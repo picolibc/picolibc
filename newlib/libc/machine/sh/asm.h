@@ -5,8 +5,19 @@
 #endif
 #define _ASM_LABEL(x)   x
 
+#if __SH5__
+# if __SH5__ == 32 && __SHMEDIA__
+#  define TEXT .section .text..SHmedia32, "ax"
+# else
+#  define TEXT .text
+# endif
+
+# define _ENTRY(name)	\
+	TEXT; .align 4; .globl name; name:
+#else
 #define _ENTRY(name)	\
 	.text; .align 2; .globl name; name:
+#endif /* __SH5__ */
 
 #define ENTRY(name)	\
 	_ENTRY(_C_LABEL(name))

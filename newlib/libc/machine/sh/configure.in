@@ -9,4 +9,11 @@ AC_CONFIG_AUX_DIR(../../../..)
 
 NEWLIB_CONFIGURE(../../..)
 
+AC_EGREP_CPP([sh5], [
+#if __SH5__
+  sh5
+#endif
+], [have_sh64=yes], [have_sh64=no])
+AM_CONDITIONAL(SH64, [test $have_sh64 = yes])
+
 AC_OUTPUT(Makefile)

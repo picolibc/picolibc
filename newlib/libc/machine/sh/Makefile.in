@@ -83,8 +83,8 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
-
-lib_a_SOURCES = memcpy.S memset.S setjmp.S strcpy.S strcmp.S
+@SH64_TRUE@lib_a_SOURCES = @SH64_TRUE@setjmp.S
+@SH64_FALSE@lib_a_SOURCES = @SH64_FALSE@memcpy.S memset.S setjmp.S strcpy.S strcmp.S
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -98,7 +98,9 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-lib_a_OBJECTS =  memcpy.o memset.o setjmp.o strcpy.o strcmp.o
+@SH64_TRUE@lib_a_OBJECTS =  setjmp.o
+@SH64_FALSE@lib_a_OBJECTS =  memcpy.o memset.o setjmp.o strcpy.o \
+@SH64_FALSE@strcmp.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)

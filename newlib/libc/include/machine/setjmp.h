@@ -93,7 +93,12 @@ typedef int jmp_buf[_JBLEN];
 #endif
 
 #ifdef  __sh__
+#if __SH5__
+#define _JBLEN 50
+#define _JBTYPE long long
+#else
 #define _JBLEN 20
+#endif /* __SH5__ */
 #endif
 
 #ifdef  __v800

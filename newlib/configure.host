@@ -150,7 +150,7 @@ case "${host_cpu}" in
   powerpc*)
 	machine_dir=powerpc
 	;;
-  sh)
+  sh | sh64)
 	machine_dir=sh
 	;;
   sparc*)
@@ -474,7 +474,7 @@ case "${host}" in
 	syscall_dir=syscalls
 	;;
   sh*-*-*)
-	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY -DWANT_PRINTF_LONG_LONG"
 	syscall_dir=syscalls
 	;;
   sparc-sun-sunos*)

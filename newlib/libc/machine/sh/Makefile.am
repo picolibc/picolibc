@@ -6,7 +6,11 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
+if SH64
+lib_a_SOURCES = setjmp.S
+else
 lib_a_SOURCES = memcpy.S memset.S setjmp.S strcpy.S strcmp.S
+endif
 
 memcpy.o: asm.h
 memset.o: asm.h

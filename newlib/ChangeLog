@@ -1,3 +1,30 @@
+2002-02-08  Alexandre Oliva  <aoliva@redhat.com>
+
+	Contribute sh64-elf.
+	2001-03-13  Alexandre Oliva  <aoliva@redhat.com>
+	* configure.host (newlib_cflags) [sh*-*-*]: Enable long long
+	support in printf.
+	2001-01-29  Alexandre Oliva  <aoliva@redhat.com>
+	* libc/machine/sh/setjmp.S [SH5]: Switch to SHmedia mode before
+	any labels.
+	2001-01-24  Alexandre Oliva  <aoliva@redhat.com>
+	* libc/sys/sh/trap.S (___trap34) [SH5]: Don't trash r2.
+	2000-12-16  Alexandre Oliva  <aoliva@redhat.com>
+	* libc/machine/sh/configure.in: Rework conditionals.
+	* libc/machine/sh/Makefile.am: Likewise.
+	* libc/machine/sh/configure, libc/machine/sh/Makefile.in: Rebuilt.
+	2000-12-01  Alexandre Oliva  <aoliva@redhat.com>
+	* configure.host: Match `sh*'.
+	* libc/include/machine/setjmp.h: Define for SH5.
+	* libc/machine/sh/configure.in: Detect SH5.
+	* libc/machine/sh/configure: Rebuilt.
+	* libc/machine/sh/Makefile.am: Use only setjmp.S for SH5.
+	* libc/machine/sh/Makefile.in: Rebuilt.
+	* libc/machine/sh/asm.h: Adjust for SH5.
+	* libc/machine/sh/setjmp.S: Implement in SHmedia.
+	* libc/sys/sh/crt0.S: Likewise.
+	* libc/sys/sh/trap.S: Likewise.
+
 2002-02-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/i386/Makefile.am: (mach_add_src): Remove.
