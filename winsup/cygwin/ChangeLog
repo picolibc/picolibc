@@ -1,3 +1,7 @@
+2000-07-04  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* security.cc (read_sd): Eliminate OemToChar.
+
 Mon Jul  4 18:57:00 2000  Corinna Vinschen  <corinna@vinschen.de>
 
 	* poll.cc: New file. Implement `poll' system call.

@@ -487,9 +487,7 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
   debug_printf("file = %s", file);
 
   DWORD len = 0;
-  char fbuf[PATH_MAX];
-  OemToChar(file, fbuf);
-  if (! GetFileSecurity (fbuf,
+  if (! GetFileSecurity (file,
                          OWNER_SECURITY_INFORMATION
                          | GROUP_SECURITY_INFORMATION
                          | DACL_SECURITY_INFORMATION,
