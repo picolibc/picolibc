@@ -1,3 +1,8 @@
+2001-11-08  Phil Edwards  <pedwards@disaster.jaj.com>
+
+	* configure.in (--enable-languages): Be more permissive about
+	syntax.  Check for empty lists better.  Warn about $LANGUAGES.
+
 2001-11-06  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* Makefile.in (MAKEINFO): Use "missing" for makeinfo older than 4.0.
