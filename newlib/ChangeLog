@@ -1,5 +1,8 @@
 2002-05-15  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
+	* testsuite/lib/newlib.exp: Add newlib_include_flags to compile
+	options when testing natively on i[3456]86-*-linux.
+
 	* testsuite/lib/checkoutput.exp (newlib_check_output): Output
 	only one pass or fail per test file.  Trim \r's from output
 	values received from test programs.  Remove support for named
