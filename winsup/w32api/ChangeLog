@@ -1,5 +1,9 @@
 2002-06-01    Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/windef.h: Fix typo in last change.
+
+2002-06-01    Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/windef.h: Add no-op __try, __except, __finally
 	defines from ...
 	* include/excpt.h: Remove file.

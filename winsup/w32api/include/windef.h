@@ -187,7 +187,7 @@ extern "C" {
 /* FIXME: This will make some code compile. The programs will most
    likely crash when an exception is raised, but at least they will
    compile. */
-#if defined (__GNUC__) && defined (__SEH_NOP)
+#if defined (__GNUC__) && defined (__SEH_NOOP)
 #define __try
 #define __except(x) if (0) /* don't execute handler */
 #define __finally
