@@ -1,3 +1,9 @@
+Fri Mar 17 18:16:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	Patch suggested by Eric Fifer <EFifer@sanwaint.com>
+        * fhandler.cc (fhandler_base::open): Call set_file_attribute()
+        only if a file is really created.
+
 Thu Mar 16 14:15:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * security.cc (set_process_privileges): Remove `static'.

@@ -340,7 +340,9 @@ fhandler_base::open (int flags, mode_t mode)
       goto done;
     }
 
-  if (flags & O_CREAT && get_device () == FH_DISK)
+  // Attributes may be set only if a file is _really_ created.
+  if (flags & O_CREAT && get_device () == FH_DISK
+      && GetLastError () != ERROR_ALREADY_EXISTS)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
   namehash_ = hash_path_name (0, get_win32_name ());
