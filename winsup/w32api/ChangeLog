@@ -1,5 +1,9 @@
 2004-04-23  Robert Wruck  <wruck@tweerlei.de>
 
+	* include/commctrl.h (LPNMLVDISPINFO): Add defines.
+
+2004-04-23  Robert Wruck  <wruck@tweerlei.de>
+
 	* include/aclui.h: New file.
 	* lib/aclui.def: New file.
 	* lib/test.c: Add aclui.h to includes.
