@@ -1,3 +1,8 @@
+2000-09-04  Egor Duda  <deo@logos-m.ru>
+
+	*  Makefile.in: Always add libltp headers directory to headers
+	search path.
+
 2000-09-02  Egor Duda  <deo@logos-m.ru>
 
 	* moved here everything from cygwin/testsuite/
