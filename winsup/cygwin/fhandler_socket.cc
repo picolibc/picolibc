@@ -30,7 +30,6 @@
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
-#include "wsock_event.h"
 #include "cygthread.h"
 #include "select.h"
 #include <unistd.h>
@@ -695,6 +694,95 @@ fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
   return res;
 }
 
+bool
+fhandler_socket::prepare (HANDLE &event, long event_mask)
+{
+  WSASetLastError (0);
+  closed (false);
+  if ((event = WSACreateEvent ()) == WSA_INVALID_EVENT)
+    {
+      debug_printf ("WSACreateEvent: %E");
+      return false;
+    }
+  if (WSAEventSelect (get_socket (), event, event_mask) == SOCKET_ERROR)
+    {
+      debug_printf ("WSAEventSelect: %E");
+      return false;
+    }
+  return true;
+}
+
+int
+fhandler_socket::wait (HANDLE event)
+{
+  int ret = SOCKET_ERROR;
+  int wsa_err = 0;
+  WSAEVENT ev[2] = { event, signal_arrived };
+  WSANETWORKEVENTS evts;
+
+  switch (WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE, FALSE))
+    {
+      case WSA_WAIT_EVENT_0:
+	if (!WSAEnumNetworkEvents (get_socket (), event, &evts))
+	  {
+	    if (!evts.lNetworkEvents)
+	      {
+	        ret = 0;
+		break;
+	      }
+	    if (evts.lNetworkEvents & FD_READ)
+	      {
+		if (evts.iErrorCode[FD_READ_BIT])
+		  wsa_err = evts.iErrorCode[FD_READ_BIT];
+		else
+		  ret = 0;
+	      }
+	    else if (evts.lNetworkEvents & FD_WRITE)
+	      {
+		if (evts.iErrorCode[FD_WRITE_BIT])
+		  wsa_err = evts.iErrorCode[FD_WRITE_BIT];
+		else
+		  ret = 0;
+	      }
+	    if (evts.lNetworkEvents & FD_CLOSE)
+	      {
+		closed (true);
+		if (!wsa_err)
+		  {
+		    if (evts.iErrorCode[FD_CLOSE_BIT])
+		      wsa_err = evts.iErrorCode[FD_CLOSE_BIT];
+		    else
+		      ret = 0;
+		  }
+	      }
+	    if (wsa_err)
+	      WSASetLastError (wsa_err);
+	  }
+	break;
+      case WSA_WAIT_EVENT_0 + 1:
+        WSASetLastError (WSAEINTR);
+	break;
+      default:
+	WSASetLastError (WSAEFAULT);
+	break;
+    }
+  return ret;
+}
+
+void
+fhandler_socket::release (HANDLE event)
+{
+  int last_err = WSAGetLastError ();
+  /* KB 168349: NT4 fails if the event parameter is not NULL. */
+  WSAEventSelect (get_socket (), NULL, 0);
+  unsigned long non_block = 0;
+  if (ioctlsocket (get_socket (), FIONBIO, &non_block))
+    debug_printf ("return to blocking failed: %d", WSAGetLastError ());
+  else
+    WSASetLastError (last_err);
+  WSACloseEvent (event);
+}
+
 int
 fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
 			ssize_t tot)
@@ -716,7 +804,7 @@ int
 fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 			   struct sockaddr *from, int *fromlen)
 {
-  int res;
+  int res = SOCKET_ERROR;
   DWORD ret;
 
   flags &= MSG_WINMASK;
@@ -728,19 +816,26 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
     {
       WSABUF wsabuf = { len, (char *) ptr };
 
-      if (is_nonblocking ())
-	res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret, (DWORD *) &flags,
-			   from, fromlen,
-			   NULL, NULL);
+      if (is_nonblocking () || closed () || async_io ())
+	res = WSARecvFrom (get_socket (), &wsabuf, 1, (ret = 0, &ret),
+			   (DWORD *) &flags, from, fromlen, NULL, NULL);
       else
 	{
-	  wsock_event wsock_evt;
-	  res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret, (DWORD *) &flags,
-			     from, fromlen,
-			     wsock_evt.prepare (), NULL);
-
-	  if (res == SOCKET_ERROR && WSAGetLastError () == WSA_IO_PENDING)
-	    ret = res = wsock_evt.wait (get_socket (), (DWORD *) &flags);
+	  HANDLE evt;
+	  if (prepare (evt, FD_CLOSE | ((flags & MSG_OOB) ? FD_OOB : FD_READ)))
+	    {
+              do
+                {
+		  res = WSARecvFrom (get_socket (), &wsabuf, 1,
+				     &ret, (DWORD *) &flags,
+				     from, fromlen, NULL, NULL);
+                }
+              while (res == SOCKET_ERROR
+                     && WSAGetLastError () == WSAEWOULDBLOCK
+		     && !closed ()
+		     && !(res = wait (evt)));
+	      release (evt);
+	    }
 	}
     }
 
@@ -778,7 +873,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
   struct sockaddr *from = (struct sockaddr *) msg->msg_name;
   int *fromlen = from ? &msg->msg_namelen : NULL;
 
-  int res;
+  int res = SOCKET_ERROR;
 
   if (!winsock2_active)
     {
@@ -845,21 +940,27 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 
       DWORD ret;
 
-      if (is_nonblocking ())
+      if (is_nonblocking () || closed () || async_io ())
 	res = WSARecvFrom (get_socket (),
-			   wsabuf, iovcnt, &ret, (DWORD *) &flags,
-			   from, fromlen,
-			   NULL, NULL);
+			   wsabuf, iovcnt, (ret = 0, &ret), (DWORD *) &flags,
+			   from, fromlen, NULL, NULL);
       else
 	{
-	  wsock_event wsock_evt;
-	  res = WSARecvFrom (get_socket (),
-			     wsabuf, iovcnt, &ret, (DWORD *) &flags,
-			     from, fromlen,
-			     wsock_evt.prepare (), NULL);
-
-	  if (res == SOCKET_ERROR && WSAGetLastError () == WSA_IO_PENDING)
-	    ret = res = wsock_evt.wait (get_socket (), (DWORD *) &flags);
+	  HANDLE evt;
+	  if (prepare (evt, FD_CLOSE | ((flags & MSG_OOB) ? FD_OOB : FD_READ)))
+	    {
+              do
+                {
+		  res = WSARecvFrom (get_socket (), wsabuf, iovcnt,
+				     &ret, (DWORD *) &flags,
+				     from, fromlen, NULL, NULL);
+                }
+              while (res == SOCKET_ERROR
+		     && WSAGetLastError () == WSAEWOULDBLOCK
+		     && !closed ()
+		     && !(res = wait (evt)));
+	      release (evt);
+	    }
 	}
 
       if (res == SOCKET_ERROR)
@@ -904,7 +1005,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
   if (to && !get_inet_addr (to, tolen, &sin, &tolen))
     return SOCKET_ERROR;
 
-  int res;
+  int res = SOCKET_ERROR;
   DWORD ret;
 
   if (!winsock2_active)
@@ -915,21 +1016,29 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
     {
       WSABUF wsabuf = { len, (char *) ptr };
 
-      if (is_nonblocking ())
-	res = WSASendTo (get_socket (), &wsabuf, 1, &ret,
+      if (is_nonblocking () || closed () || async_io ())
+	res = WSASendTo (get_socket (), &wsabuf, 1, (ret = 0, &ret),
 			 flags & MSG_WINMASK,
 			 (to ? (const struct sockaddr *) &sin : NULL), tolen,
 			 NULL, NULL);
       else
 	{
-	  wsock_event wsock_evt;
-	  res = WSASendTo (get_socket (), &wsabuf, 1, &ret,
-			   flags & MSG_WINMASK,
-			   (to ? (const struct sockaddr *) &sin : NULL), tolen,
-			   wsock_evt.prepare (), NULL);
-
-	  if (res == SOCKET_ERROR && WSAGetLastError () == WSA_IO_PENDING)
-	    ret = res = wsock_evt.wait (get_socket (), (DWORD *) &flags);
+	  HANDLE evt;
+	  if (prepare (evt, FD_CLOSE | FD_WRITE))
+	    {
+	      do 
+		{
+		  res = WSASendTo (get_socket (), &wsabuf, 1, &ret,
+				   flags & MSG_WINMASK,
+				   (to ? (const struct sockaddr *) &sin : NULL),
+				   tolen, NULL, NULL);
+		}
+	      while (res == SOCKET_ERROR
+	             && WSAGetLastError () == WSAEWOULDBLOCK
+		     && !(res = wait (evt))
+		     && !closed ());
+	      release (evt);
+	    }
 	}
     }
 
@@ -969,7 +1078,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
   struct iovec *const iov = msg->msg_iov;
   const int iovcnt = msg->msg_iovlen;
 
-  int res;
+  int res = SOCKET_ERROR;
 
   if (!winsock2_active)
     {
@@ -1038,21 +1147,28 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 
       DWORD ret;
 
-      if (is_nonblocking ())
-	res = WSASendTo (get_socket (), wsabuf, iovcnt, &ret, flags,
-			 (struct sockaddr *) msg->msg_name,
-			 msg->msg_namelen,
-			 NULL, NULL);
+      if (is_nonblocking () || closed () || async_io ())
+	res = WSASendTo (get_socket (), wsabuf, iovcnt, (ret = 0, &ret),
+			 flags, (struct sockaddr *) msg->msg_name,
+			 msg->msg_namelen, NULL, NULL);
       else
 	{
-	  wsock_event wsock_evt;
-	  res = WSASendTo (get_socket (), wsabuf, iovcnt, &ret, flags,
-			   (struct sockaddr *) msg->msg_name,
-			   msg->msg_namelen,
-			   wsock_evt.prepare (), NULL);
-
-	  if (res == SOCKET_ERROR && WSAGetLastError () == WSA_IO_PENDING)
-	    ret = res = wsock_evt.wait (get_socket (), (DWORD *) &flags);
+	  HANDLE evt;
+	  if (prepare (evt, FD_CLOSE | FD_WRITE))
+	    {
+              do
+                {
+		  res = WSASendTo (get_socket (), wsabuf, iovcnt,
+		  		   &ret, flags,
+				   (struct sockaddr *) msg->msg_name,
+				   msg->msg_namelen, NULL, NULL);
+                }
+              while (res == SOCKET_ERROR
+	             && WSAGetLastError () == WSAEWOULDBLOCK
+		     && !(res = wait (evt))
+	             && !closed ());
+	      release (evt);
+	    }
 	}
 
       if (res == SOCKET_ERROR)

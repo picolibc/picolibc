@@ -340,13 +340,18 @@ class fhandler_socket: public fhandler_base
     unsigned async_io              : 1; /* async I/O */
     unsigned saw_shutdown_read     : 1; /* Socket saw a SHUT_RD */
     unsigned saw_shutdown_write    : 1; /* Socket saw a SHUT_WR */
+    unsigned closed		   : 1;
     unsigned connect_state         : 2;
    public:
     status_flags () :
       async_io (0), saw_shutdown_read (0), saw_shutdown_write (0),
-      connect_state (unconnected)
+      closed (0), connect_state (unconnected)
       {}
   } status;
+
+  bool prepare (HANDLE &event, long event_mask);
+  int wait (HANDLE event);
+  void release (HANDLE event);
 
  public:
   fhandler_socket ();
@@ -357,6 +362,7 @@ class fhandler_socket: public fhandler_base
   IMPLEMENT_STATUS_FLAG (bool, async_io)
   IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_read)
   IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_write)
+  IMPLEMENT_STATUS_FLAG (bool, closed)
   IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
 
   int bind (const struct sockaddr *name, int namelen);

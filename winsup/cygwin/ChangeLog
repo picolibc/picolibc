@@ -1,6 +1,22 @@
-2004-05-06  Christopher Faylor  <cgf@alum.bu.edu>
+2004-05-07  Corinna Vinschen  <corinna@vinschen.de>
 
-	* 
+	Revert code reversion from 2004-04-03.  So, revert to async I/O again.
+	* fhandler.h (status): Add "closed" flag.
+	(prepare): New method declaration.
+	(wait): Ditto.
+	(release): Ditto.
+	* fhandler_socket.cc: Don't include wsock_event.h.
+	(fhandler_socket::prepare): New method, moved from wsock_event.
+	(fhandler_socket::wait): Ditto.
+	(fhandler_socket::release): New method.
+	(fhandler_socket::recvfrom): Simplify loop.
+	(fhandler_socket::recvmsg): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Ditto.
+	* net.cc: Don't include wsock_event.h.
+	(wsock_event::prepare): Remove.
+	(wsock_event::wait): Ditto.
+	* wsock_event.h: Remove.
 
 2004-05-06  Christopher Faylor  <cgf@alum.bu.edu>
 

@@ -35,7 +35,6 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "registry.h"
-#include "wsock_event.h"
 #include "cygtls.h"
 
 extern "C"
@@ -49,61 +48,6 @@ extern "C"
   int __stdcall rresvport (int *);
   int sscanf (const char *, const char *, ...);
 }				/* End of "C" section */
-
-LPWSAOVERLAPPED
-wsock_event::prepare ()
-{
-  LPWSAOVERLAPPED ret = NULL;
-
-  SetLastError (0);
-  if ((event = WSACreateEvent ()) != WSA_INVALID_EVENT)
-    {
-      memset (&ovr, 0, sizeof ovr);
-      ovr.hEvent = event;
-      ret = &ovr;
-    }
-  else if (GetLastError () == ERROR_PROC_NOT_FOUND) /* winsock2 not available */
-    WSASetLastError (0);
-
-  debug_printf ("%d = wsock_event::prepare ()", ret);
-  return ret;
-}
-
-int
-wsock_event::wait (int socket, LPDWORD flags)
-{
-  int ret = SOCKET_ERROR;
-  WSAEVENT ev[2] = { event, signal_arrived };
-  DWORD len;
-
-  switch (WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE, FALSE))
-    {
-      case WSA_WAIT_EVENT_0:
-	if (WSAGetOverlappedResult (socket, &ovr, &len, FALSE, flags))
-	  ret = (int) len;
-	break;
-      case WSA_WAIT_EVENT_0 + 1:
-	if (!CancelIo ((HANDLE) socket))
-	  {
-	    debug_printf ("CancelIo() %E, fallback to blocking io");
-	    WSAGetOverlappedResult (socket, &ovr, &len, TRUE, flags);
-	  }
-	else if (WSAGetOverlappedResult (socket, &ovr, &len, FALSE, flags)
-	         && len > 0)
-	  ret = (int) len;
-	else
-	  WSASetLastError (WSAEINTR);
-	break;
-      case WSA_WAIT_FAILED:
-	break;
-      default:			/* Should be impossible. *LOL* */
-	WSASetLastError (WSAEFAULT);
-	break;
-    }
-  WSACloseEvent (event);
-  event = NULL;
-  return ret;
-}
 
 WSADATA wsadata;
 
