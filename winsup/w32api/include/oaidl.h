@@ -79,6 +79,7 @@ extern const IID IID_IEnumVARIANT;
 extern const IID IID_ICreateErrorInfo;
 extern const IID IID_ISupportErrorInfo;
 extern const IID IID_IRecordInfo;
+extern const IID IID_ITypeMarshal;
 
 typedef enum tagSYSKIND {
 	SYS_WIN16,SYS_WIN32,SYS_MAC
@@ -601,6 +602,20 @@ DECLARE_INTERFACE_(IRecordInfo, IUnknown)
 	STDMETHOD_(PVOID,RecordCreate)(THIS) PURE;
 	STDMETHOD(RecordCreateCopy)(THIS_ PVOID,PVOID*) PURE;
 	STDMETHOD(RecordDestroy )(THIS_ PVOID) PURE;
+};
+
+EXTERN_C const IID IID_ITypeMarshal;
+#undef INTERFACE
+#define INTERFACE ITypeMarshal
+DECLARE_INTERFACE_(ITypeMarshal, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(Size)(THIS_ PVOID,DWORD,PVOID,ULONG*) PURE;
+	STDMETHOD(Marshal)(THIS_ PVOID,DWORD,PVOID,ULONG,BYTE*,ULONG*) PURE;
+	STDMETHOD(Unmarshal)(THIS_ PVOID,DWORD,ULONG,BYTE*,ULONG*) PURE;
+	STDMETHOD(Free)(THIS_ PVOID) PURE;
 };
 
 #ifdef __cplusplus
