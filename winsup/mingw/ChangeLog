@@ -1,3 +1,7 @@
+2004-07-15  "dgun"  <dgun@umpire.com>
+
+	* include/complex.h (conj): Correct typo in prototype.
+
 2004-07-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/math.h: Add pragma GCC system_header.

@@ -51,7 +51,7 @@ double __attribute__ ((const)) creal (double _Complex);
 double __attribute__ ((const)) cimag (double _Complex);
 double __attribute__ ((const)) carg (double _Complex);
 double __attribute__ ((const)) cabs (double _Complex);
-double _Complex __attribute__ ((const)) cconj (double _Complex);
+double _Complex __attribute__ ((const)) conj (double _Complex);
 double _Complex __attribute__ ((const)) cacos (double _Complex);
 double _Complex __attribute__ ((const)) casin (double _Complex);
 double _Complex __attribute__ ((const)) catan (double _Complex);
