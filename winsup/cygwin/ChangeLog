@@ -1,3 +1,19 @@
+Fri May  4 16:49:34 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.h: Correctly set __SIGOFFSET.
+
+	* path.cc (hash_path_name): Avoid calling library functions for simple
+	copying of characters.
+
+	* shortcut.c: Use WIN32_LEAN_AND_MEAN.
+	* smallprint.c: Ditto.
+
+	* environ.cc (getwinenv): Minor clarity fix.
+
+	* localtime.c: No need to include windows.h
+
+	* string.h: New file.
+
 Fri May  4 16:37:30 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (ctrl_c_handler): Always send signal to process if it

@@ -632,11 +632,11 @@ bool
 sigthread::get_winapi_lock (int test)
 {
   if (test)
-    return !ilockexch (&winapi_lock, 1);
+    return !InterlockedExchange (&winapi_lock, 1);
 
   /* Need to do a busy loop because we can't block or a potential SuspendThread
      will hang. */
-  while (ilockexch (&winapi_lock, 1))
+  while (InterlockedExchange (&winapi_lock, 1))
     Sleep (1);
   return 1;
 }
@@ -645,7 +645,7 @@ void
 sigthread::release_winapi_lock ()
 {
   /* Assumes that we have the lock. */
-  ilockexch (&winapi_lock, 0);
+  InterlockedExchange (&winapi_lock, 0);
 }
 
 static void __stdcall interrupt_setup (int sig, void *handler, DWORD retaddr,

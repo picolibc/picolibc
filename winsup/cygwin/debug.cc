@@ -87,7 +87,7 @@ thread_stub (VOID *arg)
   exception_list except_entry;
 
   /* Give up our slot in the start_buf array */
-  (void) ilockexch (&((thread_start *) arg)->notavail, 0);
+  (void) InterlockedExchange (&((thread_start *) arg)->notavail, 0);
 
   /* Initialize this thread's ability to respond to things like
      SIGSEGV or SIGFPE. */
@@ -112,7 +112,7 @@ makethread (LPTHREAD_START_ROUTINE start, LPVOID param, DWORD flags,
     {
       /* Search the start_buf array for an empty slot to use */
       for (info = start_buf; info < start_buf + NTHREADS; info++)
-	if (!ilockexch (&info->notavail, 1))
+	if (!InterlockedExchange (&info->notavail, 1))
 	  goto out;
 
       /* Should never hit here, but be defensive anyway. */

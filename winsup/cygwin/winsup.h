@@ -14,8 +14,6 @@ details. */
 
 #define __INSIDE_CYGWIN__
 
-#include "interlock.h"
-
 #define alloca __builtin_alloca
 #define strlen __builtin_strlen
 #define strcmp __builtin_strcmp
@@ -34,7 +32,6 @@ details. */
 
 #include <sys/types.h>
 #include <sys/strace.h>
-
 
 extern char case_folded_lower[];
 #define cyg_tolower(c) (case_folded_lower[(unsigned char)(c)])

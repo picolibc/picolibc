@@ -473,7 +473,7 @@ proc_terminate (void)
 void __stdcall
 sig_clear (int sig)
 {
-  (void) ilockexch (myself->getsigtodo (sig), 0L);
+  (void) InterlockedExchange (myself->getsigtodo (sig), 0L);
   return;
 }
 
@@ -696,7 +696,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 
   /* Increment the sigtodo array to signify which signal to assert.
    */
-  (void) ilockincr (p->getsigtodo (sig));
+  (void) InterlockedIncrement (p->getsigtodo (sig));
 
   /* Notify the process that a signal has arrived.
    */
@@ -783,7 +783,7 @@ out:
 void __stdcall
 sig_set_pending (int sig)
 {
-  (void) ilockincr (myself->getsigtodo (sig));
+  (void) InterlockedIncrement (myself->getsigtodo (sig));
   return;
 }
 
@@ -1137,7 +1137,7 @@ wait_sig (VOID *)
       int dispatched_sigchld = 0;
       for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
 	{
-	  while (ilockdecr (myself->getsigtodo (sig)) >= 0)
+	  while (InterlockedDecrement (myself->getsigtodo (sig)) >= 0)
 	    {
 	      if (sig == SIGCHLD)
 		saw_sigchld = 1;
@@ -1171,14 +1171,14 @@ wait_sig (VOID *)
 		    dispatched_sigchld = 1;
 		  /* Need to decrement again to offset increment below since
 		     we really do want to decrement in this case. */
-		  ilockdecr (myself->getsigtodo (sig));
+		  InterlockedDecrement (myself->getsigtodo (sig));
 		  goto nextsig;		/* FIXME: shouldn't this allow the loop to continue? */
 		}
 	    }
 
 	nextsig:
 	  /* Decremented too far. */
-	  if (ilockincr (myself->getsigtodo (sig)) > 0)
+	  if (InterlockedIncrement (myself->getsigtodo (sig)) > 0)
 	    saw_pending_signals = 1;
 	}
 

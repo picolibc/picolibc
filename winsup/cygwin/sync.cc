@@ -58,7 +58,7 @@ muto::~muto ()
    be handled correctly.
 
    Note: The goal here is to minimize, as much as possible, calls to the
-   OS.  Hence the use of ilockincr, etc., rather than (much) more
+   OS.  Hence the use of InterlockedIncrement, etc., rather than (much) more
    expensive OS mutexes.  */
 int
 muto::acquire (DWORD ms)
@@ -69,7 +69,7 @@ muto::acquire (DWORD ms)
     {
       /* Increment the waiters part of the class.  Need to do this first to
 	 avoid potential races. */
-      LONG was_waiting = ilockincr (&waiters);
+      LONG was_waiting = InterlockedIncrement (&waiters);
 
       /* This is deceptively simple.  Basically, it allows multiple attempts to
 	 lock the same muto to succeed without attempting to manipulate sync.
@@ -82,7 +82,7 @@ muto::acquire (DWORD ms)
 	 case, it is possible for a thread which is going to wait for bruteforce
 	 to wake up immediately.  It will then attempt to grab sync but will fail
 	 and go back to waiting.  */
-      while (tid != this_tid && (was_waiting || ilockexch (&sync, 1) != 0))
+      while (tid != this_tid && (was_waiting || InterlockedExchange (&sync, 1) != 0))
 	{
 	  switch (WaitForSingleObject (bruteforce, ms))
 	      {
@@ -90,7 +90,7 @@ muto::acquire (DWORD ms)
 		goto gotit;
 		break;
 	      default:
-		ilockdecr (&waiters);
+		InterlockedDecrement (&waiters);
 		return 0;	/* failed. */
 	      }
 	}
@@ -117,11 +117,11 @@ muto::release ()
   if (!--visits)
     {
       tid = 0;		/* We were the last unlocker. */
-      (void) ilockexch (&sync, 0); /* Reset trigger. */
+      (void) InterlockedExchange (&sync, 0); /* Reset trigger. */
       /* This thread had incremented waiters but had never decremented it.
 	 Decrement it now.  If it is >= 0 then there are possibly other
 	 threads waiting for the lock, so trigger bruteforce. */
-      if (ilockdecr (&waiters) >= 0)
+      if (InterlockedDecrement (&waiters) >= 0)
 	(void) SetEvent (bruteforce); /* Wake up one of the waiting threads */
     }
 
@@ -133,7 +133,7 @@ void
 muto::reset ()
 {
   visits = sync = tid = 0;
-  ilockexch (&waiters, -1);
+  InterlockedExchange (&waiters, -1);
   if (bruteforce)
     {
       CloseHandle (bruteforce);
