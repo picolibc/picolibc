@@ -1,5 +1,9 @@
 2002-01-07  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* Change reference to Cygnus Solutions to be Red Hat.
+
+2002-01-07  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* COPYING.NEWLIB: Update generic copyright date.
 
 2002-01-07  Mark Salter  <msalter@redhat.com>
