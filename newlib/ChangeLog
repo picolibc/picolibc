@@ -1,5 +1,10 @@
 2004-09-16  Antony King  <antony.king@st.com>
 
+	* libc/stdio64/freopen64.c: Remove casting of fp lock to
+	_LOCK_RECURSIVE_T.
+
+2004-09-16  Antony King  <antony.king@st.com>
+
 	* libc/time/tzlock.c: Add default stubs that use generic
 	locking code.
 
