@@ -91,6 +91,73 @@ get_inet_addr (const struct sockaddr *in, int inlen,
     }
 }
 
+class sock_event
+{
+  WSAEVENT ev[2];
+  SOCKET evt_sock;
+  int evt_type_bit;
+
+public:
+  sock_event ()
+    {
+      ev[0] = WSA_INVALID_EVENT;
+      ev[1] = signal_arrived;
+    }
+  bool load (SOCKET sock, int type_bit)
+    {
+      if ((ev[0] = WSACreateEvent ()) == WSA_INVALID_EVENT)
+        return false;
+      evt_sock = sock;
+      evt_type_bit = type_bit;
+      if (WSAEventSelect (evt_sock, ev[0], 1 << evt_type_bit))
+        {
+	  WSACloseEvent (ev[0]);
+	  ev[0] = WSA_INVALID_EVENT;
+	  return false;
+	}
+      return true;
+    }
+  int wait ()
+    {
+      WSANETWORKEVENTS sock_event;
+      int wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
+						  FALSE);
+      if (wait_result == WSA_WAIT_EVENT_0)
+        WSAEnumNetworkEvents (evt_sock, ev[0], &sock_event);
+
+      /* Cleanup,  Revert to blocking. */
+      WSAEventSelect (evt_sock, ev[0], 0);
+      WSACloseEvent (ev[0]);
+      unsigned long nonblocking = 0;
+      ioctlsocket (evt_sock, FIONBIO, &nonblocking);
+
+      switch (wait_result)
+        {
+	  case WSA_WAIT_EVENT_0:
+	    if ((sock_event.lNetworkEvents & (1 << evt_type_bit))
+	        && sock_event.iErrorCode[evt_type_bit])
+	      {
+	        WSASetLastError (sock_event.iErrorCode[evt_type_bit]);
+		set_winsock_errno ();
+		return -1;
+	      }
+	    break;
+
+	  case WSA_WAIT_EVENT_0 + 1:
+	    debug_printf ("signal received");
+	    set_errno (EINTR);
+	    return 1;
+
+	  case WSA_WAIT_FAILED:
+	  default:
+	    WSASetLastError (WSAEFAULT);
+	    set_winsock_errno ();
+	    return -1;
+	}
+      return 0;
+    }
+};
+
 /**********************************************************************/
 /* fhandler_socket */
 
@@ -431,6 +498,8 @@ out:
 int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
+  sock_event evt;
+  BOOL interrupted = FALSE;
   int res = -1;
   BOOL secret_check_failed = FALSE;
   BOOL in_progress = FALSE;
@@ -440,12 +509,36 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
 
+  if (!is_nonblocking () && !is_connect_pending ())
+    if (!evt.load (get_socket (), FD_CONNECT_BIT))
+      {
+	set_winsock_errno ();
+	return -1;
+      }
+
   res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
+
+  if (res && !is_nonblocking () && !is_connect_pending () &&
+      WSAGetLastError () == WSAEWOULDBLOCK)
+    switch (evt.wait ())
+      {
+	case 1: /* Signal */
+	  WSASetLastError (WSAEINPROGRESS);
+	  interrupted = TRUE;
+	  break;
+	case 0:
+	  res = 0;
+	  break;
+	default:
+	  res = -1;
+	  break;
+      }
+
   if (res)
     {
       /* Special handling for connect to return the correct error code
 	 when called on a non-blocking socket. */
-      if (is_nonblocking ())
+      if (is_nonblocking () || is_connect_pending ())
 	{
 	  DWORD err = WSAGetLastError ();
 	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
@@ -493,6 +586,10 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
     set_connect_state (CONNECT_PENDING);
   else
     set_connect_state (CONNECTED);
+
+  if (interrupted)
+    set_errno (EINTR);
+
   return res;
 }
 
@@ -511,7 +608,6 @@ int
 fhandler_socket::accept (struct sockaddr *peer, int *len)
 {
   int res = -1;
-  WSAEVENT ev[2] = { WSA_INVALID_EVENT, signal_arrived };
   BOOL secret_check_failed = FALSE;
   BOOL in_progress = FALSE;
 
@@ -535,65 +631,31 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 
   if (!is_nonblocking ())
     {
-      ev[0] = WSACreateEvent ();
-
-      if (ev[0] != WSA_INVALID_EVENT &&
-	  !WSAEventSelect (get_socket (), ev[0], FD_ACCEPT))
-	{
-	  WSANETWORKEVENTS sock_event;
-	  int wait_result;
-
-	  wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
-						  FALSE);
-	  if (wait_result == WSA_WAIT_EVENT_0)
-	    WSAEnumNetworkEvents (get_socket (), ev[0], &sock_event);
-
-	  /* Unset events for listening socket and
-	     switch back to blocking mode */
-	  WSAEventSelect (get_socket (), ev[0], 0);
-	  unsigned long nonblocking = 0;
-	  ioctlsocket (get_socket (), FIONBIO, &nonblocking);
-
-	  switch (wait_result)
-	    {
-	    case WSA_WAIT_EVENT_0:
-	      if (sock_event.lNetworkEvents & FD_ACCEPT)
-		{
-		  if (sock_event.iErrorCode[FD_ACCEPT_BIT])
-		    {
-		      WSASetLastError (sock_event.iErrorCode[FD_ACCEPT_BIT]);
-		      set_winsock_errno ();
-		      res = -1;
-		      goto done;
-		    }
-		}
-	      /* else; : Should never happen since FD_ACCEPT is the only event
-		 that has been selected */
-	      break;
-	    case WSA_WAIT_EVENT_0 + 1:
-	      debug_printf ("signal received during accept");
-	      set_errno (EINTR);
-	      res = -1;
-	      goto done;
-	    case WSA_WAIT_FAILED:
-	    default: /* Should never happen */
-	      WSASetLastError (WSAEFAULT);
-	      set_winsock_errno ();
-	      res = -1;
-	      goto done;
-	    }
+      sock_event evt;
+      if (!evt.load (get_socket (), FD_ACCEPT_BIT))
+        {
+	  set_winsock_errno ();
+	  return -1;
+	}
+      switch (evt.wait ())
+        {
+	  case 1: /* Signal */
+	    return -1;
+	  case 0:
+	    break;
+	  case -1:
+	    return -1;
 	}
     }
 
   res = ::accept (get_socket (), peer, len);
 
-  if ((SOCKET) res == (SOCKET) INVALID_SOCKET &&
-      WSAGetLastError () == WSAEWOULDBLOCK)
+  if ((SOCKET) res == INVALID_SOCKET && WSAGetLastError () == WSAEWOULDBLOCK)
     in_progress = TRUE;
 
   if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
     {
-      if ((SOCKET) res != (SOCKET) INVALID_SOCKET || in_progress)
+      if ((SOCKET) res != INVALID_SOCKET || in_progress)
 	{
 	  if (!create_secret_event ())
 	    secret_check_failed = TRUE;
@@ -602,7 +664,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	}
 
       if (!secret_check_failed &&
-	  (SOCKET) res != (SOCKET) INVALID_SOCKET)
+	  (SOCKET) res != INVALID_SOCKET)
 	{
 	  if (!check_peer_secret_event ((struct sockaddr_in*) peer))
 	    {
@@ -614,15 +676,14 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
       if (secret_check_failed)
 	{
 	  close_secret_event ();
-	  if ((SOCKET) res != (SOCKET) INVALID_SOCKET)
+	  if ((SOCKET) res != INVALID_SOCKET)
 	    closesocket (res);
 	  set_errno (ECONNABORTED);
-	  res = -1;
-	  goto done;
+	  return -1;
 	}
     }
 
-  if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
+  if ((SOCKET) res == INVALID_SOCKET)
     set_winsock_errno ();
   else
     {
@@ -645,10 +706,6 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	  res = -1;
 	}
     }
-
-done:
-  if (ev[0] != WSA_INVALID_EVENT)
-    WSACloseEvent (ev[0]);
 
   return res;
 }

@@ -1,3 +1,16 @@
+2003-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (class sock_event): New class managing Winsock
+	events for interruptible socket calls.
+	(fhandler_socket::connect): Move support for interruptible call to
+	class sock_event.  Use class object instead.
+	(fhandler_socket::accept): Ditto.  Remove useless casts.
+
+2003-03-27  Thomas Pfaff  <tpfaff@gmx.net>   
+
+	* fhandler_socket.cc (fhandler_socket::connect): Add support for
+	an interruptable connect.
+
 2003-02-27  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* uinfo.cc (internal_getlogin): Only update user.groups.pgsid
