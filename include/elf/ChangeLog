@@ -1,3 +1,8 @@
+2003-04-22  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+
+	* common.h: Replace references to Mitsubishi M32R with
+	references to Renesas M32R.
+
 2003-04-15  Rohit Kumar Srivastava <rohits@kpitcummins.com>
 
 	* common.h: Replace occurrances of 'Hitachi' with 'Renesas'.

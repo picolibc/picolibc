@@ -172,7 +172,7 @@
 #define EM_D10V		 85	/* Mitsubishi D10V */
 #define EM_D30V		 86	/* Mitsubishi D30V */
 #define EM_V850		 87	/* NEC v850 */
-#define EM_M32R		 88	/* Mitsubishi M32R */
+#define EM_M32R		 88	/* Renesas M32R (formerly Mitsubishi M32R) */
 #define EM_MN10300	 89	/* Matsushita MN10300 */
 #define EM_MN10200	 90	/* Matsushita MN10200 */
 #define EM_PJ		 91	/* picoJava */
