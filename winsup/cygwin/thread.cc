@@ -397,7 +397,7 @@ pthread::exit (void *value_ptr)
 
   mutex.Lock ();
   // cleanup if thread is in detached state and not joined
-  if (__pthread_equal (&joiner, &thread))
+  if (pthread_equal (joiner, thread))
     delete this;
   else
     {
@@ -428,7 +428,7 @@ pthread::cancel (void)
       return 0;
     }
 
-  else if (__pthread_equal (&thread, &self))
+  else if (pthread_equal (thread, self))
     {
       mutex.UnLock ();
       cancel_self ();
@@ -1525,7 +1525,7 @@ pthread_mutex::canBeUnlocked (pthread_mutex_t const *mutex)
   /*
    * Check if the mutex is owned by the current thread and can be unlocked
    */
-  return (__pthread_equal (&(*mutex)->owner, &self)) && 1 == (*mutex)->recursion_counter;
+  return (pthread_equal ((*mutex)->owner, self)) && 1 == (*mutex)->recursion_counter;
 }
 
 /* This is used for mutex creation protection within a single process only */
@@ -1598,7 +1598,7 @@ pthread_mutex::_Lock (pthread_t self)
 
   if (1 == InterlockedIncrement ((long *)&lock_counter))
     SetOwner (self);
-  else if (PTHREAD_MUTEX_NORMAL != type && __pthread_equal (&owner, &self))
+  else if (PTHREAD_MUTEX_NORMAL != type && pthread_equal (owner, self))
     {
       InterlockedDecrement ((long *) &lock_counter);
       if (PTHREAD_MUTEX_RECURSIVE == type)
@@ -1622,7 +1622,7 @@ pthread_mutex::_TryLock (pthread_t self)
 
   if (0 == InterlockedCompareExchange ((long *)&lock_counter, 1, 0 ))
     SetOwner (self);
-  else if (PTHREAD_MUTEX_RECURSIVE == type && __pthread_equal (&owner, &self))
+  else if (PTHREAD_MUTEX_RECURSIVE == type && pthread_equal (owner, self))
     result = LockRecursive ();
   else
     result = EBUSY;
@@ -1633,7 +1633,7 @@ pthread_mutex::_TryLock (pthread_t self)
 int
 pthread_mutex::_UnLock (pthread_t self)
 {
-  if (!__pthread_equal (&owner, &self))
+  if (!pthread_equal (owner, self))
     return EPERM;
 
   if (0 == --recursion_counter)
@@ -2063,8 +2063,8 @@ pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void
   return 0;
 }
 
-int
-__pthread_attr_init (pthread_attr_t *attr)
+extern "C" int
+pthread_attr_init (pthread_attr_t *attr)
 {
   if (check_valid_pointer (attr))
     return EINVAL;
@@ -2078,8 +2078,8 @@ __pthread_attr_init (pthread_attr_t *attr)
   return 0;
 }
 
-int
-__pthread_attr_getinheritsched (const pthread_attr_t *attr,
+extern "C" int
+pthread_attr_getinheritsched (const pthread_attr_t *attr,
 				int *inheritsched)
 {
   if (!pthread_attr::isGoodObject (attr))
@@ -2088,8 +2088,8 @@ __pthread_attr_getinheritsched (const pthread_attr_t *attr,
   return 0;
 }
 
-int
-__pthread_attr_getschedparam (const pthread_attr_t *attr,
+extern "C" int
+pthread_attr_getschedparam (const pthread_attr_t *attr,
 			      struct sched_param *param)
 {
   if (!pthread_attr::isGoodObject (attr))
@@ -2101,8 +2101,8 @@ __pthread_attr_getschedparam (const pthread_attr_t *attr,
 /* From a pure code point of view, this should call a helper in sched.cc,
    to allow for someone adding scheduler policy changes to win32 in the future.
    However that's extremely unlikely, so short and sweet will do us */
-int
-__pthread_attr_getschedpolicy (const pthread_attr_t *attr, int *policy)
+extern "C" int
+pthread_attr_getschedpolicy (const pthread_attr_t *attr, int *policy)
 {
   if (!pthread_attr::isGoodObject (attr))
     return EINVAL;
@@ -2111,8 +2111,8 @@ __pthread_attr_getschedpolicy (const pthread_attr_t *attr, int *policy)
 }
 
 
-int
-__pthread_attr_getscope (const pthread_attr_t *attr, int *contentionscope)
+extern "C" int
+pthread_attr_getscope (const pthread_attr_t *attr, int *contentionscope)
 {
   if (!pthread_attr::isGoodObject (attr))
     return EINVAL;
@@ -2120,8 +2120,8 @@ __pthread_attr_getscope (const pthread_attr_t *attr, int *contentionscope)
   return 0;
 }
 
-int
-__pthread_attr_setdetachstate (pthread_attr_t *attr, int detachstate)
+extern "C" int
+pthread_attr_setdetachstate (pthread_attr_t *attr, int detachstate)
 {
   if (!pthread_attr::isGoodObject (attr))
     return EINVAL;
@@ -2131,8 +2131,8 @@ __pthread_attr_setdetachstate (pthread_attr_t *attr, int detachstate)
   return 0;
 }
 
-int
-__pthread_attr_getdetachstate (const pthread_attr_t *attr, int *detachstate)
+extern "C" int
+pthread_attr_getdetachstate (const pthread_attr_t *attr, int *detachstate)
 {
   if (!pthread_attr::isGoodObject (attr))
     return EINVAL;
@@ -2140,8 +2140,8 @@ __pthread_attr_getdetachstate (const pthread_attr_t *attr, int *detachstate)
   return 0;
 }
 
-int
-__pthread_attr_setinheritsched (pthread_attr_t *attr, int inheritsched)
+extern "C" int
+pthread_attr_setinheritsched (pthread_attr_t *attr, int inheritsched)
 {
   if (!pthread_attr::isGoodObject (attr))
     return EINVAL;
@@ -2152,8 +2152,8 @@ __pthread_attr_setinheritsched (pthread_attr_t *attr, int inheritsched)
   return 0;
 }
 
-int
-__pthread_attr_setschedparam (pthread_attr_t *attr,
+extern "C" int
+pthread_attr_setschedparam (pthread_attr_t *attr,
 			      const struct sched_param *param)
 {
   if (!pthread_attr::isGoodObject (attr))
@@ -2165,8 +2165,8 @@ __pthread_attr_setschedparam (pthread_attr_t *attr,
 }
 
 /* See __pthread_attr_getschedpolicy for some notes */
-int
-__pthread_attr_setschedpolicy (pthread_attr_t *attr, int policy)
+extern "C" int
+pthread_attr_setschedpolicy (pthread_attr_t *attr, int policy)
 {
   if (!pthread_attr::isGoodObject (attr))
     return EINVAL;
@@ -2175,8 +2175,8 @@ __pthread_attr_setschedpolicy (pthread_attr_t *attr, int policy)
   return 0;
 }
 
-int
-__pthread_attr_setscope (pthread_attr_t *attr, int contentionscope)
+extern "C" int
+pthread_attr_setscope (pthread_attr_t *attr, int contentionscope)
 {
   if (!pthread_attr::isGoodObject (attr))
     return EINVAL;
@@ -2191,8 +2191,8 @@ __pthread_attr_setscope (pthread_attr_t *attr, int contentionscope)
   return 0;
 }
 
-int
-__pthread_attr_setstacksize (pthread_attr_t *attr, size_t size)
+extern "C" int
+pthread_attr_setstacksize (pthread_attr_t *attr, size_t size)
 {
   if (!pthread_attr::isGoodObject (attr))
     return EINVAL;
@@ -2200,8 +2200,8 @@ __pthread_attr_setstacksize (pthread_attr_t *attr, size_t size)
   return 0;
 }
 
-int
-__pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *size)
+extern "C" int
+pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *size)
 {
   if (!pthread_attr::isGoodObject (attr))
     return EINVAL;
@@ -2209,8 +2209,8 @@ __pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *size)
   return 0;
 }
 
-int
-__pthread_attr_destroy (pthread_attr_t *attr)
+extern "C" int
+pthread_attr_destroy (pthread_attr_t *attr)
 {
   if (!pthread_attr::isGoodObject (attr))
     return EINVAL;
@@ -2236,7 +2236,7 @@ pthread::join (pthread_t *thread, void **return_val)
   if (!isGoodObject (thread))
     return ESRCH;
 
-  if (__pthread_equal (thread,&joiner))
+  if (pthread_equal (*thread,joiner))
     return EDEADLK;
 
   (*thread)->mutex.Lock ();
@@ -2338,15 +2338,15 @@ pthread::resume (pthread_t *thread)
 /* provided for source level compatability.
    See http://www.opengroup.org/onlinepubs/007908799/xsh/pthread_getconcurrency.html
 */
-int
-__pthread_getconcurrency (void)
+extern "C" int
+pthread_getconcurrency (void)
 {
   return MT_INTERFACE->concurrency;
 }
 
 /* keep this in sync with sched.cc */
-int
-__pthread_getschedparam (pthread_t thread, int *policy,
+extern "C" int
+pthread_getschedparam (pthread_t thread, int *policy,
 			 struct sched_param *param)
 {
   if (!pthread::isGoodObject (&thread))
@@ -2359,8 +2359,8 @@ __pthread_getschedparam (pthread_t thread, int *policy,
 }
 
 /* Thread SpecificData */
-int
-__pthread_key_create (pthread_key_t *key, void (*destructor) (void *))
+extern "C" int
+pthread_key_create (pthread_key_t *key, void (*destructor) (void *))
 {
   /* The opengroup docs don't define if we should check this or not,
      but creation is relatively rare.  */
@@ -2378,8 +2378,8 @@ __pthread_key_create (pthread_key_t *key, void (*destructor) (void *))
   return 0;
 }
 
-int
-__pthread_key_delete (pthread_key_t key)
+extern "C" int
+pthread_key_delete (pthread_key_t key)
 {
   if (!pthread_key::isGoodObject (&key))
     return EINVAL;
@@ -2391,8 +2391,8 @@ __pthread_key_delete (pthread_key_t key)
 /* provided for source level compatability.  See
 http://www.opengroup.org/onlinepubs/007908799/xsh/pthread_getconcurrency.html
 */
-int
-__pthread_setconcurrency (int new_level)
+extern "C" int
+pthread_setconcurrency (int new_level)
 {
   if (new_level < 0)
     return EINVAL;
@@ -2401,8 +2401,8 @@ __pthread_setconcurrency (int new_level)
 }
 
 /* keep syncronised with sched.cc */
-int
-__pthread_setschedparam (pthread_t thread, int policy,
+extern "C" int
+pthread_setschedparam (pthread_t thread, int policy,
 			 const struct sched_param *param)
 {
   if (!pthread::isGoodObject (&thread))
@@ -2419,8 +2419,8 @@ __pthread_setschedparam (pthread_t thread, int policy,
 }
 
 
-int
-__pthread_setspecific (pthread_key_t key, const void *value)
+extern "C" int
+pthread_setspecific (pthread_key_t key, const void *value)
 {
   if (!pthread_key::isGoodObject (&key))
     return EINVAL;
@@ -2428,8 +2428,8 @@ __pthread_setspecific (pthread_key_t key, const void *value)
   return 0;
 }
 
-void *
-__pthread_getspecific (pthread_key_t key)
+extern "C" void *
+pthread_getspecific (pthread_key_t key)
 {
   if (!pthread_key::isGoodObject (&key))
     return NULL;
@@ -2472,8 +2472,8 @@ pthread_cond::isGoodInitializerOrBadObject (pthread_cond_t const *cond)
   return true;
 }
 
-int
-__pthread_cond_destroy (pthread_cond_t *cond)
+extern "C" int
+pthread_cond_destroy (pthread_cond_t *cond)
 {
   if (pthread_cond::isGoodInitializer (cond))
     return 0;
@@ -2516,8 +2516,8 @@ pthread_cond::init (pthread_cond_t *cond, const pthread_condattr_t *attr)
   return 0;
 }
 
-int
-__pthread_cond_broadcast (pthread_cond_t *cond)
+extern "C" int
+pthread_cond_broadcast (pthread_cond_t *cond)
 {
   if (pthread_cond::isGoodInitializer (cond))
     return 0;
@@ -2529,8 +2529,8 @@ __pthread_cond_broadcast (pthread_cond_t *cond)
   return 0;
 }
 
-int
-__pthread_cond_signal (pthread_cond_t *cond)
+extern "C" int
+pthread_cond_signal (pthread_cond_t *cond)
 {
   if (pthread_cond::isGoodInitializer (cond))
     return 0;
@@ -2587,8 +2587,8 @@ pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
   return __pthread_cond_dowait (cond, mutex, INFINITE);
 }
 
-int
-__pthread_condattr_init (pthread_condattr_t *condattr)
+extern "C" int
+pthread_condattr_init (pthread_condattr_t *condattr)
 {
   if (check_valid_pointer (condattr))
     return EINVAL;
@@ -2602,8 +2602,8 @@ __pthread_condattr_init (pthread_condattr_t *condattr)
   return 0;
 }
 
-int
-__pthread_condattr_getpshared (const pthread_condattr_t *attr, int *pshared)
+extern "C" int
+pthread_condattr_getpshared (const pthread_condattr_t *attr, int *pshared)
 {
   if (!pthread_condattr::isGoodObject (attr))
     return EINVAL;
@@ -2611,8 +2611,8 @@ __pthread_condattr_getpshared (const pthread_condattr_t *attr, int *pshared)
   return 0;
 }
 
-int
-__pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
+extern "C" int
+pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
 {
   if (!pthread_condattr::isGoodObject (attr))
     return EINVAL;
@@ -2625,8 +2625,8 @@ __pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
   return 0;
 }
 
-int
-__pthread_condattr_destroy (pthread_condattr_t *condattr)
+extern "C" int
+pthread_condattr_destroy (pthread_condattr_t *condattr)
 {
   if (!pthread_condattr::isGoodObject (condattr))
     return EINVAL;
@@ -2669,8 +2669,8 @@ pthread_rwlock::isGoodInitializerOrBadObject (pthread_rwlock_t const *rwlock)
   return true;
 }
 
-int
-__pthread_rwlock_destroy (pthread_rwlock_t *rwlock)
+extern "C" int
+pthread_rwlock_destroy (pthread_rwlock_t *rwlock)
 {
   if (pthread_rwlock::isGoodInitializer (rwlock))
     return 0;
@@ -2713,8 +2713,8 @@ pthread_rwlock::init (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr
   return 0;
 }
 
-int
-__pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
+extern "C" int
+pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
 {
   pthread_testcancel ();
 
@@ -2726,8 +2726,8 @@ __pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
   return (*rwlock)->RdLock ();
 }
 
-int
-__pthread_rwlock_tryrdlock (pthread_rwlock_t *rwlock)
+extern "C" int
+pthread_rwlock_tryrdlock (pthread_rwlock_t *rwlock)
 {
   if (pthread_rwlock::isGoodInitializer (rwlock))
     pthread_rwlock::init (rwlock, NULL);
@@ -2737,8 +2737,8 @@ __pthread_rwlock_tryrdlock (pthread_rwlock_t *rwlock)
   return (*rwlock)->TryRdLock ();
 }
 
-int
-__pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
+extern "C" int
+pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
 {
   pthread_testcancel ();
 
@@ -2750,8 +2750,8 @@ __pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
   return (*rwlock)->WrLock ();
 }
 
-int
-__pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock)
+extern "C" int
+pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock)
 {
   if (pthread_rwlock::isGoodInitializer (rwlock))
     pthread_rwlock::init (rwlock, NULL);
@@ -2761,8 +2761,8 @@ __pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock)
   return (*rwlock)->TryWrLock ();
 }
 
-int
-__pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
+extern "C" int
+pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
 {
   if (pthread_rwlock::isGoodInitializer (rwlock))
     return 0;
@@ -2772,8 +2772,8 @@ __pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
   return (*rwlock)->UnLock ();
 }
 
-int
-__pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
+extern "C" int
+pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
 {
   if (check_valid_pointer (rwlockattr))
     return EINVAL;
@@ -2787,8 +2787,8 @@ __pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
   return 0;
 }
 
-int
-__pthread_rwlockattr_getpshared (const pthread_rwlockattr_t *attr, int *pshared)
+extern "C" int
+pthread_rwlockattr_getpshared (const pthread_rwlockattr_t *attr, int *pshared)
 {
   if (!pthread_rwlockattr::isGoodObject (attr))
     return EINVAL;
@@ -2796,8 +2796,8 @@ __pthread_rwlockattr_getpshared (const pthread_rwlockattr_t *attr, int *pshared)
   return 0;
 }
 
-int
-__pthread_rwlockattr_setpshared (pthread_rwlockattr_t *attr, int pshared)
+extern "C" int
+pthread_rwlockattr_setpshared (pthread_rwlockattr_t *attr, int pshared)
 {
   if (!pthread_rwlockattr::isGoodObject (attr))
     return EINVAL;
@@ -2810,8 +2810,8 @@ __pthread_rwlockattr_setpshared (pthread_rwlockattr_t *attr, int pshared)
   return 0;
 }
 
-int
-__pthread_rwlockattr_destroy (pthread_rwlockattr_t *rwlockattr)
+extern "C" int
+pthread_rwlockattr_destroy (pthread_rwlockattr_t *rwlockattr)
 {
   if (!pthread_rwlockattr::isGoodObject (rwlockattr))
     return EINVAL;
@@ -2821,8 +2821,8 @@ __pthread_rwlockattr_destroy (pthread_rwlockattr_t *rwlockattr)
 }
 
 /* Thread signal */
-int
-__pthread_kill (pthread_t thread, int sig)
+extern "C" int
+pthread_kill (pthread_t thread, int sig)
 {
   // lock myself, for the use of thread2signal
   // two different kills might clash: FIXME
@@ -2839,8 +2839,8 @@ __pthread_kill (pthread_t thread, int sig)
   return rval;
 }
 
-int
-__pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
+extern "C" int
+pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 {
   pthread *thread = pthread::self ();
 
@@ -2860,9 +2860,9 @@ __pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 /* ID */
 
 int
-__pthread_equal (pthread_t *t1, pthread_t *t2)
+pthread_equal (pthread_t t1, pthread_t t2)
 {
-  return (*t1 == *t2);
+  return t1 == t2;
 }
 
 /* Mutexes  */
@@ -2902,8 +2902,8 @@ pthread_mutex::init (pthread_mutex_t *mutex,
   return 0;
 }
 
-int
-__pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
+extern "C" int
+pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
 				int *prioceiling)
 {
   pthread_mutex_t *themutex = (pthread_mutex_t *) mutex;
@@ -2922,7 +2922,7 @@ __pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
 }
 
 int
-__pthread_mutex_lock (pthread_mutex_t *mutex)
+pthread_mutex_lock (pthread_mutex_t *mutex)
 {
   pthread_mutex_t *themutex = mutex;
   /* This could be simplified via isGoodInitializerOrObject
@@ -2949,8 +2949,8 @@ __pthread_mutex_lock (pthread_mutex_t *mutex)
   return (*themutex)->Lock ();
 }
 
-int
-__pthread_mutex_trylock (pthread_mutex_t *mutex)
+extern "C" int
+pthread_mutex_trylock (pthread_mutex_t *mutex)
 {
   pthread_mutex_t *themutex = mutex;
   if (pthread_mutex::isGoodInitializer (mutex))
@@ -2960,8 +2960,8 @@ __pthread_mutex_trylock (pthread_mutex_t *mutex)
   return (*themutex)->TryLock ();
 }
 
-int
-__pthread_mutex_unlock (pthread_mutex_t *mutex)
+extern "C" int
+pthread_mutex_unlock (pthread_mutex_t *mutex)
 {
   if (pthread_mutex::isGoodInitializer (mutex))
     pthread_mutex::init (mutex, NULL);
@@ -2970,8 +2970,8 @@ __pthread_mutex_unlock (pthread_mutex_t *mutex)
   return (*mutex)->UnLock ();
 }
 
-int
-__pthread_mutex_destroy (pthread_mutex_t *mutex)
+extern "C" int
+pthread_mutex_destroy (pthread_mutex_t *mutex)
 {
   int rv;
 
@@ -2988,8 +2988,8 @@ __pthread_mutex_destroy (pthread_mutex_t *mutex)
   return 0;
 }
 
-int
-__pthread_mutex_setprioceiling (pthread_mutex_t *mutex, int prioceiling,
+extern "C" int
+pthread_mutex_setprioceiling (pthread_mutex_t *mutex, int prioceiling,
 				int *old_ceiling)
 {
   pthread_mutex_t *themutex = mutex;
@@ -3002,8 +3002,8 @@ __pthread_mutex_setprioceiling (pthread_mutex_t *mutex, int prioceiling,
 
 /* Win32 doesn't support mutex priorities - see __pthread_mutex_getprioceiling
    for more detail */
-int
-__pthread_mutexattr_getprotocol (const pthread_mutexattr_t *attr,
+extern "C" int
+pthread_mutexattr_getprotocol (const pthread_mutexattr_t *attr,
 				 int *protocol)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
@@ -3011,8 +3011,8 @@ __pthread_mutexattr_getprotocol (const pthread_mutexattr_t *attr,
   return ENOSYS;
 }
 
-int
-__pthread_mutexattr_getpshared (const pthread_mutexattr_t *attr,
+extern "C" int
+pthread_mutexattr_getpshared (const pthread_mutexattr_t *attr,
 				int *pshared)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
@@ -3021,8 +3021,8 @@ __pthread_mutexattr_getpshared (const pthread_mutexattr_t *attr,
   return 0;
 }
 
-int
-__pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *type)
+extern "C" int
+pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *type)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
     return EINVAL;
@@ -3031,8 +3031,8 @@ __pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *type)
 }
 
 /* FIXME: write and test process shared mutex's.  */
-int
-__pthread_mutexattr_init (pthread_mutexattr_t *attr)
+extern "C" int
+pthread_mutexattr_init (pthread_mutexattr_t *attr)
 {
   if (pthread_mutexattr::isGoodObject (attr))
     return EBUSY;
@@ -3047,8 +3047,8 @@ __pthread_mutexattr_init (pthread_mutexattr_t *attr)
   return 0;
 }
 
-int
-__pthread_mutexattr_destroy (pthread_mutexattr_t *attr)
+extern "C" int
+pthread_mutexattr_destroy (pthread_mutexattr_t *attr)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
     return EINVAL;
@@ -3059,8 +3059,8 @@ __pthread_mutexattr_destroy (pthread_mutexattr_t *attr)
 
 
 /* Win32 doesn't support mutex priorities */
-int
-__pthread_mutexattr_setprotocol (pthread_mutexattr_t *attr, int protocol)
+extern "C" int
+pthread_mutexattr_setprotocol (pthread_mutexattr_t *attr, int protocol)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
     return EINVAL;
@@ -3068,8 +3068,8 @@ __pthread_mutexattr_setprotocol (pthread_mutexattr_t *attr, int protocol)
 }
 
 /* Win32 doesn't support mutex priorities */
-int
-__pthread_mutexattr_setprioceiling (pthread_mutexattr_t *attr,
+extern "C" int
+pthread_mutexattr_setprioceiling (pthread_mutexattr_t *attr,
 				    int prioceiling)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
@@ -3077,8 +3077,8 @@ __pthread_mutexattr_setprioceiling (pthread_mutexattr_t *attr,
   return ENOSYS;
 }
 
-int
-__pthread_mutexattr_getprioceiling (const pthread_mutexattr_t *attr,
+extern "C" int
+pthread_mutexattr_getprioceiling (const pthread_mutexattr_t *attr,
 				    int *prioceiling)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
@@ -3086,8 +3086,8 @@ __pthread_mutexattr_getprioceiling (const pthread_mutexattr_t *attr,
   return ENOSYS;
 }
 
-int
-__pthread_mutexattr_setpshared (pthread_mutexattr_t *attr, int pshared)
+extern "C" int
+pthread_mutexattr_setpshared (pthread_mutexattr_t *attr, int pshared)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
     return EINVAL;
@@ -3100,9 +3100,9 @@ __pthread_mutexattr_setpshared (pthread_mutexattr_t *attr, int pshared)
   return 0;
 }
 
-/* see __pthread_mutex_gettype */
-int
-__pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
+/* see pthread_mutex_gettype */
+extern "C" int
+pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
     return EINVAL;
