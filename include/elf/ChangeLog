@@ -1,3 +1,8 @@
+2004-06-14  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (R_MIPS_PC32): Add back (undoing removal on 2004-04-24),
+	with an updated comment.
+
 2004-05-28  Andrew Stubbs <andrew.stubbs@superh.com>
 
 	* sh.h (EF_SH_HAS_DSP): Remove.
