@@ -569,23 +569,23 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
   // The real uid value for *this* process is stored at cygheap->user.real_uid
   // but we can't get at the real uid value for any other process, so
   // just fake it as p->uid. Similar for p->gid.
-  return __small_sprintf (destbuf, "Name:   %s\n"
-				   "State:  %c (%s)\n"
-				   "Tgid:   %d\n"
-				   "Pid:    %d\n"
-				   "PPid:   %d\n"
-				   "Uid:    %d %d %d %d\n"
-				   "Gid:    %d %d %d %d\n"
-				   "VmSize: %8d kB\n"
-				   "VmLck:  %8d kB\n"
-				   "VmRSS:  %8d kB\n"
-				   "VmData: %8d kB\n"
-				   "VmStk:  %8d kB\n"
-				   "VmExe:  %8d kB\n"
-				   "VmLib:  %8d kB\n"
-				   "SigPnd: %016x\n"
-				   "SigBlk: %016x\n"
-				   "SigIgn: %016x\n",
+  return __small_sprintf (destbuf, "Name:\t%s\n"
+				   "State:\t%c (%s)\n"
+				   "Tgid:\t%d\n"
+				   "Pid:\t%d\n"
+				   "PPid:\t%d\n"
+				   "Uid:\t%d %d %d %d\n"
+				   "Gid:\t%d %d %d %d\n"
+				   "VmSize:\t%8d kB\n"
+				   "VmLck:\t%8d kB\n"
+				   "VmRSS:\t%8d kB\n"
+				   "VmData:\t%8d kB\n"
+				   "VmStk:\t%8d kB\n"
+				   "VmExe:\t%8d kB\n"
+				   "VmLib:\t%8d kB\n"
+				   "SigPnd:\t%016x\n"
+				   "SigBlk:\t%016x\n"
+				   "SigIgn:\t%016x\n",
 			  cmd,
 			  state, state_str,
 			  p->pgid,

@@ -1,3 +1,8 @@
+2004-12-22  Chris January  <chris@atomice.net>
+
+	* fhandler_process.cpp (format_process_status): Use tabs in formatting
+	instead of spaces.
+
 2004-12-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (set_normalized_path): Allow empty pathnames.
