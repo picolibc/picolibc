@@ -1,3 +1,7 @@
+2003-07-18  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
+  
+	* Makefile.common (CFLAGS_COMMON): Remove -march=i386.
+
 2003-07-01  Christopher Faylor  <cgf@redhat.com>
 
 	* configure.in: Add --enable-server option.
