@@ -1,3 +1,12 @@
+Mon Feb 28 11:23:29 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.cc (set_myself): Add build date to strace output.
+
+Mon Feb 28 11:17:30 2000  Eric Fifer <EFifer@sanwaint.com>
+
+	* sigproc.cc (proc_subproc): Only clear wait event when not attending
+	to a signal.
+
 Mon Feb 28 00:08:09 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Remove --enable-strace-hhmmss option.

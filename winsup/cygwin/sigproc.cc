@@ -354,9 +354,10 @@ proc_subproc (DWORD what, DWORD val)
 	    {
 	      sip_printf ("waiting thread found no children");
 	      HANDLE oldw = w->next->ev;
-	      w->next->ev = NULL;
 	      if (clearing)
 		w->next->status = -1;		/* flag that a signal was received */
+	      else
+		w->next->ev = NULL;
 	      if (!SetEvent (oldw))
 		system_printf ("couldn't wake up wait event %p, %E", oldw);
 	      w->next = w->next->next;

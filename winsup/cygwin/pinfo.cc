@@ -60,6 +60,7 @@ set_myself (pinfo *p)
       strace_printf (1, "DLL version:  %d.%d, api: %d.%d",
 			cygwin_version.dll_major, cygwin_version.dll_minor,
 			cygwin_version.api_major, cygwin_version.api_minor);
+      strace_printf (1, "DLL build:    %s", cygwin_version.dll_build_date);
       strace_printf (1, "OS version:   Windows %s", osname);
       strace_printf (1, "**********************************************");
     }
