@@ -2,29 +2,30 @@
 
 	* external.h: New file. Common structure definitions found in
 	other COFF header files.
-	a29k.h: Use external.h.
-	apollo.h: Use external.h.
-	arm.h: Use external.h.
-	h8300.h: Use external.h.
-	h8500.h: Use external.h.
-	i386.h: Use external.h.
-	i860.h: Use external.h.
-	ia64.h: Use external.h.
-	m68k.h: Use external.h.
-	m88k.h: Use external.h.
-	mcore.h: Use external.h.
-	mips.h: Use external.h.
-	mipspe.h: Use external.h.
-	powerpc.h: Use external.h.
-	rs6000.h: Use external.h.
-	rs6k64.h: Use external.h.
-	sh.h: Use external.h.
-	sparc.h: Use external.h.
-	tic30.h: Use external.h.
-	tic80.h: Use external.h.
-	w65.h: Use external.h.
-	we32k.h: Use external.h.
-	z8k.h: Use external.h.
+
+	* a29k.h: Use external.h.
+	* apollo.h: Use external.h.
+	* arm.h: Use external.h.
+	* h8300.h: Use external.h.
+	* h8500.h: Use external.h.
+	* i386.h: Use external.h.
+	* i860.h: Use external.h.
+	* ia64.h: Use external.h.
+	* m68k.h: Use external.h.
+	* m88k.h: Use external.h.
+	* mcore.h: Use external.h.
+	* mips.h: Use external.h.
+	* mipspe.h: Use external.h.
+	* powerpc.h: Use external.h.
+	* rs6000.h: Use external.h.
+	* rs6k64.h: Use external.h.
+	* sh.h: Use external.h.
+	* sparc.h: Use external.h.
+	* tic30.h: Use external.h.
+	* tic80.h: Use external.h.
+	* w65.h: Use external.h.
+	* we32k.h: Use external.h.
+	* z8k.h: Use external.h.
 
 2001-02-09  David Mosberger  <davidm@hpl.hp.com>
 
