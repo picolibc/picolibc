@@ -1,3 +1,7 @@
+Mon Apr 23 13:17:32 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/winsock.h: Protect some more newlib defines when compiling
+	cygwin.
 
 2001-04-17  Egor Duda  <deo@logos-m.ru>
 
