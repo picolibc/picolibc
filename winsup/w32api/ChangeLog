@@ -1,3 +1,10 @@
+2004-11-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wingdi.h (NIF_INFO): Add define.
+	(NIIF_*) Add defines..
+	Thanks to: Benoit Blanchon <benoit.blanchon@free.fr>
+	(NIF_*): Convert constants to hex.
+
 2004-11-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wingdi.h (GetFontUnicodeRanges,GetGlyphIndicesA,
