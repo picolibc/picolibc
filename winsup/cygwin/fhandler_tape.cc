@@ -341,11 +341,11 @@ mtinfo_drive::get_pos (HANDLE mt, long *ppartition, long *pblock)
 }
 
 int
-mtinfo_drive::_set_pos (HANDLE mt, int mode, long count,
-			int partition)
+mtinfo_drive::_set_pos (HANDLE mt, int mode, long count, int partition,
+			BOOL dont_wait)
 {
-  TAPE_FUNC (SetTapePosition (mt, mode, partition, count,
-			      count < 0 ? -1 : 0, FALSE));
+  TAPE_FUNC (SetTapePosition (mt, mode, partition, count, count < 0 ? -1 : 0,
+			      dont_wait));
   dirty = clean;
   return lasterr;
 }
@@ -378,14 +378,14 @@ mtinfo_drive::set_pos (HANDLE mt, int mode, long count,
   if (mode == TAPE_SPACE_FILEMARKS)
     {
       while (!err && undone > 0)
-	if (!(err = _set_pos (mt, mode, 1, 0)) || IS_SM (err))
+	if (!(err = _set_pos (mt, mode, 1, 0, FALSE)) || IS_SM (err))
 	  --undone;
       while (!err && undone < 0)
-	if (!(err = _set_pos (mt, mode, -1, 0)) || IS_SM (err))
+	if (!(err = _set_pos (mt, mode, -1, 0, FALSE)) || IS_SM (err))
 	  ++undone;
     }
   else
-    err = _set_pos (mt, mode, count, dont_wait);
+    err = _set_pos (mt, mode, count, 0, dont_wait);
   switch (mode)
     {
       case TAPE_ABSOLUTE_BLOCK:
@@ -546,7 +546,7 @@ mtinfo_drive::set_partition (HANDLE mt, long count)
   else
     {
       int part_block = part (count)->block >= 0 ? part (count)->block : 0;
-      int err = _set_pos (mt, TAPE_LOGICAL_BLOCK, part_block, count + 1);
+      int err = _set_pos (mt, TAPE_LOGICAL_BLOCK, part_block, count + 1, FALSE);
       if (err)
 	{
 	  int sav_block = block;

@@ -91,7 +91,7 @@ class mtinfo_drive
 	      : ((_dp.FeaturesLow & parm) != 0));
     }
   int get_pos (HANDLE mt, long *ppartition = NULL, long *pblock = NULL);
-  int _set_pos (HANDLE mt, int mode, long count, int partition);
+  int _set_pos (HANDLE mt, int mode, long count, int partition, BOOL dont_wait);
   int create_partitions (HANDLE mt, long count);
   int set_partition (HANDLE mt, long count);
   int write_marks (HANDLE mt, int marktype, DWORD count);

@@ -1,3 +1,11 @@
+2004-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tape.cc (mtinfo_drive::_set_pos): Take additional dont_wait
+	parameter.  Use in call to SetTapePosition.
+	(mtinfo_drive::set_pos): Accomodate _set_pos calls to above change.
+	(mtinfo_drive::set_partition): Ditto.
+	* mtinfo.h (mtinfo_drive::_set_pos): Change declaration accordingly.
+
 2004-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (NtCreateFile): Add.
