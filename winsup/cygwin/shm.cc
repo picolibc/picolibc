@@ -99,7 +99,7 @@ public:
   static client_shmmgr & instance ();
 
   void *shmat (int shmid, const void *, int shmflg);
-  int shmctl (int shmid, int cmd, shmid_ds *);
+  int shmctl (int shmid, int cmd, struct shmid_ds *);
   int shmdt (const void *);
   int shmget (key_t, size_t, int shmflg);
 
@@ -190,19 +190,19 @@ client_shmmgr::shmat (const int shmid,
 int
 client_shmmgr::shmctl (const int shmid,
 		       const int cmd,
-		       shmid_ds *const buf)
+		       struct shmid_ds *const buf)
 {
   syscall_printf ("shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)",
 		  shmid, cmd, buf);
 
   // Check parameters and set up in parameters as required.
 
-  const shmid_ds *in_buf = NULL;
+  const struct shmid_ds *in_buf = NULL;
 
   switch (cmd)
     {
     case IPC_SET:
-      if (__check_invalid_read_ptr_errno (buf, sizeof (shmid_ds)))
+      if (__check_invalid_read_ptr_errno (buf, sizeof (struct shmid_ds)))
 	{
 	  syscall_printf (("-1 [EFAULT] = "
 			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
@@ -215,7 +215,7 @@ client_shmmgr::shmctl (const int shmid,
 
     case IPC_STAT:
     case SHM_STAT:
-      if (__check_null_invalid_struct_errno (buf, sizeof (shmid_ds)))
+      if (__check_null_invalid_struct_errno (buf, sizeof (struct shmid_ds)))
 	{
 	  syscall_printf (("-1 [EFAULT] = "
 			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
@@ -226,7 +226,18 @@ client_shmmgr::shmctl (const int shmid,
       break;
 
     case IPC_INFO:
-      if (__check_null_invalid_struct_errno (buf, sizeof (shminfo)))
+      if (__check_null_invalid_struct_errno (buf, sizeof (struct shminfo)))
+	{
+	  syscall_printf (("-1 [EFAULT] = "
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
+			  shmid, cmd, buf);
+	  set_errno (EFAULT);
+	  return -1;
+	}
+      break;
+
+    case SHM_INFO:
+      if (__check_null_invalid_struct_errno (buf, sizeof (struct shm_info)))
 	{
 	  syscall_printf (("-1 [EFAULT] = "
 			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
@@ -261,16 +272,17 @@ client_shmmgr::shmctl (const int shmid,
       break;
 
     case IPC_INFO:
-      *(shminfo *) buf = request.info ();
+      *(struct shminfo *) buf = request.shminfo ();
       break;
 
     case SHM_STAT:		// ipcs(8) i'face.
-      *buf = request.ds ();
       result = request.shmid ();
+      *buf = request.ds ();
       break;
 
     case SHM_INFO:		// ipcs(8) i'face.
       result = request.shmid ();
+      *(struct shm_info *) buf = request.shm_info ();
       break;
     }
 
@@ -354,32 +366,29 @@ client_shmmgr::shmdt (const void *const shmaddr)
 
 /*---------------------------------------------------------------------------*
  * client_shmmgr::shmget ()
- *
- * The `key = 0x%08x%08x' contortions in the tracing statements is
- * because small_printf () doesn't support 64-bit integers.
  *---------------------------------------------------------------------------*/
 
 int
 client_shmmgr::shmget (const key_t key, const size_t size, const int shmflg)
 {
-  syscall_printf ("shmget (key = 0x%08x%08x, size = %u, shmflg = 0%o)",
-		  (unsigned) (key >> 32), (unsigned) key, size, shmflg);
+  syscall_printf ("shmget (key = 0x%016X, size = %u, shmflg = 0%o)",
+		  key, size, shmflg);
 
   client_request_shm request (key, size, shmflg);
 
   if (request.make_request () == -1 || request.error_code ())
     {
       syscall_printf (("-1 [%d] = "
-		       "shmget (key = 0x%08x%08x, size = %u, shmflg = 0%o)"),
+		       "shmget (key = 0x%016X, size = %u, shmflg = 0%o)"),
 		      request.error_code (),
-		      (unsigned) (key >> 32), (unsigned) key, size, shmflg);
+		      key, size, shmflg);
       set_errno (request.error_code ());
       return -1;
     }
 
-  syscall_printf (("%d = shmget (key = 0x%08x%08x, size = %u, shmflg = 0%o)"),
+  syscall_printf (("%d = shmget (key = 0x%016X, size = %u, shmflg = 0%o)"),
 		  request.shmid (),
-		  (unsigned) (key >> 32), (unsigned) key, size, shmflg);
+		  key, size, shmflg);
 
   return request.shmid ();
 }
@@ -608,7 +617,7 @@ shmat (const int shmid, const void *const shmaddr, const int shmflg)
  *---------------------------------------------------------------------------*/
 
 extern "C" int
-shmctl (const int shmid, const int cmd, shmid_ds *const buf)
+shmctl (const int shmid, const int cmd, struct shmid_ds *const buf)
 {
   return shmmgr.shmctl (shmid, cmd, buf);
 }
@@ -669,7 +678,7 @@ client_request_shm::client_request_shm (const int shmid, const int shmflg)
 
 client_request_shm::client_request_shm (const int shmid,
 					const int cmd,
-					const shmid_ds *const buf)
+					const struct shmid_ds *const buf)
   : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
 {
   _parameters.in.shmop = SHMOP_shmctl;

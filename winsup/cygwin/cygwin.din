@@ -1277,6 +1277,13 @@ _acltotext = acltotext
 aclfromtext
 _aclfromtext = aclfromtext
 ftok
+msgctl
+msgget
+msgrcv
+msgsnd
+semctl
+semget
+semop
 shmat
 shmctl
 shmdt

@@ -90,7 +90,7 @@ private:
 
     const int intid;
     const int shmid;
-    shmid_ds ds;
+    struct shmid_ds ds;
     int flg;
     const HANDLE hFileMap;
 
@@ -115,8 +115,9 @@ public:
 
   int shmat (HANDLE & hFileMap,
 	     int shmid, int shmflg, pid_t, process_cache *, DWORD winpid);
-  int shmctl (int & out_shmid, shmid_ds & out_ds, shminfo & out_info,
-	      const int shmid, int cmd, const shmid_ds &, pid_t);
+  int shmctl (int & out_shmid, struct shmid_ds & out_ds,
+	      struct shminfo & out_shminfo, struct shm_info & out_shm_info,
+	      const int shmid, int cmd, const struct shmid_ds &, pid_t);
   int shmdt (int shmid, pid_t);
   int shmget (int & out_shmid, key_t, size_t, int shmflg, pid_t, uid_t, gid_t);
 
@@ -129,7 +130,8 @@ private:
   CRITICAL_SECTION _segments_lock;
   segment_t *_segments_head;	// A list sorted by int_id.
 
-  int _shmseg_cnt;		// Number of shm segments (for ipcs(8)).
+  int _shm_ids;			// Number of shm segments (for ipcs(8)).
+  int _shm_tot;			// Total bytes of shm segments (for ipcs(8)).
   int _intid_max;		// Highest intid yet allocated (for ipcs(8)).
 
   server_shmmgr ();
@@ -144,7 +146,7 @@ private:
 
   int new_segment (key_t, size_t, int shmflg, pid_t, uid_t, gid_t);
 
-  segment_t *new_segment (key_t, HANDLE);
+  segment_t *new_segment (key_t, size_t, HANDLE);
   void delete_segment (segment_t *);
 };
 
@@ -241,8 +243,12 @@ server_shmmgr::shmat (HANDLE & hFileMap,
  *---------------------------------------------------------------------------*/
 
 int
-server_shmmgr::shmctl (int & out_shmid, shmid_ds & out_ds, shminfo & out_info,
-		       const int shmid, const int cmd, const shmid_ds & ds,
+server_shmmgr::shmctl (int & out_shmid,
+		       struct shmid_ds & out_ds,
+		       struct shminfo & out_shminfo,
+		       struct shm_info & out_shm_info,
+		       const int shmid, const int cmd,
+		       const struct shmid_ds & ds,
 		       const pid_t cygpid)
 {
   syscall_printf ("shmctl (shmid = %d, cmd = 0x%x) for %d",
@@ -304,15 +310,17 @@ server_shmmgr::shmctl (int & out_shmid, shmid_ds & out_ds, shminfo & out_info,
       break;
 
     case IPC_INFO:
-      out_info.shmmax = SHMMAX;
-      out_info.shmmin = SHMMIN;
-      out_info.shmmni = SHMMNI;
-      out_info.shmseg = SHMSEG;
-      out_info.shmall = SHMALL;
+      out_shminfo.shmmax = SHMMAX;
+      out_shminfo.shmmin = SHMMIN;
+      out_shminfo.shmmni = SHMMNI;
+      out_shminfo.shmseg = SHMSEG;
+      out_shminfo.shmall = SHMALL;
       break;
 
     case SHM_INFO:		// ipcs(8) i'face.
       out_shmid = _intid_max;
+      out_shm_info.shm_ids = _shm_ids;
+      out_shm_info.shm_tot = _shm_tot;
       break;
 
     default:
@@ -395,7 +403,6 @@ server_shmmgr::shmget (int & out_shmid,
   int result = 0;
   EnterCriticalSection (&_segments_lock);
 
-  /* Does a segment already exist with that key? */
   if (key == IPC_PRIVATE)
     result = new_segment (key, size, shmflg, cygpid, uid, gid);
   else
@@ -411,6 +418,8 @@ server_shmmgr::shmget (int & out_shmid,
 	result = -EIDRM;
       else if ((shmflg & IPC_CREAT) && (shmflg & IPC_EXCL))
 	result = -EEXIST;
+      else if ((shmflg & ~(segptr->ds.shm_perm.mode)) & 0777)
+	result = -EACCES;
       else if (size && segptr->ds.shm_segsz < size)
 	result = -EINVAL;
       else
@@ -461,7 +470,8 @@ server_shmmgr::initialise_instance ()
 
 server_shmmgr::server_shmmgr ()
   : _segments_head (NULL),
-    _shmseg_cnt (0),
+    _shm_ids (0),
+    _shm_tot (0),
     _intid_max (0)
 {
   InitializeCriticalSection (&_segments_lock);
@@ -538,10 +548,10 @@ server_shmmgr::new_segment (const key_t key,
 				    "[size = %lu]: %s"),
 				   size, msg));
 
-      return -EINVAL;		// FIXME
+      return -ENOMEM;		// FIXME
     }
 
-  segment_t *const segptr = new_segment (key, hFileMap);
+  segment_t *const segptr = new_segment (key, size, hFileMap);
 
   if (!segptr)
     {
@@ -567,8 +577,12 @@ server_shmmgr::new_segment (const key_t key,
  *---------------------------------------------------------------------------*/
 
 server_shmmgr::segment_t *
-server_shmmgr::new_segment (const key_t key, const HANDLE hFileMap)
+server_shmmgr::new_segment (const key_t key, const size_t size,
+			    const HANDLE hFileMap)
 {
+  if (_shm_tot + size > SHMALL)
+    return NULL;
+
   int intid = 0;		// Next expected intid value.
   segment_t *previous = NULL;	// Insert pointer.
 
@@ -602,7 +616,8 @@ server_shmmgr::new_segment (const key_t key, const HANDLE hFileMap)
       _segments_head = segptr;
     }
 
-  _shmseg_cnt += 1;
+  _shm_ids += 1;
+  _shm_tot += size;
   if (intid > _intid_max)
     _intid_max = intid;
 
@@ -638,8 +653,9 @@ server_shmmgr::delete_segment (segment_t *const segptr)
 				  "[handle = 0x%x]: %s"),
 				 segptr->hFileMap, msg));
 
-  assert (_shmseg_cnt > 0);
-  _shmseg_cnt -= 1;
+  assert (_shm_ids > 0);
+  _shm_ids -= 1;
+  _shm_tot -= segptr->ds.shm_segsz;
 
   safe_delete (segment_t, segptr);
 }
@@ -703,7 +719,8 @@ client_request_shm::serve (transport_layer_base *const conn,
 
     case SHMOP_shmctl:
       result = shmmgr.shmctl (_parameters.out.shmid,
-			      _parameters.out.ds, _parameters.out.info,
+			      _parameters.out.ds, _parameters.out.shminfo,
+			      _parameters.out.shm_info,
 			      _parameters.in.shmid, _parameters.in.cmd,
 			      _parameters.in.ds, _parameters.in.cygpid);
       break;

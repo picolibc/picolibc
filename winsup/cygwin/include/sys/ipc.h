@@ -17,41 +17,34 @@ extern "C"
 {
 #endif
 
-/*
- * <sys/types.h> must be included before <sys/ipc.h>.  We aren't meant
- * to automatically include it however.
- */
-
-struct ipc_perm {
-  uid_t  uid;
-  gid_t  gid;
-  uid_t  cuid;
-  gid_t  cgid;
-  mode_t mode;
+struct ipc_perm
+{
+  uid_t  uid;			/* Owner's user ID. */
+  gid_t  gid;			/* Owner's group ID. */
+  uid_t  cuid;			/* Creator's user ID. */
+  gid_t  cgid;			/* Creator's group ID. */
+  mode_t mode;			/* Read/write permission. */
   key_t  key;
-}; 
+};
 
-/*
- * The mode flags used with the _get functions use the low order 9
- * bits for a mode request.
+/* Mode bits:
  */
-#define IPC_CREAT  0x0200
-#define IPC_EXCL   0x0400
-#define IPC_NOWAIT 0x0800
+#define IPC_CREAT  0x0200	/* Create entry if key does not exist. */
+#define IPC_EXCL   0x0400	/* Fail if key exists. */
+#define IPC_NOWAIT 0x0800	/* Error if request must wait. */
 
-/* This is a value that will _never_ be a valid key from ftok(3). */
-#define IPC_PRIVATE ((key_t) -2)
-
-/*
- * Values for the cmd argument to shmctl(2).
- * Commands 1000-1fff are reserved for IPC_xxx.
+/* Keys:
  */
-#define IPC_RMID 0x1000
-#define IPC_SET  0x1001
-#define IPC_STAT 0x1002
+#define IPC_PRIVATE ((key_t) 0)	/* Private key. */
+
+/* Control commands:
+ */
+#define IPC_RMID 0x1000		/* Remove identifier. */
+#define IPC_SET  0x1001		/* Set options. */
+#define IPC_STAT 0x1002		/* Get options. */
 #define IPC_INFO 0x1003		/* For ipcs(8). */
 
-key_t ftok(const char *, int);
+key_t ftok (const char *path, int id);
 
 #ifdef __cplusplus
 }

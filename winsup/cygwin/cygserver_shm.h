@@ -68,7 +68,7 @@ public:
 
 #ifdef __INSIDE_CYGWIN__
   client_request_shm (int shmid, int shmflg); // shmat
-  client_request_shm (int shmid, int cmd, const shmid_ds *); // shmctl
+  client_request_shm (int shmid, int cmd, const struct shmid_ds *); // shmctl
   client_request_shm (int shmid); // shmdt
   client_request_shm (key_t, size_t, int shmflg); // shmget
 #endif
@@ -87,16 +87,22 @@ public:
     return _parameters.out.hFileMap;
   }
 
-  const shmid_ds & ds () const
+  const struct shmid_ds & ds () const
   {
     assert (!error_code ());
     return _parameters.out.ds;
   }
 
-  const shminfo & info () const
+  const struct shminfo & shminfo () const
   {
     assert (!error_code ());
-    return _parameters.out.info;
+    return _parameters.out.shminfo;
+  }
+
+  const struct shm_info & shm_info () const
+  {
+    assert (!error_code ());
+    return _parameters.out.shm_info;
   }
 
 private:
@@ -114,16 +120,17 @@ private:
       DWORD winpid;
       uid_t uid;
       gid_t gid;
-      shmid_ds ds;
+      struct shmid_ds ds;
     } in;
 
     struct {
       int shmid;
-      HANDLE hFileMap;
       union
       {
-	shmid_ds ds;
-	shminfo info;
+	HANDLE hFileMap;
+	struct shmid_ds ds;
+	struct shminfo shminfo;
+	struct shm_info shm_info;
       };
     } out;
   } _parameters;
