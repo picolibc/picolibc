@@ -1,6 +1,6 @@
 Wed Jul 26 16:05:04 2000  Christopher Faylor <cgf@cygnus.com>
 
-	* exceptions.cc (signal_exit): Renamed from "really+exit".  Always sets
+	* exceptions.cc (signal_exit): Renamed from "really_exit".  Always sets
 	EXIT_SIGNAL bit and reorganizes exit value for backwards cygwin
 	handling.
 	(handle_exceptions): Call signal_exit.  Set "core dumped" bit.
