@@ -1,3 +1,17 @@
+2002-11-21  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sigthread::get_winapi_lock): Just do standard 'give up
+	timeslice' wait.
+	(setup_handler): Revamp YA to attempt to deliver signal multiple times
+	on failure rather than punting to wait_sig.
+	* miscfuncs.cc (low_priority_sleep): Accept INFINITE sleep to mean
+	"don't reset the priority after setting it to idle".  Return previous
+	priority.
+	* winsup.h (SLEEP_0_STAY_LOW): Define.
+	(low_priority_sleep): Return an int.
+	* sigproc.h: Define WAIT_SIG_PRIORITY here.
+	* sigproc.cc: Remove WAIT_SIG_PRIORITY definition.
+
 2002-11-20  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.h: Declare internal_getpwsid and internal_getgrsid.

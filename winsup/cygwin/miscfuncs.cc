@@ -292,12 +292,27 @@ sys_mbstowcs (WCHAR *tgt, const char *src, int len)
   return MultiByteToWideChar (get_cp (), 0, src, -1, tgt, len);
 }
 
-void __stdcall
+int __stdcall
 low_priority_sleep (DWORD secs)
 {
   HANDLE thisthread = GetCurrentThread ();
   int curr_prio = GetThreadPriority (thisthread);
+  bool staylow;
+  if (secs != INFINITE)
+    staylow = false;
+  else
+    {
+      secs = 0;
+      staylow = true;
+    }
+
+  /* Force any threads in normal priority to be scheduled */
+  SetThreadPriority (thisthread, THREAD_PRIORITY_NORMAL);
+  Sleep (0);
+
   SetThreadPriority (thisthread, THREAD_PRIORITY_IDLE);
   Sleep (secs);
-  SetThreadPriority (thisthread, curr_prio);
+  if (!staylow)
+    SetThreadPriority (thisthread, curr_prio);
+  return curr_prio;
 }

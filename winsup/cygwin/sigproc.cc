@@ -41,8 +41,6 @@ details. */
 #define WSPX		   20000 // Wait for wait_sig to terminate
 #define WWSP		   20000 // Wait for wait_subproc to terminate
 
-#define WAIT_SIG_PRIORITY		THREAD_PRIORITY_TIME_CRITICAL
-
 #define TOTSIGS	(NSIG + __SIGOFFSET)
 
 #define wake_wait_subproc() SetEvent (events[0])

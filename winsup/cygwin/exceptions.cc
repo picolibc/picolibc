@@ -666,7 +666,7 @@ sigthread::get_winapi_lock (int test)
   /* Need to do a busy loop because we can't block or a potential SuspendThread
      will hang. */
   while (InterlockedExchange (&winapi_lock, 1))
-    low_priority_sleep (1);
+    low_priority_sleep (0);
   return 1;
 }
 
@@ -782,26 +782,33 @@ static int
 setup_handler (int sig, void *handler, struct sigaction& siga)
 {
   CONTEXT cx;
-  bool interrupted = 0;
-  HANDLE hth = NULL;
-  int res;
+  bool interrupted = false;
   sigthread *th = NULL;		// Initialization needed to shut up gcc
+  int prio = INFINITE;
 
   if (sigsave.sig)
     goto set_pending;
 
-  for (int i = 0; !interrupted && i < CALL_HANDLER_RETRY; i++)
+  for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
+      DWORD res;
+      HANDLE hth;
+
       EnterCriticalSection (&mainthread.lock);
       if (mainthread.frame)
-	th = &mainthread;
+	{
+	  hth = NULL;
+	  th = &mainthread;
+	}
       else
 	{
 	  LeaveCriticalSection (&mainthread.lock);
 
-	  th = NULL;
+	  if (!mainthread.get_winapi_lock (1))
+	    continue;
 
 	  hth = myself->getthread2signal ();
+	  th = NULL;
 
 	  /* Suspend the thread which will receive the signal.  But first ensure that
 	     this thread doesn't have any mutos.  (FIXME: Someday we should just grab
@@ -811,20 +818,29 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	     If one of these conditions is not true we loop for a fixed number of times
 	     since we don't want to stall the signal handler.  FIXME: Will this result in
 	     noticeable delays?
-	     If the thread is already suspended (which can occur when a program is stopped) then
-	     just queue the signal. */
+	     If the thread is already suspended (which can occur when a program has called
+	     SuspendThread on itself then just queue the signal. */
 
-	  if (!mainthread.get_winapi_lock (1))
-	    continue;
+	  EnterCriticalSection (&mainthread.lock);
 	  sigproc_printf ("suspending mainthread");
 	  res = SuspendThread (hth);
-	  mainthread.release_winapi_lock ();
-	  if (mainthread.frame)
-	    goto resume_thread;	/* In case the main thread *just* set the frame */
+	  /* Just release the lock now since we hav suspended the main thread and it
+	     definitely can't be grabbing it now.  This will have to change, of course,
+	     if/when we can send signals to other than the main thread. */
+	  LeaveCriticalSection (&mainthread.lock);
 
 	  /* Just set pending if thread is already suspended */
 	  if (res)
-	    goto set_pending;
+	    {
+	      (void) ResumeThread (hth);
+	      break;
+	    }
+
+	  mainthread.release_winapi_lock ();
+	  if (mainthread.frame)
+	    goto resume_thread;	/* We just got the frame.  What are the odds?
+				   Just loop and we'll hopefully pick it up on
+				   the next pass through. */
 
 	  muto *m;
 	  /* FIXME: Make multi-thread aware */
@@ -835,71 +851,63 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 		goto resume_thread;
 	      }
 
-	  EnterCriticalSection (&mainthread.lock);
 	  if (mainthread.frame)
-	    {
-	      th = &mainthread;
-	      goto try_to_interrupt;
-	    }
-
-	  LeaveCriticalSection (&mainthread.lock);
-
-	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-	  if (!GetThreadContext (hth, &cx))
-	    system_printf ("couldn't get context of main thread, %E");
-	  else if (!interruptible (cx.Eip, 1))
-	    sigproc_printf ("suspended thread in a strange state pc %p, sp %p",
-			    cx.Eip, cx.Esp);
+	    th = &mainthread;
 	  else
-	    goto try_to_interrupt;
-
-	resume_thread:
-	  ResumeThread (hth);
-	  low_priority_sleep (0);
-	  continue;
+	    {
+	      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	      if (!GetThreadContext (hth, &cx))
+		{
+		  system_printf ("couldn't get context of main thread, %E");
+		  goto resume_thread;
+		}
+	    }
 	}
 
-    try_to_interrupt:
+      if ((DWORD) prio != INFINITE)
+	{
+	  /* Reset the priority so we can finish this off quickly. */
+	  SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
+	  prio = INFINITE;
+	}
+
       if (th)
 	{
 	  interrupted = interrupt_on_return (th, sig, handler, siga);
 	  LeaveCriticalSection (&th->lock);
 	}
       else if (interruptible (cx.Eip))
-	{
-	  interrupted = interrupt_now (&cx, sig, handler, siga);
-#ifdef DEBUGGING
-	  if (!interrupted)
-	    sigproc_printf ("couldn't deliver signal %d via %p", sig, cx.Eip);
-#endif
-	}
-      else
+	interrupted = interrupt_now (&cx, sig, handler, siga);
+
+    resume_thread:
+      if (hth)
+	res = ResumeThread (hth);
+
+      if (interrupted)
 	break;
+
+      if ((DWORD) prio != INFINITE && !mainthread.frame)
+	prio = low_priority_sleep (SLEEP_0_STAY_LOW);
+      sigproc_printf ("couldn't interrupt.  trying again.");
     }
 
  set_pending:
   if (interrupted)
-    res = 1;
+    {
+      if ((DWORD) prio != INFINITE)
+	SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
+      sigproc_printf ("signal successfully delivered");
+    }
   else
     {
       pending_signals = 1;	/* FIXME: Probably need to be more tricky here */
       sig_set_pending (sig);
       sig_dispatch_pending (1);
-      low_priority_sleep (0);	/* Hopefully, other process will be waking up soon. */
+      low_priority_sleep (SLEEP_0_STAY_LOW);	/* Hopefully, other process will be waking up soon. */
       sigproc_printf ("couldn't send signal %d", sig);
     }
 
-  if (!hth)
-    sigproc_printf ("good.  Didn't suspend main thread, th %p", th);
-  else
-    {
-      res = ResumeThread (hth);
-      sigproc_printf ("ResumeThread returned %d", res);
-    }
-
   sigproc_printf ("returning %d", interrupted);
-  if (pending_signals)
-    SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
   return interrupted;
 }
 #endif /* i386 */

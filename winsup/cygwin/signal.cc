@@ -57,7 +57,7 @@ signal (int sig, _sig_func_ptr func)
   myself->getsig (sig).sa_handler = func;
   myself->getsig (sig).sa_mask = 0;
   /* SA_RESTART is set to maintain BSD compatible signal behaviour by default.
-     This is also compatible to the behaviour of signal(2) in Linux. */
+     This is also compatible with the behaviour of signal(2) in Linux. */
   myself->getsig (sig).sa_flags |= SA_RESTART;
   set_sigcatchers (prev, func);
 

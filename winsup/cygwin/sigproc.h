@@ -124,7 +124,7 @@ void __stdcall wait_for_sigthread ();
 extern char myself_nowait_dummy[];
 extern char myself_nowait_nonmain_dummy[];
 
-#define WAIT_SIG_EXITING (WAIT_OBJECT_0 + 1)
+#define WAIT_SIG_PRIORITY THREAD_PRIORITY_TIME_CRITICAL
 
 #define myself_nowait ((_pinfo *)myself_nowait_dummy)
 #define myself_nowait_nonmain ((_pinfo *)myself_nowait_nonmain_dummy)
