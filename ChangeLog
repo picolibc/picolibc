@@ -1,5 +1,9 @@
 2002-12-03  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* Makefile.tpl: Introduce rules to serialize subconfigure runs.
+	* Makefile.in: Regenerate.
+	* configure.in: Introduce rules to serialize subconfigure runs.
+
 	* configure.in: Introduce BASE_CC_FOR_TARGET.
 	* Makefile.tpl: Reorganize and comment.  Introduce HOST_CONFIGARGS.
 	Realize configure-build-* targets.  Realize configure-target-* targets.

@@ -59,10 +59,17 @@ fi
 
 ### To add a new directory to the tree, first choose whether it is a target
 ### or a host dependent tool.  Then put it into the appropriate list
-### (library or tools, host or target), doing a dependency sort.  For
-### example, gdb requires that byacc (or bison) be built first, so it is in
-### the ${host_tools} list after byacc and bison.  
+### (library or tools, host or target), doing a dependency sort.
 
+# Subdirs will be configured in the order listed in build_configdirs, 
+# configdirs, or target_configdirs; see the serialization section below.
+
+# Dependency sorting is only needed when *configuration* must be done in 
+# a particular order.  In all cases a dependency should be specified in 
+# the Makefile, whether or not it's implicitly specified here.
+
+# Double entries in build_configdirs, configdirs, or target_configdirs may
+# cause circular dependencies and break everything horribly.
 
 # these libraries are used by various programs built for the host environment
 #
@@ -73,7 +80,7 @@ libstdcxx_version="target-libstdc++-v3"
 # these tools are built for the host environment
 # Note, the powerpc-eabi build depends on sim occurring before gdb in order to
 # know that we are building the simulator.
-host_tools="texinfo byacc flex bison binutils ld gas gcc sid sim gdb make patch prms send-pr gprof etc expect dejagnu ash bash bzip2 m4 autoconf automake libtool grep diff rcs fileutils shellutils time textutils wdiff find uudecode hello tar gzip indent recode release sed utils guile perl gawk findutils snavigator libtool gettext zip fastjar"
+host_tools="texinfo byacc flex bison binutils ld gas gcc sid sim gdb make patch prms send-pr gprof etc expect dejagnu ash bash bzip2 m4 autoconf automake libtool grep diff rcs fileutils shellutils time textutils wdiff find uudecode hello tar gzip indent recode release sed utils guile perl gawk findutils snavigator gettext zip fastjar"
 
 # libgcj represents the runtime libraries only used by gcj.
 libgcj="target-libffi \
@@ -1433,6 +1440,41 @@ sed -e '/@maybe_dependencies@/r maybedep.tmp' \
 rm -f Makefile
 mv -f Makefile.tem Makefile
 rm -f maybedep.tmp
+
+# Create the serialization dependencies.  This uses a temporary file.
+
+# These force 'configure's to be done one at a time, to avoid problems
+# with contention over a shared config.cache.
+rm -f serdep.tmp
+olditem=
+for item in ${build_configdirs} ; do
+  case ${olditem} in
+    "") ;;
+    *) echo "\$(BUILD_SUBDIR)/${item}/Makefile: \$(BUILD_SUBDIR)/${olditem}/Makefile" >> serdep.tmp ;;
+  esac
+  olditem=${item}
+done
+olditem=
+for item in ${configdirs} ; do
+  case ${olditem} in
+    "") ;;
+    *) echo "${item}/Makefile: ${olditem}/Makefile" >> serdep.tmp ;;
+  esac
+  olditem=${item}
+done
+olditem=
+for item in ${target_configdirs} ; do
+  case ${olditem} in
+    "") ;;
+    *) echo "\$(TARGET_SUBDIR)/${item}/Makefile: \$(TARGET_SUBDIR)/${olditem}/Makefile" >> serdep.tmp ;;
+  esac
+  olditem=${item}
+done
+sed -e '/@serialization_dependencies@/r serdep.tmp' \
+    -e 's/@serialization_dependencies@//' Makefile > Makefile.tem
+rm -f Makefile
+mv -f Makefile.tem Makefile
+rm -f serdep.tmp
 
 # Base args.  Strip norecursion, cache-file, srcdir, host, build, target.
 # These are the ones we might not want to pass down to subconfigures.

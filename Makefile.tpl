@@ -1289,6 +1289,11 @@ $(TARGET_SUBDIR)/qthreads/Makefile: $(ALL_GCC_C)
 # all-gcc only depends on all-gas if gas is present and being configured.
 @maybe_dependencies@
 
+# Serialization dependencies.  Host configures don't work well in parallel to
+# each other, due to contention over config.cache.  Target configures and 
+# build configures are similar.
+@serialization_dependencies@
+
 # --------------------------------
 # Regenerating top level configury
 # --------------------------------
