@@ -8,9 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#define _MT_SAFE 1
 
 #ifdef __INSIDE_CYGWIN__
 #error "woutsup.h is not for code being compiled inside the dll"

@@ -32,12 +32,12 @@ CXX_FOR_TARGET:=$(CXX)
 
 CFLAGS:=@CFLAGS@ -I$(cygwin_source)
 CXXFLAGS:=@CXXFLAGS@ -I$(cygwin_source)
-override CXXFLAGS+=-fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0
+override CXXFLAGS+=-fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0 -D__OUTSIDE_CYGWIN__
 
 include $(srcdir)/../Makefile.common
 
-OBJS:=	cygserver.o client.o process.o shm.o transport.o transport_pipes.o \
-	transport_sockets.o
+OBJS:=	cygserver.o client.o process.o shm.o threaded_queue.o transport.o \
+	transport_pipes.o transport_sockets.o
 
 CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o \
 	$(cygwin_build)/wincap.o
@@ -46,5 +46,16 @@ all: cygserver.exe
 
 install: all
 
+clean:
+	rm -f $(OBJS)
+
 cygserver.exe: $(OBJS) $(CYGWIN_OBJS)
-	$(CXX) -o $@ $^ -lstdc++
+	$(CXX) -o $@ $^
+
+$(cygwin_build)/%.o: $(cygwin_source)/%.cc
+	@$(MAKE) -C $(@D) $(@F)
+
+$(cygwin_build)/%.o: $(cygwin_source)/%.c
+	@$(MAKE) -C $(@D) $(@F)
+
+Makefile: Makefile.in configure

@@ -1,5 +1,10 @@
 2003-07-01  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in (OBJS): Move some more files from cygwin directory.
+	* woutsup.h: Define _MT_SAFE.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
 	* configure.in: First pass.
 	* Makefile.in: Ditto.
 	* configure: Generate.
