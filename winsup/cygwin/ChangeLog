@@ -1,3 +1,7 @@
+Thu Jun 22 14:27:04 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Add new-libcygwin.a back to all_host target.
+
 Wed Jun 21 14:32:42 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Add *.def to clean operation.

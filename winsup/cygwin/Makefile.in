@@ -146,7 +146,7 @@ all: new-$(DLL_NAME) $(all_host) all_target
 
 all_target: $(LIBGMON_A) $(LIB_NAME) binmode.o
 
-all_host: cygrun.exe
+all_host: new-$(LIB_NAME) cygrun.exe
 
 force:
 
