@@ -1,7 +1,12 @@
+Tue Apr 24 16:18:42 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/winsock2.h: Protect one *more* newlib defines when compiling
+	cygwin.
+
 Mon Apr 23 23:41:36 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/winsock2.h: Protect some more newlib defines when compiling
-	cygwin
+	cygwin.
 
 Mon Apr 23 13:17:32 2001  Christopher Faylor <cgf@cygnus.com>
 

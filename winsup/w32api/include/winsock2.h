@@ -348,8 +348,8 @@ struct sockproto {
 #define PF_INET6	AF_INET6
 #define PF_MAX	AF_MAX
 #define SOL_SOCKET	0xffff
-#define SOMAXCONN	0x7fffffff /* (5) in WinSock1.1 */
 #ifndef __INSIDE_CYGWIN__
+#define SOMAXCONN	0x7fffffff /* (5) in WinSock1.1 */
 #define MSG_OOB	1
 #define MSG_PEEK	2
 #define MSG_DONTROUTE	4
