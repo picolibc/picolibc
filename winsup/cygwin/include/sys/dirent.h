@@ -23,7 +23,7 @@ struct dirent
   __ino64_t d_ino;	/* still junk but with more bits */
   long d_fd;		/* File descriptor of open directory.
 			   Used since Cygwin 1.3.3. */
-  unsigned __flags;	/* Used internally. */
+  unsigned __ino32;
   char d_name[256];	/* FIXME: use NAME_MAX? */
 };
 #else
@@ -33,7 +33,7 @@ struct dirent
   long d_version;
   ino_t d_ino;
   long d_fd;
-  unsigned long __unused;
+  unsigned long __ino32;
   char d_name[256];
 };
 #else

@@ -174,6 +174,7 @@ readdir (DIR *dir)
 	  __ino64_t dino = hash_path_name (dir->__d_dirhash, "\\");
 	  dir->__d_dirent->d_ino = hash_path_name (dino, res->d_name);
 	}
+      res->__ino32 = dir->__d_dirent->d_ino;	// for legacy applications
     }
   return res;
 }
