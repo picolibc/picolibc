@@ -1,3 +1,10 @@
+2001-11-19  Pierre Muller  <muller@ics.u-strasbg.fr>
+
+	* w32api/include/winnt.h: prepare SSE register support.
+	(CONTEXT_EXTENDED_REGISTERS): Add new define.
+	(MAXIMUM_SUPPORTED_EXTENSION): New define.
+	(struct CONTEXT): ExtendedRegisters field added.
+
 2001-11-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winbase.h (OSVERSIONINFOEX): Add definition.
