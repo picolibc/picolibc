@@ -1,5 +1,9 @@
 2002-12-28  Christopher Faylor  <cgf@redhat.com>
 
+	Eliminate device number argument from fhandler constructors throughout.
+
+2002-12-28  Christopher Faylor  <cgf@redhat.com>
+
 	Eliminate unit argument and special unit fields from fhandler classes
 	and constructors throughout.
 	* fhandler_mem.cc (fhandler_dev_mem::fhandler_dev_mem): Make decisions
