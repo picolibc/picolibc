@@ -39,4 +39,3 @@ DllMain (
     }
   return TRUE;
 }
-

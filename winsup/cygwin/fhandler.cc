@@ -18,6 +18,8 @@ static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
 static char fhandler_disk_dummy_name[] = "some disk file";
 
+DWORD binmode;
+
 int
 fhandler_base::puts_readahead (const char *s, size_t len = (size_t) -1)
 {
@@ -352,10 +354,14 @@ fhandler_base::open (int flags, mode_t mode)
   int bin;
   if (flags & (O_BINARY | O_TEXT))
     bin = flags & O_TEXT ? 0 : O_BINARY;
+  else if (__fmode & O_BINARY)
+    bin = O_BINARY;
+  else if (__fmode & O_TEXT)
+    bin = O_TEXT;
   else if (get_device () == FH_DISK)
     bin = get_w_binary () || get_r_binary ();
   else
-    bin = (__fmode & O_BINARY) || get_w_binary () || get_r_binary ();
+    bin = binmode || get_w_binary () || get_r_binary ();
 
   set_r_binary (bin);
   set_w_binary (bin);

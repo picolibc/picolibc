@@ -1,3 +1,48 @@
+Fri Jun 30 23:21:40 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Use variables rather than configure constructs where
+	appropriate.
+	(LIBCOS): Find additional stub library stuff in their own subdirectory.
+	* dcrt0.cc: Convert user_data pointer to static __cygwin_user_data
+	area.
+	(do_global_ctors): Check magic_bisquit for initialization.
+	(dll_crt0_1): First group of premain functions prior to fd
+	initialization.  Run second group before calling main.
+	(dll_crt0 ()): New function, called from new initialization code.
+	(dll_crt0 (per_process *uptr)): Call new dll_crt0 () function on
+	initialization.
+	* debug.cc (thread_stub): Initialize bottom of stack with per-thread
+	info.
+	* environ.cc (parse_thing): Use binmode global to control
+	CYGWIN=binmode behavior.
+	* fhandler.cc (fhandler_base::open): Allow explicit setting of __fmode
+	to O_BINARY or O_TEXT to override disk mount settings.
+	* libcmain.cc: Move to lib subdirectory.
+	* libccrt0.cc: Ditto.
+	* dll_main.cc: Ditto.
+	* dll_entry.cc: Ditto.
+	* getopt.c: Ditto.
+	* thread.cc (thread_init_wrapper): Call ExitThread explicitly rather
+	than returning, as a preliminary step towards placing per thread info
+	at the bottom of the stack.
+	* winsup.h: Move per_process class to include/sys/cygwin.h.  Declare
+	new dll_crt0().
+	* include/cygwin/version.h: Bump API minor version.
+	* binmode.c: New file.
+	* textmode.c: Ditto.
+	* lib/_cygwin_crt0_common.cc: Ditto.
+	* lib/crt0.h: Ditto.
+	* lib/cygwin_attach_dll.c: Ditto.
+	* lib/cygwin_crt0.c: Ditto.
+	* lib/dll_entry.cc: Ditto.
+	* lib/dll_main.cc: Ditto.
+	* lib/getopt.c: Ditto.
+	* lib/libcmain.c: Ditto.
+	* lib/premain0.c: Ditto.
+	* lib/premain1.c: Ditto.
+	* lib/premain2.c: Ditto.
+	* lib/premain3.c: Ditto.
+
 Wed Jun 28 19:36:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (seteuid): Initialize pi.token before calling

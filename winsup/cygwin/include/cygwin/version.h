@@ -111,10 +111,12 @@ details. */
            getuid, getgid return real uid/gid.
            seteuid, setegid set only effective uid/gid.
            setuid, setgid set effective and real uid/gid.
+       23: Export new dll_crt0 interface and cygwin_user_data for use
+	   with crt0 startup code.
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 22
+#define CYGWIN_VERSION_API_MINOR 23
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -9,6 +9,7 @@ details. */
 #define NO_DEBUG_DEFINES
 #include "winsup.h"
 #include "exceptions.h"
+#include "perthread.h"
 
 static muto NO_COPY *threadname_lock = NULL;
 #define lock_threadname() \
@@ -82,11 +83,12 @@ thread_stub (VOID *arg)
   /* Give up our slot in the start_buf array */
   InterlockedExchange (&((thread_start *) arg)->notavail, 0);
 
-  /* Initialize this threads ability to respond to things like
+  /* Initialize this thread's ability to respond to things like
      SIGSEGV or SIGFPE. */
   init_exceptions (&except_entry);
 
-  return threadfunc (threadarg);
+  set_reent (&reent_data);
+  ExitThread (threadfunc (threadarg));
 }
 
 /* Wrapper for CreateThread.  Registers the thread name/id and ensures that

@@ -36,8 +36,105 @@ extern void cygwin_premain1 (int argc, char **argv);
 extern void cygwin_premain2 (int argc, char **argv);
 extern void cygwin_premain3 (int argc, char **argv);
 
-#ifdef WINVER
+#ifdef __cplusplus
+/* This lives in the app and is initialized before jumping into the DLL.
+   It should only contain stuff which the user's process needs to see, or
+   which is needed before the user pointer is initialized, or is needed to
+   carry inheritance information from parent to child.  Note that it cannot
+   be used to carry inheritance information across exec!
+
+   Remember, this structure is linked into the application's executable.
+   Changes to this can invalidate existing executables, so we go to extra
+   lengths to avoid having to do it.
+
+   When adding/deleting members, remember to adjust {public,internal}_reserved.
+   The size of the class shouldn't change [unless you really are prepared to
+   invalidate all existing executables].  The program does a check (using
+   SIZEOF_PER_PROCESS) to make sure you remember to make the adjustment.
+*/
+
+class per_process
+{
+ public:
+  char *initial_sp;
+
+  /* The offset of these 3 values can never change. */
+  /* magic_biscuit is the size of this class and should never change. */
+  unsigned long magic_biscuit;
+  unsigned long dll_major;
+  unsigned long dll_minor;
+
+  struct _reent **impure_ptr_ptr;
+  char ***envptr;
+
+  /* Used to point to the memory machine we should use.  Usually these
+     point back into the dll, but they can be overridden by the user. */
+  void *(*malloc)(size_t);
+  void (*free)(void *);
+  void *(*realloc)(void *, size_t);
+
+  int *fmode_ptr;
+
+  int (*main)(int, char **, char **);
+  void (**ctors)(void);
+  void (**dtors)(void);
+
+  /* For fork */
+  void *data_start;
+  void *data_end;
+  void *bss_start;
+  void *bss_end;
+
+  void *(*calloc)(size_t, size_t);
+  /* For future expansion of values set by the app. */
+  void (*premain[4]) (int, char **);
+
+  /* The rest are *internal* to cygwin.dll.
+     Those that are here because we want the child to inherit the value from
+     the parent (which happens when bss is copied) are marked as such. */
+
+  /* non-zero of ctors have been run.  Inherited from parent. */
+  int run_ctors_p;
+
+  /* These will be non-zero if the above (malloc,free,realloc) have been
+     overridden. */
+  /* FIXME: not currently used */
+  int __imp_malloc;
+  int __imp_free;
+  int __imp_realloc;
+
+  /* Heap management.  Inherited from parent. */
+  void *heapbase;		/* bottom of the heap */
+  void *heapptr;		/* current index into heap */
+  void *heaptop;		/* current top of heap */
+
+  HANDLE unused1;		/* unused */
+
+  /* Non-zero means the task was forked.  The value is the pid.
+     Inherited from parent. */
+  int forkee;
+
+  HMODULE hmodule;
+
+  DWORD api_major;		/* API version that this program was */
+  DWORD api_minor;		/*  linked with */
+  /* For future expansion, so apps won't have to be relinked if we
+     add an item. */
+#ifdef _MT_SAFE
+  ResourceLocks *resourcelocks;
+  MTinterface *threadinterface;
+  void *internal_reserved[6];
+#else
+  void *internal_reserved[8];
+#endif
+};
+#endif /* __cplusplus */
+
+#ifdef _PATH_PASSWD
 extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
+#endif
+
+#ifdef WINVER
 extern void cygwin_set_impersonation_token (const HANDLE);
 
 /* included if <windows.h> is included */

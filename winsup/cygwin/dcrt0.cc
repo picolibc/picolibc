@@ -19,13 +19,12 @@ details. */
 
 #define MAX_AT_FILE_LEVEL 10
 
+#define PREMAIN_LEN (sizeof(user_data->premain) / sizeof (user_data->premain[0]))
+
 HANDLE NO_COPY hMainProc = NULL;
 HANDLE NO_COPY hMainThread = NULL;
 
 sigthread NO_COPY mainthread;		// ID of the main thread
-
-static NO_COPY char dummy_user_data[sizeof (per_process)] = {0};
-per_process NO_COPY *user_data = (per_process *) &dummy_user_data;
 
 per_thread_waitq NO_COPY waitq_storage;
 per_thread_vfork NO_COPY vfork_storage;
@@ -56,11 +55,10 @@ extern "C"
      which use cygwin.dll.  */
   char **__cygwin_environ;
   /* __progname used in getopt error message */
-  char *__progname;
+  char *__progname = NULL;
   struct _reent reent_data;
+  struct per_process __cygwin_user_data;
 };
-
-static void dll_crt0_1 ();
 
 char *old_title = NULL;
 char title_buf[TITLESIZE + 1];
@@ -96,13 +94,12 @@ do_global_ctors (void (**in_pfunc)(), int force)
   while (--pfunc > in_pfunc)
     (*pfunc) ();
 
-  if (user_data != (per_process *) &dummy_user_data)
+  if (user_data->magic_biscuit == SIZEOF_PER_PROCESS)
     atexit (do_global_dtors);
 }
 
 /* remember the type of Win32 OS being run for future use. */
 os_type NO_COPY os_being_run;
-
 char NO_COPY osname[40];
 
 /* set_os_type: Set global variable os_being_run with type of Win32
@@ -576,7 +573,6 @@ dll_crt0_1 ()
      be on the stack.  */
   /* FIXME: Verify forked children get their exception handler set up ok. */
   exception_list cygwin_except_entry;
-
   do_global_ctors (&__CTOR_LIST__, 1);
 
 #ifdef DEBUGGING
@@ -734,6 +730,10 @@ dll_crt0_1 ()
   /* Connect to tty. */
   tty_init ();
 
+  if (user_data->premain[0])
+    for (unsigned int i = 0; i < PREMAIN_LEN / 2; i++)
+      user_data->premain[i] (argc, argv);
+
   /* Set up standard fds in file descriptor table. */
   hinfo_init ();
 
@@ -758,13 +758,18 @@ dll_crt0_1 ()
   DllList::the().initAll();
 
   set_errno (0);
-  debug_printf ("user_data->main %p", user_data->main);
 
   /* Flush signals and ensure that signal thread is up and running. Can't
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
   sig_send (NULL, __SIGFLUSH);	/* also initializes uid, gid */
 
+  /* Execute any specified "premain" functions */
+  if (user_data->premain[0])
+    for (unsigned int i = PREMAIN_LEN / 2; i < PREMAIN_LEN; i++)
+      user_data->premain[i] (argc, argv);
+
+  debug_printf ("user_data->main %p", user_data->main);
   if (user_data->main)
     exit (user_data->main (argc, argv, *user_data->envptr));
 }
@@ -775,12 +780,20 @@ dll_crt0_1 ()
    UPTR is a pointer to global data that lives on the libc side of the
    line [if one distinguishes the application from the dll].  */
 
-void
-dll_crt0 (per_process *uptr)
+void __stdcall
+dll_crt0 ()
 {
   char zeros[sizeof (ciresrv->zero)] = {0};
-  /* Set the local copy of the pointer into the user space. */
-  user_data = uptr;
+
+#ifdef DEBUGGING
+  char buf[80];
+  if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf)))
+    {
+      small_printf ("Sleeping %d, pid %u\n", atoi (buf), GetCurrentProcessId ());
+      Sleep (atoi(buf));
+    }
+#endif
+
   user_data->heapbase = user_data->heapptr = user_data->heaptop = NULL;
 
   set_console_handler ();
@@ -843,6 +856,15 @@ dll_crt0 (per_process *uptr)
 	}
     }
   dll_crt0_1 ();
+}
+
+void
+dll_crt0 (per_process *uptr)
+{
+  /* Set the local copy of the pointer into the user space. */
+  if (uptr)
+    *user_data = *uptr;
+  dll_crt0 ();
 }
 
 extern "C" void *export_malloc (unsigned int);

@@ -9,11 +9,12 @@
 
 # This makefile requires GNU make.
 
-CONFIG_DIR:=@srcdir@/config/@CONFIG_DIR@
 SHELL:=@SHELL@
-VPATH:=@srcdir@:$(CONFIG_DIR):@srcdir@/regexp
 srcdir:=@srcdir@
 objdir:=.
+
+CONFIG_DIR:=$(srcdir)/config/@CONFIG_DIR@
+VPATH:=$(srcdir):$(CONFIG_DIR):$(srcdir)/regexp:$(srcdir)/lib
 
 target_alias:=@target_alias@
 build_alias:=@build_alias@
@@ -106,7 +107,8 @@ GMON_START:=gcrt0.o
 # data which apps can get to, which is a pain in the dll, so we
 # include them directly into the library.
 
-LIBCOS:=libccrt0.o libcmain.o getopt.o dll_entry.o dll_main.o
+LIBCOS:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(srcdir)/lib/*.c}}}} \
+	       ${addsuffix .o,${basename ${notdir ${wildcard $(srcdir)/lib/*.cc}}}}}
 
 # Build all source files in the config directory
 
@@ -143,7 +145,7 @@ install_host=@install_host@
 
 all: new-$(DLL_NAME) $(all_host) all_target
 
-all_target: $(LIBGMON_A) $(LIB_NAME)
+all_target: $(LIBGMON_A) $(LIB_NAME) binmode.o textmode.o
 
 all_host: new-$(LIB_NAME) cygrun.exe
 
@@ -151,7 +153,7 @@ force:
 
 install: all $(install_host) $(install_target)
 	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME); \
-	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) ; do \
+	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) binmode.o ; do \
 	    $(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
 	done ; \
 	cd $(srcdir); \

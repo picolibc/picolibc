@@ -524,7 +524,7 @@ thread_init_wrapper (void *_arg)
 
 //  thread->used = false;         // release thread entry
     thread->return_ptr = ret;
-  return ret;
+  ExitThread (0);
 }
 
 int
