@@ -71,6 +71,18 @@ cygwin-api-int.sgml : cygwin-api.in.sgml ./doctool Makefile
 ./doctool : doctool.c
 	gcc -g $< -o $@
 
+%.dvi: %.sgml
+	-db2dvi $<
+
+%.rtf: %.sgml
+	-db2rtf $<
+
+%.ps: %.sgml
+	-db2ps $<
+
+%.pdf: %.ps
+	-ps2pdf $< $@
+
 %.info: %.texinfo
 	-$(MAKEINFO) -I$(srcdir) $<
 
@@ -91,3 +103,14 @@ faq.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
 	$(TEXI2HTML) -split_chapter  -v ./faq.texinfo; \
 	rm -f *.texinfo; \
 	cp faq_toc.html faq.html
+
+TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
+	  cygwin-ug-net.pdf cygwin-ug-net.sgml \
+	  cygwin-api-int.dvi cygwin-api-int.rtf cygwin-api-int.ps \
+	  cygwin-api-int.pdf cygwin-api-int.sgml
+TBDIRS = cygwin-ug-net cygwin-api-int
+TBDEPS = cygwin-ug-net/cygwin-ug-net.html cygwin-api-int/cygwin-api-int.html
+
+tarball : cygwin-docs.tar.gz
+cygwin-docs.tar.gz : $(TBFILES) $(TBDEPS)
+	tar cf - $(TBFILES) $(TBDIRS) | gzip -9 > cygwin-docs.tar.gz
