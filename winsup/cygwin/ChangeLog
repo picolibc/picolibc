@@ -1,6 +1,6 @@
-Sat Mar 17 00:05:36 2001  Christopher Faylor <cgf@cygnus.com>
+Sat Mar 17 00:10:52 2001  Christopher Faylor <cgf@cygnus.com>
 
-	* syscalls.cc (stat_dev): Give devices full read/write.
+	* syscalls.cc (stat_dev): Give devices full read/write by default.
 
 Saturday Mar 17 3:45 2001 Robert Collins <rbtcollins@hotmail.com>
 

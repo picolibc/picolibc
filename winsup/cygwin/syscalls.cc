@@ -1010,8 +1010,7 @@ stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
     case FH_PIPER:
       buf->st_mode = STD_RBITS;
       break;
-    case FH_CONIN:
-    case FH_CONOUT:
+    default:
       buf->st_mode = STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
       break;
     }
