@@ -895,7 +895,15 @@ public:
   off_t lseek (off_t offset, int whence);
   int close (void);
 
+  int dup (fhandler_base *child);
+
   void dump ();
+
+private:
+  off_t pos;
+  void *membuffer;
+  size_t msize;
+  BOOL eof;
 };
 
 class fhandler_windows: public fhandler_base
