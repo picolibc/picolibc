@@ -190,6 +190,16 @@ long __stdcall to_time_t (FILETIME * ptr);
 void __stdcall set_console_title (char *);
 void set_console_handler ();
 
+int __stdcall check_null_empty_str (const char *name) __attribute__ ((regparm(1)));
+int __stdcall check_null_empty_str_errno (const char *name) __attribute__ ((regparm(1)));
+int __stdcall __check_null_invalid_struct (const void *s, unsigned sz) __attribute__ ((regparm(1)));
+int __stdcall __check_null_invalid_struct_errno (const void *s, unsigned sz) __attribute__ ((regparm(1)));
+
+#define check_null_invalid_struct(s) \
+  __check_null_invalid ((s), sizeof (*(s)))
+#define check_null_invalid_struct_errno(s) \
+  __check_null_invalid_struct_errno ((s), sizeof (*(s)))
+
 #define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
 void __set_winsock_errno (const char *fn, int ln) __attribute__ ((regparm(2)));
 

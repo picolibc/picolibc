@@ -290,7 +290,7 @@ extern "C" int
 putenv (const char *str)
 {
   int res;
-  if ((res = check_null_empty_path (str)))
+  if ((res = check_null_empty_str (str)))
     {
       if (res == ENOENT)
 	return 0;
@@ -312,12 +312,12 @@ extern "C" int
 setenv (const char *name, const char *value, int overwrite)
 {
   int res;
-  if ((res = check_null_empty_path (value)) == EFAULT)
+  if ((res = check_null_empty_str (value)) == EFAULT)
     {
       set_errno (res);
       return  -1;
     }
-  if ((res = check_null_empty_path (name)))
+  if ((res = check_null_empty_str (name)))
     {
       if (res == ENOENT)
 	return 0;

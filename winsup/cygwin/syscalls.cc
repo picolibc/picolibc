@@ -445,7 +445,7 @@ _open (const char *unix_path, int flags, ...)
   sigframe thisframe (mainthread);
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
-  if (!check_null_empty_path_errno (unix_path))
+  if (!check_null_empty_str_errno (unix_path))
     {
       SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, " open ");
 
@@ -698,7 +698,7 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
   uid_t old_uid;
   gid_t old_gid;
 
-  if (check_null_empty_path_errno (name))
+  if (check_null_empty_str_errno (name))
     return -1;
 
   if (os_being_run != winNT)    // real chown only works on NT

@@ -1,3 +1,23 @@
+Wed Jun 27 22:19:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (path_conv::check): Add signal protection here since
+	retrieving info about remote shares can take some time.
+
+Wed Jun 27 23:30:00 2001  Robert Collins <rbtcollins@hotmail.com>
+                          Christopher Faylor <cgf@cygnus.com>
+   
+	Change check_null_empty_path* to check_null_empty_str* throughout.
+	* path.h (check_null_empty_str_errno): Convert to a function prototype.
+	* path.cc (check_null_empty_str): Move to miscfuncs.cc.
+	* miscfuncs.cc (check_null_empty_str_errno): New function.
+	(__check_null_invalid_struct): Ditto.
+	(__check_null_invalid_struct_errno): Ditto.
+	(check_null_empty_str): Change from VirtualQuery to IsBadWritePtr.
+	* thread.cc (check_valid_pointer): Ditto.
+	* resource.cc (getrlimit): Use check_null_invalid_struct macro for
+	checking validity of pointer.
+	(setrlimit): Ditto.
+
 Tue Jun 26 16:59:16 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.cc (fhandler_disk_file::fstat): Don't rely on exactly 3

@@ -150,21 +150,11 @@ class path_conv
 
 int __stdcall get_device_number (const char *name, int &unit, BOOL from_conv = FALSE)  __attribute__ ((regparm(3)));
 int __stdcall slash_unc_prefix_p (const char *path) __attribute__ ((regparm(1)));
-int __stdcall check_null_empty_path (const char *name) __attribute__ ((regparm(1)));
 
 const char * __stdcall find_exec (const char *name, path_conv& buf, const char *winenv = "PATH=",
 			int null_if_notfound = 0, const char **known_suffix = NULL)  __attribute__ ((regparm(3)));
 
 /* Common macros for checking for invalid path names */
-
-#define check_null_empty_path_errno(src) \
-({ \
-  int __err; \
-  if ((__err = check_null_empty_path(src))) \
-    set_errno (__err); \
-  __err; \
-})
-
 #define isdrive(s) (isalpha (*(s)) && (s)[1] == ':')
 
 static inline bool

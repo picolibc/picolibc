@@ -376,6 +376,7 @@ path_conv::check (const char *src, unsigned opt,
   bool need_directory = 0;
   bool saw_symlinks = 0;
   int is_relpath;
+  sigframe thisframe (mainthread);
 
 #if 0
   static path_conv last_path_conv;
@@ -403,7 +404,7 @@ path_conv::check (const char *src, unsigned opt,
 
   if (!(opt & PC_NULLEMPTY))
     error = 0;
-  else if ((error = check_null_empty_path (src)))
+  else if ((error = check_null_empty_str (src)))
     return;
 
   /* This loop handles symlink expansion.  */
@@ -2990,13 +2991,8 @@ getwd (char *buf)
 extern "C" int
 chdir (const char *in_dir)
 {
-  int dir_error = check_null_empty_path (in_dir);
-  if (dir_error)
-    {
-      syscall_printf ("NULL or invalid input to chdir");
-      set_errno (dir_error);
-      return -1;
-    }
+  if (check_null_empty_str_errno (in_dir))
+    return -1;
 
   syscall_printf ("dir '%s'", in_dir);
 
@@ -3141,7 +3137,7 @@ extern "C"
 int
 cygwin_conv_to_posix_path (const char *path, char *posix_path)
 {
-  if (check_null_empty_path_errno (path))
+  if (check_null_empty_str_errno (path))
     return -1;
   mount_table->conv_to_posix_path (path, posix_path, 1);
   return 0;
@@ -3151,7 +3147,7 @@ extern "C"
 int
 cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 {
-  if (check_null_empty_path_errno (path))
+  if (check_null_empty_str_errno (path))
     return -1;
   mount_table->conv_to_posix_path (path, posix_path, 0);
   return 0;
@@ -3352,19 +3348,6 @@ cygwin_split_path (const char *path, char *dir, char *file)
 
   memcpy (file, last_slash + 1, end - last_slash - 1);
   file[end - last_slash - 1] = 0;
-}
-
-int __stdcall
-check_null_empty_path (const char *name)
-{
-  MEMORY_BASIC_INFORMATION m;
-  if (!name || !VirtualQuery (name, &m, sizeof (m)) || (m.State != MEM_COMMIT))
-    return EFAULT;
-
-  if (!*name)
-    return ENOENT;
-
-  return 0;
 }
 
 /*****************************************************************************/

@@ -105,12 +105,8 @@ extern "C"
 int
 getrlimit (int resource, struct rlimit *rlp)
 {
-  MEMORY_BASIC_INFORMATION m;
-  if (!rlp || !VirtualQuery (rlp, &m, sizeof (m)) || (m.State != MEM_COMMIT))
-    {
-      set_errno (EFAULT);
-      return -1;
-    }
+  if (check_null_invalid_struct_errno (rlp))
+    return -1;
 
   rlp->rlim_cur = RLIM_INFINITY;
   rlp->rlim_max = RLIM_INFINITY;
@@ -141,12 +137,8 @@ extern "C"
 int
 setrlimit (int resource, const struct rlimit *rlp)
 {
-  MEMORY_BASIC_INFORMATION m;
-  if (!rlp || !VirtualQuery (rlp, &m, sizeof (m)) || (m.State != MEM_COMMIT))
-    {
-      set_errno (EFAULT);
-      return -1;
-    }
+  if (check_null_invalid_struct_errno (rlp))
+    return -1;
 
   struct rlimit oldlimits;
 

@@ -9,6 +9,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "cygerrno.h"
+#include <sys/errno.h>
 
 /********************** String Helper Functions ************************/
 
@@ -111,4 +113,43 @@ strcasestr (const char *searchee, const char *lookfor)
     }
 
   return NULL;
+}
+
+int __stdcall
+check_null_empty_str (const char *name)
+{
+  if (!name || IsBadStringPtr (name, MAX_PATH))
+    return EFAULT;
+
+  if (!*name)
+    return ENOENT;
+
+  return 0;
+}
+
+int __stdcall
+check_null_empty_str_errno (const char *name)
+{ 
+  int __err; 
+  if ((__err = check_null_empty_str (name))) 
+    set_errno (__err); 
+  return __err; 
+}
+
+int __stdcall
+__check_null_invalid_struct (const void *s, unsigned sz)
+{
+  if (!s || IsBadWritePtr ((void *) s, sz))
+    return EFAULT;
+
+  return 0;
+}
+
+int __stdcall
+__check_null_invalid_struct_errno (const void *s, unsigned sz)
+{ 
+  int __err; 
+  if ((__err = __check_null_invalid_struct (s, sz))) 
+    set_errno (__err); 
+  return __err; 
 }

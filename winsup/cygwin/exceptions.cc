@@ -638,8 +638,8 @@ interruptible (DWORD pc, int testvalid = 0)
   else
     res = !strncasematch (windows_system_directory, checkdir,
 			  windows_system_directory_length);
+  sigproc_printf ("pc %p, h %p, interruptible %d, testvalid %d", pc, h, res, testvalid);
 # undef h
-  sigproc_printf ("h %p, interruptible %d", res);
   return res;
 }
 

@@ -739,9 +739,7 @@ verifyable_object::~verifyable_object ()
 int __stdcall
 check_valid_pointer (void *pointer)
 {
-  MEMORY_BASIC_INFORMATION m;
-  if (!pointer || !VirtualQuery (pointer, &m, sizeof (m))
-      || (m.State != MEM_COMMIT))
+  if (!pointer || IsBadWritePtr (pointer, sizeof (verifyable_object)))
     return EFAULT;
   return 0;
 }
