@@ -1,3 +1,7 @@
+2003-10-22  Richard Sandiford  <rsandifo@redhat.com>
+
+	* libc/stdlib/exit.c (exit): Handle null _GLOBAL_REENT->_atexits.
+
 2003-10-20  Bob Wilson  <bob.wilson@acm.org>
 
 	* libc/locale/locale.c: Use double quotes in code.

@@ -83,7 +83,7 @@ _DEFUN (exit, (code),
     }
 #else
   p = _GLOBAL_REENT->_atexit;
-  do
+  while (p)
     {
       args = & p->_on_exit_args;
   
@@ -95,7 +95,6 @@ _DEFUN (exit, (code),
 
       p = p->_next;
     }
-  while (p);
 #endif
 
   if (_GLOBAL_REENT->__cleanup)
