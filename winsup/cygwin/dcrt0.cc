@@ -821,8 +821,10 @@ _dll_crt0 ()
 
   GetStartupInfo (&si);
   child_proc_info = (child_info *) si.lpReserved2;
-  if (si.cbReserved2 >= EXEC_MAGIC_SIZE &&
-      memcmp (child_proc_info->zero, zeros, sizeof (zeros)) == 0)
+  if (si.cbReserved2 < EXEC_MAGIC_SIZE || !child_proc_info
+      || memcmp (child_proc_info->zero, zeros, sizeof (zeros)) != 0)
+    child_proc_info = NULL;
+  else
     {
       if ((child_proc_info->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
 	multiple_cygwin_problem ("proc", child_proc_info->intro, 0);

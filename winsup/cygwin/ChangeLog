@@ -1,5 +1,10 @@
 2002-06-26  Christopher Faylor  <cgf@redhat.com>
 
+	* dcrt0.cc (_dcrt0): Be more defensive when reserved block is used and
+	it's not cygwin info.
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
 	* autoload (noload): Avoid clobbering bx register.
 
 	* environ.cc (codepage_init): Use case insensitive match.
