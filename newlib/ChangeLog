@@ -1,3 +1,18 @@
+2002-04-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am: Add support for installing crt1.o if one exists.
+	* configure.host: Specify crt1.o for linux.
+	* configure.in: Expose CRT1 and CRT1_DIR for Makefile.am to use.
+	* Makefile.in: Regenerated.
+	* configure: Ditto.
+	* libc/include/sys/unistd.h (_SC_STREAM_MAX, _SC_PRIORITY_SCHEDULING):
+	Added for non-Cygwin, non-RTEMS configurations.
+	* libc/sys/linux/Makefile.am: Add support for crt1 and sysconf.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/crt1.c: New empty file to override one defaulted
+	by gcc.  This fixes problem with reconfiguring linux newlib build.
+	* libc/sys/linux/sysconf.c: New file.
+
 2002-04-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: Add support for machine subdirectory of

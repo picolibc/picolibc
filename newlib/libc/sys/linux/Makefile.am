@@ -9,7 +9,7 @@ SUBLIBS = $(LINUX_MACH_LIB)
 
 LIB_SOURCES = \
 	brk.c getoptlong.c ids.c inode.c io.c linux.c process.c realpath.c \
-	select.c signal.c socket.c sleep.c stack.c systat.c termios.c time.c \
+	select.c signal.c socket.c sleep.c stack.c sysconf.c systat.c termios.c time.c \
 	usleep.c wait.c
 
 # This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)
@@ -37,7 +37,7 @@ lib.a:  $(LINUX_MACH_LIB) $(lib_a_OBJECTS)
 	cd tmp; \
 	for i in $(SUBLIBS); do \
 	  $(AR) x ../$$i; \
-	done; \ 
+	done; \
 	$(AR) $(AR_FLAGS) ../$@ *.o
 	$(RANLIB) $@
 	rm -rf tmp
@@ -47,7 +47,7 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../../Makefile.shared
 
-all: crt0.o
+all: crt0.o crt1.o
 
 crt0.o: machine/crt0.o
 	rm -f $@

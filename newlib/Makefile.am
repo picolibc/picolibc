@@ -79,7 +79,7 @@ endif
 
 noinst_DATA = stmp-targ-include
 
-toollib_DATA = $(CRT0)
+toollib_DATA = $(CRT0) $(CRT1)
 
 
 # The functions ldexp, frexp and modf are traditionally supplied in
@@ -168,6 +168,14 @@ crt0.o: $(CRT0_DIR)/$(CRT0)
 	 || cp $(CRT0_DIR)/$(CRT0) $@
 
 $(CRT0_DIR)/$(CRT0): ; @true
+
+crt1.o: $(CRT1_DIR)/$(CRT1)
+	rm -f $@
+	ln $(CRT0_DIR)/$(CRT0) $@ >/dev/null 2>/dev/null \
+	 || cp $(CRT0_DIR)/$(CRT0) $@
+
+$(CRT1_DIR)/$(CRT1): ; @true
+
 
 all-recursive: stmp-targ-include
 

@@ -48,6 +48,11 @@ fi
 AC_SUBST(CRT0)
 AC_SUBST(CRT0_DIR)
 
+CRT1=${crt1}
+CRT1_DIR=${crt1_dir}
+AC_SUBST(CRT1)
+AC_SUBST(CRT1_DIR)
+
 if test -n "${libm_machine_dir}"; then
   LIBM_MACHINE_OBJECTLIST=libm/machine/${libm_machine_dir}/objectlist.awk.in
 fi

@@ -234,6 +234,11 @@ int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 #define _SC_GETPW_R_SIZE_MAX             51
 #define _SC_LOGIN_NAME_MAX               52
 #define _SC_THREAD_DESTRUCTOR_ITERATIONS 53
+
+#if !defined(__CYGWIN__) && !defined(__rtems__)
+#define _SC_STREAM_MAX			100
+#define _SC_PRIORITY_SCHEDULING		101
+#endif
   
 # define	_PC_LINK_MAX	        0
 # define	_PC_MAX_CANON	        1

@@ -2371,6 +2371,11 @@ fi
 
 
 
+CRT1=${crt1}
+CRT1_DIR=${crt1_dir}
+
+
+
 if test -n "${libm_machine_dir}"; then
   LIBM_MACHINE_OBJECTLIST=libm/machine/${libm_machine_dir}/objectlist.awk.in
 fi
@@ -2623,6 +2628,8 @@ s%@HAVE_DOC_FALSE@%$HAVE_DOC_FALSE%g
 s%@subdirs@%$subdirs%g
 s%@CRT0@%$CRT0%g
 s%@CRT0_DIR@%$CRT0_DIR%g
+s%@CRT1@%$CRT1%g
+s%@CRT1_DIR@%$CRT1_DIR%g
 s%@LIBM_MACHINE_OBJECTLIST@%$LIBM_MACHINE_OBJECTLIST%g
 s%@MACHINE_OBJECTLIST@%$MACHINE_OBJECTLIST%g
 s%@SYS_OBJECTLIST@%$SYS_OBJECTLIST%g

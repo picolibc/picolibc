@@ -35,6 +35,8 @@
 #   use_libtool         flag: use libtool to build newlib?
 #   aext                library extension - needed for libtool support
 #   oext                object file extension - needed for libtool support
+#   crt1                name of crt1 object if one is provided
+#   crt1_dir            directory where crt1 object is found
 
 newlib_cflags=
 libm_machine_dir=
@@ -45,6 +47,8 @@ signal_dir=signal
 syscall_dir=
 unix_dir=
 mach_add_setjmp=
+crt1=
+crt1_dir=
 use_libtool=no
 have_sys_mach_dir=no
 aext=a
@@ -291,6 +295,8 @@ case "${host}" in
 	sys_dir=linux
 	unix_dir=unix
 	posix_dir=posix
+	crt1=crt1.o
+	crt1_dir=libc/sys/${sys_dir}	
 	gcc_dir=`gcc -print-search-dirs | awk '/^install:/{print $2}'`
 	#newlib_cflags="${newlib_cflags} -Werror" # DEBUGGING ONLY;BREAKS BUILD
 	newlib_cflags="${newlib_cflags} -Wall"
