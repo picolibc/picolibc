@@ -110,10 +110,10 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES =  aliases.c ces.c ces_iso2022.c converter.c ccs.c ces_euc.c ces_table.c iconv.c loaddata.c bialiasesi.c biccs.c bices.c
+GENERAL_SOURCES =  aliasesi.c ucsconv.c nullconv.c iconv.c aliasesbi.c iconvnls.c
 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = aliases.$(oext) ces.$(oext) ces_iso2022.$(oext) converter.$(oext) ccs.$(oext) ces_euc.$(oext) ces_table.$(oext) iconv.$(oext) loaddata.$(oext) bialiasesi.$(oext) biccs.$(oext) bices.$(oext)
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = aliasesi.$(oext) ucsconv.$(oext) nullconv.$(oext) iconv.$(oext) aliasesbi.$(oext) iconvnls.$(oext)
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES)
@@ -136,10 +136,8 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_OBJECTS =  aliases.$(OBJEXT) ces.$(OBJEXT) ces_iso2022.$(OBJEXT) \
-converter.$(OBJEXT) ccs.$(OBJEXT) ces_euc.$(OBJEXT) ces_table.$(OBJEXT) \
-iconv.$(OBJEXT) loaddata.$(OBJEXT) bialiasesi.$(OBJEXT) biccs.$(OBJEXT) \
-bices.$(OBJEXT)
+lib_a_OBJECTS =  aliasesi.$(OBJEXT) ucsconv.$(OBJEXT) nullconv.$(OBJEXT) \
+iconv.$(OBJEXT) aliasesbi.$(OBJEXT) iconvnls.$(OBJEXT)
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -1,6 +1,6 @@
-/*-
- * Copyright (c) 1999,2000
- *    Konstantin Chuguev.  All rights reserved.
+/*
+ * Copyright (c) 2003-2004, Artem B. Bityuckiy
+ * Copyright (c) 1999,2000, Konstantin Chuguev. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -22,8 +22,6 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- *    iconv (Charset Conversion Library) v2.0
  */
 
 /*
@@ -141,21 +139,31 @@ by the Single Unix specification.
 
 No supporting OS subroutine calls are required.
 */
-
+#include <_ansi.h>
 #include <reent.h>
+#include <sys/types.h>
 #include <errno.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <iconv.h>
+#include <wchar.h>
+#include <sys/iconvnls.h>
 #include "local.h"
+#include "conv.h"
+#include "ucsconv.h"
+
+/*
+ * iconv interface functions as specified by Single Unix specification.
+ */
 
 iconv_t
 _DEFUN(iconv_open, (to, from), 
                    _CONST char *to _AND
                    _CONST char *from)
 {
-    return _iconv_open_r(_REENT, to, from);
+  return _iconv_open_r (_REENT, to, from);
 }
+
 
 size_t
 _DEFUN(iconv, (cd, inbuf, inbytesleft, outbuf, outbytesleft),
@@ -165,14 +173,16 @@ _DEFUN(iconv, (cd, inbuf, inbytesleft, outbuf, outbytesleft),
               char **outbuf       _AND
               size_t *outbytesleft)
 {
-    return _iconv_r(_REENT, cd, inbuf, inbytesleft, outbuf, outbytesleft);
+    return _iconv_r (_REENT, cd, inbuf, inbytesleft, outbuf, outbytesleft);
 }
+
 
 int
 _DEFUN(iconv_close, (cd), iconv_t cd)
 {
-    return _iconv_close_r(_REENT, cd);
+    return _iconv_close_r (_REENT, cd);
 }
+
 
 #ifndef _REENT_ONLY
 iconv_t
@@ -181,32 +191,50 @@ _DEFUN(_iconv_open_r, (rptr, to, from),
                       _CONST char *to     _AND
                       _CONST char *from)
 {
-     iconv_converter_t *ic;
-    _CONST char *nlspath;
+  iconv_conversion_t *ic;
+    
+  if (to == NULL || from == NULL || *to == '\0' || *from == '\0')
+    return (iconv_t)-1;
 
-    if(!to || !from)
-            return (iconv_t)(-1);
+  if ((to = (_CONST char *)_iconv_resolve_encoding_name (rptr, to)) == NULL)
+    return (iconv_t)-1;
 
-    if ((nlspath = _getenv_r(rptr, NLS_ENVVAR_NAME)) == NULL || 
-        *nlspath == '\0')
-        nlspath = NLS_DEFAULT_NLSPATH;
-
-    if ((to = _iconv_resolve_cs_name(rptr, (_CONST char *)to, 
-                                        (_CONST char *)nlspath)) == NULL)
-            return (iconv_t)(-1);
-    if ((from = _iconv_resolve_cs_name(rptr, (_CONST char *)from, 
-                                          (_CONST char *)nlspath)) == NULL)
+  if ((from = (_CONST char *)_iconv_resolve_encoding_name (rptr, from)) == NULL)
     {
-        _free_r(rptr, (_VOID_PTR)to);
-        return (iconv_t)(-1);
+      _free_r (rptr, (_VOID_PTR)to);
+      return (iconv_t)-1;
     }
 
-    ic = strcmp(from, to) ? _iconv_unicode_conv_init(rptr, to, from)
-                          : _iconv_null_conv_init(rptr, to, from);
-    _free_r(rptr, (_VOID_PTR)to);
-    _free_r(rptr, (_VOID_PTR)from);
-    return ic ? (iconv_t)(ic) : (iconv_t)(-1);
+  ic = (iconv_conversion_t *)_malloc_r (rptr, sizeof (iconv_conversion_t));
+  if (ic == NULL)
+    return (iconv_t)-1;
+
+  /* Select which conversion type to use */
+  if (strcmp (from, to) == 0)
+    {
+      /* Use null conversion */
+      ic->handlers = &_iconv_null_conversion_handlers;
+      ic->data = ic->handlers->open (rptr, to, from);
+    }
+  else  
+    {
+      /* Use UCS-based conversion */
+      ic->handlers = &_iconv_ucs_conversion_handlers;
+      ic->data = ic->handlers->open (rptr, to, from);
+    }
+
+  _free_r (rptr, (_VOID_PTR)to);
+  _free_r (rptr, (_VOID_PTR)from);
+
+  if (ic->data == NULL)
+    {
+      _free_r (rptr, (_VOID_PTR)ic);
+      return (iconv_t)-1;
+    }
+
+  return (_VOID_PTR)ic;
 }
+
 
 size_t
 _DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
@@ -217,36 +245,105 @@ _DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
                  char **outbuf       _AND
                  size_t *outbytesleft)
 {
-    if ((_VOID_PTR)cd == NULL) {
-        __errno_r(rptr) = EBADF;
-        return (size_t)(-1);
+  iconv_conversion_t *ic = (iconv_conversion_t *)cd;
+
+  if ((_VOID_PTR)cd == NULL || cd == (iconv_t)-1 || ic->data == NULL
+       || (ic->handlers != &_iconv_null_conversion_handlers
+           && ic->handlers != &_iconv_ucs_conversion_handlers))
+    {
+      __errno_r (rptr) = EBADF;
+      return (size_t)-1;
     }
-    if (outbytesleft == NULL ||
-        outbuf == NULL || *outbuf == 0) {
-        __errno_r(rptr) = E2BIG;
-        return (size_t)(-1);
+
+  if (inbuf == NULL || *inbuf == NULL)
+    {
+      mbstate_t state_null = ICONV_ZERO_MB_STATE_T;
+      
+      if (!ic->handlers->is_stateful(ic->data, 1))
+        return (size_t)0;
+      
+      if (outbuf == NULL || *outbuf == NULL)
+        {
+          /* Reset shift state */
+          ic->handlers->set_state (ic->data, &state_null, 1);
+          
+          return (size_t)0;
+        }
+       
+      if (outbytesleft != NULL)
+        {
+          mbstate_t state_save = ICONV_ZERO_MB_STATE_T;
+          
+          /* Save current shift state */          
+          ic->handlers->get_state (ic->data, &state_save, 1);
+          
+          /* Reset shift state */
+          ic->handlers->set_state (ic->data, &state_null, 1);
+
+          /* Get initial shift state sequence and it's length */
+          ic->handlers->get_state (ic->data, &state_null, 1);
+          
+          if (*outbytesleft >= state_null.__count)
+            {
+              memcpy ((_VOID_PTR)(*outbuf), (_VOID_PTR)&state_null, state_null.__count);
+              
+              *outbuf += state_null.__count;
+              *outbytesleft -= state_null.__count;
+
+              return (size_t)0;
+            }
+
+           /* Restore shift state if output buffer is too small */
+           ic->handlers->set_state (ic->data, &state_save, 1);
+        }
+       
+      __errno_r (rptr) = E2BIG;
+      return (size_t)-1;
     }
-    return ((iconv_converter_t *)cd)->convert(rptr, (iconv_converter_t *)cd + 1,
-                                            (_CONST unsigned char**)inbuf,
-                                            inbytesleft,
-                                            (unsigned char**)outbuf,
-                                            outbytesleft);
+  
+  if (*inbytesleft == 0)
+    {
+      __errno_r (rptr) = EINVAL;
+      return (size_t)-1;
+    }
+   
+  if (*outbytesleft == 0 || *outbuf == NULL)
+    {
+      __errno_r (rptr) = E2BIG;
+      return (size_t)-1;
+    }
+
+  return ic->handlers->convert (rptr,
+                                ic->data,
+                                (_CONST unsigned char**)inbuf,
+                                inbytesleft,
+                                (unsigned char**)outbuf,
+                                outbytesleft,
+                                0);
 }
+
 
 int
 _DEFUN(_iconv_close_r, (rptr, cd),
                        struct _reent *rptr _AND
                        iconv_t cd)
 {
-    int res;
-
-    if ((_VOID_PTR)cd == NULL || cd == (iconv_t)-1) {
-        __errno_r(rptr) = EBADF;
-        return -1;
+  int res;
+  iconv_conversion_t *ic = (iconv_conversion_t *)cd;
+  
+  if ((_VOID_PTR)cd == NULL || cd == (iconv_t)-1 || ic->data == NULL
+       || (ic->handlers != &_iconv_null_conversion_handlers
+           && ic->handlers != &_iconv_ucs_conversion_handlers))
+    {
+      __errno_r (rptr) = EBADF;
+      return -1;
     }
-    res = ((iconv_converter_t *)cd)->close(rptr, (iconv_converter_t *)cd + 1);
-    _free_r(rptr, (_VOID_PTR)cd);
-    return res ? -1 : 0;
+
+  res = (int)ic->handlers->close (rptr, ic->data);
+  
+  _free_r (rptr, (_VOID_PTR)cd);
+
+  return res;
 }
-#endif /* #ifndef _REENT_ONLY */
+#endif /* !_REENT_ONLY */
 

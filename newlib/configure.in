@@ -37,6 +37,65 @@ AC_ARG_ENABLE(newlib-io-long-double,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-long-double option) ;;
  esac], [newlib_io_long_double=])dnl
 
+dnl If multibyte support is enabled, iconv should be enabled too
+dnl Support --enable-newlib-mb
+AC_ARG_ENABLE(newlib-mb,
+[  --enable-newlib-mb        enable multibyte support],
+[case "${enableval}" in
+  yes) newlib_mb=yes; newlib_iconv=yes ;;
+  no)  newlib_mb=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-mb option) ;;
+ esac], [newlib_mb=])dnl
+
+dnl Support --enable-newlib-iconv
+AC_ARG_ENABLE(newlib-iconv,
+[  --enable-newlib-iconv     enable iconv library support],
+[if test "${newlib_iconv+set}" != set; then
+   case "${enableval}" in
+     yes) newlib_iconv=yes ;;
+     no)  newlib_iconv=no ;;
+     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv option) ;;
+   esac
+ fi], [newlib_iconv=${newlib_iconv}])dnl
+
+dnl Support --enable-newlib-iconv-encodings
+AC_ARG_ENABLE(newlib-iconv-encodings,
+[  --enable-newlib-iconv-encodings   enable specific comma-separated list of bidirectional iconv encodings to be built-in],
+[if test x${enableval} = x; then
+   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv-encodings option - use comma-separated encodings list)
+ fi
+ iconv_encodings=${enableval}
+ ], [iconv_encodings=])dnl
+
+dnl Support --enable-newlib-iconv-from-encodings
+AC_ARG_ENABLE(newlib-iconv-from-encodings,
+[  --enable-newlib-iconv-from-encodings   enable specific comma-separated list of \"from\" iconv encodings to be built-in],
+[if test x${enableval} = x; then
+   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv-from-encodings option - use comma-separated encodings list)
+ fi
+ iconv_from_encodings=${enableval}
+ ], [iconv_from_encodings=])dnl
+
+dnl Support --enable-newlib-iconv-to-encodings
+AC_ARG_ENABLE(newlib-iconv-to-encodings,
+[  --enable-newlib-iconv-to-encodings   enable specific comma-separated list of \"to\" iconv encodings to be built-in],
+[if test x${enableval} = x; then
+   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv-to-encodings option - use comma-separated encodings list)
+ fi
+ iconv_to_encodings=${enableval}
+ ], [iconv_to_encodings=])dnl
+
+dnl Support --enable-newlib-iconv-external-ccs
+AC_ARG_ENABLE(newlib-iconv-external-ccs,
+[  --enable-newlib-iconv-external-ccs     enable capabilities to load external CCS files for iconv],
+[if test "${newlib_iconv_external_ccs+set}" != set; then
+   case "${enableval}" in
+     yes) newlib_iconv_external_ccs=yes ;;
+     no)  newlib_iconv_external_ccs=no ;;
+     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv-external-ccs option) ;;
+   esac
+ fi], [newlib_iconv_external_ccs=${newlib_iconv_external_ccs}])dnl
+
 NEWLIB_CONFIGURE(.)
 
 dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
@@ -180,6 +239,10 @@ else
 AC_DEFINE_UNQUOTED(_MB_LEN_MAX,1)
 fi
 
+if test "${newlib_iconv_external_ccs}" = "yes"; then
+AC_DEFINE_UNQUOTED(_ICONV_ENABLE_EXTERNAL_CCS)
+fi
+
 AC_DEFINE_UNQUOTED(_NEWLIB_VERSION,"$VERSION")
 
 if test "${multilib}" = "yes"; then
@@ -192,37 +255,87 @@ if test "${newlib_iconv}" = "yes"; then
 AC_DEFINE_UNQUOTED(_ICONV_ENABLED,1)
 fi
 
-dnl Parse --enable-newlib-builtin-converters option argument
-if test "x${builtin_converters}" != "x"; then
+if test "x${newlib_iconv_external_ccs}" = "xyes"; then
+  if test "x${newlib_iconv}" = "x"; then
+      AC_MSG_ERROR(--enable-newlib-iconv-external-ccs option can't be used if iconv library is disabled, use --enable-newlib-iconv to enable it.)
+  fi
+  AC_DEFINE_UNQUOTED(_ICONV_ENABLE_EXTERNAL_CCS,1)
+fi
+
+dnl
+dnl Parse --enable-newlib-iconv-encodings option argument
+dnl
+if test "x${iconv_encodings}" != "x" \
+   || test "x${iconv_to_encodings}" != "x" \
+   || test "x${iconv_from_encodings}" != "x"; then
   
   dnl Check that --enable-newlib-iconv was enabled
-  if test x${newlib_iconv} = x; then
-      AC_MSG_ERROR(--enable-newlib-builtin-converters option can't be used if iconv library is disabled - use --enable-newlib-iconv to enable it)
+  if test "x${newlib_iconv}" = "x"; then
+      AC_MSG_ERROR(--enable-newlib-iconv-encodings, --enable-newlib-iconv-from-encodings and --enable-newlib-iconv-to-encodings option can't be used if iconv library is disabled, use --enable-newlib-iconv to enable it.)
   fi
   
-  dnl Normalize converter names and delete commas
-  builtin_converters=`echo "${builtin_converters}" | sed -e 's/,/ /g' -e 's/-/_/g' -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
-  
-  dnl Get the list of available converters excluding comments
+  dnl Normalize encodings names and delete commas
+  iconv_encodings=`echo "${iconv_encodings}" | sed -e 's/,/ /g' -e 's/-/_/g' -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
+  iconv_to_encodings=`echo "${iconv_to_encodings}" | sed -e 's/,/ /g' -e 's/-/_/g' -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
+  iconv_from_encodings=`echo "${iconv_from_encodings}" | sed -e 's/,/ /g' -e 's/-/_/g' -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
+ 
+  dnl Get the list of available encodings excluding comments
   dnl Join line with previous if the first character is whitespace
-  available_converters=`cat "${srcdir}/libc/iconv/charset.aliases" | sed -e '/#/d' | sed -e 'N; s/\n //;'`
-    
-  dnl Check if required converters are supported
-  dnl Convert aliases to "official" names
-  builtin_converters1="${builtin_converters}"
-  builtin_converters=""
-  for converter in ${builtin_converters1}; do
-      result=`echo "${available_converters}" | grep -e "\(^\| \)${converter}\( \|\$\)"`
+  available_encodings=`cat "${srcdir}/libc/iconv/encoding.aliases" | sed -e '/^#.*/d'`
+  
+  dnl Check if required encodings are supported
+  dnl Convert aliases to names
+  
+  dnl iconv_encodings
+  iconv_encodings1="${iconv_encodings}"
+  iconv_encodings=""
+  for encoding in ${iconv_encodings1}; do
+      result=`echo "${available_encodings}" | grep -e "\(^\| \)${encoding}\( \|\$\)"`
       if test $? != "0"; then
-          AC_MSG_ERROR(${converter} is not supported - see ${srcdir}/libc/iconv/charset.aliases file for the list of available converters)
+          AC_MSG_ERROR(${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings)
       fi
-      converter1=`echo "${result}" | sed -e 's/\(^[[^ ]]*\).*$/\1/'`
-      builtin_converters="${builtin_converters} ${converter1}"
+      encoding1=`echo "${result}" | sed -e 's/\(^[[^ ]]*\).*$/\1/'`
+      iconv_encodings="${iconv_encodings} ${encoding1}"
+  done
+  dnl Enable appropriate option in newlib.h
+  for encoding in ${iconv_encodings}; do
+      opt=_ICONV_TO_ENCODING_`echo "${encoding}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+      AC_DEFINE_UNQUOTED($opt,1)
+      opt=_ICONV_FROM_ENCODING_`echo "${encoding}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+      AC_DEFINE_UNQUOTED($opt,1)
   done
 
+  dnl iconv_to_encodings
+  iconv_encodings1="${iconv_to_encodings}"
+  iconv_to_encodings=""
+  for encoding in ${iconv_encodings1}; do
+      result=`echo "${available_encodings}" | grep -e "\(^\| \)${encoding}\( \|\$\)"`
+      if test $? != "0"; then
+          AC_MSG_ERROR(${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings)
+      fi
+      encoding1=`echo "${result}" | sed -e 's/\(^[[^ ]]*\).*$/\1/'`
+      iconv_to_encodings="${iconv_to_encodings} ${encoding1}"
+  done
   dnl Enable appropriate option in newlib.h
-  for converter in ${builtin_converters}; do
-      opt=_ICONV_CONVERTER_`echo "${converter}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+  for encoding in ${iconv_to_encodings}; do
+      opt=_ICONV_TO_ENCODING_`echo "${encoding}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+      AC_DEFINE_UNQUOTED($opt,1)
+  done
+
+  dnl iconv_from_encodings
+  iconv_encodings1="${iconv_from_encodings}"
+  iconv_from_encodings=""
+  for encoding in ${iconv_encodings1}; do
+      result=`echo "${available_encodings}" | grep -e "\(^\| \)${encoding}\( \|\$\)"`
+      if test $? != "0"; then
+          AC_MSG_ERROR(${encoding} is not supported - see ${srcdir}/libc/iconv/encoding.aliases file for the list of available encodings)
+      fi
+      encoding1=`echo "${result}" | sed -e 's/\(^[[^ ]]*\).*$/\1/'`
+      iconv_from_encodings="${iconv_from_encodings} ${encoding1}"
+  done
+  dnl Enable appropriate option in newlib.h
+  for encoding in ${iconv_from_encodings}; do
+      opt=_ICONV_FROM_ENCODING_`echo "${encoding}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
       AC_DEFINE_UNQUOTED($opt,1)
   done
 fi;

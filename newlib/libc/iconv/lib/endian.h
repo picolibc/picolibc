@@ -1,6 +1,5 @@
-/*-
- * Copyright (c) 2000
- *	Konstantin Chuguev.  All rights reserved.
+/*
+ * Copyright (c) 2003-2004, Artem B. Bityuckiy
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -22,35 +21,53 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- *	iconv (Charset Conversion Library) v2.0
  */
-#ifndef __LOCAL_ENDIAN_H__
-#define __LOCAL_ENDIAN_H__
+#ifndef __ICONV_CES_ENDIAN_H__
+#define __ICONV_CES_ENDIAN_H__
 
 #include <sys/param.h>
-#include <sys/types.h>
-
-#define ICONV_CCT_BE 0
-#define ICONV_CCT_LE 1
 
 #if (BYTE_ORDER == LITTLE_ENDIAN)
 
-#define ICONV_ORDER ICONV_CCT_LE 
-#define _1l(b0, b1, b2, b3)	b3, b2, b1, b0
-#define _2s(b0, b1, b2, b3)	b1, b0, b3, b2
+#  define ICONV_BETOHS(s) \
+     ((((s) << 8) & 0xFF00) | (((s) >> 8) & 0x00FF))
+
+#  define ICONV_BETOHL(l) \
+     ((((l) << 24) & 0xFF000000) | \
+      (((l) <<  8) & 0x00FF0000) | \
+      (((l) >>  8) & 0x0000FF00) | \
+      (((l) >> 24) & 0x000000FF))
+
+#  define ICONV_LETOHS(s) (s)
+#  define ICONV_LETOHL(l) (l)
+
+#  define ICONV_HTOLES(s) ICONV_LETOHS (s)
+#  define ICONV_HTOLEL(l) ICONV_LETOHL (l)
+#  define ICONV_HTOBES(s) ICONV_BETOHS (s)
+#  define ICONV_HTOBEL(l) ICONV_BETOHL (l)
 
 #elif (BYTE_ORDER == BIG_ENDIAN)
 
-#define ICONV_ORDER ICONV_CCT_BE
-#define _1l(b0, b1, b2, b3)	b0, b1, b2, b3
-#define _2s(b0, b1, b2, b3)	b0, b1, b2, b3
+#  define ICONV_BETOHS(s) (s)
+#  define ICONV_BETOHL(l) (l)
+  
+#  define ICONV_LETOHS(s) \
+     ((((s) << 8) & 0xFF00) | (((s) >> 8) & 0x00FF))
+
+#  define ICONV_LETOHL(l) \
+     ((((l) << 24) & 0xFF000000) | \
+      (((l) <<  8) & 0x00FF0000) | \
+      (((l) >>  8) & 0x0000FF00) | \
+      (((l) >> 24) & 0x000000FF))
+
+#  define ICONV_HTOBES(s) ICONV_BETOHS (s)
+#  define ICONV_HTOBEL(l) ICONV_BETOHL (l)
+#  define ICONV_HTOLES(s) ICONV_LETOHS (s)
+#  define ICONV_HTOLEL(l) ICONV_LETOHL (l)
 
 #else
-
-#error "Unknown byte order."
-
+#  error "Unknown byte order."
 #endif
 
-#endif /* #ifndef __LOCAL_ENDIAN_H__ */
+#endif /* !__ICONV_CES_ENDIAN_H__ */
 

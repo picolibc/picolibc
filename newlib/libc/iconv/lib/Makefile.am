@@ -5,36 +5,25 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 GENERAL_SOURCES = \
-aliases.c \
-ces.c \
-ces_iso2022.c \
-converter.c \
-ccs.c \
-ces_euc.c \
-ces_table.c \
+aliasesi.c \
+ucsconv.c \
+nullconv.c \
 iconv.c \
-loaddata.c \
-bialiasesi.c \
-biccs.c \
-bices.c
+aliasesbi.c \
+iconvnls.c
+
 
 ## The following interfaces are EL/IX level 2
 if ELIX_LEVEL_1
 LIB_OBJS =
 else
 LIB_OBJS = \
-aliases.$(oext) \
-ces.$(oext) \
-ces_iso2022.$(oext) \
-converter.$(oext) \
-ccs.$(oext) \
-ces_euc.$(oext) \
-ces_table.$(oext) \
+aliasesi.$(oext) \
+ucsconv.$(oext) \
+nullconv.$(oext) \
 iconv.$(oext) \
-loaddata.$(oext) \
-bialiasesi.$(oext) \
-biccs.$(oext) \
-bices.$(oext)
+aliasesbi.$(oext) \
+iconvnls.$(oext)
 endif
 
 noinst_LIBRARIES = lib.a
@@ -58,5 +47,4 @@ CHEW = ../../../doc/makedoc -f $(srcdir)/../../../doc/doc.str
 doc: $(CHEWOUT_FILES)
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref
-
 

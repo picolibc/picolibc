@@ -1,6 +1,6 @@
-/*-
- * Copyright (c) 1999,2000
- *    Konstantin Chuguev.  All rights reserved.
+/*
+ * Copyright (c) 2003-2004, Artem B. Bityuckiy, SoftMine Corporation.
+ * Rights transferred to Franklin Electronic Publishers.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -22,16 +22,14 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- *    iconv (Charset Conversion Library) v2.0
  */
-
 #ifndef _ICONV_H_
 #define _ICONV_H_
 
 #include <_ansi.h>
-#include <sys/types.h>
 #include <reent.h>
+#include <sys/types.h>
+#include <sys/_types.h>
 
 /* iconv_t: charset conversion descriptor type */
 typedef _iconv_t iconv_t;

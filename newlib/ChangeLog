@@ -1,3 +1,182 @@
+2004-06-25  Artem B. Bityuckiy  <dedekind@oktetlabs.ru>
+
+	* acinclude.m4: Move iconv options into configure.in.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* configure.in: Add iconv options.
+	* newlib.hin: Add new iconv encodings and remove deleted ones.
+	* doc/aclocal.m4: Regenerated.
+	* doc/configure: Ditto.
+	* iconvdata/aclocal.m4: Ditto.
+	* iconvdata/configure: Ditto.
+	* libc/iconv: Design change.  New size-optimized ccs format.
+	* libc/iconv/AUTHORS: Removed.
+	* libc/iconv/COPYING: Ditto.
+	* libc/iconv/README.ORIGINAL: Ditto.
+	* libc/iconv/README.TODO: Ditto.
+	* libc/iconv/charset.aliases: Ditto.
+	* libc/iconv/encoding.aliases: New file.
+	* libc/iconv/Makefile.am: Updated.
+	* libc/iconv/Makefile.in: Regenerated.
+	* libc/iconv/iconv.tex: Updated.
+	* libc/iconv/ccs/Makefile.am: Ditto.
+	* libc/iconv/ccs/Makefile.in: Regenerated.
+	* libc/iconv/ccs/big5.c: Updated.
+	* libc/iconv/ccs/cns11643_plane1.c: Ditto.
+	* libc/iconv/ccs/cns11643_plane14.c: Ditto.
+	* libc/iconv/ccs/cns11643_plane2.c: Ditto.
+	* libc/iconv/ccs/cp775.c: Ditto.
+	* libc/iconv/ccs/cp850.c: Ditto.
+	* libc/iconv/ccs/cp852.c: Ditto.
+	* libc/iconv/ccs/cp855.c: Ditto.
+	* libc/iconv/ccs/cp866.c: Ditto.
+	* libc/iconv/ccs/iso_8859_1.c: Ditto.
+	* libc/iconv/ccs/README.CCS.SOURCES: Removed.
+	* libc/iconv/ccs/gb_2312_80.c: Ditto.
+	* libc/iconv/ccs/iconv_mktbl: Ditto.
+	* libc/iconv/ccs/jis_x0201.c: Ditto.
+	* libc/iconv/ccs/jis_x0208_1983.c: Ditto.
+	* libc/iconv/ccs/shift_jis.c: Ditto.
+	* libc/iconv/ccs/us_ascii.c: Ditto.
+	* libc/iconv/ccs/ccs.h: New file.
+	* libc/iconv/ccs/ccsbi.c: Ditto.
+	* libc/iconv/ccs/ccsbi.h: Ditto.
+	* libc/iconv/ccs/ccsnames.h: Ditto.
+	* libc/iconv/ccs/iso_8859_10.c: Ditto.
+	* libc/iconv/ccs/iso_8859_11.c: Ditto.
+	* libc/iconv/ccs/iso_8859_13.c: Ditto.
+	* libc/iconv/ccs/iso_8859_14.c: Ditto.
+	* libc/iconv/ccs/iso_8859_3.c: Ditto.
+	* libc/iconv/ccs/iso_8859_6.c: Ditto.
+	* libc/iconv/ccs/iso_8859_7.c: Ditto.
+	* libc/iconv/ccs/iso_8859_8.c: Ditto.
+	* libc/iconv/ccs/iso_8859_9.c: Ditto.
+	* libc/iconv/ccs/iso_ir_111.c: Ditto.
+	* libc/iconv/ccs/jis_x0201_1976.c: Ditto.
+	* libc/iconv/ccs/jis_x0208_1990.c: Ditto.
+	* libc/iconv/ccs/koi8_ru.c: Ditto.
+	* libc/iconv/ccs/koi8_uni.c: Ditto.
+	* libc/iconv/ccs/mktbl.pl: Ditto.
+	* libc/iconv/ccs/win_1250.c: Ditto.
+	* libc/iconv/ccs/win_1251.c: Ditto.
+	* libc/iconv/ccs/win_1252.c: Ditto.
+	* libc/iconv/ccs/win_1253.c: Ditto.
+	* libc/iconv/ccs/win_1254.c: Ditto.
+	* libc/iconv/ccs/win_1255.c: Ditto.
+	* libc/iconv/ccs/win_1256.c: Ditto.
+	* libc/iconv/ccs/win_1257.c: Ditto.
+	* libc/iconv/ccs/win_1258.c: Ditto.
+	* libc/iconv/ccs/iso_8859_15.c
+	* libc/iconv/ccs/iso_8859_2.c
+	* libc/iconv/ccs/iso_8859_4.c
+	* libc/iconv/ccs/iso_8859_5.c
+	* libc/iconv/ccs/jis_x0212_1990.c
+	* libc/iconv/ccs/koi8_r.c
+	* libc/iconv/ccs/koi8_u.c
+	* libc/iconv/ccs/ksx1001.c
+	* libc/iconv/ccs/binary/gb_2312_80.cct: Removed.
+	* libc/iconv/ccs/binary/jis_x0201.cct: Ditto.
+	* libc/iconv/ccs/binary/shift_jis.cct: Ditto.
+	* libc/iconv/ccs/binary/us_ascii.cct: Ditto.
+	* libc/iconv/ccs/binary/jis_x0208_1983.cct: Ditto.
+	* libc/iconv/ccs/binary/Makefile.am: Updated.
+	* libc/iconv/ccs/binary/Makefile.in: Regenerated.
+	* libc/iconv/ccs/binary/big5.cct: Updated.
+	* libc/iconv/ccs/binary/cns11643_plane1.cct: Ditto.
+	* libc/iconv/ccs/binary/cns11643_plane14.cct: Ditto.
+	* libc/iconv/ccs/binary/cns11643_plane2.cct: Ditto.
+	* libc/iconv/ccs/binary/cp775.cct: Updated.: Ditto.
+	* libc/iconv/ccs/binary/cp850.cct: Ditto.: Ditto.
+	* libc/iconv/ccs/binary/cp852.cct: Ditto.: Ditto.
+	* libc/iconv/ccs/binary/cp855.cct: Ditto.: Ditto.
+	* libc/iconv/ccs/binary/cp866.cct: Ditto.: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_1.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_15.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_4.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_5.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_2.cct: Ditto.
+	* libc/iconv/ccs/binary/jis_x0212_1990.cct: Ditto.
+	* libc/iconv/ccs/binary/koi8_r.cct: Ditto.
+	* libc/iconv/ccs/binary/koi8_u.cct: Ditto.
+	* libc/iconv/ccs/binary/ksx1001.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_10.cct: New file.
+	* libc/iconv/ccs/binary/iso_8859_11.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_13.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_14.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_3.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_6.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_7.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_8.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_8859_9.cct: Ditto.
+	* libc/iconv/ccs/binary/iso_ir_111.cct: Ditto.
+	* libc/iconv/ccs/binary/jis_x0201_1976.cct: Ditto.
+	* libc/iconv/ccs/binary/jis_x0208_1990.cct: Ditto.
+	* libc/iconv/ccs/binary/koi8_ru.cct: Ditto.
+	* libc/iconv/ccs/binary/koi8_uni.cct: Ditto.
+	* libc/iconv/ccs/binary/win_1250.cct: Ditto.
+	* libc/iconv/ccs/binary/win_1251.cct: Ditto.
+	* libc/iconv/ccs/binary/win_1252.cct: Ditto.
+	* libc/iconv/ccs/binary/win_1253.cct: Ditto.
+	* libc/iconv/ccs/binary/win_1254.cct: Ditto.
+	* libc/iconv/ccs/binary/win_1255.cct: Ditto.
+	* libc/iconv/ccs/binary/win_1256.cct: Ditto.
+	* libc/iconv/ccs/binary/win_1257.cct: Ditto.
+	* libc/iconv/ccs/binary/win_1258.cct: Ditto.
+	* libc/iconv/ces/Makefile.am: Updated.
+	* libc/iconv/ces/Makefile.in: Regenerated.
+	* libc/iconv/ces/ucs-2-internal.c: Updated.
+	* libc/iconv/ces/ucs-4-internal.c: Ditto.
+	* libc/iconv/ces/utf-16.c: Ditto.
+	* libc/iconv/ces/utf-8.c: Ditto.
+	* libc/iconv/ces/cesbi.c: New file.
+	* libc/iconv/ces/cesbi.h: Ditto.
+	* libc/iconv/ces/cesdeps.h: Ditto.
+	* libc/iconv/ces/euc.c: Ditto.
+	* libc/iconv/ces/mkdeps.pl: Ditto.
+	* libc/iconv/ces/table-pcs.c: Ditto.
+	* libc/iconv/ces/table.c: Ditto.
+	* libc/iconv/ces/ucs-2.c: Ditto.
+	* libc/iconv/ces/ucs-4.c: Ditto.
+	* libc/iconv/ces/us-ascii.c: Ditto.
+	* libc/iconv/ces/euc-jp.c: Removed.
+	* libc/iconv/ces/euc-kr.c: Ditto.
+	* libc/iconv/ces/euc-tw.c: Ditto.
+	* libc/iconv/ces/gb2312.c: Ditto.
+	* libc/iconv/ces/iso-10646-ucs-2.: Ditto.c
+	* libc/iconv/ces/iso-10646-ucs-4.c: Ditto.
+	* libc/iconv/lib/Makefile.am: Updated.
+	* libc/iconv/lib/Makefile.in: Regenerated.
+	* libc/iconv/lib/endian.h: Updated.
+	* libc/iconv/lib/iconv.c: Ditto.
+	* libc/iconv/lib/local.h: Ditto.
+	* libc/iconv/lib/aliases.c: Removed.
+	* libc/iconv/lib/bialiasesi.c: Ditto.
+	* libc/iconv/lib/biccs.c: Ditto.
+	* libc/iconv/lib/bices.c: Ditto.
+	* libc/iconv/lib/ccs.c: Ditto.
+	* libc/iconv/lib/ces.c: Ditto.
+	* libc/iconv/lib/ces_euc.c: Ditto.
+	* libc/iconv/lib/ces_iso2022.c: Ditto.
+	* libc/iconv/lib/ces_table.c: Ditto.
+	* libc/iconv/lib/converter.c: Ditto.
+	* libc/iconv/lib/deps.h: Ditto.
+	* libc/iconv/lib/aliasesbi.c: Ditto.
+	* libc/iconv/lib/aliasesi.c: Ditto.
+	* libc/iconv/lib/conv.h: Ditto.
+	* libc/iconv/lib/encnames.h: Ditto.
+	* libc/iconv/lib/encoding.deps: Ditto.
+	* libc/iconv/lib/iconvnls.c: Ditto.
+	* libc/iconv/lib/iconvnls.h: Ditto.
+	* libc/iconv/lib/loaddata.c: Ditto.
+	* libc/iconv/lib/nullconv.c: Ditto.
+	* libc/iconv/lib/ucsconv.c: Ditto.
+	* libc/iconv/lib/ucsconv.h: Ditto.
+	* libc/include/iconv.h: Update copyright.
+	* libc/*/aclocal.m4: Regenerated.
+	* libc/*/configure: Ditto.
+	* libm/*/aclocal.m4: Ditto.
+	* libm/*/configure: Ditto.
+
 2004-06-22  Alexandre Oliva  <aoliva@redhat.com>
 
 	* libc/include/machine/setjmp.h [__H8300__] (_JBTYPE): Define,

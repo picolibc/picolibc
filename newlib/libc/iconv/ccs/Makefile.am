@@ -4,59 +4,40 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = \
-	big5.c \
-	cp775.c \
-	cp850.c \
-	cp852.c \
-	cp855.c \
-	cp866.c \
-	gb_2312_80.c \
-	iso_8859_15.c \
-	iso_8859_1.c \
-	iso_8859_2.c \
-	iso_8859_4.c \
-	iso_8859_5.c \
-	jis_x0201.c \
-	jis_x0208_1983.c \
-	jis_x0212_1990.c \
-	koi8_r.c \
-	koi8_u.c \
-	ksx1001.c \
-	shift_jis.c \
-	cns11643_plane14.c \
-	cns11643_plane1.c \
-	cns11643_plane2.c \
-	us_ascii.c
+GENERAL_SOURCES = ccsbi.c \
+iso_8859_10.c iso_8859_13.c iso_8859_14.c iso_8859_15.c \
+iso_8859_1.c iso_8859_2.c iso_8859_3.c iso_8859_4.c \
+iso_8859_5.c iso_8859_6.c iso_8859_7.c iso_8859_8.c \
+iso_8859_9.c iso_8859_11.c \
+win_1250.c win_1252.c win_1254.c \
+win_1256.c win_1258.c win_1251.c \
+win_1253.c win_1255.c win_1257.c \
+koi8_r.c koi8_u.c koi8_ru.c koi8_uni.c \
+iso_ir_111.c \
+big5.c \
+cp775.c cp850.c cp852.c cp855.c cp866.c \
+jis_x0212_1990.c jis_x0201_1976.c jis_x0208_1990.c ksx1001.c \
+cns11643_plane1.c cns11643_plane2.c cns11643_plane14.c
 
 ## The following interfaces are EL/IX level 2
 if ELIX_LEVEL_1
-LIB_OBJS =
+LIB_OBJS = ccsbi.$(oext) \
+iso_8859_10.$(oext) iso_8859_13.$(oext) iso_8859_14.$(oext) iso_8859_15.$(oext) \
+iso_8859_1.$(oext) iso_8859_2.$(oext) iso_8859_3.$(oext) iso_8859_4.$(oext) \
+iso_8859_5.$(oext) iso_8859_6.$(oext) iso_8859_7.$(oext) iso_8859_8.$(oext) \
+iso_8859_9.$(oext) iso_8859_11.$(oext) \
+win_1250.$(oext) win_1252.$(oext) win_1254.$(oext) \
+win_1256.$(oext) win_1258.$(oext) win_1251.$(oext) \
+win_1253.$(oext) win_1255.$(oext) win_1257.$(oext) \
+koi8_r.$(oext) koi8_u.$(oext) koi8_ru.$(oext) koi8_uni.$(oext)
+iso_ir_111.$(oext) \
+big5.$(oext) \
+cp775.$(oext) cp850.$(oext) cp852.$(oext) cp855.$(oext) cp866.$(oext) \
+jis_x0212_1990.$(oext) jis_x0201_1976.$(oext) jis_x0208_1990.$(oext) ksx1001.$(oext) \
+cns11643_plane1.$(oext) cns11643_plane2.$(oext) cns11643_plane14.$(oext)
+
 else
-LIB_OBJS = \
-	big5.$(oext) \
-	cp775.$(oext) \
-	cp850.$(oext) \
-	cp852.$(oext) \
-	cp855.$(oext) \
-	cp866.$(oext) \
-	gb_2312_80.$(oext) \
-	iso_8859_15.$(oext) \
-	iso_8859_1.$(oext) \
-	iso_8859_2.$(oext) \
-	iso_8859_4.$(oext) \
-	iso_8859_5.$(oext) \
-	jis_x0201.$(oext) \
-	jis_x0208_1983.$(oext) \
-	jis_x0212_1990.$(oext) \
-	koi8_r.$(oext) \
-	koi8_u.$(oext) \
-	ksx1001.$(oext) \
-	shift_jis.$(oext) \
-	cns11643_plane14.$(oext) \
-	cns11643_plane1.$(oext) \
-	cns11643_plane2.$(oext) \
-	us_ascii.$(oext)
+LIB_OBJS =
 endif
 
 noinst_LIBRARIES = lib.a

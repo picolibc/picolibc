@@ -111,7 +111,7 @@ AUTOMAKE_OPTIONS = cygnus
 SUBDIRS = ces ccs lib .
 
 cctdir = $(datadir)/iconv_data
-cct_DATA = charset.aliases
+cct_DATA = encoding.aliases
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
@@ -126,7 +126,7 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DATA =  $(cct_DATA)
 
-DIST_COMMON =  AUTHORS COPYING Makefile.am Makefile.in
+DIST_COMMON =  Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)

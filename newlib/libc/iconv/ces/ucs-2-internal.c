@@ -1,6 +1,6 @@
-/*-
- * Copyright (c) 1999,2000
- *    Konstantin Chuguev.  All rights reserved.
+/*
+ * Copyright (c) 2003-2004, Artem B. Bityuckiy
+ * Copyright (c) 1999,2000, Konstantin Chuguev. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -22,45 +22,106 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- *    iconv (Charset Conversion Library) v2.0
  */
-#include "../lib/deps.h"
+#include "cesbi.h"
 
-#ifdef _ICONV_CONVERTER_UCS_2_INTERNAL
+#if defined (ICONV_TO_UCS_CES_UCS_2_INTERNAL) \
+ || defined (ICONV_FROM_UCS_CES_UCS_2_INTERNAL)
+
+#include <_ansi.h>
+#include <reent.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 #include "../lib/local.h"
+#include "../lib/ucsconv.h"
+#include "../lib/endian.h"
 
-static ssize_t
-_DEFUN(convert_from_ucs, (ces, in, outbuf, outbytesleft),
-                         struct iconv_ces *ces  _AND
-                         ucs_t in               _AND
-                         unsigned char **outbuf _AND
-                         size_t *outbytesleft)
+/*
+ * Internal 2-byte representation of UCS-2 codes without restrictions and
+ * without BOM support.
+ */
+ 
+#if defined (ICONV_FROM_UCS_CES_UCS_2_INTERNAL)
+static size_t
+_DEFUN(ucs_2_internal_convert_from_ucs, (data, in, outbuf, outbytesleft),
+                                        _VOID_PTR data         _AND
+                                        register ucs4_t in     _AND
+                                        unsigned char **outbuf _AND
+                                        size_t *outbytesleft)
 {
-    if (in == UCS_CHAR_NONE)
-        return 1;    /* No state reinitialization for table charsets */
-    if (iconv_char32bit(in))
-        return -1;    /* No corresponding character in UCS-2 */
-    if (*outbytesleft < sizeof(ucs2_t))
-        return 0;    /* No space in the output buffer */
-    *((ucs2_t *)(*outbuf))++ = in;
-    (*outbytesleft) -= sizeof(ucs2_t);
-    return 1;
+  if (in > 0x0000FFFF)
+    return (size_t)ICONV_CES_INVALID_CHARACTER;
+  
+  if (*outbytesleft < sizeof (ucs2_t))
+    return (size_t)ICONV_CES_NOSPACE;
+
+  *((ucs2_t *)(*outbuf)) = (ucs2_t)in;
+  *outbuf += sizeof (ucs2_t);
+  *outbytesleft -= sizeof (ucs2_t);
+
+  return sizeof (ucs2_t);
+}
+#endif /* ICONV_FROM_UCS_CES_UCS_2_INTERNAL */
+
+#if defined (ICONV_TO_UCS_CES_UCS_2_INTERNAL)
+static ucs4_t
+_DEFUN(ucs_2_internal_convert_to_ucs, (data, inbuf, inbytesleft),
+                                      _VOID_PTR data               _AND
+                                      _CONST unsigned char **inbuf _AND
+                                      size_t *inbytesleft)
+{
+  register ucs4_t res;
+  
+  if (*inbytesleft < sizeof (ucs2_t))
+    return (ucs4_t)ICONV_CES_BAD_SEQUENCE;
+
+  res = (ucs4_t)*((ucs2_t *)(*inbuf));
+  
+  if (res > 0x0000FFFF)
+    return (ucs4_t)ICONV_CES_INVALID_CHARACTER;
+    
+  *inbuf += sizeof (ucs2_t);
+  *inbytesleft -= sizeof (ucs2_t);
+
+  return res;
+}
+#endif /* ICONV_TO_UCS_CES_UCS_2_INTERNAL */
+
+static int
+_DEFUN(ucs_2_internal_get_mb_cur_max, (data),
+                                      _VOID_PTR data)
+{
+  return 2;
 }
 
-static ucs_t
-_DEFUN(convert_to_ucs, (ces, inbuf, inbytesleft),
-                       struct iconv_ces *ces        _AND
-                       _CONST unsigned char **inbuf _AND
-                       size_t *inbytesleft)
+#if defined (ICONV_TO_UCS_CES_UCS_2_INTERNAL)
+_CONST iconv_to_ucs_ces_handlers_t
+_iconv_to_ucs_ces_handlers_ucs_2_internal = 
 {
-    if (*inbytesleft < sizeof(ucs2_t))
-        return UCS_CHAR_NONE;    /* Not enough bytes in the input buffer */
-    (*inbytesleft) -= sizeof(ucs2_t);
-    return *((_CONST ucs2_t *)(*inbuf))++;
-}
+  NULL,
+  NULL,
+  ucs_2_internal_get_mb_cur_max,
+  NULL,
+  NULL,
+  NULL,
+  ucs_2_internal_convert_to_ucs
+};
+#endif
 
-ICONV_CES_STATELESS_MODULE_DECL(ucs_2_internal);
+#if defined (ICONV_FROM_UCS_CES_UCS_2_INTERNAL)
+_CONST iconv_from_ucs_ces_handlers_t
+_iconv_from_ucs_ces_handlers_ucs_2_internal =
+{
+  NULL,
+  NULL,
+  ucs_2_internal_get_mb_cur_max,
+  NULL,
+  NULL,
+  NULL,
+  ucs_2_internal_convert_from_ucs
+};
+#endif
 
-#endif /* #ifdef _ICONV_CONVERTER_UCS_2_INTERNAL */
+#endif /* ICONV_TO_UCS_CES_UCS_2_INTERNAL || ICONV_FROM_UCS_CES_UCS_2_INTERNAL */
 
