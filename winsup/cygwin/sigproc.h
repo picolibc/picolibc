@@ -65,7 +65,7 @@ public:
   sigframe () {st = NULL;}
   sigframe (sigthread &t, int up = 1)
   {
-    if (!t.frame || t.id == GetCurrentThreadId ())
+    if (!t.frame && t.id == GetCurrentThreadId ())
       set (t, up);
     else
       st = NULL;

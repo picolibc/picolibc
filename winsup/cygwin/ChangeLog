@@ -1,3 +1,8 @@
+Thu May 18 01:04:02 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.h (sigframe): Don't set frame info unless tid matches this
+	thread id.
+
 Wed May 17 23:13:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (dll_crt0_1): Initialize mainthread stuff here before
