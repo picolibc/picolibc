@@ -1,3 +1,17 @@
+Fri Mar  2 12:33:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* dir.cc (readdir): Fix shortcut==symlink condition.
+	* environ.cc: Add extern decl for `allow_winsymlinks'.
+	(struct parse_thing): Add entry for `[no]winsymlinks'.
+	* path.cc (symlink): Change to be able to create both,
+	symlink==shortcut and symlink==systemfile, dependent of
+	the setting of `allow_winsymlinks'.
+	* security.cc (cygwin_logon_user): Add debug output.
+	* shortcut.c: Add defines from path.h.
+	(has_exec_chars): Copy from path.h.
+	(check_shortcut): Check for executable file condition if not a
+	shortcut.
+
 Thu Mar  1 21:06:07 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (sig_handle_tty_stop): Ignore attempts to suspend a

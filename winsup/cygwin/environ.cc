@@ -30,6 +30,7 @@ extern BOOL allow_glob;
 extern BOOL ignore_case_with_glob;
 extern BOOL allow_ntea;
 extern BOOL allow_smbntsec;
+extern BOOL allow_winsymlinks;
 extern BOOL strip_title_path;
 extern DWORD chunksize;
 BOOL reset_com = TRUE;
@@ -454,6 +455,7 @@ struct parse_thing
   {"strip_title", {&strip_title_path}, justset, NULL, {{FALSE}, {TRUE}}},
   {"title", {&display_title}, justset, NULL, {{FALSE}, {TRUE}}},
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},
+  {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{FALSE}, {TRUE}}},
   {NULL, {0}, justset, 0, {{0}, {0}}}
 };
 

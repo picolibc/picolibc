@@ -174,12 +174,21 @@ readdir (DIR * dir)
   /* We get here if `buf' contains valid data.  */
   strcpy (dir->__d_dirent->d_name, buf.cFileName);
 
+  /* Check for Windows shortcut. If it's a Cygwin or U/WIN
+     symlink, drop the .lnk suffix. */
   if (buf.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
     {
       char *c = dir->__d_dirent->d_name;
       int len = strlen (c);
       if (!strcasecmp (c + len - 4, ".lnk"))
-        c[len - 4] = '\0';
+        {
+	  char fbuf[MAX_PATH + 1];
+	  strcpy (fbuf, dir->__d_dirname);
+	  strcat (fbuf + strlen (fbuf) - 1, dir->__d_dirent->d_name);
+	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
+	  if (fpath.issymlink ())
+            c[len - 4] = '\0';
+        }
     }
 
   /* Compute d_ino by combining filename hash with the directory hash

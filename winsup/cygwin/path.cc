@@ -2192,24 +2192,30 @@ endmntent (FILE *)
 
 /* Create a symlink from FROMPATH to TOPATH. */
 
+/* If TRUE create symlinks as Windows shortcuts, if FALSE create symlinks
+   as normal files with magic number and system bit set. */
+int allow_winsymlinks = TRUE;
+
 extern "C"
 int
 symlink (const char *topath, const char *frompath)
 {
   HANDLE h;
   int res = -1;
-
-#if 0
-  path_conv win32_path (frompath, PC_SYM_NOFOLLOW);
-#else
+  path_conv win32_path, win32_topath;
   char from[MAX_PATH + 5];
-  strcpy (from, frompath);
-  strcat (from, ".lnk");
-  path_conv win32_path (from, PC_SYM_NOFOLLOW);
-  path_conv win32_topath;
   char cwd[MAX_PATH + 1], *cp = NULL, c = 0;
   char w32topath[MAX_PATH + 1];
-#endif
+  DWORD written;
+
+  if (allow_winsymlinks)
+    {
+      strcpy (from, frompath);
+      strcat (from, ".lnk");
+      win32_path.check (from, PC_SYM_NOFOLLOW);
+    }
+  else
+    win32_path.check (frompath, PC_SYM_NOFOLLOW);
 
   if (win32_path.error)
     {
@@ -2237,86 +2243,83 @@ symlink (const char *topath, const char *frompath)
       goto done;
     }
 
-#if 0
+  if (allow_winsymlinks)
+    {
+      if (!isabspath (topath))
+	{
+	  getcwd (cwd, MAX_PATH + 1);
+	  if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
+	    {
+	      c = *cp;
+	      *cp = '\0';
+	      chdir (from);
+	    }
+	  backslashify (topath, w32topath, 0);
+	}
+      if (!cp || GetFileAttributes (w32topath) == (DWORD)-1)
+	{
+	  win32_topath.check (topath, PC_SYM_NOFOLLOW);
+	  if (!cp || win32_topath.error != ENOENT)
+	    strcpy (w32topath, win32_topath);
+	}
+      if (cp)
+	{
+	  *cp = c;
+	  chdir (cwd);
+	}
+    }
+
   h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sec_none_nih,
 		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
   if (h == INVALID_HANDLE_VALUE)
       __seterrno ();
   else
     {
-      DWORD written;
-      /* This is the old technique creating a symlink.
-         Preserved to have a fallback. */
-      char buf[sizeof (SYMLINK_COOKIE) + MAX_PATH + 10];
+      BOOL success;
 
-      __small_sprintf (buf, "%s%s", SYMLINK_COOKIE, topath);
-      DWORD len = strlen (buf) + 1;
+      if (allow_winsymlinks)
+	{
+	  create_shortcut_header ();
+	  /* Don't change the datatypes of `len' and `win_len' since
+	     their sizeof is used when writing. */
+	  unsigned short len = strlen (topath);
+	  unsigned short win_len = strlen (w32topath);
+	  success = WriteFile (h, shortcut_header, SHORTCUT_HDR_SIZE,
+	  		       &written, NULL)
+		    && written == SHORTCUT_HDR_SIZE
+		    && WriteFile (h, &len, sizeof len, &written, NULL)
+		    && written == sizeof len
+		    && WriteFile (h, topath, len, &written, NULL)
+		    && written == len
+		    && WriteFile (h, &win_len, sizeof win_len, &written, NULL)
+		    && written == sizeof win_len
+		    && WriteFile (h, w32topath, win_len, &written, NULL)
+		    && written == win_len;
+	}
+      else
+	{
+	  /* This is the old technique creating a symlink. */
+	  char buf[sizeof (SYMLINK_COOKIE) + MAX_PATH + 10];
 
-      /* Note that the terminating nul is written.  */
-      if (WriteFile (h, buf, len, &written, NULL) || written != len)
+	  __small_sprintf (buf, "%s%s", SYMLINK_COOKIE, topath);
+	  DWORD len = strlen (buf) + 1;
+
+	  /* Note that the terminating nul is written.  */
+	  success = WriteFile (h, buf, len, &written, NULL)
+	  	    || written != len;
+
+	}
+      if (success)
 	{
 	  CloseHandle (h);
 	  set_file_attribute (win32_path.has_acls (),
 			      win32_path.get_win32 (),
 			      S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
-	  SetFileAttributesA (win32_path.get_win32 (), FILE_ATTRIBUTE_SYSTEM);
+	  SetFileAttributesA (win32_path.get_win32 (),
+	  		      allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
+			      			: FILE_ATTRIBUTE_SYSTEM);
 	  res = 0;
 	}
-#else
-  if (!isabspath (topath))
-    {
-      getcwd (cwd, MAX_PATH + 1);
-      if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
-	{
-	  c = *cp;
-	  *cp = '\0';
-	  chdir (from);
-	}
-      backslashify (topath, w32topath, 0);
-    }
-  if (!cp || GetFileAttributes (w32topath) == (DWORD)-1)
-    {
-      win32_topath.check (topath, PC_SYM_NOFOLLOW);
-      if (!cp || win32_topath.error != ENOENT)
-        strcpy (w32topath, win32_topath);
-    }
-  if (cp)
-    {
-      *cp = c;
-      chdir (cwd);
-    }
-
-  h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sec_none_nih,
-		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
-  if (h == INVALID_HANDLE_VALUE)
-      __seterrno ();
-  else
-    {
-      DWORD written;
-      create_shortcut_header ();
-      /* Don't change the datatypes of `len' and `win_len' since
-         their sizeof is used later. */
-      unsigned short len = strlen (topath);
-      unsigned short win_len = strlen (w32topath);
-      if (WriteFile (h, shortcut_header, SHORTCUT_HDR_SIZE, &written, NULL)
-          && written == SHORTCUT_HDR_SIZE
-	  && WriteFile (h, &len, sizeof len, &written, NULL)
-	  && written == sizeof len
-	  && WriteFile (h, topath, len, &written, NULL)
-	  && written == len
-	  && WriteFile (h, &win_len, sizeof win_len, &written, NULL)
-	  && written == sizeof win_len
-	  && WriteFile (h, w32topath, win_len, &written, NULL)
-	  && written == win_len)
-        {
-          CloseHandle (h);
-          set_file_attribute (win32_path.has_acls (),
-                              win32_path.get_win32 (),
-                              S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
-          SetFileAttributesA (win32_path.get_win32 (), FILE_ATTRIBUTE_READONLY);
-          res = 0;
-	}
-#endif
       else
 	{
 	  __seterrno ();

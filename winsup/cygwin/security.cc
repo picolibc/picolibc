@@ -457,6 +457,7 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
   HANDLE hToken;
 
   strcpy (usernamebuf, pw->pw_name);
+  debug_printf ("pw_gecos = %x (%s)", pw->pw_gecos, pw->pw_gecos);
   if (pw->pw_gecos)
     {
       if ((c = strstr (pw->pw_gecos, "U-")) != NULL &&
@@ -475,6 +476,7 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
       *c = '\0';
       nt_user = c + 1;
     }
+  debug_printf ("LogonUserA (%s, %s, %s, ...)", nt_user, nt_domain, password);
   if (!LogonUserA (nt_user, nt_domain, (char *) password,
 		    LOGON32_LOGON_INTERACTIVE,
 		    LOGON32_PROVIDER_DEFAULT,
