@@ -1,3 +1,25 @@
+Wed Jul  5 18:56:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (__cygwin_user_data): Initialize.
+	(dll_crt0_1): Eliminate user_data initialization.
+	(dll_crt0): Set up impure_ptr_ptr for older executables.
+	(cygwin_dll_init): Eliminate user_data initializations.
+	(__api_fatal): Don't check for user_data initialization.
+	* dll_init.cc (struct dll): Store entire contents of per_process rather
+	than just a pointer.
+	(add): Ditto.
+	(initOneDll): Don't check for user_data initialization.
+	(DllList::recordDll): Store contents of per_process argument.
+	(DllList::detachDll): Pass address of per_process field.
+	(DllList::initAll): Ditto.
+	(DllList::doGlobalDestructorsOfDlls): Ditto.
+	(DllListIterator::operator *): Ditto.
+	(dll_dllcrt0): Default to __cygwin_user_data if arg is NULL.
+	* include/sys/cygwin.h: Reorganize per_process to eliminate obsolete
+	fields and accomodate new way of initializing.
+	* lib/_cygwin_crt0_common: Initialize _impure_ptr from
+	__cygwin_user_data.impure_ptr.
+
 2000-07-04  Vadim Egorov  <egorovv@mailandnews.com>
 
 	* exceptions.cc (try_to_debug): Prevent recursive spawning of JIT

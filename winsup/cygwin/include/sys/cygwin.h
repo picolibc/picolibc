@@ -53,9 +53,8 @@ extern void cygwin_premain3 (int argc, char **argv);
    SIZEOF_PER_PROCESS) to make sure you remember to make the adjustment.
 */
 
-class per_process
+struct per_process
 {
- public:
   char *initial_sp;
 
   /* The offset of these 3 values can never change. */
@@ -96,19 +95,14 @@ class per_process
   /* non-zero of ctors have been run.  Inherited from parent. */
   int run_ctors_p;
 
-  /* These will be non-zero if the above (malloc,free,realloc) have been
-     overridden. */
-  /* FIXME: not currently used */
-  int __imp_malloc;
-  int __imp_free;
-  int __imp_realloc;
+  DWORD unused[3];
 
   /* Heap management.  Inherited from parent. */
   void *heapbase;		/* bottom of the heap */
   void *heapptr;		/* current index into heap */
   void *heaptop;		/* current top of heap */
 
-  HANDLE unused1;		/* unused */
+  DWORD unused1;		/* unused */
 
   /* Non-zero means the task was forked.  The value is the pid.
      Inherited from parent. */
@@ -120,14 +114,13 @@ class per_process
   DWORD api_minor;		/*  linked with */
   /* For future expansion, so apps won't have to be relinked if we
      add an item. */
-#ifdef _MT_SAFE
+  DWORD unused2[5];
+
   ResourceLocks *resourcelocks;
   MTinterface *threadinterface;
-  void *internal_reserved[6];
-#else
-  void *internal_reserved[8];
-#endif
+  struct _reent *impure_ptr;
 };
+#define per_process_overwrite ((unsigned) &(((struct per_process *) NULL)->resourcelocks))
 #endif /* __cplusplus */
 
 #ifdef _PATH_PASSWD

@@ -48,7 +48,7 @@ _cygwin_crt0_common (MainFunc f)
   __cygwin_user_data.ctors = &__CTOR_LIST__;
   __cygwin_user_data.dtors = &__DTOR_LIST__;
   __cygwin_user_data.envptr = &environ;
-  __cygwin_user_data.impure_ptr_ptr = &_impure_ptr;
+  _impure_ptr = __cygwin_user_data.impure_ptr;
   __cygwin_user_data.main = f;
   __cygwin_user_data.premain[0] = cygwin_premain0;
   __cygwin_user_data.premain[1] = cygwin_premain1;

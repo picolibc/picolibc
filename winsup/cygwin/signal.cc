@@ -76,11 +76,6 @@ sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
       return -1;
     }
 
-  /* gcc can call sigprocmask when a builtin contructor is activated.
-     This can happen prior to the setup of myself */
-  if (!user_data)
-    return 0;
-
   if (oldset)
     *oldset = myself->getsigmask ();
   if (set)
@@ -108,21 +103,6 @@ sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
     }
   return 0;
 }
-
-#if 0
-/* This is called _raise because the real raise is in newlib.  */
-int
-_raise (int sig)
-{
-  if (!user_data)
-    {
-      set_errno (ESRCH);
-      return -1;
-    }
-
-  return _kill (myself->pid, sig);
-}
-#endif
 
 static int
 kill_worker (pid_t pid, int sig)

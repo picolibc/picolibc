@@ -29,7 +29,7 @@ typedef enum   { NONE, LINK, LOAD } dllType;
 
 struct dll
 {
-  per_process *p;
+  per_process p;
   HMODULE handle;
   const char *name;
   dllType type;
@@ -128,7 +128,7 @@ add (HMODULE h, char *name, per_process *p, dllType type)
 
   _list[_last].name = name && type == LOAD ? strdup (name) : NULL;
   _list[_last].handle = h;
-  _list[_last].p = p;
+  _list[_last].p = *p;
   _list[_last].type = type;
 
   ret = _last++;
@@ -139,14 +139,6 @@ static int
 initOneDll (per_process *p)
 {
   /* global variable user_data must be initialized */
-  if (user_data == NULL)
-    {
-      small_printf ("WARNING: process not inited while trying to init a DLL!\n");
-      return 0;
-    }
-
-  /* init impure_ptr */
-  *(p->impure_ptr_ptr) = *(user_data->impure_ptr_ptr);
 
   /* FIXME: init environment (useful?) */
   *(p->envptr) = *(user_data->envptr);
@@ -220,7 +212,7 @@ DllList::recordDll (HMODULE h, per_process *p)
 	if (_dlopenIndex != -1)
 	  {
 	    _list[_dlopenIndex].handle = h;
-	    _list[_dlopenIndex].p = p;
+	    _list[_dlopenIndex].p = *p;
 	    _list[_dlopenIndex].type = type;
 	    ret = _dlopenIndex;
 	    _dlopenIndex = -1;
@@ -248,7 +240,7 @@ DllList::detachDll (int dll_index)
   if (dll_index != -1)
     {
       dll *aDll = &(_list[dll_index]);
-      doGlobalDTORS (aDll->p);
+      doGlobalDTORS (&aDll->p);
       if (aDll->type == LOAD)
 	_numberOfOpenedDlls--;
       aDll->type = NONE;
@@ -274,7 +266,7 @@ DllList::initAll ()
       debug_printf ("call to DllList::initAll");
       for (int i = 0; i < _last; i++)
 	{
-	  per_process *p = _list[i].p;
+	  per_process *p = &_list[i].p;
 	  if (p)
 	    initOneDll (p);
 	}
@@ -290,7 +282,7 @@ DllList::doGlobalDestructorsOfDlls ()
     {
       if (_list[i].type != NONE)
 	{
-	  per_process *p = _list[i].p;
+	  per_process *p = &_list[i].p;
 	  if (p)
 	    doGlobalDTORS (p);
 	}
@@ -418,7 +410,7 @@ DllListIterator::~DllListIterator ()
 
 DllListIterator::operator per_process* ()
 {
-  return _list[index ()].p;
+  return &_list[index ()].p;
 }
 
 void
@@ -462,11 +454,15 @@ extern "C"
 int
 dll_dllcrt0 (HMODULE h, per_process *p)
 {
+  struct _reent reent_data;
+  if (p == NULL)
+    p = &__cygwin_user_data;
+  else
+    *(p->impure_ptr_ptr) = &reent_data;
+
   /* Partially initialize Cygwin guts for non-cygwin apps. */
-  if (dynamically_loaded && (! user_data || user_data->magic_biscuit == 0))
-    {
-      dll_crt0 (p);
-    }
+  if (dynamically_loaded && user_data->magic_biscuit == 0)
+    dll_crt0 (p);
   return _the.recordDll (h, p);
 }
 

@@ -49,15 +49,46 @@ HANDLE NO_COPY parent_alive = NULL;
    measure to allow an orderly transfer to the new, correct sigmask method. */
 unsigned int signal_shift_subtract = 1;
 
+#ifdef _MT_SAFE
+ResourceLocks _reslock NO_COPY;
+MTinterface _mtinterf NO_COPY;
+#endif
+
 extern "C"
 {
+  void *export_malloc (unsigned int);
+  void export_free (void *);
+  void *export_realloc (void *, unsigned int);
+  void *export_calloc (unsigned int, unsigned int);
+
   /* This is an exported copy of environ which can be used by DLLs
      which use cygwin.dll.  */
   char **__cygwin_environ;
   /* __progname used in getopt error message */
   char *__progname = NULL;
   struct _reent reent_data;
-  struct per_process __cygwin_user_data;
+  struct per_process __cygwin_user_data =
+  {/* initial_sp */ 0, /* magic_biscuit */ 0,
+   /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
+   /* dll_major */ CYGWIN_VERSION_DLL_MINOR,
+   /* impure_ptr_ptr */ NULL, /*envptr */ NULL,
+   /* malloc */ export_malloc, /* free */ export_free,
+   /* realloc */ export_realloc,
+   /* fmode_ptr */ NULL, /* main */ NULL, /* ctors */ NULL,
+   /* dtors */ NULL, /* data_start */ NULL, /* data_end */ NULL,
+   /* bss_start */ NULL, /* bss_end */ NULL,
+   /* calloc */ export_calloc,
+   /* premain */ {NULL, NULL, NULL, NULL},
+   /* run_ctors_p */ 0,
+    /* unused */ { 0, 0, 0},
+   /* heapbase */ NULL, /* heapptr */ NULL, /* heaptop */ NULL,
+   /* unused1 */ 0, /* forkee */ 0, /* hmodule */ NULL,
+   /* api_major */ CYGWIN_VERSION_API_MAJOR,
+   /* api_minor */ CYGWIN_VERSION_API_MINOR,
+   /* unused2 */ {0, 0, 0, 0, 0},
+   /* resourcelocks */ &_reslock, /* threadinterface */ &_mtinterf,
+   /* impure_ptr */ &reent_data,
+  };
 };
 
 char *old_title = NULL;
@@ -550,11 +581,6 @@ static NO_COPY int mypid = 0;
 static int argc = 0;
 static char **argv = NULL;
 
-#ifdef _MT_SAFE
-ResourceLocks _reslock NO_COPY;
-MTinterface _mtinterf NO_COPY;
-#endif
-
 void
 sigthread::init (const char *s)
 {
@@ -599,14 +625,10 @@ dll_crt0_1 ()
      fork copy code doesn't copy the data in libccrt0.cc (that's why we
      pass in the per_process struct into the .dll from libccrt0). */
 
-  *(user_data->impure_ptr_ptr) = &reent_data;
   _impure_ptr = &reent_data;
 
 #ifdef _MT_SAFE
-  user_data->resourcelocks = &_reslock;
   user_data->resourcelocks->Init();
-
-  user_data->threadinterface = &_mtinterf;
   user_data->threadinterface->Init0();
 #endif
 
@@ -755,7 +777,7 @@ dll_crt0_1 ()
   sig_send (NULL, __SIGFLUSH);	/* also initializes uid, gid */
 
   /* Execute any specified "premain" functions */
-  if (user_data->premain[0])
+  if (user_data->premain[PREMAIN_LEN / 2])
     for (unsigned int i = PREMAIN_LEN / 2; i < PREMAIN_LEN; i++)
       user_data->premain[i] (argc, argv);
 
@@ -853,21 +875,17 @@ dll_crt0 (per_process *uptr)
 {
   /* Set the local copy of the pointer into the user space. */
   if (uptr)
-    *user_data = *uptr;
+    {
+      memcpy (user_data, uptr, per_process_overwrite);
+      *(user_data->impure_ptr_ptr) = &reent_data;
+    }
   _dll_crt0 ();
 }
 
-extern "C" void *export_malloc (unsigned int);
-extern "C" void export_free (void *);
-extern "C" void *export_realloc (void *, unsigned int);
-extern "C" void *export_calloc (unsigned int, unsigned int);
-
 /* This must be called by anyone who uses LoadLibrary to load cygwin1.dll */
-extern "C" void cygwin_dll_init ();
-void
+extern "C" void
 cygwin_dll_init ()
 {
-  static struct _reent *temp_impure;
   static char **envp;
   static int _fmode;
   user_data->heapbase = user_data->heapptr = user_data->heaptop = NULL;
@@ -879,20 +897,10 @@ cygwin_dll_init ()
 
   DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
 		   &hMainThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
-  user_data->dll_major = CYGWIN_VERSION_DLL_MAJOR;
-  user_data->dll_minor = CYGWIN_VERSION_DLL_MINOR;
-  user_data->api_major = CYGWIN_VERSION_API_MAJOR;
-  user_data->api_minor = CYGWIN_VERSION_API_MINOR;
   user_data->magic_biscuit = sizeof (per_process);
 
-  user_data->impure_ptr_ptr = &temp_impure;
   user_data->envptr = &envp;
   user_data->fmode_ptr = &_fmode;
-
-  user_data->malloc = &export_malloc;
-  user_data->free = &export_free;
-  user_data->realloc = &export_realloc;
-  user_data->calloc = &export_calloc;
 
   dll_crt0_1 ();
 }
@@ -1030,11 +1038,8 @@ __api_fatal (const char *fmt, ...)
 
   /* We are going down without mercy.  Make sure we reset
      our process_state. */
-  if (user_data != NULL)
-    {
-      sigproc_terminate ();
-      myself->record_death (FALSE);
-    }
+  sigproc_terminate ();
+  myself->record_death (FALSE);
 #ifdef DEBUGGING
   (void) try_to_debug ();
 #endif
