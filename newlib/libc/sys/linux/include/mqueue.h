@@ -9,6 +9,8 @@
 #define __need_sigevent_t 1
 #include <bits/siginfo.h>
 
+#include <sys/fcntl.h>
+
 /* message queue types */
 typedef int mqd_t;
 

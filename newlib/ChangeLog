@@ -1,3 +1,7 @@
+2003-07-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/include/mqueue.h: Add include of <sys/fcntl.h>.
+
 2003-06-27  Jose Goncalves  <jose.goncalves@inov.pt>
 
 	* libc/sys/linux/mq_open.c (mq_open): Only set created flag
