@@ -1,3 +1,7 @@
+2001-11-26  Geoffrey Keating  <geoffk@redhat.com>
+
+	* config.sub: Update to version 1.232 on subversion.
+
 2001-11-20  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* Makefile.in (do-proto-toplev): Use msgfmt to generate .gmo
