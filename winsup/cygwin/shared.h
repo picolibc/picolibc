@@ -252,6 +252,10 @@ public:
   ~reg_key ();
 };
 
+/* Evaluates path to the directory of the local user registry hive */
+char *__stdcall get_registry_hive_path (const PSID psid, char *path);
+void __stdcall load_registry_hive (PSID psid);
+
 /******** Mount Table ********/
 
 /* Mount table entry */

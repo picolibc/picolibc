@@ -41,6 +41,25 @@ SID_IDENTIFIER_AUTHORITY sid_auth[] = {
 #define INHERIT_ALL  (CONTAINER_INHERIT_ACE|OBJECT_INHERIT_ACE)
 #define INHERIT_ONLY (INHERIT_ONLY_ACE|CONTAINER_INHERIT_ACE|OBJECT_INHERIT_ACE)
 
+char *
+convert_sid_to_string_sid (PSID psid, char *sid_str)
+{
+  char t[32];
+  DWORD i;
+
+  if (!psid || !sid_str)
+    return NULL;
+  strcpy (sid_str, "S-1-");
+  sprintf(t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
+  strcat (sid_str, t);
+  for (i = 0; i < *GetSidSubAuthorityCount (psid); ++i)
+    {
+      sprintf(t, "-%lu", *GetSidSubAuthority (psid, i));
+      strcat (sid_str, t);
+    }
+  return sid_str;
+}
+
 PSID
 get_sid (PSID psid, DWORD s, DWORD cnt, DWORD *r)
 {
@@ -56,7 +75,7 @@ get_sid (PSID psid, DWORD s, DWORD cnt, DWORD *r)
 }
 
 PSID
-get_ssid (PSID psid, const char *sid_str)
+convert_string_sid_to_sid (PSID psid, const char *sid_str)
 {
   char sid_buf[256];
   char *t;
@@ -85,13 +104,13 @@ get_pw_sid (PSID sid, struct passwd *pw)
 
   if (!sp)
     return FALSE;
-  return get_ssid (sid, ++sp) != NULL;
+  return convert_string_sid_to_sid (sid, ++sp) != NULL;
 }
 
 BOOL
 get_gr_sid (PSID sid, struct group *gr)
 {
-  return get_ssid (sid, gr->gr_passwd) != NULL;
+  return convert_string_sid_to_sid (sid, gr->gr_passwd) != NULL;
 }
 
 PSID
@@ -103,7 +122,7 @@ get_admin_sid ()
   if (!admin_sid)
     {
       admin_sid = (PSID) admin_sid_buf;
-      get_ssid (admin_sid, "S-1-5-32-544");
+      convert_string_sid_to_sid (admin_sid, "S-1-5-32-544");
     }
   return admin_sid;
 }
@@ -117,7 +136,7 @@ get_system_sid ()
   if (!system_sid)
     {
       system_sid = (PSID) system_sid_buf;
-      get_ssid (system_sid, "S-1-5-18");
+      convert_string_sid_to_sid (system_sid, "S-1-5-18");
     }
   return system_sid;
 }
@@ -131,7 +150,7 @@ get_creator_owner_sid ()
   if (!owner_sid)
     {
       owner_sid = (PSID) owner_sid_buf;
-      get_ssid (owner_sid, "S-1-3-0");
+      convert_string_sid_to_sid (owner_sid, "S-1-3-0");
     }
   return owner_sid;
 }
@@ -145,7 +164,7 @@ get_world_sid ()
   if (!world_sid)
     {
       world_sid = (PSID) world_sid_buf;
-      get_ssid (world_sid, "S-1-1-0");
+      convert_string_sid_to_sid (world_sid, "S-1-1-0");
     }
   return world_sid;
 }

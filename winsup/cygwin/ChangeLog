@@ -1,3 +1,32 @@
+Mon Jun 19 19:35:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* dcrt0.cc: Add load statements for `GetSidIdentifierAuthority'
+	and `RegLoadKeyA'.
+	* registry.cc (get_registry_hive_path): New function.
+	(load_registry_hive): Ditto.
+	* security.cc (convert_sid_to_string_sid): New function.
+	(get_ssid): Renamed to `convert_string_sid_to_sid'.
+	(get_pw_sid): Call `convert_string_sid_to_sid' instead of `get_ssid'.
+	(get_gr_sid): Ditto.
+	(get_admin_sid): Ditto.
+	(get_system_sid): Ditto.
+	(get_creator_owner_sid): Ditto.
+	(get_world_sid): Ditto.
+	* shared.h: New prototypes for `get_registry_hive_path' and
+	`load_registry_hive'.
+	* spawn.cc (spawn_guts): Set child->psid to NULL to force calling
+	`internal_getlogin' from child process in case of changing user context.
+	Call `load_registry_hive' in case of changing user context.
+	(_spawnve): Copy user infos only if user context remains the same.
+	* uinfo.cc: Add load statement for `NetUserGetInfo'.
+	Remove load statement for `NetGetDCName'.
+	(internal_getlogin): Rewrite to speed up process startup
+	and to correct user environment in case user context changes.
+	(uinfo_init): Call internal_getlogin only if myself->psid is NULL,
+	that is user context changes.
+	* winsup.h: Add prototypes for `convert_sid_to_string_sid',
+	`convert_string_sid_to_sid' and `get_pw_sid'.
+
 Sun Jun 18 13:42:50 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (set_name): Don't use 'unix' as name since this is defined

@@ -177,3 +177,57 @@ reg_key::~reg_key ()
     RegCloseKey (key);
   key_is_invalid = 1;
 }
+
+char *
+get_registry_hive_path (const PSID psid, char *path)
+{
+  char sid[256];
+  char key[256];
+  HKEY hkey;
+
+  if (!psid || !path)
+    return NULL;
+  convert_sid_to_string_sid (psid, sid);
+  strcpy (key,"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList\\");
+  strcat (key, sid);
+  if (!RegOpenKeyExA (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
+    {
+      char buf[256];
+      DWORD type, siz;
+
+      key[0] = '\0';
+      if (!RegQueryValueExA (hkey, "ProfileImagePath", 0, &type,
+                             (BYTE *)buf, (siz = 256, &siz)))
+        ExpandEnvironmentStringsA (buf, key, 256);
+      RegCloseKey (hkey);
+      if (key[0])
+        return strcpy (path, key);
+    }
+  return NULL;
+}
+
+void
+load_registry_hive (PSID psid)
+{
+  char sid[256];
+  char path[256];
+  HKEY hkey;
+
+  if (!psid)
+    return;
+  /* Check if user hive already exists */
+  if (!RegOpenKeyExA (HKEY_LOCAL_MACHINE, convert_sid_to_string_sid (psid, sid),
+                      0, KEY_READ, &hkey))
+    {
+      debug_printf ("User registry hive for %s already exists", sid);
+      RegCloseKey (hkey);
+      return;
+    }
+  if (get_registry_hive_path (psid, path))
+    {
+      strcat (path, "\\NTUSER.DAT");
+      if (RegLoadKeyA (HKEY_USERS, sid, path))
+        debug_printf ("Loading user registry hive for %s failed: %E", sid);
+    }
+}
+

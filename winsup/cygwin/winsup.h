@@ -429,7 +429,10 @@ extern BOOL allow_ntsec;
 /* `lookup_name' should be called instead of LookupAccountName.
  * logsrv may be NULL, in this case only the local system is used for lookup.
  * The buffer for ret_sid (40 Bytes) has to be allocated by the caller! */
-BOOL __stdcall lookup_name (const char *name, const char *logsrv, PSID ret_sid);
+BOOL __stdcall lookup_name (const char *, const char *, PSID);
+char *__stdcall convert_sid_to_string_sid (PSID, char *);
+PSID __stdcall convert_string_sid_to_sid (PSID, const char *);
+BOOL __stdcall get_pw_sid (PSID, struct passwd *);
 
 unsigned long __stdcall hash_path_name (unsigned long hash, const char *name);
 void __stdcall nofinalslash (const char *src, char *dst);

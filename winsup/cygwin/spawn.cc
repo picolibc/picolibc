@@ -543,6 +543,13 @@ skip_arg_parsing:
       if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
         seteuid (myself->orig_uid);
 
+      /* Set child->psid to NULL to force calling internal_getlogin()
+         from child process. */
+      child->psid = NULL;
+
+      /* Load users registry hive. */
+      load_registry_hive (sid);
+
       rc = CreateProcessAsUser (hToken,
 		       real_path,	/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
@@ -837,11 +844,14 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
 	child->ctty = myself->ctty;
 	child->umask = myself->umask;
 	child->process_state |= PID_INITIALIZING;
-        memcpy (child->username, myself->username, MAX_USER_NAME);
-        child->psid = myself->psid;
-        memcpy (child->sidbuf, myself->sidbuf, 40);
-        memcpy (child->logsrv, myself->logsrv, 256);
-        memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
+        if (!hToken && !myself->token)
+          {
+            memcpy (child->username, myself->username, MAX_USER_NAME);
+            child->psid = myself->psid;
+            memcpy (child->sidbuf, myself->sidbuf, 40);
+            memcpy (child->logsrv, myself->logsrv, 256);
+            memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
+          }
 	subproc_init ();
 	ret = spawn_guts (hToken, path, argv, envp, child, mode);
 	if (ret == -1)
