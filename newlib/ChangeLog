@@ -1,3 +1,9 @@
+2003-03-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfscanf.c (__svfscanf_r): For floating point conversion,
+	count all characters used to create number against maximum width.
+	* libc/machine/powerpc/vfscanf.c (__svfscanf_r): Ditto.
+
 2003-03-18  D.Venkatasubramanian  <dvenkat@noida.hcltech.com>
 
 	* libc/include/sys/h8300hms/crt0.S[__SIMULATOR__]: Add commandline

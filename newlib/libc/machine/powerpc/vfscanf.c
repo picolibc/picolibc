@@ -1085,8 +1085,8 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      break;
 	    fok:
 	      *p++ = c;
-	      fl_width--;
 	    fskip:
+	      fl_width--;
               ++nread;
 	      if (--fp->_r > 0)
 		fp->_p++;
