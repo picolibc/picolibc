@@ -1,3 +1,27 @@
+2003-09-11  James Cownie <jcownie@etnus.com>
+
+	* dwarf2.h: Add HP dwarf extensions from their hacked gdb
+	header files (ftp://ftp.hp.com/pub/lang/tools/WDB/wdb-4.0.tar.gz).
+
+2003-09-04  Nick Clifton  <nickc@redhat.com>
+
+	* v850.h (E_V850E1_ARCH): Define.
+
+2003-08-21  James Cownie <jcownie@etnus.com>
+
+	* dwarf2.h: Add PGI dwarf extensions.
+	
+2003-08-08 Dmitry Diky <diwil@mail.ru>
+	
+	* msp430.h: Add xW42 and xE42 parts. Sort MPU list according to
+	gcc order.
+
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* reloc-macros.h (START_RELOC_NUMBERS) : Remove PARAMS macro.  Use
+	C90 function definition.  Formatting.
+	(RELOC_NUMBER): Remove !__STDC__ code.
+
 2003-07-28  Eric Christopher  <echristo@redhat.com>
 
 	* ppc.h (R_PPC_RELAX32): New. Fake relocation.
@@ -37,10 +61,6 @@
 
 	* mmix.h: Convert to ISO C90 prototypes.
 	* mips.h: Likewise.
-
-	* reloc-macros.h (START_RELOC_NUMBERS): Convert to ISO C90
-	prototype.
-	(RELOC_NUMBER): Remove !__STDC__ code.
 
 2003-06-13  Robert Millan <zeratul2@wanadoo.es>
 

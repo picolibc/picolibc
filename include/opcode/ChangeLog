@@ -1,3 +1,42 @@
+2003-09-04  Nick Clifton  <nickc@redhat.com>
+
+	* v850.h (PROCESSOR_V850E1): Define.
+
+2003-08-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (PPC_OPCODE_440): Define.  Formatting.  Use hex for other
+	PPC_OPCODE_* defines.
+
+2003-08-16  Jason Eckhardt  <jle@rice.edu>
+
+	* i860.h (fmov.ds): Expand as famov.ds.
+	(fmov.sd): Expand as famov.sd.
+	(pfmov.ds): Expand as pfamov.ds.
+
+2003-08-07  Michael Meissner  <gnu@the-meissners.org>
+
+	* cgen.h: Remove PARAM macro usage in all prototypes.
+	(CGEN_EXTRACT_INFO): Use void * instead of PTR.
+	(cgen_print_fn): Ditto.
+	(CGEN_HW_ENTRY): Ditto.
+	(CGEN_MAYBE_MULTI_IFLD): Ditto.
+	(struct cgen_insn): Ditto.
+	(CGEN_CPU_TABLE): Ditto.
+
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* alpha.h: Remove PARAMS macro.
+	* arc.h: Likewise.
+	* d10v.h: Likewise.
+	* d30v.h: Likewise.
+	* i370.h: Likewise.
+	* or32.h: Likewise.
+	* pj.h: Likewise.
+	* ppc.h: Likewise.
+	* sparc.h: Likewise.
+	* tic80.h: Likewise.
+	* v850.h: Likewise.
+
 2003-07-18  Michael Snyder  <msnyder@redhat.com>
 
 	* include/opcode/h8sx.h (DO_MOVA1, DO_MOVA2): Reformatting.

@@ -1,3 +1,79 @@
+2003-09-12  Michael Chastain  <mec@shout.net>
+
+	Fix PR gdb/857.
+	* src-release (do-proto-topleve): Remove junk files
+	intl/config.cache, intl/config.status,
+	intl/config.h, intl/stamp-h.
+
+2003-09-14  Andrew Cagney  <cagney@redhat.com>
+
+	* src-release (dejagnu.tar): New target.
+	(dejagnu.tar.bz2): Recursively call "gdb-taz" rule.
+	(do-djunpack): Use $(PACKAGE) for the package name.
+
+2003-09-04  DJ Delorie  <dj@redhat.com>
+
+	* configure: Regenerate.
+
+2003-09-04  Robert Millan  <robertmh@gnu.org>
+
+	* configure.in: Match GNU/KFreeBSD with new kfreebsd*-gnu triplet.
+	
+2003-09-02  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* configure.in: Ensure arguments to sed are properly spaced.
+	* configure: Regenerate.
+
+2003-08-28  Daniel Jacobowitz  <drow@mvista.com>
+
+	Merge from gcc:
+	2003-07-20  Phil Edwards  <pme@gcc.gnu.org>
+	* install-sh:  Update to newer upstream versions (associated with
+	aclocal 1.7).
+	* missing:  Likewise, plus $1Help2man -> $1 typo fix.
+
+2003-08-27  Daniel Jacobowitz  <drow@mvista.com>
+
+	* configure.in: Set RAW_CXX_FOR_TARGET if unset.
+	* configure: Regenerated.
+
+2003-08-27  Daniel Jacobowitz  <drow@mvista.com>
+
+	* config/no-executables.m4: New file.
+
+2003-08-23  Phil Edwards  <pme@gcc.gnu.org>
+
+	* configure.in:  Use newline instead of semicolon when assuming
+	shell arguments in a for loop.
+	* configure:  Regenerated.
+
+2003-08-20  Geoffrey Keating  <geoffk@apple.com>
+
+	PR 8180
+	* configure.in: When testing with_libs and with_headers, treat
+	'no' as unset.  Based on a patch by Dan Kegel <dank@kegel.com>.
+	* configure: Regenerate.
+	
+	* configure.in (TOPLEVEL_CONFIGURE_ARGUMENTS): Quote properly for
+	make, shell, etc.
+	(baseargs): Likewise.
+	* configure: Regenerate.
+
+2003-08-19  Geoffrey Keating  <geoffk@apple.com>
+
+	* configure.in: Disable libgcj for darwin not on powerpc.
+	* configure: Rebuild.
+
+2003-08-15  Michael Chastain  <mec@shout.net>
+
+	* src-release (do-proto-toplev): Remove junk files
+	dejagnu/example/calc/config.status,
+	dejagnu/example/calc/config.log.
+
+2003-08-14  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* config-ml.in, symlink-tree: Add license.
+
 2003-08-01  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	Merge from gcc:

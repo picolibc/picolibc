@@ -1,3 +1,37 @@
+2003-09-15  Andrew Cagney  <cagney@redhat.com>
+
+	* floatformat.h (floatformat_to_double): Make input buffer constant.
+	(floatformat_from_double, floatformat_is_valid): Ditto.
+	
+2003-09-15  Andrew Cagney  <cagney@redhat.com>
+
+	* floatformat.h (struct floatformat): Make "exp_bias" signed.
+
+2003-09-15  Daniel Jacobowitz  <drow@mvista.com>
+
+	* floatformat.h (floatformat_is_valid): Add prototype.
+
+2003-08-27  Andrew Cagney  <cagney@redhat.com>
+
+	* dis-asm.h (init_disassemble_info): Declare.
+	(INIT_DISASSEMBLE_INFO): Redefine as a call to
+	init_disassemble_info.
+	(INIT_DISASSEMBLE_INFO_NO_ARCH): Ditto.
+
+2003-08-20  Nick Clifton  <nickc@redhat.com>
+
+	* bfdlink.h (enum report_method): New enum.  Describes how to
+	report something.
+        (struct bfd_link_info): Delete fields 'no_undefined' and
+	'allow_shlib_undefined'.  Replace with
+	'unresolved_symbols_in_objects' and
+	'unresolved_symbols_in_shared_libs'.
+        
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h: Remove PARAMS macro.  Replace PTR with void *.
+	* dis-asm.h: Likewise.
+
 2003-07-09  Bob Wilson  <bob.wilson@acm.org>
 
 	* xtensa-config.h: Undef all macros before defining them.

@@ -1,3 +1,18 @@
+2003-08-23  Jason Eckhardt  <jle@rice.edu>
+
+	* coff/i860.h (COFF860_R_PAIR, COFF860_R_LOW0, COFF860_R_LOW1,
+	COFF860_R_LOW2, COFF860_R_LOW3, COFF860_R_LOW4, COFF860_R_SPLIT0,
+	COFF860_R_SPLIT1, COFF860_R_SPLIT2, COFF860_R_HIGHADJ,
+	COFF860_R_BRADDR): Define new relocation constants and document.
+	Minor formatting adjustments.
+
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* ti.h (GET_SCNHDR_NRELOC): Rename PTR param to LOC.
+	(PUT_SCNHDR_NRELOC, GET_SCNHDR_NLNNO, PUT_SCNHDR_NLNNO): Likewise.
+	(GET_SCNHDR_FLAGS, PUT_SCNHDR_FLAGS): Likewise.
+	(GET_SCNHDR_PAGE, PUT_SCNHDR_PAGE): Likewise.
+
 2003-07-17  Jeff Muizelaar  <muizelaar@rogers.com>
 
 	* pe.h: (IMAGE_FILE_NET_RUN_FROM_SWAP): Define.

@@ -494,9 +494,9 @@ static const struct i860_opcode i860_opcodes[] =
 /* Floating point pseudo-instructions.  */
 { "fmov.ss",	0x48000049, 0xb7e005b6, "e,g", 0 },	/* fiadd.ss fsrc1,f0,fdest */
 { "fmov.dd",	0x480001c9, 0xb7e00436, "e,g", 0 },	/* fiadd.dd fsrc1,f0,fdest */
-{ "fmov.sd",	0x480000b0, 0xb7e0054f, "e,g", 0 },	/* fadd.sd fsrc1,f0,fdest */
-{ "fmov.ds",	0x48000130, 0xb7e004cf, "e,g", 0 },	/* fadd.ds fsrc1,f0,fdest */
-{ "pfmov.ds",	0x48000530, 0xb73000cf, "e,g", 0 },	/* pfadd.ds fsrc1,f0,fdest */
+{ "fmov.sd",	0x480000b3, 0xb400054c, "e,g", 0 },	/* famov.sd fsrc1,fdest */
+{ "fmov.ds",	0x48000133, 0xb40004cc, "e,g", 0 },	/* famov.ds fsrc1,fdest */
+{ "pfmov.ds",	0x48000533, 0xb40000cc, "e,g", 0 },	/* pfamov.ds fsrc1,fdest */
 { "pfmov.dd",	0x480005c9, 0xb7e00036, "e,g", 0 },	/* pfiadd.dd fsrc1,f0,fdest */
 { 0, 0, 0, 0, 0 },
 
