@@ -52,6 +52,7 @@
 #  define _CRTIMP  __declspec(dllimport)
 # endif
 # define __DECLSPEC_SUPPORTED
+# define __attribute__(x) /* nothing */
 #else /* __GNUC__ */
 # ifdef __declspec
 #  ifndef __MINGW_IMPORT

@@ -1,5 +1,10 @@
 2003-10-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/_mingw.h: Define __attribute__((x)) to nothing
+	if not __GNUC__.
+
+2003-10-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/complex.h: New file.
 	* mingwex/complex: New directory.
 	* mingwex/complex/cabs.c: New file.
