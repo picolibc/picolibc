@@ -382,7 +382,11 @@ fhandler_disk_file::fchmod (mode_t mode)
     {
       query_open (query_write_control);
       if (!(oret = open_fs (O_BINARY, 0)))
-	return -1;
+        {
+	  query_open (query_read_control);
+	  if (!(oret = open_fs (O_BINARY, 0)))
+	    return -1;
+        }
     }
 
   if (!allow_ntsec && allow_ntea) /* Not necessary when manipulating SD. */
@@ -423,7 +427,11 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
     {
       query_open (query_write_control);
       if (!(oret = open_fs (O_BINARY, 0)))
-	return -1;
+        {
+	  query_open (query_read_control);
+	  if (!(oret = open_fs (O_BINARY, 0)))
+	    return -1;
+        }
     }
 
   mode_t attrib = 0;
@@ -456,7 +464,11 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
     {
       query_open (query_write_control);
       if (!(oret = open_fs (O_BINARY, 0)))
-        return -1;
+        {
+	  query_open (query_read_control);
+	  if (!(oret = open_fs (O_BINARY, 0)))
+	    return -1;
+        }
     }
 
   if (!pc.has_acls () || !allow_ntsec)

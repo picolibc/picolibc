@@ -1,3 +1,10 @@
+2004-04-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmo): Try opening
+	in query_read mode if query_write fails.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchown): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::facl): Ditto.
+
 2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h: Fix copyright date.
