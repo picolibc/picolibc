@@ -836,11 +836,11 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
 
   printf ("\nOutput from %s (%s)\n", id, s);
   int n = 80 / (int) ++sz;
-  int i = n ? n - 2 : 0;
+  int i = n > 2 ? n - 2 : 0;
   sz = -sz;
   for (char **g = groups; g <= ng; g++)
     if ((g != ng) && (++i < n))
-      printf ("%*s ", sz, *g);
+      printf ("%*s", sz, *g);
     else
       {
 	puts (*g);

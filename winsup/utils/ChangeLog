@@ -1,3 +1,8 @@
+2004-10-18  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>  
+
+	* cygcheck.cc (pretty_id): Don't let i become negative. Fix
+	printf-format.
+
 2004-10-17  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* cygcheck.cc (pretty_id): Allocate space for ')' in uid and guid.
