@@ -536,6 +536,12 @@ skip_arg_parsing:
       else
         system_printf ("GetTokenInformation: %E");
 
+      /* Retrieve security attributes before setting psid to NULL
+         since it's value is needed by `sec_user'. */
+      PSECURITY_ATTRIBUTES sec_attribs = allow_ntsec && sid
+                                         ? sec_user (sa_buf, sid)
+                                         : &sec_all_nih;
+
       /* Remove impersonation */
       uid_t uid = geteuid();
       if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
@@ -553,12 +559,8 @@ skip_arg_parsing:
       rc = CreateProcessAsUser (hToken,
 		       real_path,	/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
-                                        /* process security attrs */
-                       allow_ntsec && sid ? sec_user (sa_buf, sid)
-                                          : &sec_all_nih,
-                                        /* thread security attrs */
-                       allow_ntsec && sid ? sec_user (sa_buf, sid)
-                                          : &sec_all_nih,
+                       sec_attribs,     /* process security attrs */
+                       sec_attribs,     /* thread security attrs */
 		       TRUE,	/* inherit handles from parent */
 		       flags,
 		       envblock,/* environment */

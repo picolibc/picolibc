@@ -1,3 +1,8 @@
+Fri Jul 21 21:33:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* spawn.cc (span_guts): Retrieve security attributes before setting
+	psid to NULL.
+
 Fri Jul 21 12:03:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (acl_worker): Use stat_suffixes in call to path_conv
