@@ -150,17 +150,19 @@ internal_getlogin (cygheap_user &user)
 	 and a domain user may have the same name. */
       if (!ret && user.domain ())
 	{
+	  char domain[DNLEN + 1];
+	  DWORD dlen = sizeof (domain);
+	  siz = sizeof (tu);
+	  SID_NAME_USE use = SidTypeInvalid;
 	  /* Concat DOMAIN\USERNAME for the next lookup */
 	  strcat (strcat (strcpy (buf, user.domain ()), "\\"), user.name ());
-	  if (!(ret = lookup_name (buf, NULL, user.sid ())))
-	    debug_printf ("Couldn't retrieve SID locally!");
-	}
+          if (!LookupAccountName (NULL, buf, tu, &siz,
+	                          domain, &dlen, &use) ||
+               !legal_sid_type (use))
+	        debug_printf ("Couldn't retrieve SID locally!");
+	  else user.set_sid (tu);
 
-      /* If that fails, too, as a last resort try to get the SID from
-	 the logon server. */
-      if (!ret && !(ret = lookup_name (user.name (), user.logsrv (),
-				       user.sid ())))
-	debug_printf ("Couldn't retrieve SID from '%s'!", user.logsrv ());
+	}
 
       /* If we have a SID, try to get the corresponding Cygwin user name
 	 which can be different from the Windows user name. */

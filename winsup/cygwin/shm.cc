@@ -461,7 +461,7 @@ shmget (key_t key, size_t size, int shmflg)
   /* create a sd for our open requests based on shmflag & 0x01ff */
   InitializeSecurityDescriptor (psd,
 				    SECURITY_DESCRIPTOR_REVISION);
-  psd = alloc_sd (getuid32 (), getgid32 (), cygheap->user.logsrv (),
+  psd = alloc_sd (getuid32 (), getgid32 (),
 		  shmflg & 0x01ff, psd, &sd_size);
 
   if (key == (key_t) - 1)

@@ -1353,7 +1353,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
 }
 
 PSECURITY_DESCRIPTOR
-alloc_sd (__uid32_t uid, __gid32_t gid, const char *logsrv, int attribute,
+alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 	  PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret)
 {
   BOOL dummy;
@@ -1372,8 +1372,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, const char *logsrv, int attribute,
   cygsid owner_sid;
   struct passwd *pw = getpwuid32 (uid);
   strcpy (owner, pw ? pw->pw_name : getlogin ());
-  if ((!pw || !owner_sid.getfrompw (pw))
-      && !lookup_name (owner, logsrv, owner_sid))
+  if (!pw || !owner_sid.getfrompw (pw))
     return NULL;
   debug_printf ("owner: %s [%d]", owner,
 		*GetSidSubAuthority(owner_sid,
@@ -1384,8 +1383,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, const char *logsrv, int attribute,
   struct __group32 *grp = getgrgid32 (gid);
   if (grp)
     {
-      if ((!grp || !group_sid.getfromgr (grp))
-	  && !lookup_name (grp->gr_name, logsrv, group_sid))
+      if (!grp || !group_sid.getfromgr (grp))
 	return NULL;
     }
   else
@@ -1616,14 +1614,13 @@ set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
   InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR)sd_buf,
 				SECURITY_DESCRIPTOR_REVISION);
   psa->lpSecurityDescriptor = alloc_sd (geteuid32 (), getegid32 (),
-					cygheap->user.logsrv (),
 					attribute, (PSECURITY_DESCRIPTOR)sd_buf,
 					&sd_buf_size);
 }
 
 static int
 set_nt_attribute (const char *file, __uid32_t uid, __gid32_t gid,
-		  const char *logsrv, int attribute)
+		  int attribute)
 {
   if (!wincap.has_security ())
     return 0;
@@ -1640,7 +1637,7 @@ set_nt_attribute (const char *file, __uid32_t uid, __gid32_t gid,
     }
 
   sd_size = 4096;
-  if (!(psd = alloc_sd (uid, gid, logsrv, attribute, psd, &sd_size)))
+  if (!(psd = alloc_sd (uid, gid, attribute, psd, &sd_size)))
     return -1;
 
   return write_sd (file, psd, sd_size);
@@ -1649,12 +1646,12 @@ set_nt_attribute (const char *file, __uid32_t uid, __gid32_t gid,
 int
 set_file_attribute (int use_ntsec, const char *file,
 		    __uid32_t uid, __gid32_t gid,
-		    int attribute, const char *logsrv)
+		    int attribute)
 {
   int ret = 0;
 
   if (use_ntsec && allow_ntsec)
-    ret = set_nt_attribute (file, uid, gid, logsrv, attribute);
+    ret = set_nt_attribute (file, uid, gid, attribute);
   else if (allow_ntea && !NTWriteEA (file, ".UNIXATTR", (char *) &attribute,
 				     sizeof (attribute)))
     {
@@ -1671,5 +1668,5 @@ set_file_attribute (int use_ntsec, const char *file, int attribute)
 {
   return set_file_attribute (use_ntsec, file,
 			     myself->uid, myself->gid,
-			     attribute, cygheap->user.logsrv ());
+			     attribute);
 }

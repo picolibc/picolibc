@@ -266,6 +266,7 @@ is_grp_member (__uid32_t uid, __gid32_t gid)
   return grp_member;
 }
 
+#if 0 // unused
 #define SIDLEN	(sidlen = MAX_SID_LEN, &sidlen)
 #define DOMLEN	(domlen = INTERNET_MAX_HOST_NAME_LENGTH, &domlen)
 
@@ -334,6 +335,7 @@ got_it:
 
 #undef SIDLEN
 #undef DOMLEN
+#endif //unused
 
 int
 set_process_privilege (const char *privilege, BOOL enable)

@@ -1,3 +1,25 @@
+2002-06-03  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* sec_helper.cc (lookup_name): Suppress.
+	* security.cc (alloc_sd): Remove logsrv argument.
+	Remove two calls to lookup_name.
+	(set_security_attribute): Remove logsrv argument.
+	Remove logsrv argument in call to alloc_sd.
+	(set_nt_attribute): Remove logsrv argument.
+	Remove logsrv argument in call to set_security_attribute.
+	(set_file_attribute): Remove logsrv argument.
+	Remove logsrv argument in call to set_nt_attribute.
+	(set_file_attribute): Remove logsrv argument.
+	Remove logsrv argument in call to set_file_attribute.
+	* syscalls.cc (chown_worker): Remove logserver argument in
+	call to set_file_attribute.
+	(chmod): Ditto.
+	* shm.cc (shmget): Remove logsrv argument in call to alloc_sd.
+	* uinfo.cc (internal_getlogin): Replace calls to
+	lookup_name by call to LookupAccountName.
+	* security.h: Remove logsrv in declarations of set_file_attribute
+	and alloc_sd. Remove declaration of lookup_name.
+
 2002-06-05  Christopher Faylor  <cgf@redhat.com>
 
 	* child_info.h (CHILD_INFO_MAGIC): Oops.  Revert previous change.  gcc

@@ -805,7 +805,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 	  if (win32_path.isdir())
 	    attrib |= S_IFDIR;
 	  res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
-				    gid, attrib, cygheap->user.logsrv ());
+				    gid, attrib);
 	}
       if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
 	{
@@ -933,7 +933,7 @@ chmod (const char *path, mode_t mode)
       if (win32_path.isdir ())
 	mode |= S_IFDIR;
       if (!set_file_attribute (win32_path.has_acls (), win32_path, uid, gid,
-				mode, cygheap->user.logsrv ())
+				mode)
 	  && allow_ntsec)
 	res = 0;
 

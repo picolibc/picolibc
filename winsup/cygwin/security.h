@@ -168,7 +168,7 @@ int __stdcall set_process_privileges ();
 int __stdcall get_file_attribute (int, const char *, int *,
 				  __uid32_t * = NULL, __gid32_t * = NULL);
 int __stdcall set_file_attribute (int, const char *, int);
-int __stdcall set_file_attribute (int, const char *, __uid32_t, __gid32_t, int, const char *);
+int __stdcall set_file_attribute (int, const char *, __uid32_t, __gid32_t, int);
 LONG __stdcall read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size);
 LONG __stdcall write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size);
 BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
@@ -191,10 +191,6 @@ BOOL get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL
 
 /* sec_helper.cc: Security helper functions. */
 BOOL __stdcall is_grp_member (__uid32_t uid, __gid32_t gid);
-/* `lookup_name' should be called instead of LookupAccountName.
- * logsrv may be NULL, in this case only the local system is used for lookup.
- * The buffer for ret_sid (40 Bytes) has to be allocated by the caller! */
-BOOL __stdcall lookup_name (const char *, const char *, PSID);
 int set_process_privilege (const char *privilege, BOOL enable = TRUE);
 
 /* shared.cc: */
@@ -209,7 +205,7 @@ extern BOOL sec_acl (PACL acl, BOOL admins, PSID sid1 = NO_SID, PSID sid2 = NO_S
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
-PSECURITY_DESCRIPTOR alloc_sd (__uid32_t uid, __gid32_t gid, const char *logsrv, int attribute,
+PSECURITY_DESCRIPTOR alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
           PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
 
 extern inline SECURITY_ATTRIBUTES *
