@@ -46,6 +46,8 @@ details. */
 
 #define no_signals_available() (!hwait_sig || !sig_loop_wait)
 
+#define ZOMBIEMAX	((int) (sizeof (zombies) / sizeof (zombies[0])))
+
 /*
  * Global variables
  */
@@ -100,7 +102,7 @@ Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
 Static HANDLE events[PSIZE + 1] = {0};	// All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
 Static pinfo pchildren[PSIZE];		// All my children info
-Static pinfo zombies[PSIZE];		// All my deceased children info
+Static pinfo zombies[16384];		// All my deceased children info
 Static int nchildren = 0;		// Number of active children
 Static int nzombies = 0;		// Number of deceased children
 
@@ -298,8 +300,13 @@ proc_subproc (DWORD what, DWORD val)
 
       sigproc_printf ("pid %d[%d] terminated, handle %p, nchildren %d, nzombies %d",
 		  pchildren[val]->pid, val, hchildren[val], nchildren, nzombies);
-      zombies[nzombies] = pchildren[val];	// Add to zombie array
-      zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
+      if (nzombies >= ZOMBIEMAX)
+	sigproc_printf ("Hit zombie maximum %d", nzombies);
+      else
+	{
+	  zombies[nzombies] = pchildren[val];	// Add to zombie array
+	  zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
+	}
       sigproc_printf ("removing [%d], pid %d, handle %p, nchildren %d",
 		      val, pchildren[val]->pid, hchildren[val], nchildren);
       if ((int) val < --nchildren)

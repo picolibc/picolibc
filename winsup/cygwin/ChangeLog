@@ -1,3 +1,9 @@
+Sun Jun 10 12:56:00 2001  Christopher Faylor <cgf@redhat.com>
+
+	* exceptions.cc (sigdelayed): Ensure that signal is cleared as
+	the last operation or suffer races.
+	* sigproc.cc (proc_subproc): Deal with zombie array overflow.
+
 Sun Jun 10 11:56:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	 * cygwin.din: Add fchdir symbols.
