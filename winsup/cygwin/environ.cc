@@ -18,16 +18,16 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "perprocess.h"
 #include "fhandler.h"
 #include "path.h"
 #include "cygerrno.h"
 #include "cygheap.h"
 #include "registry.h"
 #include "environ.h"
-#include "perprocess.h"
 
 extern BOOL allow_glob;
-extern BOOL ignore_case_with_glob;
+extern bool ignore_case_with_glob;
 extern BOOL allow_ntea;
 extern BOOL allow_smbntsec;
 extern BOOL allow_winsymlinks;

@@ -13,6 +13,7 @@ details. */
 #include <stdlib.h>
 #include <errno.h>
 #include <process.h>
+#include "perprocess.h"
 #include "fhandler.h"
 #include "path.h"
 #include "sync.h"

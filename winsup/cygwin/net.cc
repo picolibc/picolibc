@@ -25,6 +25,7 @@ details. */
 #include <winsock2.h>
 #include "cygheap.h"
 #include "cygerrno.h"
+#include "perprocess.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"

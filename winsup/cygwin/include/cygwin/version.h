@@ -79,7 +79,9 @@ details. */
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
   20)
 
-
+#define CYGWIN_VERSION_CHECK_FOR_S_IEXEC \
+  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) >= \
+  36)
      /* We used to use the DLL major/minor to track
 	non-backward-compatible interface changes to the API.  Now we
 	use an API major/minor number for this purpose. */
@@ -127,10 +129,11 @@ details. */
        34: Separated out mount table
        35: Export drand48, erand48, jrand48, lcong48, lrand48,
            mrand48, nrand48, seed48, and srand48.
+       36: Added _cygwin_S_IEXEC, et al
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 35
+#define CYGWIN_VERSION_API_MINOR 36
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

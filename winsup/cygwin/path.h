@@ -37,6 +37,8 @@ enum path_types
   PATH_EXEC = MOUNT_EXEC,
   PATH_CYGWIN_EXEC = MOUNT_CYGWIN_EXEC,
   PATH_ALL_EXEC = PATH_CYGWIN_EXEC | PATH_EXEC,
+  PATH_ISDISK =	      0x04000000,
+  PATH_NOTEXEC =      0x08000000,
   PATH_HAS_SYMLINKS = 0x10000000,
   PATH_HASBUGGYOPEN = 0x20000000,
   PATH_SOCKET =       0x40000000,
@@ -50,6 +52,7 @@ class path_conv
 
   unsigned path_flags;
 
+  int isdisk () {return path_flags & PATH_ISDISK;}
   int has_acls () {return path_flags & PATH_HASACLS;}
   int has_symlinks () {return path_flags & PATH_HAS_SYMLINKS;}
   int hasgood_inode () {return path_flags & PATH_HASACLS;}  // Not strictly correct
@@ -57,13 +60,24 @@ class path_conv
   int isbinary () {return path_flags & PATH_BINARY;}
   int issymlink () {return path_flags & PATH_SYMLINK;}
   int issocket () {return path_flags & PATH_SOCKET;}
-  int isexec () {return path_flags & PATH_ALL_EXEC;}
   int iscygexec () {return path_flags & PATH_CYGWIN_EXEC;}
+  executable_states exec_state ()
+  {
+    extern int _check_for_executable;
+    if (path_flags & PATH_ALL_EXEC)
+      return is_executable;
+    if (path_flags & PATH_NOTEXEC)
+      return not_executable;
+    if (!_check_for_executable)
+      return dont_care_if_executable;
+    return dont_know_if_executable;
+  }
 
   void set_binary () {path_flags |= PATH_BINARY;}
   void set_symlink () {path_flags |= PATH_SYMLINK;}
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
-  void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTHING;}
+  void set_isdisk () {path_flags |= PATH_ISDISK;}
+  void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
   void set_has_acls (int x = 1) {path_flags |= x ? PATH_HASACLS : PATH_NOTHING;}
   void set_has_buggy_open (int x = 1) {path_flags |= x ? PATH_HASBUGGYOPEN : PATH_NOTHING;}
 

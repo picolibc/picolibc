@@ -22,6 +22,7 @@ details. */
 #include "pinfo.h"
 #include "cygerrno.h"
 #include "fhandler.h"
+#include "perprocess.h"
 #include "path.h"
 #include "security.h"
 #include "cygheap.h"

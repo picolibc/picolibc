@@ -178,8 +178,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	case WAIT_OBJECT_0:
 	  break;
 	case WAIT_OBJECT_0 + 1:
-	  set_sig_errno (EINTR);
-	  return -1;
+	  goto sig_exit;
 	default:
 	  __seterrno ();
 	  return -1;
@@ -358,8 +357,14 @@ fhandler_console::read (void *pv, size_t buflen)
 	  continue;
 	}
 
-      if (toadd && line_edit (toadd, nread))
-	break;
+      if (toadd)
+	{
+	  int res = line_edit (toadd, nread);
+	  if (res < 0)
+	    goto sig_exit;
+	  else if (res)
+	    break;
+	}
 #undef ich
     }
 
@@ -374,6 +379,10 @@ fhandler_console::read (void *pv, size_t buflen)
 #undef buf
 
   return copied_chars;
+
+ sig_exit:
+  set_sig_errno (EINTR);
+  return -1;
 }
 
 void

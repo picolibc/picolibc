@@ -8,6 +8,7 @@ __infinity
 __main
 __srget
 __swbuf
+_check_for_executable DATA
 ; __vc__10pinfo_listi
 @ALLOCA@
 cygwin_stackdump

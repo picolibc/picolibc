@@ -165,6 +165,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 {
   char c;
   int input_done = 0;
+  bool sawsig = FALSE;
   int iscanon = tc->ti.c_lflag & ICANON;
 
   while (nread-- > 0)
@@ -210,6 +211,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	  termios_printf ("got interrupt %d, sending signal %d", c, sig);
 	  kill_pgrp (tc->getpgid (), sig);
 	  tc->ti.c_lflag &= ~FLUSHO;
+	  sawsig = 1;
 	  goto restart_output;
 	}
     not_a_sig:
@@ -296,6 +298,11 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
   if (!iscanon || always_accept)
     set_input_done (ralen > 0);
 
+  if (sawsig)
+    {
+      // tc->write_error = EINTR;
+      input_done = -1;
+    }
   if (input_done)
     (void) accept_input ();
 

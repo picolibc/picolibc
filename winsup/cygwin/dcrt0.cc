@@ -27,11 +27,11 @@ details. */
 #include "child_info.h"
 #define NEED_VFORK
 #include "perthread.h"
+#include "perprocess.h"
 #include "path.h"
 #include "dtable.h"
 #include "shared_info.h"
 #include "cygwin_version.h"
-#include "perprocess.h"
 #include "dll_init.h"
 #include "host_dependent.h"
 #include "security.h"
@@ -108,7 +108,11 @@ extern "C"
    /* resourcelocks */ &_reslock, /* threadinterface */ &_mtinterf,
    /* impure_ptr */ &reent_data,
   };
-  BOOL ignore_case_with_glob = FALSE;
+  bool ignore_case_with_glob = FALSE;
+  int __declspec (dllexport) _check_for_executable = FALSE;
+#ifdef DEBUGGING
+  int pinger = 0;
+#endif
 };
 
 char *old_title = NULL;
@@ -752,6 +756,9 @@ dll_crt0_1 ()
       longjmp (fork_info->jmp, fork_info->cygpid);
     }
 
+  if (!CYGWIN_VERSION_CHECK_FOR_S_IEXEC)
+    _check_for_executable = TRUE;
+
 #ifdef DEBUGGING
   {
   extern void fork_init ();
@@ -808,7 +815,7 @@ dll_crt0_1 ()
 
   if (user_data->premain[0])
     for (unsigned int i = 0; i < PREMAIN_LEN / 2; i++)
-      user_data->premain[i] (__argc, __argv);
+      user_data->premain[i] (__argc, __argv, user_data);
 
   /* Set up __progname for getopt error call. */
   __progname = __argv[0];
@@ -832,7 +839,7 @@ dll_crt0_1 ()
   /* Execute any specified "premain" functions */
   if (user_data->premain[PREMAIN_LEN / 2])
     for (unsigned int i = PREMAIN_LEN / 2; i < PREMAIN_LEN; i++)
-      user_data->premain[i] (__argc, __argv);
+      user_data->premain[i] (__argc, __argv, user_data);
 
   debug_printf ("user_data->main %p", user_data->main);
 

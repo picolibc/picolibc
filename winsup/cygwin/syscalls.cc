@@ -26,6 +26,7 @@ details. */
 #include <cygwin/version.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
+#include "perprocess.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
@@ -34,7 +35,6 @@ details. */
 #include "pinfo.h"
 #include <unistd.h>
 #include "shared_info.h"
-#include "perprocess.h"
 #include "security.h"
 #include "cygheap.h"
 
@@ -1071,7 +1071,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 
   atts = real_path.file_attributes ();
 
-  debug_printf ("%d = GetFileAttributesA (%s)", atts, real_path.get_win32 ());
+  debug_printf ("%d = file_attributes for '%s'", atts, real_path.get_win32 ());
 
   strcpy (root, real_path.get_win32 ());
   dtype = GetDriveType (rootdir (root));

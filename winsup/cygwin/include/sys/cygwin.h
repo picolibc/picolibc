@@ -31,11 +31,6 @@ extern int cygwin_conv_to_full_posix_path (const char *, char *);
 extern int cygwin_posix_path_list_p (const char *);
 extern void cygwin_split_path (const char *, char *, char *);
 
-extern void cygwin_premain0 (int argc, char **argv);
-extern void cygwin_premain1 (int argc, char **argv);
-extern void cygwin_premain2 (int argc, char **argv);
-extern void cygwin_premain3 (int argc, char **argv);
-
 struct __cygwin_perfile
 {
   const char *name;
@@ -149,7 +144,7 @@ struct per_process
 
   void *(*calloc)(size_t, size_t);
   /* For future expansion of values set by the app. */
-  void (*premain[4]) (int, char **);
+  void (*premain[4]) (int, char **, struct per_process *);
 
   /* The rest are *internal* to cygwin.dll.
      Those that are here because we want the child to inherit the value from
@@ -165,7 +160,7 @@ struct per_process
   void *heapptr;		/* current index into heap */
   void *heaptop;		/* current top of heap */
 
-  DWORD unused1;		/* unused */
+  DWORD unused1;
 
   /* Non-zero means the task was forked.  The value is the pid.
      Inherited from parent. */
@@ -189,6 +184,11 @@ struct per_process
   struct _reent *impure_ptr;
 };
 #define per_process_overwrite ((unsigned) &(((struct per_process *) NULL)->resourcelocks))
+
+extern void cygwin_premain0 (int argc, char **argv, struct per_process *);
+extern void cygwin_premain1 (int argc, char **argv, struct per_process *);
+extern void cygwin_premain2 (int argc, char **argv, struct per_process *);
+extern void cygwin_premain3 (int argc, char **argv, struct per_process *);
 
 extern void cygwin_set_impersonation_token (const HANDLE);
 

@@ -14,9 +14,9 @@ details. */
 #include <unistd.h>
 #include <ctype.h>
 #include "fhandler.h"
+#include "perprocess.h"
 #include "path.h"
 #include "thread.h"
-#include "perprocess.h"
 #include "dlfcn.h"
 #include "dll_init.h"
 
@@ -166,19 +166,15 @@ dlopen (const char *name, int)
 {
   SetResourceLock(LOCK_DLL_LIST,READ_LOCK|WRITE_LOCK," dlopen");
 
-  void *ret = 0;
+  void *ret;
 
   if (!name)
-    {
-      /* handle for the current module */
-      ret = (void *) GetModuleHandle (NULL);
-    }
+    ret = (void *) GetModuleHandle (NULL); /* handle for the current module */
   else
     {
       /* handle for the named library */
       const char *fullpath = get_full_path_of_dll (name);
-      if (fullpath)
-	ret = (void *) LoadLibrary (fullpath);
+      ret = fullpath ? (void *) LoadLibrary (fullpath) : NULL;
     }
 
   if (!ret)

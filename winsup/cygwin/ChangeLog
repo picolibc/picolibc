@@ -1,3 +1,42 @@
+Mon Mar  5 01:25:03 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dlopen.c (dlopen): Return NULL when name is NULL (suggested by
+	chrisiasci@aol.com).
+
+	* cygwin.din: Add a new, internally used export -
+	_check_for_executable.
+	* dcrt0.cc (dll_crt0_1): Set _check_for_executable for older binaries.
+	Pass user_data to premain functions.
+	* fhandler.cc (fhandler_disk_file::open): Only check for executable if
+	the linked program is intereested in the executable bit.
+	(fhandler_disk_file::check_execable_p): Delete.
+	* fhandler.h (executable_states): New enumeration of various states of
+	executable bit caring.
+	(fhandler_base::set_execable_p): New method.
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Flag when a signal
+	has been sent to the tty.  Return -1 when this is so.
+	* fhandler_console.cc (fhandler_console::read): Return -1 when signal
+	sending character encountered.
+
+	* path.cc (path_conv::check): Record when path refers to a disk device.
+	Move executable extension check here.
+	(check_sysfile): Accomodate new EXEC path states.
+	(has_suffix): Remove.
+	(next_suffix): Remove.
+	(class suffix_scan): New clas.
+	(suffix_scan::has): New method.
+	(suffix_scan:next): New method.
+	(symlink_info::check): Use suffix_scan method to control for scanning
+	for suffixes.
+	* path.h (path_conv::exec_state): New method.
+	* perprocess.h: Make "C" friendly.
+	* include/cygwin/version.h: Define CYGWIN_VERSION_CHECK_FOR_S_IEXEC.
+	Bump CYGWIN_VERSION_API_MINOR.
+	* include/sys/cygwin.h: Change premain declarations.
+
+	* winsup.h: Move __cplusplus test to after builtin defines.
+
 2001-03-04  Egor Duda  <deo@logos-m.ru>
 
 	* fhandler.h (class fhandler_tty_common): New mutex and event to

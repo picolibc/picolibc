@@ -67,6 +67,7 @@ void __stdcall add_handle (const char *, int, HANDLE, const char *);
 BOOL __stdcall close_handle (const char *, int, HANDLE, const char *, BOOL);
 int __stdcall lpfu (const char *, int, DWORD timeout);
 void __stdcall cygbench (const char *s);
+extern int pinger;
 
 #endif /*DEBUGGING*/
 #endif /*_DEBUG_H_*/

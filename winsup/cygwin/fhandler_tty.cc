@@ -194,7 +194,7 @@ process_input (void *)
     {
       int nraw = tty_master->console->read ((void *) rawbuf,
 				      (size_t) INP_BUFFER_SIZE);
-      tty_master->line_edit (rawbuf, nraw);
+      (void) tty_master->line_edit (rawbuf, nraw);
     }
 }
 
@@ -1000,7 +1000,7 @@ fhandler_pty_master::close ()
 int
 fhandler_pty_master::write (const void *ptr, size_t len)
 {
-  line_edit ((char *) ptr, len);
+  (void) line_edit ((char *) ptr, len);
   return len;
 }
 

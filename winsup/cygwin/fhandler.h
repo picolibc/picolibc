@@ -130,6 +130,14 @@ enum bg_check_types
   bg_signalled = 2
 };
 
+enum executable_states
+{
+  is_executable,
+  not_executable,
+  dont_care_if_executable,
+  dont_know_if_executable
+};
+
 class fhandler_base
 {
 private:
@@ -219,7 +227,10 @@ public:
   void set_socket_p () { FHSETF (LOCAL); }
 
   int get_execable_p () { return FHISSETF (EXECABL); }
-  void set_execable_p (int val) { FHCONDSETF (val, EXECABL); }
+  void set_execable_p (executable_states val)
+  {
+    FHCONDSETF (val == is_executable, EXECABL);
+  }
   void set_execable_p () { FHSETF (EXECABL); }
 
   int get_append_p () { return FHISSETF (APPEND); }
@@ -477,9 +488,6 @@ private:
 
 class fhandler_disk_file: public fhandler_base
 {
-private:
-  int check_execable_p (const char *path);
-
 public:
   fhandler_disk_file (const char *name);
 

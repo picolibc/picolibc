@@ -17,11 +17,11 @@ details. */
 #include <sys/cygwin.h>
 #include <signal.h>
 #include "cygerrno.h"
+#include "perprocess.h"
 #include "fhandler.h"
 #include "path.h"
 #include "shared_info.h"
 #include "host_dependent.h"
-#include "perprocess.h"
 #include "security.h"
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
@@ -1226,9 +1226,6 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
       win32_path_name_ = real_path.get_win32 ();
       set_no_free_names ();
     }
-  /* If necessary, do various other things to see if path is a program.  */
-  if (!real_path.isexec ())
-    real_path.set_exec (check_execable_p (get_win32_name ()));
 
   if (real_path.isbinary ())
     {
@@ -1264,9 +1261,9 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
 
   extern BOOL allow_ntea;
 
-  if (!real_path.isexec () && !allow_ntea
-      && (!allow_ntsec || !real_path.has_acls ())
-      && GetFileType (get_handle ()) == FILE_TYPE_DISK)
+  if (real_path.isdisk ()
+      && (real_path.exec_state () == dont_know_if_executable)
+      && !allow_ntea && (!allow_ntsec || !real_path.has_acls ()))
     {
       DWORD done;
       char magic[3];
@@ -1283,7 +1280,7 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
     SetFilePointer (get_handle(), 0, 0, FILE_END);
 
   set_symlink_p (real_path.issymlink ());
-  set_execable_p (real_path.isexec ());
+  set_execable_p (real_path.exec_state ());
   set_socket_p (real_path.issocket ());
 
 out:
@@ -1454,21 +1451,6 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
       return -1;
     }
 
-  return 0;
-}
-
-/* Perform various heuristics on PATH to see if it's a program. */
-
-int
-fhandler_disk_file::check_execable_p (const char *path)
-{
-  int len = strlen (path);
-  const char *ch = path + (len > 4 ? len - 4 : len);
-
-  if (strcasematch (".exe", ch)
-      || strcasematch (".bat", ch)
-      || strcasematch (".com", ch))
-    return 1;
   return 0;
 }
 

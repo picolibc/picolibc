@@ -14,8 +14,6 @@ details. */
 
 #define __INSIDE_CYGWIN__
 
-#ifdef __cplusplus
-
 #define alloca __builtin_alloca
 #define strlen __builtin_strlen
 #define strcmp __builtin_strcmp
@@ -25,6 +23,8 @@ details. */
 #ifdef HAVE_BUILTIN_MEMSET
 # define memset __builtin_memset
 #endif
+
+#ifdef __cplusplus
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
 #define NEW_MACRO_VARARGS

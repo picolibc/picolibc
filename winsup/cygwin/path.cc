@@ -64,6 +64,7 @@ details. */
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
 #include "cygerrno.h"
+#include "perprocess.h"
 #include "fhandler.h"
 #include "path.h"
 #include "sync.h"
@@ -412,6 +413,7 @@ out:
     }
   else
     {
+      set_isdisk ();
       debug_printf ("GetVolumeInformation(%s) = OK, full_path(%s), set_has_acls(%d)",
 		    tmp_buf, full_path, volflags & FS_PERSISTENT_ACLS);
       if (!allow_smbntsec
@@ -427,6 +429,16 @@ out:
 
   if (saw_symlinks)
     set_has_symlinks ();
+
+  if (!error && !(path_flags & (PATH_ALL_EXEC | PATH_NOTEXEC)))
+    {
+      const char *p = strchr (path, '\0') - 4;
+      if (p >= path &&
+	  (strcasematch (".exe", p) ||
+	   strcasematch (".bat", p) ||
+	   strcasematch (".com", p)))
+	path_flags |= PATH_EXEC;
+    }
 
 #if 0
   if (!error)
@@ -565,7 +577,7 @@ get_device_number (const char *name, int &unit, BOOL from_conv)
       else if (deveq ("tcp") || deveq ("udp") || deveq ("streamsocket")
 	       || deveq ("dgsocket"))
 	devn = FH_SOCKET;
-      else if (! from_conv)
+      else if (!from_conv)
 	devn = get_raw_device_number (name - 5,
 				      path_conv (name - 5,
 						 PC_SYM_IGNORE).get_win32 (),
@@ -821,7 +833,6 @@ normalize_win32_path (const char *src, char *dst)
   debug_printf ("%s = normalize_win32_path (%s)", dst_start, src_start);
   return 0;
 }
-
 
 /* Various utilities.  */
 
@@ -1303,7 +1314,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
   for (int i = 0; i < nmounts; ++i)
     {
       mount_item &mi = mount[native_sorted[i]];
-      if (! path_prefix_p (mi.native_path, pathbuf, mi.native_pathlen))
+      if (!path_prefix_p (mi.native_path, pathbuf, mi.native_pathlen))
 	continue;
 
       /* SRC_PATH is in the mount table. */
@@ -1387,7 +1398,7 @@ mount_info::read_mounts (reg_key& r)
       posix_path_size = MAX_PATH;
       /* FIXME: if maximum posix_path_size is 256, we're going to
 	 run into problems if we ever try to store a mount point that's
-	 over 256 but is under MAX_PATH! */
+	 over 256 but is under MAX_PATH. */
       res = RegEnumKeyEx (key, i, posix_path, &posix_path_size, NULL,
 			  NULL, NULL, NULL);
 
@@ -1503,7 +1514,7 @@ mount_info::add_reg_mount (const char * native_path, const char * posix_path, un
       cygwin_shared->sys_mount_table_counter++;
     }
 
-  return 0; /* Success! */
+  return 0; /* Success */
  err:
   __seterrno_from_win_error (res);
   return -1;
@@ -1542,7 +1553,7 @@ mount_info::del_reg_mount (const char * posix_path, unsigned flags)
       return -1;
     }
 
-  return 0; /* Success! */
+  return 0; /* Success */
 }
 
 /* read_cygdrive_info_from_registry: Read the default prefix and flags
@@ -2060,7 +2071,7 @@ mount_item::getmntent ()
      binary or textmode, or exec.  We don't print
      `silent' here; it's a magic internal thing. */
 
-  if (! (flags & MOUNT_BINARY))
+  if (!(flags & MOUNT_BINARY))
     strcpy (mount_table->mnt_opts, (char *) "textmode");
   else
     strcpy (mount_table->mnt_opts, (char *) "binmode");
@@ -2333,36 +2344,6 @@ done:
   return res;
 }
 
-static __inline char *
-has_suffix (const char *path, const suffix_info *suffixes)
-{
-  assert (path);
-  char *ext = strrchr (path, '.');
-  if (ext)
-    for (const suffix_info *ex = suffixes; ex->name != NULL; ex++)
-      if (strcasematch (ext, ex->name))
-	return ext;
-  return NULL;
-}
-
-static __inline__ int
-next_suffix (char *ext_here, const suffix_info *&suffixes)
-{
-  if (!suffixes)
-    return 1;
-
-  while (suffixes && suffixes->name)
-    if (!suffixes->addon)
-      suffixes++;
-    else
-      {
-	strcpy (ext_here, suffixes->name);
-	suffixes++;
-	return 1;
-      }
-  return 0;
-}
-
 static int
 check_sysfile (const char *path, DWORD fileattr, HANDLE h,
 	       char *contents, int *error, unsigned *pflags)
@@ -2371,7 +2352,7 @@ check_sysfile (const char *path, DWORD fileattr, HANDLE h,
   DWORD got;
   int res = 0;
 
-  if (! ReadFile (h, cookie_buf, sizeof (cookie_buf), &got, 0))
+  if (!ReadFile (h, cookie_buf, sizeof (cookie_buf), &got, 0))
     {
       debug_printf ("ReadFile1 failed");
       *error = EIO;
@@ -2408,10 +2389,105 @@ check_sysfile (const char *path, DWORD fileattr, HANDLE h,
   else
     {
       /* Not a symlink, see if executable.  */
-      if (!(*pflags & PATH_ALL_EXEC) && has_exec_chars (cookie_buf, got))
+      if (*pflags & PATH_ALL_EXEC)
+	/* Nothing to do */;
+      else if (has_exec_chars (cookie_buf, got))
 	*pflags |= PATH_EXEC;
-    }
+      else
+	*pflags |= PATH_NOTEXEC;
+      }
+  syscall_printf ("%d = symlink.check_sysfile (%s, %s) (%p)",
+		  res, path, contents, *pflags);
   return res;
+}
+
+#define SCAN_BEG	0
+#define SCAN_LNK	1
+#define SCAN_TERM1	2
+#define SCAN_JUSTCHECK	3
+
+class suffix_scan
+{
+  char *ext_here;
+  const suffix_info *suffixes;
+  int state;
+  int nullterm;
+public:
+  const char *path;
+  char *has (const char *, const suffix_info *, char **);
+  int next ();
+  int lnk_match () {return state == SCAN_LNK + 1;}
+};
+
+char *
+suffix_scan::has (const char *in_path, const suffix_info *in_suffixes, char **ext_where)
+{
+  path = in_path;
+  suffixes = in_suffixes;
+  nullterm = 0;
+  state = SCAN_BEG;
+  if (suffixes)
+    {
+      ext_here = *ext_where = strrchr (in_path, '.');
+      if (ext_here)
+	{
+	  /* Check if the extension matches a known extension */
+	  for (const suffix_info *ex = in_suffixes; ex->name != NULL; ex++)
+	    if (strcasematch (ext_here, ex->name))
+	      {
+		state = SCAN_JUSTCHECK;
+		goto known_suffix;
+	      }
+	  /* Didn't match.  Use last resort -- .lnk. */
+	  if (strcasematch (ext_here, ".lnk"))
+	    {
+	      state = SCAN_LNK;
+	      goto known_suffix;
+	    }
+	}
+    }
+
+  /* Didn't find a matching suffix. */
+  ext_here = *ext_where = strchr (path, '\0');
+  nullterm = 1;
+  return NULL;
+
+ known_suffix:
+  suffixes = NULL;		/* Has an extension so don't scan for one. */
+  return ext_here;
+}
+
+int
+suffix_scan::next ()
+{
+  if (suffixes)
+    {
+      while (suffixes && suffixes->name)
+	if (!suffixes->addon)
+	  suffixes++;
+	else
+	  {
+	    strcpy (ext_here, suffixes->name);
+	    suffixes++;
+	    return 1;
+	  }
+      suffixes = NULL;
+      state++;
+    }
+
+  switch (state++)
+    {
+    case SCAN_LNK:
+      strcpy (ext_here, ".lnk");
+      /* fall through */
+    case SCAN_BEG:
+    case SCAN_JUSTCHECK:
+      return 1;
+    default:
+      if (nullterm && ext_here)
+	*ext_here = '\0';
+      return 0;
+    }
 }
 
 /* Check if PATH is a symlink.  PATH must be a valid Win32 path name.
@@ -2432,43 +2508,25 @@ check_sysfile (const char *path, DWORD fileattr, HANDLE h,
    stored into BUF if PATH is a symlink.  */
 
 int
-symlink_info::check (const char *in_path, const suffix_info *suffixes)
+symlink_info::check (const char *path, const suffix_info *suffixes)
 {
   HANDLE h;
   int res = 0;
-  char extbuf[MAX_PATH + 5];
-  const char *path = in_path;
-  BOOL check_lnk = FALSE;
-
-  if (!suffixes)
-    ext_here = NULL;
-  else if ((known_suffix = has_suffix (in_path, suffixes)) != NULL)
-    {
-      suffixes = NULL;
-      ext_here = NULL;
-    }
-  else
-    {
-restart:
-      path = strcpy (extbuf, in_path);
-      ext_here = strchr (path, '\0');
-    }
+  suffix_scan suffix;
 
   is_symlink = TRUE;
+  known_suffix = suffix.has (path, suffixes, &ext_here);
 
-  error = 0;
-  do
+  while (suffix.next ())
     {
-      if (!next_suffix (ext_here, suffixes))
-	break;
       error = 0;
-      fileattr = GetFileAttributesA (path);
+      fileattr = GetFileAttributesA (suffix.path);
       if (fileattr == (DWORD) -1)
 	{
 	  /* The GetFileAttributesA call can fail for reasons that don't
 	     matter, so we just return 0.  For example, getting the
 	     attributes of \\HOST will typically fail.  */
-	  debug_printf ("GetFileAttributesA (%s) failed", path);
+	  debug_printf ("GetFileAttributesA (%s) failed", suffix.path);
 	  error = geterrno_from_win_error (GetLastError (), EACCES);
 	  continue;
 	}
@@ -2479,7 +2537,7 @@ restart:
         goto file_not_symlink;
 
       /* Windows shortcuts are treated as symlinks. */
-      if (!strcasecmp (path + strlen (path) - 4, ".lnk"))
+      if (suffix.lnk_match ())
 	sym_check = 1;
 
       /* The old Cygwin method creating symlinks: */
@@ -2493,27 +2551,27 @@ restart:
 
       /* Open the file.  */
 
-      h = CreateFileA (path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih, OPEN_EXISTING,
+      h = CreateFileA (suffix.path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih, OPEN_EXISTING,
 		       FILE_ATTRIBUTE_NORMAL, 0);
       res = -1;
       if (h == INVALID_HANDLE_VALUE)
 	goto file_not_symlink;
       else if (sym_check == 1
-               && !(res = check_shortcut (path, fileattr, h,
+               && !(res = check_shortcut (suffix.path, fileattr, h,
 	       				  contents, &error, &pflags)))
 	{
 	  CloseHandle (h);
 	  /* If searching for `foo' and then finding a `foo.lnk' which is
 	     no shortcut, return the same as if file not found. */
-	  if (check_lnk)
+	  if (suffix.lnk_match ())
 	    {
 	      fileattr = (DWORD)-1;
-	      goto out;
+	      break;
 	    }
 	  goto file_not_symlink;
 	}
       else if (sym_check == 2 &&
-      	       !(res = check_sysfile (path, fileattr, h,
+      	       !(res = check_sysfile (suffix.path, fileattr, h,
 	       			      contents, &error, &pflags)))
 	{
 	  CloseHandle (h);
@@ -2521,14 +2579,7 @@ restart:
 	}
 
       CloseHandle (h);
-      goto out;
-    }
-  while (suffixes);
-  if (!check_lnk)
-    {
-      suffixes = lnk_suffixes;
-      check_lnk = TRUE;
-      goto restart;
+      break;
     }
   goto out;
 
@@ -2539,8 +2590,7 @@ file_not_symlink:
 
 out:
   syscall_printf ("%d = symlink.check (%s, %p) (%p)",
-		  res, path, contents, pflags);
-
+		  res, suffix.path, contents, pflags);
   return res;
 }
 
@@ -2846,7 +2896,7 @@ extern "C"
 int
 cygwin_posix_path_list_p (const char *path)
 {
-  int posix_p = ! (strchr (path, ';') || isdrive (path));
+  int posix_p = !(strchr (path, ';') || isdrive (path));
   return posix_p;
 }
 
@@ -2946,7 +2996,7 @@ cygwin_split_path (const char *path, char *dir, char *file)
       *dir++ = *path++;
       *dir++ = *path++;
       *dir++ = '/';
-      if (! *path)
+      if (!*path)
 	{
 	  *dir = 0;
 	  *file = 0;
