@@ -1,3 +1,7 @@
+Mon Jul 31 15:12:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* passwd.c (main): Initialize oldpwd before beeing used.
+
 Thu Jul 27 22:54:28 2000  Jason Tishler <jt@dothill.com>
 
 	* utils/mount.cc (main): Add --show-cygdrive-prefixes option.
