@@ -1,3 +1,10 @@
+2000-08-11  Jason Merrill  <jason@redhat.com>
+
+	* configure.in (CC_FOR_TARGET, CHILL_FOR_TARGET,
+	CXX_FOR_TARGET): Add -B$$r/gcc/ here.
+	(FLAGS_FOR_TARGET): Not here.
+	(CHILL_FOR_TARGET, CXX_FOR_TARGET): Don't check the list of languages.
+
 2000-08-07  DJ Delorie  <dj@redhat.com>
 
 	* configure.in (FLAGS_FOR_TARGET): invert test for xgcc, should mean
