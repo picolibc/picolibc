@@ -1,3 +1,7 @@
+2002-07-19  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_serial.cc (fhandler_serial::tcflush): Fix typo.
+
 2002-07-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (get_group_sidlist): Fix formatting.

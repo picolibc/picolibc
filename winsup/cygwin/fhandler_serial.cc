@@ -365,7 +365,7 @@ fhandler_serial::tcflush (int queue)
   if (queue == TCOFLUSH || queue == TCIOFLUSH)
     PurgeComm (get_handle (), PURGE_TXABORT | PURGE_TXCLEAR);
 
-  if (queue == TCIFLUSH | queue == TCIOFLUSH)
+  if (queue == TCIFLUSH || queue == TCIOFLUSH)
     /* Input flushing by polling until nothing turns up
        (we stop after 1000 chars anyway) */
     for (int max = 1000; max > 0; max--)
