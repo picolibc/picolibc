@@ -758,9 +758,11 @@ dtable::vfork_parent_restore ()
   cfree (deleteme);
   unlock ();
 
-  cygheap->ctty = ctty_on_hold;			// revert
-  if (cygheap->ctty)
-    cygheap->ctty->close ();			// Undo previous bump of this archetype
+  if (cygheap->ctty != ctty_on_hold)
+    {
+      cygheap->ctty = ctty_on_hold;		// revert
+      cygheap->ctty->close ();			// Undo previous bump of this archetype
+    }
   cygheap->ctty_on_hold = NULL;
 
   return;
