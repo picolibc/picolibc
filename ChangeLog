@@ -1,3 +1,8 @@
+2003-06-24  Keith Seitz  <kseitz@sources.redhat.com>
+
+	* Makefile.tpl: Add maybe-configure-itcl to configure-gdb.
+	* Makefile.in: Regenerate.
+
 2003-06-17  Benjamin Kosnik  <bkoz@redhat.com>
 
 	* configure.in: Update testsuite_flags to new location.
