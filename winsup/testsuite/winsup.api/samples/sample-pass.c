@@ -1,4 +1,0 @@
-main()
-{
-  return 0;
-}

@@ -1,6 +1,0 @@
-proc winsup_version {} {
-    clone_output "\n[exec grep ^%%% ../new-cygwin1.dll]\n"
-}
-
-proc winsup_exit {} {
-}
