@@ -13,7 +13,7 @@ SECTIONS
 {
   /* Read-only sections, merged into text segment: */
   /* Start of RAM (leaving room for Cygmon data) */
-  . = 0;
+  . = 4;
 
   .interp     : { *(.interp) 	}
   .hash          : { *(.hash)		}
