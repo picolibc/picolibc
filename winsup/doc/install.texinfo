@@ -53,8 +53,8 @@ much better off with a whole new installation anyway.  You may backup
 or rename your old installation first, or just install the new one
 somewhere else.  Be sure to make note of your current mount table,
 because this will be overwritten during the new setup.  Make sure you
-don't end up with two different versions of @samp{cygwin1.dll} in your
-path.
+don't end up with two different versions of @samp{cygwin1.dll} on your
+system.
 
 Once you've installed the latest net release, Cygwin Setup will update
 just the individual packages that need it.
@@ -84,14 +84,13 @@ a fairly safe way to do that:
 @item Run setup to download and extract all the tar files.
 
 @item Re-activate your anti-virus software and scan everything
-in C:\cygwin (or wherever you chose to install).  If you're concerned
-about a malicious package, say if a mirror is compromised, then you
-should scan your entire hard disk after running Cygwin Setup.
+in C:\cygwin (or wherever you chose to install), or your entire hard
+disk if you are paranoid.
 
 @end enumerate
 
 This should be safe, but only if Cygwin Setup is not substituted by
-something malicious.
+something malicious, and no mirror has been compromised.
 
 @subsection What packages should I download?
 
@@ -136,9 +135,9 @@ This should become much easier in a future version of Cygwin Setup.
 
 @subsection How much disk space does Cygwin require?
 
-That depends, obviously, on what you've chosen to download and install.
-A full installation is probably 250-300MB installed, not including the
-package archives themselves or the source code.
+That depends, obviously, on what you've chosen to download and
+install.  A full installation is probably close to 500MB installed,
+not including the package archives themselves or the source code.
 
 After installation, the package archives remain in your ``Local Package
 Directory'', by default the location of @code{setup.exe}.  You may
