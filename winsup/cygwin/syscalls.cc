@@ -1013,7 +1013,7 @@ fstat64 (int fd, struct __stat64 *buf)
     res = -1;
   else
     {
-      path_conv pc (cfd->get_win32_name (), PC_SYM_NOFOLLOW);
+      path_conv pc (cfd->get_name (), PC_SYM_NOFOLLOW);
       memset (buf, 0, sizeof (struct __stat64));
       res = cfd->fstat (buf, &pc);
       if (!res && cfd->get_device () != FH_SOCKET)
@@ -1200,7 +1200,7 @@ access (const char *fn, int flags)
     return check_file_access (real_path, flags);
 
   struct __stat64 st;
-  int r = stat_worker (real_path, &st, 0);
+  int r = stat_worker (fn, &st, 0);
   if (r)
     return -1;
   r = -1;
