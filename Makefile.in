@@ -615,7 +615,6 @@ CLEAN_X11_MODULES = \
 	clean-gdb \
 	clean-expect \
 	clean-guile \
-	clean-tclX \
 	clean-tk \
 	clean-tix 
 
@@ -5575,74 +5574,6 @@ install-guile: installdirs
 	  (cd guile; $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) install)
 
 
-.PHONY: configure-tclX maybe-configure-tclX
-maybe-configure-tclX:
-configure-tclX: tclX/Makefile
-
-tclX/Makefile: config.status
-	@[ -d tclX ] || mkdir tclX; \
-	r=`${PWD}`; export r; \
-	s=`cd $(srcdir); ${PWD}`; export s; \
-	CC="$(CC)"; export CC; \
-	CFLAGS="$(CFLAGS)"; export CFLAGS; \
-	CXX="$(CXX)"; export CXX; \
-	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
-	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
-	  AR="$(AR)"; export AR; \
-	  AS="$(AS)"; export AS; \
-	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
-	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
-	  LD="$(LD)"; export LD; \
-	  NM="$(NM)"; export NM; \
-	  RANLIB="$(RANLIB)"; export RANLIB; \
-	  WINDRES="$(WINDRES)"; export WINDRES; \
-	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
-	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
-	fi; \
-	echo Configuring in tclX; \
-	cd tclX || exit 1; \
-	case $(srcdir) in \
-	  \.) \
-	    srcdiroption="--srcdir=."; \
-	    libsrcdir=".";; \
-	  /* | [A-Za-z]:[\\/]*) \
-	    srcdiroption="--srcdir=$(srcdir)/tclX"; \
-	    libsrcdir="$$s/tclX";; \
-	  *) \
-	    srcdiroption="--srcdir=../$(srcdir)/tclX"; \
-	    libsrcdir="$$s/tclX";; \
-	esac; \
-	$(SHELL) $${libsrcdir}/configure \
-	  $(HOST_CONFIGARGS) $${srcdiroption} \
-	  || exit 1
-
-.PHONY: all-tclX maybe-all-tclX
-maybe-all-tclX:
-all-tclX: configure-tclX
-	@r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  $(SET_LIB_PATH) \
-	  (cd tclX; $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) all)
-
-
-.PHONY: check-tclX
-check-tclX:
-	@r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  $(SET_LIB_PATH) \
-	  (cd tclX; $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) check)
-
-
-
-.PHONY: install-tclX maybe-install-tclX
-maybe-install-tclX:
-install-tclX: installdirs
-	@r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  $(SET_LIB_PATH) \
-	  (cd tclX; $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) install)
-
-
 .PHONY: configure-tk maybe-configure-tk
 maybe-configure-tk:
 configure-tk: tk/Makefile
@@ -7733,7 +7664,6 @@ all-sed: maybe-all-libiberty
 all-send-pr: maybe-all-prms
 all-snavigator: maybe-all-tcl maybe-all-tk maybe-all-itcl maybe-all-tix maybe-all-db maybe-all-grep maybe-all-libgui
 all-tar: maybe-all-libiberty
-all-tclX: maybe-all-tcl maybe-all-tk
 all-uudecode: maybe-all-libiberty
 
 ALL_GCC = maybe-all-gcc

@@ -1338,7 +1338,6 @@ all-sed: maybe-all-libiberty
 all-send-pr: maybe-all-prms
 all-snavigator: maybe-all-tcl maybe-all-tk maybe-all-itcl maybe-all-tix maybe-all-db maybe-all-grep maybe-all-libgui
 all-tar: maybe-all-libiberty
-all-tclX: maybe-all-tcl maybe-all-tk
 all-uudecode: maybe-all-libiberty
 
 ALL_GCC = maybe-all-gcc

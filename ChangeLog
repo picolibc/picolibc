@@ -1,3 +1,8 @@
+2002-12-13  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in, Makefile.tpl, Makefile.def: Remove tclX.
+	* Makefile.in: Regenerate.
+
 2002-12-12  Jeff Johnston  <jjohnstn@redhat.com>
 
         * COPYING.NEWLIB: Update list of alternate Regent of California
