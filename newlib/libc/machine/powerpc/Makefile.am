@@ -6,7 +6,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = setjmp.S time.c
+lib_a_SOURCES = setjmp.S times.c
 lib_a_LIBADD = @extra_objs@
 EXTRA_lib_a_SOURCES = @extra_sources@
 lib_a_DEPENDENCIES = @extra_objs@

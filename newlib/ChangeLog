@@ -1,4 +1,11 @@
-2002-07-19  Aldy Hernandez  <aldyh@redhat.com>
+2002-07-22  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/powerpc/time.c: Removed..renamed to times.c.
+	* libc/machine/powerpc/times.c: New file.
+	* libc/machine/powerpc/Makefile.am: Change time.c to times.c.
+	* libc/machine/powerpc/Makefile.in: Regenerated.
+
+2002-07-22  Aldy Hernandez  <aldyh@redhat.com>
 
         * libc/machine/powerpc/time.c: New file.
         * libc/machine/powerpc/Makefile.am (lib_a_SOURCES): Add
@@ -13,7 +20,6 @@
 	* README: Change docs URL to
 	http://sources.redhat.com/newlib/docs.html.
 
->>>>>>> 1.389
 2002-07-19  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/linux/Makefile.am: Add pathconf.c and fpathconf.c.
