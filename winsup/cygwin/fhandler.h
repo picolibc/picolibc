@@ -116,6 +116,7 @@ class path_conv;
 class fhandler_disk_file;
 typedef struct __DIR DIR;
 struct dirent;
+struct iovec;
 
 enum bg_check_types
 {
@@ -297,6 +298,8 @@ class fhandler_base
   virtual char const * ttyname () { return get_name(); }
   virtual int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   virtual int write (const void *ptr, size_t len);
+  virtual ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  virtual ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual __off64_t lseek (__off64_t offset, int whence);
   virtual int lock (int, struct flock *);
   virtual void dump ();

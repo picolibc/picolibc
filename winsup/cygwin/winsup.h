@@ -221,6 +221,10 @@ int __stdcall __check_invalid_read_ptr_errno (const void *s, unsigned sz) __attr
 #define check_null_invalid_struct_errno(s) \
   __check_null_invalid_struct_errno ((s), sizeof (*(s)))
 
+struct iovec;
+ssize_t check_iovec_for_read (const struct iovec *, int) __attribute__ ((regparm(2)));
+ssize_t check_iovec_for_write (const struct iovec *, int) __attribute__ ((regparm(2)));
+
 #define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
 void __set_winsock_errno (const char *fn, int ln) __attribute__ ((regparm(2)));
 

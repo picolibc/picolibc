@@ -11,6 +11,9 @@ details. */
 #include "winsup.h"
 #include "cygerrno.h"
 #include <sys/errno.h>
+#include <sys/uio.h>
+#include <assert.h>
+#include <limits.h>
 #include <winbase.h>
 #include <winnls.h>
 
@@ -177,6 +180,76 @@ __check_invalid_read_ptr_errno (const void *s, unsigned sz)
   if (s && !IsBadReadPtr (s, sz))
     return 0;
   return set_errno (EFAULT);
+}
+
+ssize_t
+check_iovec_for_read (const struct iovec *iov, int iovcnt)
+{
+  if (iovcnt <= 0 || iovcnt > IOV_MAX)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  if (__check_invalid_read_ptr_errno (iov, iovcnt * sizeof (*iov)))
+    return -1;
+
+  size_t tot = 0;
+
+  while (iovcnt != 0)
+    {
+      if (iov->iov_len > SSIZE_MAX || (tot += iov->iov_len) > SSIZE_MAX)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+
+      if (iov->iov_len
+	  && __check_null_invalid_struct_errno (iov->iov_base, iov->iov_len))
+	return -1;
+
+      iov += 1;
+      iovcnt -= 1;
+    }
+
+  assert (tot <= SSIZE_MAX);
+
+  return (ssize_t) tot;
+}
+
+ssize_t
+check_iovec_for_write (const struct iovec *iov, int iovcnt)
+{
+  if (iovcnt <= 0 || iovcnt > IOV_MAX)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  if (__check_invalid_read_ptr_errno (iov, iovcnt * sizeof (*iov)))
+    return -1;
+
+  size_t tot = 0;
+
+  while (iovcnt != 0)
+    {
+      if (iov->iov_len > SSIZE_MAX || (tot += iov->iov_len) > SSIZE_MAX)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+
+      if (iov->iov_len
+	  && __check_invalid_read_ptr_errno (iov->iov_base, iov->iov_len))
+	return -1;
+
+      iov += 1;
+      iovcnt -= 1;
+    }
+
+  assert (tot <= SSIZE_MAX);
+
+  return (ssize_t) tot;
 }
 
 UINT

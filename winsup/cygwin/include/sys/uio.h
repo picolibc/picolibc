@@ -1,6 +1,6 @@
 /* sys/uio.h
 
-   Copyright 1996, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -24,9 +24,10 @@ __BEGIN_DECLS
  * Define the uio buffers used for writev, readv.
  */
 
-struct iovec {
-	caddr_t iov_base;
-	int iov_len;
+struct iovec
+{
+  void *iov_base;
+  size_t iov_len;
 };
 
 extern ssize_t readv __P ((int filedes, const struct iovec *vector, int count));
