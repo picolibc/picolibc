@@ -1,3 +1,10 @@
+2003-02-22  Roland Schwingel  <roland.schwingel@onevision.de>
+
+	* include/wingdi.h (AddFontMemResourceEx[AW]): Add.
+	(RemoveFontMemResourceEx[AW]): Ditto
+	* lib/gdi32.def (AddFontMemResourceEx[AW]): Add.
+	(RemoveFontMemResourceEx[AW]): Ditto.
+
 2003-02-22  Bang Jun-Young  <junyoung@netbsd.org>
 
 	* lib/ntdll.def (NT*, RTL*, ZW*): Add missing exports.

@@ -2406,6 +2406,8 @@ BOOL WINAPI AbortPath(HDC);
 int WINAPI AddFontResourceA(LPCSTR);
 int WINAPI AddFontResourceW(LPCWSTR);
 #if (_WIN32_WINNT >= 0x0500)
+HANDLE WINAPI AddFontMemResourceExA(PVOID,DWORD,PVOID,DWORD);
+HANDLE WINAPI AddFontMemResourceExW(PVOID,DWORD,PVOID,DWORD);
 int WINAPI AddFontResourceExA(LPCSTR,DWORD,PVOID);
 int WINAPI AddFontResourceExW(LPCWSTR,DWORD,PVOID);
 #endif
@@ -2662,6 +2664,8 @@ BOOL WINAPI RectVisible(HDC,LPCRECT);
 BOOL WINAPI RemoveFontResourceA(LPCSTR);
 BOOL WINAPI RemoveFontResourceW(LPCWSTR);
 #if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI RemoveFontMemResourceExA(HANDLE);
+BOOL WINAPI RemoveFontMemResourceExW(HANDLE);
 BOOL WINAPI RemoveFontResourceExA(LPCSTR,DWORD,PVOID);
 BOOL WINAPI RemoveFontResourceExW(LPCWSTR,DWORD,PVOID);
 #endif
@@ -2780,6 +2784,7 @@ typedef ENUMLOGFONTW ENUMLOGFONT,*LPENUMLOGFONT;
 typedef ENUMLOGFONTEXW ENUMLOGFONTEX,*LPENUMLOGFONTEX;
 #define AddFontResource AddFontResourceW
 #if (_WIN32_WINNT >= 0x0500)
+#define AddFontMemResourceEx AddFontMemResourceExW
 #define AddFontResourceEx AddFontResourceExW
 #endif
 #define CopyEnhMetaFile CopyEnhMetaFileW
@@ -2820,6 +2825,7 @@ typedef ENUMLOGFONTEXW ENUMLOGFONTEX,*LPENUMLOGFONTEX;
 #define PolyTextOut PolyTextOutW
 #define RemoveFontResource RemoveFontResourceW
 #if (_WIN32_WINNT >= 0x0500)
+#define RemoveFontMemResourceEx RemoveFontMemResourceExW
 #define RemoveFontResourceEx RemoveFontResourceExW
 #endif
 #define ResetDC ResetDCW
@@ -2848,6 +2854,7 @@ typedef ENUMLOGFONTA ENUMLOGFONT,*LPENUMLOGFONT;
 typedef ENUMLOGFONTEXA ENUMLOGFONTEX,*LPENUMLOGFONTEX;
 #define AddFontResource AddFontResourceA
 #if (_WIN32_WINNT >= 0x0500)
+#define AddFontMemResourceEx AddFontMemResourceExA
 #define AddFontResourceEx AddFontResourceExA
 #endif
 #define CopyEnhMetaFile CopyEnhMetaFileA
@@ -2888,6 +2895,7 @@ typedef ENUMLOGFONTEXA ENUMLOGFONTEX,*LPENUMLOGFONTEX;
 #define PolyTextOut PolyTextOutA
 #define RemoveFontResource RemoveFontResourceA
 #if (_WIN32_WINNT >= 0x0500)
+#define RemoveFontMemResourceEx RemoveFontMemResourceExA
 #define RemoveFontResourceEx RemoveFontResourceExA
 #endif
 #define ResetDC ResetDCA
