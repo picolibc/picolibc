@@ -5,7 +5,12 @@
 #endif
 
 #ifndef WINBASEAPI
+#ifdef __INSIDE_CYGWIN__
+#define WINBASEAPI
+#else
 #define WINBASEAPI DECLSPEC_IMPORT
+#endif
+
 #endif
 #ifdef __cplusplus
 extern "C" {

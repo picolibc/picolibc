@@ -1,3 +1,7 @@
+2004-08-25   Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (WINBASEAPI): Guard with __INSIDE_CYGWIN__.
+
 2004-08-24  Sam Robb  <samrobb@users.sourceforge.net>
 
 	* include/winbase.h (GetFileSizeEx): Add _WIN32_WINNT >= 0x0500
