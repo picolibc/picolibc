@@ -20,7 +20,9 @@ extern "C" int dlmallopt (int p, int v) __attribute__ ((regparm (2)));
 extern "C" void dlmalloc_stats ();
 
 #ifndef __INSIDE_CYGWIN__
-# define USE_DL_PREFIX
+# define USE_DL_PREFIX 1
+# define MORECORE_CANNOT_TRIM 1
+# define DEBUG 1
 #else
 # define __malloc_lock() mallock->acquire ()
 # define __malloc_unlock() mallock->release ()

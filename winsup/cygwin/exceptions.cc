@@ -615,7 +615,9 @@ sig_handle_tty_stop (int sig)
     }
   sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
 		  myself->pid, sig, myself->ppid_handle);
-  SuspendThread (hMainThread);
+  if (WaitForSingleObject (sigCONT, INFINITE) != WAIT_OBJECT_0)
+    api_fatal ("WaitSingleObject failed, %E");
+  (void) ResetEvent (sigCONT);
   return;
 }
 }
@@ -992,6 +994,7 @@ sig_handle (int sig, bool thisproc)
   /* FIXME: Should we still do this if SIGCONT has a handler? */
   if (sig == SIGCONT)
     {
+      DWORD stopped = myself->process_state & PID_STOPPED;
       myself->stopsig = 0;
       myself->process_state &= ~PID_STOPPED;
       /* Clear pending stop signals */
@@ -999,10 +1002,8 @@ sig_handle (int sig, bool thisproc)
       sig_clear (SIGTSTP);
       sig_clear (SIGTTIN);
       sig_clear (SIGTTOU);
-      /* Windows 95 hangs on resuming non-suspended thread */
-      SuspendThread (hMainThread);
-      while (ResumeThread (hMainThread) > 1)
-	;
+      if (stopped)
+	SetEvent (sigCONT);
       /* process pending signals */
       sig_dispatch_pending (1);
     }

@@ -80,34 +80,35 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 Static DWORD proc_loop_wait = 1000;	// Wait for subprocesses to exit
 Static DWORD sig_loop_wait = INFINITE;	// Wait for signals to arrive
 
-Static HANDLE sigcatch_nonmain = NULL;	// The semaphore signaled when
+Static HANDLE sigcatch_nonmain;		// The semaphore signaled when
 					//  signals are available for
 					//  processing from non-main thread
-Static HANDLE sigcatch_main = NULL;	// Signalled when main thread sends a
+Static HANDLE sigcatch_main;		// Signalled when main thread sends a
 					//  signal
-Static HANDLE sigcatch_nosync = NULL;	// Signal wait_sig to scan sigtodo
+Static HANDLE sigcatch_nosync;		// Signal wait_sig to scan sigtodo
 					//  but not to bother with any
 					//  synchronization
-Static HANDLE sigcomplete_main = NULL;	// Event signaled when a signal has
+Static HANDLE sigcomplete_main;		// Event signaled when a signal has
 					//  finished processing for the main
 					//  thread
-Static HANDLE sigcomplete_nonmain = NULL;// Semaphore raised for non-main
+Static HANDLE sigcomplete_nonmain;	// Semaphore raised for non-main
 					//  threads when a signal has finished
 					//  processing
+HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 Static cygthread *hwait_sig;		// Handle of wait_sig thread
 Static cygthread *hwait_subproc;	// Handle of sig_subproc thread
 
-Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
+Static HANDLE wait_sig_inited;		// Control synchronization of
 					//  message queue startup
 
 /* Used by WaitForMultipleObjects.  These are handles to child processes.
  */
-Static HANDLE events[PSIZE + 1] = {0};  // All my children's handles++
+Static HANDLE events[PSIZE + 1];	  // All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
 Static char cpchildren[PSIZE * sizeof (pinfo)];		// All my children info
-Static int nchildren = 0;		// Number of active children
+Static int nchildren;			// Number of active children
 Static char czombies[NZOMBIES * sizeof (pinfo)];		// All my deceased children info
-Static int nzombies = 0;		// Number of deceased children
+Static int nzombies;			// Number of deceased children
 
 #define pchildren ((pinfo *) cpchildren)
 #define zombies ((pinfo *) czombies)
@@ -1048,6 +1049,7 @@ wait_sig (VOID *self)
   sigcomplete_nonmain = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
   sigcomplete_main = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
   sigproc_printf ("sigcatch_nonmain %p, sigcatch_main %p", sigcatch_nonmain, sigcatch_main);
+  sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 
   /* Setting dwProcessId flags that this process is now capable of receiving
    * signals.  Prior to this, dwProcessId was set to the windows pid of
