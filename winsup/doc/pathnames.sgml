@@ -42,7 +42,7 @@ the appropriate priviledges (Administrator priviledges in Windows
 NT).</para>
 
 <para>The current user's table is located under
-"HKEY_CURRENT_USER/Software/Red Hat, Inc./Cygwin/mounts
+"HKEY_CURRENT_USER/Software/Cygnus Solutions/Cygwin/mounts
 v&lt;version&gt;"
 where &lt;version&gt; is the latest registry version associated with
 the Cygwin library (this version is not the same as the release
@@ -350,11 +350,8 @@ In the following example compare the behaviors of the bash built-in
 <prompt>bash$</prompt> <userinput>echo  'This   is   "a     long"  line' > mylist</userinput>
 <prompt>bash$</prompt> <userinput>echo @mylist</userinput>
 @mylist
-<prompt>bash$</prompt> <userinput>/bin/echo @mylist</userinput>
+<prompt>c:\&gt;</prompt> <userinput>c:\cygwin\bin\echo @mylist</userinput>
 This is a     long line
-<prompt>bash$</prompt> <userinput>rm mylist</userinput>
-<prompt>bash$</prompt> <userinput>/bin/echo @mylist</userinput>
-@mylist
 </screen>
 </example>
 </sect2> 
