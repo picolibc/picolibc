@@ -1,6 +1,6 @@
 /* client.cc
 
-   Copyright 2001, 2002, 2003 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -18,12 +18,12 @@ details. */
 #endif
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 
 #include "sigproc.h"
 
-#include "cygerrno.h"
 #include "cygserver_msg.h"
 #include "cygserver_sem.h"
 #include "cygserver_shm.h"

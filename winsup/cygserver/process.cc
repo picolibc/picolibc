@@ -1,6 +1,6 @@
 /* process.cc
 
-   Copyright 2001, 2002 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -10,14 +10,13 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifdef __OUTSIDE_CYGWIN__
 #include "woutsup.h"
 
 #include <sys/types.h>
 
 #include <assert.h>
 #include <stdlib.h>
-
-#include "cygerrno.h"
 
 #include "process.h"
 
@@ -250,7 +249,6 @@ process_cache::process (const pid_t cygpid, const DWORD winpid,
 			  "new connection refused for %d(%lu)"),
 			 MAXIMUM_WAIT_OBJECTS - SPECIALS_COUNT,
 			 cygpid, winpid);
-	  set_errno (EAGAIN);
 	  return NULL;
 	}
 
@@ -259,7 +257,6 @@ process_cache::process (const pid_t cygpid, const DWORD winpid,
 	{
 	  LeaveCriticalSection (&_cache_write_access);
 	  delete entry;
-	  set_errno (ESRCH);
 	  return NULL;
 	}
 
@@ -433,3 +430,4 @@ process_cache::find (const DWORD winpid, class process **previous)
 }
 
 /*****************************************************************************/
+#endif /* __OUTSIDE_CYGWIN__ */

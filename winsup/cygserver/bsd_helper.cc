@@ -1,6 +1,6 @@
 /* bsd_helper.cc
 
-   Copyright 2003 Red Hat Inc.
+   Copyright 2003, 2004 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -9,7 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 #ifdef __OUTSIDE_CYGWIN__
 #include "woutsup.h"
-#include "cygerrno.h"
+#include <errno.h>
 #define _KERNEL 1
 #define __BSD_VISIBLE 1
 #include <sys/smallprint.h>

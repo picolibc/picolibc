@@ -1,6 +1,6 @@
 /* cygserver.cc
 
-   Copyright 2001, 2002, 2003 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -16,6 +16,7 @@ details. */
 #include <sys/types.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <ctype.h>
 #include <getopt.h>
 #include <signal.h>
@@ -24,7 +25,6 @@ details. */
 #include <string.h>
 #include <unistd.h>
 
-#include "cygerrno.h"
 #include "cygwin_version.h"
 
 #include "cygserver.h"

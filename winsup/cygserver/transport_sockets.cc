@@ -1,6 +1,6 @@
 /* transport_sockets.cc
 
-   Copyright 2001, 2002 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -22,12 +22,20 @@ details. */
 #include <sys/stat.h>
 
 #include <assert.h>
-#include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 
+#include "cygerrno.h"
 #include "transport.h"
 #include "transport_sockets.h"
+
+#ifdef __INSIDE_CYGWIN__
+#define SET_ERRNO(err)	set_errno (err)
+#define GET_ERRNO()	get_errno ()
+#else
+#define SET_ERRNO(err)	errno = (err)
+#define GET_ERRNO()	(errno)
+#endif
 
 /* to allow this to link into cygwin and the .dll, a little magic is needed. */
 #ifndef __OUTSIDE_CYGWIN__
@@ -99,10 +107,10 @@ transport_layer_sockets::listen ()
 
   if (stat (_addr.sun_path, &sbuf) == -1)
     {
-      if (errno != ENOENT)
+      if (GET_ERRNO () != ENOENT)
 	{
 	  system_printf ("cannot access socket file `%s': %s",
-			 _addr.sun_path, strerror (errno));
+			 _addr.sun_path, strerror (GET_ERRNO ()));
 	  return -1;
 	}
     }
@@ -115,7 +123,7 @@ transport_layer_sockets::listen ()
       if (newfd == -1)
 	{
 	  system_printf ("failed to create UNIX domain socket: %s",
-			 strerror (errno));
+			 strerror (GET_ERRNO ()));
 	  return -1;
 	}
 
@@ -133,7 +141,7 @@ transport_layer_sockets::listen ()
       if (unlink (_addr.sun_path) == -1)
 	{
 	  system_printf ("failed to remove `%s': %s",
-			 _addr.sun_path, strerror (errno));
+			 _addr.sun_path, strerror (GET_ERRNO ()));
 	  (void) ::close (newfd);
 	  return -1;
 	}
@@ -150,17 +158,17 @@ transport_layer_sockets::listen ()
   if (_fd == -1)
     {
       system_printf ("failed to create UNIX domain socket: %s",
-		     strerror (errno));
+		     strerror (GET_ERRNO ()));
       return -1;
     }
 
   if (cygwin_bind (_fd, (struct sockaddr *) &_addr, _addr_len) == -1)
     {
-      const int saved_errno = errno;
+      const int saved_errno = GET_ERRNO ();
       close ();
-      errno = saved_errno;
+      SET_ERRNO (saved_errno);
       system_printf ("failed to bind UNIX domain socket `%s': %s",
-		     _addr.sun_path, strerror (errno));
+		     _addr.sun_path, strerror (GET_ERRNO ()));
       return -1;
     }
 
@@ -168,11 +176,11 @@ transport_layer_sockets::listen ()
 
   if (cygwin_listen (_fd, SOMAXCONN) == -1)
     {
-      const int saved_errno = errno;
+      const int saved_errno = GET_ERRNO ();
       close ();
-      errno = saved_errno;
+      SET_ERRNO (saved_errno);
       system_printf ("failed to listen on UNIX domain socket `%s': %s",
-		     _addr.sun_path, strerror (errno));
+		     _addr.sun_path, strerror (GET_ERRNO ()));
       return -1;
     }
 
@@ -198,8 +206,8 @@ transport_layer_sockets::accept (bool *const recoverable)
 
   if (accept_fd == -1)
     {
-      system_printf ("failed to accept connection: %s", strerror (errno));
-      switch (errno)
+      system_printf ("failed to accept connection: %s", strerror (GET_ERRNO ()));
+      switch (GET_ERRNO ())
 	{
 	case ECONNABORTED:
 	case EINTR:
@@ -276,7 +284,7 @@ transport_layer_sockets::read (void *const buf, const size_t buf_len)
   if (res != -1)
     {
       if (res == 0)
-	errno = EIO;		// FIXME?
+	SET_ERRNO (EIO);	// FIXME?
 
       res = buf_len - read_buf_len;
     }
@@ -284,7 +292,7 @@ transport_layer_sockets::read (void *const buf, const size_t buf_len)
   if (res != static_cast<ssize_t> (buf_len))
     debug_printf ("%d = read (buf = %p, len = %u) [this = %p, fd = %d]: %s",
 		  res, buf, buf_len, this, _fd,
-		  (res == -1 ? strerror (errno) : "EOF"));
+		  (res == -1 ? strerror (GET_ERRNO ()) : "EOF"));
   else
     {
       // verbose: debug_printf ("%d = read (buf = %p, len = %u) [this = %p, fd = %d]",
@@ -322,7 +330,7 @@ transport_layer_sockets::write (void *const buf, const size_t buf_len)
   if (res != -1)
     {
       if (res == 0)
-	errno = EIO;		// FIXME?
+	SET_ERRNO (EIO);	// FIXME?
 
       res = buf_len - write_buf_len;
     }
@@ -330,7 +338,7 @@ transport_layer_sockets::write (void *const buf, const size_t buf_len)
   if (res != static_cast<ssize_t> (buf_len))
     debug_printf ("%d = write (buf = %p, len = %u) [this = %p, fd = %d]: %s",
 		  res, buf, buf_len, this, _fd,
-		  (res == -1 ? strerror (errno) : "EOF"));
+		  (res == -1 ? strerror (GET_ERRNO ()) : "EOF"));
   else
     {
       // verbose: debug_printf ("%d = write (buf = %p, len = %u) [this = %p, fd = %d]",
@@ -358,7 +366,7 @@ transport_layer_sockets::connect ()
       if (_fd == -1)
 	{
 	  system_printf ("failed to create UNIX domain socket: %s",
-			 strerror (errno));
+			 strerror (GET_ERRNO ()));
 	  return -1;
 	}
 
@@ -369,9 +377,9 @@ transport_layer_sockets::connect ()
 	  return 0;
 	}
 
-      if (!assume_cygserver || errno != ECONNREFUSED)
+      if (!assume_cygserver || GET_ERRNO () != ECONNREFUSED)
 	{
-	  debug_printf ("failed to connect to server: %s", strerror (errno));
+	  debug_printf ("failed to connect to server: %s", strerror (GET_ERRNO ()));
 	  (void) ::close (_fd);
 	  _fd = -1;
 	  return -1;
@@ -382,6 +390,6 @@ transport_layer_sockets::connect ()
       Sleep (0);		// Give the server a chance.
     }
 
-  debug_printf ("failed to connect to server: %s", strerror (errno));
+  debug_printf ("failed to connect to server: %s", strerror (GET_ERRNO ()));
   return -1;
 }

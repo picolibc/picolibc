@@ -1,3 +1,17 @@
+2004-09-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	Fix copyright throughout. 
+	Eliminate use of _impure_ptr outside Cygwin.
+	* bsd_helper.cc: Include errno.h instead of cygerrno.h.
+	* bsd_mutex.cc : Ditto.
+	* client.cc: Ditto.
+	* cygserver.cc: Ditto.
+	* process.cc: Don't build functions inside Cygwin.  Don't include
+	cygerrno.h.  Don't set errno.
+	* transport_pipes.cc (SET_ERRNO): New define.  Use througout.
+	* transport_sockets.cc (SET_ERRNO): Ditto.
+	(GET_ERRNO): Ditto.
+
 2004-09-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_mutex.cc (_msleep): Disable resetting event object for now.

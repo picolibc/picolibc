@@ -1,6 +1,6 @@
 /* transport_pipes.cc
 
-   Copyright 2001, 2002, 2003 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -33,6 +33,12 @@ details. */
 #include "cygserver_ipc.h"
 #else
 #include "security.h"
+#endif
+
+#ifdef __INSIDE_CYGWIN__
+#define SET_ERRNO(err)	set_errno (err)
+#else
+#define SET_ERRNO(err)	errno = (err)
 #endif
 
 enum
@@ -214,7 +220,7 @@ transport_layer_pipes::read (void *const buf, const size_t len)
   if (!ReadFile (_hPipe, buf, len, &count, NULL))
     {
       debug_printf ("error reading from pipe (%lu)", GetLastError ());
-      set_errno (EINVAL);	// FIXME?
+      SET_ERRNO (EINVAL);	// FIXME?
       return -1;
     }
 
@@ -234,7 +240,7 @@ transport_layer_pipes::write (void *const buf, const size_t len)
   if (!WriteFile (_hPipe, buf, len, &count, NULL))
     {
       debug_printf ("error writing to pipe, error = %lu", GetLastError ());
-      set_errno (EINVAL);	// FIXME?
+      SET_ERRNO (EINVAL);	// FIXME?
       return -1;
     }
 
