@@ -1,3 +1,9 @@
+2003-07-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Reapply Inaoko's multilib patch from
+	04-17-03.
+	* configure: Regenerated.
+
 2003-06-23  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
 
 	* m32r/crt0.S (_start): Allow _stack to be placed anywhere 
