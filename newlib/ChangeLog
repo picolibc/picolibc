@@ -1,3 +1,17 @@
+2002-05-28  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/sys/linux/Makefile.am: Add support for cfspeed.c and
+        tcsendbrk.c.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/termios.c: Add tcflow(), tcflush(),
+        tcgetpgrp(), and tcsetpgrp() functions.
+        * libc/sys/linux/sys/termios.h: Add include of machine/termios.h
+        to get __MAX_BAUD rate.
+        * libc/sys/linux/machine/i386/include/termios.h: New file.
+        * libc/include/machine/termios.h: Ditto.
+        * libc/sys/linux/cfspeed.c: Ditto.
+        * libc/sys/linux/tcsendbrk.c: Ditto.
+
 2002-05-24  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/include/string.h: Add strnlen and strerror_r prototypes.

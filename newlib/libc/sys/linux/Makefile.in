@@ -101,13 +101,13 @@ SUBLIBS = \
 
 
 LIB_SOURCES = \
-	brk.c flockfile.c funlockfile.c gethostname.c getoptlong.c getreent.c ids.c \
-	inode.c io.c io64.c linux.c mmap.c \
+	brk.c cfspeed.c flockfile.c funlockfile.c gethostname.c getoptlong.c \
+	getreent.c ids.c inode.c io.c io64.c linux.c mmap.c \
 	pread.c pread64.c process.c pwrite.c pwrite64.c raise.c realpath.c \
 	rename.c resource.c sched.c select.c seteuid.c shm_open.c \
 	shm_unlink.c signal.c siglongjmp.c socket.c sleep.c stack.c \
-	sysconf.c sysctl.c systat.c system.c tcdrain.c termios.c time.c \
-	usleep.c wait.c
+	sysconf.c sysctl.c systat.c system.c tcdrain.c tcsendbrk.c termios.c \
+	time.c usleep.c wait.c
 
 
 # This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)
@@ -137,18 +137,19 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  brk.o flockfile.o funlockfile.o \
-@USE_LIBTOOL_FALSE@gethostname.o getoptlong.o getreent.o ids.o inode.o \
-@USE_LIBTOOL_FALSE@io.o io64.o linux.o mmap.o pread.o pread64.o \
-@USE_LIBTOOL_FALSE@process.o pwrite.o pwrite64.o raise.o realpath.o \
-@USE_LIBTOOL_FALSE@rename.o resource.o sched.o select.o seteuid.o \
-@USE_LIBTOOL_FALSE@shm_open.o shm_unlink.o signal.o siglongjmp.o \
-@USE_LIBTOOL_FALSE@socket.o sleep.o stack.o sysconf.o sysctl.o systat.o \
-@USE_LIBTOOL_FALSE@system.o tcdrain.o termios.o time.o usleep.o wait.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  brk.o cfspeed.o flockfile.o \
+@USE_LIBTOOL_FALSE@funlockfile.o gethostname.o getoptlong.o getreent.o \
+@USE_LIBTOOL_FALSE@ids.o inode.o io.o io64.o linux.o mmap.o pread.o \
+@USE_LIBTOOL_FALSE@pread64.o process.o pwrite.o pwrite64.o raise.o \
+@USE_LIBTOOL_FALSE@realpath.o rename.o resource.o sched.o select.o \
+@USE_LIBTOOL_FALSE@seteuid.o shm_open.o shm_unlink.o signal.o \
+@USE_LIBTOOL_FALSE@siglongjmp.o socket.o sleep.o stack.o sysconf.o \
+@USE_LIBTOOL_FALSE@sysctl.o systat.o system.o tcdrain.o tcsendbrk.o \
+@USE_LIBTOOL_FALSE@termios.o time.o usleep.o wait.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = 
-@USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  brk.lo flockfile.lo \
+@USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  brk.lo cfspeed.lo flockfile.lo \
 @USE_LIBTOOL_TRUE@funlockfile.lo gethostname.lo getoptlong.lo \
 @USE_LIBTOOL_TRUE@getreent.lo ids.lo inode.lo io.lo io64.lo linux.lo \
 @USE_LIBTOOL_TRUE@mmap.lo pread.lo pread64.lo process.lo pwrite.lo \
@@ -156,8 +157,8 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@resource.lo sched.lo select.lo seteuid.lo shm_open.lo \
 @USE_LIBTOOL_TRUE@shm_unlink.lo signal.lo siglongjmp.lo socket.lo \
 @USE_LIBTOOL_TRUE@sleep.lo stack.lo sysconf.lo sysctl.lo systat.lo \
-@USE_LIBTOOL_TRUE@system.lo tcdrain.lo termios.lo time.lo usleep.lo \
-@USE_LIBTOOL_TRUE@wait.lo
+@USE_LIBTOOL_TRUE@system.lo tcdrain.lo tcsendbrk.lo termios.lo time.lo \
+@USE_LIBTOOL_TRUE@usleep.lo wait.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
