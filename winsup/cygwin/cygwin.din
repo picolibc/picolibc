@@ -566,6 +566,8 @@ regerror
 _regerror = regerror
 regfree
 _regfree = regfree
+regsub
+_regsub = regsub
 remainder
 _remainder = remainder
 remainderf

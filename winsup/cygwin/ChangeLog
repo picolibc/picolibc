@@ -1,3 +1,8 @@
+Thu May 11 00:54:00 2000  Charles Wilson <cwilson@ece.gatech.edu>
+
+	* cygwin.din: insure that regsub() is included in
+	cygwin1.dll
+
 Tue May  9 18:59:41 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Use appropriate VARIABLE to refer to cygwin.def in load
