@@ -657,6 +657,10 @@ This may generate warnings:
 The @code{install-info} command cannot parse these files, so you will
 have to add their entries to @code{/usr/info/dir} by hand.
 
+Even if the dir file already exists, you may have to update it when
+you install new Cygwin packages.  Some packages update the dir file
+for you, but many don't.
+
 @subsection Why do I get a message saying Out of Queue slots?
 
 "Out of queue slots!" generally occurs when you're trying to remove
