@@ -843,6 +843,9 @@ Options for 'set' Action:
  -m, --multi-string   set type to REG_MULTI_SZ
  -s, --string         set type to REG_SZ
 
+Options for 'set' and 'unset' Actions:
+ -K&lt;c&gt;, --key-separator[=]&lt;c&gt;  set key separator to &lt;c&gt; instead of '\'
+
 Other Options:
  -h, --help     output usage information and exit
  -q, --quiet    no error output, just nonzero return if KEY/VALUE missing
@@ -914,6 +917,12 @@ number, it's a DWORD.  If it starts with a percent, it's an expanding
 string.  If you give multiple values, it's a multi-string.  Else, it's
 a regular string.
 The <literal>unset</literal> action removes a value from a key.
+</para>
+
+<para>
+By default, the last "\" or "/" is assumed to be the separator between the
+key and the value.  You can use the <literal>-K</literal> option to provide 
+an alternate key/value separator character.
 </para>
 
 </sect2>

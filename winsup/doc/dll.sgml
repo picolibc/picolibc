@@ -32,7 +32,12 @@ information needed to tell the OS how your program interacts with
 
 <sect2 id="dll-build"><title>Building DLLs</title>
 
-<para>OK, let's go through a simple example of how to build a dll.
+<para>This page gives only a few simple examples of gcc's DLL-building 
+capabilities. To begin an exploration of the many additional options,
+see the gcc documentation and website, currently at 
+<ulink URL="http://gcc.gnu.org/">http://gcc.gnu.org/</ulink>
+
+<para>Let's go through a simple example of how to build a dll.
 For this example, we'll use a single file
 <filename>myprog.c</filename> for the program
 (<filename>myprog.exe</filename>) and a single file
