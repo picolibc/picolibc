@@ -132,7 +132,7 @@ create_shortcut_header (void)
 
 #define iscygdrive_device(path) \
   (isalpha (path[mount_table->cygdrive_len]) && \
-   (isdirsep (path[mount_table->cygdrive_len + 1]) || \
+   (path[mount_table->cygdrive_len + 1] == '/' || \
     !path[mount_table->cygdrive_len + 1]))
 
 #define isproc(path) \
@@ -159,16 +159,16 @@ int
 path_prefix_p (const char *path1, const char *path2, int len1)
 {
   /* Handle case where PATH1 has trailing '/' and when it doesn't.  */
-  if (len1 > 0 && SLASH_P (path1[len1 - 1]))
+  if (len1 > 0 && isdirsep (path1[len1 - 1]))
     len1--;
 
   if (len1 == 0)
-    return SLASH_P (path2[0]) && !SLASH_P (path2[1]);
+    return isdirsep (path2[0]) && !isdirsep (path2[1]);
 
   if (!pathnmatch (path1, path2, len1))
     return 0;
 
-  return SLASH_P (path2[len1]) || path2[len1] == 0 || path1[len1 - 1] == ':';
+  return isdirsep (path2[len1]) || path2[len1] == 0 || path1[len1 - 1] == ':';
 }
 
 /* Return non-zero if paths match in first len chars.
@@ -203,11 +203,10 @@ normalize_posix_path (const char *src, char *dst)
   char *dst_start = dst;
 
   syscall_printf ("src %s", src);
+
   if (isdrive (src) || strpbrk (src, "\\:"))
-    {
-      cygwin_conv_to_full_posix_path (src, dst);
-      return 0;
-    }
+    return normalize_win32_path (src, dst);
+
   if (!isslash (src[0]))
     {
       if (!cygheap->cwd.get (dst))
@@ -1190,18 +1189,18 @@ normalize_win32_path (const char *src, char *dst)
   while (*src)
     {
       /* Strip duplicate /'s.  */
-      if (SLASH_P (src[0]) && SLASH_P (src[1]))
+      if (isdirsep (src[0]) && isdirsep (src[1]))
 	src++;
       /* Ignore "./".  */
-      else if (src[0] == '.' && SLASH_P (src[1])
-	       && (src == src_start || SLASH_P (src[-1])))
+      else if (src[0] == '.' && isdirsep (src[1])
+	       && (src == src_start || isdirsep (src[-1])))
 	src += 2;
 
       /* Backup if "..".  */
       else if (src[0] == '.' && src[1] == '.'
 	       /* dst must be greater than dst_start */
 	       && dst[-1] == '\\'
-	       && (SLASH_P (src[2]) || src[2] == 0))
+	       && (isdirsep (src[2]) || src[2] == 0))
 	{
 	  /* Back up over /, but not if it's the first one.  */
 	  if (dst > dst_root_start + 1)
@@ -1210,7 +1209,7 @@ normalize_win32_path (const char *src, char *dst)
 	  while (dst > dst_root_start + 1 && dst[-1] != '\\' && dst[-2] != ':')
 	    dst--;
 	  src += 2;
-	  if (SLASH_P (*src))
+	  if (isdirsep (*src))
 	    src++;
 	}
       /* Otherwise, add char to result.  */
@@ -1289,7 +1288,7 @@ nofinalslash (const char *src, char *dst)
   int len = strlen (src);
   if (src != dst)
     memcpy (dst, src, len + 1);
-  while (len > 1 && SLASH_P (dst[--len]))
+  while (len > 1 && isdirsep (dst[--len]))
     dst[len] = '\0';
 }
 
@@ -1599,13 +1598,13 @@ mount_info::cygdrive_posix_path (const char *src, char *dst, int trailing_slash_
      The cygdrive prefix always ends with a trailing slash so
      the drive letter is added after the path. */
   dst[len++] = cyg_tolower (src[0]);
-  if (!src[2] || (SLASH_P (src[2]) && !src[3]))
+  if (!src[2] || (isdirsep (src[2]) && !src[3]))
     dst[len++] = '\000';
   else
     {
       int n;
       dst[len++] = '/';
-      if (SLASH_P (src[2]))
+      if (isdirsep (src[2]))
 	n = 3;
       else
 	n = 2;
@@ -1657,7 +1656,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
   else
     {
       const char *lastchar = src_path + src_path_len - 1;
-      trailing_slash_p = SLASH_P (*lastchar) && lastchar[-1] != ':';
+      trailing_slash_p = isdirsep (*lastchar) && lastchar[-1] != ':';
     }
 
   debug_printf ("conv_to_posix_path (%s, %s, %s)", src_path,
@@ -1705,7 +1704,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 
       if (!*p || !p[1])
 	nextchar = 0;
-      else if (isdirsep (*p))
+      else if (*p == '/')
 	nextchar = -1;
       else
 	nextchar = 1;
@@ -1756,7 +1755,8 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
     {
       /* The use of src_path and not pathbuf here is intentional.
 	 We couldn't translate the path, so just ensure no \'s are present. */
-      slashify (src_path, posix_path, trailing_slash_p);
+      strcpy (posix_path, src_path);
+      // slashify (src_path, posix_path, trailing_slash_p);
     }
 
 out:
@@ -3573,7 +3573,7 @@ cygwin_split_path (const char *path, char *dir, char *file)
 	  *file = 0;
 	  return;
 	}
-      if (SLASH_P (*path))
+      if (isdirsep (*path))
 	++path;
       dir_started_p = 1;
     }
@@ -3582,7 +3582,7 @@ cygwin_split_path (const char *path, char *dir, char *file)
      We pretend as if they don't exist.  */
   const char *end = path + strlen (path);
   /* path + 1: keep leading slash.  */
-  while (end > path + 1 && SLASH_P (end[-1]))
+  while (end > path + 1 && isdirsep (end[-1]))
     --end;
 
   /* At this point, END points to one beyond the last character
@@ -3591,7 +3591,7 @@ cygwin_split_path (const char *path, char *dir, char *file)
   /* Point LAST_SLASH at the last slash (duh...).  */
   const char *last_slash;
   for (last_slash = end - 1; last_slash >= path; --last_slash)
-    if (SLASH_P (*last_slash))
+    if (isdirsep (*last_slash))
       break;
 
   if (last_slash == path)

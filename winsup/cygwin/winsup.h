@@ -105,7 +105,7 @@ extern HANDLE title_mutex;
 /**************************** Convenience ******************************/
 
 /* Used when treating / and \ as equivalent. */
-#define SLASH_P(ch) \
+#define isdirsep(ch) \
     ({ \
 	char __c = (ch); \
 	((__c) == '/' || (__c) == '\\'); \
@@ -124,7 +124,6 @@ extern unsigned int signal_shift_subtract;
 #undef issep
 #define issep(ch) (strchr (" \t\n\r", (ch)) != NULL)
 
-#define isdirsep SLASH_P
 #define isabspath(p) \
   (isdirsep (*(p)) || (isalpha (*(p)) && (p)[1] == ':' && (!(p)[2] || isdirsep ((p)[2]))))
 

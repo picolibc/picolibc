@@ -598,7 +598,7 @@ fhandler_disk_file::opendir (path_conv& real_name)
       dir->__d_u.__d_data.__fh = this;
       /* FindFirstFile doesn't seem to like duplicate /'s. */
       len = strlen (dir->__d_dirname);
-      if (len == 0 || SLASH_P (dir->__d_dirname[len - 1]))
+      if (len == 0 || isdirsep (dir->__d_dirname[len - 1]))
 	strcat (dir->__d_dirname, "*");
       else
 	strcat (dir->__d_dirname, "\\*");  /**/

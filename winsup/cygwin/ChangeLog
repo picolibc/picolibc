@@ -1,3 +1,18 @@
+2003-01-09  Christopher Faylor  <cgf@redhat.com>
+
+	Use isdirsep rather than SLASH_P throughout.
+	* path.cc (iscygdrive): Disallow /cygdrive\x.
+	(normalize_posix_path): "Normalize" a windows path, if detected, rather
+	than converting to posix.
+
+2003-01-06  Troy Curtiss <troyc@usa.net>
+
+	* fhandler_serial.cc (fhandler_serial::tcsetattr): Add support and
+	capability checking for B230400 bitrate.
+	(fhandler_serial::tcgetattr): Add support for B230400 bitrate.
+	* include/sys/termios.h: Add B230400 definition for Posix support of
+	230.4Kbps.
+
 2003-01-05  Christopher Faylor  <cgf@redhat.com>
 
 	* pinfo.cc (_pinfo::commune_send): Use myself->lock rather than just

@@ -85,7 +85,7 @@ fhandler_process::exists ()
   const char *path = get_name ();
   debug_printf ("exists (%s)", path);
   path += proc_len + 1;
-  while (*path != 0 && !SLASH_P (*path))
+  while (*path != 0 && !isdirsep (*path))
     path++;
   if (*path == 0)
     return 2;
@@ -172,7 +172,7 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
   const char *path;
   path = get_name () + proc_len + 1;
   pid = atoi (path);
-  while (*path != 0 && !SLASH_P (*path))
+  while (*path != 0 && !isdirsep (*path))
     path++;
 
   if (*path == 0)

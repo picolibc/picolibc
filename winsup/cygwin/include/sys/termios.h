@@ -177,7 +177,8 @@ POSIX commands */
 #define B57600	 0x01001
 #define B115200	 0x01002
 #define B128000	 0x01003
-#define B256000	 0x01003
+#define B230400  0x01004
+#define B256000	 0x01005
 #define CRTSXOFF 0x04000
 #define CRTSCTS	 0x08000
 
