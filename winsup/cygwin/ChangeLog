@@ -6,8 +6,8 @@
 
 2004-02-25  Christopher Faylor  <cgf@redhat.com>
 
-	* exceptions.cc (setup_handler): Signal event for any sigwaitinfo if it
-	exists to force signal to be handled.  Zero event here to prevent
+	* exceptions.cc (setup_handler): Signal event for any sigwaitinfo, if it
+	exists, to force signal to be handled.  Zero event here to prevent
 	races.
 	* signal.cc (sigwaitinfo): Use local handle value for everything since
 	signal thread could zero event element at any time.  Detect when
