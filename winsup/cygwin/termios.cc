@@ -21,14 +21,14 @@ tcsendbreak (int fd, int duration)
 {
   int res = -1;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
 
   fhandler_base *fh;
-  fh = dtable[fd];
+  fh = fdtab[fd];
 
   if (!fh->is_tty ())
     set_errno (ENOTTY);
@@ -52,14 +52,14 @@ tcdrain (int fd)
 
   termios_printf ("tcdrain");
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
 
   fhandler_base *fh;
-  fh = dtable[fd];
+  fh = fdtab[fd];
 
   if (!fh->is_tty ())
     set_errno (ENOTTY);
@@ -81,14 +81,14 @@ tcflush (int fd, int queue)
 {
   int res = -1;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
 
   fhandler_base *fh;
-  fh = dtable[fd];
+  fh = fdtab[fd];
 
   if (!fh->is_tty ())
     set_errno (ENOTTY);
@@ -110,14 +110,14 @@ tcflow (int fd, int action)
 {
   int res = -1;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
 
   fhandler_base *fh;
-  fh = dtable[fd];
+  fh = fdtab[fd];
 
   if (!fh->is_tty ())
     set_errno (ENOTTY);
@@ -140,14 +140,14 @@ tcsetattr (int fd, int a, const struct termios *t)
   int res = -1;
 
   t = __tonew_termios (t);
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
 
   fhandler_base *fh;
-  fh = dtable[fd];
+  fh = fdtab[fd];
 
   if (!fh->is_tty ())
     set_errno (ENOTTY);
@@ -173,13 +173,13 @@ tcgetattr (int fd, struct termios *in_t)
   int res = -1;
   struct termios *t = __makenew_termios (in_t);
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     set_errno (EBADF);
-  else if (!dtable[fd]->is_tty ())
+  else if (!fdtab[fd]->is_tty ())
     set_errno (ENOTTY);
   else
     {
-      if ((res = dtable[fd]->tcgetattr (t)) == 0)
+      if ((res = fdtab[fd]->tcgetattr (t)) == 0)
 	(void) __toapp_termios (in_t, t);
     }
 
@@ -200,12 +200,12 @@ tcgetpgrp (int fd)
 {
   int res = -1;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     set_errno (EBADF);
-  else if (!dtable[fd]->is_tty ())
+  else if (!fdtab[fd]->is_tty ())
     set_errno (ENOTTY);
   else
-    res = dtable[fd]->tcgetpgrp ();
+    res = fdtab[fd]->tcgetpgrp ();
 
   termios_printf ("%d = tcgetpgrp (%d)", res, fd);
   return res;
@@ -218,12 +218,12 @@ tcsetpgrp (int fd, pid_t pgid)
 {
   int res = -1;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     set_errno (EBADF);
-  else if (!dtable[fd]->is_tty ())
+  else if (!fdtab[fd]->is_tty ())
     set_errno (ENOTTY);
   else
-    res = dtable[fd]->tcsetpgrp (pgid);
+    res = fdtab[fd]->tcsetpgrp (pgid);
 
   termios_printf ("%d = tcsetpgrp (%d, %x)", res, fd, pgid);
   return res;

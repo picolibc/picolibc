@@ -200,14 +200,14 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   else
     {
       /* Ensure that fd is open */
-      if (dtable.not_open (fd))
+      if (fdtab.not_open (fd))
 	{
 	  set_errno (EBADF);
 	  syscall_printf ("-1 = mmap(): EBADF");
           ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
 	  return (caddr_t) -1;
 	}
-      hFile = dtable[fd]->get_handle ();
+      hFile = fdtab[fd]->get_handle ();
     }
 
   HANDLE h = CreateFileMapping (hFile, &sec_none, protect, 0, len, NULL);

@@ -35,8 +35,8 @@ extern BOOL allow_ntsec;
 void __stdcall
 close_all_files (void)
 {
-  for (int i = 0; i < (int)dtable.size; i++)
-    if (!dtable.not_open (i))
+  for (int i = 0; i < (int)fdtab.size; i++)
+    if (!fdtab.not_open (i))
       _close (i);
 
   cygwin_shared->delqueue.process_queue ();
@@ -186,9 +186,9 @@ read_handler (int fd, void *ptr, size_t len)
 {
   int res;
   sigframe thisframe (mainthread);
-  fhandler_base *fh = dtable[fd];
+  fhandler_base *fh = fdtab[fd];
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return -1;
@@ -217,14 +217,14 @@ read_handler (int fd, void *ptr, size_t len)
 extern "C" int
 _read (int fd, void *ptr, size_t len)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return -1;
     }
 
   set_sig_errno (0);
-  fhandler_base *fh = dtable[fd];
+  fhandler_base *fh = fdtab[fd];
 
   /* Could block, so let user know we at least got here.  */
   syscall_printf ("read (%d, %p, %d)", fd, ptr, len);
@@ -252,7 +252,7 @@ _write (int fd, const void *ptr, size_t len)
 {
   int res = -1;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto done;
@@ -265,7 +265,7 @@ _write (int fd, const void *ptr, size_t len)
     syscall_printf  ("write (%d, %p, %d)", fd, ptr, len);
 
   fhandler_base *fh;
-  fh = dtable[fd];
+  fh = fdtab[fd];
 
   res = fh->bg_check (SIGTTOU);
   if (res > 0)
@@ -398,15 +398,15 @@ _open (const char *unix_path, int flags, ...)
       mode = va_arg (ap, mode_t);
       va_end (ap);
 
-      fd = dtable.find_unused_handle ();
+      fd = fdtab.find_unused_handle ();
 
       if (fd < 0)
 	set_errno (ENMFILE);
-      else if ((fh = dtable.build_fhandler (fd, unix_path, NULL)) == NULL)
+      else if ((fh = fdtab.build_fhandler (fd, unix_path, NULL)) == NULL)
 	res = -1;		// errno already set
       else if (!fh->open (unix_path, flags, (mode & 0777) & ~myself->umask))
 	{
-	  dtable.release (fd);
+	  fdtab.release (fd);
 	  res = -1;
 	}
       else if ((res = fd) <= 2)
@@ -424,14 +424,14 @@ _lseek (int fd, off_t pos, int dir)
 {
   off_t res;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       res = -1;
     }
   else
     {
-      res = dtable[fd]->lseek (pos, dir);
+      res = fdtab[fd]->lseek (pos, dir);
     }
   syscall_printf ("%d = lseek (%d, %d, %d)", res, fd, pos, dir);
 
@@ -447,7 +447,7 @@ _close (int fd)
   syscall_printf ("close (%d)", fd);
 
   MALLOC_CHECK;
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       debug_printf ("handle %d not open", fd);
       set_errno (EBADF);
@@ -456,8 +456,8 @@ _close (int fd)
   else
     {
       SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
-      res = dtable[fd]->close ();
-      dtable.release (fd);
+      res = fdtab[fd]->close ();
+      fdtab.release (fd);
       ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
     }
 
@@ -472,13 +472,13 @@ isatty (int fd)
 {
   int res;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       syscall_printf ("0 = isatty (%d)", fd);
       return 0;
     }
 
-  res = dtable[fd]->is_tty ();
+  res = fdtab[fd]->is_tty ();
   syscall_printf ("%d = isatty (%d)", res, fd);
   return res;
 }
@@ -741,14 +741,14 @@ extern "C"
 int
 fchown (int fd, uid_t uid, gid_t gid)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       syscall_printf ("-1 = fchown (%d,...)", fd);
       set_errno (EBADF);
       return -1;
     }
 
-  const char *path = dtable[fd]->get_name ();
+  const char *path = fdtab[fd]->get_name ();
 
   if (path == NULL)
     {
@@ -854,14 +854,14 @@ extern "C"
 int
 fchmod (int fd, mode_t mode)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       syscall_printf ("-1 = fchmod (%d, 0%o)", fd, mode);
       set_errno (EBADF);
       return -1;
     }
 
-  const char *path = dtable[fd]->get_name ();
+  const char *path = fdtab[fd]->get_name ();
 
   if (path == NULL)
     {
@@ -911,7 +911,7 @@ _fstat (int fd, struct stat *buf)
 {
   int r;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       syscall_printf ("-1 = fstat (%d, %p)", fd, buf);
       set_errno (EBADF);
@@ -920,7 +920,7 @@ _fstat (int fd, struct stat *buf)
   else
     {
       memset (buf, 0, sizeof (struct stat));
-      r = dtable[fd]->fstat (buf);
+      r = fdtab[fd]->fstat (buf);
       syscall_printf ("%d = fstat (%d, %x)", r,fd,buf);
     }
 
@@ -932,14 +932,14 @@ extern "C"
 int
 fsync (int fd)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       syscall_printf ("-1 = fsync (%d)", fd);
       set_errno (EBADF);
       return -1;
     }
 
-  HANDLE h = dtable[fd]->get_handle ();
+  HANDLE h = fdtab[fd]->get_handle ();
 
   if (FlushFileBuffers (h) == 0)
     {
@@ -1327,15 +1327,15 @@ extern "C"
 void
 setdtablesize (int size)
 {
-  if (size > (int)dtable.size)
-    dtable.extend (size);
+  if (size > (int)fdtab.size)
+    fdtab.extend (size);
 }
 
 extern "C"
 int
 getdtablesize ()
 {
-  return dtable.size;
+  return fdtab.size;
 }
 
 extern "C"
@@ -1430,11 +1430,11 @@ extern "C"
 char *
 ttyname (int fd)
 {
-  if (dtable.not_open (fd) || !dtable[fd]->is_tty ())
+  if (fdtab.not_open (fd) || !fdtab[fd]->is_tty ())
     {
       return 0;
     }
-  return (char *)(dtable[fd]->ttyname ());
+  return (char *)(fdtab[fd]->ttyname ());
 }
 
 /* Tells stdio if it should do the cr/lf conversion for this file */
@@ -1449,13 +1449,13 @@ _cygwin_istext_for_stdio (int fd)
       return 0; /* we do it for old apps, due to getc/putc macros */
     }
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       syscall_printf(" _cifs: fd not open\n");
       return 0;
     }
 
-  fhandler_base *p = dtable[fd];
+  fhandler_base *p = fdtab[fd];
 
   if (p->get_device() != FH_DISK)
     {
@@ -1497,13 +1497,13 @@ setmode_helper (FILE *f)
 extern "C" int
 getmode (int fd)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return -1;
     }
 
-  return dtable[fd]->get_flags () & (O_BINARY | O_TEXT);
+  return fdtab[fd]->get_flags () & (O_BINARY | O_TEXT);
 }
 
 /* Set a file descriptor into text or binary mode, returning the
@@ -1512,7 +1512,7 @@ getmode (int fd)
 extern "C" int
 setmode (int fd, int mode)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return -1;
@@ -1523,7 +1523,7 @@ setmode (int fd, int mode)
       return -1;
     }
 
-  fhandler_base *p = dtable[fd];
+  fhandler_base *p = fdtab[fd];
 
   /* Note that we have no way to indicate the case that writes are
      binary but not reads, or vice-versa.  These cases can arise when
@@ -1568,21 +1568,21 @@ ftruncate (int fd, off_t length)
 {
   int res = -1;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
     }
   else
     {
-      HANDLE h = dtable[fd]->get_handle ();
+      HANDLE h = fdtab[fd]->get_handle ();
       off_t prev_loc;
 
       if (h)
 	{
 	  /* remember curr file pointer location */
-	  prev_loc = dtable[fd]->lseek (0, SEEK_CUR);
+	  prev_loc = fdtab[fd]->lseek (0, SEEK_CUR);
 
-	  dtable[fd]->lseek (length, SEEK_SET);
+	  fdtab[fd]->lseek (length, SEEK_SET);
 	  if (!SetEndOfFile (h))
 	    {
 	      __seterrno ();
@@ -1591,7 +1591,7 @@ ftruncate (int fd, off_t length)
 	    res = 0;
 
 	  /* restore original file pointer location */
-	  dtable[fd]->lseek (prev_loc, 0);
+	  fdtab[fd]->lseek (prev_loc, 0);
 	}
     }
   syscall_printf ("%d = ftruncate (%d, %d)", res, fd, length);
@@ -1630,13 +1630,13 @@ get_osfhandle (int fd)
 {
   long res = -1;
 
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno ( EBADF);
     }
   else
     {
-      res = (long) dtable[fd]->get_handle ();
+      res = (long) fdtab[fd]->get_handle ();
     }
   syscall_printf ("%d = get_osfhandle(%d)", res, fd);
 
@@ -1688,12 +1688,12 @@ extern "C"
 int
 fstatfs (int fd, struct statfs *sfs)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return -1;
     }
-  fhandler_disk_file *f = (fhandler_disk_file *) dtable[fd];
+  fhandler_disk_file *f = (fhandler_disk_file *) fdtab[fd];
   return statfs (f->get_name (), sfs);
 }
 
@@ -1772,12 +1772,12 @@ extern "C"
 char *
 ptsname (int fd)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return 0;
     }
-  return (char *)(dtable[fd]->ptsname ());
+  return (char *)(fdtab[fd]->ptsname ());
 }
 
 /* FIXME: what is this? */

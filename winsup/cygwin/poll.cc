@@ -43,7 +43,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
   memset (except_fds, 0, fds_size);
 
   for (unsigned int i = 0; i < nfds; ++i)
-    if (!dtable.not_open (fds[i].fd))
+    if (!fdtab.not_open (fds[i].fd))
       {
         FD_SET (fds[i].fd, open_fds);
         if (fds[i].events & POLLIN)
@@ -61,7 +61,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
     {
       if (!FD_ISSET (fds[i].fd, open_fds))
         fds[i].revents = POLLNVAL;
-      else if (dtable.not_open(fds[i].fd))
+      else if (fdtab.not_open(fds[i].fd))
         fds[i].revents = POLLHUP;
       else if (ret < 0)
         fds[i].revents = POLLERR;

@@ -1701,13 +1701,13 @@ extern "C"
 int
 facl (int fd, int cmd, int nentries, aclent_t *aclbufp)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       syscall_printf ("-1 = facl (%d)", fd);
       set_errno (EBADF);
       return -1;
     }
-  const char *path = dtable[fd]->get_name ();
+  const char *path = fdtab[fd]->get_name ();
   if (path == NULL)
     {
       syscall_printf ("-1 = facl (%d) (no name)", fd);

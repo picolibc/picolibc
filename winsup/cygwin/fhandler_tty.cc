@@ -1074,7 +1074,7 @@ fhandler_tty_master::de_linearize (const char *buf, const char *unix_name,
 int
 fhandler_tty_master::init_console ()
 {
-  console = (fhandler_console *) dtable.build_fhandler (-1, FH_CONSOLE, "/dev/ttym");
+  console = (fhandler_console *) fdtab.build_fhandler (-1, FH_CONSOLE, "/dev/ttym");
   if (console == NULL)
     return -1;
 

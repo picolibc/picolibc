@@ -135,7 +135,7 @@ out:
 static HANDLE
 handle (int n, int direction)
 {
-  fhandler_base *fh = dtable[n];
+  fhandler_base *fh = fdtab[n];
 
   if (!fh)
     return INVALID_HANDLE_VALUE;
@@ -462,7 +462,7 @@ skip_arg_parsing:
   /* Pass fd table to a child */
 
   MALLOC_CHECK;
-  int len = dtable.linearize_fd_array (0, 0);
+  int len = fdtab.linearize_fd_array (0, 0);
   MALLOC_CHECK;
   if (len == -1)
     {
@@ -490,7 +490,7 @@ skip_arg_parsing:
   LPBYTE resrv = si.lpReserved2 + sizeof *ciresrv;
 # undef ciresrv
 
-  if (dtable.linearize_fd_array (resrv, len) < 0)
+  if (fdtab.linearize_fd_array (resrv, len) < 0)
     {
       system_printf ("FATAL error in second linearize_fd_array");
       return -1;

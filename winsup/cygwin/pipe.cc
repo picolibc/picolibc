@@ -22,16 +22,16 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
   int  fdr, fdw;
   SECURITY_ATTRIBUTES *sa = (mode & O_NOINHERIT) ?  &sec_none_nih : &sec_none;
 
-  if ((fdr = dtable.find_unused_handle ()) < 0)
+  if ((fdr = fdtab.find_unused_handle ()) < 0)
     set_errno (ENMFILE);
-  else if ((fdw = dtable.find_unused_handle (fdr + 1)) < 0)
+  else if ((fdw = fdtab.find_unused_handle (fdr + 1)) < 0)
     set_errno ( ENMFILE);
   else if (!CreatePipe (&r, &w, sa, psize))
     __seterrno ();
   else
     {
-      fhandler_base *fhr = dtable.build_fhandler (fdr, FH_PIPER, "/dev/piper");
-      fhandler_base *fhw = dtable.build_fhandler (fdw, FH_PIPEW, "/dev/pipew");
+      fhandler_base *fhr = fdtab.build_fhandler (fdr, FH_PIPER, "/dev/piper");
+      fhandler_base *fhw = fdtab.build_fhandler (fdw, FH_PIPEW, "/dev/pipew");
 
       int binmode = mode & O_TEXT ? 0 : 1;
       fhr->init (r, GENERIC_READ, binmode);
@@ -69,7 +69,7 @@ _pipe (int filedes[2], unsigned int psize, int mode)
   int res = make_pipe (filedes, psize, mode);
   /* This type of pipe is not interruptible so set the appropriate flag. */
   if (!res)
-    dtable[filedes[0]]->set_r_no_interrupt (1);
+    fdtab[filedes[0]]->set_r_no_interrupt (1);
   return res;
 }
 
@@ -79,7 +79,7 @@ dup (int fd)
   int res;
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," dup");
 
-  res = dup2 (fd, dtable.find_unused_handle ());
+  res = dup2 (fd, fdtab.find_unused_handle ());
 
   ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," dup");
 
@@ -89,5 +89,5 @@ dup (int fd)
 int
 dup2 (int oldfd, int newfd)
 {
-  return dtable.dup2 (oldfd, newfd);
+  return fdtab.dup2 (oldfd, newfd);
 }

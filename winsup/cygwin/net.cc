@@ -318,7 +318,7 @@ cygwin_getprotobynumber (int number)
 void
 fdsock (int fd, const char *name, SOCKET soc)
 {
-  fhandler_base *fh = dtable.build_fhandler(fd, FH_SOCKET, name);
+  fhandler_base *fh = fdtab.build_fhandler(fd, FH_SOCKET, name);
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR);
 }
@@ -333,7 +333,7 @@ cygwin_socket (int af, int type, int protocol)
 
   SOCKET soc;
 
-  int fd = dtable.find_unused_handle ();
+  int fd = fdtab.find_unused_handle ();
 
   if (fd < 0)
     {
@@ -361,7 +361,7 @@ cygwin_socket (int af, int type, int protocol)
 
       fdsock (fd, name, soc);
       res = fd;
-      fhandler_socket *h = (fhandler_socket *) dtable[fd];
+      fhandler_socket *h = (fhandler_socket *) fdtab[fd];
 
       h->set_addr_family (af);
     }
@@ -419,7 +419,7 @@ cygwin_sendto (int fd,
 		 const struct sockaddr *to,
 		 int tolen)
 {
-  fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  fhandler_socket *h = (fhandler_socket *) fdtab[fd];
   sockaddr_in sin;
   sigframe thisframe (mainthread, 0);
 
@@ -446,7 +446,7 @@ cygwin_recvfrom (int fd,
 		   struct sockaddr *from,
 		   int *fromlen)
 {
-  fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  fhandler_socket *h = (fhandler_socket *) fdtab[fd];
   sigframe thisframe (mainthread, 0);
 
   debug_printf ("recvfrom %d", h->get_socket ());
@@ -465,13 +465,13 @@ cygwin_recvfrom (int fd,
 fhandler_socket *
 get (int fd)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EINVAL);
       return 0;
     }
 
-  return dtable[fd]->is_socket ();
+  return fdtab[fd]->is_socket ();
 }
 
 /* exported as setsockopt: standards? */
@@ -733,7 +733,7 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 
       SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," accept");
 
-      int res_fd = dtable.find_unused_handle ();
+      int res_fd = fdtab.find_unused_handle ();
       if (res_fd == -1)
 	{
 	  /* FIXME: what is correct errno? */
@@ -929,7 +929,7 @@ extern "C"
 int
 cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 {
-  fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  fhandler_socket *h = (fhandler_socket *) fdtab[fd];
 
   debug_printf ("getpeername %d", h->get_socket ());
   int res = getpeername (h->get_socket (), name, len);
@@ -945,7 +945,7 @@ extern "C"
 int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
-  fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  fhandler_socket *h = (fhandler_socket *) fdtab[fd];
   sigframe thisframe (mainthread, 0);
 
   int res = recv (h->get_socket (), (char *) buf, len, flags);
@@ -971,7 +971,7 @@ extern "C"
 int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
-  fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  fhandler_socket *h = (fhandler_socket *) fdtab[fd];
   sigframe thisframe (mainthread, 0);
 
   int res = send (h->get_socket (), (const char *) buf, len, flags);
@@ -1361,13 +1361,13 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
   SOCKET fd2s;
   sigframe thisframe (mainthread, 0);
 
-  int res_fd = dtable.find_unused_handle ();
+  int res_fd = fdtab.find_unused_handle ();
   if (res_fd == -1)
     goto done;
 
   if (fd2p)
     {
-      *fd2p = dtable.find_unused_handle (res_fd + 1);
+      *fd2p = fdtab.find_unused_handle (res_fd + 1);
       if (*fd2p == -1)
 	goto done;
     }
@@ -1401,7 +1401,7 @@ cygwin_rresvport (int *port)
   int res = -1;
   sigframe thisframe (mainthread, 0);
 
-  int res_fd = dtable.find_unused_handle ();
+  int res_fd = fdtab.find_unused_handle ();
   if (res_fd == -1)
     goto done;
   res = rresvport (port);
@@ -1430,12 +1430,12 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
   SOCKET fd2s;
   sigframe thisframe (mainthread, 0);
 
-  int res_fd = dtable.find_unused_handle ();
+  int res_fd = fdtab.find_unused_handle ();
   if (res_fd == -1)
     goto done;
   if (fd2p)
     {
-      *fd2p = dtable.find_unused_handle (res_fd + 1);
+      *fd2p = fdtab.find_unused_handle (res_fd + 1);
       if (*fd2p == -1)
 	goto done;
     }
@@ -1478,13 +1478,13 @@ socketpair (int, int type, int, int *sb)
 
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," socketpair");
 
-  sb[0] = dtable.find_unused_handle ();
+  sb[0] = fdtab.find_unused_handle ();
   if (sb[0] == -1)
     {
       set_errno (EMFILE);
       goto done;
     }
-  sb[1] = dtable.find_unused_handle (sb[0] + 1);
+  sb[1] = fdtab.find_unused_handle (sb[0] + 1);
   if (sb[1] == -1)
     {
       set_errno (EMFILE);

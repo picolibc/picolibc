@@ -257,14 +257,14 @@ getpass (const char * prompt)
   if (passwd_state == uninitialized)
     read_etc_passwd();
 
-  if (dtable.not_open (0))
+  if (fdtab.not_open (0))
     {
       set_errno (EBADF);
       pass[0] = '\0';
     }
   else
     {
-      fhandler_base *fhstdin = dtable[0];
+      fhandler_base *fhstdin = fdtab[0];
       fhstdin->tcgetattr (&ti);
       newti = ti;
       newti.c_lflag &= ~ECHO;

@@ -559,7 +559,7 @@ fork ()
 
       MALLOC_CHECK;
 
-      dtable.fixup_after_fork (hParent);
+      fdtab.fixup_after_fork (hParent);
       signal_fixup_after_fork ();
       exec_fixup_after_fork ();
 
@@ -654,10 +654,10 @@ vfork ()
       for (pp = (char **)vf->frame, esp = vf->vfork_esp;
 	   esp <= vf->vfork_ebp + 1; pp++, esp++)
 	*pp = *esp;
-      return dtable.vfork_child_dup () ? 0 : -1;
+      return fdtab.vfork_child_dup () ? 0 : -1;
     }
 
-  dtable.vfork_parent_restore ();
+  fdtab.vfork_parent_restore ();
 
   vf = get_vfork_val ();
   if (vf->pid < 0)

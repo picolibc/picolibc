@@ -79,7 +79,7 @@ pinfo_init (LPBYTE info)
 
       /* Inherit file descriptor information from parent in info.
        */
-      LPBYTE b = dtable.de_linearize_fd_array (info);
+      LPBYTE b = fdtab.de_linearize_fd_array (info);
       extern char title_buf[];
       if (b && *b)
 	old_title = strcpy (title_buf, (char *)b);

@@ -131,14 +131,14 @@ extern "C" per_process __cygwin_user_data; /* Pointer into application's static 
    Do not change this value. */
 #define SIZEOF_PER_PROCESS (42 * 4)
 
-class hinfo
+class dtable
 {
   fhandler_base **fds;
   fhandler_base **fds_on_hold;
   int first_fd_for_open;
 public:
   size_t size;
-  hinfo () {first_fd_for_open = 3;}
+  dtable () {first_fd_for_open = 3;}
   int vfork_child_dup ();
   void vfork_parent_restore ();
   fhandler_base *dup_worker (fhandler_base *oldfh);
@@ -321,9 +321,9 @@ void heap_init (void);
 void malloc_init (void);
 
 /* fd table */
-void dtable_init (void);
-void hinfo_init (void);
-extern hinfo dtable;
+void fdtab_init (void);
+void stdio_init (void);
+extern dtable fdtab;
 
 /* UID/GID */
 void uinfo_init (void);
@@ -435,8 +435,8 @@ int kill_pgrp (pid_t, int);
 int _kill (int, int);
 int _raise (int sig);
 
-int getdtablesize ();
-void setdtablesize (int);
+int getfdtabsize ();
+void setfdtabsize (int);
 
 extern DWORD binmode;
 extern char _data_start__, _data_end__, _bss_start__, _bss_end__;

@@ -729,8 +729,8 @@ dll_crt0_1 ()
       set_console_title (cp);
     }
 
-  /* Allocate dtable */
-  dtable_init ();
+  /* Allocate fdtab */
+  fdtab_init ();
 
 /* Initialize uid, gid. */
   uinfo_init ();
@@ -742,7 +742,7 @@ dll_crt0_1 ()
   tty_init ();
 
   /* Set up standard fds in file descriptor table. */
-  hinfo_init ();
+  stdio_init ();
 
   if (user_data->premain[0])
     for (unsigned int i = 0; i < PREMAIN_LEN / 2; i++)

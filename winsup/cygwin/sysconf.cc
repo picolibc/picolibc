@@ -27,9 +27,9 @@ sysconf (int in)
 	return 1048576;
       case _SC_OPEN_MAX:
 	/* FIXME: this returns the current limit which can increase
-	   if and when hinfo::find_unused_handle is called.  Perhaps
+	   if and when dtable::find_unused_handle is called.  Perhaps
 	   we should return NOFILE or OPEN_MAX instead? */
-	return dtable.size;
+	return fdtab.size;
       case _SC_PAGESIZE:
 	{
 	  SYSTEM_INFO b;

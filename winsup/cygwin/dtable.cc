@@ -1,4 +1,4 @@
-/* hinfo.cc: file descriptor support.
+/* dtable.cc: file descriptor support.
 
    Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
 
@@ -21,29 +21,29 @@ details. */
 
 #include <winsock.h>
 
-hinfo dtable;
+dtable fdtab;
 
 /* Set aside space for the table of fds */
 void
-dtable_init (void)
+fdtab_init (void)
 {
-  if (!dtable.size)
-    dtable.extend(NOFILE_INCR);
+  if (!fdtab.size)
+    fdtab.extend(NOFILE_INCR);
 }
 
 void __stdcall
 set_std_handle (int fd)
 {
   if (fd == 0)
-    SetStdHandle (STD_INPUT_HANDLE, dtable[fd]->get_handle ());
+    SetStdHandle (STD_INPUT_HANDLE, fdtab[fd]->get_handle ());
   else if (fd == 1)
-    SetStdHandle (STD_OUTPUT_HANDLE, dtable[fd]->get_output_handle ());
+    SetStdHandle (STD_OUTPUT_HANDLE, fdtab[fd]->get_output_handle ());
   else if (fd == 2)
-    SetStdHandle (STD_ERROR_HANDLE, dtable[fd]->get_output_handle ());
+    SetStdHandle (STD_ERROR_HANDLE, fdtab[fd]->get_output_handle ());
 }
 
 int
-hinfo::extend (int howmuch)
+dtable::extend (int howmuch)
 {
   int new_size = size + howmuch;
   fhandler_base **newfds;
@@ -76,7 +76,7 @@ hinfo::extend (int howmuch)
    initialized at each fork () call.  */
 
 void
-hinfo_init (void)
+stdio_init (void)
 {
   /* Set these before trying to output anything from strace.
      Also, always set them even if we're to pick up our parent's fds
@@ -88,7 +88,7 @@ hinfo_init (void)
       HANDLE out = GetStdHandle (STD_OUTPUT_HANDLE);
       HANDLE err = GetStdHandle (STD_ERROR_HANDLE);
 
-      dtable.init_std_file_from_handle (0, in, GENERIC_READ, "{stdin}");
+      fdtab.init_std_file_from_handle (0, in, GENERIC_READ, "{stdin}");
 
       /* STD_ERROR_HANDLE has been observed to be the same as
 	 STD_OUTPUT_HANDLE.  We need separate handles (e.g. using pipes
@@ -106,13 +106,13 @@ hinfo_init (void)
 	    }
 	}
 
-      dtable.init_std_file_from_handle (1, out, GENERIC_WRITE, "{stdout}");
-      dtable.init_std_file_from_handle (2, err, GENERIC_WRITE, "{stderr}");
+      fdtab.init_std_file_from_handle (1, out, GENERIC_WRITE, "{stdout}");
+      fdtab.init_std_file_from_handle (2, err, GENERIC_WRITE, "{stderr}");
     }
 }
 
 int
-hinfo::not_open (int fd)
+dtable::not_open (int fd)
 {
   SetResourceLock(LOCK_FD_LIST,READ_LOCK," not_open");
 
@@ -123,7 +123,7 @@ hinfo::not_open (int fd)
 }
 
 int
-hinfo::find_unused_handle (int start)
+dtable::find_unused_handle (int start)
 {
   AssertResourceOwner(LOCK_FD_LIST, READ_LOCK);
 
@@ -139,7 +139,7 @@ hinfo::find_unused_handle (int start)
 }
 
 void
-hinfo::release (int fd)
+dtable::release (int fd)
 {
   if (!not_open (fd))
     {
@@ -149,7 +149,7 @@ hinfo::release (int fd)
 }
 
 void
-hinfo::init_std_file_from_handle (int fd, HANDLE handle,
+dtable::init_std_file_from_handle (int fd, HANDLE handle,
 				  DWORD myaccess, const char *name)
 {
   int bin = binmode ? O_BINARY : 0;
@@ -190,14 +190,14 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 			      DWORD myaccess)
 {
   if (fd == -1)
-    fd = dtable.find_unused_handle();
-  fhandler_base *res = dtable.build_fhandler (fd, name, handle);
+    fd = fdtab.find_unused_handle();
+  fhandler_base *res = fdtab.build_fhandler (fd, name, handle);
   res->init (handle, myaccess, bin);
   return fd;
 }
 
 fhandler_base *
-hinfo::build_fhandler (int fd, const char *name, HANDLE handle)
+dtable::build_fhandler (int fd, const char *name, HANDLE handle)
 {
   int unit;
   DWORD devn;
@@ -229,7 +229,7 @@ hinfo::build_fhandler (int fd, const char *name, HANDLE handle)
 }
 
 fhandler_base *
-hinfo::build_fhandler (int fd, DWORD dev, const char *name, int unit)
+dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 {
   fhandler_base *fh;
   void *buf = calloc (1, sizeof (fhandler_union) + 100);
@@ -297,7 +297,7 @@ hinfo::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 }
 
 fhandler_base *
-hinfo::dup_worker (fhandler_base *oldfh)
+dtable::dup_worker (fhandler_base *oldfh)
 {
   fhandler_base *newfh = build_fhandler (-1, oldfh->get_device (), NULL);
   *newfh = *oldfh;
@@ -315,7 +315,7 @@ hinfo::dup_worker (fhandler_base *oldfh)
 }
 
 int
-hinfo::dup2 (int oldfd, int newfd)
+dtable::dup2 (int oldfd, int newfd)
 {
   int res = -1;
   fhandler_base *newfh = NULL;	// = NULL to avoid an incorrect warning
@@ -343,7 +343,7 @@ hinfo::dup2 (int oldfd, int newfd)
     }
 
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
-  if ((size_t) newfd >= dtable.size || newfd < 0)
+  if ((size_t) newfd >= fdtab.size || newfd < 0)
     {
       syscall_printf ("new fd out of bounds: %d", newfd);
       set_errno (EBADF);
@@ -366,14 +366,14 @@ done:
 }
 
 select_record *
-hinfo::select_read (int fd, select_record *s)
+dtable::select_read (int fd, select_record *s)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return NULL;
     }
-  fhandler_base *fh = dtable[fd];
+  fhandler_base *fh = fdtab[fd];
   s = fh->select_read (s);
   s->fd = fd;
   s->fh = fh;
@@ -383,14 +383,14 @@ hinfo::select_read (int fd, select_record *s)
 }
 
 select_record *
-hinfo::select_write (int fd, select_record *s)
+dtable::select_write (int fd, select_record *s)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return NULL;
     }
-  fhandler_base *fh = dtable[fd];
+  fhandler_base *fh = fdtab[fd];
   s = fh->select_write (s);
   s->fd = fd;
   s->fh = fh;
@@ -400,14 +400,14 @@ hinfo::select_write (int fd, select_record *s)
 }
 
 select_record *
-hinfo::select_except (int fd, select_record *s)
+dtable::select_except (int fd, select_record *s)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return NULL;
     }
-  fhandler_base *fh = dtable[fd];
+  fhandler_base *fh = fdtab[fd];
   s = fh->select_except (s);
   s->fd = fd;
   s->fh = fh;
@@ -417,7 +417,7 @@ hinfo::select_except (int fd, select_record *s)
 }
 
 /*
- * Function to take an existant hinfo array
+ * Function to take an existant dtable array
  * and linearize it into a memory buffer.
  * If memory buffer is NULL, it returns the size
  * of memory buffer needed to do the linearization.
@@ -425,7 +425,7 @@ hinfo::select_except (int fd, select_record *s)
  */
 
 int
-hinfo::linearize_fd_array (unsigned char *in_buf, int buflen)
+dtable::linearize_fd_array (unsigned char *in_buf, int buflen)
 {
   /* If buf == NULL, just precalculate length */
   if (in_buf == NULL)
@@ -492,19 +492,19 @@ hinfo::linearize_fd_array (unsigned char *in_buf, int buflen)
 }
 
 /*
- * Function to take a linearized hinfo array in a memory buffer and
- * re-create the original hinfo array.
+ * Function to take a linearized dtable array in a memory buffer and
+ * re-create the original dtable array.
  */
 
 LPBYTE
-hinfo::de_linearize_fd_array (LPBYTE buf)
+dtable::de_linearize_fd_array (LPBYTE buf)
 {
   int len, max_used_fd;
   size_t inc_size;
 
   debug_printf ("buf %x", buf);
 
-  /* First get the number of fd's - use this to set the dtablesize.
+  /* First get the number of fd's - use this to set the fdtabsize.
      NB. This is the only place in the code this should be done !!
   */
 
@@ -554,7 +554,7 @@ hinfo::de_linearize_fd_array (LPBYTE buf)
 }
 
 void
-hinfo::fixup_after_fork (HANDLE parent)
+dtable::fixup_after_fork (HANDLE parent)
 {
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
   for (size_t i = 0; i < size; i++)
@@ -571,7 +571,7 @@ hinfo::fixup_after_fork (HANDLE parent)
 }
 
 int
-hinfo::vfork_child_dup ()
+dtable::vfork_child_dup ()
 {
   fhandler_base **newtable;
   newtable = (fhandler_base **) calloc (size, sizeof(fds[0]));
@@ -595,7 +595,7 @@ out:
 }
 
 void
-hinfo::vfork_parent_restore ()
+dtable::vfork_parent_restore ()
 {
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
 

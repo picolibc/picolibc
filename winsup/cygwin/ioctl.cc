@@ -19,14 +19,14 @@ extern "C"
 int
 ioctl (int fd, int cmd, void *buf)
 {
-  if (dtable.not_open (fd))
+  if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return -1;
     }
 
   debug_printf ("fd %d, cmd %x\n", fd, cmd);
-  fhandler_base *fh = dtable[fd];
+  fhandler_base *fh = fdtab[fd];
   if (fh->is_tty () && fh->get_device () != FH_PTYM)
     switch (cmd)
       {

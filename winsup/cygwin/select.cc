@@ -85,7 +85,7 @@ fhandler_##what::ready_for_read (int fd, DWORD howlong, int ignra) \
   me.fd = fd; \
   (void) select_read (&me); \
   while (!peek_##what (&me, ignra) && howlong == INFINITE) \
-    if (fd >= 0 && dtable.not_open (fd)) \
+    if (fd >= 0 && fdtab.not_open (fd)) \
       break; \
     else if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0) \
       break; \
@@ -94,7 +94,7 @@ fhandler_##what::ready_for_read (int fd, DWORD howlong, int ignra) \
 
 #define set_handle_or_return_if_not_open(h, s) \
   h = (s)->fh->get_handle (); \
-  if (dtable.not_open ((s)->fd)) \
+  if (fdtab.not_open ((s)->fd)) \
     { \
       (s)->saw_error = TRUE; \
       set_errno (EBADF); \
@@ -203,11 +203,11 @@ select_stuff::test_and_set (int i, fd_set *readfds, fd_set *writefds,
 			    fd_set *exceptfds)
 {
   select_record *s = NULL;
-  if (UNIX_FD_ISSET (i, readfds) && (s = dtable.select_read (i, s)) == NULL)
+  if (UNIX_FD_ISSET (i, readfds) && (s = fdtab.select_read (i, s)) == NULL)
     return 0; /* error */
-  if (UNIX_FD_ISSET (i, writefds) && (s = dtable.select_write (i, s)) == NULL)
+  if (UNIX_FD_ISSET (i, writefds) && (s = fdtab.select_write (i, s)) == NULL)
     return 0; /* error */
-  if (UNIX_FD_ISSET (i, exceptfds) && (s = dtable.select_except (i, s)) == NULL)
+  if (UNIX_FD_ISSET (i, exceptfds) && (s = fdtab.select_except (i, s)) == NULL)
     return 0; /* error */
   if (s == NULL)
     return 1; /* nothing to do */
