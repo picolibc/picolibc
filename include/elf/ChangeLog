@@ -1,3 +1,11 @@
+2001-03-22  Hans-Peter Nilsson  <hp@axis.com>
+
+	* cris.h: Add leading comment about PC-relative location.
+	(R_CRIS_COPY, R_CRIS_GLOB_DAT, R_CRIS_JUMP_SLOT, R_CRIS_RELATIVE,
+	R_CRIS_16_GOT, R_CRIS_32_GOT, R_CRIS_16_GOTPLT, R_CRIS_32_GOTPLT,
+	R_CRIS_32_GOTREL, R_CRIS_32_PLT_GOTREL, R_CRIS_32_PLT_PCREL):
+	New relocs.
+
 2001-02-27  Philip Blundell  <pb@futuretv.com>
 
 	* arm.h: Add new definitions from ARM document SWS ESPC 0003 B-01.
