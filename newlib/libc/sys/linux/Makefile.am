@@ -13,8 +13,8 @@ LIB_SOURCES = \
 	brk.c cfspeed.c flockfile.c funlockfile.c gethostname.c getoptlong.c \
 	getreent.c ids.c inode.c io.c io64.c linux.c mmap.c \
 	pread.c pread64.c process.c pwrite.c pwrite64.c raise.c realpath.c \
-	rename.c resource.c sched.c select.c seteuid.c shm_open.c \
-	shm_unlink.c sigaction.c sigqueue.c signal.c siglongjmp.c sigwait.c \
+	rename.c resource.c sched.c select.c seteuid.c shm_open.c shm_unlink.c \
+	sig.c sigaction.c sigqueue.c signal.c siglongjmp.c sigset.c sigwait.c \
 	socket.c sleep.c stack.c sysconf.c sysctl.c systat.c system.c \
 	tcdrain.c tcsendbrk.c termios.c time.c usleep.c wait.c
 
@@ -62,7 +62,7 @@ crt0.o: machine/crt0.o
 machine/crt0.o: ; @true
 
 
-signal.$(oext):	siglist.inc
+sig.$(oext):	siglist.inc
 
 siglist.inc:
 		$(AWK) '/#define.SIG.*[1-9][0-9]*/ { n[$$3] = $$2 } \

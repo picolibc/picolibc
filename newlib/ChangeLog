@@ -1,3 +1,25 @@
+2002-05-31  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/sys/linux/Makefile.am: Add sig.c and sigaction.c.  Also
+        make siglist.inc dependent on sig.c instead of signal.c.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/sig.c: Rename from signal.c and change code to
+        use NSIG instead of _NSIG. 
+        * libc/sys/linux/sigaction.c: New file.
+        * libc/sys/linux/signal.c: Changed to be linux signal() function
+        so as to override regular newlib default signal.c.
+        * libc/sys/linux/linuxthreads/config.h: Add __ASSUME_REALTIME_SIGNALS
+        definition.
+        * libc/sys/linux/linuxthreads/testrtsig.h: New file.
+        * libc/sys/linux/machine/i386/Makefile.am: Remove sigset.c.
+        * libc/sys/linux/machine/i386/Makefile.in: Regenerated.
+        * libc/sys/linux/machine/i386/sigset.c: Moved to linux main directory.
+        * libc/sys/linux/sigset.c: Moved from machine/i386 directory.
+        * libc/sys/linux/sys/signal.h: Redefine NSIG to _NSIG and override
+        default linux sigset_t typedef by defining it equal to __sigset_t.
+        * libc/unix/sigset.c: Add check so code isn't compiled on systems
+        with a sigset_t that isn't implemented with a single int.
+
 2002-05-30  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/linux/Makefile.am: Add support for new files.

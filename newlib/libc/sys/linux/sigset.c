@@ -12,6 +12,7 @@
 #include <bits/sigset.h>
 #include <errno.h>
 #include <string.h>
+#include <machine/weakalias.h>
 
 int
 sigaddset (sigset_t *set, const int signo)
@@ -25,8 +26,8 @@ sigaddset (sigset_t *set, const int signo)
       return -1;
     }
 
-  index = (signo - 1) / 32;
-  mask = 1 << ((signo - 1) % 32);
+  index = (signo - 1) / (8 * sizeof(long));
+  mask = 1 << ((signo - 1) % (8 * sizeof(long)));
 
   st->__val[index] |= mask;
   return 0;
@@ -46,8 +47,8 @@ sigdelset (sigset_t *set, const int signo)
       return -1;
     }
 
-  index = (signo - 1) / 32;
-  mask = 1 << ((signo - 1) % 32);
+  index = (signo - 1) / (8 * sizeof(long));
+  mask = 1 << ((signo - 1) % (8 * sizeof(long)));
 
   st->__val[index] &= ~mask;
   return 0;
@@ -89,8 +90,8 @@ sigismember (const sigset_t *set, int signo)
       return -1;
     }
 
-  index = (signo - 1) / 32;
-  mask = 1 << ((signo - 1) % 32);
+  index = (signo - 1) / (8 * sizeof(long));
+  mask = 1 << ((signo - 1) % (8 * sizeof(long)));
 
   return (st->__val[index] & mask) != 0;
 }

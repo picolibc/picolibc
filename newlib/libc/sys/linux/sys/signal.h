@@ -5,12 +5,20 @@
 
 #ifndef _SYS_SIGNAL_H
 #define _SYS_SIGNAL_H
+#define _SIGNAL_H
 
 #include <sys/types.h>
 #include <linux/signal.h>
 #include <bits/sigset.h>
-#define _SIGNAL_H
 #include <bits/signum.h>
+
+/* we want RT signals so we must override the definition of sigset_t
+   and NSIG */
+
+#undef NSIG
+#define NSIG _NSIG
+#undef sigset_t
+#define sigset_t __sigset_t
 
 /* --- include/signal.h thinks it knows better :-( --- */
 

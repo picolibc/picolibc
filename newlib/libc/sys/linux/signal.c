@@ -1,83 +1,54 @@
-/* libc/sys/linux/signal.c - Signal handling functions */
+/* BSD-like signal function.
+   Copyright (C) 1991, 1992, 1996, 1997, 2000 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
 
-/* Written 2000 by Werner Almesberger */
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
 
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
 
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+
+#include <errno.h>
 #include <signal.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <machine/syscall.h>
+#include <machine/weakalias.h>
 
-/* avoid name space pollution */
-#define __NR___sgetmask __NR_sgetmask
-#define __NR___ssetmask __NR_ssetmask
-#define __NR___rt_sigtimedwait __NR_rt_sigtimedwait
-#define __NR___rt_sigpending __NR_rt_sigpending
-#define __NR___rt_sigprocmask __NR_rt_sigprocmask
-#define __NR___rt_sigsuspend __NR_rt_sigsuspend
+sigset_t _sigintr;		/* Set by siginterrupt.  */
 
-_syscall2(int,kill,pid_t,pid,int,sig)
-_syscall2(__sighandler_t,signal,int,signum,__sighandler_t,handler)
-_syscall0(int,pause)
-_syscall1(unsigned int,alarm,unsigned int,seconds)
-
-static _syscall0(int,__sgetmask)
-static _syscall1(int,__ssetmask,int,newmask)
-static _syscall2(int,__rt_sigpending,sigset_t *,set,size_t,size)
-static _syscall4(int,__rt_sigprocmask,int,how,const sigset_t *,set,sigset_t *,oldset,size_t,size)
-static _syscall2(int,__rt_sigsuspend,const sigset_t *,mask,size_t,size)
-static _syscall4(int,__rt_sigtimedwait,const sigset_t *,set,siginfo_t *,info,struct timespec *,timeout,size_t,size)
-
-int __sigsuspend (const sigset_t *mask)
+/* Set the handler for the signal SIG to HANDLER,
+   returning the old handler, or SIG_ERR on error.  */
+__sighandler_t
+__bsd_signal (sig, handler)
+     int sig;
+     __sighandler_t handler;
 {
-    return __rt_sigsuspend(mask, _NSIG/8);
-}
-weak_alias(__sigsuspend,sigsuspend)
+  struct sigaction act, oact;
 
-int sigsetmask(int newmask) /* BSD */
-{
-    return __ssetmask(newmask);
-}
+  /* Check signal extents to protect __sigismember.  */
+  if (handler == SIG_ERR || sig < 1 || sig >= NSIG)
+    {
+      errno = (EINVAL);
+      return SIG_ERR;
+    }
 
-int sigmask(int signum) /* BSD */
-{
-    return 1 << signum;
-}
+  act.sa_handler = handler;
+  if (sigemptyset (&act.sa_mask) < 0
+      || sigaddset (&act.sa_mask, sig) < 0)
+    return SIG_ERR;
+  act.sa_flags = sigismember (&_sigintr, sig) ? 0 : SA_RESTART;
+  if (sigaction (sig, &act, &oact) < 0)
+    return SIG_ERR;
 
-int sigblock(int mask) /* BSD */
-{
-    return __ssetmask(mask | __sgetmask());
+  return oact.sa_handler;
 }
-
-int __libc_raise(int sig)
-{
-    return kill(getpid(),sig);
-}
-weak_alias(__libc_raise,raise)
-
-int __sigpending(sigset_t *set)
-{
-  return __rt_sigpending(set, _NSIG/8);
-}
-weak_alias(__sigpending,sigpending)
-
-int __sigprocmask (int how,const sigset_t *set,sigset_t *oldset)
-{
-  return __rt_sigprocmask(how, set, oldset, _NSIG/8);
-}
-weak_alias(__sigprocmask,sigprocmask)
-
-int sigtimedwait(const sigset_t *set, siginfo_t *info,
-                 struct timespec *timeout)
-{
-  return __rt_sigtimedwait(set, info, timeout, _NSIG/8);
-}
-
-int sigwaitinfo(const sigset_t *set, siginfo_t *info)
-{
-  return __rt_sigtimedwait(set, info, NULL, _NSIG/8);
-}
-
-const char *const sys_siglist[] = {
-#include "siglist.inc"
-};
+weak_alias (__bsd_signal, bsd_signal)
+weak_alias (__bsd_signal, signal)
+weak_alias (__bsd_signal, ssignal)

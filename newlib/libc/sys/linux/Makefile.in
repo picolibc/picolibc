@@ -104,8 +104,8 @@ LIB_SOURCES = \
 	brk.c cfspeed.c flockfile.c funlockfile.c gethostname.c getoptlong.c \
 	getreent.c ids.c inode.c io.c io64.c linux.c mmap.c \
 	pread.c pread64.c process.c pwrite.c pwrite64.c raise.c realpath.c \
-	rename.c resource.c sched.c select.c seteuid.c shm_open.c \
-	shm_unlink.c sigaction.c sigqueue.c signal.c siglongjmp.c sigwait.c \
+	rename.c resource.c sched.c select.c seteuid.c shm_open.c shm_unlink.c \
+	sig.c sigaction.c sigqueue.c signal.c siglongjmp.c sigset.c sigwait.c \
 	socket.c sleep.c stack.c sysconf.c sysctl.c systat.c system.c \
 	tcdrain.c tcsendbrk.c termios.c time.c usleep.c wait.c
 
@@ -142,11 +142,11 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@ids.o inode.o io.o io64.o linux.o mmap.o pread.o \
 @USE_LIBTOOL_FALSE@pread64.o process.o pwrite.o pwrite64.o raise.o \
 @USE_LIBTOOL_FALSE@realpath.o rename.o resource.o sched.o select.o \
-@USE_LIBTOOL_FALSE@seteuid.o shm_open.o shm_unlink.o sigaction.o \
-@USE_LIBTOOL_FALSE@sigqueue.o signal.o siglongjmp.o sigwait.o socket.o \
-@USE_LIBTOOL_FALSE@sleep.o stack.o sysconf.o sysctl.o systat.o system.o \
-@USE_LIBTOOL_FALSE@tcdrain.o tcsendbrk.o termios.o time.o usleep.o \
-@USE_LIBTOOL_FALSE@wait.o
+@USE_LIBTOOL_FALSE@seteuid.o shm_open.o shm_unlink.o sig.o sigaction.o \
+@USE_LIBTOOL_FALSE@sigqueue.o signal.o siglongjmp.o sigset.o sigwait.o \
+@USE_LIBTOOL_FALSE@socket.o sleep.o stack.o sysconf.o sysctl.o systat.o \
+@USE_LIBTOOL_FALSE@system.o tcdrain.o tcsendbrk.o termios.o time.o \
+@USE_LIBTOOL_FALSE@usleep.o wait.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = 
@@ -156,10 +156,11 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@mmap.lo pread.lo pread64.lo process.lo pwrite.lo \
 @USE_LIBTOOL_TRUE@pwrite64.lo raise.lo realpath.lo rename.lo \
 @USE_LIBTOOL_TRUE@resource.lo sched.lo select.lo seteuid.lo shm_open.lo \
-@USE_LIBTOOL_TRUE@shm_unlink.lo sigaction.lo sigqueue.lo signal.lo \
-@USE_LIBTOOL_TRUE@siglongjmp.lo sigwait.lo socket.lo sleep.lo stack.lo \
-@USE_LIBTOOL_TRUE@sysconf.lo sysctl.lo systat.lo system.lo tcdrain.lo \
-@USE_LIBTOOL_TRUE@tcsendbrk.lo termios.lo time.lo usleep.lo wait.lo
+@USE_LIBTOOL_TRUE@shm_unlink.lo sig.lo sigaction.lo sigqueue.lo \
+@USE_LIBTOOL_TRUE@signal.lo siglongjmp.lo sigset.lo sigwait.lo \
+@USE_LIBTOOL_TRUE@socket.lo sleep.lo stack.lo sysconf.lo sysctl.lo \
+@USE_LIBTOOL_TRUE@systat.lo system.lo tcdrain.lo tcsendbrk.lo \
+@USE_LIBTOOL_TRUE@termios.lo time.lo usleep.lo wait.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -519,7 +520,7 @@ crt0.o: machine/crt0.o
 
 machine/crt0.o: ; @true
 
-signal.$(oext):	siglist.inc
+sig.$(oext):	siglist.inc
 
 siglist.inc:
 		$(AWK) '/#define.SIG.*[1-9][0-9]*/ { n[$$3] = $$2 } \

@@ -1,7 +1,7 @@
 #include <signal.h>
 #include <errno.h>
 
-#ifdef SIG_SETMASK	/* easier than trying to remove from Makefile */
+#if defined(SIG_SETMASK) && NSIG <= 32	/* easier than trying to remove from Makefile */
 
 #undef sigemptyset
 int

@@ -60,7 +60,7 @@ __libc_sigaction (sig, act, oact)
      real size of the user-level sigset_t.  */
   result = __rt_sigaction (sig,
 	       act ? (&kact) : NULL,
-	       oact ? (&koact) : NULL, _NSIG / 8);
+	       oact ? (&koact) : NULL, NSIG / 8);
 
   if (oact && result >= 0)
     {

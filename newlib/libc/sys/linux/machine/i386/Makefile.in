@@ -92,7 +92,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = setjmp.S sigaction.c sigset.c
+LIB_SOURCES = setjmp.S sigaction.c
 
 liblinuxi386_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -116,12 +116,11 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  setjmp.o sigaction.o sigset.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  setjmp.o sigaction.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 liblinuxi386_la_LIBADD = 
-@USE_LIBTOOL_TRUE@liblinuxi386_la_OBJECTS =  setjmp.lo sigaction.lo \
-@USE_LIBTOOL_TRUE@sigset.lo
+@USE_LIBTOOL_TRUE@liblinuxi386_la_OBJECTS =  setjmp.lo sigaction.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
