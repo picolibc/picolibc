@@ -122,3 +122,11 @@ asm (".equ    V_FILL, 65" );
 asm (".equ    V_BSD_OS, 66" );
 asm (".equ    V_EPI_OS, 69" );
 #endif
+
+#if defined(__AVR__)
+/*
+ * Initial stack pointer address "__stack"
+ *  hard coded into GCC instead of providing it through ldscripts
+ */
+const char* __stack ;
+#endif

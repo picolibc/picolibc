@@ -1,3 +1,8 @@
+2001-10-25  Ralf Corsepius <corsepiu@faw.uni-ulm.de>
+
+	* libc/include/machine/setjmp.h: Add AVR support.
+	* libc/sys/rtems/crt0.S [__AVR__]: Add __stack.
+
 2004-10-08  Jeff Johnston  <jjohnstn@redhat.com>
                                                                                 
         * libc/include/sys/signal.h: If <signal.h> didn't include
