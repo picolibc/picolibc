@@ -1,3 +1,8 @@
+Thu Jul 26 16:43:39 2001  Pieter de Visser <pieterdv@knoware.nl>
+
+	* thread.cc (__pthread_equal): Invert return value so that true is
+	returned when threads are equal.
+
 Thu Jul 26 15:50:38 2001  Charles Wilson <cwilson@ece.gatech.edu>
 			  Christopher Faylor <cgf@cygnus.com>
 
