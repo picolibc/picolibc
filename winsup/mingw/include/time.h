@@ -44,7 +44,7 @@ typedef	long	time_t;
 #ifndef __STRICT_ANSI__
 /* A 64-bit time_t to get to Y3K */
 #ifndef _TIME64_T_DEFINED
-typedef __int64 __time64_t
+typedef __int64 __time64_t;
 #define _TIME64_T_DEFINED
 #endif
 #endif
