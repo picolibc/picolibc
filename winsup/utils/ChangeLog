@@ -1,3 +1,10 @@
+2001-01-16  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* cygpath.cc (main): Add options to show Desktop and Start
+	Menu's Programs directory for current user or all users.
+	Move bulk of DPWS options outside the getopt case statement.
+	* utils.sgml: Update cygpath section for ADPWS options.
+
 2002-01-15  Joerg Schaible <joerg.schaible@gmx.de>
 
 	* cygpath.cc (doit): Empty file ignored using option -i.

@@ -70,20 +70,21 @@ or if you know what everything is already, just leave this out.</para>
 <sect2 id="cygpath"><title>cygpath</title>
 
 <screen>
-Usage: cygpath [-p|--path] (-u|--unix)|(-w|--windows [-s|--short-name]) filename
-       cygpath [-v|--version]
-       cygpath [-W|--windir|-S|--sysdir]
-  -a|--absolute      output absolute path
-  -c|--close handle  close handle (for use in captured process)
-  -f|--file file     read file for path information
-  -i|--ignore        ignore missing filename argument
-  -p|--path          filename argument is a path
-  -s|--short-name    print Windows short form of filename
-  -S|--sysdir        print Windows system directory
-  -u|--unix          print UNIX form of filename
-  -v|--version       print program version
-  -w|--windows       print Windows form of filename
-  -W|--windir        print Windows directory
+Usage: cygpath.exe [-p|--path] (-u|--unix)|(-w|--windows [-s|--short-name]) filename
+  -a|--absolute         output absolute path
+  -c|--close handle     close handle (for use in captured process)
+  -f|--file file        read file for input path information
+  -i|--ignore           ignore missing argument
+  -p|--path             filename argument is a path
+  -s|--short-name       print Windows short form of filename
+  -u|--unix             print Unix form of filename
+  -v|--version          output version information and exit
+  -w|--windows          print Windows form of filename
+  -A|--allusers         use `All Users' instead of current user for -D, -P
+  -D|--desktop          output `Desktop' directory and exit
+  -P|--smprograms       output Start Menu `Programs' directory and exit
+  -S|--sysdir           output system directory and exit
+  -W|--windir           output `Windows' directory and exit
 </screen>
 
 <para>The <command>cygpath</command> program is a utility that
@@ -123,6 +124,17 @@ do
 done
 </screen>
 </example>
+
+<para>The capital options 
+<literal>-D</literal>, <literal>-P</literal>, <literal>-S</literal>, and
+<literal>-W</literal> output directories used by Windows that are not the
+same on all systems, for example <literal>-S</literal> might output 
+C:\WINNT\SYSTEM32 or C:\WINDOWS\SYSTEM. The <literal>-A</literal> option
+forces use of the "All Users" directories instead of the current user
+for the <literal>-D</literal> and <literal>-P</literal> options.
+On Win9x systems with only a single user, <literal>-A</literal> has no
+effect; <literal>-D</literal> and <literal>-AD</literal> would have the
+same output.
 
 </sect2>
 
