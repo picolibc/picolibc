@@ -754,8 +754,7 @@ fhandler_base::read (void *in_ptr, size_t& len)
       for (int i = 0; i < copied_chars && i < 16; ++i)
 	{
 	  unsigned char c = ((unsigned char *) ptr)[i];
-	  /* >= 33 so space prints in hex */
-	  __small_sprintf (p, c >= 33 && c <= 127 ? " %c" : " %p", c);
+	  __small_sprintf (p, " %c", c);
 	  p += strlen (p);
 	}
       *p = '\0';
