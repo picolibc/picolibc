@@ -127,6 +127,7 @@ opendir (const char *dirname)
       goto failed;
     }
   strcpy (dir->__d_dirname, real_dirname.get_win32 ());
+  dir->__d_dirent->d_version = __DIRENT_VERSION;
   dir->__d_dirent->d_fd = open (dir->__d_dirname, O_RDONLY | O_DIROPEN);
   /* FindFirstFile doesn't seem to like duplicate /'s. */
   len = strlen (dir->__d_dirname);

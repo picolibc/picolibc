@@ -1,3 +1,7 @@
+Mon Sep  3 21:06:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* dir.cc (opendir): Write version information to __d_dirent->d_version.
+
 Mon Sep  3 18:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* cygwin.din: Add `dirfd'.
