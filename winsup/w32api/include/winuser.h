@@ -2006,6 +2006,8 @@ extern "C" {
 #define ASFW_ANY ((DWORD)-1)
 #define LSFW_LOCK 1
 #define LSFW_UNLOCK 2
+#define LWA_COLORKEY 1
+#define LWA_ALPHA 2
 #endif
 #define GA_PARENT 1
 #define GA_ROOT 2

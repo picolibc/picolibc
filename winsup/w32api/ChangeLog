@@ -1,3 +1,7 @@
+2003-05-27  Andrew C. Stadt <acstadt@sympatico.ca>
+
+	* include/winuser.h (LWA_COLORKEY, LWA_ALPHA): Add defines.
+
 2003-05-25  Bill C. Riemers  <cygwin@docbill.net>
 
 	* include/winuser.h (EnumDisplayDevicesW): Fix typo.
