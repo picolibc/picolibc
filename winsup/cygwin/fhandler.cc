@@ -946,7 +946,7 @@ fhandler_disk_file::fstat (struct stat *buf)
     }
 
   buf->st_blksize = S_BLKSIZE;
-  buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
+  buf->st_blocks  = ((unsigned long) buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
 
   /* Using a side effect: get_file_attibutes checks for
      directory. This is used, to set S_ISVTX, if needed.  */

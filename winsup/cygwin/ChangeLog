@@ -1,3 +1,8 @@
+Thu Jul 27 10:24:36 2000  Egor Duda <deo@logos-m.ru>
+
+	* fhandler.cc (fhandler_disk_file::fstat): Allow block calculation to
+	succeed for files >= 2GB and <= 4GB.
+
 Wed Jul 26 16:05:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (signal_exit): Renamed from "really_exit".  Always sets
