@@ -271,6 +271,8 @@ public:
                        int flags, off_t off);
   virtual int munmap (HANDLE h, caddr_t addr, size_t len);
   virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
+  virtual BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
+				      DWORD size, void *address);
 
   void *operator new (size_t, void *p) {return p;}
 
@@ -483,6 +485,8 @@ public:
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, off_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
+  BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
+			      DWORD size, void *address);
 };
 
 class fhandler_serial: public fhandler_base
@@ -806,6 +810,8 @@ public:
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, off_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
+  BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
+			      DWORD size, void *address);
 
   void dump ();
 } ;

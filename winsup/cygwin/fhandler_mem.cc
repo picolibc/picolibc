@@ -94,7 +94,9 @@ fhandler_dev_mem::open (const char *, int flags, mode_t)
   RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
 
   OBJECT_ATTRIBUTES attr;
-  InitializeObjectAttributes(&attr, &memstr, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  InitializeObjectAttributes(&attr, &memstr,
+  			     OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			     NULL, NULL);
 
   ACCESS_MASK section_access;
   if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
@@ -277,7 +279,9 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
   RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
 
   OBJECT_ATTRIBUTES attr;
-  InitializeObjectAttributes(&attr, &memstr, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  InitializeObjectAttributes(&attr, &memstr,
+			     OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+  			     NULL, NULL);
 
   ACCESS_MASK section_access;
   ULONG protect;
@@ -357,6 +361,43 @@ int
 fhandler_dev_mem::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 {
   return 0;
+}
+
+BOOL
+fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
+					 DWORD size, void *address)
+{
+  DWORD ret;
+  PHYSICAL_ADDRESS phys;
+  void *base = address;
+  DWORD dlen = size;
+  ULONG protect;
+
+  if (access & FILE_MAP_COPY)
+    protect = PAGE_WRITECOPY;
+  else if (access & FILE_MAP_WRITE)
+    protect = PAGE_READWRITE;
+  else
+    protect = PAGE_READONLY;
+
+  phys.QuadPart = (ULONGLONG) offset;
+
+  if ((ret = NtMapViewOfSection (h,
+				 INVALID_HANDLE_VALUE,
+				 &base,
+				 0L,
+				 dlen,
+				 &phys,
+				 &dlen,
+				 ViewShare /*??*/,
+				 0,
+				 protect)) != STATUS_SUCCESS)
+    {
+      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      syscall_printf ("-1 = fixup_mmap_after_fork(): NtMapViewOfSection failed with %E");
+      return FALSE;
+    }
+  return base == address;
 }
 
 int

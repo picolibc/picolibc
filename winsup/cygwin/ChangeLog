@@ -1,3 +1,21 @@
+Thu Jan 11 13:17:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_base): New method `fixup_mmap_after_fork'.
+	(fhandler_disk_file: Ditto.
+	(fhandler_dev_mem): Ditto.
+	* fhandler_mem.cc (fhandler_dev_mem::open): Set OBJ_INHERIT attribute
+	for device\physicalmemory handle.
+	(fhandler_dev_mem::mmap): Ditto.
+	* fhandler_mem.cc (fhandler_dev_mem::fixup_mmap_after_fork): New method.
+	* mmap.cc (mmap_record): Add private `fdesc_' member. Change constructor
+	accordingly.
+	(get_fd): New method.
+	(mmap): Use new mmap_record constructor.
+	(fhandler_base::fixup_mmap_after_fork): New method.
+	(fhandler_disk_file::fixup_mmap_after_fork): Ditto.
+	(fixup_mmaps_after_fork): Call `fixup_mmap_after_fork' of appropriate 
+	fhandler class.
+
 Wed Jan 10 22:08:30 2001  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* sigproc.cc (wait_sig): Allow SIGCONT when stopped.

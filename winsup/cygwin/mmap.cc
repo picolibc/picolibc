@@ -30,6 +30,7 @@ details. */
 class mmap_record
 {
   private:
+    int fdesc_;
     HANDLE mapping_handle_;
     DWORD access_mode_;
     DWORD offset_;
@@ -37,13 +38,14 @@ class mmap_record
     void *base_address_;
 
   public:
-    mmap_record (HANDLE h, DWORD ac, DWORD o, DWORD s, void *b) :
-       mapping_handle_ (h), access_mode_ (ac), offset_ (o),
+    mmap_record (int fd, HANDLE h, DWORD ac, DWORD o, DWORD s, void *b) :
+       fdesc_ (fd), mapping_handle_ (h), access_mode_ (ac), offset_ (o),
        size_to_map_ (s), base_address_ (b) { ; }
 
     /* Default Copy constructor/operator=/destructor are ok */
 
     /* Simple accessors */
+    int get_fd () const { return fdesc_; }
     HANDLE get_handle () const { return mapping_handle_; }
     DWORD get_access () const { return access_mode_; }
     DWORD get_offset () const { return offset_; }
@@ -206,6 +208,8 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
     {
       fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
       fh = &fh_paging_file;
+      /* Ensure that fd is recorded as -1 */
+      fd = -1;
     }
   else
     {
@@ -231,7 +235,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   /* Now we should have a successfully mmaped area.
      Need to save it so forked children can reproduce it.
   */
-  mmap_record mmap_rec (h, access, off, len, base);
+  mmap_record mmap_rec (fd, h, access, off, len, base);
 
   /* Get list of mmapped areas for this fd, create a new one if
      one does not exist yet.
@@ -434,6 +438,14 @@ fhandler_base::msync (HANDLE h, caddr_t addr, size_t len, int flags)
   return -1;
 }
 
+BOOL
+fhandler_base::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
+				      DWORD size, void *address)
+{
+  set_errno (ENODEV);
+  return -1;
+}
+
 /* Implementation for disk files. */
 HANDLE
 fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
@@ -496,6 +508,15 @@ fhandler_disk_file::msync (HANDLE h, caddr_t addr, size_t len, int flags)
       return -1;
     }
   return 0;
+}
+
+BOOL
+fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
+					   DWORD size, void *address)
+{
+  /* Re-create the MapViewOfFileEx call */
+  void *base = MapViewOfFileEx (h, access, 0, offset, size, address);
+  return base == address;
 }
 
 /* Set memory protection */
@@ -575,19 +596,25 @@ fixup_mmaps_after_fork ()
 	    {
 	      mmap_record rec = l->recs[li];
 
-	      debug_printf ("h %x, access %x, offset %d, size %d, address %p",
-		  rec.get_handle (), rec.get_access (), rec.get_offset (),
-		  rec.get_size (), rec.get_address ());
+	      debug_printf ("fd %d, h %x, access %x, offset %d, size %d, address %p",
+		  rec.get_fd (), rec.get_handle (), rec.get_access (),
+		  rec.get_offset (), rec.get_size (), rec.get_address ());
 
-	      /* Now re-create the MapViewOfFileEx call */
-	      void *base = MapViewOfFileEx (rec.get_handle (),
-					    rec.get_access (), 0,
-					    rec.get_offset (),
-					    rec.get_size (),
-					    rec.get_address ());
-	      if (base != rec.get_address ())
+	      BOOL ret;
+	      fhandler_disk_file fh_paging_file (NULL);
+	      fhandler_base *fh;
+	      if (rec.get_fd () == -1) /* MAP_ANONYMOUS */
+		fh = &fh_paging_file;
+	      else
+	        fh = fdtab[rec.get_fd ()];
+	      ret = fh->fixup_mmap_after_fork (rec.get_handle (),
+					       rec.get_access (),
+					       rec.get_offset (),
+					       rec.get_size (),
+					       rec.get_address ());
+	      if (!ret)
 		{
-		  system_printf ("base address %p fails to match requested address %p",
+		  system_printf ("base address fails to match requested address %p",
 				 rec.get_address ());
 		  return -1;
 		}
