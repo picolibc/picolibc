@@ -1,3 +1,8 @@
+2001-10-22  Geoffrey Keating  <geoffk@redhat.com>
+
+	* libc/include/math.h: The C++ standard adds the single-precision
+	versions of the elementary functions.
+
 2001-10-22  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/posix/execvp.c: Remove obsolete CYGWIN32 considerations

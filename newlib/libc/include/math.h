@@ -114,6 +114,10 @@ extern double drem _PARAMS((double, double));
 
 #endif /* ! defined (_REENT_ONLY) */
 
+#endif /* ! defined (__STRICT_ANSI__) */
+
+#if !defined(__STRICT_ANSI__) || defined(__cplusplus)
+
 /* Single precision versions of ANSI functions.  */
 
 extern float atanf _PARAMS((float));
@@ -141,6 +145,10 @@ extern float powf _PARAMS((float, float));
 extern float sqrtf _PARAMS((float));
 extern float fmodf _PARAMS((float, float));
 #endif /* ! defined (_REENT_ONLY) */
+
+#endif /* !defined(__STRICT_ANSI__) || defined(__cplusplus) */
+
+#ifndef __STRICT_ANSI__
 
 /* Other single precision functions.  */
 
