@@ -1,3 +1,7 @@
+2001-04-15  Daniel Berlin  <dan@cgsoftware.com>
+
+	* ternary.h: New file - Ternary search tree header.
+
 2001-04-13  Jakub Jelinek  <jakub@redhat.com>
 
 	* bfdlink.h (bfd_link_discard): Add discard_sec_merge.
