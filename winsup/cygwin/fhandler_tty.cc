@@ -1173,7 +1173,7 @@ fhandler_tty_master::fixup_after_exec (HANDLE)
 int
 fhandler_tty_master::init_console ()
 {
-  console = (fhandler_console *) fdtab.build_fhandler (-1, FH_CONSOLE, "/dev/ttym");
+  console = (fhandler_console *) cygheap->fdtab.build_fhandler (-1, FH_CONSOLE, "/dev/ttym");
   if (console == NULL)
     return -1;
 

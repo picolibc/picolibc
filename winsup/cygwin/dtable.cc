@@ -24,14 +24,12 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "cygheap.h"
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-
-dtable fdtab;
+#include "cygheap.h"
 
 static DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 			   STD_ERROR_HANDLE};
@@ -40,17 +38,17 @@ static DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 void
 dtable_init (void)
 {
-  if (!fdtab.size)
-    fdtab.extend(NOFILE_INCR);
+  if (!cygheap->fdtab.size)
+    cygheap->fdtab.extend(NOFILE_INCR);
 }
 
 void __stdcall
 set_std_handle (int fd)
 {
   if (fd == 0)
-    SetStdHandle (std_consts[fd], fdtab[fd]->get_handle ());
+    SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_handle ());
   else if (fd <= 2)
-    SetStdHandle (std_consts[fd], fdtab[fd]->get_output_handle ());
+    SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_output_handle ());
 }
 
 int
@@ -99,7 +97,7 @@ stdio_init (void)
       HANDLE out = GetStdHandle (STD_OUTPUT_HANDLE);
       HANDLE err = GetStdHandle (STD_ERROR_HANDLE);
 
-      fdtab.init_std_file_from_handle (0, in, GENERIC_READ, "{stdin}");
+      cygheap->fdtab.init_std_file_from_handle (0, in, GENERIC_READ, "{stdin}");
 
       /* STD_ERROR_HANDLE has been observed to be the same as
 	 STD_OUTPUT_HANDLE.  We need separate handles (e.g. using pipes
@@ -117,19 +115,19 @@ stdio_init (void)
 	    }
 	}
 
-      fdtab.init_std_file_from_handle (1, out, GENERIC_WRITE, "{stdout}");
-      fdtab.init_std_file_from_handle (2, err, GENERIC_WRITE, "{stderr}");
+      cygheap->fdtab.init_std_file_from_handle (1, out, GENERIC_WRITE, "{stdout}");
+      cygheap->fdtab.init_std_file_from_handle (2, err, GENERIC_WRITE, "{stderr}");
     }
 }
 
 int
 dtable::not_open (int fd)
 {
-  SetResourceLock(LOCK_FD_LIST,READ_LOCK," not_open");
+  SetResourceLock(LOCK_FD_LIST, READ_LOCK, "not_open");
 
   int res = fd < 0 || fd >= (int)size || fds[fd] == NULL;
 
-  ReleaseResourceLock(LOCK_FD_LIST,READ_LOCK," not open");
+  ReleaseResourceLock(LOCK_FD_LIST, READ_LOCK, "not open");
   return res;
 }
 
@@ -214,8 +212,8 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 			      DWORD myaccess)
 {
   if (fd == -1)
-    fd = fdtab.find_unused_handle();
-  fhandler_base *res = fdtab.build_fhandler (fd, name, handle);
+    fd = cygheap->fdtab.find_unused_handle();
+  fhandler_base *res = cygheap->fdtab.build_fhandler (fd, name, handle);
   res->init (handle, myaccess, bin);
   return fd;
 }
@@ -377,18 +375,18 @@ dtable::dup2 (int oldfd, int newfd)
 
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
 
-  if ((size_t) newfd >= fdtab.size || newfd < 0)
+  if ((size_t) newfd >= cygheap->fdtab.size || newfd < 0)
     {
       syscall_printf ("new fd out of bounds: %d", newfd);
       set_errno (EBADF);
       goto done;
     }
 
-  if ((size_t) newfd >= fdtab.size)
+  if ((size_t) newfd >= cygheap->fdtab.size)
    {
      int inc_size = NOFILE_INCR * ((newfd + NOFILE_INCR - 1) / NOFILE_INCR) -
-		    fdtab.size;
-     fdtab.extend (inc_size);
+		    cygheap->fdtab.size;
+     cygheap->fdtab.extend (inc_size);
    }
 
   if (!not_open (newfd))
@@ -468,7 +466,7 @@ dtable::select_except (int fd, select_record *s)
 void
 dtable::fixup_before_fork (DWORD target_proc_id)
 {
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  SetResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_fork");
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
@@ -476,28 +474,26 @@ dtable::fixup_before_fork (DWORD target_proc_id)
 	debug_printf ("fd %d(%s)", i, fh->get_name ());
 	fh->fixup_before_fork_exec (target_proc_id);
       }
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  ReleaseResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_fork");
 }
 
 void
 dtable::fixup_before_exec (DWORD target_proc_id)
 {
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_exec");
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
-    if ((fh = fds[i]) != NULL && (!fh->get_close_on_exec ()))
+    if ((fh = fds[i]) != NULL && !fh->get_close_on_exec ())
       {
 	debug_printf ("fd %d(%s)", i, fh->get_name ());
 	fh->fixup_before_fork_exec (target_proc_id);
       }
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_exec");
 }
 
 void
-dtable::fixup_after_exec (HANDLE parent, size_t sz, fhandler_base **f)
+dtable::fixup_after_exec (HANDLE parent)
 {
-  size = sz;
-  fds = f;
   first_fd_for_open = 0;
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
@@ -520,7 +516,6 @@ dtable::fixup_after_exec (HANDLE parent, size_t sz, fhandler_base **f)
 void
 dtable::fixup_after_fork (HANDLE parent)
 {
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
@@ -531,7 +526,6 @@ dtable::fixup_after_fork (HANDLE parent)
 	    fh->fixup_after_fork (parent);
 	  }
       }
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
 }
 
 int
@@ -541,7 +535,7 @@ dtable::vfork_child_dup ()
   newtable = (fhandler_base **) ccalloc (HEAP_ARGV, size, sizeof(fds[0]));
   int res = 1;
 
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  SetResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   for (size_t i = 0; i < size; i++)
     if (not_open (i))
       continue;
@@ -555,14 +549,14 @@ dtable::vfork_child_dup ()
   fds_on_hold = fds;
   fds = newtable;
 out:
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  ReleaseResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   return 1;
 }
 
 void
 dtable::vfork_parent_restore ()
 {
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  SetResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "restore");
 
   close_all_files ();
   fhandler_base **deleteme = fds;
@@ -570,6 +564,30 @@ dtable::vfork_parent_restore ()
   fds_on_hold = NULL;
   cfree (deleteme);
 
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  ReleaseResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "restore");
+  return;
+}
+
+void
+dtable::vfork_child_fixup ()
+{
+  if (!fds_on_hold)
+    return;
+  fhandler_base **saveme = fds;
+  fds = fds_on_hold;
+
+  fhandler_base *fh;
+  for (int i = 0; i < (int) cygheap->fdtab.size; i++)
+    if ((fh = cygheap->fdtab[i]) != NULL)
+      {
+        fh->close ();
+	fh->clear_readahead ();
+        cygheap->fdtab.release (i);
+      }
+
+  fds = saveme;
+  cfree (fds_on_hold);
+  fds_on_hold = NULL;
+
   return;
 }

@@ -17,19 +17,20 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "cygheap.h"
 #include <sys/termios.h>
 
 extern "C" int
 ioctl (int fd, int cmd, void *buf)
 {
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return -1;
     }
 
   debug_printf ("fd %d, cmd %x\n", fd, cmd);
-  fhandler_base *fh = fdtab[fd];
+  fhandler_base *fh = cygheap->fdtab[fd];
   if (fh->is_tty () && fh->get_device () != FH_PTYM)
     switch (cmd)
       {

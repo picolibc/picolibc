@@ -70,6 +70,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "dtable.h"
 #include "cygheap.h"
 #include "shared_info.h"
 #include "registry.h"

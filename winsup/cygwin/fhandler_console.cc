@@ -21,9 +21,10 @@ details. */
 #include <winnls.h>	// MultiByteToWideChar () and friends
 #include <ctype.h>
 #include <sys/cygwin.h>
-#include "cygheap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"

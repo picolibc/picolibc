@@ -1,3 +1,37 @@
+Wed Apr 18 16:53:54 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Throughout, change fdtab references to cygheap->fdtab.
+	* child_info.h (cygheap_exec_info): Eliminate special fdtab stuff.
+	* spawn.cc (spawn_guts): Ditto.
+	* cygheap.cc (cygheap_init): Initialize fdtab, if appropriate.
+	* cygheap.h (CYGHEAPSIZE): Include size of init_cygheap.
+	(_cmalloc_entry): Include fdtab here.
+	* dtable.h (dtable): Declare/define new methods.
+	* dtable.cc (dtable::vfork_child_fixup): New method.
+	(dtable::fixup_after_exec): Remove unneeded extra arguments.
+	* dcrt0.cc (dll_crt0_1): Ditto.
+
+	* environ.cc (getwinenv): Use case sensitive comparison.
+	(winenv): Make a copy of environment cache to avoid realloc problems
+	when duplicate environment variables exist in the environment.  (From
+	Egor Duda)
+
+	* net.cc (cygwin_socket): Revert Apr 14 change.
+
+	* include/sys/file.h: Protect against previous X_OK definition.
+
+Tue Apr 17 12:18:28 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* passwd.cc: Eliminate passwd_sem throughout.
+	* security.cc: Ditto.
+
+Tue Apr 17 12:18:28 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* cygwin.din: Export New functions.
+	* passwd.cc (read_etc_passwd): Make race safe.
+	(getpwuid_r): New function.
+	(getpwnam_r): New function.
+
 2001-04-18  Egor Duda  <deo@logos-m.ru>
 
 	* grp.cc (getgroups): Avoid crash if passwd field if /etc/group is

@@ -20,16 +20,16 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "cygheap.h"
 #include "heap.h"
 #include "cygerrno.h"
-#include "fhandler.h"
-#include "child_info.h"
 #define NEED_VFORK
-#include "perthread.h"
 #include "perprocess.h"
-#include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
+#include "cygheap.h"
+#include "child_info.h"
+#include "path.h"
+#include "perthread.h"
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
@@ -701,8 +701,7 @@ dll_crt0_1 ()
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
 	    envc = spawn_info->moreinfo->envc;
-	    fdtab.fixup_after_exec (spawn_info->parent, spawn_info->moreinfo->nfds,
-				    spawn_info->moreinfo->fds);
+	    cygheap->fdtab.fixup_after_exec (spawn_info->parent);
 	    signal_fixup_after_exec (child_proc_info->type == PROC_SPAWN);
 	    CloseHandle (spawn_info->parent);
 	    if (spawn_info->moreinfo->old_title)
@@ -716,7 +715,6 @@ dll_crt0_1 ()
 	      cygheap->user.set_sid (NULL);
 	    break;
 	}
-      // fdtab.vfork_child_fixup ();
     }
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
@@ -727,6 +725,7 @@ dll_crt0_1 ()
   /* Initialize the cygwin subsystem if this is the first process,
      or attach to shared data structures if it's already running. */
   memory_init ();
+  cygheap->fdtab.vfork_child_fixup ();
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 
@@ -770,7 +769,7 @@ dll_crt0_1 ()
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
       old_title = title_buf;
 
-  /* Allocate fdtab */
+  /* Allocate cygheap->fdtab */
   dtable_init ();
 
 /* Initialize uid, gid. */

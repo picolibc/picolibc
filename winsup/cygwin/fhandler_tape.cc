@@ -16,10 +16,11 @@ details. */
 #include <unistd.h>
 
 #include <sys/mtio.h>
-#include "cygheap.h"
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include "path.h"
 
 /**********************************************************************/

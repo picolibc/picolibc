@@ -15,6 +15,7 @@ details. */
 #include <unistd.h>
 #include "fhandler.h"
 #include "dtable.h"
+#include "cygheap.h"
 #include "cygerrno.h"
 #include "thread.h"
 
@@ -26,7 +27,7 @@ _fcntl (int fd, int cmd,...)
   va_list args;
   int res;
 
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EBADF);
       res = -1;
@@ -37,9 +38,9 @@ _fcntl (int fd, int cmd,...)
   va_start (args, cmd);
   arg = va_arg (args, void *);
   if (cmd == F_DUPFD)
-    res = dup2 (fd, fdtab.find_unused_handle ((int) arg));
+    res = dup2 (fd, cygheap->fdtab.find_unused_handle ((int) arg));
   else
-    res = fdtab[fd]->fcntl(cmd, arg);
+    res = cygheap->fdtab[fd]->fcntl(cmd, arg);
   va_end (args);
   ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"_fcntl");
 

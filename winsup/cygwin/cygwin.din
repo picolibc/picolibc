@@ -933,8 +933,10 @@ getpwduid
 _getpwduid = getpwduid
 getpwnam
 _getpwnam = getpwnam
+getpwnam_r
 getpwuid
 _getpwuid = getpwuid
+getpwuid_r
 getpgrp
 _getpgrp = getpgrp
 getgrent

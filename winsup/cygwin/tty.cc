@@ -18,6 +18,7 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "cygheap.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -68,7 +69,7 @@ tty_init (void)
 void __stdcall
 create_tty_master (int ttynum)
 {
-  tty_master = (fhandler_tty_master *) fdtab.build_fhandler (-1, FH_TTYM,
+  tty_master = (fhandler_tty_master *) cygheap->fdtab.build_fhandler (-1, FH_TTYM,
 							     "/dev/ttym", ttynum);
   if (tty_master->init (ttynum))
     api_fatal ("Can't create master tty");

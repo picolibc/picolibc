@@ -25,6 +25,7 @@ details. */
 #include "perprocess.h"
 #include "path.h"
 #include "security.h"
+#include "dtable.h"
 #include "cygheap.h"
 
 /* Cygwin internal */

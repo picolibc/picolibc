@@ -20,6 +20,8 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "fhandler.h"
+#include "dtable.h"
 #include "cygheap.h"
 #include "registry.h"
 #include "security.h"

@@ -17,6 +17,7 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "cygheap.h"
 #include <cygwin/version.h>
 #include "perprocess.h"
 #include <sys/termios.h>
@@ -27,14 +28,14 @@ tcsendbreak (int fd, int duration)
 {
   int res = -1;
 
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
 
   fhandler_base *fh;
-  fh = fdtab[fd];
+  fh = cygheap->fdtab[fd];
 
   if (!fh->is_tty ())
     set_errno (ENOTTY);
@@ -57,14 +58,14 @@ tcdrain (int fd)
 
   termios_printf ("tcdrain");
 
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
 
   fhandler_base *fh;
-  fh = fdtab[fd];
+  fh = cygheap->fdtab[fd];
 
   if (!fh->is_tty ())
     set_errno (ENOTTY);
@@ -85,14 +86,14 @@ tcflush (int fd, int queue)
 {
   int res = -1;
 
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
 
   fhandler_base *fh;
-  fh = fdtab[fd];
+  fh = cygheap->fdtab[fd];
 
   if (!fh->is_tty ())
     set_errno (ENOTTY);
@@ -113,14 +114,14 @@ tcflow (int fd, int action)
 {
   int res = -1;
 
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
 
   fhandler_base *fh;
-  fh = fdtab[fd];
+  fh = cygheap->fdtab[fd];
 
   if (!fh->is_tty ())
     set_errno (ENOTTY);
@@ -142,14 +143,14 @@ tcsetattr (int fd, int a, const struct termios *t)
   int res = -1;
 
   t = __tonew_termios (t);
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
 
   fhandler_base *fh;
-  fh = fdtab[fd];
+  fh = cygheap->fdtab[fd];
 
   if (!fh->is_tty ())
     set_errno (ENOTTY);
@@ -174,13 +175,13 @@ tcgetattr (int fd, struct termios *in_t)
   int res = -1;
   struct termios *t = __makenew_termios (in_t);
 
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     set_errno (EBADF);
-  else if (!fdtab[fd]->is_tty ())
+  else if (!cygheap->fdtab[fd]->is_tty ())
     set_errno (ENOTTY);
   else
     {
-      if ((res = fdtab[fd]->tcgetattr (t)) == 0)
+      if ((res = cygheap->fdtab[fd]->tcgetattr (t)) == 0)
 	(void) __toapp_termios (in_t, t);
     }
 
@@ -200,12 +201,12 @@ tcgetpgrp (int fd)
 {
   int res = -1;
 
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     set_errno (EBADF);
-  else if (!fdtab[fd]->is_tty ())
+  else if (!cygheap->fdtab[fd]->is_tty ())
     set_errno (ENOTTY);
   else
-    res = fdtab[fd]->tcgetpgrp ();
+    res = cygheap->fdtab[fd]->tcgetpgrp ();
 
   termios_printf ("%d = tcgetpgrp (%d)", res, fd);
   return res;
@@ -217,12 +218,12 @@ tcsetpgrp (int fd, pid_t pgid)
 {
   int res = -1;
 
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     set_errno (EBADF);
-  else if (!fdtab[fd]->is_tty ())
+  else if (!cygheap->fdtab[fd]->is_tty ())
     set_errno (ENOTTY);
   else
-    res = fdtab[fd]->tcsetpgrp (pgid);
+    res = cygheap->fdtab[fd]->tcsetpgrp (pgid);
 
   termios_printf ("%d = tcsetpgrp (%d, %x)", res, fd, pgid);
   return res;

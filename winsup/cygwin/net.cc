@@ -24,12 +24,12 @@ details. */
 #include <fcntl.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
-#include "cygheap.h"
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
+#include "cygheap.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -327,10 +327,10 @@ fdsock (int fd, const char *name, SOCKET soc)
 {
   if (wsadata.wVersion < 512) /* < Winsock 2.0 */
     soc = set_socket_inheritance (soc);
-  fhandler_socket *fh = (fhandler_socket *) fdtab.build_fhandler (fd, FH_SOCKET, name);
+  fhandler_socket *fh = (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR);
-  fdtab.inc_need_fixup_before ();
+  cygheap->fdtab.inc_need_fixup_before ();
   return fh;
 }
 
@@ -343,7 +343,7 @@ cygwin_socket (int af, int type, int protocol)
 
   SOCKET soc;
 
-  int fd = fdtab.find_unused_handle ();
+  int fd = cygheap->fdtab.find_unused_handle ();
 
   if (fd < 0)
     set_errno (EMFILE);
@@ -363,12 +363,7 @@ cygwin_socket (int af, int type, int protocol)
       if (af == AF_INET)
 	name = (type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp");
       else
-	{
-	  name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
-	  /* Set LINGER with 0 timeout for hard close */
-	  struct linger tmp = {1, 0}; /* On, 0 delay */
-	  (void) setsockopt (soc, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof(tmp));
-	}
+	name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
 
       fdsock (fd, name, soc)->set_addr_family (af);
       res = fd;
@@ -435,7 +430,7 @@ cygwin_sendto (int fd,
 		 const struct sockaddr *to,
 		 int tolen)
 {
-  fhandler_socket *h = (fhandler_socket *) fdtab[fd];
+  fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sockaddr_in sin;
   sigframe thisframe (mainthread);
 
@@ -461,7 +456,7 @@ cygwin_recvfrom (int fd,
 		   struct sockaddr *from,
 		   int *fromlen)
 {
-  fhandler_socket *h = (fhandler_socket *) fdtab[fd];
+  fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sigframe thisframe (mainthread);
 
   debug_printf ("recvfrom %d", h->get_socket ());
@@ -480,13 +475,13 @@ cygwin_recvfrom (int fd,
 fhandler_socket *
 get (int fd)
 {
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EINVAL);
       return 0;
     }
 
-  return fdtab[fd]->is_socket ();
+  return cygheap->fdtab[fd]->is_socket ();
 }
 
 /* exported as setsockopt: standards? */
@@ -823,7 +818,7 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 
       SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "accept");
 
-      int res_fd = fdtab.find_unused_handle ();
+      int res_fd = cygheap->fdtab.find_unused_handle ();
       if (res_fd == -1)
 	{
 	  /* FIXME: what is correct errno? */
@@ -1021,7 +1016,7 @@ cygwin_hstrerror (int err)
 extern "C" void
 cygwin_herror (const char *s)
 {
-  if (fdtab.not_open (2))
+  if (cygheap->fdtab.not_open (2))
     return;
 
   if (s)
@@ -1053,7 +1048,7 @@ cygwin_herror (const char *s)
 extern "C" int
 cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 {
-  fhandler_socket *h = (fhandler_socket *) fdtab[fd];
+  fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
 
   debug_printf ("getpeername %d", h->get_socket ());
   int res = getpeername (h->get_socket (), name, len);
@@ -1068,7 +1063,7 @@ cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 extern "C" int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
-  fhandler_socket *h = (fhandler_socket *) fdtab[fd];
+  fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sigframe thisframe (mainthread);
 
   int res = recv (h->get_socket (), (char *) buf, len, flags);
@@ -1093,7 +1088,7 @@ cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 extern "C" int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
-  fhandler_socket *h = (fhandler_socket *) fdtab[fd];
+  fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sigframe thisframe (mainthread);
 
   int res = send (h->get_socket (), (const char *) buf, len, flags);
@@ -1728,13 +1723,13 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
   SOCKET fd2s;
   sigframe thisframe (mainthread);
 
-  int res_fd = fdtab.find_unused_handle ();
+  int res_fd = cygheap->fdtab.find_unused_handle ();
   if (res_fd == -1)
     goto done;
 
   if (fd2p)
     {
-      *fd2p = fdtab.find_unused_handle (res_fd + 1);
+      *fd2p = cygheap->fdtab.find_unused_handle (res_fd + 1);
       if (*fd2p == -1)
 	goto done;
     }
@@ -1763,7 +1758,7 @@ cygwin_rresvport (int *port)
   int res = -1;
   sigframe thisframe (mainthread);
 
-  int res_fd = fdtab.find_unused_handle ();
+  int res_fd = cygheap->fdtab.find_unused_handle ();
   if (res_fd == -1)
     goto done;
   res = rresvport (port);
@@ -1789,12 +1784,12 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
   SOCKET fd2s;
   sigframe thisframe (mainthread);
 
-  int res_fd = fdtab.find_unused_handle ();
+  int res_fd = cygheap->fdtab.find_unused_handle ();
   if (res_fd == -1)
     goto done;
   if (fd2p)
     {
-      *fd2p = fdtab.find_unused_handle (res_fd + 1);
+      *fd2p = cygheap->fdtab.find_unused_handle (res_fd + 1);
       if (*fd2p == -1)
 	goto done;
     }
@@ -1826,13 +1821,13 @@ socketpair (int, int type, int, int *sb)
 
   SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "socketpair");
 
-  sb[0] = fdtab.find_unused_handle ();
+  sb[0] = cygheap->fdtab.find_unused_handle ();
   if (sb[0] == -1)
     {
       set_errno (EMFILE);
       goto done;
     }
-  sb[1] = fdtab.find_unused_handle (sb[0] + 1);
+  sb[1] = cygheap->fdtab.find_unused_handle (sb[0] + 1);
   if (sb[1] == -1)
     {
       set_errno (EMFILE);

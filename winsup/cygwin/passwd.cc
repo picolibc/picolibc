@@ -35,6 +35,7 @@ static int max_lines = 0;
    and read in the password file if it isn't set. */
 enum pwd_state {
   uninitialized = 0,
+  initializing,
   emulated,
   loaded
 };
@@ -120,34 +121,54 @@ add_pwd_line (char *line)
 void
 read_etc_passwd ()
 {
-    extern int passwd_sem;
     char linebuf[1024];
-    ++passwd_sem;
-    FILE *f = fopen ("/etc/passwd", "rt");
-    --passwd_sem;
+    /* A mutex is ok for speed here - pthreads will use critical sections not mutex's
+     * for non-shared mutexs in the future. Also, this function will at most be called
+     * once from each thread, after that the passwd_state test will succeed
+     */
+    static pthread_mutex_t etc_passwd_mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_lock (&etc_passwd_mutex);
 
-    if (f)
+    /* if we got blocked by the mutex, then etc_passwd may have been processed */
+    if (passwd_state != uninitialized)
       {
-	while (fgets (linebuf, sizeof (linebuf), f) != NULL)
+        pthread_mutex_unlock(&etc_passwd_mutex);
+        return;
+      }
+
+    if (passwd_state != initializing)
+      {
+	passwd_state = initializing;
+
+	FILE *f = fopen ("/etc/passwd", "rt");
+
+	if (f)
 	  {
-	    if (strlen (linebuf))
-	      add_pwd_line (linebuf);
+	    while (fgets (linebuf, sizeof (linebuf), f) != NULL)
+	      {
+		if (strlen (linebuf))
+		  add_pwd_line (linebuf);
+	      }
+
+	    fclose (f);
+	    passwd_state = loaded;
+	  }
+	else
+	  {
+	    debug_printf ("Emulating /etc/passwd");
+	    snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh", cygheap->user.name (),
+		      DEFAULT_UID, DEFAULT_GID, getenv ("HOME") ?: "/");
+	    add_pwd_line (linebuf);
+	    passwd_state = emulated;
 	  }
 
-	fclose (f);
-	passwd_state = loaded;
       }
-    else
-      {
-	debug_printf ("Emulating /etc/passwd");
-	snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh", cygheap->user.name (),
-		  DEFAULT_UID, DEFAULT_GID, getenv ("HOME") ?: "/");
-	add_pwd_line (linebuf);
-	passwd_state = emulated;
-      }
+
+  pthread_mutex_unlock (&etc_passwd_mutex);
 }
 
 /* Cygwin internal */
+/* If this ever becomes non-reentrant, update all the getpw*_r functions */
 static struct passwd *
 search_for (uid_t uid, const char *name)
 {
@@ -182,25 +203,98 @@ search_for (uid_t uid, const char *name)
 extern "C" struct passwd *
 getpwuid (uid_t uid)
 {
-  if (passwd_state == uninitialized)
+  if (passwd_state  <= initializing)
     read_etc_passwd ();
 
   return search_for (uid, 0);
 }
 
+extern "C" int 
+getpwuid_r (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
+{
+  *result = NULL;
+
+  if (!pwd || !buffer)
+    return ERANGE;
+
+  if (passwd_state  <= initializing)
+    read_etc_passwd ();
+
+  struct passwd *temppw = search_for (uid, 0);
+
+  if (!temppw)
+    return 0;
+
+  /* check needed buffer size. */
+  size_t needsize = strlen (temppw->pw_name) + strlen (temppw->pw_dir) + strlen (temppw->pw_shell);
+  if (needsize > bufsize)
+    return ERANGE;
+
+  /* make a copy of temppw */
+  *result = pwd;
+  pwd->pw_uid = temppw->pw_uid;
+  pwd->pw_gid = temppw->pw_gid;
+  pwd->pw_name = buffer;
+  pwd->pw_dir = buffer + strlen (temppw->pw_name);
+  pwd->pw_shell = buffer + strlen (temppw->pw_name) + strlen (temppw->pw_dir);
+  strcpy (pwd->pw_name, temppw->pw_name);
+  strcpy (pwd->pw_dir, temppw->pw_dir);
+  strcpy (pwd->pw_shell, temppw->pw_shell);
+  return 0;
+}
+
 extern "C" struct passwd *
 getpwnam (const char *name)
 {
-  if (passwd_state == uninitialized)
+  if (passwd_state  <= initializing)
     read_etc_passwd ();
 
   return search_for (0, name);
 }
 
+
+/* the max size buffer we can expect to 
+ * use is returned via sysconf with _SC_GETPW_R_SIZE_MAX.
+ * This may need updating! - Rob Collins April 2001.
+ */
+extern "C" int
+getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
+{
+  *result = NULL;
+
+  if (!pwd || !buffer || !nam)
+    return ERANGE;
+
+  if (passwd_state  <= initializing)
+    read_etc_passwd ();
+
+  struct passwd *temppw = search_for (0, nam);
+
+  if (!temppw)
+    return 0;
+
+  /* check needed buffer size. */
+  size_t needsize = strlen (temppw->pw_name) + strlen (temppw->pw_dir) + strlen (temppw->pw_shell);
+  if (needsize > bufsize)
+    return ERANGE;
+    
+  /* make a copy of temppw */
+  *result = pwd;
+  pwd->pw_uid = temppw->pw_uid;
+  pwd->pw_gid = temppw->pw_gid;
+  pwd->pw_name = buffer;
+  pwd->pw_dir = buffer + strlen (temppw->pw_name);
+  pwd->pw_shell = buffer + strlen (temppw->pw_name) + strlen (temppw->pw_dir);
+  strcpy (pwd->pw_name, temppw->pw_name);
+  strcpy (pwd->pw_dir, temppw->pw_dir);
+  strcpy (pwd->pw_shell, temppw->pw_shell);
+  return 0;
+}
+
 extern "C" struct passwd *
 getpwent (void)
 {
-  if (passwd_state == uninitialized)
+  if (passwd_state  <= initializing)
     read_etc_passwd ();
 
   if (pw_pos < curr_lines)
@@ -212,7 +306,7 @@ getpwent (void)
 extern "C" struct passwd *
 getpwduid (uid_t)
 {
-  if (passwd_state == uninitialized)
+  if (passwd_state  <= initializing)
     read_etc_passwd ();
 
   return NULL;
@@ -221,7 +315,7 @@ getpwduid (uid_t)
 extern "C" void
 setpwent (void)
 {
-  if (passwd_state == uninitialized)
+  if (passwd_state  <= initializing)
     read_etc_passwd ();
 
   pw_pos = 0;
@@ -230,7 +324,7 @@ setpwent (void)
 extern "C" void
 endpwent (void)
 {
-  if (passwd_state == uninitialized)
+  if (passwd_state  <= initializing)
     read_etc_passwd ();
 
   pw_pos = 0;
@@ -239,7 +333,7 @@ endpwent (void)
 extern "C" int
 setpassent ()
 {
-  if (passwd_state == uninitialized)
+  if (passwd_state  <= initializing)
     read_etc_passwd ();
 
   return 0;
@@ -255,17 +349,17 @@ getpass (const char * prompt)
 #endif
   struct termios ti, newti;
 
-  if (passwd_state == uninitialized)
+  if (passwd_state  <= initializing)
     read_etc_passwd ();
 
-  if (fdtab.not_open (0))
+  if (cygheap->fdtab.not_open (0))
     {
       set_errno (EBADF);
       pass[0] = '\0';
     }
   else
     {
-      fhandler_base *fhstdin = fdtab[0];
+      fhandler_base *fhstdin = cygheap->fdtab[0];
       fhstdin->tcgetattr (&ti);
       newti = ti;
       newti.c_lflag &= ~ECHO;

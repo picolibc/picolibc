@@ -61,8 +61,8 @@ class mmap_record
        base_address_ (b),
        map_map_ (NULL)
       {
-        if (fd >= 0 && !fdtab.not_open (fd))
-	  devtype_ = fdtab[fd]->get_device ();
+        if (fd >= 0 && !cygheap->fdtab.not_open (fd))
+	  devtype_ = cygheap->fdtab[fd]->get_device ();
       }
 
     /* Default Copy constructor/operator=/destructor are ok */
@@ -231,7 +231,7 @@ mmap_record::alloc_fh ()
      the call to fork(). This requires creating a fhandler
      of the correct type to be sure to call the method of the
      correct class. */
-  return fdtab.build_fhandler (-1, get_device (), "", 0);
+  return cygheap->fdtab.build_fhandler (-1, get_device (), "", 0);
 }
 
 void
@@ -355,7 +355,7 @@ map::get_list_by_fd (int fd)
 #else /* so we use the name hash value to identify the file unless
          it's not an anonymous mapping. */
     if ((fd == -1 && lists[i]->fd == -1)
-        || (fd != -1 && lists[i]->hash == fdtab[fd]->get_namehash ()))
+        || (fd != -1 && lists[i]->hash == cygheap->fdtab[fd]->get_namehash ()))
 #endif
       return lists[i];
   return 0;
@@ -366,7 +366,7 @@ map::add_list (list *l, int fd)
 {
   l->fd = fd;
   if (fd != -1)
-    l->hash = fdtab[fd]->get_namehash ();
+    l->hash = cygheap->fdtab[fd]->get_namehash ();
   if (nlists == maxlists)
     {
       maxlists += 5;
@@ -471,14 +471,14 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   if (fd != -1)
     {
       /* Ensure that fd is open */
-      if (fdtab.not_open (fd))
+      if (cygheap->fdtab.not_open (fd))
 	{
 	  set_errno (EBADF);
 	  syscall_printf ("-1 = mmap(): EBADF");
 	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
 	  return MAP_FAILED;
 	}
-      fh = fdtab[fd];
+      fh = cygheap->fdtab[fd];
       if (fh->get_device () == FH_DISK)
         {
 	  DWORD fsiz = GetFileSize (fh->get_handle (), NULL);

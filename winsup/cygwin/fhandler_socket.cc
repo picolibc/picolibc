@@ -21,10 +21,10 @@
 #include <fcntl.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
-#include "cygheap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "cygheap.h"
 #include "sigproc.h"
 
 #define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"

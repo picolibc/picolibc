@@ -24,8 +24,6 @@ enum cygheap_types
   HEAP_1_MAX = 100
 };
 
-#define CYGHEAPSIZE ((4000 * sizeof (fhandler_union)) + (2 * 65536))
-
 #define incygheap(s) (cygheap && ((char *) (s) >= (char *) cygheap) && ((char *) (s) <= ((char *) cygheap_max)))
 
 struct _cmalloc_entry
@@ -124,7 +122,10 @@ struct init_cygheap
   HANDLE shared_h;
   HANDLE console_h;
   cwdstuff cwd;
+  dtable fdtab;
 };
+
+#define CYGHEAPSIZE (sizeof (init_cygheap) + (4000 * sizeof (fhandler_union)) + (2 * 65536))
 
 extern init_cygheap *cygheap;
 extern void *cygheap_max;

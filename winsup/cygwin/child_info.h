@@ -61,8 +61,6 @@ class cygheap_exec_info
 public:
   uid_t uid;
   char *old_title;
-  fhandler_base **fds;
-  size_t nfds;
   int argc;
   char **argv;
   int envc;

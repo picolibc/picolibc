@@ -151,7 +151,7 @@ out:
 static HANDLE
 handle (int n, int direction)
 {
-  fhandler_base *fh = fdtab[n];
+  fhandler_base *fh = cygheap->fdtab[n];
 
   if (!fh)
     return INVALID_HANDLE_VALUE;
@@ -340,8 +340,6 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 
   ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
   ciresrv.moreinfo->old_title = NULL;
-  ciresrv.moreinfo->fds = fdtab;
-  ciresrv.moreinfo->nfds = fdtab.size;
 
   /* CreateProcess takes one long string that is the command line (sigh).
      We need to quote any argument that has whitespace or embedded "'s.  */
@@ -563,7 +561,7 @@ skip_arg_parsing:
      parent after CreateProcess and before copying the datastructures
      to the child. So we have to start the child in suspend state,
      unfortunately, to avoid a race condition. */
-  if (fdtab.need_fixup_before ())
+  if (cygheap->fdtab.need_fixup_before ())
     flags |= CREATE_SUSPENDED;
 
 
@@ -690,9 +688,9 @@ skip_arg_parsing:
 
   /* Fixup the parent datastructure if needed and resume the child's
      main thread. */
-  if (fdtab.need_fixup_before ())
+  if (cygheap->fdtab.need_fixup_before ())
     {
-      fdtab.fixup_before_exec (pi.dwProcessId);
+      cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
       if (mode == _P_OVERLAY)
         ResumeThread (pi.hThread);
     }

@@ -13,12 +13,13 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "cygheap.h"
 #include <sys/cygwin.h>
 #include <signal.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include "path.h"
 #include "shared_info.h"
 #include "host_dependent.h"
@@ -77,7 +78,7 @@ fhandler_base::get_readahead ()
 {
   int chret = -1;
   if (raixget < ralen)
-    chret = ((unsigned char)rabuf[raixget++]) & 0xff;
+    chret = ((unsigned char) rabuf[raixget++]) & 0xff;
   /* FIXME - not thread safe */
   if (raixget >= ralen)
     raixget = raixput = ralen = 0;

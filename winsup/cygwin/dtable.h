@@ -21,6 +21,7 @@ public:
   size_t size;
 
   dtable () : first_fd_for_open(3), cnt_need_fixup_before(0) {}
+  void init () {first_fd_for_open = 3;}
 
   void dec_need_fixup_before ()
     { if (cnt_need_fixup_before > 0) --cnt_need_fixup_before; }
@@ -31,6 +32,7 @@ public:
 
   int vfork_child_dup ();
   void vfork_parent_restore ();
+  void vfork_child_fixup ();
   fhandler_base *dup_worker (fhandler_base *oldfh);
   int extend (int howmuch);
   void fixup_before_exec (DWORD win_proc_id);
@@ -45,7 +47,7 @@ public:
   void release (int fd);
   void init_std_file_from_handle (int fd, HANDLE handle, DWORD access, const char *name);
   int dup2 (int oldfd, int newfd);
-  void fixup_after_exec (HANDLE, size_t, fhandler_base **);
+  void fixup_after_exec (HANDLE);
   inline fhandler_base *operator [](int fd) { return fds[fd]; }
   select_record *select_read (int fd, select_record *s);
   select_record *select_write (int fd, select_record *s);

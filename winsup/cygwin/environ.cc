@@ -22,6 +22,7 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "cygerrno.h"
+#include "dtable.h"
 #include "cygheap.h"
 #include "registry.h"
 #include "environ.h"
@@ -105,7 +106,7 @@ getwinenv (const char *env, const char *in_posix)
     return NULL;
 
   for (int i = 0; conv_envvars[i].name != NULL; i++)
-    if (strncasematch (env, conv_envvars[i].name, conv_envvars[i].namelen))
+    if (strncmp (env, conv_envvars[i].name, conv_envvars[i].namelen) == 0)
       {
 	win_env *we = conv_envvars + i;
 	const char *val;
@@ -735,10 +736,14 @@ winenv (const char * const *envp, int keep_posix)
       len = strcspn (*srcp, "=") + 1;
       win_env *conv;
 
-      if (!keep_posix && (conv = getwinenv (*srcp, *srcp + len)))
-	*dstp = conv->native;
-      else
+      if (keep_posix || !(conv = getwinenv (*srcp, *srcp + len)))
 	*dstp = *srcp;
+      else
+	{
+	  char *p = (char *) alloca (strlen (conv->native) + 1);
+	  strcpy (p, conv->native);
+	  *dstp = p;
+	}
       tl += strlen (*dstp) + 1;
       if ((*dstp)[0] == '!' && isdrive ((*dstp) + 1) && (*dstp)[3] == '=')
 	{

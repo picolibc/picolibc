@@ -185,7 +185,6 @@ get_world_sid ()
   return world_sid;
 }
 
-int passwd_sem = 0;
 int group_sem = 0;
 
 static int
@@ -207,10 +206,6 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
 
       if (!search_grp)
 	{
-	  if (passwd_sem > 0)
-	    return 0;
-	  ++passwd_sem;
-
 	  struct passwd *pw;
 	  while ((pw = getpwent ()) != NULL)
 	    {
@@ -221,7 +216,6 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
 		}
 	    }
 	  endpwent ();
-	  --passwd_sem;
 	  if (id >= 0)
 	    {
 	      if (type)
@@ -330,7 +324,7 @@ is_grp_member (uid_t uid, gid_t gid)
   extern int getgroups (int, gid_t *, gid_t, const char *);
   BOOL grp_member = TRUE;
 
-  if (!group_sem && !passwd_sem)
+  if (!group_sem)
     {
       struct passwd *pw = getpwuid (uid);
       gid_t grps[NGROUPS_MAX];
@@ -1745,13 +1739,13 @@ extern "C"
 int
 facl (int fd, int cmd, int nentries, aclent_t *aclbufp)
 {
-  if (fdtab.not_open (fd))
+  if (cygheap->fdtab.not_open (fd))
     {
       syscall_printf ("-1 = facl (%d)", fd);
       set_errno (EBADF);
       return -1;
     }
-  const char *path = fdtab[fd]->get_name ();
+  const char *path = cygheap->fdtab[fd]->get_name ();
   if (path == NULL)
     {
       syscall_printf ("-1 = facl (%d) (no name)", fd);

@@ -274,7 +274,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   MALLOC_CHECK;
 
   pinfo_fixup_after_fork ();
-  fdtab.fixup_after_fork (hParent);
+  cygheap->fdtab.fixup_after_fork (hParent);
   signal_fixup_after_fork ();
 
   MALLOC_CHECK;
@@ -377,7 +377,7 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll,
      parent after CreateProcess and before copying the datastructures
      to the child. So we have to start the child in suspend state,
      unfortunately, to avoid a race condition. */
-  if (fdtab.need_fixup_before ())
+  if (cygheap->fdtab.need_fixup_before ())
     c_flags |= CREATE_SUSPENDED;
 
   /* Create an inheritable handle to pass to the child process.  This will
@@ -490,9 +490,9 @@ out:
 
   /* Fixup the parent datastructure if needed and resume the child's
      main thread. */
-  if (fdtab.need_fixup_before ())
+  if (cygheap->fdtab.need_fixup_before ())
     {
-      fdtab.fixup_before_fork (pi.dwProcessId);
+      cygheap->fdtab.fixup_before_fork (pi.dwProcessId);
       ResumeThread (pi.hThread);
     }
 
@@ -708,10 +708,10 @@ vfork ()
       for (pp = (char **)vf->frame, esp = vf->vfork_esp;
 	   esp <= vf->vfork_ebp + 1; pp++, esp++)
 	*pp = *esp;
-      return fdtab.vfork_child_dup () ? 0 : -1;
+      return cygheap->fdtab.vfork_child_dup () ? 0 : -1;
     }
 
-  fdtab.vfork_parent_restore ();
+  cygheap->fdtab.vfork_parent_restore ();
 
   vf = get_vfork_val ();
   if (vf->pid < 0)

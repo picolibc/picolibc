@@ -13,6 +13,8 @@
 #include <fhandler.h>
 #include <assert.h>
 #include <stdlib.h>
+#include "fhandler.h"
+#include "dtable.h"
 #include "cygheap.h"
 #include "heap.h"
 #include "cygerrno.h"
@@ -66,6 +68,8 @@ cygheap_init ()
 {
   cygheap_protect = new_muto (FALSE, "cygheap_protect");
   _csbrk (0);
+  if (!cygheap->fdtab)
+    cygheap->fdtab.init ();
 }
 
 /* Copyright (C) 1997, 2000 DJ Delorie */

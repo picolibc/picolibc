@@ -16,6 +16,7 @@ details. */
 #include <ntdef.h>
 #include "fhandler.h"
 #include "dtable.h"
+#include "cygheap.h"
 #include "cygerrno.h"
 #include "ntdll.h"
 
@@ -34,7 +35,7 @@ sysconf (int in)
 	/* FIXME: this returns the current limit which can increase
 	   if and when dtable::find_unused_handle is called.  Perhaps
 	   we should return NOFILE or OPEN_MAX instead? */
-	return fdtab.size;
+	return cygheap->fdtab.size;
       case _SC_PAGESIZE:
 	return getpagesize ();
       case _SC_CLK_TCK:
