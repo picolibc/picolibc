@@ -92,10 +92,11 @@ details. */
        14: Export snprintf and vnsprintf.
        15: Export glob
        16: Export cygwin_stackdump
+       17: Export fast math stuff
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 16
+#define CYGWIN_VERSION_API_MINOR 17
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
