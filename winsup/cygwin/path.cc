@@ -161,10 +161,10 @@ path_prefix_p (const char *path1, const char *path2, int len1)
   if (len1 == 0)
     return isdirsep (path2[0]) && !isdirsep (path2[1]);
 
-  if (!pathnmatch (path1, path2, len1))
-    return 0;
+  if (isdirsep (path2[len1]) || path2[len1] == 0 || path1[len1 - 1] == ':')
+    return pathnmatch (path1, path2, len1);
 
-  return isdirsep (path2[len1]) || path2[len1] == 0 || path1[len1 - 1] == ':';
+  return 0;
 }
 
 /* Return non-zero if paths match in first len chars.

@@ -1,3 +1,7 @@
+2004-04-07  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* path.cc (path_prefix_p): Optimize test order.
+
 2004-04-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (EXTRALIBS): Add libtextreadmode.a.
