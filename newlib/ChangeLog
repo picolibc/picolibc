@@ -1,3 +1,7 @@
+2000-08-30  Kazu Hirata  <kazu@hxi.com>
+
+        * libc/sys/h8300hms/crt0.S: Optimize for both speed and code size.
+
 2000-08-30  Werner Almesberger  <Werner.Almesberger@epfl.ch>
 
         * libc/posix/execve.c: included unistd.h for "_execve" prototype.

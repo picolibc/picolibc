@@ -8,7 +8,7 @@ _start:
 	mov.w	#_stack,sp
 	mov.w	#_edata,r0
 	mov.w	#_end,r1
-	mov.w	#0,r2
+	sub.w   r2,r2
 .loop:	mov.w	r2,@r0
 	adds	#2,r0
 	cmp	r1,r0
@@ -31,7 +31,7 @@ _start:
 	mov.l	#_stack,sp
 	mov.l	#_edata,er0
 	mov.l	#_end,er1
-	mov.w	#0,r2		; not sure about alignment requirements
+	sub.w   r2,r2           ; not sure about alignment requirements
 .loop:	mov.w	r2,@er0		; playing it safe for now
 	adds	#2,er0
 	cmp.l	er1,er0
@@ -54,7 +54,7 @@ _start:
 	mov.l	#_stack,sp
 	mov.l	#_edata,er0
 	mov.l	#_end,er1
-	mov.w	#0,r2		; not sure about alignment requirements
+	sub.w   r2,r2           ; not sure about alignment requirements
 .loop:	mov.w	r2,@er0		; playing it safe for now
 	adds	#2,er0
 	cmp.l	er1,er0
