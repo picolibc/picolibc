@@ -1,3 +1,12 @@
+Sat Jul 28 22:30:55 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (alloc_stack_hard_way): Make half-hearted attempt to deal
+	with growing stack under Windows 95.
+
+Fri Jul 27 12:36:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Add install-lib and install-headers.
+
 Fri Jul 27 12:28:12 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygwin.din: Export sys_errlist, sys_nerr.

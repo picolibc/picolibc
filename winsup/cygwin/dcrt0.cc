@@ -539,6 +539,8 @@ static NO_COPY STARTUPINFO si;
 child_info_fork NO_COPY *child_proc_info = NULL;
 static MEMORY_BASIC_INFORMATION sm;
 
+#define CYGWIN_GUARD ((os_being_run == winNT) ? PAGE_GUARD : PAGE_NOACCESS)
+
 // __inline__ void
 extern void
 alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
@@ -578,7 +580,7 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
     {
       m.BaseAddress = (LPVOID)((DWORD)m.BaseAddress - 1);
       if (!VirtualAlloc ((LPVOID) m.BaseAddress, 1, MEM_COMMIT,
-			 PAGE_EXECUTE_READWRITE|PAGE_GUARD))
+			 PAGE_EXECUTE_READWRITE|CYGWIN_GUARD))
 	api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
 		   m.BaseAddress);
     }

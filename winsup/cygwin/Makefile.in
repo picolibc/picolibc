@@ -132,7 +132,8 @@ DLL_OFILES:=assert.o autoload.o cygheap.o dcrt0.o debug.o delqueue.o dir.o \
 
 GMON_OFILES:= gmon.o mcount.o profil.o
 
-.PHONY: all force dll_ofiles install all_target install_target all_host install_host
+.PHONY: all force dll_ofiles install all_target install_target all_host install_host \
+	install install_target install-libs install-headers
 
 .SUFFIXES:
 .SUFFIXES: .c .cc .def .a .o .d
@@ -148,11 +149,15 @@ all_host: new-$(LIB_NAME) cygrun.exe
 
 force:
 
-install: all $(install_host) $(install_target)
+install: install-libs install-headers $(install_host) $(install_target)
+
+install-libs: $(LIB_NAME)
 	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME); \
 	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) automode.o binmode.o textmode.o ; do \
 	    $(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
-	done ; \
+	done
+
+install-headers:
 	cd $(srcdir); \
 	for sub in `find include -name '[a-z]*' -type d -print | sort`; do \
 	    for i in $$sub/*.h ; do \
