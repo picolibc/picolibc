@@ -1,3 +1,7 @@
+1999-06-21  Philip Blundell  <pb@nexus.co.uk>
+
+	* arm.h (F_SOFTFLOAT): Define.
+
 1999-07-05  Nick Clifton  <nickc@cygnus.com>
 
 	* arm.h (F_ARM_5): Define.
