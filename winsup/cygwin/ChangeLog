@@ -1,3 +1,29 @@
+2002-08-26  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler_socket.cc (fhandler_socket::check_peer_secret_event):
+	Fix strace message.
+	(fhandler_socket::connect): Remove sigframe.
+	(fhandler_socket::accept): Ditto.
+	(fhandler_socket::getsockname): Ditto.
+	(fhandler_socket::getpeername): Ditto.
+	(fhandler_socket::recvfrom): Ditto.
+	(fhandler_socket::recvmsg): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Ditto.
+	(fhandler_socket::close): Ditto.
+	(fhandler_socket::ioctl): Ditto.
+	* ioctl.cc (ioctl): Add sigframe.
+	*net.cc (cygwin_sendto): Ditto.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_connect): Ditto.
+	(cygwin_shutdown): Ditto.
+	(cygwin_getpeername): Ditto.
+	(cygwin_accept): Ditto.  Improve strace message.
+	(cygwin_getsockname): Ditto.  Ditto.
+	(cygwin_recvmsg): Ditto.  Ditto.
+	(cygwin_sendmsg): Fix strace message.
+
 2002-08-27  Christopher Faylor  <cgf@redhat.com>
 
 	* child_info.h: Add _PROC_WHOOPS enum value.

@@ -568,6 +568,8 @@ cygwin_sendto (int fd, const void *buf, int len, int flags,
 	       const struct sockaddr *to, int tolen)
 {
   int res;
+  sigframe thisframe (mainthread);
+
   fhandler_socket *fh = get (fd);
 
   if ((len && __check_invalid_read_ptr_errno (buf, (unsigned) len))
@@ -589,6 +591,8 @@ cygwin_recvfrom (int fd, void *buf, int len, int flags,
 		 struct sockaddr *from, int *fromlen)
 {
   int res;
+  sigframe thisframe (mainthread);
+
   fhandler_socket *fh = get (fd);
 
   if ((len && __check_null_invalid_struct_errno (buf, (unsigned) len))
@@ -742,6 +746,8 @@ extern "C" int
 cygwin_connect (int fd, const struct sockaddr *name, int namelen)
 {
   int res;
+  sigframe thisframe (mainthread);
+
   fhandler_socket *fh = get (fd);
 
   if (__check_invalid_read_ptr_errno (name, namelen) || !fh)
@@ -1002,6 +1008,8 @@ extern "C" int
 cygwin_accept (int fd, struct sockaddr *peer, int *len)
 {
   int res;
+  sigframe thisframe (mainthread);
+
   fhandler_socket *fh = get (fd);
 
   if ((peer && (check_null_invalid_struct_errno (len)
@@ -1011,7 +1019,7 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
   else
     res = fh->accept (peer, len);
 
-  syscall_printf ("%d = accept (%d, %p, %d)", res, fd, peer, len);
+  syscall_printf ("%d = accept (%d, %p, %p)", res, fd, peer, len);
   return res;
 }
 
@@ -1036,6 +1044,8 @@ extern "C" int
 cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 {
   int res;
+  sigframe thisframe (mainthread);
+
   fhandler_socket *fh = get (fd);
 
   if (check_null_invalid_struct_errno (namelen)
@@ -1045,7 +1055,7 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
   else
     res = fh->getsockname (addr, namelen);
 
-  syscall_printf ("%d = getsockname (%d, %p, %d)", res, fd, addr, namelen);
+  syscall_printf ("%d = getsockname (%d, %p, %p)", res, fd, addr, namelen);
   return res;
 }
 
@@ -1070,6 +1080,8 @@ extern "C" int
 cygwin_shutdown (int fd, int how)
 {
   int res;
+  sigframe thisframe (mainthread);
+
   fhandler_socket *fh = get (fd);
 
   if (!fh)
@@ -1133,6 +1145,8 @@ extern "C" int
 cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 {
   int res;
+  sigframe thisframe (mainthread);
+
   fhandler_socket *fh = get (fd);
 
   if (check_null_invalid_struct_errno (len)
@@ -2087,6 +2101,8 @@ extern "C" int
 cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 {
   int res;
+  sigframe thisframe (mainthread);
+
   fhandler_socket *fh = get (fd);
 
   if (check_null_invalid_struct_errno (msg)
@@ -2098,7 +2114,7 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
   else
     res = fh->recvmsg (msg, flags);
 
-  syscall_printf ("%d = recvmsg (%d, %p, %d)", res, fd, msg, flags);
+  syscall_printf ("%d = recvmsg (%d, %p, %x)", res, fd, msg, flags);
   return res;
 }
 
@@ -2118,6 +2134,6 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
   else
     res = fh->sendmsg (msg, flags);
 
-  syscall_printf ("%d = recvmsg (%d, %p, %d)", res, fd, msg, flags);
+  syscall_printf ("%d = sendmsg (%d, %p, %x)", res, fd, msg, flags);
   return res;
 }

@@ -20,11 +20,14 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "sigproc.h"
 #include <sys/termios.h>
 
 extern "C" int
 ioctl (int fd, int cmd, ...)
 {
+  sigframe thisframe (mainthread);
+
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     return -1;
