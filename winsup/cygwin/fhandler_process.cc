@@ -81,7 +81,7 @@ static const char * const process_listing[] =
 static const int PROCESS_LINK_COUNT =
   (sizeof (process_listing) / sizeof (const char *)) - 1;
 
-static _off64_t format_process_maps (_pinfo *p, char *destbuf, size_t maxsize);
+static _off64_t format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize);
 static _off64_t format_process_stat (_pinfo *p, char *destbuf, size_t maxsize);
 static _off64_t format_process_status (_pinfo *p, char *destbuf, size_t maxsize);
 static _off64_t format_process_statm (_pinfo *p, char *destbuf, size_t maxsize);
@@ -474,7 +474,7 @@ fhandler_process::fill_filebuf ()
 }
 
 static _off64_t
-format_process_maps (_pinfo *p, char *destbuf, size_t maxsize)
+format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
 {
   if (!wincap.is_winnt ())
     return 0;
@@ -529,8 +529,8 @@ format_process_maps (_pinfo *p, char *destbuf, size_t maxsize)
 	    st.st_dev = 0;
 	    st.st_ino = 0;
 	  }
-	if (len + strlen (posix_modname) + 50 > maxsize - 1)
-	  break;
+	if (len + strlen (posix_modname) + 62 > maxsize - 1)
+	  destbuf = (char *) realloc (destbuf, maxsize += 2048);
 	if (workingset)
 	  for (unsigned i = 1; i <= wset_size; ++i)
 	    {
@@ -554,9 +554,9 @@ format_process_maps (_pinfo *p, char *destbuf, size_t maxsize)
 				st.st_dev >> 16,
 				st.st_dev & 0xffff,
 				st.st_ino);
-	while (written++ < 61)
-	  destbuf[len + written] = ' ';
-        len += written - 1;
+	while (written < 62)
+	  destbuf[len + written++] = ' ';
+        len += written;
 	len += __small_sprintf (destbuf + len, "%s\n", posix_modname);
       }
 out:
