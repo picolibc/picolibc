@@ -1,3 +1,7 @@
+2000-12-19  Nick Clifton  <nickc@redhat.com>
+
+        * libc/machine/xscale/memcmp.c (memcmp): Add clobber for "lr".
+
 Wed Dec 14  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: Turn on long double I/O for Cygwin.

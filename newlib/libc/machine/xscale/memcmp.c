@@ -103,7 +103,7 @@ memcmp (const void *s1, const void *s2, size_t len)
 	rsb	%0, r3, r2"
        : "=r" (result), "=&r" (s2), "=&r" (len)
        : "0" (s1), "1" (s2), "2" (len)
-       : "r2", "r3", "r4", "r5", "r6", "cc");
+       : "r2", "r3", "r4", "r5", "r6", "cc", "lr");
   return result;
 }
 #endif
