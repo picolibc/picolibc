@@ -786,15 +786,31 @@ mprotect (void *addr, size_t len, int prot)
       return 0;
     }
 
+  /* If write protection is requested, check if the page was
+     originally protected writecopy.  In this case call VirtualProtect
+     requesting PAGE_WRITECOPY, otherwise the VirtualProtect will fail
+     on NT version >= 5.0 */
+  bool writecopy = false;
+  if (prot & PROT_WRITE)
+    {
+      MEMORY_BASIC_INFORMATION mbi;
+      if (VirtualQuery (addr, &mbi, sizeof mbi))
+        {
+	  if (mbi.AllocationProtect == PAGE_WRITECOPY
+	      || mbi.AllocationProtect == PAGE_EXECUTE_WRITECOPY)
+	    writecopy = true;
+	}
+    }
+
   switch (prot)
     {
       case PROT_READ | PROT_WRITE | PROT_EXEC:
       case PROT_WRITE | PROT_EXEC:
-	new_prot = PAGE_EXECUTE_READWRITE;
+	new_prot = writecopy ? PAGE_EXECUTE_WRITECOPY : PAGE_EXECUTE_READWRITE;
 	break;
       case PROT_READ | PROT_WRITE:
       case PROT_WRITE:
-	new_prot = PAGE_READWRITE;
+	new_prot = writecopy ? PAGE_WRITECOPY : PAGE_READWRITE;
 	break;
       case PROT_READ | PROT_EXEC:
 	new_prot = PAGE_EXECUTE_READ;

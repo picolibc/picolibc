@@ -1,5 +1,11 @@
 2004-07-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mmap.cc (mprotect): When MAP_WRITE protection is requested, use
+	READWRITE or WRITECOPY protection, whatever has been used when the
+	page has been allocated initially.
+
+2004-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_dev_raw): Remove is_writing flag.
 	Remove declaration of writebuf.
 	(class fhandler_dev_floppy): Remove declaration of close.
