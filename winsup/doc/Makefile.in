@@ -116,6 +116,6 @@ TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
 TBDIRS = cygwin-ug-net cygwin-api
 TBDEPS = cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 
-tarball : cygwin-docs.tar.gz
-cygwin-docs.tar.gz : $(TBFILES) $(TBDEPS)
-	tar cf - $(TBFILES) $(TBDIRS) | gzip -9 > cygwin-docs.tar.gz
+tarball : cygwin-docs.tar.bz2
+cygwin-docs.tar.bz2 : $(TBFILES) $(TBDEPS)
+	tar cf - $(TBFILES) $(TBDIRS) | gzip -9 > cygwin-docs.tar.bz2
