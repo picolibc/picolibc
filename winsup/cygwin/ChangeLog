@@ -1,3 +1,24 @@
+2004-03-26  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (path_conv::check): Use 'strchr' rather than 'strrchr' to
+	find end of string, for efficiency.
+
+2004-03-26 Thomas Pfaff <tpfaff@gmx.net>
+
+	* include/cygwin/_types.h: New file.
+	* include/sys/lock.h: Ditto.
+	* include/sys/stdio.h: Ditto.
+	* thread.cc: Include sys/lock.h
+	(__cygwin_lock_init): New function.
+	(__cygwin_lock_init_recursive): Ditto.
+	(__cygwin_lock_fini): Ditto.
+	(__cygwin_lock_lock): Ditto.
+	(__cygwin_lock_trylock): Ditto.
+	(__cygwin_lock_unlock): Ditto.
+	(pthread::atforkprepare): Lock file pointer before fork.
+	(pthread::atforkparent): Unlock file pointer after fork.
+	(pthread::atforkchild): Ditto.
+
 2004-03-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sem.cc (semget): Fix debug string.

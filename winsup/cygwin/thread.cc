@@ -44,6 +44,10 @@ details. */
 #include <sys/timeb.h>
 #include <exceptions.h>
 #include <sys/fcntl.h>
+#include <sys/lock.h>
+
+extern "C" void __fp_lock_all ();
+extern "C" void __fp_unlock_all ();
 
 extern int threadsafe;
 
@@ -52,6 +56,43 @@ extern "C" struct _reent *
 __getreent ()
 {
   return &_my_tls.local_clib;
+}
+
+extern "C" void
+__cygwin_lock_init (_LOCK_T *lock)
+{
+  *lock = _LOCK_T_INITIALIZER;
+}
+
+extern "C" void
+__cygwin_lock_init_recursive (_LOCK_T *lock)
+{
+  *lock = _LOCK_T_RECURSIVE_INITIALIZER;
+}
+
+extern "C" void
+__cygwin_lock_fini (_LOCK_T *lock)
+{
+  pthread_mutex_destroy ((pthread_mutex_t*) lock);
+}
+
+extern "C" void
+__cygwin_lock_lock (_LOCK_T *lock)
+{
+  pthread_mutex_lock ((pthread_mutex_t*) lock);
+}
+
+extern "C" void
+__cygwin_lock_trylock (_LOCK_T *lock)
+{
+  pthread_mutex_trylock ((pthread_mutex_t*) lock);
+}
+
+
+extern "C" void
+__cygwin_lock_unlock (_LOCK_T *lock)
+{
+  pthread_mutex_unlock ((pthread_mutex_t*) lock);
 }
 
 inline LPCRITICAL_SECTION
@@ -1908,11 +1949,15 @@ pthread::atforkprepare (void)
       cb->cb ();
       cb = cb->next;
     }
+
+  __fp_lock_all ();
 }
 
 void
 pthread::atforkparent (void)
 {
+  __fp_unlock_all ();
+
   callback *cb = MT_INTERFACE->pthread_parent;
   while (cb)
     {
@@ -1925,6 +1970,8 @@ void
 pthread::atforkchild (void)
 {
   MT_INTERFACE->fixup_after_fork ();
+
+  __fp_unlock_all ();
 
   callback *cb = MT_INTERFACE->pthread_child;
   while (cb)

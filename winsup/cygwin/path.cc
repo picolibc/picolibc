@@ -495,7 +495,7 @@ path_conv::check (const char *src, unsigned opt,
       MALLOC_CHECK;
       assert (src);
 
-      char *p = strrchr (src, '\0');
+      char *p = strchr (src, '\0');
       /* Detect if the user was looking for a directory.  We have to strip the
 	 trailing slash initially and add it back on at the end due to Windows
 	 brain damage. */
