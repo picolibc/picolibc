@@ -149,8 +149,8 @@ main (int argc, char **argv)
 {
   int sig = SIGTERM;
   int force = 0;
-  char *gotsig = NULL;
   int ret = 0;
+  char *gotasig = NULL;
 
   prog_name = strrchr (argv[0], '/');
   if (prog_name == NULL)
@@ -173,8 +173,8 @@ main (int argc, char **argv)
       switch (ch)
 	{
 	case 's':
-	  gotsig = optarg;
-	  sig = getsig (gotsig);
+	  gotasig = optarg;
+	  sig = getsig (gotasig);
 	  break;
 	case 'l':
 	  if (!optarg)
@@ -200,12 +200,12 @@ main (int argc, char **argv)
 	  print_version ();
 	  break;
 	case '?':
-	  if (gotsig)
+	  if (gotasig)
 	    usage ();
 	  optreset = 1;
 	  optind = 1 + av - argv;
-	  gotsig = *av + 1;
-	  sig = getsig (gotsig);
+	  gotasig = *av + 1;
+	  sig = getsig (gotasig);
 	  break;
 	default:
 	  usage ();
@@ -213,7 +213,7 @@ main (int argc, char **argv)
 	}
     }
 
-  test_for_unknown_sig (sig, gotsig);
+  test_for_unknown_sig (sig, gotasig);
 
   argv += optind;
   while (*argv != NULL)

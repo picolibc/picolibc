@@ -1,6 +1,6 @@
 /* parse_pe.cc
 
-   Copyright 1999,2000,2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -47,9 +47,11 @@ exclusion::sort_and_check ()
   for (process_mem_region * p = region; p < region + last - 1; p++)
     {
       process_mem_region *q = p + 1;
+      if (q == p + 1)
+	continue;
       if (p->base + size > q->base)
 	{
-	  fprintf (stderr, "region error @ %08x", (unsigned) p->base);
+	  fprintf (stderr, "region error @ (%8p + %d) > %8p\n", (unsigned) p->base, size, q->base);
 	  return 0;
 	}
     }

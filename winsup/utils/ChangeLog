@@ -1,3 +1,8 @@
+2003-09-17  Christopher Faylor  <cgf@redhat.com>
+
+	* parse_pe.cc (exclusion::sort_and_check): Make error message a little
+	more explicit and ignore (hopefully) harmless region overlap.
+
 2003-09-13  Christopher Faylor  <cgf@redhat.com>
 
 	* kill.c (forcekill): Wait for process to terminate even if
