@@ -1,5 +1,10 @@
 2002-06-26  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Force
+	FindFirstFile on first file of directory when asking for x:\ .
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (cygheap_user::set_name): Correct thinko in below change.
 
 2002-06-26  Christopher Faylor  <cgf@redhat.com>
