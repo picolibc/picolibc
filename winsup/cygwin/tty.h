@@ -8,7 +8,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-
 /* tty tables */
 
 #define INP_BUFFER_SIZE 256
@@ -18,15 +17,15 @@ details. */
 
 /* Input/Output/ioctl events */
 
-#define OUTPUT_DONE_EVENT	"cygtty%d.output.done"
-#define IOCTL_REQUEST_EVENT	"cygtty%d.ioctl.request"
-#define IOCTL_DONE_EVENT	"cygtty%d.ioctl.done"
-#define RESTART_OUTPUT_EVENT	"cygtty%d.output.restart"
-#define INPUT_AVAILABLE_EVENT	"cygtty%d.input.avail"
-#define OUTPUT_MUTEX		"cygtty%d.output.mutex"
-#define INPUT_MUTEX		"cygtty%d.input.mutex"
-#define TTY_SLAVE_ALIVE		"cygtty%x.slave_alive"
-#define TTY_MASTER_ALIVE	"cygtty%x.master_alive"
+#define OUTPUT_DONE_EVENT	"cygtty.output.done"
+#define IOCTL_REQUEST_EVENT	"cygtty.ioctl.request"
+#define IOCTL_DONE_EVENT	"cygtty.ioctl.done"
+#define RESTART_OUTPUT_EVENT	"cygtty.output.restart"
+#define INPUT_AVAILABLE_EVENT	"cygtty.input.avail"
+#define OUTPUT_MUTEX		"cygtty.output.mutex"
+#define INPUT_MUTEX		"cygtty.input.mutex"
+#define TTY_SLAVE_ALIVE		"cygtty.slave_alive"
+#define TTY_MASTER_ALIVE	"cygtty.master_alive"
 
 #include <sys/termios.h>
 
@@ -105,18 +104,9 @@ public:
   HWND gethwnd () {return hwnd;}
   void sethwnd (HWND wnd) {hwnd = wnd;}
   bool make_pipes (fhandler_pty_master *ptym);
-  HANDLE open_output_mutex ()
-  {
-    char buf[80];
-    __small_sprintf (buf, OUTPUT_MUTEX, ntty);
-    return OpenMutex (MUTEX_ALL_ACCESS, TRUE, buf);
-  }
-  HANDLE open_input_mutex ()
-  {
-    char buf[80];
-    __small_sprintf (buf, INPUT_MUTEX, ntty);
-    return OpenMutex (MUTEX_ALL_ACCESS, TRUE, buf);
-  }
+  HANDLE open_mutex (const char *mutex);
+  HANDLE open_output_mutex ();
+  HANDLE open_input_mutex ();
   bool exists ()
   {
     HANDLE h = open_output_mutex ();

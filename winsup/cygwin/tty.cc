@@ -310,21 +310,41 @@ bool
 tty::alive (const char *fmt)
 {
   HANDLE ev;
-  char buf[sizeof (TTY_MASTER_ALIVE) + 16];
+  char buf[CYG_MAX_PATH];
 
-  __small_sprintf (buf, fmt, ntty);
+  shared_name (buf, fmt, ntty);
   if ((ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf)))
     CloseHandle (ev);
   return ev != NULL;
+}
+
+HANDLE 
+tty::open_output_mutex ()
+{
+  return open_mutex (OUTPUT_MUTEX);
+} 
+
+HANDLE
+tty::open_input_mutex ()
+{
+  return open_mutex (INPUT_MUTEX);
+} 
+
+HANDLE 
+tty::open_mutex (const char *mutex)
+{
+  char buf[CYG_MAX_PATH];
+  shared_name (buf, mutex, ntty);
+  return OpenMutex (MUTEX_ALL_ACCESS, TRUE, buf);
 }
 
 HANDLE
 tty::create_inuse (const char *fmt)
 {
   HANDLE h;
-  char buf[sizeof (TTY_MASTER_ALIVE) + 16];
+  char buf[CYG_MAX_PATH];
 
-  __small_sprintf (buf, fmt, ntty);
+  shared_name (buf, fmt, ntty);
   h = CreateEvent (&sec_all, TRUE, FALSE, buf);
   termios_printf ("%s = %p", buf, h);
   if (!h)
@@ -348,9 +368,9 @@ HANDLE
 tty::get_event (const char *fmt, BOOL manual_reset)
 {
   HANDLE hev;
-  char buf[40];
+  char buf[CYG_MAX_PATH];
 
-  __small_sprintf (buf, fmt, ntty);
+  shared_name (buf, fmt, ntty);
   if (!(hev = CreateEvent (&sec_all, manual_reset, FALSE, buf)))
     {
       termios_printf ("couldn't create %s", buf);
@@ -440,8 +460,8 @@ tty::common_init (fhandler_pty_master *ptym)
   if (!(ptym->input_available_event = get_event (INPUT_AVAILABLE_EVENT, TRUE)))
     return false;
 
-  char buf[40];
-  __small_sprintf (buf, OUTPUT_MUTEX, ntty);
+  char buf[CYG_MAX_PATH];
+  shared_name (buf, OUTPUT_MUTEX, ntty);
   if (!(ptym->output_mutex = CreateMutex (&sec_all, FALSE, buf)))
     {
       termios_printf ("can't create %s", buf);
@@ -449,7 +469,7 @@ tty::common_init (fhandler_pty_master *ptym)
       return false;
     }
 
-  __small_sprintf (buf, INPUT_MUTEX, ntty);
+  shared_name (buf, INPUT_MUTEX, ntty);
   if (!(ptym->input_mutex = CreateMutex (&sec_all, FALSE, buf)))
     {
       termios_printf ("can't create %s", buf);

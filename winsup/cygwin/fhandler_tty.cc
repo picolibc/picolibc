@@ -466,14 +466,14 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   /* Create synchronisation events */
-  char buf[40];
+  char buf[CYG_MAX_PATH];
 
   /* output_done_event may or may not exist.  It will exist if the tty
      was opened by fhandler_tty_master::init, normally called at
      startup if use_tty is non-zero.  It will not exist if this is a
      pty opened by fhandler_pty_master::open.  In the former case, tty
      output is handled by a separate thread which controls output.  */
-  __small_sprintf (buf, OUTPUT_DONE_EVENT, get_unit ());
+  shared_name (buf, OUTPUT_DONE_EVENT, get_unit ());
   output_done_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
 
   if (!(output_mutex = get_ttyp ()->open_output_mutex ()))
@@ -488,7 +488,7 @@ fhandler_tty_slave::open (int flags, mode_t)
       __seterrno ();
       return 0;
     }
-  __small_sprintf (buf, INPUT_AVAILABLE_EVENT, get_unit ());
+  shared_name (buf, INPUT_AVAILABLE_EVENT, get_unit ());
   if (!(input_available_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf)))
     {
       termios_printf ("open input event failed, %E");
@@ -498,9 +498,9 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   /* The ioctl events may or may not exist.  See output_done_event,
      above.  */
-  __small_sprintf (buf, IOCTL_REQUEST_EVENT, get_unit ());
+  shared_name (buf, IOCTL_REQUEST_EVENT, get_unit ());
   ioctl_request_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
-  __small_sprintf (buf, IOCTL_DONE_EVENT, get_unit ());
+  shared_name (buf, IOCTL_DONE_EVENT, get_unit ());
   ioctl_done_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
 
   /* FIXME: Needs a method to eliminate tty races */
