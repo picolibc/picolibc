@@ -122,7 +122,7 @@ fhandler_console::set_cursor_maybe ()
   if (last.dwCursorPosition.X != now.dwCursorPosition.X ||
       last.dwCursorPosition.Y != now.dwCursorPosition.Y)
     {
-      SetConsoleCursorPosition (get_output_handle (), now.dwCursorPosition);
+      (void) SetConsoleCursorPosition (get_output_handle (), now.dwCursorPosition);
       last.dwCursorPosition = now.dwCursorPosition;
     }
 }
