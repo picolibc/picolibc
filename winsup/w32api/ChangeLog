@@ -1,3 +1,8 @@
+2002-05-28  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/w32api.h: Increment version to 1.5
+	* Makefile.in: Ditto.
+
 2002-05-27  René Møller Fonseca  <fonseca@users.sourceforge.net> 
 
 	* include/winreg.h: (RegConnectRegistry[AW]): Replace

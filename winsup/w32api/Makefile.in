@@ -66,8 +66,8 @@ FLAGS_TO_PASS = \
 SUBDIRS = lib
 
 PACKAGE = w32api
-VERSION = 1.4
-CYGRELEASE = 2
+VERSION = 1.5
+CYGRELEASE = 1
 
 DIST_FILES = Makefile.in configure.in configure config.guess config.sub \
 install-sh README ChangeLog TODO CONTRIBUTIONS
