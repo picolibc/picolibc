@@ -1,3 +1,7 @@
+2005-04-01  Jan Beulich  <jbeulich@novell.com>
+
+	* i386.h (i386_optab): Add rdtscp.
+
 2005-03-29  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h (i386_optab): Don't allow the `l' suffix for moving
