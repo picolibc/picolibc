@@ -1,3 +1,8 @@
+Mon Jul  3 10:53:00 2000  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/socket.h: Remove SOCK_PACKET define since it's
+	not supported by Windows sockets.
+
 Sun Jul  2 21:50:48 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (user32_init): Add primitive guard against concurrent

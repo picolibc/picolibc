@@ -36,11 +36,6 @@ struct msghdr
 #define SOCK_RAW	3		/* raw socket			*/
 #define SOCK_RDM	4		/* reliably-delivered message	*/
 #define SOCK_SEQPACKET	5		/* sequential packet socket	*/
-#define SOCK_PACKET	10		/* CYGWIN specific way of	*/
-					/* getting packets at the dev	*/
-					/* level.  For writing rarp and	*/
-					/* other similar things on the	*/
-					/* user level.			*/
 
 /* Supported address families. */
 /*
