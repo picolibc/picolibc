@@ -1,3 +1,76 @@
+2003-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	Don't use safe_new but new throughout.  Fix copyright dates
+	throughout.
+	* Makefile.in: Accomodate all new files and name changes.
+	Add a *.d dependency.
+	(sbindir): Add.
+	(etcdir): Drop in favor of more appropriate sysconfdir definition.
+	(sysconfdir): Add.
+	(CXXFLAGS): Add -MMD flag. Add SYSCONFDIR definition.
+	(.SUFFIXES): Add.
+	(install): Add action items.
+	(libclean): New target.
+	(fullclean): Ditto.
+	* bsd_helper.cc: New file.
+	* bsd_helper.h: Ditto.
+	* bsd_log.cc: Ditto.
+	* bsd_log.h: Ditto.
+	* bsd_mutex.cc: Ditto.
+	* bsd_mutex.h: Ditto.
+	* client.cc: Rearrange to build as less as possible if
+	__INSIDE_CYGWIN__.
+	(client_request::handle_request): Add Message Queue and Semaphore
+	handling.
+	* cygserver.cc: Rearrange to build as less as possible if
+	__INSIDE_CYGWIN__. Use new debug/log/panic logging functions.
+	(DEF_CONFIG_FILE): New definition for configuration file.  Use
+	throughout.
+	(getfunc): Remove.
+	(__cygserver__printf): Remove.
+	(client_request_attach_tty::serve): Return error if impersonation
+	fails.
+	(print_usage): Pump up help message.
+	(print_version): Add output of default configuration file.
+	(main): Accommodate new options.  Allow overwrite of threading options
+	from config file.  Call several new initialization functions.  Drop
+	printing dots.  Don't define SIGHANDLE inline.
+	* cygserver.conf: New file.
+	* cygserver_process.h: Rename to process.h.
+	* cygserver_transport.h: Rename to transport.h.
+	* cygserver_transport_pipes.h: Rename to transport_pipes.h.
+	* cygserver_transport_sockets.h: Rename to transport_sockets.h.
+	* msg.cc: Rewrite.
+	* sem.cc: Rewrite.
+	* shm.cc: Rewrite.
+	* sysv_msg.cc: New file, derived from FreeBSD version 1.52.
+	* sysv_sem.cc: New file, derived from FreeBSD version 1.66.
+	* sysv_shm.cc: New file, derived from FreeBSD version 1.89.
+	* threaded_queue.cc: Rearrange to build as less as possible if
+	__INSIDE_CYGWIN__.
+	* transport.cc (transport_layer_base::impersonate_client): Define bool.
+	(transport_layer_base::revert_to_self): Ditto.
+	* transport.h (transport_layer_base::impersonate_client): Declare bool.
+	(transport_layer_base::revert_to_self): Ditto.
+	* transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
+	Don't call init_security.
+	(init_security): Remove.
+	(transport_layer_pipes::accept): Use global sec_all_nih.
+	(transport_layer_pipes::connect): Ditto.
+	(transport_layer_pipes::impersonate_client): Define bool.
+	(transport_layer_pipes::revert_to_self): Ditt.
+	* transport_pipes.h (transport_layer_pipes::impersonate_client): Declare
+	bool.
+	(transport_layer_pipes::revert_to_self): Ditto.
+	* woutsup.h: Include bsd compatibility headers.
+	(SIGHANDLE): Add definition.
+	(__cygserver__printf): Remove definition.
+	(__noop_printf): Ditto.
+	(debug_printf): Define using debug.
+	(syscall_printf): Define using log.
+	(system_printf): Ditto.
+	Drop all other _printf definitions.
+
 2003-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	Accomodate moving cygserver header files from cygwin/include/cygwin

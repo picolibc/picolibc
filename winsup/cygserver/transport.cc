@@ -1,6 +1,6 @@
-/* cygserver_transport.cc
+/* transport.cc
 
-   Copyright 2001, 2002 Red Hat Inc.
+   Copyright 2001, 2002, 2003 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -19,31 +19,33 @@ details. */
 
 #include <sys/socket.h>
 
-#include "safe_memory.h"
-
-#include "cygserver_transport.h"
-#include "cygserver_transport_pipes.h"
-#include "cygserver_transport_sockets.h"
+#include "transport.h"
+#include "transport_pipes.h"
+#include "transport_sockets.h"
 
 /* The factory */
 transport_layer_base *
 create_server_transport ()
 {
   if (wincap.is_winnt ())
-    return safe_new0 (transport_layer_pipes);
+    return new transport_layer_pipes;
   else
-    return safe_new0 (transport_layer_sockets);
+    return new transport_layer_sockets;
 }
 
 #ifndef __INSIDE_CYGWIN__
 
-void
+bool
 transport_layer_base::impersonate_client ()
-{}
+{
+  return true;
+}
 
-void
+bool
 transport_layer_base::revert_to_self ()
-{}
+{
+  return true;
+}
 
 #endif /* !__INSIDE_CYGWIN__ */
 

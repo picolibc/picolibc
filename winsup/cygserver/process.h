@@ -1,4 +1,4 @@
-/* cygserver_process.h
+/* process.h
 
    Copyright 2001, 2002 Red Hat Inc.
 
@@ -10,8 +10,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _CYGSERVER_PROCESS_
-#define _CYGSERVER_PROCESS_
+#ifndef _PROCESS_H
+#define _PROCESS_H
 
 #include <assert.h>
 
@@ -161,4 +161,4 @@ private:
   class process *find (DWORD winpid, class process **previous = NULL);
 };
 
-#endif /* _CYGSERVER_PROCESS_ */
+#endif /* _PROCESS_H */

@@ -1,4 +1,4 @@
-/* cygserver_transport_sockets.cc
+/* transport_sockets.cc
 
    Copyright 2001, 2002 Red Hat Inc.
 
@@ -26,8 +26,8 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 
-#include "cygserver_transport.h"
-#include "cygserver_transport_sockets.h"
+#include "transport.h"
+#include "transport_sockets.h"
 
 /* to allow this to link into cygwin and the .dll, a little magic is needed. */
 #ifndef __OUTSIDE_CYGWIN__
@@ -219,7 +219,7 @@ transport_layer_sockets::accept (bool *const recoverable)
 
   debug_printf ("%d = accept () [this = %p, fd = %d]", accept_fd, this, _fd);
 
-  return safe_new (transport_layer_sockets, accept_fd);
+  return new transport_layer_sockets (accept_fd);
 }
 
 #endif /* !__INSIDE_CYGWIN__ */

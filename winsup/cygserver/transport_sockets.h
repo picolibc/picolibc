@@ -1,4 +1,4 @@
-/* cygserver_transport_sockets.h
+/* transport_sockets.h
 
    Copyright 2001, 2002 Red Hat Inc.
 
@@ -10,8 +10,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _CYGSERVER_TRANSPORT_SOCKETS_
-#define _CYGSERVER_TRANSPORT_SOCKETS_
+#ifndef _TRANSPORT_SOCKETS_H
+#define _TRANSPORT_SOCKETS_H
 
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -43,4 +43,4 @@ private:
   transport_layer_sockets (int fd);
 };
 
-#endif /* _CYGSERVER_TRANSPORT_SOCKETS_ */
+#endif /* _TRANSPORT_SOCKETS_H */

@@ -1,4 +1,4 @@
-/* cygserver_process.cc
+/* process.cc
 
    Copyright 2001, 2002 Red Hat Inc.
 
@@ -19,7 +19,7 @@ details. */
 
 #include "cygerrno.h"
 
-#include "cygserver_process.h"
+#include "process.h"
 
 /*****************************************************************************/
 
@@ -29,7 +29,7 @@ details. */
 
 process_cleanup::~process_cleanup ()
 {
-  safe_delete (_process);
+  delete _process;
 }
 
 void
@@ -139,7 +139,7 @@ process::remove (const cleanup_routine *const entry)
 	      else
 		_routines_head = ptr->_next;
 
-	      safe_delete (ptr);
+	      delete ptr;
 	      res = true;
 	      break;
 	    }
@@ -170,7 +170,7 @@ process::cleanup ()
       cleanup_routine *const ptr = entry;
       entry = entry->_next;
       ptr->cleanup (this);
-      safe_delete (ptr);
+      delete ptr;
     }
 }
 
@@ -250,11 +250,11 @@ process_cache::process (const pid_t cygpid, const DWORD winpid)
 	  return NULL;
 	}
 
-      entry = safe_new (class process, cygpid, winpid);
+      entry = new class process (cygpid, winpid);
       if (!entry->is_active ())
 	{
 	  LeaveCriticalSection (&_cache_write_access);
-	  safe_delete (entry);
+	  delete entry;
 	  set_errno (ESRCH);
 	  return NULL;
 	}
@@ -408,7 +408,7 @@ process_cache::check_and_remove_process (const size_t index)
   LeaveCriticalSection (&_cache_write_access);
 
   /* Schedule any cleanup tasks for this process. */
-  _queue.add (safe_new (process_cleanup, process));
+  _queue.add (new process_cleanup (process));
 }
 
 class process *

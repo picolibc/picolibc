@@ -1,6 +1,6 @@
-/* cygserver_client.cc
+/* client.cc
 
-   Copyright 2001, 2002 Red Hat Inc.
+   Copyright 2001, 2002, 2003 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -22,11 +22,12 @@ details. */
 #include <unistd.h>
 
 #include "cygerrno.h"
+#include "cygserver_msg.h"
+#include "cygserver_sem.h"
 #include "cygserver_shm.h"
-#include "safe_memory.h"
 
 #include "cygserver.h"
-#include "cygserver_transport.h"
+#include "transport.h"
 
 int cygserver_running = CYGSERVER_UNKNOWN; // Nb: inherited by children.
 
@@ -47,6 +48,8 @@ client_request_get_version::client_request_get_version ()
  * older than expected minor version number is accepted (as long as
  * the first numbers match, that is).
  */
+
+#ifdef __INSIDE_CYGWIN__
 
 bool
 client_request_get_version::check_version () const
@@ -71,8 +74,6 @@ client_request_get_version::check_version () const
   return ok;
 }
 
-#ifdef __INSIDE_CYGWIN__
-
 client_request_attach_tty::client_request_attach_tty (DWORD nmaster_pid,
 						      HANDLE nfrom_master,
 						      HANDLE nto_master)
@@ -87,15 +88,6 @@ client_request_attach_tty::client_request_attach_tty (DWORD nmaster_pid,
 		   "from_master = %lu, to_master = %lu"),
 		  req.pid, req.master_pid, req.from_master, req.to_master);
 }
-
-#else /* !__INSIDE_CYGWIN__ */
-
-client_request_attach_tty::client_request_attach_tty ()
-  : client_request (CYGSERVER_REQUEST_ATTACH_TTY, &req, sizeof (req))
-{
-  // verbose: syscall_printf ("created");
-}
-
 #endif /* __INSIDE_CYGWIN__ */
 
 /*
@@ -230,7 +222,12 @@ client_request::send (transport_layer_base * const conn)
   //			      sizeof (_header), msglen ());
 }
 
-#ifndef __INSIDE_CYGWIN__
+#ifdef __OUTSIDE_CYGWIN__
+
+client_request_attach_tty::client_request_attach_tty ()
+  : client_request (CYGSERVER_REQUEST_ATTACH_TTY, &req, sizeof (req))
+{
+}
 
 /*
  * client_request::handle_request ()
@@ -277,16 +274,22 @@ client_request::handle_request (transport_layer_base *const conn,
   switch (header.request_code)
     {
     case CYGSERVER_REQUEST_GET_VERSION:
-      req = safe_new0 (client_request_get_version);
+      req = new client_request_get_version;
       break;
     case CYGSERVER_REQUEST_SHUTDOWN:
-      req = safe_new0 (client_request_shutdown);
+      req = new client_request_shutdown;
       break;
     case CYGSERVER_REQUEST_ATTACH_TTY:
-      req = safe_new0 (client_request_attach_tty);
+      req = new client_request_attach_tty;
+      break;
+    case CYGSERVER_REQUEST_MSG:
+      req = new client_request_msg;
+      break;
+    case CYGSERVER_REQUEST_SEM:
+      req = new client_request_sem;
       break;
     case CYGSERVER_REQUEST_SHM:
-      req = safe_new0 (client_request_shm);
+      req = new client_request_shm;
       break;
     default:
       syscall_printf ("unknown request code %d received: request ignored",
@@ -299,73 +302,8 @@ client_request::handle_request (transport_layer_base *const conn,
   req->msglen (header.msglen);
   req->handle (conn, cache);
 
-  safe_delete (req);
-
-#ifndef DEBUGGING
-  printf (".");			// A little noise when we're being quiet.
-#endif
+  delete req;
 }
-
-#endif /* !__INSIDE_CYGWIN__ */
-
-client_request::client_request (request_code_t const id,
-				void * const buf,
-				size_t const buflen)
-  : _header (id, buflen),
-    _buf (buf),
-    _buflen (buflen)
-{
-  assert ((!_buf && !_buflen) || (_buf && _buflen));
-}
-
-client_request::~client_request ()
-{}
-
-int
-client_request::make_request ()
-{
-  assert (cygserver_running == CYGSERVER_UNKNOWN	\
-	  || cygserver_running == CYGSERVER_OK		\
-	  || cygserver_running == CYGSERVER_UNAVAIL);
-
-  if (cygserver_running == CYGSERVER_UNKNOWN)
-    cygserver_init ();
-
-  assert (cygserver_running == CYGSERVER_OK		\
-	  || cygserver_running == CYGSERVER_UNAVAIL);
-
-  /* Don't retry every request if the server's not there */
-  if (cygserver_running == CYGSERVER_UNAVAIL)
-    {
-      syscall_printf ("cygserver un-available");
-      error_code (ENOSYS);
-      return -1;
-    }
-
-  transport_layer_base *const transport = create_server_transport ();
-
-  assert (transport);
-
-  if (transport->connect () == -1)
-    {
-      if (errno)
-	error_code (errno);
-      else
-	error_code (ENOSYS);
-      safe_delete (transport);
-      return -1;
-    }
-
-  // verbose: debug_printf ("connected to server %p", transport);
-
-  send (transport);
-
-  safe_delete (transport);
-
-  return 0;
-}
-
-#ifndef __INSIDE_CYGWIN__
 
 /*
  * client_request::handle ()
@@ -470,7 +408,84 @@ client_request::handle (transport_layer_base *const conn,
   //			      sizeof (_header), msglen ());
 }
 
-#endif /* !__INSIDE_CYGWIN__ */
+/* The server side implementation of make_request.  Very simple. */
+int
+client_request::make_request ()
+{
+  transport_layer_base *const transport = create_server_transport ();
+  assert (transport);
+  if (transport->connect () == -1)
+    {
+      if (errno)
+	error_code (errno);
+      else
+	error_code (ENOSYS);
+      delete transport;
+      return -1;
+    }
+  send (transport);
+  delete transport;
+  return 0;
+}
+#endif /* __OUTSIDE_CYGWIN__ */
+
+client_request::client_request (request_code_t const id,
+				void * const buf,
+				size_t const buflen)
+  : _header (id, buflen),
+    _buf (buf),
+    _buflen (buflen)
+{
+  assert ((!_buf && !_buflen) || (_buf && _buflen));
+}
+
+client_request::~client_request ()
+{}
+
+#ifdef __INSIDE_CYGWIN__
+int
+client_request::make_request ()
+{
+  assert (cygserver_running == CYGSERVER_UNKNOWN	\
+	  || cygserver_running == CYGSERVER_OK		\
+	  || cygserver_running == CYGSERVER_UNAVAIL);
+
+  if (cygserver_running == CYGSERVER_UNKNOWN)
+    cygserver_init ();
+
+  assert (cygserver_running == CYGSERVER_OK		\
+	  || cygserver_running == CYGSERVER_UNAVAIL);
+
+  /* Don't retry every request if the server's not there */
+  if (cygserver_running == CYGSERVER_UNAVAIL)
+    {
+      syscall_printf ("cygserver un-available");
+      error_code (ENOSYS);
+      return -1;
+    }
+
+  transport_layer_base *const transport = create_server_transport ();
+
+  assert (transport);
+
+  if (transport->connect () == -1)
+    {
+      if (errno)
+	error_code (errno);
+      else
+	error_code (ENOSYS);
+      delete transport;
+      return -1;
+    }
+
+  // verbose: debug_printf ("connected to server %p", transport);
+
+  send (transport);
+
+  delete transport;
+
+  return 0;
+}
 
 bool
 check_cygserver_available ()
@@ -523,3 +538,4 @@ cygserver_init ()
   if (!check_cygserver_available ())
     cygserver_running = CYGSERVER_UNAVAIL;
 }
+#endif /* __INSIDE_CYGWIN__ */

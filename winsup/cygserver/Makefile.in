@@ -15,7 +15,8 @@ prefix:=@prefix@
 exec_prefix:=@exec_prefix@
 
 bindir:=@bindir@
-etcdir:=$(exec_prefix)/etc
+sbindir:=@sbindir@
+sysconfdir:=@sysconfdir@
 program_transform_name:=@program_transform_name@
 
 INSTALL:=@INSTALL@
@@ -28,14 +29,18 @@ CXX:=@CXX@
 CXX_FOR_TARGET:=$(CXX)
 AR:=@AR@
 
-CFLAGS:=@CFLAGS@ -I$(cygwin_source)
-CXXFLAGS:=@CXXFLAGS@ -I$(cygwin_source)
-override CXXFLAGS+=-fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0 -D__OUTSIDE_CYGWIN__
-
 include $(srcdir)/../Makefile.common
 
+CFLAGS:=@CFLAGS@ -I$(cygwin_source)
+CXXFLAGS:=@CXXFLAGS@ -I$(cygwin_source)
+override CXXFLAGS+=-MMD -fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0 -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""
+
+.SUFFIXES: .c .cc .a .o .d
+
 OBJS:=	cygserver.o client.o process.o msg.o sem.o shm.o threaded_queue.o \
-	transport.o transport_pipes.o transport_sockets.o
+	transport.o transport_pipes.o transport_sockets.o \
+	bsd_helper.o bsd_log.o bsd_mutex.o \
+	sysv_msg.o sysv_sem.o sysv_shm.o
 LIBOBJS:=${patsubst %.o,lib%.o,$(OBJS)}
 
 CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o \
@@ -43,10 +48,17 @@ CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o \
 
 all: cygserver.exe
 
-install: all
+install: all cygserver.conf
+	$(INSTALL_PROGRAM) cygserver.exe $(sbindir)/cygserver.exe
+	$(INSTALL_DATA) $(srcdir)/cygserver.conf $(sysconfdir)/cygserver.conf
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) ${patsubst %.o,%.d,$(OBJS)} cygserver.exe
+
+libclean:
+	rm -f $(LIBOBJS) ${patsubst %.o,%.d,$(LIBOBJS)} libcygserver.a
+
+fullclean: clean libclean
 
 cygserver.exe: $(OBJS) $(CYGWIN_OBJS)
 	$(CXX) -o $@ $^
@@ -64,3 +76,8 @@ lib%.o: %.cc
 
 libcygserver.a: $(LIBOBJS)
 	$(AR) crus $@ $?
+
+deps:=${wildcard *.d}
+ifneq (,$(deps))
+include $(deps)
+endif

@@ -1,6 +1,6 @@
-/* cygserver_transport.h
+/* transport.h
 
-   Copyright 2001, 2002 Red Hat Inc.
+   Copyright 2001, 2002, 2003 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -10,8 +10,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _CYGSERVER_TRANSPORT_
-#define _CYGSERVER_TRANSPORT_
+#ifndef _TRANSPORT_H
+#define _TRANSPORT_H
 
 class transport_layer_base *create_server_transport ();
 
@@ -29,11 +29,11 @@ public:
   virtual int connect () = 0;
 
 #ifndef __INSIDE_CYGWIN__
-  virtual void impersonate_client ();
-  virtual void revert_to_self ();
+  virtual bool impersonate_client ();
+  virtual bool revert_to_self ();
 #endif
 
   virtual ~transport_layer_base ();
 };
 
-#endif /* _CYGSERVER_TRANSPORT_ */
+#endif /* _TRANSPORT_H */

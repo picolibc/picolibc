@@ -1,6 +1,6 @@
 /* woutsup.h: for Cygwin code compiled outside the DLL (i.e. cygserver).
 
-   Copyright 2002 Red Hat, Inc.
+   Copyright 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -42,67 +42,32 @@ details. */
 
 #include "wincap.h"
 
+#include "bsd_helper.h"
+#include "bsd_log.h"
+#include "bsd_mutex.h"
+
 /* The one function we use from winuser.h most of the time */
 extern "C" DWORD WINAPI GetLastError (void);
 
 extern int cygserver_running;
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
-#define NEW_MACRO_VARARGS
-#endif
-
-/*
- * A reproduction of the <sys/strace.h> macros.  This allows code that
- * runs both inside and outside the Cygwin DLL to use the same macros
- * for logging messages.
- */
-
-extern "C" void __cygserver__printf (const char *, const char *, ...);
-
-#ifdef NEW_MACRO_VARARGS
-
-#define system_printf(...)					\
-  do								\
-    {								\
-      __cygserver__printf (__PRETTY_FUNCTION__, __VA_ARGS__);	\
+#define SIGHANDLE(SIG)							\
+  do									\
+    {									\
+      struct sigaction act;						\
+									\
+      act.sa_handler = &handle_signal;					\
+      act.sa_mask = 0;							\
+      act.sa_flags = 0;							\
+									\
+      if (sigaction (SIG, &act, NULL) == -1)				\
+	{								\
+	  panic ("failed to install handler for " #SIG ": %s",		\
+		 strerror (errno));					\
+	  exit (1);							\
+	}								\
     } while (false)
 
-#define __noop_printf(...) do {;} while (false)
-
-#else /* !NEW_MACRO_VARARGS */
-
-#define system_printf(args...)					\
-  do								\
-    {								\
-      __cygserver__printf (__PRETTY_FUNCTION__, ## args);	\
-    } while (false)
-
-#define __noop_printf(args...) do {;} while (false)
-
-#endif /* !NEW_MACRO_VARARGS */
-
-#ifdef DEBUGGING
-#define debug_printf system_printf
-#define paranoid_printf system_printf
-#define select_printf system_printf
-#define sigproc_printf system_printf
-#define syscall_printf system_printf
-#define termios_printf system_printf
-#define wm_printf system_printf
-#define minimal_printf system_printf
-#define malloc_printf system_printf
-#define thread_printf system_printf
-#else
-#define debug_printf __noop_printf
-#define paranoid_printf __noop_printf
-#define select_printf __noop_printf
-#define sigproc_printf __noop_printf
-#define syscall_printf __noop_printf
-#define termios_printf __noop_printf
-#define wm_printf __noop_printf
-#define minimal_printf __noop_printf
-#define malloc_printf __noop_printf
-#define thread_printf __noop_printf
-#endif
-
-#include "safe_memory.h"
+#define debug_printf(f,...)	debug((f),##__VA_ARGS__)
+#define syscall_printf(f,...)	log(LOG_ERR,(f),##__VA_ARGS__)
+#define system_printf(f,...)	log(LOG_ERR,(f),##__VA_ARGS__)

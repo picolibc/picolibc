@@ -1,6 +1,6 @@
-/* cygserver_transport_pipes.cc
+/* transport_pipes.cc
 
-   Copyright 2001, 2002 Red Hat Inc.
+   Copyright 2001, 2002, 2003 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -25,11 +25,14 @@ details. */
 #include <unistd.h>
 
 #include "cygerrno.h"
-#include "cygserver_transport.h"
-#include "cygserver_transport_pipes.h"
+#include "transport.h"
+#include "transport_pipes.h"
 
 #ifndef __INSIDE_CYGWIN__
 #include "cygserver.h"
+#include "cygserver_ipc.h"
+#else
+#include "security.h"
 #endif
 
 enum
@@ -64,7 +67,6 @@ transport_layer_pipes::transport_layer_pipes (const HANDLE hPipe)
   assert (_hPipe);
   assert (_hPipe != INVALID_HANDLE_VALUE);
 
-  init_security ();
 }
 
 #endif /* !__INSIDE_CYGWIN__ */
@@ -75,22 +77,6 @@ transport_layer_pipes::transport_layer_pipes ()
     _is_accepted_endpoint (false),
     _is_listening_endpoint (false)
 {
-  init_security ();
-}
-
-void
-transport_layer_pipes::init_security ()
-{
-  assert (wincap.has_security ());
-
-  /* FIXME: pthread_once or equivalent needed */
-
-  InitializeSecurityDescriptor (&_sd, SECURITY_DESCRIPTOR_REVISION);
-  SetSecurityDescriptorDacl (&_sd, TRUE, NULL, FALSE);
-
-  _sec_all_nih.nLength = sizeof (SECURITY_ATTRIBUTES);
-  _sec_all_nih.lpSecurityDescriptor = &_sd;
-  _sec_all_nih.bInheritHandle = FALSE;
 }
 
 transport_layer_pipes::~transport_layer_pipes ()
@@ -138,7 +124,7 @@ transport_layer_pipes::accept (bool *const recoverable)
 		     (PIPE_TYPE_BYTE | PIPE_WAIT),
 		     PIPE_UNLIMITED_INSTANCES,
 		     0, 0, 1000,
-		     &_sec_all_nih);
+		     &sec_all_nih);
 
   const bool duplicate = (accept_pipe == INVALID_HANDLE_VALUE
 			  && pipe_instance == 0
@@ -175,7 +161,7 @@ transport_layer_pipes::accept (bool *const recoverable)
       return NULL;
     }
 
-  return safe_new (transport_layer_pipes, accept_pipe);
+  return new transport_layer_pipes (accept_pipe);
 }
 
 #endif /* !__INSIDE_CYGWIN__ */
@@ -281,7 +267,7 @@ transport_layer_pipes::connect ()
       _hPipe = CreateFile (_pipe_name,
 			   GENERIC_READ | GENERIC_WRITE,
 			   FILE_SHARE_READ | FILE_SHARE_WRITE,
-			   &_sec_all_nih,
+			   &sec_all_nih,
 			   OPEN_EXISTING,
 			   SECURITY_IMPERSONATION,
 			   NULL);
@@ -331,32 +317,33 @@ transport_layer_pipes::connect ()
 
 #ifndef __INSIDE_CYGWIN__
 
-void
+bool
 transport_layer_pipes::impersonate_client ()
 {
   assert (_hPipe);
   assert (_hPipe != INVALID_HANDLE_VALUE);
   assert (_is_accepted_endpoint);
 
-  // verbose: debug_printf ("impersonating pipe %p", _hPipe);
-  if (_hPipe)
+  if (_hPipe && !ImpersonateNamedPipeClient (_hPipe))
     {
-      assert (_hPipe != INVALID_HANDLE_VALUE);
-
-      if (!ImpersonateNamedPipeClient (_hPipe))
-	debug_printf ("Failed to Impersonate the client, (%lu)",
-		      GetLastError ());
+      debug_printf ("Failed to Impersonate client, (%lu)", GetLastError ());
+      return false;
     }
-  // verbose: debug_printf ("I am who you are");
+
+  return true;
 }
 
-void
+bool
 transport_layer_pipes::revert_to_self ()
 {
   assert (_is_accepted_endpoint);
 
-  RevertToSelf ();
-  // verbose: debug_printf ("I am who I yam");
+  if (!RevertToSelf ())
+    {
+      debug_printf ("Failed to RevertToSelf, (%lu)", GetLastError ());
+      return false;
+    }
+  return true;
 }
 
 #endif /* !__INSIDE_CYGWIN__ */

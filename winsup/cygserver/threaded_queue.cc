@@ -1,6 +1,6 @@
 /* threaded_queue.cc
 
-   Copyright 2001, 2002 Red Hat Inc.
+   Copyright 2001, 2002, 2003 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -10,6 +10,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifdef __OUTSIDE_CYGWIN__
 #include "woutsup.h"
 
 #include <assert.h>
@@ -73,7 +74,7 @@ threaded_queue::~threaded_queue ()
     {
       queue_request *const ptr = reqptr;
       reqptr = reqptr->_next;
-      safe_delete (ptr);
+      delete ptr;
     }
 
   DeleteCriticalSection (&_queue_lock);
@@ -267,7 +268,7 @@ threaded_queue::worker_loop ()
 
       assert (reqptr);
       reqptr->process ();
-      safe_delete (reqptr);
+      delete reqptr;
     }
 }
 
@@ -406,3 +407,4 @@ queue_submission_loop::start_routine (const LPVOID lpParam)
 }
 
 /*****************************************************************************/
+#endif /* __OUTSIDE_CYGWIN__ */
