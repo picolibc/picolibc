@@ -515,7 +515,6 @@ LoadDLLfuncEx (Process32Next, 8, kernel32, 1)
 LoadDLLfuncEx (RegisterServiceProcess, 8, kernel32, 1)
 LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)
 LoadDLLfuncEx (SwitchToThread, 0, kernel32, 1)
-LoadDLLfunc (TryEnterCriticalSection, 4, kernel32)
 
 LoadDLLfuncEx (waveOutGetNumDevs, 0, winmm, 1)
 LoadDLLfuncEx (waveOutOpen, 24, winmm, 1)

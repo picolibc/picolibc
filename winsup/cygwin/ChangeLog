@@ -1,5 +1,12 @@
 2004-01-13  Christopher Faylor  <cgf@redhat.com>
 
+	* autoload.cc (TryEnterCriticalSection): Remove.
+	* dcrt0.cc (dll_crt0_0): Delete inappropriate setting of
+	_my_tls.stackptr to NULL since it has really bad consequences.  Make
+	'si' an automatic variable.
+
+2004-01-13  Christopher Faylor  <cgf@redhat.com>
+
 	* cygtls.cc (_threadinfo::init_thread): Correct thinko which caused
 	thread list to be allocated every time.
 	* cygtls.h (CYGTLS_PADSIZE): Define as const int.

@@ -576,9 +576,6 @@ dll_crt0_0 ()
   initial_env ();
 
   char zeros[sizeof (child_proc_info->zero)] = {0};
-  static NO_COPY STARTUPINFO si;
-
-  _my_tls.stackptr = NULL;
 
   init_console_handler ();
   init_global_security ();
@@ -592,6 +589,7 @@ dll_crt0_0 ()
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 
+  STARTUPINFO si;
   GetStartupInfo (&si);
   child_proc_info = (child_info *) si.lpReserved2;
 
