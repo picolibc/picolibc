@@ -1,5 +1,10 @@
 2002-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/include/sys/stat.h (_fstat): Don't declare when compiling Cygwin.
+	(_stat): Ditto.
+
+2002-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/sys/cygwin/sys/dirent.h (struct __DIR): Use __off32_t instead
 	of off_t.
 
