@@ -1,3 +1,7 @@
+2004-12-25  David Edelsohn  <edelsohn@gnu.org>
+
+	Revert 2004-12-08 Makefile changes.
+
 2004-12-16  Andrew Stubbs  <andrew.stubbs@st.com>
 
 	* configure.in (sh64-*-*): Reenable gprof.
