@@ -711,7 +711,7 @@ Other options:
 
 <para> <command>passwd</command> changes passwords for user accounts.
 A normal user may only change the password for their own account,
-the administrators may change the password for any account.
+but administrators may change passwords on any account.
 <command>passwd</command> also changes account information, such as
 password expiry dates and intervals.</para>
 
@@ -722,33 +722,14 @@ enter the correct password.  The administrators are permitted to
 bypass this step so that forgotten passwords may be changed.</para>
 
 <para>The user is then prompted for a replacement password.
-<command>passwd</command> will prompt again and compare the second entry
-against the first.  Both entries are require to match in order for the
-password to be changed.</para>
+<command>passwd</command> will prompt twice for this replacement and 
+compare the second entry against the first.  Both entries are require to 
+match in order for the password to be changed.</para>
 
 <para>After the password has been entered, password aging information
 is checked to see if the user is permitted to change their password
 at this time.  If not, <command>passwd</command> refuses to change the
 password and exits.</para>
-
-<para>Password expiry and length: The password aging information may be
-changed by the administrators with the <literal>-x</literal>,
-<literal>-n</literal> and <literal>-i</literal> options.  The
-<literal>-x</literal> option is used to set the maximum number of days
-a password remains valid.  After <emphasis>max</emphasis> days, the
-password is required to be changed.  The <literal>-n</literal> option is
-used to set the minimum number of days before a password may be changed.
-The user will not be permitted to change the password until
-<emphasis>min</emphasis> days have elapsed.  The <literal>-i</literal>
-option is used to disable an account after the password has been expired
-for a number of days.  After a user account has had an expired password
-for <emphasis>inact</emphasis> days, the user may no longer sign on to
-the account. Allowed values for the above options are 0 to 999.  The
-<literal>-L</literal> option sets the minimum length of allowed passwords
-for users, which doesn't belong to the administrators group, to
-<emphasis>len</emphasis> characters.  Allowed values for the minimum
-password length are 0 to 14.  In any of the above cases, a value of 0
-means `no restrictions'.</para>
 
 <para>Account maintenance: User accounts may be locked and unlocked with the
 <literal>-l</literal> and <literal>-u</literal> flags.  The
@@ -757,6 +738,26 @@ option re-enables an account.</para>
 
 <para>The account status may be given with the <literal>-S</literal>
 option.  The status information is self explanatory.</para>
+
+<para>Administrators can also use <command>passwd</command> to change
+system-wide password expiry and length requirements with the
+<literal>-i</literal>, <literal>-n</literal>, <literal>-x</literal>,
+and <literal>-L</literal> options.  The <literal>-i</literal>
+option is used to disable an account after the password has been expired
+for a number of days.  After a user account has had an expired password
+for <emphasis>NUM</emphasis> days, the user may no longer sign on to
+the account.  The <literal>-n</literal> option is
+used to set the minimum number of days before a password may be changed.
+The user will not be permitted to change the password until
+<emphasis>MINDAYS</emphasis> days have elapsed.  The
+<literal>-x</literal> option is used to set the maximum number of days
+a password remains valid.  After <emphasis>MAXDAYS</emphasis> days, the
+password is required to be changed.  Allowed values for the above options 
+are 0 to 999.  The <literal>-L</literal> option sets the minimum length of 
+allowed passwords for users who don't belong to the administrators group
+to <emphasis>LEN</emphasis> characters.  Allowed values for the minimum
+password length are 0 to 14.  In any of the above cases, a value of 0
+means `no restrictions'.</para>
 
 <para>Limitations: Users may not be able to change their password on
 some systems.</para>
@@ -782,10 +783,36 @@ With no options, ps outputs the long format by default
 <para>The <command>ps</command> program gives the status of all the
 Cygwin processes running on the system (ps = "process status").  Due
 to the limitations of simulating a POSIX environment under Windows,
-there is little information to give.  The PID column is the process ID
-you need to give to the <command>kill</command> command.  The WINPID
-column is the process ID that's displayed by NT's Task Manager
-program.</para>
+there is little information to give.  
+</para>
+
+<para>
+The PID column is the process ID you need to give to the 
+<command>kill</command> command. The PPID is the parent process ID,
+and PGID is the process group ID.  The WINPID column is the process 
+ID displayed by NT's Task Manager program. The TTY column gives which 
+pseudo-terminal a process is running on, or a <literal>'?'</literal>
+for services. The UID column shows which user owns each process. 
+STIME is the time the process was started, and COMMAND gives the name
+of the program running.
+</para>
+
+<para>
+By default <command>ps</command> will only show processes owned by the
+current user. With either the <literal>-a</literal> or <literal>-e</literal>
+option, all user's processes (and system processes) are listed. There are
+historical UNIX reasons for the synonomous options, which are functionally
+identical. The <literal>-f</literal> option outputs a "full" listing with
+usernames for UIDs. The <literal>-l</literal> option is the default display
+mode, showing a "long" listing with all the above columns. The other display
+option is <literal>-s</literal>, which outputs a shorter listing of just
+PID, TTY, STIME, and COMMAND. The <literal>-u</literal> option allows you
+to show only processes owned by a specific user. The <literal>-W</literal>
+option causes <command>ps</command> show non-Cygwin Windows processes as 
+well as Cygwin processes. The WINPID is also the PID, and they can be killed
+with the Cygwin <command>kill</command> command's <literal>-f</literal>
+option.
+</para>
 
 </sect2>
 
