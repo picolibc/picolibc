@@ -1,3 +1,8 @@
+2002-08-26  Casper S. Hornstrup  <chorns@users.sourceforge.net>
+
+	* include/wsahelp.h: New file.
+	* lib/test.c: Include wsahelp.h.
+
 2002-08-21  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/commctrl.h (NMCUSTOMDRAW): Fix lItemlParam.
