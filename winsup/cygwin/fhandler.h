@@ -429,7 +429,7 @@ class fhandler_pipe: public fhandler_base
   DWORD orig_pid;
   unsigned id;
  public:
-  fhandler_pipe (DWORD devtype);
+  fhandler_pipe ();
   __off64_t lseek (__off64_t offset, int whence);
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
@@ -472,7 +472,6 @@ class fhandler_dev_raw: public fhandler_base
   int is_writing      : 1;
   int has_written     : 1;
   int varblkop	      : 1;
-  int unit;
 
   virtual void clear (void);
   virtual int writebuf (void);
@@ -482,12 +481,10 @@ class fhandler_dev_raw: public fhandler_base
   /* returns not null, if `win_error' determines an end of file condition */
   virtual int is_eof(int win_error) = 0;
 
-  fhandler_dev_raw (DWORD dev, int unit);
+  fhandler_dev_raw (DWORD dev);
 
  public:
   ~fhandler_dev_raw (void);
-
-  int get_unit () { return unit; }
 
   int open (path_conv *, int flags, mode_t mode = 0);
   int close (void);
@@ -510,7 +507,7 @@ class fhandler_dev_floppy: public fhandler_dev_raw
   virtual int is_eof (int win_error);
 
  public:
-  fhandler_dev_floppy (int unit);
+  fhandler_dev_floppy ();
 
   virtual int open (path_conv *, int flags, mode_t mode = 0);
   virtual int close (void);
@@ -533,7 +530,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
   virtual int is_eof (int win_error);
 
  public:
-  fhandler_dev_tape (int unit);
+  fhandler_dev_tape ();
 
   virtual int open (path_conv *, int flags, mode_t mode = 0);
   virtual int close (void);
@@ -600,13 +597,12 @@ class fhandler_disk_file: public fhandler_base
 
 class fhandler_cygdrive: public fhandler_disk_file
 {
-  int unit;
   int ndrives;
   const char *pdrive;
   void set_drives ();
  public:
-  bool iscygdrive_root () const { return !unit; }
-  fhandler_cygdrive (int unit);
+  bool iscygdrive_root () const { return !dev.minor; }
+  fhandler_cygdrive ();
   DIR *opendir (path_conv& pc);
   struct dirent *readdir (DIR *);
   __off64_t telldir (DIR *);
@@ -631,7 +627,7 @@ class fhandler_serial: public fhandler_base
   DWORD ev;
 
   /* Constructor */
-  fhandler_serial (int unit);
+  fhandler_serial ();
 
   int open (path_conv *, int flags, mode_t mode);
   int close ();
@@ -680,8 +676,8 @@ class fhandler_termios: public fhandler_base
   virtual int accept_input () {return 1;};
  public:
   tty_min *tc;
-  fhandler_termios (DWORD dev, int unit = 0) :
-  fhandler_base (dev, unit)
+  fhandler_termios (DWORD dev) :
+  fhandler_base (dev)
   {
     set_need_fork_fixup ();
   }
@@ -836,10 +832,10 @@ class fhandler_console: public fhandler_termios
 class fhandler_tty_common: public fhandler_termios
 {
  public:
-  fhandler_tty_common (DWORD dev, int unit = 0)
-    : fhandler_termios (dev, unit), output_done_event (NULL),
+  fhandler_tty_common (DWORD dev)
+    : fhandler_termios (dev), output_done_event (NULL),
     ioctl_request_event (NULL), ioctl_done_event (NULL), output_mutex (NULL),
-    input_mutex (NULL), input_available_event (NULL), inuse (NULL), ttynum (unit)
+    input_mutex (NULL), input_available_event (NULL), inuse (NULL)
   {
     // nothing to do
   }
@@ -852,7 +848,6 @@ class fhandler_tty_common: public fhandler_termios
   HANDLE output_mutex, input_mutex;
   HANDLE input_available_event;
   HANDLE inuse;			// used to indicate that a tty is in use
-  int ttynum;			// Master tty num.
 
   DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
   void __release_output_mutex (const char *fn, int ln);
@@ -875,7 +870,6 @@ class fhandler_tty_slave: public fhandler_tty_common
  public:
   /* Constructor */
   fhandler_tty_slave ();
-  fhandler_tty_slave (int);
 
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
@@ -899,7 +893,7 @@ class fhandler_pty_master: public fhandler_tty_common
   int need_nl;			// Next read should start with \n
 
   /* Constructor */
-  fhandler_pty_master (DWORD devtype = FH_PTYM, int unit = -1);
+  fhandler_pty_master (DWORD devtype = FH_PTYM);
 
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
@@ -927,8 +921,8 @@ class fhandler_tty_master: public fhandler_pty_master
   /* Constructor */
   fhandler_console *console;	// device handler to perform real i/o.
 
-  fhandler_tty_master (int unit);
-  int init (int);
+  fhandler_tty_master ();
+  int init ();
   int init_console ();
   void set_winsize (bool);
   void fixup_after_fork (HANDLE parent);
@@ -962,7 +956,6 @@ class fhandler_dev_zero: public fhandler_base
 class fhandler_dev_random: public fhandler_base
 {
  protected:
-  int unit;
   HCRYPTPROV crypt_prov;
   long pseudo;
 
@@ -971,8 +964,7 @@ class fhandler_dev_random: public fhandler_base
   int pseudo_read (void *ptr, size_t len);
 
  public:
-  fhandler_dev_random (int unit);
-  int get_unit () { return unit; }
+  fhandler_dev_random ();
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
@@ -986,12 +978,11 @@ class fhandler_dev_random: public fhandler_base
 class fhandler_dev_mem: public fhandler_base
 {
  protected:
-  int unit;
   DWORD mem_size;
   __off64_t pos;
 
  public:
-  fhandler_dev_mem (int unit);
+  fhandler_dev_mem ();
   ~fhandler_dev_mem (void);
 
   int open (path_conv *, int flags, mode_t mode = 0);
@@ -1100,7 +1091,7 @@ class fhandler_virtual : public fhandler_base
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   __off64_t lseek (__off64_t, int);
-  int dup (fhandler_base  child);
+  int dup (fhandler_base *child);
   int open (path_conv *, int flags, mode_t mode = 0);
   int close (void);
   int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
