@@ -40,7 +40,7 @@ extern DWORD dwExeced;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
 static void signal_exit (int) __attribute__ ((noreturn));
-static char windows_system_directory[1024];
+char windows_system_directory[1024];
 static size_t windows_system_directory_length;
 
 /* This is set to indicate that we have already exited.  */
