@@ -1,3 +1,15 @@
+2004-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Add "owner" status flag.
+	* fhandler_socket.cc (wait): Take flag parameter to take FD_OOB into
+	account.  Don't wait infinitely.
+	(fhandler_socket::recvfrom): Also wait for FD_OOB if socket owner.
+	(fhandler_socket::recvmsg): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Ditto.
+	(fhandler_socket::fcntl): Set owner status flag if F_SETOWN with own
+	pid is called.
+
 2004-05-09  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* environ.cc (build_env): Only try to construct required-but-missing

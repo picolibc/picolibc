@@ -713,15 +713,18 @@ fhandler_socket::prepare (HANDLE &event, long event_mask)
 }
 
 int
-fhandler_socket::wait (HANDLE event)
+fhandler_socket::wait (HANDLE event, int flags)
 {
   int ret = SOCKET_ERROR;
   int wsa_err = 0;
   WSAEVENT ev[2] = { event, signal_arrived };
   WSANETWORKEVENTS evts;
 
-  switch (WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE, FALSE))
+  switch (WSAWaitForMultipleEvents (2, ev, FALSE, 10, FALSE))
     {
+      case WSA_WAIT_TIMEOUT:
+        ret = 0;
+	break;
       case WSA_WAIT_EVENT_0:
 	if (!WSAEnumNetworkEvents (get_socket (), event, &evts))
 	  {
@@ -729,6 +732,19 @@ fhandler_socket::wait (HANDLE event)
 	      {
 	        ret = 0;
 		break;
+	      }
+	    if (evts.lNetworkEvents & FD_OOB)
+	      {
+		if (evts.iErrorCode[FD_OOB_BIT])
+		  wsa_err = evts.iErrorCode[FD_OOB_BIT];
+		else if (flags & MSG_OOB)
+		  ret = 0;
+		else
+		  {
+		    raise (SIGURG);
+		    WSASetLastError (WSAEINTR);
+		    break;
+		  }
 	      }
 	    if (evts.lNetworkEvents & FD_READ)
 	      {
@@ -822,7 +838,7 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
       else
 	{
 	  HANDLE evt;
-	  if (prepare (evt, FD_CLOSE | ((flags & MSG_OOB) ? FD_OOB : FD_READ)))
+	  if (prepare (evt, FD_CLOSE | FD_READ | (owner () ? FD_OOB : 0)))
 	    {
               do
                 {
@@ -833,7 +849,7 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
               while (res == SOCKET_ERROR
                      && WSAGetLastError () == WSAEWOULDBLOCK
 		     && !closed ()
-		     && !(res = wait (evt)));
+		     && !(res = wait (evt, flags)));
 	      release (evt);
 	    }
 	}
@@ -947,7 +963,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
       else
 	{
 	  HANDLE evt;
-	  if (prepare (evt, FD_CLOSE | ((flags & MSG_OOB) ? FD_OOB : FD_READ)))
+	  if (prepare (evt, FD_CLOSE | FD_READ | (owner () ? FD_OOB : 0)))
 	    {
               do
                 {
@@ -958,7 +974,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
               while (res == SOCKET_ERROR
 		     && WSAGetLastError () == WSAEWOULDBLOCK
 		     && !closed ()
-		     && !(res = wait (evt)));
+		     && !(res = wait (evt, flags)));
 	      release (evt);
 	    }
 	}
@@ -1024,7 +1040,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
       else
 	{
 	  HANDLE evt;
-	  if (prepare (evt, FD_CLOSE | FD_WRITE))
+	  if (prepare (evt, FD_CLOSE | FD_WRITE | (owner () ? FD_OOB : 0)))
 	    {
 	      do 
 		{
@@ -1035,7 +1051,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 		}
 	      while (res == SOCKET_ERROR
 	             && WSAGetLastError () == WSAEWOULDBLOCK
-		     && !(res = wait (evt))
+		     && !(res = wait (evt, 0))
 		     && !closed ());
 	      release (evt);
 	    }
@@ -1154,7 +1170,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
       else
 	{
 	  HANDLE evt;
-	  if (prepare (evt, FD_CLOSE | FD_WRITE))
+	  if (prepare (evt, FD_CLOSE | FD_WRITE | (owner () ? FD_OOB : 0)))
 	    {
               do
                 {
@@ -1165,7 +1181,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
                 }
               while (res == SOCKET_ERROR
 	             && WSAGetLastError () == WSAEWOULDBLOCK
-		     && !(res = wait (evt))
+		     && !(res = wait (evt, 0))
 	             && !closed ());
 	      release (evt);
 	    }
@@ -1402,6 +1418,14 @@ fhandler_socket::fcntl (int cmd, void *arg)
 
   switch (cmd)
     {
+    case F_SETOWN:
+      {
+	/* Urgh!  Bad hack! */
+	pid_t pid = (pid_t) arg;
+	owner (pid == getpid ());
+	debug_printf ("owner set to %d", owner ());
+      }
+      break;
     case F_SETFL:
       {
 	/* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
