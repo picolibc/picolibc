@@ -1,3 +1,11 @@
+2005-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::facl): Pretend successful
+	SETACL if no acls are available.
+	* fhandler.cc (fhandler_base::facl): Implement to return sensible
+	values on GETACL and GETACLCNT.  Pretend successful SETACL.
+	* fhandler_virtual.cc (fhandler_virtual::facl): Ditto.
+
 2005-01-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_disk_file::touch_ctime): Declare.

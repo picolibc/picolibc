@@ -247,7 +247,12 @@ fhandler_virtual::fchown (__uid32_t uid, __gid32_t gid)
 int
 fhandler_virtual::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 {
-  /* Same as on Linux. */
-  set_errno (EPERM);
-  return -1;
+  int res = fhandler_base::facl (cmd, nentries, aclbufp);
+  if (res >= 0 && cmd == GETACL)
+    {
+      aclbufp[0].a_perm = (S_IRUSR | (pc.isdir () ? S_IXUSR : 0)) >> 6;
+      aclbufp[1].a_perm = (S_IRGRP | (pc.isdir () ? S_IXGRP : 0)) >> 3;
+      aclbufp[2].a_perm = S_IROTH | (pc.isdir () ? S_IXOTH : 0);
+    }
+  return res;
 }

@@ -1539,6 +1539,41 @@ fhandler_base::fchown (__uid32_t uid, __gid32_t gid)
 int
 fhandler_base::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 {
-  /* By default, just succeeds. */
-  return 0;
+  int res = -1;
+  switch (cmd)
+    {
+      case SETACL:
+	/* By default, just succeeds. */
+	res = 0;
+	break;
+      case GETACL:
+	if (!aclbufp)
+	  set_errno(EFAULT);
+	else if (nentries < MIN_ACL_ENTRIES)
+	  set_errno (ENOSPC);
+	else
+	  {
+	    aclbufp[0].a_type = USER_OBJ;
+	    aclbufp[0].a_id = myself->uid;
+	    aclbufp[0].a_perm = (S_IRUSR | S_IWUSR) >> 6;
+	    aclbufp[1].a_type = GROUP_OBJ;
+	    aclbufp[1].a_id = myself->gid;
+	    aclbufp[1].a_perm = (S_IRGRP | S_IWGRP) >> 3;
+	    aclbufp[2].a_type = OTHER_OBJ;
+	    aclbufp[2].a_id = ILLEGAL_GID;
+	    aclbufp[2].a_perm = S_IROTH | S_IWOTH;
+	    aclbufp[3].a_type = CLASS_OBJ;
+	    aclbufp[3].a_id = ILLEGAL_GID;
+	    aclbufp[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
+	    res = MIN_ACL_ENTRIES;
+	  }
+	break;
+      case GETACLCNT:
+	res = MIN_ACL_ENTRIES;
+	break;
+      default:
+	set_errno (EINVAL);
+	break;
+    }
+  return res;
 }

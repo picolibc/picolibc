@@ -498,7 +498,11 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	  struct __stat64 st;
 
 	  case SETACL:
-	    set_errno (ENOSYS);
+	    /* Open for writing required to be able to set ctime
+	       (even though setting the ACL is just pretended). */
+	    if (!get_io_handle ())
+	      oret = open_fs (O_WRONLY | O_BINARY, 0);
+	    res = 0;
 	    break;
 	  case GETACL:
 	    if (!aclbufp)
