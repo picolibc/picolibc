@@ -1,3 +1,14 @@
+2002-05-16  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* fhandler_raw.cc (fhandler_dev_raw::open): Replace set_errno()
+	by __seterrno_from_win_error().
+	* security.cc (open_local_policy): Ditto.
+	(get_lsa_srv_inf): Ditto.
+	(get_user_groups): Ditto.
+	(get_user_primary_group): Ditto.
+	(create_token): Ditto.
+	(subauth): Ditto.
+
 2002-05-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* times.cc (utimes): Use FILE_WRITE_ATTRIBUTES even on 9x/Me when

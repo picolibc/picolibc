@@ -184,7 +184,7 @@ open_local_policy ()
 
   NTSTATUS ret = LsaOpenPolicy(NULL, &oa, POLICY_EXECUTE, &lsa);
   if (ret != STATUS_SUCCESS)
-    set_errno (LsaNtStatusToWinError (ret));
+    __seterrno_from_win_error (LsaNtStatusToWinError (ret));
   return lsa;
 }
 
@@ -210,7 +210,7 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
   if ((ret = LsaQueryInformationPolicy (lsa, PolicyAccountDomainInformation,
 					(PVOID *) &adi)) != STATUS_SUCCESS)
     {
-      set_errno (LsaNtStatusToWinError(ret));
+      __seterrno_from_win_error (LsaNtStatusToWinError(ret));
       return FALSE;
     }
   lsa2wchar (account, adi->DomainName, INTERNET_MAX_HOST_NAME_LENGTH + 1);
@@ -218,7 +218,7 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
   if ((ret = LsaQueryInformationPolicy (lsa, PolicyPrimaryDomainInformation,
 					(PVOID *) &pdi)) != STATUS_SUCCESS)
     {
-      set_errno (LsaNtStatusToWinError(ret));
+      __seterrno_from_win_error (LsaNtStatusToWinError(ret));
       return FALSE;
     }
   lsa2wchar (primary, pdi->Name, INTERNET_MAX_HOST_NAME_LENGTH + 1);
@@ -282,8 +282,7 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user)
 			    MAX_PREFERRED_LENGTH, &cnt, &tot);
   if (ret)
     {
-      debug_printf ("%d = NetUserGetGroups ()", ret);
-      set_errno (ret);
+      __seterrno_from_win_error (ret);
       /* It's no error when the user name can't be found. */
       return ret == NERR_UserNotFound;
     }
@@ -356,8 +355,7 @@ get_user_local_groups (WCHAR *wlogonserver, const char *logonserver,
 			   MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
   if (ret)
     {
-      debug_printf ("%d = NetLocalGroupEnum ()", ret);
-      set_errno (ret);
+      __seterrno_from_win_error (ret);
       return FALSE;
     }
 
@@ -434,8 +432,7 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
     ret = NetUserGetInfo (NULL, wuser, 3, (LPBYTE *) &buf);
   if (ret)
     {
-      debug_printf ("%d = NetUserGetInfo ()", ret);
-      set_errno (ret);
+      __seterrno_from_win_error (ret);
       return FALSE;
     }
 
@@ -848,7 +845,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
 		       &auth_luid, &exp, &user, grps, privs, &owner, &pgrp,
 		       &dacl, &source);
   if (ret)
-    set_errno (RtlNtStatusToDosError (ret));
+    __seterrno_from_win_error (RtlNtStatusToDosError (ret));
   else if (GetLastError () == ERROR_PROC_NOT_FOUND)
     {
       __seterrno ();
@@ -929,7 +926,7 @@ subauth (struct passwd *pw)
   if (ret != STATUS_SUCCESS)
     {
       debug_printf ("LsaRegisterLogonProcess: %d", ret);
-      set_errno (LsaNtStatusToWinError(ret));
+      __seterrno_from_win_error (LsaNtStatusToWinError(ret));
       goto out;
     }
   else if (GetLastError () == ERROR_PROC_NOT_FOUND)
@@ -943,7 +940,7 @@ subauth (struct passwd *pw)
   if (ret != STATUS_SUCCESS)
     {
       debug_printf ("LsaLookupAuthenticationPackage: %d", ret);
-      set_errno (LsaNtStatusToWinError(ret));
+      __seterrno_from_win_error (LsaNtStatusToWinError(ret));
       LsaDeregisterLogonProcess(lsa_hdl);
       goto out;
     }
@@ -972,7 +969,7 @@ subauth (struct passwd *pw)
   if (ret != STATUS_SUCCESS)
     {
       debug_printf ("LsaLogonUser: %d", ret);
-      set_errno (LsaNtStatusToWinError(ret));
+      __seterrno_from_win_error (LsaNtStatusToWinError(ret));
       LsaDeregisterLogonProcess(lsa_hdl);
       goto out;
     }

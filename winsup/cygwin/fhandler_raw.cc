@@ -171,8 +171,7 @@ fhandler_dev_raw::open (path_conv *real_path, int flags, mode_t)
 				FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
     {
-      set_errno (RtlNtStatusToDosError (status));
-      debug_printf ("NtOpenFile: NTSTATUS: %d, Win32: %E", status);
+      __seterrno_from_win_error (RtlNtStatusToDosError (status));
       return 0;
     }
 
