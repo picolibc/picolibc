@@ -765,9 +765,6 @@ dll_crt0_1 ()
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
       old_title = title_buf;
 
-  /* Initialize locale */
-  locale_init ();
-
   /* Allocate fdtab */
   dtable_init ();
 
