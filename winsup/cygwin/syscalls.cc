@@ -339,7 +339,7 @@ getsid (pid_t pid)
 extern "C" ssize_t
 read (int fd, void *ptr, size_t len)
 {
-  const struct iovec iov =
+  const iovec iov =
     {
       iov_base: ptr,
       iov_len: len

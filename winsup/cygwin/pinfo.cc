@@ -613,12 +613,22 @@ winpids::enum9x (bool winpid)
   return nelem;
 }
 
+NO_COPY CRITICAL_SECTION winpids::cs;
+
 void
-winpids::init (bool winpid)
+winpids::set (bool winpid)
 {
+  EnterCriticalSection (&cs);
   npids = (this->*enum_processes) (winpid);
   if (pidlist)
     pidlist[npids] = 0;
+  LeaveCriticalSection (&cs);
+}
+
+void
+winpids::init ()
+{
+  InitializeCriticalSection (&cs);
 }
 
 DWORD

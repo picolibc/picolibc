@@ -1,3 +1,16 @@
+2002-11-29  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.h (winpids::set): Renamed from init.
+	(winpids::init): New declaration.
+	(winpids::cs): Ditto.
+	(winpids::winpids): Use set rather than init.
+	* external.cc (fillout_pinfo): Ditto.
+	* dcrt0.cc (dll_crt0_1): Call winpids::init.
+	* pinfo.cc (winpids::set): Renamed from init.  Wrap calls in critical
+	section.
+	(winpids::init): New function.
+	(winpids::cs): Define.
+
 2002-11-28  Christopher Faylor  <cgf@redhat.com>
 
 	* sigproc.cc (sig_dispatch_pending): Remove assertion.

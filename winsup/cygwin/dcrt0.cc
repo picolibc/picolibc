@@ -569,6 +569,8 @@ dll_crt0_1 ()
   mainthread.init ("mainthread"); // For use in determining if signals
 				  //  should be blocked.
 
+  winpids::init ();
+
   int envc = 0;
   char **envp = NULL;
 

@@ -203,17 +203,19 @@ class winpids
   DWORD enumNT (bool winpid);
   DWORD enum9x (bool winpid);
   void add (DWORD& nelem, bool, DWORD pid);
+  static CRITICAL_SECTION cs;
 public:
   DWORD npids;
   inline void reset () { npids = 0; release (); }
-  void init (bool winpid);
+  void set (bool winpid);
   winpids (int): enum_processes (&winpids::enum_init) { reset (); }
   winpids (): pidlist (NULL), npidlist (0), pinfolist (NULL),
-	      enum_processes (&winpids::enum_init), npids (0) { init (0); }
+	      enum_processes (&winpids::enum_init), npids (0) { set (0); }
   inline DWORD& winpid (int i) const {return pidlist[i];}
   inline _pinfo *operator [] (int i) const {return (_pinfo *) pinfolist[i];}
   ~winpids ();
   void release ();
+  static void init ();
 };
 
 extern __inline pid_t

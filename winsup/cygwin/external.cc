@@ -43,7 +43,7 @@ fillout_pinfo (pid_t pid, int winpid)
   static unsigned int i;
   if (!pids.npids || !nextpid)
     {
-      pids.init (winpid);
+      pids.set (winpid);
       i = 0;
     }
 
