@@ -1,3 +1,7 @@
+2003-02-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/locale.h: Include stddef.h for definition of NULL.
+
 2003-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/math.h (tgamma): Correct typo in comment.
