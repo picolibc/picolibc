@@ -1594,7 +1594,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       /* We must cancel WSAAsyncSelect (if any) before setting socket to
        * blocking mode
        */
-      if (cmd == FIONBIO && *(int *) p == 0)
+      if (cmd == FIONBIO && async_io () && *(int *) p == 0)
 	WSAAsyncSelect (get_socket (), winmsg, 0, 0);
       res = ioctlsocket (get_socket (), cmd, (unsigned long *) p);
       if (res == SOCKET_ERROR)
