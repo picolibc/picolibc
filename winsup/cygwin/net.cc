@@ -520,7 +520,7 @@ fdsock (int &fd, const char *name, SOCKET soc)
     debug_printf ("not setting socket inheritance since winsock2_active %d",
 		  winsock2_active);
   fhandler_socket *fh =
-    (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
+    (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, *socket_dev, name);
   if (!fh)
     return NULL;
   fh->set_io_handle ((HANDLE) soc);
