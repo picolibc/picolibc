@@ -804,7 +804,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
 	 If wr_proc_pipe exists, then it should be duplicated to the child.
 	 If the child has exited already, that's ok.  The parent will pick up
-	 on this fact when we exit.  dup_proc_pipe also closes our end of the pipe.
+	 on this fact when we exit.  dup_proc_pipe will close our end of the pipe.
 	 Note that wr_proc_pipe may also be == INVALID_HANDLE_VALUE.  That will make
 	 dup_proc_pipe essentially a no-op.  */
       if (myself->wr_proc_pipe)
@@ -812,11 +812,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
 					   just in case we've been previously
 					   execed. */
-	  SetCurrentDirectory ("c:\\");	/* Move to an innocuous location to
-					   avoid races with other processes
-					   that may want to manipulate the
-					   current directory before this process
-					   has completely exited.  */
+	  myself.zap_cwd ();
 	  (void) myself->dup_proc_pipe (pi.hProcess);
 	}
     }

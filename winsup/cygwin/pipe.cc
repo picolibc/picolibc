@@ -210,12 +210,7 @@ fhandler_pipe::close ()
   if (read_state && !cygheap->fdtab.in_vfork_cleanup ())
 #endif
     ForceCloseHandle (read_state);
-  if (get_handle ())
-    {
-      CloseHandle (get_handle ());
-      set_io_handle (NULL);
-    }
-  return 0;
+  return fhandler_base::close ();
 }
 
 bool

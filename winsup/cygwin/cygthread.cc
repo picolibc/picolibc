@@ -234,6 +234,8 @@ cygthread::release (bool nuke_h)
 #endif
   __name = NULL;
   func = NULL;
+  if (ev)
+    ResetEvent (ev);
   if (!InterlockedExchange (&inuse, 0))
 #ifdef DEBUGGING
     api_fatal ("released a thread that was not inuse");
@@ -247,37 +249,22 @@ bool
 cygthread::terminate_thread ()
 {
   bool terminated = true;
-  /* FIXME: The if (!inuse) stuff below should be handled better.  The
-     problem is that terminate_thread could be called while a thread
-     is terminating and either the thread could be handling its own
-     release or, if this is being called during exit, some other
-     thread may be attempting to free up this resource.  In the former
-     case, setting some kind of "I deal with my own exit" type of
-     flag may be the way to handle this. */
-  if (!is_freerange)
-    {
-      ResetEvent (*this);
-      ResetEvent (thread_sync);
-    }
-
   debug_printf ("thread '%s', id %p, inuse %d, stack_ptr %p", name (), id, inuse, stack_ptr);
   while (inuse && !stack_ptr)
     low_priority_sleep (0);
 
   if (!inuse)
-    return false;
-
+    goto force_notterminated;
+    
   (void) TerminateThread (h, 0);
   (void) WaitForSingleObject (h, INFINITE);
-  if (ev)
-    terminated = WaitForSingleObject (ev, 0) != WAIT_OBJECT_0;
-  if (!inuse || exiting)
-    return false;
-
   CloseHandle (h);
 
-  if (!inuse)
-    return false;
+  if (!inuse || exiting)
+    goto force_notterminated;
+
+  if (ev)
+    terminated = WaitForSingleObject (ev, 0) != WAIT_OBJECT_0;
 
   MEMORY_BASIC_INFORMATION m;
   memset (&m, 0, sizeof (m));
@@ -289,8 +276,6 @@ cygthread::terminate_thread ()
     debug_printf ("VirtualFree of allocation base %p<%p> failed, %E",
 		   stack_ptr, m.AllocationBase);
 
-  if (!inuse)
-    /* nothing */;
   if (is_freerange)
     free (this);
   else
@@ -300,6 +285,12 @@ cygthread::terminate_thread ()
 #endif
       release (true);
     }
+  
+  goto out;
+
+force_notterminated:
+  terminated = false;
+out:
   return terminated;
 }
 
@@ -311,7 +302,7 @@ bool
 cygthread::detach (HANDLE sigwait)
 {
   bool signalled = false;
-  bool terminated = false;
+  bool thread_was_reset = false;
   if (!inuse)
     system_printf ("called detach but inuse %d, thread %p?", inuse, id);
   else
@@ -322,35 +313,61 @@ cygthread::detach (HANDLE sigwait)
 	res = WaitForSingleObject (*this, INFINITE);
       else
 	{
+	  /* Lower our priority and give priority to the read thread */
+	  HANDLE hth = GetCurrentThread ();
+	  LONG prio = GetThreadPriority (hth);
+	  (void) ::SetThreadPriority (hth, THREAD_PRIORITY_IDLE);
+
 	  HANDLE w4[2];
-	  w4[0] = *this;
+	  unsigned n = 2;
+	  DWORD howlong = INFINITE;
+	  w4[0] = sigwait;
 	  w4[1] = signal_arrived;
-	  res = WaitForSingleObject (sigwait, INFINITE);
-	  if (res != WAIT_OBJECT_0)
-	    system_printf ("WFSO sigwait %p failed, res %u, %E", sigwait, res);
-	  res = WaitForMultipleObjects (2, w4, FALSE, INFINITE);
+	  /* For a description of the below loop see the end of this file */
+	  for (int i = 0; i < 2; i++)
+	    switch (res = WaitForMultipleObjects (n, w4, FALSE, howlong))
+	      {
+	      case WAIT_OBJECT_0:
+		if (n == 1)
+		  howlong = 50;
+		break;
+	      case WAIT_OBJECT_0 + 1:
+		n = 1;
+		if (i--)
+		  howlong = 50;
+		break;
+	      case WAIT_TIMEOUT:
+		break;
+	      default:
+		if (!exiting)
+		  api_fatal ("WFMO failed waiting for cygthread '%s'", __name);
+		break;
+	      }
+	  /* WAIT_OBJECT_0 means that the thread successfully read something,
+	     so wait for the cygthread to "terminate". */
 	  if (res == WAIT_OBJECT_0)
-	    signalled = false;
-	  else if (res != WAIT_OBJECT_0 + 1)
-	    api_fatal ("WFMO failed waiting for cygthread '%s'", __name);
-	  else if ((res = WaitForSingleObject (*this, 0)) == WAIT_OBJECT_0)
-	    signalled = false;
+	    (void) WaitForSingleObject (*this, INFINITE);
 	  else
 	    {
-	      terminated = true;
+	      /* Thread didn't terminate on its own, so maybe we have to
+		 do it. */
 	      signalled = terminate_thread ();
+	      /* Possibly the thread completed *just* before it was
+		 terminated.  Detect this. If this happened then the
+		 read was not terminated on a signal. */
+	      if (WaitForSingleObject (sigwait, 0) == WAIT_OBJECT_0)
+		signalled = false;
+	      if (signalled)
+		set_sig_errno (EINTR);
+	      thread_was_reset = true;
 	    }
-	  if (WaitForSingleObject (sigwait, 0) == WAIT_OBJECT_0)
-	    signalled = false;
-	  else if (signalled)
-	    set_sig_errno (EINTR);    /* caller should be dealing with return
-					 values. */
+	  (void) ::SetThreadPriority (hth, prio);
 	}
 
       thread_printf ("%s returns %d, id %p", sigwait ? "WFMO" : "WFSO",
 		     res, id);
 
-      if (terminated)
+      if (thread_was_reset)
 	/* already handled */;
       else if (is_freerange)
 	{
@@ -372,3 +389,71 @@ cygthread::terminate ()
 {
   exiting = 1;
 }
+
+/* The below is an explanation of synchronization loop in cygthread::detach.
+   The intent is that the loop will always try hard to wait for both
+   synchronization events from the reader thread but will exit with
+   res == WAIT_TIMEOUT if a signal occurred and the reader thread is
+   still blocked.
+
+    case 0 - no signal
+
+    i == 0 (howlong == INFINITE)
+	W0 activated
+	howlong not set because n != 1
+	just loop
+
+    i == 1 (howlong == INFINITE)
+	W0 activated
+	howlong not set because n != 1
+	just loop (to exit loop) - no signal
+
+    i == 2 (howlong == INFINITE)
+	exit loop
+
+    case 1 - signal before thread initialized
+
+    i == 0 (howlong == INFINITE)
+	WO + 1 activated
+	n set to 1
+	howlong untouched because i-- == 0
+	loop
+
+    i == 0 (howlong == INFINITE)
+	W0 must be activated
+	howlong set to 50 because n == 1
+
+    i == 1 (howlong == 50)
+	W0 activated
+	loop (to exit loop) - no signal
+
+	WAIT_TIMEOUT activated
+	signal potentially detected
+	loop (to exit loop)
+
+    i == 2 (howlong == 50)
+	exit loop
+
+    case 2 - signal after thread initialized
+
+    i == 0 (howlong == INFINITE)
+	W0 activated
+	howlong not set because n != 1
+	loop
+
+    i == 1 (howlong == INFINITE)
+	W0 + 1 activated
+	n set to 1
+	howlong set to 50 because i-- != 0
+	loop
+
+    i == 1 (howlong == 50)
+	W0 activated
+	loop (to exit loop) - no signal
+
+	WAIT_TIMEOUT activated
+	loop (to exit loop) - signal
+
+    i == 2 (howlong == 50)
+	exit loop
+*/

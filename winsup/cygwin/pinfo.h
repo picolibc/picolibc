@@ -196,7 +196,8 @@ public:
   }
 #endif
   HANDLE shared_handle () {return h;}
-  void set_acl();
+  void set_acl ();
+  void zap_cwd ();
   friend class _pinfo;
 };
 

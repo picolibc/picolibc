@@ -124,6 +124,16 @@ pinfo::maybe_set_exit_code_from_windows ()
 }
 
 void
+pinfo::zap_cwd ()
+{
+  extern char windows_system_directory[];
+  /* Move to an innocuous location to avoid a race with other processes
+     that may want to manipulate the current directory before this
+     process has completely exited.  */
+  (void) SetCurrentDirectory (windows_system_directory);
+}
+
+void
 pinfo::exit (DWORD n)
 {
   exit_state = ES_FINAL;
@@ -144,11 +154,7 @@ pinfo::exit (DWORD n)
 
   if (n != EXITCODE_NOSET)
     {
-      extern char windows_system_directory[];
-      /* Move to an innocuous location to avoid a race with other processes
-	 that may want to manipulate the current directory before this
-	 process has completely exited.  */
-      (void) SetCurrentDirectory (windows_system_directory);
+      zap_cwd ();
       self->alert_parent (0);		/* Shave a little time by telling our
 					   parent that we have now exited.  */
     }

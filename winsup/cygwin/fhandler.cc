@@ -234,6 +234,11 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
       signal_read_state (1);
     }
   BOOL res = ReadFile (get_handle (), ptr, len, (DWORD *) &ulen, 0);
+  if (read_state)
+    {
+      signal_read_state (1);
+      (void) SetThreadPriority (h, prio);
+    }
   if (!res)
     {
       /* Some errors are not really errors.  Detect such cases here.  */
@@ -269,11 +274,6 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
 	  bytes_read = (size_t) -1;
 	  break;
 	}
-    }
-  if (read_state)
-    {
-      signal_read_state (1);
-      (void) SetThreadPriority (h, prio);
     }
 #undef bytes_read
 }

@@ -88,7 +88,7 @@ extern char myself_nowait_dummy[];
 
 extern struct sigaction *global_sigs;
 
-#define WAIT_SIG_PRIORITY THREAD_PRIORITY_TIME_CRITICAL
+#define WAIT_SIG_PRIORITY THREAD_PRIORITY_NORMAL
 
 #define myself_nowait ((_pinfo *)myself_nowait_dummy)
 #endif /*_SIGPROC_H*/

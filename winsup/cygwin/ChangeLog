@@ -1,3 +1,22 @@
+2005-02-11  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.cc (cygthread::release): Reset ev here if it exists.
+	(cygthread::terminate_thread): Eliminat racy code which reset ev and
+	thread_sync.  Remove a few nonsensical inuse checks.  Exit at the
+	bottom.
+	(cygthread::detach): Rewrite to again try to ensure that we don't say
+	we're signalled when we are not signalled.
+	* fhandler.cc (fhandler_base::raw_read): Revert to signalling read
+	success quickly.
+	* pipe.cc (fhandler_pipe::close): Use base method to close handle.
+	* sigproc.h (WAIT_SIG_PRIORITY): Just trundle along at normal priority
+	to allow the pipe thread to do its thing if possible.
+
+	* pinfo.h (pinfo::zap_cwd): Declare new function.
+	(pinfo::zap_cwd): Move 'cd out of the way code' here.
+	(pinfo::exit): Use it here.
+	* spawn.cc (spawn_guts): And here.
+
 2005-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* times.cc (utimes): Open files with GENERIC_WRITE on file systems
