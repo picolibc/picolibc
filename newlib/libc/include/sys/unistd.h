@@ -75,6 +75,10 @@ char    _EXFUN(*ttyname, (int __fildes ));
 int     _EXFUN(unlink, (const char *__path ));
 int     _EXFUN(write, (int __fildes, const void *__buf, size_t __nbyte ));
 
+#ifndef        _POSIX_SOURCE
+pid_t   _EXFUN(vfork, (void ));
+#endif /* _POSIX_SOURCE */
+
 /* Provide prototypes for most of the _<systemcall> names that are
    provided in newlib for some compilers.  */
 int     _EXFUN(_close, (int __fildes ));
@@ -86,6 +90,7 @@ int     _EXFUN(_read, (int __fildes, void *__buf, size_t __nbyte ));
 void *  _EXFUN(_sbrk,  (size_t __incr));
 int     _EXFUN(_unlink, (const char *__path ));
 int     _EXFUN(_write, (int __fildes, const void *__buf, size_t __nbyte ));
+int     _EXFUN(_execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 
 #if defined(__CYGWIN__) || defined(__rtems__)
 unsigned _EXFUN(usleep, (unsigned int __useconds));

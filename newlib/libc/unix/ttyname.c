@@ -41,6 +41,7 @@ static char sccsid[] = "@(#)ttyname.c	5.10 (Berkeley) 5/6/91";
 #include <dirent.h>
 #include <termios.h>
 #include <unistd.h>
+#include <string.h>
 #include <paths.h>
 #include <_syslist.h>
 

@@ -10,6 +10,7 @@ DESCRIPTION
 	non-rentrant functions, such as strtok.
 */
 
+#include <stdlib.h>
 #include <reent.h>
 
 /* Interim cleanup code */

@@ -70,7 +70,8 @@ getpass (prompt)
    */
   omask = sigblock (sigmask (SIGINT) | sigmask (SIGTSTP));
   (void) tcgetattr (fileno (fp), &term);
-  if (echo = (term.c_lflag & ECHO))
+  echo = (term.c_lflag & ECHO);
+  if (echo)
     {
       term.c_lflag &= ~ECHO;
       (void) tcsetattr (fileno (fp), TCSAFLUSH, &term);

@@ -1,5 +1,28 @@
 2000-08-23  Werner Almesberger  <Werner.Almesberger@epfl.ch>
 
+	* libc/stdlib/mprec.c (ulp, b2d, d2b): changed a few expressions
+	like  x << y-z  to the equivalent  x << (y-z).
+	(d2b): changed if statements with assignment to perform the
+	assignment prior to the if check.
+	* libc/reent/reent.c: included stdlib.h for "_free_r" prototype.
+	* libc/unix/getpass.c (getpass): moved "echo" assignment out of if.
+	* libc/unix/ttyname.c: included string.h for "strcpy" prototype.
+	* libc/unix/getcwd.c (ISDOT): added parentheses to clarify && and ||
+	precedence.
+	* libc/include/sys/unistd.h: added "vfork" prototype (for popen.c).
+	Added "_execve" prototype (for execl.c, execle.c, execv.c, and 
+	execve.c).
+	* libc/posix/popen.c (popen): added parentheses to clarify && and ||
+	precedence.
+	* libm/math/e_cosh.c (__ieee754_cosh): changed parentheses to
+	clarify && and || precendence (and to remove pascalism).
+	* libm/math/e_sinh.c (__ieee754_sinh): Ditto.
+	* libm/math/s_infconst.c: added another pair of braces to all
+	initializers for __infinity (need three: for __infinity[1] array,
+	for union __dmath, and for i[2]).
+
+2000-08-23  Werner Almesberger  <Werner.Almesberger@epfl.ch>
+
 	* libc/stdlib/abort.c: changed description: uses "raise" instead of
 	"getpid" and "kill"; added: uses "write" and "_exit".
 	Also included unistd.h for "_exit" prototype.

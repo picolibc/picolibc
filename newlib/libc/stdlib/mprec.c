@@ -663,7 +663,7 @@ _DEFUN (ulp, (_x), double _x)
 	  word0 (a) = 0;
 	  L -= Exp_shift;
 #ifndef _DOUBLE_IS_32BITS
-	  word1 (a) = L >= 31 ? 1 : 1 << 31 - L;
+         word1 (a) = L >= 31 ? 1 : 1 << (31 - L);
 #endif
 	}
     }
@@ -710,7 +710,7 @@ _DEFUN (b2d, (a, e),
       d0 = Exp_1 | y << k | z >> (32 - k);
       y = xa > xa0 ? *--xa : 0;
 #ifndef _DOUBLE_IS_32BITS
-      d1 = z << k | y >> 32 - k;
+      d1 = z << k | y >> (32 - k);
 #endif
     }
   else
@@ -794,11 +794,13 @@ _DEFUN (d2b,
 #endif
 #ifdef Pack_32
 #ifndef _DOUBLE_IS_32BITS
-  if (y = d1)
+  if (d1)
     {
-      if (k = lo0bits (&y))
+      y = d1;
+      k = lo0bits (&y);
+      if (k)
 	{
-	  x[0] = y | z << 32 - k;
+         x[0] = y | z << (32 - k);
 	  z >>= k;
 	}
       else
@@ -820,9 +822,11 @@ _DEFUN (d2b,
 #endif
     }
 #else
-  if (y = d1)
+  if (d1)
     {
-      if (k = lo0bits (&y))
+      y = d1;
+      k = lo0bits (&y);
+      if (k)
 	if (k >= 16)
 	  {
 	    x[0] = y | z << 32 - k & 0xffff;

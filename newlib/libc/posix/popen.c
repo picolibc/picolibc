@@ -71,7 +71,7 @@ popen(program, type)
 	FILE *iop;
 	int pdes[2], pid;
 
-	if (*type != 'r' && *type != 'w' || type[1]) {
+       if ((*type != 'r' && *type != 'w') || type[1]) {
 		errno = EINVAL;
 		return (NULL);
 	}
