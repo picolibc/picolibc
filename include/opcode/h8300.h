@@ -313,6 +313,8 @@ struct h8_opcode
 #define O_SYS_CLOSE 105
 #define O_SYS_STAT 106
 #define O_SYS_FSTAT 107
+/* Space reserved for future file I/O system calls.  */
+#define O_SYS_CMDLINE 120
 /* End of System Call specific Changes.  */
 #define SB 0
 #define SW 1
