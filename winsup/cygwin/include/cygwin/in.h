@@ -182,7 +182,7 @@ struct sockaddr_in6
 	unsigned short sin6_family;
 	unsigned short sin6_port;
 	unsigned long sin6_flowinfo;
-	struct in_addr6 sin6_addr;
+	struct in6_addr sin6_addr;
 };
 
 #endif	/* _CYGWIN_IN_H */
