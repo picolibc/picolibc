@@ -366,7 +366,7 @@ tty::common_init (fhandler_pty_master *ptym)
 
   if (!make_pipes (ptym))
     return FALSE;
-  ptym->neednl_ = 0;
+  ptym->need_nl = 0;
 
   /* Save our pid  */
 

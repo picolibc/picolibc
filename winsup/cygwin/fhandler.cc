@@ -96,6 +96,24 @@ fhandler_base::eat_readahead (int n)
   return oralen;
 }
 
+int
+fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
+{
+  int ch;
+  int copied_chars = 0;
+
+  while (buflen)
+    if ((ch = get_readahead ()) < 0)
+      break;
+    else
+      {
+	buf[copied_chars++] = (unsigned char)(ch & 0xff);
+	buflen--;
+      }
+
+  return copied_chars;
+}
+
 uid_t __stdcall
 get_file_owner (int use_ntsec, const char *filename)
 {

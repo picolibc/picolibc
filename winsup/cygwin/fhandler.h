@@ -222,6 +222,8 @@ public:
 
   void set_readahead_valid (int val, int ch = -1);
 
+  int get_readahead_into_buffer (char *buf, size_t buflen);
+
   int has_acls () { return FHISSETF (HASACLS); }
   void set_has_acls (int val) { FHCONDSETF (val, HASACLS); }
 
@@ -663,12 +665,12 @@ class fhandler_pty_master: public fhandler_tty_common
 {
   int pktmode;			// non-zero if pty in a packet mode.
 public:
-  int neednl_;			// Next read should start with \n
+  int need_nl;			// Next read should start with \n
 
   /* Constructor */
   fhandler_pty_master (const char *name, DWORD devtype = FH_PTYM, int unit = -1);
 
-  int process_slave_output (char *buf, size_t len);
+  int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
   int accept_input ();
   int open (const char *path, int flags, mode_t mode = 0);

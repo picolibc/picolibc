@@ -409,20 +409,24 @@ peek_pipe (select_record *s, int ignra)
   if (!s->read_selected && !s->except_selected)
     goto out;
 
-  if (s->read_selected && fh->bg_check (SIGTTIN) <= 0)
+  if (s->read_selected)
     {
-      gotone = s->read_ready = 1;
-      goto out;
+      if (fh->bg_check (SIGTTIN) <= 0)
+	{
+	  gotone = s->read_ready = 1;
+	  goto out;
+	}
+
+      if (!ignra && fh->get_device () != FH_PTYM && fh->get_device () != FH_TTYM &&
+	  fh->get_readahead_valid ())
+	{
+	  select_printf ("readahead");
+	  gotone = s->read_ready = 1;
+	  goto out;
+	}
     }
 
-  if (!ignra && fh->get_readahead_valid ())
-    {
-      select_printf ("readahead");
-      gotone = s->read_ready = 1;
-      goto out;
-    }
-
-  else if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
+  if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
     {
       select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
       n = -1;

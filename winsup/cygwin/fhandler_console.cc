@@ -115,20 +115,13 @@ fhandler_console::read (void *pv, size_t buflen)
     return 0;
 
   HANDLE h = get_io_handle ();
-  int copied_chars = 0;
 
 #define buf ((char *) pv)
 
   int ch;
   set_input_state ();
-  while (buflen)
-    if ((ch = get_readahead ()) < 0)
-      break;
-    else
-      {
-	buf[copied_chars++] = (unsigned char)(ch & 0xff);
-	buflen--;
-      }
+
+  int copied_chars = get_readahead_into_buffer (buf, buflen);
 
   if (copied_chars)
     return copied_chars;

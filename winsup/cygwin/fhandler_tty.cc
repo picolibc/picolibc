@@ -214,10 +214,10 @@ fhandler_pty_master::hit_eof ()
 /* Process tty output requests */
 
 int
-fhandler_pty_master::process_slave_output (char *buf, size_t len)
+fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on)
 {
   size_t rlen;
-  char outbuf[OUT_BUFFER_SIZE];
+  char outbuf[OUT_BUFFER_SIZE + 1];
   DWORD n;
   int column = 0;
   int rc = 0;
@@ -225,20 +225,20 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len)
   if (len == 0)
     goto out;
 
+  if (need_nl)
+    {
+      /* We need to return a left over \n character, resulting from
+	 \r\n conversion.  Note that we already checked for FLUSHO and
+	 OutputStopped at the time that we read the character, so we
+	 don't check again here.  */
+      buf[0] = '\n';
+      need_nl = 0;
+      goto out;
+    }
+
+
   for (;;)
     {
-      if (neednl_)
-	{
-	  /* We need to return a left over \n character, resulting from
-	     \r\n conversion.  Note that we already checked for FLUSHO and
-	     OutputStopped at the time that we read the character, so we
-	     don't check again here.  */
-	  buf[0] = '\n';
-	  neednl_ = 0;
-	  rc = 1;
-	  break;
-	}
-
       /* Set RLEN to the number of bytes to read from the pipe.  */
       rlen = len;
       if (get_ttyp ()->ti.c_oflag & OPOST && get_ttyp ()->ti.c_oflag & ONLCR)
@@ -254,25 +254,35 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len)
 
       HANDLE handle = get_io_handle ();
 
-      /* Doing a busy wait like this is quite inefficient, but nothing
-	 else seems to work completely.  Windows should provide some sort
-	 of overlapped I/O for pipes, or something, but it doesn't.  */
-      while (1)
+      n = 0; // get_readahead_into_buffer (outbuf, len);
+      if (!n)
 	{
-	  DWORD avail;
-	  if (!PeekNamedPipe (handle, NULL, 0, NULL, &avail, NULL))
+	  /* Doing a busy wait like this is quite inefficient, but nothing
+	     else seems to work completely.  Windows should provide some sort
+	     of overlapped I/O for pipes, or something, but it doesn't.  */
+	  while (1)
+	    {
+	      if (!PeekNamedPipe (handle, NULL, 0, NULL, &n, NULL))
+		goto err;
+	      if (n > 0)
+		break;
+	      if (hit_eof ())
+		goto out;
+	      if (n == 0 && (get_flags () & (O_NONBLOCK | O_NDELAY)) != 0)
+		{
+		  set_errno (EAGAIN);
+		  rc = -1;
+		  break;
+		}
+
+	      Sleep (10);
+	    }
+
+	  if (ReadFile (handle, outbuf, rlen, &n, NULL) == FALSE)
 	    goto err;
-	  if (avail > 0)
-	    break;
-	  if (hit_eof ())
-	    goto out;
-	  Sleep (10);
 	}
 
-      if (ReadFile (handle, outbuf, rlen, &n, NULL) == FALSE)
-	goto err;
-
-      termios_printf ("rlen %u", n);
+      termios_printf ("bytes read %u", n);
 
       if (get_ttyp ()->ti.c_lflag & FLUSHO)
 	{
@@ -289,14 +299,19 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len)
 	  termios_printf ("done waiting for restart_output_event");
 	}
 
+      char *optr;
+      optr = buf;
+      if (pktmode_on)
+	*optr++ = TIOCPKT_DATA;
+
       if (!(get_ttyp ()->ti.c_oflag & OPOST))	// post-process output
 	{
-	  memcpy (buf, outbuf, n);
-	  rc = n;
+	  memcpy (optr, outbuf, n);
+	  optr += n;
 	}
       else					// raw output mode
 	{
-	  char *iptr = outbuf, *optr = buf;
+	  char *iptr = outbuf;
 
 	  while (n--)
 	    {
@@ -332,16 +347,16 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len)
 		 doing \r\n expansion.  */
 	      if (optr - buf >= (int) len)
 		{
-		  neednl_ = 1;
 		  if (*iptr != '\n' || n != 0)
 		    system_printf ("internal error: %d unexpected characters", n);
+		  need_nl = 1;
 		  break;
 		}
 
 	      *optr++ = *iptr++;
 	    }
-	  rc = optr - buf;
 	}
+      rc = optr - buf;
       break;
 
     err:
@@ -364,11 +379,10 @@ static DWORD WINAPI
 process_output (void *)
 {
   char buf[OUT_BUFFER_SIZE*2];
-  int n;
 
-  while (1)
+  for (;;)
     {
-      n = tty_master->process_slave_output (buf, OUT_BUFFER_SIZE);
+      int n = tty_master->process_slave_output (buf, OUT_BUFFER_SIZE, 0);
       if (n < 0)
 	{
 	  termios_printf ("ReadFile %E");
@@ -592,14 +606,18 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 
   while (len)
     {
+      size_t readlen = min ((unsigned) vmin, min (len, sizeof (buf)));
       termios_printf ("reading %d bytes (vtime %d)",
 		      min ((unsigned) vmin, min (len, sizeof (buf))), vtime);
-      if (ReadFile (get_handle (), (unsigned *) buf,
-		 min ((unsigned) vmin, min (len, sizeof (buf))), &n, NULL) == FALSE)
+
+      n = get_readahead_into_buffer (buf, readlen);
+
+      if (!n && ReadFile (get_handle (), buf, readlen, &n, NULL) == FALSE)
 	{
 	  termios_printf ("read failed, %E");
 	  _raise (SIGHUP);
 	}
+
       if (get_ttyp ()->read_retval < 0)	// read error
 	{
 	  set_errno (-get_ttyp ()->read_retval);
@@ -827,7 +845,7 @@ fhandler_pty_master::fhandler_pty_master (const char *name, DWORD devtype, int u
   ioctl_request_event = NULL;
   ioctl_done_event = NULL;
   restart_output_event = NULL;
-  pktmode = neednl_ = 0;
+  pktmode = need_nl = 0;
   inuse = NULL;
 }
 
@@ -908,39 +926,11 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 int
 fhandler_pty_master::read (void *ptr, size_t len)
 {
-  DWORD n;
-  char *cptr = (char *) ptr;
+  int x = process_slave_output ((char *) ptr, len, pktmode);
 
-  if (!PeekNamedPipe (get_handle (), NULL, 0, NULL, &n, NULL))
-    {
-      if (GetLastError () == ERROR_BROKEN_PIPE)
-	{
-	  /* On Unix, a read from a broken pipe returns EOF.  */
-	  return 0;
-	}
-      __seterrno ();
-      return -1;
-    }
-  if (n == 0
-      && (get_flags () & (O_NONBLOCK | O_NDELAY)) != 0)
-    {
-      set_errno (EAGAIN);
-      return -1;
-    }
-  if (pktmode)
-    {
-      *cptr++ = TIOCPKT_DATA;
-      len--;
-    }
-
-  int x;
-  x = process_slave_output (cptr, len);
-  if (x < 0)
-    return -1;
   if (output_done_event != NULL)
     SetEvent (output_done_event);
-  if (pktmode && x > 0)
-    x++;
+
   return x;
 }
 

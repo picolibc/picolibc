@@ -1,3 +1,17 @@
+Sun Mar 12 01:14:33 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.cc (fhandler_base::get_readahead_into_buffer): New function.
+	* fhandler.h: Declare new function.  Add extra argument to
+	process_slave_output.
+	* fhandler_console.cc (fhandler_console::read): Move read ahead code to
+	new function.
+	* fhandler_tty.cc (fhandler_pty_master::process_slave_output): Move
+	common code here.
+	(fhandler_tty_slave::read): Understand readahead.
+	(fhandler_pty_master::read): Move code to process_slave_output.
+	* select.cc (peek_pipe): Avoid performing certain checks when non-read
+	and on inappropriate fh types.
+
 Sat Mar 11 22:47:43 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_console.cc (fhandler_console::read): Don't even think about
