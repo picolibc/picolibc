@@ -813,7 +813,6 @@ out:
 	path_flags |= PATH_EXEC;
     }
 
-  debug_printf ("binary %d", isbinary ());
 #if 0
   if (!error)
     {
