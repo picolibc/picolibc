@@ -99,22 +99,24 @@ usage (FILE *where = stderr)
   " -V, --version  output version information and exit\n"
   "\n");
   if (where == stdout)
-    fprintf (where, ""
-    "KEY is in the format [host]\\prefix\\KEY\\KEY\\VALUE, where host is optional\n"
-    "remote host in either \\\\hostname or hostname: format and prefix is any of:\n"
-    "  root     HKCR  HKEY_CLASSES_ROOT (local only)\n"
-    "  config   HKCC  HKEY_CURRENT_CONFIG (local only)\n"
-    "  user     HKCU  HKEY_CURRENT_USER (local only)\n"
-    "  machine  HKLM  HKEY_LOCAL_MACHINE\n"
-    "  users    HKU   HKEY_USERS\n"
-    "\n"
-    "You can use forward slash ('/') as a separator instead of backslash, in\n"
-    "that case backslash is treated as escape character\n"
-    "");
-  fprintf (where, ""
-  "Example: %s get '\\user\\software\\Microsoft\\Clock\\iFormat'\n", prog_name);
+    {
+      fprintf (where, ""
+      "KEY is in the format [host]\\prefix\\KEY\\KEY\\VALUE, where host is optional\n"
+      "remote host in either \\\\hostname or hostname: format and prefix is any of:\n"
+      "  root     HKCR  HKEY_CLASSES_ROOT (local only)\n"
+      "  config   HKCC  HKEY_CURRENT_CONFIG (local only)\n"
+      "  user     HKCU  HKEY_CURRENT_USER (local only)\n"
+      "  machine  HKLM  HKEY_LOCAL_MACHINE\n"
+      "  users    HKU   HKEY_USERS\n"
+      "\n"
+      "If the keyname starts with a forward slash ('/'), the forward slash is used\n"
+      "as separator and the backslash can be used as escape character.\n");
+      fprintf (where, ""
+      "Example:\n"
+      "%s list '/machine/SOFTWARE/Classes/MIME/Database/Content Type/audio\\/wav'\n", prog_name);
+    }
   if (where == stderr)
-    fprintf (where, "Try '%s --help' for more information.", prog_name);
+    fprintf (where, "Try '%s --help' for more information.\n", prog_name);
   exit (where == stderr ? 1 : 0);
 }
 
