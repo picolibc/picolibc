@@ -17,7 +17,6 @@
 #include "winsup.h"
 #endif
 
-#include <sys/socket.h>
 #include <sys/types.h>
 
 #include <assert.h>

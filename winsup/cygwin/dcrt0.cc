@@ -33,7 +33,6 @@ details. */
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
-#include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver.h"
 
 #define MAX_AT_FILE_LEVEL 10

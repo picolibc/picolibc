@@ -28,16 +28,12 @@ details. */
 
 #include <ostream.h>
 
-#include "cygwin_version.h"
 #include "cygerrno.h"
+#include "cygwin_version.h"
 
-#include "cygserver_shm.h"
 #include "cygwin/cygserver.h"
 #include "cygwin/cygserver_process.h"
 #include "cygwin/cygserver_transport.h"
-#include "cygwin/cygserver_transport_pipes.h"
-#include "cygwin/cygserver_transport_sockets.h"
-#include "threaded_queue.h"
 
 GENERIC_MAPPING access_mapping;
 

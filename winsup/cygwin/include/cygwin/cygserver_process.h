@@ -13,7 +13,7 @@ details. */
 #ifndef _CYGSERVER_PROCESS_
 #define _CYGSERVER_PROCESS_
 
-/* needs threaded_queue.h */
+#include "threaded_queue.h"
 
 class process_cleanup:public queue_request
 {

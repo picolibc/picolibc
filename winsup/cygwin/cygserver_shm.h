@@ -12,9 +12,7 @@ details. */
 #include <sys/types.h>
 
 #include "cygwin_shm.h"
-#include "threaded_queue.h"
-#include "cygwin/cygserver_process.h"
-#include "cygwin/cygserver_transport.h"
+
 #include "cygwin/cygserver.h"
 
 /* Values for the client_request_shm::parameters.in.type field. */

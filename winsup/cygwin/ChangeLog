@@ -1,5 +1,22 @@
 2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* include/cygwin/cygserver.h: Add forward declarations of class
+	transport_layer_base and class process_cache to reduce
+	dependencies between header files.
+	* include/cygwin/cygserver_process.h: Add include of
+	"threaded_queue.h".
+	* cygserver.cc: Remove unnecessary cygserver header files.
+	* cygserver_client.cc: Ditto.
+	* cygserver_process.cc: Ditto.
+	* cygserver_shm.cc: Ditto.
+	* cygserver_shm.h: Ditto.
+	* cygserver_transport_pipes.cc: Ditto.
+	* dcrt0.cc: Ditto.
+	* fhandler_tty.cc: Ditto.
+	* tty.cc: Ditto.
+
+2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_shm.h: Replace <sys/shm.h> with "cygwin_shm.h" after
 	merge from HEAD.
 	* cygwin_ipc.h: Update with changes to include/sys/ipc.h lost in

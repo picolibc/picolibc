@@ -24,7 +24,6 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "shared_info.h"
-#include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver.h"
 
 /* Tty master stuff */

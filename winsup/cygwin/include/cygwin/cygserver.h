@@ -34,6 +34,12 @@ typedef enum {
  * class client_request
  *---------------------------------------------------------------------------*/
 
+class transport_layer_base;
+
+#ifndef __INSIDE_CYGWIN__
+class process_cache;
+#endif
+
 class client_request
 {
 protected:

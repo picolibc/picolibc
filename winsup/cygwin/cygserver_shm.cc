@@ -20,9 +20,11 @@
 
 #include "cygerrno.h"
 #include "cygserver_shm.h"
-#include "cygwin/cygserver_process.h"
 #include "security.h"
-#include "threaded_queue.h"
+
+#include "cygwin/cygserver.h"
+#include "cygwin/cygserver_process.h"
+#include "cygwin/cygserver_transport.h"
 
 // FIXME IS THIS CORRECT
 /* Implementation notes: We use two shared memory regions per key:

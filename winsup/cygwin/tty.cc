@@ -22,7 +22,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
-#include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver.h"
 #include "shared_info.h"
 

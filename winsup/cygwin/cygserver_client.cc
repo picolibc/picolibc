@@ -25,12 +25,10 @@ details. */
 #include <unistd.h>
 
 #include "cygerrno.h"
-
-#include "cygwin/cygserver_transport.h"
-#include "cygwin/cygserver_transport_pipes.h"
-#include "cygwin/cygserver_transport_sockets.h"
-#include "cygwin/cygserver.h"
 #include "cygserver_shm.h"
+
+#include "cygwin/cygserver.h"
+#include "cygwin/cygserver_transport.h"
 
 int cygserver_running = CYGSERVER_UNKNOWN;
 
