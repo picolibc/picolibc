@@ -67,7 +67,7 @@ extern "C" void __cygserver__printf (const char *, const char *, ...);
   do								\
     {								\
       __cygserver__printf (__PRETTY_FUNCTION__, __VA_ARGS__);	\
-    } while (false);
+    } while (false)
 
 #define __noop_printf(...) do {;} while (false)
 
