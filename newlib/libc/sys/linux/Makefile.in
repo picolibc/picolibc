@@ -173,6 +173,7 @@ LIB_SOURCES = \
 	termios.c \
 	time.c \
 	usleep.c \
+	utimes.c \
 	wait.c
 
 
@@ -237,7 +238,7 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@sysconf.$(OBJEXT) sysctl.$(OBJEXT) systat.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@system.$(OBJEXT) tcdrain.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@tcsendbrk.$(OBJEXT) termios.$(OBJEXT) time.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@usleep.$(OBJEXT) wait.$(OBJEXT)
+@USE_LIBTOOL_FALSE@usleep.$(OBJEXT) utimes.$(OBJEXT) wait.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  aio.lo brk.lo cfspeed.lo \
@@ -256,7 +257,7 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@sigset.lo sigwait.lo socket.lo sleep.lo stack.lo \
 @USE_LIBTOOL_TRUE@strsignal.lo sysconf.lo sysctl.lo systat.lo system.lo \
 @USE_LIBTOOL_TRUE@tcdrain.lo tcsendbrk.lo termios.lo time.lo usleep.lo \
-@USE_LIBTOOL_TRUE@wait.lo
+@USE_LIBTOOL_TRUE@utimes.lo wait.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -285,8 +286,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in  \
-		../../../acinclude.m4 ../../../aclocal.m4 \
-		../../../libtool.m4
+		../../../acinclude.m4 ../../../aclocal.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)

@@ -1,3 +1,15 @@
+2002-07-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/utime.h: Add include of <_ansi.h>.
+	* libc/sys/linux/Makefile.am: Add utimes.c.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/inode.c(__umask): New static routine.
+	(umask): Written to use __umask and attempt to thread lock.
+	(getumask): New function written to use __umask and thread lock.
+	* libc/sys/linux/utimes.c: New file.
+	* libc/sys/linux/sys/time.h: Fix utimes prototype.
+	* libc/sys/linux/sys/utime.h: New file.
+
 2002-07-04  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libtool.m4: New file.

@@ -76,6 +76,7 @@ LIB_SOURCES = \
 	termios.c \
 	time.c \
 	usleep.c \
+	utimes.c \
 	wait.c
 
 # This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)
