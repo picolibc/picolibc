@@ -1,3 +1,9 @@
+2003-11-27  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Reorganize to
+	avoid inappropriate .lnk extensions with munged filenames under managed
+	mode.
+
 2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_helper.cc (set_process_privilege): Rename restore_priv to

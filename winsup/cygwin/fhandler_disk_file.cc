@@ -704,28 +704,28 @@ fhandler_disk_file::readdir (DIR *dir)
       return res;
     }
 
-  /* We get here if `buf' contains valid data.  */
-  if (get_encoded ())
-    (void) fnunmunge (dir->__d_dirent->d_name, buf.cFileName);
-  else
-    strcpy (dir->__d_dirent->d_name, buf.cFileName);
-
   /* Check for Windows shortcut. If it's a Cygwin or U/WIN
      symlink, drop the .lnk suffix. */
   if (buf.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
     {
-      char *c = dir->__d_dirent->d_name;
+      char *c = buf.cFileName;
       int len = strlen (c);
       if (strcasematch (c + len - 4, ".lnk"))
 	{
 	  char fbuf[CYG_MAX_PATH + 1];
 	  strcpy (fbuf, dir->__d_dirname);
-	  strcpy (fbuf + strlen (fbuf) - 1, dir->__d_dirent->d_name);
+	  strcpy (fbuf + strlen (fbuf) - 1, c);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
 	  if (fpath.issymlink () || fpath.isspecial ())
 	    c[len - 4] = '\0';
 	}
     }
+
+  /* We get here if `buf' contains valid data.  */
+  if (get_encoded ())
+    (void) fnunmunge (dir->__d_dirent->d_name, buf.cFileName);
+  else
+    strcpy (dir->__d_dirent->d_name, buf.cFileName);
 
   dir->__d_position++;
   res = dir->__d_dirent;
