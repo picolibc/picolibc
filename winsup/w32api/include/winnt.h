@@ -3303,6 +3303,19 @@ extern __inline__ PVOID GetFiberData(void)
     return ret;
 }
 
+static __inline__ struct _TEB * NtCurrentTeb(void)
+{
+    struct _TEB *ret;
+
+    __asm__ __volatile__ (
+        "movl %%fs:0x18, %0\n"
+        : "=r" (ret)
+        : /* no inputs */
+    );
+
+    return ret;
+}
+
 #else
 
 extern PVOID GetCurrentFiber(void);
