@@ -1,3 +1,7 @@
+2001-08-27  Andreas Jaeger  <aj@suse.de>
+
+	* xcoff.h (struct __rtinit): Make proper prototype for rtl.
+
 Fri Aug 24 01:18:51 2001  J"orn Rennecke <amylaar@redhat.com>
 
 	* internal.h (R_JMP2, R_JMPL2, R_MOVL2): Comment spelling fix.
