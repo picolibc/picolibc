@@ -235,6 +235,7 @@ struct cwdstuff
   {
     get_initial (); 
     memcpy (dst, win32, drive_length); 
+    cwd_lock->release ();
     return drive_length;
   }
   void init ();

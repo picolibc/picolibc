@@ -1,3 +1,7 @@
+2004-12-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (cwdstuff::get_drive): Release cwd_lock.
+
 2004-12-12  Bas van Gompel  <cygwin-patch@bavag.tmfweb.nl>
 
 	* fhandler.cc (fhandler_base::puts_readahead): Fix end-condition.
