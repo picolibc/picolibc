@@ -1,3 +1,7 @@
+2003-04-13  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* mkvers.sh: Prefix day with 0 in date only when day < 10.
+
 2003-04-11  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* security.cc (get_info_from_sd): New function.

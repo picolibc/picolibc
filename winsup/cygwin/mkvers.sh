@@ -45,7 +45,7 @@ case "$2" in
     Dec) m=12 ;;
 esac
 
-if [ "$3" -le 10 ]; then
+if [ "$3" -lt 10 ]; then
     d=0$3
 else
     d=$3
