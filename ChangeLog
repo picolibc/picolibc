@@ -1,3 +1,8 @@
+2001-12-13  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configure.in (FLAGS_FOR_TARGET): Remove -nostdinc and -isystem
+	options for i[3456]86-pc-linux* native builds.
+
 2001-12-05  Laurent Guerby  <guerby@acm.org>
 
 	* MAINTAINERS: gcc adopts symlink-tree, refer more to
