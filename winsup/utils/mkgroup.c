@@ -25,8 +25,10 @@ static const char version[] = "$Revision$";
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
 
+NET_API_STATUS WINAPI (*netapibufferallocate)(DWORD,PVOID*);
 NET_API_STATUS WINAPI (*netapibufferfree)(PVOID);
 NET_API_STATUS WINAPI (*netgroupenum)(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
+NET_API_STATUS WINAPI (*netgroupgetinfo)(LPWSTR,LPWSTR,DWORD,PBYTE*);
 NET_API_STATUS WINAPI (*netlocalgroupenum)(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 NET_API_STATUS WINAPI (*netlocalgroupgetmembers)(LPWSTR,LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 NET_API_STATUS WINAPI (*netgetdcname)(LPWSTR,LPWSTR,PBYTE*);
@@ -49,9 +51,13 @@ load_netapi ()
   if (!h)
     return FALSE;
 
+  if (!(netapibufferallocate = (void *) GetProcAddress (h, "NetApiBufferAllocate")))
+    return FALSE;
   if (!(netapibufferfree = (void *) GetProcAddress (h, "NetApiBufferFree")))
     return FALSE;
   if (!(netgroupenum = (void *) GetProcAddress (h, "NetGroupEnum")))
+    return FALSE;
+  if (!(netgroupgetinfo = (void *) GetProcAddress (h, "NetGroupGetInfo")))
     return FALSE;
   if (!(netgroupgetusers = (void *) GetProcAddress (h, "NetGroupGetUsers")))
     return FALSE;
@@ -158,20 +164,29 @@ enum_local_users (LPWSTR groupname)
 }
 
 int
-enum_local_groups (int print_sids, int print_users)
+enum_local_groups (int print_sids, int print_users, char *disp_groupname)
 {
   LOCALGROUP_INFO_0 *buffer;
   DWORD entriesread = 0;
   DWORD totalentries = 0;
   DWORD resume_handle = 0;
+  WCHAR uni_name[512];
   DWORD rc;
 
   do
     {
       DWORD i;
 
-      rc = netlocalgroupenum (NULL, 0, (void *) &buffer, 1024,
-			      &entriesread, &totalentries, &resume_handle);
+      if (disp_groupname != NULL)
+	{
+	  MultiByteToWideChar (CP_ACP, 0, disp_groupname, -1, uni_name, 512 );
+	  rc = netapibufferallocate(sizeof(LOCALGROUP_INFO_0), (void *) &buffer );
+	  buffer[0].lgrpi0_name = (LPWSTR) & uni_name;
+	  entriesread=1;
+	}
+      else 
+	rc = netlocalgroupenum (NULL, 0, (void *) &buffer, 1024,
+				&entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
@@ -276,12 +291,14 @@ enum_users (LPWSTR servername, LPWSTR groupname)
 }
 
 void
-enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset)
+enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset,
+	     char *disp_groupname)
 {
   GROUP_INFO_2 *buffer;
   DWORD entriesread = 0;
   DWORD totalentries = 0;
   DWORD resume_handle = 0;
+  WCHAR uni_name[512];
   DWORD rc;
   char ansi_srvname[256];
 
@@ -292,8 +309,16 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset)
     {
       DWORD i;
 
-      rc = netgroupenum (servername, 2, (void *) & buffer, 1024,
-		         &entriesread, &totalentries, &resume_handle);
+      if (disp_groupname != NULL)
+	{
+	  MultiByteToWideChar (CP_ACP, 0, disp_groupname, -1, uni_name, 512 );
+	  rc = netgroupgetinfo(servername, (LPWSTR) & uni_name, 2,
+			       (void *) &buffer );
+	  entriesread=1;
+	}
+      else 
+	rc = netgroupenum (servername, 2, (void *) & buffer, 1024,
+			   &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
@@ -493,7 +518,8 @@ usage (FILE * stream, int isNT)
 		     "                          in domain accounts.\n"
 		     "   -s,--no-sids           don't print SIDs in pwd field\n"
 		     "                          (this affects ntsec)\n"
-	             "   -u,--users             print user list in gr_mem field\n");
+	             "   -u,--users             print user list in gr_mem field\n"
+                     "   -g,--group groupname   only return information for the specified group\n");
   fprintf (stream, "   -h,--help              print this message\n"
 	           "   -v,--version           print version information and exit\n\n");
   if (isNT)
@@ -509,12 +535,13 @@ struct option longopts[] = {
   {"id-offset", required_argument, NULL, 'o'},
   {"no-sids", no_argument, NULL, 's'},
   {"users", no_argument, NULL, 'u'},
+  {"group", required_argument, NULL, 'g'},
   {"help", no_argument, NULL, 'h'},
   {"version", no_argument, NULL, 'v'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "lcdo:suhv";
+char opts[] = "lcdo:sug:hv";
 
 void
 print_version ()
@@ -552,6 +579,8 @@ main (int argc, char **argv)
   int print_users = 0;
   int domain_specified = 0;
   int id_offset = 10000;
+  char *disp_groupname = NULL;
+  int isRoot = 0;
   int isNT;
   int i;
 
@@ -592,6 +621,10 @@ main (int argc, char **argv)
 	  break;
 	case 'u':
 	  print_users = 1;
+	  break;
+	case 'g':
+	  disp_groupname = optarg;
+	  isRoot = !strcmp(disp_groupname, "root");
 	  break;
 	case 'h':
 	  usage (stdout, isNT);
@@ -636,6 +669,8 @@ main (int argc, char **argv)
 
   if (print_local)
     {
+      if (isRoot)
+        {
       /*
        * Very special feature for the oncoming future:
        * Create a "root" group account, being actually the local
@@ -643,7 +678,10 @@ main (int argc, char **argv)
        * fixed, there's no need to call print_special() for this.
        */
       printf ("root:S-1-5-32-544:0:\n");
+	}
 
+      if (disp_groupname == NULL)
+        {
       /*
        * Get `system' group
        */
@@ -691,8 +729,12 @@ main (int argc, char **argv)
 				   0,
 				   0,
 				   0);
+	}
 
-      enum_local_groups (print_sids, print_users);
+      if (!isRoot)
+	{
+      enum_local_groups (print_sids, print_users, disp_groupname);
+	}
     }
 
   i = 1;
@@ -713,7 +755,7 @@ main (int argc, char **argv)
 	    return 1;
 	  }
 
-	enum_groups (servername, print_sids, print_users, id_offset * i++);
+	enum_groups (servername, print_sids, print_users, id_offset * i++, disp_groupname);
 	netapibufferfree (servername);	
       }
     while (++optind < argc);

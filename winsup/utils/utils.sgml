@@ -424,6 +424,7 @@ Options:
    -s,--no-sids           don't print SIDs in pwd field
                           (this affects ntsec)
    -u,--users             print user list in gr_mem field
+   -g,--group groupname   only return information for the specified group\n");
    -h,--help              print this message
 
    -v,--version           print version information and exit
@@ -471,6 +472,8 @@ gr_mem (last) field.  Note that this can greatly increase
 the time for <command>mkgroup</command> to run in a large domain.
 Having gr_mem fields is helpful when a domain user logs in remotely
 while the local machine is disconnected from the Domain Controller.
+The <literal>-g</literal> option only prints the information for
+one group.
 </para>
 
 </sect2>

@@ -1,3 +1,15 @@
+2004-07-12  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* mkgroup.cc (netapibufferallocate,netgroupgetinfo): New function
+	pointers.
+	(load_netapi): Load NetApiBufferAllocate and NetGroupGetInfo.
+	(enum_local_groups,enum_groups): Add disp_groupname parameter.
+	Load info for disp_groupname if specified.
+	(usage): Add description of "-g/--group" option.
+	(longopts,opts): Add "-g/--group" option.
+	(main): Process "-g/--group" option.
+	* utils.sgml (mkgroup): Add description of "-g/--group" option
+
 2004-06-15  Alan Modra  <amodra@bigpond.net.au>
 
 	* dumper.cc (dumper::prepare_core_dump): Use bfd_get_section_size
