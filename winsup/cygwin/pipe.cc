@@ -229,7 +229,7 @@ fhandler_pipe::dup (fhandler_base *child)
   if (read_state == NULL)
     ftp->read_state = NULL;
   else if (!DuplicateHandle (hMainProc, read_state, hMainProc,
-			     &ftp->read_state, 0, 1,
+			     &ftp->read_state, 0, 0,
 			     DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("couldn't duplicate read_state %p, %E", read_state);

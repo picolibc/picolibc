@@ -130,3 +130,16 @@ device::tty_to_real_device ()
     parse (DEV_TTYS_MAJOR, myself->ctty);
 }
 
+void
+device::parsedisk (int drive, int part)
+{
+  int base;
+  if (drive < ('q' - 'a'))
+    base = DEV_SD_MAJOR;
+  else
+    {
+      base = DEV_SD1_MAJOR;
+      drive -= 'q' - 'q';
+    }
+  parse (base, part + (drive * 16));
+}

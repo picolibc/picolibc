@@ -1,3 +1,23 @@
+2005-02-01  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.cc (cygthread::terminate_thread): Wait briefly for
+	notification event in the event that the thread was actually in the
+	process of exiting.
+
+	* pipe.cc (fhandler_pipe::dup): read_state is not supposed to be
+	inheritable.  Fix that.
+
+	* path.cc (path_conv::check): Set symlen = 0 to avoid a compiler
+	warning.
+
+	* devices.h (devices::parsedisk): Declare new function.
+	* devices.in (devices::parsedisk): Define new function.
+	* dtable.cc (dtable::init_std_file_from_handle): Use device numbers
+	rather than name.
+	* fhandler_proc.cc (format_proc_partitions): Use parsedisk to generate
+	disk names from numeric codes.  (This was broken on two of my
+	systems previously and is still broken now)
+
 2005-02-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pipe.cc (fhandler_pipe::open):  Allow re-opening of /proc/<pid>/fd

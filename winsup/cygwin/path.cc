@@ -572,7 +572,7 @@ path_conv::check (const char *src, unsigned opt,
       int component = 0;		// Number of translated components
       sym.contents[0] = '\0';
 
-      int symlen;
+      int symlen = 0;
       for (;;)
 	{
 	  const suffix_info *suff;

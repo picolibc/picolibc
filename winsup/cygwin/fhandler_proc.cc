@@ -387,7 +387,7 @@ fhandler_proc::fill_filebuf ()
       }
     case PROC_SELF:
       {
-        filebuf = (char *) realloc (filebuf, bufalloc = 32);
+	filebuf = (char *) realloc (filebuf, bufalloc = 32);
 	filesize = __small_sprintf (filebuf, "%d", getpid ());
       }
     }
@@ -967,8 +967,6 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 	    {
 	      DWORD dwBytesReturned, dwRetCode;
 	      DISK_GEOMETRY dg;
-	      int buf_size = 4096;
-	      char buf[buf_size];
 	      dwRetCode = DeviceIoControl (hDevice,
 					   IOCTL_DISK_GET_DRIVE_GEOMETRY,
 					   NULL,
@@ -981,49 +979,51 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 		debug_printf ("DeviceIoControl %E");
 	      else
 		{
-		  char devname[16];
-		  __small_sprintf (devname, "/dev/sd%c", drive_number + 'a');
 		  device dev;
-		  dev.parse (devname);
+		  dev.parsedisk (drive_number, 0);
 		  bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
 					     dev.major,
 					     dev.minor,
 					     (long long)((dg.Cylinders.QuadPart * dg.TracksPerCylinder *
 					      dg.SectorsPerTrack * dg.BytesPerSector) >> 10),
-					     devname + 5);
+					     dev.name + 5);
 		}
-	      while (dwRetCode = DeviceIoControl (hDevice,
-						  IOCTL_DISK_GET_DRIVE_LAYOUT,
-						  NULL,
-						  0,
-						  (DRIVE_LAYOUT_INFORMATION *) buf,
-						  buf_size,
-						  &dwBytesReturned,
-						  NULL),
-		     !dwRetCode && GetLastError () == ERROR_INSUFFICIENT_BUFFER)
-	      buf_size *= 2;
-	      if (!dwRetCode)
-		debug_printf ("DeviceIoControl %E");
-	      else
+	      size_t buf_size = 8192;
+	      DWORD rc;
+	      while (1)
 		{
+		  char buf[buf_size];
+		  memset (buf, 0, buf_size);
+		  rc = DeviceIoControl (hDevice, IOCTL_DISK_GET_DRIVE_LAYOUT,
+					NULL, 0, (DRIVE_LAYOUT_INFORMATION *) buf,
+					buf_size, &dwBytesReturned, NULL);
+		  if (rc)
+		    /* fall through */;
+		  else if (GetLastError () == ERROR_INSUFFICIENT_BUFFER)
+		    {
+		      buf_size *= 2;
+		      continue;
+		    }
+		  else
+		    {
+		      debug_printf ("DeviceIoControl %E");
+		      break;
+		    }
 		  DRIVE_LAYOUT_INFORMATION *dli = (DRIVE_LAYOUT_INFORMATION *) buf;
 		  for (unsigned partition = 0; partition < dli->PartitionCount; partition++)
 		    {
-		      if (dli->PartitionEntry[partition].PartitionLength.QuadPart == 0)
+		      if (!dli->PartitionEntry[partition].PartitionLength.QuadPart
+			  || !dli->PartitionEntry[partition].PartitionType)
 			continue;
-		      char devname[16];
-		      __small_sprintf (devname, "/dev/sd%c%d",
-						drive_number + 'a',
-						partition + 1);
 		      device dev;
-		      dev.parse (devname);
+		      dev.parsedisk (drive_number, partition + 1);
 		      bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
 						 dev.major, dev.minor,
 						 (long long)(dli->PartitionEntry[partition].PartitionLength.QuadPart >> 10),
-						 devname + 5);
+						 dev.name + 5);
 		    }
+		  break;
 		}
-
 	      CloseHandle (hDevice);
 	    }
 	}

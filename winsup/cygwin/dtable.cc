@@ -273,14 +273,14 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       if (GetConsoleScreenBufferInfo (handle, &buf))
 	{
 	  if (ISSTATE (myself, PID_USETTY))
-	    dev.parse ("/dev/tty");
+	    dev.parse (FH_TTY);
 	  else
 	    dev = *console_dev;
 	}
       else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
 	{
 	  if (ISSTATE (myself, PID_USETTY))
-	    dev.parse ("/dev/tty");
+	    dev.parse (FH_TTY);
 	  else
 	    dev = *console_dev;
 	}
@@ -294,7 +294,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
 	dev = *tcp_dev;
       else if (GetCommState (handle, &dcb))
-	dev.parse ("/dev/ttyS0");
+	dev.parse (DEV_TTYS_MAJOR, 0);
       else
 	{
 	  name = handle_to_fn (handle, (char *) alloca (CYG_MAX_PATH + 100));

@@ -135,6 +135,7 @@ struct device
   void parse (const char *);
   void parse (_major_t major, _minor_t minor);
   void parse (_dev_t dev);
+  void parsedisk (int, int);
   inline bool setunit (unsigned n)
   {
     minor = n;

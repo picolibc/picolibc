@@ -73,7 +73,7 @@ cygthread::stub (VOID *arg)
 	  info->func (info->arg == cygself ? info : info->arg);
 	  /* ...so the above should always return */
 
-	  /* If stack_ptr is NULL, the above function has set that to indicate
+	  /* If func is NULL, the above function has set that to indicate
 	     that it doesn't want to alert anyone with a SetEvent and should
 	     just be marked as no longer inuse.  Hopefully the function knows
 	     that it is doing.  */
@@ -175,10 +175,6 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
   else
     {
       stack_ptr = NULL;
-#ifdef DEBUGGING
-      if (__oldname)
-	system_printf ("__oldname %s, terminated %d", __oldname, terminated);
-#endif
       h = CreateThread (&sec_none_nih, 0, is_freerange ? simplestub : stub,
 			this, 0, &id);
       if (!h)
@@ -272,6 +268,8 @@ cygthread::terminate_thread ()
 
   (void) TerminateThread (h, 0);
   (void) WaitForSingleObject (h, INFINITE);
+  if (ev)
+    WaitForSingleObject (ev, 0);
   if (!inuse || exiting)
     return;
 
