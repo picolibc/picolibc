@@ -67,6 +67,8 @@
 #define	ENOTEMPTY	41	/* Directory not empty (90 in Cyg?) */
 #define	EILSEQ		42	/* Illegal byte sequence */
 
+#define ELOOP		90      /* Pretend: Too many symlinks */
+
 /*
  * NOTE: ENAMETOOLONG and ENOTEMPTY conflict with definitions in the
  *       sockets.h header provided with windows32api-0.1.2.

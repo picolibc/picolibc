@@ -1,3 +1,7 @@
+2005-01-10  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/errno.h (ELOOP): Add definition.
+
 2005-01-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/complex/(cabsl.c cacosl.c cacoshl.c cargl.c casinl.c
