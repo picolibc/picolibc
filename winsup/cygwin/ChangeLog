@@ -1,3 +1,8 @@
+Mon Feb 21 18:36:37 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.cc (set_inheritance): Revert previous patch which got rid of
+	'name' parameter.
+
 Mon Feb 21 00:19:40 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Respond to a multitude of new g++ warnings.

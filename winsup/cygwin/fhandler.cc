@@ -1453,7 +1453,7 @@ fhandler_pipe::lseek (off_t offset, int whence)
 }
 
 void __stdcall
-set_inheritance (HANDLE &h, int not_inheriting, const char *)
+set_inheritance (HANDLE &h, int not_inheriting, const char *name)
 {
   HANDLE newh;
 
