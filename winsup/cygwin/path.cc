@@ -3230,7 +3230,7 @@ symlink_info::case_check (char *path)
       FindClose (h);
 
       /* If that part of the component exists, check the case. */
-      if (strcmp (c, data.cFileName))
+      if (strncmp (c, data.cFileName, strlen (data.cFileName)))
 	{
 	  case_clash = true;
 
