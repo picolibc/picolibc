@@ -465,8 +465,7 @@ format_proc_uptime (char *destbuf, size_t maxsize)
       else if (ret != STATUS_SUCCESS)
 	{
 	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf("NtQuerySystemInformation: ret = %d, "
-		       "Dos(ret) = %d",
+	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %d",
 		       ret, RtlNtStatusToDosError (ret));
 	  return 0;
 	}
@@ -503,8 +502,7 @@ format_proc_stat (char *destbuf, size_t maxsize)
 	  != STATUS_SUCCESS)
 	{
 	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf ("NtQuerySystemInformation: ret = %d, "
-			"Dos(ret) = %d",
+	  debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %d",
 			ret, RtlNtStatusToDosError (ret));
 	  sbi.NumberProcessors = 1;
 	}
@@ -546,8 +544,7 @@ format_proc_stat (char *destbuf, size_t maxsize)
       if (ret != STATUS_SUCCESS)
 	{
 	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf("NtQuerySystemInformation: ret = %d, "
-		       "Dos(ret) = %d",
+	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %d",
 		       ret, RtlNtStatusToDosError (ret));
 	  return 0;
 	}

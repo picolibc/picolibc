@@ -51,23 +51,23 @@ cygheap_user::init ()
   if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
 			 &ptok))
     {
-      system_printf ("OpenProcessToken(): %E");
+      system_printf ("OpenProcessToken(), %E");
       return;
     }
   if (!GetTokenInformation (ptok, TokenPrimaryGroup,
 			    &groups.pgsid, sizeof (cygsid), &siz))
-    system_printf ("GetTokenInformation (TokenPrimaryGroup): %E");
+    system_printf ("GetTokenInformation (TokenPrimaryGroup), %E");
 
   /* Get the SID from current process and store it in effec_cygsid */
   if (!GetTokenInformation (ptok, TokenUser, &effec_cygsid, sizeof (cygsid), &siz))
     {
-      system_printf ("GetTokenInformation (TokenUser): %E");
+      system_printf ("GetTokenInformation (TokenUser), %E");
       goto out;
     }
 
   /* Set token owner to the same value as token user */
   if (!SetTokenInformation (ptok, TokenOwner, &effec_cygsid, sizeof (cygsid)))
-    debug_printf ("SetTokenInformation(TokenOwner): %E");
+    debug_printf ("SetTokenInformation(TokenOwner), %E");
 
   /* Standard way to build a security descriptor with the usual DACL */
   char sa_buf[1024];
@@ -81,12 +81,12 @@ cygheap_user::init ()
     {
       /* Set the default DACL and the process DACL */
       if (!SetTokenInformation (ptok, TokenDefaultDacl, &dacl, sizeof (dacl)))
-	system_printf ("SetTokenInformation (TokenDefaultDacl): %E");
+	system_printf ("SetTokenInformation (TokenDefaultDacl), %E");
       if (!SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION, psd))
-	system_printf ("SetKernelObjectSecurity: %E");
+	system_printf ("SetKernelObjectSecurity, %E");
     }
   else
-    system_printf("Cannot get dacl: %E");
+    system_printf("Cannot get dacl, %E");
  out:
   CloseHandle (ptok);
 }
@@ -122,7 +122,7 @@ internal_getlogin (cygheap_user &user)
 		  /* Set primary group to the group in /etc/passwd. */
 		  if (!SetTokenInformation (ptok, TokenPrimaryGroup,
 					    &gsid, sizeof gsid))
-		    debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
+		    debug_printf ("SetTokenInformation(TokenPrimaryGroup), %E");
 		  else
 		    user.groups.pgsid = gsid;
 		  CloseHandle (ptok);

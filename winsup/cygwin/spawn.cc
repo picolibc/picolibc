@@ -866,9 +866,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 			     nwait, myself->pid, myself->dwProcessId);
 	      system_printf ("waitbuf[0] %p %d", waitbuf[0],
 			     WaitForSingleObject (waitbuf[0], 0));
-	      system_printf ("waitbuf[1] %p = %d", waitbuf[1],
+	      system_printf ("waitbuf[1] %p %d", waitbuf[1],
 			     WaitForSingleObject (waitbuf[1], 0));
-	      system_printf ("waitbuf[w] %p = %d", waitbuf[2],
+	      system_printf ("waitbuf[w] %p %d", waitbuf[2],
 			     WaitForSingleObject (waitbuf[2], 0));
 	      set_errno (ECHILD);
 	      try_to_debug ();
@@ -879,7 +879,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
       ForceCloseHandle (subproc_ready);
 
-      sigproc_printf ("res = %x", res);
+      sigproc_printf ("res %p", res);
 
       if (res & EXIT_REPARENTING)
 	{

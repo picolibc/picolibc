@@ -1978,10 +1978,9 @@ mknod (const char *_path, mode_t mode, __dev16_t dev)
 }
 
 extern "C" int
-mkfifo (const char *_path, mode_t mode)
+mkfifo (const char *path, mode_t mode)
 {
-  set_errno (ENOSYS);  // FIXME
-  return -1;
+  return mknod32 (path, (mode & ~S_IFMT) | S_IFIFO, 0);
 }
 
 /* seteuid: standards? */
@@ -2049,7 +2048,7 @@ seteuid32 (__uid32_t uid)
       if (!SetTokenInformation (ptok, TokenDefaultDacl,
 				&tdacl, sizeof dacl_buf))
 	debug_printf ("SetTokenInformation"
-		      "(TokenDefaultDacl): %E");
+		      "(TokenDefaultDacl), %E");
     }
 
   /* If no impersonation token is available, try to
@@ -2079,17 +2078,17 @@ seteuid32 (__uid32_t uid)
       if (!SetTokenInformation (new_token, TokenOwner,
 				&usersid, sizeof usersid))
 	debug_printf ("SetTokenInformation(user.token, "
-		      "TokenOwner): %E");
+		      "TokenOwner), %E");
       /* Try setting primary group in token to current group */
       if (!SetTokenInformation (new_token, TokenPrimaryGroup,
 				&groups.pgsid, sizeof (cygsid)))
 	debug_printf ("SetTokenInformation(user.token, "
-		      "TokenPrimaryGroup): %E");
+		      "TokenPrimaryGroup), %E");
       /* Try setting default DACL */
       if (tdacl.DefaultDacl
 	  && !SetTokenInformation (new_token, TokenDefaultDacl,
 				   &tdacl, sizeof (tdacl)))
-	debug_printf ("SetTokenInformation (TokenDefaultDacl): %E");
+	debug_printf ("SetTokenInformation (TokenDefaultDacl), %E");
     }
 
   CloseHandle (ptok);
@@ -2196,22 +2195,22 @@ setegid32 (__gid32_t gid)
 				TokenPrimaryGroup,
 				&gsid, sizeof gsid))
 	debug_printf ("SetTokenInformation(thread, "
-		      "TokenPrimaryGroup): %E");
+		      "TokenPrimaryGroup), %E");
       RevertToSelf ();
     }
   if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT, &ptok))
-    debug_printf ("OpenProcessToken(): %E");
+    debug_printf ("OpenProcessToken(), %E");
   else
     {
       if (!SetTokenInformation (ptok, TokenPrimaryGroup,
 				&gsid, sizeof gsid))
 	debug_printf ("SetTokenInformation(process, "
-		      "TokenPrimaryGroup): %E");
+		      "TokenPrimaryGroup), %E");
       CloseHandle (ptok);
     }
   if (cygheap->user.issetuid ()
       && !ImpersonateLoggedOnUser (cygheap->user.token ()))
-    system_printf ("Impersonating in setegid failed: %E");
+    system_printf ("Impersonating in setegid failed, %E");
   return 0;
 }
 

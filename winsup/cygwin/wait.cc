@@ -117,6 +117,6 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 		  intpid, status, w->status, options, res);
   w->status = -1;
   if (res < 0)
-    sigproc_printf ("*** errno = %d", get_errno ());
+    sigproc_printf ("*** errno %d", get_errno ());
   return res;
 }

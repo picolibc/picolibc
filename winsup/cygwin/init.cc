@@ -97,10 +97,10 @@ respawn_wow64_process ()
 		       CREATE_DEFAULT_ERROR_MODE
 		       | GetPriorityClass (GetCurrentProcess ()),
 		       NULL, NULL, &si, &pi))
-    api_fatal ("Failed to create process <%s>: %E", GetCommandLineA ());
+    api_fatal ("Failed to create process <%s>, %E", GetCommandLineA ());
   CloseHandle (pi.hThread);
   if (WaitForSingleObject (pi.hProcess, INFINITE) == WAIT_FAILED)
-    api_fatal ("Waiting for process %d failed: %E", pi.dwProcessId);
+    api_fatal ("Waiting for process %d failed, %E", pi.dwProcessId);
   CloseHandle (pi.hProcess);
   ExitProcess (0);
 }

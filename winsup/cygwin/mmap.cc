@@ -178,12 +178,12 @@ mmap_record::alloc_page_map (_off64_t off, DWORD len)
 
       if (off > 0 &&
 	  !VirtualProtect (base_address_, off, PAGE_NOACCESS, &old_prot))
-	syscall_printf ("VirtualProtect(%x,%D) failed: %E", base_address_, off);
+	syscall_printf ("VirtualProtect(%x,%D) failed, %E", base_address_, off);
       if (off + vlen < size_to_map_
 	  && !VirtualProtect (base_address_ + off + vlen,
 			      size_to_map_ - vlen - off,
 			      PAGE_NOACCESS, &old_prot))
-	syscall_printf ("VirtualProtect(%x,%D) failed: %E",
+	syscall_printf ("VirtualProtect(%x,%D) failed, %E",
 			base_address_ + off + vlen, size_to_map_ - vlen - off);
     }
 
@@ -243,7 +243,7 @@ mmap_record::unmap_pages (caddr_t addr, DWORD len)
   if (wincap.virtual_protect_works_on_shared_pages ()
       && !VirtualProtect (base_address_ + off * getpagesize (),
 			  len * getpagesize (), PAGE_NOACCESS, &old_prot))
-    syscall_printf ("-1 = unmap_pages (): %E");
+    syscall_printf ("-1 = unmap_pages (), %E");
 
   for (; len-- > 0; ++off)
     MAP_CLR (off);
@@ -705,8 +705,7 @@ munmap (void *addr, size_t len)
 extern "C" int
 msync (void *addr, size_t len, int flags)
 {
-  syscall_printf ("addr = %x, len = %u, flags = %x",
-		  addr, len, flags);
+  syscall_printf ("addr %x, len %u, flags %x", addr, len, flags);
 
   /* However, check flags for validity. */
   if ((flags & ~(MS_ASYNC | MS_SYNC | MS_INVALIDATE))
@@ -752,7 +751,7 @@ msync (void *addr, size_t len, int flags)
 	      rec->free_fh (fh);
 
 	      if (ret)
-		syscall_printf ("%d = msync(): %E", ret);
+		syscall_printf ("%d = msync(), %E", ret);
 	      else
 		syscall_printf ("0 = msync()");
 
@@ -836,7 +835,7 @@ mprotect (void *addr, size_t len, int prot)
   if (VirtualProtect (addr, len, new_prot, &old_prot) == 0)
     {
       __seterrno ();
-      syscall_printf ("-1 = mprotect (): %E");
+      syscall_printf ("-1 = mprotect (), %E");
       return -1;
     }
 

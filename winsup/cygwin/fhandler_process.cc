@@ -441,8 +441,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 	{
 	  DWORD error = GetLastError ();
 	  __seterrno_from_win_error (error);
-	  debug_printf ("OpenProcess: ret = %d",
-			error);
+	  debug_printf ("OpenProcess: ret %d", error);
 	  return 0;
 	}
       if (ret == STATUS_SUCCESS)
@@ -456,8 +455,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
       if (ret != STATUS_SUCCESS)
 	{
 	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf ("NtQueryInformationProcess: ret = %d, "
-		       "Dos(ret) = %d",
+	  debug_printf ("NtQueryInformationProcess: ret %d, Dos(ret) %d",
 		       ret, RtlNtStatusToDosError (ret));
 	  return 0;
 	}
@@ -630,9 +628,8 @@ get_process_state (DWORD dwProcessId)
     delete [] p, p = new ULONG[n *= 2];
   if (ret != STATUS_SUCCESS)
     {
-      debug_printf ("NtQuerySystemInformation: ret = %d, "
-		   "Dos(ret) = %d",
-		   ret, RtlNtStatusToDosError (ret));
+      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %d",
+		    ret, RtlNtStatusToDosError (ret));
       goto out;
     }
   state = 'Z';
@@ -696,8 +693,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     {
       DWORD error = GetLastError ();
       __seterrno_from_win_error (error);
-      debug_printf ("OpenProcess: ret = %d",
-		    error);
+      debug_printf ("OpenProcess: ret %d", error);
       return false;
     }
   while ((ret = NtQueryVirtualMemory (hProcess, 0,
@@ -709,8 +705,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     delete [] p, p = new ULONG[n *= 2];
   if (ret != STATUS_SUCCESS)
     {
-      debug_printf ("NtQueryVirtualMemory: ret = %d, "
-		   "Dos(ret) = %d",
+      debug_printf ("NtQueryVirtualMemory: ret %d, Dos(ret) %d",
 		   ret, RtlNtStatusToDosError (ret));
       res = false;
       goto out;
@@ -735,8 +730,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
 				   sizeof vmc, NULL);
   if (ret != STATUS_SUCCESS)
     {
-      debug_printf ("NtQueryInformationProcess: ret = %d, "
-		    "Dos(ret) = %d",
+      debug_printf ("NtQueryInformationProcess: ret %d, Dos(ret) %d",
 		    ret, RtlNtStatusToDosError (ret));
       res = false;
       goto out;

@@ -1,3 +1,8 @@
+2004-09-02  Christopher Faylor  <cgf@timesys.com>
+
+	Regularize most strace_prints throughout so that %E is always preceded
+	by a comma and elminate most uses of "foo = %s" to "foo %s".
+
 2004-09-02  Bob Byrnes  <byrnes@curl.com>
 	    Christopher Faylor  <cgf@timesys.com>
 

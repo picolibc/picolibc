@@ -1529,7 +1529,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
     rc = 0;
   else
     {
-      debug_printf ("attempt to access outside of chroot '%s = %s'",
+      debug_printf ("attempt to access outside of chroot '%s - %s'",
 		    cygheap->root.posix_path (), cygheap->root.native_path ());
       rc = ENOENT;
     }

@@ -344,7 +344,7 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user,
 
       sys_wcstombs (dgroup + len, buf[i].grui0_name, GNLEN + 1);
       if (!LookupAccountName (NULL, dgroup, gsid, &glen, domain, &dlen, &use))
-	debug_printf ("LookupAccountName(%s): %E", dgroup);
+	debug_printf ("LookupAccountName(%s), %E", dgroup);
       else if (legal_sid_type (use))
 	grp_list += gsid;
       else
@@ -424,11 +424,11 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
 	if (!LookupAccountName (NULL, bgroup, gsid, &glen, domain, &dlen, &use))
 	  {
 	    if (GetLastError () != ERROR_NONE_MAPPED)
-	      debug_printf ("LookupAccountName(%s): %E", bgroup);
+	      debug_printf ("LookupAccountName(%s), %E", bgroup);
 	    strcpy (lgroup + llen, bgroup + blen);
 	    if (!LookupAccountName (NULL, lgroup, gsid, &glen,
 				    domain, &dlen, &use))
-	      debug_printf ("LookupAccountName(%s): %E", lgroup);
+	      debug_printf ("LookupAccountName(%s), %E", lgroup);
 	  }
 	if (!legal_sid_type (use))
 	  debug_printf ("Rejecting local %s. use: %d", bgroup + blen, use);
@@ -730,7 +730,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
       TOKEN_SOURCE ts;
       if (!GetTokenInformation (token, TokenSource,
 				&ts, sizeof ts, &size))
-	debug_printf ("GetTokenInformation(): %E");
+	debug_printf ("GetTokenInformation(), %E");
       else
 	*pintern = intern = !memcmp (ts.SourceName, "Cygwin.1", 8);
     }
@@ -738,7 +738,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
   cygsid tok_usersid = NO_SID;
   if (!GetTokenInformation (token, TokenUser,
 			    &tok_usersid, sizeof tok_usersid, &size))
-    debug_printf ("GetTokenInformation(): %E");
+    debug_printf ("GetTokenInformation(), %E");
   if (usersid != tok_usersid)
     return false;
 
@@ -751,10 +751,10 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
       if (!GetKernelObjectSecurity (token, GROUP_SECURITY_INFORMATION,
 				    (PSECURITY_DESCRIPTOR) sd_buf,
 				    sizeof sd_buf, &size))
-	debug_printf ("GetKernelObjectSecurity(): %E");
+	debug_printf ("GetKernelObjectSecurity(), %E");
       else if (!GetSecurityDescriptorGroup ((PSECURITY_DESCRIPTOR) sd_buf,
 					    (PSID *) &gsid, (BOOL *) &size))
-	debug_printf ("GetSecurityDescriptorGroup(): %E");
+	debug_printf ("GetSecurityDescriptorGroup(), %E");
       if (well_known_null_sid != gsid)
 	return gsid == groups.pgsid;
     }
@@ -765,11 +765,11 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 
   if (!GetTokenInformation (token, TokenGroups, NULL, 0, &size) &&
       GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-    debug_printf ("GetTokenInformation(token, TokenGroups): %E");
+    debug_printf ("GetTokenInformation(token, TokenGroups), %E");
   else if (!(my_grps = (PTOKEN_GROUPS) alloca (size)))
     debug_printf ("alloca (my_grps) failed.");
   else if (!GetTokenInformation (token, TokenGroups, my_grps, size, &size))
-    debug_printf ("GetTokenInformation(my_token, TokenGroups): %E");
+    debug_printf ("GetTokenInformation(my_token, TokenGroups), %E");
   else if (!groups.issetgroups ()) /* setgroups was never called */
     ret = sid_in_token_groups (my_grps, groups.pgsid)
 	  || groups.pgsid == usersid;
@@ -859,7 +859,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 
   /* Retrieve authentication id and group list from own process. */
   if (!OpenProcessToken (hMainProc, TOKEN_QUERY, &my_token))
-    debug_printf ("OpenProcessToken(my_token): %E");
+    debug_printf ("OpenProcessToken(my_token), %E");
   else
     {
       /* Switching user context to SYSTEM doesn't inherit the authentication
@@ -868,7 +868,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 	if (!GetTokenInformation (my_token, TokenStatistics,
 				  &stats, sizeof stats, &size))
 	  debug_printf
-	    ("GetTokenInformation(my_token, TokenStatistics): %E");
+	    ("GetTokenInformation(my_token, TokenStatistics), %E");
 	else
 	  auth_luid = stats.AuthenticationId;
 
@@ -876,13 +876,13 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 	 some important well known group sids. */
       if (!GetTokenInformation (my_token, TokenGroups, NULL, 0, &size) &&
 	  GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-	debug_printf ("GetTokenInformation(my_token, TokenGroups): %E");
+	debug_printf ("GetTokenInformation(my_token, TokenGroups), %E");
       else if (!(my_tok_gsids = (PTOKEN_GROUPS) malloc (size)))
 	debug_printf ("malloc (my_tok_gsids) failed.");
       else if (!GetTokenInformation (my_token, TokenGroups, my_tok_gsids,
 				     size, &size))
 	{
-	  debug_printf ("GetTokenInformation(my_token, TokenGroups): %E");
+	  debug_printf ("GetTokenInformation(my_token, TokenGroups), %E");
 	  free (my_tok_gsids);
 	  my_tok_gsids = NULL;
 	}

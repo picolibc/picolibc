@@ -1307,7 +1307,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
   if (len > 0)
     {
       if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
-	debug_printf ("Creating event failed: %E");
+	debug_printf ("Creating event failed, %E");
       size_t block_fit = !block_size ? len : rounddown(len,  block_size);
       if (block_fit)
 	{
@@ -1359,7 +1359,7 @@ fhandler_dev_tape::raw_write (const void *ptr, size_t len)
 {
   lock (-1);
   if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
-    debug_printf ("Creating event failed: %E");
+    debug_printf ("Creating event failed, %E");
   int ret = mt->drive (driveno ())->write (get_handle (), mt_evt, ptr, len);
   if (ret)
     __seterrno_from_win_error (ret);

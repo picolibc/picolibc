@@ -364,7 +364,7 @@ try_to_debug (bool waitloop)
 		       &pi);
 
   if (!dbg)
-    system_printf ("Failed to start debugger: %E");
+    system_printf ("Failed to start debugger, %E");
   else
     {
       if (!waitloop)
@@ -490,7 +490,7 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
     }
 
   debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e.ExceptionCode, in.Eip, in.Esp);
-  debug_printf ("In cygwin_except_handler sig = %d at %p", si.si_signo, in.Eip);
+  debug_printf ("In cygwin_except_handler sig %d at %p", si.si_signo, in.Eip);
 
   if (global_sigs[si.si_signo].sa_mask & SIGTOMASK (si.si_signo))
     syscall_printf ("signal %d, masked %p", si.si_signo,

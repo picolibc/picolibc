@@ -706,12 +706,12 @@ fhandler_socket::prepare (HANDLE &event, long event_mask)
   closed (false);
   if ((event = WSACreateEvent ()) == WSA_INVALID_EVENT)
     {
-      debug_printf ("WSACreateEvent: %E");
+      debug_printf ("WSACreateEvent, %E");
       return false;
     }
   if (WSAEventSelect (get_socket (), event, event_mask) == SOCKET_ERROR)
     {
-      debug_printf ("WSAEventSelect: %E");
+      debug_printf ("WSAEventSelect, %E");
       return false;
     }
   return true;

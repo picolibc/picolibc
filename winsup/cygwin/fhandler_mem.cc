@@ -49,7 +49,7 @@ fhandler_dev_mem::open (int flags, mode_t)
 					   sizeof sbi, NULL)) != STATUS_SUCCESS)
 	{
 	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf("NtQuerySystemInformation: ret = %d, Dos(ret) = %d",
+	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %d",
 		       ret, RtlNtStatusToDosError (ret));
 	  mem_size = 0;
 	}

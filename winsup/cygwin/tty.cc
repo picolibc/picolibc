@@ -353,7 +353,7 @@ tty::create_inuse (const char *fmt)
 
   shared_name (buf, fmt, ntty);
   h = CreateEvent (&sec_all, TRUE, FALSE, buf);
-  termios_printf ("%s = %p", buf, h);
+  termios_printf ("%s %p", buf, h);
   if (!h)
     termios_printf ("couldn't open inuse event, %E", buf);
   return h;
