@@ -82,7 +82,8 @@ print_version ()
 %s (cygwin) %.*s\n\
 Filesystem Utility\n\
 Copyright 1996, 1998, 1999, 2000, 2001, 2002\n\
-Compiled on %s", progname, len, v, __DATE__);
+Compiled on %s\n\
+", progname, len, v, __DATE__);
 }
 
 int

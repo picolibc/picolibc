@@ -887,7 +887,8 @@ print_version ()
 %s (cygwin) %.*s\n\
 System Trace\n\
 Copyright 2000, 2001, 2002 Red Hat, Inc.\n\
-Compiled on %s", pgm, len, v, __DATE__);
+Compiled on %s\n\
+", pgm, len, v, __DATE__);
 }
 
 int

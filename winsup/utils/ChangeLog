@@ -1,3 +1,18 @@
+2002-09-15  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+	* cygcheck.cc (print_version) Add final newline.
+	* getfacl.c (print_version) Add final newline.
+	* kill.cc (print_version) Add final newline.
+	* mkgroup.c (print_version) Add final newline.
+	* mkpasswd.c (print_version) Add final newline.
+	* mount.cc (print_version) Add final newline.
+	* passwd.c (print_version) Add final newline.
+	* ps.cc (print_version) Add final newline.
+	* regtool.cc (print_version) Add final newline.
+	* setfacl.c (print_version) Add final newline.
+	* ssp.c (print_version) Add final newline.
+	* strace.cc (print_version) Add final newline.
+	* umount.cc (print_version) Add final newline.
+
 2002-09-12  Igor Pechtchanski <pechtcha@cs.nyu.edu>
 	* cygpath.cc (options) New global variable.
 	(main) Make short options global for easier change.

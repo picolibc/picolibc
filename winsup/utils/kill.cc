@@ -69,7 +69,8 @@ print_version ()
 %s (cygwin) %.*s\n\
 Process Signaller\n\
 Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
-Compiled on %s", prog_name, len, v, __DATE__);
+Compiled on %s\n\
+", prog_name, len, v, __DATE__);
 }
 
 static int

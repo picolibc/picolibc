@@ -136,7 +136,8 @@ print_version ()
 %s (cygwin) %.*s\n\
 Registry Tool\n\
 Copyright 2000, 2001, 2002 Red Hat, Inc.\n\
-Compiled on %s", prog_name, len, v, __DATE__);
+Compiled on %s\n\
+", prog_name, len, v, __DATE__);
 }
 
 void
