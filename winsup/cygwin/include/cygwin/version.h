@@ -208,12 +208,13 @@ details. */
        86: Export ftok
        87: Export vsyslog
        88: Export _getreent
+       89: Export __mempcpy
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 88
+#define CYGWIN_VERSION_API_MINOR 89
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

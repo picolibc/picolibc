@@ -1,3 +1,10 @@
+2003-07-24  Christopher Faylor  <cgf@redhat.com>
+
+	* environ.cc (check_case_init): Use strncasematch.
+
+	* cygwin.din: Export __mempcpy.
+	* cygwin/version.h: Bump api minor number.
+
 2003-07-21  Pavel Tsekov  <ptsekov@gmx.net>
 
 	* mmap.cc: Use proper format specifiers for _off64_t and size_t in

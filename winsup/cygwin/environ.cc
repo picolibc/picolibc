@@ -405,7 +405,7 @@ check_case_init (const char *buf)
   if (!buf || !*buf)
     return;
 
-  if (strncmp (buf, "relax", 5)== 0)
+  if (strncasematch (buf, "relax", 5))
     {
       pcheck_case = PCHECK_RELAXED;
       debug_printf ("File case checking set to RELAXED");
