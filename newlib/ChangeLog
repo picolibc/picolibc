@@ -1,3 +1,13 @@
+2002-05-15  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* testsuite/lib/checkoutput.exp (newlib_check_output): Output
+	only one pass or fail per test file.  Trim \r's from output
+	values received from test programs.  Remove support for named
+	tests.
+	* testsuite/newlib.locale/UTF-8.exp: Update to support new
+	newlib_check_output behaviour.
+	* testsuite/newlib.locale/UTF-8.c: Likewise.
+
 2002-05-15  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/include/stdlib.h: Add on_exit prototype.
