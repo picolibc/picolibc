@@ -1,3 +1,13 @@
+Wed Nov  8 08:49:27 2000 Jason Tishler <jt@dothill.com>
+
+	* mount.cc (main): Call show_cygdrive_info instead of
+	show_cygdrive_prefixes.
+	* mount.cc (show_cygdrive_prefixes): Remove function.
+	* mount.cc (show_cygdrive_info): New function.  Actually,
+	show_cygdrive_info is really an enhanced version of
+	show_cygdrive_prefixes renamed to show_cygdrive_info that also displays
+	the user and system flags.
+
 Wed Nov  8 15:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* mkgroup.c (load_netapi): New function to load netapi32.dll functions

@@ -22,7 +22,7 @@ details. */
 #include <errno.h>
 
 static void show_mounts (void);
-static void show_cygdrive_prefixes (void);
+static void show_cygdrive_info (void);
 static void change_cygdrive_prefix (const char *new_prefix, int flags);
 static int mount_already_exists (const char *posix_path, int flags);
 
@@ -144,7 +144,7 @@ main (int argc, const char **argv)
 	  if ((i + 1) != argc)
 	    usage ();
 
-	  show_cygdrive_prefixes ();
+	  show_cygdrive_info ();
 	}
       else if (strcmp (argv[i], "-b") == 0)
 	flags |= MOUNT_BINARY;
@@ -263,23 +263,27 @@ change_cygdrive_prefix (const char *new_prefix, int flags)
   exit (0);
 }
 
-/* show_cygdrive_prefixes: Show the user and/or cygdrive path prefixes */
+/* show_cygdrive_info: Show the user and/or cygdrive info, i.e., prefixes and
+   flags.*/
 static void
-show_cygdrive_prefixes ()
+show_cygdrive_info ()
 {
-  /* Get the Cygdrive user and system path prefixes */
+  /* Get the cygdrive info */
   char user[MAX_PATH];
   char system[MAX_PATH];
-  cygwin_internal (CW_GET_CYGDRIVE_PREFIXES, user, system);
+  char user_flags[MAX_PATH];
+  char system_flags[MAX_PATH];
+  cygwin_internal (CW_GET_CYGDRIVE_INFO, user, system, user_flags,
+		   system_flags);
 
   /* Display the user and system cygdrive path prefixes, if necessary
      (ie, not empty) */
-  const char *format = "%-18s  %-11s\n";
-  printf (format, "Prefix", "Type");
+  const char *format = "%-18s  %-11s  %s\n";
+  printf (format, "Prefix", "Type", "Flags");
   if (strlen (user) > 0)
-    printf (format, user, "user");
+    printf (format, user, "user", user_flags);
   if (strlen (system) > 0)
-    printf (format, system, "system");
+    printf (format, system, "system", system_flags);
 
   exit (0);
 }
