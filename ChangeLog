@@ -1,3 +1,11 @@
+2002-10-03  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Make SET_LIB_PATH substitution more autoconfy.
+	* Makefile.tpl: Make RPATH_ENVVAR substitution more autoconfy.
+	* configure.in: Make SET_LIB_PATH substitution more autoconfy.
+	* configure.in: Make RPATH_ENVVAR substitution more autoconfy.
+	* Makefile.in: Regenerate.
+
 2002-10-02  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* Makefile.tpl: Eliminate reference to all-gui, all-libproc.
