@@ -1,6 +1,6 @@
 /* setfacl.c
 
-   Copyright 2000, 2001 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003 Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
