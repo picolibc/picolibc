@@ -24,6 +24,7 @@ int
 fhandler_dev_zero::open (path_conv *, int flags, mode_t)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
+  set_nohandle (true);
   set_open_status ();
   return 1;
 }
@@ -43,12 +44,6 @@ fhandler_dev_zero::read (void *ptr, size_t len)
 
 __off64_t
 fhandler_dev_zero::lseek (__off64_t, int)
-{
-  return 0;
-}
-
-int
-fhandler_dev_zero::close (void)
 {
   return 0;
 }

@@ -954,7 +954,6 @@ class fhandler_dev_zero: public fhandler_base
   int write (const void *ptr, size_t len);
   int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   __off64_t lseek (__off64_t offset, int whence);
-  int close (void);
 
   void dump ();
 };

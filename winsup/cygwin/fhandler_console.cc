@@ -185,7 +185,7 @@ fhandler_console::send_winch_maybe ()
   SHORT y = info.dwWinSize.Y;
   SHORT x = info.dwWinSize.X;
   fillin_info ();
-	       
+
   if (y != info.dwWinSize.Y || x != info.dwWinSize.X)
     tc->kill_pgrp (SIGWINCH);
 }

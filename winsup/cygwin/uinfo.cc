@@ -296,7 +296,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 
   if (newhomedrive && newhomedrive != homedrive)
     cfree_and_set (homedrive, (newhomedrive == almost_null)
-		   	      ? almost_null : cstrdup (newhomedrive));
+			      ? almost_null : cstrdup (newhomedrive));
 
   if (newhomepath && newhomepath != homepath)
     cfree_and_set (homepath, cstrdup (newhomepath));

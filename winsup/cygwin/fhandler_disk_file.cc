@@ -156,8 +156,12 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
   bool query_open_already;
 
   if (get_io_handle ())
-    return fstat_by_handle (buf, pc);
-
+    {
+      if (get_nohandle ())
+	return fstat_by_name (buf, pc);
+      else
+	return fstat_by_handle (buf, pc);
+    }
   /* If we don't care if the file is executable or we already know if it is,
      then just do a "query open" as it is apparently much faster. */
   if (pc->exec_state () != dont_know_if_executable)
@@ -166,7 +170,7 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
     query_open_already = false;
 
   if (query_open_already && strncasematch (pc->volname (), "FAT", 3)
-      && !strpbrk (get_win32_name (), "?*|<>|"))
+      && !strpbrk (get_win32_name (), "?*|<>"))
     oret = 0;
   else if (!(oret = open (pc, open_flags, 0)))
     {
@@ -191,7 +195,7 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
 	}
     }
 
-  if (!oret)
+  if (!oret || get_nohandle ())
     res = fstat_by_name (buf, pc);
   else
     {
@@ -363,15 +367,7 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
   set_has_acls (real_path->has_acls ());
   set_isremote (real_path->isremote ());
 
-  int res;
-  if (!real_path->isdir () || wincap.can_open_directories ())
-    res = this->fhandler_base::open (real_path, flags | O_DIROPEN, mode);
-  else
-    {
-      set_errno (EISDIR);
-      res = 0;
-    }
-
+  int res = this->fhandler_base::open (real_path, flags | O_DIROPEN, mode);
   if (!res)
     goto out;
 
@@ -790,7 +786,7 @@ fhandler_cygdrive::readdir (DIR *dir)
   dir->__d_position++;
   pdrive = strchr (pdrive, '\0') + 1;
   syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
-      		  dir->__d_dirent->d_name);
+		  dir->__d_dirent->d_name);
   return dir->__d_dirent;
 }
 

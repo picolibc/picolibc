@@ -116,7 +116,7 @@ fhandler_virtual::lseek (__off64_t offset, int whence)
    * the contents of the file are updated.
    */
   if (!fill_filebuf ())
-  	return (__off64_t) -1;
+    return (__off64_t) -1;
   switch (whence)
     {
     case SEEK_SET:

@@ -187,10 +187,10 @@ read_etc_group ()
 		    {
 		      char strbuf[100];
 		      snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:",
-		      		group_name, 
+				group_name,
 				tg.string (strbuf),
 				*GetSidSubAuthority(tg,
-				             *GetSidSubAuthorityCount(tg) - 1));
+					     *GetSidSubAuthorityCount(tg) - 1));
 		      debug_printf ("Emulating /etc/group: %s", linebuf);
 		      add_grp_line (linebuf);
 		      group_state = emulated;
@@ -365,7 +365,7 @@ getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
 	      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 		if (sid.getfromgr (gr))
 		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
-		    if (sid == groups->Groups[pg].Sid && 
+		    if (sid == groups->Groups[pg].Sid &&
 			sid != well_known_world_sid)
 		      {
 			if (cnt < gidsetsize)
@@ -516,7 +516,7 @@ setgroups (int ngroups, const __gid16_t *grouplist)
       if (grouplist32 == NULL)
 	return -1;
       for (int i = 0; i < ngroups; i++)
-        grouplist32[i] = grouplist[i];
+	grouplist32[i] = grouplist[i];
     }
   return setgroups32 (ngroups, grouplist32);
 }

@@ -387,7 +387,7 @@ pthread::setTlsSelfPointer (pthread *thisThread)
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
                     cancelstate (0), canceltype (0), cancel_event (0),
-                    joiner (NULL), cleanup_stack (NULL) 
+                    joiner (NULL), cleanup_stack (NULL)
 {
 }
 

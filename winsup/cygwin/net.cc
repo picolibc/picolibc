@@ -724,7 +724,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
   else
     {
       res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
-      			(int *) optlen);
+			(int *) optlen);
 
       if (optname == SO_ERROR)
 	{
@@ -2137,7 +2137,7 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 					     (unsigned) msg->msg_namelen))
       || !fh)
     res = -1;
-  else 
+  else
     {
       res = check_iovec_for_write (msg->msg_iov, msg->msg_iovlen);
       if (res > 0)

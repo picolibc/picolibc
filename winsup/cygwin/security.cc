@@ -697,10 +697,10 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 /* Accept a token if
    - the requested usersid matches the TokenUser and
    - if setgroups has been called:
-        the token groups that are listed in /etc/group match the union of
+	the token groups that are listed in /etc/group match the union of
 	the requested primary and supplementary groups in gsids.
    - else the (unknown) implicitly requested supplementary groups and those
-        in the token are the groups associated with the usersid. We assume
+	in the token are the groups associated with the usersid. We assume
 	they match and verify only the primary groups.
 	The requested primary group must appear in the token.
 	The primary group in the token is a group associated with the usersid,
@@ -782,14 +782,14 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
 	      saw[pos] = TRUE;
 	    else if (groups.pgsid == gsid)
 	      sawpg = TRUE;
-           else if (gsid != well_known_world_sid &&
+	   else if (gsid != well_known_world_sid &&
 		    gsid != usersid)
 	      goto done;
 	  }
       for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
 	if (!saw[gidx])
 	  goto done;
-      if (sawpg || 
+      if (sawpg ||
 	  groups.sgsids.contains (groups.pgsid) ||
 	  groups.pgsid == usersid)
 	ret = TRUE;
@@ -859,7 +859,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   else
     {
       /* Switching user context to SYSTEM doesn't inherit the authentication
-         id of the user account running current process. */
+	 id of the user account running current process. */
       if (usersid != well_known_system_sid)
 	if (!GetTokenInformation (my_token, TokenStatistics,
 				  &stats, sizeof stats, &size))
@@ -869,7 +869,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 	  auth_luid = stats.AuthenticationId;
 
       /* Retrieving current processes group list to be able to inherit
-         some important well known group sids. */
+	 some important well known group sids. */
       if (!GetTokenInformation (my_token, TokenGroups, NULL, 0, &size) &&
 	  GetLastError () != ERROR_INSUFFICIENT_BUFFER)
 	debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
@@ -1187,8 +1187,8 @@ write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 		    &bytes_written, FALSE, TRUE, &context))
     {
       /* Samba returns ERROR_NOT_SUPPORTED.
-         FAT returns ERROR_INVALID_SECURITY_DESCR.
-         This shouldn't return as error, but better be ignored. */
+	 FAT returns ERROR_INVALID_SECURITY_DESCR.
+	 This shouldn't return as error, but better be ignored. */
       DWORD ret = GetLastError ();
       if (ret != ERROR_NOT_SUPPORTED && ret != ERROR_INVALID_SECURITY_DESCR)
 	{
@@ -1463,7 +1463,7 @@ get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
   if (allow_ntsec)
     {
       int res = get_nt_object_attribute (handle, object_type, attribute,
-      					 uidret, gidret);
+					 uidret, gidret);
       if (attribute && (*attribute & S_IFLNK) == S_IFLNK)
 	*attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
       return res;
