@@ -6,6 +6,10 @@
 
 2005-03-09  Christopher Faylor  <cgf@timesys.com>
 
+	* net.cc (dup_ent): Revert previous stupid change.
+
+2005-03-09  Christopher Faylor  <cgf@timesys.com>
+
 	* net.cc (dup_ent): Avoid dereferencing a null pointer in a debug_printf.
 
 2005-03-09  Christopher Faylor  <cgf@timesys.com>
