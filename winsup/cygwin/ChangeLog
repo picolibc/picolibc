@@ -1,5 +1,9 @@
 2002-07-14  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in (cygrun.exe): Add a -lcygwin on the end.
+
+2002-07-14  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in (cygserver.exe): Add -lstdc++.
 	(cygrun.exe): Move -lgcc last.
 
