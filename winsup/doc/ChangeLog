@@ -1,3 +1,6 @@
+2004-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Add server option description.
 
 2004-02-04  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 	* Makefile.in: Generate monolithic faq0.html file.

@@ -136,6 +136,11 @@ to 9600-8-N-1 with no flow control when used. This is done at open
 time and when handles are inherited.  Defaults to set.</para>
 </listitem>
 <listitem>
+<para><envar>(no)server</envar> - if set, allows client applications
+to use the Cygserver facilities.  This option must be enabled explicitely
+on the client side, otherwise your applications won't be able to use the
+XSI IPC function calls (msgget, semget, shmget and friends) successfully.
+These function calls will return with ENOSYS, "Bad system call".</para>
 <para><envar>(no)strip_title</envar> - if set, strips the directory
 part off the window title, if any.  Default is not set.</para>
 </listitem>
