@@ -105,6 +105,8 @@ public:
   int fixup_shms_after_fork ();
 
 private:
+  static NO_COPY client_shmmgr *_instance;
+
   CRITICAL_SECTION _segments_lock;
   static segment_t *_segments_head; // A list sorted by shmaddr.
 
@@ -122,7 +124,8 @@ private:
   segment_t *new_segment (int shmid, const void *, int shmflg, HANDLE);
 };
 
-client_shmmgr::segment_t *client_shmmgr::_segments_head;
+/* static */ NO_COPY client_shmmgr *client_shmmgr::_instance;
+/* static */ client_shmmgr::segment_t *client_shmmgr::_segments_head;
 
 /*---------------------------------------------------------------------------*
  * client_shmmgr::instance ()
@@ -131,9 +134,12 @@ client_shmmgr::segment_t *client_shmmgr::_segments_head;
 client_shmmgr &
 client_shmmgr::instance ()
 {
-  static NO_COPY client_shmmgr instance;
+  if (!_instance)
+    _instance = new client_shmmgr;
 
-  return instance;
+  assert (_instance);
+
+  return *_instance;
 }
 
 /*---------------------------------------------------------------------------*

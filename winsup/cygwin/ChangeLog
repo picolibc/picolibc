@@ -1,3 +1,10 @@
+2002-07-02  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* shm.cc: Remove the use of a static client_shmmgr object.
+	(client_shmmgr::_instance): New static variable.
+	(client_shmmgr::instance): Allocate a new shmmgr on the heap,
+	rather than using a local static object.
+
 2002-07-02  Egor Duda <deo@logos-m.ru>
 
 	* include/cygwin/version.h: Bump API minor version.
