@@ -1,3 +1,8 @@
+Thu Apr 19  9:40:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap): Drop usage of the same memory area if the same
+	region of the same file is mapped twice.
+
 Wed Apr 18 16:53:54 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Throughout, change fdtab references to cygheap->fdtab.
