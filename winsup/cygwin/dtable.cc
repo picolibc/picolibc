@@ -386,7 +386,7 @@ dtable::dup2 (int oldfd, int newfd)
 
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
 
-  if ((size_t) newfd >= cygheap->fdtab.size || newfd < 0)
+  if (newfd < 0)
     {
       syscall_printf ("new fd out of bounds: %d", newfd);
       set_errno (EBADF);

@@ -1494,6 +1494,11 @@ check_posix_perm (const char *fname, int v)
 extern "C" long int
 fpathconf (int fd, int v)
 {
+  if (cygheap->fdtab.not_open (fd))
+    {
+      set_errno (EBADF);
+      return -1;
+    }
   switch (v)
     {
     case _PC_LINK_MAX:
@@ -1525,16 +1530,13 @@ fpathconf (int fd, int v)
 	}
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
-      if (cygheap->fdtab.not_open (fd))
-	set_errno (EBADF);
-      else
-        {
-          fhandler_base *fh = cygheap->fdtab[fd];
-	  if (fh->get_device () == FH_DISK)
-	    return check_posix_perm (fh->get_win32_name (), v);
-	  set_errno (EINVAL);
-        }
-      return -1;
+      {
+	fhandler_base *fh = cygheap->fdtab[fd];
+	if (fh->get_device () == FH_DISK)
+	  return check_posix_perm (fh->get_win32_name (), v);
+	set_errno (EINVAL);
+	return -1;
+      }
     default:
       set_errno (EINVAL);
       return -1;
@@ -1772,7 +1774,6 @@ ftruncate (int fd, off_t length)
 }
 
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
-/* FIXME: untested */
 extern "C" int
 truncate (const char *pathname, off_t length)
 {
@@ -1783,9 +1784,7 @@ truncate (const char *pathname, off_t length)
   fd = open (pathname, O_RDWR);
 
   if (fd == -1)
-    {
-      set_errno (EBADF);
-    }
+    set_errno (EBADF);
   else
     {
       res = ftruncate (fd, length);
@@ -1802,15 +1801,11 @@ get_osfhandle (int fd)
   long res = -1;
 
   if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-    }
+    set_errno (EBADF);
   else
-    {
-      res = (long) cygheap->fdtab[fd]->get_handle ();
-    }
-  syscall_printf ("%d = get_osfhandle (%d)", res, fd);
+    res = (long) cygheap->fdtab[fd]->get_handle ();
 
+  syscall_printf ("%d = get_osfhandle (%d)", res, fd);
   return res;
 }
 

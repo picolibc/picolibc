@@ -143,12 +143,13 @@ tcsetattr (int fd, int a, const struct termios *t)
 {
   int res = -1;
 
-  t = __tonew_termios (t);
   if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EBADF);
       goto out;
     }
+
+  t = __tonew_termios (t);
 
   fhandler_base *fh;
   fh = cygheap->fdtab[fd];
@@ -187,7 +188,7 @@ tcgetattr (int fd, struct termios *in_t)
     }
 
   if (res)
-    termios_printf ("%d = tcgetattr (%d, %x)", res, fd, in_t);
+    termios_printf ("%d = tcgetattr (%d, %p)", res, fd, in_t);
   else
     termios_printf ("iflag %x, oflag %x, cflag %x, lflag %x, VMIN %d, VTIME %d",
 	  t->c_iflag, t->c_oflag, t->c_cflag, t->c_lflag, t->c_cc[VMIN],
