@@ -1,3 +1,9 @@
+2002-07-03  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* contrib: New directory.  Created to contain a copy of the
+	texi2pod.pl script so that it is in the same place as the version in 
+	the FSF GCC sources.
+
 2002-07-02  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in: Rearrange target Makefile fragment collection.
