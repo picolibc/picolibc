@@ -452,7 +452,7 @@ Wed Oct  3 19:40:36 2001  Christopher Faylor <cgf@cygnus.com>
 	(get_raw_device_number): Just check for parts of raw device that we
 	care about.
 	(get_devn): New function, pulled from get_device_number.
-	(win32_device_name): Accomodate arg changes to get_device_number.
+	(win32_device_name): Accommodate arg changes to get_device_number.
 	(mount_info::get_device_number): Call get_device_number on translated
 	Windows path.
 
@@ -468,13 +468,13 @@ Wed Oct  3 19:40:36 2001  Christopher Faylor <cgf@cygnus.com>
 	reference.
 	* fhandler_clipboard.cc (fhandler_dev_clipboard::dup): Use new open
 	method.
-	(fhandler_dev_clipboard::open): Accomodate new argument for open
+	(fhandler_dev_clipboard::open): Accommodate new argument for open
 	methods.
 	* fhandler_console.cc (fhandler_console::open): Ditto.
 	(fhandler_console::dup): Use new open method.
 	(fhandler_console::fixup_after_fork): Ditto.
 	(fhandler_console::fixup_after_exec): Ditto.
-	* fhandler_dsp.cc (fhandler_dev_dsp::open): Accomodate new argument for
+	* fhandler_dsp.cc (fhandler_dev_dsp::open): Accommodate new argument for
 	open methods.
 	* fhandler_floppy.cc (fhandler_dev_floppy::open): Ditto.
 	* fhandler_mem.cc (fhandler_dev_mem::open): Ditto.
@@ -486,7 +486,7 @@ Wed Oct  3 19:40:36 2001  Christopher Faylor <cgf@cygnus.com>
 	(fhandler_pty_master::open): Ditto.
 	* fhandler_windows.cc (fhandler_windows::open): Ditto.
 	* fhandler_zero.cc (fhandler_dev_zero::open): Ditto.
-	* fhandler_socket.cc (fhandler_socket::set_connect_secret): Accomodate
+	* fhandler_socket.cc (fhandler_socket::set_connect_secret): Accommodate
 	new argument for open methods.
 	* syscalls.cc (_open): Ditto.
 	(stat_worker): Ditto.
@@ -1834,7 +1834,7 @@ Mon 16 Jul 2001 10:47:17 PM EDT  Christopher Faylor <cgf@cygnus.com>
 	shared memory into correct address.
 	(cygheap_setup_for_child): New function.
 	* cygheap.h: Declare new functions.
-	* dcrt0.cc (dll_crt0_1): Accomodate new cygheap_fixup_in_child
+	* dcrt0.cc (dll_crt0_1): Accommodate new cygheap_fixup_in_child
 	arguments.  Avoid protecting subproc_ready unless it is spawn/nowait.
 	* fork.cc (fork_parent): Use new cygheap_setup_for_child function to
 	setup cygwin heap info.  Close passed cygheap shared memory handle.
@@ -2189,7 +2189,7 @@ Sat Jun  2 14:07:28 2001  Christopher Faylor <cgf@cygnus.com>
 	normalize_posix_path if caller has already done so.  Substitute chroot
 	setting, if any, for root translation.  Add chroot checking to final
 	output step.
-	* shared_info (mount_info): Accomodate additional argument to
+	* shared_info (mount_info): Accommodate additional argument to
 	conv_to_win32_path.
 	* syscalls.cc (chroot): Store both normalized posix path and native
 	path in chroot.
@@ -2604,10 +2604,10 @@ Fri May  4 22:23:33 2001  Christopher Faylor <cgf@cygnus.com>
 	(stack_info::walk): Don't store arguments if they're unwanted.
 	(stackdump): Add isexception parameter for use when called by exception
 	handler.
-	(cygwin_stackdump): Accomodate extra argument to stackdump.
+	(cygwin_stackdump): Accommodate extra argument to stackdump.
 	(handle_exceptions): Ditto.
 	(sig_handle): Ditto.
-	(interrupt_on_return): Accomodate extra arguments to stack walk
+	(interrupt_on_return): Accommodate extra arguments to stack walk
 	initialization.
 
 Fri May  4 21:05:20 2001  Christopher Faylor <cgf@cygnus.com>
@@ -2686,7 +2686,7 @@ Mon Apr 30 21:51:14 2001  Christopher Faylor <cgf@cygnus.com>
 	* path.cc (mkrelpath): New function.
 	(mount_info::conv_to_win32_path): Eliminate now-unneeded relative path
 	name arg and processing.
-	(path_conv::check): Accomodate relative path names again.  Accomodate
+	(path_conv::check): Accommodate relative path names again.  Accommodate
 	one extra argument in mount_info::conv_to_win32_path.  Tack trailing
 	slash on end of relative path as a side effect, like before.
 	* shared_info.h (mount_info::conv_to_win32_path): Reflect new argument
@@ -3564,7 +3564,7 @@ Thursday Mar 22 2001  Robert Collins <rbtcollins@hotmail.com>
 	* fhandler_clipboard.cc (fhandler_dev_clipboard::fhandler_dev_clipboard):
 	Initialize new fields.  Open clipboard here.
 	(fhandler_dev_clipboard::dup): New method.
-	(fhandler_dev_clipboard::open): Accomodate new fields.  Register
+	(fhandler_dev_clipboard::open): Accommodate new fields.  Register
 	clipboard here, if appropriate.
 	(set_clipboard): New function.  Moves buffer to clipboard.
 	(fhandler_dev_clipboard::write): Truly implement clipboard writing.
@@ -3784,7 +3784,7 @@ Sat Mar 10 20:54:47 2001  Christopher Faylor <cgf@cygnus.com>
 	* exceptions.cc (unused_sig_wrapper): Ditto.
 	* fhandler.h (fhandler_base): Make get_io_handle and friends return
 	self.
-	* fhandler_tty.cc (fhandler_pty_common::close_on_exec): Accomodate
+	* fhandler_tty.cc (fhandler_pty_common::close_on_exec): Accommodate
 	DEBUGGING flag to avoid spurious warnings when inheritance is set.
 
 Sat Mar 10 16:52:12 2001  Christopher Faylor <cgf@cygnus.com>
@@ -3932,7 +3932,7 @@ Mon Mar  5 01:25:03 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (path_conv::check): Record when path refers to a disk device.
 	Move executable extension check here.
-	(check_sysfile): Accomodate new EXEC path states.
+	(check_sysfile): Accommodate new EXEC path states.
 	(has_suffix): Remove.
 	(next_suffix): Remove.
 	(class suffix_scan): New clas.

@@ -101,7 +101,7 @@ both the parent or the child.
 for the cygheap.  Unfortunately gcc does not support that feature, as of
 this writing.)
 
-The reason for choosing a fixed, arbitrary location is to accomodate
+The reason for choosing a fixed, arbitrary location is to accommodate
 Windows XP, although there were sporadic complaints of cygwin heap
 failures in other pathological situations with both NT and 9x.  In
 Windows XP, Microsoft made the allocation of memory less deterministic.
