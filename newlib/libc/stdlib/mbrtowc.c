@@ -24,7 +24,7 @@ _DEFUN (_mbrtowc_r, (ptr, pwc, s, n, ps),
 #endif
 
   if (s == NULL)
-    retval = _mbtowc_r (ptr, pwc, "", 1, ps);
+    retval = _mbtowc_r (ptr, NULL, "", 1, ps);
   else
     retval = _mbtowc_r (ptr, pwc, s, n, ps);
 

@@ -13,7 +13,9 @@ _DEFUN (_mbsrtowcs_r, (r, dst, src, n, ps),
 	mbstate_t *ps)
 {
   wchar_t *ptr = dst;
-  size_t max = n;
+  const char *tmp_src;
+  size_t max;
+  size_t count = 0;
   int bytes;
 
 #ifdef MB_CAPABLE
@@ -24,13 +26,24 @@ _DEFUN (_mbsrtowcs_r, (r, dst, src, n, ps),
     }
 #endif
 
+  if (dst == NULL)
+    {
+      /* Ignore original n value and do not alter src pointer if the
+         dst pointer is NULL.  */
+      n = (size_t)-1;
+      tmp_src = *src;
+      src = &tmp_src;
+    }      
+  
+  max = n;
   while (n > 0)
     {
-      bytes = _mbtowc_r (r, ptr, *src, MB_CUR_MAX, ps);
+      bytes = _mbrtowc_r (r, ptr, *src, MB_CUR_MAX, ps);
       if (bytes > 0)
 	{
 	  *src += bytes;
-	  ++ptr;
+	  ++count;
+	  ptr = (dst == NULL) ? NULL : ptr + 1;
 	  --n;
 	}
       else if (bytes == -2)
@@ -40,7 +53,7 @@ _DEFUN (_mbsrtowcs_r, (r, dst, src, n, ps),
       else if (bytes == 0)
 	{
 	  *src = NULL;
-	  return (size_t)(ptr - dst);
+	  return count;
 	}
       else
 	{

@@ -37,7 +37,7 @@ _DEFUN (_wcsrtombs_r, (r, dst, src, len, ps),
     {
       int count = ps->__count;
       wint_t wch = ps->__value.__wch;
-      int bytes = _wctomb_r (r, buff, *pwcs, ps);
+      int bytes = _wcrtomb_r (r, buff, *pwcs, ps);
       if (bytes == -1)
 	{
 	  r->_errno = EILSEQ;

@@ -1,3 +1,13 @@
+2004-01-21  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/mbrtowc.c (_mbrtowc_r): Fix case where s is null
+	pointer to match C99 spec.
+	* libc/stdlib/mbsrtowcs.c (_mbsrtowc_r): Fix to ignore len when
+	dst is NULL.  Also fix to not alter src pointer when dst is NULL
+	and call _mbrtowc_r instead of _mbtowc_r.
+	* libc/stdlib/wcsrtombs.c (_wcsrtombs_r): Call _wcrtomb_r instead
+	of _wctomb_r.
+
 2004-01-19  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* libc/stdio/fclose.c (fclose): Release FILE as the last step.
