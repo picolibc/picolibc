@@ -1,7 +1,11 @@
-Mon Jun 11 13:55:04 2001  Christopher Faylor <cgf@cygnus.com>
+Mon Jun 11 14:19:49 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo.cc: Use autoloaded ToolHelp functions throughout for Win9x.
 	* autoload.cc: Autoload ToolHelp functions.
+
+	* sigproc.cc (proc_subproc): Incorporate SIGCHLD == SIG_IGN special
+	handling of zombie processes.  Ensure that zombie processes which are
+	at the end of the zombie array are properly cleaned up.
 
 Mon Jun 11 11:18:56 2001  Christopher Faylor <cgf@cygnus.com>
 
