@@ -81,6 +81,8 @@ typedef double double_t;
 
 extern int __fpclassifyf (float x);
 extern int __fpclassifyd (double x);
+extern int __signbitf (float x);
+extern int __signbitd (double x);
 
 #define fpclassify(x) \
           (__extension__ ({__typeof__(x) __x = (x); \

@@ -1,3 +1,8 @@
+2003-08-13  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/math.h: Add prototypes for __signbitf and
+	__signbitd.
+
 2003-07-31  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/ctype/iswalpha.c: Fix calls to __jp2uc to pass the
