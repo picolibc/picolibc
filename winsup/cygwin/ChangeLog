@@ -1,5 +1,10 @@
 2002-06-04  Christopher Faylor  <cgf@redhat.com>
 
+	* dtable.cc (handle_to_fn): Correct placement and length of name
+	buffer. (Suggested by Pavel Tsekov)
+
+2002-06-04  Christopher Faylor  <cgf@redhat.com>
+
 	Remove fcntl.h includes throughout.
 	* fhandler.h: Move fcntl.h include here.
 	(fhandler_base::set_flags): Accept supplied_bin argument.  Make

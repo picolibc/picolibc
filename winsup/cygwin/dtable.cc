@@ -726,8 +726,8 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
   memset (fnbuf, 0, sizeof (fnbuf));
   ntfn = (OBJECT_NAME_INFORMATION *) fnbuf;
-  ntfn->Name.MaximumLength = sizeof (fnbuf);
-  ntfn->Name.Buffer = (WCHAR *) ntfn + 1;
+  ntfn->Name.MaximumLength = sizeof (fnbuf) - sizeof (*ntfn);
+  ntfn->Name.Buffer = (WCHAR *) (ntfn + 1);
 
   DWORD res = NtQueryObject (h, ObjectNameInformation, ntfn, sizeof (fnbuf), NULL);
 
