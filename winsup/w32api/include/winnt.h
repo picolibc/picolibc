@@ -2053,7 +2053,15 @@ typedef struct _TOKEN_PRIVILEGES {
 	DWORD PrivilegeCount;
 	LUID_AND_ATTRIBUTES Privileges[ANYSIZE_ARRAY];
 } TOKEN_PRIVILEGES,*PTOKEN_PRIVILEGES,*LPTOKEN_PRIVILEGES;
-typedef enum tagTOKEN_TYPE { TokenPrimary=1,TokenImpersonation }TOKEN_TYPE, *PTOKEN_TYPE;
+typedef enum tagTOKEN_TYPE {
+	TokenPrimary = 1,
+	TokenImpersonation
+} TOKEN_TYPE,*PTOKEN_TYPE;
+#if (_WIN32_WINNT >= 0x0501)
+typedef enum {
+	HeapCompatibilityInformation
+} HEAP_INFORMATION_CLASS;
+#endif
 typedef struct _TOKEN_STATISTICS {
 	LUID TokenId;
 	LUID AuthenticationId;
@@ -2087,8 +2095,9 @@ typedef enum _TOKEN_INFORMATION_CLASS {
 	TokenSessionId
 } TOKEN_INFORMATION_CLASS;
 typedef enum _SID_NAME_USE {
-	SidTypeUser=1,SidTypeGroup,SidTypeDomain,SidTypeAlias,SidTypeWellKnownGroup,
-	SidTypeDeletedAccount,SidTypeInvalid,SidTypeUnknown
+	SidTypeUser=1,SidTypeGroup,SidTypeDomain,SidTypeAlias,
+	SidTypeWellKnownGroup,SidTypeDeletedAccount,SidTypeInvalid,
+	SidTypeUnknown
 } SID_NAME_USE,*PSID_NAME_USE;
 typedef struct _QUOTA_LIMITS {
 	SIZE_T PagedPoolLimit;

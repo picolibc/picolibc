@@ -1,5 +1,42 @@
 2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winbase.h (GetWriteWatch, IsSystemResumeAutomatic,
+	ResetWriteWatch): Add function.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0500]
+	(GetSystemWindowsDirectory[AW], ProcessIdToSessionId, ReplaceFile[AW]):
+	Add functions.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501]
+	(GetSystemWow64Directory[AW], HeapQueryInformation,
+	HeapSetInformation, InitializeSListHead, InterlockedFlushSList,
+	InterlockedPopEntrySList, InterlockedPushEntrySList, IsProcessInJob,
+	IsWow64Process, QueryMemoryResourceNotification, ReleaseActCtx,
+	RemoveVectoredExceptionHandler): Add functions.
+
+	* include/winnt.h [_WIN32_WINNT >= 0x0501] (HEAP_INFORMATION_CLASS):
+	Add enumeration.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0502] (GetThreadIOPendingFlag):
+	Add function.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0510] (RestoreLastError):
+	Add function. The MSDN Magazine of June 2003 reads:
+		RestoreLastError is an enigma. It's code is identical to
+		SetLastError. It's unclear to me why it was made into a
+		separate API.
+
+	* lib/user32.def (GetSystemWindowsDirectory[AW],
+	GetSystemWow64Directory[AW], GetThreadIOPendingFlag,
+	HeapQueryInformation, HeapSetInformation, InitializeSListHead,
+	InterlockedFlushSList, InterlockedPopEntrySList,
+	InterlockedPushEntrySList, IsSystemResumeAutomatic, IsWow64Process,
+	ProcessIdToSessionId, QueryMemoryResourceNotification, ReleaseActCtx,
+	RemoveVectoredExceptionHandler, ReplaceFile[AW], ResetWriteWatch,
+	RestoreLastError): Add functions.
+
+2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winbase.h [_WIN32_WINNT >= 0x0500] (GetComputerNameEx[AW],
 	GetProcessIoCounters): Add functions.
 
