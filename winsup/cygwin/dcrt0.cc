@@ -536,25 +536,15 @@ break_here ()
 #endif
 
 static void
-initial_env (bool first)
+initial_env ()
 {
   char buf[CYG_MAX_PATH + 1];
-  if (!first)
-    /* nothing */;
-  else if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
+  if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
     _cygwin_testing = 1;
+
 #ifdef DEBUGGING
   DWORD len;
-  static bool NO_COPY did_debugging_stuff;
-#if 0
-  if (did_debugging_stuff || (first && wincap.cant_debug_dll_entry ()))
-    return;
-#else
-  if (first)
-    return;
-#endif
 
-  did_debugging_stuff = true;
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
     {
       DWORD ms = atoi (buf);
@@ -583,6 +573,8 @@ initial_env (bool first)
 	{
 	  error_start_init (p);
 	  try_to_debug ();
+	  console_printf ("*** Sending Break.  gdb may issue spurious SIGTRAP message.\n");
+	  DebugBreak ();
 	  break_here ();
 	}
     }
@@ -594,7 +586,7 @@ void __stdcall
 dll_crt0_0 ()
 {
   wincap.init ();
-  initial_env (true);
+  initial_env ();
 
   char zeros[sizeof (child_proc_info->zero)] = {0};
 
@@ -736,7 +728,6 @@ dll_crt0_1 (char *)
   /* FIXME: Verify forked children get their exception handler set up ok. */
   exception_list cygwin_except_entry;
 
-  initial_env (false);
   check_sanity_and_sync (user_data);
   malloc_init ();
 

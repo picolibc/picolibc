@@ -1,5 +1,15 @@
 2004-02-18  Christopher Faylor  <cgf@redhat.com>
 
+	* fork.cc (fork_child): Invert sense of test which defeated correct
+	handling in a fork from a non-main thread.
+
+	* dcrt0.cc (initial_env): Eliminate parameter and just send DebugBreak
+	when appropriate.
+	(dll_crt0_0): Reflect parameter change to initial_env.
+	(dll_crt0_1): Don't call initial_env.
+
+2004-02-18  Christopher Faylor  <cgf@redhat.com>
+
 	* gendef (stabilize_sig_stack): New function.
 	(setjmp): Import, add sig stack handling.  Store sig stack info.
 	(longjmp): Call stabilize_sig_stack.  Restore sig stack info.

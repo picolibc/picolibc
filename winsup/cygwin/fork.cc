@@ -246,7 +246,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   /* If we've played with the stack, stacksize != 0.  That means that
      fork() was invoked from other than the main thread.  Make sure that
      the threadinfo information is properly set up.  */
-  if (!fork_info->stacksize)
+  if (fork_info->stacksize)
     {
       _main_tls = &_my_tls;
       _main_tls->init_thread (NULL, NULL);
