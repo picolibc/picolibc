@@ -22,7 +22,6 @@ details. */
 #define TT_MAGIC 0x513e4a1c
 struct timer_tracker
 {
-  static muto *protect;
   unsigned magic;
   clockid_t clock_id;
   sigevent evp;
@@ -33,20 +32,52 @@ struct timer_tracker
   struct timer_tracker *next;
   int settime (int, const itimerspec *, itimerspec *);
   timer_tracker (clockid_t, const sigevent *);
-  timer_tracker ();
+  timer_tracker () {};
+  static void lock ();
+  static void unlock ();
+  ~timer_tracker ();
 };
 
-timer_tracker ttstart;
+timer_tracker NO_COPY ttstart;
 
-muto *timer_tracker::protect;
-
-timer_tracker::timer_tracker ()
+class lock_timer_tracker
 {
-  new_muto (protect);
+  static muto *protect;
+public:
+  lock_timer_tracker ();
+  ~lock_timer_tracker ();
+};
+
+muto NO_COPY *lock_timer_tracker::protect;
+
+lock_timer_tracker::lock_timer_tracker ()
+{
+  new_muto (protect)->acquire ();
+}
+
+lock_timer_tracker::~lock_timer_tracker ()
+{
+  protect->release ();
+}
+
+timer_tracker::~timer_tracker ()
+{
+  if (cancel)
+    {
+      SetEvent (cancel);
+      th->detach ();
+      CloseHandle (cancel);
+#ifdef DEBUGGING
+      th = NULL;
+      cancel = NULL;
+#endif
+    }
+  magic = 0;
 }
 
 timer_tracker::timer_tracker (clockid_t c, const sigevent *e)
 {
+  lock_timer_tracker now;
   if (e != NULL)
     evp = *e;
   else
@@ -59,19 +90,17 @@ timer_tracker::timer_tracker (clockid_t c, const sigevent *e)
   cancel = NULL;
   flags = 0;
   memset (&it, 0, sizeof (it));
-  protect->acquire ();
   next = ttstart.next;
   ttstart.next = this;
-  protect->release ();
   magic = TT_MAGIC;
 }
 
 static long long
-to_us (timespec& ts)
+to_us (const timespec& ts)
 {
   long long res = ts.tv_sec;
   res *= 1000000;
-  res += ts.tv_nsec / 1000 + ((ts.tv_nsec % 1000) >= 500 ? 1 : 0);
+  res += ts.tv_nsec / 1000 + (ts.tv_nsec % 1000) ? 1 : 0;
   return res;
 }
 
@@ -150,10 +179,6 @@ timer_thread (VOID *x)
     }
 
 out:
-  CloseHandle (tt.cancel);
-  // FIXME: race here but is it inevitable?
-  if (tt.cancel == tp->cancel)
-    tp->cancel = NULL;
   return 0;
 }
 
@@ -183,13 +208,16 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
   if (ovalue && check_null_invalid_struct_errno (ovalue))
     return -1;
 
+  lock_timer_tracker now;
   itimerspec *elapsed;
   if (!cancel)
     elapsed = &itzero;
   else
     {
-      SetEvent (cancel);	// should be closed when the thread exits
+      SetEvent (cancel);
       th->detach ();
+      CloseHandle (cancel);
+      th = NULL;
       elapsed = &it;
     }
 
@@ -246,18 +274,14 @@ timer_delete (timer_t timerid)
   if (check_null_invalid_struct_errno (in_tt) || in_tt->magic != TT_MAGIC)
     return -1;
 
-  timer_tracker::protect->acquire ();
+  lock_timer_tracker now;
   for (timer_tracker *tt = &ttstart; tt->next != NULL; tt = tt->next)
     if (tt->next == in_tt)
       {
-	timer_tracker *deleteme = tt->next;
-	tt->next = deleteme->next;
-	delete deleteme;
-	timer_tracker::protect->release ();
+	tt->next = in_tt->next;
+	delete in_tt;
 	return 0;
       }
-  timer_tracker::protect->release ();
-
   set_errno (EINVAL);
   return 0;
 }

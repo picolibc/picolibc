@@ -158,14 +158,16 @@ pinfo::exit (DWORD n)
       self->alert_parent (0);		/* Shave a little time by telling our
 					   parent that we have now exited.  */
     }
-  int exitcode = self->exitcode;
+  int exitcode = self->exitcode & 0xffff;
+  if (!self->cygstarted)
+    exitcode >>= 8;
   release ();
 
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
   sigproc_printf ("Calling ExitProcess hProcess %p, n %p, exitcode %p",
 		  hProcess, n, exitcode);
-  ExitProcess (exitcode & 0xffff);
+  ExitProcess (exitcode);
 }
 # undef self
 

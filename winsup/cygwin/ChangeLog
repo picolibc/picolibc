@@ -1,3 +1,8 @@
+2005-03-08  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.cc (pinfo::exit): Right shift exit value by eight when not
+	started in a cygwin environment.
+
 2005-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap64): Handle MAP_AUTOGROW flag.
