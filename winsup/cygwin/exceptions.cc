@@ -269,9 +269,9 @@ stack_info::walk ()
   return 1;
 }
 
-/* Dump the stack using either the old method or the new Win32 API method */
+/* Dump the stack */
 void
-stack (HANDLE hproc, HANDLE hthread, CONTEXT *cx)
+stack (CONTEXT *cx)
 {
   int i;
 
@@ -295,10 +295,8 @@ cygwin_stackdump()
 {
   CONTEXT c;
   c.ContextFlags = CONTEXT_FULL;
-  HANDLE h1 = GetCurrentProcess ();
-  HANDLE h2 = GetCurrentThread ();
-  GetThreadContext (h2, &c);
-  stack(h1, h2, &c);
+  GetThreadContext (GetCurrentThread (), &c);
+  stack(&c);
 }
 
 static int NO_COPY keep_looping = 0;
@@ -360,7 +358,7 @@ try_to_debug ()
 }
 
 void
-stackdump (HANDLE hproc, HANDLE hthread, EXCEPTION_RECORD *e, CONTEXT *in)
+stackdump (EXCEPTION_RECORD *e, CONTEXT *in)
 {
   char *p;
   if (myself->progname[0])
@@ -382,7 +380,7 @@ stackdump (HANDLE hproc, HANDLE hthread, EXCEPTION_RECORD *e, CONTEXT *in)
     }
   if (e)
     exception (e, in);
-  stack (hproc, hthread, in);
+  stack (in);
 }
 
 /* Main exception handler. */
@@ -487,7 +485,7 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 	  HANDLE hthread;
 	  DuplicateHandle (hMainProc, GetCurrentThread (),
 			   hMainProc, &hthread, 0, FALSE, DUPLICATE_SAME_ACCESS);
-	  stackdump (hMainProc, hthread, e, in);
+	  stackdump (e, in);
 	}
       try_to_debug ();
       really_exit (EXIT_SIGNAL | sig);
@@ -925,7 +923,7 @@ done:
 exit_sig:
   if (sig == SIGQUIT || sig == SIGABRT)
     {
-      stackdump (NULL, NULL, NULL, NULL);
+      stackdump (NULL, NULL);
       try_to_debug ();
     }
   sigproc_printf ("signal %d, about to call do_exit", sig);

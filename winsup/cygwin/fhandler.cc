@@ -1428,8 +1428,15 @@ fhandler_pipe::lseek (off_t offset, int whence)
   return -1;
 }
 
+#ifdef DEBUGGING
+#define nameparm name
+#else
+#define nameparm
+#endif
+
 void
-fhandler_base::set_inheritance (HANDLE &h, int not_inheriting, const char *name)
+fhandler_base::set_inheritance (HANDLE &h, int not_inheriting, const char *nameparm)
+#undef nameparm
 {
   HANDLE newh;
 

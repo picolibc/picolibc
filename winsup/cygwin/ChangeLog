@@ -1,3 +1,14 @@
+Sat May  6 23:22:25 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (insert_file): Eliminate unused parameter.
+	(build_argv): Ditto.
+	* exceptions.cc (stack): Eliminate unused parameters.
+	(stackdump): Ditto.
+	(cygwin_stackdump): Reflect above changes.
+	(sig_handle): Ditto.
+	* fhandler.cc (fhandler_base::set_inheritance): Use kludge to avoid
+	unused parameter warning.
+
 2000-05-06  Mumit Khan  <khan@xraylith.wisc.edu>
 
 	* include/wchar.h (wcscmp, wcslen): Fix prototypes.
@@ -25,41 +36,41 @@ Wed May  3 21:54:11 2000  Christopher Faylor <cgf@cygnus.com>
 
 Wed May  3 18:07:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * errno.cc (errmap): Map ERROR_BAD_NETPATH to new errno ENOSHARE.
-        (_sys_errlist): Add entry for ENOSHARE.
-        (strerror): Add case for ENOSHARE.
-        * syscalls.cc (stat_worker): Check for errno ENOSHARE.
+	* errno.cc (errmap): Map ERROR_BAD_NETPATH to new errno ENOSHARE.
+	(_sys_errlist): Add entry for ENOSHARE.
+	(strerror): Add case for ENOSHARE.
+	* syscalls.cc (stat_worker): Check for errno ENOSHARE.
 
 Wed May  3 17:28:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * Makefile.in: Add dependencies for fhandler_random.o
-        * fhandler.h: Add device type FH_RANDOM. Add class
-        fhandler_dev_random.
-        * fhandler_random.cc: New file. Implementation of
-        fhandler_dev_random.
-        * hinfo.cc (build_fhandler): Add case for FH_RANDOM.
-        * path.cc: Add device names for random devices to
-        windows_device_names.
-        (get_device_number): Add if branch for random devices.
-        (win32_device_name): Add device name generation for
-        random devices.
-        winsup.h: Include <wincrypt.h>.
+	* Makefile.in: Add dependencies for fhandler_random.o
+	* fhandler.h: Add device type FH_RANDOM. Add class
+	fhandler_dev_random.
+	* fhandler_random.cc: New file. Implementation of
+	fhandler_dev_random.
+	* hinfo.cc (build_fhandler): Add case for FH_RANDOM.
+	* path.cc: Add device names for random devices to
+	windows_device_names.
+	(get_device_number): Add if branch for random devices.
+	(win32_device_name): Add device name generation for
+	random devices.
+	winsup.h: Include <wincrypt.h>.
 
 2000-05-02  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
-	* path.cc (mount_info::conv_to_win32_path): Previous patch 
+	* path.cc (mount_info::conv_to_win32_path): Previous patch
 	failed to set flags on a win32 path.
 
 Tue May  2 11:34:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * security.cc (read_sd): Return 1 on success because we
-        can't rely on the returned SD size from GetFileSecurity.
+	* security.cc (read_sd): Return 1 on success because we
+	can't rely on the returned SD size from GetFileSecurity.
 
 Tue May  2  2:22:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * dcrt0.cc: Add dynamic load code for `OemToCharA' from user32.dll.
-        * security.cc (read_sd): Call `OemToCharA' to make
-        `GetFileSecurity' happy on filenames with umlauts.
+	* dcrt0.cc: Add dynamic load code for `OemToCharA' from user32.dll.
+	* security.cc (read_sd): Call `OemToCharA' to make
+	`GetFileSecurity' happy on filenames with umlauts.
 
 Wed Apr 26 23:23:23 2000  Christopher Faylor <cgf@cygnus.com>
 
@@ -74,8 +85,8 @@ Wed Apr 26 23:23:23 2000  Christopher Faylor <cgf@cygnus.com>
 	
 Wed Apr 26 16:20:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * syscalls.cc (stat_worker): Previous patch could succeed
-        in stating a non-existant file.
+	* syscalls.cc (stat_worker): Previous patch could succeed
+	in stating a non-existant file.
 
 Wed Apr 26 01:07:16 2000  Christopher Faylor <cgf@cygnus.com>
 
@@ -112,26 +123,26 @@ Tue Apr 25 16:50:54 2000  Christopher Faylor <cgf@cygnus.com>
 
 Thu Apr 25 21:35:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * syscalls.cc (stat_worker): Previous patch failed to stat
-        each drives root dir on 9X.
+	* syscalls.cc (stat_worker): Previous patch failed to stat
+	each drives root dir on 9X.
 
 Thu Apr 25 16:37:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * fhandler.cc (fhandler_disk_file::open): Check for allow_ntsec
-        when determining exec flag.
-        * path.cc (symlink_info::check): Remove call to get_file_attribute().
-        * security.cc (read_sd): Rename, ditto for variables to conform
-        to common naming convention. Use GetFileSecurity() instead of
-        BackupRead() to avoid permission problems when reading ACLs.
-        (write_sd): Same renaming as for read_sd().
-        (alloc_sd): Change default permissions according to Linux permissions
-        for group and world when write permission is set.
-        * syscalls.cc (stat_worker): Avoid different permission problems
-        when requesting file informations.
+	* fhandler.cc (fhandler_disk_file::open): Check for allow_ntsec
+	when determining exec flag.
+	* path.cc (symlink_info::check): Remove call to get_file_attribute().
+	* security.cc (read_sd): Rename, ditto for variables to conform
+	to common naming convention. Use GetFileSecurity() instead of
+	BackupRead() to avoid permission problems when reading ACLs.
+	(write_sd): Same renaming as for read_sd().
+	(alloc_sd): Change default permissions according to Linux permissions
+	for group and world when write permission is set.
+	* syscalls.cc (stat_worker): Avoid different permission problems
+	when requesting file informations.
 
 Thu Apr 25 10:50:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * net.cc: Avoid a warning in declaration inet_network.
+	* net.cc: Avoid a warning in declaration inet_network.
 
 Mon Apr 24 17:38:25 2000  Thorsten Otto <t.otto@germanynet.de>
 

@@ -185,7 +185,7 @@ host_dependent_constants::init ()
  * -@foo and not the contents of foo.
  */
 static int __stdcall
-insert_file (char *name, char *&cmd, int& alloc_cmd)
+insert_file (char *name, char *&cmd)
 {
   HANDLE f;
   DWORD size;
@@ -424,7 +424,7 @@ build_argv (char *cmd, char **&argv, int &argc, int winshell)
 	{
 	  if (++nesting > MAX_AT_FILE_LEVEL)
 	    api_fatal ("Too many levels of nesting for %s", word);
-	  if (insert_file (word, cmd, alloc_cmd))
+	  if (insert_file (word, cmd))
 	      continue;			// There's new stuff in cmd now
 	}
 
