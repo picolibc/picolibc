@@ -16,12 +16,12 @@
 
 2002-05-22  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
-	* mount.cc (version) New global variable.
-	(usage) Standardize usage output.  Accomodate new version option.
-	(print_version) New function.
-	(longopts) Accomodate new version option.
-	(opts) Ditto.
-	(main) Ditto.
+	* mount.cc (version): New global variable.
+	(usage): Standardize usage output.  Accomodate new version option.
+	(print_version): New function.
+	(longopts): Accomodate new version option.
+	(opts): Ditto.
+	(main): Ditto.
 
 2002-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -67,12 +67,12 @@
 
 2002-05-13  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
-	* kill.cc (prog_name) New global variable.
-	(usage) Standardize usage output.  Add descriptions.
-	(print_version) New function.
-	(longopts) Accomodate new version option.
-	(opts) Ditto.
-	(main) Ditto.
+	* kill.cc (prog_name): New global variable.
+	(usage): Standardize usage output.  Add descriptions.
+	(print_version): New function.
+	(longopts): Accomodate new version option.
+	(opts): Ditto.
+	(main): Ditto.
 
 2002-05-13  Christopher Faylor  <cgf@redhat.com>
 
@@ -113,11 +113,11 @@
 
 2002-05-07  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
-	* dumper.cc (usage) Standardize usage output.  Generalize to allow use
+	* dumper.cc (usage): Standardize usage output.  Generalize to allow use
 	for help.
-	(longopts) New struct.  Added longopts for all options.
-	(print_version) New function.
-	(main) Change getopt to getopt_long.  Accommodate new help and version
+	(longopts): New struct.  Added longopts for all options.
+	(print_version): New function.
+	(main): Change getopt to getopt_long.  Accommodate new help and version
 	options.
 
 2002-03-29  Corinna Vinschen  <corinna@vinschen.de>
