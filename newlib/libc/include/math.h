@@ -185,8 +185,12 @@ extern float dremf _PARAMS((float, float));
 #endif /* ! defined (_REENT_ONLY) */
 
 /* The gamma functions use a global variable, signgam.  */
+#ifndef _REENT_ONLY
+#define signgam (*__signgam())
+extern int *__signgam _PARAMS((void));
+#endif /* ! defined (_REENT_ONLY) */
 
-extern __IMPORT int signgam;
+#define __signgam_r(ptr) ((ptr)->_new._reent._gamma_signgam)
 
 /* The exception structure passed to the matherr routine.  */
 

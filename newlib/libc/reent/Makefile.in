@@ -100,6 +100,7 @@ lib_a_SOURCES = \
 	readr.c \
 	signalr.c \
 	sbrkr.c \
+	signgam.c \
 	statr.c \
 	timer.c \
 	unlinkr.c \
@@ -141,7 +142,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
 lib_a_OBJECTS =  closer.o reent.o impure.o execr.o fstatr.o linkr.o \
-lseekr.o openr.o readr.o signalr.o sbrkr.o statr.o timer.o unlinkr.o writer.o
+lseekr.o openr.o readr.o signalr.o sbrkr.o signgam.o statr.o timer.o \
+unlinkr.o writer.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -151,7 +153,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 SOURCES = $(lib_a_SOURCES)
 OBJECTS = $(lib_a_OBJECTS)
@@ -237,7 +239,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

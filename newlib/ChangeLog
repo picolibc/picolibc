@@ -1,3 +1,11 @@
+2001-01-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/math.h (signgam): Change to errno-like solution
+	using a function to return the address of the real signgam.
+	* libc/reent/signgam.c: New file containing __signgam().
+	* libc/reent/Makefile.am: Added signgam.c to list of files.
+	* libc/reent/Makefile.in: Regenerated.
+
 2001-01-25  Alexandre Oliva  <aoliva@redhat.com>
 
 	* libc/sys/sh/syscalls.c (_times): New.

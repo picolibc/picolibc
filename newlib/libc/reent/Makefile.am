@@ -18,6 +18,7 @@ lib_a_SOURCES = \
 	readr.c \
 	signalr.c \
 	sbrkr.c \
+	signgam.c \
 	statr.c \
 	timer.c \
 	unlinkr.c \
