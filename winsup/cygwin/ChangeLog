@@ -1,5 +1,11 @@
 2003-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::dup): Don't call
+	fhandler_base::dup() but call DuplicateHandle directly instead to have
+	control over socket inheritence.
+
+2003-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::dup): On NT systems avoid
 	using WinSock2 socket duplication methods.  Add comment.
 

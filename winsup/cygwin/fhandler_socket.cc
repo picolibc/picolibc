@@ -400,7 +400,20 @@ fhandler_socket::dup (fhandler_base *child)
 	  return get_io_handle () == (HANDLE) INVALID_SOCKET;
 	}
     }
-  return fhandler_base::dup (child);
+  /* We don't call fhandler_base::dup here since that requires to
+     have winsock called from fhandler_base and it creates only
+     inheritable sockets which is wrong for winsock2. */
+  HANDLE nh;
+  if (!DuplicateHandle (hMainProc, get_io_handle (), hMainProc, &nh, 0,
+			!winsock2_active, DUPLICATE_SAME_ACCESS))
+    {
+      system_printf ("dup(%s) failed, handle %x, %E",
+		     get_name (), get_io_handle ());
+      __seterrno ();
+      return -1;
+    }
+  child->set_io_handle (nh);
+  return 0;
 }
 
 int __stdcall
