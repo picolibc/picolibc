@@ -1,3 +1,7 @@
+Sun Oct  1 16:30:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * include/iprtrmib.h: Add missing MIB_IF_OPER_STATUS_xxx definitions.
+
 Sun Oct  1 16:13:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * lib/iphlpapi.def: New stub for iphlpapi.dll.
