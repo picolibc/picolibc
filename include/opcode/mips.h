@@ -381,7 +381,8 @@ struct mips_opcode
      || (cpu == CPU_R3900 && ((insn)->membership & INSN_3900) != 0)	\
      || ((cpu == CPU_R10000 || cpu == CPU_R12000)			\
 	 && ((insn)->membership & INSN_10000) != 0)			\
-     || (cpu == CPU_SB1  && ((insn)->membership & INSN_SB1) != 0))
+     || (cpu == CPU_SB1  && ((insn)->membership & INSN_SB1) != 0)	\
+     || 0)	/* Please keep this term for easier source merging.  */
 
 /* This is a list of macro expanded instructions.
 

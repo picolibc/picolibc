@@ -1,3 +1,8 @@
+2001-10-18  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (OPCODE_IS_MEMBER): Add a no-op term to the end
+	of the expression, to make source code merging easier.
+
 2001-10-17  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips.h: Sort coprocessor instruction argument characters
