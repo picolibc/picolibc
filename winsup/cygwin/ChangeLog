@@ -1,4 +1,10 @@
-2004-04-03  Corinna Vinschen  <corinna@vinschen.de>
+2004-04-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (EXTRALIBS): Add libtextreadmode.a.
+	(INSTOBJS): Add textreadmode.o.
+	* textreadmode.c: New file.
+
+2004-04-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Request
 	compressed size only if the matching attributes are set.  Use
@@ -8,7 +14,7 @@
 	* ntdll.h: Add typedefs for FILE_COMPRESSION_INFORMATION and
 	FILE_INFORMATION_CLASS.
 
-2004-04-03  Corinna Vinschen  <corinna@vinschen.de>
+2004-04-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_raw.cc (fhandler_dev_raw::open): Actually use "options".
 

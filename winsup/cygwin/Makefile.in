@@ -214,8 +214,8 @@ PWD:=${shell pwd}
 LIB_NAME:=$(PWD)/libcygwin.a
 LIBSERVER:=@LIBSERVER@
 SUBLIBS:=$(PWD)/libpthread.a $(PWD)/libm.a $(PWD)/libc.a
-EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a
-INSTOBJS:=automode.o binmode.o textmode.o
+EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a libtextreadmode.a
+INSTOBJS:=automode.o binmode.o textmode.o textreadmode.o
 TARGET_LIBS:=$(LIB_NAME) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
 
 ifneq "${filter -O%,$(CFLAGS)}" ""
