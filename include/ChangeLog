@@ -1,3 +1,7 @@
+2001-11-14  Alan Modra  <amodra@bigpond.net.au>
+
+	* dis-asm.h (print_insn_i386): Declare.
+
 2001-11-11  Timothy Wall  <twall@alum.mit.edu>
 
 	* dis-asm.h: Fix comment to refer to octets rather than bytes.
