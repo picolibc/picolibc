@@ -426,6 +426,12 @@ gmtime
 _gmtime = gmtime
 gmtime_r
 _gmtime_r = gmtime_r
+hcreate
+hcreate_r
+hdestroy
+hdestroy_r
+hsearch
+hsearch_r
 h_errno DATA
 hypot
 _hypot = hypot
@@ -455,6 +461,7 @@ isascii
 _isascii = isascii
 isatty
 _isatty = isatty
+isblank
 iscntrl
 _iscntrl = iscntrl
 isdigit
@@ -479,6 +486,19 @@ isspace
 _isspace = isspace
 isupper
 _isupper = isupper
+iswalnum
+iswalpha
+iswblank
+iswcntrl
+iswctype
+iswdigit
+iswgraph
+iswlower
+iswprint
+iswpunct
+iswspace
+iswupper
+iswxdigit
 isxdigit
 _isxdigit = isxdigit
 j0
@@ -495,6 +515,7 @@ jnf
 _jnf = jnf
 kill
 _kill = kill
+l64a
 labs
 _labs = labs
 lchown
@@ -558,6 +579,9 @@ matherr
 _matherr = matherr
 mblen
 _mblen = mblen
+mbrlen
+mbrtowc
+mbsinit
 mbstowcs
 _mbstowcs = mbstowcs
 mbtowc
@@ -571,6 +595,7 @@ memcpy
 _memcpy = memcpy
 memmove
 _memmove = memmove
+mempcpy
 memset
 _memset = memset
 mkdir
@@ -605,6 +630,7 @@ nextafterf
 _nextafterf = nextafterf
 nl_langinfo
 _nl_langinfo = nl_langinfo
+on_exit
 open
 _open = open
 opendir
@@ -848,6 +874,8 @@ strncmp
 _strncmp = strncmp
 strncpy
 _strncpy = strncpy
+strndup
+strnlen
 strpbrk
 _strpbrk = strpbrk
 strrchr
@@ -867,6 +895,7 @@ strtok_r
 _strtok_r = strtok_r
 strtol
 _strtol = strtol
+_strtold
 strtoll
 _strtoll = strtoll
 strtoul
@@ -911,11 +940,14 @@ tcsetattr
 _tcsetattr = tcsetattr
 tcsetpgrp
 _tcsetpgrp = tcsetpgrp
+tdelete
+tdestroy
 telldir
 _telldir = telldir
 telldir64
 tempnam
 _tempnam = tempnam
+tfind
 time
 _time = time
 times
@@ -931,11 +963,16 @@ tolower
 _tolower = tolower
 toupper
 _toupper = toupper
+towctrans
+towlower
+towupper
 truncate
 _truncate = truncate
 truncate64
+tsearch
 ttyname
 _ttyname = ttyname
+twalk
 tzset
 _tzset = tzset
 ualarm
@@ -991,10 +1028,35 @@ waitpid
 _waitpid = waitpid
 wait3
 wait4
-wcstombs
-_wcstombs = wcstombs
+mbsrtowcs
+wcrtomb
+wctob
+wcscat
+wcschr
+wcscpy
+wcscspn
+wcslcat
+wcslcpy
+wcsncat
+wcsncmp
+wcsncpy
+wcspbrk
+wcsrtombs
+wcsrchr
+wcsspn
+wcsstr
+wctob
 wctomb
 _wctomb = wctomb
+wcstombs
+_wcstombs = wcstombs
+wctrans
+wctype
+wmemchr
+wmemcmp
+wmemcpy
+wmemmove
+wmemset
 write
 _write = write
 writev
@@ -1023,6 +1085,8 @@ seed48
 _seed48 = seed48
 srand48
 _srand48 = srand48
+setbuffer
+setlinebuf
 setmode
 _setmode = setmode
 __assertfail
@@ -1093,6 +1157,7 @@ htons
 _htons = htons
 ntohs
 _ntohs = ntohs
+a64l
 accept = cygwin_accept
 bind = cygwin_bind
 connect = cygwin_connect
