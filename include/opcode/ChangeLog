@@ -1,3 +1,41 @@
+Fri May 28 15:26:11 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Move integer arithmetic instructions after
+	integer logical instructions.  
+
+1999-05-28  Linus Nordberg  <linus.nordberg@canit.se>
+
+	* m68k.h: Document new formats `E', `G', `H' and new places `N',
+	`n', `o'.
+
+	* m68k.h: Define mcf5206e, mcf5307, mcf.  Document new format `u'
+	and new places `m', `M', `h'.
+
+Thu May 27 04:13:54 1999  Joel Sherrill (joel@OARcorp.com
+
+	* hppa.h (pa_opcodes): Add several processor specific system
+	instructions.
+
+Wed May 26 16:57:44 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Add second entry for "comb", "comib", 
+	"addb", and "addib" to be used by the disassembler.
+
+1999-05-12  Alan Modra  <alan@apri.levels.unisa.edu.au>
+
+	* i386.h (ReverseModrm): Remove all occurences.
+	(InvMem): Add to control/debug/test mov insns, movhlps, movlhps,
+	movmskps, pextrw, pmovmskb, maskmovq.
+	Change NoSuf to FP on all MMX, XMM and AMD insns as these all
+	ignore the data size prefix.
+
+	* i386.h (i386_optab, i386_regtab): Add support for PIII SIMD.
+	Mostly stolen from Doug Ledford <dledford@redhat.com>
+
+Sat May  8 23:27:35 1999  Richard Henderson  <rth@cygnus.com>
+
+	* ppc.h (PPC_OPCODE_64_BRIDGE): New.
+
 1999-04-14  Doug Evans  <devans@casey.cygnus.com>
 
 	* cgen.h (CGEN_ATTR): Delete member num_nonbools.

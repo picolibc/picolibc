@@ -60,6 +60,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define ELFOSABI_SYSV   0       /* UNIX System V ABI */
 #define ELFOSABI_HPUX   1       /* HP-UX operating system */
 #define ELFOSABI_STANDALONE 255 /* Standalone (embedded) application */
+#define ELFOSABI_ARM   97		/* ARM */
 
 #define EI_ABIVERSION   8       /* ABI version */
 

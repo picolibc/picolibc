@@ -1,3 +1,11 @@
+Sun May 30 16:03:16 1999  Cort Dougan  <cort@cs.nmt.edu>
+
+	* config.guess (ppc-*-linux-gnu): Also use ld emul elf32ppclinux.
+
+1999-05-24  Nick Clifton  <nickc@cygnus.com>
+
+	* config.sub: Updated to match latest EGCS version.
+
 1999-04-30  Tom Tromey  <tromey@cygnus.com>
 
 	* ltmain.sh: [mode link] Always use CC given by ltconfig.

@@ -184,9 +184,21 @@ static const struct pa_opcode pa_opcodes[] =
 { "b",		0xe8000000, 0xffe0e000, "nW", pa10}, /* bl foo,r0 */
 { "ldi",	0x34000000, 0xffe0c000, "j,x", pa10},	/* ldo val(r0),r */
 { "comib", 	0x84000000, 0xfc000000, "?n5,b,w", pa10}, /* comib{tf}*/
+/* This entry is for the disassembler only.  It will never be used by
+   assembler.  */
+{ "comib", 	0x8c000000, 0xfc000000, "?n5,b,w", pa10}, /* comib{tf}*/
 { "comb",	0x80000000, 0xfc000000, "?nx,b,w", pa10}, /* comb{tf} */
+/* This entry is for the disassembler only.  It will never be used by
+   assembler.  */
+{ "comb",	0x88000000, 0xfc000000, "?nx,b,w", pa10}, /* comb{tf} */
 { "addb",	0xa0000000, 0xfc000000, "@nx,b,w", pa10}, /* addb{tf} */
+/* This entry is for the disassembler only.  It will never be used by
+   assembler.  */
+{ "addb",	0xa8000000, 0xfc000000, "@nx,b,w", pa10},
 { "addib",	0xa4000000, 0xfc000000, "@n5,b,w", pa10}, /* addib{tf}*/
+/* This entry is for the disassembler only.  It will never be used by
+   assembler.  */
+{ "addib",	0xac000000, 0xfc000000, "@n5,b,w", pa10}, /* addib{tf}*/
 { "nop",        0x08000240, 0xffffffff, "", pa10},      /* or 0,0,0 */
 { "copy",       0x08000240, 0xffe0ffe0, "x,t", pa10},   /* or r,0,t */
 { "mtsar",      0x01601840, 0xffe0ffff, "x", pa10}, /* mtctl r,cr11 */
@@ -264,27 +276,6 @@ static const struct pa_opcode pa_opcodes[] =
 
 /* Computation Instructions */
 
-{ "add",        0x08000600, 0xfc000fe0, "dx,b,t", pa10},
-{ "addl",       0x08000a00, 0xfc000fe0, "dx,b,t", pa10},
-{ "addo",       0x08000e00, 0xfc000fe0, "dx,b,t", pa10},
-{ "addc",       0x08000700, 0xfc000fe0, "dx,b,t", pa10},
-{ "addco",      0x08000f00, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh1add",     0x08000640, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh1addl",    0x08000a40, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh1addo",    0x08000e40, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh2add",     0x08000680, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh2addl",    0x08000a80, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh2addo",    0x08000e80, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh3add",     0x080006c0, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh3addl",    0x08000ac0, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh3addo",    0x08000ec0, 0xfc000fe0, "dx,b,t", pa10},
-{ "sub",        0x08000400, 0xfc000fe0, "ax,b,t", pa10},
-{ "subo",       0x08000c00, 0xfc000fe0, "ax,b,t", pa10},
-{ "subb",       0x08000500, 0xfc000fe0, "ax,b,t", pa10},
-{ "subbo",      0x08000d00, 0xfc000fe0, "ax,b,t", pa10},
-{ "subt",       0x080004c0, 0xfc000fe0, "ax,b,t", pa10},
-{ "subto",      0x08000cc0, 0xfc000fe0, "ax,b,t", pa10},
-{ "ds",         0x08000440, 0xfc000fe0, "ax,b,t", pa10},
 { "comclr",     0x08000880, 0xfc000fe0, "ax,b,t", pa10},
 { "or",         0x08000240, 0xfc000fe0, "&x,b,t", pa10},
 { "xor",        0x08000280, 0xfc000fe0, "&x,b,t", pa10},
@@ -299,9 +290,30 @@ static const struct pa_opcode pa_opcodes[] =
 { "addio",      0xb4000800, 0xfc000800, "di,b,x", pa10},
 { "addit",      0xb0000000, 0xfc000800, "di,b,x", pa10},
 { "addito",     0xb0000800, 0xfc000800, "di,b,x", pa10},
+{ "add",        0x08000600, 0xfc000fe0, "dx,b,t", pa10},
+{ "addl",       0x08000a00, 0xfc000fe0, "dx,b,t", pa10},
+{ "addo",       0x08000e00, 0xfc000fe0, "dx,b,t", pa10},
+{ "addc",       0x08000700, 0xfc000fe0, "dx,b,t", pa10},
+{ "addco",      0x08000f00, 0xfc000fe0, "dx,b,t", pa10},
+{ "sub",        0x08000400, 0xfc000fe0, "ax,b,t", pa10},
+{ "subo",       0x08000c00, 0xfc000fe0, "ax,b,t", pa10},
+{ "subb",       0x08000500, 0xfc000fe0, "ax,b,t", pa10},
+{ "subbo",      0x08000d00, 0xfc000fe0, "ax,b,t", pa10},
+{ "subt",       0x080004c0, 0xfc000fe0, "ax,b,t", pa10},
+{ "subto",      0x08000cc0, 0xfc000fe0, "ax,b,t", pa10},
+{ "ds",         0x08000440, 0xfc000fe0, "ax,b,t", pa10},
 { "subi",       0x94000000, 0xfc000800, "ai,b,x", pa10},
 { "subio",      0x94000800, 0xfc000800, "ai,b,x", pa10},
 { "comiclr",    0x90000000, 0xfc000800, "ai,b,x", pa10},
+{ "sh1add",     0x08000640, 0xfc000fe0, "dx,b,t", pa10},
+{ "sh1addl",    0x08000a40, 0xfc000fe0, "dx,b,t", pa10},
+{ "sh1addo",    0x08000e40, 0xfc000fe0, "dx,b,t", pa10},
+{ "sh2add",     0x08000680, 0xfc000fe0, "dx,b,t", pa10},
+{ "sh2addl",    0x08000a80, 0xfc000fe0, "dx,b,t", pa10},
+{ "sh2addo",    0x08000e80, 0xfc000fe0, "dx,b,t", pa10},
+{ "sh3add",     0x080006c0, 0xfc000fe0, "dx,b,t", pa10},
+{ "sh3addl",    0x08000ac0, 0xfc000fe0, "dx,b,t", pa10},
+{ "sh3addo",    0x08000ec0, 0xfc000fe0, "dx,b,t", pa10},
 
 /* Extract and Deposit Instructions */
 
@@ -377,6 +389,16 @@ static const struct pa_opcode pa_opcodes[] =
 { "fice",       0x040002c0, 0xfc001fdf, "Zx(S,b)", pa10},
 { "fice",       0x040002c0, 0xfc001fdf, "Zx(b)", pa10},
 { "diag",       0x14000000, 0xfc000000, "D", pa10},
+
+/* These may be specific to certain versions of the PA.  Joel claimed
+   they were 72000 (7200?) specific.  However, I'm almost certain the
+   mtcpu/mfcpu were undocumented, but available in the older 700 machines.  */
+{ "mtcpu",      0x14001600, 0xfc00ffff, "x,^"},
+{ "mfcpu",      0x14001A00, 0xfc00ffff, "^,x"},
+{ "tocen",      0x14403600, 0xffffffff, ""},
+{ "tocdis",     0x14401620, 0xffffffff, ""},
+{ "shdwgr",     0x14402600, 0xffffffff, ""},
+{ "grshdw",     0x14400620, 0xffffffff, ""},
 
 /* gfw and gfr are not in the HP PA 1.1 manual, but they are in either
    the Timex FPU or the Mustang ERS (not sure which) manual.  */

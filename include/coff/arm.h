@@ -44,16 +44,17 @@ struct external_filehdr {
 /* Bits stored in flags field of the internal_f structure */
 
 #define F_INTERWORK	(0x0010)
-#define F_PIC_INT	(0x0020)
 #define F_APCS_FLOAT	(0x0040)
-#define F_ARM_ARCHITECTURE_MASK	(0x0c00)
-#define F_ARM_2		(0x0000)
-#define F_ARM_2a	(0x0000)
-#define F_ARM_3		(0x0400)
-#define F_ARM_3M	(0x0400)
-#define F_ARM_4		(0x0800)
-#define F_ARM_4T	(0x0c00)
-#define F_APCS26	(0x4000)
+#define F_PIC		(0x0080)
+#define F_APCS26	(0x1000)
+#define F_ARM_ARCHITECTURE_MASK (0x4000+0x0800+0x0400)
+#define F_ARM_2		(0x0400)
+#define F_ARM_2a	(0x0800)
+#define F_ARM_3		(0x0c00)
+#define F_ARM_3M	(0x4000)
+#define F_ARM_4		(0x4400)
+#define F_ARM_4T	(0x4800)
+#define F_ARM_spare	(0x4c00)
 
 /*
  * ARMMAGIC ought to encoded the procesor type,
