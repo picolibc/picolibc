@@ -1,3 +1,12 @@
+2003-02-28  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (cygcheck.o): Fix so that actual mingw include files are
+	used.
+	* cygcheck.cc (find_on_path): Translate from cygwin path when qualified
+	path name found.
+	(pretty_id): New function.  Dump output of id command.
+	(dump_sysinfo): Call pretty_id for CYGWIN=ntsec and CYGWIN=nontsec cases.
+
 2003-02-12  Christopher Faylor  <cgf@redhat.com>
 
 	* cygpath.cc (doit): Allocate more space for non-path filename.

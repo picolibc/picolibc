@@ -1,6 +1,6 @@
 /* cygcheck.cc
 
-   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -13,7 +13,9 @@
 #include <string.h>
 #include <sys/time.h>
 #include <ctype.h>
+#include <io.h>
 #include <windows.h>
+#include "path.h"
 #include "cygwin/include/sys/cygwin.h"
 #include "cygwin/include/mntent.h"
 #include "cygwin/include/getopt.h"
@@ -171,7 +173,7 @@ find_on_path (char *file, char *default_extension,
   static char rv[4000];
   char tmp[4000], *ptr = rv;
 
-  if (file == NULL)
+  if (!file)
     {
       keyeprint ("find_on_path: NULL pointer for file");
       return 0;
@@ -184,7 +186,7 @@ find_on_path (char *file, char *default_extension,
     }
 
   if (strchr (file, ':') || strchr (file, '\\') || strchr (file, '/'))
-    return file;
+    return cygpath (file, NULL);
 
   if (strchr (file, '.'))
     default_extension = (char *) "";
@@ -759,6 +761,74 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
   free (subkey_name);
 }
 
+void
+pretty_id (const char *s, char *cygwin, size_t cyglen)
+{
+  char *groups[16384];
+
+  strcpy (cygwin + cyglen++, " ");
+  strcpy (cygwin + cyglen, s);
+  putenv (cygwin);
+
+  char *id = cygpath ("/bin/id.exe", NULL);
+  for (char *p = id; p = strchr (p, '/'); p++)
+    *p = '\\';
+
+  if (access (id, X_OK))
+    {
+      fprintf (stderr, "`id' program not found\n");
+      exit (1);
+    }
+
+  FILE *f = popen (id, "rt");
+
+  char buf[16384];
+  fgets (buf, sizeof (buf), f);
+  char *uid = strtok (buf, " ") + sizeof ("uid=") - 1;
+  char *gid = strtok (NULL, " ") + sizeof ("gid=") - 1;
+  char **ng;
+  size_t sz = 0;
+  for (ng = groups; (*ng = strtok (NULL, ",")); ng++)
+    {
+      char *p = strchr (*ng, '\n');
+      if (p)
+	*p = '\0';
+      if (ng == groups)
+	*ng += sizeof ("groups=") - 1;
+      size_t len = strlen (*ng);
+      if (sz < len)
+	sz = len;
+    }
+
+  printf ("\n%s output (%s)\n", id, s);
+  int szmaybe = sizeof ("UID: ") + strlen (uid) - 1;
+  if (sz < szmaybe)
+    sz = szmaybe;
+  sz += 1;
+  int n = 80 / (int) sz;
+  sz = -sz;
+  ng[0] += sizeof ("groups=") - 1;
+  printf ("UID: %*s GID: %s\n", sz + (sizeof ("UID: ") - 1), uid, gid);
+  int i = 0;
+  for (char **g = groups; g < ng; g++)
+    {
+      if (i < n)
+	i++;
+      else
+	{
+	  i = 0;
+	  puts ("");
+	}
+      if (++i <= n && g != (ng - 1))
+	printf ("%*s ", sz, *g);
+      else
+	{
+	  printf ("%s\n", *g);
+	  i = 0;
+	}
+    }
+}
+
 static void
 dump_sysinfo ()
 {
@@ -877,6 +947,16 @@ dump_sysinfo ()
 	break;
       s = e + 1;
     }
+
+  fflush (stdout);
+
+  char *cygwin = getenv ("CYGWIN") ?: const_cast <char *> ("CYGWIN=");
+  size_t cyglen = strlen (cygwin);
+  cygwin = strcpy ((char *) malloc (cyglen + sizeof (" nontsec")), cygwin);
+  pretty_id ("nontsec", cygwin, cyglen);
+  pretty_id ("ntsec", cygwin, cyglen);
+  cygwin[cyglen] = 0;
+  putenv (cygwin);
 
   if (!GetSystemDirectory (tmp, 4000))
     keyeprint ("dump_sysinfo: GetSystemDirectory()");
