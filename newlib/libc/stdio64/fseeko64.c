@@ -343,7 +343,7 @@ dumb:
 #ifndef _REENT_ONLY
 
 _off64_t
-_DEFUN (fseeko64_r, (fp, offset, whence),
+_DEFUN (fseeko64, (fp, offset, whence),
      register FILE *fp _AND
      _off64_t offset _AND
      int whence)

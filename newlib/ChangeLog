@@ -1,3 +1,8 @@
+2003-08-23  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/stdio64/fseeko64.c (fseeko64_r): Rename second fseeko64_r
+	definition to fseeko64.
+
 2003-08-22  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/reent.h: Add _GLOBAL_REENT macro.
