@@ -1,3 +1,8 @@
+2002-11-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/oleauto.h (DeregisterTypeLib): Remove.
+	(UnRegisterTypeLib): Add prototype.
+
 2002-11-07  Christopher January  <chris@atomice.net>
 
 	* include/winioctl.h: Add definition for IOCTL_DISK_UPDATE_DRIVE_SIZE.
