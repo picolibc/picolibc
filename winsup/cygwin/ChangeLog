@@ -205,7 +205,7 @@ Sun Oct 21 19:04:37 2001 Alexander Gottwald <ago@informatik.tu-chemnitz.de>
 
 	* dlfcn.cc: Fix to confirm to coding standards.
 
-	Reorganize includes throughout to accomodate new cygheap.h usage.
+	Reorganize includes throughout to accommodate new cygheap.h usage.
 	* cygheap.h (cygheap_fdmanip): New class: simplifies locking and
 	retrieval of fds from cygheap->fdtab.
 	(cygheap_fdget): Ditto.
@@ -304,7 +304,7 @@ Sun Oct 14 08:10:12 2001  Gary R. Van Sickle
 
 2001-10-12  Christopher Faylor  <cgf@redhat.com>
 
-	* autoload.cc (wsock_init): Reorganize slightly to accomodate a new
+	* autoload.cc (wsock_init): Reorganize slightly to accommodate a new
 	compiler.
 
 2001-10-11  Egor Duda  <deo@logos-m.ru>
@@ -1176,7 +1176,7 @@ Sun Sep 9 23:09:00 2001 Corinna Vinschen <corinna@vinschen.de>
 
 Sun Sep  9 15:59:53 2001  Christopher Faylor <cgf@cygnus.com>
 
-	* heap.h (inheap): Rewrite macro to accomodate removal of brk macros
+	* heap.h (inheap): Rewrite macro to accommodate removal of brk macros
 	below.
 
 Sun Sep  9 15:02:44 2001  Christopher Faylor <cgf@cygnus.com>
@@ -2181,7 +2181,7 @@ Sat Jun  2 14:07:28 2001  Christopher Faylor <cgf@cygnus.com>
 	(cygheap_root::native_path): Ditto.
 	* dir.cc (opendir): Remove special chroot test.
 	* path.cc (path_prefix_p): Remove front end.
-	(normalize_posix_path): Reorganize chroot tests to accomodate new
+	(normalize_posix_path): Reorganize chroot tests to accommodate new
 	convention of allowing paths using posix chroot prefix.
 	(path_conv::check): Pass a "already ran normalize" option to
 	conv_to_win32_path.  Return if there is an error from this function.
@@ -3056,7 +3056,7 @@ Fri Apr 20 14:50:00 2001  Corinna Vinschen <corinna@vinschen.de>
 	`security.cc' to here.
 	* sec_helper.cc: New file. Move security helper functions from
 	`security.cc' to here.
-	* security.h: Changed to accomodate the above changes.
+	* security.h: Changed to accommodate the above changes.
 
 Fri Apr 20 14:12:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
@@ -4329,7 +4329,7 @@ Sun Jan 28 19:29:08 2001  Christopher Faylor <cgf@cygnus.com>
 	* heap.cc (heap_init): Improve error output.
 	* heap.h: Correct some declarations.
 	* shared.cc (mount_table_init): Remove.
-	(memory_init): Renamed from shared_init.  Reorganize to accomodate
+	(memory_init): Renamed from shared_init.  Reorganize to accommodate
 	strange Windows 9x problems with cygheap/heap interaction.
 	* shared_info.h: Rename shared_init to memory_init.
 
