@@ -1,5 +1,14 @@
 2003-09-11  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (path_conv::ndisk_links): Rename from
+	num_entries.  Accept an argument and calculate any extra links needed
+	based on missing .  and ..  entries.
+	(fhandler_disk_file::fstat_helper): Always call pc->ndisks_links() to
+	calculate the number of links.
+	* path.h (path_conv::ndisk_links): Declare.
+
+2003-09-11  Christopher Faylor  <cgf@redhat.com>
+
 	* path.cc (normalize_posix_path): Put check for '//' prefix back to
 	denote a UNC path.
 	(slash_unc_prefix_p): Remove vestige of old //c method for accessing

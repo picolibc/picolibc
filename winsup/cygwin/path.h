@@ -164,6 +164,7 @@ class path_conv
   DWORD volser () { return fs.serial; }
   const char *volname () {return fs.name; }
   void fillin (HANDLE h);
+  unsigned __stdcall ndisk_links (DWORD);
   char *normalized_path;
  private:
   char path[MAX_PATH];
