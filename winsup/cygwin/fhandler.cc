@@ -443,7 +443,6 @@ int
 fhandler_base::read (void *in_ptr, size_t in_len)
 {
   int len = (int) in_len;
-  char *ctrlzpos;
   char *ptr = (char *) in_ptr;
 
   int c;
@@ -475,6 +474,8 @@ fhandler_base::read (void *in_ptr, size_t in_len)
       return copied_chars;
     }
 
+#if 0
+  char *ctrlzpos;
   /* Scan buffer for a control-z and shorten the buffer to that length */
 
   ctrlzpos = (char *) memchr ((char *) ptr, 0x1a, copied_chars);
@@ -489,6 +490,7 @@ fhandler_base::read (void *in_ptr, size_t in_len)
       debug_printf ("returning 0 chars, text mode, CTRL-Z found");
       return 0;
     }
+#endif
 
   /* Scan buffer and turn \r\n into \n */
   register char *src = (char *) ptr;

@@ -1,3 +1,7 @@
+Sat Mar 31 16:23:32 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.cc (fhandler_base::read): Remove special handling of CTRL-Z.
+
 Sat Mar 31 11:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_console): Add members `insert_mode'.
@@ -74,7 +78,7 @@ Thursday Mar 22 2001  Robert Collins <rbtcollins@hotmail.com>
 	native clipboard format.
 
 2001-03-22  Egor Duda  <deo@logos-m.ru>
-  
+
 	* fhandler_console.cc (fhandler_console::set_default_attr): Update
 	console color attributes on tty reset.
 
@@ -213,7 +217,7 @@ Fri Mar 16 20:25:40 2001  Christopher Faylor <cgf@cygnus.com>
 	Recognize new .lnk states.
 
 Saturday Mar 17 01:19 2001 Robert Collins rbtcollins@hotmail.com
-   
+
 	* cygwin.din: Export the new functions.
 	* pthread.cc (pthread_cond_*): Add wrapper functions that call
 	__pthread_cond* functions.
