@@ -765,6 +765,7 @@ __svfscanf (fp, fmt0, ap)
 	      *p++ = c;
 	      width--;
 	    fskip:
+              ++nread;
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
@@ -786,15 +787,20 @@ __svfscanf (fp, fmt0, ap)
 		{
 		  /* no digits at all */
 		  while (p > buf)
-		    ungetc (*(u_char *)-- p, fp);
+                    {
+		      ungetc (*(u_char *)-- p, fp);
+                      --nread;
+                    }
 		  goto match_failure;
 		}
 	      /* just a bad exponent (e and maybe sign) */
 	      c = *(u_char *)-- p;
+              --nread;
 	      if (c != 'e' && c != 'E')
 		{
 		  _CAST_VOID ungetc (c, fp);	/* sign */
 		  c = *(u_char *)-- p;
+                  --nread;
 		}
 	      _CAST_VOID ungetc (c, fp);
 	    }
@@ -839,7 +845,6 @@ __svfscanf (fp, fmt0, ap)
 		}
 	      nassigned++;
 	    }
-	  nread += p - buf;
 	  break;
 	}
 #endif /* FLOATING_POINT */

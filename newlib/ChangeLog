@@ -1,3 +1,9 @@
+Fri Mar 17 15:37:00 2000  Jeff Johnston <jjohnstn@cygnus.com>
+
+	* libc/stdio/vfscanf.c (__svfscanf): Fixed floating point
+	code to update nread as each character is processed instead
+	of using buffer contents which throw away leading zeroes.
+
 Mon Mar 13 15:22:00 2000  Sergei Organov <osv@javad.ru>
 
         * libm/mathfp/sf_sqrt.c: Change _DOUBLE_IS_32BITS sqrt call to sqrtf.
