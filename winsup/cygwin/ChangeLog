@@ -1,3 +1,8 @@
+2003-07-06  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (gethostid): Set thread affinity so that results are
+	predictable.
+
 2003-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (list::match): Add parameters to return valid address and
@@ -138,7 +143,7 @@
 	(cygheap_user::internal_token): New member.
 	(cygheap_user::impersonation_state): New member.
 	(cygheap_user::issetuid): Modify.
-	(cygheap_user::token): New method.   
+	(cygheap_user::token): New method.
 	(cygheap_user::deimpersonate): New method.
 	(cygheap_user::reimpersonate): New method.
 	(cygheap_user::has_impersonation_tokens): New method.
@@ -190,9 +195,9 @@
 
 2003-06-18  Pierre Humblet  <pierre.humblet@ieee.org>
 
-        * autoload.cc (GetNetworkParams): Add.
-        * net.cc (getdomainname): Call GetNetworkParams and read the
-        DhcpDomain registry value if warranted.
+	* autoload.cc (GetNetworkParams): Add.
+	* net.cc (getdomainname): Call GetNetworkParams and read the
+	DhcpDomain registry value if warranted.
 
 2003-06-17  Christopher Faylor  <cgf@redhat.com>
 
@@ -451,7 +456,7 @@
 	(fhandler_base::lseek): Call set_did_lseek() instead of
 	set_check_win95_lseek_bug().
 	(fhandler_base::fhandler_base): Initialize fs_flags to 0.
-	* fhandler_disk_file.cc (fhandler_disk_file::open): Don't create files  
+	* fhandler_disk_file.cc (fhandler_disk_file::open): Don't create files
 	as "sparse" unconditionally.  Set fs_flags member.
 
 2003-05-25  Pierre Humblet  <pierre.humblet@ieee.org>
@@ -529,7 +534,7 @@
 	* dcrt0.cc (dll_crt_0_1) Fix calls to MTinterface::Init and
 	pthread::init_mainthread.
 	Call pthread::init_mainthread only when not forked.
-	
+
 2003-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_meminfo): Make swap memory output
