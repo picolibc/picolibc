@@ -1,3 +1,7 @@
+2004-09-15  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* getfacl.c (main): Correct layout when nopt is set.
+
 2004-07-12  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
 
 	* mkgroup.cc (netapibufferallocate,netgroupgetinfo): New function

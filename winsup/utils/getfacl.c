@@ -229,7 +229,7 @@ main (int argc, char **argv)
 	      break;
 	    case USER:
 	      if (nopt)
-		printf ("user:%lu\n", (unsigned long)acls[i].a_id);
+		printf ("user:%lu:", (unsigned long)acls[i].a_id);
 	      else
 		printf ("user:%s:", username (acls[i].a_id));
 	      break;
@@ -238,7 +238,7 @@ main (int argc, char **argv)
 	      break;
 	    case GROUP:
 	      if (nopt)
-		printf ("group:%lu\n", (unsigned long)acls[i].a_id);
+		printf ("group:%lu:", (unsigned long)acls[i].a_id);
 	      else
 		printf ("group:%s:", groupname (acls[i].a_id));
 	      break;
