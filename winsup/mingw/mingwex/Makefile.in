@@ -86,8 +86,9 @@ CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET = $(CC)
 AS_FOR_TARGET = $(AS)
-CFLAGS = @CFLAGS@ -fomit-frame-pointer -Wall
+CFLAGS = @CFLAGS@
 CXXFLAGS = @CXXFLAGS@ 
+OPTFLAGS= -fomit-frame-pointer
 
 # compiling with Cygwin?
 MNO_CYGWIN = @MNO_CYGWIN@
@@ -96,8 +97,8 @@ MNO_CYGWIN = @MNO_CYGWIN@
 INCLUDES = -I$(srcdir) -I$(srcdir)/../include \
   -I$(srcdir)/../../w32api/include \
   -nostdinc -nostdinc++
-ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(MNO_CYGWIN)
-ALL_CXXFLAGS = $(CXXFLAGS) $(INCLUDES) $(MNO_CYGWIN)
+ALL_CFLAGS = $(CFLAGS) $(OPTFLAGS) $(INCLUDES) $(MNO_CYGWIN)
+ALL_CXXFLAGS = $(CXXFLAGS) $(OPTFLAGS) $(INCLUDES) $(MNO_CYGWIN)
 
 AS = @AS@
 AR = @AR@
@@ -176,7 +177,7 @@ distclean:
 	-rm -f config.cache config.status config.log 
 	-rm -f Makefile
 .c.o:
-	$(CC) -c $(ALL_CXXFLAGS) $(ALL_CFLAGS) $< -o $@
+	$(CC) -c  $(ALL_CFLAGS) $< -o $@
 .S.o:
 	$(CC) -c  $< -o $@
 .s.o:

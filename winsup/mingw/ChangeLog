@@ -1,3 +1,23 @@
+2002-04-04  Danny Smith  <dannysmith@sourceforge.users.net>
+
+	Add libgmon.a and libmingwex.a for cygwin -mno-cygwin.
+	* configure.in (SUBDIRS): Add  profile and mingwex to cygwin target.
+	(configdirs): Likewise.
+	(LIBGMON_A): Define for cygwin target as well.
+	* configure: Regenerate.
+	* profile/configure.in (THREAD_DLL): Remove define.
+	(LIBM_A): Remove define.
+	(LIBGMON_A): Define for cygwin target as well.
+	* profile/configure: Regenerate.
+	* profile/makefile.in (install): Install to inst_libdir and
+	inst_includedir.
+
+	* mingwex/makefile.in (CFLAGS): Move -fomit-frame-pointer to...
+	(OPTFLAGS): New define.
+	(ALL_CFLAGS): Add $(OPTFLAGS).
+	(ALL_CXXFLAGS): Same.
+	(.c.o:): Remove ALL_CXXFLAGS. 
+
 2002-03-29  Danny Smith  <dannysmith@sourceforge.users.net>
 
 	* include/stdint.h: Add missing newline at eof. 

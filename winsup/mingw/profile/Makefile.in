@@ -95,17 +95,17 @@ info-html:
 install-info: info
 
 install: all
-	$(mkinstalldirs) $(tooldir)/lib 
+	$(mkinstalldirs) $(inst_libdir) 
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
 	done
 	for i in $(CRT0S); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
 	done
 	for sub in . ; do \
-	$(mkinstalldirs) $(tooldir)/include/$$sub ; \
+	$(mkinstalldirs) $(inst_includedir)/$$sub ; \
 		for i in $(srcdir)/$$sub/*.h ; do \
-		  $(INSTALL_DATA) $$i $(tooldir)/include/$$sub/`basename $$i` ; \
+		  $(INSTALL_DATA) $$i $(inst_includedir)/$$sub/`basename $$i` ; \
 		done ; \
 	done
 
