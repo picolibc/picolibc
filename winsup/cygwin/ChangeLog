@@ -1,5 +1,17 @@
 2002-06-16  Christopher Faylor  <cgf@redhat.com>
 
+	Changes suggested by Pierre Humblet.
+	* environ.cc (NL): New macro.
+	(conv_envvars): Use NL macro to fill in name and namelen.
+	(spenv::namelen): New field.
+	(spenvs): Use NL to fill in name and namelen.
+	(spenv::retrieve): Eliminate length argument.  Instead, use namelen
+	throughout.
+	(build_env): Don't calculate length of initial FOO= part of
+	environment.  Accommodate spenv::retrive argument change.
+
+2002-06-16  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.h (cygheap_user::winname): New field.
 	* cygheap.cc (cygheap_user::set_name): Clear winname when name changes.
 	* uinfo.cc (cygheap_user::env_logsrv): Avoid calculating server when
