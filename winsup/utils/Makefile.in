@@ -33,7 +33,7 @@ CXXFLAGS:=@CXXFLAGS@ -fno-exceptions -nostdinc++ -fno-rtti
 
 include $(srcdir)/../Makefile.common
 
-MINGW_INCLUDES:=-I$(updir)/mingw/include
+MINGW_INCLUDES:=-I$(mingw_source)/include -I$(cygwin_source)/include -I$(w32api_include)
 
 MINGW_CXXFLAGS:=$(CXXFLAGS) -mno-cygwin $(MINGW_INCLUDES)
 MINGW_CFLAGS:=$(CFLAGS) -mno-cygwin $(MINGW_INCLUDES)
@@ -75,7 +75,7 @@ strace.exe: strace.cc mingw_getopt.o $(MINGW_DEP_LDLIBS)
 ifdef VERBOSE
 	$(CC) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 else
-	@echo $(CC) -mno-cygwin -o $@ ${wordlist 1,2,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)};\
+	@echo $(CC) -o $@ ${wordlist 1,2,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)};\
 	$(CC) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 endif
 

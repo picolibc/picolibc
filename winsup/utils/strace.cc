@@ -8,6 +8,12 @@
 #include <signal.h>
 #include "sys/strace.h"
 
+/*  GCC runtime library's C++ EH code unfortunately pulls in stdio, and we
+   get undefine references to __impure_ptr, and hence the following
+   hack. It should be reasonably safe however as long as this file
+   is built using -mno-cygwin as is intended.  */
+int _impure_ptr;
+
 static const char *pgm;
 static int forkdebug = 0;
 static int numerror = 1;

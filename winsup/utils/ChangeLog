@@ -1,3 +1,9 @@
+Sat Mar 18 22:52:37 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Patch suggested by Mumit Khan  <khan@xraylith.wisc.edu>:
+	* strace.cc (_impure_ptr): New global variable to make strace build
+	under Cygwin gcc.
+
 Sat Mar 18 12:45:10 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Make CXXFLAGS consistent with cygwin.
