@@ -309,6 +309,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     if ((*t)->clear_on_fork ())
       (*t)->set ();
 
+  user_data->threadinterface->fixup_after_fork ();
+
   /* Initialize signal/process handling */
   sigproc_init ();
   __pthread_atforkchild ();

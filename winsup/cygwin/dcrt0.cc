@@ -70,7 +70,7 @@ int cygwin_finished_initializing;
 unsigned NO_COPY int signal_shift_subtract = 1;
 
 ResourceLocks _reslock NO_COPY;
-MTinterface _mtinterf NO_COPY;
+MTinterface _mtinterf;
 
 bool NO_COPY _cygwin_testing;
 

@@ -302,6 +302,10 @@ MTinterface::Init (int forked)
   if (forked)
     return;
 
+  mutexs = NULL;
+  conds  = NULL;
+  semaphores = NULL;
+
   /*possible the atfork lists should be inited here as well */
 
 #if 0
@@ -311,6 +315,33 @@ MTinterface::Init (int forked)
   item->sigmask = NULL;
   item->sigtodo = NULL;
 #endif
+}
+
+/* This function is called from a single threaded process */
+void
+MTinterface::fixup_after_fork (void)
+{
+  pthread_mutex *mutex = mutexs;
+  debug_printf("mutexs is %x\n",mutexs);
+  while (mutex)
+    {
+      mutex->fixup_after_fork ();
+      mutex = mutex->next;
+    }
+  pthread_cond *cond = conds;
+  debug_printf("conds is %x\n",conds);
+  while (cond)
+    {
+      cond->fixup_after_fork ();
+      cond = cond->next;
+    }
+  semaphore *sem = semaphores;
+  debug_printf("semaphores is %x\n",semaphores);
+  while (sem)
+    {
+      sem->fixup_after_fork ();
+      sem = sem->next;
+    }
 }
 
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
@@ -402,6 +433,8 @@ pthread_cond::pthread_cond (pthread_condattr *attr):verifyable_object (PTHREAD_C
 
   if (!this->win32_obj_id)
     magic = 0;
+  /* threadsafe addition is easy */
+  next = (pthread_cond *)InterlockedExchangePointer (&MT_INTERFACE->conds, this);
 }
 
 pthread_cond::~pthread_cond ()
@@ -409,6 +442,17 @@ pthread_cond::~pthread_cond ()
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
   pthread_mutex_destroy (&cond_access);
+  /* I'm not 100% sure the next bit is threadsafe. I think it is... */
+  if (MT_INTERFACE->conds == this)
+    MT_INTERFACE->conds = (pthread_cond *)InterlockedExchangePointer (&MT_INTERFACE->conds, this->next);
+  else
+    {
+      pthread_cond *tempcond = MT_INTERFACE->conds;
+      while (tempcond->next && tempcond->next != this)
+        tempcond = tempcond->next;
+      /* but there may be a race between the loop above and this statement */
+      tempcond->next = (pthread_cond *)InterlockedExchangePointer (&tempcond->next, this->next);
+    }
 }
 
 void
@@ -478,6 +522,21 @@ pthread_cond::TimedWait (DWORD dwMilliseconds)
     }
 }
 
+void
+pthread_cond::fixup_after_fork ()
+{
+  debug_printf("cond %x in fixup_after_fork\n", this);
+  if (shared != PTHREAD_PROCESS_PRIVATE)
+    api_fatal("doesn't understand PROCESS_SHARED condition variables\n");
+  /* FIXME: duplicate code here and in the constructor. */
+  this->win32_obj_id =::CreateEvent (&sec_none_nih, false, false, NULL);
+  if (!win32_obj_id)
+    api_fatal("failed to create new win32 mutex\n");
+  if (waiting)
+    api_fatal("Forked() while a condition variable has waiting threads.\nReport to cygwin@cygwin.com\n");
+}
+
+
 pthread_key::pthread_key (void (*destructor) (void *)):verifyable_object (PTHREAD_KEY_MAGIC)
 {
   dwTlsIndex = TlsAlloc ();
@@ -536,6 +595,13 @@ pthread_key::get ()
  *Isn't duplicated, it's reopened.
  */
 
+/*FIXME: implement InterlockExchangePointer and get rid of the silly typecasts in pthread_atfork
+ */
+#ifndef InterlockedExchangePointer
+#define InterlockedExchangePointer InterlockedExchange
+#endif
+ 
+
 pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREAD_MUTEX_MAGIC)
 {
   /*attr checked in the C call */
@@ -552,6 +618,8 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREA
     magic = 0;
   condwaits = 0;
   pshared = PTHREAD_PROCESS_PRIVATE;
+  /* threadsafe addition is easy */
+  next = (pthread_mutex *)InterlockedExchangePointer (&MT_INTERFACE->mutexs, this);
 }
 
 pthread_mutex::~pthread_mutex ()
@@ -559,6 +627,17 @@ pthread_mutex::~pthread_mutex ()
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
   win32_obj_id = NULL;
+  /* I'm not 100% sure the next bit is threadsafe. I think it is... */
+  if (MT_INTERFACE->mutexs == this)
+    MT_INTERFACE->mutexs = (pthread_mutex *)InterlockedExchangePointer (&MT_INTERFACE->mutexs, this->next);
+  else
+    {
+      pthread_mutex *tempmutex = MT_INTERFACE->mutexs;
+      while (tempmutex->next && tempmutex->next != this)
+	tempmutex = tempmutex->next;
+      /* but there may be a race between the loop above and this statement */
+      tempmutex->next = (pthread_mutex *)InterlockedExchangePointer (&tempmutex->next, this->next);
+    }
 }
 
 int
@@ -579,6 +658,21 @@ pthread_mutex::UnLock ()
   return ReleaseMutex (win32_obj_id);
 }
 
+void
+pthread_mutex::fixup_after_fork ()
+{
+  debug_printf("mutex %x in fixup_after_fork\n", this);
+  if (pshared != PTHREAD_PROCESS_PRIVATE)
+    api_fatal("pthread_mutex::fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's\n");
+  /* FIXME: duplicate code here and in the constructor. */
+  this->win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
+
+  if (!win32_obj_id)
+    api_fatal("pthread_mutex::fixup_after_fork() failed to create new win32 mutex\n");
+  if (condwaits)
+    api_fatal("Forked() while a mutex has condition variables waiting on it.\nReport to cygwin@cygwin.com\n");
+}
+
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),
 pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_DEFAULT)
 {
@@ -595,19 +689,34 @@ semaphore::semaphore (int pshared, unsigned int value):verifyable_object (SEM_MA
   if (!this->win32_obj_id)
     magic = 0;
   this->shared = pshared;
+  currentvalue = value;
+  /* threadsafe addition is easy */
+  next = (semaphore *)InterlockedExchangePointer (&MT_INTERFACE->semaphores, this);
 }
 
 semaphore::~semaphore ()
 {
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
+  /* I'm not 100% sure the next bit is threadsafe. I think it is... */
+  if (MT_INTERFACE->semaphores == this)
+    MT_INTERFACE->semaphores = (semaphore *)InterlockedExchangePointer (&MT_INTERFACE->semaphores, this->next);
+  else
+    {
+      semaphore *tempsem = MT_INTERFACE->semaphores;
+      while (tempsem->next && tempsem->next != this)
+        tempsem = tempsem->next;
+      /* but there may be a race between the loop above and this statement */
+      tempsem->next = (semaphore *)InterlockedExchangePointer (&tempsem->next, this->next);
+    }
 }
 
 void
 semaphore::Post ()
 {
-  long pc;
-  ReleaseSemaphore (win32_obj_id, 1, &pc);
+  /* we can't use the currentvalue, because the wait functions don't let us access it */
+  ReleaseSemaphore (win32_obj_id, 1, NULL);
+  currentvalue++;
 }
 
 int
@@ -618,14 +727,27 @@ semaphore::TryWait ()
    */
   if (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT)
     return EAGAIN;
-  else
-    return 0;
+  currentvalue--;
+  return 0;
 }
 
 void
 semaphore::Wait ()
 {
   WaitForSingleObject (win32_obj_id, INFINITE);
+  currentvalue--;
+}
+
+void
+semaphore::fixup_after_fork ()
+{
+  debug_printf("sem %x in fixup_after_fork\n", this);
+  if (shared != PTHREAD_PROCESS_PRIVATE)
+    api_fatal("doesn't understand PROCESS_SHARED semaphores variables\n");
+  /* FIXME: duplicate code here and in the constructor. */
+  this->win32_obj_id =::CreateSemaphore (&sec_none_nih, currentvalue, LONG_MAX, NULL);
+  if (!win32_obj_id)
+    api_fatal("failed to create new win32 semaphore\n");
 }
 
 verifyable_object::verifyable_object (long verifyer):
@@ -1051,12 +1173,6 @@ __pthread_atforkchild (void)
       cb = cb->next;
     }
 }
-
-/*FIXME: implement InterlockExchangePointer and get rid of the silly typecasts below
- */
-#ifndef InterlockedExchangePointer
-#define InterlockedExchangePointer InterlockedExchange
-#endif
 
 /*Register a set of functions to run before and after fork.
  *prepare calls are called in LI-FC order.

@@ -270,10 +270,12 @@ public:
   HANDLE win32_obj_id;
   LONG condwaits;
   int pshared;
+  class pthread_mutex * next;
 
   int Lock ();
   int TryLock ();
   int UnLock ();
+  void fixup_after_fork ();
 
   pthread_mutex (unsigned short);
   pthread_mutex (pthread_mutexattr *);
@@ -299,9 +301,11 @@ public:
   /* to allow atomic behaviour for cond_broadcast */
   pthread_mutex_t cond_access;
   HANDLE win32_obj_id;
+  class pthread_cond * next;
   int TimedWait (DWORD dwMilliseconds);
   void BroadCast ();
   void Signal ();
+  void fixup_after_fork ();
 
     pthread_cond (pthread_condattr *);
    ~pthread_cond ();
@@ -319,10 +323,13 @@ class semaphore:public verifyable_object
 {
 public:
   HANDLE win32_obj_id;
+  class semaphore * next;
   int shared;
+  long currentvalue;
   void Wait ();
   void Post ();
   int TryWait ();
+  void fixup_after_fork ();
 
     semaphore (int, unsigned int);
    ~semaphore ();
@@ -358,8 +365,11 @@ public:
 
   // list of mutex's. USE THREADSAFE INSERTS AND DELETES.
   class pthread_mutex * mutexs;
+  class pthread_cond  * conds;
+  class semaphore     * semaphores;
 
   void Init (int);
+  void fixup_after_fork (void);
 
     MTinterface ():reent_index (0), indexallocated (0), threadcount (1)
   {
