@@ -1,3 +1,7 @@
+2003-08-09  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 3.
+
 2003-08-08  Gerrit P. Haase  <gp@familiehaase.de>
 
 	* include/stdint.h: Correctly define INT32_MIN.
