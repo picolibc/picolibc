@@ -15,10 +15,12 @@ details. */
 #include <grp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "thread.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */
@@ -248,8 +250,8 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
         if (cnt < gidsetsize)
           grouplist[cnt] = group_buf[i].gr_gid;
         ++cnt;
-        if (gidsetsize && cnt >= gidsetsize)
-          goto out;
+        if (gidsetsize && cnt > gidsetsize)
+          goto error;
       }
     else if (group_buf[i].gr_mem)
       for (int gi = 0; group_buf[i].gr_mem[gi]; ++gi)
@@ -258,11 +260,14 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
             if (cnt < gidsetsize)
               grouplist[cnt] = group_buf[i].gr_gid;
             ++cnt;
-            if (gidsetsize && cnt >= gidsetsize)
-              goto out;
+            if (gidsetsize && cnt > gidsetsize)
+              goto error;
           }
-out:
   return cnt;
+
+error:
+  set_errno ( EINVAL );
+  return -1;
 }
 
 extern "C"
