@@ -1,3 +1,7 @@
+Thu Jul  8 12:32:23 1999  John David Anglin <dave@hiauly1.hia.nrc.ca>
+
+	* configure.in: Build ld, binutils & gas for hppa*-*-linux-gnu*.
+
 1999-06-30  Mark Mitchell  <mark@codesourcery.com>
 
 	* configure.in: Build ld on IRIX6.
