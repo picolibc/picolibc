@@ -497,7 +497,7 @@ _sbrk (int incr)
       abort ();
 #else
       errno = ENOMEM;
-      return -1;
+      return (caddr_t) -1;
 #endif
     }
   
@@ -622,7 +622,7 @@ _system (const char *s)
 }
 
 int
-_rename (const char *oldpath, const char *newpath)
+_rename (const char * oldpath, const char * newpath)
 {
   errno = ENOSYS;
   return -1;

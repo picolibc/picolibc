@@ -1,3 +1,8 @@
+2002-05-06  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* libc/sys/arm/syscalls.c (_rename): Add parameter names.
+	(_sbrk): Add cast of return value.
+
 2002-05-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	*  libc/include/sys/reent.h (_l64a_buf): New reentrant area.
