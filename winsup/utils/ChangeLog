@@ -1,3 +1,8 @@
+2002-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* getfacl.c (permstr): Use `other' permission bits for requesting
+	ace permissions.
+
 2002-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (usage): Add missing LF.

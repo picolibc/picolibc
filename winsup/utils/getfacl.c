@@ -28,9 +28,9 @@ permstr (mode_t perm)
 {
   static char pbuf[4];
 
-  pbuf[0] = (perm & S_IREAD) ? 'r' : '-';
-  pbuf[1] = (perm & S_IWRITE) ? 'w' : '-';
-  pbuf[2] = (perm & S_IEXEC) ? 'x' : '-';
+  pbuf[0] = (perm & S_IROTH) ? 'r' : '-';
+  pbuf[1] = (perm & S_IWOTH) ? 'w' : '-';
+  pbuf[2] = (perm & S_IXOTH) ? 'x' : '-';
   pbuf[3] = '\0';
   return pbuf;
 }
