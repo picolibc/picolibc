@@ -1,5 +1,11 @@
 2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/Makefile.in (arm-tdep.o): Update dependencies.
+	* gdb/arm-tdep.c: Include "objfiles.h" and "dwarf2-frame.h".
+	(arm_gdbarch_init): Register dwarf2_frame_sniffer.
+
+2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* gdb/elfread.c (elf_symtab_read): Skip symbols which BFD considers
 	special.
 
