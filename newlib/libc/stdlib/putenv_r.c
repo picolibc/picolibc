@@ -33,7 +33,7 @@
 int
 _DEFUN (_putenv_r, (reent_ptr, str),
 	struct _reent *reent_ptr _AND
-	_CONST char   *str)
+	char   *str)
 {
   register char *p, *equal;
   int rval;

@@ -1,5 +1,12 @@
 2004-11-24  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/stdlib.h (putenv, _putenv_r): Change to remove
+	const for value string parameter.
+	* libc/stdlib/putenv.c: Ditto.
+	* libc/stdlib/putenv_r.c: Ditto.
+
+2004-11-24  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/stdio/Makefile.am: Fix missing vfscanf.
 	* libc/stdio/Makefile.in: Regenerated.
                                                                                 

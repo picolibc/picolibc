@@ -129,8 +129,8 @@ char *  _EXFUN(l64a,(long __input));
 char *  _EXFUN(_l64a_r,(struct _reent *,long __input));
 int	_EXFUN(on_exit,(_VOID (*__func)(int, _PTR),_PTR __arg));
 _VOID	_EXFUN(_Exit,(int __status) _ATTRIBUTE ((noreturn)));
-int	_EXFUN(putenv,(const char *__string));
-int	_EXFUN(_putenv_r,(struct _reent *, const char *__string));
+int	_EXFUN(putenv,(char *__string));
+int	_EXFUN(_putenv_r,(struct _reent *, char *__string));
 int	_EXFUN(setenv,(const char *__string, const char *__value, int __overwrite));
 int	_EXFUN(_setenv_r,(struct _reent *, const char *__string, const char *__value, int __overwrite));
 
