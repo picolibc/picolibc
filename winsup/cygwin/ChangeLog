@@ -1,5 +1,17 @@
 2003-11-28  Christopher Faylor  <cgf@redhat.com>
 
+	* pinfo.h (_pinfo::getsig): Remove obsolete function, here and
+	throughout.
+	* exceptions.cc: Ditto.
+	* fhandler_termios.cc: Ditto.
+	* signal.cc: Ditto.
+	* sigproc.cc: Ditto.
+
+	* Makefile.in: Revert previous change which made a cygwin.din newer
+	than a version.h a warning rather than an error.
+
+2003-11-28  Christopher Faylor  <cgf@redhat.com>
+
 	* cygwin.din: Re-add inexplicably missing semaphore/msg functions.
 
 2003-11-28  Christopher Faylor  <cgf@redhat.com>

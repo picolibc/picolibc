@@ -104,11 +104,6 @@ public:
 
   inline void set_has_pgid_children (bool val) {has_pgid_children = val;}
 
-  inline struct sigaction& getsig (int sig)
-  {
-    return global_sigs[sig];
-  }
-
   inline sigset_t& getsigmask ()
   {
     return sig_mask;

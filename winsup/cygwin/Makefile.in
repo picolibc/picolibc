@@ -375,8 +375,8 @@ $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
 	$(AR) rcv $(LIBGMON_A) $(GMON_OFILES)
 
 $(API_VER): $(srcdir)/cygwin.din
-	@echo Error: Version info is older than DLL API!
-#	@false
+	@echo Error: Version info is older than DLL API!;\
+	false
 
 version.cc winver.o: winver_stamp
 	@ :

@@ -547,11 +547,11 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
   debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e.ExceptionCode, in.Eip, in.Esp);
   debug_printf ("In cygwin_except_handler sig = %d at %p", sig, in.Eip);
 
-  if (myself->getsig (sig).sa_mask & SIGTOMASK (sig))
-    syscall_printf ("signal %d, masked %p", sig, myself->getsig (sig).sa_mask);
+  if (global_sigs[sig].sa_mask & SIGTOMASK (sig))
+    syscall_printf ("signal %d, masked %p", sig, global_sigs[sig].sa_mask);
 
   debug_printf ("In cygwin_except_handler calling %p",
-		 myself->getsig (sig).sa_handler);
+		 global_sigs[sig].sa_handler);
 
   DWORD *ebp = (DWORD *)in.Esp;
   for (DWORD *bpend = (DWORD *) __builtin_frame_address (0); ebp > bpend; ebp--)
@@ -563,9 +563,9 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 
   if (!myself->progname[0]
       || GetCurrentThreadId () == sigtid
-      || (void *) myself->getsig (sig).sa_handler == (void *) SIG_DFL
-      || (void *) myself->getsig (sig).sa_handler == (void *) SIG_IGN
-      || (void *) myself->getsig (sig).sa_handler == (void *) SIG_ERR)
+      || (void *) global_sigs[sig].sa_handler == (void *) SIG_DFL
+      || (void *) global_sigs[sig].sa_handler == (void *) SIG_IGN
+      || (void *) global_sigs[sig].sa_handler == (void *) SIG_ERR)
     {
       /* Print the exception to the console */
       if (1)
@@ -1010,7 +1010,7 @@ sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
     sig_clear (SIGCONT);
 
   sigproc_printf ("signal %d processing", sig);
-  struct sigaction thissig = myself->getsig (sig);
+  struct sigaction thissig = global_sigs[sig];
   void *handler;
   handler = (void *) thissig.sa_handler;
 
@@ -1061,7 +1061,7 @@ stop:
   if (ISSTATE (myself, PID_STOPPED))
     goto done;
   handler = (void *) sig_handle_tty_stop;
-  thissig = myself->getsig (SIGSTOP);
+  thissig = global_sigs[SIGSTOP];
 
 dosig:
   /* Dispatch to the appropriate function. */

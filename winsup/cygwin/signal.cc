@@ -56,12 +56,12 @@ signal (int sig, _sig_func_ptr func)
       return (_sig_func_ptr) SIG_ERR;
     }
 
-  prev = myself->getsig (sig).sa_handler;
-  myself->getsig (sig).sa_handler = func;
-  myself->getsig (sig).sa_mask = 0;
+  prev = global_sigs[sig].sa_handler;
+  global_sigs[sig].sa_handler = func;
+  global_sigs[sig].sa_mask = 0;
   /* SA_RESTART is set to maintain BSD compatible signal behaviour by default.
      This is also compatible with the behaviour of signal(2) in Linux. */
-  myself->getsig (sig).sa_flags |= SA_RESTART;
+  global_sigs[sig].sa_flags |= SA_RESTART;
   set_sigcatchers (prev, func);
 
   syscall_printf ("%p = signal (%d, %p)", prev, sig, func);
@@ -332,7 +332,7 @@ sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
       return -1;
     }
 
-  struct sigaction oa = myself->getsig (sig);
+  struct sigaction oa = global_sigs[sig];
 
   if (newact)
     {
@@ -341,7 +341,7 @@ sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 	  set_errno (EINVAL);
 	  return -1;
 	}
-      myself->getsig (sig) = *newact;
+      global_sigs[sig] = *newact;
       if (newact->sa_handler == SIG_IGN)
 	sig_clear (sig);
       if (newact->sa_handler == SIG_DFL && sig == SIGCHLD)

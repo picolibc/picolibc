@@ -1,25 +1,10 @@
 Copyright 2001 Red Hat Inc., Christopher Faylor
 
-[this information is currently obsolete -- sorry]
 How do signals work?
 
 On process startup, cygwin starts a secondary thread that deals with signals.
-This thread contains a loop which blocks waiting for one of three events:
-
-1) sigcatch_main - a semaphore which, when incremented, indicates that a
-   signal may be available for the main thread.  The caller waits for the
-   signal to be delivered before returning.
-
-2) sigcatch_nonmain - a semaphore which , when incremented, indicates that
-   a signal is available for a non-main thread (currently this is not truly
-   implemented).  The caller waits for the signal to be delivered before
-   returning.
-
-3) sigcatch_nosync - a semaphore which, when incremented, indicates that
-   a signal may be available for the main thread.  The caller does not wait
-   for the delivery of the signal before returning.
-
-So, the signal handler blocks waiting for one of these three semaphores.
+This thread contains a loop which blocks waiting for information to show up
+on a pipe whose handle (sendsig) is currently stored in _pinfo (this may change).
 
 If one of these is activated, then the the signal handler inspects an
 array of integers looking for a non-zero value.  The array corresponds

@@ -155,7 +155,7 @@ fhandler_termios::bg_check (int sig)
      return with error */
   int pgid_gone = !pid_exists (myself->pgid);
   int sigs_ignored =
-    ((void *) myself->getsig (sig).sa_handler == (void *) SIG_IGN) ||
+    ((void *) global_sigs[sig].sa_handler == (void *) SIG_IGN) ||
     (myself->getsigmask () & SIGTOMASK (sig));
 
   if (pgid_gone)

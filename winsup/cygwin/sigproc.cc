@@ -98,9 +98,9 @@ signal_fixup_after_exec ()
   /* Set up child's signal handlers */
   for (int i = 0; i < NSIG; i++)
     {
-      myself->getsig (i).sa_mask = 0;
-      if (myself->getsig (i).sa_handler != SIG_IGN)
-	myself->getsig (i).sa_handler = SIG_DFL;
+      global_sigs[i].sa_mask = 0;
+      if (global_sigs[i].sa_handler != SIG_IGN)
+	global_sigs[i].sa_handler = SIG_DFL;
     }
 }
 
@@ -381,7 +381,7 @@ proc_subproc (DWORD what, DWORD val)
 	 remove the process and move on. Otherwise, this process becomes a zombie
 	 which must be reaped by a wait() call. */
       if (nzombies >= NZOMBIES
-	  || myself->getsig (SIGCHLD).sa_handler == (void *) SIG_IGN)
+	  || global_sigs[SIGCHLD].sa_handler == (void *) SIG_IGN)
 	{
 	  sigproc_printf ("automatically removing zombie %d", thiszombie);
 	  remove_zombie (thiszombie);
@@ -616,7 +616,7 @@ sigproc_init ()
     }
   memset (w, 0, sizeof *w);	// Just to be safe
 
-  myself->getsig (SIGSTOP).sa_flags = SA_RESTART | SA_NODEFER;
+  global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
   sigproc_printf ("process/signal handling enabled(%x)", myself->process_state);
   return;
 }
