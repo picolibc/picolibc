@@ -1,3 +1,7 @@
+Wed Jan 10 22:08:30 2001  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* sigproc.cc (wait_sig): Allow SIGCONT when stopped.
+
 Tue Jan  9 16:55:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	Patch suggested by René Møller Fonseca <fonseca@mip.sdu.dk>
