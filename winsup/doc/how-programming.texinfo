@@ -63,7 +63,7 @@ works, but
     bash$  gcc -lm hello.c
     /c/TEMP/ccjLEGlU.o(.text+0x10):hello.c: multiple definition of `main'
     /usr/lib/libm.a(libcmain.o)(.text+0x0):libcmain.c: first defined here
-    /usr/lib/libm.a(libcmain.o)(.text+0x6a):libcmain.c: undefined reference to `WinMain@16'
+    /usr/lib/libm.a(libcmain.o)(.text+0x6a):libcmain.c: undefined reference to `WinMain@@16'
     collect2: ld returned 1 exit status
 @end example
 
