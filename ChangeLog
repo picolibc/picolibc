@@ -1,3 +1,10 @@
+2004-01-15  Andrew Cagney  <cagney@redhat.com>
+
+	* src-release: Update copyright year.
+	(do-proto-toplev): Configure using i686-pc-linux-gnu.
+	(NEWLIB_SUPPORT_DIRS): Delete macro.
+	(newlib.tar.bz2): Delete rule.
+
 2004-01-14  Loren J. Rittle <ljrittle@acm.org>
 
 	* Makefile.def (target_modules) [libtermcap, libiberty, zlib]: Stage.

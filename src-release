@@ -1,5 +1,5 @@
 #   Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-#   1999, 2000, 2001, 2002, 2003 Free Software Foundation
+#   1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -136,7 +136,7 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	<Makefile.in >tmp
 	mv -f tmp Makefile.in
 	#
-	./configure sun4
+	./configure i686-pc-linux-gnu
 	$(MAKE) configure-host configure-target \
 	    ALL_GCC="" ALL_GCC_C="" ALL_GCC_CXX="" \
 	    CC_FOR_TARGET="$(CC)" CXX_FOR_TARGET="$(CXX)"
@@ -328,25 +328,6 @@ insight+dejagnu.tar: $(DIST_SUPPORT) $(INSIGHTD_SUPPORT_DIRS) gdb
 	$(MAKE) -f $(SELF) gdb-tar TOOL=gdb PACKAGE="insight+dejagnu" \
 		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(INSIGHTD_SUPPORT_DIRS)"
-
-.PHONY: newlib.tar.bz2
-NEWLIB_SUPPORT_DIRS=libgloss
-# taz configures for the sun4 target which won't configure newlib.
-# We need newlib configured so that the .info files are made.
-# Unfortunately, it is not enough to just configure newlib separately:
-# taz will build the .info files but since SUBDIRS won't contain newlib,
-# distclean won't be run (leaving Makefile, config.status, and the tmp files
-# used in building the .info files, eg: *.def, *.ref).
-# The problem isn't solvable however without a lot of extra work because
-# target libraries are built in subdir $(target_alias) which gets nuked during
-# the make distclean.  For now punt on the issue of shipping newlib info files
-# with newlib net releases and wait for a day when some native target (sun4?)
-# supports newlib (if only minimally).
-newlib.tar.bz2: $(DIST_SUPPORT) $(NEWLIB_SUPPORT_DIRS) newlib
-	$(MAKE) -f $(SELF) taz TOOL=newlib \
-		MD5PROG="$(MD5PROG)" \
-		SUPPORT_FILES="$(NEWLIB_SUPPORT_DIRS)" \
-		DEVO_SUPPORT="$(DEVO_SUPPORT) COPYING.NEWLIB" newlib
 
 .NOEXPORT:
 MAKEOVERRIDES=
