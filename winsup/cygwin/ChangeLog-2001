@@ -1,3 +1,7 @@
+2001-12-31  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Strip path when installing library.
+
 2001-12-30  Christopher Faylor  <cgf@redhat.com>
 
 	* include/getopt.h: Fix define.
