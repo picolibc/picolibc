@@ -1,4 +1,5 @@
-2002-10-11  Richard Sandiford  <rsandifo@redhat.com>
+2002-10-11  Graham Stott  <graham.stott@btinternet.com>
+	    Richard Sandiford  <rsandifo@redhat.com>
 
 	* libc/include/sys/config.h (SIZE_T_SMALLER_THAN_LONG): Undefine.
 	* libc/stdlib/mallocr.c (long_sub_size_t): Define in a way that
