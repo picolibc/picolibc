@@ -79,6 +79,16 @@ _CRTIMP size_t __cdecl _get_sbh_threshold (void);
 _CRTIMP int __cdecl _set_sbh_threshold (size_t);
 _CRTIMP void* __cdecl _expand (void*, size_t); 
 
+/* These require msvcr70.dll or higher. */ 
+#if __MSVCRT_VERSION__ >= 0x0700
+_CRTIMP void * __cdecl _aligned_offset_malloc(size_t, size_t, size_t);
+_CRTIMP void * __cdecl _aligned_offset_realloc(void*, size_t, size_t, size_t);
+
+_CRTIMP void* __cdecl _aligned_malloc (size_t, size_t);
+_CRTIMP void* __cdecl _aligned_realloc (void*, size_t, size_t);
+_CRTIMP void __cdecl _aligned_free (void*);
+#endif /* __MSVCRT_VERSION__ >= 0x0700 */
+
 #ifdef __cplusplus
 }
 #endif

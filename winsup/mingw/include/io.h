@@ -33,7 +33,8 @@
  * NOTE: This also defines off_t, the file offset type, through
  *       an inclusion of sys/types.h */
 
-#include <sys/types.h>	/* To get time_t. */
+#include <sys/types.h>	/* To get time_t.  */
+#include <stdint.h>  /* For intptr_t.  */
 
 /*
  * Attributes of files as returned by _findfirst et al.
@@ -86,6 +87,14 @@ struct _finddatai64_t {
     char        name[FILENAME_MAX];
 };
 
+struct __finddata64_t {
+        unsigned    attrib;
+        __time64_t  time_create;    
+        __time64_t  time_access;    
+        __time64_t  time_write;
+        _fsize_t    size;
+         char       name[FILENAME_MAX];
+};
 
 #ifndef _WFINDDATA_T_DEFINED
 struct _wfinddata_t {
@@ -96,6 +105,7 @@ struct _wfinddata_t {
     	_fsize_t	size;
     	wchar_t		name[FILENAME_MAX];	/* may include spaces. */
 };
+
 struct _wfinddatai64_t {
     unsigned    attrib;
     time_t      time_create;
@@ -103,6 +113,15 @@ struct _wfinddatai64_t {
     time_t      time_write;
     __int64     size;
     wchar_t     name[FILENAME_MAX];
+};
+
+struct __wfinddata64_t {
+        unsigned    attrib;
+        __time64_t  time_create;    
+        __time64_t  time_access;
+        __time64_t  time_write;
+        _fsize_t    size;
+        wchar_t     name[FILENAME_MAX];
 };
 
 #define _WFINDDATA_T_DEFINED
@@ -118,6 +137,7 @@ extern "C" {
  * _findclose calls. _findnext also returns -1 if no match could be found,
  * and 0 if a match was found. Call _findclose when you are finished.
  */
+/*  FIXME: Should these all use intptr_t, as per recent MSDN docs?  */
 _CRTIMP int __cdecl _findfirst (const char*, struct _finddata_t*);
 _CRTIMP int __cdecl _findnext (int, struct _finddata_t*);
 _CRTIMP int __cdecl _findclose (int);
@@ -129,15 +149,18 @@ _CRTIMP char* __cdecl _mktemp (char*);
 _CRTIMP int __cdecl _rmdir (const char*);
 _CRTIMP int __cdecl _chmod (const char*, int);
 
-
 #ifdef __MSVCRT__
 _CRTIMP __int64 __cdecl _filelengthi64(int);
 _CRTIMP long __cdecl _findfirsti64(const char*, struct _finddatai64_t*);
 _CRTIMP int __cdecl _findnexti64(long, struct _finddatai64_t*);
 _CRTIMP __int64 __cdecl _lseeki64(int, __int64, int);
 _CRTIMP __int64 __cdecl _telli64(int);
+/* These require newer versions of msvcrt.dll (6.1 or higher). */ 
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP intptr_t __cdecl _findfirst64(const char*, struct __finddata64_t*);
+_CRTIMP intptr_t __cdecl _findnext64(intptr_t, struct __finddata64_t*); 
+#endif /* __MSVCRT_VERSION__ >= 0x0601 */
 #endif /* __MSVCRT__ */
-
 
 #ifndef _NO_OLDNAMES
 
@@ -161,7 +184,6 @@ _CRTIMP int __cdecl chmod (const char*, int);
 /* TODO: Maximum number of open handles has not been tested, I just set
  * it the same as FOPEN_MAX. */
 #define	HANDLE_MAX	FOPEN_MAX
-
 
 /* Some defines for _access nAccessMode (MS doesn't define them, but
  * it doesn't seem to hurt to add them). */
@@ -238,6 +260,10 @@ _CRTIMP int __cdecl _wsopen(const wchar_t*, int, int, ...);
 _CRTIMP wchar_t * __cdecl _wmktemp(wchar_t*);
 _CRTIMP long __cdecl _wfindfirsti64(const wchar_t*, struct _wfinddatai64_t*);
 _CRTIMP int __cdecl _wfindnexti64(long, struct _wfinddatai64_t*);
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP intptr_t __cdecl _wfindfirst64(const wchar_t*, struct __wfinddata64_t*); 
+_CRTIMP intptr_t __cdecl _wfindnext64(intptr_t, struct __wfinddata64_t*);
+#endif
 #endif /* defined (__MSVCRT__) */
 #define _WIO_DEFINED
 #endif /* _WIO_DEFINED */

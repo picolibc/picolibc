@@ -140,7 +140,11 @@ _CRTIMP wchar_t* __cdecl _wcsupr (wchar_t*);
 
 #ifdef __MSVCRT__
 _CRTIMP int __cdecl  _wcsncoll(const wchar_t*, const wchar_t*, size_t);
-_CRTIMP int __cdecl  _wcsnicoll(const wchar_t*, const wchar_t*, size_t);
+_CRTIMP int   __cdecl _wcsnicoll(const wchar_t*, const wchar_t*, size_t);
+#if __MSVCRT_VERSION__ >= 0x0700
+_CRTIMP  wchar_t* __cdecl _wcserror(int);
+_CRTIMP  wchar_t* __cdecl __wcserror(const wchar_t*);
+#endif
 #endif
 
 

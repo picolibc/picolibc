@@ -236,6 +236,12 @@ _CRTIMP int __cdecl fpclass (double);
 
 #endif /* Not _NO_OLDNAMES */
 
+/* This require msvcr70.dll or higher. */ 
+#if __MSVCRT_VERSION__ >= 0x0700
+_CRTIMP int __cdecl _set_SSE2_enable (int);
+#endif /* __MSVCRT_VERSION__ >= 0x0700 */
+
+
 #endif /* __STRICT_ANSI__ */
 
 

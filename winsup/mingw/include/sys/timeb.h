@@ -29,6 +29,7 @@
 
 /* All the headers include this file. */
 #include <_mingw.h>
+#include <sys/types.h>
 
 #ifndef	RC_INVOKED
 
@@ -56,6 +57,13 @@ struct timeb
 };
 #endif
 
+struct __timeb64
+{
+	__time64_t time;
+	short millitm;
+	short timezone;
+	short dstflag;
+};
 
 #ifdef	__cplusplus
 extern "C" {
@@ -67,6 +75,11 @@ _CRTIMP void __cdecl	_ftime (struct _timeb*);
 #ifndef	_NO_OLDNAMES
 _CRTIMP void __cdecl	ftime (struct timeb*);
 #endif	/* Not _NO_OLDNAMES */
+
+/* This requires newer versions of msvcrt.dll (6.10 or higher).  */ 
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP void __cdecl	_ftime64 (struct __timeb64*);
+#endif /* __MSVCRT_VERSION__ >= 0x0601 */
 
 #ifdef	__cplusplus
 }

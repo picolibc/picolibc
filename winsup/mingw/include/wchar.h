@@ -36,6 +36,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/types.h>
+#include <stdint.h>
 
 #define __need_size_t
 #define __need_wint_t
@@ -62,20 +63,28 @@ typedef	unsigned long	_fsize_t;
 
 #ifndef _WFINDDATA_T_DEFINED
 struct _wfinddata_t {
-    	unsigned	attrib;
-    	time_t		time_create;	/* -1 for FAT file systems */
-    	time_t		time_access;	/* -1 for FAT file systems */
-    	time_t		time_write;
-    	_fsize_t	size;
-    	wchar_t		name[FILENAME_MAX];	/* may include spaces. */
+	unsigned	attrib;
+	time_t		time_create;	/* -1 for FAT file systems */
+	time_t		time_access;	/* -1 for FAT file systems */
+	time_t		time_write;
+	_fsize_t	size;
+	wchar_t		name[FILENAME_MAX];	/* may include spaces. */
 };
 struct _wfinddatai64_t {
-    unsigned    attrib;
-    time_t      time_create;
-    time_t      time_access;
-    time_t      time_write;
-    __int64     size;
-    wchar_t     name[FILENAME_MAX];
+	unsigned    attrib;
+	time_t      time_create;
+	time_t      time_access;
+	time_t      time_write;
+	__int64     size;
+	wchar_t     name[FILENAME_MAX];
+};
+struct __wfinddata64_t {
+        unsigned    attrib;
+        __time64_t  time_create;    
+        __time64_t  time_access;
+        __time64_t  time_write;
+        _fsize_t    size;
+        wchar_t     name[FILENAME_MAX];
 };
 #define _WFINDDATA_T_DEFINED
 #endif
@@ -96,6 +105,10 @@ _CRTIMP int __cdecl	_wsopen (const wchar_t*, int, int, ...);
 _CRTIMP wchar_t* __cdecl _wmktemp (wchar_t*);
 _CRTIMP long __cdecl	_wfindfirsti64 (const wchar_t*, struct _wfinddatai64_t*);
 _CRTIMP int __cdecl 	_wfindnexti64 (long, struct _wfinddatai64_t*);
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP intptr_t __cdecl _wfindfirst64(const wchar_t*, struct __wfinddata64_t*); 
+_CRTIMP intptr_t __cdecl _wfindnext64(intptr_t, struct __wfinddata64_t*);
+#endif
 #endif /* defined (__MSVCRT__) */
 #define _WIO_DEFINED
 #endif /* _WIO_DEFINED */
@@ -218,6 +231,21 @@ struct _stati64 {
     time_t st_mtime;
     time_t st_ctime;
     };
+
+struct __stat64
+{
+    _dev_t st_dev;
+    _ino_t st_ino;
+    _mode_t st_mode;
+    short st_nlink;
+    short st_uid;
+    short st_gid;
+    _dev_t st_rdev;
+    _off_t st_size;
+    __time64_t st_atime;
+    __time64_t st_mtime;
+    __time64_t st_ctime;
+};
 #endif  /* __MSVCRT__ */
 #define _STAT_DEFINED
 #endif /* _STAT_DEFINED */
@@ -227,6 +255,9 @@ struct _stati64 {
 #if defined __MSVCRT__
 _CRTIMP int __cdecl	_wstat (const wchar_t*, struct _stat*);
 _CRTIMP int __cdecl	_wstati64 (const wchar_t*, struct _stati64*);
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP int __cdecl _wstat64 (const wchar_t*, struct __stat64*);
+#endif /* __MSVCRT_VERSION__ >= 0x0601 */
 #endif  /* __MSVCRT__ */
 #define _WSTAT_DEFINED
 #endif /* ! _WSTAT_DEFIND  */
@@ -238,6 +269,9 @@ _CRTIMP wchar_t* __cdecl	_wasctime (const struct tm*);
 _CRTIMP wchar_t* __cdecl	_wctime (const time_t*);
 _CRTIMP wchar_t* __cdecl	_wstrdate (wchar_t*);
 _CRTIMP wchar_t* __cdecl	_wstrtime (wchar_t*);
+#if __MSVCRT_VERSION__ >= 0x601
+_CRTIMP wchar_t* __cdecl	_wctime64 (const __time64_t*);
+#endif
 #endif /* __MSVCRT__ */
 _CRTIMP size_t __cdecl		wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
 #define _WTIME_DEFINED
@@ -313,7 +347,6 @@ long long __cdecl wcstoll(const wchar_t* __restrict__ nptr,
 unsigned long long __cdecl wcstoull(const wchar_t* __restrict__ nptr,
 			    wchar_t ** __restrict__ endptr, int base);
 #endif /* __NO_ISOCEXT */
-
 
 #ifdef __cplusplus
 }	/* end of extern "C" */

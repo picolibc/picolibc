@@ -117,6 +117,11 @@
 # endif
 #endif
 
+#ifndef __MSVCRT_VERSION__
+/*  High byte is the major version, low byte is the minor. */
+# define __MSVCRT_VERSION__ 0x0600
+#endif
+
 #define __MINGW32_VERSION 4.0
 #define __MINGW32_MAJOR_VERSION 4
 #define __MINGW32_MINOR_VERSION 0

@@ -130,6 +130,7 @@ struct stat
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
 };
+
 #if defined (__MSVCRT__)
 struct _stati64 {
     _dev_t st_dev;
@@ -144,6 +145,21 @@ struct _stati64 {
     time_t st_mtime;
     time_t st_ctime;
 };
+
+struct __stat64
+{
+    _dev_t st_dev;
+    _ino_t st_ino;
+    _mode_t st_mode;
+    short st_nlink;
+    short st_uid;
+    short st_gid;
+    _dev_t st_rdev;
+    _off_t st_size;
+    __time64_t st_atime;
+    __time64_t st_mtime;
+    __time64_t st_ctime;
+};
 #endif /* __MSVCRT__ */
 #define _STAT_DEFINED
 #endif /* _STAT_DEFINED */
@@ -156,16 +172,6 @@ _CRTIMP int __cdecl	_fstat (int, struct _stat*);
 _CRTIMP int __cdecl	_chmod (const char*, int);
 _CRTIMP int __cdecl	_stat (const char*, struct _stat*);
 
-#if defined (__MSVCRT__)
-_CRTIMP int __cdecl  _fstati64(int, struct _stati64 *);
-_CRTIMP int __cdecl  _stati64(const char *, struct _stati64 *);
-#if !defined ( _WSTAT_DEFINED) /* also declared in wchar.h */
-_CRTIMP int __cdecl	_wstat(const wchar_t*, struct _stat*);
-_CRTIMP int __cdecl	_wstati64 (const wchar_t*, struct _stati64*);
-#define _WSTAT_DEFINED
-#endif /* _WSTAT_DEFIND */
-#endif /* __MSVCRT__ */
-
 #ifndef	_NO_OLDNAMES
 
 /* These functions live in liboldnames.a. */
@@ -175,6 +181,23 @@ _CRTIMP int __cdecl	stat (const char*, struct stat*);
 
 #endif	/* Not _NO_OLDNAMES */
 
+#if defined (__MSVCRT__)
+_CRTIMP int __cdecl  _fstati64(int, struct _stati64 *);
+_CRTIMP int __cdecl  _stati64(const char *, struct _stati64 *);
+/* These require newer versions of msvcrt.dll (6.10 or higher).  */ 
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP int __cdecl _fstat64 (int, struct __stat64*);
+_CRTIMP int __cdecl _stat64 (const char*, struct __stat64*);
+#endif /* __MSVCRT_VERSION__ >= 0x0601 */
+#if !defined ( _WSTAT_DEFINED) /* also declared in wchar.h */
+_CRTIMP int __cdecl	_wstat(const wchar_t*, struct _stat*);
+_CRTIMP int __cdecl	_wstati64 (const wchar_t*, struct _stati64*);
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP int __cdecl _wstat64 (const wchar_t*, struct __stat64*);
+#endif /* __MSVCRT_VERSION__ >= 0x0601 */
+#define _WSTAT_DEFINED
+#endif /* _WSTAT_DEFIND */
+#endif /* __MSVCRT__ */
 
 #ifdef	__cplusplus
 }

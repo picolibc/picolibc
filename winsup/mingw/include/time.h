@@ -62,6 +62,13 @@ typedef	long	time_t;
 #define _TIME_T_DEFINED
 #endif
 
+#ifndef __STRICT_ANSI__
+/* A 64-bit time_t to get to Y3K */
+#ifndef _TIME64_T_DEFINED
+typedef __int64 __time64_t
+#define _TIME64_T_DEFINED
+#endif
+#endif
 /*
  * A type for measuring processor time (in clock ticks).
  */
@@ -69,7 +76,6 @@ typedef	long	time_t;
 typedef	long	clock_t;
 #define _CLOCK_T_DEFINED
 #endif
-
 
 /*
  * A structure for storing all kinds of useful information about the
@@ -113,12 +119,10 @@ _CRTIMP char* __cdecl		ctime (const time_t*);
 _CRTIMP struct tm*  __cdecl	gmtime (const time_t*);
 _CRTIMP struct tm*  __cdecl	localtime (const time_t*);
 
-
-_CRTIMP size_t __cdecl	strftime (char*, size_t, const char*, const struct tm*);
-
-_CRTIMP size_t __cdecl	wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
+_CRTIMP size_t __cdecl		strftime (char*, size_t, const char*, const struct tm*);
 
 #ifndef __STRICT_ANSI__
+
 extern _CRTIMP void __cdecl	_tzset (void);
 
 #ifndef _NO_OLDNAMES
@@ -128,7 +132,14 @@ extern _CRTIMP void __cdecl	tzset (void);
 _CRTIMP char* __cdecl	_strdate(char*);
 _CRTIMP char* __cdecl	_strtime(char*);
 
-#endif	/* Not __STRICT_ANSI__ */
+/* These require newer versions of msvcrt.dll (6.10 or higher). */ 
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP __time64_t __cdecl  _time64( __time64_t);
+_CRTIMP __time64_t __cdecl  _mktime64 (struct tm*);
+_CRTIMP char* __cdecl _ctime64 (const __time64_t*);
+_CRTIMP struct tm*  __cdecl _gmtime64 (const __time64_t*);
+_CRTIMP struct tm*  __cdecl _localtime64 (const __time64_t*);
+#endif /* __MSVCRT_VERSION__ >= 0x0601 */
 
 /*
  * _daylight: non zero if daylight savings time is used.
@@ -181,19 +192,6 @@ __MINGW_IMPORT int	daylight;
 __MINGW_IMPORT long	timezone;
 __MINGW_IMPORT char 	*tzname[2];
 
-#ifndef _WTIME_DEFINED
-
-/* wide function prototypes, also declared in wchar.h */
-
-_CRTIMP wchar_t* __cdecl	_wasctime(const struct tm*);
-_CRTIMP wchar_t* __cdecl	_wctime(const time_t*);
-_CRTIMP wchar_t* __cdecl	_wstrdate(wchar_t*);
-_CRTIMP wchar_t* __cdecl	_wstrtime(wchar_t*);
-
-#define _WTIME_DEFINED
-#endif /* _WTIME_DEFINED */ 
-
-
 #else /* not __MSVCRT__ */
 
 /* CRTDLL is royally messed up when it comes to these macros.
@@ -208,6 +206,24 @@ __MINGW_IMPORT char 	*tzname[2];
 #endif /* not __MSVCRT__ */
 
 #endif	/* Not _NO_OLDNAMES */
+#endif	/* Not __STRICT_ANSI__ */
+
+#ifndef __STRICT_ANSI__
+#ifndef _WTIME_DEFINED
+/* wide function prototypes, also declared in wchar.h */
+#ifdef __MSVCRT__
+_CRTIMP wchar_t* __cdecl	_wasctime(const struct tm*);
+_CRTIMP wchar_t* __cdecl	_wctime(const time_t*);
+_CRTIMP wchar_t* __cdecl	_wstrdate(wchar_t*);
+_CRTIMP wchar_t* __cdecl	_wstrtime(wchar_t*);
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP wchar_t* __cdecl	_wctime64 (const __time64_t*);
+#endif
+#endif /*  __MSVCRT__ */
+_CRTIMP size_t __cdecl		wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
+#define _WTIME_DEFINED
+#endif /* _WTIME_DEFINED */ 
+#endif /* __STRICT_ANSI__ */
 
 #ifdef	__cplusplus
 }

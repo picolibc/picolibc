@@ -1,5 +1,53 @@
 2004-03-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/_mingw.h (__MSVCRT_VERSION__): Define default as 0x0600.
+	* include/time.h (__time64_t): Add typedef.
+	(_mktime64): Add prototype for __MSVCRT_VERSION__ >= 0x0601.
+	(_ctime64): Likewise.
+	(_wctime64): Likewise.
+	(_gmtime64): Likewise.
+	(_localtime64): Likewise.
+	(wcsftime): Move into _WTIME_DEFINED block.
+	Regroup non-ANSI prototypes.
+	* include/io.h: Include <stdint.h>.
+	(__finddata64_t): Add struct definition.
+	(__wfinddata64_t): Likewise.
+	(_findfirst64): Add prototype for __MSVCRT_VERSION__ >= 0x0601.
+	(_findnext64): Likewise.
+	(_wfindfirst64): Likewise.
+	(_wfindnext64): Likewise.
+	* include/sys/timeb.h (__timeb64): Add struct definition.
+	(_ftime64): Add prototype for __MSVCRT_VERSION__ >= 0x0601.
+	* include/sys/utime.h (__utimbuf64): Add struct definition.
+	(_utime64): Add prototype for __MSVCRT_VERSION__ >= 0x0601.
+	(_futime64): Likewise.
+	(_wutime64): Likewise.
+	* include/sys/stat.h (__stat64):  Add struct definition.
+	(_fstat64): Add prototype for __MSVCRT_VERSION__ >= 0x0601.
+	(_stat64): Likewise.
+	(_wstat64): Likwise.
+	* include/sys/types.h (__time64_t):  Add typedef.
+	* include/wchar.h (__wfinddata64_t): Add structure definition.
+	(__stat64): Likewise.
+	(_wctime64): Add prototype for __MSVCRT_VERSION__ >= 0x0601.
+	(_wfindfirst64): Likewise.
+	(_wfindnext64): Likewise.
+	(_wutime64): Likewise.
+	(_wstat64): Likwise.
+	* include/malloc.h (_aligned_free): Add prototype for
+	__MSVCRT_VERSION__ >= 0x0700.
+	(_aligned_malloc): Likewise.
+	(_aligned_offset_malloc): Likewise.
+	(_aligned_offset_realloc): Likewise.
+	(_aligned_realloc): Likewise.
+	* include/string.h (_wcserror): Add prototype for
+	__MSVCRT_VERSION__ >= 0x0700.
+	(__wcserror): Likewise.
+	* include/math.h (_set_SSE2_enable): Add prototype for
+	__MSVCRT_VERSION__ >= 0x0701.
+
+2004-03-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/stdio.h (_fsopen): Add prototype.
 	* include/tchar.h (_tfsopen): Add defines.
 	Thanks to "Gerik" <gerikr at users dot sourceforge dot net>

@@ -45,6 +45,10 @@ typedef	long	time_t;
 #define	_TIME_T_DEFINED
 #endif
 
+#ifndef _TIME64_T_DEFINED
+typedef __int64 __time64_t;
+#define _TIME64_T_DEFINED
+#endif
 
 #ifndef	_OFF_T_
 #define	_OFF_T_
@@ -117,6 +121,7 @@ typedef long _ssize_t;
 typedef _ssize_t ssize_t;
 #endif
 #endif /* Not _SSIZE_T_ */ 
+
 
 #endif	/* Not RC_INVOKED */
 
