@@ -1,0 +1,22 @@
+[Not yet complete]
+Cygwin has recently adopted something called the "cygwin heap".  This is
+an internal heap that is inherited by forked/execed children.  It
+consists of process specific information that should be inherited.  So
+things like the file descriptor table, the current working directory,
+and the chroot value live there.
+
+The cygheap is also used to pass argv information to a child process.
+There is a problem here, though.  If you allocate space for argv on the
+heap and then exec a process the child process (1) will happily use the
+space in the heap.  But what happens when that process execs another
+process (2)?  The space used by child process (1) still is being used in
+child process (2) but it is basically just a memory leak.
+
+To rectify this problem, memory used by child process 1 is tagged in
+such a way that child process 2 will know to delete it.  This is in
+cygheap_fixup_in_child.
+
+The cygheap memory allocation functions are adapted from memory
+allocators developed by DJ Delorie.  They are similar to early BSD
+malloc and are intended to be relatively lightweight and relatively
+fast.
