@@ -17,10 +17,6 @@
 
 2004-01-19  Christopher Faylor  <cgf@redhat.com>
 
-	* sec_acl.cc (setacl): Make sure return sd is large enough.
-
-2004-01-19  Christopher Faylor  <cgf@redhat.com>
-
 	* sigproc.cc (sigproc_terminate): Don't close sendsig handle when
 	execing since we're not closing what we think we're closing.
 	(sig_send): Improve debugging when exiting due to no_signals_available.
