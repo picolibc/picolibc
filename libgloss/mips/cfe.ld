@@ -2,6 +2,7 @@
    workspace. */
 
 ENTRY(_prestart)
+STARTUP(crt0.o)
 OUTPUT_FORMAT("elf32-bigmips", "elf32-bigmips", "elf32-littlemips")
 GROUP(-lc -lcfe -lgcc)
 SEARCH_DIR(.)

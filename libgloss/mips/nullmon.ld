@@ -2,6 +2,7 @@
    workspace. */
 
 ENTRY(_start)
+STARTUP(crt0.o)
 OUTPUT_ARCH("mips:4000")
 OUTPUT_FORMAT("elf32-bigmips", "elf32-bigmips", "elf32-littlemips")
 GROUP(-lc -lnullmon -lgcc)

@@ -1,6 +1,7 @@
 /* Linker script forJMR 3904 board using Java + qthreads */
 
 ENTRY(_start)
+STARTUP(crt0.o)
 OUTPUT_ARCH("mips:3000")
 OUTPUT_FORMAT("elf32-bigmips", "elf32-bigmips", "elf32-littlemips")
 GROUP(-lc -ljmr3904 -lgcc -lgcjcoop)

@@ -1,6 +1,7 @@
 /* Linker script for Densan DVE-R3900/20A board */
 
 ENTRY(_start)
+STARTUP(crt0.o)
 OUTPUT_ARCH("mips:3000")
 OUTPUT_FORMAT("elf32-bigmips", "elf32-bigmips", "elf32-littlemips")
 GROUP(-lc -ldve -lgcc)

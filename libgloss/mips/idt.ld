@@ -3,6 +3,7 @@
    0xa001af20. */
 
 ENTRY(_start)
+STARTUP(crt0.o)
 OUTPUT_FORMAT("elf32-bigmips", "elf32-bigmips", "elf32-littlemips")
 GROUP(-lc -lidt -lgcc)
 SEARCH_DIR(.)
