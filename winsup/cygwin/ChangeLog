@@ -1,3 +1,10 @@
+2004-01-22  Brian Ford  <ford@vss.fsi.com>
+
+	* fhandler_serial.cc (fhandler_serial::raw_write): Prevent a deadlock
+	when the input buffer overflows.
+	(fhandler_serial::raw_read): Correct to print the actual error and only
+	call PurgeComm when necessary.
+
 2004-01-22  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (reent_data): Make global.

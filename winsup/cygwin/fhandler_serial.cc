@@ -133,16 +133,16 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
       continue;
 
     err:
-      PurgeComm (get_handle (), PURGE_RXABORT);
       debug_printf ("err %E");
-      if (GetLastError () == ERROR_OPERATION_ABORTED)
-	n = 0;
-      else
+      if (GetLastError () != ERROR_OPERATION_ABORTED)
 	{
+	  PurgeComm (get_handle (), PURGE_RXABORT);
 	  tot = -1;
 	  __seterrno ();
 	  break;
 	}
+
+      n = 0;
     }
 
 out:
@@ -169,6 +169,11 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
       switch (GetLastError ())
 	{
 	case ERROR_OPERATION_ABORTED:
+	  DWORD ev;
+	  if (!ClearCommError (get_handle (), &ev, NULL))
+	    goto err;
+	  if (ev)
+	    termios_printf ("error detected %x", ev);
 	  continue;
 	case ERROR_IO_PENDING:
 	  break;
