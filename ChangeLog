@@ -1,6 +1,7 @@
 2004-12-02  Eric Christopher  <echristo@redhat.com>
 
-	* Makefile.tpl (clean-target-libgcc): Make change in correct place.
+	* Makefile.tpl (clean-target-libgcc): Add stmp-dirs to list
+	of things to remove.
 	* Makefile.in: Regenerate.
 	
 2004-12-02  Richard Sandiford  <rsandifo@redhat.com>
