@@ -77,7 +77,7 @@ create_tty_master (int ttynum)
   ttym.setunit (ttynum); /* CGF FIXME device */
   tty_master = (fhandler_tty_master *)
     cygheap->fdtab.build_fhandler (-1, ttym, "/dev/ttym", NULL);
-  if (tty_master->init (ttynum))
+  if (tty_master->init ())
     api_fatal ("Can't create master tty");
   else
     {
