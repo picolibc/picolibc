@@ -43,6 +43,12 @@ memset() {}
   int __init;           int __fini;
 #endif
 
+/* The SH expects certain symbols to be defined in the linker script. */
+
+#if defined(__sh__)
+int __EH_FRAME_BEGIN__;
+#endif
+
 /*  The hppa expects this to be defined in the real crt0.s. 
  *  Also for some reason, the hppa1.1 does not find atexit()
  *  during the AC_PROG_CC tests.

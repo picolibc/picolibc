@@ -1,5 +1,10 @@
 2002-10-07	Joel Sherrill <joel@OARcorp.com>
 
+	* libc/sys/rtems/crt0.c: Add even more symbols so gcc() can link
+	dummy programs.
+
+2002-10-07	Joel Sherrill <joel@OARcorp.com>
+
 	* libc/include/pthread.h: Define PTHREAD_CANCELED.
 
 2002-10-07	Joel Sherrill <joel@OARcorp.com>
