@@ -1,0 +1,175 @@
+%{
+#include "winsup.h"
+#include <sys/types.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#include "devices.h"
+#include "sys/cygwin.h"
+#include "tty.h"
+#include "pinfo.h"
+#undef __GNUC__
+static unsigned int devhash (const char *, unsigned)
+  __attribute__ ((regparm (2)));
+%}
+struct device;
+%%
+"/dev/tty", FH_TTY, "\\dev\\tty", 0, 255, 0, 0
+"/dev/ttys", FH_TTYS, "\\dev\\tty%d", 0, 255, 0, 0
+"/dev/console", FH_CONSOLE, "\\dev\\console", 0, 0, 0, 0
+"/dev/ttym", FH_TTYM, "\\dev\\ttym", 0, 255, 0, 0
+"/dev/ptmx", FH_PTYM, "\\dev\\ptmx", 0, 0, 0, 0
+"/dev/windows", FH_WINDOWS, "\\dev\\windows", 0, 0, 0, 0
+"/dev/dsp", FH_OSS_DSP, "\\dev\\dsp", 0, 0, 0, 0
+"/dev/conin", FH_CONIN, "conin", 0, 0, 0, 0
+"/dev/conout", FH_CONOUT, "conout", 0, 0, 0, 0
+"/dev/null", FH_NULL, "nul", 0, 0, 0, 0
+"/dev/zero", FH_ZERO, "\\dev\\zero", 0, 0, 0, 0
+"/dev/random", FH_RANDOM, "\\dev\\random", 0, 0, 0, 0
+"/dev/urandom", FH_URANDOM, "\\dev\\urandom", 0, 0, 0, 0
+"/dev/mem", FH_MEM, "\\dev\\mem", 0, 0, 0, 0
+"/dev/clipboard", FH_CLIPBOARD, "\\dev\\clipboard", 0, 0, 0, 0
+"/dev/port", FH_PORT, "\\dev\\port", 0, 0, 0, 0
+"/dev/com", FH_SERIAL, "\\.\\com%d", 1, 99
+"/dev/ttyS", FH_SERIAL, "\\.\\com%d", 0, 99, -1
+"/dev/pipe", FH_PIPE, "\\dev\\pipe", 0, 0, 0, 0
+"/dev/piper", FH_PIPER, "\\dev\\piper", 0, 0, 0, 0
+"/dev/pipew", FH_PIPEW, "\\dev\\pipew", 0, 0, 0, 0
+"/dev/streamsocket", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
+"/dev/tcp", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
+"/dev/udp", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
+"/dev/dgsocket", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
+"/dev/st", FH_TAPE, "\\Device\\Tape%d", 0, 127
+"/dev/nst", FH_NTAPE, "\\Device\\Tape%d", 0, 127
+"/dev/fd", FH_FLOPPY, "\\Device\\Floppy%d", 0, 15
+"/dev/scd", FH_CDROM, "\\Device\\CdRom%d", 0, 15
+"/dev/sd", FH_SD, "\\Device\\Harddisk%d\\Partition%d", 'a', 'z', -'a', 16
+"/dev/tape", FH_TAPE, "\\Device\\Tape%d", 0, 127, 0, 0
+"/dev/ntape", FH_NTAPE, "\\Device\\Tape%d", 0, 127, 128, 0
+"\\\\.\\tape", FH_TAPE, "\\Device\\Tape%d", 0, 127, 0, 0
+"\\\\.\\ntape", FH_NTAPE, "\\Device\\Tape%d", 0, 127, 128, 0
+"\\\\.\\physicaldrive", FH_SD, "\\Device\\Harddisk%d\\Partition%d", 0, 224, 0, 16
+"\\\\.\\a:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\b:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\c:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\d:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\e:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\f:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\g:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\h:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\i:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\j:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\k:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\l:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\m:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\n:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\o:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\p:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\q:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\r:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\s:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\t:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\u:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\v:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\w:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\x:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\y:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"\\\\.\\z:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"////.//tape", FH_TAPE, "//Device//Tape%d", 0, 127, 0, 0
+"////.//ntape", FH_NTAPE, "//Device//Tape%d", 0, 127, 128, 0
+"//./physicaldrive", FH_SD, "\\Device\\Harddisk%d\\Partition%d", 0, 224, 0, 16
+"//./a:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./b:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./c:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./d:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./e:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./f:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./g:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./h:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./i:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./j:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./k:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./l:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./m:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./n:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./o:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./p:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./q:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./r:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./s:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./t:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./u:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./v:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./w:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./x:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./y:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+"//./z:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+%%
+void
+device::parse (const char *s)
+{
+  size_t len = strlen (s);
+  const device *dev = lookup (s, len);
+  unsigned unit = 0;
+
+  if (!dev || !*dev)
+    {
+      size_t prior_len = len;
+      while (len-- > 0 && isdigit (s[len]))
+	continue;
+      if (++len < prior_len)
+	{
+	  dev = lookup (s, len);
+	  if (!dev || !dev->upper)
+	    dev = NULL;
+	  else
+	    {
+	      unsigned n = atoi (s + len);
+	      if (dev->devn == FH_TTY)
+		dev = ttys_dev;         // SIGH
+	      if (n >= dev->lower && n <= dev->upper)
+		unit = n;
+	    }
+	}
+    }
+
+  if (!dev || !*dev)
+    devn = 0;
+  else
+    {
+      if (dev->devn != FH_TTY)
+	*this = *dev;
+      else
+	{
+	  if (!real_tty_attached (myself))
+	    *this = *console_dev;
+	  else
+	    {
+	      unit = myself->ctty;
+	      *this = *ttys_dev;
+	    }
+	}
+      if (!setunit (unit))
+	devn = 0;
+    }
+}
+
+const device *console_dev;
+const device *piper_dev;
+const device *pipew_dev;
+const device *socket_dev;
+const device *ttym_dev;
+const device *ttys_dev;
+const device *urandom_dev;
+
+void
+device::init ()
+{
+  piper_dev = lookup ("/dev/piper", sizeof ("/dev/piper") - 1);
+  pipew_dev = lookup ("/dev/pipew", sizeof ("/dev/pipew") - 1);
+  console_dev = lookup ("/dev/console", sizeof ("/dev/console") - 1);
+  ttym_dev = lookup ("/dev/ttym", sizeof ("/dev/ttym") - 1);
+  ttys_dev = lookup ("/dev/ttys", sizeof ("/dev/ttys") - 1);
+  socket_dev = lookup ("/dev/tcp", sizeof ("/dev/tcp") - 1);
+  urandom_dev = lookup ("/dev/urandom", sizeof ("/dev/urandom") - 1);
+}
