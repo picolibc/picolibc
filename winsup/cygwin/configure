@@ -1916,7 +1916,7 @@ esac
 fi
 
 
-MALLOC_OFILES=
+MALLOC_OFILES=malloc.o
 # Check whether --enable-malloc-debugging or --disable-malloc-debugging was given.
 if test "${enable_malloc_debugging+set}" = set; then
   enableval="$enable_malloc_debugging"

@@ -540,12 +540,11 @@ sig_dispatch_pending ()
 
   sigframe thisframe (mainthread);
 
-  int was_pending = pending_signals;
 #ifdef DEBUGGING
-  sigproc_printf ("pending_signals %d", was_pending);
+  sigproc_printf ("pending_signals %d", pending_signals);
 #endif
 
-  if (!was_pending)
+  if (!pending_signals)
 #ifdef DEBUGGING
     sigproc_printf ("no need to wake anything up");
 #else
@@ -559,7 +558,7 @@ sig_dispatch_pending ()
 #endif
     }
 
-  return was_pending;
+  return thisframe.call_signal_handler ();
 }
 
 /* Message initialization.  Called from dll_crt0_1

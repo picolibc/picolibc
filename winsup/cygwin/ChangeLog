@@ -1,3 +1,27 @@
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (MALLOC_OFILES): Always fill in with correct malloc
+	object.
+	* configure.in: Fill in MALLOC_OFILES with either debugging or regular
+	malloc.
+	* configure: Regenerate.
+	* dlmalloc.c: Make various fruitless changes to attempt to get to work.
+	* dlmalloc.h: Ditto.
+	* malloc.cc (free): Check malloc pool when debugging.
+
+	* path.cc (win32_device_name): Eliminate compiler warning.
+
+	* sigproc.cc (sig_dispatch_pending): Remove use of was_pending.  Let
+	thisframe.call_signal_handler decide if handler should be called rather
+	than using bogus was_pending check.
+
+	* exceptions.cc (interrupt_setup): Remove accidentally checked in
+	debugging code.
+
+2003-08-30  Christopher Faylor  <cgf@redhat.com>
+
+	* heap.cc (sbrk): Save rounded addess in user_heap_max.
+
 2003-08-30  Christopher Faylor  <cgf@redhat.com>
 
 	* sigproc.cc (sig_dispatch_pending): Remove explicit call to

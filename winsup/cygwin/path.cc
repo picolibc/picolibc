@@ -1124,7 +1124,7 @@ win32_device_name (const char *src_path, char *win32_path,
       case FH_SOCKET:
 	char *c;
 	strcpy (win32_path, src_path);
-	while (c = strchr (win32_path, '/'))
+	while ((c = strchr (win32_path, '/')))
 	  *c = '\\';
 	break;
       case FH_RANDOM:
