@@ -1993,10 +1993,12 @@ extern "C" {
 #if(WINVER >= 0x0400)
 #define ENDSESSION_LOGOFF    0x80000000
 #endif /* WINVER >= 0x0400 */
-#if(WINVER >= 0x0500)
+#if (_WIN32_WINNT >= _NT5 || _WIN32_WINDOWS >= _WME)
 #define ASFW_ANY ((DWORD)-1)
 #define LSFW_LOCK 1
 #define LSFW_UNLOCK 2
+#endif
+#if(_WIN32_WINNT >= _NT5)
 #define LWA_COLORKEY 1
 #define LWA_ALPHA 2
 #endif
@@ -3360,12 +3362,17 @@ int WINAPIV wsprintfA(LPSTR,LPCSTR,...);
 int WINAPIV wsprintfW(LPWSTR,LPCWSTR,...);
 int WINAPI wvsprintfA(LPSTR,LPCSTR,va_list arglist);
 int WINAPI wvsprintfW(LPWSTR,LPCWSTR,va_list arglist);
-#if(WINVER >= 0x0500)
+#if(_WIN32_WINNT >= _NT5  || _WIN32_WINDOWS >= _WME)
 BOOL WINAPI AllowSetForegroundWindow(DWORD);
 BOOL WINAPI LockSetForegroundWindow(UINT);
-BOOL WINAPI SetLayeredWindowAttributes(HWND,COLORREF,BYTE,DWORD);
 #endif
-
+#if(_WIN32_WINNT >= _NT5)
+BOOL WINAPI SetLayeredWindowAttributes(HWND,COLORREF,BYTE,DWORD);
+BOOL WINAPI UpdateLayeredWindow(HWND,HDC,POINT*,SIZE*,HDC,POINT*,COLORREF,BLENDFUNCTION*,DWORD);
+#endif
+#if(_WIN32_WINNT >= _WXP)
+BOOL WINAPI GetLayeredWindowAttributes(HWND,COLORREF*,BYTE*,DWORD*);
+#endif
 #ifdef UNICODE
 #define EDITWORDBREAKPROC EDITWORDBREAKPROCW
 #define PROPENUMPROC PROPENUMPROCW

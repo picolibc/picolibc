@@ -257,6 +257,7 @@ GetKeyboardState@4
 GetKeyboardType@4
 GetLastActivePopup@4
 GetLastInputInfo@4
+GetLayeredWindowAttributes@16
 GetListBoxInfo@4
 GetMenu@4
 GetMenuBarInfo@16
@@ -566,6 +567,7 @@ UnpackDDElParam@16
 UnregisterClassA@8
 UnregisterClassW@8
 UnregisterHotKey@8
+UpdateLayeredWindow@36
 UpdateWindow@4
 ValidateRect@8
 ValidateRgn@8
