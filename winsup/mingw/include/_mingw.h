@@ -136,6 +136,13 @@
 #define __MINGW_ATTRIB_PURE
 #endif
 
+/* Attribute `nonnull' was valid as of gcc 3.3.  */
+#if (__GNUC__ > 3 ||( __GNUC__ == 3 &&  __GNUC_MINOR >= 3))
+#define __MINGW_ATTRIB_NONNULL(args...) __attribute__ ((__nonnull__ (args)))
+#else
+#define __MINGW_ATTRIB_NONNULL(args...)
+#endif /* GNUC >= 3.3 */
+
 #ifndef __MSVCRT_VERSION__
 /*  High byte is the major version, low byte is the minor. */
 # define __MSVCRT_VERSION__ 0x0600

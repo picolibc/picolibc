@@ -1,3 +1,7 @@
+2005-03-31  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (__MINGW_ATTRIB_NONNULL): Define.
+
 2005-03-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdio.h (__mingw_fwrite): Change return value to
