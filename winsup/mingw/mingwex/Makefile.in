@@ -33,9 +33,8 @@ DISTFILES = Makefile.in configure configure.in \
 	ldtoa.c lltoa.c lltow.c mbsinit.c mingw-aligned-malloc.c \
 	mingw-fseek.c sitest.c strtof.c strtoimax.c strtold.c strtoumax.c \
 	testwmem.c tst-aligned-malloc.c ulltoa.c ulltow.c wcstof.c \
-	wcstoimax.c wcstold.c wcstoumax.c wdirent.c wmemchr.c wmemcmp.c \
-	wmemcpy.c wmemmove.c wmemset.c wtoll.c
-	
+	wcstoimax.c wcstold.c wcstoumax.c wctrans.c wctype.c \
+	wdirent.c wmemchr.c wmemcmp.c wmemcpy.c wmemmove.c wmemset.c wtoll.c	
 MATH_DISTFILES = \
 	acosf.c acosl.c asinf.c asinl.c atan2f.c atan2l.c \
 	atanf.c atanl.c cbrt.c cbrtf.c cbrtl.c ceilf.S ceill.S \
@@ -114,7 +113,8 @@ LIBMINGWEX_A = libmingwex.a
 Q8_OBJS = \
 	fwide.o imaxabs.o imaxdiv.o mbsinit.o \
 	strtoimax.o strtoumax.o wcstoimax.o wcstoumax.o \
-	wmemchr.o wmemcmp.o wmemcpy.o wmemmove.o wmemset.o
+	wmemchr.o wmemcmp.o wmemcpy.o wmemmove.o wmemset.o \
+	wctrans.o wctype.o
 STDLIB_OBJS = \
 	strtold.o wcstold.o
 STDLIB_STUB_OBJS = \

@@ -1,3 +1,10 @@
+2005-02-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/wctype.c: New file.
+	* mingwex/wctrans.c: New file.
+	* mingwex/Makefile.in (DISTFILES): Add wctype.c, wctrans.c.
+	* mingwex/Makefile.in (Q8_OBJS): Add wctype.o, wctrans.o.
+
 2005-02-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/tchar.h (_tstat64, _tstati64): Add Unicode/ANSI mappings.
