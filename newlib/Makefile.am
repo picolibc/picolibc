@@ -57,6 +57,8 @@ FLAGS_TO_PASS=$(AM_MAKEFLAGS)
 
 if HAVE_DOC
 DOCDIR = doc
+else
+DOCDIR =
 endif
 
 SUBDIRS = libc libm $(DOCDIR) .

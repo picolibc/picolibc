@@ -1,3 +1,8 @@
+2001-12-18  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.am (DOCDIR): Force to empty string when doc
+	directory is not present.
+
 2001-12-17  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/stdlib/Makefile.am (LIB_COMPILE): Change to equal
