@@ -1,5 +1,8 @@
 2004-06-22  Alexandre Oliva  <aoliva@redhat.com>
 
+	* libc/include/machine/setjmp.h [__H8300__] (_JBTYPE): Define,
+	instead of typedefing jmp_buf.
+
 	2003-07-02  Richard Sandiford  <rsandifo@redhat.com>
 	* libc/machine/h8300/Makefile.am (lib_a_SOURCES): Add h8sx_strcpy.S.
 	* libc/machine/h8300/defines.h (LEN): New macro.

@@ -86,7 +86,7 @@ _BEGIN_STD_C
 
 #ifdef __H8300__
 #define _JBLEN 5
-typedef int jmp_buf[_JBLEN];
+#define _JBTYPE int
 #endif
 
 #ifdef __H8300H__
