@@ -1,3 +1,11 @@
+2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.h (getace): Use FILE_*_BITS as permission mask.
+	* security.cc (get_attribute_from_acl): Ditto.
+	* security.h (FILE_READ_BITS): Define to match also GENERIC bits.
+	(FILE_WRITE_BITS): Ditto.
+	(FILE_EXEC_BITS): Ditto.
+
 2003-11-25  Christopher Faylor  <cgf@redhat.com>
 
 	* thread.cc: Minor whitespace cleanup.  Remove some obsolete code.

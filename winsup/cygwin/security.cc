@@ -1235,15 +1235,15 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
       cygpsid ace_sid ((PSID) &ace->SidStart);
       if (ace_sid == well_known_world_sid)
 	{
-	  if (ace->Mask & FILE_READ_DATA)
+	  if (ace->Mask & FILE_READ_BITS)
 	    *flags |= ((!(*anti & S_IROTH)) ? S_IROTH : 0)
 		      | ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
 		      | ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
-	  if (ace->Mask & FILE_WRITE_DATA)
+	  if (ace->Mask & FILE_WRITE_BITS)
 	    *flags |= ((!(*anti & S_IWOTH)) ? S_IWOTH : 0)
 		      | ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
 		      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
-	  if (ace->Mask & FILE_EXECUTE)
+	  if (ace->Mask & FILE_EXEC_BITS)
 	    *flags |= ((!(*anti & S_IXOTH)) ? S_IXOTH : 0)
 		      | ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
 		      | ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
@@ -1264,22 +1264,22 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 	}
       else if (ace_sid == owner_sid)
 	{
-	  if (ace->Mask & FILE_READ_DATA)
+	  if (ace->Mask & FILE_READ_BITS)
 	    *flags |= ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
-	  if (ace->Mask & FILE_WRITE_DATA)
+	  if (ace->Mask & FILE_WRITE_BITS)
 	    *flags |= ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
-	  if (ace->Mask & FILE_EXECUTE)
+	  if (ace->Mask & FILE_EXEC_BITS)
 	    *flags |= ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	}
       else if (ace_sid == group_sid)
 	{
-	  if (ace->Mask & FILE_READ_DATA)
+	  if (ace->Mask & FILE_READ_BITS)
 	    *flags |= ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
 		      | ((grp_member && !(*anti & S_IRUSR)) ? S_IRUSR : 0);
-	  if (ace->Mask & FILE_WRITE_DATA)
+	  if (ace->Mask & FILE_WRITE_BITS)
 	    *flags |= ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
 		      | ((grp_member && !(*anti & S_IWUSR)) ? S_IWUSR : 0);
-	  if (ace->Mask & FILE_EXECUTE)
+	  if (ace->Mask & FILE_EXEC_BITS)
 	    *flags |= ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
 		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	}
