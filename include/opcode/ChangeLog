@@ -1,3 +1,9 @@
+2000-02-24  Nick Clifton  <nickc@cygnus.com>
+
+	* cgen.h (cgen_cpu_desc): Rename field 'flags' to
+        'signed_overflow_ok_p'.
+	Delete prototypes for cgen_set_flags() and cgen_get_flags().
+
 2000-02-24  Andrew Haley  <aph@cygnus.com>
 
 	* cgen.h (CGEN_INSN_MACH_HAS_P): New macro.
