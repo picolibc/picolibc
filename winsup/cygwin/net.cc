@@ -896,7 +896,7 @@ cygwin_gethostname (char *name, size_t len)
   if (__check_null_invalid_struct_errno (name, len))
     return -1;
 
-  if (gethostname (name, len) == SOCKET_ERROR)
+  if (gethostname (name, len))
     {
       DWORD local_len = len;
 

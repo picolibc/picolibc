@@ -1,3 +1,10 @@
+2003-01-10  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc (gethostname): Make call optional, return 1 if function
+	can't get loaded.
+	* net.cc (cygwin_gethostname): Call GetComputerName if return value
+	of gethostname is non-zero.
+
 2003-01-10  Charles Wilson  <cwilson@ece.gatech.edu>
 
 	* cygwin.din: add asprintf and vasprintf, as well as the reentrant
