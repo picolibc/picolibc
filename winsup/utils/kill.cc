@@ -82,7 +82,10 @@ listsig (const char *in_sig)
     {
       sig = getsig (in_sig);
       test_for_unknown_sig (sig, in_sig);
-      puts (strsigno (sig) + 3);
+      if (atoi (in_sig) == sig)
+	puts (strsigno (sig) + 3);
+      else
+	printf ("%d\n", sig);
     }
 }
 
