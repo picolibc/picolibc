@@ -433,10 +433,18 @@ dtable::dup2 (int oldfd, int newfd)
 
   MALLOC_CHECK;
   debug_printf ("dup2 (%d, %d)", oldfd, newfd);
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
 
   if (not_open (oldfd))
     {
       syscall_printf ("fd %d not open", oldfd);
+      set_errno (EBADF);
+      goto done;
+    }
+
+  if (newfd < 0)
+    {
+      syscall_printf ("new fd out of bounds: %d", newfd);
       set_errno (EBADF);
       goto done;
     }
@@ -453,35 +461,28 @@ dtable::dup2 (int oldfd, int newfd)
       goto done;
     }
 
-  debug_printf ("newfh->io_handle %p, oldfh->io_handle %p", newfh->get_io_handle (), fds[oldfd]->get_io_handle ());
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
-
-  if (newfd < 0)
-    {
-      syscall_printf ("new fd out of bounds: %d", newfd);
-      set_errno (EBADF);
-      goto done;
-    }
-
-  if ((size_t) newfd >= size)
-   {
-     int inc_size = NOFILE_INCR * ((newfd + NOFILE_INCR - 1) / NOFILE_INCR) -
-		    size;
-     extend (inc_size);
-   }
+  debug_printf ("newfh->io_handle %p, oldfh->io_handle %p",
+		newfh->get_io_handle (), fds[oldfd]->get_io_handle ());
 
   if (!not_open (newfd))
     _close (newfd);
-  fds[newfd] = newfh;
+  else if ((size_t) newfd < size)
+    /* nothing to do */;
+  else if (find_unused_handle (newfd) < 0)
+    {
+      newfh->close ();
+      res = -1;
+      goto done;
+    }
 
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
-  MALLOC_CHECK;
+  fds[newfd] = newfh;
 
   if ((res = newfd) <= 2)
     set_std_handle (res);
 
-  MALLOC_CHECK;
 done:
+  MALLOC_CHECK;
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   syscall_printf ("%d = dup2 (%d, %d)", res, oldfd, newfd);
 
   return res;
