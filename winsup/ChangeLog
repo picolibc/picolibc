@@ -1,11 +1,18 @@
+Sat Jun 17 13:50:04 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Detect "cross-hosting" situation and add a subset of
+	directories to SUBDIRS.
+	* configure: Regenerate.
+
 Thu May 25 18:39:24 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Don't assume that cinstall directory exists.
+	* configure: Regenerate
 
 2000-05-24  DJ Delorie  <dj@cygnus.com>
 
-	* Makefile.common (%.o): further simplify, add "..." to make it
- 	obvious it's an abbreviated command line.
+	* Makefile.common (%.o): further simplify, add "..." to make it obvious
+	it's an abbreviated command line.
 
 Thu May 18 14:33:05 2000  Christopher Faylor <cgf@cygnus.com>
 

@@ -57,9 +57,17 @@ AC_CANONICAL_SYSTEM
 
 LIB_AC_PROG_CC
 
-SUBDIRS="cygwin w32api mingw utils doc"
-test -d $srcdir/cinstall && SUBDIRS="$SUBDIRS cinstall"
+SUBDIRS='cygwin w32api mingw'
+case "$with_cross_host" in
+  ""|*cygwin*)
+    SUBDIRS="$SUBDIRS utils"
+    test -d $srcdir/cinstall && SUBDIRS="$SUBDIRS cinstall"
+    SUBDIRS="$SUBDIRS doc"
+    ;;
+esac
+
 AC_CONFIG_SUBDIRS($SUBDIRS)
+
 AC_PROG_MAKE_SET
 
 AC_SUBST(SUBDIRS)
