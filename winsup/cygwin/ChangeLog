@@ -1,3 +1,15 @@
+2002-08-19  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_console::send_winch_maybe): New method.
+	* fhandler_console.cc (set_console_state_for_spawn): Remove if 0'ed
+	code.
+	(fhandler_console::send_winch_maybe): Define new method.
+	(fhandler_console::read): Use send_winch_maybe where appropriate.
+	(fhandler_console::init): Just call all tcsetattr rather than
+	output_tcsetattr.
+	* select.cc (peek_console): Reorganize so that send_winch_maybe is
+	called for everything but keyboard input.
+
 2002-08-18  Christopher Faylor  <cgf@redhat.com>
 
 	* perthread.h (vfork_save): Add ctty, sid, pgid, exitval fields.
