@@ -1,3 +1,8 @@
+2003-08-08 Dmitry Diky <diwil@mail.ru>
+	
+	* msp430.h: Add xW42 and xE42 parts. Sort MPU list according to
+	gcc order.
+
 2003-08-07  Alan Modra  <amodra@bigpond.net.au>
 
 	* reloc-macros.h (START_RELOC_NUMBERS) : Remove PARAMS macro.  Use
