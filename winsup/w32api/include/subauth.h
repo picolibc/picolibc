@@ -4,7 +4,8 @@
 extern "C" {
 #endif
 #ifndef NT_SUCCESS
-#define NT_SUCCESS(Status) ((Status) >= 0)
+#define NT_SUCCESS(x) ((x)>=0)
+#define STATUS_SUCCESS 0 
 #endif
 #define CYPHER_BLOCK_LENGTH 8
 #define USER_SESSION_KEY_LENGTH (CYPHER_BLOCK_LENGTH*2)
@@ -30,7 +31,6 @@ extern "C" {
 #define SAM_DAYS_PER_WEEK 7
 #define SAM_HOURS_PER_WEEK 168
 #define SAM_MINUTES_PER_WEEK 10080
-#define STATUS_SUCCESS 0 
 #define STATUS_INVALID_INFO_CLASS 0xC0000003L
 #define STATUS_NO_SUCH_USER 0xC0000064L
 #define STATUS_WRONG_PASSWORD 0xC000006AL
@@ -67,9 +67,6 @@ extern "C" {
 #define USER_ALL_PARAMETERS 2097152
 #if !defined(_NTDEF_H) && !defined(_NTSECAPI_H)
 typedef LONG NTSTATUS, *PNTSTATUS;
-#endif
-typedef PVOID SAM_HANDLE, *PSAM_HANDLE;  
-#ifndef _NTSECAPI_H
 typedef struct _UNICODE_STRING {
   USHORT Length;
   USHORT MaximumLength;
@@ -81,6 +78,7 @@ typedef struct _STRING {
   PCHAR Buffer;
 } STRING, *PSTRING;
 #endif
+typedef PVOID SAM_HANDLE, *PSAM_HANDLE;  
 typedef struct _OLD_LARGE_INTEGER {
   ULONG LowPart;
   LONG HighPart;

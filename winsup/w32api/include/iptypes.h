@@ -21,15 +21,15 @@ extern "C" {
 #define IF_PPP_ADAPTERTYPE 4
 #define IF_LOOPBACK_ADAPTERTYPE 5
 typedef struct {
-  char String[4 * 4];
+  char String[16];
 } IP_ADDRESS_STRING, *PIP_ADDRESS_STRING, IP_MASK_STRING, *PIP_MASK_STRING;
-typedef struct __IP_ADDR_STRING {
+typedef struct _IP_ADDR_STRING {
   struct __IP_ADDR_STRING* Next;
   IP_ADDRESS_STRING IpAddress;
   IP_MASK_STRING IpMask;
   DWORD Context;
 } IP_ADDR_STRING, *PIP_ADDR_STRING;
-typedef struct __IP_ADAPTER_INFO {
+typedef struct _IP_ADAPTER_INFO {
   struct __IP_ADAPTER_INFO* Next;
   DWORD ComboIndex;
   char AdapterName[MAX_ADAPTER_NAME_LENGTH+4];
@@ -49,13 +49,13 @@ typedef struct __IP_ADAPTER_INFO {
   time_t LeaseObtained;
   time_t LeaseExpires;
 } IP_ADAPTER_INFO, *PIP_ADAPTER_INFO;
-typedef struct {
-  char HostName[MAX_HOSTNAME_LEN + 4] ;
-  char DomainName[MAX_DOMAIN_NAME_LEN + 4];
+typedef struct _FIXED_INFO {
+  char HostName[MAX_HOSTNAME_LEN+4] ;
+  char DomainName[MAX_DOMAIN_NAME_LEN+4];
   PIP_ADDR_STRING CurrentDnsServer;
   IP_ADDR_STRING DnsServerList;
   UINT NodeType;
-  char ScopeId[MAX_SCOPE_ID_LEN + 4];
+  char ScopeId[MAX_SCOPE_ID_LEN+4];
   UINT EnableRouting;
   UINT EnableProxy;
   UINT EnableDns;

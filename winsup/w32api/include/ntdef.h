@@ -9,15 +9,17 @@
 #define OBJ_OPENLINK 256L
 #define OBJ_VALID_ATTRIBUTES 498L
 #define InitializeObjectAttributes(p,n,a,r,s) { \
-  (p)->Length = sizeof( OBJECT_ATTRIBUTES ); \
-  (p)->RootDirectory = r; \
-  (p)->Attributes = a; \
-  (p)->ObjectName = n; \
-  (p)->SecurityDescriptor = s; \
+  (p)->Length = sizeof(OBJECT_ATTRIBUTES); \
+  (p)->RootDirectory = (r); \
+  (p)->Attributes = (a); \
+  (p)->ObjectName = (n); \
+  (p)->SecurityDescriptor = (s); \
   (p)->SecurityQualityOfService = NULL; \
 }
-#define STATUS_SUCCESS ((NTSTATUS)0)
+#ifndef NT_SUCCESS
 #define NT_SUCCESS(x) ((x)>=0)
+#define STATUS_SUCCESS ((NTSTATUS)0)
+#endif
 #if !defined(_NTSECAPI_H) && !defined(_SUBAUTH_H)
 typedef LONG NTSTATUS, *PNTSTATUS;
 typedef struct _UNICODE_STRING {
@@ -25,7 +27,7 @@ typedef struct _UNICODE_STRING {
   USHORT MaximumLength;
   PWSTR  Buffer;
 } UNICODE_STRING, *PUNICODE_STRING;
-typedef struct __STRING {
+typedef struct _STRING {
   USHORT Length;
   USHORT MaximumLength;
   PCHAR  Buffer;

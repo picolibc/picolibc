@@ -1,3 +1,11 @@
+Mon Oct  9 11:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/iprtrmib.h: Further layout changes according to standard.
+	* include/iptypes.h: Ditto.
+	* include/ntdef.h: Ditto.
+	* include/ntsecapi.h: Ditto.
+	* include/subauth.h: Ditto.
+
 Mon Oct  9 11:32:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/ntsecapi.h: Fix PLSA_UNICODE_STRING define.

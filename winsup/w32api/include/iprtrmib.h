@@ -32,9 +32,9 @@ extern "C" {
 #define MIB_TCP_STATE_LAST_ACK 10                
 #define MIB_TCP_STATE_TIME_WAIT 11                
 #define MIB_TCP_STATE_DELETE_TCB 12                
-#define MIB_USE_CURRENT_TTL ((DWORD) -1)
-#define MIB_USE_CURRENT_FORWARDING ((DWORD) -1)
-#define MIB_TCP_MAXCONN_DYNAMIC ((DWORD) -1)
+#define MIB_USE_CURRENT_TTL ((DWORD)-1)
+#define MIB_USE_CURRENT_FORWARDING ((DWORD)-1)
+#define MIB_TCP_MAXCONN_DYNAMIC ((DWORD)-1)
 typedef struct {
   DWORD dwAddr;
   DWORD dwIndex;
