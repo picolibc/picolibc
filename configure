@@ -3,7 +3,7 @@
 ### WARNING: this file contains embedded tabs.  Do not run untabify on this file.
 
 # Configuration script
-# Copyright (C) 1988, 90, 91, 92, 93, 94, 95, 96, 1997
+# Copyright (C) 1988, 90, 91, 92, 93, 94, 95, 96, 97, 98, 1999
 # Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
@@ -587,12 +587,12 @@ esac
 # the gcc version number changes.
 if [ "${with_gcc_version_trigger+set}" = set ]; then
     gcc_version_trigger="$with_gcc_version_trigger"
-    gcc_version=`sed -e 's/.*\"\([^ \"]*\)[ \"].*/\1/' < ${with_gcc_version_trigger}`
+    gcc_version=`grep version_string ${with_gcc_version_trigger} | sed -e 's/.*\"\([^ \"]*\)[ \"].*/\1/'`
 else
     # If gcc's sources are available, define the trigger file.
     if [ -f ${topsrcdir}/gcc/version.c ] ; then
 	gcc_version_trigger=${topsrcdir}/gcc/version.c
-	gcc_version=`sed -e 's/.*\"\([^ \"]*\)[ \"].*/\1/' < ${gcc_version_trigger}`
+	gcc_version=`grep version_string ${gcc_version_trigger} | sed -e 's/.*\"\([^ \"]*\)[ \"].*/\1/'`
 	case "$arguments" in
 	  *--with-gcc-version-trigger=$gcc_version_trigger* )
 	    ;;
@@ -655,8 +655,8 @@ case "${TMPDIR}" in
 *) ;;
 esac
 
-# keep this filename short for &%*%$*# 14 char file names
-tmpfile=${TMPDIR}/cONf$$
+# keep this filename short for &%*%$*# 14 char file names and 8+3 file names
+tmpfile=${TMPDIR}/cNf$$
 # Note that under many versions of sh a trap handler for 0 will *override* any
 # exit status you explicitly specify!  At this point, the only non-error exit
 # is at the end of the script; these actions are duplicated there, minus
@@ -902,6 +902,9 @@ do
   test -n "$DEFAULT_LEX" && break
 done
 
+# BINUTILS LOCAL: This is included in the default CFLAGS when using gcc.
+warn_cflags="-W -Wall"
+
 if [ "${build}" != "${host}" ]; then
   # If we are doing a Canadian Cross, in which the host and build systems
   # are not the same, we set reasonable default values for the tools.
@@ -935,7 +938,7 @@ t loop
   AS_FOR_TARGET=${AS_FOR_TARGET-${target_alias}-as}
   BISON=${BISON-bison}
   CC=${CC-${host_alias}-gcc}
-  CFLAGS=${CFLAGS-"-g -O2"}
+  CFLAGS=${CFLAGS-"-g -O2 ${warn_cflags}"}
   CXX=${CXX-${host_alias}-c++}
   CXXFLAGS=${CXXFLAGS-"-g -O2"}
   CC_FOR_BUILD=${CC_FOR_BUILD-gcc}
@@ -1015,10 +1018,10 @@ else
 	CC="gcc"
 	echo 'void f(){}' > conftest.c
 	if test -z "`${CC} -g -c conftest.c 2>&1`"; then
-	  CFLAGS=${CFLAGS-"-g -O2"}
+	  CFLAGS=${CFLAGS-"-g -O2 ${warn_cflags}"}
 	  CXXFLAGS=${CXXFLAGS-"-g -O2"}
 	else
-	  CFLAGS=${CFLAGS-"-O2"}
+	  CFLAGS=${CFLAGS-"-O2 ${warn_cflags}"}
 	  CXXFLAGS=${CXXFLAGS-"-O2"}
 	fi
 	rm -f conftest*
@@ -1035,10 +1038,10 @@ else
       *gcc)
 	echo 'void f(){}' > conftest.c
 	if test -z "`${CC} -g -c conftest.c 2>&1`"; then
-	  CFLAGS=${CFLAGS-"-g -O2"}
+	  CFLAGS=${CFLAGS-"-g -O2 ${warn_cflags}"}
 	  CXXFLAGS=${CXXFLAGS-"-g -O2"}
 	else
-	  CFLAGS=${CFLAGS-"-O2"}
+	  CFLAGS=${CFLAGS-"-O2 ${warn_cflags}"}
 	  CXXFLAGS=${CXXFLAGS-"-O2"}
 	fi
 	rm -f conftest*
@@ -1057,6 +1060,21 @@ export CXX
 export CFLAGS
 export CXXFLAGS
 
+# FIXME: This should be in configure.in, not configure
+case "$host" in
+	*go32*)
+	    enable_gdbtk=no ;;
+	*msdosdjgpp*)
+	    enable_gdbtk=no ;;
+esac
+
+# FIXME: This should be in configure.in, not configure
+# Determine whether gdb needs tk/tcl or not.
+if [ "$enable_gdbtk" != "no" ]; then
+	GDB_TK="all-tcl all-tk all-itcl all-tix all-libgui"
+else
+	GDB_TK=""
+fi
 
 for subdir in . ${subdirs} ; do
 
@@ -1398,6 +1416,8 @@ EOF
 		    -e "s:^DEFAULT_M4[  ]*=.*$:DEFAULT_M4 = ${DEFAULT_M4}:" \
                     ${subdir}/Makefile.tem >> ${Makefile}
   
+	    sed -e "s:^GDB_TK[	 ]*=.*$:GDB_TK = ${GDB_TK}:" ${Makefile} >${Makefile}.tem
+	    mv -f ${Makefile}.tem ${Makefile}
 
 	    # If this is a Canadian Cross, preset the values of many more
 	    # tools.

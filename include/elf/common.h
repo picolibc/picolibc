@@ -1,5 +1,6 @@
 /* ELF support for BFD.
-   Copyright (C) 1991,92,93,94,95,96,97,98,99 Free Software Foundation, Inc.
+   Copyright (C) 1991, 92, 93, 94, 95, 96, 97, 98, 99, 2000
+   Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
@@ -59,7 +60,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EI_OSABI        7       /* Operating System/ABI indication */
 #define ELFOSABI_SYSV   0       /* UNIX System V ABI */
 #define ELFOSABI_HPUX   1       /* HP-UX operating system */
+#define ELFOSABI_LINUX  3       /* GNU/Linux */
 #define ELFOSABI_STANDALONE 255 /* Standalone (embedded) application */
+#define ELFOSABI_ARM   97		/* ARM */
 
 #define EI_ABIVERSION   8       /* ABI version */
 
@@ -89,19 +92,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_486		6	/* Intel 80486 */
 #define EM_860		7	/* Intel 80860 */
 #define EM_MIPS		8	/* MIPS R3000 (officially, big-endian only) */
-#define EM_S370		9	/* Amdahl */
-#define EM_MIPS_RS4_BE 10	/* MIPS R4000 big-endian */
+#define EM_S370		9	/* IBM System/370 */
+#define EM_MIPS_RS4_BE 10	/* MIPS R4000 big-endian */ /* Depreciated */
+#define EM_MIPS_RS3_LE 10	/* MIPS R3000 little-endian (Oct 4 1999 Draft)*/ /* Depreciated */
 
 #define EM_PARISC      15	/* HPPA */
+
 #define EM_VPP550      17       /* Fujitsu VPP500 */
 #define EM_SPARC32PLUS 18	/* Sun's "v8plus" */
 #define EM_960         19       /* Intel 80960 */
 #define EM_PPC	       20	/* PowerPC */
+#define EM_PPC64       21	/* 64-bit PowerPC */
 
 #define EM_V800        36	/* NEC V800 series */
 #define EM_FR20	       37	/* Fujitsu FR20 */
 #define EM_RH32	       38       /* TRW RH32 */
-#define EM_MCORE       39       /* Motorolla MCore */ /* May also be taken by Fujitsu MMA */
+#define EM_MCORE       39       /* Motorola M*Core */ /* May also be taken by Fujitsu MMA */
+#define EM_RCE         39       /* Old name for MCore */
 #define EM_ARM	       40	/* ARM */
 #define EM_OLD_ALPHA   41	/* Digital Alpha */
 #define EM_SH	       42	/* Hitachi SH */
@@ -112,10 +119,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_H8_300H     47       /* Hitachi H8/300H */
 #define EM_H8S         48       /* Hitachi H8S */
 #define EM_H8_500      49       /* Hitachi H8/500 */
-#define EM_IA_64       50       /* Intel MercedTM Processor */
+#define EM_IA_64       50       /* Intel IA-64 Processor */
 #define EM_MIPS_X      51       /* Stanford MIPS-X */
 #define EM_COLDFIRE    52       /* Motorola Coldfire */
 #define EM_68HC12      53       /* Motorola M68HC12 */
+#define EM_MMA	       54	/* Fujitsu Multimedia Accelerator */
+#define EM_PCP	       55	/* Siemens PCP */
+#define EM_NCPU	       56	/* Sony nCPU embedded RISC processor */
+#define EM_NDR1	       57	/* Denso NDR1 microprocesspr */
+#define EM_STARCORE    58	/* Motorola Star*Core processor */
+#define EM_ME16	       59	/* Toyota ME16 processor */
+#define EM_ST100       60	/* STMicroelectronics ST100 processor */
+#define EM_TINYJ       61	/* Advanced Logic Corp. TinyJ embedded processor */
+
+#define EM_FX66	       66	/* Siemens FX66 microcontroller */
+#define EM_ST9PLUS     67	/* STMicroelectronics ST9+ 8/16 bit microcontroller */
+#define EM_ST7	       68	/* STMicroelectronics ST7 8-bit microcontroller */
+#define EM_68HC16      69	/* Motorola MC68HC16 Microcontroller */
+#define EM_68HC11      70	/* Motorola MC68HC11 Microcontroller */
+#define EM_68HC08      71	/* Motorola MC68HC08 Microcontroller */
+#define EM_68HC05      72	/* Motorola MC68HC05 Microcontroller */
+#define EM_SVX         73	/* Silicon Graphics SVx */
+#define EM_ST19        74	/* STMicroelectronics ST19 8-bit microcontroller */
+#define EM_VAX         75	/* Digital VAX */
+
+#define EM_PJ          99       /* picoJava */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
@@ -161,6 +189,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* FR30 magic number - no EABI available.  */
 #define EM_CYGNUS_FR30		0x3330
 
+/* AVR magic number
+   Written in the absense of an ABI.  */
+#define EM_AVR			0x1057
+
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version */
@@ -187,7 +219,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define PF_X		(1 << 0)	/* Segment is executable */
 #define PF_W		(1 << 1)	/* Segment is writable */
 #define PF_R		(1 << 2)	/* Segment is readable */
-#define PF_MASKOS	0x0F000000	/* OS-specific reserved bits */
+/* #define PF_MASKOS	0x0F000000    *//* OS-specific reserved bits */
+#define PF_MASKOS	0x0FF00000	/* New value, Oct 4, 1999 Draft */
 #define PF_MASKPROC	0xF0000000	/* Processor-specific reserved bits */
 
 /* Values for section header, sh_type field */
@@ -204,6 +237,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define SHT_REL		9		/* Relocation entries, no addends */
 #define SHT_SHLIB	10		/* Reserved, unspecified semantics */
 #define SHT_DYNSYM	11		/* Dynamic linking symbol table */
+
+#define SHT_INIT_ARRAY  14		/* Array of pointers to init functions */
+#define SHT_FINI_ARRAY  15		/* Array of pointers to finish functions */
+#define SHT_PREINIT_ARRAY 16		/* Array of pointers to pre-init functions */
 
 #define SHT_LOOS        0x60000000      /* Operating system specific semantics, lo */
 #define SHT_HIOS        0x6fffffff      /* Operating system specific semantics, hi */
@@ -222,14 +259,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define SHT_LOPROC	0x70000000	/* Processor-specific semantics, lo */
 #define SHT_HIPROC	0x7FFFFFFF	/* Processor-specific semantics, hi */
 #define SHT_LOUSER	0x80000000	/* Application-specific semantics */
-#define SHT_HIUSER	0x8FFFFFFF	/* Application-specific semantics */
+/* #define SHT_HIUSER	0x8FFFFFFF    *//* Application-specific semantics */
+#define SHT_HIUSER	0xFFFFFFFF	/* New value, defined in Oct 4, 1999 Draft */
 
 /* Values for section header, sh_flags field */
 
 #define SHF_WRITE	(1 << 0)	/* Writable data during execution */
 #define SHF_ALLOC	(1 << 1)	/* Occupies memory during execution */
 #define SHF_EXECINSTR	(1 << 2)	/* Executable machine instructions */
-#define SHF_MASKOS	0x0F000000	/* OS-specific semantics */
+#define SHF_MERGE	(1 << 4)	/* Data in this section can be merged */
+#define SHF_STRINGS	(1 << 5)	/* Contains null terminated character strings */
+#define SHF_INFO_LINK	(1 << 6)	/* sh_info holds section header table index */
+#define SHF_LINK_ORDER  (1 << 7)	/* Preserve section ordering when linking */
+#define SHF_OS_NONCONFORMING (1 << 8)	/* OS specifci processing required */
+
+/* #define SHF_MASKOS	0x0F000000    *//* OS-specific semantics */
+#define SHF_MASKOS	0x0FF00000	/* New value, Oct 4, 1999 Draft */
 #define SHF_MASKPROC	0xF0000000	/* Processor-specific semantics */
 
 /* Values of note segment descriptor types for core files. */
@@ -237,6 +282,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define NT_PRSTATUS	1		/* Contains copy of prstatus struct */
 #define NT_FPREGSET	2		/* Contains copy of fpregset struct */
 #define NT_PRPSINFO	3		/* Contains copy of prpsinfo struct */
+#define NT_TASKSTRUCT	4		/* Contains copy of task struct */
+#define NT_PRXFPREG     0x46e62b7f	/* Contains a user_xfpregs_struct; */
+					/*   note name must be "LINUX".  */
 
 /* Note segments for core files on dir-style procfs systems. */
 
@@ -245,6 +293,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define NT_PSINFO	13		/* Has a struct psinfo */
 #define NT_LWPSTATUS	16		/* Has a struct lwpstatus_t */
 #define NT_LWPSINFO	17		/* Has a struct lwpsinfo_t */
+#define NT_WIN32PSTATUS	18		/* Has a struct win32_pstatus */
 
 /* Values of note segment descriptor types for object files.  */
 /* (Only for hppa right now.  Should this be moved elsewhere?)  */
@@ -258,6 +307,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define ELF_ST_BIND(val)		(((unsigned int)(val)) >> 4)
 #define ELF_ST_TYPE(val)		((val) & 0xF)
 #define ELF_ST_INFO(bind,type)		(((bind) << 4) + ((type) & 0xF))
+
+/* The 64bit and 32bit versions of these macros are identical, but
+   the ELF spec defines them, so here they are.  */
+#define ELF32_ST_BIND  ELF_ST_BIND
+#define ELF32_ST_TYPE  ELF_ST_TYPE
+#define ELF32_ST_INFO  ELF_ST_INFO
+#define ELF64_ST_BIND  ELF_ST_BIND
+#define ELF64_ST_TYPE  ELF_ST_TYPE
+#define ELF64_ST_INFO  ELF_ST_INFO
+
+/* This macro disassembles and assembles a symbol's visibility into
+   the st_other field.  The STV_ defines specificy the actual visibility.  */
+
+#define ELF_ST_VISIBILITY(v)		((v) & 0x3)
+/* The remaining bits in the st_other field are not currently used.
+   They should be set to zero.  */
+
+#define ELF32_ST_VISIBILITY  ELF_ST_VISIBILITY
+#define ELF64_ST_VISIBILITY  ELF_ST_VISIBILITY
+
 
 #define STN_UNDEF	0		/* undefined symbol index */
 
@@ -274,6 +343,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define STT_FUNC	2		/* Symbol is a code object */
 #define STT_SECTION	3		/* Symbol associated with a section */
 #define STT_FILE	4		/* Symbol gives a file name */
+#define STT_COMMON	5		/* An uninitialised common block */
 #define STT_LOOS        10		/* OS-specific semantics */
 #define STT_HIOS        12		/* OS-specific semantics */
 #define STT_LOPROC	13		/* Application-specific semantics */
@@ -291,6 +361,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define SHN_ABS		0xFFF1		/* Associated symbol is absolute */
 #define SHN_COMMON	0xFFF2		/* Associated symbol is in common */
 #define SHN_HIRESERVE	0xFFFF		/* End range of reserved indices */
+
+/* The following constants control how a symbol may be accessed once it has
+   become part of an executable or shared library.  */
+					   
+#define STV_DEFAULT	0		/* Visibility is specified by binding type */
+#define STV_INTERNAL	1		/* OS specific version of STV_HIDDEN */
+#define STV_HIDDEN	2		/* Can only be seen inside currect component */
+#define STV_PROTECTED	3		/* Treat as STB_LOCAL inside current component */
+					   
 
 /* relocation info handling macros */
 
@@ -333,12 +412,28 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DT_FINI_ARRAY   26
 #define DT_INIT_ARRAYSZ 27
 #define DT_FINI_ARRAYSZ 28
+#define DT_RUNPATH      29
+#define DT_FLAGS        30
 
-#define DT_LOOS         0x60000000
-#define DT_HIOS         0x6fffffff
+#define DT_ENCODING     32
+#define DT_PREINIT_ARRAY   32
+#define DT_PREINIT_ARRAYSZ 33
+
+/* Note, the Oct 4, 1999 draft of the ELF ABI changed the values
+   for DT_LOOS and DT_HIOS.  Some implementations however, use
+   values outside of the new range (see below).  */
+#define OLD_DT_LOOS	0x60000000
+#define DT_LOOS         0x6000000d
+#define DT_HIOS         0x6fff0000
+#define OLD_DT_HIOS     0x6fffffff
+
+#define DT_LOPROC       0x70000000
+#define DT_HIPROC       0x7fffffff
 
 /* The next four dynamic tags are used on Solaris.  We support them
-   everywhere.  */
+   everywhere.  Note these values lie outside of the (new) range for
+   OS specific values.  This is a deliberate special case and we
+   maintain it for backwards compatability.  */
 #define DT_VALRNGLO	0x6ffffd00
 #define DT_PLTPADSZ	0x6ffffdf9
 #define DT_MOVEENT	0x6ffffdfa
@@ -393,6 +488,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DF_1_DIRECT	0x00000100
 #define DF_1_TRANS	0x00000200
 #define DF_1_INTERPOSE	0x00000400
+
+/* Flag values for the DT_FLAGS entry.  */
+#define DF_ORIGIN	(1 << 0)
+#define DF_SYMBOLIC	(1 << 1)
+#define DF_TEXTREL	(1 << 2)
+#define DF_BIND_NOW	(1 << 3)
 
 /* These constants are used for the version number of a Elf32_Verdef
    structure.  */

@@ -62,5 +62,7 @@ END_RELOC_NUMBERS
 
 /* m32r code.  */
 #define E_M32R_ARCH		0x00000000
+/* m32rx code.  */
+#define E_M32RX_ARCH		0x10000000
 
 #endif

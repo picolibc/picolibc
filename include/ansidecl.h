@@ -160,7 +160,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #endif	/* ANSI C.  */
 
-
 /* Using MACRO(x,y) in cpp #if conditionals does not work with some
    older preprocessors.  Thus we can't define something like this:
 

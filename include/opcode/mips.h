@@ -308,6 +308,7 @@ struct mips_opcode
 #define INSN_ISA3		    0x00000003
 /* MIPS ISA 4 instruction (R8000).  */
 #define INSN_ISA4		    0x00000004
+#define INSN_ISA5		    0x00000005
 
 /* Chip specific instructions.  These are bitmasks.  */
 /* MIPS R4650 instruction.  */
@@ -319,6 +320,31 @@ struct mips_opcode
 /* Toshiba R3900 instruction.  */
 #define INSN_3900                   0x00000080
 
+/* 32-bit code running on a ISA3+ CPU. */
+#define INSN_GP32                   0x00001000
+
+/* Test for membership in an ISA including chip specific ISAs.
+   INSN is pointer to an element of the opcode table; ISA is the
+   specified ISA to test against; and CPU is the CPU specific ISA
+   to test, or zero if no CPU specific ISA test is desired.  
+   The gp32 arg is set when you need to force 32-bit register usage on
+   a machine with 64-bit registers; see the documentation under -mgp32
+   in the MIPS gas docs. */
+
+#define OPCODE_IS_MEMBER(insn,isa,cpu,gp32) 	       		\
+    ((((insn)->membership & INSN_ISA) != 0			\
+      && ((insn)->membership & INSN_ISA) <= isa			\
+      && ((insn)->membership & INSN_GP32 ? gp32 : 1))		\
+     || (cpu == 4650						\
+	 && ((insn)->membership & INSN_4650) != 0)		\
+     || (cpu == 4010						\
+	 && ((insn)->membership & INSN_4010) != 0)		\
+     || ((cpu == 4100						\
+	  || cpu == 4111					\
+	  )							\
+	 && ((insn)->membership & INSN_4100) != 0)		\
+     || (cpu == 3900						\
+	 && ((insn)->membership & INSN_3900) != 0))
 
 /* This is a list of macro expanded instructions.
  *

@@ -75,6 +75,12 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
   /* These relocs are used for the mips16.  */
   RELOC_NUMBER (R_MIPS16_26, 100)
   RELOC_NUMBER (R_MIPS16_GPREL, 101)
+  /* These are GNU extensions to handle embedded-pic.  */
+  RELOC_NUMBER (R_MIPS_PC32, 248)
+  RELOC_NUMBER (R_MIPS_PC64, 249)
+  RELOC_NUMBER (R_MIPS_GNU_REL16_S2, 250)
+  RELOC_NUMBER (R_MIPS_GNU_REL_LO16, 251)
+  RELOC_NUMBER (R_MIPS_GNU_REL_HI16, 252)
   /* These are GNU extensions to enable C++ vtable garbage collection.  */
   RELOC_NUMBER (R_MIPS_GNU_VTINHERIT, 253)
   RELOC_NUMBER (R_MIPS_GNU_VTENTRY, 254)
@@ -617,10 +623,10 @@ extern void bfd_mips_elf32_swap_reginfo_out
 /* Special values for the st_other field in the symbol table.  These
    are used in an Irix 5 dynamic symbol table.  */
 
-#define STO_DEFAULT		0x00
-#define STO_INTERNAL		0x01
-#define STO_HIDDEN		0x02
-#define STO_PROTECTED		0x03
+#define STO_DEFAULT		STV_DEFAULT
+#define STO_INTERNAL		STV_INTERNAL
+#define STO_HIDDEN		STV_HIDDEN
+#define STO_PROTECTED		STV_PROTECTED
 
 /* This value is used for a mips16 .text symbol.  */
 #define STO_MIPS16		0xf0
@@ -815,6 +821,40 @@ typedef struct
   /* GP register value for this object file.  */
   bfd_vma ri_gp_value;
 } Elf64_Internal_RegInfo;
+
+typedef struct
+{
+  /* The hash value computed from the name of the corresponding
+     dynamic symbol.  */
+  unsigned char ms_hash_value[4];
+  /* Contains both the dynamic relocation index and the symbol flags
+     field.  The macros ELF32_MS_REL_INDEX and ELF32_MS_FLAGS are used
+     to access the individual values.  The dynamic relocation index
+     identifies the first entry in the .rel.dyn section that
+     references the dynamic symbol corresponding to this msym entry.
+     If the index is 0, no dynamic relocations are associated with the
+     symbol.  The symbol flags field is reserved for future use.  */
+  unsigned char ms_info[4];
+} Elf32_External_Msym;
+
+typedef struct
+{
+  /* The hash value computed from the name of the corresponding
+     dynamic symbol.  */
+  unsigned long ms_hash_value;
+  /* Contains both the dynamic relocation index and the symbol flags
+     field.  The macros ELF32_MS_REL_INDEX and ELF32_MS_FLAGS are used
+     to access the individual values.  The dynamic relocation index
+     identifies the first entry in the .rel.dyn section that
+     references the dynamic symbol corresponding to this msym entry.
+     If the index is 0, no dynamic relocations are associated with the
+     symbol.  The symbol flags field is reserved for future use.  */
+  unsigned long ms_info;
+} Elf32_Internal_Msym;
+
+#define ELF32_MS_REL_INDEX(i) ((i) >> 8)
+#define ELF32_MS_FLAGS(i)     (i) & 0xff)
+#define ELF32_MS_INFO(r, f)   (((r) << 8) + ((f) & 0xff))
 
 /* MIPS ELF reginfo swapping routines.  */
 extern void bfd_mips_elf64_swap_reginfo_in

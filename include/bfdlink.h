@@ -237,6 +237,13 @@ struct bfd_link_info
   MPC860 C0 (or earlier) should be checked for and modified.  It gives the
   number of bytes that should be checked at the end of each text page. */
   int mpc860c0;
+
+  /* The function to call when the executable or shared object is
+     loaded.  */
+  const char *init_function;
+  /* The function to call when the executable or shared object is
+     unloaded.  */
+  const char *fini_function;
 };
 
 /* This structures holds a set of callback functions.  These are
@@ -322,10 +329,13 @@ struct bfd_link_callbacks
   /* A function which is called when a relocation is attempted against
      an undefined symbol.  NAME is the symbol which is undefined.
      ABFD, SECTION and ADDRESS identify the location from which the
-     reference is made.  In some cases SECTION may be NULL.  */
+     reference is made. FATAL indicates whether an undefined symbol is
+     a fatal error or not. In some cases SECTION may be NULL.  */
   boolean (*undefined_symbol) PARAMS ((struct bfd_link_info *,
 				       const char *name, bfd *abfd,
-				       asection *section, bfd_vma address));
+				       asection *section,
+				       bfd_vma address,
+				       boolean fatal));
   /* A function which is called when a reloc overflow occurs.  NAME is
      the name of the symbol or section the reloc is against,
      RELOC_NAME is the name of the relocation, and ADDEND is any

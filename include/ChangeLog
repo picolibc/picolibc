@@ -1,7 +1,98 @@
+2000-03-27  Denis Chertykov  <denisc@overta.ru>
+
+	* dis-asm.h (print_insn_avr): Declare.
+
+2000-03-14  Bernd Schmidt  <bernds@cygnus.co.uk>
+
+	* hashtab.h (htab_trav): Modify type so that first arg is of type
+	void **.
+	(htab_find_with_hash, htab_find_slot_with_hash): Declare new
+	functions.
+
+2000-03-09  Alex Samuel  <samuel@codesourcery.com>
+
+	* partition.h: New file.
+
+2000-03-09  Zack Weinberg  <zack@wolery.cumb.org>
+
+	* hashtab.h (struct htab): Add del_f.
+	(htab_del): New type.
+	(htab_create): Add fourth argument.
+
+2000-03-08  Zack Weinberg  <zack@wolery.cumb.org>
+
+	* hashtab.h (hash_table_t): Rename to htab_t.
+	(struct hash_table): Rename to struct htab.  Shorten element
+	names.  Reorder elements by size.
+	(htab_hash, htab_eq, htab_trav): New typedefs for the callback
+	function pointers.
+	(hash_table_entry_t): Discard; just use void * for element
+	type.
+
+2000-03-01  H.J. Lu  <hjl@gnu.org>
+
+	* bfdlink.h (bfd_link_callbacks): Add a boolean arg to
+	the undefined_symbol callback.
+
+2000-02-23  Linas Vepstas <linas@linas.org>
+
+	* dis-asm.h (print_insn_i370): Declare.
+
+2000-02-22  Chandra Chavva  <cchavva@cygnus.com>
+
+	* opcode/d30v.h (FLAG_NOT_WITH_ADDSUBppp): Redefined as operation
+	cannot be combined in parallel with ADD/SUBppp.
+
+Tue Feb 22 15:19:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* remote-sim.h (sim_trace): Document return values.
+	(sim_set_trace): Declare.  Deprecate.
+
+2000-02-21  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* dis-asm.h (struct disassemble_info): Change `length' param of
+	read_memory_func to unsigned.  Change type of `buffer_length' and
+	`octets_per_byte' to unsigned.
+	(buffer_read_memory): Change `length' param to unsigned.
+
+2000-02-16  Nick Clifton  <nickc@cygnus.com>
+
+	* dis-asm.h: Add prototypes for ARM register name functions.
+
+Wed Feb  9 18:45:49 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* wait.h: Delete. No longer used by GDB.
+
+Tue Feb  8 17:01:13 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* remote-sim.h (sim_resume): Clarify use of SIGGNAL.
+	(sim_stop_reason): Clarify meaning of sim_signalled.
+
+2000-02-03  Timothy Wall <twall@redhat.com>
+
+	* dis-asm.h (struct disassemble_info): Added octets_per_byte
+	field and initialize it to one (1).
+	
+2000-01-27  Nick Clifton  <nickc@redhat.com>
+
+	* dis-asm.h: Add prototype for disassembler_usage().
+	Add prototype for arm_disassembler_options().
+	Remove prototype for arm_toggle_regnames().
+	Add prototype for parse_arm_disassembler_option().
+
 Sat Jan  1 19:06:52 2000  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* symcat.h (STRINGX) [!__STDC__ || ALMOST_STDC]: Change "?" to "s"
 	to stringify argument s.
+
+Wed Dec 15 11:22:56 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hp-symtab.h (HP_LANGUAGE_FORTRAN): New enumeration constant.
+	(HP_LANGUAGE_F77): Define using HP_LANGUAGE_FORTRAN.
+
+1999-12-15  Doug Evans  <dje@transmeta.com>
+
+	* dis-asm.h: Enclose in extern "C" ifdef __cplusplus.
 
 1999-12-05  Mark Mitchell  <mark@codesourcery.com>
 
@@ -25,15 +116,29 @@ Sat Jan  1 19:06:52 2000  Hans-Peter Nilsson  <hp@bitrange.com>
 	(asprintf, vasprintf): Provide declarations.
 
 Wed Nov 10 12:43:21 1999  Philippe De Muyter  <phdm@macqel.be>
-                          Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+			  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* ansidecl.h: Define and test `GCC_VERSION', not `HAVE_GCC_VERSION'.
-	
+
+1999-11-04      Jimmy Guo       <guo@cup.hp.com>
+
+	* hp-symtab.h (dntt_type_fparam): Add doc_ranges, misc_kind
+	fields, change location type to CORE_ADDR from int.
+	(dntt_type_const): Name the 5th field location_type.
+
+Sun Oct 24 19:11:32 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* sim-d10v.h (SIM_D10V_TS2_DMAP_REGNUM): Define.
+
 1999-10-23 08:51 -0700  Zack Weinberg  <zack@bitmover.com>
 
 	* hashtab.h: Give hash_table_t a struct tag.  Add prototypes
 	for clear_hash_table_slot and traverse_hash_table.  Correct
 	prototype of all_hash_table_collisions.
+
+Sat Oct 23 19:00:13 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* sim-d10v.h: New file.
 
 Fri Oct 15 01:47:51 1999  Vladimir Makarov  <vmakarov@loony.cygnus.com>
 
@@ -43,7 +148,7 @@ Fri Oct 15 01:47:51 1999  Vladimir Makarov  <vmakarov@loony.cygnus.com>
 
 	* ansidecl.h (HAVE_GCC_VERSION): New macro.  Use it instead of
 	explicitly testing __GNUC__ and __GNUC_MINOR__.
-	
+
 	(ATTRIBUTE_PRINTF): Use `__format__', not `format'.
 
 1999-09-25  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
@@ -58,6 +163,10 @@ Tue Sep 14 00:35:02 1999  Marc Espie <espie@cvs.openbsd.org>
 1999-09-07  Jeff Garzik  <jgarzik@pobox.com>
 
 	* libiberty.h (xmemdup): Add prototype for new function.
+
+1999-09-04  Steve Chamberlain  <sac@pobox.com>
+
+	* dis-asm.h (print_insn_pj): Declare.
 
 1999-09-01  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
@@ -79,6 +188,37 @@ Tue Sep 14 00:35:02 1999  Marc Espie <espie@cvs.openbsd.org>
 
 	* ansidecl.h: Copy attribute support macros from egcs.
 
+1999-06-22  Mark Mitchell  <mark@codesourcery.com>
+
+	* bfdlink.h (struct bfd_link_hash_entry): Add init_function and
+	fini_function.
+
+1999-06-20  Mark Mitchell  <mark@codesourcery.com>
+
+	* mips.h (Elf32_Internal_Msym): New structure.
+	(Elf32_External_Msym): Likewise.
+	(ELF32_MS_REL_INDEX): New macro.
+	(ELF32_MS_FLAGS): Likewise.
+	(ELF32_MS_INFO): Likewise.
+	
+1999-06-14  Nick Clifton  <nickc@cygnus.com>
+
+	* dis-asm.h (arm_toggle_regnames): New prototype.
+	(struct diassemble_info): New field: disassembler_options.
+
+1999-04-11  Richard Henderson  <rth@cygnus.com>
+
+	* bfdlink.h (bfd_elf_version_expr): Rename `match' to `pattern'.
+	Add `match' callback function.
+
+1999-04-10  Richard Henderson  <rth@cygnus.com>
+
+	* bfdlink.h (bfd_link_info): Add no_undefined.
+
+1999-04-08  Nick Clifton  <nickc@cygnus.com>
+
+	* dis-asm.h: Add prototype for print_insn_mcore.
+
 1999-04-02  Mark Mitchell  <mark@codesourcery.com>
 
 	* splay-tree.h (splay_tree_compare_pointers): Declare.
@@ -91,25 +231,63 @@ Wed Mar 24 12:46:29 1999  Andrew Cagney  <cagney@amy.cygnus.com>
 
 	* libiberty.h (basename): Cygwin{,32} should have the prototype.
 
+1999-02-22  Jim Lemke  <jlemke@cygnus.com>
+
+	* bfdlink.h (bfd_link_info): add field "mpc860c0".
+
+Mon Feb  1 21:05:46 1999  Catherine Moore  <clm@cygnus.com>
+
+       * dis-asm.h (print_insn_i386_att):  Declare.
+       (print_insn_i386_intel):  Declare.
+
+998-12-30  Michael Meissner  <meissner@cygnus.com>
+
+	* dis-asm.h (INIT_DISASSEMBLE_INFO_NO_ARCH): Cast STREAM and
+	FPRINTF_FUNC to avoid compiler warnings.
+
+Wed Dec 30 16:07:14 1998  David Taylor  <taylor@texas.cygnus.com>
+
+	* dis-asm.h: change void * to PTR (two places).
+
 Mon Dec 14 09:53:31 1998  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* demangle.h: Don't check IN_GCC anymore.
 	* splay-tree.h: Likewise.
 
-Tue Dec  8 00:30:31 1998  Elena Zannoni  <ezannoni@kwikemart.cygnus.com> 
+Tue Dec  8 00:30:31 1998  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
 
-        * demangle.h: (DMGL_EDG): new macro for Kuck and Associates
-        (DMGL_STYLE_MASK): modify to include Kuck and Assoc style
-        (demangling_styles): add new edg_demangling style
-        (EDG_DEMANGLING_STYLE_STRING): new macro
-        (EDG_DEMANGLING): new macro
+	The following changes were made by Elena Zannoni
+ 	<ezannoni@kwikemart.cygnus.com> and Edith Epstein
+ 	<eepstein@sophia.cygnus.com> as part of a project to merge in
+ 	changes made by HP; HP did not create ChangeLog entries.
 
-        * demangle.h (DMGL_HP): new macro, for HP/aCC compiler.
-        (DMGL_STYLE_MASK): modify to include new HP's style.
-        (demangling_styles): add new hp_demangling value.
-        (HP_DEMANGLING_STYLE_STRING): new macro.
-        (ARM_DEMANGLING): coerce to int.
-        (HP_DEMANGLING): new macro.
+	* dis-asm.h (struct disassemble_info): change the type of stream
+	from FILE* to void*, for use with gdb's new type GDB_FILE.
+	(fprintf_ftype): change FILE* parameter type to void*.
+
+	* demangle.h: (DMGL_EDG): new macro for Kuck and Associates
+	(DMGL_STYLE_MASK): modify to include Kuck and Assoc style
+	(demangling_styles): add new edg_demangling style
+	(EDG_DEMANGLING_STYLE_STRING): new macro
+	(EDG_DEMANGLING): new macro
+
+	* demangle.h (DMGL_HP): new macro, for HP/aCC compiler.
+	(DMGL_STYLE_MASK): modify to include new HP's style.
+	(demangling_styles): add new hp_demangling value.
+	(HP_DEMANGLING_STYLE_STRING): new macro.
+	(ARM_DEMANGLING): coerce to int.
+	(HP_DEMANGLING): new macro.
+
+	* hp-symtab.h: rewritten, from HP.
+	(quick_procedure): change type of language field to unsigned int
+	(quick_module): change type of language field to unsigned int
+	(struct dntt_type_svar): add field thread_specific.
+	(hp_language): add languages modcal and dmpascal.
+
+Mon Nov 30 15:25:58 1998  J"orn Rennecke <amylaar@cygnus.co.uk>
+
+	* elf/sh.h (elf_sh_reloc_type): Add R_SH_FIRST_INVALID_RELOC,
+	R_SH_LAST_INVALID_RELOC, R_SH_SWITCH8 and R_SH_max.
 
 Fri Nov 20 13:14:00 1998  Andrew Cagney  <cagney@b1.cygnus.com>
 
@@ -126,10 +304,18 @@ Sun Nov  8 17:42:25 1998  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 	* demangle.h: Never define PARAMS().
 	* splay-tree.h: Likewise.
 
+Sat Nov  7 18:30:20 1998  Peter Schauer  <peter.schauer@regent.e-technik.tu-muenchen.de>
+
+	* dis-asm.h (print_insn_vax): Declare.
+
 Sat Nov  7 16:04:03 1998  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* demangle.h: Don't include gansidecl.h.
 	* splay-tree.h: Likewise.
+
+1998-10-26 16:03  Ulrich Drepper  <drepper@cygnus.com>
+
+	* bfdlink.h (struct bfd_link_info): Add new field optimize.
 
 Thu Oct 22 19:58:00 1998  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
@@ -156,6 +342,10 @@ Sat Sep  5 12:16:33 1998  Jeffrey A Law  (law@cygnus.com)
 Mon Jun  1 13:48:32 1998  Jason Molenda  (crash@bugshack.cygnus.com)
 
 	* obstack.h: Update to latest FSF version.
+
+Tue May 26 20:57:43 1998  Stan Cox  <scox@equinox.cygnus.com>
+
+	* elf/sparc.h (EF_SPARC_LEDATA, R_SPARC_32LE): Added.
 
 Tue Feb 24 13:05:02 1998  Doug Evans  <devans@canuck.cygnus.com>
 
@@ -428,6 +618,10 @@ Thu Feb  6 14:20:01 1997  Martin M. Hunt  <hunt@pizza.cygnus.com>
 	* dis-asm.h: (disassemble_info):  Add new fields
 	bytes_per_chunk and display_endian to control the
 	display of raw instructions.
+
+Fri Dec 27 22:17:37 1996  Fred Fish  <fnf@cygnus.com>
+
+	* dis-asm.h (print_insn_tic80): Declare.
 
 Sun Dec  8 17:11:12 1996  Doug Evans  <dje@canuck.cygnus.com>
 
@@ -806,8 +1000,8 @@ Thu Apr 28 19:06:50 1994  Ken Raeburn  (raeburn@cujo.cygnus.com)
 
 Fri Apr  1 00:38:17 1994  Jim Wilson  (wilson@mole.gnu.ai.mit.edu)
 
-        * obstack.h: Delete use of IN_GCC to control whether
-        stddef.h or gstddef.h is included.
+	* obstack.h: Delete use of IN_GCC to control whether
+	stddef.h or gstddef.h is included.
 
 Tue Mar 22 13:06:02 1994  Ian Lance Taylor  (ian@tweedledumb.cygnus.com)
 

@@ -1,4 +1,4 @@
-/* Motorolla MCore support for BFD.
+/* Motorola MCore support for BFD.
    Copyright (C) 1995, 1999 Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.
@@ -34,6 +34,10 @@ START_RELOC_NUMBERS (elf_mcore_reloc_type)
   RELOC_NUMBER (R_MCORE_PCRELJSR_IMM11BY2, 6)
   RELOC_NUMBER (R_MCORE_GNU_VTINHERIT, 7)
   RELOC_NUMBER (R_MCORE_GNU_VTENTRY, 8)
+  RELOC_NUMBER (R_MCORE_RELATIVE, 9)
+  RELOC_NUMBER (R_MCORE_COPY, 10)
+  RELOC_NUMBER (R_MCORE_GLOB_DAT, 11)
+  RELOC_NUMBER (R_MCORE_JUMP_SLOT, 12)
   EMPTY_RELOC  (R_MCORE_max)
 END_RELOC_NUMBERS
 

@@ -1,3 +1,307 @@
+2000-03-27  Nick Clifton  <nickc@cygnus.com>
+
+	* d30v.h (SHORT_A1): Fix value.
+	(SHORT_AR): Renumber so that it is at the end of the list of short
+	instructions, not the end of the list of long instructions.
+
+2000-03-26  Alan Modra  <alan@linuxcare.com>
+
+	* i386.h: (UNIXWARE_COMPAT): Rename to SYSV386_COMPAT as the
+	problem isn't really specific to Unixware.
+	(OLDGCC_COMPAT): Define.
+	(i386_optab): If !OLDGCC_COMPAT, don't handle fsubp etc. with
+	destination %st(0).
+	Fix lots of comments.
+
+2000-03-02  J"orn Rennecke <amylaar@cygnus.co.uk>
+
+        * d30v.h:
+        (SHORT_B2r, SHORT_B3, SHORT_B3r, SHORT_B3b, SHORT_B3br): Updated.
+        (SHORT_D1r, SHORT_D2, SHORT_D2r, SHORT_D2Br, SHORT_U): Updated.
+        (SHORT_F, SHORT_AF, SHORT_T, SHORT_A5, SHORT_CMP, SHORT_CMPU): Updated.
+        (SHORT_A1, SHORT_AA, SHORT_RA, SHORT_MODINC, SHORT_MODDEC): Updated.
+        (SHORT_C1, SHORT_C2, SHORT_UF, SHORT_A2, SHORT_NONE, LONG): Updated.
+        (LONG_U, LONG_Ur, LONG_CMP, LONG_M, LONG_M2, LONG_2, LONG_2r): Updated.
+        (LONG_2b, LONG_2br, LONG_D, LONG_Dr, LONG_Dbr): Updated.
+
+2000-02-25  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h (fild, fistp): Change intel d_Suf form to fildd and
+	fistpd without suffix.
+
+2000-02-24  Nick Clifton  <nickc@cygnus.com>
+
+	* cgen.h (cgen_cpu_desc): Rename field 'flags' to
+        'signed_overflow_ok_p'.
+	Delete prototypes for cgen_set_flags() and cgen_get_flags().
+
+2000-02-24  Andrew Haley  <aph@cygnus.com>
+
+	* cgen.h (CGEN_INSN_MACH_HAS_P): New macro.
+	(CGEN_CPU_TABLE): flags: new field.
+	Add prototypes for new functions.
+	
+2000-02-24  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h: Add some more UNIXWARE_COMPAT comments.
+
+2000-02-23  Linas Vepstas <linas@linas.org>
+
+	* i370.h: New file.
+
+2000-02-22  Andrew Haley  <aph@cygnus.com>
+
+	* mips.h: (OPCODE_IS_MEMBER): Add comment.
+
+1999-12-30  Andrew Haley  <aph@cygnus.com>
+
+	* mips.h (OPCODE_IS_MEMBER): Add gp32 arg, which determines
+	whether synthetic opcodes (e.g. move) generate 32-bit or 64-bit
+	insns.
+
+2000-01-15  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h: Qualify intel mode far call and jmp with x_Suf.
+
+1999-12-27  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h: Add JumpAbsolute qualifier to all non-intel mode
+	indirect jumps and calls.  Add FF/3 call for intel mode.
+
+Wed Dec  1 03:05:25 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* mn10300.h: Add new operand types.  Add new instruction formats.
+
+Wed Nov 24 20:28:58 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Correctly handle immediate for PA2.0 "bb"
+	instruction.
+
+1999-11-18  Gavin Romig-Koch  <gavin@cygnus.com>
+
+	* mips.h (INSN_ISA5): New.
+
+1999-11-01  Gavin Romig-Koch  <gavin@cygnus.com>
+
+	* mips.h (OPCODE_IS_MEMBER): New.
+
+1999-10-29  Nick Clifton  <nickc@cygnus.com>
+
+	* d30v.h (SHORT_AR): Define.
+
+1999-10-18  Michael Meissner  <meissner@cygnus.com>
+
+	* alpha.h (alpha_num_opcodes): Convert to unsigned.
+	(alpha_num_operands): Ditto.
+
+Sun Oct 10 01:46:56 1999  Jerry Quinn <jerry.quinn.adv91@alum.dartmouth.org>
+
+	* hppa.h (pa_opcodes):  Add load and store cache control to
+	instructions.  Add ordered access load and store.
+
+	* hppa.h (pa_opcode): Add new entries for addb and addib.
+
+	* hppa.h (pa_opcodes): Fix cmpb and cmpib entries.
+
+	* hppa.h (pa_opcodes):  Add entries for cmpb and cmpib.
+
+Thu Oct  7 00:12:25 MDT 1999	Diego Novillo <dnovillo@cygnus.com>
+
+	* d10v.h: Add flag RESTRICTED_NUM3 for imm3 operands.
+
+Thu Sep 23 07:08:38 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+
+	* hppa.h (pa_opcodes): Add "call" and "ret".  Clean up "b", "bve"
+	and "be" using completer prefixes.
+
+	* hppa.h (pa_opcodes): Add initializers to silence compiler.
+
+	* hppa.h: Update comments about character usage.
+
+Mon Sep 20 03:55:31 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Fix minor thinkos introduced while cleaning
+	up the new fstw & bve instructions.
+
+Sun Sep 19 10:40:59 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Add remaining PA2.0 integer load/store
+	instructions.
+
+	* hppa.h (pa_opcodes): Add remaining PA2.0 FP load/store instructions.
+
+	* hppa.h (pa_opcodes): Add long offset double word load/store
+	instructions.
+
+	* hppa.h (pa_opcodes): Add FLAG_STRICT variants of FP loads and
+	stores.
+
+	* hppa.h (pa_opcodes): Handle PA2.0 fcnv, fcmp and ftest insns.
+
+	* hppa.h (pa_opcodes): Finish support for PA2.0 "b" instructions.
+
+	* hppa.h (pa_opcodes): Handle PA2.0 "bve" instructions.
+
+	* hppa.h (pa_opcodes): Add new syntax "be" instructions.
+
+	* hppa.h (pa_opcodes): Note use of 'M' and 'L'.
+
+	* hppa.h (pa_opcodes): Add support for "b,l".
+
+	* hppa.h (pa_opcodes): Add support for "b,gate".
+
+Sat Sep 18 11:41:16 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Use 'fX' for first register operand
+	in xmpyu.  
+
+	* hppa.h (pa_opcodes): Fix mask for probe and probei.
+
+	* hppa.h (pa_opcodes): Fix mask for depwi.
+
+Tue Sep  7 13:44:25 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Add "addil" variant which has the %r1 as
+	an explicit output argument.
+
+Mon Sep  6 04:41:42 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h: Add strict variants of PA1.0/PA1.1 loads and stores.
+	Add a few PA2.0 loads and store variants.
+
+1999-09-04  Steve Chamberlain  <sac@pobox.com>
+
+	* pj.h: New file.
+
+1999-08-29  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h (i386_regtab): Move %st to top of table, and split off
+	other fp reg entries.
+	(i386_float_regtab): To here.
+
+Sat Aug 28 00:25:25 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+
+	* hppa.h (pa_opcodes): Replace 'f' by 'v'.  Prefix float register args
+	by 'f'.
+
+	* hppa.h (pa_opcodes): Add extrd, extrw, depd, depdi, depw, depwi.
+	Add supporting args.
+
+	* hppa.h:  Document new completers and args.
+	* hppa.h (pa_opcodes):  Add 64 bit patterns and pa2.0 syntax for uxor,
+	uaddcm, dcor, addi, add, sub, subi, shladd, rfi, and probe.  Add pa2.0
+	extensions for ssm, rsm, pdtlb, pitlb.  Add performance instructions
+	pmenb and pmdis.
+
+	* hppa.h (pa_opcodes):  Add pa2.0 instructions hadd, hshl,
+	hshr, hsub, mixh, mixw, permh.
+
+	* hppa.h (pa_opcodes): Change completers in instructions to
+	use 'c' prefix.
+
+	* hppa.h (pa_opcodes):  Add popbts, new forms of bb, havg,
+	hshladd, hshradd, shrpd, and shrpw instructions.  Update arg comments.
+
+	* hppa.h (pa_opcodes):  Change fmpyfadd, fmpynfadd, fneg,
+	fnegabs to use 'I' instead of 'F'.
+
+1999-08-21  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h: Add AMD athlon instructions, pfnacc, pfpnacc, pswapd.
+	Document pf2iw and pi2fw as athlon insns.  Remove pswapw.
+	Alphabetically sort PIII insns.
+
+Wed Aug 18 18:14:40 1999  Doug Evans  <devans@canuck.cygnus.com>
+
+	* cgen.h (CGEN_INSN_MACH_HAS_P): New macro.
+
+Fri Aug  6 09:46:35 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+
+	* hppa.h (pa_opcodes): Add 64 bit versions of or, xor, and,
+	and andcm.  Add 32 and 64 bit version of cmpclr, cmpiclr.
+
+	* hppa.h:  Document 64 bit condition completers.
+
+Thu Aug  5 16:56:07 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+
+	* hppa.h (pa_opcodes): Change condition args to use '?' prefix.
+
+1999-08-04  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h (i386_optab): Add DefaultSize modifier to all insns
+	that implicitly modify %esp.  #undef d_Suf, x_suf, sld_suf,
+	sldx_suf, bwld_Suf, d_FP, x_FP, sld_FP, sldx_FP at end of table.
+
+Wed Jul 28 02:04:24 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+			  Jeff Law <law@cygnus.com>
+
+	* hppa.h (pa_opcodes): Add "pushnom" and "pushbts".
+
+	* hppa.h (pa_opcodes): Mark all PA2.0 opcodes with FLAG_STRICT.
+
+	* hppa.h (pa_opcodes):  Change xmpyu, fmpyfadd, 
+	and fmpynfadd to use 'J' and 'K' instead of 'E' and 'X'.
+
+1999-07-13  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h: Add "undocumented" AMD 3DNow! pf2iw, pi2fw, pswapw insns.
+
+Thu Jul  1 00:17:24 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (struct pa_opcode): Add new field "flags".
+	(FLAGS_STRICT): Define.
+
+Fri Jun 25 04:22:04 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+			  Jeff Law <law@cygnus.com>
+
+	* hppa.h (pa_opcodes): Add pa2.0 clrbts instruction.
+
+	* hppa.h (pa_opcodes): Add entries for mfia and mtsarcm instructions.
+
+1999-06-23  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h: Allow `l' suffix on bswap.  Allow `w' suffix on arpl,
+	lldt, lmsw, ltr, str, verr, verw.  Add FP flag to fcmov*.  Add FP
+	flag to fcomi and friends.
+
+Fri May 28 15:26:11 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Move integer arithmetic instructions after
+	integer logical instructions.  
+
+1999-05-28  Linus Nordberg  <linus.nordberg@canit.se>
+
+	* m68k.h: Document new formats `E', `G', `H' and new places `N',
+	`n', `o'.
+
+	* m68k.h: Define mcf5206e, mcf5307, mcf.  Document new format `u'
+	and new places `m', `M', `h'.
+
+Thu May 27 04:13:54 1999  Joel Sherrill (joel@OARcorp.com
+
+	* hppa.h (pa_opcodes): Add several processor specific system
+	instructions.
+
+Wed May 26 16:57:44 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Add second entry for "comb", "comib", 
+	"addb", and "addib" to be used by the disassembler.
+
+1999-05-12  Alan Modra  <alan@apri.levels.unisa.edu.au>
+
+	* i386.h (ReverseModrm): Remove all occurences.
+	(InvMem): Add to control/debug/test mov insns, movhlps, movlhps,
+	movmskps, pextrw, pmovmskb, maskmovq.
+	Change NoSuf to FP on all MMX, XMM and AMD insns as these all
+	ignore the data size prefix.
+
+	* i386.h (i386_optab, i386_regtab): Add support for PIII SIMD.
+	Mostly stolen from Doug Ledford <dledford@redhat.com>
+
+Sat May  8 23:27:35 1999  Richard Henderson  <rth@cygnus.com>
+
+	* ppc.h (PPC_OPCODE_64_BRIDGE): New.
+
 1999-04-14  Doug Evans  <devans@casey.cygnus.com>
 
 	* cgen.h (CGEN_ATTR): Delete member num_nonbools.

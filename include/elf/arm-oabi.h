@@ -1,5 +1,5 @@
 /* ARM ELF support for BFD.
-   Copyright (C) 1998, 1999 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -29,7 +29,7 @@
 #define EF_APCS_26         0x08
 #define EF_APCS_FLOAT      0x10
 #define EF_PIC             0x20
-#define EF_ALIGN8	   0x40		/* 8-bit structure alignment is in use */
+#define EF_ALIGN8	   0x40		/* 8-bit structure alignment is in use.  */
 #define EF_NEW_ABI         0x80
 #define EF_OLD_ABI         0x100
 
@@ -39,15 +39,16 @@
 #define F_APCS_FLOAT	   EF_APCS_FLOAT
 #define F_PIC              EF_PIC
 
-/* Additional symbol types for Thumb */
-#define STT_ARM_TFUNC     0xd
+/* Additional symbol types for Thumb.  */
+#define STT_ARM_TFUNC      STT_LOPROC   /* A Thumb function.  */
+#define STT_ARM_16BIT      STT_HIPROC   /* A Thumb label.  */
 
-/* ARM-specific values for sh_flags */
-#define SHF_ENTRYSECT      0x10000000   /* Section contains an entry point */
-#define SHF_COMDEF         0x80000000   /* Section may be multiply defined in the input to a link step */
+/* ARM-specific values for sh_flags.  */
+#define SHF_ENTRYSECT      0x10000000   /* Section contains an entry point.  */
+#define SHF_COMDEF         0x80000000   /* Section may be multiply defined in the input to a link step.  */
 
-/* ARM-specific program header flags */
-#define PF_ARM_SB          0x10000000   /* Segment contains the location addressed by the static base */
+/* ARM-specific program header flags.  */
+#define PF_ARM_SB          0x10000000   /* Segment contains the location addressed by the static base.  */
 
 /* Relocation types.  */
 START_RELOC_NUMBERS (elf_arm_reloc_type)
@@ -62,18 +63,18 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   RELOC_NUMBER (R_ARM_THM_PC22,     8)
   RELOC_NUMBER (R_ARM_SBREL32,      9)
   RELOC_NUMBER (R_ARM_AMP_VCALL9,  10)
-  RELOC_NUMBER (R_ARM_THM_PC11,    11)       /* cygnus extension to abi: thumb unconditional branch */
-  RELOC_NUMBER (R_ARM_THM_PC9,     12)       /* cygnus extension to abi: thumb conditional branch */
+  RELOC_NUMBER (R_ARM_THM_PC11,    11)       /* Cygnus extension to abi: Thumb unconditional branch.  */
+  RELOC_NUMBER (R_ARM_THM_PC9,     12)       /* Cygnus extension to abi: Thumb conditional branch.  */
   RELOC_NUMBER (R_ARM_GNU_VTINHERIT, 13)
   RELOC_NUMBER (R_ARM_GNU_VTENTRY, 14)
-  RELOC_NUMBER (R_ARM_COPY,        20)       /* copy symbol at runtime */
-  RELOC_NUMBER (R_ARM_GLOB_DAT,    21)       /* create GOT entry */
-  RELOC_NUMBER (R_ARM_JUMP_SLOT,   22)       /* create PLT entry */
-  RELOC_NUMBER (R_ARM_RELATIVE,    23)       /* adjust by program base */
-  RELOC_NUMBER (R_ARM_GOTOFF,      24)       /* 32 bit offset to GOT */
-  RELOC_NUMBER (R_ARM_GOTPC,       25)       /* 32 bit PC relative offset to GOT */
-  RELOC_NUMBER (R_ARM_GOT32,       26)       /* 32 bit GOT entry */
-  RELOC_NUMBER (R_ARM_PLT32,       27)       /* 32 bit PLT address */
+  RELOC_NUMBER (R_ARM_COPY,        20)       /* Copy symbol at runtime.  */
+  RELOC_NUMBER (R_ARM_GLOB_DAT,    21)       /* Create GOT entry.  */
+  RELOC_NUMBER (R_ARM_JUMP_SLOT,   22)       /* Create PLT entry.  */
+  RELOC_NUMBER (R_ARM_RELATIVE,    23)       /* Adjust by program base.  */
+  RELOC_NUMBER (R_ARM_GOTOFF,      24)       /* 32 bit offset to GOT.  */
+  RELOC_NUMBER (R_ARM_GOTPC,       25)       /* 32 bit PC relative offset to GOT.  */
+  RELOC_NUMBER (R_ARM_GOT32,       26)       /* 32 bit GOT entry.  */
+  RELOC_NUMBER (R_ARM_PLT32,       27)       /* 32 bit PLT address.  */
   FAKE_RELOC   (FIRST_INVALID_RELOC, 28)
   FAKE_RELOC   (LAST_INVALID_RELOC,  249)
   RELOC_NUMBER (R_ARM_RSBREL32,   250)
