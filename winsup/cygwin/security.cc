@@ -174,6 +174,15 @@ lsa2wchar (WCHAR *tgt, LSA_UNICODE_STRING &src, int size)
   tgt[size] = 0;
 }
 
+static void
+lsa2str (char *tgt, LSA_UNICODE_STRING &src, int size)
+{
+  if (src.Length / 2 < size)
+    size = src.Length / 2;
+  sys_wcstombs (tgt, src.Buffer, size);
+  tgt[size] = 0;
+}
+
 static LSA_HANDLE
 open_local_policy ()
 {
@@ -629,8 +638,7 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 	  PTOKEN_PRIVILEGES tmp;
 	  DWORD tmp_count;
 
-	  sys_wcstombs (buf, privstrs[i].Buffer,
-			INTERNET_MAX_HOST_NAME_LENGTH + 1);
+	  lsa2str (buf, privstrs[i], sizeof(buf) - 1);
 	  if (!LookupPrivilegeValue (NULL, buf, &priv))
 	    continue;
 

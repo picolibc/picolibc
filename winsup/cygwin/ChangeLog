@@ -1,3 +1,8 @@
+2002-05-24  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (lsa2str): New function.
+	(get_priv_list): Call lsa2str instead of sys_wcstombs.
+
 2002-05-22  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* syscalls.cc (seteuid): Do not take allow_ntsec into account.
