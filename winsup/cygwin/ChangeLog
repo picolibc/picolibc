@@ -1,3 +1,7 @@
+Wed Feb 23 22:51:27 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Fix final round of gcc warnings relating to unused parameters. 
+
 Wed Feb 23 21:59:44 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* hinfo.cc (hinfo::extend): Clean up debugging output.

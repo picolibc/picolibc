@@ -573,7 +573,7 @@ __pthread_attr_getstacksize (pthread_attr_t * attr, size_t * size)
 };
 
 int
-__pthread_attr_destroy (pthread_attr_t * attr)
+__pthread_attr_destroy (pthread_attr_t * /*attr*/)
 {
   return 0;
 };
@@ -673,23 +673,23 @@ __pthread_getsequence_np (pthread_t * thread)
 
 /* Thread SpecificData */
 int
-__pthread_key_create (pthread_key_t * key)
+__pthread_key_create (pthread_key_t */*key*/)
 {
   NOT_IMP ("_p_key_create\n");
 };
 
 int
-__pthread_key_delete (pthread_key_t * key)
+__pthread_key_delete (pthread_key_t */*key*/)
 {
   NOT_IMP ("_p_key_delete\n");
 };
 int
-__pthread_setspecific (pthread_key_t * key, const void *value)
+__pthread_setspecific (pthread_key_t */*key*/, const void */*value*/)
 {
   NOT_IMP ("_p_key_setsp\n");
 };
 void *
-__pthread_getspecific (pthread_key_t * key)
+__pthread_getspecific (pthread_key_t */*key*/)
 {
   NOT_IMP ("_p_key_getsp\n");
 };
@@ -754,7 +754,7 @@ __pthread_equal (pthread_t * t1, pthread_t * t2)
 /* Mutexes  */
 
 int
-__pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * _attr)
+__pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t */*_attr*/)
 {
   SetResourceLock (LOCK_MUTEX_LIST, WRITE_LOCK | READ_LOCK, "__pthread_mutex_init");
 
