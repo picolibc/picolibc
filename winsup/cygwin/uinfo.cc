@@ -48,9 +48,9 @@ internal_getlogin (struct pinfo *pi)
             {
               LPWSTR logon_srv = NULL;
 
-              if (!NetGetAnyDCName (NULL,
-                                    ui->wkui1_logon_domain,
-                                    (LPBYTE *)&logon_srv))
+              if (!NetGetDCName (NULL,
+                                 ui->wkui1_logon_domain,
+                                 (LPBYTE *)&logon_srv))
                 wcstombs (pi->logsrv,
                           logon_srv, // filter leading double backslashes
                           (wcslen (logon_srv) + 1) * sizeof (WCHAR));
@@ -195,6 +195,6 @@ LoadDLLinitfunc (netapi32)
 }
 LoadDLLinit (netapi32)
 LoadDLLfunc (NetWkstaUserGetInfo, NetWkstaUserGetInfo@12, netapi32)
-LoadDLLfunc (NetGetAnyDCName, NetGetAnyDCName@12, netapi32)
+LoadDLLfunc (NetGetDCName, NetGetDCName@12, netapi32)
 LoadDLLfunc (NetApiBufferFree, NetApiBufferFree@4, netapi32)
 

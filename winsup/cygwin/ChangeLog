@@ -1,3 +1,8 @@
+Wed Apr 19 22:00:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * uinfo.cc (internal_getlogin): Use NetGetDCName() instead
+        of NetGetAnyDCName().
+
 Mon Apr 17 12:08:47 2000  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* syscalls.cc (_rename): Try MoveFile() at first before
