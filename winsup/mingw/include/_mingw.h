@@ -71,7 +71,11 @@
 
 /*  ISO C++.  */
 #ifndef __HAVE_STD_CXX
+#if  __GNUC__ >= 3 && __GNUC_MINOR__ >= 3
 #define __HAVE_STD_CXX 1
+#else
+#define __HAVE_STD_CXX 0
+#endif
 #endif
 
 #ifdef __cplusplus
