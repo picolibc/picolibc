@@ -1,3 +1,8 @@
+2003-05-08  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* cygwin-ug-net.in.sgml: Remove outdated revision information and 
+	author's names.
+
 2003-04-26  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* gcc.sgml: Remove outdated "WinMainCRTStartup" references. Add a
