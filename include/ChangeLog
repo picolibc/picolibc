@@ -1,3 +1,7 @@
+2000-01-27  Nick Clifton  <nickc@redhat.com>
+
+	* dis-asm.h: Add prototype for disassembler_usage().
+
 1999-12-15  Doug Evans  <dje@transmeta.com>
 
 	* dis-asm.h: Enclose in extern "C" ifdef __cplusplus.

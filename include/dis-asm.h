@@ -194,6 +194,9 @@ extern int arm_toggle_regnames          PARAMS ((void));
 /* Fetch the disassembler for a given BFD, if that support is available.  */
 extern disassembler_ftype disassembler	PARAMS ((bfd *));
 
+/* Document any target specific options available from the disassembler.  */
+extern void disassembler_usage          PARAMS ((FILE *));
+
 
 /* This block of definitions is for particular callers who read instructions
    into a buffer before calling the instruction decoder.  */
