@@ -1,3 +1,8 @@
+2002-07-16  Chris Demetriou  <cgd@broadcom.com>
+
+	* config.guess: Update to 2002-07-09 version.
+	* config.sub: Update to 2002-07-03 version.
+
 2002-07-11  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in: Remove two redundant tests.
