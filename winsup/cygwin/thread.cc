@@ -1680,7 +1680,7 @@ semaphore::semaphore (const char *sem_name, int oflag, mode_t mode,
 	set_security_attribute (mode, &sa, alloca (4096), 4096);
       this->win32_obj_id = ::CreateSemaphore (&sa, value, LONG_MAX, sem_name);
       if (!this->win32_obj_id)
-        magic = 0;
+	magic = 0;
       if (GetLastError () == ERROR_ALREADY_EXISTS && (oflag & O_EXCL))
 	{
 	  __seterrno ();
@@ -1708,7 +1708,7 @@ semaphore::semaphore (const char *sem_name, int oflag, mode_t mode,
 	  magic = 0;
 	}
       else
-        strcpy (name, sem_name);
+	strcpy (name, sem_name);
     }
 
   semaphores.insert (this);
@@ -1746,7 +1746,7 @@ semaphore::_getvalue (int *sval)
 	*sval = 0;
 	break;
       default:
-        set_errno (EAGAIN);
+	set_errno (EAGAIN);
 	return -1;
     }
   return 0;
@@ -1776,9 +1776,9 @@ semaphore::_timedwait (const struct timespec *abstime)
   if (__check_invalid_read_ptr (abstime, sizeof *abstime))
     {
       /* According to SUSv3, abstime need not be checked for validity,
-         if the semaphore can be locked immediately. */
+	 if the semaphore can be locked immediately. */
       if (!_trywait ())
-        return 0;
+	return 0;
       set_errno (EINVAL);
       return -1;
     }
