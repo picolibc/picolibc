@@ -1,4 +1,13 @@
 
+Fri Feb  2 13:08:09  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/winnt.h: (__TEXT): Add private macro.
+	(_TEXT): Modify definition to use __TEXT.
+	(_T): Ditto.
+	This change allows the passing of a MACRO as an argument and have that
+	MACRO resolved first.
+	Thanks to: Eric PAIRE <eric.paire@ri.silicomp.com>
+
 Wed Jan 31 17:35:59  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* Makefile.in: Increment VERSION to 0.5

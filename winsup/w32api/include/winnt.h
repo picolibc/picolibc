@@ -69,7 +69,7 @@ typedef CHAR *PCHAR,*LPCH,*PCH,*NPSTR,*LPSTR,*PSTR;
 typedef CONST CHAR *LPCCH,*PCSTR,*LPCSTR;
 #ifndef _TCHAR_DEFINED
 #define _TCHAR_DEFINED
-#ifdef UNICODE
+#ifdef _UNICODE
 typedef WCHAR TCHAR;
 #else
 typedef CHAR TCHAR;
@@ -78,14 +78,27 @@ typedef CHAR TCHAR;
 typedef TCHAR TBYTE,*PTCH,*PTBYTE;
 typedef TCHAR *LPTCH,*PTSTR,*LPTSTR,*LP,*PTCHAR;
 typedef const TCHAR *LPCTSTR;
-#ifdef UNICODE
-#define _TEXT(q) L##q
+#ifdef _UNICODE
+/*
+ * __TEXT is a private macro whose specific use is to force the expansion of a
+ * macro passed as an argument to the macros _T or _TEXT.  DO NOT use this
+ * macro within your programs.  It's name and function could change without
+ * notice.
+ */
+#undef __TEXT
+#define __TEXT(q) L##q
 #else
-#define _TEXT(q) q
+#undef __TEXT
+#define __TEXT(q) q
 #endif
-#ifndef _T
-#define _T _TEXT
-#endif
+/*
+ * UNICODE a constant string when _UNICODE is defined else returns the string
+ * unmodified.  Also defined in mingw/tchar.h.
+ */
+#undef _TEXT
+#define _TEXT(q) __TEXT(q)
+#undef _T
+#define _T(q) __TEXT(q)
 typedef SHORT *PSHORT;
 typedef LONG *PLONG;
 typedef void *HANDLE;
