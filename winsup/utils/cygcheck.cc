@@ -1160,7 +1160,7 @@ dump_sysinfo ()
   SetErrorMode (prev_mode);
   if (givehelp)
     {
-      puts (
+      puts ("\n"
 	  "fd = floppy,          hd = hard drive,       cd = CD-ROM\n"
 	  "net= Network Share,   ram= RAM drive,        unk= Unknown\n"
 	  "CP = Case Preserving, CS = Case Sensitive,   UN = Unicode\n"
