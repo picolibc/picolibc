@@ -1,5 +1,9 @@
 2003-07-02  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/sys/types.h (int8_t): Make signed.
+
+2003-07-02  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/include/mqueue.h: Add include of <sys/fcntl.h>.
 
 2003-06-27  Jose Goncalves  <jose.goncalves@inov.pt>
