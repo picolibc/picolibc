@@ -83,10 +83,11 @@ internal_getlogin (cygheap_user &user)
 	  if (gsid.getfromgr (internal_getgrgid (pw->pw_gid)))
 	    {
 	      /* Set primary group to the group in /etc/passwd. */
-	      user.groups.pgsid = gsid;
 	      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
 					&gsid, sizeof gsid))
 		debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
+	      else
+		user.groups.pgsid = gsid;
 	    }
 	  else
 	    debug_printf ("gsid not found in augmented /etc/group");

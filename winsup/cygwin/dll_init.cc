@@ -304,8 +304,16 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
 	 the parent had some of those. */
       if (d.type == DLL_LOAD)
 	{
+	  bool unload = true;
 	  HMODULE h = LoadLibraryEx (d.name, NULL, DONT_RESOLVE_DLL_REFERENCES);
 
+	  if (!h)
+	    {
+	      unload = false;
+	      LoadLibrary (d.name);
+	    }
+	  if (!h)
+	    system_printf ("can't reload %s", d.name);
 	  /* See if DLL will load in proper place.  If so, free it and reload
 	     it the right way.
 	     It sort of stinks that we can't invert the order of the FreeLibrary
@@ -313,10 +321,13 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
 	     should do what we want.  However, since the library was loaded above,
 	     the second LoadLibrary does not execute it's startup code unless it
 	     is first unloaded. */
-	  if (h == d.handle)
+	  else if (h == d.handle)
 	    {
-	      FreeLibrary (h);
-	      LoadLibrary (d.name);
+	      if (unload)
+		{
+		  FreeLibrary (h);
+		  LoadLibrary (d.name);
+		}
 	    }
 	  else if (try2)
 	    api_fatal ("unable to remap %s to same address as parent(%p) != %p",
