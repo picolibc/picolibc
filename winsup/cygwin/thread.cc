@@ -324,8 +324,9 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   precreate (newattr);
   if (!magic)
     return;
-   function = func;
-   arg = threadarg;
+
+  function = func;
+  arg = threadarg;
 
   win32_obj_id = ::CreateThread (&sec_none_nih, attr.stacksize,
 				(LPTHREAD_START_ROUTINE) thread_init_wrapper,
