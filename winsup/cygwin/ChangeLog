@@ -1,3 +1,9 @@
+2000-05-12  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/cygwin/in.h (struct in6_addr): Fix spelling.
+	* include/cygwin/socket.h (AF_INET6, PF_INET6): Define macros.
+	(AF_MAX, PF_MAX): Bump to 32 to leave room for future expansion.
+
 Fri May 12 21:35:54 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (build_argv): Remove unneeded variable.

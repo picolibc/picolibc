@@ -66,8 +66,9 @@ struct msghdr
 #define AF_HYLINK       15              /* NSC Hyperchannel */
 #define AF_APPLETALK    16              /* AppleTalk */
 #define AF_NETBIOS      17              /* NetBios-style addresses */
+#define AF_INET6        18              /* IP version 6 */
 
-#define AF_MAX          18
+#define AF_MAX          32
 /*
  * Protocol families, same as address families for now.
  */
@@ -91,6 +92,7 @@ struct msghdr
 #define PF_HYLINK       AF_HYLINK
 #define PF_APPLETALK    AF_APPLETALK
 #define PF_NETBIOS      AF_NETBIOS
+#define PF_INET6        AF_INET6
 
 #define PF_MAX          AF_MAX
 

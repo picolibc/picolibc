@@ -172,7 +172,7 @@ struct sockaddr_in {
  *	a beginning dont get excited 8)
  */
  
-struct in_addr6
+struct in6_addr
 {
 	unsigned char s6_addr[16];
 };
