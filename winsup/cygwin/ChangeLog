@@ -1,5 +1,10 @@
 2003-09-07  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/in.h: Don't define ipv6 stuff unless we call for it
+	specifically since it isn't really implemented yet.
+
+2003-09-07  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (_csbrk): More left coercion cleanup.
 	* fhandler_tty.cc (fhandler_tty_slave::read): Ditto.
 	(fhandler_tty_slave::write): Ditto.
