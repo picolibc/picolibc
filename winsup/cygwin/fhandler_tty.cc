@@ -418,6 +418,7 @@ fhandler_tty_slave::fhandler_tty_slave (int num)
 fhandler_tty_slave::fhandler_tty_slave ()
   : fhandler_tty_common (FH_TTYS, 0)
 {
+  set_r_no_interrupt (1);
 }
 
 /* FIXME: This function needs to close handles when it has

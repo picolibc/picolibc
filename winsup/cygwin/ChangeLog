@@ -3,8 +3,10 @@
 	(inspired by a patch from Egor Duda)
 	* select.cc (fhandler_tty_slave::ready_for_read): Remove.
 	* fhandler.h (fhandler_tty_slave::ready_for_read): Remove declaration.
-	* fhandler_tty.cc (fhandler_tty_slave::read): Don't do anything special
-	with vtime when vmin == 0.
+	* fhandler_tty.cc (fhandler_tty_slave::fhandler_tty_slave): Set "don't
+	need ready for read" flag.
+	(fhandler_tty_slave::read): Don't do anything special with vtime when
+	vmin == 0.
 
 2002-07-25  Egor Duda  <deo@logos-m.ru>
 
