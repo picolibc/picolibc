@@ -1,3 +1,7 @@
+2002-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h: Bump API minor version to 51.
+
 2002-01-19  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
 
         * cygwin.din: Add recvmsg and sendmsg.

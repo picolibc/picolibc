@@ -148,12 +148,13 @@ details. */
        48: Export "posix" regex functions
        49: Export setutent, endutent, utmpname, getutent, getutid, getutline.
        50: Export fnmatch.
+       51: Export recvmsg, sendmsg.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 50
+#define CYGWIN_VERSION_API_MINOR 51
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
