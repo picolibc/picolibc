@@ -1255,6 +1255,8 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
       else
 	{
 	  fhandler_socket* res_fh = fdsock (res_fd, sock->get_name (), res);
+	  if (sock->get_addr_family () == AF_LOCAL)
+	    res_fh->set_sun_path (sock->get_sun_path ());
 	  res_fh->set_addr_family (sock->get_addr_family ());
 	  res = res_fd;
 	}
