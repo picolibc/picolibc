@@ -190,13 +190,13 @@ find_on_path (char *file, char *default_extension,
 
   if (!file)
     {
-      display_error ("find_on_path: NULL pointer for file");
+      display_error ("find_on_path: NULL pointer for file", false, false);
       return 0;
     }
 
   if (default_extension == NULL)
     {
-      display_error ("find_on_path: NULL pointer for default_extension");
+      display_error ("find_on_path: NULL pointer for default_extension", false, false);
       return 0;
     }
 
@@ -305,7 +305,7 @@ rva_to_offset (int rva, char *sections, int nsections, int *sz)
 
   if (sections == NULL)
     {
-      display_error ("rva_to_offset: NULL passed for sections");
+      display_error ("rva_to_offset: NULL passed for sections", true, false);
       return 0;
     }
 
@@ -437,7 +437,7 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 
   if (path == NULL)
     {
-      display_error ("dll_info: NULL passed for path");
+      display_error ("dll_info: NULL passed for path", true, false);
       return;
     }
 
@@ -542,13 +542,13 @@ track_down (char *file, char *suffix, int lvl)
 {
   if (file == NULL)
     {
-      display_error ("track_down: NULL passed for file");
+      display_error ("track_down: NULL passed for file", true, false);
       return;
     }
 
   if (suffix == NULL)
     {
-      display_error ("track_down: NULL passed for suffix");
+      display_error ("track_down: NULL passed for suffix", false, false);
       return;
     }
 

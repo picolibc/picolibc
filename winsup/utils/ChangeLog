@@ -1,3 +1,11 @@
+2004-11-16  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* cygcheck.cc (find_on_path): Clear show_error and/or print_failed
+	parameters to display_error.
+	(rva_to_offset): Ditto.
+	(dll_info): Ditto.
+	(track_down): Ditto.
+
 2004-11-13  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* kill.cc (forcekill): Do not pass negative pids to 
