@@ -120,7 +120,6 @@ _DEFUN (_wctype_r, (r, c),
       if (!strcmp (c, "xdigit"))
         return WC_XDIGIT;
       break;
-    default:
     }
 
   /* otherwise invalid */
