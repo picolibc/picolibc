@@ -1,3 +1,8 @@
+2005-03-06  Christopher Faylor  <cgf@timesys.com>
+
+	* cygpath.cc (usage): Pass in one more copy of program_name to printf
+	to avoid a SEGV.
+
 2005-02-27  Christopher Faylor  <cgf@timesys.com>
 
 	* regtool.cc (opts): The argument to 'K' is not optional.
