@@ -1,8 +1,10 @@
 @chapter Known/potential Problems in the Latest Net Release
 
-@section Aware of the problem, no solution yet found.
+@section Aware of the problem, no solution known.
 
 @subsection On Win9x, scp and cvs/ssh leave ssh processes running
+
+For now you'll just have to kill them manually.
 
 This is a difficult problem, related to the implementation of select()
 and pipes on Windows 9x.  It has been discussed at length on the cygwin
@@ -10,7 +12,11 @@ mailing list.  For an excellent technical description of the problem, see
 @file{http://sources.redhat.com/ml/cygwin/2000-12/msg00470.html}, and
 related threads.
 
-For now you'll just have to kill them manually.
+@subsection Cannot access tape devices with mt on Win9x
+
+Win9x does not support the API used by the Cygwin fhandler_dev_tape
+class.  Details at
+@file{http://sources.redhat.com/ml/cygwin/2000-12/msg00331.html}.
 
 @section Fixed in the Next Release
 
