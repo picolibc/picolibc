@@ -92,7 +92,7 @@ public:
 
   /* Non-zero if process was stopped by a signal. */
   char stopsig;
-  
+
   /* commune */
   pid_t hello_pid;
   HANDLE tothem;

@@ -521,6 +521,8 @@ fdsock (int &fd, const char *name, SOCKET soc)
 		  winsock2_active);
   fhandler_socket *fh =
     (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
+  if (!fh)
+    return NULL;
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR | O_BINARY);
   fh->set_r_no_interrupt (winsock2_active);
@@ -558,12 +560,17 @@ cygwin_socket (int af, int type, int protocol)
 	name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
 
       fh = fdsock (fd, name, soc);
-      if (fh)
+      if (!fh)
+	{
+	  closesocket (soc);
+	  res = -1;
+	}
+      else
 	{
 	  fh->set_addr_family (af);
 	  fh->set_socket_type (type);
+	  res = fd;
 	}
-      res = fd;
     }
 
 done:

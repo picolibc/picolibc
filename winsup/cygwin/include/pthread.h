@@ -103,7 +103,7 @@ void pthread_cleanup_push (void (*routine)(void*), void *arg);
 void pthread_cleanup_pop (int execute);
 */
 typedef void (*__cleanup_routine_type) (void *);
-typedef struct _pthread_cleanup_handler 
+typedef struct _pthread_cleanup_handler
 {
   __cleanup_routine_type function;
   void *arg;

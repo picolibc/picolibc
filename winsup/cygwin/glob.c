@@ -833,7 +833,7 @@ g_lstat(fn, sb, pglob)
 {
 	/* FIXME: This only works as long as the application uses the old
 	   struct stat with 32 bit off_t types!!!
-	   
+
 	   As soon as we switch over to 64 bit, we have to decide by
 	   the applications API minor version number, whether to use
 	   a pointer to a __stat64 or a _stat32 struct to the
@@ -867,7 +867,7 @@ g_stat(fn, sb, pglob)
 {
 	/* FIXME: This only works as long as the application uses the old
 	   struct stat with 32 bit off_t types!!!
-	   
+
 	   As soon as we switch over to 64 bit, we have to decide by
 	   the applications API minor version number, whether to use
 	   a pointer to a __stat64 or a _stat32 struct to the

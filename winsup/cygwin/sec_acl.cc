@@ -313,7 +313,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
       for (i = 0; i < acl->AceCount; ++i)
 	{
 	  ACCESS_ALLOWED_ACE *ace;
-	  
+
 	  if (!GetAce (acl, i, (PVOID *) &ace))
 	    continue;
 
@@ -367,7 +367,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
 	    }
 	}
       /* Include DEF_CLASS_OBJ if any default ace exists */
-      if ((types_def & (USER|GROUP)) 
+      if ((types_def & (USER|GROUP))
 	  && ((pos = searchace (lacl, MAX_ACL_ENTRIES, DEF_CLASS_OBJ)) >= 0))
 	{
 	  lacl[pos].a_type = DEF_CLASS_OBJ;
@@ -378,7 +378,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
   if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
     pos = MAX_ACL_ENTRIES;
   if (aclbufp) {
-    if (EqualSid (owner_sid, group_sid)) 
+    if (EqualSid (owner_sid, group_sid))
       lacl[0].a_perm = lacl[1].a_perm;
     if (pos > nentries)
       {

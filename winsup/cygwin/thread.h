@@ -527,7 +527,6 @@ public:
   }
 };
 
- 
 #define MT_INTERFACE user_data->threadinterface
 
 extern "C"

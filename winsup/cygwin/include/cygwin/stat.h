@@ -60,7 +60,7 @@ extern int lstat64 (const char *file_name, struct __stat64 *buf);
 #endif
 
 struct stat
-{ 
+{
   dev_t         st_dev;
   ino_t         st_ino;
   mode_t        st_mode;

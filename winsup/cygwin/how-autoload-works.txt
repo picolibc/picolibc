@@ -55,12 +55,12 @@ function that was not used there before, you should add a stub so it
 will be autoloaded.  To do so, add one of the LoadDllfunc* macros to
 autoload.cc.  All macros eventually resolve to the following form:
 
-LoadDLLfuncEx2 (function name, parameter block length, dll name, 
+LoadDLLfuncEx2 (function name, parameter block length, dll name,
                 non-fatality flag , value to return if function not available)
 
-Parameter block length is a sum of sizes (in bytes) of parameters which are 
-being passed to the function. If non-fatality flag is set to 0, then failure 
-to load dll and find a function will cause fatal error. If non fatality flag 
+Parameter block length is a sum of sizes (in bytes) of parameters which are
+being passed to the function. If non-fatality flag is set to 0, then failure
+to load dll and find a function will cause fatal error. If non fatality flag
 is set to 1, then call to the function will return default value.
 You can also use shorter versions -- LoadDLLfuncEx and LoadDLLfunc, if the
 defaults they provide suit your needs.
