@@ -1,3 +1,7 @@
+Wed Mar  7 16:02:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/sys/config.h: Use ssize_t for read/write declarations.
+
 Mon Mar  5 21:48:54 2001  J"orn Rennecke <amylaar@redhat.com>
 
         * libc/include/sys/config.h (_READ_WRITE_RETURN_TYPE): Define.
