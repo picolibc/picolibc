@@ -1,3 +1,8 @@
+2002-10-01  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* src-release: New file.  Contains material for making net
+	releases for gdb, binutils, et al., formerly in Makefile.in.
+
 2002-09-30  Nick Clifton  <nickc@redhat.com>
 
 	* cpu: New top level directory.  Intended to hold input files for
