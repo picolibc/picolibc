@@ -125,6 +125,45 @@
 #undef  FILNMLEN
 #define FILNMLEN	18	/* # characters in a file name.  */
 
+struct external_PEI_DOS_hdr
+{
+  /* DOS header fields - always at offset zero in the EXE file.  */
+  char e_magic[2];		/* Magic number, 0x5a4d.  */
+  char e_cblp[2];		/* Bytes on last page of file, 0x90.  */
+  char e_cp[2];			/* Pages in file, 0x3.  */
+  char e_crlc[2];		/* Relocations, 0x0.  */
+  char e_cparhdr[2];		/* Size of header in paragraphs, 0x4.  */
+  char e_minalloc[2];		/* Minimum extra paragraphs needed, 0x0.  */
+  char e_maxalloc[2];		/* Maximum extra paragraphs needed, 0xFFFF.  */
+  char e_ss[2];			/* Initial (relative) SS value, 0x0.  */
+  char e_sp[2];			/* Initial SP value, 0xb8.  */
+  char e_csum[2];		/* Checksum, 0x0.  */
+  char e_ip[2];			/* Initial IP value, 0x0.  */
+  char e_cs[2];			/* Initial (relative) CS value, 0x0.  */
+  char e_lfarlc[2];		/* File address of relocation table, 0x40.  */
+  char e_ovno[2];		/* Overlay number, 0x0.  */
+  char e_res[4][2];		/* Reserved words, all 0x0.  */
+  char e_oemid[2];		/* OEM identifier (for e_oeminfo), 0x0.  */
+  char e_oeminfo[2];		/* OEM information; e_oemid specific, 0x0.  */
+  char e_res2[10][2];		/* Reserved words, all 0x0.  */
+  char e_lfanew[4];		/* File address of new exe header, usually 0x80.  */
+  char dos_message[16][4];	/* Other stuff, always follow DOS header.  */
+};
+
+struct external_PEI_IMAGE_hdr
+{
+  char nt_signature[4];		/* required NT signature, 0x4550.  */
+
+  /* From standard header.  */
+  char f_magic[2];		/* Magic number.		*/
+  char f_nscns[2];		/* Number of sections.		*/
+  char f_timdat[4];		/* Time & date stamp.		*/
+  char f_symptr[4];		/* File pointer to symtab.	*/
+  char f_nsyms[4];		/* Number of symtab entries.	*/
+  char f_opthdr[2];		/* Sizeof(optional hdr).	*/
+  char f_flags[2];		/* Flags.			*/
+};
+
 struct external_PEI_filehdr
 {
   /* DOS header fields - always at offset zero in the EXE file.  */
