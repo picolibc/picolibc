@@ -1,3 +1,37 @@
+2003-11-06  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (R_PPC_RELAX32PC): Define.
+
+2003-10-22  Alexandre Oliva  <aoliva@redhat.com>,
+	    Michael Snyder  <msnyder@redhat.com>
+
+	* sh.h (EF_SH4A, EF_SH4AL_DSP, EF_SH4_NOFPU, EF_SH4A_NOFPU): New.
+	(EF_SH_MERGE_MACH): Combine them.
+
+2003-10-18  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* mmix.h (R_MMIX_PUSHJ_STUBBABLE): New reloc number.
+	(_bfd_mmix_before_linker_allocation): Rename from
+	_bfd_mmix_prepare_linker_allocated_gregs.
+	(_bfd_mmix_after_linker_allocation): Rename from
+	_bfd_mmix_finalize_linker_allocated_gregs.
+
+2003-10-06  Dave Brolley  <brolley@redhat.com>
+
+	* frv.h (EF_FRV_CPU_FR550): New macro.
+
+2003-09-30  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (E_MIPS_ARCH_64R2): New define.
+
+2003-09-23  DJ Delorie  <dj@redhat.com>
+
+	* sh.h (R_SH_SWITCH8, R_SH_GNU_VTINHERIT, R_SH_GNU_VTENTRY,
+	R_SH_LOOP_START,R_SH_LOOP_END): Move to "reserved" spaces.
+	(R_SH_DIR16, R_SH_DIR8, R_SH_DIR8UL, R_SH_DIR8UW, R_SH_DIR8U,
+	R_SH_DIR8SW, R_SH_DIR8S, R_SH_DIR4UL, R_SH_DIR4UW, R_SH_DIR4U,
+	R_SH_PSHA, R_SH_PSHL): New.
+
 2003-09-11  James Cownie <jcownie@etnus.com>
 
 	* dwarf2.h: Add HP dwarf extensions from their hacked gdb
@@ -10,9 +44,9 @@
 2003-08-21  James Cownie <jcownie@etnus.com>
 
 	* dwarf2.h: Add PGI dwarf extensions.
-	
+
 2003-08-08 Dmitry Diky <diwil@mail.ru>
-	
+
 	* msp430.h: Add xW42 and xE42 parts. Sort MPU list according to
 	gcc order.
 
@@ -74,7 +108,7 @@
 2003-06-03  Nick Clifton  <nickc@redhat.com>
 
 	* v850.h (R_V850_32): Rename to R_V850_ABS32.
-        Add R_V850_REL32.
+	Add R_V850_REL32.
 
 2003-05-15  Roland McGrath  <roland@redhat.com>
 
@@ -105,8 +139,8 @@
 
 2003-04-01  Bob Wilson  <bob.wilson@acm.org>
 
-        * elf/common.h (EM_XTENSA_OLD): Define.
-        * elf/xtensa.h: New file.
+	* elf/common.h (EM_XTENSA_OLD): Define.
+	* elf/xtensa.h: New file.
 
 2003-04-01  Nick Clifton  <nickc@redhat.com>
 

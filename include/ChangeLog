@@ -1,8 +1,53 @@
+2003-11-06  Bruno Rohee  <bruno@rohee.com>
+
+	* hp-symtab.h: Fix "the the" typo.
+
+2003-10-24  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bfdlink.h (bfd_elf_version_expr): Add "symbol" and remove
+	"wildcard".
+
+2003-10-22  Joseph S. Myers  <jsm@polyomino.org.uk>
+
+	* obstack.h: Merge the following change from gnulib:
+	2003-10-21  Paul Eggert  <eggert@twinsun.com>
+	* obstack.h (obstack_1grow_fast): Properly parenthesize arg.
+	(obstack_ptr_grow_fast, obstack_int_grow_fast):
+	Don't use lvalue casts, as GCC plans to remove support for them
+	in GCC 3.5.  Reported by Joseph S. Myers.  This bug
+	was also present in the non-GCC version, indicating that this
+	code had always been buggy and had never been widely used.
+	(obstack_1grow, obstack_ptr_grow, obstack_int_grow, obstack_blank):
+	Use the fast variant of each macro, rather than copying the
+	definiens of the fast variant; that way, we'll be more likely to
+	catch future bugs in the fast variants.
+
+2003-10-22  Jakub Jelinek  <jakub@redhat.com>
+
+	* bfdlink.h (struct bfd_elf_version_expr): Remove match field.
+	Add wildcard and mask fields.
+	(BFD_ELF_VERSION_C_TYPE): Define.
+	(BFD_ELF_VERSION_CXX_TYPE): Likewise.
+	(BFD_ELF_VERSION_JAVA_TYPE): Likewise.
+	(struct bfd_elf_version_expr_head): New.
+	(struct bfd_elf_version_tree): Add match field.
+	Change type of globals and locals fields
+	to struct bfd_elf_version_expr_head.
+
+2003-10-14  Bob Wilson  <bob.wilson@acm.org>
+
+	* elf/xtensa.h: Formatting.  Fix comments about property section
+	names for linkonce sections.
+
+2003-09-22  Andrew Cagney  <cagney@redhat.com>
+
+	* floatformat.h (struct floatformat): Add field "is_valid".
+
 2003-09-15  Andrew Cagney  <cagney@redhat.com>
 
 	* floatformat.h (floatformat_to_double): Make input buffer constant.
 	(floatformat_from_double, floatformat_is_valid): Ditto.
-	
+
 2003-09-15  Andrew Cagney  <cagney@redhat.com>
 
 	* floatformat.h (struct floatformat): Make "exp_bias" signed.
