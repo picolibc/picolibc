@@ -1,3 +1,7 @@
+Wed Nov 22 11:18:02 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: new-temp.a -> new-templib.a
+
 Mon Nov 20 17:04:43 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* spawn.cc (spawn_guts): Quoting was still wrong.  Keep trying to

@@ -185,7 +185,7 @@ $(LIB_NAME): $(DEF_FILE) $(LIBCOS)
 # Otherwise dlltool gets confused. cgf (11-16-2000)
 new-$(LIB_NAME): $(LIB_NAME)
 	$(DLLTOOL) --as=$(AS) --dllname new-$(DLL_NAME) --def $(DEF_FILE) --output-lib new-templib.a
-	$(AR) rcv new-temp.a $(LIBCOS)
+	$(AR) rcv new-templib.a $(LIBCOS)
 	mv new-templib.a new-$(LIB_NAME)
 
 # Rule to build cygwin.dll
