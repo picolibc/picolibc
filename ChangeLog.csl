@@ -1,3 +1,27 @@
+2005-03-30  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/Makefile.in (arm-linux-nat.o): Update dependencies.
+	* gdb/arm-linux-nat.c: Include "gdb_assert.h".
+	(PTRACE_GETWMMXREGS, PTRACE_SETWMMXREGS): Define.
+	(arm_linux_has_wmmx_registers): New flag.
+	(GET_THREAD_ID): Remove stray punctuation.
+	(IWMMXT_REGS_SIZE): Define.
+	(fetch_wmmx_regs, store_wmmx_regs): New functions.
+	(fetch_inferior_registers, store_inferior_registers): Call them.
+	(arm_linux_available_registers): New function.
+	* gdb/inftarg.c (child_xfer_partial): Handle
+	TARGET_OBJECT_AVAILABLE_REGISTERS.
+	* gdb/config/arm/nm-linux.h (arm_linux_available_registers): Add
+	prototype.
+	(NATIVE_XFER_AVAILABLE_REGISTERS): Define.
+
+	* gdb/gdbserver/linux-arm-low.c (arm_fill_wmmxregset)
+	(arm_store_wmmxregset): Remove stray text.
+	(arm_available_registers): Remove debugging output.  Use hex.
+	* gdb/gdbserver/regcache.c (num_registers): Make global. 
+	* gdb/gdbserver/server.c (handle_p_packet, handle_P_packet): Check
+	the value of regnum.
+
 2005-03-28  Paul Brook  <paul@codesourcery.com>
 	Daniel Jacobowitz  <dan@codesourcery.com>
 
