@@ -895,14 +895,20 @@ ctrl_c_handler (DWORD type)
   if (type == CTRL_LOGOFF_EVENT)
     return TRUE;
 
-  if ((type == CTRL_CLOSE_EVENT) || (type == CTRL_SHUTDOWN_EVENT))
-    /* Return FALSE to prevent an "End task" dialog box from appearing
-       for each Cygwin process window that's open when the computer
-       is shut down or console window is closed. */
+  /* Return FALSE to prevent an "End task" dialog box from appearing
+     for each Cygwin process window that's open when the computer
+     is shut down or console window is closed. */
+  if (type == CTRL_SHUTDOWN_EVENT)
+    {
+      sig_send (NULL, SIGTERM);
+      return FALSE;
+    }
+  if (type == CTRL_CLOSE_EVENT)
     {
       sig_send (NULL, SIGHUP);
       return FALSE;
     }
+
   tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);
   /* Ignore this if we're not the process group lead since it should be handled
      *by* the process group leader. */

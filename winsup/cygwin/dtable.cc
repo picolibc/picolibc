@@ -1,6 +1,6 @@
 /* dtable.cc: file descriptor support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Cygnus Solutions.
 
 This file is part of Cygwin.
 
@@ -49,6 +49,13 @@ set_std_handle (int fd)
     SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_handle ());
   else if (fd <= 2)
     SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_output_handle ());
+}
+
+void
+dtable::dec_console_fds ()
+{
+  if (console_fds > 0 && !--console_fds && myself->ctty != TTY_CONSOLE)
+    FreeConsole ();
 }
 
 int
@@ -146,8 +153,13 @@ dtable::release (int fd)
 {
   if (!not_open (fd))
     {
-      if ((fds[fd]->get_device () & FH_DEVMASK) == FH_SOCKET)
-        dec_need_fixup_before ();
+      switch (fds[fd]->get_device ())
+	{
+	case FH_SOCKET:
+	  dec_need_fixup_before ();
+	case FH_CONSOLE:
+	  dec_console_fds ();
+	}
       delete fds[fd];
       fds[fd] = NULL;
     }
@@ -261,6 +273,7 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
       case FH_CONIN:
       case FH_CONOUT:
 	fh = new (buf) fhandler_console (name);
+	inc_console_fds ();
 	break;
       case FH_PTYM:
 	fh = new (buf) fhandler_pty_master (name);

@@ -1,6 +1,6 @@
 /* dtable.h: fd table definition.
 
-   Copyright 2000 Red Hat, Inc.
+   Copyright 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -19,18 +19,25 @@ class dtable
   fhandler_base **fds_on_hold;
   int first_fd_for_open;
   int cnt_need_fixup_before;
+  int console_fds;
 public:
   size_t size;
 
-  dtable () : first_fd_for_open(3), cnt_need_fixup_before(0) {}
+  dtable () : first_fd_for_open(3), cnt_need_fixup_before(0), console_fds(0) {}
   void init () {first_fd_for_open = 3;}
 
   void dec_need_fixup_before ()
     { if (cnt_need_fixup_before > 0) --cnt_need_fixup_before; }
   void inc_need_fixup_before ()
-    { ++cnt_need_fixup_before; }
+    { cnt_need_fixup_before++; }
   BOOL need_fixup_before ()
     { return cnt_need_fixup_before > 0; }
+
+  void dec_console_fds ();
+  void inc_console_fds ()
+    { console_fds++; }
+  BOOL has_console_fds ()
+    { return console_fds > 0; }
 
   int vfork_child_dup ();
   void vfork_parent_restore ();

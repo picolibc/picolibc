@@ -1,3 +1,16 @@
+2001-07-25  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* syscalls.cc (setsid): Detach process from its console if the current
+	controlling tty is the console and already closed.
+	* dtable.h (class dtable): Add members to count descriptors referring
+	to the console.
+	* dtable.cc (dtable::dec_console_fds): New function to detach process
+	from its console.
+	(dtable::release): Decrement the counter of console descriptors.
+	(dtable::build_fhandler): Increment it.
+	* exception.cc (ctrl_c_handler): Send SIGTERM to myself when catch
+	CTRL_SHUTDOWN_EVENT.
+
 Tue 24 Jul 2001 02:28:00 PM  Trevor Forbes <t4bs@hotmail.com>
 
 	* thread.cc (verifyable_object_isvalid): Don't validate

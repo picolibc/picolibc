@@ -240,6 +240,8 @@ setsid (void)
   /* FIXME: for now */
   if (myself->pgid != _getpid ())
     {
+      if (myself->ctty == TTY_CONSOLE && !cygheap->fdtab.has_console_fds ())
+	FreeConsole ();
       myself->ctty = -1;
       myself->sid = _getpid ();
       myself->pgid = _getpid ();
