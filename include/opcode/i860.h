@@ -15,32 +15,36 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GAS or GDB; see the file COPYING.  If not, write to
-the Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+the Free Software Foundation, 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.  */
 
-#if !defined(__STDC__) && !defined(const)
-#define const
-#endif
 
-/*
- * Structure of an opcode table entry.
- */
+/* Structure of an opcode table entry.  */
 struct i860_opcode
 {
+    /* The opcode name.  */
     const char *name;
-    unsigned long match;	/* Bits that must be set.  */
-    unsigned long lose;	/* Bits that must not be set.  */
+
+    /* Bits that must be set.  */
+    unsigned long match;
+
+    /* Bits that must not be set.  */
+    unsigned long lose;
+
     const char *args;
+
     /* Nonzero if this is a possible expand-instruction.  */
     char expand;
 };
+
 
 enum expand_type
 {
     E_MOV = 1, E_ADDR, E_U32, E_AND, E_S32, E_DELAY
 };
 
-/*
-   All i860 opcodes are 32 bits, except for the pseudoinstructions
+
+/* All i860 opcodes are 32 bits, except for the pseudo-instructions
    and the operations utilizing a 32-bit address expression, an
    unsigned 32-bit constant, or a signed 32-bit constant.
    These opcodes are expanded into a two-instruction sequence for
@@ -83,21 +87,18 @@ Kinds of operands:
    U	split 16 bit immediate, aligned 2^2. (st.l)
    e    src1 floating point register.
    f    src2 floating point register.
-   g    dest floating point register.
+   g    dest floating point register.  */
 
-*/
 
-/* The order of the opcodes in this table is significant:
-   
-   * The assembler requires that all instances of the same mnemonic must be
-   consecutive.  If they aren't, the assembler will bomb at runtime.
-
-   * The disassembler should not care about the order of the opcodes.  */
+/* The order of the opcodes in this table is significant. The assembler
+   requires that all instances of the same mnemonic must be consecutive.
+   If they aren't, the assembler will not function properly.
+ 
+   The order of opcodes does not affect the disassembler.  */
 
 static struct i860_opcode i860_opcodes[] =
 {
-
-/* REG-Format Instructions */
+/* REG-Format Instructions.  */
 { "ld.c",	0x30000000, 0xcc000000, "c,d", 0 },	/* ld.c csrc2,idest */
 { "ld.b",	0x00000000, 0xfc000000, "1(2),d", 0 },	/* ld.b isrc1(isrc2),idest */
 { "ld.b",	0x04000000, 0xf8000000, "I(2),d", E_ADDR },	/* ld.b #const(isrc2),idest */
@@ -212,7 +213,7 @@ static struct i860_opcode i860_opcodes[] =
 { "bnc",	0x78000000, 0x84000000, "l", 0 },	/* bnc lbroff */
 { "bnc.t",	0x7c000000, 0x80000000, "l", E_DELAY },	/* bnc.t lbroff */
 
-/* Floating Point Escape Instruction Format - pfam.p fsrc1,fsrc2,fdest */
+/* Floating Point Escape Instruction Format - pfam.p fsrc1,fsrc2,fdest.  */
 { "r2p1.ss",	0x48000400, 0xb40001ff, "e,f,g", 0 },
 { "r2p1.sd",	0x48000480, 0xb400017f, "e,f,g", 0 },
 { "r2p1.dd",	0x48000580, 0xb400007f, "e,f,g", 0 },
@@ -262,7 +263,7 @@ static struct i860_opcode i860_opcodes[] =
 { "m12tpa.sd",	0x4800048f, 0xb4000170, "e,f,g", 0 },
 { "m12tpa.dd",	0x4800058f, 0xb4000070, "e,f,g", 0 },
 
-/* Floating Point Escape Instruction Format - pfsm.p fsrc1,fsrc2,fdest */
+/* Floating Point Escape Instruction Format - pfsm.p fsrc1,fsrc2,fdest.  */
 { "r2s1.ss",	0x48000410, 0xb40001ef, "e,f,g", 0 },
 { "r2s1.sd",	0x48000490, 0xb400016f, "e,f,g", 0 },
 { "r2s1.dd",	0x48000590, 0xb400006f, "e,f,g", 0 },
@@ -312,7 +313,7 @@ static struct i860_opcode i860_opcodes[] =
 { "m12tsa.sd",	0x4800049f, 0xb4000160, "e,f,g", 0 },
 { "m12tsa.dd",	0x4800059f, 0xb4000060, "e,f,g", 0 },
 
-/* Floating Point Escape Instruction Format - pfmam.p fsrc1,fsrc2,fdest */
+/* Floating Point Escape Instruction Format - pfmam.p fsrc1,fsrc2,fdest.  */
 { "mr2p1.ss",	0x48000000, 0xb40005ff, "e,f,g", 0 },
 { "mr2p1.sd",	0x48000080, 0xb400057f, "e,f,g", 0 },
 { "mr2p1.dd",	0x48000180, 0xb400047f, "e,f,g", 0 },
@@ -359,7 +360,7 @@ static struct i860_opcode i860_opcodes[] =
 { "mim1p2.sd",	0x4800008e, 0xb4000571, "e,f,g", 0 },
 { "mim1p2.dd",	0x4800018e, 0xb4000471, "e,f,g", 0 },
 
-/* Floating Point Escape Instruction Format - pfmsm.p fsrc1,fsrc2,fdest */
+/* Floating Point Escape Instruction Format - pfmsm.p fsrc1,fsrc2,fdest.  */
 { "mr2s1.ss",	0x48000010, 0xb40005ef, "e,f,g", 0 },
 { "mr2s1.sd",	0x48000090, 0xb400056f, "e,f,g", 0 },
 { "mr2s1.dd",	0x48000190, 0xb400046f, "e,f,g", 0 },
@@ -406,7 +407,6 @@ static struct i860_opcode i860_opcodes[] =
 { "mim1s2.sd",	0x4800009e, 0xb4000561, "e,f,g", 0 },
 { "mim1s2.dd",	0x4800019e, 0xb4000461, "e,f,g", 0 },
 
-
 { "fmul.ss",	0x48000020, 0xb40005df, "e,f,g", 0 },	/* fmul.p fsrc1,fsrc2,fdest */
 { "fmul.sd",	0x480000a0, 0xb400055f, "e,f,g", 0 },	/* fmul.p fsrc1,fsrc2,fdest */
 { "fmul.dd",	0x480001a0, 0xb400045f, "e,f,g", 0 },	/* fmul.p fsrc1,fsrc2,fdest */
@@ -447,10 +447,10 @@ static struct i860_opcode i860_opcodes[] =
 { "pfamov.ds",	0x48000533, 0xb40000cc, "e,g", 0 },	/* pfamov.p fsrc1,fdest */
 { "pfamov.sd",	0x480004b3, 0xb400014c, "e,g", 0 },	/* pfamov.p fsrc1,fdest */
 { "pfamov.dd",	0x480005b3, 0xb400004c, "e,g", 0 },	/* pfamov.p fsrc1,fdest */
-/* pfgt has R bit cleared; pfle has R bit set */
+/* Opcode pfgt has R bit cleared; pfle has R bit set.  */
 { "pfgt.ss",	0x48000434, 0xb40001cb, "e,f,g", 0 },	/* pfgt.p fsrc1,fsrc2,fdest */
 { "pfgt.dd",	0x48000534, 0xb40000cb, "e,f,g", 0 },	/* pfgt.p fsrc1,fsrc2,fdest */
-/* pfgt has R bit cleared; pfle has R bit set */
+/* Opcode pfgt has R bit cleared; pfle has R bit set.  */
 { "pfle.ss",	0x480004b4, 0xb400014b, "e,f,g", 0 },	/* pfle.p fsrc1,fsrc2,fdest */
 { "pfle.dd",	0x480005b4, 0xb400004b, "e,f,g", 0 },	/* pfle.p fsrc1,fsrc2,fdest */
 { "pfeq.ss",	0x48000435, 0xb40001ca, "e,f,g", 0 },	/* pfeq.p fsrc1,fsrc2,fdest */
@@ -481,7 +481,7 @@ static struct i860_opcode i860_opcodes[] =
 { "form",	0x480001da, 0xb4000425, "e,g", 0 },	/* form fsrc1,fdest */
 { "pform",	0x480005da, 0xb4000025, "e,g", 0 },	/* pform fsrc1,fdest */
 
-/* Floating point pseudo-instructions */
+/* Floating point pseudo-instructions.  */
 { "fmov.ss",	0x48000049, 0xb7e005b6, "e,g", 0 },	/* fiadd.ss fsrc1,f0,fdest */
 { "fmov.dd",	0x480001c9, 0xb7e00436, "e,g", 0 },	/* fiadd.dd fsrc1,f0,fdest */
 { "fmov.sd",	0x480000b0, 0xb7e0054f, "e,g", 0 },	/* fadd.sd fsrc1,f0,fdest */
