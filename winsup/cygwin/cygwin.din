@@ -1077,6 +1077,8 @@ mbrlen
 _mbrlen = mbrlen
 mbrtowc
 _mbrtowc = mbrtowc
+mbsrtowcs
+_mbsrtowcs = mbsrtowcs
 wcrtomb
 _wcrtomb = wcrtomb
 wcsrtombs
