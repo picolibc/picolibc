@@ -26,7 +26,7 @@ int
 poll (struct pollfd *fds, unsigned int nfds, int timeout)
 {
   int max_fd = 0;
-  fd_set *open_fds, *read_fds, *write_fds, *except_fds;
+  fd_set *read_fds, *write_fds, *except_fds;
   struct timeval tv = { timeout / 1000, (timeout % 1000) * 1000 };
   sigframe thisframe (mainthread);
 
@@ -36,63 +36,55 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 
   size_t fds_size = howmany(max_fd + 1, NFDBITS) * sizeof (fd_mask);
 
-  open_fds = (fd_set *) alloca (fds_size);
   read_fds = (fd_set *) alloca (fds_size);
   write_fds = (fd_set *) alloca (fds_size);
   except_fds = (fd_set *) alloca (fds_size);
 
-  if (!open_fds || !read_fds || !write_fds || !except_fds)
+  if (!read_fds || !write_fds || !except_fds)
     {
       set_errno (ENOMEM);
       return -1;
     }
 
-  memset (open_fds, 0, fds_size);
   memset (read_fds, 0, fds_size);
   memset (write_fds, 0, fds_size);
   memset (except_fds, 0, fds_size);
 
-  bool valid_fds = false;
-  for (unsigned int i = 0; i < nfds; ++i)
-    if (!cygheap->fdtab.not_open (fds[i].fd))
-      {
-	valid_fds = true;
-	fds[i].revents = 0;
-	FD_SET (fds[i].fd, open_fds);
-	if (fds[i].events & POLLIN)
-	  FD_SET (fds[i].fd, read_fds);
-	if (fds[i].events & POLLOUT)
-	  FD_SET (fds[i].fd, write_fds);
-	if (fds[i].events & POLLPRI)
-	  FD_SET (fds[i].fd, except_fds);
-      }
-      else
-	fds[i].revents = POLLNVAL;
+  for (unsigned int i = 0; i < nfds; ++i) 
+    { 
+      fds[i].revents = 0; 
+      if (!cygheap->fdtab.not_open(fds[i].fd)) 
+	{ 
+	  if (fds[i].events & POLLIN) 
+	    FD_SET(fds[i].fd, read_fds); 
+	  if (fds[i].events & POLLOUT) 
+	    FD_SET(fds[i].fd, write_fds); 
+	  if (fds[i].events & POLLPRI) 
+	    FD_SET(fds[i].fd, except_fds); 
+	} 
+    } 
 
-  int ret = 0;
-  if (valid_fds)
-    ret = cygwin_select (max_fd + 1, read_fds, write_fds, except_fds,
-			 timeout < 0 ? NULL : &tv);
+  int ret = cygwin_select (max_fd + 1, read_fds, write_fds, except_fds, timeout < 0 ? NULL : &tv);
 
-  for (unsigned int i = 0; i < nfds; ++i)
-    {
-      if (fds[i].revents == POLLNVAL && ret >= 0)
-	ret++;
-      else if (cygheap->fdtab.not_open(fds[i].fd))
-	fds[i].revents = POLLHUP;
-      else if (ret < 0)
-	fds[i].revents = POLLERR;
-      else
-	{
-	  fds[i].revents = 0;
-	  if (FD_ISSET (fds[i].fd, read_fds))
-	    fds[i].revents |= POLLIN;
-	  if (FD_ISSET (fds[i].fd, write_fds))
-	    fds[i].revents |= POLLOUT;
-	  if (FD_ISSET (fds[i].fd, except_fds))
-	    fds[i].revents |= POLLPRI;
-	}
-    }
+  if (ret > 0) 
+    for (unsigned int i = 0; i < nfds; ++i) 
+      { 
+	if (fds[i].fd < 0) 
+	  fds[i].revents = POLLNVAL; 
+	else if (cygheap->fdtab.not_open(fds[i].fd)) 
+	  fds[i].revents = POLLHUP; 
+	else 
+	  { 
+	    if (FD_ISSET(fds[i].fd, read_fds)) 
+	      fds[i].revents |= POLLIN; 
+	    if (FD_ISSET(fds[i].fd, write_fds)) 
+	      fds[i].revents |= POLLOUT; 
+	    if (FD_ISSET(fds[i].fd, read_fds) && FD_ISSET(fds[i].fd, write_fds)) 
+	      fds[i].revents |= POLLERR; 
+	    if (FD_ISSET(fds[i].fd, except_fds)) 
+	      fds[i].revents |= POLLPRI; 
+	  } 
+      } 
 
-  return ret;
-}
+  return ret; 
+} 
