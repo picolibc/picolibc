@@ -1,5 +1,11 @@
 2005-01-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pinfo.cc (pinfo::exit): Don't access self after releasing it.
+	* path.h (path_conv::path_conv): Fill path with native device
+	name in case of device argument.
+
+2005-01-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_serial.cc (fhandler_serial::dup): Call overlapped_setup
 	for child, not for parent.
 

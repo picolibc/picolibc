@@ -140,13 +140,14 @@ pinfo::exit (DWORD n)
   set_exit_state (PID_EXITED);
   if (n != EXITCODE_EXEC)
     self->alert_parent (0);
+  int exitcode = self->exitcode;
   release ();
   
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
   sigproc_printf ("Calling ExitProcess hProcess %p, n %p, exitcode %p",
-		  hProcess, n, self->exitcode);
-  ExitProcess (self->exitcode);
+		  hProcess, n, exitcode);
+  ExitProcess (exitcode);
 }
 # undef self
 

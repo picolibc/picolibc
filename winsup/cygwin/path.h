@@ -169,7 +169,10 @@ class path_conv
 	      const suffix_info *suffixes = NULL)  __attribute__ ((regparm(3)));
 
   path_conv (const device& in_dev): fileattr (INVALID_FILE_ATTRIBUTES),
-     path_flags (0), known_suffix (NULL), error (0), dev (in_dev) {}
+     path_flags (0), known_suffix (NULL), error (0), dev (in_dev)
+    {
+      strcpy (path, in_dev.native);
+    }
 
   path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
