@@ -1,3 +1,7 @@
+2001-12-06  John Peacock <jpeacock@rowman.com>
+
+	* libc/include/sys/unistd.h: Correct ualarm declaration.
+
 2001-12-05  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* libc/sys/arm/crt0.S: For __USES_INITFINI__ preserve the argument
