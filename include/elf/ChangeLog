@@ -1,3 +1,8 @@
+1999-06-02  Stu Grossman  <grossman@babylon-5.cygnus.com>
+
+	* dwarf.h: Add LANG_JAVA.
+	* dwarf2.h: Add DW_LANG_Java.
+
 1999-05-29  Nick Clifton  <nickc@cygnus.com>
 
 	* common.h (ELFOSABI_ARM): Define.
