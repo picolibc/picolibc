@@ -201,12 +201,16 @@ details. */
        82: Export wcscoll wcswidth wcwidth
        83: Export gethostid
        84: Pty open allocates invisible console.  64 bit interface
+       85: Export new 32/64 functions from API 0.79 only with leading
+           underscore.  No problems with backward compatibility since no
+           official release has been made so far.  This change removes
+           exported symbols like fopen64, which might confuse configure.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 84
+#define CYGWIN_VERSION_API_MINOR 85
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

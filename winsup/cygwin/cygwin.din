@@ -103,31 +103,31 @@ access
 _access = access
 acl
 _acl = acl
-acl32
+_acl32 = acl32
 aclcheck
 _aclcheck = aclcheck
-aclcheck32
+_aclcheck32 = aclcheck32
 aclfrommode
 _aclfrommode = aclfrommode
-aclfrommode32
+_aclfrommode32 = aclfrommode32
 aclfrompbits
 _aclfrompbits = aclfrompbits
-aclfrompbits32
+_aclfrompbits32 = aclfrompbits32
 aclfromtext
 _aclfromtext = aclfromtext
-aclfromtext32
+_aclfromtext32 = aclfromtext32
 aclsort
 _aclsort = aclsort
-aclsort32
+_aclsort32 = aclsort32
 acltomode
 _acltomode = acltomode
-acltomode32
+_acltomode32 = acltomode32
 acltopbits
 _acltopbits = acltopbits
-acltopbits32
+_acltopbits32 = acltopbits32
 acltotext
 _acltotext = acltotext
-acltotext32
+_acltotext32 = acltotext32
 acos
 _acos = acos
 acosf
@@ -209,7 +209,7 @@ chmod
 _chmod = chmod
 chown
 _chown = chown
-chown32
+_chown32 = chown32
 chroot
 _chroot = chroot
 cleanup_glue
@@ -400,14 +400,14 @@ fabsf
 _fabsf = fabsf
 facl
 _facl = facl
-facl32
+_facl32 = facl32
 fchdir
 _fchdir = fchdir
 fchmod
 _fchmod = fchmod
 fchown
 _fchown = fchown
-fchown32
+_fchown32 = fchown32
 fclose
 _fclose = fclose
 fcloseall
@@ -436,7 +436,7 @@ fgetc
 _fgetc = fgetc
 fgetpos
 _fgetpos = fgetpos
-fgetpos64
+_fgetpos64 = fgetpos64
 fgets
 _fgets = fgets
 fileno
@@ -465,7 +465,7 @@ fnmatch
 _fnmatch = fnmatch
 fopen
 _fopen = fopen
-fopen64
+_fopen64 = fopen64
 fork
 _fork = fork
 fpathconf
@@ -481,7 +481,7 @@ free
 _free = free
 freopen
 _freopen = freopen
-freopen64
+_freopen64 = freopen64
 frexp
 _frexp = frexp
 frexpf
@@ -492,11 +492,10 @@ fseek
 _fseek = fseek
 fseeko
 _fseeko = fseeko
-fseeko64
+_fseeko64 = fseeko64
 fsetpos
 _fsetpos = fsetpos
-fsetpos64
-fstat64
+_fsetpos64 = fsetpos64
 _fstat64 = fstat64
 fstatfs
 _fstatfs = fstatfs
@@ -506,12 +505,12 @@ ftell
 _ftell = ftell
 ftello
 _ftello = ftello
-ftello64
+_ftello64 = ftello64
 ftime
 _ftime = ftime
 ftruncate
 _ftruncate = ftruncate
-ftruncate64
+_ftruncate64 = ftruncate64
 fwrite
 _fwrite = fwrite
 gamma
@@ -544,27 +543,27 @@ getdtablesize
 _getdtablesize = getdtablesize
 getegid
 _getegid = getegid
-getegid32
+_getegid32 = getegid32
 getenv
 _getenv = getenv
 geteuid
 _geteuid = geteuid
-geteuid32
+_geteuid32 = geteuid32
 getgid
 _getgid = getgid
-getgid32
+_getgid32 = getgid32
 getgrent
 _getgrent = getgrent
-getgrent32
+_getgrent32 = getgrent32
 getgrgid
 _getgrgid = getgrgid
-getgrgid32
+_getgrgid32 = getgrgid32
 getgrnam
 _getgrnam = getgrnam
-getgrnam32
+_getgrnam32 = getgrnam32
 getgroups
 _getgroups = getgroups
-getgroups32
+_getgroups32 = getgroups32
 gethostid
 getitimer
 getlogin
@@ -593,9 +592,9 @@ _getpwnam = getpwnam
 getpwnam_r
 getpwuid
 _getpwuid = getpwuid
-getpwuid32
+_getpwuid32 = getpwuid32
 getpwuid_r
-getpwuid_r32
+_getpwuid_r32 = getpwuid_r32
 getrlimit
 _getrlimit = getrlimit
 getrusage
@@ -607,7 +606,7 @@ gettimeofday
 _gettimeofday = gettimeofday
 getuid
 _getuid = getuid
-getuid32
+_getuid32 = getuid32
 getutent
 _getutent = getutent
 getutid
@@ -654,7 +653,7 @@ _infinity = infinity
 infinityf
 _infinityf = infinityf
 initgroups
-initgroups32
+_initgroups32 = initgroups32
 initstate
 ioctl
 _ioctl = ioctl
@@ -732,7 +731,7 @@ lacl
 _lacl = lacl
 lchown
 _lchown = lchown
-lchown32
+_lchown32 = lchown32
 lcong48
 _lcong48 = lcong48
 ldexp
@@ -785,9 +784,8 @@ lround
 lroundf
 lseek
 _lseek = lseek
-lseek64
 _lseek64 = lseek64
-lstat64
+_lstat64 = lstat64
 mallinfo
 mallinfo
 malloc
@@ -827,7 +825,7 @@ _mkdir = mkdir
 mkfifo
 mknod
 _mknod = mknod
-mknod32
+_mknod32 = mknod32
 mkstemp
 _mkstemp = mkstemp
 mktemp
@@ -835,7 +833,7 @@ _mktemp = mktemp
 mktime
 _mktime = mktime
 mmap
-mmap64
+_mmap64 = mmap64
 modf
 _modf = modf
 modff
@@ -1062,7 +1060,7 @@ seed48
 _seed48 = seed48
 seekdir
 _seekdir = seekdir
-seekdir64
+_seekdir64 = seekdir64
 sem_destroy
 sem_init
 sem_post
@@ -1075,20 +1073,20 @@ setdtablesize
 _setdtablesize = setdtablesize
 setegid
 _setegid = setegid
-setegid32
+_setegid32 = setegid32
 setenv
 _setenv = setenv
 seteuid
 _seteuid = seteuid
-seteuid32
+_seteuid32 = seteuid32
 setgid
 _setgid = setgid
-setgid32
+_setgid32 = setgid32
 setgrent
 _setgrent = setgrent
 setgroups
 _setgroups = setgroups
-setgroups32
+_setgroups32 = setgroups32
 sethostent
 setitimer
 setjmp
@@ -1112,9 +1110,11 @@ _setpwent = setpwent
 setregid
 _setregid = setregid
 setregid32
+_setregid32 = setregid32
 setreuid
 _setreuid = setreuid
 setreuid32
+_setreuid32 = setreuid32
 setrlimit
 _setrlimit = setrlimit
 setsid
@@ -1124,7 +1124,7 @@ settimeofday
 _settimeofday = settimeofday
 setuid
 _setuid = setuid
-setuid32
+_setuid32 = setuid32
 setutent
 _setutent = setutent
 setvbuf
@@ -1210,7 +1210,7 @@ _srand48 = srand48
 srandom
 sscanf
 _sscanf = sscanf
-stat64
+_stat64 = stat64
 statfs
 _statfs = statfs
 strcasecmp
@@ -1328,7 +1328,7 @@ tdelete
 tdestroy
 telldir
 _telldir = telldir
-telldir64
+_telldir64 = telldir64
 tempnam
 _tempnam = tempnam
 tfind
@@ -1354,7 +1354,7 @@ towlower
 towupper
 truncate
 _truncate = truncate
-truncate64
+_truncate64 = truncate64
 truncf
 tsearch
 ttyname

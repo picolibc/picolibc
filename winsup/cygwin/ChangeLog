@@ -1,3 +1,10 @@
+2003-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (NEW_FUNCTIONS): All 32/64 from 0.79 API get
+	leading underscore.
+	* cygwin.din: Ditto.
+	* include/cygwin/version.h: Bump API minor number.
+
 2003-05-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/config.h: New file.
