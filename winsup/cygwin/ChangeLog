@@ -1,5 +1,12 @@
 2003-03-08  Christopher Faylor  <cgf@redhat.com>
 
+	* syscalls.cc (unlink): Always attempt to use FILE_FLAG_CLOSE_ON_DELETE
+	to delete files since this allows us to preserve the protection of hard
+	linked files.
+	(link): Generate full path for potentially recalculated .lnk target.
+
+2003-03-08  Christopher Faylor  <cgf@redhat.com>
+
 	Revert below changes regarding _pinfo::cmdline.
 
 2003-03-08  Corinna Vinschen  <corinna@vinschen.de>

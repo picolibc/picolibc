@@ -133,27 +133,31 @@ unlink (const char *ourname)
       goto done;
     }
 
-  /* Check for shortcut as symlink condition. */
-  if (win32_name.issymlink ())
-    SetFileAttributes (win32_name, (DWORD) win32_name & ~FILE_ATTRIBUTE_READONLY);
+  SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
+  /* Attempt to use "delete on close" semantics to handle removing
+     a file which may be open. */
+  HANDLE h;
+  h = CreateFile (win32_name, GENERIC_READ, FILE_SHARE_DELETE, &sec_none_nih,
+		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
 
+  (void) SetFileAttributes (win32_name, (DWORD) win32_name);
+  (void) DeleteFile (win32_name);
   DWORD lasterr;
-  lasterr = 0;
-  for (int i = 0; i < 2; i++)
+  lasterr = GetLastError ();
+  if (h != INVALID_HANDLE_VALUE)
+    CloseHandle (h);
+
+  if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
+      || (!win32_name.isremote () && wincap.has_delete_on_close ()))
     {
-      if (DeleteFile (win32_name))
-	{
-	  syscall_printf ("DeleteFile succeeded");
-	  goto ok;
-	}
+      syscall_printf ("DeleteFile succeeded");
+      goto ok;
+    }
 
-      lasterr = GetLastError ();
-      if (i || lasterr != ERROR_ACCESS_DENIED)
-	break;		/* Couldn't delete it. */
-
-      /* if access denied, chmod to be writable, in case it is not,
-	 and try again */
-      (void) chmod (win32_name, 0777);
+  if (DeleteFile (win32_name))
+    {
+      syscall_printf ("DeleteFile after CreateFile/ClosHandle succeeded");
+      goto ok;
     }
 
   /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
@@ -162,45 +166,6 @@ unlink (const char *ourname)
   if (wincap.access_denied_on_delete () && lasterr == ERROR_ACCESS_DENIED
       && !win32_name.isremote ())
     lasterr = ERROR_SHARING_VIOLATION;
-
-  /* Tried to delete file by normal DeleteFile and by resetting protection
-     and then deleting.  That didn't work.
-
-     There are two possible reasons for this:  1) The file may be opened and
-     Windows is not allowing it to be deleted, or 2) We may not have permissions
-     to delete the file.
-
-     So, first assume that it may be 1) and try to remove the file using the
-     Windows FILE_FLAG_DELETE_ON_CLOSE semantics.  This seems to work only
-     spottily on Windows 9x/Me but it does seem to work reliably on NT as
-     long as the file doesn't exist on a remote drive. */
-
-  bool delete_on_close_ok;
-
-  delete_on_close_ok  = !win32_name.isremote ()
-			&& wincap.has_delete_on_close ();
-
-  /* Attempt to use "delete on close" semantics to handle removing
-     a file which may be open. */
-  HANDLE h;
-  h = CreateFile (win32_name, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
-		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
-  if (h == INVALID_HANDLE_VALUE)
-    {
-      if (GetLastError () == ERROR_FILE_NOT_FOUND)
-	goto ok;
-    }
-  else
-    {
-      CloseHandle (h);
-      syscall_printf ("CreateFile/CloseHandle succeeded");
-      /* Everything is fine if the file has disappeared or if we know that the
-	 FILE_FLAG_DELETE_ON_CLOSE will eventually work. */
-      if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
-	  || delete_on_close_ok)
-	goto ok;	/* The file is either gone already or will eventually be
-			   deleted by the OS. */
-    }
 
   /* FILE_FLAGS_DELETE_ON_CLOSE was a bust.  If this is a sharing
      violation, then queue the file for deletion when the process
@@ -649,7 +614,7 @@ link (const char *a, const char *b)
       strcpy (new_lnk_buf, b);
       strcat (new_lnk_buf, ".lnk");
       b = new_lnk_buf;
-      real_b.check (b, PC_SYM_NOFOLLOW);
+      real_b.check (b, PC_SYM_NOFOLLOW | PC_FULL);
     }
   /* Try to make hard link first on Windows NT */
   if (wincap.has_hard_links ())
