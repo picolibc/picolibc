@@ -1,3 +1,9 @@
+1999-05-16  Nick Clifton  <nickc@cygnus.com>
+
+	* mcore.h (R_MCORE_COPY): Define.
+	(R_MCORE_GLOB_DAT): Define.
+	(R_MCORE_JUMP_SLOT): Define.
+
 1999-05-15  Nick Clifton  <nickc@cygnus.com>
 
 	* mcore.h (R_MCORE_RELATIVE): Define.
