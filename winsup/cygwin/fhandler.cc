@@ -1068,7 +1068,7 @@ int fhandler_base::fcntl (int cmd, void *arg)
 	   Set only the flag that has been passed in.  If both are set, just
 	   record O_NONBLOCK.   */
 	if ((new_flags & OLD_O_NDELAY) && (new_flags & O_NONBLOCK))
-	  new_flags = O_NONBLOCK;
+	  new_flags &= ~OLD_O_NDELAY;
 	set_flags ((get_flags () & ~allowed_flags) | new_flags);
       }
       res = 0;
