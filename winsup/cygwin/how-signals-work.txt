@@ -27,28 +27,29 @@ the perl script "gendef".  This function notices exported cygwin
 functions which are labelled as SIGFE and generates a front end assembly
 file "sigfe.s" which contains the wrapper glue necessary for every
 function to call sigfe prior to actually dispatching to the real cygwin
-function.  This generated function contains low-level signal related
+function.  This generated file contains low-level signal related
 functions: _sigfe, _sigbe, sigdelayed, sigreturn, longjmp, and setjmp.
 
 The signal stack maintained by sigfe/sigbe and friends is a secondary
 shadow stack.  Addresses from this stack are swapped into the "real"
 stack as needed to control program flow.  The intent is that executing
-cygwin functions will still see roughly the same stack layout and will
-be able to retrieve arguments from the stack but will always return
-to the _sigbe routine so that any signal handlers will be properly
-called.
+cygwin functions will still see the same stack layout as if they had
+been called directly and will be able to retrieve arguments from the
+stack but will always return to the _sigbe routine so that any signal
+handlers will be properly called.
 
 Upon receipt of a "non-special" (see below) signal, the function
 sigpacket::process is called.  This function determines what action, if
-any, to take on the signal.  Possible actions are: Ignore the signal (e.g.,
-SIGUSR1), terminate the program (SIGKILL, SIGTERM), stop the program
-(SIGSTOP, SIGTSTP, etc.), wake up a sigwait or sigwaitinfo in a
-targetted thread, or call a signal handler (possibly in a thread).
-If no thread information has been sent to sigpacket::process, it determines
-the correct thread to use based on various heuristics, as per UNIX.
-Signals sent via the UNIX kill() function are normally sent to the
-main thread.  Ditto signals sent as the result of pressing tty keys,
-like CTRL-C.
+any, to take on the signal.  Possible actions are: Ignore the signal
+(e.g., SIGUSR1), terminate the program (SIGKILL, SIGTERM), stop the
+program (SIGSTOP, SIGTSTP, etc.), wake up a sigwait or sigwaitinfo in a
+targetted thread, or call a signal handler (possibly in a thread).  If
+no thread information has been sent to sigpacket::process, it determines
+the correct thread to use based on various heuristics, as per UNIX.  As
+per linux, the only time a handler is called in a thread is when there
+is some kind of fault like SIGSEGV, SIGILL, etc.  Signals sent via the
+UNIX kill() function are normally sent to the main thread.  Ditto
+signals sent as the result of pressing tty keys, like CTRL-C.
 
 Signals which stop a process are handled by a special internal handler:
 sig_handle_tty_stop.  Some signals (e.g., SIGKILL, SIGSTOP) are
@@ -73,26 +74,26 @@ parent via a false value.  Otherwise processing continues.
 
 (For pending signals, the theory is that the signal handler thread will
 be forced to be rerun by having some strategic cygwin function call
-sig_send with a __SIGFLUSH "argument" to it.  This causes the signal
-handler to rescan the signal array looking for pending signals.)
+sig_send with a __SIGFLUSH argument.  This causes the signal handler to
+rescan the signal array looking for pending signals.)
 
 After determining that it's ok to send a signal, setup_handler will lock
 the cygtls stack to ensure that it has complete access.  It will then
-inspect the thread's 'incyg' element.  If this is true, the thread is
+inspect the thread's 'incyg' boolean.  If this is true, the thread is
 currently executing a cygwin function.  If it is false, the thread is
 unlocked and it is assumed that the thread is executing "user" code.
 The actions taken by setup_handler differ based on whether the program
 is executing a cygwin routine or not.
 
 If the program is executing a cygwin routine, then the
-interrupt_on_return function is called which sets the address of the
-'sigdelayed' function is pushed onto the thread's signal stack, and the
-signal's mask and handler is saved in the tls structure.  Then the
-'signal_arrived' event is signalled, as well as any thread-specific wait
-event.
+interrupt_on_return function is called which causes the address of the
+'sigdelayed' function to be pushed onto the thread's signal stack, and
+the signal's mask and handler to be saved in the tls structure.  After
+performing these operations, the 'signal_arrived' event is signalled, as
+well as any thread-specific wait event.
 
 Since the sigdelayed function was saved on the thread's signal stack,
-when the cygwin functio returns, it will eventually return to the
+when the cygwin function returns, it will eventually return to the
 sigdelayed "front end".  The sigdelayed function will save a lot of
 state on the stack and set the signal mask as appropriate for POSIX.
 It uses information from the _cygtls structure which has been filled in
@@ -124,13 +125,14 @@ SA_RESTART.
 
 UNIX allows some blocking functions to be interrupted by a signal
 handler and then return to blocking.  In cygwin, so far, only
-read/readv() operate in this fashion.  To accommodate this behavior,
-readv notices when a signal comes in and then calls the _cygtls function
-'call_signal_handler_now'.  'call_signal_handler_now' emulates the
-behavior of both sigdelayed and sigreturn.  It sets the appropriate
-masks and calls the handler, returning true to the caller if SA_RESTART
-is active.  If SA_RESTART is active, readv will loop.  Otherwise
-it will return -1 and set the errno to EINTR.
+read/readv() and the wait* functions operate in this fashion.  To
+accommodate this behavior, a function notices when a signal comes in and
+then calls the _cygtls function 'call_signal_handler_now'.
+'call_signal_handler_now' emulates the behavior of both sigdelayed and
+sigreturn.  It sets the appropriate masks and calls the handler,
+returning true to the caller if SA_RESTART is active.  If SA_RESTART is
+active, the function will loop.  Otherwise it will typically return -1
+and set the errno to EINTR.
 
 Phew.  So, now we turn to the case where cygwin needs to interrupt the
 program when it is not executing a cygwin function.  In this scenario,
@@ -142,12 +144,15 @@ suspend a process executing a win32 call can cause disastrous results,
 especially on Win9x.
 
 If the process is executing in an unsafe location then setup_handler
-will return false as in the case above.  Otherwise, the current location
-of the thread is pushed on the thread's signal stack and the thread is
-redirected to the sigdelayed function via the win32 "SetThreadContext"
-call.  Then the thread is restarted using the win32 "ResumeThread" call
-and things proceed as per the sigdelayed discussion above.
+will (quickly!) return false as in the case above.  Otherwise, the
+current location of the thread is pushed on the thread's signal stack
+and the thread is redirected to the sigdelayed function via the win32
+"SetThreadContext" call.  Then the thread is restarted using the win32
+"ResumeThread" call and things proceed as per the sigdelayed discussion
+above.
 
 This leads us to the sig_send function.  This is the "client side" part
 of the signal manipulation process.  sig_send is the low-level function
 called by a high level process like kill() or pthread_kill().
+
+** More to come **
