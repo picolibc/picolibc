@@ -175,8 +175,24 @@ unlink (const char *ourname)
 					| FILE_ATTRIBUTE_SYSTEM));
     }
   /* Attempt to use "delete on close" semantics to handle removing
-     a file which may be open. */
-  if (wincap.has_delete_on_close ())
+     a file which may be open.
+
+     CV 2004-09-17: Not if the file is on a remote share.  If two processes
+     have open handles on a file and one of them calls unlink, then it
+     happens that the file is remove from the remote share even though the
+     other process still has an open handle.  This other process than gets
+     Win32 error 59, ERROR_UNEXP_NET_ERR when trying to access the file. 
+
+     For some reason, that does not happen when using DeleteFile, which
+     nicely succeeds but still, the file is available for the other process. 
+     To reproduce, mount /tmp on a remote share and call
+     
+       bash -c "cat << EOF"
+
+     Microsoft KB 837665 describes this problem as a bug in 2K3, but I have
+     reproduced it on shares on Samba 2.2.8, Samba 3.0.2, NT4SP6, XP64SP1 and
+     2K3 and in all cases, DeleteFile works, "delete on close" does not. */
+  if (!win32_name.isremote () && wincap.has_delete_on_close ())
     {
       HANDLE h;
       h = CreateFile (win32_name, 0, FILE_SHARE_READ, &sec_none_nih,
