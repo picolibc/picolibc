@@ -1,4 +1,4 @@
-2002-07-10  Florian Shrack  <florian.schrack@freenet.de>
+2002-07-10  Florian Schrack  <florian.schrack@freenet.de>
 
 	* libc/sys/mmixware/read.c: Use SYS_Fgets syscall if dealing with
 	a terminal.
