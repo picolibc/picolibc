@@ -1,6 +1,8 @@
 #ifndef _UNISTD_H
 #define _UNISTD_H
 
+#include <features.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -159,6 +161,7 @@ int     _EXFUN(_execve, (const char *__path, char * const __argv[], char * const
 #define STDOUT_FILENO   1       /* standard output file descriptor */
 #define STDERR_FILENO   2       /* standard error file descriptor */
 
+#include <bits/environments.h>
 #include <bits/confname.h>
 
 # define        MAXPATHLEN      1024
