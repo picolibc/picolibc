@@ -1,4 +1,29 @@
 
+2001-04-08  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/shellapi.h: (CommandLineToArgvW): Add WINAPI declaration.
+	* include/winbase.h: (GetFileAttributesExW): Fix typo.
+	* include/wingdi.h: (StartDocA): Change LPDOCINFOA to DOCINFOA*.
+	(StartDocB): Chage LNPDOCINFOB to DOCINFOB*.
+	Thanks To: Kent Tamura  <tkent@users.sourceforge.net>
+
+	* include/winnt.h: (GetFiberData): Add __inline assembler coding.
+	(GetCurrentFiber): Ditto.
+	Thanks to: Andy Younger  <AndyY@redlemon.com>
+
+	* include/windef.h: (HMONITOR_DECLARED): New definition to stop
+	DirectX 8 from complaining.
+	Thanks to: Sigbjørn Lund Olsen  <mosikos@online.no>
+
+2001-04-08  Michael Soderstrom <ichaelsoderstro@hotmail.com>
+
+        * include/commctrl.h Updated TreeView and ListView defines and macros.
+
+2001-04-08  Danny Smith <dannysmith@users.sourceforge.net>
+
+        * include/winuser.h (MB_SERVICE_NOTIFICATION): Correct value for NT4
+	and above.
+
 2001-03-30  Earnie Boyd  <earnie@users.sourceforge.net>
 	* include/winuser.h (VK_KANA): New definition.
 	Thanks to: "Harold Hunt" <huntharo@msu.edu>

@@ -2499,8 +2499,27 @@ typedef struct _REPARSE_POINT_INFORMATION {
 	WORD   ReparseDataLength;
 	WORD   UnparsedNameLength;
 } REPARSE_POINT_INFORMATION, *PREPARSE_POINT_INFORMATION;
-PVOID GetCurrentFiber(void);
-PVOID GetFiberData(void);
+__inline PVOID GetCurrentFiber(void)
+{
+    void* ret;
+    __asm__ volatile ("
+	      movl	%%fs:0x10,%0
+	      movl	(%0),%0
+	      " : "=r" (ret) /* allow use of reg eax, ebx, ecx, edx, esi, edi */
+	        :
+	      );
+    return ret;
+}
+__inline PVOID GetFiberData(void)
+{
+    void* ret;
+    __asm__ volatile ("
+	      movl	%%fs:0x10,%0
+	      " : "-r" (ret) /* allow use of reg eax,ebx,ecx,edx,esi,edi */
+	        :
+		);
+    return ret;
+}
 #endif
 #ifdef __cplusplus
 }

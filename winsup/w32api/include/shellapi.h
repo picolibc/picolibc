@@ -183,7 +183,7 @@ typedef struct _SHFILEINFOW {
 	WCHAR szTypeName[80];
 } SHFILEINFOW;
 
-LPWSTR *CommandLineToArgvW(LPCWSTR,int*);
+LPWSTR * WINAPI CommandLineToArgvW(LPCWSTR,int*);
 void WINAPI DragAcceptFiles(HWND,BOOL);
 void WINAPI DragFinish(HDROP);
 UINT WINAPI DragQueryFileA(HDROP,UINT,LPSTR,UINT);
