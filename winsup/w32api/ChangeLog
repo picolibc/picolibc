@@ -1,3 +1,11 @@
+Sun Oct  1 16:13:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * lib/iphlpapi.def: New stub for iphlpapi.dll.
+        * include/iptypes.h: New header file.
+        * include/ipexport.h: Ditto.
+        * include/iphlpapi.h: Ditto.
+        * include/iprtrmib.h: Ditto.
+
 Sun Oct  1  2:54:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/ntdef.h: New file.
