@@ -369,7 +369,8 @@ enum cgen_parse_operand_type
 {
   CGEN_PARSE_OPERAND_INIT,
   CGEN_PARSE_OPERAND_INTEGER,
-  CGEN_PARSE_OPERAND_ADDRESS
+  CGEN_PARSE_OPERAND_ADDRESS,
+  CGEN_PARSE_OPERAND_SYMBOLIC
 };
 
 /* Values for indicating what was parsed.  */

@@ -1,3 +1,9 @@
+2005-01-25  Alexandre Oliva  <aoliva@redhat.com>
+
+	2004-11-10  Alexandre Oliva  <aoliva@redhat.com>
+	* cgen.h (enum cgen_parse_operand_type): Add
+	CGEN_PARSE_OPERAND_SYMBOLIC.
+
 2005-01-21  Fred Fish  <fnf@specifixinc.com>
 
 	* mips.h: Change INSN_ALIAS to INSN2_ALIAS.

@@ -1,3 +1,10 @@
+2005-01-25  Alexandre Oliva  <aoliva@redhat.com>
+
+	2004-12-10  Alexandre Oliva  <aoliva@redhat.com>
+	* frv.h: Add R_FRV_TLSMOFF.
+	2004-11-10  Alexandre Oliva  <aoliva@redhat.com>
+	* frv.h: Add TLS relocations.
+
 2005-01-17  Nick Clifton  <nickc@redhat.com>
 
 	* sh.h (EF_SH2A_SH4_NOFPU, EF_SH2A_SH3_NOFPU, EF_SH2A_SH4,
