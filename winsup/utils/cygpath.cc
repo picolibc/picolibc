@@ -415,7 +415,7 @@ doit (char *filename)
     {
       len = strlen (filename);
       if (len)
-	len += 100;
+	len += MAX_PATH + 1001;
       else if (ignore_flag)
 	exit (0);
       else
@@ -470,10 +470,10 @@ doit (char *filename)
 	}
       if (!unix_flag)
 	{
-	if (shortname_flag)
-	  buf = get_short_name (buf);
-	if (longname_flag)
-	  buf = get_long_name (buf, len);
+	  if (shortname_flag)
+	    buf = get_short_name (buf);
+	  if (longname_flag)
+	    buf = get_long_name (buf, len);
 	}
     }
 

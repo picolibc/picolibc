@@ -1,3 +1,7 @@
+2003-02-12  Christopher Faylor  <cgf@redhat.com>
+
+	* cygpath.cc (doit): Allocate more space for non-path filename.
+
 2003-02-07  Christopher Faylor  <cgf@redhat.com>
 
 	* dump_setup.cc (compar): Use case insensitive comparisons.
