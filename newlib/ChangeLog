@@ -1,3 +1,10 @@
+2004-05-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF): Move file locking
+	from here ...
+	(_VFPRINTF_R): ... to here so all I/O printf routines
+	are covered.
+
 2004-05-26  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/search/hash_buf.c: Protect MAX and MIN macros from

@@ -381,10 +381,7 @@ _DEFUN(VFPRINTF, (fp, fmt0, ap),
        va_list ap)
 {
   int result;
-  _flockfile (fp);
-  CHECK_INIT (fp);
   result = _VFPRINTF_R (_REENT, fp, fmt0, ap);
-  _funlockfile (fp);
   return result;
 }
 
@@ -536,14 +533,21 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	    (u_long)GET_ARG (N, ap, u_int))
 #endif
 
+	_flockfile (fp);
+	CHECK_INIT (fp);
+
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
-	if (cantwrite (fp))
+	if (cantwrite (fp)) {
+		_funlockfile (fp);	
 		return (EOF);
+	}
 
 	/* optimise fprintf(stderr) (and other unbuffered Unix files) */
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
-	    fp->_file >= 0)
+	    fp->_file >= 0) {
+		_funlockfile (fp);
 		return (__sbprintf (data, fp, fmt0, ap));
+	}
 
 	fmt = (char *)fmt0;
 	uio.uio_iov = iovp = iov;
@@ -1211,6 +1215,7 @@ done:
 error:
 	if (malloc_buf != NULL)
 		_free_r (data, malloc_buf);
+	_funlockfile (fp);
 	return (__sferror (fp) ? EOF : ret);
 	/* NOTREACHED */
 }
