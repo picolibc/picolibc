@@ -21,6 +21,7 @@ uname (struct utsname *name)
   DWORD len;
   SYSTEM_INFO sysinfo;
   extern char osname[];
+  char *snp = strstr  (cygwin_version.dll_build_date, "SNP");
 
   memset (name, 0, sizeof (*name));
   __small_sprintf (name->sysname, "CYGWIN_%s", osname);
@@ -32,10 +33,11 @@ uname (struct utsname *name)
   GetComputerNameA (name->nodename, &len);
 
   /* Cygwin dll release */
-  __small_sprintf (name->release, "%d.%d.%d(%d.%d/%d/%d)",
+  __small_sprintf (name->release, "%d.%d.%d%s(%d.%d/%d/%d)",
 		   cygwin_version.dll_major / 1000,
 		   cygwin_version.dll_major % 1000,
 		   cygwin_version.dll_minor,
+		   snp ? "S" : "",
 		   cygwin_version.api_major,
 		   cygwin_version.api_minor,
 		   cygwin_version.shared_data,
@@ -43,6 +45,8 @@ uname (struct utsname *name)
 
   /* Cygwin "version" aka build date */
   strcpy (name->version, cygwin_version.dll_build_date);
+  if (snp)
+    name->version[snp - cygwin_version.dll_build_date] = '\0';
 
   /* CPU type */
   switch (sysinfo.wProcessorArchitecture)

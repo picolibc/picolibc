@@ -1,3 +1,10 @@
+Tue May 23 01:13:33 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* mkvers.sh: Use snapshot date as build date since it is more
+	interesting.
+	* uname.cc (uname): Detect if this is a snapshot build and add an "S"
+	to the version number.  Report the snapshot date as the release date.
+
 Mon May 22 17:11:25 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* environ.cc (regopt): Scan HKLM if HKCU scan fails.

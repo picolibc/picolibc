@@ -51,10 +51,11 @@ if [ "$3" -le 10 ]; then
 else
     d=$3
 fi
+hhmm="`echo $4 | sed 's/:..$//'`"
 #
 # Set date into YYYY-MM-DD HH:MM:SS format
 #
-builddate="${6-$5}-$m-$d $4"
+builddate="${6-$5}-$m-$d $hhmm"
 
 set -$- ''
 
@@ -95,9 +96,9 @@ cvs_tag="`sed 's%^.\(.*\)%\1%' $dir/CVS/Tag 2>/dev/null`"
 #
 dir=`echo $dir | sed -e 's%/include/cygwin.*$%%' -e 's%include/cygwin.*$%.%'`
 if [ -r "$dir/.snapshot-date" ]; then
-    read snapshot < "$dir/.snapshot-date"
+    read snapshotdate < "$dir/.snapshot-date"
     snapshot="snapshot date
-$snapshot"
+$snapshotdate"
 fi
 
 #
@@ -122,6 +123,12 @@ done | tee /tmp/mkvers.$$ 1>&9
 
 trap "rm -f /tmp/mkvers.$$" 0 1 2 15
 
+if [ -n "$snapshotdate" ]; then
+  usedate="`echo $snapshotdate | sed 's/-\\(..:..[^-]*\\).*$/ \1SNP/'`"
+else
+  usedate="$builddate"
+fi
+
 #
 # Finally, output the shared ID and set up the cygwin_version structure
 # for use by Cygwin itself.
@@ -133,14 +140,13 @@ cat <<EOF 1>&9
   "%%% Cygwin shared id: " CYGWIN_VERSION_DLL_IDENTIFIER "S" shared_data_version "\n"
 #endif
   "END_CYGWIN_VERSION_INFO\n\0";
-
 cygwin_version_info cygwin_version =
 {
   CYGWIN_VERSION_API_MAJOR, CYGWIN_VERSION_API_MINOR,
   CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR,
   CYGWIN_VERSION_SHARED_DATA,
   CYGWIN_VERSION_MOUNT_REGISTRY,
-  "$builddate",
+  "$usedate",
 #ifdef DEBUGGING
   CYGWIN_VERSION_DLL_IDENTIFIER "S" shared_data_version "-$builddate"
 #else
