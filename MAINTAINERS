@@ -4,68 +4,78 @@ Please do not make ChangeLog entries.
 COPYING, COPYING.LIB, README
 	http://gnu.org.
 
-Makefile.in, configure, configure.in
+Makefile.in; configure; configure.in
 	Please notify the following of any committed patches.
 		binutils@sources.redhat.com
 		gdb-patches@sources.redhat.com
 
-bfd/, binutils/, gas/, gprof/, ld/, opcodes/ & BFD's part of include/
+bfd/; binutils/; gas/; gprof/; ld/; opcodes/; BFD's part of include/
 	binutils: http://sources.redhat.com/binutils/
 	Patches to binutils@sources.redhat.com.
 	Please notify the following of any interface changes:
 		gdb-patches@sources.redhat.com
 
-cgen/, cgen parts of opcodes/, sim/, include/
+cgen/; cgen parts of opcodes/, sim/ & include/
 	cgen: http://sources.redhat.com/cgen/
 	Patches to cgen@sources.redhat.com
 	May need separate opcodes/ or sim/ approval for
 		commits of regenerated files there.
 
-sid/; SID's part of cgen/ and dejagnu/
-	sid: http://sources.redhat.com/sid/
-	Patches to sid@sources.redhat.com
-
-config.guess, config.sub
+config.guess; config.sub
 	config: http://gnu.org
 	Patches to config-patches@gnu.org.
 	Changes need to be done in tandem with the official CONFIG
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
 
-dejagnu/,
-	Notify http://dejagnu.sourceforge.net/ of changes.
-	Patches to gdb-patches@sources.redhat.com,
+dejagnu/
+	Notify http://dejagnu.sourceforge.net/ of generic changes.
+	Generic patches to gdb-patches@sources.redhat.com &
 	sid@sources.redhat.com.
+	See also SID & GDB.
 
-libiberty/ & libiberty's part of include/ 
+gdb/; mmalloc/; readline/; sim/; GDB's part of include/ & dejagnu/
+	gdb: http://sources.redhat.com/gdb/
+	Patches to gdb-patches@sources.redhat.com.
+	See also gdb/MAINTAINERS, sim/MAINTAINERS, mmalloc/MAINTAINERS.
+
+include/
+	See binutils/, gdb/, sid/, gcc/, libiberty/ etc.
+
+libiberty/; libiberty's part of include/ 
 	gcc: http://gcc.gnu.org
 	Changes need to be done in tandem with the official GCC
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
 
-ltconfig, ltmain.sh
+ltconfig; ltmain.sh
 	libtool: http://gnu.org
 	Changes need to be done in tandem with the official LIBTOOL
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
 
-mkinstalldirs, move-if-change, symlink-tree
+mkinstalldirs; move-if-change; symlink-tree
 	autoconf: http://gnu.org
 	Patches to autoconf-patches@gnu.org.
 	Changes need to be done in tandem with the official AUTOCONF
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
 
-newlib/, libgloss/
+newlib/; libgloss/
 	http://sources.redhat.com/newlib/
 	Patches to newlib@sources.redhat.com.
 
-gdb/; mmalloc/; readline/; sim/; GDB's part of include/, dejagnu/
-	gdb: http://sources.redhat.com/gdb/
-	Patches to gdb-patches@sources.redhat.com.
-	See also gdb/MAINTAINERS, sim/MAINTAINERS, mmalloc/MAINTAINERS.
+sid/; SID's part of cgen/ & dejagnu/
+	sid: http://sources.redhat.com/sid/
+	Patches to sid@sources.redhat.com
 
-itcl/, tcl/, tix/, tk/, libgui/
+texinfo/texinfo.tex
+	texinfo: http://ftp.gnu.org.
+	Latest version can be found on ftp://ftp.gnu.org and can be
+	imported at any (reasonable) time.
+	Please not use GCC's texinfo.  Please do not import texinfo.
+
+tcl/; tix/; itcl/; tk/; libgui/
 	insight: http://sources.redhat.com/insight/
 	Contact insight@sources.redhat.com.
 
@@ -75,17 +85,11 @@ winsup/
 	General discussion cygwin@sources.redhat.com.
 	See also winsup/MAINTAINERS.
 
-texinfo/texinfo.tex
-	texinfo: http://ftp.gnu.org.
-	Latest version can be found on ftp://ftp.gnu.org and can be
-	imported at any (reasonable) time.
-	Please not use GCC's texinfo.  Please do not import texinfo.
-
- expect/, config-ml.in, mpw-README, mpw-build.in, mpw-config.in,
-mpw-configure, mpw-install, setup.com, missing, makefile.vms, utils/,
-config/, config.if, makefile.vms, missing, ylwrap, mkdep, etc/,
-install-sh, intl/
-	?
+expect/; config-ml.in; mpw-README; mpw-build.in; mpw-config.in;
+mpw-configure; mpw-install; setup.com; missing; makefile.vms; utils/;
+config/; config.if; makefile.vms; missing; ylwrap; mkdep; etc/;
+install-sh; intl/
+	Ask.
 
 modules file
 	Obviously changes to this file should not go through
