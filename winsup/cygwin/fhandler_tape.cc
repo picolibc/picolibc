@@ -54,7 +54,7 @@ fhandler_dev_tape::is_eof (int win_error)
 }
 
 fhandler_dev_tape::fhandler_dev_tape ()
-  : fhandler_dev_raw (FH_TAPE)
+  : fhandler_dev_raw ()
 {
   debug_printf ("unit: %d", dev.minor);
 }
