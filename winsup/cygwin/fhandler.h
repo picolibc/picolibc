@@ -267,6 +267,7 @@ class fhandler_base
   virtual int __stdcall ftruncate (_off64_t) __attribute__ ((regparm (2)));
   virtual int __stdcall link (const char *) __attribute__ ((regparm (2)));
   virtual int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
+  virtual int __stdcall fsync (void) __attribute__ ((regparm (1)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const *ttyname () { return get_name (); }

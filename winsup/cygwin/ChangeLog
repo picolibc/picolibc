@@ -1,5 +1,20 @@
 2005-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (FindFirstVolumeA): Add.
+	(FindNextVolumeA): Add.
+	(FindVolumeClose): Add.
+	(GetVolumePathNamesForVolumeNameA): Add.
+	* fhandler.h (class fhandler_base): Declare new method fsync.
+	* fhandler.cc (fhandler_base::fsync): New method.
+	* syscalls.cc (fsync): Move functionality into fhandler method fsync.
+	Just call this method from here.
+	(sync_worker): New static function.
+	(sync): Fill with life for NT systems.
+	* wincap.h (wincaps::has_guid_volumes): New element.
+	* wincap.cc: Implement above element throughout.
+
+2005-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (enum query_state): Add query_write_attributes state.
 	(fhandler_base::status.query_open): Add a bit to make room for more
 	states.

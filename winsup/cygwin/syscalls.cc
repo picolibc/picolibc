@@ -915,19 +915,68 @@ fsync (int fd)
       syscall_printf ("-1 = fsync (%d)", fd);
       return -1;
     }
+  return cfd->fsync ();
+}
 
-  if (FlushFileBuffers (cfd->get_handle ()) == 0)
+static void 
+sync_worker (const char *vol)
+{
+  HANDLE fh = CreateFileA (vol, GENERIC_WRITE, wincap.shared (),
+			   &sec_none_nih, OPEN_EXISTING, 0, NULL);
+  if (fh != INVALID_HANDLE_VALUE)
     {
-      __seterrno ();
-      return -1;
+      FlushFileBuffers (fh);
+      CloseHandle (fh);
     }
-  return 0;
+  else
+    debug_printf ("Open failed with %E");
 }
 
 /* sync: SUSv3 */
 extern "C" void
 sync ()
 {
+  char vol[CYG_MAX_PATH];
+  
+  if (wincap.has_guid_volumes ()) /* Win2k and newer */
+    {
+      HANDLE sh = FindFirstVolumeA (vol, CYG_MAX_PATH);
+      if (sh != INVALID_HANDLE_VALUE)
+	{
+	  do
+	    {
+	      char pvol[CYG_MAX_PATH];
+	      DWORD len;
+	      if (GetVolumePathNamesForVolumeNameA (vol, pvol, CYG_MAX_PATH,
+						    &len))
+		debug_printf ("Try volume %s (GUID: %s)", pvol, vol);
+	      else
+		debug_printf ("Try volume %s", vol);
+
+	      /* Eliminate trailing backslash. */
+	      vol[strlen (vol) - 1] = '\0';
+	      sync_worker (vol);
+	    }
+	  while (FindNextVolumeA (sh, vol, CYG_MAX_PATH));
+	  FindVolumeClose (sh);
+	}
+    }
+  else if (wincap.is_winnt ())	/* 9x has no concept for opening volumes */
+    {
+      DWORD drives = GetLogicalDrives ();
+      DWORD mask = 1;
+      strcpy (vol, "\\\\.\\A:");
+      do
+        {
+	  if (drives & mask)
+	    {
+	      debug_printf ("Try volume %s", vol);
+	      sync_worker (vol);
+	    }
+	  vol[4]++;
+	}
+      while ((mask <<= 1) <= 1 << 25);
+    }
 }
 
 /* Cygwin internal */
