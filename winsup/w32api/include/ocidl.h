@@ -1,11 +1,36 @@
 #ifndef _OCIDL_H
 #define _OCIDL_H
+#if __GNUC__ >= 3
+#pragma GCC system_header
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <ole2.h>
-#include <olectl.h>
+
+typedef interface IErrorLog *LPERRORLOG;
+typedef interface IPropertyBag *LPPROPERTYBAG;
+typedef interface IEnumConnections *LPENUMCONNECTIONS;
+typedef interface IConnectionPoint *LPCONNECTIONPOINT;
+typedef interface IEnumConnectionPoints *LPENUMCONNECTIONPOINTS;
+typedef interface IPropertyPageSite *LPPROPERTYPAGESITE;
+typedef interface IFont *LPFONT;
+typedef interface IFontDisp *LPFONTDISP;
+
+#ifndef OLE2ANSI
+typedef TEXTMETRICW TEXTMETRICOLE;
+#else
+typedef TEXTMETRIC TEXTMETRICOLE;
+#endif
+typedef TEXTMETRICOLE *LPTEXTMETRICOLE;
+typedef DWORD OLE_COLOR;
+typedef UINT OLE_HANDLE;
+typedef long OLE_XPOS_HIMETRIC;
+typedef long OLE_YPOS_HIMETRIC;
+typedef long OLE_XSIZE_HIMETRIC;
+typedef long OLE_YSIZE_HIMETRIC;
 
 typedef enum tagREADYSTATE {
 	READYSTATE_UNINITIALIZED = 0,
@@ -14,6 +39,45 @@ typedef enum tagREADYSTATE {
 	READYSTATE_INTERACTIVE = 3,
 	READYSTATE_COMPLETE = 4
 } READYSTATE;
+typedef struct tagPOINTF {
+	float x;
+	float y;
+} POINTF,*LPPOINTF;
+typedef struct tagCONTROLINFO {
+	ULONG cb;
+	HACCEL hAccel;
+	USHORT cAccel;
+	DWORD dwFlags;
+} CONTROLINFO,*LPCONTROLINFO;
+typedef struct tagCONNECTDATA {
+	LPUNKNOWN pUnk;
+	DWORD dwCookie;
+} CONNECTDATA,*LPCONNECTDATA;
+typedef struct tagLICINFO {
+	long cbLicInfo;
+	BOOL fRuntimeKeyAvail;
+	BOOL fLicVerified;
+} LICINFO,*LPLICINFO;
+typedef struct tagCAUUID {
+	ULONG cElems;
+	GUID *pElems;
+} CAUUID,*LPCAUUID;
+typedef struct tagCALPOLESTR {
+	ULONG cElems;
+	LPOLESTR *pElems;
+} CALPOLESTR,*LPCALPOLESTR;
+typedef struct tagCADWORD {
+	ULONG cElems;
+	DWORD *pElems;
+} CADWORD,*LPCADWORD;
+typedef struct tagPROPPAGEINFO {
+	ULONG cb;
+	LPOLESTR pszTitle;
+	SIZE size;
+	LPOLESTR pszDocString;
+	LPOLESTR pszHelpFile;
+	DWORD dwHelpContext;
+} PROPPAGEINFO,*LPPROPPAGEINFO;
 
 EXTERN_C const IID IID_IOleControl;
 #undef INTERFACE

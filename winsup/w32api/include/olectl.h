@@ -1,6 +1,6 @@
 #ifndef _OLECTL_H
 #define _OLECTL_H
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
@@ -8,6 +8,7 @@
 extern "C" {
 #endif
 
+#include <ocidl.h>
 #include <olectlid.h>
 
 #define STD_CTL_SCODE(n) MAKE_SCODE(SEVERITY_ERROR,FACILITY_CONTROL,n)
@@ -224,18 +225,9 @@ extern "C" {
 #define DISPID_PICT_HEIGHT 5
 #define DISPID_PICT_RENDER 6
 
-#pragma pack(push,8)
-#ifndef OLE2ANSI
-typedef TEXTMETRICW TEXTMETRICOLE;
-#else
-typedef TEXTMETRIC TEXTMETRICOLE;
-#endif
-typedef TEXTMETRICOLE *LPTEXTMETRICOLE;
 typedef interface IOleControl *LPOLECONTROL;
 typedef interface IOleControlSite *LPOLECONTROLSITE;
 typedef interface ISimpleFrameSite *LPSIMPLEFRAMESITE;
-typedef interface IErrorLog *LPERRORLOG;
-typedef interface IPropertyBag *LPPROPERTYBAG;
 typedef interface IPersistPropertyBag *LPPERSISTPROPERTYBAG;
 typedef interface IPersistStreamInit *LPPERSISTSTREAMINIT;
 typedef interface IPersistMemory *LPPERSISTMEMORY;
@@ -243,68 +235,28 @@ typedef interface IPropertyNotifySink* LPPROPERTYNOTIFYSINK;
 typedef interface IProvideClassInfo *LPPROVIDECLASSINFO;
 typedef interface IProvideClassInfo2 *LPPROVIDECLASSINFO2;
 typedef interface IConnectionPointContainer *LPCONNECTIONPOINTCONTAINER;
-typedef interface IEnumConnectionPoints *LPENUMCONNECTIONPOINTS;
-typedef interface IConnectionPoint *LPCONNECTIONPOINT;
-typedef interface IEnumConnections *LPENUMCONNECTIONS;
 typedef interface IClassFactory2 *LPCLASSFACTORY2;
 typedef interface ISpecifyPropertyPages *LPSPECIFYPROPERTYPAGES;
 typedef interface IPerPropertyBrowsing *LPPERPROPERTYBROWSING;
-typedef interface IPropertyPageSite *LPPROPERTYPAGESITE;
 typedef interface IPropertyPage *LPPROPERTYPAGE;
 typedef interface IPropertyPage2 *LPPROPERTYPAGE2;
-typedef interface IFont *LPFONT;
-typedef interface IFontDisp *LPFONTDISP;
+
 typedef interface IPicture *LPPICTURE;
 typedef interface IPictureDisp *LPPICTUREDISP;
-typedef DWORD OLE_COLOR;
 typedef long OLE_XPOS_PIXELS;
 typedef long OLE_YPOS_PIXELS;
 typedef long OLE_XSIZE_PIXELS;
 typedef long OLE_YSIZE_PIXELS;
-typedef long OLE_XPOS_HIMETRIC;
-typedef long OLE_YPOS_HIMETRIC;
-typedef long OLE_XSIZE_HIMETRIC;
-typedef long OLE_YSIZE_HIMETRIC;
 typedef float OLE_XPOS_CONTAINER;
 typedef float OLE_YPOS_CONTAINER;
 typedef float OLE_XSIZE_CONTAINER;
-typedef float OLE_YSIZE_CONTAINER;
+
 typedef VARIANT_BOOL OLE_OPTEXCLUSIVE;
 typedef VARIANT_BOOL OLE_CANCELBOOL;
 typedef VARIANT_BOOL OLE_ENABLEDEFAULTBOOL;
-typedef UINT OLE_HANDLE;
+
+#pragma pack(push,8)
 typedef enum { triUnchecked,triChecked1,triGray } OLE_TRISTATE;
-typedef struct tagPOINTF {
-	float x;
-	float y;
-} POINTF,*LPPOINTF;
-typedef struct tagCONTROLINFO {
-	ULONG cb;
-	HACCEL hAccel;
-	USHORT cAccel;
-	DWORD dwFlags;
-} CONTROLINFO,*LPCONTROLINFO;
-typedef struct tagCONNECTDATA {
-	LPUNKNOWN pUnk;
-	DWORD dwCookie;
-} CONNECTDATA,*LPCONNECTDATA;
-typedef struct tagLICINFO {
-	long cbLicInfo;
-	BOOL fRuntimeKeyAvail;
-	BOOL fLicVerified;
-} LICINFO,*LPLICINFO;
-typedef struct tagCAUUID {
-	ULONG cElems;
-	GUID *pElems;
-} CAUUID,*LPCAUUID;
-typedef struct tagCALPOLESTR {
-	ULONG cElems;
-	LPOLESTR *pElems;
-} CALPOLESTR,*LPCALPOLESTR;
-typedef struct tagCADWORD {
-	ULONG cElems;
-	DWORD *pElems;
-} CADWORD,*LPCADWORD;
 typedef struct tagOCPFIPARAMS {
 	ULONG cbStructSize;
 	HWND hWndOwner;
@@ -318,14 +270,6 @@ typedef struct tagOCPFIPARAMS {
 	LCID lcid;
 	DISPID dispidInitialProperty;
 } OCPFIPARAMS,*LPOCPFIPARAMS;
-typedef struct tagPROPPAGEINFO {
-	ULONG cb;
-	LPOLESTR pszTitle;
-	SIZE size;
-	LPOLESTR pszDocString;
-	LPOLESTR pszHelpFile;
-	DWORD dwHelpContext;
-} PROPPAGEINFO,*LPPROPPAGEINFO;
 typedef struct tagFONTDESC {
 	UINT cbSizeofstruct;
 	LPOLESTR lpstrName;
