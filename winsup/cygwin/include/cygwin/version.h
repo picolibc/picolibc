@@ -72,6 +72,7 @@ details. */
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
   CYGWIN_VERSION_DLL_OLD_TERMIOS)
 
+#define CYGWIN_VERSION_DLL_MALLOC_ENV		28
      /* Old APIs had getc/putc macros that conflict with new CR/LF
 	handling in the stdio buffers */
 #define CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING \
@@ -119,10 +120,11 @@ details. */
        27: CW_GETPINFO_FULL addition to external.cc
        28: Accidentally bumped by cgf
        29: Export hstrerror
+       30: CW_GET_CYGDRIVE_INFO addition to external.cc
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 29
+#define CYGWIN_VERSION_API_MINOR 30
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

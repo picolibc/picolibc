@@ -88,11 +88,22 @@ fillout_pinfo (pid_t pid, int winpid)
 }
 
 static DWORD
-get_cygdrive_prefixes (char *user, char *system)
+get_cygdrive_info (char *user, char *system, char *user_flags,
+	           char *system_flags)
 {
   shared_info *info = cygwin_getshared();
-  int res = info->mount.get_cygdrive_prefixes(user, system);
+  int res = info->mount.get_cygdrive_info (user, system, user_flags,
+				          system_flags);
   return (res == ERROR_SUCCESS) ? 1 : 0;
+}
+
+static DWORD
+get_cygdrive_prefixes (char *user, char *system)
+{
+  char user_flags[MAX_PATH];
+  char system_flags[MAX_PATH];
+  DWORD res = get_cygdrive_info (user, system, user_flags, system_flags);
+  return res;
 }
 
 extern "C" DWORD
@@ -150,6 +161,15 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_INIT_EXCEPTIONS:
 	init_exceptions ((exception_list *) arg);
 	return 0;
+
+      case CW_GET_CYGDRIVE_INFO:
+	{
+	  char *user = va_arg (arg, char *);
+	  char *system = va_arg (arg, char *);
+	  char *user_flags = va_arg (arg, char *);
+	  char *system_flags = va_arg (arg, char *);
+	  return get_cygdrive_info (user, system, user_flags, system_flags);
+	}
 
       default:
 	return (DWORD) -1;

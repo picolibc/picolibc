@@ -1623,11 +1623,19 @@ mount_info::remove_cygdrive_info_from_registry (const char *cygdrive_prefix, uns
 }
 
 int
-mount_info::get_cygdrive_prefixes (char *user, char *system)
+mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
+			       char* system_flags)
 {
   /* Get the user path prefix from HKEY_CURRENT_USER. */
   reg_key r;
   int res = r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, user, MAX_PATH, "");
+
+  /* Get the user flags, if appropriate */
+  if (res == ERROR_SUCCESS)
+    {
+      int flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_AUTO);
+      strcpy (user_flags, (flags & MOUNT_BINARY) ? "binmode" : "textmode");
+    }
 
   /* Get the system path prefix from HKEY_LOCAL_MACHINE. */
   reg_key r2 (HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, "SOFTWARE",
@@ -1636,6 +1644,13 @@ mount_info::get_cygdrive_prefixes (char *user, char *system)
 	      CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
 	      NULL);
   int res2 = r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, system, MAX_PATH, "");
+
+  /* Get the system flags, if appropriate */
+  if (res2 == ERROR_SUCCESS)
+    {
+      int flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_AUTO);
+      strcpy (system_flags, (flags & MOUNT_BINARY) ? "binmode" : "textmode");
+    }
 
   return (res != ERROR_SUCCESS) ? res : res2;
 }

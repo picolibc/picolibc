@@ -511,7 +511,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   cygcwd.copy (ciresrv.moreinfo->cwd_posix, ciresrv.moreinfo->cwd_win32,
 	       ciresrv.moreinfo->cwd_hash);
 
-  ciresrv.moreinfo->envc = envsize (envp, 0);
+  ciresrv.moreinfo->envc = envsize (envp, 1);
   ciresrv.moreinfo->envp = (char **) cmalloc (HEAP_1_ARGV, ciresrv.moreinfo->envc);
   ciresrv.hexec_proc = hexec_proc;
   char **c;

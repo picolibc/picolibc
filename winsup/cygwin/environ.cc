@@ -24,6 +24,7 @@ details. */
 #include "cygheap.h"
 #include "registry.h"
 #include "environ.h"
+#include "perprocess.h"
 
 extern BOOL allow_glob;
 extern BOOL allow_ntea;
@@ -33,6 +34,11 @@ BOOL reset_com = TRUE;
 static BOOL envcache = TRUE;
 
 static char **lastenviron = NULL;
+
+#define ENVMALLOC \
+  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) \
+	  <= CYGWIN_VERSION_DLL_MALLOC_ENV)
+
 
 /* List of names which are converted from dos to unix
  * on the way in and back again on the way out.
@@ -247,8 +253,8 @@ _addenv (const char *name, const char *value, int overwrite)
 
   char *envhere;
   if (!issetenv)
-    envhere = cur_environ ()[offset] = (char *) name;	/* Not setenv. Just
-						   overwrite existing. */
+    /* Not setenv. Just overwrite existing. */
+    envhere = cur_environ ()[offset] = (char *) (ENVMALLOC ? strdup (name) : name);
   else
     {				/* setenv */
       /* Look for an '=' in the name and ignore anything after that if found. */
@@ -566,7 +572,17 @@ environ_init (char **envp, int envc)
       char **newenv = (char **) malloc (envc);
       memcpy (newenv, envp, envc);
       cfree (envp);
+
+      /* Older applications relied on the fact that cygwin malloced elements of the
+	 environment list.  */
       envp = newenv;
+      if (ENVMALLOC)
+	for (char **e = newenv; *e; e++)
+	  {
+	    char *p = *e;
+	    *e = strdup (p);
+	    cfree (p);
+	  }
       envp_passed_in = 1;
       goto out;
     }

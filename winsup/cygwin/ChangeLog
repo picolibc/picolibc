@@ -1,3 +1,27 @@
+Wed Nov  8 15:35:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc (_addenv): malloc space for setenv if cygwin1.dll is used
+	in conjunction with older binaries.
+	(environ_init): Ditto.
+
+Wed Nov  8 08:49:27 2000 Jason Tishler <jt@dothill.com>
+
+	* external.cc (get_cygdrive_info): New function.
+	* external.cc (get_cygdrive_prefixes): Change to use get_cygdrive_info
+	but toss the user and system flags.
+	* external.cc (cygwin_internal): Add new CW_GET_CYGDRIVE_INFO case.
+	* path.cc (mount_info::get_cygdrive_prefixes): Remove method.
+	* path.cc (mount_info::get_cygdrive_info): New method.  Actually,
+	get_cygdrive_info is really an enhanced version of
+	get_cygdrive_prefixes renamed to get_cygdrive_info that also gets the
+	user and system flags.
+	* shared_info.h (get_cygdrive_prefixes): Remove method.
+	* shared_info.h (get_cygdrive_info): New method.
+	* include/cygwin/version.h: Bump minor API version due to adding
+	CW_GET_CYGDRIVE_INFO to cygwin_internal.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add
+	CW_GET_CYGDRIVE_INFO.
+
 Tue Nov  7 20:58:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: Add autoload statement for `WSASetLastError'.
