@@ -1,3 +1,8 @@
+2001-02-09  David Mosberger  <davidm@hpl.hp.com>
+
+	* pe.h (PEPAOUTSZ): Rename from PEP64AOUTSZ.
+	Rename from PEPAOUTHDR.
+
 2001-01-23  H.J. Lu  <hjl@gnu.org>
 
 	* include/coff/pe.h (struct external_PEI_DOS_hdr): New.
