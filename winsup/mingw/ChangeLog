@@ -1,3 +1,14 @@
+2005-02-11  Gregory W. Chicares  <chicares@cox.net>
+            Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h (expm1, expm1f, expmll): Add prototypes.
+	* mingwex/Makefile.in (MATH_DISTFILES): Add expm1.c,
+	expm1f.c, expm1l.c.
+	(MATH_OBJS): Add expm1.o, expm1f.o, expm1l.o.
+	* mingwex/math/expm1.c: New file.
+	* mingwex/math/expm1f.c: New file.
+	* mingwex/math/expm1l.c: New file.
+
 2005-02-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/sys/stat.h (struct stat): Guard with _NO_OLDNAMES.
