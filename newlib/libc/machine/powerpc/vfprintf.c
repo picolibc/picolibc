@@ -322,8 +322,7 @@ _DEFUN (VFPRINTF, (fp, fmt0, ap),
 	_CONST char *fmt0 _AND
 	va_list ap)
 {
-  CHECK_INIT (fp);
-  return _VFPRINTF_R (fp->_data, fp, fmt0, ap);
+  return _VFPRINTF_R (_REENT, fp, fmt0, ap);
 }
 
 int 
