@@ -390,6 +390,8 @@ GetVolumeNameForVolumeMountPointA@12
 GetVolumeNameForVolumeMountPointW@12
 GetVolumePathNameA@12
 GetVolumePathNameW@12
+GetVolumePathNamesForVolumeNameA@16
+GetVolumePathNamesForVolumeNameW@16
 GetWindowsDirectoryA@8
 GetWindowsDirectoryW@8
 GlobalAddAtomA@4
