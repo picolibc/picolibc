@@ -21,7 +21,16 @@
 # define WM_MOUSEWHEEL (WM_MOUSELAST + 1)
 #endif
 
-#define WHEEL_DELTA 120
-#define WHEEL_PAGESCROLL UINT_MAX
+#ifndef WHEEL_DELTA
+# define WHEEL_DELTA 120
+#endif
+
+#ifndef WHEEL_PAGESCROLL
+# define WHEEL_PAGESCROLL UINT_MAX
+#endif
+
+#ifndef SPI_SETWHEELSCROLLLINES
+# define SPI_SETWHEELSCROLLLINES 105
+#endif
 
 #endif /* _ZMOUSE_H */
