@@ -1,3 +1,8 @@
+2001-12-05  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* libc/sys/arm/crt0.S: For __USES_INITFINI__ preserve the argument
+	vector before calling the initialisation functions.
+
 2001-11-29  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/dirent.h: Protect against multiple inclusion.

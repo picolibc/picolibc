@@ -187,9 +187,13 @@ __change_mode:
 	   to create constructors and destructors, and for these
 	   targets we need to call the _init function and arrange
 	   for _fini to be called at program exit.  */
+	mov	r4, r0
+	mov	r5, r1
 	ldr	r0, .Lfini
 	bl	FUNCTION (atexit)
 	bl	FUNCTION (_init)
+	mov	r0, r4
+	mov	r1, r5
 #endif	
 	bl	FUNCTION (main)
 
