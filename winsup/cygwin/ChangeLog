@@ -1,3 +1,8 @@
+Mon Nov  6 11:10:44 2000  Jason Tishler <jt@dothill.com>
+
+	* errno.cc (strerror): Change EAGAIN case to return "Resource
+	temporarily unavailable" instead of "No more processes".
+
 Mon Nov  6 01:04:35 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* child_info.h (child_info): Add pppid_handle for closing the parent's

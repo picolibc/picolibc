@@ -334,7 +334,7 @@ strerror (int errnum)
       error = "No children";
       break;
     case EAGAIN:
-      error = "No more processes";
+      error = "Resource temporarily unavailable";
       break;
     case ENOMEM:
       error = "Not enough memory";
