@@ -1,3 +1,9 @@
+2004-10-05  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am (stmp-targ-include): Support sys header files
+	from machine directories.
+	* Makefile.in: Regenerated.
+
 2004-10-04  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/vfscanf.c (__svfscanf_r): For int conversions,
