@@ -1,3 +1,7 @@
+2004-03-01  Richard Sandiford  <rsandifo@redhat.com>
+
+	* frv.h (EF_FRV_CPU_FR405, EF_FRV_CPU_FR450): Define.
+
 2004-01-28  Roland McGrath  <roland@redhat.com>
 
 	* common.h (AT_SECURE): New macro.
