@@ -343,8 +343,8 @@ $(TEST_DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $
 
 # Rule to build libcygwin.a
 $(LIB_NAME): rmsym newsym $(TEST_DLL_NAME) $(LIBCOS)
-	/bin/sh ${word 1,$^} ./cygdll.a "$(NM)" "$(AR)" "$(RANLIB)" $(OBSOLETE_FUNCTIONS) || exit 0
-	/bin/sh ${word 2,$^} ./cygdll.a "$(AS)" "$(AR)" "$(RANLIB)" $(NEW_FUNCTIONS) || exit 0
+	/bin/sh ${word 1,$^} ./cygdll.a "$(NM)" "$(AR)" $(OBSOLETE_FUNCTIONS) || exit 0
+	/bin/sh ${word 2,$^} ./cygdll.a "$(AS)" "$(AR)" $(NEW_FUNCTIONS) || exit 0
 	(echo create $(LIB_NAME); echo addmod $(LIBCOS); echo addlib cygdll.a; echo save) | $(AR) -M
 	$(RANLIB) $@
 

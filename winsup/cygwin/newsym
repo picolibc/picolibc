@@ -2,9 +2,8 @@
 lib=$1; shift
 as=$1; shift
 ar=$1; shift
-ranlib=$1; shift
 rm -rf newsym.dir
-# trap "rm -rf newsym.dir" 0 1 2 15
+trap "rm -rf newsym.dir" 0 1 2 15
 mkdir newsym.dir
 while [ -n "$1" ]; do
     newsym=$1; shift
@@ -31,5 +30,4 @@ __imp__$newsym:	.rva    1f
 EOF
     $as -o newsym.dir/$newsym.o newsym.dir/$newsym.s
 done
-$ar cru $lib newsym.dir/*.o
-$ranlib $lib
+$ar crus $lib newsym.dir/*.o

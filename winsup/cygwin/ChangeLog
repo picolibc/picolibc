@@ -1,5 +1,11 @@
 2003-07-07  Christopher Faylor  <cgf@redhat.com>
 
+	* newsym: Reenable removal of tmp directory.  Just use ar to generate
+	archive index.
+	* Makefile.in: Don't send ranlib to newsym.
+
+2003-07-07  Christopher Faylor  <cgf@redhat.com>
+
 	* newsym: Create objects that are closer to those created by dlltool so
 	as not to confuse --export-all-symbols.
 	* rmsym: Be a little more accepting of object filenames now that
