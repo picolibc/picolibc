@@ -78,6 +78,12 @@ size_t	_EXFUN(mbstowcs,(wchar_t *, const char *, size_t));
 size_t	_EXFUN(_mbstowcs_r,(struct _reent *, wchar_t *, const char *, size_t, int *));
 size_t	_EXFUN(wcstombs,(char *, const wchar_t *, size_t));
 size_t	_EXFUN(_wcstombs_r,(struct _reent *, char *, const wchar_t *, size_t, int *));
+#ifndef __STRICT_ANSI__
+#ifndef _REENT_ONLY
+int     _EXFUN(mkstemp,(char *));
+char *  _EXFUN(mktemp,(char *));
+#endif
+#endif
 _VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, int(*_compar)(const _PTR, const _PTR)));
 int	_EXFUN(rand,(_VOID));
 _PTR	_EXFUN(realloc,(_PTR __r, size_t __size));

@@ -1,3 +1,7 @@
+Wed Dec  6 12:01:00 2000  Corinna Vinschen <vinschen@cygnus.com>
+
+	* libc/include/stdlib.h: Add declarations for `mkstemp' and `mktemp'.
+
 2000-12-04  Joel Sherrill <joel@OARcorp.com>
 
         * libc/include/machine/time.h: RTEMS systems can configure clock
