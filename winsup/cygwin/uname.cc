@@ -15,16 +15,14 @@ details. */
 #include "winsup.h"
 
 /* uname: POSIX 4.4.1.1 */
-extern "C"
-int
+extern "C" int
 uname (struct utsname *name)
 {
   DWORD len;
   SYSTEM_INFO sysinfo;
-  OSVERSIONINFO os_version_info;
+  extern char osname[];
 
-  os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-  GetVersionEx (&os_version_info);
+  __small_sprintf (name->sysname, "CYGWIN_%s", osname);
 
   GetSystemInfo (&sysinfo);
 
@@ -32,28 +30,6 @@ uname (struct utsname *name)
   memset (name, 0, sizeof (*name));
   len = sizeof (name->nodename) - 1;
   GetComputerNameA (name->nodename, &len);
-
-  /* Operating system type */
-  switch (os_being_run)
-    {
-      case winNT:
-	strcpy (name->sysname, "CYGWIN_NT");
-	break;
-      case win98:
-	strcpy (name->sysname, "CYGWIN_98");
-	break;
-      case win95:
-	strcpy (name->sysname, "CYGWIN_95");
-	break;
-      default:
-	strcpy (name->sysname, "CYGWIN_??");
-	break;
-    }
-
-  __small_sprintf (strchr (name->sysname, '\0'), "-%d.%d",
-		   os_version_info.dwMajorVersion,
-		   os_version_info.dwMinorVersion);
-
 
   /* Cygwin dll release */
   __small_sprintf (name->release, "%d.%d.%d(%d.%d/%d/%d)",

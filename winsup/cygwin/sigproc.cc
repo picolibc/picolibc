@@ -550,7 +550,7 @@ sig_clear (int sig)
 /* Force the wait_sig thread to wake up and scan the sigtodo array.
  */
 extern "C" int __stdcall
-sig_dispatch_pending (int force)
+sig_dispatch_pending (int justwake)
 {
   if (!hwait_sig)
     return 0;
@@ -559,7 +559,7 @@ sig_dispatch_pending (int force)
 #ifdef DEBUGGING
   sip_printf ("pending_signals %d", was_pending);
 #endif
-  if (!was_pending && !force)
+  if (!was_pending && !justwake)
 #ifdef DEBUGGING
     sip_printf ("no need to wake anything up");
 #else
@@ -568,7 +568,9 @@ sig_dispatch_pending (int force)
   else
     {
       wait_for_me ();
-      if (ReleaseSemaphore (sigcatch_nosync, 1, NULL))
+      if (!justwake)
+	(void) sig_send (myself, __SIGFLUSH);
+      else if (ReleaseSemaphore (sigcatch_nosync, 1, NULL))
 #ifdef DEBUGGING
 	sip_printf ("woke up wait_sig");
 #else
@@ -578,6 +580,7 @@ sig_dispatch_pending (int force)
 	/*sip_printf ("I'm going away now")*/;
       else
 	system_printf ("%E releasing sigcatch_nosync(%p)", sigcatch_nosync);
+ 
     }
   return was_pending;
 }
@@ -958,7 +961,7 @@ getsem (pinfo *p, const char *str, int init, int max)
 
       DWORD winpid = GetCurrentProcessId ();
       h = CreateSemaphore (allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
-                           init, max, str = shared_name (str, winpid));
+			   init, max, str = shared_name (str, winpid));
       p = myself;
     }
   else

@@ -1,3 +1,23 @@
+Sun Feb 27 23:11:57 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (set_os_type): Record OS name string.
+	(getprogname): Eliminate obsolete function.
+	(dll_crt0_1): Move initial strace initialization output to set_myself.
+	* exceptions.cc (interruptible): Add debugging output.
+	(interrupt_setup): New function.
+	(interrupt_now): Use interrupt_setup to set up common interrupt handler
+	stuff.
+	(interrupt_on_return): Ditto.
+	(call_handler): Move signal_arrived arm and clear threads to region
+	where signalled thread is suspended or suffer races.
+	* pinfo.cc (set_myself): Output interesting information when strace is
+	first initialized.  Initialize progname here.
+	* sigproc.cc (sig_dispatch_pending): Modify to ensure that flush signal
+	are sent synchronously.
+	* strace.cc (strace_vsprintf): Move code into strace program.
+	* uname.cc (uname): Use 'osname' global to construct cygwin name +
+	Windows type + version.
+
 Fri Feb 25 19:26:42 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interruptible): Make a little more structured.

@@ -80,7 +80,7 @@ do_global_ctors (void (**in_pfunc)(), int force)
   if (!force)
     {
       if (user_data->forkee || user_data->run_ctors_p)
-        return;         // inherit constructed stuff from parent pid
+	return;         // inherit constructed stuff from parent pid
       user_data->run_ctors_p = 1;
     }
 
@@ -101,6 +101,8 @@ do_global_ctors (void (**in_pfunc)(), int force)
 /* remember the type of Win32 OS being run for future use. */
 os_type NO_COPY os_being_run;
 
+char NO_COPY osname[40];
+
 /* set_os_type: Set global variable os_being_run with type of Win32
    operating system being run.  This information is used internally
    to manage the inconsistency in Win32 API calls between Win32 OSes. */
@@ -109,28 +111,37 @@ static void
 set_os_type ()
 {
   OSVERSIONINFO os_version_info;
-  os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
+  const char *os;
 
+  memset (&os_version_info, 0, sizeof os_version_info);
+  os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
   GetVersionEx (&os_version_info);
 
   switch (os_version_info.dwPlatformId)
     {
       case VER_PLATFORM_WIN32_NT:
 	os_being_run = winNT;
+	os = "NT";
 	break;
       case VER_PLATFORM_WIN32_WINDOWS:
 	if (os_version_info.dwMinorVersion == 0)
-	  os_being_run = win95;
+	  {
+	    os_being_run = win95;
+	    os = "95";
+	  }
 	else /* os_version_info.dwMinorVersion == 10 */
-	  os_being_run = win98;
-	break;
-      case VER_PLATFORM_WIN32s:
-	os_being_run = win32s;
+	  {
+	    os_being_run = win98;
+	    os = "98";
+	  }
 	break;
       default:
 	os_being_run = unknown;
+	os = "??";
 	break;
     }
+  __small_sprintf (osname, "%s-%d.%d", os, os_version_info.dwMajorVersion,
+		   os_version_info.dwMinorVersion);
 }
 
 host_dependent_constants NO_COPY host_dependent;
@@ -163,31 +174,6 @@ host_dependent_constants::init (void)
     default:
       api_fatal ("unrecognized system type");
     }
-}
-
-/* Save the program name.  It's used in debugging messages and by
-   the fork code (forking spawns a copy of us).  Copy it into a temp and
-   then into the final spot because debugging messages use
-   myself->progname. Try getting the absolute path from the
-   module handle, if this fails get the name from the path.
-   This call references $PATH so we can't do this until the environment
-   vars are set up.  */
-/* FIXME: What if argv[0] is relative, $PATH changes, and then the program
-   tries to do a fork?  */
-
-static void __stdcall
-getprogname (char *argv0)
-{
-  char tmp[MAX_PATH];
-
-  if (user_data->hmodule != 0)
-    {
-      if (GetModuleFileName (user_data->hmodule, tmp, MAX_PATH) == 0)
-	find_exec (argv0, tmp);
-    }
-  else
-    find_exec (argv0, tmp);
-  strcpy (myself->progname, tmp);
 }
 
 /*
@@ -733,13 +719,6 @@ dll_crt0_1 ()
   uinfo_init ();
 #endif
 
-  syscall_printf ("Application CYGWIN version: %d.%d, api: %d.%d",
-		  user_data->dll_major, user_data->dll_minor,
-		  user_data->api_major, user_data->api_minor);
-  syscall_printf ("CYGWIN DLL version: %d.%d, api: %d.%d",
-		  cygwin_version.dll_major, cygwin_version.dll_minor,
-		  cygwin_version.api_major, cygwin_version.api_minor);
-
   /* Scan the command line and build argv.  Expand wildcards if not
      called from another cygwin process. */
   build_argv (line, argv, argc,
@@ -754,7 +733,6 @@ dll_crt0_1 ()
       argv[0] = new_argv0;
     }
 
-  getprogname (argv[0]);
   /* Set up __progname for getopt error call. */
   __progname = argv[0];
 
@@ -819,11 +797,11 @@ dll_crt0 (per_process *uptr)
 
 	      /* We don't want subprocesses to inherit this */
 	      if (!dynamically_loaded)
-	        {
+		{
 		  if (!DuplicateHandle (me, child_proc_info->parent_alive,
-	                                me, &parent_alive, 0, 0,
-				        DUPLICATE_SAME_ACCESS
-				        | DUPLICATE_CLOSE_SOURCE))
+					me, &parent_alive, 0, 0,
+					DUPLICATE_SAME_ACCESS
+					| DUPLICATE_CLOSE_SOURCE))
 		    system_printf ("parent_alive DuplicateHandle failed, %E");
 		}
 	      else if (parent_alive)

@@ -63,30 +63,16 @@ static int
 strace_vsprintf (char *buf, const char *infmt, va_list ap)
 {
   int count;
-  char fmt[80], unkfmt[80];
+  char fmt[80];
   static int nonewline = FALSE;
   DWORD err = GetLastError ();
+  const char *tn = threadname (0);
 
-#ifndef STRACE_HHMMSS
   static int lmicrosec = 0;
   int microsec = strace_microseconds ();
-  int dmicrosec = lmicrosec ? microsec - lmicrosec : 0;
   lmicrosec = microsec;
 
-  __small_sprintf (fmt, "%5d %7d [%s] %s ",
-		   dmicrosec, microsec, threadname (0), "%s %d%s");
-  __small_sprintf (unkfmt, "%6d %7d [%s] %s ",
-		   dmicrosec, microsec, threadname (0),
-		   "(unknown)");
-#else
-  SYSTEMTIME st;
-  GetLocalTime (&st);
-  const char *tn = threadname (0);
-  __small_sprintf (fmt, "%02d:%02d:%02d [%s] %s ",
-		   st.wHour, st.wMinute, st.wSecond, tn, "%s %d%s");
-  __small_sprintf (unkfmt, "%02d:%02d:%02d [%s] %s ",
-		   st.wHour, st.wMinute, st.wSecond, tn, "***");
-#endif
+  __small_sprintf (fmt, "%7d [%s] %s ", microsec, tn, "%s %d%s");
 
   SetLastError (err);
   if (nonewline)
@@ -101,21 +87,15 @@ strace_vsprintf (char *buf, const char *infmt, va_list ap)
   else
     {
       char *p, progname[sizeof (myself->progname)];
-      static BOOL NO_COPY output_path_once = FALSE;
-      if (!output_path_once)
-	output_path_once = !!(p = myself->progname);
+      if ((p = strrchr (myself->progname, '\\')) != NULL)
+	p++;
       else
-	{
-	  if ((p = strrchr (myself->progname, '\\')) != NULL)
-	    p++;
-	  else
-	    p = myself->progname;
-	  strcpy (progname, p);
-	  if ((p = strrchr (progname, '.')) != NULL)
-	    *p = '\000';
-	  p = progname;
-	}
-      count = __small_sprintf (buf, fmt, p && *p ? p : "(unknown)",
+	p = myself->progname;
+      strcpy (progname, p);
+      if ((p = strrchr (progname, '.')) != NULL)
+	*p = '\000';
+      p = progname;
+      count = __small_sprintf (buf, fmt, p && *p ? p : "?",
 			       myself->pid, hExeced ? "!" : "");
     }
 

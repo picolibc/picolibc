@@ -46,6 +46,24 @@ set_myself (pinfo *p)
   __small_sprintf (buf, "cYg%8x %x %x", _STRACE_INTERFACE_ACTIVATE_ADDR,
 		   &strace_active);
   OutputDebugString (buf);
+
+  (void) GetModuleFileName (NULL, myself->progname,
+			    sizeof(myself->progname));
+  if (strace_active)
+    {
+      extern char osname[];
+      strace_printf (1, "**********************************************");
+      strace_printf (1, "Program name: %s", myself->progname);
+      strace_printf (1, "App version:  %d.%d, api: %d.%d",
+			user_data->dll_major, user_data->dll_minor,
+			user_data->api_major, user_data->api_minor);
+      strace_printf (1, "DLL version:  %d.%d, api: %d.%d",
+			cygwin_version.dll_major, cygwin_version.dll_minor,
+			cygwin_version.api_major, cygwin_version.api_minor);
+      strace_printf (1, "OS version:   Windows %s", osname);
+      strace_printf (1, "**********************************************");
+    }
+
   return myself;
 }
 
@@ -77,9 +95,6 @@ pinfo_init (LPBYTE info)
 
       if (!set_myself (cygwin_shared->p.allocate_pid ()))
 	api_fatal ("No more processes");
-
-      (void) GetModuleFileName (NULL, myself->progname,
-				sizeof(myself->progname));
       myself->ppid = myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;
       myself->uid = USHRT_MAX;

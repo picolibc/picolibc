@@ -643,38 +643,33 @@ interruptible (DWORD pc)
 			      windows_system_directory_length);
     }
 
+  sigproc_printf ("interruptible %d", res);
   return res;
 # undef h
 #endif
 }
 
-void
+static void __stdcall
+interrupt_setup (int sig, struct sigaction& siga, void *handler, DWORD retaddr)
+{
+  sigsave.retaddr = retaddr;
+  sigsave.oldmask = myself->getsigmask ();	// Remember for restoration
+  /* FIXME: Not multi-thread aware */
+  set_process_mask (myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig));
+  sigsave.func = (void (*)(int)) handler;
+  sigsave.sig = sig;
+  sigsave.saved_errno = -1;		// Flag: no errno to save
+}
+
+static void
 interrupt_now (CONTEXT *ctx, int sig, struct sigaction& siga, void *handler)
 {
-  DWORD oldmask = myself->getsigmask ();
-  set_process_mask (myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig));
-
-  DWORD *sp = (DWORD *) ctx->Esp;
-  *(--sp) = ctx->Eip; /*  ctxinal IP where program was suspended */
-  *(--sp) = ctx->EFlags;
-  *(--sp) = ctx->Esi;
-  *(--sp) = ctx->Edi;
-  *(--sp) = ctx->Edx;
-  *(--sp) = ctx->Ecx;
-  *(--sp) = ctx->Ebx;
-  *(--sp) = ctx->Eax;
-  *(--sp) = (DWORD)-1;	/* no saved errno. */
-  *(--sp) = oldmask;
-  *(--sp) = sig;
-  *(--sp) = (DWORD) sigreturn;
-
-  ctx->Esp = (DWORD) sp;
-  ctx->Eip = (DWORD) handler;
-
+  interrupt_setup (sig, siga, handler, ctx->Eip);
+  ctx->Eip = (DWORD) sigdelayed;
   SetThreadContext (myself->getthread2signal(), ctx); /* Restart the thread */
 }
 
-int
+static int
 interrupt_on_return (CONTEXT *ctx, int sig, struct sigaction& siga, void *handler)
 {
   int i;
@@ -692,15 +687,11 @@ interrupt_on_return (CONTEXT *ctx, int sig, struct sigaction& siga, void *handle
     if (interruptible (thestack->sf.AddrReturn.Offset))
       {
 	DWORD *addr_retaddr = ((DWORD *)thestack->sf.AddrFrame.Offset) + 1;
-	if (*addr_retaddr  != thestack->sf.AddrReturn.Offset)
-	  break;
-	sigsave.retaddr = *addr_retaddr;
-	*addr_retaddr = (DWORD) sigdelayed;
-	sigsave.oldmask = myself->getsigmask ();	// Remember for restoration
-	set_process_mask (myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig));
-	sigsave.func = (void (*)(int)) handler;
-	sigsave.sig = sig;
-	sigsave.saved_errno = -1;		// Flag: no errno to save
+	if (*addr_retaddr  == thestack->sf.AddrReturn.Offset)
+	  {
+	    interrupt_setup (sig, siga, handler, *addr_retaddr);
+	    *addr_retaddr = (DWORD) sigdelayed;
+	  }
 	break;
       }
 
@@ -720,6 +711,7 @@ call_handler (int sig, struct sigaction& siga, void *handler)
 {
   CONTEXT *cx, orig;
   int interrupted = 1;
+  HANDLE hth;
   int res;
 
   if (hExeced != NULL && hExeced != INVALID_HANDLE_VALUE)
@@ -727,15 +719,10 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       SetEvent (signal_arrived);	// For an EINTR case
       sigproc_printf ("armed signal_arrived");
       exec_exit = sig;			// Maybe we'll exit with this value
-      return 1;
+      goto out;
     }
+  hth = myself->getthread2signal ();
 
-  /* Suspend the running thread, grab its context somewhere safe
-     and run the exception handler in the context of the thread -
-     we have to do that since sometimes they don't return - and if
-     this thread doesn't return, you won't ever get another exception. */
-
-  HANDLE hth = myself->getthread2signal ();
   /* Suspend the thread which will receive the signal.  But first ensure that
      this thread doesn't have the sync_proc_subproc and mask_sync mutos, since
      we need those (hack alert).  If the thread-to-be-suspended has either of
@@ -792,20 +779,18 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       interrupted = 0;
     }
 
-  (void) ResumeThread (hth);
-
   if (interrupted)
     {
-      /* Apparently we have to set signal_arrived after resuming the thread or it
-	 is possible that the event will be ignored. */
       (void) SetEvent (signal_arrived);	// For an EINTR case
+      sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
       /* Clear any waiting threads prior to dispatching to handler function */
       proc_subproc(PROC_CLEARWAIT, 1);
     }
-  sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
+
+  (void) ResumeThread (hth);
 
 out:
-  sigproc_printf ("returning");
+  sigproc_printf ("returning %d", interrupted);
   return interrupted;
 }
 #endif /* i386 */
