@@ -1,3 +1,7 @@
+2001-08-27  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* ansidecl.h (VA_OPEN, VA_CLOSE): Allow multiple uses.
+
 2001-08-25  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* bfdlink.h (struct bfd_link_info): Change 'spare_dynamic_tags' to
