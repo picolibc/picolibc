@@ -98,11 +98,6 @@ AVR_INSN (sleep,"",    "1001010110001000", 1, AVR_ISA_1200, 0x9588)
 AVR_INSN (wdr,  "",    "1001010110101000", 1, AVR_ISA_1200, 0x95a8)
 AVR_INSN (spm,  "",    "1001010111101000", 1, AVR_ISA_SPM,  0x95e8)
 
-AVR_INSN (clr,  "r=r", "001001rdddddrrrr", 1, AVR_ISA_1200, 0x2400)
-AVR_INSN (lsl,  "r=r", "000011rdddddrrrr", 1, AVR_ISA_1200, 0x0c00)
-AVR_INSN (rol,  "r=r", "000111rdddddrrrr", 1, AVR_ISA_1200, 0x1c00)
-AVR_INSN (tst,  "r=r", "001000rdddddrrrr", 1, AVR_ISA_1200, 0x2000)
-
 AVR_INSN (adc,  "r,r", "000111rdddddrrrr", 1, AVR_ISA_1200, 0x1c00)
 AVR_INSN (add,  "r,r", "000011rdddddrrrr", 1, AVR_ISA_1200, 0x0c00)
 AVR_INSN (and,  "r,r", "001000rdddddrrrr", 1, AVR_ISA_1200, 0x2000)
@@ -115,6 +110,11 @@ AVR_INSN (mul,  "r,r", "100111rdddddrrrr", 1, AVR_ISA_MUL,  0x9c00)
 AVR_INSN (or,   "r,r", "001010rdddddrrrr", 1, AVR_ISA_1200, 0x2800)
 AVR_INSN (sbc,  "r,r", "000010rdddddrrrr", 1, AVR_ISA_1200, 0x0800)
 AVR_INSN (sub,  "r,r", "000110rdddddrrrr", 1, AVR_ISA_1200, 0x1800)
+
+AVR_INSN (clr,  "r=r", "001001rdddddrrrr", 1, AVR_ISA_1200, 0x2400)
+AVR_INSN (lsl,  "r=r", "000011rdddddrrrr", 1, AVR_ISA_1200, 0x0c00)
+AVR_INSN (rol,  "r=r", "000111rdddddrrrr", 1, AVR_ISA_1200, 0x1c00)
+AVR_INSN (tst,  "r=r", "001000rdddddrrrr", 1, AVR_ISA_1200, 0x2000)
 
 AVR_INSN (andi, "d,M", "0111KKKKddddKKKK", 1, AVR_ISA_1200, 0x7000)
   /*XXX special case*/
