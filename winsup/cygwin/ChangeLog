@@ -117,7 +117,7 @@
 	* fork.cc (fork_parent): Save mount_table and myself_addr.
 	* pinfo.cc (myself_addr): New variable.
 	(set_myself): Pass PID_MYSELF flag to init.
-	(pinfo::Init): Honor PID_MYSELF.  Save address where myself shared
+	(pinfo::init): Honor PID_MYSELF.  Save address where myself shared
 	memory resides in myself_addr, for fork.
 	* pinfo.h (myself_addr): Declare.
 	* shared.cc (memory_init): On fork, use previously saved address for
