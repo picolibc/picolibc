@@ -1,3 +1,12 @@
+2002-06-23  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (get_group_sidlist): Add pw argument and use pw->pw_name
+	in call to get_supplementary_group_sidlist.
+	(create_token): Add pw argument and use it in call to
+	get_group_sidlist.
+	* security.h: Add pw argument in declaration of create_token.
+	* syscalls.cc (seteuid32): Add pw argument in call to create_token.
+
 2002-06-23  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler.cc (fhandler_base::fstat): Set S_IFIFO for pipes.

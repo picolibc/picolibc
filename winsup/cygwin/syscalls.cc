@@ -2043,7 +2043,7 @@ seteuid32 (__uid32_t uid)
     {
       /* If no impersonation token is available, try to
 	 authenticate using NtCreateToken() or subauthentication. */
-      cygheap->user.token = create_token (usersid, pgrpsid);
+      cygheap->user.token = create_token (usersid, pgrpsid, pw_new);
       if (cygheap->user.token != INVALID_HANDLE_VALUE)
 	explicitly_created_token = TRUE;
       else

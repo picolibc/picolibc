@@ -180,7 +180,7 @@ void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 /* Try a subauthentication. */
 HANDLE subauth (struct passwd *pw);
 /* Try creating a token directly. */
-HANDLE create_token (cygsid &usersid, cygsid &pgrpsid);
+HANDLE create_token (cygsid &usersid, cygsid &pgrpsid, struct passwd * pw);
 /* Verify an existing token */
 BOOL verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern = NULL);
 
@@ -206,7 +206,7 @@ extern BOOL sec_acl (PACL acl, BOOL admins, PSID sid1 = NO_SID, PSID sid2 = NO_S
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
 PSECURITY_DESCRIPTOR alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
-          PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
+	  PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
 
 extern inline SECURITY_ATTRIBUTES *
 sec_user_nih (char sa_buf[], PSID sid = NULL)
