@@ -329,11 +329,10 @@ typedef struct {
   int   init_executed;   /* has the initialization routine been run? */
 } pthread_once_t;       /* dynamic package initialization */
 #else
-#endif /* defined(_POSIX_THREADS) */
-
 #if defined (__CYGWIN__)
 #include <cygwin/types.h>
 #endif
+#endif /* defined(_POSIX_THREADS) */
 
 #endif  /* defined(__rtems__) */
 
