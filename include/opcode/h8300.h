@@ -1,7 +1,7 @@
-/* Opcode table for the H8-300
+/* Opcode table for the H8/300
    Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000
    Free Software Foundation, Inc.
-   Written by Steve Chamberlain, sac@cygnus.com.
+   Written by Steve Chamberlain <sac@cygnus.com>.
    
    This file is part of GDB, the GNU Debugger and GAS, the GNU Assembler.
    
@@ -597,9 +597,5 @@ struct h8_opcode h8_opcodes[] =
   { 0 }
 };
 #else
-extern struct h8_opcode h8_opcodes[] ;
+extern struct h8_opcode h8_opcodes[];
 #endif
-
-
-
-

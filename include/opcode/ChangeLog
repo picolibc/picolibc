@@ -1,3 +1,7 @@
+2001-03-21  Kazu Hirata  <kazu@hxi.com>
+
+	* h8300.h: Fix formatting.
+
 2001-03-22  Alan Modra  <alan@linuxcare.com.au>
 
 	* i386.h (i386_optab): Add paddq, psubq.
