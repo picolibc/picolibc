@@ -67,7 +67,7 @@ STDIO_DISTFILES = \
 	vfscanf.c vfwscanf.c vscanf.c vsscanf.c vswscanf.c vwscanf.c
 
 COMPLEX_DISTFILES = \
-	cabs.c cacos.c cacosh.c casin.c casinh.c carg.c catan.c catanh.c \
+	cabs.c cacos.c cacosh.c carg.c casin.c casinh.c catan.c catanh.c \
 	ccos.c ccosh.c cexp.c cimag.c clog.c cpow.c cproj.c creal.c \
 	csin.c csinh.c csqrt.c ctan.c ctanh.c
 
@@ -151,7 +151,7 @@ POSIX_OBJS = \
 REPLACE_OBJS = \
 	mingw-fseek.o
 COMPLEX_OBJS = \
-	cabs.o cacos.o cacosh.o casin.o casinh.o catan.o catanh.o \
+	cabs.o cacos.o cacosh.o carg.o casin.o casinh.o catan.o catanh.o \
 	ccos.o ccosh.o cexp.o cimag.o clog.o cpow.o cproj.o creal.o \
 	csin.o csinh.o csqrt.o ctan.o ctanh.o 
 

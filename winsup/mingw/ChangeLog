@@ -1,3 +1,8 @@
+2004-07-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/complex/cargs.c: New file.
+	* mingwex/Makefile.in: Really add carg.o to libmingwex.a.
+
 2004-07-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (INCLUDES): Temporarily revert previous change.
