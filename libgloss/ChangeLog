@@ -1,3 +1,10 @@
+2002-01-24  Mark Salter  <msalter@redhat.com>
+
+	* arm/redboot-crt0.S: Use __get_memtop to put stack in high memory.
+
+	* arm/redboot-syscalls.c (_times): Unconditionally use SYS_times.
+	(__get_memtop): New funtion to return top of memory.
+
 2002-01-15  Mark Salter  <msalter@redhat.com>
 
 	* xstormy16/eva_stub.ld: Provide interrupt routine symbols which
