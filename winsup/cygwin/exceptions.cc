@@ -154,7 +154,7 @@ error_start_init (const char *buf)
 static void
 exception (EXCEPTION_RECORD *e,  CONTEXT *in)
 {
-  const char *exception_name = 0;
+  const char *exception_name = NULL;
 
   if (e)
     {

@@ -13,6 +13,7 @@ details. */
 #include <time.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include <ctype.h>
 
 #define PROTECT(x) x[sizeof(x)-1] = 0
 #define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
@@ -58,9 +59,43 @@ strace::microseconds()
   return microsec - first_microsec;
 }
 
+static int __stdcall
+getfunc (char *in_dst, const char *func)
+{
+  const char *p;
+  const char *pe;
+  char *dst = in_dst;
+  for (p = func; (pe = strchr (p, '(')); p = pe + 1)
+    if (isalnum ((int)pe[-1]) || pe[-1] == '_')
+      break;
+    else if (isspace((int)pe[-1]))
+      {
+	pe--;
+	break;
+      }
+  if (!pe)
+    pe = strchr (func, '\0');
+  for (p = pe; p > func; p--)
+    if (p != pe && *p == ' ')
+      {
+	p++;
+	break;
+      }
+  if (*p == '*')
+    p++;
+  while (p < pe)
+    *dst++ = *p++;
+
+  *dst++ = ':';
+  *dst++ = ' ';
+  *dst = '\0';
+
+  return dst - in_dst;
+}
+
 /* sprintf analog for use by output routines. */
 int
-strace::vsprntf (char *buf, const char *infmt, va_list ap)
+strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
 {
   int count;
   char fmt[80];
@@ -74,15 +109,9 @@ strace::vsprntf (char *buf, const char *infmt, va_list ap)
   __small_sprintf (fmt, "%7d [%s] %s ", microsec, tn, "%s %d%s");
 
   SetLastError (err);
+
   if (nonewline)
-    {
-      count = 0;
-      if (strncmp (infmt, "%F: ", 4) == 0)
-	{
-	  infmt += 4;
-	  (void) va_arg (ap, char *);
-	}
-    }
+    count = 0;
   else
     {
       char *p, progname[sizeof (myself->progname)];
@@ -96,6 +125,8 @@ strace::vsprntf (char *buf, const char *infmt, va_list ap)
       p = progname;
       count = __small_sprintf (buf, fmt, p && *p ? p : "?",
 			       myself->pid, hExeced ? "!" : "");
+      if (func)
+	count += getfunc (buf + count, func);
     }
 
   count += __small_vsprintf (buf + count, infmt, ap);
@@ -140,7 +171,7 @@ strace::write (unsigned category, const char *buf, int count)
    Warning: DO NOT SET ERRNO HERE! */
 
 void
-strace::prntf (unsigned category, const char *fmt, ...)
+strace::prntf (unsigned category, const char *func, const char *fmt, ...)
 {
   DWORD err = GetLastError ();
   int count;
@@ -151,7 +182,7 @@ strace::prntf (unsigned category, const char *fmt, ...)
   SetLastError (err);
 
   va_start (ap, fmt);
-  count = this->vsprntf (buf, fmt, ap);
+  count = this->vsprntf (buf, func, fmt, ap);
   CHECK(buf);
   if (category & _STRACE_SYSTEM)
     {
@@ -341,11 +372,11 @@ strace::wm (int message, int word, int lon)
 	{
 	  if (ta[i].v == message)
 	    {
-	      this->prntf (_STRACE_WM, "wndproc %d %s %d %d", message, ta[i].n, word, lon);
+	      this->prntf (_STRACE_WM, NULL, "wndproc %d %s %d %d", message, ta[i].n, word, lon);
 	      return;
 	    }
 	}
-      this->prntf (_STRACE_WM, "wndproc %d unknown  %d %d", message, word, lon);
+      this->prntf (_STRACE_WM, NULL, "wndproc %d unknown  %d %d", message, word, lon);
     }
 }
 #endif /*NOSTRACE*/

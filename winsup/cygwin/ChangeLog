@@ -1,3 +1,16 @@
+Wed Aug  2 15:14:51 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* strace.cc (strace::prntf): Make second argument the function name,
+	rather than use special format options.
+	(strace::vprntf): Ditto.
+	(getfunc): New function.
+	* include/sys/strace.h: Reflect above changes.
+	* smallprint.c (__small_vsprintf): Eliminate '%F' formatting.
+	* pinfo.cc (set_myself): Modify for new strace::prntf parameter.
+	* errno.cc (seterrno_from_win_error): Ditto.
+	* fhandler_tty.cc (fhandler_tty_common::__acquire_output_mutex): Ditto.
+	* fhandler_tty.cc (fhandler_tty_common::__release_output_mutex): Ditto.
+
 Wed Aug  2 13:20:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* regexp/regexp.c: Add winsup.h.

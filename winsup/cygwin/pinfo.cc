@@ -46,17 +46,17 @@ set_myself (pid_t pid)
   if (strace.active)
     {
       extern char osname[];
-      strace.prntf (1, "**********************************************");
-      strace.prntf (1, "Program name: %s", myself->progname);
-      strace.prntf (1, "App version:  %d.%d, api: %d.%d",
-			user_data->dll_major, user_data->dll_minor,
-			user_data->api_major, user_data->api_minor);
-      strace.prntf (1, "DLL version:  %d.%d, api: %d.%d",
-			cygwin_version.dll_major, cygwin_version.dll_minor,
-			cygwin_version.api_major, cygwin_version.api_minor);
-      strace.prntf (1, "DLL build:    %s", cygwin_version.dll_build_date);
-      strace.prntf (1, "OS version:   Windows %s", osname);
-      strace.prntf (1, "**********************************************");
+      strace.prntf (1, NULL, "**********************************************");
+      strace.prntf (1, NULL, "Program name: %s", myself->progname);
+      strace.prntf (1, NULL, "App version:  %d.%d, api: %d.%d",
+		       user_data->dll_major, user_data->dll_minor,
+		       user_data->api_major, user_data->api_minor);
+      strace.prntf (1, NULL, "DLL version:  %d.%d, api: %d.%d",
+		       cygwin_version.dll_major, cygwin_version.dll_minor,
+		       cygwin_version.api_major, cygwin_version.api_minor);
+      strace.prntf (1, NULL, "DLL build:    %s", cygwin_version.dll_build_date);
+      strace.prntf (1, NULL, "OS version:   Windows %s", osname);
+      strace.prntf (1, NULL, "**********************************************");
     }
 
   return;

@@ -154,32 +154,6 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  for (i = 0; *s && i < n; i++)
 		    *dst++ = *s++;
 		  break;
-		case 'F':
-		{
-		  const char *p, *pe;
-		  s = va_arg (ap, char *);
-		  for (p = s; (pe = strchr (p, '(')); p = pe + 1)
-		    if (isalnum ((int)pe[-1]) || pe[-1] == '_')
-		      break;
-		    else if (isspace((int)pe[-1]))
-		      {
-			pe--;
-			break;
-		      }
-		  if (!pe)
-		    pe = strchr (s, '\0');
-		  for (p = pe; p > s; p--)
-		    if (p != pe && *p == ' ')
-		      {
-			p++;
-			break;
-		      }
-		  if (*p == '*')
-		    p++;
-		  while (p < pe)
-		    *dst++ = *p++;
-		  break;
-		}
 		default:
 		  *dst++ = '?';
 		  *dst++ = fmt[-1];
