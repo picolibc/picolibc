@@ -1,3 +1,16 @@
+2002-07-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/stdio.h: Move fcloseall prototype within
+        #ifndef _REENT_ONLY section.
+        * libc/sys/linux/Makefile.am: Add new files.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/sys/stdio.h: Add ctermid prototype.
+        * libc/sys/linux/sys/unistd.h: Add ttyname_r prototype.
+	* libc/sys/linux/sys/types.h: Add ino64_t type.
+        * libc/sys/linux/ctermid.c: New file.
+        * libc/sys/linux/ttyname_r.c: Ditto.
+	* libc/sys/linux/readdir64.c: Ditto.
+
 2002-07-22  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdio.h (fcloseall, _fcloseall_r): Added prototypes.

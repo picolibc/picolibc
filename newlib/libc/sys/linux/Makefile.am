@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = cygnus
 
-INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 SUBDIRS = machine \
 	.
@@ -19,6 +19,7 @@ LIB_SOURCES = \
 	clock_getres.c \
 	clock_gettime.c \
 	clock_settime.c \
+	ctermid.c \
 	flockfile.c \
 	fpathconf.c \
 	free.c \
@@ -67,6 +68,7 @@ LIB_SOURCES = \
 	pwrite.c \
 	pwrite64.c \
 	raise.c \
+	readdir64.c \
 	realloc.c \
 	reallocr.c \
 	realpath.c \
@@ -98,6 +100,7 @@ LIB_SOURCES = \
 	tcsendbrk.c \
 	termios.c \
 	time.c \
+	ttyname_r.c \
 	usleep.c \
 	utimes.c \
 	vallocr.c \

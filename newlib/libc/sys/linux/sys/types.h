@@ -144,6 +144,7 @@ typedef	long	fd_mask;
 #define __key_t_defined
 #define __off_t_defined
 
+typedef __ino64_t ino64_t;
 typedef __uint32_t uintptr_t;
 typedef __int32_t intptr_t;
 

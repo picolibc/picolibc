@@ -204,7 +204,6 @@ int	_EXFUN(rename, (const char *, const char *));
 #endif
 #ifndef __STRICT_ANSI__
 int	_EXFUN(asprintf, (char **, const char *, ...));
-int	_EXFUN(fcloseall, (_VOID));
 int	_EXFUN(fseeko, (FILE *, off_t, int));
 off_t	_EXFUN(ftello, ( FILE *));
 int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST));
@@ -218,6 +217,7 @@ int	_EXFUN(vfscanf, (FILE *, const char *, __VALIST));
 int	_EXFUN(vscanf, (const char *, __VALIST));
 int	_EXFUN(vsscanf, (const char *, const char *, __VALIST));
 #ifndef _REENT_ONLY
+int	_EXFUN(fcloseall, (_VOID));
 int	_EXFUN(snprintf, (char *, size_t, const char *, ...));
 #endif
 #endif
