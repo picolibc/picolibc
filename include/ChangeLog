@@ -1,3 +1,8 @@
+2003-04-02  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa-config.h: Remove comment indicating that this is a
+	generated file.
+
 2003-04-01  Bob Wilson  <bob.wilson@acm.org>
 
         * dis-asm.h (print_insn_xtensa): Declare.
