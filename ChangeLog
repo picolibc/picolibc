@@ -1,3 +1,11 @@
+2002-09-22  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.def: New file.
+	* Makefile.tpl: New file.
+	* Makefile.in: Generate from Makefile.tpl with 'autogen Makefile.def'.
+
+	* configure.in: Minor rearrangement.  Simplify tests.
+
 2002-09-23  Jason Thorpe  <thorpej@wasabisystems.com>
 
 	* configure.in (with_headers): Skip copy if value is "yes".
