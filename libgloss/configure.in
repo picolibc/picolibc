@@ -115,6 +115,8 @@ case "${target}" in
   xscale-*-elf | xscale-*-coff)
 	configdirs="${configdirs} arm testsuite";
 	;;
+  iq2000-*-*)
+	configdirs="${configdirs} iq2000 testsuite";;
 
 esac
 

@@ -1,3 +1,8 @@
+2004-10-28  Nick Clifton  <nickc@redhat.com>
+
+	* configure.in: Add support for iq2000 target.
+	* configure: Regenerate.
+
 2004-10-05  Tomer Levi  <Tomer.Levi@nsc.com>
 
         * configure.in: Support crx-*-*.
