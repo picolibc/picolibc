@@ -1,3 +1,8 @@
+2002-01-29  Christopher Faylor  <cgf@redhat.com>
+
+	* dump_setup.cc (parse_filename): Don't consider '_' part of the
+	version.
+
 2002-01-28  Christopher Faylor  <cgf@redhat.com>
 
 	* cygcheck.cc: Fix typo.  Remove uid_t kludge.  Rely on kludge in
