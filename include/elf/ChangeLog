@@ -1,3 +1,8 @@
+2000-01-20  Nick Clifton  <nickc@cygnus.com>
+
+	* common.h (EM_MCORE): Fix spelling of Motorola.
+	* mcore.h (EM_MCORE): Fix spelling of Motorola.
+
 2000-01-13  Nick Clifton  <nickc@cygnus.com>
 
 	* common.h (EM_S370): Change comment - this is now the IBM
@@ -204,7 +209,7 @@ Wed Jun  9 15:16:34 1999  Jeffrey A Law  (law@cygnus.com)
 
 1999-04-08  Nick Clifton  <nickc@cygnus.com>
 
-	* mcore.h: New header file.  Defines for Motorolla's MCore
+	* mcore.h: New header file.  Defines for Motorola's MCore
 	processor.
 
 1999-04-08  Nick Clifton  <nickc@cygnus.com>

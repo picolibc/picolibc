@@ -1,4 +1,4 @@
-/* Motorolla MCore support for BFD.
+/* Motorola MCore support for BFD.
    Copyright (C) 1999 Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.

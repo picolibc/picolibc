@@ -105,7 +105,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_V800        36	/* NEC V800 series */
 #define EM_FR20	       37	/* Fujitsu FR20 */
 #define EM_RH32	       38       /* TRW RH32 */
-#define EM_MCORE       39       /* Motorolla MCore */ /* May also be taken by Fujitsu MMA */
+#define EM_MCORE       39       /* Motorola M*Core */ /* May also be taken by Fujitsu MMA */
 #define EM_RCE         39       /* Old name for MCore */
 #define EM_ARM	       40	/* ARM */
 #define EM_OLD_ALPHA   41	/* Digital Alpha */

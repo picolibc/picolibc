@@ -68,7 +68,7 @@ Mon May 17 13:35:35 1999  Stan Cox  <scox@cygnus.com>
 
 1999-04-08  Nick Clifton  <nickc@cygnus.com>
 
-	* mcore.h: New header file.  Defines for Motorolla's MCore
+	* mcore.h: New header file.  Defines for Motorola's MCore
 	processor. 
 
 Sun Dec  6 21:36:37 1998  Mark Elbrecht  <snowball3@usa.net>
