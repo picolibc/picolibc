@@ -1,3 +1,23 @@
+Wed Nov 15 01:20:24 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Throughout use myself->ppid_handle rather than parent_alive.
+	* child_info.h (child_info): Eliminate parent_alive.
+	* dcrt0.cc (dll_crt0_1): Call fork_init for debugging pid creation.
+	* fork.cc (fork_child): Reflect change to fixup_mmaps_after_fork
+	arguments.
+	(slow_pid_reuse): New function to grab last 'n' pids to prevent pid
+	reuse.
+	(fork_parent): Move last_fork_proc into slow_pid_reuse.  Handle
+	fork_pids debugging.  Eliminate unnecessary call to set_child_mmap_ptr.
+	(fork_init): New debugging function.
+	* mmap.cc (fixup_mmaps_after_fork): Renamed from
+	recreate_mmaps_after_fork.  Rely on copied data after a fork.
+	(set_child_mmap_ptr): Eliminate.
+	* pinfo.h (_pinfo): Eliminate parent_alive, mmap_ptr and reflect above
+	changes.
+	* spawn.cc (spawn_guts): Eliminate vestiges of "old way" of sending new
+	hProc to parent process.
+
 Wed Nov 15  0:51:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* cygheap.cc (cygheap_root::cygheap_root): New function.

@@ -92,7 +92,7 @@ stdio_init (void)
      Also, always set them even if we're to pick up our parent's fds
      in case they're missed.  */
 
-  if (!parent_alive && NOTSTATE(myself, PID_CYGPARENT))
+  if (!myself->ppid_handle && NOTSTATE(myself, PID_CYGPARENT))
     {
       HANDLE in = GetStdHandle (STD_INPUT_HANDLE);
       HANDLE out = GetStdHandle (STD_OUTPUT_HANDLE);

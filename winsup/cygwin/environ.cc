@@ -632,7 +632,7 @@ environ_init (char **envp, int envc)
       char *eq;
       if ((eq = strchr (newp, '=')) == NULL)
 	eq = strchr (newp, '\0');
-      if (!parent_alive)
+      if (!myself->ppid_handle)
 	ucenv (newp, eq);
       if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
 	sawTERM = 1;

@@ -59,8 +59,6 @@ public:
   /* Used to spawn a child for fork(), among other things. */
   char progname[MAX_PATH];
 
-  HANDLE parent_alive;
-
   /* User information.
      The information is derived from the GetUserName system call,
      with the name looked up in /etc/passwd and assigned a default value
@@ -83,8 +81,6 @@ public:
   long start_time;
   struct rusage rusage_self;
   struct rusage rusage_children;
-  /* Pointer to mmap'ed areas for this process.  Set up by fork. */
-  void *mmap_ptr;
 
   /* Non-zero if process was stopped by a signal. */
   char stopsig;
@@ -209,8 +205,7 @@ extern void __stdcall pinfo_fixup_after_fork ();
 extern HANDLE hexec_proc;
 
 /* For mmaps across fork(). */
-int __stdcall recreate_mmaps_after_fork (void *);
-void __stdcall set_child_mmap_ptr (_pinfo *);
+int __stdcall fixup_mmaps_after_fork ();
 
 void __stdcall fill_rusage (struct rusage *, HANDLE);
 void __stdcall add_rusage (struct rusage *, struct rusage *);

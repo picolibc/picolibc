@@ -36,7 +36,6 @@ public:
   HANDLE subproc_ready;	// used for synchronization with parent
   HANDLE shared_h;
   HANDLE console_h;
-  HANDLE parent_alive;	// handle of thread used to track children
   HANDLE parent;
   HANDLE pppid_handle;
   init_cygheap *cygheap;

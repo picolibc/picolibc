@@ -128,14 +128,14 @@ BOOL __stdcall
 my_parent_is_alive ()
 {
   DWORD res;
-  if (!parent_alive)
+  if (!myself->ppid_handle)
     {
-      debug_printf ("No parent_alive mutex");
+      debug_printf ("No myself->ppid_handle");
       res = FALSE;
     }
   else
     for (int i = 0; i < 2; i++)
-      switch (res = WaitForSingleObject (parent_alive, 0))
+      switch (res = WaitForSingleObject (myself->ppid_handle, 0))
 	{
 	  case WAIT_OBJECT_0:
 	    debug_printf ("parent dead.");
@@ -149,8 +149,8 @@ my_parent_is_alive ()
 	    DWORD werr = GetLastError ();
 	    if (werr == ERROR_INVALID_HANDLE && i == 0)
 	      continue;
-	    system_printf ("WFSO for parent_alive(%p) failed, error %d",
-			   parent_alive, werr);
+	    system_printf ("WFSO for myself->ppid_handle(%p) failed, error %d",
+			   myself->ppid_handle, werr);
 	    res = FALSE;
 	    goto out;
 	}
@@ -304,6 +304,8 @@ proc_subproc (DWORD what, DWORD val)
 	  hchildren[val] = hchildren[nchildren];
 	  pchildren[val] = pchildren[nchildren];
 	}
+      /* Don't scan the wait queue yet.  Caller will send SIGCHLD to this process.
+	 This will cause an eventual scan of waiters. */
       break;
 
     /* A child is in the stopped state.  Scan wait() queue to see if anyone
@@ -816,7 +818,6 @@ subproc_init (void)
 void __stdcall
 init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
 {
-  subproc_init ();
   memset (ch, 0, sizeof *ch);
   ch->cb = sizeof *ch;
   ch->type = chtype;
@@ -825,11 +826,6 @@ init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
   ch->console_h = console_shared_h;
   ch->subproc_ready = subproc_ready;
   ch->pppid_handle = myself->ppid_handle;
-  if (chtype != PROC_EXEC || !parent_alive)
-    ch->parent_alive = hwait_subproc;
-  else
-    DuplicateHandle (hMainProc, parent_alive, hMainProc, &ch->parent_alive,
-		     0, 1, DUPLICATE_SAME_ACCESS);
 }
 
 /* Check the state of all of our children to see if any are stopped or

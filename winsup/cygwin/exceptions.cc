@@ -891,8 +891,8 @@ sig_handle_tty_stop (int sig)
       pinfo parent (myself->ppid);
       sig_send (parent, __SIGCHILDSTOPPED);
     }
-  sigproc_printf ("process %d stopped by signal %d, parent_alive %p",
-		  myself->pid, sig, parent_alive);
+  sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
+		  myself->pid, sig, myself->ppid_handle);
   /* There is a small race here with the above two mutexes */
   SuspendThread (hMainThread);
   return;

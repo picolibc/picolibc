@@ -56,7 +56,6 @@ BOOL display_title = FALSE;
 BOOL strip_title_path = FALSE;
 BOOL allow_glob = TRUE;
 
-HANDLE NO_COPY parent_alive = NULL;
 int cygwin_finished_initializing = 0;
 
 /* Used in SIGTOMASK for generating a bit for insertion into a sigset_t.
@@ -739,7 +738,6 @@ dll_crt0_1 ()
   cygcwd.init ();
 
   cygbench ("pre-forkee");
-
   if (user_data->forkee)
     {
       /* If we've played with the stack, stacksize != 0.  That means that
@@ -757,6 +755,13 @@ dll_crt0_1 ()
 
       longjmp (fork_info->jmp, fork_info->cygpid);
     }
+
+#ifdef DEBUGGING
+  {
+  extern void fork_init ();
+  fork_init ();
+  }
+#endif
 
   /* Initialize our process table entry. */
   pinfo_init (envp, envc);
@@ -910,16 +915,6 @@ _dll_crt0 ()
 	      mypid = child_proc_info->cygpid;
 	      cygwin_shared_h = child_proc_info->shared_h;
 	      console_shared_h = child_proc_info->console_h;
-
-	      /* We don't want subprocesses to inherit this */
-	      if (dynamically_loaded)
-		parent_alive = NULL;
-	      else if (!DuplicateHandle (hMainProc, child_proc_info->parent_alive,
-					hMainProc, &parent_alive, 0, 0,
-					DUPLICATE_SAME_ACCESS
-					| DUPLICATE_CLOSE_SOURCE))
-		  system_printf ("parent_alive DuplicateHandle failed, %E");
-
 	      break;
 	    }
 	  default:

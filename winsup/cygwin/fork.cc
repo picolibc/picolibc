@@ -29,6 +29,12 @@ details. */
 #include "dll_init.h"
 #include "security.h"
 
+#ifdef DEBUGGING
+static int npid = 0;
+static int npid_max = 0;
+static pid_t fork_pids[100] = {0};
+#endif
+
 DWORD NO_COPY chunksize = 0;
 /* Timeout to wait for child to start, parent to init child, etc.  */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */
@@ -289,7 +295,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   (void) ForceCloseHandle (child_proc_info->subproc_ready);
   (void) ForceCloseHandle (child_proc_info->forker_finished);
 
-  if (recreate_mmaps_after_fork (myself->mmap_ptr))
+  if (fixup_mmaps_after_fork ())
     api_fatal ("recreate_mmaps_after_fork_failed");
 
   /* Set thread local stuff to zero.  Under Windows 95/98 this is sometimes
@@ -305,17 +311,40 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   return 0;
 }
 
+static void
+slow_pid_reuse (HANDLE h)
+{
+  static NO_COPY HANDLE last_fork_procs[64];
+  static NO_COPY unsigned nfork_procs = 0;
+
+  if (nfork_procs > (sizeof (last_fork_procs) / sizeof (last_fork_procs [0])))
+    nfork_procs = 0;
+  /* Keep a list of handles to forked processes sitting around to prevent
+     Windows from reusing the same pid n times in a row.  Having the same pids
+     close in succesion confuses bash.  Keeping a handle open will stop
+     windows from reusing the same pid.  */
+  if (last_fork_procs[nfork_procs])
+    CloseHandle (last_fork_procs[nfork_procs]);
+  if (!DuplicateHandle (hMainProc, h, hMainProc, &last_fork_procs[nfork_procs],
+			0, FALSE, DUPLICATE_SAME_ACCESS))
+    {
+      last_fork_procs[nfork_procs] = NULL;
+      system_printf ("couldn't create last_fork_proc, %E");
+    }
+  nfork_procs++;
+}
+
 static int __stdcall
-fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls, child_info_fork &ch)
+fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll,
+	     bool& load_dlls, child_info_fork &ch)
 {
   HANDLE subproc_ready, forker_finished;
   DWORD rc;
   PROCESS_INFORMATION pi = {0, NULL, 0, 0};
-  static NO_COPY HANDLE last_fork_proc = NULL;
 
   subproc_init ();
 
-#ifdef DEBUGGING
+#ifdef DEBUGGING_NOTNEEDED
   /* The ProtectHandle call allocates memory so we need to make sure
      that enough is set aside here so that the sbrk pointer does not
      move when ProtectHandle is called after the child is started.
@@ -348,6 +377,8 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
   if (fdtab.need_fixup_before ())
     c_flags |= CREATE_SUSPENDED;
 
+  /* Create an inheritable handle to pass to the child process.  This will
+     allow the child to duplicate handles from the parent to itself. */
   hParent = NULL;
   if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hParent, 0, 1,
 			DUPLICATE_SAME_ACCESS))
@@ -407,6 +438,23 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
   ch.parent = hParent;
   ch.cygheap = cygheap;
   ch.cygheap_max = cygheap_max;
+#ifdef DEBUGGING
+  if (npid_max)
+    {
+      for (int pass = 0; pass < 2; pass++)
+	{
+	  pid_t pid;
+	  while ((pid = fork_pids[npid++]))
+	    if (!pinfo (pid))
+	      {
+		ch.cygpid = pid;
+		goto out;
+	      }
+	  npid = 0;
+	}
+    }
+out:
+#endif
 
   char sa_buf[1024];
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
@@ -418,7 +466,7 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
 		      TRUE,	  /* inherit handles from parent */
 		      c_flags,
 		      NULL,	  /* environment filled in later */
-		      0,		  /* use current drive/directory */
+		      0,	  /* use current drive/directory */
 		      &si,
 		      &pi);
 
@@ -444,7 +492,11 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
       ResumeThread (pi.hThread);
     }
 
+#ifdef DEBUGGING
+  pinfo forked ((ch.cygpid != 1 ? ch.cygpid : cygwin_pid (pi.dwProcessId)), 1);
+#else
   pinfo forked (cygwin_pid (pi.dwProcessId), 1);
+#endif
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */
@@ -459,22 +511,12 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
      be called in subproc handling. */
   ProtectHandle1 (pi.hProcess, childhProc);
 
-  /* Keep a handle to the current forked process sitting around to prevent
-     Windows from reusing the same pid twice in a row.  Having the same pid
-     twice in a row confuses bash.  So, after every CreateProcess, we can safely
-     remove the old pid and save a handle to the newly created process.  Keeping
-     a handle open will stop windows from reusing the same pid.  */
-  if (last_fork_proc)
-    CloseHandle (last_fork_proc);
-  if (!DuplicateHandle (hMainProc, pi.hProcess, hMainProc, &last_fork_proc,
-			0, FALSE, DUPLICATE_SAME_ACCESS))
-    system_printf ("couldn't create last_fork_proc, %E");
+  slow_pid_reuse (pi.hProcess);
 
   /* Fill in fields in the child's process table entry.  */
   forked->hProcess = pi.hProcess;
   forked->dwProcessId = pi.dwProcessId;
   forked->copysigs(myself);
-  set_child_mmap_ptr (forked);
   forked.remember ();
 
   /* Wait for subproc to initialize itself. */
@@ -602,6 +644,19 @@ fork ()
   syscall_printf ("%d = fork()", res);
   return res;
 }
+#ifdef DEBUGGING
+void
+fork_init ()
+{
+  char buf[1024];
+  if (!GetEnvironmentVariable ("CYGWIN_FORK_PIDS", buf, 1024))
+    return;
+  pid_t pid;
+  char *p, *pe;
+  for (p = buf; (pid = strtol (p, &pe, 10)); p = pe)
+    fork_pids[npid_max++] = pid;
+}
+#endif /*DEBUGGING*/
 
 #ifdef NEWVFORK
 /* Dummy function to force second assignment below to actually be

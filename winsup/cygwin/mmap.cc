@@ -156,7 +156,7 @@ map::erase (int i)
  * needs to be specially handled by the fork code.
  */
 
-static NO_COPY map *mmapped_areas;
+static map *mmapped_areas;
 
 extern "C"
 caddr_t
@@ -185,11 +185,11 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
     }
 #endif
 
-  if (mmapped_areas == 0)
+  if (mmapped_areas == NULL)
     {
       /* First mmap call, create STL map */
       mmapped_areas = new map;
-      if (mmapped_areas == 0)
+      if (mmapped_areas == NULL)
 	{
 	  set_errno (ENOMEM);
 	  syscall_printf ("-1 = mmap(): ENOMEM");
@@ -271,9 +271,9 @@ munmap (caddr_t addr, size_t len)
 
   SetResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
   /* Check if a mmap'ed area was ever created */
-  if (mmapped_areas == 0)
+  if (mmapped_areas == NULL)
     {
-      syscall_printf ("-1 = munmap(): mmapped_areas == 0");
+      syscall_printf ("-1 = munmap(): mmapped_areas == NULL");
       set_errno (EINVAL);
       ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
       return -1;
@@ -344,9 +344,9 @@ msync (caddr_t addr, size_t len, int flags)
 
   SetResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," msync");
   /* Check if a mmap'ed area was ever created */
-  if (mmapped_areas == 0)
+  if (mmapped_areas == NULL)
     {
-      syscall_printf ("-1 = msync(): mmapped_areas == 0");
+      syscall_printf ("-1 = msync(): mmapped_areas == NULL");
       set_errno (EINVAL);
       ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," msync");
       return -1;
@@ -549,31 +549,26 @@ mprotect (caddr_t addr, size_t len, int prot)
 /*
  * Call to re-create all the file mappings in a forked
  * child. Called from the child in initialization. At this
- * point we are passed a valid mmaped_areas map, and all the
+ * point we are passed a valid mmapped_areas map, and all the
  * HANDLE's are valid for the child, but none of the
  * mapped areas are in our address space. We need to iterate
  * through the map, doing the MapViewOfFile calls.
  */
 
 int __stdcall
-recreate_mmaps_after_fork (void *param)
+fixup_mmaps_after_fork ()
 {
-  map *areas = (map *)param;
-  void *base;
 
-  debug_printf ("recreate_mmaps_after_fork, mmapped_areas %p", areas);
+  debug_printf ("recreate_mmaps_after_fork, mmapped_areas %p", mmapped_areas);
 
   /* Check if a mmapped area was ever created */
-  if (areas == 0)
+  if (mmapped_areas == NULL)
     return 0;
 
   /* Iterate through the map */
-
-  int it;
-
-  for (it = 0; it < areas->nlists; ++it)
+  for (int it = 0; it < mmapped_areas->nlists; ++it)
     {
-      list *l = areas->lists[it];
+      list *l = mmapped_areas->lists[it];
       if (l != 0)
 	{
 	  int li;
@@ -586,34 +581,21 @@ recreate_mmaps_after_fork (void *param)
 		  rec.get_size (), rec.get_address ());
 
 	      /* Now re-create the MapViewOfFileEx call */
-	      base = MapViewOfFileEx (rec.get_handle (),
-				      rec.get_access (), 0,
-				      rec.get_offset (),
-				      rec.get_size (),
-				      rec.get_address ());
+	      void *base = MapViewOfFileEx (rec.get_handle (),
+					    rec.get_access (), 0,
+					    rec.get_offset (),
+					    rec.get_size (),
+					    rec.get_address ());
 	      if (base != rec.get_address ())
 		{
 		  system_printf ("base address %p fails to match requested address %p",
 				 rec.get_address ());
 		  return -1;
 		}
-	     }
-	  }
-      }
-
-  /* Now set our mmap record in case the child forks. */
-  mmapped_areas = areas;
+	    }
+	}
+    }
 
   debug_printf ("succeeded");
-
   return 0;
-}
-
-/* Set a child mmap ptr from our static one. Used to set child mmap
-   pointer for fork. */
-
-void __stdcall
-set_child_mmap_ptr (_pinfo *child)
-{
-  child->mmap_ptr = (void *) mmapped_areas;
 }

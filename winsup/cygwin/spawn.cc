@@ -754,7 +754,7 @@ skip_arg_parsing:
 	  if (mode == _P_OVERLAY)
 	    {
 	      res |= EXIT_REPARENTING;
-	      if (!parent_alive)
+	      if (!my_parent_is_alive ())
 		{
 		  nwait = 1;
 		  sigproc_terminate ();
@@ -789,32 +789,19 @@ skip_arg_parsing:
        * EXIT_REPARENTING status. Wait() syscall in parent will then wait
        * for newly created child.
        */
-      pinfo parent (myself->ppid);
-      if (!parent)
-	/* nothing */;
-      else
+      HANDLE oldh = myself->hProcess;
+      HANDLE h = myself->ppid_handle;
+      sigproc_printf ("parent handle %p", h);
+      int rc = DuplicateHandle (hMainProc, pi.hProcess, h, &myself->hProcess,
+				0, FALSE, DUPLICATE_SAME_ACCESS);
+      sigproc_printf ("%d = DuplicateHandle, oldh %p, newh %p",
+		      rc, oldh, myself->hProcess);
+      if (!rc && my_parent_is_alive ())
 	{
-	  int rc = 0;
-	  HANDLE oldh = myself->hProcess;
-	  HANDLE h = myself->ppid_handle;
-	  sigproc_printf ("parent handle %p, pid %d", h, parent->dwProcessId);
-	  if (h == NULL && GetLastError () == ERROR_INVALID_PARAMETER)
-	    rc = 0;
-	  else if (h)
-	    {
-	      rc = DuplicateHandle (hMainProc, pi.hProcess,
-				    h, &myself->hProcess, 0, FALSE,
-				    DUPLICATE_SAME_ACCESS);
-	      sigproc_printf ("%d = DuplicateHandle, oldh %p, newh %p",
-			      rc, oldh, myself->hProcess);
-	    }
-	  if (!rc)
-	    {
-	      system_printf ("Reparent failed, parent handle %p, %E", h);
-	      system_printf ("my dwProcessId %d, myself->dwProcessId %d",
-			     GetCurrentProcessId(), myself->dwProcessId);
-	      system_printf ("old hProcess %p, hProcess %p", oldh, myself->hProcess);
-	    }
+	  system_printf ("Reparent failed, parent handle %p, %E", h);
+	  system_printf ("my dwProcessId %d, myself->dwProcessId %d",
+			 GetCurrentProcessId(), myself->dwProcessId);
+	  system_printf ("old hProcess %p, hProcess %p", oldh, myself->hProcess);
 	}
     }
 
