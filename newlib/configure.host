@@ -93,6 +93,9 @@ case "${host_cpu}" in
   avr*)
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mcall-prologues"
 	;;
+  cris | crisv32)
+	machine_dir=cris
+	;;
   crx*)
 	machine_dir=crx
 	;;
@@ -501,6 +504,10 @@ case "${host}" in
 	;;
   avr*)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
+	;;
+  cris-*-* | crisv32-*-*)
+	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_GETTIMEOFDAY -D_USE_WRITE"
+	syscall_dir=syscalls
 	;;
   crx-*-*)
   	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DMISSING_SYSCALL_NAMES"

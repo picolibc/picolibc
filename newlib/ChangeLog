@@ -1,5 +1,19 @@
 2005-01-27  Hans-Peter Nilsson  <hp@axis.com>
 
+	* configure.host: Add support for cris-*-* and crisv32-*-*.
+	* libc/include/machine/ieeefp.h: Ditto.
+	* libc/include/machine/setjmp.h: Ditto.
+	* libc/machine/cris/configure.in, libc/machine/cris/Makefile.am,
+	libc/machine/cris/libcdtor.c, libc/machine/cris/setjmp.c,
+	libc/machine/cris/memmove.c, libc/machine/cris/memcpy.c,
+	libc/machine/cris/memset.c, libc/machine/cris/include/pthread.h,
+	libc/machine/cris/sys/signal.h, libc/machine/cris/sys/fcntl.h,
+	libc/machine/cris/sys/errno.h, libc/machine/cris/aclocal.m4,
+	libc/machine/cris/configure, libc/machine/cris/Makefile.in: New
+	files.
+
+2005-01-27  Hans-Peter Nilsson  <hp@axis.com>
+
 	* testsuite/newlib.string/memmove1.c: New test.
 
 2005-01-27  Hans-Peter Nilsson  <hp@axis.com>
