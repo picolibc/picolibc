@@ -1,5 +1,11 @@
 2002-12-28  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in: Add devices.gperf.
+	* devices.h: New file.
+	* devices.gperf: Ditto.
+
+2002-12-28  Christopher Faylor  <cgf@redhat.com>
+
 	Introduce device class to cygwin throughout.  Rename FH_DISK to FH_FS
 	throughout.
 	* dcrt0.cc (dll_crt0_1): Initialize device globals via device::init.
