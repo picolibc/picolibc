@@ -231,8 +231,7 @@ _cmalloc (int size)
     }
   else
     {
-      size = sz + sizeof (_cmalloc_entry);
-      rvc = (_cmalloc_entry *) _csbrk (size);
+      rvc = (_cmalloc_entry *) _csbrk (sz);
       if (!rvc)
 	{
 	  cygheap_protect->release ();

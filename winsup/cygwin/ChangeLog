@@ -1,3 +1,7 @@
+2003-01-15  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* cmalloc.cc (_cmalloc): Fix memory leak.
+
 2003-01-15  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: Fix copyright date.
