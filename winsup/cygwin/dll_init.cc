@@ -138,8 +138,6 @@ add (HMODULE h, char *name, per_process *p, dllType type)
 static int
 initOneDll (per_process *p)
 {
-  /* global variable user_data must be initialized */
-
   /* FIXME: init environment (useful?) */
   *(p->envptr) = *(user_data->envptr);
 
@@ -439,26 +437,13 @@ LoadedDllIterator::~LoadedDllIterator ()
 {
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-// the extern symbols
-
-extern "C"
-{
-  /* This is an exported copy of environ which can be used by DLLs
-     which use cygwin.dll.  */
-  extern struct _reent reent_data;
-};
-
-extern "C"
-int
+extern "C" int
 dll_dllcrt0 (HMODULE h, per_process *p)
 {
-  struct _reent reent_data;
   if (p == NULL)
     p = &__cygwin_user_data;
   else
-    *(p->impure_ptr_ptr) = &reent_data;
+    *(p->impure_ptr_ptr) = __cygwin_user_data.impure_ptr;
 
   /* Partially initialize Cygwin guts for non-cygwin apps. */
   if (dynamically_loaded && user_data->magic_biscuit == 0)

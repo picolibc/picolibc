@@ -1,3 +1,9 @@
+Wed Jul 12 00:46:00 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* debug.cc (thread_stub): Use impure_ptr in place of reent_data.
+	* dll_init.cc (dll_dllcrt0): Replace erroneous use of local symbol with
+	correct __cygwin_user_data->impure_ptr.
+
 Wed Jul 12 00:01:03 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* lib/_cygwin_crt0_common.cc (_cygwin_crt0_common): Don't reset

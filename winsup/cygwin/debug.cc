@@ -87,7 +87,7 @@ thread_stub (VOID *arg)
      SIGSEGV or SIGFPE. */
   init_exceptions (&except_entry);
 
-  set_reent (&reent_data);
+  set_reent (user_data->impure_ptr);
   ExitThread (threadfunc (threadarg));
 }
 
