@@ -1,3 +1,15 @@
+2005-02-16  Eric Blake  <ebb9@byu.net>
+
+	* libc/time/time.tex: Improve the documentation.
+	* libc/time/strftime.c: Improve the documentation.
+	(iso_year_adjust): New helper function.
+	(strftime): Simplify '%E' and '%O'. Change '%c' to use
+	recursion. Fix '%C', '%y', and '%Y' to deal with years with more
+	than 4 characters.  Combine '%d' and '%e'. Implement '%D', '%F',
+	'%g', '%G', '%n', '%R', '%t', '%T', '%u', '%V', '%X', and '%z'.
+	Avoid core dumps on valid inputs (maxsize == 0, or
+	tim_p->tm_isdst > 1).
+
 2005-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/pwd.h (struct passwd): Change pw_uid and pw_gid

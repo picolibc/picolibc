@@ -18,28 +18,28 @@ the following fields:
 
 @table @code
 @item tm_sec
-Seconds.
+Seconds, between 0 and 60 inclusive (60 allows for leap seconds).
 
 @item tm_min
-Minutes.
+Minutes, between 0 and 59 inclusive.
 
 @item tm_hour
-Hours.
+Hours, between 0 and 23 inclusive.
 
 @item tm_mday
-Day.
+Day of the month, between 1 and 31 inclusive.
 
 @item tm_mon
-Month.
+Month, between 0 (January) and 11 (December).
 
 @item tm_year
-Year (since 1900).
+Year (since 1900), can be negative for earlier years.
 
 @item tm_wday
-Day of week: the number of days since Sunday.
+Day of week, between 0 (Sunday) and 6 (Saturday).
 
 @item tm_yday
-Number of days elapsed since last January 1.
+Number of days elapsed since last January 1, between 0 and 365 inclusive.
 
 @item tm_isdst
 Daylight Savings Time flag: positive means DST in effect, zero means DST
