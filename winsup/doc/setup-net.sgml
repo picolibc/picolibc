@@ -13,8 +13,8 @@ The <command>setup.exe</command> installer is designed to be easy
 for new users to understand while remaining flexible for the 
 experienced. The volunteer development team is constantly working
 on <command>setup.exe</command>; before requesting a new feature,
-check the wishlist in the CVS <literal>README</literal>. It may
-already be present in the CVS version!
+check the wishlist in the <ulink URL="http://sources.redhat.com/cgi-bin/cvsweb.cgi/setup/README?cvsroot=cygwin-apps&amp;rev=2">CVS <literal>README</literal>
+</ulink>. It may already be present in the CVS version!
 </para>
 
 <para>
@@ -62,19 +62,16 @@ the parent directory, and any ACLs on the parent directory will
 determine access to installed files.
 </para>
 <para>
-The <literal>Install For</literal> options of 
-<literal>All Users</literal> or 
-<literal>Just Me</literal> are especially for multiuser systems
-or Domain users. If you have access to a user account that is a local 
-Administrator or a member of the Administrators group, it is best to
-install for <literal>All Users</literal>. You should only install for
-<literal>Just Me</literal> if you do not have write access to 
-<literal>HKEY_LOCAL_MACHINE</literal> in the registry or the 
-All Users Start Menu, even if you are the only user planning to use 
-Cygwin on the machine.  If you are seeking to rollout
-Cygwin on a large Domain, you will want to read <Xref Linkend="ntsec">
-in the Cygwin User's Guide and consult the Cygwin mailing list archives 
-about others' experiences.
+The <literal>Install For</literal> options of <literal>All Users</literal> 
+or <literal>Just Me</literal> should always be left on the default
+<literal>All Users</literal>, unless you do not have write access to 
+<literal>HKEY_LOCAL_MACHINE</literal> in the registry or the All Users 
+Start Menu. This is true  even if you are the only user planning to use Cygwin 
+on the machine.  Checking the <literal>Just Me</literal> will cause problems 
+for programs such as <command>crond</command> and <command>sshd</command>.
+If you do not have the necessary permissions, but still want to use these
+programs, consult the Cygwin mailing list archives about others' experiences.
+
 </para>
 <para>
 The <literal>Default Text File Type</literal> should be left on
