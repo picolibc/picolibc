@@ -226,6 +226,21 @@ LoadDLLinitfunc (ole32)
   return 0;
 }
 
+LoadDLLinitfunc (kernel32)
+{
+  extern void wsock_init ();
+  HANDLE h;
+
+  if ((h = LoadLibrary ("kernel32.dll")) != NULL)
+    kernel32_handle = h;
+  else if (!kernel32_handle)
+    api_fatal ("could not load wsock32.dll.  Is TCP/IP installed?");
+  else
+    return 0;		/* Already done by another thread? */
+
+  return 0;
+}
+
 static void __stdcall dummy_autoload (void) __attribute__ ((unused));
 static void __stdcall
 dummy_autoload (void)
@@ -374,5 +389,8 @@ LoadDLLinit (ole32)
 LoadDLLfunc (CoInitialize, 4, ole32)
 LoadDLLfunc (CoUninitialize, 0, ole32)
 LoadDLLfunc (CoCreateInstance, 20, ole32)
+
+LoadDLLinit (kernel32)
+LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)
 }
 }

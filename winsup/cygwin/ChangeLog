@@ -1,3 +1,10 @@
+Wed Mar 21 22:12:36 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* autoload.cc (kernel32_init): New function for kernel32 autoload
+	initialization.
+	(SignalObjectAndWait): Add conditional load of this function when it is
+	available.
+
 2001-03-21 Robert Collins <rbtcollins@hotmail.com>
 
 	* sched.cc: New file.  Implement sched*.
