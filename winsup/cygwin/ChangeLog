@@ -1,5 +1,42 @@
 2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* thread.h (pthread_cond::ExitingWait): Remove.
+	(pthread_cond::mutex): Ditto.
+	(pthread_cond::cond_access): Ditto.
+	(pthread_cond::win32_obj_id): Ditto.
+	(pthread_cond::TimedWait): Ditto.
+	(pthread_cond::BroadCast): Ditto.
+	(pthread_cond::Signal): Ditto.
+	(pthread_cond::waiting): Change type to unsigned long.
+	(pthread_cond::pending): New member.
+	(pthread_cond::semWait): Ditto.
+	(pthread_cond::mtxIn): Ditto.
+	(pthread_cond::mtxOut): Ditto.
+	(pthread_cond::mtxCond): Ditto.
+	(pthread_cond::UnBlock): New method.
+	(pthread_cond::Wait): Ditto.
+	* thread.cc: Update list of cancellation points.
+	(pthread_cond::pthread_cond): Rewrite.
+	(pthread_cond::~pthread_cond): Ditto.
+	(pthread_cond::TimedWait): Remove.
+	(pthread_cond::BroadCast): Ditto.
+	(pthread_cond::Signal): Ditto.
+	(pthread_cond::UnBlock): Implement.
+	(pthread_cond::Wait): Ditto.
+	(pthread_cond::fixup_after_fork): Rewrite.
+	(pthread_mutex::fixup_after_fork): Remove DETECT_BAD_APP
+	conditional.
+	(__pthread_cond_broadcast): Just return 0 if the condition is
+	not initialized. Call pthread_cond::UnBlock to release blocked
+	threads.
+	(__pthread_cond_signal): Ditto.
+	(__pthread_cond__dowait): Rewrite.
+	(pthread_cond_timedwait): Add pthread_testcancel call. Fix
+	waitlength calculation.
+	(pthread_cond_wait): Add pthread_testcancel call.
+
+2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
+
 	* include/pthread.h (PTHREAD_MUTEX_NORMAL): New define.
 	* thread.cc: Remove errno.h include.
 	(pthread::precreate): Change internal mutex type to normal.

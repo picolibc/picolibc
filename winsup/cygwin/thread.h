@@ -494,16 +494,20 @@ public:
   static int init (pthread_cond_t *, const pthread_condattr_t *);
 
   int shared;
-  LONG waiting;
-  LONG ExitingWait;
-  pthread_mutex *mutex;
-  /* to allow atomic behaviour for cond_broadcast */
-  pthread_mutex_t cond_access;
-  HANDLE win32_obj_id;
+
+  unsigned long waiting;
+  unsigned long pending;
+  HANDLE semWait;
+
+  pthread_mutex mtxIn;
+  pthread_mutex mtxOut;
+
+  pthread_mutex_t mtxCond;
+
   class pthread_cond * next;
-  int TimedWait (DWORD dwMilliseconds);
-  void BroadCast ();
-  void Signal ();
+
+  void UnBlock (const bool all);
+  int Wait (pthread_mutex_t mutex, DWORD dwMilliseconds = INFINITE);
   void fixup_after_fork ();
 
   pthread_cond (pthread_condattr *);
