@@ -603,7 +603,7 @@ fhandler_tty_slave::close ()
     FreeConsole ();
   termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
   if (myself->ctty >= 0 && get_io_handle () == cygheap->ctty.get_io_handle ())
-    return 1;
+    return 0;
   return fhandler_tty_common::close ();
 }
 
@@ -898,6 +898,14 @@ fhandler_tty_common::dup (fhandler_base *child)
   fhandler_tty_slave *fts = (fhandler_tty_slave *) child;
   int errind;
 
+debug_printf ("get_io_handle %p, cygheap->ctty.get_io_handle %p",get_io_handle (),cygheap->ctty.get_io_handle ());
+  if (get_io_handle () == cygheap->ctty.get_io_handle ())
+    {
+      *fts = cygheap->ctty;
+      termios_printf ("duped ctty");
+      return 0;
+    }
+
   fts->tcinit (get_ttyp ());
 
   attach_tty (get_unit ());
@@ -981,7 +989,7 @@ fhandler_tty_common::dup (fhandler_base *child)
     }
 
   if (get_major () == DEV_TTYS_MAJOR)
-    myself->set_ctty (get_ttyp (), openflags, (fhandler_tty_slave *) this);
+    myself->set_ctty (get_ttyp (), openflags, fts);
 
   return 0;
 
@@ -1147,6 +1155,7 @@ fhandler_pty_master::open (int flags, mode_t)
 int
 fhandler_tty_common::close ()
 {
+  termios_printf ("tty%d <%p,%p> closing", get_unit (), get_handle (), get_output_handle ());
   if (output_done_event && !CloseHandle (output_done_event))
     termios_printf ("CloseHandle (output_done_event), %E");
   if (ioctl_done_event && !CloseHandle (ioctl_done_event))
@@ -1174,10 +1183,8 @@ fhandler_tty_common::close ()
   if (!ForceCloseHandle1 (get_output_handle (), to_pty))
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
-  set_io_handle (NULL);
-
   inuse = NULL;
-  termios_printf ("tty%d <%p,%p> closed", get_unit (), get_handle (), get_output_handle ());
+  set_io_handle (NULL);
   return 0;
 }
 

@@ -952,21 +952,23 @@ extern CRITICAL_SECTION exit_lock;
 void __stdcall
 do_exit (int status)
 {
+  syscall_printf ("do_exit (%d), exit_state %d", status, exit_state);
+
+  vfork_save *vf = vfork_storage.val ();
+  if (vf != NULL && vf->pid < 0)
+    {
+      exit_state = ES_NOT_EXITING;
+      vf->restore_exit (status);
+    }
+
+  EnterCriticalSection (&exit_lock);
   if (exit_state < ES_EVENTS_TERMINATE)
     {
       exit_state = ES_EVENTS_TERMINATE;
       events_terminate ();
     }
 
-  EnterCriticalSection (&exit_lock);
   UINT n = (UINT) status;
-
-  syscall_printf ("do_exit (%d)", n);
-
-  vfork_save *vf = vfork_storage.val ();
-  if (vf != NULL && vf->pid < 0)
-    vf->restore_exit (status);
-
   if (exit_state < ES_THREADTERM)
     {
       exit_state = ES_THREADTERM;

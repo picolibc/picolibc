@@ -1,3 +1,18 @@
+2003-12-09  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_common::dup): Just copy cygheap->ctty
+	to child if duping the current ctty.
+	(fhandler_tty_common::close): Move debugging statement earlier in function.
+	(fhandler_tty_slave::close): Return success when closing ctty.
+	* syscalls.cc (close_all_files): Avoid calling fhandler_tty_slave close
+	method so that open_fhs will not be decremented when closing cygheap
+	ctty.
+	(setsid): Ditto.
+	* dcrt0.cc (do_exit): Reorganize to avoid leaving a critical section
+	active after vfork.
+	* fhandler.h (fhandler_tty_slave::get_unit): Remove regparm parameter
+	since it can't work in a virtualized function.
+
 2003-12-08  Christopher Faylor  <cgf@redhat.com>
 
 	* pinfo.cc (_pinfo::set_ctty): Don't copy over existing ctty if it is

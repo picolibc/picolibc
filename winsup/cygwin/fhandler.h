@@ -918,7 +918,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   _off64_t lseek (_off64_t, int) { return 0; }
   select_record *select_read (select_record *s);
   int cygserver_attach_tty (HANDLE*, HANDLE*);
-  int get_unit () __attribute__ ((regparm (1)));
+  int get_unit ();
   virtual char const *ttyname () { return pc.dev.name; }
 };
 

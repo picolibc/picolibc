@@ -98,10 +98,7 @@ close_all_files (void)
       }
 
   if (cygheap->ctty.get_io_handle ())
-    {
-      myself->ctty = -1;
-      cygheap->ctty.close ();
-    }
+    cygheap->ctty.fhandler_tty_common::close ();
 
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
   user_shared->delqueue.process_queue ();
@@ -324,10 +321,7 @@ setsid (void)
       myself->sid = getpid ();
       myself->pgid = getpid ();
       if (cygheap->ctty.get_io_handle ())
-	{
-	  cygheap->ctty.close ();
-	  cygheap->ctty.set_io_handle (NULL);
-	}
+	cygheap->ctty.fhandler_tty_common::close ();
       syscall_printf ("sid %d, pgid %d, ctty %d, open_fhs %d", myself->sid,
 		      myself->pgid, myself->ctty, fhandler_console::open_fhs);
       return myself->sid;
