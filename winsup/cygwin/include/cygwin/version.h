@@ -171,12 +171,21 @@ details. */
        71: Export strerror_r
        72: Export nanosleep
        73: Export setreuid32, setreuid, setregid32, setregid
+       74: Export _strtold a64l hcreate hcreate_r hdestroy hdestroy_r hsearch
+		  hsearch_r isblank iswalnum iswalpha iswblank iswcntrl iswctype
+		  iswdigit iswgraph iswlower iswprint iswpunct iswspace iswupper
+		  iswxdigit l64a mbrlen mbrtowc mbsinit mbsrtowcs mempcpy
+		  on_exit setbuffer setlinebuf strndup strnlen tdelete tdestroy
+		  tfind towctrans towlower towupper tsearch twalk wcrtomb wcscat
+		  wcschr wcscpy wcscspn wcslcat wcslcpy wcsncat wcsncmp wcsncpy
+		  wcspbrk wcsrchr wcsrtombs wcsspn wcsstr wctob wctob wctrans
+		  wctype wmemchr wmemcmp wmemcpy wmemmove wmemset
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 73
+#define CYGWIN_VERSION_API_MINOR 74
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
