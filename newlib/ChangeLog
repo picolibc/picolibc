@@ -1,3 +1,10 @@
+2000-12-13  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am: Fixed install-data-local target to use
+	$(mkinstalldirs) for the installed header files to ensure
+	the directories exist before copying.
+	* Makefile.in: Regenerated.
+
 2000-12-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/unistd.h: Restored Cygwin _SC
