@@ -1,3 +1,11 @@
+2003-12-04  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Use _r versions
+	of mb routines for %lc and %ls support.
+	* libc/stdio/vfscanf.c (_svfscanf_r): Add %lc, %C,
+	%ls, and %S support.  Remove CYGNUS_NEC markers and
+	code within.
+
 2003-12-04  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/wchar.h: Add prototypes for _mbrtowc_r,
@@ -24,7 +32,7 @@
 	* libc/stdlib/atol.c (_atol_r): New reentrant function.
 	* libc/stdlib/atoll.c (_atoll_r): Ditto.
 
-2003-11-27  Artem B. Bityuckiy  <mail_lists@mail.ru>
+2003-11-27  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 	    Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdlib.h (lldiv_t): New type.
@@ -42,12 +50,12 @@
 	* libc/include/unistd.h: Ditto.
 	* libc/include/stat.h: Ditto.  Also declare struct stat64.
 
-2003-11-24  Artem B. Bityuckiy  <mail_lists@mail.ru>
+2003-11-24  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Fix check for 'C' format
 	specifier to use ch instead of *fmt.
 
-2003-11-21  Artem B. Bityuckiy  <mail_lists@mail.ru>
+2003-11-21  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* libc/stdio/vfprintf.c (_VFPRINTF_R, get_arg): Move mb-specific
 	code within checks for MB_CAPABLE.  For non-mb-capable platforms,
@@ -163,7 +171,7 @@
 	* libc/sys/linux/linuxthreads/td_thr_validate.c: Ditto.
 
 2003-11-05  Jeff Johnston  <jjohnstn@redhat.com>
-            Artem B. Bityuckiy  <mail_lists@mail.ru>
+            Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Add support for
 	%ls, %S, %lc, and %C format specifiers.
@@ -182,7 +190,7 @@
 	CC_FOR_NEWLIB include options.
 	* configure: Regenerated.
 
-2003-10-23  Artem B. Bityuckiy  <mail_lists@mail.ru>
+2003-10-23  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* libc/string/wcsnlen.c: New file.
 	* libc/include/wchar.h: Add wcsnlen prototype.

@@ -104,6 +104,7 @@ Supporting OS subroutines required:
 
 #include <_ansi.h>
 #include <ctype.h>
+#include <wctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -138,7 +139,13 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #endif
 
 #include "floatio.h"
-#define	BUF	(MAXEXP+MAXFRACT+3)	/* 3 = sign + decimal point + NUL */
+
+#if ((MAXEXP+MAXFRACT+3) > MB_LEN_MAX)
+#  define BUF (MAXEXP+MAXFRACT+3)        /* 3 = sign + decimal point + NUL */
+#else
+#  define BUF MB_LEN_MAX
+#endif
+
 /* An upper bound for how long a long prints in decimal.  4 / 13 approximates
    log (2).  Add one char for roundoff compensation and one for the sign.  */
 #define MAX_LONG_LEN ((CHAR_BIT * sizeof (long)  - 1) * 4 / 13 + 2)
@@ -254,14 +261,14 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   int base = 0;			/* base argument to strtol/strtoul */
   int nbytes = 1;               /* number of bytes read from fmt string */
   wchar_t wc;                   /* wchar to use to read format string */
+  wchar_t *wcp;                 /* handy wide character pointer */
+  size_t mbslen;                /* length of converted multibyte sequence */
+  mbstate_t state;              /* value to keep track of multibyte state */
 
   u_long (*ccfn) () = 0;	/* conversion function (strtol/strtoul) */
   char ccltab[256];		/* character class table for %[...] */
   char buf[BUF];		/* buffer for numeric conversions */
   char *lptr;                   /* literal pointer */
-#ifdef MB_CAPABLE
-  mbstate_t state;                /* value to keep track of multibyte state */
-#endif
 
   char *cp;
   short *sp;
@@ -272,8 +279,6 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   long *lp;
 #ifndef _NO_LONGLONG
   long long *llp;
-#else
-	u_long _uquad;
 #endif
 
   /* `basefix' is used to avoid `if' tests in the integer scanner */
@@ -428,6 +433,9 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  c = CT_FLOAT;
 	  break;
 #endif
+        case 'S':
+          flags |= LONG;
+          /* FALLTHROUGH */
 
 	case 's':
 	  c = CT_STRING;
@@ -438,6 +446,10 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  flags |= NOSKIP;
 	  c = CT_CCL;
 	  break;
+
+        case 'C':
+          flags |= LONG;
+          /* FALLTHROUGH */
 
 	case 'c':
 	  flags |= NOSKIP;
@@ -516,9 +528,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
-#ifndef CYGNUS_NEC
 	      if (__srefill (fp))
-#endif
 		goto input_failure;
 	    }
 	  /*
@@ -538,10 +548,47 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  /* scan arbitrary characters (sets NOSKIP) */
 	  if (width == 0)
 	    width = 1;
-	  if (flags & SUPPRESS)
+          if (flags & LONG) 
+            {
+              if ((flags & SUPPRESS) == 0)
+                wcp = va_arg(ap, wchar_t *);
+              else
+                wcp = NULL;
+              n = 0;
+              while (width != 0) 
+                {
+                  if (n == MB_CUR_MAX)
+                    goto input_failure;
+                  buf[n++] = *fp->_p;
+                  fp->_r -= 1;
+                  fp->_p += 1;
+                  memset((void *)&state, '\0', sizeof(mbstate_t));
+                  if ((mbslen = _mbrtowc_r(rptr, wcp, buf, n, &state)) 
+                                                         == (size_t)-1)
+                    goto input_failure; /* Invalid sequence */
+                  if (mbslen == 0 && !(flags & SUPPRESS))
+                    *wcp = L'\0';
+                  if (mbslen != (size_t)-2) /* Incomplete sequence */
+                    {
+                      nread += n;
+                      width -= 1;
+                      if (!(flags & SUPPRESS))
+                        wcp += 1;
+                      n = 0;
+                    }
+                  if (BufferEmpty) 
+	            {
+                      if (n != 0) 
+                        goto input_failure;
+                      break;
+                    }
+                }
+              if (!(flags & SUPPRESS))
+                nassigned++;
+            } 
+          else if (flags & SUPPRESS) 
 	    {
 	      size_t sum = 0;
-
 	      for (;;)
 		{
 		  if ((n = fp->_r) < (int)width)
@@ -549,16 +596,12 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		      sum += n;
 		      width -= n;
 		      fp->_p += n;
-#ifndef CYGNUS_NEC
 		      if (__srefill (fp))
 			{
-#endif
 			  if (sum == 0)
 			    goto input_failure;
 			  break;
-#ifndef CYGNUS_NEC
 			}
-#endif
 		    }
 		  else
 		    {
@@ -572,27 +615,11 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	    }
 	  else
 	    {
-#ifdef CYGNUS_NEC
-	      /* Kludge city for the moment */
-	      char *dest = va_arg (ap, char *);
-	      int n = width;
-	      if (fp->_r == 0)
-		goto input_failure;
-
-	      while (n && fp->_r)
-		{
-		  *dest++ = *(fp->_p++);
-		  n--;
-		  fp->_r--;
-		  nread++;
-		}
-#else
 	      size_t r = fread ((_PTR) va_arg (ap, char *), 1, width, fp);
 
 	      if (r == 0)
 		goto input_failure;
 	      nread += r;
-#endif
 	      nassigned++;
 	    }
 	  break;
@@ -648,8 +675,56 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	case CT_STRING:
 	  /* like CCL, but zero-length string OK, & no NOSKIP */
 	  if (width == 0)
-	    width = ~0;
-	  if (flags & SUPPRESS)
+            width = (size_t)~0;
+          if (flags & LONG) 
+            {
+              /* Process %S and %ls placeholders */
+              if ((flags & SUPPRESS) == 0)
+                wcp = va_arg(ap, wchar_t *);
+              else
+                wcp = &wc;
+              n = 0;
+              while (!isspace(*fp->_p) && width != 0) 
+                {
+                  if (n == MB_CUR_MAX)
+                    goto input_failure;
+                  buf[n++] = *fp->_p;
+                  fp->_r -= 1;
+                  fp->_p += 1;
+                  memset((void *)&state, '\0', sizeof(mbstate_t));
+                  if ((mbslen = _mbrtowc_r(rptr, wcp, buf, n, &state)) 
+                                                        == (size_t)-1)
+                    goto input_failure;
+                  if (mbslen == 0)
+                    *wcp = L'\0';
+                  if (mbslen != (size_t)-2) /* Incomplete sequence */
+                    {
+                      if (iswspace(*wcp)) 
+                        {
+                          while (n != 0)
+                            ungetc(buf[--n], fp);
+                          break;
+                        }
+                      nread += n;
+                      width -= 1;
+                      if ((flags & SUPPRESS) == 0)
+                        wcp += 1;
+                      n = 0;
+                    }
+                  if (BufferEmpty) 
+                    {
+                      if (n != 0)
+                        goto input_failure;
+                      break;
+                    }
+                }
+              if (!(flags & SUPPRESS)) 
+                {
+                  *wcp = L'\0';
+                  nassigned++;
+                }
+            }
+          else if (flags & SUPPRESS) 
 	    {
 	      n = 0;
 	      while (!isspace (*fp->_p))
@@ -797,9 +872,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
-#ifndef CYGNUS_NEC
 	      if (__srefill (fp))
-#endif
 		break;		/* EOF */
 	    }
 	  /*
@@ -961,9 +1034,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
-#ifndef CYGNUS_NEC
 	      if (__srefill (fp))
-#endif
 		break;		/* EOF */
 	    }
 	  if (zeroes)
@@ -998,11 +1069,11 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {
-	      double res;
+	      double res = 0;
 #ifdef _NO_LONGDBL
 #define QUAD_RES res;
 #else  /* !_NO_LONG_DBL */
-	      long double qres;
+	      long double qres = 0;
 #define QUAD_RES qres;
 #endif /* !_NO_LONG_DBL */
 	      long new_exp = 0;
