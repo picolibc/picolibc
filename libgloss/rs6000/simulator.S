@@ -1,7 +1,7 @@
 /*
  * simulator.S -- PowerPC simulator system calls.
  *
- * Copyright (c) 1995, 2000 Cygnus Support
+ * Copyright (c) 1995, 2000, 2001 Cygnus Support
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -71,6 +71,13 @@ FUNC_START(access)
 	bnslr+
 	b	FUNC_NAME(_cerror)
 FUNC_END(access)
+
+FUNC_START(dup)
+	li	r0,41
+	sc
+	bnslr+
+	b	FUNC_NAME(_cerror)
+FUNC_END(dup)
 
 FUNC_START(lseek)
 	li	r0,199
