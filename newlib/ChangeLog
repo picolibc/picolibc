@@ -1,3 +1,9 @@
+2002-12-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/environ.c: Update license to Red Hat.
+	* libc/machine/hppa/setjmp.S: Ditto.
+	* libm/test/Makefile.in: Ditto.
+
 2002-12-19  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: Remove references to go32.
