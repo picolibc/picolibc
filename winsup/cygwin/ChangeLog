@@ -2,7 +2,8 @@
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Properly
 	check for whether we should be opening the file to search for #!
-	characters.  Set path_conv structure execability, too, if found.
+	characters.  Set path_conv structure execability, too, when
+	appropriate.
 
 2002-05-28  Corinna Vinschen  <corinna@vinschen.de>
 
