@@ -351,11 +351,11 @@ _pinfo::commune_recv ()
       return;
     }
 
-  CloseHandle (hp);
   hello_pid = 0;
 
   if (!ReadFile (__fromthem, &code, sizeof code, &nr, NULL) || nr != sizeof code)
     {
+      CloseHandle (hp);
       /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
       goto out;
     }
@@ -368,6 +368,8 @@ _pinfo::commune_recv ()
 	CloseHandle (__fromthem); __fromthem = NULL;
 	extern int __argc_safe;
 	const char *argv[__argc_safe + 1];
+
+	CloseHandle (hp);
 	for (int i = 0; i < __argc_safe; i++)
 	  {
 	    if (IsBadStringPtr (__argv[i], INT32_MAX))
@@ -403,6 +405,7 @@ _pinfo::commune_recv ()
 	if (!ReadFile (__fromthem, &len, sizeof len, &nr, NULL)
 	    || nr != sizeof len)
 	  {
+	    CloseHandle (hp);
 	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
 	    goto out;
 	  }
@@ -410,6 +413,7 @@ _pinfo::commune_recv ()
 	if (!ReadFile (__fromthem, path, len, &nr, NULL)
 	    || nr != len)
 	  {
+	    CloseHandle (hp);
 	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
 	    goto out;
 	  }
@@ -422,8 +426,16 @@ _pinfo::commune_recv ()
 	  {
 	    it[0] = fh->get_handle ();
 	    it[1] = fh->get_output_handle ();
+	    for (int i = 0; i < 2; i++)
+	      if (!DuplicateHandle (hMainProc, it[i], hp, &it[i], 0, false,
+				    DUPLICATE_SAME_ACCESS))
+		{
+		  it[0] = it[1] = NULL;	/* FIXME: possibly left a handle open in child? */
+		  break;
+		}
 	  }
 
+	CloseHandle (hp);
 	if (!WriteFile (__tothem, it, sizeof (it), &nr, NULL))
 	  {
 	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
@@ -442,7 +454,7 @@ out:
     CloseHandle (__tothem);
 }
 
-#define PIPEBUFSIZE (16 * sizeof (DWORD))
+#define PIPEBUFSIZE (4096 * sizeof (DWORD))
 
 commune_result
 _pinfo::commune_send (DWORD code, ...)
@@ -483,21 +495,6 @@ _pinfo::commune_send (DWORD code, ...)
     {
       __seterrno ();
       goto err;
-    }
-
-  switch (code)
-    {
-    case PICOM_FIFO:
-      {
-	char *path = va_arg (args, char *);
-	size_t len = strlen (path) + 1;
-	if (!WriteFile (tothem, path, len, &nr, NULL) || nr != len)
-	  {
-	    __seterrno ();
-	    goto err;
-	  }
-	break;
-      }
     }
 
   if (sig_send (this, __SIGCOMMUNE))
@@ -550,10 +547,25 @@ _pinfo::commune_send (DWORD code, ...)
       break;
     case PICOM_FIFO:
       {
+	char *path = va_arg (args, char *);
+	size_t len = strlen (path) + 1;
+	if (!WriteFile (tothem, &len, sizeof (len), &nr, NULL)
+	    || nr != sizeof (len))
+	  {
+	    __seterrno ();
+	    goto err;
+	  }
+	if (!WriteFile (tothem, path, len, &nr, NULL) || nr != len)
+	  {
+	    __seterrno ();
+	    goto err;
+	  }
+
 	DWORD x = ReadFile (fromthem, res.handles, sizeof (res.handles), &nr, NULL);
-	WriteFile (tothem, &x, sizeof (x), &x, NULL);
+	(void) WriteFile (tothem, &x, sizeof (x), &x, NULL);
 	if (!x)
 	  goto err;
+
 	if (nr != sizeof (res.handles))
 	  {
 	    set_errno (EPIPE);

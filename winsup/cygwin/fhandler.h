@@ -324,6 +324,7 @@ class fhandler_base
   bool is_fs_special () {return pc.is_fs_special ();}
   bool device_access_denied (int) __attribute__ ((regparm (2)));
   int fhaccess (int flags) __attribute__ ((regparm (2)));
+  friend class fhandler_fifo;
 };
 
 class fhandler_socket: public fhandler_base
@@ -454,6 +455,7 @@ class fhandler_fifo: public fhandler_pipe
   HANDLE owner;		// You can't have too many mutexes, now, can you?
   long read_use;
   long write_use;
+  virtual HANDLE& get_io_handle () { return io_handle ?: output_handle; }
 public:
   fhandler_fifo ();
   int open (int flags, mode_t mode = 0);

@@ -557,13 +557,18 @@ fhandler_fifo *
 dtable::find_fifo (const char *path)
 {
   lock ();
+  fhandler_fifo *fh_res = NULL;
   for (unsigned i = 0; i < size; i++)
     {
       fhandler_base *fh = fds[i];
       if (fh && fh->isfifo () && strcmp (path, fh->get_win32_name ()) == 0)
-	return (fhandler_fifo *) fh;
+	{
+	  fh_res = (fhandler_fifo *) fh;
+	  break;
+	}
     }
-  return NULL;
+  unlock ();
+  return fh_res;
 }
 
 select_record *

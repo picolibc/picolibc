@@ -1,3 +1,22 @@
+2004-06-07  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* dtable.cc (dtable::find_fifo): Release lock after fifo found (still
+	racy).
+	* fhandler.h (fhandler_fifo::get_io_handle): New fifo-specific method.
+	* fhandler_fifo.cc (fhandler_fifo::close): Close output_handle only if
+	it is open.
+	(fhandler_fifo::open_not_mine): Reorganize slightly.  Don't call _pinfo
+	methods when the fifo is owned by me or suffer dtable lock_cs deadlock.
+	(fhandler_fifo::open): Call open_not_mine first, otherwise open myself
+	(racy).
+	* pinfo.cc (_pinfo::commune_recv): Duplicate fifo handles here in
+	requesting processes arena to avoid one potential race (of many).
+	(_pinfo::commune_send): Move all PICOM_FIFO code under one case
+	statement.
+
+	* thread.cc (pthread::init_mainthread) Use existing hMainProc handle
+	rather than calling GetCurrentProcess.
+
 2004-06-04  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* winbase.h (ilockincr): Add more neverending changes from the

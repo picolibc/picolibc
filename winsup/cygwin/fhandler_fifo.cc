@@ -60,7 +60,8 @@ int
 fhandler_fifo::close ()
 {
   fhandler_pipe::close ();
-  CloseHandle (get_output_handle ());
+  if (get_output_handle ())
+    CloseHandle (get_output_handle ());
   set_use (-1);
   return 0;
 }
@@ -72,44 +73,53 @@ fhandler_fifo::open_not_mine (int flags)
   winpids pids;
   static int flagtypes[] = {DUMMY_O_RDONLY | O_RDWR, O_WRONLY | O_APPEND | O_RDWR};
   HANDLE *usehandles[2] = {&(get_handle ()), &(get_output_handle ())};
-  int res;
+  int res = 0;
+  int testflags = (flags & (O_RDWR | O_WRONLY | O_APPEND)) ?: DUMMY_O_RDONLY;
 
   for (unsigned i = 0; i < pids.npids; i++)
     {
       _pinfo *p = pids[i];
-      HANDLE hp = OpenProcess (PROCESS_DUP_HANDLE, false, p->dwProcessId);
-      if (!hp)
-	{
-	  __seterrno ();
-	  goto err;
-	}
-
-      HANDLE handles[2];
       commune_result r;
-      r = p->commune_send (PICOM_FIFO, get_win32_name ());
-      if (r.handles[0] == NULL)
-	continue;		// process doesn't own fifo
-
-      flags = (flags & (O_RDWR | O_WRONLY | O_APPEND)) ?: DUMMY_O_RDONLY;
-      for (int i = 0; i < 2; i++)
+      if (p->pid != myself->pid)
 	{
-	  if (!(flags & flagtypes[i]))
+	  r = p->commune_send (PICOM_FIFO, get_win32_name ());
+	  if (r.handles[0] == NULL)
+	    continue;		// process doesn't own fifo
+	}
+      else
+	{
+	  /* FIXME: racy? */
+	  fhandler_fifo *fh = cygheap->fdtab.find_fifo (get_win32_name ());
+	  if (!fh)
 	    continue;
-	   if (!DuplicateHandle (hp, r.handles[i], hMainProc, usehandles[i], 0,
-				 false, DUPLICATE_SAME_ACCESS))
+	  if (!DuplicateHandle (hMainProc, fh->get_handle (), hMainProc,
+				&r.handles[0], 0, false, DUPLICATE_SAME_ACCESS))
 	    {
-	      debug_printf ("couldn't duplicate handle %d/%p, %E", i, handles[i]);
 	      __seterrno ();
-	      goto err;
+	      goto out;
 	    }
-
-	  if (i == 0)
+	  if (!DuplicateHandle (hMainProc, fh->get_handle (), hMainProc,
+				&r.handles[1], 0, false, DUPLICATE_SAME_ACCESS))
 	    {
-	      read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-	      need_fork_fixup (true);
+	      CloseHandle (r.handles[0]);
+	      __seterrno ();
+	      goto out;
 	    }
 	}
-      CloseHandle (hp);
+
+      for (int i = 0; i < 2; i++)
+	if (!(testflags & flagtypes[i]))
+	    CloseHandle (r.handles[i]);
+	else
+	  {
+	    *usehandles[i] = r.handles[i];
+
+	    if (i == 0)
+	      {
+		read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+		need_fork_fixup (true);
+	      }
+	  }
 
       res = 1;
       set_flags (flags);
@@ -117,10 +127,6 @@ fhandler_fifo::open_not_mine (int flags)
     }
 
   set_errno (EAGAIN);
-
-err:
-  res = 0;
-  debug_printf ("failed");
 
 out:
   debug_printf ("res %d", res);
@@ -132,26 +138,31 @@ fhandler_fifo::open (int flags, mode_t)
 {
   int res = 1;
 
+  set_io_handle (NULL);
+  set_output_handle (NULL);
+  if (open_not_mine (flags))
+    goto out;
+
   fhandler_pipe *fhs[2];
   if (create (fhs, 0, flags, true))
-    goto errnout;
-
-  set_flags (fhs[0]->get_flags ());
-  set_io_handle (fhs[0]->get_handle ());
-  set_output_handle (fhs[1]->get_handle ());
-  guard = fhs[0]->guard;
-  read_state = fhs[0]->read_state;
-  writepipe_exists = fhs[1]->writepipe_exists;
-  orig_pid = fhs[0]->orig_pid;
-  id = fhs[0]->id;
-  delete (fhs[0]);
-  delete (fhs[1]);
-  set_use (1);
-  goto out;
-
-errnout:
-  __seterrno ();
-  res = 0;
+    {
+      __seterrno ();
+      res = 0;
+    }
+  else
+    {
+      set_flags (fhs[0]->get_flags ());
+      set_io_handle (fhs[0]->get_handle ());
+      set_output_handle (fhs[1]->get_handle ());
+      guard = fhs[0]->guard;
+      read_state = fhs[0]->read_state;
+      writepipe_exists = fhs[1]->writepipe_exists;
+      orig_pid = fhs[0]->orig_pid;
+      id = fhs[0]->id;
+      delete (fhs[0]);
+      delete (fhs[1]);
+      set_use (1);
+    }
 
 out:
   debug_printf ("returning %d, errno %d", res, get_errno ());
