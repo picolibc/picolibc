@@ -860,6 +860,23 @@ typedef PWSAQUERYSETA PWSAQUERYSET;
 typedef LPWSAQUERYSETA LPWSAQUERYSET;
 #endif
 
+#define LUP_DEEP                0x0001
+#define LUP_CONTAINERS          0x0002
+#define LUP_NOCONTAINERS        0x0004
+#define LUP_NEAREST             0x0008
+#define LUP_RETURN_NAME         0x0010
+#define LUP_RETURN_TYPE         0x0020
+#define LUP_RETURN_VERSION      0x0040
+#define LUP_RETURN_COMMENT      0x0080
+#define LUP_RETURN_ADDR         0x0100
+#define LUP_RETURN_BLOB         0x0200
+#define LUP_RETURN_ALIASES      0x0400
+#define LUP_RETURN_QUERY_STRING 0x0800
+#define LUP_RETURN_ALL          0x0FF0
+#define LUP_RES_SERVICE         0x8000
+#define LUP_FLUSHCACHE          0x1000
+#define LUP_FLUSHPREVIOUS       0x2000
+
 typedef struct _WSANSClassInfoA
 {
 	LPSTR	lpszName;
