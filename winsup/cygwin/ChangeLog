@@ -1,3 +1,8 @@
+Sun Sep 30 17:10:18 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Depend on stamp to ensure rebuilding.  Remove stamp file
+	when we've just built the DLL.
+
 Mon Oct  1 00:34:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (pthread_cond_dowait): Hopefully eliminate a race on multiple thread
