@@ -1,5 +1,11 @@
 2003-05-06  Earnie Boyd  <earnie@users.sf.net>
 
+	* configure.in (W32API_INCLUDE): Need the -I switch in the value.
+	* mingwex/configure.in (W32API_INCLUDE): Ditto.
+	* profile/configure.in (W32API_INCLUDE): Ditto.
+
+2003-05-06  Earnie Boyd  <earnie@users.sf.net>
+
 	* configure.in (CFLAGS): Remove -D__USE_CRTIMP=1 due to possibilites
 	of multiply defined symbols if the symbols is defined locally.  E.G.:
 	A local definition of malloc causes this problem.

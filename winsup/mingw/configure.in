@@ -94,7 +94,7 @@ HEADER_SUBDIR=""
 
 LIBGMON_A=libgmon.a
 
-W32API_INCLUDE='$(srcdir)/../w32api/include'
+W32API_INCLUDE='-I $(srcdir)/../w32api/include'
 
 case "$target_os" in
 *cygwin*)
