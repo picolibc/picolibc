@@ -106,6 +106,9 @@ unwelcome.  For example, the following are off-topic:
 @item Announcements from LaserJet toner cartridge suppliers
 @end itemize
 
+@item Read and obey ``How To Ask Questions The Smart Way'' by Eric
+S. Raymond, at @file{http://www.catb.org/~esr/faqs/smart-questions.html}.
+
 @end itemize
 
 If you do not follow the above guidelines, you may still elicit a
