@@ -71,13 +71,13 @@
 #define FLT_UWORD_IS_FINITE(x) ((x)<0x7f800000L)
 #define FLT_UWORD_IS_NAN(x) ((x)>0x7f800000L)
 #define FLT_UWORD_IS_INFINITE(x) ((x)==0x7f800000L)
-#define FLT_UWORD_MAX 0x7f7fffff
+#define FLT_UWORD_MAX 0x7f7fffffL
 #define FLT_UWORD_EXP_MAX 0x43000000
 #define FLT_UWORD_LOG_MAX 0x42b17217
 #define FLT_UWORD_LOG_2MAX 0x42b2d4fc
 #define HUGE ((float)3.40282346638528860e+38)
 #endif
-#define FLT_UWORD_HALF_MAX (FLT_UWORD_MAX-(1<<23))
+#define FLT_UWORD_HALF_MAX (FLT_UWORD_MAX-(1L<<23))
 #define FLT_LARGEST_EXP (FLT_UWORD_MAX>>23)
 
 /* Many routines check for zero and subnormal numbers.  Such things depend

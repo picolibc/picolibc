@@ -1,3 +1,8 @@
+2005-02-25  Ralf Corsepious  <ralf.corsepius@rtems.org>
+
+	* libm/common/fdlibm.h (FLT_UWORD_MAX, FLT_UWORD_HALF_MAX): Add
+	L qualifier for these long constants.
+
 2005-02-25  Eric Blake  <ebb9@byu.net>
 
 	* libc/include/time.h (__tzrule_struct): Make offset long, since
