@@ -996,7 +996,8 @@ sig_handle (int sig)
 
   if (handler == (void *) SIG_DFL)
     {
-      if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH)
+      if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
+          || sig == SIGURG)
 	{
 	  sigproc_printf ("default signal %d ignored", sig);
 	  goto done;

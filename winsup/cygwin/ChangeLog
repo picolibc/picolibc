@@ -1,5 +1,9 @@
 2001-01-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	exceptions.cc (sig_handle): Set default action for SIGURG to SIG_IGN.
+
+2001-01-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::init_std_file_from_handle): Don't treat NULL
 	handle as errorneous.
 
