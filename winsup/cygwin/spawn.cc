@@ -735,10 +735,6 @@ skip_arg_parsing:
 	    exitcode = 1;
 	  res |= exitcode;
 	  exited = TRUE;
-
-	  if (nwait > 2 && !(res & EXIT_REPARENTING) &&
-	      (mode == _P_OVERLAY || mode == _P_VFORK))
-	    res |= EXIT_REPARENTING;
 	  break;
 	case WAIT_OBJECT_0 + 1:
 	  sigproc_printf ("signal arrived");
@@ -822,7 +818,7 @@ skip_arg_parsing:
     case _P_OVERLAY:
       ForceCloseHandle1 (pi.hProcess, childhProc);
       proc_terminate ();
-      myself->exit (0, 1);
+      myself->exit (res, 1);
       break;
     case _P_WAIT:
       waitpid (cygpid, (int *) &res, 0);

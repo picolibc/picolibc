@@ -1,3 +1,9 @@
+Sat Oct 21 01:52:54 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (spawn_guts): Don't do the reparenting step if we notice
+	that the child has exited prior to sending the subprocess_ready signal
+	(?).
+
 Sat Oct 21 00:46:36 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (fhandler_console): Remove tcsetpgrp.
