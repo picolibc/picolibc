@@ -82,7 +82,7 @@ muto::acquire (DWORD ms)
 	 case, it is possible for a thread which is going to wait for bruteforce
 	 to wake up immediately.  It will then attempt to grab sync but will fail
 	 and go back to waiting.  */
-      while (tid != this_tid && (was_waiting || InterlockedExchange (&sync, 1) != 0))
+      if (tid != this_tid && (was_waiting || InterlockedExchange (&sync, 1) != 0))
 	{
 	  switch (WaitForSingleObject (bruteforce, ms))
 	      {

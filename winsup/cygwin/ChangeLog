@@ -1,3 +1,7 @@
+Wed Sep 12 21:06:38 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* sync.cc (muto::acquire): Fix while/if typo.
+
 Wed Sep 12 23:06:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* wincap.cc (wincapc::init): Simplify W2K/XP case.
