@@ -1,3 +1,12 @@
+2000-08-20  Doug Evans  <dje@casey.transmeta.com>
+
+	* Makefile.in (ALL_MODULES): Add all-cgen.
+	(CROSS_CHECK_MODULES,INSTALL_MODULES,CLEAN_MODULES): Similarily.
+	(all-cgen): New target.
+	(all-opcodes,all-sim): Depend on all-cgen.
+	* configure.in (host_tools): Add cgen.
+	Only configure cgen if --enable-cgen-maint.
+
 2000-08-17  Alexandre Oliva  <aoliva@redhat.com>
 
 	* config-ml.in (CC, CXX): Don't introduce a leading space.
