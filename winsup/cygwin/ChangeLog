@@ -1,3 +1,7 @@
+2002-06-11  Christopher Faylor  <cgf@redhat.com>
+
+	* spawn.cc (spawn_guts): More hToken removal cleanup.
+
 2002-06-09  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* spawn.cc (spawn_guts): Define sec_attribs and call sec_user_nih()

@@ -1189,45 +1189,45 @@ access (const char *fn, int flags)
     {
       if (st.st_uid == myself->uid)
 	{
-	  if (! (st.st_mode & S_IRUSR))
+	  if (!(st.st_mode & S_IRUSR))
 	    goto done;
 	}
       else if (st.st_gid == myself->gid)
 	{
-	  if (! (st.st_mode & S_IRGRP))
+	  if (!(st.st_mode & S_IRGRP))
 	    goto done;
 	}
-      else if (! (st.st_mode & S_IROTH))
+      else if (!(st.st_mode & S_IROTH))
 	goto done;
     }
   if (flags & W_OK)
     {
       if (st.st_uid == myself->uid)
 	{
-	  if (! (st.st_mode & S_IWUSR))
+	  if (!(st.st_mode & S_IWUSR))
 	    goto done;
 	}
       else if (st.st_gid == myself->gid)
 	{
-	  if (! (st.st_mode & S_IWGRP))
+	  if (!(st.st_mode & S_IWGRP))
 	    goto done;
 	}
-      else if (! (st.st_mode & S_IWOTH))
+      else if (!(st.st_mode & S_IWOTH))
 	goto done;
     }
   if (flags & X_OK)
     {
       if (st.st_uid == myself->uid)
 	{
-	  if (! (st.st_mode & S_IXUSR))
+	  if (!(st.st_mode & S_IXUSR))
 	    goto done;
 	}
       else if (st.st_gid == myself->gid)
 	{
-	  if (! (st.st_mode & S_IXGRP))
+	  if (!(st.st_mode & S_IXGRP))
 	    goto done;
 	}
-      else if (! (st.st_mode & S_IXOTH))
+      else if (!(st.st_mode & S_IXOTH))
 	goto done;
     }
   r = 0;
@@ -2006,7 +2006,7 @@ seteuid32 (__uid32_t uid)
   if (process_ok)
     {
       if (cygheap->user.token == INVALID_HANDLE_VALUE ||
-	  ! cygheap->user.impersonated )
+	  !cygheap->user.impersonated)
 	{
 	  CloseHandle (ptok);
 	  return 0; /* No change */
@@ -2025,12 +2025,12 @@ seteuid32 (__uid32_t uid)
 	{
 	  /* Return if current token is valid */
 	  if (cygheap->user.impersonated)
-	  {
-	    CloseHandle (ptok);
-	    if (!ImpersonateLoggedOnUser (cygheap->user.token))
-	      system_printf ("Impersonating in seteuid failed: %E");
-	    return 0; /* No change */
-	  }
+	    {
+	      CloseHandle (ptok);
+	      if (!ImpersonateLoggedOnUser (cygheap->user.token))
+		system_printf ("Impersonating in seteuid failed: %E");
+	      return 0; /* No change */
+	    }
 	}
       else cygheap->user.token = INVALID_HANDLE_VALUE;
     }
@@ -2076,7 +2076,7 @@ seteuid32 (__uid32_t uid)
       goto failed;
     }
   /* If using the token, set info and impersonate */
-  if (! process_ok )
+  if (!process_ok)
     {
       /* If the token was explicitly created, all information has
 	 already been set correctly. */

@@ -302,7 +302,7 @@ private:
     friend void __pthread_exit (void *value_ptr);
     friend int __pthread_join (pthread_t * thread, void **return_val);
     friend int __pthread_detach (pthread_t * thread);
-    
+
     void pop_all_cleanup_handlers (void);
 };
 
@@ -395,12 +395,12 @@ public:
   void Init (int);
   void fixup_after_fork (void);
 
-    MTinterface ():reent_index (0), indexallocated (0), threadcount (1)
-  {
-    pthread_prepare = NULL;
-    pthread_child   = NULL;
-    pthread_parent  = NULL;
-  }
+  MTinterface ():reent_index (0), indexallocated (0), threadcount (1)
+    {
+      pthread_prepare = NULL;
+      pthread_child   = NULL;
+      pthread_parent  = NULL;
+    }
 };
 
 void __pthread_atforkprepare(void);

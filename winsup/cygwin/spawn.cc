@@ -654,10 +654,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 since it's value is needed by `sec_user'. */
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf, sid);
 
-      /* Remove impersonation */
-      if (cygheap->user.impersonated
-	  && cygheap->user.token != INVALID_HANDLE_VALUE)
-	RevertToSelf ();
+      RevertToSelf ();
 
       /* Load users registry hive. */
       load_registry_hive (sid);
@@ -694,9 +691,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 		       &pi);
       /* Restore impersonation. In case of _P_OVERLAY this isn't
 	 allowed since it would overwrite child data. */
-      if (mode != _P_OVERLAY
-	  && cygheap->user.impersonated
-	  && cygheap->user.token != INVALID_HANDLE_VALUE)
+      if (mode != _P_OVERLAY)
 	ImpersonateLoggedOnUser (cygheap->user.token);
     }
 
