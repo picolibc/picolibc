@@ -131,6 +131,10 @@ case "${host_cpu}" in
   mn10300)
 	machine_dir=mn10300
 	;;
+  or16)
+	;;
+  or32)
+	;;
   powerpc*)
 	machine_dir=powerpc
 	;;
@@ -315,7 +319,7 @@ case "${host}" in
 #
 #  NOTE: When newlib malloc uses a semaphore, RTEMS will switch to that.
   *-*-rtems*)
-	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY -DMALLOC_PROVIDED -DEXIT_PROVIDED -DMISSING_SYSCALL_NAMES -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_OPENDIR"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY -DMALLOC_PROVIDED -DEXIT_PROVIDED -DMISSING_SYSCALL_NAMES -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_OPENDIR -DNO_EXEC"
 	;;
 # VxWorks supplies its own version of malloc, and the newlib one
 # doesn't work because VxWorks does not have sbrk.
