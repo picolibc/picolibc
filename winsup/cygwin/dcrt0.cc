@@ -991,6 +991,7 @@ do_exit (int status)
     }
 
   EnterCriticalSection (&exit_lock);
+  muto::set_exiting_thread ();
   if (exit_state < ES_EVENTS_TERMINATE)
     {
       exit_state = ES_EVENTS_TERMINATE;

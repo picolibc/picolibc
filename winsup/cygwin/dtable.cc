@@ -33,12 +33,12 @@ details. */
 #include "ntdll.h"
 #include "tty.h"
 
+static const char NO_COPY unknown_file[] = "some disk file";
+
 static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 					   STD_ERROR_HANDLE};
 
 static const char *handle_to_fn (HANDLE, char *);
-
-static const char NO_COPY unknown_file[] = "some disk file";
 
 /* Set aside space for the table of fds */
 void
@@ -57,6 +57,13 @@ set_std_handle (int fd)
     SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_handle ());
   else if (fd <= 2)
     SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_output_handle ());
+}
+
+void
+dtable::init_lock ()
+{
+  new_muto (lock_cs);
+  // InitializeCriticalSection (&lock_cs);
 }
 
 int

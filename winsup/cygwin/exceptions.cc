@@ -763,26 +763,16 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
 
       // FIXME - add check for reentering of DLL here
 
-      muto *m;
-      /* FIXME: Make multi-thread aware */
-      for (m = muto_start.next;  m != NULL; m = m->next)
-	if (m->unstable () || m->owner () == cygthread::main_thread_id)
-	  {
-	    sigproc_printf ("suspended thread owns a muto (%s)", m->name);
-	    goto resume_thread;
-	  }
-
       cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
       if (!GetThreadContext (hth, &cx))
 	system_printf ("couldn't get context of main thread, %E");
       else if (interruptible (cx.Eip))
 	interrupted = tls->interrupt_now (&cx, sig, handler, siga);
 
-    resume_thread:
       res = ResumeThread (hth);
-
       if (interrupted)
 	break;
+
       sigproc_printf ("couldn't interrupt.  trying again.");
       low_priority_sleep (0);
     }
@@ -1032,12 +1022,6 @@ signal_exit (int rc)
      of this thread really high so that it should do its thing and then exit. */
   (void) SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
   (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-
-  /* Unlock any main thread mutos since we're executing with prejudice. */
-  muto *m;
-  for (m = muto_start.next;  m != NULL; m = m->next)
-    if (m->unstable () || m->owner () == cygthread::main_thread_id)
-      m->reset ();
 
   user_data->resourcelocks->Delete ();
   user_data->resourcelocks->Init ();

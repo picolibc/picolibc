@@ -12,6 +12,7 @@ details. */
 #define NOFILE_INCR    32
 
 #include "thread.h"
+#include "sync.h"
 
 class suffix_info;
 class fhandler_fifo;
@@ -19,7 +20,8 @@ class fhandler_fifo;
 #define BFH_OPTS (PC_NULLEMPTY | PC_FULL | PC_POSIX)
 class dtable
 {
-  CRITICAL_SECTION lock_cs;
+  muto *lock_cs;
+  //CRITICAL_SECTION lock_cs;
   fhandler_base **fds;
   fhandler_base **fds_on_hold;
   fhandler_base **archetypes;
@@ -28,9 +30,9 @@ class dtable
   static const int initial_archetype_size = 8;
   int first_fd_for_open;
   int cnt_need_fixup_before;
-  void lock () {EnterCriticalSection (&lock_cs); spf ("%u locked, tid %u\n", GetCurrentProcessId (), GetCurrentThreadId ());}
-  void unlock () {LeaveCriticalSection (&lock_cs); spf ("%u ulocked, tid %u\n", GetCurrentProcessId (), GetCurrentThreadId ());}
-  void init_lock () {InitializeCriticalSection (&lock_cs); spf ("%u initialized, tid %u\n", GetCurrentProcessId (), GetCurrentThreadId ());}
+  void lock () {lock_cs->acquire ();}
+  void unlock () {lock_cs->release ();}
+  void init_lock ();
 public:
   size_t size;
 

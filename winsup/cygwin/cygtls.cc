@@ -120,7 +120,7 @@ _threadinfo::init_thread (void *x, DWORD (*func) (void *, void *))
     return;
 
   sentry here (INFINITE);
-  if (nthreads < cygheap->sthreads)
+  if (nthreads >= cygheap->sthreads)
     {
       cygheap->threadlist = (_threadinfo **)
 	crealloc (cygheap->threadlist, (cygheap->sthreads += THREADLIST_CHUNK)

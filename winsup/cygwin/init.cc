@@ -91,10 +91,10 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
   switch (reason)
     {
     case DLL_PROCESS_ATTACH:
+      prime_threads ();
       dynamically_loaded = (static_load == NULL);
       // __cygwin_user_data.impure_ptr = &_my_tls.local_clib;
       dll_crt0_0 ();
-      prime_threads ();
       // small_printf ("%u, %p, %p\n", cygwin_pid (GetCurrentProcessId ()), _tlstop, _tlsbase);
       break;
     case DLL_PROCESS_DETACH:

@@ -142,5 +142,5 @@ extern _threadinfo *_main_tls;
 
 #define __getreent() (&_my_tls.local_clib)
 
-enum {CYGTLS_PADSIZE = (((char *) _main_tls->padding) - ((char *) _main_tls))};
+const int CYGTLS_PADSIZE  = (((char *) _main_tls->padding) - ((char *) _main_tls));
 #endif /*_CYGTLS_H*/

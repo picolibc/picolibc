@@ -23,9 +23,9 @@ details. */
 #include "sync.h"
 #include "security.h"
 
-muto NO_COPY muto_start;
-
 #undef WaitForSingleObject
+
+DWORD NO_COPY muto::exiting_thread;
 
 /* Constructor */
 muto *
@@ -40,8 +40,6 @@ muto::init (const char *s)
       return NULL;
     }
   name = s;
-  next = muto_start.next;
-  muto_start.next = this;
   return this;
 }
 
@@ -71,6 +69,8 @@ int
 muto::acquire (DWORD ms)
 {
   DWORD this_tid = GetCurrentThreadId ();
+  if (exiting_thread)
+    return this_tid == exiting_thread;
 
   if (tid != this_tid)
     {
@@ -113,6 +113,8 @@ int
 muto::release ()
 {
   DWORD this_tid = GetCurrentThreadId ();
+  if (exiting_thread)
+    return this_tid == exiting_thread;
 
   if (tid != this_tid || !visits)
     {

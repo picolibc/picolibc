@@ -1,3 +1,30 @@
+2004-01-13  Christopher Faylor  <cgf@redhat.com>
+
+	* cygtls.cc (_threadinfo::init_thread): Correct thinko which caused
+	thread list to be allocated every time.
+	* cygtls.h (CYGTLS_PADSIZE): Define as const int.
+	* sync.h: Make multiple inclusion safe.
+	(muto::next): Eliminate.
+	(muto::exiting_thread): New variable.
+	(muto::set_exiting_thread): New function.
+	(new_muto): Change to use different section for mutos since c++ give
+	inexplicable warning in some cases otherwise.
+	(new_muto1): Ditto.
+	* dcrt0.cc (do_exit): Call muto::set_exiting_thread here.
+	* sync.cc (muto_start): Eliminate.
+	(muto::acquire): Always give exiting thread a lock.  Never give thread
+	a lock if exiting.
+	(muto::release): Ditto for releasing.
+	* dtable.cc (dtable::init_lock): Unline function and define here.
+	* dtable.h (lock_cs): Define as a muto since critical sections seem to
+	work oddly on Windows Me.
+	(lock): Accommodate switch to muto.
+	(unlock): Ditto.
+	* exceptions.cc (setup_handler): Don't worry about acquiring mutos
+	since that hasn't mattered for a long time.
+	(signal_exit): Ditto: muto stuff will be handled automatically on exit
+	now.
+
 2004-01-12  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (DLL_IMPORTS): Link advapi32 to ensure proper DLL
