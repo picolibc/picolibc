@@ -1,3 +1,27 @@
+2003-05-20  Jason Eckhardt  <jle@rice.edu>
+
+	opcode/i860.h (flush): Set lower 3 bits properly and use 'L'
+	for the immediate operand type instead of 'i'.
+
+2003-05-20  Jason Eckhardt  <jle@rice.edu>
+
+	opcode/i860.h (fzchks): Both S and R bits must be set.
+	(pfzchks): Likewise.
+	(faddp): Likewise.
+	(pfaddp): Likewise.
+	(fix.ss): Remove (invalid instruction).
+	(pfix.ss): Likewise.
+	(ftrunc.ss): Likewise.
+	(pftrunc.ss): Likewise.
+
+2003-05-18  Jason Eckhardt  <jle@rice.edu>
+
+	* i860.h (form, pform): Add missing .dd suffix.
+
+2003-05-13  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* m68hc11.h (M68HC12_BANK_VIRT): Define to 0x010000
+
 2003-04-07  Michael Snyder  <msnyder@redhat.com>
 
 	* h8300.h (ldc/stc): Fix up src/dst swaps.
