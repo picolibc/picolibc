@@ -11,7 +11,7 @@ details. */
 
 #include "winsup.h"
 
-static wincaps wincap_unknown = {
+static NO_COPY wincaps wincap_unknown = {
   lock_file_highword:0x0,
   chunksize:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -44,7 +44,7 @@ static wincaps wincap_unknown = {
   has_try_enter_critical_section:false,
 };
 
-static wincaps wincap_95 = {
+static NO_COPY wincaps wincap_95 = {
   lock_file_highword:0x0,
   chunksize:32 * 1024 * 1024,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -77,7 +77,7 @@ static wincaps wincap_95 = {
   has_try_enter_critical_section:false,
 };
 
-static wincaps wincap_95osr2 = {
+static NO_COPY wincaps wincap_95osr2 = {
   lock_file_highword:0x0,
   chunksize:32 * 1024 * 1024,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -110,7 +110,7 @@ static wincaps wincap_95osr2 = {
   has_try_enter_critical_section:false,
 };
 
-static wincaps wincap_98 = {
+static NO_COPY wincaps wincap_98 = {
   lock_file_highword:0x0,
   chunksize:32 * 1024 * 1024,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -143,7 +143,7 @@ static wincaps wincap_98 = {
   has_try_enter_critical_section:false,
 };
 
-static wincaps wincap_98se = {
+static NO_COPY wincaps wincap_98se = {
   lock_file_highword:0x0,
   chunksize:32 * 1024 * 1024,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -176,7 +176,7 @@ static wincaps wincap_98se = {
   has_try_enter_critical_section:false,
 };
 
-static wincaps wincap_me = {
+static NO_COPY wincaps wincap_me = {
   lock_file_highword:0x0,
   chunksize:32 * 1024 * 1024,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -209,7 +209,7 @@ static wincaps wincap_me = {
   has_try_enter_critical_section:false,
 };
 
-static wincaps wincap_nt3 = {
+static NO_COPY wincaps wincap_nt3 = {
   lock_file_highword:0xffffffff,
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -242,7 +242,7 @@ static wincaps wincap_nt3 = {
   has_try_enter_critical_section:false,
 };
 
-static wincaps wincap_nt4 = {
+static NO_COPY wincaps wincap_nt4 = {
   lock_file_highword:0xffffffff,
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -275,7 +275,7 @@ static wincaps wincap_nt4 = {
   has_try_enter_critical_section:true,
 };
 
-static wincaps wincap_nt4sp4 = {
+static NO_COPY wincaps wincap_nt4sp4 = {
   lock_file_highword:0xffffffff,
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -308,7 +308,7 @@ static wincaps wincap_nt4sp4 = {
   has_try_enter_critical_section:true,
 };
 
-static wincaps wincap_2000 = {
+static NO_COPY wincaps wincap_2000 = {
   lock_file_highword:0xffffffff,
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -341,7 +341,7 @@ static wincaps wincap_2000 = {
   has_try_enter_critical_section:true,
 };
 
-static wincaps wincap_xp = {
+static NO_COPY wincaps wincap_xp = {
   lock_file_highword:0xffffffff,
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
