@@ -1,3 +1,4 @@
+#ifndef MALLOC_PROVIDED
 /*
 FUNCTION
 <<__malloc_lock>>, <<__malloc_unlock>>--lock malloc pool
@@ -48,3 +49,4 @@ __malloc_unlock (ptr)
      struct _reent *ptr;
 {
 }
+#endif

@@ -1,3 +1,4 @@
+#ifndef MALLOC_PROVIDED
 /* msize.c -- a wrapper for malloc_usable_size.  */
 
 #include <_ansi.h>
@@ -14,4 +15,5 @@ _DEFUN (malloc_usable_size, (ptr),
   return _malloc_usable_size_r (_REENT, ptr);
 }
 
+#endif
 #endif

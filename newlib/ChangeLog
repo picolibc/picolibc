@@ -1,3 +1,12 @@
+2002-11-06  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/stdlib/malign.c: Don't compile if MALLOC_PROVIDED.
+	* libc/stdlib/mlock.c: Ditto.
+	* libc/stdlib/msize.c: Ditto.
+	* libc/stdlib/msize.c: Ditto.
+	* libc/stdlib/mtrim.c: Ditto.
+	* libc/stdlib/valloc.c: Ditto.
+
 2002-11-12  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/stdlib/ldtoa.c (e64toe): When checking the exponent
