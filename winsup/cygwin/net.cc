@@ -2112,7 +2112,11 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
       || !fh)
     res = -1;
   else
-    res = fh->recvmsg (msg, flags);
+    {
+      res = check_iovec_for_read (msg->msg_iov, msg->msg_iovlen);
+      if (res > 0)
+	res = fh->recvmsg (msg, flags, res); // res == iovec tot
+    }
 
   syscall_printf ("%d = recvmsg (%d, %p, %x)", res, fd, msg, flags);
   return res;
@@ -2123,6 +2127,8 @@ extern "C" int
 cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 {
   int res;
+  sigframe thisframe (mainthread);
+
   fhandler_socket *fh = get (fd);
 
   if (__check_invalid_read_ptr_errno (msg, sizeof msg)
@@ -2131,8 +2137,12 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 					     (unsigned) msg->msg_namelen))
       || !fh)
     res = -1;
-  else
-    res = fh->sendmsg (msg, flags);
+  else 
+    {
+      res = check_iovec_for_write (msg->msg_iov, msg->msg_iovlen);
+      if (res > 0)
+	res = fh->sendmsg (msg, flags, res); // res == iovec tot
+    }
 
   syscall_printf ("%d = sendmsg (%d, %p, %x)", res, fd, msg, flags);
   return res;
