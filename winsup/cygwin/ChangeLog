@@ -1,3 +1,12 @@
+2004-05-06  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* path.cc (path_conv::check): Strip trailing dots and spaces and
+	return error if the final component had only dots and spaces.
+	(normalize_posix_path): Revert 2004-04-30.
+	(chdir): Do not check for trailing spaces. Do not set native_dir 
+	to c:\ for virtual devices. Pass only native_dir to cwd.set.
+	(cwdstuff::set): Assume posix_cwd is already normalized.
+
 2004-05-04  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* path.cc (normalize_win32_path): Detect components with only dots.

@@ -286,10 +286,6 @@ normalize_posix_path (const char *src, char *dst, char **tail)
     }
 
 done:
-  /* Remove trailing dots and spaces which are ignored by Win32 functions but
-     not by native NT functions. */
-  while (dst[-1] == '.' || dst[-1] == ' ')
-    --dst;
   *dst = '\0';
   *tail = dst;
 
@@ -552,12 +548,25 @@ path_conv::check (const char *src, unsigned opt,
       /* Detect if the user was looking for a directory.  We have to strip the
 	 trailing slash initially while trying to add extensions but take it
 	 into account during processing */
-      if (tail > path_copy + 1 && isslash (*(tail - 1)))
+      if (tail > path_copy + 1)
 	{
-	  need_directory = 1;
-	  *--tail = '\0';
-	}
+          if (isslash (tail[-1]))
+            {
+	       need_directory = 1;
+	       tail--;
+	    }
+          /* Remove trailing dots and spaces which are ignored by Win32 functions but
+	     not by native NT functions. */
+          while (tail[-1] == '.' || tail[-1] == ' ') 
+	    tail--;
+          if (isslash (tail[-1]))
+            {
+	      error = ENOENT;
+              return;
+	    }
+        }
       path_end = tail;
+      *tail = '\0';
 
       /* Scan path_copy from right to left looking either for a symlink
 	 or an actual existing file.  If an existing file is found, just
@@ -3285,80 +3294,44 @@ chdir (const char *in_dir)
 
   syscall_printf ("dir '%s'", in_dir);
 
-  char *s;
-  char dir[strlen (in_dir) + 1];
-  strcpy (dir, in_dir);
-  /* Incredibly. Windows allows you to specify a path with trailing
-     whitespace to SetCurrentDirectory.  This doesn't work too well
-     with other parts of the API, though, apparently.  So nuke trailing
-     white space. */
-  for (s = strchr (dir, '\0'); --s >= dir && isspace ((unsigned int) (*s & 0xff)); )
-    *s = '\0';
-
-  if (!*s)
-    {
-      set_errno (ENOENT);
-      return -1;
-    }
-
   /* Convert path.  First argument ensures that we don't check for NULL/empty/invalid
      again. */
-  path_conv path (PC_NONULLEMPTY, dir, PC_FULL | PC_SYM_FOLLOW);
+  path_conv path (PC_NONULLEMPTY, in_dir, PC_FULL | PC_SYM_FOLLOW);
   if (path.error)
     {
       set_errno (path.error);
-      syscall_printf ("-1 = chdir (%s)", dir);
+      syscall_printf ("-1 = chdir (%s)", in_dir);
       return -1;
     }
 
+  int res = -1;
   const char *native_dir = path;
-
-  /* Check to see if path translates to something like C:.
-     If it does, append a \ to the native directory specification to
-     defeat the Windows 95 (i.e. MS-DOS) tendency of returning to
-     the last directory visited on the given drive. */
-  if (isdrive (native_dir) && !native_dir[2])
-    {
-      path.get_win32 ()[2] = '\\';
-      path.get_win32 ()[3] = '\0';
-    }
-  int res;
   int devn = path.get_devn ();
   if (!isvirtual_dev (devn))
-    res = SetCurrentDirectory (native_dir) ? 0 : -1;
+    {
+      /* Check to see if path translates to something like C:.
+	 If it does, append a \ to the native directory specification to
+	 defeat the Windows 95 (i.e. MS-DOS) tendency of returning to
+	 the last directory visited on the given drive. */
+      if (isdrive (native_dir) && !native_dir[2])
+        {
+	  path.get_win32 ()[2] = '\\';
+	  path.get_win32 ()[3] = '\0';
+	}
+      if (SetCurrentDirectory (native_dir))
+        res = 0;
+      else
+        __seterrno ();
+    }
   else if (!path.exists ())
-    {
-      set_errno (ENOENT);
-      return -1;
-    }
+    set_errno (ENOENT);
   else if (!path.isdir ())
-    {
-      set_errno (ENOTDIR);
-      return -1;
-    }
+    set_errno (ENOTDIR);
   else
-    {
-      native_dir = "c:\\";
-      res = 0;
-    }
+    res = 0;
 
-  /* If res != 0, we didn't change to a new directory.
-     Otherwise, set the current windows and posix directory cache from input.
-     If the specified directory is a MS-DOS style directory or if the directory
-     was symlinked, convert the MS-DOS path back to posix style.  Otherwise just
-     store the given directory.  This allows things like "find", which traverse
-     directory trees, to work correctly with Cygwin mounted directories.
-     FIXME: Is just storing the posixized windows directory the correct thing to
-     do when we detect a symlink?  Should we instead rebuild the posix path from
-     the input by traversing links?  This would be an expensive operation but
-     we'll see if Cygwin mailing list users whine about the current behavior. */
-  if (res)
-    __seterrno ();
-  else if ((!path.has_symlinks () && strpbrk (dir, ":\\") == NULL
-	    && pcheck_case == PCHECK_RELAXED) || isvirtual_dev (devn))
-    cygheap->cwd.set (native_dir, dir);
-  else
-    cygheap->cwd.set (native_dir, NULL);
+  if (res == 0)
+    cygheap->cwd.set (native_dir);
 
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */
@@ -3711,16 +3684,12 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd)
     }
 
   if (!posix_cwd)
-    mount_table->conv_to_posix_path (win32, pathbuf, 0);
-  else
     {
-      char * tail;
-      (void) normalize_posix_path (posix_cwd, pathbuf, &tail);
-      if (tail > pathbuf + 1 && *(--tail) == '/')
-	*tail = 0;
+      mount_table->conv_to_posix_path (win32, pathbuf, 0);
+      posix_cwd = pathbuf;
     }
-  posix = (char *) crealloc (posix, strlen (pathbuf) + 1);
-  strcpy (posix, pathbuf);
+  posix = (char *) crealloc (posix, strlen (posix_cwd) + 1);
+  strcpy (posix, posix_cwd);
 
   hash = hash_path_name (0, win32);
 
