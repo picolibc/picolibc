@@ -1009,6 +1009,11 @@ struct cgen_insn
   const CGEN_IBASE *base;
   const CGEN_OPCODE *opcode;
   const CGEN_OPINST *opinst;
+
+  /* Regex to disambiguate overloaded opcodes */
+  void *rx;
+#define CGEN_INSN_RX(insn) ((insn)->rx)
+#define CGEN_MAX_RX_ELEMENTS (CGEN_MAX_SYNTAX_ELEMENTS * 5)
 };
 
 /* Instruction lists.
@@ -1363,6 +1368,11 @@ extern void CGEN_SYM (cpu_close) PARAMS ((CGEN_CPU_DESC));
    Called by init_asm/init_dis.  */
 
 extern void CGEN_SYM (init_opcode_table) PARAMS ((CGEN_CPU_DESC cd_));
+
+/* build the insn selection regex.
+   called by init_opcode_table */
+
+extern char * CGEN_SYM(build_insn_regex) PARAMS ((CGEN_INSN *insn_));
 
 /* Initialize the ibld table for use.
    Called by init_asm/init_dis.  */

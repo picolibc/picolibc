@@ -1,3 +1,8 @@
+2001-07-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * opcode/cgen.h (CGEN_INSN): Add regex support.
+        (build_insn_regex): Declare.
+
 2001-07-10  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* xregex.h: New file to support libiberty regex.
