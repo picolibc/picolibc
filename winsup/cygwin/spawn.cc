@@ -322,13 +322,13 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   si.cbReserved2 = sizeof (ciresrv);
 
   DWORD chtype;
-  if (mode != _P_OVERLAY && mode != _P_VFORK)
+  if (mode != _P_OVERLAY)
     chtype = PROC_SPAWN;
   else
     chtype = PROC_EXEC;
 
   HANDLE spr;
-  if (mode != _P_OVERLAY)
+  if (chtype != PROC_EXEC)
     spr = NULL;
   else
     {
@@ -336,7 +336,8 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       ProtectHandle (spr);
     }
 
-  init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1, spr);
+  init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1,
+      		   spr);
   if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &ciresrv.parent, 0, 1,
 			DUPLICATE_SAME_ACCESS))
      {
@@ -674,7 +675,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 		       &pi);
       /* Restore impersonation. In case of _P_OVERLAY this isn't
 	 allowed since it would overwrite child data. */
-      if (mode != _P_OVERLAY && mode != _P_VFORK
+      if (mode != _P_OVERLAY
 	  && cygheap->user.impersonated
 	  && cygheap->user.token != INVALID_HANDLE_VALUE)
 	ImpersonateLoggedOnUser (cygheap->user.token);
@@ -746,6 +747,13 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       child->hProcess = pi.hProcess;
       child.remember ();
       strcpy (child->progname, real_path);
+      /* FIXME: This introduces an unreferenced, open handle into the child.
+         The purpose is to keep the pid shared memory open so that all of
+	 the fields filled out by child.remember do not disappear and so there
+	 is not a brief period during which the pid is not available.
+	 However, we should try to find another way to do this eventually. */
+      (void) DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
+			      NULL, 0, 0, DUPLICATE_SAME_ACCESS);
       /* Start the child running */
       ResumeThread (pi.hThread);
     }

@@ -212,7 +212,7 @@ fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 }
 
 int
-fhandler_serial::open (const char *name, int flags, mode_t mode)
+fhandler_serial::open (path_conv *, int flags, mode_t mode)
 {
   int res;
   COMMTIMEOUTS to;
@@ -221,7 +221,7 @@ fhandler_serial::open (const char *name, int flags, mode_t mode)
   syscall_printf ("fhandler_serial::open (%s, %p, %p)",
 			get_name (), flags, mode);
 
-  if (name && !(res = this->fhandler_base::open (flags, mode)))
+  if (!(res = this->fhandler_base::open (NULL, flags, mode)))
     return 0;
   else
     res = 1;

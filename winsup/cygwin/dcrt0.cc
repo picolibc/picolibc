@@ -598,7 +598,8 @@ dll_crt0_1 ()
 	    ProtectHandle (child_proc_info->forker_finished);
 	    break;
 	  case PROC_SPAWN:
-	    CloseHandle (spawn_info->hexec_proc);
+	    if (spawn_info->hexec_proc)
+	      CloseHandle (spawn_info->hexec_proc);
 	    goto around;
 	  case PROC_EXEC:
 	    hexec_proc = spawn_info->hexec_proc;

@@ -721,6 +721,7 @@ vfork ()
 	*pp = *esp;
       int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
       debug_printf ("%d = vfork()", res);
+      debug_printf ("exiting vfork, res %d", res);
       return res;
     }
 
@@ -743,6 +744,7 @@ vfork ()
 
   int pid = vf->pid;
   vf->pid = 0;
+  debug_printf ("exiting vfork, pid %d", pid);
   sig_dispatch_pending ();
   return pid;
 #endif

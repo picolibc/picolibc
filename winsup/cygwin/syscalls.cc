@@ -501,7 +501,7 @@ _open (const char *unix_path, int flags, ...)
 	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
 		  					      NULL, pc)))
 	    res = -1;		// errno already set
-	  else if (!fh->open (pc, flags, (mode & 07777) & ~cygheap->umask))
+	  else if (!fh->open (&pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
 	      cygheap->fdtab.release (fd);
 	      res = -1;
@@ -1107,7 +1107,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   debug_printf ("%d = file_attributes for '%s'", (DWORD) real_path,
 		(char *) real_path);
 
-  if ((oret = fh->open (real_path, open_flags, 0)))
+  if ((oret = fh->open (&real_path, open_flags, 0)))
     /* ok */;
   else
     {
@@ -1115,7 +1115,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
       /* If we couldn't open the file, try a "query open" with no permissions.
 	 This will allow us to determine *some* things about the file, at least. */
       fh->set_query_open (TRUE);
-      if ((oret = fh->open (real_path, open_flags, 0)))
+      if ((oret = fh->open (&real_path, open_flags, 0)))
         /* ok */;
       else if (allow_ntsec && real_path.has_acls () && get_errno () == EACCES
 		&& !get_file_attribute (TRUE, real_path, &ntsec_atts, &uid, &gid)
@@ -1127,7 +1127,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	     in a failing open call in the same process. Check that
 	     case. */
 	  set_file_attribute (TRUE, real_path, 0400);
-	  oret = fh->open (real_path, open_flags, 0);
+	  oret = fh->open (&real_path, open_flags, 0);
 	  set_file_attribute (TRUE, real_path, ntsec_atts);
         }
     }

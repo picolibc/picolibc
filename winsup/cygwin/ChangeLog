@@ -1,3 +1,53 @@
+Wed Oct  3 19:40:36 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Don't close hexec_proc if it is NULL.
+
+	* fork.cc (vfork): Add debugging statements.
+
+	* path.cc (get_device_number): Make static.  Rewrite to inspect both unix
+	and windows paths.
+	(get_raw_device_number): Just check for parts of raw device that we
+	care about.
+	(get_devn): New function, pulled from get_device_number.
+	(win32_device_name): Accomodate arg changes to get_device_number.
+	(mount_info::get_device_number): Call get_device_number on translated
+	Windows path.
+
+	* spawn.cc (spawn_guts): Don't treat P_VFORK differently from P_NOWAIT.
+	Add handle to child's shared region to child so that it will be
+	preserved if the parent goes away.
+	* fhandler.h: Throughout, simplify to one open method for all fhandler
+	classes, requiring a path_conv first element.
+	* fhandler.cc (fhandler_base::open): Remove obsolete method.
+	Generalize to require path_conv * as first argument.
+	(fhandler_disk_file::open): Remove obsolete method.
+	(fhandler_disk_file::open): Use path_conv pointer rather than
+	reference.
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::dup): Use new open
+	method.
+	(fhandler_dev_clipboard::open): Accomodate new argument for open
+	methods.
+	* fhandler_console.cc (fhandler_console::open): Ditto.
+	(fhandler_console::dup): Use new open method.
+	(fhandler_console::fixup_after_fork): Ditto.
+	(fhandler_console::fixup_after_exec): Ditto.
+	* fhandler_dsp.cc (fhandler_dev_dsp::open): Accomodate new argument for
+	open methods.
+	* fhandler_floppy.cc (fhandler_dev_floppy::open): Ditto.
+	* fhandler_mem.cc (fhandler_dev_mem::open): Ditto.
+	* fhandler_random (fhandler_dev_random::open): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::open): Ditto.
+	* fhandler_serial.cc (fhandler_serial::open): Ditto.
+	* fhandler_tape.cc (fhandler_dev_tape::open): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Ditto.
+	(fhandler_pty_master::open): Ditto.
+	* fhandler_windows.cc (fhandler_windows::open): Ditto.
+	* fhandler_zero.cc (fhandler_dev_zero::open): Ditto.
+	* fhandler_socket.cc (fhandler_socket::set_connect_secret): Accomodate
+	new argument for open methods.
+	* syscalls.cc (_open): Ditto.
+	(stat_worker): Ditto.
+
 Tue Oct  2 23:49:18 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (cfree): Remove malloc debugging probe.

@@ -56,7 +56,7 @@ fhandler_dev_clipboard::dup (fhandler_base * child)
 {
   fhandler_dev_clipboard *fhc = (fhandler_dev_clipboard *) child;
 
-  if (!fhc->open (get_name (), get_flags (), 0))
+  if (!fhc->open (NULL, get_flags (), 0))
     system_printf ("error opening clipboard, %E");
 
   fhc->membuffer = membuffer;
@@ -67,7 +67,7 @@ fhandler_dev_clipboard::dup (fhandler_base * child)
 }
 
 int
-fhandler_dev_clipboard::open (const char *, int flags, mode_t)
+fhandler_dev_clipboard::open (path_conv *, int flags, mode_t)
 {
   set_flags (flags);
   eof = false;

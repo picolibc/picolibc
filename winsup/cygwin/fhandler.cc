@@ -305,16 +305,9 @@ fhandler_base::get_default_fmode (int flags)
   return __fmode;
 }
 
+/* Open system call handler function. */
 int
-fhandler_base::open (path_conv& real_path, int flags, mode_t mode)
-{
-  return open ((char *) real_path, flags, mode);
-}
-
-/* Open system call handler function.
-   Path is now already checked for symlinks */
-int
-fhandler_base::open (int flags, mode_t mode)
+fhandler_base::open (path_conv *, int flags, mode_t mode)
 {
   int res = 0;
   HANDLE x;
@@ -392,15 +385,12 @@ fhandler_base::open (int flags, mode_t mode)
   if (flags & O_CREAT && get_device () == FH_DISK && allow_ntsec && has_acls ())
     set_security_attribute (mode, &sa, alloca (4096), 4096);
 
-  x = CreateFileA (get_win32_name (), access, shared,
-		   &sa, creation_distribution,
-		   file_attributes,
-		   0);
+  x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
+      		  file_attributes, 0);
 
   syscall_printf ("%p = CreateFileA (%s, %p, %p, %p, %p, %p, 0)",
-		  x, get_win32_name (), access, shared,
-		  &sa, creation_distribution,
-		  file_attributes);
+		  x, get_win32_name (), access, shared, &sa,
+		  creation_distribution, file_attributes);
 
   if (x == INVALID_HANDLE_VALUE)
     {
@@ -1231,44 +1221,21 @@ fhandler_disk_file::fhandler_disk_file (const char *name) :
 }
 
 int
-fhandler_disk_file::open (const char *path, int flags, mode_t mode)
+fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
 {
-  syscall_printf ("(%s, %p)", path, flags);
-
-  /* O_NOSYMLINK is an internal flag for implementing lstat, nothing more. */
-  path_conv real_path (path, (flags & O_NOSYMLINK) ?
-			     PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
-
-  if (real_path.error &&
-      (flags & O_NOSYMLINK || real_path.error != ENOENT
-       || !(flags & O_CREAT) || real_path.case_clash))
-    {
-      set_errno (flags & O_CREAT && real_path.case_clash ? ECASECLASH
-							 : real_path.error);
-      syscall_printf ("0 = fhandler_disk_file::open (%s, %p)", path, flags);
-      return 0;
-    }
-
-  set_name (path, real_path.get_win32 ());
-  return open (real_path, flags, mode);
-}
-
-int
-fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
-{
-  if (real_path.isbinary ())
+  if (real_path->isbinary ())
     {
       set_r_binary (1);
       set_w_binary (1);
     }
 
-  set_has_acls (real_path.has_acls ());
-  set_isremote (real_path.isremote ());
+  set_has_acls (real_path->has_acls ());
+  set_isremote (real_path->isremote ());
 
-  if (real_path.isdir ())
+  if (real_path->isdir ())
     flags |= O_DIROPEN;
 
-  int res = this->fhandler_base::open (flags, mode);
+  int res = this->fhandler_base::open (real_path, flags, mode);
 
   if (!res)
     goto out;
@@ -1279,7 +1246,7 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
      The only known file system to date is the SUN NFS Solstice Client 3.1
      which returns a valid handle when trying to open a file in a nonexistent
      directory. */
-  if (real_path.has_buggy_open ()
+  if (real_path->has_buggy_open ()
       && GetFileAttributes (win32_path_name) == (DWORD) -1)
     {
       debug_printf ("Buggy open detected.");
@@ -1291,9 +1258,9 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
   if (flags & O_APPEND)
     SetFilePointer (get_handle(), 0, 0, FILE_END);
 
-  set_symlink_p (real_path.issymlink ());
-  set_execable_p (real_path.exec_state ());
-  set_socket_p (real_path.issocket ());
+  set_symlink_p (real_path->issymlink ());
+  set_execable_p (real_path->exec_state ());
+  set_socket_p (real_path->issocket ());
 
 out:
   syscall_printf ("%d = fhandler_disk_file::open (%s, %p)", res,

@@ -61,28 +61,21 @@ fhandler_dev_tape::fhandler_dev_tape (const char *name, int unit) : fhandler_dev
 }
 
 int
-fhandler_dev_tape::open (const char *path, int flags, mode_t)
+fhandler_dev_tape::open (path_conv *real_path, int flags, mode_t)
 {
   int ret;
-  int minor;
 
-  if (get_device_number (path, minor) != FH_TAPE)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  norewind = (minor >= 128);
+  norewind = (real_path->get_unitn () >= 128);
   devbufsiz = 1L;
 
-  ret = fhandler_dev_raw::open (path, flags);
+  ret = fhandler_dev_raw::open (real_path, flags);
   if (ret)
     {
       struct mtget get;
       struct mtop op;
       struct mtpos pos;
 
-      if (! ioctl (MTIOCGET, &get))
+      if (!ioctl (MTIOCGET, &get))
 	/* Tape drive supports and is set to variable block size. */
 	if (get.mt_dsreg == 0)
 	  devbufsiz = get.mt_maxblksize;

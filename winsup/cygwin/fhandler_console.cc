@@ -542,7 +542,7 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
 }
 
 int
-fhandler_console::open (const char *, int flags, mode_t)
+fhandler_console::open (path_conv *, int flags, mode_t)
 {
   HANDLE h;
 
@@ -617,7 +617,7 @@ fhandler_console::dup (fhandler_base *child)
 {
   fhandler_console *fhc = (fhandler_console *) child;
 
-  if (!fhc->open (get_name (), get_flags () & ~O_NOCTTY, 0))
+  if (!fhc->open (NULL, get_flags () & ~O_NOCTTY, 0))
     system_printf ("error opening console, %E");
 
   fhc->default_color = default_color;
@@ -1723,7 +1723,7 @@ fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
     mode = O_WRONLY;
   if (a == (GENERIC_READ | GENERIC_WRITE))
     mode = O_RDWR;
-  open (0, mode);
+  open ((path_conv *) NULL, mode);
   if (f != INVALID_HANDLE_VALUE)
     CloseHandle (f);	/* Reopened by open */
 
@@ -1752,7 +1752,7 @@ fhandler_console::fixup_after_fork (HANDLE)
   /* Windows does not allow duplication of console handles between processes
      so open the console explicitly. */
 
-  if (!open (get_name (), O_NOCTTY | get_flags (), 0))
+  if (!open (NULL, O_NOCTTY | get_flags (), 0))
     system_printf ("error opening console after fork, %E");
 
   if (!get_close_on_exec ())
@@ -1782,7 +1782,7 @@ fhandler_console::fixup_after_exec (HANDLE)
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
-  if (!open (get_name (), O_NOCTTY | get_flags (), 0))
+  if (!open (NULL, O_NOCTTY | get_flags (), 0))
     {
       int sawerr = 0;
       if (!get_io_handle ())

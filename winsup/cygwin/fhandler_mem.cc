@@ -72,7 +72,7 @@ fhandler_dev_mem::~fhandler_dev_mem (void)
 }
 
 int
-fhandler_dev_mem::open (const char *, int flags, mode_t)
+fhandler_dev_mem::open (path_conv *, int flags, mode_t)
 {
   if (!wincap.has_physical_mem_access ())
     {

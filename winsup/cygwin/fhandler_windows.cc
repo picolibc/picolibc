@@ -55,7 +55,7 @@ fhandler_windows::fhandler_windows (const char *name) :
 }
 
 int
-fhandler_windows::open (const char *, int flags, mode_t)
+fhandler_windows::open (path_conv *, int flags, mode_t)
 {
   set_flags (flags);
   set_close_on_exec_flag (1);

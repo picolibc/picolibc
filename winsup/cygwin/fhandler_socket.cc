@@ -66,7 +66,7 @@ fhandler_socket::set_connect_secret ()
 						      ENTROPY_SOURCE_DEV_UNIT);
     }
   if (entropy_source &&
-      !entropy_source->open (ENTROPY_SOURCE_NAME, O_RDONLY))
+      !entropy_source->open (NULL, O_RDONLY))
     {
       delete entropy_source;
       entropy_source = NULL;

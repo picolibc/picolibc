@@ -131,17 +131,14 @@ fhandler_dev_raw::~fhandler_dev_raw (void)
 }
 
 int
-fhandler_dev_raw::open (const char *path, int flags, mode_t)
+fhandler_dev_raw::open (path_conv *, int flags, mode_t)
 {
-  path_conv real_path (path, PC_SYM_IGNORE);
   int ret;
-
-  set_name (path, real_path.get_win32 ());
 
   /* Always open a raw device existing and binary. */
   flags &= ~(O_CREAT | O_TRUNC);
   flags |= O_BINARY;
-  ret = fhandler_base::open (path, flags);
+  ret = fhandler_base::open (NULL, flags);
   if (ret)
     {
       if (devbufsiz > 1L)

@@ -32,7 +32,7 @@ fhandler_dev_random::fhandler_dev_random (const char *name, int nunit)
 }
 
 int
-fhandler_dev_random::open (const char *, int flags, mode_t)
+fhandler_dev_random::open (path_conv *, int flags, mode_t)
 {
   set_flags (flags);
   set_open_status ();

@@ -22,7 +22,7 @@ fhandler_dev_zero::fhandler_dev_zero (const char *name)
 }
 
 int
-fhandler_dev_zero::open (const char *, int flags, mode_t)
+fhandler_dev_zero::open (path_conv *, int flags, mode_t)
 {
   set_flags (flags);
   set_open_status ();

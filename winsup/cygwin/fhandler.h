@@ -311,13 +311,7 @@ public:
   /* fixup fd possibly non-inherited handles after fork */
   void fork_fixup (HANDLE parent, HANDLE &h, const char *name);
 
-  /* Potentially overridden virtual functions. */
-  virtual int open (const char *, int flags, mode_t mode = 0)
-  {
-    return open (flags, mode);
-  }
-  virtual int open (path_conv& real_path, int flags, mode_t mode);
-  virtual int open (int flags, mode_t mode = 0);
+  virtual int open (path_conv * real_path, int flags, mode_t mode = 0);
   virtual int close ();
   virtual int fstat (struct stat *buf) { return stat_dev (get_device (), get_unit (), get_namehash (), buf); }
   virtual int ioctl (unsigned int cmd, void *);
@@ -481,7 +475,7 @@ protected:
 public:
   ~fhandler_dev_raw (void);
 
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int close (void);
 
   int raw_read (void *ptr, size_t ulen);
@@ -506,7 +500,7 @@ protected:
 public:
   fhandler_dev_floppy (const char *name, int unit);
 
-  virtual int open (const char *path, int flags, mode_t mode = 0);
+  virtual int open (path_conv *, int flags, mode_t mode = 0);
   virtual int close (void);
 
   virtual off_t lseek (off_t offset, int whence);
@@ -528,7 +522,7 @@ protected:
 public:
   fhandler_dev_tape (const char *name, int unit);
 
-  virtual int open (const char *path, int flags, mode_t mode = 0);
+  virtual int open (path_conv *, int flags, mode_t mode = 0);
   virtual int close (void);
 
   virtual off_t lseek (off_t offset, int whence);
@@ -559,8 +553,7 @@ class fhandler_disk_file: public fhandler_base
 public:
   fhandler_disk_file (const char *name);
 
-  int open (const char *path, int flags, mode_t mode = 0);
-  int open (path_conv& real_path, int flags, mode_t mode);
+  int open (path_conv * real_path, int flags, mode_t mode);
   int close ();
   int lock (int, struct flock *);
   BOOL is_device () { return FALSE; }
@@ -587,7 +580,7 @@ public:
   /* Constructor */
   fhandler_serial (const char *name, DWORD devtype = FH_SERIAL, int unit = 0);
 
-  int open (const char *path, int flags, mode_t mode);
+  int open (path_conv *, int flags, mode_t mode);
   int close ();
   void init (HANDLE h, DWORD a, mode_t flags);
   void overlapped_setup ();
@@ -750,7 +743,7 @@ public:
 
   fhandler_console* is_console () { return this; }
 
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
 
   int write (const void *ptr, size_t len);
   void doecho (const void *str, DWORD len) { (void) write (str, len); }
@@ -823,7 +816,7 @@ public:
   fhandler_tty_slave (const char *name);
   fhandler_tty_slave (int, const char *name);
 
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   void init (HANDLE, DWORD, mode_t);
@@ -850,7 +843,7 @@ public:
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
   int accept_input ();
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   int close ();
@@ -896,7 +889,7 @@ class fhandler_dev_zero: public fhandler_base
 {
 public:
   fhandler_dev_zero (const char *name);
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   off_t lseek (off_t offset, int whence);
@@ -919,7 +912,7 @@ protected:
 public:
   fhandler_dev_random (const char *name, int unit);
   int get_unit () { return unit; }
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   off_t lseek (off_t offset, int whence);
@@ -940,7 +933,7 @@ public:
   fhandler_dev_mem (const char *name, int unit);
   ~fhandler_dev_mem (void);
 
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t ulen);
   int read (void *ptr, size_t ulen);
   off_t lseek (off_t offset, int whence);
@@ -962,7 +955,7 @@ class fhandler_dev_clipboard: public fhandler_base
 public:
   fhandler_dev_clipboard (const char *name);
   int is_windows (void) { return 1; }
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   off_t lseek (off_t offset, int whence);
@@ -987,7 +980,7 @@ private:
 public:
   fhandler_windows (const char *name = 0);
   int is_windows (void) { return 1; }
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);
@@ -1014,7 +1007,7 @@ public:
   fhandler_dev_dsp (const char *name = 0);
   ~fhandler_dev_dsp();
 
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);

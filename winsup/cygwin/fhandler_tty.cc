@@ -456,7 +456,7 @@ fhandler_tty_slave::fhandler_tty_slave (const char *name) :
 /* FIXME: This function needs to close handles when it has
    a failing condition. */
 int
-fhandler_tty_slave::open (const char *, int flags, mode_t)
+fhandler_tty_slave::open (path_conv *, int flags, mode_t)
 {
   tcinit (cygwin_shared->tty[ttynum]);
 
@@ -961,7 +961,7 @@ fhandler_pty_master::fhandler_pty_master (const char *name, DWORD devtype, int u
 }
 
 int
-fhandler_pty_master::open (const char *, int flags, mode_t)
+fhandler_pty_master::open (path_conv *, int flags, mode_t)
 {
   ttynum = cygwin_shared->tty.allocate_tty (0);
   if (ttynum < 0)

@@ -148,8 +148,6 @@ class path_conv
 
 /* Maximum depth of symlinks (after which ELOOP is issued).  */
 #define MAX_LINK_DEPTH 10
-
-int __stdcall get_device_number (const char *name, int &unit, BOOL from_conv = FALSE)  __attribute__ ((regparm(3)));
 int __stdcall slash_unc_prefix_p (const char *path) __attribute__ ((regparm(1)));
 
 const char * __stdcall find_exec (const char *name, path_conv& buf, const char *winenv = "PATH=",

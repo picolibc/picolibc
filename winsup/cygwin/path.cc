@@ -728,9 +728,6 @@ out:
 #endif
 }
 
-#define deveq(s) (strcasematch (name, (s)))
-#define deveqn(s, n) (strncasematch (name, (s), (n)))
-
 static __inline int
 digits (const char *name)
 {
@@ -769,106 +766,122 @@ const char *windows_device_names[] NO_COPY =
   "\\dev\\dsp"
 };
 
-static int
-get_raw_device_number (const char *uxname, const char *w32path, int &unit)
+#define deveq(s) (strcasematch (name, (s)))
+#define deveqn(s, n) (strncasematch (name, (s), (n)))
+#define wdeveq(s) (strcasematch (w32_path, (s)))
+#define wdeveqn(s, n) (strncasematch (w32_path, (s), (n)))
+#define udeveq(s) (strcasematch (unix_path, (s)))
+#define udeveqn(s, n) (strncasematch (unix_path, (s), (n)))
+
+static int __stdcall
+get_devn (const char *name, int &unit)
 {
-  DWORD devn = FH_BAD;
-
-  if (strncasematch (w32path, "\\\\.\\tape", 8))
+  int devn = FH_BAD;
+  name += 5;
+  if (deveq ("tty"))
     {
-      devn = FH_TAPE;
-      unit = digits (w32path + 8);
-      // norewind tape devices have leading n in name
-      if (strncasematch (uxname, "/dev/n", 6))
-	unit += 128;
+      if (real_tty_attached (myself))
+	{
+	  unit = myself->ctty;
+	  devn = FH_TTYS;
+	}
+      else if (myself->ctty > 0)
+	devn = FH_CONSOLE;
     }
-  else if (isdrive (w32path + 4))
+  else if (deveqn ("tty", 3) && (unit = digits (name + 3)) >= 0)
+    devn = FH_TTYS;
+  else if (deveq ("ttym"))
+    devn = FH_TTYM;
+  else if (deveq ("ptmx"))
+    devn = FH_PTYM;
+  else if (deveq ("windows"))
+    devn = FH_WINDOWS;
+  else if (deveq ("dsp"))
+    devn = FH_OSS_DSP;
+  else if (deveq ("conin"))
+    devn = FH_CONIN;
+  else if (deveq ("conout"))
+    devn = FH_CONOUT;
+  else if (deveq ("null"))
+    devn = FH_NULL;
+  else if (deveq ("zero"))
+    devn = FH_ZERO;
+  else if (deveq ("random") || deveq ("urandom"))
     {
-      devn = FH_FLOPPY;
-      unit = cyg_tolower (w32path[4]) - 'a';
+      devn = FH_RANDOM;
+      unit = 8 + (deveqn ("u", 1) ? 1 : 0); /* Keep unit Linux conformant */
     }
-  else if (strncasematch (w32path, "\\\\.\\physicaldrive", 17))
+  else if (deveq ("mem"))
     {
-      devn = FH_FLOPPY;
-      unit = digits (w32path + 17) + 128;
+      devn = FH_MEM;
+      unit = 1;
     }
-  return devn;
-}
-
-int __stdcall
-get_device_number (const char *name, int &unit, BOOL from_conv)
-{
-  DWORD devn = FH_BAD;
-  unit = 0;
-
-  if ((*name == '/' && deveqn ("/dev/", 5)) ||
-      (*name == '\\' && deveqn ("\\dev\\", 5)))
+  else if (deveq ("clipboard"))
+    devn = FH_CLIPBOARD;
+  else if (deveq ("port"))
     {
-      name += 5;
-      if (deveq ("tty"))
-	{
-	  if (real_tty_attached (myself))
-	    {
-	      unit = myself->ctty;
-	      devn = FH_TTYS;
-	    }
-	  else if (myself->ctty > 0)
-	    devn = FH_CONSOLE;
-	}
-      else if (deveqn ("tty", 3) && (unit = digits (name + 3)) >= 0)
-	devn = FH_TTYS;
-      else if (deveq ("ttym"))
-	devn = FH_TTYM;
-      else if (deveq ("ptmx"))
-	devn = FH_PTYM;
-      else if (deveq ("windows"))
-	devn = FH_WINDOWS;
-      else if (deveq ("dsp"))
-	devn = FH_OSS_DSP;
-      else if (deveq ("conin"))
-	devn = FH_CONIN;
-      else if (deveq ("conout"))
-	devn = FH_CONOUT;
-      else if (deveq ("null"))
-	devn = FH_NULL;
-      else if (deveq ("zero"))
-	devn = FH_ZERO;
-      else if (deveq ("random") || deveq ("urandom"))
-	{
-	  devn = FH_RANDOM;
-	  unit = 8 + (deveqn ("u", 1) ? 1 : 0); /* Keep unit Linux conformant */
-	}
-      else if (deveq ("mem"))
-	{
-	  devn = FH_MEM;
-	  unit = 1;
-	}
-      else if (deveq ("clipboard"))
-	devn = FH_CLIPBOARD;
-      else if (deveq ("port"))
-	{
-	  devn = FH_MEM;
-	  unit = 4;
-	}
-      else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
-	devn = FH_SERIAL;
-      else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
-	devn = FH_SERIAL;
-      else if (deveq ("pipe") || deveq ("piper") || deveq ("pipew"))
-	devn = FH_PIPE;
-      else if (deveq ("tcp") || deveq ("udp") || deveq ("streamsocket")
-	       || deveq ("dgsocket"))
-	devn = FH_SOCKET;
-      else if (!from_conv)
-	devn = get_raw_device_number (name - 5,
-				      path_conv (name - 5,
-						 PC_SYM_IGNORE).get_win32 (),
-				      unit);
+      devn = FH_MEM;
+      unit = 4;
     }
   else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
     devn = FH_SERIAL;
   else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
     devn = FH_SERIAL;
+  else if (deveq ("pipe") || deveq ("piper") || deveq ("pipew"))
+    devn = FH_PIPE;
+  else if (deveq ("tcp") || deveq ("udp") || deveq ("streamsocket")
+	   || deveq ("dgsocket"))
+    devn = FH_SOCKET;
+
+  return devn;
+}
+
+static int
+get_raw_device_number (const char *unix_path, const char *w32_path, int &unit)
+{
+  int devn;
+  w32_path += 4;
+  if (wdeveqn ("tape", 8))
+    {
+      unit = digits (w32_path + 4);
+      // norewind tape devices have leading n in name
+      if (udeveqn ("/dev/n", 6))
+	unit += 128;
+      devn = FH_TAPE;
+    }
+  else if (isdrive (w32_path))
+    {
+      unit = cyg_tolower (w32_path[0]) - 'a';
+      devn = FH_FLOPPY;
+    }
+  else if (wdeveqn ("physicaldrive", 17))
+    {
+      unit = digits (w32_path + 13) + 128;
+      devn = FH_FLOPPY;
+    }
+  else
+    devn = FH_BAD;
+  return devn;
+}
+
+static int __stdcall get_device_number (const char *unix_path,
+    					const char *w32_path, int &unit)
+  __attribute__ ((regparm(3)));
+static int __stdcall
+get_device_number (const char *unix_path, const char *w32_path, int &unit)
+{
+  DWORD devn = FH_BAD;
+  unit = 0;
+
+  if (*unix_path == '/' && udeveqn ("/dev/", 5))
+    devn = get_devn (unix_path, unit);
+  if (devn == FH_BAD && *w32_path == '\\' && wdeveqn ("\\dev\\", 5))
+    devn = get_devn (w32_path, unit);
+  if (devn == FH_BAD && udeveqn ("com", 3)
+      && (unit = digits (unix_path + 3)) >= 0)
+    devn = FH_SERIAL;
+  else if (strncmp (w32_path, "\\\\.\\", 4) == 0)
+    devn = get_raw_device_number (unix_path, w32_path, unit);
 
   return devn;
 }
@@ -882,7 +895,7 @@ win32_device_name (const char *src_path, char *win32_path,
 {
   const char *devfmt;
 
-  devn = get_device_number (src_path, unit, TRUE);
+  devn = get_device_number (src_path, "", unit);
 
   if (devn == FH_BAD)
     return FALSE;
@@ -1297,6 +1310,8 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       backslashify (dst, dst, 0);
       *flags = mi->flags;
     }
+
+  devn =  get_device_number (src_path, dst, unit);
 
  out:
   MALLOC_CHECK;
