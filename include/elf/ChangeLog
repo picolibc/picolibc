@@ -1,3 +1,8 @@
+2003-02-21  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* ia64.h (SHT_IA_64_LOPSREG, SHT_IA_64_HIPSREG,
+	SHT_IA_64_PRIORITY_INIT): Define.
+
 2003-02-18  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc64.h (IS_PPC64_TLS_RELOC): Rename from IS_TLS_RELOC.
