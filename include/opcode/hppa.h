@@ -43,8 +43,12 @@ struct pa_opcode
     unsigned long int mask;	/* ... in these bits. */
     char *args;
     enum pa_arch arch;
+    char flags;
 };
 
+/* Enable/disable strict syntax checking.  Not currently used, but will
+   be necessary for PA2.0 support in the future.  */
+#define FLAG_STRICT 0x1
 
 /*
    All hppa opcodes are 32 bits.
