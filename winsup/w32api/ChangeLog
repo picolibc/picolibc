@@ -1,3 +1,8 @@
+2002-08-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winerror.h: Cast OLE error codes to HRESULT.
+	Thanks to: Gunnar Degnbol <gdegnbol@users.sourceforge.net>
+
 2002-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wincrypt.h (ALG_*): Add defines.
