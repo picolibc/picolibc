@@ -34,7 +34,7 @@ ilockexch (long *t, long v)
   __asm__ __volatile__ ("\n\
 1:	lock	cmpxchgl %3,(%1)\n\
 	jne 1b\n\
- 	": "=a" (__res), "=q" (t): "1" (t), "q" (v), "0" (*t));
+ 	": "=a" (__res), "=q" (t): "1" (t), "q" (v), "0" (*t): "memory": "cc");
   return __res;
 }
 
@@ -44,7 +44,7 @@ ilockcmpexch (long *t, long v, long c)
   register int __res;
   __asm__ __volatile__ ("\n\
 	lock cmpxchgl %3,(%1)\n\
-	": "=a" (__res), "=q" (t) : "1" (t), "q" (v), "0" (c));
+	": "=a" (__res), "=q" (t) : "1" (t), "q" (v), "0" (c): "memory": "cc");
   return __res;
 }
 

@@ -243,12 +243,13 @@ details. */
       114: Export rand_r, ttyname_r.
       115: Export flockfile, ftrylockfile, funlockfile, getgrgid_r, getgrnam_r,
            getlogin_r.
+      116: Export atoll.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 115
+#define CYGWIN_VERSION_API_MINOR 116
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

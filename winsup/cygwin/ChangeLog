@@ -1,3 +1,11 @@
+2004-05-24  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* include/cygwin/version.h: Bump api minor version number.
+
+2004-05-24  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* cygwin.din: Export atoll.
+
 2004-05-20  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* tty.cc (tty_list::allocate_tty): Leave tty_mutex armed on successful

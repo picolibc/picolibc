@@ -208,6 +208,7 @@ atoi NOSIGFE
 _atoi = atoi NOSIGFE
 atol NOSIGFE
 _atol = atol NOSIGFE
+atoll NOSIGFE
 bcmp NOSIGFE
 _bcmp = bcmp NOSIGFE
 bcopy NOSIGFE
