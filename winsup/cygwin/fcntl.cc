@@ -41,13 +41,7 @@ _fcntl (int fd, int cmd,...)
   if (cmd != F_DUPFD)
     res = cfd->fcntl(cmd, arg);
   else
-    {
-      cygheap_fdnew newfd;
-      if (newfd >= 0)
-	res = dup2 (fd, newfd);
-      else
-	res = -1;
-    }
+    res = dup2 (fd, cygheap_fdnew (((int) arg) - 1));
   va_end (args);
 
 done:

@@ -14,6 +14,7 @@ details. */
 #include "perthread.h"
 #include "perprocess.h"
 #include "security.h"
+#include "cygerrno.h"
 
 #undef CloseHandle
 
@@ -347,5 +348,13 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
     small_printf ("CloseHandle(%s) failed %s:%d\n", name, func, ln);
 #endif
   return ret;
+}
+
+/* Add a handle to the linked list of known handles. */
+void __stdcall
+__set_errno (const char *func, int ln, int val)
+{
+  debug_printf ("%s:%d val %d", func, ln, val);
+  _impure_ptr->_errno = val;
 }
 #endif /*DEBUGGING*/

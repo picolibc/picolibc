@@ -1,5 +1,18 @@
 2001-10-15  Christopher Faylor  <cgf@redhat.com>
 
+	* cygerrno.h (set_errno): Define more informative version of this
+	function for debugging.
+	(__set_errno): Declare when DEBUGGING.
+	* cygheap.h (cygheap_fdget::cygheap_fdget): Add a flag to control when
+	errno is set.
+	* debug.cc (__set_errno): New function.
+	* fcntl.cc (_fcntl): Fix so that correct fd is used for second argument
+	to dup2.
+	* syscalls.cc (_cygwin_istext_for_stdio): Don't set errno here when
+	using cygheap_fdget.
+
+2001-10-15  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.cc (fhandler_base::fork_fixup): Don't protect handle.
 
 	* dlfcn.cc: Fix to confirm to coding standards.

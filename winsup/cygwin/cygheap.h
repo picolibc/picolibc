@@ -228,7 +228,7 @@ class cygheap_fdnew : public cygheap_fdmanip
 class cygheap_fdget : public cygheap_fdmanip
 {
  public:
-  cygheap_fdget (int fd, bool lockit = false)
+  cygheap_fdget (int fd, bool lockit = false, bool do_set_errno = true)
   {
     if (lockit)
       SetResourceLock (LOCK_FD_LIST, READ_LOCK, "cygheap_fdget");
@@ -241,7 +241,8 @@ class cygheap_fdget : public cygheap_fdmanip
     else
       {
 	this->fd = -1;
-	set_errno (EBADF);
+	if (do_set_errno)
+	  set_errno (EBADF + 1);
 	if (lockit)
 	  ReleaseResourceLock (LOCK_FD_LIST, READ_LOCK, "cygheap_fdget");
 	locked = false;

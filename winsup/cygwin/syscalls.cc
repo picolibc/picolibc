@@ -1461,7 +1461,7 @@ _cygwin_istext_for_stdio (int fd)
       return 0; /* we do it for old apps, due to getc/putc macros */
     }
 
-  cygheap_fdget cfd (fd);
+  cygheap_fdget cfd (fd, false, false);
   if (cfd < 0)
     {
       syscall_printf (" _cifs: fd not open\n");
