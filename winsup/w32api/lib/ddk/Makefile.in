@@ -14,9 +14,9 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-host_alias = @host_alias@
-build_alias = @build_alias@
-target_alias = @target_alias@
+host_alias = @host@
+build_alias = @build@
+target_alias = @target@
 prefix = @prefix@
 includedir:=@includedir@
 
@@ -85,7 +85,7 @@ LD = @LD@
 
 # headers
 
-HEADERS = $(notdir $(wildcard $(srcdir)/../include/*.h))
+HEADERS = $(notdir $(wildcard $(srcdir)/../../include/ddk/*.h))
 
 # libraries
 
@@ -147,7 +147,7 @@ install-libraries: all
 install-headers:
 	$(mkinstalldirs) $(inst_includedir)
 	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../../ddk/include/$$i $(inst_includedir)/$$i ; \
+		$(INSTALL_DATA) $(srcdir)/../../include/ddk/$$i $(inst_includedir)/$$i ; \
 	done
 
 # uninstall headers and libraries from a target specified directory

@@ -19,6 +19,7 @@ dnl check for cc and CFLAGS
 CFLAGS=${CFLAGS-"-O2 -g"}
 AC_CHECK_TOOL(CC, gcc, gcc)
 AC_SUBST(CC)
+AC_SUBST(CFLAGS)
 
 dnl check for various tools
 AC_CHECK_TOOL(AR, ar, ar)
@@ -46,4 +47,4 @@ else
 fi
 AC_SUBST(BUILDENV)
 
-AC_OUTPUT(Makefile lib/Makefile)
+AC_OUTPUT(Makefile lib/Makefile lib/ddk/Makefile)

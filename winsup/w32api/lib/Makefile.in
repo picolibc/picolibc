@@ -15,9 +15,12 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-host_alias = @host_alias@
-build_alias = @build_alias@
-target_alias = @target_alias@
+SUBDIRS := ddk
+subdirs := ddk
+
+host_alias = @host@
+build_alias = @build@
+target_alias = @target@
 prefix = @prefix@
 includedir:=@includedir@
 
@@ -82,6 +85,21 @@ RANLIB = @RANLIB@
 AR = @AR@
 LD = @LD@
 
+FLAGS_TO_PASS = \
+	AS="$(AS)" \
+	CC="$(CC)" \
+	CPPFLAGS="$(CPPFLAGS)" \
+	CFLAGS="$(CFLAGS)" \
+	CXXFLAGS="$(CXXFLAGS)" \
+	AR="$(AR)" \
+	RANLIB="$(RANLIB)" \
+	LD="$(LD)" \
+	DLLTOOL="$(DLLTOOL)" \
+	TAR="$(TAR)" \
+	TARFLAGS="$(TARFLAGS)" \
+	TARFILEEXT="$(TARFILEEXT)" \
+	WINDRES="$(WINDRES)"
+
 # end config section
 
 # headers
@@ -105,7 +123,15 @@ DISTFILES = Makefile.in $(DEF_FILES) $(SOURCES)
 .NOTPARALLEL:
 
 # targets
-all: $(LIBS) $(EXTRA_OBJS)
+all: $(LIBS) $(EXTRA_OBJS) ddk
+
+%-subdirs:
+	for i in $(SUBDIRS); do \
+	  $(MAKE) $(FLAGS_TO_PASS) -C $$i $*; \
+	done
+
+ddk:
+	$(MAKE) $(FLAGS_TO_PASS) -C $@
 
 TEST_OPTIONS = $(ALL_CFLAGS) -DWINVER=0x0666  \
 	-Wall -pedantic -Wsystem-headers -c $(srcdir)/test.c -o test.o
@@ -146,8 +172,9 @@ lib%.a: %.o
 	$(AR) rc $@ $*.o
 	$(RANLIB) $@
 
+.PHONY: install install-libraries install-headers install-pdk
 # install headers and libraries in a target specified directory.
-install: install-libraries install-headers
+install: install-libraries install-headers install-ddk
 
 install-libraries: all
 	$(mkinstalldirs) $(inst_libdir)
@@ -165,8 +192,11 @@ install-headers:
 		$(INSTALL_DATA) $(srcdir)/../include/GL/$$i $(inst_includedir)/GL/$$i ; \
 	done
 
+install-ddk: install-libraries install-headers
+	(cd ddk; $(MAKE) install)
+
 # uninstall headers and libraries from a target specified directory
-uninstall: uninstall-libraries uninstall-headers
+uninstall: uninstall-pdk uninstall-libraries uninstall-headers
 
 uninstall-libraries:
 	@for i in $(LIBS); do \
@@ -180,6 +210,8 @@ uninstall-headers:
 	done
 	rmdir $(inst_includedir)
 
+uninstall-pdk:
+	cd ddk && $(MAKE) -C uninstall
 
 dist:
 	mkdir $(distdir)/include
@@ -208,3 +240,4 @@ distclean: clean
 	rm -f config.cache config.status config.log Makefile
 
 maintainer-clean: distclean
+

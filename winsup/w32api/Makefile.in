@@ -14,9 +14,9 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-build_alias = @build_alias@
-host_alias = @host_alias@
-target_alias = @target_alias@
+build_alias = @build@
+host_alias = @host@
+target_alias = @target@
 prefix = @prefix@
 conf_prefix = @prefix@
 
