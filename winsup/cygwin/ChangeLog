@@ -3,6 +3,10 @@
 	* fhandler_base.cc (fhandler_base::readv): Rework to properly return
 	number of bytes from read.
 
+2003-07-28  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 2.
+
 2003-07-26  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (ctrl_c_handler): Send SIGHUP when events occur only if
