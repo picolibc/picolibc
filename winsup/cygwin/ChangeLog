@@ -1,3 +1,21 @@
+2004-02-20  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (conv_path_list): Return error condition.
+	(copy1): New function.
+	(copyenc): New function.
+	(mount_item::fnmunge): Return error condition.  Use new functions to
+	copy strings.
+	(mount_item::build_win32): Ditto.
+	(mount_info::conv_to_win32_path): Return error condition.
+	(cygwin_conv_to_posix_path): Return result of path conversion.
+	(cygwin_conv_to_full_posix_path): Ditto.
+	(return_with_errno): New macro.
+	(cygwin_win32_to_posix_path_list): Use new macro to potentially set
+	errno.
+	(cygwin_posix_to_win32_path_list): Ditto.
+	* path.h (mount_item::fnmunge): Add size argument.
+	(mount_item::build_win32): Ditto.
+
 2004-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* getopt.c: Avoid useless compiler warnings.

@@ -32,8 +32,8 @@ class mount_item
   void init (const char *dev, const char *path, unsigned flags);
 
   struct mntent *getmntent ();
-  void fnmunge (char *, const char *);
-  void build_win32 (char *, const char *, unsigned *, unsigned);
+  int fnmunge (char *, const char *, int&);
+  int build_win32 (char *, const char *, unsigned *, unsigned);
 };
 
 /* Warning: Decreasing this value will cause cygwin.dll to ignore existing

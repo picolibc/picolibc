@@ -1087,7 +1087,7 @@ slash_unc_prefix_p (const char *path)
 
 /* conv_path_list: Convert a list of path names to/from Win32/POSIX. */
 
-static void
+static int
 conv_path_list (const char *src, char *dst, int to_posix)
 {
   char *s;
@@ -1105,13 +1105,16 @@ conv_path_list (const char *src, char *dst, int to_posix)
       s = strccpy (srcbuf, &src, src_delim);
       int len = s - srcbuf;
       if (len >= CYG_MAX_PATH)
-	srcbuf[CYG_MAX_PATH - 1] = '\0';
-      (*conv_fn) (len ? srcbuf : ".", d);
+	return ENAMETOOLONG;
+      int err = (*conv_fn) (len ? srcbuf : ".", d);
+      if (err)
+	return err;
       if (!*src++)
 	break;
       d = strchr (d, '\0');
       *d++ = dst_delim;
     }
+  return 0;
 }
 
 /* init: Initialize the mount table.  */
@@ -1233,40 +1236,76 @@ fnunmunge (char *dst, const char *src)
   return converted;
 }
 
-void
-mount_item::fnmunge (char *dst, const char *src)
+static bool
+copy1 (char *&d, const char *&src, int& left)
+{
+  left--;
+  if (left || !*src)
+    *d++ = *src++;
+  else
+    return true;
+  return false;
+}
+
+static bool
+copyenc (char *&d, const char *&src, int& left)
+{
+  char buf[16];
+  int n = __small_sprintf (buf, "%%%02x", (unsigned char) *src++);
+  left -= n;
+  if (left <= 0)
+    return true;
+  strcpy (d, buf);
+  d += n;
+  return false;
+}
+
+int
+mount_item::fnmunge (char *dst, const char *src, int& left)
 {
   int name_type;
   if (!(name_type = special_name (src)))
-    strcpy (dst, src);
+    {
+      if ((int) strlen (src) >= left)
+	return ENAMETOOLONG;
+      else
+	strcpy (dst, src);
+    }
   else
     {
       char *d = dst;
-      *d++ = *src++;
-      if (name_type < 0)
-	d += __small_sprintf (d, "%%%02x", (unsigned char) *src++);
+      if (copy1 (d, src, left))
+	  return ENAMETOOLONG;
+      if (name_type < 0 && copyenc (d, src, left))
+	return ENAMETOOLONG;
 
       while (*src)
 	if (!strchr (special_chars, *src) || (*src == '%' && !special_char (src)))
-	  *d++ = *src++;
-	else
-	  d += __small_sprintf (d, "%%%02x", (unsigned char) *src++);
+	  {
+	    if (copy1 (d, src, left))
+	      return ENAMETOOLONG;
+	  }
+	else if (copyenc (d, src, left))
+	  return ENAMETOOLONG;
 
+      char dot[] = ".";
+      const char *p = dot;
       if (*--d != '.')
 	d++;
-      else
-	d += __small_sprintf (d, "%%%02x", (unsigned char) '.');
+      else if (copyenc (d, p, left))
+	return ENAMETOOLONG;
 
       *d = *src;
     }
 
   backslashify (dst, dst, 0);
+  return 0;
 }
 
-void
+int
 mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigned chroot_pathlen)
 {
-  int n;
+  int n, err = 0;
   const char *real_native_path;
   int real_posix_pathlen;
   set_flags (outflags, (unsigned) flags);
@@ -1290,26 +1329,35 @@ mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigne
     dst[n++] = '\\';
   if (!*p || !(flags & MOUNT_ENC))
     {
-      strcpy (dst + n, p);
-      backslashify (dst, dst, 0);
+      if ((n + strlen (p)) > CYG_MAX_PATH)
+	err = ENAMETOOLONG;
+      else
+	{
+	  strcpy (dst + n, p);
+	  backslashify (dst, dst, 0);
+	}
     }
   else
-    while (*p)
-      {
-	char slash = 0;
-	char *s = strchr (p + 1, '/');
-	if (s)
-	  {
-	    slash = *s;
-	    *s = '\0';
-	  }
-	fnmunge (dst += n, p);
-	if (!s)
-	  break;
-	n = strlen (dst);
-	*s = slash;
-	p = s;
-      }
+    {
+      int left = CYG_MAX_PATH - n;
+      while (*p)
+	{
+	  char slash = 0;
+	  char *s = strchr (p + 1, '/');
+	  if (s)
+	    {
+	      slash = *s;
+	      *s = '\0';
+	    }
+	  err = fnmunge (dst += n, p, left);
+	  if (!s || err)
+	    break;
+	  n = strlen (dst);
+	  *s = slash;
+	  p = s;
+	}
+    }
+  return err;
 }
 
 /* conv_to_win32_path: Ensure src_path is a pure Win32 path and store
@@ -1461,7 +1509,9 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 
   if (i < nmounts)
     {
-      mi->build_win32 (dst, pathbuf, flags, chroot_pathlen);
+      int err = mi->build_win32 (dst, pathbuf, flags, chroot_pathlen);
+      if (err)
+	return err;
       chroot_ok = true;
     }
   else
@@ -3369,6 +3419,15 @@ fchdir (int fd)
 /* Cover functions to the path conversion routines.
    These are exported to the world as cygwin_foo by cygwin.din.  */
 
+#define return_with_errno(x) \
+  do {\
+    int err = (x);\
+    if (!err)\
+     return 0;\
+    set_errno (err);\
+    return -1;\
+  } while (0)
+
 extern "C" int
 cygwin_conv_to_win32_path (const char *path, char *win32_path)
 {
@@ -3406,8 +3465,7 @@ cygwin_conv_to_posix_path (const char *path, char *posix_path)
 {
   if (check_null_empty_str_errno (path))
     return -1;
-  mount_table->conv_to_posix_path (path, posix_path, 1);
-  return 0;
+  return_with_errno (mount_table->conv_to_posix_path (path, posix_path, 1));
 }
 
 extern "C" int
@@ -3415,8 +3473,7 @@ cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 {
   if (check_null_empty_str_errno (path))
     return -1;
-  mount_table->conv_to_posix_path (path, posix_path, 0);
-  return 0;
+  return_with_errno (mount_table->conv_to_posix_path (path, posix_path, 0));
 }
 
 /* The realpath function is supported on some UNIX systems.  */
@@ -3512,6 +3569,7 @@ conv_path_list_buf_size (const char *path_list, bool to_posix)
   return size;
 }
 
+
 extern "C" int
 cygwin_win32_to_posix_path_list_buf_size (const char *path_list)
 {
@@ -3527,15 +3585,13 @@ cygwin_posix_to_win32_path_list_buf_size (const char *path_list)
 extern "C" int
 cygwin_win32_to_posix_path_list (const char *win32, char *posix)
 {
-  conv_path_list (win32, posix, 1);
-  return 0;
+  return_with_errno (conv_path_list (win32, posix, 1));
 }
 
 extern "C" int
 cygwin_posix_to_win32_path_list (const char *posix, char *win32)
 {
-  conv_path_list (posix, win32, 0);
-  return 0;
+  return_with_errno (conv_path_list (posix, win32, 0));
 }
 
 /* cygwin_split_path: Split a path into directory and file name parts.
