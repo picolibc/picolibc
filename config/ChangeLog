@@ -1,3 +1,15 @@
+2004-03-08  Paolo Bonzini  <bonzini@gnu.org>
+
+	PR ada/14131
+	Move language detection to the top level.
+	* acx.m4 (ACX_PROG_GNAT): New macro, moved here
+	from the gcc subdirectory.
+
+2004-03-09  Hans-Peter Nilsson  <hp@axis.com>
+
+	* accross.m4 (AC_C_BIGENDIAN_CROSS): Compile endian probe with
+	"-c".  Properly quote parameter for AC_MSG_ERROR.
+
 2004-01-14  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
 
 	* acinclude.m4: Quote names of macros to be defined by AC_DEFUN

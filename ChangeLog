@@ -1,3 +1,59 @@
+2004-03-17  Paolo Bonzini  <bonzini@gnu.org>
+
+	* configure.in: Remove symbolic link section.
+	* configure: Regenerate.
+	* Makefile.tpl (links): Remove.
+	* Makefile.in: Regenerate.
+
+2004-03-15  Paolo Bonzini  <bonzini@gnu.org>
+            Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in (DEFAULT_YACC, DEFAULT_M4, DEFAULT_LEX):
+        Set with AC_CHECK_PROGS.
+	* configure.in: Fix comment typo from last patch.
+	* configure: Regenerate.
+
+2004-03-15  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Introduce experimental top level bootstrap support.
+	* Makefile.in: Regenerate.
+	* configure.in: Introduce support for top level bootstrap.
+	* configure: Regenerate.
+
+2004-03-12  Eric Botcazou  <ebotcazou@gcc.gnu.org>
+            Paolo Bonzini  <bonzini@gnu.org>
+
+	PR bootstrap/14522
+	* configure.in: Cope with shells that do not support unquoted ^
+	* configure: Regenerate.
+
+2004-03-11  Eric Botcazou  <ebotcazou@gcc.gnu.org>
+            Paolo Bonzini  <bonzini@gnu.org>
+
+	PR bootstrap/14522
+	* configure.in: Cope with shell that do not support nesting
+	quotes inside quoted backquote substitutions.
+	* configure: Regenerate.
+
+2004-03-10  Andrew Pinski  <pinskia@physics.uc.edu>
+
+	PR bootstrap/14522
+	* configure.in: Fix escaping of $.
+	* configure: Regenerate.
+
+2004-03-11  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure: Regenerate.
+
+2004-03-08  Paolo Bonzini  <bonzini@gnu.org>
+
+	PR ada/14131
+	Move language detection to the top level.
+	* configure.in: Find default values for the tools as
+	soon as possible.  Disable ada if GNAT is not found.
+	Emit error message about missing languages.  Expand
+	--enable-languages=all for the gcc subdirectory.
+
 2004-03-01  Richard Sandiford  <rsandifo@redhat.com>
 
 	* configure.in (mips64*-*-linux*): Override mips*-*-linux* case

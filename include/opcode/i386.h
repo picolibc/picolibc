@@ -1,6 +1,6 @@
 /* opcode/i386.h -- Intel 80386 opcode table
    Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001
+   2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
 This file is part of GAS, the GNU Assembler, and GDB, the GNU Debugger.
@@ -896,8 +896,8 @@ static const template i386_optab[] = {
 {"cmpxchg8b",1,0x0fc7, 1, Cpu586, NoSuf|Modrm,		{ LLongMem, 0, 0} },
 
 /* Pentium II/Pentium Pro extensions.  */
-{"sysenter",0, 0x0f34, X, Cpu686|CpuNo64, NoSuf,	{ 0, 0, 0} },
-{"sysexit", 0, 0x0f35, X, Cpu686|CpuNo64, NoSuf,	{ 0, 0, 0} },
+{"sysenter",0, 0x0f34, X, Cpu686, NoSuf,		{ 0, 0, 0} },
+{"sysexit", 0, 0x0f35, X, Cpu686, NoSuf,		{ 0, 0, 0} },
 {"fxsave",  1, 0x0fae, 0, Cpu686, FP|Modrm,		{ LLongMem, 0, 0} },
 {"fxrstor", 1, 0x0fae, 1, Cpu686, FP|Modrm,		{ LLongMem, 0, 0} },
 {"rdpmc",   0, 0x0f33, X, Cpu686, NoSuf,		{ 0, 0, 0} },
@@ -1360,6 +1360,15 @@ static const template i386_optab[] = {
 {"syscall",  0, 0x0f05,    X, CpuK6,	NoSuf,			{ 0, 0, 0} },
 {"sysret",   0, 0x0f07,    X, CpuK6,	lq_Suf|DefaultSize,	{ 0, 0, 0} },
 {"swapgs",   0, 0x0f01, 0xf8, Cpu64,	NoSuf|ImmExt,		{ 0, 0, 0} },
+
+/* VIA PadLock extensions. */
+{"xstorerng", 0, 0x0fa7c0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
+{"xcryptecb", 0, 0xf30fa7c8, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
+{"xcryptcbc", 0, 0xf30fa7d0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
+{"xcryptcfb", 0, 0xf30fa7e0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
+{"xcryptofb", 0, 0xf30fa7e8, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
+/* alias for xstorerng */
+{"xstore", 0, 0x0fa7c0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
 
 /* sentinel */
 {NULL, 0, 0, 0, 0, 0, { 0, 0, 0} }
