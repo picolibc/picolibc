@@ -13,6 +13,7 @@ details. */
 #define _KERNEL 1
 #define __BSD_VISIBLE 1
 #include <sys/smallprint.h>
+#include <limits.h>
 
 #include "process.h"
 #include "cygserver_ipc.h"
@@ -96,13 +97,20 @@ mtx_destroy (mtx *m)
 /*
  * Helper functions for msleep/wakeup.
  */
+
+/* Values for which */
+#define MSLEEP_MUTEX	0
+#define MSLEEP_SEM	1
+#define MSLEEP_EVENT	2
+
 static char *
-msleep_event_name (void *ident, char *name)
+msleep_event_name (void *ident, char *name, int which)
 {
   if (wincap.has_terminal_services ())
-    __small_sprintf (name, "Global\\cygserver.msleep.evt.%08x", ident);
+    __small_sprintf (name, "Global\\cygserver.msleep.evt.%1d.%08x",
+		     which, ident);
   else
-    __small_sprintf (name, "cygserver.msleep.evt.%08x", ident);
+    __small_sprintf (name, "cygserver.msleep.evt.%1d.%08x", which, ident);
   return name;
 }
 
@@ -179,8 +187,37 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 {
   int ret = -1;
   char name[64];
-  msleep_event_name (ident, name);
-  HANDLE evt = CreateEvent (NULL, TRUE, FALSE, name);
+
+  /* The mutex is used to indicate an ident specific critical section.
+     The critical section is needed to synchronize access to the
+     semaphore and eventually the event object.  The whole idea is
+     that a wakeup is *guaranteed* to wakeup *all* threads.  If that's
+     not synchronized, sleeping threads could return into the msleep
+     function before all other threads have called CloseHandle(evt).
+     That's bad, since the event still exists and is signalled! */
+  HANDLE mutex = CreateMutex (NULL, FALSE,
+			      msleep_event_name (ident, name, MSLEEP_MUTEX));
+  if (!mutex)
+    panic ("CreateMutex in msleep (%s) failed: %E", wmesg);
+  WaitForSingleObject (mutex, INFINITE);
+
+  /* Ok, we're in the critical section now.  We create an ident specific
+     semaphore, which is used to synchronize the waiting threads. */
+  HANDLE sem = CreateSemaphore (NULL, 0, LONG_MAX,
+				msleep_event_name (ident, name, MSLEEP_SEM));
+  if (!sem)
+    panic ("CreateSemaphore in msleep (%s) failed: %E", wmesg);
+
+  /* This thread is one more thread sleeping.  The semaphore value is
+     so used as a counter of sleeping threads.  That info is needed by
+     the wakeup function. */
+  ReleaseSemaphore (sem, 1, NULL);
+
+  /* Leave critical section. */
+  ReleaseMutex (mutex);
+
+  HANDLE evt = CreateEvent (NULL, TRUE, FALSE,
+			    msleep_event_name (ident, name, MSLEEP_EVENT));
   if (!evt)
     panic ("CreateEvent in msleep (%s) failed: %E", wmesg);
   if (mtx)
@@ -199,6 +236,7 @@ _msleep (void *ident, struct mtx *mtx, int priority,
   if ((priority & PCATCH)
       && td->client->signal_arrived () != INVALID_HANDLE_VALUE)
     obj_cnt = 4;
+  
   switch (WaitForMultipleObjects (obj_cnt, obj, FALSE, timo ?: INFINITE))
     {
       case WAIT_OBJECT_0:	/* wakeup() has been called. */
@@ -220,17 +258,23 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 	panic ("wait in msleep (%s) failed, %E", wmesg);
 	break;
     }
-#if 0
-  /* Dismiss event before entering mutex. */
-  /* CV 2004-09-06, Don't dismiss for now. 
-     TODO: Dismissing was meant to solve a problem with heavy load but
-     there's no proof that it helps.  On the contrary, it breaks msgtest
-     in the testsuite.  As long as I don't get a testcase to track that
-     down, I'll keep it that way. */
-  ResetEvent (evt);
-#endif
+
   CloseHandle (evt);
+  /* wakeup has reset the semaphore to 0.  Now indicate that this thread
+     has called CloseHandle (evt) and enter the critical section.  The
+     critical section is still hold by wakeup, until all formerly sleeping
+     threads have indicated that the event has been dismissed.  That's
+     the signal for wakeup that it's the only thread still holding a
+     handle to the event object.  wakeup will then close the last handle
+     and leave the critical section. */
+  ReleaseSemaphore (sem, 1, NULL);
+  WaitForSingleObject (mutex, INFINITE);
+  CloseHandle (sem);
+  ReleaseMutex (mutex);
+  CloseHandle (mutex);
+
   set_priority (old_priority);
+
   if (mtx && !(priority & PDROP))
     mtx_lock (mtx);
   return ret;
@@ -243,22 +287,69 @@ int
 wakeup (void *ident)
 {
   char name[64];
-  msleep_event_name (ident, name);
-  HANDLE evt = OpenEvent (EVENT_MODIFY_STATE, FALSE, name);
-  if (!evt)
+  LONG threads;
+
+  HANDLE evt = OpenEvent (EVENT_MODIFY_STATE, FALSE,
+  			  msleep_event_name (ident, name, MSLEEP_EVENT));
+  if (!evt) /* No thread is waiting. */
     {
       /* Another round of different error codes returned by 9x and NT
          systems. Oh boy... */
       if (  (!wincap.is_winnt () && GetLastError () != ERROR_INVALID_NAME)
 	  || (wincap.is_winnt () && GetLastError () != ERROR_FILE_NOT_FOUND))
 	panic ("OpenEvent (%s) in wakeup failed: %E", name);
+      return 0;
     }
+
+  /* The mutex is used to indicate an ident specific critical section.
+     The critical section is needed to synchronize access to the
+     semaphore and eventually the event object.  The whole idea is
+     that a wakeup is *guaranteed* to wakeup *all* threads.  If that's
+     not synchronized, sleeping threads could return into the msleep
+     function before all other threads have called CloseHandle(evt).
+     That's bad, since the event still exists and is signalled! */
+  HANDLE mutex = OpenMutex (MUTEX_ALL_ACCESS, FALSE,
+			    msleep_event_name (ident, name, MSLEEP_MUTEX));
+  if (!mutex)
+    panic ("OpenMutex (%s) in wakeup failed: %E", name);
+  WaitForSingleObject (mutex, INFINITE);
+  /* Ok, we're in the critical section now.  We create an ident specific
+     semaphore, which is used to synchronize the waiting threads. */
+  HANDLE sem = OpenSemaphore (SEMAPHORE_ALL_ACCESS, FALSE,
+			      msleep_event_name (ident, name, MSLEEP_SEM));
+  if (!sem)
+    panic ("OpenSemaphore (%s) in wakeup failed: %E", name);
+  ReleaseSemaphore (sem, 1, &threads);
+  /* `threads' is the number of waiting threads.  Now reset the semaphore
+     to 0 and wait for this number of threads to indicate that they have
+     called CloseHandle (evt).  Then it's save to do the same here in
+     wakeup, which then means that the event object is destroyed and
+     can get safely recycled. */
+  for (int i = threads + 1; i > 0; --i)
+    WaitForSingleObject (sem, INFINITE);
+
+  if (!SetEvent (evt))
+    panic ("SetEvent (%s) in wakeup failed, %E", name);
+
+  /* Now wait for all threads which were waiting for this wakeup. */
+  while (threads-- > 0)
+    WaitForSingleObject (sem, INFINITE);
+
+  /* Now our handle is the last handle to this event object. */
+  CloseHandle (evt);
+  /* But paranoia rulez, so we check here again. */
+  evt = OpenEvent (EVENT_MODIFY_STATE, FALSE,
+		   msleep_event_name (ident, name, MSLEEP_EVENT));
   if (evt)
-    {
-      if (!SetEvent (evt))
-	panic ("SetEvent (%s) in wakeup failed, %E", name);
-      CloseHandle (evt);
-    }
+    panic ("Event %s has not been destroyed.  Obviously I can't count :-(",
+	   name);
+
+  CloseHandle (sem);
+
+  /* Leave critical section (all of wakeup is critical). */
+  ReleaseMutex (mutex);
+  CloseHandle (mutex);
+
   return 0;
 }
 

@@ -1,3 +1,15 @@
+2004-12-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc: Include limits.h.
+	(MSLEEP_MUTEX): New define for third parameter to msleep_event_name.
+	(MSLEEP_SEM): Ditto.
+	(MSLEEP_EVENT): Ditto.
+	(msleep_event_name): Add third parameter to allow multiple
+	synchronization objects per ident.
+	(_msleep): Implement new synchronization technique to make sure
+	that all threads have been woken up by a corresponding wakeup call.
+	(wakeup): Ditto.
+
 2004-10-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sysv_sem.cc: Redefine offsetof to circumvent build problems with
