@@ -1,3 +1,11 @@
+2003-12-05  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub2): Remove myself from the list of
+	threads monitored by signals since this thread will never call raise or
+	sigwait.
+	(cygthread::simplestub2): Ditto.  Set ev here.
+	(cygthread::cygthread): Don't set ev here for freerange thread.
+
 2003-12-04  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (slash_unc_prefix_p): Allow '.' as a valid character after

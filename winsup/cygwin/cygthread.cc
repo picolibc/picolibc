@@ -40,11 +40,10 @@ void
 cygthread::stub2 (void *arg, void *)
 {
   exception_list except_entry;
-
   /* Initialize this thread's ability to respond to things like
      SIGSEGV or SIGFPE. */
   init_exceptions (&except_entry);
-
+  _my_tls.remove ();	// Remove me from signal chain -- not signalable.
 
   cygthread *info = (cygthread *) arg;
   if (info->arg == cygself)
@@ -108,13 +107,14 @@ void
 cygthread::simplestub2 (void *arg, void *)
 {
   exception_list except_entry;
-
   /* Initialize this thread's ability to respond to things like
      SIGSEGV or SIGFPE. */
   init_exceptions (&except_entry);
+  _my_tls.remove ();	// Remove me from signal chain -- not signalable.
 
   cygthread *info = (cygthread *) arg;
   info->stack_ptr = &arg;
+  info->ev = info->h;
   info->func (info->arg == cygself ? info : info->arg);
   ExitThread (0);
 }
@@ -197,8 +197,6 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
 			this, 0, &id);
       if (!h)
 	api_fatal ("thread handle not set - %p<%p>, %E", h, id);
-      if (is_freerange)
-	ev = h;
       thread_printf ("created thread %p", h);
     }
 }
