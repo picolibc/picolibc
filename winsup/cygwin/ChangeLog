@@ -1,3 +1,22 @@
+Sat Sep 30 00:43:42 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (init_cheap): Set aside space for heap walk pointer.
+	(_csbrk): Make logic for detecting when to alloc cognizant of
+	initialization condition.
+	(_cmalloc): Use a structure to hold bucket size and heap chain pointer.
+	Store pointer to next freed block in bucket size location so that it
+	will be easy to see if a block is allocated.
+	(_cfree): Store pointer to next freed block in bucket size location.
+	(_crealloc): Use macro to retrieve bucket size.
+	(cygheap_init): Eliminate.
+	(cygheap_fixup_in_child): Add second argument to determine if we were
+	execed or not.  In execed case, walk the heap, cleaning up any orphaned
+	blocks.
+	* cygheap.h: Add a "MAX" value to cygheap_types.  Remove cygheap_init
+	declaration.  Accomodate new argument to cygheap_fixup_in child.
+	* fork.cc (fork): Accomodate extra argument to cygheap_fixup_in_child.
+	* dcrt0.cc (dll_crt0_1): Ditto.  Remove call to cygheap_init.
+
 Fri Sep 29 21:49:27 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (symlink_info::check): Set executable bit for a file if the

@@ -20,7 +20,8 @@ enum cygheap_types
   HEAP_1_STR,
   HEAP_1_ARGV,
   HEAP_1_BUF,
-  HEAP_1_EXEC
+  HEAP_1_EXEC,
+  HEAP_1_MAX = 100
 };
 
 #define CYGHEAPSIZE ((1000 * sizeof (fhandler_union)) + (2 * 65536))
@@ -30,10 +31,9 @@ extern HANDLE cygheap_max;
 
 #define incygheap(s) (cygheap && ((char *) (s) >= (char *) cygheap) && ((char *) (s) <= ((char *) cygheap) + CYGHEAPSIZE))
 
-void cygheap_init ();
 extern "C" {
 void __stdcall cfree (void *);
-void __stdcall cygheap_fixup_in_child (HANDLE);
+void __stdcall cygheap_fixup_in_child (HANDLE, bool);
 void *__stdcall cmalloc (cygheap_types, DWORD);
 void *__stdcall crealloc (void *, DWORD);
 void *__stdcall ccalloc (cygheap_types, DWORD, DWORD);

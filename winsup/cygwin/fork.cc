@@ -571,7 +571,7 @@ fork ()
 
       MALLOC_CHECK;
 
-      cygheap_fixup_in_child (hParent);
+      cygheap_fixup_in_child (hParent, 0);
       fdtab.fixup_after_fork (hParent);
       signal_fixup_after_fork ();
       exec_fixup_after_fork ();

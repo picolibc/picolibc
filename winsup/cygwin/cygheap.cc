@@ -16,26 +16,40 @@
 #include "heap.h"
 #include "cygerrno.h"
 
+void *cygheap = NULL;
+void *cygheap_max = NULL;
+
 inline static void
 init_cheap ()
 {
   cygheap = VirtualAlloc (NULL, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS);
   if (!cygheap)
     api_fatal ("Couldn't reserve space for cygwin's heap, %E");
-  cygheap_max = cygheap;
+  cygheap_max = (((char **) cygheap) + 1);
 }
 
 #define pagetrunc(x) ((void *) (((DWORD) (x)) & ~(4096 - 1)))
+
 static void *__stdcall
 _csbrk (int sbs)
 {
   void *lastheap;
-  if (!cygheap)
-    init_cheap ();
+  bool needalloc;
+
+  if (cygheap)
+    needalloc = 0;
+  else
+    {
+      init_cheap ();
+      needalloc = 1;
+    }
+
   lastheap = cygheap_max;
   (char *) cygheap_max += sbs;
   void *heapalign = (void *) pagetrunc (lastheap);
-  int needalloc = sbs && ((heapalign == lastheap) || heapalign != pagetrunc (cygheap_max));
+
+  if (!needalloc)
+    needalloc = sbs && ((heapalign == lastheap) || heapalign != pagetrunc (cygheap_max));
   if (needalloc && !VirtualAlloc (lastheap, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
     api_fatal ("couldn't commit memory for cygwin heap, %E");
 
@@ -44,8 +58,9 @@ _csbrk (int sbs)
 
 /* Copyright (C) 1997, 2000 DJ Delorie */
 
-char *buckets[32] = {0};
-int bucket2size[32] = {0};
+#define NBUCKETS 32
+char *buckets[NBUCKETS] = {0};
+int bucket2size[NBUCKETS] = {0};
 
 static inline int
 size2bucket (int size)
@@ -71,14 +86,30 @@ static inline void
 init_buckets ()
 {
   unsigned b;
-  for (b = 0; b < 32; b++)
+  for (b = 0; b < NBUCKETS; b++)
     bucket2size[b] = (1 << b);
 }
+
+struct _cmalloc_entry
+{
+  union
+  {
+    DWORD b;
+    char *ptr;
+  };
+  struct _cmalloc_entry *prev;
+  char data[0];
+};
+
+
+#define N0 ((_cmalloc_entry *) NULL)
+#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (int) (N0->data)))
+#define cygheap_chain ((_cmalloc_entry **)cygheap)
 
 static void *__stdcall
 _cmalloc (int size)
 {
-  char *rv;
+  _cmalloc_entry *rvc;
   int b;
 
   if (bucket2size[0] == 0)
@@ -87,25 +118,28 @@ _cmalloc (int size)
   b = size2bucket (size);
   if (buckets[b])
     {
-      rv = buckets[b];
-      buckets[b] = *(char **) rv;
-      return rv;
+      rvc = (_cmalloc_entry *) buckets[b];
+      buckets[b] = rvc->ptr;
+      rvc->b = b;
+      return rvc->data;
     }
 
-  size = bucket2size[b] + 4;
-  rv = (char *) _csbrk (size);
+  size = bucket2size[b] + sizeof (_cmalloc_entry);
+  rvc = (_cmalloc_entry *) _csbrk (size);
 
-  *(int *) rv = b;
-  rv += 4;
-  return rv;
+  rvc->b = b;
+  rvc->prev = *cygheap_chain;
+  *cygheap_chain = rvc;
+  return rvc->data;
 }
 
 static void __stdcall
 _cfree (void *ptr)
 {
-  int b = *(int *) ((char *) ptr - 4);
-  *(char **) ptr = buckets[b];
-  buckets[b] = (char *) ptr;
+  _cmalloc_entry *rvc = to_cmalloc (ptr);
+  DWORD b = rvc->b;
+  rvc->ptr = buckets[b];
+  buckets[b] = (char *) rvc;
 }
 
 static void *__stdcall
@@ -116,7 +150,7 @@ _crealloc (void *ptr, int size)
     newptr = _cmalloc (size);
   else
     {
-      int oldsize = bucket2size[*(int *) ((char *) ptr - 4)];
+      int oldsize = bucket2size[to_cmalloc (ptr)->b];
       if (size <= oldsize)
 	return ptr;
       newptr = _cmalloc (size);
@@ -128,44 +162,57 @@ _crealloc (void *ptr, int size)
 
 /* End Copyright (C) 1997 DJ Delorie */
 
-void *cygheap = NULL;
-void *cygheap_max = NULL;
-
 #define sizeof_cygheap(n) ((n) + sizeof(cygheap_entry))
 
 struct cygheap_entry
   {
-    cygheap_types type;
+    int type;
+    struct cygheap_entry *next;
     char data[0];
   };
 
 #define N ((cygheap_entry *) NULL)
 #define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - (int) (N->data)))
 
-void
-cygheap_init ()
-{
-  if (!cygheap)
-    init_cheap ();
-}
-
+/* Called by fork or spawn to reallocate cygwin heap */
 extern "C" void __stdcall
-cygheap_fixup_in_child (HANDLE parent)
+cygheap_fixup_in_child (HANDLE parent, bool execed)
 {
   DWORD m, n;
   n = (DWORD) cygheap_max - (DWORD) cygheap;
+
+  /* Reserve cygwin heap in same spot as parent */
   if (!VirtualAlloc (cygheap, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS))
     api_fatal ("Couldn't reserve space for cygwin's heap in child, %E");
 
+  /* Allocate same amount of memory as parent */
   if (!VirtualAlloc (cygheap, n, MEM_COMMIT, PAGE_READWRITE))
     api_fatal ("Couldn't allocate space for child's heap %p, size %d, %E",
 	       cygheap, n);
+
+  /* Copy memory from the parent */
   m = 0;
   n = (DWORD) pagetrunc (n + 4095);
   if (!ReadProcessMemory (parent, cygheap, cygheap, n, &m) ||
       m != n)
     api_fatal ("Couldn't read parent's cygwin heap %d bytes != %d, %E",
 	       n, m);
+
+  if (!execed)
+    return;		/* Forked.  Nothing extra to do. */
+
+  /* Walk the allocated memory chain looking for orphaned memory from
+     previous execs */
+  for (_cmalloc_entry *rvc = *cygheap_chain; rvc; rvc = rvc->prev)
+    {
+      cygheap_entry *ce = (cygheap_entry *) rvc->data;
+      if (rvc->b >= NBUCKETS || ce->type <= HEAP_1_START)
+	continue;
+      else if (ce->type < HEAP_1_MAX)
+	ce->type += HEAP_1_MAX;	/* Mark for freeing after next exec */
+      else
+	_cfree (ce);		/* Marked by parent for freeing in child */
+    }
 }
 
 static void *__stdcall
@@ -200,7 +247,7 @@ crealloc (void *s, DWORD n)
 
   assert (!inheap (s));
   cygheap_entry *c = tocygheap (s);
-  cygheap_types t = c->type;
+  cygheap_types t = (cygheap_types) c->type;
   c = (cygheap_entry *) _crealloc (c, sizeof_cygheap (n));
   if (!c)
     system_printf ("crealloc returned NULL");

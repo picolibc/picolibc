@@ -678,7 +678,7 @@ dll_crt0_1 ()
 	    HANDLE h;
 	    cygheap = spawn_info->cygheap;
 	    cygheap_max = spawn_info->cygheap_max;
-	    cygheap_fixup_in_child (spawn_info->parent);
+	    cygheap_fixup_in_child (spawn_info->parent, 1);
 	    if (!spawn_info->moreinfo->myself_pinfo ||
 		!DuplicateHandle (hMainProc, spawn_info->moreinfo->myself_pinfo,
 				 hMainProc, &h, 0, 0,
@@ -746,7 +746,6 @@ dll_crt0_1 ()
       longjmp (fork_info->jmp, fork_info->cygpid);
     }
 
-  cygheap_init ();	/* Initialize cygwin's heap */
   cygcwd.init ();
 
   /* Initialize our process table entry. */
