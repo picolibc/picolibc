@@ -901,7 +901,11 @@ ID displayed by NT's Task Manager program. The TTY column gives which
 pseudo-terminal a process is running on, or a <literal>'?'</literal>
 for services. The UID column shows which user owns each process. 
 STIME is the time the process was started, and COMMAND gives the name
-of the program running.
+of the program running. Listings may also have a status flag in
+column zero; <literal>S</literal> means stopped or suspended (in other
+words, in the background), <literal>I</literal> means waiting for
+input or interactive (foreground), and <literal>O</literal> means
+waiting to output. 
 </para>
 
 <para>
