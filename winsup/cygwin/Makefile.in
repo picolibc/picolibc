@@ -280,13 +280,13 @@ dcrt0.o sigproc.o: child_info_magic.h
 shared.o: shared_info_magic.h
 
 libpthread.a: speclib cygwin.def pthread.o thread.o
-	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" "${AS}" ${wordlist 2, 99, $^}
 
 $(PWD)/libm.a: speclib cygwin.def $(LIBM)
-	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" "${AS}" ${wordlist 2, 99, $^}
 
 $(PWD)/libc.a: speclib cygwin.def $(PWD)/libm.a libpthread.a
-	/bin/sh ${word 1, $^} -v $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+	/bin/sh ${word 1, $^} -v $@ "${NM}" "${DLLTOOL}" "${AS}" ${wordlist 2, 99, $^}
 
 lib%.a: %.o
 	$(AR) cru $@ $?
