@@ -59,7 +59,12 @@
 #endif
 
 #ifdef __mips__
+#ifdef __mips64
+#define _JBLEN 23
+#define _JBTYPE long long
+#else
 #define _JBLEN 11
+#endif
 #endif
 
 #ifdef __m88000__

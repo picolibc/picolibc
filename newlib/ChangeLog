@@ -1,6 +1,13 @@
+2001-03-08  Richard Sandiford  <rsandifo@redhat.com>
+
+        * (libc/include/machine/setjmp.h): Use 23 long long ints for a
+        jmpbuf on MIPS64 targets.
+        * (libc/machine/mips/setjmp.S): Add MIPS64 version.
+
 Wed Mar  7 16:02:07 2001  Christopher Faylor <cgf@cygnus.com>
 
-	* libc/include/sys/config.h: Use ssize_t for read/write declarations.
+	* libc/include/sys/config.h: Use ssize_t for Cygwin read/write 
+          declarations.
 
 Mon Mar  5 21:48:54 2001  J"orn Rennecke <amylaar@redhat.com>
 
