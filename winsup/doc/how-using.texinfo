@@ -42,17 +42,26 @@ For a detailed discussion of why this change was made, and how deal
 with it now, refer to
 @file{http://sources.redhat.com/ml/cygwin/2001-09/msg00014.html}.
 
-@subsection Why can't I access my network shares with @samp{cron}, or when using pubkey authentication with @samp{ssh}?
+@subsection Why don't my services work (or access network shares)?
 
-Some Cygwin services normally run as the SYSTEM user, which has
-certain limitations. Under the Windows authentication scheme, the
-SYSTEM user cannot access network shares that require authentication.
-For more information, see
+Most Windows services run as a special user called SYSTEM.  If you
+installed Cygwin for "Just Me", the SYSTEM user won't see your
+Cygwin mount table.  You need to re-mount all of your mounts as
+"system" for services to work. This script will do the trick:
+
+@example
+eval "`mount -m | sed -e 's/ -u / -s /g' -e 's/$/;/'`"
+@end example
+
+The SYSTEM user cannot access network shares that require
+authentication.  For more information, see
 @file{http://cygwin.com/cygwin-ug-net/ntsec.html}.
 
 Workarounds include using public network share that does not require
 authentication (for non-critical files), or running the service as
 your own user with @samp{cygrunsrv}.
+
+@subsection How should I set my PATH?
 
 @subsection How should I set my PATH?
 
