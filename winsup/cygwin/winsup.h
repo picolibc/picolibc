@@ -138,6 +138,11 @@ extern HANDLE title_mutex;
 
 /**************************** Convenience ******************************/
 
+/* Used to define status flag accessor methods */
+#define IMPLEMENT_STATUS_FLAG(type,flag) \
+  void flag (type val) { status.flag = (val); } \
+  type flag () const { return (type) status.flag; }
+
 /* Used when treating / and \ as equivalent. */
 #define isdirsep(ch) \
     ({ \

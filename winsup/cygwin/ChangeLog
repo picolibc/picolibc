@@ -1,3 +1,16 @@
+2004-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.h (IMPLEMENT_STATUS_FLAG): New macro to define status flag
+	accessor methods unambiguously.
+	* fhandler.h: Use IMPLEMENT_STATUS_FLAG throughout where possible.
+	* fhandler_termios.cc (fhandler_termios::tcinit): Call corrected
+	accessor for initialized status flag.
+	* mtinfo.h (class mtinfo_drive): Use IMPLEMENT_STATUS_FLAG throughout.
+	* path.cc (fs_info::update): Remove duplicate call to flags().
+	* path.h (struct fs_info): Use IMPLEMENT_STATUS_FLAG where possible.
+	(path_conv::is_auto_device): Fix spacing.
+	* tty.h (class tty_min): Use IMPLEMENT_STATUS_FLAG throughout.
+
 2004-04-12  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* thread.cc (pthread::thread_init_wrapper): Wait later to get more

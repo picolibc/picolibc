@@ -98,18 +98,13 @@ struct fs_info
   }
   inline DWORD& flags () {return status.flags;};
   inline DWORD& serial () {return status.serial;};
-  void is_remote_drive (bool b) { status.is_remote_drive = b; }
-  bool is_remote_drive () const { return status.is_remote_drive; }
-  void has_buggy_open (bool b) { status.has_buggy_open = b; }
-  bool has_buggy_open () const { return status.has_buggy_open; }
-  void is_fat (bool b) { status.is_fat = b; }
-  bool is_fat () const { return status.is_fat; }
-  void has_ea (bool b) { status.has_ea = b; }
-  int has_ea () const { return status.has_ea ? PC_CHECK_EA : 0; }
-  void has_acls (bool b) { status.has_acls = b; }
-  bool has_acls () const { return status.has_acls; }
-  void drive_type (DWORD d) { status.is_remote_drive = d; }
-  DWORD drive_type () const { return status.drive_type; }
+
+  IMPLEMENT_STATUS_FLAG (bool, is_remote_drive)
+  IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
+  IMPLEMENT_STATUS_FLAG (bool, is_fat)
+  IMPLEMENT_STATUS_FLAG (bool, has_ea)
+  IMPLEMENT_STATUS_FLAG (bool, has_acls)
+  IMPLEMENT_STATUS_FLAG (DWORD, drive_type)
 
   bool update (const char *);
 };
@@ -147,7 +142,7 @@ class path_conv
   int isdevice () const {return dev.devn && dev.devn != FH_FS && dev.devn != FH_FIFO;}
   int isfifo () const {return dev == FH_FIFO;}
   int isspecial () const {return dev.devn && dev.devn != FH_FS;}
-  int is_auto_device () const {return isdevice ()  && !is_fs_special ();}
+  int is_auto_device () const {return isdevice () && !is_fs_special ();}
   int is_fs_special () const {return isspecial () && dev.isfs ();}
   int issocket () const {return path_flags & PATH_SOCKET;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}

@@ -58,7 +58,7 @@ fhandler_termios::tcinit (tty_min *this_tc, bool force)
 
       tc->ti.c_ispeed = tc->ti.c_ospeed = B38400;
       tc->pgid = myself->pgid;
-      tc->initialize ();
+      tc->initialized (true);
     }
 }
 

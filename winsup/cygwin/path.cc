@@ -397,7 +397,6 @@ fs_info::update (const char *win32_path)
   			     &status.flags, fsname, sizeof (fsname)))
     {
       debug_printf ("Cannot get volume information (%s), %E", root_dir);
-      flags () = 0;
       has_buggy_open (false);
       has_ea (false);
       flags () = serial () = 0;

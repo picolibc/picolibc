@@ -154,9 +154,6 @@ class fhandler_base
   bool wbinary () const { return status.wbinset ? status.wbinary : 1; }
   bool rbinary () const { return status.rbinset ? status.rbinary : 1; }
 
-  bool wbinset () const { return status.wbinset; }
-  bool rbinset () const { return status.rbinset; }
-
   void wbinary (bool b) {status.wbinary = b; status.wbinset = 1;}
   void rbinary (bool b) {status.rbinary = b; status.rbinset = 1;}
 
@@ -168,26 +165,15 @@ class fhandler_base
 		   ? O_BINARY : O_TEXT));
   }
 
-  bool nohandle () const { return status.nohandle; }
-  void nohandle (bool x) { status.nohandle = x; }
-
-  bool uninterruptible_io () const { return status.uninterruptible_io; }
-  void uninterruptible_io (bool b) { status.uninterruptible_io = b; }
-
-  bool append_mode () const { return status.append_mode; }
-  void append_mode (bool b) { status.append_mode = b; }
-
-  bool did_lseek () const { return status.did_lseek; }
-  void did_lseek (bool b) { status.did_lseek = b; }
-
-  query_state query_open () const { return (query_state) status.query_open; }
-  void query_open (query_state val) { status.query_open = val; }
-
-  bool close_on_exec () const { return status.close_on_exec; }
-  void close_on_exec (bool b) { status.close_on_exec = b; }
-
-  bool need_fork_fixup () const { return status.need_fork_fixup; }
-  void need_fork_fixup (bool b) { status.need_fork_fixup = b; }
+  IMPLEMENT_STATUS_FLAG (bool, wbinset)
+  IMPLEMENT_STATUS_FLAG (bool, rbinset)
+  IMPLEMENT_STATUS_FLAG (bool, nohandle)
+  IMPLEMENT_STATUS_FLAG (bool, uninterruptible_io)
+  IMPLEMENT_STATUS_FLAG (bool, append_mode)
+  IMPLEMENT_STATUS_FLAG (bool, did_lseek)
+  IMPLEMENT_STATUS_FLAG (query_state, query_open)
+  IMPLEMENT_STATUS_FLAG (bool, close_on_exec)
+  IMPLEMENT_STATUS_FLAG (bool, need_fork_fixup)
 
   int get_default_fmode (int flags);
 
@@ -362,19 +348,10 @@ class fhandler_socket: public fhandler_base
   int get_socket () { return (int) get_handle(); }
   fhandler_socket *is_socket () { return this; }
 
-  bool async_io () const { return status.async_io; }
-  void async_io (bool b) { status.async_io = b; }
-
-  bool saw_shutdown_read () const { return status.saw_shutdown_read; }
-  bool saw_shutdown_write () const { return status.saw_shutdown_write; }
-
-  void saw_shutdown_read (bool b) { status.saw_shutdown_read = b;}
-  void saw_shutdown_write (bool b) { status.saw_shutdown_write = b;}
-
-  conn_state connect_state () const
-	{ return (conn_state) status.connect_state; }
-  void connect_state (conn_state newstate)
-	{ status.connect_state = newstate; }
+  IMPLEMENT_STATUS_FLAG (bool, async_io)
+  IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_read)
+  IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_write)
+  IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
 
   int bind (const struct sockaddr *name, int namelen);
   int connect (const struct sockaddr *name, int namelen);
@@ -496,17 +473,10 @@ class fhandler_dev_raw: public fhandler_base
       {}
   } status;
  
-  bool eom_detected () const { return status.eom_detected; }
-  void eom_detected (bool b) { status.eom_detected = b; }
-
-  bool eof_detected () const { return status.eof_detected; }
-  void eof_detected (bool b) { status.eof_detected = b; }
-
-  bool lastblk_to_read () const { return status.lastblk_to_read; }
-  void lastblk_to_read (bool b) { status.lastblk_to_read = b; }
-
-  bool is_writing () const { return status.is_writing; }
-  void is_writing (bool b) { status.is_writing = b; }
+  IMPLEMENT_STATUS_FLAG (bool, eom_detected)
+  IMPLEMENT_STATUS_FLAG (bool, eof_detected)
+  IMPLEMENT_STATUS_FLAG (bool, lastblk_to_read)
+  IMPLEMENT_STATUS_FLAG (bool, is_writing)
 
   virtual BOOL write_file (const void *buf, DWORD to_write,
 			   DWORD *written, int *err);

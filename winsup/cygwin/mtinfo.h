@@ -113,18 +113,13 @@ public:
   int ioctl (HANDLE mt, unsigned int cmd, void *buf);
   int set_pos (HANDLE mt, int mode, long count, bool sfm_func);
 
-  bool buffer_writes () const { return status.buffer_writes; }
-  void buffer_writes (bool b) { status.buffer_writes = b; }
-  bool two_fm () const { return status.two_fm; }
-  void two_fm (bool b) { status.two_fm = b; }
-  bool fast_eom () const { return status.fast_eom; }
-  void fast_eom (bool b) { status.fast_eom = b; }
-  bool auto_lock () const { return status.auto_lock; }
-  void auto_lock (bool b) { status.auto_lock = b; }
-  bool sysv () const { return status.sysv; }
-  void sysv (bool b) { status.sysv = b; }
-  bool nowait () const { return status.nowait; }
-  void nowait (bool b) { status.nowait = b; }
+  IMPLEMENT_STATUS_FLAG (bool, buffer_writes)
+  IMPLEMENT_STATUS_FLAG (bool, two_fm)
+  IMPLEMENT_STATUS_FLAG (bool, fast_eom)
+  IMPLEMENT_STATUS_FLAG (bool, auto_lock)
+  IMPLEMENT_STATUS_FLAG (bool, sysv)
+  IMPLEMENT_STATUS_FLAG (bool, nowait)
+
   PTAPE_GET_DRIVE_PARAMETERS dp (void) { return &_dp; }
   PTAPE_GET_MEDIA_PARAMETERS mp (void) { return &_mp; }
   mtinfo_part *part (int num) { return &_part[num]; }
