@@ -1,3 +1,20 @@
+2003-07-17  Jeff Muizelaar  <muizelaar@rogers.com>
+
+	* pe.h: (IMAGE_FILE_NET_RUN_FROM_SWAP): Define.
+	(IMAGE_FILE_MACHINE_WCEMIPSV2): Define.
+	(IMAGE_FILE_MACHINE_SH3DSP): Define.
+	(IMAGE_FILE_MACHINE_SH3E): Define.
+	(IMAGE_FILE_MACHINE_SH5): Define.
+	(IMAGE_FILE_MACHINE_AM33): Define.
+	(IMAGE_FILE_MACHINE_POWERPCFP): Define.
+	(IMAGE_FILE_MACHINE_AXP64): Define.
+	(IMAGE_FILE_MACHINE_TRICORE): Define.
+	(IMAGE_FILE_MACHINE_CEF): Define.
+	(IMAGE_FILE_MACHINE_EBC): Define.
+	(IMAGE_FILE_MACHINE_AMD64): Define.
+	(IMAGE_FILE_MACHINE_M32R): Define.
+	(IMAGE_FILE_MACHINE_CEE): Define.
+
 2003-07-14  Christian Groessler  <chris@groessler.org>
 
         * i860.h (AOUTSZ): Define for i860 coff.
