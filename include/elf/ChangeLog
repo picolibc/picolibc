@@ -1,3 +1,7 @@
+2001-09-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	* common.h (EM_OPENRISC_OLD): Renamed the old EM_OPENRISC entry.
+
 2001-09-12  Alexandre Oliva  <aoliva@redhat.com>
 
 	* common.h (EM_AVR_OLD): Renamed from...
