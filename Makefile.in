@@ -1717,7 +1717,19 @@ taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 
 .PHONY: gdb-taz
 gdb-taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
-	$(MAKE) -f Makefile.in taz \
+	$(MAKE) -f Makefile.in do-proto-toplev \
+		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		MD5PROG="$(MD5PROG)" \
+		SUPPORT_FILES="$(SUPPORT_FILES)"
+	$(MAKE) -f Makefile.in do-md5sum \
+		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		MD5PROG="$(MD5PROG)" \
+		SUPPORT_FILES="$(SUPPORT_FILES)"
+	$(MAKE) -f Makefile.in do-djunpack \
+		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		MD5PROG="$(MD5PROG)" \
+		SUPPORT_FILES="$(SUPPORT_FILES)"
+	$(MAKE) -f Makefile.in do-tar-bz2 \
 		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
 		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(SUPPORT_FILES)"
@@ -1789,6 +1801,16 @@ do-md5sum:
 	echo "==> Adding md5 checksum to top-level directory"
 	( cd proto-toplev && find * -follow -type f -print | xargs $(MD5PROG) ) > md5.sum
 	mv md5.sum proto-toplev
+
+.PHONY: do-djunpack
+do-djunpack:
+	echo "==> Adding updated djunpack.bat to top-level directory"
+	echo - 's /gdb-[0-9\.]*/gdb-'"$(VER)"'/'
+	sed < djunpack.bat > djunpack.new \
+		-e 's/gdb-[0-9][0-9\.]*/gdb-'"$(VER)"'/'
+	mv djunpack.new djunpack.bat
+	-rm -f proto-toplev/djunpack.bat
+	ln -s ../djunpack.bat proto-toplev/djunpack.bat
 
 TEXINFO_SUPPORT= texinfo/texinfo.tex
 DIST_SUPPORT= $(DEVO_SUPPORT) $(TEXINFO_SUPPORT)

@@ -1,3 +1,9 @@
+Wed Apr 26 17:03:53 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* Makefile.in (do-djunpack): New target. Update djunpack.bat with
+ 	current version information.  Add to proto-toplev directory.
+	(gdb-taz): Build do-djunpack.
+
 2000-04-23  Eli Zaretskii  <eliz@is.elta.co.il>
 
 	* djunpack.bat: New file.
