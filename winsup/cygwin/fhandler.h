@@ -88,7 +88,7 @@ enum
   FH_PIPEW   = 0x0000000a,	/* write end of a pipe */
   FH_SOCKET  = 0x0000000b,	/* is a socket */
   FH_WINDOWS = 0x0000000c,	/* is a window */
-
+  FH_OSS_DSP = 0x0000000d,	/* is the dsp audio device */
   FH_SLOW    = 0x00000010,	/* "slow" device if below this */
 
   /* Fast devices */
@@ -939,6 +939,29 @@ public:
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
   int ready_for_read (int fd, DWORD howlong, int ignra);
+};
+
+class fhandler_dev_dsp : public fhandler_base
+{
+private:
+  int audioformat_;
+  int audiofreq_;
+  int audiobits_;
+  int audiochannels_;
+  bool setupwav(const char *pData, int nBytes);
+  
+public:
+  fhandler_dev_dsp (const char *name = 0);
+  ~fhandler_dev_dsp();
+
+  int open (const char *path, int flags, mode_t mode = 0);
+  int write (const void *ptr, size_t len);
+  int read (void *ptr, size_t len);
+  int ioctl (unsigned int cmd, void *);
+  off_t lseek (off_t, int);
+  int close (void);
+  int dup (fhandler_base * child);
+  void dump (void);
 };
 
 #if 0

@@ -535,8 +535,9 @@ const char *windows_device_names[] =
   "\\dev\\pipew",
   "\\dev\\socket",
   "\\dev\\windows",
-
-  NULL, NULL, NULL,
+  "\\dev\\dsp",
+  
+  NULL, NULL,
 
   "\\dev\\disk",
   "\\dev\\fd%d",
@@ -602,6 +603,8 @@ get_device_number (const char *name, int &unit, BOOL from_conv)
 	devn = FH_PTYM;
       else if (deveq ("windows"))
 	devn = FH_WINDOWS;
+      else if (deveq ("dsp"))
+	devn = FH_OSS_DSP;
       else if (deveq ("conin"))
 	devn = FH_CONIN;
       else if (deveq ("conout"))

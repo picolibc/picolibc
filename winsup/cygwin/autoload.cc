@@ -102,6 +102,8 @@ LoadDLLinitfunc (netapi32)
     netapi32_handle = h;
   else if (! netapi32_handle)
     api_fatal ("could not load netapi32.dll. %d", GetLastError ());
+
+  InterlockedDecrement (&here);
   return 0;
 }
 
@@ -228,16 +230,35 @@ LoadDLLinitfunc (ole32)
 
 LoadDLLinitfunc (kernel32)
 {
-  extern void wsock_init ();
   HANDLE h;
 
   if ((h = LoadLibrary ("kernel32.dll")) != NULL)
     kernel32_handle = h;
   else if (!kernel32_handle)
-    api_fatal ("could not load wsock32.dll.  Is TCP/IP installed?");
+    api_fatal ("could not load kernel32.dll, %E");
   else
     return 0;		/* Already done by another thread? */
 
+  return 0;
+}
+
+LoadDLLinitfunc (winmm)
+{
+  HANDLE h;
+  static NO_COPY LONG here = -1L;
+
+  while (InterlockedIncrement (&here))
+    {
+      InterlockedDecrement (&here);
+      Sleep (0);
+    }
+
+  if ((h = LoadLibrary ("winmm.dll")) != NULL)
+    winmm_handle = h;
+  else if (! winmm_handle)
+    api_fatal ("could not load winmm.dll. %d", GetLastError ());
+
+  InterlockedDecrement (&here);
   return 0;
 }
 
@@ -396,5 +417,16 @@ LoadDLLfunc (CoCreateInstance, 20, ole32)
 
 LoadDLLinit (kernel32)
 LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)
+
+LoadDLLinit (winmm)
+LoadDLLfuncEx (waveOutGetNumDevs, 0, winmm, 1)
+LoadDLLfuncEx (waveOutOpen, 24, winmm, 1)
+LoadDLLfuncEx (waveOutReset, 4, winmm, 1)
+LoadDLLfuncEx (waveOutClose, 4, winmm, 1)
+LoadDLLfuncEx (waveOutGetVolume, 8, winmm, 1)
+LoadDLLfuncEx (waveOutSetVolume, 8, winmm, 1)
+LoadDLLfuncEx (waveOutUnprepareHeader, 12, winmm, 1)
+LoadDLLfuncEx (waveOutPrepareHeader, 12, winmm, 1)
+LoadDLLfuncEx (waveOutWrite, 12, winmm, 1)
 }
 }

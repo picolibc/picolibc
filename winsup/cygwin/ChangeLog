@@ -1,3 +1,20 @@
+Sun Apr 15 23:23:29 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* autoload.cc: Add winmm functions needed by fhandler_dsp.cc.
+
+Sun Apr 15 22:53:52 2001  Andy Younger <andylyounger@hotmail.com>
+
+	* fhandler_dsp.cc: New file.  Implements OSS like /dev/dsp.
+	* include/sys/soundcard.h: New file.  User land includes for OSS
+	/dev/dsp.
+	* fhandler.h: Add new class fhandler_dev_dsp and a FH_OSS_DSP
+	definition.
+	* dtable.cc (dtable::build_fhandler): Allow creation of the /dev/dsp
+	device.
+	* path.cc (windows_device_names): Add /dev/dsp into list of device
+	names.
+	* Makefile.in (DLL_OFILES): Add fhandler_dsp.o.
+
 Sun Apr 15 16:36:27 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* uname.c (uname): Default n in in86 to 6 if Windows returns > 6.
