@@ -1,5 +1,9 @@
 2004-05-25  Christopher Faylor  <cgf@alum.bu.edu>
 
+	* include/cygwin/version.h: Bump up dll version to 10.
+
+2004-05-25  Christopher Faylor  <cgf@alum.bu.edu>
+
 	* winbase.h: Semi-revert previous patch as it caused strange behavior.
 	Use syntax similar to that recommended in mingw-dvlpr.
 
