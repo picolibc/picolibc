@@ -958,9 +958,9 @@ dump_sysinfo ()
     {
       for (e = s; *e && *e != sep; e++);
       if (e-s)
-        printf ("\t%.*s\n", e - s, s);
+	printf ("\t%.*s\n", e - s, s);
       else
-        puts ("\tWarning: Empty path-component");
+	puts ("\t.");
       count_path_items++;
       if (!*e)
 	break;

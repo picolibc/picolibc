@@ -1,3 +1,8 @@
+2004-10-10  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* cygcheck.cc (dump_sysinfo): Don't warn about empty path components,
+	just display ``.''.
+
 2004-10-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* strace.cc (_impure_ptr): Remove.
@@ -45,7 +50,7 @@
 
 2004-05-29  John Paul Wallington  <jpw@gnu.org>
 
-	* ssp.c (usage): Add missing linefeed. 
+	* ssp.c (usage): Add missing linefeed.
 
 2004-05-27  Christopher Faylor  <cgf@alum.bu.edu>
 
