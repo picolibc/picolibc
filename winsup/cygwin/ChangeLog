@@ -1,3 +1,11 @@
+2003-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES):
+	Define.
+	* glob.c (g_lstat): Use CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES
+	instead of numerical constants.
+	(g_stat): Ditto.
+
 2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* pthread.cc (pthread_attr_init): Remove
