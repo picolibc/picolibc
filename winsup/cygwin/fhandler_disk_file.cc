@@ -1355,5 +1355,5 @@ fhandler_cygdrive::closedir (DIR *dir)
   if (!iscygdrive_root ())
     return fhandler_disk_file::closedir (dir);
   pdrive = get_win32_name ();
-  return -1;
+  return 0;
 }

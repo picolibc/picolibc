@@ -1,3 +1,8 @@
+2005-02-22  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_disk_file.cc (fhandler_cygdrive::closedir): Return 0 when
+	closing cygdrive_root.
+
 2005-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (basename): Export.
