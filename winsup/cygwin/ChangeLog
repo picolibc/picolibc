@@ -1,3 +1,8 @@
+Thu Jun 21 22:01:39 2001  Marius Gedminas <mgedmin@delfi.lt>
+
+	* fhandler_console.cc (fhandler_console::read): Detect AltGr more
+	robustly on WinNT.
+
 2001-06-22  Robert COllins  <rbbtcollins@hotmail.com>
 
 	* thread.cc (__pthread_cond_timedwait): Lock the waiting mutex before 

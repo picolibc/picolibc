@@ -289,6 +289,8 @@ fhandler_console::read (void *pv, size_t buflen)
 
 #define ich (input_rec.Event.KeyEvent.uChar.AsciiChar)
 #define wch (input_rec.Event.KeyEvent.uChar.UnicodeChar)
+#define ALT_PRESSED (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)
+#define CTRL_PRESSED (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)
 
 	  if (wch == 0 ||
 	      /* arrow/function keys */
@@ -306,8 +308,22 @@ fhandler_console::read (void *pv, size_t buflen)
 		 converting a CTRL-U. */
 	      if ((unsigned char)ich > 0x7f)
 		con_to_str (tmp + 1, tmp + 1, 1);
-	      /* Determine if the keystroke is modified by META. */
-	      if (!(input_rec.Event.KeyEvent.dwControlKeyState & meta_mask))
+	      /* Determine if the keystroke is modified by META.  The tricky
+		 part is to distinguish whether the right Alt key should be
+		 recognized as Alt, or as AltGr. */
+	      bool meta;
+	      if (os_being_run == winNT)
+		/* WinNT: AltGr is reported as Ctrl+Alt, and Ctrl+Alt is
+		   treated just like AltGr.  However, if Ctrl+Alt+key generates
+		   an ASCII control character, interpret is as META. */
+		meta = (control_key_state & ALT_PRESSED) != 0
+		       && ((control_key_state & CTRL_PRESSED) == 0
+		           || (ich >= 0 && ich <= 0x1f || ich == 0x7f));
+	      else
+		/* Win9x: there's no way to distinguish Alt from AltGr, so rely
+		   on meta_mask heuristic (see fhandler_console constructor). */
+		meta = (control_key_state & meta_mask) != 0;
+	      if (!meta)
 		toadd = tmp + 1;
 	      else
 		{
@@ -319,6 +335,8 @@ fhandler_console::read (void *pv, size_t buflen)
 	    }
 #undef ich
 #undef wch
+#undef ALT_PRESSED
+#undef CTRL_PRESSED
 	  break;
 
 	case MOUSE_EVENT:
