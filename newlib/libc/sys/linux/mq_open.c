@@ -98,7 +98,9 @@ mq_open (const char *name, int oflag, ...)
 	  return (mqd_t)-1;
 	}
       errno = saved_errno;
-      created = 1;
+      /* check if we created the file or not */
+      if (fd >= 0)
+        created = 1;
     }
 	  
   if (fd < 0)
