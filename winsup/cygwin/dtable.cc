@@ -428,7 +428,8 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
     }
 
   if (!fh)
-    api_fatal ("internal error -- unknown device - %p, '%s'", (int) dev, dev.name);
+    api_fatal ("internal error -- unknown device - %p, '%s', upper %d",
+	       (int) dev, dev.name, dev.upper);
 
   char w32buf[MAX_PATH + 1];
   if (!unix_name || !*unix_name)
