@@ -18,9 +18,9 @@ bindir:=@bindir@
 etcdir:=$(exec_prefix)/etc
 program_transform_name:=@program_transform_name@
 
-INSTALL:=@INSTALL@
-INSTALL_PROGRAM:=@INSTALL_PROGRAM@
-INSTALL_DATA:=@INSTALL_DATA@
+override INSTALL:=@INSTALL@
+override INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+override INSTALL_DATA:=@INSTALL_DATA@
 
 EXEEXT:=@EXEEXT@
 EXEEXT_FOR_BUILD:=@EXEEXT_FOR_BUILD@

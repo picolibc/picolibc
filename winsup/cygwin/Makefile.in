@@ -38,8 +38,9 @@ datadir:=@datadir@
 infodir:=@infodir@
 includedir:=@includedir@
 
-INSTALL:=@INSTALL@
-INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+override INSTALL:=@INSTALL@
+override INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+override INSTALL_DATA:=@INSTALL_DATA@
 
 #
 # --enable options from configure
@@ -95,8 +96,6 @@ LDSCRIPT:=cygwin.sc
 # Include common definitions for winsup directory
 #
 include $(srcdir)/../Makefile.common
-
-INSTALL_DATA:=$(SHELL) $(updir1)/install-sh -c
 
 @SET_MAKE@
 

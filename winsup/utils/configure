@@ -951,7 +951,7 @@ if test "x$cross_compiling" = "xyes"; then
   fi
 fi
 
-INSTALL=`cd $srcdir/../..; echo $(pwd)/install-sh`
+INSTALL="/bin/sh "`cd $srcdir/../..; echo $(pwd)/install-sh`
 
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
