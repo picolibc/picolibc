@@ -1931,9 +1931,9 @@ wsock_init ()
   static LONG NO_COPY here = -1L;
   static int NO_COPY wsock_started = 0;
 
-  while (InterlockedIncrement (&here))
+  while (ilockincr (&here))
     {
-      InterlockedDecrement (&here);
+      ilockdecr (&here);
       Sleep (0);
     }
   if (!wsock_started && (wsock32_handle || ws2_32_handle))
@@ -1960,6 +1960,6 @@ wsock_init ()
 	  wsock_started = 1;
         }
     }
-  InterlockedDecrement (&here);
+  ilockdecr (&here);
 }
 

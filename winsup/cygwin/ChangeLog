@@ -1,3 +1,8 @@
+Fri May  4 16:37:30 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (ctrl_c_handler): Always send signal to process if it
+	has no tty.
+
 2001-05-04  Egor Duda  <deo@logos-m.ru>
 
 	* fhandler_socket.cc (set_connect_secret): Use /dev/urandom to

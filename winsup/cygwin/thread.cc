@@ -412,7 +412,7 @@ pthread_cond::BroadCast ()
   if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
     return;
   PulseEvent (win32_obj_id);
-  while (InterlockedDecrement (&waiting) != 0)
+  while (ilockdecr (&waiting) != 0)
     PulseEvent (win32_obj_id);
   mutex = NULL;
 }
@@ -798,7 +798,7 @@ __pthread_create (pthread_t * thread, const pthread_attr_t * attr,
       *thread = NULL;
       return EAGAIN;
     }
-  InterlockedIncrement (&MT_INTERFACE->threadcount);
+  ilockincr (&MT_INTERFACE->threadcount);
 
   return 0;
 }
@@ -1073,7 +1073,7 @@ __pthread_testcancel (void)
 /*
  * Races in pthread_atfork:
  * We are race safe in that any additions to the lists are made via
- * InterlockedExchangePointer.
+ * ilockexch.
  * However, if the user application doesn't perform syncronisation of some sort
  * It's not guaranteed that a near simultaneous call to pthread_atfork and fork
  * will result in the new atfork handlers being calls.
@@ -1084,7 +1084,7 @@ __pthread_testcancel (void)
  * will result in an indeterminate order for parent and child calls (what gets inserted
  * first isn't guaranteed.)
  *
- * There is one potential race... Does the result of InterlockedExchangePointer
+ * There is one potential race... Does the result of ilockexch
  * get committed to the return location _before_ any context switches can occur?
  * If yes, we're safe, if no, we're not.
  */
@@ -1123,7 +1123,7 @@ __pthread_atforkchild (void)
 
 /* FIXME: implement InterlockExchangePointer and get rid of the silly typecasts below
  */
-#define InterlockedExchangePointer InterlockedExchange
+/*#define ilockexch ilockExchange */
 
 /* Register a set of functions to run before and after fork.
  * prepare calls are called in LI-FC order.
@@ -1165,7 +1165,7 @@ __pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(voi
   if (prepcb)
   {
     prepcb->cb = prepare;
-    prepcb->next=(callback *)InterlockedExchangePointer ((LONG *) &MT_INTERFACE->pthread_prepare, (long int) prepcb);
+    prepcb->next=(callback *)ilockexch ((LONG *) &MT_INTERFACE->pthread_prepare, (long int) prepcb);
   }
   if (parentcb)
   {
@@ -1174,7 +1174,7 @@ __pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(voi
     while (*t)
       t = &(*t)->next;
     /* t = pointer to last next in the list */
-    parentcb->next=(callback *)InterlockedExchangePointer ((LONG *) t, (long int) parentcb);
+    parentcb->next=(callback *)ilockexch ((LONG *) t, (long int) parentcb);
   }
   if (childcb)
   {
@@ -1183,7 +1183,7 @@ __pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(voi
     while (*t)
       t = &(*t)->next;
     /* t = pointer to last next in the list */
-    childcb->next=(callback *)InterlockedExchangePointer ((LONG *) t, (long int) childcb);
+    childcb->next=(callback *)ilockexch ((LONG *) t, (long int) childcb);
   }
   return 0;
 }
@@ -1351,7 +1351,7 @@ __pthread_exit (void *value_ptr)
   MT_INTERFACE->destructors.IterateNull ();
 
   thread->return_ptr = value_ptr;
-  if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
+  if (ilockdecr (&MT_INTERFACE->threadcount) == 0)
     exit (0);
   else
     ExitThread (0);
@@ -1626,15 +1626,15 @@ __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
   if ((*cond)->waiting)
     if ((*cond)->mutex && ((*cond)->mutex != (*themutex)))
       return EINVAL;
-  InterlockedIncrement (&((*cond)->waiting));
+  ilockincr (&((*cond)->waiting));
 
   (*cond)->mutex = (*themutex);
-  InterlockedIncrement (&((*themutex)->condwaits));
+  ilockincr (&((*themutex)->condwaits));
   rv = (*cond)->TimedWait (abstime->tv_sec * 1000);
   (*cond)->mutex->Lock ();
-  if (InterlockedDecrement (&((*cond)->waiting)) == 0)
+  if (ilockdecr (&((*cond)->waiting)) == 0)
     (*cond)->mutex = NULL;
-  InterlockedDecrement (&((*themutex)->condwaits));
+  ilockdecr (&((*themutex)->condwaits));
 
   return rv;
 }
@@ -1657,15 +1657,15 @@ __pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
   if ((*cond)->waiting)
     if ((*cond)->mutex && ((*cond)->mutex != (*themutex)))
       return EINVAL;
-  InterlockedIncrement (&((*cond)->waiting));
+  ilockincr (&((*cond)->waiting));
 
   (*cond)->mutex = (*themutex);
-  InterlockedIncrement (&((*themutex)->condwaits));
+  ilockincr (&((*themutex)->condwaits));
   rv = (*cond)->TimedWait (INFINITE);
   (*cond)->mutex->Lock ();
-  if (InterlockedDecrement (&((*cond)->waiting)) == 0)
+  if (ilockdecr (&((*cond)->waiting)) == 0)
     (*cond)->mutex = NULL;
-  InterlockedDecrement (&((*themutex)->condwaits));
+  ilockdecr (&((*themutex)->condwaits));
 
   return rv;
 }

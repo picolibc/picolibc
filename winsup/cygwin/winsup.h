@@ -14,6 +14,8 @@ details. */
 
 #define __INSIDE_CYGWIN__
 
+#include "interlock.h"
+
 #define alloca __builtin_alloca
 #define strlen __builtin_strlen
 #define strcmp __builtin_strcmp
@@ -33,25 +35,6 @@ details. */
 #include <sys/types.h>
 #include <sys/strace.h>
 
-#undef strchr
-#define strchr cygwin_strchr
-extern "C" inline __stdcall char * strchr(const char * s, int c)
-{
-register char * __res;
-__asm__ __volatile__(
-	"movb %%al,%%ah\n"
-	"1:\tmovb (%1),%%al\n\t"
-	"cmpb %%ah,%%al\n\t"
-	"je 2f\n\t"
-	"incl %1\n\t"
-	"testb %%al,%%al\n\t"
-	"jne 1b\n\t"
-	"xorl %1,%1\n"
-	"2:\tmovl %1,%0\n\t"
-	:"=a" (__res), "=r" (s)
-	:"0" (c),      "1"  (s));
-return __res;
-}
 
 extern char case_folded_lower[];
 #define cyg_tolower(c) (case_folded_lower[(unsigned char)(c)])

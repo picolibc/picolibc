@@ -10,8 +10,9 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include "winsup.h"
+#define WIN32_LEAN_AND_MEAN
 #include <shlobj.h>
+#include "winsup.h"
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/mount.h>

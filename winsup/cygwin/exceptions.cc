@@ -632,11 +632,11 @@ bool
 sigthread::get_winapi_lock (int test)
 {
   if (test)
-    return !InterlockedExchange (&winapi_lock, 1);
+    return !ilockexch (&winapi_lock, 1);
 
   /* Need to do a busy loop because we can't block or a potential SuspendThread
      will hang. */
-  while (InterlockedExchange (&winapi_lock, 1))
+  while (ilockexch (&winapi_lock, 1))
     Sleep (1);
   return 1;
 }
@@ -645,7 +645,7 @@ void
 sigthread::release_winapi_lock ()
 {
   /* Assumes that we have the lock. */
-  InterlockedExchange (&winapi_lock, 0);
+  ilockexch (&winapi_lock, 0);
 }
 
 static void __stdcall interrupt_setup (int sig, void *handler, DWORD retaddr,
@@ -892,8 +892,8 @@ ctrl_c_handler (DWORD type)
   tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);
   /* Ignore this if we're not the process group lead since it should be handled
      *by* the process group leader. */
-  if (!t->getpgid () || t->getpgid () != myself->pid ||
-      (GetTickCount () - t->last_ctrl_c) < MIN_CTRL_C_SLOP)
+  if (t->getpgid () && (t->getpgid () != myself->pid ||
+      (GetTickCount () - t->last_ctrl_c) < MIN_CTRL_C_SLOP))
     return TRUE;
   else
     /* Otherwise we just send a SIGINT to the process group and return TRUE (to indicate

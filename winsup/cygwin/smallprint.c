@@ -12,6 +12,7 @@ details. */
 #include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 int __small_sprintf (char *dst, const char *fmt,...);

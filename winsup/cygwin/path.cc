@@ -2837,17 +2837,13 @@ hash_path_name (unsigned long hash, const char *name)
       if (name[1] == ':')
 	{
 	  char *nn, *newname = (char *) alloca (strlen (name) + 2);
-	  nn = strncpy (newname, name, 2);
-	  if (isupper (*nn))
-	    *newname = cyg_tolower (*nn);
-	  *(nn += 2) = '\0';
+	  nn = newname;
+	  *nn = isupper (*name) ? cyg_tolower (*name) : *name;
+	  *++nn = ':';
 	  name += 2;
 	  if (*name != '\\')
-	    {
-	      *nn = '\\';
-	      *++nn = '\0';
-	    }
-	  strcpy (nn, name);
+	    *++nn = '\\';
+	  strcpy (++nn, name);
 	  name = newname;
 	  goto hashit;
 	}

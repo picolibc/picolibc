@@ -6,8 +6,8 @@
 
 /* CYGNUS LOCAL */
 #include "winsup.h"
+#include <string.h>
 #define lint
-#include <windows.h>
 
 #define USG_COMPAT
 

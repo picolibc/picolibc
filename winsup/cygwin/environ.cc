@@ -114,7 +114,7 @@ getwinenv (const char *env, const char *in_posix)
 	if (!cur_environ () || !(val = in_posix ?: getenv(we->name)))
 	  debug_printf ("can't set native for %s since no environ yet",
 			we->name);
-	else if (!envcache || !we->posix || strcmp (val, we->posix))
+	else if (!envcache || !we->posix || strcmp (val, we->posix) != 0)
 	      we->add_cache (val);
 	return we;
       }

@@ -70,9 +70,9 @@ std_dll_init (HANDLE &dll_handle, const char *dll_name, LONG &here)
 {
   HANDLE h;
 
-  while (InterlockedIncrement (&here))
+  while (ilockincr (&here))
     {
-      InterlockedDecrement (&here);
+      ilockdecr (&here);
       Sleep (0);
     }
 
@@ -83,7 +83,7 @@ std_dll_init (HANDLE &dll_handle, const char *dll_name, LONG &here)
   else
     api_fatal ("could not load %s, %E", dll_name);
 
-  InterlockedDecrement (&here);
+  ilockdecr (&here);
   return 0;
 }
 

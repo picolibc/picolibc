@@ -9,6 +9,7 @@
    details. */
 
 #include "winsup.h"
+#include <string.h>
 #include <errno.h>
 #include <fhandler.h>
 #include <assert.h>
