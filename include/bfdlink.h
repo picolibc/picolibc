@@ -81,6 +81,7 @@ struct bfd_link_hash_entry
 {
   /* Base hash table entry structure.  */
   struct bfd_hash_entry root;
+
   /* Type of this entry.  */
   enum bfd_link_hash_type type;
 
@@ -102,7 +103,8 @@ struct bfd_link_hash_entry
      symbol is undefined and becomes defined, this field will
      automatically be non-NULL since the symbol will have been on the
      undefined symbol list.  */
-  struct bfd_link_hash_entry *next;
+  struct bfd_link_hash_entry *und_next;
+
   /* A union of information depending upon the type.  */
   union
     {

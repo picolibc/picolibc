@@ -1,3 +1,7 @@
+2003-12-03  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_hash_entry): Rename "next" to "und_next".
+
 2003-12-02  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (struct bfd_link_info): Remove mpc860c0 field.
