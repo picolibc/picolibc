@@ -316,6 +316,11 @@ struct mips_opcode
 #define INSN_ISA32                0x00000200
 #define INSN_ISA64                0x00000400
 
+/* Masks used for MIPS-defined ASEs.  */
+
+/* MIPS-3D ASE */
+#define INSN_MIPS3D               0x00004000
+
 /* Chip specific instructions.  These are bitmasks.  */
 
 /* MIPS R4650 instruction.  */
@@ -367,10 +372,10 @@ struct mips_opcode
 #define CPU_MIPS64      64
 #define CPU_SB1         12310201        /* octal 'SB', 01.  */
 
-/* Test for membership in an ISA including chip specific ISAs.
-   INSN is pointer to an element of the opcode table; ISA is the
-   specified ISA to test against; and CPU is the CPU specific ISA
-   to test, or zero if no CPU specific ISA test is desired.  */
+/* Test for membership in an ISA including chip specific ISAs.  INSN
+   is pointer to an element of the opcode table; ISA is the specified
+   ISA/ASE bitmask to test against; and CPU is the CPU specific ISA to
+   test, or zero if no CPU specific ISA test is desired.  */
 
 #define OPCODE_IS_MEMBER(insn, isa, cpu)				\
     (((insn)->membership & isa) != 0					\

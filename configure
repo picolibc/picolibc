@@ -3,7 +3,7 @@
 ### WARNING: this file contains embedded tabs.  Do not run untabify on this file.
 
 # Configuration script
-# Copyright (C) 1988, 90, 91, 92, 93, 94, 95, 96, 97, 98, 1999
+# Copyright (C) 1988, 90, 91, 92, 93, 94, 95, 96, 97, 98, 1999, 2000, 2001
 # Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
@@ -53,6 +53,9 @@ cache_file_option=
 configdirs=
 extraconfigdirs=
 diroptions=
+enable_threads=no
+enable_shared=no
+enable_libstdcxx_v3=yes
 exec_prefix=
 exec_prefixoption=
 fatal=
@@ -152,12 +155,16 @@ progname=$0
 if [ -n "$PWD" ]; then PWD=`pwd`; fi
 
 case "${progname}" in
-/*) ;;
+/* | [A-Za-z]:[\\/]* ) ;;
 */*) ;;
 *)
         PATH=$PATH:${PWD=`pwd`} ; export PATH
         ;;
 esac
+
+# Export original configure arguments for use by sub-configures.
+TOPLEVEL_CONFIGURE_ARGUMENTS="$progname $@"
+export TOPLEVEL_CONFIGURE_ARGUMENTS
 
 # Loop over all args
 
@@ -656,13 +663,15 @@ case "${TMPDIR}" in
 esac
 
 # keep this filename short for &%*%$*# 14 char file names and 8+3 file names
-tmpfile=${TMPDIR}/cNf$$
+tmpdir=${TMPDIR}/cNf$$
+mkdir ${tmpdir} || exit 1
+tmpfile=${tmpdir}/cNf$$
 # Note that under many versions of sh a trap handler for 0 will *override* any
 # exit status you explicitly specify!  At this point, the only non-error exit
 # is at the end of the script; these actions are duplicated there, minus
 # the "exit 1".  Don't use "exit 0" anywhere after this without resetting the
 # trap handler, or you'll lose.
-trap "rm -f Makefile.tem ${tmpfile}.com ${tmpfile}.tgt ${tmpfile}.hst ${tmpfile}.pos; exit 1" 0 1 2 15
+trap "rm -rf Makefile.tem ${tmpdir}; exit 1" 0 1 2 15
 
 # split ${srcdir}/configure.in into common, per-host, per-target,
 # and post-target parts.  Post-target is optional.
@@ -689,7 +698,7 @@ if test -f skip-this-dir; then
 	# Perform the same cleanup as the trap handler, minus the "exit 1" of course,
 	# and reset the trap handler.
 	trap 0
-	rm -f Makefile* ${tmpfile}.com ${tmpfile}.tgt ${tmpfile}.hst ${tmpfile}.pos
+	rm -rf Makefile* ${tmpdir}
 	# Execute the final clean-up actions
 	${config_shell} skip-this-dir
 	# and stop configuring this directory.
@@ -907,7 +916,7 @@ if [ "${build}" != "${host}" ]; then
   # are not the same, we set reasonable default values for the tools.
 
   tools="AR AR_FOR_TARGET AS AS_FOR_TARGET BISON CC_FOR_BUILD"
-  tools="${tools} CC_FOR_TARGET CXX_FOR_TARGET"
+  tools="${tools} CC_FOR_TARGET CXX_FOR_TARGET GCJ_FOR_TARGET"
   tools="${tools} DLLTOOL DLLTOOL_FOR_TARGET GCC_FOR_TARGET HOST_PREFIX"
   tools="${tools} HOST_PREFIX_1 LD LD_FOR_TARGET LEX MAKEINFO NM"
   tools="${tools} NM_FOR_TARGET RANLIB RANLIB_FOR_TARGET"
@@ -942,6 +951,7 @@ t loop
   CC_FOR_BUILD=${CC_FOR_BUILD-gcc}
   CC_FOR_TARGET=${CC_FOR_TARGET-${target_alias}-gcc}
   CXX_FOR_TARGET=${CXX_FOR_TARGET-${target_alias}-c++}
+  GCJ_FOR_TARGET=${GCJ_FOR_TARGET-${target_alias}-gcj}
   DLLTOOL=${DLLTOOL-${host_alias}-dlltool}
   DLLTOOL_FOR_TARGET=${DLLTOOL_FOR_TARGET-${target_alias}-dlltool}
   GCC_FOR_TARGET=${GCC_FOR_TARGET-${CC_FOR_TARGET-${target_alias}-gcc}}
@@ -1095,7 +1105,7 @@ for subdir in . ${subdirs} ; do
     case "${srcdir}" in
         ".")  # no -srcdir option.  We're building in place.
                 makesrcdir=. ;;
-        /*) # absolute path
+        /* | [A-Za-z]:[\\/]* ) # absolute path
                 makesrcdir=`echo ${srcdir}/${subdir} | sed -e 's|/\.$||'`
                 ;;
         *) # otherwise relative
@@ -1291,7 +1301,7 @@ EOF
             esac
             # real copy now in ${subdir}/Makefile.tem
 
-            # prepend warning about editting, and a bunch of variables.
+            # prepend warning about editing, and a bunch of variables.
             rm -f ${Makefile}
             cat > ${Makefile} <<EOF
 # ${NO_EDIT}
@@ -1321,19 +1331,19 @@ EOF
 
             case "${package_makefile_frag}" in
               "") ;;
-              /*) echo package_makefile_frag = ${package_makefile_frag} >>${Makefile} ;;
+              /* | [A-Za-z]:[\\/]* ) echo package_makefile_frag = ${package_makefile_frag} >>${Makefile} ;;
               *)  echo package_makefile_frag = ${invsubdir}${package_makefile_frag} >>${Makefile} ;;
             esac
 
             case "${target_makefile_frag}" in
               "") ;;
-              /*) echo target_makefile_frag = ${target_makefile_frag} >>${Makefile} ;;
+              /* | [A-Za-z]:[\\/]* ) echo target_makefile_frag = ${target_makefile_frag} >>${Makefile} ;;
               *)  echo target_makefile_frag = ${invsubdir}${target_makefile_frag} >>${Makefile} ;;
             esac
 
             case "${host_makefile_frag}" in
               "") ;;
-              /*) echo host_makefile_frag = ${host_makefile_frag} >>${Makefile} ;;
+              /* | [A-Za-z]:[\\/]* ) echo host_makefile_frag = ${host_makefile_frag} >>${Makefile} ;;
               *)  echo host_makefile_frag = ${invsubdir}${host_makefile_frag} >>${Makefile} ;;
             esac
 
@@ -1341,12 +1351,8 @@ EOF
                 echo site_makefile_frag = ${invsubdir}${site_makefile_frag} >>${Makefile}
             fi 
 
-	    # record if we want to build shared libs.
-	    if test -z "${enable_shared}"; then
-	        echo enable_shared = no >> ${Makefile}
-	    else
-	        echo enable_shared = ${enable_shared} >> ${Makefile}
-	    fi
+	    echo enable_shared = ${enable_shared} >> ${Makefile}
+	    echo enable_threads = ${enable_threads} >> ${Makefile}
 	    # record if we want to rumtime library stuff installed in libsubdir.
 	    if test -z "${enable_version_specific_runtime_libs}"; then
 	        echo enable_version_specific_runtime_libs = no >> ${Makefile}
@@ -1364,9 +1370,14 @@ EOF
             # remove any form feeds.
             if [ -z "${subdirs}" ]; then
                 rm -f ${subdir}/Makefile.tm2
-                sed -e "s:^SUBDIRS[ 	]*=.*$:SUBDIRS = ${configdirs}:" \
-                    -e "s:^NONSUBDIRS[ 	]*=.*$:NONSUBDIRS = ${noconfigdirs}:" \
+                sedtemp=sed.$$
+                cat >$sedtemp <<EOF
+s:^SUBDIRS[ 	]*=.*$:SUBDIRS = ${configdirs}:
+s:^NONSUBDIRS[ 	]*=.*$:NONSUBDIRS = ${noconfigdirs}:
+EOF
+                sed -f $sedtemp \
                     ${subdir}/Makefile.tem > ${subdir}/Makefile.tm2
+                rm -f $sedtemp
                 rm -f ${subdir}/Makefile.tem
                 mv ${subdir}/Makefile.tm2 ${subdir}/Makefile.tem
 	    fi
@@ -1549,11 +1560,7 @@ if [ -z "${norecursion}" ] && [ -n "${configdirs}" ] ; then
 ### figure out what to do with srcdir
                         case "${srcdir}" in
                         ".") newsrcdir=${srcdir} ;; # no -srcdir option.  We're building in place.
-                        /*) # absolute path
-                                newsrcdir=${srcdir}/${cfg_dir}
-                                srcdiroption="--srcdir=${newsrcdir}"
-                                ;;
-                        ?:*) # absolute path on win32
+                        /* | [A-Za-z]:[\\/]* ) # absolute path
                                 newsrcdir=${srcdir}/${cfg_dir}
                                 srcdiroption="--srcdir=${newsrcdir}"
                                 ;;
@@ -1567,10 +1574,7 @@ if [ -z "${norecursion}" ] && [ -n "${configdirs}" ] ; then
 			case "${cache_file}" in
 			"") # empty
 				;;
-			/*) # absolute path
-				cache_file_option="--cache-file=${cache_file}"
-				;;
-			?:*) # absolute path on win32
+			/* | [A-Za-z]:[\\/]* ) # absolute path
 				cache_file_option="--cache-file=${cache_file}"
 				;;
 			*) # relative path
@@ -1583,9 +1587,8 @@ if [ -z "${norecursion}" ] && [ -n "${configdirs}" ] ; then
                                 recprog=${newsrcdir}/configure
                         elif [ -f ${newsrcdir}/configure.in ] ; then
                                 case "${progname}" in
-                                /*)     recprog=${progname} ;;
-                                ?:*)    recprog=${progname} ;;
-                                *)      recprog=../${progname} ;;
+                                /* | [A-Za-z]:[\\/]* )  recprog=${progname} ;;
+                                *)                      recprog=../${progname} ;;
                                 esac
 			else
 				eval echo No configuration information in ${cfg_dir} ${redirect}
@@ -1611,7 +1614,7 @@ fi
 
 # Perform the same cleanup as the trap handler, minus the "exit 1" of course,
 # and reset the trap handler.
-rm -f ${tmpfile}.com ${tmpfile}.tgt ${tmpfile}.hst ${tmpfile}.pos
+rm -rf ${tmpdir}
 trap 0
 
 exit 0
