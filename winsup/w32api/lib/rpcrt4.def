@@ -344,6 +344,7 @@ TowerExplode@24
 UuidCompare@12
 UuidCreate@4
 UuidCreateNil@4
+UuidCreateSequential@4
 UuidEqual@12
 UuidFromStringA@8
 UuidFromStringW@8

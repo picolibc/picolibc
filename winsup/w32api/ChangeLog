@@ -1,3 +1,8 @@
+2003-04-15  Chris January <chris@atomice.net>
+
+	* rpcdce.h: Add declaration for UuidCreateSequential.
+	* rpcrt4.def: Add entry for UuidCreateSequential.
+
 2003-04-14  Phil Krylov  <likewolf@users.sourceforge.net>
 
 	* include/winuser.h (VK_*): Add missing defines.

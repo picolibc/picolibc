@@ -366,6 +366,7 @@ DECLSPEC_NORETURN void  RPC_ENTRY RpcRaiseException(RPC_STATUS);
 RPC_STATUS RPC_ENTRY RpcTestCancel(void);
 RPC_STATUS RPC_ENTRY RpcCancelThread(void*);
 RPC_STATUS RPC_ENTRY UuidCreate(UUID*);
+RPC_STATUS RPC_ENTRY UuidCreateSequential(UUID*);
 signed int RPC_ENTRY UuidCompare(UUID*,UUID*, RPC_STATUS*);
 RPC_STATUS RPC_ENTRY UuidCreateNil(UUID*);
 int RPC_ENTRY UuidEqual(UUID*,UUID*, RPC_STATUS*);
