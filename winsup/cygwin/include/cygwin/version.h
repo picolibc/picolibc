@@ -1,6 +1,6 @@
 /* version.h -- Cygwin version numbers and accompanying documentation.
 
-   Copyright 1996, 1997, 1998, 1999 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
 
 This file is part of Cygwin.
 
