@@ -1,3 +1,16 @@
+2003-07-08  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (creturn): Set appropriate errno when out of memory.
+	(ccalloc): Only issue system_printf when debugging.
+	* dtable.cc (dtable::extend): Only allocate 100 * the incremental growth
+	size max.  Set errno appropriately.
+	(dtable::build_fhandler): Check for error from set_name.
+	* fhandler.cc (fhandler_base::set_name): Set errno and return error on OOM.
+	* fhandler.h (fhandler_base::set_name): Change to bool.
+	* fhandler_process.cc (format_process_stat): Fix formatting.
+	* resource.cc (getrlimit): Return greater of OPEN_MAX or fd table size.
+	* sysconf.cc (sysconf): Ditto.
+
 2003-07-07  Christopher Faylor  <cgf@redhat.com>
 
 	* rmsym: Don't use ranlib.

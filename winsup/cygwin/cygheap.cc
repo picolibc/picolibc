@@ -285,7 +285,7 @@ creturn (cygheap_types x, cygheap_entry * c, unsigned len)
 {
   if (!c)
     {
-      __seterrno ();
+      set_errno (ENOMEM);
       return NULL;
     }
   c->type = x;
@@ -348,8 +348,10 @@ ccalloc (cygheap_types x, DWORD n, DWORD size)
   c = (cygheap_entry *) _cmalloc (sizeof_cygheap (n));
   if (c)
     memset (c->data, 0, n);
+#ifdef DEBUGGING
   if (!c)
     system_printf ("ccalloc returned NULL");
+#endif
   return creturn (x, c, n);
 }
 

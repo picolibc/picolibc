@@ -400,7 +400,9 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
     state = 'T';
   else if (wincap.is_winnt ())
     state = get_process_state (p->dwProcessId);
- if (wincap.is_winnt ())
+  if (!wincap.is_winnt ())
+    start_time = (GetTickCount () / 1000 - time (NULL) + p->start_time) * HZ;
+  else
     {
       NTSTATUS ret;
       HANDLE hProcess;
@@ -459,9 +461,11 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 		       ret, RtlNtStatusToDosError (ret));
 	  return 0;
 	}
-       fault_count = vmc.PageFaultCount;
-       utime = put.UserTime.QuadPart * HZ / 10000000ULL;
-       stime = put.KernelTime.QuadPart * HZ / 10000000ULL;
+      fault_count = vmc.PageFaultCount;
+      utime = put.UserTime.QuadPart * HZ / 10000000ULL;
+      stime = put.KernelTime.QuadPart * HZ / 10000000ULL;
+      start_time = (put.CreateTime.QuadPart - stodi.BootTime.QuadPart) * HZ / 10000000ULL;
+#if 0
        if (stodi.CurrentTime.QuadPart > put.CreateTime.QuadPart)
 	 start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart -
 		       stodi.CurrentTime.QuadPart + put.CreateTime.QuadPart) * HZ / 10000000ULL;
@@ -471,17 +475,15 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 	  * Note: some older versions of procps are broken and can't cope
 	  * with process start times > time(NULL).
 	  */
-	 start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
-       priority = pbi.BasePriority;
-       unsigned page_size = getpagesize ();
-       vmsize = vmc.PagefileUsage;
-       vmrss = vmc.WorkingSetSize / page_size;
-       vmmaxrss = ql.MaximumWorkingSetSize / page_size;
+	 start_time = (spt.KernelTme.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
+#endif
+      priority = pbi.BasePriority;
+      unsigned page_size = getpagesize ();
+      vmsize = vmc.PagefileUsage;
+      vmrss = vmc.WorkingSetSize / page_size;
+      vmmaxrss = ql.MaximumWorkingSetSize / page_size;
     }
-  else
-    {
-      start_time = (GetTickCount () / 1000 - time (NULL) + p->start_time) * HZ;
-    }
+
   return __small_sprintf (destbuf, "%d (%s) %c "
 				   "%d %d %d %d %d "
 				   "%lu %lu %lu %lu %lu %lu %lu "

@@ -149,11 +149,11 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
    in cases where the name is really required, the filename wouldn't ever
    be too long (e.g. devices or some such).
    The unix_path_name is also used by virtual fhandlers.  */
-void
+bool
 fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit)
 {
   if (unix_path == NULL || !*unix_path)
-    return;
+    return false;
 
   if (win32_path)
     win32_path_name = cstrdup (win32_path);
@@ -161,14 +161,16 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
     {
       const char *fmt = get_native_name ();
       char *w =  (char *) cmalloc (HEAP_STR, strlen (fmt) + 16);
-      __small_sprintf (w, fmt, unit);
+      if (w)
+	__small_sprintf (w, fmt, unit);
       win32_path_name = w;
     }
 
   if (win32_path_name == NULL)
     {
       system_printf ("fatal error. strdup failed");
-      exit (ENOMEM);
+      set_errno (ENOMEM);
+      return false;
     }
 
   assert (unix_path_name == NULL);
@@ -183,8 +185,9 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
     {
       char *p = cstrdup (win32_path_name);
       unix_path_name = p;
-      while ((p = strchr (p, '\\')) != NULL)
-	*p++ = '/';
+      if (p)
+	while ((p = strchr (p, '\\')) != NULL)
+	  *p++ = '/';
       if (unix_path)
 	cfree ((void *) unix_path);
     }
@@ -192,9 +195,12 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
   if (unix_path_name == NULL)
     {
       system_printf ("fatal error. strdup failed");
-      exit (ENOMEM);
+      free ((void *) win32_path_name);
+      set_errno (ENOMEM);
+      return false;
     }
   namehash = hash_path_name (0, win32_path_name);
+  return true;
 }
 
 /* Detect if we are sitting at EOF for conditions where Windows

@@ -171,7 +171,7 @@ class fhandler_base
   HANDLE read_state;
 
  public:
-  void set_name (const char * unix_path, const char *win32_path = NULL, int unit = 0);
+  bool set_name (const char * unix_path, const char *win32_path = NULL, int unit = 0);
 
   virtual fhandler_base& operator =(fhandler_base &x);
   fhandler_base (DWORD dev, int unit = 0);
