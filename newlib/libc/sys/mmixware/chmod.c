@@ -1,7 +1,6 @@
 /* chmod stub for MMIXware.
 
    Copyright (C) 2001 Hans-Peter Nilsson.
-
    Permission to use, copy, modify, and distribute this software is freely
    granted, provided that this notice is preserved with no changes.
    THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR

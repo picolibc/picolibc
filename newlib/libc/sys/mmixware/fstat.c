@@ -1,7 +1,6 @@
 /* fstat for MMIXware.
 
    Copyright (C) 2001 Hans-Peter Nilsson.
-
    Permission to use, copy, modify, and distribute this software is freely
    granted, provided that this notice is preserved with no changes.
    THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
@@ -16,7 +15,7 @@
 
 int
 _fstat (int file,
-      struct stat *st)
+	struct stat *st)
 {
   st->st_mode = S_IFCHR;
   st->st_blksize = 4096;

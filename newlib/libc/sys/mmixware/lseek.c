@@ -1,7 +1,6 @@
 /* lseek for MMIXware.
 
    Copyright (C) 2001 Hans-Peter Nilsson.
-
    Permission to use, copy, modify, and distribute this software is freely
    granted, provided that this notice is preserved with no changes.
    THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
@@ -18,8 +17,8 @@
 
 off_t
 _lseek (int file,
-      off_t ptr,
-      int dir)
+	off_t ptr,
+	int dir)
 {
   off_t simoff = dir == SEEK_END ? -(ptr + 1) : ptr;
   long ret;
@@ -35,10 +34,10 @@ _lseek (int file,
       long curpos = TRAP2f (SYS_Ftell, file, 0);
 
       if (curpos == -1)
-      {
-        errno = EIO;
-        return -1;
-      }
+	{
+	  errno = EIO;
+	  return -1;
+	}
 
       ptr += (off_t) curpos;
     }

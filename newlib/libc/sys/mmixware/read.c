@@ -1,7 +1,6 @@
 /* read for MMIXware.
 
    Copyright (C) 2001 Hans-Peter Nilsson.
-
    Permission to use, copy, modify, and distribute this software is freely
    granted, provided that this notice is preserved with no changes.
    THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
@@ -40,7 +39,7 @@ _read (int file,
   if (ret == -1 - (long) len)
     {
       /* We don't know the nature of the failure, so this is an
-       approximation.  */
+	 approximation.  */
       errno = EIO;
       return -1;
     }

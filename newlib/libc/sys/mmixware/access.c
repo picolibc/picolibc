@@ -1,7 +1,6 @@
 /* access for MMIXware.
 
    Copyright (C) 2001 Hans-Peter Nilsson.
-
    Permission to use, copy, modify, and distribute this software is freely
    granted, provided that this notice is preserved with no changes.
    THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
@@ -30,8 +29,8 @@ access (const char *fn, int flags)
   if (ret == 0)
     {
       /* Yes, this was readable.  As in other simulator access functions,
-       we always return success in this case (though the others check
-       for directory access).  */
+	 we always return success in this case (though the others check
+	 for directory access).  */
       TRAP1f (SYS_Fclose, TMPFNO);
       return 0;
     }

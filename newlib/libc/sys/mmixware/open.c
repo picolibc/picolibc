@@ -1,7 +1,6 @@
 /* open for MMIXware.
 
    Copyright (C) 2001 Hans-Peter Nilsson.
-
    Permission to use, copy, modify, and distribute this software is freely
    granted, provided that this notice is preserved with no changes.
    THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
@@ -40,13 +39,13 @@ _open (const char *path,
 
   for (fileno = 0;
        fileno < (sizeof (_MMIX_allocated_filehandle) /
-          sizeof (_MMIX_allocated_filehandle[0]));
+		 sizeof (_MMIX_allocated_filehandle[0]));
        fileno++)
     if (_MMIX_allocated_filehandle[fileno] == 0)
       break;
 
   if (fileno == (sizeof (_MMIX_allocated_filehandle) /
-               sizeof (_MMIX_allocated_filehandle[0])))
+		 sizeof (_MMIX_allocated_filehandle[0])))
     {
       errno = EMFILE;
       return -1;
@@ -74,7 +73,7 @@ _open (const char *path,
       fffile = 1;
     }
   else if ((flags & (O_WRONLY | O_CREAT)) == (O_WRONLY | O_CREAT)
-         || (flags & (O_WRONLY | O_TRUNC)) == (O_WRONLY | O_TRUNC))
+	   || (flags & (O_WRONLY | O_TRUNC)) == (O_WRONLY | O_TRUNC))
     mode = BinaryWrite;
   else if ((flags & (O_RDWR | O_CREAT)) == (O_RDWR | O_CREAT))
     mode = BinaryReadWrite;
@@ -90,7 +89,7 @@ _open (const char *path,
   if (ret < 0)
     {
       /* It's totally unknown what the error was.  We'll just take our
-       chances and assume ENOENT.  */
+	 chances and assume ENOENT.  */
       errno = ENOENT;
       return -1;
     }
