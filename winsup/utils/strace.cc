@@ -30,6 +30,9 @@ int _impure_ptr;
 /* we *know* we're being built with GCC */
 #define alloca __builtin_alloca
 
+// Version string.
+static char *SCCSid = "@(#)strace V1.0, Copyright (C) 2001 Red Hat Inc., " __DATE__ "\n";
+
 static const char *pgm;
 static int forkdebug = 0;
 static int numerror = 1;
@@ -602,6 +605,196 @@ dostrace (unsigned mask, FILE *ofile, char **argv)
   return;
 }
 
+typedef struct tag_mask_mnemonic
+{
+  unsigned long val;
+  const char *text;
+}
+mask_mnemonic;
+
+static const mask_mnemonic mnemonic_table[] = {
+  {_STRACE_ALL, "all"},
+  {_STRACE_FLUSH, "flush"},
+  {_STRACE_INHERIT, "inherit"},
+  {_STRACE_UHOH, "uhoh"},
+  {_STRACE_SYSCALL, "syscall"},
+  {_STRACE_STARTUP, "startup"},
+  {_STRACE_DEBUG, "debug"},
+  {_STRACE_PARANOID, "paranoid"},
+  {_STRACE_TERMIOS, "termios"},
+  {_STRACE_SELECT, "select"},
+  {_STRACE_WM, "wm"},
+  {_STRACE_SIGP, "sigp"},
+  {_STRACE_MINIMAL, "minimal"},
+  {_STRACE_EXITDUMP, "exitdump"},
+  {_STRACE_SYSTEM, "system"},
+  {_STRACE_NOMUTEX, "nomutex"},
+  {_STRACE_MALLOC, "malloc"},
+  {_STRACE_THREAD, "thread"},
+  {0, NULL}
+};
+
+static unsigned long
+mnemonic2ul (const char *nptr, char **endptr)
+{
+  // Look up mnemonic in table, return value.
+  // *endptr = ptr to char that breaks match.
+  const mask_mnemonic *mnp = mnemonic_table;
+
+  while (mnp->text != NULL)
+    {
+      if (strcmp (mnp->text, nptr) == 0)
+	{
+	  // Found a match.
+	  if (endptr != NULL)
+	    {
+	      *endptr = ((char *) nptr) + strlen (mnp->text);
+	    }
+	  return mnp->val;
+	}
+      mnp++;
+    }
+
+  // Didn't find it.
+  if (endptr != NULL)
+    {
+      *endptr = (char *) nptr;
+    }
+  return 0;
+}
+
+static unsigned long
+parse_mask (const char *ms, char **endptr)
+{
+  const char *p = ms;
+  char *newp;
+  unsigned long retval = 0, thisval;
+  const size_t bufsize = 16;
+  char buffer[bufsize];
+  size_t len;
+
+  while (*p != '\0')
+    {
+      // First extract the term, terminate it, and lowercase it.
+      strncpy (buffer, p, bufsize);
+      buffer[bufsize - 1] = '\0';
+      len = strcspn (buffer, "+,\0");
+      buffer[len] = '\0';
+      strlwr (buffer);
+
+      // Check if this is a mnemonic.  We have to do this first or strtoul()
+      // will false-trigger on anything starting with "a" through "f".
+      thisval = mnemonic2ul (buffer, &newp);
+      if (buffer == newp)
+	{
+	  // This term isn't mnemonic, check if it's hex.
+	  thisval = strtoul (buffer, &newp, 16);
+	  if (newp != buffer + len)
+	    {
+	      // Not hex either, syntax error.
+	      *endptr = (char *) p;
+	      return 0;
+	    }
+	}
+
+      p += len;
+      retval += thisval;
+
+      // Handle operators
+      if (*p == '\0')
+	break;
+      if ((*p == '+') || (*p == ','))
+	{
+	  // For now these both equate to addition/ORing.  Until we get
+	  // fancy and add things like "all-<something>", all we need do is
+	  // continue the looping.
+	  p++;
+	  continue;
+	}
+      else
+	{
+	  // Syntax error
+	  *endptr = (char *) p;
+	  return 0;
+	}
+    }
+
+  *endptr = (char *) p;
+  return retval;
+}
+
+static void
+usage ()
+{
+  fprintf (stderr, "\
+Usage: strace [OPTIONS] <command-line>\n\
+  -b, --buffer-size=SIZE       Set size of output file buffer.\n\
+  -m, --mask=MASK              Set message filter mask.\n\
+\n\
+    MASK can be any combination of the following mnemonics and/or hex values\n\
+    (0x is optional).  Combine masks with '+' or ',' like so:\n\
+\n\
+                      --mask=wm+system,malloc+0x00800\n\
+\n\
+    Mnemonic Hex     Corresponding Def  Description\n\
+    =========================================================================\n\
+    all      0x00001 (_STRACE_ALL)      All strace messages.\n\
+    flush    0x00002 (_STRACE_FLUSH)    Flush output buffer after each message.\n\
+    inherit  0x00004 (_STRACE_INHERIT)  Children inherit mask from parent.\n\
+    uhoh     0x00008 (_STRACE_UHOH)     Unusual or weird phenomenon.\n\
+    syscall  0x00010 (_STRACE_SYSCALL)  System calls.\n\
+    startup  0x00020 (_STRACE_STARTUP)  argc/envp printout at startup.\n\
+    debug    0x00040 (_STRACE_DEBUG)    Info to help debugging. \n\
+    paranoid 0x00080 (_STRACE_PARANOID) Paranoid info.\n\
+    termios  0x00100 (_STRACE_TERMIOS)  Info for debugging termios stuff.\n\
+    select   0x00200 (_STRACE_SELECT)   Info on ugly select internals.\n\
+    wm       0x00400 (_STRACE_WM)       Trace Windows msgs (enable _strace_wm).\n\
+    sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.\n\
+    minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.\n\
+    exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.\n\
+    system   0x08000 (_STRACE_SYSTEM)   Cache strace messages.\n\
+    nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.\n\
+    malloc   0x20000 (_STRACE_MALLOC)   Trace malloc calls.\n\
+    thread   0x40000 (_STRACE_THREAD)   Thread-locking calls.\n\
+\n\
+  -o, --output=FILENAME        Set output file to FILENAME.\n\
+  -f, --trace-children         Also trace forked child processes.\n\
+  -n, --crack-error-numbers    Output descriptive text instead of error\n\
+                                 numbers for Windows errors.\n\
+  -d, --no-delta               Don't display the delta-t microsecond timestamp.\n\
+  -t, --timestamp              Use an absolute hh:mm:ss timestamp insted of the\n\
+                                 default microsecond timestamp.  Implies -d.\n\
+  -w, --new-window             Spawn program under test in a new window.\n\
+  -S, --flush-period=PERIOD    Flush buffered strace output every PERIOD secs.\n\
+  -v, --version                Display version info.\n\
+  -h, --help                   Display this help info.\n\
+");
+}
+
+static void
+version ()
+{
+  fprintf (stderr, SCCSid+4);
+}
+
+struct option longopts[] = {
+  {"help", no_argument, NULL, 'h'},
+  {"version", no_argument, NULL, 'v'},
+  {"buffer-size", required_argument, NULL, 'b'},
+  {"mask", required_argument, NULL, 'm'},
+  {"output", required_argument, NULL, 'o'},
+  {"trace-children", no_argument, NULL, 'f'},
+  {"crack-error-numbers", no_argument, NULL, 'n'},
+  {"no-delta", no_argument, NULL, 'd'},
+  {"usecs", no_argument, NULL, 'u'},
+  {"timestamp", no_argument, NULL, 't'},
+  {"new-window", no_argument, NULL, 'w'},
+  {"flush-period", required_argument, NULL, 'S'},
+  {NULL, 0, NULL, 0}
+};
+
+static const char *const opts = "hvb:m:o:fndutwS:";
+
 int
 main (int argc, char **argv)
 {
@@ -614,9 +807,19 @@ main (int argc, char **argv)
   else
     pgm++;
 
-  while ((opt = getopt (argc, argv, "b:m:o:fndutwS:")) != EOF)
+  while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (opt)
       {
+      case 'h':
+	// Print help and exit
+	usage ();
+	return 1;
+	break;
+      case 'v':
+	// Print version info and exit
+	version ();
+	return 1;
+	break;
       case 'f':
 	forkdebug ^= 1;
 	break;
@@ -624,8 +827,17 @@ main (int argc, char **argv)
 	bufsize = atoi (optarg);
 	break;
       case 'm':
-	mask = strtoul (optarg, NULL, 16);
+	{
+	  char *endptr;
+	  mask = parse_mask (optarg, &endptr);
+	  if (*endptr != '\0')
+	    {
+	      // Bad mask expression.
+	      error (0, "syntax error in mask expression \"%s\" near \
+character #%d.\n", optarg, (int) (endptr - optarg), endptr);
+	    }
 	break;
+	}
       case 'o':
 	if ((ofile = fopen (optarg, "w")) == NULL)
 	  error (1, "can't open %s", optarg);
@@ -643,6 +855,9 @@ main (int argc, char **argv)
 	delta ^= 1;
 	break;
       case 'u':
+    // FIXME: This option isn't handled properly/at all by the
+    // program's logic.  It seems to be the default, does it
+    // need to just be removed?
 	usecs ^= 1;
 	break;
       case 'w':

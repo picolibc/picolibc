@@ -1,3 +1,20 @@
+2001-11-15  Gary R. Van Sickle  <g.r.vansickle@worldnet.att.net>
+
+	* strace.cc (main): Change getopt() to getopt_long().
+	Add support for help and version info.
+	Use new parse_mask() function for -m/--mask option.
+	(longopts): Add long options structure.
+	(opts): Move options string from getopts call to static var.
+	(usage): Print usage information.
+	(SCCSid): Version info.
+	(version): New function for displaying version info.
+	(parse_mask): New function supporting parsing of mnemonics,
+	hex, and basic expressions in masks.
+	(mnemonic2ul): New mnemonic parsing function.
+	(tag_mask_mnemonic): New type.
+	(mnemonic_table): New table of mnemonics for mnemonic2ul() to
+	search through.
+
 2001-11-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Redefine output format slightly.
