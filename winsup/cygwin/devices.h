@@ -10,7 +10,7 @@ details. */
 
 typedef unsigned short _major_t;
 typedef unsigned short _minor_t;
-typedef unsigned char _devtype_t;
+typedef mode_t _mode_t;
 typedef __dev32_t _dev_t;
 
 #define FHDEV(maj, min) ((((unsigned) (maj)) << (sizeof (_major_t) * 8)) | (unsigned) (min))
@@ -102,7 +102,7 @@ struct device
   unsigned lower, upper;
   int adjust;
   unsigned mul;
-  _devtype_t type;
+  _mode_t mode;
   bool dev_on_fs;
   static const device *lookup (const char *, unsigned int = 0xffffffff);
   void parse (const char *);
