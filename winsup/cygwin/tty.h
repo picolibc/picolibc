@@ -125,7 +125,7 @@ class tty_list
 
 public:
   tty * operator [](int n) {return ttys + n;}
-  int allocate_tty (int n); /* n non zero if allocate a tty, pty otherwise */
+  int allocate_tty (bool); /* true if allocate a tty, pty otherwise */
   int connect_tty (int);
   void terminate ();
   void init ();

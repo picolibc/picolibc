@@ -330,7 +330,7 @@ try_to_debug (bool waitloop)
   /* if any of these mutexes is owned, we will fail to start any cygwin app
      until trapped app exits */
 
-  ReleaseMutex (title_mutex);
+  ReleaseMutex (tty_mutex);
 
   /* prevent recursive exception handling */
   char* rawenv = GetEnvironmentStrings () ;
@@ -1117,22 +1117,22 @@ signal_exit (int rc)
   do_exit (rc);
 }
 
-HANDLE NO_COPY title_mutex = NULL;
+HANDLE NO_COPY tty_mutex = NULL;
 
 void
 events_init (void)
 {
   char *name;
   char mutex_name[CYG_MAX_PATH];
-  /* title_mutex protects modification of console title. It's necessary
+  /* tty_mutex is on while searching for a tty slot. It's necessary
      while finding console window handle */
 
-  if (!(title_mutex = CreateMutex (&sec_all_nih, FALSE,
+  if (!(tty_mutex = CreateMutex (&sec_all_nih, FALSE,
 				   name = shared_name (mutex_name,
-						       "title_mutex", 0))))
+						       "tty_mutex", 0))))
     api_fatal ("can't create title mutex '%s', %E", name);
 
-  ProtectHandle (title_mutex);
+  ProtectHandle (tty_mutex);
   new_muto (mask_sync);
   windows_system_directory[0] = '\0';
   (void) GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);

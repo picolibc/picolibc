@@ -121,7 +121,7 @@ attach_tty (int num)
     }
   if (NOTSTATE (myself, PID_USETTY))
     return -1;
-  return cygwin_shared->tty.allocate_tty (1);
+  return cygwin_shared->tty.allocate_tty (true);
 }
 
 void
@@ -196,31 +196,27 @@ tty_list::init (void)
    If flag == 0, just find a free tty.
  */
 int
-tty_list::allocate_tty (int with_console)
+tty_list::allocate_tty (bool with_console)
 {
   HWND console;
+  int freetty = -1;
 
   /* FIXME: This whole function needs a protective mutex. */
+
+  if (WaitForSingleObject (tty_mutex, INFINITE) == WAIT_FAILED)
+    termios_printf ("WFSO for tty_mutex %p failed, %E", tty_mutex);
 
   if (!with_console)
     console = NULL;
   else if (!(console = GetConsoleWindow ()))
     {
-      char *oldtitle = new char [TITLESIZE];
+      char oldtitle[TITLESIZE];
 
-      if (!oldtitle)
-	{
-	  termios_printf ("Can't *allocate console title buffer");
-	  return -1;
-	}
       if (!GetConsoleTitle (oldtitle, TITLESIZE))
 	{
 	  termios_printf ("Can't read console title");
-	  return -1;
+	  goto out;
 	}
-
-      if (WaitForSingleObject (title_mutex, INFINITE) == WAIT_FAILED)
-	termios_printf ("WFSO for title_mutext %p failed, %E", title_mutex);
 
       char buf[40];
 
@@ -234,16 +230,15 @@ tty_list::allocate_tty (int with_console)
 	}
       SetConsoleTitle (oldtitle);
       Sleep (40);
-      ReleaseMutex (title_mutex);
       if (console == NULL)
 	{
 	  termios_printf ("Can't find console window");
-	  return -1;
+	  goto out;
 	}
     }
-  /* Is a tty allocated for console? */
 
-  int freetty = -1;
+  HANDLE hmaster = NULL;
+  /* Is a tty allocated for console? */
   for (int i = 0; i < NTTYS; i++)
     {
       if (!ttys[i].exists ())
@@ -254,17 +249,19 @@ tty_list::allocate_tty (int with_console)
 	    break;		/* No.  We've got one. */
 	}
 
+      /* FIXME: Is this right?  We can potentially query a "nonexistent"
+	 tty slot after falling through from the above? */
       if (with_console && ttys[i].gethwnd () == console)
 	{
 	  termios_printf ("console %x already associated with tty%d",
 		console, i);
 	  /* Is the master alive? */
-	  HANDLE hMaster;
-	  hMaster = OpenProcess (PROCESS_DUP_HANDLE, FALSE, ttys[i].master_pid);
-	  if (hMaster)
+	  hmaster = OpenProcess (PROCESS_DUP_HANDLE, FALSE, ttys[i].master_pid);
+	  if (hmaster)
 	    {
-	      CloseHandle (hMaster);
-	      return i;
+	      CloseHandle (hmaster);
+	      freetty = i;
+	      goto out;
 	    }
 	  /* Master is dead */
 	  freetty = i;
@@ -274,23 +271,27 @@ tty_list::allocate_tty (int with_console)
 
   /* There is no tty allocated to console, allocate the first free found */
   if (freetty == -1)
-    {
-      system_printf ("No free ttys available");
-      return -1;
-    }
-  tty *t = ttys + freetty;
+    goto out;
+
+  tty *t;
+  t = ttys + freetty;
   t->init ();
   t->setsid (-1);
   t->setpgid (myself->pgid);
   t->sethwnd (console);
 
-  if (with_console)
-    {
-      termios_printf ("console %x associated with tty%d", console, freetty);
-      create_tty_master (freetty);
-    }
-  else
+out:
+  if (freetty < 0)
+    system_printf ("No tty allocated");
+  else if (!with_console)
     termios_printf ("tty%d allocated", freetty);
+  else
+    {
+      termios_printf ("console %p associated with tty%d", console, freetty);
+      if (!hmaster)
+	create_tty_master (freetty);
+    }
+  ReleaseMutex (tty_mutex);
   return freetty;
 }
 

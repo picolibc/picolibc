@@ -1,3 +1,10 @@
+2004-05-17  Christopher Faylor  <cgf@alum.bu.edu>
+
+	Change the name "title_mutex" to "tty_mutex" throughout.
+	* tty.h (tty_list::allocate_tty): Turn argument into a boolean.
+	* tty.cc (tty_list::init): Protect entire allocation operation with
+	tty_mutex (formerly title_mutex) to protect against allocation races.
+
 2004-05-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::recvfrom): Use original flags

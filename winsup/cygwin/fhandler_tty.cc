@@ -1157,7 +1157,7 @@ fhandler_pty_master::fhandler_pty_master ()
 int
 fhandler_pty_master::open (int flags, mode_t)
 {
-  int ntty = cygwin_shared->tty.allocate_tty (0);
+  int ntty = cygwin_shared->tty.allocate_tty (false);
   if (ntty < 0)
     return 0;
 

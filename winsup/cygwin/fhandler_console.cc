@@ -1776,10 +1776,10 @@ set_console_title (char *title)
   char buf[257];
   strncpy (buf, title, sizeof (buf) - 1);
   buf[sizeof (buf) - 1] = '\0';
-  if ((rc = WaitForSingleObject (title_mutex, 15000)) != WAIT_OBJECT_0)
+  if ((rc = WaitForSingleObject (tty_mutex, 15000)) != WAIT_OBJECT_0)
     sigproc_printf ("wait for title mutex failed rc %d, %E", rc);
   SetConsoleTitle (buf);
-  ReleaseMutex (title_mutex);
+  ReleaseMutex (tty_mutex);
   debug_printf ("title '%s'", buf);
 }
 

@@ -134,7 +134,7 @@ extern int cygserver_running;
 #include "debug.h"
 
 /* Events/mutexes */
-extern HANDLE title_mutex;
+extern HANDLE tty_mutex;
 
 /**************************** Convenience ******************************/
 
