@@ -1,3 +1,8 @@
+2004-06-23  Tomas Ukkonen  <tomas.ukkonen@iki.fi>
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Test CPU vendor and print
+	AMD specific 3dnow capabilities.
+
 2004-06-23  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* fhandler_socket.cc (fhandler_socket::release): Call

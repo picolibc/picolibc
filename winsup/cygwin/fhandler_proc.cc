@@ -698,6 +698,14 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	  cpuid (&maxf, &vendor_id[0], &vendor_id[2], &vendor_id[1], 0);
 	  maxf &= 0xffff;
 	  vendor_id[3] = 0;
+	  
+	  // vendor identification
+	  bool is_amd = false, is_intel = false;
+	  if (!strcmp ((char*)vendor_id, "AuthenticAMD"))
+	    is_amd = true;
+	  else if (!strcmp ((char*)vendor_id, "GenuineIntel"))
+	    is_intel = true;
+	  
 	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", (char *)vendor_id);
 	  unsigned cpu_mhz  = 0;
 	  if (wincap.is_winnt ())
@@ -865,6 +873,26 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		print (" tm2");
 	      if (features2 & (1 << 10))
 		print (" cid");
+	      
+	      if (is_amd)
+	        {
+		  // uses AMD extended calls to check
+		  // for 3dnow and 3dnow extended support
+		  // (source: AMD Athlon Processor Recognition Application Note)
+		  unsigned int a = 0, b, c, d;
+		  cpuid (&a, &b, &c, &d, 0x80000000);
+		  
+		  if (a >= 0x80000001)  // has basic capabilities
+		    {
+		      cpuid (&a, &b, &c, &d, 0x80000001);
+		      
+		      if(d & (1 << 30)) // 31th bit is on
+			print (" 3dnowext");
+		      
+		      if(d & (1 << 31)) // 32th bit (highest) is on
+			print (" 3dnow");
+		    }
+		}
 	    }
 	  else if (wincap.is_winnt ())
 	    {
