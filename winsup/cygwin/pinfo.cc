@@ -183,6 +183,11 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	    api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
 	  n = realpid;
 	  release ();
+	  if (flag & PID_NOREDIR)
+	    {
+	      set_errno (ENOENT);
+	      break;
+	    }
 	  continue;
 	}
 
