@@ -376,3 +376,4 @@ char *__stdcall cstrdup1 (const char *) __attribute__ ((regparm(1)));
 void __stdcall cfree_and_set (char *&, char * = NULL) __attribute__ ((regparm(2)));
 void __stdcall cygheap_init ();
 extern DWORD _cygheap_start;
+}
