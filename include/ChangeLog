@@ -1,3 +1,8 @@
+2003-05-07  Jason Merrill  <jason@redhat.com>
+
+	* hashtab.h (burtle_hash): Prototype.
+	(burtle_hash_object): New macro.
+
 2003-04-28  H.J. Lu <hjl@gnu.org>
 
 	* bfdlink.h (bfd_link_info): Add relax_finalizing.
