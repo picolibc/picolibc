@@ -1,3 +1,8 @@
+Fri 27 Jul 2001 10:29:00  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (get_user_primary_group): Fix compiler warning.
+	(alloc_sd): Add DELETE permission for user when S_IWUSR is given.
+
 Thu Jul 26 16:43:39 2001  Pieter de Visser <pieterdv@knoware.nl>
 
 	* thread.cc (__pthread_equal): Invert return value so that true is

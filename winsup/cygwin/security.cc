@@ -425,7 +425,7 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
   WCHAR wuser[UNLEN + 1];
   NET_API_STATUS ret;
   BOOL retval = FALSE;
-  UCHAR count;
+  UCHAR count = 0;
 
   if (usersid == well_known_system_sid)
     {
@@ -1376,7 +1376,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (attribute & S_IRUSR)
     owner_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWUSR)
-    owner_allow |= FILE_GENERIC_WRITE;
+    owner_allow |= FILE_GENERIC_WRITE | DELETE;
   if (attribute & S_IXUSR)
     owner_allow |= FILE_GENERIC_EXECUTE;
   if ((attribute & (S_IFDIR | S_IWUSR | S_IXUSR))
