@@ -1,3 +1,7 @@
+2004-11-11  Christopher Faylor  <cgf@timesys.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 13.
+
 2004-10-28  Christopher Faylor  <cgf@timesys.com>
 
 	* fork.cc (NPIDS_HELD): Reduce to former number now that bash problem
