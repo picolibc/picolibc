@@ -164,7 +164,9 @@ typedef	unsigned short	gid_t;
 #endif
 
 typedef int pid_t;
+#ifndef __CYGWIN__
 typedef	long key_t;
+#endif
 typedef _ssize_t ssize_t;
 
 #ifndef __CYGWIN__
