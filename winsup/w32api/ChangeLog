@@ -1,3 +1,13 @@
+2003-05-23  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (EnumDisplayDevices[AW]): Add prototypes.
+	* include/wingdi.h (DISPLAY_DEVICE): UNICODE it.
+
+2003-05-23  Andrew Dunbar <hippietrail@users.sourceforge.net>
+
+	* include/wingdi.h (GCP_RESULTS[AW]) Correct type of
+	lpGlyphs field to LPWSTR.
+
 2003-05-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wincrypt.h (PLAINTEXTKEYBLOB, OPAQUEKEYBLOB,

@@ -2959,6 +2959,8 @@ BOOL WINAPI EnumDisplayMonitors(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 #ifndef NOGDI
 BOOL WINAPI EnumDisplaySettingsA(LPCSTR,DWORD,PDEVMODEA);
 BOOL WINAPI EnumDisplaySettingsW(LPCWSTR,DWORD,PDEVMODEW);
+BOOL WINAPI EnumDisplayDevicesA(LPCSTR,DWORD,PDISPLAY_DEVICEA,DWORD);
+BOOL WINAPI EnumDisplayDevicesA(LPCWSTR,DWORD,PDISPLAY_DEVICEW,DWORD);
 #endif
 int WINAPI EnumPropsA(HWND,PROPENUMPROCA);
 int WINAPI EnumPropsW(HWND,PROPENUMPROCW);
@@ -3519,6 +3521,7 @@ typedef NONCLIENTMETRICSW NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
 #define ChangeDisplaySettings ChangeDisplaySettingsW
 #define CreateDesktop CreateDesktopW
 #define EnumDisplaySettings EnumDisplaySettingsW
+#define EnumDisplayDevices  EnumDisplayDevicesW
 #endif /* NOGDI */
 #else /* UNICODE */
 #define EDITWORDBREAKPROC EDITWORDBREAKPROCA
@@ -3675,6 +3678,7 @@ typedef NONCLIENTMETRICSA NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
 #define ChangeDisplaySettings ChangeDisplaySettingsA
 #define CreateDesktop CreateDesktopA
 #define EnumDisplaySettings EnumDisplaySettingsA
+#define EnumDisplayDevices  EnumDisplayDevicesA
 #endif /* NOGDI */
 #endif /* UNICODE */
 #endif /* RC_INVOKED */
