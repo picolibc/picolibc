@@ -36,7 +36,7 @@ datadir:=@datadir@
 infodir:=@infodir@
 includedir:=@includedir@
 
-SUBDIRS=@SUBDIRS@ testsuite
+SUBDIRS=@SUBDIRS@
 INSTALL_SUBDIRS=${patsubst %,install_%,$(SUBDIRS)}
 CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
 
@@ -89,10 +89,10 @@ config.status: configure
 	$(SHELL) config.status --recheck
 
 check: cygwin
-	@if [ -d testsuite ]; then \
+	@if [ -f testsuite/config.status ]; then \
 	    cd testsuite; \
 	else \
-	    mkdir testsuite; \
+	    (mkdir testsuite 2>/dev/null || exit 0); \
 	    cd testsuite; \
 	    sed -n -e '1,/^done/{' -e 's%/cygwin%/testsuite%g; ' -e 'p; }'  ../cygwin/config.status > config.status; \
 	    chmod a+x config.status; \
