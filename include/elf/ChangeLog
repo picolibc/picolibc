@@ -1,3 +1,7 @@
+2004-08-12  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (R_386_USED_BY_INTEL_200): New.
+
 2004-07-29  Alexandre Oliva  <aoliva@redhat.com>
 
 	Introduce SH2a support.

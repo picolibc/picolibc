@@ -62,6 +62,9 @@ START_RELOC_NUMBERS (elf_i386_reloc_type)
      RELOC_NUMBER (R_386_TLS_DTPOFF32, 36)
      RELOC_NUMBER (R_386_TLS_TPOFF32,  37)
 
+     /* Used by Intel.  */
+     RELOC_NUMBER (R_386_USED_BY_INTEL_200, 200)
+
      /* These are GNU extensions to enable C++ vtable garbage collection.  */
      RELOC_NUMBER (R_386_GNU_VTINHERIT, 250)
      RELOC_NUMBER (R_386_GNU_VTENTRY, 251)
