@@ -1956,15 +1956,15 @@ mount_info::read_cygdrive_info_from_registry ()
       if (r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive,
 	  sizeof (cygdrive), ""))
 	strcpy (cygdrive, CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX);
-      cygdrive_flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_AUTO);
+      cygdrive_flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE);
       slashify (cygdrive, cygdrive, 1);
       cygdrive_len = strlen (cygdrive);
     }
   else
     {
-      /* Fetch user cygdrive_flags from registry; returns MOUNT_AUTO on
+      /* Fetch user cygdrive_flags from registry; returns MOUNT_CYGDRIVE on
 	 error. */
-      cygdrive_flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_AUTO);
+      cygdrive_flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE);
       slashify (cygdrive, cygdrive, 1);
       cygdrive_len = strlen(cygdrive);
     }
@@ -2071,7 +2071,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
   /* Get the user flags, if appropriate */
   if (res == ERROR_SUCCESS)
     {
-      int flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_AUTO);
+      int flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE);
       strcpy (user_flags, (flags & MOUNT_BINARY) ? "binmode" : "textmode");
     }
 
@@ -2085,7 +2085,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
   /* Get the system flags, if appropriate */
   if (res2 == ERROR_SUCCESS)
     {
-      int flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_AUTO);
+      int flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE);
       strcpy (system_flags, (flags & MOUNT_BINARY) ? "binmode" : "textmode");
     }
 
@@ -2361,7 +2361,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   else if (flags & MOUNT_NOTEXEC)
     strcat (_reent_winsup ()->mnt_opts, (char *) ",noexec");
 
-  if ((flags & MOUNT_AUTO))		/* cygdrive */
+  if ((flags & MOUNT_CYGDRIVE))		/* cygdrive */
     strcat (_reent_winsup ()->mnt_opts, (char *) ",noumount");
 
   ret.mnt_opts = _reent_winsup ()->mnt_opts;
@@ -2444,9 +2444,9 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 {
   int res = -1;
 
-  if (flags & MOUNT_AUTO) /* normal mount */
+  if (flags & MOUNT_CYGDRIVE) /* normal mount */
     {
-      /* When flags include MOUNT_AUTO, take this to mean that
+      /* When flags include MOUNT_CYGDRIVE, take this to mean that
 	we actually want to change the cygdrive prefix and flags
 	without actually mounting anything. */
       res = mount_table->write_cygdrive_info_to_registry (posix_path, flags);
@@ -2479,9 +2479,9 @@ cygwin_umount (const char *path, unsigned flags)
 {
   int res = -1;
 
-  if (flags & MOUNT_AUTO)
+  if (flags & MOUNT_CYGDRIVE)
     {
-      /* When flags include MOUNT_AUTO, take this to mean that we actually want
+      /* When flags include MOUNT_CYGDRIVE, take this to mean that we actually want
 	 to remove the cygdrive prefix and flags without actually unmounting
 	 anything. */
       res = mount_table->remove_cygdrive_info_from_registry (path, flags);

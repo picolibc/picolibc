@@ -1,5 +1,10 @@
 2002-06-08  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc: Change MOUNT_AUTO to MOUNT_CYGDRIVE throughout.
+	* shared_info.h (CURR_MOUNT_MAGIC): Update.
+
+2002-06-08  Christopher Faylor  <cgf@redhat.com>
+
 	* external.cc (cygwin_internal): Make v1 mount table access invalid.
 	* path.cc (mount_info::init): Remove had_to_create_mount_areas initialization.
 	(mount_info::from_registry): Remove v1 table import.
