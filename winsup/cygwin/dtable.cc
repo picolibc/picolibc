@@ -750,6 +750,7 @@ dtable::vfork_parent_restore ()
 {
   lock ();
 
+  fhandler_tty_slave *ctty_on_hold = cygheap->ctty_on_hold;
   close_all_files ();
   fhandler_base **deleteme = fds;
   fds = fds_on_hold;
@@ -757,7 +758,7 @@ dtable::vfork_parent_restore ()
   cfree (deleteme);
   unlock ();
 
-  cygheap->ctty = cygheap->ctty_on_hold;	// revert
+  cygheap->ctty = ctty_on_hold;			// revert
   if (cygheap->ctty)
     cygheap->ctty->close ();			// Undo previous bump of this archetype
   cygheap->ctty_on_hold = NULL;
