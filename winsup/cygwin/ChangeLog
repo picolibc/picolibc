@@ -1,6 +1,6 @@
 2003-03-09  Christopher Faylor  <cgf@redhat.com>
 
-	* include/cygwin/version.h: Bump DLL minor number to 21.
+	* include/cygwin/version.h: Bump DLL minor number to 22.
 
 2003-03-09  Christopher Faylor  <cgf@redhat.com>
 
