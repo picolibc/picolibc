@@ -1,3 +1,7 @@
+2004-07-26  Hartmut Honisch  <hhonisch@users.sourceforge.net>
+
+	* include/commctrl.h (TreeView_SetItemState): Define macro.
+
 2004-07-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wingdi.h (CMYK): Correct macro. Group CMYK/RGB

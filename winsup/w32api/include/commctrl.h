@@ -3212,6 +3212,14 @@ WINBOOL WINAPI ImageList_DrawIndirect(IMAGELISTDRAWPARAMS*);
 #endif
 #if (_WIN32_IE >= 0x0500)
 #define TreeView_GetItemState(w,i,m) (UINT)SNDMSG((w),TVM_GETITEMSTATE,(WPARAM)(i),(LPARAM)(m))
+#define TreeView_SetItemState(w,i,d,m) \
+{ \
+	TVITEM _tvi;\
+	_tvi.mask=TVIF_STATE;\
+	_tvi.stateMask=m;\
+	_tvi.state=d;\
+	SNDMSG((w),TVM_SETITEM,0,(LPARAM)(TVITEM*)&_tvi);\
+}
 #endif
 
 #ifdef UNICODE
