@@ -112,7 +112,7 @@ internal_getlogin (_pinfo *pi)
           else if (!GetTokenInformation (ptok, TokenUser, (LPVOID) &tu,
                                          sizeof tu, &siz))
             debug_printf ("GetTokenInformation(): %E");
-          else if (!(ret = CopySid (MAX_SID_LEN, (PSID) pi->sidbuf,
+          else if (!(ret = CopySid (MAX_SID_LEN, (PSID) pi->psid,
                                     ((TOKEN_USER *) &tu)->User.Sid)))
             debug_printf ("Couldn't retrieve SID from access token!");
           /* Close token only if it's a result from OpenProcessToken(). */
@@ -126,14 +126,14 @@ internal_getlogin (_pinfo *pi)
             {
               /* Concat DOMAIN\USERNAME for the next lookup */
               strcat (strcat (strcpy (buf, pi->domain), "\\"), pi->username);
-              if (!(ret = lookup_name (buf, NULL, (PSID) pi->sidbuf)))
+              if (!(ret = lookup_name (buf, NULL, (PSID) pi->psid)))
                 debug_printf ("Couldn't retrieve SID locally!");
             }
 
           /* If that failes, too, as a last resort try to get the SID from
              the logon server. */
           if (!ret && !(ret = lookup_name(pi->username, pi->logsrv,
-                                          (PSID)pi->sidbuf)))
+                                          (PSID)pi->psid)))
             debug_printf ("Couldn't retrieve SID from '%s'!", pi->logsrv);
 
           /* If we have a SID, try to get the corresponding Cygwin user name
@@ -144,7 +144,7 @@ internal_getlogin (_pinfo *pi)
               char psidbuf[MAX_SID_LEN];
               PSID psid = (PSID) psidbuf;
 
-              pi->psid = (PSID) pi->sidbuf;
+              pi->use_psid = 1;
               if (!strcasematch (pi->username, "SYSTEM")
                   && pi->domain[0] && pi->logsrv[0])
                 {

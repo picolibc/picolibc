@@ -212,7 +212,7 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
   char sid_buf[MAX_SID_LEN];
   PSID sid = (PSID) sid_buf;
 
-  if (myself->psid)
+  if (myself->use_psid)
     CopySid (MAX_SID_LEN, sid, myself->psid);
   else if (! lookup_name (getlogin (), myself->logsrv, sid))
     return inherit ? &sec_none_nih : &sec_none;

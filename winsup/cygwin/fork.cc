@@ -423,9 +423,11 @@ fork ()
       forked->process_state |= PID_INITIALIZING |
 			      (myself->process_state & PID_USETTY);
       memcpy (forked->username, myself->username, MAX_USER_NAME);
-      memcpy (forked->sidbuf, myself->sidbuf, MAX_SID_LEN);
-      if (myself->psid)
-        forked->psid = forked->sidbuf;
+      if (myself->use_psid)
+	{
+	  memcpy (forked->psid, myself->psid, MAX_SID_LEN);
+	  forked->use_psid = 1;
+	}
       memcpy (forked->logsrv, myself->logsrv, MAX_HOST_NAME);
       memcpy (forked->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
       forked->token = myself->token;

@@ -1,3 +1,19 @@
+Tue Aug  8 22:25:39 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (allocfd_set): Zero allocated fd_set.
+	(cygwin_select): Move fd_set copying logic from ::wait to here.  Use
+	common return through sell.poll.
+	(select_stuff::wait): Just return success or failure and let caller
+	fill in fd_set.
+	* pinfo.h (pinfo): Eliminate self-referential pointer to sidbuf since
+	pinfo structure exists at random locations now.
+	* fork.cc (fork): Use 'use_psid' element to control when the psid is
+	relevant.
+	* shared.cc (sec_user): Ditto.
+	* spawn.cc (spawn_guts): Ditto.
+	* uinfo.cc (internal_getlogin): Ditto.
+	* syscall.cc (seteuid): Ditto.  Set use_psid element.
+
 Tue Aug  8 13:20:00 2000  Bob Wilson  <bwilson@tensilica.com>
 
 	* fhandler_serial.cc (tcsendbreak): "sleeptime" argument to usleep()

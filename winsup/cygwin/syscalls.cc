@@ -1865,7 +1865,6 @@ seteuid (uid_t uid)
 	      }
 
 	  struct _pinfo pi;
-	  pi.psid = (PSID) pi.sidbuf;
 	  /* pi.token is used in internal_getlogin() to determine if
 	     impersonation is active. If so, the token is used for
 	     retrieving user's SID. */
@@ -1884,7 +1883,8 @@ seteuid (uid_t uid)
 	  strcpy (myself->username, pi.username);
 	  strcpy (myself->logsrv, pi.logsrv);
 	  strcpy (myself->domain, pi.domain);
-	  memcpy (myself->sidbuf, pi.sidbuf, MAX_SID_LEN);
+	  memcpy (myself->psid, pi.psid, MAX_SID_LEN);
+	  myself->use_psid = 1;
 	}
     }
   else

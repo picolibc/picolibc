@@ -1,6 +1,6 @@
 /* select.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000 Red Hat, Inc.
 
    Written by Christopher Faylor of Cygnus Solutions
    cgf@cygnus.com
@@ -71,7 +71,7 @@ typedef long fd_mask;
 #define UNIX_FD_ZERO(p, n) \
   bzero ((caddr_t)(p), sizeof_fd_set ((n)))
 
-#define allocfd_set(n) ((fd_set *) alloca (sizeof_fd_set (n)))
+#define allocfd_set(n) ((fd_set *) memset (alloca (sizeof_fd_set (n)), 0, sizeof_fd_set (n)))
 #define copyfd_set(to, from, n) memcpy (to, from, sizeof_fd_set (n));
 
 /* Make a fhandler_foo::ready_for_ready method.
@@ -105,13 +105,13 @@ fhandler_##what::ready_for_read (int fd, DWORD howlong, int ignra) \
  */
 extern "C"
 int
-cygwin_select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-		     struct timeval *to)
+cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+	       struct timeval *to)
 {
   select_stuff sel;
-  fd_set *dummy_readfds = allocfd_set (n);
-  fd_set *dummy_writefds = allocfd_set (n);
-  fd_set *dummy_exceptfds = allocfd_set (n);
+  fd_set *dummy_readfds = allocfd_set (maxfds);
+  fd_set *dummy_writefds = allocfd_set (maxfds);
+  fd_set *dummy_exceptfds = allocfd_set (maxfds);
   sigframe thisframe (mainthread, 0);
 
 #if 0
@@ -122,25 +122,16 @@ cygwin_select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
     }
 #endif
 
-  select_printf ("%d, %p, %p, %p, %p", n, readfds, writefds, exceptfds, to);
+  select_printf ("%d, %p, %p, %p, %p", maxfds, readfds, writefds, exceptfds, to);
 
   if (!readfds)
-    {
-      UNIX_FD_ZERO (dummy_readfds, n);
-      readfds = dummy_readfds;
-    }
+    readfds = dummy_readfds;
   if (!writefds)
-    {
-      UNIX_FD_ZERO (dummy_writefds, n);
-      writefds = dummy_writefds;
-    }
+    writefds = dummy_writefds;
   if (!exceptfds)
-    {
-      UNIX_FD_ZERO (dummy_exceptfds, n);
-      exceptfds = dummy_exceptfds;
-    }
+    exceptfds = dummy_exceptfds;
 
-  for (int i = 0; i < n; i++)
+  for (int i = 0; i < maxfds; i++)
     if (!sel.test_and_set (i, readfds, writefds, exceptfds))
       {
 	select_printf ("aborting due to test_and_set error");
@@ -171,18 +162,19 @@ cygwin_select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       return 0;
     }
 
-  /* If one of the selected fds is "always ready" just poll everything and return
-     the result.  There is no need to wait. */
-  if (sel.always_ready || ms == 0)
-    {
-      UNIX_FD_ZERO (readfds, n);
-      UNIX_FD_ZERO (writefds, n);
-      UNIX_FD_ZERO (exceptfds, n);
-      return sel.poll (readfds, writefds, exceptfds);
-    }
+  /* Allocate some fd_set structures using the number of fds as a guide. */
+  fd_set *r = allocfd_set (maxfds);
+  fd_set *w = allocfd_set (maxfds);
+  fd_set *e = allocfd_set (maxfds);
 
-  /* Wait for an fd to come alive */
-  return sel.wait (readfds, writefds, exceptfds, ms);
+  /* Don't bother waiting if one of the selected fds is "always ready". */
+  if ((!sel.always_ready || ms != 0) && sel.wait (r, w, e, ms))
+    return -1;	/* some kind of error */
+
+  copyfd_set (readfds, r, maxfds);
+  copyfd_set (writefds, w, maxfds);
+  copyfd_set (exceptfds, e, maxfds);
+  return sel.poll (readfds, writefds, exceptfds);
 }
 
 /* Cleanup */
@@ -273,17 +265,9 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       continue;
     }
 
-  int n = m - 1;
   DWORD start_time = GetTickCount ();	/* Record the current time for later use. */
 
-  /* Allocate some fd_set structures using the number of fds as a guide. */
-  fd_set *r = allocfd_set (n);
-  fd_set *w = allocfd_set (n);
-  fd_set *e = allocfd_set (n);
-  UNIX_FD_ZERO (r, n);
-  UNIX_FD_ZERO (w, n);
-  UNIX_FD_ZERO (e, n);
-  debug_printf ("n %d, ms %u", n, ms);
+  debug_printf ("m %d, ms %u", m, ms);
   for (;;)
     {
       if (!windows_used)
@@ -313,7 +297,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	if (s->saw_error)
 	  return -1;		/* Somebody detected an error */
 	else if ((((wait_ret >= m && s->windows_handle) || s->h == w4[wait_ret])) &&
-	    s->verify (s, r, w, e))
+	    s->verify (s, readfds, writefds, exceptfds))
 	  gotone = TRUE;
 
       select_printf ("gotone %d", gotone);
@@ -339,11 +323,8 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
     }
 
 out:
-  copyfd_set (readfds, r, n);
-  copyfd_set (writefds, w, n);
-  copyfd_set (exceptfds, e, n);
-
-  return poll (readfds, writefds, exceptfds);
+  select_printf ("returning 0");
+  return 0;
 }
 
 static int

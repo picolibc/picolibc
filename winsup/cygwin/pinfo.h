@@ -49,19 +49,19 @@ public:
      if not found.  This data resides in the shared data area (allowing
      tasks to store whatever they want here) so it's for informational
      purposes only. */
-  uid_t uid;	    /* User ID */
-  gid_t gid;	    /* Group ID */
-  pid_t pgid;	    /* Process group ID */
-  pid_t sid;	    /* Session ID */
-  int ctty;	    /* Control tty */
+  uid_t uid;		/* User ID */
+  gid_t gid;		/* Group ID */
+  pid_t pgid;		/* Process group ID */
+  pid_t sid;		/* Session ID */
+  int ctty;		/* Control tty */
   mode_t umask;
   char username[MAX_USER_NAME]; /* user's name */
 
   /* Extendend user information.
      The information is derived from the internal_getlogin call
      when on a NT system. */
-  PSID psid;        /* user's SID */
-  char sidbuf[MAX_SID_LEN];  /* buffer for user's SID */
+  int use_psid;		/* TRUE if psid contains valid data */
+  char psid[MAX_SID_LEN];  /* buffer for user's SID */
   char logsrv[MAX_HOST_NAME]; /* Logon server, may be FQDN */
   char domain[MAX_COMPUTERNAME_LENGTH+1]; /* Logon domain of the user */
 

@@ -670,9 +670,11 @@ skip_arg_parsing:
       child->ctty = myself->ctty;
       child->umask = myself->umask;
       child->process_state |= PID_INITIALIZING;
-      memcpy (child->sidbuf, myself->sidbuf, MAX_SID_LEN);
-      if (myself->psid)
-	child->psid = child->sidbuf;
+      if (myself->use_psid)
+	{
+	  child->use_psid = 1;
+	  memcpy (child->psid, myself->psid, MAX_SID_LEN);
+	}
       memcpy (child->logsrv, myself->logsrv, MAX_HOST_NAME);
       memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
       memcpy (child->root, myself->root, MAX_PATH+1);
@@ -691,7 +693,7 @@ skip_arg_parsing:
 	  /* Set child->uid to USHRT_MAX to force calling internal_getlogin()
 	     from child process. Clear username and psid to play it safe. */
 	  child->uid = USHRT_MAX;
-	  child->psid = NULL;
+	  child->use_psid = 0;
 	}
       child.remember ();
     }
