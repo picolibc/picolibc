@@ -130,7 +130,10 @@ add_path (char *s, int maxlen)
     *--e = 0;
   for (int i = 1; i < num_paths; i++)
     if (strcasecmp (paths[num_paths], paths[i]) == 0)
-      return;
+      {
+	free (paths[num_paths]);
+	return;
+      }
   num_paths++;
 }
 
