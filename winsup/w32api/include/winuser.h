@@ -744,18 +744,34 @@ extern "C" {
 #define DWLP_MSGRESULT 0
 #define DWL_USER 8
 #define DWLP_USER 8
+#if (_WIN32_WINNT >= 0x0501)
+#define QS_ALLEVENTS 1215
+#define QS_ALLINPUT 1279
+#else
 #define QS_ALLEVENTS 191
 #define QS_ALLINPUT 255
+#endif
+#define QS_ALLPOSTMESSAGE 256
 #define QS_HOTKEY 128
+#if (_WIN32_WINNT >= 0x0501)
+#define QS_INPUT 1031
+#else
 #define QS_INPUT 7
+#endif
 #define QS_KEY 1
 #define QS_MOUSE 6
 #define QS_MOUSEBUTTON 4
 #define QS_MOUSEMOVE 2
 #define QS_PAINT 32
 #define QS_POSTMESSAGE 8
+#if (_WIN32_WINNT >= 0x0501)
+#define QS_RAWINPUT 1024
+#endif
 #define QS_SENDMESSAGE 64
 #define QS_TIMER 16
+#define MWMO_WAITALL 1
+#define MWMO_ALERTABLE 2
+#define MWMO_INPUTAVAILABLE 4
 #define COLOR_3DDKSHADOW 21
 #define COLOR_3DFACE 15
 #define COLOR_3DHILIGHT 20

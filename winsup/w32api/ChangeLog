@@ -1,3 +1,15 @@
+003-08-29  Steve Cleary  <scleary@jerviswebb.com>
+
+	* include/winuser.h (QS_ALLPOSTMESSAGE, QS_RAWINPUT): Add defines.
+	(QS_INPUT, QS_ALLINPUT, QS_ALLEVENTS): Adjust by OR'ing	with
+	QS_RAWINPUT for _WIN32_WINNT >= 0x0501.
+	(MWMO_*): Add flags.
+
+	* include/wincrypt.h (MS_ENHANCED_PROV[AW], MS_STRONG_PROV[AW],
+	MS_DEF_RSA_SIG_PROV[AW], MS_DEF_RSA_SCHANNEL_PROV[AW],
+	MS_DEF_DSS_PROV[AW], MS_DEF_DSS_DH_PROV[AW], MS_ENH_DSS_DH_PROV[AW],
+	MS_DEF_DH_SCHANNEL_PROV[AW], MS_SCARD_PROV[AW]): Add definitions.
+
 2003-08-26  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* lib/test.c: Add vfw.h to includes.
