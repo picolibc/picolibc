@@ -1,7 +1,27 @@
 LIBRARY "cygwin1.dll" BASE=0x61000000
 
 EXPORTS
+__argc DATA
+__argv DATA
+__cygwin_environ DATA
+__cygwin_user_data DATA
+__mb_cur_max DATA
+__progname DATA
+_check_for_executable DATA
+_ctype_ DATA
+_daylight DATA
+_sys_errlist DATA
+sys_errlist = _sys_errlist DATA
+_sys_nerr DATA
+sys_nerr = _sys_nerr DATA
+_timezone DATA
+_tzname DATA
+h_errno DATA
+reent_data DATA
+@ALLOCA@
+@DEF_DLL_ENTRY@
 __assert
+__assertfail
 __eprintf
 __errno
 __fpclassifyd
@@ -13,19 +33,91 @@ __signbitf
 __signgam
 __srget
 __swbuf
-__argv DATA
-__argc DATA
-__progname DATA
-_check_for_executable DATA
-; __vc__10pinfo_listi
-@ALLOCA@
-cygwin_stackdump
+_asprintf_r
+asprintf_r = _asprintf_r
+_dll_crt0@0
+_exit
+_f_atan2
+__f_atan2 = _f_atan2
+_f_atan2f
+__f_atan2f = _f_atan2f
+_f_exp
+__f_exp = _f_exp
+_f_expf
+__f_expf = _f_expf
+_f_frexp
+__f_frexp = _f_frexp
+_f_frexpf
+__f_frexpf = _f_frexpf
+_f_ldexp
+__f_ldexp = _f_ldexp
+_f_ldexpf
+__f_ldexpf = _f_ldexpf
+_f_log
+__f_log = _f_log
+_f_log10
+__f_log10 = _f_log10
+_f_log10f
+__f_log10f = _f_log10f
+_f_logf
+__f_logf = _f_logf
+_f_pow
+__f_pow = _f_pow
+_f_powf
+__f_powf = _f_powf
+_f_tan
+__f_tan = _f_tan
+_f_tanf
+__f_tanf = _f_tanf
+_fcloseall_r
+fcloseall_r = _fcloseall_r
+_fscanf_r
+fscanf_r = _fscanf_r
+_fstat
+fstat = _fstat
+_pipe
+_pthread_cleanup_pop
+_pthread_cleanup_push
+_scanf_r
+scanf_r = _scanf_r
+_sscanf_r
+sscanf_r = _sscanf_r
+_stat
+stat = _stat
+_strtold
+_vasprintf_r
+vasprintf_r = _vasprintf_r
+_vfscanf_r
+vfscanf_r = _vfscanf_r
+_vscanf_r
+vscanf_r = _vscanf_r
+_vsscanf_r
+vsscanf_r = _vsscanf_r
+a64l
 abort
 _abort = abort
 abs
 _abs = abs
 access
 _access = access
+acl
+_acl = acl
+aclcheck
+_aclcheck = aclcheck
+aclfrommode
+_aclfrommode = aclfrommode
+aclfrompbits
+_aclfrompbits = aclfrompbits
+aclfromtext
+_aclfromtext = aclfromtext
+aclsort
+_aclsort = aclsort
+acltomode
+_acltomode = acltomode
+acltopbits
+_acltopbits = acltopbits
+acltotext
+_acltotext = acltotext
 acos
 _acos = acos
 acosf
@@ -52,8 +144,6 @@ asinhf
 _asinhf = asinhf
 asprintf
 _asprintf = asprintf
-_asprintf_r
-asprintf_r = _asprintf_r
 atan
 _atan = atan
 atan2
@@ -98,10 +188,10 @@ ceil
 _ceil = ceil
 ceilf
 _ceilf = ceilf
-cfgetospeed
 cfgetispeed
-cfsetospeed
+cfgetospeed
 cfsetispeed
+cfsetospeed
 chdir
 _chdir = chdir
 chmod
@@ -109,6 +199,8 @@ _chmod = chmod
 chown
 _chown = chown
 chown32
+chroot
+_chroot = chroot
 cleanup_glue
 clearerr
 _clearerr = clearerr
@@ -118,6 +210,8 @@ close
 _close = close
 closedir
 _closedir = closedir
+closelog
+_closelog = closelog
 copysign
 _copysign = copysign
 copysignf
@@ -132,26 +226,107 @@ coshf
 _coshf = coshf
 creat
 _creat = creat
+ctermid
 ctime
 _ctime = ctime
 ctime_r
 _ctime_r = ctime_r
+cuserid
+_cuserid = cuserid
 cwait
 _cwait = cwait
-difftime
-_difftime = difftime
-div
-_div = div
-dirfd
-_dirfd = dirfd
-_dll_crt0@0
-dll_crt0__FP11per_process
-cygwin_dll_init
-dll_dllcrt0
-dll_noncygwin_dllcrt0
+accept = cygwin_accept
+cygwin_attach_handle_to_fd
+cygwin32_attach_handle_to_fd = cygwin_attach_handle_to_fd
+bind = cygwin_bind
+connect = cygwin_connect
+cygwin_conv_to_full_posix_path
+cygwin32_conv_to_full_posix_path = cygwin_conv_to_full_posix_path
+cygwin_conv_to_full_win32_path
+cygwin32_conv_to_full_win32_path = cygwin_conv_to_full_win32_path
+cygwin_conv_to_posix_path
+cygwin32_conv_to_posix_path = cygwin_conv_to_posix_path
+cygwin_conv_to_win32_path
+cygwin32_conv_to_win32_path = cygwin_conv_to_win32_path
 cygwin_detach_dll
 cygwin32_detach_dll = cygwin_detach_dll
-@DEF_DLL_ENTRY@
+cygwin_dll_init
+endprotoent = cygwin_endprotoent
+endservent = cygwin_endservent
+gethostbyaddr = cygwin_gethostbyaddr
+gethostbyname = cygwin_gethostbyname
+_gethostname = cygwin_gethostname
+gethostname = cygwin_gethostname
+getpeername = cygwin_getpeername
+getprotobyname = cygwin_getprotobyname
+getprotobynumber = cygwin_getprotobynumber
+getprotoent = cygwin_getprotoent
+getservbyname = cygwin_getservbyname
+getservbyport = cygwin_getservbyport
+getservent = cygwin_getservent
+getsockname = cygwin_getsockname
+getsockopt = cygwin_getsockopt
+herror = cygwin_herror
+hstrerror = cygwin_hstrerror
+inet_addr = cygwin_inet_addr
+inet_aton = cygwin_inet_aton
+inet_network = cygwin_inet_network
+inet_ntoa = cygwin_inet_ntoa
+cygwin_internal
+cygwin32_internal = cygwin_internal
+listen = cygwin_listen
+cygwin_logon_user
+_lstat = cygwin_lstat
+lstat = cygwin_lstat
+cygwin_posix_path_list_p
+cygwin32_posix_path_list_p = cygwin_posix_path_list_p
+cygwin_posix_to_win32_path_list
+cygwin32_posix_to_win32_path_list = cygwin_posix_to_win32_path_list
+cygwin_posix_to_win32_path_list_buf_size
+cygwin32_posix_to_win32_path_list_buf_size = cygwin_posix_to_win32_path_list_buf_size
+rcmd = cygwin_rcmd
+recv = cygwin_recv
+recvfrom = cygwin_recvfrom
+recvmsg = cygwin_recvmsg
+rexec = cygwin_rexec
+rresvport = cygwin_rresvport
+_select = cygwin_select
+select = cygwin_select
+send = cygwin_send
+sendmsg = cygwin_sendmsg
+sendto = cygwin_sendto
+cygwin_set_impersonation_token
+setprotoent = cygwin_setprotoent
+setservent = cygwin_setservent
+setsockopt = cygwin_setsockopt
+shutdown = cygwin_shutdown
+socket = cygwin_socket
+cygwin_split_path
+cygwin32_split_path = cygwin_split_path
+cygwin_stackdump
+cygwin_umount
+cygwin_win32_to_posix_path_list
+cygwin32_win32_to_posix_path_list = cygwin_win32_to_posix_path_list
+cygwin_win32_to_posix_path_list_buf_size
+cygwin32_win32_to_posix_path_list_buf_size = cygwin_win32_to_posix_path_list_buf_size
+cygwin_winpid_to_pid
+cygwin32_winpid_to_pid = cygwin_winpid_to_pid
+difftime
+_difftime = difftime
+dirfd
+_dirfd = dirfd
+div
+_div = div
+dlclose
+dlerror
+dlfork
+dll_crt0__FP11per_process
+dll_dllcrt0
+dll_noncygwin_dllcrt0
+dlopen
+dlsym
+drand48
+_drand48 = drand48
 drem
 _drem = drem
 dremf
@@ -168,8 +343,15 @@ ecvtf
 _ecvtf = ecvtf
 endgrent
 _endgrent = endgrent
+endhostent
+endmntent
+_endmntent = endmntent
+endpwent
+_endpwent = endpwent
 endutent
 _endutent = endutent
+erand48
+_erand48 = erand48
 erf
 _erf = erf
 erfc
@@ -191,9 +373,10 @@ _execve = execve
 execvp
 _execvp = execvp
 exit
-_exit
 exp
 _exp = exp
+exp2
+exp2f
 expf
 _expf = expf
 expm1
@@ -204,10 +387,8 @@ fabs
 _fabs = fabs
 fabsf
 _fabsf = fabsf
-_f_atan2
-__f_atan2 = _f_atan2
-_f_atan2f
-__f_atan2f = _f_atan2f
+facl
+_facl = facl
 fchdir
 _fchdir = fchdir
 fchmod
@@ -219,8 +400,6 @@ fclose
 _fclose = fclose
 fcloseall
 _fcloseall = fcloseall
-_fcloseall_r
-fcloseall_r = _fcloseall_r
 fcntl
 _fcntl = fcntl
 fcvt
@@ -229,30 +408,24 @@ fcvtbuf
 _fcvtbuf = fcvtbuf
 fcvtf
 _fcvtf = fcvtf
+fdim
+fdimf
 fdopen
 _fdopen = fdopen
 feof
 _feof = feof
 ferror
 _ferror = ferror
-_f_exp
-__f_exp = _f_exp
-_f_expf
-__f_expf = _f_expf
 fflush
 _fflush = fflush
-_f_frexp
-__f_frexp = _f_frexp
-_f_frexpf
-__f_frexpf = _f_frexpf
+ffs
+_ffs = ffs
 fgetc
 _fgetc = fgetc
 fgetpos
 _fgetpos = fgetpos
 fgets
 _fgets = fgets
-ffs
-_ffs = ffs
 fileno
 _fileno = fileno
 finite
@@ -261,37 +434,27 @@ finitef
 _finitef = finitef
 fiprintf
 _fiprintf = fiprintf
-_f_ldexp
-__f_ldexp = _f_ldexp
-_f_ldexpf
-__f_ldexpf = _f_ldexpf
-_f_log
-__f_log = _f_log
-_f_logf
-__f_logf = _f_logf
-_f_log10
-__f_log10 = _f_log10
-_f_log10f
-__f_log10f = _f_log10f
 floor
 _floor = floor
 floorf
 _floorf = floorf
-fnmatch
-_fnmatch = fnmatch
+fma
+fmaf
+fmax
+fmaxf
+fmin
+fminf
 fmod
 _fmod = fmod
 fmodf
 _fmodf = fmodf
+fnmatch
+_fnmatch = fnmatch
 fopen
 _fopen = fopen
 fork
 _fork = fork
 fpathconf
-_f_pow
-__f_pow = _f_pow
-_f_powf
-__f_powf = _f_powf
 fprintf
 _fprintf = fprintf
 fputc
@@ -310,25 +473,17 @@ frexpf
 _frexpf = frexpf
 fscanf
 _fscanf = fscanf
-_fscanf_r
-fscanf_r = _fscanf_r
 fseek
 _fseek = fseek
 fseeko
 _fseeko = fseeko
 fsetpos
 _fsetpos = fsetpos
-_fstat
-fstat = _fstat
 fstat64
 fstatfs
 _fstatfs = fstatfs
 fsync
 _fsync = fsync
-_f_tan
-__f_tan = _f_tan
-_f_tanf
-__f_tanf = _f_tanf
 ftell
 _ftell = ftell
 ftello
@@ -352,6 +507,8 @@ gcvt
 _gcvt = gcvt
 gcvtf
 _gcvtf = gcvtf
+get_osfhandle
+_get_osfhandle = get_osfhandle
 getc
 _getc = getc
 getc_unlocked
@@ -362,17 +519,24 @@ getchar_unlocked
 _getchar_unlocked = getchar_unlocked
 getcwd
 _getcwd = getcwd
+getdomainname
+_getdomainname = getdomainname
 getdtablesize
 _getdtablesize = getdtablesize
 getegid
 _getegid = getegid
 getegid32
+getenv
+_getenv = getenv
 geteuid
 _geteuid = geteuid
 geteuid32
 getgid
 _getgid = getgid
 getgid32
+getgrent
+_getgrent = getgrent
+getgrent32
 getgrgid
 _getgrgid = getgrgid
 getgrgid32
@@ -382,24 +546,36 @@ getgrnam32
 getgroups
 _getgroups = getgroups
 getgroups32
-gethostname = cygwin_gethostname
-_gethostname = cygwin_gethostname
+getitimer
 getlogin
 _getlogin = getlogin
 getmntent
 _getmntent = getmntent
 getmode
 _getmode = getmode
-get_osfhandle
-_get_osfhandle = get_osfhandle
 getpagesize
 _getpagesize = getpagesize
 getpass
 _getpass = getpass
+getpgid
+getpgrp
+_getpgrp = getpgrp
 getpid
 _getpid = getpid
 getppid
 _getppid = getppid
+getpwduid
+_getpwduid = getpwduid
+getpwent
+_getpwent = getpwent
+getpwnam
+_getpwnam = getpwnam
+getpwnam_r
+getpwuid
+_getpwuid = getpwuid
+getpwuid32
+getpwuid_r
+getpwuid_r32
 getrlimit
 _getrlimit = getrlimit
 getrusage
@@ -418,6 +594,10 @@ getutid
 _getutid = getutid
 getutline
 _getutline = getutline
+getw
+_getw = getw
+getwd
+_getwd = getwd
 glob
 _glob = glob
 globfree
@@ -426,13 +606,17 @@ gmtime
 _gmtime = gmtime
 gmtime_r
 _gmtime_r = gmtime_r
+grantpt
 hcreate
 hcreate_r
 hdestroy
 hdestroy_r
 hsearch
 hsearch_r
-h_errno DATA
+htonl
+_htonl = htonl
+htons
+_htons = htons
 hypot
 _hypot = hypot
 hypotf
@@ -443,12 +627,15 @@ ilogbf
 _ilogbf = ilogbf
 index
 _index = index
+inet_makeaddr
+inet_netof
 infinity
 _infinity = infinity
 infinityf
 _infinityf = infinityf
 initgroups
 initgroups32
+initstate
 ioctl
 _ioctl = ioctl
 iprintf
@@ -513,14 +700,21 @@ jn
 _jn = jn
 jnf
 _jnf = jnf
+jrand48
+_jrand48 = jrand48
 kill
 _kill = kill
+killpg
 l64a
 labs
 _labs = labs
+lacl
+_lacl = lacl
 lchown
 _lchown = lchown
 lchown32
+lcong48
+_lcong48 = lcong48
 ldexp
 _ldexp = ldexp
 ldexpf
@@ -563,11 +757,15 @@ login
 logout
 longjmp
 _longjmp = longjmp
+lrand48
+_lrand48 = lrand48
+lrint
+lrintf
+lround
+lroundf
 lseek
 _lseek = lseek
 lseek64
-lstat = cygwin_lstat
-_lstat = cygwin_lstat
 lstat64
 malloc
 _malloc = malloc
@@ -582,11 +780,14 @@ _mblen = mblen
 mbrlen
 mbrtowc
 mbsinit
+mbsrtowcs
 mbstowcs
 _mbstowcs = mbstowcs
 mbtowc
 _mbtowc = mbtowc
 memalign
+memccpy
+_memccpy = memccpy
 memchr
 _memchr = memchr
 memcmp
@@ -611,44 +812,134 @@ mktime
 _mktime = mktime
 mmap
 mmap64
-mprotect
-msync
-munmap
 modf
 _modf = modf
 modff
 _modff = modff
+mount
+_mount = mount
+mprotect
+mrand48
+msync
+munmap
 nan
 _nan = nan
 nanf
 _nanf = nanf
 nanosleep
 _nanosleep = nanosleep
+nearbyint
+nearbyintf
 nextafter
 _nextafter = nextafter
 nextafterf
 _nextafterf = nextafterf
+nice
+_nice = nice
 nl_langinfo
 _nl_langinfo = nl_langinfo
+nrand48
+_nrand48 = nrand48
+ntohl
+_ntohl = ntohl
+ntohs
+_ntohs = ntohs
 on_exit
 open
 _open = open
 opendir
 _opendir = opendir
+openlog
+_openlog = openlog
 pathconf
 _pathconf = pathconf
+pause
+pclose
+_pclose = pclose
 perror
 _perror = perror
 pipe
-_pipe
 poll
 _poll = poll
+popen
+_popen = popen
+posix_regcomp
+posix_regerror
+posix_regexec
+posix_regfree
 pow
 _pow = pow
 powf
 _powf = powf
 printf
 _printf = printf
+pthread_atfork
+pthread_attr_destroy
+pthread_attr_getdetachstate
+pthread_attr_getinheritsched
+pthread_attr_getschedparam
+pthread_attr_getschedpolicy
+pthread_attr_getscope
+pthread_attr_getstacksize
+pthread_attr_init
+pthread_attr_setdetachstate
+pthread_attr_setinheritsched
+pthread_attr_setschedparam
+pthread_attr_setschedpolicy
+pthread_attr_setscope
+pthread_attr_setstacksize
+pthread_cancel
+pthread_cond_broadcast
+pthread_cond_destroy
+pthread_cond_init
+pthread_cond_signal
+pthread_cond_timedwait
+pthread_cond_wait
+pthread_condattr_destroy
+pthread_condattr_getpshared
+pthread_condattr_init
+pthread_condattr_setpshared
+pthread_continue
+pthread_create
+pthread_detach
+pthread_equal
+pthread_exit
+pthread_getconcurrency
+pthread_getschedparam
+pthread_getsequence_np
+pthread_getspecific
+pthread_join
+pthread_key_create
+pthread_key_delete
+pthread_kill
+pthread_mutex_destroy
+pthread_mutex_getprioceiling
+pthread_mutex_init
+pthread_mutex_lock
+pthread_mutex_setprioceiling
+pthread_mutex_trylock
+pthread_mutex_unlock
+pthread_mutexattr_destroy
+pthread_mutexattr_getprioceiling
+pthread_mutexattr_getprotocol
+pthread_mutexattr_getpshared
+pthread_mutexattr_gettype
+pthread_mutexattr_init
+pthread_mutexattr_setprioceiling
+pthread_mutexattr_setprotocol
+pthread_mutexattr_setpshared
+pthread_mutexattr_settype
+pthread_once
+pthread_self
+pthread_setcancelstate
+pthread_setcanceltype
+pthread_setconcurrency
+pthread_setschedparam
+pthread_setspecific
+pthread_sigmask
+pthread_suspend
+pthread_testcancel
+ptsname
 putc
 _putc = putc
 putc_unlocked
@@ -657,6 +948,8 @@ putchar
 _putchar = putchar
 putchar_unlocked
 _putchar_unlocked = putchar_unlocked
+putenv
+_putenv = putenv
 puts
 _puts = puts
 pututline
@@ -670,8 +963,6 @@ _raise = raise
 rand
 _rand = rand
 random
-initstate
-setstate
 read
 _read = read
 readdir
@@ -682,16 +973,15 @@ readv
 _readv = readv
 realloc
 _realloc = realloc
-posix_regcomp
-posix_regerror
-posix_regexec
-posix_regfree
+realpath
 remainder
 _remainder = remainder
 remainderf
 _remainderf = remainderf
 remove
 _remove = remove
+remquo
+remquof
 rename
 _rename = rename
 rewind
@@ -706,12 +996,16 @@ rintf
 _rintf = rintf
 rmdir
 _rmdir = rmdir
+round
+roundf
 sbrk
 _sbrk = sbrk
 scalb
 _scalb = scalb
 scalbf
 _scalbf = scalbf
+scalbln
+scalblnf
 scalbn
 _scalbn = scalbn
 scalbnf
@@ -720,27 +1014,65 @@ scandir
 _scandir = scandir
 scanf
 _scanf = scanf
-_scanf_r
-scanf_r = _scanf_r
+sched_get_priority_max
+sched_get_priority_min
+sched_getparam
+sched_getscheduler
+sched_rr_get_interval
+sched_setparam
+sched_setscheduler
+sched_yield
+seed48
+_seed48 = seed48
 seekdir
 _seekdir = seekdir
 seekdir64
+sem_destroy
+sem_init
+sem_post
+sem_trywait
+sem_wait
 setbuf
 _setbuf = setbuf
+setbuffer
 setdtablesize
 _setdtablesize = setdtablesize
+setegid
+_setegid = setegid
+setegid32
+setenv
+_setenv = setenv
+seteuid
+_seteuid = seteuid
+seteuid32
 setgid
 _setgid = setgid
 setgid32
+setgrent
+_setgrent = setgrent
 setgroups
 _setgroups = setgroups
 setgroups32
+sethostent
+setitimer
 setjmp
 _setjmp = setjmp
+setlinebuf
 setlocale
 _setlocale = setlocale
+setlogmask
+setmntent
+_setmntent = setmntent
+setmode
+_setmode = setmode
+setpassent
+_setpassent = setpassent
 setpgid
 _setpgid = setpgid
+setpgrp
+_setpgrp = setpgrp
+setpwent
+_setpwent = setpwent
 setregid
 _setregid = setregid
 setregid32
@@ -751,43 +1083,45 @@ setrlimit
 _setrlimit = setrlimit
 setsid
 _setsid = setsid
+setstate
 settimeofday
 _settimeofday = settimeofday
-seteuid
-_seteuid = seteuid
-seteuid32
-setegid
-_setegid = setegid
-setegid32
 setuid
 _setuid = setuid
 setuid32
 setutent
 _setutent = setutent
-chroot
-_chroot = chroot
 setvbuf
 _setvbuf = setvbuf
+sexecl = sexecve_is_bad
+sexecle = sexecve_is_bad
+sexeclp = sexecve_is_bad
+sexeclpe = sexecve_is_bad
+sexecp = sexecve_is_bad
+sexecv = sexecve_is_bad
+sexecve = sexecve_is_bad
+sexecvpe = sexecve_is_bad
 sigaction
 _sigaction = sigaction
 sigaddset
 _sigaddset = sigaddset
 sigdelset
 _sigdelset = sigdelset
-sigismember
-_sigismember = sigismember
 sigemptyset
 _sigemptyset = sigemptyset
 sigfillset
 _sigfillset = sigfillset
 siginterrupt
 _siginterrupt = siginterrupt
+sigismember
+_sigismember = sigismember
 signal
 _signal = signal
 significand
 _significand = significand
 significandf
 _significandf = significandf
+sigpause
 sigpending
 _sigpending = sigpending
 sigprocmask
@@ -796,6 +1130,8 @@ sigsuspend
 _sigsuspend = sigsuspend
 sin
 _sin = sin
+sincos
+sincosf
 sinf
 _sinf = sinf
 sinh
@@ -806,6 +1142,9 @@ siprintf
 _siprintf = siprintf
 sleep
 _sleep = sleep
+snprintf
+_snprintf = snprintf
+socketpair
 spawnl
 _spawnl = spawnl
 spawnle
@@ -824,21 +1163,17 @@ spawnvpe
 _spawnvpe = spawnvpe
 sprintf
 _sprintf = sprintf
-snprintf
-_snprintf = snprintf
 sqrt
 _sqrt = sqrt
 sqrtf
 _sqrtf = sqrtf
 srand
 _srand = srand
+srand48
+_srand48 = srand48
 srandom
 sscanf
 _sscanf = sscanf
-_sscanf_r
-sscanf_r = _sscanf_r
-_stat
-stat = _stat
 stat64
 statfs
 _statfs = statfs
@@ -862,6 +1197,12 @@ strerror
 _strerror = strerror
 strerror_r
 _strerror_r = strerror_r
+strftime
+_strftime = strftime
+strlcat
+_strlcat = strlcat
+strlcpy
+_strlcpy = strlcpy
 strlen
 _strlen = strlen
 strlwr
@@ -878,8 +1219,13 @@ strndup
 strnlen
 strpbrk
 _strpbrk = strpbrk
+strptime
+_strptime = strptime
 strrchr
 _strrchr = strrchr
+strsep
+_strsep = strsep
+strsignal
 strspn
 _strspn = strspn
 strstr
@@ -887,17 +1233,17 @@ _strstr = strstr
 strtod
 _strtod = strtod
 strtof
-strtodf = strtof
 _strtodf = strtof
+strtodf = strtof
 strtok
 _strtok = strtok
 strtok_r
 _strtok_r = strtok_r
 strtol
 _strtol = strtol
-_strtold
 strtoll
 _strtoll = strtoll
+strtosigno
 strtoul
 _strtoul = strtoul
 strtoull
@@ -914,6 +1260,8 @@ sync
 _sync = sync
 sysconf
 _sysconf = sysconf
+syslog
+_syslog = syslog
 system
 _system = system
 tan
@@ -948,6 +1296,8 @@ telldir64
 tempnam
 _tempnam = tempnam
 tfind
+tgamma
+tgammaf
 time
 _time = time
 times
@@ -969,9 +1319,11 @@ towupper
 truncate
 _truncate = truncate
 truncate64
+truncf
 tsearch
 ttyname
 _ttyname = ttyname
+ttyslot
 twalk
 tzset
 _tzset = tzset
@@ -979,12 +1331,17 @@ ualarm
 _ualarm = ualarm
 umask
 _umask = umask
+umount
+_umount = umount
 uname
 _uname = uname
 ungetc
 _ungetc = ungetc
 unlink
 _unlink = unlink
+unlockpt
+unsetenv
+_unsetenv = unsetenv
 usleep
 _usleep = usleep
 utime
@@ -996,8 +1353,6 @@ _utmpname = utmpname
 valloc
 vasprintf
 _vasprintf = vasprintf
-_vasprintf_r
-vasprintf_r = _vasprintf_r
 vfiprintf
 _vfiprintf = vfiprintf
 vfork
@@ -1006,50 +1361,48 @@ vfprintf
 _vfprintf = vfprintf
 vfscanf
 _vfscanf = vfscanf
-_vfscanf_r
-vfscanf_r = _vfscanf_r
+vhangup
+_vhangup = vhangup
 vprintf
 _vprintf = vprintf
 vscanf
 _vscanf = vscanf
-_vscanf_r
-vscanf_r = _vscanf_r
-vsprintf
-_vsprintf = vsprintf
 vsnprintf
 _vsnprintf = vsnprintf
+vsprintf
+_vsprintf = vsprintf
 vsscanf
 _vsscanf = vsscanf
-_vsscanf_r
-vsscanf_r = _vsscanf_r
 wait
 _wait = wait
-waitpid
-_waitpid = waitpid
 wait3
 wait4
-mbsrtowcs
+waitpid
+_waitpid = waitpid
 wcrtomb
-wctob
 wcscat
 wcschr
+wcscmp
+_wcscmp = wcscmp
 wcscpy
 wcscspn
 wcslcat
 wcslcpy
+wcslen
+_wcslen = wcslen
 wcsncat
 wcsncmp
 wcsncpy
 wcspbrk
-wcsrtombs
 wcsrchr
+wcsrtombs
 wcsspn
 wcsstr
+wcstombs
+_wcstombs = wcstombs
 wctob
 wctomb
 _wctomb = wctomb
-wcstombs
-_wcstombs = wcstombs
 wctrans
 wctype
 wmemchr
@@ -1057,6 +1410,8 @@ wmemcmp
 wmemcpy
 wmemmove
 wmemset
+wprintf
+_wprintf = wprintf
 write
 _write = write
 writev
@@ -1067,334 +1422,3 @@ y1
 y1f
 yn
 ynf
-drand48
-_drand48 = drand48
-erand48
-_erand48 = erand48
-jrand48
-_jrand48 = jrand48
-lcong48
-_lcong48 = lcong48
-lrand48
-_lrand48 = lrand48
-mrand48
-_lrand48 = lrand48
-nrand48
-_nrand48 = nrand48
-seed48
-_seed48 = seed48
-srand48
-_srand48 = srand48
-setbuffer
-setlinebuf
-setmode
-_setmode = setmode
-__assertfail
-getw
-_getw = getw
-getwd
-_getwd = getwd
-popen
-_popen = popen
-pclose
-_pclose = pclose
-strftime
-_strftime = strftime
-strlcat
-_strlcat = strlcat
-strlcpy
-_strlcpy = strlcpy
-strptime
-_strptime = strptime
-setgrent
-_setgrent = setgrent
-cuserid
-_cuserid = cuserid
-setpgrp
-_setpgrp = setpgrp
-mount
-_mount = mount
-setmntent
-_setmntent = setmntent
-endmntent
-_endmntent = endmntent
-umount
-_umount = umount
-wcscmp
-_wcscmp = wcscmp
-wcslen
-_wcslen = wcslen
-wprintf
-_wprintf = wprintf
-memccpy
-_memccpy = memccpy
-getpwent
-_getpwent = getpwent
-endpwent
-_endpwent = endpwent
-setpwent
-_setpwent = setpwent
-getpwduid
-_getpwduid = getpwduid
-getpwnam
-_getpwnam = getpwnam
-getpwnam_r
-getpwuid
-_getpwuid = getpwuid
-getpwuid32
-getpwuid_r
-getpwuid_r32
-getpgrp
-_getpgrp = getpgrp
-getgrent
-_getgrent = getgrent
-getgrent32
-ntohl
-_ntohl = ntohl
-htonl
-_htonl = htonl
-htons
-_htons = htons
-ntohs
-_ntohs = ntohs
-a64l
-accept = cygwin_accept
-bind = cygwin_bind
-connect = cygwin_connect
-hstrerror = cygwin_hstrerror
-herror = cygwin_herror
-inet_addr = cygwin_inet_addr
-inet_network = cygwin_inet_network
-inet_netof
-inet_makeaddr
-listen = cygwin_listen
-getdomainname
-_getdomainname = getdomainname
-gethostbyaddr = cygwin_gethostbyaddr
-gethostbyname = cygwin_gethostbyname
-getpeername = cygwin_getpeername
-getprotobyname = cygwin_getprotobyname
-getprotobynumber = cygwin_getprotobynumber
-getservbyname = cygwin_getservbyname
-getservbyport = cygwin_getservbyport
-getsockname = cygwin_getsockname
-getsockopt = cygwin_getsockopt
-recv = cygwin_recv
-select = cygwin_select
-_select = cygwin_select
-send = cygwin_send
-socket = cygwin_socket
-setsockopt = cygwin_setsockopt
-inet_aton = cygwin_inet_aton
-inet_ntoa = cygwin_inet_ntoa
-recvfrom = cygwin_recvfrom
-recvmsg = cygwin_recvmsg
-sendmsg = cygwin_sendmsg
-sendto = cygwin_sendto
-shutdown = cygwin_shutdown
-sethostent
-endhostent
-setpassent
-_setpassent = setpassent
-strsep
-_strsep = strsep
-syslog
-_syslog = syslog
-closelog
-_closelog = closelog
-openlog
-_openlog = openlog
-setlogmask
-vhangup
-_vhangup = vhangup
-nice
-_nice = nice
-cygwin_conv_to_win32_path
-cygwin_conv_to_full_win32_path
-cygwin_conv_to_posix_path
-cygwin_conv_to_full_posix_path
-cygwin_posix_path_list_p
-cygwin_win32_to_posix_path_list_buf_size
-cygwin_posix_to_win32_path_list_buf_size
-cygwin_win32_to_posix_path_list
-cygwin_posix_to_win32_path_list
-cygwin_split_path
-cygwin_umount
-cygwin32_conv_to_win32_path = cygwin_conv_to_win32_path
-cygwin32_conv_to_full_win32_path = cygwin_conv_to_full_win32_path
-cygwin32_conv_to_posix_path = cygwin_conv_to_posix_path
-cygwin32_conv_to_full_posix_path = cygwin_conv_to_full_posix_path
-cygwin32_posix_path_list_p = cygwin_posix_path_list_p
-cygwin32_win32_to_posix_path_list_buf_size = cygwin_win32_to_posix_path_list_buf_size
-cygwin32_posix_to_win32_path_list_buf_size = cygwin_posix_to_win32_path_list_buf_size
-cygwin32_win32_to_posix_path_list = cygwin_win32_to_posix_path_list
-cygwin32_posix_to_win32_path_list = cygwin_posix_to_win32_path_list
-cygwin32_split_path = cygwin_split_path
-cygwin_winpid_to_pid
-cygwin32_winpid_to_pid = cygwin_winpid_to_pid
-cygwin_logon_user
-cygwin_set_impersonation_token
-realpath
-reent_data DATA
-getenv
-_getenv = getenv
-putenv
-_putenv = putenv
-setenv
-_setenv = setenv
-unsetenv
-_unsetenv = unsetenv
-setitimer
-getitimer
-getpgid
-killpg
-pause
-__cygwin_environ DATA
-__cygwin_user_data DATA
-_ctype_ DATA
-_sys_errlist DATA
-sys_errlist = _sys_errlist DATA
-_sys_nerr DATA
-sys_nerr = _sys_nerr DATA
-__mb_cur_max DATA
-_timezone DATA
-_daylight DATA
-_tzname DATA
-ptsname
-grantpt
-unlockpt
-sexecve = sexecve_is_bad
-sexecl = sexecve_is_bad
-sexecle = sexecve_is_bad
-sexeclp = sexecve_is_bad
-sexeclpe = sexecve_is_bad
-sexecv = sexecve_is_bad
-sexecp = sexecve_is_bad
-sexecvpe = sexecve_is_bad
-ttyslot
-rcmd = cygwin_rcmd
-rresvport = cygwin_rresvport
-rexec = cygwin_rexec
-socketpair
-strsignal
-strtosigno
-ctermid
-dlopen
-dlclose
-dlsym
-dlerror
-dlfork
-sigpause
-cygwin_attach_handle_to_fd
-cygwin32_attach_handle_to_fd = cygwin_attach_handle_to_fd
-cygwin_internal
-cygwin32_internal = cygwin_internal
-pthread_atfork
-pthread_attr_destroy
-pthread_attr_getdetachstate
-pthread_attr_getinheritsched
-pthread_attr_getschedparam
-pthread_attr_getschedpolicy
-pthread_attr_getscope
-pthread_attr_getstacksize
-pthread_attr_init
-pthread_attr_setdetachstate
-pthread_attr_setinheritsched
-pthread_attr_setschedparam
-pthread_attr_setschedpolicy
-pthread_attr_setscope
-pthread_attr_setstacksize
-pthread_cancel
-_pthread_cleanup_push
-_pthread_cleanup_pop
-pthread_cond_broadcast
-pthread_cond_destroy
-pthread_cond_init
-pthread_cond_signal
-pthread_cond_timedwait
-pthread_cond_wait
-pthread_condattr_destroy
-pthread_condattr_getpshared
-pthread_condattr_init
-pthread_condattr_setpshared
-pthread_create
-pthread_detach
-pthread_equal
-pthread_exit
-pthread_getconcurrency
-pthread_getschedparam
-pthread_getsequence_np
-pthread_getspecific
-pthread_join
-pthread_key_create
-pthread_key_delete
-pthread_mutex_destroy
-pthread_mutex_getprioceiling
-pthread_mutex_init
-pthread_mutex_lock
-pthread_mutex_setprioceiling
-pthread_mutex_trylock
-pthread_mutex_unlock
-pthread_mutexattr_destroy
-pthread_mutexattr_getprioceiling
-pthread_mutexattr_getprotocol
-pthread_mutexattr_getpshared
-pthread_mutexattr_gettype
-pthread_mutexattr_init
-pthread_mutexattr_setprioceiling
-pthread_mutexattr_setprotocol
-pthread_mutexattr_setpshared
-pthread_mutexattr_settype
-pthread_once
-pthread_self
-pthread_setcancelstate
-pthread_setcanceltype
-pthread_setconcurrency
-pthread_setschedparam
-pthread_setspecific
-pthread_testcancel
-pthread_suspend
-pthread_continue
-pthread_kill
-pthread_sigmask
-sem_init
-sem_destroy
-sem_wait
-sem_trywait
-sem_post
-sched_get_priority_max
-sched_get_priority_min
-sched_getparam
-sched_getscheduler
-sched_rr_get_interval
-sched_setparam
-sched_setscheduler
-sched_yield
-acl
-_acl = acl
-facl
-_facl = facl
-lacl
-_lacl = lacl
-aclcheck
-_aclcheck = aclcheck
-aclsort
-_aclsort = aclsort
-acltomode
-_acltomode = acltomode
-aclfrommode
-_aclfrommode = aclfrommode
-acltopbits
-_acltopbits = acltopbits
-aclfrompbits
-_aclfrompbits = aclfrompbits
-acltotext
-_acltotext = acltotext
-aclfromtext
-_aclfromtext = aclfromtext
-setprotoent = cygwin_setprotoent
-setservent = cygwin_setservent
-getservent = cygwin_getservent
-getprotoent = cygwin_getprotoent
-endprotoent = cygwin_endprotoent
-endservent = cygwin_endservent
