@@ -1,3 +1,9 @@
+2000-07-29  Marek Michalkiewicz  <marekm@linux.org.pl>
+
+	* avr.h (AVR_UNDEF_P, AVR_SKIP_P, AVR_DISP0_P): New macros.
+	Move related opcodes closer to each other.
+	Minor changes in comments, list undefined opcodes.
+
 2000-07-26  Dave Brolley  <brolley@redhat.com>
 
 	* cgen.h (cgen_hw_lookup_by_num): Second parameter is unsigned.
