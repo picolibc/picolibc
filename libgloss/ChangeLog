@@ -1,3 +1,11 @@
+2002-11-08 Jeff Johnston  <jjohnstn@redhat.com> 
+	   Catherine Moore  <clm@redhat.com>
+
+        * m32r/configure.in:  Do not require gcc to be able to link an
+        executable.
+        * m32r/configure: Regenerate.
+	* m32r/Makefile.in: Directly reference gdbstub.
+
 2002-10-25  Bernd Schmidt  <bernds@redhat.com>
 
         * i386/cygmon.ld: Add entry for .gcc_except_table.

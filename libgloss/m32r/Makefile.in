@@ -64,7 +64,7 @@ TARGETDOC = ../../targetdep.tex
 
 CRT0 = crt0.o
 GDBLIB = m32r-lib.o
-GDBSTUB = @GDBSTUB@
+GDBSTUB = m32r-stub.o
 EVASCRIPT = eva.ld
 STUBSCRIPT = eva-stub.ld
 

@@ -28,7 +28,6 @@ program_suffix=NONE
 program_transform_name=s,x,x,
 silent=
 site=
-sitefile=
 srcdir=
 target=NONE
 verbose=
@@ -143,7 +142,6 @@ Configuration:
   --help                  print this message
   --no-create             do not create output files
   --quiet, --silent       do not print \`checking...' messages
-  --site-file=FILE        use FILE as the site file
   --version               print the version of autoconf that created configure
 Directory and file names:
   --prefix=PREFIX         install architecture-independent files in PREFIX
@@ -314,11 +312,6 @@ EOF
   -site=* | --site=* | --sit=*)
     site="$ac_optarg" ;;
 
-  -site-file | --site-file | --site-fil | --site-fi | --site-f)
-    ac_prev=sitefile ;;
-  -site-file=* | --site-file=* | --site-fil=* | --site-fi=* | --site-f=*)
-    sitefile="$ac_optarg" ;;
-
   -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
     ac_prev=srcdir ;;
   -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
@@ -484,16 +477,12 @@ fi
 srcdir=`echo "${srcdir}" | sed 's%\([^/]\)/*$%\1%'`
 
 # Prefer explicitly selected file to automatically selected ones.
-if test -z "$sitefile"; then
-  if test -z "$CONFIG_SITE"; then
-    if test "x$prefix" != xNONE; then
-      CONFIG_SITE="$prefix/share/config.site $prefix/etc/config.site"
-    else
-      CONFIG_SITE="$ac_default_prefix/share/config.site $ac_default_prefix/etc/config.site"
-    fi
+if test -z "$CONFIG_SITE"; then
+  if test "x$prefix" != xNONE; then
+    CONFIG_SITE="$prefix/share/config.site $prefix/etc/config.site"
+  else
+    CONFIG_SITE="$ac_default_prefix/share/config.site $ac_default_prefix/etc/config.site"
   fi
-else
-  CONFIG_SITE="$sitefile"
 fi
 for ac_site_file in $CONFIG_SITE; do
   if test -r "$ac_site_file"; then
@@ -533,21 +522,8 @@ fi
 
 
 
-if test "${enable_shared}" = "yes" ; then
-    echo "Shared libraries not supported for cross compiling, ignored"
-fi
-
-if test "$srcdir" = "." ; then
-  if test "${with_target_subdir}" != "." ; then
-    libgloss_topdir="${srcdir}/${with_multisrctop}../../.."
-  else
-    libgloss_topdir="${srcdir}/${with_multisrctop}../.."
-  fi
-else
-  libgloss_topdir="${srcdir}/../.."
-fi
 ac_aux_dir=
-for ac_dir in $libgloss_topdir $srcdir/$libgloss_topdir; do
+for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
   if test -f $ac_dir/install-sh; then
     ac_aux_dir=$ac_dir
     ac_install_sh="$ac_aux_dir/install-sh -c"
@@ -559,19 +535,11 @@ for ac_dir in $libgloss_topdir $srcdir/$libgloss_topdir; do
   fi
 done
 if test -z "$ac_aux_dir"; then
-  { echo "configure: error: can not find install-sh or install.sh in $libgloss_topdir $srcdir/$libgloss_topdir" 1>&2; exit 1; }
+  { echo "configure: error: can not find install-sh or install.sh in $srcdir $srcdir/.. $srcdir/../.." 1>&2; exit 1; }
 fi
 ac_config_guess=$ac_aux_dir/config.guess
 ac_config_sub=$ac_aux_dir/config.sub
 ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
-
-
-if test -f "${srcdir}/${with_multisrctop}../../gdb/m32r-stub.c"; then
-  GDBSTUB=${srcdir}/${with_multisrctop}../../gdb/m32r-stub.c
-else
-  GDBSTUB=
-fi
-
 
 
 # Do some error checking and defaulting for the host and target type.
@@ -601,7 +569,7 @@ else { echo "configure: error: can not run $ac_config_sub" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking host system type""... $ac_c" 1>&6
-echo "configure:605: checking host system type" >&5
+echo "configure:573: checking host system type" >&5
 
 host_alias=$host
 case "$host_alias" in
@@ -622,7 +590,7 @@ host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$host" 1>&6
 
 echo $ac_n "checking target system type""... $ac_c" 1>&6
-echo "configure:626: checking target system type" >&5
+echo "configure:594: checking target system type" >&5
 
 target_alias=$target
 case "$target_alias" in
@@ -640,7 +608,7 @@ target_os=`echo $target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$target" 1>&6
 
 echo $ac_n "checking build system type""... $ac_c" 1>&6
-echo "configure:644: checking build system type" >&5
+echo "configure:612: checking build system type" >&5
 
 build_alias=$build
 case "$build_alias" in
@@ -682,6 +650,50 @@ test "$program_suffix" != NONE &&
 test "$program_transform_name" = "" && program_transform_name="s,x,x,"
 
 
+if test "$srcdir" = "." ; then
+  mdir=`echo "${with_multisubdir}/" \
+    | sed -e 's,\([^/][^/]*\),..,g' -e 's,^/$,,'`
+  ac_aux_dir=
+for ac_dir in ${mdir}../../.. $srcdir/${mdir}../../..; do
+  if test -f $ac_dir/install-sh; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/install-sh -c"
+    break
+  elif test -f $ac_dir/install.sh; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/install.sh -c"
+    break
+  fi
+done
+if test -z "$ac_aux_dir"; then
+  { echo "configure: error: can not find install-sh or install.sh in ${mdir}../../.. $srcdir/${mdir}../../.." 1>&2; exit 1; }
+fi
+ac_config_guess=$ac_aux_dir/config.guess
+ac_config_sub=$ac_aux_dir/config.sub
+ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
+
+else
+  ac_aux_dir=
+for ac_dir in ${srcdir}/../.. $srcdir/${srcdir}/../..; do
+  if test -f $ac_dir/install-sh; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/install-sh -c"
+    break
+  elif test -f $ac_dir/install.sh; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/install.sh -c"
+    break
+  fi
+done
+if test -z "$ac_aux_dir"; then
+  { echo "configure: error: can not find install-sh or install.sh in ${srcdir}/../.. $srcdir/${srcdir}/../.." 1>&2; exit 1; }
+fi
+ac_config_guess=$ac_aux_dir/config.guess
+ac_config_sub=$ac_aux_dir/config.sub
+ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
+
+fi
+
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
 # incompatible versions:
@@ -694,7 +706,7 @@ test "$program_transform_name" = "" && program_transform_name="s,x,x,"
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:698: checking for a BSD compatible install" >&5
+echo "configure:710: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -758,7 +770,7 @@ test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:762: checking for $ac_word" >&5
+echo "configure:774: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -788,7 +800,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:792: checking for $ac_word" >&5
+echo "configure:804: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -837,7 +849,7 @@ fi
 fi
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:841: checking whether we are using GNU C" >&5
+echo "configure:853: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -846,7 +858,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:850: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:862: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -861,7 +873,7 @@ if test $ac_cv_prog_gcc = yes; then
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
   echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:865: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:877: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -897,7 +909,7 @@ LD=${LD-ld}
 # Extract the first word of "ranlib", so it can be a program name with args.
 set dummy ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:901: checking for $ac_word" >&5
+echo "configure:913: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_RANLIB'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1076,7 +1088,6 @@ s%@includedir@%$includedir%g
 s%@oldincludedir@%$oldincludedir%g
 s%@infodir@%$infodir%g
 s%@mandir@%$mandir%g
-s%@GDBSTUB@%$GDBSTUB%g
 s%@host@%$host%g
 s%@host_alias@%$host_alias%g
 s%@host_cpu@%$host_cpu%g
@@ -1205,15 +1216,10 @@ rm -f conftest.s*
 
 EOF
 cat >> $CONFIG_STATUS <<EOF
-srcdir=${srcdir}
-target=${target}
-ac_configure_args="${ac_configure_args} --enable-multilib"
-CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
-libgloss_topdir=${libgloss_topdir}
 
 EOF
 cat >> $CONFIG_STATUS <<\EOF
-. ${libgloss_topdir}/config-ml.in
+
 exit 0
 EOF
 chmod +x $CONFIG_STATUS
