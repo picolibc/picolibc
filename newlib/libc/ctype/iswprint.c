@@ -82,12 +82,12 @@ _DEFUN(iswprint,(c), wint_t c)
     }
   else if (!strcmp (__lc_ctype, "C-SJIS"))
     {
-      c = __jp2uc (c, JP_JIS);
+      c = __jp2uc (c, JP_SJIS);
       unicode = 1;
     }
   else if (!strcmp (__lc_ctype, "C-EUCJP"))
     {
-      c = __jp2uc (c, JP_JIS);
+      c = __jp2uc (c, JP_EUCJP);
       unicode = 1;
     }
   else if (!strcmp (__lc_ctype, "C-UTF-8"))

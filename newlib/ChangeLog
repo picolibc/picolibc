@@ -1,3 +1,15 @@
+2003-07-31  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/ctype/iswalpha.c: Fix calls to __jp2uc to pass the
+	correct type of conversion when dealing with EUCJP or SJIS.
+	* libc/ctype/iswblank.c: Ditto.
+	* libc/ctype/iswcntrl.c: Ditto.
+	* libc/ctype/iswprint.c: Ditto.
+	* libc/ctype/iswpunct.c: Ditto.
+	* libc/ctype/iswspace.c: Ditto.
+	* libc/ctype/towlower.c: Ditto.
+	* libc/ctype/towupper.c: Ditto.
+
 2003-07-31  Nick Clifton  <nickc@redhat.com>
 
 	* libc/sys/sysnecv850/crt0.S (_start): Allocate 4 slots on stack
