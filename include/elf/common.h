@@ -1,5 +1,5 @@
 /* ELF support for BFD.
-   Copyright (C) 1991,92,93,94,95,96,97,98,99 Free Software Foundation, Inc.
+   Copyright (C) 1991,92,93,94,95,96,97,98,1999 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
@@ -98,6 +98,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_SPARC32PLUS 18	/* Sun's "v8plus" */
 #define EM_960         19       /* Intel 80960 */
 #define EM_PPC	       20	/* PowerPC */
+#define EM_PPC64       21	/* 64-bit PowerPC */
 
 #define EM_V800        36	/* NEC V800 series */
 #define EM_FR20	       37	/* Fujitsu FR20 */

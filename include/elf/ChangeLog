@@ -1,3 +1,7 @@
+1999-06-03  Ian Lance Taylor  <ian@zembu.com>
+
+	* common.h (EM_PPC64): Define.
+
 1999-06-02  Stu Grossman  <grossman@babylon-5.cygnus.com>
 
 	* dwarf.h: Add LANG_JAVA.
