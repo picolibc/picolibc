@@ -1,3 +1,7 @@
+2002-07-24  Egor Duda  <deo@logos-m.ru>
+
+	* include/cygwin/version.h: Bump minor API version.
+
 2002-07-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_serial.cc: Change 'must_init_serial_line capability'
