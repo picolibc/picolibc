@@ -1210,13 +1210,7 @@ pthread_rwlock::unlock ()
       delete reader;
     }
 
-  if (waiting_writers)
-    {
-      if (!readers)
-        cond_writers.unblock (false);
-    }
-  else if (waiting_readers)
-    cond_readers.unblock (true);
+  release ();
 
  DONE:
   mtx.unlock ();
@@ -1263,6 +1257,7 @@ pthread_rwlock::rdlock_cleanup (void *arg)
   pthread_rwlock *rwlock = (pthread_rwlock *) arg;
 
   --(rwlock->waiting_readers);
+  rwlock->release ();
   rwlock->mtx.unlock ();
 }
 
@@ -1272,6 +1267,7 @@ pthread_rwlock::wrlock_cleanup (void *arg)
   pthread_rwlock *rwlock = (pthread_rwlock *) arg;
 
   --(rwlock->waiting_writers);
+  rwlock->release ();
   rwlock->mtx.unlock ();
 }
 

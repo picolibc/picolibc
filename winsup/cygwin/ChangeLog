@@ -1,3 +1,12 @@
+2003-04-15  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (pthread_rwlock::release): New method.
+	* thread.cc (pthread_rwlock::unlock): Use release to signal
+	waiting threads.
+	(pthread_rwlock::rdlock_cleanup): Signal waiting threads after a
+	cancelation.
+	(pthread_rwlock::wrlock_cleanup): Ditto.
+
 2003-04-13  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* mkvers.sh: Prefix day with 0 in date only when day < 10.

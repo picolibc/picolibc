@@ -587,6 +587,18 @@ private:
   void remove_reader (struct RWLOCK_READER *rd);
   struct RWLOCK_READER *lookup_reader (pthread_t thread);
 
+  void release ()
+  {
+    if (waiting_writers)
+      {
+        if (!readers)
+          cond_writers.unblock (false);
+      }
+    else if (waiting_readers)
+      cond_readers.unblock (true);
+  }
+
+
   static void rdlock_cleanup (void *arg);
   static void wrlock_cleanup (void *arg);
 
