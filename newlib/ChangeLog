@@ -1,3 +1,18 @@
+2002-09-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/posix/opendir.c (opendir): Change code to check
+	for HAVE_FCNTL before calling fcntl.
+	* libc/search/hash.c (hash_open): Ditto.
+	* libc/search/hash_page.c (open_tmp): Ditto.
+	* libc/reent/Makefile.am: Add fcntlr.c.
+	* libc/reent/Makefile.in: Regenerated.
+	* libc/reent/fcntlr.c: New file.
+	* libc/stdio/fdopen.c (_fdopen_r): Change to call _fcntl_r
+	instead of _fcntl when HAVE_FCNTL flag is set.
+	* libc/syscalls/sysfcntl.c (fcntl): Check for HAVE_FCNTL flag
+	to see if _fcntl or _fcntl_r should be called.  If flag is not
+	set, default to ENOSYS stub.
+
 2002-09-16  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/wchar.h (mbstate_t): Change protective flag to

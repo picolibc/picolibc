@@ -52,10 +52,14 @@ opendir(name)
 {
 	register DIR *dirp;
 	register int fd;
+	int rc = 0;
 
 	if ((fd = open(name, 0)) == -1)
 		return NULL;
-	if (fcntl(fd, F_SETFD, 1) == -1 ||
+#ifdef HAVE_FCNTL
+	rc = fcntl(fd, F_SETFD, 1);
+#endif
+	if (rc == -1 ||
 	    (dirp = (DIR *)malloc(sizeof(DIR))) == NULL) {
 		close (fd);
 		return NULL;

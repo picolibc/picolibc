@@ -130,6 +130,7 @@ GENERAL_SOURCES = \
 	closer.c \
 	reent.c \
 	impure.c \
+	fcntlr.c \
 	fstatr.c \
 	getreent.c \
 	linkr.c \
@@ -162,6 +163,7 @@ CHEWOUT_FILES = \
 	closer.def \
 	reent.def \
 	execr.def \
+	fcntlr.def \
 	fstatr.def \
 	linkr.def \
 	lseekr.def \
@@ -192,17 +194,17 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  closer.$(OBJEXT) reent.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@impure.$(OBJEXT) fstatr.$(OBJEXT) getreent.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@linkr.$(OBJEXT) lseekr.$(OBJEXT) openr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@readr.$(OBJEXT) signalr.$(OBJEXT) signgam.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sbrkr.$(OBJEXT) statr.$(OBJEXT) timer.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@unlinkr.$(OBJEXT) writer.$(OBJEXT)
+@USE_LIBTOOL_FALSE@impure.$(OBJEXT) fcntlr.$(OBJEXT) fstatr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getreent.$(OBJEXT) linkr.$(OBJEXT) lseekr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@openr.$(OBJEXT) readr.$(OBJEXT) signalr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@signgam.$(OBJEXT) sbrkr.$(OBJEXT) statr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@timer.$(OBJEXT) unlinkr.$(OBJEXT) writer.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libreent_la_OBJECTS =  closer.lo reent.lo impure.lo \
-@USE_LIBTOOL_TRUE@fstatr.lo getreent.lo linkr.lo lseekr.lo openr.lo \
-@USE_LIBTOOL_TRUE@readr.lo signalr.lo signgam.lo sbrkr.lo statr.lo \
-@USE_LIBTOOL_TRUE@timer.lo unlinkr.lo writer.lo
+@USE_LIBTOOL_TRUE@fcntlr.lo fstatr.lo getreent.lo linkr.lo lseekr.lo \
+@USE_LIBTOOL_TRUE@openr.lo readr.lo signalr.lo signgam.lo sbrkr.lo \
+@USE_LIBTOOL_TRUE@statr.lo timer.lo unlinkr.lo writer.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

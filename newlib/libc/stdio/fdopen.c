@@ -64,7 +64,7 @@ _DEFUN (_fdopen_r, (ptr, fd, mode),
 
   /* make sure the mode the user wants is a subset of the actual mode */
 #ifdef HAVE_FCNTL
-  if ((fdflags = _fcntl (fd, F_GETFL, 0)) < 0)
+  if ((fdflags = _fcntl_r (ptr, fd, F_GETFL, 0)) < 0)
     return 0;
   fdmode = fdflags & O_ACCMODE;
   if (fdmode != O_RDWR && (fdmode != (oflags & O_ACCMODE)))

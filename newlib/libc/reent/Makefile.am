@@ -33,6 +33,7 @@ GENERAL_SOURCES = \
 	closer.c \
 	reent.c \
 	impure.c \
+	fcntlr.c \
 	fstatr.c \
 	getreent.c \
 	linkr.c \
@@ -69,6 +70,7 @@ CHEWOUT_FILES = \
 	closer.def \
 	reent.def \
 	execr.def \
+	fcntlr.def \
 	fstatr.def \
 	linkr.def \
 	lseekr.def \

@@ -143,7 +143,9 @@ __hash_open(file, flags, mode, info, dflags)
 		     fstat(hashp->fp, &statbuf) == 0 && statbuf.st_size == 0)
 			new_table = 1;
 
+#ifdef HAVE_FCNTL
 		(void)fcntl(hashp->fp, F_SETFD, 1);
+#endif
 	}
 	if (new_table) {
 		if (!(hashp = init_hash(hashp, file, (HASHINFO *)info)))
