@@ -92,11 +92,11 @@ Other options:\n\
   -c, --close HANDLE    close HANDLE (for use in captured process)\n\
   -i, --ignore		ignore missing argument\n\
   -h, --help            output usage information and exit\n\
-  -v, --version		output version information and exit\
+  -v, --version		output version information and exit\n\
 ");
     }
   else
-    fprintf(stream, "Try `%s --help' for more information.", prog_name);
+    fprintf(stream, "Try `%s --help' for more information.\n", prog_name);
   exit (ignore_flag ? 0 : status);
 }
 
