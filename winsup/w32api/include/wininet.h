@@ -473,10 +473,13 @@ GOPHER_TYPE_UNIX_UUENCODED|GOPHER_TYPE_BINARY|GOPHER_TYPE_GIF|GOPHER_TYPE_IMAGE|
 #define INTERNET_AUTODIAL_FORCE_ONLINE	1
 #define INTERNET_AUTODIAL_FORCE_UNATTENDED	2
 #define INTERNET_AUTODIAL_FAILIFSECURITYCHECK	4
-#define INTERNET_CONNECTION_MODEM	1
-#define INTERNET_CONNECTION_LAN	2
-#define INTERNET_CONNECTION_PROXY	4
-#define INTERNET_CONNECTION_MODEM_BUSY	8
+#define INTERNET_CONNECTION_MODEM	0x01
+#define INTERNET_CONNECTION_LAN		0x02
+#define INTERNET_CONNECTION_PROXY	0x04
+#define INTERNET_CONNECTION_MODEM_BUSY	0x08
+#define INTERNET_RAS_INSTALLED		0x10
+#define INTERNET_CONNECTION_OFFLINE	0x20
+#define INTERNET_CONNECTION_CONFIGURED	0x40
 #define CACHEGROUP_SEARCH_ALL	0
 #define CACHEGROUP_SEARCH_BYURL	1
 #define INTERNET_CACHE_GROUP_ADD	0
@@ -743,6 +746,8 @@ BOOL WINAPI InternetCreateUrlA(LPURL_COMPONENTSA,DWORD,LPSTR,PDWORD);
 BOOL WINAPI InternetCreateUrlW(LPURL_COMPONENTSW,DWORD,LPWSTR,PDWORD);
 BOOL WINAPI InternetCanonicalizeUrlA(LPCSTR,LPSTR,PDWORD,DWORD);
 BOOL WINAPI InternetCanonicalizeUrlW(LPCWSTR,LPWSTR,PDWORD,DWORD);
+BOOL WINAPI InternetCheckConnectionA(LPCSTR,DWORD,DWORD);
+BOOL WINAPI InternetCheckConnectionW(LPCWSTR,DWORD,DWORD);
 BOOL WINAPI InternetCombineUrlA(LPCSTR,LPCSTR,LPSTR,PDWORD,DWORD);
 BOOL WINAPI InternetCombineUrlW(LPCWSTR,LPCWSTR,LPWSTR,PDWORD,DWORD);
 HINTERNET WINAPI InternetOpenA(LPCSTR,DWORD,LPCSTR,LPCSTR,DWORD);
@@ -863,6 +868,7 @@ BOOL WINAPI SetUrlCacheGroupAttributeW(GROUPID,DWORD,DWORD,LPINTERNET_CACHE_GROU
 #define InternetCrackUrl InternetCrackUrlW
 #define InternetCreateUrl InternetCreateUrlW
 #define InternetCanonicalizeUrl InternetCanonicalizeUrlW
+#define InternetCheckConnection InternetCheckConnectionW
 #define InternetCombineUrl InternetCombineUrlW
 #define InternetOpen InternetOpenW
 #define InternetConnect InternetConnectW
@@ -912,6 +918,7 @@ BOOL WINAPI SetUrlCacheGroupAttributeW(GROUPID,DWORD,DWORD,LPINTERNET_CACHE_GROU
 #define InternetCrackUrl InternetCrackUrlA
 #define InternetCreateUrl InternetCreateUrlA
 #define InternetCanonicalizeUrl InternetCanonicalizeUrlA
+#define InternetCheckConnection InternetCheckConnectionA
 #define InternetCombineUrl InternetCombineUrlA
 #define InternetOpen InternetOpenA
 #define InternetConnect InternetConnectA
