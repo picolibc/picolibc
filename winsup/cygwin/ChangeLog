@@ -1,3 +1,9 @@
+2004-07-14  Dave Korn  <dk@artimi.com>
+
+	* fhandler_registry.cc (registry_listing): Correct typo.
+	(fhandler_registry::fill_filebuf): Set size of newly expanded buffer
+	prior to calling RegQueryValueEx.
+
 2004-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_raw.cc (fhandler_dev_raw::raw_write): Remove buffered

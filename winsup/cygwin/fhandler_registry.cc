@@ -48,7 +48,7 @@ static const char *registry_listing[] =
   "HKEY_LOCAL_MACHINE",
   "HKEY_USERS",
   "HKEY_DYN_DATA",		// 95/98/Me
-  "HKEY_PERFOMANCE_DATA",	// NT/2000/XP
+  "HKEY_PERFORMANCE_DATA",	// NT/2000/XP
   NULL
 };
 
@@ -575,6 +575,7 @@ fhandler_registry::fill_filebuf ()
 	{
 	  bufalloc += 1000;
 	  filebuf = (char *) realloc (filebuf, bufalloc);
+	  size = bufalloc;
 	  error = RegQueryValueEx (handle, value_name, NULL, &type,
 				   (BYTE *) filebuf, &size);
 	  if (error != ERROR_SUCCESS && error != ERROR_MORE_DATA)
