@@ -178,6 +178,7 @@ EnumClipboardFormats@4
 EnumDesktopWindows@12
 EnumDesktopsA@12
 EnumDesktopsW@12
+EnumDisplayMonitors@16
 EnumDisplaySettingsA@12
 EnumDisplaySettingsW@12
 EnumPropsA@8

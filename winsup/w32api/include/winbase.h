@@ -1290,6 +1290,10 @@ BOOL WINAPI ImpersonateSelf(SECURITY_IMPERSONATION_LEVEL);
 BOOL WINAPI InitAtomTable(DWORD);
 BOOL WINAPI InitializeAcl(PACL,DWORD,DWORD);
 VOID WINAPI InitializeCriticalSection(LPCRITICAL_SECTION);
+#if (_WIN32_WINNT >= 0x0403) /* Needs NT4, SP3 or later.  */
+BOOL WINAPI InitializeCriticalSectionAndSpinCount(LPCRITICAL_SECTION,DWORD);
+DWORD WINAPI SetCriticalSectionSpinCount(LPCRITICAL_SECTION,DWORD);
+#endif
 BOOL WINAPI InitializeSecurityDescriptor(PSECURITY_DESCRIPTOR,DWORD);
 BOOL WINAPI InitializeSid (PSID,PSID_IDENTIFIER_AUTHORITY,BYTE);
 LONG WINAPI InterlockedCompareExchange(LPLONG,LONG,LONG);
@@ -1530,6 +1534,7 @@ BOOL WINAPI UpdateResourceW(HANDLE,LPCWSTR,LPCWSTR,WORD,PVOID,DWORD);
 BOOL WINAPI VerifyVersionInfoA(LPOSVERSIONINFOEXA,DWORD,DWORDLONG);
 BOOL WINAPI VerifyVersionInfoW(LPOSVERSIONINFOEXW,DWORD,DWORDLONG);
 PVOID WINAPI VirtualAlloc(PVOID,DWORD,DWORD,DWORD);
+PVOID WINAPI VirtualAllocEx(HANDLE,PVOID,DWORD,DWORD,DWORD);
 BOOL WINAPI VirtualFree(PVOID,DWORD,DWORD);
 BOOL WINAPI VirtualFreeEx(HANDLE,PVOID,DWORD,DWORD);
 BOOL WINAPI VirtualLock(PVOID,DWORD);
@@ -1583,7 +1588,7 @@ typedef HW_PROFILE_INFOW HW_PROFILE_INFO,*LPHW_PROFILE_INFO;
 #define CreateEvent CreateEventW
 #define CreateFile CreateFileW
 #define CreateFileMapping CreateFileMappingW
-#define CreateCreateHardLink CreateCreateHardLinkW
+#define CreateHardLink CreateHardLinkW
 #define CreateMailslot CreateMailslotW
 #define CreateMutex CreateMutexW
 #define CreateNamedPipe CreateNamedPipeW
@@ -1719,7 +1724,7 @@ typedef HW_PROFILE_INFOA HW_PROFILE_INFO,*LPHW_PROFILE_INFO;
 #define CreateEvent CreateEventA
 #define CreateFile CreateFileA
 #define CreateFileMapping CreateFileMappingA
-#define CreateCreateHardLink CreateCreateHardLinkA
+#define CreateHardLink CreateHardLinkA
 #define CreateMailslot CreateMailslotA
 #define CreateMutex CreateMutexA
 #define CreateNamedPipe CreateNamedPipeA

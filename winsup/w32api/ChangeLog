@@ -20,18 +20,48 @@
 	* include/winnt.h: Add missing MEM_ defines, and convert existing to 
 	hex for readability.
 
+2002-01-17  Marcus Geelnard  <marcus.geelnard@home.se>
+
+	* include/winsuser.h (tagKBDLLHOOKSTRUCT): Define struct
+	and typedefs.
+	(SPI_SETSCREENSAVERRUNNING): Add define.
+	(LLKHF_ALTDOWN): Add define.
+	* include/wingdi.h (PFD_GENERIC_ACCELERATED,
+	PFD_DEPTH_DONTCARE): Add defines.
+
+2002-01-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/objbase.h (CoGetObject): Add prototype.
+
+2002-01-14  Timothy J. Wood  <tjw@omnigroup.com>
+
+	* include/winuser.h (ENUM_CURRENT_SETTINGS,
+	ENUM_REGISTRY_SETTINGS): Add defines.
+
 2002-01-14  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (FILE_ATTRIBUTE_ENCRYPTED): Correct constant.
 	(FILE_ATTRIBUTE_DEVICE): Add define.
 
+
 2002-01-14  Corinna Vinschen  <vinschen@redhat.com>
 
 	* include/winnt.h: Add INVALID_FILE_ATTRIBUTES.
 
+2002-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* ChangeLog: correct date in last entry. 
+
+2002-01-11  Timothy J. Wood  <tjw@omnigroup.com>
+
+	* include/winuser.h (MONITORENUMPROC): Add typedef.
+	(EnumDisplayMonitors): Add prototype.
+	* lib/user32.def (EnumDisplayMonitors): Add stub.
+	
 2002-01-11 Ralf Habacker  <Ralf.Habacker@freenet.de>
 
-	* include/ntsecapi.h:  Fixed missing void parameter type in some prototypes.
+	* include/ntsecapi.h:  Fixed missing void parameter type in some 
+	prototypes.
 	* include/objbase.h: Ditto.
 	* include/rapi.h: Ditto.
 	* include/rpc.h: Ditto.
@@ -42,6 +72,28 @@
 	* include/rpcproxy.h: Ditto.
 	* include/windef.h: Ditto.
 									
+2002-01-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/vfw32.def (LIBRARY): Change to MSVFW32.DLL.
+
+2002-01-04  TAMURA Kent  <tkent@users.sourceforge.net>
+
+	* include/wingdi.h (BI_JPEG, BI_PNG, GGO_BEZIER,GGO_UNHINTED,
+	 LAYOUT_RTL, LAYOUT_BITMAPORIENTATIONPRESERVED): Add defines.
+	* include/winuser.h (HWND_MESSAGE, WS_EX_COMPOSITED,
+	WS_EX_LAYERED, WS_EX_LAYOUTRTL, WS_EX_NOACTIVATE,
+	WS_EX_NOINHERITLAYOUT): Add defines.
+	* include/winnt.h (PF_RDTSC_INSTRUCTION_AVAILABLE,
+	PF_PAE_ENABLED, MEM_PHYSICAL, MEM_RESET, MEM_TOP_DOWN,
+	MEM_WRITE_WATCH): Add defines.
+
+
+2002-01-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (InitializeCriticalSectionAndSpinCount):
+	Add prototype.
+	(SetCriticalSectionSpinCount): Likewise.
+
 2001-12-30  Guido Serassio <serassio@libero.it>
 
 	* include/winsvc.h: Add EnumServiceStatusEx(),
@@ -67,6 +119,50 @@
 	* include/commctrl.h: New typedefs for HDLAYOUT and LPHDLAYOUT based
 	on MSDN documentation for XP.
 	
+2001-12-15  Andrew Begel  <abegel@eecs.berkeley.edu>
+
+	*include/winbase.h (CreateHardLink): Correct typo in UNICODE
+	mappings.
+
+2001-12-11  Phillip Susi  <psusi@cfl.rr.com>
+
+	* include/commctrl.h (ACS_*): Add new defines.
+	(PGS_*): Ditto.
+	(CBES_*): Ditto.
+	(TBSTYLE_*): Ditto.
+	(TB_*): Ditto.
+	(TTS_*): Ditto.
+	(UDS_HOTTRACK): Add define.
+	(SBT_TOOLTIPS): Ditto.
+	(TBS_*): Add new defines.
+	(HDS_*): Ditto.
+	(LVS_EX_*) Ditto.
+	(LVKF_*): Ditto.
+	(TCM_GETEXTENDEDSTYLE): Add define.
+	(TVS_NOHSCROLL): Ditto.
+	(TVIF_INTEGRAL): Ditto.
+	(DTS_SHORTDATECENTURYFORMAT): Ditto.
+	(TCS_*): Add new defines.
+	(CBEM_*): Add defines.
+	(tagNMITEMACTIVATE): Add structure definition and typedefs.
+	(tagTVITEMEX[AW]: Ditto.
+	(tagTVINSERTSTRUCT[AW]: Add union member.
+	* include/winbase.h (VirtualAllocEx): Add prototype.
+	* include/winuser.h (SS_*): Add new defines.
+
+2001-12-07  Earnie Boyd  <earnie@users.sf.net>
+
+	* Makefile.in: Increment VERSION.
+	* include/w32api.h: Ditto.
+
+2001-12-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/setupi.h (SetupDiCreateDeviceInterfaceRegKey[AW],
+	SetupDiCreateDevRegKey[AW],SetupDiDeleteDeviceInterfaceRegKey,
+	SetupDiDeleteDevRegKey,SetupDiOpenClassRegKey,
+	SetupDiOpenClassRegKeyEx[AW],SetupDiOpenDeviceInterfaceRegKey,
+	SetupDiOpenDevRegKey): Correct function names.
+
 2001-12-07  Earnie Boyd  <earnie@users.sf.net>
 
 	* Makefile.in: Increment VERSION.
