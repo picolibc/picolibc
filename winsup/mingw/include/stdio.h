@@ -213,7 +213,7 @@ int	_vsnprintf (char*, size_t, const char*, __VALIST);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int snprintf(char* s, size_t n, const char*  format, ...);
-extern inline int vsnprintf (char* s, size_t n, const char* format,
+extern __inline__ int vsnprintf (char* s, size_t n, const char* format,
 			   __VALIST arg)
   { return _vsnprintf ( s, n, format, arg); }
 #endif
@@ -367,7 +367,7 @@ FILE*	_wpopen (const wchar_t*, const wchar_t*);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
-extern inline int
+extern __inline__ int
 vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
   { return _vsnwprintf ( s, n, format, arg);}
 #endif

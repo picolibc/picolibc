@@ -1,3 +1,12 @@
+2002-05-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdio.h (vsnprintf): Change inline to __inline__;
+	(vsnwprintf): Likewise.
+ 	* include/wchar.h (vsnwprintf): Likewise.
+	(wcstof): Likewise.
+	(fwide): Likewise.
+	(mbsinit): Likewise.
+
 2002-04-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	Change FP default precison from 53 to 64-bit mantissa.

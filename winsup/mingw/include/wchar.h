@@ -119,7 +119,7 @@ wint_t	ungetwc (wchar_t, FILE*);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
-extern inline int vsnwprintf (wchar_t* s, size_t n, const wchar_t* format,
+extern __inline__ int vsnwprintf (wchar_t* s, size_t n, const wchar_t* format,
 			   va_list arg)
   { return _vsnwprintf ( s, n, format, arg); }
 #endif
@@ -292,8 +292,8 @@ size_t  wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
 int  	wctob(wint_t);
 
 #ifndef __NO_ISOCEXT /* these need static lib libmingwex.a */
-extern inline int fwide(FILE* stream, int mode) {return -1;} /* limited to byte orientation */ 
-extern inline int mbsinit(const mbstate_t* ps) {return 1;}
+extern __inline__ int fwide(FILE* stream, int mode) {return -1;} /* limited to byte orientation */ 
+extern __inline__ int mbsinit(const mbstate_t* ps) {return 1;}
 wchar_t* wmemset(wchar_t* s, wchar_t c, size_t n);
 wchar_t* wmemchr(const wchar_t* s, wchar_t c, size_t n);
 int wmemcmp(const wchar_t* s1, const wchar_t * s2, size_t n);
