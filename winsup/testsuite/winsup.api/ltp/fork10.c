@@ -62,7 +62,6 @@ main(int ac, char **av)
 	int status, pid, fildes;
 	char parchar[2];
 	char chilchar[2];
-	long lseek();
 
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
