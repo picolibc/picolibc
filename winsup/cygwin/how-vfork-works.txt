@@ -1,3 +1,5 @@
+Copyright 2001 Red Hat Inc., Christopher Faylor
+
 How does vfork work?
 
 When a program calls vfork, cygwin attempts to short circuit its

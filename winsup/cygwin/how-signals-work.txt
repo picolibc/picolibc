@@ -1,3 +1,5 @@
+Copyright 2001 Red Hat Inc., Christopher Faylor
+
 [This is not yet complete. -cgf]
 
 How do signals work?
