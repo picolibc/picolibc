@@ -8,14 +8,14 @@
  */
 
 #if defined(__rtems__)
-typedef long long          int64_t;
+typedef signed long long   int64_t;
 #if defined( __h8300__)
-typedef long               int32_t;
+typedef signed long        int32_t;
 #else
-typedef int                int32_t;
+typedef signed int         int32_t;
 #endif
-typedef short              int16_t;
-typedef char               int8_t;
+typedef signed short       int16_t;
+typedef signed char        int8_t;
 
 typedef unsigned long long u_int64_t;
 #if defined( __h8300__)

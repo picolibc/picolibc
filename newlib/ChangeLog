@@ -1,3 +1,14 @@
+2003-01-16  Joel Sherrill <joel@OARcorp.com>
+
+        * libc/sys/rtems/include/limits.h, libc/sys/rtems/sys/param.h,
+        libc/sys/rtems/sys/syslimits.h: Update to be in sync with what 
+        constants are defined in each file in the shared versions in
+        libc/include.
+        * libc/sys/rtems/crt0.c: Define extra symbols on SH and HP-PA to
+        autoconf can link programs.
+        * libc/include/machine/types.h: Explicitly specify signed on
+        intXX_t types to ensure they are signed.
+
 2003-01-14  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/time/strftime.c (strftime): Add '%h' and '%l, %k' GNU

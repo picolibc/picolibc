@@ -41,6 +41,8 @@ memset() {}
   int __FIXUP_START__;  int __FIXUP_END__;
   int __EXCEPT_START__; int __EXCEPT_END__;
   int __init;           int __fini;
+  int __CTOR_LIST__;    int __CTOR_END__;
+  int __DTOR_LIST__;    int __DTOR_END__;
 #endif
 
 /* The SH expects certain symbols to be defined in the linker script. */
@@ -61,6 +63,10 @@ int __EH_FRAME_BEGIN__;
   asm ( "\$global\$:");
 */
 
+  asm (".text");
+  asm (".global");
+  asm (".EXPORT $$dyncall,ENTRY");
+  asm ("$$dyncall:");
   int atexit(void (*function)(void)) { return 0; }
 #endif
 
