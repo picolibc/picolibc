@@ -98,7 +98,7 @@ fhandler_dev_raw::writebuf (void)
       int ret = 0;
 
       memset (devbuf + devbufend, 0, devbufsiz - devbufend);
-      if (get_device () != FH_TAPE)
+      if (get_major () != DEV_TAPE_MAJOR)
 	to_write = ((devbufend - 1) / 512 + 1) * 512;
       else if (varblkop)
 	to_write = devbufend;
@@ -134,16 +134,10 @@ fhandler_dev_raw::fstat (struct __stat64 *buf)
 {
   debug_printf ("here");
 
-  switch (get_device ())
-    {
-    case FH_TAPE:
-    case FH_NTAPE:
-      buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
-      break;
-    default:
-      buf->st_mode = S_IFBLK | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
-      break;
-    }
+  if (get_major () == DEV_TAPE_MAJOR)
+    buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
+  else
+    buf->st_mode = S_IFBLK | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
 
   buf->st_uid = geteuid32 ();
   buf->st_gid = getegid32 ();
@@ -176,7 +170,7 @@ fhandler_dev_raw::open (int flags, mode_t)
   flags |= O_BINARY;
 
   DWORD access = GENERIC_READ | SYNCHRONIZE;
-  if (get_device () == FH_TAPE
+  if (get_major () == DEV_TAPE_MAJOR
       || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY
       || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDWR)
     access |= GENERIC_WRITE;
@@ -274,7 +268,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 	    {
 	      if (!varblkop && len >= devbufsiz)
 		{
-		  if (get_device () == FH_TAPE)
+		  if (get_major () == DEV_TAPE_MAJOR)
 		    bytes_to_read = (len / devbufsiz) * devbufsiz;
 		  else
 		    bytes_to_read = (len / 512) * 512;
@@ -538,7 +532,7 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 	switch (op->rd_op)
 	  {
 	  case RDSETBLK:
-	    if (get_device () == FH_TAPE)
+	    if (get_major () == DEV_TAPE_MAJOR)
 	      {
 		struct mtop mop;
 

@@ -1,3 +1,17 @@
+2004-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* devices.in: Change raw com device to more correct form.
+
+2004-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::open): Use major numbers rather than
+	device numbers to control special behavior for devices which take
+	units.
+	* fhandler_raw.cc (fhandler_dev_raw::writebuf): Ditto.
+	(fhandler_dev_raw::fstat): Ditto.
+	(fhandler_dev_raw::open): Ditto.
+	(fhandler_dev_raw::ioctl): Ditto.
+
 2004-01-21  Nicholas Wourms  <nwourms@netscape.net>
 
 	* signal.cc (sigaction): Fix if-statement typo.
