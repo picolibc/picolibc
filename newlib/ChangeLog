@@ -1,3 +1,9 @@
+2002-01-07 Alan Matsuoka <alanm@redhat.com>
+
+        * libc/include/machine/ieeefp.h: Configure d10v doubles to
+        be 32 bits if __DOUBLE__ == 32  otherwise doubles are 64 bits.
+        libc/include/sys/config.h: Ditto.
+
 2001-12-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/sys/cygwin/sys/utmp.h: Add definition of UTMP_FILE.

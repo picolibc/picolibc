@@ -138,7 +138,9 @@
 
 #ifdef __D10V__
 #define __IEEE_BIG_ENDIAN
+#if __DOUBLE__ == 32
 #define _DOUBLE_IS_32BITS
+#endif
 #define __SMALL_BITFIELDS
 #endif
 

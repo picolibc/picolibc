@@ -38,7 +38,9 @@
 #undef UINT_MAX
 #define INT_MAX __INT_MAX__
 #define UINT_MAX (__INT_MAX__ * 2U + 1)
+#if __DOUBLE__ == 32
 #define _DOUBLE_IS_32BITS
+#endif
 #define _POINTER_INT short
 #define __IEEE_BIG_ENDIAN
 #endif
