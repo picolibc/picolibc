@@ -1,3 +1,9 @@
+2004-04-24  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (R_MIPS_PC32, R_MIPS_PC64, R_MIPS_GNU_REL_LO16)
+	(R_MIPS_GNU_REL_HI16): Remove.
+	(R_MIPS_GNU_REL16_S2): Update comment.
+
 2004-30-30  Galit Heller  <Galit.Heller@nsc.com>
             Tomer Levi  <Tomer.Levi@nsc.com>
 

@@ -76,12 +76,8 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
   /* These relocs are used for the mips16.  */
   RELOC_NUMBER (R_MIPS16_26, 100)
   RELOC_NUMBER (R_MIPS16_GPREL, 101)
-  /* These are GNU extensions to handle embedded-pic.  */
-  RELOC_NUMBER (R_MIPS_PC32, 248)
-  RELOC_NUMBER (R_MIPS_PC64, 249)
+  /* FIXME: this relocation is used internally by gas.  */
   RELOC_NUMBER (R_MIPS_GNU_REL16_S2, 250)
-  RELOC_NUMBER (R_MIPS_GNU_REL_LO16, 251)
-  RELOC_NUMBER (R_MIPS_GNU_REL_HI16, 252)
   /* These are GNU extensions to enable C++ vtable garbage collection.  */
   RELOC_NUMBER (R_MIPS_GNU_VTINHERIT, 253)
   RELOC_NUMBER (R_MIPS_GNU_VTENTRY, 254)
