@@ -1,6 +1,6 @@
 #ifndef _SHLGUID_H
 #define _SHLGUID_H
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
@@ -57,6 +57,9 @@ extern const GUID CLSID_StdHyperLink;
 extern const GUID CLSID_FileTypes;
 extern const GUID CLSID_InternetShortcut;
 extern const GUID IID_IUniformResourceLocator;
+extern const GUID CLSID_DragDropHelper;
+extern const GUID IID_IDropTargetHelper;
+extern const GUID IID_IDragSourceHelper;
 #ifdef UNICODE
 #define IID_IFileViewer	IID_IFileViewerW
 #define IID_IShellLink	IID_IShellLinkW
@@ -72,7 +75,9 @@ extern const GUID IID_IUniformResourceLocator;
 #define IID_IShellExecuteHook	IID_IShellExecuteHookA
 #define IID_INewShortcutHook	IID_INewShortcutHookA
 #endif
+
 #ifdef __cplusplus
 }
 #endif
+
 #endif
