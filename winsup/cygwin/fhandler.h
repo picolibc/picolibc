@@ -773,7 +773,6 @@ struct select_record
   BOOL windows_handle;
   BOOL read_ready, write_ready, except_ready;
   BOOL read_selected, write_selected, except_selected;
-  select_record (fhandler_base *in_fh = NULL) {memset (this, 0, sizeof(select_record)); fh = in_fh;}
   int (*startup) (select_record *me, class select_stuff *stuff);
   int (*poll) (select_record *me, fd_set *readfds, fd_set *writefds,
 	       fd_set *exceptfds);
@@ -781,12 +780,24 @@ struct select_record
 		 fd_set *exceptfds);
   void (*cleanup) (select_record *me, class select_stuff *stuff);
   struct select_record *next;
+
+  select_record (fhandler_base *in_fh = NULL) {memset (this, 0, sizeof(select_record)); fh = in_fh;}
+  select_record (int) : fd (0), h (NULL), fh (0), saw_error (0), windows_handle (0),
+		     read_ready (0), write_ready (0), except_ready (0),
+		     read_selected (0), write_selected (0), except_selected (0),
+		     startup (NULL), poll (NULL), verify (NULL), cleanup (NULL),
+		     next (NULL) {}
 };
 
 class select_stuff
 {
 public:
   ~select_stuff ();
+  select_stuff (): always_ready (0), windows_used (0),
+		   total (0), start (0)
+  {
+    memset (device_specific, 0, sizeof (device_specific));
+  }
   BOOL always_ready, windows_used;
   int total;
   select_record start;

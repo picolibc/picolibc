@@ -121,7 +121,6 @@ cygwin_select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
   select_printf ("%d, %p, %p, %p, %p", n, readfds, writefds, exceptfds, to);
 
-  memset (&sel, 0, sizeof (sel));
   if (!readfds)
     {
       UNIX_FD_ZERO (dummy_readfds, n);
