@@ -185,7 +185,7 @@ int
 main (int argc, char **argv)
 {
   int i;
-  int flags = 0;
+  int flags = MOUNT_BINARY;
   int default_flag = MOUNT_SYSTEM;
   enum do_what
   {
