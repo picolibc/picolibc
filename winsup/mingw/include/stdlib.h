@@ -236,7 +236,7 @@ __MINGW_IMPORT unsigned int _osver;
 __MINGW_IMPORT unsigned int _winver;
 __MINGW_IMPORT unsigned int _winmajor;
 __MINGW_IMPORT unsigned int _winminor;
-#endif __DECLSPEC_SUPPORTED
+#endif /* __DECLSPEC_SUPPORTED */
 
 #else
 /* Not msvcrtxx.dll, thus crtdll.dll */

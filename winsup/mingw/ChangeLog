@@ -1,3 +1,7 @@
+2003-02-08  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/stdlib.h: Make words after #endif a comment.
+
 2003-02-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/locale.h: Include stddef.h for definition of NULL.
