@@ -1,3 +1,7 @@
+Wed Aug  8 15:24:59 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/wchar.h: Define __need_wint_t.
+
 Wed Aug  8 11:46:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (alloc_sd): Revert to setting inheritance attribute for
