@@ -34,7 +34,6 @@
 	* lib/user32.def (GetRawInputDeviceInfo[AW]): Ooops... there
 	are ANSI/Unicode versions of this function.
 
->>>>>>> 1.469
 2003-09-29  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winuser.h [_WIN32_WINNT >= 0x0501] (RIM_TYPEMOUSE,
