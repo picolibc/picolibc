@@ -80,7 +80,7 @@ extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
 
   domain[0] = 0;
   strlcpy (user, pw->pw_name, UNLEN + 1);
-  debug_printf ("pw_gecos = %x (%s)", pw->pw_gecos, pw->pw_gecos);
+  debug_printf ("pw_gecos %x (%s)", pw->pw_gecos, pw->pw_gecos);
 
   if ((d = strstr (pw->pw_gecos, "U-")) != NULL &&
       (d == pw->pw_gecos || d[-1] == ','))
@@ -1109,11 +1109,11 @@ read_sd (const char *file, security_descriptor &sd)
 			NULL, 0, &len)
       && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
     {
-      debug_printf ("file = %s", file);
+      debug_printf ("file %s", file);
       __seterrno ();
       return -1;
     }
-  debug_printf ("file = %s: len=%d", file, len);
+  debug_printf ("file %s: len %d", file, len);
   if (!sd.malloc (len))
     {
       set_errno (ENOMEM);
@@ -1313,7 +1313,7 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
   else
     get_attribute_from_acl (attribute, acl, owner_sid, group_sid, grp_member);
 
-  syscall_printf ("%sACL = %x, uid %d, gid %d",
+  syscall_printf ("%sACL %x, uid %d, gid %d",
 		  (!acl_exists || !acl)?"NO ":"", *attribute, uid, gid);
   return;
 }
