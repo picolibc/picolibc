@@ -21,7 +21,7 @@ standard Windows command shell.
 Wait a minute... Cygwin is only @emph{supported} if you are paying for
 it, such as through a support contract with Red Hat.  For information
 about getting a Red Hat support contract, see
-@file{http://www.redhat.com/products/support/cygwin/}.
+@file{http://www.redhat.com/software/tools/cygwin/}.
 
 That said, Cygwin can be expected to run on all modern 32 bit versions of
 Windows, except Windows CE.  This includes Windows 95/98/ME/NT/2000/XP.
