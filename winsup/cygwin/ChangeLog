@@ -1,3 +1,7 @@
+2002-02-27  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
 2002-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (fstat64): New symbol.
