@@ -67,17 +67,17 @@ info:
 
 $(SUBDIRS):
 	@if cd $@ 2>/dev/null; then \
-	    $(MAKE) all; \
+	    $(MAKE) all || exit 1; \
 	fi || exit 0
 
 $(INSTALL_SUBDIRS):
 	@if cd ${patsubst install_%,%,$@} 2>/dev/null; then \
-	    $(MAKE) install; \
+	    $(MAKE) install || exit 1; \
 	fi || exit 0
 
 $(CLEAN_SUBDIRS):
 	@if cd ${patsubst clean_%,%,$@} 2>/dev/null; then \
-	    $(MAKE) clean; \
+	    $(MAKE) clean || exit 1; \
 	fi || exit 0
 
 .PRECIOUS: Makefile
@@ -107,7 +107,7 @@ mingw: w32api
 
 cygwin: w32api
 
-cinstall: mingw
+cinstall: mingw bz2lib zlib
 
 install_utils: cygwin mingw
 
@@ -115,4 +115,4 @@ install_mingw: w32api
 
 install_cygwin: w32api
 
-install_cinstall: mingw
+install_cinstall: mingw bz2lib zlib
