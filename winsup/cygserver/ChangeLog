@@ -1,3 +1,7 @@
+2004-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (_msleep): Release process object while waiting.
+
 2004-08-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* transport.cc (transport_layer_base::~transport_layer_base): Resurrect.
