@@ -1,6 +1,7 @@
 Wed Sep 12 13:03:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
-	* autoload.cc (LoadDLLfuncEx): Auto load TryEnterCriticalSection - its an NT only call.
+	* autoload.cc (LoadDLLfuncEx): Auto load TryEnterCriticalSection - it's
+	an NT only call.
 	* thread.cc (pthread_cond::TimedWait): Use critical sections for NT.
 	(pthread_cond::fixup_after_fork): Don't detect bad apps.
 	(pthread_mutex::pthread_mutex): Use critical sections for NT.
@@ -8,9 +9,11 @@ Wed Sep 12 13:03:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(pthread_mutex::Lock): Ditto.
 	(pthread_mutex::TryLock): Ditto.
 	(pthread_mutex::UnLock): Ditto.
-	(pthread_mutex::fixup_after_fork): Ditto. Also do not detect bad apps.
-	(__pthread_mutex_trylock): Move WIN32 specific test into the class method.
-	(__pthread_mutex_destroy): Prevent dereferencing passed pointer without valid address.
+	(pthread_mutex::fixup_after_fork): Ditto.  Also do not detect bad apps.
+	(__pthread_mutex_trylock): Move WIN32 specific test into the class
+	method.
+	(__pthread_mutex_destroy): Prevent dereferencing passed pointer without
+	valid address.
 	* thread.h (pthread_mutex): Use critical sections for NT.
 
 Tue Sep 11 21:55:37 2001  Christopher Faylor <cgf@cygnus.com>
@@ -77,11 +80,11 @@ Sun Sep  9 20:09:11 2001  Christopher Faylor <cgf@cygnus.com>
 
 Mon Sep 10 08:28:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
-	* thread.h (MT_Interface): Remove pshared mutex array. 
-	Add a threadsafe list for mutex tracking (for fixup after fork). 
+	* thread.h (MT_Interface): Remove pshared mutex array.  Add a
+	threadsafe list for mutex tracking (for fixup after fork).
 	* thread.cc (MTInterface::Init): Remove pshared mutex array.
-	(pthread_mutex::pthread_mutex): Remove pshared mutex functionality. 
-	Fail with EINVAL on attempts to	use pshared functionality.
+	(pthread_mutex::pthread_mutex): Remove pshared mutex functionality.
+	Fail with EINVAL on attempts to use pshared functionality.
 	(__pthread_mutex_getpshared): Remove.
 	(__pthread_cond_timedwait): Remove pshared mutex functionality.
 	(__pthread_cond_wait): Ditto.
@@ -93,8 +96,8 @@ Mon Sep 10 08:28:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(__pthread_mutex_destroy): Ditto.
 	(__pthread_mutex_setprioceiling): Ditto.
 	(__pthread_mutexattr_setpshared): Ditto.
-	
-Sun Sep  9 23:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+Sun Sep 9 23:09:00 2001 Corinna Vinschen <corinna@vinschen.de>
 
 	* pwdgrp.h (pwdgrp_check::set_last_modified): Call GetFileTime()
 	instead of GetFileInformationByHandle().

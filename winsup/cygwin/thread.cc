@@ -3,6 +3,7 @@
    Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
 
    Originally written by Marco Fuykschot <marco@ddi.nl>
+   Substantialy enhanced by Robert Collins <<rbtcollins@hotmail.com>
 
 This file is part of Cygwin.
 
@@ -10,19 +11,19 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-/*Implementation overview and caveats:
+/* Implementation overview and caveats:
 
-  Win32 puts some contraints on what can and cannot be implemented. Where possible
-  we work around those contrainsts. Where we cannot work around the constraints we
-  either pretend to be conformant, or return an error code.
+   Win32 puts some contraints on what can and cannot be implemented.  Where
+   possible we work around those contrainsts.  Where we cannot work around
+   the constraints we either pretend to be conformant, or return an error
+   code.
 
-  Some caveats: PROCESS_SHARED objects while they pretend to be process shared,
-  may not actually work. Some test cases are needed to determine win32's behaviour.
-  My suspicion is that the win32 handle needs to be opened with different flags for
-  proper operation.
+   Some caveats: PROCESS_SHARED objects while they pretend to be process
+   shared, may not actually work.  Some test cases are needed to determine
+   win32's behaviour.  My suspicion is that the win32 handle needs to be
+   opened with different flags for proper operation.
 
-  R.Collins, April 2001.
-  */
+   R.Collins, April 2001.  */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -449,7 +450,7 @@ pthread_cond::~pthread_cond ()
     {
       pthread_cond *tempcond = MT_INTERFACE->conds;
       while (tempcond->next && tempcond->next != this)
-        tempcond = tempcond->next;
+	tempcond = tempcond->next;
       /* but there may be a race between the loop above and this statement */
       InterlockedExchangePointer (&tempcond->next, this->next);
     }
@@ -514,7 +515,7 @@ pthread_cond::TimedWait (DWORD dwMilliseconds)
      * critical sections, which are faster, but introduce a race _here_. Until then
      * The NT variant of the code is redundant.
      */
-	     
+
     rv = SignalObjectAndWait (mutex->win32_obj_id, win32_obj_id, dwMilliseconds,
 			 false);
 #endif
@@ -626,7 +627,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREA
     {
       this->win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
       if (!win32_obj_id)
-        magic = 0;
+	magic = 0;
     }
   condwaits = 0;
   pshared = PTHREAD_PROCESS_PRIVATE;
@@ -641,7 +642,7 @@ pthread_mutex::~pthread_mutex ()
   else
     {
       if (win32_obj_id)
-        CloseHandle (win32_obj_id);
+	CloseHandle (win32_obj_id);
       win32_obj_id = NULL;
     }
   /* I'm not 100% sure the next bit is threadsafe. I think it is... */
@@ -704,7 +705,7 @@ pthread_mutex::fixup_after_fork ()
     {
       win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
       if (!win32_obj_id)
-        api_fatal("pthread_mutex::fixup_after_fork() failed to create new win32 mutex\n");
+	api_fatal("pthread_mutex::fixup_after_fork() failed to create new win32 mutex\n");
     }
 #if DETECT_BAD_APPS
   if (condwaits)
@@ -746,7 +747,7 @@ semaphore::~semaphore ()
     {
       semaphore *tempsem = MT_INTERFACE->semaphores;
       while (tempsem->next && tempsem->next != this)
-        tempsem = tempsem->next;
+	tempsem = tempsem->next;
       /* but there may be a race between the loop above and this statement */
       InterlockedExchangePointer (&tempsem->next, this->next);
     }
