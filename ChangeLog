@@ -1,3 +1,10 @@
+2005-01-13  Kelley Cook  <kcook@gcc.gnu.org>
+
+	PR bootstrap/18222
+	* Makefile.def: Pass CPPFLAGS_FOR_TARGET.
+	* Makefile.tpl: Define target CPPFLAGS on CPPFLAGS_FOR_TARGET.
+	* Makefile.in: Regenerate.
+
 2005-01-03  Paolo Bonzini  <bonzini@gnu.org>
 
 	Revert 2004-12-28 Makefile changes, a better fix will be
