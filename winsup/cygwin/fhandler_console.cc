@@ -137,8 +137,13 @@ fhandler_console::read (void *pv, size_t buflen)
   DWORD nwait;
 
   w4[0] = h;
-  nwait = 2;
-  w4[1] = signal_arrived;
+  if (iscygthread ())
+    nwait = 1;
+  else
+    {
+      w4[1] = signal_arrived;
+      nwait = 2;
+    }
 
   for (;;)
     {
@@ -151,8 +156,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	case WAIT_OBJECT_0:
 	  break;
 	case WAIT_OBJECT_0 + 1:
-	  if (!iscygthread ())
-	    set_sig_errno (EINTR);
+	  set_sig_errno (EINTR);
 	  return -1;
 	default:
 	  __seterrno ();

@@ -154,7 +154,8 @@ void
 fhandler_pty_master::doecho (const void *str, DWORD len)
 {
   acquire_output_mutex (INFINITE);
-  WriteFile (get_ttyp ()->to_master, str, len, &len, NULL);
+  if (!WriteFile (get_ttyp ()->to_master, str, len, &len, NULL))
+    termios_printf ("Write to %p failed, %E", get_ttyp ()->to_master);
 //  WaitForSingleObject (output_done_event, INFINITE);
   release_output_mutex ();
 }
@@ -219,135 +220,144 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len)
   char outbuf[OUT_BUFFER_SIZE];
   DWORD n;
   int column = 0;
-
-again:
+  int rc = 0;
 
   if (len == 0)
-    return 0;
+    goto out;
 
-  if (neednl_)
+  for (;;)
     {
-      /* We need to return a left over \n character, resulting from
-	 \r\n conversion.  Note that we already checked for FLUSHO and
-	 OutputStopped at the time that we read the character, so we
-	 don't check again here.  */
-      buf[0] = '\n';
-      neednl_ = 0;
-      return 1;
-    }
-
-  /* Set RLEN to the number of bytes to read from the pipe.  */
-  rlen = len;
-  if (get_ttyp ()->ti.c_oflag & OPOST && get_ttyp ()->ti.c_oflag & ONLCR)
-    {
-      /* We are going to expand \n to \r\n, so don't read more than
-	 half of the number of bytes requested.  */
-      rlen /= 2;
-      if (rlen == 0)
-	rlen = 1;
-    }
-  if (rlen > sizeof outbuf)
-    rlen = sizeof outbuf;
-
-  HANDLE handle = get_io_handle ();
-
-  /* Doing a busy wait like this is quite inefficient, but nothing
-     else seems to work completely.  Windows should provide some sort
-     of overlapped I/O for pipes, or something, but it doesn't.  */
-  DWORD avail;
-  while (1)
-    {
-      if (! PeekNamedPipe (handle, NULL, 0, NULL, &avail, NULL))
+      if (neednl_)
 	{
-	  if (GetLastError () == ERROR_BROKEN_PIPE)
-	    return 0;
-	  __seterrno ();
-	  return -1;
+	  /* We need to return a left over \n character, resulting from
+	     \r\n conversion.  Note that we already checked for FLUSHO and
+	     OutputStopped at the time that we read the character, so we
+	     don't check again here.  */
+	  buf[0] = '\n';
+	  neednl_ = 0;
+	  rc = 1;
+	  break;
 	}
-      if (avail > 0)
-	break;
-      if (hit_eof ())
-	return 0;
-      Sleep (10);
-    }
 
-  if (ReadFile (handle, outbuf, rlen, &n, NULL) == FALSE)
-    {
+      /* Set RLEN to the number of bytes to read from the pipe.  */
+      rlen = len;
+      if (get_ttyp ()->ti.c_oflag & OPOST && get_ttyp ()->ti.c_oflag & ONLCR)
+	{
+	  /* We are going to expand \n to \r\n, so don't read more than
+	     half of the number of bytes requested.  */
+	  rlen /= 2;
+	  if (rlen == 0)
+	    rlen = 1;
+	}
+      if (rlen > sizeof outbuf)
+	rlen = sizeof outbuf;
+
+      HANDLE handle = get_io_handle ();
+
+      /* Doing a busy wait like this is quite inefficient, but nothing
+	 else seems to work completely.  Windows should provide some sort
+	 of overlapped I/O for pipes, or something, but it doesn't.  */
+      while (1)
+	{
+	  DWORD avail;
+	  if (!PeekNamedPipe (handle, NULL, 0, NULL, &avail, NULL))
+	    goto err;
+	  if (avail > 0)
+	    break;
+	  if (hit_eof ())
+	    goto out;
+	  Sleep (10);
+	}
+
+      if (ReadFile (handle, outbuf, rlen, &n, NULL) == FALSE)
+	goto err;
+
+      termios_printf ("rlen %u", n);
+
+      if (get_ttyp ()->ti.c_lflag & FLUSHO)
+	{
+	  get_ttyp ()->write_retval = n;
+	  if (output_done_event != NULL)
+	    SetEvent (output_done_event);
+	  continue;
+	}
+
+      if (get_ttyp ()->OutputStopped)
+	{
+	  termios_printf ("waiting for restart_output_event");
+	  WaitForSingleObject (restart_output_event, INFINITE);
+	  termios_printf ("done waiting for restart_output_event");
+	}
+
+      if (!(get_ttyp ()->ti.c_oflag & OPOST))	// post-process output
+	{
+	  memcpy (buf, outbuf, n);
+	  rc = n;
+	}
+      else					// raw output mode
+	{
+	  char *iptr = outbuf, *optr = buf;
+
+	  while (n--)
+	    {
+	      switch (*iptr)
+		{
+		case '\r':
+		  if ((get_ttyp ()->ti.c_oflag & ONOCR) && column == 0)
+		    {
+		      iptr++;
+		      continue;
+		    }
+		  if (get_ttyp ()->ti.c_oflag & OCRNL)
+		    *iptr = '\n';
+		  else
+		    column = 0;
+		  break;
+		case '\n':
+		  if (get_ttyp ()->ti.c_oflag & ONLCR)
+		    {
+		      *optr++ = '\r';
+		      column = 0;
+		    }
+		  if (get_ttyp ()->ti.c_oflag & ONLRET)
+		    column = 0;
+		  break;
+		default:
+		  column++;
+		  break;
+		}
+
+	      /* Don't store data past the end of the user's buffer.  This
+		 can happen if the user requests a read of 1 byte when
+		 doing \r\n expansion.  */
+	      if (optr - buf >= (int) len)
+		{
+		  neednl_ = 1;
+		  if (*iptr != '\n' || n != 0)
+		    system_printf ("internal error: %d unexpected characters", n);
+		  break;
+		}
+
+	      *optr++ = *iptr++;
+	    }
+	  rc = optr - buf;
+	}
+      break;
+
+    err:
       if (GetLastError () == ERROR_BROKEN_PIPE)
-	return 0;
-      __seterrno ();
-      return -1;
-    }
-
-  termios_printf ("len=%u", n);
-
-  if (get_ttyp ()->ti.c_lflag & FLUSHO)
-    {
-      get_ttyp ()->write_retval = n;
-      if (output_done_event != NULL)
-	SetEvent (output_done_event);
-      goto again;
-    }
-
-  if (get_ttyp ()->OutputStopped)
-    {
-      termios_printf ("waiting for restart_output_event");
-      WaitForSingleObject (restart_output_event, INFINITE);
-    }
-
-  if (get_ttyp ()->ti.c_oflag & OPOST)	// post-process output
-    {
-      char *iptr = outbuf, *optr = buf;
-
-      while (n--)
+	rc = 0;
+      else
 	{
-	  switch (*iptr)
-	    {
-	    case '\r':
-	      if ((get_ttyp ()->ti.c_oflag & ONOCR) && column == 0)
-		{
-		  iptr++;
-		  continue;
-		}
-	      if (get_ttyp ()->ti.c_oflag & OCRNL)
-		*iptr = '\n';
-	      else
-		column = 0;
-	      break;
-	    case '\n':
-	      if (get_ttyp ()->ti.c_oflag & ONLCR)
-		{
-		  *optr++ = '\r';
-		  column = 0;
-		}
-	      if (get_ttyp ()->ti.c_oflag & ONLRET)
-		column = 0;
-	      break;
-	    default:
-	      column++;
-	      break;
-	    }
-
-	  /* Don't store data past the end of the user's buffer.  This
-	     can happen if the user requests a read of 1 byte when
-	     doing \r\n expansion.  */
-	  if (optr - buf >= (int) len)
-	    {
-	      neednl_ = 1;
-	      if (*iptr != '\n' || n != 0)
-		system_printf ("internal error: %d unexpected characters", n);
-	      break;
-	    }
-
-	  *optr++ = *iptr++;
+	  __seterrno ();
+	  rc = -1;
 	}
-      return optr - buf;
+      break;
     }
-  else					// raw output mode
-    {
-      memcpy (buf, outbuf, n);
-      return n;
-    }
+
+out:
+  termios_printf ("returning %d", rc);
+  return rc;
 }
 
 static DWORD WINAPI
@@ -546,8 +556,10 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
 
       if (output_done_event != NULL)
 	{
-	  termios_printf("tty%d waiting for output_done", ttynum);
-	  WaitForSingleObject (output_done_event, n * 1000);
+	  DWORD rc;
+	  DWORD x = n * 1000;
+	  rc = WaitForSingleObject (output_done_event, x);
+	  termios_printf("waited %d ms for output_done_event, WFSO %d", x, rc);
 	}
 
       if (get_ttyp ()->write_retval < 0)

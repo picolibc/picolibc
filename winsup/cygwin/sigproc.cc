@@ -826,7 +826,6 @@ sigproc_printf ("ReleaseSemaphore succeeded");
       sip_printf ("Waiting for thiscomplete %p", thiscomplete);
 
       SetLastError (0);
-Sleep (0);
       rc = WaitForSingleObject (thiscomplete, WSSC);
       /* Check for strangeness due to this thread being redirected by the
 	 signal handler.  Sometimes a WAIT_TIMEOUT will occur when the
