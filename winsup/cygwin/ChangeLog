@@ -1,3 +1,7 @@
+Mon Jun 26 11:25:29 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* hinfo.cc (hinfo::dup2): Guard against out of bounds newfd.
+
 Sat Jun 24 23:43:06 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* grp.cc (read_etc_group): Open file in text mode.

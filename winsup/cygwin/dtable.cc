@@ -324,7 +324,7 @@ hinfo::dup2 (int oldfd, int newfd)
 
   if (not_open (oldfd))
     {
-      syscall_printf("dup2: fd %d not open", oldfd);
+      syscall_printf ("fd %d not open", oldfd);
       set_errno (EBADF);
       goto done;
     }
@@ -342,6 +342,12 @@ hinfo::dup2 (int oldfd, int newfd)
     }
 
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  if (newfd >= dtable.size || newfd < 0)
+    {
+      syscall_printf ("new fd out of bounds: %d", newfd);
+      set_errno (EBADF);
+      goto done;
+    }
   if (!not_open (newfd))
     _close (newfd);
   fds[newfd] = newfh;
