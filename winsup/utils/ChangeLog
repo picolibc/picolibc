@@ -1,3 +1,12 @@
+2002-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Build intermediate cygcheck.o to force use of MINGW_CXXFLAGS.
+	* cygcheck.cc (cygwin_info): Intitialize variable to quiet g++ warning.
+	(dump_sysinfo): Make variables unsigned to quiet g++ warnings.
+	* strace.cc (version_string): Rename from SCCSid.
+	(add_child): Remove unused variable.
+	(version): Use version_string.  Avoid use of fprintf.
+
 2002-01-21  DJ Delorie  <dj@redhat.com>
 
 	* Makefile.in: Use CXX instead of CC to compile C++ sources.

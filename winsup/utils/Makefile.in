@@ -86,7 +86,7 @@ endif
 
 all: Makefile $(PROGS)
 
-strace.exe: strace.cc mingw_getopt.o $(MINGW_DEP_LDLIBS)
+strace.exe: strace.o mingw_getopt.o $(MINGW_DEP_LDLIBS)
 ifdef VERBOSE
 	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 else
@@ -94,7 +94,7 @@ else
 	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 endif
 
-cygcheck.exe: cygcheck.cc mingw_getopt.o path.o dump_setup.o $(MINGW_DEP_LDLIBS)
+cygcheck.exe: cygcheck.o mingw_getopt.o path.o dump_setup.o $(MINGW_DEP_LDLIBS)
 ifdef VERBOSE
 	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,4,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 else
@@ -144,6 +144,22 @@ else
 endif
 
 dump_setup.o: dump_setup.cc
+ifdef VERBOSE
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+else
+	@echo $(CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+endif
+
+cygcheck.o: cygcheck.cc
+ifdef VERBOSE
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+else
+	@echo $(CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+endif
+
+strace.o: strace.cc
 ifdef VERBOSE
 	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 else

@@ -352,7 +352,8 @@ cygwin_info (HANDLE h)
       return;
     }
 
-  char *dll_major;
+  static char dummy[] = "\0\0\0\0\0\0\0";
+  char *dll_major = dummy;
   bufend = buf + size;
   while (buf < bufend)
     if ((buf = (char *) memchr (buf, '%', bufend - buf)) == NULL)
@@ -1051,13 +1052,13 @@ dump_sysinfo ()
     }
   printf ("\n");
 
-  unsigned int ml_fsname = 4, ml_dir = 7, ml_type = 6;
+  unsigned ml_fsname = 4, ml_dir = 7, ml_type = 6;
 
   struct mntent *mnt;
   setmntent (0, 0);
   while ((mnt = getmntent (0)))
     {
-      int n = (int) strlen (mnt->mnt_fsname);
+      unsigned n = (int) strlen (mnt->mnt_fsname);
       if (ml_fsname < n)
 	ml_fsname = n;
       n = (int) strlen (mnt->mnt_dir);

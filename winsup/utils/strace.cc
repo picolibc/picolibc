@@ -31,7 +31,7 @@ int _impure_ptr;
 #define alloca __builtin_alloca
 
 // Version string.
-static char *SCCSid = "@(#)strace V1.0, Copyright (C) 2001 Red Hat Inc., " __DATE__ "\n";
+static const char *version_string = "@(#)strace V1.0, Copyright (C) 2001 Red Hat Inc., " __DATE__ "\n";
 
 static const char *pgm;
 static int forkdebug = 0;
@@ -113,7 +113,6 @@ add_child (DWORD id, HANDLE hproc)
   children.next = new (child_list);
   children.next->next = c;
   lastid = children.next->id = id;
-  HANDLE me = GetCurrentProcess ();
   lasth = children.next->hproc = hproc;
 }
 
@@ -773,7 +772,7 @@ Usage: strace [OPTIONS] <command-line>\n\
 static void
 version ()
 {
-  fprintf (stderr, SCCSid+4);
+  fputs (version_string + 4, stderr);
 }
 
 struct option longopts[] = {
