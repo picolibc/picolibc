@@ -892,8 +892,9 @@ digits (const char *name)
   return p > name && !*p ? n : -1;
 }
 
-/* Return TRUE if src_path is a Win32 device name, filling out the device
-   name in win32_path */
+/* Return TRUE if src_path is a valid, internally supported device name.
+   In that case, win32_path gets the corresponding NT device name and
+   dev is appropriately filled with device information. */
 
 static bool
 win32_device_name (const char *src_path, char *win32_path, device& dev)
