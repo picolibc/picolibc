@@ -616,8 +616,8 @@ sigthread::init (const char *s)
 {
 #if 0 /* FIXME: Someday we'll need this for inter-thread signalling */
   lock = new_muto (FALSE, s);
-  id = GetCurrentThreadId ();
 #endif
+  id = GetCurrentThreadId ();
 }
 
 /* Take over from libc's crt0.o and start the application. Note the

@@ -38,7 +38,9 @@ struct sigthread
 {
   DWORD id;
   DWORD frame;
+#if 0
   muto *lock;			// FIXME: Use for multi-thread signalling someday
+#endif
   void init (const char *s);
 };
 

@@ -87,7 +87,7 @@ muto::acquire (DWORD ms)
 	  switch (WaitForSingleObject (bruteforce, ms))
 	      {
 	      case WAIT_OBJECT_0:
-		was_waiting = 0;
+		goto gotit;
 		break;
 	      default:
 		InterlockedDecrement (&waiters);
@@ -96,6 +96,7 @@ muto::acquire (DWORD ms)
 	}
     }
 
+gotit:
   tid = this_tid;	/* register this thread. */
   return ++visits;	/* Increment visit count. */
 }

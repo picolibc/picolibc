@@ -709,7 +709,9 @@ call_handler (int sig, struct sigaction& siga, void *handler)
   int res;
   int using_mainthread_frame;
 
+#if 0
   mainthread.lock->acquire ();
+#endif
 
   if (sigsave.sig)
     goto set_pending;
@@ -723,7 +725,9 @@ call_handler (int sig, struct sigaction& siga, void *handler)
     {
       int i;
       using_mainthread_frame = 0;
+#if 0
       mainthread.lock->release ();
+#endif
 
       hth = myself->getthread2signal ();
       /* Suspend the thread which will receive the signal.  But first ensure that
@@ -747,14 +751,18 @@ call_handler (int sig, struct sigaction& siga, void *handler)
 	    if (m->unstable () || m->owner () == mainthread.id)
 	      goto owns_muto;
 
+#if 0
 	  mainthread.lock->acquire ();
+#endif
 	  if (mainthread.frame)
 	    {
 	      ebp = mainthread.frame;	/* try to avoid a race */
 	      using_mainthread_frame = 1;
 	      goto next;
 	    }
+#if 0
 	  mainthread.lock->release ();
+#endif
 
 	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
 	  if (!GetThreadContext (hth, &cx))
@@ -816,7 +824,9 @@ out:
       sigproc_printf ("ResumeThread returned %d", res);
     }
 
+#if 0
   mainthread.lock->release ();
+#endif
 
   sigproc_printf ("returning %d", interrupted);
   return interrupted;
