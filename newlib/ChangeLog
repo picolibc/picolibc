@@ -1,3 +1,8 @@
+2003-11-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/stdlib.h (getprogname): Declare for Cygwin.
+	(setprogname): Ditto.
+
 2003-11-10  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/powerpc/ufix64toa.c (_ufix64to_r): Fix shifts

@@ -66,6 +66,9 @@ _VOID	_EXFUN(exit,(int __status) _ATTRIBUTE ((noreturn)));
 _VOID	_EXFUN(free,(_PTR));
 char *  _EXFUN(getenv,(const char *__string));
 char *	_EXFUN(_getenv_r,(struct _reent *, const char *__string));
+#ifdef __CYGWIN__
+const char *_EXFUN(getprogname,(void));
+#endif
 char *	_EXFUN(_findenv,(_CONST char *, int *));
 char *	_EXFUN(_findenv_r,(struct _reent *, _CONST char *, int *));
 long	_EXFUN(labs,(long));
@@ -90,6 +93,9 @@ char *  _EXFUN(mktemp,(char *));
 _VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, int(*_compar)(const _PTR, const _PTR)));
 int	_EXFUN(rand,(_VOID));
 _PTR	_EXFUN(realloc,(_PTR __r, size_t __size));
+#ifdef __CYGWIN__
+void	_EXFUN(setprogname,(const char *));
+#endif
 _VOID	_EXFUN(srand,(unsigned __seed));
 double	_EXFUN(strtod,(const char *__n, char **__end_PTR));
 double	_EXFUN(_strtod_r,(struct _reent *,const char *__n, char **__end_PTR));
