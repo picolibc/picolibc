@@ -312,7 +312,7 @@ _CRTIMP void __cdecl	rewind (FILE*);
  */
 
 int __cdecl __mingw_fseek (FILE *, long, int);
-int __cdecl __mingw_fwrite (const void*, size_t, size_t, FILE*);
+size_t __cdecl __mingw_fwrite (const void*, size_t, size_t, FILE*);
 #define fseek(fp, offset, whence)  __mingw_fseek(fp, offset, whence)
 #define fwrite(buffer, size, count, fp)  __mingw_fwrite(buffer, size, count, fp)
 #endif /* __USE_MINGW_FSEEK */

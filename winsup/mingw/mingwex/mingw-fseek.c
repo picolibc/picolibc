@@ -37,7 +37,7 @@ __mingw_fseeko64 (FILE *fp, off64_t offset, int whence)
   return fseeko64 (fp, offset, whence);
 }
 
-int
+size_t
 __mingw_fwrite (const void *buffer, size_t size, size_t count, FILE *fp)
 {
 # undef fwrite 
