@@ -67,7 +67,7 @@
 
 #define __MINGW32_VERSION 2.1
 #define __MINGW32_MAJOR_VERSION 2
-#define __MINGW32_MINOR_VERSION 1
+#define __MINGW32_MINOR_VERSION 2
 
 #endif /* __MINGW_H */
 
