@@ -1,3 +1,7 @@
+2004-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (link): Avoid compiler warning.
+
 2004-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (set_ntea): New function.

@@ -760,6 +760,7 @@ link (const char *a, const char *b)
 		   StreamId.dwStreamNameSize;
 
       lpContext = NULL;
+      write_err = 0;
       /* Write the WIN32_STREAM_ID */
       bSuccess = BackupWrite (
 	hFileSource,
