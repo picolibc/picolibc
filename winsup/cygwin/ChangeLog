@@ -1,6 +1,7 @@
 Sat Mar 18 23:04:27 2000  Christopher Faylor <cgf@cygnus.com>
 
-	* times.cc: Remove unneeded (and incorrect) externs.
+	* times.cc: Fix extern declarations for variables that are exported but
+	used by this modules.
 
 Sat Mar 18 01:32:04 2000  Christopher Faylor <cgf@cygnus.com>
 
