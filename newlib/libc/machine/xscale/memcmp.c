@@ -27,7 +27,7 @@ memcmp (const void * s1, const void * s2, size_t len)
 	b	1f		@ jump to LOOP TEST\n\
 0:			       @ LOOP START\n\
 	ldrb	r2, [lr], #1	@ load byte from LR, post inc.\n\
-"	PRELOADSTR("lr") "	@ preload\n\ 
+"	PRELOADSTR("lr") "	@ preload\n\
 	ldrb	r3, [r4], #1	@ load byte from R4, post inc.\n\
 "	PRELOADSTR("r4") "	@ preload\n\
 	cmp	r2, r3		@ are the two bytes the same ?\n\
@@ -49,7 +49,7 @@ memcmp (const void * s1, const void * s2, size_t len)
 	ldmia	r4,{r5, r6}	@ get two words from second pointer, post inc\n\
 	sub	%2, %2, #0x4	@ decrement count by 4\n\
 	cmp	r2, r5		@ has the count reached ????\n\
-	bne	1f		@ no = goto\n\ 
+	bne	1f		@ no = goto\n\
 	sub	%2, %2, #0x4	@ decrement the count by 4\n\
 	add	lr, lr, #0x4	@ add 4 to first pointer\n\
 	add	r4, r4, #0x4	@ add 4 to second pointer\n\
