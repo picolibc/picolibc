@@ -41,7 +41,9 @@ extern "C" {
 #endif
 #define IN
 #define OUT
+#ifndef OPTIONAL
 #define OPTIONAL
+#endif
 
 #ifdef __GNUC__
 #define PACKED __attribute__((packed))

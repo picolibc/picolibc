@@ -1,3 +1,9 @@
+Thu Jun 22 14:36:19 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* rpcdce.h: Protect OPTIONAL definition since it may be (legally)
+	previously defined.
+	* windef.h : Ditto.
+
 2000-06-14  Kazuhiro Fujieda <fujieda@jaist.ac.jp>
 
 	* include/winnt.h: Add some missing defines related to locale

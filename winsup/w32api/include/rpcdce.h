@@ -8,7 +8,9 @@ extern "C" {
 
 #define IN
 #define OUT
+#ifndef OPTIONAL
 #define OPTIONAL
+#endif
 #define uuid_t UUID
 #define rpc_binding_handle_t RPC_BINDING_HANDLE
 #define rpc_binding_vector_t RPC_BINDING_VECTOR
