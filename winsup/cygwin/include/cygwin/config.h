@@ -23,6 +23,14 @@ extern "C" {
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #define __LARGE64_FILES 1
 #define __CYGWIN_USE_BIG_TYPES__ 1
+#ifdef __CYGWIN_USE_BIG_TYPES__
+/* __USE_INTERNAL_STAT64 is needed when building newlib for Cygwin.
+   It must be set when __CYGWIN_USE_BIG_TYPES__ is set.  In this case
+   newlib will call the 64 bit stat calls internally.  Otherwise the
+   struct stat used in newlib is not matching the struct stat used in
+   Cygwin. */
+#define __USE_INTERNAL_STAT64 1
+#endif
 #if defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
 #define __IMPORT
 #else
