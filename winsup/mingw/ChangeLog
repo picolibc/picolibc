@@ -1,9 +1,20 @@
+2002-10-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/cytpe.h: Prefix identifiers used as args of inlines
+	with '__', throughout.
+	* include/inttypes.h: Likewise.
+	* include/math.h: Likewise.
+	* include/stdio.h: Likewise.
+	* include/stdlib.h: Likewise.
+	* include/wchar.h: Likewise.
+	* include/wctype.h: Likewise.
+
 2002-09-30  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ctype.h (_tolower): Move inlined definition out of
 	std namespace.
 	(_tolower): Likewise.
-	(is_wctype): Move into non-ANSI, block. Qualify wctype_t with
+	(is_wctype): Move into non-ANSI block. Qualify wctype_t with
 	 __CSTD.
 
 2002-09-29  Danny Smith  <dannysmith@users.sourceforge.net>

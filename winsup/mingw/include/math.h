@@ -143,19 +143,19 @@ double	log (double);
 double	log10 (double);
 double	pow (double, double);
 double	sqrt (double);
-extern __inline__  double sqrt (double x)
+extern __inline__  double sqrt (double __x)
 {
   double res;
-  __asm__ ("fsqrt;" : "=t" (res) : "0" (x));
+  __asm__ ("fsqrt;" : "=t" (res) : "0" (__x));
   return res;
 }
 double	ceil (double);
 double	floor (double);
 double	fabs (double);
-extern __inline__  double fabs (double x)
+extern __inline__  double fabs (double __x)
 {
   double res;
-  __asm__ ("fabs;" : "=t" (res) : "0" (x));
+  __asm__ ("fabs;" : "=t" (res) : "0" (__x));
   return res;
 }
 double	ldexp (double, int);
@@ -165,7 +165,6 @@ double	fmod (double, double);
 
 __END_CSTD_NAMESPACE
 __BEGIN_CGLOBAL_NAMESPACE
-
 
 #ifndef	__STRICT_ANSI__
 
@@ -242,7 +241,6 @@ int fpclass (double);
 #define HUGE_VALL (1.0L/0.0L)
 #define INFINITY (1.0F/0.0F)
 
-
 /* 7.12.3.1 */
 /*
    Return values for fpclassify.
@@ -257,7 +255,6 @@ int fpclass (double);
 #define FP_SUBNORMAL	(FP_NORMAL | FP_ZERO)
 /* 0x0200 is signbit mask */
 
-
 /*
   We can't inline float or double, because we want to ensure truncation
   to semantic type before classification. 
@@ -268,83 +265,83 @@ int fpclass (double);
 extern int __fpclassifyf (float);
 extern int __fpclassify (double);
 
-extern __inline__ int __fpclassifyl (long double x){
+extern __inline__ int __fpclassifyl (long double __x){
   unsigned short sw;
-  __asm__ ("fxam; fstsw %%ax;" : "=a" (sw): "t" (x));
+  __asm__ ("fxam; fstsw %%ax;" : "=a" (sw): "t" (__x));
   return sw & (FP_NAN | FP_NORMAL | FP_ZERO );
 }
 
-#define fpclassify(x) (sizeof (x) == sizeof (float) ? __fpclassifyf (x)	  \
-		       : sizeof (x) == sizeof (double) ? __fpclassify (x) \
-		       : __fpclassifyl (x))
+#define fpclassify(__x) (sizeof (__x) == sizeof (float) ? __fpclassifyf (__x)	  \
+		       : sizeof (__x) == sizeof (double) ? __fpclassify (__x) \
+		       : __fpclassifyl (__x))
 
 /* 7.12.3.2 */
-#define isfinite(x) ((fpclassify(x) & FP_NAN) == 0)
+#define isfinite(__x) ((fpclassify(__x) & FP_NAN) == 0)
 
 /* 7.12.3.3 */
-#define isinf(x) (fpclassify(x) == FP_INFINITE)
+#define isinf(__x) (fpclassify(__x) == FP_INFINITE)
 
 /* 7.12.3.4 */
 /* We don't need to worry about trucation here:
    A NaN stays a NaN. */
 
-extern __inline__ int __isnan (double _x)
+extern __inline__ int __isnan (double __x)
 {
   unsigned short sw;
   __asm__ ("fxam;"
-	   "fstsw %%ax": "=a" (sw) : "t" (_x));
+	   "fstsw %%ax": "=a" (sw) : "t" (__x));
   return (sw & (FP_NAN | FP_NORMAL | FP_INFINITE | FP_ZERO | FP_SUBNORMAL))
     == FP_NAN;
 }
 
-extern __inline__ int __isnanf (float _x)
+extern __inline__ int __isnanf (float __x)
 {
   unsigned short sw;
   __asm__ ("fxam;"
-	    "fstsw %%ax": "=a" (sw) : "t" (_x));
+	    "fstsw %%ax": "=a" (sw) : "t" (__x));
   return (sw & (FP_NAN | FP_NORMAL | FP_INFINITE | FP_ZERO | FP_SUBNORMAL))
     == FP_NAN;
 }
 
-extern __inline__ int __isnanl (long double _x)
+extern __inline__ int __isnanl (long double __x)
 {
   unsigned short sw;
   __asm__ ("fxam;"
-	    "fstsw %%ax": "=a" (sw) : "t" (_x));
+	    "fstsw %%ax": "=a" (sw) : "t" (__x));
   return (sw & (FP_NAN | FP_NORMAL | FP_INFINITE | FP_ZERO | FP_SUBNORMAL))
     == FP_NAN;
 }
 
 
-#define isnan(x) (sizeof (x) == sizeof (float) ? __isnanf (x)	\
-		  : sizeof (x) == sizeof (double) ? __isnan (x)	\
-		  : __isnanl (x))
+#define isnan(__x) (sizeof (__x) == sizeof (float) ? __isnanf (__x)	\
+		  : sizeof (__x) == sizeof (double) ? __isnan (__x)	\
+		  : __isnanl (__x))
 
 /* 7.12.3.5 */
-#define isnormal(x) (fpclassify(x) == FP_NORMAL)
+#define isnormal(__x) (fpclassify(__x) == FP_NORMAL)
 
 /* 7.12.3.6 The signbit macro */
-extern __inline__ int __signbit (double x) {
+extern __inline__ int __signbit (double __x) {
   unsigned short stw;
-  __asm__ ( "fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
+  __asm__ ( "fxam; fstsw %%a__x;": "=a" (stw) : "t" (__x));
   return stw & 0x0200;
 }
 
-extern  __inline__ int __signbitf (float x) {
+extern  __inline__ int __signbitf (float __x) {
   unsigned short stw;
-  __asm__ ("fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
+  __asm__ ("fxam; fstsw %%a__x;": "=a" (stw) : "t" (__x));
   return stw & 0x0200;
 }
-extern  __inline__ int __signbitl (long double x) {
+extern  __inline__ int __signbitl (long double __x) {
   unsigned short stw;
-  __asm__ ("fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
+  __asm__ ("fxam; fstsw %%a__x;": "=a" (stw) : "t" (__x));
   return stw & 0x0200;
 }
 
 
-#define signbit(x) (sizeof (x) == sizeof (float) ? __signbitf (x)	\
-		    : sizeof (x) == sizeof (double) ? __signbit (x)	\
-		    : __signbitl (x))
+#define signbit(__x) (sizeof (__x) == sizeof (float) ? __signbitf (__x)	\
+		    : sizeof (__x) == sizeof (double) ? __signbit (__x)	\
+		    : __signbitl (__x))
 
 /* 7.12.4 Trigonometric functions: Double in C89 */
 extern float sinf (float);
@@ -369,16 +366,16 @@ extern float atan2f (float, float);
 extern long double atan2l (long double, long double);
 
 /* 7.12.5 Hyperbolic functions: Double in C89  */
-extern __inline__ float sinhf (float x)
-  {return (float) __CSTD sinh (x);}
+extern __inline__ float sinhf (float __x)
+  {return (float) __CSTD sinh (__x);}
 extern long double sinhl (long double);
 
-extern __inline__ float coshf (float x)
-  {return (float) __CSTD cosh (x);}
+extern __inline__ float coshf (float __x)
+  {return (float) __CSTD cosh (__x);}
 extern long double coshl (long double);
 
-extern __inline__ float tanhf (float x)
-  {return (float) __CSTD tanh (x);}
+extern __inline__ float tanhf (float __x)
+  {return (float) __CSTD tanh (__x);}
 extern long double tanhl (long double);
 
 /*
@@ -386,8 +383,8 @@ extern long double tanhl (long double);
  */ 
 
 /* 7.12.6.1 Double in C89 */
-extern __inline__ float expf (float x)
-  {return (float) __CSTD exp (x);}
+extern __inline__ float expf (float __x)
+  {return (float) __CSTD exp (__x);}
 extern long double expl (long double);
 
 /* 7.12.6.2 */
@@ -398,8 +395,8 @@ extern long double exp2l(long double);
 /* 7.12.6.3 The expm1 functions: TODO */
 
 /* 7.12.6.4 Double in C89 */
-extern __inline__ float frexpf (float x, int* expn)
-  {return (float) __CSTD frexp (x, expn);}
+extern __inline__ float frexpf (float __x, int* __expn)
+  {return (float) __CSTD frexp (__x, __expn);}
 extern long double frexpl (long double, int*);
 
 /* 7.12.6.5 */
@@ -410,8 +407,8 @@ extern int ilogbf (float);
 extern int ilogbl (long double);
 
 /* 7.12.6.6  Double in C89 */
-extern __inline__ float ldexpf (float x, int expn)
-  {return (float) __CSTD ldexp (x, expn);}
+extern __inline__ float ldexpf (float __x, int __expn)
+  {return (float) __CSTD ldexp (__x, __expn);}
 extern long double ldexpl (long double, int);
 
 /* 7.12.6.7 Double in C89 */
@@ -437,27 +434,27 @@ extern double logb (double);
 extern float logbf (float);
 extern long double logbl (long double);
 
-extern __inline__ double logb (double x)
+extern __inline__ double logb (double __x)
 {
   double res;
   __asm__ ("fxtract\n\t"
-       "fstp	%%st" : "=t" (res) : "0" (x));
+       "fstp	%%st" : "=t" (res) : "0" (__x));
   return res;
 }
 
-extern __inline__ float logbf (float x)
+extern __inline__ float logbf (float __x)
 {
   float res;
   __asm__ ("fxtract\n\t"
-       "fstp	%%st" : "=t" (res) : "0" (x));
+       "fstp	%%st" : "=t" (res) : "0" (__x));
   return res;
 }
 
-extern __inline__ long double logbl (long double x)
+extern __inline__ long double logbl (long double __x)
 {
   long double res;
   __asm__ ("fxtract\n\t"
-       "fstp	%%st" : "=t" (res) : "0" (x));
+       "fstp	%%st" : "=t" (res) : "0" (__x));
   return res;
 }
 
@@ -481,43 +478,43 @@ extern float cbrtf (float);
 extern long double cbrtl (long double);
 
 /* 7.12.7.2 The fabs functions: Double in C89 */
-extern __inline__ float fabsf (float x)
+extern __inline__ float fabsf (float __x)
 {
   float res;
-  __asm__ ("fabs;" : "=t" (res) : "0" (x));
+  __asm__ ("fabs;" : "=t" (res) : "0" (__x));
   return res;
 }
 
-extern __inline__ long double fabsl (long double x)
+extern __inline__ long double fabsl (long double __x)
 {
   long double res;
-  __asm__ ("fabs;" : "=t" (res) : "0" (x));
+  __asm__ ("fabs;" : "=t" (res) : "0" (__x));
   return res;
 }
 
 /* 7.12.7.3  */
 extern double hypot (double, double); /* in libmoldname.a */
-extern __inline__ float hypotf (float x, float y)
-  { return (float) hypot (x, y);}
+extern __inline__ float hypotf (float __x, float __y)
+  { return (float) hypot (__x, __y);}
 extern long double hypotl (long double, long double);
 
 /* 7.12.7.4 The pow functions. Double in C89 */
-extern __inline__ float powf (float x, float y)
-  {return (float) __CSTD pow (x, y);}
+extern __inline__ float powf (float __x, float __y)
+  {return (float) __CSTD pow (__x, __y);}
 extern long double powl (long double, long double);
 
 /* 7.12.7.5 The sqrt functions. Double in C89. */
-extern __inline__ float sqrtf (float x)
+extern __inline__ float sqrtf (float __x)
 {
   float res;
-  __asm__ ("fsqrt" : "=t" (res) : "0" (x));
+  __asm__ ("fsqrt" : "=t" (res) : "0" (__x));
   return res;
 }
 
-extern __inline__ long double sqrtl (long double x)
+extern __inline__ long double sqrtl (long double __x)
 {
   long double res;
-  __asm__ ("fsqrt" : "=t" (res) : "0" (x));
+  __asm__ ("fsqrt" : "=t" (res) : "0" (__x));
   return res;
 }
 
@@ -538,73 +535,73 @@ extern long double nearbyintl (long double);
 
 /* 7.12.9.4 */
 /* round, using fpu control word settings */
-extern __inline__ double rint (double x)
+extern __inline__ double rint (double __x)
 {
   double retval;
-  __asm__ ("frndint;": "=t" (retval) : "0" (x));
+  __asm__ ("frndint;": "=t" (retval) : "0" (__x));
   return retval;
 }
 
-extern __inline__ float rintf (float x)
+extern __inline__ float rintf (float __x)
 {
   float retval;
-  __asm__ ("frndint;" : "=t" (retval) : "0" (x) );
+  __asm__ ("frndint;" : "=t" (retval) : "0" (__x) );
   return retval;
 }
 
-extern __inline__ long double rintl (long double x)
+extern __inline__ long double rintl (long double __x)
 {
   long double retval;
-  __asm__ ("frndint;" : "=t" (retval) : "0" (x) );
+  __asm__ ("frndint;" : "=t" (retval) : "0" (__x) );
   return retval;
 }
 
 /* 7.12.9.5 */
-extern __inline__ long lrint (double x) 
+extern __inline__ long lrint (double __x) 
 {
   long retval;  
   __asm__ __volatile__							      \
-    ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");				      \
+    ("fistpl %0"  : "=m" (retval) : "t" (__x) : "st");				      \
   return retval;
 }
 
-extern __inline__ long lrintf (float x) 
+extern __inline__ long lrintf (float __x) 
 {
   long retval;
   __asm__ __volatile__							      \
-    ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");				      \
+    ("fistpl %0"  : "=m" (retval) : "t" (__x) : "st");				      \
   return retval;
 }
 
-extern __inline__ long lrintl (long double x) 
+extern __inline__ long lrintl (long double __x) 
 {
   long retval;
   __asm__ __volatile__							      \
-    ("fistpl %0"  : "=m" (retval) : "t" (x) : "st");				      \
+    ("fistpl %0"  : "=m" (retval) : "t" (__x) : "st");				      \
   return retval;
 }
 
-extern __inline__ long long llrint (double x) 
+extern __inline__ long long llrint (double __x) 
 {
   long long retval;
   __asm__ __volatile__							      \
-    ("fistpll %0"  : "=m" (retval) : "t" (x) : "st");				      \
+    ("fistpll %0"  : "=m" (retval) : "t" (__x) : "st");				      \
   return retval;
 }
 
-extern __inline__ long long llrintf (float x) 
+extern __inline__ long long llrintf (float __x) 
 {
   long long retval;
   __asm__ __volatile__							      \
-    ("fistpll %0"  : "=m" (retval) : "t" (x) : "st");				      \
+    ("fistpll %0"  : "=m" (retval) : "t" (__x) : "st");				      \
   return retval;
 }
 
-extern __inline__ long long llrintl (long double x) 
+extern __inline__ long long llrintl (long double __x) 
 {
   long long retval;
   __asm__ __volatile__							      \
-    ("fistpll %0"  : "=m" (retval) : "t" (x) : "st");				      \
+    ("fistpll %0"  : "=m" (retval) : "t" (__x) : "st");				      \
   return retval;
 }
 
@@ -669,9 +666,9 @@ extern float nextafterf (float, float);
 
 /* 7.12.12.1 */
 /*  x > y ? (x - y) : 0.0  */
-extern double fdim (double x, double y);
-extern float fdimf (float x, float y);
-extern long double fdiml (long double x, long double y);
+extern double fdim (double __x, double __y);
+extern float fdimf (float __x, float __y);
+extern long double fdiml (long double __x, long double __y);
 
 /* fmax and fmin.
    NaN arguments are treated as missing data: if one argument is a NaN
@@ -694,7 +691,6 @@ extern double fma (double, double, double);
 extern float fmaf (float, float, float);
 extern long double fmal (long double, long double, long double);
 
-
 /* 7.12.14 */
 /* 
  *  With these functions, comparisons involving quiet NaNs set the FP
@@ -706,34 +702,34 @@ extern long double fmal (long double, long double, long double);
 
 #if __GNUC__ >= 3
 
-#define isgreater(x, y) __builtin_isgreater(x, y)
-#define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
-#define isless(x, y) __builtin_isless(x, y)
-#define islessequal(x, y) __builtin_islessequal(x, y)
-#define islessgreater(x, y) __builtin_islessgreater(x, y)
-#define isunordered(x, y) __builtin_isunordered(x, y)
+#define isgreater(__x, __y) __builtin_isgreater(__x, __y)
+#define isgreaterequal(__x, __y) __builtin_isgreaterequal(__x, __y)
+#define isless(__x, __y) __builtin_isless(__x, __y)
+#define islessequal(__x, __y) __builtin_islessequal(__x, __y)
+#define islessgreater(__x, __y) __builtin_islessgreater(__x, __y)
+#define isunordered(__x, __y) __builtin_isunordered(__x, __y)
 
 #else
 /*  helper  */
 extern  __inline__ int
-__fp_unordered_compare (long double x, long double y){
+__fp_unordered_compare (long double __x, long double __y){
   unsigned short retval;
   __asm__ ("fucom %%st(1);"
-	   "fnstsw;": "=a" (retval) : "t" (x), "u" (y));
+	   "fnstsw;": "=a" (retval) : "t" (__x), "u" (__y));
   return retval;
 }
 
-#define isgreater(x, y) ((__fp_unordered_compare(x, y) \
+#define isgreater(__x, __y) ((__fp_unordered_compare(__x, __y) \
 			   & 0x4500) == 0)
-#define isless(x, y) ((__fp_unordered_compare (y, x) \
+#define isless(__x, __y) ((__fp_unordered_compare (__y, __x) \
                        & 0x4500) == 0)
-#define isgreaterequal(x, y) ((__fp_unordered_compare (x, y) \
+#define isgreaterequal(__x, __y) ((__fp_unordered_compare (__x, __y) \
                                & FP_INFINITE) == 0)
-#define islessequal(x, y) ((__fp_unordered_compare(y, x) \
+#define islessequal(__x, __y) ((__fp_unordered_compare(__y, __x) \
 			    & FP_INFINITE) == 0)
-#define islessgreater(x, y) ((__fp_unordered_compare(x, y) \
+#define islessgreater(__x, __y) ((__fp_unordered_compare(__x, __y) \
 			      & FP_SUBNORMAL) == 0)
-#define isunordered(x, y) ((__fp_unordered_compare(x, y) \
+#define isunordered(__x, __y) ((__fp_unordered_compare(__x, __y) \
 			    & 0x4500) == 0x4500)
 
 #endif
@@ -743,6 +739,7 @@ __fp_unordered_compare (long double x, long double y){
 #endif /* __NO_ISOCEXT */
 
 __END_CGLOBAL_NAMESPACE
+
 
 #endif	/* Not RC_INVOKED */
 

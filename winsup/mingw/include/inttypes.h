@@ -254,8 +254,8 @@ typedef struct {
 
 #endif	/* !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) */
 
-extern __inline__ intmax_t	imaxabs (intmax_t j)
-	{return	(j >= 0 ? j : -j);}
+extern __inline__ intmax_t imaxabs (intmax_t __j)
+	{return	(__j >= 0 ? __j : -__j);}
 imaxdiv_t imaxdiv (intmax_t numer, intmax_t denom);
 
 /* 7.8.2 Conversion functions for greatest-width integer types */

@@ -150,8 +150,9 @@ int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VALIST);
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
 extern __inline__ int
-vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
-  { return _vsnwprintf ( s, n, format, arg);}
+vsnwprintf (wchar_t* __s, size_t __n, const wchar_t* __format,
+	    __VALIST __arg)
+  { return _vsnwprintf ( __s, __n, __format, __arg);}
 #endif
 __END_CGLOBAL_NAMESPACE
 
@@ -404,8 +405,8 @@ long	wcstol	(const wchar_t*, wchar_t**, int);
 unsigned long	wcstoul (const wchar_t*, wchar_t**, int);
 double	wcstod	(const wchar_t*, wchar_t**);
 #if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-extern __inline__ float wcstof( const wchar_t *nptr, wchar_t **endptr)
-{  return (wcstod(nptr, endptr)); }
+extern __inline__ float wcstof( const wchar_t *__nptr, wchar_t **__endptr)
+{  return (wcstod(__nptr, __endptr)); }
 #endif /* __NO_ISOCEXT */
 __END_CSTD_NAMESPACE
 #define  _WSTDLIB_DEFINED
@@ -433,8 +434,10 @@ size_t  wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
 int  	wctob(wint_t);
 
 #ifndef __NO_ISOCEXT /* these need static lib libmingwex.a */
-extern __inline__ int fwide(FILE* stream, int mode) {return -1;} /* limited to byte orientation */ 
-extern __inline__ int mbsinit(const mbstate_t* ps) {return 1;}
+extern __inline__ int fwide(FILE* __stream, int __mode)
+  {return -1;} /* limited to byte orientation */ 
+extern __inline__ int mbsinit(const mbstate_t* __ps)
+  {return 1;}
 wchar_t* wmemset(wchar_t* s, wchar_t c, size_t n);
 wchar_t* wmemchr(const wchar_t* s, wchar_t c, size_t n);
 int wmemcmp(const wchar_t* s1, const wchar_t * s2, size_t n);

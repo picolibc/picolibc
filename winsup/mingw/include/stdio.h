@@ -231,9 +231,9 @@ int	_vsnprintf (char*, size_t, const char*, __VALIST);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int snprintf(char* s, size_t n, const char*  format, ...);
-extern __inline__ int vsnprintf (char* s, size_t n, const char* format,
-			   __VALIST arg)
-  { return _vsnprintf ( s, n, format, arg); }
+extern __inline__ int
+vsnprintf (char* __s, size_t __n, const char* __format, __VALIST __arg)
+  { return _vsnprintf ( __s, __n, __format, __arg); }
 #endif
 
 __END_CGLOBAL_NAMESPACE
@@ -382,8 +382,9 @@ int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VALIST);
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
 extern __inline__ int
-vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
-  { return _vsnwprintf ( s, n, format, arg);}
+vsnwprintf (wchar_t* __s, size_t __n, const wchar_t* __format,
+	    __VALIST __arg)
+  { return _vsnwprintf ( __s, __n, __format, __arg);}
 #endif
 
 __END_CGLOBAL_NAMESPACE
