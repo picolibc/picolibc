@@ -1,5 +1,10 @@
 2001-09-12  Earnie Boyd  <earnie@SF.net>
 
+	* Makefile.in (TARFLAGS): New variable.
+	(TARFILEEXT): Ditto.
+
+2001-09-12  Earnie Boyd  <earnie@SF.net>
+
 	* Makefile.in: Increment version.
 	* include/w32api.h: Ditto.
 	* lib/Makefile.in: Add usr/ to install directory special for cygwin.

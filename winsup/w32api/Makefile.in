@@ -42,6 +42,8 @@ AR = @AR@
 LD = @LD@
 
 TAR = tar
+TARFLAGS = z
+TARFILEEXT = .tar.gz
 
 FLAGS_TO_PASS = \
 	AS="$(AS)" \
@@ -53,6 +55,9 @@ FLAGS_TO_PASS = \
 	RANLIB="$(RANLIB)" \
 	LD="$(LD)" \
 	DLLTOOL="$(DLLTOOL)" \
+	TAR="$(TAR)" \
+	TARFLAGS="$(TARFLAGS)" \
+	TARFILEEXT="$(TARFILEEXT)" \
 	WINDRES="$(WINDRES)"
 
 # end config section
@@ -94,6 +99,11 @@ else
    endif
 endif
 
+ifneq (,$(findstring cygwin, $(target_alias)))
+  TARFLAGS = j
+  TARFILEEXT = .tar.bz2
+endif
+
 dist: srcdist bindist
 
 srcdist:
@@ -106,16 +116,16 @@ srcdist:
 	for i in $(SUBDIRS); do \
 		(cd $$i; $(MAKE) distdir=../$(distdir) dist); \
 	done
-	rm -f $(distdir)-src.tar.gz
-	$(TAR) czf $(distdir)-src.tar.gz $(distdir)
+	rm -f $(distdir)-src$(TARFILEEXT)
+	$(TAR) $(TARFLAGS)cf $(distdir)-src$(TARFILEEXT) $(distdir)
 
 bindist:
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 755 $(distdir)
 	$(MAKE) install prefix=../$(distdir) exec_prefix=../$(distdir)
-	rm -f $(distdir).tar.gz
-	cd $(distdir); $(TAR) czf ../$(distdir).tar.gz .
+	rm -f $(distdir)$(TARFILEEXT)
+	cd $(distdir); $(TAR) $(TARFLAGS)cf ../$(distdir)$(TARFILEEXT) .
 
 snapshot:
 	make dist SNAPDATE=$(shell date '+%Y%m%d')
@@ -127,7 +137,7 @@ mostlyclean-top:
 	rm -f *~
 clean-top: mostlyclean-top
 	rm -rf $(distdir)
-	rm -f $(distdir)*.tar.gz
+	rm -f $(distdir)*$(TARFILEEXT)
 maintainer-clean-top:
 
 mostlyclean: mostlyclean-top mostlyclean-subdirs
