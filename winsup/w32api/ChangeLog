@@ -1,3 +1,10 @@
+2002-05-27  René Møller Fonseca  <fonseca@users.sourceforge.net> 
+
+	* include/winreg.h: (RegConnectRegistry[AW]): Replace
+	LP[W]STR with LPC[W]STR.
+	(REG_QWORD, REG_QWORD_LITTLE_ENDIAN): Add defines.
+	Clean up whitespace.
+
 2002-05-27  Rick Rankin  <rick_rankin@yahoo.com>
 
 	* include/winnls.h: Add #define for LOCALE_RETURN_NUMBER.
