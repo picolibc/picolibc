@@ -1,3 +1,8 @@
+2002-06-09  Gunnar Degnbol <gdegnbol@users.sourceforge.net>
+
+	* include/richedit.h (EM_*, TM_*, GT_*): Add new defines.
+	(GETTEXTEX): Add structure definition.
+
 2002-06-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/windows.h (ole2.h): #include if !__OBJC__ and

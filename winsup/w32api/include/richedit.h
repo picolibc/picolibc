@@ -139,7 +139,10 @@ extern "C" {
 #define EM_GETUNDONAME	(WM_USER+86)
 #define EM_GETREDONAME	(WM_USER+87)
 #define EM_STOPGROUPTYPING	(WM_USER+88)
+#define EM_SETTEXTMODE	(WM_USER+89)
+#define EM_GETTEXTMODE	(WM_USER+90)
 #define EM_AUTOURLDETECT	(WM_USER+91)
+#define EM_GETTEXTEX	(WM_USER+94)
 #define EM_GETTEXTLENGTHEX	(WM_USER+95)
 #define EM_SHOWSCROLLBAR	(WM_USER+96)
 #define EM_SETLANGOPTIONS	(WM_USER+120)
@@ -194,6 +197,14 @@ extern "C" {
 #define SCF_WORD	2
 #define SCF_ALL	4
 #define SCF_USEUIRULES	8
+#define TM_PLAINTEXT	1
+#define TM_RICHTEXT	2
+#define TM_SINGLELEVELUNDO	4
+#define TM_MULTILEVELUNDO	8
+#define TM_SINGLECODEPAGE	16
+#define TM_MULTICODEPAGE	32
+#define GT_DEFAULT	0
+#define GT_USECRLF	1
 #define yHeightCharPtsMost 1638
 #define lDefaultTab 720
 
@@ -380,6 +391,13 @@ typedef struct _punctuation {
 	UINT iSize;
 	LPSTR szPunctuation;
 } PUNCTUATION;
+typedef struct _gettextex {
+	DWORD cb;
+	DWORD flags;
+	UINT codepage;
+	LPCSTR lpDefaultChar;
+	LPBOOL lpUsedDefaultChar;
+} GETTEXTEX;
 typedef LONG (*EDITWORDBREAKPROCEX)(char*,LONG,BYTE,INT);
 /* Defines for EM_SETTYPOGRAPHYOPTIONS */
 #define	TO_ADVANCEDTYPOGRAPHY	1
