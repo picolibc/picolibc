@@ -1,6 +1,7 @@
 2002-04-11  Alan Modra  <amodra@bigpond.net.au>
 
 	* i386.h: Add intel mode cmpsd and movsd.
+	Put them before SSE2 insns, so that rep prefix works.
 
 2002-03-15  Chris G. Demetriou  <cgd@broadcom.com>
 
