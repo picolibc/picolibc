@@ -536,7 +536,8 @@ normalize_posix_path (const char *src, char *dst)
   if (!isslash (src[0]))
     {
       char cwd[MAX_PATH];
-      cygcwd.get (cwd);	/* FIXME: check return value */
+      if (!cygcwd.get (cwd))
+	return get_errno ();
       if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
 	{
 	  debug_printf ("ENAMETOOLONG = normalize_posix_path (%s)", src);
@@ -639,7 +640,8 @@ normalize_win32_path (const char *src, char *dst)
   if (!SLASH_P (src[0]) && strchr (src, ':') == NULL)
     {
       char cwd[MAX_PATH];
-      cygcwd.get (cwd, 0);	/* FIXME: check return value */
+      if (!cygcwd.get (cwd, 0))
+	return get_errno ();
       if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
 	{
 	  debug_printf ("ENAMETOOLONG = normalize_win32_path (%s)", src);
@@ -1043,7 +1045,8 @@ fillin:
   else if (isrelpath)
     {
       char cwd_win32[MAX_PATH];
-      cygcwd.get (cwd_win32, 0); /* FIXME: check return value someday */
+      if (!cygcwd.get (cwd_win32, 0))
+	return get_errno ();
       unsigned cwdlen = strlen (cwd_win32);
       if (path_prefix_p (cwd_win32, dst, cwdlen))
 	{
@@ -2950,7 +2953,10 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 
   debug_printf("myself->root: %s, posix: %s", myself->root, posix);
   if (strlen (tocopy) >= ulen)
-    set_errno (ERANGE);
+    {
+      set_errno (ERANGE);
+      buf = NULL;
+    }
   else
     {
       strcpy (buf, tocopy);
