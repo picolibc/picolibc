@@ -8,7 +8,6 @@
 #define _SIGNAL_H
 
 #include <sys/types.h>
-#include <linux/signal.h>
 #include <bits/sigset.h>
 #include <bits/signum.h>
 
@@ -19,6 +18,12 @@
 #define NSIG _NSIG
 #undef sigset_t
 #define sigset_t __sigset_t
+
+typedef void (*__sighandler_t) (int);
+
+#include <bits/siginfo.h>
+#include <bits/sigaction.h>
+#include <bits/sigstack.h>
 
 /* --- include/signal.h thinks it knows better :-( --- */
 

@@ -7,7 +7,7 @@
 
 #include <sys/types.h>
 #define __need_sigevent_t 1
-#include <asm/siginfo.h>
+#include <bits/siginfo.h>
 
 /* message queue types */
 typedef int mqd_t;

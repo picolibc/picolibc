@@ -1,3 +1,11 @@
+2002-07-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/include/mqueue.h: Change to use <bits/siginfo.h>
+	instead of <asm/siginfo.h>.
+	* libc/sys/linux/sys/signal.h: Change to include various linux
+	<bits/xxx.h> header files, rather than <linux/signal.h> so as
+	to work with multiple releases of glibc header files.
+
 2002-07-11  Chris Demetriou  <cgd@broadcom.com>
 
         * testsuite/newlib.search/hsearchtest.c: New file to test
