@@ -1,5 +1,11 @@
 2002-07-01  Christopher Faylor  <cgf@redhat.com>
 
+	* debug.cc (threads): Avoid initialization.
+	* uinfo.cc (cygheap_user::ontherange): (from Corinna Vinschen) Actually
+	make below changes work.
+
+2002-07-01  Christopher Faylor  <cgf@redhat.com>
+
 	* uinfo.cc (cygheap_user::ontherange): Make cygwin root the last resort
 	for HOMEPATH/HOMEDRIVE for consistency with HOME.
 

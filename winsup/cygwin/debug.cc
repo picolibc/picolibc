@@ -31,7 +31,7 @@ typedef struct
     const char *name;
   } thread_info;
 
-static NO_COPY thread_info threads[32] = {{0, NULL}};	// increase as necessary
+static NO_COPY thread_info threads[32];	// increase as necessary
 #define NTHREADS (sizeof (threads) / sizeof (threads[0]))
 
 void
