@@ -1,3 +1,8 @@
+Fri Sep  7 12:47:47 2001  Michael Schaap <cygwin@mscha.com>
+
+	* how-resources.texinfo: Add some additional words about where to find
+	documentation.
+
 Wed Jun 13 13:54:35 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* who.texinfo: Oops.  Add a couple of important folk.

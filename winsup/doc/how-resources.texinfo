@@ -2,6 +2,12 @@
 
 @subsection Where's the documentation?
 
+If you have installed Cygwin, you can find lots of documentation in
+@samp{/usr/doc/}.  Many packages ship with standard documentation, you
+can find this in a directory @samp{/usr/doc/@emph{package_name}}.  In
+addition, some packages have Cygwin specific instructions in a file
+@samp{/usr/doc/Cygwin/@emph{package_name}.README}.
+
 There are links to quite a lot of it on the main Cygwin project web
 page: @file{http://cygwin.com/}.  Be sure to at least
 read any 'Release Notes' or 'Readme' or 'read this' links on the main
