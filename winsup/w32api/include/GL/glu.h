@@ -121,7 +121,7 @@ extern "C" {
 #define GLU_SILHOUETTE                     100013
 
 /* QuadricCallback */
-/*      GLU_ERROR */
+#define GLU_ERROR                          100103
 
 /* QuadricNormal */
 #define GLU_SMOOTH                         100000
