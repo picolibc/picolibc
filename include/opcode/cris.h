@@ -1,5 +1,5 @@
 /* cris.h -- Header file for CRIS opcode and register tables.
-   Copyright (C) 2000 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001 Free Software Foundation, Inc.
    Contributed by Axis Communications AB, Lund, Sweden.
    Originally written for GAS 1.38.1 by Mikael Asker.
    Updated, BFDized and GNUified by Hans-Peter Nilsson.
@@ -50,7 +50,7 @@ enum cris_insn_version_usage
   /* Only for v0..3 (Etrax 1..4).  */
   cris_ver_v0_3,
 
-  /* Only for v3 or higher (ETRAX 1..4 and beyond).  */
+  /* Only for v3 or higher (ETRAX 4 and beyond).  */
   cris_ver_v3p,
 
   /* Only for v8 (Etrax 100).  */
