@@ -1,3 +1,12 @@
+Mon Aug 28 22:03:21 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* signal.cc (_raise): New function.
+	* exceptions.cc (unused_sig_wrapper): Remove _raise.
+	* sigproc.h (class sigframe): Default frames to skip to zero or suffer
+	from exuberant optimization.
+	* fhandler_tty.cc (fhandler_tty::write): Set appropriate errno when
+	WriteFile to pipe fails.
+
 Fri Aug 25 23:44:48 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo.h (pinfo): Un-inline release.

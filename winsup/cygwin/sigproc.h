@@ -60,7 +60,7 @@ public:
   }
 
   sigframe () {st = NULL;}
-  sigframe (sigthread &t, int up = 1)
+  sigframe (sigthread &t, int up = 0)
   {
     if (!t.frame && t.id == GetCurrentThreadId ())
       set (t, up);

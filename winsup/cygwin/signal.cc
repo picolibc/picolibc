@@ -144,6 +144,12 @@ kill_worker (pid_t pid, int sig)
   return res;
 }
 
+int
+_raise (int sig)
+{
+  return _kill (myself->pid, sig);
+}
+
 /* This is called _kill because the real kill is in newlib.  */
 int
 _kill (pid_t pid, int sig)

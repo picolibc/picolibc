@@ -1074,18 +1074,6 @@ void unused_sig_wrapper ()
    and returns to orignal caller. */
 __asm__ volatile ("
 	.text
-	.globl	__raise
-__raise:
-	pushl	%%ebp
-	movl	%%esp,%%ebp
-	movl	8(%%ebp),%%eax
-	pushl	%%eax
-	movl	$_myself,%%eax
-	pushl	%6(%%eax)
-	call	__kill
-	mov	%%ebp,%%esp
-	popl	%%ebp
-	ret
 
 _sigreturn:
 	addl	$4,%%esp

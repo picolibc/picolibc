@@ -568,9 +568,17 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
 
       if (WriteFile (get_output_handle (), buf, n, &n, NULL) == FALSE)
 	{
+	  DWORD err = GetLastError ();
 	  termios_printf ("WriteFile failed, %E");
-	  towrite = (DWORD) -1;
+	  switch (err)
+	    {
+	    case ERROR_NO_DATA:
+	      err = ERROR_IO_DEVICE;
+	    default:
+	      __seterrno ();
+	    }
 	  _raise (SIGHUP);		/* FIXME: Should this be SIGTTOU? */
+	  towrite = (DWORD) -1;
 	  break;
 	}
 
