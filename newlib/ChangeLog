@@ -1,3 +1,11 @@
+Thu Mar  9 17:20:41 2000  Jeff Johnston <jjohnstn@cygnus.com>
+
+        * libc/include/string.h: Changed last argument back to ssize_t
+	to make it compatible with XPG4 definition which is 
+	defined in <unistd.h>.  There is a conflict in the SVID 3
+	and XPG4 definitions and newlib will settle with XPG4.
+        * libc/string/swab.c: Ditto.
+
 Wed Mar  8 17:11:41 2000  Jeff Johnston <jjohnstn@cygnus.com>
 
         * libc/include/string.h: Changed last argument to size_t.

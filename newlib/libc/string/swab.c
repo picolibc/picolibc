@@ -4,13 +4,13 @@ FUNCTION
 
 ANSI_SYNOPSIS
 	#include <string.h>
-	void swab(const void *<[in]>, void *<[out]>, size_t <[n]>);
+	void swab(const void *<[in]>, void *<[out]>, ssize_t <[n]>);
 
 TRAD_SYNOPSIS
 	void swab(<[in]>, <[out]>, <[n]>
 	void *<[in]>;
 	void *<[out]>;
-	size_t <[n]>;
+	ssize_t <[n]>;
 
 DESCRIPTION
 	This function copies <[n]> bytes from the memory region
@@ -27,11 +27,11 @@ void
 _DEFUN (swab, (b1, b2, length),
 	_CONST void *b1 _AND
 	void *b2 _AND
-	size_t length)
+	ssize_t length)
 {
   const char *from = b1;
   char *to = b2;
-  size_t ptr;
+  ssize_t ptr;
   for (ptr = 1; ptr < length; ptr += 2)
     {
       char p = from[ptr];
