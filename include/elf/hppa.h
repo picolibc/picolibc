@@ -277,6 +277,14 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 #define PT_PARISC_ARCHEXT	0x70000000
 #define PT_PARISC_UNWIND	0x70000001
 #define PF_PARISC_SBP		0x08000000
+#define PF_HP_PAGE_SIZE		0x00100000
+#define PF_HP_FAR_SHARED	0x00200000
+#define PF_HP_NEAR_SHARED	0x00400000
+#define PF_HP_CODE		0x01000000
+#define PF_HP_MODIFY		0x02000000
+#define PF_HP_LAZYSWAP		0x04000000
+#define PF_HP_SBP		0x08000000
+
 
 /* Processor specific dynamic array tags.  */
 

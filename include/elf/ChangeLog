@@ -1,3 +1,9 @@
+Mon Oct 11 22:42:37 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (PF_HP_PAGE_SIZE): Define.
+	(PF_HP_FAR_SHARED, PF_HP_NEAR_SHARED, PF_HP_CODE): Likewise.
+	(PF_HP_MODIFY, PF_HP_LAZYSWAP, PF_HP_SBP): Likewise.
+
 Mon Oct  4 17:42:38 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* m32r.h (E_M32RX_ARCH): Define.
