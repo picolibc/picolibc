@@ -1,3 +1,7 @@
+Thu May 17 15:23:00  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygsuba.c: Create token source with well defined identifier.
+
 Fri May  4 15:06:00  Corinna Vinschen <corinna@vinschen.de>
 
 	Initial release of the Cygwin subauthentication DLL.
