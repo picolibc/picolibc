@@ -14,6 +14,7 @@ details. */
 #include <stdlib.h>
 #include <grp.h>
 #include <pwd.h>
+#include <errno.h>
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -21,6 +22,7 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
+#include "cygerrno.h"
 #include "cygheap.h"
 #include "heap.h"
 #include "shared_info.h"

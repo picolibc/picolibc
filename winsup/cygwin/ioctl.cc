@@ -25,15 +25,12 @@ details. */
 extern "C" int
 ioctl (int fd, int cmd, void *buf)
 {
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
 
   debug_printf ("fd %d, cmd %x\n", fd, cmd);
-  fhandler_base *fh = cygheap->fdtab[fd];
-  if (fh->is_tty () && fh->get_device () != FH_PTYM)
+  if (cfd->is_tty () && cfd->get_device () != FH_PTYM)
     switch (cmd)
       {
 	case TCGETA:
@@ -46,5 +43,5 @@ ioctl (int fd, int cmd, void *buf)
 	  return tcsetattr (fd, TCSAFLUSH, (struct termios *) buf);
       }
 
-  return fh->ioctl (cmd, buf);
+  return cfd->ioctl (cmd, buf);
 }

@@ -18,8 +18,8 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "cygheap.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 #include "ntdll.h"
 
 /* sysconf: POSIX 4.8.1.1 */

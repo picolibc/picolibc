@@ -73,7 +73,7 @@ check_pty_fds (void)
   fhandler_base *fh;
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
     if ((fh = cygheap->fdtab[i]) != NULL &&
-	(fh->get_device() == FH_TTYS || fh->get_device() == FH_PTYM))
+	(fh->get_device () == FH_TTYS || fh->get_device () == FH_PTYM))
       {
 	res = TRUE;
 	break;
@@ -86,11 +86,12 @@ int
 dup (int fd)
 {
   int res;
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+  cygheap_fdnew newfd;
 
-  res = dup2 (fd, cygheap->fdtab.find_unused_handle ());
-
-  ReleaseResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+  if (newfd < 0)
+    res = -1;
+  else
+    res = dup2 (fd, newfd);
 
   return res;
 }
@@ -287,7 +288,6 @@ extern "C" ssize_t
 _read (int fd, void *ptr, size_t len)
 {
   int res;
-  fhandler_base *fh;
   extern int sigcatchers;
   int e = get_errno ();
 
@@ -295,22 +295,18 @@ _read (int fd, void *ptr, size_t len)
     {
       sigframe thisframe (mainthread);
 
-      if (cygheap->fdtab.not_open (fd))
-	{
-	  set_errno (EBADF);
-	  return -1;
-	}
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
+	return -1;
 
-      // set_sig_errno (0);
-      fh = cygheap->fdtab[fd];
-      DWORD wait = fh->is_nonblocking () ? 0 : INFINITE;
+      DWORD wait = cfd->is_nonblocking () ? 0 : INFINITE;
 
       /* Could block, so let user know we at least got here.  */
       syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d", fd, ptr, len, wait ? "" : "non", sigcatchers);
 
-      if (wait && (/*!sigcatchers || */!fh->is_slow () || fh->get_r_no_interrupt ()))
+      if (wait && (/*!sigcatchers || */!cfd->is_slow () || cfd->get_r_no_interrupt ()))
 	debug_printf ("non-interruptible read\n");
-      else if (!fh->ready_for_read (fd, wait, 0))
+      else if (!cfd->ready_for_read (fd, wait, 0))
 	{
 	  if (!wait)
 	    set_sig_errno (EAGAIN);	/* Don't really need 'set_sig_errno' here, but... */
@@ -322,11 +318,11 @@ _read (int fd, void *ptr, size_t len)
 
       /* Check to see if this is a background read from a "tty",
 	 sending a SIGTTIN, if appropriate */
-      res = fh->bg_check (SIGTTIN);
+      res = cfd->bg_check (SIGTTIN);
       if (res > bg_eof)
 	{
 	  myself->process_state |= PID_TTYIN;
-	  res = fh->read (ptr, len);
+	  res = cfd->read (ptr, len);
 	  myself->process_state &= ~PID_TTYIN;
 	}
 
@@ -336,8 +332,8 @@ _read (int fd, void *ptr, size_t len)
       set_errno (e);
     }
 
-  syscall_printf ("%d = read (%d<%s>, %p, %d), bin %d, errno %d", res, fd, fh->get_name (),
-		  ptr, len, fh->get_r_binary (), get_errno ());
+  syscall_printf ("%d = read (%d, %p, %d), errno %d", res, fd, ptr, len,
+      		  get_errno ());
   MALLOC_CHECK;
   return res;
 }
@@ -348,11 +344,9 @@ _write (int fd, const void *ptr, size_t len)
   int res = -1;
   sigframe thisframe (mainthread);
 
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      goto done;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    goto done;
 
   /* Could block, so let user know we at least got here.  */
   if (fd == 1 || fd == 2)
@@ -360,15 +354,12 @@ _write (int fd, const void *ptr, size_t len)
   else
     syscall_printf  ("write (%d, %p, %d)", fd, ptr, len);
 
-  fhandler_base *fh;
-  fh = cygheap->fdtab[fd];
-
-  res = fh->bg_check (SIGTTOU);
+  res = cfd->bg_check (SIGTTOU);
 
   if (res > bg_eof)
     {
       myself->process_state |= PID_TTYOU;
-      res = fh->write (ptr, len);
+      res = cfd->write (ptr, len);
       myself->process_state &= ~PID_TTYOU;
     }
 
@@ -378,7 +369,7 @@ done:
   else
     syscall_printf ("%d = write (%d, %p, %d)", res, fd, ptr, len);
 
-  return (ssize_t)res;
+  return (ssize_t) res;
 }
 
 /*
@@ -475,24 +466,21 @@ readv (int fd, const struct iovec *iov, int iovcnt)
 extern "C" int
 _open (const char *unix_path, int flags, ...)
 {
-  int fd;
   int res = -1;
   va_list ap;
   mode_t mode = 0;
-  fhandler_base *fh;
   sigframe thisframe (mainthread);
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
   if (!check_null_empty_str_errno (unix_path))
     {
-      SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, " open ");
-
       /* check for optional mode argument */
       va_start (ap, flags);
       mode = va_arg (ap, mode_t);
       va_end (ap);
 
-      fd = cygheap->fdtab.find_unused_handle ();
+      fhandler_base *fh;
+      cygheap_fdnew fd;
 
       if (fd < 0)
 	set_errno (ENMFILE);
@@ -504,13 +492,12 @@ _open (const char *unix_path, int flags, ...)
 	    res = -1;		// errno already set
 	  else if (!fh->open (&pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
-	      cygheap->fdtab.release (fd);
+	      fd.release ();
 	      res = -1;
 	    }
 	  else if ((res = fd) <= 2)
 	    set_std_handle (res);
 	}
-      ReleaseResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," open");
     }
 
   syscall_printf ("%d = open (%s, %p)", res, unix_path, flags);
@@ -528,14 +515,13 @@ _lseek (int fd, off_t pos, int dir)
       set_errno (EINVAL);
       res = -1;
     }
-  else if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      res = -1;
-    }
   else
     {
-      res = cygheap->fdtab[fd]->lseek (pos, dir);
+      cygheap_fdget cfd (fd);
+      if (cfd >= 0)
+	res = cfd->lseek (pos, dir);
+      else
+	res = -1;
     }
   syscall_printf ("%d = lseek (%d, %d, %d)", res, fd, pos, dir);
 
@@ -551,18 +537,14 @@ _close (int fd)
   syscall_printf ("close (%d)", fd);
 
   MALLOC_CHECK;
-  if (cygheap->fdtab.not_open (fd))
-    {
-      debug_printf ("handle %d not open", fd);
-      set_errno (EBADF);
-      res = -1;
-    }
+  cygheap_fdget cfd (fd, true);
+  if (cfd < 0)
+    res = -1;
   else
     {
-      SetResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
-      res = cygheap->fdtab[fd]->close ();
-      cygheap->fdtab.release (fd);
-      ReleaseResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
+      cfd->close ();
+      cfd.release ();
+      res = 0;
     }
 
   syscall_printf ("%d = close (%d)", res, fd);
@@ -576,13 +558,11 @@ isatty (int fd)
   int res;
   sigframe thisframe (mainthread);
 
-  if (cygheap->fdtab.not_open (fd))
-    {
-      syscall_printf ("0 = isatty (%d)", fd);
-      return 0;
-    }
-
-  res = cygheap->fdtab[fd]->is_tty ();
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = 0;
+  else 
+    res = cfd->is_tty ();
   syscall_printf ("%d = isatty (%d)", res, fd);
   return res;
 }
@@ -823,14 +803,14 @@ extern "C" int
 fchown (int fd, uid_t uid, gid_t gid)
 {
   sigframe thisframe (mainthread);
-  if (cygheap->fdtab.not_open (fd))
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
     {
       syscall_printf ("-1 = fchown (%d,...)", fd);
-      set_errno (EBADF);
       return -1;
     }
 
-  const char *path = cygheap->fdtab[fd]->get_name ();
+  const char *path = cfd->get_name ();
 
   if (path == NULL)
     {
@@ -932,14 +912,14 @@ extern "C" int
 fchmod (int fd, mode_t mode)
 {
   sigframe thisframe (mainthread);
-  if (cygheap->fdtab.not_open (fd))
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
     {
       syscall_printf ("-1 = fchmod (%d, 0%o)", fd, mode);
-      set_errno (EBADF);
       return -1;
     }
 
-  const char *path = cygheap->fdtab[fd]->get_name ();
+  const char *path = cfd->get_name ();
 
   if (path == NULL)
     {
@@ -956,23 +936,20 @@ fchmod (int fd, mode_t mode)
 extern "C" int
 _fstat (int fd, struct stat *buf)
 {
-  int r;
+  int res;
   sigframe thisframe (mainthread);
 
-  if (cygheap->fdtab.not_open (fd))
-    {
-      syscall_printf ("-1 = fstat (%d, %p)", fd, buf);
-      set_errno (EBADF);
-      r = -1;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = -1;
   else
     {
       memset (buf, 0, sizeof (struct stat));
-      r = cygheap->fdtab[fd]->fstat (buf, NULL);
-      syscall_printf ("%d = fstat (%d, %x)", r, fd, buf);
+      res = cfd->fstat (buf, NULL);
     }
 
-  return r;
+  syscall_printf ("%d = fstat (%d, %p)", res, fd, buf);
+  return res;
 }
 
 /* fsync: P96 6.6.1.1 */
@@ -980,16 +957,14 @@ extern "C" int
 fsync (int fd)
 {
   sigframe thisframe (mainthread);
-  if (cygheap->fdtab.not_open (fd))
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
     {
       syscall_printf ("-1 = fsync (%d)", fd);
-      set_errno (EBADF);
       return -1;
     }
 
-  HANDLE h = cygheap->fdtab[fd]->get_handle ();
-
-  if (FlushFileBuffers (h) == 0)
+  if (FlushFileBuffers (cfd->get_handle ()) == 0)
     {
       __seterrno ();
       return -1;
@@ -1364,11 +1339,9 @@ check_posix_perm (const char *fname, int v)
 extern "C" long int
 fpathconf (int fd, int v)
 {
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
   switch (v)
     {
     case _PC_LINK_MAX:
@@ -1391,7 +1364,7 @@ fpathconf (int fd, int v)
     case _PC_NO_TRUNC:
       return -1;
     case _PC_VDISABLE:
-      if (isatty (fd))
+      if (cfd->is_tty ())
 	return -1;
       else
 	{
@@ -1400,13 +1373,10 @@ fpathconf (int fd, int v)
 	}
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
-      {
-	fhandler_base *fh = cygheap->fdtab[fd];
-	if (fh->get_device () == FH_DISK)
-	  return check_posix_perm (fh->get_win32_name (), v);
-	set_errno (EINVAL);
-	return -1;
-      }
+      if (cfd->get_device () == FH_DISK)
+	return check_posix_perm (cfd->get_win32_name (), v);
+      set_errno (EINVAL);
+      return -1;
     default:
       set_errno (EINVAL);
       return -1;
@@ -1459,11 +1429,12 @@ pathconf (const char *file, int v)
 extern "C" char *
 ttyname (int fd)
 {
-  if (cygheap->fdtab.not_open (fd) || !cygheap->fdtab[fd]->is_tty ())
+  cygheap_fdget cfd (fd);
+  if (cfd < 0 || !cfd->is_tty ())
     {
       return 0;
     }
-  return (char *) (cygheap->fdtab[fd]->ttyname ());
+  return (char *) (cfd->ttyname ());
 }
 
 extern "C" char *
@@ -1490,21 +1461,20 @@ _cygwin_istext_for_stdio (int fd)
       return 0; /* we do it for old apps, due to getc/putc macros */
     }
 
-  if (cygheap->fdtab.not_open (fd))
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
     {
       syscall_printf (" _cifs: fd not open\n");
       return 0;
     }
 
-  fhandler_base *p = cygheap->fdtab[fd];
-
-  if (p->get_device () != FH_DISK)
+  if (cfd->get_device () != FH_DISK)
     {
       syscall_printf (" _cifs: fd not disk file\n");
       return 0;
     }
 
-  if (p->get_w_binary () || p->get_r_binary ())
+  if (cfd->get_w_binary () || cfd->get_r_binary ())
     {
       syscall_printf (" _cifs: get_*_binary\n");
       return 0;
@@ -1538,13 +1508,11 @@ setmode_helper (FILE *f)
 extern "C" int
 getmode (int fd)
 {
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
 
-  return cygheap->fdtab[fd]->get_flags () & (O_BINARY | O_TEXT);
+  return cfd->get_flags () & (O_BINARY | O_TEXT);
 }
 
 /* Set a file descriptor into text or binary mode, returning the
@@ -1553,18 +1521,14 @@ getmode (int fd)
 extern "C" int
 setmode (int fd, int mode)
 {
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
   if (mode != O_BINARY  && mode != O_TEXT && mode != 0)
     {
       set_errno (EINVAL);
       return -1;
     }
-
-  fhandler_base *p = cygheap->fdtab[fd];
 
   /* Note that we have no way to indicate the case that writes are
      binary but not reads, or vice-versa.  These cases can arise when
@@ -1572,24 +1536,24 @@ setmode (int fd, int mode)
      interfaces should not use setmode.  */
 
   int res;
-  if (p->get_w_binary () && p->get_r_binary ())
+  if (cfd->get_w_binary () && cfd->get_r_binary ())
     res = O_BINARY;
-  else if (p->get_w_binset () && p->get_r_binset ())
+  else if (cfd->get_w_binset () && cfd->get_r_binset ())
     res = O_TEXT;	/* Specifically set O_TEXT */
   else
     res = 0;
 
   if (!mode)
-    p->reset_to_open_binmode ();
+    cfd->reset_to_open_binmode ();
   else if (mode & O_BINARY)
     {
-      p->set_w_binary (1);
-      p->set_r_binary (1);
+      cfd->set_w_binary (1);
+      cfd->set_r_binary (1);
     }
   else
     {
-      p->set_w_binary (0);
-      p->set_r_binary (0);
+      cfd->set_w_binary (0);
+      cfd->set_r_binary (0);
     }
 
   if (_cygwin_istext_for_stdio (fd))
@@ -1599,7 +1563,7 @@ setmode (int fd, int mode)
   setmode_file = fd;
   _fwalk (_REENT, setmode_helper);
 
-  syscall_printf ("setmode (%d<%s>, %s) returns %s\n", fd, p->get_name (),
+  syscall_printf ("setmode (%d<%s>, %s) returns %s\n", fd, cfd->get_name (),
 		  mode & O_TEXT ? "text" : "binary",
 		  res & O_TEXT ? "text" : "binary");
   return res;
@@ -1613,37 +1577,32 @@ ftruncate (int fd, off_t length)
   int res = -1;
 
   if (length < 0)
-    {
-      set_errno (EINVAL);
-    }
-  else if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-    }
+    set_errno (EINVAL);
   else
     {
-      HANDLE h = cygheap->fdtab[fd]->get_handle ();
-      off_t prev_loc;
-
-      if (h)
+      cygheap_fdget cfd (fd);
+      if (cfd >= 0)
 	{
-	  /* remember curr file pointer location */
-	  prev_loc = cygheap->fdtab[fd]->lseek (0, SEEK_CUR);
+	  HANDLE h = cygheap->fdtab[fd]->get_handle ();
 
-	  cygheap->fdtab[fd]->lseek (length, SEEK_SET);
-	  if (!SetEndOfFile (h))
+	  if (cfd->get_handle ())
 	    {
-	      __seterrno ();
-	    }
-	  else
-	    res = 0;
+	      /* remember curr file pointer location */
+	      off_t prev_loc = cfd->lseek (0, SEEK_CUR);
 
-	  /* restore original file pointer location */
-	  cygheap->fdtab[fd]->lseek (prev_loc, 0);
+	      cfd->lseek (length, SEEK_SET);
+	      if (!SetEndOfFile (h))
+		__seterrno ();
+	      else
+		res = 0;
+
+	      /* restore original file pointer location */
+	      cfd->lseek (prev_loc, 0);
+	    }
 	}
     }
-  syscall_printf ("%d = ftruncate (%d, %d)", res, fd, length);
 
+  syscall_printf ("%d = ftruncate (%d, %d)", res, fd, length);
   return res;
 }
 
@@ -1672,12 +1631,13 @@ truncate (const char *pathname, off_t length)
 extern "C" long
 get_osfhandle (int fd)
 {
-  long res = -1;
+  long res;
 
-  if (cygheap->fdtab.not_open (fd))
-    set_errno (EBADF);
+  cygheap_fdget cfd (fd);
+  if (cfd >= 0)
+    res = (long) cfd->get_handle ();
   else
-    res = (long) cygheap->fdtab[fd]->get_handle ();
+    res = -1;
 
   syscall_printf ("%d = get_osfhandle (%d)", res, fd);
   return res;
@@ -1728,13 +1688,10 @@ extern "C" int
 fstatfs (int fd, struct statfs *sfs)
 {
   sigframe thisframe (mainthread);
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
-  fhandler_disk_file *f = (fhandler_disk_file *) cygheap->fdtab[fd];
-  return statfs (f->get_name (), sfs);
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
+  return statfs (cfd->get_name (), sfs);
 }
 
 /* setpgid: POSIX 4.3.3.1 */
@@ -1814,12 +1771,10 @@ extern "C" char *
 ptsname (int fd)
 {
   sigframe thisframe (mainthread);
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return 0;
-    }
-  return (char *) (cygheap->fdtab[fd]->ptsname ());
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return 0;
+  return (char *) (cfd->ptsname ());
 }
 
 /* FIXME: what is this? */

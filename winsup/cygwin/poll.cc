@@ -16,8 +16,8 @@
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "cygheap.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 #include "sigproc.h"
 
 extern "C"

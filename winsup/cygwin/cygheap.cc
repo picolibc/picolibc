@@ -17,10 +17,10 @@
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
+#include "cygerrno.h"
 #include "cygheap.h"
 #include "child_info.h"
 #include "heap.h"
-#include "cygerrno.h"
 #include "sync.h"
 #include "shared_info.h"
 

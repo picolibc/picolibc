@@ -3136,19 +3136,17 @@ extern "C"
 int
 fchdir (int fd)
 {
+  int res;
   sigframe thisframe (mainthread);
 
-  if (cygheap->fdtab.not_open (fd))
-    {
-      syscall_printf ("-1 = fchdir (%d)", fd);
-      set_errno (EBADF);
-      return -1;
-    }
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fchdir");
-  int ret = chdir (cygheap->fdtab[fd]->get_name ());
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fchdir");
-  syscall_printf ("%d = fchdir (%d)", ret, fd);
-  return ret;
+  cygheap_fdget cfd (fd);
+  if (cfd >= 0)
+    res = chdir (cfd->get_name ());
+  else
+    res = -1;
+
+  syscall_printf ("%d = fchdir (%d)", res, fd);
+  return res;
 }
 
 /******************** Exported Path Routines *********************/

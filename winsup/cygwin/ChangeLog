@@ -1,3 +1,25 @@
+2001-10-15  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::fork_fixup): Don't protect handle.
+
+	* dlfcn.cc: Fix to confirm to coding standards.
+
+	Reorganize includes throughout to accomodate new cygheap.h usage.
+	* cygheap.h (cygheap_fdmanip): New class: simplifies locking and
+	retrieval of fds from cygheap->fdtab.
+	(cygheap_fdget): Ditto.
+	(cygheap_fdnew): Ditto.
+	* fcntl.cc (_fcntl): Use new method to lock fdtab and retrieve info.
+	* ioctl.cc (ioctl): Ditto.
+	* mmap.cc (mmap): Ditto.
+	* net.cc: Ditto, throughout.
+	* passwd.cc (getpass): Ditto.
+	* path.cc (fchdir): Ditto.
+	* pipe.cc (make_pipe): Ditto.
+	* sec_acl.cc (facl): Ditto.
+	* syscalls.cc: Ditto, throughout.
+	* termios.cc: Ditto, throughout.
+
 2001-10-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uname.cc (uname):  Use `wProcessorLevel' unless OS sets it wrong.
@@ -9,6 +31,7 @@
 
 	* dtable.cc (dtable::build_fhandler_from_name): Use PC_FULL to
 	determine path name.
+	* path.cc (fchdir): Remove rel -> abs path conversion.
 
 Sun Oct 14 08:10:12 2001  Gary R. Van Sickle
 

@@ -17,6 +17,7 @@ details. */
 #include <limits.h>
 #include <stdlib.h>
 #include <lm.h>
+#include <errno.h>
 #include <sys/cygwin.h>
 #include "sync.h"
 #include "sigproc.h"
@@ -25,6 +26,7 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
+#include "cygerrno.h"
 #include "cygheap.h"
 #include "registry.h"
 

@@ -128,51 +128,53 @@ fhandler_pipe::dup (fhandler_base *child)
 int
 make_pipe (int fildes[2], unsigned int psize, int mode)
 {
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "make_pipe");
-
   HANDLE r, w;
-  int  fdr = -1, fdw = -1;
   SECURITY_ATTRIBUTES *sa = (mode & O_NOINHERIT) ?  &sec_none_nih : &sec_none;
   int res = -1;
 
-  if ((fdr = cygheap->fdtab.find_unused_handle ()) < 0)
-    set_errno (ENMFILE);
-  else if ((fdw = cygheap->fdtab.find_unused_handle (fdr + 1)) < 0)
-    set_errno (ENMFILE);
-  else if (!CreatePipe (&r, &w, sa, psize))
-    __seterrno ();
+  cygheap_fdnew fdr;
+  if (fdr < 0)
+    /* saw an error */;
   else
     {
-      fhandler_pipe *fhr = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdr, FH_PIPER, "/dev/piper");
-      fhandler_pipe *fhw = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdw, FH_PIPEW, "/dev/pipew");
-
-      int binmode = mode & O_TEXT ? 0 : 1;
-      fhr->init (r, GENERIC_READ, binmode);
-      fhw->init (w, GENERIC_WRITE, binmode);
-      if (mode & O_NOINHERIT)
-       {
-	 fhr->set_close_on_exec_flag (1);
-	 fhw->set_close_on_exec_flag (1);
-       }
-
-      fildes[0] = fdr;
-      fildes[1] = fdw;
-
-      res = 0;
-      fhr->create_guard (sa);
-      if (wincap.has_unreliable_pipes ())
+      cygheap_fdnew fdw (fdr, false);
+      if (fdw < 0)
+	set_errno (ENMFILE);
+      else if (!CreatePipe (&r, &w, sa, psize))
+	__seterrno ();
+      else
 	{
-	  char buf[80];
-	  int count = pipecount++;	/* FIXME: Should this be InterlockedIncrement? */
-	  __small_sprintf (buf, pipeid_fmt, myself->pid, count);
-	  fhw->writepipe_exists = CreateEvent (sa, TRUE, FALSE, buf);
-	  fhr->orig_pid = myself->pid;
-	  fhr->id = count;
+	  fhandler_pipe *fhr = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdr, FH_PIPER, "/dev/piper");
+	  fhandler_pipe *fhw = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdw, FH_PIPEW, "/dev/pipew");
+
+	  int binmode = mode & O_TEXT ? 0 : 1;
+	  fhr->init (r, GENERIC_READ, binmode);
+	  fhw->init (w, GENERIC_WRITE, binmode);
+	  if (mode & O_NOINHERIT)
+	   {
+	     fhr->set_close_on_exec_flag (1);
+	     fhw->set_close_on_exec_flag (1);
+	   }
+
+	  fildes[0] = fdr;
+	  fildes[1] = fdw;
+
+	  res = 0;
+	  fhr->create_guard (sa);
+	  if (wincap.has_unreliable_pipes ())
+	    {
+	      char buf[80];
+	      int count = pipecount++;	/* FIXME: Should this be InterlockedIncrement? */
+	      __small_sprintf (buf, pipeid_fmt, myself->pid, count);
+	      fhw->writepipe_exists = CreateEvent (sa, TRUE, FALSE, buf);
+	      fhr->orig_pid = myself->pid;
+	      fhr->id = count;
+	    }
 	}
     }
 
-  syscall_printf ("%d = make_pipe ([%d, %d], %d, %p)", res, fdr, fdw, psize, mode);
-  ReleaseResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "make_pipe");
+  syscall_printf ("%d = make_pipe ([%d, %d], %d, %p)", res, fildes[0],
+      		  fildes[1], psize, mode);
   return res;
 }
 

@@ -385,14 +385,12 @@ getpass (const char * prompt)
   if (passwd_state  <= initializing)
     read_etc_passwd ();
 
-  if (cygheap->fdtab.not_open (0))
-    {
-      set_errno (EBADF);
-      pass[0] = '\0';
-    }
+  cygheap_fdget fhstdin (0);
+
+  if (fhstdin < 0)
+    pass[0] = '\0';
   else
     {
-      fhandler_base *fhstdin = cygheap->fdtab[0];
       fhstdin->tcgetattr (&ti);
       newti = ti;
       newti.c_lflag &= ~ECHO;

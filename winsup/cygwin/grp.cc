@@ -24,8 +24,8 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "cygheap.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 #include "pwdgrp.h"
 
 /* Read /etc/group only once for better performance.  This is done

@@ -452,22 +452,21 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   if (fd != -1)
     {
       /* Ensure that fd is open */
-      if (cygheap->fdtab.not_open (fd))
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
 	{
-	  set_errno (EBADF);
 	  syscall_printf ("-1 = mmap(): EBADF");
 	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return MAP_FAILED;
 	}
-      fh = cygheap->fdtab[fd];
-      if (fh->get_device () == FH_DISK)
+      if (cfd->get_device () == FH_DISK)
 	{
 	  DWORD fsiz = GetFileSize (fh->get_handle (), NULL);
 	  fsiz -= gran_off;
 	  if (gran_len > fsiz)
 	    gran_len = fsiz;
 	}
-      else if (fh->get_device () == FH_ZERO)
+      else if (cfd->get_device () == FH_ZERO)
 	/* mmap /dev/zero is like MAP_ANONYMOUS. */
 	fd = -1;
     }

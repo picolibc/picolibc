@@ -14,6 +14,7 @@ details. */
 #include <syslog.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <errno.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
