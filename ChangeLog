@@ -1,3 +1,7 @@
+2000-05-18  David Edelsohn  <edelsohn@gnu.org>
+
+	* configure.in: Special case powerpc*-*-aix* target_makefile_frag.
+
 Wed May 17 16:03:48 2000  Alexandre Oliva  <aoliva@cygnus.com>
 
 	* Makefile.in (configure-target-libiberty): Depend on
