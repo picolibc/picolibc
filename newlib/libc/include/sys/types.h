@@ -165,7 +165,7 @@ typedef	struct _types_fd_set {
 #  define	FD_CLR(n, p)	((p)->fds_bits[(n)/NFDBITS] &= ~(1L << ((n) % NFDBITS)))
 #  define	FD_ISSET(n, p)	((p)->fds_bits[(n)/NFDBITS] & (1L << ((n) % NFDBITS)))
 #  define	FD_ZERO(p)	(__extension__ (void)({ \
-     int i; \
+     size_t i; \
      char *__tmp = (char *)p; \
      for (i = 0; i < sizeof (*(p)); ++i) \
        *__tmp++ = 0; \

@@ -1,3 +1,8 @@
+Mon Nov  6 12:56:00 2000  Corinna Vinschen <vinschen@cygnus.com>
+
+	* libc/include/sys/types.h: Change type of i to `size_t' in
+	FD_ZERO macro to avoid compiler warnings.
+
 Sun Oct 29 20:06:41 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/stdlib.h: Avoid declaring cfree under Cygwin.
