@@ -1,3 +1,8 @@
+2003-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.api/known_bugs.tcl: Remove fsync01, setregid01 and setreuid01
+	from list of known bugs.
+
 2003-02-19  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
 
 	* winsup.api/crlf.c: Fix C signed/unsigned compare warning.
