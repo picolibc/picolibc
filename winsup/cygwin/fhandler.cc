@@ -463,9 +463,9 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
     {
       if (!wincap.can_open_directories () && pc && pc->isdir ())
 	{
-	  if (mode & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
+	  if (flags & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
 	    set_errno (EEXIST);
-	  else if (mode & (O_WRONLY | O_RDWR))
+	  else if (flags & (O_WRONLY | O_RDWR))
 	    set_errno (EISDIR);
 	  else
 	    set_nohandle (true);

@@ -1,3 +1,8 @@
+2002-12-19  Pierre Humblet <pierre.humblet@ieee.org>
+
+        * fhandler.cc (fhandler_base::open): Use "flags" rather than "mode"
+	in Win9X directory code.
+
 2002-12-19  Steve Osborn  <bub@io.com>
 
 	* fhandler.h (line_edit_status): Add a new element.
