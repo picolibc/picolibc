@@ -608,6 +608,9 @@ private:
 
   WORD default_color, underline_color, dim_color;
 
+  /* Used to determine if an input keystroke should be modified with META. */
+  int meta_mask;
+
 /* Output state */
   int state_;
   int args_[MAXARGS];

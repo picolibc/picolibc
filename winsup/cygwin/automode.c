@@ -14,7 +14,7 @@ details. */
 
 extern int _fmode;
 void
-cygwin_premain0 (int argc, char **argv)
+cygwin_premain0 (int argc, char **argv, struct per_process *myself)
 {
   static struct __cygwin_perfile pf[] =
   {

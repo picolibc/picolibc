@@ -250,7 +250,8 @@ fhandler_console::read (void *pv, size_t buflen)
 		 converting a CTRL-U. */
 	      if ((unsigned char)ich > 0x7f && current_codepage == ansi_cp)
 		OemToCharBuff (tmp + 1, tmp + 1, 1);
-	      if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
+	      /* Determine if the keystroke is modified by META. */
+	      if (!(input_rec.Event.KeyEvent.dwControlKeyState & meta_mask))
 		toadd = tmp + 1;
 	      else
 		{
@@ -790,6 +791,19 @@ fhandler_console::fhandler_console (const char *name) :
   dwLastButtonState = 0;
   nModifiers = 0;
   use_mouse = raw_win32_keyboard_mode = FALSE;
+  /* Set the mask that determines if an input keystroke is modified by
+     META.  We set this based on the keyboard layout language loaded
+     for the current thread.  The left <ALT> key always generates
+     META, but the right <ALT> key only generates META if we are using
+     an English keyboard because many "international" keyboards
+     replace common shell symbols ('[', '{', etc.) with accented
+     language-specific characters (umlaut, accent grave, etc.).  On
+     these keyboards right <ALT> (called AltGr) is used to produce the
+     shell symbols and should not be interpreted as META. */
+  meta_mask = LEFT_ALT_PRESSED;
+  if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
+    meta_mask |= RIGHT_ALT_PRESSED;
+
   set_need_fork_fixup ();
 }
 

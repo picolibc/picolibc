@@ -1,3 +1,27 @@
+Tue Mar  6 13:02:00 2001  Jason Tiller <jtiller@sjm.com>
+
+	* autoload.c (cygwin_premain0): Add missing parameter.
+	* binmode.c (cygwin_premain0): Ditto.
+	* textmode.c (cygwin_premain0): Ditto.
+
+Tue Mar  6 12:04:00 2001  Jason Tiller <jtiller@sjm.com>
+
+	* auto_load.cc: Add "GetKeyboardLayout" entry in the list of
+	Win32 User32.DLL exports to provide.
+	* fhandler.h (class fhandler_console): Add meta_mask private
+	member to remember which keystroke modifiers should generate
+	META.
+	* fhandler_console.cc (fhandler_console::read): Modify code that
+	tests a keystroke for a META-escaped key to use the 'meta_mask'
+	variable.
+	(fhandler_console::fhandler_console): Add definition for
+	variable "meta_mask" used to determine if a keystroke should be
+	preceded by META in the client console stream.  Set meta_mask
+	based on whether or not user's keyboard language is English -
+	non-English keyboards pass AltGr (right <ALT>) unmolested,
+	whereas English keyboards now interpret left- and right-<ALT>
+	as META.
+
 Mon Mar  5 20:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/a.out.h: Add copyright hint.
