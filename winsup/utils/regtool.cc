@@ -221,11 +221,15 @@ find_key (int howmanyparts, REGSAM access)
 	e--;
       if (*e != '\\')
 	{
-	  fprintf (stderr, "Invalid key\n");
-	  exit (1);
+	  key = wkprefixes[i].key;
+	  value = n;
+	  return;
 	}
-      *e = 0;
-      value = e + 1;
+      else
+        {
+	  *e = 0;
+	  value = e + 1;
+	}
     }
   if (n[0] == 0)
     {

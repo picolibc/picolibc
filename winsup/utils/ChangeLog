@@ -1,3 +1,7 @@
+2001-07-14   Chris Genly  <chgenly@alum.mit.edu>
+
+	* regtool.cc (find_key): Handle keys with only one subkey.
+
 Wed Jun 27 22:46:10 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* regtool.cc (find_key): Revert previous change.
