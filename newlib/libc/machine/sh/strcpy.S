@@ -47,7 +47,7 @@ no_lddst:
 
 	add r5, r63, r4
 shortstring:
-#ifndef LITTLE_ENDIAN
+#ifndef __LITTLE_ENDIAN__
 	pta/l shortstring2,tr1
 	byterev r4,r4
 #endif

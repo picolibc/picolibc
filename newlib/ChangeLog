@@ -1,3 +1,8 @@
+Thu May 16 16:12:00 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/machine/sh/strcpy.S (strcpy): Replace LITTLE_ENDIAN with
+	__LITTLE_ENDIAN__.
+
 2002-05-15  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* testsuite/lib/newlib.exp: Add newlib_include_flags to compile
