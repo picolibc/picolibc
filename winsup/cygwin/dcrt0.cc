@@ -637,9 +637,6 @@ dll_crt0_1 ()
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 
-  /* Initialize the heap. */
-  heap_init ();
-
   /* Initialize events. */
   events_init ();
 
@@ -672,6 +669,9 @@ dll_crt0_1 ()
 
       longjmp (ciresrv->jmp, ciresrv->cygpid);
     }
+
+  /* Initialize the heap. */
+  heap_init ();
 
   /* Initialize our process table entry. Don't use the parent info for
      dynamically loaded case. */

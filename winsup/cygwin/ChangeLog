@@ -1,3 +1,12 @@
+Mon Jul  3 16:09:16 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (stack_info::walk): Use method to find offset.
+	(handle_exceptions): Be more assertive in finding ebp for use under
+	W2K.  Create a dummy stack frame for cases where program is dying and a
+	stack dump is being output.
+	(sig_handle): Fill out a GetThreadContext for use with a user-generated
+	"core dump".
+
 Mon Jul  3 10:53:00 2000  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/socket.h: Remove SOCK_PACKET define since it's

@@ -197,6 +197,7 @@ class stack_info
 {
   int first_time;		/* True if just starting to iterate. */
   int walk ();		 	/* Uses the "old" method */
+  char *next_offset () {return *((char **) sf.AddrFrame.Offset);}
 public:
   STACKFRAME sf;		/* For storing the stack information */
   void init (DWORD);		/* Called the first time that stack info is needed */
@@ -233,7 +234,7 @@ stack_info::walk ()
   if (first_time)
     /* Everything is filled out already */
     ebp = (char **) sf.AddrFrame.Offset;
-  else if ((ebp = (char **) *(char **) sf.AddrFrame.Offset) != NULL)
+  else if ((ebp = (char **) next_offset ()) != NULL)
     {
       sf.AddrFrame.Offset = (DWORD) ebp;
       sf.AddrPC.Offset = sf.AddrReturn.Offset;
@@ -255,14 +256,14 @@ stack_info::walk ()
 }
 
 /* Dump the stack */
-void
+static void
 stack (CONTEXT *cx)
 {
   int i;
 
   thestack.init (cx->Ebp);	/* Initialize from the input CONTEXT */
   small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
-  for (i = 0; i < 16 && thestack++ ; i++)
+  for (i = 0; i < 16 && thestack++; i++)
     {
       small_printf ("%08x  %08x ", thestack.sf.AddrFrame.Offset,
 		    thestack.sf.AddrPC.Offset);
@@ -281,7 +282,7 @@ cygwin_stackdump()
   CONTEXT c;
   c.ContextFlags = CONTEXT_FULL;
   GetThreadContext (GetCurrentThread (), &c);
-  stack(&c);
+  stack (&c);
 }
 
 static int NO_COPY keep_looping = 0;
@@ -342,7 +343,7 @@ try_to_debug ()
   return 0;
 }
 
-void
+static void
 stackdump (EXCEPTION_RECORD *e, CONTEXT *in)
 {
   char *p;
@@ -441,6 +442,17 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
   if (myself->getsig(sig).sa_mask & SIGTOMASK (sig))
     syscall_printf ("signal %d, masked %p", sig, myself->getsig(sig).sa_mask);
 
+  debug_printf ("In cygwin_except_handler calling %p",
+		 myself->getsig(sig).sa_handler);
+
+  DWORD *ebp = (DWORD *)in->Esp;
+  for (DWORD *bpend = (DWORD *) __builtin_frame_address (0); ebp > bpend; ebp--)
+    if (*ebp == in->SegCs && ebp[-1] == in->Eip)
+      {
+	ebp -= 2;
+	break;
+      }
+
   if (!myself->progname[0]
       || (void *) myself->getsig(sig).sa_handler == (void *) SIG_DFL
       || (void *) myself->getsig(sig).sa_handler == (void *) SIG_IGN
@@ -467,25 +479,17 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
         system_printf ("Error while dumping state (probably corrupted stack)");
       else
 	{
-	  HANDLE hthread;
-	  DuplicateHandle (hMainProc, GetCurrentThread (),
-			   hMainProc, &hthread, 0, FALSE, DUPLICATE_SAME_ACCESS);
-	  stackdump (e, in);
+	  CONTEXT c = *in;
+	  DWORD stack[6];
+	  stack[0] = in->Ebp;
+	  stack[1] = in->Eip;
+	  stack[2] = stack[3] = stack[4] = stack[5] = 0;
+	  c.Ebp = (DWORD) &stack;
+	  stackdump (e, &c);
 	}
       try_to_debug ();
       really_exit (EXIT_SIGNAL | sig);
     }
-
-  debug_printf ("In cygwin_except_handler calling %p",
-		 myself->getsig(sig).sa_handler);
-
-  DWORD *ebp = (DWORD *)in->Esp;
-  for (DWORD *bpend = ebp - 16; ebp > bpend; ebp--)
-    if (*ebp == in->SegCs && ebp[-1] == in->Eip)
-      {
-	ebp -= 2;
-	break;
-      }
 
   sig_send (NULL, sig, (DWORD) ebp);		// Signal myself
   return 0;
@@ -954,8 +958,12 @@ done:
 exit_sig:
   if (sig == SIGQUIT || sig == SIGABRT)
     {
-      stackdump (NULL, NULL);
+      CONTEXT c;
+      c.ContextFlags = CONTEXT_FULL;
+      GetThreadContext (hMainThread, &c);
+      stackdump (NULL, &c);
       try_to_debug ();
+      really_exit (EXIT_SIGNAL | sig);
     }
   sigproc_printf ("signal %d, about to call do_exit", sig);
   TerminateThread (hMainThread, 0);
