@@ -249,6 +249,7 @@ fhandler_tty_CFLAGS:=-fomit-frame-pointer
 fhandler_virtual_CFLAGS:=-fomit-frame-pointer
 fhandler_windows_CFLAGS:=-fomit-frame-pointer
 fhandler_zero_CFLAGS:=-fomit-frame-pointer
+flock_CFLAGS:=-fomit-frame-pointer
 malloc_CFLAGS:=-fomit-frame-pointer
 malloc_wrapper_CFLAGS:=-fomit-frame-pointer
 miscfuncs_CFLAGS:=-fomit-frame-pointer
