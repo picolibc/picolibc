@@ -1,3 +1,10 @@
+Sat Jun 17 13:51:48 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Detect "cross-hosting" situation and set appropriate
+	variables in Makefile to avoid building excess stuff.
+	* configure: Regenerate.
+	* Makefile.in: Accomodate above change.
+
 Sat Jun 17 19:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* pinfo.cc (pinfo_init): Revert previous patch.

@@ -133,17 +133,27 @@ GMON_OFILES:= gmon.o mcount.o profil.o
 LD_STUFF=--dll $(DLL_OFILES) version.o winver.o $(DLL_IMPORTS) $(LIBM) $(LIBC) \
 	 $(LIBGCC) -e $(DLL_ENTRY) --image-base=0x61000000
 
-.PHONY: all force dll_ofiles install
+.PHONY: all force dll_ofiles install all_target install_target all_host install_host
 
 .SUFFIXES:
 .SUFFIXES: .c .cc .def .a .o
 
-all: new-$(DLL_NAME) $(LIBGMON_A) $(LIB_NAME) new-$(LIB_NAME) cygrun.exe force
+all_host=@all_host@
+install_host=@install_host@
+
+all: $(all_host) all_target
+
+install: $(install_host) install_target
+
+# all: new-$(DLL_NAME) $(LIBGMON_A) $(LIB_NAME) new-$(LIB_NAME) cygrun.exe force
+
+all_target: $(LIBGMON_A) $(LIB_NAME)
+
+all_host: new-$(DLL_NAME) cygrun.exe
 
 force:
 
-install: all
-	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME) ; \
+install: all $(install_host) $(install_target)
 	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) ; do \
 	    $(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
 	done ; \
@@ -154,6 +164,9 @@ install: all
 	    done ; \
 	done ; \
 	$(INSTALL_DATA) regexp/regexp.h $(tooldir)/include/regexp.h
+
+install_host:
+	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME)
 
 clean:
 	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp

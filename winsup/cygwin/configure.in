@@ -60,18 +60,32 @@ AC_CANONICAL_SYSTEM
 
 LIB_AC_PROG_CC
 
+case "$with_cross_host" in
+  ""|*cygwin*)
+    all_host="all_host"
+    install_host="install_host"
+    ;;
+  *)
+    all_host=
+    install_host=
+    ;;
+esac
+
+AC_SUBST(all_host)
+AC_SUBST(install_host)
+
 AC_CHECK_TOOL(AR, ar, ar)
-AC_SUBST(AR)
+dnl AC_SUBST(AR)
 AC_CHECK_TOOL(AS, as, as)
-AC_SUBST(AS)
+dnl C_SUBST(AS)
 AC_CHECK_TOOL(RANLIB, ranlib, ranlib)
-AC_SUBST(RANLIB)
+dnl C_SUBST(RANLIB)
 AC_CHECK_TOOL(LD, ld, ld)
-AC_SUBST(LD)
+dnl C_SUBST(LD)
 AC_CHECK_TOOL(DLLTOOL, dlltool, dlltool)
-AC_SUBST(DLLTOOL)
+dnl C_SUBST(DLLTOOL)
 AC_CHECK_TOOL(WINDRES, windres, windres)
-AC_SUBST(WINDRES)
+dnl C_SUBST(WINDRES)
 
 AC_ALLOCA
 AC_CONFIG_SUBDIRS(utils doc)		
