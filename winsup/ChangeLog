@@ -1,3 +1,10 @@
+Sun Dec  3 00:21:31 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.common: Eliminate checks for libgcc.a and libstdc++.a.  Use
+	CXX for g++ compiles.
+	* configure.in: Find correct c++ compiler.
+	* configure: Regenerate.
+
 Mon Oct 23 00:50:02 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.common (LIBGCC): Acommodate older gcc's that don't need

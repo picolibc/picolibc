@@ -536,6 +536,8 @@ fi
 
 
 
+
+
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
   if test -f $ac_dir/install-sh; then
@@ -583,7 +585,7 @@ else { echo "configure: error: can not run $ac_config_sub" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking host system type""... $ac_c" 1>&6
-echo "configure:587: checking host system type" >&5
+echo "configure:589: checking host system type" >&5
 
 host_alias=$host
 case "$host_alias" in
@@ -604,7 +606,7 @@ host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$host" 1>&6
 
 echo $ac_n "checking target system type""... $ac_c" 1>&6
-echo "configure:608: checking target system type" >&5
+echo "configure:610: checking target system type" >&5
 
 target_alias=$target
 case "$target_alias" in
@@ -622,7 +624,7 @@ target_os=`echo $target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$target" 1>&6
 
 echo $ac_n "checking build system type""... $ac_c" 1>&6
-echo "configure:626: checking build system type" >&5
+echo "configure:628: checking build system type" >&5
 
 build_alias=$build
 case "$build_alias" in
@@ -654,7 +656,7 @@ fi
 # Extract the first word of "${ac_tool_prefix}gcc", so it can be a program name with args.
 set dummy ${ac_tool_prefix}gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:658: checking for $ac_word" >&5
+echo "configure:660: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -686,7 +688,7 @@ if test -n "$ac_tool_prefix"; then
   # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:690: checking for $ac_word" >&5
+echo "configure:692: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -722,7 +724,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:726: checking for $ac_word" >&5
+echo "configure:728: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -771,7 +773,7 @@ fi
 fi
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:775: checking whether we are using GNU C" >&5
+echo "configure:777: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -780,7 +782,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:784: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:786: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -795,7 +797,7 @@ if test $ac_cv_prog_gcc = yes; then
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
   echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:799: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:801: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -817,13 +819,112 @@ echo "$ac_t""$ac_cv_prog_cc_g" 1>&6
   else
     CFLAGS="-O2"
   fi
-  if test "$ac_test_CXXFLAGS" != set; then
-    CXXFLAGS='$(CFLAGS)'
-  fi
 else
   GCC=
   test "${CFLAGS+set}" = set || CFLAGS="-g"
 fi
+
+# Extract the first word of "${ac_tool_prefix}g++", so it can be a program name with args.
+set dummy ${ac_tool_prefix}g++; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:831: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_prog_CXX'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test -n "$CXX"; then
+  ac_cv_prog_CXX="$CXX" # Let the user override the test.
+else
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
+  ac_dummy="$PATH"
+  for ac_dir in $ac_dummy; do
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_prog_CXX="${ac_tool_prefix}g++"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+fi
+fi
+CXX="$ac_cv_prog_CXX"
+if test -n "$CXX"; then
+  echo "$ac_t""$CXX" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+
+if test -z "$ac_cv_prog_CXX"; then
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "g++", so it can be a program name with args.
+set dummy g++; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:863: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_prog_CXX'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test -n "$CXX"; then
+  ac_cv_prog_CXX="$CXX" # Let the user override the test.
+else
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
+  ac_dummy="$PATH"
+  for ac_dir in $ac_dummy; do
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_prog_CXX="g++"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+  test -z "$ac_cv_prog_CXX" && ac_cv_prog_CXX="g++"
+fi
+fi
+CXX="$ac_cv_prog_CXX"
+if test -n "$CXX"; then
+  echo "$ac_t""$CXX" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+else
+  CXX="g++"
+fi
+fi
+
+if test -z "$CXX"; then
+  # Extract the first word of "c++", so it can be a program name with args.
+set dummy c++; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:899: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_prog_CXX'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test -n "$CXX"; then
+  ac_cv_prog_CXX="$CXX" # Let the user override the test.
+else
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
+  ac_dummy="$PATH"
+  for ac_dir in $ac_dummy; do
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_prog_CXX="c++"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+fi
+fi
+CXX="$ac_cv_prog_CXX"
+if test -n "$CXX"; then
+  echo "$ac_t""$CXX" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+  test -z "$CC" && { echo "configure: error: no acceptable cc found in \$PATH" 1>&2; exit 1; }
+fi
+
+CXXFLAGS="$(CFLAGS)"
 
 
 SUBDIRS='w32api cygwin mingw'
@@ -838,7 +939,7 @@ subdirs="$SUBDIRS"
 
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:842: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:943: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1026,6 +1127,7 @@ s%@build_cpu@%$build_cpu%g
 s%@build_vendor@%$build_vendor%g
 s%@build_os@%$build_os%g
 s%@CC@%$CC%g
+s%@CXX@%$CXX%g
 s%@subdirs@%$subdirs%g
 s%@SET_MAKE@%$SET_MAKE%g
 s%@SUBDIRS@%$SUBDIRS%g

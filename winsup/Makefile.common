@@ -85,16 +85,10 @@ c=-E
 o=.E
 endif
 
-libstdcxx:=${subst \,/,${shell $(CC_FOR_TARGET) -print-file-name=libstdc++.a}}
-ifeq ($(libstdcxx),${notdir $(libstdcxx)})
-LIBGCC+=${subst \,/,${shell $(CC_FOR_TARGET) -print-libgcc-file-name}}
-else
-LIBGCC:=${subst \,/,${shell $(CC_FOR_TARGET) -print-libgcc-file-name}} $(libstdcxx)
-endif
+libgcc:=${subst \,/,${shell $(CC_FOR_TARGET) -print-libgcc-file-name}}
+GCC_INCLUDE:=${word 1,${dir $(libgcc)}}/include
 
-GCC_INCLUDE:=${word 1,${dir $(LIBGCC)}}/include
-
-COMPILE_CXX:=$(CC) $c -nostdinc++ $(ALL_CXXFLAGS) -I$(GCC_INCLUDE) \
+COMPILE_CXX:=$(CXX) $c -nostdinc++ $(ALL_CXXFLAGS) -I$(GCC_INCLUDE) \
 	     -fno-rtti -fno-exceptions
 COMPILE_CC:=$(CC) $c -nostdinc $(ALL_CFLAGS) -I$(GCC_INCLUDE)
 
@@ -122,7 +116,7 @@ endif
 ifdef VERBOSE
 	$(COMPILE_CXX) -o $(@D)/$(*F)$o $<
 else
-	@echo $(CC) $c $(CXXFLAGS) ... $(*F).cc
+	@echo $(CXX) $c $(CXXFLAGS) ... $(*F).cc
 	@$(COMPILE_CXX) -o $(@D)/$(*F)$o $<
 endif
 
