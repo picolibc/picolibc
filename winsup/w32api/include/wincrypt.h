@@ -313,7 +313,6 @@ extern "C" {
 #define szOID_SERVER_GATED_CRYPTO "4235658"
 #define szOID_SGC_NETSCAPE "2.16.840.1.113730.4.1"
 #define szOID_PKIX_KP_CLIENT_AUTH "1.3.6.1.5.5.7.3.2"
-
 #define CRYPT_NOHASHOID 0x00000001
 #define CRYPT_NO_SALT 0x10
 #define CRYPT_PREGEN 0x40
@@ -326,6 +325,26 @@ extern "C" {
 #define CRYPT_DATA_KEY 0x800
 #define CRYPT_VOLATILE 0x1000
 #define CRYPT_SGCKEY 0x2000
+#define KP_IV               0x00000001
+#define KP_SALT             0x00000002
+#define KP_PADDING          0x00000003
+#define KP_MODE             0x00000004
+#define KP_MODE_BITS        0x00000005
+#define KP_PERMISSIONS      0x00000006
+#define KP_ALGID            0x00000007
+#define KP_BLOCKLEN         0x00000008
+#define KP_KEYLEN           0x00000009
+#define KP_SALT_EX          0x0000000a
+#define KP_P                0x0000000b
+#define KP_G                0x0000000c
+#define KP_Q                0x0000000d
+#define KP_X                0x000000Oe
+#define KP_Y                0x000000Of
+#define KP_RA               0x00000010
+#define KP_RB               0x00000011
+#define KP_INFO             0x00000012
+#define KP_EFFECTIVE_KEYLEN 0x00000013
+#define KP_PUB_PARAMS       0x00000027
 
 typedef UINT ALG_ID;
 typedef struct _VTableProvStruc {FARPROC FuncVerifyImage;} VTableProvStruc,*PVTableProvStruc;
