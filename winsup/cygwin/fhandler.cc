@@ -938,8 +938,9 @@ fhandler_disk_file::fstat (struct stat *buf)
           && !get_symlink_p ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
-      buf->st_mode &= ~S_IFMT;
-      if (get_socket_p ())
+      if (buf->st_mode & S_IFMT)
+	/* already set */;
+      else if (get_socket_p ())
 	buf->st_mode |= S_IFSOCK;
       else if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	buf->st_mode |= S_IFDIR;
@@ -954,7 +955,9 @@ fhandler_disk_file::fstat (struct stat *buf)
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
-      if (get_socket_p ())
+      if (buf->st_mode & S_IFMT)
+	/* already set */;
+      else if (get_socket_p ())
 	buf->st_mode |= S_IFSOCK;
       else
 	switch (GetFileType (get_handle ()))

@@ -1,3 +1,8 @@
+Thu May 31 15:57:57 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.cc (fhandler_disk_file::fstat): Avoid clearing S_IFMT bits
+	since we've already pre-cleared everything anyway.
+
 Wed May 30 23:51:32 2001  Earnie Boyd  <earnie_boyd@yahoo.com>
 
 	* path.cc (chdir): Always send unsigned chars to isspace since newlib's
