@@ -30,6 +30,7 @@ along with this program; if not, write to the Free Software Foundation, Inc.,
 #define E_AVR_MACH_AVR2 2
 #define E_AVR_MACH_AVR3 3
 #define E_AVR_MACH_AVR4 4
+#define E_AVR_MACH_AVR5 5
 
 /* Relocations.  */
 START_RELOC_NUMBERS (elf_avr_reloc_type)

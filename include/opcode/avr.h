@@ -21,18 +21,17 @@
 #define AVR_ISA_LPM   0x0002 /* device has LPM */
 #define AVR_ISA_LPMX  0x0004 /* device has LPM Rd,Z[+] */
 #define AVR_ISA_SRAM  0x0008 /* device has SRAM (LD, ST, PUSH, POP, ...) */
-#define AVR_ISA_WRAP  0x0010 /* device has exactly 8K program memory */
-#define AVR_ISA_MEGA  0x0020 /* device has >8K program memory (JMP, CALL) */
+#define AVR_ISA_MEGA  0x0020 /* device has >8K program memory (JMP and CALL
+				supported, no 8K wrap on RJMP and RCALL) */
 #define AVR_ISA_MUL   0x0040 /* device has new core (MUL, MOVW, ...) */
 #define AVR_ISA_ELPM  0x0080 /* device has >64K program memory (ELPM) */
 #define AVR_ISA_ELPMX 0x0100 /* device has ELPM Rd,Z[+] (none yet) */
-#define AVR_ISA_SPM   0x0200 /* device can program itself (<=64K) */
-#define AVR_ISA_ESPM  0x0400 /* device can program itself (>64K, none yet) */
+#define AVR_ISA_SPM   0x0200 /* device can program itself */
 #define AVR_ISA_EIND  0x0800 /* device has >128K program memory (none yet) */
 
 #define AVR_ISA_TINY1 (AVR_ISA_1200 | AVR_ISA_LPM)
 #define AVR_ISA_2xxx (AVR_ISA_TINY1 | AVR_ISA_SRAM)
-#define AVR_ISA_85xx (AVR_ISA_2xxx | AVR_ISA_WRAP)
+#define AVR_ISA_M83  (AVR_ISA_2xxx | AVR_ISA_MUL | AVR_ISA_LPMX | AVR_ISA_SPM)
 #define AVR_ISA_M603 (AVR_ISA_2xxx | AVR_ISA_MEGA)
 #define AVR_ISA_M103 (AVR_ISA_M603 | AVR_ISA_ELPM)
 #define AVR_ISA_M161 (AVR_ISA_M603 | AVR_ISA_MUL | AVR_ISA_LPMX | AVR_ISA_SPM)
@@ -191,12 +190,7 @@ AVR_INSN (mulsu,"a,a", "000000110ddd0rrr", 1, AVR_ISA_MUL,  0x0300)
 AVR_INSN (fmul, "a,a", "000000110ddd1rrr", 1, AVR_ISA_MUL,  0x0308)
 AVR_INSN (fmuls,"a,a", "000000111ddd0rrr", 1, AVR_ISA_MUL,  0x0380)
 AVR_INSN (fmulsu,"a,a","000000111ddd1rrr", 1, AVR_ISA_MUL,  0x0388)
-     /* these are for devices that don't exists yet */
-     /* >64K program memory, new core */
-AVR_INSN (espm, "",    "1001010111111000", 1, AVR_ISA_ESPM, 0x95f8)
-     /* >128K program memory (PC = EIND:Z) */
-AVR_INSN (eicall, "",  "1001010100011001", 1, AVR_ISA_EIND, 0x9519)
-AVR_INSN (eijmp, "",   "1001010000011001", 1, AVR_ISA_EIND, 0x9419)
+
 AVR_INSN (sts,  "i,r", "1001001ddddd0000", 2, AVR_ISA_2xxx, 0x9200)
 AVR_INSN (lds,  "r,i", "1001000ddddd0000", 2, AVR_ISA_2xxx, 0x9000)
 AVR_INSN (ldd,  "r,b", "10o0oo0dddddbooo", 1, AVR_ISA_2xxx, 0x8000)
@@ -204,4 +198,10 @@ AVR_INSN (std,  "b,r", "10o0oo1rrrrrbooo", 1, AVR_ISA_2xxx, 0x8200)
   /* ee = {X=11,Y=10,Z=00, 0) */
 AVR_INSN (ld,   "r,e", "100!000dddddee-+", 1, AVR_ISA_1200, 0x8000)
 AVR_INSN (st,   "e,r", "100!001rrrrree-+", 1, AVR_ISA_1200, 0x8200)
+
+     /* these are for devices that don't exist yet */
+/* espm (0x95f8) removed in databook update, use spm with RAMPZ:Z */
+     /* >128K program memory (PC = EIND:Z) */
+AVR_INSN (eicall, "",  "1001010100011001", 1, AVR_ISA_EIND, 0x9519)
+AVR_INSN (eijmp, "",   "1001010000011001", 1, AVR_ISA_EIND, 0x9419)
 

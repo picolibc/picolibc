@@ -1,3 +1,12 @@
+2000-06-26  Marek Michalkiewicz  <marekm@linux.org.pl>
+
+	* avr.h (AVR_ISA_WRAP): Remove, now assumed if not AVR_ISA_MEGA.
+	(AVR_ISA_ESPM): Remove, because ESPM removed in databook update.
+	(AVR_ISA_85xx): Remove, all uses changed back to AVR_ISA_2xxx.
+	(AVR_ISA_M83): Define for ATmega83, ATmega85.
+	(espm): Remove, because ESPM removed in databook update.
+	(eicall, eijmp): Move to the end of opcode table.
+
 2000-06-18  Stephane Carrez  <stcarrez@worldnet.fr>
 
 	* m68hc11.h: New file for support of Motorola 68hc11.

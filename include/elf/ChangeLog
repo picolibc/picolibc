@@ -1,3 +1,7 @@
+2000-06-26  Marek Michalkiewicz  <marekm@linux.org.pl>
+
+	* avr.h (E_AVR_MACH_AVR5): Define.
+
 2000-06-18  Stephane Carrez  <stcarrez@worldnet.fr>
 
 	* m68hc11.h: New file, definitions for the Motorola 68hc11.
