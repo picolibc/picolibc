@@ -437,6 +437,7 @@ free_protoent_ptr (struct protoent *&p)
       if (p->p_name)
 	free (p->p_name);
       free_char_list (p->p_aliases);
+      free ((void *) p);
       p = NULL;
     }
 }
@@ -784,6 +785,7 @@ free_servent_ptr (struct servent *&p)
       if (p->s_proto)
 	free (p->s_proto);
       free_char_list (p->s_aliases);
+      free ((void *) p);
       p = NULL;
     }
 }
@@ -915,6 +917,7 @@ free_hostent_ptr (struct hostent *&p)
 	free ((void *) p->h_name);
       free_char_list (p->h_aliases);
       free_addr_list (p->h_addr_list);
+      free ((void *) p);
       p = NULL;
     }
 }

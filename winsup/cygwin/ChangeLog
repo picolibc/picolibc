@@ -1,3 +1,9 @@
+2002-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (free_protoent_ptr): Add missing free() for base structure.
+	(free_servent_pt): Ditto.
+	(free_hostent_pt): Ditto.
+
 2002-12-10 Craig McGeachie <slapdau@yahoo.com.au>
 
 	* netdb.cc (parse_alias_list, parse_services_line)
