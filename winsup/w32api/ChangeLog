@@ -1,3 +1,8 @@
+2003-06-05  Bart Oldeman  <bartoldeman@users.sourceforge.net>
+
+	* include/lmaccess.h (UF_MNS_LOGON_ACCOUNT): Add define.
+	* include/wingdi.h (LPRGBTRIPLE, LPRGBQUAD): Add typedefs.
+
 2003-06-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ddk/ntpoapi.h (POWER_INFORMATION_LEVEL): Remove.
