@@ -41,6 +41,7 @@ details. */
 #include <semaphore.h>
 #include <stdio.h>
 #include <sys/timeb.h>
+#include <sys/fcntl.h>
 
 extern int threadsafe;
 
@@ -1631,14 +1632,65 @@ pthread_mutexattr::~pthread_mutexattr ()
 
 List<semaphore> semaphore::semaphores;
 
-semaphore::semaphore (int pshared, unsigned int value):verifyable_object (SEM_MAGIC)
+semaphore::semaphore (int pshared, unsigned int value)
+: verifyable_object (SEM_MAGIC),
+  shared (pshared),
+  currentvalue (value),
+  name (NULL)
 {
-  this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, value, LONG_MAX,
-					  NULL);
+  SECURITY_ATTRIBUTES sa = (pshared != PTHREAD_PROCESS_PRIVATE)
+			   ? sec_all : sec_none_nih;
+  this->win32_obj_id = ::CreateSemaphore (&sa, value, LONG_MAX, NULL);
   if (!this->win32_obj_id)
     magic = 0;
-  this->shared = pshared;
-  currentvalue = value;
+
+  semaphores.insert (this);
+}
+
+semaphore::semaphore (const char *sem_name, int oflag, mode_t mode,
+				  unsigned int value)
+: verifyable_object (SEM_MAGIC),
+  shared (PTHREAD_PROCESS_SHARED),
+  currentvalue (value), 		/* Unused for named semaphores. */
+  name (NULL)
+{
+  if (oflag & O_CREAT)
+    {
+      SECURITY_ATTRIBUTES sa = sec_all;
+      if (allow_ntsec)
+	set_security_attribute (mode, &sa, alloca (4096), 4096);
+      this->win32_obj_id = ::CreateSemaphore (&sa, value, LONG_MAX, sem_name);
+      if (!this->win32_obj_id)
+        magic = 0;
+      if (GetLastError () == ERROR_ALREADY_EXISTS && (oflag & O_EXCL))
+	{
+	  __seterrno ();
+	  CloseHandle (this->win32_obj_id);
+	  magic = 0;
+	}
+    }
+  else
+    {
+      this->win32_obj_id = ::OpenSemaphore (SEMAPHORE_ALL_ACCESS, FALSE,
+					    sem_name);
+      if (!this->win32_obj_id)
+	{
+	  __seterrno ();
+	  magic = 0;
+	}
+    }
+  if (magic)
+    {
+      name = new char [strlen (sem_name + 1)];
+      if (!name)
+	{
+	  set_errno (ENOSPC);
+	  CloseHandle (this->win32_obj_id);
+	  magic = 0;
+	}
+      else
+        strcpy (name, sem_name);
+    }
 
   semaphores.insert (this);
 }
@@ -1648,15 +1700,37 @@ semaphore::~semaphore ()
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
 
+  delete [] name;
+
   semaphores.remove (this);
 }
 
 void
 semaphore::_post ()
 {
-  /* we can't use the currentvalue, because the wait functions don't let us access it */
-  ReleaseSemaphore (win32_obj_id, 1, NULL);
-  currentvalue++;
+  if (ReleaseSemaphore (win32_obj_id, 1, &currentvalue))
+    currentvalue++;
+}
+
+int
+semaphore::_getvalue (int *sval)
+{
+  long val;
+
+  switch (WaitForSingleObject (win32_obj_id, 0))
+    {
+      case WAIT_OBJECT_0:
+	ReleaseSemaphore (win32_obj_id, 1, &val);
+	*sval = val + 1;
+	break;
+      case WAIT_TIMEOUT:
+	*sval = 0;
+	break;
+      default:
+        set_errno (EAGAIN);
+	return -1;
+    }
+  return 0;
 }
 
 int
@@ -1671,6 +1745,43 @@ semaphore::_trywait ()
       return -1;
     }
   currentvalue--;
+  return 0;
+}
+
+int
+semaphore::_timedwait (const struct timespec *abstime)
+{
+  struct timeval tv;
+  long waitlength;
+
+  if (__check_invalid_read_ptr (abstime, sizeof *abstime))
+    {
+      /* According to SUSv3, abstime need not be checked for validity,
+         if the semaphore can be locked immediately. */
+      if (!_trywait ())
+        return 0;
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  gettimeofday (&tv, NULL);
+  waitlength = abstime->tv_sec * 1000 + abstime->tv_nsec / (1000 * 1000);
+  waitlength -= tv.tv_sec * 1000 + tv.tv_usec / 1000;
+  if (waitlength < 0)
+    waitlength = 0;
+  switch (pthread::cancelable_wait (win32_obj_id, waitlength))
+    {
+    case WAIT_OBJECT_0:
+      currentvalue--;
+      break;
+    case WAIT_TIMEOUT:
+      set_errno (ETIMEDOUT);
+      return -1;
+    default:
+      debug_printf ("cancelable_wait failed. %E");
+      __seterrno ();
+      return -1;
+    }
   return 0;
 }
 
@@ -1691,13 +1802,15 @@ semaphore::_wait ()
 void
 semaphore::_fixup_after_fork ()
 {
-  debug_printf ("sem %x in _fixup_after_fork", this);
-  if (shared != PTHREAD_PROCESS_PRIVATE)
-    api_fatal ("doesn't understand PROCESS_SHARED semaphores variables");
-  /* FIXME: duplicate code here and in the constructor. */
-  this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue, LONG_MAX, NULL);
-  if (!win32_obj_id)
-    api_fatal ("failed to create new win32 semaphore");
+  if (shared == PTHREAD_PROCESS_PRIVATE)
+    {
+      debug_printf ("sem %x in _fixup_after_fork", this);
+      /* FIXME: duplicate code here and in the constructor. */
+      this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
+					      LONG_MAX, NULL);
+      if (!win32_obj_id)
+	api_fatal ("failed to create new win32 semaphore, error %d");
+    }
 }
 
 verifyable_object::verifyable_object (long verifyer):
@@ -3102,6 +3215,33 @@ semaphore::destroy (sem_t *sem)
   return 0;
 }
 
+sem_t *
+semaphore::open (const char *name, int oflag, mode_t mode, unsigned int value)
+{
+  if (value > SEM_VALUE_MAX)
+    {
+      set_errno (EINVAL);
+      return NULL;
+    }
+
+  sem_t *sem = new sem_t;
+  if (!sem)
+    {
+      set_errno (ENOMEM);
+      return NULL;
+    }
+
+  *sem = new semaphore (name, oflag, mode, value);
+
+  if (!is_good_object (sem))
+    {
+      delete *sem;
+      delete sem;
+      return NULL;
+    }
+  return sem;
+}
+
 int
 semaphore::wait (sem_t *sem)
 {
@@ -3130,13 +3270,42 @@ semaphore::trywait (sem_t *sem)
 }
 
 int
+semaphore::timedwait (sem_t *sem, const struct timespec *abstime)
+{
+  if (!is_good_object (sem))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  return (*sem)->_timedwait (abstime);
+}
+
+int
 semaphore::post (sem_t *sem)
 {
   if (!is_good_object (sem))
-    return EINVAL;
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
   (*sem)->_post ();
   return 0;
+}
+
+int
+semaphore::getvalue (sem_t *sem, int *sval)
+{
+  
+  if (!is_good_object (sem)
+      || __check_null_invalid_struct (sval, sizeof (int)))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  return (*sem)->_getvalue (sval);
 }
 
 /* pthread_null */

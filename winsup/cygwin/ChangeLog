@@ -1,5 +1,34 @@
 2003-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din: Add sem_close, sem_getvalue, sem_open and sem_timedwait.
+	* pthread.cc (+mangle_sem_name): New function.
+	(sem_open): Ditto.
+	(sem_close: Ditto.
+	(sem_timedwait): Ditto.
+	(sem_getvalue): Ditto.
+	* thread.cc (semaphore::semaphore): Rearrange member initialization.
+	Use appropriate security attribute for process shared semaphores.
+	(semaphore::semaphore): New constructor for named semaphores.
+	(semaphore::~semaphore): Care for semaphore name.
+	(semaphore::_post): Accomodate failing ReleaseSemaphore. Use value
+	returned by ReleaseSemaphore vor currentvalue.
+	(semaphore::_getvalue): New method.
+	(semaphore::_timedwait): Ditto.
+	(semaphore::_fixup_after_fork): Rearrange. Don't fail for process
+	shared semaphores.
+	(semaphore::open): New method.
+	(semaphore::timedwait): Ditto.
+	(semaphore::post): Fix return value.  Set errno appropriately.
+	(semaphore::getvalue): New method.
+	* thread.h (class semaphore): Add prototypes for open, getvalue,
+	timedwait, _getvalue, _timedwait.  Add prototypes for new constructor.
+	Add name member.
+	* include/semaphore.h: Add prototypes for sem_open, sem_close,
+	sem_timedwait and sem_getvalue.
+	include/cygwin/version.h: Bump API minor number.
+
+2003-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* miscfunc.cc (__check_invalid_read_ptr): New function.
 	* winsup.h: Declare.
 

@@ -710,15 +710,21 @@ public:
   /* API calls */
   static int init (sem_t * sem, int pshared, unsigned int value);
   static int destroy (sem_t * sem);
+  static sem_t *open (const char *name, int oflag, mode_t mode,
+		      unsigned int value);
   static int wait (sem_t * sem);
-  static int trywait (sem_t * sem);
   static int post (sem_t * sem);
+  static int getvalue (sem_t * sem, int *sval);
+  static int trywait (sem_t * sem);
+  static int timedwait (sem_t * sem, const struct timespec *abstime);
 
   HANDLE win32_obj_id;
   int shared;
   long currentvalue;
+  char *name;
 
   semaphore (int, unsigned int);
+  semaphore (const char *name, int oflag, mode_t mode, unsigned int value);
   ~semaphore ();
 
   class semaphore * next;
@@ -731,7 +737,9 @@ public:
 private:
   void _wait ();
   void _post ();
+  int _getvalue (int *sval);
   int _trywait ();
+  int _timedwait (const struct timespec *abstime);
 
   void _fixup_after_fork ();
 

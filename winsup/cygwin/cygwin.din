@@ -1122,9 +1122,13 @@ _seed48 = seed48
 seekdir
 _seekdir = seekdir
 _seekdir64 = seekdir64
+sem_close
 sem_destroy
+sem_getvalue
 sem_init
+sem_open
 sem_post
+sem_timedwait
 sem_trywait
 sem_wait
 setbuf
