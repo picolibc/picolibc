@@ -128,7 +128,7 @@ cygwin_inet_addr (const char *cp)
 }
 
 /* undocumented in wsock32.dll */
-extern "C" unsigned int	 inet_network (const char *);
+extern "C" unsigned int	WINAPI inet_network (const char *);
 
 extern "C"
 unsigned int 
