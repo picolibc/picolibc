@@ -10,6 +10,17 @@ Sat Jul 29 11:59:29 2000  Christopher Faylor <cgf@cygnus.com>
 	determine default open mode.
 	* winsup.h: Declare binmode.
 
+Sat Jul 29 00:16:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/cygwin_dll.h: Update for modern compilers.
+	* lib/cygwin_crt0.c: Inexplicably need to define alloca for newer
+	compilers.
+	* fhandler.h (fhandler_console): Add new method.
+	* fhandler.cc (fhandler_console::set_cursor_maybe): New method.
+	(fhandler_console::read): Set cursor if it has moved to make it
+	visible.
+
+
 Thu Jul 27 22:54:28 2000  Jason Tishler <jt@dothill.com>
 
 	* dcrt0.cc (dummy_autoload): Add load statement for RegDeleteValueA.
