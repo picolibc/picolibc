@@ -123,14 +123,13 @@ the documentation in <Xref Linkend="ntsec">.</para>
 </listitem>
 <listitem>
 <para><envar>(no)smbntsec</envar> - if set, use <envar>ntsec</envar> on remote
-drives as well (this is the default). If you encounter problems with NT shares
-or Samba drives, setting this to <envar>nosmbntsec</envar> could help. In that
-case the permission and owner/group information is faked as on FAT partitions.
-A reason for a non working <envar>ntsec</envar> on remote drives could be
-insufficient permissions of the users. Since the needed user rights are
-somewhat dangerous (SeRestorePrivilege) it's not always an option to grant that
-rights to users.  However, this shouldn't be a problem in NT domain
-environments.</para>
+drives as well (default is "nosmbntesc"). When setting "smbntsec" there's
+a chance that you get problems with Samba shares so you should use this
+option with care.  One reason for a non working <envar>ntsec</envar> on
+remote drives could be insufficient permissions of the users. The requires
+user rights are somewhat dangerous (SeRestorePrivilege), so it's not always
+an option to grant that rights to users.  However, this shouldn't be a
+problem in NT domain environments.</para>
 </listitem>
 <listitem>
 <para><envar>(no)reset_com</envar> - if set, serial ports are reset
