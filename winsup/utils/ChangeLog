@@ -1,3 +1,7 @@
+2004-05-29  John Paul Wallington  <jpw@gnu.org>
+
+	* ssp.c (usage): Add missing linefeed. 
+
 2004-05-27  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* kill.cc (listsig): Fix "kill -l" segv.  NSIG includes Signal 0, so we
