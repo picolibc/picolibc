@@ -1,3 +1,15 @@
+2005-03-28  Mark Mitchell  <mark@codesourcery.com>
+
+	* gdb/configure.ac: No tgetent on MinGW.
+	* gdb/event-loop.c (struct gdb_notifier): Add "handles" for Windows.
+	(create_file_handler): On Windows, update handles, rather than
+	check_masks and ready_masks.  
+	(delete_file_handler): Likewise.
+	(gdb_wait_for_event): Use WaitForMultipleObjects, not select, on
+	Windows.
+	* gdb/event-top.c (gdb_setup_readline): Put console into
+	character-at-a-time mode under Windows.
+
 2005-03-25  Mark Mitchell  <mark@codesourcery.com>
 
 	* gdb/configure.ac: Link with -lws2_32 on mingw.
