@@ -10,6 +10,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>
 #include <fcntl.h>
 #include <getopt.h>
@@ -19,7 +20,10 @@ details. */
 #include <time.h>
 #include <windows.h>
 #include <signal.h>
-#include "sys/strace.h"
+#include <errno.h>
+#include "cygwin/include/sys/strace.h"
+#include "cygwin/include/sys/cygwin.h"
+#undef cygwin_internal
 
 /*  GCC runtime library's C++ EH code unfortunately pulls in stdio, and we
    get undefine references to __impure_ptr, and hence the following
@@ -249,6 +253,49 @@ ctrl_c (DWORD)
 	   GetLastError ());
   return TRUE;
 }
+
+DWORD (*cygwin_internal) (int, ...);
+
+static int
+load_cygwin ()
+{
+  static HMODULE h;
+
+  if (cygwin_internal)
+    return 1;
+
+  if (h)
+    return 0;
+
+  if (!(h = LoadLibrary ("cygwin1.dll")))
+    {
+      errno = ENOENT;
+      return 0;
+    }
+  if (!(cygwin_internal = (DWORD (*) (int, ...)) GetProcAddress (h, "cygwin_internal")))
+    {
+      errno = ENOSYS;
+      return 0;
+    }
+  return 1;
+}
+
+static void
+attach_process (pid_t pid)
+{
+  load_cygwin ();
+  child_pid = (DWORD) cygwin_internal (CW_CYGWIN_PID_TO_WINPID, pid);
+  if (!child_pid)
+    error (0, "no such pid - %d", pid);
+
+  if (!DebugActiveProcess (child_pid))
+    error (0, "couldn't attach to pid %d<%d> for debugging", pid, child_pid);
+
+  (void) cygwin_internal (CW_STRACE_ON, pid);
+  printf ("Attached to pid %d (windows pid %u)\n", pid, (unsigned) child_pid);
+  return;
+}
+
 
 static void
 create_child (char **argv)
@@ -596,9 +643,14 @@ proc_child (unsigned mask, FILE *ofile)
 }
 
 static void
-dostrace (unsigned mask, FILE *ofile, char **argv)
+dostrace (unsigned mask, FILE *ofile, pid_t pid, char **argv)
 {
-  create_child (argv);
+  if (*argv && pid)
+    error (0, "can't use -p with program argument");
+  if (!pid)
+    create_child (argv);
+  else
+    attach_process (pid);
   proc_child (mask, ofile);
 
   return;
@@ -733,6 +785,7 @@ Usage: strace [OPTIONS] <command-line>\n\
   -h, --help                   display this help info\n\
   -m, --mask=MASK              set message filter mask\n\
   -o, --output=FILENAME        set output file to FILENAME\n\
+  -p, --pid=n                  attach to executing program with cygwin pid n\n\
   -n, --crack-error-numbers    output descriptive text instead of error\n\
                                numbers for Windows errors\n\
   -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs\n\
@@ -762,7 +815,7 @@ Usage: strace [OPTIONS] <command-line>\n\
     sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.\n\
     minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.\n\
     exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.\n\
-    system   0x08000 (_STRACE_SYSTEM)   Cache strace messages.\n\
+    system   0x08000 (_STRACE_SYSTEM)   Serious error which goes to console and log.\n\
     nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.\n\
     malloc   0x20000 (_STRACE_MALLOC)   Trace malloc calls.\n\
     thread   0x40000 (_STRACE_THREAD)   Thread-locking calls.\n\
@@ -776,28 +829,30 @@ version ()
 }
 
 struct option longopts[] = {
-  {"help", no_argument, NULL, 'h'},
-  {"version", no_argument, NULL, 'v'},
   {"buffer-size", required_argument, NULL, 'b'},
-  {"mask", required_argument, NULL, 'm'},
-  {"output", required_argument, NULL, 'o'},
-  {"trace-children", no_argument, NULL, 'f'},
-  {"crack-error-numbers", no_argument, NULL, 'n'},
-  {"no-delta", no_argument, NULL, 'd'},
-  {"usecs", no_argument, NULL, 'u'},
-  {"timestamp", no_argument, NULL, 't'},
-  {"new-window", no_argument, NULL, 'w'},
+  {"help", no_argument, NULL, 'h'},
   {"flush-period", required_argument, NULL, 'S'},
+  {"mask", required_argument, NULL, 'm'},
+  {"new-window", no_argument, NULL, 'w'},
+  {"output", required_argument, NULL, 'o'},
+  {"no-delta", no_argument, NULL, 'd'},
+  {"pid", required_argument, NULL, 'p'},
+  {"timestamp", no_argument, NULL, 't'},
+  {"trace-children", no_argument, NULL, 'f'},
+  {"translate-error-numbers", no_argument, NULL, 'n'},
+  {"usecs", no_argument, NULL, 'u'},
+  {"version", no_argument, NULL, 'v'},
   {NULL, 0, NULL, 0}
 };
 
-static const char *const opts = "hvb:m:o:fndutwS:";
+static const char *const opts = "b:dhfm:no:p:S:tuvw";
 
 int
 main (int argc, char **argv)
 {
   unsigned mask = 0;
   FILE *ofile = NULL;
+  pid_t attach_pid = 0;
   int opt;
 
   if (!(pgm = strrchr (*argv, '\\')) && !(pgm = strrchr (*argv, '/')))
@@ -808,21 +863,19 @@ main (int argc, char **argv)
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (opt)
       {
-      case 'h':
-	// Print help and exit
-	usage ();
-	return 1;
+      case 'b':
+	bufsize = atoi (optarg);
 	break;
-      case 'v':
-	// Print version info and exit
-	version ();
-	return 1;
+      case 'd':
+	delta ^= 1;
 	break;
       case 'f':
 	forkdebug ^= 1;
 	break;
-      case 'b':
-	bufsize = atoi (optarg);
+      case 'h':
+	// Print help and exit
+	usage ();
+	return 1;
 	break;
       case 'm':
 	{
@@ -836,6 +889,9 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 	    }
 	break;
 	}
+      case 'n':
+	numerror ^= 1;
+	break;
       case 'o':
 	if ((ofile = fopen (optarg, "w")) == NULL)
 	  error (1, "can't open %s", optarg);
@@ -843,26 +899,26 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 	(void) fcntl (fileno (ofile), F_SETFD, 0);
 #endif
 	break;
-      case 'n':
-	numerror ^= 1;
+      case 'p':
+	attach_pid = strtol (optarg, NULL, 10);
+	break;
+      case 'S':
+	flush_period = strtol (optarg, NULL, 10);
 	break;
       case 't':
 	hhmmss ^= 1;
 	break;
-      case 'd':
-	delta ^= 1;
-	break;
       case 'u':
-    // FIXME: This option isn't handled properly/at all by the
-    // program's logic.  It seems to be the default, does it
-    // need to just be removed?
+	// FIXME: currently unimplemented
 	usecs ^= 1;
+	break;
+      case 'v':
+	// Print version info and exit
+	version ();
+	return 1;
 	break;
       case 'w':
 	new_window ^= 1;
-	break;
-      case 'S':
-	flush_period = strtol (optarg, NULL, 10);
 	break;
       }
 
@@ -875,7 +931,7 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
   if (!ofile)
     ofile = stdout;
 
-  dostrace (mask, ofile, argv + optind);
+  dostrace (mask, ofile, attach_pid, argv + optind);
 }
 
 #undef CloseHandle

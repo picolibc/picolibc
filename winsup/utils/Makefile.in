@@ -36,7 +36,7 @@ CXXFLAGS+=-fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0
 
 include $(srcdir)/../Makefile.common
 
-MINGW_INCLUDES:=$(MINGW_INCLUDES) $(cygwin_include) $(w32api_include)
+MINGW_INCLUDES:=$(MINGW_INCLUDES) $(w32api_include) -I$(updir)
 
 libbfd:=${shell $(CC) -L$(bupdir2)/bfd --print-file-name=libbfd.a}
 libintl:=${shell $(CC) -L$(bupdir2)/intl --print-file-name=libintl.a}
