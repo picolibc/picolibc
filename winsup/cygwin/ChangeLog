@@ -1,3 +1,14 @@
+2004-10-26  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::fixup_after_fork): Wipe out exitsock local since
+	it should not be used by the child.
+	* select.cc (start_thread_socket): Turn off inheritance for exitsock.
+	Don't add exitsock to exception mask since it should never get an
+	exception.
+	(socket_cleanup): Change some debug messages for consistency.
+	* fhandler_socket.cc (fhandler_socket::dup): Change comment wording
+	slightly.
+
 2004-10-26  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* registry.cc (get_registry_hive_path): Simplify and add a

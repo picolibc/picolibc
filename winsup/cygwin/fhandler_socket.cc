@@ -352,8 +352,8 @@ fhandler_socket::dup (fhandler_base *child)
       debug_printf ("WSADuplicateSocket failed, trying DuplicateHandle");
     }
 
-  /* We don't call fhandler_base::dup here since that requires to
-     have winsock called from fhandler_base and it creates only
+  /* We don't call fhandler_base::dup here since that requires
+     having winsock called from fhandler_base and it creates only
      inheritable sockets which is wrong for winsock2. */
 
   HANDLE nh;

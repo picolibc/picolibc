@@ -1371,11 +1371,14 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 	  select_printf ("getsockname error");
 	  goto err;
 	}
+      if (winsock2_active && wincap.has_set_handle_information ())
+	SetHandleInformation ((HANDLE) si->exitsock, HANDLE_FLAG_INHERIT, 0);
+      /* else
+	   too bad? */
     }
 
   select_printf ("exitsock %p", si->exitsock);
   WINSOCK_FD_SET ((HANDLE) si->exitsock, &si->readfds);
-  WINSOCK_FD_SET ((HANDLE) si->exitsock, &si->exceptfds);
   stuff->device_specific_socket = (void *) si;
   si->start = &stuff->start;
   select_printf ("stuff_start %p", &stuff->start);
@@ -1400,11 +1403,11 @@ socket_cleanup (select_record *, select_stuff *stuff)
       int res = sendto (_my_tls.locals.exitsock, buf, 1, 0,
 			(sockaddr *) &_my_tls.locals.exitsock_sin,
 			sizeof (_my_tls.locals.exitsock_sin));
-      select_printf ("sent a byte to the exit sock %p, res %d", _my_tls.locals.exitsock, res);
+      select_printf ("sent a byte to exitsock %p, res %d", _my_tls.locals.exitsock, res);
       /* Wait for thread to go away */
       si->thread->detach ();
       /* empty the socket */
-      select_printf ("reading a byte from %p", si->exitsock);
+      select_printf ("reading a byte from exitsock %p", si->exitsock);
       res = recv (si->exitsock, buf, 1, 0);
       select_printf ("recv returned %d", res);
       stuff->device_specific_socket = NULL;
