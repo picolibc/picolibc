@@ -355,7 +355,7 @@ pthread::self ()
 
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-cancelstate (0), canceltype (0), joiner (NULL), cleanup_handlers(NULL) 
+                    cancelstate (0), canceltype (0), joiner (NULL), cleanup_stack(NULL) 
 {
 }
 
@@ -370,6 +370,8 @@ void
 pthread::create (void *(*func) (void *), pthread_attr *newattr,
 		 void *threadarg)
 {
+  pthread_mutex *verifyable_mutex_obj = &mutex;
+
   /*already running ? */
   if (win32_obj_id)
     return;
@@ -384,7 +386,7 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   function = func;
   arg = threadarg;
 
-  if (verifyable_object_isvalid (&mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
+  if (verifyable_object_isvalid (&verifyable_mutex_obj, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     {
       thread_printf ("New thread object access mutex is not valid. this %p",
 		     this);
@@ -417,10 +419,8 @@ pthread::push_cleanup_handler (__pthread_cleanup_handler *handler)
   if (this != self ())
     // TODO: do it?
     api_fatal ("Attempt to push a cleanup handler across threads"); 
-  mutex.Lock();
-  handler->next = cleanup_handlers;
-  cleanup_handlers = handler;
-  mutex.UnLock();
+  handler->next = cleanup_stack;
+  InterlockedExchangePointer( &cleanup_stack, handler );
 }
 
 void
@@ -430,21 +430,20 @@ pthread::pop_cleanup_handler (int const execute)
     // TODO: send a signal or something to the thread ?
     api_fatal ("Attempt to execute a cleanup handler across threads");
   
-  if (cleanup_handlers != NULL )
+  if (cleanup_stack != NULL)
     {
-      __pthread_cleanup_handler *handler = cleanup_handlers;
+      __pthread_cleanup_handler *handler = cleanup_stack;
 
       if (execute)
-	 (*handler->function) (handler->arg);
-
-      cleanup_handlers = handler->next;
+        (*handler->function) (handler->arg);
+      cleanup_stack = handler->next;
     }
 }
 
 void
 pthread::pop_all_cleanup_handlers ()
 {
-  while (cleanup_handlers != NULL)
+  while (cleanup_stack != NULL)
     pop_cleanup_handler (1);
 }
 
@@ -1015,6 +1014,10 @@ __pthread_create (pthread_t *thread, const pthread_attr_t *attr,
 int
 __pthread_once (pthread_once_t *once_control, void (*init_routine) (void))
 {
+  // already done ?
+  if (once_control->state)
+    return 0;
+
   pthread_mutex_lock (&once_control->mutex);
   /*Here we must set a cancellation handler to unlock the mutex if needed */
   /*but a cancellation handler is not the right thing. We need this in the thread
@@ -1022,7 +1025,7 @@ __pthread_once (pthread_once_t *once_control, void (*init_routine) (void))
    *at a time. Stote a mutex_t *in the pthread_structure. if that's non null unlock
    *on pthread_exit ();
    */
-  if (once_control->state == 0)
+  if (!once_control->state)
     {
       init_routine ();
       once_control->state = 1;
@@ -1556,7 +1559,7 @@ __pthread_exit (void *value_ptr)
   pthread * thread = pthread::self ();
 
   // run cleanup handlers
-  thread->pop_all_cleanup_handlers();
+  thread->pop_all_cleanup_handlers ();
 
   MT_INTERFACE->destructors.IterateNull ();
   
@@ -1581,23 +1584,21 @@ __pthread_join (pthread_t *thread, void **return_val)
 {
    pthread_t joiner = pthread::self ();
 
+   // Initialize return val with NULL
+   if (return_val)
+     *return_val = NULL;
+
   /*FIXME: wait on the thread cancellation event as well - we are a cancellation point*/
   if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
 
-  if ( joiner == *thread)    
-    {
-      if (return_val)
-	*return_val = NULL;
-      return EDEADLK;
-    }
+  if (__pthread_equal(thread,&joiner))
+    return EDEADLK;
 
   (*thread)->mutex.Lock ();
 
   if((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
-      if (return_val)
-	*return_val = NULL;
       (*thread)->mutex.UnLock ();
       return EINVAL;
     }
@@ -1640,8 +1641,11 @@ __pthread_detach (pthread_t *thread)
       (*thread)->mutex.UnLock ();
     }
   else
-    // thread has already terminated.
+    {
+      // thread has already terminated.
+      (*thread)->mutex.UnLock ();
       delete (*thread);
+    }
 
   return 0;
 }
