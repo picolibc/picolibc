@@ -1,3 +1,75 @@
+2003-07-09  Christopher Faylor  <cgf@redhat.com>
+
+	* sysconf.cc (sysconf): Return processors online rather than bitmask
+	for _SC_NPROCESSORS_ONLN.
+
+2003-07-08  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (creturn): Set appropriate errno when out of memory.
+	(ccalloc): Only issue system_printf when debugging.
+	* dtable.cc (dtable::extend): Only allocate 100 * the incremental growth
+	size max.  Set errno appropriately.
+	(dtable::build_fhandler): Check for error from set_name.
+	* fhandler.cc (fhandler_base::set_name): Set errno and return error on OOM.
+	* fhandler.h (fhandler_base::set_name): Change to bool.
+	* fhandler_process.cc (format_process_stat): Fix formatting.
+	* resource.cc (getrlimit): Return greater of OPEN_MAX or fd table size.
+	* sysconf.cc (sysconf): Ditto.
+
+2003-07-07  Christopher Faylor  <cgf@redhat.com>
+
+	* rmsym: Don't use ranlib.
+
+2003-07-07  Christopher Faylor  <cgf@redhat.com>
+
+	* newsym: Reenable removal of tmp directory.  Just use ar to generate
+	archive index.
+	* Makefile.in: Don't send ranlib to newsym or rmsym.
+
+2003-07-07  Christopher Faylor  <cgf@redhat.com>
+
+	* newsym: Create objects that are closer to those created by dlltool so
+	as not to confuse --export-all-symbols.
+	* rmsym: Be a little more accepting of object filenames now that
+	dlltool can create different format files.
+
+2003-07-06  Christopher Faylor  <cgf@redhat.com>
+
+	* newsym: Oops.  Revert below change.
+
+2003-07-06  Christopher Faylor  <cgf@redhat.com>
+
+	* newsym: Use correct prefix for generating imports.
+	* pinfo.cc (_pinfo::commune_send): Don't wait forever for a response
+	from another process.
+
+2003-07-06  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (gethostid): Set thread affinity so that results are
+	predictable.
+
+2003-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (list::match): Add parameters to return valid address and
+	length back to munmap().  Evaluate intersection between given
+	area and mapped area and return it, if any.
+	(mmap64): On regular files, don't allow mappings beginning beyond
+	EOF.  Return with errno set to ENXIO instead.
+	(munmap): Rewrite SUSv3 conformant.  Check if given memory area is
+	valid.  Unmap all maps inside given memory area.  Don't return error
+	if no mapping has been unmapped.
+
+2003-07-05  N Stephens  <nigel@mips.com>
+
+	* fhandler.h (fhandler_socket::get_connect_state): New method to
+	return socket connection state.
+	* fhandler_socket.cc (dup): Copy socket connect state to new file
+	handle.
+	* net.cc (cygwin_rcmd): Mark file handles of sockets returned by
+	rcmd() as CONNECTED state.
+	(cygwin_rexec): Similarly for rexec().
+	(socketpair): Mark both ends of a new socket pair as CONNECTED.
+
 2003-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (fhandler_disk_file::mmap): Fix address test.
@@ -116,7 +188,7 @@
 	(cygheap_user::internal_token): New member.
 	(cygheap_user::impersonation_state): New member.
 	(cygheap_user::issetuid): Modify.
-	(cygheap_user::token): New method.   
+	(cygheap_user::token): New method.
 	(cygheap_user::deimpersonate): New method.
 	(cygheap_user::reimpersonate): New method.
 	(cygheap_user::has_impersonation_tokens): New method.
@@ -168,9 +240,9 @@
 
 2003-06-18  Pierre Humblet  <pierre.humblet@ieee.org>
 
-        * autoload.cc (GetNetworkParams): Add.
-        * net.cc (getdomainname): Call GetNetworkParams and read the
-        DhcpDomain registry value if warranted.
+	* autoload.cc (GetNetworkParams): Add.
+	* net.cc (getdomainname): Call GetNetworkParams and read the
+	DhcpDomain registry value if warranted.
 
 2003-06-17  Christopher Faylor  <cgf@redhat.com>
 
@@ -429,7 +501,7 @@
 	(fhandler_base::lseek): Call set_did_lseek() instead of
 	set_check_win95_lseek_bug().
 	(fhandler_base::fhandler_base): Initialize fs_flags to 0.
-	* fhandler_disk_file.cc (fhandler_disk_file::open): Don't create files  
+	* fhandler_disk_file.cc (fhandler_disk_file::open): Don't create files
 	as "sparse" unconditionally.  Set fs_flags member.
 
 2003-05-25  Pierre Humblet  <pierre.humblet@ieee.org>
@@ -507,7 +579,7 @@
 	* dcrt0.cc (dll_crt_0_1) Fix calls to MTinterface::Init and
 	pthread::init_mainthread.
 	Call pthread::init_mainthread only when not forked.
-	
+
 2003-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_meminfo): Make swap memory output
