@@ -281,9 +281,6 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf)
 
       if (!(buf->st_mode & S_IFMT))
 	buf->st_mode |= S_IFREG;
-
-      buf->st_uid = uid;
-      buf->st_gid = gid;
     }
   else
     {
@@ -337,6 +334,9 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf)
 	    break;
 	  }
     }
+
+  buf->st_uid = uid;
+  buf->st_gid = gid;
 
   syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%D, st_mode=%p, st_ino=%d, sizeof=%d",
 		 buf, buf->st_atime, buf->st_size, buf->st_mode,

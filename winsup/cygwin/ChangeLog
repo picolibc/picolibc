@@ -1,5 +1,10 @@
 2002-03-21  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Always set
+	st_[ug]id to value derived from get_file_attributes.
+
+2002-03-21  Christopher Faylor  <cgf@redhat.com>
+
 	* spawn.cc (find_exec): Return input if file not found.
 
 2002-03-19  Boris Schaeling  <boriss@web.de>
