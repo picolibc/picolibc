@@ -78,11 +78,14 @@ typedef	void (*__p_sig_fn_t)(int);
 /*
  * These are special values of signal handler pointers which are
  * used to send a signal to the default handler (SIG_DFL), ignore
- * the signal (SIG_IGN), or indicate an error return (SIG_ERR).
+ * the signal (SIG_IGN), indicate an error return (SIG_ERR),
+ * get an error (SIG_SGE), or acknowledge (SIG_ACK).
  */
 #define	SIG_DFL	((__p_sig_fn_t) 0)
 #define	SIG_IGN	((__p_sig_fn_t) 1)
 #define	SIG_ERR ((__p_sig_fn_t) -1)
+#define SIG_SGE ((__p_sig_fn_t) 3)
+#define SIG_ACK ((__p_sig_fn_t) 4)
 
 #ifdef	__cplusplus
 extern "C" {

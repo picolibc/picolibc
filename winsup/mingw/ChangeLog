@@ -1,3 +1,7 @@
+2003-11-27  Dimitry Sibiryakov  <aafemt@users.sourceforge.net>
+
+	* include/signal.h (SIG_SGE, SIG_ACK): Add defines.
+
 2003-10-27  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/math.h: Guard ISO C99 additions with __cplusplus
