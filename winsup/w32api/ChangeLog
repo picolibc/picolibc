@@ -1,4 +1,9 @@
 
+2001.06.11  TAMURA Kent  <tkent@users.sourceforge.net>
+
+	* objidl.h (IMalloc::ReAlloc()): Correct declaration.
+	(IMalloc::Free()): Ditto.
+
 2001-06-11 Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h (REGSTR_PATH_EXPLORER): Unicode it. 

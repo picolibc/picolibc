@@ -482,8 +482,8 @@ DECLARE_INTERFACE_(IMalloc,IUnknown)
 	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
 	STDMETHOD_(ULONG,Release)(THIS) PURE;
 	STDMETHOD_(void*,Alloc)(THIS_ ULONG) PURE;
-	STDMETHOD_(void,ReAlloc)(THIS_ void*) PURE;
-	STDMETHOD_(void*,Free)(THIS_ void*) PURE;
+	STDMETHOD_(void*,ReAlloc)(THIS_ void*,ULONG) PURE;
+	STDMETHOD_(void,Free)(THIS_ void*) PURE;
 	STDMETHOD_(ULONG,GetSize)(THIS_ void*) PURE;
 	STDMETHOD_(int,DidAlloc)(THIS_ void*) PURE;
 	STDMETHOD_(void,HeapMinimize)(THIS) PURE;
