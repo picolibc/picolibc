@@ -3,21 +3,21 @@
    2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
-This file is part of GAS, the GNU Assembler, and GDB, the GNU Debugger.
+   This file is part of GAS, the GNU Assembler, and GDB, the GNU Debugger.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* The SystemV/386 SVR3.2 assembler, and probably all AT&T derived
    ix86 Unix assemblers, generate floating point instructions with
@@ -48,7 +48,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define OLDGCC_COMPAT SYSV386_COMPAT
 #endif
 
-static const template i386_optab[] = {
+static const template i386_optab[] =
+{
 
 #define X None
 #define NoSuf (No_bSuf|No_wSuf|No_lSuf|No_sSuf|No_xSuf|No_qSuf)
@@ -138,23 +139,22 @@ static const template i386_optab[] = {
 {"movzx",  2, 0x0fb7, X, Cpu386, w_Suf|Modrm,			{ Reg16|ShortMem, Reg32, 0} },
 /* These instructions are not particulary usefull, since the zero extend
    32->64 is implicit, but we can encode them.  */
-{"movzx",  2, 0x0fb6, X, Cpu386, b_Suf|Modrm|Rex64,		{ Reg8|ByteMem, Reg64, 0} },
-{"movzx",  2, 0x0fb7, X, Cpu386, w_Suf|Modrm|Rex64,		{ Reg16|ShortMem, Reg64, 0} },
+{"movzx",  2, 0x0fb6, X, Cpu64, b_Suf|Modrm|Rex64,		{ Reg8|ByteMem, Reg64, 0} },
+{"movzx",  2, 0x0fb7, X, Cpu64, w_Suf|Modrm|Rex64,		{ Reg16|ShortMem, Reg64, 0} },
 
 /* Push instructions.  */
 {"push",   1,	0x50, X, CpuNo64, wl_Suf|ShortForm|DefaultSize,	{ WordReg, 0, 0 } },
 {"push",   1,	0xff, 6, CpuNo64, wl_Suf|Modrm|DefaultSize,	{ WordReg|WordMem, 0, 0 } },
 {"push",   1,	0x6a, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,	{ Imm8S, 0, 0} },
 {"push",   1,	0x68, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,	{ Imm16|Imm32, 0, 0} },
-{"push",   1,	0x06, X, 0|CpuNo64, wl_Suf|Seg2ShortForm|DefaultSize, { SReg2, 0, 0 } },
+{"push",   1,	0x06, X, CpuNo64, wl_Suf|Seg2ShortForm|DefaultSize, { SReg2, 0, 0 } },
 {"push",   1, 0x0fa0, X, Cpu386|CpuNo64, wl_Suf|Seg3ShortForm|DefaultSize, { SReg3, 0, 0 } },
 /* In 64bit mode, the operand size is implicitly 64bit.  */
-{"push",   1,	0x50, X, Cpu64,	wq_Suf|ShortForm|DefaultSize|NoRex64, { WordReg, 0, 0 } },
-{"push",   1,	0xff, 6, Cpu64,	wq_Suf|Modrm|DefaultSize|NoRex64, { WordReg|WordMem, 0, 0 } },
-{"push",   1,	0x6a, X, Cpu186|Cpu64, wq_Suf|DefaultSize|NoRex64, { Imm8S, 0, 0} },
-{"push",   1,	0x68, X, Cpu186|Cpu64, wq_Suf|DefaultSize|NoRex64, { Imm32S|Imm16, 0, 0} },
-{"push",   1,	0x06, X, Cpu64,	wq_Suf|Seg2ShortForm|DefaultSize|NoRex64, { SReg2, 0, 0 } },
-{"push",   1, 0x0fa0, X, Cpu386|Cpu64, wq_Suf|Seg3ShortForm|DefaultSize|NoRex64, { SReg3, 0, 0 } },
+{"push",   1,	0x50, X, Cpu64,	wq_Suf|ShortForm|DefaultSize|NoRex64, { Reg16|Reg64, 0, 0 } },
+{"push",   1,	0xff, 6, Cpu64,	wq_Suf|Modrm|DefaultSize|NoRex64, { Reg16|Reg64|WordMem, 0, 0 } },
+{"push",   1,	0x6a, X, Cpu64,	wq_Suf|DefaultSize|NoRex64, { Imm8S, 0, 0} },
+{"push",   1,	0x68, X, Cpu64,	wq_Suf|DefaultSize|NoRex64, { Imm32S|Imm16, 0, 0} },
+{"push",   1, 0x0fa0, X, Cpu64,	wq_Suf|Seg3ShortForm|DefaultSize|NoRex64, { SReg3, 0, 0 } },
 
 {"pusha",  0,	0x60, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,	{ 0, 0, 0 } },
 
@@ -165,9 +165,8 @@ static const template i386_optab[] = {
 {"pop",	   1,	0x07, X, CpuNo64,	 wl_Suf|Seg2ShortForm|DefaultSize, { SReg2, 0, 0 } },
 {"pop",	   1, 0x0fa1, X, Cpu386|CpuNo64, wl_Suf|Seg3ShortForm|DefaultSize, { SReg3, 0, 0 } },
 /* In 64bit mode, the operand size is implicitly 64bit.  */
-{"pop",	   1,	0x58, X, Cpu64,	 wq_Suf|ShortForm|DefaultSize|NoRex64,	{ WordReg, 0, 0 } },
-{"pop",	   1,	0x8f, 0, Cpu64,	 wq_Suf|Modrm|DefaultSize|NoRex64,	{ WordReg|WordMem, 0, 0 } },
-{"pop",	   1,	0x07, X, Cpu64,	 wq_Suf|Seg2ShortForm|DefaultSize|NoRex64, { SReg2, 0, 0 } },
+{"pop",	   1,	0x58, X, Cpu64,	 wq_Suf|ShortForm|DefaultSize|NoRex64,	{ Reg16|Reg64, 0, 0 } },
+{"pop",	   1,	0x8f, 0, Cpu64,	 wq_Suf|Modrm|DefaultSize|NoRex64,	{ Reg16|Reg64|WordMem, 0, 0 } },
 {"pop",	   1, 0x0fa1, X, Cpu64,  wq_Suf|Seg3ShortForm|DefaultSize|NoRex64, { SReg3, 0, 0 } },
 
 {"popa",   0,	0x61, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,		{ 0, 0, 0 } },
@@ -175,14 +174,24 @@ static const template i386_optab[] = {
 /* Exchange instructions.
    xchg commutes:  we allow both operand orders.
  
-   In the 64bit code, xchg eax, eax is reused for new nop instruction.
- */
+   In the 64bit code, xchg eax, eax is reused for new nop instruction.  */
+#if 0 /* While the two entries that are disabled generate shorter code
+         for xchg eax, reg (on x86_64), the special case xchg eax, eax
+         does not get handled correctly - it degenerates into nop, but
+         that way the side effect of zero-extending eax to rax is lost.  */
 {"xchg",   2,	0x90, X, 0,	 wlq_Suf|ShortForm,	{ WordReg, Acc, 0 } },
 {"xchg",   2,	0x90, X, 0,	 wlq_Suf|ShortForm,	{ Acc, WordReg, 0 } },
+#else
+{"xchg",   2,	0x90, X, CpuNo64, wl_Suf|ShortForm,	{ WordReg, Acc, 0 } },
+{"xchg",   2,	0x90, X, CpuNo64, wl_Suf|ShortForm,	{ Acc, WordReg, 0 } },
+{"xchg",   2,	0x90, X, Cpu64, wq_Suf|ShortForm,	{ Reg16|Reg64, Acc, 0 } },
+{"xchg",   2,	0x90, X, Cpu64, wq_Suf|ShortForm,	{ Acc, Reg16|Reg64, 0 } },
+#endif
 {"xchg",   2,	0x86, X, 0,	 bwlq_Suf|W|Modrm,	{ Reg, Reg|AnyMem, 0 } },
 {"xchg",   2,	0x86, X, 0,	 bwlq_Suf|W|Modrm,	{ Reg|AnyMem, Reg, 0 } },
 
 /* In/out from ports.  */
+/* XXX should reject %rax */
 {"in",	   2,	0xe4, X, 0,	 bwl_Suf|W,		{ Imm8, Acc, 0 } },
 {"in",	   2,	0xec, X, 0,	 bwl_Suf|W,		{ InOutPortReg, Acc, 0 } },
 {"in",	   1,	0xe4, X, 0,	 bwl_Suf|W,		{ Imm8, 0, 0 } },
@@ -196,11 +205,11 @@ static const template i386_optab[] = {
 {"lea",	   2, 0x8d,   X, 0,	 wlq_Suf|Modrm,		{ WordMem, WordReg, 0 } },
 
 /* Load segment registers from memory.  */
-{"lds",	   2,	0xc5, X, CpuNo64, wlq_Suf|Modrm,	{ WordMem, WordReg, 0} },
-{"les",	   2,	0xc4, X, CpuNo64, wlq_Suf|Modrm,	{ WordMem, WordReg, 0} },
-{"lfs",	   2, 0x0fb4, X, Cpu386, wlq_Suf|Modrm,		{ WordMem, WordReg, 0} },
-{"lgs",	   2, 0x0fb5, X, Cpu386, wlq_Suf|Modrm,		{ WordMem, WordReg, 0} },
-{"lss",	   2, 0x0fb2, X, Cpu386, wlq_Suf|Modrm,		{ WordMem, WordReg, 0} },
+{"lds",	   2,	0xc5, X, CpuNo64, wl_Suf|Modrm,	{ WordMem, WordReg, 0} },
+{"les",	   2,	0xc4, X, CpuNo64, wl_Suf|Modrm,	{ WordMem, WordReg, 0} },
+{"lfs",	   2, 0x0fb4, X, Cpu386, wl_Suf|Modrm,		{ WordMem, WordReg, 0} },
+{"lgs",	   2, 0x0fb5, X, Cpu386, wl_Suf|Modrm,		{ WordMem, WordReg, 0} },
+{"lss",	   2, 0x0fb2, X, Cpu386, wl_Suf|Modrm,		{ WordMem, WordReg, 0} },
 
 /* Flags register instructions.  */
 {"clc",	   0,	0xf8, X, 0,	 NoSuf,			{ 0, 0, 0} },
@@ -210,9 +219,9 @@ static const template i386_optab[] = {
 {"cmc",	   0,	0xf5, X, 0,	 NoSuf,			{ 0, 0, 0} },
 {"lahf",   0,	0x9f, X, CpuNo64,NoSuf,			{ 0, 0, 0} },
 {"sahf",   0,	0x9e, X, CpuNo64,NoSuf,			{ 0, 0, 0} },
-{"pushf",  0,	0x9c, X, CpuNo64,wlq_Suf|DefaultSize,	{ 0, 0, 0} },
+{"pushf",  0,	0x9c, X, CpuNo64,wl_Suf|DefaultSize,	{ 0, 0, 0} },
 {"pushf",  0,	0x9c, X, Cpu64,	 wq_Suf|DefaultSize|NoRex64,{ 0, 0, 0} },
-{"popf",   0,	0x9d, X, CpuNo64,wlq_Suf|DefaultSize,	{ 0, 0, 0} },
+{"popf",   0,	0x9d, X, CpuNo64,wl_Suf|DefaultSize,	{ 0, 0, 0} },
 {"popf",   0,	0x9d, X, Cpu64,	 wq_Suf|DefaultSize|NoRex64,{ 0, 0, 0} },
 {"stc",	   0,	0xf9, X, 0,	 NoSuf,			{ 0, 0, 0} },
 {"std",	   0,	0xfd, X, 0,	 NoSuf,			{ 0, 0, 0} },
@@ -276,14 +285,14 @@ static const template i386_optab[] = {
 {"neg",	   1,	0xf6, 3, 0,	 bwlq_Suf|W|Modrm,	{ Reg|AnyMem, 0, 0} },
 {"not",	   1,	0xf6, 2, 0,	 bwlq_Suf|W|Modrm,	{ Reg|AnyMem, 0, 0} },
 
-{"aaa",	   0,	0x37, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"aas",	   0,	0x3f, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"daa",	   0,	0x27, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"das",	   0,	0x2f, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"aad",	   0, 0xd50a, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"aad",	   1,   0xd5, X, 0,	 NoSuf,			{ Imm8S, 0, 0} },
-{"aam",	   0, 0xd40a, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"aam",	   1,   0xd4, X, 0,	 NoSuf,			{ Imm8S, 0, 0} },
+{"aaa",	   0,	0x37, X, CpuNo64,	 NoSuf,			{ 0, 0, 0} },
+{"aas",	   0,	0x3f, X, CpuNo64,	NoSuf,			{ 0, 0, 0} },
+{"daa",	   0,	0x27, X, CpuNo64,	NoSuf,			{ 0, 0, 0} },
+{"das",	   0,	0x2f, X, CpuNo64,	NoSuf,			{ 0, 0, 0} },
+{"aad",	   0, 0xd50a, X, CpuNo64,	NoSuf,			{ 0, 0, 0} },
+{"aad",	   1,   0xd5, X, CpuNo64,	NoSuf,			{ Imm8S, 0, 0} },
+{"aam",	   0, 0xd40a, X, CpuNo64,	NoSuf,			{ 0, 0, 0} },
+{"aam",	   1,   0xd4, X, CpuNo64,	NoSuf,			{ Imm8S, 0, 0} },
 
 /* Conversion insns.  */
 /* Intel naming */
@@ -370,37 +379,38 @@ static const template i386_optab[] = {
 {"shrd",   2, 0x0fad, X, Cpu386, wlq_Suf|Modrm,		{ WordReg, WordReg|WordMem, 0} },
 
 /* Control transfer instructions.  */
-{"call",   1,	0xe8, X, 0,	 wlq_Suf|JumpDword|DefaultSize,	{ Disp16|Disp32, 0, 0} },
+{"call",   1,	0xe8, X, CpuNo64, wl_Suf|JumpDword|DefaultSize,	{ Disp16|Disp32, 0, 0} },
+{"call",   1,	0xe8, X, Cpu64,	 wq_Suf|JumpDword|DefaultSize|NoRex64, { Disp16|Disp32, 0, 0} },
 {"call",   1,	0xff, 2, CpuNo64, wl_Suf|Modrm|DefaultSize,	{ WordReg|WordMem|JumpAbsolute, 0, 0} },
-{"call",   1,	0xff, 2, Cpu64,	 wq_Suf|Modrm|DefaultSize|NoRex64,{ WordReg|WordMem|JumpAbsolute, 0, 0} },
+{"call",   1,	0xff, 2, Cpu64,	 wq_Suf|Modrm|DefaultSize|NoRex64, { Reg16|Reg64|WordMem|LLongMem|JumpAbsolute, 0, 0} },
 /* Intel Syntax */
-{"call",   2,	0x9a, X, CpuNo64,wlq_Suf|JumpInterSegment|DefaultSize, { Imm16, Imm16|Imm32, 0} },
+{"call",   2,	0x9a, X, CpuNo64, wl_Suf|JumpInterSegment|DefaultSize, { Imm16, Imm16|Imm32, 0} },
 /* Intel Syntax */
-{"call",   1,	0xff, 3, 0,	 x_Suf|Modrm|DefaultSize,	{ WordMem, 0, 0} },
-{"lcall",  2,	0x9a, X, CpuNo64,	 wl_Suf|JumpInterSegment|DefaultSize, { Imm16, Imm16|Imm32, 0} },
-{"lcall",  1,	0xff, 3, CpuNo64,	 wl_Suf|Modrm|DefaultSize,	{ WordMem|JumpAbsolute, 0, 0} },
-{"lcall",  1,	0xff, 3, Cpu64,	 q_Suf|Modrm|DefaultSize|NoRex64,{ WordMem|JumpAbsolute, 0, 0} },
+{"call",   1,	0xff, 3, 0,	 x_Suf|Modrm|DefaultSize,	{WordMem, 0, 0} },
+{"lcall",  2,	0x9a, X, CpuNo64, wl_Suf|JumpInterSegment|DefaultSize, {Imm16, Imm16|Imm32, 0} },
+{"lcall",  1,	0xff, 3, 0,	 wl_Suf|Modrm|DefaultSize,	{WordMem|JumpAbsolute, 0, 0} },
 
 #define JUMP_PC_RELATIVE 0xeb
-{"jmp",	   1,	0xeb, X, 0,	 NoSuf|Jump,		{ Disp, 0, 0} },
+{"jmp",	   1,	0xeb, X, 0,	 NoSuf|Jump,		{ Disp,0, 0} },
 {"jmp",	   1,	0xff, 4, CpuNo64, wl_Suf|Modrm,		{ WordReg|WordMem|JumpAbsolute, 0, 0} },
-{"jmp",	   1,	0xff, 4, Cpu64,	 wq_Suf|Modrm|NoRex64,	{ WordReg|WordMem|JumpAbsolute, 0, 0} },
-/* Intel Syntax */
+{"jmp",	   1,	0xff, 4, Cpu64,	 wq_Suf|Modrm|NoRex64,	{ Reg16|Reg64|ShortMem|LLongMem|JumpAbsolute, 0, 0} },
+/* Intel Syntax.  */
 {"jmp",    2,	0xea, X, CpuNo64,wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
-/* Intel Syntax */
+/* Intel Syntax.  */
 {"jmp",    1,	0xff, 5, 0,	 x_Suf|Modrm,		{ WordMem, 0, 0} },
-{"ljmp",   2,	0xea, X, CpuNo64,	 wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
-{"ljmp",   1,	0xff, 5, CpuNo64,	 wl_Suf|Modrm,		{ WordMem|JumpAbsolute, 0, 0} },
-{"ljmp",   1,	0xff, 5, Cpu64,	 q_Suf|Modrm|NoRex64,	{ WordMem|JumpAbsolute, 0, 0} },
+{"ljmp",   2,	0xea, X, CpuNo64, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
+{"ljmp",   1,	0xff, 5, 0,	 wl_Suf|Modrm,		{ WordMem|JumpAbsolute, 0, 0} },
 
-{"ret",	   0,	0xc3, X, CpuNo64,wlq_Suf|DefaultSize,	{ 0, 0, 0} },
-{"ret",	   1,	0xc2, X, CpuNo64,wlq_Suf|DefaultSize,	{ Imm16, 0, 0} },
-{"ret",	   0,	0xc3, X, Cpu64,  q_Suf|DefaultSize|NoRex64,{ 0, 0, 0} },
-{"ret",	   1,	0xc2, X, Cpu64,  q_Suf|DefaultSize|NoRex64,{ Imm16, 0, 0} },
+{"ret",	   0,	0xc3, X, CpuNo64,wl_Suf|DefaultSize,	{ 0, 0, 0} },
+{"ret",	   1,	0xc2, X, CpuNo64,wl_Suf|DefaultSize,	{ Imm16, 0, 0} },
+{"ret",	   0,	0xc3, X, Cpu64,  wq_Suf|DefaultSize|NoRex64,{ 0, 0, 0} },
+{"ret",	   1,	0xc2, X, Cpu64,  wq_Suf|DefaultSize|NoRex64,{ Imm16, 0, 0} },
 {"lret",   0,	0xcb, X, 0,	 wlq_Suf|DefaultSize,	{ 0, 0, 0} },
 {"lret",   1,	0xca, X, 0,	 wlq_Suf|DefaultSize,	{ Imm16, 0, 0} },
-{"enter",  2,	0xc8, X, Cpu186, wlq_Suf|DefaultSize,	{ Imm16, Imm8, 0} },
-{"leave",  0,	0xc9, X, Cpu186, wlq_Suf|DefaultSize,	{ 0, 0, 0} },
+{"enter",  2,	0xc8, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,	{ Imm16, Imm8, 0} },
+{"enter",  2,	0xc8, X, Cpu64,  wq_Suf|DefaultSize|NoRex64,	{ Imm16, Imm8, 0} },
+{"leave",  0,	0xc9, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,	{ 0, 0, 0} },
+{"leave",  0,	0xc9, X, Cpu64,  wq_Suf|DefaultSize|NoRex64,	{ 0, 0, 0} },
 
 /* Conditional jumps.  */
 {"jo",	   1,	0x70, X, 0,	 NoSuf|Jump,		{ Disp, 0, 0} },
@@ -536,33 +546,37 @@ static const template i386_optab[] = {
 /* Interrupts & op. sys insns.  */
 /* See gas/config/tc-i386.c for conversion of 'int $3' into the special
    int 3 insn.  */
-#define INT_OPCODE 0xcd
+#define INT_OPCODE  0xcd
 #define INT3_OPCODE 0xcc
 {"int",	   1,	0xcd, X, 0,	 NoSuf,			{ Imm8, 0, 0} },
 {"int3",   0,	0xcc, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"into",   0,	0xce, X, 0,	 NoSuf,			{ 0, 0, 0} },
+{"into",   0,	0xce, X, CpuNo64,	 NoSuf,			{ 0, 0, 0} },
 {"iret",   0,	0xcf, X, 0,	 wlq_Suf|DefaultSize,	{ 0, 0, 0} },
 /* i386sl, i486sl, later 486, and Pentium.  */
 {"rsm",	   0, 0x0faa, X, Cpu386, NoSuf,			{ 0, 0, 0} },
 
-{"bound",  2,	0x62, X, Cpu186, wlq_Suf|Modrm,		{ WordReg, WordMem, 0} },
+{"bound",  2,	0x62, X, Cpu186|CpuNo64, wl_Suf|Modrm,		{ WordReg, WordMem, 0} },
 
 {"hlt",	   0,	0xf4, X, 0,	 NoSuf,			{ 0, 0, 0} },
 /* nop is actually 'xchgl %eax, %eax'.  */
 {"nop",	   0,	0x90, X, 0,	 NoSuf,			{ 0, 0, 0} },
 
 /* Protection control.  */
-{"arpl",   2,	0x63, X, Cpu286, w_Suf|Modrm|IgnoreSize,{ Reg16, Reg16|ShortMem, 0} },
+{"arpl",   2,	0x63, X, Cpu286|CpuNo64, w_Suf|Modrm|IgnoreSize,{ Reg16, Reg16|ShortMem, 0} },
 {"lar",	   2, 0x0f02, X, Cpu286, wlq_Suf|Modrm,		{ WordReg|WordMem, WordReg, 0} },
-{"lgdt",   1, 0x0f01, 2, Cpu286, wlq_Suf|Modrm,		{ WordMem, 0, 0} },
-{"lidt",   1, 0x0f01, 3, Cpu286, wlq_Suf|Modrm,		{ WordMem, 0, 0} },
+{"lgdt",   1, 0x0f01, 2, Cpu286|CpuNo64, wl_Suf|Modrm,		{ WordMem, 0, 0} },
+{"lgdt",   1, 0x0f01, 2, Cpu64, q_Suf|Modrm|NoRex64,		{ LLongMem, 0, 0} },
+{"lidt",   1, 0x0f01, 3, Cpu286|CpuNo64, wl_Suf|Modrm,		{ WordMem, 0, 0} },
+{"lidt",   1, 0x0f01, 3, Cpu64, q_Suf|Modrm|NoRex64,		{ LLongMem, 0, 0} },
 {"lldt",   1, 0x0f00, 2, Cpu286, w_Suf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
 {"lmsw",   1, 0x0f01, 6, Cpu286, w_Suf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
 {"lsl",	   2, 0x0f03, X, Cpu286, wlq_Suf|Modrm,		{ WordReg|WordMem, WordReg, 0} },
 {"ltr",	   1, 0x0f00, 3, Cpu286, w_Suf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
 
-{"sgdt",   1, 0x0f01, 0, Cpu286, wlq_Suf|Modrm,		{ WordMem, 0, 0} },
-{"sidt",   1, 0x0f01, 1, Cpu286, wlq_Suf|Modrm,		{ WordMem, 0, 0} },
+{"sgdt",   1, 0x0f01, 0, Cpu286|CpuNo64, wl_Suf|Modrm,		{ WordMem, 0, 0} },
+{"sgdt",   1, 0x0f01, 0, Cpu64, q_Suf|Modrm|NoRex64,		{ LLongMem, 0, 0} },
+{"sidt",   1, 0x0f01, 1, Cpu286|CpuNo64, wl_Suf|Modrm,		{ WordMem, 0, 0} },
+{"sidt",   1, 0x0f01, 1, Cpu64, q_Suf|Modrm,		{ LLongMem, 0, 0} },
 {"sldt",   1, 0x0f00, 0, Cpu286, wlq_Suf|Modrm,		{ WordReg|InvMem, 0, 0} },
 {"sldt",   1, 0x0f00, 0, Cpu286, w_Suf|Modrm|IgnoreSize,{ ShortMem, 0, 0} },
 {"smsw",   1, 0x0f01, 4, Cpu286, wlq_Suf|Modrm,		{ WordReg|InvMem, 0, 0} },
@@ -650,7 +664,7 @@ static const template i386_optab[] = {
 {"fldln2", 0, 0xd9ed, X, 0,	 FP,			{ 0, 0, 0} },
 {"fldz",   0, 0xd9ee, X, 0,	 FP,			{ 0, 0, 0} },
 
-/* arithmetic */
+/* Arithmetic.  */
 
 /* add */
 {"fadd",   2, 0xd8c0, X, 0,	 FP|ShortForm|FloatD,	{ FloatReg, FloatAcc, 0} },
@@ -827,30 +841,30 @@ static const template i386_optab[] = {
 /* Opcode prefixes; we allow them as separate insns too.  */
 
 #define ADDR_PREFIX_OPCODE 0x67
-{"addr16", 0,	0x67, X, Cpu386, NoSuf|IsPrefix|Size16|IgnoreSize,	{ 0, 0, 0} },
-{"addr32", 0,	0x67, X, Cpu386, NoSuf|IsPrefix|Size32|IgnoreSize,	{ 0, 0, 0} },
-{"aword",  0,	0x67, X, Cpu386, NoSuf|IsPrefix|Size16|IgnoreSize,	{ 0, 0, 0} },
-{"adword", 0,	0x67, X, Cpu386, NoSuf|IsPrefix|Size32|IgnoreSize,	{ 0, 0, 0} },
+{"addr16", 0,	0x67, X, Cpu386|CpuNo64, NoSuf|IsPrefix|Size16|IgnoreSize,	{ 0, 0, 0} },
+{"addr32", 0,	0x67, X, Cpu386,NoSuf|IsPrefix|Size32|IgnoreSize,	{ 0, 0, 0} },
+{"aword",  0,	0x67, X, Cpu386|CpuNo64,NoSuf|IsPrefix|Size16|IgnoreSize,	{ 0, 0, 0} },
+{"adword", 0,	0x67, X, Cpu386,NoSuf|IsPrefix|Size32|IgnoreSize,	{ 0, 0, 0} },
 #define DATA_PREFIX_OPCODE 0x66
-{"data16", 0,	0x66, X, Cpu386, NoSuf|IsPrefix|Size16|IgnoreSize,	{ 0, 0, 0} },
-{"data32", 0,	0x66, X, Cpu386, NoSuf|IsPrefix|Size32|IgnoreSize,	{ 0, 0, 0} },
-{"word",   0,	0x66, X, Cpu386, NoSuf|IsPrefix|Size16|IgnoreSize,	{ 0, 0, 0} },
-{"dword",  0,	0x66, X, Cpu386, NoSuf|IsPrefix|Size32|IgnoreSize,	{ 0, 0, 0} },
+{"data16", 0,	0x66, X, Cpu386,NoSuf|IsPrefix|Size16|IgnoreSize,	{ 0, 0, 0} },
+{"data32", 0,	0x66, X, Cpu386|CpuNo64,NoSuf|IsPrefix|Size32|IgnoreSize,	{ 0, 0, 0} },
+{"word",   0,	0x66, X, Cpu386,NoSuf|IsPrefix|Size16|IgnoreSize,	{ 0, 0, 0} },
+{"dword",  0,	0x66, X, Cpu386|CpuNo64,NoSuf|IsPrefix|Size32|IgnoreSize,	{ 0, 0, 0} },
 #define LOCK_PREFIX_OPCODE 0xf0
 {"lock",   0,	0xf0, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
 {"wait",   0,   0x9b, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define CS_PREFIX_OPCODE 0x2e
-{"cs",	   0,	0x2e, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
+{"cs",	   0,	0x2e, X, CpuNo64,	NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define DS_PREFIX_OPCODE 0x3e
-{"ds",	   0,	0x3e, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
+{"ds",	   0,	0x3e, X, CpuNo64,	NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define ES_PREFIX_OPCODE 0x26
-{"es",	   0,	0x26, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
+{"es",	   0,	0x26, X, CpuNo64,	NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define FS_PREFIX_OPCODE 0x64
 {"fs",	   0,	0x64, X, Cpu386, NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define GS_PREFIX_OPCODE 0x65
 {"gs",	   0,	0x65, X, Cpu386, NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define SS_PREFIX_OPCODE 0x36
-{"ss",	   0,	0x36, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
+{"ss",	   0,	0x36, X, CpuNo64,	NoSuf|IsPrefix,	{ 0, 0, 0} },
 #define REPNE_PREFIX_OPCODE 0xf2
 #define REPE_PREFIX_OPCODE  0xf3
 {"rep",	   0,	0xf3, X, 0,	 NoSuf|IsPrefix,	{ 0, 0, 0} },
@@ -1358,14 +1372,14 @@ static const template i386_optab[] = {
 {"sysret",   0, 0x0f07,    X, CpuK6,	lq_Suf|DefaultSize,	{ 0, 0, 0} },
 {"swapgs",   0, 0x0f01, 0xf8, Cpu64,	NoSuf|ImmExt,		{ 0, 0, 0} },
 
-/* VIA PadLock extensions. */
-{"xstorerng", 0, 0x0fa7c0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
+/* VIA PadLock extensions.  */
+{"xstorerng", 0, 0x000fa7c0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
 {"xcryptecb", 0, 0xf30fa7c8, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
 {"xcryptcbc", 0, 0xf30fa7d0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
 {"xcryptcfb", 0, 0xf30fa7e0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
 {"xcryptofb", 0, 0xf30fa7e8, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
-/* alias for xstorerng */
-{"xstore", 0, 0x0fa7c0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
+/* Alias for xstorerng.  */
+{"xstore",    0, 0x000fa7c0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
 
 /* sentinel */
 {NULL, 0, 0, 0, 0, 0, { 0, 0, 0} }
@@ -1389,13 +1403,13 @@ static const template i386_optab[] = {
 #undef x_FP
 #undef sl_FP
 
-#define MAX_MNEM_SIZE 16	/* for parsing insn mnemonics from input */
-
+#define MAX_MNEM_SIZE 16	/* For parsing insn mnemonics from input.  */
 
 /* 386 register table.  */
 
-static const reg_entry i386_regtab[] = {
-  /* make %st first as we test for it */
+static const reg_entry i386_regtab[] =
+{
+  /* Make %st first as we test for it.  */
   {"st", FloatReg|FloatAcc, 0, 0},
   /* 8 bit regs */
 #define REGNAM_AL 1		/* Entry in i386_regtab.  */
@@ -1443,7 +1457,7 @@ static const reg_entry i386_regtab[] = {
   {"r15w", Reg16, RegRex, 7},
   /* 32 bit regs */
 #define REGNAM_EAX 41
-  {"eax", Reg32|BaseIndex|Acc, 0, 0},  /* Must be in ax + 16 slot */
+  {"eax", Reg32|BaseIndex|Acc, 0, 0},  /* Must be in ax + 16 slot.  */
   {"ecx", Reg32|BaseIndex, 0, 1},
   {"edx", Reg32|BaseIndex, 0, 2},
   {"ebx", Reg32|BaseIndex, 0, 3},
@@ -1475,14 +1489,14 @@ static const reg_entry i386_regtab[] = {
   {"r13", Reg64|BaseIndex, RegRex, 5},
   {"r14", Reg64|BaseIndex, RegRex, 6},
   {"r15", Reg64|BaseIndex, RegRex, 7},
-  /* segment registers */
+  /* Segment registers.  */
   {"es", SReg2, 0, 0},
   {"cs", SReg2, 0, 1},
   {"ss", SReg2, 0, 2},
   {"ds", SReg2, 0, 3},
   {"fs", SReg3, 0, 4},
   {"gs", SReg3, 0, 5},
-  /* control registers */
+  /* Control registers.  */
   {"cr0", Control, 0, 0},
   {"cr1", Control, 0, 1},
   {"cr2", Control, 0, 2},
@@ -1499,7 +1513,7 @@ static const reg_entry i386_regtab[] = {
   {"cr13", Control, RegRex, 5},
   {"cr14", Control, RegRex, 6},
   {"cr15", Control, RegRex, 7},
-  /* debug registers */
+  /* Debug registers.  */
   {"db0", Debug, 0, 0},
   {"db1", Debug, 0, 1},
   {"db2", Debug, 0, 2},
@@ -1532,7 +1546,7 @@ static const reg_entry i386_regtab[] = {
   {"dr13", Debug, RegRex, 5},
   {"dr14", Debug, RegRex, 6},
   {"dr15", Debug, RegRex, 7},
-  /* test registers */
+  /* Test registers.  */
   {"tr0", Test, 0, 0},
   {"tr1", Test, 0, 1},
   {"tr2", Test, 0, 2},
@@ -1541,7 +1555,7 @@ static const reg_entry i386_regtab[] = {
   {"tr5", Test, 0, 5},
   {"tr6", Test, 0, 6},
   {"tr7", Test, 0, 7},
-  /* mmx and simd registers */
+  /* MMX and simd registers.  */
   {"mm0", RegMMX, 0, 0},
   {"mm1", RegMMX, 0, 1},
   {"mm2", RegMMX, 0, 2},
@@ -1566,12 +1580,13 @@ static const reg_entry i386_regtab[] = {
   {"xmm13", RegXMM, RegRex, 5},
   {"xmm14", RegXMM, RegRex, 6},
   {"xmm15", RegXMM, RegRex, 7},
-  /* no type will make this register rejected for all purposes except
+  /* No type will make this register rejected for all purposes except
      for addressing.  This saves creating one extra type for RIP.  */
   {"rip", BaseIndex, 0, 0}
 };
 
-static const reg_entry i386_float_regtab[] = {
+static const reg_entry i386_float_regtab[] =
+{
   {"st(0)", FloatReg|FloatAcc, 0, 0},
   {"st(1)", FloatReg, 0, 1},
   {"st(2)", FloatReg, 0, 2},
@@ -1582,9 +1597,9 @@ static const reg_entry i386_float_regtab[] = {
   {"st(7)", FloatReg, 0, 7}
 };
 
-#define MAX_REG_NAME_SIZE 8	/* for parsing register names from input */
+#define MAX_REG_NAME_SIZE 8	/* For parsing register names from input.  */
 
-/* segment stuff */
+/* Segment stuff.  */
 static const seg_entry cs = { "cs", 0x2e };
 static const seg_entry ds = { "ds", 0x3e };
 static const seg_entry ss = { "ss", 0x36 };
@@ -1592,4 +1607,3 @@ static const seg_entry es = { "es", 0x26 };
 static const seg_entry fs = { "fs", 0x64 };
 static const seg_entry gs = { "gs", 0x65 };
 
-/* end of opcode/i386.h */

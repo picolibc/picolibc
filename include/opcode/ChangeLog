@@ -1,3 +1,8 @@
+2004-07-21  Jan Beulich  <jbeulich@novell.com>
+
+	* i386.h: Adjust instruction descriptions to better match the
+	specification.
+
 2004-07-16  Richard Earnshaw  <rearnsha@arm.com>
 
 	* arm.h: Remove all old content.  Replace with architecture defines
