@@ -198,6 +198,8 @@ read_etc_passwd ()
 	      && (searchentry = !internal_getpwsid (tu)))
 	    default_uid = DEFAULT_UID_NT;
 	}
+      else if (myself->uid == ILLEGAL_UID)
+        searchentry = !search_for (DEFAULT_UID, NULL);
       if (searchentry &&
 	  (!(pw = search_for (0, cygheap->user.name ())) ||
 	   (myself->uid != ILLEGAL_UID &&

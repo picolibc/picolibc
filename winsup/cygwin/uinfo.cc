@@ -61,20 +61,21 @@ internal_getlogin (cygheap_user &user)
 	 from the Windows user name */
       if (ret)
 	{
-	  if ((pw = internal_getpwsid (tu)))
-	    user.set_name (pw->pw_name);
+	  pw = internal_getpwsid (tu);
 	  /* Set token owner to the same value as token user */
 	  if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
 	    debug_printf ("SetTokenInformation(TokenOwner): %E");
 	 }
     }
 
-  if (!pw && !(pw = getpwnam (user.name ())))
-    debug_printf("user name not found in augmented /etc/passwd");
+  if (!pw && !(pw = getpwnam (user.name ()))
+      && !(pw = getpwuid32 (DEFAULT_UID)))
+    debug_printf("user not found in augmented /etc/passwd");
   else
     {
       myself->uid = pw->pw_uid;
       myself->gid = pw->pw_gid;
+      user.set_name (pw->pw_name);
       if (wincap.has_security ())
         {
 	  cygsid gsid;

@@ -1,3 +1,10 @@
+2002-11-25  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* passwd.cc (read_etc_passwd): Never add an entry when starting
+	on Win95/98/ME if a default entry is present.
+	* uinfo.cc (internal_getlogin): Look for the default uid if needed.
+	Always call user.set_name ().
+
 2002-11-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (getacl): Set errno to ENOSPC if command is GETACL and
