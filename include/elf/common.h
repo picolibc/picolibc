@@ -126,7 +126,7 @@
 #define EM_RCE		 39	/* Old name for MCore */
 #define EM_ARM		 40	/* ARM */
 #define EM_OLD_ALPHA	 41	/* Digital Alpha */
-#define EM_SH		 42	/* Renesas (formerly Hitachi) SH */
+#define EM_SH		 42	/* Renesas (formerly Hitachi) / SuperH SH */
 #define EM_SPARCV9	 43	/* SPARC v9 64-bit */
 #define EM_TRICORE	 44	/* Siemens Tricore embedded processor */
 #define EM_ARC		 45	/* ARC Cores */
@@ -172,7 +172,7 @@
 #define EM_D10V		 85	/* Mitsubishi D10V */
 #define EM_D30V		 86	/* Mitsubishi D30V */
 #define EM_V850		 87	/* NEC v850 */
-#define EM_M32R		 88	/* Mitsubishi M32R */
+#define EM_M32R		 88	/* Renesas M32R (formerly Mitsubishi M32R) */
 #define EM_MN10300	 89	/* Matsushita MN10300 */
 #define EM_MN10200	 90	/* Matsushita MN10200 */
 #define EM_PJ		 91	/* picoJava */
