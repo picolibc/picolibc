@@ -1167,6 +1167,12 @@ extern "C" {
 #define AC_SRC_OVER 0
 #define LAYOUT_RTL 1
 #define LAYOUT_BITMAPORIENTATIONPRESERVED 8
+#if (WINVER > 0x500)
+#define GRADIENT_FILL_RECT_H 0x00
+#define GRADIENT_FILL_RECT_V 0x01
+#define GRADIENT_FILL_TRIANGLE 0x02
+#define GRADIENT_FILL_OP_FLAG 0xff
+#endif
 
 #ifndef RC_INVOKED
 typedef struct _ABC {

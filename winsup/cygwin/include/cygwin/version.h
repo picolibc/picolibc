@@ -42,7 +42,7 @@ details. */
 	 changes to the DLL and is mainly informative in nature. */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1005
-#define CYGWIN_VERSION_DLL_MINOR 3
+#define CYGWIN_VERSION_DLL_MINOR 4
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -210,12 +210,22 @@ details. */
        88: Export _getreent
        89: Export __mempcpy
        90: Export _fopen64
+       91: Export argz_add argz_add_sep argz_append argz_count argz_create
+	   argz_create_sep argz_delete argz_extract argz_insert
+	   argz_next argz_replace argz_stringify envz_add envz_entry
+	   envz_get envz_merge envz_remove envz_strip
+       92: Export getusershell, setusershell, endusershell
+       93: Export daemon, forkpty, openpty, iruserok, ruserok, login_tty,
+	   openpty, forkpty, revoke, logwtmp, updwtmp
+       94: Export getopt, getopt_long, optarg, opterr, optind, optopt,
+       	   optreset, __check_rhosts_file, __rcmd_errstr.
+
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 90
+#define CYGWIN_VERSION_API_MINOR 94
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

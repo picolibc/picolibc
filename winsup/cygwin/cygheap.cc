@@ -22,6 +22,7 @@
 #include "heap.h"
 #include "sync.h"
 #include "shared_info.h"
+#include "sigproc.h"
 
 init_cygheap NO_COPY *cygheap;
 void NO_COPY *cygheap_max;
@@ -178,14 +179,14 @@ _csbrk (int sbs)
 {
   void *prebrk = cygheap_max;
   void *prebrka = pagetrunc (prebrk);
-  (char *) cygheap_max += sbs;
+  cygheap_max = (char *) cygheap_max + sbs;
   if (!sbs || (prebrk != prebrka && prebrka == pagetrunc (cygheap_max)))
     /* nothing to do */;
   else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
     {
       malloc_printf ("couldn't commit memory for cygwin heap, %E");
       __seterrno ();
-      (char *) cygheap_max -= sbs;
+      cygheap_max = (char *) cygheap_max - sbs;
       return NULL;
     }
 
@@ -203,6 +204,8 @@ cygheap_init ()
     }
   if (!cygheap->fdtab)
     cygheap->fdtab.init ();
+  if (!cygheap->sigs)
+    sigalloc ();
 }
 
 /* Copyright (C) 1997, 2000 DJ Delorie */

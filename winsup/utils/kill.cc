@@ -129,13 +129,18 @@ static void __stdcall
 forcekill (int pid, int sig, int wait)
 {
   external_pinfo *p = (external_pinfo *) cygwin_internal (CW_GETPINFO_FULL, pid);
-  if (!p)
-    return;
-  HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) p->dwProcessId);
+  DWORD dwpid = p ? p->dwProcessId : (DWORD) pid;
+  HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) dwpid);
   if (!h)
-    return;
+    {
+      fprintf (stderr, "couldn't open pid %u\n", (unsigned) dwpid);
+      return;
+    }
   if (!wait || WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
-    TerminateProcess (h, sig << 8);
+    if (!TerminateProcess (h, sig << 8)
+	&& WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
+      fprintf (stderr, "couldn't kill pid %u, %u\n", (unsigned) dwpid,
+	       (unsigned) GetLastError ());
   CloseHandle (h);
 }
 
@@ -144,8 +149,8 @@ main (int argc, char **argv)
 {
   int sig = SIGTERM;
   int force = 0;
-  char *gotsig = NULL;
   int ret = 0;
+  char *gotasig = NULL;
 
   prog_name = strrchr (argv[0], '/');
   if (prog_name == NULL)
@@ -168,8 +173,8 @@ main (int argc, char **argv)
       switch (ch)
 	{
 	case 's':
-	  gotsig = optarg;
-	  sig = getsig (gotsig);
+	  gotasig = optarg;
+	  sig = getsig (gotasig);
 	  break;
 	case 'l':
 	  if (!optarg)
@@ -195,12 +200,12 @@ main (int argc, char **argv)
 	  print_version ();
 	  break;
 	case '?':
-	  if (gotsig)
+	  if (gotasig)
 	    usage ();
 	  optreset = 1;
 	  optind = 1 + av - argv;
-	  gotsig = *av + 1;
-	  sig = getsig (gotsig);
+	  gotasig = *av + 1;
+	  sig = getsig (gotasig);
 	  break;
 	default:
 	  usage ();
@@ -208,7 +213,7 @@ main (int argc, char **argv)
 	}
     }
 
-  test_for_unknown_sig (sig, gotsig);
+  test_for_unknown_sig (sig, gotasig);
 
   argv += optind;
   while (*argv != NULL)

@@ -507,12 +507,12 @@ fhandler_console::read (void *pv, size_t& buflen)
 
 err:
   __seterrno ();
-  (ssize_t) buflen = -1;
+  buflen = (size_t) -1;
   return;
 
- sig_exit:
+sig_exit:
   set_sig_errno (EINTR);
-  (ssize_t) buflen = -1;
+  buflen = (size_t) -1;
   return;
 }
 

@@ -1,3 +1,4 @@
+LIBRARY snmpapi.dll
 EXPORTS
 SnmpSvcAddrIsIpx@12
 SnmpSvcAddrToSocket@8

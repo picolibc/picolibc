@@ -28,6 +28,21 @@
  *  malloc_usable_size(P) is equivalent to realloc(P, malloc_usable_size(P))
  *
  * $Log$
+ * Revision 1.6  2003/08/31 18:26:58  cgf
+ * * Makefile.in (MALLOC_OFILES): Always fill in with correct malloc object.
+ * * configure.in: Fill in MALLOC_OFILES with either debugging or regular malloc.
+ * * configure: Regenerate.
+ * * dlmalloc.c: Make various fruitless changes to attempt to get to work.
+ * * dlmalloc.h: Ditto.
+ * * malloc.cc (free): Check malloc pool when debugging.
+ * * path.cc (win32_device_name): Eliminate compiler warning.
+ * * sigproc.cc (sig_dispatch_pending): Remove use of was_pending.  Let
+ * thisframe.call_signal_handler decide if handler should be called rather than
+ * using bogus was_pending check.
+ * * exceptions.cc (interrupt_setup): Remove accidentally checked in debugging
+ * code.
+ * * heap.cc (sbrk): Save rounded addess in user_heap_max.
+ *
  * Revision 1.5  2001/10/03 03:49:25  cgf
  * * cygheap.cc (cfree): Remove malloc debugging probe.
  * * dlmalloc.c (errprint): Remove abort() call which causes interesting error
@@ -973,31 +988,31 @@ extern Void_t*     sbrk();
 #else
 
 #ifndef cALLOc
-#define cALLOc		calloc
+#define cALLOc		dlcalloc
 #endif
 #ifndef fREe
-#define fREe		free
+#define fREe		dlfree
 #endif
 #ifndef mALLOc
-#define mALLOc		malloc
+#define mALLOc		dlmalloc
 #endif
 #ifndef mEMALIGn
-#define mEMALIGn	memalign
+#define mEMALIGn	dlmemalign
 #endif
 #ifndef rEALLOc
-#define rEALLOc		realloc
+#define rEALLOc		dlrealloc
 #endif
 #ifndef vALLOc
-#define vALLOc		valloc
+#define vALLOc		dlvalloc
 #endif
 #ifndef pvALLOc
-#define pvALLOc		pvalloc
+#define pvALLOc		dlpvalloc
 #endif
 #ifndef mALLINFo
-#define mALLINFo	mallinfo
+#define mALLINFo	dlmallinfo
 #endif
 #ifndef mALLOPt
-#define mALLOPt		mallopt
+#define mALLOPt		dlmallopt
 #endif
 
 #endif
@@ -1012,7 +1027,6 @@ extern Void_t*     sbrk();
 #define memalign(align, size)	memalign_dbg(align, size, __FILE__, __LINE__)
 #define valloc(size)		valloc_dbg(size, __FILE__, __LINE__)
 #define pvalloc(size)		pvalloc_dbg(size, __FILE__, __LINE__)
-#define cfree(p)		cfree_dbg(p, __FILE__, __LINE__)
 #define malloc_trim(pad)	malloc_trim_dbg(pad, __FILE__, __LINE__)
 #define malloc_usable_size(p)	malloc_usable_size_dbg(p, __FILE__, __LINE__)
 #define malloc_stats(void)	malloc_stats_dbg(__FILE__, __LINE__)
@@ -1027,7 +1041,6 @@ Void_t* calloc_dbg(size_t, size_t, const char *, int);
 Void_t* memalign_dbg(size_t, size_t, const char *, int);
 Void_t* valloc_dbg(size_t, const char *, int);
 Void_t* pvalloc_dbg(size_t, const char *, int);
-void    cfree_dbg(Void_t*, const char *, int);
 int     malloc_trim_dbg(size_t, const char *, int);
 size_t  malloc_usable_size_dbg(Void_t*, const char *, int);
 void    malloc_stats_dbg(const char *, int);
@@ -1041,7 +1054,6 @@ Void_t* calloc_dbg();
 Void_t* memalign_dbg();
 Void_t* valloc_dbg();
 Void_t* pvalloc_dbg();
-void    cfree_dbg();
 int     malloc_trim_dbg();
 size_t  malloc_usable_size_dbg();
 void    malloc_stats_dbg();
@@ -1060,7 +1072,6 @@ Void_t* cALLOc(size_t, size_t);
 Void_t* mEMALIGn(size_t, size_t);
 Void_t* vALLOc(size_t);
 Void_t* pvALLOc(size_t);
-void    cfree(Void_t*);
 int     malloc_trim(size_t);
 size_t  malloc_usable_size(Void_t*);
 void    malloc_stats(void);
@@ -1074,7 +1085,6 @@ Void_t* cALLOc();
 Void_t* mEMALIGn();
 Void_t* vALLOc();
 Void_t* pvALLOc();
-void    cfree();
 int     malloc_trim();
 size_t  malloc_usable_size();
 void    malloc_stats();
@@ -1102,7 +1112,6 @@ extern "C" {
 #undef memalign
 #undef valloc
 #undef pvalloc
-#undef cfree
 #undef malloc_trim
 #undef malloc_usable_size
 #undef malloc_stats
@@ -1117,7 +1126,6 @@ Void_t* cALLOc(size_t, size_t);
 Void_t* mEMALIGn(size_t, size_t);
 Void_t* vALLOc(size_t);
 Void_t* pvALLOc(size_t);
-void    cfree(Void_t*);
 int     malloc_trim(size_t);
 size_t  malloc_usable_size(Void_t*);
 void    malloc_stats(void);
@@ -1131,7 +1139,6 @@ Void_t* cALLOc();
 Void_t* mEMALIGn();
 Void_t* vALLOc();
 Void_t* pvALLOc();
-void    cfree();
 int     malloc_trim();
 size_t  malloc_usable_size();
 void    malloc_stats();
@@ -1901,7 +1908,6 @@ static void malloc_err(const char *err, mchunkptr p)
 #undef valloc
 #undef pvalloc
 #undef calloc
-#undef cfree
 #undef malloc_trim
 #undef malloc_usable_size
 #undef malloc_stats
@@ -1959,19 +1965,16 @@ Void_t* realloc_dbg(Void_t *oldmem, size_t bytes, dbgargs) {
   skelr(Void_t*, realloc(oldmem, bytes));
 }
 Void_t* memalign_dbg(size_t alignment, size_t bytes, dbgargs) {
-  skelr(Void_t*, memalign(alignment, bytes));
+  skelr(Void_t*, dlmemalign(alignment, bytes));
 }
 Void_t* valloc_dbg(size_t bytes, dbgargs) {
-  skelr(Void_t*, valloc(bytes));
+  skelr(Void_t*, dlvalloc(bytes));
 }
 Void_t* pvalloc_dbg(size_t bytes, dbgargs) {
-  skelr(Void_t*, pvalloc(bytes));
+  skelr(Void_t*, dlpvalloc(bytes));
 }
 Void_t* calloc_dbg(size_t n, size_t elem_size, dbgargs) {
   skelr(Void_t*, calloc(n, elem_size));
-}
-void cfree_dbg(Void_t *mem, dbgargs) {
-  skelv(cfree(mem));
 }
 int malloc_trim_dbg(size_t pad, dbgargs) {
   skelr(int, malloc_trim(pad));
@@ -1983,10 +1986,10 @@ void malloc_stats_dbg(dbgargs) {
   skelv(malloc_stats());
 }
 int mallopt_dbg(int flag, int value, dbgargs) {
-  skelr(int, mallopt(flag, value));
+  skelr(int, dlmallopt(flag, value));
 }
 struct mallinfo mallinfo_dbg(dbgargs) {
-  skelr(struct mallinfo, mallinfo());
+  skelr(struct mallinfo, dlmallinfo());
 }
 
 #undef skel
@@ -3536,24 +3539,6 @@ Void_t* cALLOc(n, elem_size) size_t n; size_t elem_size;
   }
 }
 
-/*
-
-  cfree just calls free. It is needed/defined on some systems
-  that pair it with calloc, presumably for odd historical reasons.
-
-*/
-
-#if !defined(INTERNAL_LINUX_C_LIB) || !defined(__ELF__)
-#if __STD_C
-void cfree(Void_t *mem)
-#else
-void cfree(mem) Void_t *mem;
-#endif
-{
-  free(mem);
-}
-#endif
-
 
 
 /*
@@ -3580,7 +3565,7 @@ void cfree(mem) Void_t *mem;
 */
 
 #if __STD_C
-int malloc_trim(size_t pad)
+int dlmalloc_trim(size_t pad)
 #else
 int malloc_trim(pad) size_t pad;
 #endif
@@ -3653,7 +3638,7 @@ int malloc_trim(pad) size_t pad;
 */
 
 #if __STD_C
-size_t malloc_usable_size(Void_t* mem)
+size_t dlmalloc_usable_size(Void_t* mem)
 #else
 size_t malloc_usable_size(mem) Void_t* mem;
 #endif
@@ -3745,7 +3730,7 @@ static void malloc_update_mallinfo(void)
 
 */
 
-void malloc_stats(void)
+void dlmalloc_stats(void)
 {
   malloc_update_mallinfo();
   fprintf(stderr, "max system bytes = %10u\n",

@@ -76,7 +76,7 @@ fhandler_pipe::read (void *in_ptr, size_t& in_len)
       ResetEvent (read_state);
       cygthread *th = new cygthread (read_pipe, &pi, "read_pipe");
       if (th->detach (read_state) && !in_len)
-	(ssize_t) in_len = -1;	/* received a signal */
+	in_len = (size_t) -1;	/* received a signal */
     }
   (void) ReleaseMutex (guard);
   return;

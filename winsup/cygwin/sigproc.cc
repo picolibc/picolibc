@@ -17,6 +17,7 @@ details. */
 #include <stdlib.h>
 #include <sys/cygwin.h>
 #include <assert.h>
+#include <sys/signal.h>
 #include "cygerrno.h"
 #include "sync.h"
 #include "sigproc.h"
@@ -48,10 +49,33 @@ details. */
 
 #define NZOMBIES	256
 
-LONG local_sigtodo[TOTSIGS];
-inline LONG* getlocal_sigtodo (int sig)
+static LONG local_sigtodo[TOTSIGS];
+struct sigaction *global_sigs;
+
+inline LONG *
+getlocal_sigtodo (int sig)
 {
   return local_sigtodo + __SIGOFFSET + sig;
+}
+
+void __stdcall
+sigalloc ()
+{
+  cygheap->sigs = global_sigs =
+    (struct sigaction *) ccalloc (HEAP_SIGS, NSIG, sizeof (struct sigaction));
+}
+
+void __stdcall
+signal_fixup_after_exec ()
+{
+  global_sigs = cygheap->sigs;
+  /* Set up child's signal handlers */
+  for (int i = 0; i < NSIG; i++)
+    {
+      myself->getsig (i).sa_mask = 0;
+      if (myself->getsig (i).sa_handler != SIG_IGN)
+	myself->getsig (i).sa_handler = SIG_DFL;
+    }
 }
 
 /*
@@ -123,7 +147,7 @@ muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
 
 DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 
-static bool NO_COPY pending_signals = false;	// true if signals pending
+bool NO_COPY pending_signals = false;	// true if signals pending
 
 /* Functions
  */
@@ -177,7 +201,6 @@ wait_for_sigthread ()
 {
   sigproc_printf ("wait_sig_inited %p", wait_sig_inited);
   HANDLE hsig_inited = wait_sig_inited;
-  assert (hsig_inited);
   (void) WaitForSingleObject (hsig_inited, INFINITE);
   wait_sig_inited = NULL;
   (void) ForceCloseHandle1 (hsig_inited, wait_sig_inited);
@@ -300,7 +323,6 @@ proc_subproc (DWORD what, DWORD val)
       vchild->sid = myself->sid;
       vchild->ctty = myself->ctty;
       vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
-      vchild->copysigs (myself);
 
       sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",
 		  vchild->pid, nchildren, vchild->dwProcessId,
@@ -540,12 +562,11 @@ sig_dispatch_pending ()
 
   sigframe thisframe (mainthread);
 
-  int was_pending = pending_signals;
 #ifdef DEBUGGING
-  sigproc_printf ("pending_signals %d", was_pending);
+  sigproc_printf ("pending_signals %d", pending_signals);
 #endif
 
-  if (!was_pending)
+  if (!pending_signals)
 #ifdef DEBUGGING
     sigproc_printf ("no need to wake anything up");
 #else
@@ -559,10 +580,7 @@ sig_dispatch_pending ()
 #endif
     }
 
-  if (was_pending)
-    thisframe.call_signal_handler ();
-
-  return was_pending;
+  return thisframe.call_signal_handler ();
 }
 
 /* Message initialization.  Called from dll_crt0_1
@@ -699,7 +717,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 	{
 	  thiscatch = sigcatch_main;
 	  thiscomplete = sigcomplete_main;
-	  thisframe.set (mainthread, ebp, exception);
+	  thisframe.init (mainthread, ebp, exception);
 	  todo = getlocal_sigtodo (sig);
 	  issem = true;
 	}
@@ -1171,7 +1189,7 @@ wait_sig (VOID *self)
 		{
 		  /* If x > 0, we have to deal with a signal at some later point */
 		  if (rc != RC_NOSYNC && x > 0)
-		    pending_signals = true;	// There should be an armed semaphore, in this case
+		    /*pending_signals = true*/;	// There should be an armed semaphore, in this case
 
 		  if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
 		      (sigismember (&myself->getsigmask (), sig) ||
@@ -1180,7 +1198,7 @@ wait_sig (VOID *self)
 		    {
 		      sigproc_printf ("signal %d blocked", sig);
 		      x = InterlockedIncrement (myself->getsigtodo (sig));
-		      pending_signals = true;
+		      /* pending_signals = true;*/  // will be set by set_process_mask
 		    }
 		  else
 		    {
@@ -1210,9 +1228,9 @@ wait_sig (VOID *self)
 			  sigproc_printf ("Got signal %d", sig);
 			  if (!sig_handle (sig))
 			    {
+			      pending_signals = true;
 			      saw_failed_interrupt = true;
 			      x = InterlockedIncrement (myself->getsigtodo (sig));
-			      pending_signals = true;
 			    }
 			}
 		      if (rc == RC_NOSYNC && x > 0)

@@ -17,6 +17,7 @@ enum cygheap_types
   HEAP_ARGV,
   HEAP_BUF,
   HEAP_MOUNT,
+  HEAP_SIGS,
   HEAP_1_START,
   HEAP_1_STR,
   HEAP_1_ARGV,
@@ -133,6 +134,7 @@ public:
 
   ~cygheap_user ();
 
+  void init ();
   void set_name (const char *new_name);
   const char *name () const { return pname; }
 
@@ -255,9 +257,10 @@ struct init_cygheap
 #ifdef DEBUGGING
   cygheap_debug debug;
 #endif
+  struct sigaction *sigs;
 };
 
-#define CYGHEAPSIZE (sizeof (init_cygheap) + (16000 * sizeof (fhandler_union)) + (5 * 65536))
+#define CYGHEAPSIZE (sizeof (init_cygheap) + (20000 * sizeof (fhandler_union)) + (5 * 65536))
 
 extern init_cygheap *cygheap;
 extern void *cygheap_max;

@@ -115,12 +115,16 @@ init_exception_handler (exception_list *el)
 #endif
 
 void
-early_stuff_init ()
+init_console_handler ()
 {
   (void) SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
   if (!SetConsoleCtrlHandler (ctrl_c_handler, TRUE))
     system_printf ("SetConsoleCtrlHandler failed, %E");
+}
 
+void
+init_global_security ()
+{
   /* Initialize global security attribute stuff */
 
   sec_none.nLength = sec_none_nih.nLength =
@@ -611,14 +615,13 @@ sig_handle_tty_stop (int sig)
   if (my_parent_is_alive ())
     {
       pinfo parent (myself->ppid);
-      if (!(parent->getsig (SIGCHLD).sa_flags & SA_NOCLDSTOP))
+      if (NOTSTATE (parent, PID_NOCLDSTOP))
 	sig_send (parent, SIGCHLD);
     }
   sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
 		  myself->pid, sig, myself->ppid_handle);
   if (WaitForSingleObject (sigCONT, INFINITE) != WAIT_OBJECT_0)
     api_fatal ("WaitSingleObject failed, %E");
-  (void) ResetEvent (sigCONT);
   return;
 }
 }
@@ -729,18 +732,6 @@ signal_fixup_after_fork ()
 	}
     }
   sigproc_init ();
-}
-
-void __stdcall
-signal_fixup_after_exec ()
-{
-  /* Set up child's signal handlers */
-  for (int i = 0; i < NSIG; i++)
-    {
-      myself->getsig (i).sa_mask = 0;
-      if (myself->getsig (i).sa_handler != SIG_IGN)
-	myself->getsig (i).sa_handler = SIG_DFL;
-    }
 }
 
 static int interrupt_on_return (sigthread *, int, void *, struct sigaction&) __attribute__((regparm(3)));
@@ -975,11 +966,15 @@ set_process_mask (sigset_t newmask)
   sigproc_printf ("old mask = %x, new mask = %x", myself->getsigmask (), newmask);
   myself->setsigmask (newmask);	// Set a new mask
   mask_sync->release ();
-  if (oldmask != newmask)
-    sig_dispatch_pending ();
-  else
+  if (!(oldmask & ~newmask))
     sigproc_printf ("not calling sig_dispatch_pending.  sigtid %p current %p",
 		    sigtid, GetCurrentThreadId ());
+  else
+    {
+      extern bool pending_signals;
+      pending_signals = true;
+      sig_dispatch_pending ();
+    }
   return;
 }
 
@@ -1033,7 +1028,7 @@ sig_handle (int sig)
   if (handler == (void *) SIG_DFL)
     {
       if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
-	  || sig == SIGURG || (hExeced && sig == SIGINT))
+	  || sig == SIGURG)
 	{
 	  sigproc_printf ("default signal %d ignored", sig);
 	  goto done;
@@ -1056,23 +1051,23 @@ sig_handle (int sig)
 
   goto dosig;
 
- stop:
+stop:
   /* Eat multiple attempts to STOP */
   if (ISSTATE (myself, PID_STOPPED))
     goto done;
   handler = (void *) sig_handle_tty_stop;
   thissig = myself->getsig (SIGSTOP);
 
- dosig:
+dosig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", sig, handler);
   rc = setup_handler (sig, handler, thissig);
 
- done:
+done:
   sigproc_printf ("returning %d", rc);
   return rc;
 
- exit_sig:
+exit_sig:
   if (sig == SIGQUIT || sig == SIGABRT)
     {
       CONTEXT c;
@@ -1116,7 +1111,10 @@ signal_exit (int rc)
   user_data->resourcelocks->Init ();
 
   if (hExeced)
-    TerminateProcess (hExeced, rc);
+    {
+      sigproc_printf ("terminating captive process");
+      TerminateProcess (hExeced, rc);
+    }
 
   sigproc_printf ("about to call do_exit (%x)", rc);
   (void) SetEvent (signal_arrived);

@@ -89,10 +89,9 @@ enum
   PID_ORPHANED	       = 0x0020, /* Member of an orphaned process group. */
   PID_ACTIVE	       = 0x0040, /* Pid accepts signals. */
   PID_CYGPARENT	       = 0x0080, /* Set if parent was a cygwin app. */
-  PID_SPLIT_HEAP       = 0x0100, /* Set if the heap has been split, */
-				 /*  which means we can't fork again. */
+  PID_UNUSED	       = 0x0100, /* ... */
   PID_MYSELF	       = 0x0200, /* Flag that pid is me. */
-  PID_UNUSED1	       = 0x0400, /* Set if process uses Winsock. */
+  PID_NOCLDSTOP	       = 0x0400, /* Set if no SIGCHLD signal on stop. */
   PID_INITIALIZING     = 0x0800, /* Set until ready to receive signals. */
   PID_USETTY	       = 0x1000, /* Setting this enables or disables cygwin's */
 				 /*  tty support.  This is inherited by */
@@ -207,6 +206,7 @@ extern void cygwin_set_impersonation_token (const HANDLE);
 extern int cygwin32_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 
+#ifdef __CYGWIN__
 #include <sys/resource.h>
 
 #define TTY_CONSOLE	0x40000000
@@ -250,11 +250,10 @@ struct external_pinfo
   __uid32_t uid32;
   __gid32_t gid32;
 };
-
+#endif /*__CYGWIN__*/
 #endif /*WINVER*/
 
 #ifdef __cplusplus
 };
 #endif
-
 #endif /* _SYS_CYGWIN_H */

@@ -523,6 +523,7 @@ alloc_stack (child_info_fork *ci)
 }
 
 static NO_COPY int mypid = 0;
+int __argc_safe;
 int _declspec(dllexport) __argc;
 char _declspec(dllexport) **__argv;
 vfork_save NO_COPY *main_vfork = NULL;
@@ -723,6 +724,7 @@ dll_crt0_1 ()
 	}
     }
 
+  __argc_safe = __argc;
   if (user_data->premain[0])
     for (unsigned int i = 0; i < PREMAIN_LEN / 2; i++)
       user_data->premain[i] (__argc, __argv, user_data);
@@ -857,7 +859,8 @@ _dll_crt0 ()
   main_environ = user_data->envptr;
   *main_environ = NULL;
 
-  early_stuff_init ();
+  init_console_handler ();
+  init_global_security ();
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
 		       GetCurrentProcess (), &hMainProc, 0, FALSE,
 			DUPLICATE_SAME_ACCESS))

@@ -1,6 +1,6 @@
 /* shared.cc: shared data area support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -67,7 +67,8 @@ static char *offsets[] =
 };
 
 void * __stdcall
-open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locations m)
+open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
+	     shared_locations m, PSECURITY_ATTRIBUTES psa)
 {
   void *shared;
 
@@ -96,7 +97,7 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
 				       TRUE, mapname);
 	}
       if (!shared_h &&
-	  !(shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_all,
+	  !(shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
 					  PAGE_READWRITE, 0, size, mapname)))
 	api_fatal ("CreateFileMapping, %E.  Terminating.");
     }
@@ -145,66 +146,31 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
 }
 
 void
-shared_info::initialize ()
+user_shared_initialize ()
 {
-  if (version)
+  char name[UNLEN + 1] = "";
+
+  if (wincap.has_security ())
     {
-      if (version != SHARED_VERSION_MAGIC)
-	multiple_cygwin_problem ("shared", version, SHARED_VERSION_MAGIC);
-      else if (cb != SHARED_INFO_CB)
-	multiple_cygwin_problem ("shared size", cb, SHARED_INFO_CB);
-      return;
+      cygsid tu (cygheap->user.sid ());
+      tu.string (name);
+    }
+  else
+    strcpy (name, cygheap->user.name ());
+
+  if (cygwin_mount_h) /* Reinit */
+    {
+      if (!UnmapViewOfFile (mount_table))
+	debug_printf("UnmapViewOfFile %E");
+      if (!ForceCloseHandle (cygwin_mount_h))
+	debug_printf("CloseHandle %E");
+      cygwin_mount_h = NULL;
     }
 
-  /* Initialize the queue of deleted files.  */
-  delqueue.init ();
-
-  /* Initialize tty table.  */
-  tty.init ();
-  version = SHARED_VERSION_MAGIC;
-  cb = sizeof (*this);
-  if (cb != SHARED_INFO_CB)
-    system_printf ("size of shared memory region changed from %u to %u",
-		   SHARED_INFO_CB, cb);
-}
-
-void __stdcall
-memory_init ()
-{
-  getpagesize ();
-  /* Initialize general shared memory */
-  HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
-  cygwin_shared = (shared_info *) open_shared ("shared",
-					       CYGWIN_VERSION_SHARED_DATA,
-					       shared_h,
-					       sizeof (*cygwin_shared),
-					       SH_CYGWIN_SHARED);
-
-  cygwin_shared->initialize ();
-
-  /* Allocate memory for the per-user mount table */
-  char user_name[UNLEN + 1];
-  DWORD user_name_len = UNLEN + 1;
-
-  if (!GetUserName (user_name, &user_name_len))
-    strcpy (user_name, "unknown");
-
-  /* Initialize the Cygwin heap, if necessary */
-  if (!cygheap)
-    {
-      cygheap_init ();
-      cygheap->user.set_name (user_name);
-    }
-
-  cygheap->shared_h = shared_h;
-  ProtectHandleINH (cygheap->shared_h);
-
-  heap_init ();
-
-  mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
+  mount_table = (mount_info *) open_shared (name, MOUNT_VERSION,
 					    cygwin_mount_h, sizeof (mount_info),
-					    SH_MOUNT_TABLE);
-  debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
+					    SH_MOUNT_TABLE, &sec_none);
+  debug_printf ("opening mount table for '%s' at %p", name,
 		mount_table);
   ProtectHandleINH (cygwin_mount_h);
   debug_printf ("mount table version %x at %p", mount_table->version, mount_table);
@@ -224,7 +190,66 @@ memory_init ()
     multiple_cygwin_problem ("mount", mount_table->version, MOUNT_VERSION);
   else if (mount_table->cb !=  MOUNT_INFO_CB)
     multiple_cygwin_problem ("mount table size", mount_table->cb, MOUNT_INFO_CB);
+}
 
+void
+shared_info::initialize ()
+{
+  DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &version, SHARED_VERSION_MAGIC);
+  if (!sversion)
+    {
+      /* Initialize the queue of deleted files.  */
+      delqueue.init ();
+
+      /* Initialize tty table.  */
+      tty.init ();
+    }
+  else
+    {
+      if (version != SHARED_VERSION_MAGIC)
+	{
+	  multiple_cygwin_problem ("shared", version, SHARED_VERSION_MAGIC);
+	  InterlockedExchange ((LONG *) &version, sversion);
+	}
+      while (!cb)
+	low_priority_sleep (0);	// Should be hit only very very rarely
+    }
+
+  /* Initialize the Cygwin heap, if necessary */
+  if (!cygheap)
+    {
+      cygheap_init ();
+      cygheap->user.init ();
+    }
+
+  heap_init ();
+
+  if (!sversion)
+    cb = sizeof (*this);	// Do last, after all shared memory initializion
+
+  if (cb != SHARED_INFO_CB)
+    system_printf ("size of shared memory region changed from %u to %u",
+		   SHARED_INFO_CB, cb);
+}
+
+void __stdcall
+memory_init ()
+{
+  getpagesize ();
+
+  /* Initialize general shared memory */
+  HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
+  cygwin_shared = (shared_info *) open_shared ("shared",
+					       CYGWIN_VERSION_SHARED_DATA,
+					       shared_h,
+					       sizeof (*cygwin_shared),
+					       SH_CYGWIN_SHARED);
+
+  cygwin_shared->initialize ();
+  cygheap->shared_h = shared_h;
+  ProtectHandleINH (cygheap->shared_h);
+
+  user_shared_initialize ();
 }
 
 unsigned

@@ -30,6 +30,8 @@ details. */
 #include <process.h>
 #include <utmp.h>
 #include <sys/uio.h>
+#include <errno.h>
+#include <ctype.h>
 #include <limits.h>
 #include <unistd.h>
 #include <setjmp.h>
@@ -2074,9 +2076,9 @@ seteuid32 (__uid32_t uid)
   user_groups &groups = cygheap->user.groups;
   HANDLE ptok, new_token = INVALID_HANDLE_VALUE;
   struct passwd * pw_new;
-  PSID origpsid, psid2 = NO_SID;
-  BOOL token_is_internal;
-
+  cygpsid origpsid, psid2 (NO_SID);
+  BOOL token_is_internal, issamesid;
+  
   pw_new = internal_getpwuid (uid);
   if (!wincap.has_security () && pw_new)
     goto success_9x;
@@ -2152,6 +2154,9 @@ seteuid32 (__uid32_t uid)
     }
   else if (new_token != ptok)
     {
+      /* Avoid having HKCU use default user */
+      load_registry_hive (usersid);
+      
       /* Try setting owner to same value as user. */
       if (!SetTokenInformation (new_token, TokenOwner,
 				&usersid, sizeof usersid))
@@ -2166,10 +2171,16 @@ seteuid32 (__uid32_t uid)
     }
 
   CloseHandle (ptok);
+  issamesid = (usersid == (psid2 = cygheap->user.sid ())); 
   cygheap->user.set_sid (usersid);
   cygheap->user.current_token = new_token == ptok ? INVALID_HANDLE_VALUE
-						  : new_token;
+                                                  : new_token;
+  if (!issamesid) /* MS KB 199190 */
+    RegCloseKey(HKEY_CURRENT_USER); 
   cygheap->user.reimpersonate ();
+  if (!issamesid)
+    user_shared_initialize ();
+
 success_9x:
   cygheap->user.set_name (pw_new->pw_name);
   myself->uid = uid;
@@ -2362,6 +2373,8 @@ chroot (const char *newroot)
 
   syscall_printf ("%d = chroot (%s)", ret ? get_errno () : 0,
 				      newroot ? newroot : "NULL");
+  if (path.normalized_path)
+    cfree (path.normalized_path);
   return ret;
 }
 
@@ -2529,21 +2542,18 @@ ffs (int i)
 }
 
 extern "C" void
-login (struct utmp *ut)
+updwtmp (const char *wtmp_file, const struct utmp *ut)
 {
-  sigframe thisframe (mainthread);
-  register int fd;
-
-  pututline (ut);
-  endutent ();
   /* Writing to wtmp must be atomic to prevent mixed up data. */
   char mutex_name[MAX_PATH];
-  HANDLE mutex = CreateMutex (NULL, FALSE,
-			      shared_name (mutex_name, "wtmp_mutex", 0));
+  HANDLE mutex;
+  int fd;
+
+  mutex = CreateMutex (NULL, FALSE, shared_name (mutex_name, "wtmp_mutex", 0));
   if (mutex)
     while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
       ;
-  if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
+  if ((fd = open (wtmp_file, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
     {
       write (fd, ut, sizeof *ut);
       close (fd);
@@ -2553,6 +2563,33 @@ login (struct utmp *ut)
       ReleaseMutex (mutex);
       CloseHandle (mutex);
     }
+}
+
+extern "C" void
+logwtmp (const char *line, const char *user, const char *host)
+{
+  sigframe thisframe (mainthread);
+  struct utmp ut;
+  memset (&ut, 0, sizeof ut);
+  ut.ut_type = USER_PROCESS;
+  ut.ut_pid = getpid ();
+  if (line)
+    strncpy (ut.ut_line, line, sizeof ut.ut_line);
+  time (&ut.ut_time);
+  if (user)
+    strncpy (ut.ut_user, user, sizeof ut.ut_user);
+  if (host)
+    strncpy (ut.ut_host, host, sizeof ut.ut_host);
+  updwtmp (_PATH_WTMP, &ut);
+}
+
+extern "C" void
+login (struct utmp *ut)
+{
+  sigframe thisframe (mainthread);
+  pututline (ut);
+  endutent ();
+  updwtmp (_PATH_WTMP, ut);
 }
 
 extern "C" int
@@ -2568,29 +2605,11 @@ logout (char *line)
 
   if (ut)
     {
-      int fd;
-
       ut->ut_type = DEAD_PROCESS;
       memset (ut->ut_user, 0, sizeof ut->ut_user);
       time (&ut->ut_time);
-      /* Writing to wtmp must be atomic to prevent mixed up data. */
-      char mutex_name[MAX_PATH];
-      HANDLE mutex = CreateMutex (NULL, FALSE,
-				  shared_name (mutex_name, "wtmp_mutex", 0));
-      if (mutex)
-	while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
-	  ;
-      if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
-	{
-	  write (fd, &ut_buf, sizeof ut_buf);
-	  debug_printf ("set logout time for %s", line);
-	  close (fd);
-	}
-      if (mutex)
-	{
-	  ReleaseMutex (mutex);
-	  CloseHandle (mutex);
-	}
+      updwtmp (_PATH_WTMP, &ut_buf);
+      debug_printf ("set logout time for %s", line);
       memset (ut->ut_line, 0, sizeof ut_buf.ut_line);
       ut->ut_time = 0;
       pututline (ut);
@@ -2896,4 +2915,68 @@ long gethostid(void)
   debug_printf ("hostid: %08x", hostid);
 
   return hostid;
+}
+
+#define ETC_SHELLS "/etc/shells"
+static int shell_index;
+static struct __sFILE64 *shell_fp;
+
+extern "C" char *
+getusershell ()
+{
+  /* List of default shells if no /etc/shells exists, defined as on Linux.
+     FIXME: SunOS has a far longer list, containing all shells which
+     might be shipped with the OS.  Should we do the same for the Cygwin
+     distro, adding bash, tcsh, ksh, pdksh and zsh?  */
+  static NO_COPY const char *def_shells[] = {
+    "/bin/sh",
+    "/bin/csh",
+    "/usr/bin/sh",
+    "/usr/bin/csh",
+    NULL
+  };
+  static char buf[MAX_PATH];
+  int ch, buf_idx;
+
+  if (!shell_fp && !(shell_fp = fopen64 (ETC_SHELLS, "rt")))
+    {
+      if (def_shells[shell_index])
+        return strcpy (buf, def_shells[shell_index++]);
+      return NULL;
+    }
+  /* Skip white space characters. */
+  while ((ch = getc (shell_fp)) != EOF && isspace (ch))
+    ;
+  /* Get each non-whitespace character as part of the shell path as long as
+     it fits in buf. */
+  for (buf_idx = 0;
+       ch != EOF && !isspace (ch) && buf_idx < MAX_PATH;
+       buf_idx++, ch = getc (shell_fp))
+    buf[buf_idx] = ch;
+  /* Skip any trailing non-whitespace character not fitting in buf.  If the
+     path is longer than MAX_PATH, it's invalid anyway. */
+  while (ch != EOF && !isspace (ch))
+    ch = getc (shell_fp);
+  if (buf_idx)
+    {
+      buf[buf_idx] = '\0';
+      return buf;
+    }
+  return NULL;
+}
+
+extern "C" void
+setusershell ()
+{
+  if (shell_fp)
+    fseek (shell_fp, 0L, SEEK_SET);
+  shell_index = 0;
+}
+
+extern "C" void
+endusershell ()
+{
+  if (shell_fp)
+    fclose (shell_fp);
+  shell_index = 0;
 }

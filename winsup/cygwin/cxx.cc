@@ -1,6 +1,6 @@
 /* cxx.cc
 
-   Copyright 2002 Red Hat, Inc.
+   Copyright 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -16,9 +16,7 @@ details. */
 void *
 operator new (size_t s)
 {
-  void *p = malloc (s);
-  if (p)
-    memset (p,0,s);
+  void *p = calloc (1, s);
   return p;
 }
 
@@ -45,5 +43,4 @@ __cxa_pure_virtual (void)
 {
   api_fatal ("pure virtual method called");
 }
-
 #endif

@@ -203,10 +203,10 @@ normalize_posix_path (const char *src, char *dst)
 
   syscall_printf ("src %s", src);
 
-  if (isdrive (src))
+  if (isdrive (src) || slash_unc_prefix_p (src))
     {
       int err = normalize_win32_path (src, dst);
-      if (!err && isdrive (dst))
+      if (!err)
 	for (char *p = dst; (p = strchr (p, '\\')); p++)
 	  *p = '/';
       return err;
@@ -1124,7 +1124,7 @@ win32_device_name (const char *src_path, char *win32_path,
       case FH_SOCKET:
 	char *c;
 	strcpy (win32_path, src_path);
-	while (c = strchr (win32_path, '/'))
+	while ((c = strchr (win32_path, '/')))
 	  *c = '\\';
 	break;
       case FH_RANDOM:
@@ -1315,9 +1315,7 @@ slash_unc_prefix_p (const char *path)
   char *p = NULL;
   int ret = (isdirsep (path[0])
 	     && isdirsep (path[1])
-	     && isalpha (path[2])
-	     && path[3] != 0
-	     && !isdirsep (path[3])
+	     && isalnum (path[2])
 	     && ((p = strpbrk (path + 3, "\\/")) != NULL));
   if (!ret || p == NULL)
     return ret;
@@ -3653,6 +3651,10 @@ conv_path_list_buf_size (const char *path_list, bool to_posix)
     + (num_elms * max_mount_path_len)
     + (nrel * strlen (to_posix ? pc.normalized_path : pc.get_win32 ()))
     + 100;
+
+  cfree (pc.normalized_path);		// FIXME - probably should be in a destructor but
+  					// it's hard to justify a destructor for the few
+   					// places where this is needed
   return size;
 }
 

@@ -1,3 +1,95 @@
+2003-09-17  Christopher Faylor  <cgf@redhat.com>
+
+	* parse_pe.cc (exclusion::sort_and_check): Make error message a little
+	more explicit and ignore (hopefully) harmless region overlap.
+
+2003-09-13  Christopher Faylor  <cgf@redhat.com>
+
+	* kill.c (forcekill): Wait for process to terminate even if
+	TerminateProcess says it failed.
+
+2003-09-11  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Tweak mingw libz.a detection to make it more reliably
+	detect when libz.a is not available.
+
+2003-09-11  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* cygcheck.cc (dump_only): New global variable.
+	(usage): Add "--dump-only" option, fix "--verbose" line.
+	(longopts, opts): Add "--dump-only" option.
+	(main): Process the "--dump-only" flag.  Add new semantic check.
+	Pass dump_only information to dump_setup().
+
+2003-09-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* getfacl (main): Remove extern declaration of optind.
+	* setfacl (main): Remove extern declaration of optarg and optind.
+
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (cygcheck.o): Use MINGW_CXX for compilation.
+	* cygcheck.cc: Just include <getopt.h> rather than cygwin version.
+	(pretty_id): Avoid compiler warnings.
+	* cygpath.cc (usage): Ditto.
+
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (MINGW_CXX): Define and use for mingw-compiled files.
+	* path.cc: Include more path info in cygwin-specific includes since the
+	cygwin directory is no longer included by default.
+
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: More fixups to adjust for the fact that mingw_getopt.o
+	is no longer built.
+
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Remove references to getopt since it is now part of
+	mingwex.
+
+2003-09-08  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Rename libz.h -> zlib.h.
+
+2003-09-07  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Detect existence of mingw zlib headers and libraries.
+	Build cygcheck without package checking if they are unavailable.
+	* dump_setup.cc: Generate dummy zlib macros when zlib is not available.
+	(open_package_list): Use zlib functions to uncompress package lists.
+	Return gzFile rather than FILE *.
+	(check_package_files): Change fp to gzFile to accommodate zlib
+	functions.  Use gzgets to read from package file.  Use gzclose to close
+	the handle.
+	(package_list): Ditto.
+	(package_find): Ditto.
+
+2003-09-05  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* dump_setup.cc (check_package_files): Don't fail on empty package.
+
+2003-09-01  AJ Reins  <reinsaj@yahoo.com>
+
+	* mount.cc (mount_commands): Ensure user mode is actually user mode and
+	not the default system mode.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* kill.cc (forcekill): Silence some compiler warnings.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Oops.  Put the '...' in the right place.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Display "..." when not-verbose.
+
+	* kill.cc (forcekill): Default to entered pid when pinfo fails.  Issue
+	some warnings when things don't work.
+
 2003-08-17  David Rothenberger  <daveroth@acm.org>
 
 	* dump_setup.cc (check_package_files): Strip leading / and ./ from

@@ -16,9 +16,9 @@
 #include <io.h>
 #include <windows.h>
 #include "path.h"
+#include <getopt.h>
 #include "cygwin/include/sys/cygwin.h"
 #include "cygwin/include/mntent.h"
-#include "cygwin/include/getopt.h"
 
 int verbose = 0;
 int registry = 0;
@@ -26,6 +26,7 @@ int sysinfo = 0;
 int givehelp = 0;
 int keycheck = 0;
 int check_setup = 0;
+int dump_only = 0;
 int find_package = 0;
 int list_package = 0;
 
@@ -775,7 +776,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
   putenv (cygwin);
 
   char *id = cygpath ("/bin/id.exe", NULL);
-  for (char *p = id; p = strchr (p, '/'); p++)
+  for (char *p = id; (p = strchr (p, '/')); p++)
     *p = '\\';
 
   if (access (id, X_OK))
@@ -805,7 +806,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
     }
 
   printf ("\nOutput from %s (%s)\n", id, s);
-  int szmaybe = strlen ("UID: ") + strlen (uid);
+  size_t szmaybe = strlen ("UID: ") + strlen (uid);
   if (sz < szmaybe)
     sz = szmaybe;
   sz += 1;
@@ -1322,8 +1323,9 @@ Usage: cygcheck [OPTIONS] [PROGRAM...]\n\
 Check system information or PROGRAM library dependencies\n\
 \n\
  -c, --check-setup   check packages installed via setup.exe\n\
+ -d, --dump-only     no integrity checking of package contents (requires -c)\n\
  -s, --sysinfo       system information (not with -k)\n\
- -v, --verbose       verbose output (indented) (for -s or programs)\n\
+ -v, --verbose       verbose output (indented) (for -[cfls] or programs)\n\
  -r, --registry      registry search (requires -s)\n\
  -k, --keycheck      perform a keyboard check session (not with -[scfl])\n\
  -f, --find-package  find installed packages containing files (not with -[cl])\n\
@@ -1336,6 +1338,7 @@ You must at least give either -s or -k or a program name\n");
 
 struct option longopts[] = {
   {"check-setup", no_argument, NULL, 'c'},
+  {"dump-only", no_argument, NULL, 'd'},
   {"sysinfo", no_argument, NULL, 's'},
   {"registry", no_argument, NULL, 'r'},
   {"verbose", no_argument, NULL, 'v'},
@@ -1347,7 +1350,7 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-static char opts[] = "cfhklrsvV";
+static char opts[] = "cdfhklrsvV";
 
 static void
 print_version ()
@@ -1385,6 +1388,9 @@ main (int argc, char **argv)
 	break;
       case 'c':
 	check_setup = 1;
+	break;
+      case 'd':
+	dump_only = 1;
 	break;
       case 'r':
 	registry = 1;
@@ -1425,6 +1431,9 @@ main (int argc, char **argv)
   if ((find_package || list_package) && check_setup)
     usage (stderr, 1);
 
+  if (dump_only && !check_setup)
+    usage (stderr, 1);
+
   if (find_package && list_package)
     usage (stderr, 1);
 
@@ -1446,7 +1455,7 @@ main (int argc, char **argv)
 
   if (check_setup)
     {
-      dump_setup (verbose, argv, true);
+      dump_setup (verbose, argv, !dump_only);
     }
   else if (find_package)
     {

@@ -12,12 +12,14 @@ details. */
    Cygwin's mount table.  If the format or location of the mount table
    changes, this is the file to change to match it. */
 
+#define str(a) #a
+#define scat(a,b) str(a##b)
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cygwin/version.h>
-#include <sys/mount.h>
-#include <mntent.h>
+#include "cygwin/include/cygwin/version.h"
+#include "cygwin/include/sys/mount.h"
+#include "cygwin/include/mntent.h"
 
 /* Used when treating / and \ as equivalent. */
 #define SLASH_P(ch) \
