@@ -1,3 +1,19 @@
+
+2001-02-15  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/commctrl.h: Use _TEXT() instead of TEXT() throughout.
+	* include/lmalert.h: Ditto.
+	* include/lmcons.h: Ditto.
+	* include/lmsname.h: Ditto.
+	* include/lmsvc.h: Ditto.
+	* include/ntsecapi.h: Ditto.
+	* include/oledlg.h: Ditto.
+	* include/ras.h: Ditto.
+	* include/regstr.h: Ditto.
+	* include/richedit.h: Ditto.
+	* include/wininet.h: Ditto.
+	* include/w32api.h: New File.
+
 Tue Feb 13 22:38:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/shlobj.h: Add missing SLR_* flags.
