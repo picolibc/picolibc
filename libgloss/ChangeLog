@@ -1,3 +1,10 @@
+2001-09-14  Eric Christopher  <echristo@redhat.com>
+
+	* mips/configure.in: Add mipsisa32 support.
+	* mips/configure: Regenerate.
+	* mips/idt32.ld: New file.
+	* mips/idt64.ld: New file.
+
 2001-09-11  Michael Meissner  <meissner@redhat.com>
 
 	* mips/crt0.S (_start): If -mfp32, don't enable 64-bit floating
@@ -18,7 +25,7 @@
 	idpgdb-test.srec, idpgdb-test.dis, idpgdb-test): New rules.
 	(install): Install the IDPGDB stuff, too.
 
-2001-03-30  Richard Henderson  <rth@redhat.com>
+2001-08-30  Richard Henderson  <rth@redhat.com>
 	    Eric Christopher  <echristo@redhat.com>
 
 	* mips/crt0.S: Fix for .init/.fini sections.
