@@ -116,8 +116,13 @@ struct per_process
      add an item. */
   DWORD unused2[5];
 
+#ifdef __INSIDE_CYGWIN__
   ResourceLocks *resourcelocks;
   MTinterface *threadinterface;
+#else
+  void *resourcelocks;
+  void *threadinterface;
+#endif
   struct _reent *impure_ptr;
 };
 #define per_process_overwrite ((unsigned) &(((struct per_process *) NULL)->resourcelocks))

@@ -1,3 +1,8 @@
+Fri Jul  7 10:31:00 2000  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/cygwin.h: Hide internal data types in per_process
+	when not __INSIDE_CYGWIN__.
+
 Wed Jul  5 18:56:58 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (__cygwin_user_data): Initialize.
