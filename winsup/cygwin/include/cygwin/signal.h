@@ -198,7 +198,11 @@ struct sigaction
 #define	SIGLOST 29	/* resource lost (eg, record-lock lost) */
 #define	SIGUSR1 30	/* user defined signal 1 */
 #define	SIGUSR2 31	/* user defined signal 2 */
-#define NSIG	32      /* signal 0 implied */
+
+/* Real-Time signals per SUSv3.  RT_SIGMAX is defined as 8 in limits.h */
+#define SIGRTMIN 32
+#define SIGRTMAX ((SIGRTMIN) + 0)
+#define NSIG	33      /* signal 0 implied */
 
 int sigwait (const sigset_t *, int *);
 int sigwaitinfo (const sigset_t *, siginfo_t *);

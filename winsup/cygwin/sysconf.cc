@@ -120,6 +120,8 @@ sysconf (int in)
 	      }
 	    return spi.AvailablePages;
 	  }
+      case _SC_RTSIG_MAX:
+	return RTSIG_MAX;
     }
 
   /* Invalid input or unimplemented sysconf name */

@@ -82,6 +82,7 @@ struct _local_storage
   struct protoent *protoent_buf;
   struct servent *servent_buf;
   struct hostent *hostent_buf;
+  char signamebuf[sizeof ("Unknown signal XX")];
 };
 
 /* Please keep this file simple.  Changes to the below structure may require

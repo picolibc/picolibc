@@ -1,6 +1,6 @@
 /* limits.h
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -164,6 +164,9 @@ details. */
 #define _POSIX_SSIZE_MAX	32767
 #define _POSIX_STREAM_MAX	8
 #define _POSIX_TZNAME_MAX       3
+#define _POSIX_RTSIG_MAX	8
+
+#define RTSIG_MAX		_POSIX_RTSIG_MAX
 
 #endif /* _MACH_MACHLIMITS_H_ */
 #endif /* _LIMITS_H___ */
