@@ -6688,6 +6688,16 @@ IoReleaseRemoveLockAndWaitEx(
   IN PVOID  Tag,
   IN ULONG  RemlockSize);
 
+/*
+ * VOID
+ * IoReleaseRemoveLockAndWait(
+ *   IN PIO_REMOVE_LOCK  RemoveLock,
+ *   IN PVOID  Tag)
+ */
+#define IoReleaseRemoveLockAndWait(_RemoveLock, \
+                                   _Tag) \
+  IoReleaseRemoveLockAndWaitEx(_RemoveLock, _Tag, sizeof(IO_REMOVE_LOCK))
+
 NTOSAPI
 VOID
 DDKAPI
@@ -6698,11 +6708,11 @@ IoReleaseRemoveLockEx(
 
 /*
  * VOID
- * IoReleaseRemoveLockAndWait(
+ * IoReleaseRemoveLock(
  *   IN PIO_REMOVE_LOCK  RemoveLock,
  *   IN PVOID  Tag)
  */
-#define IoReleaseRemoveLockAndWait(_RemoveLock, \
+#define IoReleaseRemoveLock(_RemoveLock, \
                                    _Tag) \
   IoReleaseRemoveLockEx(_RemoveLock, _Tag, sizeof(IO_REMOVE_LOCK))
 
