@@ -1,5 +1,7 @@
 2002-12-05  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* src-release: Configure host subdirs.
+
 	* Makefile.tpl: Change dependency for */multilib.out so that
 	it works when gcc isn't in the tree.
 
