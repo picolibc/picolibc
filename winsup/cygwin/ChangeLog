@@ -1,5 +1,10 @@
 2004-04-12  Christopher Faylor  <cgf@alum.bu.edu>
 
+	* thread.cc (pthread::thread_init_wrapper): Wait later to get more
+	parallel behavior.
+
+2004-04-12  Christopher Faylor  <cgf@alum.bu.edu>
+
 	* thread.cc (pthread::create): Use thread mutex to control
 	synchronization rather than creating a suspended thread.  Wait for
 	"cancellation event" to indicate that started thread has been properly

@@ -301,10 +301,10 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
     }
   else
     {
+      postcreate ();
       if (WaitForSingleObject (cancel_event, 5000) != WAIT_OBJECT_0)
 	thread_printf ("event never arrived after CreateThread");
       ResetEvent (cancel_event);
-      postcreate ();
     }
   mutex.unlock ();
 }
