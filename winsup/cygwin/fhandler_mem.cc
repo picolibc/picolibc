@@ -15,7 +15,6 @@
 #include <sys/mman.h>
 #include <ntdef.h>
 
-#include "autoload.h"
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "ntdll.h"
@@ -401,43 +400,4 @@ void
 fhandler_dev_mem::dump ()
 {
   paranoid_printf("here, fhandler_dev_mem");
-}
-
-extern "C" {
-
-LoadDLLinitfunc (ntdll)
-{
-  HANDLE h;
-  static NO_COPY LONG here = -1L;
-
-  while (InterlockedIncrement (&here))
-    {
-      InterlockedDecrement (&here);
-small_printf ("Multiple tries to read ntdll.dll\n");
-      Sleep (0);
-    }
-
-  if (ntdll_handle)
-    /* nothing to do */;
-  else if ((h = LoadLibrary ("ntdll.dll")) != NULL)
-    ntdll_handle = h;
-  else if (!ntdll_handle)
-    api_fatal ("could not load ntdll.dll, %E");
-
-  InterlockedDecrement (&here);
-  return 0;
-}
-
-static void dummy_autoload (void) __attribute__ ((unused));
-static void
-dummy_autoload (void)
-{
-LoadDLLinit (ntdll)
-LoadDLLfuncEx (NtMapViewOfSection, 40, ntdll, 1)
-LoadDLLfuncEx (NtOpenSection, 12, ntdll, 1)
-LoadDLLfuncEx (NtQuerySystemInformation, 16, ntdll, 1)
-LoadDLLfuncEx (NtUnmapViewOfSection, 8, ntdll, 1)
-LoadDLLfuncEx (RtlInitUnicodeString, 8, ntdll, 1)
-LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)
-}
 }

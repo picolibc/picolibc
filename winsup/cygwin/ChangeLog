@@ -1,3 +1,12 @@
+Fri Oct 27 20:51:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: New file keeping all autoload stuff.
+	* Makefile.in: Add autoload.o to dependencies.
+	* dcrt0.cc: Move all autoload stuff to autoload.cc.
+	* fhandler_mem.cc: Ditto.
+	* net.cc: Ditto.
+	* uinfo.cc: Ditto.
+
 Fri Oct 27 11:37:20 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (wait_sig): Add braces to avoid confusion.

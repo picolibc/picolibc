@@ -21,7 +21,6 @@ details. */
 #include <unistd.h>
 #include <netdb.h>
 #include <fcntl.h>
-#include "autoload.h"
 #include <winsock2.h>
 #include "cygheap.h"
 #include "cygerrno.h"
@@ -1782,7 +1781,7 @@ endhostent (void)
 {
 }
 
-static void
+extern "C" void
 wsock_init ()
 {
   int res = WSAStartup ((2<<8) | 2, &wsadata);
@@ -1800,83 +1799,3 @@ wsock_init ()
     debug_printf ("****************  FIONBIO  != REAL_FIONBIO");
 }
 
-extern "C" {
-/* Initialize WinSock */
-LoadDLLinitfunc (wsock32)
-{
-  HANDLE h;
-
-  if ((h = LoadLibrary ("wsock32.dll")) != NULL)
-    wsock32_handle = h;
-  else if (!wsock32_handle)
-    api_fatal ("could not load wsock32.dll.  Is TCP/IP installed?");
-  else
-    return 0;		/* Already done by another thread? */
-
-  if (!ws2_32_handle)
-    wsock_init ();
-
-  return 0;
-}
-
-/* Initialize WinSock2.0 */
-LoadDLLinitfunc (ws2_32)
-{
-  HANDLE h;
-
-  if ((h = LoadLibrary ("ws2_32.dll")) == NULL)
-    return 0;          /* Already done or not available. */
-  ws2_32_handle = h;
-
-  if (!wsock32_handle)
-    wsock_init ();
-
-  return 0;
-}
-
-static void dummy_autoload (void) __attribute__ ((unused));
-static void
-dummy_autoload (void)
-{
-LoadDLLinit (wsock32)
-LoadDLLfunc (WSAAsyncSelect, 16, wsock32)
-LoadDLLfunc (WSACleanup, 0, wsock32)
-LoadDLLfunc (WSAGetLastError, 0, wsock32)
-LoadDLLfunc (WSAStartup, 8, wsock32)
-LoadDLLfunc (__WSAFDIsSet, 8, wsock32)
-LoadDLLfunc (accept, 12, wsock32)
-LoadDLLfunc (bind, 12, wsock32)
-LoadDLLfunc (closesocket, 4, wsock32)
-LoadDLLfunc (connect, 12, wsock32)
-LoadDLLfunc (gethostbyaddr, 12, wsock32)
-LoadDLLfunc (gethostbyname, 4, wsock32)
-LoadDLLfunc (gethostname, 8, wsock32)
-LoadDLLfunc (getpeername, 12, wsock32)
-LoadDLLfunc (getprotobyname, 4, wsock32)
-LoadDLLfunc (getprotobynumber, 4, wsock32)
-LoadDLLfunc (getservbyname, 8, wsock32)
-LoadDLLfunc (getservbyport, 8, wsock32)
-LoadDLLfunc (getsockname, 12, wsock32)
-LoadDLLfunc (getsockopt, 20, wsock32)
-LoadDLLfunc (inet_addr, 4, wsock32)
-LoadDLLfunc (inet_network, 4, wsock32)
-LoadDLLfunc (inet_ntoa, 4, wsock32)
-LoadDLLfunc (ioctlsocket, 12, wsock32)
-LoadDLLfunc (listen, 8, wsock32)
-LoadDLLfunc (rcmd, 24, wsock32)
-LoadDLLfunc (recv, 16, wsock32)
-LoadDLLfunc (recvfrom, 24, wsock32)
-LoadDLLfunc (rexec, 24, wsock32)
-LoadDLLfunc (rresvport, 4, wsock32)
-LoadDLLfunc (select, 20, wsock32)
-LoadDLLfunc (send, 16, wsock32)
-LoadDLLfunc (sendto, 24, wsock32)
-LoadDLLfunc (setsockopt, 20, wsock32)
-LoadDLLfunc (shutdown, 8, wsock32)
-LoadDLLfunc (socket, 12, wsock32)
-
-LoadDLLinit (ws2_32)
-LoadDLLfuncEx (WSADuplicateSocketA, 12, ws2_32, 1)
-LoadDLLfuncEx (WSASocketA, 24, ws2_32, 1)
-}
-}

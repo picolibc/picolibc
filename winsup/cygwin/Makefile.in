@@ -112,7 +112,8 @@ EXTRA_OFILES=$(bupdir1)/libiberty/random.o $(bupdir1)/libiberty/strsignal.o
 
 DLL_IMPORTS:=$(w32api_lib)/libkernel32.a
 
-DLL_OFILES:=assert.o cygheap.o dcrt0.o debug.o delqueue.o dir.o dlfcn.o \
+DLL_OFILES:=assert.o autoload.o cygheap.o dcrt0.o debug.o delqueue.o dir.o \
+	dlfcn.o \
 	dll_init.o dtable.o environ.o  errno.o exceptions.o exec.o external.o \
 	fcntl.o fhandler.o fhandler_clipboard.o fhandler_console.o \
 	fhandler_floppy.o fhandler_mem.o fhandler_random.o fhandler_raw.o \

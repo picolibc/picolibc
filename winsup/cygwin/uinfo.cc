@@ -14,7 +14,6 @@ details. */
 #include <winnls.h>
 #include <utmp.h>
 #include <limits.h>
-#include "autoload.h"
 #include <stdlib.h>
 #include <wchar.h>
 #include <lm.h>
@@ -251,27 +250,4 @@ cuserid (char *src)
     {
       return getlogin ();
     }
-}
-
-extern "C" {
-LoadDLLinitfunc (netapi32)
-{
-  HANDLE h;
-
-  if ((h = LoadLibrary ("netapi32.dll")) != NULL)
-    netapi32_handle = h;
-  else if (! netapi32_handle)
-    api_fatal ("could not load netapi32.dll. %d", GetLastError ());
-  return 0;
-}
-
-static void dummy_autoload (void) __attribute__ ((unused));
-static void
-dummy_autoload (void)
-{
-LoadDLLinit (netapi32)
-LoadDLLfunc (NetWkstaUserGetInfo, 12, netapi32)
-LoadDLLfunc (NetUserGetInfo, 16, netapi32)
-LoadDLLfunc (NetApiBufferFree, 4, netapi32)
-}
 }
