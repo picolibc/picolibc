@@ -613,23 +613,27 @@ reported.  The valid bits to set are as follows:
 <sect2 id="regtool"><title>regtool</title>
 
 <screen>
-regtool -h  - print this message
-regtool [-v] list [key]  - list subkeys and values
-regtool [-v] add [key\subkey]  - add new subkey
-regtool [-v] remove [key]  - remove key
-regtool [-v|-q] check [key]  - exit 0 if key exists, 1 if not
-regtool [-i|-s|-e|-m] set [key\value] [data ...]  - set value
+Regtool Copyright (c) 2000 Red Hat Inc
+ regtool -h  - print this message
+ regtool [-v|-p|-k|-l] list [key]  - list subkeys and values
+     -p=postfix, like ls -p, appends / postfix to key names
+     -k=keys, lists only keys
+     -l=values, lists only values
+ regtool [-v] add [key\subkey]  - add new subkey
+ regtool [-v] remove [key]  - remove key
+ regtool [-v|-q] check [key]  - exit 0 if key exists, 1 if not
+ regtool [-i|-s|-e|-m] set [key\value] [data ...]  - set value
      -i=integer -s=string -e=expand-string -m=multi-string
-regtool [-v] unset [key\value]  - removes value from key
-regtool [-q] get [key\value]  - prints value to stdout
+ regtool [-v] unset [key\value]  - removes value from key
+ regtool [-q] get [key\value]  - prints value to stdout
      -q=quiet, no error msg, just return nonzero exit if key/value missing
-keys are like \prefix\key\key\key\value, where prefix is any of:
+ keys are like \prefix\key\key\key\value, where prefix is any of:
    root     HKCR  HKEY_CLASSES_ROOT
    config   HKCC  HKEY_CURRENT_CONFIG
    user     HKCU  HKEY_CURRENT_USER
    machine  HKLM  HKEY_LOCAL_MACHINE
    users    HKU   HKEY_USERS
-example: \user\software\Microsoft\Clock\iFormat
+ example: \user\software\Microsoft\Clock\iFormat
 </screen>
 
 <para>The <command>regtool</command> program allows shell scripts

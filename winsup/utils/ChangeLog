@@ -1,3 +1,11 @@
+Tue Jan 09 10:26:23 2001  Tony Sideris  <tonys1110@home.com>
+
+	* regtool.cc (cmd_list): Add new registry display options.
+	(cmd_list): Add code to implement -p, -k, and -l options.
+
+	* regtool.cc (Fail): Add call to LocalFree to free memory allocated by
+	FormatMessage.
+
 Wed Jan 10 09:16:57 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* regtool.cc (translate): Ensure that 'c' is initialized.

@@ -19,6 +19,12 @@ enum
   KT_AUTO, KT_INT, KT_STRING, KT_EXPAND, KT_MULTI
 } key_type = KT_AUTO;
 
+#define LIST_KEYS	0x01
+#define LIST_VALS	0x02
+#define LIST_ALL	(LIST_KEYS | LIST_VALS)
+
+int listwhat = 0;
+int postfix = 0;
 int verbose = 0;
 int quiet = 0;
 char **argv;
@@ -29,7 +35,10 @@ char *value;
 const char *usage_msg[] = {
   "Regtool Copyright (c) 2000 Red Hat Inc",
   " regtool -h  - print this message",
-  " regtool [-v] list [key]  - list subkeys and values",
+  " regtool [-v|-p|-k|-l] list [key]  - list subkeys and values",
+  "     -p=postfix, like ls -p, appends / postfix to key names",
+  "     -k=keys, lists only keys",
+  "     -l=values, lists only values",
   " regtool [-v] add [key\\subkey]  - add new subkey",
   " regtool [-v] remove [key]  - remove key",
   " regtool [-v|-q] check [key]  - exit 0 if key exists, 1 if not",
@@ -67,6 +76,7 @@ Fail (DWORD rv)
 		     | FORMAT_MESSAGE_FROM_SYSTEM,
 		     0, rv, 0, (CHAR *) & buf, 0, 0);
       fprintf (stderr, "Error: %s\n", buf);
+      LocalFree (buf);
     }
   exit (1);
 }
@@ -248,64 +258,71 @@ cmd_list ()
   value_name = (char *) malloc (maxvalnamelen + 1);
   value_data = (unsigned char *) malloc (maxvaluelen + 1);
 
-  for (i = 0; i < num_subkeys; i++)
-    {
-      m = maxsubkeylen + 1;
-      n = maxclasslen + 1;
-      RegEnumKeyEx (key, i, subkey_name, &m, 0, class_name, &n, 0);
-      if (verbose)
-	printf ("%s\\ (%s)\n", subkey_name, class_name);
-      else
-	printf ("%s\n", subkey_name);
-    }
+  if (!listwhat)
+    listwhat = LIST_ALL;
 
-  for (i = 0; i < num_values; i++)
-    {
-      m = maxvalnamelen + 1;
-      n = maxvaluelen + 1;
-      RegEnumValue (key, i, value_name, &m, 0, &t, (BYTE *) value_data, &n);
-      if (!verbose)
-	printf ("%s\n", value_name);
-      else
-	{
-	  printf ("%s = ", value_name);
-	  switch (t)
-	    {
-	    case REG_BINARY:
-	      for (j = 0; j < 8 && j < n; j++)
-		printf ("%02x ", value_data[j]);
-	      printf ("\n");
-	      break;
-	    case REG_DWORD:
-	      printf ("0x%08lx (%lu)\n", *(DWORD *) value_data,
-		      *(DWORD *) value_data);
-	      break;
-	    case REG_DWORD_BIG_ENDIAN:
-	      v = ((value_data[0] << 24)
-		   | (value_data[1] << 16)
-		   | (value_data[2] << 8) | (value_data[3]));
-	      printf ("0x%08x (%d)\n", v, v);
-	      break;
-	    case REG_EXPAND_SZ:
-	    case REG_SZ:
-	      printf ("\"%s\"\n", value_data);
-	      break;
-	    case REG_MULTI_SZ:
-	      vd = value_data;
-	      while (vd && *vd)
-		{
-		  printf ("\"%s\"", vd);
-		  vd = vd + strlen ((const char *) vd) + 1;
-		  if (*vd)
-		    printf (", ");
-		}
-	      printf ("\n");
-	      break;
-	    default:
-	      printf ("? (type %d)\n", (int) t);
-	    }
-	}
-    }
+  if (listwhat & LIST_KEYS)
+    for (i = 0; i < num_subkeys; i++)
+      {
+	m = maxsubkeylen + 1;
+	n = maxclasslen + 1;
+	RegEnumKeyEx (key, i, subkey_name, &m, 0, class_name, &n, 0);
+	printf ("%s%s", subkey_name, (postfix || verbose) ? "\\" : "");
+
+	if (verbose)
+	  printf (" (%s)", class_name);
+
+	puts ("");
+      }
+
+  if (listwhat & LIST_VALS)
+    for (i = 0; i < num_values; i++)
+      {
+	m = maxvalnamelen + 1;
+	n = maxvaluelen + 1;
+	RegEnumValue (key, i, value_name, &m, 0, &t, (BYTE *) value_data, &n);
+	if (!verbose)
+	  printf ("%s\n", value_name);
+	else
+	  {
+	    printf ("%s = ", value_name);
+	    switch (t)
+	      {
+	      case REG_BINARY:
+		for (j = 0; j < 8 && j < n; j++)
+		  printf ("%02x ", value_data[j]);
+		printf ("\n");
+		break;
+	      case REG_DWORD:
+		printf ("0x%08lx (%lu)\n", *(DWORD *) value_data,
+			*(DWORD *) value_data);
+		break;
+	      case REG_DWORD_BIG_ENDIAN:
+		v = ((value_data[0] << 24)
+		     | (value_data[1] << 16)
+		     | (value_data[2] << 8) | (value_data[3]));
+		printf ("0x%08x (%d)\n", v, v);
+		break;
+	      case REG_EXPAND_SZ:
+	      case REG_SZ:
+		printf ("\"%s\"\n", value_data);
+		break;
+	      case REG_MULTI_SZ:
+		vd = value_data;
+		while (vd && *vd)
+		  {
+		    printf ("\"%s\"", vd);
+		    vd = vd + strlen ((const char *) vd) + 1;
+		    if (*vd)
+		      printf (", ");
+		  }
+		printf ("\n");
+		break;
+	      default:
+		printf ("? (type %d)\n", (int) t);
+	      }
+	  }
+      }
   return 0;
 }
 
@@ -496,7 +513,7 @@ main (int argc, char **_argv)
 {
   while (1)
     {
-      int g = getopt (argc, _argv, "hvqisem");
+      int g = getopt (argc, _argv, "hvqisempkl");
       if (g == -1)
 	break;
       switch (g)
@@ -506,6 +523,15 @@ main (int argc, char **_argv)
 	  break;
 	case 'q':
 	  quiet++;
+	  break;
+	case 'p':
+	  postfix++;
+	  break;
+	case 'k':
+	  listwhat |= LIST_KEYS;
+	  break;
+	case 'l':
+	  listwhat |= LIST_VALS;
 	  break;
 
 	case 'i':
