@@ -66,9 +66,7 @@ static char rcsid[] = "$OpenBSD: fnmatch.c,v 1.7 2000/03/23 19:13:51 millert Exp
 static int rangematch __P((const char *, char, int, char **));
 
 int
-fnmatch(pattern, string, flags)
-	const char *pattern, *string;
-	int flags;
+fnmatch(const char *pattern, const char *string, int flags)
 {
 	const char *stringstart;
 	char *newp;
@@ -168,15 +166,7 @@ fnmatch(pattern, string, flags)
 }
 
 static int
-#ifdef __STDC__
 rangematch(const char *pattern, char test, int flags, char **newp)
-#else
-rangematch(pattern, test, flags, newp)
-	char *pattern;
-	char test;
-	int flags;
-	char **newp;
-#endif
 {
 	int negate, ok;
 	char c, c2;

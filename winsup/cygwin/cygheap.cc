@@ -22,6 +22,7 @@
 #include "heap.h"
 #include "sync.h"
 #include "shared_info.h"
+#include "sigproc.h"
 
 init_cygheap NO_COPY *cygheap;
 void NO_COPY *cygheap_max;
@@ -203,6 +204,8 @@ cygheap_init ()
     }
   if (!cygheap->fdtab)
     cygheap->fdtab.init ();
+  if (!cygheap->sigs)
+    sigalloc ();
 }
 
 /* Copyright (C) 1997, 2000 DJ Delorie */

@@ -731,18 +731,6 @@ signal_fixup_after_fork ()
   sigproc_init ();
 }
 
-void __stdcall
-signal_fixup_after_exec ()
-{
-  /* Set up child's signal handlers */
-  for (int i = 0; i < NSIG; i++)
-    {
-      myself->getsig (i).sa_mask = 0;
-      if (myself->getsig (i).sa_handler != SIG_IGN)
-	myself->getsig (i).sa_handler = SIG_DFL;
-    }
-}
-
 static int interrupt_on_return (sigthread *, int, void *, struct sigaction&) __attribute__((regparm(3)));
 static int
 interrupt_on_return (sigthread *th, int sig, void *handler, struct sigaction& siga)

@@ -1,5 +1,27 @@
 2003-08-31  Christopher Faylor  <cgf@redhat.com>
 
+	* cygheap.cc (cygheap_init): Allocate space for sigaction array in
+	cygheap.
+	* cygheap.h (cygheap_types): Add HEAP_SIGS.
+	* exceptions.cc (signal_fixup_after_exec): Remove from this file.
+	* pinfo.h (pinfo::getsig): Just return global_sigs array.
+	(pinfo::sigs): Delete.
+	* sigproc.cc (signal_fixup_after_exec): Move it here.
+	(global_sigs): New global array, moved from pinfo structure.
+	(sigalloc): New function.  Allocate global sigaction array here.
+	(proc_subproc): Remove copysigs call.  It's automatic now.
+	* include/sys/cygwin.h (PID_NOCLDSTOP): New value.
+	* signal.cc (sigaction): Set myself->PID_NODCLDSTOP when appropriate.
+	* sigproc.h (sigalloc): Declare.
+
+	* fnmatch.c (fnmatch): Use C90 parameters.
+	(rangematch): Ditto.
+
+	* fhandler.cc (fhandler_base::raw_read): Use right coercion to avoid a
+	compiler warning.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
 	* net.cc (dup_ent): Make debugging output consistent.
 
 2003-08-31  Christopher Faylor  <cgf@redhat.com>

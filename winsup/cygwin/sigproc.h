@@ -120,6 +120,7 @@ int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_addre
 void __stdcall signal_fixup_after_fork ();
 void __stdcall signal_fixup_after_exec ();
 void __stdcall wait_for_sigthread ();
+void __stdcall sigalloc ();
 
 extern char myself_nowait_dummy[];
 extern char myself_nowait_nonmain_dummy[];
