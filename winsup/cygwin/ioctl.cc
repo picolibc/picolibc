@@ -39,20 +39,27 @@ ioctl (int fd, int cmd, ...)
   va_end (ap);
 
   debug_printf ("fd %d, cmd %x", fd, cmd);
+  int res;
   if (cfd->is_tty () && cfd->get_device () != FH_PTYM)
     switch (cmd)
       {
 	case TCGETA:
-	  return tcgetattr (fd, (struct termios *) argp);
+	  res = tcgetattr (fd, (struct termios *) argp);
+	  goto out;
 	case TCSETA:
-	  return tcsetattr (fd, TCSANOW, (struct termios *) argp);
+	  res = tcsetattr (fd, TCSANOW, (struct termios *) argp);
+	  goto out;
 	case TCSETAW:
-	  return tcsetattr (fd, TCSADRAIN, (struct termios *) argp);
+	  res = tcsetattr (fd, TCSADRAIN, (struct termios *) argp);
+	  goto out;
 	case TCSETAF:
-	  return tcsetattr (fd, TCSAFLUSH, (struct termios *) argp);
+	  res = tcsetattr (fd, TCSAFLUSH, (struct termios *) argp);
+	  goto out;
       }
 
-  int res = cfd->ioctl (cmd, argp);
+  res = cfd->ioctl (cmd, argp);
+
+out:
   debug_printf ("returning %d", res);
   return res;
 }

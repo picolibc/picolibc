@@ -1,5 +1,13 @@
 2002-11-13  Christopher Faylor  <cgf@redhat.com>
 
+	* ioctl.cc (ioctl): Always print ioctl results, even when it's a tty.
+
+2002-11-13  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.h (low_priority_sleep): Declare.
+
+2002-11-13  Christopher Faylor  <cgf@redhat.com>
+
 	* miscfuncs.cc (low_priority_sleep): New function.  Use throughout
 	where code is supposed to be giving up time slice.
 
