@@ -531,9 +531,7 @@ done:
 int
 fhandler_base::open (int flags, mode_t mode)
 {
-  UNICODE_STRING upath;
-  WCHAR wpath[CYG_MAX_PATH + 10];
-  if (!wincap.is_winnt () || RtlIsDosDeviceName_U(wpath))
+  if (!wincap.is_winnt ())
     return fhandler_base::open_9x (flags, mode);
 
   int res = 0;
@@ -544,6 +542,8 @@ fhandler_base::open (int flags, mode_t mode)
   ULONG create_options;
   SECURITY_ATTRIBUTES sa = sec_none;
   security_descriptor sd;
+  UNICODE_STRING upath;
+  WCHAR wpath[CYG_MAX_PATH + 10];
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   NTSTATUS status;
@@ -555,7 +555,8 @@ fhandler_base::open (int flags, mode_t mode)
       goto done;
     }
 
-  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+  InitializeObjectAttributes (&attr, pc.get_nt_native_path (upath, wpath),
+			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 			      sa.lpSecurityDescriptor, NULL);
 
   switch (query_open ())
