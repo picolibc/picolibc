@@ -1,3 +1,8 @@
+Wed Oct 10 16:10:41 2001  Alexander Gottwald <ago@informatik.tu-chemnitz.de>    
+
+	* net.cc (get_95_ifconf): Using other registry values pointing to
+	correct networkdevice identification for Windows95.
+
 Tue Oct  9 22:22:45 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Throughout, rename PROC_FORK1 to PROC_FORK.

@@ -1921,7 +1921,7 @@ get_95_ifconf (struct ifconf *ifc, int what)
        ++i)
     {
       HKEY ifkey, subkey;
-      char driver[256], classname[256], bindname[256], netname[256];
+      char driver[256], classname[256], netname[256];
       char adapter[256], ip[256], np[256];
 
       if (res != ERROR_SUCCESS
@@ -1997,57 +1997,34 @@ get_95_ifconf (struct ifconf *ifc, int what)
 
       RegCloseKey (subkey);
 
-      if (RegOpenKeyEx (ifkey, "Bindings",
-			 0, KEY_READ, &subkey) != ERROR_SUCCESS)
-	{
-	  RegCloseKey (ifkey);
-	  --ifr;
-	  continue;
-	}
+      strcpy (netname, "System\\CurrentControlSet\\Services\\Class\\Net\\");
+      strcat (netname, ifname);
 
-      for (int j = 0;
-	   (res = RegEnumValue (subkey, j, bindname,
-				(size = sizeof bindname, &size),
-				0, NULL, NULL, NULL)) != ERROR_NO_MORE_ITEMS;
-	   ++j)
-	if (!strncasecmp (bindname, "VREDIR\\", 7))
-	  break;
+      if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, netname,
+                  0, KEY_READ, &subkey) != ERROR_SUCCESS)
+      {
+          RegCloseKey (ifkey);
+          --ifr;
+          continue;
+      }
 
+      if (RegQueryValueEx (subkey, "AdapterName", 0,
+                  NULL, (unsigned char *) adapter,
+                  (size = sizeof adapter, &size)) == ERROR_SUCCESS
+              && strcasematch (adapter, "MS$PPP"))
+      {
+          ++*ppp;
+          strcpy (ifr->ifr_name, "ppp");
+          strcat (ifr->ifr_name, ppp);
+      }
+      else
+      {
+          ++*eth;
+          strcpy (ifr->ifr_name, "eth");
+          strcat (ifr->ifr_name, eth);
+      }
+      
       RegCloseKey (subkey);
-
-      if (res == ERROR_SUCCESS)
-	{
-	  strcpy (netname, "System\\CurrentControlSet\\Services\\Class\\Net\\");
-	  strcat (netname, bindname + 7);
-
-	  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, netname,
-			    0, KEY_READ, &subkey) != ERROR_SUCCESS)
-	    {
-	      RegCloseKey (ifkey);
-	      --ifr;
-	      continue;
-	    }
-
-	  if (RegQueryValueEx (subkey, "AdapterName", 0,
-			       NULL, (unsigned char *) adapter,
-			       (size = sizeof adapter, &size)) == ERROR_SUCCESS
-	      && strcasematch (adapter, "MS$PPP"))
-	    {
-	      ++*ppp;
-	      strcpy (ifr->ifr_name, "ppp");
-	      strcat (ifr->ifr_name, ppp);
-	    }
-	  else
-	    {
-	      ++*eth;
-	      strcpy (ifr->ifr_name, "eth");
-	      strcat (ifr->ifr_name, eth);
-	    }
-
-	  RegCloseKey (subkey);
-
-	}
-
       RegCloseKey (ifkey);
 
       ++cnt;
