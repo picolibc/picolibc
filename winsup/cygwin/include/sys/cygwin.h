@@ -31,15 +31,15 @@ extern int cygwin_conv_to_full_posix_path (const char *, char *);
 extern int cygwin_posix_path_list_p (const char *);
 extern void cygwin_split_path (const char *, char *, char *);
 
-extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
-extern void cygwin_set_impersonation_token (const HANDLE);
-
 extern void cygwin_premain0 (int argc, char **argv);
 extern void cygwin_premain1 (int argc, char **argv);
 extern void cygwin_premain2 (int argc, char **argv);
 extern void cygwin_premain3 (int argc, char **argv);
 
 #ifdef WINVER
+extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
+extern void cygwin_set_impersonation_token (const HANDLE);
+
 /* included if <windows.h> is included */
 extern int cygwin32_attach_handle_to_fd (char *, int, HANDLE, int, int);
 extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, unsigned);

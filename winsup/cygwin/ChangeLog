@@ -1,4 +1,4 @@
-Thu Jun 22 15:51:17 2000  Christopher Faylor <cgf@cygnus.com>
+Thu Jun 22 17:05:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/sys/cygwin.h: Don't define parts of this file that rely on
 	Windows headers unless the Windows header was previously included.
