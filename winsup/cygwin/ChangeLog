@@ -1,7 +1,7 @@
 2003-06-07  Christopher Faylor  <cgf@redhat.com>
 
 	* poll.cc: Define FD_SETSIZE to ridiculously large number so that there
-	will be no artificially large limits.
+	will be no artificially small limits.
 
 2003-06-07  Christopher Faylor  <cgf@redhat.com>
 
