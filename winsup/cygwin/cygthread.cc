@@ -19,7 +19,7 @@ static cygthread NO_COPY threads[6];
 #define NTHREADS (sizeof (threads) / sizeof (threads[0]))
 
 DWORD NO_COPY cygthread::main_thread_id;
-bool NO_COPY cygthread::initialized;
+int NO_COPY cygthread::initialized;
 
 /* Initial stub called by cygthread constructor. Performs initial
    per-thread initialization and loops waiting for new thread functions
@@ -68,7 +68,10 @@ cygthread::stub (VOID *arg)
 #endif
       SetEvent (info->ev);
       info->__name = NULL;
-      SuspendThread (info->h);
+      if (initialized < 0)
+	ExitThread (0);
+      else
+	SuspendThread (info->h);
     }
 }
 
@@ -78,9 +81,14 @@ DWORD WINAPI
 cygthread::runner (VOID *arg)
 {
   for (unsigned i = 0; i < NTHREADS; i++)
-    threads[i].h = CreateThread (&sec_none_nih, 0, cygthread::stub, &threads[i],
-				 CREATE_SUSPENDED, &threads[i].avail);
-  cygthread::initialized = true;
+    if (!initialized)
+      threads[i].h = CreateThread (&sec_none_nih, 0, cygthread::stub,
+				   &threads[i], CREATE_SUSPENDED,
+				   &threads[i].avail);
+    else
+      return 0;
+
+  initialized ^= 1;
   return 0;
 }
 
@@ -127,7 +135,10 @@ new (size_t)
 
   for (;;)
     {
-      bool was_initialized = initialized;
+      int was_initialized = initialized;
+      if (was_initialized < 0)
+	ExitThread (0);
+
       /* Search the threads array for an empty slot to use */
       for (info = threads + NTHREADS - 1; info >= threads; info--)
 	if ((id = (DWORD) InterlockedExchange ((LPLONG) &info->avail, 0)))
@@ -139,6 +150,9 @@ new (size_t)
 #endif
 	    return info;
 	  }
+
+      if (was_initialized < 0)
+	ExitThread (0);
 
       if (!was_initialized)
 	Sleep (0); /* thread_runner is not finished yet. */
@@ -258,4 +272,13 @@ cygthread::detach ()
 	  (void) InterlockedExchange ((LPLONG) &this->avail, avail);
 	}
     }
+}
+
+void
+cygthread::terminate ()
+{
+  initialized = -1;
+  for (cygthread *info = threads + NTHREADS - 1; info >= threads; info--)
+    if (!(DWORD) InterlockedExchange ((LPLONG) &info->avail, 0) && info->id)
+      SetEvent (info->ev);
 }

@@ -159,8 +159,8 @@ class verifyable_object
 public:
   long magic;
 
-    verifyable_object (long);
-   ~verifyable_object ();
+  verifyable_object (long);
+  virtual ~verifyable_object ();
 };
 
 typedef enum
@@ -197,7 +197,7 @@ public:
   void *get () const;
 
   pthread_key (void (*)(void *));
-   ~pthread_key ();
+  ~pthread_key ();
   static void fixup_before_fork();
   static void fixup_after_fork();
 
@@ -225,23 +225,23 @@ template <class ListNode> void
 List<ListNode>::Insert (ListNode *aNode)
 {
   if (!aNode)
-    return;
+  return;
   aNode->next = (ListNode *) InterlockedExchangePointer (&head, aNode);
 }
 template <class ListNode> ListNode *
 List<ListNode>::Remove ( ListNode *aNode)
 {
   if (!aNode)
-    return NULL;
+  return NULL;
   if (!head)
-    return NULL;
+  return NULL;
   if (aNode == head)
-    return Pop ();
+  return Pop ();
   ListNode *resultPrev = head;
   while (resultPrev && resultPrev->next && !(aNode == resultPrev->next))
-    resultPrev = resultPrev->next;
+  resultPrev = resultPrev->next;
   if (resultPrev)
-    return (ListNode *)InterlockedExchangePointer (&resultPrev->next, resultPrev->next->next);
+  return (ListNode *)InterlockedExchangePointer (&resultPrev->next, resultPrev->next->next);
   return NULL;
 }
 template <class ListNode> ListNode *
@@ -255,10 +255,10 @@ List<ListNode>::forEach (void (*callback)(ListNode *))
 {
   ListNode *aNode = head;
   while (aNode) 
-    {
-      callback (aNode);
-      aNode = aNode->next;
-    }
+  {
+    callback (aNode);
+    aNode = aNode->next;
+  }
 }
 
 class pthread_attr:public verifyable_object
@@ -271,8 +271,8 @@ public:
   struct sched_param schedparam;
   size_t stacksize;
 
-    pthread_attr ();
-   ~pthread_attr ();
+  pthread_attr ();
+  ~pthread_attr ();
 };
 
 class pthread_mutexattr:public verifyable_object
@@ -281,8 +281,8 @@ public:
   static bool isGoodObject(pthread_mutexattr_t const *);
   int pshared;
   int mutextype;
-    pthread_mutexattr ();
-   ~pthread_mutexattr ();
+  pthread_mutexattr ();
+  ~pthread_mutexattr ();
 };
 
 class pthread_mutex:public verifyable_object
@@ -327,80 +327,80 @@ public:
   LONG *sigtodo;
   virtual void create (void *(*)(void *), pthread_attr *, void *);
 
-   pthread ();
-   virtual ~pthread ();
+  pthread ();
+  virtual ~pthread ();
 
-   static void initMainThread(pthread *, HANDLE);
-   static bool isGoodObject(pthread_t const *);
-   static void atforkprepare();
-   static void atforkparent();
-   static void atforkchild();
+  static void initMainThread(pthread *, HANDLE);
+  static bool isGoodObject(pthread_t const *);
+  static void atforkprepare();
+  static void atforkparent();
+  static void atforkchild();
 
-   /* API calls */
-   static int cancel (pthread_t);
-   static int join (pthread_t * thread, void **return_val);
-   static int detach (pthread_t * thread);
-   static int create (pthread_t * thread, const pthread_attr_t * attr,
+  /* API calls */
+  static int cancel (pthread_t);
+  static int join (pthread_t * thread, void **return_val);
+  static int detach (pthread_t * thread);
+  static int create (pthread_t * thread, const pthread_attr_t * attr,
 			      void *(*start_routine) (void *), void *arg);
-   static int once (pthread_once_t *, void (*)(void));
-   static int atfork(void (*)(void), void (*)(void), void (*)(void));
-   static int suspend (pthread_t * thread);
-   static int resume (pthread_t * thread);
+  static int once (pthread_once_t *, void (*)(void));
+  static int atfork(void (*)(void), void (*)(void), void (*)(void));
+  static int suspend (pthread_t * thread);
+  static int resume (pthread_t * thread);
 
-   virtual void exit (void *value_ptr);
+  virtual void exit (void *value_ptr);
 
-   virtual int cancel ();
-   
-   virtual void testcancel ();
-   static void static_cancel_self ();
+  virtual int cancel ();
+  
+  virtual void testcancel ();
+  static void static_cancel_self ();
 
-   virtual int setcancelstate (int state, int *oldstate);
-   virtual int setcanceltype (int type, int *oldtype);
+  virtual int setcancelstate (int state, int *oldstate);
+  virtual int setcanceltype (int type, int *oldtype);
 
-   virtual void push_cleanup_handler (__pthread_cleanup_handler *handler);
-   virtual void pop_cleanup_handler (int const execute);
+  virtual void push_cleanup_handler (__pthread_cleanup_handler *handler);
+  virtual void pop_cleanup_handler (int const execute);
 
-   static pthread* self ();
-   static void *thread_init_wrapper (void *);
+  static pthread* self ();
+  static void *thread_init_wrapper (void *);
 
-   virtual unsigned long getsequence_np();
+  virtual unsigned long getsequence_np();
 
 private:
-    DWORD thread_id;
-    __pthread_cleanup_handler *cleanup_stack;
-    pthread_mutex mutex;
+  DWORD thread_id;
+  __pthread_cleanup_handler *cleanup_stack;
+  pthread_mutex mutex;
 
-    void pop_all_cleanup_handlers (void);
-    void precreate (pthread_attr *);
-    void postcreate ();
-    void setThreadIdtoCurrent();
-    static void setTlsSelfPointer(pthread *);
-    void cancel_self ();
-    DWORD getThreadId ();
+  void pop_all_cleanup_handlers (void);
+  void precreate (pthread_attr *);
+  void postcreate ();
+  void setThreadIdtoCurrent();
+  static void setTlsSelfPointer(pthread *);
+  void cancel_self ();
+  DWORD getThreadId ();
 };
 
 class pthreadNull : public pthread
 {
   public:
-    static pthread *getNullpthread();
-    ~pthreadNull();
+  static pthread *getNullpthread();
+  ~pthreadNull();
 
-    /* From pthread These should never get called
-     * as the ojbect is not verifyable
-     */
-    void create (void *(*)(void *), pthread_attr *, void *);
-    void exit (void *value_ptr);
-    int cancel ();
-    void testcancel ();
-    int setcancelstate (int state, int *oldstate);
-    int setcanceltype (int type, int *oldtype);
-    void push_cleanup_handler (__pthread_cleanup_handler *handler);
-    void pop_cleanup_handler (int const execute);
-    unsigned long getsequence_np();
+  /* From pthread These should never get called
+  * as the ojbect is not verifyable
+  */
+  void create (void *(*)(void *), pthread_attr *, void *);
+  void exit (void *value_ptr);
+  int cancel ();
+  void testcancel ();
+  int setcancelstate (int state, int *oldstate);
+  int setcanceltype (int type, int *oldtype);
+  void push_cleanup_handler (__pthread_cleanup_handler *handler);
+  void pop_cleanup_handler (int const execute);
+  unsigned long getsequence_np();
 
   private:
-    pthreadNull ();
-    static pthreadNull _instance;
+  pthreadNull ();
+  static pthreadNull _instance;
 };
 
 class pthread_condattr:public verifyable_object
@@ -432,8 +432,8 @@ public:
   void Signal ();
   void fixup_after_fork ();
 
-    pthread_cond (pthread_condattr *);
-   ~pthread_cond ();
+  pthread_cond (pthread_condattr *);
+  ~pthread_cond ();
 };
 
 class pthread_once
@@ -464,8 +464,8 @@ public:
   int TryWait ();
   void fixup_after_fork ();
 
-    semaphore (int, unsigned int);
-   ~semaphore ();
+  semaphore (int, unsigned int);
+  ~semaphore ();
 };
 
 class callback
@@ -505,11 +505,11 @@ public:
   void fixup_after_fork (void);
 
   MTinterface ():reent_index (0), indexallocated (0), threadcount (1)
-    {
-      pthread_prepare = NULL;
-      pthread_child   = NULL;
-      pthread_parent  = NULL;
-    }
+  {
+    pthread_prepare = NULL;
+    pthread_child   = NULL;
+    pthread_parent  = NULL;
+  }
 };
 
 extern "C"

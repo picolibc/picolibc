@@ -1024,6 +1024,7 @@ do_exit (int status)
   window_terminate ();
   events_terminate ();
   shared_terminate ();
+  cygthread::terminate ();
 
   minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
   myself->exit (n);

@@ -17,7 +17,7 @@ class cygthread
   VOID *arg;
   bool is_freerange;
   static DWORD main_thread_id;
-  static bool initialized;
+  static int initialized;
   static DWORD WINAPI runner (VOID *);
   static DWORD WINAPI free_runner (VOID *);
   static DWORD WINAPI stub (VOID *);
@@ -33,6 +33,7 @@ class cygthread
   void * operator new (size_t);
   static void * freerange ();
   void exit_thread ();
+  static void terminate ();
 };
 
 #define cygself NULL

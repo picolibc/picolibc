@@ -1,3 +1,14 @@
+2002-09-28  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.h (cygthread::terminate): Declare new function.
+	(cygthread::initialized): Change to 'int'.
+	* cygthread.cc (cygthread::stub): Exit thread if initialized < 0.
+	(cygthread::new): Ditto.
+	(cygthread::runner): Ditto.  Set initialized using xor to preserve
+	sign.
+	(cygthread::terminate): New function.
+	* dcrt0.cc (do_exit): Call cygthread::terminate.
+
 2002-09-27  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (pthread_key::run_destructor): Run_destructor is not
