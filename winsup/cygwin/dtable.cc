@@ -329,7 +329,7 @@ build_fh_pc (path_conv& pc)
 	fh = cnew (fhandler_tty_master) ();
 	break;
       case DEV_CYGDRIVE_MAJOR:
-        fh = cnew (fhandler_cygdrive) ();
+	fh = cnew (fhandler_cygdrive) ();
 	break;
       case DEV_FLOPPY_MAJOR:
       case DEV_CDROM_MAJOR:
