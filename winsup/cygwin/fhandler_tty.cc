@@ -43,7 +43,7 @@ fhandler_tty_master::fhandler_tty_master ()
 int
 fhandler_tty_slave::get_unit ()
 {
-  return dev == FH_TTYS ? myself->ctty : dev.minor;
+  return dev == FH_TTY ? myself->ctty : dev.minor;
 }
 
 void
