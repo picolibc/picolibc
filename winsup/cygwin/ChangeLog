@@ -1,3 +1,50 @@
+2003-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (setacl): Move all permission settings to beginning of
+	loop.  Set default rights to same values as in alloc_sd().  Set DELETE
+	for owner and default owner only if S_IWOTH is given.
+
+2003-02-05  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* sec_acl.cc: Change all  __aclent16_t to  __aclent32_t except in
+	wrapper function definitions. Replace call to the aclXYZ functions by
+	calls aclXYZ32.
+	(searchace): Change type of third argument to __uid32_t and use
+	ILLEGAL_UID instead of -1;
+	(setacl): Remove some initializations. Only give STANDARD_RIGHTS_WRITE
+	for S_IWOTH. Replace -1 by ILLEGAL_UID.
+	(getacl): Change type of owner_sid, group_sid and ace_sid to cygpsid.
+	In last else clause, suppress second call to ace_sid.get_id and use
+	TRUE in first call. Replace EqualSid by ==.
+	(acl_access): Call internal_getgroups in USER and GROUP cases.
+	(acecmp: Define static.
+	(acl32): Create from 16 bit type.
+	(facl32): Ditto.
+	(lacl32): Ditto.
+	(aclcheck32): Ditto.
+	(aclsort32): Ditto.
+	(acltomode32): Ditto.
+	(aclfrommode32): Ditto.
+	(acltopbits32): Ditto.
+	(aclfrompbits32): Ditto.
+	(acltotext32): Ditto.
+	(aclfromtext32): Ditto, and use strechr.
+	(acl16to32): Create.
+	(acl): Make it a wrapper function.
+	(facl): Ditto.
+	(lacl): Ditto.
+	(aclcheck): Ditto.
+	(aclsort): Ditto.
+	(acltomode): Ditto.
+	(aclfrommode): Ditto.
+	(acltopbits): Ditto.
+	(aclfrompbits): Ditto.
+	(acltotext): Ditto.
+	(aclfromtext): Ditto.
+	* security.cc (write_sd): Call set_process_privilege and check
+	ownership.
+	(alloc_sd): Remove call to set_process_privilege and the owner check.
+
 2003-02-05  Christopher Faylor  <cgf@redhat.com>
 
 	* include/sys/cygwin.h: Use C-style comments.
