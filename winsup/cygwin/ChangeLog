@@ -1,3 +1,10 @@
+2001-10-22  Robert Collins  <rbtcollins@hotmail.com>
+
+	* autoload.cc: Autoload GetProcessMemoryInfo.
+	* resource.cc (fill_rusage): Calculate ru_maxrss and ru_majflt entries.
+	(Bug report on this from Guido Serassio in the squid project).
+	This requires including psapi.h.
+
 2001-10-20  Christopher Faylor  <cgf@redhat.com>
 
 	* dll_init.cc (dll_list::alloc): Increase retry count to 1000.
@@ -55,7 +62,7 @@
 	(fhandler_dev_tape::norewind): Eliminate.
 	(fhandler_dev_tape::is_rewind_device): New method.
 	* fhandler_raw.cc (fhandler_dev_raw::open): Open new
-	fixed device name devices using NT internal method. 
+	fixed device name devices using NT internal method.
 	Keep calling fhandler_base::open() for old mount table
 	device mapping compatibility devices.
 	(fhandler_dev_raw::fstat): Eliminate.  Settings are done
@@ -212,7 +219,7 @@ Sun Oct 14 08:10:12 2001  Gary R. Van Sickle
 	* net.cc (cygwin_sendto): Use correct socket address when sending
 	data to AF_UNIX socket.
 
-Wed Oct 10 16:10:41 2001  Alexander Gottwald <ago@informatik.tu-chemnitz.de>    
+Wed Oct 10 16:10:41 2001  Alexander Gottwald <ago@informatik.tu-chemnitz.de>
 
 	* net.cc (get_95_ifconf): Using other registry values pointing to
 	correct networkdevice identification for Windows95.
@@ -573,9 +580,9 @@ Sat Sep 29 18:26:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(__pthread_cond_dowait): New function, contains core logic from
 	__pthread_cond_wait and __pthread_cond_timedwait. Decrement (*cond)->waiting
 	before reentering the cond access mutex to allow detection of lost signals.
-	(__pthread_cond_timedwait): Rename to pthread_cond_timedwait, and call 
+	(__pthread_cond_timedwait): Rename to pthread_cond_timedwait, and call
 	__pthread_cond_dowait after calculating the wait length.
-	(__pthread_cond_wait): Rename to pthread_cond_wait, and call 
+	(__pthread_cond_wait): Rename to pthread_cond_wait, and call
 	__pthread_cond_dowait.
 	* thread.h: New enum for use with verifyable_object_isvalid.
 	Remove the extern exporting of __pthread_cond_timedwait and __pthread_cond_wait.
@@ -688,7 +695,7 @@ Tue Sep 25 21:25:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(__pthread_mutexattr_getprotocol): Fix typo in magic number.
 	(__pthread_mutexattr_getpshared): Ditto.
 	(__pthread_mutexattr_gettype): Ditto.
-	* thread.h (verifyable_object_isvalid): Change prototype to recieve a pointer to a 
+	* thread.h (verifyable_object_isvalid): Change prototype to recieve a pointer to a
 	pointer for verification.
 	* include/pthread.h: Fix typo for __cleanup_routine_type typedef. (Contrib from Net).
 

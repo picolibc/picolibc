@@ -381,6 +381,8 @@ LoadDLLfuncEx (RtlInitUnicodeString, 8, ntdll, 1)
 LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)
 LoadDLLfuncEx (ZwQuerySystemInformation, 16, ntdll, 1)
 
+LoadDLLfuncEx (GetProcessMemoryInfo, 12, psapi, 1)
+
 LoadDLLfuncEx (LsaDeregisterLogonProcess, 4, secur32, 1)
 LoadDLLfuncEx (LsaFreeReturnBuffer, 4, secur32, 1)
 LoadDLLfuncEx (LsaLogonUser, 56, secur32, 1)
