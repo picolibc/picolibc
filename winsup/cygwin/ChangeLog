@@ -1,3 +1,8 @@
+2001-04-18  Egor Duda  <deo@logos-m.ru>
+
+	* grp.cc (getgroups): Avoid crash if passwd field if /etc/group is
+	empty.
+
 Tue Apr 17 19:05:44 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.h (path_conv::add_ext_from_sym): Declare.

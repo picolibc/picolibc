@@ -260,7 +260,8 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
 	  convert_sid_to_string_sid (groups->Groups[pg].Sid, ssid);
           for (int gg = 0; gg < curr_lines; ++gg)
 	    {
-	      if (!strcmp (group_buf[gg].gr_passwd, ssid))
+	      if (group_buf[gg].gr_passwd &&
+	          !strcmp (group_buf[gg].gr_passwd, ssid))
 	        {
 		  if (cnt < gidsetsize)
 		    grouplist[cnt] = group_buf[gg].gr_gid;
