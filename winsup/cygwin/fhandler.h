@@ -359,6 +359,7 @@ protected:
   int lastblk_to_read : 1;
   int is_writing      : 1;
   int has_written     : 1;
+  int varblkop        : 1;
   int unit;
 
   virtual void clear (void);

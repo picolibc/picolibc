@@ -77,22 +77,21 @@ fhandler_dev_tape::open (const char *path, int flags, mode_t)
       struct mtpos pos;
 
       if (! ioctl (MTIOCGET, &get))
-	{
+        /* Tape drive supports and is set to variable block size. */
+        if (get.mt_dsreg == 0)
+          devbufsiz = get.mt_maxblksize;
+        else
 	  devbufsiz = get.mt_dsreg;
-	}
+        varblkop = get.mt_dsreg == 0;
 
       if (devbufsiz > 1L)
-	{
-	  devbuf = new char [ devbufsiz ];
-	}
+	devbuf = new char [ devbufsiz ];
 
-      /*
-       * The following rewind in position 0 solves a problem which appears
+      /* The following rewind in position 0 solves a problem which appears
        * in case of multi volume archives: The last ReadFile on first medium
        * returns ERROR_NO_DATA_DETECTED. After media change, all subsequent
-       * ReadFile calls return ERROR_NO_DATA_DETECTED, too!
-       * The call to tape_set_pos seems to reset some internal flags!
-      */
+       * ReadFile calls return ERROR_NO_DATA_DETECTED, too.
+       * The call to tape_set_pos seems to reset some internal flags. */
       if ((! ioctl (MTIOCPOS, &pos)) && (! pos.mt_blkno))
 	{
 	  op.mt_op = MTREW;
@@ -280,14 +279,9 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    break;
 	  case MTRETEN:
 	    if (! tape_get_feature (TAPE_DRIVE_END_OF_DATA))
-	      {
-		ret = ERROR_INVALID_PARAMETER;
-		break;
-	      }
-	    if (! (ret = tape_set_pos (TAPE_REWIND, 0, FALSE)))
-	      {
-		ret = tape_prepare (TAPE_TENSION);
-	      }
+	      ret = ERROR_INVALID_PARAMETER;
+	    else if (! (ret = tape_set_pos (TAPE_REWIND, 0, FALSE)))
+	      ret = tape_prepare (TAPE_TENSION);
 	    break;
 	  case MTBSFM:
 	    ret = tape_set_pos (TAPE_SPACE_FILEMARKS, -op->mt_count, TRUE);
@@ -297,13 +291,9 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    break;
 	  case MTEOM:
 	    if (tape_get_feature (TAPE_DRIVE_END_OF_DATA))
-	      {
-		ret = tape_set_pos (TAPE_SPACE_END_OF_DATA, 0);
-	      }
+	      ret = tape_set_pos (TAPE_SPACE_END_OF_DATA, 0);
 	    else
-	      {
-		ret = tape_set_pos (TAPE_SPACE_FILEMARKS, 32767);
-	      }
+	      ret = tape_set_pos (TAPE_SPACE_FILEMARKS, 32767);
 	    break;
 	  case MTERASE:
 	    ret = tape_erase (TAPE_ERASE_SHORT);
@@ -324,27 +314,43 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		}
 	      ret = tape_get_blocksize (&min, NULL, &max, NULL);
 	      if (ret)
-		{
 		  break;
-		}
-	      if (op->mt_count < min || op->mt_count > max)
-		{
-		  ret = ERROR_INVALID_PARAMETER;
-		  break;
-		}
-	      if (devbuf && (size_t) op->mt_count == devbufsiz)
+	      if (devbuf && (size_t) op->mt_count == devbufsiz && !varblkop)
 		{
 		  ret = 0;
 		  break;
 		}
-	      if (devbuf && (size_t) op->mt_count < devbufend - devbufstart)
+	      if ((op->mt_count == 0
+                   && !tape_get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
+                  || (op->mt_count > 0
+                      && (op->mt_count < min || op->mt_count > max)))
 		{
 		  ret = ERROR_INVALID_PARAMETER;
 		  break;
 		}
+	      if (devbuf && op->mt_count > 0
+                  && (size_t) op->mt_count < devbufend - devbufstart)
+		{
+		  ret = ERROR_MORE_DATA;
+		  break;
+		}
 	      if (! (ret = tape_set_blocksize (op->mt_count)))
 		{
-		  char *buf = new char [ op->mt_count ];
+                  size_t size = 0;
+                  if (op->mt_count == 0)
+                    {
+                      struct mtget get;
+                      if ((ret = tape_status (&get)) != NO_ERROR)
+                        break;
+                      size = get.mt_maxblksize;
+                      ret = NO_ERROR;
+                    }
+		  char *buf = new char [ size ];
+                  if (!buf)
+                    {
+                      ret = ERROR_OUTOFMEMORY;
+                      break;
+                    }
 		  if (devbuf)
 		    {
 		      memcpy(buf,devbuf + devbufstart, devbufend - devbufstart);
@@ -352,12 +358,11 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		      delete [] devbuf;
 		    }
 		  else
-		    {
-		      devbufend = 0;
-		    }
-		    devbufstart = 0;
-		    devbuf = buf;
-		    devbufsiz = op->mt_count;
+		    devbufend = 0;
+		  devbufstart = 0;
+		  devbuf = buf;
+		  devbufsiz = size;
+                  varblkop = op->mt_count == 0;
 		}
 	    }
 	    break;

@@ -1,3 +1,17 @@
+Sun Jul 23 20:00:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_raw): Add private member `varblkop'
+	to be set when variable blocksize mode is on.
+	* fhandler_raw.cc: Eliminate `\n' from trace output.
+	(clear): Set `varblkop' to 0.
+	(dup): Copy varblkop as well.
+	(writebuf): Care for variable blocksize.
+	(open): Ditto.
+	(raw_read): Ditto.
+	(raw_write): Ditto.
+	* fhandler_tape.cc (open): Ditto.
+	(ioctl): Ditto. Some cleanups.
+
 Sat Jul 22 18:40:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	Patch suggested by Kazuhiro Fujieda  <fujieda@jaist.ac.jp>.

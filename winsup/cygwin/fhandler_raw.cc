@@ -37,7 +37,7 @@ static BOOL write_file (HANDLE fh, const void *buf, DWORD to_write,
             *err = GetLastError ();
         }
     }
-  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)\n",
+  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
                   ret, *err, fh, buf, to_write, *written);
   return ret;
 }
@@ -58,7 +58,7 @@ static BOOL read_file (HANDLE fh, void *buf, DWORD to_read,
             *err = GetLastError ();
         }
     }
-  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)\n",
+  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
                   ret, *err, fh, buf, to_read, *read);
   return ret;
 }
@@ -76,6 +76,7 @@ fhandler_dev_raw::clear (void)
   eom_detected = 0;
   eof_detected = 0;
   lastblk_to_read = 0;
+  varblkop = 0;
   unit = 0;
 }
 
@@ -87,15 +88,19 @@ fhandler_dev_raw::writebuf (void)
 
   if (is_writing && devbuf && devbufend)
     {
-      memset (devbuf + devbufend, 0, devbufsiz - devbufend);
-      DWORD to_write = ((devbufend - 1) / 512 + 1) * 512;
-      ret = 0;
+      DWORD to_write;
+      int ret = 0;
 
-      if (!write_file (get_handle (), devbuf, to_write, &written, &ret))
-	{
-	  if (is_eom (ret))
-	    eom_detected = 1;
-	}
+      memset (devbuf + devbufend, 0, devbufsiz - devbufend);
+      if (get_device () != FH_TAPE)
+        to_write = ((devbufend - 1) / 512 + 1) * 512;
+      else if (varblkop)
+        to_write = devbufend;
+      else
+        to_write = devbufsiz;
+      if (!write_file (get_handle (), devbuf, to_write, &written, &ret)
+          && is_eom (ret))
+	eom_detected = 1;
       if (written)
 	has_written = 1;
       devbufstart = devbufend = 0;
@@ -142,14 +147,10 @@ fhandler_dev_raw::open (const char *path, int flags, mode_t)
   if (ret)
     {
       if (devbufsiz > 1L)
-	{
-	  devbuf = new char[devbufsiz];
-	}
+	devbuf = new char[devbufsiz];
     }
   else
-    {
-      devbufsiz = 0;
-    }
+    devbufsiz = 0;
   return ret;
 }
 
@@ -219,7 +220,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 	  if (devbufstart < devbufend)
 	    {
 	      bytes_to_read = min (len, devbufend - devbufstart);
-	      debug_printf ("read %d bytes from buffer (rest %d)\n",
+	      debug_printf ("read %d bytes from buffer (rest %d)",
 			    bytes_to_read, devbufstart - devbufend);
 	      memcpy (ptr, devbuf + devbufstart, bytes_to_read);
 	      len -= bytes_to_read;
@@ -235,19 +236,24 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 	    }
 	  if (len > 0)
 	    {
-	      if (len >= devbufsiz)
+	      if (!varblkop && len >= devbufsiz)
 		{
-		  bytes_to_read = (len / 512) * 512;
+                  if (get_device () == FH_TAPE)
+		    bytes_to_read = (len / devbufsiz) * devbufsiz;
+                  else
+		    bytes_to_read = (len / 512) * 512;
 		  tgt = (char *) ptr;
-		  debug_printf ("read %d bytes direct from file\n",
-				bytes_to_read);
+		  debug_printf ("read %d bytes direct from file",bytes_to_read);
 		}
 	      else
 		{
 		  bytes_to_read = devbufsiz;
 		  tgt = devbuf;
-		  debug_printf ("read %d bytes from file into buffer\n",
-				bytes_to_read);
+                  if (varblkop)
+		    debug_printf ("read variable bytes from file into buffer");
+                  else
+		    debug_printf ("read %d bytes from file into buffer",
+				  bytes_to_read);
 		}
 	      if (!read_file (get_handle (), tgt, bytes_to_read, &read2, &ret))
 		{
@@ -342,7 +348,8 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
     {
       while (len > 0)
 	{
-	  if ((len < devbufsiz || devbufend > 0) && devbufend < devbufsiz)
+	  if (!varblkop &&
+              (len < devbufsiz || devbufend > 0) && devbufend < devbufsiz)
 	    {
 	      bytes_to_write = min (len, devbufsiz - devbufend);
 	      memcpy (devbuf + devbufend, p, bytes_to_write);
@@ -353,7 +360,12 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
 	    }
 	  else
 	    {
-	      if (devbufend == devbufsiz)
+	      if (varblkop)
+		{
+		  bytes_to_write = len;
+		  tgt = p;
+		}
+	      else if (devbufend == devbufsiz)
 		{
 		  bytes_to_write = devbufsiz;
 		  tgt = devbuf;
@@ -449,6 +461,7 @@ fhandler_dev_raw::dup (fhandler_base *child)
       fhc->eom_detected = eom_detected;
       fhc->eof_detected = eof_detected;
       fhc->lastblk_to_read = lastblk_to_read;
+      fhc->varblkop = varblkop;
       fhc->unit = unit;
     }
   return ret;
