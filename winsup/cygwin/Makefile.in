@@ -48,12 +48,14 @@ override INSTALL_DATA:=@INSTALL_DATA@
 MT_SAFE:=@MT_SAFE@
 DEFS:=@DEFS@
 
-# cygheap_CFLAGS:=-fomit-frame-pointer
+cygheap_CFLAGS:=-fomit-frame-pointer
 malloc_CFLAGS:=-fomit-frame-pointer
+malloc_wrapper_CFLAGS:=-fomit-frame-pointer
 shared_CFLAGS:=-fomit-frame-pointer
 cygthread_CFLAGS:=-fomit-frame-pointer
 miscfuncs_CFLAGS:=-fomit-frame-pointer
 fhandler_CFLAGS:=-fomit-frame-pointer
+fhandler_clipboard_CFLAGS:=-fomit-frame-pointer
 fhandler_clipboard_CFLAGS:=-fomit-frame-pointer
 fhandler_console_CFLAGS:=-fomit-frame-pointer
 fhandler_disk_file_CFLAGS:=-fomit-frame-pointer
