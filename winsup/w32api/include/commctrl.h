@@ -2043,11 +2043,14 @@ typedef struct tagTVHITTESTINFO {
 #define TV_HITTESTINFO TVHITTESTINFO
 #define LPTV_HITTESTINFO LPTVHITTESTINFO
 typedef int(CALLBACK *PFNTVCOMPARE)(LPARAM,LPARAM,LPARAM);
-typedef struct _TV_SORTCB {
+typedef struct tagTVSORTCB {
 	HTREEITEM hParent;
 	PFNTVCOMPARE lpfnCompare;
 	LPARAM lParam;
-} TV_SORTCB,*LPTV_SORTCB;
+} TVSORTCB,*LPTVSORTCB;
+#define _TV_SORTCB tagTVSORTCB
+#define TV_SORTCB TVSORTCB
+#define LPTV_SORTCB LPTVSORTCB
 typedef struct tagNMTREEVIEWA {
 	NMHDR hdr;
 	UINT action;
@@ -2533,7 +2536,7 @@ BOOL WINAPI _TrackMouseEvent(LPTRACKMOUSEEVENT);
 #define TreeView_CreateDragImage(w,i) (HIMAGELIST)SNDMSG((w),TVM_CREATEDRAGIMAGE,0,(LPARAM)(HTREEITEM)(i))
 #define TreeView_SortChildren(w,i,r) (BOOL)SNDMSG((w),TVM_SORTCHILDREN,r,(LPARAM)(HTREEITEM)(i))
 #define TreeView_EnsureVisible(w,i) (BOOL)SNDMSG((w),TVM_ENSUREVISIBLE,0,(LPARAM)(HTREEITEM)(i))
-#define TreeView_SortChildrenCB(w,s,r) (BOOL)SNDMSG((w),TVM_SORTCHILDRENCB,r,(LPARAM)(LPTV_SORTCB)(s))
+#define TreeView_SortChildrenCB(w,s,r) (BOOL)SNDMSG((w),TVM_SORTCHILDRENCB,r,(LPARAM)(LPTVSORTCB)(s))
 #define TreeView_EndEditLabelNow(w,f) (BOOL)SNDMSG((w),TVM_ENDEDITLABELNOW,f,0)
 #define TreeView_GetISearchString(w,s) (BOOL)SNDMSG((w),TVM_GETISEARCHSTRING,0,(LPARAM)s)
 #if (_WIN32_IE >= 0x0300)
