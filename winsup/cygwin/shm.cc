@@ -69,14 +69,12 @@ getsystemallocgranularity ()
  * Used for: SHM_ATTACH, SHM_DETACH, SHM_REATTACH, and SHM_DEL.
  */
 client_request_shm::client_request_shm (int ntype, int nshmid)
-  : client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+  : client_request (CYGSERVER_REQUEST_SHM, &parameters, sizeof (parameters))
 {
   assert (ntype == SHM_REATTACH			\
 	  || ntype == SHM_ATTACH		\
 	  || ntype == SHM_DETACH		\
 	  || ntype == SHM_DEL);
-
-  buffer = (char *) &parameters;
 
   parameters.in.type = ntype;
   parameters.in.cygpid = getpid ();
@@ -86,19 +84,20 @@ client_request_shm::client_request_shm (int ntype, int nshmid)
   assert (parameters.in.cygpid > 0);
   assert (parameters.in.winpid != 0);
 
-  debug_printf ("created: ntype = %d, shmid = %d", ntype, nshmid);
+  msglen (sizeof (parameters.in) - sizeof (parameters.in.sd_buf));
+
+  syscall_printf ("created: type = %d, shmid = %d",
+		  parameters.in.type, parameters.in.shm_id);
 }
 
 /*
  * Used for: SHM_CREATE.
  */
 client_request_shm::client_request_shm (key_t nkey, size_t nsize, int nshmflg)
-  : client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+  : client_request (CYGSERVER_REQUEST_SHM, &parameters, sizeof (parameters))
 {
   assert (nkey != (key_t) -1);
   assert (nsize >= 0);
-
-  buffer = (char *) &parameters;
 
   parameters.in.type = SHM_CREATE;
   parameters.in.cygpid = getpid ();
@@ -110,16 +109,29 @@ client_request_shm::client_request_shm (key_t nkey, size_t nsize, int nshmflg)
   assert (parameters.in.cygpid > 0);
   assert (parameters.in.winpid != 0);
 
+  DWORD sd_buf_size = 0;
+
   if (wincap.has_security ())
     {
       SECURITY_ATTRIBUTES sa = sec_none;
-      set_security_attribute (nshmflg & 0777, &sa,
-			      parameters.in.sd_buf,
-			      sizeof (parameters.in.sd_buf));
+      sd_buf_size = sizeof (parameters.in.sd_buf);
+
+      PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) parameters.in.sd_buf;
+
+      InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
+
+      alloc_sd (geteuid32 (), getegid32 (), parameters.in.shmflg & 0777,
+		psd, &sd_buf_size);
     }
 
-  debug_printf ("created: key = 0x%x%08x, size = %ld, shmflg = %o",
-		hi_ulong(nkey), lo_ulong(nkey), nsize, nshmflg);
+  msglen (sizeof (parameters.in) - sizeof (parameters.in.sd_buf)
+	  + sd_buf_size);
+
+  syscall_printf (("created: type = %d, "
+		   "key = 0x%x%08x, size = %ld, shmflg = %o"),
+		  parameters.in.type,
+		  hi_ulong(parameters.in.key), lo_ulong(parameters.in.key),
+		  parameters.in.size, parameters.in.shmflg);
 }
 
 static shmnode *shm_head = NULL;
@@ -268,20 +280,17 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       /* couldn't find a currently open shm control area for the key - probably because
        * shmget hasn't been called.
        * Allocate a new control block - this has to be handled by the daemon */
-      client_request_shm *req = new client_request_shm (SHM_REATTACH, shmid);
+      client_request_shm req (SHM_REATTACH, shmid);
 
-      int rc;
-      if ((rc = cygserver_request (req)))
+      if (req.make_request () == -1)
 	{
-	  delete req;
 	  set_errno (ENOSYS);	/* daemon communication failed */
 	  return (void *) -1;
 	}
 
-      if (req->header.error_code)	/* shm_get failed in the daemon */
+      if (req.error_code ())	/* shm_get failed in the daemon */
 	{
-	  set_errno (req->header.error_code);
-	  delete req;
+	  set_errno (req.error_code ());
 	  return (void *) -1;
 	}
 
@@ -290,11 +299,10 @@ shmat (int shmid, const void *shmaddr, int shmflg)
        * FIXME: make this a method of shmnode ?
        */
       tempnode =
-	build_inprocess_shmds (req->parameters.out.filemap,
-			       req->parameters.out.attachmap,
-			       req->parameters.out.key,
-			       req->parameters.out.shm_id);
-      delete req;
+	build_inprocess_shmds (req.parameters.out.filemap,
+			       req.parameters.out.attachmap,
+			       req.parameters.out.key,
+			       req.parameters.out.shm_id);
       if (!tempnode)
 	return (void *) -1;
 
@@ -320,13 +328,12 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       return (void *) -1;
     }
   /* tell the daemon we have attached */
-  client_request_shm *req = new client_request_shm (SHM_ATTACH, shmid);
-  int rc;
-  if ((rc = cygserver_request (req)))
+  client_request_shm req (SHM_ATTACH, shmid);
+
+  if (req.make_request () == -1)
     {
       debug_printf ("failed to tell daemon that we have attached");
     }
-  delete req;
 
   _shmattach *attachnode = new _shmattach;
   attachnode->data = rv;
@@ -368,14 +375,12 @@ shmdt (const void *shmaddr)
 
   UnmapViewOfFile (attachnode->data);
   /* tell the daemon we have attached */
-  client_request_shm *req =
-    new client_request_shm (SHM_DETACH, tempnode->shm_id);
-  int rc;
-  if ((rc = cygserver_request (req)))
+  client_request_shm req (SHM_DETACH, tempnode->shm_id);
+
+  if (req.make_request () == -1)
     {
       debug_printf ("failed to tell daemon that we have detached");
     }
-  delete req;
 
   return 0;
 }
@@ -392,20 +397,17 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
       /* couldn't find a currently open shm control area for the key - probably because
        * shmget hasn't been called.
        * Allocate a new control block - this has to be handled by the daemon */
-      client_request_shm *req = new client_request_shm (SHM_REATTACH, shmid);
+      client_request_shm req (SHM_REATTACH, shmid);
 
-      int rc;
-      if ((rc = cygserver_request (req)))
+      if (req.make_request () == -1)
 	{
-	  delete req;
 	  set_errno (ENOSYS);	/* daemon communication failed */
 	  return -1;
 	}
 
-      if (req->header.error_code)	/* shm_get failed in the daemon */
+      if (req.error_code ())	/* shm_get failed in the daemon */
 	{
-	  set_errno (req->header.error_code);
-	  delete req;
+	  set_errno (req.error_code ());
 	  return -1;
 	}
 
@@ -414,11 +416,10 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
        * FIXME: make this a method of shmnode ?
        */
       tempnode =
-	build_inprocess_shmds (req->parameters.out.filemap,
-			       req->parameters.out.attachmap,
-			       req->parameters.out.key,
-			       req->parameters.out.shm_id);
-      delete req;
+	build_inprocess_shmds (req.parameters.out.filemap,
+			       req.parameters.out.attachmap,
+			       req.parameters.out.key,
+			       req.parameters.out.shm_id);
       if (!tempnode)
 	return -1;
     }
@@ -444,19 +445,17 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 	   * daemon has an attach. The daemon gets asked to detach immediately.
 	 */
 	//waiting for the daemon to handle terminating process's
-	client_request_shm *req = new client_request_shm (SHM_DEL, shmid);
-	int rc;
-	if ((rc = cygserver_request (req)))
+	client_request_shm req (SHM_DEL, shmid);
+
+	if (req.make_request () == -1)
 	  {
-	    delete req;
 	    set_errno (ENOSYS);	/* daemon communication failed */
 	    return -1;
 	  }
 
-	if (req->header.error_code)	/* shm_del failed in the daemon */
+	if (req.error_code ())	/* shm_del failed in the daemon */
 	  {
-	    set_errno (req->header.error_code);
-	    delete req;
+	    set_errno (req.error_code ());
 	    return -1;
 	  }
 
@@ -528,20 +527,17 @@ shmget (key_t key, size_t size, int shmflg)
     }
   /* couldn't find a currently open shm control area for the key.
    * Allocate a new control block - this has to be handled by the daemon */
-  client_request_shm *req = new client_request_shm (key, size, shmflg);
+  client_request_shm req (key, size, shmflg);
 
-  int rc;
-  if ((rc = cygserver_request (req)))
+  if (req.make_request () == -1)
     {
-      delete req;
       set_errno (ENOSYS);	/* daemon communication failed */
       return -1;
     }
 
-  if (req->header.error_code)	/* shm_get failed in the daemon */
+  if (req.error_code ())	/* shm_get failed in the daemon */
     {
-      set_errno (req->header.error_code);
-      delete req;
+      set_errno (req.error_code ());
       return -1;
     }
 
@@ -549,11 +545,10 @@ shmget (key_t key, size_t size, int shmflg)
    * This tests security automagically
    * FIXME: make this a method of shmnode ?
    */
-  shmnode *shmtemp = build_inprocess_shmds (req->parameters.out.filemap,
-					    req->parameters.out.attachmap,
+  shmnode *shmtemp = build_inprocess_shmds (req.parameters.out.filemap,
+					    req.parameters.out.attachmap,
 					    key,
-					    req->parameters.out.shm_id);
-  delete req;
+					    req.parameters.out.shm_id);
   if (shmtemp)
     return shmtemp->shm_id;
   return -1;

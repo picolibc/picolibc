@@ -12,22 +12,20 @@
 
 #include "woutsup.h"
 
-// #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/shm.h>
+
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <time.h>
-#include "cygerrno.h"
 #include <unistd.h>
-#include "security.h"
-//#include "fhandler.h"
-//#include "dtable.h"
-//#include "cygheap.h"
-//#include "thread.h"
-#include <sys/shm.h>
-//#include "perprocess.h"
-#include <threaded_queue.h>
-#include <cygwin/cygserver_process.h>
+
+#include "cygerrno.h"
 #include "cygserver_shm.h"
+#include "cygwin/cygserver_process.h"
+#include "security.h"
+#include "threaded_queue.h"
 
 // FIXME IS THIS CORRECT
 /* Implementation notes: We use two shared memory regions per key:
@@ -50,11 +48,10 @@ getsystemallocgranularity ()
   return buffer_offset;
 }
 
-
-client_request_shm::client_request_shm ():client_request (CYGSERVER_REQUEST_SHM_GET,
-	       sizeof (parameters))
+client_request_shm::client_request_shm ()
+  : client_request (CYGSERVER_REQUEST_SHM, &parameters, sizeof (parameters))
 {
-  buffer = (char *) &parameters;
+  syscall_printf ("created");
 }
 
 /* FIXME: evaluate getuid() and getgid() against the requested mode. Then
@@ -127,8 +124,33 @@ delete_shmnode (shmnode **nodeptr)
 }
 
 void
-client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
+client_request_shm::serve (transport_layer_base * const conn,
+			   process_cache * const cache)
 {
+  assert (conn);
+  assert (cache);
+
+  assert (!error_code ());
+
+  // The minimum possible request length.  SHM_CREATE requests should
+  // be longer than this.
+  const size_t min_req_msglen =
+    (sizeof (parameters.in) - sizeof (parameters.in.sd_buf));
+
+  if (msglen () < min_req_msglen)
+    {
+      syscall_printf (("bad request body length: " 
+		       "expecting at least %lu bytes, got %lu"),
+		      min_req_msglen, msglen ());
+      error_code (EINVAL);
+      msglen (0);
+      return;
+    }
+
+  // FIXME: check length of sd_buf contents for SHM_CREATE?
+
+  msglen (sizeof (parameters.out));
+
   HANDLE from_process_handle = NULL;
   HANDLE token_handle = NULL;
   DWORD rc;
@@ -142,7 +164,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
   if (!from_process_handle)
     {
       system_printf ("error opening process (%lu)", GetLastError ());
-      header.error_code = EACCES;
+      error_code (EACCES);
       return;
     }
 
@@ -158,7 +180,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
       if (!rc)
 	{
 	  system_printf ("error opening thread token (%lu)", GetLastError ());
-	  header.error_code = EACCES;
+	  error_code (EACCES);
 	  CloseHandle (from_process_handle);
 	  return;
 	}
@@ -185,7 +207,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		{
 		  system_printf ("error duplicating filemap handle (%lu)",
 				 GetLastError ());
-		  header.error_code = EACCES;
+		  error_code (EACCES);
 		}
 	      if (check_and_dup_handle
 		  (GetCurrentProcess (), from_process_handle, token_handle,
@@ -194,14 +216,14 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		{
 		  system_printf ("error duplicating attachmap handle (%lu)",
 				 GetLastError ());
-		  header.error_code = EACCES;
+		  error_code (EACCES);
 		}
 	      CloseHandle (token_handle);
 	      return;
 	    }
 	  tempnode = tempnode->next;
 	}
-      header.error_code = EINVAL;
+      error_code (EINVAL);
       CloseHandle (token_handle);
       return;
     }
@@ -220,13 +242,12 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	  if (tempnode->shm_id == parameters.in.shm_id)
 	    {
 	      InterlockedIncrement (&tempnode->shmds->ds.shm_nattch);
-	      header.error_code = 0;
 	      CloseHandle (token_handle);
 	      return;
 	    }
 	  tempnode = tempnode->next;
 	}
-      header.error_code = EINVAL;
+      error_code (EINVAL);
       CloseHandle (token_handle);
       return;
     }
@@ -240,13 +261,12 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	  if (tempnode->shm_id == parameters.in.shm_id)
 	    {
 	      InterlockedDecrement (&tempnode->shmds->ds.shm_nattch);
-	      header.error_code = 0;
 	      CloseHandle (token_handle);
 	      return;
 	    }
 	  tempnode = tempnode->next;
 	}
-      header.error_code = EINVAL;
+      error_code (EINVAL);
       CloseHandle (token_handle);
       return;
     }
@@ -256,7 +276,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
     {
       shmnode **tempnode = &shm_head;
       while (*tempnode)
-	  {
+	{
 	    if ((*tempnode)->shm_id == parameters.in.shm_id)
 	      {
 		// unlink from the accessible node list
@@ -276,13 +296,12 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		    delete_shmnode (&temp2);
 		  }
 
-		header.error_code = 0;
 		CloseHandle (token_handle);
 		return;
 	      }
 	    tempnode = &(*tempnode)->next;
 	  }
-      header.error_code = EINVAL;
+      error_code (EINVAL);
       CloseHandle (token_handle);
       return;
     }
@@ -325,8 +344,6 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
        * with the same key and size. Different modes is a ?.
        */
 
-
-
       /* walk the list of known keys and return the id if found. remember, we are
        * authoritative...
        */
@@ -341,7 +358,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	      if (parameters.in.size
 		  && tempnode->shmds->ds.shm_segsz < parameters.in.size)
 		{
-		  header.error_code = EINVAL;
+		  error_code (EINVAL);
 		  CloseHandle (token_handle);
 		  return;
 		}
@@ -351,7 +368,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	      if ((parameters.in.shmflg & IPC_CREAT)
 		  && (parameters.in.shmflg & IPC_EXCL))
 		{
-		  header.error_code = EEXIST;
+		  error_code (EEXIST);
 		  debug_printf
 		    ("attempt to exclusively create already created shm_area with key 0x%0qx",
 		     parameters.in.key);
@@ -376,8 +393,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		{
 		  system_printf ("error duplicating filemap handle (%lu)",
 				 GetLastError ());
-		  header.error_code = EACCES;
-/*mutex*/
+		  error_code (EACCES);
+		  /*mutex*/
 		  CloseHandle (token_handle);
 		  return;
 		}
@@ -388,8 +405,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		{
 		  system_printf ("error duplicating attachmap handle (%lu)",
 				 GetLastError ());
-		  header.error_code = EACCES;
-/*mutex*/
+		  error_code (EACCES);
+		  /*mutex*/
 		  CloseHandle (token_handle);
 		  return;
 		}
@@ -432,7 +449,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 			 GetLastError ());
 	  // free the mutex
 	  // we can assume that it exists, and that it was an access problem.
-	  header.error_code = EACCES;
+	  error_code (EACCES);
 	  CloseHandle (token_handle);
 	  return;
 	}
@@ -450,7 +467,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	    {
 	      /* FIXME free mutex */
 	      CloseHandle (filemap);
-	      header.error_code = EEXIST;
+	      error_code (EEXIST);
 	      CloseHandle (token_handle);
 	      return;
 	    }
@@ -462,7 +479,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	{
 	  CloseHandle (filemap);
 	  /* FIXME free mutex */
-	  header.error_code = ENOENT;
+	  error_code (ENOENT);
 	  CloseHandle (token_handle);
 	  return;
 	}
@@ -476,7 +493,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	  CloseHandle (filemap);
 	  //FIXME: close filemap and free the mutex
 	  /* we couldn't access the mapped area with the requested permissions */
-	  header.error_code = EACCES;
+	  error_code (EACCES);
 	  CloseHandle (token_handle);
 	  return;
 	}
@@ -491,13 +508,13 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 					    parameters.in.size %
 					    getsystemallocgranularity (),
 					    shmaname	// object name
-	);
+					    );
       conn->revert_to_self ();
 
       if (attachmap == NULL)
 	{
 	  system_printf ("failed to get shm attachmap");
-	  header.error_code = ENOMEM;
+	  error_code (ENOMEM);
 	  UnmapViewOfFile (mapptr);
 	  CloseHandle (filemap);
 	  /* FIXME exit the mutex */
@@ -509,7 +526,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
       if (!shmtemp)
 	{
 	  system_printf ("failed to malloc shm node");
-	  header.error_code = ENOMEM;
+	  error_code (ENOMEM);
 	  UnmapViewOfFile (mapptr);
 	  CloseHandle (filemap);
 	  CloseHandle (attachmap);
@@ -545,7 +562,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 
       /* we now have the area in the daemon list, opened.
 
-	 FIXME: leave the system wide shm mutex */
+      FIXME: leave the system wide shm mutex */
 
       parameters.out.shm_id = tempnode->shm_id;
       if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
@@ -556,9 +573,9 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	{
 	  system_printf ("error duplicating filemap handle (%lu)",
 			 GetLastError ());
-	  header.error_code = EACCES;
+	  error_code (EACCES);
 	  CloseHandle (token_handle);
-/* mutex et al */
+	  /* mutex et al */
 	  return;
 	}
       if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
@@ -569,20 +586,18 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	{
 	  system_printf ("error duplicating attachmap handle (%lu)",
 			 GetLastError ());
-	  header.error_code = EACCES;
+	  error_code (EACCES);
 	  CloseHandle (from_process_handle);
 	  CloseHandle (token_handle);
-/* more cleanup... yay! */
+	  /* more cleanup... yay! */
 	  return;
 	}
       CloseHandle (token_handle);
-
       return;
     }
 
-  header.error_code = ENOSYS;
+  error_code (ENOSYS);
   CloseHandle (token_handle);
-
 
   return;
 }

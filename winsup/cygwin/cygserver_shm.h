@@ -51,14 +51,37 @@ struct shmnode
 class client_request_shm : public client_request
 {
 public:
-#ifndef __INSIDE_CYGWIN__
-  virtual void serve (transport_layer_base *conn, process_cache *cache);
-#endif
+#ifdef __INSIDE_CYGWIN__
   client_request_shm (key_t ntype, size_t nsize, int shmflg);
-  client_request_shm ();
   client_request_shm (int ntype, int nshmid);
-  union {
-   struct {int type; pid_t cygpid; DWORD winpid; int shm_id; key_t key; size_t size; int shmflg; char sd_buf[4096];} in;
-   struct {int shm_id; HANDLE filemap; HANDLE attachmap; key_t key;} out;
+#else
+  client_request_shm ();
+#endif
+
+  union
+  {
+    struct
+    {
+      int type;
+      pid_t cygpid;
+      DWORD winpid;
+      int shm_id;
+      key_t key;
+      size_t size;
+      int shmflg;
+      char sd_buf[4096];	// Must be the last item (variable length).
+    } in;
+    struct
+    {
+      int shm_id;
+      HANDLE filemap;
+      HANDLE attachmap;
+      key_t key;
+    } out;
   } parameters;
+
+private:
+#ifndef __INSIDE_CYGWIN__
+  virtual void serve (transport_layer_base *, process_cache *);
+#endif
 };

@@ -1,5 +1,90 @@
 2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* include/cygwin/cygserver.h: Change the client_request classes to
+	give greater encapsulation and to allow variable length requests
+	and replies.
+	(enum cygserver_request_code): Now client_request::request_code_t.
+	(class request_header): Now client_request::header_t.  Make a
+	union of the request_code and the error_code.  The `cb' field,
+	which was the buffer length, is now the `size_t msglen' field.
+	(struct request_get_version): Now
+	client_request_get_version::request_get_version.
+	(struct request_shutdown): Remove unused type.
+	(struct request_attach_tty): Now
+	client_request_attach_tty::request_attach_tty.
+	(client_request::_buf): Make field const.
+	(client_request::_buflen): New const private field.
+	(client_request::request_code): New accessor.
+	(client_request::error_code): Ditto.
+	(client_request::msglen): Ditto.
+	(client_request::handle_request): New static method.
+	(client_request::make_request): New virtual method.
+	(client_request::handle): New method.
+	(client_request::send): Make private.
+	(client_request_get_version::check_version): New method.
+	(client_request_get_version::serve): Make private.
+	(client_request_get_version::version): Ditto.
+	(client_request_shutdown::serve): Ditto.
+	(client_request_attach_tty::req): Ditto.
+	(client_request_attach_tty::serve): Ditto.
+	(client_request_attach_tty::from_master): Make method const.
+	(client_request_attach_tty::from_master): Ditto.
+	* cygserver_client.cc
+	(client_request_get_version::client_request_get_version): Track
+	changes to the client_request classes.
+	(client_request_attach_tty::client_request_attach_tty): Ditto.
+	(client_request_get_version::check_version): New method to
+	encapsulate code from cygserver_init().
+	(client_request_shutdown::client_request_shutdown): Move into
+	"cygserver.cc".
+	(client_request::send): Track changes to the client_request
+	classes.  Add more error checking.
+	(client_request::handle_request): New static method containing the
+	first half of the old server_request::process() code.
+	(client_request::make_request): New method to replace the old
+	cygserver_request() function.
+	(client_request::handle): New method containing the second half of
+	the old server_request::process() code.
+	(cygserver_init): Track changes to the client_request classes.  In
+	particular, some code moved into the
+	client_request_get_version::check_version() method.
+	* cygserver.cc (client_request_attach_tty::serve): Track changes
+	to the client_request classes.  In particular, only return a reply
+	body if some handles are successfully duplicated for the client.
+	And remove goto's.
+	(client_request_get_version::serve): Track changes to the
+	client_request classes.
+	(client_request_shutdown::serve): Ditto.
+	(class client_request_invalid): Dead, and so young too.
+	(server_request::request_buffer): Remove unnecessary field.
+	(client_request_shutdown::client_request_shutdown): Moved here
+	from "cygserver_client.cc".
+	(server_request::process): Implementation moved into the new
+	client_request::handle_request() and client_request::handle()
+	methods.
+	* cygserver_shm.h (class client_request_shm): Put client- and
+	server-specific interfaces inside #ifdef/#ifndef __INSIDE_CYGWIN__
+	guards.
+	(client_request_shm::serve): Make private.
+	* cygserver_shm.cc
+	(client_request_shm::client_request_shm): Track changes to the
+	client_request classes.
+	(client_request_shm::serve): Ditto
+	* shm.cc (client_request_shm::client_request_shm): Ditto.  Use
+	alloc_sd() rather than set_security_attribute() to get access to
+	the SECURITY_DESCRIPTOR length, so that we can use it to set the
+	request body length.
+	(shmat): Track changes to the client_request classes. In
+	particular, allocate client_request objects on the stack rather
+	than on the heap, and use the client_request::make_request()
+	method rather than the old cygserver_request() function.
+	(shmdt): Ditto.
+	(shmctl): Ditto.
+	(shmget): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::cygserver_attach_tty): Ditto.
+
+2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* include/cygwin/cygserver_transport.h
 	(cygserver_transport::read): Change buffer type to void *.
 	(cygserver_transport::write): Ditto.

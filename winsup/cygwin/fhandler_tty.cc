@@ -572,29 +572,15 @@ fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
   if (!from_master_ptr || !to_master_ptr)
     return 0;
 
-  client_request_attach_tty *request =
-	new client_request_attach_tty ((DWORD) GetCurrentProcessId (),
-				      (DWORD) get_ttyp ()->master_pid,
-				      (HANDLE) get_ttyp ()->from_master,
-				      (HANDLE) get_ttyp ()->to_master);
+  client_request_attach_tty req ((DWORD) get_ttyp ()->master_pid,
+				 (HANDLE) get_ttyp ()->from_master,
+				 (HANDLE) get_ttyp ()->to_master);
 
-  if (cygserver_request (request) != 0 ||
-	request->header.error_code != 0)
+  if (req.make_request () != 0 || req.error_code () != 0)
     return 0;
 
-/*
-  struct request_attach_tty req;
-  INIT_REQUEST (req, CYGSERVER_REQUEST_ATTACH_TTY);
-  req.pid = GetCurrentProcessId ();
-  req.master_pid = get_ttyp ()->master_pid;
-  req.from_master = get_ttyp ()->from_master;
-  req.to_master = get_ttyp ()->to_master;
-  if (cygserver_request ((struct request_header*) &req) != 0)
-    return 0;
-*/
-  *from_master_ptr = request->from_master ();
-  *to_master_ptr = request->to_master ();
-  delete request;
+  *from_master_ptr = req.from_master ();
+  *to_master_ptr = req.to_master ();
   return 1;
 }
 
