@@ -32,11 +32,11 @@ BEGIN
   BEGIN
     BLOCK "040904B0"
     BEGIN
-      VALUE "CompanyName", "Cygnus Solutions"
+      VALUE "CompanyName", "Red Hat"
       VALUE "FileDescription", "Cygwin\256 POSIX Emulation DLL"
       VALUE "FileVersion", STRINGIFY(CYGWIN_VERSION)
       VALUE "InternalName", CYGWIN_DLL_NAME
-      VALUE "LegalCopyright", "Copyright \251 Cygnus Solutions. 1996-1999"
+      VALUE "LegalCopyright", "Copyright \251 Red Hat. 1996-2000"
       VALUE "OriginalFilename", CYGWIN_DLL_NAME
       VALUE "ProductName", "Cygwin"
       VALUE "ProductVersion", STRINGIFY(CYGWIN_VERSION)
