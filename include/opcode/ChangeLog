@@ -1,3 +1,8 @@
+1999-10-18  Michael Meissner  <meissner@cygnus.com>
+
+	* alpha.h (alpha_num_opcodes): Convert to unsigned.
+	(alpha_num_operands): Ditto.
+
 Sun Oct 10 01:46:56 1999  Jerry Quinn <jerry.quinn.adv91@alum.dartmouth.org>
 
 	* hppa.h (pa_opcodes):  Add load and store cache control to
