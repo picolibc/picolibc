@@ -1,3 +1,7 @@
+2003-01-26  Christopher Faylor  <cgf@redhat.com>
+
+	* pwdgrp.cc (pwdgrp::parse_group): Fix off-by-one problem in allocating
+	gr_mem.
 
 2003-01-26  Christopher Faylor  <cgf@redhat.com>
 

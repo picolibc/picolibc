@@ -59,7 +59,7 @@ pwdgrp::parse_group ()
   grp.gr_mem = &null_ptr;
   if (n)
     {
-      char **namearray = (char **) calloc (n + 2, sizeof (char *));
+      char **namearray = (char **) calloc (n + 1, sizeof (char *));
       if (namearray)
 	{
 	  for (int i = 0; i < n; i++, dp = strchr (dp, '\0') + 1)
