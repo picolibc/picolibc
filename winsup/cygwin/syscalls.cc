@@ -89,6 +89,12 @@ close_all_files (void)
 {
   SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
 
+  if (cygheap->ctty)
+    {
+      debug_printf ("decrementing ctty usecount");
+      cygheap->ctty->usecount--;
+    }
+
   fhandler_base *fh;
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
     if ((fh = cygheap->fdtab[i]) != NULL)
@@ -96,9 +102,6 @@ close_all_files (void)
 	fh->close ();
 	cygheap->fdtab.release (i);
       }
-
-  if (cygheap->ctty.get_io_handle ())
-    cygheap->ctty.fhandler_tty_common::close ();
 
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
   user_shared->delqueue.process_queue ();
@@ -320,10 +323,14 @@ setsid (void)
       myself->ctty = -1;
       myself->sid = getpid ();
       myself->pgid = getpid ();
-      if (cygheap->ctty.get_io_handle ())
-	cygheap->ctty.fhandler_tty_common::close ();
       syscall_printf ("sid %d, pgid %d, ctty %d, open_fhs %d", myself->sid,
 		      myself->pgid, myself->ctty, fhandler_console::open_fhs);
+      if (cygheap->ctty)
+	{
+	  if (!--cygheap->ctty->usecount)
+	    cygheap->ctty->close ();
+	  cygheap->ctty = NULL;
+	}
       return myself->sid;
     }
 

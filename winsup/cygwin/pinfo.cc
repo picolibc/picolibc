@@ -255,7 +255,7 @@ pinfo::set_acl()
 }
 
 void
-_pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *fhctty)
+_pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 {
   if ((ctty < 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
     {
@@ -276,8 +276,21 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *fhctty)
 	sid = tc->getsid ();
       if (tc->getpgid () == 0)
 	tc->setpgid (pgid);
-      if (fhctty && !cygheap->ctty.get_io_handle ())
-	cygheap->ctty  = *fhctty;
+      if (cygheap->ctty != arch)
+	{
+	  if (cygheap->ctty)
+	    syscall_printf ("ctty NULL");
+	  else
+	    {
+	      syscall_printf ("ctty %p, usecount %d", cygheap->ctty,
+			      cygheap->ctty->usecount);
+	      if (!--cygheap->ctty->usecount)
+		cygheap->ctty->close ();
+	    }
+	  cygheap->ctty = arch;
+	  if (arch)
+	    arch->usecount++;
+	}
     }
 }
 

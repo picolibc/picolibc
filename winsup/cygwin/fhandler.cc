@@ -1177,7 +1177,9 @@ fhandler_base::fhandler_base ():
   rabuflen (0),
   open_status (0),
   fs_flags (0),
-  read_state (NULL)
+  read_state (NULL),
+  archetype (NULL),
+  usecount (0)
 {
 }
 

@@ -112,7 +112,7 @@ public:
   commune_result commune_send (DWORD, ...);
   bool alive ();
   char *cmdline (size_t &);
-  void set_ctty (class tty_min *, int, class fhandler_tty_slave * = NULL);
+  void set_ctty (class tty_min *, int, class fhandler_tty_slave *);
 
   friend void __stdcall set_myself (pid_t, HANDLE);
 

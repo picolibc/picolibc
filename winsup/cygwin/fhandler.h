@@ -121,8 +121,11 @@ class fhandler_base
   DWORD fs_flags;
   HANDLE read_state;
   path_conv pc;
+  class fhandler_base *archetype;
 
  public:
+  int usecount;
+
   void set_name (path_conv &pc);
   int error () const {return pc.error;}
   void set_error (int error) {pc.error = error;}
@@ -130,6 +133,7 @@ class fhandler_base
   int pc_binmode () const {return pc.binmode ();}
   device& dev () {return pc.dev;}
   operator DWORD& () {return (DWORD) pc;}
+  virtual size_t size () const {return sizeof (*this);}
 
   virtual fhandler_base& operator =(fhandler_base &x);
   fhandler_base ();
@@ -138,7 +142,7 @@ class fhandler_base
   /* Non-virtual simple accessor functions. */
   void set_io_handle (HANDLE x) { io_handle = x; }
 
-  DWORD get_device () { return dev ().devn; }
+  DWORD& get_device () { return dev ().devn; }
   DWORD get_major () { return dev ().major; }
   DWORD get_minor () { return dev ().minor; }
   virtual int get_unit () { return dev ().minor; }

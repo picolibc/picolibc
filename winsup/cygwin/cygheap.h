@@ -18,6 +18,7 @@ enum cygheap_types
   HEAP_BUF,
   HEAP_MOUNT,
   HEAP_SIGS,
+  HEAP_ARCHETYPES,
   HEAP_1_START,
   HEAP_1_STR,
   HEAP_1_ARGV,
@@ -260,7 +261,7 @@ struct init_cygheap
 #endif
   struct sigaction *sigs;
 
-  fhandler_tty_slave ctty;	/* Current tty */
+  fhandler_tty_slave *ctty;	/* Current tty */
 };
 
 #define CYGHEAPSIZE (sizeof (init_cygheap) + (20000 * sizeof (fhandler_union)) + (5 * 65536))

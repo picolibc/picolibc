@@ -94,7 +94,7 @@ fhandler_console::get_tty_stuff (int flags = 0)
     {
       shared_console_info->tty_min_state.setntty (TTY_CONSOLE);
       shared_console_info->tty_min_state.setsid (myself->sid);
-      myself->set_ctty (&shared_console_info->tty_min_state, flags);
+      myself->set_ctty (&shared_console_info->tty_min_state, flags, NULL);
 
       dev_state->scroll_region.Bottom = -1;
       dev_state->dwLastCursorPosition.X = -1;

@@ -447,16 +447,16 @@ fhandler_tty_slave::fhandler_tty_slave ()
 int
 fhandler_tty_slave::open (int flags, mode_t)
 {
-  if (get_device () != FH_TTY)
-    /* nothing to do */;
-  else if (!cygheap->ctty.get_io_handle ())
+  if (get_device () == FH_TTY)
     pc.dev.tty_to_real_device ();
-  else
+  fhandler_tty_slave *arch = (fhandler_tty_slave *)
+    cygheap->fdtab.find_archetype (pc.dev);
+  if (arch)
     {
-      *this = cygheap->ctty;
-      fhandler_console::open_fhs++;
+      *this = *(fhandler_tty_slave *) arch;
       termios_printf ("copied tty fhandler from cygheap");
-      return 1;
+      fhandler_console::open_fhs++;
+      goto out;
     }
 
   tcinit (cygwin_shared->tty[get_unit ()]);
@@ -519,8 +519,9 @@ fhandler_tty_slave::open (int flags, mode_t)
       return 0;
     }
 
-  HANDLE from_master_local = NULL;
-  HANDLE to_master_local = NULL;
+  HANDLE from_master_local;
+  HANDLE to_master_local;
+  from_master_local = to_master_local = NULL;
 
 #ifdef USE_SERVER
   if (!wincap.has_security ()
@@ -569,7 +570,6 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   set_io_handle (from_master_local);
   set_output_handle (to_master_local);
-  myself->set_ctty (get_ttyp (), flags, this);
 
   set_open_status ();
   if (fhandler_console::open_fhs++ == 0 && !GetConsoleCP ()
@@ -590,8 +590,19 @@ fhandler_tty_slave::open (int flags, mode_t)
       if (b)
 	init_console_handler ();
     }
-  termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
-  termios_printf ("tty%d opened", get_unit ());
+
+  // FIXME: Do this better someday
+  arch = (fhandler_tty_slave *) cmalloc (HEAP_ARCHETYPES, sizeof (*this));
+  *((fhandler_tty_slave **) cygheap->fdtab.add_archetype ()) = arch;
+  archetype = arch;
+  *arch = *this;
+
+out:
+  usecount = 0;
+  archetype->usecount++;
+  myself->set_ctty (get_ttyp (), flags, arch);
+  termios_printf ("%s opened, incremented open_fhs %d, archetype usecount %d",
+		  pc.dev.name, fhandler_console::open_fhs, archetype->usecount);
 
   return 1;
 }
@@ -601,10 +612,19 @@ fhandler_tty_slave::close ()
 {
   if (!--fhandler_console::open_fhs && myself->ctty == -1)
     FreeConsole ();
-  termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
-  if (myself->ctty >= 0 && get_io_handle () == cygheap->ctty.get_io_handle ())
-    return 0;
-  return fhandler_tty_common::close ();
+  termios_printf ("decremented open_fhs %d, archetype usecount %d",
+		  fhandler_console::open_fhs, archetype->usecount);
+  if (--archetype->usecount)
+    {
+      termios_printf ("just exiting because archetype usecount is > 0");
+      return 0;
+    }
+
+  termios_printf ("closing last open %s handle", pc.dev.name);
+  fhandler_tty_slave *arch = (fhandler_tty_slave *) archetype;
+  int res = fhandler_tty_common::close ();
+  cygheap->fdtab.delete_archetype (arch);
+  return res;
 }
 
 int
@@ -888,8 +908,14 @@ int
 fhandler_tty_slave::dup (fhandler_base *child)
 {
   fhandler_console::open_fhs++;
-  termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
-  return fhandler_tty_common::dup (child);
+  fhandler_tty_slave *arch = (fhandler_tty_slave *) archetype;
+  *(fhandler_tty_slave *) child = *arch;
+  archetype->usecount++;
+  child->usecount = 0;
+  myself->set_ctty (get_ttyp (), openflags, arch);
+  termios_printf ("incremented open_fhs %d, archetype usecount %d",
+		  fhandler_console::open_fhs, archetype->usecount);
+  return 0;
 }
 
 int
@@ -897,13 +923,6 @@ fhandler_tty_common::dup (fhandler_base *child)
 {
   fhandler_tty_slave *fts = (fhandler_tty_slave *) child;
   int errind;
-
-  if (get_io_handle () == cygheap->ctty.get_io_handle ())
-    {
-      *fts = cygheap->ctty;
-      termios_printf ("duped ctty");
-      return 0;
-    }
 
   fts->tcinit (get_ttyp ());
 
@@ -986,9 +1005,6 @@ fhandler_tty_common::dup (fhandler_base *child)
       errind = 9;
       goto err;
     }
-
-  if (get_major () == DEV_TTYS_MAJOR)
-    myself->set_ctty (get_ttyp (), openflags, fts);
 
   return 0;
 
@@ -1315,8 +1331,7 @@ fhandler_pty_master::ptsname ()
 void
 fhandler_tty_common::set_close_on_exec (int val)
 {
-  if (get_major () == DEV_TTYS_MAJOR
-      && get_io_handle () == cygheap->ctty.get_io_handle ())
+  if (get_major () == DEV_TTYS_MAJOR)
     set_close_on_exec_flag (val);
   else
     {

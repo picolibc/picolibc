@@ -163,6 +163,39 @@ dtable::stdio_init ()
     set_console_ctty ();
 }
 
+const int dtable::initial_archetype_size;
+
+fhandler_base *
+dtable::find_archetype (device& dev)
+{
+  for (unsigned i = 0; i < farchetype; i++)
+    if (archetypes[i]->get_device () == (unsigned) dev)
+      return archetypes[i];
+  return NULL;
+}
+
+fhandler_base **
+dtable::add_archetype ()
+{
+  if (farchetype++ >= narchetypes)
+    archetypes = (fhandler_base **) crealloc (archetypes, (narchetypes += initial_archetype_size) * sizeof archetypes[0]);
+  return archetypes + farchetype - 1;
+}
+
+void
+dtable::delete_archetype (fhandler_base *fh)
+{
+  for (unsigned i = 0; i < narchetypes; i++)
+    if (fh == archetypes[i])
+      {
+	if (i < --farchetype)
+	  archetypes[i] = archetypes[farchetype];
+	break;
+      }
+
+  delete fh;
+}
+
 int
 dtable::find_unused_handle (int start)
 {

@@ -21,12 +21,16 @@ class dtable
 {
   fhandler_base **fds;
   fhandler_base **fds_on_hold;
+  fhandler_base **archetypes;
+  unsigned narchetypes;
+  unsigned farchetype;
+  static const int initial_archetype_size = 8;
   int first_fd_for_open;
   int cnt_need_fixup_before;
 public:
   size_t size;
 
-  dtable () : first_fd_for_open(3), cnt_need_fixup_before(0) {}
+  dtable () : archetypes (NULL), narchetypes (0), farchetype (0), first_fd_for_open(3), cnt_need_fixup_before(0) {}
   void init () {first_fd_for_open = 3;}
 
   void dec_need_fixup_before ()
@@ -69,6 +73,9 @@ public:
   void set_file_pointers_for_exec ();
   bool in_vfork_cleanup () {return fds_on_hold == fds;}
   fhandler_fifo *find_fifo (ATOM);
+  fhandler_base *find_archetype (device& dev);
+  fhandler_base **add_archetype ();
+  void delete_archetype (fhandler_base *);
 };
 
 fhandler_base *build_fh_dev (const device&, const char * = NULL);

@@ -1,3 +1,39 @@
+2003-12-11  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.h (cygheap_types): Add HEAP_ARCHETYPES.
+	(init_cheap::ctty): Change to pointer.
+	* dtable.h (dtable::find_archetype): Declare new function.
+	(dtable::add_archetype): Declare new function.
+	(dtable::delete_archetype): Declare new function.
+	(dtable::narchetypes): Declare.
+	(dtable::farchetypes): Declare.
+	(dtable::initial_archetype_size): Declare.
+	(dtable::dtable): Initialize new fields.
+	(dtable::initial_archetype_size): Declare.
+	* dtable.cc (dtable::find_archetype): Define new function.
+	(dtable::add_archetype): Define new function.
+	(dtable::delete_archetype): Define new function.
+	(dtable::initial_archetype_size): Define.
+	* fhandler.h (fhandler_base::archetype): Declare.
+	(fhandler_base::usecount): Declare.
+	* fhandler.cc (fhandler_base::fhandler_base): Initialize new fields.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Pass NULL to
+	third argument of set_ctty.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Accommodate new archetype
+	method to create only one instance of a tty.
+	(fhandler_tty_slave::close): Don't close handles unless archetype
+	usecount is zero.  When that happens, close archetype too.
+	(fhandler_tty_slave::dup): Just copy archetype.  Set use count
+	appropriately.  Set ctty, if appropriate.
+	(fhandler_tty_common::dup): Remove slave considerations.
+	(fhandler_tty_common::set_close_on_exec): Remove cygheap->ctty
+	considerations.
+	* pinfo.cc (_pinfo::set_ctty): Accommodate new archetype methods.
+	* pinfo.h (_pinfo::set_ctty): Make third argument explicit.
+	* syscalls.cc (close_all_files): Decrement controlling tty use count
+	before closing all handles to allow controlling tty to be closed.
+	Remove previous controlling tty considerations.
+
 2003-12-09  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_tty.cc (fhandler_tty_common::dup): Just copy cygheap->ctty
