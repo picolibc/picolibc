@@ -170,7 +170,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	}
       else if (!createit)
 	{
-	  h = OpenFileMappingA (access, FALSE, mapname);
+	  h = OpenFileMapping (access, FALSE, mapname);
 	  created = 0;
 	}
       else

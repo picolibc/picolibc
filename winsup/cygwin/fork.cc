@@ -514,8 +514,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   int forked_pid;
 
-  forked_pid = forked->pid;
-
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */
   strcpy (forked->progname, myself->progname);
@@ -552,6 +550,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   if (!sync_with_child (pi, subproc_ready, true, "waiting for longjmp"))
     goto cleanup;
 
+  forked_pid = forked->pid;
   /* CHILD IS STOPPED */
   debug_printf ("child is alive (but stopped)");
 
