@@ -1,8 +1,4 @@
-Thu Nov 16 00:15:59 2000  Christopher Faylor <cgf@cygnus.com>
-
-	* sigproc.cc (wait_sig): Remove unneeded for loop iteration.
-
-Wed Nov 15 21:02:56 2000  Christopher Faylor <cgf@cygnus.com>
+Thu Nov 16 00:18:15 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interrupt_setup): Don't set signal mask here or races
 	occur with main thread.  Set it in sigdelayed instead.
@@ -12,6 +8,7 @@ Wed Nov 15 21:02:56 2000  Christopher Faylor <cgf@cygnus.com>
 	(signal_dispatch): Add newmask.
 	* sigproc.cc (wait_sig): Eliminate ill-considered attempt to halt
 	looping signal processors.
+	* perthread.h (signal_dispatch): Add newmask field.
 
 Wed Nov 15 22:08:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
