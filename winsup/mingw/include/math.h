@@ -454,7 +454,11 @@ extern double __cdecl exp2(double);
 extern float __cdecl exp2f(float);
 extern long double __cdecl exp2l(long double);
 
-/* 7.12.6.3 The expm1 functions: TODO */
+/* 7.12.6.3 The expm1 functions */
+/* TODO: These could be inlined */
+extern double __cdecl expm1(double);
+extern float __cdecl expm1f(float);
+extern long double __cdecl expm1l(long double);
 
 /* 7.12.6.4 Double in C89 */
 __CRT_INLINE float __cdecl frexpf (float x, int* expn)

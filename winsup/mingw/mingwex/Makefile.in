@@ -41,7 +41,8 @@ MATH_DISTFILES = \
 	atanf.c atanl.c cbrt.c cbrtf.c cbrtl.c ceilf.S ceill.S \
 	cephes_emath.h cephes_emath.c cephes_mconf.h \
 	copysign.S copysignf.S copysignl.S cosf.S coshf.c coshl.c cosl.S \
-	exp2.S exp2f.S exp2l.S expf.c expl.c fabs.c fabsf.c fabsl.c \
+	exp2.S exp2f.S exp2l.S expf.c expl.c expm1.c expm1l.c expm1f.c \
+	fabs.c fabsf.c fabsl.c \
 	fdim.c fdimf.c fdiml.c floorf.S floorl.S fma.S fmaf.S fmal.c \
 	fmax.c fmaxf.c fmaxl.c fmin.c fminf.c fminl.c fmodf.c \
 	fmodl.c fp_consts.c fp_consts.h fp_constsf.c  fp_constsl.c \
@@ -131,7 +132,8 @@ MATH_OBJS = \
 	atanf.o atanl.o cbrt.o cbrtf.o cbrtl.o ceilf.o ceill.o \
 	cephes_emath.o \
 	copysign.o copysignf.o copysignl.o cosf.o coshf.o coshl.o cosl.o \
-	exp2.o exp2f.o exp2l.o expf.o expl.o fabs.o fabsf.o fabsl.o \
+	exp2.o exp2f.o exp2l.o expf.o expl.o expm1.o expm1l.o expm1f.o \
+	fabs.o fabsf.o fabsl.o \
 	fdim.o fdimf.o fdiml.o floorf.o floorl.o fma.o fmaf.o fmal.o \
 	fmax.o fmaxf.o fmaxl.o fmin.o fminf.o fminl.o fmodf.o \
 	fmodl.o fp_consts.o fp_constsf.o fp_constsl.o \
