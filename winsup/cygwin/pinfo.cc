@@ -63,7 +63,8 @@ set_myself (pid_t pid, HANDLE h)
 
   (void) GetModuleFileName (NULL, myself->progname,
 			    sizeof(myself->progname));
-  strace.hello ();
+  if (!strace.active)
+    strace.hello ();
   return;
 }
 

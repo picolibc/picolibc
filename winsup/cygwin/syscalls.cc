@@ -1978,8 +1978,7 @@ seteuid32 (__uid32_t uid)
   sav_impersonated = cygheap->user.impersonated;
 
   RevertToSelf();
-  if (!OpenProcessToken (GetCurrentProcess (),
-			 TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &ptok))
+  if (!OpenProcessToken (hMainProc, TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &ptok))
     {
       __seterrno ();
       goto failed;
@@ -1987,17 +1986,17 @@ seteuid32 (__uid32_t uid)
   /* Verify if the process token is suitable.
      Currently we do not try to differentiate between
 	 internal tokens and others */
-  process_ok = verify_token(ptok, usersid, pgrpsid);
-  debug_printf("Process token %sverified", process_ok?"":"not ");
+  process_ok = verify_token (ptok, usersid, pgrpsid);
+  debug_printf("Process token %sverified", process_ok ? "" : "not ");
   if (process_ok)
     {
-      if (cygheap->user.token == INVALID_HANDLE_VALUE ||
-	  !cygheap->user.impersonated)
+      if (cygheap->user.issetuid ())
+	cygheap->user.impersonated = FALSE;
+      else
 	{
 	  CloseHandle (ptok);
 	  return 0; /* No change */
 	}
-      else cygheap->user.impersonated = FALSE;
     }
 
   if (!process_ok && cygheap->user.token != INVALID_HANDLE_VALUE)
@@ -2007,7 +2006,9 @@ seteuid32 (__uid32_t uid)
 				    & sav_token_is_internal_token);
       debug_printf("Thread token %d %sverified",
 		   cygheap->user.token, token_ok?"":"not ");
-      if (token_ok)
+      if (!token_ok)
+	cygheap->user.token = INVALID_HANDLE_VALUE;
+      else
 	{
 	  /* Return if current token is valid */
 	  if (cygheap->user.impersonated)
@@ -2018,7 +2019,6 @@ seteuid32 (__uid32_t uid)
 	      return 0; /* No change */
 	    }
 	}
-      else cygheap->user.token = INVALID_HANDLE_VALUE;
     }
 
   /* Set process def dacl to allow access to impersonated token */
@@ -2152,9 +2152,7 @@ setegid32 (__gid32_t gid)
 		      "TokenPrimaryGroup): %E");
       RevertToSelf ();
     }
-  if (!OpenProcessToken (GetCurrentProcess (),
-			 TOKEN_ADJUST_DEFAULT,
-			 &ptok))
+  if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT, &ptok))
     debug_printf ("OpenProcessToken(): %E\n");
   else
     {

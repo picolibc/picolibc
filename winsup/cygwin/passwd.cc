@@ -168,7 +168,7 @@ read_etc_passwd ()
 	      cygsid tu, tg;
 	      DWORD siz;
 
-	      if (OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+	      if (OpenProcessToken (hMainProc, TOKEN_QUERY, &ptok))
 	        {
 		  if (GetTokenInformation (ptok, TokenUser, &tu, sizeof tu,
 		                           &siz)

@@ -43,8 +43,7 @@ internal_getlogin (cygheap_user &user)
 
       /* Try to get the SID either from current process and
 	 store it in user.psid */
-      if (!OpenProcessToken (GetCurrentProcess (),
-			     TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
+      if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
 			     &ptok))
 	system_printf ("OpenProcessToken(): %E\n");
       else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
@@ -247,31 +246,27 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	cygwin_conv_to_full_win32_path (pw->pw_dir, homepath_env_buf);
       else
 	{
-	  sys_mbstowcs (wuser, name (), sizeof (wuser) / sizeof (*wuser));
-	  if ((ret = NetUserGetInfo (NULL, wuser, 3, (LPBYTE *)&ui)))
+	  if (env_logsrv ())
 	    {
-	      if (env_logsrv ())
+	      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+	      sys_mbstowcs (wlogsrv, env_logsrv (),
+			    sizeof (wlogsrv) / sizeof(*wlogsrv));
+	      sys_mbstowcs (wuser, name (), sizeof (wuser) / sizeof (*wuser));
+	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui)))
 		{
-		  WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-		  strcpy (homepath_env_buf, env_logsrv ());
-		  sys_mbstowcs (wlogsrv, homepath_env_buf,
-				sizeof (wlogsrv) / sizeof(*wlogsrv));
-		  ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui);
-		}
-	    }
-	  if (!ret)
-	    {
-	      char *p;
-	      sys_wcstombs (homepath_env_buf, ui->usri3_home_dir, MAX_PATH);
-	      if (!homepath_env_buf[0])
-		{
-		  sys_wcstombs (homepath_env_buf, ui->usri3_home_dir_drive, MAX_PATH);
-		  if (homepath_env_buf[0])
-		    strcat (homepath_env_buf, "\\");
-		  else if (!GetSystemDirectory (homepath_env_buf, MAX_PATH))
-		    strcpy (homepath_env_buf, "c:\\");
-		  else if ((p = strchr (homepath_env_buf, '\\')))
-		    p[1] = '\0';
+		  char *p;
+		  sys_wcstombs (homepath_env_buf, ui->usri3_home_dir, MAX_PATH);
+		  if (!homepath_env_buf[0])
+		    {
+		      sys_wcstombs (homepath_env_buf, ui->usri3_home_dir_drive,
+				    MAX_PATH);
+		      if (homepath_env_buf[0])
+			strcat (homepath_env_buf, "\\");
+		      else if (!GetSystemDirectory (homepath_env_buf, MAX_PATH))
+			strcpy (homepath_env_buf, "c:\\");
+		      else if ((p = strchr (homepath_env_buf, '\\')))
+			p[1] = '\0';
+		    }
 		}
 	    }
 	  if (ui)

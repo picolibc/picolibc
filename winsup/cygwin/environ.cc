@@ -58,16 +58,16 @@ static NO_COPY win_env conv_envvars[] =
      cygwin_posix_to_win32_path_list,
      cygwin_win32_to_posix_path_list_buf_size,
      cygwin_posix_to_win32_path_list_buf_size},
-    {NL ("HOME="), NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
-     return_MAX_PATH, return_MAX_PATH},
+    {NL ("HOME="), NULL, NULL, cygwin_conv_to_full_posix_path,
+     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
     {NL ("LD_LIBRARY_PATH="), NULL, NULL, cygwin_conv_to_full_posix_path,
      cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
-    {NL ("TMPDIR="), NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
-     return_MAX_PATH, return_MAX_PATH},
-    {NL ("TMP="), NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
-     return_MAX_PATH, return_MAX_PATH},
-    {NL ("TEMP="), NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
-     return_MAX_PATH, return_MAX_PATH},
+    {NL ("TMPDIR="), NULL, NULL, cygwin_conv_to_full_posix_path,
+     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
+    {NL ("TMP="), NULL, NULL, cygwin_conv_to_full_posix_path,
+     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
+    {NL ("TEMP="), NULL, NULL, cygwin_conv_to_full_posix_path,
+     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
     {NULL, 0, NULL, NULL, NULL, NULL, 0, 0}
   };
 
@@ -780,18 +780,30 @@ spenv::retrieve (bool no_envblock, const char *const envname)
 {
   if (envname && !strncasematch (envname, name, namelen))
     return NULL;
+
+  debug_printf ("no_envblock %d", no_envblock);
+
   if (from_cygheap)
     {
       const char *p;
-      if (!cygheap->user.issetuid ())
+      if (cygheap->user.issetuid ())
+	debug_printf ("calculating for setuid");
+      else
 	{
+	  debug_printf ("calculating for non-setuid");
 	  if (!envname)
-	    return NULL;		/* No need to force these into the
+	    {
+	      debug_printf ("not adding %s to windows environment", name);
+	      return NULL;		/* No need to force these into the
 					   environment */
+	    }
 
 	  if (no_envblock)
-	    return cstrdup1 (envname);	/* Don't really care what it's set to
+	    {
+	      debug_printf ("duping existing value for '%s'", name);
+	      return cstrdup1 (envname);/* Don't really care what it's set to
 					   if we're calling a cygwin program */
+	    }
 	}
 
       /* Calculate (potentially) value for given environment variable.  */
@@ -801,6 +813,7 @@ spenv::retrieve (bool no_envblock, const char *const envname)
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
       (void) strcpy (s + namelen, p);
+      debug_printf ("using computed value for '%s'", name);
       return s;
     }
 
@@ -814,7 +827,11 @@ spenv::retrieve (bool no_envblock, const char *const envname)
       char *p = (char *) cmalloc (HEAP_1_STR, namelen + ++vallen);
       strcpy (p, name);
       if (GetEnvironmentVariable (name, p + namelen, vallen))
-	return p;
+	{
+	  debug_printf ("using value from GetEnvironmentVariable for '%s'",
+			envname);
+	  return p;
+	}
       else
 	cfree (p);
     }

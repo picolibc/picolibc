@@ -338,6 +338,20 @@
 	* Makefile.in: Remove special __OUTSIDE_CYGWIN__ case for
 	cygserver_shm.cc.
 
+2002-06-19  Christopher Faylor  <cgf@redhat.com>
+
+	Use hMainProc where appropriate, throughout. 
+	* environ.cc (spenv::retrieve): Add debugging statements.
+
+	* pinfo.cc (set_myself): Don't call strace.hello if already stracing.
+	* strace.cc (strace): Move NO_COPY keyword so that it will actually
+	take effect.
+
+2002-06-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (cygheap_user::ontherange): Call NetUserGetInfo() only with
+	non-NULL logserver parameter.
+
 2002-06-16  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.h (cygheap_user::issetuid): New method.
