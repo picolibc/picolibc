@@ -505,7 +505,6 @@ fdsock (int& fd, const char *name, SOCKET soc)
   fhandler_socket *fh = (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR);
-  cygheap->fdtab.inc_need_fixup_before ();
   fh->set_name (name, name);
   debug_printf ("fd %d, name '%s', soc %p", fd, name, soc);
   return fh;

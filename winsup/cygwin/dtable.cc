@@ -271,8 +271,8 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
       case FH_CONSOLE:
       case FH_CONIN:
       case FH_CONOUT:
-	fh = cnew (fhandler_console) ();
-	inc_console_fds ();
+	if ((fh = cnew (fhandler_console) ()))
+	  inc_console_fds ();
 	break;
       case FH_PTYM:
 	fh = cnew (fhandler_pty_master) ();
@@ -295,7 +295,8 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 	fh = cnew (fhandler_pipe) ();
 	break;
       case FH_SOCKET:
-	fh = cnew (fhandler_socket) ();
+	if ((fh = cnew (fhandler_socket) ()))
+	  inc_need_fixup_before ();
 	break;
       case FH_DISK:
 	fh = cnew (fhandler_disk_file) ();
@@ -400,10 +401,6 @@ dtable::dup2 (int oldfd, int newfd)
   if (!not_open (newfd))
     _close (newfd);
   fds[newfd] = newfh;
-
-  /* Count sockets. */
-  if ((fds[newfd]->get_device () & FH_DEVMASK) == FH_SOCKET)
-    inc_need_fixup_before ();
 
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   MALLOC_CHECK;
