@@ -1,3 +1,9 @@
+Wed Sep 19 11:52:42 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* lib/getopt.c: Use __progname==__argv[0] when not compiling for cygwin.
+
+	* scandir.cc (scandir): Use correct default when compar == NULL.
+
 Wed Sep 19 17:49:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Revert

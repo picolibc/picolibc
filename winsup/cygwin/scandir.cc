@@ -16,8 +16,13 @@
 #include <errno.h>
 #include "cygerrno.h"
 
-extern "C"
-int
+extern "C" int
+alphasort (const struct dirent **a, const struct dirent **b)
+{
+  return strcoll ((*a)->d_name, (*b)->d_name);
+}
+
+extern "C" int
 scandir (const char *dir,
 	 struct dirent ***namelist,
 	 int (*select) (const struct dirent *),
@@ -33,6 +38,8 @@ scandir (const char *dir,
 
   int prior_errno = get_errno ();
   set_errno (0);
+  if (!compar)
+    compar = alphasort;
 
   while ((ent = readdir (dirp)))
     {
@@ -91,11 +98,3 @@ scandir (const char *dir,
     *namelist = nl;
   return count;
 }
-
-extern "C"
-int
-alphasort (const struct dirent **a, const struct dirent **b)
-{
-  return strcoll ((*a)->d_name, (*b)->d_name);
-}
-
