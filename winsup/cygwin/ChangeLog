@@ -1,3 +1,13 @@
+Thu Aug  3 20:44:39 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (fhandler_console::select_read): Call set_cursor_maybe
+	since select may block and cursor may not be visible.
+	* select.cc (fhandler_console::select_write): Ditto.
+	* select.cc (fhandler_console::select_except): Ditto.
+	* environ.cc (cur_environ): Give "C" linkage.
+	* winsup.h: Ditto.
+	* winsup.cc: Change include ordering.
+
 Sun Jul 30 13:54:35 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_console.cc: Remove VK_DIVIDE detection.
