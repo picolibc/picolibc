@@ -1475,6 +1475,10 @@ extern "C" {
 #define ICC_NATIVEFNTCTL_CLASS 8192
 #define INFOTIPSIZE 1024
 #endif /* _WIN32_IE */
+#if (_WIN32_WINNT >= 0x501)
+#define ICC_STANDARD_CLASSES	0x00004000
+#define ICC_LINK_CLASS		0x00008000
+#endif
 #define GDTR_MIN 1
 #define GDTR_MAX 2
 #define GMR_VISIBLE 0

@@ -1,3 +1,8 @@
+2004-02-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (ICC_STANDARD_CLASSES, ICC_LINK_CLASS): Add
+	defines.
+
 2004-01-31  Jiri Malak  <Jiri.Malak@geac.cz>
 
 	* include/winuser.h (RT_MANIFEST): Make conditional on
