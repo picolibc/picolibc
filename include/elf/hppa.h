@@ -121,6 +121,9 @@ RELOC_NUMBER (R_PARISC_DIR17F,	   	 4)
 RELOC_NUMBER (R_PARISC_DIR14R,	   	 6)
 /*		load/store (1)		   RR(symbol, addend) 		  */
 
+RELOC_NUMBER (R_PARISC_DIR14F,	   	 7)
+/*		load/store (1)		   symbol, addend 		  */
+
 /* PC-relative relocation types
    Typically used for calls.
    Note PCREL17C and PCREL17F differ only in overflow handling.
