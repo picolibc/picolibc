@@ -1,3 +1,7 @@
+2000-07-11  DJ Delorie  <dj@cygnus.com>
+
+	* include/shlobj.h: add CSIDL_COMMON_*
+
 Tue Jun 27 19:35:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/winbase.h: Add stream ids BACKUP_OBJECT_ID,
