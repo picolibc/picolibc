@@ -1,3 +1,8 @@
+Thu Jun 13 15:52:03 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/machine/sh/memset.S (memset, __SHMEDIA__ code):
+	Fixed bug in writing end of set region.
+
 2002-06-10  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/process.h: Remove cygwin-only sexec* declarations.  Fix

@@ -19,7 +19,7 @@ ENTRY(memset)
 	mperm.w r3, r63, r3	// Fill pattern now in every byte of r3
 
 	movi 8, r9
-	bgtu/u r23, r9, tr0
+	bgtu/u r23, r9, tr0 // multiquad
 
 	ldlo.q r2, 0, r7
 	shlli r4, 2, r4
@@ -62,8 +62,10 @@ loop:
 	st.q r25, 24, r3
 	st.q r25, 32, r3
 	addi r25, 32, r25
-	bgeu/l r8, r25, tr1
+	bgeu/l r8, r25, tr1 // loop
 
+	st.q r20, -40, r3
+	st.q r20, -32, r3
 	st.q r20, -24, r3
 	st.q r20, -16, r3
 	st.q r20, -8, r3
