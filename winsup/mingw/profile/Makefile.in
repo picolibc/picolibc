@@ -24,7 +24,7 @@ SHELL = /bin/sh
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
-mkinstalldirs = $(SHELL) $(srcdir)/../../mkinstalldirs
+mkinstalldirs = $(SHELL) $(srcdir)/../mkinstalldirs
 DISTFILES = Makefile.in configure configure.in gcrt0.c gmon.c gmon.h mcount.c \
 profil.c profil.h profile.h
 
