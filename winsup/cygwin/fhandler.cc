@@ -371,6 +371,15 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
   if (get_device () == FH_SERIAL)
     file_attributes |= FILE_FLAG_OVERLAPPED;
 
+#ifdef HIDDEN_DOT_FILES
+  if (flags & O_CREAT && get_device () == FH_DISK)
+    {
+      char *c = strrchr (get_win32_name (), '\\');
+      if ((c && c[1] == '.') || *get_win32_name () == '.')
+        file_attributes |= FILE_ATTRIBUTE_HIDDEN;
+    }
+#endif
+
   /* CreateFile() with dwDesiredAccess == 0 when called on remote
      share returns some handle, even if file doesn't exist. This code
      works around this bug. */

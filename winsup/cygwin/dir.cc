@@ -340,6 +340,11 @@ mkdir (const char *dir, mode_t mode)
       if (!allow_ntsec && allow_ntea)
 	set_file_attribute (real_dir.has_acls (), real_dir.get_win32 (),
 			    S_IFDIR | ((mode & 07777) & ~cygheap->umask));
+#ifdef HIDDEN_DOT_FILES
+      char *c = strrchr (real_dir.get_win32 (), '\\');
+      if ((c && c[1] == '.') || *real_dir.get_win32 () == '.')
+        SetFileAttributes (real_dir.get_win32 (), FILE_ATTRIBUTE_HIDDEN);
+#endif
       res = 0;
     }
   else

@@ -2605,9 +2605,9 @@ symlink (const char *topath, const char *frompath)
 			    &sa, alloca (4096), 4096);
 
   h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sa,
-		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
+  		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
   if (h == INVALID_HANDLE_VALUE)
-      __seterrno ();
+    __seterrno ();
   else
     {
       BOOL success;
@@ -2651,9 +2651,16 @@ symlink (const char *topath, const char *frompath)
 	    set_file_attribute (win32_path.has_acls (),
 				win32_path.get_win32 (),
 				S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
-	  SetFileAttributesA (win32_path.get_win32 (),
-			      allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
-						: FILE_ATTRIBUTE_SYSTEM);
+
+	  DWORD attr = allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
+	  				 : FILE_ATTRIBUTE_SYSTEM;
+#ifdef HIDDEN_DOT_FILES
+	  cp = strrchr (win32_path, '\\');
+	  if ((cp && cp[1] == '.') || *win32_path == '.')
+	    attr |= FILE_ATTRIBUTE_HIDDEN;
+#endif
+	  SetFileAttributesA (win32_path.get_win32 (), attr);
+
 	  if (win32_path.fs_fast_ea ())
 	    set_symlink_ea (win32_path, topath);
 	  res = 0;

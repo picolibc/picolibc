@@ -1240,7 +1240,16 @@ done:
   else
     {
       /* make the new file have the permissions of the old one */
-      SetFileAttributes (real_new, real_old);
+      DWORD attr = real_old;
+#ifdef HIDDEN_DOT_FILES
+      char *c = strrchr (real_old.get_win32 (), '\\');
+      if ((c && c[1] == '.') || *real_old.get_win32 () == '.')
+        attr &= ~FILE_ATTRIBUTE_HIDDEN;
+      c = strrchr (real_new.get_win32 (), '\\');
+      if ((c && c[1] == '.') || *real_new.get_win32 () == '.')
+        attr |= FILE_ATTRIBUTE_HIDDEN;
+#endif
+      SetFileAttributes (real_new, attr);
 
       /* Shortcut hack, No. 2, part 2 */
       /* if the new filename was an existing shortcut, remove it now if the

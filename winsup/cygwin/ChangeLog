@@ -1,3 +1,12 @@
+2001-11-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (mkdir): Add HIDDEN file attribute if file has leading dot
+	and HIDDEN_DOT_FILES is defined.
+	* fhandler.cc (fhandler_base::open): Ditto.
+	* path.cc (symlink): Ditto.
+	* syscalls.cc (_rename): Ditto and remove HIDDEN file attribute if
+	new filename does not begin with a dot.
+
 2001-11-12  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::read): Revert 2001-10-23
