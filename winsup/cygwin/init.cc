@@ -128,12 +128,6 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       dll_crt0_0 ();
       break;
     case DLL_PROCESS_DETACH:
-      if (myself)
-	{
-	  if (!hExeced && myself->exitcode == EXITCODE_UNSET)
-	    myself->exitcode = 1 << 8;
-	  myself.release ();
-	}
       break;
     case DLL_THREAD_ATTACH:
       munge_threadfunc ();

@@ -140,6 +140,7 @@ pinfo::exit (DWORD n)
   set_exit_state (PID_EXITED);
   if (n != EXITCODE_EXEC)
     self->alert_parent (0);
+  release ();
   
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;

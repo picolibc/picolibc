@@ -1,3 +1,10 @@
+2005-01-13  Christopher Faylor  <cgf@timesys.com>
+
+	* init.cc (dll_entry): Nuke attempt to set exit code since parent will
+	use windows exit code if needed.
+	* pinfo.cc (pinfo::exit): Move release() here to minimize pid creation
+	race (suggested by Pierre Humblet).
+
 2005-01-12  Christopher Faylor  <cgf@timesys.com>
 
 	Reorganize header file inclusion throughout so that cygerrno.h comes
