@@ -55,13 +55,16 @@
 #else /* __GNUC__ */
 # ifdef __declspec
 #  ifndef __MINGW_IMPORT
-
    /* Note the extern. This is needed to work around GCC's
       limitations in handling dllimport attribute.  */
 #   define __MINGW_IMPORT  extern __attribute__((dllimport))
 #  endif
 #  ifndef _CRTIMP
-#   define _CRTIMP  __attribute__((dllimport))
+#   ifdef __USE_CRTIMP
+#    define _CRTIMP  __attribute__((dllimport))
+#   else  
+#    define _CRTIMP
+#   endif
 #  endif
 #  define __DECLSPEC_SUPPORTED
 # else /* __declspec */
