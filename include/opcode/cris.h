@@ -1,5 +1,5 @@
 /* cris.h -- Header file for CRIS opcode and register tables.
-   Copyright (C) 2000 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001 Free Software Foundation, Inc.
    Contributed by Axis Communications AB, Lund, Sweden.
    Originally written for GAS 1.38.1 by Mikael Asker.
    Updated, BFDized and GNUified by Hans-Peter Nilsson.
