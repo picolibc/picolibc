@@ -20,6 +20,8 @@ wget which xpm xpm-nox zip zlib
 
 @end example
 
+(This list is almost certainly out of date as new packages are added.)
+
 Full source code is available for all packages and tools.
 
 There is one recommended way to install Cygwin, which is to use the GUI
@@ -172,36 +174,6 @@ without spaces.
 (If you use the @samp{login} package or anything else that reads
 /etc/passwd, you may need to make corresponding changes there.  See the
 README file for that package.)
-
-@subsection Setup screwed up my mounts!
-
-Setup will remove the following mounts, should you have them:
-
-@example
-	/
-        /usr
-        /usr/bin
-        /usr/lib
-        /var
-        /lib
-        /bin
-        /etc
-@end example
-
-It will then restore (or create new) mounts for /, /usr/bin and /usr/lib
-as follows (assuming the default install root C:\cygwin):
-
-@example
-	Device              Directory
-	C:\cygwin\bin       /usr/bin
-	C:\cygwin\lib       /usr/lib
-	C:\cygwin           /
-@end example
-
-Since setup is not a Cygwin program, it cannot know about your mounts
-(or symlinks, for that matter), and so must impose and enforce this
-structure.  You should not try to defeat it, unless you know what you
-are doing and can deal with the consequences.
 
 @subsection How do I uninstall Cygwin?
 
