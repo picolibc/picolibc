@@ -1,5 +1,9 @@
 2001-10-29  Egor Duda  <deo@logos-m.ru>
 
+	* winsup.api/ltp/stat03.c: Supress compiler warning.
+
+2001-10-29  Egor Duda  <deo@logos-m.ru>
+
 	* winsup.api/signal-into-win32-api.c: Supress compiler warning.
 
 Mon Oct  8 14:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
