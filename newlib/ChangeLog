@@ -1,3 +1,7 @@
+2004-09-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/local.h: Include <stdlib.h>.
+
 2004-09-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdio/fread.c (fread): Include <malloc.h>.
