@@ -136,8 +136,8 @@ tty_list::terminate (void)
 	}
 
       termios_printf ("tty %d master about to finish", ttynum);
-      CloseHandle (t->to_slave);
-      CloseHandle (t->from_slave);
+      ForceCloseHandle1 (t->to_slave, to_pty);
+      ForceCloseHandle1 (t->from_slave, from_pty);
       WaitForSingleObject (tty_master->hThread, INFINITE);
       t->init ();
 
@@ -355,12 +355,14 @@ tty::make_pipes (fhandler_pty_master *ptym)
       return FALSE;
     }
 
+  ProtectHandle1 (to_slave, to_pty);
   if (CreatePipe (&from_slave, &to_master, &sec_all, 0) == FALSE)
     {
       termios_printf ("can't create output pipe");
       set_errno (ENOENT);
       return FALSE;
     }
+  ProtectHandle1 (from_slave, from_pty);
   termios_printf ("tty%d from_slave %p, to_slave %p", ntty, from_slave,
 		  to_slave);
   ptym->set_io_handle (from_slave);

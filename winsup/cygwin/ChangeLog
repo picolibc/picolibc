@@ -1,3 +1,16 @@
+Mon Oct 16 21:36:57 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* debug.cc (add_handle): Issue warning on attempts to add the same
+	handle more than once.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Protect some handles.
+	(fhandler_tty_common::close): Use proper name when closing handles.
+	(fhandler_pty_master::close): Don't close to_slave or from_slave since
+	they've already been closed earlier in the function.
+	* sigproc.cc (proc_subproc): Don't protect vchild->hProcess.  Expect
+	that the caller will do this, instead.
+	* tty.cc (tty_list::terminate): Use proper name when closing handles.
+	(tty::make_pipes): Protect some handles.
+
 Mon Oct 16 18:37:22 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Remove some obsolete stuff.

@@ -258,7 +258,6 @@ proc_subproc (DWORD what, DWORD val)
 
       pchildren[nchildren] = vchild;
       hchildren[nchildren] = vchild->hProcess;
-      ProtectHandle1 (vchild->hProcess, childhProc);
       if (!DuplicateHandle (hMainProc, vchild->hProcess, hMainProc, &vchild->pid_handle,
 			    0, 0, DUPLICATE_SAME_ACCESS))
 	system_printf ("Couldn't duplicate child handle for pid %d, %E", vchild->pid);

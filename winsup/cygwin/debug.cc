@@ -246,8 +246,14 @@ add_handle (const char *func, int ln, HANDLE h, const char *name)
   handle_list *hl;
   lock_debug ();
 
-  if (find_handle (h))
-    goto out;		/* Already did this once */
+  if ((hl = find_handle (h)))
+    {
+      system_printf ("%s:%d - multiple attempts to add handle %s<%p>", func,
+		     ln, name, h);
+      system_printf (" previously allocated by %s:%d(%s<%p>)",
+		     hl->func, hl->ln, hl->name, hl->h);
+      goto out;		/* Already did this once */
+    }
 
   if ((hl = newh()) == NULL)
     {

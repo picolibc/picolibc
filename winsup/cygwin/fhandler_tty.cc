@@ -503,6 +503,7 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
       return 0;
     }
   set_io_handle (nh);
+  ProtectHandle1 (nh, from_pty);
   termios_printf ("duplicated from_master %p->%p from tty_owner %p",
 		  get_ttyp ()->from_master, nh, tty_owner);
   if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master, hMainProc, &nh, 0, TRUE,
@@ -513,6 +514,7 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
       return 0;
     }
   set_output_handle (nh);
+  ProtectHandle1 (nh, to_pty);
   CloseHandle (tty_owner);
 
   termios_printf("tty%d opened", ttynum);
@@ -886,9 +888,9 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (inuse), %E");
   if (!ForceCloseHandle (output_mutex))
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
-  if (!CloseHandle (get_handle ()))
+  if (!ForceCloseHandle1 (get_handle (), from_pty))
     termios_printf ("CloseHandle (get_handle ()<%p>), %E", get_handle ());
-  if (!CloseHandle (get_output_handle ()))
+  if (!ForceCloseHandle1 (get_output_handle (), to_pty))
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
   inuse = NULL;
@@ -908,10 +910,12 @@ fhandler_pty_master::close ()
   if (!get_ttyp ()->master_alive ())
     {
       termios_printf ("freeing tty%d (%d)", ttynum, get_ttyp ()->ntty);
+#if 0
       if (get_ttyp ()->to_slave)
-	CloseHandle (get_ttyp ()->to_slave);
+	ForceCloseHandle1 (get_ttyp ()->to_slave, to_slave);
       if (get_ttyp ()->from_slave)
-	CloseHandle (get_ttyp ()->from_slave);
+	ForceCloseHandle1 (get_ttyp ()->from_slave, from_slave);
+#endif
       if (get_ttyp ()->from_master)
 	CloseHandle (get_ttyp ()->from_master);
       if (get_ttyp ()->to_master)
@@ -1037,6 +1041,8 @@ fhandler_pty_master::set_close_on_exec (int val)
     {
       get_ttyp ()->from_slave = get_handle ();
       get_ttyp ()->to_slave = get_output_handle ();
+      termios_printf ("from_slave %p, to_slave %p", get_handle (),
+		      get_output_handle ());
     }
 }
 
