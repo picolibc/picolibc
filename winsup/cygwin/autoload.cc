@@ -263,6 +263,7 @@ wsock_init ()
     {
       int (*wsastartup) (int, WSADATA *);
 
+      /* Don't use autoload to load WSAStartup to eliminate recursion. */
       wsastartup = (int (*)(int, WSADATA *))
 		   GetProcAddress ((HMODULE) (dll->handle), "WSAStartup");
       if (wsastartup)
