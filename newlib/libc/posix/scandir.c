@@ -33,6 +33,7 @@
 
 #include <sys/cdefs.h>
 __SCCSID("@(#)scandir.c	8.3 (Berkeley) 1/2/94");
+__FBSDID("$FreeBSD$");
 
 /*
  * Scan the directory dirname calling select to make a list of selected
@@ -64,15 +65,11 @@ __SCCSID("@(#)scandir.c	8.3 (Berkeley) 1/2/94");
     (offsetof (struct dirent, d_name) + ((strlen((dp)->d_name)+1 + 3) &~ 3))
 #endif
 
-#ifndef __P
-#define __P(args) ()
-#endif
 
 int
-scandir (const char *dirname,
-	struct dirent ***namelist,
-	int (*select) __P((const struct dirent *)),
-	int (*dcomp) __P((const struct dirent **, const struct dirent **)))
+scandir(const char *dirname, struct dirent ***namelist,
+    int (*select)(const struct dirent *), int (*dcomp)(const struct dirent **,
+	const struct dirent **))
 {
 	register struct dirent *d, *p, **names;
 	register size_t nitems;
