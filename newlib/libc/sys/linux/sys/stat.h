@@ -7,14 +7,15 @@
 #define _SYS_STAT_H
 
 #include <asm/stat.h>
+#include <_ansi.h>
+#include <sys/types.h>
+#include <linux/time.h>
 #define __KERNEL__
 #include <linux/stat.h>
 #undef __KERNEL__
 
 /* --- redundant stuff below --- */
 
-#include <_ansi.h>
-#include <sys/types.h>
 
 int     _EXFUN(fstat,( int __fd, struct stat *__sbuf ));
 int     _EXFUN(mkdir,( const char *_path, mode_t __mode ));

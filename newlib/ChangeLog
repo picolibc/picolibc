@@ -1,3 +1,12 @@
+2004-12-02  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/sys/linux/stdlib/glob.c: Include <sys/types.h> which defines
+	time_t before including sys/stat.h, which uses it.
+	* libc/sys/linux/sys/stat.h: Include <sys/types.h> and
+	<linux/time.h> just prior to definition of __KERNEL__ so as to
+	allow building on Debian Linux where otherwise, mktime would
+	be redefined.
+
 2004-11-26  Paul Brook  <paul@codesourcery.com>
 
 	* libc/sys/arm/crt0.S (_start): Add .cantunwind annotation.

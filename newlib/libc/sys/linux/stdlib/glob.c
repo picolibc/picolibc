@@ -66,6 +66,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.19 2002/02/01 01:32:19 obrien Ex
  */
 
 #include <sys/param.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 
 #include <ctype.h>
