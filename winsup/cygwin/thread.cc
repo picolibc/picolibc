@@ -1791,20 +1791,22 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   InterlockedIncrement (&((*themutex)->condwaits));
   if (pthread_mutex_unlock (&(*cond)->cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %p", *cond);
+  /* At this point calls to Signal will progress evebn if we aren' yet waiting
+   * However, the loop there should allow us to get scheduled and call wait,
+   * and have them call PulseEvent again if we dont' respond.
+   */
   rv = (*cond)->TimedWait (waitlength);
   /* this may allow a race on the mutex acquisition and waits..
    * But doing this within the cond access mutex creates a different race
    */
-  bool last = false;
-  if (InterlockedDecrement (&((*cond)->waiting)) == 0)
-    last = true;
+  InterlockedDecrement (&((*cond)->waiting));
   /* Tell Signal that we have been released */
   InterlockedDecrement (&((*cond)->ExitingWait));
   (*themutex)->Lock ();
-  if (last == true)
-    (*cond)->mutex = NULL;
   if (pthread_mutex_lock (&(*cond)->cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %p", *cond);
+  if ((*cond)->waiting == 0)
+    (*cond)->mutex = NULL;
   InterlockedDecrement (&((*themutex)->condwaits));
   if (pthread_mutex_unlock (&(*cond)->cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %p", *cond);

@@ -1,3 +1,9 @@
+2002-05-02  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (__pthread_cond_dowait): Fix a race on signalling from a
+	thread woken by the same condition variable it's signalling on. Thanks
+	to Michael Beach for the report and test case.
+
 2002-05-02  Christopher Faylor  <cgf@redhat.com>
 
 	* path.h (pathconv_arg): Add PC_POSIX.
@@ -44,6 +50,7 @@ Wed May  1 16:06:02 2002  Jason Tishler <jason@tishler.net>
 
 	* include/cygwin/types.h: Include <sys/sysmacros.h>.
 
+>>>>>>> 1.1179
 Wed Apr 17 11:27:04 2002  Jason Tishler <jason@tishler.net>
 
 	* security.cc (get_lsa_srv_inf): Prevent extraneous backslashes for
