@@ -1,5 +1,6 @@
 2000-02-28  Mumit Khan  <khan@xraylith.wisc.edu>
 
+	* lib/ole32.def: Add missing exports.
 	* include/winbase.h (TLS_MINIMUM_AVAILABLE): Move macro from here
 	* include/winnt.h (TLS_MINIMUM_AVAILABLE): to here.
 	(NT_TIB): Define.
