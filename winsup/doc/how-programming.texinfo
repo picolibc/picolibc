@@ -546,9 +546,6 @@ invoked in your Makefiles.
 
 @subsection What preprocessor do I need to know about?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 We use _WIN32 to signify access to the Win32 API and __CYGWIN__ for
 access to the Cygwin environment provided by the dll.
 
@@ -558,9 +555,6 @@ to follow their example.  We use _MFC_VER to indicate code that should
 be compiled with VC++.
 
 @subsection How should I port my Unix GUI to Windows?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 There are two basic strategies for porting Unix GUIs to Windows.
 
