@@ -421,10 +421,25 @@ fhandler_console::read (void *pv, size_t& buflen)
 	      if (mouse_event.dwEventFlags)
 		continue;
 
-	      /* If the mouse event occurred out of the area we can handle,
-		 ignore it. */
+	      /* Retrieve reported mouse position */
 	      int x = mouse_event.dwMousePosition.X;
 	      int y = mouse_event.dwMousePosition.Y;
+
+	      /* Adjust mouse position by scroll buffer offset */
+	      CONSOLE_SCREEN_BUFFER_INFO now;
+	      if (GetConsoleScreenBufferInfo (get_output_handle (), &now))
+		{
+		  y -= now.srWindow.Top;
+		  x -= now.srWindow.Left;
+		}
+	      else
+		{
+		  syscall_printf ("mouse: cannot adjust position by scroll buffer offset");
+		  continue;
+		}
+
+	      /* If the mouse event occurred out of the area we can handle,
+		 ignore it. */
 	      if ((x + ' ' + 1 > 0xFF) || (y + ' ' + 1 > 0xFF))
 		{
 		  syscall_printf ("mouse: position out of range");

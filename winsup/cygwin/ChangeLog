@@ -1,3 +1,8 @@
+2004-12-14  Thomas Wolff  <towo@computer.org>
+
+	* fhandler_console.cc (read): Consider offset within scrolling
+	region of the console window.
+
 2004-12-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (cwdstuff::get_drive): Release cwd_lock.
