@@ -1,3 +1,7 @@
+2003-02-26  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* sec_helper.cc (get_sids_info): debug_print owner_sid and group_sid.
+
 2003-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap64): Fix returned address by taking the granularity
