@@ -1,3 +1,34 @@
+2002-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc: Change some formatting.
+	* include/cygwin/version.h: Bump API minor version.
+
+2002-07-28 Pierre Humblet <Pierre.Humblet@ieee.org>
+
+        * cygheap.h (class cygheap_user): Add member groups.
+        * security.h (class cygsidlist): Add members type and maxcount,
+        methods position, addfromgr, alloc_sids and free_sids and
+        operator+= (const PSID psid). Modify contains () to call
+        position () and optimize add () to use maxcount.
+        (class user_groups): Create.
+        Update declarations of verify_token and create_token.
+        * security.cc (cygsidlist::alloc_sids): New.
+        (cygsidlist::free_sids): New.
+        (get_token_group_sidlist): Create from get_group_sidlist.
+        (get_initgroups_sidlist): Create from get_group_sidlist.
+        (get_group_sidlist): Suppress.
+        (get_setgroups_sidlist): Create.
+        (verify_token): Modify arguments. Add setgroups case.
+        (create_token): Modify arguments. Call get_initgroups_sidlist and
+        get_setgroups_sidlist as needed. Set SE_GROUP_LOGON_ID from auth_pos
+        outside of the loop. Rename the various group sid lists consistently.
+        * syscalls.cc (seteuid32): Modify to use cygheap->user.groups.
+        (setegid32): Call cygheap->user.groups.update_pgrp.
+        * grp.cc (setgroups): Create.
+        (setgroups32): Create.
+        * uinfo.cc (internal_getlogin): Initialize and update user.groups.pgsid.
+        * cygwin.din: Add setgroups and setgroups32.
+
 2002-07-28  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::read): Use appropriate

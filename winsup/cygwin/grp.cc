@@ -457,3 +457,64 @@ initgroups (const char *, __gid16_t)
 {
   return 0;
 }
+
+/* setgroups32: standards? */
+extern "C"
+int
+setgroups32 (int ngroups, const __gid32_t *grouplist)
+{
+  if (ngroups < 0 || (ngroups > 0 && !grouplist))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  if (!wincap.has_security ())
+    return 0;
+
+  cygsidlist gsids (cygsidlist_alloc, ngroups);
+  struct __group32 *gr;
+
+  if (ngroups && !gsids.sids)
+    return -1;
+
+  for (int gidx = 0; gidx < ngroups; ++gidx)
+    {
+      for (int gidy = 0; gidy < gidx; gidy++)
+	if (grouplist[gidy] == grouplist[gidx])
+	  goto found; /* Duplicate */
+      for (int gidy = 0; (gr = internal_getgrent (gidy)); ++gidy)
+	if (gr->gr_gid == (__gid32_t) grouplist[gidx])
+	  {
+	    if (gsids.addfromgr (gr))
+	      goto found;
+	    break;
+	  }
+      debug_printf ("No sid found for gid %d", grouplist[gidx]);
+      gsids.free_sids ();
+      set_errno (EINVAL);
+      return -1;
+    found:
+      continue;
+    }
+  cygheap->user.groups.update_supp (gsids);
+  return 0;
+}
+
+extern "C"
+int
+setgroups (int ngroups, const __gid16_t *grouplist)
+{
+  __gid32_t *grouplist32 = NULL;
+
+  if (ngroups > 0 && grouplist)
+    {
+      grouplist32 = (__gid32_t *) alloca (ngroups * sizeof (__gid32_t));
+      if (grouplist32 == NULL)
+	return -1;
+      for (int i = 0; i < ngroups; i++)
+        grouplist32[i] = grouplist[i];
+    }
+  return setgroups32 (ngroups, grouplist32);
+
+}

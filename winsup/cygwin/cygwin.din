@@ -678,6 +678,9 @@ _setdtablesize = setdtablesize
 setgid
 _setgid = setgid
 setgid32
+setgroups
+_setgroups = setgroups
+setgroups32
 setjmp
 _setjmp = setjmp
 setlocale
