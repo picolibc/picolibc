@@ -1,4 +1,9 @@
-2001-12-17  Robret Collins  <rbtcollins@hotmail.com>
+2001-12-17  Guido Serassio <serassio@libero.it>
+
+	* include/winsvc.h: Add ChangeServiceConfig2() &
+	QueryServiceConfig2() definition
+    
+2001-12-17  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/commctrl.h: New typedefs for HDLAYOUT and LPHDLAYOUT based
 	on MSDN documentation for XP.
