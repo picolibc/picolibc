@@ -616,15 +616,16 @@ fhandler_tty_slave::close ()
 		  fhandler_console::open_fhs, archetype->usecount);
   if (--archetype->usecount)
     {
+#ifdef DEBUGGING
+      if (archetype->usecount < 0)
+	system_printf ("usecount %d", archetype->usecount);
+#endif
       termios_printf ("just exiting because archetype usecount is > 0");
       return 0;
     }
 
   termios_printf ("closing last open %s handle", pc.dev.name);
-  fhandler_tty_slave *arch = (fhandler_tty_slave *) archetype;
-  int res = fhandler_tty_common::close ();
-  cygheap->fdtab.delete_archetype (arch);
-  return res;
+  return fhandler_tty_common::close ();
 }
 
 int
@@ -910,7 +911,7 @@ fhandler_tty_slave::dup (fhandler_base *child)
   fhandler_console::open_fhs++;
   fhandler_tty_slave *arch = (fhandler_tty_slave *) archetype;
   *(fhandler_tty_slave *) child = *arch;
-  archetype->usecount++;
+  arch->usecount++;
   child->usecount = 0;
   myself->set_ctty (get_ttyp (), openflags, arch);
   termios_printf ("incremented open_fhs %d, archetype usecount %d",
@@ -1331,7 +1332,7 @@ fhandler_pty_master::ptsname ()
 void
 fhandler_tty_common::set_close_on_exec (int val)
 {
-  if (get_major () == DEV_TTYS_MAJOR)
+  if (archetype)
     set_close_on_exec_flag (val);
   else
     {

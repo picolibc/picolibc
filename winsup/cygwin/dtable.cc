@@ -188,6 +188,7 @@ dtable::delete_archetype (fhandler_base *fh)
   for (unsigned i = 0; i < narchetypes; i++)
     if (fh == archetypes[i])
       {
+	debug_printf ("deleting archive element %d for %s", i, fh->get_name ());
 	if (i < --farchetype)
 	  archetypes[i] = archetypes[farchetype];
 	break;
@@ -218,7 +219,10 @@ dtable::release (int fd)
     {
       if (fds[fd]->need_fixup_before ())
 	dec_need_fixup_before ();
+      fhandler_base *arch = fds[fd]->archetype;
       delete fds[fd];
+      if (arch && !arch->usecount)
+	cygheap->fdtab.delete_archetype (arch);
       fds[fd] = NULL;
     }
 }
@@ -697,6 +701,8 @@ dtable::vfork_child_dup ()
 
   /* Remove impersonation */
   cygheap->user.deimpersonate ();
+  if (cygheap->ctty)
+    cygheap->ctty->usecount++;
 
   for (size_t i = 0; i < size; i++)
     if (not_open (i))
@@ -746,16 +752,16 @@ dtable::vfork_child_fixup ()
   fds = fds_on_hold;
 
   fhandler_base *fh;
-  for (int i = 0; i < (int) cygheap->fdtab.size; i++)
-    if ((fh = cygheap->fdtab[i]) != NULL)
+  for (int i = 0; i < (int) size; i++)
+    if ((fh = fds[i]) != NULL)
       {
 	fh->clear_readahead ();
-	if (fh->get_close_on_exec ())
+	if (!fh->archetype && fh->get_close_on_exec ())
 	  release (i);
 	else
 	  {
 	    fh->close ();
-	    cygheap->fdtab.release (i);
+	    release (i);
 	  }
       }
 

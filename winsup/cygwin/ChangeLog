@@ -1,5 +1,20 @@
 2003-12-12  Christopher Faylor  <cgf@redhat.com>
 
+	* dtable.cc (dtable::delete_archetype): Add debugging.
+	(dtable::release): Move archetype deletion here.
+	(dtable::vfork_child_dup): Increment ctty usecount to catch later
+	close_all_files case in parent/child.
+	(dtable::vfork_child_fixup): Avoid using cygheap->foo where this should
+	really be using local references.  Call close on archetyped handles
+	since the handles haven't had the noninherit flag set.
+	* fhandler_tty.cc (fhandler_tty_slave::close): Remove archetype
+	deletion code.  Add defensive error message when DEBUGGING.
+	(fhandler_tty_common::set_close_on_exec): Use more robust method for
+	checking whether to set handles into noninherit if there is an
+	archetype associated with the fhandler.
+
+2003-12-12  Christopher Faylor  <cgf@redhat.com>
+
 	* dcrt0.cc (alloc_stack): Move _main_tls if stack is relocated.
 
 2003-12-11  Christopher Faylor  <cgf@redhat.com>
