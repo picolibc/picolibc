@@ -1,3 +1,7 @@
+Thu May 25 18:28:10 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Don't assume that cinstall directory exists.
+
 2000-05-24  DJ Delorie  <dj@cygnus.com>
 
 	* Makefile.common (%.o): further simplify, add "..." to make it
