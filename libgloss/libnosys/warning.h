@@ -35,9 +35,10 @@
 # define link_warning(symbol, msg)
 #endif
 
-/* A canned warning for sysdeps/stub functions.  */
+/* A canned warning for sysdeps/stub functions.
+   The GNU linker prepends a "warning: " string.  */
 #define stub_warning(name) \
   link_warning (name, \
-                "warning: " #name " is not implemented and will always fail")
+                #name " is not implemented and will always fail")
 
 #endif /* __WARNING_H__ */
