@@ -1,3 +1,17 @@
+2002-06-24  Casper S. Hornstrup  <chorns@users.sourceforge.net>
+
+	* include/winnt.h (PCCHAR, FCHAR, FSHORT, FLONG,
+	PLUID_AND_ATTRIBUTES,PSECURITY_IMPERSONATION_LEVEL,
+	PSID_AND_ATTRIBUTES, PTOKEN_TYPE, PTOKEN_STATISTICS):
+	Add typedefs.
+	(CCHAR): Correct typedef.
+	(PROCESS_SET_SESSIONID, SECURITY_*,SECTION_MAP_EXECUTE):
+	Add defines.
+
+2002-06-24  Casper S. Hornstrup  <chorns@users.sourceforge.net>
+
+	* README.w32api: Correct spelling error.
+
 2002-06-19  Casper S. Hornstrup  <chorns@users.sourceforge.net>
 
 	* include/winuser.h (FLASHW_*,INPUT_MOUSE,INPUT_KEYBOARD,
