@@ -17,7 +17,7 @@
 #ifndef __FBSDID
 #define __FBSDID(s)	const char version[] = (s)
 #endif
-__FBSDID("$FreeBSD: /usr/local/www/cvsroot/FreeBSD/src/sys/kern/sysv_sem.c,v 1.66 2003/11/10 07:22:41 tjr Exp $");
+__FBSDID("$FreeBSD: /usr/local/www/cvsroot/FreeBSD/src/sys/kern/sysv_sem.c,v 1.67 2003/11/15 11:56:53 tjr Exp $");
 
 #define _KERNEL 1
 #define __BSD_VISIBLE 1
@@ -228,6 +228,7 @@ seminit(void)
 	for (i = 0; i < seminfo.semmni; i++) {
 		sema[i].sem_base = 0;
 		sema[i].sem_perm.mode = 0;
+		sema[i].sem_perm.seq = 0;
 	}
 	for (i = 0; i < seminfo.semmni; i++)
 		mtx_init(&sema_mtx[i], "semid", NULL, MTX_DEF);

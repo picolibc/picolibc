@@ -726,6 +726,8 @@ main (const int argc, char *argv[])
   if (wincap.has_security () && !setup_privileges ())
     panic ("Setting process privileges failed.");
 
+  ipcinit ();
+
   /*XXXXX*/
   threaded_queue request_queue (request_threads);
 
@@ -739,11 +741,7 @@ main (const int argc, char *argv[])
   request_queue.add_submission_loop (&submission_loop);
 
   if (transport->listen () == -1)
-    {
-      exit (1);
-    }
-
-  ipcinit ();
+    return 1;
 
   cache.start ();
 

@@ -1,5 +1,12 @@
 2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygserver.cc (main): Move call to ipcinit() up before installing
+	any threads.
+	* sysv_sem.cc: Update to FreeBSD version 1.67.
+	(seminit): Initialize semaphore sequence numbers to 0.
+
+2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (CYGWIN_LIB): Variable pointing to libcygwin.a in
 	the parallel cygwin dir.
 	(cygserver.exe): Depend on and link against $CYGWIN_LIB.
