@@ -1,3 +1,12 @@
+Mon Sep 18 23:17:19 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.h: Create new input path flag PATH_NEEDDIR.
+	* path.cc (path::check): Detect trailing slash before converting to
+	windows path.  Tell symlink_info::check to check for directory if one is
+	found.
+	(symlink_info::check): Set errno when path is not a directory if
+	pflags & PATH_NEEDDIR.
+
 Mon Sep 18 19:44:08 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::write): Correct typo which

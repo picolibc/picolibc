@@ -189,6 +189,16 @@ path_conv::check (const char *src, unsigned opt,
   for (;;)
     {
       MALLOC_CHECK;
+      DWORD need_directory = 0;
+      char *p = strrchr (src, '/');
+      if (p)
+	{
+	  if (strcmp (p, "/") == 0 || strcmp (p, "/.") == 0)
+	    need_directory = PATH_NEEDDIR;
+	}
+      else if ((p = strrchr (src, '\\')) &&
+	       (strcmp (p, "\\") == 0 || strcmp (p, "\\.") == 0))
+	need_directory = PATH_NEEDDIR;
       /* Must look up path in mount table, etc.  */
       error = cygwin_shared->mount.conv_to_win32_path (src, rel_path,
 						       full_path,
@@ -247,7 +257,7 @@ path_conv::check (const char *src, unsigned opt,
 	  else
 	    {
 	      suff = suffixes;
-	      sym.pflags = path_flags;
+	      sym.pflags = path_flags | need_directory;
 	    }
 
 	  int len = sym.check (path_copy, suff);
@@ -317,7 +327,6 @@ path_conv::check (const char *src, unsigned opt,
 	  }
 
       /* Copy tail of full_path to discovered symlink. */
-      char *p;
       for (p = sym.contents + buflen; *tail; tail++)
 	*p++ = *tail == '\\' ? '/' : *tail;
       *p = '\0';
@@ -2175,6 +2184,7 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
   HANDLE h;
   int res = 0;
   char extbuf[MAX_PATH + 5];
+  int needdir;
   const char *path = in_path;
 
   if (!suffixes)
@@ -2193,6 +2203,13 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
   is_symlink = TRUE;
 
   error = 0;
+  if (!(pflags & PATH_NEEDDIR))
+    needdir = 0;
+  else
+    {
+      pflags &= ~PATH_NEEDDIR;
+      needdir = 1;
+    }
   do
     {
       if (!next_suffix (ext_here, suffixes))
@@ -2217,7 +2234,8 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 
       char *p = strrchr (path, '\\');
       if (p && !(fileattr & FILE_ATTRIBUTE_DIRECTORY) &&
-	  (*++p == '\0' || (*p == '.' && (*++p == '\0' || (*p == '.' && p[1] == '\0')))))
+	  (needdir || *++p == '\0' ||
+	   (*p == '.' && (*++p == '\0' || (*p == '.' && p[1] == '\0')))))
 	{
 	  debug_printf ("%s is a non-directory", path);
 	  error = ENOTDIR;
