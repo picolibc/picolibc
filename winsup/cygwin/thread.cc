@@ -231,9 +231,10 @@ pthread::init_mainthread ()
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
 			GetCurrentProcess (), &thread->win32_obj_id,
 			0, FALSE, DUPLICATE_SAME_ACCESS))
-    thread->win32_obj_id = NULL;
+    api_fatal ("failed to create mainthread handle");
   thread->set_tls_self_pointer ();
-  (void) thread->create_cancel_event ();
+  if (!thread->create_cancel_event ())
+    api_fatal ("couldn't create cancel event for main thread");
   thread->postcreate ();
 }
 
@@ -289,7 +290,7 @@ pthread::create_cancel_event ()
   cancel_event = ::CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   if (!cancel_event)
     {
-      system_printf ("couldn't create cancel event for main thread, %E");
+      system_printf ("couldn't create cancel event, %E");
       /* we need the event for correct behaviour */
       return false;
     }
