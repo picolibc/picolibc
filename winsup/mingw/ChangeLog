@@ -1,3 +1,9 @@
+2003-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/mingw-fseek.c (INLINE): Remove define.
+	(__mingw_is_win9x): Remove static inline function.
+	(_mingw_fwrite): Use _osver instead of __mingw_is_win9x.
+
 2003-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/llround.c: Correct function name and

@@ -8,41 +8,10 @@
 #include <windows.h>
 #include <stdio.h>
 #include <io.h>
-
-#ifdef __GNUC__
-# define INLINE __inline__
-#elif defined _MSC_VER
-# define INLINE __inline
-#else 
-# define INLINE
-#endif
+#include <stdlib.h>
 
 #define ZEROBLOCKSIZE 512
 static int __mingw_fseek_called;
-
-/* FIXME: put this in startup code and make os_platform_id global?
-   Or just get _osver from msvcrt.dll and bitest (_osver & 0x8000)? */
-
-INLINE 
-static
-int
-__mingw_is_win9x (void)
-{
-  static DWORD os_platform_id =  -1 ;
-
-  if (os_platform_id == -1)
-    {
-      OSVERSIONINFO os_version_info;
-      memset (&os_version_info, 0, sizeof (OSVERSIONINFO));
-      os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-      GetVersionEx (&os_version_info);
-
-      os_platform_id = os_version_info.dwPlatformId;
-    }
- 
-  /* Don't even bother to check for Win32s. */
-  return os_platform_id == VER_PLATFORM_WIN32_WINDOWS;
-}
 
 /* The fseek in Win9x runtime does not zero out the file if seeking past
    the end; if you don't want random stuff from your disk included in your
@@ -64,7 +33,7 @@ int
 __mingw_fwrite (const void *buffer, size_t size, size_t count, FILE *fp)
 {
 # undef fwrite 
-  if ( __mingw_is_win9x () &&  __mingw_fseek_called)
+  if ((_osver & 0x8000) &&  __mingw_fseek_called)
     {
       DWORD actual_length, current_position;
       __mingw_fseek_called = 0;
