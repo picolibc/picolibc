@@ -340,6 +340,12 @@
 
 2002-06-19  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.cc (fhandler_base::set_flags): Change priority of "linked
+	in" default binmode setting so that it has priority over optional
+	setting.
+
+2002-06-19  Christopher Faylor  <cgf@redhat.com>
+
 	Use hMainProc where appropriate, throughout. 
 	* environ.cc (spenv::retrieve): Add debugging statements.
 
