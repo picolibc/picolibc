@@ -108,8 +108,18 @@ LIBS = libcrtdll.a libmsvcrt.a libmsvcrt20.a libmsvcrt40.a libmingw32.a \
 
 DLLS = $(THREAD_DLL_NAME)
 
-all : $(CRT0S) $(LIBS) $(DLLS)
+all_dlls_host = @all_dlls_host@
+install_dlls_host = @install_dlls_host@
+
+all : $(CRT0S) $(LIBS) $(all_dlls_host)
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
+
+all_dlls_host: $(DLLS)
+
+install_dlls_host:
+	for i in $(DLLS); do \
+		$(INSTALL_PROGRAM) $$i $(bindir)/$$i ; \
+	done
 
 _libm_dummy.o:
 	rm -f _libm_dummy.c
@@ -190,11 +200,8 @@ info-html:
 
 install-info: info
 
-install: all
+install: all $(install_dlls_host)
 	$(mkinstalldirs) $(bindir)
-	for i in $(DLLS); do \
-		$(INSTALL_PROGRAM) $$i $(bindir)/$$i ; \
-	done
 	$(mkinstalldirs) $(tooldir)/lib 
 	for i in $(LIBS); do \
 		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
