@@ -179,6 +179,11 @@ pathmatch (const char *path1, const char *path2)
   				      : strcasematch (path1, path2);
 }
 
+#define add_ext_from_sym(sym) \
+  (void)(sym.ext_here && *sym.ext_here && \
+  	  ( known_suffix = this->path + sym.extn, \
+	    (sym.ext_tacked_on && strcpy (known_suffix, sym.ext_here))))
+
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
    passing to Win32 API routines.
 
@@ -331,12 +336,7 @@ path_conv::check (const char *src, unsigned opt,
 		  if (component == 0)
 		    {
 		      fileattr = sym.fileattr;
-		      if (sym.ext_here && *sym.ext_here)
-			{
-			  known_suffix = this->path + sym.extn;
-			  if (sym.ext_tacked_on)
-			    strcpy (known_suffix, sym.ext_here);
-			}
+		      add_ext_from_sym (sym);
 		    }
 		  if (pcheck_case == PCHECK_RELAXED)
 		    goto out;	// file found
@@ -361,12 +361,7 @@ path_conv::check (const char *src, unsigned opt,
 			  strcpy (path, sym.contents);
 			  goto out;
 			}
-		      if (sym.ext_here && *sym.ext_here)
-			{
-			  known_suffix = this->path + sym.extn;
-			  if (sym.ext_tacked_on)
-			    strcpy (known_suffix, sym.ext_here);
-			}
+		      add_ext_from_sym (sym);
 		      if (pcheck_case == PCHECK_RELAXED)
 		        goto out;
 		      /* Avoid further symlink evaluation. Only case checks are
@@ -436,12 +431,8 @@ path_conv::check (const char *src, unsigned opt,
     }
 
 /*fillin:*/
-  if (sym.ext_here && *sym.ext_here && !(opt & PC_SYM_CONTENTS))
-    {
-      known_suffix = this->path + sym.extn;
-      if (sym.ext_tacked_on)
-	strcpy (known_suffix, sym.ext_here);
-    }
+  if (!(opt & PC_SYM_CONTENTS))
+    add_ext_from_sym (sym);
 
 out:
   /* Deal with Windows stupidity which considers filename\. to be valid

@@ -1,4 +1,9 @@
-Thu Apr 17 23:19:00 2001  Corinna Vinschen <corinna@vinschen.de>
+Fri Apr 13  9:52:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (add_ext_from_sym): New define evaluating `known'suffix'.
+	(path_conv::check): Use add_ext_from_sym throughout.
+
+Thu Apr 12 23:19:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* dir.cc (mkdir): Check for case clash.
 	* environ.cc: Add extern declaration for `pcheck_case'.
