@@ -22,6 +22,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "security.h"
+#include "sys/cygwin.h"
 
 #define PAGE_CNT(bytes) howmany(bytes,getpagesize())
 
@@ -739,13 +740,32 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
   else
     protect = PAGE_READONLY;
 
-  HANDLE h = CreateFileMapping (get_handle (),
-  				&sec_none,
-				protect,
-				0,
-  				get_handle () == INVALID_HANDLE_VALUE ? len : 0,
-				NULL);
-  if (h == 0)
+  HANDLE h;
+
+  /* On 9x/ME try first to open the mapping by name when opening a
+     shared file object. This is needed since 9x/ME only shares
+     objects between processes by name. What a mess... */
+  if (os_being_run != winNT
+      && get_handle () != INVALID_HANDLE_VALUE
+      && get_device () == FH_DISK
+      && !(access & FILE_MAP_COPY))
+    {
+      /* Grrr, the whole stuff is just needed to try to get a reliable
+         mapping of the same file. Even that uprising isn't bullet
+	 proof but it does it's best... */
+      char namebuf[MAX_PATH];
+      cygwin_conv_to_full_posix_path (get_name (), namebuf);
+      for (int i = strlen (namebuf) - 1; i >= 0; --i)
+        namebuf[i] = cyg_tolower (namebuf [i]);
+
+      if (!(h = OpenFileMapping (access, TRUE, namebuf)))
+	h = CreateFileMapping (get_handle(), &sec_none, protect, 0, 0, namebuf);
+    }
+  else
+    h = CreateFileMapping (get_handle (), &sec_none, protect, 0,
+			   get_handle () == INVALID_HANDLE_VALUE ? len : 0,
+			   NULL);
+  if (!h)
     {
       __seterrno ();
       syscall_printf ("-1 = mmap(): CreateFileMapping failed with %E");
