@@ -1,3 +1,13 @@
+2003-06-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc: Include cygthread.h.
+	(class sock_event): Remove.
+	(thread_connect): New function.
+	(thread_accept): Ditto.
+	(fhandler_socket::connect): Use cygthread instead of socket event
+	handling for blocking sockets.
+	(fhandler_socket::accept): Ditto.
+
 2003-06-02  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::write): Correct minor printf formatting
@@ -5,8 +15,8 @@
 
 2003-06-01  Pierre Humblet  <pierre.humblet@ieee.org>
 
-        * fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Assume
-        an existing directory is a root if FindFirstFile fails.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Assume
+	an existing directory is a root if FindFirstFile fails.
 
 2003-05-30  Christopher Faylor  <cgf@redhat.com>
 

@@ -32,6 +32,7 @@
 #include "cygheap.h"
 #include "sigproc.h"
 #include "wsock_event.h"
+#include "cygthread.h"
 #include <unistd.h>
 
 #define ENTROPY_SOURCE_DEV_UNIT 9
@@ -119,85 +120,29 @@ get_inet_addr (const struct sockaddr *in, int inlen,
     }
 }
 
-class sock_event
+struct sock_thread_data
 {
-  WSAEVENT ev[2];
-  SOCKET evt_sock;
-  int evt_type_bit;
-
-public:
-  sock_event ()
-    {
-      ev[0] = WSA_INVALID_EVENT;
-      ev[1] = signal_arrived;
-    }
-  ~sock_event ()
-    {
-      if (ev[0] != WSA_INVALID_EVENT)
-        WSACloseEvent (ev[0]);
-    }
-  void load (SOCKET sock, int type_bit)
-    {
-      if (!winsock2_active)
-        /* Can not wait for signal if winsock2 is not active */
-        return;
-
-      if (ev[0] == WSA_INVALID_EVENT)
-        if ((ev[0] = WSACreateEvent ()) == WSA_INVALID_EVENT)
-          return;
-
-      evt_sock = sock;
-      evt_type_bit = type_bit;
-      if (WSAEventSelect (evt_sock, ev[0], 1 << evt_type_bit))
-	{
-	  WSACloseEvent (ev[0]);
-	  ev[0] = WSA_INVALID_EVENT;
-	}
-    }
-  int wait ()
-    {
-      WSANETWORKEVENTS sock_event;
-      int wait_result;
-
-      if (ev[0] == WSA_INVALID_EVENT)
-        return 0;
-
-      wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
-						  FALSE);
-      if (wait_result == WSA_WAIT_EVENT_0)
-	WSAEnumNetworkEvents (evt_sock, ev[0], &sock_event);
-
-      /* Cleanup,  Revert to blocking. */
-      WSAEventSelect (evt_sock, ev[0], 0);
-      unsigned long nonblocking = 0;
-      ioctlsocket (evt_sock, FIONBIO, &nonblocking);
-
-      switch (wait_result)
-	{
-	  case WSA_WAIT_EVENT_0:
-	    if ((sock_event.lNetworkEvents & (1 << evt_type_bit))
-		&& sock_event.iErrorCode[evt_type_bit])
-	      {
-		WSASetLastError (sock_event.iErrorCode[evt_type_bit]);
-		set_winsock_errno ();
-		return -1;
-	      }
-	    break;
-
-	  case WSA_WAIT_EVENT_0 + 1:
-	    debug_printf ("signal received");
-	    set_errno (EINTR);
-	    return 1;
-
-	  case WSA_WAIT_FAILED:
-	  default:
-	    WSASetLastError (WSAEFAULT);
-	    set_winsock_errno ();
-	    return -1;
-	}
-      return 0;
-    }
+  int socket;
+  sockaddr *peer;
+  int *len;
+  int ret;
 };
+
+static DWORD WINAPI
+connect_thread (void *arg)
+{
+  sock_thread_data *std = (sock_thread_data *) arg;
+  std->ret = ::connect (std->socket, std->peer, *std->len);
+  return 0;
+}
+
+static DWORD WINAPI
+accept_thread (void *arg)
+{
+  sock_thread_data *std = (sock_thread_data *) arg;
+  std->ret = ::accept (std->socket, std->peer, std->len);
+  return 0;
+}
 
 /**********************************************************************/
 /* fhandler_socket */
@@ -575,7 +520,6 @@ out:
 int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
-  sock_event evt;
   BOOL interrupted = FALSE;
   int res = -1;
   BOOL secret_check_failed = FALSE;
@@ -586,26 +530,28 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
 
-  if (!is_nonblocking () && !is_connect_pending ())
-    evt.load (get_socket (), FD_CONNECT_BIT);
-
-  res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
-
-  if (res && !is_nonblocking () && !is_connect_pending ()
-      && WSAGetLastError () == WSAEWOULDBLOCK)
-    switch (evt.wait ())
-      {
-	case 1: /* Signal */
-	  WSASetLastError (WSAEINPROGRESS);
+  if (!is_nonblocking ())
+    {
+      sock_thread_data cd = { get_socket (), (sockaddr *) &sin, &namelen, -1 };
+      cygthread *thread = new cygthread (connect_thread, &cd, "connect");
+      HANDLE wait_events[2] = { *thread, signal_arrived };
+      if (WaitForMultipleObjects(2, wait_events, FALSE, INFINITE)
+      	  != WAIT_OBJECT_0)
+	{
+	  /* Signal arrived */
+	  thread->terminate_thread ();
 	  interrupted = TRUE;
-	  break;
-	case 0:
-	  res = 0;
-	  break;
-	default:
-	  res = -1;
-	  break;
-      }
+	}
+      else
+	{
+	  /* connect returned normally */
+	  res = cd.ret;
+	  thread->detach ();
+	}
+      delete thread;
+    }
+  else
+    res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
 
   if (res)
     {
@@ -704,20 +650,25 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 
   if (!is_nonblocking ())
     {
-      sock_event evt;
-      evt.load (get_socket (), FD_ACCEPT_BIT);
-      switch (evt.wait ())
-	{
-	  case 1: /* Signal */
-	    return -1;
-	  case 0:
-	    break;
-	  case -1:
-	    return -1;
+      sock_thread_data ad = { get_socket (), peer, len, -1 };
+      cygthread *thread = new cygthread (accept_thread, &ad, "accept");
+      HANDLE wait_events[2] = { *thread, signal_arrived };
+      if (WaitForMultipleObjects(2, wait_events, FALSE, INFINITE)
+          != WAIT_OBJECT_0)
+        {
+	  /* Signal arrived */
+	  thread->terminate_thread ();
+	  delete thread;
+	  set_errno (EINTR);
+	  return -1;
 	}
+      /* accept returned normally */
+      res = ad.ret;
+      thread->detach ();
+      delete thread;
     }
-
-  res = ::accept (get_socket (), peer, len);
+  else
+    res = ::accept (get_socket (), peer, len);
 
   if ((SOCKET) res == INVALID_SOCKET && WSAGetLastError () == WSAEWOULDBLOCK)
     in_progress = TRUE;
