@@ -1,6 +1,6 @@
 /* strace.cc
 
-   Copyright 2000, 2001, 2002, 2003 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat Inc.
 
    Written by Chris Faylor <cgf@redhat.com>
 
@@ -890,7 +890,7 @@ print_version ()
   printf ("\
 %s (cygwin) %.*s\n\
 System Trace\n\
-Copyright 2000, 2001, 2002, 2003 Red Hat, Inc.\n\
+Copyright 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", pgm, len, v, __DATE__);
 }

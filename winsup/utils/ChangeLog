@@ -1,5 +1,10 @@
 2004-02-10  Christopher Faylor  <cgf@redhat.com>
 
+	* strace.cc: Update copyrights.
+	* cygcheck.cc: Update copyrights.
+
+2004-02-10  Christopher Faylor  <cgf@redhat.com>
+
 	* strace.cc (main): Ensure POSIXLY_CORRECT argument ordering.
 	* cygcheck.cc (main): Ditto.
 
