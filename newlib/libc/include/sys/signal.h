@@ -86,7 +86,7 @@ int _EXFUN(sigpause, (int));
 #define SIGUSR1	18
 #define SIGUSR2	19
 #define NSIG    20
-#elif defined(__CYGWIN__)	/* BSD signals symantics */
+#elif defined(__CYGWIN__)	/* BSD signals semantics */
 #define	SIGHUP	1	/* hangup */
 #define	SIGINT	2	/* interrupt */
 #define	SIGQUIT	3	/* quit */
