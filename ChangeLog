@@ -1,5 +1,8 @@
 2002-10-02  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* Makefile.tpl: Remove material now in src-release.  (Finally!)
+	* Makefile.in: Regenerate.
+
 	* configure: Restore my original patch by syncing with gcc version.
 
 	* Bring following over from gcc:
