@@ -1,3 +1,7 @@
+2003-01-21 Anita Kulkarni  <anitak@kpit.com>
+  
+	* libc/time/difftime.c : Typecast the result to double.
+
 2003-01-20  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/sys/unistd.h: Add rresvport declaration for cygwin.
