@@ -47,7 +47,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "ehiklmpqsvVK::";
+static char opts[] = "ehiklmpqsvVK:";
 
 int listwhat = 0;
 int postfix = 0;
@@ -674,10 +674,7 @@ main (int argc, char **_argv)
 	  print_version ();
 	  exit (0);
 	case 'K':
-	  if (!optarg)
-	    usage ();
-	  else
-	    key_sep = *optarg;
+	  key_sep = *optarg;
 	  break;
 	default :
 	  usage ();
