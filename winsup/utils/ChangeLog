@@ -1,3 +1,12 @@
+2002-10-30  Christopher Faylor  <cgf@redhat.com>
+
+	* cygpath.cc (get_long_path_name_w32impl): Define similarly to
+	GetLongPathName.
+	(get_long_name): Correctly prototype GetLongPathName.
+	(get_long_paths): Implement using get_long_name to cut down on code
+	duplication.
+	(doit): Do various things to make path output work predictably.
+
 2002-10-19  Christopher Faylor  <cgf@redhat.com>
 
 	* mount.cc (usage): Correctly report default mode.

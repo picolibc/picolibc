@@ -175,14 +175,14 @@ get_short_name (const char *filename)
   return strcpy (sbuf, buf);
 }
 
-static DWORD
+static DWORD WINAPI
 get_long_path_name_w32impl (LPCSTR src, LPSTR sbuf, DWORD)
 {
   char buf1[MAX_PATH], buf2[MAX_PATH], *ptr;
   const char *pelem, *next;
   WIN32_FIND_DATA w32_fd;
   int len;
-  
+
   strcpy (buf1, src);
   *buf2 = 0;
   pelem = src;
@@ -221,97 +221,78 @@ get_long_path_name_w32impl (LPCSTR src, LPSTR sbuf, DWORD)
 }
 
 static char *
-get_long_paths (char *path)
-{
-  char *sbuf;
-  char *sptr;
-  char *next;
-  char *ptr = path;
-  char *end = strrchr (path, 0);
-  DWORD acc = 0;
-  DWORD len;
-
-  HINSTANCE hinst;
-  DWORD (*GetLongPathNameAPtr) (LPCSTR, LPSTR, DWORD) = 0;
-  hinst = LoadLibrary ("kernel32");
-  if (hinst)
-    GetLongPathNameAPtr = (DWORD (*) (LPCSTR, LPSTR, DWORD))
-      GetProcAddress (hinst, "GetLongPathNameA");
-  /* subsequent calls of kernel function with NULL cause SegFault in W2K!! */
-  if (1 || !GetLongPathNameAPtr)
-    GetLongPathNameAPtr = get_long_path_name_w32impl;
-
-  while (ptr != NULL)
-    {
-      next = ptr;
-      ptr = strchr (ptr, ';');
-      if (ptr)
-	*ptr++ = 0;
-      len = (*GetLongPathNameAPtr) (next, NULL, 0);
-      if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
-	{
-	  fprintf (stderr, "%s: cannot create long name of %s\n", prog_name,
-		   next);
-	  exit (2);
-	}
-      acc += len + 1;
-    }
-  sptr = sbuf = (char *) malloc (acc + 1);
-  if (sbuf == NULL)
-    {
-      fprintf (stderr, "%s: out of memory\n", prog_name);
-      exit (1);
-    }
-  ptr = path;
-  for (;;)
-    {
-      len = (*GetLongPathNameAPtr) (ptr, sptr, acc);
-      if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
-	{
-	  fprintf (stderr, "%s: cannot create long name of %s\n", prog_name,
-		   ptr);
-	  exit (2);
-	}
-
-      ptr = strrchr (ptr, 0);
-      sptr = strrchr (sptr, 0);
-      if (ptr == end)
-	break;
-      *ptr = *sptr = ';';
-      ++ptr, ++sptr;
-      acc -= len + 1;
-    }
-  return sbuf;
-}
-
-static char *
-get_long_name (const char *filename)
+get_long_name (const char *filename, DWORD& len)
 {
   char *sbuf, buf[MAX_PATH];
-  DWORD len;
-  HINSTANCE hinst;
-  DWORD (*GetLongPathNameAPtr) (LPCSTR, LPSTR, DWORD) = 0;
-  hinst = LoadLibrary ("kernel32");
-  if (hinst)
-    GetLongPathNameAPtr = (DWORD (*) (LPCSTR, LPSTR, DWORD))
-      GetProcAddress (hinst, "GetLongPathNameA");
-  if (!GetLongPathNameAPtr)
-    GetLongPathNameAPtr = get_long_path_name_w32impl;
-  
-  len = (*GetLongPathNameAPtr) (filename, buf, MAX_PATH);
+  static HINSTANCE k32 = LoadLibrary ("kernel32.dll");
+  static DWORD (WINAPI *GetLongPathName) (LPCSTR, LPSTR, DWORD) =
+    (DWORD (WINAPI *) (LPCSTR, LPSTR, DWORD)) GetProcAddress (k32, "GetLongPathName");
+  if (!GetLongPathName)
+    GetLongPathName = get_long_path_name_w32impl;
+
+  len = GetLongPathName (filename, buf, MAX_PATH);
   if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
     {
       fprintf (stderr, "%s: cannot create long name of %s\n", prog_name,
 	       filename);
       exit (2);
     }
-  sbuf = (char *) malloc (++len);
-  if (sbuf == NULL)
+  sbuf = (char *) malloc (len + 1);
+  if (!sbuf)
     {
       fprintf (stderr, "%s: out of memory\n", prog_name);
       exit (1);
     }
   return strcpy (sbuf, buf);
+}
+
+static char *
+get_long_paths (char *path)
+{
+  char *sbuf;
+  char *ptr;
+  int n = 1;
+
+  ptr = path;
+  while ((ptr = strchr (ptr, ';')))
+    {
+      ptr++;
+      n++;
+    }
+
+  char *paths[n];
+  DWORD acc = 0;
+  int i;
+  if (!n)
+    return strdup ("");
+
+  for (i = 0, ptr = path; ptr; i++)
+    {
+      DWORD len;
+      char *next = ptr;
+      ptr = strchr (ptr, ';');
+      if (ptr)
+	*ptr++ = 0;
+      paths[i] = get_long_name (next, len);
+      acc += len + 1;
+    }
+
+  sbuf = (char *) malloc (acc + 1);
+  if (sbuf == NULL)
+    {
+      fprintf (stderr, "%s: out of memory\n", prog_name);
+      exit (1);
+    }
+
+  sbuf[0] = '\0';
+  for (i = 0; i < n; i++)
+    {
+      strcat (strcat (sbuf, paths[i]), ";");
+      free (paths[i]);
+    }
+
+  strchr (sbuf, '\0')[-1] = '\0';
+  return sbuf;
 }
 
 static void
@@ -348,14 +329,14 @@ dowin (char option)
   DWORD len = MAX_PATH;
   WIN32_FIND_DATA w32_fd;
   LPITEMIDLIST id;
-  HINSTANCE hinst;
+  HINSTANCE k32;
   BOOL (*GetProfilesDirectoryAPtr) (LPSTR, LPDWORD) = 0;
-      
+
   buf = buf1;
   switch (option)
     {
     case 'D':
-      SHGetSpecialFolderLocation (NULL, allusers_flag ? 
+      SHGetSpecialFolderLocation (NULL, allusers_flag ?
 	CSIDL_COMMON_DESKTOPDIRECTORY : CSIDL_DESKTOPDIRECTORY, &id);
       SHGetPathFromIDList (id, buf);
       /* This if clause is a Fix for Win95 without any "All Users" */
@@ -367,7 +348,7 @@ dowin (char option)
       break;
 
     case 'P':
-      SHGetSpecialFolderLocation (NULL, allusers_flag ? 
+      SHGetSpecialFolderLocation (NULL, allusers_flag ?
 	CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS, &id);
       SHGetPathFromIDList (id, buf);
       /* This if clause is a Fix for Win95 without any "All Users" */
@@ -379,10 +360,10 @@ dowin (char option)
       break;
 
     case 'H':
-      hinst = LoadLibrary ("userenv");
-      if (hinst)
+      k32 = LoadLibrary ("userenv");
+      if (k32)
 	GetProfilesDirectoryAPtr = (BOOL (*) (LPSTR, LPDWORD))
-	  GetProcAddress (hinst, "GetProfilesDirectoryA");
+	  GetProcAddress (k32, "GetProfilesDirectoryA");
       if (GetProfilesDirectoryAPtr)
 	(*GetProfilesDirectoryAPtr) (buf, &len);
       else
@@ -426,44 +407,27 @@ static void
 doit (char *filename)
 {
   char *buf;
-  size_t len;
+  DWORD len;
   int retval;
   int (*conv_func) (const char *, char *);
 
-  if (path_flag)
-    {
-      if (cygwin_posix_path_list_p (filename) ? unix_flag : windows_flag)
-	{
-	  /* The path is already in the right format.  */
-	  puts (filename);
-	  exit (0);
-	}
-    }
-
   if (!path_flag)
     {
-      len = strlen (filename) + 100;
-      if (len == 100)
+      len = strlen (filename);
+      if (len)
+	len += 100;
+      else if (ignore_flag)
+	exit (0);
+      else
 	{
-	  if (!ignore_flag)
-	    {
-	      fprintf (stderr, "%s: can't convert empty path\n", prog_name);
-	      exit (1);
-	    }
-	  else
-	    exit (0);
+	  fprintf (stderr, "%s: can't convert empty path\n", prog_name);
+	  exit (1);
 	}
     }
+  else if (unix_flag)
+    len = cygwin_win32_to_posix_path_list_buf_size (filename);
   else
-    {
-      if (unix_flag)
-	len = cygwin_win32_to_posix_path_list_buf_size (filename);
-      else
-	len = cygwin_posix_to_win32_path_list_buf_size (filename);
-    }
-
-  if (len < PATH_MAX)
-    len = PATH_MAX;
+    len = cygwin_posix_to_win32_path_list_buf_size (filename);
 
   buf = (char *) malloc (len);
   if (buf == NULL)
@@ -509,7 +473,7 @@ doit (char *filename)
 	if (shortname_flag)
 	  buf = get_short_name (buf);
 	if (longname_flag)
-	  buf = get_long_name (buf);
+	  buf = get_long_name (buf, len);
 	}
     }
 
@@ -578,7 +542,7 @@ main (int argc, char **argv)
 	  break;
 
 	case 'd':
-	  if (windows_flag) 
+	  if (windows_flag)
 	    usage (stderr, 1);
 	  unix_flag = 0;
 	  windows_flag = 1;
@@ -630,31 +594,31 @@ main (int argc, char **argv)
 
 	  format_type_arg = (*optarg == '=') ? (optarg + 1) : (optarg);
 	  if (strcasecmp (format_type_arg, "dos") == 0)
-            {
-            if (windows_flag || longname_flag)
-              usage (stderr, 1);
-            unix_flag = 0;
-            windows_flag = 1;
-            shortname_flag = 1;
-            }
+	    {
+	    if (windows_flag || longname_flag)
+	      usage (stderr, 1);
+	    unix_flag = 0;
+	    windows_flag = 1;
+	    shortname_flag = 1;
+	    }
 	  else if (strcasecmp (format_type_arg, "mixed") == 0)
-            {
-            unix_flag = 0;
+	    {
+	    unix_flag = 0;
 	    mixed_flag = 1;
-            }
+	    }
 	  else if (strcasecmp (format_type_arg, "unix") == 0)
-            {
-            if (windows_flag)
-              usage (stderr, 1);
+	    {
+	    if (windows_flag)
+	      usage (stderr, 1);
 	    unix_flag = 1;
-            }
+	    }
 	  else if (strcasecmp (format_type_arg, "windows") == 0)
-            {
-            if (mixed_flag)
-              usage (stderr, 1);
-            unix_flag = 0;
-            windows_flag = 1;
-            }
+	    {
+	    if (mixed_flag)
+	      usage (stderr, 1);
+	    unix_flag = 0;
+	    windows_flag = 1;
+	    }
 	  else
 	    usage (stderr, 1);
 	  break;
