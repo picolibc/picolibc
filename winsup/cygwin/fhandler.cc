@@ -361,6 +361,19 @@ fhandler_base::get_default_fmode (int flags)
   return fmode;
 }
 
+bool
+fhandler_base::device_access_denied (int flags)
+{
+  int mode = 0;
+  if (flags & O_RDONLY)
+    mode |= R_OK;
+  if (flags & O_RDWR)
+    mode |= R_OK | W_OK;
+  if (flags & O_WRONLY)
+    mode |= W_OK;
+  return ::access (get_win32_name (), mode);
+}
+
 /* Open system call handler function. */
 int
 fhandler_base::open (path_conv *pc, int flags, mode_t mode)
