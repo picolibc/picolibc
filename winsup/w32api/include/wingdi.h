@@ -2464,7 +2464,7 @@ typedef UINT (CALLBACK *LPFNDEVMODE)(HWND,HMODULE,LPDEVMODEA,LPSTR,LPSTR,LPDEVMO
 typedef DWORD (CALLBACK *LPFNDEVCAPS)(LPSTR,LPSTR,UINT,LPSTR,LPDEVMODEA);
 
 
-#define RGB(r,g,b)	((DWORD)(((BYTE)(r)|((WORD)(g)<<8))|(((DWORD)(BYTE)(b))<<16)))
+#define RGB(r,g,b)	((COLORREF)((BYTE)(r) | ((BYTE)(g) << 8) | ((BYTE)(b) << 16)))
 #define MAKEPOINTS(l) (*((POINTS*)&(l)))
 #define MAKEROP4(f,b)	(DWORD)((((b)<<8)&0xFF000000)|(f))
 #define PALETTEINDEX(i)	((0x01000000|(COLORREF)(WORD)(i)))
