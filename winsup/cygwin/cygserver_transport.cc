@@ -19,6 +19,8 @@ details. */
 
 #include <sys/socket.h>
 
+#include "safe_memory.h"
+
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver_transport_pipes.h"
 #include "cygwin/cygserver_transport_sockets.h"
@@ -27,17 +29,10 @@ details. */
 transport_layer_base *
 create_server_transport ()
 {
-#ifdef safe_new0
   if (wincap.is_winnt ())
     return safe_new0 (transport_layer_pipes);
   else
     return safe_new0 (transport_layer_sockets);
-#else
-  if (wincap.is_winnt ())
-    return new transport_layer_pipes;
-  else
-    return new transport_layer_sockets;
-#endif
 }
 
 #ifndef __INSIDE_CYGWIN__

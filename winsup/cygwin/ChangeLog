@@ -1,5 +1,25 @@
 2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* safe_memory.h: New file extracted from "woutsup.h".
+	* woutsup.h: Move the "safe" new/delete macros into the new
+	"safe_memory.h" header file and include that here.
+	* cygserver_client.cc: Explicitly include "safe_memory.h" for
+	client-side code.
+	(client_request::make_request): Use the "safe" new/delete macros
+	unconditionally, i.e. use them on the client side as well as on
+	the server side.
+	* cygserver_transport.cc: Explicitly include "safe_memory.h" for
+	client-side code.
+	(create_server_transport): Use the "safe" new/delete macros
+	unconditionally, i.e. use them on the client side as well as on
+	the server side.
+	* shm.cc: Include "safe_memory.h".
+	(client_shmmgr::instance): Use the "safe" new/delete macros.
+	(client_shmmgr::shmdt): Ditto.
+	(client_shmmgr::new_segment): Ditto.
+
+2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_process (process::process): Add the client's cygpid
 	and winpid to all tracing statements as appropriate.
 	(process::exit_code): Ditto.

@@ -21,6 +21,7 @@ details. */
 #include <unistd.h>
 
 #include "cygerrno.h"
+#include "safe_memory.h"
 #include "sigproc.h"
 
 #include "cygserver_ipc.h"
@@ -145,7 +146,7 @@ client_shmmgr &
 client_shmmgr::instance ()
 {
   if (!_instance)
-    _instance = new client_shmmgr;
+    _instance = safe_new0 (client_shmmgr);
 
   assert (_instance);
 
@@ -358,7 +359,7 @@ client_shmmgr::shmdt (const void *const shmaddr)
 		    segptr->shmid, segptr->hFileMap,
 		    strerror (request.error_code ()));
 
-  delete segptr;
+  safe_delete (segment_t, segptr);
 
   syscall_printf ("0 = shmdt (shmaddr = 0x%p)", shmaddr);
 
@@ -582,7 +583,8 @@ client_shmmgr::new_segment (const int shmid,
 	  ? (!previous->next || previous->next->shmaddr > shmaddr)	\
 	  : (!_segments_head || _segments_head->shmaddr > shmaddr));
 
-  segment_t *const segptr = new segment_t (shmid, shmaddr, shmflg, hFileMap);
+  segment_t *const segptr =
+    safe_new (segment_t, shmid, shmaddr, shmflg, hFileMap);
 
   assert (segptr);
 

@@ -24,6 +24,7 @@ details. */
 
 #include "cygerrno.h"
 #include "cygserver_shm.h"
+#include "safe_memory.h"
 
 #include "cygwin/cygserver.h"
 #include "cygwin/cygserver_transport.h"
@@ -355,11 +356,7 @@ client_request::make_request ()
 	error_code (errno);
       else
 	error_code (ENOSYS);
-#ifdef safe_delete
       safe_delete (transport_layer_base, transport);
-#else
-      delete transport;
-#endif
       return -1;
     }
 
@@ -367,11 +364,7 @@ client_request::make_request ()
 
   send (transport);
 
-#ifdef safe_delete
   safe_delete (transport_layer_base, transport);
-#else
-  delete transport;
-#endif
 
   return 0;
 }
