@@ -163,7 +163,7 @@ struct bfd_link_hash_table
   struct bfd_link_hash_entry *undefs;
   /* Entries are added to the tail of the undefs list.  */
   struct bfd_link_hash_entry *undefs_tail;
-  /* The type of the ink hash table.  */
+  /* The type of the link hash table.  */
   enum bfd_link_hash_table_type type;
 };
 
