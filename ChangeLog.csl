@@ -1,3 +1,40 @@
+2005-03-25  Mark Mitchell  <mark@codesourcery.com>
+
+	* gdb/configure.ac: Link with -lws2_32 on mingw.
+	* gdb/configure: Regenerated.
+	* gdb/defs.h (WINAPI): Define, conditionally.
+	* gdb/ser-base.c (winsock2.h): Include it.
+	(fd_event): Use read_prim.
+	(ser_base_wait_for): Moved here from ser-unix.c.
+	(do_ser_base_readchar): Likewise.
+	(generic_readchar): Likewise.
+	(ser_base_readchar): Likewise.
+	* gdb/ser-base.h (generic_readchar): Declare.
+	(ser_base_readchar): Likewise.
+	* gdb/ser-pipe.c (_initialize_ser_pipe): Adjust for name changes.
+	* gdb/ser-tcp.c (winsock2.h): Include it.
+	(ETIMEDOUT): Define on Windows.
+	(closesocket): Define on UNIX.
+	(ioctlsocket): Likewise.
+	(net_open): Adjust for differences in socket functions between
+	Windows and UNIX.
+	(_initialize_ser_tcp): Adjust for name changes.
+	(net_read_prim): New function.
+	(net_write_prim): Likewise.
+	* gdb/ser-unix.c (generic_readchar): Remove.
+	(ser_unix_wait_for): Likewise.
+	(do_unix_readchar): Likewise.
+	(ser_unix_readchar): Likewise.
+	(_initialize_ser_hardwire): Adjust for name changes.
+	(ser_unix_read_prim): New function.
+	(ser_unix_write_prim): New function.
+	* gdb/ser-unix.h (ser_unix_readchar): Remove.
+	(ser_unix_read_prim): Declare.
+	(ser_unix_write_prim): Declare.
+	* gdb/serial.h (struct serial_ops): Add read_prim and write_prim.
+	* gdb/utils.c (winerror.h): Include it.
+	(safe_strerror): Handle winsock errors.
+
 2005-03-28  Mark Mitchell  <mark@codesourcery.com>
 
 	Backport from mainline:
