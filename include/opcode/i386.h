@@ -815,12 +815,12 @@ static const template i386_optab[] = {
 {"rdtsc",   0, 0x0f31, X, Cpu586, NoSuf,		{ 0, 0, 0} },
 {"rdmsr",   0, 0x0f32, X, Cpu586, NoSuf,		{ 0, 0, 0} },
 {"cmpxchg8b",1,0x0fc7, 1, Cpu586, NoSuf|Modrm,		{ LLongMem, 0, 0} },
-{"sysenter",0, 0x0f34, X, Cpu586, NoSuf,		{ 0, 0, 0} },
-{"sysexit", 0, 0x0f35, X, Cpu586, NoSuf,		{ 0, 0, 0} },
-{"fxsave",  1, 0x0fae, 0, Cpu586, FP|Modrm,		{ LLongMem, 0, 0} },
-{"fxrstor", 1, 0x0fae, 1, Cpu586, FP|Modrm,		{ LLongMem, 0, 0} },
 
-/* Pentium Pro extensions.  */
+/* Pentium II/Pentium Pro extensions.  */
+{"sysenter",0, 0x0f34, X, Cpu686, NoSuf,		{ 0, 0, 0} },
+{"sysexit", 0, 0x0f35, X, Cpu686, NoSuf,		{ 0, 0, 0} },
+{"fxsave",  1, 0x0fae, 0, Cpu686, FP|Modrm,		{ LLongMem, 0, 0} },
+{"fxrstor", 1, 0x0fae, 1, Cpu686, FP|Modrm,		{ LLongMem, 0, 0} },
 {"rdpmc",   0, 0x0f33, X, Cpu686, NoSuf,		{ 0, 0, 0} },
 /* official undefined instr. */
 {"ud2",	    0, 0x0f0b, X, Cpu686, NoSuf,		{ 0, 0, 0} },

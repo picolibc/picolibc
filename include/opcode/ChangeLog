@@ -1,4 +1,8 @@
 2000-05-13  Alan Modra  <alan@linuxcare.com.au>,
+
+	* i386.h (i386_optab): Cpu686 for sysenter,sysexit,fxsave,fxrestore.
+
+2000-05-13  Alan Modra  <alan@linuxcare.com.au>,
 	    Alexander Sokolov <robocop@netlink.ru>
 
 	* i386.h (i386_optab): Add cpu_flags for all instructions.
