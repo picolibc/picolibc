@@ -309,6 +309,7 @@ extern "C" {
 #define HDM_LAYOUT	(HDM_FIRST+5)
 #if (_WIN32_IE >= 0x0300)
 #define HDM_GETITEMRECT (HDM_FIRST+7)
+#define HDM_ORDERTOINDEX	(HDM_FIRST+15)
 #define HDM_GETORDERARRAY	(HDM_FIRST+17)
 #define HDM_SETORDERARRAY	(HDM_FIRST+18)
 #endif
@@ -1021,11 +1022,13 @@ extern "C" {
 #define TVM_GETBKCOLOR (TV_FIRST+31)
 #define TVM_GETINSERTMARKCOLOR (TV_FIRST+38)
 #define TVM_GETITEMHEIGHT (TV_FIRST+28)
+#define TVM_GETSCROLLTIME (TV_FIRST+34)
 #define TVM_GETTEXTCOLOR (TV_FIRST+32)
 #define TVM_SETBKCOLOR (TV_FIRST+29)
 #define TVM_SETINSERTMARK (TV_FIRST+26)
 #define TVM_SETINSERTMARKCOLOR (TV_FIRST+37)
 #define TVM_SETITEMHEIGHT (TV_FIRST+27)
+#define TVM_SETSCROLLTIME (TV_FIRST+33)
 #define TVM_SETTEXTCOLOR (TV_FIRST+30)
 #endif
 #define TVE_COLLAPSE	1
@@ -2340,7 +2343,9 @@ void WINAPI GetEffectiveClientRect(HWND,LPRECT,LPINT);
 #define Header_SetItem(w,i,phdi) (BOOL)SNDMSG((w),HDM_SETITEM,(WPARAM)(int)(i),(LPARAM)(const HD_ITEM*)(phdi))
 #define Header_Layout(w,l) (BOOL)SNDMSG((w),HDM_LAYOUT,0,(LPARAM)(HD_LAYOUT*)(l))
 #if (_WIN32_IE >= 0x0300)
+#define Header_OrderToIndex(w,o) (int)SNDMSG((w),HDM_ORDERTOINDEX,(WPARAM)(o),0)
 #define Header_GetItemRect(w,i,r) (BOOL)SNDMSG((w),HDM_GETITEMRECT,(WPARAM)(i),(LPARAM)(r))
+#define Header_GetOrderArray(w,l,a) (BOOL)SNDMSG((w),HDM_GETORDERARRAY,(WPARAM)(l),(LPARAM)(a))
 #define Header_SetOrderArray(w,l,a) (BOOL)SNDMSG((w),HDM_SETORDERARRAY,(WPARAM)(l),(LPARAM)(a))
 #endif
 int WINAPI ImageList_Add(HIMAGELIST,HBITMAP,HBITMAP);

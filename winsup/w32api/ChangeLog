@@ -1,3 +1,24 @@
+2003-08-10  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/shlobj.h (SHELLSTATE): Add structure.
+	(SHGetSetSettings): Add prototype.
+	(SHGetSettings): Add prototype.
+	* lib/user32.def (SHGetSetSettings): Add stub.
+
+2003-08-10  Phil Krylov  <likewolf@users.sourceforge.net>
+
+	* include/commctrl.h (HDM_ORDERTOINDEX): Add define.
+	(Header_OrderToIndex): Add macro.
+	(Header_GetOrderArray): Add macro.
+
+	* include/commdlg.h (FR_MATCHALEFHAMZA,
+	FR_MATCHDIAC, FR_MATCHKASHIDA): Add defines.
+
+2003-08-10  Martin Fuchs  <Martin-Fuchs@gmx.net>
+
+	* include/commctrl.h (TVM_GETSCROLLTIME,
+	TVM_SETSCROLLTIME): Add defines.
+
 2003-08-01  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h (SHELLFLAGSTATE): Add structure.

@@ -48,6 +48,7 @@ SHGetUnreadMailCountW@24
 SHGetSpecialFolderPathW@16
 SHGetSpecialFolderPathA@16
 SHGetSpecialFolderLocation@12
+SHGetSetSettings@12
 SHGetSettings@8
 SHGetPathFromIDListW@8
 SHGetPathFromIDListA@8

@@ -776,6 +776,38 @@ typedef struct {
 	UINT fRestFlags : 3;
 } SHELLFLAGSTATE, * LPSHELLFLAGSTATE;
 
+#if (_WIN32_WINNT >= 0x0500) /* W2K */
+typedef struct {
+	BOOL fShowAllObjects : 1;
+	BOOL fShowExtensions : 1;
+	BOOL fNoConfirmRecycle : 1;
+	BOOL fShowSysFiles : 1;
+	BOOL fShowCompColor : 1;
+	BOOL fDoubleClickInWebView : 1;
+	BOOL fDesktopHTML : 1;
+	BOOL fWin95Classic : 1;
+	BOOL fDontPrettyPath : 1;
+	BOOL fShowAttribCol : 1;
+	BOOL fMapNetDrvBtn : 1;
+	BOOL fShowInfoTip : 1;
+	BOOL fHideIcons : 1;
+	BOOL fWebView : 1;
+	BOOL fFilter : 1;
+	BOOL fShowSuperHidden : 1;
+	BOOL fNoNetCrawling : 1;
+	DWORD dwWin95Unused;
+	UINT uWin95Unused;
+	LONG lParamSort;
+	int iSortDirection;
+	UINT version;
+	UINT uNotUsed;
+	BOOL fSepProcess : 1;
+	BOOL fStartPanelOn : 1;
+	BOOL fShowStartPage : 1;
+	UINT fSpareFlags : 13;
+} SHELLSTATE, *LPSHELLSTATE;
+#endif
+
 void WINAPI SHAddToRecentDocs(UINT,PCVOID);
 LPITEMIDLIST WINAPI SHBrowseForFolderA(PBROWSEINFOA);
 LPITEMIDLIST WINAPI SHBrowseForFolderW(PBROWSEINFOW);
@@ -802,6 +834,10 @@ HRESULT WINAPI SHGetFolderLocation(HWND,int,HANDLE,DWORD,LPITEMIDLIST*);
 #if (_WIN32_WINNT >= 0x0501) /* XP */
 HRESULT WINAPI SHGetFolderPathAndSubDirA(HWND,int,HANDLE,DWORD,LPCSTR,LPSTR);
 HRESULT WINAPI SHGetFolderPathAndSubDirW(HWND,int,HANDLE,DWORD,LPCWSTR,LPWSTR);
+#endif
+void WINAPI SHGetSettings(LPSHELLFLAGSTATE,DWORD);
+#if (_WIN32_WINNT >= 0x0500) /* W2K */
+void WINAPI SHGetSetSettings(LPSHELLSTATE,DWORD,BOOL);
 #endif
 
 #ifdef UNICODE
