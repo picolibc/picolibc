@@ -1,3 +1,7 @@
+2003-02-25  Nick Clifton  <nickc@redhat.com>
+
+	* configure: Remove site-file supprot - it is obsolete.
+
 2003-02-24  Uwe Stieber <uwe@wwws.de>
 
 	* configure.in: Add support for kaOS as cross build target system.
