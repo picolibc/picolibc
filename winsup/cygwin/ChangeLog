@@ -1,3 +1,25 @@
+2002-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (UNCONNECTED): New define.
+	(CONNECT_PENDING): Ditto.
+	(CONNECTED): Ditto.
+	(class fhandler_socket): Add member `had_connect_or_listen'.
+	Add member functions `is_unconnected', `is_connect_pending' and
+	`is_connected'.
+	* fhandler_socket.cc (fhandler_socket::connect): Set member
+	`had_connect_or_listen' according to return code of WinSock
+	call.
+	(fhandler_socket::listen): Ditto.
+	* net.cc (cygwin_getsockopt): Modify SO_ERROR return value in
+	case of socket with pending connect().
+	* select.cc (peek_socket): Only add socket to matching fd_set
+	if it's not "ready".  Call WINSOCK_SELECT only if at least one
+	socket is in one of the fd_sets.
+	(start_thread_socket): Only add socket to matching fd_set
+	if it's not "ready".
+	(fhandler_socket::select_write): Set write_ready to true also
+	if socket isn't connected or listening.
+
 2002-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::set_sun_path): Don't free

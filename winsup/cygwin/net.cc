@@ -712,6 +712,8 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
       if (optname == SO_ERROR)
 	{
 	  int *e = (int *) optval;
+	  if (!*e && fh->is_connect_pending ())
+	    *e = WSAEINPROGRESS;
 	  *e = find_winsock_errno (*e);
 	}
 

@@ -101,6 +101,10 @@ enum
    both flags are set. */
 #define O_NONBLOCK_MASK (O_NONBLOCK | OLD_O_NDELAY)
 
+#define UNCONNECTED     0
+#define CONNECT_PENDING 1
+#define CONNECTED       2
+
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
 #define __fmode (*(user_data->fmode_ptr))
@@ -367,6 +371,7 @@ class fhandler_socket: public fhandler_base
   HANDLE secret_event;
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
   char *sun_path;
+  int had_connect_or_listen;
 
  public:
   fhandler_socket ();
@@ -379,6 +384,10 @@ class fhandler_socket: public fhandler_base
 
   void set_shutdown_read () {FHSETF (SHUTRD);}
   void set_shutdown_write () {FHSETF (SHUTWR);}
+
+  bool is_unconnected () {return had_connect_or_listen == UNCONNECTED;}
+  bool is_connect_pending () {return had_connect_or_listen == CONNECT_PENDING;}
+  bool is_connected () {return had_connect_or_listen == CONNECTED;}
 
   int bind (const struct sockaddr *name, int namelen);
   int connect (const struct sockaddr *name, int namelen);
