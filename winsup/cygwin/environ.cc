@@ -826,7 +826,7 @@ spenv::retrieve (bool no_envblock, const char *const envname)
 
       /* Calculate (potentially) value for given environment variable.  */
       p = (cygheap->user.*from_cygheap) (name, namelen);
-      if (!p || (no_envblock && !envname))
+      if (!p || (no_envblock && !envname) || (p == env_dontadd))
 	return env_dontadd;
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
@@ -898,10 +898,9 @@ build_env (const char * const *envp, char *&envblock, int &envc,
     if (!saw_spenv[i])
       {
 	*dstp = spenvs[i].retrieve (no_envblock);
-	if (*dstp && *dstp != env_dontadd)
+	if (*dstp && *dstp != env_dontadd && !no_envblock)
 	  {
-	    if (!no_envblock)
-	      tl += strlen (*dstp) + 1;
+	    tl += strlen (*dstp) + 1;
 	    dstp++;
 	  }
       }
@@ -941,8 +940,9 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	  /* See if we need to increase the size of the block. */
 	  if (new_tl > tl)
 	    {
+	      tl = new_tl + 100;
 	      char *new_envblock =
-	      		(char *) realloc (envblock, 2 + (tl += len + 100));
+	      		(char *) realloc (envblock, 2 + tl);
 	      /* If realloc moves the block, move `s' with it. */
 	      if (new_envblock != envblock)
 	        {

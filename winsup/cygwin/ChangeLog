@@ -1,5 +1,13 @@
 2002-06-29  Christopher Faylor  <cgf@redhat.com>
 
+	* environ.cc (spenv::retrieve): Detect return of env_dontadd from
+	cygheap_user methods.
+	(build_env): Avoid incrementing environment pointer if not actually
+	adding to the environment.  That could result in garbage in the
+	environment table.  Be more defensive when reallocing envblock.
+
+2002-06-29  Christopher Faylor  <cgf@redhat.com>
+
 	* uinfo.cc (cygheap_user::test_uid): Return NULL or further tests are
 	sorta useless.
 	(cygheap_user::env_domain): Recalculate if name is missing.
