@@ -161,6 +161,19 @@ This is not to be confused with 'MinGW' (Minimalist GNU for Windows),
 which is a completely separate effort.  That project's home page is
 @file{http://www.mingw.org/index.shtml}.
 
+@subsection Can I build a Cygwin program that does not require cygwin1.dll at runtime?
+
+No.  If your program uses the Cygwin API, then your executable cannot
+run without cygwin1.dll.  In particular, it is not possible to
+statically link with a Cygwin library to obtain an independent,
+self-contained executable.
+
+If this is an issue because you intend to distribute your Cygwin
+application, then you had better read and understand
+@file{http://cygwin.com/licensing.html}, which explains the licensing
+options.  Unless you purchase a special commercial license from
+Red Hat, then your Cygwin application must conform to the GPL.
+
 @subsection Can I link with both MSVCRT*.DLL and cygwin1.dll?
 
 No, you must use one or the other, they are mutually exclusive.
