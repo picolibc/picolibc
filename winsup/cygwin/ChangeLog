@@ -1,3 +1,14 @@
+Tue Mar 27 22:38:42 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* lib/_cygwin_S_IEXEC.c: Remove "const" from globals or they never seem
+	to be defined.  Wrap definitions in extern "C".  Include winsup.h to
+	assure proper definitions.
+
+	* dcrt0.cc (dll_crt0_1): Call stdio_init after premain run so that
+	binmode.o, etc., will control default stdio settings.
+	* dtable.cc (dtable::init_std_file_from_handle): Allow __fmode to force
+	binmode/textmode settings.  Default pipes to binmode.
+
 Tue Mar 27 11:31:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (mmap): Fix conditional for previous patch.

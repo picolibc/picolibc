@@ -165,7 +165,13 @@ void
 dtable::init_std_file_from_handle (int fd, HANDLE handle,
 				  DWORD myaccess, const char *name)
 {
-  int bin = binmode ? O_BINARY : 0;
+  int bin;
+
+  if (__fmode)
+    bin = __fmode;
+  else
+    bin = binmode ?: 0;
+
   /* Check to see if we're being redirected - if not then
      we open then as consoles */
   if (fd == 0 || fd == 1 || fd == 2)
@@ -189,6 +195,11 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle,
 	    name = "/dev/tty";
 	  else
 	    name = "/dev/conin";
+	}
+      else if (GetFileType (handle) == FILE_TYPE_PIPE)
+	{
+	  if (bin == 0)
+	    bin = O_BINARY;
 	}
     }
 

@@ -8,19 +8,17 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#if 0
-#include "windows.h"
-#include <sys/cygwin.h>
-#include "perprocess.h"
-#endif
+extern "C" {
+#include "winsup.h"
 #include <sys/stat.h>
 #include <sys/unistd.h>
 
-const unsigned _cygwin_S_IEXEC = S_IEXEC;
-const unsigned _cygwin_S_IXUSR = S_IXUSR;
-const unsigned _cygwin_S_IXGRP = S_IXGRP;
-const unsigned _cygwin_S_IXOTH = S_IXOTH;
-const unsigned _cygwin_X_OK = X_OK;
+unsigned _cygwin_S_IEXEC = S_IEXEC;
+unsigned _cygwin_S_IXUSR = S_IXUSR;
+unsigned _cygwin_S_IXGRP = S_IXGRP;
+unsigned _cygwin_S_IXOTH = S_IXOTH;
+unsigned _cygwin_X_OK = X_OK;
+};
 
 extern int __declspec (dllimport) _check_for_executable;
 struct _cygwin_bob__

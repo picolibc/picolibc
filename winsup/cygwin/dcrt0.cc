@@ -784,9 +784,6 @@ dll_crt0_1 ()
   /* Connect to tty. */
   tty_init ();
 
-  /* Set up standard fds in file descriptor table. */
-  stdio_init ();
-
   if (!__argc)
     {
       char *line = GetCommandLineA ();
@@ -816,6 +813,9 @@ dll_crt0_1 ()
   if (user_data->premain[0])
     for (unsigned int i = 0; i < PREMAIN_LEN / 2; i++)
       user_data->premain[i] (__argc, __argv, user_data);
+
+  /* Set up standard fds in file descriptor table. */
+  stdio_init ();
 
   /* Set up __progname for getopt error call. */
   __progname = __argv[0];
