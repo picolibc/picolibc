@@ -1315,10 +1315,10 @@ ZwPowerInformation@20
 ;ZwQueryBootOptions
 ZwQueryDefaultLocale@8
 ZwQueryDefaultUILanguage@4
-;ZwQueryDirectoryFile
+ZwQueryDirectoryFile@44
 ZwQueryDirectoryObject@28
 ;ZwQueryEaFile
-;ZwQueryFullAttributesFile
+ZwQueryFullAttributesFile@8
 ZwQueryInformationFile@20
 ZwQueryInformationJobObject@20
 ZwQueryInformationProcess@20
@@ -1332,7 +1332,7 @@ ZwQuerySecurityObject@20
 ZwQuerySymbolicLinkObject@12
 ZwQuerySystemInformation@16
 ZwQueryValueKey@24
-;ZwQueryVolumeInformationFile
+ZwQueryVolumeInformationFile@20
 ZwReadFile@36
 ZwReplaceKey@12
 ZwRequestWaitReplyPort@12

@@ -4410,6 +4410,15 @@ RtlDeleteRegistryValue(
   IN PCWSTR  Path,
   IN PCWSTR  ValueName);
 
+NTOSAPI
+BOOL
+DDKAPI
+RtlDosPathNameToNtPathName_U(
+  IN PCWSTR  DosPathName,
+  OUT PUNICODE_STRING  NtPathName,
+  OUT PCWSTR  *NtFileNamePart,
+  OUT VOID  *DirectoryInfo);
+
 /*
  * BOOLEAN
  * RtlEqualLuid( 

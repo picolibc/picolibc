@@ -1,3 +1,12 @@
+2004-10-24  Dan Aloni  <da-x@colinux.org>
+
+	* include/ddk/ntapi.h (NtQueryFullAttributesFile,
+	ZwQueryFullAttributesFile): Declare.
+	* include/ddk/ntapi.h (RtlDosPathNameToNtPathName_U):
+	Declare.
+	lib/ntoskrnl.def (ZwQueryDirectoryFile, ZwQueryFullAttributesFile.
+	ZwQueryVolumeInformationFile): Add stubs.
+
 2004-10-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	= include/wsahelp.h (WINSOCK_MAPPING, WSHGetWinsockMapping,
