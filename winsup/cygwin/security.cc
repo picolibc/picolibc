@@ -710,7 +710,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     { sizeof sqos, SecurityImpersonation, SECURITY_STATIC_TRACKING, FALSE };
   OBJECT_ATTRIBUTES oa =
     { sizeof oa, 0, 0, 0, 0, &sqos };
-  SECURITY_ATTRIBUTES sa = { sizeof sa, NULL, TRUE };
+  char sa_buf[1024];
   LUID auth_luid = SYSTEM_LUID;
   LARGE_INTEGER exp = { QuadPart:0x7fffffffffffffffLL  };
 
@@ -827,9 +827,8 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     }
 
   /* Convert to primary token. */
-  if (!DuplicateTokenEx (token, TOKEN_ALL_ACCESS, &sa,
-			 SecurityImpersonation, TokenPrimary,
-			 &primary_token))
+  if (!DuplicateTokenEx (token, MAXIMUM_ALLOWED, sec_user (sa_buf, usersid),
+			 SecurityImpersonation, TokenPrimary, &primary_token))
     __seterrno ();
 
 out:
