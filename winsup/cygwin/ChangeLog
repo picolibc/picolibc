@@ -1,3 +1,10 @@
+Thu Aug 24 14:33:46 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/core_dump.h: New file, contains structures used in
+	cygwin core core files.
+	* include/sys/procfs.h: New file, needed to autoconfigure cygwin core
+	dumps support in bfd.
+
 Thu Aug 24 13:50:15 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* environ.cc (parse_thing): nobinmode should force O_TEXT.
