@@ -1,3 +1,9 @@
+2004-06-27  Christopher Faylor  <me@cgf.cx>
+
+	* thread.cc (__cygwin_lock_lock): Don't bother locking when there is
+	only one known thread.
+	(__cygwin_lock_unlock): Ditto for unlocking.
+
 2004-06-23  Tomas Ukkonen  <tomas.ukkonen@iki.fi>
 
 	* fhandler_proc.cc (format_proc_cpuinfo): Test CPU vendor and print
