@@ -58,6 +58,7 @@ fhandler_windows::open (const char *, int flags, mode_t)
 {
   set_flags (flags);
   set_close_on_exec_flag (1);
+  set_open_status ();
   return 1;
 }
 

@@ -1651,20 +1651,17 @@ setmode (int fd, int mode)
   else
     res = 0;
 
-  if (mode & O_BINARY)
+  if (!mode)
+    p->reset_to_open_binmode ();
+  else if (mode & O_BINARY)
     {
       p->set_w_binary (1);
       p->set_r_binary (1);
     }
-  else if (mode & O_TEXT)
+  else
     {
       p->set_w_binary (0);
       p->set_r_binary (0);
-    }
-  else
-    {
-      p->clear_w_binary ();
-      p->clear_r_binary ();
     }
 
   if (_cygwin_istext_for_stdio (fd))
@@ -1677,7 +1674,6 @@ setmode (int fd, int mode)
   syscall_printf ("setmode (%d<%s>, %s) returns %s\n", fd, p->get_name (),
 		  mode & O_TEXT ? "text" : "binary",
 		  res & O_TEXT ? "text" : "binary");
-
   return res;
 }
 

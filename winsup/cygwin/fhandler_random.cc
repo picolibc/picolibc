@@ -34,6 +34,7 @@ int
 fhandler_dev_random::open (const char *, int flags, mode_t)
 {
   set_flags (flags);
+  set_open_status ();
   return 1;
 }
 

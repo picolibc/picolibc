@@ -277,6 +277,7 @@ fhandler_serial::open (const char *name, int flags, mode_t mode)
     }
 
   SetCommMask (get_handle (), EV_RXCHAR);
+  set_open_status ();
   syscall_printf ("%p = fhandler_serial::open (%s, %p, %p)",
 			res, get_name (), flags, mode);
   return res;

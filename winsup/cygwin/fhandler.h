@@ -65,7 +65,7 @@ enum
   FH_W95LSBUG= 0x00400000,	/* set when lseek is called as a flag that
 				 * _write should check if we've moved beyond
 				 * EOF, zero filling if so. */
-  FH_NOFRNAME= 0x00800000,	/* Set if shouldn't free unix_path_name_ and
+  FH_NOFRNAME= 0x00800000,	/* Set if shouldn't free unix_path_name and
 				   windows_path_name_ on destruction. */
   FH_NOEINTR = 0x01000000,	/* Set if I/O should be uninterruptible. */
   FH_FFIXUP  = 0x02000000,	/* Set if need to fixup after fork. */
@@ -145,14 +145,14 @@ private:
 public:
   int cb;
 private:
-  int access_;
+  int access;
   HANDLE io_handle;
 
-  unsigned long namehash_;	/* hashed filename, used as inode num */
+  unsigned long namehash;	/* hashed filename, used as inode num */
 
   /* Full unix path name of this file */
   /* File open flags from open () and fcntl () calls */
-  int openflags_;
+  int openflags;
 
 protected:
   char *rabuf;		/* used for crlf conversion in text files */
@@ -161,8 +161,9 @@ protected:
   size_t raixput;
   size_t rabuflen;
 
-  char *unix_path_name_;
-  char *win32_path_name_;
+  char *unix_path_name;
+  char *win32_path_name;
+  DWORD open_status;
 
 public:
   void set_name (const char * unix_path, const char * win32_path = NULL,
@@ -180,14 +181,14 @@ public:
   virtual int get_unit () { return 0; }
   virtual BOOL is_slow () { return get_device () < FH_SLOW; }
 
-  int get_access () { return access_; }
-  void set_access (int x) { access_ = x; }
+  int get_access () { return access; }
+  void set_access (int x) { access = x; }
 
   int get_async () { return FHISSETF (ASYNC); }
   void set_async (int x) { FHCONDSETF (x, ASYNC); }
 
-  int get_flags () { return openflags_; }
-  void set_flags (int x) { openflags_ = x; }
+  int get_flags () { return openflags; }
+  void set_flags (int x) { openflags = x; }
 
   int get_w_binary () { return FHISSETF (WBINARY); }
   int get_r_binary () { return FHISSETF (RBINARY); }
@@ -199,6 +200,14 @@ public:
   void set_r_binary (int b) { FHCONDSETF (b, RBINARY); FHSETF (RBINSET); }
   void clear_w_binary () {FHCLEARF (WBINARY); FHCLEARF (WBINSET); }
   void clear_r_binary () {FHCLEARF (RBINARY); FHCLEARF (RBINSET); }
+  void set_open_status () {open_status = status;}
+  DWORD get_open_status () {return open_status;}
+  void reset_to_open_binmode ()
+  {
+    status = status & ~(FH_WBINARY | FH_WBINSET | FH_RBINARY | FH_RBINSET);
+    status = status | ((FH_WBINARY | FH_WBINSET | FH_RBINARY | FH_RBINSET)
+		       & open_status);
+  }
 
   int get_default_fmode (int flags);
 
@@ -259,9 +268,9 @@ public:
   void set_no_free_names (int val) { FHCONDSETF (val, NOFRNAME); }
   void set_no_free_names () { FHSETF (NOFRNAME); }
 
-  const char *get_name () { return unix_path_name_; }
-  const char *get_win32_name () { return win32_path_name_; }
-  unsigned long get_namehash () { return namehash_; }
+  const char *get_name () { return unix_path_name; }
+  const char *get_win32_name () { return win32_path_name; }
+  unsigned long get_namehash () { return namehash; }
 
   virtual void hclose (HANDLE h) {CloseHandle (h);}
   virtual void set_inheritance (HANDLE &h, int not_inheriting,

@@ -1,3 +1,28 @@
+Mon Apr 23 22:00:29 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Remove trailing underscore from fhandler_base and friends, throughout.
+	* fhandler.h (fhandler_base::set_open_status): New method.  Stores
+	original open status.
+	(fhandler_base::get_open_status): New method.  Retrieves original open
+	status.
+	(fhandler_base::reset_to_open_binmode): New method.
+	* fhandler.cc (fhandler_base::open): Save open status.
+	(fhandler_base::init): Ditto.
+	* fhandler_clipboard.cc (fhandler_clipboard::open): Ditto.
+	* fhandler_console.cc (fhandler_console::open): Ditto.
+	* fhandler_dsp.cc (fhandler_dsp::open): Ditto.
+	* fhandler_dev_mem.cc (fhandler_dev_mem::open): Ditto.
+	* fhandler_dev_random.cc (fhandler_dev_random::open): Ditto.
+	* fhandler_serial.cc (fhandler_serial::open): Ditto.
+	* fhandler_tty_slave.cc (fhandler_tty_slave::open): Ditto.
+	* fhandler_tty_master.cc (fhandler_tty_master::open): Ditto.
+	* fhandler_dev_zero.cc (fhandler_dev_zero::open): Ditto.
+	* syscalls.cc (setmode): Rework so that 0 mode value causes reversion
+	to open state.
+
+	* fhandler_tty_slave.cc (fhandler_tty_slave::read): Use correct
+	multiplier when converting from deciseconds to milliseconds.
+
 Mon Apr 23 13:28:35 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (fhandler_base::clear_r_binary): New method.

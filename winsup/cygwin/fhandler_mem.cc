@@ -125,6 +125,7 @@ fhandler_dev_mem::open (const char *, int flags, mode_t)
     }
 
   set_io_handle (mem);
+  set_open_status ();
   return 1;
 }
 

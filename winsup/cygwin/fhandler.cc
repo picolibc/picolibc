@@ -37,8 +37,8 @@ inline fhandler_base&
 fhandler_base::operator =(fhandler_base &x)
 {
   memcpy (this, &x, sizeof *this);
-  unix_path_name_ = x.unix_path_name_ ? cstrdup (x.unix_path_name_) : NULL;
-  win32_path_name_ = x.win32_path_name_ ? cstrdup (x.win32_path_name_) : NULL;
+  unix_path_name = x.unix_path_name ? cstrdup (x.unix_path_name) : NULL;
+  win32_path_name = x.win32_path_name ? cstrdup (x.win32_path_name) : NULL;
   rabuf = NULL;
   ralen = 0;
   raixget = 0;
@@ -154,33 +154,33 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
 {
   if (!no_free_names ())
     {
-      if (unix_path_name_ != NULL && unix_path_name_ != fhandler_disk_dummy_name)
-	cfree (unix_path_name_);
-      if (win32_path_name_ != NULL && unix_path_name_ != fhandler_disk_dummy_name)
-	cfree (win32_path_name_);
+      if (unix_path_name != NULL && unix_path_name != fhandler_disk_dummy_name)
+	cfree (unix_path_name);
+      if (win32_path_name != NULL && unix_path_name != fhandler_disk_dummy_name)
+	cfree (win32_path_name);
     }
 
-  unix_path_name_ = win32_path_name_ = NULL;
+  unix_path_name = win32_path_name = NULL;
   if (unix_path == NULL || !*unix_path)
     return;
 
-  unix_path_name_ = cstrdup (unix_path);
-  if (unix_path_name_ == NULL)
+  unix_path_name = cstrdup (unix_path);
+  if (unix_path_name == NULL)
     {
       system_printf ("fatal error. strdup failed");
       exit (ENOMEM);
     }
 
   if (win32_path)
-    win32_path_name_ = cstrdup (win32_path);
+    win32_path_name = cstrdup (win32_path);
   else
     {
       const char *fmt = get_native_name ();
-      win32_path_name_ = (char *) cmalloc (HEAP_STR, strlen(fmt) + 16);
-      __small_sprintf (win32_path_name_, fmt, unit);
+      win32_path_name = (char *) cmalloc (HEAP_STR, strlen(fmt) + 16);
+      __small_sprintf (win32_path_name, fmt, unit);
     }
 
-  if (win32_path_name_ == NULL)
+  if (win32_path_name == NULL)
     {
       system_printf ("fatal error. strdup failed");
       exit (ENOMEM);
@@ -236,7 +236,7 @@ fhandler_base::raw_read (void *ptr, size_t ulen)
 	  if (is_at_eof (get_handle (), errcode))
 	    return 0;
 	default:
-	  syscall_printf ("ReadFile %s failed, %E", unix_path_name_);
+	  syscall_printf ("ReadFile %s failed, %E", unix_path_name);
 	  __seterrno_from_win_error (errcode);
 	  return -1;
 	  break;
@@ -310,25 +310,25 @@ fhandler_base::open (int flags, mode_t mode)
 
   if (get_device () == FH_TAPE)
     {
-      access_ = GENERIC_READ | GENERIC_WRITE;
+      access = GENERIC_READ | GENERIC_WRITE;
     }
   else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
     {
-      access_ = GENERIC_READ;
+      access = GENERIC_READ;
     }
   else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
     {
-      access_ = GENERIC_WRITE;
+      access = GENERIC_WRITE;
     }
   else
     {
-      access_ = GENERIC_READ | GENERIC_WRITE;
+      access = GENERIC_READ | GENERIC_WRITE;
     }
 
   /* Allow reliable lseek on disk devices. */
   if (get_device () == FH_FLOPPY)
     {
-      access_ |= GENERIC_READ;
+      access |= GENERIC_READ;
     }
 
   /* FIXME: O_EXCL handling?  */
@@ -366,13 +366,13 @@ fhandler_base::open (int flags, mode_t mode)
   if (get_device () == FH_SERIAL)
     file_attributes |= FILE_FLAG_OVERLAPPED;
 
-  x = CreateFileA (get_win32_name (), access_, shared,
+  x = CreateFileA (get_win32_name (), access, shared,
 		   &sec_none, creation_distribution,
 		   file_attributes,
 		   0);
 
   syscall_printf ("%p = CreateFileA (%s, %p, %p, %p, %p, %p, 0)",
-		  x, get_win32_name (), access_, shared,
+		  x, get_win32_name (), access, shared,
 		  &sec_none, creation_distribution,
 		  file_attributes);
 
@@ -390,7 +390,7 @@ fhandler_base::open (int flags, mode_t mode)
       && GetLastError () != ERROR_ALREADY_EXISTS)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
-  namehash_ = hash_path_name (0, get_win32_name ());
+  namehash = hash_path_name (0, get_win32_name ());
   set_io_handle (x);
   int bin;
   int fmode;
@@ -425,6 +425,7 @@ fhandler_base::open (int flags, mode_t mode)
     }
 
   res = 1;
+  set_open_status ();
 done:
   syscall_printf ("%d = fhandler_base::open (%s, %p)", res, get_win32_name (),
 		  flags);
@@ -674,7 +675,7 @@ fhandler_base::lseek (off_t offset, int whence)
       set_readahead_valid (0);
     }
 
-  debug_printf ("lseek (%s, %d, %d)", unix_path_name_, offset, whence);
+  debug_printf ("lseek (%s, %d, %d)", unix_path_name, offset, whence);
 
 #if 0	/* lseek has no business messing about with text-mode stuff */
 
@@ -995,7 +996,7 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
   set_io_handle (f);
   set_r_binary (bin);
   set_w_binary (bin);
-  access_ = a;
+  access = a;
   a &= GENERIC_READ | GENERIC_WRITE;
   if (a == GENERIC_READ)
     set_flags (O_RDONLY);
@@ -1003,6 +1004,7 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
     set_flags (O_WRONLY);
   if (a == (GENERIC_READ | GENERIC_WRITE))
     set_flags (O_RDWR);
+  set_open_status ();
   debug_printf ("created new fhandler_base for handle %p", f);
 }
 
@@ -1149,15 +1151,16 @@ fhandler_base::operator delete (void *p)
 
 /* Normal I/O constructor */
 fhandler_base::fhandler_base (DWORD devtype, const char *name, int unit):
-  access_ (0),
+  access (0),
   io_handle (NULL),
-  namehash_ (0),
-  openflags_ (0),
+  namehash (0),
+  openflags (0),
   rabuf (NULL),
   ralen (0),
   raixget (0),
   raixput (0),
-  rabuflen (0)
+  rabuflen (0),
+  open_status (0)
 {
   status = devtype;
   int bin = __fmode & O_TEXT ? 0 : 1;
@@ -1168,7 +1171,7 @@ fhandler_base::fhandler_base (DWORD devtype, const char *name, int unit):
       if (!get_w_binset ())
 	set_w_binary (bin);
     }
-  unix_path_name_  = win32_path_name_  = NULL;
+  unix_path_name  = win32_path_name  = NULL;
   set_name (name, NULL, unit);
 }
 
@@ -1177,14 +1180,14 @@ fhandler_base::~fhandler_base (void)
 {
   if (!no_free_names ())
     {
-      if (unix_path_name_ != NULL && unix_path_name_ != fhandler_disk_dummy_name)
-	cfree (unix_path_name_);
-      if (win32_path_name_ != NULL && win32_path_name_ != fhandler_disk_dummy_name)
-	cfree (win32_path_name_);
+      if (unix_path_name != NULL && unix_path_name != fhandler_disk_dummy_name)
+	cfree (unix_path_name);
+      if (win32_path_name != NULL && win32_path_name != fhandler_disk_dummy_name)
+	cfree (win32_path_name);
     }
   if (rabuf)
     free (rabuf);
-  unix_path_name_ = win32_path_name_ = NULL;
+  unix_path_name = win32_path_name = NULL;
 }
 
 /**********************************************************************/
@@ -1195,7 +1198,7 @@ fhandler_disk_file::fhandler_disk_file (const char *name) :
 {
   set_cb (sizeof *this);
   set_no_free_names ();
-  unix_path_name_ = win32_path_name_ = fhandler_disk_dummy_name;
+  unix_path_name = win32_path_name = fhandler_disk_dummy_name;
 }
 
 int
@@ -1227,7 +1230,7 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
 {
   if (get_win32_name () == fhandler_disk_dummy_name)
     {
-      win32_path_name_ = real_path.get_win32 ();
+      win32_path_name = real_path.get_win32 ();
       set_no_free_names ();
     }
 
@@ -1255,7 +1258,7 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
      which returns a valid handle when trying to open a file in a non
      existant directory. */
   if (real_path.has_buggy_open ()
-      && GetFileAttributes (win32_path_name_) == (DWORD) -1)
+      && GetFileAttributes (win32_path_name) == (DWORD) -1)
     {
       debug_printf ("Buggy open detected.");
       close ();

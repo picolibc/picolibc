@@ -420,10 +420,10 @@ fhandler_tty_slave::fhandler_tty_slave (int num, const char *name) :
   ttynum = num;
   /* FIXME: This is wasteful.  We should rewrite the set_name path to eliminate the
      need for double allocates. */
-  unix_path_name_ = (char *) crealloc (unix_path_name_, strlen (win32_path_name_) + 1);
-  strcpy (unix_path_name_, win32_path_name_);
-  unix_path_name_[0] = unix_path_name_[4] = '/';
-  debug_printf ("unix '%s', win32 '%s'", unix_path_name_, win32_path_name_);
+  unix_path_name = (char *) crealloc (unix_path_name, strlen (win32_path_name) + 1);
+  strcpy (unix_path_name, win32_path_name);
+  unix_path_name[0] = unix_path_name[4] = '/';
+  debug_printf ("unix '%s', win32 '%s'", unix_path_name, win32_path_name);
   inuse = NULL;
 }
 
@@ -434,6 +434,8 @@ fhandler_tty_slave::fhandler_tty_slave (const char *name) :
   inuse = NULL;
 }
 
+/* FIXME: This function needs to close handles when it has
+   a failing condition. */
 int
 fhandler_tty_slave::open (const char *, int flags, mode_t)
 {
@@ -531,6 +533,7 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
   ProtectHandle1 (nh, to_pty);
   CloseHandle (tty_owner);
 
+  set_open_status ();
   termios_printf ("tty%d opened", ttynum);
 
   return 1;
@@ -632,7 +635,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
       if (vmin == 0)
 	time_to_wait = INFINITE;
       else
-	time_to_wait = (vtime == 0 ? INFINITE : 10 * vtime);
+	time_to_wait = (vtime == 0 ? INFINITE : 100 * vtime);
     }
   else
     time_to_wait = INFINITE;
@@ -951,6 +954,7 @@ fhandler_pty_master::open (const char *, int flags, mode_t)
   cygwin_shared->tty[ttynum]->common_init (this);
   inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE, FALSE);
   set_flags (flags);
+  set_open_status ();
 
   termios_printf ("opened pty master tty%d<%p>", ttynum, this);
   return 1;

@@ -76,6 +76,7 @@ fhandler_dev_clipboard::open (const char *, int flags, mode_t)
   membuffer = NULL;
   if (!cygnativeformat)
     cygnativeformat = RegisterClipboardFormat (CYGWIN_NATIVE);
+  set_open_status ();
   return 1;
 }
 

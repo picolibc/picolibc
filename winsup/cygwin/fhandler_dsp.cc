@@ -432,10 +432,13 @@ fhandler_dev_dsp::open (const char *path, int flags, mode_t mode = 0)
       audiochannels_ = 1;
     }
 
-  if (s_audio.open(audiofreq_, audiobits_, audiochannels_))
-    debug_printf("/dev/dsp: successfully opened\n"); 
-  else
+  if (!s_audio.open(audiofreq_, audiobits_, audiochannels_))
     debug_printf("/dev/dsp: failed to open\n");   
+  else
+    {
+      set_open_status ();
+      debug_printf("/dev/dsp: successfully opened\n"); 
+    }
   return 1;
 }
 

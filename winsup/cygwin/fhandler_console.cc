@@ -562,6 +562,7 @@ fhandler_console::open (const char *, int flags, mode_t)
 
   TTYCLEARF (RSTCONS);
   set_ctty (TTY_CONSOLE, flags);
+  set_open_status ();
   debug_printf ("opened conin$ %p, conout$ %p",
 		get_io_handle (), get_output_handle ());
 
