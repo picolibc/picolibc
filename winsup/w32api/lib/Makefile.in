@@ -40,8 +40,8 @@ infodir = @infodir@
 ifneq (,$(findstring cygwin,$(target_alias)))
 ifeq ($(build_alias),$(host_alias))
 ifeq ($(prefix),$(config_prefix))
-inst_includedir:=$(includedir)
-inst_libdir:=$(libdir)
+inst_includedir:=$(tooldir)/include/w32api
+inst_libdir:=$(tooldir)/lib/w32api
 else
 inst_includedir:=$(tooldir)/usr/include/w32api
 inst_libdir:=$(tooldir)/usr/lib/w32api

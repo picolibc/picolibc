@@ -1,5 +1,11 @@
 2001-09-13  Earnie Boyd  <earnie@SF.net>
 
+	* lib/Makefile.in (inst_includedir): Change to always use w32api
+	subdirectory for target == cygwin.
+	(inst_libdir): Ditto.
+
+2001-09-13  Earnie Boyd  <earnie@SF.net>
+
 	* lib/Makefile.in (config_prefix): New variable.
 	(inst_includedir): Manipulate special value only if target == cygwin
 	and build == target and prefix != config_prefix.
