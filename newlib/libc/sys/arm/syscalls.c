@@ -622,7 +622,7 @@ _system (const char *s)
 }
 
 int
-_rename (const char *, const char *)
+_rename (const char *oldpath, const char *newpath)
 {
   errno = ENOSYS;
   return -1;
