@@ -1,3 +1,10 @@
+2002-05-29  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Attempt stronger
+	detection of invalid handle.
+	(handle_to_fn): Detect pathological condition where NT resets the
+	buffer pointer to NULL on an invalid handle.
+
 2002-05-28  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Properly

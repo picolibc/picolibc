@@ -217,7 +217,7 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 void
 dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 {
-  int bin;
+  int bin = 0;
   const char *name;
   CONSOLE_SCREEN_BUFFER_INFO buf;
   struct sockaddr sa;
@@ -229,55 +229,61 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
   if (!not_open (fd))
     return;
 
-  if (!handle || handle == INVALID_HANDLE_VALUE)
-    {
-      fds[fd] = NULL;
-      return;
-    }
-
-  if (__fmode)
-    bin = __fmode;
+  SetLastError (0);
+  DWORD ft = GetFileType (handle);
+  if (ft == FILE_TYPE_UNKNOWN && GetLastError () == ERROR_INVALID_HANDLE)
+    name = NULL;
   else
-    bin = binmode ?: 0;
+    {
+      if (__fmode)
+	bin = __fmode;
+      else
+	bin = binmode ?: 0;
 
-  /* See if we can consoleify it  - if it is a console,
-   don't open it in binary.  That will screw up our crlfs*/
-  if (GetConsoleScreenBufferInfo (handle, &buf))
-    {
-      if (ISSTATE (myself, PID_USETTY))
-	name = "/dev/tty";
+      /* See if we can consoleify it  - if it is a console,
+       don't open it in binary.  That will screw up our crlfs*/
+      if (GetConsoleScreenBufferInfo (handle, &buf))
+	{
+	  if (ISSTATE (myself, PID_USETTY))
+	    name = "/dev/tty";
+	  else
+	    name = "/dev/conout";
+	  bin = 0;
+	}
+      else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
+	{
+	  if (ISSTATE (myself, PID_USETTY))
+	    name = "/dev/tty";
+	  else
+	    name = "/dev/conin";
+	  bin = 0;
+	}
+      else if (ft == FILE_TYPE_PIPE)
+	{
+	  if (fd == 0)
+	    name = "/dev/piper";
+	  else
+	    name = "/dev/pipew";
+	  if (bin == 0)
+	    bin = O_BINARY;
+	}
+      else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
+	name = "/dev/socket";
+      else if (GetCommState (handle, &dcb))
+	name = "/dev/ttyS0"; // FIXME - determine correct device
       else
-	name = "/dev/conout";
-      bin = 0;
+	name = handle_to_fn (handle, (char *) alloca (MAX_PATH + 100));
     }
-  else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
-    {
-      if (ISSTATE (myself, PID_USETTY))
-	name = "/dev/tty";
-      else
-	name = "/dev/conin";
-      bin = 0;
-    }
-  else if (GetFileType (handle) == FILE_TYPE_PIPE)
-    {
-      if (fd == 0)
-	name = "/dev/piper";
-      else
-	name = "/dev/pipew";
-      if (bin == 0)
-	bin = O_BINARY;
-    }
-  else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
-    name = "/dev/socket";
-  else if (GetCommState (handle, &dcb))
-    name = "/dev/ttyS0"; // FIXME - determine correct device
+
+  if (!name)
+    fds[fd] = NULL;
   else
-    name = handle_to_fn (handle, (char *) alloca (MAX_PATH + 100));
-
-  path_conv pc;
-  build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess, bin);
-  set_std_handle (fd);
-  paranoid_printf ("fd %d, handle %p", fd, handle);
+    {
+      path_conv pc;
+      build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess, bin);
+      set_std_handle (fd);
+      paranoid_printf ("fd %d, handle %p", fd, handle);
+    }
 }
 
 fhandler_base *
@@ -736,6 +742,11 @@ handle_to_fn (HANDLE h, char *posix_fn)
   ntfn->Name.Buffer = (WCHAR *) ntfn + 1;
 
   DWORD res = NtQueryObject (h, ObjectNameInformation, ntfn, sizeof (fnbuf), NULL);
+
+  // NT seems to do this on an unopened file
+  if (!ntfn->Name.Buffer)
+    return NULL;
+
   if (res)
     {
       strcpy (posix_fn, "some disk file");
