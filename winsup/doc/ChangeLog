@@ -1,5 +1,9 @@
 2002-10-22  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
+	* ntsec.sgml: Correct some minor grammatical errors.
+
+2002-10-22  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
 	* dll.sgml: Simplify dll build instructions.
 
 2002-09-11  Corinna Vinschen  <corinna@vinschen.de>

@@ -130,8 +130,8 @@ set </para></listitem>
 
 <para>The two important types of ACEs are the `access allowed ACE' and the
 `access denied ACE'. The ntsec patch only used `access allowed ACEs' up
-to Cygwin version 1.1.0. Later versions use `access denied ACEs' as well
-to reflect the UNIX permissions as good as possible.</para>
+to Cygwin version 1.1.0. Later versions also use `access denied ACEs' 
+to reflect the UNIX permissions as well as possible.</para>
 
 <para>The possible permissions on objects are more detailed than in
 UNIX. For example, the permission to delete an object is different
@@ -232,9 +232,9 @@ well known group with different naming in local systems and domains.
 Outside of domains the group is named 'None' (`Kein' in German, `Aucun'
 in French, etc.), in domains it is named 'Domain Users'.  Unfortunately,
 the group `None' is never shown in the user admin tool outside of domains!
-This is very confusing but it seems that this has no negativ influences.</para>
+This is very confusing but this seems to have no negative consequences.</para>
 
-<para>To work correctly the ntsec patch depends on reasoned files
+<para>To work correctly the ntsec patch depends on the files
 <filename>/etc/passwd/</filename> and <filename>/etc/group</filename>.
 In cygwin release 1.0 the names and the IDs must correspond to the
 appropriate NT IDs! The IDs used in cygwin are the RID of the NT SID, as
@@ -257,7 +257,7 @@ have to change the primary group by hand if `None' as primary group is
 not what you want (and I'm sure, it's not what you want!)</para>
 
 <para>Look at the following examples, which were parts of my files before
-storing SIDs in /etc/passwd and /etc/group has been introduced (See next
+storing SIDs in /etc/passwd and /etc/group had been introduced (See next
 chapter for details).  With the exception of my personal user entry, all
 entries are well known entries.</para> 
 
@@ -286,15 +286,15 @@ powerusers::547:
 </screen>
 </example>
 
-<para>As you can see, I've changed my primary group membership from 513 (None)
-to 547 (powerusers).  So all file I created inside of Cygwin were now owned
+<para>As you can see, I changed my primary group membership from 513 (None)
+to 547 (powerusers).  So all files I created inside of Cygwin were now owned
 by the powerusers group instead of None.  This is the way I liked it.</para>
 
 <para>Groups may be mentioned in the passwd file, too. This has two
 advantages:</para>
 <itemizedlist spacing="compact">
 <listitem><para>Because NT assigns them to files as owners, a
-<command>ls -l</command> is often better readable.</para></listitem>
+<command>ls -l</command> is often more readable.</para></listitem>
 <listitem><para>Moreover it's possible to assigned them to files as
 owners with cygwin's <command>chown</command>.</para></listitem>
 </itemizedlist>
@@ -593,11 +593,12 @@ permissions:</para>
 "Increase quotas"
 </screen>
 
-<para>Note that administrators do not have all that user rights set by default.</para>
+<para>Note that administrators do not have all these user rights set 
+by default.</para>
 
 <para>Two new Cygwin calls are introduced to support porting
 <command>setuid</command> applications with a minimum of effort. You only
-have to care to give Cygwin the right access token and then you can call
+give Cygwin the right access token and then you can call
 <command>seteuid</command> or <command>setuid</command> as usual in POSIX
 applications. The call to <command>sexec</command> is not needed
 anymore. Porting a <command>setuid</command> application is illustrated by
