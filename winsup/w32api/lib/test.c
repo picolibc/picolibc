@@ -59,6 +59,8 @@
 #include <wsnetbs.h>
 #include <setupapi.h>
 #include <aclapi.h>
+#include <security.h>
+#include <schnlsp.h>
 
 #ifndef __OBJC__  /* problems with BOOL */
 #include <ole2.h>

@@ -1,3 +1,39 @@
+2002-02-14 Mattia Barbon  <mbarbon@users.sourceforge.net>
+
+	* include/ntsecpkg.h: New file.
+	* include/schannel.h: New file.
+	* include/schnlsp.h: New file.
+	* include/security.h: New file.
+	* include/sspi.h: New file.
+	* include/ntsecapi.h (KERB_WRAP_NO_ENCRYPT,
+	MICROSOFT_KERBEROS_NAME_[AW]): Add missing constants
+	* include/wincrypt.h (CALG_*, X509_ASN_ENCODING.
+	PKCS_7_ASN_ENCODING, CERT_*, USAGE_MATCH_TYPE_AND,
+	USAGE_MATCH_TYPE_OR, szOID_*): Add missing constants
+	(struct _CRYPTOAPI_BLOB): Add structure and typedefs.
+	(SSL_EXTRA_CERT_CHAIN_POLICY_PARA,HTTPSPolicyCallbackData,
+	CERT_CHAIN_POLICY_PARA,CERT_CHAIN_POLICY_STATUS,
+	CRYPT_ALGORITHM_IDENTIFIER, CRYPT_BIT_BLOB,
+	CERT_PUBLIC_KEY_INFO, CERT_EXTENSION, CERT_INFO, CERT_CONTEXT,
+	CTL_USAGE, CERT_ENHKEY_USAGE, CERT_USAGE_MATCH,
+	CERT_CHAIN_PARA, CERT_CHAIN_FIND_BY_ISSUER_PARA,
+	CERT_TRUST_STATUS, CRL_ENTRY, CRL_INFO, CRL_CONTEXT,
+	CERT_REVOCATION_CRL_INFO, CERT_REVOCATION_INFO,
+	CERT_CHAIN_ELEMENT, CRYPT_ATTRIBUTE, CTL_ENTRY, CTL_INFO,
+	CTL_CONTEXT, CERT_TRUST_LIST_INFO, CERT_SIMPLE_CHAIN,
+	CERT_CHAIN_CONTEXT): Add missing structures.
+	(CertCloseStore, CertGetCertificateChain,
+	CertVerifyCertificateChainPolicy, CertFreeCertificateChain,
+	CertNameToStr[AW], CertOpenSystemStore[AW], CertOpenStore,
+	CertFindCertificateInStore, CertFreeCertificateContext,
+	CertGetIssuerCertificateFromStore,
+	CertFindChainInStore): Add missing functions.
+	(CertNameToStr, CertOpenSystemStore, CERT_FIND_SUBJECT_STR,
+	CERT_FIND_ISSUER_STR): Add Unicode mappings.
+	* lib/crypt32.def: New file.
+	* lib/secur32.def: Add mising stubs.
+	* lib/test.c: Include new headers.
+
 2002-02-14  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/windef.h (PROC,FARPROC,NEARPROC): Remove void
