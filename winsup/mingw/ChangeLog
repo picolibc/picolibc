@@ -1,3 +1,9 @@
+2002-10-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/string.h (strcasecmp): Make extern __inline__.
+	(strncasecmp): Likewise.
+	(wcscmpi): Likewise.
+
 2002-10-08  Heiko Gerdau  <hg@technosis.de>
 
 	* include/tchar.h (_tchdir. _tgetcwd, _tgetdcwd.

@@ -161,11 +161,15 @@ int	memicmp (const void*, const void*, size_t);
 char*	strdup (const char*);
 int	strcmpi (const char*, const char*);
 int	stricmp (const char*, const char*);
-int	strcasecmp (const char*, const char*);
+extern __inline__ int
+strcasecmp (const char * __sz1, const char * __sz2)
+  {return _stricmp (__sz1, __sz2);}
 int	stricoll (const char*, const char*);
 char*	strlwr (char*);
 int	strnicmp (const char*, const char*, size_t);
-int	strncasecmp (const char*, const char*, size_t);
+extern __inline__ int
+strncasecmp (const char * __sz1, const char * __sz2, size_t __sizeMaxCompare)
+  {return _strnicmp (__sz1, __sz2, __sizeMaxCompare);}
 char*	strnset (char*, int, size_t);
 char*	strrev (char*);
 char*	strset (char*, int);
@@ -175,7 +179,9 @@ void	swab (const char*, char*, size_t);
 #endif /* _UWIN */
 
 /* NOTE: There is no _wcscmpi, but this is for compatibility. */
-int	wcscmpi	(const wchar_t*, const wchar_t*);
+extern __inline__ int
+wcscmpi (const wchar_t * __ws1, const wchar_t * __ws2)
+  {return _wcsicmp (__ws1, __ws2);}
 wchar_t* wcsdup (wchar_t*);
 int	wcsicmp (const wchar_t*, const wchar_t*);
 int	wcsicoll (const wchar_t*, const wchar_t*);
