@@ -1,3 +1,8 @@
+2000-05-08  DJ Delorie  <dj@cygnus.com>
+
+	* fhandler.cc (lock): use signed math to allow checking ranges
+	properly.
+
 Sat May  6 23:22:25 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (insert_file): Eliminate unused parameter.

@@ -1243,8 +1243,8 @@ fhandler_disk_file::close ()
 int
 fhandler_disk_file::lock (int cmd, struct flock *fl)
 {
-  DWORD win32_start;
-  DWORD win32_len;
+  int win32_start;
+  int win32_len;
   DWORD win32_upper;
   DWORD startpos;
 
@@ -1304,7 +1304,8 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 
   if (win32_start < 0)
     {
-      win32_len -= win32_start;
+      /* watch the signs! */
+      win32_len -= -win32_start;
       if (win32_len <= 0)
 	{
 	  /* Failure ! */
@@ -1337,17 +1338,17 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 
       ov.Internal = 0;
       ov.InternalHigh = 0;
-      ov.Offset = win32_start;
+      ov.Offset = (DWORD)win32_start;
       ov.OffsetHigh = 0;
       ov.hEvent = (HANDLE) 0;
 
       if (fl->l_type == F_UNLCK)
 	{
-	  res = UnlockFileEx (get_handle (), 0, win32_len, win32_upper, &ov);
+	  res = UnlockFileEx (get_handle (), 0, (DWORD)win32_len, win32_upper, &ov);
 	}
       else
 	{
-	  res = LockFileEx (get_handle (), lock_flags, 0, win32_len,
+	  res = LockFileEx (get_handle (), lock_flags, 0, (DWORD)win32_len,
 							win32_upper, &ov);
 	  /* Deal with the fail immediately case. */
 	  /*
@@ -1366,10 +1367,10 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
     {
       /* Windows 95 -- use primitive lock call */
       if (fl->l_type == F_UNLCK)
-	res = UnlockFile (get_handle (), win32_start, 0, win32_len,
+	res = UnlockFile (get_handle (), (DWORD)win32_start, 0, (DWORD)win32_len,
 							win32_upper);
       else
-	res = LockFile (get_handle (), win32_start, 0, win32_len, win32_upper);
+	res = LockFile (get_handle (), (DWORD)win32_start, 0, (DWORD)win32_len, win32_upper);
     }
 
   if (res == 0)
