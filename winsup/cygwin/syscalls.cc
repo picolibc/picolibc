@@ -1689,41 +1689,79 @@ mknod ()
 }
 
 /* setgid: POSIX 4.2.2.1 */
-/* FIXME: unimplemented! */
 extern "C"
 int
-setgid (gid_t)
+setgid (gid_t gid)
 {
-  set_errno (ENOSYS);
+  if (os_being_run == winNT)
+    {
+      if (gid != (gid_t) -1)
+        {
+          if (!getgrgid (gid))
+            {
+              set_errno (EINVAL);
+              return -1;
+            }
+          myself->gid = gid;
+        }
+    }
+  else
+    set_errno (ENOSYS);
   return 0;
 }
 
+extern char *internal_getlogin (struct pinfo *pi);
+
 /* setuid: POSIX 4.2.2.1 */
-/* FIXME: unimplemented! */
 extern "C"
 int
-setuid (uid_t)
+setuid (uid_t uid)
 {
-  set_errno (ENOSYS);
+  if (os_being_run == winNT)
+    {
+      if (uid != (uid_t) -1)
+        {
+          struct passwd *pw_new = getpwuid (uid);
+          if (!pw_new)
+            {
+              set_errno (EINVAL);
+              return -1;
+            }
+
+          struct pinfo pi;
+          pi.psid = (PSID) pi.sidbuf;
+          struct passwd *pw_cur = getpwnam (internal_getlogin (&pi));
+          if (pw_cur != pw_new)
+            {
+              set_errno (EPERM);
+              return -1;
+            }
+          myself->uid = uid;
+          strcpy (myself->username, pi.username);
+          CopySid (40, myself->psid, pi.psid);
+          strcpy (myself->logsrv, pi.logsrv);
+          strcpy (myself->domain, pi.domain);
+        }
+    }
+  else
+    set_errno (ENOSYS);
   return 0;
 }
 
 /* seteuid: standards? */
 extern "C"
 int
-seteuid (uid_t)
+seteuid (uid_t uid)
 {
-  set_errno (ENOSYS);
-  return 0;
+  return setuid (uid);
 }
 
 /* setegid: from System V.  */
 extern "C"
 int
-setegid (gid_t)
+setegid (gid_t gid)
 {
-  set_errno (ENOSYS);
-  return 0;
+  return setgid (gid);
 }
 
 /* chroot: privileged Unix system call.  */

@@ -1,3 +1,11 @@
+Wed Apr 20  0:19:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * syscalls.cc (setuid): Allow switching user context after
+        successful call to ImpersonateLogedOnUser (NT only).
+        (setgid): Ditto.
+        (seteuid): Call setuid.
+        (setegid): Call setgid.
+
 Wed Apr 19 22:00:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * uinfo.cc (internal_getlogin): Use NetGetDCName() instead
