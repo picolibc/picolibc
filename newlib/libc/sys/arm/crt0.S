@@ -181,6 +181,13 @@ __change_mode:
 	bhi	.LC13
 #endif
 
+	/* Push a NULL argument onto the end of the list.  */
+	mov	r2, #0
+#ifdef __thumb__
+	push	{r2}
+#else
+	stmfd	sp!, {r1}
+#endif
 #endif
 
 #ifdef __USES_INITFINI__

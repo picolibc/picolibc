@@ -1,3 +1,7 @@
+2002-11-18  Nick Clifton  <nickc@redhat.com>
+
+	* libc/sys/arm/crt0.S: Add NULL to end of argv array.
+
 2002-11-14  Jeff Johnston  <jjohnstn@redhat.com>
 
         * testsuite/lib/passfail.exp (newlib_pass_fail): Changed to
