@@ -143,6 +143,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define OP_MASK_VECALIGN	0x7	/* Vector byte-align (alni.ob) op.  */
 #define OP_SH_VECALIGN		21
 
+#define	OP_OP_COP0		0x10
+#define	OP_OP_COP1		0x11
+#define	OP_OP_COP2		0x12
+#define	OP_OP_COP3		0x13
+#define	OP_OP_LWC1		0x31
+#define	OP_OP_LWC2		0x32
+#define	OP_OP_LWC3		0x33	/* a.k.a. pref */
+#define	OP_OP_LDC1		0x35
+#define	OP_OP_LDC2		0x36
+#define	OP_OP_LDC3		0x37	/* a.k.a. ld */
+#define	OP_OP_SWC1		0x39
+#define	OP_OP_SWC2		0x3a
+#define	OP_OP_SWC3		0x3b
+#define	OP_OP_SDC1		0x3d
+#define	OP_OP_SDC2		0x3e
+#define	OP_OP_SDC3		0x3f	/* a.k.a. sd */
+
 /* Values in the 'VSEL' field.  */
 #define MDMX_FMTSEL_IMM_QH	0x1d
 #define MDMX_FMTSEL_IMM_OB	0x1e

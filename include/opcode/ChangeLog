@@ -1,3 +1,10 @@
+2002-12-19  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (OP_OP_COP0, OP_OP_COP1, OP_OP_COP2, OP_OP_COP3)
+	(OP_OP_LWC1, OP_OP_LWC2, OP_OP_LWC3, OP_OP_LDC1, OP_OP_LDC2)
+	(OP_OP_LDC3, OP_OP_SWC1, OP_OP_SWC2, OP_OP_SWC3, OP_OP_SDC1)
+	(OP_OP_SDC2, OP_OP_SDC3): Define.
+
 2002-12-16  Alan Modra  <amodra@bigpond.net.au>
 
 	* hppa.h (completer_chars): #if 0 out.

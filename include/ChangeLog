@@ -1,3 +1,7 @@
+2002-12-27  Chris Demetriou  <cgd@broadcom.com>
+
+	* dis-asm.h (print_mips_disassembler_options): Prototype.
+
 2002-12-23  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (struct bfd_link_info): Add "strip_discarded".
