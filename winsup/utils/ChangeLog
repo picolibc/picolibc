@@ -1,3 +1,20 @@
+2003-08-07  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* dump_setup.cc (version_len): New static variable.
+	(could_not_access,directory_exists): New static function.
+	(file_exists): Ditto.
+	(check_package_files): Ditto.
+	(dump_setup): Check the contents of each package if check_files is true
+	and output the result in the "Status" column.  Flush output after each
+	package.
+
+2003-08-07  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* dump_setup.cc (dump_setup): Remove redundant null check.  Add
+	informative message if package info not found.
+
 2003-07-26  Christopher Faylor  <cgf@redhat.com>
 
 	* mount.cc (do_mount): Issue warning when using managed mount option on
@@ -66,7 +83,7 @@
 	and free servername in the loop.
 	* mkgroup.c (enum_groups): Do not free servername.
 	(usage): Update to allow several domains. Change uid to gid.
-	(main): Only print specials when -l is specified. Add a 
+	(main): Only print specials when -l is specified. Add a
 	loop to allow several domains and free servername in the loop.
 
 2003-03-24  Christopher Faylor  <cgf@redhat.com>
@@ -91,11 +108,11 @@
 
 2003-03-01  Pierre Humblet  <pierre.humblet@ieee.org>
 
-	* mkpasswd.cc (main): On Win95, output both a default line and a 
+	* mkpasswd.cc (main): On Win95, output both a default line and a
 	line for the current user (if known) with a pseudorandom uid. If
 	the -u switch is given, produce a line for the specified user.
-	* mkgroup.cc (main): On Win95 change the group name from "unknown" to 
-	"all". 
+	* mkgroup.cc (main): On Win95 change the group name from "unknown" to
+	"all".
 
 2003-02-28  Christopher Faylor  <cgf@redhat.com>
 
@@ -149,11 +166,11 @@
 	Win95/98/ME and to call current_user. Add username in gecos field
 	on Win95/98/ME.
 	* mkgroup.c (enum_groups): Print gid with %u.
-	(print_win_error): Create from passwd.cc.  
+	(print_win_error): Create from passwd.cc.
 	(current_group): Create.
 	(usage): Reorganize to support Win95/98/ME.
 	(main): Add option for -c. Reorganize to parse options for
-	Win95/98/ME and to call current_group.   
+	Win95/98/ME and to call current_group.
 
 2002-12-14  Pierre Humblet <pierre.humblet@ieee.org>
 
@@ -556,7 +573,7 @@
 
 	* mkgroup.c (main): Change call to exit() to a return statement.
 	* mkpasswd.c (main): Ditto.
-	
+
 2002-03-27  Joshua Daniel Franklin  joshuadfranklin@yahoo.com
 
 	* mkpasswd.c (usage): Simplify usage output.  Generalize to allow use
@@ -870,7 +887,7 @@ Fri Dec 14 12:10:39 2001  Jason Tishler <jason@tishler.net>
 	Tolerate whitespace and comment chars in input.
 	(usage): Add more user friendly help text.
 	(main): Add --help option.
-	
+
 2001-11-04  Egor Duda  <deo@logos-m.ru>
 
 	* strace.cc (main): New option '-w'. Start traced process in separate

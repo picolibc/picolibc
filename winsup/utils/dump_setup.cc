@@ -15,9 +15,12 @@ details. */
 #include <stdlib.h>
 #include <string.h>
 #include <io.h>
+#include <sys/stat.h>
+#include <errno.h>
 #include "path.h"
 
 static int package_len = 20;
+static unsigned int version_len = 10;
 
 
 typedef struct
@@ -173,23 +176,119 @@ match_argv (char **argv, const char *name)
   return false;
 }
 
+static bool
+could_not_access (int verbose, char *filename, char *package, const char *type)
+{
+  switch (errno)
+    {
+      case ENOTDIR:
+        break;
+      case ENOENT:
+        if (verbose)
+          printf ("Missing %s: /%s from package %s\n",
+                  type, filename, package);
+        return true;
+      case EACCES:
+        if (verbose)
+          printf ("Unable to access %s /%s from package %s\n",
+                  type, filename, package);
+        return true;
+    }
+  return false;
+}
+
+static bool
+directory_exists (int verbose, char *filename, char *package)
+{
+  struct stat status;
+  if (stat(cygpath("/", filename, ".", NULL), &status))
+    {
+      if (could_not_access (verbose, filename, package, "directory"))
+        return false;
+    }
+  else if (!S_ISDIR(status.st_mode))
+    {
+      if (verbose)
+        printf ("Directory/file mismatch: /%s from package %s\n", filename, package);
+      return false;
+    }
+  return true;
+}
+
+static bool
+file_exists (int verbose, char *filename, const char *alt, char *package)
+{
+  struct stat status;
+  if (stat(cygpath("/", filename, NULL), &status) &&
+      (!alt || stat(cygpath("/", filename, alt, NULL), &status)))
+    {
+      if (could_not_access (verbose, filename, package, "file"))
+        return false;
+    }
+  else if (!S_ISREG(status.st_mode))
+    {
+      if (verbose)
+        printf ("File type mismatch: /%s from package %s\n", filename, package);
+      return false;
+    }
+  return true;
+}
+
+static bool
+check_package_files (int verbose, char *package)
+{
+  bool result = true;
+  char filelist[4096] = " -dc /etc/setup/";
+  strcat(strcat(filelist, package), ".lst.gz");
+  char *zcat = cygpath("/bin/gzip.exe", NULL);
+  char command[4096];
+  while (char *p = strchr (zcat, '/'))
+    *p = '\\';
+  strcat(strcpy(command, zcat), filelist);
+  FILE *fp = popen (command, "rt");
+  char buf[4096];
+  while (fgets (buf, 4096, fp))
+    {
+      char *filename = strtok(buf, "\n");
+      if (filename[strlen(filename)-1] == '/')
+        {
+          if (!directory_exists(verbose, filename, package))
+            result = false;
+        }
+      else if (!strncmp(filename, "etc/postinstall/", 16))
+        {
+          if (!file_exists(verbose, filename, ".done", package))
+            result = false;
+        }
+      else
+        {
+          if (!file_exists(verbose, filename, ".lnk", package))
+            result = false;
+        }
+    }
+  fclose(fp);
+  return result;
+}
+
 void
-dump_setup (int verbose, char **argv, bool /*check_files*/)
+dump_setup (int verbose, char **argv, bool check_files)
 {
   char *setup = cygpath ("/etc/setup/installed.db", NULL);
   FILE *fp = fopen (setup, "rt");
+
   puts ("Cygwin Package Information");
   if (fp == NULL)
-    goto err;
+    {
+      puts ("No package information found");
+      goto err;
+    }
+
   if (verbose)
     {
       bool need_nl = dump_file ("Last downloaded files to: ", "last-cache");
       if (dump_file ("Last downloaded files from: ", "last-mirror") || need_nl)
 	puts ("");
     }
-
-  if (!fp)
-    goto err;
 
   int nlines;
   nlines = 0;
@@ -226,6 +325,8 @@ dump_setup (int verbose, char **argv, bool /*check_files*/)
 	  if (f.what[0])
 	    strcat (strcat (packages[n].name, "-"), f.what);
 	  packages[n].ver = strdup (f.ver);
+	  if (strlen(f.ver) > version_len)
+	    version_len = strlen(f.ver);
 	  n++;
 	  if (strtok (NULL, " ") == NULL)
 	    break;
@@ -234,9 +335,14 @@ dump_setup (int verbose, char **argv, bool /*check_files*/)
 
   qsort (packages, n, sizeof (packages[0]), compar);
 
-  printf ("%-*s %s\n", package_len, "Package", "Version");
+  printf ("%-*s %-*s     %s\n", package_len, "Package", version_len, "Version", check_files?"Status":"");
   for (int i = 0; i < n; i++)
-    printf ("%-*s %s\n", package_len, packages[i].name, packages[i].ver);
+    {
+      printf ("%-*s %-*s     %s\n", package_len, packages[i].name, version_len,
+	      packages[i].ver, check_files ?
+	      (check_package_files (verbose, packages[i].name) ? "OK" : "Incomplete") : "");
+      fflush(stdout);
+    }
   fclose (fp);
 
   return;
