@@ -1668,7 +1668,7 @@ LIBGMON_A=libgmon.a
 case "$target_os" in
 *cygwin*)
   MNO_CYGWIN=-mno-cygwin
-  LIBM_A=
+  LIBM_A=libm.a
   # Install mingw headers in mingw subdirectory.
   HEADER_SUBDIR="mingw"
   ;;
