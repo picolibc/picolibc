@@ -122,7 +122,9 @@ uinfo_init ()
 
   cygheap->user.orig_uid = cygheap->user.real_uid = myself->uid;
   cygheap->user.orig_gid = cygheap->user.real_gid = myself->gid;
-  cygheap->user.impersonation_state = IMP_NONE;
+  cygheap->user.external_token = INVALID_HANDLE_VALUE;
+  cygheap->user.internal_token = INVALID_HANDLE_VALUE;
+  cygheap->user.current_token = INVALID_HANDLE_VALUE;
   cygheap->user.set_orig_sid ();	/* Update the original sid */
 }
 

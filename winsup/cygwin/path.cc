@@ -892,8 +892,6 @@ digits (const char *name)
   return p > name && !*p ? n : -1;
 }
 
-
-
 /* Return TRUE if src_path is a Win32 device name, filling out the device
    name in win32_path */
 
@@ -1150,7 +1148,7 @@ set_flags (unsigned *flags, unsigned val)
     }
 }
 
-char special_chars[] =
+static char special_chars[] =
     "\001" "\002" "\003" "\004" "\005" "\006" "\007" "\010"
     "\011" "\012" "\013" "\014" "\015" "\016" "\017" "\020"
     "\021" "\022" "\023" "\024" "\025" "\026" "\027" "\030"
@@ -1160,28 +1158,66 @@ char special_chars[] =
     "I"    "J"    "K"    "L"    "M"    "N"    "O"    "P"
     "Q"    "R"    "S"    "T"    "U"    "V"    "W"    "X"
     "Y"    "Z";
+static char special_introducers[] =
+    "anpcl";
 
-static inline char
-special_char (const char *s)
+static char
+special_char (const char *s, const char *valid_chars = special_chars)
 {
-  char *p = strechr (special_chars, *s);
-  if (*p == '%' && strlen (p) >= 3)
-    {
-      char hex[] = {s[1], s[2], '\0'};
-      unsigned char c = strtoul (hex, &p, 16);
-      p = strechr (special_chars, c);
-    }
+  if (*s != '%' || strlen (s) < 3)
+    return 0;
+
+  char *p;
+  char hex[] = {s[1], s[2], '\0'};
+  unsigned char c = strtoul (hex, &p, 16);
+  p = strechr (valid_chars, c);
   return *p;
 }
 
+/* Determines if name is "special".  Assumes that name is empty or "absolute" */
+static int
+special_name (const char *s, int inc = 1)
+{
+  if (!*s)
+    return false;
+
+  s += inc;
+  if (strpbrk (s, special_chars))
+    return !strncasematch (s, "%2f", 3);
+
+  if (strcasematch (s, "nul")
+      || strcasematch (s, "aux")
+      || strcasematch (s, "prn")
+      || strcasematch (s, "con")
+      || strcasematch (s, "conin$")
+      || strcasematch (s, "conout$"))
+    return -1;
+  if (!strncasematch (s, "com", 3)
+      && !strncasematch (s, "lpt", 3))
+    return false;
+  char *p;
+  (void) strtoul (s + 3, &p, 10);
+  return -(*p == '\0');
+}
+
 bool
-fnunmunge (char *dst, const char *src) 
+fnunmunge (char *dst, const char *src)
 {
   bool converted = false;
   char c;
 
+  if ((c = special_char (src, special_introducers)))
+    {
+      __small_sprintf (dst, "%c%s", c, src + 3);
+      if (special_name (dst, 0))
+	{
+	  *dst++ = c;
+	  src += 3;
+	}
+    }
+
   while (*src)
-    if (*src != '%' || !(c = special_char (src)))
+    if (!(c = special_char (src)))
       *dst++ = *src++;
     else
       {
@@ -1192,28 +1228,6 @@ fnunmunge (char *dst, const char *src)
 
   *dst = *src;
   return converted;
-}
-
-/* Determines if name is "special".  Assumes that name is empty or "absolute" */
-static int
-special_name (const char *s)
-{
-  if (!*s)
-    return false;
-
-  if (strpbrk (++s, special_chars))
-    return !strncasematch (s, "%2f", 3);
-
-  if (strcasematch (s, "nul")
-      || strcasematch (s, "aux")
-      || strcasematch (s, "prn"))
-    return -1;
-  if (!strncasematch (s, "com", 3)
-      && !strncasematch (s, "lpt", 3))
-    return false;
-  char *p;
-  (void) strtol (s, &p, 10);
-  return -(*p == '\0');
 }
 
 void
@@ -1227,19 +1241,13 @@ mount_item::fnmunge (char *dst, const char *src)
       char *d = dst;
       *d++ = *src++;
       if (name_type < 0)
-	{
-	  __small_sprintf (d, "%%%02x", (unsigned char) *src++);
-	  d += 3;
-	}
+	d += __small_sprintf (d, "%%%02x", (unsigned char) *src++);
 
       while (*src)
-	if (!special_char (src))
+	if (!strchr (special_chars, *src) || (*src == '%' && !special_char (src)))
 	  *d++ = *src++;
 	else
-	  {
-	    __small_sprintf (d, "%%%02x", (unsigned char) *src++);
-	    d += 3;
-	  }
+	  d += __small_sprintf (d, "%%%02x", (unsigned char) *src++);
       *d = *src;
     }
 
@@ -2299,8 +2307,7 @@ cygdrive_getmntent ()
 	  break;
 
       __small_sprintf (native_path, "%c:\\", drive);
-      if (GetDriveType (native_path) == DRIVE_REMOVABLE ||
-	  GetFileAttributes (native_path) == INVALID_FILE_ATTRIBUTES)
+      if (GetFileAttributes (native_path) == INVALID_FILE_ATTRIBUTES)
 	{
 	  available_drives &= ~mask;
 	  continue;

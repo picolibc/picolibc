@@ -47,7 +47,7 @@ secret_event_name (char *buf, short port, int *secret_ptr)
 {
   __small_sprintf (buf, "%scygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x",
 		   wincap.has_terminal_services () ? "Global\\" : "",
-  		   port,
+		   port,
 		   secret_ptr [0], secret_ptr [1],
 		   secret_ptr [2], secret_ptr [3]);
 }
@@ -231,7 +231,7 @@ fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
 {
 
   char event_name[MAX_PATH];
-  
+
   secret_event_name (event_name, peer->sin_port, secret ?: connect_secret);
   HANDLE ev = CreateEvent (&sec_all_nih, FALSE, FALSE, event_name);
   if (!ev && GetLastError () == ERROR_ALREADY_EXISTS)
@@ -943,7 +943,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
     res = ret;
 
   /* Special handling for EPIPE and SIGPIPE.
-     
+
      EPIPE is generated if the local end has been shut down on a connection
      oriented socket.  In this case the process will also receive a SIGPIPE
      unless MSG_NOSIGNAL is set.  */

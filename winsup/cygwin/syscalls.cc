@@ -290,14 +290,14 @@ setsid (void)
     {
       if (myself->ctty >= 0 && fhandler_console::open_fhs <= 0)
 	{
-	  syscall_printf ("open_fhs %d, freeing console",
-			  fhandler_console::open_fhs);
+	  syscall_printf ("freeing console");
 	  FreeConsole ();
 	}
       myself->ctty = -1;
       myself->sid = getpid ();
       myself->pgid = getpid ();
-      syscall_printf ("sid %d, pgid %d, ctty %d", myself->sid, myself->pgid, myself->ctty);
+      syscall_printf ("sid %d, pgid %d, ctty %d, open_fhs %d", myself->sid,
+		      myself->pgid, myself->ctty, fhandler_console::open_fhs);
       return myself->sid;
     }
 
@@ -2123,7 +2123,6 @@ seteuid32 (__uid32_t uid)
   HANDLE ptok, new_token = INVALID_HANDLE_VALUE;
   struct passwd * pw_new;
   PSID origpsid, psid2 = NO_SID;
-  enum impersonation new_state = IMP_BAD;
   BOOL token_is_internal;
 
   pw_new = internal_getpwuid (uid);
@@ -2144,48 +2143,47 @@ seteuid32 (__uid32_t uid)
 
   /* Verify if the process token is suitable. */
   if (verify_token (ptok, usersid, groups))
-    new_state = IMP_NONE;
-  /* Verify if a current token is suitable */
-  else if (cygheap->user.external_token
+    new_token = ptok;
+  /* Verify if the external token is suitable */
+  else if (cygheap->user.external_token != INVALID_HANDLE_VALUE
 	   && verify_token (cygheap->user.external_token, usersid, groups))
-    {
-      new_token = cygheap->user.external_token;
-      new_state = IMP_EXTERNAL;
-    }
-  else if (cygheap->user.internal_token
+    new_token = cygheap->user.external_token;
+  /* Verify if the current token (internal or former external) is suitable */
+  else if (cygheap->user.current_token != INVALID_HANDLE_VALUE
+	   && cygheap->user.current_token != cygheap->user.external_token
+	   && verify_token (cygheap->user.current_token, usersid, groups,
+			    &token_is_internal))
+    new_token = cygheap->user.current_token;
+  /* Verify if the internal token is suitable */
+  else if (cygheap->user.internal_token != INVALID_HANDLE_VALUE
+	   && cygheap->user.internal_token != cygheap->user.current_token
 	   && verify_token (cygheap->user.internal_token, usersid, groups,
 			    &token_is_internal))
-    {
-      new_token = cygheap->user.internal_token;
-      new_state = IMP_INTERNAL;
-    }
+    new_token = cygheap->user.internal_token;
 
-  debug_printf ("New token %d, state %d", new_token, new_state);
-  /* Return if current token is valid */
-  if (cygheap->user.impersonation_state == new_state)
-    {
-      cygheap->user.reimpersonate ();
-      goto success; /* No change */
-    }
+  debug_printf ("Found token %d", new_token);
 
   /* Set process def dacl to allow access to impersonated token */
-  char dacl_buf[MAX_DACL_LEN (5)];
-  if (usersid != (origpsid = cygheap->user.orig_sid ()))
-    psid2 = usersid;
-  if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
+  if (cygheap->user.current_token != new_token)
     {
-      TOKEN_DEFAULT_DACL tdacl;
-      tdacl.DefaultDacl = (PACL) dacl_buf;
-      if (!SetTokenInformation (ptok, TokenDefaultDacl,
-				&tdacl, sizeof dacl_buf))
-	debug_printf ("SetTokenInformation"
-		      "(TokenDefaultDacl): %E");
+      char dacl_buf[MAX_DACL_LEN (5)];
+      if (usersid != (origpsid = cygheap->user.orig_sid ()))
+	psid2 = usersid;
+      if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
+	{
+	  TOKEN_DEFAULT_DACL tdacl;
+	  tdacl.DefaultDacl = (PACL) dacl_buf;
+	  if (!SetTokenInformation (ptok, TokenDefaultDacl,
+				    &tdacl, sizeof dacl_buf))
+	    debug_printf ("SetTokenInformation"
+			  "(TokenDefaultDacl): %E");
+	}
     }
 
-  if (new_state == IMP_BAD)
+  /* If no impersonation token is available, try to
+     authenticate using NtCreateToken () or subauthentication. */
+  if (new_token == INVALID_HANDLE_VALUE)
     {
-      /* If no impersonation token is available, try to
-	 authenticate using NtCreateToken () or subauthentication. */
       new_token = create_token (usersid, groups, pw_new);
       if (new_token == INVALID_HANDLE_VALUE)
 	{
@@ -2195,48 +2193,31 @@ seteuid32 (__uid32_t uid)
 	  if (new_token == INVALID_HANDLE_VALUE)
 	    goto failed;
 	}
-      new_state = IMP_INTERNAL;
-    }
-
-  /* If using the token, set info and impersonate */
-  if (new_state != IMP_NONE)
-    {
-      /* If the token was explicitly created, all information has
-	 already been set correctly. */
-      if (new_state == IMP_EXTERNAL)
-	{
-	  /* Try setting owner to same value as user. */
-	  if (!SetTokenInformation (new_token, TokenOwner,
-				    &usersid, sizeof usersid))
-	    debug_printf ("SetTokenInformation(user.token, "
-			  "TokenOwner): %E");
-	  /* Try setting primary group in token to current group */
-	  if (!SetTokenInformation (new_token,
-				    TokenPrimaryGroup,
-				    &groups.pgsid, sizeof (cygsid)))
-	    debug_printf ("SetTokenInformation(user.token, "
-			  "TokenPrimaryGroup): %E");
-	}
-      /* Try to impersonate. */
-      if (!ImpersonateLoggedOnUser (new_token))
-	{
-	  debug_printf ("ImpersonateLoggedOnUser %E");
-	  __seterrno ();
-	  goto failed;
-	}
       /* Keep at most one internal token */
-      if (new_state == IMP_INTERNAL)
-        {
-	  if (cygheap->user.internal_token)
-	    CloseHandle (cygheap->user.internal_token);
-	  cygheap->user.internal_token = new_token;
-	}
+      if (cygheap->user.internal_token != INVALID_HANDLE_VALUE)
+	CloseHandle (cygheap->user.internal_token);
+      cygheap->user.internal_token = new_token;
     }
-  cygheap->user.set_sid (usersid);
+  else if (new_token != ptok)
+    {
+      /* Try setting owner to same value as user. */
+      if (!SetTokenInformation (new_token, TokenOwner,
+				&usersid, sizeof usersid))
+	debug_printf ("SetTokenInformation(user.token, "
+		      "TokenOwner): %E");
+      /* Try setting primary group in token to current group */
+      if (!SetTokenInformation (new_token,
+				TokenPrimaryGroup,
+				&groups.pgsid, sizeof (cygsid)))
+	debug_printf ("SetTokenInformation(user.token, "
+		      "TokenPrimaryGroup): %E");
+    }
 
-success:
   CloseHandle (ptok);
-  cygheap->user.impersonation_state = new_state;
+  cygheap->user.set_sid (usersid);
+  cygheap->user.current_token = new_token == ptok ? INVALID_HANDLE_VALUE
+						  : new_token;
+  cygheap->user.reimpersonate ();
 success_9x:
   cygheap->user.set_name (pw_new->pw_name);
   myself->uid = uid;
@@ -2632,27 +2613,25 @@ logout (char *line)
   strncpy (ut_buf.ut_line, line, sizeof ut_buf.ut_line);
   setutent ();
   ut = getutline (&ut_buf);
+
   if (ut)
     {
       int fd;
 
-      /* We can't use ut further since it's a pointer to the static utmp_data
-	 area (see below) and would get overwritten in pututline().  So we
-	 copy it back to the local ut_buf. */
-      memcpy (&ut_buf, ut, sizeof ut_buf);
-      ut_buf.ut_type = DEAD_PROCESS;
-      memset (ut_buf.ut_user, 0, sizeof ut_buf.ut_user);
-      time (&ut_buf.ut_time);
+      ut->ut_type = DEAD_PROCESS;
+      memset (ut->ut_user, 0, sizeof ut->ut_user);
+      time (&ut->ut_time);
       /* Writing to wtmp must be atomic to prevent mixed up data. */
       char mutex_name[MAX_PATH];
       HANDLE mutex = CreateMutex (NULL, FALSE,
-      				  shared_name (mutex_name, "wtmp_mutex", 0));
+				  shared_name (mutex_name, "wtmp_mutex", 0));
       if (mutex)
 	while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
 	  ;
       if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
 	{
 	  write (fd, &ut_buf, sizeof ut_buf);
+	  debug_printf ("set logout time for %s", line);
 	  close (fd);
 	}
       if (mutex)
@@ -2660,9 +2639,9 @@ logout (char *line)
 	  ReleaseMutex (mutex);
 	  CloseHandle (mutex);
 	}
-      memset (ut_buf.ut_line, 0, sizeof ut_buf.ut_line);
-      ut_buf.ut_time = 0;
-      pututline (&ut_buf);
+      memset (ut->ut_line, 0, sizeof ut_buf.ut_line);
+      ut->ut_time = 0;
+      pututline (ut);
       endutent ();
     }
   return 1;
@@ -2671,8 +2650,6 @@ logout (char *line)
 static int utmp_fd = -1;
 static bool utmp_readonly = false;
 static char *utmp_file = (char *) _PATH_UTMP;
-
-static struct utmp utmp_data;
 
 static void
 internal_setutent (bool force_readwrite)
@@ -2687,11 +2664,11 @@ internal_setutent (bool force_readwrite)
 	 case we try again for reading only unless the process calls
 	 pututline() (==force_readwrite) in which case opening just fails. */
       if (utmp_fd < 0 && !force_readwrite)
-        {
+	{
 	  utmp_fd = open (utmp_file, O_RDONLY | O_BINARY);
 	  if (utmp_fd >= 0)
 	    utmp_readonly = true;
-        }
+	}
     }
   else
     lseek (utmp_fd, 0, SEEK_SET);
@@ -2729,6 +2706,16 @@ utmpname (_CONST char *file)
   debug_printf ("New UTMP file: %s", utmp_file);
 }
 
+/* Note: do not make NO_COPY */
+static struct utmp utmp_data_buf[16];
+static unsigned utix = 0;
+#define nutdbuf (sizeof (utmp_data_buf) / sizeof (utmp_data_buf[0]))
+#define utmp_data ({ \
+  if (utix > nutdbuf) \
+    utix = 0; \
+  utmp_data_buf + utix++; \
+})
+
 extern "C" struct utmp *
 getutent ()
 {
@@ -2737,11 +2724,13 @@ getutent ()
     {
       internal_setutent (false);
       if (utmp_fd < 0)
-        return NULL;
+	return NULL;
     }
-  if (read (utmp_fd, &utmp_data, sizeof utmp_data) != sizeof utmp_data)
+
+  utmp *ut = utmp_data;
+  if (read (utmp_fd, ut, sizeof *ut) != sizeof *ut)
     return NULL;
-  return &utmp_data;
+  return ut;
 }
 
 extern "C" struct utmp *
@@ -2754,9 +2743,11 @@ getutid (struct utmp *id)
     {
       internal_setutent (false);
       if (utmp_fd < 0)
-        return NULL;
+	return NULL;
     }
-  while (read (utmp_fd, &utmp_data, sizeof utmp_data) == sizeof utmp_data)
+
+  utmp *ut = utmp_data;
+  while (read (utmp_fd, ut, sizeof *ut) == sizeof *ut)
     {
       switch (id->ut_type)
 	{
@@ -2764,15 +2755,15 @@ getutid (struct utmp *id)
 	case BOOT_TIME:
 	case OLD_TIME:
 	case NEW_TIME:
-	  if (id->ut_type == utmp_data.ut_type)
-	    return &utmp_data;
+	  if (id->ut_type == ut->ut_type)
+	    return ut;
 	  break;
 	case INIT_PROCESS:
 	case LOGIN_PROCESS:
 	case USER_PROCESS:
 	case DEAD_PROCESS:
-	   if (strncmp (id->ut_id, utmp_data.ut_id, UT_IDLEN) == 0)
-	    return &utmp_data;
+	   if (strncmp (id->ut_id, ut->ut_id, UT_IDLEN) == 0)
+	    return ut;
 	  break;
 	default:
 	  return NULL;
@@ -2791,16 +2782,16 @@ getutline (struct utmp *line)
     {
       internal_setutent (false);
       if (utmp_fd < 0)
-        return NULL;
+	return NULL;
     }
-  while (read (utmp_fd, &utmp_data, sizeof utmp_data) == sizeof utmp_data)
-    {
-      if ((utmp_data.ut_type == LOGIN_PROCESS ||
-	   utmp_data.ut_type == USER_PROCESS) &&
-	  !strncmp (utmp_data.ut_line, line->ut_line,
-		    sizeof utmp_data.ut_line))
-	return &utmp_data;
-    }
+
+  utmp *ut = utmp_data;
+  while (read (utmp_fd, ut, sizeof *ut) == sizeof *ut)
+    if ((ut->ut_type == LOGIN_PROCESS ||
+	 ut->ut_type == USER_PROCESS) &&
+	!strncmp (ut->ut_line, line->ut_line, sizeof (ut->ut_line)))
+      return ut;
+
   return NULL;
 }
 
@@ -2812,7 +2803,14 @@ pututline (struct utmp *ut)
     return;
   internal_setutent (true);
   if (utmp_fd < 0)
-    return;
+    {
+      debug_printf ("error: utmp_fd %d", utmp_fd);
+      return;
+    }
+  debug_printf ("ut->ut_type %d, ut->ut_pid %d, ut->ut_line '%s', ut->ut_id '%s'\n",
+		ut->ut_type, ut->ut_pid, ut->ut_line, ut->ut_id);
+  debug_printf ("ut->ut_user '%s', ut->ut_host '%s'\n",
+		ut->ut_user, ut->ut_host);
   /* Read/write to utmp must be atomic to prevent overriding data
      by concurrent processes. */
   char mutex_name[MAX_PATH];
@@ -2838,18 +2836,18 @@ extern "C"
 long gethostid(void)
 {
   unsigned data[13] = {0x92895012,
-                       0x10293412,
-                       0x29602018,
-                       0x81928167,
-                       0x34601329,
-                       0x75630198,
-                       0x89860395,
-                       0x62897564,
-                       0x00194362,
-                       0x20548593,
-                       0x96839102,
-                       0x12219854,
-                       0x00290012};
+		       0x10293412,
+		       0x29602018,
+		       0x81928167,
+		       0x34601329,
+		       0x75630198,
+		       0x89860395,
+		       0x62897564,
+		       0x00194362,
+		       0x20548593,
+		       0x96839102,
+		       0x12219854,
+		       0x00290012};
 
   bool has_cpuid = false;
   sigframe thisframe (mainthread);
@@ -2864,12 +2862,12 @@ long gethostid(void)
     {
       debug_printf ("486 processor");
       if (can_set_flag (0x00200000))
-        {
-          debug_printf ("processor supports CPUID instruction");
-          has_cpuid = true;
-        }
+	{
+	  debug_printf ("processor supports CPUID instruction");
+	  has_cpuid = true;
+	}
       else
-        debug_printf ("processor does not support CPUID instruction");
+	debug_printf ("processor does not support CPUID instruction");
     }
   if (has_cpuid)
     {
@@ -2877,22 +2875,22 @@ long gethostid(void)
       cpuid (&maxf, &unused[0], &unused[1], &unused[2], 0);
       maxf &= 0xffff;
       if (maxf >= 1)
-        {
-          unsigned features;
-          cpuid (&data[0], &unused[0], &unused[1], &features, 1);
-          if (features & (1 << 18))
-            {
-              debug_printf ("processor has psn");
-              if (maxf >= 3)
-                {
-                  cpuid (&unused[0], &unused[1], &data[1], &data[2], 3);
-                  debug_printf ("Processor PSN: %04x-%04x-%04x-%04x-%04x-%04x",
-                                data[0] >> 16, data[0] & 0xffff, data[2] >> 16, data[2] & 0xffff, data[1] >> 16, data[1] & 0xffff);
-                }
-            }
-          else
-            debug_printf ("processor does not have psn");
-        }
+	{
+	  unsigned features;
+	  cpuid (&data[0], &unused[0], &unused[1], &features, 1);
+	  if (features & (1 << 18))
+	    {
+	      debug_printf ("processor has psn");
+	      if (maxf >= 3)
+		{
+		  cpuid (&unused[0], &unused[1], &data[1], &data[2], 3);
+		  debug_printf ("Processor PSN: %04x-%04x-%04x-%04x-%04x-%04x",
+				data[0] >> 16, data[0] & 0xffff, data[2] >> 16, data[2] & 0xffff, data[1] >> 16, data[1] & 0xffff);
+		}
+	    }
+	  else
+	    debug_printf ("processor does not have psn");
+	}
     }
 
   UUID Uuid;
@@ -2906,8 +2904,8 @@ long gethostid(void)
       // Unfortunately Windows will sometimes pick a virtual Ethernet card
       // e.g. VMWare Virtual Ethernet Adaptor
       debug_printf ("MAC address of first Ethernet card: %02x:%02x:%02x:%02x:%02x:%02x",
-                    Uuid.Data4[2], Uuid.Data4[3], Uuid.Data4[4],
-                    Uuid.Data4[5], Uuid.Data4[6], Uuid.Data4[7]);
+		    Uuid.Data4[2], Uuid.Data4[3], Uuid.Data4[4],
+		    Uuid.Data4[5], Uuid.Data4[6], Uuid.Data4[7]);
     }
   else
     {
@@ -2923,16 +2921,16 @@ long gethostid(void)
     GetDiskFreeSpace ("C:\\", NULL, NULL, NULL, (DWORD *)&data[11]);
 
   debug_printf ("hostid entropy: %08x %08x %08x %08x "
-                                "%08x %08x %08x %08x "
-                                "%08x %08x %08x %08x "
-                                "%08x",
-                                data[0], data[1],
-                                data[2], data[3],
-                                data[4], data[5],
-                                data[6], data[7],
-                                data[8], data[9],
-                                data[10], data[11],
-                                data[12]);
+				"%08x %08x %08x %08x "
+				"%08x %08x %08x %08x "
+				"%08x",
+				data[0], data[1],
+				data[2], data[3],
+				data[4], data[5],
+				data[6], data[7],
+				data[8], data[9],
+				data[10], data[11],
+				data[12]);
 
   long hostid = 0x40291372;
   // a random hashing algorithm

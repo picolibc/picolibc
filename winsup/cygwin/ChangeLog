@@ -1,6 +1,164 @@
+2003-08-05  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Rework to accommodate new speclib arguments.
+	* speclib: Rework to extract everything from libcygwin.a rather than
+	building things from existing object files.
+
+2003-08-05  Pavel Tsekov  <ptsekov@gmx.net>
+
+	* path.cc (cygdrive_getmntent): Do not skip over drives of type
+	DRIVE_REMOVABLE.
+
+2003-08-05  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::lseek): Be more paranoid when
+	constructing offsets from 64 bit value.
+	* syscalls.cc (logout): Avoid temp buffer memcpy since new scheme does
+	not require it.
+	(utmp_data): Rework as a macro which returns a pointer into a buffer.
+	(getutent): Use new buffer allocation mechanism to grab a utmp buffer.
+	(getutid): Ditto.
+	(pututline): Ditto.
+
+2003-08-05  Pavel Tsekov  <ptsekov@gmx.net>
+
+	* fhandler_disk_file.cc (fhandler_cygdrive::readdir): Do not change
+	'errno' if end of directory condition is encountered as per SUSv2.
+	* fhandler_proc.cc (fhandler_proc::readdir): Ditto.
+	* fhandler_process (fhandler_process::readdir): Ditto.
+	* fhandler_registry (fhandler_registry::readdir): Ditto.
+
+2003-07-30  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (_dll_crt0): Move strace.microseconds initialization to
+	after pthread initialization.
+	(dll_crt0_1): i.e., here.
+
+2003-07-28  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_base.cc (fhandler_base::readv): Rework to properly return
+	number of bytes from read.
+
+2003-07-28  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 2.
+
+2003-07-26  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (ctrl_c_handler): Send SIGHUP when events occur only if
+	there is a tty associated with the process.  Send SIGHUP on
+	CTRL_LOGOFF_EVENT.
+
+	* fhandler_tty.cc (fhandler_tty_slave::open): Adjust console open
+	handle counter regardless of whether this is a pty or tty.
+	(fhandler_tty_slave::open): Ditto.
+	(fhandler_tty_slave::dup): Ditto.
+	(fhandler_tty_common::set_close_on_exec): Ditto.
+	(fhandler_tty_master::init_console): Decrement console open handle
+	counter after init since it will now be handled by all tty open.
+	* syscalls.cc (setsid): Rework debugging output slightly.
+
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Use 'install-sh -c'.
+	* configure: Regenerate.
+
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Always use install-sh.
+	* configure: Regenerate.
+
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/socket.h: Conditionalize [AP]F_INET6 define.
+
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (OBSOLETE_FUNCTION):  Add fdopen.
+
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Export _fdopen64
+	* Makefile.in (NEW_FUNCTIONS): Add _fdopen64 -> fdopen translation.
+	* include/cygwin/version.h: Bump api minor number.
+
+	* ntdll.h: Remove (now) duplicate FILE_SYNCHRONOUS_IO_NONALERT
+	definition.
+
+2003-07-24  Christopher Faylor  <cgf@redhat.com>
+
+	* environ.cc (check_case_init): Use strncasematch.
+
+	* cygwin.din: Export __mempcpy.
+	* cygwin/version.h: Bump api minor number.
+
+2003-07-21  Pavel Tsekov  <ptsekov@gmx.net>
+
+	* mmap.cc: Use proper format specifiers for _off64_t and size_t in
+	format strings passed to syscall_printf () and debug_printf ()
+	throughout.
+
+2003-07-18  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.cc (verify_token): Fix white space and style.
+	Use type bool instead of BOOL and char. Use alloca
+	instead of malloc and free for my_grps.
+
+2003-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysconf.cc (sysconf): Fix OPEN_MAX patch.  Return page size on
+	_SC_PAGESIZE again.
+
+2003-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (class cygheap_user): Use INVALID_HANDLE_VALUE as invalid
+	value for tokens.
+	* syscalls.cc (seteuid32): Ditto.  Set new_token to process token if
+	process token is suitable.
+	* uinfo.cc (uinfo_init): Initialize tokens in cygheap user info
+	to INVALID_HANDLE_VALUE.
+
+2003-07-14  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* cygheap.h (enum impersonation): Delete.
+	(cygheap_user::impersonation_state): Delete.
+	(cygheap_user::current_token): New.
+	(cygheap_user::issetuid): Modify to use current_token.
+	(cygheap_user::token): Ditto.
+	(cygheap_user::deimpersonate): Ditto.
+	(cygheap_user::reimpersonate): Ditto.
+	(cygheap_user::has_impersonation_tokens): Ditto.
+	(cygheap_user::close_impersonation_tokens): Ditto.
+	* security.cc (cygwin_set_impersonation_token): Always set the token.
+	(verify_token): Change type of gsid to cygpsid.
+	(get_file_attribute): Use the effective ids.
+	* syscalls.cc (seteuid32): Modify to use cygheap_user::current_token.
+	* uinfo.cc (uinfo_init) Do not set cygheap->user.impersonation_state.
+
+2003-07-12  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::commune_send): Fix bounds test so that poll of
+	communicating pid actually stops eventually.
+
+2003-07-10  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (get_device_number): Remove special com?  consideration.
+	(special_chars): Make static.
+	(special_introducers): New.
+	(special_char): Allow specified valid_chars args.
+	(fnunmunge): Handle aux-like filenames correctly.
+	(special_name): Add con, conin$, conout$.
+	(mount_item::fnmunge): Use __small_sprintf return value to calculate
+	increments.
+
 2003-07-09  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 1.
+
+2003-07-09  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_proc.cc (format_proc_stat): Use correctly sized constants
+	for filling in zeros on 98.
 
 2003-07-09  Christopher Faylor  <cgf@redhat.com>
 
@@ -2804,4 +2962,3 @@
 
 	* passwd.cc (getpwuid_r32): Add uid/gid fields to size check
 	calculation.
-

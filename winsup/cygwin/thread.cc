@@ -288,7 +288,7 @@ List<pthread> pthread::threads;
 
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-		    running (false), suspended (false), 
+		    running (false), suspended (false),
 		    cancelstate (0), canceltype (0), cancel_event (0),
 		    joiner (NULL), next (NULL), cleanup_stack (NULL)
 {
@@ -856,8 +856,8 @@ pthread_cond::pthread_cond (pthread_condattr *attr) :
   if (attr)
     if (attr->shared != PTHREAD_PROCESS_PRIVATE)
       {
-        magic = 0;
-        return;
+	magic = 0;
+	return;
       }
 
   verifyable_mutex_obj = &mtx_in;
@@ -907,7 +907,7 @@ pthread_cond::unblock (const bool all)
 {
   unsigned long releaseable;
 
-  /* 
+  /*
    * Block outgoing threads (and avoid simultanous unblocks)
    */
   mtx_out.lock ();
@@ -918,19 +918,19 @@ pthread_cond::unblock (const bool all)
       unsigned long released;
 
       if (!pending)
-        {
-          /* 
-           * Block incoming threads until all waiting threads are released.
-           */
-          mtx_in.lock ();
+	{
+	  /*
+	   * Block incoming threads until all waiting threads are released.
+	   */
+	  mtx_in.lock ();
 
-          /* 
-           * Calculate releaseable again because threads can enter until
-           * the semaphore has been taken, but they can not leave, therefore pending
-           * is unchanged and releaseable can only get higher
-           */
-          releaseable = waiting - pending;
-        }
+	  /*
+	   * Calculate releaseable again because threads can enter until
+	   * the semaphore has been taken, but they can not leave, therefore pending
+	   * is unchanged and releaseable can only get higher
+	   */
+	  releaseable = waiting - pending;
+	}
 
       released = all ? releaseable : 1;
       pending += released;
@@ -971,20 +971,20 @@ pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
   rv = pthread::cancelable_wait (sem_wait, dwMilliseconds, false);
 
   mtx_out.lock ();
-  
+
   if (rv != WAIT_OBJECT_0)
     {
       /*
        * It might happen that a signal is sent while the thread got canceled
        * or timed out. Try to take one.
        * If the thread gets one than a signal|broadcast is in progress.
-       */ 
+       */
       if (WaitForSingleObject (sem_wait, 0) == WAIT_OBJECT_0)
-        /*
-         * thread got cancelled ot timed out while a signalling is in progress.
-         * Set wait result back to signaled
-         */
-        rv = WAIT_OBJECT_0;
+	/*
+	 * thread got cancelled ot timed out while a signalling is in progress.
+	 * Set wait result back to signaled
+	 */
+	rv = WAIT_OBJECT_0;
     }
 
   InterlockedDecrement ((long *)&waiting);
@@ -997,7 +997,7 @@ pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
     mtx_in.unlock ();
 
   mtx_out.unlock ();
- 
+
   mutex->lock ();
   --mutex->condwaits;
 
@@ -1068,8 +1068,8 @@ pthread_rwlock::pthread_rwlock (pthread_rwlockattr *attr) :
   if (attr)
     if (attr->shared != PTHREAD_PROCESS_PRIVATE)
       {
-        magic = 0;
-        return;
+	magic = 0;
+	return;
       }
 
   if (!pthread_mutex::is_good_object (&verifyable_mutex_obj))
@@ -1129,7 +1129,7 @@ pthread_rwlock::rdlock ()
     }
 
   while (writer || waiting_writers)
-    {  
+    {
       pthread_cleanup_push (pthread_rwlock::rdlock_cleanup, this);
 
       ++waiting_readers;
@@ -1162,14 +1162,14 @@ pthread_rwlock::tryrdlock ()
     {
       struct RWLOCK_READER *reader = new struct RWLOCK_READER;
       if (reader)
-        {
-          reader->thread = self;
-          add_reader (reader);
-        }
+	{
+	  reader->thread = self;
+	  add_reader (reader);
+	}
       else
-        result = EAGAIN;
+	result = EAGAIN;
     }
-    
+
   mtx.unlock ();
 
   return result;
@@ -1190,7 +1190,7 @@ pthread_rwlock::wrlock ()
     }
 
   while (writer || readers)
-    {  
+    {
       pthread_cleanup_push (pthread_rwlock::wrlock_cleanup, this);
 
       ++waiting_writers;
@@ -1220,7 +1220,7 @@ pthread_rwlock::trywrlock ()
     result = EBUSY;
   else
     writer = self;
-    
+
   mtx.unlock ();
 
   return result;
@@ -1237,10 +1237,10 @@ pthread_rwlock::unlock ()
   if (writer)
     {
       if (writer != self)
-        {
-          result = EPERM;
-          goto DONE;
-        }
+	{
+	  result = EPERM;
+	  goto DONE;
+	}
 
       writer = NULL;
     }
@@ -1249,10 +1249,10 @@ pthread_rwlock::unlock ()
       struct RWLOCK_READER *reader = lookup_reader (self);
 
       if (!reader)
-        {
-          result = EPERM;
-          goto DONE;
-        }
+	{
+	  result = EPERM;
+	  goto DONE;
+	}
 
       remove_reader (reader);
       delete reader;
@@ -1336,13 +1336,13 @@ pthread_rwlock::_fixup_after_fork ()
   while (*temp)
     {
       if ((*temp)->thread == self)
-        temp = &((*temp)->next);
+	temp = &((*temp)->next);
       else
-        {
-          struct RWLOCK_READER *cur = *temp;
-          *temp = (*temp)->next;
-          delete cur;
-        }
+	{
+	  struct RWLOCK_READER *cur = *temp;
+	  *temp = (*temp)->next;
+	  delete cur;
+	}
     }
 }
 

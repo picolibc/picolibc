@@ -69,17 +69,8 @@ extern "C" void
 cygwin_set_impersonation_token (const HANDLE hToken)
 {
   debug_printf ("set_impersonation_token (%d)", hToken);
-  if (cygheap->user.impersonation_state == IMP_EXTERNAL
-      && cygheap->user.external_token != hToken)
-    {
-      set_errno (EPERM);
-      return;
-    }
-  else
-    {
-      cygheap->user.external_token = hToken;
-      return;
-    }
+  cygheap->user.external_token = hToken;
+  return;
 }
 
 void
@@ -741,42 +732,38 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
   if (intern && !groups.issetgroups ())
     {
       char sd_buf[MAX_SID_LEN + sizeof (SECURITY_DESCRIPTOR)];
-      PSID gsid = NO_SID;
+      cygpsid gsid (NO_SID);
       if (!GetKernelObjectSecurity (token, GROUP_SECURITY_INFORMATION,
 				    (PSECURITY_DESCRIPTOR) sd_buf,
 				    sizeof sd_buf, &size))
 	debug_printf ("GetKernelObjectSecurity(): %E");
       else if (!GetSecurityDescriptorGroup ((PSECURITY_DESCRIPTOR) sd_buf,
-					    &gsid, (BOOL *) &size))
+					    (PSID *) &gsid, (BOOL *) &size))
 	debug_printf ("GetSecurityDescriptorGroup(): %E");
       if (well_known_null_sid != gsid)
 	return gsid == groups.pgsid;
     }
 
-  PTOKEN_GROUPS my_grps = NULL;
-  BOOL ret = FALSE;
-  char saw_buf[NGROUPS_MAX] = {};
-  char *saw = saw_buf, sawpg = FALSE;
+  PTOKEN_GROUPS my_grps;
+  bool saw_buf[NGROUPS_MAX] = {};
+  bool *saw = saw_buf, sawpg = false, ret = false;
 
   if (!GetTokenInformation (token, TokenGroups, NULL, 0, &size) &&
       GetLastError () != ERROR_INSUFFICIENT_BUFFER)
     debug_printf ("GetTokenInformation(token, TokenGroups): %E");
-  else if (!(my_grps = (PTOKEN_GROUPS) malloc (size)))
-    debug_printf ("malloc (my_grps) failed.");
+  else if (!(my_grps = (PTOKEN_GROUPS) alloca (size)))
+    debug_printf ("alloca (my_grps) failed.");
   else if (!GetTokenInformation (token, TokenGroups, my_grps, size, &size))
     debug_printf ("GetTokenInformation(my_token, TokenGroups): %E");
   else if (!groups.issetgroups ()) /* setgroups was never called */
-    {
-      ret = sid_in_token_groups (my_grps, groups.pgsid);
-      if (ret == FALSE)
-	ret = (groups.pgsid == tok_usersid);
-    }
+    ret = sid_in_token_groups (my_grps, groups.pgsid)
+	  || groups.pgsid == usersid;
   else /* setgroups was called */
     {
       struct __group32 *gr;
       cygsid gsid;
-      if (groups.sgsids.count > (int) sizeof (saw_buf) &&
-	  !(saw = (char *) calloc (groups.sgsids.count, sizeof (char))))
+      if (groups.sgsids.count > (int) (sizeof (saw_buf) / sizeof (*saw_buf))
+	  && !(saw = (bool *) calloc (groups.sgsids.count, sizeof (bool))))
 	goto done;
 
       /* token groups found in /etc/group match the user.gsids ? */
@@ -785,24 +772,21 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
 	  {
 	    int pos = groups.sgsids.position (gsid);
 	    if (pos >= 0)
-	      saw[pos] = TRUE;
+	      saw[pos] = true;
 	    else if (groups.pgsid == gsid)
-	      sawpg = TRUE;
-	   else if (gsid != well_known_world_sid &&
-		    gsid != usersid)
+	      sawpg = true;
+	    else if (gsid != well_known_world_sid
+		     && gsid != usersid)
 	      goto done;
 	  }
       for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
 	if (!saw[gidx])
 	  goto done;
-      if (sawpg ||
-	  groups.sgsids.contains (groups.pgsid) ||
-	  groups.pgsid == usersid)
-	ret = TRUE;
+      ret = sawpg
+	    || groups.sgsids.contains (groups.pgsid)
+	    || groups.pgsid == usersid;
     }
 done:
-  if (my_grps)
-    free (my_grps);
   if (saw != saw_buf)
     free (saw);
   return ret;
@@ -1414,9 +1398,9 @@ get_file_attribute (int use_ntsec, const char *file,
     }
 
   if (uidret)
-    *uidret = getuid32 ();
+    *uidret = myself->uid;
   if (gidret)
-    *gidret = getgid32 ();
+    *gidret = myself->gid;
 
   if (!attribute)
     return 0;
@@ -1446,15 +1430,15 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
       psd = (PSECURITY_DESCRIPTOR) & sd_buf[0];
       DWORD len = sizeof (sd_buf);
       if (ERROR_SUCCESS != RegGetKeySecurity ((HKEY) handle,
-                                              DACL_SECURITY_INFORMATION |
-                                              GROUP_SECURITY_INFORMATION |
-                                              OWNER_SECURITY_INFORMATION,
-                                              psd, &len))
-        {
-          __seterrno ();
-          debug_printf ("RegGetKeySecurity %E");
-          psd = NULL;
-        }
+					      DACL_SECURITY_INFORMATION |
+					      GROUP_SECURITY_INFORMATION |
+					      OWNER_SECURITY_INFORMATION,
+					      psd, &len))
+	{
+	  __seterrno ();
+	  debug_printf ("RegGetKeySecurity %E");
+	  psd = NULL;
+	}
       }
   else
     {
@@ -1463,7 +1447,7 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 					    GROUP_SECURITY_INFORMATION |
 					    OWNER_SECURITY_INFORMATION,
 					    NULL, NULL, NULL, NULL, &psd))
-        {
+	{
 	  __seterrno ();
 	  debug_printf ("GetSecurityInfo %E");
 	  psd = NULL;

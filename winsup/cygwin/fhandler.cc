@@ -723,28 +723,29 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
   assert (iov);
   assert (iovcnt >= 1);
 
+  size_t len = tot;
   if (iovcnt == 1)
     {
-      size_t len = iov->iov_len;
+      len = iov->iov_len;
       read (iov->iov_base, len);
       return len;
     }
 
   if (tot == -1)		// i.e. if not pre-calculated by the caller.
     {
-      tot = 0;
+      len = 0;
       const struct iovec *iovptr = iov + iovcnt;
       do
 	{
 	  iovptr -= 1;
-	  tot += iovptr->iov_len;
+	  len += iovptr->iov_len;
 	}
       while (iovptr != iov);
     }
 
   assert (tot >= 0);
 
-  if (tot == 0)
+  if (!len)
     return 0;
 
   char *buf = (char *) alloca (tot);
@@ -755,10 +756,10 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
       return -1;
     }
 
-  read (buf, (size_t) tot);
+  read (buf, len);
+  ssize_t nbytes = (ssize_t) len;
 
   const struct iovec *iovptr = iov;
-  int nbytes = tot;
 
   while (nbytes > 0)
     {
@@ -769,7 +770,7 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
       nbytes -= frag;
     }
 
-  return tot;
+  return len;
 }
 
 ssize_t
@@ -855,13 +856,13 @@ fhandler_base::lseek (_off64_t offset, int whence)
   DWORD win32_whence = whence == SEEK_SET ? FILE_BEGIN
 		       : (whence == SEEK_CUR ? FILE_CURRENT : FILE_END);
 
-  LONG off_low = offset & 0xffffffff;
+  LONG off_low = ((__uint64_t) offset) & 0xffffffffLL;
   LONG *poff_high, off_high;
   if (!wincap.has_64bit_file_access ())
     poff_high = NULL;
   else
     {
-      off_high =  offset >> 32;
+      off_high =  ((__uint64_t) offset) >> 32LL;
       poff_high = &off_high;
     }
 

@@ -201,7 +201,6 @@ fhandler_proc::readdir (DIR * dir)
 	    dir->__d_position++;
 	    return dir->__d_dirent;
 	  }
-      set_errno (ENMFILE);
       return NULL;
     }
 
@@ -457,7 +456,7 @@ format_proc_stat (char *destbuf, size_t maxsize)
 
   char *eobuf = destbuf;
   if (!wincap.is_winnt ())
-    eobuf += __small_sprintf (destbuf, "cpu %U %U %U %U\n", 0, 0, 0, 0);
+    eobuf += __small_sprintf (destbuf, "cpu %U %U %U %U\n", 0ULL, 0ULL, 0ULL, 0ULL);
   else
     {
       NTSTATUS ret;
@@ -634,30 +633,30 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", szBuffer);
 	  read_value ("Identifier", REG_SZ);
 	  bufptr += __small_sprintf (bufptr, "identifier      : %s\n", szBuffer);
-          if (wincap.is_winnt ())
-            {
+	  if (wincap.is_winnt ())
+	    {
 	      read_value ("~Mhz", REG_DWORD);
 	      bufptr += __small_sprintf (bufptr, "cpu MHz         : %u\n", *(DWORD *) szBuffer);
 
 	      print ("flags           :");
 	      if (IsProcessorFeaturePresent (PF_3DNOW_INSTRUCTIONS_AVAILABLE))
-	        print (" 3dnow");
+		print (" 3dnow");
 	      if (IsProcessorFeaturePresent (PF_COMPARE_EXCHANGE_DOUBLE))
-	        print (" cx8");
+		print (" cx8");
 	      if (!IsProcessorFeaturePresent (PF_FLOATING_POINT_EMULATED))
-	        print (" fpu");
+		print (" fpu");
 	      if (IsProcessorFeaturePresent (PF_MMX_INSTRUCTIONS_AVAILABLE))
-	        print (" mmx");
+		print (" mmx");
 	      if (IsProcessorFeaturePresent (PF_PAE_ENABLED))
-	        print (" pae");
+		print (" pae");
 	      if (IsProcessorFeaturePresent (PF_RDTSC_INSTRUCTION_AVAILABLE))
-	        print (" tsc");
+		print (" tsc");
 	      if (IsProcessorFeaturePresent (PF_XMMI_INSTRUCTIONS_AVAILABLE))
-	        print (" sse");
+		print (" sse");
 	      if (IsProcessorFeaturePresent (PF_XMMI64_INSTRUCTIONS_AVAILABLE))
-	        print (" sse2");
+		print (" sse2");
 	    }
-        }
+	}
       else
 	{
 	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
@@ -666,12 +665,12 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	  maxf &= 0xffff;
 	  vendor_id[3] = 0;
 	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", (char *)vendor_id);
-          unsigned cpu_mhz  = 0;
-          if (wincap.is_winnt ())
-            {
+	  unsigned cpu_mhz  = 0;
+	  if (wincap.is_winnt ())
+	    {
 	      read_value ("~Mhz", REG_DWORD);
 	      cpu_mhz = *(DWORD *)szBuffer;
-            }
+	    }
 	  if (maxf >= 1)
 	    {
 	      unsigned features2, features1, extra_info, cpuid_sig;
@@ -717,10 +716,10 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		  // could implement a lookup table here if someone needs it
 		  strcpy (szBuffer, "unknown");
 		}
-              if (wincap.is_winnt ())
-                {
-	          bufptr += __small_sprintf (bufptr, "type            : %s\n"
-	        				     "cpu family      : %d\n"
+	      if (wincap.is_winnt ())
+		{
+		  bufptr += __small_sprintf (bufptr, "type            : %s\n"
+						     "cpu family      : %d\n"
 						     "model           : %d\n"
 						     "model name      : %s\n"
 						     "stepping        : %d\n"
@@ -739,28 +738,28 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 					     apic_id,
 					     cpu_mhz,
 					     (features1 & (1 << 0)) ? "yes" : "no");
-                }
-              else
-                {
-                  bufptr += __small_sprintf (bufptr, "type            : %s\n"
-                                                     "cpu family      : %d\n"
-                                                     "model           : %d\n"
-                                                     "model name      : %s\n"
-                                                     "stepping        : %d\n"
-                                                     "brand id        : %d\n"
-                                                     "cpu count       : %d\n"
-                                                     "apic id         : %d\n"
-                                                     "fpu             : %s\n",
-                                             type_str,
-                                             family,
-                                             model,
-                                             szBuffer,
-                                             stepping,
-                                             brand_id,
-                                             cpu_count,
-                                             apic_id,
-                                             (features1 & (1 << 0)) ? "yes" : "no");
-                }
+		}
+	      else
+		{
+		  bufptr += __small_sprintf (bufptr, "type            : %s\n"
+						     "cpu family      : %d\n"
+						     "model           : %d\n"
+						     "model name      : %s\n"
+						     "stepping        : %d\n"
+						     "brand id        : %d\n"
+						     "cpu count       : %d\n"
+						     "apic id         : %d\n"
+						     "fpu             : %s\n",
+					     type_str,
+					     family,
+					     model,
+					     szBuffer,
+					     stepping,
+					     brand_id,
+					     cpu_count,
+					     apic_id,
+					     (features1 & (1 << 0)) ? "yes" : "no");
+		}
 	      print ("flags           :");
 	      if (features1 & (1 << 0))
 		print (" fpu");

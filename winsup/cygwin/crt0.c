@@ -30,6 +30,8 @@ int __cygwin_crt0_bp = 0;
 
 extern int main (int argc, char **argv);
 
+void cygwin_crt0 (int (*main) (int, char **));
+
 void
 mainCRTStartup ()
 {

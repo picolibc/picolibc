@@ -38,8 +38,9 @@ datadir:=@datadir@
 infodir:=@infodir@
 includedir:=@includedir@
 
-INSTALL:=@INSTALL@
-INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+override INSTALL:=@INSTALL@
+override INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+override INSTALL_DATA:=@INSTALL_DATA@
 
 #
 # --enable options from configure
@@ -97,8 +98,6 @@ LDSCRIPT:=cygwin.sc
 #
 include $(srcdir)/../Makefile.common
 
-INSTALL_DATA:=$(SHELL) $(updir1)/install-sh -c
-
 @SET_MAKE@
 
 # Setup the testing framework, if you have one
@@ -118,7 +117,6 @@ RUNTESTFLAGS =
 
 DLL_NAME:=cygwin1.dll
 TEST_DLL_NAME:=cygwin0.dll
-LIB_NAME:=libcygwin.a
 TEST_LIB_NAME:=libcygwin0.a
 DEF_FILE:=cygwin.def
 DLL_ENTRY:=@DLL_ENTRY@
@@ -171,7 +169,7 @@ GMON_OFILES:=gmon.o mcount.o profil.o
 OBSOLETE_FUNCTIONS:=regcomp regerror regexec regfree regsub \
 		    open acl aclcheck aclfrommode aclfrompbits \
 		    aclfromtext aclsort acltomode acltopbits \
-		    acltotext chown facl fchown fgetpos fopen \
+		    acltotext chown facl fchown fdopen fgetpos fopen \
 		    freopen fseeko fsetpos fstat ftello ftruncate \
 		    getegid geteuid getgid getgrent getgrgid getgrnam \
 		    getgroups getpwuid getpwuid_r getuid initgroups \
@@ -196,6 +194,7 @@ NEW_FUNCTIONS:=regcomp posix_regcomp \
 	       chown _chown32 \
 	       facl _facl32 \
 	       fchown _fchown32 \
+	       fdopen _fdopen64 \
 	       fgetpos _fgetpos64 \
 	       fopen _fopen64 \
 	       freopen _freopen64 \
@@ -235,10 +234,11 @@ NEW_FUNCTIONS:=regcomp posix_regcomp \
 API_VER:=$(srcdir)/include/cygwin/version.h
 
 PWD:=${shell pwd}
-SUBLIBS:=libpthread.a $(PWD)/libm.a libc.a
+LIB_NAME:=$(PWD)/libcygwin.a
+SUBLIBS:=$(PWD)/libpthread.a $(PWD)/libm.a $(PWD)/libc.a
 EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a
 INSTOBJS:=automode.o binmode.o textmode.o
-TARGET_LIBS:=$(LIB_NAME) $(SUBLIBS) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
+TARGET_LIBS:=$(LIB_NAME) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host \
 	install install-libs install-headers -lgcc
 
@@ -378,14 +378,14 @@ dcrt0.o sigproc.o: child_info_magic.h
 
 shared.o: shared_info_magic.h
 
-libpthread.a: speclib cygwin.def pthread.o thread.o
-	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" "${AS}" ${wordlist 2, 99, $^}
+$(PWD)/libpthread.a: speclib $(LIB_NAME) pthread.o thread.o
+	/bin/sh ${word 1, $^} $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
 
-$(PWD)/libm.a: speclib cygwin.def $(LIBM)
-	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" "${AS}" ${wordlist 2, 99, $^}
+$(PWD)/libm.a: speclib $(LIB_NAME) $(LIBM)
+	/bin/sh ${word 1, $^} $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
 
-$(PWD)/libc.a: speclib cygwin.def $(PWD)/libm.a libpthread.a
-	/bin/sh ${word 1, $^} -v $@ "${NM}" "${DLLTOOL}" "${AS}" ${wordlist 2, 99, $^}
+$(PWD)/libc.a: speclib $(LIB_NAME) $(PWD)/libm.a libpthread.a
+	/bin/sh ${word 1, $^} -v $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
 
 lib%.a: %.o
 	$(AR) cru $@ $?

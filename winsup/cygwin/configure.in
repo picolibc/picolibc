@@ -13,6 +13,8 @@ AC_PREREQ(2.12)dnl
 AC_INIT(init.cc)
 AC_CONFIG_HEADER(config.h)
 
+INSTALL="/bin/sh "`cd $srcdir/../..; echo $(pwd)/install-sh -c`
+
 AC_PROG_INSTALL
 
 dnl FIXME: We temporarily define our own version of AC_PROG_CC.  This is

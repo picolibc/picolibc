@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 # speclib - Make a special version of the cygwin import library.
 #
 #   Copyright 2001, 2002 Red Hat, Inc.
@@ -10,14 +10,30 @@
 # details.
 
 case "$1" in
-    -v) v="-v"; shift
+    -v) shift; v() { :; } ;;
+    *) v() { /bin/false; } ;;
 esac
 lib=$1; shift
 nm=$1; shift
-dlltool=$1; shift
-as=$1; shift
-def=$1; shift
-trap "rm -f /tmp/$$.def" 0 1 2 15
-(echo "LIBRARY cygwin1.dll
-EXPORTS"; $nm --extern-only --defined-only $* | sed -e '/^[ 	]*$/d' -e '/:$/d' -e 's/^.* _\(.*\)/\1/' |  grep $v -f - -w $def |egrep -vi '^library|exports|^$' | sort) > /tmp/$$.def
-$dlltool --as=$as -d /tmp/$$.def -l "$lib"
+ar=$1; shift
+libdll=$1; shift
+cp /dev/null /tmp/$$.objs
+trap "/bin/rm -rf /tmp/$$.dir /tmp/$$.syms /tmp/$$.objs /tmp/$$.raw" 0 1 2 15
+$nm --extern-only --defined-only $* | sed -e '/^[ 	]*$/d' -e '/:$/d' -e 's%^.* _\(.*\)%/ __imp__\1$/p%' | grep -v ' __imp___imp__' > /tmp/$$.syms
+v || $nm -Ap --extern-only --defined-only $libdll | egrep ' I __head| I _.*_iname' |  awk -F: '{print $2}' > /tmp/$$.objs
+$nm -Ap --extern-only --defined-only $libdll | sed -n -f /tmp/$$.syms | awk -F: '{print $2}' >> /tmp/$$.objs
+sort -o /tmp/$$.objs -u /tmp/$$.objs
+
+[ -s /tmp/$$.objs ] || { echo "speclib: couldn't find symbols for $lib" 1>&2; exit 1; }
+
+/bin/rm -f /tmp/$$>dir
+mkdir /tmp/$$.dir
+cd /tmp/$$.dir
+if v; then
+    $ar x $libdll
+    /bin/rm -f `cat /tmp/$$.objs`
+else
+    $ar x $libdll `cat /tmp/$$.objs`
+fi
+/bin/rm -f $lib
+$ar crus $lib *.o

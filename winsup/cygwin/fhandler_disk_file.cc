@@ -128,7 +128,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
       FILETIME ft = {};
       res = fstat_helper (buf, ft, ft, ft, 0, 0);
     }
-  else 
+  else
     {
       debug_printf ("FindFirstFile failed for '%s', %E", (char *) pc);
       __seterrno ();
@@ -232,7 +232,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       /* Although the documentation indicates otherwise, it seems like
 	 "inodes" on these devices are persistent, at least across reboots. */
       buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
-                    | (__ino64_t) nFileIndexLow;
+		    | (__ino64_t) nFileIndexLow;
       break;
     default:
       /* Either the nFileIndex* fields are unreliable or unavailable.  Use the
@@ -786,10 +786,7 @@ fhandler_cygdrive::readdir (DIR *dir)
   if (!iscygdrive_root ())
     return fhandler_disk_file::readdir (dir);
   if (!pdrive || !*pdrive)
-    {
-      set_errno (ENMFILE);
-      return NULL;
-    }
+    return NULL;
   else if (dir->__d_position > 1
 	   && GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
     {

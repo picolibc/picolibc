@@ -425,6 +425,7 @@ fdim
 fdimf
 fdopen
 _fdopen = fdopen
+_fdopen64 = fdopen64
 feof
 _feof = feof
 ferror
@@ -820,6 +821,7 @@ _memcpy = memcpy
 memmove
 _memmove = memmove
 mempcpy
+__mempcpy = mempcpy
 memset
 _memset = memset
 mkdir

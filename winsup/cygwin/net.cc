@@ -527,7 +527,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   fd->set_io_handle ((HANDLE) soc);
   fd->set_flags (O_RDWR | O_BINARY);
   fd->set_r_no_interrupt (winsock2_active);
-  cygheap->fdtab.inc_need_fixup_before ();
+  // CORINNA - needed? // cygheap->fdtab.inc_need_fixup_before ();
   debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
   return true;
 }
@@ -771,14 +771,14 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
     {
       bool was_blocking = false;
       if (!fh->is_nonblocking ())
-        {
+	{
 	  int nonblocking = 1;
 	  fh->ioctl (FIONBIO, &nonblocking);
 	  was_blocking = true;
 	}
       res = fh->connect (name, namelen);
       if (was_blocking)
-        {
+	{
 	  if (res == -1 && get_errno () == EINPROGRESS)
 	    {
 	      size_t fds_size = howmany (fd + 1, NFDBITS) * sizeof (fd_mask);
@@ -790,7 +790,7 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
 	      FD_SET (fd, except_fds);
 	      res = cygwin_select (fd + 1, NULL, write_fds, except_fds, NULL);
 	      if (res > 0 && FD_ISSET (fd, except_fds))
-	        {
+		{
 		  res = -1;
 		  for (;;)
 		    {
@@ -799,7 +799,7 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
 		      cygwin_getsockopt (fd, SOL_SOCKET, SO_ERROR,
 					 (void *) &err, &len);
 		      if (err)
-		        {
+			{
 			  set_errno (err);
 			  break;
 			}
@@ -807,9 +807,9 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
 		    }
 		}
 	      else if (res > 0)
-	        res = 0;
+		res = 0;
 	      else
-	        {
+		{
 		  WSASetLastError (WSAEINPROGRESS);
 		  set_winsock_errno ();
 		}
@@ -1300,7 +1300,7 @@ getdomainname (char *domain, size_t len)
 
   /* This is only used by Win95 and NT <=  4.0.
      The registry names are language independent.
-     FIXME: Handle DHCP on Win95. The DhcpDomain(s) may be available 
+     FIXME: Handle DHCP on Win95. The DhcpDomain(s) may be available
      in ..VxD\DHCP\DhcpInfoXX\OptionInfo, RFC 1533 format */
 
   reg_key r (HKEY_LOCAL_MACHINE, KEY_READ,

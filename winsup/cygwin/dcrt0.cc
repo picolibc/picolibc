@@ -634,6 +634,10 @@ dll_crt0_1 ()
   if (!user_data->forkee)
     pthread::init_mainthread ();
 
+#ifdef DEBUGGING
+  strace.microseconds ();
+#endif
+
   /* Initialize debug muto, if DLL is built with --enable-debugging.
      Need to do this before any helper threads start. */
   debug_init ();
@@ -848,9 +852,6 @@ _dll_crt0 ()
   initial_env ();
   char zeros[sizeof (fork_info->zero)] = {0};
   static NO_COPY STARTUPINFO si;
-#ifdef DEBUGGING
-  strace.microseconds ();
-#endif
 
   main_environ = user_data->envptr;
   *main_environ = NULL;

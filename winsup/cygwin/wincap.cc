@@ -540,7 +540,7 @@ wincapc::init ()
 		  case 0:
 		    caps = &wincap_2000;
 		    break;
-		  
+
 		  case 1:
 		    caps = &wincap_xp;
 		    break;

@@ -555,25 +555,22 @@ fhandler_tty_slave::open (int flags, mode_t)
   set_output_handle (to_master_local);
 
   set_open_status ();
-  if (!output_done_event)
+  if (fhandler_console::open_fhs++ == 0 && !output_done_event
+      && wincap.pty_needs_alloc_console ())
     {
-      if (fhandler_console::open_fhs++ == 0
-	  && wincap.pty_needs_alloc_console ())
+      BOOL b;
+      HWINSTA h = CreateWindowStation (NULL, 0, GENERIC_READ | GENERIC_WRITE, &sec_none_nih);
+      termios_printf ("CreateWindowStation %p, %E", h);
+      if (h)
 	{
-	  BOOL b;
-	  HWINSTA h = CreateWindowStation (NULL, 0, GENERIC_READ | GENERIC_WRITE, &sec_none_nih);
-	  termios_printf ("CreateWindowStation %p, %E", h);
-	  if (h)
-	    {
-	      b = SetProcessWindowStation (h);
-	      termios_printf ("SetProcessWindowStation %d, %E", b);
-	    }
-	  b = AllocConsole ();	// will cause flashing if workstation
-	  			// stuff fails
-	  termios_printf ("%d = AllocConsole ()", b);
+	  b = SetProcessWindowStation (h);
+	  termios_printf ("SetProcessWindowStation %d, %E", b);
 	}
-      termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
+      b = AllocConsole ();	// will cause flashing if workstation
+			    // stuff fails
+      termios_printf ("%d = AllocConsole ()", b);
     }
+  termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
   termios_printf ("tty%d opened", get_unit ());
 
   return 1;
@@ -582,12 +579,9 @@ fhandler_tty_slave::open (int flags, mode_t)
 int
 fhandler_tty_slave::close ()
 {
-  if (!output_done_event)
-    {
-      if (!--fhandler_console::open_fhs && myself->ctty == -1)
-	FreeConsole ();
-      termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
-    }
+  if (!--fhandler_console::open_fhs && myself->ctty == -1)
+    FreeConsole ();
+  termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
   return fhandler_tty_common::close ();
 }
 
@@ -855,11 +849,8 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 int
 fhandler_tty_slave::dup (fhandler_base *child)
 {
-  if (!output_done_event)
-    {
-      fhandler_console::open_fhs++;
-      termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
-    }
+  fhandler_console::open_fhs++;
+  termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
   return fhandler_tty_common::dup (child);
 }
 
@@ -1254,11 +1245,8 @@ fhandler_tty_common::set_close_on_exec (int val)
 void
 fhandler_tty_slave::fixup_after_fork (HANDLE parent)
 {
-  if (!output_done_event)
-    {
-      fhandler_console::open_fhs++;
-      termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
-    }
+  fhandler_console::open_fhs++;
+  termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
   fhandler_tty_common::fixup_after_fork (parent);
 }
 
@@ -1318,6 +1306,7 @@ fhandler_tty_master::init_console ()
     return -1;
 
   console->init (INVALID_HANDLE_VALUE, GENERIC_READ | GENERIC_WRITE, O_BINARY);
+  fhandler_console::open_fhs--;  /* handled when individual fds are opened */
   console->set_r_no_interrupt (1);
   return 0;
 }

@@ -923,25 +923,29 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 static BOOL WINAPI
 ctrl_c_handler (DWORD type)
 {
-  if (type == CTRL_LOGOFF_EVENT)
-    return TRUE;
+  static bool saw_close;
 
   /* Return FALSE to prevent an "End task" dialog box from appearing
      for each Cygwin process window that's open when the computer
      is shut down or console window is closed. */
+
   if (type == CTRL_SHUTDOWN_EVENT)
     {
 #if 0
       /* Don't send a signal.  Only NT service applications and their child
-         processes will receive this event and the services typically already
+	 processes will receive this event and the services typically already
 	 handle the shutdown action when getting the SERVICE_CONTROL_SHUTDOWN
 	 control message. */
       sig_send (NULL, SIGTERM);
 #endif
       return FALSE;
     }
-  if (type == CTRL_CLOSE_EVENT)
+
+  if (myself->ctty != -1
+      && (type == CTRL_CLOSE_EVENT || (!saw_close && type == CTRL_LOGOFF_EVENT)))
     {
+      if (type == CTRL_CLOSE_EVENT)
+	saw_close = true;
       sig_send (NULL, SIGHUP);
       return FALSE;
     }

@@ -406,7 +406,7 @@ _pinfo::commune_send (DWORD code, ...)
 
   /* FIXME: Need something better than an busy loop here */
   bool isalive;
-  for (int i = 0; (isalive = alive ()) || (i < 65536); i++)
+  for (int i = 0; (isalive = alive ()) && (i < 10000); i++)
     if (myself->hello_pid <= 0)
       break;
     else
