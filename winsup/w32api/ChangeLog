@@ -1,3 +1,8 @@
+2004-08-24  Sam Robb  <samrobb@users.sourceforge.net>
+
+	* include/winbase.h (GetFileSizeEx): Add _WIN32_WINNT >= 0x0500
+	guard.
+
 2004-08-24   Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winbase.h: Add WINBASEAPI token to prototypes, throughout.
