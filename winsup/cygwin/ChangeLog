@@ -1,5 +1,11 @@
 2005-03-30  Christopher Faylor  <cgf@timesys.com>
 
+	* environ.cc (spenvs): Re-force SYSTEMROOT to always be included in
+	environment.
+	(build_env): Ditto.
+
+2005-03-30  Christopher Faylor  <cgf@timesys.com>
+
 	* environ.cc (spenv::retrieve): Revert most of previous change.
 	(build_env): Ditto.  Rework to track environment variables which need
 	to always be in the windows environment in a separate array.

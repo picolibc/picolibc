@@ -878,7 +878,7 @@ static NO_COPY spenv spenvs[] =
   {NL ("LOGONSERVER="), false, false, &cygheap_user::env_logsrv},
   {NL ("PATH="), false, true, NULL},
   {NL ("SYSTEMDRIVE="), false, false, NULL},
-  {NL ("SYSTEMROOT="), true, false, &cygheap_user::env_systemroot},
+  {NL ("SYSTEMROOT="), true, true, &cygheap_user::env_systemroot},
   {NL ("USERDOMAIN="), false, false, &cygheap_user::env_domain},
   {NL ("USERNAME="), false, false, &cygheap_user::env_name},
   {NL ("USERPROFILE="), false, false, &cygheap_user::env_userprofile}
@@ -984,8 +984,9 @@ build_env (const char * const *envp, char *&envblock, int &envc,
     if (!saw_spenv[i] && (spenvs[i].add_always || cygheap->user.issetuid ()))
       {
 	  *dstp = spenvs[i].retrieve (no_envblock);
-	  if (*dstp && !no_envblock && *dstp != env_dontadd)
+	  if (*dstp && (!no_envblock || spenvs[i].force) && *dstp != env_dontadd)
 	    {
+	      *pass_dstp = *dstp;
 	      tl += strlen (*dstp) + 1;
 	      dstp++;
 	    }
