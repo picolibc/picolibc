@@ -118,8 +118,8 @@
 
 2003-03-27  Joe Buehler  <jhpb@draco.hekimian.com>
 
-	* autoload.cc: added RegGetKeySecurity()
-	* security.cc (get_nt_object_attribute): use RegGetKeySecurity() for
+	* autoload.cc: Add RegGetKeySecurity().
+	* security.cc (get_nt_object_attribute): Use RegGetKeySecurity() for
 	performance.
 
 2003-03-25  Christopher Faylor  <cgf@redhat.com>
