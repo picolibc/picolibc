@@ -23,11 +23,6 @@ mailing list.
 
 @section Installation using the @samp{setup.exe} program
 
-@strong{IMPORTANT: First read the README file in the @samp{latest}
-directory at any ftp mirror.  DO THIS NOW!  Information in the README
-file is not repeated here.  You can find a mirror site near you from
-@file{http://cygwin.com/mirrors.html}.}
-
 The @samp{setup.exe} program is the recommended way to install Cygwin,
 but it is still a work in progress.  Expect features and functionality
 to change.  For this reason, it is a good idea to note the version and
