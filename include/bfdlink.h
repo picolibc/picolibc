@@ -198,6 +198,19 @@ struct bfd_sym_chain
   const char *name;
 };
 
+/* How to handle unresolved symbols.
+   There are four possibilities which are enumerated below:  */
+enum report_method
+{
+  /* This is the initial value when then link_info structure is created.
+     It allows the various stages of the linker to determine whether they
+     allowed to set the value.  */
+  RM_NOT_YET_SET = 0,
+  RM_IGNORE,
+  RM_GENERATE_WARNING,
+  RM_GENERATE_ERROR
+};
+
 /* This structure holds all the information needed to communicate
    between BFD and the linker when doing a link.  */
 
@@ -237,24 +250,6 @@ struct bfd_link_info
   /* TRUE if we want to produced optimized output files.  This might
      need much more time and therefore must be explicitly selected.  */
   unsigned int optimize: 1;
-
-  /* TRUE if BFD should generate errors for undefined symbols
-     even if generating a shared object.  */
-  unsigned int no_undefined: 1;
-
-  /* TRUE if BFD should allow undefined symbols in shared objects even
-     when no_undefined is set to disallow undefined symbols.  The net
-     result will be that undefined symbols in regular objects will
-     still trigger an error, but undefined symbols in shared objects
-     will be ignored.  The implementation of no_undefined makes the
-     assumption that the runtime linker will choke on undefined
-     symbols.  However there is at least one system (BeOS) where
-     undefined symbols in shared libraries is normal since the kernel
-     patches them at load time to select which function is most
-     appropriate for the current architecture.  I.E. dynamically
-     select an appropriate memset function.  Apparently it is also
-     normal for HPPA shared libraries to have undefined symbols.  */
-  unsigned int allow_shlib_undefined: 1;
 
   /* TRUE if ok to have multiple definition.  */
   unsigned int allow_multiple_definition: 1;
@@ -304,6 +299,17 @@ struct bfd_link_info
   /* TRUE if PT_GNU_STACK segment should be created with PF_R|PF_W
      flags.  */
   unsigned int noexecstack: 1;
+
+  /* What to do with unresolved symbols in an object file.
+     When producing static binaries the default is GENERATE_ERROR.
+     When producing dynamic binaries the default is IGNORE.  The
+     assumption with dynamic binaries is that the reference will be
+     resolved at load/execution time.  */
+  enum report_method unresolved_syms_in_objects;
+
+  /* What to do with unresolved symbols in a shared library.
+     The same defaults apply.  */
+  enum report_method unresolved_syms_in_shared_libs;
 
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
