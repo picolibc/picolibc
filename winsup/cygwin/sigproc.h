@@ -38,7 +38,7 @@ struct sigthread
 {
   DWORD id;
   DWORD frame;
-  muto *lock;
+  muto *lock;			// FIXME: Use for multi-thread signalling someday
   void init (const char *s);
 };
 
@@ -50,10 +50,8 @@ private:
 public:
   void set (sigthread &t, DWORD ebp)
   {
-    t.lock->acquire ();
     st = &t;
     t.frame = ebp;
-    t.lock->release ();
   }
 
   sigframe () {st = NULL;}
@@ -68,9 +66,7 @@ public:
   {
     if (st)
       {
-	st->lock->acquire ();
 	st->frame = 0;
-	st->lock->release ();
 	st = NULL;
       }
   }

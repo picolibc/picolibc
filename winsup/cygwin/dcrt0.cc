@@ -614,8 +614,10 @@ char _declspec(dllexport) **__argv = NULL;
 void
 sigthread::init (const char *s)
 {
+#if 0 /* FIXME: Someday we'll need this for inter-thread signalling */
   lock = new_muto (FALSE, s);
   id = GetCurrentThreadId ();
+#endif
 }
 
 /* Take over from libc's crt0.o and start the application. Note the
@@ -734,10 +736,6 @@ dll_crt0_1 ()
 
   /* Initialize events. */
   events_init ();
-
-  /* Allow backup semantics. It's better done only once on process start
-     instead of each time a file is opened. */
-  set_process_privileges ();
 
   cygcwd.init ();
 

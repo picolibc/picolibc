@@ -1,3 +1,12 @@
+Wed Oct 18 20:50:27 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.h (sigthread): Eliminate locking for now since per thread
+	signalling is not available.
+	* dcrt0.cc (sigthread::init): Ditto.
+	(dll_crt0_1): Move set_process_privileges call (temporarily?) to
+	pinfo_init.
+	(pinfo_init): Only call set_process_privileges when allow_ntsec.
+
 2000-10-18  DJ Delorie  <dj@redhat.com>
 
 	* dcrt0.cc (dll_crt0_1): init cygcwd before forkee branch
