@@ -1,3 +1,11 @@
+2003-06-18  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/dirent.h (dirent): Make d_name and array instead of a pointer.
+	* mingwex/dirent.c: Modifications througout to fill d_name array.
+	* Makefile.in (LIBS): Add new MSVCRT libraries libmsvcr70 and
+	libmsvcr71, including debug versions.
+	(msvcr70.def, msvcr70d.def, msvcr71.def, msvcr71.def): New targets.
+
 2003-06-17  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* msvcrt.def.in (__badioinfo, __lc_codepage, __lc_handle,
