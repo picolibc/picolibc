@@ -70,6 +70,9 @@
  * Redefining these macros does not effect the CRT functions.
  */
 #define _P_tmpdir   "\\"
+#ifndef __STRICT_ANSI__
+#define P_tmpdir _P_tmpdir
+#endif
 #define _wP_tmpdir  L"\\"
 
 /*
