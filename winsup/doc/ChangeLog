@@ -1,3 +1,8 @@
+2002-08-29  Christopher Faylor  <cgf@redhat.com>
+
+	* how-api.texinfo: Remove a line from the CRLF discussion about lseek
+	not working.  Answer thread safe question more simply.
+
 2002-08-27  Nicholas Wourms  <nwourms@netscape.net>
 
 	* calls.texinfo: Add getc_unlocked, getchar_unlocked, putc_unlocked

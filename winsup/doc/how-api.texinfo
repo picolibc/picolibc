@@ -75,18 +75,14 @@ Note that because the open/fopen switches are defined by ANSI, they
 exist under most flavors of Unix; open/fopen will just ignore the switch
 since they have no meaning to UNIX.
 
-Also note that @code{lseek} only works in binary mode.
-
 Explanation adapted from mailing list email by Earnie Boyd
 <earnie_boyd@@yahoo.com>.
 
 @subsection Is the Cygwin library multi-thread-safe?
 
-Multi-thread-safe support is turned on by default in 1.1.x releases
-(i.e., in the latest net release).  That does not mean that it is bug
-free!
+Yes.
 
-There is also limited support for 'POSIX threads', see the file
+There is also extensive support for 'POSIX threads', see the file
 @code{cygwin.din} for the list of POSIX thread functions provided.
 
 @subsection Why is some functionality only supported in Windows NT?
