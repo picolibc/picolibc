@@ -1,9 +1,9 @@
 #include <fenv.h>
 #include <math.h>
 
-long
-lround (double x) {
-  long retval;
+long long
+llround (double x) {
+  long long retval;
   unsigned short saved_cw, _cw;
   __asm__ (
 	"fnstcw %0;" : "=m" (saved_cw)

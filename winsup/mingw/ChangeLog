@@ -1,3 +1,8 @@
+2003-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/llround.c: Correct function name and
+	change return value to long long.
+
 2003-01-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ctype.h (__isascii): Don't cast arg to unsigned.
