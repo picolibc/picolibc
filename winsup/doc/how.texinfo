@@ -53,7 +53,7 @@ Cygwin mailing lists are not gatewayed to USENET, so anti-spam measures
 in your email address are neither required nor appreciated.  Also, avoid
 sending HTML content to Cygwin mailing lists.
 
-@subsection Why won't you/the mailing list answer my questions?
+@subsection Posting Guidelines (Or: Why won't you/the mailing list answer my questions?)
 
 If you follow these guidelines, you are much more likely to get a
 helpful response from the Cygwin developers and/or the Cygwin community at
@@ -253,9 +253,13 @@ properly).
 @subsection Is it OK to have multiple copies of the DLL?
 
 It is a very bad idea to have multiple *versions* of the cygwin DLL in
-your path.  They often conflict in funny ways.  If you have multiple
-versions, get rid of (or rename) all the older versions, keeping only
-the newest one.
+your path.  They often conflict in funny ways.
+
+If you get the error "shared region is corrupted" it means you have
+multiple versions of cygwin1.dll running at the same time.
+
+If you do have multiple versions, get rid of (or rename) all the older
+versions, keeping only the newest one.
 
 It should be OK to have multiple copies of the *same* DLL in your path,
 though.
@@ -399,46 +403,49 @@ This should never be necessary under Windows NT.
 
 @subsection Why the weird directory structure?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+Why do /lib and /usr/lib (and /bin, /usr/bin) point to the same thing?
 
-Why are cpp.exe, cc1.exe, etc., not in the bin directory?
+Why use mounts instead of symbolic links?
 
-Why more than one lib and include directory?
+Can I use a disk root (e.g., C:\) as Cygwin root?  Why is this discouraged?
 
-@smallexample
-H-i586-cygwin32\lib\gcc-lib\...\egcs-2.91.57\include
-x86-cygwin32\include
-x86-cygwin32\H-i586-cygwin32\i586-cygwin32\include
-@end smallexample
+After a new installation in the default location, your mount points will
+look something like this:
 
-This way multiple releases for different hosts and targets can all
-coexist in the same tree.  H-i586-cygwin32 means hosted on
-i586-cygwin32, common files shared by all hosts are in the top level
-directories, target-specific files are in the
-H-i586-cygwin32/i586-cygwin32
-directory, etc...
+@example
+Device              Directory           Type         Flags
+C:\cygwin\bin       /usr/bin            user         binmode
+C:\cygwin\lib       /usr/lib            user         binmode
+C:\cygwin           /                   user         binmode
+@end example
 
-If you had a server sharing files to a ppc NT machine and an x86 NT
-machine, you could have both an H-i586-cygwin32 and an
-H-powerpcle-cygwin32 directory without having to duplicate the top level
-files that are the same for both hosts.  If you built and installed an
-i586-cygwin32 x mips-elf cross-compiler, you would have an
-H-i586-cygwin32/mips-elf with its target-specific files and some
-mips-elf- prefixed binaries in H-i586-cygwin32/bin.
+Note that /bin and /usr/bin point to the same location, as do /lib and
+/usr/lib.  This is intentional, and you should not undo these mounts
+unless you @emph{really} know what you are doing.
 
-Normally we also have another higher level directory that identifies the
-release.  Then multiple Cygwin releases can coexist with different
-dll versions, giving:
+Various applications and packages may expect to be installed in /lib or
+/usr/lib (similarly /bin or /usr/bin).  Rather than distinguish between
+them and try to keep track of them (possibly requiring the occasional
+duplication or symbolic link), it was decided to maintain only one
+actual directory, with equivalent ways to access it.
 
-@smallexample
-cygnus/b19/H-i586-cygwin32
-cygnus/cygwin-b20/H-i586-cygwin32
-...
-@end smallexample
+Symbolic links had been considered for this purpose, but were dismissed
+because they do not always work on Samba drives.  Also, mounts are
+faster to process because no disk access is required to resolve them.
 
-In any case, this does add complexity to the directory structure but
-it's worth it for people with more complex installations.
+Note that non-cygwin applications will not observe Cygwin mounts (or
+symlinks for that matter).  For example, if you use WinZip to unpack the
+tar distribution of a Cygwin package, it may not get installed to the
+correct Cygwin path.  @emph{So don't do this!}
+
+It is strongly recommended not to make the Cygwin root directory the
+same as your drive's root directory, unless you know what you are doing
+and are prepared to deal with the consequences.  It is generally easier
+to maintain the Cygwin hierarchy if it is isolated from, say, C:\.  For
+one thing, you avoid possible collisions with other (non-cygwin)
+applications that may create (for example) \bin and \lib directories.
+(Maybe you have nothing like that installed now, but who knows about
+things you might add in the future?)
 
 @subsection How do anti-virus programs like Cygwin?
 
@@ -509,7 +516,7 @@ documentation and then add these lines to your samba configuration
 file:
 
 @smallexample
-	mask system = yes
+	map system = yes
 	create mask = 0775
 @end smallexample
 
@@ -865,6 +872,12 @@ GCC_EXEC_PREFIX set -- it should be able to find cpp regardless of the
 install location.  But if you have it set incorrectly, you may still
 see this message.
 
+@subsection Where is glibc?
+
+Cygwin does not provide glibc.  It uses newlib instead, which provides
+much (but not all) of the same functionality.  Porting glibc to Cygwin
+would be difficult.
+
 @subsection Why can't bison find bison.simple or bison.hairy?
 
 @strong{(Please note: This section has not yet been updated for the latest
@@ -1050,6 +1063,23 @@ make > make.log 2>&1
 make install > install.log 2>&1
 @end example
 
+This will normally attempt to build the documentation, which
+additionally requires texinfo, texi2html, db2html and possibly others.
+These tools are not included in the Cygwin distribution, but are readily
+obtainable (or build OOTB).
+
+To check a cygwin1.dll, run "make check" in the winsup/cygwin directory.
+If that works, install everything @emph{except} the dll (if you can).
+Then, close down all cygwin programs (including bash windows, inetd,
+etc.), save your old dll, and copy the new dll to @emph{all} the
+places where the old dll was (if there is more than one on your
+machine).  Then start up a bash window and see what happens.  (Or better,
+run a cygwin program from the Windows command prompt.)
+
+If you get the error "shared region is corrupted" it means that two
+different versions of cygwin1.dll are running on your machine at the
+same time.
+
 @subsection How can I compile a powerpc NT toolchain?
 
 @strong{(Please note: This section has not yet been updated for the latest
@@ -1107,8 +1137,11 @@ question.
 
 @subsection How can I build a relocatable dll?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+@strong{(Please note: This section has not yet been updated for the
+latest net release.  However, there was a discussion on the cygwin
+mailing list recently that addresses this issue.  Read
+@file{http://sourceware.cygnus.com/ml/cygwin/2000-06/msg00688.html} and
+related messages.)}
 
 You must execute the following sequence of five commands, in this
 order:
@@ -1290,9 +1323,6 @@ If you have written your own @code{malloc} to need some initialization
 to occur after @code{main} is called, then this will surely break.
 
 @subsection Can I mix objects compiled with msvc++ and gcc?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 Yes, but only if you are combining C object files.  MSVC C++ uses a
 different mangling scheme than GNU C++, so you will have difficulties
