@@ -197,8 +197,7 @@ dtable::release (int fd)
     }
 }
 
-extern "C"
-int
+extern "C" int
 cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 			    DWORD myaccess)
 {
@@ -691,31 +690,6 @@ dtable::vfork_child_fixup ()
   return;
 }
 
-#if 0
-static char *
-handle_to_fn (HANDLE h, char *posix_fn)
-{
-  IO_STATUS_BLOCK io;
-  FILE_NAME_INFORMATION ntfn;
-
-  io.Status = 0;
-  io.Information = 0;
-
-  SetLastError (0);
-  DWORD res = NtQueryInformationFile (h, &io, &ntfn, sizeof (ntfn), 9);
-  if (res || GetLastError () == ERROR_PROC_NOT_FOUND)
-    {
-      strcpy (posix_fn, "some disk file");
-      return posix_fn;
-    }
-  ntfn.FileName[ntfn.FileNameLength / sizeof (WCHAR)] = 0;
-
-  char win32_fn[MAX_PATH + 100];
-  sys_wcstombs (win32_fn, ntfn.FileName, ntfn.FileNameLength);
-  cygwin_conv_to_full_posix_path (win32_fn, posix_fn);
-  return posix_fn;
-}
-#else
 #define DEVICE_PREFIX "\\device\\"
 #define DEVICE_PREFIX_LEN sizeof(DEVICE_PREFIX) - 1
 #define REMOTE "\\Device\\LanmanRedirector\\"
@@ -814,4 +788,3 @@ handle_to_fn (HANDLE h, char *posix_fn)
   cygwin_conv_to_full_posix_path (w32, posix_fn);
   return posix_fn;
 }
-#endif

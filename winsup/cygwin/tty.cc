@@ -402,7 +402,7 @@ tty::common_init (fhandler_pty_master *ptym)
   if (wincap.has_security () && cygserver_running==CYGSERVER_OK &&
       (SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION,
 			       get_null_sd ()) == FALSE))
-    small_printf ("Can't set process security, %E");
+    system_printf ("Can't set process security, %E");
 
   /* Create synchronisation events */
 
