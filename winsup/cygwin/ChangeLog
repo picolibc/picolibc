@@ -1,3 +1,8 @@
+Sun Sep  9 15:59:53 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* heap.h (inheap): Rewrite macro to accomodate removal of brk macros
+	below.
+
 Sun Sep  9 15:02:44 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (cygheap_fixup_in_child): Clear cygheap->base so that heap

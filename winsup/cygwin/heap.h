@@ -14,4 +14,6 @@ details. */
 void heap_init ();
 void malloc_init ();
 
-#define inheap(s) (brk && ((char *) (s) >= (char *) brkbase) && ((char *) (s) <= (char *) brktop))
+#define inheap(s) \
+  (cygheap->heapptr && ((char *) (s) >= (char *) cygheap->heapbase) \
+   && ((char *) (s) <= (char *) cygheap->heaptop))
