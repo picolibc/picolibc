@@ -156,7 +156,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 {
   extern void fixup_hooks_after_fork ();
   extern void fixup_timers_after_fork ();
-  extern void create_signal_arrived ();
+  extern void __stdcall create_signal_arrived ();
   debug_printf ("child is running.  pid %d, ppid %d, stack here %p",
 		myself->pid, myself->ppid, __builtin_frame_address (0));
 
