@@ -4,13 +4,18 @@
 #pragma GCC system_header
 #endif
 
+#include <stdarg.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#if (_WIN32_WINNT < 0x0403)
 #define INPUT_MOUSE 0
 #define INPUT_KEYBOARD 1
 #define INPUT_HARDWARE 2
+#endif /* (_WIN32_WINNT < 0x04030) */
+#if (WINVER < 0x0500)
 #define CHILDID_SELF 0
 #define OBJID_WINDOW 0x00000000
 #define OBJID_SYSMENU 0xFFFFFFFF
@@ -29,9 +34,6 @@ extern "C" {
 #define GUI_INMENUMODE 0x00000004
 #define GUI_SYSTEMMENUMODE 0x00000008
 #define GUI_POPUPMENUMODE 0x00000010
-#if(_WIN32_WINNT >= 0x0501)
-#define GUI_16BITTASK 0x00000020
-#endif
 typedef struct tagGUITHREADINFO {
 	DWORD cbSize;
 	DWORD flags;
@@ -43,6 +45,7 @@ typedef struct tagGUITHREADINFO {
 	HWND hwndCaret;
 	RECT rcCaret;
 } GUITHREADINFO,*PGUITHREADINFO;
+#endif /* (WINVER < 0x0500) */
 
 #ifdef __cplusplus
 }
