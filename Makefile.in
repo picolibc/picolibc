@@ -515,12 +515,10 @@ EXTRA_GCC_FLAGS = \
 	'AS=$(AS)' \
 	'CC=$(CC)' \
 	'CXX=$(CXX)' \
-	'DLLTOOL=$$(DLLTOOL_FOR_TARGET)' \
 	'BUILD_PREFIX=$(BUILD_PREFIX)' \
 	'BUILD_PREFIX_1=$(BUILD_PREFIX_1)' \
 	'NM=$(NM)' \
 	'RANLIB=$(RANLIB)' \
-	'WINDRES=$$(WINDRES_FOR_TARGET)' \
 	"GCC_FOR_TARGET=$(GCC_FOR_TARGET)" \
 	"CFLAGS_FOR_BUILD=$(CFLAGS_FOR_BUILD)" \
 	"`echo 'LANGUAGES=$(LANGUAGES)' | sed -e s/.*=$$/XFOO=/`" \
@@ -529,7 +527,6 @@ EXTRA_GCC_FLAGS = \
 	"`echo 'LIBGCC2_CFLAGS=$(LIBGCC2_CFLAGS)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'LIBGCC2_DEBUG_CFLAGS=$(LIBGCC2_DEBUG_CFLAGS)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'LIBGCC2_INCLUDES=$(LIBGCC2_INCLUDES)' | sed -e s/.*=$$/XFOO=/`" \
-	"`echo 'ENQUIRE=$(ENQUIRE)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'STAGE1_CFLAGS=$(STAGE1_CFLAGS)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'BOOT_CFLAGS=$(BOOT_CFLAGS)' | sed -e s/.*=$$/XFOO=/`"
 
