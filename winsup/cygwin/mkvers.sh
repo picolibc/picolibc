@@ -92,10 +92,12 @@ wv_cvs_tag="$cvs_tag"
 
 #
 # Look in the source directory containing the include/cygwin/version.h
-# file for a ".snapshot-date" file.  If one is found then this information
-# will be saved for output to the DLL.
-#
+# and set dir accordingly.
 dir=`echo $dir | sed -e 's%/include/cygwin.*$%%' -e 's%include/cygwin.*$%.%'`
+
+# Look in $dir for a a ".snapshot-date" file.  If one is found then this
+# information will be saved for output to the DLL.
+#
 if [ -r "$dir/.snapshot-date" ]; then
     read snapshotdate < "$dir/.snapshot-date"
     snapshot="snapshot date

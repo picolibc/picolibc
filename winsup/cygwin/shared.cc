@@ -201,14 +201,6 @@ shared_info::heap_chunk_size ()
   return heap_chunk_in_mb << 20;
 }
 
-/* For apps that wish to access the shared data.  */
-
-shared_info *
-cygwin_getshared ()
-{
-  return cygwin_shared;
-}
-
 /*
  * Function to return a common SECURITY_DESCRIPTOR * that
  * allows all access.

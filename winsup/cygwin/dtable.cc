@@ -246,7 +246,7 @@ dtable::build_fhandler (int fd, const char *name, HANDLE handle)
 	devn = FH_CONIN;
       else if (GetConsoleScreenBufferInfo (handle, &cinfo))
 	devn= FH_CONOUT;
-      else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal))
+      else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
 	devn = FH_SOCKET;
       else if (GetFileType (handle) == FILE_TYPE_PIPE)
 	devn = FH_PIPE;

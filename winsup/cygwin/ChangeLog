@@ -1,6 +1,17 @@
+Tue Sep 11 11:23:10 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygwin.din: Remove cygwin_getshared.
+	* shared.cc: Ditto.
+	* include/cygwin/version.h: Bump API minor number.
+
+Tue Sep 11 11:14:11 2001  Dmitry Timoshkov  <dmitry@baikal.ru>
+
+	* dtable.cc (dtable::build_fhandler): Fix incorrect test for socket.
+
 Tue Sep 11 21:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
-	* thread.cc (pthread_cond::~pthread_cond): Bugfix: Incorrect use of InterlockExchangePointer.
+	* thread.cc (pthread_cond::~pthread_cond): Bugfix: Incorrect use of
+	InterlockExchangePointer.
 	(pthread_mutex::~pthread_mutex): Ditto.
 	(semaphore::~semaphore): Ditto.
 
@@ -8,20 +19,26 @@ Tue Sep 11 18:15:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* dcrt0.cc (cygwin_finished_initializing): Copy _mtinterf on fork;
 	* fork.cc (fork_child): fixup thread-related structures after fork;
-	* thread.cc (MTinterface::Init): Initialise the new mutex, condition and semaphore lists.
-	(MTinterface::fixup_after_fork): Iterate through each list and fixup the objects.
+	* thread.cc (MTinterface::Init): Initialise the new mutex, condition
+	and semaphore lists.
+	(MTinterface::fixup_after_fork): Iterate through each list and fixup
+	the objects.
 	(pthread_cond::pthread_cond): Add this to the condition list.
 	(pthread_cond::~pthread_cond): Remove this from the condition list.
-	(pthread_cond::fixup_after_fork): Recreate as best we can the pre-fork state.
+	(pthread_cond::fixup_after_fork): Recreate as best we can the pre-fork
+	state.
 	(pthread_mutex::pthread_mutex): Add this to the mutex list.
 	(pthread_mutex::~pthread_mutex): Remove this from the mutex list.
-	(pthread_mutex::fixup_after_fork): Recreate as best we can the pre-fork state.
- 	(semaphore::semaphore): Store the initial value, and add this to the semaphore list.
+	(pthread_mutex::fixup_after_fork): Recreate as best we can the pre-fork
+	state.
+	(semaphore::semaphore): Store the initial value, and add this to the
+	semaphore list.
 	(semaphore::~semaphore): Remove this from the semaphore list.
 	(semaphore::Post): Increment the current semaphore value.
 	(semaphore::TryWait): Decrement the current semaphore value.
 	(semaphore::Wait): Ditto.
-	(semaphote::fixup_after_fork): Recreate the pre-fork state as best we can.
+	(semaphote::fixup_after_fork): Recreate the pre-fork state as best we
+	can.
 	* thread.h (pthread_mutex): New members to allow fixup_after_fork.
 	(pthread_cond): Ditto.
 	(semaphore): Ditto.
