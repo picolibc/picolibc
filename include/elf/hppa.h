@@ -318,4 +318,8 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 #define PT_HP_PARALLEL		(PT_LOOS + 0x10)
 #define PT_HP_FASTBIND		(PT_LOOS + 0x11)
 
+/* Additional symbol types.  */
+#define STT_HP_OPAQUE		(STT_LOOS + 0x1)
+#define STT_HP_STUB		(STT_LOOS + 0x2)
+
 #endif /* _ELF_HPPA_H */

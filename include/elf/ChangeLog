@@ -1,5 +1,7 @@
 1999-09-02  Ulrich Drepper  <drepper@cygnus.com>
 
+	* hppa.h: Add HPUX specific symbol type definitions.
+
 	* hppa.h: Add HPUX specific dynamic and program header table
 	specific definitions.
 
