@@ -1,3 +1,8 @@
+2005-03-07  Christopher Faylor  <cgf@timesys.com>
+
+	* kill.cc (getsig): Rectify bug introduced by 2005-02-26 change.  Don't
+	pad signal name with spaces.
+
 2005-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* strace.cc (handle_output_debug_string): Fix compiler warning.
@@ -19,7 +24,7 @@
 
 2005-02-26  Christopher Faylor  <cgf@timesys.com>
 
-	* kill (getsig): Avoid buffer overflow when generating a signal name.
+	* kill.cc (getsig): Avoid buffer overflow when generating a signal name.
 
 	* strace.cc (handle_output_debug_string): Make error a little more specific.
 

@@ -87,7 +87,7 @@ getsig (const char *in_sig)
     sig = in_sig;
   else
     {
-      sprintf (buf, "SIG%-20.20s", in_sig);
+      sprintf (buf, "SIG%-.20s", in_sig);
       sig = buf;
     }
   intsig = strtosigno (sig) ?: atoi (in_sig);
