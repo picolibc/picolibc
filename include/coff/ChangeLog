@@ -1,7 +1,11 @@
+2005-01-10  Inderpreet Singh <inderpreetb@noida.hcltech.com>
+
+	* maxq.h (F_MAXQ10, F_MAXQ20): Define.
+
 2004-11-08  Inderpreet Singh   <inderpreetb@nioda.hcltech.com>
 	    Vineet Sharma      <vineets@noida.hcltech.com>
 
-	* maxqh: New file: Defintions for the maxq port.
+	* maxq.h: New file: Defintions for the maxq port.
 
 2004-11-08  Aaron W. LaFramboise <aaron98wiridge9@aaronwl.com>
 
