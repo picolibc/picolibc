@@ -93,6 +93,8 @@ int     _EXFUN(_write, (int __fildes, const void *__buf, size_t __nbyte ));
 int     _EXFUN(_execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 
 #if defined(__CYGWIN__) || defined(__rtems__)
+int	_EXFUN(getdtablesize, (void));
+void	_EXFUN(setdtablesize, (int));
 unsigned _EXFUN(usleep, (unsigned int __useconds));
 int     _EXFUN(ftruncate, (int __fd, off_t __length));
 int     _EXFUN(truncate, (const char *, off_t __length));
