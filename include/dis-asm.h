@@ -318,7 +318,7 @@ extern int generic_symbol_at_address
   (INFO).insn_info_valid = 0
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif /* ! defined (DIS_ASM_H) */

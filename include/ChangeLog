@@ -1,3 +1,8 @@
+2002-09-19  Nathan Tallent  <eraxxon@alumni.rice.edu>
+
+	* dis-asm.h: Remove (errant) trailing semicolon (;) from the
+	extern "C" { } declaration.
+
 2002-09-04  Nick Clifton  <nickc@redhat.com>
 
 	* dis-asm.h (print_ppc_disassembler_options): Prototype.
