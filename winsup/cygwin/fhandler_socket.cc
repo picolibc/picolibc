@@ -1,6 +1,6 @@
 /* fhandler_socket.cc. See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -42,7 +42,7 @@ fhandler_dev_random* entropy_source;
 /* fhandler_socket */
 
 fhandler_socket::fhandler_socket ()
-  : fhandler_base (FH_SOCKET)
+  : fhandler_base (FH_SOCKET), sun_path (NULL)
 {
   set_need_fork_fixup ();
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
@@ -53,6 +53,8 @@ fhandler_socket::~fhandler_socket ()
 {
   if (prot_info_ptr)
     cfree (prot_info_ptr);
+  if (sun_path)
+    cfree (sun_path);
 }
 
 void
@@ -477,4 +479,12 @@ fhandler_socket::set_close_on_exec (int val)
     set_inheritance (get_handle (), val);
   set_close_on_exec_flag (val);
   debug_printf ("set close_on_exec for %s to %d", get_name (), val);
+}
+
+void
+fhandler_socket::set_sun_path (const char *path)
+{
+  if (sun_path)
+    cfree (sun_path);
+  sun_path = cstrdup (path);
 }

@@ -1,6 +1,6 @@
 /* fhandler.h
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -360,6 +360,7 @@ class fhandler_socket: public fhandler_base
   int connect_secret [4];
   HANDLE secret_event;
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
+  char *sun_path;
 
  public:
   fhandler_socket ();
@@ -392,6 +393,8 @@ class fhandler_socket: public fhandler_base
   select_record *select_except (select_record *s);
   int get_addr_family () {return addr_family;}
   void set_addr_family (int af) {addr_family = af;}
+  void set_sun_path (const char *path);
+  char *get_sun_path () {return sun_path;}
   void set_connect_secret ();
   void get_connect_secret (char*);
   HANDLE create_secret_event (int *secret = NULL);

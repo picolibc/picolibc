@@ -1,6 +1,6 @@
 /* net.cc: network-related routines.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1338,6 +1338,7 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
 	      _close (fd);
 	      chmod (un_addr->sun_path,
 		(S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask);
+	      sock->set_sun_path (un_addr->sun_path);
 	      res = 0;
 	    }
 #undef un_addr
@@ -1366,10 +1367,27 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
   fhandler_socket *sock = get (fd);
   if (sock)
     {
-      res = getsockname (sock->get_socket (), addr, namelen);
-      if (res)
-	set_winsock_errno ();
-
+      if (sock->get_addr_family () == AF_UNIX)
+	{
+	  struct sockaddr_un *sun = (struct sockaddr_un *) addr;
+	  memset (sun, 0, *namelen);
+	  sun->sun_family = AF_UNIX;
+	  /* According to SUSv2 "If the actual length of the address is greater
+	     than the length of the supplied sockaddr structure, the stored
+	     address will be truncated."  We play it save here so that the
+	     path always has a trailing 0 even if it's truncated. */
+	  strncpy (sun->sun_path, sock->get_sun_path (),
+		   *namelen - sizeof *sun + sizeof sun->sun_path - 1);
+	  *namelen = sizeof *sun - sizeof sun->sun_path
+		     + strlen (sun->sun_path) + 1;
+	  res = 0;
+	}
+      else
+	{
+	  res = getsockname (sock->get_socket (), addr, namelen);
+	  if (res)
+	    set_winsock_errno ();
+	}
     }
   syscall_printf ("%d = getsockname (%d, %x, %d)", res, fd, addr, namelen);
   return res;
