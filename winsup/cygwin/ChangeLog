@@ -1,3 +1,7 @@
+2002-08-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* poll.cc (poll): Eliminate erroneous POLLERR conditional.
+
 2002-08-26  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler_socket.cc (fhandler_socket::check_peer_secret_event):
