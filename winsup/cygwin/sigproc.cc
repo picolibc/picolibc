@@ -100,7 +100,6 @@ Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing t
 Static waitq waitq_main;		// Storage for main thread
 
 muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
-muto NO_COPY *sync_sig_send = NULL;	// Control access to sig_send
 
 DWORD NO_COPY maintid = 0;		// ID of the main thread
 DWORD NO_COPY sigtid = 0;		// ID of the signal thread
@@ -618,7 +617,6 @@ sigproc_init ()
    * access to the children and zombie arrays.
    */
   sync_proc_subproc = new_muto (FALSE, NULL);
-  sync_sig_send = new_muto (FALSE, NULL);
 
   /* Initialize waitq structure for main thread.  A waitq structure is
    * allocated for each thread that executes a wait to allow multiple threads
@@ -772,7 +770,6 @@ sig_send (pinfo *p, int sig)
     sd = signal_dispatch_storage.create ();
 #endif
 
-  sync_sig_send->acquire ();
   /* Increment the sigtodo array to signify which signal to assert.
    */
   (void) InterlockedIncrement (p->getsigtodo(sig));
@@ -820,7 +817,6 @@ sigproc_printf ("ReleaseSemaphore succeeded");
     {
       rc = WAIT_OBJECT_0;
       sip_printf ("Not waiting for sigcomplete.  its_me %d sig %d", its_me, sig);
-      sync_sig_send->release ();
       if (!its_me)
 	ForceCloseHandle (thiscatch);
     }
@@ -829,7 +825,6 @@ sigproc_printf ("ReleaseSemaphore succeeded");
       sip_printf ("Waiting for thiscomplete %p", thiscomplete);
 
       SetLastError (0);
-      sync_sig_send->release ();
 Sleep (0);
       rc = WaitForSingleObject (thiscomplete, WSSC);
       /* Check for strangeness due to this thread being redirected by the

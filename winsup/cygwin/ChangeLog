@@ -1,3 +1,12 @@
+Tue Mar  7 13:31:10 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (sig_send): Eliminate sync_sig_send synchronization since
+	it didn't seem to affect the "bash hangs" problem.
+
+Tue Mar  7 13:17:56 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* mcount.c: Remove strace.h include.
+
 Tue Mar  7 00:29:34 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Throughout use strace class in place of individual functions and

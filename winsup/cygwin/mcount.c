@@ -37,7 +37,6 @@ static char rcsid[] = "$OpenBSD: mcount.c,v 1.6 1997/07/23 21:11:27 kstailey Exp
 
 #include <sys/param.h>
 #include <sys/types.h>
-#include <sys/strace.h>
 #include <gmon.h>
 
 /*
