@@ -49,10 +49,10 @@ int pthread_attr_init (pthread_attr_t * attr);
 int pthread_attr_destroy (pthread_attr_t * attr);
 int pthread_attr_setstacksize (pthread_attr_t * attr, size_t size);
 int pthread_attr_getstacksize (pthread_attr_t * attr, size_t * size);
-/*
- pthread_attr_setstackaddr(...);
- pthread_attr_getstackaddr(...);
-*/
+
+/* Thread Control */
+int pthread_detach (pthread_t thread);
+int pthread_join (pthread_t thread, void **value_ptr);
 
 /* Thread Exit */
 int pthread_exit (void *value_ptr);

@@ -1,3 +1,8 @@
+2000-05-08  Paul K. Fisher  <pfisher@plexware.com>
+
+	* include/pthread.h (pthread_detach): Add missing prototype.
+	(pthread_join): same.
+
 2000-05-08  DJ Delorie  <dj@cygnus.com>
 
 	* fhandler.cc (lock): use signed math to allow checking ranges
