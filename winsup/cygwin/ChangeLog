@@ -1,3 +1,8 @@
+Mon Oct 23 22:27:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::fcntl): Setting flags in F_SETFL
+	branch according to Linux documentation.
+
 Mon Oct 23 21:43:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fcntl.cc (_fcntl): Rearrange as wrapper function. Move all

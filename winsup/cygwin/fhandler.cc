@@ -1001,8 +1001,6 @@ int fhandler_base::fcntl (int cmd, void *arg)
 {
   int res;
 
-  /*int temp = 0;*/
-
   switch (cmd)
     {
     case F_GETFD:
@@ -1016,16 +1014,19 @@ int fhandler_base::fcntl (int cmd, void *arg)
       res = get_flags ();
       break;
     case F_SETFL:
-      /* Only O_APPEND, O_NONBLOCK and O_ASYNC may be set. */
-      /*
-      if (arg & O_RDONLY)
-	temp |= GENERIC_READ;
-      if (arg & O_WRONLY)
-	temp |= GENERIC_WRITE;
-      syscall_printf ("fcntl (F_SETFL, %d)", (int) arg);
-      set_access (temp);
-      */
-      set_flags ((int) arg);
+      {
+	/*
+	 * Only O_APPEND, O_ASYNC and O_NONBLOCK are allowed.
+	 * Each other flag will be ignored.
+	 * Since O_ASYNC isn't defined in fcntl.h it's currently
+	 * ignored as well.
+	 * There's no functionality at all, so...
+	 */
+        int flags = get_flags ();
+        flags &= ~(O_APPEND | O_NONBLOCK);
+      	flags |= ((int) arg & (O_APPEND | O_NONBLOCK));
+        set_flags (flags);
+      }
       res = 0;
       break;
     case F_GETLK:
