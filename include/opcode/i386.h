@@ -316,7 +316,7 @@ static const template i386_optab[] = {
 /* Intel Syntax */
 {"call",   2,	0x9a, X, wl_Suf|JumpInterSegment|DefaultSize, { Imm16, Imm16|Imm32, 0} },
 /* Intel Syntax */
-{"call",   1,	0xff, 3, wl_Suf|Modrm|DefaultSize,	{ WordMem, 0, 0} },
+{"call",   1,	0xff, 3, x_Suf|Modrm|DefaultSize,	{ WordMem, 0, 0} },
 {"lcall",  2,	0x9a, X, wl_Suf|JumpInterSegment|DefaultSize, { Imm16, Imm16|Imm32, 0} },
 {"lcall",  1,	0xff, 3, wl_Suf|Modrm|DefaultSize,	{ WordMem|JumpAbsolute, 0, 0} },
 
@@ -326,7 +326,7 @@ static const template i386_optab[] = {
 /* Intel Syntax */
 {"jmp",    2,	0xea, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
 /* Intel Syntax */
-{"jmp",    1,	0xff, 5, wl_Suf|Modrm,		{ WordMem, 0, 0} },
+{"jmp",    1,	0xff, 5, x_Suf|Modrm,		{ WordMem, 0, 0} },
 {"ljmp",   2,	0xea, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
 {"ljmp",   1,	0xff, 5, wl_Suf|Modrm,		{ WordMem|JumpAbsolute, 0, 0} },
 
