@@ -116,7 +116,7 @@ install:
 install_host:
 
 clean:
-	-rm -f *.o *.dll *.a *.exp junk *.bak *.base *.exe testsuite/*
+	-rm -f *.o *.dll *.a *.exp junk *.bak *.base *.exe testsuite/* *.d
 
 maintainer-clean realclean: clean
 	@echo "This command is intended for maintainers to use;"
