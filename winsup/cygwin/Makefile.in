@@ -80,9 +80,6 @@ CFLAGS=@CFLAGS@
 override CFLAGS+=-MMD ${$(*F)_CFLAGS}
 CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@
-ifeq ($(CYGINLINE),1)
-override CXXFLAGS+=-finline-functions
-endif
 
 AR:=@AR@
 AR_FLAGS:=qv

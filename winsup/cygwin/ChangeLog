@@ -1,3 +1,7 @@
+2003-04-30  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* Makefile.in: Revert patch from 2003-04-17.
+
 2003-04-28  Brian Ford  <ford@vss.fsi.com>
 
 	* profil.h (PROFADDR): Prevent overflow when text segments are larger
