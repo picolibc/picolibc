@@ -2763,9 +2763,12 @@ symlink_info::parse_device (const char *contents)
 
   switch (mymode & S_IFMT)
     {
+    case S_IFIFO:
+      mymajor = _major (FH_FIFO);
+      myminor = _minor (FH_FIFO);
+      break;
     case S_IFBLK:
     case S_IFCHR:
-    case S_IFIFO:
       if (mymajor || myminor)
 	break;
     default:
