@@ -1,4 +1,10 @@
 
+Tue Jan 30 08:30:33  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* objidl.h: (GetClassID): Argument needs to be a pointer.
+	(GetUnmarshalClass): CLSID argument needs to be a pointer.
+	Thanks To: <bge@users.sourceforge.net>
+
 Tue Jan 30 07:52:54  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* Apply Danny Smith patch 102386
