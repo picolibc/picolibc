@@ -1,3 +1,7 @@
+2002-08-18  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/sys/unistd.h: Add getsid declaration for cygwin.
+
 2002-08-17  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/include/sys/config.h[__PPC__][__SPE__]: Set

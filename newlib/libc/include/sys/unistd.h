@@ -64,6 +64,9 @@ pid_t   _EXFUN(getpgid, (pid_t));
 pid_t   _EXFUN(getpgrp, (void ));
 pid_t   _EXFUN(getpid, (void ));
 pid_t   _EXFUN(getppid, (void ));
+#ifdef __CYGWIN__
+pid_t   _EXFUN(getsid, (pid_t));
+#endif
 uid_t   _EXFUN(getuid, (void ));
 #ifdef __CYGWIN__
 char *	_EXFUN(getusershell, (void));
