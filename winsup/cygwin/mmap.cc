@@ -17,6 +17,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -42,6 +43,7 @@ class mmap_record
   private:
     int fdesc_;
     HANDLE mapping_handle_;
+    int devtype_;
     DWORD access_mode_;
     DWORD offset_;
     DWORD size_to_map_;
@@ -50,14 +52,25 @@ class mmap_record
 
   public:
     mmap_record (int fd, HANDLE h, DWORD ac, DWORD o, DWORD s, caddr_t b) :
-       fdesc_ (fd), mapping_handle_ (h), access_mode_ (ac), offset_ (o),
-       size_to_map_ (s), base_address_ (b) , map_map_ (NULL) { ; }
+       fdesc_ (fd),
+       mapping_handle_ (h),
+       devtype_ (0),
+       access_mode_ (ac),
+       offset_ (o),
+       size_to_map_ (s),
+       base_address_ (b),
+       map_map_ (NULL)
+      {
+        if (fd >= 0 && !fdtab.not_open (fd))
+	  devtype_ = fdtab[fd]->get_device ();
+      }
 
     /* Default Copy constructor/operator=/destructor are ok */
 
     /* Simple accessors */
     int get_fd () const { return fdesc_; }
     HANDLE get_handle () const { return mapping_handle_; }
+    DWORD get_device () const { return devtype_; }
     DWORD get_access () const { return access_mode_; }
     DWORD get_offset () const { return offset_; }
     DWORD get_size () const { return size_to_map_; }
@@ -83,6 +96,9 @@ class mmap_record
     DWORD map_map (DWORD off, DWORD len);
     BOOL unmap_map (caddr_t addr, DWORD len);
     void fixup_map (void);
+
+    fhandler_base *alloc_fh ();
+    void free_fh (fhandler_base *fh);
 };
 
 DWORD
@@ -197,6 +213,32 @@ mmap_record::fixup_map ()
 	            getpagesize (),
 		    MAP_ISSET (off - 1) ? prot : PAGE_NOACCESS,
 		    &old_prot);
+}
+
+static fhandler_disk_file fh_paging_file (NULL);
+
+fhandler_base *
+mmap_record::alloc_fh ()
+{
+  if (get_fd () == -1)
+    {
+      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
+      return &fh_paging_file;
+    }
+
+  /* The file descriptor could have been closed or, even
+     worse, could have been reused for another file before
+     the call to fork(). This requires creating a fhandler
+     of the correct type to be sure to call the method of the
+     correct class. */
+  return fdtab.build_fhandler (-1, get_device (), "", 0);
+}
+
+void
+mmap_record::free_fh (fhandler_base *fh)
+{
+  if (get_fd () != -1)
+    cfree (fh);
 }
 
 class list {
@@ -422,7 +464,6 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   DWORD gran_off = off & ~(granularity - 1);
   DWORD gran_len = howmany (len, granularity) * granularity;
 
-  fhandler_disk_file fh_paging_file (NULL);
   fhandler_base *fh = NULL;
   caddr_t base = addr;
   HANDLE h;
@@ -548,27 +589,17 @@ munmap (caddr_t addr, size_t len)
   for (int it = 0; it < mmapped_areas->nlists; ++it)
     {
       list *l = mmapped_areas->lists[it];
-      if (l != 0)
+      if (l)
 	{
-	  int fd = l->fd;
-	  fhandler_disk_file fh_paging_file (NULL);
-	  fhandler_base *fh;
-
-	  if (fd == -1 || fdtab.not_open (fd))
-	    {
-	      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
-	      fh = &fh_paging_file;
-	    }
-	  else
-	    fh = fdtab[fd];
-
 	  off_t li = -1;
 	  if ((li = l->match(addr, len, li)) >= 0)
 	    {
 	      mmap_record *rec = l->recs + li;
 	      if (rec->unmap_map (addr, len))
 	        {
+		  fhandler_base *fh = rec->alloc_fh ();
                   fh->munmap (rec->get_handle (), addr, len);
+		  rec->free_fh (fh);
 
 		  /* Delete the entry. */
 		  l->erase (li);
@@ -623,24 +654,14 @@ msync (caddr_t addr, size_t len, int flags)
       list *l = mmapped_areas->lists[it];
       if (l != 0)
 	{
-	  int fd = l->fd;
-	  fhandler_disk_file fh_paging_file (NULL);
-	  fhandler_base *fh;
-
-	  if (fd == -1 || fdtab.not_open (fd))
-	    {
-	      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
-	      fh = &fh_paging_file;
-	    }
-	  else
-	    fh = fdtab[fd];
-
 	  for (int li = 0; li < l->nrecs; ++li)
 	    {
 	      mmap_record *rec = l->recs + li;
 	      if (rec->get_address () == addr)
 		{
+		  fhandler_base *fh = rec->alloc_fh ();
                   int ret = fh->msync (rec->get_handle (), addr, len, flags);
+		  rec->free_fh (fh);
 
                   if (ret)
 		    syscall_printf ("%d = msync(): %E", ret);
@@ -863,18 +884,14 @@ fixup_mmaps_after_fork ()
 		  rec->get_fd (), rec->get_handle (), rec->get_access (),
 		  rec->get_offset (), rec->get_size (), rec->get_address ());
 
-	      BOOL ret;
-	      fhandler_disk_file fh_paging_file (NULL);
-	      fhandler_base *fh;
-	      if (rec->get_fd () == -1) /* MAP_ANONYMOUS */
-		fh = &fh_paging_file;
-	      else
-	        fh = fdtab[rec->get_fd ()];
-	      ret = fh->fixup_mmap_after_fork (rec->get_handle (),
-					       rec->get_access (),
-					       rec->get_offset (),
-					       rec->get_size (),
-					       rec->get_address ());
+	      fhandler_base *fh = rec->alloc_fh ();
+	      BOOL ret = fh->fixup_mmap_after_fork (rec->get_handle (),
+					            rec->get_access (),
+					            rec->get_offset (),
+					            rec->get_size (),
+					            rec->get_address ());
+	      rec->free_fh (fh);
+
 	      if (!ret)
 		{
 		  system_printf ("base address fails to match requested address %p",

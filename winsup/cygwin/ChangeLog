@@ -1,3 +1,18 @@
+Mon Apr 16 19:19:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc: Move fh_paging_file from some functions to be
+	a global static variable.
+	(class mmap_record): Add `devtype_' member to remember
+	the device type of the file. Add declaration for methods
+	`get_device', `alloc_fh' and `free_fh'.
+	(mmap_record::mmap_record): Initialize `devtype_' correctly.
+	(mmap_record::alloc_fh): New method.
+	(mmap_record::free_fh): Ditto.
+	(munmap): Use new mmap_record::alloc_fh and mmap_record::free_fh
+	methods to create a correct fhandler.
+	(msync): Ditto.
+	(fixup_mmaps_after_fork): Ditto.
+
 Mon Apr 16 16:01:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* grp.cc (getgroups): If `allow_ntsec' is set, use the process token
