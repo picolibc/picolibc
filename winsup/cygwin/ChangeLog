@@ -1,3 +1,9 @@
+2001-08-24  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+   
+	* syscalls.cc (check_tty_fds): New function.  Check whether there is a
+	fd referring to pty slave.
+	(setsid): Don't detach console if the process has a pty slave.
+
 Fri Aug 24  8:54:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (free_addr_list): Add define for symmetry.
