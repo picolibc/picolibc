@@ -1,3 +1,8 @@
+Sun Mar 12 21:22:25 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* strace.cc: Throughout, track information like start_time, etc.  on a
+	per-process basis.
+
 Sun Feb 27 23:37:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* strace.cc (handle_output_debug_string): Parse strace output to allow

@@ -23,10 +23,16 @@ struct child_list
   {
     DWORD id;
     HANDLE hproc;
+    int saw_stars;
+    char nfields;
+    long long start_time;
+    DWORD last_usecs;
     struct child_list *next;
+    child_list () : id (0), hproc (NULL), saw_stars (0), nfields (0),
+		    start_time (0), last_usecs (0), next (NULL) {}
   };
 
-child_list children = {0, NULL, NULL};
+child_list children;
 
 static void
 warn (int geterrno, const char *fmt, ...)
@@ -84,13 +90,13 @@ add_child (DWORD id, HANDLE hproc)
   lasth = children.next->hproc;
 }
 
-static HANDLE
-get_child_handle (DWORD id)
+static child_list *
+get_child (DWORD id)
 {
   child_list *c;
   for (c = &children; (c = c->next) != NULL; )
     if (c->id == id)
-      return c->hproc;
+      return c;
 
   error (0, "no process id %d found", id);
 }
@@ -317,12 +323,9 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   int special;
   char alen[3 + 8 + 1];
   DWORD nbytes;
-  HANDLE hchild = get_child_handle (id);
+  child_list *child = get_child (id);
+  HANDLE hchild = child->hproc;
   #define INTROLEN (sizeof (alen) - 1)
-  static int saw_stars = 0;
-  static char nfields = 0;
-  static long long start_time;
-  static DWORD last_usecs;
 
   if (id == lastid && hchild != lasth)
     warn (0, "%p != %p", hchild, lasth);
@@ -402,71 +405,71 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
       usecs = dusecs;
     }
 
-  if (saw_stars == 0)
+  if (child->saw_stars == 0)
     {
       FILETIME st;
       char *news;
 
       GetSystemTimeAsFileTime (&st);
       FileTimeToLocalFileTime (&st, &st);
-      start_time = st.dwHighDateTime;
-      start_time <<= 32;
-      start_time |= st.dwLowDateTime;
+      child->start_time = st.dwHighDateTime;
+      child->start_time <<= 32;
+      child->start_time |= st.dwLowDateTime;
       if (*(news = ptrest) != '[')
-	saw_stars = 2;
+	child->saw_stars = 2;
       else
 	{
-	  saw_stars++;
+	  child->saw_stars++;
 	  while ((news = strchr (news, ' ')) != NULL && *++news != '*')
-	    nfields++;
+	    child->nfields++;
 	  if (news == NULL)
-	    saw_stars++;
+	    child->saw_stars++;
 	  else
 	    {
 	      s = news;
-	      nfields++;
+	      child->nfields++;
 	    }
 	}
     }
-  else if (saw_stars < 2)
+  else if (child->saw_stars < 2)
     {
       int i;
       char *news;
       if (*(news = ptrest) != '[')
-	saw_stars = 2;
+	child->saw_stars = 2;
       else
 	{
-	  for (i = 0; i < nfields; i++)
+	  for (i = 0; i < child->nfields; i++)
 	    if ((news = strchr (news, ' ')) == NULL)
 	      break; 	// Should never happen
 	    else
 	      news++;
 
 	  if (news == NULL)
-	    saw_stars = 2;
+	    child->saw_stars = 2;
 	  else
 	    {
 	      s = news;
 	      if (*s == '*')
 		{
-		  SYSTEMTIME *st = syst (start_time);
+		  SYSTEMTIME *st = syst (child->start_time);
 		  fprintf (ofile, "Date/Time:    %d-%02d-%02d %02d:%02d:%02d\n",
 			   st->wYear, st->wMonth, st->wDay, st->wHour, st->wMinute, st->wSecond);
-		  saw_stars++;
+		  child->saw_stars++;
 		}
 	    }
 	}
     }
 
-  long long d = usecs - last_usecs;
+  long long d = usecs - child->last_usecs;
   char intbuf[40];
 
-  if (saw_stars < 2 || s != origs)
+  if (child->saw_stars < 2 || s != origs)
     /* Nothing */;
   else if (hhmmss)
     {
       s = ptrest - 9;
-      SYSTEMTIME *st = syst (start_time + (long long) usecs * 10);
+      SYSTEMTIME *st = syst (child->start_time + (long long) usecs * 10);
       sprintf (s, "%02d:%02d:%02d", st->wHour, st->wMinute, st->wSecond);
       *strchr (s, '\0') = ' ';
     }
@@ -481,7 +484,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
       memcpy ((s -= len), intbuf, len);
     }
 
-  last_usecs = usecs;
+  child->last_usecs = usecs;
   if (numerror || !output_winerror (ofile, s))
     fputs (s, ofile);
   fflush (ofile);
