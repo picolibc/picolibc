@@ -1,3 +1,7 @@
+2001-10-12  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.common: Perform more include file testing trickery.
+
 Sun Oct  7 23:08:46 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.common: Avoid adding -I options to compile if they already

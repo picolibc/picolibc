@@ -66,16 +66,20 @@ mingw_build:=$(bupdir)/mingw
 mingw_source:=$(updir)/mingw
 utils_build:=$(bupdir)/utils
 utils_source:=$(updir)/utils
-ifeq (,${findstring $(newlib_source),$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
+ifeq (,${findstring $(newlib_source)/libc/include,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
 newlib_include:=-I$(newlib_source)/libc/include
-newlib_sys_include:=-I$(newlib_source)/libc/sys
+endif
+ifeq (,${findstring $(newlib_source)/libc/sys/cygwin,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
+newlib_sys_include:=-I$(newlib_source)/libc/sys/cygwin
+endif
+ifeq (,${findstring $(newlib_source)/libc/sys/cygwin/include,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
+newlib_sys_include_include:=-I$(newlib_source)/libc/sys/cygwin/include
 endif
 ifeq (,${findstring $(cygwin_source)/include,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
 cygwin_include:=-I$(cygwin_source)/include
 endif
-cygwin_include:=-I$(cygwin_source)/include
 
-INCLUDES:=-I. $(cygwin_include) -I$(cygwin_source) $(newlib_sys_include) $(newlib_include) $(w32api_include)
+INCLUDES:=-I. $(cygwin_include) -I$(cygwin_source) $(newlib_sys_include) $(newlib_include)  $(newlib_sys_include_include) $(w32api_include)
 ifdef CONFIG_DIR
 INCLUDES+=-I$(CONFIG_DIR)
 endif
