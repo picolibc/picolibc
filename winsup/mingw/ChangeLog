@@ -1,5 +1,10 @@
 2002-09-05  Earnie Boyd  <earnie@users.sf.net>
 
+	* include/_mingw.h: Increment version to 2.3.
+	Makefile.in: Ditto.
+
+2002-09-05  Earnie Boyd  <earnie@users.sf.net>
+
 	* mingwex/fegetenv.c: Change to \n line endings.
 	* mingwex/vsnprintf.c: Ditto.
 	* mingwex/vsnwprintf.c: Ditto.
