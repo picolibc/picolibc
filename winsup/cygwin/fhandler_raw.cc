@@ -40,8 +40,7 @@ fhandler_dev_raw::is_eof (int)
 }
 
 
-/* Wrapper functions to allow fhandler_dev_tape to detect and care for
-   media changes and bus resets. */
+/* Wrapper functions to simplify error handling. */
 
 BOOL
 fhandler_dev_raw::write_file (const void *buf, DWORD to_write,
@@ -67,28 +66,6 @@ fhandler_dev_raw::read_file (void *buf, DWORD to_read, DWORD *read, int *err)
     *err = GetLastError ();
   syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
 		  ret, *err, get_handle (), buf, to_read, *read);
-  return ret;
-}
-
-int
-fhandler_dev_raw::writebuf (void)
-{
-  DWORD written;
-  int ret = 0;
-
-  if (is_writing () && devbuf && devbufend)
-    {
-      DWORD to_write;
-      int ret = 0;
-
-      memset (devbuf + devbufend, 0, devbufsiz - devbufend);
-      to_write = ((devbufend - 1) / 512 + 1) * 512;
-      if (!write_file (devbuf, to_write, &written, &ret)
-	  && is_eom (ret))
-	eom_detected (true);
-      devbufstart = devbufend = 0;
-    }
-  is_writing (false);
   return ret;
 }
 
@@ -171,17 +148,6 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
   size_t len = ulen;
   char *tgt;
   char *p = (char *) ptr;
-
-  /* In mode O_RDWR the buffer has to be written to device first */
-  ret = writebuf ();
-  if (ret)
-    {
-      if (is_eom (ret))
-	set_errno (ENOSPC);
-      else
-	__seterrno ();
-      goto err;
-    }
 
   /* Checking a previous end of file */
   if (eof_detected () && !lastblk_to_read ())
@@ -320,9 +286,8 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
       return -1;
     }
 
-  if (!is_writing ())
-    devbufstart = devbufend = 0;
-  is_writing (true);
+  /* Invalidate buffer. */
+  devbufstart = devbufend = 0;
 
   if (len > 0)
     {

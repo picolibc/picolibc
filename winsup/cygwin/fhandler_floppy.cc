@@ -66,20 +66,6 @@ fhandler_dev_floppy::open (int flags, mode_t)
   return fhandler_dev_raw::open (flags);
 }
 
-int
-fhandler_dev_floppy::close (void)
-{
-  int ret;
-
-  ret = writebuf ();
-  if (ret)
-    {
-      fhandler_dev_raw::close ();
-      return ret;
-    }
-  return fhandler_dev_raw::close ();
-}
-
 _off64_t
 fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 {
@@ -144,10 +130,8 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 	  return -1;
 	}
       current_position = low + ((_off64_t) high << 32);
-      if (is_writing ())
-	current_position += devbufend - devbufstart;
-      else
-	current_position -= devbufend - devbufstart;
+      /* devbufend and devbufstart are always 0 when writing. */
+      current_position -= devbufend - devbufstart;
 
       lloffset += current_position;
       whence = SEEK_SET;
@@ -167,9 +151,6 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
   if (whence == SEEK_SET)
     {
       /* Invalidate buffer. */
-      ret = writebuf ();
-      if (ret)
-	return ret;
       devbufstart = devbufend = 0;
 
       low = sector_aligned_offset & UINT32_MAX;
@@ -181,6 +162,7 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 	  return -1;
 	}
 
+      eom_detected (false);
       size_t len = bytes_left;
       raw_read (buf, len);
       return sector_aligned_offset + bytes_left;

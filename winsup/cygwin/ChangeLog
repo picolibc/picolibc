@@ -1,5 +1,17 @@
 2004-07-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_dev_raw): Remove is_writing flag.
+	Remove declaration of writebuf.
+	(class fhandler_dev_floppy): Remove declaration of close.
+	* fhandler_floppy.cc (fhandler_dev_floppy::close): Delete.
+	(fhandler_dev_floppy::lseek): Remove calls to writebuf.  Set
+	eom_detected to false after successful seek.
+	* fhandler_raw.cc (fhandler_dev_raw::writebuf): Delete.
+	(fhandler_dev_raw::raw_read): Remove calls to writebuf.
+	(fhandler_dev_raw::raw_write): Always invalidate buffer.
+
+2004-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (class mmap_record): Fix return type of get_offset.
 	(mmap_record::fixup_page_map): Fix off by one error.
 	(list::search_record): Use long as type of "start" argument in both,

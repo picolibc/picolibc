@@ -482,22 +482,19 @@ class fhandler_dev_raw: public fhandler_base
     unsigned eom_detected    : 1;
     unsigned eof_detected    : 1;
     unsigned lastblk_to_read : 1;
-    unsigned is_writing      : 1;
    public:
     status_flags () :
-      eom_detected (0), eof_detected (0), lastblk_to_read (0), is_writing (0)
+      eom_detected (0), eof_detected (0), lastblk_to_read (0)
       {}
   } status;
  
   IMPLEMENT_STATUS_FLAG (bool, eom_detected)
   IMPLEMENT_STATUS_FLAG (bool, eof_detected)
   IMPLEMENT_STATUS_FLAG (bool, lastblk_to_read)
-  IMPLEMENT_STATUS_FLAG (bool, is_writing)
 
   virtual BOOL write_file (const void *buf, DWORD to_write,
 			   DWORD *written, int *err);
   virtual BOOL read_file (void *buf, DWORD to_read, DWORD *read, int *err);
-  virtual int writebuf (void);
 
   /* returns not null, if `win_error' determines an end of media condition */
   virtual int is_eom(int win_error);
@@ -535,7 +532,6 @@ class fhandler_dev_floppy: public fhandler_dev_raw
   fhandler_dev_floppy ();
 
   virtual int open (int flags, mode_t mode = 0);
-  virtual int close (void);
 
   virtual _off64_t lseek (_off64_t offset, int whence);
 
