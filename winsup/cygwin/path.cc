@@ -3297,7 +3297,7 @@ chdir (const char *in_dir)
 
   /* Convert path.  First argument ensures that we don't check for NULL/empty/invalid
      again. */
-  path_conv path (PC_NONULLEMPTY, in_dir, PC_FULL | PC_SYM_FOLLOW);
+  path_conv path (PC_NONULLEMPTY, in_dir, PC_FULL | PC_SYM_FOLLOW | PC_POSIX);
   if (path.error)
     {
       set_errno (path.error);
@@ -3306,7 +3306,8 @@ chdir (const char *in_dir)
     }
 
   int res = -1;
-  const char *native_dir = path;
+  bool doit = false;
+  const char *native_dir = path, *posix_cwd = NULL;
   int devn = path.get_devn ();
   if (!isvirtual_dev (devn))
     {
@@ -3319,20 +3320,28 @@ chdir (const char *in_dir)
 	  path.get_win32 ()[2] = '\\';
 	  path.get_win32 ()[3] = '\0';
 	}
-      if (SetCurrentDirectory (native_dir))
-        res = 0;
-      else
-        __seterrno ();
+      /* The sequence chdir("xx"); chdir(".."); must be a noop if xx
+	 is not a symlink. This is exploited by find.exe.
+	 The posix_cwd is just path.normalized_path.
+	 In other cases we let cwd.set obtain the Posix path through
+	 the mount table. */
+      if (!path.has_symlinks () && !isabspath (in_dir))
+	posix_cwd = path.normalized_path;
+      res = 0;
+      doit = true;
     }
   else if (!path.exists ())
     set_errno (ENOENT);
   else if (!path.isdir ())
     set_errno (ENOTDIR);
   else
-    res = 0;
+   {
+     posix_cwd = path.normalized_path;
+     res = 0;
+   }
 
-  if (res == 0)
-    cygheap->cwd.set (native_dir);
+  if (!res)
+    res = cygheap->cwd.set (native_dir, posix_cwd, doit);
 
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */
@@ -3648,38 +3657,50 @@ cwdstuff::get_initial ()
   if (win32)
     return 1;
 
-  int i;
-  DWORD len, dlen;
-  for (i = 0, dlen = CYG_MAX_PATH, len = 0; i < 3; dlen *= 2, i++)
-    {
-      win32 = (char *) crealloc (win32, dlen + 2);
-      if ((len = GetCurrentDirectoryA (dlen, win32)) < dlen)
-	break;
-    }
-
-  if (len == 0)
-    {
-      __seterrno ();
-      cwd_lock->release ();
-      debug_printf ("get_initial_cwd failed, %E");
-      cwd_lock->release ();
-      return 0;
-    }
-  set (NULL);
-  return 1;	/* Leaves cwd lock unreleased */
+  /* Leaves cwd lock unreleased, if success */
+  return !set (NULL, NULL, false);
 }
 
-/* Fill out the elements of a cwdstuff struct.
+/* Chdir and fill out the elements of a cwdstuff struct.
    It is assumed that the lock for the cwd is acquired if
    win32_cwd == NULL. */
-void
-cwdstuff::set (const char *win32_cwd, const char *posix_cwd)
+int
+cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 {
-  char pathbuf[CYG_MAX_PATH];
+  char pathbuf[2 * CYG_MAX_PATH];
+  int res = -1;
 
   if (win32_cwd)
     {
-      cwd_lock->acquire ();
+       cwd_lock->acquire ();
+       if (doit && !SetCurrentDirectory (win32_cwd))
+         {
+            __seterrno ();
+            goto out;
+         }
+    }
+  /* If there is no win32 path or it has the form c:xxx, get the value */
+  if (!win32_cwd || (isdrive (win32_cwd) && win32_cwd[2] != '\\'))
+    {
+      int i;
+      DWORD len, dlen;
+      for (i = 0, dlen = CYG_MAX_PATH/3; i < 2; i++, dlen = len)
+        {
+	  win32 = (char *) crealloc (win32, dlen);
+	  if ((len = GetCurrentDirectoryA (dlen, win32)) < dlen)
+	    break;
+	}
+      if (len == 0)
+        {
+	  __seterrno ();
+	  debug_printf ("GetCurrentDirectory, %E");
+	  win32_cwd = pathbuf; /* Force lock release */
+	  goto out;
+	}
+      posix_cwd = NULL;
+    }
+  else
+    {
       win32 = (char *) crealloc (win32, strlen (win32_cwd) + 1);
       strcpy (win32, win32_cwd);
     }
@@ -3694,10 +3715,11 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd)
 
   hash = hash_path_name (0, win32);
 
+  res = 0;
+out:
   if (win32_cwd)
     cwd_lock->release ();
-
-  return;
+  return res;
 }
 
 /* Copy the value for either the posix or the win32 cwd into a buffer. */

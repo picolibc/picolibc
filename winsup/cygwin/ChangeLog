@@ -1,3 +1,13 @@
+2004-05-15  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* cygheap.h (cwdstuff::set): Modify return value and arguments.
+	* path.cc (chdir): Specify PC_POSIX.  Do not call SetCurrentDirectory.
+	Set posix_cwd in a way that does not break find.exe.  Change call to
+	cwd.set.
+	(cwdstuff::get_initial): Do not call GetCurrentDirectory here.
+	(cwdstuff::set): Call SetCurrentDirectory and GetCurrentDirectory as
+	needed.
+
 2004-05-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Don't bail out with error if path is "//".
@@ -8,7 +18,7 @@
 	* fhandler_tape.cc (mt_h): Drop in favor of cygheap based handle.
 	(mtinfo_init): Use cygheap->mt_h handle.  Protect it.
 
-2004-05-12  Pierre Humblet <pierre.humblet@ieee.org>
+2004-05-12  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* tty.h: Remove the %d or %x from all cygtty strings.
 	(tty::open_output_mutex): Only declare.
