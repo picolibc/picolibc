@@ -2,13 +2,14 @@
 
 	* cygtls.h (_local_storage::signamebuf): Increase size to prevent
 	overflow on really odd values.
+	* tlsoffsets.h: Regenerate.
 
 2004-02-03  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (DLL_OFILES): Add strsig.o.
 	* cygtls.h (_local_storage::signamebuf): New element.
 	* sysconf.cc (sysconf): Implement _SC_RTSIG_MAX.
-	* tlsoffset.h: Regenerate.
+	* tlsoffsets.h: Regenerate.
 	* include/limits.h (_POSIX_RTSIG_MAX): New define.
 	(RTSIG_MAX): Ditto.
 	* include/cygwin/signal.h (SIGRTMIN): New define.
