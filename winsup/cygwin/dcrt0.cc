@@ -961,10 +961,7 @@ do_exit (int status)
 
   vfork_save *vf = vfork_storage.val ();
   if (vf != NULL && vf->pid < 0)
-    {
-      vf->pid = status < 0 ? status : -status;
-      longjmp (vf->j, 1);
-    }
+    vf->restore_exit (status);
 
   if (exit_state < ES_SIGNAL)
     {

@@ -3294,7 +3294,7 @@ static Void_t* sYSMALLOc(nb, av) INTERNAL_SIZE_T nb; mstate av;
 
 
 
-
+#ifndef MORECORE_CANNOT_TRIM
 /*
   sYSTRIm is an inverse of sorts to sYSMALLOc.  It gives memory back
   to the system (via negative arguments to sbrk) if there is unused
@@ -3360,6 +3360,7 @@ static int sYSTRIm(pad, av) size_t pad; mstate av;
   }
   return 0;
 }
+#endif /*MORECORE_CANNOT_TRIM*/
 
 /*
   ------------------------------ malloc ------------------------------

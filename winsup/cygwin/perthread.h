@@ -48,14 +48,30 @@ public:
 };
 
 #if defined (NEED_VFORK)
-struct vfork_save
+class vfork_save
 {
-  int pid;
   jmp_buf j;
+  int exitval;
+ public:
+  int pid;
   DWORD frame[100];
   char **vfork_ebp;
   char **vfork_esp;
+  int ctty;
+  pid_t sid;
+  pid_t pgid;
   int is_active () { return pid < 0; }
+  void restore_pid (int val)
+  {
+    pid = val;
+    longjmp (j, 1);
+  }
+  void restore_exit (int val)
+  {
+    exitval = val;
+    longjmp (j, 1);
+  }
+  friend int vfork ();
 };
 
 class per_thread_vfork : public per_thread

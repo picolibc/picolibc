@@ -394,6 +394,7 @@ getrusage
 _getrusage = getrusage
 gets
 _gets = gets
+getsid
 gettimeofday
 _gettimeofday = gettimeofday
 getuid

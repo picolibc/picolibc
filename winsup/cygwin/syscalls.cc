@@ -36,6 +36,9 @@ details. */
 #include <unistd.h>
 #include "shared_info.h"
 #include "cygheap.h"
+#define NEED_VFORK
+#include <setjmp.h>
+#include "perthread.h"
 
 SYSTEM_INFO system_info;
 
@@ -265,11 +268,24 @@ getppid ()
 extern "C" pid_t
 setsid (void)
 {
-  if (myself->pgid != _getpid ())
+  vfork_save *vf = vfork_storage.val ();
+  /* This is a horrible, horrible kludge */
+  if (vf && vf->pid < 0)
     {
-      if (myself->ctty == TTY_CONSOLE &&
-	  !cygheap->fdtab.has_console_fds () &&
-	  !check_pty_fds ())
+      pid_t pid = fork ();
+      if (pid > 0)
+	{
+	  syscall_printf ("longjmping due to vfork");
+	  vf->restore_pid (pid);
+	}
+      /* assuming that fork was successful */
+    }
+
+  if (myself->pgid != myself->pid)
+    {
+      if (myself->ctty == TTY_CONSOLE
+	  && !cygheap->fdtab.has_console_fds ()
+	  && !check_pty_fds ())
 	FreeConsole ();
       myself->ctty = -1;
       myself->sid = _getpid ();
@@ -277,8 +293,29 @@ setsid (void)
       syscall_printf ("sid %d, pgid %d, ctty %d", myself->sid, myself->pgid, myself->ctty);
       return myself->sid;
     }
+
   set_errno (EPERM);
   return -1;
+}
+
+extern "C" pid_t
+getsid (pid_t pid)
+{
+  pid_t res;
+  if (!pid)
+    res = myself->sid;
+  else
+    {
+      pinfo p (pid);
+      if (p)
+	res = p->sid;
+      else
+	{
+	  set_errno (ESRCH);
+	  res = -1;
+	}
+    }
+  return res;
 }
 
 extern "C" ssize_t
