@@ -6,6 +6,8 @@
 
         * mips.h (E_MIPS_ARCH_5, E_MIPS_ARCH_64): New definitions.
 
+        * mips.h (E_MIPS_MACH_SB1): New constant.
+
 2000-11-30  Jan Hubicka  <jh@suse.cz>
 	
         * common.h (EM_X86_64): New macro.
