@@ -1573,10 +1573,10 @@ get_2k_ifconf (struct ifconf *ifc, int what)
     {
       /* Iterate over all known interfaces */
       for (if_cnt = 0; if_cnt < ift->dwNumEntries; ++if_cnt)
-        {
+	{
 	  *sub = '0';
 	  /* Iterate over all configured IP-addresses */
-	  for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt) 
+	  for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt)
 	    {
 	      /* Does the IP address belong to the interface? */
 	      if (ipt->table[ip_cnt].dwIndex == ift->table[if_cnt].dwIndex)
@@ -1997,29 +1997,29 @@ get_95_ifconf (struct ifconf *ifc, int what)
       strcat (netname, ifname);
 
       if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, netname,
-                  0, KEY_READ, &subkey) != ERROR_SUCCESS)
+		  0, KEY_READ, &subkey) != ERROR_SUCCESS)
       {
-          RegCloseKey (ifkey);
-          --ifr;
-          continue;
+	  RegCloseKey (ifkey);
+	  --ifr;
+	  continue;
       }
 
       if (RegQueryValueEx (subkey, "AdapterName", 0,
-                  NULL, (unsigned char *) adapter,
-                  (size = sizeof adapter, &size)) == ERROR_SUCCESS
-              && strcasematch (adapter, "MS$PPP"))
+		  NULL, (unsigned char *) adapter,
+		  (size = sizeof adapter, &size)) == ERROR_SUCCESS
+	      && strcasematch (adapter, "MS$PPP"))
       {
-          ++*ppp;
-          strcpy (ifr->ifr_name, "ppp");
-          strcat (ifr->ifr_name, ppp);
+	  ++*ppp;
+	  strcpy (ifr->ifr_name, "ppp");
+	  strcat (ifr->ifr_name, ppp);
       }
       else
       {
-          ++*eth;
-          strcpy (ifr->ifr_name, "eth");
-          strcat (ifr->ifr_name, eth);
+	  ++*eth;
+	  strcpy (ifr->ifr_name, "eth");
+	  strcat (ifr->ifr_name, eth);
       }
-      
+
       RegCloseKey (subkey);
       RegCloseKey (ifkey);
 

@@ -366,7 +366,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
     }
 
   init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1,
-      		   spr);
+		   spr);
   if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &ciresrv.parent, 0, 1,
 			DUPLICATE_SAME_ACCESS))
      {
@@ -496,7 +496,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	newargv.unshift (arg1);
 
       /* FIXME: This should not be using FE_NATIVE.  It should be putting
-         the posix path on the argv list. */
+	 the posix path on the argv list. */
       find_exec (pgm, real_path, "PATH=", FE_NATIVE, &ext);
       newargv.unshift (real_path, 1);
     }
@@ -779,7 +779,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       child.remember ();
       strcpy (child->progname, real_path);
       /* FIXME: This introduces an unreferenced, open handle into the child.
-         The purpose is to keep the pid shared memory open so that all of
+	 The purpose is to keep the pid shared memory open so that all of
 	 the fields filled out by child.remember do not disappear and so there
 	 is not a brief period during which the pid is not available.
 	 However, we should try to find another way to do this eventually. */

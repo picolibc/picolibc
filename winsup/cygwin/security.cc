@@ -542,7 +542,7 @@ get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
   if (get_supplementary_group_sidlist (user, sup_list))
     {
       for (int i = 0; i < sup_list.count; ++i)
-        if (!grp_list.contains (sup_list.sids[i]))
+	if (!grp_list.contains (sup_list.sids[i]))
 	  grp_list += sup_list.sids[i];
     }
   return TRUE;

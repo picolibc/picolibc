@@ -153,7 +153,7 @@ memory_init ()
 
   heap_init ();
   mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
-      					    cygwin_mount_h,
+					    cygwin_mount_h,
 					    sizeof (mount_info), 0);
   debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
 		mount_table_address);

@@ -164,7 +164,7 @@ public:
    ~verifyable_object ();
 };
 
-typedef enum 
+typedef enum
 {
   VALID_OBJECT,
   INVALID_OBJECT,

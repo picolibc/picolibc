@@ -286,7 +286,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       s = &start;
       int gotone = FALSE;
       /* Some types of object (e.g., consoles) wake up on "inappropriate" events
-         like mouse movements.  The verify function will detect these situations.
+	 like mouse movements.  The verify function will detect these situations.
 	 If it returns false, then this wakeup was a false alarm and we should go
 	 back to waiting. */
       while ((s = s->next))
@@ -671,7 +671,7 @@ peek_console (select_record *me, bool)
 
   return me->write_ready;
 }
- 
+
 static int
 verify_console (select_record *me, fd_set *rfds, fd_set *wfds,
 	      fd_set *efds)

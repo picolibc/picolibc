@@ -176,7 +176,7 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
     }
 
   syscall_printf ("%d = make_pipe ([%d, %d], %d, %p)", res, fildes[0],
-      		  fildes[1], psize, mode);
+		  fildes[1], psize, mode);
   return res;
 }
 

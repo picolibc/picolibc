@@ -93,12 +93,12 @@ details. */
      /* API_MAJOR 0.0: Initial version.  API_MINOR changes:
 	1: Export cygwin32_ calls as cygwin_ as well.
 	2: Export j1, jn, y1, yn.
-        3: Export dll_noncygwin_dllcrt0.
-        4: New socket ioctls, revamped ifconf support.
-        5: Thread support/exports.
-        6: Change in termios handling.
-        7: Export scandir and alphasort.
-        8: Export _ctype_, _sys_errlist, _sys_nerr.
+	3: Export dll_noncygwin_dllcrt0.
+	4: New socket ioctls, revamped ifconf support.
+	5: Thread support/exports.
+	6: Change in termios handling.
+	7: Export scandir and alphasort.
+	8: Export _ctype_, _sys_errlist, _sys_nerr.
 	9: Mount-related changes, new cygwin_umount export.
 	   Raw device support (tape, floppies).
        10: Fast math routine support added.
@@ -114,10 +114,10 @@ details. */
        20: regsub, inet_network
        21: incompatible change to stdio cr/lf and buffering
        22: Export cygwin_logon_user, cygwin_set_impersonation_token.
-           geteuid, getegid return effective uid/gid.
-           getuid, getgid return real uid/gid.
-           seteuid, setegid set only effective uid/gid.
-           setuid, setgid set effective and real uid/gid.
+	   geteuid, getegid return effective uid/gid.
+	   getuid, getgid return real uid/gid.
+	   seteuid, setegid set only effective uid/gid.
+	   setuid, setgid set effective and real uid/gid.
        23: Export new dll_crt0 interface and cygwin_user_data for use
 	   with crt0 startup code.
        24: Export poll and _poll.
@@ -132,7 +132,7 @@ details. */
        33: Export setlogmask
        34: Separated out mount table
        35: Export drand48, erand48, jrand48, lcong48, lrand48,
-           mrand48, nrand48, seed48, and srand48.
+	   mrand48, nrand48, seed48, and srand48.
        36: Added _cygwin_S_IEXEC, et al
        37: [f]pathconv support _PC_POSIX_PERMISSIONS and _PC_POSIX_SECURITY
        38: vscanf, vscanf_r, and random pthread functions

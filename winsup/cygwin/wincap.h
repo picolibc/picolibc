@@ -12,7 +12,7 @@ details. */
 #define _WINCAP_H
 
 struct wincaps
-{ 
+{
   DWORD    lock_file_highword;
   DWORD    chunksize;
   int      shared;
@@ -58,7 +58,7 @@ public:
   void init ();
 
   void set_chunksize (DWORD nchunksize);
-  
+
   const char *osname () const { return osnam; }
 
 #define IMPLEMENT(cap) cap() const { return ((wincaps *)this->caps)->cap; }

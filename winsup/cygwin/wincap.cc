@@ -430,9 +430,9 @@ wincapc::init ()
 	    case 4:
 	      os = "NT";
 	      if (strcmp (version.szCSDVersion, "Service Pack 4") < 0)
-	        caps = &wincap_nt4;
+		caps = &wincap_nt4;
 	      else
-	        caps = &wincap_nt4sp4;
+		caps = &wincap_nt4sp4;
 	      break;
 	    case 5:
 	      os = "NT";
@@ -446,7 +446,7 @@ wincapc::init ()
 	      caps = &wincap_unknown;
 	      break;
 	  }
-        break;
+	break;
       case VER_PLATFORM_WIN32_WINDOWS:
 	switch (version.dwMinorVersion)
 	  {
@@ -460,9 +460,9 @@ wincapc::init ()
 	    case 10:
 	      os = "98";
 	      if (strchr(version.szCSDVersion, 'A'))
-	        caps = &wincap_98se;
+		caps = &wincap_98se;
 	      else
-	        caps = &wincap_98;
+		caps = &wincap_98;
 	      break;
 	    case 90:
 	      os = "ME";
@@ -473,9 +473,9 @@ wincapc::init ()
 	      caps = &wincap_unknown;
 	      break;
 	  }
-        break;
+	break;
       default:
-        os = "??";
+	os = "??";
 	caps = &wincap_unknown;
 	break;
     }

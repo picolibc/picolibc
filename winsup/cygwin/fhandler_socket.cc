@@ -45,7 +45,7 @@ fhandler_socket::fhandler_socket ()
   : fhandler_base (FH_SOCKET)
 {
   set_need_fork_fixup ();
-  prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF, 
+  prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
 						 sizeof (WSAPROTOCOL_INFOA));
 }
 
@@ -174,7 +174,7 @@ fhandler_socket::fixup_before_fork_exec (DWORD win_proc_id)
   else
     {
       debug_printf ("WSADuplicateSocket error, sock %p, win_proc_id %d, prot_info_ptr %p",
-	  	    get_socket (), win_proc_id, prot_info_ptr);
+		    get_socket (), win_proc_id, prot_info_ptr);
       set_winsock_errno ();
     }
 }
@@ -290,7 +290,7 @@ fhandler_socket::close ()
 	      (const char *)&linger, sizeof linger);
 
   while ((res = closesocket (get_socket ()))
-         && WSAGetLastError () == WSAEWOULDBLOCK)
+	 && WSAGetLastError () == WSAEWOULDBLOCK)
     continue;
   if (res)
     {

@@ -83,7 +83,7 @@ int pthread_attr_setscope (pthread_attr_t *, int);
 
 #ifdef _POSIX_THREAD_ATTR_STACKADDR
 /* These functions may be implementable via some low level trickery. For now they are
- * Not supported or implemented. The prototypes are here so if someone greps the 
+ * Not supported or implemented. The prototypes are here so if someone greps the
  * source they will see these comments
  */
 int pthread_attr_getstackaddr (const pthread_attr_t *, void **);
@@ -96,7 +96,7 @@ int pthread_attr_setstacksize (pthread_attr_t *, size_t);
 #endif
 
 int pthread_cancel (pthread_t);
-/* Macros for cleanup_push and pop; 
+/* Macros for cleanup_push and pop;
  * The function definitions are
 void pthread_cleanup_push (void (*routine)(void*), void *arg);
 void pthread_cleanup_pop (int execute);

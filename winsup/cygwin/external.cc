@@ -187,7 +187,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  if (check_null_empty_str_errno (cr))
 	    return (DWORD) NULL;
 	  cygheap->cygwin_regname = (char *) crealloc (cygheap->cygwin_regname,
-	      					       strlen (cr) + 1);
+						       strlen (cr) + 1);
 	  strcpy (cygheap->cygwin_regname, cr);
       case CW_GET_CYGWIN_REGISTRY_NAME:
 	  return (DWORD) cygheap->cygwin_regname;

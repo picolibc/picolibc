@@ -378,7 +378,7 @@ rmdir (const char *dir)
       /* Even own directories can't be removed if R/O attribute is set. */
       if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
 	SetFileAttributes (real_dir,
-	    		   (DWORD) real_dir & ~FILE_ATTRIBUTE_READONLY);
+			   (DWORD) real_dir & ~FILE_ATTRIBUTE_READONLY);
 
       if (RemoveDirectory (real_dir))
 	{

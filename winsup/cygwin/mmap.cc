@@ -503,7 +503,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
      While the changes are not propagated to the file, they are
      visible to other processes sharing the same file mapping object.
      Workaround: Don't use named file mapping.  That should work since
-     		 sharing file mappings only works reliable using named
+		 sharing file mappings only works reliable using named
 		 file mapping on 9x.
   */
   if ((flags & MAP_PRIVATE)

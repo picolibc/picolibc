@@ -218,7 +218,7 @@ sync_with_parent(const char *s, bool hang_self)
 	      WaitForSingleObject (child_proc_info->forker_finished, 1) != WAIT_FAILED)
 	    break;
 	  api_fatal ("WFSO failed for %s, fork_finished %p, %E", s,
-	      	     child_proc_info->forker_finished);
+		     child_proc_info->forker_finished);
 	  break;
 	default:
 	  debug_printf ("no problems");

@@ -178,7 +178,7 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
     fd = cygheap->fdtab.find_unused_handle ();
   path_conv pc;
   fhandler_base *res = cygheap->fdtab.build_fhandler_from_name (fd, name, handle,
-      								pc);
+								pc);
   res->init (handle, myaccess, bin);
   return fd;
 }
@@ -242,7 +242,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 
 fhandler_base *
 dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
-    				  path_conv& pc, unsigned opt, suffix_info *si)
+				  path_conv& pc, unsigned opt, suffix_info *si)
 {
   pc.check (name, opt | PC_NULLEMPTY | PC_FULL, si);
   if (pc.error)

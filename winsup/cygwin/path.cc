@@ -861,7 +861,7 @@ get_devn (const char *name, int &unit)
 
 /*
     major      minor    POSIX filename	NT filename
-    -----      -----	--------------	-------------------------	
+    -----      -----	--------------	-------------------------
     FH_TAPE	  0	/dev/st0	\device\tape0
     FH_TAPE	  1	/dev/st1	\device\tape1
     ...
@@ -947,7 +947,7 @@ get_raw_device_number (const char *name, const char *w32_path, int &unit)
   else /* Backward compatible checking of mount table device mapping. */
     {
       if (wdeveqn ("tape", 4))
-        {
+	{
 	  unit = digits (w32_path + 4);
 	  /* Norewind tape devices have leading n in name. */
 	  if (deveqn ("n", 1))
@@ -955,12 +955,12 @@ get_raw_device_number (const char *name, const char *w32_path, int &unit)
 	  devn = FH_TAPE;
 	}
       else if (wdeveqn ("physicaldrive", 13))
-        {
+	{
 	  unit = digits (w32_path + 13) * 16 + 32;
 	  devn = FH_FLOPPY;
 	}
       else if (isdrive (w32_path))
-        {
+	{
 	  unit = cyg_tolower (w32_path[0]) - 'a' + 224;
 	  devn = FH_FLOPPY;
 	}
@@ -969,7 +969,7 @@ get_raw_device_number (const char *name, const char *w32_path, int &unit)
 }
 
 static int __stdcall get_device_number (const char *unix_path,
-    					const char *w32_path, int &unit)
+					const char *w32_path, int &unit)
   __attribute__ ((regparm(3)));
 static int __stdcall
 get_device_number (const char *unix_path, const char *w32_path, int &unit)
@@ -1020,12 +1020,12 @@ win32_device_name (const char *src_path, char *win32_path,
     {
       case FH_RANDOM:
 	__small_sprintf (win32_path, devfmt, unit == 8 ? "" : "u");
-        break;
+	break;
       case FH_TAPE:
-        __small_sprintf (win32_path, "\\Device\\Tape%d", unit % 128);
-        break;
+	__small_sprintf (win32_path, "\\Device\\Tape%d", unit % 128);
+	break;
       case FH_FLOPPY:
-        if (unit < 16)
+	if (unit < 16)
 	  __small_sprintf (win32_path, "\\Device\\Floppy%d", unit);
 	else if (unit < 32)
 	  __small_sprintf (win32_path, "\\Device\\CdRom%d", unit - 16);
@@ -1034,10 +1034,10 @@ win32_device_name (const char *src_path, char *win32_path,
 				       (unit - 32) / 16, unit % 16);
 	else
 	  __small_sprintf (win32_path, "\\DosDevices\\%c:", unit - 224 + 'A');
-        break;
+	break;
       default:
 	__small_sprintf (win32_path, devfmt, unit);
-        break;
+	break;
     }
   return TRUE;
 }
@@ -2541,7 +2541,7 @@ symlink (const char *topath, const char *frompath)
 
   /* POSIX says that empty 'frompath' is invalid input whlie empty
      'topath' is valid -- it's symlink resolver job to verify if
-     symlink contents point to existing filesystem object */ 
+     symlink contents point to existing filesystem object */
   if (check_null_empty_str_errno (topath) == EFAULT ||
       check_null_empty_str_errno (frompath))
     goto done;

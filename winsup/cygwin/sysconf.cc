@@ -89,7 +89,7 @@ sysconf (int in)
 		return sbi.HighestPhysicalPage - sbi.LowestPhysicalPage + 1;
 	      }
 	  }
-        break;
+	break;
     }
 
   /* Invalid input or unimplemented sysconf name */

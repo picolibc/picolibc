@@ -1767,7 +1767,7 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   if (pthread_mutex_unlock (&(*cond)->cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
   rv = (*cond)->TimedWait (waitlength);
-  /* this may allow a race on the mutex acquisition and waits.. 
+  /* this may allow a race on the mutex acquisition and waits..
    * But doing this within the cond access mutex creates a different race
    */
   bool last = false;
@@ -1964,11 +1964,11 @@ __pthread_mutex_lock (pthread_mutex_t *mutex)
       break;
     case VALID_STATIC_OBJECT:
       if (*mutex == PTHREAD_MUTEX_INITIALIZER)
-        {
-          int rv = __pthread_mutex_init (mutex, NULL);
-          if (rv)
+	{
+	  int rv = __pthread_mutex_init (mutex, NULL);
+	  if (rv)
 	    return rv;
-        }
+	}
       break;
     case VALID_OBJECT:
       break;

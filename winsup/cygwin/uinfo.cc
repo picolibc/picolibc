@@ -85,7 +85,7 @@ internal_getlogin (cygheap_user &user)
        * only obtain HOMEDRIVE and HOMEPATH if they are not already set
        * in the environment. */
       if (!getenv ("HOMEPATH") || !getenv ("HOMEDRIVE"))
-        {
+	{
 	  LPUSER_INFO_3 ui = NULL;
 	  WCHAR wuser[UNLEN + 1];
 
@@ -98,7 +98,7 @@ internal_getlogin (cygheap_user &user)
 		  strcat (strcpy (buf, "\\\\"), user.logsrv ());
 
 		  sys_mbstowcs (wlogsrv, buf,
-		  		sizeof (wlogsrv) / sizeof(*wlogsrv));
+				sizeof (wlogsrv) / sizeof(*wlogsrv));
 		  ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui);
 		}
 	    }
@@ -218,7 +218,7 @@ internal_getlogin (cygheap_user &user)
     {
       const char *homedrive, *homepath;
       if (pw && pw->pw_dir && *pw->pw_dir)
-        {
+	{
 	  setenv ("HOME", pw->pw_dir, 1);
 	  debug_printf ("Set HOME (from /etc/passwd) to %s", pw->pw_dir);
 	}

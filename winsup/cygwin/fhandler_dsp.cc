@@ -525,8 +525,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 
       CASE (SNDCTL_DSP_GETBLKSIZE)
 	*intptr = Audio::BLOCK_SIZE;
-        return 0;
-	break;
+	return 0;
 
       CASE (SNDCTL_DSP_SETFMT)
       {

@@ -389,7 +389,7 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
     set_security_attribute (mode, &sa, alloca (4096), 4096);
 
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
-      		  file_attributes, 0);
+		  file_attributes, 0);
 
   syscall_printf ("%p = CreateFileA (%s, %p, %p, %p, %p, %p, 0)",
 		  x, get_win32_name (), access, shared, &sa,
@@ -927,11 +927,11 @@ fhandler_disk_file::fstat (struct stat *buf, path_conv *pc)
 	 This will allow us to determine *some* things about the file, at least. */
       set_query_open (TRUE);
       if ((oret = open (pc, open_flags, 0)))
-        /* ok */;
+	/* ok */;
       else if (allow_ntsec && pc->has_acls () && get_errno () == EACCES
 		&& !get_file_attribute (TRUE, get_win32_name (), &ntsec_atts, &uid, &gid)
 		&& !ntsec_atts && uid == myself->uid && gid == myself->gid)
-        {
+	{
 	  /* Check a special case here. If ntsec is ON it happens
 	     that a process creates a file using mode 000 to disallow
 	     other processes access. In contrast to UNIX, this results
@@ -940,7 +940,7 @@ fhandler_disk_file::fstat (struct stat *buf, path_conv *pc)
 	  set_file_attribute (TRUE, get_win32_name (), 0400);
 	  oret = open (pc, open_flags, 0);
 	  set_file_attribute (TRUE, get_win32_name (), ntsec_atts);
-        }
+	}
     }
   if (oret)
     {

@@ -187,7 +187,7 @@ _unlink (const char *ourname)
   bool delete_on_close_ok;
 
   delete_on_close_ok  = !win32_name.isremote ()
-  			&& wincap.has_delete_on_close ();
+			&& wincap.has_delete_on_close ();
 
   /* Attempt to use "delete on close" semantics to handle removing
      a file which may be open. */
@@ -319,7 +319,7 @@ _read (int fd, void *ptr, size_t len)
 	}
 
       /* FIXME: This is not thread safe.  We need some method to
-         ensure that an fd, closed in another thread, aborts I/O
+	 ensure that an fd, closed in another thread, aborts I/O
 	 operations. */
       if (!cfd.isopen())
 	return -1;
@@ -347,7 +347,7 @@ _read (int fd, void *ptr, size_t len)
     }
 
   syscall_printf ("%d = read (%d, %p, %d), errno %d", res, fd, ptr, len,
-      		  get_errno ());
+		  get_errno ());
   MALLOC_CHECK;
   return res;
 }
@@ -503,7 +503,7 @@ _open (const char *unix_path, int flags, ...)
 	{
 	  path_conv pc;
 	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
-		  					      NULL, pc)))
+							      NULL, pc)))
 	    res = -1;		// errno already set
 	  else if (!fh->open (&pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
@@ -576,7 +576,7 @@ isatty (int fd)
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     res = 0;
-  else 
+  else
     res = cfd->is_tty ();
   syscall_printf ("%d = isatty (%d)", res, fd);
   return res;
@@ -784,7 +784,7 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 	  if (win32_path.isdir())
 	    attrib |= S_IFDIR;
 	  res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
-	      			    gid, attrib, cygheap->user.logsrv ());
+				    gid, attrib, cygheap->user.logsrv ());
 	}
       if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
 	{
@@ -1029,7 +1029,7 @@ stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
   else
     {
       debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
-	  	    pc, (DWORD) real_path);
+		    pc, (DWORD) real_path);
       memset (buf, 0, sizeof (struct stat));
       res = fh->fstat (buf, pc);
     }
@@ -2042,7 +2042,7 @@ seteuid (uid_t uid)
       user.token = cygheap->user.impersonated ? cygheap->user.token
 					      : INVALID_HANDLE_VALUE;
       /* Unsetting these both env vars is necessary to get NetUserGetInfo()
-         called in internal_getlogin ().  Otherwise the wrong path is used
+	 called in internal_getlogin ().  Otherwise the wrong path is used
 	 after a user switch, probably. */
       unsetenv ("HOMEDRIVE");
       unsetenv ("HOMEPATH");

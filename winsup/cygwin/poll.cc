@@ -56,7 +56,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
     if (!cygheap->fdtab.not_open (fds[i].fd))
       {
 	valid_fds = true;
-	fds[i].revents = 0;	
+	fds[i].revents = 0;
 	FD_SET (fds[i].fd, open_fds);
 	if (fds[i].events & POLLIN)
 	  FD_SET (fds[i].fd, read_fds);

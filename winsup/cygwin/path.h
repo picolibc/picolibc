@@ -159,7 +159,7 @@ enum fe_types
   FE_CWD = 4		/* Search CWD for program */
 };
 const char * __stdcall find_exec (const char *name, path_conv& buf,
-    				  const char *winenv = "PATH=",
+				  const char *winenv = "PATH=",
 				  unsigned opt = FE_NADA,
 				  const char **known_suffix = NULL)
   __attribute__ ((regparm(3)));

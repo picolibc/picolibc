@@ -124,7 +124,7 @@ out:
   info->arg = param;	/* The single parameter to the thread */
 
   if ((h = CreateThread (&sec_none_nih, 0, thread_stub, (VOID *) info, flags,
-	  		 &tid)))
+			 &tid)))
     regthread (name, tid);	/* Register for debugging output. */
 
   return h;
