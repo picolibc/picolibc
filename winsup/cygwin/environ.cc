@@ -235,10 +235,10 @@ _addenv (const char *name, const char *value, int overwrite)
 
       if (!__cygwin_environ)
 	{
-#ifdef DEBUGING
+#ifdef DEBUGGING
 	  try_to_debug ();
-	  return -1;		/* Oops.  No more memory. */
 #endif
+	  return -1;		/* Oops.  No more memory. */
 	}
 
       __cygwin_environ[offset + 1] = NULL;	/* NULL terminate. */
@@ -598,7 +598,7 @@ environ_init (char **envp, int envc)
 	parse_options (newp + sizeof("CYGWIN=") - 1);
       if (*eq && conv_start_chars[(unsigned char)envp[i][0]])
 	posify (envp + i, *++eq ? eq : --eq);
-      debug_printf ("%s", envp[i]);
+      debug_printf ("%p: %s", envp[i], envp[i]);
     }
 
   if (!sawTERM)
