@@ -1,3 +1,9 @@
+2003-05-30  Ulrich Drepper  <drepper@redhat.com>
+	    Jakub Jelinek  <jakub@redhat.com>
+
+	* bfdlink.h (struct bfd_link_info): Add pie and executable
+	bits.
+
 2003-05-21  Nick Clifton  <nickc@redhat.com>
 
 	* bfdlink.h (struct bfd_link_hash_table): Fix typo in comment.

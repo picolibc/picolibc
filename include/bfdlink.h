@@ -291,6 +291,12 @@ struct bfd_link_info
   /* TRUE if relaxation is being finalized.  */
   unsigned int relax_finalizing: 1;
 
+  /* TRUE if generating a position independent executable.  */
+  unsigned int pie: 1;
+
+  /* TRUE if generating an executable, position independent or not.  */
+  unsigned int executable : 1;
+
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
 
