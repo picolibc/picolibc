@@ -1150,7 +1150,7 @@ typedef struct _CONTEXT {
 	DWORD Psr;
 	DWORD ContextFlags;
 	DWORD Fill[4];
-} CONTEXT, *PCONTEXT;
+} CONTEXT;
 #elif defined(SHx)
 
 /* These are the debug or break registers on the SH3 */
@@ -1261,7 +1261,7 @@ typedef struct _CONTEXT {
 	ULONG	xFRegs[16];
 #endif
 #endif
-} CONTEXT,*PCONTEXT,*LPCONTEXT;
+} CONTEXT;
 
 #elif defined(MIPS)
 
@@ -1410,7 +1410,7 @@ typedef struct _CONTEXT {
 
     DWORD Fill[2];
 
-} CONTEXT,*PCONTEXT,*LPCONTEXT;
+} CONTEXT;
 #elif defined(ARM)
 //
 // The following flags control the contents of the CONTEXT structure.
@@ -1461,7 +1461,7 @@ typedef struct _CONTEXT {
     ULONG Lr;
     ULONG Pc;
     ULONG Psr;
-} CONTEXT, *PCONTEXT;
+} CONTEXT;
 
 #else
 #error "undefined processor type"

@@ -1,3 +1,7 @@
+Sun Mar 26 13:41:47 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/winnt.h: Eliminate duplicate PCONTEXT and LPCONTEXT typedefs.
+
 2000-02-28  Mumit Khan  <khan@xraylith.wisc.edu>
 
 	Patches from Jan Nijtmans <j.nijtmans@chello.nl>:
