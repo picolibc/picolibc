@@ -13,7 +13,7 @@
 
 2002-06-24  J"orn Rennecke <joern.rennecke@superh.com>
 
-	* libc/machine/sh/strcpy.S: New file.
+	* libc/machine/sh/strlen.S: New file.
 	* libc/machine/sh/Makefile.am (lib_a_SOURCES): Add rule for it.
 	* libc/machine/sh/Makefile.am: Regenerate.
 
