@@ -1,5 +1,10 @@
 2003-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* samples/dlltest/expexe.def (NAME): Add.
+	* samples/dlltest/dll.def (LIBRARY): Add.
+ 
+2003-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/stdarg.h: Get rid of namespaces.
 
 2003-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
