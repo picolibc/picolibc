@@ -1,3 +1,10 @@
+2003-10-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wincrypt (KP_IV, KP_SALT, KP_PADDING, KP_MODE,
+	KP_MODE_BITS, KP_PERMISSIONS, KP_ALGID, KP_BLOCKLEN): Remove
+	duplicate definitions.
+	(KP_X, KP_Y): Correct typos.
+
 2003-10-11  Manu B  <manubee@users.sourceforge.net>
 
 	* include/afxres.h: New file.

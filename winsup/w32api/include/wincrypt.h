@@ -119,14 +119,6 @@ extern "C" {
 #define AT_KEYEXCHANGE 1
 #define AT_SIGNATURE 2
 #define CRYPT_USERDATA 1
-#define KP_IV 1
-#define KP_SALT 2
-#define KP_PADDING 3
-#define KP_MODE 4
-#define KP_MODE_BITS 5
-#define KP_PERMISSIONS 6
-#define KP_ALGID 7
-#define KP_BLOCKLEN 8
 #define PKCS5_PADDING 1
 #define CRYPT_MODE_CBC 1
 #define CRYPT_MODE_ECB 2
@@ -338,8 +330,8 @@ extern "C" {
 #define KP_P                0x0000000b
 #define KP_G                0x0000000c
 #define KP_Q                0x0000000d
-#define KP_X                0x000000Oe
-#define KP_Y                0x000000Of
+#define KP_X                0x0000000e
+#define KP_Y                0x0000000f
 #define KP_RA               0x00000010
 #define KP_RB               0x00000011
 #define KP_INFO             0x00000012
