@@ -145,6 +145,11 @@ typedef int jmp_buf[_JBLEN];
 #define _JBTYPE double
 #endif
 
+#ifdef __frv__
+#define _JBLEN (68/2)  /* room for 68 32-bit regs */
+#define _JBTYPE double
+#endif
+
 #ifdef __fr30__
 #define _JBLEN 10
 #endif

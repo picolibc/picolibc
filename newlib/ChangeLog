@@ -1,3 +1,16 @@
+2002-06-18  Dave Brolley  <brolley@redhat.com>
+
+	From Catherine Moore, Michael Meissner, Richard Sandiford:
+	* libc/include/machine/setjmp.h (_JBLEN): Define for __frv__.
+	(_JBTYPE): Ditto.
+	* libc/include/sys/config.h (__IEEE_BIG_ENDIAN): Ditto.
+	(__ATTRIBUTE_IMPURE_PTR__): Ditto.
+	* libc/include/machine/ieeefp.h (__IEEE_BIG_ENDIAN): Ditto.
+	* configure.host: Support frv-*-*.
+	* libc/machine/frv/Makefile.am: New file.
+	* libc/machine/frv/configure.in: New file.
+	* libc/machine/frv/setjmp.S: New file.
+
 2002-06-18  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/include/ctype.h: Remove isblank macro.

@@ -193,6 +193,9 @@ case "${host_cpu}" in
 	machine_dir=v850
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 "
 	;;
+  frv)
+	machine_dir=frv
+        ;;
   w65*)
 	machine_dir=w65
 	;;
@@ -372,6 +375,9 @@ case "${host}" in
   v850ea-*-*)
 	sys_dir=sysnecv850
 	;;
+  frv*)
+        sys_dir=
+        ;;
   w65-*-*)
 	sys_dir=w65
 	;;
@@ -559,6 +565,10 @@ case "${host}" in
   v850ea-*-*)
 	syscall_dir=syscalls
 	;;
+  frv-*-*)
+        syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DWANT_PRINTF_LONG_LONG"
+        ;;
   w65-*-*)
 	syscall_dir=syscalls	
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"

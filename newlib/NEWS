@@ -1,3 +1,5 @@
+Support for the Fujitsu FRV architecture added by Red Hat.
+
 *** Major changes in newlib version 1.10.0:
 
 * libtool support for i[3456]86-pc-linux native builds

@@ -180,6 +180,10 @@ __extension__ typedef unsigned long long __uint64_t;
 #define _POINTER_INT long
 #endif
 
+#ifdef __frv__
+#define __IEEE_BIG_ENDIAN
+#define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
+#endif
 #undef __RAND_MAX
 #if __INT_MAX__ == 32767
 #define __RAND_MAX 32767
