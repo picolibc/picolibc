@@ -600,7 +600,14 @@ cygwin_connect (int fd,
     {
       res = connect (sock->get_socket (), (sockaddr *) &sin, namelen);
       if (res)
-	set_winsock_errno ();
+        {
+	  /* Special handling for connect to return the correct error code
+	     when called to early on a non-blocking socket. */
+	  if (WSAGetLastError () == WSAEWOULDBLOCK)
+ 	    WSASetLastError (WSAEINPROGRESS);
+
+	  set_winsock_errno ();
+        }
     }
   return res;
 }

@@ -1,3 +1,9 @@
+Tue Nov  7 20:58:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Add autoload statement for `WSASetLastError'.
+	* net.cc (cygwin_connect): Change error code to WSAEINPROGRESS
+	when connect returns WSAEWOULDBLOCK.
+
 Mon Nov  6 15:11:57 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (sigthread::init): Reinstitute sigthread lock as a critical
