@@ -3060,6 +3060,9 @@ DWORD WINAPI GetQueueStatus(UINT);
 BOOL WINAPI GetScrollInfo(HWND,int,LPSCROLLINFO);
 int WINAPI GetScrollPos(HWND,int);
 BOOL WINAPI GetScrollRange(HWND,int,LPINT,LPINT);
+#if (_WIN32_WINNT >= _NT5)
+HWND WINAPI GetShellWindow(VOID);
+#endif
 HMENU WINAPI GetSubMenu(HMENU,int);
 DWORD WINAPI GetSysColor(int);
 HBRUSH WINAPI GetSysColorBrush(int);

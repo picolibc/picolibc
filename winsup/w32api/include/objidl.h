@@ -159,7 +159,7 @@ typedef struct tagSTGMEDIUM {
 		PVOID hMetaFilePict;
 		HENHMETAFILE hEnhMetaFile;
 		HGLOBAL hGlobal;
-		LPCSTR lpszFileName;
+		LPWSTR lpszFileName;
 		LPSTREAM pstm;
 		LPSTORAGE pstg;
 	} DUMMYUNIONNAME;

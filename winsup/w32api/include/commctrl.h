@@ -2582,10 +2582,12 @@ WINBOOL WINAPI ImageList_DrawIndirect(IMAGELISTDRAWPARAMS*);
 #define TreeView_GetBkColor(w) (COLORREF)SNDMSG((w),TVM_GETBKCOLOR,0,0)
 #define TreeView_GetInsertMarkColor(w) (COLORREF)SNDMSG((w),TVM_GETINSERTMARKCOLOR,0,0)
 #define TreeView_GetItemHeight(w) (int)SNDMSG((w),TVM_GETITEMHEIGHT,0,0)
+#define TreeView_GetScrollTime(w) (UINT)SNDMSG((w),TVM_GETSCROLLTIME,0,0)
 #define TreeView_GetTextColor(w) (COLORREF)SNDMSG((w),TVM_GETTEXTCOLOR,0,0)
 #define TreeView_SetBkColor(w,c) (COLORREF)SNDMSG((w),TVM_SETBKCOLOR,0,(LPARAM)(c))
 #define TreeView_SetInsertMarkColor(w,c) (COLORREF)SNDMSG((w),TVM_SETINSERTMARKCOLOR,0,(LPARAM)(c))
 #define TreeView_SetItemHeight(w,h) (int)SNDMSG((w),TVM_SETITEMHEIGHT,(WPARAM)(h),0)
+#define TreeView_SetScrollTime(w,t) (UINT)SNDMSG((w),TVM_SETSCROLLTIME,(WPARAM)(UINT)(t),0)
 #define TreeView_SetTextColor(w,c) (COLORREF)SNDMSG((w),TVM_SETTEXTCOLOR,0,(LPARAM)(c))
 #endif
 
