@@ -613,7 +613,23 @@ static const struct pa_opcode pa_opcodes[] =
 { "gfr",	0x04001a80, 0xfc003fdf, "cZx(b)", pa11},
 
 /* Floating Point Coprocessor Instructions */
-  
+ 
+{ "fldw",       0x24000000, 0xfc001f80, "cxx(s,b),fT", pa10, FLAG_STRICT},
+{ "fldw",       0x24000000, 0xfc001f80, "cxx(b),fT", pa10, FLAG_STRICT},
+{ "fldw",       0x24001000, 0xfc001f80, "cm5(s,b),fT", pa10, FLAG_STRICT},
+{ "fldw",       0x24001000, 0xfc001f80, "cm5(b),fT", pa10, FLAG_STRICT},
+{ "fldd",       0x2c000000, 0xfc001fc0, "cxx(s,b),ft", pa10, FLAG_STRICT},
+{ "fldd",       0x2c000000, 0xfc001fc0, "cxx(b),ft", pa10, FLAG_STRICT},
+{ "fldd",       0x2c001000, 0xfc001fc0, "cm5(s,b),ft", pa10, FLAG_STRICT},
+{ "fldd",       0x2c001000, 0xfc001fc0, "cm5(b),ft", pa10, FLAG_STRICT},
+{ "fstw",       0x24000200, 0xfc001f80, "cxfT,x(s,b)", pa10, FLAG_STRICT},
+{ "fstw",       0x24000200, 0xfc001f80, "cxfT,x(b)", pa10, FLAG_STRICT},
+{ "fstw",       0x24001200, 0xfc001f80, "cmfT,5(s,b)", pa10, FLAG_STRICT},
+{ "fstw",       0x24001200, 0xfc001f80, "cmfT,5(b)", pa10, FLAG_STRICT},
+{ "fstd",       0x2c000200, 0xfc001fc0, "cxft,x(s,b)", pa10, FLAG_STRICT},
+{ "fstd",       0x2c000200, 0xfc001fc0, "cxft,x(b)", pa10, FLAG_STRICT},
+{ "fstd",       0x2c001200, 0xfc001fc0, "cmft,5(s,b)", pa10, FLAG_STRICT},
+{ "fstd",       0x2c001200, 0xfc001fc0, "cmft,5(b)", pa10, FLAG_STRICT},
 { "fldwx",      0x24000000, 0xfc001f80, "cxx(s,b),fT", pa10},
 { "fldwx",      0x24000000, 0xfc001f80, "cxx(b),fT", pa10},
 { "flddx",      0x2c000000, 0xfc001fc0, "cxx(s,b),ft", pa10},
