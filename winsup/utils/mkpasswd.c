@@ -1,6 +1,6 @@
 /* mkpasswd.c:
 
-   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -20,6 +20,8 @@
 #include <lmapibuf.h>
 #include <sys/fcntl.h>
 #include <lmerr.h>
+
+static const char version[] = "$Revision$";
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
@@ -393,26 +395,27 @@ print_special (int print_sids,
 }
 
 int
-usage ()
+usage (FILE * stream, int status)
 {
-  fprintf (stderr, "Usage: mkpasswd [OPTION]... [domain]\n\n");
-  fprintf (stderr, "This program prints a /etc/passwd file to stdout\n\n");
-  fprintf (stderr, "Options:\n");
-  fprintf (stderr, "   -l,--local              print local user accounts\n");
-  fprintf (stderr, "   -d,--domain             print domain accounts (from current domain\n");
-  fprintf (stderr, "                           if no domain specified)\n");
-  fprintf (stderr, "   -o,--id-offset offset   change the default offset (10000) added to uids\n");
-  fprintf (stderr, "                           in domain accounts.\n");
-  fprintf (stderr, "   -g,--local-groups       print local group information too\n");
-  fprintf (stderr, "                           if no domain specified\n");
-  fprintf (stderr, "   -m,--no-mount           don't use mount points for home dir\n");
-  fprintf (stderr, "   -s,--no-sids            don't print SIDs in GCOS field\n");
-  fprintf (stderr, "                           (this affects ntsec)\n");
-  fprintf (stderr, "   -p,--path-to-home path  use specified path instead of user account home dir\n");
-  fprintf (stderr, "   -u,--username username  only return information for the specified user\n");
-  fprintf (stderr, "   -?,--help               displays this message\n\n");
-  fprintf (stderr, "One of `-l', `-d' or `-g' must be given on NT/W2K.\n");
-  return 1;
+  fprintf (stream, "Usage: mkpasswd [OPTION]... [domain]\n\n"
+                   "This program prints a /etc/passwd file to stdout\n\n"
+                   "Options:\n"
+                   "   -l,--local              print local user accounts\n"
+                   "   -d,--domain             print domain accounts (from current domain\n"
+                   "                           if no domain specified)\n"
+                   "   -o,--id-offset offset   change the default offset (10000) added to uids\n"
+                   "                           in domain accounts.\n"
+                   "   -g,--local-groups       print local group information too\n"
+                   "                           if no domain specified\n"
+                   "   -m,--no-mount           don't use mount points for home dir\n"
+                   "   -s,--no-sids            don't print SIDs in GCOS field\n"
+                   "                           (this affects ntsec)\n"
+                   "   -p,--path-to-home path  use specified path instead of user account home dir\n"
+                   "   -u,--username username  only return information for the specified user\n"
+                   "   -h,--help               displays this message\n"
+                   "   -v,--version            version information and exit\n\n"
+                   "One of `-l', `-d' or `-g' must be given on NT/W2K.\n");
+  return status;
 }
 
 struct option longopts[] = {
@@ -425,10 +428,33 @@ struct option longopts[] = {
   {"path-to-home", required_argument, NULL, 'p'},
   {"username", required_argument, NULL, 'u'},
   {"help", no_argument, NULL, 'h'},
+  {"version", no_argument, NULL, 'v'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "ldo:gsmhp:u:";
+char opts[] = "ldo:gsmhp:u:v";
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+mkpasswd (cygwin) %.*s\n\
+passwd File Generator\n\
+Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", len, v, __DATE__);
+}
 
 int
 main (int argc, char **argv)
@@ -455,7 +481,7 @@ main (int argc, char **argv)
   if (GetVersion () < 0x80000000)
     {
       if (argc == 1)
-	return usage ();
+	return usage (stderr, 1);
       else
 	{
 	  while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
@@ -494,7 +520,10 @@ main (int argc, char **argv)
 		disp_username = optarg;
 		break;
 	      case 'h':
-		return usage ();
+		return usage (stdout, 0);
+	      case 'v':
+               print_version ();
+		return 0;
 	      default:
 		fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
 		return 1;
@@ -577,7 +606,7 @@ main (int argc, char **argv)
       if (rc != ERROR_SUCCESS)
 	{
 	  print_win_error(rc);
-	  exit (1);
+	  return 1;
 	}
 
       enum_users (servername, print_sids, print_cygpath, passed_home_path,

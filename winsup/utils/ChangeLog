@@ -1,3 +1,18 @@
+2002-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (main): Change call to exit() to a return statement.
+	* mkpasswd.c (main): Ditto.
+	
+2002-03-27  Joshua Daniel Franklin  joshuadfranklin@yahoo.com
+
+	* mkpasswd.c (usage): Simplify usage output.  Generalize to allow use
+	for help. Correct '?' typo to 'h'.
+	(longopts): Add version option.
+	(opts): Add 'v' version option.
+	(print_version): New function.
+	(main): Accommodate new version option.  Accommodate usage parameter
+	changes.
+
 2002-03-19  Christopher Faylor  <cgf@redhat.com>
 
 	* mkgroup.c (usage): Use one just fprintf + string concatenation for

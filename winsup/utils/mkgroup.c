@@ -512,7 +512,7 @@ main (int argc, char **argv)
 		return usage (stdout, 0);
 	      case 'v':
 		print_version ();
-		exit (0);
+		return 0;
 	      default:
 		fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
 		return 1;
@@ -617,7 +617,7 @@ main (int argc, char **argv)
       if (rc != ERROR_SUCCESS)
 	{
 	  fprintf (stderr, "Cannot get PDC, code = %ld\n", rc);
-	  exit (1);
+	  return 1;
 	}
 
       enum_groups (servername, print_sids, print_users, id_offset);
