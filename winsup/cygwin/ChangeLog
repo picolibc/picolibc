@@ -1,4 +1,10 @@
-2003-11-11  Robert Collins <rbtcollins@hotmail.com>
+2003-11-15  Christopher Faylor  <cgf@redhat.com>
+
+	* include/limits.h: Revert unsanctioned changes below.
+	* include/cygwin/config.h: Ditto.
+	* include/sys/param.h: Ditto.
+
+2003-11-14  Robert Collins <rbtcollins@hotmail.com>
 	    Ron Parker <rdparker@butlermfg.com>
 
 	* bsdlib.cc: Update throughout to use CYG_MAX_PATH rather than MAX_PATH.

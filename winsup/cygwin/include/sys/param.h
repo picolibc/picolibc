@@ -31,7 +31,7 @@
 
 /* This is defined to be the same as MAX_PATH which is used internally.
    The Posix version is PATH_MAX.  */
-#define MAXPATHLEN      (4096 - 1 /*NUL*/)
+#define MAXPATHLEN      (260 - 1 /*NUL*/)
 
 /* This is the number of bytes per block given in the st_blocks stat member.
    It should be in sync with S_BLKSIZE in sys/stat.h.  S_BLKSIZE is the
