@@ -1,3 +1,12 @@
+2002-12-06  Ken Fitlike  <kenfitlike@users.sourceforge.net>
+
+	* include/commctrl.h (TN_GETDISPINFO[AW]): Add defines and
+	UNICODE mappings.
+	(tagNMTTDISPINFO[AW]): Replace obsolete struct names
+	tagTOOLTIPTEXT[AW] and typedefs. Add defines for backward
+	compatability. Add lParam field. Add UNICODE mappings for new
+	names.
+
 2002-12-02  Andrew Stadt  <acstadt@sympatico.ca>
 
 	* include/shellapi.h (_SHFILEOPSTRUCTA,_SHFILEOPSTRUCTW):
