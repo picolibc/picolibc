@@ -1,5 +1,9 @@
 2002-11-04  Christopher Faylor  <cgf@redhat.com>
 
+	* pinfo.cc (_pinfo::commune_send): Fix thinko in previous checkin.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
 	* pinfo.cc (_pinfo::commune_send): Set priority low when sleeping,
 	waiting for commune completion so that we don't spin waiting for lower
 	priority processes.

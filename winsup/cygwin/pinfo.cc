@@ -369,7 +369,8 @@ _pinfo::commune_send (DWORD code)
       break;
     else
       {
-	DWORD prio = SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
+	DWORD prio = GetThreadPriority (GetCurrentThread ());
+	SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
 	Sleep (0);
 	SetThreadPriority (GetCurrentThread (), prio);
       }
