@@ -1,4 +1,9 @@
-Wed Jul 28 02:04:24 1999  "Jerry Quinn" <jquinn@nortelnetworks.com>
+Wed Jul 28 02:04:24 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+			  Jeff Law <law@cygnus.com>
+
+	* hppa.h (pa_opcodes): Add "pushnom" and "pushbts".
+
+	* hppa.h (pa_opcodes): Mark all PA2.0 opcodes with FLAG_STRICT.
 
 	* hppa.h (pa_opcodes):  Change xmpyu, fmpyfadd, 
 	and fmpynfadd to use 'J' and 'K' instead of 'E' and 'X'.
