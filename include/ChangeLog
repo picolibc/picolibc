@@ -1,3 +1,7 @@
+2002-09-26  Andrew Cagney  <ac131313@redhat.com>
+
+	* regs/: Delete directory.
+
 2002-09-19  Alexandre Oliva  <aoliva@redhat.com>
 
 	* libiberty.h (asprintf, vasprintf): Don't declare them if the
