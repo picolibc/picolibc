@@ -1367,40 +1367,7 @@ get_nt_attribute (const char *file, mode_t *attribute,
   get_info_from_sd (sd, attribute, uidret, gidret);
 }
 
-int
-get_file_attribute (int use_ntsec, const char *file,
-		    mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
-{
-  int res;
-  syscall_printf ("file: %s", file);
-
-  if (use_ntsec && allow_ntsec && wincap.has_security ())
-    {
-      get_nt_attribute (file, attribute, uidret, gidret);
-      return 0;
-    }
-
-  if (uidret)
-    *uidret = myself->uid;
-  if (gidret)
-    *gidret = myself->gid;
-
-  if (!attribute)
-    return 0;
-
-  if (allow_ntea)
-    {
-      int oatt = *attribute;
-      res = NTReadEA (file, ".UNIXATTR", (char *)attribute, sizeof (*attribute));
-      *attribute |= oatt;
-    }
-  else
-    res = 0;
-
-  return res > 0 ? 0 : -1;
-}
-
-static void
+static int
 get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 			 mode_t *attribute, __uid32_t *uidret,
 			 __gid32_t *gidret)
@@ -1436,12 +1403,16 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 				   | GROUP_SECURITY_INFORMATION
 				   | OWNER_SECURITY_INFORMATION,
 				   NULL, NULL, NULL, NULL, &psd)))
-    __seterrno_from_win_error (ret);
+    {
+      __seterrno_from_win_error (ret);
+      return -1;
+    }
   else
     {
       get_info_from_sd (psd, attribute, uidret, gidret);
       LocalFree (psd);
     }
+  return 0;
 }
 
 int
@@ -1455,6 +1426,41 @@ get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
     }
   /* The entries are already set to default values */
   return -1;
+}
+
+int
+get_file_attribute (int use_ntsec, HANDLE handle, const char *file,
+		    mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
+{
+  int res;
+  syscall_printf ("file: %s", file);
+
+  if (use_ntsec && allow_ntsec && wincap.has_security ())
+    {
+      if (handle && get_nt_object_attribute (handle, SE_FILE_OBJECT,
+					     attribute, uidret, gidret))
+	get_nt_attribute (file, attribute, uidret, gidret);
+      return 0;
+    }
+
+  if (uidret)
+    *uidret = myself->uid;
+  if (gidret)
+    *gidret = myself->gid;
+
+  if (!attribute)
+    return 0;
+
+  if (allow_ntea)
+    {
+      int oatt = *attribute;
+      res = NTReadEA (file, ".UNIXATTR", (char *)attribute, sizeof (*attribute));
+      *attribute |= oatt;
+    }
+  else
+    res = 0;
+
+  return res > 0 ? 0 : -1;
 }
 
 bool

@@ -846,9 +846,8 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
       mode_t attrib = 0;
       if (win32_path.isdir ())
 	attrib |= S_IFDIR;
-      res = get_file_attribute (win32_path.has_acls (),
-				win32_path.get_win32 (),
-				&attrib);
+      res = get_file_attribute (win32_path.has_acls (), NULL,
+				win32_path.get_win32 (), &attrib);
       if (!res)
 	 res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
 				   gid, attrib);

@@ -1,3 +1,27 @@
+2004-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Set query access mode according
+	to query_open setting.
+	(fhandler_base::fhandler_base): Initialize query_open.
+	* fhandler.h (FH_QUERYOPEN): Drop.
+	(enum query_state): Add.
+	(class fhandler_base): Add query_open member.
+	(fhandler_base::get_query_open): Redefine to use query_open.
+	(fhandler_base::set_query_open): Ditto.
+	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Remove O_DIROPEN
+	from open_flags since it's added in open_fs anyway.  Remove
+	query_open_already.  Use new query_open settings.  Rearrange slightly.
+	(fhandler_base::fstat_helper): Add get_io_handle as parameter to
+	get_file_attribute.
+	* security.cc (get_nt_object_attribute): Make returning an int.
+	Return -1 on error, 0 otherwise.
+	(get_file_attribute): Take an object handle as argument. Move down
+	to allow calling get_nt_object_attribute in case a non-NULL handle
+	is given.
+	* security.h (get_file_attribute): Add handle to argument list.
+	* syscalls.cc (chown_worker): Accomodate new definition of
+	get_file_attribute.
+
 2004-04-07  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* path.cc (path_prefix_p): Optimize test order.

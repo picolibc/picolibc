@@ -37,8 +37,6 @@ enum
   FH_ISREMOTE	= 0x10000000,	/* File is on a remote drive */
   FH_DCEXEC	= 0x20000000,	/* Don't care if this is executable */
   FH_HASACLS	= 0x40000000,	/* True if fs of file has ACLS */
-  FH_QUERYOPEN	= 0x80000000,	/* open file without requesting either read
-				   or write access */
 };
 
 #define FHDEVN(n)	(n)
@@ -95,12 +93,19 @@ enum bg_check_types
   bg_signalled = 2
 };
 
+enum query_state {
+  no_query = 0,
+  query_read_control = 1,
+  query_null_access = 2
+};
+
 class fhandler_base
 {
   friend class dtable;
   friend void close_all_files ();
  protected:
   DWORD status;
+  unsigned query_open : 2;
  private:
   int access;
   HANDLE io_handle;
@@ -239,8 +244,8 @@ class fhandler_base
   bool get_fs_flags (DWORD flagval = UINT32_MAX)
     { return (fs_flags & (flagval)); }
 
-  bool get_query_open () { return FHISSETF (QUERYOPEN); }
-  void set_query_open (bool val) { FHCONDSETF (val, QUERYOPEN); }
+  query_state get_query_open () { return (query_state) query_open; }
+  void set_query_open (query_state val) { query_open = val; }
 
   bool get_readahead_valid () { return raixget < ralen; }
   int puts_readahead (const char *s, size_t len = (size_t) -1);

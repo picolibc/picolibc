@@ -443,7 +443,7 @@ fhandler_base::open (int flags, mode_t mode)
     }
 
   if (get_query_open ())
-    access = 0;
+    access = get_query_open () == query_read_control ? READ_CONTROL : 0;
   else if (get_major () == DEV_TAPE_MAJOR)
     access = GENERIC_READ | GENERIC_WRITE;
   else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
@@ -1258,6 +1258,7 @@ fhandler_base::operator delete (void *p)
 /* Normal I/O constructor */
 fhandler_base::fhandler_base ():
   status (0),
+  query_open (no_query),
   access (0),
   io_handle (NULL),
   namehash (0),

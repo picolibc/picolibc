@@ -160,8 +160,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
 {
   int res = -1;
   int oret;
-  int open_flags = O_RDONLY | O_BINARY | O_DIROPEN;
-  bool query_open_already;
+  int open_flags = O_RDONLY | O_BINARY;
 
   if (get_io_handle ())
     {
@@ -173,21 +172,18 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
   /* If we don't care if the file is executable or we already know if it is,
      then just do a "query open" as it is apparently much faster. */
   if (pc.exec_state () != dont_know_if_executable)
-    set_query_open (query_open_already = true);
-  else
-    query_open_already = false;
-
-  if (query_open_already && strncasematch (pc.volname (), "FAT", 3)
-      && !strpbrk (get_win32_name (), "?*|<>"))
-    oret = 0;
-  else if (!(oret = open_fs (open_flags, 0))
-	   && !query_open_already
-	   && get_errno () == EACCES)
     {
-      /* If we couldn't open the file, try a "query open" with no permissions.
-	 This will allow us to determine *some* things about the file, at least. */
+      set_query_open (query_read_control);
+      if (strncasematch (pc.volname (), "FAT", 3)
+	  && !strpbrk (get_win32_name (), "?*|<>"))
+	return fstat_by_name (buf);
+    }
+  if (!(oret = open_fs (open_flags, 0)) && get_errno () == EACCES)
+    {
+      /* If we couldn't open the file, try a query open with no permissions.
+	 This allows us to determine *some* things about the file, at least. */
       pc.set_exec (0);
-      set_query_open (true);
+      set_query_open (query_null_access);
       oret = open_fs (open_flags, 0);
     }
 
@@ -289,15 +285,15 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     {
       /* symlinks are everything for everyone! */
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
-      get_file_attribute (pc.has_acls (), get_win32_name (), NULL,
-			  &buf->st_uid, &buf->st_gid);
+      get_file_attribute (pc.has_acls (), get_io_handle (), get_win32_name (),
+      			  NULL, &buf->st_uid, &buf->st_gid);
       goto done;
     }
   else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
-  if (get_file_attribute (pc.has_acls (), get_win32_name (), &buf->st_mode,
-			  &buf->st_uid, &buf->st_gid) == 0)
+  if (!get_file_attribute (pc.has_acls (), get_io_handle (), get_win32_name (),
+  			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (pc.has_attribute (FILE_ATTRIBUTE_READONLY) && !get_symlink_p ())

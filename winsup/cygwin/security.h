@@ -249,7 +249,7 @@ extern bool allow_smbntsec;
 
 /* File manipulation */
 int __stdcall set_process_privileges ();
-int __stdcall get_file_attribute (int, const char *, mode_t *,
+int __stdcall get_file_attribute (int, HANDLE, const char *, mode_t *,
 				  __uid32_t * = NULL, __gid32_t * = NULL);
 int __stdcall set_file_attribute (int, const char *, int);
 int __stdcall set_file_attribute (int, const char *, __uid32_t, __gid32_t, int);
