@@ -35,12 +35,10 @@ AC_CHECK_TOOL(WINDRES, windres, windres)
 AC_SUBST(WINDRES)
 
 AC_MSG_CHECKING([for build environment])
-BUILDENV=
-if test -d ../../winsup; then
-        BUILDENV=cygwin
-elif test -d ../mingw; then
-        BUILDENV=mingw
-fi
+case "$build_alias" in
+*-mingw*) BUILDENV=mingw;;
+*-cygwin*) BUILDENV=cygwin;;
+esac
 if test -z "$BUILDENV"; then
         AC_MSG_RESULT(standard)
 else

@@ -1183,12 +1183,10 @@ fi
 
 echo $ac_n "checking for build environment""... $ac_c" 1>&6
 echo "configure:1186: checking for build environment" >&5
-BUILDENV=
-if test -d ../../winsup; then
-        BUILDENV=cygwin
-elif test -d ../mingw; then
-        BUILDENV=mingw
-fi
+case "$build_alias" in
+*-mingw*) BUILDENV=mingw;;
+*-cygwin*) BUILDENV=cygwin;;
+esac
 if test -z "$BUILDENV"; then
         echo "$ac_t""standard" 1>&6
 else
