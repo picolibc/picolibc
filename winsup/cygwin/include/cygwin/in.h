@@ -103,7 +103,7 @@ struct sockaddr_in
   struct in_addr sin_addr;	/* Internet address		*/
 
   /* Pad to size of `struct sockaddr'. */
-  unsigned chari  __pad[__SOCK_SIZE__ - sizeof(short int)
+  unsigned char  __pad[__SOCK_SIZE__ - sizeof(short int)
 			- sizeof(unsigned short int) - sizeof(struct in_addr)];
 };
 #define sin_zero	__pad		/* for BSD UNIX comp. -FvK	*/
