@@ -405,12 +405,12 @@ net release.)}
 
 @item Synchronization (Section 11)
 @itemize @code
-@item pthread_cond_broadcast: P96 11.4.3.1 -- unimplemented
-@item pthread_cond_destroy: P96 11.4.2.1 -- unimplemented
-@item pthread_cond_init: P96 11.4.2.1 -- unimplemented
-@item pthread_cond_signal: P96 11.4.3.1 -- unimplemented
-@item pthread_cond_timedwait: P96 11.4.4.1 -- unimplemented
-@item pthread_cond_wait: P96 11.4.4.1 -- unimplemented
+@item pthread_cond_broadcast: P96 11.4.3.1
+@item pthread_cond_destroy: P96 11.4.2.1
+@item pthread_cond_init: P96 11.4.2.1
+@item pthread_cond_signal: P96 11.4.3.1
+@item pthread_cond_timedwait: P96 11.4.4.1
+@item pthread_cond_wait: P96 11.4.4.1
 @item pthread_condattr_destroy: P96 11.4.1.1 -- unimplemented
 @item pthread_condattr_getpshared: P96 11.4.1.1 -- unimplemented
 @item pthread_condattr_init: P96 11.4.1.1 -- unimplemented
@@ -451,18 +451,18 @@ net release.)}
 @item pthread_attr_getschedparam: P96 13.5.1.1 -- unimplemented
 @item pthread_attr_getschedpolicy: P96 13.5.1.1 -- unimplemented
 @item pthread_attr_getscope: P96 13.5.1.1 -- unimplemented
-@item pthread_attr_setinheritsched: P96 13.5.1.1 -- unimplemented
+@item pthread_attr_setinheritsched: P96 13.5.1.1
 @item pthread_attr_setschedparam: P96 13.5.1.1 -- unimplemented
 @item pthread_attr_setschedpolicy: P96 13.5.1.1 -- unimplemented
 @item pthread_attr_setscope: P96 13.5.1.1 -- unimplemented
-@item pthread_getschedparam: P96 13.5.2.1 -- unimplemented
+@item pthread_getschedparam: P96 13.5.2.1
 @item pthread_mutex_getprioceiling: P96 13.6.2.1 -- unimplemented
 @item pthread_mutex_setprioceiling: P96 13.6.2.1 -- unimplemented
 @item pthread_mutexattr_getprioceiling: P96 13.6.1.1 -- unimplemented
 @item pthread_mutexattr_getprotocol: P96 13.6.1.1 -- unimplemented
 @item pthread_mutexattr_setprioceiling: P96 13.6.1.1 -- unimplemented
 @item pthread_mutexattr_setprotocol: P96 13.6.1.1 -- unimplemented
-@item pthread_setschedparam: P96 13.5.2.1 -- unimplemented
+@item pthread_setschedparam: P96 13.5.2.1
 @item sched_get_priority_max: P96 13.3.6.1 -- unimplemented
 @item sched_get_priority_min: P96 13.3.6.1 -- unimplemented
 @item sched_getparam: P96 13.3.2.1 -- unimplemented
