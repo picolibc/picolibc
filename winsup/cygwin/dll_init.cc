@@ -310,7 +310,7 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
 	  if (!h)
 	    {
 	      unload = false;
-	      LoadLibrary (d.name);
+	      h = LoadLibrary (d.name);
 	    }
 	  if (!h)
 	    system_printf ("can't reload %s", d.name);
