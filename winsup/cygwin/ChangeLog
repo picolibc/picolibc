@@ -1,3 +1,24 @@
+2002-06-29  Pierre Humblet <pierre.humblet@ieee.org>   
+
+	* security.cc (extract_nt_dom_user): Check for all buffer overflows.
+	Call LookupAccountSid after trying to get domain & user from passwd.
+	(get_group_sidlist): Obtain the domain and user by calling
+	extract_nt_dom_user instead of LookupAccountSid.
+
+2002-06-29  Christopher Faylor  <cgf@redhat.com>
+
+	* uinfo.cc (cygheap_user::test_uid): Use standard issetuid test.
+
+2002-06-29  Christopher Faylor  <cgf@redhat.com>
+
+	* autoload.cc (NetGetDCName): Change to make this an optional load
+	function.
+	* cygheap.h (cygheap_user::logsrv): Return NULL when operation fails.
+	(cygheap_user::winname): Ditto.
+	(cygheap_user::domain): Ditto.
+	* uinfo.cc (cygheap_user::env_logsrv): Save results in temp variable.
+	(cygheap_user::env_userprofile): Ditto.
+
 2002-06-29  Christopher Faylor  <cgf@redhat.com>
 
 	* environ.cc (spenv::retrieve): Detect return of env_dontadd from

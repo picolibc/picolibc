@@ -144,15 +144,18 @@ public:
 
   const char *logsrv ()
   {
-    return env_logsrv ("LOGONSERVER=", sizeof ("LOGONSERVER=") - 1);
+    const char *p = env_logsrv ("LOGONSERVER=", sizeof ("LOGONSERVER=") - 1);
+    return (p == almost_null) ? NULL : p;
   }
   const char *winname ()
   {
-    return env_name ("USERNAME=", sizeof ("USERNAME=") - 1);
+    const char *p = env_name ("USERNAME=", sizeof ("USERNAME=") - 1);
+    return (p == almost_null) ? NULL : p;
   }
   const char *domain ()
   {
-    return env_domain ("USERDOMAIN=", sizeof ("USERDOMAIN=") - 1);
+    const char *p = env_domain ("USERDOMAIN=", sizeof ("USERDOMAIN=") - 1);
+    return (p == almost_null) ? NULL : p;
   }
   BOOL set_sid (PSID new_sid);
   BOOL set_orig_sid ();

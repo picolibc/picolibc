@@ -308,7 +308,7 @@ cygheap_user::test_uid (char *&what, const char *name, size_t namelen)
 {
   if (what)
     return what;
-  if (orig_uid == myself->uid)
+  if (!issetuid ())
     what = getwinenveq (name, namelen, HEAP_STR);
   return what;
 }
@@ -319,12 +319,14 @@ cygheap_user::env_logsrv (const char *name, size_t namelen)
   if (test_uid (plogsrv, name, namelen))
     return plogsrv;
 
-  if (!domain () || strcasematch (winname (), "SYSTEM"))
+  const char *mydomain = domain ();
+  const char *myname = winname ();
+  if (!mydomain || strcasematch (myname, "SYSTEM"))
     return almost_null;
 
   char logsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
   cfree_and_set (plogsrv, almost_null);
-  if (get_logon_server (domain (), logsrv, NULL))
+  if (get_logon_server (mydomain, logsrv, NULL))
     plogsrv = cstrdup (logsrv);
   return plogsrv;
 }
@@ -363,7 +365,8 @@ cygheap_user::env_userprofile (const char *name, size_t namelen)
   char userprofile_env_buf[MAX_PATH + 1];
   cfree_and_set (puserprof, almost_null);
   /* FIXME: Should this just be setting a puserprofile like everything else? */
-  if (!strcasematch (winname (), "SYSTEM")
+  const char *myname = winname ();
+  if (myname && strcasematch (myname, "SYSTEM")
       && get_registry_hive_path (sid (), userprofile_env_buf))
     puserprof = cstrdup (userprofile_env_buf);
 

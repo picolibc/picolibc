@@ -371,7 +371,7 @@ LoadDLLfunc (SetSecurityDescriptorOwner, 12, advapi32)
 LoadDLLfunc (SetTokenInformation, 16, advapi32)
 
 LoadDLLfunc (NetApiBufferFree, 4, netapi32)
-LoadDLLfunc (NetGetDCName, 12, netapi32)
+LoadDLLfuncEx (NetGetDCName, 12, netapi32, 1)
 LoadDLLfunc (NetLocalGroupEnum, 28, netapi32)
 LoadDLLfunc (NetLocalGroupGetMembers, 32, netapi32)
 LoadDLLfunc (NetUserGetGroups, 28, netapi32)
