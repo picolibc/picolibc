@@ -1780,7 +1780,7 @@ typedef HW_PROFILE_INFOA HW_PROFILE_INFO,*LPHW_PROFILE_INFO;
 #define FindAtom FindAtomA
 #define FindFirstChangeNotification FindFirstChangeNotificationA
 #define FindFirstFile FindFirstFileA
-#define FindFirstFileEx FindFirstFileExW
+#define FindFirstFileEx FindFirstFileExA
 #define FindNextFile FindNextFileA
 #define FindResource FindResourceA
 #define FindResourceEx FindResourceExA
