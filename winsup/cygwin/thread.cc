@@ -384,6 +384,14 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   function = func;
   arg = threadarg;
 
+  if (verifyable_object_isvalid (&mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
+    {
+      thread_printf ("New thread object access mutex is not valid. this %p",
+		     this);
+      magic = 0;
+      return;
+    }
+
   win32_obj_id = ::CreateThread (&sec_none_nih, attr.stacksize,
 				(LPTHREAD_START_ROUTINE) thread_init_wrapper,
 				this, CREATE_SUSPENDED, &thread_id);
@@ -409,8 +417,10 @@ pthread::push_cleanup_handler (__pthread_cleanup_handler *handler)
   if (this != self ())
     // TODO: do it?
     api_fatal ("Attempt to push a cleanup handler across threads"); 
+  mutex.Lock();
   handler->next = cleanup_handlers;
   cleanup_handlers = handler;
+  mutex.UnLock();
 }
 
 void
@@ -923,7 +933,7 @@ verifyable_object_isvalid (void const * objectptr, long magic)
 
 /* Pthreads */
 void *
-thread_init_wrapper (void *_arg)
+pthread::thread_init_wrapper (void *_arg)
 {
   // Setup the local/global storage of this thread
 
@@ -955,9 +965,11 @@ thread_init_wrapper (void *_arg)
   /*the OS doesn't check this for <= 64 Tls entries (pre win2k) */
   TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thread);
 
+  thread->mutex.Lock();
   // if thread is detached force cleanup on exit
   if (thread->attr.joinable == PTHREAD_CREATE_DETACHED && thread->joiner == NULL)
     thread->joiner = pthread::self ();
+  thread->mutex.UnLock();
 
 #ifdef _CYG_THREAD_FAILSAFE
   if (_REENT == _impure_ptr)
@@ -1547,12 +1559,16 @@ __pthread_exit (void *value_ptr)
   thread->pop_all_cleanup_handlers();
 
   MT_INTERFACE->destructors.IterateNull ();
-
+  
+  thread->mutex.Lock();
   // cleanup if thread is in detached state and not joined
   if( __pthread_equal(&thread->joiner, &thread ) )
     delete thread;
   else
-    thread->return_ptr = value_ptr;
+    {  
+      thread->return_ptr = value_ptr;
+      thread->mutex.UnLock();
+    }
 
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     exit (0);
@@ -1569,24 +1585,27 @@ __pthread_join (pthread_t *thread, void **return_val)
   if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
 
-  if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
-    {
-      if (return_val)
-        *return_val = NULL;
-      return EINVAL;
-    }
-
-  else if( __pthread_equal(thread, &joiner ) )
+  if ( joiner == *thread)    
     {
       if (return_val)
         *return_val = NULL;
       return EDEADLK;
     }
 
+  (*thread)->mutex.Lock ();
+
+  if((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
+    {
+      if (return_val)
+        *return_val = NULL;
+      (*thread)->mutex.UnLock ();
+      return EINVAL;
+    }
   else
     {
       (*thread)->joiner = joiner;
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
+      (*thread)->mutex.UnLock ();
       WaitForSingleObject ((*thread)->win32_obj_id, INFINITE);
       if (return_val)
          *return_val = (*thread)->return_ptr;
@@ -1605,14 +1624,24 @@ __pthread_detach (pthread_t *thread)
   if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
 
+  (*thread)->mutex.Lock ();
   if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
+      (*thread)->mutex.UnLock ();
       return EINVAL;
     }
 
-  // force cleanup on exit
-  (*thread)->joiner = *thread;
-  (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
+  // check if thread is still alive
+  if (WAIT_TIMEOUT == WaitForSingleObject ((*thread)->win32_obj_id, 0) )
+    {
+      // force cleanup on exit
+      (*thread)->joiner = *thread;
+      (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
+      (*thread)->mutex.UnLock ();
+    }
+  else
+    // thread has already terminated.
+      delete (*thread);
 
   return 0;
 }

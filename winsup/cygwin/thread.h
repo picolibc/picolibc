@@ -229,6 +229,34 @@ public:
    ~pthread_attr ();
 };
 
+class pthread_mutexattr:public verifyable_object
+{
+public:
+  int pshared;
+  int mutextype;
+    pthread_mutexattr ();
+   ~pthread_mutexattr ();
+};
+
+class pthread_mutex:public verifyable_object
+{
+public:
+  CRITICAL_SECTION criticalsection;
+  HANDLE win32_obj_id;
+  LONG condwaits;
+  int pshared;
+  class pthread_mutex * next;
+
+  int Lock ();
+  int TryLock ();
+  int UnLock ();
+  void fixup_after_fork ();
+
+  pthread_mutex (pthread_mutexattr * = NULL);
+  pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
+  ~pthread_mutex ();
+};
+
 class pthread:public verifyable_object
 {
 public:
@@ -264,42 +292,18 @@ public:
    void pop_cleanup_handler (int const execute);
 
    static pthread* self ();
+   static void *thread_init_wrapper (void *);
 
 private:
     DWORD thread_id;
     __pthread_cleanup_handler *cleanup_handlers;
+    pthread_mutex mutex;
 
     friend void __pthread_exit (void *value_ptr);
+    friend int __pthread_join (pthread_t * thread, void **return_val);
+    friend int __pthread_detach (pthread_t * thread);
+    
     void pop_all_cleanup_handlers (void);
-};
-
-class pthread_mutexattr:public verifyable_object
-{
-public:
-  int pshared;
-  int mutextype;
-    pthread_mutexattr ();
-   ~pthread_mutexattr ();
-};
-
-class pthread_mutex:public verifyable_object
-{
-public:
-  CRITICAL_SECTION criticalsection;
-  HANDLE win32_obj_id;
-  LONG condwaits;
-  int pshared;
-  class pthread_mutex * next;
-
-  int Lock ();
-  int TryLock ();
-  int UnLock ();
-  void fixup_after_fork ();
-
-  pthread_mutex (unsigned short);
-  pthread_mutex (pthread_mutexattr *);
-  pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
-  ~pthread_mutex ();
 };
 
 class pthread_condattr:public verifyable_object
@@ -410,8 +414,6 @@ int __pthread_detach (pthread_t * thread);
 
 extern "C"
 {
-void *thread_init_wrapper (void *);
-
 /*  ThreadCreation */
 int __pthread_create (pthread_t * thread, const pthread_attr_t * attr,
 		      void *(*start_routine) (void *), void *arg);

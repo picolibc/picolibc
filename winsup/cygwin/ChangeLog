@@ -5,6 +5,23 @@
 
 2002-06-10  Robert Collins  <rbtcollins@hotmail.com>
 
+	* thread.cc: Variation of a patch from Thomas Pffaf.
+       	(__pthread_detach): Cleanup thread object if the thread has terminated.
+	(__pthread_join): Change order of error checks, and lock against
+	join/detach/exit races.
+	(__pthread_exit): Lock object against join/detach/exit races.
+	(pthread::thread_init_wrapper): Ditto.
+	(thread_init_wrapper): Rename to pthread::thread_init_wrapper.
+	(pthread::create): Check that the mutex initialized correctly.
+	(pthread::push_cleanup_handler): Lock against potential cancellation
+	race. NB: this may not be required if pthread_cleanup_push is non-
+	cancelable.
+	* thread.h (pthread::mutex): New member.
+	(thread_init_wrapper): Rename to pthread::thread_init_wrapper.
+	(pthread::thread_init_wrapper_: New static member.
+
+2002-06-10  Robert Collins  <rbtcollins@hotmail.com>
+
 	* cygwin.din: Add _pthread_cleanup_push and _pthread_cleanup_pop.
 	* pthread.cc: Change __pthread_self to pthread::self() thruoghout.
 	(_pthread_cleanup_push): New function.
