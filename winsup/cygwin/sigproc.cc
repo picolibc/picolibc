@@ -872,10 +872,10 @@ remove_proc (int ci)
 }
 
 /* Check status of child process vs. waitq member.
-  
+
    parent_w is the pointer to the parent of the waitq member in question.
    child is the subprocess being considered.
-  
+
    Returns non-zero if waiting thread released.  */
 static bool __stdcall
 stopped_or_terminated (waitq *parent_w, _pinfo *child)

@@ -213,7 +213,7 @@ public:
     else
       return strcpy (buf, name ());
   }
-	  
+
   const char *cygheap_user::test_uid (char *&, const char *, size_t)
     __attribute__ ((regparm (3)));
 };
@@ -231,10 +231,10 @@ struct cwdstuff
   muto *cwd_lock;
   char *get (char *, int = 1, int = 0, unsigned = CYG_MAX_PATH);
   DWORD get_hash ();
-  DWORD get_drive (char * dst) 
+  DWORD get_drive (char * dst)
   {
-    get_initial (); 
-    memcpy (dst, win32, drive_length); 
+    get_initial ();
+    memcpy (dst, win32, drive_length);
     cwd_lock->release ();
     return drive_length;
   }

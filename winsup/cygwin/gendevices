@@ -119,7 +119,7 @@ sub generate {
 	$rest = "$fh, $rest" if $rest =~ /^"/o;
 	$rest = fixup($rest, $vars);
 	if ($rest =~ /^(.*), ([a-z_]*_dev)/) {
-	    $pointers{$2} ||= "const device *$2 = $storage_loc;\n"; 
+	    $pointers{$2} ||= "const device *$2 = $storage_loc;\n";
 	    $rest = $1;
 	}
 	push(@storage, "  {\"$dev\", " . $rest . "},\n");

@@ -22,7 +22,7 @@ foreach ($tls =~ /^.*\n/mg) {
     if (!s/;.*$//o) {
 	if (!$struct && /^\s*(?:struct|class)\s*([a-z_0-9]+)/o) {
 	    $def .= $_;
-	    $struct = $1 
+	    $struct = $1
 	}
 	next;
     }

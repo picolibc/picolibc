@@ -30,7 +30,7 @@ reg_key::reg_key (HKEY top, REGSAM access, ...)
 
 /* Opens a key under the appropriate Cygwin key.
    Do not use HKCU per MS KB 199190  */
- 
+
 reg_key::reg_key (bool isHKLM, REGSAM access, ...)
 {
   va_list av;
@@ -40,8 +40,8 @@ reg_key::reg_key (bool isHKLM, REGSAM access, ...)
     top = HKEY_LOCAL_MACHINE;
   else
     {
-      char name[128]; 
-      const char *names[2] = {cygheap->user.get_windows_id (name), ".DEFAULT"}; 
+      char name[128];
+      const char *names[2] = {cygheap->user.get_windows_id (name), ".DEFAULT"};
       for (int i = 0; i < 2; i++)
 	{
 	  key_is_invalid = RegOpenKeyEx (HKEY_USERS, names[i], 0, access, &top);
@@ -52,14 +52,14 @@ reg_key::reg_key (bool isHKLM, REGSAM access, ...)
       return;
     }
 OK:
-  new (this) reg_key (top, access, "SOFTWARE", 
+  new (this) reg_key (top, access, "SOFTWARE",
 		      CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
 		      CYGWIN_INFO_CYGWIN_REGISTRY_NAME, NULL);
   if (top != HKEY_LOCAL_MACHINE)
     RegCloseKey (top);
   if (key_is_invalid)
     return;
-    
+
   top = key;
   va_start (av, access);
   build_reg (top, access, av);
@@ -215,7 +215,7 @@ get_registry_hive_path (const char *name, char *path)
   if (!name || !path)
     return NULL;
   __small_sprintf (key, "SOFTWARE\\Microsoft\\Windows%s\\CurrentVersion\\ProfileList\\",
-		   wincap.is_winnt ()?" NT":""); 
+		   wincap.is_winnt ()?" NT":"");
   strcat (key, name);
   if (!RegOpenKeyExA (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
     {
@@ -257,7 +257,7 @@ load_registry_hive (const char * name)
       if (wincap.is_winnt ())
 	strcat (path, "\\NTUSER.DAT");
       else
-	strcat (path, "\\USER.DAT");	
+	strcat (path, "\\USER.DAT");
       if ((ret = RegLoadKeyA (HKEY_USERS, name, path)) != ERROR_SUCCESS)
 	debug_printf ("Loading user registry hive for %s failed: %d", name, ret);
     }

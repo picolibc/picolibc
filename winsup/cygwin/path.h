@@ -221,7 +221,7 @@ class path_conv
   void set_normalized_path (const char *, bool) __attribute__ ((regparm (3)));
   DWORD get_symlink_length () { return symlink_length; };
  private:
-  DWORD symlink_length;  
+  DWORD symlink_length;
   char path[CYG_MAX_PATH];
 };
 

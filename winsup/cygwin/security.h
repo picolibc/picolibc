@@ -300,10 +300,10 @@ SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
 
 /* Various types of security attributes for use in Create* functions. */
 extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
-extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, 
+extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid1, PSID sid2,
 						  DWORD access2, BOOL inherit)
   __attribute__ ((regparm (3)));
-extern bool sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID, 
+extern bool sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID,
 		     PSID sid2 = NO_SID, DWORD access2 = 0);
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);

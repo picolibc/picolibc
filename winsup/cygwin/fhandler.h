@@ -88,7 +88,7 @@ class fhandler_base
 					beyond EOF, zero filling or making
 					file sparse if so. */
     unsigned query_open         : 2; /* open file without requesting either
-    					read or write access */
+					read or write access */
     unsigned close_on_exec      : 1; /* close-on-exec */
     unsigned need_fork_fixup    : 1; /* Set if need to fixup after fork. */
     unsigned has_changed	: 1; /* Flag used to set ctime on close. */
@@ -507,7 +507,7 @@ class fhandler_dev_raw: public fhandler_base
       eom_detected (0), eof_detected (0), lastblk_to_read (0)
       {}
   } status;
- 
+
   IMPLEMENT_STATUS_FLAG (bool, eom_detected)
   IMPLEMENT_STATUS_FLAG (bool, eof_detected)
   IMPLEMENT_STATUS_FLAG (bool, lastblk_to_read)

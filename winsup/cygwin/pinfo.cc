@@ -160,7 +160,7 @@ pinfo::exit (DWORD n)
     }
   int exitcode = self->exitcode;
   release ();
-  
+
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
   sigproc_printf ("Calling ExitProcess hProcess %p, n %p, exitcode %p",

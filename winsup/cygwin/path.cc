@@ -731,7 +731,7 @@ is_virtual_symlink:
                     {
                       error = ENOTDIR;
 		      goto out;
-                    }	
+                    }
 		  if (pcheck_case == PCHECK_RELAXED)
 		    goto out;	// file found
 		  /* Avoid further symlink evaluation. Only case checks are
@@ -1938,7 +1938,7 @@ mount_info::read_cygdrive_info_from_registry ()
   for (int i = 0; i < 2; i++)
     {
       if (i)
-	cygheap->user.deimpersonate ();	
+	cygheap->user.deimpersonate ();
       reg_key r (i, KEY_READ, CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
       if (i)
 	cygheap->user.reimpersonate ();
@@ -1954,7 +1954,7 @@ mount_info::read_cygdrive_info_from_registry ()
       if (i == 0)
 	cygdrive_flags &= ~MOUNT_SYSTEM;
       else
-	cygdrive_flags |= MOUNT_SYSTEM;	
+	cygdrive_flags |= MOUNT_SYSTEM;
       slashify (cygdrive, cygdrive, 1);
       cygdrive_len = strlen (cygdrive);
     }

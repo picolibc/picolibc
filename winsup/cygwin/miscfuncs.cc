@@ -383,7 +383,7 @@ winprio_to_nice (DWORD prio)
 
 /* Get a Win32 priority matching the incoming nice factor.  The incoming
    nice is limited to the interval [-NZERO,NZERO-1]. */
-DWORD 
+DWORD
 nice_to_winprio (int &nice)
 {
   static const DWORD priority[] NO_COPY =

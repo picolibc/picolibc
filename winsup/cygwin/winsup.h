@@ -70,12 +70,12 @@ extern unsigned long cygwin_inet_addr (const char *cp);
 
    Thou shalt use CYG_MAX_PATH throughout.  It avoids the NUL vs no-NUL
    issue and is neither of the Unixy ones [so we can punt on which
-   one is the right one to use]. 
-   
+   one is the right one to use].
+
    Windows ANSI calls are limited to MAX_PATH in length. Cygwin calls that
    thunk through to Windows Wide calls are limited to 32K. We define
    CYG_MAX_PATH as a convenient, not to short, not too long 'happy medium'.
-   
+
    */
 
 #define CYG_MAX_PATH (MAX_PATH)

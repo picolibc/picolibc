@@ -181,12 +181,12 @@ unlink (const char *ourname)
      have open handles on a file and one of them calls unlink, then it
      happens that the file is remove from the remote share even though the
      other process still has an open handle.  This other process than gets
-     Win32 error 59, ERROR_UNEXP_NET_ERR when trying to access the file. 
+     Win32 error 59, ERROR_UNEXP_NET_ERR when trying to access the file.
 
      For some reason, that does not happen when using DeleteFile, which
-     nicely succeeds but still, the file is available for the other process. 
+     nicely succeeds but still, the file is available for the other process.
      To reproduce, mount /tmp on a remote share and call
-     
+
        bash -c "cat << EOF"
 
      Microsoft KB 837665 describes this problem as a bug in 2K3, but I have
@@ -1284,12 +1284,12 @@ rename (const char *oldpath, const char *newpath)
      existing file or directory real_new.  Otherwise we end up with a
      non-moved directory *and* a deleted read_new path.  Also this case
      has to generate an EINVAL in all circumstances,
-     
+
      NB: We could test this also before calling MoveFile but the idea is
      that this is a somewhat seldom case and we like to avoid expensive
      string comparison.  So we allow MoveFile to fail and test the error
-     code instead. 
-     
+     code instead.
+
      The order in the condition is (hopefully) trimmed for doing the least
      expensive stuff first.  Nevertheless it would be nice if 9x could
      generate the same error codes as NT.

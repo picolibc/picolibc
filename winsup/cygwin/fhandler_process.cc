@@ -343,7 +343,7 @@ fhandler_process::fill_filebuf ()
     {
     case PROCESS_FD:
       {
-	size_t fs; 
+	size_t fs;
 	char *fdp = strrchr (path, '/');
 	if (!fdp || *++fdp == 'f') /* The "fd" directory itself. */
 	  {
@@ -414,7 +414,7 @@ fhandler_process::fill_filebuf ()
       {
         if (filebuf)
 	  free (filebuf);
-	size_t fs; 
+	size_t fs;
 	switch (fileid)
 	  {
 	  case PROCESS_ROOT:
@@ -582,7 +582,7 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
 				st.st_ino);
 	while (written < 62)
 	  destbuf[len + written++] = ' ';
-        len += written;
+	len += written;
 	len += __small_sprintf (destbuf + len, "%s\n", posix_modname);
       }
 out:

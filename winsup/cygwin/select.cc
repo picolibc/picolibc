@@ -1346,7 +1346,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 
   if (_my_tls.locals.exitsock != INVALID_SOCKET)
     si->exitsock = _my_tls.locals.exitsock;
-  else 
+  else
     {
       si->exitsock = _my_tls.locals.exitsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
       if (_my_tls.locals.exitsock == INVALID_SOCKET)

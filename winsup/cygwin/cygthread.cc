@@ -255,7 +255,7 @@ cygthread::terminate_thread ()
 
   if (!inuse)
     goto force_notterminated;
-    
+
   (void) TerminateThread (h, 0);
   (void) WaitForSingleObject (h, INFINITE);
   CloseHandle (h);
@@ -285,7 +285,7 @@ cygthread::terminate_thread ()
 #endif
       release (true);
     }
-  
+
   goto out;
 
 force_notterminated:
