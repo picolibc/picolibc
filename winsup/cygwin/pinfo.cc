@@ -258,7 +258,7 @@ pinfo::set_acl()
 void
 _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 {
-  debug_printf ("checking if /dev/tty%d differs from input", ctty);
+  debug_printf ("checking if /dev/tty%d changed", ctty);
   if ((ctty < 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc->ntty;

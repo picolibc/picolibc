@@ -176,7 +176,9 @@ void
 init_cygheap::close_ctty ()
 {
   debug_printf ("closing cygheap->ctty %p", cygheap->ctty);
+#ifdef NEWVFORK
   int usecount = cygheap->ctty->usecount;
+#endif
   cygheap->ctty->close ();
 #ifndef NEWVFORK
   cygheap->ctty = NULL;

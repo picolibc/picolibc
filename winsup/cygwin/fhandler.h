@@ -108,7 +108,6 @@ class fhandler_base
   __ino64_t namehash;	/* hashed filename, used as inode num */
 
  protected:
-  /* Full unix path name of this file */
   /* File open flags from open () and fcntl () calls */
   int openflags;
 
@@ -256,12 +255,11 @@ class fhandler_base
 
   int get_readahead_into_buffer (char *buf, size_t buflen);
 
-  bool has_acls () { return FHISSETF (HASACLS); }
-  void set_has_acls (int val) { FHCONDSETF (val, HASACLS); }
+  bool has_acls () const { return pc.has_acls (); }
 
-  bool isremote () { return FHISSETF (ISREMOTE); }
-  void set_isremote (int val) { FHCONDSETF (val, ISREMOTE); }
+  bool isremote () { return pc.isremote (); }
 
+  bool has_attribute (DWORD x) const {return pc.has_attribute (x);}
   const char *get_name () const { return pc.normalized_path; }
   const char *get_win32_name () { return pc.get_win32 (); }
   __ino64_t get_namehash () { return namehash; }
@@ -364,8 +362,9 @@ class fhandler_base
   virtual int closedir (DIR *);
   virtual bool is_slow () {return 0;}
   bool is_auto_device () {return isdevice () && !dev ().isfs ();}
-  bool is_fs_special () {return dev ().isfs ();}
-  bool device_access_denied (int) __attribute__ ((regparm (1)));
+  bool is_fs_special () {return pc.is_fs_special ();}
+  bool device_access_denied (int) __attribute__ ((regparm (2)));
+  bool fhaccess (int flags) __attribute__ ((regparm (2)));
 };
 
 class fhandler_socket: public fhandler_base

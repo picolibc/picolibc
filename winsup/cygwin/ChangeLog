@@ -1,3 +1,29 @@
+2004-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (init_cygheap::close_ctty): Protect YA vforkism.
+	* fhandler.h (fhandler_base::has_acls): Make pass through for path_conv
+	method.
+	(fhandler_base::isremote): Ditto.
+	(fhandler_base::is_fs_special): Ditto.
+	(fhandler_base::has_attribute): Ditto.  Define new function.
+	(fhandler_base::fhaccess): Declare new function based on access_worker.
+	(fhandler_base::set_has_acls): Eliminate obsolete function.
+	(fhandler_base::set_isremote): Ditto.
+	* fhandler.cc (fhandler_base::fhaccess): Move from syscalls.cc and into
+	fhandler_base class.  Use fhandler methods to access data rather than
+	path_conv stuff.
+	(fhandler_base::device_access_denied): Use fhaccess method.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Ditto.
+	(fhandler_base::open_fs): Remove calls to obsolete functions.
+	* fhandler_virtual.cc (fhandler_virtual::open): Ditto.
+	* winsup.h (access_worker): Remove obsolete access_worker declaration.
+	*syscalls.cc (access_worker): Move function to fhandler.cc.
+	(access): Use fhaccess method.
+
+	* pinfo.cc (_pinfo::set_ctty): Clarify debugging output.
+	* sigproc.cc (sig_dispatch_pending): Ditto.
+	* syscalls.cc (setsid): Perform minor rearrangement.
+
 2004-01-23  Pierre Humblet <pierre.humblet@ieee.org>
 
         * fhandler_socket.cc (fhandler_socket::create_secret_event): Avoid
