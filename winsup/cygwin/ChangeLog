@@ -1,3 +1,7 @@
+Fri 20 Jul 2001 09:15:00  Mark Bradshaw <bradshaw@staff.crosswalk.com>
+
+	* dir.cc (readdir): Protect FindNextFileA against INVALID_HANDLE_VALUE.
+
 Wed 18 Jul 2001 01:00:47 PM EDT  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (_cmalloc): Use correct constants for size calculation.

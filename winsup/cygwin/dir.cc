@@ -159,6 +159,10 @@ readdir (DIR * dir)
 	  return res;
 	}
     }
+  else if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE)
+    {
+      return res;
+    }
   else if (!FindNextFileA (dir->__d_u.__d_data.__handle, &buf))
     {
       DWORD lasterr = GetLastError ();
