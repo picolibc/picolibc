@@ -8,6 +8,23 @@
         (MIPS operand specifier comments): Remove 'm', add 'U' and
         'J', and update the meaning of 'B' so that it's more general.
 
+        * mips.h (INSN_ISA1, INSN_ISA2, INSN_ISA3, INSN_ISA4,
+        INSN_ISA5): Renumber, redefine to mean the ISA at which the
+        instruction was added.
+        (INSN_ISA32): New constant.
+        (INSN_4650, INSN_4010, INSN_4100, INSN_3900, INSN_GP32):
+        Renumber to avoid new and/or renumbered INSN_* constants.
+        (INSN_MIPS32): Delete.
+        (ISA_UNKNOWN): New constant to indicate unknown ISA.
+        (ISA_MIPS1, ISA_MIPS2, ISA_MIPS3, ISA_MIPS4, ISA_MIPS5,
+        ISA_MIPS32): New constants, defined to be the mask of INSN_*
+        constants available at that ISA level. 
+        (CPU_UNKNOWN): New constant to indicate unknown CPU.
+        (CPU_4K, CPU_MIPS32_4K): Rename the former to the latter,
+        define it with a unique value.
+        (OPCODE_IS_MEMBER): Update for new ISA membership-related
+        constant meanings.
+
 2000-10-20  Jakub Jelinek  <jakub@redhat.com>
 
 	* sparc.h (enum sparc_opcode_arch_val): Add SPARC_OPCODE_ARCH_V9B.

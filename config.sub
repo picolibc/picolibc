@@ -211,10 +211,11 @@ esac
 case $basic_machine in
 	# Recognize the basic CPU types without company name.
 	# Some are omitted here because they have special meanings below.
-	tahoe | i860 | ia64 | m32r | m68k | m68000 | m88k | ns32k | arc | arm \
-		| arme[lb] | armv[2345] | armv[345][lb] | pyramid | mn10200 | mn10300 | tron | a29k \
+	tahoe | i860 | ia64 | m32r | m68k | m68000 | m88k | ns32k | arc \
+	        | arm | arme[lb] | arm[bl]e | armv[2345] | armv[345][lb] | strongarm | xscale \
+		| pyramid | mn10200 | mn10300 | tron | a29k \
 		| 580 | i960 | h8300 \
-		| x86 | ppcbe | mipsbe | mipsle | shbe | shle | armbe | armle \
+		| x86 | ppcbe | mipsbe | mipsle | shbe | shle \
 		| hppa | hppa1.0 | hppa1.1 | hppa2.0 | hppa2.0w | hppa2.0n \
 		| hppa64 \
 		| alpha | alphaev[4-8] | alphaev56 | alphapca5[67] \
@@ -251,11 +252,12 @@ case $basic_machine in
 	# Recognize the basic CPU types with company name.
 	# FIXME: clean up the formatting here.
 	vax-* | tahoe-* | i[234567]86-* | i860-* | ia64-* | m32r-* | m68k-* | m68000-* \
-	      | m88k-* | sparc-* | ns32k-* | fx80-* | arc-* | arm-* | c[123]* \
+	      | m88k-* | sparc-* | ns32k-* | fx80-* | arc-* | c[123]* \
+	      | arm-*  | armbe-* | armle-* | armv*-* | strongarm-* | xscale-* \
 	      | mips-* | pyramid-* | tron-* | a29k-* | romp-* | rs6000-* \
 	      | power-* | none-* | 580-* | cray2-* | h8300-* | h8500-* | i960-* \
 	      | xmp-* | ymp-* \
-	      | x86-* | ppcbe-* | mipsbe-* | mipsle-* | shbe-* | shle-* | armbe-* | armle-* \
+	      | x86-* | ppcbe-* | mipsbe-* | mipsle-* | shbe-* | shle-* \
 	      | hppa-* | hppa1.0-* | hppa1.1-* | hppa2.0-* | hppa2.0w-* \
 	      | hppa2.0n-* | hppa64-* \
 	      | alpha-* | alphaev[4-8]-* | alphaev56-* | alphapca5[67]-* \
@@ -267,7 +269,7 @@ case $basic_machine in
 	      | mips64el-* | mips64orion-* | mips64orionel-* \
 	      | mips64vr4100-* | mips64vr4100el-* | mips64vr4300-* | mips64vr4300el-* \
 	      | mipstx39-* | mipstx39el-* | mcore-* \
-	      | f301-* | armv*-* | s390-* | sv1-* | t3e-* \
+	      | f301-* | s390-* | sv1-* | t3e-* \
 	      | m88110-* | m680[01234]0-* | m683?2-* | m68360-* | z8k-* | d10v-* \
 	      | thumb-* | v850-* | d30v-* | tic30-* | c30-* | fr30-* \
 	      | bs2000-* | tic54x-* | c54x-* | x86_64-*)

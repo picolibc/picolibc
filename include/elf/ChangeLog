@@ -1,3 +1,9 @@
+2000-10-16  Chris Demetriou  <cgd@sibyte.com>
+
+        * mips.h (E_MIPS_ARCH_32): New constant.
+        (E_MIPS_MACH_MIPS32, E_MIPS_MACH_MIPS32_4K): Replace the
+        former with the latter. 
+
 2000-11-30  Jan Hubicka  <jh@suse.cz>
 	
         * common.h (EM_X86_64): New macro.

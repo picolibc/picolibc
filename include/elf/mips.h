@@ -121,6 +121,9 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 /* -mips4 code.  */
 #define E_MIPS_ARCH_4		0x30000000
 
+/* -mips32 code.  */
+#define E_MIPS_ARCH_32                0x50000000
+
 /* The ABI of the file.  Also see EF_MIPS_ABI2 above. */
 #define EF_MIPS_ABI		0x0000F000
 
@@ -153,9 +156,7 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 #define E_MIPS_MACH_4100	0x00830000
 #define E_MIPS_MACH_4650	0x00850000
 #define E_MIPS_MACH_4111	0x00880000
-/* -mips32 code.
-   It is easier to treat MIPS32 as a machine rather than an architecture.  */
-#define E_MIPS_MACH_MIPS32	0x00890000
+#define E_MIPS_MACH_MIPS32_4K	0x00890000
 
 /* Processor specific section indices.  These sections do not actually
    exist.  Symbols with a st_shndx field corresponding to one of these
