@@ -109,7 +109,7 @@ largely on how closely you want to simulate a POSIX environment,
 whether you mix Windows and Cygwin programs, and how many drive
 letters you are using.  If you want to be very POSIX-like (assuming
 "CygwinRoot" is the top directory of your Cygwin distribution), you may
-want to do something like this:
+want to do something like this:</para>
 
 <example><title>POSIX-like mount setup</title>
 <screen>
@@ -186,6 +186,8 @@ default printer with the command <command>cat filename > PRN</command>
 (make sure to end with a Form Feed).
 </para>
 
+</sect2>
+
 <sect2> <Title>POSIX devices</title>
 <para>There is no need to create a POSIX <filename>/dev</filename> 
 directory as it is simulated within Cygwin automatically.
@@ -199,6 +201,8 @@ FIXME: Are there other devices under /dev. What about the funny ones
 mounted by default, such as /dev/fd1. What do they really do?
 </comment>
 </para>
+
+</sect2>
 
 <sect2><title>The .exe extension</title>
 
@@ -254,7 +258,7 @@ starting with "@" in a special way.  If a file
 file to delimit strings containing blank space. 
 Embedded double quotes must be repeated.
 In the following example compare the behaviors of the bash built-in
-<command>echo</command> and of the program <command>/bin/echo</command>.
+<command>echo</command> and of the program <command>/bin/echo</command>.</para>
 
 <example><title> Using @pathname</title>
 <screen>

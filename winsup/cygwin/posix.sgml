@@ -10,27 +10,32 @@ _exit, kill, sigemptyset, sigfillset, sigaddset, sigdelset,
 sigismember, sigaction, pthread_sigmask, sigprocmask, sigpending,
 sigsuspend, alarm, pause, sleep, pthread_kill, pthread_sigmask
 
+</para></sect2>
 <sect2><title>Process Environment (Section 4) </title><para>
 
 getpid, getppid, getuid, geteuid, getgid, getegid, setuid, setgid,
 getgroups, getlogin, getpgrp, setsid, setpgid, uname, time, times,
 getenv, ctermid, ttyname, isatty, sysconf
 
+</para></sect2>
 <sect2><title>Files and Directories (Section 5) </title><para>
 
 opendir, readdir, rewinddir, closedir, chdir, getcwd, open, creat,
 umask, link, mkdir, unlink, rmdir, rename, stat, fstat, access, chmod,
 fchmod, chown, utime, ftruncate, pathconf, fpathconf
 
+</para></sect2>
 <sect2><title>Input and Output Primitives (Section 6) </title><para>
 
 pipe, dup, dup2, close, read, write, fcntl, lseek, fsync
 
+</para></sect2>
 <sect2><title>Device- and Class-Specific Functions (Section 7) </title><para>
 
 cfgetispeed, cfgetospeed, cfsetispeed, cfsetospeed, tcdrain, tcflow,
 tcflush, tcgetattr, tcgetpgrp, tcsendbreak, tcsetattr, tcsetpgrp
 
+</para></sect2>
 <sect2><title>Language-Specific Services for the C Programming Language (Section 8) </title><para>
 
 abort, exit, fclose, fdopen, fflush, fgetc, fgets, fileno, fopen,
@@ -39,32 +44,37 @@ getc, getchar, gets, perror, printf, putc, putchar, puts, remove,
 rewind, scanf, setlocale, siglongjmp, sigsetjmp, tmpfile, tmpnam,
 tzset
 
+</para></sect2>
 <sect2><title>System Databases (Section 9) </title><para>
 
 getgrgid, getgrnam, getpwnam, getpwuid
 
+</para></sect2>
 <sect2><title>Synchronization (Section 11) </title><para>
 
 sem_init, sem_destroy, sem_wait, sem_trywait, sem_post,
 pthread_mutex_init, pthread_mutex_destroy, pthread_mutex_lock,
 pthread_mutex_trylock, pthread_mutex_unlock
 
+</para></sect2>
 <sect2><title>Memory Management (Section 12) </title><para>
 
 mmap, mprotect, msync, munmap
 
+</para></sect2>
 <sect2><title>Thread Management (Section 16) </title><para>
 
 pthread_attr_init, pthread_attr_destroy, pthread_attr_setstacksize,
 pthread_attr_getstacksize, pthread_create, pthread_exit, pthread_self,
 pthread_equal
 
+</para></sect2>
 <sect2><title>Thread-Specific Data Functions (Section 17) </title><para>
 
 pthread_key_create, pthread_setspecific, pthread_getspecific,
 pthread_key_delete
 
-</sect2>
+</para></sect2>
 
 <sect2><title>Implementation Details</title>
 

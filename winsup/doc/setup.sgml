@@ -13,7 +13,9 @@ tcl, tix, tk</para>
 findutils, gawk, grep, gzip, m4, sed, shellutils, tar, textutils,
 time</para>
 
-<sect1><title>Installing the binary release</title>
+</sect1>
+
+<sect1 id="installing-binaries"><title>Installing the binary release</title>
 
 <para>Load the GNUPro CD-ROM and run the installer.  It will
 take you through the installation process, starting with asking for
@@ -34,6 +36,8 @@ drive letter is mounted as `/'.</para>
 
 <para>If you should ever want to uninstall the tools, you may do so
 via the "Add/Remove Programs" control panel.</para>
+
+</sect1>
 
 DOCTOOL-INSERT-setup-dir
 DOCTOOL-INSERT-setup-env

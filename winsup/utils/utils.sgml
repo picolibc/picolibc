@@ -424,7 +424,7 @@ path location.</para>
 text files in the same manner by default.  Binary mode mounts are
 marked as "binmode" in the Flags column of <command>mount</command>
 output.  By default, mounts are in text mode ("textmode" in the Flags
-column).
+column).</para>
 
 <para>The "-x" flag is used to instruct Cygwin that the mounted file
 is "executable".  If the "-x" flag is used with a directory then
@@ -433,7 +433,7 @@ extensions (.exe, .com, .bat, .cmd) are assumed to be executable
 by default.  Files whose first two characters begin with '#!' are
 also considered to be executable.  This option allows other files
 to be marked as executable and avoids the overhead of opening each
-file to check for a '#!'.
+file to check for a '#!'.</para>
 
 </sect3>
 
@@ -466,6 +466,8 @@ specify the "-s" flag to make this the system-wide default prefix.  By
 default, the cygdrive-prefix applies only to the current user.  In the
 same way, you can specify the "-b" flag such that all new automounted
 filesystems default to binary mode file accesses.</para>
+
+</sect3>
 
 <sect3><title>Limitations</title>
 

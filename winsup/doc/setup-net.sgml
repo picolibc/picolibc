@@ -16,7 +16,7 @@ grep, gzip, less, m4, sed, shellutils, tar, textutils, time</para>
 <para>Full source code is available for these tools.</para>
 
 </sect1>
-<sect1><title>Installing the binary release</title>
+<sect1 id="installing-binaries"><title>Installing the binary release</title>
 
 <para>Important!  Be sure to remove any older versions of the Cygwin
 tools from your <EnVar>PATH</EnVar> environment variable so you do
@@ -77,7 +77,7 @@ instructions in the next section, else go directly to
 <Xref LinkEnd="setup-dir"> to complete your system setup.</para>
 
 </sect1>
-<sect1><title>Installing the source code</title>
+<sect1 id="installing-source"><title>Installing the source code</title>
 
 <para>Before downloading the source code corresponding to the release,
 you should install the latest release of the tools (either the full

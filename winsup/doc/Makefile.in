@@ -11,6 +11,8 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
+SGMLDIRS =  -d $(srcdir) -d $(utils_source) -d $(cygwin_source)
+
 DOC=faq.txt faq.info readme.txt readme.info
 HTMLDOC=faq.html readme.html
 
@@ -46,25 +48,25 @@ cygwin-ug/cygwin-ug.html : cygwin-ug.sgml doctool
 	-db2html $<
 
 cygwin-ug.sgml : cygwin-ug.in.sgml ./doctool Makefile
-	-./doctool -m -d $(srcdir) -d $(utils_source) -s $(srcdir) -o $@ $<
+	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
 cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.sgml doctool
 	-db2html $<
 
 cygwin-ug-net.sgml : cygwin-ug-net.in.sgml ./doctool Makefile
-	-./doctool -m -d $(srcdir) -d $(utils_source) -s $(srcdir) -o $@ $<
+	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
 cygwin-api/cygwin-api.html : cygwin-api.sgml
 	-db2html $<
 
 cygwin-api.sgml : cygwin-api.in.sgml ./doctool Makefile
-	-./doctool -m -d $(srcdir) -d $(utils_source) -s $(srcdir) -o $@ $<
+	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
 cygwin-api-int/cygwin-api-int.html : cygwin-api-int.sgml
 	-db2html $<
 
 cygwin-api-int.sgml : cygwin-api.in.sgml ./doctool Makefile
-	-./doctool -i -m -d $(srcdir) -d $(utils_source) -s $(srcdir) -b cygwin-api-int -o $@ $<
+	-./doctool -i -m $(SGMLDIRS) -s $(srcdir) -b cygwin-api-int -o $@ $<
 
 ./doctool : doctool.c
 	gcc -g $< -o $@

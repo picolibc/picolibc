@@ -1,6 +1,6 @@
 <chapter id="overview"><title>Cygwin Overview</title>
 
-<sect1><title>What is it?</title>
+<sect1 id="what-is-it"><title>What is it?</title>
 
 <para>The Cygwin tools are ports of the popular GNU development
 tools and utilities for Windows NT and 9x. They function through the
@@ -20,7 +20,7 @@ from the bash shell (provided) or from the command.com.</para>
 
 </sect1>
 
-<sect1><title>Are the Cygwin tools free software?</title>
+<sect1 id="are-free"><title>Are the Cygwin tools free software?</title>
 
 <para>Yes. Parts are GNU software (gcc, gas, ld, etc...), parts are
 covered by the standard X11 license, some of it is public domain,
@@ -38,7 +38,7 @@ sent to the project mailing list cygwin@sourceware.cygnus.com.</para>
 
 </sect1>
 
-<sect1><title>A brief history of the Cygwin project</title>
+<sect1 id="brief-history"><title>A brief history of the Cygwin project</title>
 
 <para>The first thing done was to enhance the development tools (gcc,
 gdb, gas, et al) so that they could generate/interpret Win32 native
@@ -72,7 +72,7 @@ the GNU configure mechanism. Self hosting was achieved as of the beta
 
 DOCTOOL-INSERT-ov-ex-unix
 DOCTOOL-INSERT-ov-ex-win
-<sect1><title>Highlights of Cygwin Functionality</title>
+<sect1 id="highlights"><title>Highlights of Cygwin Functionality</title>
 DOCTOOL-INSERT-ov-hi-intro
 DOCTOOL-INSERT-ov-hi-win9xnt
 DOCTOOL-INSERT-ov-hi-perm

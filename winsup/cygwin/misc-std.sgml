@@ -5,7 +5,7 @@
 standards:</para>
 
 
-<sect2><title>Networking</title><para>
+<sect2><title>Networking</title>
 
 <para>(Standardized by POSIX 1.g, which is probably still in draft?)</para>
 
@@ -38,6 +38,7 @@ strsignal, strtosigno, swab, syslog, timezone, truncate, ttyslot,
 unlockpt, unsetenv, usleep, utimes, vfork, vhangup, wait3, wait4,
 wcscmp, wcslen, wprintf, writev
 
+</para></sect2>
 <sect2><title>Implementation Notes</title>
 
 <para> <function>initgroups</function> does nothing</para>
@@ -59,7 +60,7 @@ An increment above REALTIME_PRIORITY_CLASS results in the process
 staying at that priority.  Likewise, a decrement to
 IDLE_PRIORITY_CLASS has it stay at that priority.  Note that in the
 Win32 API, there are 32 priorities.  So currently we only give access
-to four of these through <function>nice</function>.
+to four of these through <function>nice</function>.</para>
 
 <para> <function>seteuid</function> and <function>setegid</function>
 always return 0 and set errno to

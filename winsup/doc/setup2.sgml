@@ -269,7 +269,7 @@ set output-meta on
 # Ignore case while completing
 set completion-ignore-case on
 </screen>
-<para>The first three commands allow bash to display 8-bit characters,
+The first three commands allow bash to display 8-bit characters,
 useful for languages with accented characters.  The last line makes
 filename completion case insensitive, which can be convenient in a
 Windows environment.
