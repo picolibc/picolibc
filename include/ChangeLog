@@ -1,3 +1,8 @@
+2000-07-29  Nick Clifton  <nickc@cygnus.com>
+
+	* os9k.h: Add copyright notice.
+	Fix formatting.
+
 2000-07-22  Jason Eckhardt  <jle@cygnus.com>
 
 	* opcode/i860.h (btne, bte, bla): Changed these opcodes
