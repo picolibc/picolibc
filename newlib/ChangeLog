@@ -1,5 +1,9 @@
 2005-01-27  Hans-Peter Nilsson  <hp@axis.com>
 
+	* testsuite/include/check.h: Include stdlib.h.
+
+2005-01-27  Hans-Peter Nilsson  <hp@axis.com>
+
 	* Makefile.am (stmp-targ-include): Support include header files
 	from machine directories.
 	* Makefile.in: Regenerate.
