@@ -1,5 +1,9 @@
 2003-11-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygserver-config: Slightly modify printed message.
+
+2003-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (install): Install cygserver-config script to bindir.
 	* cygserver-config: New script.
 

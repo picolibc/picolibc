@@ -202,11 +202,8 @@ echo "Please keep in mind, that a client application which wants to use"
 echo "the services provided by cygserver *must* have the environment variable"
 echo "CYGWIN set so that it contains the word \"server\".  So, if you don't"
 echo "need any other special CYGWIN setting, just set it to \"server\"".
-echo "You can do this in the Windows system environment or in the local"
-echo "shell profiles like this:"
 echo
-echo "  export CYGWIN=server     in sh/bash/ksh/zsh or"
-echo "  setenv CYGWIN server     in tcsh."
+echo "It is advisable to add this setting to the Windows system environment."
 echo
 echo "Basic Cygserver configuration finished. Have fun!"
 echo
