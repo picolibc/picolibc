@@ -1,3 +1,8 @@
+2004-04-30  DJ Delorie  <dj@redhat.com>
+
+	* init.cc (threadfunc_fe): Hack to make thread stacks always 16
+	byte aligned.
+
 2004-04-21  Yitzchak Scott-Thoennes  <sthoenna@efn.org>
 
 	* syscalls.cc (lseek64): Fix debug_printf format string.

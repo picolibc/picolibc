@@ -27,6 +27,8 @@ HANDLE sync_startup;
 static void WINAPI
 threadfunc_fe (VOID *arg)
 {
+  (void)__builtin_return_address(1);
+  asm volatile ("andl $-16,%%esp" ::: "%esp");
   _cygtls::call ((DWORD (*)  (void *, void *)) (((char **) _tlsbase)[OLDFUNC_OFFSET]), arg);
 }
 
