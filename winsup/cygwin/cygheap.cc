@@ -57,7 +57,7 @@ init_cheap ()
   char buf[80];
   DWORD initial_sz = 0;
   if (!GetEnvironmentVariable ("CYGWIN_HEAPSIZE", buf, sizeof buf - 1))
-    alloc_sz = CYGHEAPSIZE;
+    initial_sz = alloc_sz = CYGHEAPSIZE;
   else
     {
       initial_sz = alloc_sz = atoi (buf);
@@ -148,14 +148,14 @@ cygheap_fixup_in_child (bool execed)
   void *newaddr;
 
   newaddr = MapViewOfFileEx (child_proc_info->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, addr);
+  alloc_sz = child_proc_info->cygheap_alloc_sz;
   if (newaddr != cygheap)
     {
       if (!newaddr)
 	newaddr = MapViewOfFileEx (child_proc_info->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
       DWORD n = (DWORD) cygheap_max - (DWORD) cygheap;
       /* Reserve cygwin heap in same spot as parent */
-      if (!VirtualAlloc (cygheap, child_proc_info->cygheap_alloc_sz,
-			 MEM_RESERVE, PAGE_NOACCESS))
+      if (!VirtualAlloc (cygheap, alloc_sz, MEM_RESERVE, PAGE_NOACCESS))
 	{
 	  MEMORY_BASIC_INFORMATION m;
 	  memset (&m, 0, sizeof m);
@@ -231,7 +231,7 @@ _csbrk (int sbs)
     /* nothing to do */;
   else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
     {
-#if 1
+#ifdef DEBUGGING
       system_printf ("couldn't commit memory for cygwin heap, prebrk %p, size %d, heapsize now %d, max heap size %u, %E",
 		     prebrk, sbs, (char *) cygheap_max - (char *) cygheap,
 		     alloc_sz);

@@ -1,5 +1,13 @@
 2004-03-21  Christopher Faylor  <cgf@redhat.com>
 
+	* cygheap.cc (init_cheap): Set initial_sz to something or suffer
+	spurious output.
+	(cygheap_fixup_in_child): Set alloc_sz to passed in size to ensure that
+	children will have the right size heap.
+	(_csbrk): Make output conditional on DEBUGGING.
+
+2004-03-21  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (init_cheap): Conditionalize debugging code.
 
 2004-03-21  Christopher Faylor  <cgf@redhat.com>
