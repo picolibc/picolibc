@@ -1,5 +1,9 @@
 2002-01-19  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-01-19  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in (new-cygwin1.dll): Just use -lsupc++ for link.
 	* sigproc.cc (proc_exists): Change existence criteria.
 	* sync.h (new_muto): Add volatile to definition to avoid gcc
