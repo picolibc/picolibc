@@ -1,3 +1,7 @@
+Fri Feb  9 12:17:27 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (mknod): Add valid parameters.
+
 Thu Feb  8 22:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (mmap): Check for reusing a mapping only on MAP_SHARED

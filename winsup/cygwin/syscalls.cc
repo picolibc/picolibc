@@ -1844,7 +1844,7 @@ regfree ()
    fileutils) assume its existence so we must provide a stub that always
    fails. */
 extern "C" int
-mknod ()
+mknod (const char *_path, mode_t mode, dev_t dev)
 {
   set_errno (ENOSYS);
   return -1;
