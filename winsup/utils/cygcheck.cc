@@ -780,14 +780,27 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
     *p = '\\';
 
   if (access (id, X_OK))
-    fprintf (stderr, "`id' program not found\n");
+    {
+      fprintf (stderr, "`id' program not found\n");
+      return;
+    }
 
   FILE *f = popen (id, "rt");
 
   char buf[16384];
+  static char empty[] = "";
+  buf[0] = '\0';
   fgets (buf, sizeof (buf), f);
-  char *uid = strtok (buf, ")") + strlen ("uid=");
-  char *gid = strtok (NULL, ")") + strlen ("gid=") + 1;
+  char *uid = strtok (buf, ")");
+  if (uid)
+    uid += strlen ("uid=");
+  else
+    uid = empty;
+  char *gid = strtok (NULL, ")");
+  if (gid)
+    gid += strlen ("gid=") + 1;
+  else
+    gid = empty;
   char **ng;
   size_t sz = 0;
   for (ng = groups; (*ng = strtok (NULL, ",")); ng++)

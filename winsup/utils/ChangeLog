@@ -1,3 +1,7 @@
+2004-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* cygcheck.cc (pretty_id): Make more robust in absence of id.exe.
+
 2004-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc (dowin): Revert accidental checkin from November.
