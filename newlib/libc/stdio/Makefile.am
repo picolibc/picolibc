@@ -33,6 +33,8 @@ LIB_SOURCES = \
 	fwrite.c 			\
 	getc.c 				\
 	getchar.c 			\
+	getc_u.c			\
+	getchar_u.c			\
 	gets.c 				\
 	getw.c				\
 	iprintf.c 			\
@@ -42,6 +44,8 @@ LIB_SOURCES = \
 	printf.c 			\
 	putc.c 				\
 	putchar.c 			\
+	putc_u.c			\
+	putchar_u.c			\
 	puts.c 				\
 	putw.c				\
 	refill.c 			\
@@ -121,6 +125,8 @@ CHEWOUT_FILES = \
 	fwrite.def		\
 	getc.def		\
 	getchar.def		\
+	getc_u.def		\
+	getchar_u.def		\
 	gets.def		\
 	getw.def		\
 	iprintf.def		\
@@ -128,6 +134,8 @@ CHEWOUT_FILES = \
 	perror.def		\
 	putc.def		\
 	putchar.def		\
+	putc_u.def		\
+	putchar_u.def		\
 	puts.def		\
 	putw.def		\
 	remove.def		\

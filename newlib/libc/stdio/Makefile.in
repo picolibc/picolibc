@@ -131,6 +131,8 @@ LIB_SOURCES = \
 	fwrite.c 			\
 	getc.c 				\
 	getchar.c 			\
+	getc_u.c			\
+	getchar_u.c			\
 	gets.c 				\
 	getw.c				\
 	iprintf.c 			\
@@ -140,6 +142,8 @@ LIB_SOURCES = \
 	printf.c 			\
 	putc.c 				\
 	putchar.c 			\
+	putc_u.c			\
+	putchar_u.c			\
 	puts.c 				\
 	putw.c				\
 	refill.c 			\
@@ -206,6 +210,8 @@ CHEWOUT_FILES = \
 	fwrite.def		\
 	getc.def		\
 	getchar.def		\
+	getc_u.def		\
+	getchar_u.def		\
 	gets.def		\
 	getw.def		\
 	iprintf.def		\
@@ -213,6 +219,8 @@ CHEWOUT_FILES = \
 	perror.def		\
 	putc.def		\
 	putchar.def		\
+	putc_u.def		\
+	putchar_u.def		\
 	puts.def		\
 	putw.def		\
 	remove.def		\
@@ -251,8 +259,9 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@findfp.o fiprintf.o flags.o fopen.o fprintf.o \
 @USE_LIBTOOL_FALSE@fputc.o fputs.o fread.o freopen.o fscanf.o fseek.o \
 @USE_LIBTOOL_FALSE@fsetpos.o ftell.o fvwrite.o fwalk.o fwrite.o getc.o \
-@USE_LIBTOOL_FALSE@getchar.o gets.o getw.o iprintf.o makebuf.o mktemp.o \
-@USE_LIBTOOL_FALSE@perror.o printf.o putc.o putchar.o puts.o putw.o \
+@USE_LIBTOOL_FALSE@getchar.o getc_u.o getchar_u.o gets.o getw.o \
+@USE_LIBTOOL_FALSE@iprintf.o makebuf.o mktemp.o perror.o printf.o \
+@USE_LIBTOOL_FALSE@putc.o putchar.o putc_u.o putchar_u.o puts.o putw.o \
 @USE_LIBTOOL_FALSE@refill.o remove.o rename.o rewind.o rget.o scanf.o \
 @USE_LIBTOOL_FALSE@setbuf.o setvbuf.o siprintf.o snprintf.o sprintf.o \
 @USE_LIBTOOL_FALSE@sscanf.o stdio.o tmpfile.o tmpnam.o ungetc.o \
@@ -268,12 +277,13 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@fopen.lo fprintf.lo fputc.lo fputs.lo fread.lo \
 @USE_LIBTOOL_TRUE@freopen.lo fscanf.lo fseek.lo fsetpos.lo ftell.lo \
 @USE_LIBTOOL_TRUE@fvwrite.lo fwalk.lo fwrite.lo getc.lo getchar.lo \
-@USE_LIBTOOL_TRUE@gets.lo getw.lo iprintf.lo makebuf.lo mktemp.lo \
-@USE_LIBTOOL_TRUE@perror.lo printf.lo putc.lo putchar.lo puts.lo \
-@USE_LIBTOOL_TRUE@putw.lo refill.lo remove.lo rename.lo rewind.lo \
-@USE_LIBTOOL_TRUE@rget.lo scanf.lo setbuf.lo setvbuf.lo siprintf.lo \
-@USE_LIBTOOL_TRUE@snprintf.lo sprintf.lo sscanf.lo stdio.lo tmpfile.lo \
-@USE_LIBTOOL_TRUE@tmpnam.lo ungetc.lo vfscanf.lo vprintf.lo vscanf.lo \
+@USE_LIBTOOL_TRUE@getc_u.lo getchar_u.lo gets.lo getw.lo iprintf.lo \
+@USE_LIBTOOL_TRUE@makebuf.lo mktemp.lo perror.lo printf.lo putc.lo \
+@USE_LIBTOOL_TRUE@putchar.lo putc_u.lo putchar_u.lo puts.lo putw.lo \
+@USE_LIBTOOL_TRUE@refill.lo remove.lo rename.lo rewind.lo rget.lo \
+@USE_LIBTOOL_TRUE@scanf.lo setbuf.lo setvbuf.lo siprintf.lo snprintf.lo \
+@USE_LIBTOOL_TRUE@sprintf.lo sscanf.lo stdio.lo tmpfile.lo tmpnam.lo \
+@USE_LIBTOOL_TRUE@ungetc.lo vfscanf.lo vprintf.lo vscanf.lo \
 @USE_LIBTOOL_TRUE@vsnprintf.lo vsprintf.lo vsscanf.lo wbuf.lo wsetup.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

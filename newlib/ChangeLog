@@ -1,3 +1,15 @@
+2002-05-08  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/stdio/getc_u.c: New file.
+	* libc/stdio/getchar_u.c: New file.
+	* libc/stdio/putc_u.c: New file.
+	* libc/stdio/putchar_u.c: New file.
+	* libc/include/stdio.h: Add declarations for getc_unlocked,
+	getchar_unlocked, putc_unlocked and putchar_unlocked.
+	* libc/stdio/Makefile.am (LIB_SOURCES): Add new files.
+	(CHEWOUT_FILES): Add new files' .def's.
+	* libc/stdio/putchar.c (_putchar_r): Replace __sputc with putc.
+
 Wed May  8 17:47:35 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/machine/sh/memset.S (memset, __SHMEDIA__ code):

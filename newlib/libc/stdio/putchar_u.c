@@ -17,81 +17,64 @@
 
 /*
 FUNCTION
-<<putchar>>---write a character (macro)
+<<putchar_unlocked>>---non-thread-safe version of putchar (macro)
 
 INDEX
-	putchar
-INDEX
-	_putchar_r
+	putchar_unlocked
 
-ANSI_SYNOPSIS
+POSIX_SYNOPSIS
 	#include <stdio.h>
-	int putchar(int <[ch]>);
-
-	int _putchar_r(void *<[reent]>, int <[ch]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int putchar(<[ch]>)
-	int <[ch]>;
-
-	int _putchar_r(<[reent]>, <[ch]>)
-	char *<[reent]>;
-	int <[ch]>;
+	int putchar_unlocked(int <[ch]>);
 
 DESCRIPTION
-<<putchar>> is a macro, defined in <<stdio.h>>.  <<putchar>>
-writes its argument to the standard output stream,
-after converting it from an <<int>> to an <<unsigned char>>.
-
-The alternate function <<_putchar_r>> is a reentrant version.  The
-extra argument <[reent]> is a pointer to a reentrancy structure.
+<<putchar_unlocked>> is a non-thread-safe version of <<putchar>>
+declared in <<stdio.h>>.  <<putchar_unlocked>> may only safely be used
+within a scope protected by flockfile() (or ftrylockfile()) and
+funlockfile().  These functions may safely be used in a multi-threaded
+program if and only if they are called while the invoking thread owns
+the ( FILE *) object, as is the case after a successful call to the
+flockfile() or ftrylockfile() functions.  If threads are disabled,
+then <<putchar_unlocked>> is equivalent to <<putchar>>.
 
 RETURNS
-If successful, <<putchar>> returns its argument <[ch]>.  If an error
-intervenes, the result is <<EOF>>.  You can use `<<ferror(stdin)>>' to
-query for errors.
+See <<putchar>>.
 
 PORTABILITY
-ANSI C requires <<putchar>>; it suggests, but does not require, that
-<<putchar>> be implemented as a macro.
+POSIX 1003.1 requires <<putchar_unlocked>>.  <<putchar_unlocked>> may
+be implemented as a macro.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
-<<lseek>>, <<read>>, <<sbrk>>, <<write>>.
-*/
+<<lseek>>, <<read>>, <<sbrk>>, <<write>>.  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
 /*
- * A subroutine version of the macro putchar.
+ * A subroutine version of the macro putchar_unlocked.
  */
 
 #include <stdio.h>
 
-#include "local.h"
-
-#undef putchar
+#undef putchar_unlocked
 
 int
-_putchar_r (ptr, c)
+_putchar_unlocked_r (ptr, c)
      struct _reent *ptr;
      int c;
 {
-  _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
-  return putc (c, _stdout_r (ptr));
+  return putc_unlocked (c, _stdout_r (ptr));
 }
 
 #ifndef _REENT_ONLY
 
 int
-putchar (c)
+putchar_unlocked (c)
      int c;
 {
   /* CHECK_INIT is (eventually) called by __swbuf.  */
 
-  return _putchar_r (_REENT, c);
+  _putchar_unlocked_r (_REENT, c);
 }
 
 #endif

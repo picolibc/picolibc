@@ -222,9 +222,13 @@ FILE *  _EXFUN(popen, (const char *, const char *));
 int	_EXFUN(putw, (int, FILE *));
 void    _EXFUN(setbuffer, (FILE *, char *, int));
 int	_EXFUN(setlinebuf, (FILE *));
-void    _EXFUN(flockfile, (FILE *));
-int     _EXFUN(ftrylockfile, (FILE *));
-void    _EXFUN(funlockfile, (FILE *));
+int	_EXFUN(getc_unlocked, (FILE *));
+int	_EXFUN(getchar_unlocked, (void));
+void	_EXFUN(flockfile, (FILE *));
+int	_EXFUN(ftrylockfile, (FILE *));
+void	_EXFUN(funlockfile, (FILE *));
+int	_EXFUN(putc_unlocked, (int, FILE *));
+int	_EXFUN(putchar_unlocked, (int));
 #endif
 
 /*
