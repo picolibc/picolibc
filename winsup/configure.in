@@ -57,7 +57,7 @@ AC_CANONICAL_SYSTEM
 
 LIB_AC_PROG_CC
 
-SUBDIRS="cygwin w32api mingw utils doc"
+SUBDIRS="cygwin w32api mingw utils doc cinstall"
 AC_CONFIG_SUBDIRS($SUBDIRS)
 AC_PROG_MAKE_SET
 
