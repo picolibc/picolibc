@@ -1,3 +1,8 @@
+2004-03-11  Brian Keener  <bkeener@thesoftwaresource.com>
+
+	* include/process.h: Remove the #endif associated with removal of
+	__STRICT_ANSI__ guard from non-ANSI header.
+
 2004-03-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/conio.h: Remove __STRICT_ANSI__ guard from non-ANSI header.
