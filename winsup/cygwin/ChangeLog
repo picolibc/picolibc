@@ -1,3 +1,7 @@
+2003-11-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc: Renamed from flock.c.
+
 2003-11-29  Christopher Faylor  <cgf@redhat.com>
 
 	* pinfo.h: Remove global_sigs declaration.
