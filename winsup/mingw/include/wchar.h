@@ -105,17 +105,24 @@ int 	_wfindnexti64 (long, struct _wfinddatai64_t*);
 int	fwprintf (FILE*, const wchar_t*, ...);
 int	wprintf (const wchar_t*, ...);
 int	swprintf (wchar_t*, const wchar_t*, ...);
-int	_swnprintf (wchar_t*, size_t, const wchar_t*, ...);
+int	_snwprintf (wchar_t*, size_t, const wchar_t*, ...);
 int	vfwprintf (FILE*, const wchar_t*, va_list);
 int	vwprintf (const wchar_t*, va_list);
 int	vswprintf (wchar_t*, const wchar_t*, va_list);
-int	_vswnprintf (wchar_t*, size_t, const wchar_t*, va_list);
+int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, va_list);
 int	fwscanf (FILE*, const wchar_t*, ...);
 int	wscanf (const wchar_t*, ...);
 int	swscanf (const wchar_t*, const wchar_t*, ...);
 wint_t	fgetwc (FILE*);
 wint_t	fputwc (wchar_t, FILE*);
 wint_t	ungetwc (wchar_t, FILE*);
+
+#ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
+int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
+extern inline int vsnwprintf (wchar_t* s, size_t n, const wchar_t* format,
+			   va_list arg)
+  { return _vsnwprintf ( s, n, format, arg); }
+#endif
 
 #ifdef __MSVCRT__ 
 wchar_t* fgetws (wchar_t*, int, FILE*);

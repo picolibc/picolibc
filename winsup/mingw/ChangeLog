@@ -1,7 +1,25 @@
+2002-03-29  Danny Smith  <dannysmith@sourceforge.users.net>
+
+	* include/stdint.h: Add missing newline at eof. 
+	* include/stdio.h (_snwprintf): Correct spelling.
+	(_vsnwprintf): Likewise.
+	(snprintf): Add prototype.
+	(vsnprintf): Add prototype and inline definition.
+	(snwprintf): Add prototype.
+	(vsnwprintf): Add prototype and inline definition.
+	* include/wchar.h (_snwprintf): Correct spelling.
+	(_vsnwprintf): Likewise.
+	(snwprintf): Add prototype.
+	(vsnwprintf): Add prototype and inline definition.
+	* mingwex/Makefile.in: Add snprintf.o, snwprintf.o
+	to libmingwex.a.
+	* mingwex/snprintf.c: New file.
+	* mingwex/snwprintf.c: New file.
+
 2002-03-26  Danny Smith  <dannysmith@sourceforge.users.net>
 
-	* moldname.def.in (__MSVCRT__): Replace with !(__CRTDLL).
-	(wpopen): Add if !(__CRTDLL).
+	* moldname.def.in (__MSVCRT__): Replace with !(__CRTDLL__).
+	(wpopen): Add if !(__CRTDLL__).
 	* Makefile.in (moldname-msvcrt.def rule): Use -C, not -c to
 	preserve comments.
 	(moldname-crtdll.def rule): Likewise.

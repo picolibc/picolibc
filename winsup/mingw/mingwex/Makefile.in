@@ -61,6 +61,8 @@ DISTFILES = Makefile.in configure configure.in \
 	round.c \
 	signbit.c \
 	sitest.c \
+	snprintf.c \
+	snwprintf.c \
 	strtof.c \
 	strtoimax.c \
 	strtoumax.c \
@@ -118,6 +120,8 @@ STDLIB_STUB_OBJS = \
 	lltow.o ulltow.o \
 	atoll.o wtoll.o \
 	strtof.o wcstof.o
+STDIO_STUB_OBJS = \
+	snprintf.o snwprintf.o
 MATH_OBJS = \
 	fpclassify.o fucom.o round.o \
 	rint.o signbit.o trunc.o \
@@ -133,8 +137,8 @@ FENV_OBJS = fesetround.o  fegetround.o \
 POSIX_OBJS = \
 	dirent.o
 
-LIB_OBJS = $(Q8_OBJS) $(STDLIB_STUB_OBJS) $(MATH_OBJS) $(MATH_STUB_OBJS) \
-	$(FENV_OBJS) $(POSIX_OBJS)
+LIB_OBJS = $(Q8_OBJS) $(STDLIB_STUB_OBJS) $(STDIO_STUB_OBJS) \
+	$(MATH_OBJS) $(MATH_STUB_OBJS) $(FENV_OBJS) $(POSIX_OBJS) 
 
 LIBS = $(LIBMINGWEX_A)
 DLLS = 
