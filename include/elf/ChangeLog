@@ -1,3 +1,54 @@
+1999-12-27  Nick Clifton  <nickc@cygnus.com>
+
+	* common.h: Upgrade to match Oct4, 1999 Draft ELF ABI Spec.
+	(EM_MIPS_RS3_LE): New machine number.
+	(EM_RCE): New machine number.
+	(EM_MMA): New machine number.
+	(EM_PCP): New machine number.
+	(EM_NCPU): New machine number.
+	(EM_NDR1): New machine number.
+	(EM_STARCORE): New machine number.
+	(EM_ME16): New machine number.
+	(EM_ST100): New machine number.
+	(EM_TINYJ): New machine number.
+	(EM_FX66): New machine number.
+	(EM_ST9PLUS): New machine number.
+	(EM_ST7): New machine number.
+	(EM_68HC16): New machine number.
+	(EM_68HC11): New machine number.
+	(EM_68HC08): New machine number.
+	(EM_68HC05): New machine number.
+	(EM_SVX): New machine number.
+	(EM_VAX): New machine number.
+	(PF_MASKOS): Change value.
+	(SHT_INIT_ARRAY): New value for sh_type field.
+	(SHT_FINI_ARRAY): New value for sh_type field.
+	(SHT_PREINIT_ARRAY): New value for sh_type field.
+	(SHT_HIUSER): Change value.
+	(SHF_MERGE): New valye for sh_flags field.
+	(SHF_STRINGS): New valye for sh_flags field.
+	(SHF_INFO_LINK): New valye for sh_flags field.
+	(SHF_OS_NONCONFORMING): New valye for sh_flags field.
+	(SHF_MASKOS): Change value.
+	(ELF_ST_VISIBILITY): New macro.
+	(ELF_ST_OTHER): New macro.
+	(STT_COMMON): New symbol type.
+	(STV_DEFAULT): Value for symbol visibility.
+	(STV_INTERNAL): Value for symbol visibility.
+	(STV_HIDDEN): Value for symbol visibility.
+	(STV_PROTECTED): Value for symbol visibility.
+	(DT_RUNPATH): New dynamic section tag.
+	(DT_FLAGS): New dynamic section tag.
+	(DT_ENCODING): New dynamic section tag.
+	(DT_PREINIT_ARRAY): New dynamic section tag.
+	(DT_PREINIT_ARRAYSZ): New dynamic section tag.
+	(DT_LOPROC): New dynamic section tag index.
+	(DT_HIPROC): New dynamic section tag index.
+	(DF_ORIGIN): Value for dynamic section flag.
+	(DF_SYMBOLIC): Value for dynamic section flag.
+	(DF_TEXTREL): Value for dynamic section flag.
+	(DF_BIND_NOW): Value for dynamic section flag.
+
 1999-12-09  Fred Fish  <fnf@cygnus.com>
 
 	* i960.h (reloc-macros.h):  Include using relative dir elf/.
