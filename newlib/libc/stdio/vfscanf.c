@@ -872,6 +872,10 @@ _DEFUN(__svfscanf_r, (rptr, fp, fmt0, ap),
 		    {
 		      base = 16;/* if %i */
 		      flags &= ~PFXOK;
+		      /* We must reset the NZDIGITS and NDIGITS
+		         flags that would have been unset by seeing
+			 the zero that preceded the X or x.  */
+		      flags |= NZDIGITS | NDIGITS;
 		      goto ok;
 		    }
 		  break;
