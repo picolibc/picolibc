@@ -1,3 +1,7 @@
+2002-05-22  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/isnanl.c: New file.
+
 2002-05-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdint.h: Include stddef.h to get
