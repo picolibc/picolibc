@@ -45,7 +45,7 @@ struct external_filehdr {
 
 /* This value is made available in the rare case where a bfd is unavailable */
 #ifndef OCTETS_PER_BYTE_POWER
-#warn OCTETS_PER_BYTE_POWER not defined for this CPU, it will default to 0
+#warning OCTETS_PER_BYTE_POWER not defined for this CPU, it will default to 0
 #else
 #define OCTETS_PER_BYTE (1<<OCTETS_PER_BYTE_POWER)
 #endif
