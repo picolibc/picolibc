@@ -583,7 +583,6 @@ static const template i386_optab[] = {
 {"fld",    1,	0xdb, 5, 0,	 x_FP|Modrm,		{ LLongMem, 0, 0} },
 {"fild",   1,	0xdf, 0, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 /* Intel Syntax */
-{"fildd",  1,	0xdf, 5, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
 {"fildq",  1,	0xdf, 5, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
 {"fildll", 1,	0xdf, 5, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
 {"fldt",   1,	0xdb, 5, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
@@ -603,7 +602,6 @@ static const template i386_optab[] = {
 {"fstp",   1,	0xdb, 7, 0,	 x_FP|Modrm,		{ LLongMem, 0, 0} },
 {"fistp",  1,	0xdf, 3, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 /* Intel Syntax */
-{"fistpd", 1,	0xdf, 7, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
 {"fistpq", 1,	0xdf, 7, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
 {"fistpll",1,	0xdf, 7, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
 {"fstpt",  1,	0xdb, 7, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
@@ -1308,7 +1306,6 @@ static const template i386_optab[] = {
 {"addsubps",  2, 0xf20fd0,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"fisttp",    1, 0xdf,      1, CpuPNI, sl_FP|FloatMF|Modrm, { ShortMem|LongMem, 0, 0} },
 /* Intel Syntax */
-{"fisttpd",   1, 0xdd,      1, CpuPNI, FP|Modrm,	{ LLongMem, 0, 0} },
 {"fisttpq",   1, 0xdd,      1, CpuPNI, FP|Modrm,	{ LLongMem, 0, 0} },
 {"fisttpll",  1, 0xdd,      1, CpuPNI, FP|Modrm,	{ LLongMem, 0, 0} },
 {"haddpd",    2, 0x660f7c,  X, CpuPNI, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },

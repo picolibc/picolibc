@@ -1,3 +1,7 @@
+2004-06-24  Alan Modra  <amodra@bigpond.net.au>
+
+	* i386.h (i386_optab): Remove fildd, fistpd and fisttpd.
+
 2004-05-24  Peter Barada  <peter@the-baradas.com>
 
 	* m68k.h: Add 'size' to m68k_opcode.
