@@ -63,12 +63,12 @@ _DEFUN(_vsscanf_r, (ptr, str, fmt, ap),
 {
   FILE f;
 
-  f._flags = __SRD;
+  f._flags = __SRD | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._r = strlen (str);
   f._read = eofread1;
   f._ub._base = NULL;
   f._lb._base = NULL;
-  return __svfscanf_r (ptr, &f, fmt, ap);    
+  f._file = -1;  /* No file. */
+  return __svfscanf_r (ptr, &f, fmt, ap);
 }
-

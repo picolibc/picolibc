@@ -402,12 +402,13 @@ sscanf(str, fmt, va_alist)
   va_list ap;
   FILE f;
 
-  f._flags = __SRD;
+  f._flags = __SRD | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._r = strlen (str);
   f._read = eofread;
   f._ub._base = NULL;
   f._lb._base = NULL;
+  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
@@ -439,12 +440,13 @@ _sscanf_r(ptr, str, fmt, va_alist)
   va_list ap;
   FILE f;
 
-  f._flags = __SRD;
+  f._flags = __SRD | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._r = strlen (str);
   f._read = eofread;
   f._ub._base = NULL;
   f._lb._base = NULL;
+  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else

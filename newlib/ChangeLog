@@ -1,5 +1,24 @@
 2004-09-16  Antony King  <antony.king@st.com>
 
+	* libc/include/sys/lock.h: Replaced empty {} with (0) to conform
+	with locking API.
+	* libc/include/sys/stdio.h: (_flockfile)[!_SINGLE_THREAD]: Add 
+	check for__SSTR in _flags and if set, skip lock request.
+	(_funlockfile)[!SINGLE_THREAD]: Ditto.
+	* libc/stdio/local.h (CHECK_INIT): Added check that _REENT is
+	not NULL.
+	* libc/stdio/siprintf.c (siprintf, _siprintf_r): Added missing
+	initialisation of _file to -1 in local FILE.
+	* libc/stdio/snprintf.c (snprintf, _snprintf_r): Ditto.
+	* libc/stdio/sscanf.c (sscanf, _sscanf_r): Ditto.
+	* libc/stdio/vsnprintf.c (vsnprintf, _vsnprintf_r): Ditto.
+	* libc/stdio/vsscanf.c (_vsscanf_r): Ditto.
+	* libc/stdio/sscanf.c (sscanf, _sscanf_r): Added __SSTR flag to
+	_flags in local FILE to prevent locking.
+	* libc/stdio/vsscanf.c (_vsscanf_r): Ditto.
+
+2004-09-16  Antony King  <antony.king@st.com>
+
 	* libc/stdio/fwalk.c (_fwalk): Remove check for _GLOBAL_REENT
 	and only walk the reentrancy parameter.
 	(_fwalk_reent): Ditto.

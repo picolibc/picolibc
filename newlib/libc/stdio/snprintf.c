@@ -51,6 +51,7 @@ _snprintf_r(ptr, str, size, fmt, va_alist)
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
+  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
@@ -86,6 +87,7 @@ snprintf(str, size, fmt, va_alist)
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
+  f._file = -1;  /* No file. */
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
