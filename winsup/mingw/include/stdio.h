@@ -210,12 +210,11 @@ void	setbuf (FILE*, char*);
 int	fprintf (FILE*, const char*, ...);
 int	printf (const char*, ...);
 int	sprintf (char*, const char*, ...);
-int     _snprintf (char*, size_t, const char*, ...);
+int	_snprintf (char*, size_t, const char*, ...);
 int	vfprintf (FILE*, const char*, va_list);
 int	vprintf (const char*, va_list);
 int	vsprintf (char*, const char*, va_list);
-int     _vsnprintf (char*, size_t, const char*, va_list);
-
+int	_vsnprintf (char*, size_t, const char*, va_list);
 
 /*
  * Formatted Input
@@ -251,9 +250,9 @@ size_t	fwrite (const void*, size_t, size_t, FILE*);
  * File Positioning Functions
  */
 
-int	fseek	(FILE*, long, int);
-long	ftell	(FILE*);
-void	rewind	(FILE*);
+int	fseek (FILE*, long, int);
+long	ftell (FILE*);
+void	rewind (FILE*);
 
 /*
  * An opaque data type used for storing file positions... The contents of
@@ -298,7 +297,7 @@ int	pclose (FILE*);
 /*
  * Other Non ANSI functions
  */
-int  _flushall(void);
+int	_flushall (void);
 int	_fgetchar (void);
 int	_fputchar (int);
 FILE*	_fdopen (int, const char*);
@@ -320,9 +319,11 @@ int	fileno (FILE*);
 int	fwprintf (FILE*, const wchar_t*, ...);
 int	wprintf (const wchar_t*, ...);
 int	swprintf (wchar_t*, const wchar_t*, ...);
+int	_swnprintf (wchar_t*, size_t, const wchar_t*, ...);
 int	vfwprintf (FILE*, const wchar_t*, va_list);
 int	vwprintf (const wchar_t*, va_list);
 int	vswprintf (wchar_t*, const wchar_t*, va_list);
+int	_vswnprintf (wchar_t*, size_t, const wchar_t*, va_list);
 int	fwscanf (FILE*, const wchar_t*, ...);
 int	wscanf (const wchar_t*, ...);
 int	swscanf (const wchar_t*, const wchar_t*, ...);
@@ -330,23 +331,23 @@ wint_t	fgetwc (FILE*);
 wint_t	fputwc (wchar_t, FILE*);
 wint_t	ungetwc (wchar_t, FILE*);
 #ifdef __MSVCRT__ 
-wchar_t*    fgetws (wchar_t*, int, FILE*);
-int         fputws (const wchar_t*, FILE*);
-wint_t		getwc (FILE*);
-wint_t	    getwchar (void);
-wchar_t*    _getws (wchar_t*);
-wint_t	    putwc (wint_t, FILE*);
-int         _putws (const wchar_t*);
-wint_t	    putwchar (wint_t);
+wchar_t* fgetws (wchar_t*, int, FILE*);
+int	fputws (const wchar_t*, FILE*);
+wint_t	getwc (FILE*);
+wint_t	getwchar (void);
+wchar_t* _getws (wchar_t*);
+wint_t	putwc (wint_t, FILE*);
+int	_putws (const wchar_t*);
+wint_t	putwchar (wint_t);
 FILE*	_wfopen (const wchar_t*, const wchar_t*);
 FILE*	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
-FILE*   _wfsopen(const wchar_t*, const wchar_t*, int);
-wchar_t*	_wtmpnam (wchar_t*);
-wchar_t*	_wtempnam (const wchar_t*, const wchar_t*);
-int 	_wrename(const wchar_t*, const wchar_t*);
-int 	_wremove (const wchar_t*);
-void  _wperror(const wchar_t*);
-FILE*  _wpopen(const wchar_t*, const wchar_t*);
+FILE*	_wfsopen (const wchar_t*, const wchar_t*, int);
+wchar_t* _wtmpnam (wchar_t*);
+wchar_t* _wtempnam (const wchar_t*, const wchar_t*);
+int	_wrename (const wchar_t*, const wchar_t*);
+int	_wremove (const wchar_t*);
+void	_wperror (const wchar_t*);
+FILE*	_wpopen (const wchar_t*, const wchar_t*);
 #endif	/* __MSVCRT__ */
 #define _WSTDIO_DEFINED
 #endif /* _WSTDIO_DEFINED */
@@ -354,31 +355,21 @@ FILE*  _wpopen(const wchar_t*, const wchar_t*);
 #ifndef __STRICT_ANSI__
 #ifdef __MSVCRT__
 #ifndef NO_OLDNAMES
-#if 0
 FILE*	wpopen (const wchar_t*, const wchar_t*);
-#else /* Always true */
-/*
- * The above prototypeing is not possible unless the wpopen export is added
- * to moldnames, which can't be done unless we make separate moldnames.def
- * files for every supported runtime. For the time being we use a define
- * instead. Pedro's modified dlltool should take care of this I think.
- */
-#define wpopen _wpopen
-#endif	/* Always true */
 #endif /* not NO_OLDNAMES */
 #endif /* MSVCRT runtime */
 
 /*
  * Other Non ANSI wide functions
  */
-wint_t	_fgetwchar(void);
-wint_t	_fputwchar(wint_t);
+wint_t	_fgetwchar (void);
+wint_t	_fputwchar (wint_t);
 int	_getw (FILE*);
 int	_putw (int, FILE*);
 
 #ifndef _NO_OLDNAMES
-wint_t	fgetwchar(void);
-wint_t	fputwchar(wint_t);
+wint_t	fgetwchar (void);
+wint_t	fputwchar (wint_t);
 int	getw (FILE*);
 int	putw (int, FILE*);
 #endif	/* Not _NO_OLDNAMES */

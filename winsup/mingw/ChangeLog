@@ -1,4 +1,21 @@
-ChangeLog  2002-03-22  Danny Smith   <dannysmith@users.sourceforge>
+2002-03-26  Danny Smith  <dannysmith@sourceforge.users.net>
+
+	* moldname.def.in (__MSVCRT__): Replace with !(__CRTDLL).
+	(wpopen): Add if !(__CRTDLL).
+	* Makefile.in (moldname-msvcrt.def rule): Use -C, not -c to
+	preserve comments.
+	(moldname-crtdll.def rule): Likewise.
+	* moldname-msvcrt.def: Regenerate.
+	* moldname-crtdll.def: Regenerate.
+	* include/stdio.h (wpopen):Use prototype, not a define.
+	(_swnprintf): Add prototype.
+	(_vswnprintf}: Likewise.
+	Tidy up whitespace.
+	* include/wchar.h (_swnprintf): Add prototype.
+	(_vswnprintf): Likewise.
+	Tidy up whitespace.
+
+2002-03-22  Danny Smith   <dannysmith@users.sourceforge>
 
 	* configure.in: Add mingwex as SUBDIRS and configdirs.
 	* configure: Regenerate.

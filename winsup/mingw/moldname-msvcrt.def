@@ -1,5 +1,5 @@
 ;
-; moldname-msvcrt.def 
+; moldname-msvcrt.def
 ;
 ; Exports from the runtime except that these exports are actually preceeded
 ; by a underscore in the actual DLL. These correspond to functions which
@@ -10,18 +10,18 @@
 ; underscored functions.
 ;
 ; Contributors:
-;  Created by Colin Peters <colin@bird.fu.is.saga-u.ac.jp>
-;  Maintained by Mumit Khan <khan@xraylith.wisc.edu>
+; Created by Colin Peters <colin@bird.fu.is.saga-u.ac.jp>
+; Maintained by Mumit Khan <khan@xraylith.wisc.edu>
 ;
-;  THIS SOFTWARE IS NOT COPYRIGHTED
+; THIS SOFTWARE IS NOT COPYRIGHTED
 ;
-;  This source code is offered for use in the public domain. You may
-;  use, modify or distribute it freely.
+; This source code is offered for use in the public domain. You may
+; use, modify or distribute it freely.
 ;
-;  This code is distributed in the hope that it will be useful but
-;  WITHOUT ANY WARRANTY. ALL WARRENTIES, EXPRESS OR IMPLIED ARE HEREBY
-;  DISCLAMED. This includes but is not limited to warrenties of
-;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+; This code is distributed in the hope that it will be useful but
+; WITHOUT ANY WARRANTY. ALL WARRENTIES, EXPRESS OR IMPLIED ARE HEREBY
+; DISCLAMED. This includes but is not limited to warrenties of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ;
 EXPORTS
 access
@@ -133,6 +133,9 @@ wcsnset
 wcsrev
 wcsset
 wcsupr
+
+wpopen
+
 write
 y0
 y1

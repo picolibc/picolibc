@@ -85,17 +85,17 @@ struct _wfinddatai64_t {
    applies to other wide character versions? */
 #if !defined (_WIO_DEFINED)
 #if defined (__MSVCRT__)
-int 		_waccess(const wchar_t*, int);
-int 		_wchmod(const wchar_t*, int);
-int 		_wcreat(const wchar_t*, int);
-long 		_wfindfirst(wchar_t*, struct _wfinddata_t *);
-int 		_wfindnext(long, struct _wfinddata_t *);
-int 		_wunlink(const wchar_t*);
-int 		_wopen(const wchar_t*, int, ...);
-int 		_wsopen(const wchar_t*, int, int, ...);
-wchar_t * 	_wmktemp(wchar_t*);
-long  _wfindfirsti64(const wchar_t*, struct _wfinddatai64_t*);
-int  _wfindnexti64(long, struct _wfinddatai64_t*);
+int	 _waccess (const wchar_t*, int);
+int	_wchmod (const wchar_t*, int);
+int	_wcreat (const wchar_t*, int);
+long	_wfindfirst (wchar_t*, struct _wfinddata_t *);
+int	_wfindnext (long, struct _wfinddata_t *);
+int	_wunlink (const wchar_t*);
+int	_wopen (const wchar_t*, int, ...);
+int	_wsopen (const wchar_t*, int, int, ...);
+wchar_t* _wmktemp (wchar_t*);
+long	_wfindfirsti64 (const wchar_t*, struct _wfinddatai64_t*);
+int 	_wfindnexti64 (long, struct _wfinddatai64_t*);
 #endif /* defined (__MSVCRT__) */
 #define _WIO_DEFINED
 #endif /* _WIO_DEFINED */
@@ -105,9 +105,11 @@ int  _wfindnexti64(long, struct _wfinddatai64_t*);
 int	fwprintf (FILE*, const wchar_t*, ...);
 int	wprintf (const wchar_t*, ...);
 int	swprintf (wchar_t*, const wchar_t*, ...);
+int	_swnprintf (wchar_t*, size_t, const wchar_t*, ...);
 int	vfwprintf (FILE*, const wchar_t*, va_list);
 int	vwprintf (const wchar_t*, va_list);
 int	vswprintf (wchar_t*, const wchar_t*, va_list);
+int	_vswnprintf (wchar_t*, size_t, const wchar_t*, va_list);
 int	fwscanf (FILE*, const wchar_t*, ...);
 int	wscanf (const wchar_t*, ...);
 int	swscanf (const wchar_t*, const wchar_t*, ...);
@@ -116,25 +118,25 @@ wint_t	fputwc (wchar_t, FILE*);
 wint_t	ungetwc (wchar_t, FILE*);
 
 #ifdef __MSVCRT__ 
-wchar_t*    fgetws (wchar_t*, int, FILE*);
-int         fputws (const wchar_t*, FILE*);
-wint_t		getwc (FILE*);
-wint_t	    getwchar (void);
-wchar_t*    _getws (wchar_t*);
-wint_t	    putwc (wint_t, FILE*);
-int         _putws (const wchar_t*);
-wint_t	    putwchar (wint_t);
+wchar_t* fgetws (wchar_t*, int, FILE*);
+int	fputws (const wchar_t*, FILE*);
+wint_t	getwc (FILE*);
+wint_t  getwchar (void);
+wchar_t* _getws (wchar_t*);
+wint_t	putwc (wint_t, FILE*);
+int	_putws (const wchar_t*);
+wint_t	putwchar (wint_t);
 
 FILE*	_wfopen (const wchar_t*, const wchar_t*);
 FILE*	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
-FILE*   _wfsopen(const wchar_t*, const wchar_t*, int);
-wchar_t*	_wtmpnam (wchar_t*);
-wchar_t*	_wtempnam (const wchar_t*, const wchar_t*);
-int 	_wrename(const wchar_t*, const wchar_t*);
-int 	_wremove (const wchar_t*)
+FILE*   _wfsopen (const wchar_t*, const wchar_t*, int);
+wchar_t* _wtmpnam (wchar_t*);
+wchar_t* _wtempnam (const wchar_t*, const wchar_t*);
+int 	_wrename (const wchar_t*, const wchar_t*);
+int	_wremove (const wchar_t*)
 
-FILE*  _wpopen(const wchar_t*, const wchar_t*)
-void  _wperror(const wchar_t*);
+FILE*	  _wpopen (const wchar_t*, const wchar_t*)
+void	  _wperror (const wchar_t*);
 #endif	/* __MSVCRT__ */
 #define _WSTDIO_DEFINED
 #endif /* _WSTDIO_DEFINED */
@@ -142,11 +144,11 @@ void  _wperror(const wchar_t*);
 #ifndef _WDIRECT_DEFINED
 /* Also in direct.h */
 #ifdef __MSVCRT__ 
-int _wchdir(const wchar_t*);
-wchar_t* _wgetcwd(wchar_t*, int);
-wchar_t* _wgetdcwd(int, wchar_t*, int);
-int _wmkdir(const wchar_t*);
-int _wrmdir(const wchar_t*);
+int	  _wchdir (const wchar_t*);
+wchar_t*  _wgetcwd (wchar_t*, int);
+wchar_t*  _wgetdcwd (int, wchar_t*, int);
+int	  _wmkdir (const wchar_t*);
+int	  _wrmdir (const wchar_t*);
 #endif	/* __MSVCRT__ */
 #define _WDIRECT_DEFINED
 #endif /* _WDIRECT_DEFINED */
@@ -211,7 +213,7 @@ struct _stati64 {
 #if !defined ( _WSTAT_DEFINED)
 /* also declared in sys/stat.h */
 #if defined __MSVCRT__
-int	_wstat(const wchar_t*, struct _stat*);
+int	_wstat (const wchar_t*, struct _stat*);
 int	_wstati64 (const wchar_t*, struct _stati64*);
 #endif  /* __MSVCRT__ */
 #define _WSTAT_DEFINED
@@ -220,17 +222,17 @@ int	_wstati64 (const wchar_t*, struct _stati64*);
 #ifndef _WTIME_DEFINED
 #ifdef __MSVCRT__
 /* wide function prototypes, also declared in time.h */
-wchar_t *	_wasctime(const struct tm*);
-wchar_t *	_wctime(const time_t*);
-wchar_t*	_wstrdate(wchar_t*);
-wchar_t*	_wstrtime(wchar_t*);
+wchar_t*	_wasctime (const struct tm*);
+wchar_t*	_wctime (const time_t*);
+wchar_t*	_wstrdate (wchar_t*);
+wchar_t*	_wstrtime (wchar_t*);
 #endif /* __MSVCRT__ */
-size_t		wcsftime(wchar_t*, size_t, const wchar_t*, const struct tm*);
+size_t		wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
 #define _WTIME_DEFINED
 #endif /* _WTIME_DEFINED */ 
 
 #ifndef _WLOCALE_DEFINED  /* also declared in locale.h */
-wchar_t* _wsetlocale(int, const wchar_t*);
+wchar_t* _wsetlocale (int, const wchar_t*);
 #define _WLOCALE_DEFINED
 #endif
 
@@ -251,17 +253,17 @@ extern __inline__ float wcstof( const wchar_t *nptr, wchar_t **endptr)
 /* Wide character versions. Also declared in io.h. */
 /* CHECK: Are these in the oldnames???  NO! */
 #if (0)
-int 		waccess(const wchar_t *, int);
-int 		wchmod(const wchar_t *, int);
-int 		wcreat(const wchar_t *, int);
-long 		wfindfirst(wchar_t *, struct _wfinddata_t *);
-int 		wfindnext(long, struct _wfinddata_t *);
-int 		wunlink(const wchar_t *);
-int 		wrename(const wchar_t *, const wchar_t *);
-int 		wremove (const wchar_t *);
-int 		wopen(const wchar_t *, int, ...);
-int 		wsopen(const wchar_t *, int, int, ...);
-wchar_t * 	wmktemp(wchar_t *);
+int		waccess (const wchar_t *, int);
+int		wchmod (const wchar_t *, int);
+int		wcreat (const wchar_t *, int);
+long		wfindfirst (wchar_t *, struct _wfinddata_t *);
+int		wfindnext (long, struct _wfinddata_t *);
+int		wunlink (const wchar_t *);
+int		wrename (const wchar_t *, const wchar_t *);
+int		wremove (const wchar_t *);
+int		wopen (const wchar_t *, int, ...);
+int		wsopen (const wchar_t *, int, int, ...);
+wchar_t*	wmktemp (wchar_t *);
 #endif
 #endif /* _NO_OLDNAMES */
 
