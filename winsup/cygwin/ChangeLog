@@ -1,3 +1,13 @@
+Sat Oct 14 10:54:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygwin.din: Add symbol hstrerror.
+	* net.cc: Change meaning of member `s' of struct host_errmap.
+	(set_host_errno): Fix error in loop condition.
+	(hstrerror): Ditto.
+	(herror): Add appropriate functionality.
+	* include/netdb.h: Add declaration of hstrerror.
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 29.
+
 Sat Oct 14 01:45:25 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (cygheap_fixup_in_child): Don't page round cygheap copied
