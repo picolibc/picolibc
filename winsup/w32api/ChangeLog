@@ -121,7 +121,7 @@
 
 2004-02-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/Gl/glu (GLU_ERROR): Define.
+	* include/Gl/glu.h (GLU_ERROR): Define.
 	Thanks to Philip Lamb  <phil at rave dot co dot nz> 
 
 2004-02-19  Danny Smith  <dannysmith@users.sourceforge.net>
