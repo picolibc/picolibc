@@ -41,10 +41,13 @@ cygthread::stub (VOID *arg)
       if (!info->func)
 	ExitThread (0);
 
-      /* Cygwin threads should not call ExitThread */
-      info->func (info->arg);
+      /* Cygwin threads should not call ExitThread directly */
+      info->func (info->arg == cygself ? info : info->arg);
+      /* ...so the above should always return */
 
-      debug_printf ("returned from function %p", info->func);
+#ifdef DEBUGGING
+      info->func = NULL;	// catch erroneous activation
+#endif
       SetEvent (info->ev);
       info->__name = NULL;
       SuspendThread (info->h);
@@ -100,6 +103,10 @@ new (size_t)
 	if ((id = (DWORD) InterlockedExchange ((LPLONG) &info->avail, 0)))
 	  {
 	    info->id = id;
+#ifdef DEBUGGING
+	    if (info->__name)
+	      api_fatal ("name not NULL? id %p, i %d", id, info - threads);
+#endif
 	    return info;
 	  }
 
@@ -109,10 +116,18 @@ new (size_t)
 }
 
 cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
-		      const char *name): __name (name), func (start), arg (param)
+		      const char *name): func (start), arg (param)
 {
+#ifdef DEBUGGGING
+  if (!__name)
+    api_fatal ("name should never be NULL");
+#endif
+  thread_printf ("name %s, id %p", name, id);
   while (ResumeThread (h) == 0)
     Sleep (0);
+  __name = name;	/* Need to set after thread has woken up to
+			   ensure that it won't be cleared by exiting
+			   thread. */
 }
 
 /* Return the symbolic name of the current thread for debugging.
@@ -157,7 +172,7 @@ HANDLE ()
 void
 cygthread::exit_thread ()
 {
-  SetEvent (ev);
+  SetEvent (*this);
   ExitThread (0);
 }
 
@@ -168,20 +183,23 @@ cygthread::exit_thread ()
 void
 cygthread::detach ()
 {
-  if (!avail)
+  if (avail)
+    system_printf ("called detach on available thread %d?", avail);
+  else
     {
       DWORD avail = id;
       /* Checking for __name here is just a minor optimization to avoid
 	 an OS call. */
       if (!__name)
-	debug_printf ("thread routine returned.  No need to wait.");
+	thread_printf ("thread id %p returned.  No need to wait.", id);
       else
 	{
 	  DWORD res = WaitForSingleObject (*this, INFINITE);
-	  debug_printf ("WFSO returns %d", res);
+	  thread_printf ("WFSO returns %d, id %p", res, id);
 	}
       ResetEvent (*this);
       id = 0;
+      __name = NULL;
       /* Mark the thread as available by setting avail to non-zero */
       (void) InterlockedExchange ((LPLONG) &this->avail, avail);
     }

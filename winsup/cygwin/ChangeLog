@@ -1,3 +1,22 @@
+2002-08-06  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Accept flag to pass info structure to
+	thread function.
+	(cygthread::operator new): Add defense debugging output.
+	(cygthread::cygthread): Add debugging output.  Set name after thread
+	has been awakened to avoid a race.
+	(cygthread::exit_thread): Use handle operator rather than using ev
+	directly.
+	(cygthread::exit_thread): Reorganize to provide debugging.  Set __name
+	to NULL.
+	* cygthread.h (cygself): Define.
+	* fhandler_tty.cc (fhandler_tty_master::init): Use cygself as argument
+	so that invoked thread can access its own info.
+	(process_output): Derive cygthread info of thread from thread argument.
+	* sigproc.cc (sigproc_init): Use cygself as argument so that invoked
+	thread can access its own info.
+	(wait_sig): Derive cygthread info of thread from thread argument.
+
 2002-08-06  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* debug.h (handle_list::allocated): Remove field.

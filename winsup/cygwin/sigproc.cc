@@ -571,7 +571,7 @@ sigproc_init ()
   signal_arrived = CreateEvent(&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (signal_arrived);
 
-  hwait_sig = new cygthread (wait_sig, NULL, "sig");
+  hwait_sig = new cygthread (wait_sig, cygself, "sig");
 
   /* sync_proc_subproc is used by proc_subproc.  It serialises
    * access to the children and zombie arrays.
@@ -1030,10 +1030,10 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
  * has been handled, as per POSIX.
  */
 static DWORD WINAPI
-wait_sig (VOID *)
+wait_sig (VOID *self)
 {
   /* Initialization */
-  (void) SetThreadPriority (*hwait_sig, WAIT_SIG_PRIORITY);
+  (void) SetThreadPriority (*((cygthread *) self), WAIT_SIG_PRIORITY);
 
   /* sigcatch_nosync       - semaphore incremented by sig_dispatch_pending and
    *			     by foreign processes to force an examination of
