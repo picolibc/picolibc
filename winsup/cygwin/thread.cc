@@ -290,9 +290,9 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   function = func;
   arg = threadarg;
 
+  mutex.lock ();
   win32_obj_id = ::CreateThread (&sec_none_nih, attr.stacksize,
-				thread_init_wrapper, this, CREATE_SUSPENDED,
-				&thread_id);
+				thread_init_wrapper, this, 0, &thread_id);
 
   if (!win32_obj_id)
     {
@@ -301,9 +301,12 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
     }
   else
     {
+      if (WaitForSingleObject (cancel_event, 5000) != WAIT_OBJECT_0)
+	thread_printf ("event never arrived after CreateThread");
+      ResetEvent (cancel_event);
       postcreate ();
-      ResumeThread (win32_obj_id);
     }
+  mutex.unlock ();
 }
 
 void
@@ -1861,7 +1864,8 @@ DWORD WINAPI
 pthread::thread_init_wrapper (void *arg)
 {
   pthread *thread = (pthread *) arg;
-  _my_tls.tid = thread;
+  set_tls_self_pointer (thread);
+  SetEvent (thread->cancel_event);
 
   thread->mutex.lock ();
 

@@ -1,6 +1,15 @@
+2004-04-12  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* thread.cc (pthread::create): Use thread mutex to control
+	synchronization rather than creating a suspended thread.  Wait for
+	"cancellation event" to indicate that started thread has been properly
+	initialized.
+	(pthread::thread_init_wrapper): Use set_tls_self_pointer() to set tid
+	and cygtls.  Signal with cancel_event when done.
+
 2004-04-12  Pierre Humblet <pierre.humblet@ieee.org>
 
-        * path.cc (path_conv::check): Fix "tail filling" logic.
+	* path.cc (path_conv::check): Fix "tail filling" logic.
 
 2004-04-11  Christopher Faylor  <cgf@alum.bu.edu>
 
@@ -169,14 +178,14 @@
 	(FHSTATOFF): Remove.
 	(UNCONNECTED, CONNECT_PENDING, CONNECTED): Substitute by enum
 	connect_state.
-	(fhandler_base::status): Define as bitfield struct type status_flags. 
+	(fhandler_base::status): Define as bitfield struct type status_flags.
 	Remove unused flags entirely.  Accomodate all status access methods.
 	(open_status): Define as bitfield struct type status_flags.
 	(fhandler_socket): Move socket related status bits to here.  Redefine
 	had_connect_or_listen to be part of these status bits.  Accomodate
 	related access methods.
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Use pc.issymlink
-	instead of dropped method get_symlink_p. 
+	instead of dropped method get_symlink_p.
 	(fhandler_base::open_fs): Remove setting dropped status flags.
 	* fhandler_socket.cc: Use values from enum connect_state throughout.
 	(fhandler_socket::fhandler_socket): Initialize status bits.
@@ -352,7 +361,7 @@
 	* shm.cc (shmat): If shmid is unknown, call a special variation
 	of shmget to retrieve the shared memory segment from Cygserver
 	instead of failing immediately.
-	* include/cygwin/ipc.h (IPC_KEY_IS_SHMID): New internal flag for 
+	* include/cygwin/ipc.h (IPC_KEY_IS_SHMID): New internal flag for
 	shmget when called from shmat.
 
 2004-03-29  Corinna Vinschen  <corinna@vinschen.de>
@@ -509,7 +518,7 @@
 	* autoload.cc: Load eight more functions for waveIn support.
 	* fhandler.h (class fhandler_dev_dsp): Add class Audio, class Audio_in
 	and class Audio_out members and audio_in_, audio_out_ pointers so
-	that future changes are restricted to file fhandler_dsp.cc.  
+	that future changes are restricted to file fhandler_dsp.cc.
 	* fhandler_dsp.cc (fhandler_dev_dsp::Audio): Add this class to treat
 	things common to audio recording and playback.
 	Add more format conversions.
@@ -571,8 +580,8 @@
 
 2004-03-19  Pierre Humblet <pierre.humblet@ieee.org>
 
-        * dir.cc (rmdir): Reorganize error handling to reduce indentation.
- 
+	* dir.cc (rmdir): Reorganize error handling to reduce indentation.
+
 2004-03-19  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 10.
@@ -714,7 +723,7 @@
 	(fhandler_dev_tape::read_file): Ditto.
 	(fhandler_dev_tape::tape_get_feature): Convert to inline method.
 	(fhandler_dev_tape::tape_error): New method, created from former
-	static function. 
+	static function.
 	(fhandler_dev_tape::tape_get_blocksize): Remove declaration.
 	* fhandler_raw.cc (fhandler_dev_raw::write_file): New method, created
 	from former static function.
