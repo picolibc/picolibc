@@ -103,16 +103,16 @@ endif
 ifdef VERBOSE
 	$(COMPILE_CXX) -o $(@D)/$(*F)$o $<
 else
-	@echo $(CC) $c $(CXXFLAGS) -o $(@D)/$(*F)$o ${subst $(srcdir)/,,$<}; \
-	$(COMPILE_CXX) -o $(@D)/$(*F)$o $<
+	@echo $(CC) $c $(CXXFLAGS) ... $(*F).cc
+	@$(COMPILE_CXX) -o $(@D)/$(*F)$o $<
 endif
 
 %.o: %.c
 ifdef VERBOSE
 	$(COMPILE_CC) -o $(@D)/$(*F)$o $<
 else
-	@echo $(CC) $c $(CFLAGS) -o $(@D)/$(*F)$o ${subst $(srcdir)/,,$<}; \
-	$(COMPILE_CC) -o $(@D)/$(*F)$o $<
+	@echo $(CC) $c $(CFLAGS) ... $(*F).c
+	@$(COMPILE_CC) -o $(@D)/$(*F)$o $<
 endif
 
 $(bupdir1)/libiberty/%.o: $(updir1)/libiberty/%.c

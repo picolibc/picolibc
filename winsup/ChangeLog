@@ -1,3 +1,8 @@
+2000-05-24  DJ Delorie  <dj@cygnus.com>
+
+	* Makefile.common (%.o): further simplify, add "..." to make it
+ 	obvious it's an abbreviated command line.
+
 Thu May 18 14:33:05 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* MAINTAINERS: Add Corinna to general list.
