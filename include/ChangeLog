@@ -1,3 +1,8 @@
+2000-12-16  Herman A.J. ten Brugge  <Haj.Ten.Brugge@net.HCC.nl>
+
+	* safe-ctype.h: Make code work on all targets and not just on
+	targets where a char is 8 bits.
+
 2000-12-10  Fred Fish  <fnf@be.com>
 
       * bfdlink.h (struct bfd_link_info): Add new allow_shlib_undefined
