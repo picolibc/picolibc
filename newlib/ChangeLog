@@ -1,3 +1,8 @@
+2001-11-27  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/sys/types.h: Define useconds_t.
+	* libc/include/sys/ulimit.h: Declare ualarm.
+
 2001-11-21  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/sys/cygwin/sys/dirent.h (DIR): Add another internal element.

@@ -218,6 +218,10 @@ typedef _TIMER_T_ timer_t;
 #define __timer_t_defined
 #endif
 
+#ifdef __CYGWIN__
+typedef long useconds_t;
+#endif
+
 #include <sys/features.h>
 
 
