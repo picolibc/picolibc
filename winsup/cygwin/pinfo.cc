@@ -257,7 +257,6 @@ pinfo::set_acl()
 void
 _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *fhctty)
 {
-  int initial_ctty = ctty;
   if ((ctty < 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc->ntty;
@@ -277,10 +276,8 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *fhctty)
 	sid = tc->getsid ();
       if (tc->getpgid () == 0)
 	tc->setpgid (pgid);
-      if (fhctty)
+      if (fhctty && !cygheap->ctty.get_io_handle ())
 	cygheap->ctty  = *fhctty;
-      else if (initial_ctty < 0)
-	assert (cygheap->ctty.get_io_handle () == NULL);
     }
 }
 

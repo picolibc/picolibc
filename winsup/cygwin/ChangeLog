@@ -1,5 +1,10 @@
 2003-12-08  Christopher Faylor  <cgf@redhat.com>
 
+	* pinfo.cc (_pinfo::set_ctty): Don't copy over existing ctty if it is
+	active.
+
+2003-12-08  Christopher Faylor  <cgf@redhat.com>
+
 	* thread.cc (pthread::precreate): Delete duplicate setting of
 	cancel_event.
 
