@@ -1139,6 +1139,7 @@ wait_sig (VOID *self)
 	}
 
       sigpacket *q;
+      bool clearwait = false;
       switch (pack.si.si_signo)
 	{
 	case __SIGCOMMUNE:
@@ -1155,18 +1156,23 @@ wait_sig (VOID *self)
 	    if (myself->getsigmask () & (bit = SIGTOMASK (q->si.si_signo)))
 	      *pack.mask |= bit;
 	  break;
-	case __SIGFLUSH:
-	case __SIGFLUSHFAST:
-	  sigq.reset ();
-	  while ((q = sigq.next ()))
-	    if (q->si.si_signo == __SIGDELETE || q->process () > 0)
-	      sigq.del ();
-	  break;
 	case __SIGHOLD:
 	  holding_signals = 1;
 	  break;
 	case __SIGNOHOLD:
 	  holding_signals = 0;
+	  /* fall through, intentionally */
+	case __SIGFLUSH:
+	case __SIGFLUSHFAST:
+	  sigq.reset ();
+	  while ((q = sigq.next ()))
+	    {
+	      int sig = q->si.si_signo;
+	      if (sig == __SIGDELETE || q->process () > 0)
+		sigq.del ();
+	      if (sig == __SIGNOHOLD && q->si.si_signo == SIGCHLD)
+		clearwait = true;
+	    }
 	  break;
 	default:
 	  if (pack.si.si_signo < 0)
@@ -1191,10 +1197,12 @@ wait_sig (VOID *self)
 		    }
 		}
 	      if (sig == SIGCHLD)
-		proc_subproc (PROC_CLEARWAIT, 0);
+		clearwait = true;
 	    }
 	  break;
 	}
+      if (clearwait)
+	proc_subproc (PROC_CLEARWAIT, 0);
       if (pack.wakeup)
 	{
 	  SetEvent (pack.wakeup);

@@ -1,5 +1,10 @@
 2004-09-12  Christopher Faylor  <cgf@timesys.com>
 
+	* sigproc.cc (wait_sig): Ensure that waiting threads are awoken after
+	returning from a hold condition.
+
+2004-09-12  Christopher Faylor  <cgf@timesys.com>
+
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
 
 2004-09-11  Pierre Humblet  <pierre.humblet@ieee.org>
