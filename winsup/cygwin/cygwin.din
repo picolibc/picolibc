@@ -9,6 +9,9 @@ __main
 __signgam
 __srget
 __swbuf
+__argv DATA
+__argc DATA
+__progname DATA
 _check_for_executable DATA
 ; __vc__10pinfo_listi
 @ALLOCA@

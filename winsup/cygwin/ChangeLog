@@ -1,3 +1,11 @@
+Tue Sep 18 21:04:26 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygwin.din (__argv): Export.
+	(__argc): Ditto.
+	(__progname): Ditto.
+	* include/getopt.h (getopt_long): constify arguments.
+	* lib/getopt.c: Import new file from NetBSD.
+
 Tue Sep 18 18:21:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (mmap): Don't reuse anonymous memory in MAP_FIXED case.
