@@ -1,3 +1,8 @@
+2004-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Use created
+	handle regardless of nohandle state.  Clean up afterwards.
+
 2004-03-23  Gerd Spalink  <Gerd.Spalink@t-online.de>
 
 	* autoload.cc: Load eight more functions for waveIn support.

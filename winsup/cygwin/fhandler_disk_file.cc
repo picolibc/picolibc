@@ -201,13 +201,21 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
       oret = open_fs (open_flags, 0);
     }
 
-  if (!oret || get_nohandle ())
-    res = fstat_by_name (buf);
-  else
+  if (oret)
     {
+      /* We now have a valid handle, regardless of the "nohandle" state.
+         Since fhandler_base::open only calls CloseHandle if !get_nohandle,
+	 we have to set it to false before calling close_fs and restore
+	 the state afterwards. */
       res = fstat_by_handle (buf);
+      bool nohandle = get_nohandle ();
+      set_nohandle (false);
       close_fs ();
+      set_nohandle (nohandle);
+      set_io_handle (NULL);
     }
+  else
+    res = fstat_by_name (buf);
 
   return res;
 }
