@@ -1156,8 +1156,13 @@ mount_info::cygdrive_posix_path (const char *src, char *dst, int trailing_slash_
     dst[len++] = '\000';
   else
     {
+      int n;
       dst[len++] = '/';
-      strcpy (dst + len, src + 3);
+      if (SLASH_P (src[2]))
+	n = 3;
+      else
+	n = 2;
+      strcpy (dst + len, src + n);
     }
   slashify (dst, dst, trailing_slash_p);
 }
