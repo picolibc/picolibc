@@ -1,3 +1,7 @@
+Wed Aug  2 11:22:53 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/sys/strace.h: Fix strace definition.
+
 Tue Aug  1 23:37:08 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* strace.h: Add kludgy workarounds to avoid using deprecated methods

@@ -73,13 +73,13 @@ extern "C" void small_printf (const char *, ...);
 
 #define define_strace0(c,...) \
   do { \
-      if (c & _STRACE_SYSTEM || strace.active) \
+      if ((c & _STRACE_SYSTEM) || strace.active) \
 	strace.prntf (c, "%F: " __VA_ARGS__); \
     } \
   while (0)
 
 #define define_strace(c, ...) define_strace0 (_STRACE_ ## c, __VA_ARGS__)
-#define define_strace1(c, ...) define_strace0 (_STRACE_ ## c | _STRACE_NOTALL, __VA_ARGS__)
+#define define_strace1(c, ...) define_strace0 ((_STRACE_ ## c | _STRACE_NOTALL), __VA_ARGS__)
 
 #define debug_printf(...)	define_strace (DEBUG, __VA_ARGS__)
 #define paranoid_printf(...)	define_strace (PARANOID, __VA_ARGS__)
