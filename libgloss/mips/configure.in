@@ -93,7 +93,8 @@ case "${target}" in
         bsp_list="libdve.a libidt.a libjmr3904.a"
         ;;
   mipsisa32-*-* | mipsisa32el-*-* | \
-  mipsisa32r2-*-* | mipsisa32r2el-*-*)
+  mipsisa32r2-*-* | mipsisa32r2el-*-* | \
+  mipsisa64-*-*)
 	crt0="crt0_cfe.o crt0_cygmon.o crt0.o"
 	pcrt0="pcrt0.o"
 	part_specific_obj=

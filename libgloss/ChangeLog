@@ -1,3 +1,8 @@
+2004-03-23  Eric Christopher  <echristo@redhat.com>
+
+	* mips/configure.in: Add mipsisa64-*-* to target support.
+	* mips/configure: Regenerate.
+
 2004-03-03  Stephane Carrez  <stcarrez@nerim.fr>
 
 	* m68hc11/sci-inout.S: Supports -mlong-calls.
@@ -38,7 +43,7 @@
 2003-10-27  Bernardo Innocenti  <bernie@develer.com>
 
 	* m68k/asm.h: Add macros for -fPIC, -msep-data and
-	-mid-shared-library support.     
+	-mid-shared-library support.
 	* m68k/crt0.S: Use macros for -fPIC, -msep-data and
 	-mid-shared-library support.
 	* m68k/sim-crt0.S: Likewise.
@@ -104,15 +109,15 @@
 
 2003-06-23  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
 
-	* m32r/crt0.S (_start): Allow _stack to be placed anywhere 
+	* m32r/crt0.S (_start): Allow _stack to be placed anywhere
 	in memory.
 
 2003-06-06  Stan Cox  <scox@redhat.com>
             Jeff Johnston  <jjohnstn@redhat.com>
             Anthony Green  <green@redhat.com>
 
-	* configure.in: Add iq2000 support.  
-	* configure: Rebuilt.  
+	* configure.in: Add iq2000 support.
+	* configure: Rebuilt.
 	* iq2000/Makefile.in, iq2000/access.c, iq2000/_exit.c,
 	iq2000/configure, iq2000/chmod.c, iq2000/chown.c, iq2000/close.c,
 	iq2000/configure.in, iq2000/creat.c, iq2000/crt0.S, iq2000/crt1.c,
@@ -148,14 +153,14 @@
 2003-04-23  Andrew Haley  <aph@cambridge.redhat.com>
 
 	* xstormy16/sim_rom.ld: New.
-	* xstormy16/Makefile.in (SIM_SCRIPTS): Add sim_rom.ld.	
+	* xstormy16/Makefile.in (SIM_SCRIPTS): Add sim_rom.ld.
 	* xstormy16/crt0.s (_int_reset): Copy ROM data to RAM.
 	* xstormy16/eva_app.ld (_rdata, _data): New.
 	* xstormy16/sim_high.ld (_rdata, _data): New.
 
 2003-04-17  Inaoka Kazuhiro  <inaoka.kazuhiro@renesas.com>
 
-	* m32r/Makefile.in: Add multilib support. 
+	* m32r/Makefile.in: Add multilib support.
 	* m32r/configure.in: Ditto.
 	* m32r/configure: Regenerated.
 
@@ -213,7 +218,7 @@
 	* pmon.S: Likewise.
 	* cygmon.c (sysCall): Avoid multi-line string literals.
 
-2002-11-12 Jeff Johnston  <jjohnstn@redhat.com> 
+2002-11-12 Jeff Johnston  <jjohnstn@redhat.com>
 
 	*  mips/Makefile.in: Add cygmon support.
 	*  mips/configure.in: Ditto.
@@ -223,7 +228,7 @@
 	*  mips/pmon.S: Minor formatting and copyright changes.
 	*  mips/crt0.S: Ditto.
 
-2002-11-08 Jeff Johnston  <jjohnstn@redhat.com> 
+2002-11-08 Jeff Johnston  <jjohnstn@redhat.com>
 
 	* arm/Makefile.in: Add support for new pid specs.
 	* arm/coff-iq80310.specs: Change to allow future support.
@@ -235,7 +240,7 @@
 	* arm/coff-pid.specs: New file.
 	* arm/elf-pid.specs: New file.
 
-2002-11-08 Jeff Johnston  <jjohnstn@redhat.com> 
+2002-11-08 Jeff Johnston  <jjohnstn@redhat.com>
 	   Catherine Moore  <clm@redhat.com>
 
         * m32r/configure.in:  Do not require gcc to be able to link an
@@ -333,7 +338,7 @@
         * mips/cfe_api.c: New file.
         * mips/cfe_api.h: New file.
         * mips/cfe_api_int.h: New file.
-        * mips/cfe_error.h: New file.  
+        * mips/cfe_error.h: New file.
         * mips/cfe_prestart.S: New file.
 
 2002-07-12  Chris Demetriou  <cgd@broadcom.com>
@@ -410,7 +415,7 @@
 
 2002-04-17  Joel Sherrill <joel@OARcorp.com>
 
-	* debug.h: Change mem_err to volatile to match definition in 
+	* debug.h: Change mem_err to volatile to match definition in
 	debug.c.
 
 2002-04-17  Joel Sherrill <joel@OARcorp.com>
@@ -557,7 +562,7 @@
 
 	* configure.in: Treat ddb-kseg0.ld like ddb.ld.
 	* configure: Regenerate.
-	
+
 2001-09-15  Eric Christopher  <echristo@redhat.com>
 
 	* mips/configure.in (LIB_AC_PROG_CC): Fix typo in mipsisa32 to
