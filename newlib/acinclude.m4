@@ -44,6 +44,16 @@ AC_ARG_ENABLE(newlib-mb,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-mb option) ;;
  esac], [newlib_mb=no])dnl
 
+dnl Support --disable-newlib-io-float
+AC_ARG_ENABLE(newlib-io-float,
+[  --disable-newlib-io-float disable printf/scanf family float support],
+[case "${enableval}" in
+  yes) newlib_io_float=yes ;;
+  no)  newlib_io_float=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-float option) ;;
+ esac], [newlib_io_float=yes])dnl
+
+
 dnl We may get other options which we don't document:
 dnl --with-target-subdir, --with-multisrctop, --with-multisubdir
 

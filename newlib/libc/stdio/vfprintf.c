@@ -150,7 +150,9 @@ static char *rcsid = "$Id$";
 #else
 #define VFPRINTF vfprintf
 #define _VFPRINTF_R _vfprintf_r
+#ifndef NO_FLOATING_POINT
 #define FLOATING_POINT
+#endif
 #endif
 
 #define _NO_LONGLONG

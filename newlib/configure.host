@@ -209,6 +209,12 @@ if [ "${newlib_mb}" = "yes" ] ; then
 	newlib_cflags="${newlib_cflags} -DMB_CAPABLE"
 fi
 
+# Disable printf/scanf floating-point support if requested.
+
+if [ "${newlib_io_float}" = "no" ] ; then
+	newlib_cflags="${newlib_cflags} -DNO_FLOATING_POINT"
+fi
+
 # Verify if shared newlib support is allowed and set appropriate variables
 # We don't want to use libtool for platforms that we are not going to
 # support shared libraries.  This is because it adds executable tests which
