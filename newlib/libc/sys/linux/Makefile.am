@@ -21,6 +21,7 @@ LIB_SOURCES = \
 	clock_settime.c \
 	confstr.c \
 	ctermid.c \
+	fclean.c \
 	flockfile.c \
 	fpathconf.c \
 	free.c \

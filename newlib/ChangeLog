@@ -1,5 +1,11 @@
 2002-07-25  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/sys/linux/Makefile.am: Add fclean.c.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/fclean.c: New file.
+
+2002-07-25  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/Makefile.am: Add confstr.c.
 	* libc/sys/linux/Makefile.in: Regenerated.
 	* libc/sys/linux/confstr.c: New file.

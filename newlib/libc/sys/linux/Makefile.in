@@ -118,6 +118,7 @@ LIB_SOURCES = \
 	clock_settime.c \
 	confstr.c \
 	ctermid.c \
+	fclean.c \
 	flockfile.c \
 	fpathconf.c \
 	free.c \
@@ -253,7 +254,7 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@calloc.$(OBJEXT) callocr.$(OBJEXT) cfreer.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@cfspeed.$(OBJEXT) clock_getres.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@clock_gettime.$(OBJEXT) clock_settime.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@confstr.$(OBJEXT) ctermid.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@confstr.$(OBJEXT) ctermid.$(OBJEXT) fclean.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@flockfile.$(OBJEXT) fpathconf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@free.$(OBJEXT) freer.$(OBJEXT) fstab.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@fstatvfs.$(OBJEXT) fstatvfs64.$(OBJEXT) \
@@ -298,9 +299,9 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  aio.lo brk.lo calloc.lo \
 @USE_LIBTOOL_TRUE@callocr.lo cfreer.lo cfspeed.lo clock_getres.lo \
 @USE_LIBTOOL_TRUE@clock_gettime.lo clock_settime.lo confstr.lo \
-@USE_LIBTOOL_TRUE@ctermid.lo flockfile.lo fpathconf.lo free.lo freer.lo \
-@USE_LIBTOOL_TRUE@fstab.lo fstatvfs.lo fstatvfs64.lo ftok.lo \
-@USE_LIBTOOL_TRUE@funlockfile.lo getdate.lo getdate_err.lo \
+@USE_LIBTOOL_TRUE@ctermid.lo fclean.lo flockfile.lo fpathconf.lo \
+@USE_LIBTOOL_TRUE@free.lo freer.lo fstab.lo fstatvfs.lo fstatvfs64.lo \
+@USE_LIBTOOL_TRUE@ftok.lo funlockfile.lo getdate.lo getdate_err.lo \
 @USE_LIBTOOL_TRUE@gethostname.lo getoptlong.lo getreent.lo \
 @USE_LIBTOOL_TRUE@getrlimit64.lo ids.lo inode.lo io.lo io64.lo ipc.lo \
 @USE_LIBTOOL_TRUE@linux.lo malign.lo malignr.lo mallinfor.lo mallocr.lo \
