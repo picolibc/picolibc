@@ -1,3 +1,7 @@
+2004-01-25  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (proc_subproc): Don't protect *child's* handle.
+
 2004-01-24  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (fhandler_base::fhaccess): Return int for compatibility
