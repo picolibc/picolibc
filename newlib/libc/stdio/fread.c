@@ -167,19 +167,15 @@ _DEFUN(fread, (buf, size, count, fp),
 	  fp->_bf._base = old_base;
 	  fp->_bf._size = old_size;
 	  fp->_p = old_p;
-	  if (rc)
-	    {
-	      /* no more input: return partial result */
 #ifdef __SCLE
-	      if (fp->_flags & __SCLE)
-		{
-		  _funlockfile (fp);
-		  return crlf (fp, buf, total-resid, 1) / size;
-		}
-#endif
+          if (fp->_flags & __SCLE)
+	    {
 	      _funlockfile (fp);
-	      return (total - resid) / size;
+	      return crlf (fp, buf, total-resid, 1) / size;
 	    }
+#endif
+	  _funlockfile (fp);
+	  return (total - resid) / size;
 	}
     }
   else

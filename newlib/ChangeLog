@@ -1,3 +1,8 @@
+2004-10-26  Jason Tishler  <jason@tishler.net>
+
+	* libc/stdio/fread.c (fread): Fix return value for unbuffered
+	fread.
+
 2004-10-25  Ralf Corsepius <corsepiu@faw.uni-ulm.de>
 
 	* libc/include/machine/setjmp.h: Add AVR support.
