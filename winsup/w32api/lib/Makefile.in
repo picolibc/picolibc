@@ -15,8 +15,8 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-SUBDIRS := ddk
-subdirs := ddk
+SUBDIRS := ddk directx
+subdirs := ddk directx
 
 host_alias = @host@
 build_alias = @build@
@@ -113,21 +113,21 @@ DEF_FILES = $(notdir $(wildcard $(srcdir)/*.def))
 MRI_FILES = $(notdir $(wildcard $(srcdir)/*.mri))
 IMPLIBS = $(addprefix lib,$(subst .def,.a,$(DEF_FILES)))
 MIMPLIBS = $(addprefix lib,$(subst .mri,.a,$(MRI_FILES)))
-EXTRA_LIBS=libuuid.a libscrnsave.a libscrnsavw.a libdxguid.a liblargeint.a
+EXTRA_LIBS=libuuid.a libscrnsave.a libscrnsavw.a liblargeint.a
 LIBS = $(IMPLIBS) $(MIMPLIBS) $(EXTRA_LIBS)
 UUID_OBJS = uuid.o mshtml-uuid.o
-EXTRA_OBJS = shell32.o dxguid.o scrnsave.o scrnsavw.o largeint.o \
-	$(UUID_OBJS) dinput.o kernel32.o
+EXTRA_OBJS = shell32.o scrnsave.o scrnsavw.o largeint.o \
+	$(UUID_OBJS) kernel32.o
 UUID_SOURCES = uuid.c mshtml-uuid.c
-SOURCES = scrnsave.c shell32.c  largeint.c dinput.c $(UUID_SOURCES)\
-dxguid.c res.rc test.c kernel32.c
+SOURCES = scrnsave.c shell32.c  largeint.c $(UUID_SOURCES)\
+res.rc test.c kernel32.c
 
 DISTFILES = Makefile.in $(DEF_FILES) $(MRI_FILES) $(SOURCES)
 
 .NOTPARALLEL:
 
 # targets
-all: $(LIBS) $(EXTRA_OBJS) ddk
+all: $(LIBS) $(EXTRA_OBJS) ddk directx
 
 %-subdirs:
 	for i in $(SUBDIRS); do \
@@ -135,6 +135,9 @@ all: $(LIBS) $(EXTRA_OBJS) ddk
 	done
 
 ddk:
+	$(MAKE) $(FLAGS_TO_PASS) -C $@
+
+directx:
 	$(MAKE) $(FLAGS_TO_PASS) -C $@
 
 TEST_OPTIONS = $(ALL_CFLAGS) -DWINVER=0x0666  \
@@ -191,7 +194,7 @@ lib%.a: %.o
 
 .PHONY: install install-libraries install-headers install-ddk
 # install headers and libraries in a target specified directory.
-install: install-libraries install-headers install-ddk
+install: install-libraries install-headers install-ddk install-directx
 
 install-libraries: all
 	$(mkinstalldirs) $(inst_libdir)
@@ -212,8 +215,11 @@ install-headers:
 install-ddk: install-libraries install-headers
 	cd ddk && $(MAKE) install $(FLAGS_TO_PASS)
 
+install-directx: install-libraries install-headers
+	cd directx && $(MAKE) install $(FLAGS_TO_PASS)
+
 # uninstall headers and libraries from a target specified directory
-uninstall: uninstall-ddk uninstall-libraries uninstall-headers
+uninstall: uninstall-ddk uninstall-directx uninstall-libraries uninstall-headers
 
 uninstall-libraries:
 	@for i in $(LIBS); do \
@@ -229,6 +235,9 @@ uninstall-headers:
 
 uninstall-ddk:
 	cd ddk && $(MAKE) -C uninstall $(FLAGS_TO_PASS)
+
+uninstall-directx:
+	cd directx && $(MAKE) -C uninstall $(FLAGS_TO_PASS)
 
 dist:
 	mkdir $(distdir)/include

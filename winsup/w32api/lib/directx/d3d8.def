@@ -1,0 +1,6 @@
+LIBRARY d3d8.dll
+EXPORTS
+DebugSetMute
+Direct3DCreate8@4
+_Z19ValidatePixelShaderPKmPK9_D3DCAPS8mPPc@16=ValidatePixelShader
+_Z20ValidateVertexShaderPKmS0_PK9_D3DCAPS8mPPc@20=ValidateVertexShader

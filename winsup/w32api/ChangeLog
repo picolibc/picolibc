@@ -1,3 +1,20 @@
+2004-03-27  Filip Navara  <xnavara@volny.cz>
+
+	* include/directx: New subdir.
+	* lib/directx: Ditto.
+	* include/directx/(d3d9.h, d3d9caps.h, d3d9types.h, dxerr8.h,
+	dxerr9.h): New files.
+	* lib/ddk/(Makefile.in, d3d8.def, d3d9.def, d3dim.def, d3drm.def,
+	d3dx8d.def, d3dx9d.def, d3dxof.def, ddraw.def, dinput.def,
+	dinput_joy.c, dinput_joy2.c, dinput_kbd.c, dinput_mouse.c,
+	dinput_mouse2.c, dinput_private.h, dinput8.def, dmoguids.c, dplayx.def,
+	dpnaddr.def, dpnet.def, dpnlobby.def, dpvoice.def, dsetup.def,
+	dsound.def, dxerr.c, dxerr8.c, dxerr8w.c, dxerr9.c, dxerr9w.c,
+	dxguid.c, ksproxy.def, ksuser.c, ksuser.def, msdmo.def, quartz.def,
+	strmiids.c, test.c): Ditto.
+	* lib/(d3dim.def, d3drm.def, d3dxof.def, ddraw.def, dinput.c,
+	dinput.def, dplayx.def, dsetup.def, dsound.def, dxguid.c): Removed.
+
 2004-03-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/GL/glu.h (GLU_AUTO_LOAD_MATRIX, GLU_CULLING,

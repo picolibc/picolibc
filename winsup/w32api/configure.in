@@ -47,4 +47,4 @@ else
 fi
 AC_SUBST(BUILDENV)
 
-AC_OUTPUT(Makefile lib/Makefile lib/ddk/Makefile)
+AC_OUTPUT(Makefile lib/Makefile lib/ddk/Makefile lib/directx/Makefile)
