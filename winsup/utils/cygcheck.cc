@@ -99,10 +99,10 @@ static int num_paths = 0, max_paths = 0;
 static char **paths = 0;
 
 /*
- * keyeprint() is used to report failure modes
+ * display_error() is used to report failure modes
  */
 static int
-keyeprint (const char *name, bool show_error = true, bool print_failed = true)
+display_error (const char *name, bool show_error = true, bool print_failed = true)
 {
   if (show_error)
     fprintf (stderr, "cygcheck: %s%s: %lu\n", name,
@@ -127,7 +127,7 @@ add_path (char *s, int maxlen)
   paths[num_paths] = (char *) malloc (maxlen + 1);
   if (paths[num_paths] == NULL)
     {
-      keyeprint ("add_path: malloc()");
+      display_error ("add_path: malloc()");
       return;
     }
   memcpy (paths[num_paths], s, maxlen);
@@ -153,7 +153,7 @@ init_paths ()
   if (GetSystemDirectory (tmp, 4000))
     add_path (tmp, strlen (tmp));
   else
-    keyeprint ("init_paths: GetSystemDirectory()");
+    display_error ("init_paths: GetSystemDirectory()");
   sl = strrchr (tmp, '\\');
   if (sl)
     {
@@ -190,13 +190,13 @@ find_on_path (char *file, char *default_extension,
 
   if (!file)
     {
-      keyeprint ("find_on_path: NULL pointer for file");
+      display_error ("find_on_path: NULL pointer for file");
       return 0;
     }
 
   if (default_extension == NULL)
     {
-      keyeprint ("find_on_path: NULL pointer for default_extension");
+      display_error ("find_on_path: NULL pointer for default_extension");
       return 0;
     }
 
@@ -265,10 +265,10 @@ get_word (HANDLE fh, int offset)
 
   if (SetFilePointer (fh, offset, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER
       && GetLastError () != NO_ERROR)
-    keyeprint ("get_word: SetFilePointer()");
+    display_error ("get_word: SetFilePointer()");
 
   if (!ReadFile (fh, &rv, 2, (DWORD *) &r, 0))
-    keyeprint ("get_word: Readfile()");
+    display_error ("get_word: Readfile()");
 
   return rv;
 }
@@ -281,10 +281,10 @@ get_dword (HANDLE fh, int offset)
 
   if (SetFilePointer (fh, offset, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER
       && GetLastError () != NO_ERROR)
-    keyeprint ("get_dword: SetFilePointer()");
+    display_error ("get_dword: SetFilePointer()");
 
   if (!ReadFile (fh, &rv, 4, (DWORD *) &r, 0))
-    keyeprint ("get_dword: Readfile()");
+    display_error ("get_dword: Readfile()");
 
   return rv;
 }
@@ -305,7 +305,7 @@ rva_to_offset (int rva, char *sections, int nsections, int *sz)
 
   if (sections == NULL)
     {
-      keyeprint ("rva_to_offset: NULL passed for sections");
+      display_error ("rva_to_offset: NULL passed for sections");
       return 0;
     }
 
@@ -364,7 +364,7 @@ cygwin_info (HANDLE h)
   buf_start = buf = (char *) calloc (1, size + 1);
   if (buf == NULL)
     {
-      keyeprint ("cygwin_info: calloc()");
+      display_error ("cygwin_info: calloc()");
       return;
     }
 
@@ -437,16 +437,16 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 
   if (path == NULL)
     {
-      keyeprint ("dll_info: NULL passed for path");
+      display_error ("dll_info: NULL passed for path");
       return;
     }
 
   if (SetFilePointer (fh, opthdr_ofs + 40, 0, FILE_BEGIN) ==
       INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
-    keyeprint ("dll_info: SetFilePointer()");
+    display_error ("dll_info: SetFilePointer()");
 
   if (!ReadFile (fh, &v, sizeof (v), &junk, 0))
-    keyeprint ("dll_info: Readfile()");
+    display_error ("dll_info: Readfile()");
 
   if (verbose)
     printf (" - os=%d.%d img=%d.%d sys=%d.%d\n",
@@ -467,10 +467,10 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 		      get_word (fh, pe_header_offset + 4 + 16), 0,
 		      FILE_BEGIN) == INVALID_SET_FILE_POINTER
       && GetLastError () != NO_ERROR)
-    keyeprint ("dll_info: SetFilePointer()");
+    display_error ("dll_info: SetFilePointer()");
 
   if (!ReadFile (fh, sections, nsections * 40, &junk, 0))
-    keyeprint ("dll_info: Readfile()");
+    display_error ("dll_info: Readfile()");
 
   if (verbose && num_entries >= 1 && export_size > 0)
     {
@@ -481,12 +481,12 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 	{
 	  if (SetFilePointer (fh, expbase, 0, FILE_BEGIN) ==
 	      INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
-	    keyeprint ("dll_info: SetFilePointer()");
+	    display_error ("dll_info: SetFilePointer()");
 
 	  unsigned char *exp = (unsigned char *) malloc (expsz);
 
 	  if (!ReadFile (fh, exp, expsz, &junk, 0))
-	    keyeprint ("dll_info: Readfile()");
+	    display_error ("dll_info: Readfile()");
 
 	  ExpDirectory *ed = (ExpDirectory *) exp;
 	  int ofs = ed->name_rva - export_rva;
@@ -512,17 +512,17 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 	{
 	  if (SetFilePointer (fh, impbase, 0, FILE_BEGIN) ==
 	      INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
-	    keyeprint ("dll_info: SetFilePointer()");
+	    display_error ("dll_info: SetFilePointer()");
 
 	  unsigned char *imp = (unsigned char *) malloc (impsz);
 	  if (imp == NULL)
 	    {
-	      keyeprint ("dll_info: malloc()");
+	      display_error ("dll_info: malloc()");
 	      return;
 	    }
 
 	  if (!ReadFile (fh, imp, impsz, &junk, 0))
-	    keyeprint ("dll_info: Readfile()");
+	    display_error ("dll_info: Readfile()");
 
 	  ImpDirectory *id = (ImpDirectory *) imp;
 	  for (i = 0; id[i].name_rva; i++)
@@ -542,13 +542,13 @@ track_down (char *file, char *suffix, int lvl)
 {
   if (file == NULL)
     {
-      keyeprint ("track_down: NULL passed for file");
+      display_error ("track_down: NULL passed for file");
       return;
     }
 
   if (suffix == NULL)
     {
-      keyeprint ("track_down: NULL passed for suffix");
+      display_error ("track_down: NULL passed for suffix");
       return;
     }
 
@@ -611,7 +611,7 @@ track_down (char *file, char *suffix, int lvl)
   dll_info (path, fh, lvl, 1);
   d->state = DID_INACTIVE;
   if (!CloseHandle (fh))
-    keyeprint ("track_down: CloseHandle()");
+    display_error ("track_down: CloseHandle()");
 }
 
 static void
@@ -622,18 +622,18 @@ ls (char *f)
   BY_HANDLE_FILE_INFORMATION info;
 
   if (!GetFileInformationByHandle (h, &info))
-    keyeprint ("ls: GetFileInformationByHandle()");
+    display_error ("ls: GetFileInformationByHandle()");
 
   SYSTEMTIME systime;
 
   if (!FileTimeToSystemTime (&info.ftLastWriteTime, &systime))
-    keyeprint ("ls: FileTimeToSystemTime()");
+    display_error ("ls: FileTimeToSystemTime()");
   printf ("%5dk %04d/%02d/%02d %s",
 	  (((int) info.nFileSizeLow) + 512) / 1024,
 	  systime.wYear, systime.wMonth, systime.wDay, f);
   dll_info (f, h, 16, 0);
   if (!CloseHandle (h))
-    keyeprint ("ls: CloseHandle()");
+    display_error ("ls: CloseHandle()");
 }
 
 static void
@@ -718,14 +718,14 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
       char *value_name = (char *) malloc (max_value_len + 1);
       if (value_name == NULL)
 	{
-	  keyeprint ("scan_registry: malloc()");
+	  display_error ("scan_registry: malloc()");
 	  return;
 	}
 
       char *value_data = (char *) malloc (max_valdata_len + 1);
       if (value_data == NULL)
 	{
-	  keyeprint ("scan_registry: malloc()");
+	  display_error ("scan_registry: malloc()");
 	  return;
 	}
 
@@ -769,7 +769,7 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
 	    {
 	      scan_registry (&ri, sKey, subkey_name, cygnus);
 	      if (RegCloseKey (sKey) != ERROR_SUCCESS)
-		keyeprint ("scan_registry: RegCloseKey()");
+		display_error ("scan_registry: RegCloseKey()");
 	    }
 	}
     }
@@ -868,7 +868,7 @@ dump_sysinfo ()
   OSVERSIONINFO osversion;
   osversion.dwOSVersionInfoSize = sizeof (osversion);
   if (!GetVersionEx (&osversion))
-    keyeprint ("dump_sysinfo: GetVersionEx()");
+    display_error ("dump_sysinfo: GetVersionEx()");
   char *osname = (char *) "unknown OS";
   switch (osversion.dwPlatformId)
     {
@@ -990,7 +990,7 @@ dump_sysinfo ()
   putenv (cygwin);
 
   if (!GetSystemDirectory (tmp, 4000))
-    keyeprint ("dump_sysinfo: GetSystemDirectory()");
+    display_error ("dump_sysinfo: GetSystemDirectory()");
   printf ("\nSysDir: %s\n", tmp);
 
   GetWindowsDirectory (tmp, 4000);
@@ -1094,7 +1094,7 @@ dump_sysinfo ()
       if (!GetVolumeInformation
 	  (drive, name, sizeof (name), &serno, &maxnamelen, &flags, fsname,
 	   sizeof (fsname)) && GetLastError () != ERROR_NOT_READY)
-	keyeprint ("dump_sysinfo: GetVolumeInformation()");
+	display_error ("dump_sysinfo: GetVolumeInformation()");
 
       int dtype = GetDriveType (drive);
       char drive_type[4] = "unk";
@@ -1161,7 +1161,7 @@ dump_sysinfo ()
     }
 
   if (!FreeLibrary (k32))
-    keyeprint ("dump_sysinfo: FreeLibrary()");
+    display_error ("dump_sysinfo: FreeLibrary()");
   SetErrorMode (prev_mode);
   if (givehelp)
     {
@@ -1276,17 +1276,17 @@ check_keys ()
 			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
   if (h == INVALID_HANDLE_VALUE || h == NULL)
-    return (keyeprint ("check_keys: Opening CONIN$"));
+    return (display_error ("check_keys: Opening CONIN$"));
 
   DWORD mode;
 
   if (!GetConsoleMode (h, &mode))
-    keyeprint ("check_keys: GetConsoleMode()");
+    display_error ("check_keys: GetConsoleMode()");
   else
     {
       mode &= ~ENABLE_PROCESSED_INPUT;
       if (!SetConsoleMode (h, mode))
-	keyeprint ("check_keys: SetConsoleMode()");
+	display_error ("check_keys: SetConsoleMode()");
     }
 
   fputs ("\nThis key check works only in a console window,", stderr);
@@ -1305,7 +1305,7 @@ check_keys ()
     {
       prev_in = in;
       if (!ReadConsoleInput (h, &in, 1, &mode))
-	keyeprint ("check_keys: ReadConsoleInput()");
+	display_error ("check_keys: ReadConsoleInput()");
 
       if (!memcmp (&in, &prev_in, sizeof in))
 	continue;
