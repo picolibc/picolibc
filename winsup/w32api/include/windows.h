@@ -44,63 +44,6 @@
 #include <winresrc.h>
 #else
 
-#ifdef __GNUC__
-#ifndef NONAMELESSUNION
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95) 
-#define _ANONYMOUS_UNION __extension__
-#define _ANONYMOUS_STRUCT __extension__
-#else
-#if defined(__cplusplus)
-#define _ANONYMOUS_UNION __extension__
-#endif /* __cplusplus */
-#endif /* __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95) */
-#endif /* NONAMELESSUNION */
-#elif defined(__WATCOMC__)
-#define _ANONYMOUS_UNION
-#define _ANONYMOUS_STRUCT
-#endif /* __GNUC__/__WATCOMC__ */
-
-#ifndef _ANONYMOUS_UNION
-#define _ANONYMOUS_UNION
-#define _UNION_NAME(x) x
-#define DUMMYUNIONNAME	u
-#define DUMMYUNIONNAME2	u2
-#define DUMMYUNIONNAME3	u3
-#define DUMMYUNIONNAME4	u4
-#define DUMMYUNIONNAME5	u5
-#define DUMMYUNIONNAME6	u6
-#define DUMMYUNIONNAME7	u7
-#define DUMMYUNIONNAME8	u8
-#else
-#define _UNION_NAME(x)
-#define DUMMYUNIONNAME
-#define DUMMYUNIONNAME2
-#define DUMMYUNIONNAME3
-#define DUMMYUNIONNAME4
-#define DUMMYUNIONNAME5
-#define DUMMYUNIONNAME6
-#define DUMMYUNIONNAME7
-#define DUMMYUNIONNAME8
-#endif
-#ifndef _ANONYMOUS_STRUCT
-#define _ANONYMOUS_STRUCT
-#define _STRUCT_NAME(x) x
-#define DUMMYSTRUCTNAME	s
-#define DUMMYSTRUCTNAME2 s2
-#define DUMMYSTRUCTNAME3 s3
-#else
-#define _STRUCT_NAME(x)
-#define DUMMYSTRUCTNAME
-#define DUMMYSTRUCTNAME2
-#define DUMMYSTRUCTNAME3
-#endif
-
-#ifndef NO_STRICT
-#ifndef STRICT
-#define STRICT 1
-#endif
-#endif
-
 #include <stdarg.h>
 #include <windef.h>
 #include <wincon.h>

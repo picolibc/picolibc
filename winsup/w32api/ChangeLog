@@ -1,7 +1,13 @@
-2002-06-02  Danny Smith  <dannysmith@users.sourceforge.net>
+2002-05-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/windows.h: Move ANONYMOUS_UNION, _ANONYMOUS_STRUCT,
+	STRICT and related defines to ...
+	* include/windef.h: Here.
+
+2002-05-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winsock2.h (int32): Remove typedef.
-	(SEVICETYPE): Add typedef.
+	(SERVICETYPE): Add typedef.
 	(struct _flowspec):Revise struct definition,  Comment
 	on types used for members.
 
