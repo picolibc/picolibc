@@ -410,13 +410,28 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
       case FH_PROCESS:
 	fh = cnew (fhandler_process) ();
 	break;
+      case FH_TTY:
+	{
+	  device newdev = dev;
+	  newdev.tty_to_real_device ();
+	  switch (newdev)
+	    {
+	    case FH_CONSOLE:
+	      if ((fh = cnew (fhandler_console) ()))
+		inc_console_fds ();
+	      break;
+	    case FH_TTYS:
+	      fh = cnew (fhandler_tty_slave) ();
+	      break;
+	    }
+	}
     }
 
   if (!fh)
     api_fatal ("internal error -- unknown device - %p, '%s'", (int) dev, dev.name);
 
   char w32buf[MAX_PATH + 1];
-  if (!unix_name)
+  if (!unix_name || !*unix_name)
     {
       if (!win32_name && dev.fmt && *dev.fmt)
 	{
