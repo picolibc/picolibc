@@ -1,5 +1,14 @@
 2002-09-27  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/stdio.h: Don't include stdarg.h.
+	(__VA_LIST): Define as __builtin_va_list or char* instead.
+	* include/stdarg.h: #include _mingw.h.
+	In C++, #include_next<stdarg.g> in namespace __ginclude.
+	Push va_list into std:: if whole file is needed, else
+	push __gnuc_va_list into global.
+
+2002-09-27  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/wchar: #include sys/types.h in non-ANSI mode.
 	* Protect _Wint_t typedef with __STRICT_ANSI__.  Remove from std
 	namespace.

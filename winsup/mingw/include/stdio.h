@@ -40,8 +40,6 @@
 #define __need_wchar_t
 #define	__need_wint_t
 #include <stddef.h>
-#define __need___va_list
-#include <stdarg.h>
 #endif	/* Not RC_INVOKED */
 
 
@@ -131,12 +129,13 @@
 
 #ifndef	RC_INVOKED
 
-#ifdef __GNUC__
-#define __VALIST __gnuc_va_list
+#ifndef __VALIST
+#if defined __GNUC__ && __GNUC__ >= 3
+#define __VALIST __builtin_va_list
 #else
 #define __VALIST char*
 #endif
-
+#endif
 /*
  * The structure underlying the FILE type.
  *
