@@ -66,6 +66,14 @@ enum bfd_link_hash_type
   bfd_link_hash_warning		/* Like indirect, but warn if referenced.  */
 };
 
+enum bfd_link_common_skip_ar_aymbols
+{
+  bfd_link_common_skip_none,
+  bfd_link_common_skip_text,
+  bfd_link_common_skip_data,
+  bfd_link_common_skip_all
+};
+
 /* The linking routines use a hash table which uses this structure for
    its elements.  */
 
@@ -343,6 +351,10 @@ struct bfd_link_info
 
   /* How many spare .dynamic DT_NULL entries should be added?  */
   unsigned int spare_dynamic_tags;
+
+  /* Criteria for skipping symbols when detemining
+     whether to include an object from an archive. */
+  enum bfd_link_common_skip_ar_aymbols common_skip_ar_aymbols;
 };
 
 /* This structures holds a set of callback functions.  These are
