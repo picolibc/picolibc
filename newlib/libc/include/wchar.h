@@ -3,6 +3,8 @@
 
 #include <_ansi.h>
 
+#include <sys/reent.h>
+
 #define __need_size_t
 #define __need_wchar_t
 #define __need_wint_t
