@@ -360,8 +360,7 @@ typedef char	_TCHAR;
 #define _tunlink    _unlink
 #define _tfinddata_t    _finddata_t
 
-
-#if 1  // defined __MSVCRT__
+#if 1  /* defined __MSVCRT_ */
 /* Not in crtdll.dll. Define macros anyway? */
 #define _ttoi64     _atoi64
 #define _i64tot     _i64toa
