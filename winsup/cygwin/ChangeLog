@@ -1,3 +1,7 @@
+Sat Jun 17 19:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* pinfo.cc (pinfo_init): Revert previous patch.
+
 Sat Jun 17 13:29:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* pinfo.cc (pinfo_init): Add missing initializers.
