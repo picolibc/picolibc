@@ -1118,6 +1118,17 @@ events_terminate (void)
   exit_already = 1;
 }
 
+extern "C" {
+static int __stdcall call_signal_handler_now ();
+};
+
+int
+sigframe::call_signal_handler ()
+{
+  unregister ();
+  call_signal_handler_now ();
+}
+
 #define pid_offset (unsigned)(((_pinfo *)NULL)->pid)
 extern "C" {
 void __stdcall
@@ -1135,13 +1146,6 @@ call_signal_handler_now ()
   *sigsave.retaddr_on_stack = sigsave.retaddr;
   sigdelayed0 ();
   return sa_flags & SA_RESTART;
-}
-
-int
-sigframe::call_signal_handler ()
-{
-  unregister ();
-  call_signal_handler_now ();
 }
 
 void unused_sig_wrapper ()
