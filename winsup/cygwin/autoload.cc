@@ -74,15 +74,9 @@ details. */
 #define LoadDLLfunc(name, n, dllname) LoadDLLfuncEx (name, n, dllname, 0)
 
 /* Main DLL setup stuff. */
-#define LoadDLLfuncEx(name, n, dllname, notimp) __asm__ ("\
-  .section	." #dllname "_info,\"w\"		\n\
-  .linkonce						\n\
-  .long		std_dll_init				\n\
-  .long		0					\n\
-  .long		-1					\n\
-  .long		dll_func_load				\n\
-  .asciz	\"" #dllname "\"			\n\
-							\n\
+#define LoadDLLfuncEx(name, n, dllname, notimp) \
+  LoadDLLprime (dllname, dll_func_load)			\
+  __asm__ ("						\n\
   .section	." #dllname "_text,\"wx\"		\n\
   .global	_" mangle (name, n) "			\n\
   .global	_win32_" mangle (name, n) "		\n\

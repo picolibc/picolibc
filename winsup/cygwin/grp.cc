@@ -140,7 +140,7 @@ read_etc_group ()
 
   strncpy (group_name, "Administrators", sizeof (group_name));
 
-  static pthread_mutex_t etc_group_mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+  static NO_COPY pthread_mutex_t etc_group_mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
   pthread_mutex_lock (&etc_group_mutex);
 
   /* if we got blocked by the mutex, then etc_group may have been processed */

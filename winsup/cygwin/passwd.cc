@@ -127,7 +127,7 @@ read_etc_passwd ()
      * for non-shared mutexs in the future. Also, this function will at most be called
      * once from each thread, after that the passwd_state test will succeed
      */
-    static pthread_mutex_t etc_passwd_mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+    static NO_COPY pthread_mutex_t etc_passwd_mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_lock (&etc_passwd_mutex);
 
     /* if we got blocked by the mutex, then etc_passwd may have been processed */
