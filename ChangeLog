@@ -1,3 +1,8 @@
+2003-05-13  Andreas Jaeger  <aj@suse.de>
+
+	* config.guess: Update to 2003-05-09 version.
+	* config.sub: Update to 2003-05-09 version.
+
 2003-05-13  Michael Eager <eager@mvista.com>
 
 	* configure.in: Correct sed script so that options in quotes are not
@@ -83,7 +88,7 @@
 	* texinfo/texinfo.tex: Import version 2003-02-03.16.
 
 2003-03-04  Daniel Jacobowitz  <drow@mvista.com>
-	
+
 	* configure.in: Include $(build_tooldir)/sys-include in
 	FLAGS_FOR_TARGET.
 	* configure: Regenerated.
@@ -272,7 +277,7 @@
 	* configure.in (GDB_TK): Add tcl directories conditional on
 	gdb/gdbtk directory being present.
 	* configure: Regenerate.
-	
+
 2003-01-04 John David Anglin  <dave.anglin@nrc.ca>
 
 	* configure.in (LD): Improve test for gcc.  Try to set LD to the ld used
@@ -356,10 +361,10 @@
 
 2002-12-27  Nathanael Nerode  <neroden@gcc.gnu.org>
 
-	* configure: Remove unneeded 'export's.  Make CC_FOR_TARGET, 
+	* configure: Remove unneeded 'export's.  Make CC_FOR_TARGET,
 	CXX_FOR_TARGET, GCJ_FOR_TARGET substituted in configure.in only.
 
-	* ChangeLog: Move a couple of entries from here to winsup/cygwin, 
+	* ChangeLog: Move a couple of entries from here to winsup/cygwin,
 	where they belong.
 
 2002-12-24  Andreas Schwab  <schwab@suse.de>
@@ -533,7 +538,7 @@
 
 	* Makefile.tpl: Strip out useless setting of 'dir'.
 	* Makefile.in: Regenerate.
-	
+
 2002-12-02  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	(finishing slow-motion replay)
@@ -552,12 +557,12 @@
 	* Makefile.tpl: Remove unnecessary ifs.
 	* Makefile.in: Regenerate.
 
-	* Makefile.tpl: Implement soft dependency machinery.  Maybe-ize 
+	* Makefile.tpl: Implement soft dependency machinery.  Maybe-ize
 	dependencies.  Maybe-ize build-libiberty.  Create dummy install
 	targets for 'no_install' modules.
-	* configure: Move GDB_TK substitution to configure.in.  Move 
+	* configure: Move GDB_TK substitution to configure.in.  Move
 	build_modules stuff to configure.in.
-	* configure.in: Implement soft dependency machinery.  Maybe-ize 
+	* configure.in: Implement soft dependency machinery.  Maybe-ize
 	GDB_TK, rearrange slightly.  Move build_modules stuff from configure.
 	* Makefile.in: Regenerate.
 
@@ -575,12 +580,12 @@
 
 	* ltcf-c.sh, ltcf-gcj.sh, Makefile.tpl: Correct BUILD/HOST confusion.
 
-	* configure.in: Produce lists of subdir targets we're actually 
+	* configure.in: Produce lists of subdir targets we're actually
 	configuring.  Remove references to "dosrel".
 	* Makefile.tpl: Let configure set which subdir targets are hit.
-	Remove install-cross; clean up install; remove ALL.  Remove 
+	Remove install-cross; clean up install; remove ALL.  Remove
 	references to "dosrel".  Remove "EXTRA_TARGET_HOST" hackery.
-	Autogenerate host module targets.  Remove empty dependency lines 
+	Autogenerate host module targets.  Remove empty dependency lines
 	and redundant dependency; rearrange slightly.
 	* Makefile.def: Add host-side libtermcap, utils.
 
@@ -866,7 +871,7 @@
 2002-07-03  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* contrib: New directory.  Created to contain a copy of the
-	texi2pod.pl script so that it is in the same place as the version in 
+	texi2pod.pl script so that it is in the same place as the version in
 	the FSF GCC sources.
 
 2002-07-02  Nathanael Nerode  <neroden@gcc.gnu.org>
@@ -1082,7 +1087,7 @@
 	* configure.in (target_libs): Remove target-libchill.
 	Do not compute CHILL_FOR_TARGET.
 	* libchill: Remove directory.
-	
+
 2002-04-15  DJ Delorie  <dj@redhat.com>
 
 	* Makefile.in, configure.in, configure: Sync with gcc, entries
@@ -1445,7 +1450,7 @@ Wed Sep 13 11:11:29 2000  Jeffrey A Law  (law@cygnus.com)
 	* configure.in: Re-enable all references to libg++ and librx.
 
 2002-04-09  Loren James Rittle  <rittle@labs.mot.com>
-	
+
 	* configure.in: Add *-*-freebsd* configurations.
 
 2002-04-07  Andrew Cagney  <ac131313@redhat.com>
@@ -1597,7 +1602,7 @@ Wed Sep 13 11:11:29 2000  Jeffrey A Law  (law@cygnus.com)
 	libiberty.
 
 	Import this patch from gcc:
-	
+
 	2000-12-09  Laurynas Biveinis  <lauras@softhome.net>
 
 	    * symlink-tree: handle DOS-style absolute paths.
@@ -1747,7 +1752,7 @@ Wed Sep 13 11:11:29 2000  Jeffrey A Law  (law@cygnus.com)
 Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* Makefile.in (VER): When present, extract the version number from
- 	the file version.in.
+	the file version.in.
 
 2001-06-08  Alexandre Oliva  <aoliva@redhat.com>, Jeff Sturm  <jsturm@one-point.com>
 
