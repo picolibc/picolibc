@@ -1,3 +1,8 @@
+2002-07-31  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler.h (fhandler_base::get_r_no_interrupt): Make non-virtual.
+	* net.cc (fdsock): Call set_r_no_interrupt.
+
 2002-07-30  Christopher Faylor  <cgf@redhat.com>
 
 	* syscalls.cc (_read): Clarify debugging output.
