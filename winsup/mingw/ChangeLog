@@ -1,3 +1,7 @@
+2004-04-24  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* include/limits.h (_I64_MIN, _I64_MAX, _UI64_MAX): Add defines.
+
 2004-04-22  Earnie Boyd  <earnie@users.sf.net>
 
 	* DISCLAIMER: Add words about "free to use".

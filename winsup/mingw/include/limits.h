@@ -109,6 +109,11 @@
 #define LLONG_MIN LONG_LONG_MIN
 #define ULLONG_MAX ULONG_LONG_MAX
 
+/* MSVC compatibility */
+#define _I64_MIN LONG_LONG_MIN
+#define _I64_MAX LONG_LONG_MAX
+#define _UI64_MAX ULONG_LONG_MAX
+
 #endif /* Not Strict ANSI and GNU C compiler */
 
 
