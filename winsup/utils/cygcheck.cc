@@ -65,8 +65,7 @@ struct
   const char *name;
   int missing_is_good;
 }
-static common_apps[] =
-{
+static common_apps[] = {
   {"bash", 0},
   {"cat", 0},
   {"cpp", 1},
@@ -244,7 +243,7 @@ get_word (HANDLE fh, int offset)
       && GetLastError () != NO_ERROR)
     keyeprint ("get_word: SetFilePointer()");
 
-  if (!ReadFile (fh, &rv, 2, (DWORD *) & r, 0))
+  if (!ReadFile (fh, &rv, 2, (DWORD *) &r, 0))
     keyeprint ("get_word: Readfile()");
 
   return rv;
@@ -260,7 +259,7 @@ get_dword (HANDLE fh, int offset)
       && GetLastError () != NO_ERROR)
     keyeprint ("get_word: SetFilePointer()");
 
-  if (!ReadFile (fh, &rv, 4, (DWORD *) & r, 0))
+  if (!ReadFile (fh, &rv, 4, (DWORD *) &r, 0))
     keyeprint ("get_dword: Readfile()");
 
   return rv;
@@ -382,7 +381,8 @@ cygwin_info (HANDLE h)
 	    int maj = atoi (dll_major);
 	    dll_major[1] = c;
 	    int min = atoi (dll_major + 1);
-	    sprintf (pbuf, "DLL version: %d.%d.%.*s", maj, min, len - 11, buf + 11);
+	    sprintf (pbuf, "DLL version: %d.%d.%.*s", maj, min, len - 11,
+		     buf + 11);
 	    len = strlen (s = pbuf);
 	  }
 	if (strncmp (s, "dll", 3) == 0)
@@ -417,8 +417,8 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
       return;
     }
 
-  if (SetFilePointer (fh, opthdr_ofs + 40, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER
-      && GetLastError () != NO_ERROR)
+  if (SetFilePointer (fh, opthdr_ofs + 40, 0, FILE_BEGIN) ==
+      INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
     keyeprint ("dll_info: SetFilePointer()");
 
   if (!ReadFile (fh, &v, sizeof (v), &junk, 0))
@@ -455,8 +455,8 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 
       if (expbase)
 	{
-	  if (SetFilePointer (fh, expbase, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER
-	      && GetLastError () != NO_ERROR)
+	  if (SetFilePointer (fh, expbase, 0, FILE_BEGIN) ==
+	      INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
 	    keyeprint ("dll_info: SetFilePointer()");
 
 	  unsigned char *exp = (unsigned char *) malloc (expsz);
@@ -486,8 +486,8 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
       int impbase = rva_to_offset (import_rva, sections, nsections, &impsz);
       if (impbase)
 	{
-	  if (SetFilePointer (fh, impbase, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER
-	      && GetLastError () != NO_ERROR)
+	  if (SetFilePointer (fh, impbase, 0, FILE_BEGIN) ==
+	      INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
 	    keyeprint ("dll_info: SetFilePointer()");
 
 	  unsigned char *imp = (unsigned char *) malloc (impsz);
@@ -778,13 +778,13 @@ dump_sysinfo ()
       switch (osversion.dwMinorVersion)
 	{
 	case 0:
-	  if (strchr(osversion.szCSDVersion, 'C'))
+	  if (strchr (osversion.szCSDVersion, 'C'))
 	    osname = (char *) "95 OSR2";
 	  else
 	    osname = (char *) "95";
 	  break;
 	case 10:
-	  if (strchr(osversion.szCSDVersion, 'A'))
+	  if (strchr (osversion.szCSDVersion, 'A'))
 	    osname = (char *) "98 SE";
 	  else
 	    osname = (char *) "98";
@@ -803,44 +803,46 @@ dump_sysinfo ()
 	  BOOL more_info = FALSE;
 	  OSVERSIONINFOEX osversionex;
 	  osversionex.dwOSVersionInfoSize = sizeof (osversionex);
-	  if (GetVersionEx ((OSVERSIONINFO *)&osversionex))
+	  if (GetVersionEx ((OSVERSIONINFO *) &osversionex))
 	    more_info = TRUE;
 	  if (osversion.dwMinorVersion == 0)
 	    {
 	      if (!more_info)
 		osname = (char *) "2000";
 	      else if (osversionex.wProductType == VER_NT_SERVER
-		       || osversionex.wProductType == VER_NT_DOMAIN_CONTROLLER)
-	        {
-		  if (osversionex.wSuiteMask & VER_SUITE_DATACENTER)
+		       || osversionex.wProductType ==
+		       VER_NT_DOMAIN_CONTROLLER)
+		{
+		  if (osversionex.wSuiteMask &VER_SUITE_DATACENTER)
 		    osname = (char *) "2000 Datacenter Server";
 		  else if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
 		    osname = (char *) "2000 Advanced Server";
 		  else
 		    osname = (char *) "2000 Server";
-	        }
+		}
 	      else
-	        osname = (char *) "2000 Professional";
+		osname = (char *) "2000 Professional";
 	    }
 	  else
 	    {
 	      if (!more_info)
 		osname = (char *) "XP";
 	      else if (osversionex.wProductType == VER_NT_SERVER
-		       || osversionex.wProductType == VER_NT_DOMAIN_CONTROLLER)
-	        {
+		       || osversionex.wProductType ==
+		       VER_NT_DOMAIN_CONTROLLER)
+		{
 		  if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
 		    osname = (char *) ".NET Enterprise Server";
 		  else
 		    osname = (char *) ".NET Server";
 		}
 	      else if (osversionex.wSuiteMask & VER_SUITE_PERSONAL)
-	        osname = (char *) "XP Home Edition";
+		osname = (char *) "XP Home Edition";
 	      else
-	        osname = (char *) "XP Professional";
-		
+		osname = (char *) "XP Professional";
+
 	    }
-        }
+	}
       else
 	osname = (char *) "NT";
       break;
@@ -851,9 +853,9 @@ dump_sysinfo ()
   printf ("Windows %s Ver %lu.%lu Build %lu %s\n\n", osname,
 	  osversion.dwMajorVersion, osversion.dwMinorVersion,
 	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
-	    osversion.dwBuildNumber : (osversion.dwBuildNumber & 0xffff),
+	  osversion.dwBuildNumber : (osversion.dwBuildNumber & 0xffff),
 	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
-	    osversion.szCSDVersion : "");
+	  osversion.szCSDVersion : "");
 
   printf ("Path:");
   char *s = getenv ("PATH"), *e;
@@ -970,10 +972,10 @@ dump_sysinfo ()
       sprintf (drive, "%c:\\", i + 'a');
       /* Report all errors, except if the Volume is ERROR_NOT_READY. 
          ERROR_NOT_READY is returned when removeable media drives are empty
-	 (CD, floppy, etc.) */
-      if (!GetVolumeInformation (drive, name, sizeof (name), &serno, &maxnamelen, &flags,
-				 fsname, sizeof (fsname))
-	  && GetLastError () != ERROR_NOT_READY)
+         (CD, floppy, etc.) */
+      if (!GetVolumeInformation
+	  (drive, name, sizeof (name), &serno, &maxnamelen, &flags, fsname,
+	   sizeof (fsname)) && GetLastError () != ERROR_NOT_READY)
 	keyeprint ("dump_sysinfo: GetVolumeInformation()");
 
       int dtype = GetDriveType (drive);
@@ -1218,7 +1220,7 @@ check_keys ()
 }
 
 static void
-usage (FILE *stream, int status)
+usage (FILE * stream, int status)
 {
   fprintf (stream, "\
 Usage: cygcheck [OPTIONS] [program ...]\n\
@@ -1296,7 +1298,7 @@ main (int argc, char **argv)
 	break;
       case 'V':
 	print_version ();
-        exit (0);
+	exit (0);
       default:
 	usage (stderr, 1);
        /*NOTREACHED*/}
@@ -1304,10 +1306,10 @@ main (int argc, char **argv)
   argv += optind;
 
   if (argc == 0 && !sysinfo && !keycheck && !check_setup)
-     if (givehelp)
-	usage (stdout, 0);
-     else
-	usage (stderr, 1);
+    if (givehelp)
+      usage (stdout, 0);
+    else
+      usage (stderr, 1);
 
   if ((check_setup || sysinfo) && keycheck)
     usage (stderr, 1);

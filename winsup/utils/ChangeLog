@@ -1,5 +1,9 @@
 2002-03-06  Christopher Faylor  <cgf@redhat.com>
 
+	* cygcheck.cc: Reformat.
+
+2002-03-06  Christopher Faylor  <cgf@redhat.com>
+
 	* cygcheck.cc (longopts): Use correct short option for --version.
 
 2002-03-06  Christopher Faylor  <cgf@redhat.com>
