@@ -1,3 +1,10 @@
+Sat Sep  1 01:37:13 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* tty.cc (tty::create_inuse): Eliminate unneeded argument.
+	* tty.h: Reflect above change.
+	* fhandler_tty.cc: Reflect argument reduction in tty::create_inuse,
+	throughout.  Always make inuse inheritable.
+
 Sat Sep  1 01:10:07 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* debug.cc (mark_closed): Rename from debug_mark_closed and make

@@ -62,7 +62,7 @@ fhandler_tty_master::init (int ntty)
 
   cygwin_shared->tty[ttynum]->common_init (this);
 
-  inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE, FALSE);
+  inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
 
   h = makethread (process_input, NULL, 0, "ttyin");
   if (h == NULL)
@@ -509,7 +509,7 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
   /* FIXME: Needs a method to eliminate tty races */
   {
     acquire_output_mutex (500);
-    inuse = get_ttyp ()->create_inuse (TTY_SLAVE_ALIVE, TRUE);
+    inuse = get_ttyp ()->create_inuse (TTY_SLAVE_ALIVE);
     get_ttyp ()->was_opened = TRUE;
     release_output_mutex ();
   }
@@ -972,7 +972,7 @@ fhandler_pty_master::open (const char *, int flags, mode_t)
     return 0;
 
   cygwin_shared->tty[ttynum]->common_init (this);
-  inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE, FALSE);
+  inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
   set_flags (flags);
   set_open_status ();
 
