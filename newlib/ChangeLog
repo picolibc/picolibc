@@ -1,3 +1,8 @@
+2002-04-22  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* acinclude.m4 (newlib_cflags): Remove include directories that
+	are already specified in the top-level configure.in's FLAGS_FOR_TARGET.
+
 2002-04-19  Bill Siegmund 
 
 	* libc/machine/xscale/memchr.c: Don't use multi-line strings.

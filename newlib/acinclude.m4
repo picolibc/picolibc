@@ -141,18 +141,6 @@ fi
 
 . [$]{newlib_basedir}/configure.host
 
-case [$]{newlib_basedir} in
-/* | [A-Za-z]:[/\\]*) newlib_flagbasedir=[$]{newlib_basedir} ;;
-*) newlib_flagbasedir='[$](top_builddir)/'[$]{newlib_basedir} ;;
-esac
-
-newlib_cflags="[$]{newlib_cflags} -I"'[$](top_builddir)'"/$1/targ-include -I[$]{newlib_flagbasedir}/libc/include"
-case "${host}" in
-  *-*-cygwin*)
-    newlib_cflags="[$]{newlib_cflags} -I[$]{newlib_flagbasedir}/../winsup/cygwin/include  -I[$]{newlib_flagbasedir}/../winsup/w32api/include"
-    ;;
-esac
-
 newlib_cflags="[$]{newlib_cflags} -fno-builtin"
 
 NEWLIB_CFLAGS=${newlib_cflags}
