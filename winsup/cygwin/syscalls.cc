@@ -91,8 +91,11 @@ _unlink (const char *ourname)
 	{
 	  CloseHandle (h);
 	  syscall_printf ("CreateFile/CloseHandle succeeded");
-	  res = 0;
-	  break;
+	  if (i > 0 || GetFileAttributes (win32_name) == (DWORD) -1)
+	    {
+	      res = 0;
+	      break;
+	    }
 	}
 
       if (i > 0)

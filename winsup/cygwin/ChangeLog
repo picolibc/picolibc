@@ -1,3 +1,10 @@
+Sun Apr 16 18:54:21 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* init.cc (dll_entry): Use better check for determining when to set
+	thread specific stuff.
+	* syscalls.cc (_unlink): Continue with chmod'ing file even if
+	DELETE_ON_CLOSE succeeds, if file still exists.
+
 Fri Apr 14 23:51:15 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_console.cc (keytable): Add support for keypad 5 key, which

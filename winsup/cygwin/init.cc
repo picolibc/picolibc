@@ -26,7 +26,7 @@ WINAPI dll_entry (HANDLE h, DWORD reason, void *static_load)
       dynamically_loaded = (static_load == NULL);
       break;
     case DLL_THREAD_ATTACH:
-      if (user_data->initial_sp)
+      if (user_data->threadinterface)
 	{
 	  if ( !TlsSetValue(user_data->threadinterface->reent_index,
                     &user_data->threadinterface->reents))
