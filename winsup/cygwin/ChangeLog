@@ -3,7 +3,7 @@
 	* thread.h (class List): Move inline code inside class
 	declaration.
 	(List::forEach): Change callback parameter to template class
-	member function	pointer.
+	member function pointer.
 	(pthread_keys::fixup_before_fork): Change to inline. Use
 	List::forEach to fixup keys.
 	(pthread_keys::fixup_after_fork): Ditto.
