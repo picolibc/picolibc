@@ -1,3 +1,11 @@
+2003-02-05  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/basetypes.h (_GUID_DEFINED): Add deprecation warning, start
+	using GUID_DEFINED instead.
+	* include/sqltypes.h: Ditto.
+	* include/winnt.h: Ditto.
+	* include/ddk/scsiwmi.h: Ditto.
+
 2003-02-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlwapi.h (PathRelativePathTo[AW]): Correct

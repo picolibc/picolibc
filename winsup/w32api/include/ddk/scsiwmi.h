@@ -46,8 +46,12 @@ typedef struct _SCSIWMI_REQUEST_CONTEXT {
   ULONG  ReturnSize;
 } SCSIWMI_REQUEST_CONTEXT, *PSCSIWMI_REQUEST_CONTEXT;
 
-#ifndef _GUID_DEFINED
-#define _GUID_DEFINED
+#ifdef _GUID_DEFINED
+# warning _GUID_DEFINED is deprecated, use GUID_DEFINED instead
+#endif
+
+#if ! (defined _GUID_DEFINED || defined GUID_DEFINED)
+#define GUID_DEFINED
 typedef struct _GUID {
     unsigned long  Data1;
     unsigned short Data2;
