@@ -2,32 +2,21 @@
 
 @subsection How should I set my PATH?
 
-If you look at the "Cygwin 1.1.0" (or similar) shortcut created in the
-"Cygnus Solutions" programs folder, you'll see that it runs
-@code{C:\cygwin\bin\cygwin.bat} (assuming your root is
-@code{C:\cygwin}).  The contents should look something like this:
+This is done for you in the file /etc/profile, which is sourced by bash
+when you start it from the Desktop or Start Menu shortcut, created by
+@code{setup.exe}.  The line is
 
 @example
-	@@echo off
-	SET MAKE_MODE=unix
-	SET PATH=C:\cygwin\bin;C:\cygwin\usr\local\bin;%PATH%
-	bash
+	PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
 @end example
 
-Effectively, this @strong{prepends} /usr/bin and /usr/local/bin to your
+Effectively, this @strong{prepends} /usr/local/bin and /usr/bin to your
 Windows system path.  If you choose to reset your PATH, say in
-$HOME/.bashrc, then you should follow this rule.  You @strong{must} have
-@code{/usr/bin} in your PATH @strong{before} any Windows system
-directories.  (And you must not omit the Windows system directories!)
-Otherwise you will likely encounter all sorts of problems
-running Cygwin applications.
-
-If you haven't messed up the default mounts, then @code{/bin} and
-@code{/usr/bin} are the same location, so you only need one of them in
-your PATH.  You should use @code{/usr/local/bin} for installing
-additional Cygwin applications that are not part of the core net
-release.  (That is, anything not found in an ftp mirror of @code{latest}
-and installed by @code{setup.exe}.)
+$HOME/.bashrc, or by editing etc/profile directly, then you should
+follow this rule.  You @strong{must} have @code{/usr/bin} in your PATH
+@strong{before} any Windows system directories.  (And you must not omit
+the Windows system directories!)  Otherwise you will likely encounter
+all sorts of problems running Cygwin applications.
 
 @subsection Bash says "command not found", but it's right there!
 
@@ -264,11 +253,6 @@ cygwin-mounted filesystems (as Cygwin 'find' would do).
 
 If you are looking for the "more" pager, you should use the "less" pager
 instead.
-
-@subsection Where can I find "which"?
-
-There is no "which" command with Cygwin.  However, you can use the bash
-shell builtin "type" which does something similar.
 
 @subsection Why isn't package XXXX available in Cygwin?  (Or, why is your package so out of date?)
 
