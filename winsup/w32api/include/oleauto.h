@@ -32,11 +32,7 @@
 #else
 #define V_UNION(X,Y) ((X)->Y)
 #endif
-#ifdef __cplusplus
 #define V_BOOL(X) V_UNION(X,boolVal)
-#else
-#define V_BOOL(X) V_UNION(X,bool)
-#endif
 #define V_VT(X) ((X)->vt)
 #define V_ISBYREF(X) (V_VT(X)&VT_BYREF)
 #define V_ISARRAY(X) (V_VT(X)&VT_ARRAY)
