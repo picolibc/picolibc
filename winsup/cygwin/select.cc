@@ -1329,6 +1329,11 @@ socket_cleanup (select_record *, select_stuff *stuff)
     {
       select_printf ("connection to si->exitsock %p", si->exitsock);
       SOCKET s = socket (AF_INET, SOCK_STREAM, 0);
+
+      /* Set LINGER with 0 timeout for hard close */
+      struct linger tmp = {1, 0}; /* On, 0 delay */
+      (void) setsockopt (s, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof(tmp));
+
       /* Connecting to si->exitsock will cause any executing select to wake
 	 up.  When this happens then the exitsock condition will cause the
 	 thread to terminate. */
@@ -1338,12 +1343,12 @@ socket_cleanup (select_record *, select_stuff *stuff)
 	  select_printf ("connect failed");
 	  /* FIXME: now what? */
 	}
-      shutdown (s, 2);
+      shutdown (s, SD_BOTH);
       closesocket (s);
 
       /* Wait for thread to go away */
       WaitForSingleObject (si->thread, INFINITE);
-      shutdown (si->exitsock, 2);
+      shutdown (si->exitsock, SD_BOTH);
       closesocket (si->exitsock);
       CloseHandle (si->thread);
       stuff->device_specific[FHDEVN(FH_SOCKET)] = NULL;

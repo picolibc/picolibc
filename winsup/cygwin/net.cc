@@ -363,7 +363,12 @@ cygwin_socket (int af, int type, int protocol)
       if (af == AF_INET)
 	name = (type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp");
       else
-	name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
+	{
+	  name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
+	  /* Set LINGER with 0 timeout for hard close */
+	  struct linger tmp = {1, 0}; /* On, 0 delay */
+	  (void) setsockopt (soc, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof(tmp));
+	}
 
       fdsock (fd, name, soc)->set_addr_family (af);
       res = fd;

@@ -1,3 +1,14 @@
+Sat Apr 14 18:04:35 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* net.cc (cygwin_socket): Set SO_LINGER to small value so closed UNIX
+	domain sockets will not stay around.
+
+Sat Apr 14 18:01:43 2001  Pierre A. Humblet  <Pierre.Humblet@ieee.org>
+
+	* select.cc (socket_cleanup): Set SO_LINGER to small value so closed
+	dummy sockets do not stay around.  Use correct value for second argument
+	to shutdown.
+
 Sat Apr 14 17:04:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.h (MTinterface): Add threadcount.
