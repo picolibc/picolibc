@@ -1,3 +1,8 @@
+2000-03-01  H.J. Lu  <hjl@gnu.org>
+
+	* bfdlink.h (bfd_link_callbacks): Add a boolean arg to
+	the undefined_symbol callback.
+
 2000-02-23  Linas Vepstas <linas@linas.org>
 
 	* dis-asm.h (print_insn_i370): Declare.
