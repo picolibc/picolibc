@@ -102,8 +102,8 @@ LIB_SOURCES = \
 	brk.c flockfile.c funlockfile.c getoptlong.c getreent.c ids.c \
 	inode.c io.c io64.c linux.c mmap.c \
 	pread.c pread64.c process.c pwrite.c pwrite64.c raise.c realpath.c \
-	sched.c select.c shm_open.c shm_unlink.c signal.c siglongjmp.c \
-	socket.c sleep.c stack.c \
+	resource.c sched.c select.c shm_open.c shm_unlink.c signal.c \
+	siglongjmp.c socket.c sleep.c stack.c \
 	sysconf.c systat.c system.c tcdrain.c termios.c time.c \
 	usleep.c wait.c
 
@@ -138,10 +138,11 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  brk.o flockfile.o funlockfile.o \
 @USE_LIBTOOL_FALSE@getoptlong.o getreent.o ids.o inode.o io.o io64.o \
 @USE_LIBTOOL_FALSE@linux.o mmap.o pread.o pread64.o process.o pwrite.o \
-@USE_LIBTOOL_FALSE@pwrite64.o raise.o realpath.o sched.o select.o \
-@USE_LIBTOOL_FALSE@shm_open.o shm_unlink.o signal.o siglongjmp.o \
-@USE_LIBTOOL_FALSE@socket.o sleep.o stack.o sysconf.o systat.o system.o \
-@USE_LIBTOOL_FALSE@tcdrain.o termios.o time.o usleep.o wait.o
+@USE_LIBTOOL_FALSE@pwrite64.o raise.o realpath.o resource.o sched.o \
+@USE_LIBTOOL_FALSE@select.o shm_open.o shm_unlink.o signal.o \
+@USE_LIBTOOL_FALSE@siglongjmp.o socket.o sleep.o stack.o sysconf.o \
+@USE_LIBTOOL_FALSE@systat.o system.o tcdrain.o termios.o time.o \
+@USE_LIBTOOL_FALSE@usleep.o wait.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = 
@@ -149,10 +150,11 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@funlockfile.lo getoptlong.lo getreent.lo ids.lo \
 @USE_LIBTOOL_TRUE@inode.lo io.lo io64.lo linux.lo mmap.lo pread.lo \
 @USE_LIBTOOL_TRUE@pread64.lo process.lo pwrite.lo pwrite64.lo raise.lo \
-@USE_LIBTOOL_TRUE@realpath.lo sched.lo select.lo shm_open.lo \
-@USE_LIBTOOL_TRUE@shm_unlink.lo signal.lo siglongjmp.lo socket.lo \
-@USE_LIBTOOL_TRUE@sleep.lo stack.lo sysconf.lo systat.lo system.lo \
-@USE_LIBTOOL_TRUE@tcdrain.lo termios.lo time.lo usleep.lo wait.lo
+@USE_LIBTOOL_TRUE@realpath.lo resource.lo sched.lo select.lo \
+@USE_LIBTOOL_TRUE@shm_open.lo shm_unlink.lo signal.lo siglongjmp.lo \
+@USE_LIBTOOL_TRUE@socket.lo sleep.lo stack.lo sysconf.lo systat.lo \
+@USE_LIBTOOL_TRUE@system.lo tcdrain.lo termios.lo time.lo usleep.lo \
+@USE_LIBTOOL_TRUE@wait.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -1,5 +1,16 @@
 2002-05-23  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * libc/sys/linux/Makefile.am: Add resource.c.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/resource.c: New file.
+        * libc/sys/linux/time.c: Add settimeofday, getitimer, and setitimer.
+        * libc/sys/linux/machine/i386/Makefile.am: Remove syscalls.c.
+        * libc/sys/linux/machine/i386/Makefile.in: Regenerated.
+        * libc/sys/linux/machine/i386/syscalls.c: Removed as functions
+        are now found in libc/sys/linux/resource.c.
+
+2002-05-23  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/include/string.h (bcmp, bcopy, bzero): Change prototypes
         to use void * pointers and comply with Single Unix spec.
         * libc/string/bcmp.c: Change to use void * instead of char *.
