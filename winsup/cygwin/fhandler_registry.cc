@@ -114,9 +114,9 @@ fhandler_registry::exists ()
     }
   pathlen = strlen (path);
   file = path + pathlen - 1;
-  if (SLASH_P (*file) && pathlen > 1)
+  if (isdirsep (*file) && pathlen > 1)
     file--;
-  while (!SLASH_P (*file))
+  while (!isdirsep (*file))
     file--;
   file++;
 
@@ -240,9 +240,9 @@ fhandler_registry::fstat (struct __stat64 *buf, path_conv *pc)
 		{
 		  int pathlen = strlen (path);
 		  const char *value_name = path + pathlen - 1;
-		  if (SLASH_P (*value_name) && pathlen > 1)
+		  if (isdirsep (*value_name) && pathlen > 1)
 		    value_name--;
-		  while (!SLASH_P (*value_name))
+		  while (!isdirsep (*value_name))
 		    value_name--;
 		  value_name++;
 		  DWORD dwSize;
@@ -429,9 +429,9 @@ fhandler_registry::open (path_conv * pc, int flags, mode_t mode)
   path++;
   pathlen = strlen (path);
   file = path + pathlen - 1;
-  if (SLASH_P (*file) && pathlen > 1)
+  if (isdirsep (*file) && pathlen > 1)
     file--;
-  while (!SLASH_P (*file))
+  while (!isdirsep (*file))
     file--;
   file++;
 
@@ -625,7 +625,7 @@ open_key (const char *name, REGSAM access, bool isValue)
   while (*name)
     {
       const char *anchor = name;
-      while (*name && !SLASH_P (*name))
+      while (*name && !isdirsep (*name))
 	name++;
       strncpy (component, anchor, name - anchor);
       component[name - anchor] = '\0';
