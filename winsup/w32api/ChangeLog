@@ -1,4 +1,9 @@
-Wed May 17 17:12:00 2001  Corinna Vinschen <corinna@vinschen.de>
+Thu May 17 23:12:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/winnt.h: Define SE_GROUP_LOGON_ID as unsigned to avoid
+	compiler warnings.
+
+Thu May 17 17:12:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/ntdef.h: Protect definition of OBJECT_ATTRIBUTES against
 	previous definition in include/ntsecapi.h.
