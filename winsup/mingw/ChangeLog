@@ -1,3 +1,7 @@
+2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Make sure libmingwex.a from current build tree is used.
+
 2003-02-14  Christopher Faylor  <cgf@redhat.com>
 
 	* profile/Makefile.in (mcount.o): Use ALL_CFLAGS for compilation to
