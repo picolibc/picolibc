@@ -619,22 +619,25 @@ fhandler_disk_file::opendir (path_conv& real_name)
       strcpy (dir->__d_dirname, real_name.get_win32 ());
       dir->__d_dirent->d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
-      fd = this;
-      fd->set_nohandle (true);
-      dir->__d_dirent->d_fd = fd;
-      dir->__d_u.__d_data.__fh = this;
-      /* FindFirstFile doesn't seem to like duplicate /'s. */
-      len = strlen (dir->__d_dirname);
-      if (len == 0 || isdirsep (dir->__d_dirname[len - 1]))
-	strcat (dir->__d_dirname, "*");
-      else
-	strcat (dir->__d_dirname, "\\*");  /**/
-      dir->__d_cookie = __DIRENT_COOKIE;
-      dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
-      dir->__d_position = 0;
-      dir->__d_dirhash = get_namehash ();
+      if (fd >= 0)
+        {
+	  fd = this;
+	  fd->set_nohandle (true);
+	  dir->__d_dirent->d_fd = fd;
+	  dir->__d_u.__d_data.__fh = this;
+	  /* FindFirstFile doesn't seem to like duplicate /'s. */
+	  len = strlen (dir->__d_dirname);
+	  if (len == 0 || isdirsep (dir->__d_dirname[len - 1]))
+	    strcat (dir->__d_dirname, "*");
+	  else
+	    strcat (dir->__d_dirname, "\\*");  /**/
+	  dir->__d_cookie = __DIRENT_COOKIE;
+	  dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+	  dir->__d_position = 0;
+	  dir->__d_dirhash = get_namehash ();
 
-      res = dir;
+	  res = dir;
+	}
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());

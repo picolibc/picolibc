@@ -540,40 +540,36 @@ cygwin_socket (int af, int type, int protocol)
   SOCKET soc = 0;
   fhandler_socket *fh = NULL;
 
-  cygheap_fdnew fd;
+  debug_printf ("socket (%d, %d, %d)", af, type, protocol);
 
-  if (fd >= 0)
+  soc = socket (AF_INET, type, af == AF_LOCAL ? 0 : protocol);
+
+  if (soc == INVALID_SOCKET)
     {
-      debug_printf ("socket (%d, %d, %d)", af, type, protocol);
-
-      soc = socket (AF_INET, type, af == AF_LOCAL ? 0 : protocol);
-
-      if (soc == INVALID_SOCKET)
-	{
-	  set_winsock_errno ();
-	  goto done;
-	}
-
-      const char *name;
-
-      if (af == AF_INET)
-	name = (type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp");
-      else
-	name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
-
-      fh = fdsock (fd, name, soc);
-      if (!fh)
-	{
-	  closesocket (soc);
-	  res = -1;
-	}
-      else
-	{
-	  fh->set_addr_family (af);
-	  fh->set_socket_type (type);
-	  res = fd;
-	}
+      set_winsock_errno ();
+      goto done;
     }
+
+  const char *name;
+
+  if (af == AF_INET)
+    name = (type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp");
+  else
+    name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
+
+  {
+    cygheap_fdnew fd;
+    if (fd >= 0)
+      fh = fdsock (fd, name, soc);
+    if (fh)
+      {
+	fh->set_addr_family (af);
+	fh->set_socket_type (type);
+	res = fd;
+      }
+    else
+	closesocket (soc);
+  }
 
 done:
   syscall_printf ("%d = socket (%d, %d, %d)", res, af, type, protocol);
@@ -1901,6 +1897,7 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 {
   int res = -1;
   SOCKET fd2s;
+
   sig_dispatch_pending (0);
   sigframe thisframe (mainthread);
 
@@ -1910,33 +1907,40 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
       (remuser && check_null_str_errno (remuser)))
     return (int) INVALID_SOCKET;
 
-  cygheap_fdnew res_fd;
-
-  if (res_fd < 0)
-    goto done;
-
-  if (fd2p)
-    {
-      cygheap_fdnew newfd (res_fd, false);
-
-      if (*fd2p < 0)
-	goto done;
-      *fd2p = newfd;
-    }
-
   res = rcmd (ahost, inport, locuser, remuser, cmd, fd2p ? &fd2s : NULL);
-  if (res == (int) INVALID_SOCKET)
-    goto done;
-  else
+  if (res != (int) INVALID_SOCKET)
     {
-      fdsock (res_fd, "/dev/tcp", res);
-      res = res_fd;
+      fhandler_socket *fh = NULL;
+      cygheap_fdnew res_fd;
+
+      if (res_fd >= 0)
+	fh = fdsock (res_fd, "/dev/tcp", res);
+      if (fh)
+	res = res_fd;
+      else
+	{
+	  closesocket (res);
+	  res = -1;
+	}
+
+      if (res >= 0 && fd2p)
+	{
+	  cygheap_fdnew newfd (res_fd, false);
+
+	  fh = NULL;
+	  if (newfd >= 0)
+	    fh = fdsock (*fd2p, "/dev/tcp", fd2s);
+	  if (fh)
+	    *fd2p = newfd;
+	  else
+	    {
+	      closesocket (res);
+	      closesocket (fd2s);
+	      res = -1;
+	    }
+	}
     }
 
-  if (fd2p)
-    fdsock (*fd2p, "/dev/tcp", fd2s);
-
-done:
   syscall_printf ("%d = rcmd (...)", res);
   return res;
 }
@@ -1952,19 +1956,19 @@ cygwin_rresvport (int *port)
   if (check_null_invalid_struct_errno (port))
     return -1;
 
-  cygheap_fdnew res_fd;
+  res = rresvport (port);
 
-  if (res_fd < 0)
-    res = -1;
-  else
+  if (res != (int) INVALID_SOCKET)
     {
-      res = rresvport (port);
+      fhandler_socket *fh = NULL;
+      cygheap_fdnew res_fd;
 
-      if (res != (int) INVALID_SOCKET)
-	{
-	  fdsock (res_fd, "/dev/tcp", res);
-	  res = res_fd;
-	}
+      if (res_fd >= 0)
+	fh = fdsock (res_fd, "/dev/tcp", res);
+      if (fh)
+        res = res_fd;
+      else
+	res = -1;
     }
 
   syscall_printf ("%d = rresvport (%d)", res, port ? *port : 0);
@@ -1987,30 +1991,40 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
       (password && check_null_str_errno (password)))
     return (int) INVALID_SOCKET;
 
-  cygheap_fdnew res_fd;
-
-  if (res_fd < 0)
-    goto done;
-  if (fd2p)
-    {
-      cygheap_fdnew newfd (res_fd);
-
-      if (newfd < 0)
-	goto done;
-      *fd2p = newfd;
-    }
   res = rexec (ahost, inport, locuser, password, cmd, fd2p ? &fd2s : NULL);
-  if (res == (int) INVALID_SOCKET)
-    goto done;
-  else
+  if (res != (int) INVALID_SOCKET)
     {
-      fdsock (res_fd, "/dev/tcp", res);
-      res = res_fd;
-    }
-  if (fd2p)
-    fdsock (*fd2p, "/dev/tcp", fd2s);
+      fhandler_socket *fh = NULL;
+      cygheap_fdnew res_fd;
 
-done:
+      if (res_fd >= 0)
+	fh = fdsock (res_fd, "/dev/tcp", res);
+      if (fh)
+	res = res_fd;
+      else
+	{
+	  closesocket (res);
+	  res = -1;
+	}
+
+      if (res >= 0 && fd2p)
+	{
+	  cygheap_fdnew newfd (res_fd, false);
+
+	  fh = NULL;
+	  if (newfd >= 0)
+	    fh = fdsock (*fd2p, "/dev/tcp", fd2s);
+	  if (fh)
+	    *fd2p = newfd;
+	  else
+	    {
+	      closesocket (res);
+	      closesocket (fd2s);
+	      res = -1;
+	    }
+	}
+    }
+
   syscall_printf ("%d = rexec (...)", res);
   return res;
 }
@@ -2024,8 +2038,6 @@ socketpair (int family, int type, int protocol, int *sb)
   SOCKET insock, outsock, newsock;
   struct sockaddr_in sock_in, sock_out;
   int len;
-  cygheap_fdnew sb0;
-  fhandler_socket *fh;
 
   sig_dispatch_pending (0);
   sigframe thisframe (mainthread);
@@ -2047,19 +2059,6 @@ socketpair (int family, int type, int protocol, int *sb)
     {
       set_errno (EPROTONOSUPPORT);
       goto done;
-    }
-
-  if (sb0 < 0)
-    goto done;
-  else
-    {
-      sb[0] = sb0;
-      cygheap_fdnew sb1 (sb0, false);
-
-      if (sb1 < 0)
-	goto done;
-
-      sb[1] = sb1;
     }
 
   /* create the first socket */
@@ -2175,35 +2174,47 @@ socketpair (int family, int type, int protocol, int *sb)
       insock = newsock;
     }
 
-  res = 0;
+  {
+    fhandler_socket *fh = NULL;
+    cygheap_fdnew sb0;
+    const char *name;
 
-  if (family == AF_LOCAL)
-    {
+    if (family == AF_INET)
+      name = (type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp");
+    else
+      name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
 
-      fh = fdsock (sb[0],
-		   type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket",
-		   insock);
-      fh->set_sun_path ("");
-      fh->set_addr_family (AF_LOCAL);
-      fh->set_socket_type (type);
-      fh = fdsock (sb[1],
-		   type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket",
-		   outsock);
-      fh->set_sun_path ("");
-      fh->set_addr_family (AF_LOCAL);
-      fh->set_socket_type (type);
-    }
-  else
-    {
-      fh = fdsock (sb[0], type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp",
-		   insock);
-      fh->set_addr_family (AF_INET);
-      fh->set_socket_type (type);
-      fh = fdsock (sb[1], type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp",
-		   outsock);
-      fh->set_addr_family (AF_INET);
-      fh->set_socket_type (type);
-    }
+    if (sb0 >= 0)
+      fh = fdsock (sb0, name, insock);
+    if (fh)
+      {
+	fh->set_sun_path ("");
+	fh->set_addr_family (family);
+	fh->set_socket_type (type);
+
+	cygheap_fdnew sb1 (sb0, false);
+
+	fh = NULL;
+	if (sb1 >= 0)
+	  fh = fdsock (sb1, name, outsock);
+	if (fh)
+	  {
+	    fh->set_sun_path ("");
+	    fh->set_addr_family (family);
+	    fh->set_socket_type (type);
+
+	    sb[0] = sb0;
+	    sb[1] = sb1;
+	    res = 0;
+	  }
+      }
+
+    if (res == -1)
+      {
+        closesocket (insock);
+	closesocket (outsock);
+      }
+  }
 
 done:
   syscall_printf ("%d = socketpair (...)", res);

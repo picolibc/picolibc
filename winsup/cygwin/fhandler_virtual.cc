@@ -74,16 +74,19 @@ fhandler_virtual::opendir (path_conv& pc)
       strcpy (dir->__d_dirname, get_name ());
       dir->__d_dirent->d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
-      fd = this;
-      fd->set_nohandle (true);
-      dir->__d_dirent->d_fd = fd;
-      dir->__d_u.__d_data.__fh = this;
-      dir->__d_cookie = __DIRENT_COOKIE;
-      dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
-      dir->__d_position = 0;
-      dir->__d_dirhash = get_namehash ();
+      if (fd >= 0)
+        {
+	  fd = this;
+	  fd->set_nohandle (true);
+	  dir->__d_dirent->d_fd = fd;
+	  dir->__d_u.__d_data.__fh = this;
+	  dir->__d_cookie = __DIRENT_COOKIE;
+	  dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+	  dir->__d_position = 0;
+	  dir->__d_dirhash = get_namehash ();
 
-      res = dir;
+	  res = dir;
+	}
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());

@@ -1,5 +1,18 @@
 2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Check descriptor
+	created by cygheap_fdnew constructor.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Ditto.
+	* fhandler_socket.cc (fhandler_socket::accept): Ditto and move
+	creation of file descriptor behind blocking OS call.
+	* net.cc (cygwin_socket): Ditto.
+	(cygwin_rcmd): Ditto.
+	(cygwin_rresvport): Ditto.
+	(cygwin_rexec): Ditto.
+	(socketpair): Ditto.
+
+2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (GetCompressedFileSize): Add.
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Compute
 	st_blocks value from GetCompressedFileSize() if available.
