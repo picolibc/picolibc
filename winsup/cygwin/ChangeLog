@@ -1,5 +1,27 @@
 2003-08-31  Christopher Faylor  <cgf@redhat.com>
 
+	* net.cc (free_char_list): Delete.
+	(dup_addr_list): Delete.
+	(dup_char_list): Delete.
+	(free_hostent_ptr): Delete.
+	(free_protoent_ptr): Delete.
+	(free_servent_ptr): Delete.
+	(DWORD_round): New function.
+	(strlen_round): New function.  Returns strlen rounded up to word size.
+	(dup_ent): New, generic function to duplicate a {host,proto,serv}ent
+	structure.
+	(gen_ent): New macro.  Generates a generic dup_{host,proto,serv}ent_ptr
+	function.
+	(cygwin_getservbyname): Remove call to free_servent_ptr, pass
+	servent_buf to dup_servent_ptr.
+	(cygwin_getservbyport): Ditto.
+	(cygwin_gethostbyname): Ditto for hostent.
+	(cygwin_gethostbyaddr): Ditto.
+	(cygwin_getprotobyname): Ditto for protoent.
+	(cygwin_getprotobynumber): Ditto.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in (MALLOC_OFILES): Always fill in with correct malloc
 	object.
 	* configure.in: Fill in MALLOC_OFILES with either debugging or regular

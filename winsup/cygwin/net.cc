@@ -25,6 +25,7 @@ details. */
 #include <netdb.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
+#include <assert.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
@@ -381,96 +382,211 @@ set_host_errno ()
     h_errno = NETDB_INTERNAL;
 }
 
-static void
-free_char_list (char **clist)
+inline int
+DWORD_round (int n)
 {
-  if (clist)
-    {
-      for (char **cl = clist; *cl; ++cl)
-	free (*cl);
-      free (clist);
-    }
+  return sizeof (DWORD) * (((n + sizeof (DWORD) - 1)) / sizeof (DWORD));
 }
 
-static char **
-dup_char_list (char **src)
+inline int
+strlen_round (const char *s)
 {
-  char **dst;
-  int cnt = 0;
+  if (!s)
+    return 0;
+  return DWORD_round (strlen (s) + 1);
+}
 
-  for (char **cl = src; *cl; ++cl)
-    ++cnt;
-  if (!(dst = (char **) calloc (cnt + 1, sizeof *dst)))
-    return NULL;
-  while (cnt-- > 0)
-    if (!(dst[cnt] = strdup (src[cnt])))
-      return NULL;
+enum struct_type
+{
+  is_protoent, is_servent, is_hostent
+};
+
+#pragma pack(push,2)
+struct pservent
+{
+  char *s_name;
+  char **s_aliases;
+  short s_port;
+  char *s_proto;
+};
+#pragma pack(pop)
+
+struct unionent
+{
+  char *name;
+  char **list;
+  short port_proto_addrtype;
+  short h_len;
+  union
+  {
+    char *s_proto;
+    char **h_addr_list;
+  };
+};
+
+/* Generic "dup a {host,proto,serv}ent structure" function.
+   This is complicated because we need to be able to free the
+   structure at any point and we can't rely on the pointer contents
+   being untouched by callers.  So, we allocate a chunk of memory
+   large enough to hold the structure and all of the stuff it points
+   to then we copy the source into this new block of memory.
+   The 'unionent' struct is a union of all of the currently used
+   *ent structure.  */
+
+#ifdef DEBUGGING
+static void *
+#else
+static inline void *
+#endif
+dup_ent (void *src0, struct_type type)
+{
+  unionent *src = (unionent *) src0;
+
+  /* Find the size of the raw structure minus any character strings, etc. */
+  int sz, struct_sz;
+  switch (type)
+    {
+    case is_protoent:
+      struct_sz = sizeof (protoent);
+      break;
+    case is_servent:
+      struct_sz = sizeof (servent);
+      break;
+    case is_hostent:
+      struct_sz = sizeof (hostent);
+      break;
+    default:
+      api_fatal ("called with invalid value %d", type);
+      break;
+    }
+
+  /* Every *ent begins with a name.  Calculate it's length. */
+  int namelen = strlen_round (src->name);
+  sz = struct_sz + namelen;
+
+  char **av;
+  /* The next field in every *ent is an argv list of "something".
+     Calculate the number of components and how much space the
+     character strings will take.  */
+  int list_len = 0;
+  for (av = src->list; av && *av; av++)
+    {
+      list_len++;
+      sz += sizeof (char **) + strlen_round (*av);
+    }
+
+  /* NULL terminate if there actually was a list */
+  if (av)
+    {
+      sz += sizeof (char **);
+      list_len++;
+    }
+
+  /* Do servent/hostent specific processing */
+  int protolen = 0;
+  int addr_list_len = 0;
+  if (type == is_servent)
+    sz += (protolen = strlen_round (src->s_proto));
+  else if (type == is_hostent)
+    {
+      /* Calculate the length and storage used for h_addr_list */
+      for (av = src->h_addr_list; av && *av; av++)
+	{
+	  addr_list_len++;
+	  sz += sizeof (char **) + DWORD_round (src->h_len);
+	}
+      if (av)
+	{
+	  sz += sizeof (char **);
+	  addr_list_len++;
+	}
+    }
+
+  /* Allocate the storage needed */
+  unionent *dst = (unionent *) calloc (1, sz);
+
+  /* Hopefully, this worked. */
+  if (dst)
+    {
+      /* This field is common to all *ent structures but named differently
+	 in each, of course.  */
+      dst->port_proto_addrtype = src->port_proto_addrtype;
+
+      /* Copy the name field to dst, using space just beyond the end of
+	 the dst structure. */
+      char *dp = ((char *) dst) + struct_sz;
+      strcpy (dst->name = dp, src->name);
+      dp += namelen;
+
+      /* Copy the 'list' type to dst, using space beyond end of structure
+	 + storage for name. */
+      if (src->list)
+	{
+	  char **dav = dst->list = (char **) dp;
+	  dp += sizeof (char **) * list_len;
+	  for (av = src->list; av && *av; av++)
+	    {
+	      int len = strlen (*av) + 1;
+	      memcpy (*dav++ = dp, *av, len);
+	      dp += DWORD_round (len);
+	    }
+	}
+
+      /* Do servent/hostent specific processing. */
+      if (type == is_servent)
+	{
+	  if (src->s_proto)
+	    {
+	      char *s_proto;
+	      /* Windows 95 idiocy.  Structure is misaligned on Windows 95.
+		 Kludge around this by trying a different pointer alignment.  */
+	      if (IsBadReadPtr (src->s_proto, sizeof (src->s_proto))
+		  && !IsBadReadPtr (((pservent *) src)->s_proto, sizeof (src->s_proto)))
+		s_proto = ((pservent *) src)->s_proto;
+	      else
+		s_proto = src->s_proto;
+	      strcpy (dst->s_proto = dp, s_proto);
+	      dp += protolen;
+	    }
+	}
+      else if (type == is_hostent)
+	{
+	  /* Transfer h_len and duplicate contents of h_addr_list, using
+	     memory after 'list' allocation. */
+	  dst->h_len = src->h_len;
+	  char **dav = dst->h_addr_list = (char **) dp;
+	  dp += sizeof (char **) * addr_list_len;
+	  for (av = src->h_addr_list; av && *av; av++)
+	    {
+	      memcpy (*dav++ = dp, *av, src->h_len);
+	      dp += DWORD_round (src->h_len);
+	    }
+	}
+      /* Sanity check that we did our bookkeeping correctly. */
+      assert ((dp - (char *) dst) == sz);
+    }
   return dst;
 }
 
-#define free_addr_list(addr_list)	free_char_list (addr_list)
+/* Generic macro to build a dup_{host,proto,serv}ent_ptr function.
+   The *ent buffers are allocated by dup_ent as contiguous storage.
+   Frees any previously exiting `old' storage, as well.  */
+#define gen_ent(x, p)								\
+static x *									\
+dup_##x##_ptr (x *old, x *src)							\
+{										\
+  if (old)									\
+    {										\
+      debug_printf ("freeing %s", old->p##_name);				\
+      free (old);								\
+    }										\
+  debug_printf ("%s", src ? "<null!>" : src->p##_name);				\
+  x *dst = (x *) dup_ent (src, is_##x);						\
+  debug_printf ("copied %s", dst ? "<null!>" : dst->p##_name);			\
+  return dst;									\
+}										\
 
-static char **
-dup_addr_list (char **src, unsigned int size)
-{
-  char **dst;
-  int cnt = 0;
-
-  for (char **cl = src; *cl; ++cl)
-    ++cnt;
-  if (!(dst = (char **) calloc (cnt + 1, sizeof *dst)))
-    return NULL;
-  while (cnt-- > 0)
-    {
-      if (!(dst[cnt] = (char *) malloc (size)))
-	return NULL;
-      memcpy (dst[cnt], src[cnt], size);
-    }
-  return dst;
-}
-
-static void
-free_protoent_ptr (struct protoent *&p)
-{
-  if (p)
-    {
-      debug_printf ("protoent: %s", p->p_name);
-
-      if (p->p_name)
-	free (p->p_name);
-      free_char_list (p->p_aliases);
-      free ((void *) p);
-      p = NULL;
-    }
-}
-
-static struct protoent *
-dup_protoent_ptr (struct protoent *src)
-{
-  if (!src)
-    return NULL;
-
-  struct protoent *dst = (struct protoent *) calloc (1, sizeof *dst);
-
-  if (!dst)
-    return NULL;
-
-  debug_printf ("protoent: %s", src->p_name);
-
-  dst->p_proto = src->p_proto;
-  if (src->p_name && !(dst->p_name = strdup (src->p_name)))
-    goto out;
-  if (src->p_aliases && !(dst->p_aliases = dup_char_list (src->p_aliases)))
-    goto out;
-
-  debug_printf ("protoent: copied %s", dst->p_name);
-
-  return dst;
-
-out:
-  free_protoent_ptr (dst);
-  return NULL;
-}
+gen_ent (protoent, p)
 
 #ifdef _MT_SAFE
 #define protoent_buf  _reent_winsup ()->_protoent_buf
@@ -484,8 +600,7 @@ cygwin_getprotobyname (const char *p)
 {
   if (check_null_str_errno (p))
     return NULL;
-  free_protoent_ptr (protoent_buf);
-  protoent_buf = dup_protoent_ptr (getprotobyname (p));
+  protoent_buf = dup_protoent_ptr (protoent_buf, getprotobyname (p));
   if (!protoent_buf)
     set_winsock_errno ();
 
@@ -497,8 +612,7 @@ cygwin_getprotobyname (const char *p)
 extern "C" struct protoent *
 cygwin_getprotobynumber (int number)
 {
-  free_protoent_ptr (protoent_buf);
-  protoent_buf = dup_protoent_ptr (getprotobynumber (number));
+  protoent_buf = dup_protoent_ptr (protoent_buf, getprotobynumber (number));
   if (!protoent_buf)
     set_winsock_errno ();
 
@@ -828,70 +942,7 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
   return res;
 }
 
-static void
-free_servent_ptr (struct servent *&p)
-{
-  if (p)
-    {
-      debug_printf ("servent: %s", p->s_name);
-
-      if (p->s_name)
-	free (p->s_name);
-      if (p->s_proto)
-	free (p->s_proto);
-      free_char_list (p->s_aliases);
-      free ((void *) p);
-      p = NULL;
-    }
-}
-
-#pragma pack(push,2)
-struct pservent
-{
-  char *s_name;
-  char **s_aliases;
-  short s_port;
-  char *s_proto;
-};
-
-#pragma pack(pop)
-static struct servent *
-dup_servent_ptr (struct servent *src)
-{
-  if (!src)
-    return NULL;
-
-  struct servent *dst = (struct servent *) calloc (1, sizeof *dst);
-
-  if (!dst)
-    return NULL;
-
-  debug_printf ("servent: %s", src->s_name);
-
-  dst->s_port = src->s_port;
-  if (src->s_name && !(dst->s_name = strdup (src->s_name)))
-    goto out;
-  if (src->s_aliases && !(dst->s_aliases = dup_char_list (src->s_aliases)))
-    goto out;
-  char *s_proto;
-
-  if (IsBadReadPtr (src->s_proto, sizeof (src->s_proto))
-      && !IsBadReadPtr (((pservent *) src)->s_proto, sizeof (src->s_proto)))
-    s_proto = ((pservent *) src)->s_proto;
-  else
-    s_proto = src->s_proto;
-
-  if (s_proto && !(dst->s_proto = strdup (s_proto)))
-    goto out;
-
-  debug_printf ("servent: copied %s", dst->s_name);
-
-  return dst;
-
-out:
-  free_servent_ptr (dst);
-  return NULL;
-}
+gen_ent (servent, s)
 
 #ifdef _MT_SAFE
 #define servent_buf  _reent_winsup ()->_servent_buf
@@ -909,8 +960,7 @@ cygwin_getservbyname (const char *name, const char *proto)
       || (proto != NULL && check_null_str_errno (proto)))
     return NULL;
 
-  free_servent_ptr (servent_buf);
-  servent_buf = dup_servent_ptr (getservbyname (name, proto));
+  servent_buf = dup_servent_ptr (servent_buf, getservbyname (name, proto));
   if (!servent_buf)
     set_winsock_errno ();
 
@@ -927,8 +977,7 @@ cygwin_getservbyport (int port, const char *proto)
   if (proto != NULL && check_null_str_errno (proto))
     return NULL;
 
-  free_servent_ptr (servent_buf);
-  servent_buf = dup_servent_ptr (getservbyport (port, proto));
+  servent_buf = dup_servent_ptr (servent_buf, getservbyport (port, proto));
   if (!servent_buf)
     set_winsock_errno ();
 
@@ -959,53 +1008,7 @@ cygwin_gethostname (char *name, size_t len)
   return 0;
 }
 
-static void
-free_hostent_ptr (struct hostent *&p)
-{
-  if (p)
-    {
-      debug_printf ("hostent: %s", p->h_name);
-
-      if (p->h_name)
-	free ((void *) p->h_name);
-      free_char_list (p->h_aliases);
-      free_addr_list (p->h_addr_list);
-      free ((void *) p);
-      p = NULL;
-    }
-}
-
-static struct hostent *
-dup_hostent_ptr (struct hostent *src)
-{
-  if (!src)
-    return NULL;
-
-  struct hostent *dst = (struct hostent *) calloc (1, sizeof *dst);
-
-  if (!dst)
-    return NULL;
-
-  debug_printf ("hostent: %s", src->h_name);
-
-  dst->h_addrtype = src->h_addrtype;
-  dst->h_length = src->h_length;
-  if (src->h_name && !(dst->h_name = strdup (src->h_name)))
-    goto out;
-  if (src->h_aliases && !(dst->h_aliases = dup_char_list (src->h_aliases)))
-    goto out;
-  if (src->h_addr_list
-      && !(dst->h_addr_list = dup_addr_list (src->h_addr_list, src->h_length)))
-    goto out;
-
-  debug_printf ("hostent: copied %s", dst->h_name);
-
-  return dst;
-
-out:
-  free_hostent_ptr (dst);
-  return NULL;
-}
+gen_ent (hostent, h)
 
 #ifdef _MT_SAFE
 #define hostent_buf  _reent_winsup ()->_hostent_buf
@@ -1045,8 +1048,7 @@ cygwin_gethostbyname (const char *name)
       return &tmp;
     }
 
-  free_hostent_ptr (hostent_buf);
-  hostent_buf = dup_hostent_ptr (gethostbyname (name));
+  hostent_buf = dup_hostent_ptr (hostent_buf, gethostbyname (name));
   if (!hostent_buf)
     {
       set_winsock_errno ();
@@ -1069,8 +1071,7 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
   if (__check_invalid_read_ptr_errno (addr, len))
     return NULL;
 
-  free_hostent_ptr (hostent_buf);
-  hostent_buf = dup_hostent_ptr (gethostbyaddr (addr, len, type));
+  hostent_buf = dup_hostent_ptr (hostent_buf, gethostbyaddr (addr, len, type));
   if (!hostent_buf)
     {
       set_winsock_errno ();
