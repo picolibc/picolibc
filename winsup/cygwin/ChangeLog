@@ -1,3 +1,15 @@
+2002-07-18  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (get_unix_group_sidlist): Create.
+	(get_supplementary_group_sidlist): Evolve into get_unix_group_sidlist.
+	(get_user_local_groups): Add check for duplicates.
+	(get_user_primary_group): Suppress.
+	(get_group_sidlist): Silently ignore PDC unavailability.
+	Call get_unix_group_sidlist() before get_user_local_groups().
+	Remove call to get_supplementary_group_sidlist(). Never call
+	get_user_primary_group() as the passwd group is always included.
+	Add well_known_authenticated_users_sid in only one statement.
+
 2002-07-19  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_serial.cc (fhandler_serial::tcflush): Fix typo.
