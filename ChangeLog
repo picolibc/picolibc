@@ -1,3 +1,25 @@
+2004-03-22  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Rearrange by moving recursive_targets rules
+	into their proper sections.
+	* Makefile.tpl (top level bootstrap support): Move disabling
+	of coverage flags from 'make' to 'configure'; improve comments.
+	* Makefile.in: Regenerate.
+
+	* Makefile.tpl (experimental top level bootstrap) Move stage1
+	language setting from all- target to configure- target; disable
+	intermodule optimization in stage 1; prevent gratuitous rebuilds
+	of stage 1.
+	* Makefile.in: Regenerate.
+	* configure.in: Comma-separate stage 1 language list for top
+	level bootstrap.
+	* configure: Regenerate.
+
+	* Makefile.tpl: Clean up experimental top level bootstrap support:
+	note known problems; set CONFIG_SHELL; don't set BUILD_CC; relocate
+	prev-gcc in configure- targets as well as all- targets.
+	* Makefile.in: Regenerate.
+
 2004-03-17  Paolo Bonzini  <bonzini@gnu.org>
 
 	* configure.in: Remove symbolic link section.
