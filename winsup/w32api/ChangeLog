@@ -1,3 +1,10 @@
+2002-09-04  Kevin Chase  <kevincha99@hotmail.com>
+
+	* include/winbase.h (AllocateUserPhysicalPages,
+	MapUserPhysicalPages, MapUserPhysicalPagesScatter,
+	FreeUserPhysicalPages): Add prototypes.
+	* lib/kernel32.def: Add function stubs for above.
+
 2002-09-03  René Møller Fonseca  <fonseca@users.sourceforge.net>
 
 	* include/winuser.h (IDTRYAGAIN,IDCONTINUE): Add defines.

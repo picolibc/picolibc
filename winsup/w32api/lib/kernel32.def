@@ -5,6 +5,7 @@ AddAtomW@4
 AddConsoleAliasA@12
 AddConsoleAliasW@12
 AllocConsole@0
+AllocateUserPhysicalPages@12
 AreFileApisANSI@0
 AssignProcessToJobObject@8
 BackupRead@28
@@ -188,6 +189,7 @@ FreeEnvironmentStringsW@4
 FreeLibrary@4
 FreeLibraryAndExitThread@8
 FreeResource@4
+FreeUserPhysicalPages@12
 FreeVirtualBuffer@4
 GenerateConsoleCtrlEvent@8
 GetACP@0
@@ -477,6 +479,8 @@ LocalUnlock@4
 LockFile@20
 LockFileEx@24
 LockResource@4
+MapUserPhysicalPages@12
+MapUserPhysicalPagesScatter@12
 MapViewOfFile@20
 MapViewOfFileEx@24
 MapViewOfFileVlm@28
