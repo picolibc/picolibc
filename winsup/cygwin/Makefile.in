@@ -153,7 +153,7 @@ force:
 
 install: all $(install_host) $(install_target)
 	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME); \
-	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) binmode.o ; do \
+	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) binmode.o textmode.o ; do \
 	    $(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
 	done ; \
 	cd $(srcdir); \

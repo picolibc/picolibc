@@ -1,3 +1,7 @@
+Mon Jul 10 11:28:57 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in (install): Install textmode.o as well as binmode.o.
+
 Sun Jul  9 21:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Close handle `hToken' only if it's not

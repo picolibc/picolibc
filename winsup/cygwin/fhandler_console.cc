@@ -128,6 +128,7 @@ fhandler_console::read (void *pv, size_t buflen)
 
   HANDLE w4[2];
   DWORD nwait;
+  char tmp[17];
 
   w4[0] = h;
   if (iscygthread ())
@@ -155,11 +156,12 @@ fhandler_console::read (void *pv, size_t buflen)
 	  __seterrno ();
 	  return -1;
 	}
+
       DWORD nread;
       INPUT_RECORD input_rec;
       const char *toadd;
 
-      if (!ReadConsoleInput (h, &input_rec, 1, &nread))
+      if (!ReadConsoleInputW (h, &input_rec, 1, &nread))
 	{
 	  syscall_printf ("ReadConsoleInput failed, %E");
 	  __seterrno ();
@@ -167,6 +169,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	}
 
 #define ich (input_rec.Event.KeyEvent.uChar.AsciiChar)
+#define wch (input_rec.Event.KeyEvent.uChar.UnicodeChar)
 
       /* check if we're just disposing of this one */
 
@@ -179,7 +182,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	  !input_rec.Event.KeyEvent.bKeyDown)
 	continue;
 
-      if (ich == 0 ||
+      if (wch == 0 ||
 	  /* arrow/function keys */
 	  (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
 	{
@@ -188,18 +191,18 @@ fhandler_console::read (void *pv, size_t buflen)
 	    continue;
 	  nread = strlen (toadd);
 	}
-      else if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
-	{
-	  OemToCharBuff (&ich, &ich, 1);
-	  toadd = &ich;
-	}
       else
 	{
-	  static char tmp[2];
-	  tmp[0] = '\033';
-	  tmp[1] = tolower (ich);
-	  toadd = tmp;
-	  nread = 2;
+	  nread = WideCharToMultiByte (CP_ACP, 0, &wch, 1, tmp + 1, sizeof (tmp) - 1, NULL, NULL);
+	  if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
+	    toadd = tmp + 1;
+	  else
+	    {
+	      tmp[0] = '\033';
+	      tmp[1] = tolower (tmp[1]);
+	      toadd = tmp;
+	      nread++;
+	    }
 	}
 
       if (line_edit (toadd, nread))
