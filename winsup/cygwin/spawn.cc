@@ -423,7 +423,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 
       char buf[2 * MAX_PATH + 1];
       buf[0] = buf[1] = buf[2] = buf[sizeof(buf) - 1] = '\0';
-      if (! ReadFile (hnd, buf, sizeof (buf) - 1, &done, 0))
+      if (!ReadFile (hnd, buf, sizeof (buf) - 1, &done, 0))
 	{
 	  CloseHandle (hnd);
 	  __seterrno ();
@@ -456,8 +456,8 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	      {
 		/* Null terminate the initial command and step over
 		   any additional white space.  If we've hit the
-		   end of the line, exit the loop.  Otherwise, position
-		   we've found the first argument. Position the current
+		   end of the line, exit the loop.  Otherwise, we've
+		   found the first argument. Position the current
 		   pointer on the last known white space. */
 		*ptr = '\0';
 		char *newptr = ptr + 1;

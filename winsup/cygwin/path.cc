@@ -2097,7 +2097,7 @@ symlink (const char *topath, const char *frompath)
       goto done;
     }
 
-  h = CreateFileA(win32_path.get_win32 (), GENERIC_WRITE, 0, &sec_none_nih,
+  h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sec_none_nih,
 		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
   if (h == INVALID_HANDLE_VALUE)
       __seterrno ();
@@ -2297,7 +2297,8 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 	      /* Not a symlink, see if executable.  */
 	      if (!(pflags & (PATH_EXEC | PATH_CYGWIN_EXEC)) && got >= 2 &&
 		  ((cookie_buf[0] == '#' && cookie_buf[1] == '!') ||
-		   (cookie_buf[0] == ':' && cookie_buf[1] == '\n')))
+		   (cookie_buf[0] == ':' && cookie_buf[1] == '\n') ||
+		   (cookie_buf[0] == 'M' && cookie_buf[1] == 'Z')))
 		pflags |= PATH_EXEC;
 	    close_and_return:
 	      CloseHandle (h);

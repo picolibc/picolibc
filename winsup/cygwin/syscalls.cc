@@ -55,8 +55,7 @@ close_all_files (void)
   cygwin_shared->delqueue.process_queue ();
 }
 
-extern "C"
-int
+extern "C" int
 _unlink (const char *ourname)
 {
   int res = -1;
@@ -161,24 +160,21 @@ done:
   return res;
 }
 
-extern "C"
-pid_t
+extern "C" pid_t
 _getpid ()
 {
   return myself->pid;
 }
 
 /* getppid: POSIX 4.1.1.1 */
-extern "C"
-pid_t
+extern "C" pid_t
 getppid ()
 {
   return myself->ppid;
 }
 
 /* setsid: POSIX 4.3.2.1 */
-extern "C"
-pid_t
+extern "C" pid_t
 setsid (void)
 {
   /* FIXME: for now */
@@ -242,8 +238,7 @@ out:
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 _write (int fd, const void *ptr, size_t len)
 {
   int res = -1;
@@ -288,8 +283,7 @@ done:
  * these.
  */
 
-extern "C"
-ssize_t
+extern "C" ssize_t
 writev (int fd, const struct iovec *iov, int iovcnt)
 {
   int i;
@@ -343,8 +337,7 @@ writev (int fd, const struct iovec *iov, int iovcnt)
  * these.
  */
 
-extern "C"
-ssize_t
+extern "C" ssize_t
 readv (int fd, const struct iovec *iov, int iovcnt)
 {
   int i;
@@ -374,8 +367,7 @@ readv (int fd, const struct iovec *iov, int iovcnt)
 /* _open */
 /* newlib's fcntl.h defines _open as taking variable args so we must
    correspond.  The third arg if it exists is: mode_t mode. */
-extern "C"
-int
+extern "C" int
 _open (const char *unix_path, int flags, ...)
 {
   int fd;
@@ -414,8 +406,7 @@ _open (const char *unix_path, int flags, ...)
   return res;
 }
 
-extern "C"
-off_t
+extern "C" off_t
 _lseek (int fd, off_t pos, int dir)
 {
   off_t res;
@@ -434,8 +425,7 @@ _lseek (int fd, off_t pos, int dir)
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 _close (int fd)
 {
   int res;
@@ -462,8 +452,7 @@ _close (int fd)
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 isatty (int fd)
 {
   int res;
@@ -486,8 +475,7 @@ isatty (int fd)
    we should just copy the file.
 */
 
-extern "C"
-int
+extern "C" int
 _link (const char *a, const char *b)
 {
   int res = -1;
@@ -718,22 +706,19 @@ done:
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 chown (const char * name, uid_t uid, gid_t gid)
 {
   return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
 }
 
-extern "C"
-int
+extern "C" int
 lchown (const char * name, uid_t uid, gid_t gid)
 {
   return chown_worker (name, PC_SYM_IGNORE, uid, gid);
 }
 
-extern "C"
-int
+extern "C" int
 fchown (int fd, uid_t uid, gid_t gid)
 {
   if (fdtab.not_open (fd))
@@ -758,8 +743,7 @@ fchown (int fd, uid_t uid, gid_t gid)
 }
 
 /* umask: POSIX 5.3.3.1 */
-extern "C"
-mode_t
+extern "C" mode_t
 umask (mode_t mask)
 {
   mode_t oldmask;
@@ -770,8 +754,7 @@ umask (mode_t mask)
 }
 
 /* chmod: POSIX 5.6.4.1 */
-extern "C"
-int
+extern "C" int
 chmod (const char *path, mode_t mode)
 {
   int res = -1;
@@ -845,8 +828,7 @@ done:
 
 /* fchmod: P96 5.6.4.1 */
 
-extern "C"
-int
+extern "C" int
 fchmod (int fd, mode_t mode)
 {
   if (fdtab.not_open (fd))
@@ -900,8 +882,7 @@ num_entries (const char *win32_name)
   return count;
 }
 
-extern "C"
-int
+extern "C" int
 _fstat (int fd, struct stat *buf)
 {
   int r;
@@ -923,8 +904,7 @@ _fstat (int fd, struct stat *buf)
 }
 
 /* fsync: P96 6.6.1.1 */
-extern "C"
-int
+extern "C" int
 fsync (int fd)
 {
   if (fdtab.not_open (fd))
@@ -945,8 +925,7 @@ fsync (int fd)
 }
 
 /* sync: standards? */
-extern "C"
-int
+extern "C" int
 sync ()
 {
   return 0;
@@ -1097,16 +1076,14 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 _stat (const char *name, struct stat *buf)
 {
   return stat_worker ("stat", name, buf, 0);
 }
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
-extern "C"
-int
+extern "C" int
 lstat (const char *name, struct stat *buf)
 {
   return stat_worker ("lstat", name, buf, 1);
@@ -1114,8 +1091,7 @@ lstat (const char *name, struct stat *buf)
 
 extern int acl_access (const char *, int);
 
-extern "C"
-int
+extern "C" int
 access (const char *fn, int flags)
 {
   // flags were incorrectly specified
@@ -1185,8 +1161,7 @@ done:
   return r;
 }
 
-extern "C"
-int
+extern "C" int
 _rename (const char *oldpath, const char *newpath)
 {
   int res = 0;
@@ -1282,8 +1257,7 @@ done:
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 system (const char *cmdstring)
 {
   int res;
@@ -1318,31 +1292,27 @@ system (const char *cmdstring)
   return res;
 }
 
-extern "C"
-void
+extern "C" void
 setdtablesize (int size)
 {
   if (size > (int)fdtab.size)
     fdtab.extend (size);
 }
 
-extern "C"
-int
+extern "C" int
 getdtablesize ()
 {
   return fdtab.size;
 }
 
-extern "C"
-size_t
+extern "C" size_t
 getpagesize ()
 {
   return sysconf (_SC_PAGESIZE);
 }
 
 /* FIXME: not all values are correct... */
-extern "C"
-long int
+extern "C" long int
 fpathconf (int fd, int v)
 {
   switch (v)
@@ -1380,8 +1350,7 @@ fpathconf (int fd, int v)
     }
 }
 
-extern "C"
-long int
+extern "C" long int
 pathconf (const char *file, int v)
 {
   switch (v)
@@ -1872,8 +1841,7 @@ seteuid (uid_t uid)
 }
 
 /* setegid: from System V.  */
-extern "C"
-int
+extern "C" int
 setegid (gid_t gid)
 {
   if (os_being_run == winNT)
@@ -1895,8 +1863,7 @@ setegid (gid_t gid)
 
 /* chroot: privileged Unix system call.  */
 /* FIXME: Not privileged here. How should this be done? */
-extern "C"
-int
+extern "C" int
 chroot (const char *newroot)
 {
   int ret = -1;
@@ -1932,22 +1899,19 @@ done:
   return ret;
 }
 
-extern "C"
-int
+extern "C" int
 creat (const char *path, mode_t mode)
 {
   return open (path, O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
 
-extern "C"
-void
+extern "C" void
 __assertfail ()
 {
   exit (99);
 }
 
-extern "C"
-int
+extern "C" int
 getw (FILE *fp)
 {
   int w, ret;
@@ -1955,8 +1919,7 @@ getw (FILE *fp)
   return ret != 1 ? EOF : w;
 }
 
-extern "C"
-int
+extern "C" int
 putw (int w, FILE *fp)
 {
   int ret;
@@ -1966,8 +1929,7 @@ putw (int w, FILE *fp)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 wcscmp (const wchar_t *s1, const wchar_t *s2)
 {
   while (*s1  && *s1 == *s2)
@@ -1979,8 +1941,7 @@ wcscmp (const wchar_t *s1, const wchar_t *s2)
   return (*(unsigned short *) s1) - (*(unsigned short *) s2);
 }
 
-extern "C"
-size_t
+extern "C" size_t
 wcslen (const wchar_t *s1)
 {
   int l = 0;
@@ -1992,8 +1953,7 @@ wcslen (const wchar_t *s1)
 /* FIXME: to do this right, maybe work out the usoft va_list machine
    and use wsvprintfW instead?
 */
-extern "C"
-int
+extern "C" int
 wprintf (const char *fmt, ...)
 {
   va_list ap;
@@ -2005,16 +1965,14 @@ wprintf (const char *fmt, ...)
   return ret;
 }
 
-extern "C"
-int
+extern "C" int
 vhangup ()
 {
   set_errno (ENOSYS);
   return -1;
 }
 
-extern "C"
-_PTR
+extern "C" _PTR
 memccpy (_PTR out, const _PTR in, int c, size_t len)
 {
   const char *inc = (char *) in;
@@ -2031,8 +1989,7 @@ memccpy (_PTR out, const _PTR in, int c, size_t len)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 nice (int incr)
 {
   DWORD priority[] =
@@ -2079,8 +2036,7 @@ nice (int incr)
  * Find the first bit set in I.
  */
 
-extern "C"
-int
+extern "C" int
 ffs (int i)
 {
   static const unsigned char table[] =
@@ -2102,8 +2058,7 @@ ffs (int i)
   return table[x >> a] + a;
 }
 
-extern "C"
-void
+extern "C" void
 login (struct utmp *ut)
 {
   register int fd;
@@ -2125,9 +2080,9 @@ login (struct utmp *ut)
 
 /* It isn't possible to use unix-style I/O function in logout code because
 cygwin's I/O subsystem may be inaccessible at logout() call time.
+FIXME (cgf): huh?
 */
-extern "C"
-int
+extern "C" int
 logout (char *line)
 {
   int res = 0;

@@ -1,3 +1,8 @@
+Fri Sep 29 21:49:27 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (symlink_info::check): Set executable bit for a file if the
+	first two characters are 'MZ' to mirror spawn_guts check.
+
 Sat Sep 30 03:34:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* winsup.h: Add `winME' to os_type symbols.
