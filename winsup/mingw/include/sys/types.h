@@ -111,6 +111,15 @@ typedef _sigset_t	sigset_t;
 #endif
 #endif	/* Not _SIGSET_T_ */
 
+#ifndef _SSIZE_T_
+#define _SSIZE_T_
+typedef long _ssize_t;
+
+#ifndef	_NO_OLDNAMES
+typedef _ssize_t ssize_t;
+#endif
+#endif /* Not _SSIZE_T_ */ 
+
 #endif	/* Not __STRICT_ANSI__ */
 
 #endif	/* Not RC_INVOKED */
