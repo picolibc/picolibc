@@ -191,7 +191,7 @@ details. */
        76: mallinfo
        77: thread-safe exit/at_exit
        78: Use stat and fstat rather than _stat, and _fstat.
-           Export btowc and trunc.
+	   Export btowc and trunc.
        79: Export acl32 aclcheck32 aclfrommode32 aclfrompbits32 aclfromtext32
 		  aclsort32 acltomode32 acltopbits32 acltotext32 facl32
 		  fgetpos64 fopen64 freopen64 fseeko64 fsetpos64 ftello64
@@ -202,9 +202,9 @@ details. */
        83: Export gethostid
        84: Pty open allocates invisible console.  64 bit interface
        85: Export new 32/64 functions from API 0.79 only with leading
-           underscore.  No problems with backward compatibility since no
-           official release has been made so far.  This change removes
-           exported symbols like fopen64, which might confuse configure.
+	   underscore.  No problems with backward compatibility since no
+	   official release has been made so far.  This change removes
+	   exported symbols like fopen64, which might confuse configure.
        86: Export ftok
        87: Export vsyslog
        88: Export _getreent
@@ -218,7 +218,7 @@ details. */
        93: Export daemon, forkpty, openpty, iruserok, ruserok, login_tty,
 	   openpty, forkpty, revoke, logwtmp, updwtmp
        94: Export getopt, getopt_long, optarg, opterr, optind, optopt,
-       	   optreset, __check_rhosts_file, __rcmd_errstr.
+	   optreset, __check_rhosts_file, __rcmd_errstr.
 
      */
 
