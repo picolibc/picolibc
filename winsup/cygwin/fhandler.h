@@ -397,6 +397,7 @@ public:
   void get_connect_secret (char*);
   HANDLE create_secret_event (int *secret = NULL);
   int check_peer_secret_event (struct sockaddr_in *peer, int *secret = NULL);
+  void signal_secret_event ();
   void close_secret_event ();
 };
 

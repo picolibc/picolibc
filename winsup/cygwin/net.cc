@@ -739,6 +739,7 @@ cygwin_connect (int fd,
 {
   int res;
   BOOL secret_check_failed = FALSE;
+  BOOL in_progress = FALSE;
   fhandler_socket *sock = get (fd);
   sockaddr_in sin;
   int secret [4];
@@ -759,18 +760,23 @@ cygwin_connect (int fd,
 	  /* Special handling for connect to return the correct error code
 	     when called to early on a non-blocking socket. */
 	  if (WSAGetLastError () == WSAEWOULDBLOCK)
- 	    WSASetLastError (WSAEINPROGRESS);
+	    {
+	      WSASetLastError (WSAEINPROGRESS);
+	      in_progress = TRUE;
+	    }
 
 	  set_winsock_errno ();
         }
       if (sock->get_addr_family () == AF_UNIX)
         {
-          if (!res || errno == EINPROGRESS)
+          if (!res || in_progress)
             {
               if (!sock->create_secret_event (secret))
                 {   
 		  secret_check_failed = TRUE;
 		}
+	      else if (in_progress)
+		sock->signal_secret_event ();
             }
 
           if (!secret_check_failed && !res)
@@ -887,6 +893,7 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 {
   int res = -1;
   BOOL secret_check_failed = FALSE;
+  BOOL in_progress = FALSE;
   sigframe thisframe (mainthread);
 
   fhandler_socket *sock = get (fd);
@@ -901,18 +908,21 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 
       res = accept (sock->get_socket (), peer, len);  // can't use a blocking call inside a lock
 
+      if ((SOCKET) res == (SOCKET) INVALID_SOCKET &&
+	  WSAGetLastError () == WSAEWOULDBLOCK)
+	in_progress = TRUE;
+
       if (sock->get_addr_family () == AF_UNIX)
         {
-          if (((SOCKET) res != (SOCKET) INVALID_SOCKET ||
-               WSAGetLastError () == WSAEWOULDBLOCK))
-            {
-              if (!sock->create_secret_event ())
-		{
-		  secret_check_failed = TRUE;
-                }
-            }
+	  if ((SOCKET) res != (SOCKET) INVALID_SOCKET || in_progress)
+	    {
+	      if (!sock->create_secret_event ())
+		secret_check_failed = TRUE;
+	      else if (in_progress)
+		sock->signal_secret_event ();
+	    }
 
-          if (!secret_check_failed &&
+	  if (!secret_check_failed &&
               (SOCKET) res != (SOCKET) INVALID_SOCKET)
             {
 	      if (!sock->check_peer_secret_event ((struct sockaddr_in*) peer))

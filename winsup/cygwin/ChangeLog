@@ -1,3 +1,15 @@
+2001-06-20  Egor Duda  <deo@logos-m.ru>
+
+	* fhandler_socket.cc (fhandler_socket::signal_secret_event): New
+	function.
+	* fhandler.h: Declare it.
+	* fhandler_socket.cc (fhandler_socket::create_secret_event): Don't
+	signal secret event immediately.
+	(fhandler_socket::check_peer_secret_event): Do it after peer event
+	was opened.
+	* net.cc (cygwin_connect): Or if socket is non-blocking.
+	(cygwin_accept): Ditto.
+
 Mon Jun 18 17:09:25 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::init): Revert 2001-06-16 change.

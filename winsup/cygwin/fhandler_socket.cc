@@ -103,12 +103,16 @@ fhandler_socket::create_secret_event (int* secret)
     secret_event = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
 
   if (secret_event)
-    {
-      ProtectHandle (secret_event);
-      SetEvent (secret_event);
-    }
+    ProtectHandle (secret_event);
 
   return secret_event;
+}
+
+void
+fhandler_socket::signal_secret_event ()
+{
+  if (secret_event)
+    SetEvent (secret_event);
 }
 
 void
@@ -135,6 +139,8 @@ fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
       debug_printf ("%s event already exist");
       ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
     }
+
+  signal_secret_event ();
 
   if (ev)
     {
