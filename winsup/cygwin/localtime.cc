@@ -1451,7 +1451,9 @@ tzsetwall P((void))
 	    /* printf("TZ deduced as `%s'\n", buf); */
 	    if (tzparse(buf, lclptr, FALSE) == 0) {
 		settzname();
-		setenv("TZ", buf, 1);
+		lcl_is_set = 1;
+		strlcpy(lcl_TZname, buf, sizeof (lcl_TZname));
+		setenv("TZ", lcl_TZname, 1);
 		return;
 	    }
 	}

@@ -1,5 +1,10 @@
 2002-12-19  Pierre Humblet <pierre.humblet@ieee.org>
 
+        * localtime.cc (tzsetwall): Set lcl_is_set and lcl_TZname
+        in the Cygwin specific part of the routine.
+
+2002-12-19  Pierre Humblet <pierre.humblet@ieee.org>
+
         * fhandler.cc (fhandler_base::open): Use "flags" rather than "mode"
 	in Win9X directory code.
 
