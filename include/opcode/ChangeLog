@@ -1,3 +1,7 @@
+2004-07-09  Andreas Schwab  <schwab@suse.de>
+
+	* m68k.h: Fix comment.
+
 2004-07-07  Tomer Levi  <Tomer.Levi@nsc.com>
 
 	* crx.h: New file.

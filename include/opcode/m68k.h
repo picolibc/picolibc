@@ -219,7 +219,7 @@ struct m68k_opcode_alias
    !  control					(modes 2,5,6,7.0-3)
 						(not 0,1,3,4,7.4)
    &  alterable control				(modes 2,5,6,7.0,7.1)
-						(not 0,1,7.2-4)
+						(not 0,1,3,4,7.2-4)
    $  alterable data				(modes 0,2-6,7.0,7.1)
 						(not 1,7.2-4)
    ?  alterable control, or data register	(modes 0,2,5,6,7.0,7.1)
