@@ -680,7 +680,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp)
 	{
 	  thiscatch = sigcatch_main;
 	  thiscomplete = sigcomplete_main;
-	  thisframe.set (mainthread, ebp);
+	  thisframe.set (mainthread, ebp, 1);
 	}
     }
   else if (!(thiscatch = getsem (p, "sigcatch", 0, 0)))

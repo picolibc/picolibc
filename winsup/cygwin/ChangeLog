@@ -1,3 +1,13 @@
+Wed Apr 25 15:07:37 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.h [sigthread]: Add exception field.  [sigframe::~sigframe]:
+	Clear exception field.  [sigframe::set]: Set exception field from
+	caller.
+	* sigproc.cc (sig_send): Set exception field when frame pointer is
+	passed in.
+	* exceptions.cc (interrupt_on_return): Always treat exception as
+	interruptible.
+
 2001-04-25  Egor Duda  <deo@logos-m.ru>
 
 	* cygwin.din: Export asctime_r, ctime_r, gmtime_r, localtime_r

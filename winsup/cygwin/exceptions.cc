@@ -735,7 +735,7 @@ interrupt_on_return (sigthread *th, int sig, void *handler, struct sigaction& si
 
   thestack.init (ebp);  /* Initialize from the input CONTEXT */
   for (i = 0; i < 32 && thestack++ ; i++)
-    if (interruptible (thestack.sf.AddrReturn.Offset))
+    if (th->exception || interruptible (thestack.sf.AddrReturn.Offset))
       {
 	DWORD *addr_retaddr = ((DWORD *)thestack.sf.AddrFrame.Offset) + 1;
 	if (*addr_retaddr  == thestack.sf.AddrReturn.Offset)
