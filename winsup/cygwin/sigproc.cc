@@ -72,6 +72,14 @@ public:
   friend int __stdcall sig_dispatch_pending ();
 };
 
+struct sigpacket
+{
+  int sig;
+  pid_t pid;
+  HANDLE wakeup;
+  sigset_t *mask;
+};
+
 static pending_signals sigqueue;
 
 struct sigaction *global_sigs;
@@ -652,10 +660,10 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
   int rc = 1;
   DWORD tid = GetCurrentThreadId ();
   BOOL its_me;
-  HANDLE thiscomplete;
   HANDLE sendsig;
   bool wait_for_completion;
   sigframe thisframe;
+  sigpacket pack;
 
   if (p == myself_nowait_nonmain)
     p = (tid == mainthread.id) ? (_pinfo *) myself : myself_nowait;
@@ -691,7 +699,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 	{
 	  if (tid == mainthread.id)
 	    thisframe.init (mainthread, ebp, exception);
-	  thiscomplete = sigcomplete_main;
+	  pack.wakeup = sigcomplete_main;
 	}
     }
   else
@@ -708,15 +716,26 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 	  __seterrno ();
 	  goto out;
 	}
-      thiscomplete = NULL;
+      pack.wakeup = NULL;
     }
 
+  sigset_t pending;
+  if (!its_me)
+    pack.mask = NULL;
+  else if (sig == __SIGPENDING)
+    pack.mask = &pending;
+  else if (sig == __SIGFLUSH || sig > 0)
+    pack.mask = &myself->getsigmask ();
+  else
+    pack.mask = NULL;
+
+  pack.sig = sig;
+  pack.pid = myself->pid;
   DWORD nb;
-  if (!WriteFile (sendsig, &sig, sizeof (sig), &nb, NULL) || nb != sizeof (sig))
+  if (!WriteFile (sendsig, &pack, sizeof (pack), &nb, NULL) || nb != sizeof (pack))
     {
-      /* Couldn't signal the semaphore.  This probably means that the
-       * process is exiting.
-       */
+      /* Couldn't send to the pipe.  This probably means that the
+         process is exiting.  */
       if (!its_me)
 	{
 	  __seterrno ();
@@ -733,47 +752,24 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
       goto out;
     }
 
-  /* Write completion handle or NULL */
-  if (!WriteFile (sendsig, &thiscomplete, sizeof (thiscomplete), &nb, NULL)
-      || nb != sizeof (thiscomplete))
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  sigset_t pending;
-  sigset_t *mask;
-  if (sig == __SIGPENDING)
-    mask = &pending;
-  else if (sig == __SIGFLUSH || sig > 0)
-    mask = &myself->getsigmask ();
-  else
-    mask = NULL;
-  if (mask && !WriteFile (sendsig, &mask, sizeof (mask), &nb, NULL)
-      || nb != sizeof (pending))
-    {
-      __seterrno ();
-      goto out;
-    }
 
   /* No need to wait for signal completion unless this was a signal to
-   * this process.
-   *
-   * If it was a signal to this process, wait for a dispatched signal.
-   * Otherwise just wait for the wait_sig to signal that it has finished
-   * processing the signal.
-   */
-  if (!wait_for_completion)
+     this process.
+
+     If it was a signal to this process, wait for a dispatched signal.
+     Otherwise just wait for the wait_sig to signal that it has finished
+     processing the signal.  */
+  if (wait_for_completion)
+    {
+      sigproc_printf ("Waiting for pack.wakeup %p", pack.wakeup);
+      rc = WaitForSingleObject (pack.wakeup, WSSC);
+    }
+  else
     {
       rc = WAIT_OBJECT_0;
       sigproc_printf ("Not waiting for sigcomplete.  its_me %d signal %d", its_me, sig);
       if (!its_me)
 	ForceCloseHandle (sendsig);
-    }
-  else
-    {
-      sigproc_printf ("Waiting for thiscomplete %p", thiscomplete);
-      rc = WaitForSingleObject (thiscomplete, WSSC);
     }
 
   if (rc == WAIT_OBJECT_0)
@@ -1088,32 +1084,29 @@ wait_sig (VOID *self)
 
   for (;;)
     {
-      int sig;
       DWORD nb;
-      if (!ReadFile (readsig, &sig, sizeof (sig), &nb, NULL))
+      sigpacket pack;
+      if (!ReadFile (readsig, &pack, sizeof (pack), &nb, NULL))
 	break;
 
-      HANDLE wakeup;
-      if (!ReadFile (readsig, &wakeup, sizeof (wakeup), &nb, NULL)
-	  || nb != sizeof (wakeup))
+      if (nb != sizeof (pack))
 	{
-	  system_printf ("signal notification handle read failure, %E");
+	  system_printf ("short read from signal pipe: %d != %d", nb,
+			 sizeof (pack));
 	  continue;
 	}
 
-      if (!sig)
+      if (!pack.sig)
 	continue;		/* Just checking to see if we exist */
 
-      sigset_t *mask;
-      if ((sig == __SIGFLUSH || sig == __SIGPENDING || sig > 0)
-	  && (!ReadFile (readsig, &mask, sizeof (mask), &nb, NULL)
-	      || nb != sizeof (mask)))
+      sigset_t dummy_mask;
+      if (!pack.mask)
 	{
-	  system_printf ("signal mask handle read failure, %E");
-	  continue;
+	  dummy_mask = myself->getsigmask ();
+	  pack.mask = &dummy_mask;
 	}
 
-      switch (sig)
+      switch (pack.sig)
 	{
 	case __SIGCOMMUNE:
 	  talktome ();
@@ -1122,35 +1115,35 @@ wait_sig (VOID *self)
 	  strace.hello ();
 	  continue;
 	case __SIGPENDING:
-	  *mask = 0;
+	  *pack.mask = 0;
 	  unsigned bit;
 	  sigqueue.reset ();
-	  while ((sig = sigqueue.next ()))
-	    if (myself->getsigmask () & (bit = SIGTOMASK (sig)))
-	      *mask |= bit;
+	  while ((pack.sig = sigqueue.next ()))
+	    if (myself->getsigmask () & (bit = SIGTOMASK (pack.sig)))
+	      *pack.mask |= bit;
 	  break;
 	default:
-	  if (sig < 0)
-	    sig_clear (-sig);
+	  if (pack.sig < 0)
+	    sig_clear (-pack.sig);
 	  else
 	    {
 	      int sh;
-	      for (int i = 0; !(sh = sig_handle (sig, *mask)) && i < 100 ; i++)
+	      for (int i = 0; !(sh = sig_handle (pack.sig, *pack.mask)) && i < 100 ; i++)
 		low_priority_sleep (0);		// hopefully a temporary condition
 	      if (sh <= 0)
-		sigqueue.add (sig);		// FIXME: Shouldn't add this in !sh condition
-	      if (sig == SIGCHLD)
+		sigqueue.add (pack.sig);	// FIXME: Shouldn't add this in !sh condition
+	      if (pack.sig == SIGCHLD)
 		proc_subproc (PROC_CLEARWAIT, 0);
 	    }
 	case __SIGFLUSH:
 	  sigqueue.reset ();
-	  while ((sig = sigqueue.next ()))
-	    if (sig_handle (sig, *mask) > 0)
+	  while ((pack.sig = sigqueue.next ()))
+	    if (sig_handle (pack.sig, *pack.mask) > 0)
 	      sigqueue.del ();
 	  break;
 	}
-      if (wakeup)
-	SetEvent (wakeup);
+      if (pack.wakeup)
+	SetEvent (pack.wakeup);
     }
 
   sigproc_printf ("done");

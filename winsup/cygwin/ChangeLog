@@ -1,3 +1,12 @@
+2003-09-24  Christopher Faylor  <cgf@redhat.com>
+
+	* shared_info.h (CURR_MOUNT_MAGIC): Fix.
+
+	* sigproc.cc (sigpacket): New structure.
+	(sig_send): Fill out sigpacket structure to send to signal thread
+	rather than racily sending separate packets.
+	(wait_sig): Use sigpacket structure to receive info from signal sender.
+
 2003-09-24  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* shared_info.h (class user_info): New.

@@ -44,7 +44,7 @@ class mount_item
 
 #define USER_VERSION	1	// increment when mount table changes and
 #define USER_VERSION_MAGIC CYGWIN_VERSION_MAGIC (MOUNT_MAGIC, USER_VERSION)
-#define CURR_MOUNT_MAGIC 0x4fe431cdU    /* FIXME */
+#define CURR_MOUNT_MAGIC 0x6dd73a3fU
 
 class reg_key;
 struct device;
