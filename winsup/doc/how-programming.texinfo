@@ -98,8 +98,6 @@ works, but
     collect2: ld returned 1 exit status
 @end example
 
-This is an artifact of libm.a being a symbolic link to libcygwin.a.
-
 If you're using GCJ, you need to pass a "--main" flag:
 
 @example
