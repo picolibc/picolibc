@@ -233,7 +233,7 @@ When the last post-install script is completed, <command>setup.exe</command>
 will display a box announcing the completion. A few packages, such as
 the OpenSSH server, require some manual site-specific configuration. 
 Relevant documentation can be found in the <literal>/usr/doc/Cygwin/</literal> 
-directory.
+or <literal>/usr/share/doc/Cygwin/</literal> directory.
 </para>
 </sect2>
 

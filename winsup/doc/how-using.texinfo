@@ -165,6 +165,12 @@ itself a symbolic link, then find will not traverse it unless you
 specify the @samp{-follow} option.  This behavior is different than most
 other UNIX implementations, but is not likely to change.
 
+If find does not seem to be producing enough results, or seems to be
+missing out some directories, you may be experiencing a problem with one
+of find's optimisations.  The absence of @samp{.} and @samp{..}
+directories on some filesystems, such as DVD-R UDF, can confuse find.
+See the documentation for the option @samp{-noleaf} in the man page.
+
 @subsection Why doesn't @samp{su} work?
 
 The @samp{su} command has been in and out of Cygwin distributions, but
@@ -678,16 +684,17 @@ middle mouse buttons, respectively.  It will honor settings in your
 
 Don't invoke as simply ``rxvt'' because that will run /bin/sh (really
 ash) which is not a good interactive shell.  For details see
-@code{/usr/doc/Cygwin/rxvt-<ver>.README}.
+@code{/usr/share/doc/Cygwin/rxvt-<ver>.README}.
 
 @subsection info error "dir: No such file or directory"
 
-Cygwin packages install their info documentation in the /usr/info
-directory.  But you need to create a @code{dir} file there before the
-standalone info program (probably @code{/usr/bin/info}) can be used to
-read those info files.  This is how you do it:
+Cygwin packages install their info documentation in the
+@code{/usr/share/info} directory.  But you need to create a @code{dir}
+file there before the standalone info program (probably
+@code{/usr/bin/info}) can be used to read those info files.  This is how
+you do it:
 @example
-	bash$ cd /usr/info
+	bash$ cd /usr/share/info
 	bash$ for f in *.info ; do install-info $f dir ; done
 @end example
 This may generate warnings:
@@ -696,7 +703,7 @@ This may generate warnings:
 	install-info: warning: no info dir entry in `time.info'
 @end example
 The @code{install-info} command cannot parse these files, so you will
-have to add their entries to @code{/usr/info/dir} by hand.
+have to add their entries to @code{/usr/share/info/dir} by hand.
 
 Even if the dir file already exists, you may have to update it when
 you install new Cygwin packages.  Some packages update the dir file
