@@ -1,3 +1,7 @@
+2002-01-27  David O'Brien  <obrien@FreeBSD.org>
+
+	* cgen.h (BFD_VERSION): Use BFD_VERSION_DATE instead.
+
 2002-01-15  Richard Earnshaw  <rearnsha@arm.com>
 
 	* coff/arm.h (F_VFP_FLOAT): Define.
