@@ -1,3 +1,7 @@
+Wed Dec 20 13:34:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/winbase.h: Add prototype for SetSecurityDescriptorControl.
+
 Mon Dec 11 13:11:36 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* lib/Makefile.in: Install headers and libraries in tooldir.
