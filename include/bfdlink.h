@@ -1,6 +1,6 @@
 /* bfdlink.h -- header file for BFD link routines
    Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2002, 2003,
-   2004 Free Software Foundation, Inc.
+   2004, 2005 Free Software Foundation, Inc.
    Written by Steve Chamberlain and Ian Lance Taylor, Cygnus Support.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -196,6 +196,10 @@ extern void bfd_link_hash_traverse
 /* Add an entry to the undefs list.  */
 extern void bfd_link_add_undef
   (struct bfd_link_hash_table *, struct bfd_link_hash_entry *);
+
+/* Remove symbols from the undefs list that don't belong there.  */
+extern void bfd_link_repair_undef_list
+  (struct bfd_link_hash_table *table);
 
 struct bfd_sym_chain
 {

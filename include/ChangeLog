@@ -1,3 +1,7 @@
+2005-02-01  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (bfd_link_repair_undef_list): Declare.
+
 2005-01-10  Andreas Schwab  <schwab@suse.de>
 
 	* dis-asm.h (struct disassemble_info): Add skip_zeroes and
