@@ -1,3 +1,10 @@
+2002-03-06  dannysmith@users.sourceforge.net
+
+	* include/mswsock.h: Group winsock2 dependants
+	together and protect with #ifdef _WINSOCK2_H.
+	* lib/test.c: Only test ws2tcpip.h if winsock2.h
+	has been included.
+
 2002-03-05  dannysmith@users.sourceforge.net
 
 	* include/mswsock.h (TP_*): Add new defines.

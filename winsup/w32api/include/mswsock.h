@@ -1,6 +1,6 @@
 /*
  * mswsock.h
- * MS-specific extensions to Windows Sockets 1.1, exported from mswsock.dll.
+ * MS-specific extensions to Windows Sockets, exported from mswsock.dll.
  * These functions are N/A on Windows9x.
  *
  * This file is part of a free library for the Win32 API.
@@ -40,16 +40,23 @@ extern "C" {
 #define TF_USE_SYSTEM_THREAD    16
 #define TF_USE_KERNEL_APC   32
 
-#define TP_ELEMENT_FILE		1
-#define TP_ELEMENT_MEMORY	2
-#define TP_ELEMENT_EOP		4
-
 typedef struct _TRANSMIT_FILE_BUFFERS {
 	PVOID Head;
 	DWORD HeadLength;
 	PVOID Tail;
 	DWORD TailLength;
 } TRANSMIT_FILE_BUFFERS, *PTRANSMIT_FILE_BUFFERS, *LPTRANSMIT_FILE_BUFFERS;
+
+int PASCAL WSARecvEx(SOCKET,char*,int,int*);
+BOOL PASCAL TransmitFile(SOCKET,HANDLE,DWORD,DWORD,LPOVERLAPPED,LPTRANSMIT_FILE_BUFFERS,DWORD);
+BOOL PASCAL AcceptEx(SOCKET,SOCKET,PVOID,DWORD,DWORD,DWORD,LPDWORD,LPOVERLAPPED);
+VOID PASCAL GetAcceptExSockaddrs(PVOID,DWORD,DWORD,DWORD,struct sockaddr**, LPINT, struct sockaddr**, LPINT);
+
+#ifdef WINSOCK2_H /* These require the winsock2 interface.  */
+
+#define TP_ELEMENT_FILE		1
+#define TP_ELEMENT_MEMORY	2
+#define TP_ELEMENT_EOP		4
 
 typedef struct _TRANSMIT_PACKETS_ELEMENT { 
 	ULONG dwElFlags;
@@ -92,12 +99,10 @@ typedef struct wsacmsghdr {
 #define WSA_CMSG_LEN(length)
 #endif
 
-int PASCAL WSARecvEx(SOCKET,char*,int,int*);
-BOOL PASCAL TransmitFile(SOCKET,HANDLE,DWORD,DWORD,LPOVERLAPPED,LPTRANSMIT_FILE_BUFFERS,DWORD);
-BOOL PASCAL AcceptEx(SOCKET,SOCKET,PVOID,DWORD,DWORD,DWORD,LPDWORD,LPOVERLAPPED);
-VOID PASCAL GetAcceptExSockaddrs(PVOID,DWORD,DWORD,DWORD,struct sockaddr**, LPINT, struct sockaddr**, LPINT);
 BOOL PASCAL DisconnectEx(SOCKET,LPOVERLAPPED,DWORD,DWORD);
 int PASCAL WSARecvMsg(SOCKET,LPWSAMSG,LPDWORD,LPWSAOVERLAPPED,LPWSAOVERLAPPED_COMPLETION_ROUTINE);
+
+#endif /* WINSOCK2_H */
 
 #ifdef __cplusplus
 }

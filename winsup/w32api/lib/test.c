@@ -55,7 +55,9 @@
 #include <winioctl.h>
 #include <winresrc.h>
 #include <winsock.h>
+#ifdef _WINSOCK2_H
 #include <ws2tcpip.h>
+#endif
 #include <wsnetbs.h>
 #include <setupapi.h>
 #include <aclapi.h>
