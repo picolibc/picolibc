@@ -1,8 +1,8 @@
 Thu Feb 22 17:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (symlink): Keep relative paths relative in the DOS
-	path inside of a shortcut. If that's impossible for some
-	reason, save an absolute path.
+	path inside of a shortcut. If that's impossible or the target
+	path is already absolute save an absolute path.
 
 Thu Feb 22 15:33:00 2001  Corinna Vinschen <corinna@vinschen.de>
 

@@ -2209,7 +2209,7 @@ symlink (const char *topath, const char *frompath)
     strcpy (from + len, ".lnk");
   path_conv win32_path (from, PC_SYM_NOFOLLOW);
   path_conv win32_topath;
-  char cwd[MAX_PATH + 1], *cp, c = 0;
+  char cwd[MAX_PATH + 1], *cp = NULL, c = 0;
   char w32topath[MAX_PATH + 1];
 #endif
 
@@ -2265,18 +2265,21 @@ symlink (const char *topath, const char *frompath)
 	  res = 0;
 	}
 #else
-  getcwd (cwd, MAX_PATH + 1);
-  if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
+  if (!isabspath (topath))
     {
-      c = *cp;
-      *cp = '\0';
-      chdir (from);
+      getcwd (cwd, MAX_PATH + 1);
+      if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
+	{
+	  c = *cp;
+	  *cp = '\0';
+	  chdir (from);
+	}
+      backslashify (topath, w32topath, 0);
     }
-  backslashify (topath, w32topath, 0);
-  if (GetFileAttributes (w32topath) == (DWORD)-1)
+  if (!cp || GetFileAttributes (w32topath) == (DWORD)-1)
     {
       win32_topath.check (topath, PC_SYM_NOFOLLOW);
-      if (win32_topath.error != ENOENT)
+      if (!cp || win32_topath.error != ENOENT)
         strcpy (w32topath, win32_topath);
     }
   if (cp)
