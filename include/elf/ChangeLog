@@ -1,3 +1,12 @@
+2003-06-29  Andreas Jaeger  <aj@suse.de>
+
+	* mmix.h: Convert to ISO C90 prototypes.
+	* mips.h: Likewise.
+
+	* reloc-macros.h (START_RELOC_NUMBERS): Convert to ISO C90
+	prototype.
+	(RELOC_NUMBER): Remove !__STDC__ code.
+
 2003-06-13  Robert Millan <zeratul2@wanadoo.es>
 
 	* common.h (GNU_ABI_TAG_NETBSD): New tag.
@@ -95,7 +104,7 @@
 
 	2002-04-02  Alexandre Oliva  <aoliva@redhat.com>
 
-	 	* sh.h (EF_SH_MERGE_MACH): Handle SH2E.
+		* sh.h (EF_SH_MERGE_MACH): Handle SH2E.
 
 	2002-04-02  Elena Zannoni  <ezannoni@redhat.com>
 
