@@ -21,9 +21,11 @@
 
 #if defined(__arm__) || defined(__thumb__)
 /* ARM always has big-endian words.  Within those words the byte ordering
-   appears to be big or little endian.  Newlib doesn't seem to care about
-   the byte ordering within words.  */
+   will be big or little endian depending upon the target.  */
 #define __IEEE_BIG_ENDIAN
+#ifdef __ARMEL__
+#define __IEEE_BYTES_LITTLE_ENDIAN
+#endif
 #endif
 
 #ifdef __hppa__
