@@ -1,3 +1,15 @@
+2003-05-15  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (pthread::init_mainthread): Remove function parameter.
+	(MTinterface::Init): Ditto.
+	* thread.cc (MTinterface::Init): Remove function parameter.
+	Always initialize reent_key.
+	(pthread::init_mainthread): Remove function parameter.
+	(MTinterface::fixup_after_fork): Fix pthread::init_mainthread call.
+	* dcrt0.cc (dll_crt_0_1) Fix calls to MTinterface::Init and
+	pthread::init_mainthread.
+	Call pthread::init_mainthread only when not forked.
+	
 2003-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_meminfo): Make swap memory output

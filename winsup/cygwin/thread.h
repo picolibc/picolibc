@@ -401,7 +401,7 @@ public:
   pthread ();
   virtual ~pthread ();
 
-  static void init_mainthread (bool);
+  static void init_mainthread ();
   static bool is_good_object(pthread_t const *);
   static void atforkprepare();
   static void atforkparent();
@@ -679,7 +679,7 @@ public:
   pthread_key reent_key;
   pthread_key thread_self_key;
 
-  void Init (int);
+  void Init ();
   void fixup_before_fork (void);
   void fixup_after_fork (void);
 

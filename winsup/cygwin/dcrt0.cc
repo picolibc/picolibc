@@ -565,7 +565,7 @@ dll_crt0_1 ()
   _impure_ptr = &reent_data;
 
   user_data->resourcelocks->Init ();
-  user_data->threadinterface->Init (user_data->forkee);
+  user_data->threadinterface->Init ();
 
   mainthread.init ("mainthread"); // For use in determining if signals
 				  //  should be blocked.
@@ -631,7 +631,10 @@ dll_crt0_1 ()
   ProtectHandle (hMainThread);
   cygthread::init ();
 
-  pthread::init_mainthread (!user_data->forkee);
+  /* Initialize pthread mainthread when not forked and it is save to call new,
+     otherwise it is reinitalized in fixup_after_fork */
+  if (!user_data->forkee)
+    pthread::init_mainthread ();
 
   /* Initialize debug muto, if DLL is built with --enable-debugging.
      Need to do this before any helper threads start. */
