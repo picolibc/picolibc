@@ -4,7 +4,9 @@
 #pragma GCC system_header
 #endif
 
+#ifndef WINBASEAPI
 #define WINBASEAPI DECLSPEC_IMPORT
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif

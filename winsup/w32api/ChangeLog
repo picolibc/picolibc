@@ -1,3 +1,16 @@
+2002-06-26  Casper S. Hornstrup  <chorns@users.sourceforge.net>
+
+	* include/winbase.h (WINBASEAPI): Don't define if prior
+	definition.
+
+	* include/winioctl.h (PARTITION_FAT32, PARTITION_FAT32_XINT13,
+	PARTITION_XINT13, PARTITION_XINT13_EXTENDED, PARTITION_LDM,
+	PARTITION_UNIX): Add defines.
+	(PDRIVE_LAYOUT_INFORMATION): Add typedef.
+	(IsRecognizedPartition): Also check for PARTITION_FAT32,
+	PARTITION_FAT32_XINT13 and PARTITION_XINT13.
+	(IsContainerPartition): Add macro.
+
 2002-06-25  Ken Fitlike  <kenfitlike@hotmail.com>
 
 	* include/commctrl.h: (CBEIF_*): Add defines.
