@@ -366,7 +366,7 @@ ucenv (char *p, char *eq)
 
 /* Parse CYGWIN options */
 
-static NO_COPY BOOL export_settings = FALSE;
+static NO_COPY BOOL export_settings = false;
 
 enum settings
   {
@@ -536,7 +536,8 @@ parse_options (char *buf)
 
   if (buf == NULL)
     {
-      char newbuf[MAX_PATH + 7] = "CYGWIN";
+      char newbuf[MAX_PATH + 7];
+      newbuf[0] = '\0';
       for (k = known; k->name != NULL; k++)
 	if (k->remember)
 	  {
@@ -544,11 +545,12 @@ parse_options (char *buf)
 	    free (k->remember);
 	    k->remember = NULL;
 	  }
-      if (!export_settings)
-	return;
-      newbuf[sizeof ("CYGWIN") - 1] = '=';
-      debug_printf ("%s", newbuf);
-      putenv (newbuf);
+
+      if (export_settings)
+	{
+	  debug_printf ("%s", newbuf + 1);
+	  setenv ("CYGWIN", newbuf + 1, 1);
+	}
       return;
     }
 
@@ -612,16 +614,21 @@ parse_options (char *buf)
 }
 
 /* Set options from the registry. */
-static void __stdcall
+static bool __stdcall
 regopt (const char *name)
 {
+  bool parsed_something = false;
   /* FIXME: should not be under mount */
   reg_key r (KEY_READ, CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
   char buf[MAX_PATH];
   char lname[strlen(name) + 1];
   strlwr (strcpy (lname, name));
+
   if (r.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
-    parse_options (buf);
+    {
+      parse_options (buf);
+      parsed_something = true;
+    }
   else
     {
       reg_key r1 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
@@ -629,9 +636,13 @@ regopt (const char *name)
 		  CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
 		  CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
       if (r1.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
-	parse_options (buf);
+	{
+	  parse_options (buf);
+	  parsed_something = true;
+	}
     }
   MALLOC_CHECK;
+  return parsed_something;
 }
 
 /* Initialize the environ array.  Look for the CYGWIN environment
@@ -645,6 +656,7 @@ environ_init (char **envp, int envc)
   char *newp;
   int sawTERM = 0;
   bool envp_passed_in;
+  bool got_something_from_registry;
   static char NO_COPY cygterm[] = "TERM=cygwin";
 
   static int initted;
@@ -658,9 +670,9 @@ environ_init (char **envp, int envc)
       initted = 1;
     }
 
-  regopt ("default");
+  got_something_from_registry = regopt ("default");
   if (myself->progname[0])
-    regopt (myself->progname);
+    got_something_from_registry = regopt (myself->progname) || got_something_from_registry;
 
 #ifdef NTSEC_ON_BY_DEFAULT
   /* Set ntsec explicit as default, if NT is running */
@@ -736,7 +748,10 @@ out:
       if (p)
 	parse_options (p);
     }
-  parse_options (NULL);
+
+  if (got_something_from_registry)
+    parse_options (NULL);	/* possibly export registry settings to
+				   environment */
   MALLOC_CHECK;
 }
 
@@ -893,12 +908,13 @@ build_env (const char * const *envp, char *&envblock, int &envc,
       continue;
     }
 
+  assert ((srcp - envp) == n);
   /* Fill in any required-but-missing environment variables. */
   for (unsigned i = 0; i < SPENVS_SIZE; i++)
     if (!saw_spenv[i])
       {
 	*dstp = spenvs[i].retrieve (no_envblock);
-	if (*dstp && *dstp != env_dontadd && !no_envblock)
+	if (*dstp && !no_envblock && *dstp != env_dontadd)
 	  {
 	    tl += strlen (*dstp) + 1;
 	    dstp++;
@@ -906,6 +922,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
       }
 
   envc = dstp - newenv;		/* Number of entries in newenv */
+  assert ((size_t) envc <= (n + SPENVS_SIZE));
   *dstp = NULL;			/* Terminate */
 
   if (no_envblock)

@@ -1,5 +1,14 @@
 2002-06-30  Christopher Faylor  <cgf@redhat.com>
 
+	* environ.cc (parse_options): Use setenv to potentially replace CYGWIN
+	value on export.  Fixes broken behavior since November 2000 changes.
+	(regopt): Return indication of whether or not something has been parsed
+	from the registry.
+	(environ_init): Only attempt to export CYGWIN variable when values were
+	set from the registry.  It is exported automatically otherwise.
+
+2002-06-30  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.h (fhandler_process::pid): New field.
 	(fhandler_process::fstat): Remove unneeded array.  Set pid element.
 	(fhandler_process::open): Ditto.
