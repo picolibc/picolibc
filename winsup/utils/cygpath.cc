@@ -90,7 +90,7 @@ get_short_paths (char *path)
       if (ptr)
 	*ptr++ = 0;
       len = GetShortPathName (next, NULL, 0);
-      if (len == ERROR_INVALID_PARAMETER)
+      if (len ==0 && GetLastError () == ERROR_INVALID_PARAMETER)
 	{
 	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
 		   next);
