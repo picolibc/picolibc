@@ -1,3 +1,24 @@
+2001-02-28  Will Cohen  <wcohen@redhat.com>
+
+        * src/libgloss/m68k/Makefile.in: Updated copyright and
+         added rules to build simulator related libraries.
+        (SIM_SCRIPTS): New variable.
+        (SIM_LDFLAGS): New variable.
+        (SIM_BSP): New variable.
+        (SIM_CRT0): New variable.
+        (SIM_OBJS): New variable.
+        (SIM_TEST): New variable.
+        (SIM_INSTALL): new variable.
+        * src/libgloss/m68k/sim-abort.c: New file.
+        * src/libgloss/m68k/sim-crt0.S: New file.
+        * src/libgloss/m68k/sim-errno.c: New file.
+        * src/libgloss/m68k/sim-funcs.c: New file.
+        * src/libgloss/m68k/sim-inbyte.c: New file.
+        * src/libgloss/m68k/sim-print.c: New file.
+        * src/libgloss/m68k/sim-sbrk.c: New file.
+        * src/libgloss/m68k/sim.ld: New file.
+        * src/libgloss/m68k/simulator.S: New file.
+
 2001-02-22  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* mn10200/access.c: With DJ Delorie's permission, this code is

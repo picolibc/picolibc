@@ -1,4 +1,4 @@
-# Copyright (c) 1995, 1996 Cygnus Support
+# Copyright (c) 1995, 1996, 2001 Cygnus Support
 #
 # The authors hereby grant permission to use, copy, modify, distribute,
 # and license this software and its documentation for any purpose, provided
@@ -68,6 +68,17 @@ OBJS =  close.o fstat.o getpid.o isatty.o kill.o \
 CFLAGS = -g
 # ARFLAGS = rv
 
+
+# Here is all of the simulator stuff
+SIM_SCRIPTS	= sim.ld
+SIM_LDFLAGS	= -Tsim.ld
+SIM_BSP		= libsim.a
+SIM_CRT0	= sim-crt0.o
+SIM_OBJS	= sim-print.o sim-inbyte.o sim-sbrk.o sim-abort.o sim-errno.o simulator.o sim-funcs.o unlink.o
+SIM_TEST	= 
+SIM_INSTALL	= install-sim
+
+
 CRT0 = crt0.o
 #
 # here's all the MVME135 target stuff
@@ -111,11 +122,15 @@ DBUG_OBJS=	dbug-exit.o dbug-inbyte.o dbug-outbyte.o
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
-all: ${CRT0} ${BCC_BSP} ${IDP_BSP} ${MVME135_BSP} ${MVME162_BSP} ${DBUG_BSP}
+all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${MVME135_BSP} ${MVME162_BSP} ${DBUG_BSP}
 
 #
 # here's where we build the board support packages for each target
 #
+${SIM_BSP}: ${SIM_OBJS}
+	${AR} ${ARFLAGS} $@ ${SIM_OBJS}
+	${RANLIB} $@
+
 ${BCC_BSP}: $(OBJS) ${BCC_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${BCC_OBJS}
 	${RANLIB} $@
@@ -214,9 +229,15 @@ dtor.x: dtor.o ${CRT0} ${srcdir}/mvme135.ld Makefile  ${MVME135_BSP}
 	${CC} -L${srcdir} -L${objdir} dtor.o -o $@ $(LIBS_FOR_TARGET) \
 	-N -Wl,-Tmvme135.ld -nostdlib
 
+unlink.o: $(srcdir)/../unlink.c
 
 .PHONY: install info dvi doc install-info clean-info
 install:
+	# install SIM stuff
+	$(INSTALL_PROGRAM) $(SIM_CRT0) $(tooldir)/lib${MULTISUBDIR}/$(SIM_CRT0)
+	$(INSTALL_PROGRAM) $(SIM_BSP) $(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
+	$(INSTALL_DATA) ${srcdir}/sim.ld $(tooldir)/lib${MULTISUBDIR}/sim.ld
+	#
 	$(INSTALL_PROGRAM) $(CRT0) $(tooldir)/lib${MULTISUBDIR}/$(CRT0)
 	# install BCC stuff
 	$(INSTALL_PROGRAM) $(BCC_BSP) $(tooldir)/lib${MULTISUBDIR}/$(BCC_BSP)
