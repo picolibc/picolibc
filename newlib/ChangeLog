@@ -1,3 +1,7 @@
+2000-08-16  Eric Fifer  <efifer@sanwaint.com>
+
+        * libc/stdio/vfprintf.c (_vfprintf_r): suppress . with "%.0f", 0.1
+
 2000-08-09  Nick Clifton  <nickc@cygnus.com>
 
 	* libc/sys/arm/setjmp.S: Recode to clean up function prologues and

@@ -805,9 +805,11 @@ number:			if ((dprec = prec) >= 0)
 					}
 				} else if (expt <= 0) {
 					PRINT("0", 1);
-					PRINT(decimal_point, 1);
-					PAD(-expt, zeroes);
-					PRINT(cp, ndig);
+					if(ndig) {
+						PRINT(decimal_point, 1);
+						PAD(-expt, zeroes);
+						PRINT(cp, ndig);
+					}
 				} else if (expt >= ndig) {
 					PRINT(cp, ndig);
 					PAD(expt - ndig, zeroes);
