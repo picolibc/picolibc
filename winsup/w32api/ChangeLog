@@ -1,3 +1,11 @@
+2004-01-09  Stuart Cunningham  <stuart_hc@users.sourceforge.net>
+
+	* include/objbase.h (STGFMT): Declare enum.
+	(STGOPTIONS): Declare structure.
+	(StgCreateStorageEx, StgOpenStorageEx): Declare.
+	(STGOPTIONS_VERSION): Define.
+	* lib/ole32.def (StgCreateStorageEx, StgOpenStorageEx): Add stubs.
+
 2004-04-13  Filip Navara  <xnavara@volny.cz>
 
 	* include/winuser.h (IS_INTRESOURCE, MB_CANCELTRYCONTINUE,

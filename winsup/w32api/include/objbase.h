@@ -50,6 +50,19 @@
 #define STG_LAYOUT_INTERLEAVED	1
 #define COM_RIGHTS_EXECUTE 1
 #define COM_RIGHTS_SAFE_FOR_SCRIPTING 2
+#define STGOPTIONS_VERSION 2
+typedef enum tagSTGFMT {
+	STGFMT_STORAGE = 0, 
+	STGFMT_FILE = 3, 
+	STGFMT_ANY = 4, 
+	STGFMT_DOCFILE = 5
+} STGFMT;
+typedef struct tagSTGOPTIONS {
+	USHORT usVersion;
+	USHORT reserved;
+	ULONG ulSectorSize;
+	const WCHAR pwcsTemplateFile;
+} STGOPTIONS;
 typedef enum tagREGCLS {
 	REGCLS_SINGLEUSE = 0,
 	REGCLS_MULTIPLEUSE = 1,
@@ -152,6 +165,8 @@ WINOLEAPI StgOpenStorageOnILockBytes(ILockBytes*,IStorage*,DWORD,SNB,DWORD,IStor
 WINOLEAPI StgIsStorageFile(const OLECHAR*);
 WINOLEAPI StgIsStorageILockBytes(ILockBytes*);
 WINOLEAPI StgSetTimes(OLECHAR const*,FILETIME const*,FILETIME const*,FILETIME const*);
+WINOLEAPI StgCreateStorageEx(const WCHAR*,DWORD,DWORD,DWORD,STGOPTIONS*,void*,REFIID,void**);
+WINOLEAPI StgOpenStorageEx(const WCHAR*,DWORD,DWORD,DWORD,STGOPTIONS*,void*,REFIID,void**);
 WINOLEAPI BindMoniker(LPMONIKER,DWORD,REFIID,PVOID*);
 WINOLEAPI CoGetObject(LPCWSTR,BIND_OPTS*,REFIID,void**);
 WINOLEAPI MkParseDisplayName(LPBC,LPCOLESTR,ULONG*,LPMONIKER*);
