@@ -1,3 +1,8 @@
+2001-08-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+        * bfdlink.h (struct bfd_link_info): add new boolean
+        field pei386_auto_import.
+
 2001-08-01  Aldy Hernandez  <aldyh@redhat.com>
 
 	* opcode/mips.h (INSN_ISA_MASK): Nuke bits 12-15.

@@ -274,6 +274,10 @@ struct bfd_link_info
 
   /* May be used to set DT_FLAGS_1 for ELF. */
   bfd_vma flags_1;
+
+  /* true if auto-import thunks for DATA items in pei386 DLLs 
+     should be generated/linked against.  */
+  boolean pei386_auto_import;
 };
 
 /* This structures holds a set of callback functions.  These are
