@@ -160,9 +160,9 @@ uinfo_init ()
 
   cygheap->user.saved_uid = cygheap->user.real_uid = myself->uid;
   cygheap->user.saved_gid = cygheap->user.real_gid = myself->gid;
-  cygheap->user.external_token = INVALID_HANDLE_VALUE;
-  cygheap->user.internal_token = INVALID_HANDLE_VALUE;
-  cygheap->user.current_token = INVALID_HANDLE_VALUE;
+  cygheap->user.external_token = NO_IMPERSONATION;
+  cygheap->user.internal_token = NO_IMPERSONATION;
+  cygheap->user.current_token = NO_IMPERSONATION;
   cygheap->user.set_saved_sid ();	/* Update the original sid */
 }
 

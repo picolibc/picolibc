@@ -1,3 +1,17 @@
+2004-10-28  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* path.cc (mount_info::from_registry): Deimpersonate while
+	accessing HKLM.
+	(mount_info::read_cygdrive_info_from_registry): Ditto.
+	* cygheap.h: Define NO_IMPERSONATION.
+	(cygheap_user::issetuid): Replace INVALID_HANDLE_VALUE by 
+	NO_IMPERSONATION.
+	(cygheap_user::has_impersonation_tokens): Ditto.
+	(cygheap_user::close_impersonation_tokens): Ditto.
+	* uinfo.cc (uinfo_init): Ditto.
+	* syscalls.cc (seteuid32): Ditto.
+	* security.cc (set_impersonation_token): Ditto.
+
 2004-10-26  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (_cygtls::fixup_after_fork): Wipe out exitsock local since

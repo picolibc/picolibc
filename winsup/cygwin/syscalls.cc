@@ -2032,17 +2032,17 @@ seteuid32 (__uid32_t uid)
   if (verify_token (ptok, usersid, groups))
     new_token = ptok;
   /* Verify if the external token is suitable */
-  else if (cygheap->user.external_token != INVALID_HANDLE_VALUE
+  else if (cygheap->user.external_token != NO_IMPERSONATION
 	   && verify_token (cygheap->user.external_token, usersid, groups))
     new_token = cygheap->user.external_token;
   /* Verify if the current token (internal or former external) is suitable */
-  else if (cygheap->user.current_token != INVALID_HANDLE_VALUE
+  else if (cygheap->user.current_token != NO_IMPERSONATION
 	   && cygheap->user.current_token != cygheap->user.external_token
 	   && verify_token (cygheap->user.current_token, usersid, groups,
 			    &token_is_internal))
     new_token = cygheap->user.current_token;
   /* Verify if the internal token is suitable */
-  else if (cygheap->user.internal_token != INVALID_HANDLE_VALUE
+  else if (cygheap->user.internal_token != NO_IMPERSONATION
 	   && cygheap->user.internal_token != cygheap->user.current_token
 	   && verify_token (cygheap->user.internal_token, usersid, groups,
 			    &token_is_internal))
@@ -2074,10 +2074,11 @@ seteuid32 (__uid32_t uid)
 	    goto failed;
 	}
       /* Keep at most one internal token */
-      if (cygheap->user.internal_token != INVALID_HANDLE_VALUE)
+      if (cygheap->user.internal_token != NO_IMPERSONATION)
 	CloseHandle (cygheap->user.internal_token);
       cygheap->user.internal_token = new_token;
     }
+
   if (new_token != ptok)
     {
       /* Avoid having HKCU use default user */
@@ -2103,7 +2104,7 @@ seteuid32 (__uid32_t uid)
   CloseHandle (ptok);
   issamesid = (usersid == cygheap->user.sid ());
   cygheap->user.set_sid (usersid);
-  cygheap->user.current_token = new_token == ptok ? INVALID_HANDLE_VALUE
+  cygheap->user.current_token = new_token == ptok ? NO_IMPERSONATION
 						  : new_token;
   if (!issamesid) /* MS KB 199190 */
     RegCloseKey (HKEY_CURRENT_USER);

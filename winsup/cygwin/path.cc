@@ -1802,11 +1802,13 @@ mount_info::from_registry ()
   read_mounts (r);
 
   /* Then read mounts from system-wide mount table. */
+  cygheap->user.deimpersonate ();
   reg_key r1 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
 	      CYGWIN_INFO_CYGNUS_REGISTRY_NAME, CYGWIN_REGNAME,
 	      CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
 	      NULL);
   read_mounts (r1);
+  cygheap->user.reimpersonate ();
 }
 
 /* add_reg_mount: Add mount item to registry.  Return zero on success,
@@ -1922,16 +1924,16 @@ mount_info::read_cygdrive_info_from_registry ()
 {
   /* reg_key for user path prefix in HKEY_CURRENT_USER. */
   reg_key r;
-
+  /* First read cygdrive from user's registry. */
   if (r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive, sizeof (cygdrive), "") != 0)
     {
-      /* Didn't find the user path prefix so check the system path prefix. */
-
-      /* reg_key for system path prefix in HKEY_LOCAL_MACHINE.  */
+      /* Then read cygdrive from system-wide registry. */
+      cygheap->user.deimpersonate ();
       reg_key r2 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
 		 CYGWIN_INFO_CYGNUS_REGISTRY_NAME, CYGWIN_REGNAME,
 		 CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
 		 NULL);
+      cygheap->user.reimpersonate ();
 
       if (r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive,
 	  sizeof (cygdrive), ""))

@@ -169,7 +169,8 @@ public:
   PSID sid () { return effec_cygsid; }
   PSID saved_sid () { return saved_cygsid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);
-  bool issetuid () const { return current_token != INVALID_HANDLE_VALUE; }
+#define NO_IMPERSONATION NULL
+  bool issetuid () const { return current_token != NO_IMPERSONATION; }
   HANDLE token () { return current_token; }
   void deimpersonate ()
   {
@@ -183,26 +184,26 @@ public:
       system_printf ("ImpersonateLoggedOnUser: %E");
   }
   bool has_impersonation_tokens ()
-    { return external_token != INVALID_HANDLE_VALUE
-	     || internal_token != INVALID_HANDLE_VALUE
-	     || current_token != INVALID_HANDLE_VALUE; }
+    { return external_token != NO_IMPERSONATION
+	     || internal_token != NO_IMPERSONATION
+	     || current_token != NO_IMPERSONATION; }
   void close_impersonation_tokens ()
   {
-    if (current_token != INVALID_HANDLE_VALUE)
+    if (current_token != NO_IMPERSONATION)
       {
 	if( current_token != external_token && current_token != internal_token)
 	  CloseHandle (current_token);
-	current_token = INVALID_HANDLE_VALUE;
+	current_token = NO_IMPERSONATION;
       }
-    if (external_token != INVALID_HANDLE_VALUE)
+    if (external_token != NO_IMPERSONATION)
       {
 	CloseHandle (external_token);
-	external_token = INVALID_HANDLE_VALUE;
+	external_token = NO_IMPERSONATION;
       }
-    if (internal_token != INVALID_HANDLE_VALUE)
+    if (internal_token != NO_IMPERSONATION)
       {
 	CloseHandle (internal_token);
-	internal_token = INVALID_HANDLE_VALUE;
+	internal_token = NO_IMPERSONATION;
       }
   }
   const char *cygheap_user::test_uid (char *&, const char *, size_t)
