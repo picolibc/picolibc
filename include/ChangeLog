@@ -10,9 +10,20 @@
 	Remvoe prototype for arm_toggle_regnames().
 	Add prototype for parse_arm_disassembler_option().
 
+Wed Dec 15 11:22:56 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hp-symtab.h (HP_LANGUAGE_FORTRAN): New enumeration constant.
+	(HP_LANGUAGE_F77): Define using HP_LANGUAGE_FORTRAN.
+
 1999-12-15  Doug Evans  <dje@transmeta.com>
 
 	* dis-asm.h: Enclose in extern "C" ifdef __cplusplus.
+
+1999-11-04      Jimmy Guo       <guo@cup.hp.com>
+
+	* hp-symtab.h (dntt_type_fparam): Add doc_ranges, misc_kind
+	fields, change location type to CORE_ADDR from int.
+	(dntt_type_const): Name the 5th field location_type.
 
 Sun Oct 24 19:11:32 1999  Andrew Cagney  <cagney@b1.cygnus.com>
 
