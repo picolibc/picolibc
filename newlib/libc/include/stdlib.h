@@ -105,6 +105,9 @@ unsigned long _EXFUN(_strtoul_r,(struct _reent *,const char *__n, char **__end_P
 int	_EXFUN(system,(const char *__string));
 
 #ifndef __STRICT_ANSI__
+long    _EXFUN(a64l,(const char *__input));
+char *  _EXFUN(l64a,(long __input));
+char *  _EXFUN(_l64a_r,(struct _reent *,long __input));
 int	_EXFUN(putenv,(const char *__string));
 int	_EXFUN(_putenv_r,(struct _reent *, const char *__string));
 int	_EXFUN(setenv,(const char *__string, const char *__value, int __overwrite));
