@@ -84,8 +84,8 @@ cabs
 _cabs = cabs
 cabsf
 _cabsf = cabsf
-calloc = export_calloc
-_calloc = export_calloc
+calloc
+_calloc = calloc
 cbrt
 _cbrt = cbrt
 cbrtf
@@ -296,8 +296,8 @@ fputs
 _fputs = fputs
 fread
 _fread = fread
-free = export_free
-_free = export_free
+free
+_free = free
 freopen
 _freopen = freopen
 frexp
@@ -535,8 +535,12 @@ lseek64
 lstat = cygwin_lstat
 _lstat = cygwin_lstat
 lstat64
-malloc = export_malloc
-_malloc = export_malloc
+malloc
+_malloc = malloc
+malloc_stats
+malloc_trim
+malloc_usable_size
+mallopt
 matherr
 _matherr = matherr
 mblen
@@ -545,6 +549,7 @@ mbstowcs
 _mbstowcs = mbstowcs
 mbtowc
 _mbtowc = mbtowc
+memalign
 memchr
 _memchr = memchr
 memcmp
@@ -626,8 +631,8 @@ readlink
 _readlink = readlink
 readv
 _readv = readv
-realloc = export_realloc
-_realloc = export_realloc
+realloc
+_realloc = realloc
 posix_regcomp
 posix_regerror
 posix_regexec
@@ -917,6 +922,7 @@ utimes
 _utimes = utimes
 utmpname
 _utmpname = utmpname
+valloc
 vfiprintf
 _vfiprintf = vfiprintf
 vfork

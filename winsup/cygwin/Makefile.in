@@ -129,13 +129,13 @@ DLL_OFILES:=assert.o autoload.o cygheap.o cygserver_client.o \
 	fhandler_socket.o fhandler_tape.o fhandler_termios.o fhandler_tty.o \
 	fhandler_virtual.o fhandler_windows.o fhandler_zero.o fnmatch.o fork.o \
 	glob.o grp.o heap.o init.o ioctl.o ipc.o localtime.o malloc.o \
-	miscfuncs.o mmap.o net.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o \
-	pthread.o regcomp.o regerror.o regexec.o regfree.o registry.o \
-	resource.o scandir.o sched.o sec_acl.o sec_helper.o security.o \
-	select.o shared.o shm.o shortcut.o signal.o sigproc.o smallprint.o \
-	spawn.o strace.o strsep.o sync.o syscalls.o sysconf.o syslog.o \
-	termios.o thread.o times.o tty.o uinfo.o uname.o v8_regexp.o \
-	v8_regerror.o v8_regsub.o wait.o wincap.o window.o \
+	malloc_wrapper.o miscfuncs.o mmap.o net.o ntea.o passwd.o path.o \
+	pinfo.o pipe.o poll.o pthread.o regcomp.o regerror.o regexec.o \
+	regfree.o registry.o resource.o scandir.o sched.o sec_acl.o \
+	sec_helper.o security.o select.o shared.o shm.o shortcut.o signal.o \
+	sigproc.o smallprint.o spawn.o strace.o strsep.o sync.o syscalls.o \
+	sysconf.o syslog.o termios.o thread.o times.o tty.o uinfo.o uname.o \
+	v8_regexp.o v8_regerror.o v8_regsub.o wait.o wincap.o window.o \
 	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
 
 GMON_OFILES:=gmon.o mcount.o profil.o
@@ -310,6 +310,9 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	$(SHELL) ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) && \
 	$(COMPILE_CXX) -o version.o version.cc && \
 	touch $@
+
+malloc.o: malloc.cc
+	$(COMPILE_CXX) -fomit-frame-pointer -o $@ $<
 
 cygrun.exe : cygrun.o $(LIB_NAME) $(w32api_lib)/libuser32.a \
 	     $(w32api_lib)/libshell32.a $(w32api_lib)/libkernel32.a

@@ -80,11 +80,6 @@ char NO_COPY almost_null[1];
 
 extern "C"
 {
-  void *export_malloc (unsigned int);
-  void export_free (void *);
-  void *export_realloc (void *, unsigned int);
-  void *export_calloc (unsigned int, unsigned int);
-
   /* This is an exported copy of environ which can be used by DLLs
      which use cygwin.dll.  */
   char **__cygwin_environ;
@@ -97,12 +92,12 @@ extern "C"
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
    /* dll_major */ CYGWIN_VERSION_DLL_MINOR,
    /* impure_ptr_ptr */ NULL, /* envptr */ NULL,
-   /* malloc */ export_malloc, /* free */ export_free,
-   /* realloc */ export_realloc,
+   /* malloc */ malloc, /* free */ free,
+   /* realloc */ realloc,
    /* fmode_ptr */ NULL, /* main */ NULL, /* ctors */ NULL,
    /* dtors */ NULL, /* data_start */ NULL, /* data_end */ NULL,
    /* bss_start */ NULL, /* bss_end */ NULL,
-   /* calloc */ export_calloc,
+   /* calloc */ calloc,
    /* premain */ {NULL, NULL, NULL, NULL},
    /* run_ctors_p */ 0,
    /* unused */ {0, 0, 0, 0, 0, 0, 0},
