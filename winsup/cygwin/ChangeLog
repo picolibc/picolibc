@@ -1,3 +1,8 @@
+2004-04-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Fix NT native path evaluation
+	to allow opening serial ports.
+
 2004-04-30  DJ Delorie  <dj@redhat.com>
 
 	* init.cc (threadfunc_fe): Hack to make thread stacks always 16
