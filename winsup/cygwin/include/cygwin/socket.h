@@ -106,7 +106,7 @@ struct msghdr
 #define PF_MAX          AF_MAX
 
 /* Maximum queue length specificable by listen.  */
-#define SOMAXCONN       5
+#define SOMAXCONN       0x7fffffff
 
 /* Flags we can use with send/ and recv. */
 #define MSG_OOB         0x1             /* process out-of-band data */
