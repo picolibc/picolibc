@@ -1,3 +1,8 @@
+2004-07-23  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bin-bugs.h (REPORT_BUGS_TO): Set to
+	"<URL:http://www.sourceware.org/bugzilla/>".
+
 2004-07-21  Paolo Bonzini  <bonzini@gnu.org>
 
 	* ansidecl.h (ATTRIBUTE_PURE): New.
