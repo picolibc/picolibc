@@ -21,6 +21,7 @@
 #include <lmapibuf.h>
 #include <sys/fcntl.h>
 #include <lmerr.h>
+#include <lmcons.h>
 
 static const char version[] = "$Revision$";
 
@@ -123,6 +124,94 @@ print_win_error(DWORD code)
     fprintf (stderr, "mkpasswd: [%lu] %s", code, buf);
   else
     fprintf (stderr, "mkpasswd: error %lu", code);
+}
+
+void
+current_user (int print_sids, int print_cygpath,
+	      const char * passed_home_path, int id_offset, const char * disp_username)
+{
+  char name[UNLEN + 1], *envname, *envdomain;
+  DWORD len;
+  HANDLE ptok;
+  int errpos = 0;
+  struct {
+    PSID psid;
+    int buffer[10];
+  } tu, tg;
+
+
+  if ((!GetUserName (name, (len = sizeof (name), &len)) && (errpos = __LINE__))
+      || !name[0]
+      || !(envname = getenv("USERNAME"))
+      || strcasecmp (envname, name)
+      || (disp_username && strcasecmp(envname, disp_username))
+      || (!GetComputerName (name, (len = sizeof (name), &len))
+	  && (errpos = __LINE__))
+      || !(envdomain = getenv("USERDOMAIN"))
+      || !envdomain[0]
+      || !strcasecmp (envdomain, name)
+      || (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok)
+	  && (errpos = __LINE__))
+      || (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &len)
+	  && (errpos = __LINE__))
+      || (!GetTokenInformation (ptok, TokenPrimaryGroup, &tg, sizeof tg, &len)
+	  && (errpos = __LINE__))
+      || (!CloseHandle (ptok) && (errpos = __LINE__)))
+    {
+      if (errpos)
+	{
+	  print_win_error (GetLastError ());
+	  fprintf(stderr, " on line %d\n", errpos);
+	}
+      return;
+    }
+
+  int uid = *GetSidSubAuthority (tu.psid, *GetSidSubAuthorityCount(tu.psid) - 1);
+  int gid = *GetSidSubAuthority (tg.psid, *GetSidSubAuthorityCount(tg.psid) - 1);
+  char homedir_psx[MAX_PATH] = {0}, homedir_w32[MAX_PATH] = {0};
+
+  char *envhomedrive = getenv ("HOMEDRIVE");
+  char *envhomepath = getenv ("HOMEPATH");
+
+  if (passed_home_path[0] == '\0')
+    {
+      if (envhomepath && envhomepath[0])
+        {
+	  if (envhomedrive)
+	    strlcpy (homedir_w32, envhomedrive, sizeof (homedir_w32));
+	  if (envhomepath[0] != '\\')
+	    strlcat (homedir_w32, "\\", sizeof (homedir_w32));
+	  strlcat (homedir_w32, envhomepath, sizeof (homedir_w32));
+	  if (print_cygpath)
+	    cygwin_conv_to_posix_path (homedir_w32, homedir_psx);
+	  else
+	    psx_dir (homedir_w32, homedir_psx);
+	}
+      else
+        {
+	  strlcpy (homedir_psx, "/home/", sizeof (homedir_psx));
+	  strlcat (homedir_psx, envname, sizeof (homedir_psx));
+	}
+    }
+  else
+    {
+      strlcpy (homedir_psx, passed_home_path, sizeof (homedir_psx));
+      strlcat (homedir_psx, envname, sizeof (homedir_psx));
+    }
+
+  printf ("%s:unused_by_nt/2000/xp:%d:%d:%s%s%s%s%s%s%s%s:%s:/bin/bash\n",
+	  envname,
+	  uid + id_offset,
+	  gid + id_offset,
+	  envname,
+	  print_sids ? "," : "",
+	  print_sids ? "U-" : "",
+	  print_sids ? envdomain : "",
+	  print_sids ? "\\" : "",
+	  print_sids ? envname : "",
+	  print_sids ? "," : "",
+	  print_sids ? put_sid (tu.psid) : "",
+	  homedir_psx);
 }
 
 int
@@ -396,31 +485,35 @@ print_special (int print_sids,
 }
 
 int
-usage (FILE * stream, int status)
+usage (FILE * stream, int isNT)
 {
   fprintf (stream, "Usage: mkpasswd [OPTION]... [domain]\n\n"
-                   "This program prints a /etc/passwd file to stdout\n\n"
-                   "Options:\n"
-                   "   -l,--local              print local user accounts\n"
-                   "   -d,--domain             print domain accounts (from current domain\n"
-                   "                           if no domain specified)\n"
-                   "   -o,--id-offset offset   change the default offset (10000) added to uids\n"
-                   "                           in domain accounts.\n"
-                   "   -g,--local-groups       print local group information too\n"
-                   "                           if no domain specified\n"
-                   "   -m,--no-mount           don't use mount points for home dir\n"
-                   "   -s,--no-sids            don't print SIDs in GCOS field\n"
-                   "                           (this affects ntsec)\n"
-                   "   -p,--path-to-home path  use specified path instead of user account home dir\n"
+	           "This program prints a /etc/passwd file to stdout\n\n"
+	           "Options:\n");
+  if (isNT)
+    fprintf (stream, "   -l,--local              print local user accounts\n"
+	             "   -c,--current            print current account, if a domain account\n"
+                     "   -d,--domain             print domain accounts (from current domain\n"
+                     "                           if no domain specified)\n"
+                     "   -o,--id-offset offset   change the default offset (10000) added to uids\n"
+                     "                           in domain accounts.\n"
+                     "   -g,--local-groups       print local group information too\n"
+                     "                           if no domain specified\n"
+                     "   -m,--no-mount           don't use mount points for home dir\n"
+                     "   -s,--no-sids            don't print SIDs in GCOS field\n"
+	             "                           (this affects ntsec)\n");
+  fprintf (stream, "   -p,--path-to-home path  use specified path instead of user account home dir\n"
                    "   -u,--username username  only return information for the specified user\n"
                    "   -h,--help               displays this message\n"
-                   "   -v,--version            version information and exit\n\n"
-                   "One of `-l', `-d' or `-g' must be given on NT/W2K.\n");
-  return status;
+	           "   -v,--version            version information and exit\n\n");
+  if (isNT)
+    fprintf (stream, "One of `-l', `-d' or `-g' must be given.\n");
+  return 1;
 }
 
 struct option longopts[] = {
   {"local", no_argument, NULL, 'l'},
+  {"current", no_argument, NULL, 'c'},
   {"domain", no_argument, NULL, 'd'},
   {"id-offset", required_argument, NULL, 'o'},
   {"local-groups", no_argument, NULL, 'g'},
@@ -433,7 +526,7 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "ldo:gsmhp:u:v";
+char opts[] = "lcdo:gsmhp:u:v";
 
 static void
 print_version ()
@@ -465,6 +558,7 @@ main (int argc, char **argv)
   DWORD rc = ERROR_SUCCESS;
   WCHAR domain_name[200];
   int print_local = 0;
+  int print_current = 0;
   int print_domain = 0;
   int print_local_groups = 0;
   int domain_name_specified = 0;
@@ -472,103 +566,108 @@ main (int argc, char **argv)
   int print_cygpath = 1;
   int id_offset = 10000;
   int i;
+  int isNT;
   char *disp_username = NULL;
-
   char name[256], passed_home_path[MAX_PATH];
   DWORD len;
 
+  isNT = (GetVersion () < 0x80000000);
   passed_home_path[0] = '\0';
   if (!isatty (1))
     setmode (1, O_BINARY);
 
-  if (GetVersion () < 0x80000000)
+  if (isNT && argc == 1)
+    return usage (stderr, isNT);
+  else
     {
-      if (argc == 1)
-	return usage (stderr, 1);
-      else
-	{
-	  while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
-	    switch (i)
-	      {
-	      case 'l':
-		print_local = 1;
-		break;
-	      case 'd':
-		print_domain = 1;
-		break;
-	      case 'o':
-		id_offset = strtol (optarg, NULL, 10);
-		break;
-	      case 'g':
-		print_local_groups = 1;
-		break;
-	      case 's':
-		print_sids = 0;
-		break;
-	      case 'm':
-		print_cygpath = 0;
-		break;
-	      case 'p':
-		if (optarg[0] != '/')
-		  {
-		    fprintf (stderr, "%s: `%s' is not a fully qualified path.\n",
-			     argv[0], optarg);
-		    return 1;
-		  }
-		strcpy (passed_home_path, optarg);
-		if (optarg[strlen (optarg)-1] != '/')
-		  strcat (passed_home_path, "/");
-		break;
-	      case 'u':
-		disp_username = optarg;
-		break;
-	      case 'h':
-		return usage (stdout, 0);
-	      case 'v':
-               print_version ();
-		return 0;
-	      default:
-		fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
-		return 1;
-	      }
-	  if (!print_local && !print_domain && !print_local_groups)
+      while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+	switch (i)
+	  {
+	  case 'l':
+	    print_local = 1;
+	    break;
+	  case 'c':
+	    print_current = 1;
+	    break;
+	  case 'd':
+	    print_domain = 1;
+	    break;
+	  case 'o':
+	    id_offset = strtol (optarg, NULL, 10);
+	    break;
+	  case 'g':
+	    print_local_groups = 1;
+	    break;
+	  case 's':
+	    print_sids = 0;
+	    break;
+	  case 'm':
+	    print_cygpath = 0;
+	    break;
+	  case 'p':
+	    if (optarg[0] != '/')
 	    {
-	      fprintf (stderr, "%s: Specify one of `-l', `-d' or `-g'\n", argv[0]);
+	      fprintf (stderr, "%s: `%s' is not a fully qualified path.\n",
+		       argv[0], optarg);
 	      return 1;
 	    }
-	  if (optind < argc)
-	    {
-	      if (!print_domain)
-		{
-		  fprintf (stderr, "%s: A domain name is only accepted "
-				   "when `-d' is given.\n", argv[0]);
-		  return 1;
-		}
-	      mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
-	      domain_name_specified = 1;
-	    }
-	}
+	    strcpy (passed_home_path, optarg);
+	    if (optarg[strlen (optarg)-1] != '/')
+	      strcat (passed_home_path, "/");
+	    break;
+	  case 'u':
+	    disp_username = optarg;
+	    break;
+	  case 'h':
+	    usage (stdout, isNT);
+	    return 0;
+	  case 'v':
+	    print_version ();
+	    return 0;
+	  default:
+	    fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
+	    return 1;
+	  }
     }
-
-  /* This takes Windows 9x/ME into account. */
-  if (GetVersion () >= 0x80000000)
+  if (!isNT)
     {
-      /* Same behaviour as in cygwin/uinfo.cc (internal_getlogin). */
-      if (!GetUserName (name, (len = 256, &len)))
-	strcpy (name, "unknown");
+      /* This takes Windows 9x/ME into account. */
+      if (!disp_username)
+        {
+	  if (GetUserName (name, (len = 256, &len)))
+	    disp_username = name;
+	  else
+	    /* Same behaviour as in cygwin/shared.cc (memory_init). */
+	    disp_username = (char *) "unknown";
+	}
 
       if (passed_home_path[0] == '\0')
 	strcpy (passed_home_path, "/home/");
 
-      printf ("%s:*:%ld:%ld::%s%s:/bin/bash\n", name,
+      printf ("%s:*:%ld:%ld:%s:%s%s:/bin/bash\n", disp_username,
 					        DOMAIN_USER_RID_ADMIN,
 					        DOMAIN_ALIAS_RID_ADMINS,
+	                                        disp_username,
 					        passed_home_path,
-					        name);
-
+					        disp_username);
       return 0;
     }
-
+  if (!print_local && !print_domain && !print_local_groups)
+    {
+      fprintf (stderr, "%s: Specify one of `-l', `-d' or `-g'\n", argv[0]);
+      return 1;
+    }
+  if (optind < argc)
+    {
+      if (!print_domain)
+        {
+	  fprintf (stderr, "%s: A domain name is only accepted "
+		   "when `-d' is given.\n", argv[0]);
+	  return 1;
+	}
+      mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
+      domain_name_specified = 1;
+    }
   if (!load_netapi ())
     {
       print_win_error(GetLastError ());
@@ -621,6 +720,10 @@ main (int argc, char **argv)
   if (print_local)
     enum_users (NULL, print_sids, print_cygpath, passed_home_path, 0,
     		disp_username);
+
+  if (print_current && !print_domain)
+    current_user(print_sids, print_cygpath, passed_home_path,
+		 id_offset, disp_username);
 
   if (servername)
     netapibufferfree (servername);

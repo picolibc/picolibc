@@ -1,3 +1,17 @@
+2003-01-07  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* mkpasswd.cc (current_user): Create.
+	(usage): Reorganize to support Win95/98/ME.
+	(main): Add option for -c. Reorganize to parse options for
+	Win95/98/ME and to call current_user. Add username in gecos field
+	on Win95/98/ME.
+	* mkgroup.cc (enum_groups): Print gid with %u.
+	(print_win_error): Create from passwd.cc.  
+	(current_group): Create.
+	(usage): Reorganize to support Win95/98/ME.
+	(main): Add option for -c. Reorganize to parse options for
+	Win95/98/ME and to call current_group.   
+
 2002-12-14  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* setfacl.c (main): Place a single : after other and mask.

@@ -360,7 +360,7 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset)
                     }
                 }
             }
-	  printf ("%s:%s:%d:", groupname,
+	  printf ("%s:%s:%u:", groupname,
                                print_sids ? put_sid (psid) : "",
                                gid + id_offset);
 	  if (print_users)
@@ -420,29 +420,95 @@ print_special (int print_sids,
     }
 }
 
+void
+print_win_error(DWORD code)
+{
+  char buf[4096];
+
+  if (FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM
+      | FORMAT_MESSAGE_IGNORE_INSERTS,
+      NULL,
+      code,
+      MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+      (LPTSTR) buf, sizeof (buf), NULL))
+    fprintf (stderr, "mkgroup: [%lu] %s", code, buf);
+  else
+    fprintf (stderr, "mkgroup: error %lu", code);
+}
+
+void
+current_group (int print_sids, int print_users, int id_offset)
+{
+  char name[UNLEN + 1], *envname, *envdomain;
+  DWORD len;
+  HANDLE ptok;
+  int errpos = 0;
+  struct {
+    PSID psid;
+    int buffer[10];
+  } tg;
+
+
+  if ((!GetUserName (name, (len = sizeof (name), &len)) && (errpos = __LINE__))
+      || !name[0]
+      || !(envname = getenv("USERNAME"))
+      || strcasecmp (envname, name)
+      || (!GetComputerName (name, (len = sizeof (name), &len))
+	  && (errpos = __LINE__))
+      || !(envdomain = getenv("USERDOMAIN"))
+      || !envdomain[0]
+      || !strcasecmp (envdomain, name)
+      || (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok)
+	  && (errpos = __LINE__))
+      || (!GetTokenInformation (ptok, TokenPrimaryGroup, &tg, sizeof tg, &len)
+	  && (errpos = __LINE__))
+      || (!CloseHandle (ptok) && (errpos = __LINE__)))
+    {
+      if (errpos)
+	{
+	  print_win_error (GetLastError ());
+	  fprintf(stderr, " on line %d\n", errpos);
+	}
+      return;
+    }
+
+  int gid = *GetSidSubAuthority (tg.psid, *GetSidSubAuthorityCount(tg.psid) - 1);
+
+  printf ("mkgroup_l_d:%s:%u:", print_sids ? put_sid (tg.psid) : "",
+                                gid + id_offset);
+  if (print_users)
+    printf("%s", envname);
+  printf ("\n");
+}
+
 int
-usage (FILE * stream, int status)
+usage (FILE * stream, int isNT)
 {
   fprintf (stream, "Usage: mkgroup [OPTION]... [domain]\n\n"
-		   "This program prints a /etc/group file to stdout\n\n"
-		   "Options:\n"
-		   "   -l,--local             print local group information\n"
-		   "   -d,--domain            print global group information from the domain\n"
-		   "                          specified (or from the current domain if there is\n"
-		   "                          no domain specified)\n"
-		   "   -o,--id-offset offset  change the default offset (10000) added to uids\n"
-		   "                          in domain accounts.\n"
-		   "   -s,--no-sids           don't print SIDs in pwd field\n"
-		   "                          (this affects ntsec)\n"
-		   "   -u,--users             print user list in gr_mem field\n"
-		   "   -h,--help              print this message\n\n"
-		   "   -v,--version           print version information and exit\n\n"
-		   "One of `-l' or `-d' must be given on NT/W2K.\n");
-  return status;
+	           "This program prints a /etc/group file to stdout\n\n"
+	           "Options:\n");
+  if (isNT)
+    fprintf (stream, "   -l,--local             print local group information\n"
+	             "   -c,--current           print current group, if a domain account\n"
+		     "   -d,--domain            print global group information from the domain\n"
+		     "                          specified (or from the current domain if there is\n"
+		     "                          no domain specified)\n"
+		     "   -o,--id-offset offset  change the default offset (10000) added to uids\n"
+		     "                          in domain accounts.\n"
+		     "   -s,--no-sids           don't print SIDs in pwd field\n"
+		     "                          (this affects ntsec)\n"
+	             "   -u,--users             print user list in gr_mem field\n");
+  fprintf (stream, "   -h,--help              print this message\n"
+	           "   -v,--version           print version information and exit\n\n");
+  if (isNT)
+    fprintf (stream, "One of `-l' or `-d' must be given.\n");
+
+  return 1;
 }
 
 struct option longopts[] = {
   {"local", no_argument, NULL, 'l'},
+  {"current", no_argument, NULL, 'c'},
   {"domain", no_argument, NULL, 'd'},
   {"id-offset", required_argument, NULL, 'o'},
   {"no-sids", no_argument, NULL, 's'},
@@ -452,7 +518,7 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "ldo:suhv";
+char opts[] = "lcdo:suhv";
 
 void
 print_version ()
@@ -484,11 +550,13 @@ main (int argc, char **argv)
   DWORD rc = ERROR_SUCCESS;
   WCHAR domain_name[100];
   int print_local = 0;
+  int print_current = 0;
   int print_domain = 0;
   int print_sids = 1;
   int print_users = 0;
   int domain_specified = 0;
   int id_offset = 10000;
+  int isNT;
   int i;
 
   char name[256], dom[256];
@@ -502,65 +570,68 @@ main (int argc, char **argv)
   NTSTATUS ret;
   PPOLICY_PRIMARY_DOMAIN_INFO pdi;
 
-  if (GetVersion () < 0x80000000)
+  isNT = (GetVersion () < 0x80000000);
+
+  if (isNT && argc == 1)
+    return usage(stderr, isNT);
+  else
     {
-      if (argc == 1)
-	return usage(stderr, 1);
-      else
+      while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+	switch (i)
 	{
-	  while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
-	    switch (i)
-	      {
-	      case 'l':
-		print_local = 1;
-		break;
-	      case 'd':
-		print_domain = 1;
-		break;
-	      case 'o':
-		id_offset = strtol (optarg, NULL, 10);
-		break;
-	      case 's':
-		print_sids = 0;
-		break;
-	      case 'u':
-		print_users = 1;
-		break;
-	      case 'h':
-		return usage (stdout, 0);
-	      case 'v':
-		print_version ();
-		return 0;
-	      default:
-		fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
-		return 1;
-	      }
-	  if (!print_local && !print_domain)
-	    {
-	      fprintf (stderr, "%s: Specify one of `-l' or `-d'\n", argv[0]);
-	      return 1;
-	    }
-	  if (optind < argc)
-	    {
-	      if (!print_domain)
-		{
-		  fprintf (stderr, "%s: A domain name is only accepted "
-				   "when `-d' is given.\n", argv[0]);
-		  return 1;
-		}
-	      mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
-	      domain_specified = 1;
-	    }
+	case 'l':
+	  print_local = 1;
+	  break;
+	case 'c':
+	  print_current = 1;
+	  break;
+	case 'd':
+	  print_domain = 1;
+	  break;
+	case 'o':
+	  id_offset = strtol (optarg, NULL, 10);
+	  break;
+	case 's':
+	  print_sids = 0;
+	  break;
+	case 'u':
+	  print_users = 1;
+	  break;
+	case 'h':
+	  usage (stdout, isNT);
+	  return 0;
+	case 'v':
+	  print_version ();
+	  return 0;
+	default:
+	  fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
+	  return 1;
 	}
     }
 
   /* This takes Windows 9x/ME into account. */
-  if (GetVersion () >= 0x80000000)
+  if (!isNT)
     {
       printf ("unknown::%ld:\n", DOMAIN_ALIAS_RID_ADMINS);
       return 0;
     }
-  
+
+  if (!print_local && !print_domain)
+    {
+      fprintf (stderr, "%s: Specify one of `-l' or `-d'\n", argv[0]);
+      return 1;
+    }
+  if (optind < argc)
+    {
+      if (!print_domain)
+        {
+	  fprintf (stderr, "%s: A domain name is only accepted "
+		   "when `-d' is given.\n", argv[0]);
+	  return 1;
+	}
+      mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
+      domain_specified = 1;
+    }
   if (!load_netapi ())
     {
       fprintf (stderr, "Failed loading symbols from netapi32.dll "
@@ -646,6 +717,9 @@ main (int argc, char **argv)
 
   if (print_local)
     enum_local_groups (print_sids, print_users);
+
+  if (print_current && !print_domain)
+    current_group (print_sids, print_users, id_offset);
 
   return 0;
 }
