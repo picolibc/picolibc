@@ -55,14 +55,16 @@ ENTRY(strcmp)
 	pt	loop,tr1
 	bnei/u	r8,0,tr0 // r23_zero
 	pt	found_zero,tr0
-	ori	r3,7,r3
-	addi	r3,9,r3
+	addi	r3,15,r3
+	andi	r3,-8,r3
 	sub	r3,r2,r3
 	bne/l	r7,r6,tr1 // loop
 	/* The strings are aligned to each other.  */
+	/* It is possible to have a loop with six cycles / iteration
+	   by re-ordering the exit conditions, but then it needs extra
+	   time and/or code to sort out the r4 != r5 case.  */
 	pt	al_loop,tr1
 	pt	al_found_zero,tr0
-	addi	r3,-8,r3
 al_loop:
 	ld.q	r2,8,r4
 	ldx.q	r2,r3,r5
@@ -103,8 +105,8 @@ cmp_quad:
 	blink tr2,r63
 found_zero:
 	pt	zero_now,tr0
-	mcmpeq.b r63,r5,r7
 	pt	cmp_quad,tr1
+	SHHI	r9,r20,r7
 	bne/u	r8,r7,tr0 // zero_now
 	bne/u	r4,r5,tr1 // cmp_quad
 	SHLO	r9,r22,r8

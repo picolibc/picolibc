@@ -1,4 +1,4 @@
-Sun Jul  7 01:23:45 2002  J"orn Rennecke <joern.rennecke@superh.com>
+Mon Jul  8 13:55:23 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/machine/sh/Makefile.am (lib_a_SOURCES):
 	Make strcmp.S unconditional.
