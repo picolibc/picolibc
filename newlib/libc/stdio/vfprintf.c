@@ -233,8 +233,9 @@ _DEFUN(__sprint, (fp, uio),
  * worries about ungetc buffers and so forth.
  */
 static int
-_DEFUN(__sbprintf, (fp, fmt, ap),
-       register FILE *fp _AND
+_DEFUN(__sbprintf, (rptr, fp, fmt, ap),
+       struct _reent *rptr _AND
+       register FILE *fp   _AND
        _CONST char *fmt  _AND
        va_list ap)
 {
@@ -257,7 +258,7 @@ _DEFUN(__sbprintf, (fp, fmt, ap),
 #endif
 
 	/* do the work, then copy any error status */
-	ret = VFPRINTF (&fake, fmt, ap);
+	ret = _VFPRINTF_R (rptr, &fake, fmt, ap);
 	if (ret >= 0 && fflush(&fake))
 		ret = EOF;
 	if (fake._flags & __SERR)
@@ -541,7 +542,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	/* optimise fprintf(stderr) (and other unbuffered Unix files) */
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0)
-		return (__sbprintf (fp, fmt0, ap));
+		return (__sbprintf (data, fp, fmt0, ap));
 
 	fmt = (char *)fmt0;
 	uio.uio_iov = iovp = iov;

@@ -96,8 +96,8 @@ int
 _iprintf_r(struct _reent *ptr, _CONST char *fmt, ...)
 #else
 int
-_iprintf_r(data, fmt, va_alist)
-           char *data;
+_iprintf_r(ptr, fmt, va_alist)
+           struct _reent *ptr;
            char *fmt;
            va_dcl
 #endif
@@ -111,7 +111,8 @@ _iprintf_r(data, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = vfiprintf (_stdout_r (ptr), fmt, ap);
+  ret = _vfiprintf_r (ptr, _stdout_r (ptr), fmt, ap);
   va_end (ap);
   return ret;
 }
+

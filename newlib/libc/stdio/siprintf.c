@@ -27,6 +27,12 @@ ANSI_SYNOPSIS
 
         int siprintf(char *<[str]>, const char *<[format]> [, <[arg]>, ...]);
 
+TRAD_SYNOPSIS
+        #include <stdio.h>
+
+        int siprintf(<[str]>, <[format]>, [, <[arg]>, ...])
+        char *<[str]>;
+        const char *<[format]>;
 
 DESCRIPTION
 <<siprintf>> is a restricted version of <<sprintf>>: it has the same
@@ -58,6 +64,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <limits.h>
 #include "local.h"
 
+#ifndef _REENT_ONLY
+
 int
 #ifdef _HAVE_STDC
 _DEFUN(siprintf, (str, fmt),
@@ -87,3 +95,38 @@ siprintf(str, fmt, va_alist)
   *f._p = 0;
   return (ret);
 }
+
+#endif /* ! _REENT_ONLY */
+
+int
+#ifdef _HAVE_STDC
+_DEFUN(_siprintf_r, (rptr, str, fmt),
+       struct _reent *rptr _AND
+       char *str           _AND
+       _CONST char *fmt _DOTS)
+#else
+_siprintf_r(rptr, str, fmt, va_alist)
+            struct _reent *rptr;
+            char *str;
+            _CONST char *fmt;
+            va_dcl
+#endif
+{
+  int ret;
+  va_list ap;
+  FILE f;
+
+  f._flags = __SWR | __SSTR;
+  f._bf._base = f._p = (unsigned char *) str;
+  f._bf._size = f._w = INT_MAX;
+#ifdef _HAVE_STDC
+  va_start (ap, fmt);
+#else
+  va_start (ap);
+#endif
+  ret = _vfiprintf_r (rptr, &f, fmt, ap);
+  va_end (ap);
+  *f._p = 0;
+  return (ret);
+}
+
