@@ -1,3 +1,17 @@
+2001-11-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* getfacl.c (username): New function.
+	(groupname): Ditto.
+	(usage): Ditto.  Add more user friendly help text.
+	(main): Add -n and --help option.  Print names instead of IDs
+	unless -n option is given.
+	* setfacl.c (getperm): Tolerate whitespace and comment chars in input.
+	(getaclentry): Fix several input string misdetections.
+	(getaclentries): Allow - as input file name to read from stdin.
+	Tolerate whitespace and comment chars in input.
+	(usage): Add more user friendly help text.
+	(main): Add --help option.
+	
 2001-11-04  Egor Duda  <deo@logos-m.ru>
 
 	* strace.cc (main): New option '-w'. Start traced process in separate
