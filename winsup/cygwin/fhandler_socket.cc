@@ -183,6 +183,9 @@ fhandler_socket::create_secret_event (int* secret)
   struct sockaddr_in sin;
   int sin_len = sizeof (sin);
 
+  if (secret_event)
+    return secret_event;
+
   if (::getsockname (get_socket (), (struct sockaddr*) &sin, &sin_len))
     {
       debug_printf ("error getting local socket name (%d)", WSAGetLastError ());
@@ -191,17 +194,13 @@ fhandler_socket::create_secret_event (int* secret)
 
   char event_name[CYG_MAX_PATH];
   secret_event_name (event_name, sin.sin_port, secret ?: connect_secret);
-  LPSECURITY_ATTRIBUTES sec = get_inheritance (true);
-  secret_event = CreateEvent (sec, FALSE, FALSE, event_name);
-  if (!secret_event && GetLastError () == ERROR_ALREADY_EXISTS)
-    secret_event = OpenEvent (EVENT_ALL_ACCESS, FALSE, event_name);
+  secret_event = CreateEvent (&sec_all, FALSE, FALSE, event_name);
 
   if (!secret_event)
-    /* nothing to do */;
-  else if (sec == &sec_all_nih || sec == &sec_none_nih)
-    ProtectHandle (secret_event);
-  else
-    ProtectHandleINH (secret_event);
+    debug_printf("create event %E");
+  else if (get_close_on_exec ())
+    /* Event allows inheritance, but handle will not be inherited */
+    set_inheritance (secret_event, 1);
 
   return secret_event;
 }
@@ -222,7 +221,7 @@ void
 fhandler_socket::close_secret_event ()
 {
   if (secret_event)
-    ForceCloseHandle (secret_event);
+    CloseHandle (secret_event);
   secret_event = NULL;
 }
 
@@ -234,11 +233,8 @@ fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
 
   secret_event_name (event_name, peer->sin_port, secret ?: connect_secret);
   HANDLE ev = CreateEvent (&sec_all_nih, FALSE, FALSE, event_name);
-  if (!ev && GetLastError () == ERROR_ALREADY_EXISTS)
-    {
-      debug_printf ("event \"%s\" already exists", event_name);
-      ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, event_name);
-    }
+  if (!ev)
+    debug_printf("create event %E");
 
   signal_secret_event ();
 
@@ -1303,6 +1299,8 @@ fhandler_socket::fcntl (int cmd, void *arg)
 void
 fhandler_socket::set_close_on_exec (int val)
 {
+  if (secret_event)
+    set_inheritance (secret_event, val);
   if (!winsock2_active) /* < Winsock 2.0 */
     set_inheritance (get_handle (), val);
   set_close_on_exec_flag (val);

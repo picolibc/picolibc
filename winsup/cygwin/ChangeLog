@@ -1,3 +1,12 @@
+2004-01-23  Pierre Humblet <pierre.humblet@ieee.org>
+
+        * fhandler_socket.cc (fhandler_socket::create_secret_event): Avoid
+        creating multiple handles. Always allow event inheritance but set the
+        handle inheritance appropriately. Improve error handling.
+        (fhandler_socket::check_peer_secret_event): Improve error handling.
+        (fhandler_socket::close_secret_event): Simply call CloseHandle.
+        (fhandler_socket::set_close_on_exec): Set secret event inheritance.
+
 2004-01-23  Christopher Faylor  <cgf@redhat.com>
 
 	* configure.in: Remove NEWVFORK default.
