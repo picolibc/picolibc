@@ -1,3 +1,7 @@
+Wed 18 Jul 2001 11:56:00  Corinna Vinschen <corinna@vinschen.de>
+
+	* syscalls.cc (_unlink): Explicitely check for non-existant file.
+
 Tue 17 Jul 2001 10:19:00  Corinna Vinschen <corinna@vinschen.de>
 
 	* delqueue.h: Remove obsolete file.

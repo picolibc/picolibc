@@ -83,7 +83,14 @@ _unlink (const char *ourname)
 
   DWORD atts;
   atts = win32_name.file_attributes ();
-  if (atts != 0xffffffff && atts & FILE_ATTRIBUTE_DIRECTORY)
+  if (atts == 0xffffffff)
+    {
+      syscall_printf ("unlinking a nonexistant file");
+      set_errno (ENOENT);
+      goto done;
+    }
+
+  if (atts & FILE_ATTRIBUTE_DIRECTORY)
     {
       syscall_printf ("unlinking a directory");
       set_errno (EPERM);
@@ -98,7 +105,7 @@ _unlink (const char *ourname)
     }
 
   /* Check for shortcut as symlink condition. */
-  if (atts != 0xffffffff && atts & FILE_ATTRIBUTE_READONLY)
+  if (atts & FILE_ATTRIBUTE_READONLY)
     {
       int len = strlen (win32_name);
       if (len > 4 && strcasematch (win32_name + len - 4, ".lnk"))
