@@ -255,11 +255,9 @@ to_timestruc_t (FILETIME *ptr, timestruc_t *out)
 void __stdcall
 time_as_timestruc_t (timestruc_t * out)
 {
-  SYSTEMTIME systemtime;
   FILETIME filetime;
 
-  GetSystemTime (&systemtime);
-  SystemTimeToFileTime (&systemtime, &filetime);
+  GetSystemTimeAsFileTime (&filetime);
   to_timestruc_t (&filetime, out);
 }
 
@@ -269,11 +267,9 @@ extern "C" time_t
 time (time_t * ptr)
 {
   time_t res;
-  SYSTEMTIME systemtime;
   FILETIME filetime;
 
-  GetSystemTime (&systemtime);
-  SystemTimeToFileTime (&systemtime, &filetime);
+  GetSystemTimeAsFileTime (&filetime);
   res = to_time_t (&filetime);
   if (ptr)
     *ptr = res;

@@ -1,3 +1,10 @@
+2005-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::touch_ctime): Replace
+	GetSystemTime/SystemTimeToFileTime with GetSystemTimeAsFileTime.
+	* times.cc (time_as_timestruc_t): Ditto.
+	(time): Ditto.
+
 2005-03-01  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 14.

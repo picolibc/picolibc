@@ -388,11 +388,9 @@ fhandler_disk_file::fstat (struct __stat64 *buf)
 void
 fhandler_disk_file::touch_ctime (void)
 {
-  SYSTEMTIME st;
   FILETIME ft;
 
-  GetSystemTime (&st);
-  SystemTimeToFileTime (&st, &ft);
+  GetSystemTimeAsFileTime (&ft);
   if (!SetFileTime (get_io_handle (), &ft, NULL, NULL))
     debug_printf ("SetFileTime (%s) failed, %E", get_win32_name ());
   else
