@@ -1,3 +1,12 @@
+2002-07-09  Christopher Faylor  <cgf@redhat.com>
+
+	* debug.cc: Avoid explicit zeroing of globals.
+	(lock_debug): Make locker a static member.  Avoid unlocking when
+	already unlocked (from Conrad Scott).
+	(debug_init): Initialize lock_debug::locker here.
+	* fork.cc (fork_child): Fix up fdtab earlier to avoid some (but not
+	all) confusion with close-on-exec craziness.
+
 2002-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_socket::is_unconnected): Constify.
