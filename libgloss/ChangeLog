@@ -1,3 +1,8 @@
+2004-08-25  Corinna Vinschen  <vinschen@redhat.com>
+
+	* i386/cygmon.ld (.text): Fix alignment.
+	(.rodata): Handle .rodata.* sections.
+
 2004-06-27  Hideki Iwamoto <h-iwamoto@kit.hi-ho.ne.jp>
 
 	* Makefile.in: Support $(DESTDIR).
