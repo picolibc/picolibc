@@ -128,8 +128,8 @@
 
 2004-03-08  Christopher Faylor  <cgf@redhat.com>
 
-	* exceptions.cc (setup_handler): Avoid suspending a thread if it in a
-	cygwin function, in an exception, spinning, or locked.
+	* exceptions.cc (setup_handler): Avoid suspending a thread if it is in
+	a cygwin function, in an exception, spinning, or locked.
 	* gendef (_sigfe): Move incyg setting earlier.
 	(sigreturn): Set incyg flag to avoid interrupting called cygwin
 	functions.
