@@ -1,3 +1,10 @@
+2004-09-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (_impure_ptr): Don't export.
+	(reent_data): Export.
+	* lib/_cygwin_crt0_common.cc (_impure_ptr): Drop entirely.  Don't
+	initialize _impure_ptr or u->impure_ptr_ptr.
+
 2004-09-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (_impure_ptr): Export.

@@ -15,9 +15,6 @@ details. */
 #include <reent.h>
 #include <stdlib.h>
 
-/* Avoid an info message from linker when linking applications. */
-extern __declspec(dllimport) struct _reent *_impure_ptr;
-
 #undef environ
 
 extern "C"
@@ -63,10 +60,6 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->ctors = &__CTOR_LIST__;
   u->dtors = &__DTOR_LIST__;
   u->envptr = &environ;
-  if (uwasnull)
-    _impure_ptr = u->impure_ptr;	/* Use field initialized in newer DLLs. */
-  else
-    u->impure_ptr_ptr = &_impure_ptr;	/* Older DLLs need this. */
 
   u->forkee = 0;			/* This should only be set in dcrt0.cc
 					   when the process is actually forked */
