@@ -1,5 +1,10 @@
 2003-10-31  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* thread.cc (pthread::thread_init_wrapper): Initialize exception
+	handling.
+
+2003-10-31  Thomas Pfaff  <tpfaff@gmx.net>
+
 	Rename pthread::running to pthread::valid throughout.
 
 	* thread.h: (pthread::suspend_all_except_self): New static method.

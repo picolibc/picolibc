@@ -38,6 +38,7 @@ details. */
 #include "pinfo.h"
 #include "perprocess.h"
 #include "security.h"
+#include "exceptions.h"
 #include <semaphore.h>
 #include <stdio.h>
 #include <sys/timeb.h>
@@ -1893,6 +1894,13 @@ pthread::thread_init_wrapper (void *_arg)
 
   struct sigaction _sigs[NSIG];
   sigset_t _sig_mask;		/* one set for everything to ignore. */
+
+  /* According to onno@stack.urc.tue.nl, the exception handler record must
+     be on the stack.  */
+  exception_list cygwin_except_entry;
+
+  /* Initialize SIGSEGV handling, etc. */
+  init_exceptions (&cygwin_except_entry);
 
   // setup signal structures
   thread->sigs = _sigs;
