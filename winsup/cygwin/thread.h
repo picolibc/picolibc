@@ -347,6 +347,7 @@ private:
 };
 
 #define WAIT_CANCELED   (WAIT_OBJECT_0 + 1)
+#define WAIT_SIGNALED  (WAIT_OBJECT_0 + 2)
 
 class _cygtls;
 class pthread: public verifyable_object
@@ -393,7 +394,7 @@ public:
   virtual void testcancel ();
   static void static_cancel_self ();
 
-  static DWORD cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel = true);
+  static DWORD cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel = true, const bool do_sig_wait = false);
 
   virtual int setcancelstate (int state, int *oldstate);
   virtual int setcanceltype (int type, int *oldtype);
@@ -646,7 +647,7 @@ public:
   }
 
 private:
-  void _wait ();
+  int _wait ();
   void _post ();
   int _getvalue (int *sval);
   int _trywait ();

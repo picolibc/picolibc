@@ -1,3 +1,19 @@
+2004-02-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (pthread::cancelable_wait): Rearrange slightly.
+	Add do_sig_wait parameter.  Wait for signal_arrived if set to true.
+	Return WAIT_SIGNALED if signal arrived.
+	(pthread_cond::wait): Accomodate change to pthread::cancelable_wait.
+	(pthread::join): Ditto.
+	(semaphore::_timedwait): Ditto.
+	(semaphore::_wait): Ditto.  Change to return int to allow status
+	feedback.
+	(semaphore::wait): Return return value from semaphore::_wait.
+	* thread.h (WAIT_SIGNALED): New definition.
+	(pthread::cancelable_wait): Change declaration.  Define do_sig_wait   
+	as false by default to not interfere with existing calls accidentally.
+	(semaphore::_wait): Declare int.
+
 2004-02-21  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (sigpacket::process): Make sure that tls is filled in

@@ -537,27 +537,37 @@ pthread::static_cancel_self (void)
   pthread::self ()->cancel_self ();
 }
 
-
 DWORD
-pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel)
+pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
+			  const bool do_sig_wait)
 {
   DWORD res;
-  HANDLE wait_objects[2];
+  DWORD num = 0;
+  HANDLE wait_objects[3];
   pthread_t thread = self ();
 
-  if (!is_good_object (&thread) || thread->cancelstate == PTHREAD_CANCEL_DISABLE)
-    return WaitForSingleObject (object, timeout);
+  /* Do not change the wait order.
+     The object must have higher priority than the cancel event,
+     because WaitForMultipleObjects will return the smallest index
+     if both objects are signaled. */
+  wait_objects[num++] = object;
+  if (is_good_object (&thread) &&
+      thread->cancelstate != PTHREAD_CANCEL_DISABLE)
+    wait_objects[num++] = thread->cancel_event;
+  if (do_sig_wait)
+    wait_objects[num++] = signal_arrived;
 
-  // Do not change the wait order
-  // The object must have higher priority than the cancel event,
-  // because WaitForMultipleObjects will return the smallest index
-  // if both objects are signaled
-  wait_objects[0] = object;
-  wait_objects[1] = thread->cancel_event;
-
-  res = WaitForMultipleObjects (2, wait_objects, FALSE, timeout);
-  if (do_cancel && res == WAIT_CANCELED)
-    pthread::static_cancel_self ();
+  res = WaitForMultipleObjects (num, wait_objects, FALSE, timeout);
+  if (res == WAIT_CANCELED)
+    {
+      if (num == 3 || !do_sig_wait)
+        {
+	  if (do_cancel)
+	    pthread::static_cancel_self ();
+        }
+      else
+        res = WAIT_SIGNALED;
+    }
   return res;
 }
 
@@ -856,7 +866,7 @@ pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
   ++mutex->condwaits;
   mutex->unlock ();
 
-  rv = pthread::cancelable_wait (sem_wait, dwMilliseconds, false);
+  rv = pthread::cancelable_wait (sem_wait, dwMilliseconds, false, true);
 
   mtx_out.lock ();
 
@@ -891,6 +901,13 @@ pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
 
   if (rv == WAIT_CANCELED)
     pthread::static_cancel_self ();
+  else if (rv == WAIT_SIGNALED)
+    /* SUSv3 states:  If a signal is delivered to a thread waiting for a
+       condition variable, upon return from the signal handler the thread
+       resumes waiting for the condition variable as if it was not
+       interrupted, or it shall return zero due to spurious wakeup.
+       We opt for the latter choice here. */
+    return 0;
   else if (rv == WAIT_TIMEOUT)
     return ETIMEDOUT;
 
@@ -1692,11 +1709,14 @@ semaphore::_timedwait (const struct timespec *abstime)
   waitlength -= tv.tv_sec * 1000 + tv.tv_usec / 1000;
   if (waitlength < 0)
     waitlength = 0;
-  switch (pthread::cancelable_wait (win32_obj_id, waitlength))
+  switch (pthread::cancelable_wait (win32_obj_id, waitlength, true, true))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
       break;
+    case WAIT_SIGNALED:
+      set_errno (EINTR);
+      return -1;
     case WAIT_TIMEOUT:
       set_errno (ETIMEDOUT);
       return -1;
@@ -1708,18 +1728,22 @@ semaphore::_timedwait (const struct timespec *abstime)
   return 0;
 }
 
-void
+int
 semaphore::_wait ()
 {
-  switch (pthread::cancelable_wait (win32_obj_id, INFINITE))
+  switch (pthread::cancelable_wait (win32_obj_id, INFINITE, true, true))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
       break;
+    case WAIT_SIGNALED:
+      set_errno (EINTR);
+      return -1;
     default:
       debug_printf ("cancelable_wait failed. %E");
-      return;
+      break;
     }
+  return 0;
 }
 
 void
@@ -2157,7 +2181,7 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->mutex.unlock ();
 
-      switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, false))
+      switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, false, false))
 	{
 	case WAIT_OBJECT_0:
 	  if (return_val)
@@ -3101,8 +3125,7 @@ semaphore::wait (sem_t *sem)
       return -1;
     }
 
-  (*sem)->_wait ();
-  return 0;
+  return (*sem)->_wait ();
 }
 
 int
