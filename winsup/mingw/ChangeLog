@@ -1,3 +1,8 @@
+2003-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/dirent.c (_treaddir): Reset errno to 0 if end
+	of directory.
+
 2003-09-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdlib.h: Guard non-ISO functions with
