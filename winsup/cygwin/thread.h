@@ -332,6 +332,8 @@ private:
   static nativeMutex mutexInitializationLock;
 };
 
+#define WAIT_CANCELED   (WAIT_OBJECT_0 + 1)
+
 class pthread:public verifyable_object
 {
 public:
@@ -378,6 +380,8 @@ public:
 
   virtual void testcancel ();
   static void static_cancel_self ();
+
+  static DWORD cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel = true);
 
   virtual int setcancelstate (int state, int *oldstate);
   virtual int setcanceltype (int type, int *oldtype);

@@ -471,7 +471,7 @@ pwrite ()
 read ()
 readv ()
 select ()
-sem_wait ()
+*sem_wait ()
 sigpause ()
 sigsuspend ()
 sigtimedwait ()
@@ -631,6 +631,28 @@ pthread::static_cancel_self (void)
   pthread::self ()->cancel_self ();
 }
 
+
+DWORD pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel)
+{
+  DWORD res;
+  HANDLE wait_objects[2];
+  pthread_t thread = self ();
+
+  if (!isGoodObject (&thread) || thread->cancelstate == PTHREAD_CANCEL_DISABLE)
+    return WaitForSingleObject (object, timeout);
+
+  // Do not change the wait order
+  // The object must have higher priority than the cancel event,
+  // because WaitForMultipleObjects will return the smallest index
+  // if both objects are signaled
+  wait_objects[0] = object;
+  wait_objects[1] = thread->cancel_event;
+
+  res = WaitForMultipleObjects (2, wait_objects, FALSE, timeout);
+  if (do_cancel && res == WAIT_CANCELED)
+    pthread::static_cancel_self ();
+  return res;
+}
 
 int
 pthread::setcancelstate (int state, int *oldstate)
@@ -1390,8 +1412,15 @@ semaphore::TryWait ()
 void
 semaphore::Wait ()
 {
-  WaitForSingleObject (win32_obj_id, INFINITE);
-  currentvalue--;
+  switch (pthread::cancelable_wait (win32_obj_id, INFINITE))
+    {
+    case WAIT_OBJECT_0:
+      currentvalue--;
+      break;
+    default:
+      debug_printf ("cancelable_wait failed. %E");
+      return;
+    }
 }
 
 void
@@ -1850,14 +1879,15 @@ pthread::join (pthread_t *thread, void **return_val)
 {
    pthread_t joiner = self ();
 
-   if (!isGoodObject (&joiner))
-     return EINVAL;
+   joiner->testcancel ();
 
    // Initialize return val with NULL
    if (return_val)
      *return_val = NULL;
 
-  /* FIXME: wait on the thread cancellation event as well - we are a cancellation point*/
+   if (!isGoodObject (&joiner))
+     return EINVAL;
+
   if (!isGoodObject (thread))
     return ESRCH;
 
@@ -1876,14 +1906,26 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->joiner = joiner;
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->mutex.UnLock ();
-      WaitForSingleObject ((*thread)->win32_obj_id, INFINITE);
-      if (return_val)
-	 *return_val = (*thread)->return_ptr;
-      // cleanup
-      delete (*thread);
-    }	/* End if */
 
-  pthread_testcancel ();
+      switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, false))
+        {
+        case WAIT_OBJECT_0:
+          if (return_val)
+            *return_val = (*thread)->return_ptr;
+          delete (*thread);
+          break;
+        case WAIT_CANCELED:
+          // set joined thread back to joinable since we got canceled
+          (*thread)->joiner = NULL;
+          (*thread)->attr.joinable = PTHREAD_CREATE_JOINABLE;
+          joiner->cancel_self ();
+          // never reached
+          break;
+        default:
+          // should never happen
+          return EINVAL;
+        }
+    }
 
   return 0;
 }
@@ -2629,6 +2671,8 @@ semaphore::destroy (sem_t *sem)
 int
 semaphore::wait (sem_t *sem)
 {
+  pthread_testcancel ();
+
   if (!isGoodObject (sem))
     {
       set_errno (EINVAL);

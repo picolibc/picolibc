@@ -1,5 +1,15 @@
 2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* thread.h (WAIT_CANCELED): New define.
+	(pthread::cancelable_wait): New static method.
+	* thread.cc (pthread::cancelable_wait): Implement.
+	(semaphore::Wait): Wait on semaphore and thread cancellation.
+	(pthread::join): Wait on joined thread and thread cancellation.
+	(semaphore::wait): Add testcancel to check for thread
+	cancellation even if the semaphore is available.
+
+2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
+
 	* include/pthread.h: Add define for errorchecking mutexes.
 	Change default mutex type.
 	* thread.cc (pthread_cond::TimedWait): Update mutex unlock
