@@ -41,6 +41,8 @@ details. */
 
      fhandler_dev_random  /dev/[u]random implementation (fhandler_random.cc)
 
+     fhandler_dev_mem     /dev/mem implementation (fhandler_mem.cc)
+
      fhandler_proc	  Interesting possibility, not implemented yet
 */
 
@@ -94,8 +96,9 @@ enum
   FH_NULL    = 0x00000013,	/* is the null device */
   FH_ZERO    = 0x00000014,	/* is the zero device */
   FH_RANDOM  = 0x00000015,	/* is a random device */
+  FH_MEM     = 0x00000016,	/* is a mem device */
 
-  FH_NDEV    = 0x00000016,	/* Maximum number of devices */
+  FH_NDEV    = 0x00000017,	/* Maximum number of devices */
   FH_DEVMASK = 0x00000fff,	/* devices live here */
   FH_BAD     = 0xffffffff
 };
@@ -756,6 +759,26 @@ public:
   int read (void *ptr, size_t len);
   off_t lseek (off_t offset, int whence);
   int close (void);
+  int dup (fhandler_base *child);
+
+  void dump ();
+};
+
+class fhandler_dev_mem: public fhandler_base
+{
+protected:
+  unsigned long pos;
+
+public:
+  fhandler_dev_mem (const char *name, int unit);
+  ~fhandler_dev_mem (void);
+
+  int open (const char *path, int flags, mode_t mode = 0);
+  int write (const void *ptr, size_t ulen);
+  int read (void *ptr, size_t ulen);
+  off_t lseek (off_t offset, int whence);
+  int close (void);
+  int fstat (struct stat *buf);
   int dup (fhandler_base *child);
 
   void dump ();

@@ -417,6 +417,7 @@ const char *windows_device_names[] =
   "nul",
   "\\dev\\zero",
   "\\dev\\%srandom",
+  "\\dev\\mem",
 };
 
 static int
@@ -486,6 +487,8 @@ get_device_number (const char *name, int &unit, BOOL from_conv)
 	  devn = FH_RANDOM;
 	  unit = 8 + (deveqn ("u", 1) ? 1 : 0); /* Keep unit Linux conformant */
 	}
+      else if (deveq ("mem"))
+        devn = FH_MEM;
       else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
 	devn = FH_SERIAL;
       else if (deveq ("pipe") || deveq ("piper") || deveq ("pipew"))

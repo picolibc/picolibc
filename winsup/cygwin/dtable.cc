@@ -296,6 +296,9 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
       case FH_RANDOM:
 	fh = new (buf) fhandler_dev_random (name, unit);
 	break;
+      case FH_MEM:
+	fh = new (buf) fhandler_dev_mem (name, unit);
+	break;
       default:
 	/* FIXME - this could recurse forever */
 	return build_fhandler (fd, name, NULL);

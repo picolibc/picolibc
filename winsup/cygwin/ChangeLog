@@ -1,3 +1,12 @@
+Sun Oct  1  2:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* Makefile.in: Add fhandler_mem.o to the dependencies.
+	* dtable.cc (dtable::build_fhandler): Add case for FH_MEM.
+	* fhandler.h: Add FH_MEM device type.  Add class fhandler_dev_mem. 
+	* fhandler_mem.cc: New file. Implementation of class fhandler_dev_mem.
+	* path.cc: Add /dev/mem to windows_device_names.
+	(get_device_number): Add FH_MEM type.
+
 Sat Sep 30 00:43:42 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (init_cheap): Set aside space for heap walk pointer.

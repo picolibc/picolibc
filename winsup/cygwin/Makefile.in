@@ -119,7 +119,7 @@ DLL_IMPORTS:=$(w32api_lib)/libkernel32.a
 
 DLL_OFILES:=assert.o cygheap.o dcrt0.o debug.o delqueue.o dir.o dlfcn.o \
 	dll_init.o dtable.o environ.o  errno.o exceptions.o exec.o external.o \
-	fcntl.o fhandler.o fhandler_console.o fhandler_floppy.o \
+	fcntl.o fhandler.o fhandler_console.o fhandler_floppy.o fhandler_mem.o \
 	fhandler_random.o fhandler_raw.o fhandler_serial.o fhandler_tape.o \
 	fhandler_termios.o fhandler_tty.o fhandler_windows.o fhandler_zero.o \
 	fork.o glob.o grp.o heap.o init.o ioctl.o localtime.o malloc.o mmap.o \
