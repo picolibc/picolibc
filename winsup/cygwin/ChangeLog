@@ -1,3 +1,7 @@
+Sat May 19 18:35:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Add missing load statement for `CancelIo'.
+
 Sat May 19 01:22:43 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* grp.cc (read_etc_group): Don't copy mutex on fork.

@@ -463,6 +463,7 @@ LoadDLLfunc (CoUninitialize, 0, ole32)
 LoadDLLfunc (CoCreateInstance, 20, ole32)
 
 LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)
+LoadDLLfuncEx (CancelIo, 4, kernel32, 1)
 
 LoadDLLfuncEx (waveOutGetNumDevs, 0, winmm, 1)
 LoadDLLfuncEx (waveOutOpen, 24, winmm, 1)
