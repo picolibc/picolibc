@@ -292,9 +292,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	{
 	  for (;;)
 	    {
-	      if (BufferEmpty)
-		return nassigned;
-	      if (!isspace (*fp->_p))
+	      if (BufferEmpty || !isspace (*fp->_p))
 		break;
 	      nread++, fp->_r--, fp->_p++;
 	    }

@@ -1,3 +1,9 @@
+2002-01-11 Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfscanf.c (__svfscanf_r): Change loop that
+	reads blanks from the input file to break if EOF reached
+	rather than end processing.
+
 2002-01-07 Jeff Johnston  <jjohnstn@redhat.com>
 
 	* MAINTAINERS: Change e-mail addresses to refer to redhat domain.
