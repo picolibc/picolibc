@@ -1,3 +1,7 @@
+2001-04-13  Robert Collins <rbtcollins@hotmail.com>
+
+	* libc/include/sys/unistd.h: Add pthread_atfork (Cygwin only).
+
 Thu Apr 12 23:11:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* libc/include/sys/errno.h: Add ECASECLASH to indicate case clash

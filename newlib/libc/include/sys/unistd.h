@@ -65,6 +65,9 @@ int	_EXFUN(nice, (int __nice_value ));
 off_t   _EXFUN(lseek, (int __fildes, off_t __offset, int __whence ));
 long    _EXFUN(pathconf, (const char *__path, int __name ));
 int     _EXFUN(pause, (void ));
+#ifdef __CYGWIN__
+int	_EXFUN(pthread_atfork, (void (*)(void), void (*)(void), void (*)(void)));
+#endif
 int     _EXFUN(pipe, (int __fildes[2] ));
 _READ_WRITE_RETURN_TYPE _EXFUN(read, (int __fd, void *__buf, size_t __nbyte ));
 int     _EXFUN(rmdir, (const char *__path ));
