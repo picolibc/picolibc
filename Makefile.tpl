@@ -259,7 +259,6 @@ REALLY_SET_LIB_PATH = \
 # Should be substed by configure.in
 FLAGS_FOR_TARGET = @FLAGS_FOR_TARGET@
 CC_FOR_TARGET = @CC_FOR_TARGET@
-BASE_CC_FOR_TARGET = @BASE_CC_FOR_TARGET@
 CXX_FOR_TARGET = @CXX_FOR_TARGET@
 RAW_CXX_FOR_TARGET = @RAW_CXX_FOR_TARGET@
 CXX_FOR_TARGET_FOR_RECURSIVE_MAKE = @CXX_FOR_TARGET_FOR_RECURSIVE_MAKE@
@@ -530,14 +529,8 @@ EXTRA_GCC_FLAGS = \
 
 GCC_FLAGS_TO_PASS = $(BASE_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS)
 
-# This is a list of the configure targets for all of the modules which
-# are compiled using the target tools.
-CONFIGURE_TARGET_MODULES =[+
-    FOR target_modules +] \
-	configure-target-[+module+][+
-    ENDFOR target_modules +]
-
-configure-target: $(CONFIGURE_TARGET_MODULES)
+configure-host: @configure_host_modules@
+configure-target: @configure_target_modules@
 
 # This is a list of the targets for which we can do a clean-{target}.
 CLEAN_MODULES =[+
@@ -566,6 +559,7 @@ all.normal: @all_build_modules@ \
 	@all_host_modules@ \
 	@all_target_modules@
 
+all-host: @all_host_modules@
 all-target: @all_target_modules@
 
 # Do a target for all the subdirectories.  A ``make do-X'' will do a
@@ -910,7 +904,7 @@ configure-[+module+]: [+module+]/Makefile
 
 .PHONY: all-[+module+] maybe-all-[+module+]
 maybe-all-[+module+]:
-all-[+module+]:
+all-[+module+]: configure-[+module+]
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -973,7 +967,9 @@ install-[+module+]: installdirs
 maybe-configure-target-[+module+]:
 configure-target-[+module+]: $(TARGET_SUBDIR)/[+module+]/Makefile
 
-$(TARGET_SUBDIR)/[+module+]/multilib.out: $(BASE_CC_FOR_TARGET)
+# Don't manually override CC_FOR_TARGET at make time; get it set right
+# at configure time.  Otherwise multilibs may be wrong.
+$(TARGET_SUBDIR)/[+module+]/multilib.out: maybe-all-gcc
 	@[ -d $(TARGET_SUBDIR)/[+module+] ] || mkdir $(TARGET_SUBDIR)/[+module+];\
 	r=`${PWD}`; export r; \
 	echo "Configuring multilibs for [+module+]"; \
@@ -1139,16 +1135,19 @@ gcc/Makefile: config.status
 	  $(HOST_CONFIGARGS) $${srcdiroption} \
 	  || exit 1
 
+# Don't remake gcc if it's already been made by 'bootstrap'; that causes
+# nothing but trouble.  This wart will be fixed eventually by moving
+# the bootstrap behavior to this file.
 .PHONY: all-gcc maybe-all-gcc
 maybe-all-gcc:
-all-gcc:
-	@if [ -f ./gcc/Makefile ] ; then \
+all-gcc: configure-gcc
+	@if [ -f gcc/xgcc ] ; then \
+	  exit 0 ; \
+	else \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
 	  (cd gcc; $(MAKE) $(GCC_FLAGS_TO_PASS) all); \
-	else \
-	  true; \
 	fi
 
 # Building GCC uses some tools for rebuilding "source" files
@@ -1162,7 +1161,7 @@ all-gcc:
 # in parallel.
 #
 .PHONY: bootstrap bootstrap-lean bootstrap2 bootstrap2-lean bootstrap3 bootstrap3-lean bootstrap4 bootstrap4-lean bubblestrap quickstrap cleanstrap restrap
-bootstrap bootstrap-lean bootstrap2 bootstrap2-lean bootstrap3 bootstrap3-lean bootstrap4 bootstrap4-lean bubblestrap quickstrap cleanstrap restrap: all-bootstrap
+bootstrap bootstrap-lean bootstrap2 bootstrap2-lean bootstrap3 bootstrap3-lean bootstrap4 bootstrap4-lean bubblestrap quickstrap cleanstrap restrap: all-bootstrap configure-gcc
 	@r=`${PWD}`; export r; \
 	s=`cd $(srcdir); ${PWD}`; export s; \
 	$(SET_LIB_PATH) \

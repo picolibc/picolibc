@@ -1,3 +1,13 @@
+2002-12-05  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Change dependency for */multilib.out so that
+	it works when gcc isn't in the tree.
+
+	* configure.in: Substitute more.
+	* configure: Run subconfigures from the Makefile.
+	* Makefile.tpl: Run subconfigures from the Makefile; add a few
+	convenience targets.  Make sure gcc isn't rebuilt after bootstrap.
+
 2002-12-03  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* Makefile.tpl: Add targets for configuring host subdirs in Makefile,

@@ -202,7 +202,7 @@ esac
 
 # Some tools are only suitable for building in a "native" situation.
 # Remove these if host!=target.  
-native_only="autoconf automake libtool fileutils find gawk gettext grep gzip hello indent m4 rcs recode sed shellutils tar textutils uudecode wdiff gprof target-groff guile perl time ash bash bzip2 prms snavigator gnuserv target-gperf"
+native_only="autoconf automake libtool fileutils find gawk gettext grep gzip hello indent m4 rcs recode sed shellutils tar textutils uudecode wdiff gprof target-groff guile perl time ash bash bzip2 prms snavigator gnuserv target-gperf target-rda"
 
 # Similarly, some are only suitable for cross toolchains.
 # Remove these if host=target.
@@ -1706,12 +1706,14 @@ BASE_CC_FOR_TARGET=`echo "$cc_for_target_first_word" | sed -e 's,[$][$]r,.,'`
 sedtemp=sed.$$
 cat >$sedtemp <<EOF
 s%@GDB_TK@%${GDB_TK}%
-s%@all_build_modules@%${all_build_modules}%
 s%@configure_build_modules@%${configure_build_modules}%
+s%@all_build_modules@%${all_build_modules}%
+s%@configure_host_modules@%${configure_host_modules}%
 s%@all_host_modules@%${all_host_modules}%
 s%@check_host_modules@%${check_host_modules}%
 s%@install_host_modules@%${install_host_modules}%
 s%@install_host_modules_nogcc@%${install_host_modules_nogcc}%
+s%@configure_target_modules@%${configure_target_modules}%
 s%@all_target_modules@%${all_target_modules}%
 s%@check_target_modules@%${check_target_modules}%
 s%@install_target_modules@%${install_target_modules}%
