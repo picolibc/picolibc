@@ -1,21 +1,25 @@
-2002-06-05    Danny Smith  <dannysmith@users.sourceforge.net>
+2002-06-07  Gunnar Degnbol <gdegnbol@users.sourceforge.net>
+
+	* include/mapi.h: Change LPTSTR to LPSTR throughout.
+
+2002-06-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (PACE_HEADER, PACCESS_ALLOWED_ACE,
 	PACCESS_DENIED_ACE): Add typedefs.
 
-2002-06-03    Danny Smith  <dannysmith@users.sourceforge.net>
+2002-06-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/thunk32.def (LIBRARY): Change to KERNEL32.dll.
 
-2002-06-03    Steven Edwards  <Steven_Ed4153@yahoo.com>
+2002-06-03 Steven Edwards  <Steven_Ed4153@yahoo.com>
 
 	* lib/kernel32.def (ConvertToGlobalHandle): Add stub.
 
-2002-06-01    Danny Smith  <dannysmith@users.sourceforge.net>
+2002-06-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/windef.h: Fix typo in last change.
 
-2002-06-01    Danny Smith  <dannysmith@users.sourceforge.net>
+2002-06-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/windef.h: Add no-op __try, __except, __finally
 	defines from ...
