@@ -73,7 +73,7 @@ Fri Dec 10 20:22:41 1999  Christopher Faylor <cgf@cygnus.com>
 	signal handler.
 	(handle_sigsuspend): Use set_sig_errno to ensure that the correct errno
 	is set after a signal handler.
-	(interrupt_now): Accomodate default errno field in stack.
+	(interrupt_now): Accommodate default errno field in stack.
 	(intterupt_on_return): Ditto.
 	(sigreturn): Pop, test, and possibly restore saved errno on return from
 	signal handler.
@@ -117,9 +117,9 @@ Wed Dec  8 23:06:07 1999  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Ensure that winver.o is a dependency for building the
 	dll.
-	* mkvers.sh: Attempt to call windres in a fashion that accomodates
+	* mkvers.sh: Attempt to call windres in a fashion that accommodates
 	older and newer versions.
-	* winver.c: Reorganize slightly to accomodate older versions of
+	* winver.c: Reorganize slightly to accommodate older versions of
 	windres.
 	* fhandler.cc (fhandler_disk_file::fstat): Avoid using Windows "inodes"
 	on disks which do not support them.
@@ -207,7 +207,7 @@ Fri Dec  3 22:52:05 1999  Christopher Faylor <cgf@cygnus.com>
 	(events_init): Allocate mask_sync muto.
 	(unused_sig_wrapper): New function.  Encapsulates assembly language
 	signal handling support.
-	* fhandler.h (class select_stuff): Accomodate new signal-handling
+	* fhandler.h (class select_stuff): Accommodate new signal-handling
 	scheme.
 	* fhandler_console.cc (fhandler_console): Simplify to use new
 	signal-handling scheme.
@@ -321,7 +321,7 @@ Tue Nov 16 23:29:17 1999  Christopher Faylor <cgf@cygnus.com>
 Sat Oct 30 00:59:38 1999  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Some general cleanup.
-	* smallprint.c (__small_vsprintf): Accomodate new format for
+	* smallprint.c (__small_vsprintf): Accommodate new format for
 	__PRETTY_FUNCTION__.
 
 Wed Oct 27 16:13:36 1999  Christopher Faylor <cgf@cygnus.com>
@@ -384,7 +384,7 @@ Tue Oct 19 22:10:21 1999  Christopher Faylor <cgf@cygnus.com>
 
 Tue Oct 19 21:09:42 1999  Christopher Faylor <cgf@cygnus.com>
 
-	Make minor changes throughout to accomodate new gcc merge.
+	Make minor changes throughout to accommodate new gcc merge.
 	* Makefile.in: Remvoe -fpermissive option when compiling using g++.
 	* dcrt0.cc (noload): Mark as "unused" to avoid a compiler warning.
 	* exceptions.cc (sigreturn): Make this "extern" since it essentially
@@ -393,7 +393,7 @@ Tue Oct 19 21:09:42 1999  Christopher Faylor <cgf@cygnus.com>
 	considered void.
 	* heap.cc (sbrk): Remove debugging code.
 	* passwd.cc (getpass): Don't use fprintf to print the prompt.
-	* path.cc (mount_info::conv_to_win32_path): Accomodate compiler
+	* path.cc (mount_info::conv_to_win32_path): Accommodate compiler
 	warning.
 	* select.cc (cygwin_select): Experimental version of select which
 	handles fd_sets with non-standard FD_SETSIZE.
@@ -851,7 +851,7 @@ Mon Sep  6 13:36:34 1999  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_tty.cc (fhandler_tty_master::init_console): Remove retrieval
 	of stderr handle since it is not required for correct init operation.
-	* hinfo.cc (hinfo_init): Reorganize to accomodate potential closing of
+	* hinfo.cc (hinfo_init): Reorganize to accommodate potential closing of
 	console handles by fhandler_console::init.
 	(init_std_file_from_handle): Set standard handle as appropriate.
 	(hinfo::de_linearize_fd_arry): Ditto.
@@ -1407,9 +1407,9 @@ Tue Jul 27 23:31:28 1999  Christopher Faylor <cgf@cygnus.com>
 	or suffer weird behavior.  Suggested by Andrew Dalgleish
 	<andrewd@axonet.com.au>.
 	* shared.cc: Make SHAREDVER "unsigned" to avoid a compiler warning.
-	* spawn.cc : Accomodate additional argument to _spawnve, throughout.
+	* spawn.cc : Accommodate additional argument to _spawnve, throughout.
 	(_spawnve): Make this a global function and take an hToken argument so
-	that it can be used by sexecve.  Accomodate experimental vfork
+	that it can be used by sexecve.  Accommodate experimental vfork
 	functionality.
 	* winsup.h: Add initial support for per-thread vfork stuff.
 	* include/cygwin/version.h: Bump shared memory version number.
@@ -1440,7 +1440,7 @@ Sat Jul 17 00:45:34 1999  Christopher Faylor <cgf@cygnus.com>
 
 Fri Jul 16 23:47:31 1999  Christopher Faylor <cgf@cygnus.com>
 
-	* sigproc.cc (proc_can_be_signalled): Accomodate different flavors of
+	* sigproc.cc (proc_can_be_signalled): Accommodate different flavors of
 	myself.
 	* include/ddeml.h: Add missing struct.
 	* include/wingdi.h: Add missing defines.
@@ -1534,7 +1534,7 @@ Wed Jul 14 22:08:52 1999  Christopher Faylor <cgf@cygnus.com>
 	(sig_wait): Set active state after all handles have been set up and
 	before protecting the handles.  Use ForceCloseHandle to close
 	subproc_ready as it is now protected.  Close signal_mutex here.
-	* sigproc.h: Accomodate alive_parent rename.
+	* sigproc.h: Accommodate alive_parent rename.
 	* spawn.cc Use init_child_info to initilize memory block passed to
 	subprocess.
 	* strace.cc (__system_printf): Write to screen before writing to strace
@@ -1614,7 +1614,7 @@ Wed Jul  7 23:59:50 1999  Christopher Faylor <cgf@cygnus.com>
 	* fhandler.h: Add an extra 'fd' argument to all ready_for_read methods.
 	* select.cc: Ditto, throughout.
 	* fhandler_console (get_tty_stuff): Protect the tty_stuff handle here.
-	* fhandler_termios.cc (fhandler_termios::line_edit): Accomodate fd
+	* fhandler_termios.cc (fhandler_termios::line_edit): Accommodate fd
 	argument to ready_for_read.
 	* fhandler_tty.cc (fhandler_tty_master::init): Close an unneeded thread
 	handle.
@@ -1724,7 +1724,7 @@ Thu Jul  1 22:36:31 1999  Christopher Faylor <cgf@cygnus.com>
 	* net.cc: Redo winsock functions to use dynamic loading scheme.
 	* shared.cc (shared_info::initialize): Cosmetic change.
 	* shared.h: Change magic number for memory block sent to child
-	processes.  Accomodate new heap information in child_info.
+	processes.  Accommodate new heap information in child_info.
 	* sigproc.cc (sig_dispatch_pending): Remove some memory debugging checks.
 	(__release_signal_mutex): Ditto.
 	* syscalls.cc (stat_worker): Don't attempt the .exe hack unless the
@@ -1732,7 +1732,7 @@ Thu Jul  1 22:36:31 1999  Christopher Faylor <cgf@cygnus.com>
 	and the file did not already contain an extension.
 	* times.cc: Initialize static NO_COPY variables throughout or they will
 	not actually be NO_COPY.
-	* winsup.h: Rename heap fields in per_process to accomodate new sbrk.
+	* winsup.h: Rename heap fields in per_process to accommodate new sbrk.
 	Eliminate winsock stuff invalidated by dynamic loading change.
 	* include/winsock.h: Make this file C++ safe.
 
@@ -1876,7 +1876,7 @@ Mon Jun 14 12:43:32 1999  Christopher Faylor <cgf@cygnus.com>
 	(strace_dump): Delete.
 	(mark): Gut.
 	* winsup.h: Remove a declaration.  Add a new one.
-	* include/sys/strace.h: Modify to accomodate new strace scheme.
+	* include/sys/strace.h: Modify to accommodate new strace scheme.
 	* utils/Makefile.in: Build strace.exe
 	* utils/strace.cc: New file.
 
@@ -2036,7 +2036,7 @@ Mon May 31 22:10:57 1999  Christopher Faylor <cgf@cygnus.com>
 	* fhandler.cc: Use methods to access path_conv flags
 	throughout.
 	* path.cc: (symlink-check_one): Accept a bitmask flags
-	variable to accomodate path_conv changes.
+	variable to accommodate path_conv changes.
 	(path_conv::path_conv): Propagate path_flags from mount
 	table to path_conv class.  Avoid walking the mount table
 	twice to find "binary" info.
@@ -2593,7 +2593,7 @@ Wed Mar 24 20:04:21 1999  Christopher Faylor <cgf@cygnus.com>
 	there is no change or Windows 95 will eat input.
 	(fhandler_console::tcsetattr): Use ONLRET to control binary behavior
 	since it is more closely analgous.
-	(fhandler_console::fhandler_console): Accomodate fhandler_termios
+	(fhandler_console::fhandler_console): Accommodate fhandler_termios
 	base class.
 	(fhandler_console::init): Ditto.
 	(fhandler_console::igncr_enabled): Ditto.
@@ -2601,20 +2601,20 @@ Wed Mar 24 20:04:21 1999  Christopher Faylor <cgf@cygnus.com>
 	(fhandler_console::de_linearize): New function.
 	* fhandler_serial.cc: Need additional include.
 	* fhandler_tty.cc (fhandler_tty_master::fhandler_tty_master):
-	Accomodate fhandler_termios base class.
+	Accommodate fhandler_termios base class.
 	(fhandler_tty_master::init): Ditto.
 	(fhandler_tty_master::accept_input): New function.  Sends
 	(possibly line-edited) input to slave.
 	(process_input): Use line editing capabilities of fhandler_termios
 	base class when processing input.
-	(fhandler_tty_slave::open): Accomodate fhandler_termios base class.
+	(fhandler_tty_slave::open): Accommodate fhandler_termios base class.
 	(fhandler_tty_slave::tcgetattr): Ditto.
 	(fhandler_tty_slave::ioctl): Ditto.
 	(fhandler_pty_master::fhandler_pty_master): Ditto.
 	(fhandler_pty_master::read): Ditto.
 	(fhandler_tty_slave::dup): Be more paranoid about setting output
 	handle in case of error.
-	* fhandler_tty.h: Accomodate new tty_min base class in tty class.
+	* fhandler_tty.h: Accommodate new tty_min base class in tty class.
 	* hinfo.cc (hinfo::build_fhandler): Send tty 'unit' to constructor.
 	* select.cc (peek_console): Send resize event to window regardless
 	of tty setting.  Eliminate ReadFile kludge.

@@ -1,6 +1,6 @@
 /* tty.h: shared tty info for cygwin
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -62,6 +62,7 @@ public:
   int getsid () {return sid;}
   void setsid (pid_t tsid) {sid = tsid;}
   void set_ctty (int ttynum, int flags);
+  void kill_pgrp (int sig);
   struct termios ti;
   struct winsize winsize;
 

@@ -77,7 +77,11 @@ function that is known to block (such as _read()), usually by calling
 sets up information about the current stack frame of an executing cygwin
 process.  Any function which uses 'sigframe thisframe' should be signal
 aware.  It should detect when a signal has arrived and return
-immediately.
+immediately.  This method is also used throughout the DLL to ensure
+accurate frame info for the executing function.  So, you'll see it
+sprinkled liberally throughout the DLL, usually at places where
+empirical tests have indicated problems finding this address via the
+brute force method stack walking method employed in setup_handler.
 
 So, if mainframe is active, that means that we have good information
 about the state of the main thread.  Cygwin uses the stack frame info

@@ -1,6 +1,6 @@
 /* fhandler_dev_zero.cc: code to access /dev/zero
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    Written by DJ Delorie (dj@cygnus.com)
 
@@ -15,16 +15,16 @@ details. */
 #include "security.h"
 #include "fhandler.h"
 
-fhandler_dev_zero::fhandler_dev_zero (const char *name)
-  : fhandler_base (FH_ZERO, name)
+fhandler_dev_zero::fhandler_dev_zero ()
+  : fhandler_base (FH_ZERO)
 {
-  set_cb (sizeof *this);
 }
 
 int
-fhandler_dev_zero::open (const char *, int flags, mode_t)
+fhandler_dev_zero::open (path_conv *, int flags, mode_t)
 {
-  set_flags (flags);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
+  set_nohandle (true);
   set_open_status ();
   return 1;
 }
@@ -35,21 +35,15 @@ fhandler_dev_zero::write (const void *, size_t len)
   return len;
 }
 
-int
+int __stdcall
 fhandler_dev_zero::read (void *ptr, size_t len)
 {
-  memset(ptr, 0, len);
+  memset (ptr, 0, len);
   return len;
 }
 
-off_t
-fhandler_dev_zero::lseek (off_t, int)
-{
-  return 0;
-}
-
-int
-fhandler_dev_zero::close (void)
+__off64_t
+fhandler_dev_zero::lseek (__off64_t, int)
 {
   return 0;
 }
@@ -57,5 +51,5 @@ fhandler_dev_zero::close (void)
 void
 fhandler_dev_zero::dump ()
 {
-  paranoid_printf("here, fhandler_dev_zero");
+  paranoid_printf ("here, fhandler_dev_zero");
 }

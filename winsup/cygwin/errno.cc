@@ -1,6 +1,6 @@
 /* errno.cc: errno-related functions
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,12 +8,16 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define _sys_nerr FOO_sys_nerr
+#define sys_nerr FOOsys_nerr
 #include "winsup.h"
 #define _REENT_ONLY
 #include <stdio.h>
 #include <errno.h>
 #include "cygerrno.h"
 #include "thread.h"
+#undef _sys_nerr
+#undef sys_nerr
 
 /* Table to map Windows error codes to Errno values.  */
 /* FIXME: Doing things this way is a little slow.  It's trivial to change
@@ -131,7 +135,7 @@ geterrno_from_win_error (DWORD code, int deferrno)
 void __stdcall
 seterrno_from_win_error (const char *file, int line, DWORD code)
 {
-  syscall_printf ("%s:%d errno %d", file, line, code);
+  syscall_printf ("%s:%d windows error %d", file, line, code);
   set_errno (geterrno_from_win_error (code, EACCES));
   return;
 }
@@ -145,10 +149,11 @@ seterrno (const char *file, int line)
 
 extern char *_user_strerror _PARAMS ((int));
 
-extern const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
+extern "C" {
+const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 {
 /*      NOERROR 0       */ "No error",
-/*	EPERM 1		*/ "Not super-user",
+/*	EPERM 1		*/ "Operation not permitted",
 /*	ENOENT 2	*/ "No such file or directory",
 /*	ESRCH 3		*/ "No such process",
 /*	EINTR 4		*/ "Interrupted system call",
@@ -156,7 +161,7 @@ extern const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 /*	ENXIO 6		*/ "No such device or address",
 /*	E2BIG 7		*/ "Arg list too long",
 /*	ENOEXEC 8	*/ "Exec format error",
-/*	EBADF 9		*/ "Bad file number",
+/*	EBADF 9		*/ "Bad file descriptor",
 /*	ECHILD 10	*/ "No children",
 /*	EAGAIN 11	*/ "Resource temporarily unavailable",
 /*	ENOMEM 12	*/ "Not enough core",
@@ -287,8 +292,8 @@ extern const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 /* ECASECLASH 137 */ "Filename exists with different case"
 };
 
-int NO_COPY __declspec(dllexport) _sys_nerr =
-  sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
+extern int const NO_COPY __declspec(dllexport) _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
+};
 
 /* FIXME: Why is strerror() a long switch and not just:
 	return sys_errlist[errnum];
@@ -303,10 +308,13 @@ extern "C" char *
 strerror (int errnum)
 {
   const char *error;
+  if (errnum < _sys_nerr)
+    error = _sys_errlist [errnum];
+  else
   switch (errnum)
     {
     case EPERM:
-      error = "Not owner";
+      error = "Operation not permitted";
       break;
     case ENOENT:
       error = "No such file or directory";
@@ -330,7 +338,7 @@ strerror (int errnum)
       error = "Exec format error";
       break;
     case EBADF:
-      error = "Bad file number";
+      error = "Bad file descriptor";
       break;
     case ECHILD:
       error = "No children";
@@ -665,7 +673,7 @@ strerror (int errnum)
       break;
     default:
 #ifdef _MT_SAFE
-      char *buf= _reent_winsup()->_strerror_buf;
+      char *buf= _reent_winsup ()->_strerror_buf;
 #else
       static NO_COPY char buf[20];
 #endif

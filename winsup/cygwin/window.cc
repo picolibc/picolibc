@@ -1,6 +1,6 @@
 /* window.cc: hidden windows for signals/itimer support
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Sergey Okhapkin <sos@prospect.com.ru>
 
@@ -18,9 +18,13 @@ details. */
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
+#define USE_SYS_TYPES_FD_SET
+#include <winsock2.h>
+#include <unistd.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
+#include "cygthread.h"
 
 static NO_COPY UINT timer_active = 0;
 static NO_COPY struct itimerval itv;
@@ -60,7 +64,10 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
       return 0;
     case WM_ASYNCIO:
-      raise (SIGIO);
+      if (WSAGETSELECTEVENT(lParam) == FD_OOB)
+	raise (SIGURG);
+      else
+	raise (SIGIO);
       return 0;
     default:
       return DefWindowProc (hwnd, uMsg, wParam, lParam);
@@ -74,7 +81,7 @@ Winmain (VOID *)
 {
   MSG msg;
   WNDCLASS wc;
-  static const NO_COPY char classname[] = "CygwinWndClass";
+  static NO_COPY char classname[] = "CygwinWndClass";
 
   /* Register the window class for the main window. */
 
@@ -125,19 +132,11 @@ gethwnd ()
   if (ourhwnd != NULL)
     return ourhwnd;
 
-  HANDLE hThread;
+  cygthread *h;
 
   window_started = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  hThread = makethread (Winmain, NULL, 0, "win");
-  if (!hThread)
-    {
-      system_printf ("Cannot start window thread");
-    }
-  else
-    {
-      SetThreadPriority (hThread, THREAD_PRIORITY_HIGHEST);
-      CloseHandle (hThread);
-    }
+  h = new cygthread (Winmain, NULL, "win");
+  SetThreadPriority (*h, THREAD_PRIORITY_HIGHEST);
   WaitForSingleObject (window_started, INFINITE);
   CloseHandle (window_started);
   return ourhwnd;
@@ -150,8 +149,7 @@ window_terminate ()
     SendMessage (ourhwnd, WM_DESTROY, 0, 0);
 }
 
-extern "C"
-int
+extern "C" int
 setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
 {
   UINT elapse;
@@ -195,8 +193,7 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 getitimer (int which, struct itimerval *value)
 {
   UINT elapse, val;
@@ -221,27 +218,41 @@ getitimer (int which, struct itimerval *value)
   elapse = GetTickCount () - start_time;
   val = itv.it_value.tv_sec * 1000 + itv.it_value.tv_usec / 1000;
   val -= elapse;
-  value->it_value.tv_sec = val/1000;
-  value->it_value.tv_usec = val%1000;
+  value->it_value.tv_sec = val / 1000;
+  value->it_value.tv_usec = val % 1000;
   return 0;
 }
 
-extern "C"
-unsigned int
+extern "C" unsigned int
 alarm (unsigned int seconds)
 {
   int ret;
   struct itimerval newt, oldt;
 
-  getitimer (ITIMER_REAL, &oldt);
-
   newt.it_value.tv_sec = seconds;
   newt.it_value.tv_usec = 0;
   newt.it_interval.tv_sec = 0;
   newt.it_interval.tv_usec = 0;
-  setitimer (ITIMER_REAL, &newt, NULL);
+  setitimer (ITIMER_REAL, &newt, &oldt);
   ret = oldt.it_value.tv_sec;
   if (ret == 0 && oldt.it_value.tv_usec)
     ret = 1;
   return ret;
 }
+
+extern "C" useconds_t
+ualarm (useconds_t value, useconds_t interval)
+{
+  struct itimerval timer, otimer;
+
+  timer.it_value.tv_sec = 0;
+  timer.it_value.tv_usec = value;
+  timer.it_interval.tv_sec = 0;
+  timer.it_interval.tv_usec = interval;
+
+  if (setitimer (ITIMER_REAL, &timer, &otimer) < 0)
+    return (u_int)-1;
+
+  return (otimer.it_value.tv_sec * 1000000) + otimer.it_value.tv_usec;
+}
+

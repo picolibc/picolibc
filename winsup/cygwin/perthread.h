@@ -15,27 +15,6 @@ details. */
 struct _reent;
 extern struct _reent reent_data;
 
-extern DWORD *__stackbase __asm__ ("%fs:4");
-
-extern __inline struct _reent *
-get_reent ()
-{
-  DWORD *base = __stackbase - 1;
-
-  if (*base != PTMAGIC)
-    return &reent_data;
-  return (struct _reent *) base[-1];
-}
-
-extern inline void
-set_reent (struct _reent *r)
-{
-  DWORD *base = __stackbase - 1;
-
-  *base = PTMAGIC;
-  base[-1] = (DWORD) r;
-}
-
 #define PER_THREAD_FORK_CLEAR ((void *)0xffffffff)
 class per_thread
 {
@@ -69,14 +48,30 @@ public:
 };
 
 #if defined (NEED_VFORK)
-struct vfork_save
+class vfork_save
 {
-  int pid;
   jmp_buf j;
+  int exitval;
+ public:
+  int pid;
   DWORD frame[100];
   char **vfork_ebp;
   char **vfork_esp;
+  int ctty;
+  pid_t sid;
+  pid_t pgid;
   int is_active () { return pid < 0; }
+  void restore_pid (int val)
+  {
+    pid = val;
+    longjmp (j, 1);
+  }
+  void restore_exit (int val)
+  {
+    exitval = val;
+    longjmp (j, 1);
+  }
+  friend int vfork ();
 };
 
 class per_thread_vfork : public per_thread

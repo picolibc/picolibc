@@ -1,6 +1,6 @@
 /* fhandler_console.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,13 +12,12 @@ details. */
 #include <sys/termios.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <wingdi.h>
 #include <winuser.h>
 #include <wincon.h>
-#include <winnls.h>	// MultiByteToWideChar () and friends
+#include <winnls.h>
 #include <ctype.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
@@ -27,23 +26,15 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "shared_info.h"
+#include "cygthread.h"
 
 #define CONVERT_LIMIT 4096
 
-/* The codepages are resolved here instead of using CP_ACP and
-   CP_OEMCP, so that they can later be compared for equality. */
-inline UINT
-cp_get_internal ()
-{
-  return current_codepage == ansi_cp ? GetACP() : GetOEMCP();
-}
-
 static BOOL
-cp_convert (UINT destcp, char * dest, UINT srccp, const char * src, DWORD size)
+cp_convert (UINT destcp, char *dest, UINT srccp, const char *src, DWORD size)
 {
   if (!size)
     /* no action */;
@@ -70,13 +61,13 @@ cp_convert (UINT destcp, char * dest, UINT srccp, const char * src, DWORD size)
 inline BOOL
 con_to_str (char *d, const char *s, DWORD sz)
 {
-  return cp_convert (cp_get_internal (), d, GetConsoleCP (), s, sz);
+  return cp_convert (get_cp (), d, GetConsoleCP (), s, sz);
 }
 
 inline BOOL
 str_to_con (char *d, const char *s, DWORD sz)
 {
-  return cp_convert (GetConsoleOutputCP (), d, cp_get_internal (), s, sz);
+  return cp_convert (GetConsoleOutputCP (), d, get_cp (), s, sz);
 }
 
 /*
@@ -104,10 +95,10 @@ get_tty_stuff (int flags = 0)
   if (shared_console_info)
     return shared_console_info;
 
-  shared_console_info = (tty_min *) open_shared (NULL, cygheap->console_h,
+  shared_console_info = (tty_min *) open_shared (NULL, 0, cygheap->console_h,
 						 sizeof (*shared_console_info),
 						 NULL);
-  ProtectHandle (cygheap->console_h);
+  ProtectHandleINH (cygheap->console_h);
   if (!shared_console_info->ntty)
     {
       shared_console_info->setntty (TTY_CONSOLE);
@@ -144,11 +135,11 @@ tty_list::get_tty (int n)
 int __stdcall
 set_console_state_for_spawn ()
 {
-  HANDLE h = CreateFileA ("CONIN$", GENERIC_READ, FILE_SHARE_WRITE,
-			  &sec_none_nih, OPEN_EXISTING,
-			  FILE_ATTRIBUTE_NORMAL, NULL);
+  HANDLE h = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_WRITE,
+			 &sec_none_nih, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+			 NULL);
 
-  if (h == INVALID_HANDLE_VALUE || h == NULL)
+  if (h == INVALID_HANDLE_VALUE)
     return 0;
 
   if (shared_console_info != NULL)
@@ -156,13 +147,6 @@ set_console_state_for_spawn ()
 #     define tc shared_console_info	/* ACK.  Temporarily define for use in TTYSETF macro */
       SetConsoleMode (h, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
       TTYSETF (RSTCONS);
-#if 0
-      char ch;
-      DWORD n;
-      /* NOTE -- This ReadFile is apparently necessary for correct functioning on
-	 Windows NT 4.0.  Without this, the next ReadFile returns garbage.  */
-      (void) ReadFile (h, &ch, 0, &n, NULL);
-#endif
 #     undef tc
     }
 
@@ -195,12 +179,20 @@ fhandler_console::set_cursor_maybe ()
     }
 }
 
-int
+void
+fhandler_console::send_winch_maybe ()
+{
+  SHORT y = info.dwWinSize.Y;
+  SHORT x = info.dwWinSize.X;
+  fillin_info ();
+
+  if (y != info.dwWinSize.Y || x != info.dwWinSize.X)
+    tc->kill_pgrp (SIGWINCH);
+}
+
+int __stdcall
 fhandler_console::read (void *pv, size_t buflen)
 {
-  if (!buflen)
-    return 0;
-
   HANDLE h = get_io_handle ();
 
 #define buf ((char *) pv)
@@ -218,7 +210,7 @@ fhandler_console::read (void *pv, size_t buflen)
   char tmp[60];
 
   w4[0] = h;
-  if (iscygthread ())
+  if (cygthread::is ())
     nwait = 1;
   else
     {
@@ -310,7 +302,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	      tmp[1] = ich;
 	      /* Need this check since US code page seems to have a bug when
 		 converting a CTRL-U. */
-	      if ((unsigned char)ich > 0x7f)
+	      if ((unsigned char) ich > 0x7f)
 		con_to_str (tmp + 1, tmp + 1, 1);
 	      /* Determine if the keystroke is modified by META.  The tricky
 		 part is to distinguish whether the right Alt key should be
@@ -344,9 +336,10 @@ fhandler_console::read (void *pv, size_t buflen)
 	  break;
 
 	case MOUSE_EVENT:
+	  send_winch_maybe ();
 	  if (use_mouse)
 	    {
-	      MOUSE_EVENT_RECORD & mouse_event = input_rec.Event.MouseEvent;
+	      MOUSE_EVENT_RECORD& mouse_event = input_rec.Event.MouseEvent;
 
 	      /* Treat the double-click event like a regular button press */
 	      if (mouse_event.dwEventFlags == DOUBLE_CLICK)
@@ -428,10 +421,10 @@ fhandler_console::read (void *pv, size_t buflen)
 	    }
 	  break;
 
+	case FOCUS_EVENT:
 	case WINDOW_BUFFER_SIZE_EVENT:
-	  kill_pgrp (tc->getpgid (), SIGWINCH);
-	  continue;
-
+	  send_winch_maybe ();
+	  /* fall through */
 	default:
 	  continue;
 	}
@@ -505,7 +498,7 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
   CHAR_INFO fill;
   COORD dest;
 
-  (void)fillin_info ();
+  (void) fillin_info ();
   sr1.Left = x1 >= 0 ? x1 : info.dwWinSize.X - 1;
   if (y1 == 0)
     sr1.Top = info.winTop;
@@ -542,21 +535,21 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
 }
 
 int
-fhandler_console::open (const char *, int flags, mode_t)
+fhandler_console::open (path_conv *, int flags, mode_t)
 {
   HANDLE h;
 
   tcinit (get_tty_stuff (flags));
 
-  set_io_handle (INVALID_HANDLE_VALUE);
-  set_output_handle (INVALID_HANDLE_VALUE);
+  set_io_handle (NULL);
+  set_output_handle (NULL);
 
-  set_flags (flags);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
 
   /* Open the input handle as handle_ */
-  h = CreateFileA ("CONIN$", GENERIC_READ|GENERIC_WRITE,
-		   FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
-		   OPEN_EXISTING, 0, 0);
+  h = CreateFile ("CONIN$", GENERIC_READ | GENERIC_WRITE,
+		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
+		  OPEN_EXISTING, 0, 0);
 
   if (h == INVALID_HANDLE_VALUE)
     {
@@ -566,9 +559,9 @@ fhandler_console::open (const char *, int flags, mode_t)
   set_io_handle (h);
   set_r_no_interrupt (1);	// Handled explicitly in read code
 
-  h = CreateFileA ("CONOUT$", GENERIC_READ|GENERIC_WRITE,
-		   FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
-		   OPEN_EXISTING, 0, 0);
+  h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
+		  OPEN_EXISTING, 0, 0);
 
   if (h == INVALID_HANDLE_VALUE)
     {
@@ -602,8 +595,8 @@ fhandler_console::close (void)
 {
   CloseHandle (get_io_handle ());
   CloseHandle (get_output_handle ());
-  set_io_handle (INVALID_HANDLE_VALUE);
-  set_output_handle (INVALID_HANDLE_VALUE);
+  set_io_handle (NULL);
+  set_output_handle (NULL);
   return 0;
 }
 
@@ -617,7 +610,7 @@ fhandler_console::dup (fhandler_base *child)
 {
   fhandler_console *fhc = (fhandler_console *) child;
 
-  if (!fhc->open (get_name (), get_flags () & ~O_NOCTTY, 0))
+  if (!fhc->open (NULL, get_flags () & ~O_NOCTTY, 0))
     system_printf ("error opening console, %E");
 
   fhc->default_color = default_color;
@@ -718,12 +711,6 @@ fhandler_console::tcflush (int queue)
 int
 fhandler_console::output_tcsetattr (int, struct termios const *t)
 {
-  /* Ignore the optional_actions stuff, since all output is emitted
-     instantly */
-
-  /* Enable/disable LF -> CRLF conversions */
-  set_w_binary ((t->c_oflag & ONLCR) ? 0 : 1);
-
   /* All the output bits we can ignore */
 
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
@@ -746,8 +733,10 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
     oflags = 0;
   DWORD flags = 0;
 
+#if 0
   /* Enable/disable LF -> CRLF conversions */
   set_r_binary ((t->c_iflag & INLCR) ? 0 : 1);
+#endif
 
   /* There's some disparity between what we need and what's
      available.  We've got ECHO and ICANON, they've
@@ -777,8 +766,6 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
     {
       flags |= ENABLE_PROCESSED_INPUT;
     }
-  /* What about ENABLE_WINDOW_INPUT
-     and ENABLE_MOUSE_INPUT   ? */
 
   if (use_tty)
     {
@@ -822,13 +809,6 @@ fhandler_console::tcgetattr (struct termios *t)
 
   t->c_cflag |= CS8;
 
-#if 0
-  if (!get_r_binary ())
-    t->c_iflag |= IGNCR;
-  if (!get_w_binary ())
-    t->c_oflag |= ONLCR;
-#endif
-
   DWORD flags;
 
   if (!GetConsoleMode (get_io_handle (), &flags))
@@ -858,29 +838,21 @@ fhandler_console::tcgetattr (struct termios *t)
   return res;
 }
 
-/*
- * Constructor.
- */
-
-fhandler_console::fhandler_console (const char *name) :
-  fhandler_termios (FH_CONSOLE, name, -1)
+fhandler_console::fhandler_console () :
+  fhandler_termios (FH_CONSOLE, -1),
+  default_color (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE),
+  underline_color (FOREGROUND_GREEN | FOREGROUND_BLUE),
+  dim_color (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE),
+  meta_mask (LEFT_ALT_PRESSED), state_ (normal), nargs_ (0), savex (0),
+  savey (0), savebuf (NULL), dwLastButtonState (0), nModifiers (0),
+  insert_mode (false), use_mouse (false), raw_win32_keyboard_mode (false)
 {
-  set_cb (sizeof *this);
-  default_color = dim_color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-  underline_color = FOREGROUND_GREEN | FOREGROUND_BLUE;
-  state_ = normal;
-  nargs_ = 0;
   for (int i = 0; i < MAXARGS; i++) args_ [i] = 0;
-  savex = savey = 0;
   savebufsiz.X = savebufsiz.Y = 0;
-  savebuf = NULL;
   scroll_region.Top = 0;
   scroll_region.Bottom = -1;
   dwLastCursorPosition.X = -1;
   dwLastCursorPosition.Y = -1;
-  dwLastButtonState = 0;
-  nModifiers = 0;
-  insert_mode = use_mouse = raw_win32_keyboard_mode = FALSE;
   /* Set the mask that determines if an input keystroke is modified by
      META.  We set this based on the keyboard layout language loaded
      for the current thread.  The left <ALT> key always generates
@@ -890,7 +862,6 @@ fhandler_console::fhandler_console (const char *name) :
      language-specific characters (umlaut, accent grave, etc.).  On
      these keyboards right <ALT> (called AltGr) is used to produce the
      shell symbols and should not be interpreted as META. */
-  meta_mask = LEFT_ALT_PRESSED;
   if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
     meta_mask |= RIGHT_ALT_PRESSED;
 
@@ -988,7 +959,7 @@ fhandler_console::cursor_set (BOOL rel_to_top, int x, int y)
 {
   COORD pos;
 
-  (void)fillin_info ();
+  (void) fillin_info ();
   if (y > info.winBottom)
     y = info.winBottom;
   else if (y < 0)
@@ -1207,7 +1178,7 @@ fhandler_console::char_command (char c)
 	      ReadConsoleOutputA (get_output_handle (), savebuf,
 				  savebufsiz, cob, &now.srWindow);
 	    }
-	  else          /* restore */
+	  else		/* restore */
 	    {
 	      CONSOLE_SCREEN_BUFFER_INFO now;
 	      COORD cob = { 0, 0 };
@@ -1456,21 +1427,19 @@ fhandler_console::write_normal (const unsigned char *src,
 	case ESC:
 	  state_ = gotesc;
 	  break;
-	case DWN:		/* WriteFile ("\n") always adds CR... */
+	case DWN:
 	  cursor_get (&x, &y);
 	  if (y >= srBottom)
 	    {
-	      if (y < info.winBottom || scroll_region.Top)
+	      if (y >= info.winBottom && !scroll_region.Top)
+		WriteFile (get_output_handle (), "\n", 1, &done, 0);
+	      else
 		{
 		  scroll_screen (0, srTop + 1, -1, srBottom, 0, srTop);
 		  y--;
 		}
-	      else
-		WriteFile (get_output_handle (), "\n", 1, &done, 0);
 	    }
-	  if (!get_w_binary ())
-	    x = 0;
-	  cursor_set (FALSE, x, y + 1);
+	  cursor_set (FALSE, ((tc->ti.c_oflag & ONLCR) ? 0 : x), y + 1);
 	  break;
 	case BAK:
 	  cursor_rel (-1, 0);
@@ -1647,7 +1616,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 static struct {
   int vk;
   const char *val[4];
-} const keytable[] NO_COPY = {
+} keytable[] NO_COPY = {
 	       /* NORMAL */  /* SHIFT */    /* CTRL */       /* ALT */
   {VK_LEFT,	{"\033[D",	"\033[D",	"\033[D",	"\033\033[D"}},
   {VK_RIGHT,	{"\033[C",	"\033[C",	"\033[C",	"\033\033[C"}},
@@ -1711,23 +1680,22 @@ get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
 void
 fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
 {
-  this->fhandler_termios::init (f, bin, a);
-
+  // this->fhandler_termios::init (f, mode, bin);
   /* Ensure both input and output console handles are open */
-  int mode = 0;
+  int flags = 0;
 
   a &= GENERIC_READ | GENERIC_WRITE;
   if (a == GENERIC_READ)
-    mode = O_RDONLY;
+    flags = O_RDONLY;
   if (a == GENERIC_WRITE)
-    mode = O_WRONLY;
+    flags = O_WRONLY;
   if (a == (GENERIC_READ | GENERIC_WRITE))
-    mode = O_RDWR;
-  open (0, mode);
+    flags = O_RDWR;
+  open ((path_conv *) NULL, flags | O_BINARY);
   if (f != INVALID_HANDLE_VALUE)
     CloseHandle (f);	/* Reopened by open */
 
-  output_tcsetattr (0, &tc->ti);
+  this->tcsetattr (0, &tc->ti);
 }
 
 int
@@ -1752,7 +1720,7 @@ fhandler_console::fixup_after_fork (HANDLE)
   /* Windows does not allow duplication of console handles between processes
      so open the console explicitly. */
 
-  if (!open (get_name (), O_NOCTTY | get_flags (), 0))
+  if (!open (NULL, O_NOCTTY | get_flags (), 0))
     system_printf ("error opening console after fork, %E");
 
   if (!get_close_on_exec ())
@@ -1782,7 +1750,7 @@ fhandler_console::fixup_after_exec (HANDLE)
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
-  if (!open (get_name (), O_NOCTTY | get_flags (), 0))
+  if (!open (NULL, O_NOCTTY | get_flags (), 0))
     {
       int sawerr = 0;
       if (!get_io_handle ())

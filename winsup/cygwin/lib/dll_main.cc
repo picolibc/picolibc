@@ -15,7 +15,7 @@ details. */
 
 extern "C"
 BOOL APIENTRY DllMain (HINSTANCE hInst, DWORD reason,
-                       LPVOID reserved /* Not used. */);
+		       LPVOID reserved /* Not used. */);
 
 BOOL APIENTRY
 DllMain (

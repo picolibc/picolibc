@@ -1,6 +1,6 @@
 /* resource.cc: getrusage () and friends.
 
-   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Steve Chamberlain (sac@cygnus.com), Doug Evans (dje@cygnus.com),
    Geoffrey Noer (noer@cygnus.com) of Cygnus Support.
@@ -17,9 +17,8 @@ details. */
 #include <unistd.h>
 #include <limits.h>
 #include "cygerrno.h"
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
+#include "psapi.h"
 
 /* add timeval values */
 static void
@@ -73,6 +72,15 @@ fill_rusage (struct rusage *r, HANDLE h)
   add_timeval (&r->ru_stime, &tv);
   totimeval (&tv, &user_time, 0, 0);
   add_timeval (&r->ru_utime, &tv);
+
+  PROCESS_MEMORY_COUNTERS pmc;
+
+  memset (&pmc, 0, sizeof (pmc));
+  if (GetProcessMemoryInfo (h, &pmc, sizeof (pmc)))
+    {
+      r->ru_maxrss += (long) (pmc.WorkingSetSize /1024);
+      r->ru_majflt += pmc.PageFaultCount;
+    }
 }
 
 extern "C"
@@ -102,8 +110,7 @@ getrusage (int intwho, struct rusage *rusage_in)
 
 unsigned long rlim_core = RLIM_INFINITY;
 
-extern "C"
-int
+extern "C" int
 getrlimit (int resource, struct rlimit *rlp)
 {
   MEMORY_BASIC_INFORMATION m;
@@ -147,11 +154,10 @@ getrlimit (int resource, struct rlimit *rlp)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 setrlimit (int resource, const struct rlimit *rlp)
 {
-  if (check_null_invalid_struct_errno (rlp))
+  if (__check_invalid_read_ptr_errno (rlp, sizeof (*rlp)))
     return -1;
 
   struct rlimit oldlimits;
@@ -159,7 +165,7 @@ setrlimit (int resource, const struct rlimit *rlp)
   // Check if the request is to actually change the resource settings.
   // If it does not result in a change, take no action and do not
   // fail.
-  if (getrlimit(resource, &oldlimits) < 0)
+  if (getrlimit (resource, &oldlimits) < 0)
     return -1;
 
   if (oldlimits.rlim_cur == rlp->rlim_cur &&

@@ -1,6 +1,6 @@
 /* security.h: security declarations
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,14 +8,14 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#define DONT_INHERIT (0)
-#define INHERIT_ALL  (CONTAINER_INHERIT_ACE|OBJECT_INHERIT_ACE)
-#define INHERIT_ONLY (INHERIT_ONLY_ACE|CONTAINER_INHERIT_ACE|OBJECT_INHERIT_ACE)
+#include <accctrl.h>
 
 #define DEFAULT_UID DOMAIN_USER_RID_ADMIN
 #define DEFAULT_GID DOMAIN_ALIAS_RID_ADMINS
 
 #define MAX_SID_LEN 40
+#define MAX_DACL_LEN(n) (sizeof (ACL) \
+		   + (n) * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + MAX_SID_LEN))
 
 #define NO_SID ((PSID)NULL)
 
@@ -39,20 +39,7 @@ class cygsid {
     }
 
 public:
-  inline cygsid () : psid ((PSID) sbuf) {}
-  inline cygsid (const PSID nsid) { *this = nsid; }
-  inline cygsid (const char *nstrsid) { *this = nstrsid; }
-
-  inline PSID set () { return psid = (PSID) sbuf; }
-
-  BOOL getfrompw (const struct passwd *pw);
-  BOOL getfromgr (const struct group *gr);
-
-  int get_id (BOOL search_grp, int *type = NULL);
-  inline int get_uid () { return get_id (FALSE); }
-  inline int get_gid () { return get_id (TRUE); }
-
-  char *string (char *nsidstr) const;
+  inline operator const PSID () { return psid; }
 
   inline const PSID operator= (cygsid &nsid)
     { return assign (nsid); }
@@ -60,6 +47,21 @@ public:
     { return assign (nsid); }
   inline const PSID operator= (const char *nsidstr)
     { return getfromstr (nsidstr); }
+
+  inline cygsid () : psid ((PSID) sbuf) {}
+  inline cygsid (const PSID nsid) { *this = nsid; }
+  inline cygsid (const char *nstrsid) { *this = nstrsid; }
+
+  inline PSID set () { return psid = (PSID) sbuf; }
+
+  BOOL getfrompw (const struct passwd *pw);
+  BOOL getfromgr (const struct __group32 *gr);
+
+  int get_id (BOOL search_grp, int *type = NULL);
+  inline int get_uid () { return get_id (FALSE); }
+  inline int get_gid () { return get_id (TRUE); }
+
+  char *string (char *nsidstr) const;
 
   inline BOOL operator== (const PSID nsid) const
     {
@@ -77,8 +79,6 @@ public:
   inline BOOL operator!= (const char *nsidstr) const
     { return !(*this == nsidstr); }
 
-  inline operator const PSID () { return psid; }
-
   void debug_print (const char *prefix = NULL) const
     {
       char buf[256];
@@ -86,40 +86,63 @@ public:
     }
 };
 
+typedef enum { cygsidlist_empty, cygsidlist_alloc, cygsidlist_auto } cygsidlist_type;
 class cygsidlist {
+  int maxcount;
 public:
   int count;
   cygsid *sids;
+  cygsidlist_type type;
 
-  cygsidlist () : count (0), sids (NULL) {}
-  ~cygsidlist () { delete [] sids; }
-
-  BOOL add (cygsid &nsi)
+  cygsidlist (cygsidlist_type t, int m)
     {
-      cygsid *tmp = new cygsid [count + 1];
-      if (!tmp)
-	return FALSE;
-      for (int i = 0; i < count; ++i)
-	tmp[i] = sids[i];
-      delete [] sids;
-      sids = tmp;
+      type = t;
+      count = 0;
+      maxcount = m;
+      if (t == cygsidlist_alloc)
+	sids = alloc_sids (m);
+      else
+	sids = new cygsid [m];
+    }
+  ~cygsidlist () { if (type == cygsidlist_auto) delete [] sids; }
+
+  BOOL add (const PSID nsi) /* Only with auto for now */
+    {
+      if (count >= maxcount)
+        {
+	  cygsid *tmp = new cygsid [ 2 * maxcount];
+	  if (!tmp)
+	    return FALSE;
+	  maxcount *= 2;
+	  for (int i = 0; i < count; ++i)
+	    tmp[i] = sids[i];
+	  delete [] sids;
+	  sids = tmp;
+	}
       sids[count++] = nsi;
       return TRUE;
     }
-  BOOL add (const PSID nsid) { return add (nsid); }
+  BOOL add (cygsid &nsi) { return add ((PSID) nsi); }
   BOOL add (const char *sidstr)
     { cygsid nsi (sidstr); return add (nsi); }
+  BOOL addfromgr (struct __group32 *gr) /* Only with alloc */
+    { return sids[count++].getfromgr (gr); }
 
   BOOL operator+= (cygsid &si) { return add (si); }
   BOOL operator+= (const char *sidstr) { return add (sidstr); }
+  BOOL operator+= (const PSID psid) { return add (psid); }
 
-  BOOL contains (cygsid &sid) const
+  int position (const PSID sid) const
     {
       for (int i = 0; i < count; ++i)
 	if (sids[i] == sid)
-	  return TRUE;
-      return FALSE;
+	  return i;
+      return -1;
     }
+
+  BOOL contains (const PSID sid) const { return position (sid) >= 0; }
+  cygsid *alloc_sids (int n);
+  void free_sids ();
   void debug_print (const char *prefix = NULL) const
     {
       debug_printf ("-- begin sidlist ---");
@@ -128,6 +151,31 @@ public:
       for (int i = 0; i < count; ++i)
 	sids[i].debug_print (prefix);
       debug_printf ("-- ende sidlist ---");
+    }
+};
+
+class user_groups {
+public:
+  cygsid pgsid;
+  cygsidlist sgsids;
+  BOOL ischanged;
+
+  BOOL issetgroups () const { return (sgsids.type == cygsidlist_alloc); }
+  void update_supp (const cygsidlist &newsids)
+    {
+      sgsids.free_sids ();
+      sgsids = newsids;
+      ischanged = TRUE;
+    }
+  void clear_supp ()
+    {
+      sgsids.free_sids ();
+      ischanged = TRUE;
+    }
+  void update_pgrp (const PSID sid)
+    {
+      pgsid = sid;
+      ischanged = TRUE;
     }
 };
 
@@ -159,14 +207,16 @@ extern BOOL allow_smbntsec;
    and group lists so they are somehow security related. Besides that
    I didn't find a better place to declare them. */
 extern struct passwd *internal_getpwent (int);
-extern struct group *internal_getgrent (int);
+extern struct __group32 *internal_getgrent (int);
 
 /* File manipulation */
 int __stdcall set_process_privileges ();
 int __stdcall get_file_attribute (int, const char *, int *,
-				  uid_t * = NULL, gid_t * = NULL);
+				  __uid32_t * = NULL, __gid32_t * = NULL);
 int __stdcall set_file_attribute (int, const char *, int);
-int __stdcall set_file_attribute (int, const char *, uid_t, gid_t, int, const char *);
+int __stdcall set_file_attribute (int, const char *, __uid32_t, __gid32_t, int);
+int __stdcall get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, int *,
+				  __uid32_t * = NULL, __gid32_t * = NULL);
 LONG __stdcall read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size);
 LONG __stdcall write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size);
 BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
@@ -178,19 +228,17 @@ void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 /* Try a subauthentication. */
 HANDLE subauth (struct passwd *pw);
 /* Try creating a token directly. */
-HANDLE create_token (cygsid &usersid, cygsid &pgrpsid);
+HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw);
+/* Verify an existing token */
+BOOL verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL * pintern = NULL);
 
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);
-/* Get default logonserver and domain for this box. */
-BOOL get_logon_server_and_user_domain (char *logonserver, char *domain);
+/* Get default logonserver for a domain. */
+BOOL get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL);
 
 /* sec_helper.cc: Security helper functions. */
-BOOL __stdcall is_grp_member (uid_t uid, gid_t gid);
-/* `lookup_name' should be called instead of LookupAccountName.
- * logsrv may be NULL, in this case only the local system is used for lookup.
- * The buffer for ret_sid (40 Bytes) has to be allocated by the caller! */
-BOOL __stdcall lookup_name (const char *, const char *, PSID);
+BOOL __stdcall is_grp_member (__uid32_t uid, __gid32_t gid);
 int set_process_privilege (const char *privilege, BOOL enable = TRUE);
 
 /* shared.cc: */
@@ -199,10 +247,23 @@ SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
 
 /* Various types of security attributes for use in Create* functions. */
 extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
-extern SECURITY_ATTRIBUTES *__stdcall sec_user (PVOID sa_buf, PSID sid2 = NULL, BOOL inherit = TRUE);
-extern SECURITY_ATTRIBUTES *__stdcall sec_user_nih (PVOID sa_buf, PSID sid2 = NULL);
+extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
+  __attribute__ ((regparm (3)));
+extern BOOL sec_acl (PACL acl, BOOL admins, PSID sid1 = NO_SID, PSID sid2 = NO_SID);
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
-PSECURITY_DESCRIPTOR alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
-          PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
+PSECURITY_DESCRIPTOR alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
+	  PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
+
+extern inline SECURITY_ATTRIBUTES *
+sec_user_nih (char sa_buf[], PSID sid = NULL)
+{
+  return allow_ntsec ? __sec_user (sa_buf, sid, FALSE) : &sec_none_nih;
+}
+
+extern inline SECURITY_ATTRIBUTES *
+sec_user (char sa_buf[], PSID sid = NULL)
+{
+  return allow_ntsec ? __sec_user (sa_buf, sid, TRUE) : &sec_none_nih;
+}

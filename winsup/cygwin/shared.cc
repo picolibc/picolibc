@@ -1,6 +1,6 @@
 /* shared.cc: shared data area support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,31 +14,22 @@ details. */
 #include <stdlib.h>
 #include <grp.h>
 #include <pwd.h>
-#include "sync.h"
-#include "sigproc.h"
+#include <errno.h>
 #include "pinfo.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
+#include "cygerrno.h"
 #include "cygheap.h"
 #include "heap.h"
-#include "shared_info.h"
+#include "shared_info_magic.h"
 #include "registry.h"
 #include "cygwin_version.h"
 
-#define SHAREDVER (unsigned)(cygwin_version.api_major << 16 | \
-		   cygwin_version.api_minor)
-
 shared_info NO_COPY *cygwin_shared = NULL;
 mount_info NO_COPY *mount_table = NULL;
-HANDLE cygwin_mount_h;
-
-/* General purpose security attribute objects for global use. */
-SECURITY_ATTRIBUTES NO_COPY sec_none;
-SECURITY_ATTRIBUTES NO_COPY sec_none_nih;
-SECURITY_ATTRIBUTES NO_COPY sec_all;
-SECURITY_ATTRIBUTES NO_COPY sec_all_nih;
+HANDLE NO_COPY cygwin_mount_h;
 
 char * __stdcall
 shared_name (const char *str, int num)
@@ -47,13 +38,13 @@ shared_name (const char *str, int num)
   extern bool _cygwin_testing;
 
   __small_sprintf (buf, "%s.%s.%d", cygwin_version.shared_id, str, num);
-  if (!_cygwin_testing)
+  if (_cygwin_testing)
     strcat (buf, cygwin_version.dll_build_date);
   return buf;
 }
 
 void * __stdcall
-open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
+open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, void *addr)
 {
   void *shared;
 
@@ -64,18 +55,14 @@ open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
 	mapname = NULL;
       else
 	{
-	  mapname = shared_name (name, 0);
+	  mapname = shared_name (name, n);
 	  shared_h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE,
 				       TRUE, mapname);
 	}
       if (!shared_h &&
-	  !(shared_h = CreateFileMappingA (INVALID_HANDLE_VALUE,
-					   &sec_all,
-					   PAGE_READWRITE,
-					   0,
-					   size,
-					   mapname)))
-	api_fatal ("CreateFileMappingA, %E.  Terminating.");
+	  !(shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_all,
+					  PAGE_READWRITE, 0, size, mapname)))
+	api_fatal ("CreateFileMapping, %E.  Terminating.");
     }
 
   shared = (shared_info *) MapViewOfFileEx (shared_h,
@@ -104,13 +91,12 @@ open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
 void
 shared_info::initialize ()
 {
-  if (inited)
+  if (version)
     {
-      if (inited != SHAREDVER)
-	api_fatal ("Shared region version mismatch.  Version %x != %x.\n"
-		   "Are you using multiple versions of cygwin1.dll?\n"
-		   "Run 'cygcheck -r -s -v' to find out.",
-		   inited, SHAREDVER);
+      if (version != SHARED_VERSION_MAGIC)
+	multiple_cygwin_problem ("shared", version, SHARED_VERSION);
+      else if (cb != SHARED_INFO_CB)
+	multiple_cygwin_problem ("shared size", cb, SHARED_INFO_CB);
       return;
     }
 
@@ -119,7 +105,11 @@ shared_info::initialize ()
 
   /* Initialize tty table.  */
   tty.init ();
-  inited = SHAREDVER;
+  version = SHARED_VERSION_MAGIC;
+  cb = sizeof (*this);
+  if (cb != SHARED_INFO_CB)
+    system_printf ("size of shared memory region changed from %u to %u",
+		   SHARED_INFO_CB, cb);
 }
 
 void __stdcall
@@ -128,6 +118,7 @@ memory_init ()
   /* Initialize general shared memory */
   HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
   cygwin_shared = (shared_info *) open_shared ("shared",
+					       CYGWIN_VERSION_SHARED_DATA,
 					       shared_h,
 					       sizeof (*cygwin_shared),
 					       cygwin_shared_address);
@@ -149,23 +140,34 @@ memory_init ()
     }
 
   cygheap->shared_h = shared_h;
-  ProtectHandle (cygheap->shared_h);
+  ProtectHandleINH (cygheap->shared_h);
 
+  getpagesize ();
   heap_init ();
-  mount_table = (mount_info *) open_shared (user_name, cygwin_mount_h,
+  mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
+					    cygwin_mount_h,
 					    sizeof (mount_info), 0);
   debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
 		mount_table_address);
-  ProtectHandle (cygwin_mount_h);
+  ProtectHandleINH (cygwin_mount_h);
   debug_printf ("mount table version %x at %p", mount_table->version, mount_table);
 
   /* Initialize the Cygwin per-user mount table, if necessary */
   if (!mount_table->version)
     {
-      mount_table->version = MOUNT_VERSION;
+      mount_table->version = MOUNT_VERSION_MAGIC;
       debug_printf ("initializing mount table");
+      mount_table->cb = sizeof (*mount_table);
+      if (mount_table->cb != MOUNT_INFO_CB)
+	system_printf ("size of mount table region changed from %u to %u",
+		       MOUNT_INFO_CB, mount_table->cb);
       mount_table->init ();	/* Initialize the mount table.  */
     }
+  else if (mount_table->version != MOUNT_VERSION_MAGIC)
+    multiple_cygwin_problem ("mount", mount_table->version, MOUNT_VERSION);
+  else if (mount_table->cb !=  MOUNT_INFO_CB)
+    multiple_cygwin_problem ("mount table size", mount_table->cb, MOUNT_INFO_CB);
+
 }
 
 void __stdcall
@@ -200,111 +202,4 @@ shared_info::heap_chunk_size ()
     }
 
   return heap_chunk_in_mb << 20;
-}
-
-/*
- * Function to return a common SECURITY_DESCRIPTOR * that
- * allows all access.
- */
-
-static NO_COPY SECURITY_DESCRIPTOR *null_sdp = 0;
-
-SECURITY_DESCRIPTOR *__stdcall
-get_null_sd ()
-{
-  static NO_COPY SECURITY_DESCRIPTOR sd;
-
-  if (null_sdp == 0)
-    {
-      InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-      SetSecurityDescriptorDacl (&sd, TRUE, 0, FALSE);
-      null_sdp = &sd;
-    }
-  return null_sdp;
-}
-
-PSECURITY_ATTRIBUTES __stdcall
-sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
-{
-  if (! sa_buf)
-    return inherit ? &sec_none_nih : &sec_none;
-
-  PSECURITY_ATTRIBUTES psa = (PSECURITY_ATTRIBUTES) sa_buf;
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR)
-			     ((char *) sa_buf + sizeof (*psa));
-  PACL acl = (PACL) ((char *) sa_buf + sizeof (*psa) + sizeof (*psd));
-
-  cygsid sid;
-
-  if (cygheap->user.sid ())
-    sid = cygheap->user.sid ();
-  else if (! lookup_name (getlogin (), cygheap->user.logsrv (), sid))
-    return inherit ? &sec_none_nih : &sec_none;
-
-  size_t acl_len = sizeof (ACL)
-		   + 4 * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD))
-		   + GetLengthSid (sid)
-		   + GetLengthSid (well_known_admins_sid)
-		   + GetLengthSid (well_known_system_sid)
-		   + GetLengthSid (well_known_creator_owner_sid);
-  if (sid2)
-    acl_len += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD)
-	       + GetLengthSid (sid2);
-
-  if (! InitializeAcl (acl, acl_len, ACL_REVISION))
-    debug_printf ("InitializeAcl %E");
-
-  if (! AddAccessAllowedAce (acl, ACL_REVISION,
-			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     sid))
-    debug_printf ("AddAccessAllowedAce(%s) %E", getlogin ());
-
-  if (! AddAccessAllowedAce (acl, ACL_REVISION,
-			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     well_known_admins_sid))
-    debug_printf ("AddAccessAllowedAce(admin) %E");
-
-  if (! AddAccessAllowedAce (acl, ACL_REVISION,
-			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     well_known_system_sid))
-    debug_printf ("AddAccessAllowedAce(system) %E");
-
-  if (! AddAccessAllowedAce (acl, ACL_REVISION,
-			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     well_known_creator_owner_sid))
-    debug_printf ("AddAccessAllowedAce(creator_owner) %E");
-
-  if (sid2)
-    if (! AddAccessAllowedAce (acl, ACL_REVISION,
-			       SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			       sid2))
-      debug_printf ("AddAccessAllowedAce(sid2) %E");
-
-  if (! InitializeSecurityDescriptor (psd,
-				      SECURITY_DESCRIPTOR_REVISION))
-    debug_printf ("InitializeSecurityDescriptor %E");
-
-/*
- * Setting the owner lets the created security attribute not work
- * on NT4 SP3 Server. Don't know why, but the function still does
- * what it should do also if the owner isn't set.
-*/
-#if 0
-  if (! SetSecurityDescriptorOwner (psd, sid, FALSE))
-    debug_printf ("SetSecurityDescriptorOwner %E");
-#endif
-
-  if (! SetSecurityDescriptorDacl (psd, TRUE, acl, FALSE))
-    debug_printf ("SetSecurityDescriptorDacl %E");
-
-  psa->nLength = sizeof (SECURITY_ATTRIBUTES);
-  psa->lpSecurityDescriptor = psd;
-  psa->bInheritHandle = inherit;
-  return psa;
-}
-
-SECURITY_ATTRIBUTES *__stdcall
-sec_user_nih (PVOID sa_buf, PSID sid2)
-{
-  return sec_user (sa_buf, sid2, FALSE);
 }

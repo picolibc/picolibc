@@ -91,12 +91,11 @@ NTReadEA (const char *file, const char *attrname, char *attrbuf, int len)
     int easize;
 
     hFileSource = CreateFile (file, FILE_READ_EA,
-	FILE_SHARE_READ | FILE_SHARE_WRITE,
-	&sec_none_nih, // sa
-	OPEN_EXISTING,
-	FILE_FLAG_BACKUP_SEMANTICS,
-	NULL
-	);
+			      FILE_SHARE_READ | FILE_SHARE_WRITE,
+			      &sec_none_nih, // sa
+			      OPEN_EXISTING,
+			      FILE_FLAG_BACKUP_SEMANTICS,
+			      NULL);
 
     if (hFileSource == INVALID_HANDLE_VALUE)
 	return 0;

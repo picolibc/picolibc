@@ -21,6 +21,6 @@ struct sockaddr_un {
 
 /* Evaluates the actual length of `sockaddr_un' structure. */
 #define SUN_LEN(p) ((size_t)(((struct sockaddr_un *) NULL)->sun_path) \
-                   + strlen ((p)->sun_path))
+		   + strlen ((p)->sun_path))
 
 #endif

@@ -1,6 +1,6 @@
 /* mmap.cc
 
-   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -20,15 +20,13 @@ details. */
 #include "dtable.h"
 #include "cygerrno.h"
 #include "cygheap.h"
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "sys/cygwin.h"
 
-#define PAGE_CNT(bytes) howmany(bytes,getpagesize())
+#define PAGE_CNT(bytes) howmany((bytes),getpagesize())
 
 #define PGBITS		(sizeof(DWORD)*8)
-#define MAPSIZE(pages)	howmany(pages,PGBITS)
+#define MAPSIZE(pages)	howmany((pages),PGBITS)
 
 #define MAP_SET(n)	(map_map_[(n)/PGBITS] |= (1L << ((n) % PGBITS)))
 #define MAP_CLR(n)	(map_map_[(n)/PGBITS] &= ~(1L << ((n) % PGBITS)))
@@ -47,13 +45,13 @@ class mmap_record
     HANDLE mapping_handle_;
     int devtype_;
     DWORD access_mode_;
-    DWORD offset_;
+    __off64_t offset_;
     DWORD size_to_map_;
     caddr_t base_address_;
     DWORD *map_map_;
 
   public:
-    mmap_record (int fd, HANDLE h, DWORD ac, DWORD o, DWORD s, caddr_t b) :
+    mmap_record (int fd, HANDLE h, DWORD ac, __off64_t o, DWORD s, caddr_t b) :
        fdesc_ (fd),
        mapping_handle_ (h),
        devtype_ (0),
@@ -95,9 +93,10 @@ class mmap_record
     void free_map () { if (map_map_) free (map_map_); }
 
     DWORD find_empty (DWORD pages);
-    DWORD map_map (DWORD off, DWORD len);
+    __off64_t map_map (__off64_t off, DWORD len);
     BOOL unmap_map (caddr_t addr, DWORD len);
     void fixup_map (void);
+    int access (char *address);
 
     fhandler_base *alloc_fh ();
     void free_fh (fhandler_base *fh);
@@ -109,6 +108,8 @@ mmap_record::find_empty (DWORD pages)
   DWORD mapped_pages = PAGE_CNT (size_to_map_);
   DWORD start;
 
+  if (pages > mapped_pages)
+    return (DWORD)-1;
   for (start = 0; start <= mapped_pages - pages; ++start)
     if (!MAP_ISSET (start))
       {
@@ -122,8 +123,8 @@ mmap_record::find_empty (DWORD pages)
   return (DWORD)-1;
 }
 
-DWORD
-mmap_record::map_map (DWORD off, DWORD len)
+__off64_t
+mmap_record::map_map (__off64_t off, DWORD len)
 {
   DWORD prot, old_prot;
   switch (access_mode_)
@@ -148,7 +149,10 @@ mmap_record::map_map (DWORD off, DWORD len)
 	  if (wincap.virtual_protect_works_on_shared_pages ()
 	      && !VirtualProtect (base_address_ + off * getpagesize (),
 				  len * getpagesize (), prot, &old_prot))
-	    syscall_printf ("-1 = map_map (): %E");
+	    {
+	      debug_printf ("-1 = map_map (): %E");
+	      return (__off64_t)-1;
+	    }
 
 	  while (len-- > 0)
 	    MAP_SET (off + len);
@@ -161,7 +165,10 @@ mmap_record::map_map (DWORD off, DWORD len)
   if (wincap.virtual_protect_works_on_shared_pages ()
       && !VirtualProtect (base_address_ + start * getpagesize (),
 			  len * getpagesize (), prot, &old_prot))
-    syscall_printf ("-1 = map_map (): %E");
+    {
+      debug_printf ("-1 = map_map (): %E");
+      return (__off64_t)-1;
+    }
 
   for (; len-- > 0; ++start)
     MAP_SET (start);
@@ -217,7 +224,16 @@ mmap_record::fixup_map ()
 		    &old_prot);
 }
 
-static fhandler_disk_file fh_paging_file (NULL);
+int
+mmap_record::access (char *address)
+{
+  if (address < base_address_ || address >= base_address_ + size_to_map_)
+    return 0;
+  DWORD off = (address - base_address_) / getpagesize ();
+  return MAP_ISSET (off);
+}
+
+static fhandler_disk_file fh_paging_file;
 
 fhandler_base *
 mmap_record::alloc_fh ()
@@ -233,7 +249,7 @@ mmap_record::alloc_fh ()
      the call to fork(). This requires creating a fhandler
      of the correct type to be sure to call the method of the
      correct class. */
-  return cygheap->fdtab.build_fhandler (-1, get_device (), "", 0);
+  return cygheap->fdtab.build_fhandler (-1, get_device ());
 }
 
 void
@@ -253,8 +269,9 @@ public:
   ~list ();
   mmap_record *add_record (mmap_record r);
   void erase (int i);
-  mmap_record *match (DWORD off, DWORD len);
-  off_t match (caddr_t addr, DWORD len, off_t start);
+  void erase ();
+  mmap_record *match (__off64_t off, DWORD len);
+  long match (caddr_t addr, DWORD len, long start);
 };
 
 list::list ()
@@ -285,7 +302,7 @@ list::add_record (mmap_record r)
 
 /* Used in mmap() */
 mmap_record *
-list::match (DWORD off, DWORD len)
+list::match (__off64_t off, DWORD len)
 {
   if (fd == -1 && !off)
     {
@@ -298,21 +315,23 @@ list::match (DWORD off, DWORD len)
     {
       for (int i = 0; i < nrecs; ++i)
 	if (off >= recs[i].get_offset ()
-	    && off + len <= recs[i].get_offset () + recs[i].get_size ())
+	    && off + len <= recs[i].get_offset ()
+			 + (PAGE_CNT (recs[i].get_size ()) * getpagesize ()))
 	  return recs + i;
     }
   return NULL;
 }
 
 /* Used in munmap() */
-off_t
-list::match (caddr_t addr, DWORD len, off_t start)
+long
+list::match (caddr_t addr, DWORD len, __off32_t start)
 {
   for (int i = start + 1; i < nrecs; ++i)
     if (addr >= recs[i].get_address ()
-	&& addr + len <= recs[i].get_address () + recs[i].get_size ())
+	&& addr + len <= recs[i].get_address ()
+			 + (PAGE_CNT (recs[i].get_size ()) * getpagesize ()))
       return i;
-  return (off_t)-1;
+  return -1;
 }
 
 void
@@ -322,6 +341,12 @@ list::erase (int i)
   for (; i < nrecs-1; i++)
     recs[i] = recs[i+1];
   nrecs--;
+}
+
+void
+list::erase ()
+{
+  erase (nrecs-1);
 }
 
 class map {
@@ -398,9 +423,9 @@ static map *mmapped_areas;
 
 extern "C"
 caddr_t
-mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
+mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
 {
-  syscall_printf ("addr %x, len %d, prot %x, flags %x, fd %d, off %d",
+  syscall_printf ("addr %x, len %d, prot %x, flags %x, fd %d, off %D",
 		  addr, len, prot, flags, fd, off);
 
   static DWORD granularity;
@@ -423,7 +448,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
       return MAP_FAILED;
     }
 
-  SetResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+  SetResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 
   if (mmapped_areas == NULL)
     {
@@ -433,7 +458,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	{
 	  set_errno (ENOMEM);
 	  syscall_printf ("-1 = mmap(): ENOMEM");
-	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return MAP_FAILED;
 	}
     }
@@ -442,27 +467,29 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
     fd = -1;
 
   /* Map always in multipliers of `granularity'-sized chunks. */
-  DWORD gran_off = off & ~(granularity - 1);
+  __off64_t gran_off = off & ~(granularity - 1);
   DWORD gran_len = howmany (len, granularity) * granularity;
 
-  fhandler_base *fh = NULL;
+  fhandler_base *fh;
   caddr_t base = addr;
   HANDLE h;
 
   if (fd != -1)
     {
       /* Ensure that fd is open */
-      if (cygheap->fdtab.not_open (fd))
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
 	{
-	  set_errno (EBADF);
 	  syscall_printf ("-1 = mmap(): EBADF");
-	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return MAP_FAILED;
 	}
-      fh = cygheap->fdtab[fd];
+      fh = cfd;
       if (fh->get_device () == FH_DISK)
 	{
-	  DWORD fsiz = GetFileSize (fh->get_handle (), NULL);
+	  DWORD high;
+	  DWORD low = GetFileSize (fh->get_handle (), &high);
+	  __off64_t fsiz = ((__off64_t)high << 32) + low;
 	  fsiz -= gran_off;
 	  if (gran_len > fsiz)
 	    gran_len = fsiz;
@@ -487,10 +514,16 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
       mmap_record *rec;
       if ((rec = l->match (off, len)) != NULL)
 	{
-	  off = rec->map_map (off, len);
+	  if ((off = rec->map_map (off, len)) == (__off64_t)-1)
+	    {
+	      set_errno (ENOMEM);
+	      syscall_printf ("-1 = mmap(): ENOMEM");
+	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK|WRITE_LOCK, "mmap");
+	      return MAP_FAILED;
+	    }
 	  caddr_t ret = rec->get_address () + off;
 	  syscall_printf ("%x = mmap() succeeded", ret);
-	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return ret;
 	}
     }
@@ -503,7 +536,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
      While the changes are not propagated to the file, they are
      visible to other processes sharing the same file mapping object.
      Workaround: Don't use named file mapping.  That should work since
-     		 sharing file mappings only works reliable using named
+		 sharing file mappings only works reliable using named
 		 file mapping on 9x.
   */
   if ((flags & MAP_PRIVATE)
@@ -514,7 +547,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 
   if (h == INVALID_HANDLE_VALUE)
     {
-      ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
       return MAP_FAILED;
     }
 
@@ -537,7 +570,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	  fh->munmap (h, base, gran_len);
 	  set_errno (ENOMEM);
 	  syscall_printf ("-1 = mmap(): ENOMEM");
-	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return MAP_FAILED;
 	}
       l = mmapped_areas->add_list (l, fd);
@@ -545,11 +578,26 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 
   /* Insert into the list */
   mmap_record *rec = l->add_record (mmap_rec);
-  off = rec->map_map (off, len);
+  if ((off = rec->map_map (off, len)) == (__off64_t)-1)
+    {
+      fh->munmap (h, base, gran_len);
+      l->erase ();
+      set_errno (ENOMEM);
+      syscall_printf ("-1 = mmap(): ENOMEM");
+      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+      return MAP_FAILED;
+    }
   caddr_t ret = rec->get_address () + off;
   syscall_printf ("%x = mmap() succeeded", ret);
-  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
   return ret;
+}
+
+extern "C"
+caddr_t
+mmap (caddr_t addr, size_t len, int prot, int flags, int fd, __off32_t off)
+{
+  return mmap64 (addr, len, prot, flags, fd, (__off64_t)off);
 }
 
 /* munmap () removes an mmapped area.  It insists that base area
@@ -569,13 +617,13 @@ munmap (caddr_t addr, size_t len)
       return -1;
     }
 
-  SetResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
+  SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
   /* Check if a mmap'ed area was ever created */
   if (mmapped_areas == NULL)
     {
       syscall_printf ("-1 = munmap(): mmapped_areas == NULL");
       set_errno (EINVAL);
-      ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
+      ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
       return -1;
     }
 
@@ -587,7 +635,7 @@ munmap (caddr_t addr, size_t len)
       list *l = mmapped_areas->lists[it];
       if (l)
 	{
-	  off_t li = -1;
+	  long li = -1;
 	  if ((li = l->match(addr, len, li)) >= 0)
 	    {
 	      mmap_record *rec = l->recs + li;
@@ -601,7 +649,7 @@ munmap (caddr_t addr, size_t len)
 		  l->erase (li);
 		}
 	      syscall_printf ("0 = munmap(): %x", addr);
-	      ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
+	      ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
 	      return 0;
 	    }
 	}
@@ -610,7 +658,7 @@ munmap (caddr_t addr, size_t len)
   set_errno (EINVAL);
   syscall_printf ("-1 = munmap(): EINVAL");
 
-  ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
+  ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
   return -1;
 }
 
@@ -632,13 +680,13 @@ msync (caddr_t addr, size_t len, int flags)
       return -1;
     }
 
-  SetResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
+  SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
   /* Check if a mmap'ed area was ever created */
   if (mmapped_areas == NULL)
     {
       syscall_printf ("-1 = msync(): mmapped_areas == NULL");
       set_errno (EINVAL);
-      ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
+      ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
       return -1;
     }
 
@@ -653,8 +701,12 @@ msync (caddr_t addr, size_t len, int flags)
 	  for (int li = 0; li < l->nrecs; ++li)
 	    {
 	      mmap_record *rec = l->recs + li;
-	      if (rec->get_address () == addr)
+	      if (rec->access (addr))
 		{
+		  /* Check whole area given by len. */
+		  for (DWORD i = getpagesize (); i < len; ++i)
+		    if (!rec->access (addr + i))
+		      goto invalid_address_range;
 		  fhandler_base *fh = rec->alloc_fh ();
 		  int ret = fh->msync (rec->get_handle (), addr, len, flags);
 		  rec->free_fh (fh);
@@ -664,18 +716,19 @@ msync (caddr_t addr, size_t len, int flags)
 		  else
 		    syscall_printf ("0 = msync()");
 
-		  ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
+		  ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
 		  return 0;
 		}
-	     }
-	 }
-     }
+	    }
+	}
+    }
 
+invalid_address_range:
   /* SUSv2: Return code if indicated memory was not mapped is ENOMEM. */
   set_errno (ENOMEM);
   syscall_printf ("-1 = msync(): ENOMEM");
 
-  ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
+  ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
   return -1;
 }
 
@@ -693,7 +746,7 @@ msync (caddr_t addr, size_t len, int flags)
 */
 HANDLE
 fhandler_base::mmap (caddr_t *addr, size_t len, DWORD access,
-		     int flags, off_t off)
+		     int flags, __off64_t off)
 {
   set_errno (ENODEV);
   return INVALID_HANDLE_VALUE;
@@ -724,7 +777,7 @@ fhandler_base::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 /* Implementation for disk files. */
 HANDLE
 fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
-			  int flags, off_t off)
+			  int flags, __off64_t off)
 {
   DWORD protect;
 
@@ -754,7 +807,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
 
       debug_printf ("named sharing");
       if (!(h = OpenFileMapping (access, TRUE, namebuf)))
-	h = CreateFileMapping (get_handle(), &sec_none, protect, 0, 0, namebuf);
+	h = CreateFileMapping (get_handle (), &sec_none, protect, 0, 0, namebuf);
     }
   else
     h = CreateFileMapping (get_handle (), &sec_none, protect, 0,
@@ -767,9 +820,10 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
       return INVALID_HANDLE_VALUE;
     }
 
-  void *base = MapViewOfFileEx (h, access, 0, off, len,
+  DWORD high = off >> 32, low = off & 0xffffffff;
+  void *base = MapViewOfFileEx (h, access, high, low, len,
 			       (flags & MAP_FIXED) ? *addr : NULL);
-  debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%d, len:%d, addr:%x)", base, h, access, off, len, (flags & MAP_FIXED) ? *addr : NULL);
+  debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%D, len:%d, addr:%x)", base, h, access, off, len, (flags & MAP_FIXED) ? *addr : NULL);
   if (!base || ((flags & MAP_FIXED) && base != *addr))
     {
       if (!base)
@@ -875,7 +929,7 @@ mprotect (caddr_t addr, size_t len, int prot)
  */
 
 int __stdcall
-fixup_mmaps_after_fork ()
+fixup_mmaps_after_fork (HANDLE parent)
 {
 
   debug_printf ("recreate_mmaps_after_fork, mmapped_areas %p", mmapped_areas);
@@ -912,6 +966,20 @@ fixup_mmaps_after_fork ()
 		  system_printf ("base address fails to match requested address %p",
 				 rec->get_address ());
 		  return -1;
+		}
+	      if (rec->get_access () == FILE_MAP_COPY)
+		{
+		  for (char *address = rec->get_address ();
+		       address < rec->get_address () + rec->get_size ();
+		       address += getpagesize ())
+		    if (rec->access (address)
+			&& !ReadProcessMemory (parent, address, address,
+					       getpagesize (), NULL))
+		      {
+			system_printf ("ReadProcessMemory failed for MAP_PRIVATE address %p, %E",
+				       rec->get_address ());
+			return -1;
+		      }
 		}
 	      rec->fixup_map ();
 	    }

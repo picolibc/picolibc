@@ -63,10 +63,6 @@
  *	Number of matches in the current invocation of glob.
  */
 
-/* CYGNUS LOCAL: don't include */
-/* #include "namespace.h" */
-/* end CYGNUS LOCAL */
-
 #include "winsup.h"
 
 #include <sys/param.h>
@@ -98,7 +94,11 @@ __weak_alias(__globfree13,___globfree13);
 #ifdef __LIBC12_SOURCE__
 #define	STAT	stat12
 #else
+#if defined (__INSIDE_CYGWIN__)
+#define STAT	__stat64
+#else
 #define	STAT	stat
+#endif
 #endif
 
 #define	DOLLAR		'$'
@@ -649,7 +649,7 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob)
 
 
 /*
- * Extend the gl_pathv member of a glob_t structure to accomodate a new item,
+ * Extend the gl_pathv member of a glob_t structure to accommodate a new item,
  * add the new item, and update gl_pathc.
  *
  * This assumes the BSD realloc, which only copies the block when its size
@@ -807,18 +807,56 @@ g_opendir(str, pglob)
 	return(opendir(buf));
 }
 
+static void
+stat32_to_STAT (struct __stat32 *src, struct STAT *dst)
+{
+  dst->st_dev = src->st_dev;
+  dst->st_ino = src->st_ino;
+  dst->st_mode = src->st_mode;
+  dst->st_nlink = src->st_nlink;
+  dst->st_uid = src->st_uid;
+  dst->st_gid = src->st_gid;
+  dst->st_rdev = src->st_rdev;
+  dst->st_size = src->st_size;
+  dst->st_atim = src->st_atim;
+  dst->st_mtim = src->st_mtim;
+  dst->st_ctim = src->st_ctim;
+  dst->st_blksize = src->st_blksize;
+  dst->st_blocks = src->st_blocks;
+}
+
 static int
 g_lstat(fn, sb, pglob)
 	register Char *fn;
 	struct STAT *sb;
 	glob_t *pglob;
 {
+	/* FIXME: This only works as long as the application uses the old
+	   struct stat with 32 bit off_t types!!!
+	   
+	   As soon as we switch over to 64 bit, we have to decide by
+	   the applications API minor version number, whether to use
+	   a pointer to a __stat64 or a _stat32 struct to the
+	   pglob->gl_lstat function. */
+#ifdef __CYGWIN_USE_BIG_TYPES__
+#error FIXME check apps API minor and use correct struct stat
+#endif
 	char buf[MAXPATHLEN];
 
 	g_Ctoc(fn, buf);
-	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
-		return((*pglob->gl_lstat)(buf, sb));
+	if (pglob->gl_flags & GLOB_ALTDIRFUNC) {
+		struct __stat32 lsb;
+		int ret;
+
+		if (!(ret = (*pglob->gl_lstat)(buf, &lsb)))
+			stat32_to_STAT (&lsb, sb);
+		return ret;
+	}
+#ifdef __INSIDE_CYGWIN__
+	return(lstat64(buf, sb));
+#else
 	return(lstat(buf, sb));
+#endif
 }
 
 static int
@@ -827,12 +865,32 @@ g_stat(fn, sb, pglob)
 	struct STAT *sb;
 	glob_t *pglob;
 {
+	/* FIXME: This only works as long as the application uses the old
+	   struct stat with 32 bit off_t types!!!
+	   
+	   As soon as we switch over to 64 bit, we have to decide by
+	   the applications API minor version number, whether to use
+	   a pointer to a __stat64 or a _stat32 struct to the
+	   pglob->gl_stat function. */
+#ifdef __CYGWIN_USE_BIG_TYPES__
+#error FIXME check apps API minor and use correct struct stat
+#endif
 	char buf[MAXPATHLEN];
 
 	g_Ctoc(fn, buf);
-	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
-		return((*pglob->gl_stat)(buf, sb));
+	if (pglob->gl_flags & GLOB_ALTDIRFUNC) {
+		struct __stat32 lsb;
+		int ret;
+
+		if (!(ret = (*pglob->gl_stat)(buf, &lsb)))
+			stat32_to_STAT (&lsb, sb);
+		return ret;
+	}
+#ifdef __INSIDE_CYGWIN__
+	return(stat64(buf, sb));
+#else
 	return(stat(buf, sb));
+#endif
 }
 
 static Char *

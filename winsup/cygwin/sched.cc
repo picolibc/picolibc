@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <syslog.h>
 #include <sched.h>
-#include "sigproc.h"
 #include "pinfo.h"
 /* for getpid */
 #include <unistd.h>

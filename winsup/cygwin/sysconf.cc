@@ -1,6 +1,6 @@
 /* sysconf.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -18,8 +18,8 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "cygheap.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 #include "ntdll.h"
 
 /* sysconf: POSIX 4.8.1.1 */
@@ -62,7 +62,7 @@ sysconf (int in)
 	/*FALLTHRU*/
       case _SC_PHYS_PAGES:
       case _SC_AVPHYS_PAGES:
-	if (!wincap.supports_smp ())
+	if (wincap.supports_smp ())
 	  {
 	    NTSTATUS ret;
 	    SYSTEM_BASIC_INFORMATION sbi;
@@ -72,9 +72,9 @@ sysconf (int in)
 		  != STATUS_SUCCESS)
 	      {
 		__seterrno_from_win_error (RtlNtStatusToDosError (ret));
-		debug_printf("NtQuerySystemInformation: ret = %d, "
-			     "Dos(ret) = %d",
-			     ret, RtlNtStatusToDosError (ret));
+		debug_printf ("NtQuerySystemInformation: ret = %d, "
+			      "Dos(ret) = %d",
+			      ret, RtlNtStatusToDosError (ret));
 		return -1;
 	      }
 	    switch (in)
@@ -89,7 +89,7 @@ sysconf (int in)
 		return sbi.HighestPhysicalPage - sbi.LowestPhysicalPage + 1;
 	      }
 	  }
-        break;
+	break;
     }
 
   /* Invalid input or unimplemented sysconf name */

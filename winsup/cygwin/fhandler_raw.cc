@@ -1,6 +1,6 @@
 /* fhandler_raw.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -10,12 +10,12 @@
 
 #include "winsup.h"
 #include <sys/termios.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 
 #include <cygwin/rdevio.h>
 #include <sys/mtio.h>
+#include <ntdef.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
@@ -23,6 +23,7 @@
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "ntdll.h"
 
 /* static wrapper functions to hide the effect of media changes and
    bus resets which occurs after a new media is inserted. This is
@@ -55,7 +56,7 @@ static BOOL read_file (HANDLE fh, void *buf, DWORD to_read,
   BOOL ret;
 
   *err = 0;
-  if (!(ret = ReadFile(fh, buf, to_read, read, 0)))
+  if (!(ret = ReadFile (fh, buf, to_read, read, 0)))
     {
       if ((*err = GetLastError ()) == ERROR_MEDIA_CHANGED
 	  || *err == ERROR_BUS_RESET)
@@ -84,7 +85,6 @@ fhandler_dev_raw::clear (void)
   eof_detected = 0;
   lastblk_to_read = 0;
   varblkop = 0;
-  unit = 0;
 }
 
 int
@@ -116,10 +116,10 @@ fhandler_dev_raw::writebuf (void)
   return ret;
 }
 
-fhandler_dev_raw::fhandler_dev_raw (DWORD devtype, const char *name, int unit) : fhandler_base (devtype, name)
+fhandler_dev_raw::fhandler_dev_raw (DWORD devtype, int nunit)
+  : fhandler_base (devtype), unit (nunit)
 {
   clear ();
-  this->unit = unit;
   set_need_fork_fixup ();
 }
 
@@ -131,52 +131,62 @@ fhandler_dev_raw::~fhandler_dev_raw (void)
 }
 
 int
-fhandler_dev_raw::open (const char *path, int flags, mode_t)
+fhandler_dev_raw::open (path_conv *real_path, int flags, mode_t)
 {
-  path_conv real_path (path, PC_SYM_IGNORE);
-  int ret;
+  if (!wincap.has_raw_devices ())
+    {
+      set_errno (ENOENT);
+      debug_printf ("%s is accessible under NT/W2K only",real_path->get_win32());
+      return 0;
+    }
 
-  set_name (path, real_path.get_win32 ());
+  /* Check for illegal flags. */
+  if (flags & (O_APPEND | O_EXCL))
+    {
+      set_errno (EINVAL);
+      return 0;
+    }
 
   /* Always open a raw device existing and binary. */
   flags &= ~(O_CREAT | O_TRUNC);
   flags |= O_BINARY;
-  ret = fhandler_base::open (path, flags);
-  if (ret)
+
+  DWORD access = GENERIC_READ | SYNCHRONIZE;
+  if (get_device () == FH_TAPE
+      || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY
+      || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDWR)
+    access |= GENERIC_WRITE;
+
+  extern void str2buf2uni (UNICODE_STRING &, WCHAR *, const char *);
+  UNICODE_STRING dev;
+  WCHAR devname[MAX_PATH + 1];
+  str2buf2uni (dev, devname, real_path->get_win32 ());
+  OBJECT_ATTRIBUTES attr;
+  InitializeObjectAttributes (&attr, &dev, OBJ_CASE_INSENSITIVE, NULL, NULL);
+
+  HANDLE h;
+  IO_STATUS_BLOCK io;
+  NTSTATUS status = NtOpenFile (&h, access, &attr, &io, wincap.shared (),
+				FILE_SYNCHRONOUS_IO_NONALERT);
+  if (!NT_SUCCESS (status))
     {
-      if (devbufsiz > 1L)
-	devbuf = new char [devbufsiz];
+      __seterrno_from_win_error (RtlNtStatusToDosError (status));
+      return 0;
     }
-  else
-    devbufsiz = 0;
-  return ret;
+
+  set_io_handle (h);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
+
+  if (devbufsiz > 1L)
+    devbuf = new char [devbufsiz];
+
+  return 1;
 }
 
 int
 fhandler_dev_raw::close (void)
 {
   return fhandler_base::close ();
-}
-
-int
-fhandler_dev_raw::fstat (struct stat *buf)
-{
-  if (!buf)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  memset (buf, 0, sizeof *buf);
-  buf->st_mode = S_IFCHR |
-		 S_IRUSR | S_IWUSR |
-		 S_IRGRP | S_IWGRP |
-		 S_IROTH | S_IWOTH;
-  buf->st_nlink = 1;
-  buf->st_blksize = devbuf ? devbufsiz : 1;
-  buf->st_dev = buf->st_rdev = get_device () << 8 | (unit & 0xff);
-
-  return 0;
 }
 
 int

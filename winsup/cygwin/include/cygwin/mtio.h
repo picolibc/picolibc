@@ -20,6 +20,10 @@ details. */
 #include <sys/ioctl.h>
 #include <asm/socket.h>
 
+#ifndef DEFTAPE
+#define DEFTAPE "/dev/tape"
+#endif
+
 /*
  * Structures and definitions for mag tape io control commands
  */
@@ -85,7 +89,8 @@ struct	mtget {
 				 *  Cygwin: remaining KB.
 				 */
 	/* the following registers are device dependent */
-	long	mt_dsreg;	/* status register */
+	long	mt_dsreg;	/* status register, Cygwin returns current
+				   blocksize here. */
 	long	mt_gstat;	/* generic (device independent) status */
 	long	mt_erreg;	/* error register */
 	/* The next two fields are not always used */
@@ -99,6 +104,7 @@ struct	mtget {
 	int		mt_defblksize;
 	unsigned long	mt_featureslow;
 	unsigned long	mt_featureshigh;
+	unsigned long	mt_eotwarningzonesize;
 };
 
 /* structure for MTIOCPOS - mag tape get position command */

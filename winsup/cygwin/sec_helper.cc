@@ -1,6 +1,6 @@
 /* sec_helper.cc: NT security helper functions
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -25,15 +25,18 @@ details. */
 #include <winuser.h>
 #include <wininet.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
+
+/* General purpose security attribute objects for global use. */
+SECURITY_ATTRIBUTES NO_COPY sec_none;
+SECURITY_ATTRIBUTES NO_COPY sec_none_nih;
+SECURITY_ATTRIBUTES NO_COPY sec_all;
+SECURITY_ATTRIBUTES NO_COPY sec_all_nih;
 
 SID_IDENTIFIER_AUTHORITY sid_auth[] = {
 	{SECURITY_NULL_SID_AUTHORITY},
@@ -66,11 +69,11 @@ cygsid::string (char *nsidstr) const
   if (!psid || !nsidstr)
     return NULL;
   strcpy (nsidstr, "S-1-");
-  __small_sprintf(t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
+  __small_sprintf (t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
   strcat (nsidstr, t);
   for (i = 0; i < *GetSidSubAuthorityCount (psid); ++i)
     {
-      __small_sprintf(t, "-%lu", *GetSidSubAuthority (psid, i));
+      __small_sprintf (t, "-%lu", *GetSidSubAuthority (psid, i));
       strcat (nsidstr, t);
     }
   return nsidstr;
@@ -87,7 +90,7 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r)
       return NULL;
     }
   set ();
-  InitializeSid(psid, &sid_auth[s], cnt);
+  InitializeSid (psid, &sid_auth[s], cnt);
   for (i = 0; i < cnt; ++i)
     memcpy ((char *) psid + 8 + sizeof (DWORD) * i, &r[i], sizeof (DWORD));
   return psid;
@@ -129,7 +132,7 @@ cygsid::getfrompw (const struct passwd *pw)
 }
 
 BOOL
-cygsid::getfromgr (const struct group *gr)
+cygsid::getfromgr (const struct __group32 *gr)
 {
   char *sp = (gr && gr->gr_passwd) ? gr->gr_passwd : NULL;
   return (*this = sp ?: "") != NULL;
@@ -146,7 +149,7 @@ cygsid::get_id (BOOL search_grp, int *type)
   if (!IsValidSid (psid))
     {
       __seterrno ();
-      small_printf ("IsValidSid failed with %E");
+      system_printf ("IsValidSid failed with %E");
       return -1;
     }
 
@@ -176,7 +179,7 @@ cygsid::get_id (BOOL search_grp, int *type)
 	}
       if (search_grp || type)
 	{
-	  struct group *gr;
+	  struct __group32 *gr;
 	  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 	    {
 	      if (sid.getfromgr (gr) && sid == psid)
@@ -195,7 +198,7 @@ cygsid::get_id (BOOL search_grp, int *type)
     }
 
   /* We use the RID as default UID/GID */
-  int id = *GetSidSubAuthority(psid, *GetSidSubAuthorityCount(psid) - 1);
+  int id = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount (psid) - 1);
 
   /*
    * The RID maybe -1 if accountname == computername.
@@ -226,7 +229,7 @@ cygsid::get_id (BOOL search_grp, int *type)
 	      *type = GROUP;
 	    if (id == -1)
 	      {
-		struct group *gr = getgrnam (account);
+		struct __group32 *gr = getgrnam32 (account);
 		if (gr)
 		  id = gr->gr_gid;
 	      }
@@ -246,21 +249,21 @@ cygsid::get_id (BOOL search_grp, int *type)
 	}
     }
   if (id == -1)
-    id = getuid ();
+    id = getuid32 ();
   return id;
 }
 
 BOOL
-is_grp_member (uid_t uid, gid_t gid)
+is_grp_member (__uid32_t uid, __gid32_t gid)
 {
-  extern int getgroups (int, gid_t *, gid_t, const char *);
+  extern int getgroups32 (int, __gid32_t *, __gid32_t, const char *);
   BOOL grp_member = TRUE;
 
-  struct passwd *pw = getpwuid (uid);
-  gid_t grps[NGROUPS_MAX];
-  int cnt = getgroups (NGROUPS_MAX, grps,
-		       pw ? pw->pw_gid : myself->gid,
-		       pw ? pw->pw_name : cygheap->user.name ());
+  struct passwd *pw = getpwuid32 (uid);
+  __gid32_t grps[NGROUPS_MAX];
+  int cnt = getgroups32 (NGROUPS_MAX, grps,
+			 pw ? pw->pw_gid : myself->gid,
+			 pw ? pw->pw_name : cygheap->user.name ());
   int i;
   for (i = 0; i < cnt; ++i)
     if (grps[i] == gid)
@@ -269,6 +272,7 @@ is_grp_member (uid_t uid, gid_t gid)
   return grp_member;
 }
 
+#if 0 // unused
 #define SIDLEN	(sidlen = MAX_SID_LEN, &sidlen)
 #define DOMLEN	(domlen = INTERNET_MAX_HOST_NAME_LENGTH, &domlen)
 
@@ -321,13 +325,13 @@ lookup_name (const char *name, const char *logsrv, PSID ret_sid)
       if (LookupAccountName (NULL, domuser, sid, SIDLEN, dom, DOMLEN,&acc_type))
 	goto got_it;
     }
-  debug_printf ("LookupAccountName(%s) %E", name);
+  debug_printf ("LookupAccountName (%s) %E", name);
   __seterrno ();
   return FALSE;
 
 got_it:
-  debug_printf ("sid : [%d]", *GetSidSubAuthority((PSID) sid,
-			      *GetSidSubAuthorityCount((PSID) sid) - 1));
+  debug_printf ("sid : [%d]", *GetSidSubAuthority ((PSID) sid,
+			      *GetSidSubAuthorityCount ((PSID) sid) - 1));
 
   if (ret_sid)
     memcpy (ret_sid, sid, sidlen);
@@ -337,6 +341,7 @@ got_it:
 
 #undef SIDLEN
 #undef DOMLEN
+#endif //unused
 
 int
 set_process_privilege (const char *privilege, BOOL enable)
@@ -371,7 +376,7 @@ set_process_privilege (const char *privilege, BOOL enable)
       goto out;
     }
   /* AdjustTokenPrivileges returns TRUE even if the privilege could not
-     be enabled. GetLastError() returns an correct error code, though. */
+     be enabled. GetLastError () returns an correct error code, though. */
   if (enable && GetLastError () == ERROR_NOT_ALL_ASSIGNED)
     {
       debug_printf ("Privilege %s couldn't be assigned", privilege);
@@ -385,6 +390,96 @@ out:
   if (hToken)
     CloseHandle (hToken);
 
-  syscall_printf ("%d = set_process_privilege (%s, %d)",ret, privilege, enable);
+  syscall_printf ("%d = set_process_privilege (%s, %d)", ret, privilege, enable);
   return ret;
+}
+
+/*
+ * Function to return a common SECURITY_DESCRIPTOR * that
+ * allows all access.
+ */
+
+static NO_COPY SECURITY_DESCRIPTOR *null_sdp = 0;
+
+SECURITY_DESCRIPTOR *__stdcall
+get_null_sd ()
+{
+  static NO_COPY SECURITY_DESCRIPTOR sd;
+
+  if (null_sdp == 0)
+    {
+      InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
+      SetSecurityDescriptorDacl (&sd, TRUE, 0, FALSE);
+      null_sdp = &sd;
+    }
+  return null_sdp;
+}
+
+BOOL
+sec_acl (PACL acl, BOOL admins, PSID sid1, PSID sid2)
+{
+  size_t acl_len = MAX_DACL_LEN(5);
+
+  if (!InitializeAcl (acl, acl_len, ACL_REVISION))
+    {
+      debug_printf ("InitializeAcl %E");
+      return FALSE;
+    }
+  if (sid2)
+    if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			      GENERIC_ALL, sid2))
+      debug_printf ("AddAccessAllowedAce(sid2) %E");
+  if (sid1)
+    if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			      GENERIC_ALL, sid1))
+      debug_printf ("AddAccessAllowedAce(sid1) %E");
+  if (admins)
+    if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			      GENERIC_ALL, well_known_admins_sid))
+      debug_printf ("AddAccessAllowedAce(admin) %E");
+  if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			    GENERIC_ALL, well_known_system_sid))
+    debug_printf ("AddAccessAllowedAce(system) %E");
+#if 0 /* Does not seem to help */
+  if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			    GENERIC_ALL, well_known_creator_owner_sid))
+    debug_printf ("AddAccessAllowedAce(creator_owner) %E");
+#endif
+  return TRUE;
+}
+
+PSECURITY_ATTRIBUTES __stdcall
+__sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
+{
+  PSECURITY_ATTRIBUTES psa = (PSECURITY_ATTRIBUTES) sa_buf;
+  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR)
+			     ((char *) sa_buf + sizeof (*psa));
+  PACL acl = (PACL) ((char *) sa_buf + sizeof (*psa) + sizeof (*psd));
+
+  cygsid sid;
+
+  if (!(sid = cygheap->user.orig_sid ()) ||
+	  (!sec_acl (acl, TRUE, sid, sid2)))
+    return inherit ? &sec_none : &sec_none_nih;
+
+  if (!InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION))
+    debug_printf ("InitializeSecurityDescriptor %E");
+
+/*
+ * Setting the owner lets the created security attribute not work
+ * on NT4 SP3 Server. Don't know why, but the function still does
+ * what it should do also if the owner isn't set.
+*/
+#if 0
+  if (!SetSecurityDescriptorOwner (psd, sid, FALSE))
+    debug_printf ("SetSecurityDescriptorOwner %E");
+#endif
+
+  if (!SetSecurityDescriptorDacl (psd, TRUE, acl, FALSE))
+    debug_printf ("SetSecurityDescriptorDacl %E");
+
+  psa->nLength = sizeof (SECURITY_ATTRIBUTES);
+  psa->lpSecurityDescriptor = psd;
+  psa->bInheritHandle = inherit;
+  return psa;
 }

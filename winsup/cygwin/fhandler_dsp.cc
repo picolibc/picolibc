@@ -1,6 +1,6 @@
 /* fhandler_dev_dsp: code to emulate OSS sound model /dev/dsp
 
-   Copyright 2001 Red Hat, Inc
+   Copyright 2001, 2002 Red Hat, Inc
 
    Written by Andy Younger (andy@snoogie.demon.co.uk)
 
@@ -15,7 +15,6 @@ details. */
 #include <errno.h>
 #include <windows.h>
 #include <sys/soundcard.h>
-#include <sys/fcntl.h>
 #include <mmsystem.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -86,7 +85,7 @@ Audio::~Audio ()
 }
 
 bool
-Audio::open (int rate, int bits, int channels, bool bCallback = false)
+Audio::open (int rate, int bits, int channels, bool bCallback)
 {
   WAVEFORMATEX format;
   int nDevices = waveOutGetNumDevs ();
@@ -420,10 +419,9 @@ fhandler_dev_dsp::setupwav (const char *pData, int nBytes)
 }
 
 //------------------------------------------------------------------------
-fhandler_dev_dsp::fhandler_dev_dsp (const char *name):
-  fhandler_base (FH_OSS_DSP, name)
+fhandler_dev_dsp::fhandler_dev_dsp ():
+  fhandler_base (FH_OSS_DSP)
 {
-  set_cb (sizeof *this);
 }
 
 fhandler_dev_dsp::~fhandler_dev_dsp ()
@@ -431,35 +429,38 @@ fhandler_dev_dsp::~fhandler_dev_dsp ()
 }
 
 int
-fhandler_dev_dsp::open (const char *path, int flags, mode_t mode = 0)
+fhandler_dev_dsp::open (path_conv *, int flags, mode_t mode)
 {
   // currently we only support writing
   if ((flags & (O_WRONLY | O_RDONLY | O_RDWR)) != O_WRONLY)
-    return 0;
+    {
+      set_errno (EACCES);
+      return 0;
+    }
 
-  set_flags (flags);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
 
   if (!s_audio)
     s_audio = new (audio_buf) Audio;
 
   // Work out initial sample format & frequency
-  if (strcmp (path, "/dev/dsp") == 0L)
-    {
       // dev/dsp defaults
-      audioformat_ = AFMT_S8;
-      audiofreq_ = 8000;
-      audiobits_ = 8;
-      audiochannels_ = 1;
-    }
+  audioformat_ = AFMT_S8;
+  audiofreq_ = 8000;
+  audiobits_ = 8;
+  audiochannels_ = 1;
 
+  int res;
   if (!s_audio->open (audiofreq_, audiobits_, audiochannels_))
-    debug_printf ("/dev/dsp: failed to open\n");
+    res = 0;
   else
     {
       set_open_status ();
-      debug_printf ("/dev/dsp: successfully opened\n");
+      res = 1;
     }
-  return 1;
+
+  debug_printf ("returns %d", res);
+  return res;
 }
 
 int
@@ -480,14 +481,14 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
   return len;
 }
 
-int
+int __stdcall
 fhandler_dev_dsp::read (void *ptr, size_t len)
 {
   return len;
 }
 
-off_t
-fhandler_dev_dsp::lseek (off_t offset, int whence)
+__off64_t
+fhandler_dev_dsp::lseek (__off64_t offset, int whence)
 {
   return 0;
 }
@@ -529,7 +530,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 
       CASE (SNDCTL_DSP_GETBLKSIZE)
 	*intptr = Audio::BLOCK_SIZE;
-	break;
+	return 0;
 
       CASE (SNDCTL_DSP_SETFMT)
       {

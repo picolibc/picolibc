@@ -1,6 +1,6 @@
 /* sync.h: Header file for cygwin synchronization primitives.
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -22,33 +22,28 @@ class muto
 public:
   class muto *next;
   const char *name;
-  void *operator new (size_t, void *p) {return p;}
-  void *operator new (size_t) {return ::new muto; }
-  void operator delete (void *) {;} /* can't handle allocated mutos
-					currently */
 
-  muto() {}
   /* The real constructor. */
-  muto(int inh, const char *name);
-  ~muto ();
-  int acquire (DWORD ms = INFINITE) __attribute__ ((regparm(1))); /* Acquire the lock. */
-  int release ();		     /* Release the lock. */
+  muto *init(const char *name) __attribute__ ((regparm (3)));
+
+#if 0	/* FIXME: See comment in sync.cc */
+  ~muto ()
+#endif
+  int acquire (DWORD ms = INFINITE) __attribute__ ((regparm (2))); /* Acquire the lock. */
+  int release () __attribute__ ((regparm (1)));		     /* Release the lock. */
 
   /* Return true if caller thread owns the lock. */
   int ismine () {return tid == GetCurrentThreadId ();}
   DWORD owner () {return tid;}
   int unstable () {return !tid && (sync || waiters >= 0);}
-  void reset ();
+  void reset () __attribute__ ((regparm (1)));
 };
 
 extern muto muto_start;
 
 /* Use a statically allocated buffer as the storage for a muto */
-#define new_muto(__inh, __name) \
+#define new_muto(__name) \
 ({ \
-  static __attribute__((section(".data_cygwin_nocopy"))) muto __mbuf; \
-  (void) new ((char *) &__mbuf) muto (__inh, __name); \
-  __mbuf.next = muto_start.next; \
-  muto_start.next = &__mbuf; \
-  &__mbuf; \
+  static muto __name##_storage __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy"))); \
+  __name = __name##_storage.init (#__name); \
 })

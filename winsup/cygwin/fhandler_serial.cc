@@ -1,6 +1,6 @@
 /* fhandler_serial.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,14 +9,12 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include <sys/termios.h>
@@ -24,13 +22,9 @@ details. */
 /**********************************************************************/
 /* fhandler_serial */
 
-fhandler_serial::fhandler_serial (const char *name, DWORD devtype, int unit) :
-	fhandler_base (devtype, name, unit)
+fhandler_serial::fhandler_serial (int unit)
+  : fhandler_base (FH_SERIAL, unit), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
 {
-  set_cb (sizeof *this);
-  vmin_ = 0;
-  vtime_ = 0;
-  pgrp_ = myself->pgid;
   set_need_fork_fixup ();
 }
 
@@ -64,7 +58,6 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
 
   for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *)ptr + n)
     {
-      DWORD ev;
       COMSTAT st;
       DWORD inq = 1;
 
@@ -125,7 +118,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
       if (inq > ulen)
 	inq = ulen;
       debug_printf ("inq %d", inq);
-      if (ReadFile (get_handle(), ptr, min (inq, ulen), &n, &io_status))
+      if (ReadFile (get_handle (), ptr, min (inq, ulen), &n, &io_status))
 	/* Got something */;
       else if (GetLastError () != ERROR_IO_PENDING)
 	goto err;
@@ -169,7 +162,7 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
 
   for (;;)
     {
-      if (WriteFile (get_handle(), ptr, len, &bytes_written, &write_status))
+      if (WriteFile (get_handle (), ptr, len, &bytes_written, &write_status))
 	break;
 
       switch (GetLastError ())
@@ -188,13 +181,13 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
       break;
     }
 
-  ForceCloseHandle(write_status.hEvent);
+  ForceCloseHandle (write_status.hEvent);
 
   return bytes_written;
 
 err:
   __seterrno ();
-  ForceCloseHandle(write_status.hEvent);
+  ForceCloseHandle (write_status.hEvent);
   return -1;
 }
 
@@ -207,12 +200,11 @@ fhandler_serial::dump (void)
 void
 fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 {
-  fhandler_base::init (f, flags, bin);
-  (void) open (NULL, flags, bin ? O_BINARY : 0);
+  (void) open (NULL, flags, bin & (O_BINARY | O_TEXT));
 }
 
 int
-fhandler_serial::open (const char *name, int flags, mode_t mode)
+fhandler_serial::open (path_conv *, int flags, mode_t mode)
 {
   int res;
   COMMTIMEOUTS to;
@@ -221,10 +213,10 @@ fhandler_serial::open (const char *name, int flags, mode_t mode)
   syscall_printf ("fhandler_serial::open (%s, %p, %p)",
 			get_name (), flags, mode);
 
-  if (name && !(res = this->fhandler_base::open (flags, mode)))
+  if (!(res = this->fhandler_base::open (NULL, flags, mode)))
     return 0;
-  else
-    res = 1;
+
+  res = 1;
 
   (void) SetCommMask (get_handle (), EV_RXCHAR);
 
@@ -274,6 +266,23 @@ fhandler_serial::open (const char *name, int flags, mode_t mode)
       state.fAbortOnError = TRUE;
       if (!SetCommState (get_handle (), &state))
 	system_printf ("couldn't set initial state for %s, %E", get_name ());
+    }
+
+  /* setting rts and dtr to known state so that ioctl() function with
+  request TIOCMGET could return correct value of RTS and DTR lines.
+  Important only for Win 9x systems */
+
+  if (!wincap.supports_reading_modem_output_lines ())
+    {
+      if (EscapeCommFunction (get_handle (), SETDTR) == 0)
+	system_printf ("couldn't set initial state of DTR for %s, %E", get_name ());
+      if (EscapeCommFunction (get_handle (), SETRTS) == 0)
+	system_printf ("couldn't set initial state of RTS for %s, %E", get_name ());
+
+      /* even though one of above functions fail I have to set rts and dtr
+      variables to initial value. */
+      rts = TIOCM_RTS;
+      dtr = TIOCM_DTR;
     }
 
   SetCommMask (get_handle (), EV_RXCHAR);
@@ -366,6 +375,99 @@ fhandler_serial::tcflow (int action)
   return 0;
 }
 
+
+/* ioctl: */
+int
+fhandler_serial::ioctl (unsigned int cmd, void *buffer)
+{
+
+  DWORD ev;
+  COMSTAT st;
+  DWORD action;
+  DWORD modemLines;
+  DWORD mcr;
+  DWORD cbReturned;
+  bool result;
+  int modemStatus;
+  int request;
+
+  request = *(int *) buffer;
+  action = 0;
+  modemStatus = 0;
+  if (!ClearCommError (get_handle (), &ev, &st))
+    return -1;
+  switch (cmd)
+    {
+    case TIOCMGET:
+      if (GetCommModemStatus (get_handle (), &modemLines) == 0)
+	return -1;
+      if (modemLines & MS_CTS_ON)
+	modemStatus |= TIOCM_CTS;
+      if (modemLines & MS_DSR_ON)
+	modemStatus |= TIOCM_DSR;
+      if (modemLines & MS_RING_ON)
+	modemStatus |= TIOCM_RI;
+      if (modemLines & MS_RLSD_ON)
+	modemStatus |= TIOCM_CD;
+      if (!wincap.supports_reading_modem_output_lines ())
+	modemStatus |= rts | dtr;
+      else
+	{
+	  result = DeviceIoControl (get_handle (),
+				    0x001B0078,
+				    NULL, 0, &mcr, 4, &cbReturned, 0);
+	  if (!result)
+	    return -1;
+	  if (cbReturned != 4)
+	    return -1;
+	  if (mcr & 2)
+	    modemStatus |= TIOCM_RTS;
+	  if (mcr & 1)
+	    modemStatus |= TIOCM_DTR;
+	}
+      *(int *) buffer = modemStatus;
+      return 0;
+    case TIOCMSET:
+      if (request & TIOCM_RTS)
+	{
+	  if (EscapeCommFunction (get_handle (), SETRTS) == 0)
+	    return -1;
+	  else
+	    rts = TIOCM_RTS;
+	}
+      else
+	{
+	  if (EscapeCommFunction (get_handle (), CLRRTS) == 0)
+	    return -1;
+	  else
+	    rts = 0;
+	}
+      if (request & TIOCM_DTR)
+	{
+	  if (EscapeCommFunction (get_handle (), SETDTR) == 0)
+	    return -1;
+	  else
+	    dtr = TIOCM_DTR;
+	}
+      else
+	{
+	  if (EscapeCommFunction (get_handle (), CLRDTR) == 0)
+	    return -1;
+	  else
+	    dtr = 0;
+	}
+      return 0;
+   case TIOCINQ:
+     if (ev & CE_FRAME | ev & CE_IOE | ev & CE_OVERRUN |
+	 ev & CE_RXOVER | ev & CE_RXPARITY)
+       return -1;
+     *(int *) buffer = st.cbInQue;
+     return 0;
+   default:
+     return -1;
+   }
+}
+
 /* tcflush: POSIX 7.2.2.1 */
 int
 fhandler_serial::tcflush (int queue)
@@ -373,12 +475,11 @@ fhandler_serial::tcflush (int queue)
   if (queue == TCOFLUSH || queue == TCIOFLUSH)
     PurgeComm (get_handle (), PURGE_TXABORT | PURGE_TXCLEAR);
 
-  if (queue == TCIFLUSH | queue == TCIOFLUSH)
+  if (queue == TCIFLUSH || queue == TCIOFLUSH)
     /* Input flushing by polling until nothing turns up
        (we stop after 1000 chars anyway) */
     for (int max = 1000; max > 0; max--)
       {
-	DWORD ev;
 	COMSTAT st;
 	if (!PurgeComm (get_handle (), PURGE_RXABORT | PURGE_RXCLEAR))
 	  break;
@@ -404,6 +505,8 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   COMMTIMEOUTS to;
   DCB ostate, state;
   unsigned int ovtime = vtime_, ovmin = vmin_;
+  int tmpDtr, tmpRts;
+  tmpDtr = tmpRts = 0;
 
   termios_printf ("action %d", action);
   if ((action == TCSADRAIN) || (action == TCSAFLUSH))
@@ -569,6 +672,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
     {							/* disable */
       state.fRtsControl = RTS_CONTROL_ENABLE;
       state.fOutxCtsFlow = FALSE;
+      tmpRts = TIOCM_RTS;
     }
 
   if (t->c_cflag & CRTSXOFF)
@@ -601,7 +705,10 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   set_w_binary ((t->c_oflag & ONLCR) ? 0 : 1);
 
   if (dropDTR == TRUE)
-    EscapeCommFunction (get_handle (), CLRDTR);
+    {
+      EscapeCommFunction (get_handle (), CLRDTR);
+      tmpDtr = 0;
+    }
   else
     {
       /* FIXME: Sometimes when CLRDTR is set, setting
@@ -610,7 +717,11 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       parameters while DTR is still down. */
 
       EscapeCommFunction (get_handle (), SETDTR);
+      tmpDtr = TIOCM_DTR;
     }
+
+  rts = tmpRts;
+  dtr = tmpDtr;
 
   /*
   The following documentation on was taken from "Linux Serial Programming

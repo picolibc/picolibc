@@ -1,6 +1,6 @@
 /* fork.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,7 +12,6 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <stdarg.h>
 #include <errno.h>
 #include "security.h"
@@ -20,7 +19,6 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygerrno.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
@@ -29,6 +27,8 @@ details. */
 #include "perthread.h"
 #include "perprocess.h"
 #include "dll_init.h"
+#include "sync.h"
+#include "cygmalloc.h"
 
 #ifdef DEBUGGING
 static int npid;
@@ -194,15 +194,15 @@ resume_child (PROCESS_INFORMATION &pi, HANDLE forker_finished)
    Note that this has to be a macro since the parent may be messing with
    our stack. */
 static void __stdcall
-sync_with_parent(const char *s, bool hang_self)
+sync_with_parent (const char *s, bool hang_self)
 {
   debug_printf ("signalling parent: %s", s);
   /* Tell our parent we're waiting. */
-  if (!SetEvent (child_proc_info->subproc_ready))
+  if (!SetEvent (fork_info->subproc_ready))
     api_fatal ("fork child - SetEvent for %s failed, %E", s);
   if (hang_self)
     {
-      HANDLE h = child_proc_info->forker_finished;
+      HANDLE h = fork_info->forker_finished;
       /* Wait for the parent to fill in our stack and heap.
 	 Don't wait forever here.  If our parent dies we don't want to clog
 	 the system.  If the wait fails, we really can't continue so exit.  */
@@ -215,10 +215,10 @@ sync_with_parent(const char *s, bool hang_self)
 	  break;
 	case WAIT_FAILED:
 	  if (GetLastError () == ERROR_INVALID_HANDLE &&
-	      WaitForSingleObject (child_proc_info->forker_finished, 1) != WAIT_FAILED)
+	      WaitForSingleObject (fork_info->forker_finished, 1) != WAIT_FAILED)
 	    break;
 	  api_fatal ("WFSO failed for %s, fork_finished %p, %E", s,
-	      	     child_proc_info->forker_finished);
+		     fork_info->forker_finished);
 	  break;
 	default:
 	  debug_printf ("no problems");
@@ -245,7 +245,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     }
 
   sync_with_parent ("after longjmp.", TRUE);
-  ProtectHandle (hParent);
   sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d\n", hParent,
 		  first_dll, load_dlls);
 
@@ -259,7 +258,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (GetEnvironmentVariable ("CYGWIN_FORK_SLEEP", buf, sizeof (buf)))
     {
       small_printf ("Sleeping %d after fork, pid %u\n", atoi (buf), GetCurrentProcessId ());
-      Sleep (atoi(buf));
+      Sleep (atoi (buf));
     }
 #endif
 
@@ -267,22 +266,26 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
      fork() was invoked from other than the main thread.  Make sure that
      when the "main" thread exits it calls do_exit, like a normal process.
      Exit with a status code of 0. */
-  if (child_proc_info->stacksize)
+  if (fork_info->stacksize)
     {
-      ((DWORD *)child_proc_info->stackbottom)[-17] = (DWORD)do_exit;
-      ((DWORD *)child_proc_info->stackbottom)[-15] = (DWORD)0;
+      ((DWORD *)fork_info->stackbottom)[-17] = (DWORD)do_exit;
+      ((DWORD *)fork_info->stackbottom)[-15] = (DWORD)0;
     }
 
   set_file_api_mode (current_codepage);
 
   MALLOC_CHECK;
 
-  debug_fixup_after_fork ();
-  pinfo_fixup_after_fork ();
   cygheap->fdtab.fixup_after_fork (hParent);
+  ProtectHandleINH (hParent);
+
+  pinfo_fixup_after_fork ();
   signal_fixup_after_fork ();
 
   MALLOC_CHECK;
+
+  if (fixup_mmaps_after_fork (hParent))
+    api_fatal ("recreate_mmaps_after_fork_failed");
 
   /* If we haven't dynamically loaded any dlls, just signal
      the parent.  Otherwise, load all the dlls, tell the parent
@@ -297,11 +300,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     }
 
   ForceCloseHandle (hParent);
-  (void) ForceCloseHandle (child_proc_info->subproc_ready);
-  (void) ForceCloseHandle (child_proc_info->forker_finished);
-
-  if (fixup_mmaps_after_fork ())
-    api_fatal ("recreate_mmaps_after_fork_failed");
+  (void) ForceCloseHandle1 (fork_info->subproc_ready, subproc_ready);
+  (void) ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
@@ -313,11 +313,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     if ((*t)->clear_on_fork ())
       (*t)->set ();
 
-  user_data->threadinterface->fixup_after_fork ();
-
-  /* Initialize signal/process handling */
-  sigproc_init ();
-  __pthread_atforkchild ();
+  wait_for_sigthread ();
+  pthread::atforkchild ();
   cygbench ("fork-child");
   return 0;
 }
@@ -355,20 +352,9 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   DWORD rc;
   PROCESS_INFORMATION pi = {0, NULL, 0, 0};
 
-  /* call the pthread_atfork prepare functions */
-  __pthread_atforkprepare ();
+  pthread::atforkprepare ();
 
   subproc_init ();
-
-#ifdef DEBUGGING_NOTNEEDED
-  /* The ProtectHandle call allocates memory so we need to make sure
-     that enough is set aside here so that the sbrk pointer does not
-     move when ProtectHandle is called after the child is started.
-     Otherwise the sbrk pointers in the parent will not agree with
-     the child and when user_data is (regrettably) copied over,
-     the user_data->ptr field will not be accurate. */
-  free (malloc (4096));
-#endif
 
   int c_flags = GetPriorityClass (hMainProc) /*|
 		CREATE_NEW_PROCESS_GROUP*/;
@@ -376,12 +362,12 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   /* If we don't have a console, then don't create a console for the
      child either.  */
-  HANDLE console_handle = CreateFileA ("CONOUT$", GENERIC_WRITE,
-				       FILE_SHARE_WRITE, &sec_none_nih,
-				       OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-				       NULL);
+  HANDLE console_handle = CreateFile ("CONOUT$", GENERIC_WRITE,
+				      FILE_SHARE_WRITE, &sec_none_nih,
+				      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+				      NULL);
 
-  if (console_handle != INVALID_HANDLE_VALUE && console_handle != 0)
+  if (console_handle != INVALID_HANDLE_VALUE)
     CloseHandle (console_handle);
   else
     c_flags |= DETACHED_PROCESS;
@@ -425,14 +411,14 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     {
       CloseHandle (hParent);
       CloseHandle (subproc_ready);
-      system_printf ("unable to allocate subproc_ready event, %E");
+      system_printf ("unable to allocate forker_finished event, %E");
       return -1;
     }
 
-  ProtectHandle (subproc_ready);
-  ProtectHandle (forker_finished);
+  ProtectHandleINH (subproc_ready);
+  ProtectHandleINH (forker_finished);
 
-  init_child_info (PROC_FORK1, &ch, 1, subproc_ready);
+  init_child_info (PROC_FORK, &ch, 1, subproc_ready);
 
   ch.forker_finished = forker_finished;
 
@@ -440,10 +426,10 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   si.cb = sizeof (STARTUPINFO);
   si.lpReserved2 = (LPBYTE)&ch;
-  si.cbReserved2 = sizeof(ch);
+  si.cbReserved2 = sizeof (ch);
 
   /* Remove impersonation */
-  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.issetuid ())
     RevertToSelf ();
 
   ch.parent = hParent;
@@ -466,15 +452,16 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 #endif
 
   char sa_buf[1024];
+  PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
-  __malloc_lock (_reent_clib ());
+  __malloc_lock ();
   void *newheap;
   newheap = cygheap_setup_for_child (&ch,cygheap->fdtab.need_fixup_before ());
   rc = CreateProcess (myself->progname, /* image to run */
 		      myself->progname, /* what we send in arg0 */
-		      allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
-		      allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
+		      sec_attribs,
+		      sec_attribs,
 		      TRUE,	  /* inherit handles from parent */
 		      c_flags,
 		      NULL,	  /* environment filled in later */
@@ -488,11 +475,10 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     {
       __seterrno ();
       syscall_printf ("CreateProcessA failed, %E");
-      ForceCloseHandle(subproc_ready);
-      ForceCloseHandle(forker_finished);
+      ForceCloseHandle (subproc_ready);
+      ForceCloseHandle (forker_finished);
       /* Restore impersonation */
-      if (cygheap->user.impersonated
-	  && cygheap->user.token != INVALID_HANDLE_VALUE)
+      if (cygheap->user.issetuid ())
 	ImpersonateLoggedOnUser (cygheap->user.token);
       cygheap_setup_for_child_cleanup (newheap, &ch, 0);
       return -1;
@@ -517,10 +503,10 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */
-  strcpy(forked->progname, myself->progname);
+  strcpy (forked->progname, myself->progname);
 
   /* Restore impersonation */
-  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.issetuid ())
     ImpersonateLoggedOnUser (cygheap->user.token);
 
   ProtectHandle (pi.hThread);
@@ -531,7 +517,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   /* Fill in fields in the child's process table entry.  */
   forked->hProcess = pi.hProcess;
   forked->dwProcessId = pi.dwProcessId;
-  forked->copysigs(myself);
+  forked->copysigs (myself);
 
   /* Hopefully, this will succeed.  The alternative to doing things this
      way is to reserve space prior to calling CreateProcess and then fill
@@ -548,7 +534,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   slow_pid_reuse (pi.hProcess);
 
   /* Wait for subproc to initialize itself. */
-  if (!sync_with_child(pi, subproc_ready, TRUE, "waiting for longjmp"))
+  if (!sync_with_child (pi, subproc_ready, TRUE, "waiting for longjmp"))
     goto cleanup;
 
   /* CHILD IS STOPPED */
@@ -568,7 +554,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 		  dll_data_start, dll_data_end,
 		  dll_bss_start, dll_bss_end, NULL);
 
-  __malloc_unlock (_reent_clib ());
+  __malloc_unlock ();
   MALLOC_CHECK;
   if (!rc)
     goto cleanup;
@@ -612,7 +598,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   ForceCloseHandle (forker_finished);
   forker_finished = NULL;
   pi.hThread = NULL;
-  __pthread_atforkparent ();
+  pthread::atforkparent ();
 
   return forked->pid;
 
@@ -698,8 +684,7 @@ get_vfork_val ()
 }
 #endif
 
-extern "C"
-int
+extern "C" int
 vfork ()
 {
 #ifndef NEWVFORK
@@ -722,6 +707,9 @@ vfork ()
       for (pp = (char **)vf->frame, esp = vf->vfork_esp;
 	   esp <= vf->vfork_ebp + 2; pp++, esp++)
 	*pp = *esp;
+      vf->ctty = myself->ctty;
+      vf->sid = myself->sid;
+      vf->pgid = myself->pgid;
       int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
       debug_printf ("%d = vfork()", res);
       return res;
@@ -736,9 +724,13 @@ vfork ()
   thisframe.init (mainthread);
   cygheap->fdtab.vfork_parent_restore ();
 
+  myself->ctty = vf->ctty;
+  myself->sid = vf->sid;
+  myself->pgid = vf->pgid;
+
   if (vf->pid < 0)
     {
-      int exitval = -vf->pid;
+      int exitval = vf->exitval;
       vf->pid = 0;
       if ((vf->pid = fork ()) == 0)
 	exit (exitval);
@@ -746,6 +738,7 @@ vfork ()
 
   int pid = vf->pid;
   vf->pid = 0;
+  debug_printf ("exiting vfork, pid %d", pid);
   sig_dispatch_pending ();
   return pid;
 #endif

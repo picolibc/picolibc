@@ -1,6 +1,6 @@
 /* dcrt0.cc -- essentially the main() for the Cygwin dll
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -17,10 +17,9 @@ details. */
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
-#include "sync.h"
+#include <errno.h>
 #include "sigproc.h"
 #include "pinfo.h"
-#include "heap.h"
 #include "cygerrno.h"
 #define NEED_VFORK
 #include "perprocess.h"
@@ -29,20 +28,19 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "child_info.h"
+#include "child_info_magic.h"
 #include "perthread.h"
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
-#include "cygwin/cygserver_transport.h"
-#include "cygwin/cygserver.h"
+#include "cygthread.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
 #define PREMAIN_LEN (sizeof (user_data->premain) / sizeof (user_data->premain[0]))
 
-HANDLE NO_COPY hMainProc = NULL;
-HANDLE NO_COPY hMainThread = NULL;
+HANDLE NO_COPY hMainProc;
+HANDLE NO_COPY hMainThread;
 
 sigthread NO_COPY mainthread;		// ID of the main thread
 
@@ -74,14 +72,12 @@ ResourceLocks _reslock NO_COPY;
 MTinterface _mtinterf;
 
 bool NO_COPY _cygwin_testing;
+unsigned NO_COPY _cygwin_testing_magic;
+
+char NO_COPY almost_null[1];
 
 extern "C"
 {
-  void *export_malloc (unsigned int);
-  void export_free (void *);
-  void *export_realloc (void *, unsigned int);
-  void *export_calloc (unsigned int, unsigned int);
-
   /* This is an exported copy of environ which can be used by DLLs
      which use cygwin.dll.  */
   char **__cygwin_environ;
@@ -94,12 +90,12 @@ extern "C"
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
    /* dll_major */ CYGWIN_VERSION_DLL_MINOR,
    /* impure_ptr_ptr */ NULL, /* envptr */ NULL,
-   /* malloc */ export_malloc, /* free */ export_free,
-   /* realloc */ export_realloc,
+   /* malloc */ malloc, /* free */ free,
+   /* realloc */ realloc,
    /* fmode_ptr */ NULL, /* main */ NULL, /* ctors */ NULL,
    /* dtors */ NULL, /* data_start */ NULL, /* data_end */ NULL,
    /* bss_start */ NULL, /* bss_end */ NULL,
-   /* calloc */ export_calloc,
+   /* calloc */ calloc,
    /* premain */ {NULL, NULL, NULL, NULL},
    /* run_ctors_p */ 0,
    /* unused */ {0, 0, 0, 0, 0, 0, 0},
@@ -157,10 +153,10 @@ do_global_ctors (void (**in_pfunc)(), int force)
 }
 
 /*
- * Replaces -@file in the command line with the contents of the file.
- * There may be multiple -@file's in a single command line
- * A \-@file is replaced with -@file so that echo \-@foo would print
- * -@foo and not the contents of foo.
+ * Replaces @file in the command line with the contents of the file.
+ * There may be multiple @file's in a single command line
+ * A \@file is replaced with @file so that echo \@foo would print
+ * @foo and not the contents of foo.
  */
 static int __stdcall
 insert_file (char *name, char *&cmd)
@@ -451,13 +447,11 @@ check_sanity_and_sync (per_process *p)
     signal_shift_subtract = 0;
 }
 
-static NO_COPY STARTUPINFO si;
-# define fork_info ((struct child_info_fork *)(si.lpReserved2))
-# define spawn_info ((struct child_info_spawn *)(si.lpReserved2))
-child_info_fork NO_COPY *child_proc_info = NULL;
-static MEMORY_BASIC_INFORMATION sm;
+child_info NO_COPY *child_proc_info = NULL;
+static MEMORY_BASIC_INFORMATION NO_COPY sm;
 
-#define CYGWIN_GUARD ((wincap.has_page_guard ()) ? PAGE_GUARD : PAGE_NOACCESS)
+#define CYGWIN_GUARD ((wincap.has_page_guard ()) ? \
+                     PAGE_EXECUTE_READWRITE|PAGE_GUARD : PAGE_NOACCESS)
 
 // __inline__ void
 extern void
@@ -498,7 +492,7 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
     {
       m.BaseAddress = (LPVOID)((DWORD)m.BaseAddress - 1);
       if (!VirtualAlloc ((LPVOID) m.BaseAddress, 1, MEM_COMMIT,
-			 PAGE_EXECUTE_READWRITE|CYGWIN_GUARD))
+			 CYGWIN_GUARD))
 	api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
 		   m.BaseAddress);
     }
@@ -517,18 +511,13 @@ alloc_stack (child_info_fork *ci)
      fork on Win95, but I don't know exactly why yet. DJ */
   volatile char b[ci->stacksize + 16384];
 
-  if (ci->type == PROC_FORK)
-    ci->stacksize = 0;		// flag to fork not to do any funny business
-  else
-    {
-      if (!VirtualQuery ((LPCVOID) &b, &sm, sizeof sm))
-	api_fatal ("fork: couldn't get stack info, %E");
+  if (!VirtualQuery ((LPCVOID) &b, &sm, sizeof sm))
+    api_fatal ("fork: couldn't get stack info, %E");
 
-      if (sm.AllocationBase != ci->stacktop)
-	alloc_stack_hard_way (ci, b + sizeof (b) - 1);
-      else
-	ci->stacksize = 0;
-    }
+  if (sm.AllocationBase != ci->stacktop)
+    alloc_stack_hard_way (ci, b + sizeof (b) - 1);
+  else
+    ci->stacksize = 0;
 
   return;
 }
@@ -560,11 +549,11 @@ dll_crt0_1 ()
   /* Initialize SIGSEGV handling, etc. */
   init_exceptions (&cygwin_except_entry);
 
-  do_global_ctors (&__CTOR_LIST__, 1);
-
   /* Set the os_being_run global. */
   wincap.init ();
   check_sanity_and_sync (user_data);
+
+  do_global_ctors (&__CTOR_LIST__, 1);
 
   /* Nasty static stuff needed by newlib -- point to a local copy of
      the reent stuff.
@@ -577,11 +566,6 @@ dll_crt0_1 ()
   user_data->resourcelocks->Init ();
   user_data->threadinterface->Init (user_data->forkee);
 
-  threadname_init ();
-  debug_init ();
-  (void) getpagesize ();	/* initialize page size constant */
-
-  regthread ("main", GetCurrentThreadId ());
   mainthread.init ("mainthread"); // For use in determining if signals
 				  //  should be blocked.
 
@@ -590,30 +574,32 @@ dll_crt0_1 ()
 
   if (child_proc_info)
     {
+      bool close_ppid_handle = false;
+      bool close_hexec_proc = false;
       switch (child_proc_info->type)
 	{
-	  case PROC_FORK:
-	  case PROC_FORK1:
-	    cygheap_fixup_in_child (child_proc_info, 0);
+	  case _PROC_FORK:
+	    cygheap_fixup_in_child (0);
 	    alloc_stack (fork_info);
 	    set_myself (mypid);
-	    ProtectHandle (child_proc_info->forker_finished);
+	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    break;
-	  case PROC_SPAWN:
-	    CloseHandle (spawn_info->hexec_proc);
+	  case _PROC_SPAWN:
+	    /* Have to delay closes until after cygheap is setup */
+	    close_hexec_proc = !!spawn_info->hexec_proc;
+	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    goto around;
-	  case PROC_EXEC:
+	  case _PROC_EXEC:
 	    hexec_proc = spawn_info->hexec_proc;
 	  around:
 	    HANDLE h;
-	    cygheap_fixup_in_child (spawn_info, 1);
+	    cygheap_fixup_in_child (1);
 	    if (!spawn_info->moreinfo->myself_pinfo ||
 		!DuplicateHandle (hMainProc, spawn_info->moreinfo->myself_pinfo,
 				  hMainProc, &h, 0, 0,
 				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	      h = NULL;
 	    set_myself (mypid, h);
-	    myself->uid = spawn_info->moreinfo->uid;
 	    __argc = spawn_info->moreinfo->argc;
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
@@ -626,19 +612,26 @@ dll_crt0_1 ()
 		old_title = strcpy (title_buf, spawn_info->moreinfo->old_title);
 		cfree (spawn_info->moreinfo->old_title);
 	      }
-	    if (child_proc_info->subproc_ready)
-	      ProtectHandle (child_proc_info->subproc_ready);
-	    if (myself->uid == USHRT_MAX)
-	      cygheap->user.set_sid (NULL);
 	    break;
 	}
+      if (close_hexec_proc)
+	CloseHandle (spawn_info->hexec_proc);
+      if (close_ppid_handle)
+	CloseHandle (child_proc_info->pppid_handle);
     }
-  ProtectHandle (hMainProc);
-  ProtectHandle (hMainThread);
 
   /* Initialize the cygwin subsystem if this is the first process,
      or attach to shared data structures if it's already running. */
   memory_init ();
+  cygthread::init ();
+
+  ProtectHandle (hMainProc);
+  ProtectHandle (hMainThread);
+
+  /* Initialize debug muto, if DLL is built with --enable-debugging.
+     Need to do this before any helper threads start. */
+  debug_init ();
+
   cygheap->fdtab.vfork_child_fixup ();
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
@@ -684,13 +677,12 @@ dll_crt0_1 ()
   /* Allocate cygheap->fdtab */
   dtable_init ();
 
-/* Initialize uid, gid. */
-  uinfo_init ();
+  /* Initialize uid, gid if necessary. */
+  if (child_proc_info == NULL || spawn_info->moreinfo->uid == ILLEGAL_UID)
+    uinfo_init ();
 
   /* Initialize signal/subprocess handling. */
   sigproc_init ();
-
-  cygserver_init ();
 
   /* Connect to tty. */
   tty_init ();
@@ -714,9 +706,6 @@ dll_crt0_1 ()
 	{
 	  char *new_argv0 = (char *) alloca (MAX_PATH);
 	  cygwin_conv_to_posix_path (__argv[0], new_argv0);
-	  char *p = strchr (new_argv0, '\0') - 4;
-	  if (p > new_argv0 && strcasematch (p, ".exe"))
-	    *p = '\0';
 	  __argv[0] = new_argv0;
 	}
     }
@@ -726,10 +715,19 @@ dll_crt0_1 ()
       user_data->premain[i] (__argc, __argv, user_data);
 
   /* Set up standard fds in file descriptor table. */
-  stdio_init ();
+  cygheap->fdtab.stdio_init ();
 
   /* Set up __progname for getopt error call. */
-  __progname = __argv[0];
+  if (__argv[0] && (__progname = strrchr (__argv[0], '/')))
+    ++__progname;
+  else
+    __progname = __argv[0];
+  if (__progname)
+    {
+      char *cp = strchr (__progname, '\0') - 4;
+      if (cp > __progname && strcasematch (cp, ".exe"))
+	*cp = '\0';
+    }
 
   /* Set new console title if appropriate. */
 
@@ -766,7 +764,7 @@ dll_crt0_1 ()
   /* Flush signals and ensure that signal thread is up and running. Can't
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
-  sig_send (NULL, __SIGFLUSH);
+  wait_for_sigthread ();
 
   set_errno (0);
 
@@ -774,6 +772,59 @@ dll_crt0_1 ()
   cygbench (__progname);
   if (user_data->main)
     exit (user_data->main (__argc, __argv, *user_data->envptr));
+}
+
+#ifdef DEBUGGING
+void
+break_here ()
+{
+  debug_printf ("break here");
+}
+#endif
+
+void
+initial_env ()
+{
+  DWORD len;
+  char buf[MAX_PATH + 1];
+#ifdef DEBUGGING
+  if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
+    {
+      DWORD ms = atoi (buf);
+      buf[0] = '\0';
+      len = GetModuleFileName (NULL, buf, MAX_PATH);
+      console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
+      Sleep (ms);
+    }
+  if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
+    {
+      char buf1[MAX_PATH + 1];
+      len = GetModuleFileName (NULL, buf1, MAX_PATH);
+      strlwr (buf1);
+      strlwr (buf);
+      char *p = strchr (buf, '=');
+      if (!p)
+	p = (char *) "gdb.exe -nw";
+      else
+	*p++ = '\0';
+      if (strstr (buf1, buf))
+	{
+	  error_start_init (p);
+	  try_to_debug ();
+	  break_here ();
+	}
+    }
+#endif
+
+  if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
+    {
+      _cygwin_testing = 1;
+      if ((len = GetModuleFileName (cygwin_hmodule, buf, MAX_PATH))
+	  && len > sizeof ("new-cygwin1.dll")
+	  && strcasematch (buf + len - sizeof ("new-cygwin1.dll"),
+			   "\\new-cygwin1.dll"))
+	_cygwin_testing_magic = 0x10;
+    }
 }
 
 /* Wrap the real one, otherwise gdb gets confused about
@@ -785,19 +836,10 @@ dll_crt0_1 ()
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  char envbuf[8];
-#ifdef DEBUGGING
-  if (GetEnvironmentVariable ("CYGWIN_SLEEP", envbuf, sizeof (envbuf) - 1))
-    {
-      console_printf ("Sleeping %d, pid %u\n", atoi (envbuf), GetCurrentProcessId ());
-      Sleep (atoi (envbuf));
-    }
-#endif
-
-  if (GetEnvironmentVariable ("CYGWIN_TESTING", envbuf, sizeof (envbuf) - 1))
-    _cygwin_testing = 1;
-
+  DECLARE_TLS_STORAGE;
+  initial_env ();
   char zeros[sizeof (fork_info->zero)] = {0};
+  static NO_COPY STARTUPINFO si;
 #ifdef DEBUGGING
   strace.microseconds ();
 #endif
@@ -805,7 +847,7 @@ _dll_crt0 ()
   main_environ = user_data->envptr;
   *main_environ = NULL;
 
-  set_console_handler ();
+  early_stuff_init ();
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
 		       GetCurrentProcess (), &hMainProc, 0, FALSE,
 			DUPLICATE_SAME_ACCESS))
@@ -815,34 +857,47 @@ _dll_crt0 ()
 		   &hMainThread, 0, false, DUPLICATE_SAME_ACCESS);
 
   GetStartupInfo (&si);
-  if (si.cbReserved2 >= EXEC_MAGIC_SIZE &&
-      memcmp (fork_info->zero, zeros, sizeof (zeros)) == 0)
+  child_proc_info = (child_info *) si.lpReserved2;
+  if (si.cbReserved2 < EXEC_MAGIC_SIZE || !child_proc_info
+      || memcmp (child_proc_info->zero, zeros, sizeof (zeros)) != 0)
+    child_proc_info = NULL;
+  else
     {
-      switch (fork_info->type)
+      if ((child_proc_info->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
+	multiple_cygwin_problem ("proc", child_proc_info->intro, 0);
+      else if (child_proc_info->intro == PROC_MAGIC_GENERIC
+	       && child_proc_info->magic != CHILD_INFO_MAGIC)
+	multiple_cygwin_problem ("proc", child_proc_info->magic,
+				 CHILD_INFO_MAGIC);
+      else if (child_proc_info->cygheap != (void *) &_cygheap_start)
+	multiple_cygwin_problem ("cygheap", (DWORD) child_proc_info->cygheap,
+				 (DWORD) &_cygheap_start);
+      unsigned should_be_cb = 0;
+      switch (child_proc_info->type)
 	{
-	  case PROC_FORK:
-	  case PROC_FORK1:
-	    user_data->forkee = fork_info->cygpid;
-	  case PROC_SPAWN:
-	    if (fork_info->pppid_handle)
-	      CloseHandle (fork_info->pppid_handle);
-	  case PROC_EXEC:
-	    {
-	      child_proc_info = fork_info;
-	      cygwin_mount_h = child_proc_info->mount_h;
-	      mypid = child_proc_info->cygpid;
-	      break;
-	    }
+	  case _PROC_FORK:
+	    user_data->forkee = child_proc_info->cygpid;
+	    should_be_cb = sizeof (child_info_fork);
+	    /* fall through */;
+	  case _PROC_SPAWN:
+	  case _PROC_EXEC:
+	    if (!should_be_cb)
+	      should_be_cb = sizeof (child_info);
+	    if (should_be_cb != child_proc_info->cb)
+	      multiple_cygwin_problem ("proc size", child_proc_info->cb, should_be_cb);
+	    else if (sizeof (fhandler_union) != child_proc_info->fhandler_union_cb)
+	      multiple_cygwin_problem ("fhandler size", child_proc_info->fhandler_union_cb, sizeof (fhandler_union));
+	    else
+	      {
+		cygwin_mount_h = child_proc_info->mount_h;
+		mypid = child_proc_info->cygpid;
+		break;
+	      }
 	  default:
-	    if (_cygwin_testing)
-	      fork_info = NULL;
-	    else if ((fork_info->type & PROC_MAGIC_MASK) == PROC_MAGIC_GENERIC)
-	      api_fatal ("\
-You have multiple copies of cygwin1.dll on your system.\n\
-Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
-and delete all but the most recent version.  This will probably be\n\
-the one that resides in x:\\cygwin\\bin, where 'x' is the drive on which\n\
-you have installed the cygwin distribution.\n");
+	    system_printf ("unknown exec type %d", child_proc_info->type);
+	    /* intentionally fall through */
+	  case _PROC_WHOOPS:
+	    child_proc_info = NULL;
 	    break;
 	}
     }
@@ -852,6 +907,7 @@ you have installed the cygwin distribution.\n");
 void
 dll_crt0 (per_process *uptr)
 {
+  DECLARE_TLS_STORAGE;
   /* Set the local copy of the pointer into the user space. */
   if (uptr && uptr != user_data)
     {
@@ -906,10 +962,7 @@ do_exit (int status)
 
   vfork_save *vf = vfork_storage.val ();
   if (vf != NULL && vf->pid < 0)
-    {
-      vf->pid = status < 0 ? status : -status;
-      longjmp (vf->j, 1);
-    }
+    vf->restore_exit (status);
 
   if (exit_state < ES_SIGNAL)
     {
@@ -962,7 +1015,7 @@ do_exit (int status)
 
 	/* CGF FIXME: This can't be right. */
 	  if (tp->getsid () == myself->sid)
-	    kill_pgrp (tp->getpgid (), SIGHUP);
+	    tp->kill_pgrp (SIGHUP);
 	}
 
       tty_terminate ();
@@ -1000,10 +1053,10 @@ __api_fatal (const char *fmt, ...)
      a serious error. */
   if (GetFileType (GetStdHandle (STD_ERROR_HANDLE)) != FILE_TYPE_CHAR)
     {
-      HANDLE h = CreateFileA ("CONOUT$", GENERIC_READ|GENERIC_WRITE,
-			      FILE_SHARE_WRITE | FILE_SHARE_WRITE, &sec_none,
-			      OPEN_EXISTING, 0, 0);
-      if (h)
+      HANDLE h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+			     FILE_SHARE_WRITE | FILE_SHARE_WRITE,
+			     &sec_none, OPEN_EXISTING, 0, 0);
+      if (h != INVALID_HANDLE_VALUE)
 	(void) WriteFile (h, buf, len, &done, 0);
     }
 
@@ -1014,6 +1067,30 @@ __api_fatal (const char *fmt, ...)
   (void) try_to_debug ();
 #endif
   myself->exit (1);
+}
+
+void
+multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned version)
+{
+  if (_cygwin_testing && (strstr (what, "proc") || strstr (what, "cygheap")))
+    {
+      child_proc_info->type = _PROC_WHOOPS;
+      return;
+    }
+
+  char buf[1024];
+  if (GetEnvironmentVariable ("CYGWIN_MISMATCH_OK", buf, sizeof (buf)))
+    return;
+
+  if (CYGWIN_VERSION_MAGIC_VERSION (magic_version) == version)
+    system_printf ("%s magic number mismatch detected - %p/%p", what, magic_version, version);
+  else
+    api_fatal ("%s version mismatch detected - %p/%p.\n\
+You have multiple copies of cygwin1.dll on your system.\n\
+Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
+and delete all but the most recent version.  The most recent version *should*\n\
+reside in x:\\cygwin\\bin, where 'x' is the drive on which you have\n\
+installed the cygwin distribution.", what, magic_version, version);
 }
 
 #ifdef DEBUGGING

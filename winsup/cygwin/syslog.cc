@@ -14,6 +14,7 @@ details. */
 #include <syslog.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <errno.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
@@ -41,11 +42,11 @@ get_win95_event_log_path ()
 /* FIXME: For MT safe code these will need to be replaced */
 
 #ifdef _MT_SAFE
-#define process_ident  _reent_winsup()->_process_ident
-#define process_logopt  _reent_winsup()->_process_logopt
-#define process_facility  _reent_winsup()->_process_facility
+#define process_ident  _reent_winsup ()->_process_ident
+#define process_logopt  _reent_winsup ()->_process_logopt
+#define process_facility  _reent_winsup ()->_process_facility
   /* Default priority logmask */
-#define process_logmask _reent_winsup()->_process_logmask
+#define process_logmask _reent_winsup ()->_process_logmask
 #else
 static char *process_ident = 0;
 static int process_logopt = 0;
@@ -257,13 +258,18 @@ syslog (int priority, const char *message, ...)
     WORD eventType;
     switch (LOG_PRI (priority))
       {
+      case LOG_EMERG:
+      case LOG_ALERT:
+      case LOG_CRIT:
       case LOG_ERR:
 	eventType = EVENTLOG_ERROR_TYPE;
 	break;
       case LOG_WARNING:
 	eventType = EVENTLOG_WARNING_TYPE;
 	break;
+      case LOG_NOTICE:
       case LOG_INFO:
+      case LOG_DEBUG:
 	eventType = EVENTLOG_INFORMATION_TYPE;
 	break;
       default:
@@ -297,7 +303,7 @@ syslog (int priority, const char *message, ...)
 	if (process_logopt & LOG_PID)
 	  {
 	    if (pass.print ("Win32 Process Id = 0x%X : Cygwin Process Id = 0x%X : ",
-			GetCurrentProcessId(),  getpid ()) == -1)
+			GetCurrentProcessId (),  getpid ()) == -1)
 	      return;
 	  }
 
@@ -307,14 +313,29 @@ syslog (int priority, const char *message, ...)
 	       eventlog capability. */
 	    switch (LOG_PRI (priority))
 	      {
+	     case LOG_EMERG:
+	       pass.print ("%s : ", "LOG_EMERG");
+	       break;
+	     case LOG_ALERT:
+	       pass.print ("%s : ", "LOG_ALERT");
+	       break;
+	     case LOG_CRIT:
+	       pass.print ("%s : ", "LOG_CRIT");
+	       break;
 	      case LOG_ERR:
 		pass.print ("%s : ", "LOG_ERR");
 		break;
 	      case LOG_WARNING:
 		pass.print ("%s : ", "LOG_WARNING");
 		break;
+	     case LOG_NOTICE:
+	       pass.print ("%s : ", "LOG_NOTICE");
+	       break;
 	      case LOG_INFO:
 		pass.print ("%s : ", "LOG_INFO");
+	       break;
+	     case LOG_DEBUG:
+	       pass.print ("%s : ", "LOG_DEBUG");
 		break;
 	      default:
 		pass.print ("%s : ", "LOG_ERR");
@@ -368,7 +389,7 @@ syslog (int priority, const char *message, ...)
 	HANDLE fHandle = cygheap->fdtab[fileno (fp)]->get_handle ();
 	if (LockFile (fHandle, 0, 0, 1, 0) == FALSE)
 	  {
-	    debug_printf ("failed to lock file %s", get_win95_event_log_path());
+	    debug_printf ("failed to lock file %s", get_win95_event_log_path ());
 	    fclose (fp);
 	    return;
 	  }
