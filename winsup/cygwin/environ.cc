@@ -448,20 +448,18 @@ codepage_init (const char *buf)
   if (!buf || !*buf)
     return;
 
-  if (strcmp (buf, "oem")== 0)
+  if (strcasematch (buf, "oem"))
     {
       current_codepage = oem_cp;
       set_file_api_mode (current_codepage);
     }
-  else if (strcmp (buf, "ansi")== 0)
+  else if (strcasematch (buf, "ansi"))
     {
       current_codepage = ansi_cp;
       set_file_api_mode (current_codepage);
     }
   else
-    {
-      debug_printf ("Wrong codepage name: %s", buf);
-    }
+    debug_printf ("Wrong codepage name: %s", buf);
 }
 
 static void

@@ -68,15 +68,18 @@ extern "C" DWORD WINAPI GetLastError (void);
 enum codepage_type {ansi_cp, oem_cp};
 extern codepage_type current_codepage;
 
-extern int cygserver_running;
+UINT get_cp ();
+
+int __stdcall sys_wcstombs(char *, const WCHAR *, int)
+  __attribute__ ((regparm(3)));
+
+int __stdcall sys_mbstowcs(WCHAR *, const char *, int)
+  __attribute__ ((regparm(3)));
 
 /* Used to check if Cygwin DLL is dynamically loaded. */
 extern int dynamically_loaded;
 
-#define sys_wcstombs(tgt,src,len) \
-		    WideCharToMultiByte((current_codepage==ansi_cp?CP_ACP:CP_OEMCP),0,(src),-1,(tgt),(len),NULL,NULL)
-#define sys_mbstowcs(tgt,src,len) \
-		    MultiByteToWideChar((current_codepage==ansi_cp?CP_ACP:CP_OEMCP),0,(src),-1,(tgt),(len))
+extern int cygserver_running;
 
 #define TITLESIZE 1024
 

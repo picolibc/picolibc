@@ -1,5 +1,19 @@
 2002-06-26  Christopher Faylor  <cgf@redhat.com>
 
+	* autoload (noload): Avoid clobbering bx register.
+
+	* environ.cc (codepage_init): Use case insensitive match.
+
+	* fhandler_console.cc (cp_get_internal): Delete.
+	(con_to_str): Use get_cp to derive code page.
+	(str_to_con): Ditto.
+	* miscfuncs.cc (get_cp): New function.
+	(sys_wcstombs): New function.  Converted from macro.
+	(sys_mbstowcs): Ditto.
+	* winsup.h: Reflect above changes.
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
 	* winsup.h: Minor cleanup.
 	* path.h (path_conv::[]): New operator.
 	* syscalls.cc (_link): Use path_conv operators rather than methods,
