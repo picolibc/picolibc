@@ -1,3 +1,11 @@
+2002-08-13  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* m68hc11.h (M6812_OP_PAGE): Define to identify call operand.
+	(M68HC12_BANK_VIRT, M68HC12_BANK_MASK, M68HC12_BANK_BASE,
+	M68HC12_BANK_SHIFT, M68HC12_BANK_PAGE_MASK): Define for 68HC12
+	memory banks.
+	(M6811_OC1M5, M6811_OC1M4, M6811_MODF): Fix value.
+
 2002-07-09  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
 
 	* mips.h (INSN_MIPS16): New define.
