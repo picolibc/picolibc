@@ -378,7 +378,7 @@ __CSTD FILE* _wpopen (const wchar_t*, const wchar_t*);
 
 /* C99 names, but non-standard behaviour */
 int	_snwprintf (wchar_t*, __CSTD size_t, const wchar_t*, ...);
-int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VALIST);
+int	_vsnwprintf (wchar_t*, __CSTD size_t, const wchar_t*, __VALIST);
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int snwprintf(wchar_t* s, __CSTD size_t n, const wchar_t*  format, ...);
 extern __inline__ int

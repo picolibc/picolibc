@@ -145,12 +145,12 @@ __CSTD FILE*	_wpopen (const wchar_t*, const wchar_t*);
 #endif	/* __MSVCRT__ */
 
 /* C99 names, but non-standard behaviour */
-int	_snwprintf (wchar_t*, size_t, const wchar_t*, ...);
-int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VALIST);
+int	_snwprintf (wchar_t*, __CSTD size_t, const wchar_t*, ...);
+int	_vsnwprintf (wchar_t*, __CSTD size_t, const wchar_t*, __VALIST);
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
-int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
+int snwprintf(wchar_t* s, __CSTD size_t n, const wchar_t*  format, ...);
 extern __inline__ int
-vsnwprintf (wchar_t* __s, size_t __n, const wchar_t* __format,
+vsnwprintf (wchar_t* __s, __CSTD size_t __n, const wchar_t* __format,
 	    __VALIST __arg)
   { return _vsnwprintf ( __s, __n, __format, __arg);}
 #endif
@@ -197,15 +197,15 @@ wchar_t* _wcsdup (const wchar_t*);
 int	_wcsicmp (const wchar_t*, const wchar_t*);
 int	_wcsicoll (const wchar_t*, const wchar_t*);
 wchar_t* _wcslwr (wchar_t*);
-int	_wcsnicmp (const wchar_t*, const wchar_t*, size_t);
-wchar_t* _wcsnset (wchar_t*, wchar_t, size_t);
+int	_wcsnicmp (const wchar_t*, const wchar_t*, __CSTD size_t);
+wchar_t* _wcsnset (wchar_t*, wchar_t, __CSTD size_t);
 wchar_t* _wcsrev (wchar_t*);
 wchar_t* _wcsset (wchar_t*, wchar_t);
 wchar_t* _wcsupr (wchar_t*);
 
 #ifdef __MSVCRT__
-int  _wcsncoll(const wchar_t*, const wchar_t*, size_t);
-int  _wcsnicoll(const wchar_t*, const wchar_t*, size_t);
+int  _wcsncoll(const wchar_t*, const wchar_t*, __CSTD size_t);
+int  _wcsnicoll(const wchar_t*, const wchar_t*, __CSTD size_t);
 #endif
 
 #ifndef __NO_OLDNAMES
@@ -215,8 +215,8 @@ wchar_t* wcsdup (wchar_t*);
 int	wcsicmp (const wchar_t*, const wchar_t*);
 int	wcsicoll (const wchar_t*, const wchar_t*);
 wchar_t* wcslwr (wchar_t*);
-int	wcsnicmp (const wchar_t*, const wchar_t*, size_t);
-wchar_t* wcsnset (wchar_t*, wchar_t, size_t);
+int	wcsnicmp (const wchar_t*, const wchar_t*, __CSTD size_t);
+wchar_t* wcsnset (wchar_t*, wchar_t, __CSTD size_t);
 wchar_t* wcsrev (wchar_t*);
 wchar_t* wcsset (wchar_t*, wchar_t);
 wchar_t* wcsupr (wchar_t*);

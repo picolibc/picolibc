@@ -1,8 +1,15 @@
+2002-10-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdio.h: Qualify another size_t with __CSTD.
+	* include/stdlib.h: Likewise.
+	* include/wchar.h: Qualify size_t with __CSTD,
+	when in global namespace.
+
 2002-10-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/ctype: Qualify wint_t with __CSTD
+	* include/ctype.h: Qualify wint_t with __CSTD
 	when in global namespace.
-	* include/wctype:Likewise.
+	* include/wctype.h:Likewise.
 	* include/stdio.h: Qualify wint_t and size_t with __CSTD
 	when in global namespace.
 	* include/stdlib.h: Qualify size_t with __CSTD

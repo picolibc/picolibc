@@ -422,7 +422,7 @@ char*	_gcvt (double, int, char*);
 
 void	_makepath (char*, const char*, const char*, const char*, const char*);
 void	_splitpath (const char*, char*, char*, char*, char*);
-char*	_fullpath (char*, const char*, size_t);
+char*	_fullpath (char*, const char*, __CSTD size_t);
 
 
 char*	_itoa (int, char*, int);
