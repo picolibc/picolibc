@@ -1,3 +1,7 @@
+2005-01-06  Hans-Peter Nilsson  <hp@axis.com>
+                                                                                
+        * README: Fix typo of LGPL.  Change "license" to "copyright".
+                                                                                
 2004-12-17  Christian Groessler  <chris@groessler.org>
 
 	* libc/machine/z8k/memcmp.S: New file.
