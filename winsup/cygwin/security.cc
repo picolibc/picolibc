@@ -1194,8 +1194,6 @@ get_file_attribute (int use_ntsec, const char *file,
   if ((*attribute & S_IFLNK) == S_IFLNK)
     *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
-  if (res <= 0)
-    set_errno (ENOSYS);
   return res > 0 ? 0 : -1;
 }
 

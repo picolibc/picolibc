@@ -1,3 +1,7 @@
+Tue May 22 17:58:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (get_file_attribute): Don't set errno.
+
 Mon May 21 15:08:00 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Allow --enable-newvfork to turn NEWVFORK on and off.
