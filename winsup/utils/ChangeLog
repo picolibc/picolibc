@@ -1,3 +1,10 @@
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Display "..." when not-verbose.
+
+	* kill.cc (forcekill): Default to entered pid when pinfo fails.  Issue
+	some warnings when things don't work.
+
 2003-08-17  David Rothenberger  <daveroth@acm.org>
 
 	* dump_setup.cc (check_package_files): Strip leading / and ./ from
