@@ -1,6 +1,6 @@
 /* thread.cc: Locking and threading module functions
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
 
    Originally written by Marco Fuykschot <marco@ddi.nl>
    Substantialy enhanced by Robert Collins <rbtcollins@hotmail.com>

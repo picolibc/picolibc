@@ -463,7 +463,7 @@ utimes (const char *path, const struct timeval *tvp)
      the times of directories.  */
   /* Note: It's documented in MSDN that FILE_WRITE_ATTRIBUTES is
      sufficient to change the timestamps.  Unfortunately it's not
-     sufficient for a remote HPFS which requires GENERIC_WRITE. 
+     sufficient for a remote HPFS which requires GENERIC_WRITE.
      Since we don't trust the weird FS name "??SS", we just try to
      open with GENERIC_WRITE if opening with FILE_WRITE_ATTRIBUTES
      failed.  That should do it, though this fails for R/O files
