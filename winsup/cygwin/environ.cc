@@ -482,6 +482,24 @@ set_chunksize (const char *buf)
   wincap.set_chunksize (strtol (buf, NULL, 0));
 }
 
+static void
+set_ntea (const char *buf)
+{
+  allow_ntea = (buf && strcasematch (buf, "yes") && wincap.has_security ());
+}
+
+static void
+set_ntsec (const char *buf)
+{
+  allow_ntsec = (buf && strcasematch (buf, "yes") && wincap.has_security ());
+}
+
+static void
+set_smbntsec (const char *buf)
+{
+  allow_smbntsec = (buf && strcasematch (buf, "yes") && wincap.has_security ());
+}
+
 /* The structure below is used to set up an array which is used to
    parse the CYGWIN environment variable or, if enabled, options from
    the registry.  */
@@ -516,9 +534,9 @@ static struct parse_thing
   {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
   {"forkchunk", {func: set_chunksize}, isfunc, NULL, {{0}, {0}}},
   {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
-  {"ntea", {&allow_ntea}, justset, NULL, {{false}, {true}}},
-  {"ntsec", {&allow_ntsec}, justset, NULL, {{false}, {true}}},
-  {"smbntsec", {&allow_smbntsec}, justset, NULL, {{false}, {true}}},
+  {"ntea", {func: set_ntea}, isfunc, NULL, {{0}, {s: "yes"}}},
+  {"ntsec", {func: set_ntsec}, isfunc, NULL, {{0}, {s: "yes"}}},
+  {"smbntsec", {func: set_smbntsec}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
   {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
   {"subauth_id", {func: &subauth_id_init}, isfunc, NULL, {{0}, {0}}},

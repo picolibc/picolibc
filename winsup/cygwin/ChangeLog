@@ -1,3 +1,11 @@
+2004-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (set_ntea): New function.
+	(set_ntsec): Ditto.
+	(set_smbntsec): Ditto.
+	(parse_thing): Change ntea, ntsec and smbntsec settings to call
+	appropriate functions.
+
 2004-08-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tape.cc (fhandler_dev_tape::raw_read): Use ?: instead of
