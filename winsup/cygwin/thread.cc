@@ -18,6 +18,7 @@ details. */
 #include "winsup.h"
 #include <limits.h>
 #include <errno.h>
+#include "cygerrno.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <syslog.h>
@@ -26,6 +27,7 @@ details. */
 #include "pinfo.h"
 #include "perprocess.h"
 #include "security.h"
+#include <semaphore.h>
 
 extern int threadsafe;
 
@@ -33,53 +35,12 @@ extern int threadsafe;
 
 #define NOT_IMP(n)  system_printf ("not implemented %s\n", n); return 0;
 
-#define CHECKHANDLE(rval, release) \
-  if (!item->HandleOke ()) \
-    { \
-      if (release) \
-	item->used=false; \
-      return rval; \
-    }
-
-#define GETTHREAD(n) \
-  if (!thread) system_printf ("thread is NULL");\
-  SetResourceLock (LOCK_THREAD_LIST, READ_LOCK, n);\
-  ThreadItem *item=user_data->threadinterface->GetThread (thread); \
-  ReleaseResourceLock (LOCK_THREAD_LIST, READ_LOCK, n); \
-  if (!item) return EINVAL; \
-  CHECKHANDLE (EINVAL, 0);
-
-#define GETMUTEX(n) \
-  SetResourceLock (LOCK_MUTEX_LIST, READ_LOCK, n); \
-  MutexItem* item=user_data->threadinterface->GetMutex (mutex); \
-  ReleaseResourceLock (LOCK_MUTEX_LIST, READ_LOCK, n); \
-  if (!item) return EINVAL;  \
-  CHECKHANDLE (EINVAL, 0);
-
-#define GETSEMA(n) \
-  SetResourceLock (LOCK_SEM_LIST, READ_LOCK, n); \
-  SemaphoreItem* item=user_data->threadinterface->GetSemaphore (sem); \
-  ReleaseResourceLock (LOCK_SEM_LIST, READ_LOCK, n); \
-  if (!item) return EINVAL; \
-  CHECKHANDLE (EINVAL, 0);
-
-#define GETCOND(n) \
-  SetResourceLock (LOCK_COND_LIST, READ_LOCK, n); \
-  CondItem *item=user_data->threadinterface->GetCond (cond); \
-  ReleaseResourceLock (LOCK_COND_LIST, READ_LOCK, n); \
-  if (!item) return EINVAL; \
-  CHECKHANDLE (EINVAL, 0);
-
-#define CHECKITEM(rn, rm, fn) \
-  if (!item) { \
-    ReleaseResourceLock (rn, rm, fn); \
-    return EINVAL;  }; \
-
 struct _reent *
 _reent_clib ()
 {
   int tmp = GetLastError ();
-  struct __reent_t *_r = (struct __reent_t *) TlsGetValue (MT_INTERFACE->reent_index);
+  struct __reent_t *_r =
+    (struct __reent_t *) TlsGetValue (MT_INTERFACE->reent_index);
 
 #ifdef _CYG_THREAD_FAILSAFE
   if (_r == 0)
@@ -111,8 +72,9 @@ ResourceLocks::Lock (int _resid)
   if (!inited)
     system_printf ("lock called before initialization");
 
-  thread_printf ("Get Resource lock %d ==> %p for %p , real : %d , threadid %d ",
-		 _resid, &lock, user_data, myself->pid, GetCurrentThreadId ());
+  thread_printf
+    ("Get Resource lock %d ==> %p for %p , real : %d , threadid %d ", _resid,
+     &lock, user_data, myself->pid, GetCurrentThreadId ());
 #endif
   return &lock;
 }
@@ -136,7 +98,8 @@ void
 ReleaseResourceLock (int _res_id, int _mode, const char *_function)
 {
 #ifdef _CYG_THREAD_FAILSAFE
-  thread_printf ("Release resource lock %d mode %d for %s done", _res_id, _mode, _function);
+  thread_printf ("Release resource lock %d mode %d for %s done", _res_id,
+		 _mode, _function);
 
   AssertResourceOwner (_res_id, _mode);
   user_data->resourcelocks->count--;
@@ -152,9 +115,10 @@ void
 AssertResourceOwner (int _res_id, int _mode)
 {
 
-  thread_printf ("Assert Resource lock %d ==> for %p , real : %d , threadid %d count %d owner %d",
-		 _res_id, user_data, myself->pid, GetCurrentThreadId (),
-		 user_data->resourcelocks->count, user_data->resourcelocks->owner);
+  thread_printf
+    ("Assert Resource lock %d ==> for %p , real : %d , threadid %d count %d owner %d",
+     _res_id, user_data, myself->pid, GetCurrentThreadId (),
+     user_data->resourcelocks->count, user_data->resourcelocks->owner);
   if (user_data && (user_data->resourcelocks->owner != GetCurrentThreadId ()))
     system_printf ("assertion failed, not the resource owner");
 }
@@ -184,77 +148,6 @@ ResourceLocks::Delete ()
       DeleteCriticalSection (&lock);
       inited = false;
     }
-}
-
-// Thread interface
-
-void
-MTinterface::ReleaseItem (MTitem * _item)
-{
-  _item->used = false;
-}
-
-MTitem *
-MTinterface::Find (void *_value, int (*comp) (void *, void *), register int &_index, MTList * _list)
-{
-  register MTitem *current = NULL;
-  for (; _index < _list->index; _index++)
-    {
-      current = _list->items[_index];
-      if (current->used && comp (current, _value))
-	break;
-      current = NULL;
-    }
-  return current;
-}
-
-int
-MTinterface::Find (MTitem & _item, MTList * _list)
-{
-  register MTitem *current;
-  register int _index = 0;
-  for (; _index < _list->index; _index++)
-    {
-      current = _list->items[_index];
-      if (current->used && current == &_item)
-	break;
-    }
-  return (_index == _list->index ? -1 : _index);
-}
-
-int
-MTinterface::FindNextUnused (MTList * _list)
-{
-  register int i = 0;
-  for (; i < _list->index && _list->items[i] != NULL && _list->items[i]->used && _list->items[i]->joinable != 'Y';  i++)
-    continue;
-  return i;
-}
-
-MTitem *
-MTinterface::GetItem (int _index, MTList * _list)
-{
-  return (_index < _list->index ? _list->items[_index] : NULL);
-}
-
-MTitem *
-MTinterface::SetItem (int _index, MTitem * _item, MTList * _list)
-{
-  if (_index == _list->index && _list->index < MT_MAX_ITEMS)
-    _list->index++;
-  return (_index < _list->index ? _list->items[_index] = _item : NULL);
-}
-
-int
-CmpPthreadObj (void *_i, void *_value)
-{
-  return ((MTitem *) _i)->Id () == *(int *) _value;
-}
-
-int
-CmpThreadId (void *_i, void *_id)
-{
-  return ((ThreadItem *) _i)->thread_id == * (DWORD *) _id;
 }
 
 void
@@ -288,17 +181,24 @@ MTinterface::Init (int forked)
   TlsSetValue (reent_index, &reents);
   // the static reent_data will be used in the main thread
 
+
+  if (!indexallocated)
+    {
+      indexallocated = (-1);
+      thread_self_dwTlsIndex = TlsAlloc ();
+      if (thread_self_dwTlsIndex == TLS_OUT_OF_INDEXES)
+	system_printf
+	  ("local storage for thread couldn't be set\nThis means that we are not thread safe!\n");
+    }
+
   if (forked)
     return;
 
-  // create entry for main thread
 
-  ThreadItem *item = (ThreadItem *) GetItem (0, &threadlist);
-
-  item = (ThreadItem *) SetItem (0, &mainthread, &threadlist);
-  item->used = true;
-  item->win32_obj_id = myself->hProcess;
-  item->thread_id = GetCurrentThreadId ();
+  mainthread.win32_obj_id = myself->hProcess;
+  mainthread.setThreadIdtoCurrent ();
+  /* store the main thread's self pointer */
+  TlsSetValue (thread_self_dwTlsIndex, &mainthread);
 #if 0
   item->function = NULL;
 
@@ -308,245 +208,264 @@ MTinterface::Init (int forked)
 #endif
 }
 
-ThreadItem *
-MTinterface::CreateThread (pthread_t * t, TFD (func), void *arg, pthread_attr_t a)
+pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0)
 {
-  AssertResourceOwner (LOCK_THREAD_LIST, WRITE_LOCK | READ_LOCK);
-
-  int i = FindNextUnused (&threadlist);
-
-  ThreadItem *item = (ThreadItem *) GetItem (i, &threadlist);
-  if (!item)
-    item = (ThreadItem *) SetItem (i, new ThreadItem (), &threadlist);
-  if (!item)
-    system_printf ("thread creation failed");
-
-  item->used = true;
-  item->function = func;
-  item->arg = arg;
-  item->attr = a;
-
-  item->win32_obj_id = ::CreateThread (&sec_none_nih, item->attr.stacksize,
-   (LPTHREAD_START_ROUTINE) thread_init_wrapper, item, 0, &item->thread_id);
-
-  CHECKHANDLE (NULL, 1);
-
-  *t = (pthread_t) item->win32_obj_id;
-
-  return item;
 }
 
-MutexItem *
-MTinterface::CreateMutex (pthread_mutex_t * mutex)
+pthread::~pthread ()
 {
-  AssertResourceOwner (LOCK_MUTEX_LIST, WRITE_LOCK | READ_LOCK);
-
-  int i = FindNextUnused (&mutexlist);
-
-  MutexItem *item = (MutexItem *) GetItem (i, &mutexlist);
-  if (!item)
-    item = (MutexItem *) SetItem (i, new MutexItem (), &mutexlist);
-  if (!item)
-    system_printf ("mutex creation failed");
-  item->used = true;
-
-  item->win32_obj_id = ::CreateMutex (&sec_none_nih, false, NULL);
-
-  CHECKHANDLE (NULL, 1);
-
-  *mutex = (pthread_mutex_t) item->win32_obj_id;
-
-  return item;
+  if (win32_obj_id)
+    CloseHandle (win32_obj_id);
 }
 
-ThreadItem *
-MTinterface::GetCallingThread ()
+
+void
+pthread::create (void *(*func) (void *), pthread_attr * newattr,
+		 void *threadarg)
 {
-  AssertResourceOwner (LOCK_THREAD_LIST, READ_LOCK);
-  DWORD id = GetCurrentThreadId ();
-  int index = 0;
-  return (ThreadItem *) Find (&id, &CmpThreadId, index, &threadlist);
+  /* already running ? */
+  if (win32_obj_id)
+    return;
+
+  if (newattr)
+    {
+      attr.joinable = newattr->joinable;
+      attr.stacksize = newattr->stacksize;
+    }
+  function = func;
+  arg = threadarg;
+
+  win32_obj_id =::CreateThread (&sec_none_nih, attr.stacksize,
+				(LPTHREAD_START_ROUTINE) thread_init_wrapper,
+				this, CREATE_SUSPENDED, &thread_id);
+
+  if (!win32_obj_id)
+    magic = 0;
+  else
+    ResumeThread (win32_obj_id);
 }
 
-ThreadItem *
-MTinterface::GetThread (pthread_t * _t)
+pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
+joinable (PTHREAD_CREATE_JOINABLE), stacksize (0)
 {
-  AssertResourceOwner (LOCK_THREAD_LIST, READ_LOCK);
-  int index = 0;
-  return (ThreadItem *) Find (_t, &CmpPthreadObj, index, &threadlist);
 }
 
-MutexItem *
-MTinterface::GetMutex (pthread_mutex_t * mp)
+pthread_attr::~pthread_attr ()
 {
-  AssertResourceOwner (LOCK_MUTEX_LIST, READ_LOCK);
-  int index = 0;
-  return (MutexItem *) Find (mp, &CmpPthreadObj, index, &mutexlist);
 }
 
-SemaphoreItem *
-MTinterface::GetSemaphore (sem_t * sp)
+pthread_condattr::pthread_condattr ():verifyable_object 
+(PTHREAD_CONDATTR_MAGIC), shared (PTHREAD_PROCESS_PRIVATE)
 {
-  AssertResourceOwner (LOCK_SEM_LIST, READ_LOCK);
-  int index = 0;
-  return (SemaphoreItem *) Find (sp, &CmpPthreadObj, index, &semalist);
 }
 
-CondItem *
-MTinterface::GetCond (pthread_cond_t * mp)
+pthread_condattr::~pthread_condattr ()
 {
-  AssertResourceOwner (LOCK_COND_LIST, READ_LOCK);
-  int index = 0;
-  return (CondItem *) Find (mp, &CmpPthreadObj, index, &condlist);
+}
+
+pthread_cond::pthread_cond (pthread_condattr * attr):verifyable_object (PTHREAD_COND_MAGIC)
+{
+  this->shared = attr ? attr->shared : PTHREAD_PROCESS_PRIVATE;
+  this->mutex = NULL;
+  this->waiting = 0;
+
+  this->win32_obj_id =::CreateEvent (&sec_none_nih, 
+	false,	/* auto signal reset - which I think is pthreads like ? */
+	false,	/* start non signaled */
+	NULL /* no name */ );
+
+  if (!this->win32_obj_id)
+    magic = 0;
+}
+
+pthread_cond::~pthread_cond ()
+{
+  if (win32_obj_id)
+    CloseHandle (win32_obj_id);
 }
 
 void
-MTitem::Destroy ()
+pthread_cond::BroadCast ()
 {
-  CloseHandle (win32_obj_id);
+  if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
+    return;
+  PulseEvent (win32_obj_id);
+  while (InterlockedDecrement (&waiting) != 0)
+    PulseEvent (win32_obj_id);
+  mutex = NULL;
+}
+
+void
+pthread_cond::Signal ()
+{
+  if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
+    return;
+  PulseEvent (win32_obj_id);
 }
 
 int
-MutexItem::Lock ()
+pthread_cond::TimedWait (DWORD dwMilliseconds)
+{
+  DWORD rv =
+    SignalObjectAndWait (mutex->win32_obj_id, win32_obj_id, dwMilliseconds,
+			 false);
+  switch (rv)
+    {
+    case WAIT_FAILED:
+      return 0;		/* POSIX doesn't allow errors after we modify the mutex state */
+    case WAIT_ABANDONED:
+      return ETIMEDOUT;
+    case WAIT_OBJECT_0:
+      return 0;		/* we have been signaled */
+    default:
+      return 0;
+    }
+}
+
+pthread_key::pthread_key ():verifyable_object (PTHREAD_KEY_MAGIC)
+{
+  dwTlsIndex = TlsAlloc ();
+  if (dwTlsIndex == TLS_OUT_OF_INDEXES)
+    magic = 0;
+}
+
+pthread_key::~pthread_key ()
+{
+/* FIXME: New feature completeness.
+ * bracketed code is to called when the thread exists, not when delete is called
+ * if (destructor && TlsGetValue(dwTlsIndex))
+ *   destructor (TlsGetValue(dwTlsIndex));
+ */
+  TlsFree (dwTlsIndex);
+};
+
+int
+pthread_key::set (const void *value)
+{
+  /* the OS function doesn't perform error checking */
+  TlsSetValue (dwTlsIndex, (void *) value);
+  return 0;
+}
+
+void *
+pthread_key::get ()
+{
+  set_errno (0);
+  return TlsGetValue (dwTlsIndex);
+}
+
+pthread_mutex::pthread_mutex (pthread_mutexattr * attr):verifyable_object (PTHREAD_MUTEX_MAGIC)
+{
+  this->win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
+  if (!this->win32_obj_id)
+    magic = 0;
+  condwaits = 0;
+};
+
+pthread_mutex::~pthread_mutex ()
+{
+  if (win32_obj_id)
+    CloseHandle (win32_obj_id);
+}
+
+int
+pthread_mutex::Lock ()
 {
   return WaitForSingleObject (win32_obj_id, INFINITE);
 }
 
 int
-MutexItem::TryLock ()
+pthread_mutex::TryLock ()
 {
   return WaitForSingleObject (win32_obj_id, 0);
 }
 
 int
-MutexItem::UnLock ()
+pthread_mutex::UnLock ()
 {
   return ReleaseMutex (win32_obj_id);
 }
 
-SemaphoreItem *
-MTinterface::CreateSemaphore (sem_t * _s, int pshared, int _v)
+semaphore::semaphore (int pshared, unsigned int value):verifyable_object (SEM_MAGIC)
 {
-  AssertResourceOwner (LOCK_SEM_LIST, WRITE_LOCK | READ_LOCK);
-
-  int i = FindNextUnused (&semalist);
-
-  SemaphoreItem *item = (SemaphoreItem *) GetItem (i, &semalist);
-  if (!item)
-    item = (SemaphoreItem *) SetItem (i, new SemaphoreItem (), &semalist);
-  if (!item)
-    system_printf ("semaphore creation failed");
-  item->used = true;
-  item->shared = pshared;
-
-  item->win32_obj_id = ::CreateSemaphore (&sec_none_nih, _v, LONG_MAX, NULL);
-
-  CHECKHANDLE (NULL, 1);
-
-  *_s = (sem_t) item->win32_obj_id;
-
-  return item;
+  this->win32_obj_id =::CreateSemaphore (&sec_none_nih, value, LONG_MAX,
+					 NULL);
+  if (!this->win32_obj_id)
+    magic = 0;
+  this->shared = pshared;
 }
 
-int
-SemaphoreItem::Wait ()
+semaphore::~semaphore ()
 {
-  return WaitForSingleObject (win32_obj_id, INFINITE);
+  if (win32_obj_id)
+    CloseHandle (win32_obj_id);
 }
 
-int
-SemaphoreItem::Post ()
+void
+semaphore::Post ()
 {
   long pc;
-  return ReleaseSemaphore (win32_obj_id, 1, &pc);
+  ReleaseSemaphore (win32_obj_id, 1, &pc);
 }
 
 int
-SemaphoreItem::TryWait ()
+semaphore::TryWait ()
 {
-  return WaitForSingleObject (win32_obj_id, 0);
-}
-
-/* Condition Items */
-CondItem *
-MTinterface::CreateCond (pthread_cond_t * cond, const pthread_condattr_t * attr)
-{
-  AssertResourceOwner (LOCK_COND_LIST, WRITE_LOCK | READ_LOCK);
-
-  int i = FindNextUnused (&condlist);
-
-  CondItem *item = (CondItem *) GetItem (i, &condlist);
-  if (!item)
-    item = (CondItem *) SetItem (i, new CondItem (), &condlist);
-  if (!item)
-    system_printf ("cond creation failed");
-  item->used = true;
-  item->shared = attr ? attr->shared: PTHREAD_PROCESS_PRIVATE;
-  item->mutexitem=NULL;
-  item->waiting=0;
-
-  item->win32_obj_id = ::CreateEvent (&sec_none_nih,
-	false, /* auto signal reset - which I think is pthreads like ? */
-	false, /* start non signaled */
-	NULL /* no name */);
-
-  CHECKHANDLE (NULL, 1);
-
-  *cond = (pthread_cond_t) item->win32_obj_id;
-
-  return item;
-}
-
-
-int
-CondItem::Signal ()
-{
-  return !PulseEvent (win32_obj_id);
-}
-
-int
-CondItem::Wait ()
-{
-  DWORD rv = SignalObjectAndWait (mutexitem->win32_obj_id, win32_obj_id, INFINITE, false);
-  switch (rv) {
-    case WAIT_FAILED: return 0; /* POSIX doesn't allow errors after we modify the mutex state */
-    case WAIT_OBJECT_0: return 0; /* we have been signaled */
-    default: return 0;
-  }
-}
-
-int
-CondItem::TimedWait (DWORD dwMilliseconds)
-{
-  DWORD rv = SignalObjectAndWait (mutexitem->win32_obj_id, win32_obj_id, dwMilliseconds, false);
-  switch (rv) {
-    case WAIT_FAILED: return 0; /* POSIX doesn't allow errors after we modify the mutex state */
-    case WAIT_ABANDONED: return ETIMEDOUT;
-    case WAIT_OBJECT_0: return 0; /* we have been signaled */
-    default: return 0;
-  }
-}
-
-int
-CondItem::BroadCast ()
-{
-  if (!mutexitem)
+  /* FIXME: signals should be able to interrupt semaphores...
+   * We probably need WaitForMultipleObjects here.
+   */
+  if (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT)
+    return EAGAIN;
+  else
     return 0;
-  PulseEvent (win32_obj_id);
-  while (InterlockedDecrement (&waiting)!=0)
-    PulseEvent (win32_obj_id);
-  mutexitem=NULL;
+}
+
+void
+semaphore::Wait ()
+{
+  WaitForSingleObject (win32_obj_id, INFINITE);
+}
+
+verifyable_object::verifyable_object (long verifyer):
+magic (verifyer)
+{
+}
+
+verifyable_object::~verifyable_object ()
+{
+  magic = 0;
+}
+
+/* Generic memory acccess routine - where should it live ? */
+int __stdcall
+check_valid_pointer (void *pointer)
+{
+  MEMORY_BASIC_INFORMATION m;
+  if (!pointer || !VirtualQuery (pointer, &m, sizeof (m))
+      || (m.State != MEM_COMMIT))
+    return EFAULT;
   return 0;
 }
 
-/*  Pthreads */
+int
+verifyable_object_isvalid (verifyable_object * object, long magic)
+{
+  if (!object)
+    return 0;
+  if (check_valid_pointer (object))
+    return 0;
+  if (object->magic != magic)
+    return 0;
+  return -1;
+}
 
+/*  Pthreads */
 void *
 thread_init_wrapper (void *_arg)
 {
   // Setup the local/global storage of this thread
 
-  ThreadItem *thread = (ThreadItem *) _arg;
+  pthread *thread = (pthread *) _arg;
   struct __reent_t local_reent;
   struct _winsup_t local_winsup;
   struct _reent local_clib;
@@ -573,106 +492,144 @@ thread_init_wrapper (void *_arg)
 
   local_winsup._process_logmask = LOG_UPTO (LOG_DEBUG);
 
+  /* This is not checked by the OS !! */
   if (!TlsSetValue (MT_INTERFACE->reent_index, &local_reent))
     system_printf ("local storage for thread couldn't be set");
+
+  /* the OS doesn't check this for <=64 Tls entries (pre win2k) */
+  TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thread);
 
 #ifdef _CYG_THREAD_FAILSAFE
   if (_REENT == _impure_ptr)
     system_printf ("local storage for thread isn't setup correctly");
 #endif
 
-  thread_printf ("started thread %p %p %p %p %p %p", _arg, &local_clib, _impure_ptr, thread, thread->function, thread->arg);
+  thread_printf ("started thread %p %p %p %p %p %p", _arg, &local_clib,
+		 _impure_ptr, thread, thread->function, thread->arg);
 
   // call the user's thread
   void *ret = thread->function (thread->arg);
 
-  // FIXME : cleanup code
+  __pthread_exit (ret);
 
-  //  thread->used = false;	// release thread entry
-    thread->return_ptr = ret;
-  ExitThread (0);
+#if 0
+// ??? This code only runs if the thread exits by returning.
+// it's all now in __pthread_exit();
+#endif
+  /* never reached */
+  return 0;
 }
 
 int
-__pthread_create (pthread_t * thread, const pthread_attr_t * attr, TFD (start_routine), void *arg)
+__pthread_create (pthread_t * thread, const pthread_attr_t * attr,
+		  void *(*start_routine) (void *), void *arg)
 {
-  SetResourceLock (LOCK_THREAD_LIST, WRITE_LOCK | READ_LOCK, "__pthread_create");
+  if (attr && !verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
 
-  pthread_attr_t a;
-  ThreadItem *item;
-
-  if (attr)
-    item = MT_INTERFACE->CreateThread (thread, start_routine, arg, *attr);
-  else
+  *thread = new pthread ();
+  (*thread)->create (start_routine, attr ? *attr : NULL, arg);
+  if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
     {
-      __pthread_attr_init (&a);
-      item = MT_INTERFACE->CreateThread (thread, start_routine, arg, a);
+      delete (*thread);
+      *thread = NULL;
+      return EAGAIN;
     }
 
-  CHECKITEM (LOCK_THREAD_LIST, WRITE_LOCK | READ_LOCK, "__pthread_create")
-
-  ReleaseResourceLock (LOCK_THREAD_LIST, WRITE_LOCK | READ_LOCK, "__pthread_create");
   return 0;
 }
 
 int
 __pthread_attr_init (pthread_attr_t * attr)
 {
-  attr->stacksize = 0;
+  *attr = new pthread_attr;
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    {
+      delete (*attr);
+      *attr = NULL;
+      return EAGAIN;
+    }
+  return 0;
+}
+
+int
+__pthread_attr_setdetachstate (pthread_attr_t * attr, int detachstate)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  if (detachstate < 0 || detachstate > 1)
+    return EINVAL;
+  (*attr)->joinable = detachstate;
+  return 0;
+}
+
+int
+__pthread_attr_getdetachstate (const pthread_attr_t * attr, int *detachstate)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  *detachstate = (*attr)->joinable;
   return 0;
 }
 
 int
 __pthread_attr_setstacksize (pthread_attr_t * attr, size_t size)
 {
-  attr->stacksize = size;
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  (*attr)->stacksize = size;
   return 0;
 }
 
 int
 __pthread_attr_getstacksize (pthread_attr_t * attr, size_t * size)
 {
-  *size = attr->stacksize;
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  *size = (*attr)->stacksize;
   return 0;
 }
 
 int
-__pthread_attr_destroy (pthread_attr_t * /*attr*/)
+__pthread_attr_destroy (pthread_attr_t * attr)
 {
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  delete (*attr);
+  *attr = NULL;
   return 0;
 }
 
-int
+void
 __pthread_exit (void *value_ptr)
 {
-  ThreadItem *item = MT_INTERFACE->GetCallingThread ();
-  item->return_ptr = value_ptr;
+  class pthread *thread = __pthread_self ();
+
+// FIXME: run the destructors of thread_key items here
+
+  thread->return_ptr = value_ptr;
   ExitThread (0);
-  return 0;
 }
 
 int
 __pthread_join (pthread_t * thread, void **return_val)
 {
-  ThreadItem *item=user_data->threadinterface->GetThread (thread);
+  if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
+    return ESRCH;
 
-
-  if (!item)
-     return ESRCH;
-
-  if (item->joinable == 'N')
-  {
-     if (return_val)
+  if ((*thread)->joinable == PTHREAD_CREATE_DETACHED)
+    {
+      if (return_val)
 	*return_val = NULL;
-     return EINVAL;
-  }
+      return EINVAL;
+    }
   else
-  {
-     item->joinable = 'N';
-     WaitForSingleObject ((HANDLE)*thread, INFINITE);
-     if (return_val)
-	*return_val = item->return_ptr;
-  }/* End if*/
+    {
+      (*thread)->joinable = PTHREAD_CREATE_DETACHED;
+      WaitForSingleObject ((*thread)->win32_obj_id, INFINITE);
+      if (return_val)
+	*return_val = (*thread)->return_ptr;
+    }				/* End if */
 
   return 0;
 }
@@ -680,32 +637,30 @@ __pthread_join (pthread_t * thread, void **return_val)
 int
 __pthread_detach (pthread_t * thread)
 {
-  ThreadItem *item=user_data->threadinterface->GetThread (thread);
-  if (!item)
-     return ESRCH;
+  if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
+    return ESRCH;
 
-  if (item->joinable == 'N')
-  {
-     item->return_ptr = NULL;
-     return EINVAL;
-  }
+  if ((*thread)->joinable == PTHREAD_CREATE_DETACHED)
+    {
+      (*thread)->return_ptr = NULL;
+      return EINVAL;
+    }
 
-  item->joinable = 'N';
+  (*thread)->joinable = PTHREAD_CREATE_DETACHED;
   return 0;
 }
 
 int
 __pthread_suspend (pthread_t * thread)
 {
-  ThreadItem *item=user_data->threadinterface->GetThread (thread);
-  if (!item)
-     return ESRCH;
+  if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
+    return ESRCH;
 
-  if (item->suspended == false)
-  {
-     item->suspended = true;
-     SuspendThread ((HANDLE)*thread);
-  }
+  if ((*thread)->suspended == false)
+    {
+      (*thread)->suspended = true;
+      SuspendThread ((*thread)->win32_obj_id);
+    }
 
   return 0;
 }
@@ -714,13 +669,12 @@ __pthread_suspend (pthread_t * thread)
 int
 __pthread_continue (pthread_t * thread)
 {
-  ThreadItem *item=user_data->threadinterface->GetThread (thread);
-  if (!item)
-     return ESRCH;
+  if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
+    return ESRCH;
 
-  if (item->suspended == true)
-	ResumeThread ((HANDLE)*thread);
-  item->suspended = false;
+  if ((*thread)->suspended == true)
+    ResumeThread ((*thread)->win32_obj_id);
+  (*thread)->suspended = false;
 
   return 0;
 }
@@ -728,139 +682,172 @@ __pthread_continue (pthread_t * thread)
 unsigned long
 __pthread_getsequence_np (pthread_t * thread)
 {
-  GETTHREAD ("__pthread_getsequence_np");
-  return item->GetThreadId ();
+  if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
+    return EINVAL;
+  return (*thread)->GetThreadId ();
 }
 
 /* Thread SpecificData */
 int
-__pthread_key_create (pthread_key_t */*key*/)
+__pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
 {
-  NOT_IMP ("_p_key_create\n");
+  /* The opengroup docs don't define if we should check this or not,
+   * but creation is relatively rare.. 
+   */
+  if (verifyable_object_isvalid (*key, PTHREAD_KEY_MAGIC))
+    return EBUSY;
+
+  *key = new pthread_key ();
+
+  if (!verifyable_object_isvalid (*key, PTHREAD_KEY_MAGIC))
+    {
+      delete (*key);
+      *key = NULL;
+      return EAGAIN;
+    }
+  return 0;
 }
 
 int
-__pthread_key_delete (pthread_key_t */*key*/)
+__pthread_key_delete (pthread_key_t * key)
 {
-  NOT_IMP ("_p_key_delete\n");
+  if (!verifyable_object_isvalid (*key, PTHREAD_KEY_MAGIC))
+    return EINVAL;
+
+  delete (*key);
+  return 0;
 }
+
+
 int
-__pthread_setspecific (pthread_key_t */*key*/, const void */*value*/)
+__pthread_setspecific (pthread_key_t key, const void *value)
 {
-  NOT_IMP ("_p_key_setsp\n");
+  if (!verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC))
+    return EINVAL;
+  (key)->set (value);
+  return 0;
 }
+
 void *
-__pthread_getspecific (pthread_key_t */*key*/)
+__pthread_getspecific (pthread_key_t key)
 {
-  NOT_IMP ("_p_key_getsp\n");
+  if (!verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC))
+    return NULL;
+
+  return (key)->get ();
+
 }
 
 /* Thread synchronisation */
 
 int
-__pthread_cond_destroy (pthread_cond_t *cond)
+__pthread_cond_destroy (pthread_cond_t * cond)
 {
-  SetResourceLock (LOCK_COND_LIST, READ_LOCK | WRITE_LOCK, "__pthread_cond_destroy");
-
-  CondItem *item = MT_INTERFACE->GetCond (cond);
-
-  CHECKITEM (LOCK_COND_LIST, WRITE_LOCK | READ_LOCK, "__pthread_cond_init");
-
-  item->Destroy ();
-
-  MT_INTERFACE->ReleaseItem (item);
-
-  ReleaseResourceLock (LOCK_COND_LIST, READ_LOCK | WRITE_LOCK, "__pthread_cond_destroy")
-;
-  return 0;
-}
-
-int
-__pthread_cond_init (pthread_cond_t *cond, const pthread_condattr_t *attr)
-{
-  if (attr && (attr->valid != 0xf341))
+  if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
     return EINVAL;
-  SetResourceLock (LOCK_COND_LIST, WRITE_LOCK | READ_LOCK, "__pthread_cond_init");
 
-  CondItem *item = MT_INTERFACE->CreateCond (cond, attr);
+  /* reads are atomic */
+  if ((*cond)->waiting)
+    return EBUSY;
 
-  CHECKITEM (LOCK_COND_LIST, WRITE_LOCK | READ_LOCK, "__pthread_cond_init");
+  delete (*cond);
+  *cond = NULL;
 
-  ReleaseResourceLock (LOCK_COND_LIST, WRITE_LOCK | READ_LOCK, "__pthread_cond_init");
   return 0;
-
 }
 
 int
-__pthread_cond_broadcast (pthread_cond_t *cond)
+__pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
 {
-  GETCOND("_pthread_cond_lock");
+  if (attr && !verifyable_object_isvalid (*attr, PTHREAD_CONDATTR_MAGIC))
+    return EINVAL;
 
-  item->BroadCast ();
+  if (verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
+    return EBUSY;
+
+  *cond = new pthread_cond (attr ? (*attr) : NULL);
+
+  if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
+    {
+      delete (*cond);
+      *cond = NULL;
+      return EAGAIN;
+    }
 
   return 0;
 }
 
 int
-__pthread_cond_signal (pthread_cond_t *cond)
+__pthread_cond_broadcast (pthread_cond_t * cond)
 {
-  GETCOND("_pthread_cond_lock");
+  if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
+    return EINVAL;
 
-  item->Signal ();
+  (*cond)->BroadCast ();
 
   return 0;
 }
 
 int
-__pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime)
+__pthread_cond_signal (pthread_cond_t * cond)
+{
+  if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
+    return EINVAL;
+
+  (*cond)->Signal ();
+
+  return 0;
+}
+
+int
+__pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
+			  const struct timespec *abstime)
 {
   int rv;
   if (!abstime)
     return EINVAL;
-  SetResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock");
-  MutexItem* mutexitem=user_data->threadinterface->GetMutex (mutex);
-  ReleaseResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock");
-  if (!mutexitem) return EINVAL;
-  if (!mutexitem->HandleOke ())
-  {
+  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
-  }
-  GETCOND("_pthread_cond_lock");
-  if (item->mutexitem && (item->mutexitem != mutexitem))
+  if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
     return EINVAL;
 
-  item->mutexitem=mutexitem;
-  InterlockedIncrement (&item->waiting);
-  rv = item->TimedWait (abstime->tv_sec*1000);
-  mutexitem->Lock ();
-  if (InterlockedDecrement (&item->waiting)==0)
-    item->mutexitem=NULL;
+  if ((*cond)->waiting)
+    if ((*cond)->mutex && ((*cond)->mutex != (*mutex)))
+      return EINVAL;
+  InterlockedIncrement (&((*cond)->waiting));
+
+  (*cond)->mutex = (*mutex);
+  InterlockedIncrement (&((*mutex)->condwaits));
+  rv = (*cond)->TimedWait (abstime->tv_sec * 1000);
+  (*cond)->mutex->Lock ();
+  if (InterlockedDecrement (&((*cond)->waiting)) == 0)
+    (*cond)->mutex = NULL;
+  InterlockedDecrement (&((*mutex)->condwaits));
 
   return rv;
 }
 
 int
-__pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
+__pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
 {
   int rv;
-  SetResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock");
-  MutexItem* mutexitem=user_data->threadinterface->GetMutex (mutex);
-  ReleaseResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock");
-  if (!mutexitem) return EINVAL;
-  if (!mutexitem->HandleOke ())
-  {
+  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
-  }
-  GETCOND("_pthread_cond_lock");
-  if (item->mutexitem && (item->mutexitem != mutexitem))
+  if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
     return EINVAL;
 
-  item->mutexitem=mutexitem;
-  InterlockedIncrement (&item->waiting);
-  rv = item->Wait ();
-  mutexitem->Lock ();
-  if (InterlockedDecrement (&item->waiting)==0)
-    item->mutexitem=NULL;
+  if ((*cond)->waiting)
+    if ((*cond)->mutex && ((*cond)->mutex != (*mutex)))
+      return EINVAL;
+  InterlockedIncrement (&((*cond)->waiting));
+
+  (*cond)->mutex = (*mutex);
+  InterlockedIncrement (&((*mutex)->condwaits));
+  rv = (*cond)->TimedWait (INFINITE);
+  (*cond)->mutex->Lock ();
+  if (InterlockedDecrement (&((*cond)->waiting)) == 0)
+    (*cond)->mutex = NULL;
+  InterlockedDecrement (&((*mutex)->condwaits));
 
   return rv;
 }
@@ -868,35 +855,43 @@ __pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
 int
 __pthread_condattr_init (pthread_condattr_t * condattr)
 {
-  condattr->shared = 0;
-  condattr->valid  = 0xf341; /* Roberts magic number */
+  *condattr = new pthread_condattr;
+  if (!verifyable_object_isvalid (*condattr, PTHREAD_CONDATTR_MAGIC))
+    {
+      delete (*condattr);
+      *condattr = NULL;
+      return EAGAIN;
+    }
   return 0;
 }
 
 int
 __pthread_condattr_getpshared (const pthread_condattr_t * attr, int *pshared)
 {
-  if (!attr || (attr->valid != 0xf341))
+  if (!verifyable_object_isvalid (*attr, PTHREAD_CONDATTR_MAGIC))
     return EINVAL;
-  *pshared = attr->shared;
+  *pshared = (*attr)->shared;
   return 0;
 }
 
 int
 __pthread_condattr_setpshared (pthread_condattr_t * attr, int pshared)
 {
-  if (!attr || (attr->valid != 0xf341) || (pshared <0) || (pshared > 1))
+  if (!verifyable_object_isvalid (*attr, PTHREAD_CONDATTR_MAGIC))
     return EINVAL;
-  attr->shared = pshared;
+  if ((pshared < 0) || (pshared > 1))
+    return EINVAL;
+  (*attr)->shared = pshared;
   return 0;
 }
 
 int
 __pthread_condattr_destroy (pthread_condattr_t * condattr)
 {
-  if (!condattr || (condattr->valid != 0xf341))
-      return EINVAL;
-  condattr->valid=0;
+  if (!verifyable_object_isvalid (*condattr, PTHREAD_CONDATTR_MAGIC))
+    return EINVAL;
+  delete (*condattr);
+  *condattr = NULL;
   return 0;
 }
 
@@ -904,12 +899,14 @@ __pthread_condattr_destroy (pthread_condattr_t * condattr)
 int
 __pthread_kill (pthread_t * thread, int sig)
 {
-  // lock myself, for the use of thread2signal
+// lock myself, for the use of thread2signal
   // two differ kills might clash: FIXME
-  GETTHREAD ("__pthread_kill");
 
-  if (item->sigs)
-    myself->setthread2signal (item);
+  if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
+    return EINVAL;
+
+  if ((*thread)->sigs)
+    myself->setthread2signal (*thread);
 
   int rval = _kill (myself->pid, sig);
 
@@ -920,15 +917,13 @@ __pthread_kill (pthread_t * thread, int sig)
 int
 __pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
 {
-  SetResourceLock (LOCK_THREAD_LIST, READ_LOCK, "__pthread_sigmask");
-  ThreadItem *item = MT_INTERFACE->GetCallingThread ();
-  ReleaseResourceLock (LOCK_THREAD_LIST, READ_LOCK, "__pthread_sigmask");
+  pthread *thread = __pthread_self ();
 
   // lock this myself, for the use of thread2signal
   // two differt kills might clash: FIXME
 
-  if (item->sigs)
-    myself->setthread2signal (item);
+  if (thread->sigs)
+    myself->setthread2signal (thread);
 
   int rval = sigprocmask (operation, set, old_set);
 
@@ -938,16 +933,9 @@ __pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
 }
 
 /*  ID */
-pthread_t
-__pthread_self ()
+pthread_t __pthread_self ()
 {
-  SetResourceLock (LOCK_THREAD_LIST, READ_LOCK, "__pthread_self");
-
-  ThreadItem *item = MT_INTERFACE->GetCallingThread ();
-
-  ReleaseResourceLock (LOCK_THREAD_LIST, READ_LOCK, "__pthread_self");
-  return (pthread_t) item->Id ();
-
+  return (pthread *) TlsGetValue (MT_INTERFACE->thread_self_dwTlsIndex);
 }
 
 int
@@ -959,63 +947,65 @@ __pthread_equal (pthread_t * t1, pthread_t * t2)
 /* Mutexes  */
 
 int
-__pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t */*_attr*/)
+__pthread_mutex_init (pthread_mutex_t * mutex,
+		      const pthread_mutexattr_t * attr)
 {
-  SetResourceLock (LOCK_MUTEX_LIST, WRITE_LOCK | READ_LOCK, "__pthread_mutex_init");
+  if (attr && !verifyable_object_isvalid (*attr, PTHREAD_MUTEXATTR_MAGIC))
+    return EINVAL;
 
-  MutexItem *item = MT_INTERFACE->CreateMutex (mutex);
+  if (verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+    return EBUSY;
 
-  CHECKITEM (LOCK_MUTEX_LIST, WRITE_LOCK | READ_LOCK, "__pthread_mutex_init");
-
-  ReleaseResourceLock (LOCK_MUTEX_LIST, WRITE_LOCK | READ_LOCK, "__pthread_mutex_init");
+  *mutex = new pthread_mutex (attr ? (*attr) : NULL);
+  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+    {
+      delete (*mutex);
+      *mutex = NULL;
+      return EAGAIN;
+    }
   return 0;
 }
 
 int
 __pthread_mutex_lock (pthread_mutex_t * mutex)
 {
-  GETMUTEX ("_ptherad_mutex_lock");
-
-  item->Lock ();
-
+  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+    return EINVAL;
+  (*mutex)->Lock ();
   return 0;
 }
 
 int
 __pthread_mutex_trylock (pthread_mutex_t * mutex)
 {
-  GETMUTEX ("_ptherad_mutex_lock");
-
-  if (item->TryLock () == WAIT_TIMEOUT)
+  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+    return EINVAL;
+  if ((*mutex)->TryLock () == WAIT_TIMEOUT)
     return EBUSY;
-
   return 0;
 }
 
 int
 __pthread_mutex_unlock (pthread_mutex_t * mutex)
 {
-  GETMUTEX ("_ptherad_mutex_lock");
-
-  item->UnLock ();
-
+  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+    return EINVAL;
+  (*mutex)->UnLock ();
   return 0;
 }
 
 int
 __pthread_mutex_destroy (pthread_mutex_t * mutex)
 {
-  SetResourceLock (LOCK_MUTEX_LIST, READ_LOCK | WRITE_LOCK, "__pthread_mutex_destroy");
+  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+    return EINVAL;
 
-  MutexItem *item = MT_INTERFACE->GetMutex (mutex);
+  /* reading a word is atomic */
+  if ((*mutex)->condwaits)
+    return EBUSY;
 
-  CHECKITEM (LOCK_MUTEX_LIST, WRITE_LOCK | READ_LOCK, "__pthread_mutex_init");
-
-  item->Destroy ();
-
-  MT_INTERFACE->ReleaseItem (item);
-
-  ReleaseResourceLock (LOCK_MUTEX_LIST, READ_LOCK | WRITE_LOCK, "__pthread_mutex_destroy");
+  delete (*mutex);
+  *mutex = NULL;
   return 0;
 }
 
@@ -1023,61 +1013,63 @@ __pthread_mutex_destroy (pthread_mutex_t * mutex)
 int
 __sem_init (sem_t * sem, int pshared, unsigned int value)
 {
-  SetResourceLock (LOCK_SEM_LIST, READ_LOCK | WRITE_LOCK, "__sem_init");
+  /* opengroup calls this undefined */
+  if (verifyable_object_isvalid (*sem, SEM_MAGIC))
+    return EBUSY;
 
-  SemaphoreItem *item = MT_INTERFACE->CreateSemaphore (sem, pshared, value);
+  if (value > SEM_VALUE_MAX)
+    return EINVAL;
 
-  CHECKITEM (LOCK_SEM_LIST, READ_LOCK | WRITE_LOCK, "__sem_init");
+  *sem = new semaphore (pshared, value);
 
-  ReleaseResourceLock (LOCK_SEM_LIST, READ_LOCK | WRITE_LOCK, "__sem_init");
+  if (!verifyable_object_isvalid (*sem, SEM_MAGIC))
+    {
+      delete (*sem);
+      *sem = NULL;
+      return EAGAIN;
+    }
   return 0;
 }
 
 int
 __sem_destroy (sem_t * sem)
 {
-  SetResourceLock (LOCK_SEM_LIST, READ_LOCK | WRITE_LOCK, "__sem_destroy");
+  if (!verifyable_object_isvalid (*sem, SEM_MAGIC))
+    return EINVAL;
 
-  SemaphoreItem *item = MT_INTERFACE->GetSemaphore (sem);
+  /* FIXME - new feature - test for busy against threads... */
 
-  CHECKITEM (LOCK_SEM_LIST, READ_LOCK | WRITE_LOCK, "__sem_init");
-
-  item->Destroy ();
-
-  MT_INTERFACE->ReleaseItem (item);
-
-  ReleaseResourceLock (LOCK_SEM_LIST, READ_LOCK | WRITE_LOCK, "__sem_destroy");
+  delete (*sem);
+  *sem = NULL;
   return 0;
 }
 
 int
 __sem_wait (sem_t * sem)
 {
-  GETSEMA ("__sem_wait");
+  if (!verifyable_object_isvalid (*sem, SEM_MAGIC))
+    return EINVAL;
 
-  item->Wait ();
-
+  (*sem)->Wait ();
   return 0;
 }
 
 int
 __sem_trywait (sem_t * sem)
 {
-  GETSEMA ("__sem_trywait");
+  if (!verifyable_object_isvalid (*sem, SEM_MAGIC))
+    return EINVAL;
 
-  if (item->TryWait () == WAIT_TIMEOUT)
-    return EAGAIN;
-
-  return 0;
+  return (*sem)->TryWait ();
 }
 
 int
 __sem_post (sem_t * sem)
 {
-  GETSEMA ("__sem_post");
+  if (!verifyable_object_isvalid (*sem, SEM_MAGIC))
+    return EINVAL;
 
-  item->Post ();
-
+  (*sem)->Post ();
   return 0;
 }
 
@@ -1087,7 +1079,8 @@ __sem_post (sem_t * sem)
 // empty functions needed when makeing the dll without mt_safe support
 extern "C"
 {
-  int __pthread_create (pthread_t *, const pthread_attr_t *, TFD (start_routine), void *arg)
+  int __pthread_create (pthread_t *, const pthread_attr_t *,
+			TFD (start_routine), void *arg)
   {
     return -1;
   }
@@ -1099,6 +1092,16 @@ extern "C"
   {
     return -1;
   }
+  int __pthread_attr_setdetachstate (pthread_attr_t * attr, int detachstate)
+  {
+    return -1;
+  }
+  int
+    __pthread_attr_getdetachstate (const pthread_attr_t * attr,
+				   int *detachstate)
+  {
+    return -1;
+  }
   int __pthread_attr_setstacksize (pthread_attr_t * attr, size_t size)
   {
     return -1;
@@ -1107,7 +1110,7 @@ extern "C"
   {
     return -1;
   }
-/*
+/* these cannot be supported on win32 - the os allocates it's own stack space..
    __pthread_attr_setstackaddr (...){ return -1; };
    __pthread_attr_getstackaddr (...){ return -1; };
  */
@@ -1118,7 +1121,7 @@ extern "C"
 
   int __pthread_join (pthread_t thread_id, void **return_val)
   {
-     return -1;
+    return -1;
   }
 
   unsigned long __pthread_getsequence_np (pthread_t * thread)
@@ -1145,7 +1148,8 @@ extern "C"
   {
     return -1;
   }
-  int __pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
+  int __pthread_sigmask (int operation, const sigset_t * set,
+			 sigset_t * old_set)
   {
     return -1;
   }
@@ -1193,7 +1197,8 @@ extern "C"
   {
     return -1;
   }
-  int __pthread_cond_timedwait (pthread_cond_t *, pthread_mutex_t *, const struct timespec *)
+  int __pthread_cond_timedwait (pthread_cond_t *, pthread_mutex_t *,
+				const struct timespec *)
   {
     return -1;
   }
@@ -1243,4 +1248,4 @@ extern "C"
   }
 }
 
-#endif // MT_SAFE
+#endif				// MT_SAFE

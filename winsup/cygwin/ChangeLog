@@ -1,3 +1,10 @@
+2001-03-21 Robert Collins <rbtcollins@hotmail.com>
+
+	* sched.cc: New file.  Implement sched*.
+	* include/sched.h: New file.  User land includes for sched*.
+	* Makefile.in: Add sched.o
+	* cygwin.din: Add exports for sched*.
+
 Tue Mar 20 14:48:46 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dtable.cc: Guard against new winsock.h/winsock2.h warnings when

@@ -116,13 +116,13 @@ public:
     return thread2signal ? thread2signal->win32_obj_id : hMainThread;
   }
 
-  inline void setthread2signal (void *thr) {thread2signal = (ThreadItem *) thr;}
+  inline void setthread2signal (void *thr) {thread2signal = (pthread *) thr;}
 
 private:
   struct sigaction sigs[NSIG];
   sigset_t sig_mask;		/* one set for everything to ignore. */
   LONG _sigtodo[NSIG + __SIGOFFSET];
-  ThreadItem *thread2signal;  // NULL means means thread any other means a pthread
+  pthread *thread2signal;  // NULL means means thread any other means a pthread
 };
 
 class pinfo
