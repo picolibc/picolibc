@@ -442,7 +442,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
 
   if (x == INVALID_HANDLE_VALUE)
     {
-      if (pc->isdir () && !wincap.can_open_directories ())
+      if (!wincap.can_open_directories () && pc && pc->isdir ())
 	{
 	  if (mode & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
 	    set_errno (EEXIST);
