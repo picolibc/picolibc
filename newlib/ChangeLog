@@ -1,3 +1,8 @@
+2003-06-27  Joe Vornehm  <joev@mitre.org>
+
+	* libm/common/s_fpclassify.c (__fpclassifyf): Fix
+	comparisons to account for unsigned internal value w.
+
 2003-06-26  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/mq_open.c (mq_open): Must allocate rdbuf and
