@@ -6,6 +6,7 @@
 	(cygheap_user::puserprof): New member.
 	(cfree_and_set): Declare.
 	* dcrt0.cc (almost_null): Define.
+	* environ.cc (env_dontadd): Redefine as "almost_null".
 	* winsup.h (almost_null): Declare.
 	* syscalls.cc (cfree_and_set): Remove unused variable.
 	* uinfo.cc (cygheap_user::homepath_env_buf): Eliminate.
