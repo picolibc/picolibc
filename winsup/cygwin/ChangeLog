@@ -1,5 +1,9 @@
 2004-12-22  Christopher Faylor  <cgf@timesys.com>
 
+	* cygthread.cc (cygthread::stub): Make diagnostic output more informative.
+
+2004-12-22  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (proc_waiter): Zero wait_thread in child to avoid races with
 	process termination.
 	* cygthread.cc (cygthread::terminate): Clumsily detect when h has gone away

@@ -54,8 +54,9 @@ cygthread::stub (VOID *arg)
 
   while (1)
     {
-      if (!info->__name)
-	system_printf ("erroneous thread activation");
+      const char *name = info->__name;
+      if (!name)
+	system_printf ("erroneous thread activation, name is non-NULL '%s'", name);
       else
 	{
 	  if (!info->func || exiting)
