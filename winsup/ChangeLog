@@ -4,7 +4,7 @@
 
 2003-08-05  Christopher Faylor  <cgf@redhat.com>
 
-	* Makefile.common: Don't send -nostdinc++ with g++.
+	* Makefile.common: Don't use -nostdinc with g++.
 
 2003-07-25  Christopher Faylor  <cgf@redhat.com>
 
