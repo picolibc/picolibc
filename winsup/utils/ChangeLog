@@ -1,3 +1,13 @@
+2002-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (main): When generating group 513, check for computer's
+	primary domain instead of current user's domain.
+
+2002-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (main): When generating group 513, check for domain SID
+	if computer name isn't mapped to a SID.
+
 2001-03-11 Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* kill.cc (usage): Move to top of file.

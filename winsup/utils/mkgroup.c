@@ -17,6 +17,8 @@
 #include <getopt.h>
 #include <lmaccess.h>
 #include <lmapibuf.h>
+#include <ntsecapi.h>
+#include <ntdef.h>
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
@@ -447,8 +449,14 @@ main (int argc, char **argv)
 
   char name[256], dom[256];
   DWORD len, len2;
-  PSID csid;
+  char buf[1024];
+  PSID psid = NULL;
   SID_NAME_USE use;
+
+  LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
+  LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
+  NTSTATUS ret;
+  PPOLICY_PRIMARY_DOMAIN_INFO pdi;
 
   if (GetVersion () < 0x80000000)
     {
@@ -530,23 +538,43 @@ main (int argc, char **argv)
       */
       len = 256;
       GetComputerName (name, &len);
-      csid = (PSID) malloc (1024);
       len = 1024;
       len2 = 256;
-      LookupAccountName (NULL, name,
-			 csid, &len,
-			 dom, &len,
-			 &use);
-      print_special (print_sids, GetSidIdentifierAuthority (csid), 5,
-				 *GetSidSubAuthority (csid, 0),
-				 *GetSidSubAuthority (csid, 1),
-				 *GetSidSubAuthority (csid, 2),
-				 *GetSidSubAuthority (csid, 3),
-				 513,
-				 0,
-				 0,
-				 0);
-      free (csid);
+      if (LookupAccountName (NULL, name, (PSID) buf, &len, dom, &len, &use))
+	psid = (PSID) buf;
+      else
+        {
+	  ret = LsaOpenPolicy(NULL, &oa, POLICY_VIEW_LOCAL_INFORMATION, &lsa);
+	  if (ret == STATUS_SUCCESS && lsa != INVALID_HANDLE_VALUE)
+	    {
+	      ret = LsaQueryInformationPolicy (lsa,
+					       PolicyPrimaryDomainInformation,
+					       (PVOID *) &pdi);
+	      if (ret == STATUS_SUCCESS)
+	        {
+		  if (pdi->Sid)
+		    {
+		      CopySid (1024, (PSID) buf, pdi->Sid);
+		      psid = (PSID) buf;
+		    }
+		  LsaFreeMemory (pdi);
+		}
+	      LsaClose (lsa);
+	    }
+	}
+      if (!psid)
+        fprintf (stderr,
+	        "WARNING: Group 513 couldn't get retrieved.  Try mkgroup -d\n");
+      else
+	print_special (print_sids, GetSidIdentifierAuthority (psid), 5,
+				   *GetSidSubAuthority (psid, 0),
+				   *GetSidSubAuthority (psid, 1),
+				   *GetSidSubAuthority (psid, 2),
+				   *GetSidSubAuthority (psid, 3),
+				   513,
+				   0,
+				   0,
+				   0);
     }
 
   if (print_domain)
