@@ -1,3 +1,7 @@
+2004-12-02  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.cc (pinfo::wait): Use better name for cygthread.
+
 2004-12-03  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* registry.h (reg_key::reg_key): Change arguments.

@@ -815,7 +815,7 @@ pinfo::wait ()
   preserve ();		/* Preserve the shared memory associated with the pinfo */
 
   /* Fire up a new thread to track the subprocess */
-  cygthread *h = new cygthread (proc_waiter, this, "sig");
+  cygthread *h = new cygthread (proc_waiter, this, "proc_waiter");
   if (!h)
     sigproc_printf ("tracking thread creation failed for pid %d", (*this)->pid);
   else
