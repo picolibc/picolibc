@@ -184,7 +184,7 @@ extern HANDLE netapi32_handle;
 
 /* debug_on_trap support. see exceptions.cc:try_to_debug() */
 extern "C" void error_start_init (const char*);
-extern "C" int try_to_debug ();
+extern "C" int try_to_debug (bool waitloop = 1);
 
 extern int cygwin_finished_initializing;
 

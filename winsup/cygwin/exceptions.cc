@@ -109,8 +109,6 @@ init_exception_handler (exception_list *el)
   el->prev = _except_list;
   _except_list = el;
 }
-
-#define INIT_EXCEPTION_HANDLER(el) init_exception_handler (el)
 #endif
 
 void
@@ -134,9 +132,7 @@ set_console_handler ()
 extern "C" void
 init_exceptions (exception_list *el)
 {
-#ifdef INIT_EXCEPTION_HANDLER
-  INIT_EXCEPTION_HANDLER (el);
-#endif
+  init_exception_handler (el);
 }
 
 extern "C" void
@@ -153,6 +149,29 @@ error_start_init (const char *buf)
   /* FIXME: gdb cannot use win32 paths, but what if debugger isn't gdb? */
   cygwin_conv_to_posix_path (myself->progname, myself_posix_name);
   __small_sprintf (debugger_command, "%s %s", buf, myself_posix_name);
+}
+
+static void
+open_stackdumpfile ()
+{
+  if (myself->progname[0])
+    {
+      const char *p;
+      /* write to progname.stackdump if possible */
+      if ((p = strrchr (myself->progname, '\\')))
+	p++;
+      else
+	p = myself->progname;
+      char corefile[strlen (p) + sizeof (".stackdump")];
+      __small_sprintf (corefile, "%s.stackdump", p);
+      HANDLE h = CreateFile (corefile, GENERIC_WRITE, 0, &sec_none_nih,
+			     CREATE_ALWAYS, 0, 0);
+      if (h != INVALID_HANDLE_VALUE)
+	{
+	  system_printf ("Dumping stack trace to %s", corefile);
+	  SetStdHandle (STD_ERROR_HANDLE, h);
+	}
+    }
 }
 
 /* Utilities for dumping the stack, etc.  */
@@ -201,13 +220,11 @@ exception (EXCEPTION_RECORD *e,  CONTEXT *in)
 /* A class for manipulating the stack. */
 class stack_info
 {
-  int first_time;		/* True if just starting to iterate. */
   int walk ();			/* Uses the "old" method */
   char *next_offset () {return *((char **) sf.AddrFrame.Offset);}
 public:
   STACKFRAME sf;		/* For storing the stack information */
   void init (DWORD);		/* Called the first time that stack info is needed */
-  stack_info (): first_time (1) {}
 
   /* Postfix ++ iterates over the stack, returning zero when nothing is left. */
   int operator ++(int) { return this->walk (); }
@@ -224,11 +241,12 @@ static signal_dispatch sigsave;
 void
 stack_info::init (DWORD ebp)
 {
-  first_time = 1;
+# define debp ((DWORD *) ebp)
   memset (&sf, 0, sizeof (sf));
   sf.AddrFrame.Offset = ebp;
-  sf.AddrPC.Offset = ((DWORD *) ebp)[1];
+  sf.AddrReturn.Offset = debp[1];
   sf.AddrFrame.Mode = AddrModeFlat;
+# undef debp
 }
 
 /* Walk the stack by looking at successive stored 'bp' frames.
@@ -237,10 +255,7 @@ int
 stack_info::walk ()
 {
   char **ebp;
-  if (first_time)
-    /* Everything is filled out already */
-    ebp = (char **) sf.AddrFrame.Offset;
-  else if ((ebp = (char **) next_offset ()) != NULL)
+  if ((ebp = (char **) next_offset ()) != NULL)
     {
       sf.AddrFrame.Offset = (DWORD) ebp;
       sf.AddrPC.Offset = sf.AddrReturn.Offset;
@@ -248,7 +263,6 @@ stack_info::walk ()
   else
     return 0;
 
-  first_time = 0;
   if (!sf.AddrPC.Offset)
     return 0;		/* stack frames are exhausted */
 
@@ -261,13 +275,20 @@ stack_info::walk ()
   return 1;
 }
 
-/* Dump the stack */
 static void
-stack (CONTEXT *cx)
+stackdump (DWORD ebp, int open_file)
 {
+  extern unsigned long rlim_core;
+
+  if (rlim_core == 0UL)
+    return;
+
+  if (open_file)
+    open_stackdumpfile ();
+
   int i;
 
-  thestack.init (cx->Ebp);	/* Initialize from the input CONTEXT */
+  thestack.init (ebp);		/* Initialize from the input CONTEXT */
   small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
   for (i = 0; i < 16 && thestack++; i++)
     {
@@ -288,15 +309,13 @@ cygwin_stackdump ()
   CONTEXT c;
   c.ContextFlags = CONTEXT_FULL;
   GetThreadContext (GetCurrentThread (), &c);
-  stack (&c);
+  stackdump (c.Ebp, 0);
 }
-
-static int NO_COPY keep_looping = 0;
 
 #define TIME_TO_WAIT_FOR_DEBUGGER 10000
 
 extern "C" int
-try_to_debug ()
+try_to_debug (bool waitloop)
 {
   debug_printf ("debugger_command '%s'", debugger_command);
   if (*debugger_command == '\0')
@@ -306,6 +325,7 @@ try_to_debug ()
 
   BOOL dbg;
 
+  SetThreadPriority (hMainThread, THREAD_PRIORITY_HIGHEST);
   PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
 
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
@@ -348,65 +368,24 @@ try_to_debug ()
 		       NULL,
 		       &si,
 		       &pi);
-  if (!dbg)
+
+  static int NO_COPY keep_looping = 0;
+
+  if (dbg)
     {
-      system_printf ("Failed to start debugger: %E");
-      /* FIXME: need to know handles of all running threads to
-	resume_all_threads_except (current_thread_id);
-      */
-    }
-  else
-    {
-      char event_name [sizeof ("cygwin_error_start_event") + 9];
-      DWORD win32_pid = GetCurrentProcessId ();
-      __small_sprintf (event_name, "cygwin_error_start_event%x", win32_pid);
-      HANDLE sync_with_dbg = CreateEvent (NULL, TRUE, FALSE, event_name);
-      keep_looping = 1;
+      if (!waitloop)
+	return 1;
+      SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
       while (keep_looping)
-	{
-	  if (sync_with_dbg == NULL)
-	    Sleep (TIME_TO_WAIT_FOR_DEBUGGER);
-	  else
-	    {
-	      if (WaitForSingleObject (sync_with_dbg,
-				       TIME_TO_WAIT_FOR_DEBUGGER) == WAIT_OBJECT_0)
-		break;
-	    }
-	 }
+	/* spin */;
     }
 
+
+  system_printf ("Failed to start debugger: %E");
+  /* FIXME: need to know handles of all running threads to
+    resume_all_threads_except (current_thread_id);
+  */
   return 0;
-}
-
-static void
-stackdump (EXCEPTION_RECORD *e, CONTEXT *in)
-{
-  extern unsigned long rlim_core;
-  const char *p;
-
-  if (rlim_core == 0UL)
-    return;
-
-  if (myself->progname[0])
-    {
-      /* write to progname.stackdump if possible */
-      if ((p = strrchr (myself->progname, '\\')))
-	p++;
-      else
-	p = myself->progname;
-      char corefile[strlen (p) + sizeof (".stackdump")];
-      __small_sprintf (corefile, "%s.stackdump", p);
-      HANDLE h = CreateFile (corefile, GENERIC_WRITE, 0, &sec_none_nih,
-			     CREATE_ALWAYS, 0, 0);
-      if (h != INVALID_HANDLE_VALUE)
-	{
-	  system_printf ("Dumping stack trace to %s", corefile);
-	  SetStdHandle (STD_ERROR_HANDLE, h);
-	}
-    }
-  if (e)
-    exception (e, in);
-  stack (in);
 }
 
 /* Main exception handler. */
@@ -415,6 +394,11 @@ static int
 handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 {
   int sig;
+  static int NO_COPY debugging = 0;
+  static int NO_COPY recursed = 0;
+
+  if (debugging)
+    return 0;
 
   /* If we've already exited, don't do anything here.  Returning 1
      tells Windows to keep looking for an exception handler.  */
@@ -499,8 +483,6 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
       || (void *) myself->getsig (sig).sa_handler == (void *) SIG_IGN
       || (void *) myself->getsig (sig).sa_handler == (void *) SIG_ERR)
     {
-      static NO_COPY int traced = 0;
-
       /* Print the exception to the console */
       if (e)
 	{
@@ -516,20 +498,22 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 
       /* Another exception could happen while tracing or while exiting.
 	 Only do this once.  */
-      if (traced++)
+      if (recursed++)
 	system_printf ("Error while dumping state (probably corrupted stack)");
       else
 	{
-	  CONTEXT c = *in;
-	  DWORD stack[6];
-	  stack[0] = in->Ebp;
-	  stack[1] = in->Eip;
-	  stack[2] = stack[3] = stack[4] = stack[5] = 0;
-	  c.Ebp = (DWORD) &stack;
-	  stackdump (e, &c);
+	  if (try_to_debug (0))
+	    {
+	      debugging = 1;
+	      return 0;
+	    }
+
+	  open_stackdumpfile ();
+	  exception (e, in);
+	  stackdump ((DWORD) ebp, 0);
 	}
-      try_to_debug ();
-      signal_exit (0x80 | sig);		// Flag signal + core dump
+
+      signal_exit (0x80 | sig);	// Flag signal + core dump
     }
 
   sig_send (NULL, sig, (DWORD) ebp, 1);		// Signal myself
@@ -1017,30 +1001,30 @@ sig_handle (int sig)
 
   goto dosig;
 
-stop:
+ stop:
   /* Eat multiple attempts to STOP */
   if (ISSTATE (myself, PID_STOPPED))
     goto done;
   handler = (void *) sig_handle_tty_stop;
   thissig = myself->getsig (SIGSTOP);
 
-dosig:
+ dosig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", sig, handler);
   rc = setup_handler (sig, handler, thissig);
 
-done:
+ done:
   sigproc_printf ("returning %d", rc);
   return rc;
 
-exit_sig:
+ exit_sig:
   if (sig == SIGQUIT || sig == SIGABRT)
     {
       CONTEXT c;
       c.ContextFlags = CONTEXT_FULL;
       GetThreadContext (hMainThread, &c);
-      stackdump (NULL, &c);
-      try_to_debug ();
+      if (!try_to_debug ())
+	stackdump (c.Ebp, 1);
       sig |= 0x80;
     }
   sigproc_printf ("signal %d, about to call do_exit", sig);

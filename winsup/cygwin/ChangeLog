@@ -1,3 +1,25 @@
+Sun Apr 29 22:28:06 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (INIT_EXCEPTION_HANDLER): Eliminate.
+	(init_exceptions): Just use init_exception_handler.
+	(open_stackdumpfile): New function.
+	(stack_info::first_time): Eliminate.
+	(stack_info::init): Set up fields to avoid "first_time" consideration.
+	(stack_info::walk): Remove "first_time" consideration.
+	(stackdump): Change arguments to accept initial frame pointer and open
+	stack file flag.
+	(stack): Eliminate.
+	(cygwin_stackdump): Use stackdump() rather than stack().
+	(try_to_debug): Remove all synchronization logic.  Just keep looping in
+	exception handler until debugger notices us.  Return 1 if successfully
+	started debugger.
+	(handle_exceptions): Just return if we know that we're debugging.
+	Reorganize to avoid creating a stackdump file if we are starting a
+	debugger.  Return from exception handler if debugger started
+	successfully.
+	(sig_handle): Create a stackdump only if debugger wasn't started.
+	* winsup.h (try_to_debug): Add an argument.
+
 Sun Apr 29 21:41:25 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (symlink_info::check): Remove extra arguments, move
