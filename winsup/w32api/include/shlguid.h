@@ -63,6 +63,13 @@ extern const GUID IID_IUniformResourceLocator;
 extern const GUID CLSID_DragDropHelper;
 extern const GUID IID_IDropTargetHelper;
 extern const GUID IID_IDragSourceHelper;
+extern const GUID CLSID_AutoComplete;
+extern const GUID IID_IAutoComplete;
+extern const GUID IID_IAutoComplete2;
+extern const GUID CLSID_ACLMulti;
+extern const GUID IID_IObjMgr;
+extern const GUID CLSID_ACListISF;
+extern const GUID IID_IACList;
 #if (_WIN32_IE >= 0x400 || _WIN32_WINNT >= 0x500)
 extern const GUID IID_IPersistFolder2;
 #endif

@@ -554,6 +554,17 @@ typedef IEnumIDList *LPENUMIDLIST;
 #endif
 
 #undef INTERFACE
+#define INTERFACE IObjMgr
+DECLARE_INTERFACE_(IObjMgr, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(Append)(THIS_ IUnknown*) PURE;
+	STDMETHOD(Remove)(THIS_ IUnknown*) PURE;
+};
+
+#undef INTERFACE
 #define INTERFACE IContextMenu
 DECLARE_INTERFACE_(IContextMenu,IUnknown)
 {

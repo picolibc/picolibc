@@ -1,3 +1,16 @@
+2004-12-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/shldisp.h (IAutoComplete): Added interface definiton.
+	* include/shldisp.h (IAutoComplete2): Added interface definiton.
+	* include/shldisp.h (ACO_AUTOSUGGEST): Added definition.
+	* include/shlobj.h (IObjMgr): Added interface definiton.
+	* lib/shell32.c (CLSID_AutoComplete, IID_AutoComplete,
+	IID_AutoComplete2, CLSID_ACLMulti, IID_IObjMgr,
+	CLSID_ACListISF, IID_IACList): Added GUIDs.
+	* include/shlguid.h (CLSID_AutoComplete, IID_AutoComplete,
+	IID_AutoComplete2, CLSID_ACLMulti, IID_IObjMgr,
+	CLSID_ACListISF, IID_IACList): Added GUIDs.
+
 2004-12-23  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commctrl.h (CDRF_NOTIFYSUBITEMDRAW): Add define.
