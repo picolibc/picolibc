@@ -300,7 +300,10 @@ fhandler_process::fill_filebuf ()
 	filebuf = p->cmdline (fs);
 	filesize = fs;
 	if (!filebuf || !*filebuf)
-	  filebuf = strdup ("<defunct>");
+	  {
+	    filebuf = strdup ("<defunct>");
+	    filesize = strlen (filebuf) + 1;
+	  }
 	break;
       }
     case PROCESS_EXENAME:

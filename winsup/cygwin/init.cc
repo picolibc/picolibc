@@ -52,13 +52,15 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
     {
     case DLL_PROCESS_ATTACH:
       dynamically_loaded = (static_load == NULL);
-      __cygwin_user_data.impure_ptr = &_my_tls.local_clib;
+      // __cygwin_user_data.impure_ptr = &_my_tls.local_clib;
       _my_tls.stackptr = _my_tls.stack;
       break;
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_ATTACH:
       munge_threadfunc (h);
+      break;
+    case DLL_THREAD_DETACH:
       break;
     }
   return 1;

@@ -90,6 +90,7 @@ extern "C"
   char ***main_environ;
   /* __progname used in getopt error message */
   char *__progname;
+  static struct _reent reent_data;
   struct per_process __cygwin_user_data =
   {/* initial_sp */ 0, /* magic_biscuit */ 0,
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
@@ -110,7 +111,7 @@ extern "C"
    /* api_minor */ CYGWIN_VERSION_API_MINOR,
    /* unused2 */ {0, 0, 0, 0, 0},
    /* resourcelocks */ &_reslock, /* threadinterface */ &_mtinterf,
-   /* impure_ptr */ NULL,
+   /* impure_ptr */ &reent_data,
   };
   bool ignore_case_with_glob;
   int __declspec (dllexport) _check_for_executable = true;
@@ -700,9 +701,9 @@ dll_crt0_1 (char *)
 	 win32 style. */
       if ((strchr (__argv[0], ':')) || (strchr (__argv[0], '\\')))
 	{
-	  char *new_argv0 = (char *) alloca (CYG_MAX_PATH);
+	  char *new_argv0 = (char *) malloc (CYG_MAX_PATH);
 	  cygwin_conv_to_posix_path (__argv[0], new_argv0);
-	  __argv[0] = new_argv0;
+	  __argv[0] = (char *) realloc (new_argv0, strlen (new_argv0) + 1);
 	}
     }
 
@@ -826,9 +827,6 @@ initialize_main_tls (char *padding)
       _threadinfo::init ();
       _main_tls = &_my_tls;
       _main_tls->init_thread (padding);
-      _main_tls->local_clib._stdin = &_main_tls->local_clib.__sf[0];
-      _main_tls->local_clib._stdout = &_main_tls->local_clib.__sf[1];
-      _main_tls->local_clib._stderr = &_main_tls->local_clib.__sf[2];
     }
   return &_main_tls->local_clib;
 }
@@ -906,7 +904,12 @@ _dll_crt0 ()
 	}
     }
   
-  user_data->impure_ptr = _impure_ptr = initialize_main_tls (zeros);
+  _impure_ptr = &reent_data;
+  _impure_ptr->_stdin = &_impure_ptr->__sf[0];
+  _impure_ptr->_stdout = &_impure_ptr->__sf[1];
+  _impure_ptr->_stderr = &_impure_ptr->__sf[2];
+  _impure_ptr->_current_locale = "C";
+  initialize_main_tls (zeros);
   dll_crt0_1 (zeros);
 }
 

@@ -1,3 +1,20 @@
+2003-12-25  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (reent_data): Reluctantly resurrect.
+	(__cygwin_user_data::impure_ptr): Ditto.
+	(_dll_crt0): Reluctantly initialize _impure_ptr here.
+	(initialize_main_tls): Eliminate local_clib initialization since it now
+	happens in init_thread.
+	* init.cc (dll_entry): Reluctantly remove code which set _impure_ptr to
+	the main thread's local_clib.
+	* perthread.h (reent_data): Remove obsolete declaration.
+
+	* sigproc.cc (proc_subproc): Add more debugging output.
+	(get_proc_lock): Ditto.
+
+	*dcrt0.cc (dll_crt0_1): Allocate argv[0] via malloc since main thread
+	could exit.
+
 2003-12-23  Christopher Faylor  <cgf@redhat.com>
 
 	* fork.cc (fork_child): After a pthread/fork, ensure that impure

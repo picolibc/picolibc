@@ -12,9 +12,6 @@ details. */
 
 #define PTMAGIC 0x77366377
 
-struct _reent;
-extern struct _reent reent_data;
-
 #define PER_THREAD_FORK_CLEAR ((void *)UINT32_MAX)
 class per_thread
 {

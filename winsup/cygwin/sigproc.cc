@@ -226,14 +226,20 @@ get_proc_lock (DWORD what, DWORD val)
 {
   Static int lastwhat = -1;
   if (!sync_proc_subproc)
-    return false;
+    {
+      sigproc_printf ("sync_proc_subproc is NULL (1)");
+      return false;
+    }
   if (sync_proc_subproc->acquire (WPSP))
     {
       lastwhat = what;
       return true;
     }
   if (!sync_proc_subproc)
-    return false;
+    {
+      sigproc_printf ("sync_proc_subproc is NULL (2)");
+      return false;
+    }
   system_printf ("Couldn't aquire sync_proc_subproc for(%d,%d), %E, last %d",
 		  what, val, lastwhat);
   return true;
@@ -312,7 +318,7 @@ proc_subproc (DWORD what, DWORD val)
 
   if (!get_proc_lock (what, val))	// Serialize access to this function
     {
-      system_printf ("couldn't get proc lock.  Something is wrong.");
+      system_printf ("couldn't get proc lock. what %d, val %d", what, val);
       goto out1;
     }
 
@@ -546,9 +552,7 @@ proc_terminate (void)
 	  pchildren[i].release ();
 	}
       nchildren = nzombies = 0;
-      /* Just zero sync_proc_subproc as the delete below seems to cause
-	 problems for older gccs. */
-	sync_proc_subproc = NULL;
+      sync_proc_subproc = NULL;
     }
   sigproc_printf ("leaving");
 }
@@ -1167,9 +1171,9 @@ wait_sig (VOID *self)
 	      int sigres = sig_handle (pack.sig, *pack.mask, pack.pid, pack.tls);
 	      if (sigres <= 0)
 		{
-#ifdef DEBUGGING
+#ifdef DEBUGGING2
 		  if (!sigres)
-		    system_printf ("Failed to arm signal %d from pid %d");
+		    system_printf ("Failed to arm signal %d from pid %d", pack.sig, pack.pid);
 #endif
 		  sigqueue.add (pack.sig, pack.pid, pack.tls);// FIXME: Shouldn't add this in !sh condition
 		}
