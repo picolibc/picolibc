@@ -1,3 +1,7 @@
+2004-01-21  Nicholas Wourms  <nwourms@netscape.net>
+
+	* signal.cc (sigaction): Fix if-statement typo.
+
 2004-01-21  Christopher Faylor  <cgf@redhat.com>
 
 	* cygtls.cc (handle_threadlist_exception): Change logic, improve
