@@ -70,7 +70,8 @@ typedef enum
     CW_STRACE_TOGGLE,
     CW_STRACE_ACTIVE,
     CW_CYGWIN_PID_TO_WINPID,
-    CW_EXTRACT_DOMAIN_AND_USER
+    CW_EXTRACT_DOMAIN_AND_USER,
+    CW_CMDLINE
   } cygwin_getinfo_types;
 
 #define CW_NEXTPID	0x80000000	// or with pid to get next one

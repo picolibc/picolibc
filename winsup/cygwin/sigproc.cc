@@ -1014,6 +1014,15 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
   return -potential_match;
 }
 
+static void
+talktome ()
+{
+  winpids pids;
+  for (unsigned i = 0; i < pids.npids; i++)
+    if (pids[i]->hello_pid == myself->pid)
+      pids[i]->commune_recv ();
+}
+
 /* Process signals by waiting for a semaphore to become signaled.
  * Then scan an in-memory array representing queued signals.
  * Executes in a separate thread.
@@ -1141,6 +1150,10 @@ wait_sig (VOID *self)
 		/* Internal signal to turn on stracing. */
 		case __SIGSTRACE:
 		  strace.hello ();
+		  break;
+
+		case __SIGCOMMUNE:
+		  talktome ();
 		  break;
 
 		/* A normal UNIX signal */

@@ -241,6 +241,13 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  extract_nt_dom_user (pw, domain, user);
 	  return 0;
 	}
+      case CW_CMDLINE:
+	{
+	  size_t n;
+	  pid_t pid = va_arg (arg, pid_t);
+	  pinfo p (pid);
+	  return (DWORD) p->cmdline (n);
+	}
       default:
 	return (DWORD) -1;
     }

@@ -34,8 +34,15 @@ fhandler_virtual::fhandler_virtual (DWORD devtype):
 fhandler_virtual::~fhandler_virtual ()
 {
   if (filebuf)
-    cfree (filebuf);
+    free (filebuf);
   filebuf = NULL;
+}
+
+void
+fhandler_virtual::fixup_after_exec (HANDLE)
+{
+  if (filebuf)
+    filebuf = NULL;
 }
 
 DIR *
@@ -143,7 +150,7 @@ fhandler_virtual::dup (fhandler_base * child)
   if (!ret)
     {
       fhandler_virtual *fhproc_child = (fhandler_virtual *) child;
-      fhproc_child->filebuf = (char *) cmalloc (HEAP_BUF, filesize);
+      fhproc_child->filebuf = (char *) malloc (filesize);
       fhproc_child->bufalloc = fhproc_child->filesize = filesize;
       fhproc_child->position = position;
       memcpy (fhproc_child->filebuf, filebuf, filesize);
@@ -156,7 +163,7 @@ int
 fhandler_virtual::close ()
 {
   if (filebuf)
-    cfree (filebuf);
+    free (filebuf);
   filebuf = NULL;
   bufalloc = (size_t) -1;
   cygwin_shared->delqueue.process_queue ();

@@ -1,3 +1,44 @@
+2002-10-30  Christopher Faylor  <cgf@redhat.com>
+
+	* external.cc (cygwin_internal): Implement CW_CMDLINE.
+	* pinfo.h (SIGCOMMUNE): New signal type.
+	(commune_result): New structure for commune functions.
+	(picom): New enum for commune functions.
+	(_pinfo::hello_pid): New.  Pid who's communicating with me.
+	(_pinfo::tothem): New.  Handle of communicating pipe.
+	(_pinfo::fromthem): Ditto.
+	(_pinfo::commune_recv): Declare.
+	(_pinfo::commune_send): Declare.
+	(_pinfo::alive): Declare.
+	(_pinfo::cmdline): Declare.
+	(_pinfo::lock): Declare.
+	* pinfo.cc (set_myself): Initialize new _pinfo lock.
+	(_pinfo::alive): Define. Determines if process still exists.
+	(_pinfo::commune_recv): Define.  Receive info from another cooperating process.
+	(_pinfo::commune_send): Define.  Send info to another cooperating process.
+	(_pinfo::cmdline): Define.  Determine command line of a given process.
+	* include/sys/cygwin.h (CW_CMDLINE): Define.
+
+	*sigproc.cc (talktome): Communicate with any processes who want to talk
+	to me.
+	(wait_sig): Honor __SIGCOMMUNE.
+
+	* fhandler.cc (fhandler_virtual::fixup_after_exec): Declare.
+	* fhandler_proc.cc: Use malloc/free/realloc throughout rather than
+	cmalloc since buffers don't need to be propagated to subprocesses.
+	* fhandler_registry.cc: Ditto.
+	* fhandler_virtual.cc: Ditto.
+	(fhandler_virtual::fixup_after_exec): Define.
+	* fhandler_process.cc: Ditto for malloc/free/realloc.
+	(process_listin): Add "cmdline".
+	(fhandler_process::fill_filebuf): Implement PROCESS_CMDLINE.
+
+	* miscfuncs.cc (isalpha_array): New array populated with xor values for
+	alpha characters to switch from one case to another.
+	* string.h (cygwin_strcasematch): New asm implementation of case match.
+	* string.h (cygwin_nstrcasematch): New asm implementation of counted
+	case match.
+
 2002-10-24  Pierre Humblet <pierre.humblet@ieee.org>
   
 	* pwdgrp.h (pwdgrp_read::open): Compare fh to INVALID_HANDLE_VALUE.

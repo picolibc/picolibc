@@ -555,7 +555,7 @@ fhandler_registry::fill_filebuf ()
 	  goto value_not_found;
 	}
       bufalloc = size;
-      filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
+      filebuf = (char *) malloc (bufalloc);
       error =
 	RegQueryValueEx (handle, value_name, NULL, NULL, (BYTE *) filebuf,
 			 &size);
@@ -572,14 +572,9 @@ fhandler_registry::fill_filebuf ()
       do
 	{
 	  bufalloc += 1000;
-	  if (filebuf)
-	    {
-	      cfree (filebuf);
-	      filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
-	    }
-	  error =
-	    RegQueryValueEx (handle, value_name, NULL, &type,
-			     (BYTE *) filebuf, &size);
+	  filebuf = (char *) realloc (filebuf, bufalloc);
+	  error = RegQueryValueEx (handle, value_name, NULL, &type,
+				   (BYTE *) filebuf, &size);
 	  if (error != ERROR_SUCCESS && error != ERROR_MORE_DATA)
 	    {
 	      if (error != ERROR_FILE_NOT_FOUND)

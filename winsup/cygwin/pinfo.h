@@ -16,7 +16,7 @@ enum
 {
   __SIGFLUSH	    = -2,
   __SIGSTRACE	    = -1,
-  __SIGUNUSED	    =  0,
+  __SIGCOMMUNE	    =  0,
   __SIGOFFSET	    =  2
 };
 
@@ -24,6 +24,17 @@ enum
 
 #include <sys/resource.h>
 #include "thread.h"
+
+struct commune_result
+{
+  char *s;
+  int n;
+};
+
+enum picom
+{
+  PICOM_CMDLINE = 1
+};
 
 class _pinfo
 {
@@ -81,6 +92,11 @@ public:
 
   /* Non-zero if process was stopped by a signal. */
   char stopsig;
+  
+  /* commune */
+  pid_t hello_pid;
+  HANDLE tothem;
+  HANDLE fromthem;
 
   void exit (UINT n, bool norecord = 0) __attribute__ ((noreturn, regparm(2)));
 
@@ -119,12 +135,19 @@ public:
   }
 
   inline void setthread2signal (void *thr) {thread2signal = (pthread *) thr;}
+  void commune_recv ();
+  commune_result commune_send (DWORD);
+  bool alive ();
+  char *cmdline (size_t &);
+
+  friend void __stdcall set_myself (pid_t, HANDLE);
 
 private:
   struct sigaction sigs[NSIG];
   sigset_t sig_mask;		/* one set for everything to ignore. */
   LONG _sigtodo[NSIG + __SIGOFFSET];
-  pthread *thread2signal;  // NULL means means thread any other means a pthread
+  pthread *thread2signal;  // NULL means thread any other means a pthread
+  CRITICAL_SECTION lock;
 };
 
 class pinfo

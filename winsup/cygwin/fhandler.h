@@ -1107,6 +1107,7 @@ class fhandler_virtual : public fhandler_base
   int close (void);
   int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
   virtual bool fill_filebuf ();
+  void fixup_after_exec (HANDLE);
 };
 
 class fhandler_proc: public fhandler_virtual
