@@ -129,7 +129,7 @@ __hash_open(file, flags, mode, info, dflags)
 
 	new_table = 0;
 	if (!file || (flags & O_TRUNC) ||
-#ifdef __CYGWIN_USE_BIG_TYPES__
+#ifdef __USE_INTERNAL_STAT64
 	    (stat64(file, &statbuf) && (errno == ENOENT))) {
 #else
 	    (stat(file, &statbuf) && (errno == ENOENT))) {
@@ -145,7 +145,7 @@ __hash_open(file, flags, mode, info, dflags)
 		/* if the .db file is empty, and we had permission to create
 		   a new .db file, then reinitialize the database */
 		if ((flags & O_CREAT) &&
-#ifdef __CYGWIN_USE_BIG_TYPES__
+#ifdef __USE_INTERNAL_STAT64
 		     fstat64(hashp->fp, &statbuf) == 0 && statbuf.st_size == 0)
 #else
 		     fstat(hashp->fp, &statbuf) == 0 && statbuf.st_size == 0)
@@ -323,7 +323,7 @@ init_hash(hashp, file, info)
 
 	/* Fix bucket size to be optimal for file system */
 	if (file != NULL) {
-#ifdef __CYGWIN_USE_BIG_TYPES__
+#ifdef __USE_INTERNAL_STAT64
 		if (stat64(file, &statbuf))
 #else
 		if (stat(file, &statbuf))

@@ -132,7 +132,7 @@ _DEFUN (_gettemp, (ptr, path, doopen),
       if (*trv == '/')
 	{
 	  *trv = '\0';
-#ifdef __CYGWIN_USE_BIG_TYPES__
+#ifdef __USE_INTERNAL_STAT64
 	  if (_stat64_r (ptr, path, &sbuf))
 #else
 	  if (_stat_r (ptr, path, &sbuf))
@@ -162,7 +162,7 @@ _DEFUN (_gettemp, (ptr, path, doopen),
 #endif
 	    return 0;
 	}
-#ifdef __CYGWIN_USE_BIG_TYPES__
+#ifdef __USE_INTERNAL_STAT64
       else if (_stat64_r (ptr, path, &sbuf))
 #else
       else if (_stat_r (ptr, path, &sbuf))

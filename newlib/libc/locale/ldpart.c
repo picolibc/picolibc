@@ -98,7 +98,7 @@ __part_load_locale(const char *name,
 	fd = open(filename, O_RDONLY);
 	if (fd < 0)
 		goto no_locale;
-#ifdef __CYGWIN_USE_BIG_TYPES__
+#ifdef __USE_INTERNAL_STAT64
 	if (fstat64(fd, &st) != 0)
 #else
 	if (fstat(fd, &st) != 0)

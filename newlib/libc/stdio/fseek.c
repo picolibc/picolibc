@@ -198,7 +198,7 @@ fseek (fp, offset, whence)
     {
       if (seekfn != __sseek
 	  || fp->_file < 0
-#ifdef __CYGWIN_USE_BIG_TYPES__
+#ifdef __USE_INTERNAL_STAT64
 	  || _fstat64_r (ptr, fp->_file, &st)
 #else
 	  || _fstat_r (ptr, fp->_file, &st)
@@ -225,7 +225,7 @@ fseek (fp, offset, whence)
     target = offset;
   else
     {
-#ifdef __CYGWIN_USE_BIG_TYPES__
+#ifdef __USE_INTERNAL_STAT64
       if (_fstat64_r (ptr, fp->_file, &st))
 #else
       if (_fstat_r (ptr, fp->_file, &st))

@@ -47,7 +47,7 @@ __smakebuf (fp)
       fp->_bf._size = 1;
       return;
     }
-#ifdef __CYGWIN_USE_BIG_TYPES__
+#ifdef __USE_INTERNAL_STAT64
   if (fp->_file < 0 || _fstat64_r (fp->_data, fp->_file, &st) < 0)
 #else
   if (fp->_file < 0 || _fstat_r (fp->_data, fp->_file, &st) < 0)

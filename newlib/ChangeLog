@@ -1,3 +1,13 @@
+2003-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/ldpart.c (__part_load_locale): Substitute
+	__CYGWIN_USE_BIG_TYPES__ by __USE_INTERNAL_STAT64.
+	* libc/search/hash.c (__hash_open): Ditto.
+	(init_hash): Ditto.
+	* libc/stdio/fseek.c (fseek): Ditto.
+	* libc/stdio/makebuf.c (__smakebuf): Ditto.
+	* libc/stdio/mktemp.c (_gettemp): Ditto.
+
 2003-05-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/stdio.h: Change one __CYGWIN__ to __CYGWIN32__.
