@@ -154,7 +154,7 @@ details. */
        56: Make ntsec on by default.
        57: Export setgroups.
        58: Export memalign, valloc, malloc_trim, malloc_usable_size, mallopt,
-           malloc_stats
+	   malloc_stats
        59: getsid
        60: MSG_NOSIGNAL
        61: Export getc_unlocked, getchar_unlocked, putc_unlocked,
