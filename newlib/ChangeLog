@@ -66,14 +66,14 @@
 	* libc/iconv/ccs/win_1256.c: Ditto.
 	* libc/iconv/ccs/win_1257.c: Ditto.
 	* libc/iconv/ccs/win_1258.c: Ditto.
-	* libc/iconv/ccs/iso_8859_15.c
-	* libc/iconv/ccs/iso_8859_2.c
-	* libc/iconv/ccs/iso_8859_4.c
-	* libc/iconv/ccs/iso_8859_5.c
-	* libc/iconv/ccs/jis_x0212_1990.c
-	* libc/iconv/ccs/koi8_r.c
-	* libc/iconv/ccs/koi8_u.c
-	* libc/iconv/ccs/ksx1001.c
+	* libc/iconv/ccs/iso_8859_15.c: Updated.
+	* libc/iconv/ccs/iso_8859_2.c: Ditto.
+	* libc/iconv/ccs/iso_8859_4.c: Ditto.
+	* libc/iconv/ccs/iso_8859_5.c: Ditto.
+	* libc/iconv/ccs/jis_x0212_1990.c: Ditto.
+	* libc/iconv/ccs/koi8_r.c: Ditto.
+	* libc/iconv/ccs/koi8_u.c: Ditto.
+	* libc/iconv/ccs/ksx1001.c: Ditto.
 	* libc/iconv/ccs/binary/gb_2312_80.cct: Removed.
 	* libc/iconv/ccs/binary/jis_x0201.cct: Ditto.
 	* libc/iconv/ccs/binary/shift_jis.cct: Ditto.
@@ -160,14 +160,14 @@
 	* libc/iconv/lib/ces_table.c: Ditto.
 	* libc/iconv/lib/converter.c: Ditto.
 	* libc/iconv/lib/deps.h: Ditto.
-	* libc/iconv/lib/aliasesbi.c: Ditto.
+	* libc/iconv/lib/loaddata.c: Ditto.
+	* libc/iconv/lib/aliasesbi.c: New file.
 	* libc/iconv/lib/aliasesi.c: Ditto.
 	* libc/iconv/lib/conv.h: Ditto.
 	* libc/iconv/lib/encnames.h: Ditto.
 	* libc/iconv/lib/encoding.deps: Ditto.
 	* libc/iconv/lib/iconvnls.c: Ditto.
 	* libc/iconv/lib/iconvnls.h: Ditto.
-	* libc/iconv/lib/loaddata.c: Ditto.
 	* libc/iconv/lib/nullconv.c: Ditto.
 	* libc/iconv/lib/ucsconv.c: Ditto.
 	* libc/iconv/lib/ucsconv.h: Ditto.
