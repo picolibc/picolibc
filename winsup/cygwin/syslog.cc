@@ -208,7 +208,7 @@ pass_handler::print_va (const char *fmt, va_list list)
  */
 
 extern "C" void
-syslog (int priority, const char *message, ...)
+vsyslog (int priority, const char *message, va_list ap)
 {
     debug_printf ("%x %s", priority, message);
     /* If the priority fails the current mask, reject */
@@ -281,8 +281,6 @@ syslog (int priority, const char *message, ...)
        output, then do it again to a malloc'ed string. This
        is ugly, slow, but prevents core dumps :-).
      */
-    va_list ap;
-
     pass_handler pass;
     for (int pass_number = 0; pass_number < 2; ++pass_number)
       {
@@ -341,10 +339,8 @@ syslog (int priority, const char *message, ...)
 	  }
 
 	/* Print out the variable part */
-	va_start (ap, message);
 	if (pass.print_va (message, ap) == -1)
 	  return;
-	va_end (ap);
 
       }
     const char *msg_strings[1];
@@ -406,6 +402,15 @@ syslog (int priority, const char *message, ...)
 	fputc ('\n', fp);
 	fclose (fp);
       }
+}
+
+extern "C" void
+syslog (int priority, const char *message, ...)
+{
+  va_list ap;
+  va_start (ap, message);
+  vsyslog (priority, message, ap);
+  va_end (ap);
 }
 
 extern "C" void

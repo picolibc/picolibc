@@ -629,7 +629,7 @@ fhandler_base::write (const void *ptr, size_t len)
       if (current_position > actual_length)
 	{
 	  if ((get_fs_flags (FILE_SUPPORTS_SPARSE_FILES))
-	      && current_position >= actual_length + (64 * 1024))
+	      && current_position >= actual_length + (128 * 1024))
 	    {
 	      /* If the file systemn supports sparse files and the application
 	         is writing after a long seek beyond EOF, convert the file to

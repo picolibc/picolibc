@@ -1300,6 +1300,7 @@ sysconf
 _sysconf = sysconf
 syslog
 _syslog = syslog
+vsyslog
 system
 _system = system
 tan

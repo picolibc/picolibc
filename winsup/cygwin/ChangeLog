@@ -1,3 +1,14 @@
+2003-06-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Add vsyslog.
+	* fhandler.cc (fhandler_base::write): Only make file sparse if the
+	seeked area is >= 128K.
+	* syslog.cc (vsyslog): New function, overtaking functionality from
+	syslog.
+	(syslog): Just call vsyslog.
+	* include/cygwin/version.h: Bump API minor.
+	* include/sys/syslog.h: Add vsyslog declaration.
+
 2003-06-05  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.cc (cygthread::terminate_thread): Change system_printf to
