@@ -1,3 +1,7 @@
+2002-11-06  Sergey Okhapkin  <sos@prospect.com.ru>
+
+	* syscalls.cc (getutid): Use UT_IDLEN where appropriate.
+
 2002-11-06  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump API minor number for below export.

@@ -2571,7 +2571,7 @@ getutid (struct utmp *id)
 	case LOGIN_PROCESS:
 	case USER_PROCESS:
 	case DEAD_PROCESS:
-   if (strncmp (id->ut_id, utmp_data.ut_id, 2) == 0)
+	   if (strncmp (id->ut_id, utmp_data.ut_id, UT_IDLEN) == 0)
 	    return &utmp_data;
 	  break;
 	default:
