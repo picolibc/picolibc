@@ -1,3 +1,8 @@
+2004-04-20  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* include/wingdi.h: Protect use of ENUMLOGFONTEXDV, PENUMLOGFONTEXDV,
+	LPENUMLOGFONTEXDV with appropriate version check.
+
 2004-04-18  Hans Leidekker  <hans@it.vu.nl>
 
 	* lib/directx/dxguid.c (CLSID_DirectSoundPrivate,
