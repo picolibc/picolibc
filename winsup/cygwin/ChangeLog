@@ -458,7 +458,7 @@
 
 	* cygthread.cc (cygthread::stub): Accept flag to pass info structure to
 	thread function.
-	(cygthread::operator new): Add defense debugging output.
+	(cygthread::operator new): Add defensive debugging output.
 	(cygthread::cygthread): Add debugging output.  Set name after thread
 	has been awakened to avoid a race.
 	(cygthread::exit_thread): Use handle operator rather than using ev
