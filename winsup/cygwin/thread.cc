@@ -604,22 +604,33 @@ pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel,
      because WaitForMultipleObjects will return the smallest index
      if both objects are signaled. */
   wait_objects[num++] = object;
-  if (is_good_object (&thread) &&
-      thread->cancelstate != PTHREAD_CANCEL_DISABLE)
-    wait_objects[num++] = thread->cancel_event;
-  if (do_sig_wait)
-    wait_objects[num++] = signal_arrived;
+  DWORD cancel_n;
+  if (!is_good_object (&thread) ||
+      thread->cancelstate == PTHREAD_CANCEL_DISABLE)
+    cancel_n = (DWORD) -1;
+  else
+    {
+      cancel_n = num++;
+      wait_objects[cancel_n] = thread->cancel_event;
+    }
+
+  DWORD sig_n;
+  if (!do_sig_wait || &_my_tls != _main_tls)
+    sig_n = (DWORD) -1;
+  else
+    {
+      sig_n = num++;
+      wait_objects[sig_n] = signal_arrived;
+    }
 
   res = WaitForMultipleObjects (num, wait_objects, FALSE, timeout);
-  if (res == WAIT_CANCELED)
+  if (res == sig_n - WAIT_OBJECT_0)
+    res = WAIT_SIGNALED;
+  else if (res == cancel_n - WAIT_OBJECT_0)
     {
-      if (num == 3 || !do_sig_wait)
-        {
-	  if (do_cancel)
-	    pthread::static_cancel_self ();
-        }
-      else
-        res = WAIT_SIGNALED;
+      if (do_cancel)
+	pthread::static_cancel_self ();
+      res = WAIT_CANCELED;
     }
   return res;
 }

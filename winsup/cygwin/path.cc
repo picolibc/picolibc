@@ -1693,7 +1693,9 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 
   if (!cygheap->root.exists ())
     /* nothing */;
-  else if (cygheap->root.ischroot_native (pathbuf))
+  else if (!cygheap->root.ischroot_native (pathbuf))
+    return ENOENT;
+  else
     {
       const char *p = pathbuf + cygheap->root.native_length ();
       if (*p)
@@ -1703,9 +1705,8 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 	  posix_path[0] = '/';
 	  posix_path[1] = '\0';
 	}
+      goto out;
     }
-  else
-    return ENOENT;
 
   /* Not in the database.  This should [theoretically] only happen if either
      the path begins with //, or / isn't mounted, or the path has a drive
