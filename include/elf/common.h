@@ -724,6 +724,26 @@
 /* Pointer to the global system page used for system calls and other
    nice things.  */
 #define AT_SYSINFO	32
-#define AT_SYSINFO_EHDR	33
+#define AT_SYSINFO_EHDR	33 /* Pointer to ELF header of system-supplied DSO.  */
+
+#define AT_SUN_UID      2000    /* Effective user ID.  */
+#define AT_SUN_RUID     2001    /* Real user ID.  */
+#define AT_SUN_GID      2002    /* Effective group ID.  */
+#define AT_SUN_RGID     2003    /* Real group ID.  */
+#define AT_SUN_LDELF    2004    /* Dynamic linker's ELF header.  */
+#define AT_SUN_LDSHDR   2005    /* Dynamic linker's section headers.  */
+#define AT_SUN_LDNAME   2006    /* String giving name of dynamic linker.  */
+#define AT_SUN_LPAGESZ  2007    /* Large pagesize.   */
+#define AT_SUN_PLATFORM 2008    /* Platform name string.  */
+#define AT_SUN_HWCAP    2009	/* Machine dependent hints about
+				   processor capabilities.  */
+#define AT_SUN_IFLUSH   2010    /* Should flush icache? */
+#define AT_SUN_CPU      2011    /* CPU name string.  */
+#define AT_SUN_EMUL_ENTRY 2012	/* COFF entry point address.  */
+#define AT_SUN_EMUL_EXECFD 2013	/* COFF executable file descriptor.  */
+#define AT_SUN_EXECNAME 2014    /* Canonicalized file name given to execve.  */
+#define AT_SUN_MMU      2015    /* String for name of MMU module.   */
+#define AT_SUN_LDDATA   2016    /* Dynamic linker's data segment address.  */
+
 
 #endif /* _ELF_COMMON_H */
