@@ -10,10 +10,6 @@ details. */
 
 #ifndef _PINFO_H
 #define _PINFO_H
-/* Signal constants (have to define them here, unfortunately) */
-
-#define PSIZE 63
-
 #include <sys/resource.h>
 #include "thread.h"
 

@@ -36,12 +36,14 @@ details. */
 /*
  * Convenience defines
  */
-#define WSSC		   60000 // Wait for signal completion
-#define WPSP		   40000 // Wait for proc_subproc mutex
+#define WSSC		  60000	// Wait for signal completion
+#define WPSP		  40000	// Wait for proc_subproc mutex
+
+#define PSIZE 63		// Number of processes
 
 #define wake_wait_subproc() SetEvent (events[0])
 
-#define no_signals_available() (!hwait_sig || !sig_loop_wait && !exit_state)
+#define no_signals_available() (!hwait_sig || !sig_loop_wait || exit_state)
 
 #define NZOMBIES	256
 

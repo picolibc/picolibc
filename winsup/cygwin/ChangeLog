@@ -1,5 +1,11 @@
 2003-11-28  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (no_signals_available): Fix so that non-zero exit state is
+	a true condition rather than errnoneously only checking other states
+	when exist_state was zero.
+
+2003-11-28  Christopher Faylor  <cgf@redhat.com>
+
 	* pinfo.h (_pinfo::getthread2signal): Remove obsolete function.
 	* cygtls.h (_threadinfo): Define tid more precisely.
 	(_threadinfo::operator HANDLE): Define.
