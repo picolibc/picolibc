@@ -1,8 +1,0 @@
-#
-# A example of Win32 GUI programming in C.
-#
-
-Main test.exe : test.c ;
-
-Gui test.exe ;
-
