@@ -1,3 +1,11 @@
+Thu Jul 20 13:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* ntsec.sgml: Add description for the new setuid ability
+	of Cygwin since release 1.1.3.
+	* overview2.sgml: Add description for new chroot functionality.
+	* calls.texinfo: Add missing calls. Change comments for
+	setuid, setgid, seteuid, setegid, chroot.
+
 Tue May  3  0:25:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * ntsec.sgml: Revisited description of `ntsec' according to

@@ -251,8 +251,8 @@ net release.)}
 @item geteuid: P 4.2.1.1
 @item getgid: P 4.2.1.1
 @item getegid: P 4.2.1.1
-@item setuid: P 4.2.2.1 (stub, sets ENOSYS, returns zero)
-@item setgid: P 4.2.2.1 (stub, sets ENOSYS, returns zero)
+@item setuid: P 4.2.2.1 (stub on 9X, sets ENOSYS, returns zero)
+@item setgid: P 4.2.2.1 (stub on 9X, sets ENOSYS, returns zero)
 @item getgroups: P 4.2.3.1
 @item getlogin: P 4.2.4.1
 @item getlogin_r: P 4.2.4.1 -- unimplemented
@@ -583,16 +583,27 @@ in MS IP stack but may not be implemented in other vendors' stacks.
 
 @item Other
 @itemize @code
-@item chroot (stub, sets ENOSYS, returns -1)
+@item acl
+@item aclcheck
+@item aclfrommode
+@item aclfrompbits
+@item aclfromtext
+@item aclsort
+@item acltomode
+@item acltopbits
+@item acltotext
+@item chroot (with restrictions)
 @item closelog
 @item cwait
 @item cygwin_conv_to_full_posix_path
 @item cygwin_conv_to_full_win32_path
 @item cygwin_conv_to_posix_path
 @item cygwin_conv_to_win32_path
+@item cygwin_logon_user
 @item cygwin_posix_path_list_p
 @item cygwin_posix_to_win32_path_list
 @item cygwin_posix_to_win32_path_list_buf_size
+@item cygwin_set_impersonation_token
 @item cygwin_split_path
 @item cygwin_win32_to_posix_path_list
 @item cygwin_win32_to_posix_path_list_buf_size
@@ -604,6 +615,7 @@ in MS IP stack but may not be implemented in other vendors' stacks.
 @item dlsym
 @item endgrent
 @item endhostent
+@item facl
 @item ffs
 @item fstatfs
 @item ftime
@@ -638,10 +650,10 @@ in MS IP stack but may not be implemented in other vendors' stacks.
 @item regfree
 @item rexec
 @item select
-@item setegid: SVR4 (stub, sets ENOSYS, returns zero)@item endpwent
+@item setegid: SVR4 (stub on 9X, sets ENOSYS, returns zero)@item endpwent
 @item setenv
 @item seterrno
-@item seteuid (stub, sets ENOSYS, returns zero)
+@item seteuid (stub on 9X, sets ENOSYS, returns zero)
 @item sethostent
 @item setitimer
 @item setmntent

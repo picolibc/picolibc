@@ -67,18 +67,22 @@ nature.  The best example is that only NT provides a security model.</para>
 
 <sect2 id="ov-hi-perm"><title>Permissions and Security</title>
 <para>Windows NT includes a sophisticated security model based on Access
-Control Lists (ACLs).  Although some modern UNIX operating systems include
-support for ACLs, Cygwin maps Win32 file ownership and permissions to the
-more standard, older UNIX model.  The chmod call maps UNIX-style permissions
+Control Lists (ACLs).  Cygwin maps Win32 file ownership and permissions to the
+more standard, older UNIX model by default.  Cygwin version 1.1 introduces
+support for ACLs according to the system calls used on newer versions of
+Solaris. This ability is used when the `ntsec' feature is switched on which
+is described in another chapter.
+The chmod call maps UNIX-style permissions
 back to the Win32 equivalents.  Because many programs expect to be able to find
 the /etc/passwd and /etc/group files, we provide utilities that can be used to
 construct them from the user and group information provided by the operating
 system.</para>
 
 <para>Under Windows NT, the administrator is permitted to chown files.  There
-is currently no mechanism to support the setuid concept or API call.  Although
-we hope to support this functionality at some point in the future, in practice,
-the programs we have ported have not needed it.</para>
+is no mechanism to support the setuid concept or API call since Cygwin version
+1.1.2.  With version 1.1.3 Cygwin introduces a mechanism for setting real
+and effective UIDs under Windows NT/W2K. This is described in the ntsec
+section.</para>
 
 <para>Under Windows 9x, the situation is considerably different.  Since a
 security model is not provided, Cygwin fakes file ownership by making all
@@ -144,6 +148,18 @@ d_ino of the dirent structure.  It is worth noting that the number produced by
 this method is not guaranteed to be unique.  However, we have not found this to
 be a significant problem because of the low probability of generating a
 duplicate inode number.</para>
+
+<para>Chroot is supported since release 1.1.3. Note that chroot isn't
+supported native by Windows. This implies some restrictions. First of all,
+the chroot call isn't a privileged call. Each user may call it. Second, the
+chroot environment isn't safe against native windows processes. If you
+want to support a chroot environment as, for example, by allowing an
+anonymous ftp with restricted access, you'll have to care that only
+native Cygwin applications are accessible inside of the chroot environment.
+Since that applications are only using the Cygwin POSIX API to access the
+file system their access can be restricted as it is intended. This includes
+not only POSIX paths but Win32 paths (containing drive letter and/or
+backslashes) and CIFS paths (//server/share or \\server\share) as well.</para>
 </sect2>
 
 <sect2 id="ov-hi-textvsbinary"><title>Text Mode vs. Binary Mode</title>
