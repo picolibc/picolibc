@@ -1,6 +1,8 @@
 #ifndef _NTDEF_H_
 #define _NTDEF_H_
 
+#define NTAPI __stdcall
+
 #define OBJ_INHERIT 2L
 #define OBJ_PERMANENT 16L
 #define OBJ_EXCLUSIVE 32L
