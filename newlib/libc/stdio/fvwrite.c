@@ -129,7 +129,11 @@ _DEFUN(__sfvwrite, (fp, uio),
                                                      fp->_bf._base, 
                                                      curpos + len);
 		  if (!ptr)
-		    goto err;
+		    {
+		      /* Free buffer which is no longer used.  */
+		      _free_r (_REENT, fp->_bf._base);
+		      goto err;
+		    }
 		  fp->_bf._base = ptr;
 		  fp->_p = ptr + curpos;
 		  fp->_bf._size = curpos + len;

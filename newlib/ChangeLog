@@ -1,3 +1,9 @@
+2004-07-16  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/fvwrite.c (_sfvwrite):  For asprintf family
+	calls, if realloc fails, free up buffer as it is no longer
+	used.
+
 2004-07-07  Artem B. Bityuckiy  <dedekind@oktetlabs.ru>
 
 	* libc/iconv/iconv.tex: Updated to represent recent changes.
