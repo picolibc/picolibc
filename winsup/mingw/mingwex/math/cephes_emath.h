@@ -300,8 +300,6 @@ static __inline__ void __eshdn6(register short unsigned int *x);
 #define NTEN 12
 #define MAXP 4096
 
-extern const unsigned short __etens[NTEN + 1][NE];
-
 /*
 ; Clear out entire external format number.
 ;

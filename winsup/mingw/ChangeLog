@@ -1,3 +1,7 @@
+2004-07-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/cephes_emath.h (__etens): Remove declaration.
+
 2004-07-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/unistd.h (ftruncate): Add inline definition.
