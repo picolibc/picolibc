@@ -1,3 +1,8 @@
+2003-02-18  Earnie Boyd  <earnie@users.sf.net>
+
+	* libc/stdlib/mallocr.c (unlink): Don't assign a value to a pointer
+	with a NULL value.
+
 2003-02-10  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/sys/types.h: Don't define __MS_types__ for Cygwin.
