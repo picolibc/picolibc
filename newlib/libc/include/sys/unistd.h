@@ -148,29 +148,33 @@ int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 
 long _EXFUN(sysconf, (int __name));
 
-# define	_SC_ARG_MAX	0
-# define	_SC_CHILD_MAX	1
-# define	_SC_CLK_TCK	2
-# define	_SC_NGROUPS_MAX	3
-# define	_SC_OPEN_MAX	4
+# define	_SC_ARG_MAX	        0
+# define	_SC_CHILD_MAX	        1
+# define	_SC_CLK_TCK	        2
+# define	_SC_NGROUPS_MAX	        3
+# define	_SC_OPEN_MAX	        4
 /* no _SC_STREAM_MAX */
-# define	_SC_JOB_CONTROL	5
-# define	_SC_SAVED_IDS	6
-# define	_SC_VERSION	7
-# define        _SC_PAGESIZE    8
+# define	_SC_JOB_CONTROL	        5
+# define	_SC_SAVED_IDS	        6
+# define	_SC_VERSION	        7
+# define        _SC_PAGESIZE            8
+# define        _SC_NPROCESSORS_CONF    9
+# define        _SC_NPROCESSORS_ONLN   10
+# define        _SC_PHYS_PAGES         11
+# define        _SC_AVPHYS_PAGES       12
 
-# define	_PC_LINK_MAX	0
-# define	_PC_MAX_CANON	1
-# define	_PC_MAX_INPUT	2
-# define	_PC_NAME_MAX	3
-# define	_PC_PATH_MAX	4
-# define	_PC_PIPE_BUF	5
-# define	_PC_CHOWN_RESTRICTED	6
-# define	_PC_NO_TRUNC	7
-# define	_PC_VDISABLE	8
-# define	_PC_ASYNC_IO    9
-# define	_PC_PRIO_IO     10
-# define	_PC_SYNC_IO     11
+# define	_PC_LINK_MAX	        0
+# define	_PC_MAX_CANON	        1
+# define	_PC_MAX_INPUT	        2
+# define	_PC_NAME_MAX	        3
+# define	_PC_PATH_MAX	        4
+# define	_PC_PIPE_BUF	        5
+# define	_PC_CHOWN_RESTRICTED   	6
+# define	_PC_NO_TRUNC	        7
+# define	_PC_VDISABLE	        8
+# define	_PC_ASYNC_IO            9
+# define	_PC_PRIO_IO            10
+# define	_PC_SYNC_IO            11
 
 # ifndef	_POSIX_SOURCE
 #  define	MAXNAMLEN	1024

@@ -1,3 +1,9 @@
+Tue Oct 24 20:16:00 2000  Corinna Vinschen <vinschen@cygnus.com>
+
+	* libc/include/sys/unistd.h: Add defines for sysconf values
+	_SC_NPROCESSORS_CONF, _SC_NPROCESSORS_ONLN, _SC_PHYS_PAGES and
+	_SC_AVPHYS_PAGES.
+
 Mon Oct  9 20:26:33 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/sys/unistd.h: Add getdtablesize and setdtablesize
