@@ -5,6 +5,7 @@
 
 #ifndef SYSCALL_H
 
+#include <machine/weakalias.h>
 #include <sys/errno.h>
 #include <asm/unistd.h>
 
@@ -21,6 +22,12 @@
 /*
  * PIC uses %ebx, so we need to save it during system calls
  */
+
+#undef __inline_syscall0
+#define __inline_syscall0(name,ret) \
+__asm__ volatile ("int $0x80" \
+	: "=a" (ret) \
+	: "0" (__NR_##name));
 
 #undef __inline_syscall1
 #define __inline_syscall1(name,ret,arg1) \
@@ -61,61 +68,77 @@ __asm__ volatile ("push %%ebx; lea 8(%%ebp),%%ebx; int $0x80; pop %%ebx" \
 	: "=a" (ret) \
 	: "0" (__NR_##name));
 
+#undef _syscall0
+#define _syscall0(type,name) \
+type __libc_##name (void) \
+{ \
+long __res; \
+__inline_syscall0(name,__res) \
+__syscall_return(type,__res); \
+} \
+weak_alias(__libc_##name,name);
+
 #undef _syscall1
 #define _syscall1(type,name,type1,arg1) \
-type name(type1 arg1) \
+type __libc_##name (type1 arg1) \
 { \
 long __res; \
 __inline_syscall1(name,__res,arg1) \
 __syscall_return(type,__res); \
-}
+} \
+weak_alias(__libc_##name,name);
 
 #undef _syscall2
 #define _syscall2(type,name,type1,arg1,type2,arg2) \
-type name(type1 arg1,type2 arg2) \
+type __libc_##name (type1 arg1,type2 arg2) \
 { \
 long __res; \
 __inline_syscall2(name,__res,arg1,arg2) \
 __syscall_return(type,__res); \
-}
+} \
+weak_alias(__libc_##name,name);
 
 #undef _syscall3
 #define _syscall3(type,name,type1,arg1,type2,arg2,type3,arg3) \
-type name(type1 arg1,type2 arg2,type3 arg3) \
+type __libc_##name (type1 arg1,type2 arg2,type3 arg3) \
 { \
 long __res; \
 __inline_syscall3(name,__res,arg1,arg2,arg3) \
 __syscall_return(type,__res); \
-}
+} \
+weak_alias(__libc_##name,name);
 
 #undef _syscall4
 #define _syscall4(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4) \
-type name (type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
+type __libc_##name (type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
 { \
 long __res; \
 __inline_syscall4(name,__res,arg1,arg2,arg3,arg4) \
 __syscall_return(type,__res); \
-}
+} \
+weak_alias(__libc_##name,name);
 
 #undef _syscall5
 #define _syscall5(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4, \
           type5,arg5) \
-type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5) \
+type __libc_##name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5) \
 { \
 long __res; \
 __inline_syscall5(name,__res,arg1,arg2,arg3,arg4,arg5) \
 __syscall_return(type,__res); \
-}
+} \
+weak_alias(__libc_##name,name);
 
 #undef _syscall6
 #define _syscall6(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4, \
           type5,arg5,type6,arg6) \
-type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,type6 arg6) \
+type __libc_##name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,type6 arg6) \
 { \
 long __res; \
 __inline_syscall6(name,__res,arg1,arg2,arg3,arg4,arg5,arg6) \
 __syscall_return(type,__res); \
-}
+} \
+weak_alias(__libc_##name,name);
 
 #endif /* __PIC__ && __i386__ */
 

@@ -6,10 +6,10 @@
    LinuxThreads. */
 #if !defined(__SINGLE_THREAD__)
 #  if !defined(_flockfile)
-#    define _flockfile(fp) /* FIXME: Uncomment when LinuxThreads is in: flockfile(fp) */
+#    define _flockfile(fp) flockfile(fp)
 #  endif
 #  if !defined(_funlockfile)
-#    define _funlockfile(fp) /* FIXME: Uncomment when LinuxThreads is in: funlockfile(fp) */
+#    define _funlockfile(fp) funlockfile(fp)
 #  endif
 #endif /* __SINGLE_THREAD__ */
 

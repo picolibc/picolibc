@@ -43,6 +43,7 @@ AM_MAKEFLAGS = \
 	"libdir=$(libdir)" \
 	"prefix=$(prefix)" \
 	"tooldir=$(tooldir)" \
+	"toollibdir=$(toollibdir)" \
 	"AR=$(AR)" \
 	"AS=$(AS)" \
 	"CC=$(CC_FOR_NEWLIB)" \
@@ -205,6 +206,11 @@ stmp-targ-include: config.status
 	      cp $$i targ-include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done
+	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/include/*.h; do \
+	    if [ -f $$i ]; then \
+	      cp $$i targ-include/machine/`basename $$i`; \
+	    else true; fi ; \
+	  done
 	touch $@
 
 CLEANFILES = targ-include stmp-targ-include
@@ -242,6 +248,11 @@ endif
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
+	    else true; fi ; \
+	  done ; \
+	  for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/include/*.h; do \
+	    if [ -f $$i ]; then \
+	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
 	else true; fi

@@ -50,11 +50,11 @@ int sigblock(int mask) /* BSD */
     return __ssetmask(mask | __sgetmask());
 }
 
-
-int raise(int sig)
+int __libc_raise(int sig)
 {
     return kill(getpid(),sig);
 }
+weak_alias(__libc_raise,raise)
 
 int sigtimedwait(const sigset_t *set, siginfo_t *info,
                  struct timespec *timeout)

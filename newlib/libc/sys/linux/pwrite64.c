@@ -35,9 +35,10 @@ Supporting OS subroutine required: <<write>>, <<lseek64>>.
 #include <_ansi.h>
 #include <unistd.h>
 #include <reent.h>
+#include <machine/weakalias.h>
 
 ssize_t
-_DEFUN (pwrite64, (fd, buf, n, off),
+_DEFUN (__libc_pwrite64, (fd, buf, n, off),
      int fd _AND
      _PTR buf _AND
      size_t n _AND
@@ -59,4 +60,5 @@ _DEFUN (pwrite64, (fd, buf, n, off),
 
   return (ssize_t)num_written;
 }
+weak_alias(__libc_pwrite64,pwrite64)
 

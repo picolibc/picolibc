@@ -9,12 +9,15 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 
 extern char **environ;
 
 extern int main(int argc,char **argv,char **envp);
 
+extern void *_end;
+extern void *__bss_start;
 
 void _start(int args)
 {
@@ -29,6 +32,10 @@ void _start(int args)
     char **argv = (char **) (params+1);
 
     environ = argv+argc+1;
+
+    /* clear bss */
+    memset(__bss_start,0,((char *)_end - (char *)__bss_start));
+
     tzset(); /* initialize timezone info */
     exit(main(argc,argv,environ));
 }

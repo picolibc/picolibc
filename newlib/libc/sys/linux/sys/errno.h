@@ -25,4 +25,6 @@ extern __IMPORT int _sys_nerr;
 
 #include <asm/errno.h>
 
+#define ENOTSUP EOPNOTSUPP
+
 #endif

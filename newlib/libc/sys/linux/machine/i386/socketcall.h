@@ -6,6 +6,7 @@
 
 #define _SOCKETCALL_H 
 
+#include <machine/weakalias.h>
 #include <sys/errno.h>
 #include <asm/unistd.h>
 #include "sockops.h"
@@ -25,32 +26,38 @@ __syscall_return(type,__res); \
 
 #undef _sockcall1
 #define _sockcall1(type,name,type1,arg1) \
-type name(type1 arg1) \
-__sockcall_base(type,name)
+type __libc_##name(type1 arg1) \
+__sockcall_base(type,name) \
+weak_alias(__libc_##name,name)
 
 #undef _sockcall2
 #define _sockcall2(type,name,type1,arg1,type2,arg2) \
-type name(type1 arg1, type2 arg2) \
-__sockcall_base(type,name)
+type __libc_##name(type1 arg1, type2 arg2) \
+__sockcall_base(type,name) \
+weak_alias(__libc_##name,name)
 
 #undef _sockcall3
 #define _sockcall3(type,name,type1,arg1,type2,arg2,type3,arg3) \
-type name(type1 arg1, type2 arg2, type3 arg3) \
-__sockcall_base(type,name)
+type __libc_##name(type1 arg1, type2 arg2, type3 arg3) \
+__sockcall_base(type,name) \
+weak_alias(__libc_##name,name)
 
 #undef _sockcall4
 #define _sockcall4(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4) \
-type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
-__sockcall_base(type,name)
+type __libc_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
+__sockcall_base(type,name) \
+weak_alias(__libc_##name,name)
 
 #undef _sockcall5
 #define _sockcall5(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5) \
-type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) \
-__sockcall_base(type,name)
+type __libc_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5) \
+__sockcall_base(type,name) \
+weak_alias(__libc_##name,name)
 
 #undef _sockcall6
 #define _sockcall6(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5,type6,arg6) \
-type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6) \
-__sockcall_base(type,name)
+type __libc_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6) \
+__sockcall_base(type,name) \
+weak_alias(__libc_##name,name)
 
 #endif /* _SOCKETCALL_H */

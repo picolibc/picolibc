@@ -29,6 +29,6 @@ if test -n "${machine_dir}"; then
 fi
 AC_SUBST(LINUX_MACH_LIB)
 
-AC_CONFIG_SUBDIRS(machine)
+AC_CONFIG_SUBDIRS(machine $EXTRA_DIRS)
 
 AC_OUTPUT(Makefile)

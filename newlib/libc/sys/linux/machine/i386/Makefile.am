@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = sigset.c
+LIB_SOURCES = setjmp.S sigset.c syscalls.c
 
 liblinuxi386_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -22,5 +22,6 @@ include $(srcdir)/../../../../../Makefile.shared
 
 all: crt0.o
 
+AM_CFLAGS = -I$(srcdir)/../..
 ACLOCAL_AMFLAGS = -I ../../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

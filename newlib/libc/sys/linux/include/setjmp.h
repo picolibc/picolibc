@@ -15,10 +15,12 @@ extern "C" {
 
 typedef struct __sigjmpbuf
 {
-  jmp_buf __buf;
+  __jmp_buf __buf;
   int __is_mask_saved;
   sigset_t __saved_mask;
 } sigjmp_buf;
+
+typedef __jmp_buf jmp_buf;
 
 void	_EXFUN(longjmp,(jmp_buf __jmpb, int __retval));
 int	_EXFUN(setjmp,(jmp_buf __jmpb));

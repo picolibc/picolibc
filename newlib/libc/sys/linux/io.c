@@ -12,6 +12,7 @@
 #include <sys/uio.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <poll.h>
 #include <machine/syscall.h>
 
 
@@ -32,6 +33,7 @@ _syscall2(int,dup2,int,oldfd,int,newfd)
 _syscall3(int,fcntl,int,fd,int,cmd,long,arg)
 _syscall1(int,fdatasync,int,fd)
 _syscall1(int,fsync,int,fd)
+_syscall3(int,poll,struct pollfd *,fds,nfds_t,nfds,int,timeout)
 
 static _syscall2(long,__flock,unsigned int,fd,unsigned int,cmd)
 static _syscall3(int,__ioctl,int,fd,int,request,void *,arg)
@@ -58,3 +60,12 @@ int mkfifo(const char *path, mode_t mode)
    dev_t dev = 0;
    return __mknod(path, mode | S_IFIFO, &dev);
 }
+
+weak_alias(__libc_close,__close);
+weak_alias(__libc_fcntl,__fcntl);
+weak_alias(__libc_lseek,__lseek);
+weak_alias(__libc_open,__open);
+weak_alias(__libc_read,__read);
+weak_alias(__libc_write,__write);
+weak_alias(__libc_poll,__poll);
+

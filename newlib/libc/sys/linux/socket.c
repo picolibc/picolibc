@@ -28,3 +28,5 @@ _sockcall3(int,socket,int,domain,int,type,int,protocol)
 _sockcall4(int,socketpair,int,domain,int,type,int,protocol,int,fds[2])
 _sockcall3(ssize_t,sendmsg,int,fd,const struct msghdr *,message,int,flags)
 
+weak_alias(__libc_connect,__connect);
+weak_alias(__libc_send,__send);

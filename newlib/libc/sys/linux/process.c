@@ -19,6 +19,8 @@ _syscall0(pid_t,getppid)
 _syscall0(pid_t,getpgrp)
 _syscall0(pid_t,setsid)
 
+weak_alias(__libc_getpid,__getpid);
+
 /* FIXME: get rid of noreturn warning */
 
 #define return for (;;)

@@ -1,3 +1,76 @@
+2002-05-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am: Copy and install headers from sys/machine/include
+	directory.  Also pass $toollibdir to lower-level directories.
+	* Makefile.in: Regenerated.
+	* libc/include/stdio.h[!_REENT_ONLY]: Change stdin, stdout, and 
+	stderr to use _REENT macro instead of _impure_ptr directly.
+	* libc/include/sys/config.h[__i386__][__linux__]: Define
+	__DYNAMIC_REENT__.
+	* libc/include/sys/reent.h[!_REENT_ONLY]: Change _REENT macro to be 
+	call to __getreent() function if !__SINGLE_THREAD__ and
+	__DYNAMIC_REENT__ is set.
+	* libc/reent/Makefile.am: Add support for getreent.c.
+	* libc/reent/Makefile.in: Regenerated.
+	* libc/string/strerror.c: Add check if EOPNOTSUPP and ENOTSUP are same.
+	* libc/sys/linux/Makefile.am: Add support for new files.
+	* libc/sys/linux/configure.in: Add $EXTRA_DIRS variable.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/configure: Ditto.
+	* libc/sys/linux/io.c: Add poll syscall.  Also weak-alias
+	__close, __read, __write, __poll, __open, __lseek, __fcntl from
+	their __libc_ counterparts.
+	* libc/sys/linux/io64.c: Add __libc_ prefix to lseek64 and open64
+	and weak-alias to regular names.
+	* libc/sys/linux/pread64.c: Rename to __libc_pread64 and weak-alias
+	to pread64 and __pread64.
+	* libc/sys/linux/process.c: Weak_alias __libc_getpid to __getpid.
+	* libc/sys/linux/pwrite64.c: Rename to __libc_pwrite64 and
+	weak-alias to pwrite64.
+	* libc/sys/linux/sched.c: Weak-alias __libc_sched_getparam,
+	__libc_sched_getscheduler, __libc_sched_get_priority_max,
+	__libc_sched_get_priority_min, and __libc_sched_setschedule to
+	name with __ instead of __libc_. 
+	* libc/sys/linux/siglongjmp.c: Include <machine/weakalias.h>.
+	Rename siglongjmp to __libc_siglongjmp and weak-alias to siglongjmp.
+	Call __libc_longjmp instead of longjmp, from __libc_siglongjmp.
+	* libc/sys/linux/signal.c: Rename raise to __libc_raise and weak-alias
+	to raise.
+	* libc/sys/linux/socket.c: Weak-alias __libc_connect to __connect and
+	__libc_send to __send.
+	* libc/sys/linux/time.c: Weak-alias __libc_gettimeofday to
+	__gettimeofday.
+	* libc/sys/linux/wait.c: Rename wait to __libc_wait and weak-alias
+	it to wait.  Rename wait3 to __libc_wait3 and weak-alias it to wait3.
+	* libc/sys/linux/include/setjmp.h: Use __jmp_buf in sigjmp_buf
+	type and typedef __jmp_buf to jmp_buf.
+	* libc/sys/linux/machine/i386/Makefile.am: Add syscalls.c and
+	setjmp.S.
+	* libc/sys/linux/machine/i386/Makefile.in: Regenerated.
+	* libc/sys/linux/machine/i386/crt0.c: Add support to clear .bss
+	section.
+	* libc/sys/linux/machine/i386/socketcall.h: Change to use __libc_
+	prefix for function macros and then use weak_alias() to regular names.
+	* libc/sys/linux/machine/i386/syscall.h: Ditto.
+	* libc/sys/linux/sys/errno.h: Define EOPNOTSUP to be ENOTSUP.
+	* libc/sys/linux/sys/stdio.h: Define _flockfile and _funlockfile
+	to be flockfile() and funlockfile() respectively.
+	* libc/sys/linux/sys/types.h
+	* libc/reent/getreent.c: New file.
+	* libc/sys/linux/flockfile.c: Ditto.
+	* libc/sys/linux/funlockfile.c: Ditto.
+	* libc/sys/linux/getreent.c: Ditto.
+	* libc/sys/linux/pread.c: Ditto.
+	* libc/sys/linux/pwrite.c: Ditto.
+	* libc/sys/linux/raise.c: Ditto.
+	* libc/sys/linux/system.c: Ditto.
+	* libc/sys/linux/tcdrain.c: Ditto.
+	* libc/sys/linux/machine/i386/i386mach.h: Ditto.
+	* libc/sys/linux/machine/i386/setjmp.S: Ditto.
+	* libc/sys/linux/machine/i386/syscalls.c: Ditto.
+	* libc/sys/linux/machine/i386/weakalias.h: Ditto.
+	* libc/sys/linux/machine/i386/include/setjmp.h: Ditto.
+
 2002-05-14 Dhananjay Deshpande <dhananjayd@kpit.com>
 
 	* newlib/libc/sys/h8300hms/Makeile.am (lib_a_SOURCES): Add read.c.

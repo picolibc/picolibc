@@ -15,3 +15,4 @@ _syscall1(clock_t,times,struct tms *,buf)
 _syscall2(int,gettimeofday,struct timeval *,tv,struct timezone *,tz)
 _syscall2(int,nanosleep,const struct timespec *,req,struct timespec *,rem)
 
+weak_alias(__libc_gettimeofday,__gettimeofday);

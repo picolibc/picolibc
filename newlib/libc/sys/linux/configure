@@ -2369,7 +2369,7 @@ if test -n "${machine_dir}"; then
 fi
 
 
-subdirs="machine"
+subdirs="machine $EXTRA_DIRS"
 
 
 trap '' 1 2 15
@@ -2704,7 +2704,7 @@ if test "$no_recursion" != yes; then
     esac
   done
 
-  for ac_config_dir in machine; do
+  for ac_config_dir in machine $EXTRA_DIRS; do
 
     # Do not complain, so a configure script can configure whichever
     # parts of a large source tree are present.

@@ -20,14 +20,15 @@ _syscall2(int,stat64,const char *,name,struct stat64 *,st)
 
 static _syscall5(void,_llseek,int,fd,off_t,hi,off_t,lo,loff_t *,pos,int,whence)
 
-loff_t lseek64(int fd, loff_t offset, int whence)
+loff_t __libc_lseek64(int fd, loff_t offset, int whence)
 {
   loff_t pos;
-  _llseek(fd, offset >> 32, offset & 0xffffffff, &pos, whence);
+  __libc__llseek(fd, offset >> 32, offset & 0xffffffff, &pos, whence);
   return pos;
 }
+weak_alias(__libc_lseek64,lseek64);
 
-int open64(const char *path, int oflag, ...)
+int __libc_open64(const char *path, int oflag, ...)
 {
    mode_t mode = 0;
    if (oflag & O_CREAT)
@@ -37,7 +38,9 @@ int open64(const char *path, int oflag, ...)
        mode = va_arg(list, int);
        va_end(list);
      }
-   return open(path, oflag | O_LARGEFILE, mode);
+   return __libc_open(path, oflag | O_LARGEFILE, mode);
 }
+weak_alias(__libc_open64,open64);
+weak_alias(__libc_open64,__open64);
 
 

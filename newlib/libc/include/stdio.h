@@ -131,9 +131,15 @@ typedef struct __sFILE FILE;
 
 #define	TMP_MAX		26
 
+#ifndef _REENT_ONLY
+#define	stdin	(_REENT->_stdin)
+#define	stdout	(_REENT->_stdout)
+#define	stderr	(_REENT->_stderr)
+#else /* _REENT_ONLY */
 #define	stdin	(_impure_ptr->_stdin)
 #define	stdout	(_impure_ptr->_stdout)
 #define	stderr	(_impure_ptr->_stderr)
+#endif /* _REENT_ONLY */
 
 #define _stdin_r(x)	((x)->_stdin)
 #define _stdout_r(x)	((x)->_stdout)

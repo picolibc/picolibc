@@ -92,7 +92,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = sigset.c
+LIB_SOURCES = setjmp.S sigset.c syscalls.c
 
 liblinuxi386_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -103,6 +103,7 @@ liblinuxi386_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
 
+AM_CFLAGS = -I$(srcdir)/../..
 ACLOCAL_AMFLAGS = -I ../../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -115,11 +116,12 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  sigset.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  setjmp.o sigset.o syscalls.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 liblinuxi386_la_LIBADD = 
-@USE_LIBTOOL_TRUE@liblinuxi386_la_OBJECTS =  sigset.lo
+@USE_LIBTOOL_TRUE@liblinuxi386_la_OBJECTS =  setjmp.lo sigset.lo \
+@USE_LIBTOOL_TRUE@syscalls.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

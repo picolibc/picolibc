@@ -35,9 +35,10 @@ Supporting OS subroutine required: <<read>>, <<lseek64>>.
 #include <_ansi.h>
 #include <unistd.h>
 #include <reent.h>
+#include <machine/weakalias.h>
 
 ssize_t
-_DEFUN (pread64, (fd, buf, n, off),
+_DEFUN (__libc_pread64, (fd, buf, n, off),
      int fd _AND
      _PTR buf _AND
      size_t n _AND
@@ -59,4 +60,6 @@ _DEFUN (pread64, (fd, buf, n, off),
 
   return (ssize_t)num_read;
 }
+weak_alias(__libc_pread64,pread64);
+weak_alias(__libc_pread64,__pread64);
 

@@ -10,6 +10,7 @@ LIB_SOURCES = \
 	impure.c \
 	execr.c \
 	fstatr.c \
+	getreent.c \
 	linkr.c \
 	lseekr.c \
 	openr.c \

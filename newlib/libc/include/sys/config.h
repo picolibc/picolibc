@@ -54,6 +54,10 @@
 /* in other words, go32 */
 #define _FLOAT_RET double
 #endif
+#ifdef __linux__
+/* we want the reentrancy structure to be returned by a function */
+#define __DYNAMIC_REENT__
+#endif
 #endif
 
 #ifdef __M32R__
