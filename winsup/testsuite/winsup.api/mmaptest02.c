@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 
 sigset_t unblock_sigsegv;
 jmp_buf r;
@@ -27,7 +28,7 @@ int fd;
 */
 
 void
-perror_exit (char *str, int code)
+perror_exit (const char *str, int code)
 {
   printf ("%s: %s\n", str, strerror (errno));
   exit (code);

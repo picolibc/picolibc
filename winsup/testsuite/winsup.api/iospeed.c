@@ -33,7 +33,7 @@ void
 end()
 {
   unsigned long end_tic = GetTickCount();
-  printf("%6d", end_tic - start_tic);
+  printf("%6ld", end_tic - start_tic);
 }
 
 void

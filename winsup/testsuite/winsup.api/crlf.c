@@ -1,4 +1,3 @@
-
 typedef enum {
   Nop=100000,	/* 	; do nothing */
   New1,		/*	; reset and begin new  test */
@@ -146,6 +145,7 @@ int commands[] = {
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -250,7 +250,7 @@ v(char *fmt, ...)
 }
 
 void
-vp(char *fmt, ...)
+vp(const char *fmt, ...)
 {
   va_list ap;
   if (!verbose) return;
@@ -262,7 +262,7 @@ vp(char *fmt, ...)
 }
 
 void
-errorq(int use_errno, char *fmt, ...)
+errorq(int use_errno, const char *fmt, ...)
 {
   va_list ap;
   fprintf(stderr, "crlf: Error at pc=%d: ", pc);
@@ -276,7 +276,7 @@ errorq(int use_errno, char *fmt, ...)
 }
 
 void
-error(int use_errno, char *fmt, ...)
+error(int use_errno, const char *fmt, ...)
 {
   va_list ap;
   fprintf(stderr, "crlf: Error at pc=%d: ", pc);
@@ -291,7 +291,7 @@ error(int use_errno, char *fmt, ...)
 }
 
 void
-display_buf(char *which, Buffer *buf, int ofs)
+display_buf(const char *which, Buffer *buf, int ofs)
 {
   int i;
   fprintf(stderr, "%s %04x:", which, ofs);
@@ -303,13 +303,13 @@ display_buf(char *which, Buffer *buf, int ofs)
 	if (isgraph(b))
 	  fprintf(stderr, " %c ", b);
 	else
-	  fprintf(stderr, "   ", b);
+	  fprintf(stderr, " . "/*, b*/);
       }
   fprintf(stderr, "\n");
 }
 
 void
-compare_bufs(char *name, Buffer *actual, Buffer *expected)
+compare_bufs(const char *name, Buffer *actual, Buffer *expected)
 {
   int i, got_one=0;
   for (i=0; i<actual->count && i<expected->count; i++)
@@ -340,12 +340,12 @@ compare_bufs(char *name, Buffer *actual, Buffer *expected)
 int
 main(int argc, char **argv)
 {
-  char *readmode = "rb";
-  char *writemode = "wb";
+  const char *readmode = "rb";
+  const char *writemode = "wb";
   FILE *file = 0;
-  int i, fd;
+  int i;
   struct stat st;
-  char *str;
+  const char *str = "";
 
   while (argc > 1 && argv[1][0] == '-')
     {

@@ -8,6 +8,7 @@
 #include <sys/mman.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <string.h>
 
 /* - Checks if mapping of already closed file survives fork()
    - Checks if mapping the same region of the same file twice
@@ -21,7 +22,7 @@ jmp_buf r;
 char const line[] = "y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1";
 
 void
-perror_exit (char *str)
+perror_exit (const char *str)
 {    
   printf ("%s: %s\n", str, strerror (errno));
   exit (1);
@@ -37,7 +38,7 @@ sigsegv (int unused)
 int
 main(int argc, char **argv)
 {
-  int i, fd, status;
+  int fd, status;
   struct stat statbuf;
   char c, *buf1, *buf2;
   pid_t pid;

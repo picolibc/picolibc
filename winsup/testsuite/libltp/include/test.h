@@ -200,7 +200,7 @@ extern void tst_brkm(int ttype, void (*func)(), const char *arg_fmt, ...);
 extern void tst_brkloopm(int ttype, void (*func)(), const char *arg_fmt, ...);
 
 extern int  tst_environ();
-extern void tst_exit();
+extern void tst_exit() __attribute__ ((noreturn));
 extern void tst_flush();
 
 /* prototypes for the t_res.c functions */

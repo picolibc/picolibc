@@ -2,6 +2,9 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -10,7 +13,7 @@
 int
 main ()
 {
-  char *data, *data2, *data3;
+  char *data, *data2 = NULL, *data3;
   int i, pagesize;
   int fd;
 

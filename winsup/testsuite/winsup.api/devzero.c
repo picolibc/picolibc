@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 
-main()
+int
+main(int argc, char **argv)
 {
-  int fd, r, w, l;
+  int fd, r, l;
   char buf[1024];
   char *v;
 

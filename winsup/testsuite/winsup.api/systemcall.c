@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/wait.h>
 
 int
 main (int argc, char **argv)
@@ -13,19 +16,19 @@ main (int argc, char **argv)
   close (0);
   if ((fd = open ("/dev/null", O_WRONLY)) != 0)
     {
-      fprintf (stderr, "couldn't redirect stdin to /dev/null, fd %d - %s\n", fd, strerror ());
+      fprintf (stderr, "couldn't redirect stdin to /dev/null, fd %d - %s\n", fd, strerror (errno));
       exit (1);
     }
 
   close (1);
   if ((fd = open ("/dev/null", O_WRONLY)) != 1)
     {
-      fprintf (stderr, "couldn't redirect stdout to /dev/null, fd %d - %s\n", fd, strerror ());
+      fprintf (stderr, "couldn't redirect stdout to /dev/null, fd %d - %s\n", fd, strerror (errno));
       exit (1);
     }
   if (pipe (fds))
     {
-      fprintf (stderr, "pipe call failed - %s\n", strerror ());
+      fprintf (stderr, "pipe call failed - %s\n", strerror (errno));
       exit (1);
     }
   if ((pid = fork ()) == 0)
@@ -33,7 +36,7 @@ main (int argc, char **argv)
       close (fds[0]);
       if (dup2 (fds[1], 2) != 2)
 	{
-	  fprintf (stderr, "couldn't redirect stderr to pipe - %s\n", strerror ());
+	  fprintf (stderr, "couldn't redirect stderr to pipe - %s\n", strerror (errno));
 	  exit (1);
 	}
       exit (system ("ls"));
@@ -58,7 +61,7 @@ main (int argc, char **argv)
     }
   if (n != 0)
     {
-      fprintf (stderr, "system() call returned %p\n", n);
+      fprintf (stderr, "system() call returned %p\n", (void *) n);
       exit (1);
     }
   exit (0);

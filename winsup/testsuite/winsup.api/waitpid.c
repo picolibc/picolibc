@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 int
 main (int argc, char **argv)

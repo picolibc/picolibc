@@ -52,11 +52,12 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "mmaptest01";	/* Test program identifier. */
+const char *TCID = "mmaptest01";	/* Test program identifier. */
 int TST_TOTAL = 7;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
@@ -77,8 +78,6 @@ char const line2 [] = "y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2 y2\n";
 
 int main ()
 {
-  int ret = 0;
-
   char fnam1[32];
   char fnam2[32];
 

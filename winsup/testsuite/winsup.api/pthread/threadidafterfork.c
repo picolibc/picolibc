@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <pthread.h>
+#include <stdlib.h>
 
 static void * TestThread ( void * );
 

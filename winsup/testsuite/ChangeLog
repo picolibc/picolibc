@@ -1,5 +1,28 @@
 2003-01-23  Christopher Faylor  <cgf@redhat.com>
 
+	* libltp/include/test.h: Fix C warnings.
+	* winsup.api/checksignal.c: Ditto.
+	* winsup.api/crlf.c: Ditto.
+	* winsup.api/devzero.c: Ditto.
+	* winsup.api/iospeed.c: Ditto.
+	* winsup.api/mmaptest01.c: Ditto.
+	* winsup.api/mmaptest02.c: Ditto.
+	* winsup.api/mmaptest03.c: Ditto.
+	* winsup.api/mmaptest04.c: Ditto.
+	* winsup.api/nullgetcwd.c: Ditto.
+	* winsup.api/sigchld.c: Ditto.
+	* winsup.api/signal-into-win32-api.c: Ditto.
+	* winsup.api/systemcall.c: Ditto.
+	* winsup.api/waitpid.c: Ditto.
+	* winsup.api/pthread/mainthreadexits.c: Ditto.
+	* winsup.api/pthread/test.h: Ditto.
+	* winsup.api/pthread/threadidafterfork.c: Ditto.
+
+	* Makefile.in: Remove cygrun.exe from RUNTIME since it is built here
+	now.
+
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
 	* Makeifle.in: Use ALL_CFLAGS to build test programs so that correct
 	libraries and other options are used.
 

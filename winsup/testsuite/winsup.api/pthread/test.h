@@ -16,7 +16,7 @@
 
 /* #define assert(x) do { fprint (stderr, "assertion failed\n"); exit(1) } while (0) */
 
-char * error_string[] = {
+const char * error_string[] = {
   "ZERO_or_EOK",
   "EPERM",
   "ENOFILE_or_ENOENT",

@@ -7,7 +7,7 @@
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "checksignal";    	/* Test program identifier. */
+const char *TCID = "checksignal";    	/* Test program identifier. */
 int TST_TOTAL = 3;              /* Total number of test cases. */
 extern int Tst_count;           /* Test Case counter for tst_* routines */
 

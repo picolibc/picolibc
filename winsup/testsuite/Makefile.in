@@ -88,7 +88,7 @@ ifdef VERBOSE
     RUNTESTFLAGS = -v
 endif
 
-RUNTIME=$(cygwin_build)/new-cygwin1.dll $(cygwin_build)/new-libcygwin.a cygrun.exe
+RUNTIME=$(cygwin_build)/new-cygwin1.dll $(cygwin_build)/new-libcygwin.a
 
 TESTSUP_LIB_NAME:=libltp.a
 TESTSUP_OFILES:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(libltp_srcdir)/lib/*.c}}}}}
@@ -187,4 +187,3 @@ cygrun.o: cygrun.c
 
 cygrun.exe : cygrun.o
 	$(CC) ${MINGW_LDFLAGS} -mno-cygwin -o $@ $<
-
