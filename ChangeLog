@@ -1,3 +1,7 @@
+Fri Apr  7 18:10:29 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure (warn_cflags): Delete.
+
 2000-03-30  Christopher Faylor  <cgf@cygnus.com>
 
 	* Makefile.in (CC_FOR_TARGET): Add new winsup directory

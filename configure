@@ -902,9 +902,6 @@ do
   test -n "$DEFAULT_LEX" && break
 done
 
-# BINUTILS LOCAL: This is included in the default CFLAGS when using gcc.
-warn_cflags="-W -Wall"
-
 if [ "${build}" != "${host}" ]; then
   # If we are doing a Canadian Cross, in which the host and build systems
   # are not the same, we set reasonable default values for the tools.
@@ -938,7 +935,7 @@ t loop
   AS_FOR_TARGET=${AS_FOR_TARGET-${target_alias}-as}
   BISON=${BISON-bison}
   CC=${CC-${host_alias}-gcc}
-  CFLAGS=${CFLAGS-"-g -O2 ${warn_cflags}"}
+  CFLAGS=${CFLAGS-"-g -O2"}
   CXX=${CXX-${host_alias}-c++}
   CXXFLAGS=${CXXFLAGS-"-g -O2"}
   CC_FOR_BUILD=${CC_FOR_BUILD-gcc}
@@ -1018,10 +1015,10 @@ else
 	CC="gcc"
 	echo 'void f(){}' > conftest.c
 	if test -z "`${CC} -g -c conftest.c 2>&1`"; then
-	  CFLAGS=${CFLAGS-"-g -O2 ${warn_cflags}"}
+	  CFLAGS=${CFLAGS-"-g -O2"}
 	  CXXFLAGS=${CXXFLAGS-"-g -O2"}
 	else
-	  CFLAGS=${CFLAGS-"-O2 ${warn_cflags}"}
+	  CFLAGS=${CFLAGS-"-O2"}
 	  CXXFLAGS=${CXXFLAGS-"-O2"}
 	fi
 	rm -f conftest*
@@ -1038,10 +1035,10 @@ else
       *gcc)
 	echo 'void f(){}' > conftest.c
 	if test -z "`${CC} -g -c conftest.c 2>&1`"; then
-	  CFLAGS=${CFLAGS-"-g -O2 ${warn_cflags}"}
+	  CFLAGS=${CFLAGS-"-g -O2"}
 	  CXXFLAGS=${CXXFLAGS-"-g -O2"}
 	else
-	  CFLAGS=${CFLAGS-"-O2 ${warn_cflags}"}
+	  CFLAGS=${CFLAGS-"-O2"}
 	  CXXFLAGS=${CXXFLAGS-"-O2"}
 	fi
 	rm -f conftest*
