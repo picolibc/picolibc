@@ -84,9 +84,11 @@ details. */
   .align	8					\n\
 _" mangle (name, n) ":					\n\
 _win32_" mangle (name, n) ":				\n\
-  movl		(1f),%eax				\n\
+  .byte		0xe9					\n\
+  .long		-4 + 1f - .				\n\
+1:movl		(2f),%eax				\n\
   call		*(%eax)					\n\
-1:.long		." #dllname "_info			\n\
+2:.long		." #dllname "_info			\n\
   .long		(" #n "+" #notimp ") | " #err "<<16	\n\
   .asciz	\"" #name "\"				\n\
   .text							\n\
@@ -153,12 +155,11 @@ dll_func_load:								\n\
 	jne	gotit		# Yes					\n\
 	jmp	noload		# Issue an error or return		\n\
 gotit:									\n\
-	popl	%ecx		# Pointer to 'return address'		\n\
-	movb	$0xe9,-7(%ecx)	# Turn preceding call to a jmp *%eax	\n\
-	movl	%eax,%edx	# Save					\n\
-	subl	%ecx,%eax	# Make it relative			\n\
-	addl	$2,%eax		# Tweak					\n\
-	movl	%eax,-6(%ecx)	# Move relative address after jump	\n\
+	popl	%edx		# Pointer to 'return address'		\n\
+	subl	%edx,%eax	# Make it relative			\n\
+	addl	$7,%eax		# Tweak					\n\
+	subl	$12,%edx	# Point to jmp				\n\
+	movl	%eax,1(%edx)	# Move relative address after jump	\n\
 	jmp	*%edx		# Jump to actual function		\n\
 									\n\
 	.global	dll_chain						\n\

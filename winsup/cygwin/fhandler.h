@@ -629,6 +629,8 @@ class fhandler_serial: public fhandler_base
   unsigned int vmin_;			/* from termios */
   unsigned int vtime_;			/* from termios */
   pid_t pgrp_;
+  int rts;				/* for Windows 9x purposes only */
+  int dtr;				/* for Windows 9x purposes only */
 
  public:
   int overlapped_armed;
@@ -648,6 +650,7 @@ class fhandler_serial: public fhandler_base
   int tcsendbreak (int);
   int tcdrain ();
   int tcflow (int);
+  int ioctl (unsigned int cmd, void *);
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
   __off64_t lseek (__off64_t, int) { return 0; }

@@ -1,3 +1,56 @@
+2002-07-22  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_serial.cc: Fix formatting problems introduced by below
+	changes.
+
+2002-07-22  Jacek Trzcinski <jacek@certum.pl>
+
+	* fhandler.h (class fhandler_serial): Add new members of the class -
+	rts,dtr and method ioctl().  Variables rts and dtr important for Win 9x
+	only.
+	* fhandler_serial.cc (fhandler_serial::open): Add initial setting of
+	dtr and rts.  Important for Win 9x only.
+	(fhandler_serial::ioctl): New function.  Implements commands TIOCMGET,
+	TIOCMSET and TIOCINQ.
+	(fhandler_serial::tcflush): Fixed found error.
+	(fhandler_serial::tcsetattr): Add settings of rts and dtr.  Important
+	for Win 9x only.
+	* termios.h: Add new defines as a support for ioctl() function on
+	serial device.
+
+2002-07-20  Christopher Faylor  <cgf@redhat.com>
+
+	* autoload.cc (LoadDLLprime): Add jmp call to allow streamlining of
+	later jmp rewrite.
+	(doit): Avoid use of cx register.  Just change one word to avoid races.
+
+2002-07-18  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (get_unix_group_sidlist): Create.
+	(get_supplementary_group_sidlist): Evolve into get_unix_group_sidlist.
+	(get_user_local_groups): Add check for duplicates.
+	(get_user_primary_group): Suppress.
+	(get_group_sidlist): Silently ignore PDC unavailability.
+	Call get_unix_group_sidlist() before get_user_local_groups().
+	Remove call to get_supplementary_group_sidlist(). Never call
+	get_user_primary_group() as the passwd group is always included.
+	Add well_known_authenticated_users_sid in only one statement.
+
+2002-07-19  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_serial.cc (fhandler_serial::tcflush): Fix typo.
+
+2002-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_group_sidlist): Fix formatting.
+
+2002-07-14  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (initial_env): Force path and CYGWIN_DEBUG contents to lower
+	case.
+	* exceptions.cc (error_start_init): Use the name derived from
+	GetModuleName rather than myself->progname.
+
 2002-07-14  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (dll_crt0_1): Move debug_init call back to here.  Avoid a
