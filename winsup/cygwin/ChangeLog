@@ -1,3 +1,10 @@
+2002-11-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (getgroups32): Revert previous patch.  Use impersonation
+	token if process is in impersonated state.
+	* sec_helper.cc (is_grp_member): Rewrite.  Call getgroups32 only
+	for current user.  Scan passwd and group info otherwise.
+
 2002-11-14  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::write): Allow characters >=

@@ -183,19 +183,50 @@ BOOL
 is_grp_member (__uid32_t uid, __gid32_t gid)
 {
   extern int getgroups32 (int, __gid32_t *, __gid32_t, const char *);
-  BOOL grp_member = TRUE;
+  struct passwd *pw;
+  struct __group32 *gr;
+  int idx;
 
-  struct passwd *pw = getpwuid32 (uid);
-  __gid32_t grps[NGROUPS_MAX];
-  int cnt = getgroups32 (NGROUPS_MAX, grps,
-			 pw ? pw->pw_gid : myself->gid,
-			 pw ? pw->pw_name : cygheap->user.name ());
-  int i;
-  for (i = 0; i < cnt; ++i)
-    if (grps[i] == gid)
-      break;
-  grp_member = (i < cnt);
-  return grp_member;
+  /* Evaluate current user info by examining the info given in cygheap and
+     the current access token if ntsec is on. */
+  if (uid == myself->uid)
+    {
+      /* If gid == primary group of current user, return immediately. */
+      if (gid == myself->gid)
+        return TRUE;
+      /* Calling getgroups32 only makes sense when reading the access token. */
+      if (allow_ntsec)
+        {
+	  __gid32_t grps[NGROUPS_MAX];
+	  int cnt = getgroups32 (NGROUPS_MAX, grps, myself->gid,
+				 cygheap->user.name ());
+	  for (idx = 0; idx < cnt; ++idx)
+	    if (grps[idx] == gid)
+	      return TRUE;
+	  return FALSE;
+	}
+    }
+
+  /* Otherwise try getting info from examining passwd and group files. */
+  for (int idx = 0; (pw = internal_getpwent (idx)); ++idx)
+    if ((__uid32_t) pw->pw_uid == uid)
+      {
+	/* If gid == primary group of uid, return immediately. */
+	if ((__gid32_t) pw->pw_gid == gid)
+	  return TRUE;
+	/* Otherwise search for supplementary user list of this group. */
+	for (idx = 0; (gr = internal_getgrent (idx)); ++idx)
+	  if ((__gid32_t) gr->gr_gid == gid)
+	    {
+	      if (gr->gr_mem)
+		for (idx = 0; gr->gr_mem[idx]; ++idx)
+		  if (strcasematch (cygheap->user.name (), gr->gr_mem[idx]))
+		    return TRUE;
+	      return FALSE;
+	    }
+        return FALSE;
+      }
+  return FALSE;
 }
 
 #if 0 // unused

@@ -341,9 +341,15 @@ getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
   if (group_state  <= initializing)
     read_etc_group ();
 
-  if (allow_ntsec &&
-      strcasematch (username, cygheap->user.name ()) &&
-      OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken))
+  if (allow_ntsec)
+    {
+      /* If impersonated, use impersonation token. */
+      if (cygheap->user.issetuid ())
+        hToken = cygheap->user.token;
+      else if (!OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken))
+        hToken = NULL;
+    }
+  if (hToken)
     {
       if (GetTokenInformation (hToken, TokenGroups, NULL, 0, &size)
 	  || GetLastError () == ERROR_INSUFFICIENT_BUFFER)
@@ -375,7 +381,8 @@ getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
 	}
       else
 	debug_printf ("%d = GetTokenInformation(NULL) %E", size);
-      CloseHandle (hToken);
+      if (hToken != cygheap->user.token)
+        CloseHandle (hToken);
       if (cnt)
 	return cnt;
     }
