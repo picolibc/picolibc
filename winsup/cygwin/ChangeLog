@@ -1,5 +1,9 @@
 2003-08-20  Christopher Faylor  <cgf@redhat.com>
 
+	* speclib: Reenable removal of temp files.
+
+2003-08-20  Christopher Faylor  <cgf@redhat.com>
+
 	* miscfuncs.cc (low_priority_sleep): Sleep at same priority as main
 	thread.
 	* sigproc.cc (wait_sig): Keep looping if there are more signals to
