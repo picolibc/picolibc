@@ -302,8 +302,7 @@ syslog (int priority, const char *message, ...)
 	  }
 	if (process_logopt & LOG_PID)
 	  {
-	    if (pass.print ("Win32 Process Id = 0x%X : Cygwin Process Id = 0x%X : ",
-			GetCurrentProcessId (),  getpid ()) == -1)
+	    if (pass.print ("PID %u : ", getpid ()) == -1)
 	      return;
 	  }
 
@@ -375,6 +374,8 @@ syslog (int priority, const char *message, ...)
     else
       {
 	/* Under Windows 95, append the message to the log file */
+	char timestamp[24];
+	time_t ctime;
 	FILE *fp = fopen (get_win95_event_log_path (), "a");
 	if (fp == NULL)
 	  {
@@ -382,24 +383,32 @@ syslog (int priority, const char *message, ...)
 			  get_win95_event_log_path ());
 	    return;
 	  }
+	strftime (timestamp, sizeof timestamp, "%Y-%m-%d %H:%M:%S : ",
+		  localtime (&(ctime = time (NULL))));
+
 	/* Now to prevent several syslog messages from being
 	   interleaved, we must lock the first byte of the file
 	   This works on Win32 even if we created the file above.
 	*/
 	HANDLE fHandle = cygheap->fdtab[fileno (fp)]->get_handle ();
-	if (LockFile (fHandle, 0, 0, 1, 0) == FALSE)
-	  {
-	    debug_printf ("failed to lock file %s", get_win95_event_log_path ());
-	    fclose (fp);
-	    return;
-	  }
+	for (int i = 0;; i++)
+	  if (LockFile (fHandle, 0, 0, 1, 0) == FALSE)
+	    if (i == 3)
+	      {
+		debug_printf ("failed to lock file %s", get_win95_event_log_path ());
+		fclose (fp);
+		return;
+	      }
+	    else
+	      usleep (1000);
+	  else
+	    break;
+	fputs (timestamp, fp);
 	fputs (msg_strings[0], fp);
 	fputc ('\n', fp);
 	UnlockFile (fHandle, 0, 0, 1, 0);
 	if (ferror (fp))
-	  {
-	    debug_printf ("error in writing syslog");
-	  }
+	  debug_printf ("error in writing syslog");
 	fclose (fp);
       }
 }

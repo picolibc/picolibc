@@ -1,3 +1,9 @@
+2003-02-22  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* syslog.cc (syslog): Do not print the Windows pid.  Print the Cygwin
+	pid as an unsigned decimal.  On Win95 print a timestamp and attempt to
+	lock the file up to four times in 3 ms.
+
 2003-02-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Fix compiler
