@@ -1,13 +1,17 @@
 LIBRARY KERNEL32.dll
 EXPORTS
+ActivateActCtx@8
 AddAtomA@4
 AddAtomW@4
 AddConsoleAliasA@12
 AddConsoleAliasW@12
+AddLocalAlternateComputerNameA@8
+AddLocalAlternateComputerNameW@8
 AllocConsole@0
 AllocateUserPhysicalPages@12
 AreFileApisANSI@0
 AssignProcessToJobObject@8
+AttachConsole@4
 BackupRead@28
 BackupSeek@24
 BackupWrite@28
@@ -25,6 +29,8 @@ CancelIo@4
 CancelTimerQueueTimer@8
 CancelWaitableTimer@4
 ChangeTimerQueueTimer@16
+CheckNameLegalDOS8Dot3A@20
+CheckNameLegalDOS8Dot3W@20
 ClearCommBreak@4
 ClearCommError@12
 CloseConsoleHandle@4

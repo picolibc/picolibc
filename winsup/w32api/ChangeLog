@@ -1,5 +1,26 @@
 2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winbase.h [_WIN32_WINNT >= 0x0501] (ACTCTX_FLAG_*):
+	Add constants.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501] (ACTCTX[AW]): Add
+	structures.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501] (ActivateActCtx): Add
+	function. MSDN says the first argument is HACTCTX but I'm not sure
+	where such a specialized handle is defined, so use HANDLE instead.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501] (AttachConsole,
+	CheckNameLegalDOS8Dot3[AW]): Add functions.
+
+	* lib/user32.def (ActivateActCtx, AttachConsole,
+	CheckNameLegalDOS8Dot3[AW]): Add functions.
+
+	* lib/user32.def (AddLocalAlternateComputerName[AW]): Add functions.
+	Unfortunately I don't know which header to put the declarations in.
+
+2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winnls.h (CTRY_KYRGYZSTAN, CTRY_MALDIVES, CTRY_MONGOLIA):
 	Add constants.
 
