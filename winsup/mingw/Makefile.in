@@ -140,7 +140,7 @@ FLAGS_TO_PASS:=\
 	target_alias="$(target_alias)"
 
 CRT0S = crt1.o dllcrt1.o crt2.o dllcrt2.o CRT_noglob.o crtmt.o crtst.o
-MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o dirent.o dllmain.o gccmain.o \
+MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o  dllmain.o gccmain.o \
 	     main.o crtst.o mthr_stub.o
 MOLD_OBJS = ctype_old.o string_old.o
 
@@ -151,7 +151,7 @@ DLLS = $(THREAD_DLL_NAME)
 
 SRCDIST_FILES = CRT_noglob.c CRTfmode.c CRTglob.c CRTinit.c ChangeLog \
 Makefile.in README TODO config.guess config.sub configure configure.in \
-crt1.c crtdll.def crtmt.c crtst.c ctype_old.c dirent.c dllcrt1.c dllmain.c \
+crt1.c crtdll.def crtmt.c crtst.c ctype_old.c  dllcrt1.c dllmain.c \
 gccmain.c init.c install-sh jamfile main.c mkinstalldirs moldname-crtdll.def \
 moldname-msvcrt.def moldname.def moldname.def.in msvcrt.def msvcrt20.def \
 msvcrt40.def mthr.c mthr_init.c mthr_stub.c readme.txt string_old.c
@@ -368,7 +368,6 @@ crtst.o: $(srcdir)/crtst.c
 ctype_old.o: $(srcdir)/ctype_old.c
 dllcrt1.o: $(srcdir)/dllcrt1.c 
 dllcrt2.o: $(srcdir)/dllcrt1.c 
-dirent.o: $(srcdir)/dirent.c
 dllmain.o: $(srcdir)/dllmain.c
 main.o: $(srcdir)/main.c
 oldnames.o: $(srcdir)/oldnames.c

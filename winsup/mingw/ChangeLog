@@ -1,3 +1,98 @@
+ChangeLog  2002-03-22  Danny Smith   <dannysmith@users.sourceforge>
+
+	* configure.in: Add mingwex as SUBDIRS and configdirs.
+	* configure: Regenerate.
+	* Makefile.in (MINGW_OBJS): Remove dirent.o.
+	(SRC_DIST_FILES): Remove dirent.c.
+	* dirent.c: Remove.
+	* include/stdlib.h (_Exit): Add static inline
+	function.
+	(struct lldiv_t): Define.
+	(lldiv): Add prototype.
+	(llabs): Add extern inline function.
+	(strtoll,strtoull): Add prototypes.
+	(wcstol, wcstoul, wcstod): Group together.
+	(strtof, wcstof): Add extern inline definitions.
+	(atoll,lltoa,ulltoa, wtoll, lltow ulltow): Add prototypes
+	and extern inline definitions.
+	* include/wchar.h (fwide, wcstoll,wcstoull, wmemchr
+	wmemcmp, wmemcpy, wmemmove, wmemset. mbsinit): Add
+	prototypes.
+	(wcstol, wcstoul,wcstod): Copy prototypes from stdlib.h.
+	(wcstof): Add extern inline definition.
+	* include/math.h (nan, nanf): Add prototypes.
+	(NAN, INFINITE): Define constants.
+	(fpclassify, isnan ,signbit): Add macros and supporting float
+	and double functions.
+	(isfinite, isinf, isnormal): Add macros.
+	(isgreater, isless, isgreaterequal, islessequal,islessgreater):
+	Add macros.
+	(rint, rintf, round, roundf, trunc. truncf, fmax, fmaxf,
+	fmin, fminf, fma, fmaf, log2, log2f): Add prototypes.
+	(copysign, logb, nextafter, scalb): Add prototypes and
+	inline stubs for underscored versions in msvcrt.dll.  	
+	* include/inttypes.h: New file.
+	* include/fenv.h: New file
+
+	Add new mingwex subdir and files.
+	* mingwex: New directory.
+	* mingwex/Makefile.in: New file.
+	* mingwex/configure.in: New file.
+	* mingwex/configure: Generate.
+	* mingwex/dirent.c: Moved here from parent dir.
+	* mingwex/atoll.c: New file.
+	* mingwex/feclearexcept.c: New file.
+	* mingwex/fegetenv.c: New file.
+	* mingwex/fegetexceptflag.c: New file.
+	* mingwex/fegetround.c: New file.
+	* mingwex/feholdexcept.c: New file.
+	* mingwex/feraiseexcept.c: New file.
+	* mingwex/fesetenv.c: New file.
+	* mingwex/fesetexceptflag.c: New file.
+	* mingwex/fesetround.o: New file.
+	* mingwex/fetestexcept.c: New file.
+	* mingwex/feupdateenv.c: New file.
+	* mingwex/fma.S: New file.
+	* mingwex/fmaf.S: New file.
+	* mingwex/fmax.c: New file.
+	* mingwex/fmaxf.c: New file.
+	* mingwex/fmin.c: New file.
+	* mingwex/fminf.c: New file.
+	* mingwex/fp_consts.c: New file.
+	* mingwex/fpclassify.c: New file.
+	* mingwex/fucom.c: New file.
+	* mingwex/fwide.c: New file.
+	* mingwex/imaxabs.c: New file.
+	* mingwex/imaxdiv.c: New file.
+	* mingwex/isnan.c: New file.
+	* mingwex/isnanf.c: New file.
+	* mingwex/lltoa.c: New file.
+	* mingwex/lltow.c: New file.
+	* mingwex/log2.c: New file.
+	* mingwex/log2f.c: New file.
+	* mingwex/math_stubs.c: New file.
+	* mingwex/mbsinit.c: New file.
+	* mingwex/rint.c: New file.
+	* mingwex/round.c: New file.
+	* mingwex/signbit.c: New file.
+	* mingwex/sitest.c: New file.
+	* mingwex/strtof.c: New file.
+	* mingwex/strtoimax.c: New file.
+	* mingwex/strtoumax.c: New file.
+	* mingwex/testwmem.c: New file.
+	* mingwex/trunc.c: New file.
+	* mingwex/ulltoa.c: New file.
+	* mingwex/ulltow.c: New file.
+	* mingwex/wcstof.c: New file.
+	* mingwex/wcstoimax.c: New file.
+	* mingwex/wcstoumax.c: New file.
+	* mingwex/wmemchr.c: New file.
+	* mingwex/wmemcmp.c: New file.
+	* mingwex/wmemcpy.c: New file.
+	* mingwex/wmemmove.c: New file.
+	* mingwex/wmemset.c: New file.
+	* mingwex/wtoll.c: New file.
+
 2002-01-28  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/malloc.h (_heapinfo): Correct structure definition.

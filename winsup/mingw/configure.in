@@ -110,8 +110,8 @@ case "$target_os" in
   MNO_CYGWIN=
   LIBM_A=libm.a
   LIBGMON_A=libgmon.a
-  SUBDIRS="profile"
-  configdirs="$configdirs profile"
+  SUBDIRS="profile mingwex"
+  configdirs="$configdirs profile mingwex"
   ;;
 esac
 
