@@ -1,5 +1,12 @@
 2002-06-05  Christopher Faylor  <cgf@redhat.com>
 
+	* dir.cc (rmdir): Streamline.  Detect attempts to remove directories
+	from "read-only" virtual devices. (Suggested by Pavel Tsekov)
+	* syscalls.cc (unlink): Detect attempts to remove directories
+        from "read-only" virtual devices.  (From Pavel Tsekov)
+
+2002-06-05  Christopher Faylor  <cgf@redhat.com>
+
 	* dtable.cc (handle_to_fn): Check error return value from NtQueryObject
 	first before seeing if name buffer is NULL.
 
@@ -61,7 +68,7 @@
 2002-06-04  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (handle_to_fn): Correct placement and length of name
-	buffer. (Suggested by Pavel Tsekov)
+	buffer.  (Suggested by Pavel Tsekov)
 
 2002-06-04  Christopher Faylor  <cgf@redhat.com>
 

@@ -273,24 +273,19 @@ extern "C" int
 rmdir (const char *dir)
 {
   int res = -1;
+  DWORD devn;
 
   path_conv real_dir (dir, PC_SYM_NOFOLLOW);
 
   if (real_dir.error)
-    {
-      set_errno (real_dir.error);
-      res = -1;
-    }
+    set_errno (real_dir.error);
+  else if ((devn = real_dir.get_devn ()) == FH_PROC || devn == FH_REGISTRY
+	   || devn == FH_PROCESS)
+    set_errno (EROFS);
   else if (!real_dir.exists ())
-    {
-      set_errno (ENOENT);
-      res = -1;
-    }
+    set_errno (ENOENT);
   else if  (!real_dir.isdir ())
-    {
-      set_errno (ENOTDIR);
-      res = -1;
-    }
+    set_errno (ENOTDIR);
   else
     {
       /* Even own directories can't be removed if R/O attribute is set. */
@@ -330,22 +325,20 @@ rmdir (const char *dir)
 	      else if ((res = rmdir (dir)))
 		SetCurrentDirectory (cygheap->cwd.win32);
 	    }
-	  if (GetLastError () == ERROR_ACCESS_DENIED)
+	  if (res)
 	    {
-
-	      /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
-		 a non-empty directory. */
-	      if (wincap.access_denied_on_delete ())
-		set_errno (ENOTEMPTY);
-	      else
+	      if (GetLastError () != ERROR_ACCESS_DENIED
+		  || !wincap.access_denied_on_delete ())
 		__seterrno ();
-	    }
-	  else
-	    __seterrno ();
+	      else
+		set_errno (ENOTEMPTY);	/* On 9X ERROR_ACCESS_DENIED is
+					       returned if you try to remove a
+					       non-empty directory. */
 
-	  /* If directory still exists, restore R/O attribute. */
-	  if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
-	    SetFileAttributes (real_dir, real_dir);
+	      /* If directory still exists, restore R/O attribute. */
+	      if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
+		SetFileAttributes (real_dir, real_dir);
+	    }
 	}
     }
 

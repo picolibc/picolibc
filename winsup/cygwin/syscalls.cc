@@ -94,6 +94,7 @@ extern "C" int
 _unlink (const char *ourname)
 {
   int res = -1;
+  DWORD devn;
   sigframe thisframe (mainthread);
 
   path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
@@ -101,6 +102,13 @@ _unlink (const char *ourname)
   if (win32_name.error)
     {
       set_errno (win32_name.error);
+      goto done;
+    }
+
+  if ((devn = win32_name.get_devn ()) == FH_PROC || devn == FH_REGISTRY
+      || devn == FH_PROCESS)
+    {
+      set_errno (EROFS);
       goto done;
     }
 
