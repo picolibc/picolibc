@@ -20,7 +20,7 @@ SECTIONS
      etext = .;
     *(.gcc_except_table)
   }
-  /* The Cygwin32 library uses a section to avoid copying certain data
+  /* The Cygwin DLL uses a section to avoid copying certain data
      on fork.  This used to be named ".data".  The linker used
      to include this between __data_start__ and __data_end__, but that
      breaks building the cygwin32 dll.  Instead, we name the section
