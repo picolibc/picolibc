@@ -54,6 +54,7 @@ details. */
 #define SO_LINGER       0x0080          /* linger on close if data present */
 #define SO_OOBINLINE    0x0100          /* leave received OOB data in line */
 #define SO_DONTLINGER   (u_int)(~SO_LINGER)
+#define SO_PEERCRED	0x0200		/* same as getpeereid */
 
 /*
  * Additional options.

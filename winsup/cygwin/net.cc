@@ -780,6 +780,8 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
       case SO_ERROR:
 	name = "SO_ERROR";
 	break;
+      case SO_PEERCRED:
+        name = "SO_PEERCRED";
     }
 
   if ((optval
@@ -787,6 +789,11 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
 	   || __check_null_invalid_struct_errno (optval, (unsigned) *optlen)))
       || !fh)
     res = -1;
+  else if (optname == SO_PEERCRED)
+    {
+      struct ucred *cred = (struct ucred *) optval;
+      res = fh->getpeereid (&cred->pid, &cred->uid, &cred->gid);
+    }
   else
     {
       res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
@@ -806,6 +813,16 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
   syscall_printf ("%d = getsockopt (%d, %d, %x (%s), %p, %p)",
 		  res, fd, level, optname, name, optval, optlen);
   return res;
+}
+
+extern "C" int
+getpeereid (int fd, __uid32_t *euid, __gid32_t *egid)
+{
+  sig_dispatch_pending ();
+  fhandler_socket *fh = get (fd);
+  if (fh)
+    return fh->getpeereid (NULL, euid, egid);
+  return -1;
 }
 
 /* exported as connect: standards? */

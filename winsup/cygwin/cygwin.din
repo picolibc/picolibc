@@ -307,6 +307,7 @@ gethostbyaddr = cygwin_gethostbyaddr SIGFE
 gethostbyname = cygwin_gethostbyname SIGFE
 _gethostname = cygwin_gethostname SIGFE
 gethostname = cygwin_gethostname SIGFE
+getpeereid SIGFE
 getpeername = cygwin_getpeername SIGFE
 getprogname NOSIGFE
 getprotobyname = cygwin_getprotobyname SIGFE

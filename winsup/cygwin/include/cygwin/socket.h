@@ -25,6 +25,12 @@ struct sockaddr {
 #include <cygwin/uio.h>			/* iovec support		*/
 #include <sys/types.h>
 
+struct ucred {
+  pid_t		pid;
+  __uid32_t	uid;
+  __gid32_t	gid;
+};
+
 struct linger {
   unsigned short			l_onoff;	/* Linger active		*/
  unsigned short			l_linger;	/* How long to linger for	*/

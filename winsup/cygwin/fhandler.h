@@ -355,6 +355,16 @@ class fhandler_socket: public fhandler_base
   int type;
   int connect_secret [4];
   HANDLE secret_event;
+
+  HANDLE sec_pipe;
+  pid_t     sec_pid;
+  __uid32_t sec_uid;
+  __gid32_t sec_gid;
+  pid_t     sec_peer_pid;
+  __uid32_t sec_peer_uid;
+  __gid32_t sec_peer_gid;
+  char *eid_pipe_name (char *buf);
+
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
   char *sun_path;
   struct status_flags
@@ -395,6 +405,7 @@ class fhandler_socket: public fhandler_base
   int accept (struct sockaddr *peer, int *len);
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
+  int getpeereid (pid_t *pid, __uid32_t *euid, __gid32_t *egid);
 
   int open (int flags, mode_t mode = 0);
   ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);

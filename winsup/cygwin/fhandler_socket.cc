@@ -53,6 +53,13 @@ secret_event_name (char *buf, short port, int *secret_ptr)
 		   secret_ptr [2], secret_ptr [3]);
 }
 
+char *
+fhandler_socket::eid_pipe_name (char *buf)
+{
+  __small_sprintf (buf, "\\\\.\\pipe\\cygwin-unix-$s", get_sun_path ());
+  return buf;
+}
+
 /* cygwin internal: map sockaddr into internet domain address */
 static int
 get_inet_addr (const struct sockaddr *in, int inlen,
@@ -124,6 +131,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 
 fhandler_socket::fhandler_socket () :
   fhandler_base (),
+  sec_pipe (INVALID_HANDLE_VALUE),
   sun_path (NULL),
   status ()
 {
@@ -620,6 +628,22 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	  set_errno (ECONNREFUSED);
 	  res = -1;
 	}
+
+      /* eid credential transaction. */
+      struct ucred in = { getpid (), geteuid32 (), getegid32 () };
+      struct ucred out = { (pid_t) -1, (__uid32_t) -1, (__gid32_t) -1 };
+      DWORD bytes = 0;
+      if (CallNamedPipe(eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
+      			&in, sizeof in, &out, sizeof out, &bytes, 1000))
+	{
+	  debug_printf ("Received eid credentials: pid: %d, uid: %d, gid: %d",
+			out.pid, out.uid, out.gid);
+	  sec_peer_pid = out.pid;
+	  sec_peer_uid = out.uid;
+	  sec_peer_gid = out.gid;
+        }
+      else
+        debug_printf ("Receiving eid credentials failed: %E");
     }
 
   err = WSAGetLastError ();
@@ -638,7 +662,26 @@ fhandler_socket::listen (int backlog)
   if (res)
     set_winsock_errno ();
   else
-    connect_state (connected);
+    {
+      if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
+        {
+	  /* Prepare eid credential transaction. */
+	  sec_pid = getpid ();
+	  sec_uid = geteuid32 ();
+	  sec_gid = getegid32 ();
+	  sec_peer_pid = (pid_t) -1;
+	  sec_peer_uid = (__uid32_t) -1;
+	  sec_peer_gid = (__gid32_t) -1;
+	  sec_pipe =
+	    CreateNamedPipe (eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
+			     PIPE_ACCESS_DUPLEX,
+			     PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
+			     1, sizeof (struct ucred), sizeof (struct ucred),
+			     1000, &sec_all);
+	  debug_printf ("sec_pipe: %x", sec_pipe);
+	}
+      connect_state (connected);
+    }
   return res;
 }
 
@@ -648,6 +691,8 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   int res = -1;
   bool secret_check_failed = false;
   bool in_progress = false;
+  struct ucred in = { sec_pid, sec_uid, sec_gid };
+  struct ucred out = { (pid_t) -1, (__uid32_t) -1, (__gid32_t) -1 };
 
   /* Allows NULL peer and len parameters. */
   struct sockaddr_in peer_dummy;
@@ -700,6 +745,23 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	  set_errno (ECONNABORTED);
 	  return -1;
 	}
+
+      /* eid credential transaction. */
+      DWORD bytes = 0;
+      bool ret = ConnectNamedPipe (sec_pipe, NULL);
+      if (ret || GetLastError () == ERROR_PIPE_CONNECTED)
+        {
+	  if (!ReadFile (sec_pipe, &out, sizeof out, &bytes, NULL))
+	    debug_printf ("Receiving eid credentials failed: %E");
+	  else
+	     debug_printf ("Received eid credentials: pid: %d, uid: %d, gid: %d",
+			   out.pid, out.uid, out.gid);
+	  if (!WriteFile (sec_pipe, &in, sizeof in, &bytes, NULL))
+	    debug_printf ("Sending eid credentials failed: %E");
+	  DisconnectNamedPipe (sec_pipe);
+	}
+      else
+        debug_printf ("Connecting the eid credential pipe failed: %E");
     }
 
   if ((SOCKET) res == INVALID_SOCKET)
@@ -709,10 +771,18 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
       cygheap_fdnew res_fd;
       if (res_fd >= 0 && fdsock (res_fd, &dev (), res))
 	{
-	  if (get_addr_family () == AF_LOCAL)
-	    ((fhandler_socket *) res_fd)->set_sun_path (get_sun_path ());
 	  ((fhandler_socket *) res_fd)->set_addr_family (get_addr_family ());
 	  ((fhandler_socket *) res_fd)->set_socket_type (get_socket_type ());
+	  if (get_addr_family () == AF_LOCAL)
+	    {
+	      ((fhandler_socket *) res_fd)->set_sun_path (get_sun_path ());
+	      if (get_socket_type () == SOCK_STREAM)
+		{
+		  ((fhandler_socket *) res_fd)->sec_peer_pid = out.pid;
+		  ((fhandler_socket *) res_fd)->sec_peer_uid = out.uid;
+		  ((fhandler_socket *) res_fd)->sec_peer_gid = out.gid;
+		}
+	    }
 	  ((fhandler_socket *) res_fd)->connect_state (connected);
 	  res = res_fd;
 	}
@@ -1322,6 +1392,10 @@ fhandler_socket::close ()
   setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
 	      (const char *)&linger, sizeof linger);
 
+  /* Close eid credentials pipe handle. */
+  if (sec_pipe != INVALID_HANDLE_VALUE)
+    CloseHandle (sec_pipe);
+
   while ((res = closesocket (get_socket ())) != 0)
     {
       if (WSAGetLastError () != WSAEWOULDBLOCK)
@@ -1538,4 +1612,26 @@ void
 fhandler_socket::set_sun_path (const char *path)
 {
   sun_path = path ? cstrdup (path) : NULL;
+}
+
+int
+fhandler_socket::getpeereid (pid_t *pid, __uid32_t *euid, __gid32_t *egid)
+{
+  if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
+    {
+      if (connect_state () == connected && sec_peer_pid != (pid_t) -1)
+        {
+	  if (!check_null_invalid_struct (pid))
+	    *pid = sec_peer_pid;
+	  if (!check_null_invalid_struct (euid))
+	    *euid = sec_peer_uid;
+	  if (!check_null_invalid_struct (egid))
+	    *egid = sec_peer_gid;
+	  return 0;
+	}
+      set_errno (ENOTCONN);
+    }
+  else
+    set_errno (EINVAL);
+  return -1;
 }

@@ -1,5 +1,27 @@
 2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din (getpeereid): Export.
+	* fhandler.h (class fhandler_socket): Add pipe and id members to
+	exchange eid credentials for AF_LOCAL sockets.
+	(eid_pipe_name): Declare new method.
+	(getpeereid): Ditto.
+	* fhandler_socket.cc (fhandler_socket::eid_pipe_name): New method.
+	(fhandler_socket::fhandler_socket): Initialize sec_pipe.
+	(fhandler_socket::connect): Exchange eid credentials with accepting
+	socket process.
+	(fhandler_socket::listen): Prepare eid credential transaction.
+	(fhandler_socket::accept): Exchange eid credentials with connecting
+	socket process.
+	(fhandler_socket::close): Close eid credentials pipe if open.
+	(fhandler_socket::getpeereid): New method.
+	* net.cc (cygwin_getsockopt): Add SO_PEERCRED handling.
+	(getpeereid): New function.
+	* include/asm/socket.h (SO_PEERCRED): Define.
+	* include/cygwin/socket.h (struct ucred): Define new type.
+	* include/cygwin/version.h: Bump API minor version.
+
+2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/sys/statvfs.h (ST_RDONLY): Define.
 	(ST_NOSUID): Define.
 
