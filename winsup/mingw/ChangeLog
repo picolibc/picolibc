@@ -1,3 +1,10 @@
+2003-01-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ctype.h (__isascii): Don't cast arg to unsigned.
+	(iswascii): Likewise.  Correct mask.
+	* include/wctype.h (iswascii): Don't cast arg to unsigned.
+	Correct mask
+
 2003-01-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdlib.h (_osver, _winver, _winmajor,

@@ -212,7 +212,7 @@ int	isleadbyte (int);
 #define __WCTYPE_INLINES_DEFINED
 extern __inline__ int iswalnum(wint_t wc) {return (iswctype(wc,_ALPHA|_DIGIT));}
 extern __inline__ int iswalpha(wint_t wc) {return (iswctype(wc,_ALPHA));}
-extern __inline__ int iswascii(wint_t wc) {return (((unsigned)wc & 0x7F) ==0);}
+extern __inline__ int iswascii(wint_t wc) {return ((wc & ~0x7F) ==0);}
 extern __inline__ int iswcntrl(wint_t wc) {return (iswctype(wc,_CONTROL));}
 extern __inline__ int iswdigit(wint_t wc) {return (iswctype(wc,_DIGIT));}
 extern __inline__ int iswgraph(wint_t wc) {return (iswctype(wc,_PUNCT|_ALPHA|_DIGIT));}
@@ -232,7 +232,7 @@ int	__iscsymf (int);	/* Valid first character in C symbol */
 int	__iscsym (int);		/* Valid character in C symbol (after first) */
 
 #ifndef __NO_CTYPE_INLINES
-extern __inline__ int __isascii(int c) {return (((unsigned)c & ~0x7F) == 0);} 
+extern __inline__ int __isascii(int c) {return ((c & ~0x7F) == 0);} 
 extern __inline__ int __toascii(int c) {return (c & 0x7F);}
 extern __inline__ int __iscsymf(int c) {return (isalpha(c) || (c == '_'));}
 extern __inline__ int __iscsym(int c)  {return  (isalnum(c) || (c == '_'));}
