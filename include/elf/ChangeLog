@@ -1,3 +1,8 @@
+2003-02-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h: Replace DTPMOD64, TPREL64, DTPREL64 with DTPMOD32 etc.
+	(IS_PPC_TLS_RELOC): Define.
+
 2003-02-10  Nick Clifton  <nickc@redhat.com>
 
 	* arm.h (EF_ARM_MAVERICK_FLOAT): Define.
