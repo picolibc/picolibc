@@ -1,3 +1,7 @@
+Tue Jan 30 18:15:23 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Bump version to 1.3.0.
+
 Tue Jan 30  8:55:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* pinfo.cc (pinfo::init): Use INVALID_HANDLE_VALUE instead of
