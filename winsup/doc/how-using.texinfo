@@ -629,3 +629,12 @@ There is a bug in the Win32 API function GetFreeDiskSpace that
 makes it return incorrect values for disks larger than 2 GB in size.
 Perhaps that may be your problem?
 
+@subsection Why doesn't Cygwin tcl/tk understand Cygwin paths?
+
+The versions of Tcl/Tk distributed with Cygwin (e.g. cygtclsh80.exe) are
+not actually "Cygwin versions" of those tools.  They are built with the
+@samp{-mno-cygwin} option to @code{gcc}, which means they do not
+understand Cygwin mounts or symbolic links.
+
+See the entry "How do I convert between Windows and UNIX paths?"
+elsewhere in this FAQ.
