@@ -190,7 +190,7 @@ LoadDLLinitfunc (netapi32)
   return 0;
 }
 LoadDLLinit (netapi32)
-LoadDLLfunc (NetWkstaUserGetInfo, NetWkstaUserGetInfo@12, netapi32)
-LoadDLLfunc (NetGetDCName, NetGetDCName@12, netapi32)
-LoadDLLfunc (NetApiBufferFree, NetApiBufferFree@4, netapi32)
+LoadDLLfunc (NetWkstaUserGetInfo, 12, netapi32)
+LoadDLLfunc (NetGetDCName, 12, netapi32)
+LoadDLLfunc (NetApiBufferFree, 4, netapi32)
 

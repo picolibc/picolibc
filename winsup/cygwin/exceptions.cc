@@ -195,17 +195,6 @@ exception (EXCEPTION_RECORD *e,  CONTEXT *in)
 
 #define HAVE_STACK_TRACE
 
-/* The function used to load the imagehlp DLL.  Returns TRUE if the
-   DLL was found. */
-static LoadDLLinitfunc (imagehlp)
-{
-  imagehlp_handle = LoadLibrary ("imagehlp.dll");
-  return !!imagehlp_handle;
-}
-
-LoadDLLinit (imagehlp)	/* Set up storage for imagehlp.dll autoload */
-LoadDLLfunc (StackWalk, StackWalk@36, imagehlp)
-
 /* A class for manipulating the stack. */
 class stack_info
 {

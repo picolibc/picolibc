@@ -47,29 +47,35 @@ static int dllname ## _init ()
  * So, immediately following the the call to one of the above routines
  * we have:
  *  foojmp (4 bytes) 	 Pointer to a word containing the routine used
- *			 to eventually invokethe function.  Initially
+ *			 to eventually invoke the function.  Initially
  *			 points to an init function which loads the
- *			 DLL, gets the processes load address,
+ *			 DLL, gets the process's load address,
  *			 changes the contents here to point to the
  *			 function address, and changes the call *(%eax)
  *			 to a jmp %eax.  If the initialization has been
  *			 done, only the load part is done.
  *  DLL handle (4 bytes) The handle to use when loading the DLL.
+ *  flag (4 bytes)	 If "TRUE" then it is not a fatal error if this
+ *			 function cannot be found.  Instead, error is set
+ *			 to ERROR_PROC_NOT_FOUND and 0 is returned.
  *  func name (n bytes)	 asciz string containing the name of the function
  *			 to be loaded.
  */
 
-#define LoadDLLfunc(name, mangled, dllname) \
+#define LoadDLLmangle(name, n) #name "@" #n
+#define LoadDLLfunc(name, n, dllname) LoadDLLfuncEx (name, n, dllname, 0)
+#define LoadDLLfuncEx(name, n, dllname, notimp) \
 __asm__ (".section .data_cygwin_nocopy,\"w\""); \
-__asm__ (".global _" #mangled); \
-__asm__ (".global _win32_" #mangled); \
+__asm__ (".global _" LoadDLLmangle (name, n)); \
+__asm__ (".global _win32_" LoadDLLmangle (name, n)); \
 __asm__ (".align 8"); \
-__asm__ ("_" #mangled ":"); \
-__asm__ ("_win32_" #mangled ":"); \
+__asm__ ("_" LoadDLLmangle (name, n) ":"); \
+__asm__ ("_win32_" LoadDLLmangle (name, n) ":"); \
 __asm__ ("movl (" #name "jump),%eax"); \
 __asm__ ("call *(%eax)"); \
 __asm__ (#name "jump: .long " #dllname "_init_holder"); \
 __asm__ (" .long _" #dllname "_handle"); \
+__asm__ (" .long " #n "+" #notimp); \
 __asm__ (".asciz \"" #name "\""); \
 __asm__ (".text");
 

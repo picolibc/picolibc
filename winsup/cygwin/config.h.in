@@ -33,6 +33,3 @@
 
 /* Define if building thread-safe Cygwin DLL.  */
 #undef _MT_SAFE
-
-/* Define if strace log output has date/time stamp.  */
-#undef STRACE_HHMMSS

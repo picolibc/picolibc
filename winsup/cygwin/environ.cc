@@ -543,8 +543,7 @@ winenv (const char * const *envp, int keep_posix)
       else
 	*dstp = *srcp;
       tl += strlen (*dstp) + 1;
-      if ((*dstp)[0] == '!' && isalpha((*dstp)[1]) && (*dstp)[2] == ':' &&
-	  (*dstp)[3] == '=')
+      if ((*dstp)[0] == '!' && isdrive ((*dstp) + 1) && (*dstp)[3] == '=')
 	{
 	  char *p = (char *) alloca (strlen (*dstp) + 1);
 	  strcpy (p, *dstp);

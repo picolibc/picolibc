@@ -189,6 +189,7 @@ path_conv::check (const char *src, symlink_follow follow_mode,
      trailer.  */
   char path_buf[MAX_PATH];
   char path_copy[MAX_PATH];
+  char tmp_buf[MAX_PATH];
   symlink_info sym;
 
   char *rel_path, *full_path;
@@ -353,7 +354,6 @@ path_conv::check (const char *src, symlink_follow follow_mode,
 	system_printf ("problem parsing %s - '%s'", src, full_path);
       else
 	{
-	  char tmp_buf[MAX_PATH];
 	  int headlen = 1 + tail - path_copy;
 	  p = sym.contents - headlen;
 	  memcpy (p, path_copy, headlen);
@@ -378,19 +378,18 @@ fillin:
 out:
   DWORD serial, volflags;
 
-  char root[strlen(full_path) + 10];
-  strcpy (root, full_path);
-  if (!rootdir (root) ||
-      !GetVolumeInformation (root, NULL, 0, &serial, NULL, &volflags, NULL, 0))
+  strcpy (tmp_buf, full_path);
+  if (!rootdir (tmp_buf) ||
+      !GetVolumeInformation (tmp_buf, NULL, 0, &serial, NULL, &volflags, NULL, 0))
     {
       debug_printf ("GetVolumeInformation(%s) = ERR, full_path(%s), set_has_acls(FALSE)",
-                    root, full_path, GetLastError ());
+                    tmp_buf, full_path, GetLastError ());
       set_has_acls (FALSE);
     }
   else
     {
       debug_printf ("GetVolumeInformation(%s) = OK, full_path(%s), set_has_acls(%d)",
-                    root, full_path, volflags & FS_PERSISTENT_ACLS);
+                    tmp_buf, full_path, volflags & FS_PERSISTENT_ACLS);
       set_has_acls (volflags & FS_PERSISTENT_ACLS);
     }
 }
@@ -446,7 +445,7 @@ get_raw_device_number (const char *uxname, const char *w32path, int &unit)
       if (! strncasecmp (uxname, "/dev/n", 6))
 	unit += 128;
     }
-  else if (isalpha (w32path[4]) && w32path[5] == ':')
+  else if (isdrive (w32path + 4))
     {
       devn = FH_FLOPPY;
       unit = tolower (w32path[4]) - 'a';
@@ -1023,6 +1022,8 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
       int n = mi->native_pathlen;
       memcpy (dst, mi->native_path, n);
       char *p = pathbuf + mi->posix_pathlen;
+      if (!trailing_slash_p && isdrive (mi->native_path) && !mi->native_path[2])
+	trailing_slash_p = 1;
       if (!trailing_slash_p && !*p)
 	dst[n] = '\0';
       else
@@ -1048,17 +1049,23 @@ fillin:
 	   path_prefix_p (current_directory_name, dst,
 			  cwdlen = strlen (current_directory_name)))
     {
-      if (strlen (dst) == cwdlen)
-	dst += cwdlen;
+      size_t n = strlen (dst);
+      if (n < cwdlen)
+	strcpy (win32_path, dst);
       else
-	dst += isdirsep (current_directory_name[cwdlen - 1]) ? cwdlen : cwdlen + 1;
-
-      memmove (win32_path, dst, strlen (dst) + 1);
-      if (!*win32_path)
 	{
-	  strcpy (win32_path, ".");
-	  if (trailing_slash_p)
-	    strcat (win32_path, "\\");
+	  if (n == cwdlen)
+	    dst += cwdlen;
+	  else
+	    dst += isdirsep (current_directory_name[cwdlen - 1]) ? cwdlen : cwdlen + 1;
+
+	  memmove (win32_path, dst, strlen (dst) + 1);
+	  if (!*win32_path)
+	    {
+	      strcpy (win32_path, ".");
+	      if (trailing_slash_p)
+		strcat (win32_path, "\\");
+	    }
 	}
     }
   else if (win32_path != dst)
@@ -1220,7 +1227,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
      letter not covered by the mount table.  If it's a relative path then the
      caller must want an absolute path (otherwise we would have returned
      above).  So we always return an absolute path at this point. */
-  if ((isalpha (pathbuf[0])) && (pathbuf[1] == ':'))
+  if (isdrive (pathbuf))
     cygdrive_posix_path (pathbuf, posix_path, trailing_slash_p);
   else
     {
@@ -2500,13 +2507,13 @@ chdir (const char *dir)
      If it does, append a \ to the native directory specification to
      defeat the Windows 95 (i.e. MS-DOS) tendency of returning to
      the last directory visited on the given drive. */
-  if (isalpha (native_dir[0]) && native_dir[1] == ':' && !native_dir[2])
+  if (isdrive (native_dir) && !native_dir[2])
     {
       native_dir[2] = '\\';
       native_dir[3] = '\0';
     }
-  int res = SetCurrentDirectoryA (native_dir);
-  if (!res)
+  int res = SetCurrentDirectoryA (native_dir) ? 0 : -1;
+  if (res == -1)
     __seterrno ();
 
   /* Clear the cache until we need to retrieve the directory again.  */
@@ -2521,8 +2528,8 @@ chdir (const char *dir)
       current_directory_posix_name = NULL;
     }
 
-  syscall_printf ("%d = chdir (%s) (dos %s)", res ? 0 : -1, dir, native_dir);
-  return res ? 0 : -1;
+  syscall_printf ("%d = chdir (%s) (dos %s)", res, dir, native_dir);
+  return res;
 }
 
 /******************** Exported Path Routines *********************/
@@ -2629,8 +2636,7 @@ extern "C"
 int
 cygwin_posix_path_list_p (const char *path)
 {
-  int posix_p = ! (strchr (path, ';')
-		   || (isalpha (path[0]) && path[1] == ':'));
+  int posix_p = ! (strchr (path, ';') || isdrive (path));
   return posix_p;
 }
 
@@ -2725,7 +2731,7 @@ cygwin_split_path (const char *path, char *dir, char *file)
 
   /* Deal with drives.
      Remember that c:foo <==> c:/foo.  */
-  if (isalpha (path[0]) && path[1] == ':')
+  if (isdrive (path))
     {
       *dir++ = *path++;
       *dir++ = *path++;

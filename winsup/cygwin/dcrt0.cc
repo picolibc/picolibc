@@ -309,9 +309,9 @@ globify (char *word, char **&argv, int &argc, int &argvlen)
 
   int n = 0;
   char *p, *s;
-  int dos_spec = isalpha(*word) && word[1] == ':' ? 1 : 0;
+  int dos_spec = isdrive (word);
   if (!dos_spec && isquote(*word) && word[1] && word[2])
-    dos_spec = isalpha(word[1]) && word[2] == ':' ? 1 : 0;
+    dos_spec = isdrive (word + 1);
 
   /* We'll need more space if there are quoting characters in
      word.  If that is the case, doubling the size of the
@@ -653,7 +653,7 @@ dll_crt0_1 ()
   /* Allow backup semantics. It's better done only once on process start
      instead of each time a file is opened. */
   set_process_privileges ();
-  
+
   /* Initialize SIGSEGV handling, etc...  Because the exception handler
      references data in the shared area, this must be done after
      shared_init. */
@@ -987,31 +987,52 @@ __api_fatal (const char *fmt, ...)
 }
 
 extern "C" {
-static void noload (HANDLE h, char *s) __asm__ ("noload");
-static void __attribute__((unused))
-noload (HANDLE h, char *s)
+
+/* This struct is unused, but it illustrates the layout of a DLL
+   information block. */
+struct DLLinfo
 {
-  api_fatal ("couldn't dynamically determine load address for '%s' (handle %p), %E", s, h);
-}
+  char jmpinst[4];
+  HANDLE h;
+  DWORD flag;
+  char name[0];
+};
 
 /* FIXME: This is not thread-safe! */
 __asm__ ("
-.globl	cygwin_dll_func_load
+msg1:
+  .ascii \"couldn't dynamically determine load address for '%s' (handle %p), %E\\0\"
+
+  .align 32
+noload:
+  popl %edx		# Get the address of the information block
+  movl 8(%edx),%eax	# Should we 'ignore' the lack
+  test $1,%eax		#  of this function?
+  jz 1f			# Nope.
+  decl %eax		# Yes.  This is the # of bytes + 1
+  popl %edx		# Caller's caller
+  addl %eax,%esp	# Pop off bytes
+  xor %eax,%eax		# Zero functional return
+  jmp *%edx		# Return
+1:
+  movl 4(%edx),%eax	# Handle value
+  pushl (%eax)
+  leal 12(%edx),%eax	# Location of name of function
+  push %eax
+  push $msg1		# The message
+  call ___api_fatal	# Print message. Never returns
+
+  .globl cygwin_dll_func_load
 cygwin_dll_func_load:
   movl (%esp),%eax	# 'Return address' contains load info
-  addl $8,%eax		# Address of name of function to load
+  addl $12,%eax		# Address of name of function to load
   pushl %eax		# Second argument
-  movl -4(%eax),%eax	# Address of Handle to DLL
+  movl -8(%eax),%eax	# Address of Handle to DLL
   pushl (%eax)		# Handle to DLL
   call _GetProcAddress@8# Load it
   test %eax,%eax	# Success?
   jne gotit		# Yes
-  popl %eax		# No.  Get back
-  addl $8,%eax		#  pointer to name
-  pushl %eax		#   and
-  movl -4(%eax),%eax	# Address of Handle to DLL
-  pushl (%eax)		# Handle to DLL
-  call noload		#    issue an error
+  jmp noload		# Issue an error or return
 gotit:
   popl %ecx		# Pointer to 'return address'
   movb $0xe0,-1(%ecx)	# Turn preceding call to a jmp *%eax
@@ -1033,24 +1054,81 @@ LoadDLLinitfunc (user32)
 }
 
 LoadDLLinit (user32)
-LoadDLLfunc (CharToOemA, CharToOemA@8, user32)
-LoadDLLfunc (CreateWindowExA, CreateWindowExA@48, user32)
-LoadDLLfunc (DefWindowProcA, DefWindowProcA@16, user32)
-LoadDLLfunc (DispatchMessageA, DispatchMessageA@4, user32)
-LoadDLLfunc (FindWindowA, FindWindowA@8, user32)
-LoadDLLfunc (GetMessageA, GetMessageA@16, user32)
-LoadDLLfunc (GetProcessWindowStation, GetProcessWindowStation@0, user32)
-LoadDLLfunc (GetThreadDesktop, GetThreadDesktop@4, user32)
-LoadDLLfunc (GetUserObjectInformationA, GetUserObjectInformationA@20, user32)
-LoadDLLfunc (KillTimer, KillTimer@8, user32)
-LoadDLLfunc (MessageBoxA, MessageBoxA@16, user32)
-LoadDLLfunc (MsgWaitForMultipleObjects, MsgWaitForMultipleObjects@20, user32)
-LoadDLLfunc (OemToCharA, OemToCharA@8, user32)
-LoadDLLfunc (OemToCharW, OemToCharW@8, user32)
-LoadDLLfunc (PeekMessageA, PeekMessageA@20, user32)
-LoadDLLfunc (PostMessageA, PostMessageA@16, user32)
-LoadDLLfunc (PostQuitMessage, PostQuitMessage@4, user32)
-LoadDLLfunc (RegisterClassA, RegisterClassA@4, user32)
-LoadDLLfunc (SendMessageA, SendMessageA@16, user32)
-LoadDLLfunc (SetTimer, SetTimer@16, user32)
-LoadDLLfunc (SetUserObjectSecurity, SetUserObjectSecurity@12, user32)
+LoadDLLfunc (CharToOemA, 8, user32)
+LoadDLLfunc (CreateWindowExA, 48, user32)
+LoadDLLfunc (DefWindowProcA, 16, user32)
+LoadDLLfunc (DispatchMessageA, 4, user32)
+LoadDLLfunc (FindWindowA, 8, user32)
+LoadDLLfunc (GetMessageA, 16, user32)
+LoadDLLfunc (GetProcessWindowStation, 0, user32)
+LoadDLLfunc (GetThreadDesktop, 4, user32)
+LoadDLLfunc (GetUserObjectInformationA, 20, user32)
+LoadDLLfunc (KillTimer, 8, user32)
+LoadDLLfunc (MessageBoxA, 16, user32)
+LoadDLLfunc (MsgWaitForMultipleObjects, 20, user32)
+LoadDLLfunc (OemToCharA, 8, user32)
+LoadDLLfunc (OemToCharW, 8, user32)
+LoadDLLfunc (PeekMessageA, 20, user32)
+LoadDLLfunc (PostMessageA, 16, user32)
+LoadDLLfunc (PostQuitMessage, 4, user32)
+LoadDLLfunc (RegisterClassA, 4, user32)
+LoadDLLfunc (SendMessageA, 16, user32)
+LoadDLLfunc (SetTimer, 16, user32)
+LoadDLLfunc (SetUserObjectSecurity, 12, user32)
+
+LoadDLLinitfunc (advapi32)
+{
+  HANDLE h;
+
+  if ((h = LoadLibrary ("advapi32.dll")) != NULL)
+    advapi32_handle = h;
+  else if (!advapi32_handle)
+    api_fatal ("could not load advapi32.dll, %E");
+
+  return 0;		/* Already done by another thread? */
+}
+
+LoadDLLinit (advapi32)
+LoadDLLfunc (AddAccessAllowedAce, 16, advapi32)
+LoadDLLfunc (AddAccessDeniedAce, 16, advapi32)
+LoadDLLfunc (AddAce, 20, advapi32)
+LoadDLLfunc (AdjustTokenPrivileges, 24, advapi32)
+LoadDLLfunc (CopySid, 12, advapi32)
+LoadDLLfunc (CreateProcessAsUserA, 44, advapi32)
+LoadDLLfunc (CryptAcquireContextA, 20, advapi32)
+LoadDLLfunc (CryptGenRandom, 12, advapi32)
+LoadDLLfunc (CryptReleaseContext, 8, advapi32)
+LoadDLLfunc (DeregisterEventSource, 4, advapi32)
+LoadDLLfunc (EqualSid, 8, advapi32)
+LoadDLLfunc (GetAce, 12, advapi32)
+LoadDLLfunc (GetFileSecurityA, 20, advapi32)
+LoadDLLfunc (GetLengthSid, 4, advapi32)
+LoadDLLfunc (GetSecurityDescriptorDacl, 16, advapi32)
+LoadDLLfunc (GetSecurityDescriptorGroup, 12, advapi32)
+LoadDLLfunc (GetSecurityDescriptorOwner, 12, advapi32)
+LoadDLLfunc (GetSidSubAuthority, 8, advapi32)
+LoadDLLfunc (GetSidSubAuthorityCount, 4, advapi32)
+LoadDLLfunc (GetTokenInformation, 20, advapi32)
+LoadDLLfunc (GetUserNameA, 8, advapi32)
+LoadDLLfunc (InitializeAcl, 12, advapi32)
+LoadDLLfunc (InitializeSecurityDescriptor, 8, advapi32)
+LoadDLLfunc (InitializeSid, 12, advapi32)
+LoadDLLfunc (IsValidSid, 4, advapi32)
+LoadDLLfunc (LookupAccountNameA, 28, advapi32)
+LoadDLLfunc (LookupAccountSidA, 28, advapi32)
+LoadDLLfunc (LookupPrivilegeValueA, 12, advapi32)
+LoadDLLfunc (MakeSelfRelativeSD, 12, advapi32)
+LoadDLLfunc (OpenProcessToken, 12, advapi32)
+LoadDLLfunc (RegCloseKey, 4, advapi32)
+LoadDLLfunc (RegCreateKeyExA, 36, advapi32)
+LoadDLLfunc (RegDeleteKeyA, 8, advapi32)
+LoadDLLfunc (RegEnumKeyExA, 32, advapi32)
+LoadDLLfunc (RegOpenKeyExA, 20, advapi32)
+LoadDLLfunc (RegQueryValueExA, 24, advapi32)
+LoadDLLfunc (RegSetValueExA, 24, advapi32)
+LoadDLLfunc (RegisterEventSourceA, 8, advapi32)
+LoadDLLfunc (ReportEventA, 36, advapi32)
+LoadDLLfunc (SetKernelObjectSecurity, 12, advapi32)
+LoadDLLfunc (SetSecurityDescriptorDacl, 16, advapi32)
+LoadDLLfunc (SetSecurityDescriptorGroup, 12, advapi32)
+LoadDLLfunc (SetSecurityDescriptorOwner, 12, advapi32)

@@ -1,3 +1,38 @@
+Mon May 29 20:31:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Remove libadvapi32.a.
+	* autoload.h: Add additional field to autoload block for handling
+	unimplemented functions.
+	(LoadDLLfuncEx): New function which accepts additional parameter for
+	controlling unimplemented function behavior.
+	(LoadDLLfunc): Use LoadDLLfuncEx.
+	* dcrt0.cc: Use new arguments for LoadDLLfunc.  Add advapi32 routines.
+	(noload): Rewrite in assembler.  Handle new unimplemented function
+	type.
+	* exceptions.cc: Eliminate another vestige of StackWalk stuff.
+	* net.cc: Use new arguments for LoadDLLfunc.
+	* uinfo.cc: Ditto.
+
+Mon May 29 20:18:47 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* config.h.in: Remove obsolete define.
+	* path.h (isdrive): New macro.
+	* dcrt0.cc (globify): Use new macro to determine if a string refers to
+	an MS-DOS drive.
+	* environ.cc (winenv): Ditto.
+	* spawn.cc (find_exec): Ditto.
+	* path.cc (get_raw_device_number): Ditto.
+	(mount_info::conv_to_posix_path): Ditto.
+	(chdir): Ditto.
+	(cygwin_posix_path_list_p): Ditto.
+	(cygwin_split_path): Ditto.
+	(path_conv::check): Move tmp_buf to beginning of function since it can
+	be used earlier in the loop.  Use tmp_buf rather than 'root' to hold
+	root information.
+	(mount_info::conv_to_win32_path): Add trailing slash to end of mount
+	path when it translates to a drive.  Add defensive code to avoid
+	writing beyond the end of 'dst'.
+
 Wed May 27 15:57:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_random.cc (read): Use CRYPT_MACHINE_KEYSET in
@@ -32,13 +67,13 @@ Wed May 24 21:59:00 2000  Corinna Vinschen <corinna@vinschen.de>
 	* security.cc (get_nt_attribute): Fix error in debug output.
 	Never set FILE_DELETE_CHILD for files.
 	Construct appropriate inherit attribute according to file type.
-	
+
 2000-05-23  DJ Delorie  <dj@cygnus.com>
 
 	* syscalls.cc (_cygwin_istext_for_stdio): New, for newlib
 	* include/cygwin/version.h: Bump API number for detect old
 	programs using old getc/putc macros
-	
+      
 2000-05-23  DJ Delorie  <dj@cygnus.com>
 
 	* dir.cc (writable_directory): handle root directories
@@ -350,7 +385,7 @@ Wed Apr 26 23:23:23 2000  Christopher Faylor <cgf@cygnus.com>
 2000-04-26  DJ Delorie  <dj@cygnus.com>
 
 	* Makefile.in (install): install regexp.h
-	
+
 Wed Apr 26 16:20:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (stat_worker): Previous patch could succeed

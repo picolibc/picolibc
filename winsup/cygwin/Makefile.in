@@ -114,7 +114,7 @@ EXTRA_DLL_OFILES:=${addsuffix .o,${basename ${notdir ${wildcard $(CONFIG_DIR)/*.
 
 EXTRA_OFILES=$(bupdir1)/libiberty/random.o $(bupdir1)/libiberty/strsignal.o
 
-DLL_IMPORTS:=$(w32api_lib)/libkernel32.a $(w32api_lib)/libadvapi32.a
+DLL_IMPORTS:=$(w32api_lib)/libkernel32.a
 
 DLL_OFILES:=assert.o dcrt0.o debug.o delqueue.o dir.o dlfcn.o dll_init.o \
 	environ.o  errno.o exceptions.o exec.o external.o fcntl.o fhandler.o \
