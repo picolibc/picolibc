@@ -200,6 +200,8 @@ void __stdcall close_all_files (void);
 
 /* Invisible window initialization/termination. */
 HWND __stdcall gethwnd (void);
+/* Check if running in a visible window station. */
+extern bool has_visible_window_station (void);
 
 /* Globals that handle initialization of winsock in a child process. */
 extern HANDLE wsock32_handle;

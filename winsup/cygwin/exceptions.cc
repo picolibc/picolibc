@@ -12,6 +12,8 @@ details. */
 #include <imagehlp.h>
 #include <stdlib.h>
 #include <setjmp.h>
+#include <wingdi.h>
+#include <winuser.h>
 
 #include "exceptions.h"
 #include "sync.h"
@@ -919,13 +921,23 @@ ctrl_c_handler (DWORD type)
       return FALSE;
     }
 
-  if (myself->ctty != -1
-      && (type == CTRL_CLOSE_EVENT || (!saw_close && type == CTRL_LOGOFF_EVENT)))
+  if (myself->ctty != -1)
     {
       if (type == CTRL_CLOSE_EVENT)
-	saw_close = true;
-      sig_send (NULL, SIGHUP);
-      return FALSE;
+        {
+	  saw_close = true;
+	  sig_send (NULL, SIGHUP);
+	  return FALSE;
+	}
+      if (!saw_close && type == CTRL_LOGOFF_EVENT)
+        {
+	  /* Check if the process is actually associated with a visible
+	     window station, one which actually represents a visible desktop.
+	     If not, the CTRL_LOGOFF_EVENT doesn't concern this process. */
+	  if (has_visible_window_station ())
+	    sig_send (NULL, SIGHUP);
+	  return FALSE;
+	}
     }
 
   /* If we are a stub and the new process has a pinfo structure, let it

@@ -1,3 +1,10 @@
+2003-10-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (ctrl_c_handler): Don't send SIGHUP on
+	CTRL_LOGOFF_EVENT to processes running in invisible Windows Stations.
+	* window.cc (has_visible_window_station): New function.
+	* winsup.h: Add declaration for has_visible_window_station.
+
 2003-10-10  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::open): Don't create a new window
