@@ -29,6 +29,27 @@ additional Cygwin applications that are not part of the core net
 release.  (That is, anything not found in an ftp mirror of @code{latest}
 and installed by @code{setup.exe}.)
 
+@subsection Bash says "command not found", but it's right there!
+
+If you compile a program, you might find that you can't run it:
+
+@example
+	bash$ gcc -o hello hello.c
+        bash$ hello
+        bash: hello: command not found
+@end example
+
+Unlike Windows, bash does not look for programs in @samp{.} (the current
+directory) by default.  You can add @samp{.} to your PATH (see above),
+but this is not recommended (at least on UNIX) for security reasons.
+Just tell bash where to find it, when you type it on the command line:
+
+@example
+	bash$ gcc -o hello hello.c
+        bash$ ./hello
+        Hello World!
+@end example
+
 @subsection How do I convert between Windows and UNIX paths?
 
 Use the 'cygpath' utility.  Type '@code{cygpath}' with no arguments to
