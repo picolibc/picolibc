@@ -1,3 +1,15 @@
+2003-02-28  Roland Schwingel <roland.schwingel@onevision.de>
+
+	Fixup UNICODE thinko in 2003-02-22 patch.
+	* include/wingdi.h (AddFontMemResourceEx): Add.
+	(RemoveFontMemResourceEx): Ditto.
+	(AddFontMemResourceEx[AW]): Remove.
+	(RemoveFontMemResourceEx[AW]): Ditto
+	* lib/gdi32.def: (AddFontResourceEx): Add.
+	(RemoveFontMemResourceEx): Ditto.
+	(AddFontMemResourceEx[AW]): Remove.
+	(RemoveFontResourceEx[AW]): Ditto.
+
 2003-02-23  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winbase.h (EVENTLOG_SUCCESS): Add define.
