@@ -438,6 +438,9 @@ extern "C" {
 #define DFC_MENU	2
 #define DFC_SCROLL	3
 #define DFC_BUTTON	4
+#if (WINVER >= 0x0500)
+#define DFC_POPUPMENU 5
+#endif /* WINVER >= 0x0500 */
 #define DFCS_CAPTIONCLOSE	0
 #define DFCS_CAPTIONMIN	1
 #define DFCS_CAPTIONMAX	2
