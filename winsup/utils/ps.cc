@@ -325,8 +325,14 @@ main (int argc, char *argv[])
        (p = (external_pinfo *) cygwin_internal (query, pid | CW_NEXTPID));
        pid = p->pid)
     {
-      if (!aflag && p->uid32 != (__uid32_t) uid)
-        continue;
+      if (!aflag)
+        if (p->version >= EXTERNAL_PINFO_VERSION_32_BIT)
+	  {
+	    if (p->uid32 != (__uid32_t) uid)
+	      continue;
+          }
+	else if (p->uid != uid)
+	  continue;
       char status = ' ';
       if (p->process_state & PID_STOPPED)
         status = 'S';
@@ -349,7 +355,8 @@ main (int argc, char *argv[])
 	}
       else if (query == CW_GETPINFO_FULL)
 	{
-	  HANDLE h = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, p->dwProcessId);
+	  HANDLE h = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+	  			  FALSE, p->dwProcessId);
 	  if (!h)
 	    continue;
 	  HMODULE hm[1000];
@@ -370,19 +377,25 @@ main (int argc, char *argv[])
         {
           struct passwd *pw;
 
-          if ((pw = getpwuid (p->uid32)))
+          if ((pw = getpwuid (p->version >= EXTERNAL_PINFO_VERSION_32_BIT ?
+	                      p->uid32 : p->uid)))
             strcpy (uname, pw->pw_name);
           else
-            sprintf (uname, "%u", (unsigned) p->uid32);
+            sprintf (uname, "%u", (unsigned)
+	             (p->version >= EXTERNAL_PINFO_VERSION_32_BIT ?
+		      p->uid32 : p->uid));
         }
 
       if (sflag)
         printf (dfmt, p->pid, ttynam (p->ctty), start_time (p), pname);
       else if (fflag)
-        printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty), start_time (p), pname);
+        printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty), start_time (p),
+	        pname);
       else if (lflag)
         printf (lfmt, status, p->pid, p->ppid, p->pgid,
-                p->dwProcessId, ttynam (p->ctty), p->uid32, start_time (p), pname);
+                p->dwProcessId, ttynam (p->ctty),
+		p->version >= EXTERNAL_PINFO_VERSION_32_BIT ? p->uid32 : p->uid,
+		start_time (p), pname);
 
     }
   (void) cygwin_internal (CW_UNLOCK_PINFO);
