@@ -1,3 +1,7 @@
+2004-04-08  Eric Christopher  <echristo@redhat.com>
+
+	* libc/include/machine/setjmp.h: Fix endif locations.
+
 2004-04-01  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* libc/time/strptime.c: Add standard includes to avoid

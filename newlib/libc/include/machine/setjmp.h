@@ -203,6 +203,7 @@ typedef	_JBTYPE jmp_buf[_JBLEN];
 #else
 typedef	int jmp_buf[_JBLEN];
 #endif
+#endif
 
 _END_STD_C
 
@@ -235,4 +236,3 @@ typedef int sigjmp_buf[_JBLEN+2];
 }
 #endif
 #endif /* __CYGWIN__ or __rtems__ */
-#endif
