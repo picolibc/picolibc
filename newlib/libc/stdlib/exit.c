@@ -64,9 +64,8 @@ _DEFUN (exit, (code),
   register int n;
   int i;
 
-  p = &_GLOBAL_REENT->_atexit;
-
 #ifdef _REENT_SMALL
+  p = &_GLOBAL_REENT->_atexit;
   args = p->_on_exit_args_ptr;
   
   if (args == NULL)
@@ -83,6 +82,7 @@ _DEFUN (exit, (code),
           p->_fns[n] ();
     }
 #else
+  p = _GLOBAL_REENT->_atexit;
   do
     {
       args = & p->_on_exit_args;

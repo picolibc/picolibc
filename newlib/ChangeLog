@@ -1,3 +1,9 @@
+2003-09-05  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/exit.c (exit): Setting of struct _atexit ptr p
+	is different for _REENT_SMALL than when using regular reent
+	struct.
+
 2003-09-05  Ben Elliston  <bje@wasabisystems.com>
 
 	* libc/ctype/wctype.c (_DEFUN): Remove empty default case, as
