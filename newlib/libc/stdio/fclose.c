@@ -83,11 +83,11 @@ _DEFUN (fclose, (fp),
     FREEUB (fp);
   if (HASLB (fp))
     FREELB (fp);
-  fp->_flags = 0;		/* release this FILE for reuse */
   _funlockfile(fp);
 #ifndef __SINGLE_THREAD__
   __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
 #endif
+  fp->_flags = 0;		/* release this FILE for reuse */
 
   return (r);
 }

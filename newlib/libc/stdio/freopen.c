@@ -148,12 +148,12 @@ _DEFUN (_freopen_r, (ptr, file, mode, fp),
 
   if (f < 0)
     {				/* did not get it after all */
-      fp->_flags = 0;		/* set it free */
       ptr->_errno = e;		/* restore in case _close clobbered */
       _funlockfile(fp);
 #ifndef __SINGLE_THREAD__
       __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
 #endif
+      fp->_flags = 0;		/* set it free */
       return NULL;
     }
 

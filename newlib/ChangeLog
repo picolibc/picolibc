@@ -1,3 +1,8 @@
+2004-01-19  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* libc/stdio/fclose.c (fclose): Release FILE as the last step.
+	* libc/stdio/freopen.c (freopen): Ditto.
+
 2004-01-16  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/stdio/vfprintf.c: Add sys/lock.h include.
