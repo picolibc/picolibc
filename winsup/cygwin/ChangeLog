@@ -1,3 +1,9 @@
+Sun Jun 10 23:34:09 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (path_conv::update_fs_info): Don't consider remote drives to
+	be NTFS.  Set root_dir before invoking GetDriveType (from Kazuhiro
+	Fujieda <fujieda@jaist.ac.jp>).  Eliminate extra checks for rootdir.
+
 Sun Jun 10 20:19:47 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (chdir): Pre-check path for validity before eating trailing

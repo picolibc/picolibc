@@ -152,7 +152,7 @@ int
 pathnmatch (const char *path1, const char *path2, int len)
 {
   return pcheck_case == PCHECK_STRICT ? !strncmp (path1, path2, len)
-  				      : strncasematch (path1, path2, len);
+				      : strncasematch (path1, path2, len);
 }
 
 /* Return non-zero if paths match. Check is dependent of the case
@@ -161,7 +161,7 @@ int
 pathmatch (const char *path1, const char *path2)
 {
   return pcheck_case == PCHECK_STRICT ? !strcmp (path1, path2)
-  				      : strcasematch (path1, path2);
+				      : strcasematch (path1, path2);
 }
 
 /* Normalize a POSIX path.
@@ -242,7 +242,7 @@ normalize_posix_path (const char *src, char *dst)
 		}
 	      else if (src[2] && !isslash (src[2]))
 		break;
-              else
+	      else
 		{
 		  while (dst > dst_start && !isslash (*--dst))
 		    continue;
@@ -312,9 +312,7 @@ path_conv::update_fs_info (const char* win32_path)
   char tmp_buf [MAX_PATH];
   strncpy (tmp_buf, win32_path, MAX_PATH);
 
-  if (!rootdir (tmp_buf) &&
-      (!GetCurrentDirectory (sizeof (tmp_buf), tmp_buf) <= sizeof (tmp_buf) ||
-       !rootdir (tmp_buf)))       
+  if (!rootdir (tmp_buf))
     {
       debug_printf ("Cannot get root component of path %s", win32_path);
       root_dir [0] = fs_name [0] = '\0';
@@ -325,13 +323,13 @@ path_conv::update_fs_info (const char* win32_path)
 
   if (strcmp (tmp_buf, root_dir) != 0)
     {
+      strncpy (root_dir, tmp_buf, MAX_PATH);
       drive_type = GetDriveType (root_dir);
       if (drive_type == DRIVE_REMOTE || (drive_type == DRIVE_UNKNOWN && (root_dir[0] == '\\' && root_dir[1] == '\\')))
 	is_remote_drive = 1;
       else
 	is_remote_drive = 0;
 
-      strncpy (root_dir, tmp_buf, MAX_PATH);
       if (!GetVolumeInformation (root_dir, NULL, 0, &fs_serial, NULL, &fs_flags,
 				     fs_name, sizeof (fs_name)))
 	{
@@ -341,14 +339,14 @@ path_conv::update_fs_info (const char* win32_path)
 	  sym_opt = 0;
 	}
       else
-        {
+	{
 	  /* FIXME: Samba by default returns "NTFS" in file system name, but
 	   * doesn't support Extended Attributes. If there's some fast way to
 	   * distinguish between samba and real ntfs, it should be implemented
 	   * here.
 	   */
-	  sym_opt = (strcmp (fs_name, "NTFS") == 0 ? PC_CHECK_EA : 0);
-        }
+	  sym_opt = (!is_remote_drive && strcmp (fs_name, "NTFS") == 0) ? PC_CHECK_EA : 0;
+	}
     }
 }
 
@@ -502,7 +500,7 @@ path_conv::check (const char *src, unsigned opt,
 	      goto out;
 	    }
 
-	  int len = sym.check (full_path, suff, opt | sym_opt );
+	  int len = sym.check (full_path, suff, opt | sym_opt);
 
 	  if (sym.case_clash)
 	    {
@@ -631,7 +629,7 @@ path_conv::check (const char *src, unsigned opt,
       /* See if we need to separate first part + symlink contents with a / */
       if (headptr > tmp_buf && headptr[-1] != '/')
 	*headptr++ = '/';
-      
+
       /* Copy the symlink contents to the end of tmp_buf.
 	 Convert slashes.  FIXME? */
       for (p = sym.contents; *p; p++)
@@ -754,7 +752,7 @@ const char *windows_device_names[] =
   "\\dev\\pipew",
   "\\dev\\socket",
   "\\dev\\windows",
-  
+
   NULL, NULL, NULL,
 
   "\\dev\\disk",
@@ -2240,7 +2238,7 @@ cygdrive_getmntent ()
 
   return ret;
 }
-  
+
 struct mntent *
 mount_info::getmntent (int x)
 {
@@ -2504,10 +2502,10 @@ symlink (const char *topath, const char *frompath)
 			      win32_path.get_win32 (),
 			      S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
 	  SetFileAttributesA (win32_path.get_win32 (),
-	  		      allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
-			      			: FILE_ATTRIBUTE_SYSTEM);
+			      allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
+						: FILE_ATTRIBUTE_SYSTEM);
 	  if (win32_path.fs_fast_ea ())
-            set_symlink_ea (win32_path, topath);
+	    set_symlink_ea (win32_path, topath);
 	  res = 0;
 	}
       else
@@ -2787,7 +2785,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       if (h == INVALID_HANDLE_VALUE)
 	goto file_not_symlink;
 
-      /* FIXME: if symlink isn't present in EA, but EAs are supported, 
+      /* FIXME: if symlink isn't present in EA, but EAs are supported,
        * should we write it there?
        */
       switch (sym_check)
