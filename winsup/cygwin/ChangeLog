@@ -1,3 +1,8 @@
+2002-06-12  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* spawn.cc (spawn_guts): Revert removal of ciresrv.moreinfo->uid =
+	ILLEGAL_UID.
+
 2002-06-15  Christopher Faylor  <cgf@redhat.com>
 
 	* child_info.h (child_proc_info): Declare as base class.

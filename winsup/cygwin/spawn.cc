@@ -646,6 +646,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       char wstname[1024];
       char dskname[1024];
 
+      ciresrv.moreinfo->uid = ILLEGAL_UID;
       hwst = GetProcessWindowStation ();
       SetUserObjectSecurity (hwst, &dsi, get_null_sd ());
       GetUserObjectInformation (hwst, UOI_NAME, wstname, 1024, &n);
