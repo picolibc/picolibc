@@ -307,6 +307,8 @@ quoted (char *cmd, int winshell)
       strcpy (cmd, cmd + 1);
       if ((p = strchr (cmd, quote)) != NULL)
 	strcpy (p, p + 1);
+      else
+	p = strchr (cmd, '\0');
       return p;
     }
 
