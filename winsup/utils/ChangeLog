@@ -1,3 +1,14 @@
+Sat Jul 29 00:44:46 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* kill.cc (main): Add '-f' option to force termination of a process.
+	(forcekill): New function.
+	* ps.cc (main): Add '-W' option to list Windows pids as well as Cygwin
+	pids.
+	(dummyprocessmodules): New function.
+	(GetModuleFileNameEx95): New function.
+	(init_win): New function.
+	(to_time_t): New function.
+
 Thu Jul 27 22:54:28 2000  Jason Tishler <jt@dothill.com>
 
 	* utils/mount.cc (main): Add --show-cygdrive-prefixes option.
@@ -31,11 +42,11 @@ Sat Jun 24 23:16:33 2000  Christopher Faylor <cgf@cygnus.com>
 
 2000-06-07  Kazuhiro Fujieda <fujieda@jaist.ac.jp>
 
-        mount.cc (error): New function to report an error and exit.
-        umount.cc (error): Ditto.
-        (remove_all_automounts): Check return status of cygwin_umount.
-        (remove_all_user_mounts): Ditto.
-        (remove_all_system_mounts): Ditto.
+	* mount.cc (error): New function to report an error and exit.
+	* umount.cc (error): Ditto.
+	(remove_all_automounts): Check return status of cygwin_umount.
+	(remove_all_user_mounts): Ditto.
+	(remove_all_system_mounts): Ditto.
 
 2000-06-05  DJ Delorie  <dj@cygnus.com>
 
