@@ -44,7 +44,7 @@ struct external_filehdr
  *	F_AR32WR	file has byte ordering of an AR32WR machine (e.g. vax)
  *	F_APCS_26	file uses 26 bit ARM Procedure Calling Standard
  *	F_APCS_SET	the F_APCS_26, F_APCS_FLOAT and F_PIC bits have been initialised
- *	F_SOFTFLOAT	code does not use floating point instructions
+ *	F_SOFT_FLOAT	code does not use floating point instructions
  */
 
 #define F_RELFLG	(0x0001)
@@ -59,7 +59,7 @@ struct external_filehdr
 #define	F_AR32WR	(0x0100)
 #define F_APCS_26	(0x0400)
 #define F_APCS_SET	(0x0800)
-#define F_SOFTFLOAT	(0x2000)
+#define F_SOFT_FLOAT	(0x2000)
 
 /* Bits stored in flags field of the internal_f structure */
 
@@ -262,8 +262,6 @@ union external_auxent
 		char x_tvlen[2];	/* length of .tv */
 		char x_tvran[2][2];	/* tv range */
 	} x_tv;		/* info about .tv section (in auxent of symbol .tv)) */
-
-
 };
 
 #define	SYMENT	struct external_syment
@@ -281,7 +279,6 @@ struct external_reloc
   char r_type[2];
   char r_offset[4];
 };
-
 
 #define RELOC struct external_reloc
 #define RELSZ 14
