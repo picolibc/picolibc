@@ -1,3 +1,7 @@
+2002-10-02  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.in: Regenerate.  This really ought to fix things. :sigh:
+
 2002-10-02  Alan Modra  <amodra@bigpond.net.au>
 
 	* configure: Move stray lines back to where they belong.
