@@ -1,5 +1,9 @@
 1999-08-08  Ian Lance Taylor  <ian@zembu.com>
 
+	* mkdep: New file.
+	* Makefile.in (GAS_SUPPORT_DIRS): Add mkdep.
+	(BINUTILS_SUPPORT_DIRS): Add mkdep.
+
 	From Eli Zaretskii <eliz@is.elta.co.il>:
 	* configure (tmpfile): Change cONf$$ to cNf$$ to avoid an overly
 	long file name when using DJGPP on MS-DOS.
