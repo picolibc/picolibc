@@ -18,7 +18,7 @@ details. */
 
 #include <assert.h>
 
-#include "cygwin_shm.h"
+#include <sys/shm.h>
 
 #include "cygwin/cygserver.h"
 

@@ -1,3 +1,12 @@
+2002-06-29  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygwin_ipc.h: Moved (back) to "include/sys/ipc.h".
+	* cygwin_shm.h: Moved (back) to "include/sys/shm.h".
+	* include/sys/ipc.h: New file.
+	* include/sys/shm.h: New file.
+	* cygserver_shm.h: Update for new header file locations.
+	* ipc.cc: Ditto.
+
 2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_client.cc (client_request::make_request): Comment out
