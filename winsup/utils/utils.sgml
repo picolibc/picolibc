@@ -652,27 +652,6 @@ Usage strace [options] program [args...]
 optionally the children of the program, reporting any Cygwin DLL output
 from the program(s) to file.  This program is mainly useful for debugging
 the Cygwin DLL itself.
-
-The mask argument is a hexadecimal string signifying which events should be
-reported.  The valid bits to set are as follows:
-</para>
-
-<screen>
-  Bit			Explanation
-0x00000001		All strace output is collected
-0x00000008		Unusual or weird phenomenon
-0x00000010		System calls
-0x00000020		argv/envp printout at startup
-0x00000040		Information useful for DLL debugging
-0x00000080		Paranoid information
-0x00000100		Termios debbugging
-0x00000200		Select() function debugging
-0x00000400		Window message debugging
-0x00000800		Signal and process handling
-0x00001000		Very minimal strace output
-0x00020000		Malloc calls
-0x00040000		Thread locking calls
-</screen>
 </sect2>
 
 <sect2 id="regtool"><title>regtool</title>
