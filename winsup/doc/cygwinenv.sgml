@@ -22,9 +22,9 @@ pipe to binary by default.
 </para>
 </listitem>
 <listitem>
-<para><envar>check_case:level</envar> - Controls the behaviour of
+<para><envar>check_case:level</envar> - Controls the behavior of
 Cygwin when a user tries to open or create a file using a case different from
-the case of the path as asved on the disk.
+the case of the path as saved on the disk.
 <literal>level</literal> is one of <literal>relaxed</literal>,
 <literal>adjust</literal> and <literal>strict</literal>.</para>
 <itemizedlist Mark="bullet">

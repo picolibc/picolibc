@@ -1,3 +1,10 @@
+2004-05-21  Brian Ford  <ford@vss.fsi.com>
+
+	* pathnames.sgml: Remove /dev/kmem from the supported POSIX
+	device list.
+
+	* cygwinenv.sgml: Fix typo in check_case description.
+
 2004-03-30  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* ntsec.sgml: Replace chapter numbers with <link>s, 

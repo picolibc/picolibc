@@ -172,9 +172,10 @@ Cygwin supports the following devices commonly found on POSIX systems:
 <filename>/dev/tty</filename>, <filename>/dev/ttym</filename>, 
 <filename>/dev/ttyX</filename>, <filename>/dev/ttySX</filename>, 
 <filename>/dev/pipe</filename>, <filename>/dev/port</filename>, 
-<filename>/dev/ptmx</filename>, <filename>/dev/kmem</filename>,
-<filename>/dev/mem</filename>,
+<filename>/dev/ptmx</filename>, <filename>/dev/mem</filename>,
 <filename>/dev/random</filename>, and <filename>/dev/urandom</filename>.
+Some other POSIX devices, such as 
+<filename>/dev/kmem</filename>, are planned for development.
 Cygwin also has several Windows-specific devices:
 <filename>/dev/comX</filename> (the serial ports, starting with 
 <filename>COM1</filename> which is the same as <filename>ttyS0</filename>),
