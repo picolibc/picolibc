@@ -1,3 +1,17 @@
+Fri Feb 25 19:26:42 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (interruptible): Make a little more structured.
+	(call_handler): Allow signals to be sent even if signalled thread is
+	stopped.  Change order of signal_arrived arming/waiting threads
+	clearing to eliminate a race.
+	(reset_signal_arrived): New helper function.
+	* malloc.cc (malloc_init): Use mutos so that signal handler can keep
+	track of who owns the lock.
+	(__malloc_lock): Ditto.
+	(__malloc_unlock): Ditto.
+	* sync.h (new_muto): Actually use a muto for the "buffer".
+	* Makefile.in: Fix a dependency.
+
 2000-02-25  DJ Delorie  <dj@cygnus.com>
 
 	* Makefile.in: fix "make check" support and cygrun.
@@ -17,7 +31,7 @@ Thu Feb 24 14:45:06 2000  Christopher Faylor <cgf@cygnus.com>
 
 Thu Feb 24 00:59:15 2000  Christopher Faylor <cgf@cygnus.com>
 
-	Fix final round of gcc warnings relating to unused parameters. 
+	Fix final round of gcc warnings relating to unused parameters.
 	* debug.cc (iscygthread): New function.
 	* debug.h: Declare it.
 	* exceptions.cc (set_process_mask): Flush pending signals.

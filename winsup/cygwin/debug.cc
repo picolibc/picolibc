@@ -9,6 +9,7 @@ details. */
 #define NO_DEBUG_DEFINES
 #include "winsup.h"
 #include "exceptions.h"
+#include "sync.h"
 
 static muto NO_COPY *threadname_lock = NULL;
 #define lock_threadname() \

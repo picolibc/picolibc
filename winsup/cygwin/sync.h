@@ -28,7 +28,7 @@ public:
 
   /* This simple constructor is used for cases where no bruteforce
      event handling is required. */
-  muto(): sync(0), visits(0), waiters(-1), bruteforce(0), tid(0), next (0) {;}
+  muto(): sync(0), visits(0), waiters(-1), bruteforce(0), tid(0), next (NULL) {;}
   /* A more complicated constructor. */
   muto(int inh, const char *name);
   ~muto ();
@@ -46,9 +46,9 @@ extern muto muto_start;
 /* Use a statically allocated buffer as the storage for a muto */
 #define new_muto(__inh, __name) \
 ({ \
-  static NO_COPY char __mbuf[sizeof(class muto) + 100] = {0}; \
-  muto *m = muto_start.next; \
-  muto_start.next = new (__mbuf) muto ((__inh), (__name)); \
-  muto_start.next->next = m; \
-  muto_start.next; \
+  static NO_COPY muto __mbuf; \
+  (void) new ((char *) &__mbuf) muto (__inh, __name); \
+  __mbuf.next = muto_start.next; \
+  muto_start.next = &__mbuf; \
+  &__mbuf; \
 })

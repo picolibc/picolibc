@@ -16,6 +16,7 @@ details. */
 #include <errno.h>
 #include <stdlib.h>
 #include "winsup.h"
+#include "sync.h"
 
 extern BOOL allow_ntsec;
 

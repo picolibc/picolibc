@@ -18,6 +18,7 @@ details. */
 #define DECLSPEC_IMPORT
 #include <imagehlp.h>
 #include "autoload.h"
+#include "sync.h"
 
 char debugger_command[2 * MAX_PATH + 20];
 
@@ -557,7 +558,7 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 	bp -= 2;
 	break;
       }
-  
+
   in->Ebp = (DWORD) bp;
   sigsave.cx = in;
   sig_send (NULL, sig);		// Signal myself
@@ -621,21 +622,28 @@ interruptible (DWORD pc)
   return ((pc >= (DWORD) &__sigfirst) && (pc <= (DWORD) &__siglast)) ||
 	 !(pchigh == 0xb0000000 || pchigh == 0x70000000 || pchigh == 0x60000000);
 #else
+  int res = 1;
   if ((pc >= (DWORD) &__sigfirst) && (pc <= (DWORD) &__siglast))
-    return 1;
+    res = 0;
+  else
+    {
+      MEMORY_BASIC_INFORMATION m;
+      memset (&m, 0, sizeof m);
+      if (!VirtualQuery ((LPCVOID) pc, &m, sizeof m))
+	sigproc_printf ("couldn't get memory info, %E");
 
-  MEMORY_BASIC_INFORMATION m;
-  memset (&m, 0, sizeof m);
-  if (!VirtualQuery ((LPCVOID) pc, &m, sizeof m))
-    sigproc_printf ("couldn't get memory info, %E");
+      char *checkdir = (char *) alloca (windows_system_directory_length);
+#     define h ((HMODULE) m.AllocationBase)
+      if (h == cygwin_hmodule)
+	res = 0;
+      else if (!GetModuleFileName (h, checkdir, windows_system_directory_length))
+	res = 0;
+      else
+        res = !strncasematch (windows_system_directory, checkdir,
+			      windows_system_directory_length);
+    }
 
-# define h ((HMODULE) m.AllocationBase)
-  if (h == cygwin_hmodule)
-    return 0;
-  char *checkdir = (char *) alloca (windows_system_directory_length);
-  if (!GetModuleFileName (h, checkdir, windows_system_directory_length))
-    return 0;
-  return !strncasematch (windows_system_directory, checkdir, windows_system_directory_length);
+  return res;
 # undef h
 #endif
 }
@@ -727,7 +735,6 @@ call_handler (int sig, struct sigaction& siga, void *handler)
      we have to do that since sometimes they don't return - and if
      this thread doesn't return, you won't ever get another exception. */
 
-  sigproc_printf ("Suspending %p (mainthread)", myself->getthread2signal());
   HANDLE hth = myself->getthread2signal ();
   /* Suspend the thread which will receive the signal.  But first ensure that
      this thread doesn't have the sync_proc_subproc and mask_sync mutos, since
@@ -736,10 +743,8 @@ call_handler (int sig, struct sigaction& siga, void *handler)
      already suspended (which should never occur) then just queue the signal. */
   for (;;)
     {
+      sigproc_printf ("suspending mainthread");
       res = SuspendThread (hth);
-
-      if (res)
-	goto set_pending;
 
       /* FIXME: Make multi-thread aware */
       for (muto *m = muto_start.next;  m != NULL; m = m->next)
@@ -749,10 +754,14 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       break;
 
     keep_looping:
+      sigproc_printf ("suspended thread owns a muto");
+      if (res)
+	  goto set_pending;
+
       ResumeThread (hth);
       Sleep (0);
     }
-      
+
   sigproc_printf ("suspend said %d, %E", res);
 
   if (sigsave.cx)
@@ -783,12 +792,6 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       interrupted = 0;
     }
 
-  if (interrupted)
-    {
-      /* Clear any waiting threads prior to dispatching to handler function */
-      proc_subproc(PROC_CLEARWAIT, 1);
-    }
-
   (void) ResumeThread (hth);
 
   if (interrupted)
@@ -796,6 +799,8 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       /* Apparently we have to set signal_arrived after resuming the thread or it
 	 is possible that the event will be ignored. */
       (void) SetEvent (signal_arrived);	// For an EINTR case
+      /* Clear any waiting threads prior to dispatching to handler function */
+      proc_subproc(PROC_CLEARWAIT, 1);
     }
   sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
 
@@ -1068,6 +1073,15 @@ events_terminate (void)
 
 #define pid_offset (unsigned)(((pinfo *)NULL)->pid)
 extern "C" {
+static void __stdcall
+reset_signal_arrived () __attribute__ ((unused));
+static void __stdcall
+reset_signal_arrived ()
+{
+  (void) ResetEvent (signal_arrived);
+  sigproc_printf ("reset signal_arrived");
+}
+
 void unused_sig_wrapper()
 {
 /* Signal cleanup stuff.  Cleans up stack (too bad that we didn't
@@ -1076,7 +1090,6 @@ void unused_sig_wrapper()
    and returns to orignal caller. */
 __asm__ volatile ("
 	.text
-___sigfirst:
 	.globl	__raise
 __raise:
 	pushl	%%ebp
@@ -1120,19 +1133,21 @@ _sigdelayed:
 	pushl	%3	# oldmask
 	pushl	%4	# signal argument
 	pushl	$_sigreturn
-	movl	$0,%0
 
-	pushl	_signal_arrived	# Everybody waiting for this should
-	call	_ResetEvent@4	# have woken up by now.
+	call	_reset_signal_arrived@0
+#	pushl	_signal_arrived	# Everybody waiting for this should
+#	call	_ResetEvent@4	# have woken up by now.
+	movl	$0,%0
 
 	cmpl	$0,_pending_signals
 	je	2f
+___sigfirst:
 	pushl	$0
 	call	_sig_dispatch_pending@4
+___siglast:
 
 2:	jmp	*%5
 
-___siglast:
 " : "=m" (sigsave.sig) : "m" (&_impure_ptr->_errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
     "g" (sigsave.func), "o" (pid_offset), "g" (sigsave.saved_errno)

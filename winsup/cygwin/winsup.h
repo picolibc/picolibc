@@ -82,8 +82,6 @@ extern int dynamically_loaded;
 extern HANDLE hMainThread;
 extern HANDLE hMainProc;
 
-#include "sync.h"
-
 /* Now that pinfo has been defined, include... */
 #include "debug.h"
 #include "sigproc.h"

@@ -178,7 +178,6 @@ fhandler_console::read (void *pv, size_t buflen)
 	  kill_pgrp (tc->getpgid (), SIGWINCH);
 	  continue;
 	}
-debug_printf ("ich %d, keydown %d, type %d", ich, input_rec.Event.KeyEvent.bKeyDown, input_rec.EventType);
       if (input_rec.EventType != KEY_EVENT ||
 	  !input_rec.Event.KeyEvent.bKeyDown)
 	continue;

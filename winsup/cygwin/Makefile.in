@@ -302,7 +302,7 @@ ioctl.o: $(WINSUP_H)
 libccrt0.o: $(WINSUP_H)
 libcmain.o: $(WINSUP_H)
 localtime.o: tz_posixrules.h
-malloc.o: $(WINSUP_H)
+malloc.o: $(WINSUP_H) sync.h
 mcount.o: gmon.h
 mmap.o: $(WINSUP_H)
 net.o: $(WINSUP_H) autoload.h

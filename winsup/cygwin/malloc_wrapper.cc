@@ -13,6 +13,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include "sync.h"
 
 /* we provide these stubs to call into a user's
    provided malloc if there is one - otherwise
@@ -200,12 +201,12 @@ _strdup_r (struct _reent *, const char *s)
    newlib will call __malloc_lock and __malloc_unlock at appropriate
    times.  */
 
-static NO_COPY CRITICAL_SECTION malloc_critical_section;
+static NO_COPY muto *mprotect = NULL;
 
 void
 malloc_init ()
 {
-  InitializeCriticalSection (&malloc_critical_section);
+  mprotect = new_muto (FALSE, NULL);
   /* Check if mallock is provided by application. If so, redirect all
      calls to export_malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides
@@ -226,12 +227,12 @@ extern "C"
 void
 __malloc_lock (struct _reent *)
 {
-  SetResourceLock(LOCK_MEMORY_LIST,WRITE_LOCK|READ_LOCK," __malloc_lock");
+  mprotect->acquire ();
 }
 
 extern "C"
 void
 __malloc_unlock (struct _reent *)
 {
-  ReleaseResourceLock(LOCK_MEMORY_LIST,WRITE_LOCK|READ_LOCK," __malloc_unlock");
+  mprotect->release ();
 }
