@@ -10,7 +10,6 @@
 # details.
 
 exec 9> version.cc
-trap "rm -f /tmp/version.cc" 1 2 15
 
 #
 # Arg 1 is the name of the version include file
@@ -172,5 +171,4 @@ fi
 
 echo "Version $cygwin_ver"
 set -$- $builddate
-set -x
-exec $windres --include-dir $dir/../w32api/include --include-dir $dir/include --define CYGWIN_BUILD_DATE="$1" --define CYGWIN_BUILD_TIME="$2" --define CYGWIN_VERSION='"'"$cygwin_ver"'"' $rcfile winver.o
+$windres --include-dir $dir/../w32api/include --include-dir $dir/include --define CYGWIN_BUILD_DATE="$1" --define CYGWIN_BUILD_TIME="$2" --define CYGWIN_VERSION='"'"$cygwin_ver"'"' $rcfile winver.o

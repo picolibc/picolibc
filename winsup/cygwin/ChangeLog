@@ -1,3 +1,8 @@
+Sat Aug 12 01:47:28 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* mkvers.sh: Properly trap exit removal of temp file.  Remove debugging
+	statement.
+
 Sat Aug 12 01:37:56 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* poll.cc: Make winsup.h the first include file, re 2000-08-02 change.
