@@ -106,8 +106,7 @@ GMON_START:=gcrt0.o
 # data which apps can get to, which is a pain in the dll, so we
 # include them directly into the library.
 
-LIBCOS:=libccrt0.o libcmain.o getopt.o dll_entry.o dll_main.o \
-	premain0.o premain1.o premain2.o premain3.o
+LIBCOS:=libccrt0.o libcmain.o getopt.o dll_entry.o dll_main.o
 
 # Build all source files in the config directory
 
@@ -144,7 +143,7 @@ install_host=@install_host@
 
 all: new-$(DLL_NAME) $(all_host) all_target
 
-all_target: $(LIBGMON_A) $(LIB_NAME) binmode.o
+all_target: $(LIBGMON_A) $(LIB_NAME)
 
 all_host: new-$(LIB_NAME) cygrun.exe
 
