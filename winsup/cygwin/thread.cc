@@ -1356,12 +1356,12 @@ verifyable_object_state
 verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr)
 {
   verifyable_object **object = (verifyable_object **)objectptr;
+  if (static_ptr && *object == static_ptr)
+    return VALID_STATIC_OBJECT;
   if (check_valid_pointer (object))
     return INVALID_OBJECT;
   if (!*object)
     return INVALID_OBJECT;
-  if (static_ptr && *object == static_ptr)
-    return VALID_STATIC_OBJECT;
   if (check_valid_pointer (*object))
     return INVALID_OBJECT;
   if ((*object)->magic != magic)

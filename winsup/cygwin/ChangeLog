@@ -1,3 +1,7 @@
+2002-10-17  Thomas Pfaff  <tpfaff@gmx.net>
+ 
+	* thread.cc (verifyable_object_isvalid): Test for static object first.
+
 2002-10-16  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::read): Attempt #527 to properly
