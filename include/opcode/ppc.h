@@ -98,7 +98,7 @@ extern const int powerpc_num_opcodes;
 #define PPC_OPCODE_BOOKE (04000)
 
 /* Opcode is only supported by 64-bit Motorola BookE processor.  */
-#define PPC_OPCODE_BOOKE64 (001000)
+#define PPC_OPCODE_BOOKE64 (010000)
 
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
