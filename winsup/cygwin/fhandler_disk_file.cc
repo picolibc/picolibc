@@ -114,6 +114,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 		       local.ftCreationTime,
 		       local.ftLastAccessTime,
 		       local.ftLastWriteTime,
+		       local.dwVolumeSerialNumber,
 		       local.nFileSizeHigh,
 		       local.nFileSizeLow,
 		       local.nFileIndexHigh,
@@ -141,13 +142,17 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
 			  local.ftCreationTime,
 			  local.ftLastAccessTime,
 			  local.ftLastWriteTime,
+			  pc.volser (),
 			  local.nFileSizeHigh,
-			  local.nFileSizeLow);
+			  local.nFileSizeLow,
+			  0,
+			  0,
+			  1);
     }
   else if (pc.isdir ())
     {
       FILETIME ft = {};
-      res = fstat_helper (buf, ft, ft, ft, 0, 0);
+      res = fstat_helper (buf, ft, ft, ft, pc.volser (), 0, 0, 0, 0, 1);
     }
   else
     {
@@ -213,6 +218,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 			     FILETIME ftCreationTime,
 			     FILETIME ftLastAccessTime,
 			     FILETIME ftLastWriteTime,
+			     DWORD dwVolumeSerialNumber,
 			     DWORD nFileSizeHigh,
 			     DWORD nFileSizeLow,
 			     DWORD nFileIndexHigh,
@@ -233,7 +239,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   to_timestruc_t (&ftLastAccessTime, &buf->st_atim);
   to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
   to_timestruc_t (&ftCreationTime, &buf->st_ctim);
-  buf->st_dev = pc.volser ();
+  buf->st_dev = dwVolumeSerialNumber ?: pc.volser ();
   buf->st_size = ((_off64_t) nFileSizeHigh << 32) + nFileSizeLow;
   /* The number of links to a directory includes the
      number of subdirectories in the directory, since all

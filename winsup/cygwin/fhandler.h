@@ -250,14 +250,15 @@ class fhandler_base
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_fs (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_helper (struct __stat64 *buf,
-			      FILETIME ftCreateionTime,
+			      FILETIME ftCreationTime,
 			      FILETIME ftLastAccessTime,
 			      FILETIME ftLastWriteTime,
+			      DWORD dwVolumeSerialNumber,
 			      DWORD nFileSizeHigh,
 			      DWORD nFileSizeLow,
-			      DWORD nFileIndexHigh = 0,
-			      DWORD nFileIndexLow = 0,
-			      DWORD nNumberOfLinks = 1)
+			      DWORD nFileIndexHigh,
+			      DWORD nFileIndexLow,
+			      DWORD nNumberOfLinks)
     __attribute__ ((regparm (3)));
   int __stdcall fstat_by_handle (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));

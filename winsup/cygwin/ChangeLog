@@ -1,5 +1,18 @@
 2005-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_base::fstat_helper): Declare with additional
+	dwVolumeSerialNumber argument.  Drop default values for last three
+	arguments.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Pass
+	dwVolumeSerialNumber from GetFileInformationByHandle to fstat_helper.
+	(fhandler_base::fstat_by_name): Pass pc.volser () to fstat_helper.
+	Accomodate dropping default values for last three arguments of
+	fstat_helper.
+	(fhandler_base::fstat_helper): Add dwVolumeSerialNumber argument. 
+	Use for st_dev member unless 0 in which case pc.volser () is used.
+
+2005-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (FindFirstVolumeA): Add.
 	(FindNextVolumeA): Add.
 	(FindVolumeClose): Add.
