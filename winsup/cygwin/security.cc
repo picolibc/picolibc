@@ -1407,48 +1407,40 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 {
   security_descriptor sd;
   PSECURITY_DESCRIPTOR psd = NULL;
+  LONG ret;
 
   if (object_type == SE_REGISTRY_KEY)
     {
       /* use different code for registry handles, for performance reasons */
       DWORD len = 0;
-      if (RegGetKeySecurity ((HKEY) handle,
-			     DACL_SECURITY_INFORMATION
-			     | GROUP_SECURITY_INFORMATION
-			     | OWNER_SECURITY_INFORMATION,
-			     sd, &len) != ERROR_INSUFFICIENT_BUFFER)
-	{
-	  __seterrno ();
-	  debug_printf ("RegGetKeySecurity %E");
-	}
-      if (!sd.malloc (len))
+      if ((ret = RegGetKeySecurity ((HKEY) handle,
+				    DACL_SECURITY_INFORMATION
+				    | GROUP_SECURITY_INFORMATION
+				    | OWNER_SECURITY_INFORMATION,
+				    sd, &len)) != ERROR_INSUFFICIENT_BUFFER)
+	__seterrno_from_win_error (ret);
+      else if (!sd.malloc (len))
 	set_errno (ENOMEM);
-      else if (RegGetKeySecurity ((HKEY) handle,
-				  DACL_SECURITY_INFORMATION
-				  | GROUP_SECURITY_INFORMATION
-				  | OWNER_SECURITY_INFORMATION,
-				  sd, &len) != ERROR_SUCCESS)
-	{
-	  __seterrno ();
-	  debug_printf ("RegGetKeySecurity %E");
-	}
-	get_info_from_sd (sd, attribute, uidret, gidret);
-      }
+      else if ((ret = RegGetKeySecurity ((HKEY) handle,
+					 DACL_SECURITY_INFORMATION
+					 | GROUP_SECURITY_INFORMATION
+					 | OWNER_SECURITY_INFORMATION,
+					 sd, &len)) != ERROR_SUCCESS)
+	__seterrno_from_win_error (ret);
+      else
+        psd = sd;
+      get_info_from_sd (psd, attribute, uidret, gidret);
+    }
+  else if ((ret = GetSecurityInfo (handle, object_type,
+				   DACL_SECURITY_INFORMATION
+				   | GROUP_SECURITY_INFORMATION
+				   | OWNER_SECURITY_INFORMATION,
+				   NULL, NULL, NULL, NULL, &psd)))
+    __seterrno_from_win_error (ret);
   else
     {
-      if (ERROR_SUCCESS != GetSecurityInfo (handle, object_type,
-					    DACL_SECURITY_INFORMATION |
-					    GROUP_SECURITY_INFORMATION |
-					    OWNER_SECURITY_INFORMATION,
-					    NULL, NULL, NULL, NULL, &psd))
-	{
-	  __seterrno ();
-	  debug_printf ("GetSecurityInfo %E");
-	  psd = NULL;
-	}
       get_info_from_sd (psd, attribute, uidret, gidret);
-      if (psd)
-	LocalFree (psd);
+      LocalFree (psd);
     }
 }
 

@@ -1,3 +1,7 @@
+2004-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_nt_object_attribute): Fix error handling.
+
 2004-02-09  Ralf Habacker  <ralf.habacker@freenet.de>
 
 	* fhandler_socket.cc (fhandler_socket::ioctl): Add FIONREAD handling.
