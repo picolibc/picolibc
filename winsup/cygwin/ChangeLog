@@ -1,3 +1,7 @@
+Tue Apr 17  2:07:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* config.h.in: Turn off VFORK again.
+
 Mon Apr 16 23:45:24 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.h (cwdstuff): Move class.
