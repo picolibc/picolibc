@@ -2,6 +2,11 @@
 
 	* include/windows.h: optimize non-inclusion of repeat headers
 	
+Fri Jul 21 12:10:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/winnt.h: Add missing typedefs for PTOKEN_SOURCE and
+	LPTOKEN_SOURCE.
+
 2000-07-11  DJ Delorie  <dj@cygnus.com>
 
 	* include/shlobj.h: add CSIDL_COMMON_*
