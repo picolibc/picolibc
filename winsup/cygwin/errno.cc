@@ -123,6 +123,7 @@ static NO_COPY struct
   X (IO_PENDING,		EAGAIN),
   X (TOO_MANY_LINKS,		EMLINK),
   X (PROC_NOT_FOUND,		ESRCH),
+  X (ERROR_DISK_CORRUPT,	EIO),
   { 0, NULL, 0}
 };
 

@@ -1,3 +1,9 @@
+2005-03-15  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::remove): Free process_ident, if it exists.
+
+	* errno.cc (errmap): ERROR_DISK_CORRUPT -> EIO.
+
 2005-03-11  Christopher Faylor  <cgf@timesys.com>
 
 	* path.h (pathconv_arg): Define PC_NO_ACCESS_CHECK.

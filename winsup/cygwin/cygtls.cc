@@ -12,6 +12,7 @@ details. */
 #include "assert.h"
 #include <syslog.h>
 #include <signal.h>
+#include <malloc.h>
 #include "exceptions.h"
 #include "sync.h"
 #include "cygerrno.h"
@@ -158,6 +159,8 @@ _cygtls::remove (DWORD wait)
   // select to control this themselves
   if (locals.exitsock != INVALID_SOCKET)
     closesocket (locals.exitsock);
+  if (locals.process_ident != NULL)
+    free (locals.process_ident);
   do
     {
       sentry here (wait);
