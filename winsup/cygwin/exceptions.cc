@@ -604,7 +604,7 @@ sig_handle_tty_stop (int sig)
   if (my_parent_is_alive ())
     {
       pinfo parent (myself->ppid);
-      if (ISSTATE (parent, PID_NOCLDSTOP))
+      if (NOTSTATE (parent, PID_NOCLDSTOP))
 	sig_send (parent, SIGCHLD);
     }
   sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",

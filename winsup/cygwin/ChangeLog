@@ -1,3 +1,9 @@
+2004-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sig_handle_tty_stop): Fix boneheaded mistake by using
+	correct check for parent state rather than inverted check mistakenly
+	introduced on 2003-09-15.
+
 2004-01-22  Brian Ford  <ford@vss.fsi.com>
 
 	* fhandler_serial.cc (fhandler_serial::raw_write): Prevent a deadlock
