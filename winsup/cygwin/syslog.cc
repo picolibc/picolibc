@@ -360,8 +360,9 @@ vsyslog (int priority, const char *message, va_list ap)
 	    debug_printf ("RegisterEventSourceA failed with %E");
 	    return;
 	  }
-	ReportEventA (hEventSrc, eventType, 0, 0,
-		      cygheap->user.sid (), 1, 0, msg_strings, NULL);
+	if (!ReportEventA (hEventSrc, eventType, 0, 0,
+			   cygheap->user.sid (), 1, 0, msg_strings, NULL))
+	  debug_printf ("ReportEventA failed with %E");
 	DeregisterEventSource (hEventSrc);
       }
     else

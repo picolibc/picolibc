@@ -1,3 +1,7 @@
+2003-09-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syslog.cc (vsyslog): Print debug message if ReportEventA fails.
+
 2003-09-28  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* sigproc.cc (proc_subproc): Restrict permissions on ppid_handle.
