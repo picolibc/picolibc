@@ -36,32 +36,6 @@ extern "C" {
 #include "ntddk.h"
 #include "batclass.h"
 
-typedef enum _POWER_INFORMATION_LEVEL {
-	SystemPowerPolicyAc,
-	SystemPowerPolicyDc,
-	VerifySystemPolicyAc,
-	VerifySystemPolicyDc,
-	SystemPowerCapabilities,
-	SystemBatteryState,
-	SystemPowerStateHandler,
-	ProcessorStateHandler,
-	SystemPowerPolicyCurrent,
-	AdministratorPowerPolicy,
-	SystemReserveHiberFile,
-	ProcessorInformation,
-	SystemPowerInformation,
-	ProcessorStateHandler2,
-	LastWakeTime,
-	LastSleepTime,
-	SystemExecutionState,
-	SystemPowerStateNotifyHandler,
-	ProcessorPowerPolicyAc,
-	ProcessorPowerPolicyDc,
-	VerifyProcessorPowerPolicyAc,
-	VerifyProcessorPowerPolicyDc,
-	ProcessorPowerPolicyCurrent
-} POWER_INFORMATION_LEVEL;
-
 #define POWER_PERF_SCALE                  100
 #define PERF_LEVEL_TO_PERCENT(x)          (((x) * 1000) / (POWER_PERF_SCALE * 10))
 #define PERCENT_TO_PERF_LEVEL(x)          (((x) * POWER_PERF_SCALE * 10) / 1000)

@@ -1,3 +1,11 @@
+2003-06-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ddk/ntpoapi.h (POWER_INFORMATION_LEVEL): Remove.
+	* include/winnt.h (POWER_INFORMATION_LEVEL): Add.
+	* include/ddk/winddk.h (SINGLE_LIST_ENTRY,SLIST_HEADER):
+	Remove.
+	* include/ddk/ndis.h (NdisAllocateSpinLock): Add missing '\'.
+
 2003-05-30  Mattia Barbon  <mbarbon@dsi.unive.it>
 
 	* lib/oleacc.def: New file.

@@ -138,22 +138,6 @@ typedef enum _MODE {
   MaximumMode
 } MODE;
 
-typedef struct _SINGLE_LIST_ENTRY {
-  struct _SINGLE_LIST_ENTRY  *Next;
-} SINGLE_LIST_ENTRY, *PSINGLE_LIST_ENTRY;
-
-#define SLIST_ENTRY SINGLE_LIST_ENTRY
-#define PSLIST_ENTRY PSINGLE_LIST_ENTRY
-
-typedef union _SLIST_HEADER {
-  ULONGLONG  Alignment;
-  struct {
-    SLIST_ENTRY  Next;
-    USHORT  Depth;
-    USHORT  Sequence;
-  };
-} SLIST_HEADER, *PSLIST_HEADER;
-
 
 /* Structures not exposed to drivers */
 typedef struct _IO_TIMER *PIO_TIMER;

@@ -2524,7 +2524,7 @@ NdisUnicodeStringToAnsiString(
  * NdisAllocateSpinLock(
  *   IN PNDIS_SPIN_LOCK  SpinLock);
  */
-#define NdisAllocateSpinLock(_SpinLock)
+#define NdisAllocateSpinLock(_SpinLock) \
   KeInitializeSpinLock(&(_SpinLock)->SpinLock)
 
 /*

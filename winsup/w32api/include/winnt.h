@@ -2962,6 +2962,32 @@ typedef struct _SYSTEM_BATTERY_STATE {
 	ULONG  DefaultAlert2;
 } SYSTEM_BATTERY_STATE, *PSYSTEM_BATTERY_STATE;
 
+typedef enum _POWER_INFORMATION_LEVEL {
+	SystemPowerPolicyAc,
+	SystemPowerPolicyDc,
+	VerifySystemPolicyAc,
+	VerifySystemPolicyDc,
+	SystemPowerCapabilities,
+	SystemBatteryState,
+	SystemPowerStateHandler,
+	ProcessorStateHandler,
+	SystemPowerPolicyCurrent,
+	AdministratorPowerPolicy,
+	SystemReserveHiberFile,
+	ProcessorInformation,
+	SystemPowerInformation,
+	ProcessorStateHandler2,
+	LastWakeTime,
+	LastSleepTime,
+	SystemExecutionState,
+	SystemPowerStateNotifyHandler,
+	ProcessorPowerPolicyAc,
+	ProcessorPowerPolicyDc,
+	VerifyProcessorPowerPolicyAc,
+	VerifyProcessorPowerPolicyDc,
+	ProcessorPowerPolicyCurrent
+} POWER_INFORMATION_LEVEL;
+
 #if 1 /* (WIN32_WINNT >= 0x0500) */
 typedef struct _SYSTEM_POWER_INFORMATION {
 	ULONG  MaxIdlenessAllowed;
