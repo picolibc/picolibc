@@ -1,3 +1,12 @@
+2003-02-08  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2003-02-07  Christopher Faylor  <cgf@redhat.com>
+
+	* malloc.cc (DEFAULT_MMAP_THRESHOLD): Bump down to 16MB thanks to below
+	changes.
+
 2003-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap_record::alloc_map): De-inline.  Add offset and length
