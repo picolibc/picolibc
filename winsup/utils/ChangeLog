@@ -1,3 +1,7 @@
+Fri Aug 25 11:44:29 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Make failure to build dumper.exe a non-error.
+
 Thu Aug 24 18:02:35 2000  Christopher Faylor <cgf@cygnus.com>
 
         * ps.cc (main): Always print a cygwin process using cygwin paths.

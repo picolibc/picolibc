@@ -116,9 +116,9 @@ $(mingw_build)/libmingw32.a: $(mingw_build)/Makefile
 
 dumper.exe: module_info.o parse_pe.o dumper.o $(ALL_DEP_LDLIBS)
 ifdef VERBOSE
-	$(CC) -o $@ ${wordlist 1,3,$^} -B$(cygwin_build)/ $(DUMPER_LDFLAGS)
+	-$(CC) -o $@ ${wordlist 1,3,$^} -B$(cygwin_build)/ $(DUMPER_LDFLAGS)
 else
-	@echo $(CC) -o $@ ${wordlist 1,3,$^} ${filter-out -B%, $(DUMPER_LDFLAGS)};\
+	-@echo $(CC) -o $@ ${wordlist 1,3,$^} ${filter-out -B%, $(DUMPER_LDFLAGS)};\
 	$(CC) -o $@ ${wordlist 1,3,$^} -B$(cygwin_build)/ $(DUMPER_LDFLAGS)
 endif
 
