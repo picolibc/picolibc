@@ -101,13 +101,12 @@ END_RELOC_NUMBERS (R_PPC_max)
 
 /* Processor specific flags for the ELF header e_flags field.  */
 
-#define	EF_PPC_EMB		0x80000000	/* PowerPC embedded flag  */
+#define	EF_PPC_EMB		0x80000000	/* PowerPC embedded flag.  */
 
-						/* CYGNUS local bits below */
-#define	EF_PPC_RELOCATABLE	0x00010000	/* PowerPC -mrelocatable flag */
-#define	EF_PPC_RELOCATABLE_LIB	0x00008000	/* PowerPC -mrelocatable-lib flag */
+#define	EF_PPC_RELOCATABLE	0x00010000	/* PowerPC -mrelocatable flag.  */
+#define	EF_PPC_RELOCATABLE_LIB	0x00008000	/* PowerPC -mrelocatable-lib flag.  */
 
-/* Processor specific section headers, sh_type field */
+/* Processor specific section headers, sh_type field.  */
 
 #define SHT_ORDERED		SHT_HIPROC	/* Link editor is to sort the \
 						   entries in this section \
@@ -115,7 +114,7 @@ END_RELOC_NUMBERS (R_PPC_max)
 						   specified in the associated \
 						   symbol table entry.  */
 
-/* Processor specific section flags, sh_flags field */
+/* Processor specific section flags, sh_flags field.  */
 
 #define SHF_EXCLUDE		0x80000000	/* Link editor is to exclude \
 						   this section from executable \

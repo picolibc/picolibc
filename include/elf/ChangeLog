@@ -1,3 +1,8 @@
+2000-08-07  Nick Clifton  <nickc@cygnus.com>
+
+	* ppc.h: Remove spurious CYGNUS LOCAL comments.
+	* v850.h: Likewise.
+
 2000-07-20  Hans-Peter Nilsson  <hp@axis.com>
 
 	common.h (EM_CRIS): New machine number.
