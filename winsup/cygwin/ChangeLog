@@ -1,3 +1,21 @@
+2003-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (SECRET_EVENT_NAME): Remove.
+	(ENTROPY_SOURCE_NAME): Ditto.
+	(secret_event_name): New static function.  Create shared event name
+	with "Global\" prefix on systems supporting terminal services.
+	(fhandler_socket::set_connect_secret): Fix conditional.
+	(fhandler_socket::create_secret_event): Create secret event using
+	secret_event_name().
+	(fhandler_socket::close_secret_event): Ditto.
+	* shared.cc (shared_name): Create shared object name with "Global\"
+	prefix on systems supporting terminal services.
+	* wincap.cc: Set has_terminal_services capability throughout.
+	(wincap_2003): New global object representing Windows 2003 Server
+	capabilities.
+	(wincapc::init): Accomodate Windows 2003 Server.
+	* wincap.h (struct wincaps): Add has_terminal_services capability.
+
 2003-05-20  Charles Wilson  <cygwin@cwilson.fastmail.fm>
 
 	* winsup/cygwin/include/cygwin/version.h: Bump API minor version.

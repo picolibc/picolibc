@@ -50,6 +50,7 @@ struct wincaps
   unsigned supports_reading_modem_output_lines          : 1;
   unsigned needs_memory_protection			: 1;
   unsigned pty_needs_alloc_console			: 1;
+  unsigned has_terminal_services			: 1;
 };
 
 class wincapc
@@ -104,6 +105,7 @@ public:
   bool  IMPLEMENT (supports_reading_modem_output_lines)
   bool  IMPLEMENT (needs_memory_protection)
   bool  IMPLEMENT (pty_needs_alloc_console)
+  bool  IMPLEMENT (has_terminal_services)
 
 #undef IMPLEMENT
 };

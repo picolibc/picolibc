@@ -34,8 +34,6 @@
 #include "wsock_event.h"
 #include <unistd.h>
 
-#define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
-#define ENTROPY_SOURCE_NAME "/dev/urandom"
 #define ENTROPY_SOURCE_DEV_UNIT 9
 
 extern fhandler_socket *fdsock (int& fd, const char *name, SOCKET soc);
@@ -44,6 +42,19 @@ int sscanf (const char *, const char *, ...);
 } /* End of "C" section */
 
 fhandler_dev_random* entropy_source;
+
+static char *
+secret_event_name (short port, int *secret_ptr)
+{
+  static NO_COPY char buf[MAX_PATH] = {0};
+
+  __small_sprintf (buf, "%scygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x",
+		   wincap.has_terminal_services () ? "Global\\" : "",
+  		   port,
+		   secret_ptr [0], secret_ptr [1],
+		   secret_ptr [2], secret_ptr [3]);
+  return buf;
+}
 
 /* cygwin internal: map sockaddr into internet domain address */
 static int
@@ -211,7 +222,7 @@ fhandler_socket::set_connect_secret ()
       delete entropy_source;
       entropy_source = NULL;
     }
-  if (!entropy_source)
+  if (entropy_source)
     {
       size_t len = sizeof (connect_secret);
       entropy_source->read (connect_secret, len);
@@ -231,8 +242,6 @@ fhandler_socket::get_connect_secret (char* buf)
 HANDLE
 fhandler_socket::create_secret_event (int* secret)
 {
-  char buf [128];
-  int* secret_ptr = (secret ? : connect_secret);
   struct sockaddr_in sin;
   int sin_len = sizeof (sin);
 
@@ -242,13 +251,12 @@ fhandler_socket::create_secret_event (int* secret)
       return NULL;
     }
 
-  __small_sprintf (buf, SECRET_EVENT_NAME, sin.sin_port,
-		   secret_ptr [0], secret_ptr [1],
-		   secret_ptr [2], secret_ptr [3]);
+  char *event_name = secret_event_name (sin.sin_port,
+  					secret ?: connect_secret);
   LPSECURITY_ATTRIBUTES sec = get_inheritance (true);
-  secret_event = CreateEvent (sec, FALSE, FALSE, buf);
+  secret_event = CreateEvent (sec, FALSE, FALSE, event_name);
   if (!secret_event && GetLastError () == ERROR_ALREADY_EXISTS)
-    secret_event = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
+    secret_event = OpenEvent (EVENT_ALL_ACCESS, FALSE, event_name);
 
   if (!secret_event)
     /* nothing to do */;
@@ -283,18 +291,13 @@ fhandler_socket::close_secret_event ()
 int
 fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
 {
-  char buf [128];
-  HANDLE ev;
-  int* secret_ptr = (secret ? : connect_secret);
-
-  __small_sprintf (buf, SECRET_EVENT_NAME, peer->sin_port,
-		  secret_ptr [0], secret_ptr [1],
-		  secret_ptr [2], secret_ptr [3]);
-  ev = CreateEvent (&sec_all_nih, FALSE, FALSE, buf);
+  char *event_name = secret_event_name (peer->sin_port,
+  					secret ?: connect_secret);
+  HANDLE ev = CreateEvent (&sec_all_nih, FALSE, FALSE, event_name);
   if (!ev && GetLastError () == ERROR_ALREADY_EXISTS)
     {
-      debug_printf ("event \"%s\" already exists", buf);
-      ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
+      debug_printf ("event \"%s\" already exists", event_name);
+      ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, event_name);
     }
 
   signal_secret_event ();

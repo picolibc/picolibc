@@ -38,7 +38,9 @@ shared_name (const char *str, int num)
   static NO_COPY char buf[MAX_PATH] = {0};
   extern bool _cygwin_testing;
 
-  __small_sprintf (buf, "%s.%s.%d", cygwin_version.shared_id, str, num);
+  __small_sprintf (buf, "%s%s.%s.%d",
+  		   wincap.has_terminal_services () ?  "Global\\" : "",
+		   cygwin_version.shared_id, str, num);
   if (_cygwin_testing)
     strcat (buf, cygwin_version.dll_build_date);
   return buf;
