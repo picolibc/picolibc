@@ -1937,7 +1937,7 @@ mount_info::read_cygdrive_info_from_registry ()
       if (r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive,
 	  sizeof (cygdrive), ""))
 	strcpy (cygdrive, CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX);
-      cygdrive_flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE);
+      cygdrive_flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE | MOUNT_BINARY);
       slashify (cygdrive, cygdrive, 1);
       cygdrive_len = strlen (cygdrive);
     }
@@ -1945,7 +1945,7 @@ mount_info::read_cygdrive_info_from_registry ()
     {
       /* Fetch user cygdrive_flags from registry; returns MOUNT_CYGDRIVE on
 	 error. */
-      cygdrive_flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE);
+      cygdrive_flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE | MOUNT_BINARY);
       slashify (cygdrive, cygdrive, 1);
       cygdrive_len = strlen (cygdrive);
     }
@@ -2052,7 +2052,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
   /* Get the user flags, if appropriate */
   if (res == ERROR_SUCCESS)
     {
-      int flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE);
+      int flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE | MOUNT_BINARY);
       strcpy (user_flags, (flags & MOUNT_BINARY) ? "binmode" : "textmode");
     }
 
@@ -2066,7 +2066,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
   /* Get the system flags, if appropriate */
   if (res2 == ERROR_SUCCESS)
     {
-      int flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE);
+      int flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE | MOUNT_BINARY);
       strcpy (system_flags, (flags & MOUNT_BINARY) ? "binmode" : "textmode");
     }
 
