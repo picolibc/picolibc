@@ -1,5 +1,12 @@
 2002-07-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din (__fpclassifyd): Add symbol.
+	(__fpclassifyf): Ditto.
+	(__signbitd): Ditto.
+	(__signbitf): Ditto.
+
+2002-07-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.h (DONT_INHERIT): Eliminate definition.
 	(INHERIT_ALL): Ditto.
 	(INHERIT_ONLY): Ditto.
