@@ -28,7 +28,7 @@ _DEFUN (_strtosfix64_r, (rptr, nptr, endptr),
   _simdstrtold ((char *)nptr, endptr, &ldbl);
 
   /* treat NAN as domain error, +/- infinity as saturation */
-  ld_type = _simdldcheck (&ldbl.ld);
+  ld_type = _simdldcheck (&ldbl);
   if (ld_type != 0)
     {
       if (ld_type == 1)

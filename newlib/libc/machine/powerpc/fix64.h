@@ -33,7 +33,7 @@ union long_double_union
 typedef union long_double_union LONG_DOUBLE_UNION;
 
 extern void _simdstrtold (char *, char **, LONG_DOUBLE_UNION *);
-extern int  _simdldchk (LONG_DOUBLE_UNION *);
+extern int  _simdldcheck (LONG_DOUBLE_UNION *);
 
 #define SIMD_LDBL_MANT_DIG 113
 

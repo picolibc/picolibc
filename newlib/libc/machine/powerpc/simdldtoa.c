@@ -16,7 +16,6 @@
 /* linux name:  long double _IO_strtold (char *, char **); */
 void _simdstrtold (char *, char **, LONG_DOUBLE_UNION *);
 char * _simdldtoa_r (struct _reent *, LONG_DOUBLE_UNION *, int, int, int *, int *, char **);
-int    _simdldcheck (LONG_DOUBLE_UNION *);
 
  /* Number of 16 bit words in external x type format */
  #define NE 10
@@ -2752,7 +2751,7 @@ if( mode == 0 )
 /* we want to have enough space to hold the formatted result */
 i = ndigits + (mode == 3 ? (MAX_EXP_DIGITS + 1) : 1);
 j = sizeof (__ULong);
-for (_REENT_MP_RESULT_K(ptr) = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i; j <<= 1)
+for (_REENT_MP_RESULT_K(ptr) = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= (unsigned)i; j <<= 1)
   _REENT_MP_RESULT_K(ptr)++;
 _REENT_MP_RESULT(ptr) = Balloc (ptr, _REENT_MP_RESULT_K(ptr));
 outstr = (char *)_REENT_MP_RESULT(ptr);

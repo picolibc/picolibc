@@ -19,7 +19,7 @@ _DEFUN (_strtoufix32_r, (rptr, nptr, endptr),
 	char **endptr)
 {
   union double_union dbl;
-  int exp, negexp, sign;
+  int exp, negexp;
   __uint32_t tmp, tmp2, result = 0;
 
   dbl.d = _strtod_r (rptr, nptr, endptr);
