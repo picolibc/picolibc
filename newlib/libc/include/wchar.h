@@ -31,6 +31,10 @@
 #endif
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _MBSTATE_T
 #define _MBSTATE_T
 typedef _mbstate_t mbstate_t;
@@ -64,5 +68,9 @@ int	_EXFUN(wmemcmp, (const wchar_t *, const wchar_t *, size_t));
 wchar_t	*_EXFUN(wmemcpy, (wchar_t * , const wchar_t * , size_t));
 wchar_t	*_EXFUN(wmemmove, (wchar_t *, const wchar_t *, size_t));
 wchar_t	*_EXFUN(wmemset, (wchar_t *, wchar_t, size_t));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _WCHAR_H_ */

@@ -11,6 +11,10 @@
 # define WEOF ((wint_t)-1)
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _WCTYPE_T
 #define _WCTYPE_T
 typedef int wctype_t;
@@ -39,5 +43,9 @@ wint_t	_EXFUN(towupper, (wint_t));
 wint_t	_EXFUN(towlower, (wint_t));
 wctrans_t _EXFUN(wctrans, (const char *));
 wctype_t _EXFUN(wctype, (const char *));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _WCTYPE_H_ */

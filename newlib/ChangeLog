@@ -1,3 +1,8 @@
+2002-11-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/wchar.h: Add extern "C" specifier if C++.
+        * libc/include/wctype.h: Ditto.
+
 2002-10-18  Jeff Johnston  <jjohnstn@redhat.com>
 
         * testsuite/newlib.wctype/tiswctype.c: New test case.
