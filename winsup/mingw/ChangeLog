@@ -1,5 +1,10 @@
 2003-07-01  Earnie Boyd  <earnie@users.sf.net>
 
+	* include/_mingw.h (small, hyper): Change to __small and __hyper to
+	avoid user space name conflicts.
+
+2003-07-01  Earnie Boyd  <earnie@users.sf.net>
+
 	* include/_mingw.h (__int32, __int16, __int8, small, hyper): Define.
 	Note: Also added to w32api/include/basetyps.h.
 	* mingwex/math/tgamma.c, tgammaf.c, tgammal.c (small): 

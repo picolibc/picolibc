@@ -92,11 +92,11 @@
 # ifndef __int8
 #  define __int8 char
 # endif
-# ifndef small
-#  define small char
+# ifndef __small
+#  define __small char
 # endif
-# ifndef hyper
-#  define hyper long long
+# ifndef __hyper
+#  define __hyper long long
 # endif
 #endif /* __GNUC__ */
 
