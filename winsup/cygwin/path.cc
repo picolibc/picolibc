@@ -1280,7 +1280,10 @@ mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigne
   else if ((!(flags & MOUNT_ENC) && isdrive (dst) && !dst[2]) || *p)
     dst[n++] = '\\';
   if (!*p || !(flags & MOUNT_ENC))
-    strcpy (dst + n, p);
+    {
+      strcpy (dst + n, p);
+      backslashify (dst, dst, 0);
+    }
   else
     while (*p)
       {

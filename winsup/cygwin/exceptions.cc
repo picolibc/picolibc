@@ -710,11 +710,10 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
 
   for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
-      __stack_t retaddr;
       __stack_t *retaddr_on_stack = tls->stackptr - 1;
-      if (retaddr_on_stack >= tls->stack
-	  && (retaddr = InterlockedExchange ((LONG *) retaddr_on_stack, 0)))
+      if (retaddr_on_stack >= tls->stack)
 	{
+	  __stack_t retaddr = InterlockedExchange ((LONG *) retaddr_on_stack, 0);
 	  if (!retaddr)
 	    continue;
 	  tls->reset_exception ();

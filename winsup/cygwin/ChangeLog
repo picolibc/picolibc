@@ -1,3 +1,8 @@
+2003-12-26  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (mount_item::build_win32): Backslashify paths in non-managed
+	case.
+
 2003-12-25  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (reent_data): Reluctantly resurrect.
