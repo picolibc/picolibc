@@ -1,3 +1,7 @@
+2005-01-12  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.cc (pinfo::exit): Don't assume that this == myself.
+
 2005-01-11  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.cc (pinfo::init): Don't close input handle on temporary (?)

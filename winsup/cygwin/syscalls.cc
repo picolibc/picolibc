@@ -1407,7 +1407,7 @@ system (const char *cmdstring)
   command[2] = cmdstring;
   command[3] = (const char *) NULL;
 
-  if ((res = spawnvp (_P_SYSTEM, "sh", command)) == -1)
+  if ((res = spawnvp (_P_SYSTEM, "/bin/sh", command)) == -1)
     {
       // when exec fails, return value should be as if shell
       // executed exit (127)

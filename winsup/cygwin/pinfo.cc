@@ -130,7 +130,6 @@ pinfo::exit (DWORD n)
       sigproc_terminate ();	/* Just terminate signal and process stuff */
       self->exitcode = n;	/* We're really exiting.  Record the UNIX exit code. */
     }
-  sigproc_printf ("1 hProcess %p, n %p, exitcode %p", hProcess, n, self->exitcode);
 
   /* FIXME:  There is a potential race between an execed process and its
      parent here.  I hated to add a mutex just for this, though.  */
@@ -139,11 +138,8 @@ pinfo::exit (DWORD n)
   add_rusage (&self->rusage_self, &r);
 
   set_exit_state (PID_EXITED);
-  sigproc_printf ("2 hProcess %p, n %p, exitcode %p, EXITCODE_EXEC %p", hProcess, n, self->exitcode, EXITCODE_EXEC);
   if (n != EXITCODE_EXEC)
-{sigproc_printf ("3 hProcess %p, n %p, exitcode %p, EXITCODE_EXE %pC", hProcess, n, self->exitcode, EXITCODE_EXEC);
-    myself->alert_parent (0);
-}
+    self->alert_parent (0);
   
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
