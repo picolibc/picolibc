@@ -17,6 +17,8 @@ extern "C"
 #ifndef _CYGWIN_TYPES_H
 #define _CYGWIN_TYPES_H
 
+#include <sys/sysmacros.h>
+
 typedef long __off32_t;
 typedef long long __off64_t;
 #ifdef __CYGWIN_USE_BIG_TYPES__
