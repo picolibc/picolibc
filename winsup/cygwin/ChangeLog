@@ -1,3 +1,8 @@
+Sat Mar 17 12:43:15 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (suffix_scan::next): Avoid searching for foo.lnk twice when
+	input is "foo".
+
 Sat Mar 17 18:10:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (cygwin_socket): Set protocol to 0 when address family is

@@ -2472,10 +2472,14 @@ suffix_scan::next ()
     {
     case SCAN_BEG:
       suffixes = suffixes_start;
-      if (suffixes)
-	nextstate = SCAN_EXTRALNK;
-      else
+      if (!suffixes)
 	nextstate = SCAN_LNK;
+      else
+	{
+	  if (!*suffixes->name)
+	    suffixes++;
+	  nextstate = SCAN_EXTRALNK;
+	}
       return 1;
     case SCAN_HASLNK:
       nextstate = SCAN_EXTRALNK;	/* Skip SCAN_BEG */
