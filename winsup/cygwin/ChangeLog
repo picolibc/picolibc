@@ -1,4 +1,4 @@
-Fri Apr 21 01:27:47 2000  Christopher Faylor <cgf@cygnus.com>
+Fri Apr 21 10:37:08 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (normalize_posix_path): Previous two patches were still
 	incorrect so rewrite this function to deal with trailing dots.

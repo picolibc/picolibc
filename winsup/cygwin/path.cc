@@ -561,7 +561,11 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
       strcpy (dst, cwd);
       dst = strchr (dst, '\0');
       if (*src == '.')
-	goto sawdot;
+	{
+	  if (dst == dst_start + 1)
+	    dst--;
+	  goto sawdot;
+	}
       if (dst > dst_start && !isslash (dst[-1]))
 	*dst++ = '/';
     }
