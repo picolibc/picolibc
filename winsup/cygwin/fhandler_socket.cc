@@ -258,7 +258,7 @@ fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
 {
   int res = fhandler_base::fstat (buf, pc);
   if (!res)
-    buf->st_ino = get_handle ();
+    buf->st_ino = (ino_t) get_handle ();
   return res;
 }
 
