@@ -119,6 +119,27 @@ Cygwin User's Guide at
 @file{http://sources.redhat.com/cygwin/cygwin-ug-net/cygwin-ug-net.html}
 for more information on this variable and its settings.
 
+@subsection Why doesn't @samp{mkdir -p} work on a network share?
+
+Unfortunately, you cannot do something like this:
+
+@example
+bash$ mkdir -p //MACHINE/Share/path/to/new/dir
+mkdir: cannot create directory `//MACHINE': No such file or directory
+@end example
+
+This is because mkdir checks for the existence of each directory on the
+path, creating them as necessary.  Since @samp{//MACHINE} is not a
+directory (you can't cd to it either), mkdir tries to create it, and
+fails.
+
+This might get fixed someday, but for now, you have to work around it:
+
+@example
+bash$ cd //MACHINE/Share
+bash$ mkdir -p path/to/new/dir
+@end example
+
 @subsection Why don't cursor keys work under Win95/Win98?
 
 @strong{(Please note: This section has not yet been updated for the latest
