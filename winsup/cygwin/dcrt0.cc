@@ -461,7 +461,7 @@ static MEMORY_BASIC_INFORMATION NO_COPY sm;
 
 // __inline__ void
 extern void
-alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
+alloc_stack_hard_way (child_info_fork *ci)
 {
   void *new_stack_pointer;
   MEMORY_BASIC_INFORMATION m;
@@ -505,7 +505,6 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
   if (!VirtualQuery ((LPCVOID) m.BaseAddress, &m, sizeof m))
     api_fatal ("fork: couldn't get new stack info, %E");
   ci->stacktop = m.BaseAddress;
-  *b = 0;
 }
 
 /* extend the stack prior to fork longjmp */
@@ -522,7 +521,7 @@ alloc_stack (child_info_fork *ci)
       return;
     }
 
-  alloc_stack_hard_way (ci, b + sizeof (b) - 1);
+  alloc_stack_hard_way (ci);
   return;
 }
 
