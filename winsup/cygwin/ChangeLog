@@ -1,3 +1,22 @@
+Wed Aug 22 17:31:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (free_char_list): New static function.
+	(dup_char_list): Ditto.
+	(free_protoent_ptr): Ditto.
+	(dup_protoent_ptr): Ditto.
+	(free_servent_ptr): Ditto.
+	(dup_servent_ptr): Ditto.
+	(free_hostent_ptr): Ditto.
+	(dup_hostent_ptr): Ditto.
+	(cygwin_inet_ntoa): Use local static buffer to allow propagating of
+	the result to child processes.
+	(cygwin_getprotobyname): Ditto.
+	(cygwin_getprotobynumber): Ditto.
+	(cygwin_getservbyname): Ditto.
+	(cygwin_getservbyport): Ditto.
+	(cygwin_gethostbyname): Ditto.
+	(cygwin_gethostbyaddr): Ditto.
+
 Mon Aug 20 11:56:19 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (init_cheap): Allocate cygheap in shared memory for Windows NT.

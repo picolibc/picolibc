@@ -182,8 +182,17 @@ dump_protoent (struct protoent *p)
 extern "C" char *
 cygwin_inet_ntoa (struct in_addr in)
 {
+  static char *buf = NULL;
+
   char *res = inet_ntoa (in);
-  return res;
+  if (buf)
+    {
+      free (buf);
+      buf = NULL;
+    }
+  if (res)
+    buf = strdup (res);
+  return buf;
 }
 
 /* exported as inet_addr: BSD 4.3 */
@@ -369,11 +378,81 @@ set_host_errno ()
     h_errno = NETDB_INTERNAL;
 }
 
+static void
+free_char_list (char **clist)
+{
+  if (clist)
+    {
+      for (char **cl = clist; *cl; ++cl)
+        free (*cl);
+      free (clist);
+    }
+}
+
+static char **
+dup_char_list (char **src)
+{
+  char **dst;
+  int cnt = 0;
+
+  for (char **cl = src; *cl; ++cl)
+    ++cnt;
+  if (!(dst = (char **) calloc (cnt + 1, sizeof *dst)))
+    return NULL;
+  while (cnt-- > 0)
+    if (!(dst[cnt] = strdup (src[cnt])))
+      return NULL;
+  return dst;
+}
+
+static void
+free_protoent_ptr (struct protoent *&p)
+{
+  if (p)
+    {
+      debug_printf ("protoent: %s", p->p_name);
+
+      if (p->p_name)
+        free (p->p_name);
+      free_char_list (p->p_aliases);
+      p = NULL;
+    }
+}
+
+static struct protoent *
+dup_protoent_ptr (struct protoent *src)
+{
+  if (!src)
+    return NULL;
+
+  struct protoent *dst = (struct protoent *) calloc (1, sizeof *dst);
+  if (!dst)
+    return NULL;
+
+  debug_printf ("protoent: %s", src->p_name);
+
+  dst->p_proto = src->p_proto;
+  if (src->p_name && !(dst->p_name = strdup (src->p_name)))
+    goto out;
+  if (src->p_aliases && !(dst->p_aliases = dup_char_list (src->p_aliases)))
+    goto out;
+
+  debug_printf ("protoent: copied %s", dst->p_name);
+
+  return dst;
+
+out:
+  free_protoent_ptr (dst);
+  return NULL;
+}
+
 /* exported as getprotobyname: standards? */
 extern "C" struct protoent *
 cygwin_getprotobyname (const char *p)
 {
-  struct protoent *res = getprotobyname (p);
+  static struct protoent *res = NULL;
+  free_protoent_ptr (res);
+  res = dup_protoent_ptr (getprotobyname (p));
   if (!res)
     set_winsock_errno ();
 
@@ -385,7 +464,9 @@ cygwin_getprotobyname (const char *p)
 extern "C" struct protoent *
 cygwin_getprotobynumber (int number)
 {
-  struct protoent *res = getprotobynumber (number);
+  static struct protoent *res = NULL;
+  free_protoent_ptr (res);
+  res = dup_protoent_ptr (getprotobynumber (number));
   if (!res)
     set_winsock_errno ();
 
@@ -801,11 +882,58 @@ cygwin_connect (int fd,
   return res;
 }
 
+static void
+free_servent_ptr (struct servent *&p)
+{
+  if (p)
+    {
+      debug_printf ("servent: %s", p->s_name);
+
+      if (p->s_name)
+        free (p->s_name);
+      if (p->s_proto)
+        free (p->s_proto);
+      free_char_list (p->s_aliases);
+      p = NULL;
+    }
+}
+
+static struct servent *
+dup_servent_ptr (struct servent *src)
+{
+  if (!src)
+    return NULL;
+
+  struct servent *dst = (struct servent *) calloc (1, sizeof *dst);
+  if (!dst)
+    return NULL;
+
+  debug_printf ("servent: %s", src->s_name);
+
+  dst->s_port = src->s_port;
+  if (src->s_name && !(dst->s_name = strdup (src->s_name)))
+    goto out;
+  if (src->s_proto && !(dst->s_proto = strdup (src->s_proto)))
+    goto out;
+  if (src->s_aliases && !(dst->s_aliases = dup_char_list (src->s_aliases)))
+    goto out;
+
+  debug_printf ("servent: copied %s", dst->s_name);
+
+  return dst;
+
+out:
+  free_servent_ptr (dst);
+  return NULL;
+}
+
 /* exported as getservbyname: standards? */
 extern "C" struct servent *
 cygwin_getservbyname (const char *name, const char *proto)
 {
-  struct servent *p = getservbyname (name, proto);
+  static struct servent *p = NULL;
+  free_servent_ptr (p);
+  p = dup_servent_ptr (getservbyname (name, proto));
   if (!p)
     set_winsock_errno ();
 
@@ -817,7 +945,9 @@ cygwin_getservbyname (const char *name, const char *proto)
 extern "C" struct servent *
 cygwin_getservbyport (int port, const char *proto)
 {
-  struct servent *p = getservbyport (port, proto);
+  static struct servent *p = NULL;
+  free_servent_ptr (p);
+  p = dup_servent_ptr (getservbyport (port, proto));
   if (!p)
     set_winsock_errno ();
 
@@ -844,6 +974,51 @@ cygwin_gethostname (char *name, size_t len)
   debug_printf ("name %s\n", name);
   h_errno = 0;
   return 0;
+}
+
+static void
+free_hostent_ptr (struct hostent *&p)
+{
+  if (p)
+    {
+      debug_printf ("hostent: %s", p->h_name);
+
+      if (p->h_name)
+        free ((void *)p->h_name);
+      free_char_list (p->h_aliases);
+      free_char_list (p->h_addr_list);
+      p = NULL;
+    }
+}
+
+static struct hostent *
+dup_hostent_ptr (struct hostent *src)
+{
+  if (!src)
+    return NULL;
+
+  struct hostent *dst = (struct hostent *) calloc (1, sizeof *dst);
+  if (!dst)
+    return NULL;
+
+  debug_printf ("hostent: %s", src->h_name);
+
+  dst->h_addrtype = src->h_addrtype;
+  dst->h_length = src->h_length;
+  if (src->h_name && !(dst->h_name = strdup (src->h_name)))
+    goto out;
+  if (src->h_aliases && !(dst->h_aliases = dup_char_list (src->h_aliases)))
+    goto out;
+  if (src->h_addr_list && !(dst->h_addr_list = dup_char_list(src->h_addr_list)))
+    goto out;
+
+  debug_printf ("hostent: copied %s", dst->h_name);
+
+  return dst;
+
+out:
+  free_hostent_ptr (dst);
+  return NULL;
 }
 
 /* exported as gethostbyname: standards? */
@@ -873,7 +1048,9 @@ cygwin_gethostbyname (const char *name)
       return &tmp;
     }
 
-  struct hostent *ptr = gethostbyname (name);
+  static struct hostent *ptr = NULL;
+  free_hostent_ptr (ptr);
+  ptr = dup_hostent_ptr (gethostbyname (name));
   if (!ptr)
     {
       set_winsock_errno ();
@@ -1087,7 +1264,9 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 extern "C" struct hostent *
 cygwin_gethostbyaddr (const char *addr, int len, int type)
 {
-  struct hostent *ptr = gethostbyaddr (addr, len, type);
+  static struct hostent *ptr = NULL;
+  free_hostent_ptr (ptr);
+  ptr = dup_hostent_ptr (gethostbyaddr (addr, len, type));
   if (!ptr)
     {
       set_winsock_errno ();
