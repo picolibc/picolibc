@@ -1,3 +1,12 @@
+2002-07-01  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (get_logon_server): Interpret a zero length
+	domain as the local domain.
+	(get_group_sidlist): Add authenticated users SID to SYSTEM's group
+	list instead of SYSTEM itself.
+	(verify_token): Accept the primary group sid if it equals
+	the token user sid.
+
 2002-07-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (__fpclassifyd): Add symbol.

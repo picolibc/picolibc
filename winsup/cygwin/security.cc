@@ -255,8 +255,9 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
   WCHAR * buf;
   DWORD size = INTERNET_MAX_HOST_NAME_LENGTH + 1;
 
+  /* Empty domain is interpreted as local system */
   if ((GetComputerName (server + 2, &size)) &&
-      strcasematch (domain, server + 2))
+      (strcasematch (domain, server + 2) || !domain[0]))
     {
       server[0] = server[1] = '\\';
       if (wserver)
@@ -489,7 +490,7 @@ get_group_sidlist (cygsidlist &grp_list,
   grp_list += well_known_world_sid;
   if (usersid == well_known_system_sid)
     {
-      grp_list += well_known_system_sid;
+      grp_list += well_known_authenticated_users_sid;
       grp_list += well_known_admins_sid;
     }
   else
@@ -699,10 +700,12 @@ verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern)
 	   debug_printf ("GetSecurityDescriptorGroup(): %E");
        if (well_known_null_sid != gsid) return pgrpsid == gsid;
     }
-  /* See if the pgrpsid is in the token groups */
+  /* See if the pgrpsid is the tok_usersid in the token groups */
   PTOKEN_GROUPS my_grps = NULL;
   BOOL ret = FALSE;
 
+  if ( pgrpsid == tok_usersid)
+    return TRUE;
   if (!GetTokenInformation (token, TokenGroups, NULL, 0, &size) &&
       GetLastError () != ERROR_INSUFFICIENT_BUFFER)
     debug_printf ("GetTokenInformation(token, TokenGroups): %E\n");
