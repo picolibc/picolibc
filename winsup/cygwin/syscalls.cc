@@ -1599,33 +1599,34 @@ ctermid (char *str)
 extern "C" int
 _cygwin_istext_for_stdio (int fd)
 {
-  syscall_printf ("_cygwin_istext_for_stdio (%d)", fd);
   if (CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING)
     {
-      syscall_printf (" _cifs: old API");
+      syscall_printf ("fd %d: old API", fd);
       return 0; /* we do it for old apps, due to getc/putc macros */
     }
 
   cygheap_fdget cfd (fd, false, false);
   if (cfd < 0)
     {
-      syscall_printf (" _cifs: fd not open");
+      syscall_printf ("fd %d: not open", fd);
       return 0;
     }
 
+#if 0
   if (cfd->get_device () != FH_FS)
     {
-      syscall_printf (" _cifs: fd not disk file");
+      syscall_printf ("fd not disk file.  Defaulting to binary.");
       return 0;
     }
+#endif
 
   if (cfd->get_w_binary () || cfd->get_r_binary ())
     {
-      syscall_printf (" _cifs: get_*_binary");
+      syscall_printf ("fd %d: opened as binary", fd);
       return 0;
     }
 
-  syscall_printf ("_cygwin_istext_for_stdio says yes");
+  syscall_printf ("fd %d: defaulting to text", fd);
   return 1;
 }
 
@@ -1639,10 +1640,12 @@ static int
 setmode_helper (FILE *f)
 {
   if (fileno (f) != setmode_file)
-    return 0;
-  syscall_printf ("setmode: file was %s now %s",
-		 f->_flags & __SCLE ? "text" : "raw",
-		 setmode_mode & O_TEXT ? "text" : "raw");
+    {
+      syscall_printf ("improbable, but %d != %d", fileno (f), setmode_file);
+      return 0;
+    }
+  syscall_printf ("file was %s now %s", f->_flags & __SCLE ? "text" : "binary",
+		  setmode_mode & O_TEXT ? "text" : "binary");
   if (setmode_mode & O_TEXT)
     f->_flags |= __SCLE;
   else
@@ -1700,7 +1703,7 @@ setmode (int fd, int mode)
   setmode_file = fd;
   _fwalk (_REENT, setmode_helper);
 
-  syscall_printf ("setmode (%d<%s>, %p) returns %s", fd, cfd->get_name (),
+  syscall_printf ("(%d<%s>, %p) returning %s", fd, cfd->get_name (),
 		  mode, res & O_TEXT ? "text" : "binary");
   return res;
 }

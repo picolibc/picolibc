@@ -1,3 +1,19 @@
+2004-01-26  Christopher Faylor  <cgf@redhat.com>
+
+	* cygtls.cc (_threadinfo::init_thread): Add more local reent stdio
+	initialization.
+	* dcrt0.cc (initial_env): Can it really be true that XP doesn't allow
+	attaching a debugger during DLL attach?  Add temporary workaround.
+	(dll_crt0_0): Ensure that _impure_ptr stdio is initialized before any
+	threads.
+	(dll_crt0_1): Move _impure_ptr initialization to dll_crt0_0.
+	* exceptions.cc (try_to_debug): Reinstate old method for looping while
+	debugging.
+	* syscalls.cc (_cygwin_istext_for_stdio): Regularize debugging output.
+	Remove hopefully extraneous check.
+	(setmode_helper): Add debugging output for improbable case.  Use
+	"binary" rather "raw" for consistency.
+
 2004-01-25  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::fhaccess): Avoid always setting errno to
