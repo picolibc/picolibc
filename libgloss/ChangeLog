@@ -1,3 +1,9 @@
+2002-04-16  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* m68k/configure.in: Change to use LIB_AC_PROG_CC instead
+	of AC_PROG_CC to avoid building an executable in configuration.
+	* m68k/configure: Regenerated.
+
 2002-04-15  Hans-Peter Nilsson  <hp@bitrange.com>
 
         * d30v/syscalls.c: #include <time.h>.  Don't use multi-line
