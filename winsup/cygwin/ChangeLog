@@ -1,3 +1,15 @@
+2003-04-10  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.h: Change 'avail' cygthread element to 'inuse' throughout.
+	* cygthread.cc: Ditto.
+	(cygthread::stub): Don't initialize already initialized events.
+	(cygthread::freerange): Don't create thread here.
+	(cygthread::cygthread): Create thread here.  Die if thread not created.
+	(cygthread::operator new): Simplify.  Just grab a thread structure from
+	the pool.  Don't try to start the thread.
+	(cygthread::terminate_thread): Don't close event handles.  Just reuse
+	them.  Call MEM_RELEASE rather than MEM_DECOMMIT (from Joe Buehler).
+
 2003-04-08  Bob Cassels <bcassels@abinitio.com>
 
 	* fhandler_console.cc (fhandler_console::read) Handle certain key up

@@ -55,7 +55,7 @@ class pwdgrp
     i = (unsigned int) x;
     return res;
   }
-  bool next_num (int& i)
+  inline bool next_num (int& i)
   {
     unsigned long x;
     bool res = next_num (x);
@@ -67,7 +67,7 @@ public:
   int curr_lines;
 
   void load (const char *);
-  void refresh (bool check)
+  inline void refresh (bool check)
   {
     if (!check && initialized)
       return;
@@ -77,14 +77,14 @@ public:
     pglock->release ();
   }
 
-  pwdgrp (passwd *&pbuf) :
+  inline pwdgrp (passwd *&pbuf) :
     pwdgrp_buf_elem_size (sizeof (*pbuf)), passwd_buf (&pbuf)
     {
       read = &pwdgrp::read_passwd;
       parse = &pwdgrp::parse_passwd;
       new_muto (pglock);
     }
-  pwdgrp (__group32 *&gbuf) :
+  inline pwdgrp (__group32 *&gbuf) :
     pwdgrp_buf_elem_size (sizeof (*gbuf)), group_buf (&gbuf)
     {
       read = &pwdgrp::read_group;

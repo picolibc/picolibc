@@ -40,11 +40,21 @@ cygthread::stub (VOID *arg)
 
   cygthread *info = (cygthread *) arg;
   if (info->arg == cygself)
+    {
+      if (info->ev)
+	{
+	  CloseHandle (info->ev);
+	  CloseHandle (info->thread_sync);
+	}
     info->ev = info->thread_sync = info->stack_ptr = NULL;
+    }
   else
     {
-      info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-      info->thread_sync = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+      if (!info->ev)
+	{
+	  info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+	  info->thread_sync = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+	}
       info->stack_ptr = &arg;
     }
   while (1)
@@ -118,8 +128,6 @@ cygthread::freerange ()
 {
   cygthread *self = (cygthread *) calloc (1, sizeof (*self));
   self->is_freerange = true;
-  self->h = CreateThread (&sec_none_nih, 0, cygthread::simplestub, self,
-			  CREATE_SUSPENDED, &self->id);
   self->ev = self->h;
   return self;
 }
@@ -127,29 +135,17 @@ cygthread::freerange ()
 void * cygthread::operator
 new (size_t)
 {
-  LONG is_avail;
   cygthread *info;
 
   /* Search the threads array for an empty slot to use */
   for (info = threads; info < threads + NTHREADS; info++)
-    if ((is_avail = InterlockedExchange (&info->avail, -1)) < 0)
-      /* in use */;
-    else if (is_avail > 0)
+    if (!InterlockedExchange (&info->inuse, 1))
       {
 	/* available */
 #ifdef DEBUGGING
 	if (info->__name)
 	  api_fatal ("name not NULL? id %p, i %d", info->id, info - threads);
-	if (!info->h)
-	  api_fatal ("h not set? id %p, i %d", info->id, info - threads);
 #endif
-	goto out;
-      }
-    else
-      {
-	/* Uninitialized.  Available as soon as thread is created */
-	info->h = CreateThread (&sec_none_nih, 0, cygthread::stub, info,
-				CREATE_SUSPENDED, &info->id);
 	goto out;
       }
 
@@ -166,27 +162,25 @@ out:
 }
 
 cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
-		      const char *name): func (start), arg (param)
+		      const char *name): __name (name),
+					 func (start), arg (param)
 {
-#ifdef DEBUGGGING
-  if (!__name)
-    api_fatal ("name should never be NULL");
-#endif
   thread_printf ("name %s, id %p", name, id);
-  while (!h)
-#ifndef DEBUGGING
-    low_priority_sleep (0);
-#else
+  if (h)
     {
-      system_printf ("waiting for %s<%p> to become active", __name, h);
-      low_priority_sleep (0);
+      while (!thread_sync)
+	low_priority_sleep (0);
+      SetEvent (thread_sync);
+      thread_printf ("activated thread_sync %p", thread_sync);
     }
-#endif
-  __name = name;
-  if (!thread_sync)
-    ResumeThread (h);
   else
-    SetEvent (thread_sync);
+    {
+      h = CreateThread (&sec_none_nih, 0, is_freerange ? simplestub : stub,
+			this, 0, &id);
+      if (!h)
+	api_fatal ("thread handle not set - %p<%p>, %E", h, id);
+      thread_printf ("created thread %p", h);
+    }
 }
 
 /* Return the symbolic name of the current thread for debugging.
@@ -241,29 +235,26 @@ void
 cygthread::terminate_thread ()
 {
   if (!is_freerange)
-    SetEvent (*this);
+    {
+      ResetEvent (*this);
+      ResetEvent (thread_sync);
+    }
   (void) TerminateThread (h, 0);
   (void) WaitForSingleObject (h, INFINITE);
+  CloseHandle (h);
+
 
   MEMORY_BASIC_INFORMATION m;
   memset (&m, 0, sizeof (m));
   (void) VirtualQuery (stack_ptr, &m, sizeof m);
 
   if (m.RegionSize)
-    (void) VirtualFree (m.AllocationBase, m.RegionSize, MEM_DECOMMIT);
+    (void) VirtualFree (m.AllocationBase, 0, MEM_RELEASE);
 
-  if (is_freerange)
-    is_freerange = false;
-  else
-    {
-      CloseHandle (ev);
-      CloseHandle (thread_sync);
-    }
-  CloseHandle (h);
-  thread_sync = ev = h = NULL;
+  h = NULL;
   __name = NULL;
-  id = 0;
-  (void) InterlockedExchange (&avail, 0); /* No longer initialized */
+  stack_ptr = NULL;
+  (void) InterlockedExchange (&inuse, 0); /* No longer in use */
 }
 
 /* Detach the cygthread from the current thread.  Note that the
@@ -274,8 +265,8 @@ bool
 cygthread::detach (HANDLE sigwait)
 {
   bool signalled = false;
-  if (avail >= 0)
-    system_printf ("called detach but avail %d, thread %d?", avail, id);
+  if (!inuse)
+    system_printf ("called detach but inuse %d, thread %p?", inuse, id);
   else
     {
       DWORD res;
@@ -317,8 +308,8 @@ cygthread::detach (HANDLE sigwait)
       else
 	{
 	  ResetEvent (*this);
-	  /* Mark the thread as available by setting avail to positive value */
-	  (void) InterlockedExchange (&avail, 1);
+	  /* Mark the thread as available by setting inuse to zero */
+	  (void) InterlockedExchange (&inuse, 0);
 	}
     }
   return signalled;
