@@ -1,3 +1,10 @@
+2005-01-07  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/commctrl.h (ComboBox_SetMinVisible,
+	ComboBox_GetMinVisible): Added Macros.
+	* include/winuser.h (CB_SETMINVISIBLE, CB_GETMINVISIBLE):
+	Added definitions.
+
 2005-01-02  Jiri Malak  <Jiri.Malak@geac.cz>
 
 	* include/winnt.h (GetCurrentFiber, GetFiberData): Make inline

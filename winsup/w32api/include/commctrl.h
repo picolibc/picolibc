@@ -3066,6 +3066,11 @@ int WINAPI LBItemFromPt(HWND,POINT,BOOL);
 #define ListView_SetCheckState(w,i,f) ListView_SetItemState(w,i,INDEXTOSTATEIMAGEMASK((f)+1),LVIS_STATEIMAGEMASK)
 #define ListView_GetISearchString(w, lpsz) (BOOL)SNDMSG((w), LVM_GETISEARCHSTRING, 0, (LPARAM) (LPTSTR)(lpsz)) 
 
+#if (_WIN32_WINNT >= 0x0501)
+#define ComboBox_SetMinVisible(w,i) (BOOL)SNDMSG((w), CB_SETMINVISIBLE, (WPARAM)(i), 0);
+#define ComboBox_GetMinVisible(w) (int)SNDMSG((w), CB_GETMINVISIBLE, 0, 0);
+#endif
+
 BOOL WINAPI MakeDragList(HWND);
 void WINAPI MenuHelp(UINT,WPARAM,LPARAM,HMENU,HINSTANCE,HWND,PUINT);
 #define MonthCal_GetColor(hwnd,icolor) SNDMSG(hwnd,MCM_GETCOLOR,(WPARAM)icolor,(LPARAM)0)
