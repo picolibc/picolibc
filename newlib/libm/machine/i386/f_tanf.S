@@ -1,6 +1,6 @@
 /*
  * ====================================================
- * Copyright (C) 1998 by Cygnus Solutions. All rights reserved.
+ * Copyright (C) 1998, 2002 by Red Hat Inc. All rights reserved.
  *                              
  * Permission to use, copy, modify, and distribute this
  * software is freely granted, provided that this notice

@@ -1,5 +1,48 @@
 2002-12-20  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/machine/i386/f_atan2.S: Change copyright from Cygnus
+	Solutions to Red Hat Inc.
+	* libc/machine/i386/f_atan2f.S: Ditto.
+	* libc/machine/i386/f_exp.c: Ditto.
+	* libc/machine/i386/f_expf.c: Ditto.
+	* libc/machine/i386/f_frexp.S: Ditto.
+	* libc/machine/i386/f_frexpf.S: Ditto.
+	* libc/machine/i386/f_ldexp.S: Ditto.
+	* libc/machine/i386/f_ldexpf.S: Ditto.
+	* libc/machine/i386/f_log.S: Ditto.
+	* libc/machine/i386/f_log10.S: Ditto.
+	* libc/machine/i386/f_log10f.S: Ditto.
+	* libc/machine/i386/f_logf.S: Ditto.
+	* libc/machine/i386/f_pow.c: Ditto.
+	* libc/machine/i386/f_powf.c: Ditto.
+	* libc/machine/i386/f_tan.S: Ditto.
+	* libc/machine/i386/f_tanf.S: Ditto.
+	* libc/machine/i386/memchr.S: Ditto.
+	* libc/machine/i386/memcmp.S: Ditto.
+	* libc/machine/i386/memcpy.S: Ditto.
+	* libc/machine/i386/memmove.S: Ditto.
+	* libc/machine/i386/memset.S: Ditto.
+	* libc/machine/i386/strchr.S: Ditto.
+	* libc/machine/i386/strlen.S: Ditto.
+	* libm/machine/i386/f_atan2.S: Ditto.
+	* libm/machine/i386/f_atan2f.S: Ditto.
+	* libm/machine/i386/f_exp.c: Ditto.
+	* libm/machine/i386/f_expf.c: Ditto.
+	* libm/machine/i386/f_frexp.S: Ditto.
+	* libm/machine/i386/f_frexpf.S: Ditto.
+	* libm/machine/i386/f_ldexp.S: Ditto.
+	* libm/machine/i386/f_ldexpf.S: Ditto.
+	* libm/machine/i386/f_log.S: Ditto.
+	* libm/machine/i386/f_log10.S: Ditto.
+	* libm/machine/i386/f_log10f.S: Ditto.
+	* libm/machine/i386/f_logf.S: Ditto.
+	* libm/machine/i386/f_pow.c: Ditto.
+	* libm/machine/i386/f_powf.c: Ditto.
+	* libm/machine/i386/f_tan.S: Ditto.
+	* libm/machine/i386/f_tanf.S: Ditto.
+
+2002-12-20  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/stdlib/environ.c: Update license to Red Hat.
 	* libc/machine/hppa/setjmp.S: Ditto.
 	* libm/test/Makefile.in: Ditto.
