@@ -389,6 +389,7 @@ LoadDLLfuncEx (NtSetSecurityObject, 12, ntdll, 1)
 LoadDLLfuncEx (NtUnmapViewOfSection, 8, ntdll, 1)
 LoadDLLfuncEx (RtlInitUnicodeString, 8, ntdll, 1)
 LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)
+LoadDLLfuncEx (RtlIsDosDeviceName_U, 4, ntdll, 1)
 
 LoadDLLfuncEx (GetProcessMemoryInfo, 12, psapi, 1)
 

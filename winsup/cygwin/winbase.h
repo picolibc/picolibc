@@ -1,3 +1,11 @@
+/* winbase.h
+
+   Copyright 2002, 2003, 2004 Red Hat, Inc.
+
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
+
 #include_next "winbase.h"
 
 #ifndef _WINBASE2_H
@@ -9,7 +17,7 @@ ilockincr (long *m)
   register int __res;
   __asm__ __volatile__ ("\n\
 	movl	$1,%0\n\
-	lock	xadd %0,%2\n\
+	lock	xadd %0,%1\n\
 	inc	%0\n\
 	": "=a" (__res), "=m" (*m): "m" (m): "cc");
   return __res;
@@ -21,7 +29,7 @@ ilockdecr (long *m)
   register int __res;
   __asm__ __volatile__ ("\n\
 	movl	$0xffffffff,%0\n\
-	lock	xadd %0,%2\n\
+	lock	xadd %0,%1\n\
 	dec	%0\n\
 	": "=a" (__res), "=m" (*m): "m" (m): "cc");
   return __res;

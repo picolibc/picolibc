@@ -420,4 +420,5 @@ extern "C"
   NTSTATUS NTAPI NtUnmapViewOfSection (HANDLE, PVOID);
   VOID NTAPI RtlInitUnicodeString (PUNICODE_STRING, PCWSTR);
   ULONG NTAPI RtlNtStatusToDosError (NTSTATUS);
+  ULONG WINAPI RtlIsDosDeviceName_U (PCWSTR);
 }

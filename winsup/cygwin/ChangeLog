@@ -1,3 +1,9 @@
+2004-06-03  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* winbase.h (ilockincr): More changes from the inexplicable world of
+	gcc asm magic.
+	(ilockdecr): Ditto.
+
 2004-06-03  Christopher Faylor  <me@cgf.cx>
 
 	* winbase.h (ilockincr): YA correction to ensure correct operation with
