@@ -1,3 +1,8 @@
+2002-12-14  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.cc (get_user_local_groups): Use LookupAccountSid to find the
+	local equivalent of BUILTIN.
+
 2002-12-14  Christopher Faylor  <cgf@redhat.com>
 
 	* pipe.cc (make_pipe): Set fork fixup flag for read pipe.

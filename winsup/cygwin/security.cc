@@ -389,16 +389,19 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
       return FALSE;
     }
 
-  char bgroup[sizeof ("BUILTIN\\") + GNLEN] = "BUILTIN\\";
+  char bgroup[INTERNET_MAX_HOST_NAME_LENGTH + GNLEN + 2];
   char lgroup[INTERNET_MAX_HOST_NAME_LENGTH + GNLEN + 2];
-  const DWORD blen = sizeof ("BUILTIN\\") - 1;
-  DWORD llen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-  if (!GetComputerNameA (lgroup, &llen))
+  DWORD blen, llen;
+  SID_NAME_USE use;
+
+  blen = llen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+  if (!LookupAccountSid (NULL, well_known_admins_sid, lgroup, &llen, bgroup, &blen, &use)
+      || !GetComputerNameA (lgroup, &(llen = INTERNET_MAX_HOST_NAME_LENGTH + 1)))
     {
       __seterrno ();
       return FALSE;
     }
-  lgroup[llen++] = '\\';
+  bgroup[blen++] = lgroup[llen++] = '\\';
 
   for (DWORD i = 0; i < cnt; ++i)
     if (is_group_member (buf[i].lgrpi0_name, pusersid, grp_list))
@@ -407,8 +410,8 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
 	DWORD glen = sizeof (gsid);
 	char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
 	DWORD dlen = sizeof (domain);
-	SID_NAME_USE use = SidTypeInvalid;
 
+	use = SidTypeInvalid;
 	sys_wcstombs (bgroup + blen, buf[i].lgrpi0_name, GNLEN + 1);
 	if (!LookupAccountName (NULL, bgroup, gsid, &glen, domain, &dlen, &use))
 	  {
