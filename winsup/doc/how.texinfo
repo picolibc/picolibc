@@ -624,37 +624,12 @@ Explanation adapted from mailing list email by Earnie Boyd
 
 @subsection Is the Cygwin library multi-thread-safe?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+Multi-thread-safe support is turned on by default in 1.1.x releases
+(i.e., in the latest net release).  That does not mean that it is bug
+free!
 
-No.
-
-There is an experimental configure option (--enable-threadsafe), which
-allows you to build a DLL with some additional "thread safety" but there
-are no guarantees that this is 100% operational.  This option also
-enables limited "POSIX thread" support.  See the file cygwin.din for the
-list of POSIX thread functions provided.
-
-Cygnus does not distribute a DLL with this option enabled, and,
-currently, has no plans to do so.
-
-Cygwin is not multi-thread-safe because:
-
-1) Newlib (out libc/libm) isn't reentrant (although it almost is).
-This would have to be fixed or we would have to switch to a libc/libm
-that is reentrant.
-
-2) Cygwin locks shared memory areas (shared by multiple processes),
-but the per-process data is not locked.  Thus, different threads in a
-multi-threaded application would have access to it and give rise to
-nasty race-conditions.
-
-The Mingw package (what you get when you invoke gcc with -mno-cygwin) is
-multi-thread-safe because that configuration doesn't use Cygwin or
-newlib.  Instead, it uses Microsoft libraries which are
-multi-thread-safe for the most part.  So as long as the programmer
-avoids Microsoft APIs that aren't multi-thread-safe (most are ok), they
-should be fine.
+There is also limited support for 'POSIX threads', see the file
+@code{cygwin.din} for the list of POSIX thread functions provided.
 
 @subsection Why is some functionality only supported in Windows NT?
 
