@@ -234,6 +234,9 @@ extern int print_insn_v850		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_vax		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_w65		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_xstormy16		PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_sh64		PARAMS ((bfd_vma, disassemble_info *));
+extern int print_insn_sh64l		PARAMS ((bfd_vma, disassemble_info *));
+extern int print_insn_sh64x_media	PARAMS ((bfd_vma, disassemble_info *));
 
 extern disassembler_ftype arc_get_disassembler PARAMS ((void *));
 extern disassembler_ftype cris_get_disassembler PARAMS ((bfd *));
