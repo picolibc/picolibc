@@ -72,6 +72,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 
+#include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
 #include <glob.h>
@@ -81,6 +82,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <windows.h>
 
 #ifdef __weak_alias
 #ifdef __LIBC12_SOURCE__
@@ -173,6 +175,8 @@ static void	 qprintf __P((const char *, Char *));
 
 #undef MAXPATHLEN
 #define MAXPATHLEN 16384
+
+extern BOOL ignore_case_with_glob;
 
 int
 glob(pattern, flags, errfunc, pglob)
@@ -727,19 +731,41 @@ match(name, pat, patend)
 				return(0);
 			if ((negate_range = ((*pat & M_MASK) == M_NOT)) != EOS)
 				++pat;
-			while (((c = *pat++) & M_MASK) != M_END)
-				if ((*pat & M_MASK) == M_RNG) {
-					if (c <= k && k <= pat[1])
-						ok = 1;
-					pat += 2;
-				} else if (c == k)
-					ok = 1;
+			if (ignore_case_with_glob)
+			  {
+			    while (((c = *pat++) & M_MASK) != M_END)
+			      if ((*pat & M_MASK) == M_RNG) {
+				if (tolower(c) <= tolower(k) && tolower(k) <= tolower(pat[1]))
+				  ok = 1;
+				pat += 2;
+			      } else if (tolower(c) == tolower(k))
+				ok = 1;
+			  }
+			else
+			  {
+			    while (((c = *pat++) & M_MASK) != M_END)
+			      if ((*pat & M_MASK) == M_RNG) {
+				if (c <= k && k <= pat[1])
+				  ok = 1;
+				pat += 2;
+			      } else if (c == k)
+				ok = 1;
+			  }
 			if (ok == negate_range)
 				return(0);
 			break;
 		default:
-			if (*name++ != c)
-				return(0);
+			if (ignore_case_with_glob)
+			  {
+			    if (tolower(*name) != tolower(c))
+			      return(0);
+			    ++name;
+			  }
+			else
+			  {
+			    if (*name++ != c)
+			      return(0);
+			  }
 			break;
 		}
 	}

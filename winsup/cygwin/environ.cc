@@ -27,6 +27,7 @@ details. */
 #include "perprocess.h"
 
 extern BOOL allow_glob;
+extern BOOL ignore_case_with_glob;
 extern BOOL allow_ntea;
 extern BOOL strip_title_path;
 extern DWORD chunksize;
@@ -380,6 +381,31 @@ enum settings
     set_process_state,
   };
 
+/* When BUF is:
+ * null or empty: disables globbing
+ * "ignorecase": enables case-insensitive globbing
+ * anything else: enables case-sensitive globbing
+ */
+static void
+glob_init (const char *buf)
+{
+  if (!buf || !*buf)
+    {
+      allow_glob = FALSE;
+      ignore_case_with_glob = FALSE;
+    }
+  else if (strncasematch (buf, "ignorecase", 10))
+    {
+      allow_glob = TRUE;
+      ignore_case_with_glob = TRUE;
+    }
+  else
+    {
+      allow_glob = TRUE;
+      ignore_case_with_glob = FALSE;
+    }
+}
+
 /* The structure below is used to set up an array which is used to
  * parse the CYGWIN environment variable or, if enabled, options from
  * the registry.
@@ -409,7 +435,7 @@ struct parse_thing
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{FALSE}, {TRUE}}},
   {"forkchunk", {x: &chunksize}, justset, NULL, {{8192}, {0}}},
-  {"glob", {&allow_glob}, justset, NULL, {{FALSE}, {TRUE}}},
+  {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
   {"ntea", {&allow_ntea}, justset, NULL, {{FALSE}, {TRUE}}},
   {"ntsec", {&allow_ntsec}, justset, NULL, {{FALSE}, {TRUE}}},
   {"reset_com", {&reset_com}, justset, NULL, {{FALSE}, {TRUE}}},

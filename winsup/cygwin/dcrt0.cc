@@ -106,6 +106,7 @@ extern "C"
    /* resourcelocks */ &_reslock, /* threadinterface */ &_mtinterf,
    /* impure_ptr */ &reent_data,
   };
+  BOOL ignore_case_with_glob = FALSE;
 };
 
 char *old_title = NULL;
@@ -834,6 +835,9 @@ dll_crt0_1 ()
       set_errno (0);
       return;
     }
+
+  /* Disable case-insensitive globbing */
+  ignore_case_with_glob = FALSE;
 
   /* Flush signals and ensure that signal thread is up and running. Can't
      do this for noncygwin case since the signal thread is blocked due to

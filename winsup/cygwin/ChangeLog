@@ -1,3 +1,12 @@
+Fri Nov 10 13:48:44 2000 Bradley A. Town <townba@pobox.com>
+
+	* dcrt0.cc: New global variable `ignore_case_with_glob'.
+	(dll_crt0_1): Disable case-insensitive globbing before calling `main'.
+	* environ.cc (glob_init): New static function to set or clear
+	`ignore_case_with_glob'.
+	(known): Changed "glob" entry to call `glob_init'.
+	* glob.c (match): Use case-insensitive globbing if needed.
+
 Thu Nov  9 14:30:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* dir.cc (readdir): Avoid reading from the beginning when
