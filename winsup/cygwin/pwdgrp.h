@@ -21,6 +21,7 @@ extern struct __group32 *internal_getgrnam (const char *, bool = FALSE);
 extern struct __group32 *internal_getgrent (int);
 int internal_getgroups (int, __gid32_t *, cygsid * = NULL);
 
+#include "sync.h"
 class pwdgrp
 {
   unsigned pwdgrp_buf_elem_size;
@@ -31,51 +32,48 @@ class pwdgrp
     void **pwdgrp_buf;
   };
   void (pwdgrp::*read) ();
-  bool (pwdgrp::*parse) (char *);
+  bool (pwdgrp::*parse) ();
   int etc_ix;
   path_conv pc;
-  char *buf;
+  char *buf, *lptr;
   int max_lines;
   bool initialized;
-  CRITICAL_SECTION lock;
+  muto *pglock;
 
-  char *gets (char*&);
+  bool parse_passwd ();
+  bool parse_group ();
+  void read_passwd ();
+  void read_group ();
+  char *add_line (char *);
+  char *pwdgrp::next_str (char = 0);
+  int pwdgrp::next_int (char = 0);
 
 public:
   int curr_lines;
 
-  bool parse_passwd (char *);
-  bool parse_group (char *);
-  void read_passwd ();
-  void read_group ();
-
-  void add_line (char *);
+  bool load (const char *);
   void refresh (bool check = true)
   {
-    if (initialized && check && etc::file_changed (etc_ix))
-      initialized = false;
-    if (!initialized)
-      {
-	EnterCriticalSection (&lock);
-	if (!initialized)
-	  (this->*read) ();
-	LeaveCriticalSection (&lock);
-      }
+    if (!check && initialized)
+      return;
+    pglock->acquire ();
+    if (!initialized || (check && etc::file_changed (etc_ix)))
+      (this->*read) ();
+    pglock->release ();
   }
 
-  bool load (const char *);
   pwdgrp (passwd *&pbuf) :
     pwdgrp_buf_elem_size (sizeof (*pbuf)), passwd_buf (&pbuf)
     {
       read = &pwdgrp::read_passwd;
       parse = &pwdgrp::parse_passwd;
-      InitializeCriticalSection (&lock);
+      new_muto (pglock);
     }
   pwdgrp (__group32 *&gbuf) :
     pwdgrp_buf_elem_size (sizeof (*gbuf)), group_buf (&gbuf)
     {
       read = &pwdgrp::read_group;
       parse = &pwdgrp::parse_group;
-      InitializeCriticalSection (&lock);
+      new_muto (pglock);
     }
 };

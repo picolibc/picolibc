@@ -254,4 +254,3 @@ AC_SUBST(DEF_DLL_ENTRY)
 AC_SUBST(ALLOCA)
 AC_SUBST(CONFIG_DIR)
 AC_OUTPUT(Makefile cygwin.def:cygwin.din)
-

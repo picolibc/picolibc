@@ -34,50 +34,40 @@ static pwdgrp gr (group_buf);
 static char * NO_COPY null_ptr;
 
 bool
-pwdgrp::parse_group (char *line)
+pwdgrp::parse_group ()
 {
-  char *dp = strchr (line, ':');
-
-  if (!dp)
-    return false;
+  char *dp;
 
 # define grp (*group_buf)[curr_lines]
-  *dp++ = '\0';
-  grp.gr_name = line;
+  memset (&grp, 0, sizeof (grp));
+  grp.gr_name = next_str ();
+  if (!grp.gr_name)
+    return false;
 
-  grp.gr_passwd = dp;
-  dp = strchr (grp.gr_passwd, ':');
-  if (dp)
+  grp.gr_passwd = next_str ();
+  int n = next_int ();
+  if (n >= 0)
     {
-      *dp++ = '\0';
-      grp.gr_gid = strtoul (line = dp, &dp, 10);
-      if (dp != line && *dp == ':')
+      grp.gr_gid = n;
+      dp = next_str ();
+      if (!dp)
 	{
-	  grp.gr_mem = &null_ptr;
-	  if (*++dp)
-	    {
-	      int i = 0;
-	      char *cp;
-
-	      for (cp = dp; (cp = strchr (cp, ',')) != NULL; ++cp)
-		++i;
-	      char **namearray = (char **) calloc (i + 2, sizeof (char *));
-	      if (namearray)
-		{
-		  i = 0;
-		  for (cp = dp; (cp = strchr (dp, ',')) != NULL; dp = cp + 1)
-		    {
-		      *cp = '\0';
-		      namearray[i++] = dp;
-		    }
-		  namearray[i++] = dp;
-		  namearray[i] = NULL;
-		  grp.gr_mem = namearray;
-		}
-	    }
-	  curr_lines++;
-	  return true;
+	  static char empty[] = "";
+	  dp = empty;
 	}
+      int i = 0;
+      for (char *cp = dp; (cp = strchr (cp, ',')) != NULL; cp++)
+	i++;
+      char **namearray = (char **) calloc (i + 2, sizeof (char *));
+      if (namearray)
+	{
+	  for (i = 0; (dp = next_str (',')); i++)
+	    namearray[i] = dp;
+	  namearray[i] = NULL;
+	  grp.gr_mem = namearray;
+	}
+      curr_lines++;
+      return true;
     }
   return false;
 # undef grp

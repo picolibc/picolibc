@@ -33,52 +33,31 @@ static pwdgrp pr (passwd_buf);
 /* Position in the passwd cache */
 #define pw_pos  _reent_winsup ()->_pw_pos
 
-/* Remove a : terminated string from the buffer, and increment the pointer */
-static char *
-grab_string (char **p)
-{
-  char *src = *p;
-  char *res = src;
-
-  while (*src && *src != ':')
-    src++;
-
-  if (*src == ':')
-    {
-      *src = 0;
-      src++;
-    }
-  *p = src;
-  return res;
-}
-
-/* same, for ints */
-static unsigned int
-grab_int (char **p)
-{
-  char *src = *p;
-  unsigned int val = strtoul (src, p, 10);
-  *p = (*p == src || **p != ':') ? almost_null : *p + 1;
-  return val;
-}
-
 /* Parse /etc/passwd line into passwd structure. */
 bool
-pwdgrp::parse_passwd (char *buf)
+pwdgrp::parse_passwd ()
 {
+  int n;
 # define res (*passwd_buf)[curr_lines]
   /* Allocate enough room for the passwd struct and all the strings
      in it in one go */
-  res.pw_name = grab_string (&buf);
-  res.pw_passwd = grab_string (&buf);
-  res.pw_uid = grab_int (&buf);
-  res.pw_gid = grab_int (&buf);
-  if (!*buf)
+  memset (&res, 0, sizeof (res));
+  res.pw_name = next_str ();
+  res.pw_passwd = next_str ();
+
+  n = next_int ();
+  if (n < 0)
     return false;
+  res.pw_uid = n;
+
+  n = next_int ();
+  if (n < 0)
+    return false;
+  res.pw_gid = n;
   res.pw_comment = 0;
-  res.pw_gecos = grab_string (&buf);
-  res.pw_dir =  grab_string (&buf);
-  res.pw_shell = grab_string (&buf);
+  res.pw_gecos = next_str ();
+  res.pw_dir =  next_str ();
+  res.pw_shell = next_str ();
   curr_lines++;
   return true;
 # undef res

@@ -391,34 +391,58 @@ cygheap_user::env_name (const char *name, size_t namelen)
 }
 
 char *
-pwdgrp::gets (char*& eptr)
+pwdgrp::next_str (char c)
 {
-  char *lptr;
-  if (!eptr)
+  if (!lptr)
+    return NULL;
+  char search[] = ":\n\0\0";
+  search[2] = c;
+  char *res = lptr;
+  char *p = strpbrk (lptr, search);
+  if (!p)
     lptr = NULL;
   else
+    {
+      lptr = (*p == '\n') ? NULL : p + 1;
+      *p = '\0';
+    }
+  return res;
+}
+
+int
+pwdgrp::next_int (char c)
+{
+  char *p = next_str (c);
+  if (!p)
+    return -1;
+  char *cp;
+  unsigned n = strtoul (p, &cp, 10);
+  if (p == cp)
+    return -1;
+  return n;
+}
+
+char *
+pwdgrp::add_line (char *eptr)
+{
+  if (eptr)
     {
       lptr = eptr;
       eptr = strchr (lptr, '\n');
       if (eptr)
 	{
-	  if (eptr > lptr && *(eptr - 1) == '\r')
-	    *(eptr - 1) = 0;
-	  *eptr++ = '\0';
+	  if (eptr > lptr && eptr[-1] == '\r')
+	    eptr[-1] = '\n';
+	  eptr++;
 	}
+      if (curr_lines >= max_lines)
+	{
+	  max_lines += 10;
+	  *pwdgrp_buf = realloc (*pwdgrp_buf, max_lines * pwdgrp_buf_elem_size);
+	}
+      (void) (this->*parse) ();
     }
-  return lptr;
-}
-
-void
-pwdgrp::add_line (char *line)
-{
-  if (curr_lines >= max_lines)
-    {
-      max_lines += 10;
-      *pwdgrp_buf = realloc (*pwdgrp_buf, max_lines * pwdgrp_buf_elem_size);
-    }
-  (void) (this->*parse) (line);
+  return eptr;
 }
 
 bool
@@ -459,11 +483,9 @@ pwdgrp::load (const char *posix_fname)
 	      CloseHandle (fh);
 	      buf[read_bytes] = '\0';
 	      char *eptr = buf;
-	      eptr = buf;
-	      char *line;
 	      curr_lines = 0;
-	      while ((line = gets (eptr)) != NULL)
-		add_line (line);
+	      while ((eptr = add_line (eptr)))
+		continue;
 	      debug_printf ("%s curr_lines %d", posix_fname, curr_lines);
 	      res = true;
 	    }

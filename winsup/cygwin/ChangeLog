@@ -1,3 +1,26 @@
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* pwdrp.h (pwdgrp::refresh): Lock entire test prior to reading.
+
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* grp.cc (pwdgrp::parse_group): Eliminate arg and use class member
+	instead.  Use next_str and next_int to parse arguments.
+	* passwd.cc (pwdgrp::parse_passwd): Ditto.
+	(grab_string): Eliminate.
+	(grab_int): Ditto.
+	* pwdgrp.h (pwdgrp::parse): Eliminate input arg.
+	(pwdgrp::parse_passwd): Reflect above change.
+	(pwdgrp::parse_group): Reflect above change.
+	(pwdgrp::next_str): New function.
+	(pwdgrp::next_int): Ditto.
+	(pwdgrp::gets): Eliminate.
+	* uinfo.cc (pwdgrp::next_str): New function.
+	(pwdgrp::next_int): Ditto.
+	(pwdgrp::add_line): Subsume gets.
+	(pwdgrp::gets): Eliminate.
+	(pwdgrp::load): Just call add_line to parse input buffer.
+
 2003-01-22  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* include/pthread.h (PTHREAD_MUTEX_RECURSIVE): Revert changes from
@@ -16,25 +39,6 @@
 	(sleep): Move old functionality to nanosleep().  Call nanosleep().
 	(usleep): Remove old functionality.  Call nanosleep().
 	* include/cygwin/version.h: Bump API minor number.
-
-2003-01-21  Christopher Faylor  <cgf@redhat.com>
-
-	* grp.cc (pwdgrp::parse_group): Eliminate arg and use class member
-	instead.  Use next_str and next_int to parse arguments.
-	* passwd.cc (pwdgrp::parse_passwd): Ditto.
-	(grab_string): Eliminate.
-	(grab_int): Ditto.
-	* pwdgrp.h (pwdgrp::parse): Eliminate input arg.
-	(pwdgrp::parse_passwd): Reflect above change.
-	(pwdgrp::parse_group): Reflect above change.
-	(pwdgrp::next_str): New function.
-	(pwdgrp::next_int): Ditto.
-	(pwdgrp::gets): Eliminate.
-	* uinfo.cc (pwdgrp::next_str): New function.
-	(pwdgrp::next_int): Ditto.
-	(pwdgrp::add_line): Subsume gets.
-	(pwdgrp::gets): Eliminate.
-	(pwdgrp::load): Just call add_line to parse input buffer.
 
 2003-01-21  Christopher Faylor  <cgf@redhat.com>
 

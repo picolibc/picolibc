@@ -3813,7 +3813,8 @@ etc::dir_changed (int n)
 	{
 	  path_conv pwd ("/etc");
 	  changed_h = FindFirstChangeNotification (pwd, FALSE,
-						  FILE_NOTIFY_CHANGE_LAST_WRITE);
+						  FILE_NOTIFY_CHANGE_LAST_WRITE
+						  | FILE_NOTIFY_CHANGE_FILE_NAME);
 #ifdef DEBUGGING
 	  if (changed_h == INVALID_HANDLE_VALUE)
 	    system_printf ("Can't open /etc for checking, %E", (char *) pwd,
