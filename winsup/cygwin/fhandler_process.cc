@@ -15,9 +15,9 @@ details. */
 #include <ntdef.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 #include "pinfo.h"
-#include "path.h"
 #include "shared_info.h"
 #include "dtable.h"
 #include "cygheap.h"
@@ -96,16 +96,16 @@ fhandler_process::exists ()
 }
 
 fhandler_process::fhandler_process ():
-  fhandler_proc (FH_PROCESS)
+  fhandler_proc ()
 {
 }
 
 int
-fhandler_process::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_process::fstat (struct __stat64 *buf)
 {
   const char *path = get_name ();
   int file_type = exists ();
-  (void) fhandler_base::fstat (buf, pc);
+  (void) fhandler_base::fstat (buf);
   path += proc_len + 1;
   pid = atoi (path);
   pinfo p (pid);
@@ -155,11 +155,11 @@ fhandler_process::readdir (DIR * dir)
 }
 
 int
-fhandler_process::open (path_conv *pc, int flags, mode_t mode)
+fhandler_process::open (int flags, mode_t mode)
 {
   int process_file_no = -1;
 
-  int res = fhandler_virtual::open (pc, flags, mode);
+  int res = fhandler_virtual::open (flags, mode);
   if (!res)
     goto out;
 

@@ -11,12 +11,14 @@ details. */
 #include "winsup.h"
 #include <imagehlp.h>
 #include <stdlib.h>
+#include <setjmp.h>
 
 #include "exceptions.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
+#define NEED_VFORK
 #include "perthread.h"
 #include "shared_info.h"
 #include "perprocess.h"
@@ -966,25 +968,42 @@ set_process_mask (sigset_t newmask)
   sigproc_printf ("old mask = %x, new mask = %x", myself->getsigmask (), newmask);
   myself->setsigmask (newmask);	// Set a new mask
   mask_sync->release ();
-  if (!(oldmask & ~newmask))
+  if (oldmask & ~newmask)
+    sig_dispatch_pending ();
+  else
     sigproc_printf ("not calling sig_dispatch_pending.  sigtid %p current %p",
 		    sigtid, GetCurrentThreadId ());
-  else
-    {
-      extern bool pending_signals;
-      pending_signals = true;
-      sig_dispatch_pending ();
-    }
   return;
 }
 
 int __stdcall
-sig_handle (int sig)
+sig_handle (int sig, sigset_t mask)
 {
+  if (sig == SIGCONT)
+    {
+      DWORD stopped = myself->process_state & PID_STOPPED;
+      myself->stopsig = 0;
+      myself->process_state &= ~PID_STOPPED;
+      /* Clear pending stop signals */
+      sig_clear (SIGSTOP);
+      sig_clear (SIGTSTP);
+      sig_clear (SIGTTIN);
+      sig_clear (SIGTTOU);
+      if (stopped)
+	SetEvent (sigCONT);
+    }
+
+  if (sig != SIGKILL && sig != SIGSTOP
+      && (sigismember (&mask, sig) || main_vfork->pid
+	  || ISSTATE (myself, PID_STOPPED)))
+    {
+      sigproc_printf ("signal %d blocked", sig);
+      return -1;
+    }
+
   int rc = 1;
 
-  sigproc_printf ("signal %d", sig);
-
+  sigproc_printf ("signal %d processing", sig);
   struct sigaction thissig = myself->getsig (sig);
   void *handler = (void *) thissig.sa_handler;
 
@@ -999,25 +1018,6 @@ sig_handle (int sig)
 
   if (sig == SIGSTOP)
     goto stop;
-
-  /* FIXME: Should we still do this if SIGCONT has a handler? */
-  if (sig == SIGCONT)
-    {
-      DWORD stopped = myself->process_state & PID_STOPPED;
-      myself->stopsig = 0;
-      myself->process_state &= ~PID_STOPPED;
-      /* Clear pending stop signals */
-      sig_clear (SIGSTOP);
-      sig_clear (SIGTSTP);
-      sig_clear (SIGTTIN);
-      sig_clear (SIGTTOU);
-      if (stopped)
-	SetEvent (sigCONT);
-      /* process pending signals */
-#if 0 // FIXME?
-      sig_dispatch_pending ();
-#endif
-    }
 
 #if 0
   char sigmsg[24];

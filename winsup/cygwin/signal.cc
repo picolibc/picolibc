@@ -182,8 +182,6 @@ kill_worker (pid_t pid, int sig)
       return -1;
     }
 
-  dest->setthread2signal (NULL);
-
   if ((sendSIGCONT = (sig < 0)))
     sig = -sig;
 

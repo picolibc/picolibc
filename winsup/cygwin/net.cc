@@ -28,8 +28,8 @@ details. */
 #include <assert.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
@@ -617,8 +617,8 @@ cygwin_getprotobynumber (int number)
   return protoent_buf;
 }
 
-fhandler_socket *
-fdsock (int &fd, const char *name, SOCKET soc)
+bool
+fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 {
   if (!winsock2_active)
     soc = set_socket_inheritance (soc);
@@ -632,16 +632,15 @@ fdsock (int &fd, const char *name, SOCKET soc)
   else
     debug_printf ("not setting socket inheritance since winsock2_active %d",
 		  winsock2_active);
-  fhandler_socket *fh = (fhandler_socket *)
-	cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name, NULL,
-				       tolower (name[5]) - 'a');
-  if (!fh)
-    return NULL;
-  fh->set_io_handle ((HANDLE) soc);
-  fh->set_flags (O_RDWR | O_BINARY);
-  fh->set_r_no_interrupt (winsock2_active);
-  debug_printf ("fd %d, name '%s', soc %p", fd, name, soc);
-  return fh;
+  fd = build_fh_dev (*dev);
+  if (!fd.isopen ())
+    return false;
+  fd->set_io_handle ((HANDLE) soc);
+  fd->set_flags (O_RDWR | O_BINARY);
+  fd->set_r_no_interrupt (winsock2_active);
+  cygheap->fdtab.inc_need_fixup_before ();
+  debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
+  return true;
 }
 
 /* exported as socket: standards? */
@@ -650,7 +649,6 @@ cygwin_socket (int af, int type, int protocol)
 {
   int res = -1;
   SOCKET soc = 0;
-  fhandler_socket *fh = NULL;
 
   debug_printf ("socket (%d, %d, %d)", af, type, protocol);
 
@@ -662,25 +660,23 @@ cygwin_socket (int af, int type, int protocol)
       goto done;
     }
 
-  const char *name;
+  const device *dev;
 
   if (af == AF_INET)
-    name = (type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp");
+    dev = type == SOCK_STREAM ? tcp_dev : udp_dev;
   else
-    name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
+    dev = type == SOCK_STREAM ? stream_dev : dgram_dev;
 
   {
     cygheap_fdnew fd;
-    if (fd >= 0)
-      fh = fdsock (fd, name, soc);
-    if (fh)
+    if (fd < 0 || !fdsock (fd, dev, soc))
+      closesocket (soc);
+    else
       {
-	fh->set_addr_family (af);
-	fh->set_socket_type (type);
+	((fhandler_socket *) fd)->set_addr_family (af);
+	((fhandler_socket *) fd)->set_socket_type (type);
 	res = fd;
       }
-    else
-	closesocket (soc);
   }
 
 done:
@@ -1990,14 +1986,11 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
   res = rcmd (ahost, inport, locuser, remuser, cmd, fd2p ? &fd2s : NULL);
   if (res != (int) INVALID_SOCKET)
     {
-      fhandler_socket *fh = NULL;
       cygheap_fdnew res_fd;
 
-      if (res_fd >= 0)
-	fh = fdsock (res_fd, "/dev/tcp", res);
-      if (fh)
+      if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
 	{
-	  fh->set_connect_state (CONNECTED);
+	  ((fhandler_socket *) res_fd)->set_connect_state (CONNECTED);
 	  res = res_fd;
 	}
       else
@@ -2009,14 +2002,12 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
       if (res >= 0 && fd2p)
 	{
 	  cygheap_fdnew newfd (res_fd, false);
+	  cygheap_fdget fd (*fd2p);
 
-	  fh = NULL;
-	  if (newfd >= 0)
-	    fh = fdsock (newfd, "/dev/tcp", fd2s);
-	  if (fh)
+	  if (newfd >= 0 && fdsock (newfd, tcp_dev, fd2s))
 	    {
 	      *fd2p = newfd;
-	      fh->set_connect_state (CONNECTED);
+	      ((fhandler_socket *) fd2p)->set_connect_state (CONNECTED);
 	    }
 	  else
 	    {
@@ -2046,13 +2037,10 @@ cygwin_rresvport (int *port)
 
   if (res != (int) INVALID_SOCKET)
     {
-      fhandler_socket *fh = NULL;
       cygheap_fdnew res_fd;
 
-      if (res_fd >= 0)
-	fh = fdsock (res_fd, "/dev/tcp", res);
-      if (fh)
-	res = res_fd;
+      if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
+        res = res_fd;
       else
 	res = -1;
     }
@@ -2080,14 +2068,11 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
   res = rexec (ahost, inport, locuser, password, cmd, fd2p ? &fd2s : NULL);
   if (res != (int) INVALID_SOCKET)
     {
-      fhandler_socket *fh = NULL;
       cygheap_fdnew res_fd;
 
-      if (res_fd >= 0)
-	fh = fdsock (res_fd, "/dev/tcp", res);
-      if (fh)
+      if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
 	{
-	  fh->set_connect_state (CONNECTED);
+	  ((fhandler_socket *) res_fd)->set_connect_state (CONNECTED);
 	  res = res_fd;
 	}
       else
@@ -2099,13 +2084,11 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
       if (res >= 0 && fd2p)
 	{
 	  cygheap_fdnew newfd (res_fd, false);
+	  cygheap_fdget fd (*fd2p);
 
-	  fh = NULL;
-	  if (newfd >= 0)
-	    fh = fdsock (newfd, "/dev/tcp", fd2s);
-	  if (fh)
+	  if (newfd >= 0 && fdsock (newfd, tcp_dev, fd2s))
 	    {
-	      fh->set_connect_state (CONNECTED);
+	      ((fhandler_socket *) fd2p)->set_connect_state (CONNECTED);
 	      *fd2p = newfd;
 	    }
 	  else
@@ -2267,35 +2250,29 @@ socketpair (int family, int type, int protocol, int *sb)
     }
 
   {
-    fhandler_socket *fh = NULL;
     cygheap_fdnew sb0;
-    const char *name;
+    const device *dev;
 
     if (family == AF_INET)
-      name = (type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp");
+      dev = (type == SOCK_STREAM ? tcp_dev : udp_dev);
     else
-      name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
+      dev = (type == SOCK_STREAM ? stream_dev : dgram_dev);
 
-    if (sb0 >= 0)
-      fh = fdsock (sb0, name, insock);
-    if (fh)
+    if (sb0 >= 0 && fdsock (sb0, dev, insock))
       {
-	fh->set_sun_path ("");
-	fh->set_addr_family (family);
-	fh->set_socket_type (type);
-	fh->set_connect_state (CONNECTED);
+	((fhandler_socket *) sb0)->set_sun_path ("");
+	((fhandler_socket *) sb0)->set_addr_family (family);
+	((fhandler_socket *) sb0)->set_socket_type (type);
+	((fhandler_socket *) sb0)->set_connect_state (CONNECTED);
 
 	cygheap_fdnew sb1 (sb0, false);
 
-	fh = NULL;
-	if (sb1 >= 0)
-	  fh = fdsock (sb1, name, outsock);
-	if (fh)
+	if (sb1 >= 0 && fdsock (sb1, dev, outsock))
 	  {
-	    fh->set_sun_path ("");
-	    fh->set_addr_family (family);
-	    fh->set_socket_type (type);
-	    fh->set_connect_state (CONNECTED);
+	    ((fhandler_socket *) sb1)->set_sun_path ("");
+	    ((fhandler_socket *) sb1)->set_addr_family (family);
+	    ((fhandler_socket *) sb1)->set_socket_type (type);
+	    ((fhandler_socket *) sb1)->set_connect_state (CONNECTED);
 
 	    sb[0] = sb0;
 	    sb[1] = sb1;

@@ -15,7 +15,7 @@ details. */
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-int __small_sprintf (char *dst, const char *fmt,...);
+int __small_sprintf (char *dst, const char *fmt, ...);
 int __small_vsprintf (char *dst, const char *fmt, va_list ap);
 
 static char *
@@ -108,7 +108,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  continue;
 		case 'c':
 		  {
-		    int c = va_arg (ap,int);
+		    int c = va_arg (ap, int);
 		    if (c > ' ' && c <= 127)
 		      *dst++ = c;
 		    else
@@ -180,7 +180,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 }
 
 int
-__small_sprintf (char *dst, const char *fmt,...)
+__small_sprintf (char *dst, const char *fmt, ...)
 {
   int r;
   va_list ap;
@@ -191,7 +191,7 @@ __small_sprintf (char *dst, const char *fmt,...)
 }
 
 void
-small_printf (const char *fmt,...)
+small_printf (const char *fmt, ...)
 {
   char buf[16384];
   va_list ap;
@@ -218,7 +218,7 @@ small_printf (const char *fmt,...)
 #ifdef DEBUGGING
 static HANDLE NO_COPY console_handle = NULL;
 void
-console_printf (const char *fmt,...)
+console_printf (const char *fmt, ...)
 {
   char buf[16384];
   va_list ap;

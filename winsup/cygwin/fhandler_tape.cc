@@ -16,8 +16,8 @@ details. */
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 
@@ -52,20 +52,20 @@ fhandler_dev_tape::is_eof (int win_error)
   return ret;
 }
 
-fhandler_dev_tape::fhandler_dev_tape (int unit)
-  : fhandler_dev_raw (FH_TAPE, unit)
+fhandler_dev_tape::fhandler_dev_tape ()
+  : fhandler_dev_raw ()
 {
-  debug_printf ("unit: %d", unit);
+  debug_printf ("unit: %d", dev ().minor);
 }
 
 int
-fhandler_dev_tape::open (path_conv *real_path, int flags, mode_t)
+fhandler_dev_tape::open (int flags, mode_t)
 {
   int ret;
 
   devbufsiz = 1L;
 
-  ret = fhandler_dev_raw::open (real_path, flags);
+  ret = fhandler_dev_raw::open (flags);
   if (ret)
     {
       struct mtget get;
@@ -88,7 +88,7 @@ fhandler_dev_tape::open (path_conv *real_path, int flags, mode_t)
        * returns ERROR_NO_DATA_DETECTED. After media change, all subsequent
        * ReadFile calls return ERROR_NO_DATA_DETECTED, too.
        * The call to tape_set_pos seems to reset some internal flags. */
-      if ((! ioctl (MTIOCPOS, &pos)) && (! pos.mt_blkno))
+      if ((!ioctl (MTIOCPOS, &pos)) && (!pos.mt_blkno))
 	{
 	  op.mt_op = MTREW;
 	  ioctl (MTIOCTOP, &op);
@@ -145,11 +145,11 @@ fhandler_dev_tape::close (void)
 }
 
 int
-fhandler_dev_tape::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_dev_tape::fstat (struct __stat64 *buf)
 {
   int ret;
 
-  if (!(ret = fhandler_base::fstat (buf, pc)))
+  if (!(ret = fhandler_base::fstat (buf)))
     {
       struct mtget get;
 

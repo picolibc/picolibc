@@ -19,8 +19,8 @@ details. */
 #include "pinfo.h"
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 
@@ -84,15 +84,13 @@ extern "C" DIR *
 opendir (const char *name)
 {
   fhandler_base *fh;
-  path_conv pc;
   DIR *res;
 
-  fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, pc,
-						PC_SYM_FOLLOW | PC_FULL, NULL);
+  fh = build_fh_name (name, NULL, PC_SYM_FOLLOW | PC_FULL);
   if (!fh)
     res = NULL;
-  else if (pc.exists ())
-      res = fh->opendir (pc);
+  else if (fh->exists ())
+      res = fh->opendir ();
   else
     {
       set_errno (ENOENT);

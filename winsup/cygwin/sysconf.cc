@@ -14,8 +14,8 @@ details. */
 #include <limits.h>
 #include <ntdef.h>
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
 #include "cygheap.h"

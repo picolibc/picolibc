@@ -14,6 +14,7 @@ details. */
 #include <limits.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 
 #define RANDOM   8
@@ -22,13 +23,13 @@ details. */
 #define PSEUDO_MULTIPLIER       (6364136223846793005LL)
 #define PSEUDO_SHIFTVAL		(21)
 
-fhandler_dev_random::fhandler_dev_random (int nunit)
-  : fhandler_base (FH_RANDOM), unit (nunit), crypt_prov ((HCRYPTPROV) NULL)
+fhandler_dev_random::fhandler_dev_random ()
+  : fhandler_base (), crypt_prov ((HCRYPTPROV) NULL)
 {
 }
 
 int
-fhandler_dev_random::open (path_conv *, int flags, mode_t)
+fhandler_dev_random::open (int flags, mode_t)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_nohandle (true);
@@ -84,7 +85,7 @@ fhandler_dev_random::write (const void *ptr, size_t len)
   memcpy (buf, ptr, limited_len);
 
   /* Mess up system entropy source. Return error if device is /dev/random. */
-  if (!crypt_gen_random (buf, limited_len) && unit == RANDOM)
+  if (!crypt_gen_random (buf, limited_len) && dev () == FH_RANDOM)
     {
       __seterrno ();
       return -1;
@@ -128,7 +129,7 @@ fhandler_dev_random::read (void *ptr, size_t& len)
   /* If device is /dev/urandom, use pseudo number generator as fallback.
      Don't do this for /dev/random since it's intended for uses that need
      very high quality randomness. */
-  if (unit == URANDOM)
+  if (dev () == FH_URANDOM)
     {
       len = pseudo_read (ptr, len);
       return;
@@ -158,7 +159,6 @@ int
 fhandler_dev_random::dup (fhandler_base *child)
 {
   fhandler_dev_random *fhr = (fhandler_dev_random *) child;
-  fhr->unit = unit;
   fhr->crypt_prov = (HCRYPTPROV)NULL;
   return 0;
 }

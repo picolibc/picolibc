@@ -49,8 +49,8 @@ details. */
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -72,6 +72,12 @@ details. */
 #undef _fstat64
 
 SYSTEM_INFO system_info;
+
+static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
+				   _minor_t);
+
+static int __stdcall stat_worker (const char *name, struct __stat64 *buf,
+				  int nofollow) __attribute__ ((regparm (3)));
 
 /* Close all files and process any queued deletions.
    Lots of unix style applications will open a tmp file, unlink it,
@@ -486,7 +492,7 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
 
   res = cfd->bg_check (SIGTTOU);
 
-  if (res > bg_eof)
+  if (res > (int) bg_eof)
     {
       myself->process_state |= PID_TTYOU;
       res = cfd->writev (iov, iovcnt, tot);
@@ -530,17 +536,24 @@ open (const char *unix_path, int flags, ...)
 
       if (fd >= 0)
 	{
-	  path_conv pc;
-	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
-							      NULL, pc)))
+	  if (!(fh = build_fh_name (unix_path, NULL, PC_SYM_FOLLOW)))
 	    res = -1;		// errno already set
-	  else if (!fh->open (&pc, flags, (mode & 07777) & ~cygheap->umask))
+	  else if (fh->is_fs_special () && fh->device_access_denied (flags))
 	    {
-	      fd.release ();
+	      delete fh;
 	      res = -1;
 	    }
-	  else if ((res = fd) <= 2)
-	    set_std_handle (res);
+	  else if (!fh->open (flags, (mode & 07777) & ~cygheap->umask))
+	    {
+	      delete fh;
+	      res = -1;
+	    }
+	  else
+	    {
+	      cygheap->fdtab[fd] = fh;
+	      if ((res = fd) <= 2)
+		set_std_handle (res);
+	    }
 	}
     }
 
@@ -817,7 +830,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 
       /* FIXME: This makes chown on a device succeed always.  Someday we'll want
 	 to actually allow chown to work properly on devices. */
-      if (win32_path.is_device () && !win32_path.issocket ())
+      if (win32_path.is_auto_device () && !win32_path.issocket ())
 	{
 	  res = 0;
 	  goto done;
@@ -918,6 +931,12 @@ umask (mode_t mask)
   return oldmask;
 }
 
+int
+chmod_device (path_conv& pc, mode_t mode)
+{
+  return mknod_worker (pc, pc.dev.mode & S_IFMT, mode, pc.dev.major, pc.dev.minor);
+}
+
 /* chmod: POSIX 5.6.4.1 */
 extern "C" int
 chmod (const char *path, mode_t mode)
@@ -935,9 +954,14 @@ chmod (const char *path, mode_t mode)
 
   /* FIXME: This makes chmod on a device succeed always.  Someday we'll want
      to actually allow chmod to work properly on devices. */
-  if (win32_path.is_device () && !win32_path.issocket ())
+  if (win32_path.is_auto_device ())
     {
       res = 0;
+      goto done;
+    }
+  if (win32_path.is_fs_special ())
+    {
+      res = chmod_device (win32_path, mode);
       goto done;
     }
 
@@ -1033,15 +1057,14 @@ fstat64 (int fd, struct __stat64 *buf)
     res = -1;
   else
     {
-      path_conv pc (cfd->get_name (), PC_SYM_NOFOLLOW);
       memset (buf, 0, sizeof (struct __stat64));
-      res = cfd->fstat (buf, &pc);
-      if (!res && cfd->get_device () != FH_SOCKET)
+      res = cfd->fstat (buf);
+      if (!res)
 	{
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, cfd->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = (cfd->get_device () << 16) | cfd->get_unit ();
+	    buf->st_dev = cfd->get_device ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
@@ -1118,42 +1141,35 @@ suffix_info stat_suffixes[] =
 };
 
 /* Cygwin internal */
-int __stdcall
-stat_worker (const char *name, struct __stat64 *buf, int nofollow,
-	     path_conv *pc)
+static int __stdcall
+stat_worker (const char *name, struct __stat64 *buf, int nofollow)
 {
   int res = -1;
-  path_conv real_path;
   fhandler_base *fh = NULL;
 
   if (check_null_invalid_struct_errno (buf))
     goto done;
 
-  if (!pc)
-    pc = &real_path;
+  fh = build_fh_name (name, NULL, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
+		      		  | PC_FULL, stat_suffixes);
 
-  fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, *pc,
-						(nofollow ? PC_SYM_NOFOLLOW
-							  : PC_SYM_FOLLOW)
-						| PC_FULL, stat_suffixes);
-
-  if (pc->error)
+  if (fh->error ())
     {
-      debug_printf ("got %d error from build_fhandler_from_name", pc->error);
-      set_errno (pc->error);
+      debug_printf ("got %d error from build_fh_name", fh->error ());
+      set_errno (fh->error ());
     }
   else
     {
       debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
-		    pc, (DWORD) real_path);
+		    fh, (DWORD) *fh);
       memset (buf, 0, sizeof (*buf));
-      res = fh->fstat (buf, pc);
-      if (!res && fh->get_device () != FH_SOCKET)
+      res = fh->fstat (buf);
+      if (!res)
 	{
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = (fh->get_device () << 16) | fh->get_unit ();
+	    buf->st_dev = fh->get_device ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
@@ -1227,18 +1243,9 @@ lstat (const char *name, struct __stat32 *buf)
   return ret;
 }
 
-extern "C" int
-access (const char *fn, int flags)
+int
+access_worker (path_conv& real_path, int flags)
 {
-  sigframe thisframe (mainthread);
-  // flags were incorrectly specified
-  if (flags & ~(F_OK|R_OK|W_OK|X_OK))
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  path_conv real_path (fn, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
   if (real_path.error)
     {
       set_errno (real_path.error);
@@ -1254,17 +1261,18 @@ access (const char *fn, int flags)
   if (!(flags & (R_OK | W_OK | X_OK)))
     return 0;
 
-  if (real_path.has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
+  if (real_path.is_fs_special ())
+    /* short circuit */;
+  else if (real_path.has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
     {
       set_errno (EACCES);
       return -1;
     }
-
-  if (real_path.has_acls () && allow_ntsec)
+  else if (real_path.has_acls () && allow_ntsec)
     return check_file_access (real_path, flags);
 
   struct __stat64 st;
-  int r = stat_worker (fn, &st, 0);
+  int r = stat_worker (real_path, &st, 0);
   if (r)
     return -1;
   r = -1;
@@ -1318,6 +1326,21 @@ done:
   if (r)
     set_errno (EACCES);
   return r;
+}
+
+extern "C" int
+access (const char *fn, int flags)
+{
+  sigframe thisframe (mainthread);
+  // flags were incorrectly specified
+  if (flags & ~(F_OK|R_OK|W_OK|X_OK))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  path_conv pc (fn, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
+  return access_worker (pc, flags);
 }
 
 extern "C" int
@@ -1573,7 +1596,7 @@ fpathconf (int fd, int v)
 	}
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
-      if (cfd->get_device () == FH_DISK)
+      if (cfd->get_device () == FH_FS)
 	return check_posix_perm (cfd->get_win32_name (), v);
       set_errno (EINVAL);
       return -1;
@@ -1615,7 +1638,7 @@ pathconf (const char *file, int v)
 	    set_errno (full_path.error);
 	    return -1;
 	  }
-	if (full_path.is_device ())
+	if (full_path.is_auto_device ())
 	  {
 	    set_errno (EINVAL);
 	    return -1;
@@ -1633,9 +1656,7 @@ ttyname (int fd)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0 || !cfd->is_tty ())
-    {
-      return 0;
-    }
+    return 0;
   return (char *) (cfd->ttyname ());
 }
 
@@ -1670,7 +1691,7 @@ _cygwin_istext_for_stdio (int fd)
       return 0;
     }
 
-  if (cfd->get_device () != FH_DISK)
+  if (cfd->get_device () != FH_FS)
     {
       syscall_printf (" _cifs: fd not disk file");
       return 0;
@@ -1860,8 +1881,7 @@ statfs (const char *fname, struct statfs *sfs)
     }
 
   path_conv full_path (fname, PC_SYM_FOLLOW | PC_FULL);
-
-  const char *root = full_path.root_dir();
+  const char *root = full_path.root_dir ();
 
   syscall_printf ("statfs %s", root);
 
@@ -2006,17 +2026,62 @@ regfree ()
   return 0;
 }
 
-/* mknod was the call to create directories before the introduction
-   of mkdir in 4.2BSD and SVR3.  Use of mknod required superuser privs
-   so the mkdir command had to be setuid root.
-   Although mknod hasn't been implemented yet, some GNU tools (e.g. the
-   fileutils) assume its existence so we must provide a stub that always
-   fails. */
-extern "C" int
-mknod32 (const char *_path, mode_t mode, __dev32_t dev)
+static int __stdcall
+mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
+	      _minor_t minor)
 {
-  set_errno (ENOSYS);
-  return -1;
+  char buf[sizeof (":00000000:00000000:00000000") + MAX_PATH];
+  sprintf (buf, ":%x:%x:%x", major, minor,
+	   type | (mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
+  return symlink_worker (buf, path, true, true);
+}
+
+extern "C" int
+mknod32 (const char *path, mode_t mode, __dev32_t dev)
+{
+  if (check_null_empty_str_errno (path))
+    return -1;
+
+  if (strlen (path) >= MAX_PATH)
+    return -1;
+
+  path_conv w32path (path, PC_SYM_NOFOLLOW | PC_FULL);
+  if (w32path.exists ())
+    {
+      set_errno (EEXIST);
+      return -1;
+    }
+
+  mode_t type = mode & S_IFMT;
+  _major_t major = _major (dev);
+  _minor_t minor = _minor (dev);
+  switch (type)
+    {
+    case S_IFCHR:
+    case S_IFBLK:
+      break;
+
+    case S_IFIFO:
+      major = _major (FH_FIFO);
+      minor = _minor (FH_FIFO);
+      break;
+
+    case 0:
+    case S_IFREG:
+      {
+	int fd = open (path, O_CREAT, mode);
+	if (fd < 0)
+	  return -1;
+	close (fd);
+	return 0;
+      }
+
+    default:
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  return mknod_worker (w32path, type, mode, major, minor);
 }
 
 extern "C" int
@@ -2028,7 +2093,7 @@ mknod (const char *_path, mode_t mode, __dev16_t dev)
 extern "C" int
 mkfifo (const char *_path, mode_t mode)
 {
-  set_errno (ENOSYS);
+  set_errno (ENOSYS);	// FIXME
   return -1;
 }
 
@@ -2343,7 +2408,7 @@ chroot (const char *newroot)
 
   syscall_printf ("%d = chroot (%s)", ret ? get_errno () : 0,
 				      newroot ? newroot : "NULL");
-  if (path.normalized_path)
+  if (!path.normalized_path_size && path.normalized_path)
     cfree (path.normalized_path);
   return ret;
 }

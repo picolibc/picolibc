@@ -17,8 +17,8 @@ details. */
 #include <ntdef.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "pinfo.h"
 #include "dtable.h"
 #include "cygheap.h"
@@ -146,23 +146,18 @@ fhandler_proc::exists ()
 }
 
 fhandler_proc::fhandler_proc ():
-  fhandler_virtual (FH_PROC)
-{
-}
-
-fhandler_proc::fhandler_proc (DWORD devtype):
-  fhandler_virtual (devtype)
+  fhandler_virtual ()
 {
 }
 
 int
-fhandler_proc::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_proc::fstat (struct __stat64 *buf)
 {
   const char *path = get_name ();
   debug_printf ("fstat (%s)", path);
 
   path += proc_len;
-  (void) fhandler_base::fstat (buf, pc);
+  (void) fhandler_base::fstat (buf);
 
   buf->st_mode &= ~_IFMT & NO_W;
 
@@ -216,11 +211,11 @@ fhandler_proc::readdir (DIR * dir)
 }
 
 int
-fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
+fhandler_proc::open (int flags, mode_t mode)
 {
   int proc_file_no = -1;
 
-  int res = fhandler_virtual::open (pc, flags, mode);
+  int res = fhandler_virtual::open (flags, mode);
   if (!res)
     goto out;
 

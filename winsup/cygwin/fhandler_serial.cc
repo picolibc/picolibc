@@ -13,6 +13,7 @@ details. */
 #include <stdlib.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -22,8 +23,8 @@ details. */
 /**********************************************************************/
 /* fhandler_serial */
 
-fhandler_serial::fhandler_serial (int unit)
-  : fhandler_base (FH_SERIAL, unit), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
+fhandler_serial::fhandler_serial ()
+  : fhandler_base (), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
 {
   set_need_fork_fixup ();
 }
@@ -200,11 +201,11 @@ fhandler_serial::dump (void)
 void
 fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 {
-  (void) open (NULL, flags, bin & (O_BINARY | O_TEXT));
+  (void) open (flags, bin & (O_BINARY | O_TEXT));
 }
 
 int
-fhandler_serial::open (path_conv *, int flags, mode_t mode)
+fhandler_serial::open (int flags, mode_t mode)
 {
   int res;
   COMMTIMEOUTS to;
@@ -213,7 +214,7 @@ fhandler_serial::open (path_conv *, int flags, mode_t mode)
   syscall_printf ("fhandler_serial::open (%s, %p, %p)",
 			get_name (), flags, mode);
 
-  if (!fhandler_base::open (NULL, flags, mode))
+  if (!fhandler_base::open (flags, mode))
     return 0;
 
   res = 1;

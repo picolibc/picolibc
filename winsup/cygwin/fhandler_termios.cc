@@ -15,6 +15,7 @@ details. */
 #include <ctype.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 #include "sigproc.h"
 #include "pinfo.h"

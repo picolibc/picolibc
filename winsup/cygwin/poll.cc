@@ -19,8 +19,8 @@
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
 #include "cygheap.h"

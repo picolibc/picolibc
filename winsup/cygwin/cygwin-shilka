@@ -1,0 +1,6 @@
+#!/bin/sh -x
+c="$(basename $1 .shilka).c"
+shilka -strip -no-definitions $1 && \
+sed -e '1,4d' -e '/KR_reset.*;/d' -e '/KR_output_statistics.*;/d' \
+    -e '/KR_reset.*)/,/}/d' -e '/KR_output_statistics.*)/,/}/d' "$c" > $2 &&
+rm -f "$c"

@@ -13,15 +13,16 @@ details. */
 #include "winsup.h"
 #include <errno.h>
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 
 fhandler_dev_zero::fhandler_dev_zero ()
-  : fhandler_base (FH_ZERO)
+  : fhandler_base ()
 {
 }
 
 int
-fhandler_dev_zero::open (path_conv *, int flags, mode_t)
+fhandler_dev_zero::open (int flags, mode_t)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_nohandle (true);

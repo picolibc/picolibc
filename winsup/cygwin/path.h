@@ -8,6 +8,19 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "devices.h"
+
+#include <sys/ioctl.h>
+#include <fcntl.h>
+
+enum executable_states
+{
+  is_executable,
+  dont_care_if_executable,
+  not_executable = dont_care_if_executable,
+  dont_know_if_executable
+};
+
 struct suffix_info
 {
   const char *name;
@@ -60,13 +73,20 @@ enum path_types
 class symlink_info;
 struct fs_info
 {
-  char name[MAX_PATH];
-  char root_dir[MAX_PATH];
-  DWORD flags;
-  DWORD serial;
-  DWORD sym_opt; /* additional options to pass to symlink_info resolver */
-  DWORD is_remote_drive;
-  DWORD drive_type;
+  char name_storage[MAX_PATH];
+  char root_dir_storage[MAX_PATH];
+  DWORD flags_storage;
+  DWORD serial_storage;
+  DWORD sym_opt_storage; /* additional options to pass to symlink_info resolver */
+  bool is_remote_drive_storage;
+  DWORD drive_type_storage;
+  inline char* name () const {return (char *) name_storage;}
+  inline char* root_dir () const {return (char *) root_dir_storage;}
+  inline DWORD& flags () {return flags_storage;};
+  inline DWORD& serial () {return serial_storage;};
+  inline DWORD& sym_opt () {return sym_opt_storage;};
+  inline bool& is_remote_drive () {return is_remote_drive_storage;};
+  inline DWORD& drive_type () {return drive_type_storage;};
   bool update (const char *);
 };
 
@@ -80,12 +100,11 @@ class path_conv
   unsigned path_flags;
   char *known_suffix;
   int error;
-  DWORD devn;
-  int unit;
+  device dev;
   BOOL case_clash;
 
   int isdisk () const { return path_flags & PATH_ISDISK;}
-  int isremote () const {return fs.is_remote_drive;}
+  bool& isremote () {return fs.is_remote_drive ();}
   int has_acls () const {return path_flags & PATH_HASACLS;}
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int hasgood_inode () const {return path_flags & PATH_HASACLS;}  // Not strictly correct
@@ -101,6 +120,11 @@ class path_conv
   }
   int issymlink () const {return path_flags & PATH_SYMLINK;}
   int is_lnk_symlink () const {return path_flags & PATH_LNK;}
+  int isdevice () const {return dev.devn && dev.devn != FH_FS && dev.devn != FH_FIFO;}
+  int isfifo () const {return dev == FH_FIFO;}
+  int isspecial () const {return dev.devn && dev.devn != FH_FS;}
+  int is_auto_device () const {return isdevice ()  && !is_fs_special ();}
+  int is_fs_special () const {return isspecial () && dev.isfs ();}
   int issocket () const {return path_flags & PATH_SOCKET;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
   bool exists () const {return fileattr != INVALID_FILE_ATTRIBUTES;}
@@ -121,13 +145,16 @@ class path_conv
   void set_binary () {path_flags |= PATH_BINARY;}
   void set_symlink () {path_flags |= PATH_SYMLINK;}
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
-  void set_isdisk () {path_flags |= PATH_ISDISK; devn = FH_DISK;}
+  void set_isdisk () {path_flags |= PATH_ISDISK; dev.devn = FH_FS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
   void set_has_acls (int x = 1) {path_flags |= x ? PATH_HASACLS : PATH_NOTHING;}
   void set_has_buggy_open (int x = 1) {path_flags |= x ? PATH_HASBUGGYOPEN : PATH_NOTHING;}
 
   void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL)  __attribute__ ((regparm(3)));
+
+  path_conv (const device& in_dev): fileattr (INVALID_FILE_ATTRIBUTES),
+     path_flags (0), known_suffix (NULL), error (0), dev (in_dev) {}
 
   path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
@@ -142,8 +169,8 @@ class path_conv
   }
 
   path_conv (): fileattr (INVALID_FILE_ATTRIBUTES), path_flags (0),
-  		known_suffix (NULL), error (0), devn (0), unit (0),
-		normalized_path (NULL) {path[0] = '\0';}
+  		known_suffix (NULL), error (0), normalized_path (NULL)
+    {path[0] = '\0';}
 
   inline char *get_win32 () { return path; }
   operator char *() {return path;}
@@ -151,21 +178,26 @@ class path_conv
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
   char operator [](int i) const {return path[i];}
-  BOOL is_device () {return devn != FH_BAD && devn != FH_DISK;}
-  DWORD get_devn () {return devn == FH_BAD ? (DWORD) FH_DISK : devn;}
-  short get_unitn () {return devn == FH_BAD ? 0 : unit;}
+  DWORD get_devn () {return dev.devn;}
+  short get_unitn () {return dev.minor;}
   DWORD file_attributes () {return fileattr;}
-  DWORD drive_type () {return fs.drive_type;}
-  DWORD fs_flags () {return fs.flags;}
-  BOOL fs_fast_ea () {return fs.sym_opt & PC_CHECK_EA;}
+  DWORD drive_type () {return fs.drive_type ();}
+  DWORD fs_flags () {return fs.flags ();}
+  BOOL fs_fast_ea () {return fs.sym_opt () & PC_CHECK_EA;}
   void set_path (const char *p) {strcpy (path, p);}
-  char *return_and_clear_normalized_path ();
-  const char * root_dir () { return fs.root_dir; }
-  DWORD volser () { return fs.serial; }
-  const char *volname () {return fs.name; }
+  const char * root_dir () const { return fs.root_dir (); }
+  DWORD volser () { return fs.serial (); }
+  const char *volname () {return fs.name (); }
   void fillin (HANDLE h);
+  inline size_t size ()
+  {
+    return (sizeof (*this) - sizeof (path)) + strlen (path) + 1 + normalized_path_size;
+  }
+
   unsigned __stdcall ndisk_links (DWORD);
   char *normalized_path;
+  size_t normalized_path_size;
+  void set_normalized_path (const char *) __attribute__ ((regparm (2)));
  private:
   char path[MAX_PATH];
 };
@@ -222,6 +254,7 @@ int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__
 #define MAX_ETC_FILES 2
 class etc
 {
+  friend class dtable;
   static int curr_ix;
   static bool change_possible[MAX_ETC_FILES + 1];
   static const char *fn[MAX_ETC_FILES + 1];

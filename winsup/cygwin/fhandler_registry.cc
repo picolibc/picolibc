@@ -16,8 +16,8 @@ details. */
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include <assert.h>
@@ -187,14 +187,14 @@ out:
 }
 
 fhandler_registry::fhandler_registry ():
-fhandler_proc (FH_REGISTRY)
+fhandler_proc ()
 {
 }
 
 int
-fhandler_registry::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_registry::fstat (struct __stat64 *buf)
 {
-  fhandler_base::fstat (buf, pc);
+  fhandler_base::fstat (buf);
   buf->st_mode &= ~_IFMT & NO_W;
   int file_type = exists ();
   switch (file_type)
@@ -396,13 +396,13 @@ fhandler_registry::closedir (DIR * dir)
 }
 
 int
-fhandler_registry::open (path_conv * pc, int flags, mode_t mode)
+fhandler_registry::open (int flags, mode_t mode)
 {
   int pathlen;
   const char *file;
   HKEY handle;
 
-  int res = fhandler_virtual::open (pc, flags, mode);
+  int res = fhandler_virtual::open (flags, mode);
   if (!res)
     goto out;
 

@@ -101,7 +101,7 @@ typedef __ino32_t ino_t;
 
 #ifndef __key_t_defined
 #define __key_t_defined
-typedef long long key_t;
+typedef long key_t;
 #endif /* __key_t_defined */
 
 #ifndef __BIT_TYPES_DEFINED

@@ -17,8 +17,8 @@ details. */
 #include <stdlib.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "pinfo.h"
 #include "hires.h"
 

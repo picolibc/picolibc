@@ -14,8 +14,8 @@ details. */
 #include <stdlib.h>
 #include <stdarg.h>
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
 #include "sigproc.h"

@@ -44,10 +44,11 @@ class mount_item
 
 #define MOUNT_VERSION	27	// increment when mount table changes and
 #define MOUNT_VERSION_MAGIC CYGWIN_VERSION_MAGIC (MOUNT_MAGIC, MOUNT_VERSION)
-#define CURR_MOUNT_MAGIC 0x4fe431cdU
+#define CURR_MOUNT_MAGIC 0x6dd73a3fU
 #define MOUNT_INFO_CB 16488
 
 class reg_key;
+struct device;
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -86,8 +87,8 @@ class mount_info
   int del_reg_mount (const char * posix_path, unsigned mountflags);
 
   unsigned set_flags_from_win32_path (const char *path);
-  int conv_to_win32_path (const char *src_path, char *dst, DWORD &devn,
-			  int &unit, unsigned *flags = NULL, bool no_normalize = 0);
+  int conv_to_win32_path (const char *src_path, char *dst, device&,
+			  unsigned *flags = NULL, bool no_normalize = 0);
   int conv_to_posix_path (const char *src_path, char *posix_path,
 			  int keep_rel_p);
   struct mntent *getmntent (int x);

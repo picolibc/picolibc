@@ -25,8 +25,8 @@
 #include "security.h"
 #include "cygwin/version.h"
 #include "perprocess.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
@@ -35,9 +35,7 @@
 #include "select.h"
 #include <unistd.h>
 
-#define ENTROPY_SOURCE_DEV_UNIT 9
-
-extern fhandler_socket *fdsock (int& fd, const char *name, SOCKET soc);
+extern bool fdsock (cygheap_fdmanip& fd, const device *, SOCKET soc);
 extern "C" {
 int sscanf (const char *, const char *, ...);
 } /* End of "C" section */
@@ -123,12 +121,20 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 /**********************************************************************/
 /* fhandler_socket */
 
-fhandler_socket::fhandler_socket (int nunit)
-  : fhandler_base (FH_SOCKET), sun_path (NULL), unit (nunit)
+fhandler_socket::fhandler_socket ()
+  : fhandler_base (), sun_path (NULL)
 {
   set_need_fork_fixup ();
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
 						 sizeof (WSAPROTOCOL_INFOA));
+#if 0
+  if (pc.is_fs_special ())
+    {
+      fhandler_socket * fhs = (fhandler_socket *) fh;
+      fhs->set_addr_family (AF_LOCAL);
+      fhs->set_sun_path (posix_path);
+    }
+#endif
 }
 
 fhandler_socket::~fhandler_socket ()
@@ -145,10 +151,11 @@ fhandler_socket::set_connect_secret ()
   if (!entropy_source)
     {
       void *buf = malloc (sizeof (fhandler_dev_random));
-      entropy_source = new (buf) fhandler_dev_random (ENTROPY_SOURCE_DEV_UNIT);
+      entropy_source = new (buf) fhandler_dev_random ();
+      entropy_source->dev () = *urandom_dev;
     }
   if (entropy_source &&
-      !entropy_source->open (NULL, O_RDONLY))
+      !entropy_source->open (O_RDONLY))
     {
       delete entropy_source;
       entropy_source = NULL;
@@ -361,25 +368,9 @@ fhandler_socket::dup (fhandler_base *child)
 }
 
 int __stdcall
-fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_socket::fstat (struct __stat64 *buf)
 {
-  int res;
-  if (get_addr_family () == AF_LOCAL && get_sun_path () && !get_socket_type ())
-    {
-      path_conv spc (get_sun_path (), PC_SYM_NOFOLLOW | PC_NULLEMPTY | PC_FULL,
-		     NULL);
-      fhandler_base *fh = cygheap->fdtab.build_fhandler (-1, FH_DISK,
-							 get_sun_path (),
-							 spc, 0);
-      if (fh)
-	{
-	  res = fh->fstat (buf, &spc);
-	  buf->st_rdev = buf->st_size = buf->st_blocks = 0;
-	  return res;
-	}
-    }
-
-  res = fhandler_base::fstat (buf, pc);
+  int res = fhandler_base::fstat (buf);
   if (!res)
     {
       if (get_socket_type ()) /* fstat */
@@ -639,16 +630,13 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   else
     {
       cygheap_fdnew res_fd;
-      fhandler_socket* res_fh = NULL;
-      if (res_fd >= 0)
-	  res_fh = fdsock (res_fd, get_name (), res);
-      if (res_fh)
-	{
+      if (res_fd >= 0 && fdsock (res_fd, &dev (), res))
+        {
 	  if (get_addr_family () == AF_LOCAL)
-	    res_fh->set_sun_path (get_sun_path ());
-	  res_fh->set_addr_family (get_addr_family ());
-	  res_fh->set_socket_type (get_socket_type ());
-	  res_fh->set_connect_state (CONNECTED);
+	    ((fhandler_socket *) res_fd)->set_sun_path (get_sun_path ());
+	  ((fhandler_socket *) res_fd)->set_addr_family (get_addr_family ());
+	  ((fhandler_socket *) res_fd)->set_socket_type (get_socket_type ());
+	  ((fhandler_socket *) res_fd)->set_connect_state (CONNECTED);
 	  res = res_fd;
 	}
       else
@@ -658,6 +646,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	}
     }
 
+  debug_printf ("res %d", res);
   return res;
 }
 

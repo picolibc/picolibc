@@ -14,8 +14,8 @@ details. */
 #include <stddef.h>
 #include <sys/mman.h>
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
 #include "cygheap.h"
@@ -56,31 +56,31 @@ class mmap_record
   private:
     int fdesc_;
     HANDLE mapping_handle_;
-    int devtype_;
     DWORD access_mode_;
     _off64_t offset_;
     DWORD size_to_map_;
     caddr_t base_address_;
     DWORD *page_map_;
+    device dev;
 
   public:
     mmap_record (int fd, HANDLE h, DWORD ac, _off64_t o, DWORD s, caddr_t b) :
        fdesc_ (fd),
        mapping_handle_ (h),
-       devtype_ (0),
        access_mode_ (ac),
        offset_ (o),
        size_to_map_ (s),
        base_address_ (b),
        page_map_ (NULL)
       {
+	dev.devn = 0;
 	if (fd >= 0 && !cygheap->fdtab.not_open (fd))
-	  devtype_ = cygheap->fdtab[fd]->get_device ();
+	  dev = cygheap->fdtab[fd]->dev ();
       }
 
     int get_fd () const { return fdesc_; }
     HANDLE get_handle () const { return mapping_handle_; }
-    DWORD get_device () const { return devtype_; }
+    device& get_device () { return dev; }
     DWORD get_access () const { return access_mode_; }
     DWORD get_offset () const { return offset_; }
     DWORD get_size () const { return size_to_map_; }
@@ -295,12 +295,13 @@ mmap_record::alloc_fh ()
       return &fh_paging_file;
     }
 
+  static path_conv pc; // should be thread safe - CGF
   /* The file descriptor could have been closed or, even
      worse, could have been reused for another file before
      the call to fork(). This requires creating a fhandler
      of the correct type to be sure to call the method of the
      correct class. */
-  return cygheap->fdtab.build_fhandler (-1, get_device ());
+  return build_fh_dev (get_device ());
 }
 
 void
@@ -509,7 +510,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  return MAP_FAILED;
 	}
       fh = cfd;
-      if (fh->get_device () == FH_DISK)
+      if (fh->get_device () == FH_FS)
 	{
 	  DWORD high;
 	  DWORD low = GetFileSize (fh->get_handle (), &high);

@@ -1,3 +1,218 @@
+2003-09-24  Christopher Faylor  <cgf@redhat.com>
+
+	* devices.cc: New file.
+	* devices.gperf: New file.
+	* devices.shilka: New file.
+	* cygwin-gperf: New file.
+	* cygwin-shilka: New file.
+	* fhandler_fifo.cc: New file.
+	* fhandler_nodevice.cc : New file.
+
+2003-09-24  Christopher Faylor  <cgf@redhat.com>
+
+	Reorganize headers so that path.h precedes fhandler.h throughout.
+	Remove device argument and unit arguments from fhandler constructors
+	throughout.  Remove pc arguments to fhandler functions and use internal
+	pc element instead, throughout.  Use dev element in pc throughout.  Use
+	major/minor elements rather than units and device numbers previously in
+	fhandler class.  Use correct methods for fhandler file names rather
+	than directly accessing file name variables, throughout.
+	* Makefile.in (DLL_OFILES): Add devices.o, fhandler_fifo.o
+	* dcrt0.cc (dll_crt0_1): Call device::init.
+	* devices.h: Renumber devices based on more Linux-like major/minor
+	numbers.  Add more devices.  Declare standard device storage.
+	(device): Declare struct.
+	* dir.cc (opendir): Use new 'build_fh_name' to construct a fhandler_*
+	type.
+	* dtable.cc (dtable::get_debugger_info): Ditto.
+	(cygwin_attach_handle_to_fd): Ditto.
+	(dtable::release): Remove special FH_SOCKET case in favor of generic
+	"need_fixup_before" test.
+	(dtable::init_std_file_from_handle): Use either build_fh_dev or
+	build_fh_name to build standard fhandler.
+	(dtable::build_fh_name): Renamed from dtable::build_fhandler_from_name.
+	Move out of dtable class.  Don't accept a path_conv argument.  Just
+	build it here and pass it to:
+	(build_fh_pc): Renamed from dtable::build_fhandler.  Move out of dtable
+	class.  Use intrinsic device type in path_conv to create new fhandler.
+	(build_fh_dev): Renamed from dtable::build_fhandler.  Move out of
+	dtable class.  Simplify arguments to just take new 'device' type and a
+	name.  Just return pointer to fhandler rather than trying to insert
+	into dtable.
+	(dtable::dup_worker): Accommodate above build_fh name changes.
+	(dtable::find_fifo): New (currently broken) function.
+	(handle_to_fn): Use strechr for efficiency.
+	* dtable.h: Reflect above build_fh name changes and argument
+	differences.
+	(fhandler_base *&operator []): Return self rather than copy of self.
+	* fhandler.cc (fhandler_base::operator =): Use pc element to set
+	normalized path.
+	(fhandler_base::set_name): Ditto.
+	(fhandler_base::raw_read): Use method to access name.
+	(fhandler_base::write): Correctly use get_output_handle rather than
+	get_handle.
+	(handler_base::device_access_denied): New function.
+	(fhandler_base::open): Eliminate pc argument and use pc element of
+	fhandler_base throughout.
+	(fhandler_base::fstat): Detect if device is based in filesystem and use
+	fstat_fs to calculate stat, if so.
+	(fhandler_base::fhandler_base): Eliminate handling of file names and,
+	instead, just free appropriate component from pc.
+	(fhandler_base::opendir): Remove path_conv parameter.
+	* fhandler.h: Remove all device flags.
+	(fhandler_base::pc): New element.
+	(fhandler_base::set_name): Change argument to path_conv.
+	(fhandler_base::error): New function.
+	(fhandler_base::exists): New function.
+	(fhandler_base::pc_binmode): New function.
+	(fhandler_base::dev): New function.
+	(fhandler_base::open_fs): New function.
+	(fhandler_base::fstat_fs): New function.
+	(fhandler_base::fstat_by_name): New function.
+	(fhandler_base::fstat_by_handle): New function.
+	(fhandler_base::isfifo): New function.
+	(fhandler_base::is_slow): New function.
+	(fhandler_base::is_auto_device): New function.
+	(fhandler_base::is_fs_special): New function.
+	(fhandler_base::device_access_denied): New function.
+	(fhandler_base::operator DWORD&): New operator.
+	(fhandler_base::get_name): Return normalized path from pc.
+	(fhandler_base::get_win32_name): Return windows path from pc.
+	(fhandler_base::isdevice): Renamed from is_device.
+	(fhandler_base::get_native_name): Return device format.
+	(fhandler_fifo): New class.
+	(fhandler_nodevice): New class.
+	(select_stuff::device_specific): Remove array.
+	(select_stuff::device_specific_pipe): New class element.
+	(select_stuff::device_specific_socket): New class element.
+	(select_stuff::device_specific_serial): New class element.
+	(select_stuff::select_stuff): Initialize new elements.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Move to base
+	class from fhandler_disk_file.
+	(fhandler_base::fstat_by_name): Ditto.
+	(fhandler_base::fstat_by_name): Ditto.
+	(fhandler_disk_file::open): Move most functionality into
+	fhandler_base::open_fs.
+	(fhandler_base::open_fs): New function.
+	(fhandler_disk_file::close): Move most functionality into
+	fhandler_base::close_fs.
+	(fhandler_base::close_fs): New function.
+	* fhandler_mem.cc (fhandler_dev_mem::open): Use device name in
+	debugging output.
+	* fhandler_socket.cc (fhandler_socket::set_connect_secret): Copy
+	standard urandom device into appropriate place.
+	(fhandler_socket::accept): Reflect change in fdsock return value.
+	* fhandler_tty.cc: See "throughouts" above.
+	* net.cc: Accommodate fdsock change throughout.
+	(fdsock): Return success or failure, accept fd argument and device
+	argument.
+	* path.cc (symlink_info::major): New element.
+	(symlink_info::minor): New element.
+	(symlink_info::parse_device): Declare new function.
+	(fs_info::update): Accommodate changes in path_conv class.
+	(path_conv::fillin): Ditto.
+	(path_conv::return_and_clear_normalized_path): Eliminate.
+	(path_conv::set_normalized_path): New function.
+	(path_conv::path_conv): Set info in dev element.  Use path_conv methods
+	Check for FH_FS rather than FH_BAD to indicate when to fill in
+	filesystem stuff.  where appropriate rather than direct access.  Use
+	set_normalized_path to set normalized path.
+	(windows_device_names): Eliminate.
+	(get_dev): Ditto.
+	(get_raw_device_number): Ditto.
+	(get_device_number): Ditto.
+	(win32_device_name): Call new device name parser to do most of the
+	heavy lifting.
+	(mount_info::conv_to_win32_path): Fill in dev field as appropriate.
+	(symlink_worker): Handle new device files.
+	(symlink_info::check): Ditto.
+	(symlink_info::parse_device): Define new function.
+	* path.h (executable_states): Move here from fhandler.h.
+	(fs_info): Rename variables to *_storage and create methods for
+	accessing same.
+	(path_conv): Add dev element, remove devn and unit and adjust inline
+	methods to accommodate.
+	(set_normalized_path): Declare new function.
+	* pinfo.cc (_pinfo::commune_recv): Add broken support for handling
+	fifos.
+	(_pinfo::commune_send): Ditto.
+	* pipe.cc (fhandler_pipe::close): check for existence of handle before
+	closing it.
+	(handler_pipe::create): Rename from make_pipe.  Change arguments to
+	accept fhandler_pipe array.  Accommodate fifos.
+	(pipe): Rework to deal with fhandler_pipe::create changes.
+	(_pipe): Ditto.
+	* select.cc: Use individual device_specific types throughout rather
+	than indexing with obsolete device number.
+	(set_bits): Use is_socket call rather than checking device number.
+	* shared_info.h (CURR_MOUNT_MAGIC): Update.
+	(conv_to_win32_path): Reflect addition of device argument.
+	* syscalls.cc (mknod_worker): New function.
+	(open): Use build_fh_name to build fhandler.
+	(chown_worker): Detect if this is an 'auto' device rather than an
+	on-filesystem device and handle appropriately.
+	(chmod_device): New function.
+	(chmod): Detect if this is an 'auto' device rather than an
+	on-filesystem device and handle appropriately.  Use chmod_device to set
+	mode of in-filesystem devices.
+	(stat_worker): Eliminate path_conv argument.  Call build_fh_name to
+	construct fhandler.  Use fh->error() rather than pc->error to detect
+	errors in fhandler construction.
+	(access_worker): New function pulled from access.  Accommodate
+	in-filesystem devices.
+	(access): Use access_worker.
+	(fpathconf): Detect if this is an 'auto' device rather than an
+	on-filesystem device and handle appropriately.
+	(mknod_worker): New function.
+	(mknod32): New function.
+	(chroot): Free normalized path -- assuming it was actually cmalloced.
+	* tty.cc (create_tty_master): Tweak for new device class.
+	(tty::common_init): Ditto.
+	* winsup.h (stat_worker): Remove.
+	(symlink_worker): Declare.
+
+	* exceptions.cc (set_process_mask): Just call sig_dispatch_pending and
+	don't worry about pending_signals since sig_dispatch_pending should
+	always do the right thing now.
+	(sig_handle): Reorganize SIGCONT handling to more closely conform to
+	SUSv3.
+	* pinfo.h: Move __SIG enum to sigproc.h.
+	(PICOM_FIFO): New enum element.
+	(_pinfo): Remove 'thread2signal' stuff throughout class.
+	(_pinfo::commune_send): Make varargs.
+	(_pinfo::sigtodo): Eliminate.
+	(_pinfo::thread2signal): Ditto.
+	* signal.cc (kill_worker): Eliminate call to setthread2signal.
+	* sigproc.cc (local_sigtodo): Eliminate.
+	(getlocal_sigtodo): Ditto.
+	(sigelem): New class.
+	(pending_signals): New class.
+	(sigqueue): New variable, start of sigqueue linked list.
+	(sigcatch_nonmain): Eliminate.
+	(sigcatch_main): Eliminate.
+	(sigcatch_nosync): Eliminate.
+	(sigcomplete_nonmain): Eliminate.
+	(pending_signals): Eliminate.
+	(sig_clear): Call signal thread to clear pending signals, unless
+	already in signal thread.
+	(sigpending): Call signal thread to get pending signals.
+	(sig_dispatch_pending): Eliminate use of pending_signals and just check
+	sigqueue.
+	(sigproc_terminate): Eliminate all of the obsolete semaphore stuff.
+	Close signal pipe handle.
+	(sig_send): Eliminate all of the obsolete semaphore stuff and use pipe
+	to send signals.
+	(getevent): Eliminate.
+	(pending_signals::add): New function.
+	(pending_signals::del): New function.
+	(pending_signals::next): New function.
+	(wait_sig): Eliminate all of the obsolete semaphore stuff.  Use pipe to
+	communicate and maintain a linked list of signals.
+	* sigproc.h: Move __SIG defines here.  Add __SIGPENDING.
+	(sig_dispatch_pending): Remove "C" specifier.
+	(sig_handle): Accept a mask argument.
+	* thread.cc: Remove signal handling considerations throughout.
+
 2003-09-22  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (do_exit): Eliminate "C" linkage.  Call events_terminate
@@ -37,7 +252,7 @@
 
 2003-09-18  Corinna Vinschen  <corinna@vinschen.de>
 
-	* fhandler_tty.cc (fhandler_pty_master::process_slave_output):  
+	* fhandler_tty.cc (fhandler_pty_master::process_slave_output):
 	Handle buf == NULL as flushing the buffer.
 	(fhandler_tty_slave::read): Handle ptr == NULL as flushing the buffer.
 	(fhandler_tty_slave::tcflush): Implement input queue flushing by
@@ -97,18 +312,18 @@
 
 	* security.h (__sec_user): Add "access2" argument.
 	(sec_acl): Add "original" and "access2" arguments.
-	(sec_user): Add "sid2" and "access2" argument. Remove dependence on 
+	(sec_user): Add "sid2" and "access2" argument. Remove dependence on
 	allow_ntsec.
 	(sec_user_nih): Ditto.
 	* sec_helper.cc (__sec_user): Add "has_security" test.
 	Call sec_acl with new arguments, letting it handle original_sid.
-	(sec_acl): Add "original" and "access2" arguments. Handle original_sid 
+	(sec_acl): Add "original" and "access2" arguments. Handle original_sid
 	depending on flag but avoiding duplicates. Use "access2" for sid2.
 	* pinfo.cc (pinfo::init): Use security attributes created by sec_user
 	when creating the mapping.
 	* security.cc (create_token): Adjust arguments in call to sec_acl.
 	Call sec_user instead of __sec_user.
-	* syscall.cc (seteuid32):  Adjust arguments in call to sec_acl. Remove 
+	* syscall.cc (seteuid32):  Adjust arguments in call to sec_acl. Remove
 	now unnecessary test. Remove useless conversions to psid.
 	* dcrt0.cc (dll_crt0_1): Call cygsid::init before pinfo_init.
 
@@ -290,11 +505,11 @@
 	* security.h: Add _SECURITY_H guard.
 	(sec_user): Use sec_none in the no ntsec case.
 	* spawn.cc (spawn_guts): Remove call to load_registry_hive.
-	* syscalls (seteuid32): If warranted, call load_registry_hive,  
+	* syscalls (seteuid32): If warranted, call load_registry_hive,
 	user_shared_initialize and RegCloseKey(HKEY_CURRENT_USER).
 	* shared.cc (user_shared_initialize): New.
 	(open_shared): Add and use psa argument.
-	(memory_init): Move mount table initialization to 
+	(memory_init): Move mount table initialization to
 	user_shared_initialize. Call it.
 
 2003-09-09  Corinna Vinschen  <corinna@vinschen.de>

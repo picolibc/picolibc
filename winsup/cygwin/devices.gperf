@@ -11,6 +11,8 @@
 #undef __GNUC__
 static unsigned int devhash (const char *, unsigned)
   __attribute__ ((regparm (2)));
+#define bad_dev (&dev_bad_storage)
+
 %}
 struct device;
 %%

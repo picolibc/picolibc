@@ -270,9 +270,9 @@ extern "C" int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__
 extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
 extern void multiple_cygwin_problem (const char *, unsigned, unsigned);
 
-class path_conv;
-int __stdcall stat_worker (const char *name, struct __stat64 *buf, int nofollow,
-			   path_conv *pc = NULL) __attribute__ ((regparm (3)));
+int symlink_worker (const char *, const char *, bool, bool)
+  __attribute__ ((regparm (3)));
+
 int __stdcall low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
 #define SLEEP_0_STAY_LOW INFINITE
 
