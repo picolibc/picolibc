@@ -122,11 +122,11 @@ _DEFUN (_tzset_r, (reent_ptr),
 
   tzenv += n;
 
-  if (*tzenv == ',')
-    ++tzenv;
-
   for (i = 0; i < 2; ++i)
     {
+      if (*tzenv == ',')
+        ++tzenv;
+
       if (*tzenv == 'M')
 	{
 	  if (sscanf (tzenv, "M%hu%n.%hu%n.%hu%n", &m, &n, &w, &n, &d, &n) != 3 ||
@@ -187,11 +187,14 @@ _DEFUN (_tzset_r, (reent_ptr),
       hh = 2;
       mm = 0;
       ss = 0;
+      n = 0;
       
       if (*tzenv == '/')
 	sscanf (tzenv, "%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n);
 
       __tzrule[i].s = ss + SECSPERMIN * mm + SECSPERHOUR  * hh;
+      
+      tzenv += n;
     }
 
   __tzcalc_limits (__tzyear);

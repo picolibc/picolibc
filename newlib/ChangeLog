@@ -1,5 +1,9 @@
 2004-12-08  Alex Mogilnikov  <alx@intellectronika.ru>
 
+	* libc/time/tzset_r (_tzset_r): Fix loop.
+
+2004-12-08  Alex Mogilnikov  <alx@intellectronika.ru>
+
 	* libc/time/mktm_r (_mktm_r): Fix overflow calculation for
 	m_day.
 	(__tzcalc_limits): Fix reference to month array to be zero-based.
