@@ -93,7 +93,7 @@ include $(srcdir)/../../Makefile.shared
 # libtool moves vfprintf.o and subsequently can't find it.
 
 vfprintf.$(oext): vfprintf.c
-	$(LIB_COMPILE) -c $(srcdir)/vfprintf.c
+	$(LIB_COMPILE) $(INCLUDES) -c $(srcdir)/vfprintf.c
 
 vfiprintf.$(oext): vfprintf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@

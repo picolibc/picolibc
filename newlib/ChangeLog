@@ -1,3 +1,8 @@
+2001-12-14  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/stdio/Makefile.am (vfprintf.$(oext)): Add $(INCLUDES) to
+	compile line.
+
 2001-12-13  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* Makefile.shared: New file.
