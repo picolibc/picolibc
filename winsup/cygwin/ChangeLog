@@ -1,3 +1,9 @@
+2001-09-04  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+        * fhandler_console.cc (fhandler_console::char_command): Save the cursor
+	position relative to the top of the window.
+	* fhandler_cc (fhandler_console::write): Ditto.
+
 Mon Sep  3 21:06:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* dir.cc (opendir): Write version information to __d_dirent->d_version.

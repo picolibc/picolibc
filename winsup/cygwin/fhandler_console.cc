@@ -1306,9 +1306,10 @@ fhandler_console::char_command (char c)
       break;
     case 's':   /* Save cursor position */
       cursor_get (&savex, &savey);
+      savey -= info.winTop;
       break;
     case 'u':   /* Restore cursor position */
-      cursor_set (FALSE, savex, savey);
+      cursor_set (TRUE, savex, savey);
       break;
     case 'I':	/* TAB */
       cursor_get (&x, &y);
@@ -1543,12 +1544,13 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    }
 	  else if (*src == '8')		/* Restore cursor position */
 	    {
-	      cursor_set (FALSE, savex, savey);
+	      cursor_set (TRUE, savex, savey);
 	      state_ = normal;
 	    }
 	  else if (*src == '7')		/* Save cursor position */
 	    {
 	      cursor_get (&savex, &savey);
+	      savey -= info.winTop;
 	      state_ = normal;
 	    }
 	  else if (*src == 'R')
