@@ -1,3 +1,9 @@
+2004-03-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/GL/glu.h (GLU_AUTO_LOAD_MATRIX, GLU_CULLING,
+	GLU_SAMPLING_TOLERANCE, GLU_DISPLAY_MODE, GLU_PARAMETRIC_TOLERANCE,
+	GLU_SAMPLING_METHOD, GLU_U_STEP, GLU_V_STEP): Define.
+
 2004-03-24  Filip Navara  <xnavara@volny.cz>
 
 	* include/commctrl.h (TB_GETSTRING[AW]): Add defines.
@@ -121,12 +127,12 @@
 
 2004-02-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/Gl/glu.h (GLU_ERROR): Define.
+	* include/GL/glu.h (GLU_ERROR): Define.
 	Thanks to Philip Lamb  <phil at rave dot co dot nz> 
 
 2004-02-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/Gl/glu.h: Include <stddef.h>.
+	* include/GL/glu.h: Include <stddef.h>.
 	Thanks to Greg Couch <gregcouch@users.sourceforge.net>
 
 2004-02-13  Earnie Boyd  <earnie@users.sourceforge.net>
