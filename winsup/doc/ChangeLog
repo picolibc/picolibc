@@ -1,3 +1,7 @@
+Wed Jun 13 13:54:35 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* who.texinfo: Oops.  Add a couple of important folk.
+
 Wed Jun 13 13:45:44 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* who.texinfo: Remove email addresses.  Modernize.

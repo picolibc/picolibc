@@ -32,6 +32,11 @@ as well as generic fixes to cygwin itself.
 
 Kazuhiro Fujieda has contributed many bug fixes and bug reports.
 
+Earnie Boyd has contributed many bug fixes and is the mingw and w32api
+maintainer.
+
+David Starks-Browning is our dedicated FAQ maintainer.
+
 Geoffrey Noer took over the Cygwin project from its initial author Steve
 Chamberlain in mid-1996.  As maintainer, he produced Net releases beta
 16 through 20; made the development snapshots; worked with Net

@@ -39,6 +39,7 @@ all : \
 	cygwin-ug/cygwin-ug.html \
 	cygwin-ug-net/cygwin-ug-net.html \
 	cygwin-api-int/cygwin-api-int.html \
+	cygwin-api/cygwin-api.html \
 	$(DOC) \
 	$(HTMLDOC)
 
