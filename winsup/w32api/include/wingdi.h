@@ -1363,9 +1363,9 @@ typedef struct tagDIBSECTION {
 } DIBSECTION;
 typedef struct _DOCINFOA {
 	int cbSize;
-	LPCTSTR lpszDocName;
-	LPCTSTR lpszOutput;
-	LPCTSTR lpszDatatype;
+	LPCSTR lpszDocName;
+	LPCSTR lpszOutput;
+	LPCSTR lpszDatatype;
 	DWORD fwType;
 } DOCINFOA,*LPDOCINFOA;
 typedef struct _DOCINFOW {

@@ -1,5 +1,9 @@
 2002-12-26  Dimitri Papadopoulos  <dimitri_at@sourceforge.users.net>
 
+	* include/wingdi.h (DOCINFOA): Replace LPCTSTR with LPCSTR.
+
+2002-12-26  Dimitri Papadopoulos  <dimitri_at@sourceforge.users.net>
+
 	* include/wingdi.h (BALTIC_CHARSET, JOHAB_CHARSET,
 	VIETNAMESE_CHARSET): Remove duplicate defines. 
 	* lib/comctl32.def (ImageList_SetImageCount): Add stub.
