@@ -1,3 +1,7 @@
+2004-04-11  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* cygheap.h (CYGHEAP_SLOP): Reduce drastically to avoid collisions.
+
 2004-04-11  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* dtable.cc (dtable::extend): Change order of memcpy and cfree.
