@@ -3,18 +3,18 @@
 @subsection Where's the documentation?
 
 There are links to quite a lot of it on the main Cygwin project web
-page: @file{http://sources.redhat.com/cygwin/}.  Be sure to at least
+page: @file{http://cygwin.com/}.  Be sure to at least
 read any 'Release Notes' or 'Readme' or 'read this' links on the main
 web page, if there are any.
 
 There is a comprehensive Cygwin User's Guide at
-@file{http://sources.redhat.com/cygwin/cygwin-ug-net/cygwin-ug-net.html}
+@file{http://cygwin.com/cygwin-ug-net/cygwin-ug-net.html}
 and an API Reference at
-@file{http://sources.redhat.com/cygwin/cygwin-api/cygwin-api.html}.
+@file{http://cygwin.com/cygwin-api/cygwin-api.html}.
 
 There is an interesting paper about Cygwin from the 1998 USENIX Windows
 NT Workshop Proceedings at
-@file{http://sources.redhat.com/cygwin/usenix-98/cygwin.html}.
+@file{http://cygwin.com/usenix-98/cygwin.html}.
 
 You can find documentation for the individual GNU tools at
 @file{http://www.fsf.org/manual/}.  (You should read GNU manuals from a
@@ -24,16 +24,16 @@ for a list of them.)
 @subsection What Cygwin mailing lists can I join?
 
 Comprehensive information about the Cygwin mailing lists can be found at
-@file{http://sources.redhat.com/cygwin/lists.html}.
+@file{http://cygwin.com/lists.html}.
 
 To subscribe to the main list, send a message to
-cygwin-subscribe@@sources.redhat.com.  To unsubscribe from the 
-main list, send a message to cygwin-unsubscribe@@sources.redhat.com.
+cygwin-subscribe@@cygwin.com.  To unsubscribe from the 
+main list, send a message to cygwin-unsubscribe@@cygwin.com.
 In both cases, the subject and body of the message are ignored.
 
 Similarly, to subscribe to the Cygwin annoucements list, send a message
-to cygwin-announce-subscribe@@sources.redhat.com.  To unsubscribe,
-send a message to cygwin-announce-unsubscribe@@sources.redhat.com.
+to cygwin-announce-subscribe@@cygwin.com.  To unsubscribe,
+send a message to cygwin-announce-unsubscribe@@cygwin.com.
 
 If you are going to help develop the Cygwin library by volunteering for
 the project, you will want to subscribe to the Cygwin developers list,
@@ -44,7 +44,7 @@ works for these as well.  Both cygwin-developers and cygwin-apps are
 by-approval lists.
 
 There is a searchable archive of the main mailing list at
-@file{http://sources.redhat.com/ml/cygwin/}.  There is an alternate
+@file{http://cygwin.com/ml/cygwin/}.  There is an alternate
 archive, also searchable, at @file{http://www.delorie.com/archives/}.
 
 Cygwin mailing lists are not gatewayed to USENET, so anti-spam measures

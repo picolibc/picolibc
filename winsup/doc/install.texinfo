@@ -39,7 +39,7 @@ mailing list.
 @strong{IMPORTANT: First read the README file in the @samp{latest}
 directory at any ftp mirror.  DO THIS NOW!  Information in the README
 file is not repeated here.  You can find a mirror site near you from
-@file{http://sources.redhat.com/cygwin/mirrors.html}.}
+@file{http://cygwin.com/mirrors.html}.}
 
 The @samp{setup.exe} program is the recommended way to install Cygwin,
 but it is still a work in progress.  Expect features and functionality
@@ -126,11 +126,11 @@ First, make sure that you are using the latest version of
 @code{setup.exe}.  It's a work in progress, with improvements and
 bugfixes being made often.  The latest version is always available from
 the 'Install Cygwin now' link on the Cygwin Home Page at
-@file{http://sources.redhat.com/cygwin/}.
+@file{http://cygwin.com/}.
 
 If you are downloading from the internet, setup will fail if it cannot
 download the list of mirrors at
-@file{http://sources.redhat.com/cygwin/mirrors.html}.  It could be that
+@file{http://cygwin.com/mirrors.html}.  It could be that
 the network is too busy.  Similarly for an ftp download site that isn't
 working.  Try another mirror, or try again later.
 
@@ -156,7 +156,7 @@ what happened that wasn't supposed to happen, etc.
 
 Good question!  That very issue has been debated on the
 @samp{cygwin-apps} mailing list.  Check the list archives if you want to
-know more.  Start at @file{http://sources.redhat.com/cygwin/lists.html}.
+know more.  Start at @file{http://cygwin.com/lists.html}.
 
 In any case, there is no distinction as far as @code{setup.exe} is
 concerned.  It should install all packages from both @code{latest} and

@@ -19,7 +19,7 @@ standard Windows command shell.
 @section Where can I get it?
 
 The main WWW page for the Cygwin project is
-@file{http://sources.redhat.com/cygwin/}.  There you should find
+@file{http://cygwin.com/}.  There you should find
 everything you need for Cygwin, including links for download and setup,
 a current list of ftp mirror sites, a User's Guide, an API Reference,
 mailing lists and archives, and additional ported software.
@@ -44,7 +44,7 @@ application using Cygwin, you will need the proprietary-use license
 for the Cygwin library.  This is available for purchase; please
 contact sales@@cygnus.com for more information.
 All other questions should be sent to the project
-mailing list cygwin@@sources.redhat.com.
+mailing list cygwin@@cygwin.com.
 
 Note that when we say "free" we mean freedom, not price.  The goal of
 such freedom is that the people who use a given piece of software
@@ -66,7 +66,7 @@ project so we could continue working on it.  However, Red Hat is no
 longer offering Cygwin 1.0 on CD.  There are tentative plans to offer a
 new Cygwin CD sometime in early 2001.  So far, however, there are no
 definite plans.  The latest news about this can be found at
-@file{http://sources.redhat.com/cygwin/cygwin-cd.html}.
+@file{http://cygwin.com/cygwin-cd.html}.
 
 
 @section Recent history of the project: What version @emph{is} this, anyway?
@@ -113,10 +113,10 @@ Users obtain this package by first downloading a version of
 @code{setup.exe}.  This program started as a simple command line tool,
 has metamorphosed into a GUI, and is in the process of continual
 improvement.  However, its purpose is simple -- it is designed to
-install packages from the cygwin web site at sources.redhat.com.  In
-effect, it is a smaller, more intelligent replacement for FULL.EXE.  It
-does not require the downloading a huge executable but rather downloads
-individual small packages.
+install packages from the cygwin web site at @file{http://cygwin.com/}.
+In effect, it is a smaller, more intelligent replacement for FULL.EXE.
+It does not require the downloading a huge executable but rather
+downloads individual small packages.
 
 Does this mean that the new net release of the Cygwin package is 1.1.x?
 No.  We no longer label the releases with the Cygwin version number.
@@ -142,4 +142,4 @@ easiest way to determine what you need on your system.
 
 For some "ancient" history of the project (rather, just woefully out of
 date), visit the Project History page at
-@file{http://sources.redhat.com/cygwin/history.html}.
+@file{http://cygwin.com/history.html}.

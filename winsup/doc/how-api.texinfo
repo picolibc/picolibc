@@ -26,7 +26,7 @@ is going on).  They are only intended for those people who wish to
 contribute code to the project.  If you aren't going to be happy
 debugging problems in a buggy snapshot, avoid these and wait for a real
 release.  The snapshots are available from
-http://sources.redhat.com/cygwin/snapshots/
+http://cygwin.com/snapshots/
 
 
 @subsection How is the DOS/Unix CR/LF thing handled?

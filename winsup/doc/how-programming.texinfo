@@ -267,7 +267,7 @@ bash.)
 net release.)}
 
 There's documentation that explains the process on the main Cygwin
-project web page (http://sources.redhat.com/cygwin/).
+project web page (http://cygwin.com/).
 
 @subsection How can I set a breakpoint at MainCRTStartup?
 
@@ -282,7 +282,7 @@ question.
 @strong{(Please note: This section has not yet been updated for the
 latest net release.  However, there was a discussion on the cygwin
 mailing list recently that addresses this issue.  Read
-@file{http://sources.redhat.com/ml/cygwin/2000-06/msg00688.html} and
+@file{http://cygwin.com/ml/cygwin/2000-06/msg00688.html} and
 related messages.)}
 
 You must execute the following sequence of five commands, in this

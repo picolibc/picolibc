@@ -16,9 +16,9 @@ There are some discussions of this in the mailing list.  See
 
 @itemize @bullet
 @item
-@file{http://sources.redhat.com/ml/cygwin/2000-05/msg01175.html}
+@file{http://cygwin.com/ml/cygwin/2000-05/msg01175.html}
 @item
-@file{http://sources.redhat.com/ml/cygwin/2000-09/msg00290.html}
+@file{http://cygwin.com/ml/cygwin/2000-09/msg00290.html}
 @end itemize
 
 and related messages.
@@ -37,4 +37,4 @@ Any invocation of dllwrap results in the error
 This should be fixed in the next release.  For details and a workaround,
 see
 
-@file{http://sources.redhat.com/ml/cygwin/2000-08/msg00256.html}
+@file{http://cygwin.com/ml/cygwin/2000-08/msg00256.html}

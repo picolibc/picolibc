@@ -121,7 +121,7 @@ There is no solution at all for Windows 9x.
 
 These are settings for the @samp{CYGWIN} environment variable.  See the
 Cygwin User's Guide at
-@file{http://sources.redhat.com/cygwin/cygwin-ug-net/cygwin-ug-net.html}
+@file{http://cygwin.com/cygwin-ug-net/cygwin-ug-net.html}
 for more information on this variable and its settings.
 
 @subsection Why doesn't @samp{mkdir -p} work on a network share?

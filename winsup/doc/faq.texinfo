@@ -4,7 +4,7 @@
 
 @subtitle (Not @emph{completely} updated for the latest net release, but still useful!)
 
-@author You can always find the latest version of this FAQ at @file{http://sources.redhat.com/cygwin/faq/}.
+@author You can always find the latest version of this FAQ at @file{http://cygwin.com/faq/}.
 
 @setfilename faq.txt
 
