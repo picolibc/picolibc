@@ -69,6 +69,8 @@ extern "C" DWORD WINAPI GetLastError (void);
 enum codepage_type {ansi_cp, oem_cp};
 extern codepage_type current_codepage;
 
+extern int cygserver_running;
+
 /* Used to check if Cygwin DLL is dynamically loaded. */
 extern int dynamically_loaded;
 

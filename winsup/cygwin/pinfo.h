@@ -201,6 +201,8 @@ extern HANDLE hexec_proc;
 
 /* For mmaps across fork(). */
 int __stdcall fixup_mmaps_after_fork ();
+/* for shm areas across fork (). */
+int __stdcall fixup_shms_after_fork ();
 
 void __stdcall fill_rusage (struct rusage *, HANDLE);
 void __stdcall add_rusage (struct rusage *, struct rusage *);

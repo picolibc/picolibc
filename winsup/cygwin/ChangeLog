@@ -1,3 +1,22 @@
+Tue Sep 25 16:22:00 2001 Robert Collins <rbtcollins@hotmail.com>
+
+	* autoload.cc: Add dynamic load statement for 'ImpersonateNamedPipeClient'.
+	* Makefile.in: Add new object files, and build instructions for cygserver.exe.
+	* cygwin.din: Export ftok, shmat, shmctl and shmget.
+	* dcrt0.cc: Additional includes for cygserver support.
+	(dll_crt0_1): Initialise the cygserver client.
+	* fhandler.h (fhandler_tty): New method cygserver_attach_tty.
+	* fhandler_tty.cc: Additional includes for cygserver support.
+	(fhandler_tty_slave::open): Attempt to use the cygserver when obtaining
+	handles from the parent process. On failure or 9x use the current method.
+	(fhandler_tty_slave::cygserver_attach_tty): New function.
+	* fork.cc (fork_child): Fixup shm memory mapped areas.
+	* pinfo.h: Declare fixup_shms_after_fork().
+	* security.h: Declare alloc_sd().
+	* tty.cc: Additonal includes to support cygserver.
+	(tty::common_init): Don't allow others to open us if the cygserver is running.
+	* winsup.h: Declare cygserver_running.
+
 Mon Sep 24 18:46:39 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (peek_pipe): Only grab mutex when we actually got something

@@ -25,6 +25,9 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "shared_info.h"
+#include <sys/socket.h>
+#include "cygwin/cygserver_transport.h"
+#include "cygwin/cygserver.h"
 
 /* Tty master stuff */
 
@@ -523,42 +526,89 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
       return 0;
     }
 
-  HANDLE tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
-				     get_ttyp ()->master_pid);
-  if (tty_owner == NULL)
+  HANDLE from_master_local, to_master_local;
+
+  if (!wincap.has_security () ||
+      cygserver_running!=CYGSERVER_OK ||
+      !cygserver_attach_tty ( &from_master_local, &to_master_local))
     {
-      termios_printf ("can't open tty (%d) handle process %d",
-		      ttynum, get_ttyp ()->master_pid);
-      __seterrno ();
-      return 0;
+      termios_printf ("cannot dup handles via server. using old method.");
+
+      HANDLE tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
+				         get_ttyp ()->master_pid);
+      if (tty_owner == NULL)
+        {
+          termios_printf ("can't open tty (%d) handle process %d",
+	 	          ttynum, get_ttyp ()->master_pid);
+          __seterrno ();
+          return 0;
+        }
+
+      if (!DuplicateHandle (tty_owner, get_ttyp ()->from_master, 
+			  hMainProc, &from_master_local, 0, TRUE,
+			    DUPLICATE_SAME_ACCESS))
+        {
+          termios_printf ("can't duplicate input, %E");
+          __seterrno ();
+          return 0;
+        }
+      termios_printf ("duplicated from_master %p->%p from tty_owner %p",
+		     get_ttyp ()->from_master, from_master_local, tty_owner);
+
+      if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master, 
+			  hMainProc, &to_master_local, 0, TRUE,
+			  DUPLICATE_SAME_ACCESS))
+        {
+          termios_printf ("can't duplicate output, %E");
+          __seterrno ();
+          return 0;
+        }
+      termios_printf ("duplicated to_master %p->%p from tty_owner %p",
+      		     get_ttyp ()->to_master, to_master_local, tty_owner);
+      CloseHandle (tty_owner);
     }
 
-  HANDLE nh;
-  if (!DuplicateHandle (tty_owner, get_ttyp ()->from_master, hMainProc, &nh, 0, TRUE,
-			DUPLICATE_SAME_ACCESS))
-    {
-      termios_printf ("can't duplicate input, %E");
-      __seterrno ();
-      return 0;
-    }
-  set_io_handle (nh);
-  ProtectHandle1 (nh, from_pty);
-  termios_printf ("duplicated from_master %p->%p from tty_owner %p",
-		  get_ttyp ()->from_master, nh, tty_owner);
-  if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master, hMainProc, &nh, 0, TRUE,
-			DUPLICATE_SAME_ACCESS))
-    {
-      termios_printf ("can't duplicate output, %E");
-      __seterrno ();
-      return 0;
-    }
-  set_output_handle (nh);
-  ProtectHandle1 (nh, to_pty);
-  CloseHandle (tty_owner);
+  set_io_handle (from_master_local);
+  ProtectHandle1 (from_master_local, from_pty);
+  set_output_handle (to_master_local);
+  ProtectHandle1 (to_master_local, to_pty);
 
   set_open_status ();
   termios_printf ("tty%d opened", ttynum);
 
+  return 1;
+}
+
+int
+fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
+                                        LPHANDLE to_master_ptr)
+{
+  if (!from_master_ptr || !to_master_ptr)
+    return 0;
+
+  client_request_attach_tty *request = 
+	new client_request_attach_tty ((DWORD) GetCurrentProcessId (),
+				      (DWORD) get_ttyp ()->master_pid,
+				      (HANDLE) get_ttyp ()->from_master,
+				      (HANDLE) get_ttyp ()->to_master);
+
+  if (cygserver_request (request) != 0 ||
+	request->header.error_code != 0)
+    return 0;
+
+/*
+  struct request_attach_tty req;
+  INIT_REQUEST (req, CYGSERVER_REQUEST_ATTACH_TTY);
+  req.pid = GetCurrentProcessId ();
+  req.master_pid = get_ttyp ()->master_pid;
+  req.from_master = get_ttyp ()->from_master;
+  req.to_master = get_ttyp ()->to_master;
+  if (cygserver_request ((struct request_header*) &req) != 0)
+    return 0;
+*/
+  *from_master_ptr = request->from_master ();
+  *to_master_ptr = request->to_master ();
+  delete request;
   return 1;
 }
 

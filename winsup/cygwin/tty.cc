@@ -23,6 +23,9 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include <sys/socket.h>
+#include "cygwin/cygserver_transport.h"
+#include "cygwin/cygserver.h"
 #include "shared_info.h"
 
 extern fhandler_tty_master *tty_master;
@@ -392,7 +395,7 @@ tty::common_init (fhandler_pty_master *ptym)
 
   /* Allow the others to open us (for handle duplication) */
 
-  if (wincap.has_security () &&
+  if (wincap.has_security () && cygserver_running==CYGSERVER_OK &&
       (SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION,
 			       get_null_sd ()) == FALSE))
     small_printf ("Can't set process security, %E");

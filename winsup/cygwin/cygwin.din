@@ -1220,3 +1220,7 @@ acltotext
 _acltotext = acltotext
 aclfromtext
 _aclfromtext = aclfromtext
+ftok
+shmat
+shmctl
+shmget

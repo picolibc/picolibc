@@ -34,6 +34,9 @@ details. */
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
+#include <sys/socket.h>
+#include "cygwin/cygserver_transport.h"
+#include "cygwin/cygserver.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
@@ -687,6 +690,8 @@ dll_crt0_1 ()
 
   /* Initialize signal/subprocess handling. */
   sigproc_init ();
+
+  cygserver_init ();
 
   /* Connect to tty. */
   tty_init ();

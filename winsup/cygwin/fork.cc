@@ -302,6 +302,9 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (fixup_mmaps_after_fork ())
     api_fatal ("recreate_mmaps_after_fork_failed");
 
+  if (fixup_shms_after_fork ())
+    api_fatal ("recreate_shm areas after fork failed");
+
   /* Set thread local stuff to zero.  Under Windows 95/98 this is sometimes
      non-zero, for some reason.
      FIXME:  There is a memory leak here after a fork. */
