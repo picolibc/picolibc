@@ -1,3 +1,7 @@
+2004-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_file_attribute): Fix conditional.
+
 2004-04-08  Christopher Faylor  <cgf@bosbc.com>
 
 	* child_info.h: Update CHILD_INFO_MAGIC after 2004-04-03 change.

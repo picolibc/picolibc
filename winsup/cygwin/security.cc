@@ -1437,8 +1437,8 @@ get_file_attribute (int use_ntsec, HANDLE handle, const char *file,
 
   if (use_ntsec && allow_ntsec && wincap.has_security ())
     {
-      if (handle && get_nt_object_attribute (handle, SE_FILE_OBJECT,
-					     attribute, uidret, gidret))
+      if (!handle || get_nt_object_attribute (handle, SE_FILE_OBJECT,
+					      attribute, uidret, gidret))
 	get_nt_attribute (file, attribute, uidret, gidret);
       return 0;
     }
