@@ -1,5 +1,9 @@
 2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/sys/param.h (MAXPATHLEN): Define.
+
+2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/tchar.h: Ansi-fy a comment.
 
 2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
