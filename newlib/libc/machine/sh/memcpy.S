@@ -134,7 +134,7 @@ L8_15:	/* 8..15 byte memcpy cntd. */
 Large:
 	ld.b r2, 0, r63
 	pta/l  Loop_ua, tr1
-	andi r3, 7, r7
+	ori r3, -8, r7
 	sub r2, r7, r22
 	sub r3, r2, r6
 	add r2, r4, r5
@@ -142,6 +142,7 @@ Large:
 	addi r5, -16, r5
 	movi 64+8, r27 // could subtract r7 from that.
 	stlo.q r2, 0, r0
+	sthi.q r2, 7, r0
 	ldx.q r22, r6, r0
 	bgtu/l r27, r4, tr1
 

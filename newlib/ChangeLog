@@ -1,3 +1,8 @@
+Tue Mar 26 17:17:10 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/machine/sh/memcpy.S (Large): Fix alignment rounding.
+	Store high part of leading bytes too.
+
 2002-03-22  Richard Sandiford  <rsandifo@redhat.com>
 
 	* libm/math/ef_hypot.c: Increase scale factor to 68.
