@@ -2950,6 +2950,16 @@ typedef struct tagMONITORINFO {
 	DWORD dwFlags;
 } MONITORINFO,*LPMONITORINFO;
 #define CCHDEVICENAME 32
+#ifdef __cplusplus
+typedef struct tagMONITORINFOEXA : public tagMONITORINFO
+{
+    CHAR    szDevice[CCHDEVICENAME];
+} MONITORINFOEXA, *LPMONITORINFOEXA;
+typedef struct tagMONITORINFOEXW : public tagMONITORINFO
+{
+    WCHAR   szDevice[CCHDEVICENAME];
+} MONITORINFOEXW, *LPMONITORINFOEXW;
+#else
 typedef struct tagMONITORINFOEXA {
 	DWORD	cbSize;
 	RECT	rcMonitor;
@@ -2964,6 +2974,7 @@ typedef struct tagMONITORINFOEXW {
 	DWORD	dwFlags;
 	WCHAR	szDevice[CCHDEVICENAME];
 } MONITORINFOEXW,*LPMONITORINFOEXW;
+#endif /* __cplusplus */
 typedef struct tagKBDLLHOOKSTRUCT {
 	DWORD vkCode;
 	DWORD scanCode;

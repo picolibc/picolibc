@@ -1,3 +1,8 @@
+2004-04-18  Allan Bazinet  <bazineta@users.sourceforge.net>
+
+	* include/winuser.h (MONITORINFOEX[AW]): Change to be derived from
+	MONITORINFO when compiling as C++.
+
 2004-04-17  Luke Dunstan  <infidel@users.sourceforge.net>
 
 	* README.w32api: List separate copyright conditions for some headers.
