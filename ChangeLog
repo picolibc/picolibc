@@ -1,3 +1,8 @@
+2004-12-16  Andrew Stubbs  <andrew.stubbs@st.com>
+
+	* configure.in (sh64-*-*): Reenable gprof.
+	* configure: Regenerate.
+
 2004-12-09  Jim Blandy  <jimb@redhat.com>
 
 	* MAINTAINERS: List 'depcomp' as part of automake.
