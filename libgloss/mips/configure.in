@@ -101,7 +101,7 @@ case "${target}" in
   mips64vr5*-*-*)
 	part_specific_obj="vr5xxx.o cma101.o"
 	part_specific_defines=-DR5000
-        script_list="idt pmon ddb lsi idtecoff nullmon"
+        script_list="idt pmon ddb ddb-kseg0 lsi idtecoff nullmon"
         bsp_list="libidt.a libpmon.a liblsi.a libnullmon.a"
 	;;
   mipsisa32*-*-*)
@@ -113,7 +113,7 @@ case "${target}" in
   *)
         part_specific_obj="vr4300.o cma101.o"
 	part_specific_defines=
-        script_list="idt pmon ddb lsi idtecoff nullmon"
+        script_list="idt pmon ddb ddb-kseg0 lsi idtecoff nullmon"
         bsp_list="libidt.a libpmon.a liblsi.a libnullmon.a"
         ;;
 esac

@@ -1,7 +1,7 @@
 /*
  * cma101.c -- lo-level support for Cogent CMA101 development board.
  *
- * Copyright (c) 1996 Cygnus Support
+ * Copyright (c) 1996, 2001 Cygnus Support
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -187,7 +187,13 @@ __sizemem ()
   unsigned int baseorig;
   unsigned int sr;
   extern void *end;
+  char *endptr = (char *)&end;
   int extra;
+
+  /* If we are running in kernel segment 0 (possibly cached), try sizing memory
+     in kernel segment 1 (uncached) to avoid some problems with monitors.  */
+  if (endptr >= K0BASE_ADDR && endptr < K1BASE_ADDR)
+    endptr = (endptr - K0BASE_ADDR) + K1BASE_ADDR;
 
   INTDISABLE(sr,baseorig); /* disable all interrupt masks */
 
@@ -200,8 +206,8 @@ __sizemem ()
      for an int pointer, so we adjust the address to make sure it is safe.
      We use void * arithmetic to avoid accidentally truncating the pointer.  */
 
-  extra = ((int) &end & (sizeof (int) - 1));
-  base = ((void *) &end + sizeof (int) - extra);
+  extra = ((int) endptr & (sizeof (int) - 1));
+  base = ((void *) endptr + sizeof (int) - extra);
   baseorig = *base;
 
   *base = SM_PATTERN;

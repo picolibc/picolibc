@@ -1,3 +1,18 @@
+2001-10-17  Michael Meissner  <meissner@redhat.com>
+
+	* regs.S (K0BASE_ADDR,K1BASE_ADDR): Define as addresses to
+	identify if a program is running in kernel segment 0.
+
+	* cma101.c (__sizemem): If we are running in kernel segment 0,
+	instead of kernel segment 1, use kernel segment 0 addresses which
+	are uncached when sizing memory.
+
+	* ddb-kseg0.ld: New file, clone of ddb.ld, except it links the
+	program to run in kernel segment 0, instead of kernel segment 1.
+
+	* configure.in: Treat ddb-kseg0.ld like ddb.ld.
+	* configure: Regenerate.
+	
 2001-09-15  Eric Christopher  <echristo@redhat.com>
 
 	* mips/configure.in (LIB_AC_PROG_CC): Fix typo in mipsisa32 to
