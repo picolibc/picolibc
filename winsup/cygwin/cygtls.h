@@ -105,9 +105,9 @@ struct _threadinfo
   struct _reent local_clib;
   struct _local_storage locals;
   struct _threadinfo *prev, *next;
-  __stack_t stack[8];
-  int sig;
   __stack_t *stackptr;
+  int sig;
+  __stack_t stack[1024];
 
   /*gentls_offsets*/
   static CRITICAL_SECTION protect_linked_list;

@@ -1,5 +1,16 @@
 2003-12-29  Christopher Faylor  <cgf@redhat.com>
 
+	* cygtls.h (_threadinfo::stack): Increase stack size to accommodate
+	nested signal handlers.  Reorganize to cause potential SEGV on stack
+	overflow.
+	* sigproc.cc (no_signals_available): Check sendsig value rather than
+	relying on obsolete sig_loop_wait.
+	(sigproc_terminate): Ditto.
+	(proc_can_be_signalled): Check sendsig value even for myself.
+	* tlsoffsets.h: Regenerate.
+
+2003-12-29  Christopher Faylor  <cgf@redhat.com>
+
 	Move open_fhs from fhandler.h to cygheap.h for easier tracking.
 	Accommodate this change throughout.
 	* dtable.cc (dtable::add_archetype): Use correct count when iterating
@@ -651,7 +662,8 @@
 	* exceptions.cc (_threadinfo::interupt_now): Use _threadinfo HANDLE
 	operator to derive thread handle.
 	(setup_handler): Ditto.
-	* sigproc.cc: Reorganize includes.
+	* sigproc.cc: Reorganize includes.  Fix no_signals_available test to
+	properly return true when !sig_wait_loop.
 
 2003-11-28  Christopher Faylor  <cgf@redhat.com>
 

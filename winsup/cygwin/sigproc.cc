@@ -43,7 +43,7 @@ details. */
 
 #define wake_wait_subproc() SetEvent (events[0])
 
-#define no_signals_available() (!hwait_sig || !sig_loop_wait || exit_state)
+#define no_signals_available() (!hwait_sig || (myself->sendsig == INVALID_HANDLE_VALUE) || exit_state)
 
 #define NZOMBIES	256
 
@@ -129,7 +129,6 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 #define Static static NO_COPY
 
 Static DWORD proc_loop_wait = 1000;	// Wait for subprocesses to exit
-Static DWORD sig_loop_wait = INFINITE;	// Wait for signals to arrive
 
 Static HANDLE sigcomplete_main;		// Event signaled when a signal has
 					//  finished processing for the main
@@ -248,17 +247,14 @@ get_proc_lock (DWORD what, DWORD val)
 static bool __stdcall
 proc_can_be_signalled (_pinfo *p)
 {
-  if (p == myself_nowait || p == myself)
-    {
-      assert (!wait_sig_inited);
-      return true;
-    }
-
   if (p->sendsig == INVALID_HANDLE_VALUE)
     {
       set_errno (EPERM);
       return false;
     }
+
+  if (p == myself_nowait || p == myself)
+    return hwait_sig;
 
   if (ISSTATE (p, PID_INITIALIZING) ||
       (((p)->process_state & (PID_ACTIVE | PID_IN_USE)) ==
@@ -657,12 +653,11 @@ sigproc_terminate (void)
 {
   hwait_sig = NULL;
 
-  if (!sig_loop_wait)
+  if (myself->sendsig == INVALID_HANDLE_VALUE)
     sigproc_printf ("sigproc handling not active");
   else
     {
       sigproc_printf ("entering");
-      sig_loop_wait = 0;	// Tell wait_sig to exit when it is
 				//  finished with anything it is doing
       ForceCloseHandle (sigcomplete_main);
       HANDLE sendsig = myself->sendsig;
@@ -800,7 +795,6 @@ sig_send (_pinfo *p, int sig, void *tls)
     rc = 0;		// Successful exit
   else
     {
-      /* It's an error unless sig_loop_wait == 0 (the process is exiting). */
       if (!no_signals_available ())
 	system_printf ("wait for sig_complete event failed, signal %d, rc %d, %E",
 		      sig, rc);
