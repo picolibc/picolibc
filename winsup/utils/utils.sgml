@@ -344,6 +344,7 @@ Usage mount
 
   -b = text files are equivalent to binary files (newline = \n)
   -x = files in the mounted directory are automatically given execute permission.
+  -X = files in the mounted directory are automatically given execute permission and are assumed to be Cygwin (i.e., not generic windows) executables only.
   -f = force mount, don't warn about missing mount point directories
   -s = add mount point to system-wide registry location
   --change-automount-prefix = change path prefix used for automatic mount points

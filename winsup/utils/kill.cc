@@ -61,30 +61,23 @@ sig0:
       char *p;
       int pid = strtol (*argv, &p, 10);
       if (*p != '\0')
-	fprintf (stderr, "kill: illegal pid: %s\n", *argv);
+	{
+	  fprintf (stderr, "kill: illegal pid: %s\n", *argv);
+	  ret = 1;
+	}
+      else if (kill (pid, sig) == 0)
+	{
+	  if (force)
+	    forcekill (pid, sig, 1);
+	}
+      else if (force && sig != 0)
+	forcekill (pid, sig, 0);
       else
 	{
-#if 0
-	  printf ("Sending %s(%d) signal to pid %d\n",
-		  strsignal (sig), sig, pid);
-#endif
-	  if (kill (pid, sig) == 0)
-	    {
-	      if (force)
-		forcekill (pid, sig, 1);
-	    }
-	  else
-	    {
-	      if (force && sig != 0)
-		forcekill (pid, sig, 0);
-	      else
-		{
-		  char buf[1000];
-		  sprintf (buf, "kill %d", pid);
-		  perror (buf);
-		  ret = 1;
-		}
-	    }
+	  char buf[1000];
+	  sprintf (buf, "kill %d", pid);
+	  perror (buf);
+	  ret = 1;
 	}
       argv++;
     }

@@ -1,3 +1,8 @@
+Sun Oct  7 23:06:39 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* kill.cc (main): Set exit value to 1 on invalid pid.  Perform minor
+	cleanup.
+
 Fri Sep 21 20:40:30 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in (mingw_getopt.o): Ensure that newlib include directories
