@@ -34,6 +34,7 @@
 #define EF_ARM_OLD_ABI     0x100
 #define EF_ARM_SOFT_FLOAT  0x200
 #define EF_ARM_VFP_FLOAT   0x400
+#define EF_ARM_MAVERICK_FLOAT 0x800
 
 /* Other constants defined in the ARM ELF spec. version B-01.  */
 #define EF_ARM_SYMSARESORTED 0x04	/* NB conflicts with EF_INTERWORK */

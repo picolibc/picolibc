@@ -1,3 +1,24 @@
+2003-02-21  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* ia64.h (SHT_IA_64_LOPSREG, SHT_IA_64_HIPSREG,
+	SHT_IA_64_PRIORITY_INIT): Define.
+
+2003-02-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc64.h (IS_PPC64_TLS_RELOC): Rename from IS_TLS_RELOC.
+
+	* ppc.h: Replace DTPMOD64, TPREL64, DTPREL64 with DTPMOD32 etc.
+	(IS_PPC_TLS_RELOC): Define.
+
+2003-02-10  Nick Clifton  <nickc@redhat.com>
+
+	* arm.h (EF_ARM_MAVERICK_FLOAT): Define.
+
+2003-02-05  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h: Add TLS relocs.  Format.
+	* ppc64.h: Likewise.
+
 2003-01-27  Alexandre Oliva  <aoliva@redhat.com>
 
 	* mips.h (EF_MIPS_XGOT): Define.

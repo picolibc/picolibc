@@ -85,6 +85,10 @@ extern char *basename ();
 
 extern const char *lbasename PARAMS ((const char *));
 
+/* A well-defined realpath () that is always compiled in.  */
+
+extern char *lrealpath PARAMS ((const char *));
+
 /* Concatenate an arbitrary number of strings.  You must pass NULL as
    the last argument of this function, to terminate the list of
    strings.  Allocates memory using xmalloc.  */
@@ -241,6 +245,10 @@ extern char *xstrdup PARAMS ((const char *)) ATTRIBUTE_MALLOC;
 /* Copy an existing memory buffer to a new memory buffer without fail.  */
 
 extern PTR xmemdup PARAMS ((const PTR, size_t, size_t)) ATTRIBUTE_MALLOC;
+
+/* Physical memory routines.  Return values are in BYTES.  */
+extern double physmem_total PARAMS ((void));
+extern double physmem_available PARAMS ((void));
 
 /* hex character manipulation routines */
 
