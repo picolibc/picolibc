@@ -959,6 +959,12 @@ do_exit (int status)
   UINT n = (UINT) status;
   static int NO_COPY exit_state = 0;
 
+  syscall_printf ("do_exit (%d)", n);
+
+  vfork_save *vf = vfork_storage.val ();
+  if (vf != NULL && vf->pid < 0)
+    vf->restore_exit (status);
+
   if (!DisableThreadLibraryCalls (cygwin_hmodule))
     system_printf ("DisableThreadLibraryCalls (%p) failed, %E",
 		   cygwin_hmodule);
@@ -968,12 +974,6 @@ do_exit (int status)
       exit_state = ES_THREADTERM;
       cygthread::terminate ();
     }
-
-  syscall_printf ("do_exit (%d)", n);
-
-  vfork_save *vf = vfork_storage.val ();
-  if (vf != NULL && vf->pid < 0)
-    vf->restore_exit (status);
 
   if (exit_state < ES_SIGNAL)
     {

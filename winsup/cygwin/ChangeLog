@@ -1,3 +1,12 @@
+2002-10-10  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (new-cygwin1.dll): Reorganize library order.
+
+	* dcrt0.cc (do_exit): Move thread stuff after vfork stuff or threads
+	are terminated during vfork.
+	* sigproc.cc (proc_terminate): Grab proc lock prior to signalling
+	subproc thread exit to avoid an extra "wait-for-thread-to-exit".
+
 2002-10-09  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.cc (cygthread::stub): Don't create an event for "cygself"
@@ -93,7 +102,7 @@
 	* thread.cc (pthread_key::keys): Copy on fork. Add a comment explaining
 	why.
 	(pthreadNull::_instance): Copy on fork. Absolutely no state exists
-	in pthreadNull. 
+	in pthreadNull.
 
 2002-09-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
@@ -127,8 +136,8 @@
 	(pthread_mutex::nativeMutex::init): Implement.
 	(pthread_mutex::nativeMutex::lock): Ditto.
 	(pthread_mutex::nativeMutex::unlock): Ditto.
-       	(pthread_mutex::init): Use the wrapper lock and unlockcalls.
-	* thread.h (pthread_mutex): Move mutexInitializationLock into a 
+	(pthread_mutex::init): Use the wrapper lock and unlockcalls.
+	* thread.h (pthread_mutex): Move mutexInitializationLock into a
 	nativeMutex wrapper class.
 
 2002-09-30  Christopher Faylor  <cgf@redhat.com>
@@ -166,7 +175,7 @@
 	* pthread.cc (pthread_mutex_init): Use new pthread_mutex::init.
 	* thread.cc: Change __pthread_mutex_init to pthread_mutex::init
 	throughout.
-       	(MTinterface::Init): Initialise pthread_mutex support.
+	(MTinterface::Init): Initialise pthread_mutex support.
 	(pthread_mutex::mutexInitializationLock): Instantiate.
 	(pthread_mutex::initMutex): New method.
 	(__pthread_cond_dowait): Don't dereference untrusted pointers.
@@ -175,7 +184,7 @@
 	(__pthread_mutex_init): Rename to pthread_mutex::init.
 	Lock and release mutexInitializationLock to prevent races on
 	mutex initialisation.
-	* thread.h (pthread_mutex::initMutex): New method, initialise 
+	* thread.h (pthread_mutex::initMutex): New method, initialise
 	pthread_mutex supporting state on process initialisation.
 	(pthread_mutex::init): Initialise a single mutex.
 	(pthread_mutex::mutexInitializationLock): A win32 mutex for
@@ -1714,7 +1723,7 @@
 	* fhandler_process.cc: Add <sys/param.h> include.
 	(format_process_stat): Make number of 'jiffies' per second same as
 	HZ define. Use KernelTime and UserTime only to calculate start_time.
-	
+
 2002-08-30  Christopher Faylor  <cgf@redhat.com>
 
 	(inspired by a patch from Egor Duda)

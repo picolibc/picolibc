@@ -457,10 +457,10 @@ proc_terminate (void)
   if (hwait_subproc)
     {
       proc_loop_wait = 0;	// Tell wait_subproc thread to exit
+      sync_proc_subproc->acquire (WPSP);
       wake_wait_subproc ();	// Wake wait_subproc loop
       hwait_subproc = NULL;
 
-      sync_proc_subproc->acquire (WPSP);
       (void) proc_subproc (PROC_CLEARWAIT, 1);
 
       /* Clean out zombie processes from the pid list. */
