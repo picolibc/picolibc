@@ -1,5 +1,11 @@
 2003-09-10  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in (MINGW_CXX): Define and use for mingw-compiled files.
+	* path.cc: Include more path info in cygwin-specific includes since the
+	cygwin directory is no longer included by default.
+
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: More fixups to adjust for the fact that mingw_getopt.o
 	is no longer built.
 

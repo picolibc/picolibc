@@ -66,10 +66,11 @@ ALL_LDLIBS:=${patsubst $(w32api_lib)/lib%.a,-l%,\
 LIBICONV:=@libiconv@
 MINGW_LIB:=$(mingw_build)/libmingw32.a
 DUMPER_LIB:=${libbfd} ${libintl} -L$(bupdir1)/libiberty $(LIBICONV) -liberty
-MINGW_LDLIBS:=$(ALL_LDLIBS) $(MINGW_LIB)
+MINGW_LDLIBS:=${filter-out $(libcygwin),$(ALL_LDLIBS) $(MINGW_LIB)}
 MINGW_DEP_LDLIBS:=${ALL_DEP_LDLIBS} ${MINGW_LIB}
 ALL_LDFLAGS:=-B$(newlib_build)/libc -B$(w32api_lib) $(LDFLAGS) $(ALL_LDLIBS)
 DUMPER_LDFLAGS:=$(ALL_LDFLAGS) $(DUMPER_LIB)
+MINGW_CXX:=${patsubst %/cygwin/include,%/mingw/include,${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)}} -I$(updir)
 
 PROGS:=	cygcheck.exe cygpath.exe getfacl.exe kill.exe mkgroup.exe \
 	mkpasswd.exe mount.exe passwd.exe ps.exe regtool.exe setfacl.exe \
@@ -135,18 +136,18 @@ endif
 
 path.o: path.cc
 ifdef VERBOSE
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+	$(MINGW_CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 else
-	@echo $(CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+	@echo $(MINGW_CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
+	${MINGW_CXX} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 endif
 
 dump_setup.o: dump_setup.cc
 ifdef VERBOSE
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $(zconf_h) $(zlib_h) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+	$(MINGW_CXX) $(zconf_h) $(zlib_h) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 else
-	@echo $(CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $(zconf_h) $(zlib_h) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+	@echo $(MINGW_CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
+	$(MINGW_CXX) $(zconf_h) $(zlib_h) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 endif
 
 cygcheck.o: cygcheck.cc
@@ -159,10 +160,10 @@ endif
 
 strace.o: strace.cc
 ifdef VERBOSE
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
+	$(MINGW_CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
 else
-	@echo $(CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
+	@echo $(MINGW_CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
+	$(MINGW_CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
 endif
 
 kill.exe: kill.o $(bupdir1)/libiberty/strsignal.o
