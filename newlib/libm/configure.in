@@ -28,10 +28,10 @@ AM_PROG_LIBTOOL
 fi
 
 LIBM_MACHINE_LIB=
-if test -n "${machine_dir}"; then
+if test -n "${libm_machine_dir}"; then
   AC_CONFIG_SUBDIRS(machine)
   if test "${use_libtool}" = "yes"; then
-    LIBM_MACHINE_LIB=machine/${machine_dir}/lib${machine_dir}.${aext}
+    LIBM_MACHINE_LIB=machine/${libm_machine_dir}/lib${libm_machine_dir}.${aext}
   else
     LIBM_MACHINE_LIB=machine/lib.${aext}
   fi

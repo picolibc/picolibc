@@ -1,3 +1,9 @@
+2003-09-29  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* libm/configure.in: Check libm_machine_dir, not machine_dir.
+	* libm/configure: Regenerate.
+	* libm/Makefile.in: Ditto.
+
 2003-09-29  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/machine/sh/strncpy.S: New file.
