@@ -1,3 +1,22 @@
+2004-01-06  Alexandre Oliva  <aoliva@redhat.com>
+
+	2003-12-02  Richard Sandiford  <rsandifo@redhat.com>
+	* frv/crt0.S (_start): Fix use of FDPIC conditionals.  Move the set of
+	gr11 outside the FDPIC conditional.  Avoid clobbering gr4 too early.
+	2003-11-14  Richard Sandiford  <rsandifo@redhat.com>
+	* frv/crt0.S: Fix fdpic sp calculation.
+	2003-11-05  Alexandre Oliva  <aoliva@redhat.com>
+	* frv/crt0.S: Use __stacksize, not __stack, to initialize sp on
+	FDPIC.  Update comments on computing _GLOBAL_OFFSET_TABLE_.  Don't
+	fixup ctors nor dtors on FDPIC.
+	2003-09-19  Alexandre Oliva  <aoliva@redhat.com>
+	* frv/crt0.S (_start): Set up gr15 only for FDPIC.
+	* frv/crt0.S (_start): Save _GLOBAL_OFFSET_TABLE_ in gr17, and set
+	gr15 before function calls.
+	2003-09-19  DJ Delorie  <dj@redhat.com>, Alexandre Oliva  <aoliva@redhat.com>
+	* frv/crt0.S (_start): Set up gr15 with _GLOBAL_OFFSET_TABLE_'s
+	value.
+
 2003-10-27  Bernardo Innocenti  <bernie@develer.com>
 
 	* m68k/asm.h: Add macros for -fPIC, -msep-data and

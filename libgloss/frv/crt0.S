@@ -1,6 +1,6 @@
 /* crt0.S -- startup file for frv.
  * 
- * Copyright (c) 2002 Red Hat, Inc
+ * Copyright (c) 2002, 2003 Red Hat, Inc
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -36,10 +36,40 @@ _start:
 	setlo	 #gprello(.Lcall), gr5
 	P(sub)	 gr4, gr5, gr16
 
+#if ! __FRV_FDPIC__
 	sethi	 #gprelhi(EXT(_stack)), sp	/* load up stack pointer */
 	P(setlo) #gprello(EXT(_stack)), sp
 	setlos   #0, fp				/* zero fp to allow unwinders to stop */
 	P(add)	 sp, gr16, sp
+
+#define FDPIC(...)
+#else
+#define FDPIC(...) __VA_ARGS__
+	
+	/* The assembler will rightfully claim that
+	#hi/lo(__stacksize) are unsafe for PIC, but since __stacksize
+	is absolute, and we don't want it to be relocated, we should
+	be fine.  */
+
+	sethi	#gprelhi(EXT(__end)), gr6
+	P(sethi) #hi(EXT(__stacksize+7)), gr5
+	setlo	#gprello(EXT(__end)), gr6
+	P(setlo) #lo(EXT(__stacksize+7)), gr5
+	add	gr6, gr16, gr6
+	add	gr6, gr5, gr5
+	andi	gr5, -8, sp
+
+	/* Using GPREL to compute _GLOBAL_OFFSET_TABLE_'s will force
+	the entire program to relocate as a unit, which is fine for
+	frv-elf.  */
+	
+	P(sethi) #gprelhi(EXT(_GLOBAL_OFFSET_TABLE_)), gr15
+	setlo    #gprello(EXT(_GLOBAL_OFFSET_TABLE_)), gr15
+	/* We compute the value in a call-saved register (that happens
+	to be the PIC register in the EABI, and copy it to gr15 before
+	every call.  */
+	add	 gr15, gr16, gr17
+#endif
 
 	sethi	 #gprelhi(EXT(__start_cmp)), gr5
 	setlo    #gprello(EXT(__start_cmp)), gr5
@@ -48,6 +78,9 @@ _start:
 	beq	icc0, 0, .Lfixed
 
 	P(st)	gr4, @(gr5, gr16)	/* update so if we restart no need to fixup */
+	setlos	4, gr11
+
+#if ! __FRV_FDPIC__
 
 					/* fixup the .ctors list */
 	sethi	 #gprelhi(EXT(__CTOR_LIST__)), gr9
@@ -58,7 +91,6 @@ _start:
 	P(add)	 gr10, gr16, gr10
 	addi	 gr9, 4, gr9
 	P(subi)	 gr10, 4, gr10
-	setlos	 4, gr11
 	call	 EXT(__frv_fixptrs)
 
 					/* fixup the .dtors list */
@@ -71,6 +103,7 @@ _start:
 	P(addi)	 gr9, 4, gr9
 	subi	 gr10, 4, gr10
 	call	 EXT(__frv_fixptrs)
+#endif /* ! __FRV_FDPIC__ */
 
 					/* fixup the .dtors list */
 	P(sethi) #gprelhi(EXT(__ROFIXUP_LIST__)), gr9
@@ -79,6 +112,7 @@ _start:
 	setlo	 #gprello(EXT(__ROFIXUP_END__)), gr10
 	P(add)	 gr9, gr16, gr9
 	add	 gr10, gr16, gr10
+	FDPIC(mov gr17, gr15)
 	call	 EXT(__frv_fix_usrptrs)
 
 .Lfixed:
@@ -166,17 +200,21 @@ _start:
 	add	  gr4, gr16, gr4
 	P(setlos) #0, gr9
 	sub	  gr4, gr8, gr10
+	FDPIC(mov gr17, gr15)
 	call	  EXT(memset)
 
 	P(setlos) #0, gr8		/* zero argc, argv, envp */
 	setlos	  #0, gr9
 	P(setlos) #0, gr10
 
+	FDPIC(mov gr17, gr15)
 	call	  EXT(main)
+	FDPIC(mov gr17, gr15)
 	call	  EXT(exit)
 .Lend:
 	.size	__start,(.Lend-__start)
 
+#if ! __FRV_FDPIC__
 	/* Routine to adjust pointers
 	   gr8  = difference to adjust by
 	   gr9  = starting address
@@ -199,6 +237,7 @@ EXT(__frv_fixptrs):
 .Lret2:	ret
 .Lend2:
 	.size	EXT(__frv_fixptrs),.Lend2-EXT(__frv_fixptrs)
+#endif /* ! __FRV_FDPIC__ */
 
 	/* Routine to adjust statically initialized pointers
 	   Note since these are pointers to pointers, they
