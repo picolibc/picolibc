@@ -94,7 +94,8 @@ fhandler_##what::ready_for_read (int fd, DWORD howlong, int ignra) \
   select_record me (this); \
   me.fd = fd; \
   (void) select_read (&me); \
-  while (!peek_##what (&me, ignra) && howlong == INFINITE) \
+  while (select_read (&me) && !me.read_ready && \
+         !peek_##what (&me, ignra) && howlong == INFINITE) \
     if (fd >= 0 && cygheap->fdtab.not_open (fd)) \
       break; \
     else if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0) \
@@ -1176,7 +1177,6 @@ peek_socket (select_record *me, int)
   WINSOCK_FD_ZERO (&ws_readfds);
   WINSOCK_FD_ZERO (&ws_writefds);
   WINSOCK_FD_ZERO (&ws_exceptfds);
-  int gotone = 0;
 
   HANDLE h;
   set_handle_or_return_if_not_open (h, me);
@@ -1210,12 +1210,12 @@ peek_socket (select_record *me, int)
     }
 
   if (WINSOCK_FD_ISSET (h, &ws_readfds) || (me->read_selected && me->read_ready))
-    gotone = me->read_ready = TRUE;
+    me->read_ready = TRUE;
   if (WINSOCK_FD_ISSET (h, &ws_writefds) || (me->write_selected && me->write_ready))
-    gotone = me->write_ready = TRUE;
+    me->write_ready = TRUE;
   if (WINSOCK_FD_ISSET (h, &ws_exceptfds) || (me->except_selected && me->except_ready))
-    gotone = me->except_ready = TRUE;
-  return gotone;
+    me->except_ready = TRUE;
+  return me->read_ready || me->write_ready || me->except_ready;
 }
 
 static int

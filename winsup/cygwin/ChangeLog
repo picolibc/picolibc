@@ -1,3 +1,10 @@
+2001-10-26  Christopher Faylor  <cgf@redhat.com>
+
+	* select.cc (MAKEready): Check for read_ready in loop since select_read
+	could set it.
+	(peek_socket): Check ready/write/except specifically since they could
+	have been set even prior to peek_socket call.
+
 2001-10-24  Christopher Faylor  <cgf@redhat.com>
 
 	* shared_info.h (MOUNT_VERSION): Change to a smaller, still arbitrary
