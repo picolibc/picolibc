@@ -1,3 +1,15 @@
+2003-10-22  Jakub Jelinek  <jakub@redhat.com>
+
+	* bfdlink.h (struct bfd_elf_version_expr): Remove match field.
+	Add wildcard and mask fields.
+	(BFD_ELF_VERSION_C_TYPE): Define.
+	(BFD_ELF_VERSION_CXX_TYPE): Likewise.
+	(BFD_ELF_VERSION_JAVA_TYPE): Likewise.
+	(struct bfd_elf_version_expr_head): New.
+	(struct bfd_elf_version_tree): Add match field.
+	Change type of globals and locals fields
+	to struct bfd_elf_version_expr_head.
+
 2003-10-14  Bob Wilson  <bob.wilson@acm.org>
 
 	* elf/xtensa.h: Formatting.  Fix comments about property section
