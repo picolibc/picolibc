@@ -1,3 +1,8 @@
+2003-02-24  Uwe Stieber <uwe@wwws.de>
+
+	* configure.in: Add support for kaOS as cross build target system.
+	* configure: Regenerated.
+
 2003-02-20  Sean McNeil  <sean@blue.mcneil.com>
 
 	* Makefile.tpl: Add definition of CPPFLAGS to pass into
