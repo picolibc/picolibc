@@ -20,6 +20,7 @@ details. */
 #define LOCK_THREAD_LIST 5
 #define LOCK_MUTEX_LIST  6
 #define LOCK_SEM_LIST    7
+#define LOCK_COND_LIST   8
 
 #define WRITE_LOCK 1
 #define READ_LOCK  2
@@ -190,6 +191,17 @@ public:
   int TryWait ();
 };
 
+class CondItem: public MTitem
+{
+public:
+  int shared;
+  LONG waiting;
+  MutexItem *mutexitem;
+  int Wait ();
+  int TimedWait (DWORD dwMilliseconds);
+  int BroadCast ();
+  int Signal ();
+};
 
 typedef struct
 {
@@ -226,6 +238,10 @@ public:
   SemaphoreItem *CreateSemaphore (sem_t *, int, int);
   SemaphoreItem *GetSemaphore (sem_t * t);
 
+  // Condition functions
+  CondItem *CreateCond (pthread_cond_t *, const pthread_condattr_t *); 
+  CondItem *GetCond (pthread_cond_t *);
+
 private:
   // General Administration
   MTitem * Find (void *, int (*compare) (void *, void *), int &, MTList *);
@@ -237,6 +253,7 @@ private:
   MTList threadlist;
   MTList mutexlist;
   MTList semalist;
+  MTList condlist;
 };
 
 
@@ -274,6 +291,17 @@ int __pthread_key_delete (pthread_key_t * key);
 int __pthread_setspecific (pthread_key_t * key, const void *value);
 void *__pthread_getspecific (pthread_key_t * key);
 
+/* Thead synchroniation */
+int __pthread_cond_destroy(pthread_cond_t *cond);
+int __pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr);
+int __pthread_cond_signal(pthread_cond_t *cond);
+int __pthread_cond_broadcast(pthread_cond_t *cond);
+int __pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime);
+int __pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
+int __pthread_condattr_init (pthread_condattr_t * condattr);
+int __pthread_condattr_destroy (pthread_condattr_t * condattr);
+int __pthread_condattr_getpshared (const pthread_condattr_t *attr, int *pshared);
+int __pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared);
 
 /* Thread signal */
 int __pthread_kill (pthread_t * thread, int sig);

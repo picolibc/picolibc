@@ -1,3 +1,14 @@
+aturday Mar 17 01:19 2001 Robert Collins rbtcollins@hotmail.com
+   
+	* cygwin.din: Export the new functions.
+	* pthread.cc (pthread_cond_*): Add wrapper functions that call
+	__pthread_cond* functions.
+	* thread.cc (__pthread_cond_*): Implement the pthread_cond* functions.
+	* thread.h: Add new class entries and prototypes for __pthread_cond*
+	functions.
+	* include/pthread.h: user land header prototypes for pthread_cond*
+	functions and related defines.
+
 Wed Mar 14 16:30:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* environ.cc (parse_options): Use strtok_r instead of strtok.

@@ -1099,6 +1099,16 @@ cygwin32_internal = cygwin_internal
 @PTH_ALLOW@pthread_mutex_trylock
 @PTH_ALLOW@pthread_mutex_unlock
 @PTH_ALLOW@pthread_mutex_destroy
+@PTH_ALLOW@pthread_cond_init
+@PTH_ALLOW@pthread_cond_destroy
+@PTH_ALLOW@pthread_cond_broadcast
+@PTH_ALLOW@pthread_cond_signal
+@PTH_ALLOW@pthread_cond_wait
+@PTH_ALLOW@pthread_cond_timedwait
+@PTH_ALLOW@pthread_condattr_init
+@PTH_ALLOW@pthread_condattr_destroy
+@PTH_ALLOW@pthread_condattr_getpshared
+@PTH_ALLOW@pthread_condattr_setpshared
 @PTH_ALLOW@sem_init
 @PTH_ALLOW@sem_destroy
 @PTH_ALLOW@sem_wait

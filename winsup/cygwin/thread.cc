@@ -63,6 +63,13 @@ extern int threadsafe;
   if (!item) return EINVAL; \
   CHECKHANDLE (EINVAL, 0);
 
+#define GETCOND(n) \
+  SetResourceLock (LOCK_COND_LIST, READ_LOCK, n); \
+  CondItem *item=user_data->threadinterface->GetCond (cond); \
+  ReleaseResourceLock (LOCK_COND_LIST, READ_LOCK, n); \
+  if (!item) return EINVAL; \
+  CHECKHANDLE (EINVAL, 0);
+
 #define CHECKITEM(rn, rm, fn) \
   if (!item) { \
     ReleaseResourceLock (rn, rm, fn); \
@@ -387,6 +394,13 @@ MTinterface::GetSemaphore (sem_t * sp)
   return (SemaphoreItem *) Find (sp, &CmpPthreadObj, index, &semalist);
 }
 
+CondItem *
+MTinterface::GetCond (pthread_cond_t * mp)
+{
+  AssertResourceOwner (LOCK_COND_LIST, READ_LOCK);
+  int index = 0;
+  return (CondItem *) Find (mp, &CmpPthreadObj, index, &condlist);
+}
 
 void
 MTitem::Destroy ()
@@ -455,6 +469,78 @@ SemaphoreItem::TryWait ()
   return WaitForSingleObject (win32_obj_id, 0);
 }
 
+/* Condition Items */
+CondItem *
+MTinterface::CreateCond (pthread_cond_t * cond, const pthread_condattr_t * attr)
+{
+  AssertResourceOwner (LOCK_COND_LIST, WRITE_LOCK | READ_LOCK);
+
+  int i = FindNextUnused (&condlist);
+
+  CondItem *item = (CondItem *) GetItem (i, &condlist);
+  if (!item)
+    item = (CondItem *) SetItem (i, new CondItem (), &condlist);
+  if (!item)
+    system_printf ("cond creation failed");
+  item->used = true;
+  item->shared = attr->shared;
+  item->mutexitem=NULL;
+  item->waiting=0;
+
+  item->win32_obj_id = ::CreateEvent (&sec_none_nih, 
+	false, /* auto signal reset - which I think is pthreads like ? */
+	false, /* start non signaled */
+	NULL /* no name */ );
+
+
+  CHECKHANDLE (NULL, 1);
+
+  *cond = (pthread_cond_t) item->win32_obj_id;
+
+  return item;
+}
+
+
+int
+CondItem::Signal ()
+{
+  return !PulseEvent(win32_obj_id);
+}
+
+int
+CondItem::Wait ()
+{
+  DWORD rv = SignalObjectAndWait (mutexitem->win32_obj_id, win32_obj_id, INFINITE, false);
+  switch (rv) {
+    case WAIT_FAILED: return 0; /* POSIX doesn't allow errors after we modify the mutex state */
+    case WAIT_OBJECT_0: return 0; /* we have been signaled */
+    default: return 0;
+  }
+}
+
+int
+CondItem::TimedWait (DWORD dwMilliseconds)
+{
+  DWORD rv = SignalObjectAndWait (mutexitem->win32_obj_id, win32_obj_id, dwMilliseconds, false);
+  switch (rv) {
+    case WAIT_FAILED: return 0; /* POSIX doesn't allow errors after we modify the mutex state */
+    case WAIT_ABANDONED: return ETIMEDOUT;
+    case WAIT_OBJECT_0: return 0; /* we have been signaled */
+    default: return 0;
+  }
+}
+
+int
+CondItem::BroadCast ()
+{
+  if (!mutexitem)
+    return 0;
+  PulseEvent(win32_obj_id);
+  while (InterlockedDecrement(&waiting)!=0)
+    PulseEvent(win32_obj_id);
+  mutexitem=NULL;
+  return 0;
+}
 
 //////////////////////////  Pthreads
 
@@ -678,6 +764,147 @@ __pthread_getspecific (pthread_key_t */*key*/)
   NOT_IMP ("_p_key_getsp\n");
 }
 
+/* Thread synchronisation */
+
+int
+__pthread_cond_destroy(pthread_cond_t *cond)
+{
+  SetResourceLock (LOCK_COND_LIST, READ_LOCK | WRITE_LOCK, "__pthread_cond_destroy");
+
+  CondItem *item = MT_INTERFACE->GetCond (cond);
+
+  CHECKITEM (LOCK_COND_LIST, WRITE_LOCK | READ_LOCK, "__pthread_cond_init");
+
+  item->Destroy ();
+
+  MT_INTERFACE->ReleaseItem (item);
+
+  ReleaseResourceLock (LOCK_COND_LIST, READ_LOCK | WRITE_LOCK, "__pthread_cond_destroy")
+;
+  return 0;
+}
+
+int
+__pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
+{
+  if (attr && (attr->valid != 0xf341))
+    return EINVAL;
+  SetResourceLock (LOCK_COND_LIST, WRITE_LOCK | READ_LOCK, "__pthread_cond_init");
+
+  CondItem *item = MT_INTERFACE->CreateCond (cond, attr);
+
+  CHECKITEM (LOCK_COND_LIST, WRITE_LOCK | READ_LOCK, "__pthread_cond_init");
+
+  ReleaseResourceLock (LOCK_COND_LIST, WRITE_LOCK | READ_LOCK, "__pthread_cond_init");
+  return 0;
+
+}
+
+int __pthread_cond_broadcast(pthread_cond_t *cond)
+{
+  GETCOND("_pthread_cond_lock");
+  
+  item->BroadCast();
+
+  return 0;
+}
+
+int __pthread_cond_signal(pthread_cond_t *cond)
+{
+  GETCOND("_pthread_cond_lock");
+
+  item->Signal();
+
+  return 0;
+}
+
+int __pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime)
+{
+  int rv;
+  if (!abstime)
+    return EINVAL;
+  SetResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock");
+  MutexItem* mutexitem=user_data->threadinterface->GetMutex (mutex);
+  ReleaseResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock");
+  if (!mutexitem) return EINVAL;
+  if (!mutexitem->HandleOke ())
+  {
+    return EINVAL;
+  }
+  GETCOND("_pthread_cond_lock");
+  if (item->mutexitem && (item->mutexitem != mutexitem))
+    return EINVAL;
+
+  item->mutexitem=mutexitem;
+  InterlockedIncrement(&item->waiting);
+  rv = item->TimedWait(abstime->tv_sec*1000);
+  mutexitem->Lock();
+  if (InterlockedDecrement(&item->waiting)==0)
+    item->mutexitem=NULL;
+
+  return rv;
+}
+
+int __pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
+{ 
+  int rv;
+  SetResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock"); 
+  MutexItem* mutexitem=user_data->threadinterface->GetMutex (mutex); 
+  ReleaseResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock"); 
+  if (!mutexitem) return EINVAL;  
+  if (!mutexitem->HandleOke ())
+  { 
+    return EINVAL; 
+  }
+  GETCOND("_pthread_cond_lock");
+  if (item->mutexitem && (item->mutexitem != mutexitem))
+    return EINVAL;
+  
+  item->mutexitem=mutexitem;
+  InterlockedIncrement(&item->waiting);
+  rv = item->Wait();  
+  mutexitem->Lock();
+  if (InterlockedDecrement(&item->waiting)==0)
+    item->mutexitem=NULL;
+ 
+  return rv;
+}
+
+int
+__pthread_condattr_init (pthread_condattr_t * condattr)
+{
+  condattr->shared = 0;
+  condattr->valid  = 0xf341; /* Roberts magic number */
+  return 0;
+}
+
+int
+__pthread_condattr_getpshared (const pthread_condattr_t * attr, int *pshared)
+{
+  if (!attr || (attr->valid != 0xf341))
+    return EINVAL;
+  *pshared = attr->shared;
+  return 0;
+}
+
+int
+__pthread_condattr_setpshared (pthread_condattr_t * attr, int pshared)
+{
+  if (!attr || (attr->valid != 0xf341) || (pshared <0) || (pshared > 1 ))
+    return EINVAL;
+  attr->shared = pshared;
+  return 0;
+}
+
+int
+__pthread_condattr_destroy (pthread_condattr_t * condattr)
+{
+  if (!condattr || (condattr->valid != 0xf341))
+      return EINVAL;
+  condattr->valid=0;
+  return 0;
+}
+
 /* Thread signal */
 int
 __pthread_kill (pthread_t * thread, int sig)
@@ -693,7 +920,6 @@ __pthread_kill (pthread_t * thread, int sig)
 
 // unlock myself
   return rval;
-
 }
 
 int
@@ -953,6 +1179,46 @@ extern "C"
     return -1;
   }
   int __pthread_mutex_destroy (pthread_mutex_t *)
+  {
+    return -1;
+  }
+  int __pthread_cond_destroy(pthread_cond_t *)
+  {
+    return -1;
+  }
+  int __pthread_cond_init(pthread_cond_t *, const pthread_condattr_t *)
+  {
+    return -1;
+  }
+  int __pthread_cond_signal(pthread_cond_t *)
+  {
+    return -1;
+  }
+  int __pthread_cond_broadcast(pthread_cond_t *)
+  {
+    return -1;
+  }
+  int __pthread_cond_timedwait(pthread_cond_t *, pthread_mutex_t *, const struct timespec *)
+  {
+    return -1;
+  }
+  int __pthread_cond_wait(pthread_cond_t *, pthread_mutex_t *)
+  {
+    return -1;
+  }
+  int __pthread_condattr_init (pthread_condattr_t *)
+  {
+    return -1;
+  }
+  int __pthread_condattr_destroy (pthread_condattr_t *)
+  {
+    return -1;
+  }
+  int __pthread_condattr_getpshared (pthread_condattr_t *, int *)
+  {
+    return -1;
+  }
+  int __pthread_condattr_setpshared (pthread_condattr_t *, int)
   {
     return -1;
   }

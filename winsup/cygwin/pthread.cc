@@ -171,6 +171,67 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
   return __pthread_mutex_destroy (mutex);
 }
 
+/* Synchronisation */
+
+int
+pthread_cond_destroy(pthread_cond_t *cond)
+{
+  return  __pthread_cond_destroy (cond);
+}
+
+int
+pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
+{
+  return __pthread_cond_init (cond, attr);
+}
+
+int
+pthread_cond_signal(pthread_cond_t *cond)
+{
+  return __pthread_cond_signal (cond);
+}
+
+int pthread_cond_broadcast(pthread_cond_t *cond)
+{
+  return __pthread_cond_broadcast (cond);
+}
+
+int
+pthread_cond_timedwait(pthread_cond_t *cond,
+	 pthread_mutex_t *mutex, const struct timespec *abstime)
+{
+  return __pthread_cond_timedwait (cond, mutex, abstime);
+}
+
+int
+pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
+{
+  return __pthread_cond_wait (cond, mutex);
+}
+
+int
+pthread_condattr_init(pthread_condattr_t *condattr)
+{
+  return __pthread_condattr_init (condattr);
+}
+
+int
+pthread_condattr_destroy(pthread_condattr_t *condattr)
+{
+  return __pthread_condattr_destroy (condattr);
+}
+
+int
+pthread_condattr_getpshared (const pthread_condattr_t *attr, int *pshared)
+{
+  return __pthread_condattr_getpshared (attr, pshared);
+}
+
+int pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
+{
+  return __pthread_condattr_setpshared (attr, pshared);
+}
+
 /* Semaphores */
 int
 sem_init (sem_t * sem, int pshared, unsigned int value)
