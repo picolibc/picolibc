@@ -304,7 +304,7 @@ process_cache::sync_wait_array (const HANDLE interrupt_event)
 
   EnterCriticalSection (&_cache_write_access);
 
-  assert (_processes_count + SPECIALS_COUNT < elements (_wait_array));
+  assert (_processes_count + SPECIALS_COUNT <= elements (_wait_array));
 
   size_t index = 0;
 

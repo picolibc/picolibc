@@ -67,7 +67,7 @@ protected:
 
 public:
 #ifndef __INSIDE_CYGWIN__
-  static void handle_request (transport_layer_base *, class process_cache *);
+  static void handle_request (transport_layer_base *, process_cache *);
 #endif
 
   client_request (request_code_t request_code,
@@ -94,8 +94,8 @@ private:
   const size_t _buflen;
 
 #ifndef __INSIDE_CYGWIN__
-  void handle (transport_layer_base *, class process_cache *);
-  virtual void serve (transport_layer_base *, class process_cache *) = 0;
+  void handle (transport_layer_base *, process_cache *);
+  virtual void serve (transport_layer_base *, process_cache *) = 0;
 #endif
 };
 
@@ -122,7 +122,7 @@ private:
   struct request_get_version version;
 
 #ifndef __INSIDE_CYGWIN__
-  virtual void serve (transport_layer_base *, class process_cache *);
+  virtual void serve (transport_layer_base *, process_cache *);
 #endif
 };
 
@@ -141,7 +141,7 @@ public:
   client_request_shutdown ();
 
 private:
-  virtual void serve (transport_layer_base *, class process_cache *);
+  virtual void serve (transport_layer_base *, process_cache *);
 };
 
 #endif /* !__INSIDE_CYGWIN__ */
@@ -177,7 +177,7 @@ private:
   struct request_attach_tty req;
 
 #ifndef __INSIDE_CYGWIN__
-  virtual void serve (transport_layer_base *, class process_cache *);
+  virtual void serve (transport_layer_base *, process_cache *);
 #endif
 };
 

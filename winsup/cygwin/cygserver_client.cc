@@ -342,7 +342,7 @@ client_request::make_request ()
       return -1;
     }
 
-  class transport_layer_base * const transport = create_server_transport ();
+  transport_layer_base *const transport = create_server_transport ();
 
   assert (transport);
 
@@ -361,7 +361,7 @@ client_request::make_request ()
       return -1;
     }
 
-  debug_printf ("connected to server %p", transport);
+  // verbose: debug_printf ("connected to server %p", transport);
 
   send (transport);
 

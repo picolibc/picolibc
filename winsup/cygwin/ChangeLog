@@ -1,5 +1,17 @@
 2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver_client.cc (client_request::make_request): Comment out
+	a verbose tracing statement.
+	* cygserver_process.cc (process_cache::sync_wait_array): Fix
+	broken assert.
+	* include/cygwin/cygserver.h (class client_request): Remove excess
+	use of `class' qualifier in declarations.
+	(class client_request_get_version): Ditto.
+	(class client_request_shutdown): Ditto.
+	(class client_request_attach_tty): Ditto.
+
+2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_ipc.h: New file.
 	* cygserver_shm.h: Re-written from scratch.
 	* cygserver_shm.cc: Ditto.
