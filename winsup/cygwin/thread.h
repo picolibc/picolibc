@@ -108,6 +108,7 @@ struct __reent_t
 {
   struct _reent *_clib;
   struct _winsup_t *_winsup;
+  void init_clib (_reent&);
 };
 
 _winsup_t *_reent_winsup ();
