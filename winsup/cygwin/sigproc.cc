@@ -147,7 +147,7 @@ muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
 
 DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 
-static bool NO_COPY pending_signals = false;	// true if signals pending
+bool NO_COPY pending_signals = false;	// true if signals pending
 
 /* Functions
  */
@@ -1190,7 +1190,7 @@ wait_sig (VOID *self)
 		{
 		  /* If x > 0, we have to deal with a signal at some later point */
 		  if (rc != RC_NOSYNC && x > 0)
-		    pending_signals = true;	// There should be an armed semaphore, in this case
+		    /*pending_signals = true*/;	// There should be an armed semaphore, in this case
 
 		  if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
 		      (sigismember (&myself->getsigmask (), sig) ||
@@ -1199,7 +1199,7 @@ wait_sig (VOID *self)
 		    {
 		      sigproc_printf ("signal %d blocked", sig);
 		      x = InterlockedIncrement (myself->getsigtodo (sig));
-		      pending_signals = true;
+		      /* pending_signals = true;*/  // will be set by set_process_mask
 		    }
 		  else
 		    {
@@ -1229,9 +1229,9 @@ wait_sig (VOID *self)
 			  sigproc_printf ("Got signal %d", sig);
 			  if (!sig_handle (sig))
 			    {
+			      pending_signals = true;
 			      saw_failed_interrupt = true;
 			      x = InterlockedIncrement (myself->getsigtodo (sig));
-			      pending_signals = true;
 			    }
 			}
 		      if (rc == RC_NOSYNC && x > 0)

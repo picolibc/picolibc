@@ -145,24 +145,40 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
 }
 
 void
-shared_info::initialize ()
+shared_info::initialize (const char *user_name)
 {
-  if (version)
+  DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &version, SHARED_VERSION_MAGIC);
+  if (!sversion)
+    {
+      /* Initialize the queue of deleted files.  */
+      delqueue.init ();
+
+      /* Initialize tty table.  */
+      tty.init ();
+    }
+  else
     {
       if (version != SHARED_VERSION_MAGIC)
-	multiple_cygwin_problem ("shared", version, SHARED_VERSION_MAGIC);
-      else if (cb != SHARED_INFO_CB)
-	multiple_cygwin_problem ("shared size", cb, SHARED_INFO_CB);
-      return;
+	{
+	  multiple_cygwin_problem ("shared", version, SHARED_VERSION_MAGIC);
+	  InterlockedExchange ((LONG *) &version, sversion);
+	}
+      while (!cb)
+	low_priority_sleep (0);	// Should be hit only very very rarely
     }
 
-  /* Initialize the queue of deleted files.  */
-  delqueue.init ();
+  /* Initialize the Cygwin heap, if necessary */
+  if (!cygheap)
+    {
+      cygheap_init ();
+      cygheap->user.set_name (user_name);
+    }
 
-  /* Initialize tty table.  */
-  tty.init ();
-  version = SHARED_VERSION_MAGIC;
-  cb = sizeof (*this);
+  heap_init ();
+
+  if (!sversion)
+    cb = sizeof (*this);	// Do last, after all shared memory initializion
+
   if (cb != SHARED_INFO_CB)
     system_printf ("size of shared memory region changed from %u to %u",
 		   SHARED_INFO_CB, cb);
@@ -172,6 +188,13 @@ void __stdcall
 memory_init ()
 {
   getpagesize ();
+
+  char user_name[UNLEN + 1];
+  DWORD user_name_len = UNLEN + 1;
+
+  if (!GetUserName (user_name, &user_name_len))
+    strcpy (user_name, "unknown");
+
   /* Initialize general shared memory */
   HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
   cygwin_shared = (shared_info *) open_shared ("shared",
@@ -180,27 +203,12 @@ memory_init ()
 					       sizeof (*cygwin_shared),
 					       SH_CYGWIN_SHARED);
 
-  cygwin_shared->initialize ();
-
-  /* Allocate memory for the per-user mount table */
-  char user_name[UNLEN + 1];
-  DWORD user_name_len = UNLEN + 1;
-
-  if (!GetUserName (user_name, &user_name_len))
-    strcpy (user_name, "unknown");
-
-  /* Initialize the Cygwin heap, if necessary */
-  if (!cygheap)
-    {
-      cygheap_init ();
-      cygheap->user.set_name (user_name);
-    }
+  cygwin_shared->initialize (user_name);
 
   cygheap->shared_h = shared_h;
   ProtectHandleINH (cygheap->shared_h);
 
-  heap_init ();
-
+  /* Allocate memory for the per-user mount table */
   mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
 					    cygwin_mount_h, sizeof (mount_info),
 					    SH_MOUNT_TABLE);

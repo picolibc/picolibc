@@ -963,11 +963,15 @@ set_process_mask (sigset_t newmask)
   sigproc_printf ("old mask = %x, new mask = %x", myself->getsigmask (), newmask);
   myself->setsigmask (newmask);	// Set a new mask
   mask_sync->release ();
-  if (oldmask != newmask)
-    sig_dispatch_pending ();
-  else
+  if (!(oldmask & ~newmask))
     sigproc_printf ("not calling sig_dispatch_pending.  sigtid %p current %p",
 		    sigtid, GetCurrentThreadId ());
+  else
+    {
+      extern bool pending_signals;
+      pending_signals = true;
+      sig_dispatch_pending ();
+    }
   return;
 }
 

@@ -1,3 +1,17 @@
+2003-09-03  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (set_process_mask): Set pending signals only when
+	signals become unmasked.
+	* sigproc.cc (pending_signals): Flip back to a global.
+	(wait_sig): Don't set pending signals when there is an armed semaphore
+	or signal is blocked.
+
+	* shared.cc (shared_info::initialize): Add a username parameter for
+	user-mode mounts.  Reorganize to try to avoid startup race.
+	(memory_init): Move some stuff into shared_info::initialize.
+	* shared_info.h (shared_info::initialize): Change declaration.
+	(CURR_SHARED_MAGIC): Update.
+
 2003-09-01  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 4.
