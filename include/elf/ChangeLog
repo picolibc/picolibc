@@ -1,3 +1,9 @@
+2003-10-22  Alexandre Oliva  <aoliva@redhat.com>,
+	    Michael Snyder  <msnyder@redhat.com>
+
+	* sh.h (EF_SH4A, EF_SH4AL_DSP, EF_SH4_NOFPU, EF_SH4A_NOFPU): New.
+	(EF_SH_MERGE_MACH): Combine them.
+
 2003-10-18  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* mmix.h (R_MMIX_PUSHJ_STUBBABLE): New reloc number.

@@ -27,13 +27,18 @@
 #define EF_SH1		   1
 #define EF_SH2		   2
 #define EF_SH3		   3
-#define EF_SH_HAS_DSP(flags) ((flags) & 4)
+#define EF_SH_HAS_DSP(flags) (((flags) & EF_SH_MACH_MASK & ~3) == 4)
 #define EF_SH_DSP	   4
 #define EF_SH3_DSP	   5
+#define EF_SH4AL_DSP	   6
 #define EF_SH_HAS_FP(flags) ((flags) & 8)
 #define EF_SH3E		   8
 #define EF_SH4		   9
 #define EF_SH2E            11
+#define EF_SH4A		   12
+
+#define EF_SH4_NOFPU	   0x10
+#define EF_SH4A_NOFPU	   0x11
 
 /* This one can only mix in objects from other EF_SH5 objects.  */
 #define EF_SH5		  10
@@ -56,6 +61,20 @@
    : (((mach1) == EF_SH3E && (mach2) == EF_SH_UNKNOWN) \
       || ((mach2) == EF_SH3E && (mach1) == EF_SH_UNKNOWN)) \
    ? EF_SH4 \
+   /* ??? SH4?  Why not SH3E?  */ \
+   : ((((mach1) == EF_SH4_NOFPU || (mach1) == EF_SH4A_NOFPU) \
+       && EF_SH_HAS_DSP (mach2)) \
+      || (((mach2) == EF_SH4_NOFPU || (mach2) == EF_SH4A_NOFPU) \
+	  && EF_SH_HAS_DSP (mach1))) \
+   ? EF_SH4AL_DSP \
+   : ((mach1) == EF_SH4_NOFPU && EF_SH_HAS_FP (mach2)) \
+   ? ((mach2) < EF_SH4A) ? EF_SH4 : (mach2) \
+   : ((mach2) == EF_SH4_NOFPU && EF_SH_HAS_FP (mach1)) \
+   ? ((mach1) < EF_SH4A) ? EF_SH4 : (mach1) \
+   : ((mach1) == EF_SH4A_NOFPU && EF_SH_HAS_FP (mach2)) \
+   ? ((mach2) <= EF_SH4A) ? EF_SH4A : (mach2) \
+   : ((mach2) == EF_SH4A_NOFPU && EF_SH_HAS_FP (mach1)) \
+   ? ((mach1) <= EF_SH4A) ? EF_SH4A : (mach1) \
    : (((mach1) == EF_SH2E ? 7 : (mach1)) > ((mach2) == EF_SH2E ? 7 : (mach2)) \
       ? (mach1) : (mach2)))
 
