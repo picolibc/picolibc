@@ -910,6 +910,10 @@ mount
 _mount = mount
 mprotect
 mrand48
+msgctl
+msgget
+msgrcv
+msgsnd
 msync
 munmap
 nan
@@ -1131,6 +1135,9 @@ _seed48 = seed48
 seekdir
 _seekdir = seekdir
 _seekdir64 = seekdir64
+semctl
+semget
+semop
 sem_close
 sem_destroy
 sem_getvalue

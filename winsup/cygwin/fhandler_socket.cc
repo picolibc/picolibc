@@ -1106,7 +1106,7 @@ fhandler_socket::close ()
      solution but it helps in many cases. */
   struct linger linger;
   linger.l_onoff = 1;
-  linger.l_linger = 240; /* seconds. default 2MSL value according to MSDN. */
+  linger.l_linger = 240; /* secs. default 2MSL value according to MSDN. */
   setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
 	      (const char *)&linger, sizeof linger);
 

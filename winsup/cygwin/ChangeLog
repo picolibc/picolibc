@@ -1,5 +1,61 @@
 2003-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygserver.h (client_request::request_code_t): Add
+	CYGSERVER_REQUEST_MSG and CYGSERVER_REQUEST_SEM.
+	(admininstrator_group_sid): Add extern declaration.
+	* cygserver_ipc.h: Rewrite.
+	* cygserver_msg.h: New file.
+	* cygserver_sem.h: New file.
+	* cygserver_shm.h: More or less rewrite.
+	* cygwin.din: Add msgctl, msgget, msgrcv, msgsnd, semctl, semget and
+	semop.
+	* msg.cc: Rewrite.
+	* safe_memory.h: Remove.
+	* sem.cc: Rewrite.
+	* shm.cc: Rewrite.
+	* include/cygwin/ipc.h: Use appropriate guard.
+	(struct ipc_perm): Add seq.
+	(IPCID_TO_IX): New define from BSD.
+	(IPCID_TO_SEQ): Ditto.
+	(IXSEQ_TO_IPCID): Ditto.
+	(IPC_R): Ditto.
+	(IPC_W): Ditto.
+	(IPC_M): Ditto.
+	* include/cygwin/msg.h: Use appropriate guard. #ifdef _KERNEL all stuff
+	not explicitely defined by SUSv3. Use signed types in structs to match
+	types used in BSD.
+	(msgqnum_t): Define unsigned.
+	(msglen_t): Ditto.
+	(struct msqid_ds): Add msg_first and msg_last.
+	(struct msginfo): Remove msgpool. Add msgssz and msgseg.
+	* include/cygwin/sem.h: Use appropriate guard. #ifdef _KERNEL all stuff
+	not explicitely defined by SUSv3. Use signed types in structs to match
+	types used in BSD.
+	(SEM_UNDO): Define appropriately.
+	(struct semid_ds): Add sem_base.
+	(struct seminfo): Add semmap and semusz.
+	(SEM_A): New define from BSD.
+	(SEM_R): Ditto.
+	(SEM_ALLOC): Ditto.
+	(union semun): Define.
+	* include/cygwin/shm.h: Use appropriate guard. #ifdef _KERNEL all stuff
+	not explicitely defined by SUSv3. Use signed types in structs to match
+	types used in BSD.
+	(SHMLBA): Define using cygwin_internal(CW_GET_SHMLBA) call.
+	(struct shmid_ds): Add shm_internal.
+	(struct shm_info): Rename shm_ids to used_ids as in BSD.  Add define
+	for shm_ids.
+	* include/cygwin/sysproto.h: New file.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/ipc.h: New file.
+	* include/sys/msg.h: New file.
+	* include/sys/queue.h: New file from BSD.
+	* include/sys/sem.h: New file.
+	* include/sys/shm.h: New file.
+	* include/sys/sysproto.h: New file.
+
+2003-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (build_fh_pc): Resurrect accidentally removed
 	DEV_CYGDRIVE_MAJOR case.
 

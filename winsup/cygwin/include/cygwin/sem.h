@@ -9,8 +9,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _SYS_SEM_H
-#define _SYS_SEM_H
+#ifndef _CYGWIN_SEM_H
+#define _CYGWIN_SEM_H
 
 #include <cygwin/ipc.h>
 
@@ -21,7 +21,7 @@ extern "C"
 
 /* Semaphore operation flags:
  */
-#define SEM_UNDO		/* Set up adjust on exit entry. */
+#define SEM_UNDO   010000	/* Set up adjust on exit entry. */
 
 /* Command definitions for the semctl () function:
  */
@@ -33,8 +33,10 @@ extern "C"
 #define SETVAL     0x3005	/* Set semval. */
 #define SETALL     0x3006	/* Set all cases of semval. */
 
+#ifdef _KERNEL
 #define SEM_STAT   0x3010	/* For ipcs(8). */
 #define SEM_INFO   0x3011	/* For ipcs(8). */
+#endif /* _KERNEL */
 
 struct semid_ds
 {
@@ -42,7 +44,12 @@ struct semid_ds
   unsigned short   sem_nsems;	/* Number of semaphores in set. */
   timestruc_t      sem_otim;	/* Last semop () time. */
   timestruc_t      sem_ctim;	/* Last time changed by semctl (). */
+#ifdef _KERNEL
+  struct sem	  *sem_base;	/* pointer to first semaphore in set */
+  long             sem_spare4[1];
+#else
   long             sem_spare4[2];
+#endif /* _KERNEL */
 };
 
 #define sem_otime sem_otim.tv_sec
@@ -55,34 +62,60 @@ struct sembuf
   short           sem_flg;	/* Operation flags. */
 };
 
+#ifdef _KERNEL
 /* Buffer type for semctl (IPC_INFO, ...) as used by ipcs(8).
  */
 struct seminfo
 {
-  unsigned long semmni;		/* Maximum number of unique semaphore
-				   sets, system wide. */
-  unsigned long semmns;		/* Maximum number of semaphores,
-				   system wide. */
-  unsigned long semmsl;		/* Maximum number of semaphores per
-				   semaphore set. */
-  unsigned long semopm;		/* Maximum number of operations per
-				   semop call. */
-  unsigned long semmnu;		/* Maximum number of undo structures,
-				   system wide. */
-  unsigned long semume;		/* Maximum number of undo entries per
-				   undo structure. */
-  unsigned long semvmx;		/* Maximum semaphore value. */
-  unsigned long semaem;		/* Maximum adjust-on-exit value. */
-  unsigned long sem_spare[4];
+  long semmni;		/* Maximum number of unique semaphore
+			   sets, system wide. */
+  long semmns;		/* Maximum number of semaphores,
+			   system wide. */
+  long semmsl;		/* Maximum number of semaphores per
+			   semaphore set. */
+  long semopm;		/* Maximum number of operations per
+			   semop call. */
+  long semmnu;		/* Maximum number of undo structures,
+			   system wide. */
+  long semume;		/* Maximum number of undo entries per
+			   undo structure. */
+  long semvmx;		/* Maximum semaphore value. */
+  long semaem;		/* Maximum adjust-on-exit value. */
+  long semmap;		/* # of entries in semaphore map */
+  long semusz;		/* size in bytes of undo structure */
+  long sem_spare[2];
 };
 
 /* Buffer type for semctl (SEM_INFO, ...) as used by ipcs(8).
  */
 struct sem_info
 {
-  unsigned long sem_ids;	/* Number of allocated semaphore sets. */
-  unsigned long sem_num;	/* Number of allocated semaphores. */
+  long sem_ids;		/* Number of allocated semaphore sets. */
+  long sem_num;		/* Number of allocated semaphores. */
 };
+
+/* Permission flags */
+#define SEM_A		IPC_W	/* alter permission */
+#define SEM_R		IPC_R	/* read permission */
+
+/* Internally used mode bits. */
+#define	SEM_ALLOC	01000	/* semaphore is allocated */
+
+#endif /* _KERNEL */
+
+#ifdef _KERNEL
+/* According to SUSv3, "the fourth argument [to semctl()] is optional and
+   depends upon the operation requested. If required, it is of type
+   union semun, which the application shall explicitly declare:" */
+union semun {
+    int val;			/* value for SETVAL */
+    struct semid_ds *buf;	/* buffer for IPC_STAT, IPC_SET */
+    unsigned short  *array;	/* array for GETALL, SETALL */
+};
+/* Therefore this union is only declared here if building internal code.
+   _KERNEL must not be defined in exernal applications!  Declare union
+   semun explicitely as required by SUSv3, please. */
+#endif /* _KERNEL */
 
 int semctl (int semid, int semnum, int cmd, ...);
 int semget (key_t key, int nsems, int semflg);
@@ -92,4 +125,4 @@ int semop (int semid, struct sembuf *sops, size_t nsops);
 }
 #endif
 
-#endif /* _SYS_SEM_H */
+#endif /* _CYGWIN_SEM_H */

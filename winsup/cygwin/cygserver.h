@@ -48,6 +48,8 @@ protected:
     CYGSERVER_REQUEST_GET_VERSION,
     CYGSERVER_REQUEST_SHUTDOWN,
     CYGSERVER_REQUEST_ATTACH_TTY,
+    CYGSERVER_REQUEST_MSG,
+    CYGSERVER_REQUEST_SEM,
     CYGSERVER_REQUEST_SHM,
     CYGSERVER_REQUEST_LAST
   } request_code_t;
@@ -177,6 +179,10 @@ private:
   virtual void serve (transport_layer_base *, process_cache *);
 #endif
 };
+
+#ifndef __INSIDE_CYGWIN__
+extern PSID admininstrator_group_sid;
+#endif
 
 extern bool check_cygserver_available ();
 extern void cygserver_init ();

@@ -1,9 +1,6 @@
-/* shm.cc: Single unix specification IPC interface for Cygwin.
+/* shm.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2002,2003 Red Hat, Inc.
-
-   Written by Conrad Scott <conrad.scott@dsl.pipex.com>.
-   Based on code by Robert Collins <robert.collins@hotmail.com>.
+   Copyright 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -15,697 +12,349 @@ details. */
 #include "cygerrno.h"
 #ifdef USE_SERVER
 #include <sys/types.h>
-
-#include <assert.h>
+#include <sys/queue.h>
 #include <stdio.h>
 #include <unistd.h>
 
-#include "safe_memory.h"
+#include "pinfo.h"
 #include "sigproc.h"
 
 #include "cygserver_ipc.h"
 #include "cygserver_shm.h"
 
-/*---------------------------------------------------------------------------*
- * class client_shmmgr
- *
- * A singleton class.
- *---------------------------------------------------------------------------*/
+/*
+ * client_request_shm Constructors
+ */
 
-#define shmmgr (client_shmmgr::instance ())
-
-class client_shmmgr
+client_request_shm::client_request_shm (int shmid,
+					const void *shmaddr,
+					int shmflg)
+  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
 {
-private:
-  class segment_t
-  {
-  public:
-    const int shmid;
-    const void *const shmaddr;
-    const int shmflg;
-    HANDLE hFileMap;		// Updated by fixup_shms_after_fork ().
+  _parameters.in.shmop = SHMOP_shmat;
+  ipc_set_proc_info (_parameters.in.ipcblk);
 
-    segment_t *next;
+  _parameters.in.atargs.shmid = shmid;
+  _parameters.in.atargs.shmaddr = shmaddr;
+  _parameters.in.atargs.shmflg = shmflg;
 
-    segment_t (const int shmid, const void *const shmaddr, const int shmflg,
-	       const HANDLE hFileMap)
-      : shmid (shmid), shmaddr (shmaddr), shmflg (shmflg), hFileMap (hFileMap),
-	next (NULL)
-    {}
-  };
+  msglen (sizeof (_parameters.in));
+}
 
-public:
-  static client_shmmgr & instance ();
+client_request_shm::client_request_shm (int shmid,
+					int cmd,
+					struct shmid_ds *buf)
+  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
+{
+  _parameters.in.shmop = SHMOP_shmctl;
+  ipc_set_proc_info (_parameters.in.ipcblk);
 
-  void *shmat (int shmid, const void *, int shmflg);
-  int shmctl (int shmid, int cmd, struct shmid_ds *);
-  int shmdt (const void *);
-  int shmget (key_t, size_t, int shmflg);
+   _parameters.in.ctlargs.shmid = shmid;
+   _parameters.in.ctlargs.cmd = cmd;
+   _parameters.in.ctlargs.buf = buf;
 
-  int fixup_shms_after_fork ();
+  msglen (sizeof (_parameters.in));
+}
 
-private:
-  static NO_COPY client_shmmgr *_instance;
+client_request_shm::client_request_shm (const void *shmaddr)
+  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
+{
+  _parameters.in.shmop = SHMOP_shmdt;
+  ipc_set_proc_info (_parameters.in.ipcblk);
 
-  CRITICAL_SECTION _segments_lock;
-  static segment_t *_segments_head; // List of attached segs by shmaddr.
+  _parameters.in.dtargs.shmaddr = shmaddr;
 
-  static long _shmat_cnt;	// No. of attached segs; for info. only.
+  msglen (sizeof (_parameters.in));
+}
 
-  client_shmmgr ();
-  ~client_shmmgr ();
+client_request_shm::client_request_shm (key_t key,
+					size_t size,
+					int shmflg)
+  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
+{
+  _parameters.in.shmop = SHMOP_shmget;
+  ipc_set_proc_info (_parameters.in.ipcblk);
 
-  // Undefined (as this class is a singleton):
-  client_shmmgr (const client_shmmgr &);
-  client_shmmgr & operator= (const client_shmmgr &);
+  _parameters.in.getargs.key = key;
+  _parameters.in.getargs.size = size;
+  _parameters.in.getargs.shmflg = shmflg;
 
-  segment_t *find (const void *, segment_t **previous = NULL);
+  msglen (sizeof (_parameters.in));
+}
 
-  void *attach (int shmid, const void *, int shmflg, HANDLE & hFileMap);
+client_request_shm::client_request_shm (proc *p1)
+  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
+{
+  _parameters.in.shmop = SHMOP_shmfork;
+  ipc_set_proc_info (_parameters.in.ipcblk);
 
-  segment_t *new_segment (int shmid, const void *, int shmflg, HANDLE);
+  _parameters.in.forkargs = *p1;
+}
+
+/* List of shmid's with file mapping HANDLE and size, returned by shmget. */
+struct shm_shmid_list {
+  SLIST_ENTRY(shm_shmid_list) ssh_next;
+  int shmid;
+  vm_object_t hdl;
+  size_t size;
 };
 
-/* static */ NO_COPY client_shmmgr *client_shmmgr::_instance;
-
-/* The following two variables must be inherited by child processes
- * since they are used by fixup_shms_after_fork () to re-attach to the
- * parent's shm segments.
- */
-/* static */ client_shmmgr::segment_t *client_shmmgr::_segments_head;
-/* static */ long client_shmmgr::_shmat_cnt;
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::instance ()
- *---------------------------------------------------------------------------*/
-
-client_shmmgr &
-client_shmmgr::instance ()
-{
-  if (!_instance)
-    _instance = safe_new0 (client_shmmgr);
-
-  assert (_instance);
-
-  return *_instance;
-}
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::shmat ()
- *---------------------------------------------------------------------------*/
-
-void *
-client_shmmgr::shmat (const int shmid,
-		      const void *const shmaddr,
-		      const int shmflg)
-{
-  syscall_printf ("shmat (shmid = %d, shmaddr = %p, shmflg = 0%o)",
-		  shmid, shmaddr, shmflg);
-
-  EnterCriticalSection (&_segments_lock);
-
-  HANDLE hFileMap = NULL;
-
-  void *const ptr = attach (shmid, shmaddr, shmflg, hFileMap);
-
-  if (ptr)
-    new_segment (shmid, ptr, shmflg, hFileMap);
-
-  LeaveCriticalSection (&_segments_lock);
-
-  if (ptr)
-    syscall_printf ("%p = shmat (shmid = %d, shmaddr = %p, shmflg = 0%o)",
-		    ptr, shmid, shmaddr, shmflg);
-  // else
-    // See the syscall_printf in client_shmmgr::attach ().
-
-  return (ptr ? ptr : (void *) -1);
-}
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::shmctl ()
- *---------------------------------------------------------------------------*/
-
-int
-client_shmmgr::shmctl (const int shmid,
-		       const int cmd,
-		       struct shmid_ds *const buf)
-{
-  syscall_printf ("shmctl (shmid = %d, cmd = 0x%x, buf = %p)",
-		  shmid, cmd, buf);
-
-  // Check parameters and set up in parameters as required.
-
-  const struct shmid_ds *in_buf = NULL;
-
-  switch (cmd)
-    {
-    case IPC_SET:
-      if (__check_invalid_read_ptr_errno (buf, sizeof (struct shmid_ds)))
-	{
-	  syscall_printf (("-1 [EFAULT] = "
-			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
-			  shmid, cmd, buf);
-	  set_errno (EFAULT);
-	  return -1;
-	}
-      in_buf = buf;
-      break;
-
-    case IPC_STAT:
-    case SHM_STAT:
-      if (__check_null_invalid_struct_errno (buf, sizeof (struct shmid_ds)))
-	{
-	  syscall_printf (("-1 [EFAULT] = "
-			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
-			  shmid, cmd, buf);
-	  set_errno (EFAULT);
-	  return -1;
-	}
-      break;
-
-    case IPC_INFO:
-      if (__check_null_invalid_struct_errno (buf, sizeof (struct shminfo)))
-	{
-	  syscall_printf (("-1 [EFAULT] = "
-			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
-			  shmid, cmd, buf);
-	  set_errno (EFAULT);
-	  return -1;
-	}
-      break;
-
-    case SHM_INFO:
-      if (__check_null_invalid_struct_errno (buf, sizeof (struct shm_info)))
-	{
-	  syscall_printf (("-1 [EFAULT] = "
-			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
-			  shmid, cmd, buf);
-	  set_errno (EFAULT);
-	  return -1;
-	}
-      break;
-    }
-
-  // Create and issue the command.
-
-  client_request_shm request (shmid, cmd, in_buf);
-
-  if (request.make_request () == -1 || request.error_code ())
-    {
-      syscall_printf (("-1 [%d] = "
-		       "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
-		      request.error_code (), shmid, cmd, buf);
-      set_errno (request.error_code ());
-      return -1;
-    }
-
-  // Some commands require special processing for their out parameters.
-
-  int result = 0;
-
-  switch (cmd)
-    {
-    case IPC_STAT:
-      *buf = request.ds ();
-      break;
-
-    case IPC_INFO:
-      *(struct shminfo *) buf = request.shminfo ();
-      break;
-
-    case SHM_STAT:		// ipcs(8) i'face.
-      result = request.shmid ();
-      *buf = request.ds ();
-      break;
-
-    case SHM_INFO:		// ipcs(8) i'face.
-      result = request.shmid ();
-      *(struct shm_info *) buf = request.shm_info ();
-      break;
-    }
-
-  syscall_printf ("%d = shmctl (shmid = %d, cmd = 0x%x, buf = %p)",
-		  result, shmid, cmd, buf);
-
-  return result;
-}
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::shmdt ()
- *
- * According to Posix, the only error condition for this system call
- * is EINVAL if shmaddr is not the address of the start of an attached
- * shared memory segment.  Given that, all other errors just generate
- * tracing noise.
- *---------------------------------------------------------------------------*/
-
-int
-client_shmmgr::shmdt (const void *const shmaddr)
-{
-  syscall_printf ("shmdt (shmaddr = %p)", shmaddr);
-
-  EnterCriticalSection (&_segments_lock);
-
-  segment_t *previous = NULL;
-
-  segment_t *const segptr = find (shmaddr, &previous);
-
-  if (!segptr)
-    {
-      LeaveCriticalSection (&_segments_lock);
-      syscall_printf ("-1 [EINVAL] = shmdt (shmaddr = %p)", shmaddr);
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  assert (previous ? previous->next == segptr : _segments_head == segptr);
-
-  if (previous)
-    previous->next = segptr->next;
-  else
-    _segments_head = segptr->next;
-
-  LeaveCriticalSection (&_segments_lock);
-
-  const long cnt = InterlockedDecrement (&_shmat_cnt);
-  assert (cnt >= 0);
-
-  if (!UnmapViewOfFile ((void *) shmaddr))
-    syscall_printf (("failed to unmap view "
-		     "[shmid = %d, handle = %p, shmaddr = %p]:"
-		     "%E"),
-		    segptr->shmid, segptr->hFileMap, shmaddr);
-
-  assert (segptr->hFileMap);
-
-  if (!CloseHandle (segptr->hFileMap))
-    syscall_printf (("failed to close file map handle "
-		     "[shmid = %d, handle = %p]: %E"),
-		    segptr->shmid, segptr->hFileMap);
-
-  client_request_shm request (segptr->shmid);
-
-  if (request.make_request () == -1 || request.error_code ())
-    syscall_printf ("shmdt request failed [shmid = %d, handle = %p]: %s",
-		    segptr->shmid, segptr->hFileMap,
-		    strerror (request.error_code ()));
-
-  safe_delete (segptr);
-
-  syscall_printf ("0 = shmdt (shmaddr = %p)", shmaddr);
-
-  return 0;
-}
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::shmget ()
- *---------------------------------------------------------------------------*/
-
-int
-client_shmmgr::shmget (const key_t key, const size_t size, const int shmflg)
-{
-  syscall_printf ("shmget (key = 0x%016X, size = %u, shmflg = 0%o)",
-		  key, size, shmflg);
-
-  client_request_shm request (key, size, shmflg);
-
-  if (request.make_request () == -1 || request.error_code ())
-    {
-      syscall_printf (("-1 [%d] = "
-		       "shmget (key = 0x%016X, size = %u, shmflg = 0%o)"),
-		      request.error_code (),
-		      key, size, shmflg);
-      set_errno (request.error_code ());
-      return -1;
-    }
-
-  syscall_printf (("%d = shmget (key = 0x%016X, size = %u, shmflg = 0%o)"),
-		  request.shmid (),
-		  key, size, shmflg);
-
-  return request.shmid ();
-}
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::fixup_shms_after_fork ()
- *
- * The hFileMap handles are non-inheritable: so they have to be
- * re-acquired from cygserver.
- *
- * Nb. This routine need not be thread-safe as it is only called at startup.
- *---------------------------------------------------------------------------*/
-
-int
-client_shmmgr::fixup_shms_after_fork ()
-{
-  debug_printf ("re-attaching to shm segments: %d attached", _shmat_cnt);
-
-  {
-    int length = 0;
-    for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
-      length += 1;
-
-    if (_shmat_cnt != length)
-      {
-	system_printf (("state inconsistent: "
-			"_shmat_cnt = %d, length of segments list = %d"),
-		       _shmat_cnt, length);
-	return 1;
-      }
-  }
-
-  for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
-    if (!attach (segptr->shmid,
-		 segptr->shmaddr,
-		 segptr->shmflg & ~SHM_RND,
-		 segptr->hFileMap))
-      {
-	system_printf ("fatal error re-attaching to shm segment %d",
-		       segptr->shmid);
-	return 1;
-      }
-
-  if (_shmat_cnt)
-    debug_printf ("re-attached all %d shm segments", _shmat_cnt);
-
-  return 0;
-}
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::client_shmmgr ()
- *---------------------------------------------------------------------------*/
-
-client_shmmgr::client_shmmgr ()
-{
-  InitializeCriticalSection (&_segments_lock);
-}
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::~client_shmmgr ()
- *---------------------------------------------------------------------------*/
-
-client_shmmgr::~client_shmmgr ()
-{
-  DeleteCriticalSection (&_segments_lock);
-}
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::find ()
- *---------------------------------------------------------------------------*/
-
-client_shmmgr::segment_t *
-client_shmmgr::find (const void *const shmaddr, segment_t **previous)
-{
-  if (previous)
-    *previous = NULL;
-
-  for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
-    if (segptr->shmaddr == shmaddr)
-      return segptr;
-    else if (segptr->shmaddr > shmaddr) // The list is sorted by shmaddr.
-      return NULL;
-    else if (previous)
-      *previous = segptr;
-
-  return NULL;
-}
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::attach ()
- *
- * The body of shmat (), also used by fixup_shms_after_fork ().
- *---------------------------------------------------------------------------*/
-
-void *
-client_shmmgr::attach (const int shmid,
-		       const void *shmaddr,
-		       const int shmflg,
-		       HANDLE & hFileMap)
-{
-  client_request_shm request (shmid, shmflg);
-
-  if (request.make_request () == -1 || request.error_code ())
-    {
-      syscall_printf (("-1 [%d] = "
-		       "shmat (shmid = %d, shmaddr = %p, shmflg = 0%o)"),
-		      request.error_code (), shmid, shmaddr, shmflg);
-      set_errno (request.error_code ());
-      return NULL;
-    }
-
-  int result = 0;
-
-  const DWORD access = (shmflg & SHM_RDONLY) ? FILE_MAP_READ : FILE_MAP_WRITE;
-
-  if (shmaddr && (shmflg & SHM_RND))
-    shmaddr = (char *) shmaddr - ((ssize_t) shmaddr % SHMLBA);
-
-  void *const ptr =
-    MapViewOfFileEx (request.hFileMap (), access, 0, 0, 0, (void *) shmaddr);
-
-  if (!ptr)
-    {
-      syscall_printf (("failed to map view "
-		       "[shmid = %d, handle = %p, shmaddr = %p]: %E"),
-		      shmid, request.hFileMap (), shmaddr);
-      result = EINVAL;		// FIXME
-    }
-  else if (shmaddr && ptr != shmaddr)
-    {
-      syscall_printf (("failed to map view at requested address "
-		       "[shmid = %d, handle = %p]: "
-		       "requested address = %p, mapped address = %p"),
-		      shmid, request.hFileMap (),
-		      shmaddr, ptr);
-      result = EINVAL;		// FIXME
-    }
-
-  if (result != 0)
-    {
-      if (!CloseHandle (request.hFileMap ()))
-	syscall_printf (("failed to close file map handle "
-			 "[shmid = %d, handle = %p]: %E"),
-			shmid, request.hFileMap ());
-
-      client_request_shm dt_req (shmid);
-
-      if (dt_req.make_request () == -1 || dt_req.error_code ())
-	syscall_printf ("shmdt request failed [shmid = %d, handle = %p]: %s",
-			shmid, request.hFileMap (),
-			strerror (dt_req.error_code ()));
-
-      set_errno (result);
-      return NULL;
-    }
-
-  hFileMap = request.hFileMap ();
-  return ptr;
-}
-
-/*---------------------------------------------------------------------------*
- * client_shmmgr::new_segment ()
- *
- * Allocate a new segment for the given shmid, file map and address
- * and insert into the segment map.
- *---------------------------------------------------------------------------*/
-
-client_shmmgr::segment_t *
-client_shmmgr::new_segment (const int shmid,
-			    const void *const shmaddr,
-			    const int shmflg,
-			    const HANDLE hFileMap)
-{
-  assert (ipc_ext2int_subsys (shmid) == IPC_SHMOP);
-  assert (hFileMap);
-  assert (shmaddr);
-
-  segment_t *previous = NULL;	// Insert pointer.
-
-  const segment_t *const tmp = find (shmaddr, &previous);
-
-  assert (!tmp);
-  assert (previous							\
-	  ? (!previous->next || previous->next->shmaddr > shmaddr)	\
-	  : (!_segments_head || _segments_head->shmaddr > shmaddr));
-
-  segment_t *const segptr =
-    safe_new (segment_t, shmid, shmaddr, shmflg, hFileMap);
-
-  assert (segptr);
-
-  if (previous)
-    {
-      segptr->next = previous->next;
-      previous->next = segptr;
-    }
-  else
-    {
-      segptr->next = _segments_head;
-      _segments_head = segptr;
-    }
-
-  const long cnt = InterlockedIncrement (&_shmat_cnt);
-  assert (cnt > 0);
-
-  return segptr;
-}
-
-/*---------------------------------------------------------------------------*
- * fixup_shms_after_fork ()
- *---------------------------------------------------------------------------*/
+static SLIST_HEAD(, shm_shmid_list) ssh_list;
+
+/* List of attached mappings, as returned by shmat. */
+struct shm_attached_list {
+  SLIST_ENTRY(shm_attached_list) sph_next;
+  vm_object_t ptr;
+  vm_object_t hdl;
+  size_t size;
+  int access;
+};
+
+static SLIST_HEAD(, shm_attached_list) sph_list;
 
 int __stdcall
 fixup_shms_after_fork ()
 {
-  return shmmgr.fixup_shms_after_fork ();
-}
+  if (!SLIST_FIRST (&sph_list))
+    return 0;
+  pinfo p (myself->ppid);
+  proc parent = { myself->ppid, p->dwProcessId, p->uid, p->gid };
 
-/*---------------------------------------------------------------------------*
- * client_request_shm::client_request_shm ()
- *---------------------------------------------------------------------------*/
-
-client_request_shm::client_request_shm (const int shmid, const int shmflg)
-  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
-{
-  _parameters.in.shmop = SHMOP_shmat;
-
-  _parameters.in.shmid = shmid;
-  _parameters.in.shmflg = shmflg;
-
-  _parameters.in.cygpid = getpid ();
-  _parameters.in.winpid = GetCurrentProcessId ();
-  _parameters.in.uid = geteuid32 ();
-  _parameters.in.gid = getegid32 ();
-
-  msglen (sizeof (_parameters.in));
-}
-
-/*---------------------------------------------------------------------------*
- * client_request_shm::client_request_shm ()
- *---------------------------------------------------------------------------*/
-
-client_request_shm::client_request_shm (const int shmid,
-					const int cmd,
-					const struct shmid_ds *const buf)
-  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
-{
-  _parameters.in.shmop = SHMOP_shmctl;
-
-  _parameters.in.shmid = shmid;
-  _parameters.in.cmd = cmd;
-  if (buf)
-    _parameters.in.ds = *buf;
-
-  _parameters.in.cygpid = getpid ();
-  _parameters.in.winpid = GetCurrentProcessId ();
-  _parameters.in.uid = geteuid32 ();
-  _parameters.in.gid = getegid32 ();
-
-  msglen (sizeof (_parameters.in));
-}
-
-/*---------------------------------------------------------------------------*
- * client_request_shm::client_request_shm ()
- *---------------------------------------------------------------------------*/
-
-client_request_shm::client_request_shm (const int shmid)
-  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
-{
-  _parameters.in.shmop = SHMOP_shmdt;
-
-  _parameters.in.shmid = shmid;
-
-  _parameters.in.cygpid = getpid ();
-  _parameters.in.winpid = GetCurrentProcessId ();
-  _parameters.in.uid = geteuid32 ();
-  _parameters.in.gid = getegid32 ();
-
-  msglen (sizeof (_parameters.in));
-}
-
-/*---------------------------------------------------------------------------*
- * client_request_shm::client_request_shm ()
- *---------------------------------------------------------------------------*/
-
-client_request_shm::client_request_shm (const key_t key,
-					const size_t size,
-					const int shmflg)
-  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
-{
-  _parameters.in.shmop = SHMOP_shmget;
-
-  _parameters.in.key = key;
-  _parameters.in.size = size;
-  _parameters.in.shmflg = shmflg;
-
-  _parameters.in.cygpid = getpid ();
-  _parameters.in.winpid = GetCurrentProcessId ();
-  _parameters.in.uid = geteuid32 ();
-  _parameters.in.gid = getegid32 ();
-
-  msglen (sizeof (_parameters.in));
+  client_request_shm request (&parent);
+  if (request.make_request () == -1 || request.retval () == -1)
+    {
+      syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
+      set_errno (request.error_code ());
+      return 0;
+    }
+  shm_attached_list *sph_entry;
+  /* Remove map from list... */
+  SLIST_FOREACH (sph_entry, &sph_list, sph_next)
+    {
+      vm_object_t ptr = MapViewOfFileEx(sph_entry->hdl, sph_entry->access,
+      					0, 0, sph_entry->size, sph_entry->ptr);
+      if (ptr != sph_entry->ptr)
+        api_fatal ("MapViewOfFileEx (%p), %E.  Terminating.", sph_entry->ptr);
+    }
+  return 0;
 }
 #endif /* USE_SERVER */
 
-/*---------------------------------------------------------------------------*
- * shmat ()
- *---------------------------------------------------------------------------*/
+/*
+ * XSI shmaphore API.  These are exported by the DLL.
+ */
 
 extern "C" void *
-shmat (const int shmid, const void *const shmaddr, const int shmflg)
+shmat (int shmid, const void *shmaddr, int shmflg)
 {
 #ifdef USE_SERVER
   sigframe thisframe (mainthread);
-  return shmmgr.shmat (shmid, shmaddr, shmflg);
+  syscall_printf ("shmat (shmid = %d, shmaddr = %p, shmflg = 0x%x)",
+		  shmid, shmaddr, shmflg);
+
+  shm_shmid_list *ssh_entry;
+  SLIST_FOREACH (ssh_entry, &ssh_list, ssh_next)
+    {
+      if (ssh_entry->shmid == shmid)
+	break;
+    }
+  if (!ssh_entry)
+    {
+      /* Invalid shmid */
+      set_errno (EINVAL);
+      return NULL;
+    }
+  vm_object_t attach_va = NULL;
+  if (shmaddr)
+    {
+      if (shmflg & SHM_RND)
+        attach_va = (vm_object_t)((vm_offset_t)shmaddr & ~(SHMLBA-1));
+      else
+	attach_va = (vm_object_t)shmaddr;
+      /* Don't even bother to call anything if shmaddr is NULL or
+         not aligned. */
+      if (!attach_va || (vm_offset_t)attach_va % SHMLBA)
+	{
+	  set_errno (EINVAL);
+	  return NULL;
+	}
+    }
+  /* Try allocating memory before calling cygserver. */
+  shm_attached_list *sph_entry = new (shm_attached_list);
+  if (!sph_entry)
+    {
+      set_errno (ENOMEM);
+      return NULL;
+    }
+  DWORD access = (shmflg & SHM_RDONLY) ? FILE_MAP_READ : FILE_MAP_WRITE;
+  vm_object_t ptr = MapViewOfFileEx(ssh_entry->hdl, access, 0, 0,
+				    ssh_entry->size, attach_va);
+  if (!ptr)
+    {
+      __seterrno ();
+      delete sph_entry;
+      return NULL;
+    }
+  /* Use returned ptr address as is, so it's stored using the exact value
+     in cygserver. */
+  client_request_shm request (shmid, ptr, shmflg & ~SHM_RND);
+  if (request.make_request () == -1 || request.ptrval () == NULL)
+    {
+      syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
+      UnmapViewOfFile (ptr);
+      delete sph_entry;
+      set_errno (request.error_code ());
+      return NULL;
+    }
+  sph_entry->ptr = ptr;
+  sph_entry->hdl = ssh_entry->hdl;
+  sph_entry->size = ssh_entry->size;
+  sph_entry->access = access;
+  SLIST_INSERT_HEAD (&sph_list, sph_entry, sph_next);
+  return ptr;
 #else
   set_errno (ENOSYS);
-  return (void *) -1;
+  return NULL;
 #endif
 }
 
-/*---------------------------------------------------------------------------*
- * shmctl ()
- *---------------------------------------------------------------------------*/
-
 extern "C" int
-shmctl (const int shmid, const int cmd, struct shmid_ds *const buf)
+shmctl (int shmid, int cmd, struct shmid_ds *buf)
 {
 #ifdef USE_SERVER
   sigframe thisframe (mainthread);
-  return shmmgr.shmctl (shmid, cmd, buf);
+  syscall_printf ("shmctl (shmid = %d, cmd = %d, buf = 0x%x)",
+		  shmid, cmd, buf);
+  switch (cmd)
+    {
+      case IPC_STAT:
+      case IPC_SET:
+	if (__check_null_invalid_struct_errno (buf, sizeof (struct shmid_ds)))
+	  return -1;
+        break;
+      case IPC_INFO:
+	/* shmid == 0: Request for shminfo struct. */
+	if (!shmid
+	    && __check_null_invalid_struct_errno (buf, sizeof (struct shminfo)))
+	    return -1;
+	/* Otherwise, request shmid entries from internal shmid_ds array. */
+	if (shmid)
+	  if (__check_null_invalid_struct_errno (buf, shmid * sizeof (struct shmid_ds)))
+	    return -1;
+        break;
+      case SHM_INFO:
+        if (__check_null_invalid_struct_errno (buf, sizeof (struct shm_info)))
+	  return -1;
+        break;
+    }
+  client_request_shm request (shmid, cmd, buf);
+  if (request.make_request () == -1 || request.retval () == -1)
+    {
+      syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
+      set_errno (request.error_code ());
+      return -1;
+    }
+  if (cmd == IPC_RMID)
+    {
+      /* The process must cleanup its own storage... */
+      shm_shmid_list *ssh_entry, *ssh_next_entry;
+      SLIST_FOREACH_SAFE (ssh_entry, &ssh_list, ssh_next, ssh_next_entry)
+        {
+	  if (ssh_entry->shmid == shmid)
+	    {
+	      SLIST_REMOVE (&ssh_list, ssh_entry, shm_shmid_list, ssh_next);
+	      /* ...and close the handle. */
+	      CloseHandle (ssh_entry->hdl);
+	      delete ssh_entry;
+	      break;
+	    }
+	}
+    }
+  return request.retval ();
 #else
   set_errno (ENOSYS);
   return -1;
 #endif
 }
 
-/*---------------------------------------------------------------------------*
- * shmdt ()
- *---------------------------------------------------------------------------*/
-
 extern "C" int
-shmdt (const void *const shmaddr)
+shmdt (const void *shmaddr)
 {
 #ifdef USE_SERVER
   sigframe thisframe (mainthread);
-  return shmmgr.shmdt (shmaddr);
+  syscall_printf ("shmget (shmaddr = %p)", shmaddr);
+  client_request_shm request (shmaddr);
+  if (request.make_request () == -1 || request.retval () == -1)
+    {
+      syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
+      set_errno (request.error_code ());
+      return -1;
+    }
+  shm_attached_list *sph_entry, *sph_next_entry;
+  /* Remove map from list... */
+  SLIST_FOREACH_SAFE (sph_entry, &sph_list, sph_next, sph_next_entry)
+    {
+      if (sph_entry->ptr == shmaddr)
+        {
+	  SLIST_REMOVE (&sph_list, sph_entry, shm_attached_list, sph_next);
+	  /* ...and unmap view. */
+	  UnmapViewOfFile (sph_entry->ptr);
+	  delete sph_entry;
+	  break;
+	}
+    }
+  return request.retval ();
 #else
   set_errno (ENOSYS);
   return -1;
 #endif
 }
 
-/*---------------------------------------------------------------------------*
- * shmget ()
- *---------------------------------------------------------------------------*/
-
 extern "C" int
-shmget (const key_t key, const size_t size, const int shmflg)
+shmget (key_t key, size_t size, int shmflg)
 {
 #ifdef USE_SERVER
   sigframe thisframe (mainthread);
-  return shmmgr.shmget (key, size, shmflg);
+  syscall_printf ("shmget (key = %U, size = %d, shmflg = 0x%x)",
+		  key, size, shmflg);
+  /* Try allocating memory before calling cygserver. */
+  shm_shmid_list *ssh_new_entry = new (shm_shmid_list);
+  if (!ssh_new_entry)
+    {
+      set_errno (ENOMEM);
+      return -1;
+    }
+  client_request_shm request (key, size, shmflg);
+  if (request.make_request () == -1 || request.retval () == -1)
+    {
+      syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
+      delete ssh_new_entry;
+      set_errno (request.error_code ());
+      return -1;
+    }
+  int shmid = request.retval ();	/* Shared mem ID */
+  vm_object_t hdl = request.objval ();	/* HANDLE associated with it. */
+  shm_shmid_list *ssh_entry;
+  SLIST_FOREACH (ssh_entry, &ssh_list, ssh_next)
+    {
+      if (ssh_entry->shmid == shmid)
+        {
+	  /* We already maintain an entry for this shmid.  That means,
+	     the hdl returned by cygserver is a superfluous duplicate
+	     of the original hdl maintained by cygserver.  We can safely
+	     delete it. */
+	  CloseHandle (hdl);
+	  delete ssh_new_entry;
+	  return shmid;
+	}
+    }
+  /* We arrive here only if shmid is a new one for this process.  Add the
+     shmid and hdl value to the list. */
+  ssh_new_entry->shmid = shmid;
+  ssh_new_entry->hdl = hdl;
+  ssh_new_entry->size = size;
+  SLIST_INSERT_HEAD (&ssh_list, ssh_new_entry, ssh_next);
+  return shmid;
 #else
   set_errno (ENOSYS);
   return -1;

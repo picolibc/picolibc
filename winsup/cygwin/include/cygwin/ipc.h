@@ -9,8 +9,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _SYS_IPC_H
-#define _SYS_IPC_H
+#ifndef _CYGWIN_IPC_H
+#define _CYGWIN_IPC_H
 
 #ifdef __cplusplus
 extern "C"
@@ -25,6 +25,7 @@ struct ipc_perm
   gid_t  cgid;			/* Creator's group ID. */
   mode_t mode;			/* Read/write permission. */
   key_t  key;
+  unsigned short seq;
 };
 
 /* Mode bits:
@@ -44,10 +45,20 @@ struct ipc_perm
 #define IPC_STAT 0x1002		/* Get options. */
 #define IPC_INFO 0x1003		/* For ipcs(8). */
 
+#ifdef _KERNEL
+#define IPCID_TO_IX(id)         ((id) & 0xffff)
+#define IPCID_TO_SEQ(id)        (((id) >> 16) & 0xffff)
+#define IXSEQ_TO_IPCID(ix,perm) (((perm.seq) << 16) | (ix & 0xffff))
+
+#define IPC_R           000400  /* read permission */
+#define IPC_W           000200  /* write/alter permission */
+#define IPC_M           010000  /* permission to change control info */
+#endif
+
 key_t ftok (const char *path, int id);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _SYS_IPC_H */
+#endif /* _CYGWIN_IPC_H */
