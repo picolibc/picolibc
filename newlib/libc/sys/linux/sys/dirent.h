@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <linux/dirent.h>
 #define _LIBC 1
+#define  NOT_IN_libc 1
 #include <sys/lock.h>
 #undef _LIBC
 

@@ -224,12 +224,6 @@ crt0.o: machine/crt0.o
 
 machine/crt0.o: ; @true
 
-malloc.$(oext): $(srcdir)/malloc.c
-	$(LIBC_COMPILE) -D_LIBC=1 -c $< -o $@
-
-mcheck.$(oext): $(srcdir)/mcheck.c
-	$(LIBC_COMPILE) -D_LIBC=1 -c $< -o $@
-
 sig.$(oext):	siglist.inc
 
 siglist.inc:

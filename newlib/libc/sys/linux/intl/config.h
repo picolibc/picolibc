@@ -24,3 +24,6 @@
 #define UINT32_C(c)    c ## U
 
 #include <machine/sysdep.h>
+#include <features.h>
+
+#define _LIBC 1

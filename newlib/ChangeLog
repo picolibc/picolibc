@@ -1,3 +1,25 @@
+2003-06-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h (_REENT_INIT_PTR): Fix macros
+	to handle latest on_exit change.
+	* libc/sys/linux/Makefile.am: Remove special compilation
+	for malloc.c and mcheck.c.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/mntent.c: Add definition of _LIBC flag
+	after including <features.h>.
+	* libc/sys/linux/mcheck.c: Ditto.
+	* libc/sys/linux/malloc.c: Ditto plus define _GNU_SOURCE
+	for <features.h>.
+	* libc/sys/linux/intl/Makefile.am: Remove -D_LIBC and
+	add -DNOT_IN_libc to C flags.
+	* libc/sys/linux/intl/Makefile.in: Regenerated.
+	* libc/sys/linux/intl/config.h: Add definition of _LIBC.
+	* libc/sys/linux/linuxthreads/semaphore.h: Include
+	<bits/pthreadtypes.h>.
+	* libc/sys/linux/sys/dirent.h: Define _LIBC and NOT_IN_libc after
+	including <features.h>.
+	* libc/sys/linux/sys/lock.h: Ditto.
+
 2003-06-11  Nick Clifton  <nickc@redhat.com>
 
 	* libc/reent/reent.c (reclaim_reent): Fix typo in code to free

@@ -17,9 +17,12 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+#include <features.h>
 #include <mntent.h>
 #include <stdlib.h>
 #include <libc-symbols.h>
+#define  _LIBC 1
+#define  NOT_IN_libc 1
 #include <bits/libc-lock.h>
 
 /* We don't want to allocate the static buffer all the time since it

@@ -302,6 +302,11 @@
 #endif
 #endif /*Void_t*/
 
+#define _GNU_SOURCE
+#include <features.h>
+#define _LIBC 1
+#define NOT_IN_libc 1
+
 #if __STD_C
 # include <stddef.h>   /* for size_t */
 # if defined _LIBC || defined MALLOC_HOOKS

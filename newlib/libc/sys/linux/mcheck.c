@@ -22,6 +22,8 @@
 
 #ifndef	_MALLOC_INTERNAL
 # define _MALLOC_INTERNAL
+# include <features.h>
+# define _LIBC 1
 # include <malloc.h>
 # include <mcheck.h>
 # include <stdint.h>

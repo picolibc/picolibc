@@ -407,8 +407,7 @@ struct _reent
     var->_sig_func = _NULL; \
     var->_atexit._ind = 0; \
     var->_atexit._fns[0] = _NULL; \
-    var->_atexit._fnargs[0] = _NULL; \
-    var->_atexit._fntypes = 0; \
+    var->_atexit._on_exit_args = _NULL; \
     var->__sglue._next = _NULL; \
     var->__sglue._niobs = 0; \
     var->__sglue._iobs = _NULL; \
@@ -673,7 +672,8 @@ struct _reent
     var->_atexit = _NULL; \
     var->_atexit0._ind = 0; \
     var->_atexit0._fns[0] = _NULL; \
-    var->_atexit0._fntypes = 0; \
+    var->_atexit0._on_exit_args._fntypes = 0; \
+    var->_atexit0._on_exit_args._fnargs[0] = _NULL; \
     var->_sig_func = _NULL; \
     var->__sglue._next = _NULL; \
     var->__sglue._niobs = 0; \

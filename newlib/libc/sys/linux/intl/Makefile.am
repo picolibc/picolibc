@@ -27,7 +27,7 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../../../Makefile.shared
 
-AM_CFLAGS = -D_LIBC -DHAVE_CONFIG_H -D_GNU_SOURCE -D__libc_enable_secure=1 -D'LOCALEDIR="$(msgcatdir)"' -D'LOCALE_ALIAS_PATH="$(msgcatdir)"' -DNLSPATH='"$(msgcatdir)/%L/%N:$(msgcatdir)/%L/LC_MESSAGES/%N:$(msgcatdir)/%l/%N:$(msgcatdir)/%l/LC_MESSAGES/%N:"'
+AM_CFLAGS = -DNOT_IN_libc -DHAVE_CONFIG_H -D_GNU_SOURCE -D__libc_enable_secure=1 -D'LOCALEDIR="$(msgcatdir)"' -D'LOCALE_ALIAS_PATH="$(msgcatdir)"' -DNLSPATH='"$(msgcatdir)/%L/%N:$(msgcatdir)/%L/LC_MESSAGES/%N:$(msgcatdir)/%l/%N:$(msgcatdir)/%l/LC_MESSAGES/%N:"'
 
 # shouldn't have to do the following, but if needed
 BISONFLAGS = --yacc --name-prefix=__gettext --output

@@ -2,8 +2,11 @@
 #define __SYS_LOCK_H__
 
 #include <machine/weakalias.h>
+#include <features.h>
 
-#define _LIBC 1
+#define  _LIBC  1
+#define  NOT_IN_libc 1
+
 #include <bits/libc-lock.h>
 
 typedef __libc_lock_t _LOCK_T;
