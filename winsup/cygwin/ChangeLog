@@ -1,3 +1,7 @@
+2000-05-04  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Makefile.in (install): Install profile startup and library.
+
 Wed May  3 21:54:11 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Use -gstabs+ as compile debug option.  This seems to

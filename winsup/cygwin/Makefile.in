@@ -144,7 +144,9 @@ force:
 
 install: all
 	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME) ; \
-	$(INSTALL_DATA) $(LIB_NAME) $(tooldir)/lib/$(LIB_NAME); \
+	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) ; do \
+	    $(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+	done ; \
 	cd $(srcdir); \
 	for sub in `find include -name '[a-z]*' -type d -print | sort`; do \
 	    for i in $$sub/*.h ; do \
