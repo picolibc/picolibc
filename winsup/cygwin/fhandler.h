@@ -581,6 +581,8 @@ public:
   bg_check_types bg_check (int sig);
   virtual DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms) {return 1;}
   virtual void __release_output_mutex (const char *fn, int ln) {}
+  void fixup_after_fork (HANDLE);
+  void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
 };
 
 enum ansi_intensity

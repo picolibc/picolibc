@@ -1097,7 +1097,7 @@ fhandler_tty_common::set_close_on_exec (int val)
 void
 fhandler_tty_common::fixup_after_fork (HANDLE parent)
 {
-  this->fhandler_base::fixup_after_fork (parent);
+  this->fhandler_termios::fixup_after_fork (parent);
   if (output_done_event)
     fork_fixup (parent, output_done_event, "output_done_event");
   if (ioctl_request_event)
@@ -1116,7 +1116,6 @@ fhandler_tty_common::fixup_after_fork (HANDLE parent)
     }
   if (input_available_event)
     fork_fixup (parent, input_available_event, "input_available_event");
-  fork_fixup (parent, output_handle, "output_handle");
   fork_fixup (parent, inuse, "inuse");
 }
 
