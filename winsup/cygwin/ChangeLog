@@ -1,3 +1,8 @@
+2001-11-26  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (libcygwin.a): Use ar commands to build libcygwin.a since
+	adding an archive doesn't work the way we want it to.
+
 2001-11-24  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_cygdrive::readdir): Avoid reporting

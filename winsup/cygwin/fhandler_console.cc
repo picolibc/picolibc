@@ -585,6 +585,11 @@ fhandler_console::open (path_conv *, int flags, mode_t)
       cflags |= ENABLE_PROCESSED_INPUT;
       SetConsoleMode (get_io_handle (), ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | cflags);
     }
+  if (GetConsoleMode (get_output_handle (), &cflags))
+    {
+      cflags |= ENABLE_PROCESSED_OUTPUT;
+      SetConsoleMode (get_io_handle (), cflags);
+    }
 
   TTYCLEARF (RSTCONS);
   set_open_status ();

@@ -198,7 +198,7 @@ new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(
 	@rm -f stamp-cygwin-lib
 
 $(LIB_NAME): new-$(DLL_NAME) $(LIBCOS) stamp-cygwin-lib
-	$(AR) rcv $(LIB_NAME) $(LIBCOS) cygdll.a
+	(echo create $(LIB_NAME); echo addlib cygdll.a; echo addmod $(LIBCOS); echo save) | $(AR) -M
 
 stamp-cygwin-lib:
 	@touch stamp-cygwin-lib
