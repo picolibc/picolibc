@@ -39,7 +39,6 @@ SECTIONS
   } > RAM
   . = ALIGN(2);
   __stack = .;
-  . = . + 4096;
   _end = .;
   PROVIDE (end = .);
   /* Read-only sections in ROM.  */

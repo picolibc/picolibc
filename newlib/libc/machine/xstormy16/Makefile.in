@@ -86,6 +86,11 @@ lib_a_SOURCES = setjmp.S
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
+
+lib_a_LIBADD = malloc.o free.o realloc.o calloc.o cfree.o malign.o 	valloc.o pvalloc.o mallinfo.o mallstats.o msize.o mallopt.o 	mallocr.o freer.o reallocr.o callocr.o
+
+
+MALLOC_COMPILE = $(COMPILE)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../../../mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -96,7 +101,9 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-lib_a_LIBADD = 
+lib_a_DEPENDENCIES =  malloc.o free.o realloc.o calloc.o cfree.o \
+malign.o valloc.o pvalloc.o mallinfo.o mallstats.o msize.o mallopt.o \
+mallocr.o freer.o reallocr.o callocr.o
 lib_a_OBJECTS =  setjmp.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -314,6 +321,54 @@ install uninstall-am uninstall all-redirect all-am all installdirs \
 mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+malloc.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/tiny-malloc.c -o $@
+
+free.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_FREE -c $(srcdir)/tiny-malloc.c -o $@
+
+realloc.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_REALLOC -c $(srcdir)/tiny-malloc.c -o $@
+
+calloc.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/tiny-malloc.c -o $@
+
+cfree.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_CFREE -c $(srcdir)/tiny-malloc.c -o $@
+
+malign.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_MEMALIGN -c $(srcdir)/tiny-malloc.c -o $@
+
+valloc.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_VALLOC -c $(srcdir)/tiny-malloc.c -o $@
+
+pvalloc.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_PVALLOC -c $(srcdir)/tiny-malloc.c -o $@
+
+mallinfo.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_MALLINFO -c $(srcdir)/tiny-malloc.c -o $@
+
+mallstats.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_MALLOC_STATS -c $(srcdir)/tiny-malloc.c -o $@
+
+msize.o: tiny-malloc.c
+	$(MALLOC_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $(srcdir)/tiny-malloc.c -o $@
+
+mallopt.o: mallocr.c
+	$(MALLOC_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/mallocr.c -o $@
+
+mallocr.o: mallocr.c
+	$(MALLOC_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/mallocr.c -o $@
+
+freer.o: mallocr.c
+	$(MALLOC_COMPILE) -DDEFINE_FREE -c $(srcdir)/mallocr.c -o $@
+
+reallocr.o: mallocr.c
+	$(MALLOC_COMPILE) -DDEFINE_REALLOC -c $(srcdir)/mallocr.c -o $@
+
+callocr.o: mallocr.c
+	$(MALLOC_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/mallocr.c -o $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -191,6 +191,7 @@ case "${host_cpu}" in
 	;;
   xstormy16)
 	machine_dir=xstormy16
+	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED"
         ;;
   z8k)
 	machine_dir=z8k

@@ -13,6 +13,7 @@ MEMORY
 SECTIONS
 {
   __stack = 2 ;
+  __malloc_start = 0x800;
   .data    :
   {
     *(.data)

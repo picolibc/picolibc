@@ -1,3 +1,13 @@
+2002-02-01  Geoffrey Keating  <geoffk@redhat.com>
+
+	* xstormy16/Makefile.in (SIM_OBJS): Remove sbrk.o, add
+	sim_malloc_start.o.
+	* xstormy16/eva_app.ld: Add __malloc_start.
+	* xstormy16/sbrk.c: Remove.
+	* xstormy16/sim_malloc_start.s: New file.
+	* xstormy16/sim_high.ld: Make the stack start immediately at the
+	end of the program.
+
 2002-02-01  Michael Meissner  <meissner@redhat.com>
 
 	* mips/cma101.c (__sizemem_default): Allow user to specify the

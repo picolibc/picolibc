@@ -1,3 +1,11 @@
+2002-02-01  Geoffrey Keating  <geoffk@redhat.com>
+
+	* configure.host (xstormy16): Don't use the generic malloc.
+	* libc/machine/xstormy16/Makefile.am: Build tiny-malloc.
+	* libc/machine/xstormy16/Makefile.in: Regenerate.
+	* libc/machine/xstormy16/mallocr.c: New file.
+	* libc/machine/xstormy16/tiny-malloc.c: New file.
+
 2002-01-28  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/include/sys/signal.h [__CYGWIN__]: Issue error message

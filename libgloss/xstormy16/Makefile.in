@@ -48,7 +48,7 @@ CRT		= crt0.o crti.o crtn.o
 SIM_SCRIPTS	= sim_high.ld
 SIM_LDFLAGS	=
 SIM_BSP		= libsim.a
-SIM_OBJS	= syscalls.o sbrk.o
+SIM_OBJS	= syscalls.o sim_malloc_start.o
 
 # Here is stuff for building apps for GDB on the EVA board
 EVA_APP_BSP     = libeva_app.a
