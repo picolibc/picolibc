@@ -1,3 +1,13 @@
+Mon Feb  5 13:30:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap_record::fixup_map): New method to duplicate
+	the memory protection in a just forked child.
+	(mmap): Realign gran_len to page boundary only on anonymous
+	mapping before saving in the mmap_record.
+	(munmap): Cleanup code.
+	(msync): Ditto.
+	(fixup_mmaps_after_fork): Ditto. Call mmap_record::fixup_map now.
+
 Thu Feb  1 23:08:29 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (creturn): Correctly calculate cygheap_max.

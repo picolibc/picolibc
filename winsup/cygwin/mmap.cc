@@ -82,6 +82,7 @@ class mmap_record
     DWORD find_empty (DWORD pages);
     DWORD map_map (DWORD off, DWORD len);
     BOOL unmap_map (caddr_t addr, DWORD len);
+    void fixup_map (void);
 };
 
 DWORD
@@ -169,6 +170,33 @@ mmap_record::unmap_map (caddr_t addr, DWORD len)
     if (map_map_[--len])
       return FALSE;
   return TRUE;
+}
+
+void
+mmap_record::fixup_map ()
+{
+  if (os_being_run != winNT)
+    return;
+
+  DWORD prot, old_prot;
+  switch (access_mode_)
+    {
+    case FILE_MAP_WRITE:
+      prot = PAGE_READWRITE;
+      break;
+    case FILE_MAP_READ:
+      prot = PAGE_READONLY;
+      break;
+    default:
+      prot = PAGE_WRITECOPY;
+      break;
+    }
+
+  for (DWORD off = PAGE_CNT (size_to_map_); off > 0; --off)
+    VirtualProtect (base_address_ + off * getpagesize (),
+	            getpagesize (),
+		    MAP_ISSET (off - 1) ? prot : PAGE_NOACCESS,
+		    &old_prot);
 }
 
 class list {
@@ -444,7 +472,8 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   /* Now we should have a successfully mmapped area.
      Need to save it so forked children can reproduce it.
   */
-  gran_len = PAGE_CNT (gran_len) * getpagesize ();
+  if (fd == -1)
+    gran_len = PAGE_CNT (gran_len) * getpagesize ();
   mmap_record mmap_rec (fd, h, access, gran_off, gran_len, base);
 
   /* Get list of mmapped areas for this fd, create a new one if
@@ -504,29 +533,29 @@ munmap (caddr_t addr, size_t len)
   /* Iterate through the map, looking for the mmapped area.
      Error if not found. */
 
-  int it;
-  for (it = 0; it < mmapped_areas->nlists; ++it)
+  for (int it = 0; it < mmapped_areas->nlists; ++it)
     {
       list *l = mmapped_areas->lists[it];
       if (l != 0)
 	{
+	  int fd = l->fd;
+	  fhandler_disk_file fh_paging_file (NULL);
+	  fhandler_base *fh;
+
+	  if (fd == -1 || fdtab.not_open (fd))
+	    {
+	      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
+	      fh = &fh_paging_file;
+	    }
+	  else
+	    fh = fdtab[fd];
+
 	  off_t li = -1;
-	  while ((li = l->match(addr, len, li)) >= 0)
+	  if ((li = l->match(addr, len, li)) >= 0)
 	    {
 	      mmap_record *rec = l->recs + li;
 	      if (rec->unmap_map (addr, len))
 	        {
-                  int fd = l->fd;
-                  fhandler_disk_file fh_paging_file (NULL);
-                  fhandler_base *fh;
-
-                  if (fd == -1 || fdtab.not_open (fd))
-                    {
-                      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
-                      fh = &fh_paging_file;
-                    }
-                  else
-                    fh = fdtab[fd];
                   fh->munmap (rec->get_handle (), addr, len);
 
 		  /* Delete the entry. */
@@ -577,31 +606,29 @@ msync (caddr_t addr, size_t len, int flags)
   /* Iterate through the map, looking for the mmapped area.
      Error if not found. */
 
-  int it;
-  for (it = 0; it < mmapped_areas->nlists; ++it)
+  for (int it = 0; it < mmapped_areas->nlists; ++it)
     {
       list *l = mmapped_areas->lists[it];
       if (l != 0)
 	{
-	  int li;
-	  for (li = 0; li < l->nrecs; ++li)
+	  int fd = l->fd;
+	  fhandler_disk_file fh_paging_file (NULL);
+	  fhandler_base *fh;
+
+	  if (fd == -1 || fdtab.not_open (fd))
 	    {
-	      mmap_record rec = l->recs[li];
-	      if (rec.get_address () == addr)
+	      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
+	      fh = &fh_paging_file;
+	    }
+	  else
+	    fh = fdtab[fd];
+
+	  for (int li = 0; li < l->nrecs; ++li)
+	    {
+	      mmap_record *rec = l->recs + li;
+	      if (rec->get_address () == addr)
 		{
-                  int fd = l->fd;
-                  fhandler_disk_file fh_paging_file (NULL);
-                  fhandler_base *fh;
-
-                  if (fd == -1 || fdtab.not_open (fd))
-                    {
-                      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
-                      fh = &fh_paging_file;
-                    }
-                  else
-                    fh = fdtab[fd];
-
-                  int ret = fh->msync (rec.get_handle (), addr, len, flags);
+                  int ret = fh->msync (rec->get_handle (), addr, len, flags);
 
                   if (ret)
 		    syscall_printf ("%d = msync(): %E", ret);
@@ -818,30 +845,31 @@ fixup_mmaps_after_fork ()
 	  int li;
 	  for (li = 0; li < l->nrecs; ++li)
 	    {
-	      mmap_record rec = l->recs[li];
+	      mmap_record *rec = l->recs + li;
 
 	      debug_printf ("fd %d, h %x, access %x, offset %d, size %d, address %p",
-		  rec.get_fd (), rec.get_handle (), rec.get_access (),
-		  rec.get_offset (), rec.get_size (), rec.get_address ());
+		  rec->get_fd (), rec->get_handle (), rec->get_access (),
+		  rec->get_offset (), rec->get_size (), rec->get_address ());
 
 	      BOOL ret;
 	      fhandler_disk_file fh_paging_file (NULL);
 	      fhandler_base *fh;
-	      if (rec.get_fd () == -1) /* MAP_ANONYMOUS */
+	      if (rec->get_fd () == -1) /* MAP_ANONYMOUS */
 		fh = &fh_paging_file;
 	      else
-	        fh = fdtab[rec.get_fd ()];
-	      ret = fh->fixup_mmap_after_fork (rec.get_handle (),
-					       rec.get_access (),
-					       rec.get_offset (),
-					       rec.get_size (),
-					       rec.get_address ());
+	        fh = fdtab[rec->get_fd ()];
+	      ret = fh->fixup_mmap_after_fork (rec->get_handle (),
+					       rec->get_access (),
+					       rec->get_offset (),
+					       rec->get_size (),
+					       rec->get_address ());
 	      if (!ret)
 		{
 		  system_printf ("base address fails to match requested address %p",
-				 rec.get_address ());
+				 rec->get_address ());
 		  return -1;
 		}
+	      rec->fixup_map ();
 	    }
 	}
     }
