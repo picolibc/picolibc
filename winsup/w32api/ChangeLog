@@ -8,6 +8,8 @@
 	* include/security.h: Include secext.h.
 	* include/winbase.h: Declare COMPUTER_NAME_FORMAT.
 	Thanks to Dimitri Papadopoulos <dimitri_at@users.sf.net>
+	* include/GL/gl.h: Remove include of glext.h.
+	Thanks to Greg Couch <gregcouch@users.sf.net>
 
 2003-02-05  Earnie Boyd  <earnie@users.sf.net>
 
