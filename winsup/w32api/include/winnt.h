@@ -267,12 +267,12 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define THREAD_ALL_ACCESS (STANDARD_RIGHTS_REQUIRED|SYNCHRONIZE|0x3FF)
 #define EXCEPTION_NONCONTINUABLE	1
 #define EXCEPTION_MAXIMUM_PARAMETERS 15
-#define SECURITY_NULL_SID_AUTHORITY	{{0,0,0,0,0,0}}
-#define SECURITY_WORLD_SID_AUTHORITY	{{0,0,0,0,0,1}}
-#define SECURITY_LOCAL_SID_AUTHORITY	{{0,0,0,0,0,2}}
-#define SECURITY_CREATOR_SID_AUTHORITY	{{0,0,0,0,0,3}}
-#define SECURITY_NON_UNIQUE_AUTHORITY	{{0,0,0,0,0,4}}
-#define SECURITY_NT_AUTHORITY	{{0,0,0,0,0,5}}
+#define SECURITY_NULL_SID_AUTHORITY	{0,0,0,0,0,0}
+#define SECURITY_WORLD_SID_AUTHORITY	{0,0,0,0,0,1}
+#define SECURITY_LOCAL_SID_AUTHORITY	{0,0,0,0,0,2}
+#define SECURITY_CREATOR_SID_AUTHORITY	{0,0,0,0,0,3}
+#define SECURITY_NON_UNIQUE_AUTHORITY	{0,0,0,0,0,4}
+#define SECURITY_NT_AUTHORITY	{0,0,0,0,0,5}
 #define SECURITY_NULL_RID	0
 #define SECURITY_WORLD_RID	0
 #define SECURITY_LOCAL_RID	0
@@ -2524,7 +2524,6 @@ typedef struct _REPARSE_POINT_INFORMATION {
 	WORD   ReparseDataLength;
 	WORD   UnparsedNameLength;
 } REPARSE_POINT_INFORMATION, *PREPARSE_POINT_INFORMATION;
-PVOID GetCurrentFiber(void);
 extern __inline__ PVOID GetCurrentFiber(void)
 {
     void* ret;
@@ -2535,7 +2534,7 @@ extern __inline__ PVOID GetCurrentFiber(void)
 		);
     return ret;
 }
-PVOID GetFiberData(void);
+
 extern __inline__ PVOID GetFiberData(void)
 {
     void* ret;

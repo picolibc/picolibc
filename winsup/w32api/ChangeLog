@@ -1,3 +1,7 @@
+2001-11-09  Robert Collins  <rbtcollins@hotmail.com>
+
+	* include/winnt.h: Backout last change.
+
 2001-11-08  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/winnt.h: Define *_SID_AUTHORITY appropriately. (nested
