@@ -33,3 +33,8 @@ to fail, and will "fail" if they compile, run, and return zero.
 
 "make check" will only work if you run it *on* an NT machine.
 Cross-checking is not supported.
+
+To test a subset of the test-suite, use
+$ make check CYGWIN_TESTSUITE_TESTS=regexp
+
+
