@@ -1,3 +1,11 @@
+2004-11-29  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* opcode/crx.h (enum operand_type): Rename rbase_cst4 to rbase_dispu4.
+	Remove redundant instruction types.
+	(struct argument): X_op - new field.
+	(struct cst4_entry): Remove.
+	(no_op_insn): Declare.
+
 2004-11-04  Paul Brook  <paul@codesourcery.com>
 
 	* bfdlink.h (bfd_link_info): Add default_imported_symver.
