@@ -2,6 +2,23 @@
                                                                                 
         * README: Fix typo of LGPL.  Change "license" to "copyright".
                                                                                 
+2004-12-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* NEWS: Update with 1.13.0 info.
+	* README: Ditto.
+	* acinclude.m4: Change version number to 1.13.0.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* doc/aclocal.m4: Ditto.
+	* doc/configure: Ditto.
+	* libc/*/aclocal.m4: Ditto.
+	* libc/*/configure: Ditto.
+	* libc/libc.texinfo: Ditto.
+	* libm/*/aclocal.m4: Ditto.
+	* libm/*/configure: Ditto.
+	* libm/libm.texinfo: Ditto.
+	* libc/sys/linux/shared.ld: Add VERS_1.13.
+
 2004-12-17  Christian Groessler  <chris@groessler.org>
 
 	* libc/machine/z8k/memcmp.S: New file.
