@@ -1,7 +1,7 @@
 2004-11-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdlib.h (putenv, _putenv_r): Change to remove
-	const for value string parameter.
+	const for value string parameter to match Single Unix and glibc.
 	* libc/stdlib/putenv.c: Ditto.
 	* libc/stdlib/putenv_r.c: Ditto.
 
