@@ -220,6 +220,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
   struct sockaddr sa;
   int sal = sizeof (sa);
   DCB dcb;
+  unsigned bin = O_BINARY;
 
   first_fd_for_open = 0;
 
@@ -259,7 +260,10 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       else if (GetCommState (handle, &dcb))
 	name = "/dev/ttyS0"; // FIXME - determine correct device
       else
-	name = handle_to_fn (handle, (char *) alloca (MAX_PATH + 100));
+	{
+	  name = handle_to_fn (handle, (char *) alloca (MAX_PATH + 100));
+	  bin = 0;
+	}
     }
 
   if (!name)
@@ -267,11 +271,13 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
   else
     {
       path_conv pc;
-      unsigned bin;
       fhandler_base *fh = build_fhandler_from_name (fd, name, handle, pc);
-      bin = fh->get_default_fmode (O_RDWR);
-      if (!bin && name != unknown_file)
-	bin = pc.binmode ();
+      if (!bin)
+	{
+	  bin = fh->get_default_fmode (O_RDWR);
+	  if (!bin && name != unknown_file)
+	    bin = pc.binmode ();
+	}
 
       fh->init (handle, GENERIC_READ | GENERIC_WRITE, bin);
       set_std_handle (fd);

@@ -1,5 +1,10 @@
 2002-10-17  Christopher Faylor  <cgf@redhat.com>
 
+	* dtable.cc (dtable::init_std_file_from_handle): Force "devices" to
+	always be in binary mode.  Temporary fix until ssh is rebuilt?
+
+2002-10-17  Christopher Faylor  <cgf@redhat.com>
+
 	* dtable.cc (dtable::set_file_pointers_for_exec): New function.
 	* dtable.h (dtable::set_file_pointers_for_exec): Declare new function.
 	* spawn.cc (spawn_guts): Call dtable::set_file_pointers_for_exec to set
