@@ -1,4 +1,18 @@
-2004-09 05  Earnie Boyd  <earnie@users.sf.net>
+2004-09-06  Hosaka Yuji  <hos@tamanegi.org>
+ 
+	* include/mshtml.h (IHTMLDocument2): Correct get_selection
+	declaration.
+	(IHTMLSelectionObject): Correct get_type declaration.
+	(IHTMLFramesCollection2, IHTMLWindow2, IHTMLFrameBase,
+	IHTMLFrameBase2, IHTMLFrameBase3, IHTMLBodyElement,
+	IHTMLBodyElement2): Add interfaces.
+	(LPHTMLIMAGEELEMENTFACTORY, LPHTMLEVENTOBJ, LPHTMLSCREEN,
+	LPHTMLOPTIONELEMENTFACTORY, LPOMHISTORY, LPOMNAVIGATOR): Add
+	typedefs.
+	* lib/mshtml-uuid.c (IID_IHTMLFrameBase2, IID_IHTMLFrameBase3):
+	Add IIDs.
+
+2004-09-05  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.1.
 	* Makefile.in: Ditto.
