@@ -324,7 +324,8 @@ mtinfo_drive::get_pos (HANDLE mt, long *ppartition, long *pblock)
     TAPE_FUNC (GetTapePosition (mt, TAPE_ABSOLUTE_POSITION, &p, &low, &high));
   if (!lasterr)
     {
-      partition = (long) (p > 0 ? p - 1 : p);
+      if (p > 0)
+	partition = (long) p - 1;
       block = (long) low;
       if (ppartition)
         *ppartition= partition;
@@ -511,9 +512,26 @@ mtinfo_drive::create_partitions (HANDLE mt, long count)
     return ERROR_INVALID_PARAMETER;
   if (set_pos (mt, TAPE_REWIND, 0, false))
     goto out;
+  partition = 0;
+  part (partition)->initialize (0);
   debug_printf ("Format tape with %s partition(s)", count <= 0 ? "one" : "two");
-  TAPE_FUNC (CreateTapePartition (mt, TAPE_SELECT_PARTITIONS,
-				  count <= 0 ? 1 : 2, 0));
+  if (get_feature (TAPE_DRIVE_INITIATOR))
+    {
+      if (count <= 0)
+        TAPE_FUNC (CreateTapePartition (mt, TAPE_INITIATOR_PARTITIONS,
+					count <= 0 ? 0 : 2, (DWORD) count));
+    }
+  else if (get_feature (TAPE_DRIVE_FIXED))
+    {
+      /* This is supposed to work for Tandberg SLR drivers up to version
+         1.6 which missed to set the TAPE_DRIVE_INITIATOR flag.  According
+	 to Tandberg, CreateTapePartition(TAPE_FIXED_PARTITIONS) apparently
+	 does not ignore the dwCount parameter.  Go figure! */
+      TAPE_FUNC (CreateTapePartition (mt, TAPE_FIXED_PARTITIONS,
+				      count <= 0 ? 0 : 2, (DWORD) count));
+    }
+  else
+    lasterr = ERROR_INVALID_PARAMETER;
 out:
   return error ("partition");
 }
@@ -545,7 +563,11 @@ mtinfo_drive::set_partition (HANDLE mt, long count)
 	  lasterr = err;
 	}
       else
-	partition = count;
+        {
+	  partition = count;
+	  if (part (partition)->block == -1)
+	    part (partition)->initialize (0);
+	}
     }
   return error ("set_partition");
 }
@@ -727,6 +749,7 @@ mtinfo_drive::status (HANDLE mt, struct mtget *get)
 
   if (!notape)
     {
+      get->mt_resid = partition;
       get->mt_fileno = part (partition)->file;
       get->mt_blkno = part (partition)->fblock;
 

@@ -1,5 +1,17 @@
 2004-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_tape.cc (mtinfo_drive::get_pos): Only set partition if
+	GetTapePosition returned a non-zero partition number.
+	(mtinfo_drive::create_partitions): Reinitialize to partition 0.
+	Support TAPE_DRIVE_INITIATOR and TAPE_DRIVE_FIXED partitioning.
+	(mtinfo_drive::set_partition): Initialize new partition.
+	(mtinfo_drive::status): Readd accidentally dropped setting of mt_resid.
+
+	* net.cc (wsock_event::prepare): Always print debug output in case
+	of error.
+
+2004-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::sendmsg): Add SIGPIPE handling.
 
 2004-03-31  Corinna Vinschen  <corinna@vinschen.de>

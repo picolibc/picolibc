@@ -54,8 +54,9 @@ bool
 wsock_event::prepare (int sock, long event_mask)
 {
   WSASetLastError (0);
-  if ((event = WSACreateEvent ()) != WSA_INVALID_EVENT
-      && WSAEventSelect (sock, event, event_mask) == SOCKET_ERROR)
+  if ((event = WSACreateEvent ()) == WSA_INVALID_EVENT)
+    debug_printf ("WSACreateEvent: %E");
+  else if (WSAEventSelect (sock, event, event_mask) == SOCKET_ERROR)
     {
       debug_printf ("WSAEventSelect: %E");
       WSACloseEvent (event);
