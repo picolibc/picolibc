@@ -1,3 +1,7 @@
+Sun Apr 22 19:18:18 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* features.h: Reinstate as wrapper for sys/features.h.
+
 Mon Apr 23  0:10:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (alloc_sd): Reformat comment.
