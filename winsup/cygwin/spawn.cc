@@ -678,6 +678,7 @@ skip_arg_parsing:
     }
   else
     {
+      myself->set_has_pgid_children ();
       ProtectHandle (pi.hThread);
       pinfo child (cygpid, 1);
       if (!child)

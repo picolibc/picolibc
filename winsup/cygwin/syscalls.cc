@@ -1711,6 +1711,8 @@ setpgid (pid_t pid, pid_t pgid)
       if (p == myself || p->ppid == myself->pid)
 	{
 	  p->pgid = pgid;
+	  if (p->pid != p->pgid)
+	    p->set_has_pgid_children (0);
 	  res = 0;
 	}
       else

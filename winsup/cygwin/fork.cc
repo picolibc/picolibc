@@ -598,6 +598,8 @@ fork ()
   void *esp;
   __asm ("movl %%esp,%0": "=r" (esp));
 
+  myself->set_has_pgid_children ();
+
   child_info_fork ch;
 
   int res = setjmp (ch.jmp);

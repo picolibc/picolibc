@@ -70,6 +70,7 @@ public:
   pid_t sid;		/* Session ID */
   int ctty;		/* Control tty */
   mode_t umask;
+  bool has_pgid_children;/* True if we've forked or spawned children with our GID. */
   char username[MAX_USER_NAME]; /* user's name */
 
   /* Extendend user information.
@@ -105,6 +106,14 @@ public:
   char stopsig;
 
   void exit (UINT n, bool norecord = 0) __attribute__ ((noreturn, regparm(2)));
+
+  inline void set_has_pgid_children ()
+  {
+    if (pgid == pid)
+      has_pgid_children = 1;
+  }
+
+  inline void set_has_pgid_children (bool val) {has_pgid_children = val;}
 
   inline struct sigaction& getsig (int sig)
   {
@@ -158,7 +167,7 @@ public:
     if (destroy && procinfo)
       release ();
   }
-    
+
   _pinfo *operator -> () const {return procinfo;}
   int operator == (pinfo *x) const {return x->procinfo == procinfo;}
   int operator == (pinfo &x) const {return x.procinfo == procinfo;}

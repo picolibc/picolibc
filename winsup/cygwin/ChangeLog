@@ -1,3 +1,14 @@
+Tue Oct 24 23:45:09 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (do_exit): Don't bother looking for pgrp children to send
+	SIGHUP if process has never created any children.
+	* fork.cc (fork): Set flag indicating that there is another process
+	with our process group.
+	* spawn.cc (spawn_guts): Ditto.
+	* pinfo.h (set_has_pgid_children): New methods for setting when process
+	has children in its process group.
+	* syscalls.cc (setpgid): Clear has_gid_children if pgid changes.
+
 Tue Oct 24 20:38:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* ntdll.h: New file.

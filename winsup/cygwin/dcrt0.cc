@@ -1024,7 +1024,7 @@ do_exit (int status)
 	set_console_title (old_title);
 
       /* Kill orphaned children on group leader exit */
-      if (myself->pid == myself->pgid)
+      if (myself->has_pgid_children && myself->pid == myself->pgid)
 	{
 	  system_printf ("%d == pgrp %d, send SIG{HUP,CONT} to stopped children",
 			  myself->pid, myself->pgid);
@@ -1041,7 +1041,7 @@ do_exit (int status)
 			  myself->pid, myself->sid);
 
 	  if (tp->getsid () == myself->sid)
-	    kill (-tp->getpgid (), SIGHUP);
+	    kill_pgrp (tp->getpgid (), SIGHUP);
 	}
 
       tty_terminate ();
