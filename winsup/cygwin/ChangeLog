@@ -1,5 +1,73 @@
 2002-12-28  Christopher Faylor  <cgf@redhat.com>
 
+	Introduce device class to cygwin throughout.  Rename FH_DISK to FH_FS
+	throughout.
+	* dcrt0.cc (dll_crt0_1): Initialize device globals via device::init.
+	* dtable.cc (dtable::init_std_file_from_handle): Use device numbers
+	rather than names when they are known.  Should speed up process startup
+	slightly.
+	(dtable::build_fhandler_from_name): Pass path_conv device to
+	build_fhandler.
+	(dtable::build_fhandler): Accept device argument rather than separate
+	device/unit arguments.
+	(dtable::build_fhandler): Ditto.  Separate switch statement by devices
+	which take units and those which don't.  Build unix/win32 names from
+	device if required.
+	(dtable::dup_worker): Reflect changes to build_fhandler arguments.
+	* dtable.h (dtable::build_fhandler): Ditto.
+	* fhandler.cc (fhandler_base::set_name): Eliminate unit argument.  Use
+	get_unit to derive unit.
+	* fhandler.h: Separate FH device defines into devices.h include.
+	Define is_slow as appropriate for each fhandler_class.
+	(fhandler_base::dev): New element.
+	(fhandler_base::fhandler_base): Eliminate unit argument.
+	(fhandler_base::get_device): Return device number.
+	(fhandler_base::get_major): Return device major number.
+	(fhandler_base::get_minor): Return device minor number.
+	(fhandler_base::get_unit): Ditto.
+	(fhandler_base::get_native_name): Return device format field.
+	(fhandler_fifo): New class.
+	(select_stuff::device_specific): Remove array.
+	(select_stuff::device_specific_pipe): New class element.
+	(select_stuff::device_specific_socket): New class element.
+	(select_stuff::device_specific_serial): New class element.
+	(select_stuff::select_stuff): Initialize new elements.
+	* fhandler_disk_file.cc (fhandler_cygdrive::fhandler_cygdrive): Remove
+	unit initialization.
+	* fhandler_tty.cc (fhandler_tty_master::init_console): Use
+	"console_dev" global to initialize captive console used by tty master.
+	* mmap.cc (mmap_record::devtype_): Remove.
+	(mmap_record::dev): New.
+	(mmap_record::mmap_record): Use dev.
+	(mmap_record::get_device): Implement via dev.
+	* net.cc (fdsock): Use socket_dev global to initialize socket fhandler.
+	* path.cc (path_conv::check): Accommodate new path_conv::dev element.
+	(get_devn): Eliminate.
+	(get_raw_device_number): Ditto.
+	(get_device_number): Ditto.
+	(win32_device_name): Accept dev argument.  Use it.  Use device::parse
+	to derive potential device name.
+	(mount_info::conv_to_win32_path): Accept dev argument.  Use it.
+	* path.h (path_conv::devn): Eliminate.
+	(path_conv::unit): Ditto.
+	(path_conv::dev): Declare.
+	(path_conv::path_conv): Don't initialize deleted members.
+	(path_conv::is_device): Implement via dev element.
+	(path_conv::get_devn): Ditto.
+	(path_conv::get_unitn): Ditto.
+	* pipe.cc (make_pipe): Use pipe[rw]_dev in fhandler construction.
+	* select.cc: Use new device_specific_* select class elements
+	* shared_info.h (CURR_MOUNT_MAGIC): Update.
+	(mount_info::conv_to_win32_path): Reflect new arguments.
+	* syscalls.cc (fstat64): Just use get_device() without interpretation
+	for st_dev element.
+	(stat_worker): Ditto.
+	* tty.cc (create_tty_master): Use ttym_dev in fhandler constructor.
+	(tty::common_init): Check for tty major device number rather than
+	FH_TTYM.
+
+2002-12-28  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_termios.cc (fhandler_termios::line_edit): Perform echo
 	before input is accepted or suffer a "race".
 
