@@ -130,10 +130,11 @@ details. */
        35: Export drand48, erand48, jrand48, lcong48, lrand48,
            mrand48, nrand48, seed48, and srand48.
        36: Added _cygwin_S_IEXEC, et al
+       37: [f]pathconv support _PC_POSIX_PERMISSIONS and _PC_POSIX_SECURITY
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 36
+#define CYGWIN_VERSION_API_MINOR 37
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

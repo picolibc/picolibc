@@ -1,3 +1,11 @@
+Sat Mar 17 18:30:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* syscalls.cc (check_posix_perm): New static function.
+	(fpathconf): Add _PC_POSIX_PERMISSIONS and _PC_POSIX_SECURITY
+	support.
+	(pathconf): Ditto.
+	* include/cygwin/version.h: Bump API minor number to 37.
+
 2001-03-18  Egor Duda <deo@logos-m.ru>
 
 	* fhandler.h (fhandler_tty_slave): Declare new methods.

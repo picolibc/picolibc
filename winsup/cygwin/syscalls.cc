@@ -1428,6 +1428,40 @@ getpagesize ()
   return (int) system_info.dwPageSize;
 }
 
+static int
+check_posix_perm (const char *fname, int v)
+{
+  extern int allow_ntea, allow_ntsec, allow_smbntsec;
+
+  /* Windows 95/98/ME don't support file system security at all. */
+  if (os_being_run != winNT)
+    return 0;
+
+  /* ntea is ok for supporting permission bits but it doesn't support
+     full POSIX security settings. */
+  if (v == _PC_POSIX_PERMISSIONS && allow_ntea)
+    return 1;
+
+  if (!allow_ntsec)
+    return 0;
+
+  char *root = rootdir (strcpy ((char *)alloca (strlen (fname)), fname));
+
+  if (!allow_smbntsec
+      && ((root[0] == '\\' && root[1] == '\\')
+          || GetDriveType (root) == DRIVE_REMOTE))
+    return 0;
+
+  DWORD vsn, len, flags;
+  if (!GetVolumeInformation (root, NULL, 0, &vsn, &len, &flags, NULL, 16))
+    {
+      __seterrno ();
+      return 0;
+    }
+
+  return (flags & FS_PERSISTENT_ACLS) ? 1 : 0;
+}
+
 /* FIXME: not all values are correct... */
 extern "C" long int
 fpathconf (int fd, int v)
@@ -1461,6 +1495,18 @@ fpathconf (int fd, int v)
 	  set_errno (EBADF);
 	  return -1;
 	}
+    case _PC_POSIX_PERMISSIONS:
+    case _PC_POSIX_SECURITY:
+      if (fdtab.not_open (fd))
+	set_errno (EBADF);
+      else
+        {
+          fhandler_base *fh = fdtab[fd];
+	  if (fh->get_device () == FH_DISK)
+	    return check_posix_perm (fh->get_win32_name (), v);
+	  set_errno (EINVAL);
+        }
+      return -1;
     default:
       set_errno (EINVAL);
       return -1;
@@ -1480,14 +1526,30 @@ pathconf (const char *file, int v)
       return _POSIX_LINK_MAX;
     case _PC_MAX_CANON:
     case _PC_MAX_INPUT:
-	return _POSIX_MAX_CANON;
+      return _POSIX_MAX_CANON;
     case _PC_PIPE_BUF:
       return 4096;
     case _PC_CHOWN_RESTRICTED:
     case _PC_NO_TRUNC:
       return -1;
     case _PC_VDISABLE:
-	return -1;
+      return -1;
+    case _PC_POSIX_PERMISSIONS:
+    case _PC_POSIX_SECURITY:
+      {
+        path_conv full_path (file, PC_SYM_FOLLOW | PC_FULL);
+	if (full_path.error)
+	  {
+	    set_errno (full_path.error);
+	    return -1;
+	  }
+	if (full_path.is_device ())
+	  {
+	    set_errno (EINVAL);
+	    return -1;
+	  }
+        return check_posix_perm (full_path, v);
+      }
     default:
       set_errno (EINVAL);
       return -1;
