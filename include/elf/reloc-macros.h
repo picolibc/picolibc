@@ -46,8 +46,8 @@
    If RELOC_MACROS_GEN_FUNC *is* defined, then instead the
    following function will be generated:
 
-   	static char * foo PARAMS ((unsigned long rtype));
-   	static char *
+   	static const char * foo PARAMS ((unsigned long rtype));
+   	static const char *
    	foo (rtype)
    	    unsigned long rtype;
    	{

@@ -1,3 +1,7 @@
+1999-05-28  Nick Clifton  <nickc@cygnus.com>
+
+	* reloc-macros.h: Update comment.
+
 1999-05-28  Ian Lance Taylor  <ian@zembu.com>
 
 	* i960.h: New file.
