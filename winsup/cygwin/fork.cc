@@ -22,6 +22,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "child_info.h"
 #include "perthread.h"
 
 DWORD NO_COPY chunksize = 0;

@@ -132,7 +132,7 @@ fhandler_termios::bg_check (int sig)
 
   /* If the process group is no more or if process is ignoring or blocks 'sig',
      return with error */
-  int pgid_gone = !proc_exists (myself->pgid);
+  int pgid_gone = !pid_exists (myself->pgid);
   int sigs_ignored =
     ((void *) myself->getsig(sig).sa_handler == (void *) SIG_IGN) ||
     (myself->getsigmask () & SIGTOMASK (sig));

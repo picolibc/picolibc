@@ -98,7 +98,7 @@ void __stdcall sigproc_init ();
 void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
 BOOL __stdcall proc_exists (_pinfo *);
-BOOL __stdcall proc_exists (pid_t);
+BOOL __stdcall pid_exists (pid_t);
 int __stdcall sig_send (_pinfo *, int, DWORD ebp = 0);
 void __stdcall signal_fixup_after_fork ();
 

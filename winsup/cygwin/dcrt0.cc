@@ -22,6 +22,7 @@ details. */
 #include "pinfo.h"
 #include "cygerrno.h"
 #include "fhandler.h"
+#include "child_info.h"
 #include "path.h"
 #include "dtable.h"
 #include "thread.h"

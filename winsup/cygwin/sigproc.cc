@@ -20,6 +20,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "child_info.h"
 #include "perthread.h"
 
 extern BOOL allow_ntsec;
@@ -185,7 +186,7 @@ proc_can_be_signalled (_pinfo *p)
 }
 
 BOOL __stdcall
-proc_exists (pid_t pid)
+pid_exists (pid_t pid)
 {
   pinfo p (pid);
   return proc_exists (p);
@@ -235,7 +236,7 @@ proc_exists (_pinfo *p)
   /* If the parent pid does not exist, clean this process out of the pinfo
    * table.  It must have died abnormally.
    */
-  if ((p->pid == p->ppid) || (p->ppid == 1) || !proc_exists (p->ppid))
+  if ((p->pid == p->ppid) || (p->ppid == 1) || !pid_exists (p->ppid))
     {
       p->hProcess = NULL;
       p->process_state = PID_NOT_IN_USE;
@@ -390,7 +391,7 @@ proc_subproc (DWORD what, DWORD val)
 
       if (wval->pid <= 0)
 	child = NULL;		// Not looking for a specific pid
-      else if (!proc_exists (wval->pid)) /* CGF FIXME -- test that this is one of mine */
+      else if (!pid_exists (wval->pid)) /* CGF FIXME -- test that this is one of mine */
 	goto out;		// invalid pid.  flag no such child
 
       wval->status = 0;		// Don't know status yet

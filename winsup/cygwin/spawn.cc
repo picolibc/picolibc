@@ -26,6 +26,7 @@ details. */
 #include "dtable.h"
 #include "sync.h"
 #include "sigproc.h"
+#include "child_info.h"
 #include "pinfo.h"
 #include "perthread.h"
 

@@ -1,3 +1,12 @@
+Fri Sep  1 16:51:26 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (proc_info): Rename proc_exists which takes a pid to
+	"pid_exists".
+	* shared.h: Split out "child_info" stuff into a new header file and
+	use where necessary.
+	Declare pid_exists.
+	* child_info.h: New file.
+
 Thu Aug 31 16:06:21 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* errno.cc (set_errno_from_win_error): Actually use arguments to
