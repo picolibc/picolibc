@@ -53,9 +53,7 @@ int     _EXFUN(fchown, (int __fildes, uid_t __owner, gid_t __group ));
 pid_t   _EXFUN(fork, (void ));
 long    _EXFUN(fpathconf, (int __fd, int __name ));
 int     _EXFUN(fsync, (int __fd));
-#ifndef __CYGWIN__
 int     _EXFUN(fdatasync, (int __fd));
-#endif
 char    _EXFUN(*getcwd, (char *__buf, size_t __size ));
 #if defined(__CYGWIN__)
 int	_EXFUN(getdomainname ,(char *__name, size_t __len));
