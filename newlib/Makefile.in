@@ -103,6 +103,7 @@ SYS_OBJECTLIST = @SYS_OBJECTLIST@
 UNIX_OBJECTLIST = @UNIX_OBJECTLIST@
 VERSION = @VERSION@
 aext = @aext@
+libc_cv_initfinit_array = @libc_cv_initfinit_array@
 libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@

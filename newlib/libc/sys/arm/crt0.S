@@ -1,3 +1,4 @@
+#include "newlib.h"
 #include "swi.h"
 
 /* ANSI concatenation macros.  */
@@ -8,6 +9,11 @@
 #define FUNCTION( name ) CONCAT (__USER_LABEL_PREFIX__, name)
 #else
 #error __USER_LABEL_PREFIX is not defined
+#endif
+
+#ifdef HAVE_INITFINI_ARRAY
+#define _init	__libc_init_array
+#define _fini	__libc_fini_array
 #endif
 
 /* .text is used instead of .section .text so it works with arm-aout too.  */

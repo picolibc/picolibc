@@ -110,7 +110,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = dprintf.c unctrl.c ffs.c
+LIB_SOURCES = dprintf.c unctrl.c ffs.c init.c
 
 libmisc_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -140,11 +140,12 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  dprintf.$(OBJEXT) unctrl.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@ffs.$(OBJEXT)
+@USE_LIBTOOL_FALSE@ffs.$(OBJEXT) init.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libmisc_la_LIBADD = 
-@USE_LIBTOOL_TRUE@libmisc_la_OBJECTS =  dprintf.lo unctrl.lo ffs.lo
+@USE_LIBTOOL_TRUE@libmisc_la_OBJECTS =  dprintf.lo unctrl.lo ffs.lo \
+@USE_LIBTOOL_TRUE@init.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -137,5 +137,9 @@
 #undef _ICONV_FROM_ENCODING_WIN_1257
 #undef _ICONV_FROM_ENCODING_WIN_1258
 
+/* Define if the linker supports .preinit_array/.init_array/.fini_array
+ * sections.  */
+#undef  HAVE_INITFINI_ARRAY
+
 #endif /* !__NEWLIB_H__ */
 

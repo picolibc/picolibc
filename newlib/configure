@@ -3425,6 +3425,40 @@ EOF
   done
 fi;
 
+echo $ac_n "checking for .preinit_array/.init_array/.fini_array support""... $ac_c" 1>&6
+echo "configure:3430: checking for .preinit_array/.init_array/.fini_array support" >&5
+if eval "test \"`echo '$''{'libc_cv_initfinit_array'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  cat > conftest.c <<EOF
+int _start (void) { return 0; }
+int __start (void) { return 0; }
+int foo (void) { return 1; }
+int (*fp) (void) __attribute__ ((section (".init_array"))) = foo;
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest conftest.c
+		   -static -nostartfiles -nostdlib 1>&AS_MESSAGE_LOG_FD'; { (eval echo configure:3441: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }
+then
+  if readelf -S conftest | grep -e INIT_ARRAY > /dev/null; then
+    libc_cv_initfinit_array=yes
+  else
+    libc_cv_initfinit_array=no
+  fi
+else
+  libc_cv_initfinit_array=no
+fi
+rm -f conftest*
+fi
+
+echo "$ac_t""$libc_cv_initfinit_array" 1>&6
+
+if test $libc_cv_initfinit_array = yes; then
+  cat >> confdefs.h <<EOF
+#define HAVE_INITFINI_ARRAY 1
+EOF
+
+fi
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -3641,6 +3675,7 @@ s%@SYSCALL_OBJECTLIST@%$SYSCALL_OBJECTLIST%g
 s%@UNIX_OBJECTLIST@%$UNIX_OBJECTLIST%g
 s%@STDIO64_OBJECTLIST@%$STDIO64_OBJECTLIST%g
 s%@CC_FOR_BUILD@%$CC_FOR_BUILD%g
+s%@libc_cv_initfinit_array@%$libc_cv_initfinit_array%g
 
 CEOF
 EOF

@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = dprintf.c unctrl.c ffs.c
+LIB_SOURCES = dprintf.c unctrl.c ffs.c init.c
 
 libmisc_la_LDFLAGS = -Xcompiler -nostdlib
 
