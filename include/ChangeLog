@@ -1,3 +1,8 @@
+2002-11-14  Egor Duda  <deo@logos-m.ru>
+
+	* bfdlink.h (struct bfd_link_info): Add new boolean
+	field pei386_runtime_pseudo_reloc.
+
 2002-11-11  Svein E. Seldal  <Svein.Seldal@solidas.com>
 
 	* opcode/tic4x.h: Added new opcodes and corrected some bugs.  Add
