@@ -1,3 +1,14 @@
+2004-04-22  Earnie Boyd  <earnie@users.sf.net>
+
+	* DISCLAIMER: Add words about "free to use".
+	* README: Modify "Win32 runtime" to "Microsoft C Runtime".
+	* Makefile.in (SRCDIST_FILES): Add DISCLAIMER and README.
+	(inst_docdir): New variable.
+	(INSTDOCS): Ditto.
+	(FLAGS_TO_PASS): Include inst_docdir.
+	(install-dirs): Add inst_docdir.
+	(install): Add loop for INSTDOCS.
+	
 2004-04-22  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/lround.c: Rewrite.

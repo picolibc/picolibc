@@ -51,10 +51,12 @@ ifneq (,$(findstring cygwin,$(target_alias)))
 inst_bindir:=$(tooldir)/bin
 inst_includedir:=$(tooldir)/include/mingw
 inst_libdir:=$(tooldir)/lib/mingw
+inst_docdir:=$(tooldir)/doc/mingw-runtime
 else
 inst_bindir:=$(bindir)
 inst_includedir:=$(includedir)
 inst_libdir:=$(libdir)
+inst_docdir:=$(prefix)/doc/mingw-runtime
 endif
 
 # The Mingw headers are installed under a subdirectory of 
@@ -142,6 +144,7 @@ FLAGS_TO_PASS:=\
 	inst_bindir="$(inst_bindir)" \
 	inst_includedir="$(inst_includedir)" \
 	inst_libdir="$(inst_libdir)" \
+	inst_docdir="$(inst_docdir)" \
 	prefix="$(prefix)" \
 	target_alias="$(target_alias)" \
 	TAR="$(TAR)" \
@@ -169,6 +172,9 @@ LIBS = libcrtdll.a \
 
 DLLS = $(THREAD_DLL_NAME)
 
+INSTDOCS = DISCLAIMER \
+	   README
+
 SRCDIST_FILES = CRT_noglob.c CRTfmode.c CRTglob.c CRTinit.c ChangeLog \
 Makefile.in README TODO config.guess config.sub configure configure.in \
 crt1.c crtdll.def crtmt.c crtst.c  dllcrt1.c dllmain.c \
@@ -178,7 +184,8 @@ mthr.c mthr_init.c mthr_stub.c readme.txt \
 isascii.c iscsym.c iscsymf.c toascii.c \
 strcasecmp.c strncasecmp.c wcscmpi.c \
 CRT_fp8.c CRT_fp10.c test_headers.c txtmode.c binmode.c pseudo-reloc.c \
-pseudo-reloc-list.c
+pseudo-reloc-list.c \
+DISCLAIMER README
 
 
 all_dlls_host = @all_dlls_host@
@@ -389,6 +396,7 @@ install-dirs:
 	$(mkinstalldirs) $(inst_bindir)
 	$(mkinstalldirs) $(inst_includedir)
 	$(mkinstalldirs) $(inst_libdir)
+	$(mkinstalldirs) $(inst_docdir)
 
 install: all install-dirs $(install_dlls_host)
 	for i in $(LIBS); do \
@@ -396,6 +404,9 @@ install: all install-dirs $(install_dlls_host)
 	done
 	for i in $(CRT0S); do \
 		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
+	done
+	for i in $(INSTDOCS); do \
+		$(INSTALL_DATA) $(srcdir)/$$i $(inst_docdir)/$$i ; \
 	done
 	for sub in . sys ; do \
 		dstdir=$(inst_includedir)/$$sub ; \
