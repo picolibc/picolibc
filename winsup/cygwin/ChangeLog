@@ -1,5 +1,9 @@
 2003-03-27  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* thread.cc: Change 1==foo equations to foo==1 throughout.
+
+2003-03-27  Thomas Pfaff  <tpfaff@gmx.net>
+
 	* thread.h: Change class names, methods, members and local vars
 	according to the GNU coding style.
 	* thread.cc: Ditto.

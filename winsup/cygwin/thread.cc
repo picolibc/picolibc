@@ -606,7 +606,7 @@ pthread::testcancel (void)
   if (cancelstate == PTHREAD_CANCEL_DISABLE)
     return;
 
-  if (WAIT_OBJECT_0 == WaitForSingleObject (cancel_event, 0))
+  if (WaitForSingleObject (cancel_event, 0) == WAIT_OBJECT_0)
     cancel_self ();
 }
 
@@ -904,7 +904,7 @@ pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
   DWORD rv;
 
   mtx_in.lock ();
-  if (1 == InterlockedIncrement ((long *)&waiting))
+  if (InterlockedIncrement ((long *)&waiting) == 1)
     mtx_cond = mutex;
   else if (mtx_cond != mutex)
     {
@@ -931,7 +931,7 @@ pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
        * or timed out. Try to take one.
        * If the thread gets one than a signal|broadcast is in progress.
        */ 
-      if (WAIT_OBJECT_0 == WaitForSingleObject (sem_wait, 0))
+      if (WaitForSingleObject (sem_wait, 0) == WAIT_OBJECT_0)
         /*
          * thread got cancelled ot timed out while a signalling is in progress.
          * Set wait result back to signaled
@@ -941,7 +941,7 @@ pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
 
   InterlockedDecrement ((long *)&waiting);
 
-  if (rv == WAIT_OBJECT_0 && 0 == --pending)
+  if (rv == WAIT_OBJECT_0 && --pending == 0)
     /*
      * All signaled threads are released,
      * new threads can enter Wait
@@ -1450,7 +1450,7 @@ pthread_mutex::can_be_unlocked (pthread_mutex_t const *mutex)
   /*
    * Check if the mutex is owned by the current thread and can be unlocked
    */
-  return (pthread_equal ((*mutex)->owner, self)) && 1 == (*mutex)->recursion_counter;
+  return ((*mutex)->recursion_counter == 1 && pthread_equal ((*mutex)->owner, self));
 }
 
 List<pthread_mutex> pthread_mutex::mutexes;
@@ -1510,12 +1510,12 @@ pthread_mutex::_lock (pthread_t self)
 {
   int result = 0;
 
-  if (1 == InterlockedIncrement ((long *)&lock_counter))
+  if (InterlockedIncrement ((long *)&lock_counter) == 1)
     set_owner (self);
-  else if (PTHREAD_MUTEX_NORMAL != type && pthread_equal (owner, self))
+  else if (type != PTHREAD_MUTEX_NORMAL && pthread_equal (owner, self))
     {
       InterlockedDecrement ((long *) &lock_counter);
-      if (PTHREAD_MUTEX_RECURSIVE == type)
+      if (type == PTHREAD_MUTEX_RECURSIVE)
 	result = lock_recursive ();
       else
 	result = EDEADLK;
@@ -1534,9 +1534,9 @@ pthread_mutex::_trylock (pthread_t self)
 {
   int result = 0;
 
-  if (0 == InterlockedCompareExchange ((long *)&lock_counter, 1, 0 ))
+  if (InterlockedCompareExchange ((long *)&lock_counter, 1, 0 ) == 0)
     set_owner (self);
-  else if (PTHREAD_MUTEX_RECURSIVE == type && pthread_equal (owner, self))
+  else if (type == PTHREAD_MUTEX_RECURSIVE && pthread_equal (owner, self))
     result = lock_recursive ();
   else
     result = EBUSY;
@@ -1550,7 +1550,7 @@ pthread_mutex::_unlock (pthread_t self)
   if (!pthread_equal (owner, self))
     return EPERM;
 
-  if (0 == --recursion_counter)
+  if (--recursion_counter == 0)
     {
       owner = NULL;
       if (InterlockedDecrement ((long *)&lock_counter))
@@ -1585,7 +1585,7 @@ pthread_mutex::_fixup_after_fork ()
   if (pshared != PTHREAD_PROCESS_PRIVATE)
     api_fatal ("pthread_mutex::_fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's");
 
-  if (NULL == owner)
+  if (owner == NULL)
     /* mutex has no owner, reset to initial */
     lock_counter = 0;
   else if (lock_counter != 0)
@@ -2196,7 +2196,7 @@ pthread::detach (pthread_t *thread)
     }
 
   // check if thread is still alive
-  if (WAIT_TIMEOUT == WaitForSingleObject ((*thread)->win32_obj_id, 0))
+  if (WaitForSingleObject ((*thread)->win32_obj_id, 0) == WAIT_TIMEOUT)
     {
       // force cleanup on exit
       (*thread)->joiner = *thread;
