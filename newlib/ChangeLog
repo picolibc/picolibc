@@ -1,3 +1,11 @@
+2002-09-04  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+        * libc/include/sys/config.h: Define accordingly __WCHAR_MAX__.
+        * libc/include/wchar.h: Define WCHAR_MIN as 0 and WCHAR_MAX as
+        __WCHAR_MAX__ or 0x7fffffffu.
+        * libc/string/wcscmp.c: Delete wrong and unnecessary type cast.
+        * libc/string/wcsncmp.c: Ditto.
+
 2002-09-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/string/wcschr.c: Add include of <stddef.h>.

@@ -19,6 +19,16 @@
 # define WEOF ((wint_t)-1)
 #endif
 
+#ifndef WCHAR_MIN
+#define WCHAR_MIN 0
+#endif
+
+#ifdef __WCHAR_MAX__
+#define WCHAR_MAX __WCHAR_MAX__
+#else
+#define WCHAR_MAX 0x7fffffffu
+#endif
+
 #ifndef MBSTATE_T
 #define MBSTATE_T
 typedef _mbstate_t mbstate_t;
