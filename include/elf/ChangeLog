@@ -1,3 +1,8 @@
+2004-06-25  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+
+	* m32r.h: Add defintions of R_M32R_GOTOFF_HI_ULO,
+	R_M32R_GOTOFF_HI_SLO and R_M32R_GOTOFF_LO.
+
 2004-06-19  Alan Modra  <amodra@bigpond.net.au>
 
 	* common.h (ELF64_R_INFO): Warning fix.
