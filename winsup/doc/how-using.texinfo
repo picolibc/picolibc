@@ -140,6 +140,38 @@ bash$ cd //MACHINE/Share
 bash$ mkdir -p path/to/new/dir
 @end example
 
+@subsection Why doesn't my script work?
+
+There are two basic problems you might run into.  One is the fact that
+/bin/sh is really ash, and is missing some features you might expect in
+/bin/sh.  For example:
+
+@itemize bullet
+@item No job control
+@item No getopts
+@item No functions exported
+@end itemize
+
+Or it could be a permission problem, and Cygwin doesn't understand that
+your script is executable.  Because @samp{chmod} may not work (see FAQ
+entry above), Cygwin must read the contents of files to determine if
+they are executable.  If your script does not start with
+
+@example
+	#! /bin/sh
+@end example
+
+(or any path to a script interpreter, it does not have to be /bin/sh)
+then Cygwin will not know it is an executable script.  The common Bourne
+shell idiom
+
+@example
+	:
+	# This is the 2nd line, assume processing by /bin/sh
+@end example
+
+does not work.
+
 @subsection Why don't cursor keys work under Win95/Win98?
 
 @strong{(Please note: This section has not yet been updated for the latest
