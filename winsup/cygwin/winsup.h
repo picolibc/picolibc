@@ -24,7 +24,7 @@ details. */
 # define memset __builtin_memset
 #endif
 
-#define NO_COPY __attribute__((section("COMMON")))
+#define NO_COPY __attribute__((section(".data_cygwin_nocopy")))
 
 #ifdef __cplusplus
 

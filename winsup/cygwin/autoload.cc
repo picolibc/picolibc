@@ -236,7 +236,7 @@ std_dll_init ()
 
 /* Initialization function for winsock stuff. */
 static long long wsock_init () __asm__ ("wsock_init") __attribute__ ((unused, regparm(1)));
-bool NO_COPY wsock_started;
+bool NO_COPY wsock_started = 0;
 static long long
 wsock_init ()
 {

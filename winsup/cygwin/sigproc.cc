@@ -74,46 +74,46 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 
 #define Static static NO_COPY
 
-Static DWORD proc_loop_wait;		// Wait for subprocesses to exit
-Static DWORD sig_loop_wait;		// Wait for signals to arrive
+Static DWORD proc_loop_wait = 1000;	// Wait for subprocesses to exit
+Static DWORD sig_loop_wait = INFINITE;	// Wait for signals to arrive
 
-Static HANDLE sigcatch_nonmain;		// The semaphore signaled when
+Static HANDLE sigcatch_nonmain = NULL;	// The semaphore signaled when
 					//  signals are available for
 					//  processing from non-main thread
-Static HANDLE sigcatch_main;		// Signalled when main thread sends a
+Static HANDLE sigcatch_main = NULL;	// Signalled when main thread sends a
 					//  signal
-Static HANDLE sigcatch_nosync;		// Signal wait_sig to scan sigtodo
+Static HANDLE sigcatch_nosync = NULL;	// Signal wait_sig to scan sigtodo
 					//  but not to bother with any
 					//  synchronization
-Static HANDLE sigcomplete_main;		// Event signaled when a signal has
+Static HANDLE sigcomplete_main = NULL;	// Event signaled when a signal has
 					//  finished processing for the main
 					//  thread
-Static HANDLE sigcomplete_nonmain;	// Semaphore raised for non-main
+Static HANDLE sigcomplete_nonmain = NULL;// Semaphore raised for non-main
 					//  threads when a signal has finished
 					//  processing
-Static HANDLE hwait_sig;		// Handle of wait_sig thread
-Static HANDLE hwait_subproc;		// Handle of sig_subproc thread
+Static HANDLE hwait_sig = NULL;		// Handle of wait_sig thread
+Static HANDLE hwait_subproc = NULL;	// Handle of sig_subproc thread
 
-Static HANDLE wait_sig_inited;		// Control synchronization of
+Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
 					//  message queue startup
 
 /* Used by WaitForMultipleObjects.  These are handles to child processes.
  */
-Static HANDLE events[PSIZE + 1];	// All my children's handles++
+Static HANDLE events[PSIZE + 1] = {0};	// All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
 Static pinfo pchildren[PSIZE];		// All my children info
 Static pinfo zombies[16384];		// All my deceased children info
 Static int nchildren = 0;		// Number of active children
 Static int nzombies = 0;		// Number of deceased children
 
-Static waitq waitq_head;		// Start of queue for wait'ing threads
+Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 Static waitq waitq_main;		// Storage for main thread
 
-muto NO_COPY *sync_proc_subproc;	// Control access to subproc stuff
+muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
 
-DWORD NO_COPY sigtid;			// ID of the signal thread
+DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 
-int NO_COPY pending_signals;		// TRUE if signals pending
+int NO_COPY pending_signals = 0;	// TRUE if signals pending
 
 /* Functions
  */
@@ -543,7 +543,6 @@ sig_dispatch_pending (int justwake)
 void __stdcall
 sigproc_init ()
 {
-  sig_loop_wait = INFINITE;
   wait_sig_inited = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (wait_sig_inited);
 
@@ -815,7 +814,6 @@ subproc_init (void)
   if (hwait_subproc)
     return;
 
-  proc_loop_wait = 1000;
   /* A "wakeup" handle which can be toggled to make wait_subproc reexamine
    * the hchildren array.
    */

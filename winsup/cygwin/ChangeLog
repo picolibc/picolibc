@@ -1,3 +1,10 @@
+Fri Aug 31 13:58:51 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygwin.sc: Revert to previous NO_COPY behavior.
+	* winsup.h: Ditto.
+	* sigproc.cc: Ditto.
+	* autoload.cc: Ditto.
+
 Fri Aug 31 00:56:26 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygwin.sc: New file -- linker script for building cygwin DLL.
@@ -27,8 +34,6 @@ Fri Aug 31 00:56:26 2001  Christopher Faylor <cgf@cygnus.com>
 	(subproc_init): Initialize proc_loop_wait here, rather than via
 	initialization.
 
-
-
 Thu Aug 30 10:19:00 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (select_read): Add setting read_ready flag.
@@ -55,7 +60,7 @@ Mon Aug 27 11:58:19 2001  Christopher Faylor <cgf@cygnus.com>
 	(select_stuff::wait): Ditto.
 
 2001-08-24  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
-   
+
 	* syscalls.cc (check_tty_fds): New function.  Check whether there is a
 	fd referring to pty slave.
 	(setsid): Don't detach console if the process has a pty slave.
@@ -244,12 +249,12 @@ Tue Aug  7 16:24:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 Tue Aug  7 10:54:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
-        * grp.cc (class grp_check): New class. Make `group_state'
-        a member of class grp_check.
-        (read_etc_group): Free former allocated memory on reread.
-        * passwd.cc (class pwd_check): New class Make `passwd_state'
-        a member of class pwd_check.
-        (read_etc_passwd): Free former allocated memory on reread.
+	* grp.cc (class grp_check): New class. Make `group_state'
+	a member of class grp_check.
+	(read_etc_group): Free former allocated memory on reread.
+	* passwd.cc (class pwd_check): New class Make `passwd_state'
+	a member of class pwd_check.
+	(read_etc_passwd): Free former allocated memory on reread.
 
 Tue Aug  7 01:13:58 2001  Christopher Faylor <cgf@cygnus.com>
 

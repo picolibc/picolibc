@@ -32,7 +32,7 @@ SECTIONS
     *(.data2)
     *(SORT(.data$*))
     __data_end__ = . ;
-    *(COMMON)
+    *(.data_cygwin_nocopy)
   }
   .rdata BLOCK(__section_alignment__) :
   {
@@ -48,6 +48,7 @@ SECTIONS
   {
     __bss_start__ = . ;
     *(.bss)
+    *(COMMON)
     __bss_end__ = . ;
   }
   .edata BLOCK(__section_alignment__) :
