@@ -102,7 +102,7 @@ uni2ansi (LPWSTR wcs, char *mbs, int size)
 
 int
 enum_users (LPWSTR servername, int print_sids, int print_cygpath,
-	    const char * passed_home_path)
+	    const char * passed_home_path, int id_offset)
 {
   USER_INFO_3 *buffer;
   DWORD entriesread = 0;
@@ -205,7 +205,9 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 		    }
 		}
 	    }
-	  printf ("%s::%d:%d:%s%s%s:%s:/bin/sh\n", username, uid, gid,
+	  printf ("%s::%d:%d:%s%s%s:%s:/bin/sh\n", username,
+		  uid + id_offset,
+		  gid + id_offset,
 		  fullname,
 		  print_sids ? "," : "",
 		  print_sids ? put_sid (psid) : "",
@@ -318,6 +320,8 @@ usage ()
   fprintf (stderr, "   -l,--local              print local user accounts\n");
   fprintf (stderr, "   -d,--domain             print domain accounts (from current domain\n");
   fprintf (stderr, "                           if no domain specified)\n");
+  fprintf (stderr, "   -o,--id-offset offset   change the default offset (10000) added to uids\n");
+  fprintf (stderr, "                           in domain accounts.\n");
   fprintf (stderr, "   -g,--local-groups       print local group information too\n");
   fprintf (stderr, "                           if no domain specified\n");
   fprintf (stderr, "   -m,--no-mount           don't use mount points for home dir\n");
@@ -333,6 +337,7 @@ usage ()
 struct option longopts[] = {
   {"local", no_argument, NULL, 'l'},
   {"domain", no_argument, NULL, 'd'},
+  {"id-offset", required_argument, NULL, 'o'},
   {"local-groups", no_argument, NULL, 'g'},
   {"no-mount", no_argument, NULL, 'm'},
   {"no-sids", no_argument, NULL, 's'},
@@ -341,7 +346,7 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "ldgsmhp:";
+char opts[] = "ldo:gsmhp:";
 
 int
 main (int argc, char **argv)
@@ -355,6 +360,7 @@ main (int argc, char **argv)
   int domain_name_specified = 0;
   int print_sids = 1;
   int print_cygpath = 1;
+  int id_offset = 10000;
   int i;
 
   char name[256], dom[256], passed_home_path[MAX_PATH];
@@ -377,6 +383,9 @@ main (int argc, char **argv)
 	      break;
 	    case 'd':
 	      print_domain = 1;
+	      break;
+	    case 'o':
+	      id_offset = strtol (optarg, NULL, 10);
 	      break;
 	    case 'g':
 	      print_local_groups = 1;
@@ -522,11 +531,11 @@ main (int argc, char **argv)
 	  exit (1);
 	}
 
-      enum_users (servername, print_sids, print_cygpath, passed_home_path);
+      enum_users (servername, print_sids, print_cygpath, passed_home_path, id_offset);
     }
 
   if (print_local)
-    enum_users (NULL, print_sids, print_cygpath, passed_home_path);
+    enum_users (NULL, print_sids, print_cygpath, passed_home_path, 0);
 
   if (servername)
     netapibufferfree (servername);

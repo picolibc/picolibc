@@ -1,3 +1,15 @@
+2001-04-13  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* mkgroup.c (enum_groups): Use RID + offset specified an additional
+	argument as ID.
+	(usage): Add description of -o option.
+	(longopts, opts): Add specifications of -o/--id-offset option.
+	(main): Add -o option. Invoke enum_groups with specified offset.
+	* mkpasswd.c (enum_users): Just like mkgroup.c.
+	(usage, longopts, opts): Ditto.
+	(main): Add -o option. Invoke enum_users with specified offset
+	only against domain accounts.
+
 2001-04-11  Egor Duda  <deo@logos-m.ru>
 
 	* mkgroup.c (uni2ansi): Use native method to convert from Unicode

@@ -187,7 +187,7 @@ enum_local_groups (int print_sids)
 }
 
 void
-enum_groups (LPWSTR servername, int print_sids)
+enum_groups (LPWSTR servername, int print_sids, int id_offset)
 {
   GROUP_INFO_2 *buffer;
   DWORD entriesread = 0;
@@ -273,7 +273,7 @@ enum_groups (LPWSTR servername, int print_sids)
             }
 	  printf ("%s:%s:%d:\n", groupname,
                                  print_sids ? put_sid (psid) : "",
-                                 gid);
+                                 gid + id_offset);
 	}
 
       netapibufferfree (buffer);
@@ -291,13 +291,15 @@ usage ()
   fprintf (stderr, "Usage: mkgroup [OPTION]... [domain]\n\n");
   fprintf (stderr, "This program prints a /etc/group file to stdout\n\n");
   fprintf (stderr, "Options:\n");
-  fprintf (stderr, "   -l,--local           print local group information\n");
-  fprintf (stderr, "   -d,--domain          print global group information from the domain\n");
-  fprintf (stderr, "                        specified (or from the current domain if there is\n");
-  fprintf (stderr, "                        no domain specified)\n");
-  fprintf (stderr, "   -s,--no-sids         don't print SIDs in pwd field\n");
-  fprintf (stderr, "                         (this affects ntsec)\n");
-  fprintf (stderr, "   -?,--help            print this message\n\n");
+  fprintf (stderr, "   -l,--local             print local group information\n");
+  fprintf (stderr, "   -d,--domain            print global group information from the domain\n");
+  fprintf (stderr, "                          specified (or from the current domain if there is\n");
+  fprintf (stderr, "                          no domain specified)\n");
+  fprintf (stderr, "   -o,--id-offset offset  change the default offset (10000) added to uids\n");
+  fprintf (stderr, "                          in domain accounts.\n");
+  fprintf (stderr, "   -s,--no-sids           don't print SIDs in pwd field\n");
+  fprintf (stderr, "                          (this affects ntsec)\n");
+  fprintf (stderr, "   -?,--help              print this message\n\n");
   fprintf (stderr, "One of `-l' or `-d' must be given on NT/W2K.\n");
   return 1;
 }
@@ -305,12 +307,13 @@ usage ()
 struct option longopts[] = {
   {"local", no_argument, NULL, 'l'},
   {"domain", no_argument, NULL, 'd'},
+  {"id-offset", required_argument, NULL, 'o'},
   {"no-sids", no_argument, NULL, 's'},
   {"help", no_argument, NULL, 'h'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "ldsh";
+char opts[] = "ldo:sh";
 
 int
 main (int argc, char **argv)
@@ -322,6 +325,7 @@ main (int argc, char **argv)
   int print_domain = 0;
   int print_sids = 1;
   int domain_specified = 0;
+  int id_offset = 10000;
   int i;
 
   char name[256], dom[256];
@@ -342,6 +346,9 @@ main (int argc, char **argv)
 	      break;
 	    case 'd':
 	      print_domain = 1;
+	      break;
+	    case 'o':
+	      id_offset = strtol (optarg, NULL, 10);
 	      break;
 	    case 's':
 	      print_sids = 0;
@@ -464,7 +471,7 @@ main (int argc, char **argv)
 	  exit (1);
 	}
 
-      enum_groups (servername, print_sids);
+      enum_groups (servername, print_sids, id_offset);
     }
 
   if (print_local)
