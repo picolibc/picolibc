@@ -1057,34 +1057,29 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
       if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
 	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
 	{
-	  get_ttyp ()->arg.winsize = *(struct winsize *) arg;
-	  if (ioctl_request_event)
-	    {
-	      get_ttyp ()->ioctl_retval = -1;
-	      SetEvent (ioctl_request_event);
-	    }
+	  if (!ioctl_request_event)
+	    get_ttyp ()->ioctl_retval = -EINVAL;
 	  else
 	    {
+	      get_ttyp ()->arg.winsize = *(struct winsize *) arg;
+	      SetEvent (ioctl_request_event);
 	      get_ttyp ()->winsize = *(struct winsize *) arg;
 	      kill (-get_ttyp ()->getpgid (), SIGWINCH);
+	      if (ioctl_done_event)
+		WaitForSingleObject (ioctl_done_event, INFINITE);
 	    }
-	  if (ioctl_done_event)
-	    WaitForSingleObject (ioctl_done_event, INFINITE);
 	}
       break;
     case TIOCLINUX:
-      int val = * (unsigned char *) arg;
-      if (val == 6 && ioctl_request_event && ioctl_done_event)
-	{
-	  get_ttyp ()->arg.value = val; 
-	  SetEvent (ioctl_request_event);
-	  WaitForSingleObject (ioctl_done_event, INFINITE);
-	  * (unsigned char *) arg = get_ttyp ()->arg.value & 0xFF;
-	}
+      int val = *(unsigned char *) arg;
+      if (val != 6 || !ioctl_request_event || !ioctl_done_event)
+	  get_ttyp ()->ioctl_retval = -EINVAL;
       else
 	{
-	  get_ttyp ()->ioctl_retval = -1;
-	  set_errno (EINVAL);
+	  get_ttyp ()->arg.value = val;
+	  SetEvent (ioctl_request_event);
+	  WaitForSingleObject (ioctl_done_event, INFINITE);
+	  *(unsigned char *) arg = get_ttyp ()->arg.value & 0xFF;
 	}
       break;
     }
@@ -1092,8 +1087,14 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
   release_output_mutex ();
 
 out:
-  termios_printf ("%d = ioctl (%x)", get_ttyp ()->ioctl_retval, cmd);
-  return get_ttyp ()->ioctl_retval;
+  int retval = get_ttyp ()->ioctl_retval;
+  if (retval < 0)
+    {
+      set_errno (-retval);
+      retval = -1;
+    }
+  termios_printf ("%d = ioctl (%x)", retval, cmd);
+  return retval;
 }
 
 /*******************************************************
@@ -1250,7 +1251,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
   switch (cmd)
     {
       case TIOCPKT:
-	pktmode = * (int *) arg;
+	pktmode = *(int *) arg;
 	break;
       case TIOCGWINSZ:
 	*(struct winsize *) arg = get_ttyp ()->winsize;
@@ -1259,7 +1260,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
 	    || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
 	  {
-	    get_ttyp ()->winsize = * (struct winsize *) arg;
+	    get_ttyp ()->winsize = *(struct winsize *) arg;
 	    kill (-get_ttyp ()->getpgid (), SIGWINCH);
 	  }
 	break;

@@ -1,3 +1,9 @@
+2003-09-26  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::ioctl): Properly set
+	ioctl_request event when window size changes.  Store failing errno in
+	ioctl_retval (needed?).
+
 2003-09-26  Pavel Tsekov  <ptsekov@gmx.net>
 
 	* fhandler_console.c (fhandler_console::read): Record the state of the
