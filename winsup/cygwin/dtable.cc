@@ -328,9 +328,6 @@ build_fh_pc (path_conv& pc)
       case DEV_TTYM_MAJOR:
 	fh = cnew (fhandler_tty_master) ();
 	break;
-      case DEV_CYGDRIVE_MAJOR:
-	fh = cnew (fhandler_cygdrive) ();
-	break;
       case DEV_FLOPPY_MAJOR:
       case DEV_CDROM_MAJOR:
       case DEV_SD_MAJOR:
@@ -338,6 +335,9 @@ build_fh_pc (path_conv& pc)
 	break;
       case DEV_TAPE_MAJOR:
 	fh = cnew (fhandler_dev_tape) ();
+	break;
+      case DEV_SERIAL_MAJOR:
+	fh = cnew (fhandler_serial) ();
 	break;
       default:
 	switch (pc.dev)
@@ -347,17 +347,11 @@ build_fh_pc (path_conv& pc)
 	  case FH_CONOUT:
 	    fh = cnew (fhandler_console) ();
 	    break;
-	  case FH_CYGDRIVE:
-	    fh = cnew (fhandler_cygdrive) ();
-	    break;
 	  case FH_PTYM:
 	    fh = cnew (fhandler_pty_master) ();
 	    break;
 	  case FH_WINDOWS:
 	    fh = cnew (fhandler_windows) ();
-	    break;
-	  case FH_SERIAL:
-	    fh = cnew (fhandler_serial) ();
 	    break;
 	  case FH_FIFO:
 	    fh = cnew (fhandler_fifo) ();

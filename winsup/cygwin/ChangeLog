@@ -1,3 +1,9 @@
+2003-11-12  Brian Ford  <ford@vss.fsi.com>
+
+	* dtable.cc (build_fh_pc): Use DEV_SERIAL_MAJOR to catch all serial
+	ports.  Remove redundant FH_CYGDRIVE case since it is handled by
+	DEV_CYGDRIVE_MAJOR.
+
 2003-11-11  Christopher Faylor  <cgf@redhat.com>
 	    Thomas Pfaff <tpfaff@gmx.net>
 
