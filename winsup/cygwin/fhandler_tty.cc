@@ -211,7 +211,9 @@ process_input (void *)
     {
       size_t nraw = INP_BUFFER_SIZE;
       tty_master->console->read ((void *) rawbuf, nraw);
-      (void) tty_master->line_edit (rawbuf, nraw, tty_master->get_ttyp ()->ti);
+      if (tty_master->line_edit (rawbuf, nraw, tty_master->get_ttyp ()->ti)
+	  == line_edit_signalled)
+	tty_master->console->eat_readahead (-1);
     }
 }
 

@@ -1,3 +1,8 @@
+2003-02-12  Christopher Faylor  <cgf@redhat.com>
+
+	* spawn.cc (linebuf::~linebuf): Resurrect commented out (for
+	debugging?) code.
+
 2003-02-10  Ralf Habacker <ralf.habacker@freenet.de>
 
 	* include/cygwin/in.h (in_attr_t): Define new type.
