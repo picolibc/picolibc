@@ -1,4 +1,4 @@
-2003-08-18  Pierre Humblet  <pierre.humblet@ieee.org>
+2003-08-18  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (sigdelayed): Fix race where signal handler could get
 	the wrong mask.
