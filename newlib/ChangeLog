@@ -1,5 +1,10 @@
 2002-10-18  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libm/machine/i386/aclocal.m4: Regenerated.
+	* libm/machine/i386/configure: Ditto.
+
+2002-10-18  Jeff Johnston  <jjohnstn@redhat.com>
+
         * testsuite/include/check.h: New header file to use with
         test cases.
         * testsuite/lib/newlib.exp: Add testsuite/include directory
