@@ -55,7 +55,7 @@
 	* fhandler_dsp.cc (fhandler_dev_dsp::ioctl): Add implementation
 	for ioctl codes SNDCTL_DSP_CHANNELS and SNDCTL_DSP_GETCAPS.
 
-2004-04-03  Christopher Faylor  <cgf@redhat.com>
+2004-04-03  Christopher Faylor  <cgf@bosbc.com>
 
 	* child_info.h (child_info::cygheap_reserve_sz): Rename from
 	cygheap_alloc_sz.
