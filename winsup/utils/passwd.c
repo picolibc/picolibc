@@ -175,8 +175,8 @@ PrintPW (PUSER_INFO_3 ui)
 
   printf ("Account disabled           : %s",
   	(ui->usri3_flags & UF_ACCOUNTDISABLE) ? "yes\n" : "no\n");
-  printf ("Password required          : %s",
-  	(ui->usri3_flags & UF_PASSWD_NOTREQD) ? "no\n" : "yes\n");
+  printf ("Password not required      : %s",
+  	(ui->usri3_flags & UF_PASSWD_NOTREQD) ? "yes\n" : "no\n");
   printf ("User can't change password : %s",
   	(ui->usri3_flags & UF_PASSWD_CANT_CHANGE) ? "yes\n" : "no\n");
   printf ("Password never expires     : %s",
@@ -464,32 +464,36 @@ main (int argc, char **argv)
 
   if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
     {
+      USER_INFO_1008 uif;
+
       if (li->usri3_priv != USER_PRIV_ADMIN)
         return eprint (0, "You have no maintenance privileges.");
+      uif.usri1008_flags = ui->usri3_flags;
       if (lopt)
         {
 	  if (ui->usri3_priv == USER_PRIV_ADMIN)
 	    return eprint (0, "Locking an admin account is disallowed.");
-          ui->usri3_flags |= UF_ACCOUNTDISABLE;
+          uif.usri1008_flags |= UF_ACCOUNTDISABLE;
         }
       if (uopt)
-        ui->usri3_flags &= ~UF_ACCOUNTDISABLE;
+        uif.usri1008_flags &= ~UF_ACCOUNTDISABLE;
       if (copt)
-        ui->usri3_flags |= UF_PASSWD_CANT_CHANGE;
+        uif.usri1008_flags |= UF_PASSWD_CANT_CHANGE;
       if (Copt)
-        ui->usri3_flags &= ~UF_PASSWD_CANT_CHANGE;
+        uif.usri1008_flags &= ~UF_PASSWD_CANT_CHANGE;
       if (eopt)
-        ui->usri3_flags |= UF_DONT_EXPIRE_PASSWD;
+        uif.usri1008_flags |= UF_DONT_EXPIRE_PASSWD;
       if (Eopt)
-        ui->usri3_flags &= ~UF_DONT_EXPIRE_PASSWD;
+        uif.usri1008_flags &= ~UF_DONT_EXPIRE_PASSWD;
       if (popt)
-        ui->usri3_flags |= UF_PASSWD_NOTREQD;
+        uif.usri1008_flags |= UF_PASSWD_NOTREQD;
       if (Popt)
-        ui->usri3_flags &= ~UF_PASSWD_NOTREQD;
+        uif.usri1008_flags &= ~UF_PASSWD_NOTREQD;
 
       if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt)
 	{
-          ret = NetUserSetInfo (NULL, ui->usri3_name, 3, (LPBYTE) ui, NULL);
+          ret = NetUserSetInfo (NULL, ui->usri3_name, 1008, (LPBYTE) &uif,
+	  			NULL);
           return EvalRet (ret, NULL);
 	}
       // Sopt
