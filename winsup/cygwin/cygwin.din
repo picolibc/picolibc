@@ -597,6 +597,8 @@ nextafter
 _nextafter = nextafter
 nextafterf
 _nextafterf = nextafterf
+nl_langinfo
+_nl_langinfo = nl_langinfo
 open
 _open = open
 opendir

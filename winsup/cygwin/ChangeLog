@@ -1,3 +1,8 @@
+2002-11-26  Jason Tishler  <jason@tishler.net>
+
+	* cygwin.din: Export nl_langinfo().
+	* include/cygwin/version.h: Bump API minor version.
+
 2002-11-26  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_tty.cc (fhandler_pty_master::accept_input): Just use a
