@@ -440,7 +440,7 @@ process_ioctl (void *)
 fhandler_tty_slave::fhandler_tty_slave ()
   : fhandler_tty_common ()
 {
-  set_r_no_interrupt (1);
+  uninterruptible_io (true);
 }
 
 /* FIXME: This function needs to close handles when it has
@@ -1334,10 +1334,10 @@ fhandler_pty_master::ptsname ()
 }
 
 void
-fhandler_tty_common::set_close_on_exec (int val)
+fhandler_tty_common::set_close_on_exec (bool val)
 {
   if (archetype)
-    set_close_on_exec_flag (val);
+    close_on_exec (val);
   else
     {
       if (output_done_event)
@@ -1359,7 +1359,7 @@ fhandler_tty_common::set_close_on_exec (int val)
 	 It is here because we need to specify the "from_pty" stuff here or
 	 we'll get warnings from ForceCloseHandle when debugging. */
       set_no_inheritance (get_io_handle (), val);
-      set_close_on_exec_flag (val);
+      close_on_exec (val);
 #endif
     }
 }
@@ -1391,7 +1391,7 @@ fhandler_tty_common::fixup_after_fork (HANDLE parent)
 }
 
 void
-fhandler_pty_master::set_close_on_exec (int val)
+fhandler_pty_master::set_close_on_exec (bool val)
 {
   fhandler_tty_common::set_close_on_exec (val);
 
@@ -1414,6 +1414,6 @@ fhandler_tty_master::init_console ()
 
   console->init (INVALID_HANDLE_VALUE, GENERIC_READ | GENERIC_WRITE, O_BINARY);
   cygheap->open_fhs--;  	/* handled when individual fds are opened */
-  console->set_r_no_interrupt (1);
+  console->uninterruptible_io (true);
   return 0;
 }

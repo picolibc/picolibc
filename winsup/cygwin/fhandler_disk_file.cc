@@ -164,7 +164,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
 
   if (get_io_handle ())
     {
-      if (get_nohandle ())
+      if (nohandle ())
 	return fstat_by_name (buf);
       else
 	return fstat_by_handle (buf);
@@ -173,9 +173,8 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
      then just do a "query open" as it is apparently much faster. */
   if (pc.exec_state () != dont_know_if_executable)
     {
-      set_query_open (query_read_control);
-      if (strncasematch (pc.volname (), "FAT", 3)
-	  && !strpbrk (get_win32_name (), "?*|<>"))
+      query_open (query_read_control);
+      if (pc.fs_is_fat () && !strpbrk (get_win32_name (), "?*|<>"))
 	return fstat_by_name (buf);
     }
   if (!(oret = open_fs (open_flags, 0)) && get_errno () == EACCES)
@@ -183,21 +182,21 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
       /* If we couldn't open the file, try a query open with no permissions.
 	 This allows us to determine *some* things about the file, at least. */
       pc.set_exec (0);
-      set_query_open (query_null_access);
+      query_open (query_null_access);
       oret = open_fs (open_flags, 0);
     }
 
   if (oret)
     {
       /* We now have a valid handle, regardless of the "nohandle" state.
-         Since fhandler_base::open only calls CloseHandle if !get_nohandle,
+         Since fhandler_base::open only calls CloseHandle if !nohandle,
 	 we have to set it to false before calling close_fs and restore
 	 the state afterwards. */
       res = fstat_by_handle (buf);
-      bool nohandle = get_nohandle ();
-      set_nohandle (false);
+      bool no_handle = nohandle ();
+      nohandle (false);
       close_fs ();
-      set_nohandle (nohandle);
+      nohandle (no_handle);
       set_io_handle (NULL);
     }
   else
@@ -631,7 +630,7 @@ fhandler_disk_file::opendir ()
 	goto free_dirent;
 
       fd = this;
-      fd->set_nohandle (true);
+      fd->nohandle (true);
       dir->__d_dirent->d_fd = fd;
       dir->__fh = this;
       /* FindFirstFile doesn't seem to like duplicate /'s. */
@@ -647,8 +646,6 @@ fhandler_disk_file::opendir ()
 
       res = dir;
 
-      if (pc.isencoded ())
-	set_encoded ();
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());
@@ -715,7 +712,7 @@ fhandler_disk_file::readdir (DIR *dir)
     }
 
   /* We get here if `buf' contains valid data.  */
-  if (get_encoded ())
+  if (pc.isencoded ())
     (void) fnunmunge (dir->__d_dirent->d_name, buf.cFileName);
   else
     strcpy (dir->__d_dirent->d_name, buf.cFileName);

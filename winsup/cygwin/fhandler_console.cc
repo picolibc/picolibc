@@ -155,7 +155,7 @@ set_console_state_for_spawn ()
     {
       /* ACK.  Temporarily define for use in TTYSETF macro */
       SetConsoleMode (h, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
-      shared_console_info->tty_min_state.set_rstcons ();
+      shared_console_info->tty_min_state.rstcons (true);
     }
 
   CloseHandle (h);
@@ -536,7 +536,7 @@ sig_exit:
 void
 fhandler_console::set_input_state ()
 {
-  if (tc->needs_rstcons ())
+  if (tc->rstcons ())
     input_tcsetattr (0, &tc->ti);
 }
 
@@ -633,7 +633,7 @@ fhandler_console::open (int flags, mode_t)
       return 0;
     }
   set_io_handle (h);
-  set_r_no_interrupt (1);	// Handled explicitly in read code
+  uninterruptible_io (true);	// Handled explicitly in read code
 
   h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
 		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
@@ -658,7 +658,7 @@ fhandler_console::open (int flags, mode_t)
       SetConsoleMode (get_io_handle (), ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | cflags);
     }
 
-  tc->clear_rstcons ();
+  tc->rstcons (false);
   set_open_status ();
   cygheap->open_fhs++;
   debug_printf ("incremented open_fhs, now %d", cygheap->open_fhs);
@@ -789,7 +789,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
 
 #if 0
   /* Enable/disable LF -> CRLF conversions */
-  set_r_binary ((t->c_iflag & INLCR) ? 0 : 1);
+  rbinary ((t->c_iflag & INLCR) ? false : true);
 #endif
 
   /* There's some disparity between what we need and what's
@@ -842,7 +842,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
 		      res, t, flags, t->c_lflag, t->c_iflag);
     }
 
-  tc->clear_rstcons ();
+  tc->rstcons (false);
   return res;
 }
 
@@ -1742,7 +1742,7 @@ fhandler_console::igncr_enabled (void)
 }
 
 void
-fhandler_console::set_close_on_exec (int val)
+fhandler_console::set_close_on_exec (bool val)
 {
   fhandler_base::set_close_on_exec (val);
   set_no_inheritance (output_handle, val);
@@ -1761,7 +1761,7 @@ fhandler_console::fixup_after_fork (HANDLE)
   if (!open (O_NOCTTY | get_flags (), 0))
     system_printf ("error opening console after fork, %E");
 
-  if (!get_close_on_exec ())
+  if (!close_on_exec ())
     {
       CloseHandle (h);
       CloseHandle (oh);

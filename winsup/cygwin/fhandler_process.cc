@@ -163,7 +163,7 @@ fhandler_process::open (int flags, mode_t mode)
   if (!res)
     goto out;
 
-  set_nohandle (true);
+  nohandle (true);
 
   const char *path;
   path = get_name () + proc_len + 1;

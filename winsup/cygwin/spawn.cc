@@ -185,7 +185,7 @@ handle (int n, int direction)
 
   if (!fh)
     return INVALID_HANDLE_VALUE;
-  if (fh->get_close_on_exec ())
+  if (fh->close_on_exec ())
     return INVALID_HANDLE_VALUE;
   if (direction == 0)
     return fh->get_handle ();

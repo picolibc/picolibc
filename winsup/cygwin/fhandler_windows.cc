@@ -55,7 +55,7 @@ int
 fhandler_windows::open (int flags, mode_t)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
-  set_close_on_exec_flag (1);
+  close_on_exec (true);
   set_open_status ();
   return 1;
 }
@@ -125,12 +125,12 @@ fhandler_windows::ioctl (unsigned int cmd, void *val)
 }
 
 void
-fhandler_windows::set_close_on_exec (int val)
+fhandler_windows::set_close_on_exec (bool val)
 {
   if (get_handle ())
     fhandler_base::set_close_on_exec (val);
   else
-    fhandler_base::set_close_on_exec_flag (val);
+    fhandler_base::close_on_exec (val);
   void *h = hWnd_;
   if (h)
     set_no_inheritance (h, val);

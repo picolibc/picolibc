@@ -106,7 +106,7 @@ fhandler_fifo::open_not_mine (int flags)
 	  if (i == 0)
 	    {
 	      read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-	      set_need_fork_fixup ();
+	      need_fork_fixup (true);
 	    }
 	}
       CloseHandle (hp);

@@ -219,7 +219,7 @@ fhandler_proc::open (int flags, mode_t mode)
   if (!res)
     goto out;
 
-  set_nohandle (true);
+  nohandle (true);
 
   const char *path;
 

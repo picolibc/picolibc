@@ -1075,8 +1075,8 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
     { /* All tried query () succeeded */
       rc = 1;
       set_open_status ();
-      set_need_fork_fixup ();
-      set_close_on_exec_flag (1);
+      need_fork_fixup (true);
+      close_on_exec (true);
     }
   else
     { /* One of the tried query () failed */

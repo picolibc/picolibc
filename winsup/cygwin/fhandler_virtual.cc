@@ -75,7 +75,7 @@ fhandler_virtual::opendir ()
       if (fd >= 0)
 	{
 	  fd = this;
-	  fd->set_nohandle (true);
+	  fd->nohandle (true);
 	  dir->__d_dirent->d_fd = fd;
 	  dir->__fh = this;
 	  dir->__d_cookie = __DIRENT_COOKIE;
@@ -207,8 +207,8 @@ fhandler_virtual::write (const void *ptr, size_t len)
 int
 fhandler_virtual::open (int flags, mode_t mode)
 {
-  set_r_binary (1);
-  set_w_binary (1);
+  rbinary (true);
+  wbinary (true);
 
   set_flags ((flags & ~O_TEXT) | O_BINARY);
 

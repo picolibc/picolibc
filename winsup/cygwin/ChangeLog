@@ -1,3 +1,38 @@
+2004-04-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Use new unified status_flag accessor methods from classes fhandler_*,
+	tty_min, mtinfo and fs_info thoroughout.
+	* fhandler.h: Redefine all set_close_on_exec methods to take a bool
+	argument.
+	(enum conn_state): Rename from connect_state.
+	(class fhandler_base): Rename some status flags to align with
+	accessor method names.  Drop encoded flag entirely.  Unify status
+	accessor methods.  Const'ify all read accessor methods.
+	(class fhandler_socket): Ditto.
+	(class fhandler_dev_raw): Ditto.
+	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Use fs.fs_is_fat()
+	instead of evaluating FATness of file system here.
+	(fhandler_disk_file::opendir): Drop call to set_encoded().
+	(fhandler_disk_file::readdir): Use pc.isencoded() directly.
+	* mtinfo.h (class mtinfo_drive): Const'ify all read accessor methods.
+	* path.cc (fsinfo_cnt): Add.
+	(fs_info::update): Accomodate class changes. Evaluate file system
+	name specific flags right here. Add thread safety for reading and
+	writing global fsinfo array.
+	* path.h (enum path_types): Drop values for flags kept in fs already.
+	(struct fs_info): Move status informatin into private struct type
+	status_flags.  Add accessor methods. Remove path and file system
+	name string arrays in favor of status bits.
+	(class path_conv): Use new fs_info status information where
+	appropriate.
+	(path_conf::fs_has_ea): Rename from fs_fast_ea.
+	(path_conf::fs_has_acls): New method.
+	(path_conf::root_dir): Remove.
+	(path_conf::volname): Remove.
+	* syscalls (statfs): Evaluate root dir locally.
+	* tty.h (class tty_min): Unify status accessor methods.  Const'ify
+	all read accessor methods.
+
 2004-04-09  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.h (pthread::init_mainthread): Remove parameter forked.

@@ -49,11 +49,10 @@ public:
   int ntty;
   DWORD last_ctrl_c;	// tick count of last ctrl-c
 
+  bool initialized () const { return status.initialized; }
   void initialize () { status.initialized = 1; }
-  bool is_initialized () { return status.initialized; }
-  void set_rstcons () { status.rstcons = 1; }
-  void clear_rstcons () { status.rstcons = 1; }
-  bool needs_rstcons () { return status.rstcons; }
+  bool rstcons () const { return status.rstcons; }
+  void rstcons (bool b) { status.rstcons = b; }
 
   tty_min (int t = -1, pid_t s = -1) : sid (s), ntty (t) {}
   void setntty (int n) {ntty = n;}

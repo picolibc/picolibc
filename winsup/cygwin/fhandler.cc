@@ -180,8 +180,8 @@ fhandler_base::set_flags (int flags, int supplied_bin)
   debug_printf ("flags %p, supplied_bin %p", flags, supplied_bin);
   if ((bin = flags & (O_BINARY | O_TEXT)))
     debug_printf ("O_TEXT/O_BINARY set in flags %p", bin);
-  else if (get_r_binset () && get_w_binset ())
-    bin = get_r_binary () ? O_BINARY : O_TEXT;	// FIXME: Not quite right
+  else if (rbinset () && wbinset ())
+    bin = rbinary () ? O_BINARY : O_TEXT;	// FIXME: Not quite right
   else if ((fmode = get_default_fmode (flags)) & O_BINARY)
     bin = O_BINARY;
   else if (fmode & O_TEXT)
@@ -189,14 +189,14 @@ fhandler_base::set_flags (int flags, int supplied_bin)
   else if (supplied_bin)
     bin = supplied_bin;
   else
-    bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT)
+    bin = wbinary () || rbinary () || (binmode != O_TEXT)
 	  ? O_BINARY : O_TEXT;
 
   openflags = flags | bin;
 
   bin &= O_BINARY;
-  set_r_binary (bin);
-  set_w_binary (bin);
+  rbinary (bin ? true : false);
+  wbinary (bin ? true : false);
   syscall_printf ("filemode set to %s", bin ? "binary" : "text");
 }
 
@@ -434,7 +434,7 @@ fhandler_base::open (int flags, mode_t mode)
   SECURITY_ATTRIBUTES sa = sec_none;
   security_descriptor sd;
 
-  syscall_printf ("(%s, %p) query_open %d", get_win32_name (), flags, get_query_open ());
+  syscall_printf ("(%s, %p) query_open %d", get_win32_name (), flags, query_open ());
 
   if (get_win32_name () == NULL)
     {
@@ -442,8 +442,8 @@ fhandler_base::open (int flags, mode_t mode)
       goto done;
     }
 
-  if (get_query_open ())
-    access = get_query_open () == query_read_control ? READ_CONTROL : 0;
+  if (query_open ())
+    access = (query_open () == query_read_control ? READ_CONTROL : 0);
   else if (get_major () == DEV_TAPE_MAJOR)
     access = GENERIC_READ | GENERIC_WRITE;
   else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
@@ -475,7 +475,7 @@ fhandler_base::open (int flags, mode_t mode)
     creation_distribution = CREATE_NEW;
 
   if (flags & O_APPEND)
-    set_append_p ();
+    append_mode (true);
 
   /* These flags are host dependent. */
   shared = wincap.shared ();
@@ -498,7 +498,7 @@ fhandler_base::open (int flags, mode_t mode)
   /* CreateFile() with dwDesiredAccess == 0 when called on remote
      share returns some handle, even if file doesn't exist. This code
      works around this bug. */
-  if (get_query_open () && isremote () &&
+  if (query_open () && isremote () &&
       creation_distribution == OPEN_EXISTING && !pc.exists ())
     {
       set_errno (ENOENT);
@@ -526,13 +526,13 @@ fhandler_base::open (int flags, mode_t mode)
 	  else if (flags & (O_WRONLY | O_RDWR))
 	    set_errno (EISDIR);
 	  else
-	    set_nohandle (true);
+	    nohandle (true);
 	}
       else if (GetLastError () == ERROR_INVALID_HANDLE)
 	set_errno (ENOENT);
       else
 	__seterrno ();
-      if (!get_nohandle ())
+      if (!nohandle ())
 	goto done;
    }
 
@@ -597,7 +597,7 @@ fhandler_base::read (void *in_ptr, size_t& len)
   else
     len = copied_chars;
 
-  if (get_r_binary () || len <= 0)
+  if (rbinary () || len <= 0)
     goto out;
 
   /* Scan buffer and turn \r\n into \n */
@@ -660,8 +660,7 @@ out:
   if (need_signal)
     SetEvent (read_state);
 
-  debug_printf ("returning %d, %s mode", len,
-		get_r_binary () ? "binary" : "text");
+  debug_printf ("returning %d, %s mode", len, rbinary () ? "binary" : "text");
   return;
 }
 
@@ -670,15 +669,15 @@ fhandler_base::write (const void *ptr, size_t len)
 {
   int res;
 
-  if (get_append_p ())
+  if (append_mode ())
     SetFilePointer (get_output_handle (), 0, 0, FILE_END);
-  else if (get_did_lseek ())
+  else if (did_lseek ())
     {
       _off64_t actual_length, current_position;
       DWORD size_high = 0;
       LONG pos_high = 0;
 
-      set_did_lseek (false); /* don't do it again */
+      did_lseek (false); /* don't do it again */
 
       actual_length = GetFileSize (get_output_handle (), &size_high);
       actual_length += ((_off64_t) size_high) << 32;
@@ -745,7 +744,7 @@ fhandler_base::write (const void *ptr, size_t len)
 	}
     }
 
-  if (get_w_binary ())
+  if (wbinary ())
     {
       debug_printf ("binary write");
       res = raw_write (ptr, len);
@@ -970,7 +969,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
 
       /* When next we write(), we will check to see if *this* seek went beyond
 	 the end of the file, and back-seek and fill with zeros if so - DJ */
-      set_did_lseek (true);
+      did_lseek (true);
 
       /* If this was a SEEK_CUR with offset 0, we still might have
 	 readahead that we have to take into account when calculating
@@ -988,7 +987,7 @@ fhandler_base::close ()
   int res = -1;
 
   syscall_printf ("closing '%s' handle %p", get_name (), get_handle ());
-  if (get_nohandle () || CloseHandle (get_handle ()))
+  if (nohandle () || CloseHandle (get_handle ()))
     res = 0;
   else
     {
@@ -1109,7 +1108,7 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
     flags = O_RDWR;
   set_flags (flags | bin);
   set_open_status ();
-  debug_printf ("created new fhandler_base for handle %p, bin %d", f, get_r_binary ());
+  debug_printf ("created new fhandler_base for handle %p, bin %d", f, rbinary ());
 }
 
 void
@@ -1124,7 +1123,7 @@ fhandler_base::dup (fhandler_base *child)
   debug_printf ("in fhandler_base dup");
 
   HANDLE nh;
-  if (!get_nohandle ())
+  if (!nohandle ())
     {
       if (!DuplicateHandle (hMainProc, get_handle (), hMainProc, &nh, 0, TRUE,
 			    DUPLICATE_SAME_ACCESS))
@@ -1148,10 +1147,10 @@ int fhandler_base::fcntl (int cmd, void *arg)
   switch (cmd)
     {
     case F_GETFD:
-      res = get_close_on_exec () ? FD_CLOEXEC : 0;
+      res = close_on_exec () ? FD_CLOEXEC : 0;
       break;
     case F_SETFD:
-      set_close_on_exec ((int) arg);
+      set_close_on_exec (((int) arg & FD_CLOEXEC) ? 1 : 0);
       res = 0;
       break;
     case F_GETFL:
@@ -1320,9 +1319,9 @@ void
 fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 {
   HANDLE oh = h;
-  if (/* !is_socket () && */ !get_close_on_exec ())
+  if (/* !is_socket () && */ !close_on_exec ())
     debug_printf ("handle %p already opened", h);
-  else if (!DuplicateHandle (parent, h, hMainProc, &h, 0, !get_close_on_exec (),
+  else if (!DuplicateHandle (parent, h, hMainProc, &h, 0, !close_on_exec (),
 			     DUPLICATE_SAME_ACCESS))
     system_printf ("%s - %E, handle %s<%p>", get_name (), name, h);
   else if (oh != h)
@@ -1330,11 +1329,11 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 }
 
 void
-fhandler_base::set_close_on_exec (int val)
+fhandler_base::set_close_on_exec (bool val)
 {
-  if (!get_nohandle ())
+  if (!nohandle ())
     set_no_inheritance (io_handle, val);
-  set_close_on_exec_flag (val);
+  close_on_exec (val);
   debug_printf ("set close_on_exec for %s to %d", get_name (), val);
 }
 
@@ -1342,7 +1341,7 @@ void
 fhandler_base::fixup_after_fork (HANDLE parent)
 {
   debug_printf ("inheriting '%s' from parent", get_name ());
-  if (!get_nohandle ())
+  if (!nohandle ())
     fork_fixup (parent, io_handle, "io_handle");
 }
 

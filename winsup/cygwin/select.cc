@@ -335,7 +335,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
     {
       UNIX_FD_SET (me->fd, writefds);
       if (me->except_on_write && me->fh->is_socket ())
-	((fhandler_socket *) me->fh)->set_connect_state (connected);
+	((fhandler_socket *) me->fh)->connect_state (connected);
       ready++;
     }
   if ((me->except_selected || me->except_on_write) && me->except_ready)
@@ -344,7 +344,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
 	{
 	  UNIX_FD_SET (me->fd, writefds);
 	  if (me->fh->is_socket ())
-	    ((fhandler_socket *) me->fh)->set_connect_state (connected);
+	    ((fhandler_socket *) me->fh)->connect_state (connected);
 	}
       if (me->except_selected)
 	UNIX_FD_SET (me->fd, exceptfds);
@@ -1400,9 +1400,9 @@ fhandler_socket::select_write (select_record *s)
       s->cleanup = socket_cleanup;
     }
   s->peek = peek_socket;
-  s->write_ready = saw_shutdown_write () || is_unconnected ();
+  s->write_ready = saw_shutdown_write () || connect_state () == unconnected;
   s->write_selected = true;
-  if (is_connect_pending ())
+  if (connect_state () == connect_pending)
     {
       s->except_ready = saw_shutdown_write () || saw_shutdown_read ();
       s->except_on_write = true;

@@ -32,7 +32,7 @@ int
 fhandler_dev_random::open (int flags, mode_t)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
-  set_nohandle (true);
+  nohandle (true);
   set_open_status ();
   return 1;
 }

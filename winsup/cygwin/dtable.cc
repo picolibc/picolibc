@@ -484,7 +484,7 @@ dtable::dup_worker (fhandler_base *oldfh)
       return NULL;
     }
 
-  newfh->set_close_on_exec_flag (0);
+  newfh->close_on_exec (false);
   MALLOC_CHECK;
   debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
   return newfh;
@@ -639,7 +639,7 @@ dtable::fixup_before_exec (DWORD target_proc_id)
   lock ();
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
-    if ((fh = fds[i]) != NULL && !fh->get_close_on_exec ())
+    if ((fh = fds[i]) != NULL && !fh->close_on_exec ())
       {
 	debug_printf ("fd %d (%s)", i, fh->get_name ());
 	fh->fixup_before_fork_exec (target_proc_id);
@@ -668,7 +668,7 @@ dtable::fixup_after_exec ()
     if ((fh = fds[i]) != NULL)
       {
 	fh->clear_readahead ();
-	if (fh->get_close_on_exec ())
+	if (fh->close_on_exec ())
 	  {
 	    if (fh->archetype)
 	      fh->close ();
@@ -693,7 +693,7 @@ dtable::fixup_after_fork (HANDLE parent)
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
       {
-	if (fh->get_close_on_exec () || fh->get_need_fork_fixup ())
+	if (fh->close_on_exec () || fh->need_fork_fixup ())
 	  {
 	    debug_printf ("fd %d (%s)", i, fh->get_name ());
 	    fh->fixup_after_fork (parent);
@@ -727,7 +727,7 @@ dtable::vfork_child_dup ()
     if (not_open (i))
       continue;
     else if ((newtable[i] = dup_worker (fds[i])) != NULL)
-      newtable[i]->set_close_on_exec (fds[i]->get_close_on_exec ());
+      newtable[i]->set_close_on_exec (fds[i]->close_on_exec ());
     else
       {
 	res = 0;
@@ -783,7 +783,7 @@ dtable::vfork_child_fixup ()
     if ((fh = fds[i]) != NULL)
       {
 	fh->clear_readahead ();
-	if (!fh->archetype && fh->get_close_on_exec ())
+	if (!fh->archetype && fh->close_on_exec ())
 	  release (i);
 	else
 	  {

@@ -424,7 +424,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
       syscall_printf ("readv (%d, %p, %d) %sblocking, sigcatchers %d",
 		      fd, iov, iovcnt, wait ? "" : "non", sigcatchers);
 
-      if (wait && (!cfd->is_slow () || cfd->get_r_no_interrupt ()))
+      if (wait && (!cfd->is_slow () || cfd->uninterruptible_io ()))
 	debug_printf ("no need to call ready_for_read");
       else if (!cfd->ready_for_read (fd, wait))
 	{
@@ -1617,7 +1617,7 @@ _cygwin_istext_for_stdio (int fd)
     }
 #endif
 
-  if (cfd->get_w_binary () || cfd->get_r_binary ())
+  if (cfd->wbinary () || cfd->rbinary ())
     {
       syscall_printf ("fd %d: opened as binary", fd);
       return 0;
@@ -1681,9 +1681,9 @@ setmode (int fd, int mode)
      interfaces should not use setmode.  */
 
   int res;
-  if (cfd->get_w_binary () && cfd->get_r_binary ())
+  if (cfd->wbinary () && cfd->rbinary ())
     res = O_BINARY;
-  else if (cfd->get_w_binset () && cfd->get_r_binset ())
+  else if (cfd->wbinset () && cfd->rbinset ())
     res = O_TEXT;	/* Specifically set O_TEXT */
   else
     res = 0;
@@ -1793,6 +1793,8 @@ get_osfhandle (int fd)
 extern "C" int
 statfs (const char *fname, struct statfs *sfs)
 {
+  char root_dir[CYG_MAX_PATH];
+
   if (!sfs)
     {
       set_errno (EFAULT);
@@ -1800,7 +1802,8 @@ statfs (const char *fname, struct statfs *sfs)
     }
 
   path_conv full_path (fname, PC_SYM_FOLLOW | PC_FULL);
-  const char *root = full_path.root_dir ();
+  strncpy (root_dir, full_path, CYG_MAX_PATH);
+  const char *root = rootdir (root_dir);
 
   syscall_printf ("statfs %s", root);
 

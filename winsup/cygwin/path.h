@@ -65,29 +65,52 @@ enum path_types
   PATH_TEXT =	      0x02000000,
   PATH_ISDISK =	      0x04000000,
   PATH_HAS_SYMLINKS = 0x10000000,
-  PATH_HASBUGGYOPEN = 0x20000000,
-  PATH_SOCKET =       0x40000000,
-  PATH_HASACLS =      0x80000000
+  PATH_SOCKET =       0x40000000
 };
 
 class symlink_info;
 struct fs_info
 {
-  char name_storage[CYG_MAX_PATH];
-  char root_dir_storage[CYG_MAX_PATH];
+ private:
   __ino64_t name_hash;
-  DWORD flags_storage;
-  DWORD serial_storage;
-  DWORD sym_opt_storage; /* additional options to pass to symlink_info resolver */
-  bool is_remote_drive_storage;
-  DWORD drive_type_storage;
-  inline char* name () const {return (char *) name_storage;}
-  inline char* root_dir () const {return (char *) root_dir_storage;}
-  inline DWORD& flags () {return flags_storage;};
-  inline DWORD& serial () {return serial_storage;};
-  inline DWORD& sym_opt () {return sym_opt_storage;};
-  inline bool& is_remote_drive () {return is_remote_drive_storage;};
-  inline DWORD& drive_type () {return drive_type_storage;};
+  struct status_flags
+  {
+    DWORD flags;  /* Volume flags */
+    DWORD serial; /* Volume serial number */
+    unsigned is_remote_drive : 1;
+    unsigned has_buggy_open  : 1;
+    unsigned has_ea          : 1;
+    unsigned has_acls        : 1;
+    unsigned is_fat          : 1;
+    unsigned drive_type      : 3;
+  } status;
+ public:
+  void clear ()
+  {
+    name_hash = 0;
+    flags () = serial () = 0;
+    is_remote_drive (false);
+    has_buggy_open (false);
+    has_ea (false);
+    has_acls (false);
+    is_fat (false);
+    drive_type (false);
+  }
+  inline DWORD& flags () {return status.flags;};
+  inline DWORD& serial () {return status.serial;};
+  void is_remote_drive (bool b) { status.is_remote_drive = b; }
+  bool is_remote_drive () const { return status.is_remote_drive; }
+  void has_buggy_open (bool b) { status.has_buggy_open = b; }
+  bool has_buggy_open () const { return status.has_buggy_open; }
+  void is_fat (bool b) { status.is_fat = b; }
+  bool is_fat () const { return status.is_fat; }
+  void has_ea (bool b) { status.has_ea = b; }
+  int has_ea () const { return status.has_ea ? PC_CHECK_EA : 0; }
+  void has_acls (bool b) { status.has_acls = b; }
+  bool has_acls () const { return status.has_acls; }
+  void drive_type (DWORD d) { status.is_remote_drive = d; }
+  DWORD drive_type () const { return status.drive_type; }
+
   bool update (const char *);
 };
 
@@ -105,11 +128,11 @@ class path_conv
   bool case_clash;
 
   int isdisk () const { return path_flags & PATH_ISDISK;}
-  bool& isremote () {return fs.is_remote_drive ();}
-  int has_acls () const {return path_flags & PATH_HASACLS;}
+  bool isremote () {return fs.is_remote_drive ();}
+  int has_acls () const {return fs.has_acls (); }
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
-  int hasgood_inode () const {return path_flags & PATH_HASACLS;}  // Not strictly correct
-  int has_buggy_open () const {return path_flags & PATH_HASBUGGYOPEN;}
+  int hasgood_inode () const {return has_acls ();}  // Not strictly correct
+  int has_buggy_open () const {return fs.has_buggy_open ();}
   bool isencoded () {return path_flags & PATH_ENC;}
   int binmode () const
   {
@@ -148,8 +171,6 @@ class path_conv
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
   void set_isdisk () {path_flags |= PATH_ISDISK; dev.devn = FH_FS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
-  void set_has_acls (int x = 1) {path_flags |= x ? PATH_HASACLS : PATH_NOTHING;}
-  void set_has_buggy_open (int x = 1) {path_flags |= x ? PATH_HASBUGGYOPEN : PATH_NOTHING;}
 
   void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL)  __attribute__ ((regparm(3)));
@@ -185,11 +206,10 @@ class path_conv
   DWORD file_attributes () {return fileattr;}
   DWORD drive_type () {return fs.drive_type ();}
   DWORD fs_flags () {return fs.flags ();}
-  bool fs_fast_ea () {return !!(fs.sym_opt () & PC_CHECK_EA);}
+  bool fs_has_ea () {return fs.has_ea ();}
+  bool fs_is_fat () {return fs.is_fat ();}
   void set_path (const char *p) {strcpy (path, p);}
-  const char * root_dir () const { return fs.root_dir (); }
   DWORD volser () { return fs.serial (); }
-  const char *volname () {return fs.name (); }
   void fillin (HANDLE h);
   inline size_t size ()
   {

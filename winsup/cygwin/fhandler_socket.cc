@@ -126,7 +126,7 @@ fhandler_socket::fhandler_socket () :
   sun_path (NULL),
   status ()
 {
-  set_need_fork_fixup ();
+  need_fork_fixup (true);
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
 						 sizeof (WSAPROTOCOL_INFOA));
 #if 0
@@ -200,7 +200,7 @@ fhandler_socket::create_secret_event (int* secret)
 
   if (!secret_event)
     debug_printf("create event %E");
-  else if (get_close_on_exec ())
+  else if (close_on_exec ())
     /* Event allows inheritance, but handle will not be inherited */
     set_no_inheritance (secret_event, 1);
 
@@ -308,7 +308,7 @@ void
 fhandler_socket::fixup_after_exec ()
 {
   debug_printf ("here");
-  if (!get_close_on_exec ())
+  if (!close_on_exec ())
     fixup_after_fork (NULL);
 #if 0
   else if (!winsock2_active)
@@ -325,7 +325,7 @@ fhandler_socket::dup (fhandler_base *child)
   if (get_addr_family () == AF_LOCAL)
     fhs->set_sun_path (get_sun_path ());
   fhs->set_socket_type (get_socket_type ());
-  fhs->set_connect_state (get_connect_state ());
+  fhs->connect_state (connect_state ());
 
   if (winsock2_active)
     {
@@ -501,7 +501,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
     {
       /* Special handling for connect to return the correct error code
 	 when called on a non-blocking socket. */
-      if (is_nonblocking () || is_connect_pending ())
+      if (is_nonblocking () || connect_state () == connect_pending)
 	{
 	  err = WSAGetLastError ();
 	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
@@ -547,9 +547,9 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
   err = WSAGetLastError ();
   if (err == WSAEINPROGRESS || err == WSAEALREADY)
-    set_connect_state (connect_pending);
+    connect_state (connect_pending);
   else
-    set_connect_state (connected);
+    connect_state (connected);
 
   return res;
 }
@@ -561,7 +561,7 @@ fhandler_socket::listen (int backlog)
   if (res)
     set_winsock_errno ();
   else
-    set_connect_state (connected);
+    connect_state (connected);
   return res;
 }
 
@@ -636,7 +636,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	    ((fhandler_socket *) res_fd)->set_sun_path (get_sun_path ());
 	  ((fhandler_socket *) res_fd)->set_addr_family (get_addr_family ());
 	  ((fhandler_socket *) res_fd)->set_socket_type (get_socket_type ());
-	  ((fhandler_socket *) res_fd)->set_connect_state (connected);
+	  ((fhandler_socket *) res_fd)->connect_state (connected);
 	  res = res_fd;
 	}
       else
@@ -1088,14 +1088,14 @@ fhandler_socket::shutdown (int how)
     switch (how)
       {
       case SHUT_RD:
-	set_shutdown_read ();
+	saw_shutdown_read (true);
 	break;
       case SHUT_WR:
-	set_shutdown_write ();
+	saw_shutdown_write (true);
 	break;
       case SHUT_RDWR:
-	set_shutdown_read ();
-	set_shutdown_write ();
+	saw_shutdown_read (true);
+	saw_shutdown_write (true);
 	break;
       }
   return res;
@@ -1246,7 +1246,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	      *(int *) p ? ASYNC_MASK : 0);
       syscall_printf ("Async I/O on socket %s",
 	      *(int *) p ? "started" : "cancelled");
-      set_async (*(int *) p);
+      async_io (*(int *) p != 0);
       break;
     case FIONREAD:
       res = ioctlsocket (get_socket (), FIONREAD, (unsigned long *) p);
@@ -1267,7 +1267,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  syscall_printf ("socket is now %sblocking",
 			    *(int *) p ? "non" : "");
 	  /* Start AsyncSelect if async socket unblocked */
-	  if (*(int *) p && get_async ())
+	  if (*(int *) p && async_io ())
 	    WSAAsyncSelect (get_socket (), gethwnd (), WM_ASYNCIO, ASYNC_MASK);
 
 	  set_nonblocking (*(int *) p);
@@ -1309,13 +1309,13 @@ fhandler_socket::fcntl (int cmd, void *arg)
 }
 
 void
-fhandler_socket::set_close_on_exec (int val)
+fhandler_socket::set_close_on_exec (bool val)
 {
   if (secret_event)
     set_no_inheritance (secret_event, val);
   if (!winsock2_active) /* < Winsock 2.0 */
     set_no_inheritance (get_handle (), val);
-  set_close_on_exec_flag (val);
+  close_on_exec (val);
   debug_printf ("set close_on_exec for %s to %d", get_name (), val);
 }
 

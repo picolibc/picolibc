@@ -26,7 +26,7 @@ details. */
 fhandler_serial::fhandler_serial ()
   : fhandler_base (), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
 {
-  set_need_fork_fixup ();
+  need_fork_fixup (true);
 }
 
 void
@@ -226,7 +226,7 @@ fhandler_serial::open (int flags, mode_t mode)
 
   (void) SetCommMask (get_handle (), EV_RXCHAR);
 
-  set_r_no_interrupt (1);	// Handled explicitly in read code
+  uninterruptible_io (true);	// Handled explicitly in read code
 
   overlapped_setup ();
 
@@ -765,8 +765,8 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       res = -1;
     }
 
-  set_r_binary ((t->c_iflag & IGNCR) ? 0 : 1);
-  set_w_binary ((t->c_oflag & ONLCR) ? 0 : 1);
+  rbinary ((t->c_iflag & IGNCR) ? false : true);
+  wbinary ((t->c_oflag & ONLCR) ? false : true);
 
   if (dropDTR)
     {
@@ -1020,11 +1020,11 @@ fhandler_serial::tcgetattr (struct termios *t)
 
   /* FIXME: need to handle IGNCR */
 #if 0
-  if (!get_r_binary ())
+  if (!rbinary ())
     t->c_iflag |= IGNCR;
 #endif
 
-  if (!get_w_binary ())
+  if (!wbinary ())
     t->c_oflag |= ONLCR;
 
   t->c_cc[VTIME] = vtime_ / 100;
@@ -1038,7 +1038,7 @@ fhandler_serial::tcgetattr (struct termios *t)
 void
 fhandler_serial::fixup_after_fork (HANDLE parent)
 {
-  if (get_close_on_exec ())
+  if (close_on_exec ())
     fhandler_base::fixup_after_fork (parent);
   overlapped_setup ();
   debug_printf ("io_status.hEvent %p", io_status.hEvent);

@@ -95,7 +95,7 @@ fhandler_dev_raw::writebuf (void)
 fhandler_dev_raw::fhandler_dev_raw ()
   : fhandler_base (), status ()
 {
-  set_need_fork_fixup ();
+  need_fork_fixup (true);
 }
 
 fhandler_dev_raw::~fhandler_dev_raw (void)

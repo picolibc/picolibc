@@ -354,26 +354,28 @@ mkrelpath (char *path)
 
 #define MAX_FS_INFO_CNT 25
 fs_info fsinfo[MAX_FS_INFO_CNT];
+LONG fsinfo_cnt;
 
 bool
 fs_info::update (const char *win32_path)
 {
-  char tmp_buf [CYG_MAX_PATH];
-  strncpy (tmp_buf, win32_path, CYG_MAX_PATH);
+  char fsname [CYG_MAX_PATH];
+  char root_dir [CYG_MAX_PATH];
+  strncpy (root_dir, win32_path, CYG_MAX_PATH);
 
-  if (!rootdir (tmp_buf))
+  if (!rootdir (root_dir))
     {
       debug_printf ("Cannot get root component of path %s", win32_path);
-      name_storage [0] = '\0';
-      sym_opt_storage = flags_storage = serial_storage = 0;
+      clear ();
       return false;
     }
 
-  __ino64_t tmp_name_hash = hash_path_name (1, tmp_buf);
+  __ino64_t tmp_name_hash = hash_path_name (1, root_dir);
   if (tmp_name_hash == name_hash)
     return true;
   int idx = 0;
-  while (idx < MAX_FS_INFO_CNT && fsinfo[idx].name_hash)
+  LONG cur_fsinfo_cnt = fsinfo_cnt;
+  while (idx < cur_fsinfo_cnt && fsinfo[idx].name_hash)
     {
       if (tmp_name_hash == fsinfo[idx].name_hash)
 	{
@@ -384,21 +386,22 @@ fs_info::update (const char *win32_path)
     }
   name_hash = tmp_name_hash;
 
-  strncpy (root_dir_storage, tmp_buf, CYG_MAX_PATH);
-  drive_type_storage = GetDriveType (root_dir_storage);
-  if (drive_type_storage == DRIVE_REMOTE
-      || (drive_type_storage == DRIVE_UNKNOWN
-	  && (root_dir_storage[0] == '\\' && root_dir_storage[1] == '\\')))
-    is_remote_drive_storage = 1;
+  drive_type (GetDriveType (root_dir));
+  if (drive_type () == DRIVE_REMOTE
+      || (drive_type () == DRIVE_UNKNOWN
+	  && (root_dir[0] == '\\' && root_dir[1] == '\\')))
+    is_remote_drive (true);
   else
-    is_remote_drive_storage = 0;
+    is_remote_drive (false);
 
-  if (!GetVolumeInformation (root_dir_storage, NULL, 0, &serial_storage, NULL, &flags_storage,
-				 name_storage, sizeof (name_storage)))
+  if (!GetVolumeInformation (root_dir, NULL, 0, &status.serial, NULL,
+  			     &status.flags, fsname, sizeof (fsname)))
     {
-      debug_printf ("Cannot get volume information (%s), %E", root_dir_storage);
-      name_storage[0] = '\0';
-      sym_opt_storage = flags_storage = serial_storage = 0;
+      debug_printf ("Cannot get volume information (%s), %E", root_dir);
+      flags () = 0;
+      has_buggy_open (false);
+      has_ea (false);
+      flags () = serial () = 0;
       return false;
     }
   /* FIXME: Samba by default returns "NTFS" in file system name, but
@@ -406,10 +409,34 @@ fs_info::update (const char *win32_path)
    * distinguish between samba and real ntfs, it should be implemented
    * here.
    */
-  sym_opt_storage = (!is_remote_drive_storage && strcmp (name_storage, "NTFS") == 0) ? PC_CHECK_EA : 0;
+  has_ea (!is_remote_drive () && strcmp (fsname, "NTFS") == 0);
+  has_acls ((flags () & FS_PERSISTENT_ACLS)
+	    && (allow_smbntsec || !is_remote_drive ()));
+  is_fat (strncasematch (fsname, "FAT", 3));
+  /* Known file systems with buggy open calls. Further explanation
+     in fhandler.cc (fhandler_disk_file::open). */
+  has_buggy_open (!strcmp (fsname, "SUNWNFS"));
 
-  if (idx < MAX_FS_INFO_CNT && drive_type_storage != DRIVE_REMOVABLE)
-    fsinfo[idx] = *this;
+  /* Only append non-removable drives to the global fsinfo storage */
+  if (drive_type () != DRIVE_REMOVABLE && drive_type () != DRIVE_CDROM
+      && idx < MAX_FS_INFO_CNT)
+    {
+      LONG exc_cnt;
+      while ((exc_cnt = InterlockedExchange (&fsinfo_cnt, -1)) == -1)
+	low_priority_sleep (0);
+      if (exc_cnt < MAX_FS_INFO_CNT)
+	{
+	  /* Check if another thread has already appended that very drive */
+	  while (idx < exc_cnt)
+	    {
+	      if (fsinfo[idx++].name_hash == name_hash)
+		goto done;
+	    }
+	  fsinfo[exc_cnt++] = *this;
+	}
+     done:
+      InterlockedExchange (&fsinfo_cnt, exc_cnt);
+    }
   return true;
 }
 
@@ -427,7 +454,7 @@ path_conv::fillin (HANDLE h)
       fileattr = local.dwFileAttributes;
       fs.serial () = local.dwVolumeSerialNumber;
     }
-    fs.drive_type () = DRIVE_UNKNOWN;
+    fs.drive_type (DRIVE_UNKNOWN);
 }
 
 void
@@ -492,12 +519,7 @@ path_conv::check (const char *src, unsigned opt,
   fileattr = INVALID_FILE_ATTRIBUTES;
   case_clash = false;
   memset (&dev, 0, sizeof (dev));
-  fs.root_dir ()[0] = '\0';
-  fs.name ()[0] = '\0';
-  fs.flags () = fs.serial () = 0;
-  fs.sym_opt () = 0;
-  fs.drive_type () = 0;
-  fs.is_remote_drive () = 0;
+  fs.clear ();
   normalized_path = NULL;
 
   if (!(opt & PC_NULLEMPTY))
@@ -624,7 +646,7 @@ path_conv::check (const char *src, unsigned opt,
 	      goto out;
 	    }
 
-	  symlen = sym.check (full_path, suff, opt | fs.sym_opt ());
+	  symlen = sym.check (full_path, suff, opt | fs.has_ea ());
 
 	  if (sym.minor || sym.major)
 	    {
@@ -794,30 +816,14 @@ out:
 
   if (dev.devn == FH_FS)
     {
-      if (!fs.update (path))
-	{
-	  fs.root_dir ()[0] = '\0';
-	  set_has_acls (false);		// already implied but...
-	  set_has_buggy_open (false);	// ditto
-	}
-      else
+      if (fs.update (path))
 	{
 	  set_isdisk ();
-	  debug_printf ("root_dir(%s), this->path(%s), set_has_acls(%d)",
-			fs.root_dir (), this->path, fs.flags () & FS_PERSISTENT_ACLS);
-	  if (!(fs.flags () & FS_PERSISTENT_ACLS) || (!allow_smbntsec && fs.is_remote_drive ()))
-	    set_has_acls (false);
-	  else
-	    {
-	      set_has_acls (true);
-	      if (allow_ntsec && wincap.has_security ())
-		set_exec (0);  /* We really don't know if this is executable or not here
-				  but set it to not executable since it will be figured out
-				  later by anything which cares about this. */
-	    }
-	  /* Known file systems with buggy open calls. Further explanation
-	     in fhandler.cc (fhandler_disk_file::open). */
-	  set_has_buggy_open (strcmp (fs.name (), "SUNWNFS") == 0);
+	  debug_printf ("this->path(%s), has_acls(%d)", path, fs.has_acls ());
+	  if (fs.has_acls () && allow_ntsec && wincap.has_security ())
+	    set_exec (0);  /* We really don't know if this is executable or not here
+			      but set it to not executable since it will be figured out
+			      later by anything which cares about this. */
 	}
       if (exec_state () != dont_know_if_executable)
 	/* ok */;
@@ -2657,7 +2663,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 #endif
 	  SetFileAttributes (win32_path, attr);
 
-	  if (!isdevice && win32_path.fs_fast_ea ())
+	  if (!isdevice && win32_path.fs_has_ea ())
 	    set_symlink_ea (win32_path, topath);
 	  res = 0;
 	}

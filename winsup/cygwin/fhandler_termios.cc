@@ -31,7 +31,7 @@ fhandler_termios::tcinit (tty_min *this_tc, bool force)
 
   tc = this_tc;
 
-  if (force || !tc->is_initialized ())
+  if (force || !tc->initialized ())
     {
       tc->ti.c_iflag = BRKINT | ICRNL | IXON;
       tc->ti.c_oflag = OPOST | ONLCR;

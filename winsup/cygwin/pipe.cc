@@ -41,7 +41,7 @@ fhandler_pipe::lseek (_off64_t offset, int whence)
 }
 
 void
-fhandler_pipe::set_close_on_exec (int val)
+fhandler_pipe::set_close_on_exec (bool val)
 {
   fhandler_base::set_close_on_exec (val);
   if (guard)
@@ -230,12 +230,12 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fif
       fhs[1]->init (w, GENERIC_WRITE, binmode);
       if (mode & O_NOINHERIT)
        {
-	 fhs[0]->set_close_on_exec_flag (1);
-	 fhs[1]->set_close_on_exec_flag (1);
+	 fhs[0]->close_on_exec (true);
+	 fhs[1]->close_on_exec (true);
        }
 
       fhs[0]->read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-      fhs[0]->set_need_fork_fixup ();
+      fhs[0]->need_fork_fixup (true);
       ProtectHandle1 (fhs[0]->read_state, read_state);
 
       res = 0;
@@ -312,7 +312,7 @@ _pipe (int filedes[2], unsigned int psize, int mode)
     {
       cygheap_fdnew fdin;
       cygheap_fdnew fdout (fdin, false);
-      fhs[0]->set_r_no_interrupt (1);
+      fhs[0]->uninterruptible_io (true);
       fdin = fhs[0];
       fdout = fhs[1];
       filedes[0] = fdin;

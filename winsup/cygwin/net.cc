@@ -636,7 +636,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
     return false;
   fd->set_io_handle ((HANDLE) soc);
   fd->set_flags (O_RDWR | O_BINARY);
-  fd->set_r_no_interrupt (winsock2_active);
+  fd->uninterruptible_io (winsock2_active);
   cygheap->fdtab.inc_need_fixup_before ();
   debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
   return true;
@@ -1960,7 +1960,7 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 
       if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
 	{
-	  ((fhandler_socket *) res_fd)->set_connect_state (connected);
+	  ((fhandler_socket *) res_fd)->connect_state (connected);
 	  res = res_fd;
 	}
       else
@@ -1977,7 +1977,7 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 	  if (newfd >= 0 && fdsock (newfd, tcp_dev, fd2s))
 	    {
 	      *fd2p = newfd;
-	      ((fhandler_socket *) fd2p)->set_connect_state (connected);
+	      ((fhandler_socket *) fd2p)->connect_state (connected);
 	    }
 	  else
 	    {
@@ -2040,7 +2040,7 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
 
       if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
 	{
-	  ((fhandler_socket *) res_fd)->set_connect_state (connected);
+	  ((fhandler_socket *) res_fd)->connect_state (connected);
 	  res = res_fd;
 	}
       else
@@ -2056,7 +2056,7 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
 
 	  if (newfd >= 0 && fdsock (newfd, tcp_dev, fd2s))
 	    {
-	      ((fhandler_socket *) fd2p)->set_connect_state (connected);
+	      ((fhandler_socket *) fd2p)->connect_state (connected);
 	      *fd2p = newfd;
 	    }
 	  else
@@ -2230,7 +2230,7 @@ socketpair (int family, int type, int protocol, int *sb)
 	((fhandler_socket *) sb0)->set_sun_path ("");
 	((fhandler_socket *) sb0)->set_addr_family (family);
 	((fhandler_socket *) sb0)->set_socket_type (type);
-	((fhandler_socket *) sb0)->set_connect_state (connected);
+	((fhandler_socket *) sb0)->connect_state (connected);
 
 	cygheap_fdnew sb1 (sb0, false);
 
@@ -2239,7 +2239,7 @@ socketpair (int family, int type, int protocol, int *sb)
 	    ((fhandler_socket *) sb1)->set_sun_path ("");
 	    ((fhandler_socket *) sb1)->set_addr_family (family);
 	    ((fhandler_socket *) sb1)->set_socket_type (type);
-	    ((fhandler_socket *) sb1)->set_connect_state (connected);
+	    ((fhandler_socket *) sb1)->connect_state (connected);
 
 	    sb[0] = sb0;
 	    sb[1] = sb1;
