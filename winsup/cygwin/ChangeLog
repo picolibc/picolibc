@@ -1,4 +1,9 @@
 2002-08-06  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (_csbrk): Avoid !cygheap considerations.
+	(cygheap_init): Deal with unintialized cygheap issues here.
+
+2002-08-06  Christopher Faylor  <cgf@redhat.com>
 	    Conrad Scott  <conrad.scott@dsl.pipex.com
 
 	* cygheap.cc (_csbrk): Allocate some slop initially.  Don't erroneously

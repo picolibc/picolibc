@@ -171,25 +171,13 @@ cygheap_fixup_in_child (bool execed)
 static void *__stdcall
 _csbrk (int sbs)
 {
-  void *prebrk;
-
-  if (!cygheap)
-    {
-      init_cheap ();
-      cygheap_max = cygheap;
-      (void) _csbrk (sbs + sizeof (*cygheap) + (2 * system_info.dwPageSize));
-      prebrk = (char *) (cygheap + 1);
-    }
-  else
-    {
-      prebrk = cygheap_max;
-      void *prebrka = pagetrunc (prebrk);
-      (char *) cygheap_max += sbs;
-      if (!sbs || (prebrk != prebrka && prebrka == pagetrunc (cygheap_max)))
-	/* nothing to do */;
-      else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
-	api_fatal ("couldn't commit memory for cygwin heap, %E");
-    }
+  void *prebrk = cygheap_max;
+  void *prebrka = pagetrunc (prebrk);
+  (char *) cygheap_max += sbs;
+  if (!sbs || (prebrk != prebrka && prebrka == pagetrunc (cygheap_max)))
+    /* nothing to do */;
+  else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
+    api_fatal ("couldn't commit memory for cygwin heap, %E");
 
   return prebrk;
 }
@@ -198,7 +186,12 @@ extern "C" void __stdcall
 cygheap_init ()
 {
   new_muto (cygheap_protect);
-  _csbrk (0);
+  if (!cygheap)
+    {
+      init_cheap ();
+      cygheap_max = cygheap;
+      (void) _csbrk (sizeof (*cygheap));
+    }
   if (!cygheap->fdtab)
     cygheap->fdtab.init ();
 }
