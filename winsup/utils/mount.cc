@@ -118,7 +118,6 @@ static struct option longopts[] =
   {"executable", no_argument, NULL, 'x'},
   {"force", no_argument, NULL, 'f'},
   {"help", no_argument, NULL, 'h' },
-  {"import-old-mounts", no_argument, NULL, 'i'},
   {"mount-commands", no_argument, NULL, 'm'},
   {"no-executable", no_argument, NULL, 'E'},
   {"show-cygdrive-prefix", no_argument, NULL, 'p'},
@@ -129,7 +128,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "bcfhimpstuvxEX";
+static char opts[] = "bcfhmpstuvxEX";
 
 static void
 usage (FILE *where = stderr)
@@ -141,8 +140,6 @@ usage (FILE *where = stderr)
   -f, --force                   force mount, don't warn about missing mount\n\
 				point directories\n\
   -h, --help                    output usage information and exit\n\
-  -i, --import-old-mounts       copy old registry mount table mounts into the\n\
-                                current mount areas\n\
   -m, --mount-commands          write mount commands to replace user and\n\
 				system mount points and cygdrive prefixes\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
@@ -191,7 +188,6 @@ main (int argc, char **argv)
   {
     nada,
     saw_change_cygdrive_prefix,
-    saw_import_old_mounts,
     saw_show_cygdrive_prefix,
     saw_mount_commands
   } do_what = nada;
@@ -227,12 +223,6 @@ main (int argc, char **argv)
 	break;
       case 'h':
 	usage (stdout);
-	break;
-      case 'i':
-	if (do_what == nada)
-	  do_what = saw_import_old_mounts;
-	else
-	  usage ();
 	break;
       case 'm':
 	if (do_what == nada)
@@ -286,12 +276,6 @@ main (int argc, char **argv)
       if (optind != argc)
 	usage ();
       change_cygdrive_prefix (argv[optind], flags);
-      break;
-    case saw_import_old_mounts:
-      if (optind <= argc)
-	usage ();
-      else
-	cygwin_internal (CW_READ_V1_MOUNT_TABLES);
       break;
     case saw_show_cygdrive_prefix:
       if (optind <= argc)

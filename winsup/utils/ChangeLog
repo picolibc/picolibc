@@ -1,3 +1,10 @@
+2002-06-08  Christopher Faylor  <cgf@redhat.com>
+
+	* mount.cc (opts): Remove '-i' option.
+	(usage): Ditto.
+	(main): Ditto.
+	(longopts): Remove --import-old-mounts option.
+
 2002-06-07  David Peterson  <chief@mail.idrive.com>
 	    Christopher Faylor  <cgf@redhat.com>
 
