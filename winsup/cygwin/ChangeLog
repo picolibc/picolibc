@@ -1,3 +1,16 @@
+2003-01-25  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* syscalls.cc (seteuid32): On Win95 get the pw entry. If it exists
+	update the euid and call cygheap->user.set_name. Remove special
+	handling of ILLEGAL_UID.
+	(setgid32): Add a debug_printf. On Win95, always set the egid. 
+	Remove special handling of ILLEGAL_GID. Do not compare gid and gr_gid.
+	* child_info.h (class cygheap_exec_info): Remove uid.
+	* spawn.cc (spawn_guts): Do not set ciresrv.moreinfo->uid.
+	* dcrto.cc (dll_crt0_1): Always call uinfo_init.
+	* uinfo.cc (uinfo_init): Reorganize and close handle if needed.
+	(cygheap_user::ontherange): Do not call internal_getpwnam if pw is NULL.
+
 2003-01-24  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::send_winch_maybe): Reset

@@ -102,15 +102,18 @@ internal_getlogin (cygheap_user &user)
 void
 uinfo_init ()
 {
-  if (!child_proc_info)
-    internal_getlogin (cygheap->user); /* Set the cygheap->user. */
-
+  if (!child_proc_info || cygheap->user.token != INVALID_HANDLE_VALUE)
+    {
+      if (!child_proc_info)
+	internal_getlogin (cygheap->user); /* Set the cygheap->user. */
+      else
+        CloseHandle (cygheap->user.token);
+      cygheap->user.set_orig_sid ();	/* Update the original sid */
+      cygheap->user.token = INVALID_HANDLE_VALUE; /* No token present */
+    }
   /* Real and effective uid/gid are identical on process start up. */
   cygheap->user.orig_uid = cygheap->user.real_uid = myself->uid;
   cygheap->user.orig_gid = cygheap->user.real_gid = myself->gid;
-  cygheap->user.set_orig_sid ();	/* Update the original sid */
-
-  cygheap->user.token = INVALID_HANDLE_VALUE; /* No token present */
 }
 
 extern "C" char *
@@ -214,8 +217,6 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	debug_printf ("HOME is already in the environment %s", p);
       else
 	{
-	  if (!pw)
-	    pw = internal_getpwnam (name ());
 	  if (pw && pw->pw_dir && *pw->pw_dir)
 	    {
 	      debug_printf ("Set HOME (from /etc/passwd) to %s", pw->pw_dir);

@@ -684,9 +684,8 @@ dll_crt0_1 ()
   /* Init global well known SID objects */
   cygsid::init ();
 
-  /* Initialize uid, gid if necessary. */
-  if (child_proc_info == NULL || spawn_info->moreinfo->uid == ILLEGAL_UID)
-    uinfo_init ();
+  /* Initialize user info. */
+  uinfo_init ();
 
   /* Initialize signal/subprocess handling. */
   sigproc_init ();

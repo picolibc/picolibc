@@ -1948,20 +1948,12 @@ mkfifo (const char *_path, mode_t mode)
 extern "C" int
 seteuid32 (__uid32_t uid)
 {
+  debug_printf ("uid: %u myself->gid: %u", uid, myself->gid);
 
-  debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
-
-  if (!wincap.has_security ()
-      || (uid == myself->uid && !cygheap->user.groups.ischanged))
+  if (uid == myself->uid && !cygheap->user.groups.ischanged)
     {
       debug_printf ("Nothing happens");
       return 0;
-    }
-
-  if (uid == ILLEGAL_UID)
-    {
-      set_errno (EINVAL);
-      return -1;
     }
 
   sigframe thisframe (mainthread);
@@ -1974,6 +1966,8 @@ seteuid32 (__uid32_t uid)
   PSID origpsid, psid2 = NO_SID;
 
   pw_new = internal_getpwuid (uid);
+  if (!wincap.has_security () && pw_new)
+    goto success;
   if (!usersid.getfrompw (pw_new))
     {
       set_errno (EINVAL);
@@ -2092,9 +2086,9 @@ seteuid32 (__uid32_t uid)
       sav_token != cygheap->user.token &&
       sav_token_is_internal_token)
       CloseHandle (sav_token);
-  cygheap->user.set_name (pw_new->pw_name);
   cygheap->user.set_sid (usersid);
 success:
+  cygheap->user.set_name (pw_new->pw_name);
   myself->uid = uid;
   groups.ischanged = FALSE;
   return 0;
@@ -2160,22 +2154,21 @@ setreuid (__uid16_t ruid, __uid16_t euid)
 extern "C" int
 setegid32 (__gid32_t gid)
 {
-  if (!wincap.has_security () || gid == myself->gid)
-    return 0;
+  debug_printf ("new egid: %u current: %u", gid, myself->gid);
 
-  if (gid == ILLEGAL_GID)
+  if (gid == myself->gid || !wincap.has_security ())
     {
-      set_errno (EINVAL);
-      return -1;
+      myself->gid = gid;
+      return 0;
     }
 
   sigframe thisframe (mainthread);
   user_groups * groups = &cygheap->user.groups;
   cygsid gsid;
   HANDLE ptok;
-
   struct __group32 * gr = internal_getgrgid (gid);
-  if (!gr || gr->gr_gid != gid || !gsid.getfromgr (gr))
+
+  if (!gsid.getfromgr (gr))
     {
       set_errno (EINVAL);
       return -1;
