@@ -1,4 +1,4 @@
-2000-09-27  Hans-Peter Nilsson  <hp@axis.com>
+2000-09-29  Hans-Peter Nilsson  <hp@axis.com>
 
 	* dis-asm.h: Declare cris_get_disassembler, not print_insn_cris.
 	Fix typo in comment.
