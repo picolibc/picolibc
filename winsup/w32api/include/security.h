@@ -37,5 +37,6 @@ typedef long SECURITY_STATUS;
 
 #include <sspi.h>
 #include <ntsecpkg.h>
+#include <secext.h>
 
 #endif /* _SECURITY_H */

@@ -1608,6 +1608,18 @@ BOOL WINAPI AllocateUserPhysicalPages(HANDLE,PULONG_PTR,PULONG_PTR);
 BOOL WINAPI FreeUserPhysicalPages(HANDLE,PULONG_PTR,PULONG_PTR);
 BOOL WINAPI MapUserPhysicalPages(PVOID,ULONG_PTR,PULONG_PTR);
 BOOL WINAPI MapUserPhysicalPagesScatter(PVOID*,ULONG_PTR,PULONG_PTR);
+typedef enum _COMPUTER_NAME_FORMAT
+{
+  ComputerNameNetBIOS, 
+  ComputerNameDnsHostname, 
+  ComputerNameDnsDomain, 
+  ComputerNameDnsFullyQualified, 
+  ComputerNamePhysicalNetBIOS, 
+  ComputerNamePhysicalDnsHostname, 
+  ComputerNamePhysicalDnsDomain, 
+  ComputerNamePhysicalDnsFullyQualified, 
+  ComputerNameMax
+} COMPUTER_NAME_FORMAT;
 #endif
 
 #ifdef UNICODE

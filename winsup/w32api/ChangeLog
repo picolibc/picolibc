@@ -4,6 +4,10 @@
 	(Ke386QueryToAccessMap): Ditto.
 	(Ke386SetIoAccessMap): Ditto.
 	Thanks to Marcel Telka <telka@users.sf.net>
+	* include/secext.h: New file. Declare EXTENDED_NAME_FORMAT.
+	* include/security.h: Include secext.h.
+	* include/winbase.h: Declare COMPUTER_NAME_FORMAT.
+	Thanks to Dimitri Papadopoulos <dimitri_at@users.sf.net>
 
 2003-02-05  Earnie Boyd  <earnie@users.sf.net>
 
