@@ -7,6 +7,8 @@ configure.*			Chris Faylor <cgf@cygnus.com>
 MAINTAINERS			Chris Faylor <cgf@cygnus.com>
 cygwin/security.cc and
 ntsec stuff			Corinna Vinschen <corinna@vinschen.de>
+cygwin/fhandler_raw.cc		Corinna Vinschen <corinna@vinschen.de>
+cygwin/fhandler_floppy.cc	Corinna Vinschen <corinna@vinschen.de>
 cygwin/fhandler_tape.cc		Corinna Vinschen <corinna@vinschen.de>
 cygwin/{everything else}	Chris Faylor <cgf@cygnus.com>,
 				DJ Delorie <cgf@cygnus.com>
