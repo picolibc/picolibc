@@ -1,6 +1,6 @@
 /* window.cc: hidden windows for signals/itimer support
 
-   Copyright 1997, 1998, 2000 Cygnus Solutions.
+   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
 
    Written by Sergey Okhapkin <sos@prospect.com.ru>
 

@@ -1,6 +1,6 @@
 /* core_dump.h
 
-   Copyright 1999 Cygnus Solutions.
+   Copyright 1999, 2000, 2001 Red Hat, Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 

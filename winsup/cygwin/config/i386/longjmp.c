@@ -1,6 +1,6 @@
 /* longjmp.c
 
-   Copyright 1996, 1998 Cygnus Solutions.
+   Copyright 1996, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 

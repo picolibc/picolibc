@@ -1,6 +1,6 @@
 /* cygrun.c: testsuite support program
 
-   Copyright 1999 Cygnus Solutions.
+   Copyright 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 

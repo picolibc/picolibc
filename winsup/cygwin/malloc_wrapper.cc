@@ -1,8 +1,8 @@
-/* malloc.cc for WIN32.
+/* malloc.cc
 
-   Copyright 1996, 1997, 1998 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
-   Written by Steve Chamberlain of Cygnus Support
+   Originally written by Steve Chamberlain of Cygnus Support
    sac@cygnus.com
 
 This file is part of Cygwin.

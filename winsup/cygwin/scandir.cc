@@ -1,6 +1,6 @@
 /* scandir.cc
 
-   Copyright 1998 Cygnus Solutions.
+   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 

@@ -1,6 +1,6 @@
 /* sync.h: Header file for cygwin synchronization primitives.
 
-   Copyright 1999, 2000 Cygnus Solutions.
+   Copyright 1999, 2000, 2001 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 

@@ -1,6 +1,6 @@
-/* fhandler_dev_random.cc: code to access /dev/random and /dev/urandom
+/* fhandler_random.cc: code to access /dev/random and /dev/urandom
 
-   Copyright 2000 Cygnus Solutions.
+   Copyright 2000, 2001 Red Hat, Inc.
 
    Written by Corinna Vinschen (vinschen@cygnus.com)
 

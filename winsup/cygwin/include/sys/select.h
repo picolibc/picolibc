@@ -1,5 +1,5 @@
 /* select.h
-   Copyright 1998 Cygnus Solutions.
+   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
 
    Written by Geoffrey Noer <noer@cygnus.com>
 

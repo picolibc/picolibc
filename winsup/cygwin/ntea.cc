@@ -1,6 +1,6 @@
 /* ntea.cc: code for manipulating NTEA information
 
-   Copyright 1997, 1998, 2000 Cygnus Solutions.
+   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
 
    Written by Sergey S. Okhapkin (sos@prospect.com.ru)
 
