@@ -190,11 +190,6 @@ list.  You must provide complete details in your query: version of
 setup, options you selected, contents of setup.log and setup.log.full,
 what happened that wasn't supposed to happen, etc.
 
-@subsection What's the difference between packages in @samp{latest} and @samp{contrib}?
-
-There is no difference as far as Cygwin Setup is concerned.  The
-distinction is historical, not practical.
-
 @subsection My Windows logon name has a space in it, will this cause problems?
 
 Most definitely yes!  UNIX shells (and thus Cygwin) use the space
