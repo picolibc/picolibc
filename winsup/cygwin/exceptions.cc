@@ -1034,9 +1034,6 @@ sig_handle (int sig, bool thisproc)
   if (handler == (void *) SIG_ERR)
     goto exit_sig;
 
-  if (sig == SIGCHLD)
-    goto done;
-
   goto dosig;
 
  stop:

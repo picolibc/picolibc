@@ -1,3 +1,13 @@
+2002-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* speclib: Don't use /dev/null as DLL name.  Just default to what's
+	already in .def file.
+
+2002-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sig_handle): Remove last vestiges of SA_NOCLDSTOP code
+	which caused SIGCHLD to be ignored.
+
 2002-01-20  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number.
