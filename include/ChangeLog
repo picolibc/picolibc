@@ -1,3 +1,39 @@
+2004-07-07  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* dis-asm.h (print_insn_crx): Declare.
+
+2004-06-24  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_order): Update comment.
+
+2004-05-11  Jakub Jelinek  <jakub@redhat.com>
+
+	* bfdlink.h (struct bfd_link_info): Add relro, relro_start and
+	relro_end fields.
+	* elf/common.h (PT_GNU_EH_FRAME, PT_GNU_STACK): Add comments.
+	(PT_GNU_RELRO): Define.
+
+2004-05-04  Andreas Jaeger  <aj@suse.de>
+
+	* demangle.h: Do not use C++ reserved keyword typename as
+	parameter for cplus_demangle_fill_builtin_type.
+
+2004-04-22  Richard Henderson  <rth@redhat.com>
+
+	* hashtab.h (struct htab): Add size_prime_index.
+
+2004-04-13  Jeff Law  <law@redhat.com>
+
+	* hashtab.h (htab_remove_elt_with_hash): Prototype new function.
+
+2004-03-30  Zack Weinberg  <zack@codesourcery.com>
+
+	* hashtab.h, splay-tree.h: Use new shorter form of GTY markers.
+
+2004-03-25  Stan Shebs  <shebs@apple.com>
+
+	* mpw/: Remove subdirectory and everything in it.
+
 2004-03-23  Alan Modra  <amodra@bigpond.net.au>
 
 	PR 51.

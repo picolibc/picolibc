@@ -302,6 +302,9 @@ struct bfd_link_info
      flags.  */
   unsigned int noexecstack: 1;
 
+  /* TRUE if PT_GNU_RELRO segment should be created.  */
+  unsigned int relro: 1;
+
   /* What to do with unresolved symbols in an object file.
      When producing executables the default is GENERATE_ERROR.
      When producing shared libraries the default is IGNORE.  The
@@ -391,6 +394,9 @@ struct bfd_link_info
 
   /* May be used to set DT_FLAGS_1 for ELF. */
   bfd_vma flags_1;
+
+  /* Start and end of RELRO region.  */
+  bfd_vma relro_start, relro_end;
 };
 
 /* This structures holds a set of callback functions.  These are
@@ -550,7 +556,7 @@ struct bfd_link_order
 	  /* Section to include.  If this is used, then
 	     section->output_section must be the section the
 	     link_order is attached to, section->output_offset must
-	     equal the link_order offset field, and section->_raw_size
+	     equal the link_order offset field, and section->size
 	     must equal the link_order size field.  Maybe these
 	     restrictions should be relaxed someday.  */
 	  asection *section;
