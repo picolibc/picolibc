@@ -1,3 +1,7 @@
+2003-06-23  H.J. Lu <hongjiu.lu@intel.com>
+
+	* i386.h (i386_optab): Support Intel Precott New Instructions.
+
 2003-06-10  Gary Hade <garyhade@us.ibm.com>
 
 	* ppc.h (PPC_OPERAND_DQ): Define.
