@@ -1,5 +1,9 @@
 2003-01-07  Christopher Faylor  <cgf@redhat.com>
 
+	* configure: Regenerate with proper autoconf 2.13.
+
+2003-01-07  Christopher Faylor  <cgf@redhat.com>
+
         * configure.in: Add AC_PREREQ for consistency.
         * configure: Regenerate.
 
