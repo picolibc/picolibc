@@ -1389,12 +1389,15 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	  dst[0] = '\0';
 	  if (mount_table->cygdrive_len > 1)
 	    devn = FH_CYGDRIVE;
+	  goto out;
 	}
-      else if (!cygdrive_win32_path (pathbuf, dst, unit))
+      else if (cygdrive_win32_path (pathbuf, dst, unit))
+	{
+	  *flags = cygdrive_flags;
+	  goto out;
+	}
+      else if (mount_table->cygdrive_len > 1)
 	return ENOENT;
-      else
-	*flags = cygdrive_flags;
-      goto out;
     }
 
   int chrooted_path_len;
@@ -1518,8 +1521,9 @@ mount_info::cygdrive_win32_path (const char *src, char *dst, int& unit)
   const char *p = src + cygdrive_len;
   if (!isalpha (*p) || (!isdirsep (p[1]) && p[1]))
     {
-      res = unit = -1;
+      unit = -1;
       dst[0] = '\0';
+      res = 0;
     }
   else
     {
@@ -1528,9 +1532,10 @@ mount_info::cygdrive_win32_path (const char *src, char *dst, int& unit)
       strcpy (dst + 2, p + 1);
       backslashify (dst, dst, !dst[2]);
       unit = dst[0];
+      res = 1;
     }
   debug_printf ("src '%s', dst '%s'", src, dst);
-  return 1;
+  return res;
 }
 
 /* conv_to_posix_path: Ensure src_path is a POSIX path.
@@ -1862,8 +1867,7 @@ mount_info::read_cygdrive_info_from_registry ()
   /* reg_key for user path prefix in HKEY_CURRENT_USER. */
   reg_key r;
 
-  if (r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive, sizeof (cygdrive),
-      "") != 0)
+  if (r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive, sizeof (cygdrive), "") != 0)
     {
       /* Didn't find the user path prefix so check the system path prefix. */
 
@@ -1873,22 +1877,12 @@ mount_info::read_cygdrive_info_from_registry ()
 		 CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
 		 NULL);
 
-    if (r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive, sizeof (cygdrive),
-	"") != 0)
-      {
-	/* Didn't find either so write the default to the registry and use it.
-	   NOTE: We are writing and using the user path prefix.  */
-	write_cygdrive_info_to_registry (CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX,
-					 MOUNT_AUTO);
-      }
-    else
-      {
-	/* Fetch system cygdrive_flags from registry; returns MOUNT_AUTO on
-	   error. */
-	cygdrive_flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_AUTO);
-	slashify (cygdrive, cygdrive, 1);
-	cygdrive_len = strlen(cygdrive);
-      }
+      if (r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive,
+	  sizeof (cygdrive), ""))
+	strcpy (cygdrive, CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX);
+      cygdrive_flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_AUTO);
+      slashify (cygdrive, cygdrive, 1);
+      cygdrive_len = strlen (cygdrive);
     }
   else
     {
