@@ -1,3 +1,7 @@
+2003-03-08  Christopher Faylor  <cgf@redhat.com>
+
+	Revert below changes regarding _pinfo::cmdline.
+
 2003-03-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (cygwin_internal): Change n to __off64_t to match change

@@ -300,7 +300,9 @@ fhandler_process::fill_filebuf ()
       {
 	if (filebuf)
 	  free (filebuf);
-	filebuf = p->cmdline (filesize);
+	size_t fs;
+	filebuf = p->cmdline (fs);
+	filesize = fs;
 	if (!filebuf || !*filebuf)
 	  filebuf = strdup ("<defunct>");
 	break;
@@ -363,8 +365,7 @@ fhandler_process::fill_filebuf ()
   return true;
 }
 
-static
-__off64_t
+static __off64_t
 format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 {
   char cmd[MAX_PATH];
@@ -499,8 +500,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 			  );
 }
 
-static
-__off64_t
+static __off64_t
 format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
 {
   char cmd[MAX_PATH];
@@ -593,8 +593,7 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
 			  );
 }
 
-static
-__off64_t
+static __off64_t
 format_process_statm (_pinfo *p, char *destbuf, size_t maxsize)
 {
   unsigned long vmsize = 0UL, vmrss = 0UL, vmtext = 0UL, vmdata = 0UL,
@@ -610,8 +609,7 @@ format_process_statm (_pinfo *p, char *destbuf, size_t maxsize)
 			  );
 }
 
-static
-int
+static int
 get_process_state (DWORD dwProcessId)
 {
   /*
@@ -678,8 +676,7 @@ out:
   return state;
 }
 
-static
-bool
+static bool
 get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
 		unsigned long *vmtext, unsigned long *vmdata,
 		unsigned long *vmlib, unsigned long *vmshare)
