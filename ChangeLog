@@ -1,3 +1,10 @@
+2002-03-12  Richard Henderson  <rth@redhat.com>
+
+	* Makefile.in (NOTPARALLEL): New.  Use it instead of explicit
+	.NOTPARALLEL tag.
+	(do-check): Rename from check.
+	(check): Allow parallel check.
+
 2002-03-11  Richard Henderson  <rth@redhat.com>
 
 	* Makefile.in (.NOTPARALLEL): Add fake tag.
@@ -34,8 +41,8 @@
 
 2002-02-04  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * COPYING.NEWLIB: Remove advertising clause from
-        Berkeley and Red Hat licenses.
+	* COPYING.NEWLIB: Remove advertising clause from
+	Berkeley and Red Hat licenses.
 
 2002-02-01  Mo DeJong  <supermo@bayarea.net>
 
@@ -111,7 +118,7 @@
 2001-12-05  Laurent Guerby  <guerby@acm.org>
 
 	* MAINTAINERS: gcc adopts symlink-tree, refer more to
-        libiberty.
+	libiberty.
 
 	Import this patch from gcc:
 	
@@ -177,7 +184,7 @@
 
 2001-11-12  Hans-Peter Nilsson  <hp@bitrange.com>
 
-        * COPYING.NEWLIB: Add BSD-style license/copyright blurb for my work.
+	* COPYING.NEWLIB: Add BSD-style license/copyright blurb for my work.
 
 2001-11-08  Phil Edwards  <pedwards@disaster.jaj.com>
 
@@ -465,7 +472,7 @@ Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
 
 2001-01-07  Andreas Jaeger  <aj@suse.de>
 
-        * config.sub, config.guess: Update from subversions.
+	* config.sub, config.guess: Update from subversions.
 
 2000-12-12  Alexandre Oliva  <aoliva@redhat.com>
 
@@ -509,8 +516,8 @@ Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
 
 2000-10-30  Stephane Carrez  <stcarrez@worldnet.fr>
 
-        * configure.in (noconfigdirs): Don't compile some
-        of the libraries for 68HC11 & 68hc12 targets.
+	* configure.in (noconfigdirs): Don't compile some
+	of the libraries for 68HC11 & 68hc12 targets.
 
 2000-09-30  Alexandre Oliva  <aoliva@redhat.com>
 
@@ -673,7 +680,7 @@ Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
 
 2000-07-01  Koundinya K  <kk@ddeorg.soft.net>
 
-        * ltconfig: Add support for mips-dde-sysv4.2MP
+	* ltconfig: Add support for mips-dde-sysv4.2MP
 
 2000-06-28  Corinna Vinschen  <vinschen@cygnus.com>
 
@@ -701,12 +708,12 @@ Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
 
 20000-05-21  H.J. Lu  (hjl@gnu.org)
 
-        * Makefile.in (CC_FOR_TARGET): Make sure as/ld in the gcc
-        directory are used if they exist. Make sure
-        $(build_tooldir)/include is searched for header files,
-        $(build_tooldir)/lib/ for library files.
+	* Makefile.in (CC_FOR_TARGET): Make sure as/ld in the gcc
+	directory are used if they exist. Make sure
+	$(build_tooldir)/include is searched for header files,
+	$(build_tooldir)/lib/ for library files.
 	(GCC_FOR_TARGET): Likewise.
-        (CXX_FOR_TARGET): Likewise.
+	(CXX_FOR_TARGET): Likewise.
 
 2000-05-18  Jeffrey A Law  (law@cygnus.com)
 
@@ -754,7 +761,7 @@ Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
 2000-05-08  Eli Zaretskii  <eliz@is.elta.co.il>
 
 	* djunpack.bat: Change the Sed script to replace @V@ in fnchange.lst
-        with the version name.
+	with the version name.
 
 2000-05-01  Benjamin Kosnik  <bkoz@cygnus.com>
 
@@ -773,8 +780,8 @@ Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
 
 2000-04-16  Dave Pitts  <dpitts@cozx.com>
 
-        * config.sub (case $basic_machine): Change default for "ibm-*"
-        to "openedition".
+	* config.sub (case $basic_machine): Change default for "ibm-*"
+	to "openedition".
 
 2000-04-12  Andrew Cagney  <cagney@b1.cygnus.com>
 
@@ -795,13 +802,13 @@ Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
 	* configure (warn_cflags): Delete.
 
 2000-04-05  Benjamin Kosnik  <bkoz@cygnus.com>
-            Martin v. Loewis  <martin@loewis.home.cs.tu-berlin.de>
+	    Martin v. Loewis  <martin@loewis.home.cs.tu-berlin.de>
 
-        * configure.in (enable_libstdcxx_v3): Add.
-        (target_libs): Add bits here to switch between libstdc++-v2 and
-        libstdc++-v3.
-        * config.if: And this file too.
-        * Makefile.in: Add libstdc++-v3 targets.
+	* configure.in (enable_libstdcxx_v3): Add.
+	(target_libs): Add bits here to switch between libstdc++-v2 and
+	libstdc++-v3.
+	* config.if: And this file too.
+	* Makefile.in: Add libstdc++-v3 targets.
 
 2000-04-05  Michael Meissner  <meissner@redhat.com>
 
@@ -982,15 +989,15 @@ Tue Jun 22 23:45:18 1999  Tom Tromey  <tromey@cygnus.com>
 	(configure-target-boehm-gc): New target.
 	(configure-target-qthreads): New target.
 
-        * configure.in (target_libs): Added target-qthreads.
-        * Makefile.in (ALL_TARGET_MODULES): Added qthreads.
-        (CONFIGURE_TARGET_MODULES): Likewise.
-        (CHECK_TARGET_MODULES): Likewise.
-        (INSTALL_TARGET_MODULES): Likewise.
-        (CLEAN_TARGET_MODULES): Likewise.
-        (all-target-qthreads): New target.
-        (configure-target-libjava): Depend on configure-target-qthreads.
-        (all-target-libjava): Depend on all-target-qthreads.
+	* configure.in (target_libs): Added target-qthreads.
+	* Makefile.in (ALL_TARGET_MODULES): Added qthreads.
+	(CONFIGURE_TARGET_MODULES): Likewise.
+	(CHECK_TARGET_MODULES): Likewise.
+	(INSTALL_TARGET_MODULES): Likewise.
+	(CLEAN_TARGET_MODULES): Likewise.
+	(all-target-qthreads): New target.
+	(configure-target-libjava): Depend on configure-target-qthreads.
+	(all-target-libjava): Depend on all-target-qthreads.
 
 	* Makefile.in (ALL_TARGET_MODULES): Added libjava, boehm-gc.
 	(CONFIGURE_TARGET_MODULES): Likewise.
@@ -1078,7 +1085,7 @@ Thu Jul  8 12:32:23 1999  John David Anglin <dave@hiauly1.hia.nrc.ca>
 	Bad merge removed these two changes.
 
 Tue Apr 13 22:50:54 1999  Donn Terry (donn@interix.com)
-                          Martin Heller (Ing.-Buero_Heller@t-online.de)
+	                  Martin Heller (Ing.-Buero_Heller@t-online.de)
 
 	* config.guess (interix Alpha): Add.
 
@@ -1135,7 +1142,7 @@ Fri Apr  2 15:11:32 1999  H.J. Lu  (hjl@gnu.org)
 
 1999-03-21  Ben Elliston  <bje@cygnus.com>
 
-        * config.guess: Correct typo for detecting ELF on FreeBSD.
+	* config.guess: Correct typo for detecting ELF on FreeBSD.
 
 Thu Mar 18 00:17:50 1999  Mark Elbrecht <snowball3@usa.net>
 
@@ -1245,8 +1252,8 @@ Wed Mar 10 17:39:09 1999  Drew Moseley  <dmoseley@cygnus.com>
 
 1999-02-02  Catherine Moore  <clm@cygnus.com>
 
-        * config.sub (oabi):  Recognize.
-        * configure.in (arm-*-oabi):  Handle.
+	* config.sub (oabi):  Recognize.
+	* configure.in (arm-*-oabi):  Handle.
 
 1999-01-30  Robert Lipe  (robertlipe@usa.net)
 
@@ -1334,8 +1341,8 @@ Wed Nov 18 20:13:29 1998  Christopher Faylor <cgf@cygnus.com>
 
 1998-11-17  Geoffrey Noer  <noer@cygnus.com>
 
-        * Makefile.in: modify CC_FOR_TARGET and CXX_FOR_TARGET so that
-        they include winsup/include when it's a cygwin target.
+	* Makefile.in: modify CC_FOR_TARGET and CXX_FOR_TARGET so that
+	they include winsup/include when it's a cygwin target.
 
 1998-11-12  Tom Tromey  <tromey@cygnus.com>
 
@@ -1361,7 +1368,7 @@ Wed Nov 18 20:13:29 1998  Christopher Faylor <cgf@cygnus.com>
 
 1998-11-02  Geoffrey Noer  <noer@cygnus.com>
 
-        * configure.in: drop "32" from config/mh-cygwin32.  Check
+	* configure.in: drop "32" from config/mh-cygwin32.  Check
 	cygwin* instead of cygwin32*.
 	* config.sub: Check cygwin* instead of cygwin32*.
 
@@ -1958,7 +1965,7 @@ Fri Mar  6 00:14:55 1998  Franz Sirl <Franz.Sirl-kernel@lauterbach.com>
 
 Mon Feb 23 15:09:18 1998  Bruno Haible <bruno@linuix.mathematik.uni-karlsruhe.de
 
-        * config.sub (sco5): Fix typo.
+	* config.sub (sco5): Fix typo.
 
 Mon Feb 23 14:46:06 1998  Ian Lance Taylor  <ian@cygnus.com>
 
@@ -2270,10 +2277,10 @@ Sat Nov  8 14:42:59 1997  Michael Meissner  <meissner@cygnus.com>
 
 Fri Nov  7 10:34:09 1997  Rob Savoye  <rob@darkstar.cygnus.com>
 
-        * include/libiberty.h: Add extern "C" { so it can be used with C++
-        progrms.
-        * include/remote-sim.h:  Add extern "C" { so it can be used with C++
-        programs.
+	* include/libiberty.h: Add extern "C" { so it can be used with C++
+	progrms.
+	* include/remote-sim.h:  Add extern "C" { so it can be used with C++
+	programs.
 
 Thu Oct 30 11:09:29 1997  Michael Meissner  <meissner@cygnus.com>
 
@@ -2397,7 +2404,7 @@ Sun Sep  7 15:55:28 1997  Gavin Koch  <gavin@cygnus.com>
 
 Fri Sep  5 16:11:28 1997  Joel Sherrill  (joel@OARcorp.com)
 
-        * configure.in (*-*-rtems*): Do not build libgloss for rtems.
+	* configure.in (*-*-rtems*): Do not build libgloss for rtems.
 
 Fri Sep  5 12:27:17 1997  Jeffrey A Law  (law@cygnus.com)
 
@@ -2465,7 +2472,7 @@ Thu Aug 14 14:42:17 1997  Ian Lance Taylor  <ian@cygnus.com>
 
 	* configure: When handling a Canadian Cross, handle YACC as well as
 	BISON.  Just set BISON to bison.  When setting YACC, prefer bison.
-        * Makefile.in (all-bison): Depend upon all-texinfo.
+	* Makefile.in (all-bison): Depend upon all-texinfo.
 
 Tue Aug 12 20:09:48 1997  Jason Merrill  <jason@yorick.cygnus.com>
 
@@ -2798,7 +2805,7 @@ Tue Apr  1 16:28:50 1997  Klaus Kaempf  <kkaempf@progis.de>
 
 Mon Mar 31 16:26:55 1997  Joel Sherrill  <joel@oarcorp.com>
 
-        * configure.in (hppa1.1-*-rtems*): New target, like hppa-*-*elf*.
+	* configure.in (hppa1.1-*-rtems*): New target, like hppa-*-*elf*.
 
 Sun Mar 30 12:38:27 1997  Fred Fish  <fnf@cygnus.com>
 
@@ -3150,11 +3157,11 @@ Wed Oct  9 17:24:59 1996  Per Bothner  <bothner@deneb.cygnus.com>
 	* config.guess:  Merge from FSF.
 
 	1996-09-12  Richard Stallman  <rms@ethanol.gnu.ai.mit.edu>
-        * config.guess: Use pc instead of unknown, for pc clone systems.
-        Change linux to linux-gnu.
+	* config.guess: Use pc instead of unknown, for pc clone systems.
+	Change linux to linux-gnu.
 
 	Mon Jul 15 23:51:11 1996  Karl Heuer  <kwzh@gnu.ai.mit.edu>
-        * config.guess: Avoid non-portable tr syntax.
+	* config.guess: Avoid non-portable tr syntax.
 
 Wed Oct  9 06:06:46 1996  Jeffrey A Law  (law@cygnus.com)
 
@@ -3428,9 +3435,9 @@ Mon Jun 24 15:01:12 1996  Joel Sherrill  <joel@merlin.gcs.redstone.army.mil>
 
 Sun Jun 23 22:41:54 1996  Geoffrey Noer  <noer@cygnus.com>
 
-        * configure.in: enable dosrel for cygwin32-hosted builds,
-                remove diff from the list of things not buildable
-                via Canadian Cross
+	* configure.in: enable dosrel for cygwin32-hosted builds,
+	        remove diff from the list of things not buildable
+	        via Canadian Cross
 
 Sat Jun 22 11:39:01 1996  Jason Merrill  <jason@yorick.cygnus.com>
 
@@ -3632,8 +3639,8 @@ Thu Mar 28 14:11:11 1996  Tom Tromey  <tromey@creche.cygnus.com>
 
 Tue Mar 26 21:18:50 1996  Andrew Cagney  <cagney@kremvax.highland.com.au>
 
-        * configure (--enable-*): Handle quoted option lists such as
-        --enable-sim-cflags='-g0 -O' better.
+	* configure (--enable-*): Handle quoted option lists such as
+	--enable-sim-cflags='-g0 -O' better.
 
 Thu Mar 21 11:53:08 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
 
@@ -4634,7 +4641,7 @@ Fri Apr 14 15:21:17 1995  Doug Evans  <dje@chestnut.cygnus.com>
 Wed Apr 12 16:06:01 1995  Jason Merrill  <jason@phydeaux.cygnus.com>
 
 	* test-build.mk: Enable building of shared libraries on IRIX 5 and
-        OSF/1.  Fix compiler flags.
+	OSF/1.  Fix compiler flags.
 	* build-all.mk: Support Linux and OSF/1 3.0.  Fix compiler flags.
 
 Tue Apr 11 18:55:40 1995  Doug Evans  <dje@canuck.cygnus.com>
@@ -5068,21 +5075,21 @@ Fri Aug 26 13:05:27 1994  Per Bothner  (bothner@kalessin.cygnus.com)
 	Thu Aug 25 20:28:51 1994  Richard Stallman  <rms@mole.gnu.ai.mit.edu>
 
 	* config.guess (Pyramid*:OSx*:*:*): New case.
-        (PATH): Add /.attbin at end for finding uname.
-        (dummy.c): Handle i860-alliant-bsd.  Follow whitespace conventions.
+	(PATH): Add /.attbin at end for finding uname.
+	(dummy.c): Handle i860-alliant-bsd.  Follow whitespace conventions.
 
 	Wed Aug 17 18:21:02 1994  Tor Egge  (tegge@pvv.unit.no)
 
-        * config.guess (M88*:DolphinOS:*:*): New case.
+	* config.guess (M88*:DolphinOS:*:*): New case.
 
 	Thu Aug 11 17:00:13 1994  Stan Cox  (coxs@dg-rtp.dg.com)
 
-        * config.guess (AViiON:dgux:*:*): Use TARGET_BINARY_INTERFACE
-        to select whether to use ELF or COFF.
+	* config.guess (AViiON:dgux:*:*): Use TARGET_BINARY_INTERFACE
+	to select whether to use ELF or COFF.
 
 	Sun Jul 24 16:20:53 1994  Richard Stallman  <rms@mole.gnu.ai.mit.edu>
 
-        * config.guess: Recognize i860-stardent-sysv and i860-unknown-sysv.
+	* config.guess: Recognize i860-stardent-sysv and i860-unknown-sysv.
 
 	Sun May  1 10:23:10 1994  Richard Stallman  (rms@mole.gnu.ai.mit.edu)
 
@@ -5421,7 +5428,7 @@ Thu Apr 14 23:33:17 1994  Ian Lance Taylor  (ian@tweedledumb.cygnus.com)
 Wed Apr 13 15:14:52 1994  Bill Cox  (bill@cygnus.com)
 
 	* configure: Make file links cleanly even if Lynx fails on
-          an NFS symlink (at least fail cleanly).
+	  an NFS symlink (at least fail cleanly).
 
 Mon Apr 11 10:58:56 1994  Jim Wilson  (wilson@sphagnum.cygnus.com)
 
@@ -5574,7 +5581,7 @@ Sat Feb  5 01:00:33 1994  Ian Lance Taylor  (ian@tweedledumb.cygnus.com)
 
 Wed Feb  2 13:57:57 1994  Jeffrey A. Law  (law@snake.cs.utah.edu)
 
-        * Makefile.in:  Avoid bug in losing hpux sed.
+	* Makefile.in:  Avoid bug in losing hpux sed.
 
 Wed Feb  2 14:53:05 1994  Jim Kingdon  (kingdon@lioth.cygnus.com)
 
@@ -7009,8 +7016,8 @@ Thu Oct 29 00:12:41 1992  david d `zoo' zuhn  (zoo at cirdan.cygnus.com)
 	ranlib.
 
 	* configure: also define $(host_canonical) and
-        $(target_canonical), which are the full, canonical names for the
-        given host and target
+	$(target_canonical), which are the full, canonical names for the
+	given host and target
 
 Sun Nov  1 16:38:17 1992  Per Bothner  (bothner@cygnus.com)
 
@@ -7158,7 +7165,7 @@ Mon Aug 24 14:05:14 1992  Ian Lance Taylor  (ian@cygnus.com)
 
 Tue Aug 11 23:13:17 1992  david d `zoo' zuhn  (zoo at cirdan.cygnus.com)
 
-        * COPYING: new file, GPL v2
+	* COPYING: new file, GPL v2
 
 Tue Aug  4 01:12:43 1992  david d `zoo' zuhn  (zoo at cirdan.cygnus.com)
 
