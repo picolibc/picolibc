@@ -1,4 +1,8 @@
 
+2001-01-22  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+
+	* include/stdint.h: New file.
+
 Thu Jan 18 10:33:01  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/wchar.h: Protect prototypes only declared in the C++ STL
