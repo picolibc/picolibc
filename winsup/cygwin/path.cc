@@ -2242,7 +2242,6 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
   char extbuf[MAX_PATH + 5];
   const char *path = in_path;
 
-  error = 0;
   if (!suffixes)
     ext_here = NULL;
   else if ((known_suffix = has_suffix (in_path, suffixes)) != NULL)
@@ -2258,10 +2257,12 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 
   is_symlink = TRUE;
 
+  error = 0;
   do
     {
       if (!next_suffix (ext_here, suffixes))
 	break;
+      error = 0;
       fileattr = GetFileAttributesA (path);
       if (fileattr == (DWORD) -1)
 	{

@@ -1,3 +1,8 @@
+Tue Aug 22 13:57:36 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (symlink_info::check): Clear error on each iteration of
+	extension check.
+
 Tue Aug 22 11:23:59 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Don't include '.d' file if there are none generated yet.
