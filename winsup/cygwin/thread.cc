@@ -1878,6 +1878,7 @@ __reent_t::init_clib (struct _reent& var)
   var._stdin = _GLOBAL_REENT->_stdin;
   var._stdout = _GLOBAL_REENT->_stdout;
   var._stderr = _GLOBAL_REENT->_stderr;
+  var.__sdidinit = _GLOBAL_REENT->__sdidinit;
   _clib = &var;
 };
 

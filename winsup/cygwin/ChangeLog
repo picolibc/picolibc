@@ -1,3 +1,8 @@
+2003-11-10  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (__reent_t::init_clib): Set thread local clib
+	__sdidinit var appropriately.
+
 2003-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (ftruncate64): Log length as long long.
