@@ -1,3 +1,8 @@
+2004-11-08  Inderpreet Singh   <inderpreetb@nioda.hcltech.com>
+	    Vineet Sharma      <vineets@noida.hcltech.com>
+
+	* dis-asm.h: Add prototype for print_insn_maxq_little.
+
 2004-11-05  Tomer Levi  <Tomer.Levi@nsc.com>
 	
 	* opcode/crx.h (enum argtype): Rename types, remove unused types.

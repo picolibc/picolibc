@@ -1,3 +1,8 @@
+2004-11-08  Inderpreet Singh   <inderpreetb@nioda.hcltech.com>
+	    Vineet Sharma      <vineets@noida.hcltech.com>
+
+	* maxq.h: New file: Disassembly information for the maxq port.
+
 2004-11-05  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h (i386_optab): Put back "movzb".

@@ -1,3 +1,8 @@
+2004-11-08  Inderpreet Singh   <inderpreetb@nioda.hcltech.com>
+	    Vineet Sharma      <vineets@noida.hcltech.com>
+
+	* maxqh: New file: Defintions for the maxq port.
+
 2004-11-08  Aaron W. LaFramboise <aaron98wiridge9@aaronwl.com>
 
 	* pe.h (IMAGE_WEAK_EXTERN_SEARCH_NOLIBRARY): Define.
