@@ -1,3 +1,12 @@
+2005-01-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/strtod.c (_strtod_r): Add NaN support.
+	* (strtof): Ditto.
+	* libc/stdio/vfscanf.c (__svfscanf_r): Ditto.
+	* Makefile.am (MATHOBJS_IN_LIBC): Add s_nan and sf_nan
+	functions for use by strtod and strtof.
+	* Makefile.in: Regenerated.
+                                                                                
 2005-01-06  Hans-Peter Nilsson  <hp@axis.com>
                                                                                 
 	* libc/stdio/ftell.c (ftell_r): Add parenthesis for __SWR

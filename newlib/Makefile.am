@@ -89,6 +89,7 @@ toollib_DATA = $(CRT0) $(CRT1)
 MATHOBJS_IN_LIBC = \
 	s_isinf.$(oext) sf_isinf.$(oext) \
 	s_isnan.$(oext) sf_isnan.$(oext) \
+	s_nan.$(oext) sf_nan.$(oext) \
 	s_ldexp.$(oext) sf_ldexp.$(oext) \
 	s_frexp.$(oext) sf_frexp.$(oext) \
 	s_modf.$(oext) \

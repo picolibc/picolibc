@@ -135,6 +135,7 @@ Supporting OS subroutines required:
 #endif
 
 #ifdef FLOATING_POINT
+#include <math.h>
 #include <float.h>
 
 /* Currently a test is made to see if long double processing is warranted.
@@ -985,6 +986,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  long zeroes, exp_adjust;
 	  char *exp_start = NULL;
 	  unsigned width_left = 0;
+	  int nancount = 0;
 #ifdef hardway
 	  if (width == 0 || width > sizeof (buf) - 1)
 #else
@@ -1007,7 +1009,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	       */
 	      switch (c)
 		{
-
 		case '0':
 		  if (flags & NDIGITS)
 		    {
@@ -1030,14 +1031,41 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		case '7':
 		case '8':
 		case '9':
-		  flags &= ~(SIGNOK | NDIGITS);
-		  goto fok;
+		  if (nancount == 0)
+		    {
+		      flags &= ~(SIGNOK | NDIGITS);
+		      goto fok;
+		    }
+		  break;
 
 		case '+':
 		case '-':
 		  if (flags & SIGNOK)
 		    {
 		      flags &= ~SIGNOK;
+		      goto fok;
+		    }
+		  break;
+		case 'n':
+		case 'N':
+	          if (nancount == 0
+		      && (flags & (SIGNOK | NDIGITS | DPTOK | EXPOK)))
+		    {
+		      flags &= ~(SIGNOK | DPTOK | EXPOK | NDIGITS);
+		      nancount = 1;
+		      goto fok;
+		    }
+		  else if (nancount == 2)
+		    {
+		      nancount = 3;
+		      goto fok;
+		    }
+		  break;
+		case 'a':
+		case 'A':
+		  if (nancount == 1)
+		    {
+		      nancount = 2;
 		      goto fok;
 		    }
 		  break;
@@ -1163,7 +1191,10 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      else
 		{
 		  flp = va_arg (ap, float *);
-		  *flp = res;
+		  if (isnan (res))
+		    *flp = nanf (NULL);
+		  else
+		    *flp = res;
 		}
 	      nassigned++;
 	    }

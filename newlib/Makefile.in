@@ -151,7 +151,7 @@ toollib_DATA = $(CRT0) $(CRT1)
 # The functions ldexp, frexp and modf are traditionally supplied in
 # both libc.a and libm.a.  We build them in libm.a and copy them over,
 # along with some required supporting routines.
-MATHOBJS_IN_LIBC =  	s_isinf.$(oext) sf_isinf.$(oext) 	s_isnan.$(oext) sf_isnan.$(oext) 	s_ldexp.$(oext) sf_ldexp.$(oext) 	s_frexp.$(oext) sf_frexp.$(oext) 	s_modf.$(oext) 	sf_modf.$(oext) s_scalbn.$(oext) 	sf_scalbn.$(oext) 	s_finite.$(oext) sf_finite.$(oext) 	s_copysign.$(oext) sf_copysign.$(oext) 	s_infconst.$(oext)
+MATHOBJS_IN_LIBC =  	s_isinf.$(oext) sf_isinf.$(oext) 	s_isnan.$(oext) sf_isnan.$(oext) 	s_nan.$(oext) sf_nan.$(oext) 	s_ldexp.$(oext) sf_ldexp.$(oext) 	s_frexp.$(oext) sf_frexp.$(oext) 	s_modf.$(oext) 	sf_modf.$(oext) s_scalbn.$(oext) 	sf_scalbn.$(oext) 	s_finite.$(oext) sf_finite.$(oext) 	s_copysign.$(oext) sf_copysign.$(oext) 	s_infconst.$(oext)
 
 
 LIBC_OBJECTLISTS =  	$(POSIX_OBJECTLIST) 	$(SIGNAL_OBJECTLIST) 	$(SYSCALL_OBJECTLIST) 	$(UNIX_OBJECTLIST) 	$(STDIO64_OBJECTLIST) 	libc/argz/objectlist.awk.in 	libc/stdlib/objectlist.awk.in 	libc/time/objectlist.awk.in 	libc/ctype/objectlist.awk.in 	libc/search/objectlist.awk.in 	libc/string/objectlist.awk.in 	libc/locale/objectlist.awk.in 	libc/misc/objectlist.awk.in 	libc/reent/objectlist.awk.in 	libc/errno/objectlist.awk.in 	libc/stdio/objectlist.awk.in 	$(MACHINE_OBJECTLIST) 	$(SYS_OBJECTLIST) 	$(SYS_MACH_OBJECTLIST)
