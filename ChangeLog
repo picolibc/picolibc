@@ -1,3 +1,7 @@
+2000-04-23  Eli Zaretskii  <eliz@is.elta.co.il>
+
+	* djunpack.bat: New file.
+
 2000-04-21  Michael Meissner  <meissner@redhat.com>
 
 	* config.sub (d30v): Add d30v as a basic machine type.
