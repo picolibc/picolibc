@@ -252,6 +252,11 @@ extern void (*__DTOR_LIST__) (void);
 #define O_NOSYMLINK 0x080000
 #define O_DIROPEN   0x100000
 
+/* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
+   properly defines both to be the same.  Unfortunately, we have to
+   behave properly the old version, too, to accomodate older executables. */
+#define OLD_O_NDELAY	4
+
 /* The title on program start. */
 extern char *old_title;
 extern BOOL display_title;

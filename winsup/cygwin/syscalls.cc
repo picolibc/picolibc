@@ -37,11 +37,6 @@ details. */
 #include "perprocess.h"
 #include "security.h"
 
-/* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
-   properly defines both to be the same.  Unfortunately, we have to
-   behave properly the old version, too, to accomodate older executables. */
-#define OLD_O_NDELAY	4
-
 extern BOOL allow_ntsec;
 
 /* Close all files and process any queued deletions.

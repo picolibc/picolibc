@@ -1,3 +1,10 @@
+Tue Oct 24 20:00:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::fcntl): Behave properly when passed
+	previous version of O_NDELAY.
+	* syscalls.cc: Move OLD_O_NDELAY to winsup.h.
+	* winsup.h: Define OLD_O_NDELAY now.
+
 Mon Oct 23 21:47:55 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (signal_exit): Kill any executing child process if
