@@ -378,7 +378,8 @@ fs_info::update (const char *win32_path)
     is_remote_drive (false);
 
   if (!GetVolumeInformation (root_dir, NULL, 0, &status.serial, NULL,
-			     &status.flags, fsname, sizeof (fsname)))
+			     &status.flags, fsname, sizeof (fsname))
+      && !is_remote_drive ())
     {
       debug_printf ("Cannot get volume information (%s), %E", root_dir);
       has_buggy_open (false);
@@ -766,7 +767,7 @@ is_virtual_symlink:
 		  else
 		    break;
 		}
-	      else if (sym.error != ENOENT) /* E. g. EACCES */
+	      else if (sym.error != ENOENT && sym.error != ENOSHARE) /* E. g. EACCES */
 		{
 		  error = sym.error;
 		  goto out;
