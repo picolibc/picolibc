@@ -799,7 +799,7 @@ cygwin_getsockopt (int fd,
   int res = -1;
   const char *name = "error";
   if (!check_null_invalid_struct_errno (optlen)
-      && (!optval || !__check_null_invalid_struct_errno (optval, (unsigned) optlen))
+      && (!optval || !__check_null_invalid_struct_errno (optval, (unsigned) *optlen))
       && h)
     {
       /* For the following debug_printf */
