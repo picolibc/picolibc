@@ -1,3 +1,8 @@
+2002-02-01  Ben Elliston  <bje@redhat.com>
+
+	* config.guess: Import from master sources, rev 1.229.
+	* config.sub: Import from master sources, rev 1.240.
+
 2002-01-27  Daniel Jacobowitz  <drow@mvista.com>
 
 	From Steve Ellcey <sje@cup.hp.com>:
