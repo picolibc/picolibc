@@ -736,25 +736,21 @@ typedef struct
    the data is recorded in the parse/insert/extract/print switch statements. */
 
 /* This should be at least as large as necessary for any target. */
-#define CGEN_MAX_SYNTAX_BYTES 40
+#define CGEN_MAX_SYNTAX_ELEMENTS 40
 
 /* A target may know its own precise maximum.  Assert that it falls below
    the above limit. */
-#ifdef CGEN_ACTUAL_MAX_SYNTAX_BYTES
-#if CGEN_ACTUAL_MAX_SYNTAX_BYTES > CGEN_MAX_SYNTAX_BYTES
-#error "CGEN_ACTUAL_MAX_SYNTAX_BYTES too high - enlarge CGEN_MAX_SYNTAX_BYTES"
+#ifdef CGEN_ACTUAL_MAX_SYNTAX_ELEMENTS
+#if CGEN_ACTUAL_MAX_SYNTAX_ELEMENTS > CGEN_MAX_SYNTAX_ELEMENTS
+#error "CGEN_ACTUAL_MAX_SYNTAX_ELEMENTS too high - enlarge CGEN_MAX_SYNTAX_ELEMENTS"
 #endif
 #endif
 
-#if !defined(MAX_OPERANDS) || MAX_OPERANDS <= 127
-typedef unsigned char CGEN_SYNTAX_CHAR_TYPE;
-#else
 typedef unsigned short CGEN_SYNTAX_CHAR_TYPE;
-#endif
 
 typedef struct
 {
-  CGEN_SYNTAX_CHAR_TYPE syntax[CGEN_MAX_SYNTAX_BYTES];
+  CGEN_SYNTAX_CHAR_TYPE syntax[CGEN_MAX_SYNTAX_ELEMENTS];
 } CGEN_SYNTAX;
 
 #define CGEN_SYNTAX_STRING(syn) (syn->syntax)
