@@ -199,12 +199,13 @@ details. */
        80: Export pthread_rwlock stuff
        81: CW_CHECK_NTSEC addition to external.cc
        82: Export wcscoll wcswidth wcwidth
+       83: Export gethostid
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 82
+#define CYGWIN_VERSION_API_MINOR 83
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

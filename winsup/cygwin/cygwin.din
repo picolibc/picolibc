@@ -565,6 +565,7 @@ getgrnam32
 getgroups
 _getgroups = getgroups
 getgroups32
+gethostid
 getitimer
 getlogin
 _getlogin = getlogin

@@ -1,8 +1,25 @@
+2003-04-15  Christopher Faylor  <cgf@redhat.com>
+
+	* termios.cc (setspeed): New function.
+	(cfsetospeed): Use setspeed to set speed.
+	(cfsetispeed): Use setspeed to set speed.
+
+2003-04-15  Chris January <chris@atomice.net>
+
+	* autoload.cc: Add load statement for UuidCreate, and
+	UuidCreateSequential.
+	* cpuid.h: New file.
+	* cygwin.din: Export gethostid.
+	* fhandler_proc.cc (cpuid): Move to cpuid.h.
+	(can_set_flag): Move to cpuid.h.
+	* syscalls.cc (gethostid): New function.
+	* version.h: Bump DLL minor version number to 83.
+
 2003-04-15  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.h (pthread_rwlock::release): New method.
-	* thread.cc (pthread_rwlock::unlock): Use release to signal
-	waiting threads.
+	* thread.cc (pthread_rwlock::unlock): Use release to signal waiting
+	threads.
 	(pthread_rwlock::rdlock_cleanup): Signal waiting threads after a
 	cancelation.
 	(pthread_rwlock::wrlock_cleanup): Ditto.

@@ -36,6 +36,7 @@ details. */
 #include <winnls.h>
 #include <wininet.h>
 #include <lmcons.h> /* for UNLEN */
+#include <rpc.h>
 
 #undef fstat
 #undef stat
@@ -55,6 +56,8 @@ details. */
 #define NEED_VFORK
 #include "perthread.h"
 #include "pwdgrp.h"
+#include "cpuid.h"
+#include "registry.h"
 
 #undef _close
 #undef _lseek
@@ -2724,4 +2727,110 @@ pututline (struct utmp *ut)
       ReleaseMutex (mutex);
       CloseHandle (mutex);
     }
+}
+
+extern "C"
+long gethostid(void)
+{
+  unsigned data[13] = {0x92895012,
+                       0x10293412,
+                       0x29602018,
+                       0x81928167,
+                       0x34601329,
+                       0x75630198,
+                       0x89860395,
+                       0x62897564,
+                       0x00194362,
+                       0x20548593,
+                       0x96839102,
+                       0x12219854,
+                       0x00290012};
+
+  bool has_cpuid = false;
+
+  if (!can_set_flag (0x00040000))
+    debug_printf ("386 processor - no cpuid");
+  else
+    {
+      debug_printf ("486 processor");
+      if (can_set_flag (0x00200000))
+        {
+          debug_printf ("processor supports CPUID instruction");
+          has_cpuid = true;
+        }
+      else
+        debug_printf ("processor does not support CPUID instruction");
+    }
+  if (has_cpuid)
+    {
+      unsigned maxf, unused[3];
+      cpuid (&maxf, &unused[0], &unused[1], &unused[2], 0);
+      maxf &= 0xffff;
+      if (maxf >= 1)
+        {
+          unsigned features;
+          cpuid (&data[0], &unused[0], &unused[1], &features, 1);
+          if (features & (1 << 18))
+            {
+              debug_printf ("processor has psn");
+              if (maxf >= 3)
+                {
+                  cpuid (&unused[0], &unused[1], &data[1], &data[2], 3);
+                  debug_printf ("Processor PSN: %04x-%04x-%04x-%04x-%04x-%04x",
+                                data[0] >> 16, data[0] & 0xffff, data[2] >> 16, data[2] & 0xffff, data[1] >> 16, data[1] & 0xffff);
+                }
+            }
+          else
+            debug_printf ("processor does not have psn");
+        }
+    }
+
+  UUID Uuid;
+  RPC_STATUS status = UuidCreateSequential (&Uuid);
+  if (GetLastError () == ERROR_PROC_NOT_FOUND)
+    status = UuidCreate (&Uuid);
+  if (status == RPC_S_OK)
+    {
+      data[4] = *(unsigned *)&Uuid.Data4[2];
+      data[5] = *(unsigned short *)&Uuid.Data4[6];
+      // Unfortunately Windows will sometimes pick a virtual Ethernet card
+      // e.g. VMWare Virtual Ethernet Adaptor
+      debug_printf ("MAC address of first Ethernet card: %02x:%02x:%02x:%02x:%02x:%02x",
+                    Uuid.Data4[2], Uuid.Data4[3], Uuid.Data4[4],
+                    Uuid.Data4[5], Uuid.Data4[6], Uuid.Data4[7]);
+    }
+  else
+    {
+      debug_printf ("no Ethernet card installed");
+    }
+
+  reg_key key (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE", "Microsoft", "Windows", "CurrentVersion", NULL);
+  key.get_string ("ProductId", (char *)&data[6], 24, "00000-000-0000000-00000");
+  debug_printf ("Windows Product ID: %s", (char *)&data[6]);
+
+  GetDiskFreeSpaceEx ("C:\\", NULL, (PULARGE_INTEGER) &data[11], NULL);
+  if (GetLastError () == ERROR_PROC_NOT_FOUND)
+    GetDiskFreeSpace ("C:\\", NULL, NULL, NULL, (DWORD *)&data[11]);
+
+  debug_printf ("hostid entropy: %08x %08x %08x %08x "
+                                "%08x %08x %08x %08x "
+                                "%08x %08x %08x %08x "
+                                "%08x",
+                                data[0], data[1],
+                                data[2], data[3],
+                                data[4], data[5],
+                                data[6], data[7],
+                                data[8], data[9],
+                                data[10], data[11],
+                                data[12]);
+
+  long hostid = 0x40291372;
+  // a random hashing algorithm
+  // dependancy on md5 is probably too costly
+  for (int i=0;i<13;i++)
+        hostid ^= ((data[i] << (i << 2)) | (data[i] >> (32 - (i << 2))));
+
+  debug_printf ("hostid: %08x", hostid);
+
+  return hostid;
 }

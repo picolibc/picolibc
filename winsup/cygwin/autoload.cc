@@ -523,4 +523,7 @@ LoadDLLfuncEx (timeGetDevCaps, 8, winmm, 1)
 LoadDLLfuncEx (timeGetTime, 0, winmm, 1)
 LoadDLLfuncEx (timeBeginPeriod, 4, winmm, 1)
 LoadDLLfuncEx (timeEndPeriod, 4, winmm, 1)
+
+LoadDLLfuncEx (UuidCreate, 4, rpcrt4, 1)
+LoadDLLfuncEx (UuidCreateSequential, 4, rpcrt4, 1)
 }

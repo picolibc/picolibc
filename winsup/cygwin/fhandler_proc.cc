@@ -28,6 +28,7 @@ details. */
 #include <sys/param.h>
 #include "ntdll.h"
 #include <winioctl.h>
+#include "cpuid.h"
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -549,37 +550,6 @@ format_proc_stat (char *destbuf, size_t maxsize)
 	  strcpy (bufptr, x), \
 	  bufptr += sizeof (x) - 1; \
 	} while (0)
-
-static inline void
-cpuid (unsigned *a, unsigned *b, unsigned *c, unsigned *d, unsigned in)
-{
-  asm ("cpuid"
-       : "=a" (*a),
-	 "=b" (*b),
-	 "=c" (*c),
-	 "=d" (*d)
-       : "a" (in));
-}
-
-static inline bool
-can_set_flag (unsigned flag)
-{
-  unsigned r1, r2;
-  asm("pushfl\n"
-      "popl %0\n"
-      "movl %0, %1\n"
-      "xorl %2, %0\n"
-      "pushl %0\n"
-      "popfl\n"
-      "pushfl\n"
-      "popl %0\n"
-      "pushl %1\n"
-      "popfl\n"
-      : "=&r" (r1), "=&r" (r2)
-      : "ir" (flag)
-  );
-  return ((r1 ^ r2) & flag) != 0;
-}
 
 static _off64_t
 format_proc_cpuinfo (char *destbuf, size_t maxsize)
