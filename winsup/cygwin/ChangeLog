@@ -1,3 +1,11 @@
+2003-09-08  Nicholas Wourms  <nwourms@netscape.net>
+
+	* cygwin.din: Export argz_add argz_add_sep argz_append argz_count
+	argz_create argz_create_sep argz_delete argz_extract argz_insert
+	argz_next argz_replace argz_stringify envz_add envz_entry envz_get
+	envz_merge envz_remove envz_strip
+	* include/cygwin/version.h: Bump api minor number.
+
 2003-09-07  Christopher Faylor  <cgf@redhat.com>
 
 	Throughout, remove __d_u.__d_data fields from DIR structure.

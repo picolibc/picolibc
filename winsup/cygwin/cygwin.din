@@ -141,6 +141,30 @@ alarm
 _alarm = alarm
 alphasort
 _alphasort = alphasort
+argz_add
+__argz_add = argz_add
+argz_add_sep
+__argz_add_sep = argz_add_sep
+argz_append
+__argz_append = argz_append
+argz_count
+__argz_count = argz_count
+argz_create
+__argz_create = argz_create
+argz_create_sep
+__argz_create_sep = argz_create_sep
+argz_delete
+__argz_delete = argz_delete
+argz_extract
+__argz_extract = argz_extract
+argz_insert
+__argz_insert = argz_insert
+argz_next
+__argz_next = argz_next
+argz_replace
+__argz_replace = argz_replace
+argz_stringify
+__argz_stringify = argz_stringify
 asctime
 _asctime = asctime
 asctime_r
@@ -362,6 +386,18 @@ endpwent
 _endpwent = endpwent
 endutent
 _endutent = endutent
+envz_add
+__envz_add = envz_add
+envz_entry
+__envz_entry = envz_entry
+envz_get
+__envz_get = envz_get
+envz_merge
+__envz_merge = envz_merge
+envz_remove
+__envz_remove = envz_remove
+envz_strip
+__envz_strip = envz_strip
 erand48
 _erand48 = erand48
 erf
