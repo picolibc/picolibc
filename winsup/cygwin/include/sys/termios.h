@@ -195,6 +195,14 @@ details. */
 
 #define NCCS		18
 
+/* `c_cc' member of 'struct termios' structure can be disabled by
+   using the value _POSIX_VDISABLE.  */
+#define	_POSIX_VDISABLE	'\0'
+
+/* Compare a character C to a value VAL from the `c_cc' array in a
+   `struct termios'.  If VAL is _POSIX_VDISABLE, no character can match it.  */
+#define CCEQ(val, c)	((c) == (val) && (val) != _POSIX_VDISABLE)
+
 typedef unsigned char cc_t;
 typedef unsigned int  tcflag_t;
 typedef unsigned int  speed_t;

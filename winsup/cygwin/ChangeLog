@@ -1,3 +1,10 @@
+2002-03-04  Christian Lestrade  <christian.lestrade@free.fr>
+
+	* include/sys/termios.h: Define _POSIX_VDISABLE.  Define CCEQ macro.
+	* fhandler_termios.cc: Include <sys/termios.h>.
+	(line_edit): Recognize disabled c_cc[] chars.  Ignore VDISCARD when
+	not in ICANON mode.
+
 2002-03-04  Dmitry Timoshkov  <dmitry@baikal.ru>
 
 	* syscalls.cc (truncate64): Use ftruncate64 directly to not lose
