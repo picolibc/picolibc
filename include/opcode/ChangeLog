@@ -1,3 +1,7 @@
+2001-11-29  Alexandre Oliva  <aoliva@redhat.com>
+
+	* d10v.h (OPERAND_SP): New macro.
+
 2001-11-15  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (struct powerpc_operand <insert, extract>): Add dialect param.

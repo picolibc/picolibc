@@ -181,6 +181,9 @@ extern const struct d10v_operand d10v_operands[];
 /* needed for rac/rachi */
 #define RESTRICTED_NUM3	(0x80000)
 
+/* Pre-decrement is only supported for SP.  */
+#define OPERAND_SP      (0x100000)
+
 /* Structure to hold information about predefined registers.  */
 struct pd_reg
 {
