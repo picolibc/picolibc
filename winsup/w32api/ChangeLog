@@ -1,3 +1,15 @@
+2003-08-22  Filip Navara  <xnavara@volny.cz>
+
+	* include/aclapi.h (BuildImpersonateExplicitAccessWithName[AW]):
+	Add prototypes.
+	BuildImpersonateTrustee[AW]): Add prototypes.
+	GetMultipleTrustee[AW]): Add prototypes.
+	GetMultipleTrusteeOperation[AW]): Add prototypes.
+
+2003-08-22   Danny Smith <dannysmith@users.sourceforge.net>
+
+        * include/winnt.h (IMAGE_SUBSYSTEM_XBOX): Add define. 
+
 2003-08-22  Mihai Preda <mihai_preda@users.sourceforge.net>
 
 	* include/shlobj.h (IPersistFolder::GetClassID):
