@@ -1,3 +1,7 @@
+Mon Mar 12 11:19:41 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* mkvers.sh: Include config.h so that DEBUGGING is correctly defined.
+
 Mon Mar 12 09:47:55 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* spawn.cc (spawn_guts): Don't set EXIT_REPARENTING if parent process
