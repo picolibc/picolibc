@@ -521,10 +521,12 @@ find <filename>mtpt</filename>.
 
 <screen>
 Usage ps [-aefl] [-u uid]
+  -a, -e   show processes of all users
   -f       show process uids, ppids
   -l       show process uids, ppids, pgids, winpids
-  -u uid   list processes owned by uid
-  -a, -e   show processes of all users
+  -s	   short process listing
+  -u uid   show processes owned by uid
+  -W	   show all windows processes, not just cygwin processes
 </screen>
 
 <para>The <command>ps</command> program gives the status of all the
@@ -571,11 +573,14 @@ table.</para>
 <screen>
 Usage strace [-m mask] [-o output-file] [ft] program [args...]
 
+-b n		  use buffer of size 'n' when writing output file
+-d		  include delta time in usecs for each line (default)
+-f		  follow all forks and execs
 -m mask		  mask for reporting cygwin events (default 1)
+-n		  convert Win32 error messages to text
 -o output-file	  output file to hold strace events (default stderr)
 -f		  follow forked subprocesses
--t		  convert Win32 error messages to text
--s		  remove mount point from system-wide registry location
+-u		  include time in usecs since start for each line (default)
 </screen>
 
 <para>The <command>strace</command> program executes a program, and
@@ -590,7 +595,7 @@ reported.  The valid bits to set are as follows:
 <screen>
   Bit			Explanation
 0x00000001		All strace output is collected
-0x00000002		Unusual or weird phenomenon
+0x00000008		Unusual or weird phenomenon
 0x00000010		System calls
 0x00000020		argv/envp printout at startup
 0x00000040		Information useful for DLL debugging

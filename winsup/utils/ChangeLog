@@ -1,3 +1,7 @@
+Sat Nov 18 23:53:59 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* utils.sgml: Document new options for ps and strace.
+
 Wed Nov  8 08:49:27 2000 Jason Tishler <jt@dothill.com>
 
 	* mount.cc (main): Call show_cygdrive_info instead of
