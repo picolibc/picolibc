@@ -1,3 +1,8 @@
+Tue May 30 16:58:33 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (mount_info::conv_to_win32_path): Previous patch was too
+	aggressive in adding a trailing slash.
+
 Mon May 29 20:31:01 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Remove libadvapi32.a.
@@ -73,7 +78,7 @@ Wed May 24 21:59:00 2000  Corinna Vinschen <corinna@vinschen.de>
 	* syscalls.cc (_cygwin_istext_for_stdio): New, for newlib
 	* include/cygwin/version.h: Bump API number for detect old
 	programs using old getc/putc macros
-      
+
 2000-05-23  DJ Delorie  <dj@cygnus.com>
 
 	* dir.cc (writable_directory): handle root directories

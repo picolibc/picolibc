@@ -1020,12 +1020,14 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
   else
     {
       int n = mi->native_pathlen;
-      memcpy (dst, mi->native_path, n);
+      memcpy (dst, mi->native_path, n + 1);
       char *p = pathbuf + mi->posix_pathlen;
-      if (!trailing_slash_p && isdrive (mi->native_path) && !mi->native_path[2])
-	trailing_slash_p = 1;
       if (!trailing_slash_p && !*p)
-	dst[n] = '\0';
+	{
+	  if (isdrive (dst) && !dst[2])
+	    dst[n++] = '\\';
+	  dst[n] = '\0';
+	}
       else
 	{
 	  /* Do not add trailing \ to UNC device names like \\.\a: */
