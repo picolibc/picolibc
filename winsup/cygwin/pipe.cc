@@ -133,9 +133,12 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
 int
 fhandler_pipe::dup (fhandler_base *child)
 {
-  int res = fhandler_base::dup (child);
-  if (res)
-    return res;
+  if (get_handle ())
+    {
+      int res = fhandler_base::dup (child);
+      if (res)
+	return res;
+    }
 
   fhandler_pipe *ftp = (fhandler_pipe *) child;
 

@@ -1,5 +1,10 @@
 2003-03-22  Christopher Faylor  <cgf@redhat.com>
 
+	* pipe.cc (fhandler_pipe::dup): Don't dup input_handle if it doesn't
+	exist.
+
+2003-03-22  Christopher Faylor  <cgf@redhat.com>
+
 	* syscalls.cc (unlink): Be more defensive when SetFileAttributes is
 	called.  Fix typo in debugging output.
 
