@@ -35,7 +35,7 @@ int vsscanf(const char * __restrict__ s, const char * __restrict__ format, va_li
     : "=a"(ret), "=c"(s), "=d"(format)
     : "1"(s), "2"(format), "S"(arg),
       "a"(&ret)
-    : "ebx");
+    : "ebx", "edi");
 
   return ret;
 }

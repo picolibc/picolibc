@@ -37,7 +37,7 @@ int vswscanf(const wchar_t * __restrict__ s, const wchar_t * __restrict__ format
     : "=a"(ret), "=c"(s), "=d"(format)
     : "1"(s), "2"(format), "S"(arg),
       "a"(&ret)
-    : "ebx");
+    : "ebx", "edi");
 
   return ret;
 }

@@ -1,9 +1,9 @@
 2004-07-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* mingwex/stdio/vsscanf: Add "edi" to registers-modified field
-	* mingwex/stdio/vfscanf: Likewise.
-	* mingwex/stdio/vswscanf: Likewise.
-	* mingwex/stdio/vfwscanf: Likewise.
+	* mingwex/stdio/vsscanf.c: Add "edi" to registers-modified field
+	* mingwex/stdio/vfscanf.c: Likewise.
+	* mingwex/stdio/vswscanf.c: Likewise.
+	* mingwex/stdio/vfwscanf.c: Likewise.
 
 2004-07-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
