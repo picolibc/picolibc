@@ -307,8 +307,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
 	buf->st_mode |= S_IFIFO;
       else if (pc->isdevice ())
 	{
-	  buf->st_mode |= dev.type == 'b' ? S_IFBLK : S_IFCHR;
 	  buf->st_dev = dev;
+	  buf->st_mode = dev.mode;
 	}
       else
 	{
