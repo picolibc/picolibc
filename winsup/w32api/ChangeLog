@@ -1,7 +1,11 @@
+2004-11-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ras.h (RASCONN[AW]): Remove dwSessionId field.
+
 2004-11-09  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/winnls.h (WINBASEAPI): Define as DECLSPEC_IMPORT.
-	if  undefined. and __W32API_USE_DLLIMPORT__.
+	* include/winnls.h (WINBASEAPI): Define as DECLSPEC_IMPORT
+	if  undefined and __W32API_USE_DLLIMPORT__.
 	Add WINBASEAPI token to prototypes, throughout.
 
 2004-11-08  Danny Smith  <dannysmith@users.sourceforge.net>

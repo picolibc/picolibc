@@ -234,7 +234,6 @@ typedef struct tagRASCONNW {
     GUID guidEntry;
 #endif
 #if (WINVER >= 0x501)
-    DWORD dwSessionId;
     DWORD dwFlags;
     LUID luid;
 #endif
@@ -256,7 +255,6 @@ typedef struct tagRASCONNA {
     GUID guidEntry;
 #endif
 #if (WINVER >= 0x501)
-    DWORD dwSessionId;
     DWORD dwFlags;
     LUID luid;
 #endif
