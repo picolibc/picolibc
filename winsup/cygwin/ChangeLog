@@ -1,5 +1,94 @@
 2002-09-21  Robert Collins <rbtcollins@hotmail.com>
 
+	* pthread.cc: Use class::call for converted pthread and semaphore
+	calls.
+	* thread.cc: Convert various __pthread_call and __sem_call to 
+	pthread::call and sem::call throughout.
+	* pthread.h (__pthread_cancel): Convert to pthread::cancel.
+	(__pthread_join): Convert to pthread::join.
+	(__pthread_detach): Convert to pthread::detach.
+	(__pthread_create): Convert to pthread::create.
+	(__pthread_once): Convert to pthread::once.
+	(__pthread_atfork): Convert to pthread::atfork.
+	(__pthread_suspend): Convert to pthread::suspend.
+	(__pthread_continue): Convert to pthread::resume.
+	(__sem_init): Convert to semaphore::init.
+	(__sem_destroy): Convert to semaphore::destroy.
+	(__sem_wait): Convert to semaphore::wait.
+	(__sem_trywait): Convert to semaphore::trywait.
+	(__sem_post): Convert to semaphore::post.
+
+2002-09-21  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc: Finish the removal of the separate pthread_key
+	destructor list.
+	Remove all pthread_key_destructor and pthread_key_destructor_list
+	references throughout.
+	(pthread::exit): Call the new pthread_key interface to activate
+	destructors.
+	(pthread_key::keys): Change into a list.
+	(pthread_key::saveAKey): New method, used via forEach.
+	(pthread_key::restoreAKey): Ditto.
+	(pthread_key::destroyAKey): Ditto.
+	(pthread_key::fixup_before_fork): Use the List::forEach functionality.
+	(pthread_key::fixup_after_fork): Ditto.
+	(pthread_key::runAllDestructors): New method implementation.
+	(pthread_key::pthread_key): Use List::Insert rather than custom list
+	code.
+	(pthread_key::~pthread_key): Use List::Remove for the same reason.
+	* thread.h: Remove all pthread_key_destructor and
+	pthread_key_destructor_list references throughout.
+	(List): Move the interface above pthread_key in the header.
+	Use atomic operations during insert and delete.
+	(List::forEach): A generic interface for doing something on each node.
+	(pthread_key::runAllDestructors): New method, run all destructors.
+	(pthread_key::fork_buf): Make private.
+	(pthread_key::run_destructor): Ditto.
+	(pthread_key::saveAKey): New method for clearer source.
+	(pthread_key::restoreAKey): Ditto.
+	(pthread_key::destroyAKey): Ditto.
+	(MTinterface::destructors): Remove.
+
+2002-09-21  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc: Partial refactoring of pthread_key destructor 
+	handling. Loosely based on Thomas Pfaff's work.
+	(pthread_key_destructor_list::Insert): Remove.
+	(pthread_key_destructor_list::Pop): Remove.
+	(pthread_key_destructor_list::IterateNull): Call the key's
+	run_destructor method.
+	(pthread_key::pthread_key): Initialize new member.
+	(pthread_key::get): Mark as const for correctness.
+	(pthread_key::run_destructor): Implement.
+	* thread.h (pthread_key::get): Mark as const for correctness.
+	(pthread_key::run_destructor): Declare.
+	(List): New template class that implements a generic list.
+	(pthread_key_destructor_list): Inherit from List, and remove
+	now duplicate functions.
+
+2002-09-21  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc: Change verifyable_object_isvalid calls with
+	PTHREAD_CONDATTR_MAGIC, PTHREAD_MUTEXATTR_MAGIC, PTHREAD_COND_MAGIC,
+	SEM_MAGIC to objecttype::isGoodObject() calls throughout.
+	(pthread_condattr::isGoodObject): Implement.
+	(pthread_mutex::isGoodInitializer): Implement.
+	(pthread_mutex::isGoodInitializerOrObject): Minor bugfix in the
+	check for verifyable_object_isvalid result.
+	(pthread_mutexattr::isGoodObject): Implement.
+	(pthread_cond::isGoodObject): Ditto.
+	(pthread_cond::isGoodInitializer): Ditto.
+	(pthread_cond::isGoodInitializerOrObject): Ditto.
+	(semaphore::isGoodObject): Ditto.
+	* thread.h (pthread_mutex::isGoodInitializer): Declare.
+	(pthread_condattr::isGoodObject): Ditto.
+	(pthread_cond::isGoodObject): Const correctness.
+	(pthread_cond::isGoodInitializer): Declare.
+	(pthread_cond::isGoodInitializerOrObject): Ditto.
+	(semaphore::isGoodObject): Const correctness.
+
+2002-09-21  Robert Collins <rbtcollins@hotmail.com>
+
 	* thread.cc: Change verifyable_object_isvalid calls with 
 	PTHREAD_MUTEX_MAGIC and PTHREAD_KEY_MAGIC and PTHREAD_ATTR_MAGIC to
 	::isGoodObject() calls throughout.
