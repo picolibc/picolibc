@@ -1249,13 +1249,16 @@ wait_subproc (VOID *)
 	    if ((rc = WaitForSingleObject (events[i], 0)) == WAIT_OBJECT_0 ||
 		rc == WAIT_TIMEOUT)
 	      continue;
+	    else if (i == 0)
+		system_printf ("nchildren %d, event[%d] %p, %E", nchildren, i, events[i]);
 	    else
 	      {
 		system_printf ("nchildren %d, event[%d] %p, pchildren[%d] %p, events[0] %p, %E",
 			       nchildren, i, events[i], i - 1, (_pinfo *) pchildren[i - 1], events[0]);
-		system_printf ("pid %d, dwProcessId %u, progname '%s'",
+		system_printf ("pid %d, dwProcessId %u, hProcess %p, progname '%s'",
 			       pchildren[i - 1]->pid, pchildren[i - 1]->dwProcessId,
-			       pchildren[i - 1]->progname);
+			       pchildren[i - 1]->hProcess, pchildren[i - 1]->progname);
+		Sleep (10000);
 	      }
 	  break;
 	}

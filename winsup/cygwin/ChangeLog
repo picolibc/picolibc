@@ -1,3 +1,7 @@
+Sun Nov  5 13:46:23 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo (wait_subproc): Son of neverending debug tweaking.
+
 Sun Nov  5 11:45:15 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo (wait_subproc): Neverending debug tweaking.
