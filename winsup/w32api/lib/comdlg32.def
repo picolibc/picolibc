@@ -17,6 +17,8 @@ LoadAlterBitmap@12
 PageSetupDlgA@4
 PageSetupDlgW@4
 PrintDlgA@4
+PrintDlgExA@4
+PrintDlgExW@4
 PrintDlgW@4
 ReplaceTextA@4
 ReplaceTextW@4

@@ -34,6 +34,9 @@ typedef enum tagOLEGETMONIKER {
 	OLEGETMONIKER_UNASSIGN,
 	OLEGETMONIKER_TEMPFORUSER
 } OLEGETMONIKER;
+#ifdef __GNUC__
+__extension__  /* IS0 C says enums limited to range of int */ 
+#endif
 typedef enum tagDROPEFFECT {
 	DROPEFFECT_NONE=0,
 	DROPEFFECT_COPY=1,

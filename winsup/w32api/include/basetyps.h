@@ -26,7 +26,11 @@
 #define PURE	=0
 #define THIS_
 #define THIS	void
-#if defined(__GNUC__) && !defined(NOCOMATTRIBUTE)
+/*
+ __attribute__((com_interface)) is obsolete in __GNUC__ >= 3
+ g++ vtables are now COM-compatible by default
+*/
+#if defined(__GNUC__) &&  __GNUC__ < 3 && !defined(NOCOMATTRIBUTE)
 #define DECLARE_INTERFACE(i) interface __attribute__((com_interface)) i
 #define DECLARE_INTERFACE_(i,b) interface __attribute__((com_interface)) i : public b
 #else

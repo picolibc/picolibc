@@ -171,6 +171,9 @@ typedef struct tagSAFEARRAY {
 	PVOID pvData;
 	SAFEARRAYBOUND rgsabound[1];
 }SAFEARRAY,*LPSAFEARRAY;
+#if defined (__GNUC__) && !defined (NONAMELESSUNION)
+__extension__   /* no named members  */
+#endif
 typedef struct tagVARIANT {
   _ANONYMOUS_UNION union {
 	struct __tagVARIANT {

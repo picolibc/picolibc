@@ -445,7 +445,7 @@ typedef IShellPropSheetExt *LPSHELLPROPSHEETEXT;
 
 #undef INTERFACE
 #define INTERFACE IExtractIcon
-DECLARE_INTERFACE_(IExtractIcon, IUnknown)  // exic
+DECLARE_INTERFACE_(IExtractIcon, IUnknown)  /* exic */
 {
 	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
 	STDMETHOD_(ULONG,AddRef)(THIS) PURE;

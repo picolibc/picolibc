@@ -426,6 +426,73 @@ typedef struct tagPDW {
 	HANDLE hPrintTemplate;
 	HANDLE hSetupTemplate;
 } PRINTDLGW,*LPPRINTDLGW;
+#if (WINVER >= 0x0500)
+/* We could  #include <unknwn.h> here but that would bring
+in a cascade of rpc dependencies */
+#ifndef __IUnknown_INTERFACE_DEFINED__
+#define __IUnknown_INTERFACE_DEFINED__
+#undef INTERFACE
+#define INTERFACE IUnknown
+DECLARE_INTERFACE(IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+};
+typedef IUnknown *LPUNKNOWN;
+#endif
+#include <prsht.h> /* for HPROPSHEETPAGE */
+typedef struct tagPRINTPAGERANGE {
+   DWORD  nFromPage;
+   DWORD  nToPage;
+} PRINTPAGERANGE, *LPPRINTPAGERANGE;
+typedef struct tagPDEXA {
+   DWORD lStructSize;
+   HWND hwndOwner;
+   HGLOBAL hDevMode;
+   HGLOBAL hDevNames;
+   HDC hDC;
+   DWORD Flags;
+   DWORD Flags2;
+   DWORD ExclusionFlags;
+   DWORD nPageRanges;
+   DWORD nMaxPageRanges;
+   LPPRINTPAGERANGE lpPageRanges;
+   DWORD nMinPage;
+   DWORD nMaxPage;
+   DWORD nCopies;
+   HINSTANCE hInstance;
+   LPCSTR lpPrintTemplateName;
+   LPUNKNOWN lpCallback;
+   DWORD nPropertyPages;
+   HPROPSHEETPAGE *lphPropertyPages;
+   DWORD nStartPage;
+   DWORD dwResultAction;
+} PRINTDLGEXA, *LPPRINTDLGEXA;
+typedef struct tagPDEXW {
+   DWORD lStructSize;
+   HWND hwndOwner;
+   HGLOBAL hDevMode;
+   HGLOBAL hDevNames;
+   HDC hDC;
+   DWORD Flags;
+   DWORD Flags2;
+   DWORD ExclusionFlags;
+   DWORD nPageRanges;
+   DWORD nMaxPageRanges;
+   LPPRINTPAGERANGE lpPageRanges;
+   DWORD nMinPage;
+   DWORD nMaxPage;
+   DWORD nCopies;
+   HINSTANCE hInstance;
+   LPCWSTR lpPrintTemplateName;
+   LPUNKNOWN lpCallback;
+   DWORD nPropertyPages;
+   HPROPSHEETPAGE *lphPropertyPages;
+   DWORD nStartPage;
+   DWORD dwResultAction;
+} PRINTDLGEXW, *LPPRINTDLGEXW;
+#endif /* WINVER >= 0x0500 */
 
 BOOL WINAPI ChooseColorA(LPCHOOSECOLORA);
 BOOL WINAPI ChooseColorW(LPCHOOSECOLORW);
@@ -446,6 +513,10 @@ BOOL WINAPI PrintDlgA(LPPRINTDLGA);
 BOOL WINAPI PrintDlgW(LPPRINTDLGW);
 HWND WINAPI ReplaceTextA(LPFINDREPLACEA);
 HWND WINAPI ReplaceTextW(LPFINDREPLACEW);
+#if (WINVER >= 0x0500) 
+HRESULT WINAPI PrintDlgExA(LPPRINTDLGEXA);
+HRESULT WINAPI PrintDlgExW(LPPRINTDLGEXW);
+#endif /* WINVER >= 0x0500 */
 
 #ifdef UNICODE
 #define LBSELCHSTRING  LBSELCHSTRINGW
@@ -471,7 +542,11 @@ typedef PRINTDLGW PRINTDLG,*LPPRINTDLG;
 #define PageSetupDlg PageSetupDlgW
 #define PrintDlg PrintDlgW
 #define ReplaceText ReplaceTextW
-#else
+#if (WINVER >= 0x0500) 
+typedef PRINTDLGEXW PRINTDLGEX, *LPPRINTDLGEX;
+#define PrintDlgEx PrintDlgExW
+#endif /* WINVER >= 0x0500 */
+#else /* UNICODE */
 #define LBSELCHSTRING  LBSELCHSTRINGA
 #define SHAREVISTRING  SHAREVISTRINGA
 #define FILEOKSTRING   FILEOKSTRINGA
@@ -495,7 +570,11 @@ typedef PRINTDLGA PRINTDLG,*LPPRINTDLG;
 #define PageSetupDlg PageSetupDlgA
 #define PrintDlg PrintDlgA
 #define ReplaceText ReplaceTextA
-#endif
+#if (WINVER >= 0x0500) 
+typedef PRINTDLGEXA PRINTDLGEX, *LPPRINTDLGEX;
+#define PrintDlgEx PrintDlgExA
+#endif /* WINVER >= 0x0500 */
+#endif /* UNICODE */
 #pragma pack(pop)
 #ifdef __cplusplus
 }

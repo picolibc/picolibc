@@ -1,8 +1,59 @@
+2001-11-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/basetyps.h (DECLARE_INTERFACE): Don't add
+	__attribute__((com_interface)) for __GNUC__ >= 3. 
+
+2001-11-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commdlg.h (PRINTPAGERANGE): Add structure
+	definition.
+	(PRINTDLGEX[AW]): Likewise.
+	(PrintDlgEx[AW]): Add function declaration.
+	* lib/comdlg32.def (PrintDlgEx[AW]): Add function stubs.
+	* ChangeLog: Fix typo in last entry.
+	
+
+2001-11-01  TAMURA Kent  <tkent@users.sourceforge.net>
+
+	* include/objbase.h (CoGetClassObject): Change third parameter
+	to COSERVERINFO*.
+
+2001-10-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (MOUSEEVENTF_WHEEL): Define.
+	Thanks to: Kim Saunders.
+	* include/oleauto.h: Define VARIANT* flags for VariantChangeType.
+	Thanks to: Pat Thoyts.
+	* include/winnt.h: Change C++ style comment to C style.
+ 	* include/shlobj.h: Ditto.
+	* include/objbase.h (enum tagCOINIT): Remove comma at end of
+	list.
+	* include/oledlg.h (enum tagOLEUIPASTEFLAG): Ditto.
+	* include/oleidl.h (enum tagDROPEFFECT): Mark as __extension__
+	(enum not limited to range of int).
+	* include/oaidl.h (struct tagVARIANT): Mark as __extension__
+	(struct with no named members), ifndef NONAMELESSUNION. 
+
+2001-10-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (CREATESTRUCT): UNICODE it.
+	(CBT_CREATEWND): Likewise.
+
 2001-10-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winnetwk.h (WNetGetResourceInformationA): Add declaration.
 	(WNetGetResourceInformationW): Ditto.
 	(WNetGetResourceInformation): Add define.
+
+2001-10-12  Pedro A Aranda  <paaguti@hotmail.com>
+
+	* include/winuser.h (POINTSTOPOINT): Use explicit casts
+	before extracting words.
+
+2001-10-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h: Add PF_* defines.
+	Thanks to: "Wizord"  <wizord@argoslabs.com>
 
 2001-09-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
