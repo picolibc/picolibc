@@ -1,3 +1,7 @@
+Sun Jul 23 23:11:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h: Add comment.
+
 Sun Jul 23 20:00:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_dev_raw): Add private member `varblkop'

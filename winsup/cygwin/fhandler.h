@@ -39,6 +39,8 @@ details. */
 
      fhandler_windows	  Windows messages I/O (fhandler_windows.cc)
 
+     fhandler_dev_random  /dev/[u]random implementation (fhandler_random.cc)
+
      fhandler_proc	  Interesting possibility, not implemented yet
 */
 
@@ -741,6 +743,7 @@ class fhandler_dev_random: public fhandler_base
 protected:
   int unit;
   HCRYPTPROV crypt_prov;
+
 public:
   fhandler_dev_random (const char *name, int unit);
   int get_unit () { return unit; }
