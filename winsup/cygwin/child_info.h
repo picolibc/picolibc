@@ -28,7 +28,7 @@ enum
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0xaec3
+#define CURR_CHILD_INFO_MAGIC 0x8b3c
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between

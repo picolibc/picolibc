@@ -1,5 +1,10 @@
 2002-06-05  Christopher Faylor  <cgf@redhat.com>
 
+	* child_info.h (CHILD_INFO_MAGIC): Oops.  Revert previous change.  gcc
+	3.1 bug?
+
+2002-06-05  Christopher Faylor  <cgf@redhat.com>
+
 	* child_info.h (CHILD_INFO_MAGIC): Update.
 
 2002-06-05  Christopher Faylor  <cgf@redhat.com>

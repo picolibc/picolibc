@@ -276,10 +276,10 @@ version.cc winver.o: winver_stamp
 	@ :
 
 shared_info_magic.h: cygmagic shared_info.h
-	/bin/sh ${word 1,$^} $@ "$(CXX) -x c++" ${word 2,$^} MOUNT_MAGIC 'class mount_info' SHARED_MAGIC 'class shared_info'
+	/bin/sh ${word 1,$^} $@ "$(CXX) -x c" ${word 2,$^} MOUNT_MAGIC 'class mount_info' SHARED_MAGIC 'class shared_info'
 
 child_info_magic.h: cygmagic child_info.h
-	/bin/sh ${word 1,$^} $@ "$(CXX) -x c++" ${word 2,$^} CHILD_INFO_MAGIC 'class child_info'
+	/bin/sh ${word 1,$^} $@ "$(CXX) -x c" ${word 2,$^} CHILD_INFO_MAGIC 'class child_info'
 
 dcrt0.o sigproc.o: child_info_magic.h
 
