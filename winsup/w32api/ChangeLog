@@ -1,3 +1,8 @@
+2003-03-15  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* winnt.h (JOBOBJECTINFOCLASS): Define enum.
+	(JOBOBJECT_*): Define corresponding structures.
+
 2003-03-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ddk/winddk.h (PCUNICODE_STRING): Remove incorrect
