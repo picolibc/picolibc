@@ -1,3 +1,10 @@
+Fri Apr 14 23:51:15 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_console.cc (keytable): Add support for keypad 5 key, which
+	MS seems to think is equivalent to VK_CLEAR.
+	* debug.cc (thread_stub): Eliminate initialization of reent stuff.
+	* init.cc (dll_entry): Move it here.
+
 Thu Apr 13 18:32:26 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (insert_file): Avoid freeing previously allocated argument

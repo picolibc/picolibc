@@ -83,16 +83,6 @@ thread_stub (VOID *arg)
   /* Give up our slot in the start_buf array */
   InterlockedExchange (&((thread_start *) arg)->notavail, 0);
 
-#ifdef _MT_SAFE
-  /* marco@ddi.nl: Needed for the reent's  of this local dll thread
-     I assume that the local threads are using the reent structure of
-     the main thread
-   */
-  if ( !TlsSetValue(user_data->threadinterface->reent_index,
-		    &user_data->threadinterface->reents) )
-	api_fatal(" Sig proc MT init failed\n");
-#endif
-
   /* Initialize this threads ability to respond to things like
      SIGSEGV or SIGFPE. */
   init_exceptions (&except_entry);

@@ -1255,6 +1255,7 @@ static struct {
   {VK_F11,	{"\033[23~",	NULL,		NULL,		NULL}},
   {VK_F12,	{"\033[24~",	NULL,		NULL,		NULL}},
   {VK_NUMPAD5,	{"\033[G",	NULL,		NULL,		NULL}},
+  {VK_CLEAR,	{"\033[G",	NULL,		NULL,		NULL}},
   {'6',		{NULL,		NULL,		"\036",		NULL}},
   {0,		{"",		NULL,		NULL,		NULL}}
 };
