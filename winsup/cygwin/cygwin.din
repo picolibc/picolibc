@@ -621,6 +621,8 @@ putchar_unlocked
 _putchar_unlocked = putchar_unlocked
 puts
 _puts = puts
+pututline
+_pututline = pututline
 putw
 _putw = putw
 qsort

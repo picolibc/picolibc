@@ -88,6 +88,7 @@ create_tty_master (int ttynum)
       cygwin_gethostname (our_utmp.ut_host, sizeof (our_utmp.ut_host));
       __small_sprintf (our_utmp.ut_line, "tty%d", ttynum);
       our_utmp.ut_type = USER_PROCESS;
+      our_utmp.ut_pid = myself->pid;
       myself->ctty = ttynum;
       login (&our_utmp);
     }

@@ -2427,15 +2427,8 @@ login (struct utmp *ut)
 {
   sigframe thisframe (mainthread);
   register int fd;
-  int currtty = ttyslot ();
 
-  if (currtty >= 0 && (fd = open (_PATH_UTMP, O_WRONLY | O_CREAT | O_BINARY,
-					 0644)) >= 0)
-    {
-      (void) lseek (fd, (long) (currtty * sizeof (struct utmp)), SEEK_SET);
-      (void) write (fd, (char *) ut, sizeof (struct utmp));
-      (void) close (fd);
-    }
+  pututline (ut);
   if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
     {
       (void) write (fd, (char *) ut, sizeof (struct utmp));
@@ -2516,7 +2509,7 @@ setutent ()
   sigframe thisframe (mainthread);
   if (utmp_fd == -2)
     {
-      utmp_fd = open (utmp_file, O_RDONLY);
+      utmp_fd = open (utmp_file, O_RDWR);
     }
   lseek (utmp_fd, 0, SEEK_SET);
 }
@@ -2525,8 +2518,11 @@ extern "C" void
 endutent ()
 {
   sigframe thisframe (mainthread);
-  close (utmp_fd);
-  utmp_fd = -2;
+  if (utmp_fd != -2)
+    {
+      close (utmp_fd);
+      utmp_fd = -2;
+    }
 }
 
 extern "C" void
@@ -2538,6 +2534,7 @@ utmpname (_CONST char *file)
       debug_printf ("Invalid file");
       return;
     }
+  endutent ();
   utmp_file = strdup (file);
   debug_printf ("New UTMP file: %s", utmp_file);
 }
@@ -2563,7 +2560,6 @@ getutid (struct utmp *id)
     {
       switch (id->ut_type)
 	{
-#if 0 /* Not available in Cygwin. */
 	case RUN_LVL:
 	case BOOT_TIME:
 	case OLD_TIME:
@@ -2571,12 +2567,11 @@ getutid (struct utmp *id)
 	  if (id->ut_type == utmp_data.ut_type)
 	    return &utmp_data;
 	  break;
-#endif
 	case INIT_PROCESS:
 	case LOGIN_PROCESS:
 	case USER_PROCESS:
 	case DEAD_PROCESS:
-	  if (id->ut_id == utmp_data.ut_id)
+   if (strncmp (id->ut_id, utmp_data.ut_id, 2) == 0)
 	    return &utmp_data;
 	  break;
 	default:
@@ -2601,4 +2596,19 @@ getutline (struct utmp *line)
 	return &utmp_data;
     }
   return NULL;
+}
+
+extern "C" void
+pututline (struct utmp *ut)
+{
+  sigframe thisframe (mainthread);
+  if (check_null_invalid_struct (ut))
+    return;
+  setutent ();
+  struct utmp *u;
+  if ((u = getutid (ut)))
+    lseek (utmp_fd, -sizeof(struct utmp), SEEK_CUR);
+  else
+    lseek (utmp_fd, 0, SEEK_END);
+  (void) write (utmp_fd, (char *) ut, sizeof (struct utmp));
 }

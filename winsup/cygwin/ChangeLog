@@ -1,3 +1,18 @@
+2002-11-06  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump API minor number for below export.
+
+2002-11-06  Sergey Okhapkin  <sos@prospect.com.ru>
+
+	* cygwin.din (pututline): New exported function.
+	* syscalls.cc (login): Use pututiline().
+	(setutent): Open utmp as read/write.
+	(endutent): Check if utmp file is open.
+	(utmpname): call endutent() to close current utmp file.
+	(getutid): Enable all cases, use strncmp() to compare ut_id fields.
+	(pututline): New.
+	* tty.cc (create_tty_master): Set ut_pid to current pid.
+
 2002-11-05  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_serial.cc (fhandler_serial::ioctl): Don't try to figure out
