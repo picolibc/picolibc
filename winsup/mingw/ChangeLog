@@ -1,3 +1,7 @@
+2004-08-08  Christopher Faylor  <cgf@timesys.com>
+
+	* mingwex/stdio/vwscanf.c: Add stdio.h needed after 2004-08-07 change.
+
 2004-08-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/complex.h:  Remove __attribute__ ((const)) from
