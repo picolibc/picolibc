@@ -1,3 +1,6 @@
+2004-04-20  DJ Delorie  <dj@redhat.com>
+
+	* internal.h (R_SECREL32): Add.
 
 For older changes see ChangeLog-9103
 
