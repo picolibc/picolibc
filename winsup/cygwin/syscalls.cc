@@ -2597,6 +2597,7 @@ utmpname (const char *file)
   utmp_file = strdup (file);
   debug_printf ("New UTMP file: %s", utmp_file);
 }
+EXPORT_ALIAS (utmpname, utmpxname)
 
 /* Note: do not make NO_COPY */
 static struct utmp utmp_data_buf[16];

@@ -17,7 +17,10 @@
 extern "C" {
 #endif
 
-#define ut_name ut_user
+#ifndef ut_name
+#define ut_name		ut_user
+#endif
+
 
 struct utmp 
 {

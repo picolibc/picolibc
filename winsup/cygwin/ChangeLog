@@ -1,3 +1,12 @@
+2005-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (utmpxname): Export.
+	* syscalls.cc (utmpxname): Create export alias to utmpname.
+	* include/utmpx.h: Define ut_name and ut_xtime if not already defined.
+	(utmpxname): Add prototype.
+	* include/sys/utmp.h: Only define ut_name if not already defined.
+	* include/cygwin/version.h: Bump API minor version.
+
 2005-03-03  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.cc (cygthread::detach): Use a slightly higher priority when

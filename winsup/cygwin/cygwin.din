@@ -1489,6 +1489,7 @@ utimes SIGFE
 _utimes = utimes SIGFE
 utmpname SIGFE
 _utmpname = utmpname SIGFE
+utmpxname SIGFE
 valloc SIGFE
 vasprintf SIGFE
 _vasprintf = vasprintf SIGFE

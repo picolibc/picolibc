@@ -32,12 +32,21 @@ struct utmpx
  struct timeval ut_tv;
 };
 
+#ifndef ut_name
+#define ut_name		ut_user
+#endif
+
+#ifndef ut_xtime
+#define ut_xtime	ut_tv.tv_sec
+#endif
+
 extern void endutxent (void);
 extern struct utmpx *getutxent (void);
 extern struct utmpx *getutxid (const struct utmpx *id);
 extern struct utmpx *getutxline (const struct utmpx *line);
 extern struct utmpx *pututxline (const struct utmpx *utmpx);
 extern void setutxent (void);
+extern void utmpxname (const char *file);
 
 #ifdef __cplusplus
 }

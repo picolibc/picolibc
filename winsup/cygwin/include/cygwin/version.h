@@ -249,12 +249,13 @@ details. */
       119: Export fdatasync.
       120: Export basename, dirname.
       122: Export statvfs, fstatvfs.
+      123: Export utmpxname.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 122
+#define CYGWIN_VERSION_API_MINOR 123
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
