@@ -92,7 +92,8 @@ static bool get_mem_values (DWORD dwProcessId, unsigned long *vmsize,
 			    unsigned long *vmshare);
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
- * -1 if path is a file, -2 if path is a symlink.
+ * -1 if path is a file, -2 if path is a symlink, -3 if path is a pipe,
+ * -4 if path is a socket.
  */
 int
 fhandler_process::exists ()
@@ -116,6 +117,15 @@ fhandler_process::exists ()
       fileid = PROCESS_FD;
       if (fill_filebuf ())
         return -2;
+      /* Check for nameless device entries. */
+      path = strrchr (path, '/');
+      if (path && *++path)
+        {
+	  if (!strncmp (path, "pipe:[", 6))
+	    return -3;
+	  else if (!strncmp (path, "socket:[", 8))
+	    return -4;
+	}
     }
   return 0;
 }
@@ -164,6 +174,16 @@ fhandler_process::fstat (struct __stat64 *buf)
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
+      return 0;
+    case -3:
+      buf->st_uid = p->uid;
+      buf->st_gid = p->gid;
+      buf->st_mode = S_IFIFO | S_IRUSR | S_IWUSR;
+      return 0;
+    case -4:
+      buf->st_uid = p->uid;
+      buf->st_gid = p->gid;
+      buf->st_mode = S_IFSOCK | S_IRUSR | S_IWUSR;
       return 0;
     case -1:
     default:
@@ -269,6 +289,12 @@ fhandler_process::open (int flags, mode_t mode)
 	  goto out;
 	}
     }
+  if (process_file_no == PROCESS_FD)
+    {
+      set_errno (EISDIR);
+      res = 0;
+      goto out;
+    }
   if (flags & O_WRONLY)
     {
       set_errno (EROFS);
@@ -338,8 +364,8 @@ fhandler_process::fill_filebuf ()
 	    filebuf = p->fd (fd, fs);
 	    if (!filebuf || !*filebuf)
 	      {
-		filebuf = strdup ("<disconnected>");
-		fs = strlen (filebuf) + 1;
+		set_errno (ENOENT);
+		return false;
 	      }
 	  }
 	filesize = fs;

@@ -35,6 +35,13 @@ fhandler_pipe::fhandler_pipe ()
 {
 }
 
+int
+fhandler_pipe::open (int flags, mode_t mode)
+{
+  set_errno (ENXIO);
+  return 0;
+}
+
 _off64_t
 fhandler_pipe::lseek (_off64_t offset, int whence)
 {

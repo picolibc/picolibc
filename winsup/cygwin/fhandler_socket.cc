@@ -149,11 +149,15 @@ fhandler_socket::~fhandler_socket ()
 
 char *fhandler_socket::get_proc_fd_name (char *buf)
 {
-  if (get_sun_path ())
-    __small_sprintf (buf, "%s", get_sun_path ());
-  else
-    __small_sprintf (buf, "socket:[%d]", get_socket ());
+  __small_sprintf (buf, "socket:[%d]", get_socket ());
   return buf;
+}
+
+int
+fhandler_socket::open (int flags, mode_t mode)
+{
+  set_errno (ENXIO);
+  return 0;
 }
 
 void
@@ -385,20 +389,9 @@ fhandler_socket::fstat (struct __stat64 *buf)
   int res = fhandler_base::fstat (buf);
   if (!res)
     {
-      if (get_socket_type ()) /* fstat */
-	{
-	  buf->st_dev = 0;
-	  buf->st_ino = (__ino64_t) ((DWORD) get_handle ());
-	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
-	}
-      else
-	{
-	  path_conv spc ("/dev", PC_SYM_NOFOLLOW | PC_NULLEMPTY, NULL);
-	  buf->st_dev = spc.volser ();
-	  buf->st_ino = get_namehash ();
-	  buf->st_mode &= ~S_IRWXO;
-	  buf->st_rdev = (get_device () << 16) | get_unit ();
-	}
+      buf->st_dev = 0;
+      buf->st_ino = (__ino64_t) ((DWORD) get_handle ());
+      buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
     }
   return res;
 }

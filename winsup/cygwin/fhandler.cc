@@ -160,8 +160,7 @@ char *fhandler_base::get_proc_fd_name (char *buf)
     return strcpy (buf, get_name ());
   if (dev ().name)
     return strcpy (buf, dev ().name);
-  __small_sprintf (buf, "device:[%d:%d]", get_major (), get_minor ());
-  return buf;
+  return strcpy (buf, "");
 }
 
 /* Detect if we are sitting at EOF for conditions where Windows

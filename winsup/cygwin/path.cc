@@ -95,7 +95,7 @@ struct symlink_info
   _minor_t minor;
   _mode_t mode;
   int check (char *path, const suffix_info *suffixes, unsigned opt);
-  int set (char *path, int type);
+  int set (char *path);
   bool parse_device (const char *);
   bool case_check (char *path);
 };
@@ -617,10 +617,10 @@ path_conv::check (const char *src, unsigned opt,
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
 	      fhandler_virtual *fh = (fhandler_virtual *) build_fh_dev (dev, path_copy);
 	      int file_type = fh->exists ();
-	      if (file_type == -2 || file_type == -3)
+	      if (file_type == -2)
 	        {
 		  fh->fill_filebuf ();
-		  symlen = sym.set (fh->get_filebuf (), file_type);
+		  symlen = sym.set (fh->get_filebuf ());
 		}
 	      delete fh;
 	      switch (file_type)
@@ -632,9 +632,16 @@ path_conv::check (const char *src, unsigned opt,
 		  case -1:
 		    fileattr = 0;
 		    break;
-		  case -2:	/* /proc/<pid>/symlinks */
-		  case -3:	/* /proc/self */
+		  case -2:	/* /proc/self or /proc/<pid>/symlinks */
 		    goto is_virtual_symlink;
+		  case -3:	/* /proc/<pid>/fd/pipe:[] */
+		    fileattr = 0;
+		    dev.parse (FH_PIPE);
+		    break;
+		  case -4:	/* /proc/<pid>/fd/socket:[] */
+		    fileattr = 0;
+		    dev.parse (FH_TCP);
+		    break;
 		  default:
 		    fileattr = INVALID_FILE_ATTRIBUTES;
 		    goto virtual_component_retry;
@@ -678,7 +685,16 @@ is_virtual_symlink:
 	    }
 
 	  if (sym.pflags & PATH_SOCKET)
-	    dev.setfs (1);
+	    {
+	      if (component)
+		{
+		  error = ENOTDIR;
+		  return;
+		}
+	      fileattr = 0;
+	      dev.parse (FH_UNIX);
+	      goto out;
+	    }
 
 	  if (sym.case_clash)
 	    {
@@ -3142,7 +3158,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 /* "path" is the path in a virtual symlink.  Set a symlink_info struct from
    that and proceed with further path checking afterwards. */
 int
-symlink_info::set (char *path, int type)
+symlink_info::set (char *path)
 {
   strcpy (contents, path);
   pflags = PATH_SYMLINK;

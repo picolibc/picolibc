@@ -1,3 +1,29 @@
+2005-02-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::get_proc_fd_name): Don't generate
+	"device:" entry.
+	* fhandler.h (fhandler_socket::open): New method.
+	(fhandler_pipe::open): New method.
+	* fhandler_proc.cc (fhandler_proc::exists): Return -2 in case of
+	/proc/self.
+	* fhandler_process.cc (fhandler_process::exists): Return -2 in
+	case of symlinks, -3 for pipes and -4 for sockets.
+	(fhandler_process::fstat): Handle pipes and sockets.
+	(fhandler_process::open): Handle opening /proc/<pid>/fd.
+	(fhandler_process::fill_filebuf): Generate empty names for
+	non exisiting file descriptors.
+	* fhandler_socket.cc (fhandler_socket::get_proc_fd_name): Always
+	generate "socket:[number]" strings as on Linux.
+	(fhandler_socket::open): New method.
+	(fhandler_socket::fstat): Always return socket type.
+	* path.cc (symlink_info::set): Remove unused second parameter.
+	(path_conv::check): Handle pipes and sockets in /proc.
+	Set correct device type for AF_LOCAL sockets.
+	* pinfo.cc (_pinfo::commune_recv): Generate empty names for
+	non exisiting file descriptors.
+	(_pinfo::fd): Ditto.
+	* pipe.cc (fhandler_pipe::open): New method.
+
 2005-01-31  Christopher Faylor  <cgf@timesys.com>
 
 	* path.h (path_conv::set_name): Declare new function.

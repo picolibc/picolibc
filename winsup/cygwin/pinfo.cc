@@ -521,7 +521,7 @@ _pinfo::commune_recv ()
 	unsigned int n;
 	cygheap_fdget cfd (fd);
 	if (cfd < 0)
-	  n = strlen (strcpy (path, "<disconnected>")) + 1;
+	  n = strlen (strcpy (path, "")) + 1;
 	else
 	  n = strlen (cfd->get_proc_fd_name (path)) + 1;
 	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
@@ -756,7 +756,7 @@ _pinfo::fd (int fd, size_t &n)
     {
       cygheap_fdget cfd (fd);
       if (cfd < 0)
-	s = strdup ("<disconnected>");
+	s = strdup ("");
       else
 	s = cfd->get_proc_fd_name ((char *) malloc (CYG_MAX_PATH + 1));
       n = strlen (s) + 1;

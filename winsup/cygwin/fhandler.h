@@ -377,6 +377,7 @@ class fhandler_socket: public fhandler_base
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
 
+  int open (int flags, mode_t mode = 0);
   ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   int recvfrom (void *ptr, size_t len, int flags,
 		struct sockaddr *from, int *fromlen);
@@ -438,6 +439,7 @@ public:
   char *get_proc_fd_name (char *buf);
   void set_close_on_exec (bool val);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
+  int open (int flags, mode_t mode = 0);
   int close ();
   void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
   int dup (fhandler_base *child);
