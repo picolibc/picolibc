@@ -53,9 +53,9 @@
 #ifdef __weak_alias
 __weak_alias(getopt,_getopt)
 #endif
-int __declspec(dllexport) opterr;	/* if error message should be printed */
-int __declspec(dllexport) optind;	/* index into parent argv vector */
-int __declspec(dllexport) optopt;	/* character checked for validity */
+int __declspec(dllexport) opterr = 1;	/* if error message should be printed */
+int __declspec(dllexport) optind = 1;	/* index into parent argv vector */
+int __declspec(dllexport) optopt = '?';	/* character checked for validity */
 int __declspec(dllexport) optreset;	/* reset getopt */
 char __declspec(dllexport) *optarg;	/* argument associated with option */
 #endif

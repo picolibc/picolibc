@@ -27,6 +27,7 @@ details. */
 #include "ntdll.h"
 #include "cygthread.h"
 #include "shared_info.h"
+#include "cygheap.h"
 
 static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
