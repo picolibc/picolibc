@@ -65,6 +65,7 @@
 #define __attribute_pure__
 #define __attribute_format_strfmon__(a,b)
 #define __flexarr      [0]
+#define __restrict_arr
 
 #ifdef  __cplusplus
 # define __BEGIN_DECLS  extern "C" {
@@ -79,6 +80,7 @@
 # define __unbounded    /* nothing */
 # define __ptrvalue     /* nothing */
 #endif
+
 
 #ifdef __GNUC__
 #define	__strong_reference(sym,aliassym)	\

@@ -10,6 +10,7 @@ SUBLIBS = \
 	$(LINUX_MACH_LIB)
 
 LIB_SOURCES = \
+	aio.c \
 	brk.c \
 	cfspeed.c \
 	clock_getres.c \

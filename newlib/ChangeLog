@@ -1,3 +1,17 @@
+2002-06-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/sys/_types.h: Define _ssize_t as int if int is
+        32-bits, otherwise define it as long.
+        * libc/include/sys/types.h: Include <_ansi.h> and <sys/_types.h>
+        and define ssize_t as _ssize_t.
+        * libc/reent/readr.c: Change return type to _ssize_t.
+        * libc/reent/writer.c: Ditto.
+        * libc/sys/linux/Makefile.am: Add aio.c.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/aio.c: New file.
+        * libc/sys/linux/sys/cdefs.h: Add __restrict_arr definition.
+        * libm/common/fdlibm.h: Undef __P before defining it.
+
 2002-06-27  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libm/mathfp/s_pow.c (pow): Fix checks on variable k.  Add

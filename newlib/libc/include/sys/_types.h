@@ -10,6 +10,11 @@
 #define _SYS__TYPES_H
 
 typedef long _off_t;
+
+#if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
+typedef int _ssize_t;
+#else
 typedef long _ssize_t;
+#endif
 
 #endif	/* _SYS__TYPES_H */

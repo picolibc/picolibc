@@ -18,6 +18,9 @@
 #ifndef _SYS_TYPES_H
 #define _SYS_TYPES_H
 
+#include <_ansi.h>
+#include <sys/_types.h>
+
 #if defined (_WIN32) || defined (__CYGWIN__)
 #define __MS_types__
 #endif
@@ -158,7 +161,7 @@ typedef	unsigned short	gid_t;
 
 typedef int pid_t;
 typedef	long key_t;
-typedef long ssize_t;
+typedef _ssize_t ssize_t;
 
 #ifdef __MS_types__
 typedef	char *	addr_t;
