@@ -1,3 +1,8 @@
+2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* tty.cc (tty::common_init): Reverse logic of cygserver check in
+	call to SetKernelObjectSecurity.
+
 2002-07-03  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* autoload.cc (WSAEventSelect): Define new autoload function.

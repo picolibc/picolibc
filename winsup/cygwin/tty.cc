@@ -399,7 +399,7 @@ tty::common_init (fhandler_pty_master *ptym)
   /* FIXME: we shold NOT set the security wide open when the
      daemon is running
    */
-  if (wincap.has_security () && cygserver_running==CYGSERVER_OK &&
+  if (wincap.has_security () && cygserver_running != CYGSERVER_OK &&
       (SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION,
 			       get_null_sd ()) == FALSE))
     system_printf ("Can't set process security, %E");
