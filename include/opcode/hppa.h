@@ -71,7 +71,7 @@ struct pa_opcode
    In the args field, the following characters are unused:
 
 	'  "#  &     -  /   34 6789:;< > @'
-	' BC      JKLM          XYZ[\]  '
+	' BC      JKLM          XY [\]  '
 	'   de gh   lm           y { } '
 
    Here are all the characters:
@@ -140,6 +140,7 @@ Also these:
    Q	5 bit immediate value at 10 (a bit position specified in
 	the bb instruction. It's the same as r above, except the
         value is in a different location)
+   Z    %r1 -- implicit target of addil instruction.
 
 Completer operands all have 'c' as the prefix:
 
@@ -354,6 +355,7 @@ static const struct pa_opcode pa_opcodes[] =
 /* Immediate instructions.  */
 { "ldo",	0x34000000, 0xfc00c000, "j(b),x", pa10},
 { "ldil",	0x20000000, 0xfc000000, "k,b", pa10},
+{ "addil",	0x28000000, 0xfc000000, "k,b,Z", pa10},
 { "addil",	0x28000000, 0xfc000000, "k,b", pa10},
 
 /* Branching instructions. */
