@@ -556,7 +556,7 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
   char *dst_start = dst;
 
   syscall_printf ("cwd %s, src %s", cwd, src);
-  if (isdrive (src) || strpbrk (src, "\\:/"))
+  if (isdrive (src) || strpbrk (src, "\\:"))
     {
       cygwin_conv_to_full_posix_path (src, dst);
       return 0;
