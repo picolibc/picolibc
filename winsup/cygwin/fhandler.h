@@ -400,15 +400,15 @@ class fhandler_socket: public fhandler_base
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
 
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   int recvfrom (void *ptr, size_t len, int flags,
 		struct sockaddr *from, int *fromlen);
-  int recvmsg (struct msghdr *msg, int flags);
+  int recvmsg (struct msghdr *msg, int flags, ssize_t tot = -1);
 
-  int write (const void *ptr, size_t len);
+  ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   int sendto (const void *ptr, size_t len, int flags,
 	      const struct sockaddr *to, int tolen);
-  int sendmsg (const struct msghdr *msg, int flags);
+  int sendmsg (const struct msghdr *msg, int flags, ssize_t tot = -1);
 
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, void *);

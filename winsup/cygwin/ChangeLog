@@ -1,3 +1,21 @@
+2002-09-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler.h (fhandler_socket::read): Remove method.
+	(fhandler_socket::write): Ditto.
+	(fhandler_socket::readv): New method.
+	(fhandler_socket::writev): Ditto.
+	(fhandler_socket::recvmsg): Add new optional argument.
+	(fhandler_socket::sendmsg): Ditto.
+	* fhandler.cc (fhandler_socket::read): Remove method.
+	(fhandler_socket::write): Ditto.
+	(fhandler_socket::readv): New method.
+	(fhandler_socket::writev): Ditto.
+	(fhandler_socket::recvmsg): Use win32's scatter/gather IO where
+	possible.
+	(fhandler_socket::sendmsg): Ditto.
+	* net.cc (cygwin_recvmsg): Check the msghdr's iovec fields.
+	(cygwin_sendmsg): Ditto.  Add omitted sigframe.
+
 2002-09-02  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* cygwin.din: Revert exporting new wchar functions.
