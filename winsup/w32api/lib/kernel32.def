@@ -782,7 +782,7 @@ VDMConsoleOperation@8
 VDMOperationStarted@4
 VerLanguageNameA@12
 VerLanguageNameW@12
-VerSetConditionMask@13
+VerSetConditionMask@16
 VerifyConsoleIoHandle@4
 VerifyVersionInfoA@16
 VerifyVersionInfoW@16
