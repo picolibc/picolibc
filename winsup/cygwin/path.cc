@@ -2313,8 +2313,7 @@ mount_item::init (const char *native, const char *posix, unsigned mountflags)
    that will cause paths under win32_path to be translated to paths
    under posix_path. */
 
-extern "C"
-int
+extern "C" int
 mount (const char *win32_path, const char *posix_path, unsigned flags)
 {
   int res = -1;
@@ -2339,8 +2338,7 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
    mount from the user or global mount registry table, assume the user
    table. */
 
-extern "C"
-int
+extern "C" int
 umount (const char *path)
 {
   return cygwin_umount (path, 0);
@@ -2350,8 +2348,7 @@ umount (const char *path)
    parameter that specifies whether to umount from the user or system-wide
    registry area. */
 
-extern "C"
-int
+extern "C" int
 cygwin_umount (const char *path, unsigned flags)
 {
   int res = -1;
@@ -2372,8 +2369,7 @@ cygwin_umount (const char *path, unsigned flags)
   return res;
 }
 
-extern "C"
-FILE *
+extern "C" FILE *
 setmntent (const char *filep, const char *)
 {
   iteration = 0;
@@ -2381,15 +2377,13 @@ setmntent (const char *filep, const char *)
   return (FILE *) filep;
 }
 
-extern "C"
-struct mntent *
+extern "C" struct mntent *
 getmntent (FILE *)
 {
   return mount_table->getmntent (iteration++);
 }
 
-extern "C"
-int
+extern "C" int
 endmntent (FILE *)
 {
   return 1;
@@ -2425,8 +2419,7 @@ set_symlink_ea (const char* frompath, const char* topath)
    as normal files with magic number and system bit set. */
 int allow_winsymlinks = TRUE;
 
-extern "C"
-int
+extern "C" int
 symlink (const char *topath, const char *frompath)
 {
   HANDLE h;
@@ -2914,8 +2907,7 @@ symlink_info::case_check (char *path)
 
 /* readlink system call */
 
-extern "C"
-int
+extern "C" int
 readlink (const char *path, char *buf, int buflen)
 {
   extern suffix_info stat_suffixes[];
@@ -3033,8 +3025,7 @@ getcwd (char *buf, size_t ulen)
 }
 
 /* getwd: standards? */
-extern "C"
-char *
+extern "C" char *
 getwd (char *buf)
 {
   return getcwd (buf, MAX_PATH);
@@ -3132,8 +3123,7 @@ chdir (const char *in_dir)
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 fchdir (int fd)
 {
   int res;
@@ -3154,8 +3144,7 @@ fchdir (int fd)
 /* Cover functions to the path conversion routines.
    These are exported to the world as cygwin_foo by cygwin.din.  */
 
-extern "C"
-int
+extern "C" int
 cygwin_conv_to_win32_path (const char *path, char *win32_path)
 {
   path_conv p (path, PC_SYM_FOLLOW);
@@ -3169,8 +3158,7 @@ cygwin_conv_to_win32_path (const char *path, char *win32_path)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
 {
   path_conv p (path, PC_SYM_FOLLOW | PC_FULL);
@@ -3186,8 +3174,7 @@ cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
 
 /* This is exported to the world as cygwin_foo by cygwin.din.  */
 
-extern "C"
-int
+extern "C" int
 cygwin_conv_to_posix_path (const char *path, char *posix_path)
 {
   if (check_null_empty_str_errno (path))
@@ -3196,8 +3183,7 @@ cygwin_conv_to_posix_path (const char *path, char *posix_path)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 {
   if (check_null_empty_str_errno (path))
@@ -3208,8 +3194,7 @@ cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 
 /* The realpath function is supported on some UNIX systems.  */
 
-extern "C"
-char *
+extern "C" char *
 realpath (const char *path, char *resolved)
 {
   int err;
@@ -3249,8 +3234,7 @@ DOCTOOL-START
 DOCTOOL-END
   */
 
-extern "C"
-int
+extern "C" int
 cygwin_posix_path_list_p (const char *path)
 {
   int posix_p = !(strchr (path, ';') || isdrive (path));
@@ -3291,30 +3275,26 @@ conv_path_list_buf_size (const char *path_list, int to_posix_p)
   return size;
 }
 
-extern "C"
-int
+extern "C" int
 cygwin_win32_to_posix_path_list_buf_size (const char *path_list)
 {
   return conv_path_list_buf_size (path_list, 1);
 }
 
-extern "C"
-int
+extern "C" int
 cygwin_posix_to_win32_path_list_buf_size (const char *path_list)
 {
   return conv_path_list_buf_size (path_list, 0);
 }
 
-extern "C"
-int
+extern "C" int
 cygwin_win32_to_posix_path_list (const char *win32, char *posix)
 {
   conv_path_list (win32, posix, 1);
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 cygwin_posix_to_win32_path_list (const char *posix, char *win32)
 {
   conv_path_list (posix, win32, 0);
@@ -3340,8 +3320,7 @@ cygwin_posix_to_win32_path_list (const char *posix, char *win32)
    c:/foo -> `c:/' / `foo'
  */
 
-extern "C"
-void
+extern "C" void
 cygwin_split_path (const char *path, char *dir, char *file)
 {
   int dir_started_p = 0;
