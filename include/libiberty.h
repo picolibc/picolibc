@@ -90,6 +90,33 @@ extern const char *lbasename PARAMS ((const char *));
 
 extern char *concat PARAMS ((const char *, ...)) ATTRIBUTE_MALLOC;
 
+/* Determine the length of concatenating an arbitrary number of
+   strings, up to (char *) NULL.  */
+
+extern unsigned long concat_length PARAMS ((const char *, ...));
+
+/* Concatenate an arbitrary number of strings into a SUPPLIED area of
+   memory, up to (char *) NULL.  The supplied memory is assumed to be
+   large enough.  */
+
+extern char *concat_copy PARAMS ((char *, const char *, ...));
+
+/* Concatenate an arbitrary number of strings into a GLOBAL area of
+   memory, up to (char *) NULL.  The supplied memory is assumed to be
+   large enough.  */
+
+extern char *concat_copy2 PARAMS ((const char *, ...));
+
+/* This is the global area used by concat_copy2.  */
+
+extern char *libiberty_concat_ptr;
+
+/* Concatenate an arbitrary number of strings, up to (char *) NULL.
+   Allocates memory using alloca.  Arguments are evaluated twice!.  */
+#define ACONCAT(ACONCAT_PARAMS) \
+  (libiberty_concat_ptr = alloca (concat_length ACONCAT_PARAMS + 1), \
+   concat_copy2 ACONCAT_PARAMS)
+
 /* Check whether two file descriptors refer to the same file.  */
 
 extern int fdmatch PARAMS ((int fd1, int fd2));
@@ -246,12 +273,25 @@ extern PTR C_alloca PARAMS((size_t));
 #if GCC_VERSION >= 2000 && !defined USE_C_ALLOCA
 # define alloca(x) __builtin_alloca(x)
 # undef C_ALLOCA
+# define ASTRDUP(X) \
+  (__extension__ ({ const char *const libiberty_optr = (X); \
+   const unsigned long libiberty_len = strlen (libiberty_optr) + 1; \
+   char *const libiberty_nptr = alloca (libiberty_len); \
+   (char *) memcpy (libiberty_nptr, libiberty_optr, libiberty_len); }))
 #else
 # define alloca(x) C_alloca(x)
 # undef USE_C_ALLOCA
 # define USE_C_ALLOCA 1
 # undef C_ALLOCA
 # define C_ALLOCA 1
+extern const char *libiberty_optr;
+extern char *libiberty_nptr;
+extern unsigned long libiberty_len;
+# define ASTRDUP(X) \
+  (libiberty_optr = (X), \
+   libiberty_len = strlen (libiberty_optr) + 1, \
+   libiberty_nptr = alloca (libiberty_len), \
+   (char *) memcpy (libiberty_nptr, libiberty_optr, libiberty_len))
 #endif
 
 #ifdef __cplusplus
