@@ -1,3 +1,14 @@
+2002-04-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wtypes.h (enum tagCLSCTX): Change formatting.
+
+2002-04-02  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* include/objidl.h (IRunningObjectTable.Register): Correct
+	prototype.
+	* include/wtypes.h (ROTFLAGS_REGISTRATIONKEEPSALIVE,
+	ROTFLAGS_ALLOWANYCLIENT): Add defines.
+
 2002-03-31  Victor Porton  <porton@narod.ru>
 
 	* include/shellapi.h (SHGFI_ATTR_SPECIFIED): Add define.

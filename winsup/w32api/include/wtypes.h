@@ -15,6 +15,9 @@ extern "C" {
 #define CBPCLIPDATA(d) ((d).cbSize-sizeof((d).ulClipFmt))
 #define DECIMAL_NEG ((BYTE)0x80)
 #define DECIMAL_SETZERO(d) {(d).Lo64=(d).Hi32=(d).signscale=0;}
+#define ROTFLAGS_REGISTRATIONKEEPSALIVE	0x01
+#define ROTFLAGS_ALLOWANYCLIENT		0x02
+
 #ifndef __BLOB_T_DEFINED /* also in winsock2.h */
 #define __BLOB_T_DEFINED
 typedef struct _BLOB {
@@ -49,8 +52,7 @@ typedef enum tagMSHCTX {
 	MSHCTX_DIFFERENTMACHINE,
 	MSHCTX_INPROC
 } MSHCTX;
-typedef
-enum tagCLSCTX {
+typedef enum tagCLSCTX {
 	CLSCTX_INPROC_SERVER=1,CLSCTX_INPROC_HANDLER=2,CLSCTX_LOCAL_SERVER=4,
 	CLSCTX_INPROC_SERVER16=8,CLSCTX_REMOTE_SERVER=16
 } CLSCTX;
