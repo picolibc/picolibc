@@ -80,6 +80,8 @@ client_request_shm::serve (transport_layer_base *const conn,
     }
   /* Early revert_to_self since IPC code runs in kernel mode. */
   conn->revert_to_self ();
+  /* sysv_shm.cc takes care of itself. */
+  client->release ();
   thread td = { client, &_parameters.in.ipcblk, {0, 0} };
   int res;
   shmop_t shmop = _parameters.in.shmop; /* Get's overwritten otherwise. */
@@ -110,7 +112,6 @@ client_request_shm::serve (transport_layer_base *const conn,
   /* Allocated by the call to adjust_identity_info(). */
   if (_parameters.in.ipcblk.gidlist)
     free (_parameters.in.ipcblk.gidlist);
-  client->release ();
   error_code (res);
   if (shmop == SHMOP_shmat)
     _parameters.out.ptr = td.td_retval[0];

@@ -69,10 +69,12 @@ process::process (const pid_t cygpid, const DWORD winpid, HANDLE signal_arrived)
 		       GetLastError ());
     }
   InitializeCriticalSection (&_access);
+  debug ("initialized (%lu)", _cygpid);
 }
 
 process::~process ()
 {
+  debug ("deleting (%lu)", _cygpid);
   DeleteCriticalSection (&_access);
   CloseHandle (_signal_arrived);
   CloseHandle (_hProcess);
@@ -105,7 +107,7 @@ process::add (cleanup_routine *const entry)
   assert (entry);
 
   bool res = false;
-  EnterCriticalSection (&_access);
+  hold ();
 
   if (!_cleaning_up)
     {
@@ -114,7 +116,7 @@ process::add (cleanup_routine *const entry)
       res = true;
     }
 
-  LeaveCriticalSection (&_access);
+  release ();
   return res;
 }
 
@@ -124,7 +126,7 @@ process::remove (const cleanup_routine *const entry)
   assert (entry);
 
   bool res = false;
-  EnterCriticalSection (&_access);
+  hold ();
 
   if (!_cleaning_up)
     {
@@ -148,7 +150,7 @@ process::remove (const cleanup_routine *const entry)
 	}
     }
 
-  LeaveCriticalSection (&_access);
+  release ();
   return res;
 }
 
@@ -159,13 +161,13 @@ process::remove (const cleanup_routine *const entry)
 void
 process::cleanup ()
 {
-  EnterCriticalSection (&_access);
+  hold ();
   assert (!is_active ());
   assert (!_cleaning_up);
   InterlockedExchange (&_cleaning_up, true);
   cleanup_routine *entry = _routines_head;
   _routines_head = NULL;
-  LeaveCriticalSection (&_access);
+  release ();
 
   while (entry)
     {
@@ -275,7 +277,7 @@ process_cache::process (const pid_t cygpid, const DWORD winpid,
       SetEvent (_cache_add_trigger);
     }
 
-  EnterCriticalSection (&entry->_access); // To be released by the caller.
+  entry->hold (); // To be released by the caller.
   LeaveCriticalSection (&_cache_write_access);
   assert (entry);
   assert (entry->_winpid == winpid);

@@ -65,6 +65,9 @@ private:
 
 class process_cache;
 
+#define hold()		_hold(__FILE__,__LINE__)
+#define release()	_release(__FILE__,__LINE__)
+
 class process
 {
   friend class process_cache;
@@ -82,8 +85,15 @@ public:
 
   bool is_active () const { return _exit_status == STILL_ACTIVE; }
 
-  void hold () { EnterCriticalSection (&_access); }
-  void release () { LeaveCriticalSection (&_access); }
+  void _hold (const char *file, int line) {
+    _log (file, line, LOG_DEBUG, "Try hold(%lu)", _cygpid);
+    EnterCriticalSection (&_access);
+    _log (file, line, LOG_DEBUG, "holding (%lu)", _cygpid);
+  }
+  void _release (const char *file, int line) {
+    _log (file, line, LOG_DEBUG, "leaving (%lu)", _cygpid);
+    LeaveCriticalSection (&_access);
+  }
 
   bool add (cleanup_routine *);
   bool remove (const cleanup_routine *);

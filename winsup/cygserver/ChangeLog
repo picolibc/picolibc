@@ -1,3 +1,17 @@
+2004-10-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (_msleep): Simplify event creation.  Revert change from
+	2004-08-24.  It should be unnecessary now.
+	* msg.cc (client_request_msg::serve): Release process critical
+	section as early as possible.
+	* sem.cc (client_request_sem::serve): Ditto.
+	* shm.cc (client_request_shm::serve): Ditto.
+	* process.cc: Use hold and release method calls instead of
+	EnterCriticalSection/LeaveCriticalSection calls throughout.
+	* process.h (_hold): Rename from hold.  Take filename and linenumber
+	parameter for logging.  Define matching hold macro.
+	(release): Ditto.
+
 2004-10-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sysv_sem.cc: Update to FreeBSD version 1.69.

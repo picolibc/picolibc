@@ -72,6 +72,7 @@ client_request_msg::serve (transport_layer_base *const conn,
     }
   if (!adjust_identity_info (&_parameters.in.ipcblk))
     {
+      client->release ();
       conn->revert_to_self ();
       error_code (EACCES);
       msglen (0);
@@ -79,6 +80,8 @@ client_request_msg::serve (transport_layer_base *const conn,
     }
   /* Early revert_to_self since IPC code runs in kernel mode. */
   conn->revert_to_self ();
+  /* sysv_msg.cc takes care of itself. */
+  client->release ();
   thread td = { client, &_parameters.in.ipcblk, {-1, -1} };
   int res;
   msgop_t msgop = _parameters.in.msgop; /* Get's overwritten otherwise. */
@@ -104,7 +107,6 @@ client_request_msg::serve (transport_layer_base *const conn,
   /* Allocated by the call to adjust_identity_info(). */
   if (_parameters.in.ipcblk.gidlist)
     free (_parameters.in.ipcblk.gidlist);
-  client->release ();
   error_code (res);
   if (msgop == MSGOP_msgrcv)
     _parameters.out.rcv = td.td_retval[0];

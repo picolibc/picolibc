@@ -77,6 +77,8 @@ client_request_sem::serve (transport_layer_base *const conn,
     }
   /* Early revert_to_self since IPC code runs in kernel mode. */
   conn->revert_to_self ();
+  /* sysv_sem.cc takes care of itself. */
+  client->release ();
   thread td = { client, &_parameters.in.ipcblk, {-1, -1} };
   int res;
   switch (_parameters.in.semop)
@@ -98,7 +100,6 @@ client_request_sem::serve (transport_layer_base *const conn,
   /* Allocated by the call to adjust_identity_info(). */
   if (_parameters.in.ipcblk.gidlist)
     free (_parameters.in.ipcblk.gidlist);
-  client->release ();
   error_code (res);
   _parameters.out.ret = td.td_retval[0];
   msglen (sizeof (_parameters.out));

@@ -180,9 +180,7 @@ _msleep (void *ident, struct mtx *mtx, int priority,
   int ret = -1;
   char name[64];
   msleep_event_name (ident, name);
-  HANDLE evt = OpenEvent (EVENT_ALL_ACCESS, FALSE, name);
-  if (!evt)
-    evt = CreateEvent (NULL, TRUE, FALSE, name);
+  HANDLE evt = CreateEvent (NULL, TRUE, FALSE, name);
   if (!evt)
     panic ("CreateEvent in msleep (%s) failed: %E", wmesg);
   if (mtx)
@@ -201,7 +199,6 @@ _msleep (void *ident, struct mtx *mtx, int priority,
   if ((priority & PCATCH)
       && td->client->signal_arrived () != INVALID_HANDLE_VALUE)
     obj_cnt = 4;
-  td->client->release ();
   switch (WaitForMultipleObjects (obj_cnt, obj, FALSE, timo ?: INFINITE))
     {
       case WAIT_OBJECT_0:	/* wakeup() has been called. */
@@ -233,7 +230,6 @@ _msleep (void *ident, struct mtx *mtx, int priority,
   ResetEvent (evt);
 #endif
   CloseHandle (evt);
-  td->client->hold ();
   set_priority (old_priority);
   if (mtx && !(priority & PDROP))
     mtx_lock (mtx);
