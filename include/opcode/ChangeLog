@@ -1,3 +1,10 @@
+2000-05-16  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cgen.h (CGEN_MAX_SYNTAX_BYTES): Increase to 32.  Check that
+	it exceeds CGEN_ACTUAL_MAX_SYNTAX_BYTES, if set.
+	(CGEN_MAX_IFMT_OPERANDS): Increase to 16.  Check that it exceeds
+	CGEN_ACTUAL_MAX_IFMT_OPERANDS, if set.
+
 2000-05-13  Alan Modra  <alan@linuxcare.com.au>,
 
 	* i386.h (i386_optab): Cpu686 for sysenter,sysexit,fxsave,fxrestore.
