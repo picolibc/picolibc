@@ -1988,15 +1988,22 @@ fhandler_socket::fcntl (int cmd, void *arg)
   switch (cmd)
     {
     case F_SETFL:
-      request = ((int) arg & O_NONBLOCK) ? 1 : 0;
-      current = (get_flags () & O_NONBLOCK) ? 1 : 0;
-      if (request != current && (res = ioctl (FIONBIO, &request)))
+      {
+        /* Care for the old O_NDELAY flag. If one of the flags is set,
+           both flags are set. */
+        int new_flags = (int) arg;
+        if (new_flags & (O_NONBLOCK | OLD_O_NDELAY))
+          new_flags |= O_NONBLOCK | OLD_O_NDELAY;
+        request = (new_flags & O_NONBLOCK) ? 1 : 0;
+        current = (get_flags () & O_NONBLOCK) ? 1 : 0;
+        if (request != current && (res = ioctl (FIONBIO, &request)))
+          break;
+        if (request)
+          set_flags (get_flags () | O_NONBLOCK | OLD_O_NDELAY);
+        else
+          set_flags (get_flags () & ~(O_NONBLOCK | OLD_O_NDELAY));
         break;
-      if (request)
-        set_flags (get_flags () | O_NONBLOCK);
-      else
-        set_flags (get_flags () & ~O_NONBLOCK);
-      break;
+      }
     default:
       res = fhandler_base::fcntl (cmd, arg);
       break;

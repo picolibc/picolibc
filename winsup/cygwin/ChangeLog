@@ -1,3 +1,9 @@
+Wed Oct 25 10:43:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::fcntl): Treat O_NONBLOCK and OLD_O_NDELAY
+	as exactly the same. If one is set, both are set.
+	* net.cc (fhandler_socket::fcntl): Ditto.
+
 Tue Oct 24 23:58:35 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (do_exit): Remove debugging statement.

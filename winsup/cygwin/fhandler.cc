@@ -1021,12 +1021,17 @@ int fhandler_base::fcntl (int cmd, void *arg)
 	 * Each other flag will be ignored.
 	 * Since O_ASYNC isn't defined in fcntl.h it's currently
 	 * ignored as well.
-	 * There's no functionality at all, so...
 	 */
         const int allowed_flags = O_APPEND | O_NONBLOCK | OLD_O_NDELAY;
 
+        /* Care for the old O_NDELAY flag. If one of the flags is set,
+           both flags are set. */
+	int new_flags = (int) arg;
+        if (new_flags & (O_NONBLOCK | OLD_O_NDELAY))
+          new_flags |= O_NONBLOCK | OLD_O_NDELAY;
+
         int flags = get_flags () & ~allowed_flags;
-        set_flags (flags | ((int)arg & allowed_flags));
+        set_flags (flags | (new_flags & allowed_flags));
       }
       res = 0;
       break;
