@@ -616,6 +616,8 @@ in MS IP stack but may not be implemented in other vendors' stacks.
 @item endgrent
 @item endhostent
 @item facl
+@item fcloseall
+@item fcloseall_r
 @item ffs
 @item fstatfs
 @item ftime
