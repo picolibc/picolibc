@@ -535,7 +535,6 @@ ALL_MODULES = \
 	all-bison \
 	all-byacc \
 	all-bzip2 \
-	all-cgen \
 	all-cvssrc \
 	all-db \
 	all-dejagnu \
@@ -616,7 +615,6 @@ CROSS_CHECK_MODULES = \
 	check-bfd \
 	check-binutils \
 	check-bzip2 \
-	check-cgen \
 	check-cvssrc \
 	check-db \
 	check-dejagnu \
@@ -689,7 +687,6 @@ INSTALL_MODULES = \
 	install-binutils \
 	install-bison \
 	install-byacc \
-	install-cgen \
 	install-cvssrc \
 	install-db \
 	install-dejagnu \
@@ -869,7 +866,6 @@ CLEAN_MODULES = \
 	clean-bison \
 	clean-byacc \
 	clean-bzip2 \
-	clean-cgen \
 	clean-cvssrc \
 	clean-db \
 	clean-dejagnu \
@@ -1714,7 +1710,6 @@ configure-target-bsp: $(ALL_GCC_C)
 all-target-bsp: configure-target-bsp
 all-byacc:
 all-bzip2:
-all-cgen: all-libiberty
 all-cvssrc:
 configure-target-cygmon: $(ALL_GCC_C)
 all-target-cygmon: configure-target-cygmon all-target-libiberty all-target-libstub all-target-bsp
@@ -1781,7 +1776,7 @@ configure-target-newlib: $(ALL_GCC)
 all-target-newlib: configure-target-newlib
 configure-target-libtermcap: $(ALL_GCC_C)
 all-target-libtermcap: configure-target-libtermcap
-all-opcodes: all-bfd all-libiberty all-cgen
+all-opcodes: all-bfd all-libiberty
 all-patch: all-libiberty
 all-perl:
 all-prms: all-libiberty
@@ -1794,7 +1789,7 @@ all-sed: all-libiberty
 all-send-pr: all-prms
 all-shellutils:
 all-sid: all-tcl all-tk
-all-sim: all-libiberty all-bfd all-opcodes all-readline all-cgen
+all-sim: all-libiberty all-bfd all-opcodes all-readline
 all-snavigator: all-tcl all-tk all-itcl all-tix all-db all-grep all-libgui
 all-tar: all-libiberty
 all-tcl:

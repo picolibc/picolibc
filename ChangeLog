@@ -1,13 +1,22 @@
+2002-06-24  Ben Elliston  <bje@redhat.com>
+
+	* configure.in (host_tools): Remove cgen.
+
+	* Makefile.in (all-cgen): Remove; runs from its source directory.
+	(check-cgen, install-cgen, clean-cgen): Likewise.
+	(all-opcodes): No not depend on all-cgen.
+	(all-sim): Likewise.
+
 2002-06-22  Nathanael Nerode  <neroden@twcny.rr.com>
 
 	* configure.in: Fix AIX configury bug.
 
 2002-06-19  Nathanael Nerode  <neroden@twcny.rr.com>
 
-	* configure.in: replace ${topsrcdir} with ${srcdir}
+	* configure.in: Replace ${topsrcdir} with ${srcdir}.
 
-	* configure.in: Move definition of libstdcxx_flags
-	right above usage, rather than waaay earlier.
+	* configure.in: Move definition of libstdcxx_flags right above
+	usage, rather than way earlier.
 
 	* configure.in: Pull definition of is_cross_compiler earlier.
 
