@@ -109,7 +109,7 @@ INSTALL_DATA = $(INSTALL) -m 644
 AS = @AS@
 AR = @AR@
 AR_FLAGS = rc
-CC = cc
+CC = @CC@
 
 # Special variables passed down in EXTRA_GCC_FLAGS.  They are defined
 # here so that they can be overridden by Makefile fragments.
@@ -117,9 +117,8 @@ BUILD_CC = $(CC_FOR_BUILD)
 BUILD_PREFIX = @BUILD_PREFIX@
 BUILD_PREFIX_1 = @BUILD_PREFIX_1@
 
-# These flag values are normally overridden by the configure script.
-CFLAGS = -g
-CXXFLAGS = -g -O2
+CFLAGS = @CFLAGS@
+CXXFLAGS = @CXXFLAGS@
 
 LDFLAGS = 
 LIBCFLAGS = $(CFLAGS)
@@ -134,7 +133,7 @@ LIBCFLAGS_FOR_TARGET = $(CFLAGS_FOR_TARGET)
 PICFLAG = 
 PICFLAG_FOR_TARGET = 
 
-CXX = c++
+CXX = @CXX@
 
 # Use -O2 to stress test the compiler.
 LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates

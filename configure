@@ -1279,34 +1279,10 @@ if [ -f ${srcdir}/${Makefile_in} ] ; then
       -e "s|@oldincludedir@|${oldincludedir}|" \
       -e "s|@infodir@|${infodir}|" \
       -e "s|@mandir@|${mandir}|" \
-      -e "/^CC[ 	]*=/{
-          :loop1
-          /\\\\$/ N
-          s/\\\\\\n//g
-          t loop1
-          s%^CC[ 	]*=.*$%CC = ${CC}%
-          }" \
-      -e "/^CXX[ 	]*=/{
-          :loop2
-          /\\\\$/ N
-          s/\\\\\\n//g
-          t loop2
-          s%^CXX[ 	]*=.*$%CXX = ${CXX}%
-          }" \
-      -e "/^CFLAGS[ 	]*=/{
-          :loop3
-          /\\\\$/ N
-          s/\\\\\\n//g
-          t loop3
-          s%^CFLAGS[ 	]*=.*$%CFLAGS = ${CFLAGS}%
-          }" \
-      -e "/^CXXFLAGS[ 	]*=/{
-          :loop4
-          /\\\\$/ N
-          s/\\\\\\n//g
-          t loop4
-          s%^CXXFLAGS[ 	]*=.*$%CXXFLAGS = ${CXXFLAGS}%
-          }" \
+      -e "s|@CC@|${CC}|" \
+      -e "s|@CXX@|${CXX}|" \
+      -e "s|@CC@|${CFLAGS}|" \
+      -e "s|@CXXFLAGS@|${CXXFLAGS}|" \
       -e "s|@config_shell@|${config_shell}|" \
       -e "s|@srcdir@|${srcdir}|" \
       -e "s///" \

@@ -1,7 +1,13 @@
-2002-12-06  DJ Delorie  <dj@redhat.com>
+2002-12-10  Nathanael Nerode  <neroden@gcc.gnu.org>
 
-	* Makefile.tpl: Change configure dependencies to not have real
-	targets depend on phony targets.
+	* Makefile.tpl: Substitute more autoconfily.
+	* configure: Substitute more autoconfily.
+	* Makefile.in: Regenerate.
+
+2002-12-08  Andrew Cagney  <ac131313@redhat.com>
+
+	* Makefile.tpl (all-sim): Depend on maybe-configure-gdb.
+	* Makefile.in (all-sim): Ditto.
 
 2002-12-06  DJ Delorie  <dj@redhat.com>
 
