@@ -981,6 +981,8 @@ fhandler_base::fstat (struct __stat64 *buf, path_conv *)
       break;
     }
 
+  buf->st_uid = geteuid32 ();
+  buf->st_gid = getegid32 ();
   buf->st_nlink = 1;
   buf->st_blksize = S_BLKSIZE;
   time_as_timestruc_t (&buf->st_ctim);

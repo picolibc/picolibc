@@ -444,8 +444,6 @@ fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
 	  buf->st_dev = 0;
 	  buf->st_ino = (ino_t) get_handle ();
 	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
-	  buf->st_uid = geteuid32 ();
-	  buf->st_gid = getegid32 ();
 	}
       else
 	{

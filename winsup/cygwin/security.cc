@@ -1322,9 +1322,6 @@ static int
 get_nt_attribute (const char *file, mode_t *attribute,
 		  __uid32_t *uidret, __gid32_t *gidret)
 {
-  if (!wincap.has_security ())
-    return 0;
-
   syscall_printf ("file: %s", file);
 
   /* Yeah, sounds too much, but I've seen SDs of 2100 bytes! */
@@ -1391,7 +1388,7 @@ get_file_attribute (int use_ntsec, const char *file,
 {
   int res;
 
-  if (use_ntsec && allow_ntsec)
+  if (use_ntsec && allow_ntsec && wincap.has_security ())
     {
       res = get_nt_attribute (file, attribute, uidret, gidret);
       if (res)
@@ -1437,9 +1434,6 @@ static int
 get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 			 mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
-  if (!wincap.has_security ())
-    return 0;
-
   PSECURITY_DESCRIPTOR psd = NULL;
   cygpsid owner_sid;
   cygpsid group_sid;
@@ -1548,7 +1542,7 @@ int
 get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 		      mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
-  if (allow_ntsec)
+  if (allow_ntsec && wincap.has_security ())
     {
       int res = get_nt_object_attribute (handle, object_type, attribute,
 					 uidret, gidret);
