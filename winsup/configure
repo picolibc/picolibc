@@ -916,7 +916,10 @@ fi
 CXXFLAGS='$(CFLAGS)'
 
 
-SUBDIRS='w32api cygwin mingw'
+SUBDIRS='cygwin'
+test -d $srcdir/w32api && SUBDIRS="w32api $SUBDIRS"
+test -d $srcdir/mingw && SUBDIRS="$SUBDIRS mingw"
+
 case "$with_cross_host" in
   ""|*cygwin*)
     test -d $srcdir/bz2lib && SUBDIRS="$SUBDIRS bz2lib"
@@ -931,7 +934,7 @@ subdirs="$SUBDIRS"
 
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:935: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:938: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6

@@ -66,7 +66,10 @@ AC_CANONICAL_SYSTEM
 LIB_AC_PROG_CC
 LIB_AC_PROG_CXX
 
-SUBDIRS='w32api cygwin mingw'
+SUBDIRS='cygwin'
+test -d $srcdir/w32api && SUBDIRS="w32api $SUBDIRS"
+test -d $srcdir/mingw && SUBDIRS="$SUBDIRS mingw"
+
 case "$with_cross_host" in
   ""|*cygwin*)
     test -d $srcdir/bz2lib && SUBDIRS="$SUBDIRS bz2lib"

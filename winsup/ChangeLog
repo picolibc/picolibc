@@ -1,3 +1,8 @@
+2002-02-19  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Avoid building w32api or mingw if they don't exist.
+	* configure: Regenerate.
+
 2001-12-18  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Don't attempt to use zlib directory as a dependency if
