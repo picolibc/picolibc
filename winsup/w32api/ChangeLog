@@ -1,5 +1,11 @@
 2003-01-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/winnt.h (GetCurrentFiber): Remove blank input field in
+	asm code.
+	(GetFiberData): Likewise.
+
+2003-01-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/winerror.h (ERROR_DIFFERENT_SERVICE_ACCOUNT,
 	ERROR_EXE_MACHINE_TYPE_MISMATCH, ERROR_HOOK_TYPE_NOT_ALLOWED,
 	ERROR_INVALID_KEYBOARD_HANDLE, ERROR_INVALID_PRINT_MONITOR,
