@@ -1,3 +1,11 @@
+2002-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/grp.h: Include Cygwin specific header.
+	* libc/include/sys/stat.h: Ditto.  Don't define `struct stat'
+	when compiling for Cygwin.
+	* libc/include/sys/types.h: Don't define off_t, uid_t
+	and gid_t when compiling for Cygwin.
+
 2002-02-08  matthew green  <mrg@redhat.com>
 
 	* libc/include/sys/reent.h (_REENT_CHECK_EMERGENCY): Allocate

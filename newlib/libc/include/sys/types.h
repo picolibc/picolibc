@@ -128,10 +128,13 @@ typedef unsigned long long dev_t;
 typedef	short	dev_t;
 #endif
 
-typedef	long	off_t;
+#ifndef __CYGWIN__	/* which defines these types in it's own types.h. */
+typedef long		off_t;
 
 typedef	unsigned short	uid_t;
 typedef	unsigned short	gid_t;
+#endif
+
 typedef int pid_t;
 typedef	long key_t;
 typedef long ssize_t;

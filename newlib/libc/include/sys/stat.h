@@ -22,6 +22,9 @@ extern "C" {
    sizes of any of the basic types change (short, int, long) [via a compile
    time option].  */
 
+#ifdef __CYGWIN__
+#include <cygwin/stat.h>
+#else
 struct	stat 
 {
   dev_t		st_dev;
@@ -49,6 +52,7 @@ struct	stat
   long	st_spare4[2];
 #endif
 };
+#endif
 
 #define	_IFMT		0170000	/* type of file */
 #define		_IFDIR	0040000	/* directory */

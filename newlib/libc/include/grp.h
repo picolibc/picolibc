@@ -44,6 +44,9 @@
 #define	_GRP_H_
 
 #include <sys/types.h>
+#ifdef __CYGWIN__
+#include <cygwin/grp.h>
+#endif
 
 #if !defined(_POSIX_SOURCE) && !defined(_XOPEN_SOURCE)
 #define	_PATH_GROUP		"/etc/group"
@@ -55,7 +58,6 @@ struct group {
 	gid_t	gr_gid;			/* group id */
 	char	**gr_mem;		/* group members */
 };
-
 
 #ifdef __cplusplus
 extern "C" {
