@@ -1536,9 +1536,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
   /* Check for current user first */
   if (uid == myself->uid)
     owner_sid = cygheap->user.sid ();
-  else if (uid == cygheap->user.orig_uid)
-    owner_sid = cygheap->user.orig_sid ();
-  if (!owner_sid)
+  else
     {
       /* Otherwise retrieve user data from /etc/passwd */
       struct passwd *pw = getpwuid32 (uid);
@@ -1559,12 +1557,17 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 
   /* Get SID of new group. */
   cygsid group_sid (NO_SID);
-  struct __group32 *grp = getgrgid32 (gid);
-  if (!grp)
-    debug_printf ("no /etc/group entry for %d", gid);
-  else if (!group_sid.getfromgr (grp))
-    debug_printf ("no SID for group %d", gid);
-
+  /* Check for current user first */
+  if (gid == myself->gid)
+    group_sid = cygheap->user.groups.pgsid;
+  else
+   {
+      struct __group32 *grp = getgrgid32 (gid);
+      if (!grp)
+	debug_printf ("no /etc/group entry for %d", gid);
+      else if (!group_sid.getfromgr (grp))
+	debug_printf ("no SID for group %d", gid);
+   }
   /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;
   PSECURITY_DESCRIPTOR psd = NULL;

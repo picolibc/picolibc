@@ -162,14 +162,17 @@ cygsid::get_id (BOOL search_grp, int *type)
       if (!search_grp)
 	{
 	  struct passwd *pw;
-	  for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
-	    {
-	      if (sid.getfrompw (pw) && sid == psid)
-		{
-		  id = pw->pw_uid;
-		  break;
-		}
-	    }
+	 if (EqualSid(psid, cygheap->user.sid ()))
+	   id = myself->uid;
+	 else
+	   for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
+	     {
+	       if (sid.getfrompw (pw) && sid == psid)
+		 {
+		   id = pw->pw_uid;
+		   break;
+		 }
+	     }
 	  if (id >= 0)
 	    {
 	      if (type)
@@ -180,14 +183,17 @@ cygsid::get_id (BOOL search_grp, int *type)
       if (search_grp || type)
 	{
 	  struct __group32 *gr;
-	  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-	    {
-	      if (sid.getfromgr (gr) && sid == psid)
-		{
-		  id = gr->gr_gid;
-		  break;
-		}
-	    }
+	 if (cygheap->user.groups.pgsid == psid)
+	   id = myself->gid;
+	 else
+	   for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+	     {
+	       if (sid.getfromgr (gr) && sid == psid)
+		 {
+		   id = gr->gr_gid;
+		   break;
+		 }
+	     }
 	  if (id >= 0)
 	    {
 	      if (type)

@@ -1,3 +1,11 @@
+2002-10-22  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* sec_helper.cc (cygsid::get_id): If the sid matches a sid stored in
+	cygheap->user, return the uid or gid from myself.
+	* security.cc (alloc_sd): If gid == myself->gid, return the group sid
+	from cygheap->user.  Remove the test for uid == original_uid, which is
+	counter-productive.
+
 2002-10-22  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.cc (cygheap_fixup_in_child): Use user_heap element in
