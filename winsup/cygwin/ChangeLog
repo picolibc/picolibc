@@ -2,6 +2,7 @@
 
 	* spawn.cc (spawn_guts): Change type back to 'int' after erroneous
 	change below.
+	* wait.cc (wait4): Move sawsig initialization inside loop.
 
 2003-12-07  Christopher Faylor  <cgf@redhat.com>
 
