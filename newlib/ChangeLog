@@ -1,3 +1,8 @@
+2003-01-31  Michael Snyder  <msnyder@redhat.com>
+
+	* libc/sys/h8300hms/crt0.S (_start): Change local label
+	from .loop to .Loop, so that ld and gdb will ignore it.
+
 2003-01-29  Jason Tishler  <jason@tishler.net>
 
 	* libc/include/time.h: Declare nanosleep() under Cygwin.

@@ -9,10 +9,10 @@ _start:
 	mov.w	#_edata,r0
 	mov.w	#_end,r1
 	sub.w   r2,r2
-.loop:	mov.w	r2,@r0
+.Loop:	mov.w	r2,@r0
 	adds	#2,r0
 	cmp	r1,r0
-	blo	.loop
+	blo	.Loop
 #ifdef __ELF__
 	mov.l   #__fini,r0
 	jsr     @_atexit
@@ -38,10 +38,10 @@ _start:
 	mov.l	#_edata,er0
 	mov.l	#_end,er1
 	sub.w   r2,r2           ; not sure about alignment requirements
-.loop:	mov.w	r2,@er0		; playing it safe for now
+.Loop:	mov.w	r2,@er0		; playing it safe for now
 	adds	#2,er0
 	cmp.l	er1,er0
-	blo	.loop
+	blo	.Loop
 #ifdef __ELF__
 	mov.l   #__fini,r0
 	jsr     @_atexit
@@ -67,10 +67,10 @@ _start:
 	mov.l	#_edata,er0
 	mov.l	#_end,er1
 	sub.w   r2,r2           ; not sure about alignment requirements
-.loop:	mov.w	r2,@er0		; playing it safe for now
+.Loop:	mov.w	r2,@er0		; playing it safe for now
 	adds	#2,er0
 	cmp.l	er1,er0
-	blo	.loop
+	blo	.Loop
 #ifdef __ELF__
 	mov.l   #__fini,r0
 	jsr     @_atexit
