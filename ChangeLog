@@ -1,3 +1,9 @@
+2003-01-09  Alexandre Oliva  <aoliva@redhat.com>
+
+	* configure.in: Remove Makefile in build, host and target modules
+	unless configure was run with --no-recursion.
+	* configure: Rebuilt.
+
 2003-01-08  Chris Demetriou  <cgd@broadcom.com>
 
 	* config.guess: Update to 2003-01-03 version.
