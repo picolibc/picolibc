@@ -46,7 +46,7 @@ class pwdgrp
   void read_group ();
   char *add_line (char *);
   char *raw_ptr () const {return lptr;}
-  char *next_str (char = 0);
+  char *next_str (char);
   bool next_num (unsigned long&);
   bool next_num (unsigned int& i)
   {

@@ -1,5 +1,18 @@
 2003-01-26  Christopher Faylor  <cgf@redhat.com>
 
+	* strings.h (strechr): New function.
+	* uinfo.cc (pwdgrp::next_str): Search only for input char in string.
+	Return EOS on failure.  Don't check for NULL since it shouldn't be
+	possible.
+	(pwdgrp::add_line): Revert to replacing '\n' in input line with '\0'.
+	(pwdgrp::next_num): Pass explicit separator character to next_str.
+	* grp.cc (pwdgrp::parse_group): Ditto.
+	* passwd.cc (pwdgrp::parse_passwd): Ditto.  Revamp test for garbage
+	input.
+	* pwdgrp.h (pwdgrp::next_str): Don't use default parameter.
+
+2003-01-26  Christopher Faylor  <cgf@redhat.com>
+
 	* uinfo.cc (pwdgrp::load): Regularize strace output.  Add warning for
 	CreateFile failure.
 

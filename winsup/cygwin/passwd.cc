@@ -38,18 +38,17 @@ bool
 pwdgrp::parse_passwd ()
 {
 # define res (*passwd_buf)[curr_lines]
-  res.pw_name = next_str ();
-  res.pw_passwd = next_str ();
-
-  if (res.pw_name == res.pw_passwd)
-    return false;
-
+  res.pw_name = next_str (':');
+  res.pw_passwd = next_str (':');
+  char *p = raw_ptr ();
   (void) next_num (res.pw_uid);
+  if (p == raw_ptr ())
+    return false;	/* parsing did not advance.  line is garbage */
   (void) next_num (res.pw_gid);
   res.pw_comment = NULL;
-  res.pw_gecos = next_str ();
-  res.pw_dir =  next_str ();
-  res.pw_shell = next_str ();
+  res.pw_gecos = next_str (':');
+  res.pw_dir =  next_str (':');
+  res.pw_shell = next_str (':');
   return true;
 # undef res
 }

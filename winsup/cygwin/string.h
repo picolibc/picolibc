@@ -38,6 +38,27 @@ strchr (const char *s, int c)
   return res;
 }
 
+#undef strechr
+#define strechr cygwin_strechr
+static inline __stdcall char *
+strechr (const char *s, int c)
+{
+  register char * res;
+  __asm__ __volatile__ ("\
+	movb	%%al,%%ah\n\
+1:	movb	(%1),%%al\n\
+	cmpb	%%ah,%%al\n\
+	je	2f\n\
+	incl	%1\n\
+	testb	%%al,%%al\n\
+	jne	1b\n\
+	decl	%1\n\
+2:	movl	%1,%0\n\
+	":"=a" (res), "=r" (s)
+	:"0" (c), "1" (s));
+  return res;
+}
+
 extern const char isalpha_array[];
 
 #undef strcasematch
