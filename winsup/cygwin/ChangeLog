@@ -1,3 +1,7 @@
+Sun Nov 26 14:37:29 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Bump DLL minor version number to 7.
+
 Sat Nov 25 11:27:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump minor API version due to adding
