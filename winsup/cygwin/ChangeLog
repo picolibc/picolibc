@@ -1,3 +1,8 @@
+2004-09-28  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Disallow attempts
+	to set the process group to a nonexistent process group.
+
 2004-09-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lib/_cygwin_crt0_common.cc: Revert patch from 2004-09-16.  Brakes
