@@ -6,7 +6,8 @@ URL="http://cygwin.com/">http://cygwin.com/</ulink> and click on <ulink
 URL="http://cygwin.com/">"Install Cygwin Now!"</ulink>.  This will
 download a GUI installer called <command>setup.exe</command> which can
 be run to download a complete cygwin installation via the internet.
-Follow the instructions on each screen to install Cygwin.</para>
+Follow the instructions on each screen to install Cygwin.
+</para>
 
 <para>
 The <command>setup.exe</command> installer is designed to be easy
@@ -27,6 +28,10 @@ which you can choose by experimenting with those listed at
 http://cygwin.com/mirrors.html
 </ulink>. For more details about each of page of the 
 <command>setup.exe</command> installation, read on below.
+Please note that this guide assumes that you have a basic understanding
+of Unix (or a Unix-like OS). If you are new to Unix, you will also want 
+to make use of <ulink URL="http://www.google.com/search?q=new+to+unix">
+other resources</ulink>.
 </para>
 
 <sect2><title>Download Source</title>
@@ -44,11 +49,21 @@ second (installing the contents of the packages).
 The <literal>Download from Internet</literal> option is mainly
 for creating a base Cygwin package tree on one computer for 
 installation on several machines with 
-<literal>Install from Local Directory</literal>.
+<literal>Install from Local Directory</literal>; copy the
+entire local package tree to another machine with the directory
+tree intact. For example, you might create a <literal>C:\cache\</literal>
+directory and place <command>setup.exe</command> in it. Run 
+<command>setup.exe</command> to <literal>Install from Internet</literal>
+or <literal>Download from Internet</literal>, then copy the whole
+<literal>C:\cache\</literal> to each machine and instead choose
+<literal>Install from Local Directory</literal>. Unfortunately
+<command>setup.exe</command> does not yet support unattended installs.
+</para>
+<para>
 Though this provides some basic mirroring functionality, if you
-are managing a wide Cygwin installation we recommend using a mirroring
-tool such as <command>wget</command>. A helpful user on the Cygwin
-mailing list created a simple demonstration script to accomplish
+are managing a wide Cygwin installation, to keep up to date we recommend 
+using a mirroring tool such as <command>wget</command>. A helpful user on 
+the Cygwin mailing list created a simple demonstration script to accomplish
 this; search the list for <command>mkcygwget</command> for ideas.
 </para>
 </sect2>
