@@ -269,8 +269,17 @@ static const unsigned short R[] = {
 #else
 #define MNEXP (-NXT*16384.0L)
 #endif
-static const unsigned short L[] = {0xc2ef,0x705f,0xeca5,0xe2a8,0x3ffd, XPD};
-#define LOG2EA (*(long double *)(&L[0]))
+static const
+union
+{
+  unsigned short L[6];
+  long double ld;
+} log2ea = {{0xc2ef,0x705f,0xeca5,0xe2a8,0x3ffd, XPD}};
+
+#define LOG2EA (log2ea.ld)
+/*
+#define LOG2EA 0.44269504088896340735992L
+*/
 #endif
 
 #ifdef MIEEE

@@ -1,5 +1,18 @@
 2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/dirent.c (_topendir): Eliminate signed/unsigned warning.
+	* mingwex/strtoimax.c (strtoimax): Likewise.
+	* mingwex/wcstoimax.c (wcstoimax): Likewise.
+	* mingwex/wtoll.c (wtoll): Remove unnecessary ';'
+	* mingwex/fesentenv.c: Include float.h.
+	* mingwex/math/powl.c: Eliminate type punning/strict aliasing 
+	warning.
+	* mingwex/math/tanhl.c: Eliminate signed/unsigned warning in
+	constants.
+	* mingwex/math/tgammal.c: Likewise.
+
+2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/utime.h: New file, forwarding to sys/utime.h.
 
 2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
