@@ -11,7 +11,7 @@
    details. */
 
 #include "winsup.h"
-#include <sys/ipc.h>
+#include "cygwin_ipc.h"
 #include <sys/stat.h>
 
 extern "C"

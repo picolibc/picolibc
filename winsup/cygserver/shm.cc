@@ -37,10 +37,10 @@ details. */
 //#include "thread.h"
 #ifndef __INSIDE_CYGWIN__
 #define __INSIDE_CYGWIN__
-#include <sys/shm.h>
+#include "cygwin_shm.h"
 #undef __INSIDE_CYGWIN__
 #else
-#include <sys/shm.h>
+#include "cygwin_shm.h"
 #endif
 //#include "perprocess.h"
 #include <threaded_queue.h>
