@@ -1,3 +1,13 @@
+2004-12-25  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler.cc (fhandler_base::fchmod): Do the right thing when changing
+	an "on disk" device or fifo.
+	(fhandler_base::fchown): Ditto for changing ownership.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Accommodate
+	device files on ntfs partitions.
+	* path.cc (path_conv::check): Use isfs function to figure out if a path
+	exists on a filesystem to make sure that device files are caught.
+
 2004-12-24  Christopher Faylor  <cgf@timesys.com>
 
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.

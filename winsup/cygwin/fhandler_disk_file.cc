@@ -300,8 +300,15 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       if (pc.has_attribute (FILE_ATTRIBUTE_READONLY) && !pc.issymlink ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
-      if (!(buf->st_mode & S_IFMT))
+      if (buf->st_mode & S_IFMT)
+	/* nothing */;
+      else if (!is_fs_special ())
 	buf->st_mode |= S_IFREG;
+      else
+	{
+	  buf->st_dev = dev ();
+	  buf->st_mode = dev ().mode;
+	}
     }
   else
     {

@@ -1520,6 +1520,9 @@ fhandler_base::closedir (DIR *)
 int
 fhandler_base::fchmod (mode_t mode)
 {
+  extern int chmod_device (path_conv& pc, mode_t mode);
+  if (pc.is_fs_special ())
+    return chmod_device (pc, mode);
   /* By default, just succeeds. */
   return 0;
 }
@@ -1527,6 +1530,8 @@ fhandler_base::fchmod (mode_t mode)
 int
 fhandler_base::fchown (__uid32_t uid, __gid32_t gid)
 {
+  if (pc.is_fs_special ())
+    return ((fhandler_disk_file *) this)->fhandler_disk_file::fchown (uid, gid);
   /* By default, just succeeds. */
   return 0;
 }

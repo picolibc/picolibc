@@ -71,7 +71,6 @@ set_myself (HANDLE h)
       ForceCloseHandle (cygheap->pid_handle);
       cygheap->pid_handle = NULL;
     }
-  return;
 }
 
 /* Initialize the process table entry for the current task.

@@ -816,7 +816,7 @@ out:
       return;
     }
 
-  if (dev.devn == FH_FS)
+  if (dev.isfs ())
     {
       if (strncmp (path, "\\\\.\\", 4))
 	{
