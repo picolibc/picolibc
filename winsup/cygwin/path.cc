@@ -556,6 +556,11 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
   char *dst_start = dst;
 
   syscall_printf ("cwd %s, src %s", cwd, src);
+  if (isdrive (src) || strpbrk (src, "\\:/"))
+    {
+      cygwin_conv_to_full_posix_path (src, dst);
+      return 0;
+    }
   if (!isslash (src[0]))
     {
       if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
@@ -1614,10 +1619,8 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
   if (slash_drive_prefix_p (native))
     slash_drive_to_win32_path (native, nativetmp, 0);
   else
-    {
-      backslashify (native, nativetmp, 0);
-      nofinalslash (nativetmp, nativetmp);
-    }
+    backslashify (native, nativetmp, 0);
+  nofinalslash (nativetmp, nativetmp);
 
   slashify (posix, posixtmp, 0);
   nofinalslash (posixtmp, posixtmp);
@@ -1677,36 +1680,49 @@ int
 mount_info::del_item (const char *path, unsigned flags, int reg_p)
 {
   char pathtmp[MAX_PATH];
+  int posix_path_p = FALSE;
 
   /* Something's wrong if path is NULL or empty. */
-  if (path == NULL || *path == 0)
+  if (path == NULL || *path == 0 || !isabspath (path))
     {
       set_errno (EINVAL);
       return -1;
     }
 
-  slashify (path, pathtmp, 0);
+  if (slash_drive_prefix_p (path))
+      slash_drive_to_win32_path (path, pathtmp, 0);
+  else if (slash_unc_prefix_p (path) || strpbrk (path, ":\\"))
+      backslashify (path, pathtmp, 0);
+  else
+    {
+      slashify (path, pathtmp, 0);
+      posix_path_p = TRUE;
+    }
   nofinalslash (pathtmp, pathtmp);
 
-  debug_printf ("%s[%s]", path, pathtmp);
-
-  if (reg_p && del_reg_mount (pathtmp, flags)
-      && del_reg_mount (path, flags)) /* for old irregular entries */
+  if (reg_p && posix_path_p &&
+      del_reg_mount (pathtmp, flags) &&
+      del_reg_mount (path, flags)) /* for old irregular entries */
     return -1;
 
   for (int i = 0; i < nmounts; i++)
     {
-      /* Delete if paths and mount locations match. */
-      if ((strcasematch (mount[i].posix_path, pathtmp)
-	   || strcasematch (mount[i].native_path, pathtmp)) &&
-	  (mount[i].flags & MOUNT_SYSTEM) == (flags & MOUNT_SYSTEM))
+      int ent = native_sorted[i]; /* in the same order as getmntent() */
+      if (((posix_path_p)
+	   ? strcasematch (mount[ent].posix_path, pathtmp)
+	   : strcasematch (mount[ent].native_path, pathtmp)) &&
+	  (mount[ent].flags & MOUNT_SYSTEM) == (flags & MOUNT_SYSTEM))
 	{
-	  nmounts--;		/* One less mount table entry */
+	  if (!posix_path_p &&
+	      reg_p && del_reg_mount (mount[ent].posix_path, flags))
+	    return -1;
+
+	  nmounts--; /* One less mount table entry */
 	  /* Fill in the hole if not at the end of the table */
-	  if (i < nmounts)
-	    memmove (mount + i, mount + i + 1,
-		     sizeof (mount[i]) * (nmounts - i));
-	  sort ();		/* Resort the table */
+	  if (ent < nmounts)
+	    memmove (mount + ent, mount + ent + 1,
+		     sizeof (mount[ent]) * (nmounts - ent));
+	  sort (); /* Resort the table */
 	  return 0;
 	}
     }

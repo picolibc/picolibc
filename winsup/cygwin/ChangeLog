@@ -1,3 +1,14 @@
+Thu Jun 15 15:43:50 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (normalize_posix_path): Convert path to POSIX if it seems to
+	be a Windows path.
+
+2000-06-15 Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* path.cc (mount_info::add_item): Eliminate a trailing backslash
+	included in a native path starting with '//[A-Za-z]/...'.
+	* path.cc (mount_info::del_item): Accept a native path as its target.
+
 Wed Jun 14 23:47:19 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* environ.cc (conv_envvars): Detect and convert all environment
