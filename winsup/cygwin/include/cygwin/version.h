@@ -233,9 +233,9 @@ details. */
       106: Export flock.
       107: Export fcntl64.
       108: Remove unused (hopefully) reent_data export.
-      109: Export clock_gettime, sigwaitinfo, timer_create, timer_delete,
+      109: Oh well.  Someone uses reent_data.
+      110: Export clock_gettime, sigwaitinfo, timer_create, timer_delete,
            timer_settime
-      110: Oh well.  Someone uses reent_data.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
