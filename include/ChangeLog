@@ -1,3 +1,7 @@
+2005-03-22  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa-isa.h: Update a comment and whitespace.
+
 2005-03-01  Jan Beulich  <jbeulich@novell.com>
 
 	* libiberty.h: Declare unlink_if_ordinary.
