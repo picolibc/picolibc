@@ -1,3 +1,8 @@
+1999-06-22  Mark Mitchell  <mark@codesourcery.com>
+
+	* bfdlink.h (struct bfd_link_hash_entry): Add init_function and
+	fini_function.
+
 1999-06-20  Mark Mitchell  <mark@codesourcery.com>
 
 	* mips.h (Elf32_Internal_Msym): New structure.
