@@ -1,6 +1,7 @@
 2005-03-28  Mark Mitchell  <mark@codesourcery.com>
 
 	* gdb/configure.ac: No tgetent on MinGW.
+	* gdb/configure: Regenerated.
 	* gdb/event-loop.c (struct gdb_notifier): Add "handles" for Windows.
 	(create_file_handler): On Windows, update handles, rather than
 	check_masks and ready_masks.  
