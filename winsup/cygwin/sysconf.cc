@@ -33,10 +33,7 @@ sysconf (int in)
 	/* FIXME: what's the right value?  _POSIX_ARG_MAX is only 4K */
 	return 1048576;
       case _SC_OPEN_MAX:
-	/* FIXME: this returns the current limit which can increase
-	   if and when dtable::find_unused_handle is called.  Perhaps
-	   we should return NOFILE or OPEN_MAX instead? */
-	return cygheap->fdtab.size;
+	return OPEN_MAX;
       case _SC_PAGESIZE:
 	return getpagesize ();
       case _SC_CLK_TCK:

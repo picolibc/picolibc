@@ -15,6 +15,7 @@ details. */
 #include "winsup.h"
 #include <errno.h>
 #include <unistd.h>
+#include <limits.h>
 #include "cygerrno.h"
 #include "sync.h"
 #include "sigproc.h"
@@ -117,7 +118,9 @@ getrlimit (int resource, struct rlimit *rlp)
     case RLIMIT_FSIZE:
     case RLIMIT_DATA:
     case RLIMIT_STACK:
+      break;
     case RLIMIT_NOFILE:
+      rlp->rlim_cur = OPEN_MAX;
       break;
     case RLIMIT_CORE:
       rlp->rlim_cur = rlim_core;
