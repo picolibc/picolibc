@@ -3090,6 +3090,12 @@ else
 fi
 
 EXTRA_DIRS=
+case $host in
+  i345686-pc-linux-*)
+	configdirs="${configdirs} iconvdata"
+	EXTRA_DIRS=iconvdata
+	;;
+esac
 
 
 # These get added in the top-level configure.in, except in the case where

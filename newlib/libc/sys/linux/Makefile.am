@@ -169,6 +169,8 @@ liblinux_la_LDFLAGS = -Xcompiler -nostdlib
 
 ADD_OBJS = \
 	malloc.$(oext) \
+	gethostid.$(oext) \
+	sethostid.$(oext) \
 	$(LINUX_MACH_LIB)
 
 if USE_LIBTOOL

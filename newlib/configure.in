@@ -51,6 +51,12 @@ fi
 AM_CONDITIONAL(HAVE_DOC, test x$have_doc = xyes)
 
 EXTRA_DIRS=
+case $host in
+  i[3456]86-pc-linux-*)
+	configdirs="${configdirs} iconvdata"
+	EXTRA_DIRS=iconvdata
+	;;
+esac
 AC_SUBST(EXTRA_DIRS)
 
 # These get added in the top-level configure.in, except in the case where
