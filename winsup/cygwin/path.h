@@ -78,8 +78,7 @@ class path_conv
   unsigned path_flags;
   char *known_suffix;
   int error;
-  DWORD devn;
-  int unit;
+  device dev;
   BOOL case_clash;
   char *normalized_path;
 
@@ -118,7 +117,7 @@ class path_conv
   void set_binary () {path_flags |= PATH_BINARY;}
   void set_symlink () {path_flags |= PATH_SYMLINK;}
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
-  void set_isdisk () {path_flags |= PATH_ISDISK; devn = FH_DISK;}
+  void set_isdisk () {path_flags |= PATH_ISDISK; dev.devn = FH_FS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
   void set_has_acls (int x = 1) {path_flags |= x ? PATH_HASACLS : PATH_NOTHING;}
   void set_has_buggy_open (int x = 1) {path_flags |= x ? PATH_HASBUGGYOPEN : PATH_NOTHING;}
@@ -139,8 +138,8 @@ class path_conv
   }
 
   path_conv (): fileattr (INVALID_FILE_ATTRIBUTES), path_flags (0),
-  		known_suffix (NULL), error (0), devn (0), unit (0),
-		normalized_path (NULL) {path[0] = '\0';}
+  		known_suffix (NULL), error (0), normalized_path (NULL)
+    {path[0] = '\0';}
 
   inline char *get_win32 () { return path; }
   operator char *() {return path;}
@@ -148,9 +147,9 @@ class path_conv
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
   char operator [](int i) const {return path[i];}
-  BOOL is_device () {return devn != FH_BAD && devn != FH_DISK;}
-  DWORD get_devn () {return devn == FH_BAD ? (DWORD) FH_DISK : devn;}
-  short get_unitn () {return devn == FH_BAD ? 0 : unit;}
+  BOOL is_device () {return dev.devn != FH_BAD && dev.devn != FH_FS;}
+  DWORD get_devn () {return dev.devn == FH_BAD ? (DWORD) FH_FS : dev.devn;}
+  short get_unitn () {return dev.minor;}
   DWORD file_attributes () {return fileattr;}
   DWORD drive_type () {return fs.drive_type;}
   BOOL fs_fast_ea () {return fs.sym_opt & PC_CHECK_EA;}
