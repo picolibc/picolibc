@@ -47,10 +47,10 @@ INSTALL_PROGRAM:=@INSTALL_PROGRAM@
 MT_SAFE = @MT_SAFE@
 DEFS = @DEFS@
 
-CC:=@CC@ -MD
+CC:=@CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET:=$(CC)
-CFLAGS:=@CFLAGS@
+CFLAGS:=@CFLAGS@ -MD
 CXXFLAGS:=@CXXFLAGS@
 
 # For linking mount, etc. crt0.o isn't accessable in a fresh build.
@@ -136,7 +136,7 @@ LD_STUFF=--dll $(DLL_OFILES) version.o winver.o $(DLL_IMPORTS) $(LIBM) $(LIBC) \
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host
 
 .SUFFIXES:
-.SUFFIXES: .c .cc .def .a .o
+.SUFFIXES: .c .cc .def .a .o .d
 
 all_host=@all_host@
 install_host=@install_host@
@@ -283,4 +283,6 @@ WINSUP_H:=winsup.h fhandler.h path.h shared.h \
 
 winsup.h: config.h
 
+ifneq (,${wildcard *.d})
 include *.d
+endif
