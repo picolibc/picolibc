@@ -241,10 +241,22 @@ gcc as:
 
 @subsection How can I find out which dlls are needed by an executable?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+@samp{objdump -p} provides this information, but is rather verbose.
 
-objdump -p provides this information.
+@samp{cygcheck} will do this much more concisely, provided the command
+is in your path.
+
+Note there is currently a bug in cygcheck in that it will not report
+on a program in a Windows system dir (e.g., C:\Windows or C:\WINNT) even
+if it's in your path.  To work around this, supply the full Win32 path
+to the executable, including the .exe extension:
+
+@example
+cygcheck c:\\winnt\\system32\\cmd.exe
+@end example
+
+(Note the windows path separator must be escaped if this is typed in
+bash.)
 
 @subsection How do I build a DLL?
 
