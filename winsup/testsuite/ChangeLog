@@ -1,3 +1,7 @@
+2003-04-08  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* winsup.api/pthread/condvar9.c: Fix test.
+
 2003-03-27  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* winsup.api/pthread/rwlock1.c: Remove pthreads-win32 header.

@@ -18,7 +18,7 @@
  * - 
  *
  * Description:
- * - Make NUMTHREADS threads wait on CV, cancel one, broadcast signal them,
+ * - Make NUMTHREADS threads wait on CV, broadcast signal them, cancel them
  *   and then repeat.
  *
  * Environment:
@@ -79,6 +79,7 @@ static pthread_mutex_t start_flag = PTHREAD_MUTEX_INITIALIZER;
 static struct timespec abstime = { 0, 0 };
 
 static int awoken;
+static int not_canceled;
 
 static void *
 mythread(void * arg)
@@ -107,14 +108,18 @@ mythread(void * arg)
   while (! (cvthing.shared > 0))
     assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == 0);
 
+  assert(cvthing.shared > 0);
+
+  awoken++;
+
+  pthread_testcancel();
+
   pthread_cleanup_pop(0);
 #ifdef _MSC_VER
 #pragma inline_depth()
 #endif
 
-  assert(cvthing.shared > 0);
-
-  awoken++;
+  not_canceled++;
 
   assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
@@ -127,7 +132,6 @@ main()
   int failed = 0;
   int i;
   int first, last;
-  int canceledThreads = 0;
   pthread_t t[NUMTHREADS + 1];
   struct timeb currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
@@ -149,6 +153,7 @@ main()
   assert((t[0] = pthread_self()) != NULL);
 
   awoken = 0;
+  not_canceled = 0;
 
   for (first = 1, last = NUMTHREADS / 2;
        first < NUMTHREADS;
@@ -180,12 +185,11 @@ main()
 
       cvthing.shared++;
 
-      assert(pthread_mutex_unlock(&cvthing.lock) == 0);
-
-      assert(pthread_cancel(t[(first + last) / 2]) == 0);
-      canceledThreads++;
-
       assert(pthread_cond_broadcast(&cvthing.notbusy) == 0);
+      for (i = first; i <= last; i++)
+        assert(pthread_cancel(t[i]) == 0);
+
+      assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
       /*
        * Give threads time to complete.
@@ -225,7 +229,8 @@ main()
    * Check any results here.
    */
 
-  assert(awoken == NUMTHREADS - canceledThreads);
+  assert(awoken == NUMTHREADS);
+  assert(not_canceled == 0);
 
   /*
    * Success.
