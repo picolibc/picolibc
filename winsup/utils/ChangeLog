@@ -1,3 +1,8 @@
+2003-02-06  Christopher Faylor  <cgf@redhat.com>
+
+	* cygcheck.cc (common_apps): Add some more apps.
+	* path.cc (get_cygdrive): Correctly set system flag.
+
 2003-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (ALL_LDFLAGS): Remove newlib/libm from tools paths.

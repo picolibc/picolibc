@@ -66,16 +66,23 @@ struct
   int missing_is_good;
 }
 static common_apps[] = {
+  {"awk", 0},
   {"bash", 0},
   {"cat", 0},
+  {"cp", 0},
   {"cpp", 1},
   {"find", 0},
   {"gcc", 0},
   {"gdb", 0},
+  {"grep", 0},
   {"ld", 0},
   {"ls", 0},
   {"make", 0},
+  {"mv", 0},
+  {"rm", 0},
+  {"sed", 0},
   {"sh", 0},
+  {"tar", 0},
   {0, 0}
 };
 

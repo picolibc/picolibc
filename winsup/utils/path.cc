@@ -78,7 +78,6 @@ get_cygdrive0 (HKEY key, const char *what, void *val, DWORD len)
 static mnt *
 get_cygdrive (HKEY key, mnt *m, int issystem)
 {
-
   if (get_cygdrive0 (key, CYGWIN_INFO_CYGDRIVE_FLAGS, &m->flags,
 		     sizeof (m->flags)) != ERROR_SUCCESS) {
     free (m->posix);
@@ -86,6 +85,7 @@ get_cygdrive (HKEY key, mnt *m, int issystem)
   }
   get_cygdrive0 (key, CYGWIN_INFO_CYGDRIVE_PREFIX, m->posix, MAX_PATH);
   m->native = strdup (".");
+  m->issys = issystem;
   return m + 1;
 }
 
