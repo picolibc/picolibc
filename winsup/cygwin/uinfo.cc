@@ -153,7 +153,6 @@ internal_getlogin (cygheap_user &user)
 	  cygsid gsid (NO_SID);
 	  if (ret)
 	    {
-	      char dom[INTERNET_MAX_HOST_NAME_LENGTH + 1];
 	      cygsid psid;
 
 	      for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)

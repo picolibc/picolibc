@@ -191,6 +191,8 @@ _f_atan2
 __f_atan2 = _f_atan2
 _f_atan2f
 __f_atan2f = _f_atan2f
+fchdir
+_fchdir = fchdir
 fchmod
 _fchmod = fchmod
 fchown

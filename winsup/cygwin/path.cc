@@ -2994,8 +2994,14 @@ int
 chdir (const char *dir)
 {
   MALLOC_CHECK;
-  syscall_printf ("dir %s", dir);
   path_conv path (dir, PC_FULL | PC_SYM_FOLLOW);
+  if (path.error)
+    {
+      set_errno (path.error);
+      syscall_printf ("-1 = chdir (%s)", dir);
+      return -1;
+    }
+  syscall_printf ("dir %s", dir);
 
   char *s;
   /* Incredibly. Windows allows you to specify a path with trailing
@@ -3004,13 +3010,6 @@ chdir (const char *dir)
      white space. */
   for (s = strchr (dir, '\0'); --s >= dir && isspace ((unsigned int) (*s & 0xff)); )
     *s = '\0';
-
-  if (path.error)
-    {
-      set_errno (path.error);
-      syscall_printf ("-1 = chdir (%s)", dir);
-      return -1;
-    }
 
   /* Look for trailing path component consisting entirely of dots.  This
      is needed only in case of chdir since Windows simply ignores count
@@ -3066,6 +3065,23 @@ chdir (const char *dir)
 		  cygheap->cwd.posix, native_dir);
   MALLOC_CHECK;
   return res;
+}
+
+extern "C"
+int
+fchdir (int fd)
+{
+  sigframe thisframe (mainthread);
+
+  if (cygheap->fdtab.not_open (fd))
+    {
+      syscall_printf ("-1 = fchdir (%d)", fd);
+      set_errno (EBADF);
+      return -1;
+    }
+  int ret = chdir (cygheap->fdtab[fd]->get_name ());
+  syscall_printf ("%d = fchdir (%d)", ret, fd);
+  return ret;
 }
 
 /******************** Exported Path Routines *********************/

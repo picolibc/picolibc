@@ -1,3 +1,11 @@
+Sun Jun 10 11:56:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	 * cygwin.din: Add fchdir symbols.
+	 * path.cc (chdir): Guard against invalid parameter.
+	 (fchdir): New function.
+	 * include/cygwin/version.h: Bump API minor version to 40.
+	 * uinfo.cc (internal_getlogin): Remove unused variable.
+
 Sat Jun  9 23:20:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (seteuid): Set environment variables USERNAME and
