@@ -951,11 +951,11 @@ static const template i386_optab[] = {
 
 /* Pentium4 extensions.  */
 
-{"movnti",    2, 0x0fc3,    X, CpuP4, lq_Suf|Modrm,	{ WordReg|WordMem, WordReg, 0 } },
-{"clflush",   1, 0x0fae,    7, CpuP4, FP|Modrm, 	{ ByteMem, 0, 0 } },
-{"lfence",    0, 0x0fae, 0xe8, CpuP4, FP|ImmExt,	{ 0, 0, 0 } },
-{"mfence",    0, 0x0fae, 0xf0, CpuP4, FP|ImmExt,	{ 0, 0, 0 } },
-{"pause",     0, 0xf390,    X, CpuP4, FP,		{ 0, 0, 0 } },
+{"movnti",   2, 0x0fc3,    X, CpuP4, FP|Modrm,		{ WordReg, WordMem, 0 } },
+{"clflush",  1, 0x0fae,    7, CpuP4, FP|Modrm, 		{ ByteMem, 0, 0 } },
+{"lfence",   0, 0x0fae, 0xe8, CpuP4, FP|ImmExt,		{ 0, 0, 0 } },
+{"mfence",   0, 0x0fae, 0xf0, CpuP4, FP|ImmExt,		{ 0, 0, 0 } },
+{"pause",    0, 0xf390,    X, CpuP4, FP,		{ 0, 0, 0 } },
 
 /* MMX/SSE2 instructions.  */
 
