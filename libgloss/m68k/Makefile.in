@@ -110,6 +110,13 @@ IDP_BSP=	libidp.a
 IDP_OBJS=	leds.o idp-inbyte.o idp-outbyte.o mc68ec.o
 
 #
+# here's all the IDP GDB target stuff
+#
+IDPGDB_LDFLAGS=	-L${srcdir} -Tidpgdb.ld
+IDPGDB_BSP=	libidpgdb.a
+IDPGDB_OBJS=	leds.o idp-inbyte.o idp-gdb-outbyte.o mc68ec.o
+
+#
 # here's all the DBUG target stuff
 #
 DBUG_BSP=	libdbug.a
@@ -122,7 +129,7 @@ DBUG_OBJS=	dbug-exit.o dbug-inbyte.o dbug-outbyte.o
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
-all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${MVME135_BSP} ${MVME162_BSP} ${DBUG_BSP}
+all: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} ${IDPGDB_BSP} ${MVME135_BSP} ${MVME162_BSP} ${DBUG_BSP}
 
 #
 # here's where we build the board support packages for each target
@@ -137,6 +144,10 @@ ${BCC_BSP}: $(OBJS) ${BCC_OBJS}
 
 ${IDP_BSP}: $(OBJS) ${IDP_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${IDP_OBJS}
+	${RANLIB} $@
+
+${IDPGDB_BSP}: $(OBJS) ${IDPGDB_OBJS}
+	${AR} ${ARFLAGS} $@ $(OBJS) ${IDPGDB_OBJS}
 	${RANLIB} $@
 
 ${DBUG_BSP}: $(OBJS) ${DBUG_OBJS}
@@ -159,6 +170,9 @@ idp-inbyte.o: ${srcdir}/idp-inbyte.c
 
 idp-outbyte.o: ${srcdir}/idp-outbyte.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $<
+
+idp-gdb-outbyte.o: ${srcdir}/idp-outbyte.c
+	$(CC) $(CFLAGS_FOR_TARGET) -DGDB_MONITOR_OUTPUT $(INCLUDES) -c $< -o $@
 
 mc68ec.o: ${srcdir}/mc68ec.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $<
@@ -188,6 +202,16 @@ idp-test.dis: idp-test.x
 	@rm -fr idp-test.dis
 	$(OBJDUMP) -d idp-test.x > $@
 idp-test: idp-test.srec idp-test.dis
+
+idpgdb-test.x: test.o ${CRT0} Makefile ${IDPGDB_BSP}
+	${CC} $(CFLAGS_FOR_TARGET) -L${srcdir} -L${objdir} \
+	test.o -o $@ $(LDFLAGS_FOR_TARGET) -N -Wl,-Tidpgdb.ld
+idpgdb-test.srec: idpgdb-test.x
+	$(OBJCOPY) -O srec idpgdb-test.x $@
+idpgdb-test.dis: idpgdb-test.x
+	@rm -fr idpgdb-test.dis
+	$(OBJDUMP) -d idpgdb-test.x > $@
+idpgdb-test: idpgdb-test.srec idpgdb-test.dis
 
 mvme135-test.x: test.o ${CRT0} ${srcdir}/mvme135.ld Makefile  ${MVME135_BSP}
 	${CC} -L${srcdir} -L${objdir} test.o -o $@ $(LDFLAGS_FOR_TARGET) \
@@ -245,6 +269,9 @@ install:
 	# install IDP stuff
 	$(INSTALL_PROGRAM) $(IDP_BSP) $(tooldir)/lib${MULTISUBDIR}/$(IDP_BSP)
 	$(INSTALL_DATA) ${srcdir}/idp.ld $(tooldir)/lib${MULTISUBDIR}/idp.ld
+	# install IDPGDB stuff
+	$(INSTALL_PROGRAM) $(IDPGDB_BSP) $(tooldir)/lib${MULTISUBDIR}/$(IDPGDB_BSP)
+	$(INSTALL_DATA) ${srcdir}/idpgdb.ld $(tooldir)/lib${MULTISUBDIR}/idpgdb.ld
 	# install MVME135 stuff
 	$(INSTALL_PROGRAM) $(MVME135_BSP) $(tooldir)/lib${MULTISUBDIR}/$(MVME135_BSP)
 	$(INSTALL_DATA) ${srcdir}/mvme135.ld $(tooldir)/lib${MULTISUBDIR}/mvme135.ld

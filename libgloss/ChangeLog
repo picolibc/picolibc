@@ -1,3 +1,18 @@
+2001-09-10  Jim Blandy  <jimb@redhat.com>
+
+	Add support for GDB monitor-style I/O.
+	* m68k/idp-outbyte.c (raw_outbyte): Renamed from outbyte; made
+	static.
+	(outbyte): Call raw_outbyte; if GDB_MONITOR_OUTPUT is #defined,
+	precede the byte with a ^O character.
+	* m68k/idpgdb.ld: New linker script.
+	* m68k/Makefile.in (IDPGDB_LDFLAGS, IDPGDB_BSP, IDPGDB_OBJS): New
+	variables.
+	(all): Add ${IDPGDB_BSP} to the list of things to build.
+	(${IDPGDB_BSP}, idp-gdb-outbyte.o, idpgdb-test.x,
+	idpgdb-test.srec, idpgdb-test.dis, idpgdb-test): New rules.
+	(install): Install the IDPGDB stuff, too.
+
 2001-03-30  Richard Henderson  <rth@redhat.com>
 	    Eric Christopher  <echristo@redhat.com>
 
