@@ -1,3 +1,9 @@
+2004-03-10  Al Slater  <al.slater@scluk.com>
+
+	* include/winsock2.h: Add missing LPFN_ typdefs for
+	function pointers.
+	Clean up whitespace.
+
 2004-03-05  Filip Navara  <xnavara@volny.cz>
 
 	* include/ddk/scsi.h: Replace assert with ASSERT.

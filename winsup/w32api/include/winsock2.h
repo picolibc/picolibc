@@ -3,7 +3,7 @@
   Definitions for winsock 2
 
   Initially taken from the Wine project.
-  
+
   Portions Copyright (c) 1980, 1983, 1988, 1993
   The Regents of the University of California.  All rights reserved.
 
@@ -45,7 +45,7 @@ typedef u_int	SOCKET;
 
 #ifndef _SYS_TYPES_FD_SET
 /* fd_set may be defined by the newlib <sys/types.h>
- * if __USE_W32_SOCKETS not defined.   
+ * if __USE_W32_SOCKETS not defined.
  */
 #ifdef fd_set
 #undef fd_set
@@ -93,7 +93,7 @@ if (__i == ((fd_set *)(set))->fd_count) {\
 #endif
 #elif !defined (USE_SYS_TYPES_FD_SET)
 #warning "fd_set and associated macros have been defined in sys/types.  \
-    This may cause runtime problems with W32 sockets" 
+    This may cause runtime problems with W32 sockets"
 #endif /* ndef _SYS_TYPES_FD_SET */
 #if !(defined (__INSIDE_CYGWIN__) || (__INSIDE_MSYS__))
 #ifndef _TIMEVAL_DEFINED /* also in sys/time.h */
@@ -321,7 +321,7 @@ typedef WSADATA *LPWSADATA;
 #define AF_CLUSTER  24
 #define AF_12844    25
 #define AF_IRDA     26
-#define AF_NETDES   28                     
+#define AF_NETDES   28
 #if !(defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 #define AF_MAX	29
 struct sockaddr {
@@ -382,7 +382,7 @@ struct sockproto {
 #define MAXGETHOSTSTRUCT	1024
 
 #define FD_READ_BIT      0
-#define FD_READ          (1 << FD_READ_BIT)  
+#define FD_READ          (1 << FD_READ_BIT)
 #define FD_WRITE_BIT     1
 #define FD_WRITE         (1 << FD_WRITE_BIT)
 #define FD_OOB_BIT       2
@@ -414,7 +414,7 @@ struct sockproto {
 #define WSAEINVAL	(WSABASEERR+22)
 #define WSAEMFILE	(WSABASEERR+24)
 #define WSAEWOULDBLOCK	(WSABASEERR+35)
-#define WSAEINPROGRESS	(WSABASEERR+36) /* deprecated on WinSock2 */ 
+#define WSAEINPROGRESS	(WSABASEERR+36) /* deprecated on WinSock2 */
 #define WSAEALREADY	(WSABASEERR+37)
 #define WSAENOTSOCK	(WSABASEERR+38)
 #define WSAEDESTADDRREQ	(WSABASEERR+39)
@@ -471,7 +471,7 @@ struct sockproto {
 #define WSA_E_NO_MORE	(WSABASEERR+110)
 #define WSA_E_CANCELLED	(WSABASEERR+111)
 #define WSAEREFUSED	(WSABASEERR+112)
- 
+
 /* WS QualityofService errors */
 #define WSA_QOS_RECEIVERS	(WSABASEERR + 1005)
 #define WSA_QOS_SENDERS	(WSABASEERR + 1006)
@@ -536,10 +536,45 @@ DECLARE_STDCALL_P(struct servent *) getservbyport(int,const char*);
 DECLARE_STDCALL_P(struct servent *) getservbyname(const char*,const char*);
 DECLARE_STDCALL_P(struct protoent *) getprotobynumber(int);
 DECLARE_STDCALL_P(struct protoent *) getprotobyname(const char*);
+typedef SOCKET (PASCAL * LPFN_ACCEPT)(SOCKET, struct sockaddr*,int *);
+typedef int (PASCAL * LPFN_BIND)(SOCKET, const struct sockaddr*,int);
+typedef int (PASCAL * LPFN_CLOSESOCKET)(SOCKET);
+typedef int (PASCAL * LPFN_CONNECT)(SOCKET, const struct sockaddr*,int);
+typedef int (PASCAL * LPFN_IOCTLSOCKET)(SOCKET, long, u_long*);
+typedef int	(PASCAL * LPFN_GETPEERNAME)(SOCKET, struct sockaddr*, int*);
+typedef int(PASCAL * LPFN_GETSOCKNAME)(SOCKET, struct sockaddr*, int*);
+typedef int(PASCAL * LPFN_GETSOCKOPT)(SOCKET, int, int, char*, int*);
+typedef u_long(PASCAL * LPFN_HTONL)(u_long);
+typedef u_short(PASCAL * LPFN_HTONS)(u_short);
+typedef unsigned long(PASCAL * LPFN_INET_ADDR)(const char*);
+typedef char*(PASCAL * LPFN_INET_NTOA)(struct in_addr);
+typedef int(PASCAL * LPFN_LISTEN)(SOCKET, int);
+typedef u_long(PASCAL * LPFN_NTOHL)(u_long);
+typedef u_short(PASCAL * LPFN_NTOHS)(u_short);
+typedef int(PASCAL * LPFN_RECV)(SOCKET, char*, int, int);
+typedef int(PASCAL * LPFN_RECVFROM)(SOCKET, char*, int, int, struct sockaddr*,  int*);
+typedef int(PASCAL * LPFN_SELECT)(int, fd_set*, fd_set*, fd_set*, const struct timeval*);
+typedef int(PASCAL * LPFN_SEND)(SOCKET, const char*, int, int);
+typedef int(PASCAL * LPFN_SENDTO)(SOCKET, const char*, int, int, const struct sockaddr*, int);
+typedef int(PASCAL * LPFN_SETSOCKOPT)(SOCKET, int, int, const char*, int);
+typedef int(PASCAL * LPFN_SHUTDOWN)(SOCKET, int);
+typedef SOCKET(PASCAL * LPFN_SOCKET)(int, int, int);
+typedef struct hostent*(PASCAL * LPFN_GETHOSTBYADDR)( const char*, int, int);
+typedef struct hostent*(PASCAL * LPFN_GETHOSTBYNAME)( const char*);
+typedef int(PASCAL * LPFN_GETHOSTNAME)(char*, int);
+typedef struct servent*(PASCAL * LPFN_GETSERVBYPORT)(int, const char*);
+typedef struct servent*(PASCAL * LPFN_GETSERVBYNAME)(const char*, const char*);
+typedef struct protoent*(PASCAL * LPFN_GETPROTOBYNUMBER)(int);
+typedef struct protoent*(PASCAL * LPFN_GETPROTOBYNAME)(const char*);
+
 int PASCAL WSAStartup(WORD,LPWSADATA);
 int PASCAL WSACleanup(void);
 void PASCAL WSASetLastError(int);
 int PASCAL WSAGetLastError(void);
+typedef int(PASCAL * LPFN_WSASTARTUP)(WORD, LPWSADATA);
+typedef int(PASCAL * LPFN_WSACLEANUP)(void);
+typedef void(PASCAL * LPFN_WSASETLASTERROR)(int);
+typedef int(PASCAL * LPFN_WSAGETLASTERROR)(void);
 /*
  * Pseudo-blocking functions are deprecated in WinSock2
  * spec. Use threads instead.
@@ -548,6 +583,10 @@ BOOL PASCAL WSAIsBlocking(void);
 int PASCAL WSAUnhookBlockingHook(void);
 FARPROC PASCAL WSASetBlockingHook(FARPROC);
 int PASCAL WSACancelBlockingCall(void);
+typedef BOOL(PASCAL * LPFN_WSAISBLOCKING)(void);
+typedef int(PASCAL * LPFN_WSAUNHOOKBLOCKINGHOOK)(void);
+typedef FARPROC (PASCAL * LPFN_WSASETBLOCKINGHOOK)(FARPROC);
+typedef int(PASCAL * LPFN_WSACANCELBLOCKINGCALL)(void);
 
 HANDLE PASCAL WSAAsyncGetServByName(HWND,u_int,const char*,const char*,char*,int);
 HANDLE PASCAL WSAAsyncGetServByPort(HWND,u_int,int,const char*,char*,int);
@@ -557,6 +596,13 @@ HANDLE PASCAL WSAAsyncGetHostByName(HWND,u_int,const char*,char*,int);
 HANDLE PASCAL WSAAsyncGetHostByAddr(HWND,u_int,const char*,int,int,char*,int);
 int PASCAL WSACancelAsyncRequest(HANDLE);
 int PASCAL WSAAsyncSelect(SOCKET,HWND,u_int,long);
+typedef HANDLE(PASCAL * LPFN_WSAASYNCGETSERVBYNAME)(HWND, u_int, const char *, const char *, char *, int);
+typedef HANDLE(PASCAL * LPFN_WSAASYNCGETSERVBYPORT)(HWND, u_int, int, const char *, char *, int);
+typedef HANDLE(PASCAL * LPFN_WSAASYNCGETPROTOBYNAME)(HWND, u_int, const char*, char*, int);
+typedef HANDLE(PASCAL * LPFN_WSAASYNCGETPROTOBYNUMBER)(HWND, u_int, int, char*, int);
+typedef HANDLE(PASCAL * LPFN_WSAASYNCGETHOSTBYADDR)(HWND, u_int, const char*, int, int, char*, int);
+typedef int(PASCAL * LPFN_WSACANCELASYNCREQUEST)(HANDLE);
+typedef int(PASCAL * LPFN_WSAASYNCSELECT)(SOCKET, HWND, u_int, long);
 #if ! (defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 u_long PASCAL htonl(u_long);
 u_long PASCAL ntohl(u_long);
