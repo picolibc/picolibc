@@ -1,5 +1,10 @@
 2003-11-23  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (sig_send): Correct below checkin.  Use
+	thisframe.call_signal_handler.
+
+2003-11-23  Christopher Faylor  <cgf@redhat.com>
+
 	* sigproc.cc (proc_exists): A zombie process does not exist.
 	(sig_send): Improve debugging output.  Wait for pipe to be created
 	before trying to send to it.  Call call_signal_handler_now if sending a

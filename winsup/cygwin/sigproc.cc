@@ -790,7 +790,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
     }
 
   if (wait_for_completion)
-    call_signal_handler_now ();
+    thisframe.call_signal_handler ();
 
 out:
   if (sig != __SIGPENDING)
