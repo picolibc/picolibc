@@ -1,3 +1,7 @@
+2003-02-13  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (try_to_debug): Don't reset priority when returning
+	from non-waitloop call.
 
 2003-02-13  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
             Christopher Faylor  <cgf@redhat.com>

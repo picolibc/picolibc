@@ -392,16 +392,15 @@ try_to_debug (bool waitloop)
     system_printf ("Failed to start debugger: %E");
   else
     {
-      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       if (!waitloop)
 	return 1;
+      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       while (!being_debugged ())
 	Sleep (0);
       Sleep (2000);
       small_printf ("*** continuing from debugger call\n");
+      SetThreadPriority (GetCurrentThread (), prio);
     }
-
-  SetThreadPriority (GetCurrentThread (), prio);
 
   /* FIXME: need to know handles of all running threads to
     resume_all_threads_except (current_thread_id);
