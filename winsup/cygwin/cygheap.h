@@ -107,10 +107,10 @@ class cygheap_user
   char  *pwinname;	/* User's name as far as Windows knows it */
   char  *puserprof;	/* User profile */
   PSID   psid;          /* buffer for user's SID */
-  PSID   orig_psid;     /* Remains intact even after impersonation */
+  PSID   saved_psid;    /* Remains intact even after impersonation */
 public:
-  __uid32_t orig_uid;      /* Remains intact even after impersonation */
-  __gid32_t orig_gid;      /* Ditto */
+  __uid32_t saved_uid;     /* Remains intact even after impersonation */
+  __gid32_t saved_gid;     /* Ditto */
   __uid32_t real_uid;      /* Remains intact on seteuid, replaced by setuid */
   __gid32_t real_gid;      /* Ditto */
   user_groups groups;      /* Primary and supp SIDs */
@@ -128,7 +128,7 @@ public:
      I've removed the constructor entirely.  Please reinstate this f this
      situation ever changes.
   cygheap_user () : pname (NULL), plogsrv (NULL), pdomain (NULL),
-		    homedrive (NULL), homepath (NULL), psid (NULL),
+		    homedrive (NULL), homepath (NULL),
 		    token (INVALID_HANDLE_VALUE) {}
   */
 
@@ -161,9 +161,9 @@ public:
     return (p == almost_null) ? NULL : p;
   }
   BOOL set_sid (PSID new_sid);
-  BOOL set_orig_sid ();
+  BOOL set_saved_sid ();
   PSID sid () const { return psid; }
-  PSID orig_sid () const { return orig_psid; }
+  PSID saved_sid () const { return saved_psid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);
   bool issetuid () const { return current_token != INVALID_HANDLE_VALUE; }
   HANDLE token () { return current_token; }

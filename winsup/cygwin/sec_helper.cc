@@ -386,7 +386,7 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
     if (!AddAccessAllowedAce (acl, ACL_REVISION,
 			      GENERIC_ALL, sid1))
       debug_printf ("AddAccessAllowedAce(sid1) %E");
-  if (original && (psid = cygheap->user.orig_sid ())
+  if (original && (psid = cygheap->user.saved_sid ())
       && psid != sid1 && psid != well_known_system_sid)
     if (!AddAccessAllowedAce (acl, ACL_REVISION,
 			      GENERIC_ALL, psid))

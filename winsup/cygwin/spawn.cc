@@ -625,11 +625,11 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
      effective vs. real ids.
-     FIXME: If ruid != euid and ruid != orig_uid we currently give
+     FIXME: If ruid != euid and ruid != saved_uid we currently give
      up on ruid. The new process will have ruid == euid. */
   if (!cygheap->user.issetuid ()
-      || (cygheap->user.orig_uid == cygheap->user.real_uid
-	  && cygheap->user.orig_gid == cygheap->user.real_gid
+      || (cygheap->user.saved_uid == cygheap->user.real_uid
+	  && cygheap->user.saved_gid == cygheap->user.real_gid
 	  && !cygheap->user.groups.issetgroups ()))
     {
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);

@@ -1,3 +1,14 @@
+2003-09-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_user::set_saved_sid): Rename from set_orig_sid.
+	* cygheap.h (class cygheap_user): Rename orig_psid, orig_uid and
+	orig_gid to saved_psid, saved_uid and saved_gid respectively.
+	Rename methods orig_sid and set_orig_sid to saved_sid and set_saved_sid
+	respectively.
+	* sec_helper.cc (sec_acl): Accomodate above changes.
+	* spawn.cc (spawn_guts): Ditto.
+	* uinfo.cc (uinfo_init): Ditto.
+
 2003-09-15  Christopher Faylor  <cgf@redhat.com>
 
 	* getopt.c (opterr): Reinstate initialization.

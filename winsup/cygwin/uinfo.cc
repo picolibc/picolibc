@@ -128,8 +128,8 @@ uinfo_init ()
   /* Conditions must match those in spawn to allow starting child
      processes with ruid != euid and rgid != egid. */
   else if (cygheap->user.issetuid ()
-  	   && cygheap->user.orig_uid == cygheap->user.real_uid
-	   && cygheap->user.orig_gid == cygheap->user.real_gid
+  	   && cygheap->user.saved_uid == cygheap->user.real_uid
+	   && cygheap->user.saved_gid == cygheap->user.real_gid
 	   && !cygheap->user.groups.issetgroups ())
     {
       cygheap->user.reimpersonate ();
@@ -138,12 +138,12 @@ uinfo_init ()
   else
     cygheap->user.close_impersonation_tokens ();
 
-  cygheap->user.orig_uid = cygheap->user.real_uid = myself->uid;
-  cygheap->user.orig_gid = cygheap->user.real_gid = myself->gid;
+  cygheap->user.saved_uid = cygheap->user.real_uid = myself->uid;
+  cygheap->user.saved_gid = cygheap->user.real_gid = myself->gid;
   cygheap->user.external_token = INVALID_HANDLE_VALUE;
   cygheap->user.internal_token = INVALID_HANDLE_VALUE;
   cygheap->user.current_token = INVALID_HANDLE_VALUE;
-  cygheap->user.set_orig_sid ();	/* Update the original sid */
+  cygheap->user.set_saved_sid ();	/* Update the original sid */
 }
 
 extern "C" char *
