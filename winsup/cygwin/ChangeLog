@@ -1,3 +1,14 @@
+2000-10-18  DJ Delorie  <dj@redhat.com>
+
+	* Makefile.in: add miscfuncs.cc
+	* miscfuncs.cc: new, miscellaneous functions
+	* winsup.h: define table-driven tolower/toupper
+	* environ.cc: use them
+	* fhandler_console.cc: ditto
+	* fhandler_termios: ditto
+	* path.cc: ditto
+	(strncasematch, strcasematch, strcasestr): move to miscfuncs.cc
+
 Wed Oct 18 20:50:27 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.h (sigthread): Eliminate locking for now since per thread

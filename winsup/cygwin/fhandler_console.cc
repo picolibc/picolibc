@@ -228,7 +228,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	  else
 	    {
 	      tmp[0] = '\033';
-	      tmp[1] = tolower (tmp[1]);
+	      tmp[1] = cyg_tolower (tmp[1]);
 	      toadd = tmp;
 	      nread++;
 	    }

@@ -118,7 +118,8 @@ DLL_OFILES:=assert.o cygheap.o dcrt0.o debug.o delqueue.o dir.o dlfcn.o \
 	fhandler_floppy.o fhandler_mem.o \
 	fhandler_random.o fhandler_raw.o fhandler_serial.o fhandler_tape.o \
 	fhandler_termios.o fhandler_tty.o fhandler_windows.o fhandler_zero.o \
-	fork.o glob.o grp.o heap.o init.o ioctl.o localtime.o malloc.o mmap.o \
+	fork.o glob.o grp.o heap.o init.o ioctl.o localtime.o malloc.o \
+	miscfuncs.o mmap.o \
 	net.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o pthread.o regexp.o \
 	regerror.o regsub.o registry.o resource.o scandir.o security.o select.o \
 	shared.o signal.o sigproc.o smallprint.o spawn.o strace.o strsep.o \

@@ -53,6 +53,11 @@ __asm__ __volatile__(
 return __res;
 }
 
+extern char case_folded_lower[];
+#define cyg_tolower(c) (case_folded_lower[(unsigned char)(c)])
+extern char case_folded_upper[];
+#define cyg_toupper(c) (case_folded_upper[(unsigned char)(c)])
+
 #define cfree newlib_cfree_dont_use
 
 #define WIN32_LEAN_AND_MEAN 1

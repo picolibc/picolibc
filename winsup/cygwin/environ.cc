@@ -354,7 +354,7 @@ ucenv (char *p, char *eq)
      we only do it for the first process in a session group. */
   for (; p < eq; p++)
     if (islower (*p))
-      *p = toupper (*p);
+      *p = cyg_toupper (*p);
 }
 
 /* Parse CYGWIN options */
@@ -538,8 +538,8 @@ environ_init (char **envp, int envc)
     {
       for (int i = 0; conv_envvars[i].name != NULL; i++)
 	{
-	  conv_start_chars[tolower(conv_envvars[i].name[0])] = 1;
-	  conv_start_chars[toupper(conv_envvars[i].name[0])] = 1;
+	  conv_start_chars[cyg_tolower(conv_envvars[i].name[0])] = 1;
+	  conv_start_chars[cyg_toupper(conv_envvars[i].name[0])] = 1;
 	}
       initted = 1;
     }
