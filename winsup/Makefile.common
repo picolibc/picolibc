@@ -117,9 +117,9 @@ ifeq (,${findstring $(gcc_libdir),$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
 GCC_INCLUDE:=-I$(gcc_libdir)/include
 endif
 
-COMPILE_CXX:=$(CXX) $c -nostdinc++ -nostdinc $(ALL_CXXFLAGS) $(GCC_INCLUDE) \
+COMPILE_CXX=$(CXX) $c -nostdinc++ -nostdinc $(ALL_CXXFLAGS) $(GCC_INCLUDE) \
 	     -fno-rtti -fno-exceptions
-COMPILE_CC:=$(CC) $c -nostdinc $(ALL_CFLAGS) $(GCC_INCLUDE)
+COMPILE_CC=$(CC) $c -nostdinc $(ALL_CFLAGS) $(GCC_INCLUDE)
 
 vpath %.a	$(cygwin_build):$(w32api_lib):$(newlib_build)/libc:$(newlib_build)/libm
 
