@@ -16,10 +16,6 @@ extern void __stdcall check_sanity_and_sync (per_process *);
 dll_list NO_COPY dlls;
 
 static NO_COPY int in_forkee = 0;
-/* local variables */
-
-//-----------------------------------------------------------------------------
-
 static int dll_global_dtors_recorded = 0;
 
 /* Run destructors for all DLLs on exit. */
@@ -95,7 +91,7 @@ dll_list::operator[] (const char *name)
 
 #define RETRIES 100
 
-/* Allocate space for a dll struct after the just-loaded dll. */
+/* Allocate space for a dll struct contiguous with the just-loaded dll. */
 dll *
 dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 {
@@ -119,29 +115,32 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       if (!VirtualQuery (s, &m, sizeof (m)))
 	return NULL;	/* Can't do it. */
       if (m.State == MEM_FREE)
-	break;
+	break;		/* Found some free space */
       s = (char *) m.BaseAddress + m.RegionSize;
     }
 
   /* Couldn't find any.  Uh oh.  FIXME: Issue an error? */
   if (i == RETRIES)
-    return NULL; /* Oh well */
+    return NULL;	/* Oh well.  Couldn't locate free space. */
 
   SYSTEM_INFO s1;
   GetSystemInfo (&s1);
 
-  /* Need to do the shared memory thing since W95 can't allocate in
-     the shared memory region otherwise. */
+  /* Ensure that this is rounded to the nearest page boundary.
+     FIXME: Should this be ensured by VirtualQuery? */
   DWORD n = (DWORD) m.BaseAddress;
   DWORD r = n % s1.dwAllocationGranularity;
 
   if (r)
     n = ((n - r) + s1.dwAllocationGranularity);
+
+  /* First reserve the area of memory, then commit it. */
   if (VirtualAlloc ((void *) n, sizeof (dll), MEM_RESERVE, PAGE_READWRITE))
     d = (dll *) VirtualAlloc ((void *) n, sizeof (dll), MEM_COMMIT, PAGE_READWRITE);
 
+  /* Did we succeed? */
   if (d == NULL)
-    {
+    {			/* Nope. */
 #ifdef DEBUGGING
       system_printf ("VirtualAlloc failed for %p, %E", n);
 #endif
@@ -189,7 +188,7 @@ dll_list::detach (dll *d)
     }
 }
 
-/* Initialization called by dll_crt0_1. */
+/* Initialization for all linked DLLs, called by dll_crt0_1. */
 void
 dll_list::init ()
 {
@@ -256,7 +255,6 @@ release_upto (const char *name, DWORD here)
       }
 }
 
-#define MAX_DLL_SIZE (sizeof (dll))
 /* Reload DLLs after a fork.  Iterates over the list of dynamically loaded DLLs
    and attempts to load them in the same place as they were loaded in the parent. */
 void
@@ -271,9 +269,10 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
     {
       DWORD nb;
       /* Read the dll structure from the parent. */
-      if (!ReadProcessMemory (parent, next, &d, MAX_DLL_SIZE, &nb) ||
-	  nb != MAX_DLL_SIZE)
+      if (!ReadProcessMemory (parent, next, &d, sizeof (dll), &nb) ||
+	  nb != sizeof (dll))
 	return;
+
       /* We're only interested in dynamically loaded dlls.
 	 Hopefully, this function wouldn't even have been called unless
 	 the parent had some of those. */
@@ -286,7 +285,7 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
 	     It sort of stinks that we can't invert the order of the FreeLibrary
 	     and LoadLibrary since Microsoft documentation seems to imply that that
 	     should do what we want.  However, since the library was loaded above,
-	     The second LoadLibrary does not execute it's startup code unless it
+	     the second LoadLibrary does not execute it's startup code unless it
 	     is first unloaded. */
 	  if (h == d.handle)
 	    {
