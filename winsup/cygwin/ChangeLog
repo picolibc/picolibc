@@ -1,3 +1,9 @@
+2003-07-30  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (_dll_crt0): Move strace.microseconds initialization to
+	after pthread initialization.
+	(dll_crt0_1): i.e., here.
+
 2003-07-28  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_base.cc (fhandler_base::readv): Rework to properly return
