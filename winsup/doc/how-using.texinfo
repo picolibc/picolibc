@@ -1,5 +1,14 @@
 @section Using Cygwin
 
+@subsection Why doesn't //c (for C:) work anymore?
+
+(Similarly for any drive letter, e.g. @code{//z} for @code{Z:})
+
+This ``feature'' has long been deprecated, and no longer works at all
+in the latest release.  For a detailed discussion of why this change
+was made, and how deal with it now, refer to
+@file{http://sources.redhat.com/ml/cygwin/2001-09/msg00014.html}.
+
 @subsection How should I set my PATH?
 
 This is done for you in the file /etc/profile, which is sourced by bash
