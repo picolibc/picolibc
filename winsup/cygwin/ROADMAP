@@ -25,8 +25,8 @@ itself.  Comments to dj@cygnus.com.
 
 - files and I/O
 .h	delqueue fhandler path select
-.cc	delqueue dir fhandler* hinfo path pipe select tty
-.sgml	hinfo path
+.cc	delqueue dir fhandler* dtable path pipe select tty
+.sgml	dtable path
 
 - common unix functions
 .h	dll_init tz_posixrules
@@ -96,17 +96,17 @@ init.cc - has dll_entry() which is called by the OS when the dll is
 An fhandler is a file type handler.  This is where the unix device
 emulation happens.
 
-hinfo.cc maps posix file descriptors to a table of file handlers (type
+dtable.cc maps posix file descriptors to a table of file handlers (type
 fhandler) in the dll.  It's mostly concerned with managing the table
 of descriptors (open, dup, fork, select).  Most of the posix I/O
-system calls (syscalls.cc) use the hinfo table to call the right
+system calls (syscalls.cc) use the fdtab table to call the right
 fhandler directly.
 
 fhandler.cc is the base class; specific types are derived as
-appropriate (see fhandler.h).  hinfo.cc is in charge of selecting and
+appropriate (see fhandler.h).  dtable.cc is in charge of selecting and
 creating a suitable fhandler when you open a file.  path.cc handles
 emulated files in /dev (like /dev/null) by returning an FH_* value
-from get_device_number (which hinfo.cc calls in hinfo::build_fhandler).
+from get_device_number (which dtable.cc calls in dtable::build_fhandler).
 
 Note: if you're looking for read() and write(), they call _read() and
 _write() in syscalls.cc.  The non-underscored ones are in
