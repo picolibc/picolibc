@@ -148,6 +148,7 @@ contain spaces (C:\Program Files) so should be enclosed in quotes.
 
 <example><title>Example cygpath usage</title>
 <screen>
+<![CDATA[
 #!/bin/sh
 if [ "${1}" = "" ];
 	then
@@ -156,6 +157,7 @@ if [ "${1}" = "" ];
 		XPATH="$(cygpath -w "${1}")";
 	fi
 	explorer $XPATH &
+]]>
 </screen>
 </example>
 
@@ -1399,7 +1401,7 @@ option.  With the <literal>-w</literal> option, you can start an strace
 session in a new window, for example:
 
 <screen>
-$ strace -o tracing_output -w sh -c 'while true; do echo "tracing..."; done' &
+$ strace -o tracing_output -w sh -c 'while true; do echo "tracing..."; done' &amp;
 </screen>
 This is particularly useful for <command>strace</command> sessions that
 take a long time to complete.
