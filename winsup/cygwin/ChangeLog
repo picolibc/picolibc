@@ -1,3 +1,7 @@
+Thu Apr 12 12:49:53 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (mkfifo): New function stub.
+
 2001-04-12   Robert Collins <rbtcollins@hotmail.com>
 
 	* configure.in: Remove PTH_ALLOW.

@@ -1913,6 +1913,13 @@ mknod (const char *_path, mode_t mode, dev_t dev)
   return -1;
 }
 
+extern "C" int
+mkfifo (const char *_path, mode_t mode)
+{
+  set_errno (ENOSYS);
+  return -1;
+}
+
 /* setgid: POSIX 4.2.2.1 */
 extern "C" int
 setgid (gid_t gid)
