@@ -1,3 +1,7 @@
+2000-04-21  Michael Meissner  <meissner@redhat.com>
+
+	* config.sub (d30v): Add d30v as a basic machine type.
+
 Wed Apr 19 12:46:26 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* Makefile.in (taz, gdb-taz, gas.tar.bz2, binutils.tar.bz2,
