@@ -1,5 +1,5 @@
 /* ARC ELF support for BFD.
-   Copyright (C) 1995, 1997 Free Software Foundation, Inc.
+   Copyright (C) 1995, 97, 98, 2000 Free Software Foundation, Inc.
    Contributed by Doug Evans, (dje@cygnus.com)
 
 This file is part of BFD, the Binary File Descriptor library.

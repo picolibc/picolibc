@@ -84,7 +84,7 @@ Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
 	(EF_ARM_EABI_VER1): Define.
 	(PF_ARM_PI): Define.
 	(PF_ARM_ABS): Define.
-	
+
 Wed Apr  5 22:08:59 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 	* sh.h (R_SH_LOOP_START, R_SH_LOOP_END): New RELOC_NUMBERs.
@@ -97,8 +97,8 @@ Wed Apr  5 22:08:59 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 2000-03-10  Geoffrey Keating  <geoffk@cygnus.com>
 
 	* mips.h: Add R_MIPS_GNU_REL_HI16, R_MIPS_GNU_REL_LO16,
- 	R_MIPS_GNU_REL16_S2, R_MIPS_PC64 and R_MIPS_PC32 relocation
- 	numbers.
+	R_MIPS_GNU_REL16_S2, R_MIPS_PC64 and R_MIPS_PC32 relocation
+	numbers.
 
 2000-02-23  Linas Vepstas <linas@linas.org>
 
@@ -127,7 +127,7 @@ Thu Feb 17 00:18:33 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 2000-01-27  Thomas de Lellis  <tdel@windriver.com>
 
-        * arm.h (STT_ARM_TFUNC): Define in terms of STT_LOPROC.
+	* arm.h (STT_ARM_TFUNC): Define in terms of STT_LOPROC.
 	(STT_ARM_16BIT): New flag.  Denotes a label that was defined in
 	Thumb block but was does not identify a function.
 
@@ -154,12 +154,12 @@ Thu Feb 17 00:18:33 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 2000-01-10  Egor Duda  <deo@logos-m.ru>
 
-	* common.h (NT_WIN32PSTATUS): Define.  (cygwin elf core dumps). 
+	* common.h (NT_WIN32PSTATUS): Define.  (cygwin elf core dumps).
 
 1999-12-28  Nick Clifton  <nickc@cygnus.com>
 
 	* mips.h (STO_*): Redefine in terms of STV_* values now in
-	common.h. 
+	common.h.
 
 1999-12-27  Nick Clifton  <nickc@cygnus.com>
 
@@ -217,7 +217,7 @@ Thu Feb 17 00:18:33 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 	* i960.h (reloc-macros.h):  Include using relative dir elf/.
 	* i386.h (reloc-macros.h):  Include using relative dir elf/.
 	* hppa.h (reloc-macros.h):  Include using relative dir elf/.
-	
+
 1999-12-07  Jim Blandy  <jimb@cygnus.com>
 
 	* common.h (NT_PRXFPREG): New definition.
@@ -326,9 +326,9 @@ Wed Jun  9 15:16:34 1999  Jeffrey A Law  (law@cygnus.com)
 
 	* mcore.h (R_MCORE_RELATIVE): Define.
 
-999-05-05  Catherine Moore  <clm@cygnus.com>
+1999-05-05  Catherine Moore  <clm@cygnus.com>
 
-        * m68k.h (EF_CPU32): Define.
+	* m68k.h (EF_CPU32): Define.
 
 1999-04-21  Nick Clifton  <nickc@cygnus.com>
 
@@ -386,10 +386,10 @@ Thu Feb 18 18:58:26 1999  Ian Lance Taylor  <ian@cygnus.com>
 
 Mon Feb  1 11:33:56 1999  Catherine Moore  <clm@cygnus.com>
 
-        * arm.h:  Renumber relocs to conform to standard.
-        (EF_NEW_ABI):  Define.
-        (EF_OLD_ABI):  Define.
-        * arm-oabi.h:  New file.
+	* arm.h:  Renumber relocs to conform to standard.
+	(EF_NEW_ABI):  Define.
+	(EF_OLD_ABI):  Define.
+	* arm-oabi.h:  New file.
 
 1999-01-28  Nick Clifton  <nickc@cygnus.com>
 
@@ -426,7 +426,7 @@ Tue Nov 10 15:12:28 1998  Nick Clifton  <nickc@cygnus.com>
 
 Tue Nov 10 15:17:28 1998  Catherine Moore  <clm@cygnus.com>
 
-        * d10v.h:  Add vtable relocs.
+	* d10v.h:  Add vtable relocs.
 
 Wed Nov  4 15:56:50 1998  Nick Clifton  <nickc@cygnus.com>
 
@@ -436,9 +436,9 @@ Wed Nov  4 15:56:50 1998  Nick Clifton  <nickc@cygnus.com>
 
 Fri Oct 30 11:54:15 1998  Catherine Moore  <clm@cygnus.com>
 
-        From Philip Blundell <pb@nexus.co.uk>:
-        * arm.h (R_ARM_COPY, et al.): New relocs, used by Linux for PIC.
-        (EF_ALIGN8): New flag.
+	From Philip Blundell <pb@nexus.co.uk>:
+	* arm.h (R_ARM_COPY, et al.): New relocs, used by Linux for PIC.
+	(EF_ALIGN8): New flag.
 
 Tue Oct 20 11:19:50 1998  Ian Lance Taylor  <ian@cygnus.com>
 
@@ -446,25 +446,25 @@ Tue Oct 20 11:19:50 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 Mon Oct 19 20:24:11 1998  Catherine Moore  <clm@cygnus.com>
 
-        * sh.h:  Add vtable relocs.
+	* sh.h:  Add vtable relocs.
 
 Mon Oct 19 01:44:42 1998  Felix Lee  <flee@cygnus.com>
 
 	* common.h (NT_PSTATUS, NT_FPREGS, NT_PSINFO,
- 	NT_LWPSTATUS,NT_LWPSINFO): added.
+	NT_LWPSTATUS,NT_LWPSINFO): added.
 	* internal.h (Elf_Internal_Note): new structure members.
 
 Fri Oct 16 14:11:25 1998  Catherine Moore  <clm@cygnus.com>
 
-        * m32r.h:  Add vtable relocs.
+	* m32r.h:  Add vtable relocs.
 
 Tue Oct  6 09:22:22 1998  Catherine Moore  <clm@cygnus.com>
 
-        * sparc.h:  Add vtable relocs.
+	* sparc.h:  Add vtable relocs.
 
 Mon Oct  5 09:39:22 1998  Catherine Moore  <clm@cygnus.com>
 
-        * v850.h:  Add vtable relocs.
+	* v850.h:  Add vtable relocs.
 
 Sun Oct  4 21:17:51 1998  Ian Lance Taylor  <ian@cygnus.com>
 
@@ -472,7 +472,7 @@ Sun Oct  4 21:17:51 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 Mon Sep 21 12:24:44 1998  Catherine Moore  <clm@cygnus.com>
 
-        * i386.h:  Change vtable reloc numbers.
+	* i386.h:  Change vtable reloc numbers.
 
 Sun Sep 20 00:54:22 1998  Andreas Schwab  <schwab@issan.informatik.uni-dortmund.de>
 
@@ -480,12 +480,12 @@ Sun Sep 20 00:54:22 1998  Andreas Schwab  <schwab@issan.informatik.uni-dortmund.
 
 Tue Sep 15 09:56:49 CDT 1998  Catherine Moore  <clm@cygnus.com>
 
-       * arm.h:  Add vtable relocs.
+	* arm.h:  Add vtable relocs.
 
 Mon Aug 31 11:25:27 1998  Catherine Moore  <clm@cygnus.com>
 
-        * arm.h:  Define STT_ARM_TFUNC.  Remove ST_THUMB_xxxx
-        definitions.
+	* arm.h:  Define STT_ARM_TFUNC.  Remove ST_THUMB_xxxx
+	definitions.
 
 Sat Aug 29 22:25:51 1998  Richard Henderson  <rth@cygnus.com>
 
@@ -502,7 +502,7 @@ Sat Aug 29 22:25:51 1998  Richard Henderson  <rth@cygnus.com>
 
 Sun Aug  9 20:26:49 CDT 1998  Catherine Moore  <clm@cygnus.com>
 
-       * arm.h:  Add ST_THUMB definitions.
+	* arm.h:  Add ST_THUMB definitions.
 
 Wed Aug  5 15:52:35 1998  Nick Clifton  <nickc@cygnus.com>
 
@@ -518,7 +518,7 @@ Wed Aug  5 15:52:35 1998  Nick Clifton  <nickc@cygnus.com>
 
 Fri Jul 31 10:01:40 1998 Catherine Moore  <clm@cygnus.com>
 
-        * arm.h: Add R_ARM_THM_PC9 relocation.
+	* arm.h: Add R_ARM_THM_PC9 relocation.
 
 1998-07-30 16:25  Ulrich Drepper  <drepper@cygnus.com>
 
@@ -538,7 +538,7 @@ Fri Jul 24 11:22:06 1998  Jeffrey A Law  (law@cygnus.com)
 
 Wed Jul 22 19:29:00 Catherine Moore  <clm@cygnus.com>
 
-        * arm.h: Rename relocations.
+	* arm.h: Rename relocations.
 
 1998-07-22  Ulrich Drepper  <drepper@cygnus.com>
 
