@@ -251,6 +251,20 @@ Finally, you can simply @samp{cat} the file to the printer's share name:
 You may need to press the formfeed button on your printer or append the
 formfeed character to your file.
 
+@subsection Why don't international (8-bit) characters work?
+
+Before you can type international characters (Једц) in bash, you must
+add the following lines to your @code{~/.inputrc} file:
+
+@example
+	set meta-flag on 
+        set convert-meta off 
+        set output-meta on 
+@end example
+
+These are options to the @code{readline} library, which you can read
+about in the @code{bash(1)} man page.
+
 @subsection Why don't cursor keys work under Win95/Win98?
 
 @strong{(Please note: This section has not yet been updated for the latest
