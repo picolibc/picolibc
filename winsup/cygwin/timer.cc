@@ -230,7 +230,9 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
   if (ovalue)
     gettime (ovalue);
 
-  if (value->it_value.tv_sec || value->it_value.tv_nsec)
+  if (!value->it_value.tv_sec && !value->it_value.tv_nsec)
+    interval_us = sleepto_us = 0;
+  else
     {
       sleepto_us = now + to_us (value->it_value);
       interval_us = to_us (value->it_interval);
