@@ -1,5 +1,5 @@
 /* SH ELF support for BFD.
-   Copyright 1998, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright 1998, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -39,6 +39,7 @@
 
 #define EF_SH4_NOFPU	   0x10
 #define EF_SH4A_NOFPU	   0x11
+#define EF_SH4_NOMMU_NOFPU 0x12
 
 /* This one can only mix in objects from other EF_SH5 objects.  */
 #define EF_SH5		  10

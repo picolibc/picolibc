@@ -1,3 +1,15 @@
+2004-03-23  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (EF_ERM_BE8, EF_ARM_LE8, EF_ARM_EABI_VER3): Add.
+
+2003-03-03  Andrew Stubbs  <andrew.stubbs@superh.com>
+
+	* sh.h: Add EF_SH4_NOMMU_NOFPU.
+
+2004-03-01  Richard Sandiford  <rsandifo@redhat.com>
+
+	* frv.h (EF_FRV_CPU_FR405, EF_FRV_CPU_FR450): Define.
+
 2004-01-28  Roland McGrath  <roland@redhat.com>
 
 	* common.h (AT_SECURE): New macro.

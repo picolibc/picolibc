@@ -1,6 +1,6 @@
 /* bfdlink.h -- header file for BFD link routines
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2002, 2003
-   Free Software Foundation, Inc.
+   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2002, 2003,
+   2004 Free Software Foundation, Inc.
    Written by Steve Chamberlain and Ian Lance Taylor, Cygnus Support.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -303,9 +303,9 @@ struct bfd_link_info
   unsigned int noexecstack: 1;
 
   /* What to do with unresolved symbols in an object file.
-     When producing static binaries the default is GENERATE_ERROR.
-     When producing dynamic binaries the default is IGNORE.  The
-     assumption with dynamic binaries is that the reference will be
+     When producing executables the default is GENERATE_ERROR.
+     When producing shared libraries the default is IGNORE.  The
+     assumption with shared libraries is that the reference will be
      resolved at load/execution time.  */
   enum report_method unresolved_syms_in_objects;
 
@@ -322,6 +322,11 @@ struct bfd_link_info
   /* Criteria for skipping symbols when detemining
      whether to include an object from an archive. */
   enum bfd_link_common_skip_ar_aymbols common_skip_ar_aymbols;
+
+  /* Char that may appear as the first char of a symbol, but should be
+     skipped (like symbol_leading_char) when looking up symbols in
+     wrap_hash.  Used by PowerPC Linux for 'dot' symbols.  */
+  char wrap_char;
 
   /* Function callbacks.  */
   const struct bfd_link_callbacks *callbacks;
