@@ -1,3 +1,10 @@
+2003-03-04  Heiko Gerdau  <hg@technosis.de>
+
+	* oleidl.h (IOleObject): Correct GetUserType prototype.
+	(IViewObject2): Correct GetExtent prototype.
+	* olectl.h (DISPIP_): Add new defines
+	* ocidl.h (IOleInPlaceSiteWindowless): Add new interface.
+
 2003-03-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/olectl.h (OleLoadPictureEx) Add prototype.
