@@ -1,3 +1,12 @@
+2001-03-20  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* libc/include/sys/types.h (BSD int typedefs): Guard with
+	_BSDTYPES_DEFINED rather than _WINSOCK_H.
+	(fd_set): Add !defined __USE_W32_SOCKETS to guard; define
+	_SYS_TYPES_FD_SET.
+	* libc/include/sys/unistd.h (gethostname): Don't declare if defined
+	(_WINSOCK_H) || defined (__USE_W32_SOCKETS).
+
 Sat Mar 17 18:30:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Add _PC_POSIX_PERMISSONS and

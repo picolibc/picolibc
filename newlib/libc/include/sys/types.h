@@ -49,11 +49,13 @@
 #  define	physadr		physadr_t
 #  define	quad		quad_t
 
-#ifndef _WINSOCK_H
+#ifndef _BSDTYPES_DEFINED
+/* also defined in mingw/gmon.h and in w32api/winsock[2].h */
 typedef	unsigned char	u_char;
 typedef	unsigned short	u_short;
 typedef	unsigned int	u_int;
 typedef	unsigned long	u_long;
+#define _BSDTYPES_DEFINED
 #endif
 
 typedef	unsigned short	ushort;		/* System V compatibility */
@@ -152,12 +154,14 @@ typedef unsigned int mode_t _ST_INT32;
 typedef unsigned short nlink_t;
 
 /* We don't define fd_set and friends if we are compiling POSIX
-   source, or if we have included the Windows Sockets.h header (which
-   defines Windows versions of them).  Note that a program which
-   includes the Windows sockets.h header must know what it is doing;
-   it must not call the cygwin32 select function.  */
-# if ! defined (_POSIX_SOURCE) && ! defined (_WINSOCK_H)
-
+   source, or if we have included (or may include as indicated
+   by __USE_W32_SOCKETS) the W32api winsock[2].h header which
+   defines Windows versions of them.   Note that a program which
+   includes the W32api winsock[2].h header must know what it is doing;
+   it must not call the cygwin32 select function.
+*/
+# if !(defined (_POSIX_SOURCE) || defined (_WINSOCK_H) || defined (__USE_W32_SOCKETS)) 
+#  define _SYS_TYPES_FD_SET
 #  define	NBBY	8		/* number of bits in a byte */
 /*
  * Select uses bit masks of file descriptors in longs.
@@ -193,7 +197,7 @@ typedef	struct _types_fd_set {
        *__tmp++ = 0; \
 }))
 
-# endif	/* ! defined (_POSIX_SOURCE) && ! defined (_WINSOCK_H) */
+# endif	/* !(defined (_POSIX_SOURCE) || defined (_WINSOCK_H) || defined (__USE_W32_SOCKETS)) */
 
 #undef __MS_types__
 #undef _ST_INT32

@@ -115,7 +115,10 @@ int	_EXFUN(setdtablesize, (int));
 unsigned _EXFUN(usleep, (unsigned int __useconds));
 int     _EXFUN(ftruncate, (int __fd, off_t __length));
 int     _EXFUN(truncate, (const char *, off_t __length));
-int	_EXFUN(gethostname, (char *__name, size_t __len));
+#if !(defined  (_WINSOCK_H) || defined (__USE_W32_SOCKETS))
+/* winsock[2].h defines as __stdcall, and with int as 2nd arg */
+ int	_EXFUN(gethostname, (char *__name, size_t __len));
+#endif
 char *	_EXFUN(mktemp, (char *));
 int     _EXFUN(sync, (void));
 int     _EXFUN(readlink, (const char *__path, char *__buf, int __buflen));
