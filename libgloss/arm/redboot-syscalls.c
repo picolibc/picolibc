@@ -38,8 +38,11 @@ _close(int fd)
 {
     int  err;
     err = __syscall(SYS_close, fd);
-    if (err)
-	errno = err;
+    if (err<0)
+      {
+        errno = -err;
+        return -1;
+      }
     return err;
 }
 
@@ -53,11 +56,29 @@ _exit(int stat)
 
 
 int
+_stat (const char *filename, struct stat *st)
+{
+    int err;
+    err = __syscall(SYS_stat, filename, st);
+    if (err<0)
+      {
+        errno = -err;
+        return -1;
+      }
+    return err;
+}
+
+int
 _fstat (int file, struct stat *st)
 {
-    st->st_mode = S_IFCHR;
-    st->st_blksize = 4096;
-    return 0;
+    int err;
+    err = __syscall(SYS_fstat, file, st);
+    if (err<0)
+      {
+        errno = -err;
+        return -1;
+      }
+    return err;
 }
 
 int
@@ -70,14 +91,28 @@ _getpid(void)
 int
 _gettimeofday (void * tp, void * tzp)
 {
-    return 0;
+    int err;
+    err = __syscall(SYS_gettimeofday, tp, tzp);
+    if (err<0)
+      {
+        errno = -err;
+        return -1;
+      }
+    return err;
 }
 
 
 int
 isatty(int fd)
 {
-    return (1);
+    int err;
+    err = __syscall(SYS_isatty, fd);
+    if (err<0)
+      {
+        errno = -err;
+        return -1;
+      }
+    return err;
 }
 
 
@@ -95,8 +130,11 @@ _lseek(int fd, off_t offset, int whence)
 {
     int err;
     err = __syscall(SYS_lseek, fd, offset, whence);
-    if (err)
-	errno = err;
+    if (err<0)
+      {
+        errno = -err;
+        return (off_t)-1;
+      }
     return err;
 }
 
@@ -106,8 +144,11 @@ _open(const char *buf, int flags, int mode)
 {
     int err ;
     err = __syscall(SYS_open, buf, flags, mode);
-    if (err)
-	errno = err;
+    if (err<0)
+      {
+        errno = -err;
+        return -1;
+      }
     return err;
 }
 
@@ -118,8 +159,11 @@ _write(int fd, const char *buf, int nbytes)
     int err;
 
     err = __syscall(SYS_write, fd, buf, nbytes);
-    if (err)
-	errno = err;
+    if (err<0)
+      {
+        errno = -err;
+        return -1;
+      }
     return err;
 }
 
@@ -147,8 +191,11 @@ _read(int fd, char *buf, int nbytes)
 {
     int err;
     err = __syscall(SYS_read, fd, buf, nbytes);
-    if (err)
-	errno = err;
+    if (err<0)
+      {
+        errno = -err;
+        return -1;
+      }
     return err;
 }
 
@@ -190,13 +237,39 @@ _times(struct tms * tp)
     return utime;
 }
 
+int
+_rename (const char *oldpath, const char *newpath)
+{
+    int err ;
+    err = __syscall(SYS_rename, oldpath, newpath);
+    if (err<0)
+      {
+        errno = -err;
+        return -1;
+      }
+    return err;
+}
 
 int
 _unlink (const char *pathname)
 {
-  return -1;
+    int err ;
+    err = __syscall(SYS_unlink, pathname);
+    if (err<0)
+      {
+        errno = -err;
+        return -1;
+      }
+    return err;
 }
 
+int
+_system (const char *command)
+{
+    int err ;
+    err = __syscall(SYS_system, command);
+    return err;
+}
 
 #define SYS_meminfo     1001
 

@@ -1,3 +1,20 @@
+2002-04-22  Jonathan Larmour  <jlarmour@redhat.com>
+
+	* arm/syscall.h: New file. To define extra syscall values for RedBoot.
+
+	* arm/redboot-syscalls.c (_close): Fix setting of errno value.
+	(_lseek): Ditto.
+	(_open): Ditto.
+	(_write): Ditto.
+	(_read): Ditto.
+	(_rename): New function.
+	(_system): Ditto.
+	(_stat): Ditto.
+	(_unlink): Call a syscall for this now.
+	(isatty): Ditto.
+	(_fstat): Ditto.
+	(_gettimeofday): Ditto.
+
 2002-04-17  Joel Sherrill <joel@OARcorp.com>
 
 	* debug.h: Change mem_err to volatile to match definition in 
