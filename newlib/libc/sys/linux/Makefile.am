@@ -4,10 +4,20 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(INCLTDL)
 
+if ELIX_LEVEL_1
+argp_dir=
+ARGP_LIB=
+else
+argp_dir=argp
+ARGP_LIB=argp/libargp.la
+endif
+
 SUBDIRS = machine \
+	$(argp_dir) \
 	cmath \
 	.
 SUBLIBS = \
+	$(ARGP_LIB) \
 	cmath/libcmath.la \
 	$(LINUX_MACH_LIB)
 
@@ -102,7 +112,8 @@ ELIX_2_OBJS = \
 	fstatvfs64.$(oext) \
 	ftw.$(oext) \
 	ftw64.$(oext) \
-	getoptlong.$(oext) \
+	getopt.$(oext) \
+	getopt1.$(oext) \
 	getrlimit64.$(oext) \
 	getwd.$(oext) \
 	io64.$(oext) \

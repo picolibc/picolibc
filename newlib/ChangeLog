@@ -1,3 +1,18 @@
+2002-08-29  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/sys/linux/argp: New directory.
+	* libc/sys/linux/getopt.c: New file.
+	* libc/sys/linux/getopt1.c: New file.
+	* libc/sys/linux/getoptlong.c: Remove file.
+	* libc/sys/linux/include/argp.h: New file.
+	* libc/sys/linux/Makefile.am: Define argp_dir and ARGP_LIB,
+	based on ELIX level.
+	(SUBDIRS): Add argp_dir.
+	(SUBLIBS): Add ARGP_LIB.
+	(ELIX_2_OBJS): Add getopt.$(oext), getopt1.$(oext), remove
+	getopt_long.$(oext).
+	* libc/sys/linux/configure.in (AC_OUTPUT): Add argp/Makefile.
+
 2002-08-29  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/libc.texinfo: Add node reference to wide-character strings.

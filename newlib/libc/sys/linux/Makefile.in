@@ -97,12 +97,18 @@ sys_dir = @sys_dir@
 AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(INCLTDL)
+@ELIX_LEVEL_1_TRUE@argp_dir = 
+@ELIX_LEVEL_1_FALSE@argp_dir = @ELIX_LEVEL_1_FALSE@argp
+@ELIX_LEVEL_1_TRUE@ARGP_LIB = 
+@ELIX_LEVEL_1_FALSE@ARGP_LIB = @ELIX_LEVEL_1_FALSE@argp/libargp.la
 
 SUBDIRS = machine \
+	$(argp_dir) \
 	cmath \
 	.
 
 SUBLIBS = \
+	$(ARGP_LIB) \
 	cmath/libcmath.la \
 	$(LINUX_MACH_LIB)
 
@@ -199,7 +205,8 @@ ELIX_2_OBJS = \
 	fstatvfs64.$(oext) \
 	ftw.$(oext) \
 	ftw64.$(oext) \
-	getoptlong.$(oext) \
+	getopt.$(oext) \
+	getopt1.$(oext) \
 	getrlimit64.$(oext) \
 	getwd.$(oext) \
 	io64.$(oext) \
@@ -342,6 +349,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
+DIST_SUBDIRS =  machine argp cmath .
 SOURCES = $(lib_a_SOURCES) $(liblinux_la_SOURCES)
 OBJECTS = $(lib_a_OBJECTS) $(liblinux_la_OBJECTS)
 
@@ -567,7 +575,7 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-	for subdir in $(SUBDIRS); do \
+	for subdir in $(DIST_SUBDIRS); do \
 	  if test "$$subdir" = .; then :; else \
 	    test -d $(distdir)/$$subdir \
 	    || mkdir $(distdir)/$$subdir \
