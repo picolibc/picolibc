@@ -1,5 +1,11 @@
 2003-10-09  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/errorep.h: New file.
+
+	* lib/faultrep.def: New file.
+
+2003-10-09  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winbase.h (AddVectoredExceptionHandler): Define if
 	_WIN32_WINNT >= 0x0500.
 

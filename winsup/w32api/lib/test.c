@@ -81,6 +81,7 @@
 #include <uxtheme.h>
 #include <tmschema.h>
 #include <dhcpcsdk.h>
+#include <errorrep.h>
 
 #ifndef __OBJC__  /* problems with BOOL */
 #include <ole2.h>
