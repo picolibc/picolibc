@@ -1,3 +1,9 @@
+Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/machine/sh/memset.S: Fix problem with alloco region
+	exceeding destination region for length >= 88 bytes, start
+	& 0x16 == 0, end & 0x1f == 18.
+
 2001-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/string/wcscoll.c: Fix comment.
