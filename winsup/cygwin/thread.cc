@@ -1106,7 +1106,7 @@ void
 pthread_mutex::initMutex ()
 {
   if (!mutexInitializationLock.init ())
-    api_fatal ("Could not create win32 Mutex for pthread mutex static initializer support.\n");
+    api_fatal ("Could not create win32 Mutex for pthread mutex static initializer support.");
 }
 
 pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREAD_MUTEX_MAGIC)
