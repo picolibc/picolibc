@@ -1,3 +1,23 @@
+Tue Oct  9 22:22:45 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Throughout, rename PROC_FORK1 to PROC_FORK.
+	* child_info.h: Rename PROC_* to _PROC_*.  Define PROC_* with
+	additional testing magic.  Eliminate old PROC_FORK and rename
+	PROC_FORK1 to PROC_FORK.
+	* dcrt0.cc (_cygwin_testing_magic): New variable.  Added to magic
+	number in proc_info.
+	(alloc_stack): Eliminate old PROC_FORK test.
+	(dll_crt0_1): Ditto.  Use _PROC_* enums for test.  Subtract
+	_cygwin_testing_magic from child_proc_info->type so that normal cygwin
+	programs invoked by test suite programs do not consider themselves to
+	be in a cygwin environment.
+	(_dll_crt0): Ditto.  Move environment checks to initial_env function to
+	conserve on stack space.
+	(initial_env): New function.  Checks for testing and debugging
+	environment variables.
+	* init.cc (cygwin_hmodule): Move declaration.
+	* winsup.h: Declare variables used for cygwin testing.
+
 Tue Oct  9 19:17:53 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* uinfo.cc (internal_getlogin): Reorganize slightly to minimize work in

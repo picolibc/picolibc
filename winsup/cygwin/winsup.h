@@ -261,4 +261,8 @@ extern BOOL display_title;
 extern HANDLE hMainThread;
 extern HANDLE hMainProc;
 
+extern bool cygwin_testing;
+extern unsigned _cygwin_testing_magic;
+extern HMODULE cygwin_hmodule;
+
 #endif /* defined __cplusplus */

@@ -13,8 +13,6 @@ details. */
 #include "thread.h"
 #include "perprocess.h"
 
-extern HMODULE cygwin_hmodule;
-
 int NO_COPY dynamically_loaded;
 
 extern "C" int

@@ -72,6 +72,7 @@ ResourceLocks _reslock NO_COPY;
 MTinterface _mtinterf;
 
 bool NO_COPY _cygwin_testing;
+unsigned NO_COPY _cygwin_testing_magic;
 
 extern "C"
 {
@@ -515,18 +516,13 @@ alloc_stack (child_info_fork *ci)
      fork on Win95, but I don't know exactly why yet. DJ */
   volatile char b[ci->stacksize + 16384];
 
-  if (ci->type == PROC_FORK)
-    ci->stacksize = 0;		// flag to fork not to do any funny business
-  else
-    {
-      if (!VirtualQuery ((LPCVOID) &b, &sm, sizeof sm))
-	api_fatal ("fork: couldn't get stack info, %E");
+  if (!VirtualQuery ((LPCVOID) &b, &sm, sizeof sm))
+    api_fatal ("fork: couldn't get stack info, %E");
 
-      if (sm.AllocationBase != ci->stacktop)
-	alloc_stack_hard_way (ci, b + sizeof (b) - 1);
-      else
-	ci->stacksize = 0;
-    }
+  if (sm.AllocationBase != ci->stacktop)
+    alloc_stack_hard_way (ci, b + sizeof (b) - 1);
+  else
+    ci->stacksize = 0;
 
   return;
 }
@@ -588,20 +584,19 @@ dll_crt0_1 ()
 
   if (child_proc_info)
     {
-      switch (child_proc_info->type)
+      switch (child_proc_info->type - _cygwin_testing_magic)
 	{
-	  case PROC_FORK:
-	  case PROC_FORK1:
+	  case _PROC_FORK:
 	    cygheap_fixup_in_child (child_proc_info, 0);
 	    alloc_stack (fork_info);
 	    set_myself (mypid);
 	    ProtectHandle (child_proc_info->forker_finished);
 	    break;
-	  case PROC_SPAWN:
+	  case _PROC_SPAWN:
 	    if (spawn_info->hexec_proc)
 	      CloseHandle (spawn_info->hexec_proc);
 	    goto around;
-	  case PROC_EXEC:
+	  case _PROC_EXEC:
 	    hexec_proc = spawn_info->hexec_proc;
 	  around:
 	    HANDLE h;
@@ -773,6 +768,31 @@ dll_crt0_1 ()
     exit (user_data->main (__argc, __argv, *user_data->envptr));
 }
 
+void
+initial_env ()
+{
+  char buf[MAX_PATH + 1];
+#ifdef DEBUGGING
+  if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
+    {
+      console_printf ("Sleeping %d, pid %u\n", atoi (buf), GetCurrentProcessId ());
+      Sleep (atoi (buf));
+    }
+#endif
+
+  if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
+    {
+      _cygwin_testing = 1;
+      DWORD len;
+      if ((len = GetModuleFileName (cygwin_hmodule, buf, MAX_PATH))
+	  && len > sizeof ("new-cygwin1.dll")
+	  && strcasematch (buf + len - sizeof ("new-cygwin1.dll"),
+			   "\\new-cygwin1.dll"))
+	_cygwin_testing_magic = 0x10;
+    }
+}
+
+
 /* Wrap the real one, otherwise gdb gets confused about
    two symbols with the same name, but different addresses.
 
@@ -782,18 +802,7 @@ dll_crt0_1 ()
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  char envbuf[8];
-#ifdef DEBUGGING
-  if (GetEnvironmentVariable ("CYGWIN_SLEEP", envbuf, sizeof (envbuf) - 1))
-    {
-      console_printf ("Sleeping %d, pid %u\n", atoi (envbuf), GetCurrentProcessId ());
-      Sleep (atoi (envbuf));
-    }
-#endif
-
-  if (GetEnvironmentVariable ("CYGWIN_TESTING", envbuf, sizeof (envbuf) - 1))
-    _cygwin_testing = 1;
-
+  initial_env ();
   char zeros[sizeof (fork_info->zero)] = {0};
 #ifdef DEBUGGING
   strace.microseconds ();
@@ -815,15 +824,14 @@ _dll_crt0 ()
   if (si.cbReserved2 >= EXEC_MAGIC_SIZE &&
       memcmp (fork_info->zero, zeros, sizeof (zeros)) == 0)
     {
-      switch (fork_info->type)
+      switch (fork_info->type - _cygwin_testing_magic)
 	{
-	  case PROC_FORK:
-	  case PROC_FORK1:
+	  case _PROC_FORK:
 	    user_data->forkee = fork_info->cygpid;
-	  case PROC_SPAWN:
+	  case _PROC_SPAWN:
 	    if (fork_info->pppid_handle)
 	      CloseHandle (fork_info->pppid_handle);
-	  case PROC_EXEC:
+	  case _PROC_EXEC:
 	    {
 	      child_proc_info = fork_info;
 	      cygwin_mount_h = child_proc_info->mount_h;

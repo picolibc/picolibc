@@ -13,17 +13,19 @@ details. */
 enum
 {
   PROC_MAGIC = 0xaf12f000,
-  PROC_FORK = PROC_MAGIC + 1,
-  PROC_EXEC = PROC_MAGIC + 2,
-  PROC_SPAWN = PROC_MAGIC + 3,
-  PROC_FORK1 = PROC_MAGIC + 4,	// Newer versions provide stack
+  _PROC_EXEC = PROC_MAGIC + 2,
+  _PROC_SPAWN = PROC_MAGIC + 3,
+  _PROC_FORK = PROC_MAGIC + 4,	// Newer versions provide stack
 				// location information
-  PROC_SPAWN1 = PROC_MAGIC + 5
 };
 
 #define PROC_MAGIC_MASK 0xff00f000
 #define PROC_MAGIC_GENERIC 0xaf00f000
 #define PROC_MAGIC_VER_MASK 0x0ff0000
+
+#define PROC_EXEC (_PROC_EXEC + _cygwin_testing_magic)
+#define PROC_SPAWN (_PROC_SPAWN + _cygwin_testing_magic)
+#define PROC_FORK (_PROC_FORK + _cygwin_testing_magic)
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 class child_info

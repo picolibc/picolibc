@@ -429,7 +429,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   ProtectHandle (subproc_ready);
   ProtectHandle (forker_finished);
 
-  init_child_info (PROC_FORK1, &ch, 1, subproc_ready);
+  init_child_info (PROC_FORK, &ch, 1, subproc_ready);
 
   ch.forker_finished = forker_finished;
 
