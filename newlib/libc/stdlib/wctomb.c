@@ -54,9 +54,9 @@ _DEFUN (wctomb, (s, wchar),
         wchar_t wchar)
 {
 #ifdef MB_CAPABLE
-        static int state;
+        _REENT_CHECK_MISC(_REENT);
 
-        return _wctomb_r (_REENT, s, wchar, &state);
+        return _wctomb_r (_REENT, s, wchar, &(_REENT_WCTOMB_STATE(_REENT)));
 #else /* not MB_CAPABLE */
         if (s == NULL)
                 return 0;

@@ -60,9 +60,9 @@ _DEFUN (mbtowc, (pwc, s, n),
         size_t n)
 {
 #ifdef MB_CAPABLE
-        static int state;
+        _REENT_CHECK_MISC(_REENT);
 
-        return _mbtowc_r (_REENT, pwc, s, n, &state);
+        return _mbtowc_r (_REENT, pwc, s, n, &(_REENT_MBTOWC_STATE(_REENT)));
 #else /* not MB_CAPABLE */
         if (s == NULL)
                 return 0;

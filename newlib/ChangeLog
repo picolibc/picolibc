@@ -1,3 +1,26 @@
+2002-04-01  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h (_REENT_INIT_PTR): New macro for
+	initializing a struct _reent that has been dynamically allocated.
+	(_REENT_CHECK_MISC): New macro that checks _misc struct for
+	_REENT_SMALL and does nothing otherwise.
+	(_REENT_STRTOK_LAST): New macro for reentrant strtok.
+	(_REENT_MBLEN_STATE): New macro for reentrant mblen.
+	(_REENT_MBTOWC_STATE): New macro for reentrant mbtowc.
+	(_REENT_WCTOMB_STATE): New macro for reentrant wctomb.
+	[_REENT_SMALL](struct _misc_reent): New structure containing
+	miscellaneous reentrant areas needed by newlib.
+	[_REENT_SMALL](struct _reent): Add _misc pointer.
+	[_REENT_SMALL](_REENT_INIT_MISC): New macro.
+	* libc/string/strtok (strtok): Change to use _REENT_CHECK_MISC
+	and _REENT_STRTOK_LAST macros.
+	* libc/stdlib/mblen (mblen): Change to use _REENT_CHECK_MISC
+	and _REENT_MBLEN_STATE macros.
+	* libc/stdlib/mbtowc (mbtowc): Change to use _REENT_CHECK_MISC
+	and _REENT_MBTOWC_STATE macros.
+	* libc/stdlib/wctomb (wctomb): Change to use _REENT_CHECK_MISC
+	and _REENT_WCTOMB_STATE macros.
+
 2002-04-01  Till Straumann <strauman@SLAC.Stanford.EDU>
 
 	* libc/stdlib/getenv_r.c (_findenv_r): Add missing ENV_UNLOCK.

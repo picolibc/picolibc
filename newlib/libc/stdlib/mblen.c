@@ -51,9 +51,9 @@ _DEFUN (mblen, (s, n),
         size_t n)
 {
 #ifdef MB_CAPABLE
-        static int state;
+        _REENT_CHECK_MISC(_REENT);
 
-        return _mbtowc_r (_REENT, NULL, s, n, &state);
+        return _mbtowc_r (_REENT, NULL, s, n, &(_REENT_MBLEN_STATE(_REENT)));
 #else /* not MB_CAPABLE */
         if (s == NULL || *s == '\0')
                 return 0;

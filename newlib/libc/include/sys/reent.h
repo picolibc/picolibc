@@ -245,6 +245,16 @@ struct _mprec
   struct _Bigint **_freelist;
 };
 
+
+struct _misc_reent
+{
+  /* miscellaneous reentrant data */
+  char *_strtok_last;
+  int _mblen_state;
+  int _wctomb_state;
+  int _mbtowc_state;
+};
+
 /* This version of _reent is layed our with "int"s in pairs, to help
  * ports with 16-bit int's but 32-bit pointers, align nicely.  */
 struct _reent
@@ -289,13 +299,44 @@ struct _reent
   struct _glue __sglue;			/* root of glue chain */
   struct __sFILE *__sf;			/* file descriptors */
   struct __sFILE_fake __sf_fake;	/* fake initial stdin/out/err */
+  struct _misc_reent *_misc;            /* strtok, multibyte states */
 };
 
 #define _REENT_INIT(var) \
   { &var.__sf_fake, &var.__sf_fake, &var.__sf_fake, 0, 0, _NULL, 0, 0, \
     "C", _NULL, _NULL, 0, 0, _NULL, _NULL, _NULL, _NULL, _NULL, \
-    { 0, _NULL }, { _NULL, 0, _NULL }, 0 }
+    { 0, _NULL }, { _NULL, 0, _NULL }, 0, _NULL }
 
+#define _REENT_INIT_PTR(var) \
+  { var->_stdin = &var->__sf_fake; \
+    var->_stdout = &var->__sf_fake; \
+    var->_stderr = &var->__sf_fake; \
+    var->_errno = 0; \
+    var->_inc = 0; \
+    var->_emergency = _NULL; \
+    var->__sdidinit = 0; \
+    var->_current_category = 0; \
+    var->_current_locale = "C"; \
+    var->_mp = _NULL; \
+    var->__cleanup = _NULL; \
+    var->_gamma_signgam = 0; \
+    var->_cvtlen = 0; \
+    var->_cvtbuf = _NULL; \
+    var->_r48 = _NULL; \
+    var->_localtime_buf = _NULL; \
+    var->_asctime_buf = _NULL; \
+    var->_sig_func = _NULL;
+    var->_atexit._ind = 0; \
+    var->_atexit._fns = _NULL}; \
+    var->__sglue._next = _NULL; \
+    var->__sglue._niobs = 0; \
+    var->__sglue._iobs = _NULL; \
+    var->__sf = 0; \
+    var->_misc = _NULL; \
+  }
+
+  /* signal info */
+  void (**(_sig_func))(int);
 /* Only built the assert() calls if we are built with debugging.  */
 #if DEBUG 
 #include <assert.h>
@@ -347,6 +388,16 @@ struct _reent
 #define _REENT_CHECK_EMERGENCY(var) \
   _REENT_CHECK(var, _emergency, char *, _REENT_EMERGENCY_SIZE, /* nothing */)
 
+#define _REENT_INIT_MISC(var) do { \
+  struct _reent *_r = (var); \
+  _r->_misc->_strtok_last = _NULL; \
+  _r->_misc->_mblen_state = 0; \
+  _r->_misc->_wctomb_state = 0; \
+  _r->_misc->_mbtowc_state = 0; \
+} while (0)
+#define _REENT_CHECK_MISC(var) \
+  _REENT_CHECK(var, _misc, struct _misc_reent *, sizeof *((var)->_misc), _REENT_INIT_MISC(var))
+
 #define _REENT_SIGNGAM(ptr)	((ptr)->_gamma_signgam)
 #define _REENT_RAND_NEXT(ptr)	((ptr)->_r48->_rand_next)
 #define _REENT_RAND48_SEED(ptr)	((ptr)->_r48->_seed)
@@ -359,6 +410,10 @@ struct _reent
 #define _REENT_ASCTIME_BUF(ptr)	((ptr)->_asctime_buf)
 #define _REENT_TM(ptr)		((ptr)->_localtime_buf)
 #define _REENT_EMERGENCY(ptr)	((ptr)->_emergency)
+#define _REENT_STRTOK_LAST(ptr)	((ptr)->_misc->_strtok_last)
+#define _REENT_MBLEN_STATE(ptr)	((ptr)->_misc->_mblen_state)
+#define _REENT_MBTOWC_STATE(ptr)((ptr)->_misc->_mbtowc_state)
+#define _REENT_WCTOMB_STATE(ptr)((ptr)->_misc->_wctomb_state)
 
 #else /* !_REENT_SMALL */
 
@@ -396,12 +451,15 @@ struct _reent
       struct
         {
           unsigned int _unused_rand;
-          char * _unused_strtok_last;
+          char * _strtok_last;
           char _asctime_buf[26];
           struct __tm _localtime_buf;
           int _gamma_signgam;
           __extension__ unsigned long long _rand_next;
           struct _rand48 _r48;
+          int _mblen_state;
+          int _mbtowc_state;
+          int _wctomb_state;
         } _reent;
   /* Two next two fields were once used by malloc.  They are no longer
      used. They are used to preserve the space used before so as to
@@ -433,13 +491,55 @@ struct _reent
     0, _NULL, _NULL, 0, _NULL, _NULL, 0, _NULL, { {0, _NULL, "", \
     { 0,0,0,0,0,0,0,0}, 0, 1, \
     {{_RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2}, \
-     {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, _RAND48_ADD}} } }
+     {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, _RAND48_ADD}, \
+    0, 0, 0} } }
+
+#define _REENT_INIT_PTR(var) \
+  { int i; \
+    char *tmp_ptr; \
+    var->_errno = 0; \
+    var->_stdin = &var->__sf[0]; \
+    var->_stdout = &var->__sf[1]; \
+    var->_stderr = &var->__sf[2]; \
+    var->_inc = 0; \
+    for (i = 0; i < _REENT_EMERGENCY_SIZE; ++i) \
+      var->_emergency[i] = 0; \
+    var->_current_category = 0; \
+    var->_current_locale = "C"; \
+    var->__sdidinit = 0; \
+    var->__cleanup = _NULL; \
+    var->_result = _NULL; \
+    var->_result_k = 0; \
+    var->_p5s = _NULL; \
+    var->_freelist = _NULL; \
+    var->_cvtlen = 0; \
+    var->_cvtbuf = _NULL; \
+    var->_new._reent._unused_rand = 0; \
+    var->_new._reent._strtok_last = _NULL; \
+    var->_new._reent._asctime_buf[0] = 0; \
+    tmp_ptr = (char *)&var->_new._reent._localtime_buf; \
+    for (i = 0; i < sizeof(struct __tm); ++i) \
+      tmp_ptr[i] = 0; \
+    var->_new._reent._gamma_signgam = 0; \
+    var->_new._reent._rand_next = 1; \
+    var->_new._reent._r48._seed[0] = _RAND48_SEED_0; \
+    var->_new._reent._r48._seed[1] = _RAND48_SEED_1; \
+    var->_new._reent._r48._seed[2] = _RAND48_SEED_2; \
+    var->_new._reent._r48._mult[0] = _RAND48_MULT_0; \
+    var->_new._reent._r48._mult[1] = _RAND48_MULT_1; \
+    var->_new._reent._r48._mult[2] = _RAND48_MULT_2; \
+    var->_new._reent._r48._add = _RAND48_ADD; \
+    var->_new._reent._mblen_state = 0; \
+    var->_new._reent._mbtowc_state = 0; \
+    var->_new._reent._wctomb_state = 0; \
+  }
 
 #define _REENT_CHECK_RAND48(ptr)	/* nothing */
 #define _REENT_CHECK_MP(ptr)		/* nothing */
 #define _REENT_CHECK_TM(ptr)		/* nothing */
 #define _REENT_CHECK_ASCTIME_BUF(ptr)	/* nothing */
 #define _REENT_CHECK_EMERGENCY(ptr)	/* nothing */
+#define _REENT_CHECK_MISC(ptr)	        /* nothing */
 
 #define _REENT_SIGNGAM(ptr)	((ptr)->_new._reent._gamma_signgam)
 #define _REENT_RAND_NEXT(ptr)	((ptr)->_new._reent._rand_next)
@@ -453,6 +553,10 @@ struct _reent
 #define _REENT_ASCTIME_BUF(ptr)	(&(ptr)->_new._reent._asctime_buf)
 #define _REENT_TM(ptr)		(&(ptr)->_new._reent._localtime_buf)
 #define _REENT_EMERGENCY(ptr)	((ptr)->_emergency)
+#define _REENT_STRTOK_LAST(ptr)	((ptr)->_new._reent._strtok_last)
+#define _REENT_MBLEN_STATE(ptr)	((ptr)->_new._reent._mblen_state)
+#define _REENT_MBTOWC_STATE(ptr)((ptr)->_new._reent._mbtowc_state)
+#define _REENT_WCTOMB_STATE(ptr)((ptr)->_new._reent._wctomb_state)
 
 #endif /* !_REENT_SMALL */
 
@@ -475,7 +579,7 @@ void _reclaim_reent _PARAMS ((struct _reent *));
 
 #ifndef _REENT_ONLY
 #define _REENT _impure_ptr
-#endif
+#endif /* !_REENT_ONLY */
 
 #ifdef __cplusplus
 }

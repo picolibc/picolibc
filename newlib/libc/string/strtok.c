@@ -73,7 +73,7 @@ _DEFUN (strtok, (s, delim),
 	register char *s _AND
 	register const char *delim)
 {
-	static char *last;
-	return strtok_r (s, delim, &last);
+	_REENT_CHECK_MISC(_REENT);
+	return strtok_r (s, delim, &(_REENT_STRTOK_LAST(_REENT)));
 }
 #endif
