@@ -814,6 +814,8 @@ BOOL WINAPI InternetAutodial(DWORD,DWORD);
 BOOL WINAPI InternetAutodialHangup(DWORD);
 BOOL WINAPI InternetGetConnectedState(LPDWORD,DWORD);
 BOOL WINAPI InternetSetDialState(LPCTSTR,DWORD,DWORD);
+BOOL WINAPI InternetReadFileExA(HINTERNET,LPINTERNET_BUFFERSA,DWORD,DWORD_PTR);
+BOOL WINAPI InternetReadFileExW(HINTERNET,LPINTERNET_BUFFERSW,DWORD,DWORD_PTR);
 
 #ifdef UNICODE
 #define InternetCrackUrl InternetCrackUrlW
@@ -828,6 +830,7 @@ BOOL WINAPI InternetSetDialState(LPCTSTR,DWORD,DWORD);
 #define InternetSetOption InternetSetOptionW
 #define InternetSetOptionEx InternetSetOptionExW
 #define InternetGetLastResponseInfo InternetGetLastResponseInfoW
+#define InternetReadFileEx  InternetReadFileExW
 #define FtpFindFirstFile FtpFindFirstFileW
 #define FtpGetFile FtpGetFileW
 #define FtpPutFile FtpPutFileW
@@ -874,6 +877,7 @@ BOOL WINAPI InternetSetDialState(LPCTSTR,DWORD,DWORD);
 #define InternetSetOption InternetSetOptionA
 #define InternetSetOptionEx InternetSetOptionExA
 #define InternetGetLastResponseInfo InternetGetLastResponseInfoA
+#define InternetReadFileEx  InternetReadFileExA
 #define FtpFindFirstFile FtpFindFirstFileA
 #define FtpGetFile FtpGetFileA
 #define FtpPutFile FtpPutFileA
