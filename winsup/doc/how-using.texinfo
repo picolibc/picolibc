@@ -445,6 +445,10 @@ will change all @code{/cygdrive/...} mounts to binmode.
 
 @subsection How can I copy and paste into Cygwin console windows?
 
+First, consider using rxvt instead of the standard console window.  In
+rxvt, selecting with the left-mouse also copies, and middle-mouse
+pastes.  It couldn't be easier!
+
 Under Windows NT, open the properties dialog of the console window.
 The options contain a toggle button, named "Quick edit mode".  It must
 be ON.  Save the properties.
