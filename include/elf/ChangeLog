@@ -1,3 +1,8 @@
+2003-06-03  Nick Clifton  <nickc@redhat.com>
+
+	* v850.h (R_V850_32): Rename to R_V850_ABS32.
+        Add R_V850_REL32.
+
 2003-04-24 Dhananjay Deshpande <dhananjayd@kpitcummins.com> 
 
 	* elf/h8.h (E_H8_MACH_H8300HN, E_H8_MACH_H8300SN): New
