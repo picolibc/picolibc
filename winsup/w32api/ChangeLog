@@ -1,3 +1,7 @@
+2000-04-25  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/winspool.h: Add 2 more PRINTER_ATTRIBUTE_* macros.
+
 2000-04-25  Martin Kotulla  <martin-k@softmaker.de>
 
 	* include/ddeml.h (DdeCreateStringHandle{A,W}): Fix prototype.
