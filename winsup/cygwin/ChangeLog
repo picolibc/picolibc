@@ -1,3 +1,9 @@
+2004-02-14  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Compile syscalls.o with -fomit-frame-pointer.
+
+	* sigproc.cc: Eliminate unused variable.
+
 2004-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* getopt.c: Replace with latest NetBSD version 1.16.  Keep Cygwin

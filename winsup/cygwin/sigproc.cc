@@ -89,7 +89,6 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 
 Static DWORD proc_loop_wait = 1000;	// Wait for subprocesses to exit
 
-Static HANDLE sendsig_tome;
 HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 Static cygthread *hwait_sig;		// Handle of wait_sig thread
 Static cygthread *hwait_subproc;	// Handle of sig_subproc thread
