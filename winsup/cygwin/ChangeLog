@@ -1,5 +1,9 @@
 2002-11-04  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (WAIT_SIG_PRIORITY): Bump to highest priority.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
 	* include/cygwin/version.h: Bump DLL minor number.
 
 2002-11-03  Christopher Faylor  <cgf@redhat.com>
