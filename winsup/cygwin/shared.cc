@@ -128,7 +128,7 @@ shared_info::initialize ()
   /* FIXME: We should not be restricted to a fixed size heap no matter
   what the fixed size is. */
 
-  heap_chunk_in_mb = reg.get_int ("heap_chunk_in_mb", 1024);
+  heap_chunk_in_mb = reg.get_int ("heap_chunk_in_mb", 256);
   if (heap_chunk_in_mb < 4)
     {
       heap_chunk_in_mb = 4;

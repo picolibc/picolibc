@@ -1,3 +1,7 @@
+Wed Jan 31 10:04:58 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* shared.cc (shared_info::initialize): Reduce size of heap.
+
 Wed Jan 31 13:22:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/sys/resource.h: Fix typo.
