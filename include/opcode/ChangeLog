@@ -1,3 +1,8 @@
+2001-02-10  Nick Clifton  <nickc@redhat.com>
+
+	* mips.h: Remove extraneous whitespace.  Formating change to allow
+	for future contribution.
+
 2001-02-09  Martin Schwidefsky  <schwidefsky@de.ibm.com>
 
 	* s390.h: New file.

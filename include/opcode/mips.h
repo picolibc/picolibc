@@ -30,9 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 	i = (i &~ (OP_MASK_X << OP_SH_X)) | (j << OP_SH_X)
 
    Make sure you use fields that are appropriate for the instruction,
-   of course.  
+   of course.
 
-   The 'i' format uses OP, RS, RT and IMMEDIATE.  
+   The 'i' format uses OP, RS, RT and IMMEDIATE.
 
    The 'j' format uses OP and TARGET.
 
@@ -123,7 +123,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define OP_SH_HINT              16
 #define OP_MASK_HINT            0x1f
 #define OP_SH_MMI               0       /* Multimedia (parallel) op.  */
-#define OP_MASK_MMI             0x3f 
+#define OP_MASK_MMI             0x3f
 #define OP_SH_MMISUB            6
 #define OP_MASK_MMISUB          0x1f
 #define OP_MASK_PERFREG		0x1f	/* Performance monitoring.  */
@@ -366,14 +366,15 @@ struct mips_opcode
 /* Test for membership in an ISA including chip specific ISAs.
    INSN is pointer to an element of the opcode table; ISA is the
    specified ISA to test against; and CPU is the CPU specific ISA
-   to test, or zero if no CPU specific ISA test is desired.  
+   to test, or zero if no CPU specific ISA test is desired.
    The gp32 arg is set when you need to force 32-bit register usage on
    a machine with 64-bit registers; see the documentation under -mgp32
    in the MIPS gas docs.  */
 
 #define OPCODE_IS_MEMBER(insn, isa, cpu, gp32)				\
     ((((insn)->membership & isa) != 0                           	\
-      && ((insn)->membership & INSN_GP32 ? gp32 : 1))			\
+      && ((insn)->membership & INSN_GP32 ? gp32 : 1)			\
+     )									\
      || (cpu == CPU_R4650 && ((insn)->membership & INSN_4650) != 0)	\
      || (cpu == CPU_R4010 && ((insn)->membership & INSN_4010) != 0)	\
      || ((cpu == CPU_VR4100 || cpu == CPU_R4111)			\
@@ -381,7 +382,7 @@ struct mips_opcode
      || (cpu == CPU_R3900  && ((insn)->membership & INSN_3900) != 0))
 
 /* This is a list of macro expanded instructions.
-  
+
    _I appended means immediate
    _A appended means address
    _AB appended means address with base register
@@ -446,11 +447,11 @@ enum
   M_DLA_AB,
   M_DLI,
   M_DMUL,
-  M_DMUL_I, 
+  M_DMUL_I,
   M_DMULO,
-  M_DMULO_I, 
+  M_DMULO_I,
   M_DMULOU,
-  M_DMULOU_I, 
+  M_DMULOU_I,
   M_DREM_3,
   M_DREM_3I,
   M_DREMU_3,
@@ -505,11 +506,11 @@ enum
   M_LWR_AB,
   M_LWU_AB,
   M_MUL,
-  M_MUL_I, 
+  M_MUL_I,
   M_MULO,
-  M_MULO_I, 
+  M_MULO_I,
   M_MULOU,
-  M_MULOU_I, 
+  M_MULOU_I,
   M_NOR_I,
   M_OR_I,
   M_REM_3,
