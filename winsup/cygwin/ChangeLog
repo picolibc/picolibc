@@ -18,6 +18,8 @@
 	consistency.
 	(stabilize_sig_stack): Ditto.
 
+	* tlsoffsets.h: Regenerate.
+
 2004-03-05  Christopher Faylor  <cgf@redhat.com>
 
 	* gendef (sigdelayed): Handle return here rather than going through
