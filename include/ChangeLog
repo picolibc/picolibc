@@ -1,3 +1,7 @@
+2004-07-24  Bernardo Innocenti  <bernie@develer.com>
+
+	* ansidecl.h (ARG_UNUSED): New Macro.
+
 2004-07-23  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* bin-bugs.h (REPORT_BUGS_TO): Set to
