@@ -1,5 +1,10 @@
 2004-02-11  Christopher Faylor  <cgf@redhat.com>
 
+	* gendef (_sigbe): Zero location on pop.
+	(_cygtls::pop): Ditto.
+
+2004-02-11  Christopher Faylor  <cgf@redhat.com>
+
 	* dcrt0.cc (alloc_stack_hard_way): Eliminate second argument.
 	(alloc_stack): Remove use of 'b' throughout.
 
