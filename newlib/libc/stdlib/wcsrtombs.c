@@ -14,9 +14,9 @@ _DEFUN (_wcsrtombs_r, (r, dst, src, len, ps),
 {
   char *ptr = dst;
   char buff[10];
-  int i, n;
-  int count;
-  wint_t wch;
+  wchar_t *pwcs;
+  size_t n;
+  int i;
 
 #ifdef MB_CAPABLE
   if (ps == NULL)
@@ -26,11 +26,15 @@ _DEFUN (_wcsrtombs_r, (r, dst, src, len, ps),
     }
 #endif
 
-  n = (int)len;
+  /* If no dst pointer, treat len as maximum possible value. */
+  if (dst == NULL)
+    len = (size_t)-1;
 
-  while (n > 0)
+  n = 0;
+  pwcs = (wchar_t *)(*src);
+
+  while (n < len)
     {
-      wchar_t *pwcs = (wchar_t *)(*src);
       int count = ps->__count;
       wint_t wch = ps->__value.__wch;
       int bytes = _wctomb_r (r, buff, *pwcs, ps);
@@ -40,29 +44,33 @@ _DEFUN (_wcsrtombs_r, (r, dst, src, len, ps),
 	  ps->__count = 0;
 	  return (size_t)-1;
 	}
-      if (bytes <= n)
+      if (n <= len - bytes && bytes < len)
 	{
-	  for (i = 0; i < bytes; ++i)
-	    *ptr++ = buff[i];
-          
-	  if (*pwcs == 0x00)
+          n += bytes;
+	  if (dst)
 	    {
-	      *src = NULL;
-	      ps->__count = 0;
-	      return (size_t)(ptr - dst - 1);
+	      for (i = 0; i < bytes; ++i)
+	        *ptr++ = buff[i];
+	      ++(*src);
 	    }
-	  ++(*src);
+	  if (*pwcs++ == 0x00)
+	    {
+	      if (dst)
+	        *src = NULL;
+	      ps->__count = 0;
+	      return n - 1;
+	    }
 	}
       else
 	{
 	  /* not enough room, we must back up state to before _wctomb_r call */
 	  ps->__count = count;
 	  ps->__value.__wch = wch;
+          len = 0;
 	}
-      n -= bytes;
     }
 
-  return (size_t)(ptr - dst);
+  return n;
 } 
 
 #ifndef _REENT_ONLY

@@ -1,3 +1,8 @@
+2003-11-05  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/wcsrtombs.c (_wcsrtombs_r): Numerous fixes
+	to make code work as specified in standard.
+
 2003-10-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.in: Use absolute newlib basedir when forming
