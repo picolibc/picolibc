@@ -1,3 +1,9 @@
+2003-01-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdlib.h (_osver, _winver, _winmajor,
+	_winminor): Declare as direct imports from dll if
+	__DECLSPEC_SUPPORTED.
+
 2003-01-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* pseudo-reloc.c (do_pseudo_reloc): Make static.

@@ -226,10 +226,17 @@ extern unsigned int*	__p__winver(void);
 extern unsigned int*	__p__winmajor(void);
 extern unsigned int*	__p__winminor(void);
 
-#define _osver		(*__p__osver())
-#define _winver		(*__p__winver())
-#define _winmajor	(*__p__winmajor())
-#define _winminor	(*__p__winminor())
+#ifndef __DECLSPEC_SUPPORTED
+# define _osver		(*__p__osver())
+# define _winver	(*__p__winver())
+# define _winmajor	(*__p__winmajor())
+# define _winminor	(*__p__winminor())
+#else
+__MINGW_IMPORT unsigned int _osver;
+__MINGW_IMPORT unsigned int _winver;
+__MINGW_IMPORT unsigned int _winmajor;
+__MINGW_IMPORT unsigned int _winminor;
+#endif __DECLSPEC_SUPPORTED
 
 #else
 /* Not msvcrtxx.dll, thus crtdll.dll */
