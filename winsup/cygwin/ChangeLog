@@ -1,3 +1,9 @@
+2002-01-19  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+        * cygwin.din: Add recvmsg and sendmsg.
+        * net.cc: Add cygwin_recvmsg and cygwin_sendmsg.
+        * /usr/include/sys/socket.h: Add recvmsg and sendmsg.
+
 2002-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (create_token): Close processes token handle as soon
