@@ -1,5 +1,11 @@
 2001-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* select.cc: Set errno using set_sig_errno() throughout.
+	* signal.cc (signal): Always set SA_RESTART flag.
+	* syscalls.cc (_read): Revert previous patch.
+
+2001-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* select.cc (fhandler_tty_slave::ready_for_read):  Return 0 on EBADF.
 	* syscalls.cc (_read): If ready_for_read() failed, save errno from
 	being overwritten by signal handler call.

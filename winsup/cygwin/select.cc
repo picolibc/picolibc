@@ -89,7 +89,7 @@ typedef long fd_mask;
   if (cygheap->fdtab.not_open ((s)->fd)) \
     { \
       (s)->saw_error = true; \
-      set_errno (EBADF); \
+      set_sig_errno (EBADF); \
       return -1; \
     } \
 
@@ -238,7 +238,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
     {
       if (m > MAXIMUM_WAIT_OBJECTS)
 	{
-	  set_errno (EINVAL);
+	  set_sig_errno (EINVAL);
 	  return -1;
 	}
       if (!s->startup (s, this))
@@ -780,7 +780,7 @@ fhandler_tty_slave::ready_for_read (int fd, DWORD howlong)
   HANDLE w4[2];
   if (cygheap->fdtab.not_open (fd))
     {
-      set_errno (EBADF);
+      set_sig_errno (EBADF);
       return 0;
     }
   if (get_readahead_valid ())
@@ -793,17 +793,17 @@ fhandler_tty_slave::ready_for_read (int fd, DWORD howlong)
   switch (WaitForMultipleObjects (2, w4, FALSE, howlong))
     {
     case WAIT_OBJECT_0:
-      set_errno (EINTR);
+      set_sig_errno (EINTR);
       return 0;
     case WAIT_OBJECT_0 + 1:
       return 1;
     case WAIT_FAILED:
       select_printf ("wait failed %E");
-      set_errno (EINVAL); /* FIXME: correct errno? */
+      set_sig_errno (EINVAL); /* FIXME: correct errno? */
       return 0;
     default:
       if (!howlong)
-	set_errno (EAGAIN);
+	set_sig_errno (EAGAIN);
       return 0;
     }
 }
@@ -1089,7 +1089,7 @@ fhandler_base::ready_for_read (int fd, DWORD howlong)
 
       if (fd >= 0 && cygheap->fdtab.not_open (fd))
 	{
-	  set_errno (EBADF);
+	  set_sig_errno (EBADF);
 	  avail = 0;
 	  break;
 	}
@@ -1097,13 +1097,13 @@ fhandler_base::ready_for_read (int fd, DWORD howlong)
       if (howlong != INFINITE)
 	{
 	  if (!avail)
-	    set_errno (EAGAIN);
+	    set_sig_errno (EAGAIN);
 	  break;
 	}
 
       if (WaitForSingleObject (signal_arrived, avail ? 0 : 10) == WAIT_OBJECT_0)
 	{
-	  set_errno (EINTR);
+	  set_sig_errno (EINTR);
 	  avail = 0;
 	  break;
 	}
