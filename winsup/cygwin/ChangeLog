@@ -1,5 +1,38 @@
 2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* include/cygwin/cygserver_transport_pipes.h
+	(cygserver_transport_pipes::_sd): Rename field.
+	(cygserver_transport_pipes::_sec_none_nih): Ditto.
+	(cygserver_transport_pipes::_sec_all_nih): Ditto.
+	(cygserver_transport_pipes::_pipe_name): Ditto.
+	(cygserver_transport_pipes::_hPipe): Ditto.
+	(cygserver_transport_pipes::_is_accepted_endpoint): Ditto.
+	* cygserver_transport_pipes.cc
+	(transport_layer_pipes::transport_layer_pipes): Rename fields.
+	(transport_layer_pipes::init_security): Ditto.
+	(transport_layer_pipes::listen): Ditto.
+	(transport_layer_pipes::accept): Ditto.
+	(transport_layer_pipes::close): Ditto.
+	(transport_layer_pipes::read): Ditto.
+	(transport_layer_pipes::write): Ditto.
+	(transport_layer_pipes::connect): Ditto.
+	(transport_layer_pipes::impersonate_client): Ditto.
+	(transport_layer_pipes::revert_to_self): Ditto.
+	* include/cygwin/cygserver_transport_sockets.h
+	(cygserver_transport_sockets::_fd): Rename field.
+	(cygserver_transport_sockets::_addr): Ditto.
+	(cygserver_transport_sockets::_addr_len): Ditto.
+	* cygserver_transport_sockets.cc
+	(transport_layer_sockets::transport_layer_sockets): Rename fields.
+	(transport_layer_sockets::listen): Ditto.
+	(transport_layer_sockets::accept): Ditto.
+	(transport_layer_sockets::close): Ditto.
+	(transport_layer_sockets::read): Ditto.
+	(transport_layer_sockets::write): Ditto.
+	(transport_layer_sockets::connect): Ditto.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_shm.cc (with_strerr): Fix use of %p format.
 	* shm.cc (client_shmmgr::shmat): Ditto.
 	(client_shmmgr::shmctl): Ditto.

@@ -56,12 +56,12 @@ initialise_pipe_instance_lock ()
 
 #ifndef __INSIDE_CYGWIN__
 
-transport_layer_pipes::transport_layer_pipes (const HANDLE new_pipe)
-  : pipe_name (""),
-    pipe (new_pipe),
-    is_accepted_endpoint (true)
+transport_layer_pipes::transport_layer_pipes (const HANDLE hPipe)
+  : _pipe_name (""),
+    _hPipe (hPipe),
+    _is_accepted_endpoint (true)
 {
-  assert (pipe && pipe != INVALID_HANDLE_VALUE);
+  assert (_hPipe && _hPipe != INVALID_HANDLE_VALUE);
 
   init_security ();
 }
@@ -69,9 +69,9 @@ transport_layer_pipes::transport_layer_pipes (const HANDLE new_pipe)
 #endif /* !__INSIDE_CYGWIN__ */
 
 transport_layer_pipes::transport_layer_pipes ()
-  : pipe_name ("\\\\.\\pipe\\cygwin_lpc"),
-    pipe (NULL),
-    is_accepted_endpoint (false)
+  : _pipe_name ("\\\\.\\pipe\\cygwin_lpc"),
+    _hPipe (NULL),
+    _is_accepted_endpoint (false)
 {
   init_security ();
 }
@@ -83,13 +83,13 @@ transport_layer_pipes::init_security ()
 
   /* FIXME: pthread_once or equivalent needed */
 
-  InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-  SetSecurityDescriptorDacl (&sd, TRUE, NULL, FALSE);
+  InitializeSecurityDescriptor (&_sd, SECURITY_DESCRIPTOR_REVISION);
+  SetSecurityDescriptorDacl (&_sd, TRUE, NULL, FALSE);
 
-  sec_none_nih.nLength = sec_all_nih.nLength = sizeof (SECURITY_ATTRIBUTES);
-  sec_none_nih.bInheritHandle = sec_all_nih.bInheritHandle = FALSE;
-  sec_none_nih.lpSecurityDescriptor = NULL;
-  sec_all_nih.lpSecurityDescriptor = &sd;
+  _sec_none_nih.nLength = _sec_all_nih.nLength = sizeof (SECURITY_ATTRIBUTES);
+  _sec_none_nih.bInheritHandle = _sec_all_nih.bInheritHandle = FALSE;
+  _sec_none_nih.lpSecurityDescriptor = NULL;
+  _sec_all_nih.lpSecurityDescriptor = &_sd;
 }
 
 transport_layer_pipes::~transport_layer_pipes ()
@@ -102,16 +102,16 @@ transport_layer_pipes::~transport_layer_pipes ()
 void
 transport_layer_pipes::listen ()
 {
-  assert (!is_accepted_endpoint);
-  assert (!pipe);
+  assert (!_is_accepted_endpoint);
+  assert (!_hPipe);
   /* no-op */
 }
 
 class transport_layer_pipes *
 transport_layer_pipes::accept (bool *const recoverable)
 {
-  assert (!is_accepted_endpoint);
-  assert (!pipe);
+  assert (!_is_accepted_endpoint);
+  assert (!_hPipe);
 
   pthread_once (&pipe_instance_lock_once, &initialise_pipe_instance_lock);
 
@@ -125,13 +125,13 @@ transport_layer_pipes::accept (bool *const recoverable)
   const bool first_instance = (pipe_instance == 0);
 
   const HANDLE accept_pipe =
-    CreateNamedPipe (pipe_name,
+    CreateNamedPipe (_pipe_name,
 		     (PIPE_ACCESS_DUPLEX
 		      | (first_instance ? FILE_FLAG_FIRST_PIPE_INSTANCE : 0)),
 		     (PIPE_TYPE_BYTE | PIPE_WAIT),
 		     PIPE_UNLIMITED_INSTANCES,
 		     0, 0, 1000,
-		     &sec_all_nih);
+		     &_sec_all_nih);
 
   const bool duplicate = (accept_pipe == INVALID_HANDLE_VALUE
 			  && pipe_instance == 0
@@ -176,53 +176,53 @@ transport_layer_pipes::accept (bool *const recoverable)
 void
 transport_layer_pipes::close ()
 {
-  // verbose: debug_printf ("closing pipe %p", pipe);
+  // verbose: debug_printf ("closing pipe %p", _hPipe);
 
-  if (pipe)
+  if (_hPipe)
     {
-      assert (pipe != INVALID_HANDLE_VALUE);
+      assert (_hPipe != INVALID_HANDLE_VALUE);
 
 #ifndef __INSIDE_CYGWIN__
 
-      if (is_accepted_endpoint)
+      if (_is_accepted_endpoint)
 	{
-	  (void) FlushFileBuffers (pipe); // Blocks until client reads.
-	  (void) DisconnectNamedPipe (pipe);
+	  (void) FlushFileBuffers (_hPipe); // Blocks until client reads.
+	  (void) DisconnectNamedPipe (_hPipe);
 	  EnterCriticalSection (&pipe_instance_lock);
-	  (void) CloseHandle (pipe);
+	  (void) CloseHandle (_hPipe);
 	  assert (pipe_instance > 0);
 	  InterlockedDecrement (&pipe_instance);
 	  LeaveCriticalSection (&pipe_instance_lock);
 	}
       else
-	(void) CloseHandle (pipe);
+	(void) CloseHandle (_hPipe);
 
 #else /* __INSIDE_CYGWIN__ */
 
-      assert (!is_accepted_endpoint);
-      (void) ForceCloseHandle (pipe);
+      assert (!_is_accepted_endpoint);
+      (void) ForceCloseHandle (_hPipe);
 
 #endif /* __INSIDE_CYGWIN__ */
 
-      pipe = NULL;
+      _hPipe = NULL;
     }
 }
 
 ssize_t
 transport_layer_pipes::read (void *const buf, const size_t len)
 {
-  // verbose: debug_printf ("reading from pipe %p", pipe);
+  // verbose: debug_printf ("reading from pipe %p", _hPipe);
 
-  if (!pipe)
+  if (!_hPipe)
     {
       set_errno (EBADF);
       return -1;
     }
 
-  assert (pipe != INVALID_HANDLE_VALUE);
+  assert (_hPipe != INVALID_HANDLE_VALUE);
 
   DWORD count;
-  if (!ReadFile (pipe, buf, len, &count, NULL))
+  if (!ReadFile (_hPipe, buf, len, &count, NULL))
     {
       debug_printf ("error reading from pipe (%lu)", GetLastError ());
       set_errno (EINVAL);	// FIXME?
@@ -235,18 +235,18 @@ transport_layer_pipes::read (void *const buf, const size_t len)
 ssize_t
 transport_layer_pipes::write (void *const buf, const size_t len)
 {
-  // verbose: debug_printf ("writing to pipe %p", pipe);
+  // verbose: debug_printf ("writing to pipe %p", _hPipe);
 
-  if (!pipe)
+  if (!_hPipe)
     {
       set_errno (EBADF);
       return -1;
     }
 
-  assert (pipe != INVALID_HANDLE_VALUE);
+  assert (_hPipe != INVALID_HANDLE_VALUE);
 
   DWORD count;
-  if (!WriteFile (pipe, buf, len, &count, NULL))
+  if (!WriteFile (_hPipe, buf, len, &count, NULL))
     {
       debug_printf ("error writing to pipe, error = %lu", GetLastError ());
       set_errno (EINVAL);	// FIXME?
@@ -268,9 +268,9 @@ transport_layer_pipes::write (void *const buf, const size_t len)
 bool
 transport_layer_pipes::connect ()
 {
-  if (pipe)
+  if (_hPipe)
     {
-      assert (pipe != INVALID_HANDLE_VALUE);
+      assert (_hPipe != INVALID_HANDLE_VALUE);
 
       debug_printf ("Already have a pipe in this %p",this);
       return false;
@@ -283,19 +283,19 @@ transport_layer_pipes::connect ()
 
   while (rc)
     {
-      pipe = CreateFile (pipe_name,
-			 GENERIC_READ | GENERIC_WRITE,
-			 FILE_SHARE_READ | FILE_SHARE_WRITE,
-			 &sec_all_nih,
-			 OPEN_EXISTING,
-			 SECURITY_IMPERSONATION,
-			 NULL);
+      _hPipe = CreateFile (_pipe_name,
+			   GENERIC_READ | GENERIC_WRITE,
+			   FILE_SHARE_READ | FILE_SHARE_WRITE,
+			   &_sec_all_nih,
+			   OPEN_EXISTING,
+			   SECURITY_IMPERSONATION,
+			   NULL);
 
-      if (pipe != INVALID_HANDLE_VALUE)
+      if (_hPipe != INVALID_HANDLE_VALUE)
 	{
-	  assert (pipe);
+	  assert (_hPipe);
 #ifdef __INSIDE_CYGWIN__
-	  ProtectHandle (pipe);
+	  ProtectHandle (_hPipe);
 #endif
 	  assume_cygserver = true;
 	  return true;
@@ -304,11 +304,11 @@ transport_layer_pipes::connect ()
       if (!assume_cygserver && GetLastError () != ERROR_PIPE_BUSY)
 	{
 	  debug_printf ("Error opening the pipe (%lu)", GetLastError ());
-	  pipe = NULL;
+	  _hPipe = NULL;
 	  return false;
 	}
 
-      pipe = NULL;
+      _hPipe = NULL;
 
       /* Note: `If no instances of the specified named pipe exist, the
        * WaitNamedPipe function returns immediately, regardless of the
@@ -316,7 +316,7 @@ transport_layer_pipes::connect ()
        * with ERROR_FILE_NOT_FOUND.
        */
       while (retries != MAX_WAIT_NAMED_PIPE_RETRY
-	     && !(rc = WaitNamedPipe (pipe_name, WAIT_NAMED_PIPE_TIMEOUT)))
+	     && !(rc = WaitNamedPipe (_pipe_name, WAIT_NAMED_PIPE_TIMEOUT)))
 	{
 	  if (GetLastError () == ERROR_FILE_NOT_FOUND)
 	    Sleep (0);		// Give the server a chance.
@@ -340,14 +340,14 @@ transport_layer_pipes::connect ()
 void
 transport_layer_pipes::impersonate_client ()
 {
-  assert (is_accepted_endpoint);
+  assert (_is_accepted_endpoint);
 
-  // verbose: debug_printf ("impersonating pipe %p", pipe);
-  if (pipe)
+  // verbose: debug_printf ("impersonating pipe %p", _hPipe);
+  if (_hPipe)
     {
-      assert (pipe != INVALID_HANDLE_VALUE);
+      assert (_hPipe != INVALID_HANDLE_VALUE);
 
-      if (!ImpersonateNamedPipeClient (pipe))
+      if (!ImpersonateNamedPipeClient (_hPipe))
 	debug_printf ("Failed to Impersonate the client, (%lu)",
 		      GetLastError ());
     }
@@ -357,7 +357,7 @@ transport_layer_pipes::impersonate_client ()
 void
 transport_layer_pipes::revert_to_self ()
 {
-  assert (is_accepted_endpoint);
+  assert (_is_accepted_endpoint);
 
   RevertToSelf ();
   // verbose: debug_printf ("I am who I yam");

@@ -31,9 +31,9 @@ public:
 
 private:
   /* for socket based communications */
-  int fd;
-  struct sockaddr sockdetails;
-  int sdlen;
+  int _fd;
+  struct sockaddr _addr;
+  int _addr_len;
 
   transport_layer_sockets (int newfd);
 };

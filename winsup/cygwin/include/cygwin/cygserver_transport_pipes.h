@@ -39,13 +39,13 @@ private:
   /* for pipe based communications */
   void init_security ();
   //FIXME: allow inited, sd, all_nih_.. to be static members
-  SECURITY_DESCRIPTOR sd;
-  SECURITY_ATTRIBUTES sec_none_nih, sec_all_nih;
-  const char *const pipe_name;
-  HANDLE pipe;
-  const bool is_accepted_endpoint;
+  SECURITY_DESCRIPTOR _sd;
+  SECURITY_ATTRIBUTES _sec_none_nih, _sec_all_nih;
+  const char *const _pipe_name;
+  HANDLE _hPipe;
+  const bool _is_accepted_endpoint;
 
-  transport_layer_pipes (HANDLE new_pipe);
+  transport_layer_pipes (HANDLE hPipe);
 };
 
 #endif /* _CYGSERVER_TRANSPORT_PIPES_ */

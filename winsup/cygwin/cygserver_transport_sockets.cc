@@ -28,43 +28,39 @@ details. */
 
 /* to allow this to link into cygwin and the .dll, a little magic is needed. */
 #ifndef __OUTSIDE_CYGWIN__
-extern "C" int
-cygwin_socket (int af, int type, int protocol);
-extern "C" int
-cygwin_connect (int fd,
-		const struct sockaddr *name,
-		int namelen);
-extern "C" int
-cygwin_accept (int fd, struct sockaddr *peer, int *len);
-extern "C" int
-cygwin_listen (int fd, int backlog);
-extern "C" int
-cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen);
 
-#else
-#define cygwin_accept(A,B,C)  ::accept (A,B,C)
-#define cygwin_socket(A,B,C)  ::socket (A,B,C)
-#define cygwin_listen(A,B)    ::listen (A,B)
-#define cygwin_bind(A,B,C)    ::bind (A,B,C)
-#define cygwin_connect(A,B,C) ::connect (A,B,C)
-#endif
+extern "C" int cygwin_accept (int fd, struct sockaddr *, int *len);
+extern "C" int cygwin_bind (int fd, const struct sockaddr *, int len);
+extern "C" int cygwin_connect (int fd, const struct sockaddr *, int len);
+extern "C" int cygwin_listen (int fd, int backlog);
+extern "C" int cygwin_socket (int af, int type, int protocol);
+
+#else /* __OUTSIDE_CYGWIN__ */
+
+#define cygwin_accept(A,B,C)    ::accept (A,B,C)
+#define cygwin_bind(A,B,C)      ::bind (A,B,C)
+#define cygwin_connect(A,B,C)   ::connect (A,B,C)
+#define cygwin_listen(A,B)      ::listen (A,B)
+#define cygwin_socket(A,B,C)    ::socket (A,B,C)
+
+#endif /* __OUTSIDE_CYGWIN__ */
 
 transport_layer_sockets::transport_layer_sockets (int newfd)
-  : fd (newfd)
+  : _fd (newfd)
 {
   /* This may not be needed in this constructor - it's only used
    * when creating a connection via bind or connect
    */
-  sockdetails.sa_family = AF_UNIX;
-  strcpy (sockdetails.sa_data, "/tmp/cygdaemo");
-  sdlen = strlen (sockdetails.sa_data) + sizeof (sockdetails.sa_family);
+  _addr.sa_family = AF_UNIX;
+  strcpy (_addr.sa_data, "/tmp/cygdaemo");
+  _addr_len = strlen (_addr.sa_data) + sizeof (_addr.sa_family);
 };
 
-transport_layer_sockets::transport_layer_sockets (): fd (-1)
+transport_layer_sockets::transport_layer_sockets (): _fd (-1)
 {
-  sockdetails.sa_family = AF_UNIX;
-  strcpy (sockdetails.sa_data, "/tmp/cygdaemo");
-  sdlen = strlen (sockdetails.sa_data) + sizeof (sockdetails.sa_family);
+  _addr.sa_family = AF_UNIX;
+  strcpy (_addr.sa_data, "/tmp/cygdaemo");
+  _addr_len = strlen (_addr.sa_data) + sizeof (_addr.sa_family);
 }
 
 transport_layer_sockets::~transport_layer_sockets ()
@@ -78,11 +74,11 @@ void
 transport_layer_sockets::listen ()
 {
   /* we want a thread pool based approach. */
-  if ((fd = cygwin_socket (AF_UNIX, SOCK_STREAM,0)) < 0)
+  if ((_fd = cygwin_socket (AF_UNIX, SOCK_STREAM,0)) < 0)
     system_printf ("Socket not created error %d", errno);
-  if (cygwin_bind (fd, &sockdetails, sdlen))
+  if (cygwin_bind (_fd, &_addr, _addr_len))
     system_printf ("Bind doesn't like you. Tsk Tsk. Bind said %d", errno);
-  if (cygwin_listen (fd, 5) < 0)
+  if (cygwin_listen (_fd, 5) < 0)
     system_printf ("And the OS just isn't listening, all it says is %d",
 		   errno);
 }
@@ -91,7 +87,7 @@ class transport_layer_sockets *
 transport_layer_sockets::accept (bool *const recoverable)
 {
   /* FIXME: check we have listened */
-  const int accept_fd = cygwin_accept (fd, &sockdetails, &sdlen);
+  const int accept_fd = cygwin_accept (_fd, &_addr, &_addr_len);
 
   if (accept_fd == -1)
     {
@@ -123,10 +119,10 @@ void
 transport_layer_sockets::close ()
 {
   /* FIXME - are we open? */
-  if (fd != -1)
+  if (_fd != -1)
     {
-      ::close (fd);
-      fd = -1;
+      ::close (_fd);
+      _fd = -1;
     }
 }
 
@@ -134,27 +130,27 @@ ssize_t
 transport_layer_sockets::read (void *buf, size_t len)
 {
   /* FIXME: are we open? */
-  return ::read (fd, buf, len);
+  return ::read (_fd, buf, len);
 }
 
 ssize_t
 transport_layer_sockets::write (void *buf, size_t len)
 {
   /* FIXME: are we open? */
-  return ::write (fd, buf, len);
+  return ::write (_fd, buf, len);
 }
 
 bool
 transport_layer_sockets::connect ()
 {
   /* are we already connected? */
-  if (fd != -1)
+  if (_fd != -1)
     return false;
-  fd = cygwin_socket (AF_UNIX, SOCK_STREAM, 0);
-  if (cygwin_connect (fd, &sockdetails, sdlen) < 0)
+  _fd = cygwin_socket (AF_UNIX, SOCK_STREAM, 0);
+  if (cygwin_connect (_fd, &_addr, _addr_len) < 0)
     {
       debug_printf ("client connect failure %d", errno);
-      ::close (fd);
+      ::close (_fd);
       return false;
     }
   return true;
