@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 /*
- * Guess on types by examining *_MIN/*_MAX defines.
+ * Guess on types by examining *_MIN / *_MAX defines.
  */
 #if defined(__GNUC__) && (__GNUC__ >= 3 ) \
   && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ > 2 ) 

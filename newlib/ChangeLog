@@ -1,3 +1,8 @@
+2005-03-22  Christopher Faylor  <cgf@timesys.com>
+
+	* libc/include/machine/_types.h: Make trivial change to comment to
+	avoid a spurious warning from gcc.
+
 2005-03-21  Nicholas Wourms  <nwourms@netscape.net>
 
 	* libc/stdio/vfprintf.c: Move newlib.h before _WANT_IO_POS_ARGS test,
