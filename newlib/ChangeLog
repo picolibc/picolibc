@@ -1,3 +1,8 @@
+2000-08-22  Werner Almesberger  <Werner.Almesberger@epfl.ch>
+
+	* libc/unix/getut.c (utmpname): added _CONST to reflect common use
+	and prototype in cygwin's utmp.h
+
 2000-08-16  Eric Fifer  <efifer@sanwaint.com>
 
         * libc/stdio/vfprintf.c (_vfprintf_r): suppress . with "%.0f", 0.1

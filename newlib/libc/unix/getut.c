@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <utmp.h>
 #include <_syslist.h>
+#include <_ansi.h>
 
 static int utmp_fd = -2;
 static char *utmp_file = UTMP_FILE;
@@ -26,7 +27,7 @@ endutent ()
 }
 
 void
-utmpname (char *file)
+utmpname (_CONST char *file)
 {
   extern char *strdup (char *);
 
