@@ -180,7 +180,7 @@ grp32togrp16 (struct __group16 *gp16, struct __group32 *gp32)
 extern "C" struct __group32 *
 getgrgid32 (__gid32_t gid)
 {
-  return internal_getgrgid (gid, TRUE);
+  return internal_getgrgid (gid, true);
 }
 
 extern "C" struct __group16 *
@@ -194,7 +194,7 @@ getgrgid (__gid16_t gid)
 extern "C" struct __group32 *
 getgrnam32 (const char *name)
 {
-  return internal_getgrnam (name, TRUE);
+  return internal_getgrnam (name, true);
 }
 
 extern "C" struct __group16 *

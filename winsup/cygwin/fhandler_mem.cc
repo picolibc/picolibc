@@ -366,7 +366,7 @@ fhandler_dev_mem::msync (HANDLE h, caddr_t addr, size_t len, int flags)
   return 0;
 }
 
-BOOL
+bool
 fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 					 DWORD size, void *address)
 {
@@ -398,7 +398,7 @@ fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       syscall_printf ("-1 = fixup_mmap_after_fork(): NtMapViewOfSection failed with %E");
-      return FALSE;
+      return false;
     }
   return base == address;
 }

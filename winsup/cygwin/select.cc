@@ -281,7 +281,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
       select_printf ("woke up.  wait_ret %d.  verifying", wait_ret);
       s = &start;
-      int gotone = FALSE;
+      bool gotone = false;
       /* Some types of object (e.g., consoles) wake up on "inappropriate" events
 	 like mouse movements.  The verify function will detect these situations.
 	 If it returns false, then this wakeup was a false alarm and we should go
@@ -511,7 +511,7 @@ static int start_thread_pipe (select_record *me, select_stuff *stuff);
 struct pipeinf
   {
     cygthread *thread;
-    BOOL stop_thread_pipe;
+    bool stop_thread_pipe;
     select_record *start;
   };
 
@@ -519,7 +519,7 @@ static DWORD WINAPI
 thread_pipe (void *arg)
 {
   pipeinf *pi = (pipeinf *) arg;
-  BOOL gotone = FALSE;
+  bool gotone = false;
 
   for (;;)
     {
@@ -559,7 +559,7 @@ start_thread_pipe (select_record *me, select_stuff *stuff)
     }
   pipeinf *pi = new pipeinf;
   pi->start = &stuff->start;
-  pi->stop_thread_pipe = FALSE;
+  pi->stop_thread_pipe = false;
   pi->thread = new cygthread (thread_pipe, (LPVOID) pi, "select_pipe");
   me->h = *pi->thread;
   if (!me->h)
@@ -848,7 +848,7 @@ static int start_thread_serial (select_record *me, select_stuff *stuff);
 struct serialinf
   {
     cygthread *thread;
-    BOOL stop_thread_serial;
+    bool stop_thread_serial;
     select_record *start;
   };
 
@@ -956,7 +956,7 @@ static DWORD WINAPI
 thread_serial (void *arg)
 {
   serialinf *si = (serialinf *) arg;
-  BOOL gotone= FALSE;
+  bool gotone = false;
 
   for (;;)
     {
@@ -990,7 +990,7 @@ start_thread_serial (select_record *me, select_stuff *stuff)
     }
   serialinf *si = new serialinf;
   si->start = &stuff->start;
-  si->stop_thread_serial = FALSE;
+  si->stop_thread_serial = false;
   si->thread = new cygthread (thread_serial, (LPVOID) si, "select_serial");
   me->h = *si->thread;
   stuff->device_specific_serial = (void *) si;

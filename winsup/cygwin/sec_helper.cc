@@ -418,7 +418,7 @@ init_global_security ()
     get_null_sd ();
 }
 
-BOOL
+bool
 sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD access2)
 {
   size_t acl_len = MAX_DACL_LEN(5);
@@ -428,7 +428,7 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
   if (!InitializeAcl (acl, acl_len, ACL_REVISION))
     {
       debug_printf ("InitializeAcl %E");
-      return FALSE;
+      return false;
     }
   if (sid1)
     if (!AddAccessAllowedAce (acl, ACL_REVISION,
@@ -456,7 +456,7 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
   else
     debug_printf ("FindFirstFreeAce %E");
 
-  return TRUE;
+  return true;
 }
 
 PSECURITY_ATTRIBUTES __stdcall

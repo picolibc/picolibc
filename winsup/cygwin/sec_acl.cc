@@ -352,7 +352,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent32_t *aclbufp)
 	      id = ILLEGAL_GID;
 	    }
 	  else
-	    id = ace_sid.get_id (TRUE, &type);
+	    id = ace_sid.get_id (true, &type);
 
 	  if (!type)
 	    continue;
@@ -516,16 +516,16 @@ facl32 (int fd, int cmd, int nentries, __aclent32_t *aclbufp)
 extern "C" int
 aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 {
-  BOOL has_user_obj = FALSE;
-  BOOL has_group_obj = FALSE;
-  BOOL has_other_obj = FALSE;
-  BOOL has_class_obj = FALSE;
-  BOOL has_ug_objs = FALSE;
-  BOOL has_def_user_obj = FALSE;
-  BOOL has_def_group_obj = FALSE;
-  BOOL has_def_other_obj = FALSE;
-  BOOL has_def_class_obj = FALSE;
-  BOOL has_def_ug_objs = FALSE;
+  bool has_user_obj = false;
+  bool has_group_obj = false;
+  bool has_other_obj = false;
+  bool has_class_obj = false;
+  bool has_ug_objs = false;
+  bool has_def_user_obj = false;
+  bool has_def_group_obj = false;
+  bool has_def_other_obj = false;
+  bool has_def_class_obj = false;
+  bool has_def_ug_objs = false;
   int pos2;
 
   for (int pos = 0; pos < nentries; ++pos)
@@ -538,7 +538,7 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return USER_ERROR;
 	  }
-	has_user_obj = TRUE;
+	has_user_obj = true;
 	break;
       case GROUP_OBJ:
 	if (has_group_obj)
@@ -547,7 +547,7 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return GRP_ERROR;
 	  }
-	has_group_obj = TRUE;
+	has_group_obj = true;
 	break;
       case OTHER_OBJ:
 	if (has_other_obj)
@@ -556,7 +556,7 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return OTHER_ERROR;
 	  }
-	has_other_obj = TRUE;
+	has_other_obj = true;
 	break;
       case CLASS_OBJ:
 	if (has_class_obj)
@@ -565,7 +565,7 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return CLASS_ERROR;
 	  }
-	has_class_obj = TRUE;
+	has_class_obj = true;
 	break;
       case USER:
       case GROUP:
@@ -576,7 +576,7 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 	      *which = pos2;
 	    return DUPLICATE_ERROR;
 	  }
-	has_ug_objs = TRUE;
+	has_ug_objs = true;
 	break;
       case DEF_USER_OBJ:
 	if (has_def_user_obj)
@@ -585,7 +585,7 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return USER_ERROR;
 	  }
-	has_def_user_obj = TRUE;
+	has_def_user_obj = true;
 	break;
       case DEF_GROUP_OBJ:
 	if (has_def_group_obj)
@@ -594,7 +594,7 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return GRP_ERROR;
 	  }
-	has_def_group_obj = TRUE;
+	has_def_group_obj = true;
 	break;
       case DEF_OTHER_OBJ:
 	if (has_def_other_obj)
@@ -603,7 +603,7 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return OTHER_ERROR;
 	  }
-	has_def_other_obj = TRUE;
+	has_def_other_obj = true;
 	break;
       case DEF_CLASS_OBJ:
 	if (has_def_class_obj)
@@ -612,7 +612,7 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return CLASS_ERROR;
 	  }
-	has_def_class_obj = TRUE;
+	has_def_class_obj = true;
 	break;
       case DEF_USER:
       case DEF_GROUP:
@@ -623,7 +623,7 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 	      *which = pos2;
 	    return DUPLICATE_ERROR;
 	  }
-	has_def_ug_objs = TRUE;
+	has_def_ug_objs = true;
 	break;
       default:
 	return ENTRY_ERROR;
@@ -781,13 +781,13 @@ acltotext32 (__aclent32_t *aclbufp, int aclcnt)
     }
   char buf[32000];
   buf[0] = '\0';
-  BOOL first = TRUE;
+  bool first = true;
 
   for (int pos = 0; pos < aclcnt; ++pos)
     {
       if (!first)
 	strcat (buf, ",");
-      first = FALSE;
+      first = false;
       if (aclbufp[pos].a_type & ACL_DEFAULT)
 	strcat (buf, "default");
       switch (aclbufp[pos].a_type)

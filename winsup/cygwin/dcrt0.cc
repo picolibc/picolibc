@@ -51,7 +51,7 @@ per_thread NO_COPY *threadstuff[] = {&waitq_storage,
 
 bool display_title;
 bool strip_title_path;
-bool allow_glob = TRUE;
+bool allow_glob = true;
 codepage_type current_codepage = ansi_cp;
 
 int cygwin_finished_initializing;
@@ -103,7 +103,7 @@ extern "C"
    /* impure_ptr */ &reent_data,
   };
   bool ignore_case_with_glob;
-  int __declspec (dllexport) _check_for_executable = TRUE;
+  int __declspec (dllexport) _check_for_executable = true;
 #ifdef DEBUGGING
   int pinger;
 #endif
@@ -153,7 +153,7 @@ do_global_ctors (void (**in_pfunc)(), int force)
  * A \@file is replaced with @file so that echo \@foo would print
  * @foo and not the contents of foo.
  */
-static int __stdcall
+static bool __stdcall
 insert_file (char *name, char *&cmd)
 {
   HANDLE f;
@@ -170,7 +170,7 @@ insert_file (char *name, char *&cmd)
   if (f == INVALID_HANDLE_VALUE)
     {
       debug_printf ("couldn't open file '%s', %E", name);
-      return FALSE;
+      return false;
     }
 
   /* This only supports files up to about 4 billion bytes in
@@ -180,7 +180,7 @@ insert_file (char *name, char *&cmd)
   if (size == 0xFFFFFFFF)
     {
       debug_printf ("couldn't get file size for '%s', %E", name);
-      return FALSE;
+      return false;
     }
 
   int new_size = strlen (cmd) + size + 2;
@@ -188,7 +188,7 @@ insert_file (char *name, char *&cmd)
   if (!tmp)
     {
       debug_printf ("malloc failed, %E");
-      return FALSE;
+      return false;
     }
 
   /* realloc passed as it should */
@@ -199,13 +199,13 @@ insert_file (char *name, char *&cmd)
   if (!rf_result || (rf_read != size))
     {
       debug_printf ("ReadFile failed, %E");
-      return FALSE;
+      return false;
     }
 
   tmp[size++] = ' ';
   strcpy (tmp + size, cmd);
   cmd = tmp;
-  return TRUE;
+  return true;
 }
 
 static inline int
@@ -769,7 +769,7 @@ dll_crt0_1 ()
     }
 
   /* Disable case-insensitive globbing */
-  ignore_case_with_glob = FALSE;
+  ignore_case_with_glob = false;
 
   /* Flush signals and ensure that signal thread is up and running. Can't
      do this for noncygwin case since the signal thread is blocked due to
@@ -943,7 +943,7 @@ cygwin_dll_init ()
 extern "C" void
 __main (void)
 {
-  do_global_ctors (user_data->ctors, FALSE);
+  do_global_ctors (user_data->ctors, false);
 }
 
 exit_states NO_COPY exit_state;

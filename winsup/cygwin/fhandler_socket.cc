@@ -487,8 +487,8 @@ int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
   int res = -1;
-  BOOL secret_check_failed = FALSE;
-  BOOL in_progress = FALSE;
+  bool secret_check_failed = false;
+  bool in_progress = false;
   sockaddr_in sin;
   int secret [4];
   DWORD err;
@@ -506,7 +506,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	{
 	  err = WSAGetLastError ();
 	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
-	    in_progress = TRUE;
+	    in_progress = true;
 
 	  if (err == WSAEWOULDBLOCK)
 	    WSASetLastError (WSAEINPROGRESS);
@@ -521,7 +521,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	{
 	  if (!create_secret_event (secret))
 	    {
-	      secret_check_failed = TRUE;
+	      secret_check_failed = true;
 	    }
 	  else if (in_progress)
 	    signal_secret_event ();
@@ -532,7 +532,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	  if (!check_peer_secret_event (&sin, secret))
 	    {
 	      debug_printf ("accept from unauthorized server");
-	      secret_check_failed = TRUE;
+	      secret_check_failed = true;
 	    }
        }
 
@@ -570,8 +570,8 @@ int
 fhandler_socket::accept (struct sockaddr *peer, int *len)
 {
   int res = -1;
-  BOOL secret_check_failed = FALSE;
-  BOOL in_progress = FALSE;
+  bool secret_check_failed = false;
+  bool in_progress = false;
 
   /* Allows NULL peer and len parameters. */
   struct sockaddr_in peer_dummy;
@@ -594,14 +594,14 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   res = ::accept (get_socket (), peer, len);
 
   if ((SOCKET) res == INVALID_SOCKET && WSAGetLastError () == WSAEWOULDBLOCK)
-    in_progress = TRUE;
+    in_progress = true;
 
   if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
     {
       if ((SOCKET) res != INVALID_SOCKET || in_progress)
 	{
 	  if (!create_secret_event ())
-	    secret_check_failed = TRUE;
+	    secret_check_failed = true;
 	  else if (in_progress)
 	    signal_secret_event ();
 	}
@@ -612,7 +612,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	  if (!check_peer_secret_event ((struct sockaddr_in*) peer))
 	    {
 	      debug_printf ("connect from unauthorized client");
-	      secret_check_failed = TRUE;
+	      secret_check_failed = true;
 	    }
 	}
 

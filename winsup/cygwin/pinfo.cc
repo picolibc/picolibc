@@ -254,6 +254,36 @@ pinfo::set_acl()
     debug_printf ("SetKernelObjectSecurity %E");
 }
 
+void
+_pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *fhctty)
+{
+  int initial_ctty = ctty;
+  if ((ctty < 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
+    {
+      ctty = tc->ntty;
+      syscall_printf ("attached tty%d sid %d, pid %d, tty->pgid %d, tty->sid %d",
+		      tc->ntty, sid, pid, pgid, tc->getsid ());
+
+      pinfo p (tc->getsid ());
+      if (sid == pid && (!p || p->pid == pid || !proc_exists (p)))
+	{
+	  paranoid_printf ("resetting tty%d sid.  Was %d, now %d.  pgid was %d, now %d.",
+			   tc->ntty, tc->getsid (), sid, tc->getpgid (), pgid);
+	  /* We are the session leader */
+	  tc->setsid (sid);
+	  tc->setpgid (pgid);
+	}
+      else
+	sid = tc->getsid ();
+      if (tc->getpgid () == 0)
+	tc->setpgid (pgid);
+      if (fhctty)
+	cygheap->ctty  = *fhctty;
+      else if (initial_ctty < 0)
+	assert (cygheap->ctty.get_io_handle () == NULL);
+    }
+}
+
 bool
 _pinfo::alive ()
 {

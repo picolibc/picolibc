@@ -261,7 +261,7 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
 }
 #endif
 
-BOOL
+bool
 get_logon_server (const char *domain, char *server, WCHAR *wserver)
 {
   WCHAR wdomain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -276,7 +276,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
       server[0] = server[1] = '\\';
       if (wserver)
 	sys_mbstowcs (wserver, server, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-      return TRUE;
+      return true;
     }
 
   /* Try to get the primary domain controller for the domain */
@@ -288,13 +288,13 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
 	for (WCHAR *ptr1 = buf; (*wserver++ = *ptr1++);)
 	  ;
       NetApiBufferFree (buf);
-      return TRUE;
+      return true;
     }
   __seterrno_from_win_error (ret);
-  return FALSE;
+  return false;
 }
 
-static BOOL
+static bool
 get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user,
 		 char *domain)
 {
@@ -338,36 +338,36 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user,
     }
 
   NetApiBufferFree (buf);
-  return TRUE;
+  return true;
 }
 
-static BOOL
+static bool
 is_group_member (WCHAR *wgroup, PSID pusersid, cygsidlist &grp_list)
 {
   LPLOCALGROUP_MEMBERS_INFO_0 buf;
   DWORD cnt, tot;
   NET_API_STATUS ret;
-  BOOL retval = FALSE;
+  bool retval = false;
 
   /* Members can be users or global groups */
   ret = NetLocalGroupGetMembers (NULL, wgroup, 0, (LPBYTE *) &buf,
 				 MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
   if (ret)
-    return FALSE;
+    return false;
 
   for (DWORD bidx = 0; !retval && bidx < cnt; ++bidx)
     if (EqualSid (pusersid, buf[bidx].lgrmi0_sid))
-      retval = TRUE;
+      retval = true;
     else
       for (int glidx = 0; !retval && glidx < grp_list.count; ++glidx)
 	if (EqualSid (grp_list.sids[glidx], buf[bidx].lgrmi0_sid))
-	  retval = TRUE;
+	  retval = true;
 
   NetApiBufferFree (buf);
   return retval;
 }
 
-static BOOL
+static bool
 get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
 {
   LPLOCALGROUP_INFO_0 buf;
@@ -379,7 +379,7 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
   if (ret)
     {
       __seterrno_from_win_error (ret);
-      return FALSE;
+      return false;
     }
 
   char bgroup[INTERNET_MAX_HOST_NAME_LENGTH + GNLEN + 2];
@@ -392,7 +392,7 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
       || !GetComputerNameA (lgroup, &(llen = INTERNET_MAX_HOST_NAME_LENGTH + 1)))
     {
       __seterrno ();
-      return FALSE;
+      return false;
     }
   bgroup[blen++] = lgroup[llen++] = '\\';
 
@@ -421,18 +421,18 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
 	  grp_list += gsid;
       }
   NetApiBufferFree (buf);
-  return TRUE;
+  return true;
 }
 
-static BOOL
+static bool
 sid_in_token_groups (PTOKEN_GROUPS grps, cygsid &sid)
 {
   if (!grps)
-    return FALSE;
+    return false;
   for (DWORD i = 0; i < grps->GroupCount; ++i)
     if (sid == grps->Groups[i].Sid)
-      return TRUE;
-  return FALSE;
+      return true;
+  return false;
 }
 
 #if 0				/* Unused */
@@ -529,11 +529,11 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
     }
 }
 
-static BOOL
+static bool
 get_initgroups_sidlist (cygsidlist &grp_list,
 			PSID usersid, PSID pgrpsid, struct passwd *pw,
 			PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos,
-			BOOL &special_pgrp)
+			bool &special_pgrp)
 {
   grp_list += well_known_world_sid;
   grp_list += well_known_authenticated_users_sid;
@@ -556,12 +556,12 @@ get_initgroups_sidlist (cygsidlist &grp_list,
 	get_user_groups (wserver, grp_list, user, domain);
       get_unix_group_sidlist (pw, grp_list);
       if (!get_user_local_groups (grp_list, usersid))
-	return FALSE;
+	return false;
     }
   /* special_pgrp true if pgrpsid is not in normal groups */
   if ((special_pgrp = !grp_list.contains (pgrpsid)))
     grp_list += pgrpsid;
-  return TRUE;
+  return true;
 }
 
 static void
@@ -704,11 +704,11 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 	except if the token is internal and the group is in the token SD
 	(see create_token). In that latter case that group must match the
 	requested primary group.  */
-BOOL
-verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
+bool
+verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 {
   DWORD size;
-  BOOL intern = FALSE;
+  bool intern = false;
 
   if (pintern)
     {
@@ -725,7 +725,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
 			    &tok_usersid, sizeof tok_usersid, &size))
     debug_printf ("GetTokenInformation(): %E");
   if (usersid != tok_usersid)
-    return FALSE;
+    return false;
 
   /* For an internal token, if setgroups was not called and if the sd group
      is not well_known_null_sid, it must match pgrpsid */
@@ -805,7 +805,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     { sizeof sqos, SecurityImpersonation, SECURITY_STATIC_TRACKING, FALSE };
   OBJECT_ATTRIBUTES oa = { sizeof oa, 0, 0, 0, 0, &sqos };
   PSECURITY_ATTRIBUTES psa;
-  BOOL special_pgrp = FALSE;
+  bool special_pgrp = false;
   char sa_buf[1024];
   LUID auth_luid = SYSTEM_LUID;
   LARGE_INTEGER exp = { QuadPart:INT64_MAX };
@@ -1204,7 +1204,7 @@ write_sd (const char *file, security_descriptor &sd)
 
 static void
 get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
-			PSID group_sid, BOOL grp_member)
+			PSID group_sid, bool grp_member)
 {
   ACCESS_ALLOWED_ACE *ace;
   int allow = 0;
@@ -1325,7 +1325,7 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
 
   __uid32_t uid;
   __gid32_t gid;
-  BOOL grp_member = get_sids_info (owner_sid, group_sid, &uid, &gid);
+  bool grp_member = get_sids_info (owner_sid, group_sid, &uid, &gid);
   if (uidret)
     *uidret = uid;
   if (gidret)
@@ -1465,36 +1465,36 @@ get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
   return -1;
 }
 
-BOOL
+bool
 add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
 			PSID sid, size_t &len_add, DWORD inherit)
 {
   if (!AddAccessAllowedAce (acl, ACL_REVISION, attributes, sid))
     {
       __seterrno ();
-      return FALSE;
+      return false;
     }
   ACCESS_ALLOWED_ACE *ace;
   if (inherit && GetAce (acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + GetLengthSid (sid);
-  return TRUE;
+  return true;
 }
 
-BOOL
+bool
 add_access_denied_ace (PACL acl, int offset, DWORD attributes,
 		       PSID sid, size_t &len_add, DWORD inherit)
 {
   if (!AddAccessDeniedAce (acl, ACL_REVISION, attributes, sid))
     {
       __seterrno ();
-      return FALSE;
+      return false;
     }
   ACCESS_DENIED_ACE *ace;
   if (inherit && GetAce (acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD) + GetLengthSid (sid);
-  return TRUE;
+  return true;
 }
 
 static PSECURITY_DESCRIPTOR
@@ -1640,7 +1640,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 
   /* Add owner and group permissions if SIDs are equal
      and construct deny attributes for group and owner. */
-  BOOL isownergroup;
+  bool isownergroup;
   if ((isownergroup = (owner_sid == group_sid)))
     owner_allow |= group_allow;
 

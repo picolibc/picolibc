@@ -408,17 +408,11 @@ build_fh_pc (path_conv& pc)
 	    break;
 	  case FH_TTY:
 	    {
-	      device newdev = pc.dev;
-	      newdev.tty_to_real_device ();
-	      switch (newdev)
-		{
-		case FH_CONSOLE:
-		  fh = cnew (fhandler_console) ();
-		  break;
-		case FH_TTYS:
-		  fh = cnew (fhandler_tty_slave) ();
-		  break;
-		}
+	      if (myself->ctty == TTY_CONSOLE)
+		fh = cnew (fhandler_console) ();
+	      else if (myself->ctty >= 0)
+		fh = cnew (fhandler_tty_slave) ();
+	      break;
 	    }
 	}
       }

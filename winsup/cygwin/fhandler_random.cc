@@ -37,7 +37,7 @@ fhandler_dev_random::open (int flags, mode_t)
   return 1;
 }
 
-BOOL
+bool
 fhandler_dev_random::crypt_gen_random (void *ptr, size_t len)
 {
   if (!crypt_prov
@@ -48,14 +48,14 @@ fhandler_dev_random::crypt_gen_random (void *ptr, size_t len)
 			       | CRYPT_NEWKEYSET))
     {
       debug_printf ("%E = CryptAquireContext()");
-      return FALSE;
+      return false;
     }
   if (!CryptGenRandom (crypt_prov, len, (BYTE *)ptr))
     {
       debug_printf ("%E = CryptGenRandom()");
-      return FALSE;
+      return false;
     }
-  return TRUE;
+  return true;
 }
 
 int

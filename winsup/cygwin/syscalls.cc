@@ -317,6 +317,11 @@ setsid (void)
       myself->ctty = -1;
       myself->sid = getpid ();
       myself->pgid = getpid ();
+      if (cygheap->ctty.get_io_handle ())
+	{
+	  cygheap->ctty.close ();
+	  cygheap->ctty.set_io_handle (NULL);
+	}
       syscall_printf ("sid %d, pgid %d, ctty %d, open_fhs %d", myself->sid,
 		      myself->pgid, myself->ctty, fhandler_console::open_fhs);
       return myself->sid;
@@ -652,7 +657,7 @@ link (const char *a, const char *b)
   int res = -1;
   path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
-  extern BOOL allow_winsymlinks;
+  extern bool allow_winsymlinks;
 
   if (real_a.error)
     {
@@ -2096,7 +2101,7 @@ seteuid32 (__uid32_t uid)
   user_groups &groups = cygheap->user.groups;
   HANDLE ptok, new_token = INVALID_HANDLE_VALUE;
   struct passwd * pw_new;
-  BOOL token_is_internal, issamesid;
+  bool token_is_internal, issamesid;
   char dacl_buf[MAX_DACL_LEN (5)];
   TOKEN_DEFAULT_DACL tdacl = {};
 

@@ -248,8 +248,8 @@ int __stdcall get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, m
 				  __uid32_t * = NULL, __gid32_t * = NULL);
 LONG __stdcall read_sd (const char *file, security_descriptor &sd);
 LONG __stdcall write_sd (const char *file, security_descriptor &sd);
-BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
-BOOL __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
+bool __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
+bool __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 int __stdcall check_file_access (const char *, int);
 
 void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
@@ -262,12 +262,12 @@ HANDLE subauth (struct passwd *pw);
 /* Try creating a token directly. */
 HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw);
 /* Verify an existing token */
-BOOL verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL * pintern = NULL);
+bool verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern = NULL);
 
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);
 /* Get default logonserver for a domain. */
-BOOL get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL);
+bool get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL);
 
 /* sec_helper.cc: Security helper functions. */
 int set_process_privilege (const char *privilege, bool enable = true, bool use_thread = false);
@@ -281,7 +281,7 @@ extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
 extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, 
 						  DWORD access2, BOOL inherit)
   __attribute__ ((regparm (3)));
-extern BOOL sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID, 
+extern bool sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID, 
 		     PSID sid2 = NO_SID, DWORD access2 = 0);
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);

@@ -1,3 +1,39 @@
+2003-12-07  Christopher Faylor  <cgf@redhat.com>
+
+	Change use of BOOL, TRUE, FALSE to bool, true, false, as appropriate,
+	throughout.
+
+2003-12-07  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* tty.cc (tty::common_init): Remove call to SetKernelObjectSecurity and
+	edit some comments.
+
+2003-12-07  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.h (init_cygheap::ctty): Add new element.
+	* devices.in (device::parse): Remove special handling for /dev/tty.
+	* devices.cc: Regenerate.
+	* dtable.cc (build_fh_pc): Don't reset /dev/tty device.  Let the device
+	opener do that.
+	* fhandler_termios.cc (tty_min::set_ctty): Redefine to _pinfo class.
+	* fhandler_tty.cc (fhandler_tty_common::set_close_on_exec): Avoid
+	setting noninherit flag for ctty.
+	* tty.h: Move BOOLs to bools.
+	(tty_min::set_ctty): Redeclare to _pinfo class.
+	* pinfo.cc (_pinfo::set_ctty): Define new function based on
+	tty_min::set_ctty.  Change first argument from tty number to tty_min
+	class.
+	* pinfo.h (_pinfo::set_ctty): Declare.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Reflect move
+	of set_ctty to _pinfo class.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Treat FH_TTY specially.
+	Use saved cygheap value if it exists.  Otherwise convert to real device
+	and save on first time open.
+	(fhandler_tty_common::dup): Potentially set controlling tty if duping a
+	slave tty.
+	* syscalls.cc (setsid): Close controlling tty in cygheap.
+	* tty.cc: Change some BOOLs to bools.
+
 2003-12-07  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* syscalls.cc (locked_append): New.

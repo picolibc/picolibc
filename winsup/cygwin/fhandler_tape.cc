@@ -273,14 +273,14 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	  case MTRETEN:
 	    if (! tape_get_feature (TAPE_DRIVE_END_OF_DATA))
 	      ret = ERROR_INVALID_PARAMETER;
-	    else if (! (ret = tape_set_pos (TAPE_REWIND, 0, FALSE)))
+	    else if (! (ret = tape_set_pos (TAPE_REWIND, 0, false)))
 	      ret = tape_prepare (TAPE_TENSION);
 	    break;
 	  case MTBSFM:
-	    ret = tape_set_pos (TAPE_SPACE_FILEMARKS, -op->mt_count, TRUE);
+	    ret = tape_set_pos (TAPE_SPACE_FILEMARKS, -op->mt_count, true);
 	    break;
 	  case MTFSFM:
-	    ret = tape_set_pos (TAPE_SPACE_FILEMARKS, op->mt_count, TRUE);
+	    ret = tape_set_pos (TAPE_SPACE_FILEMARKS, op->mt_count, true);
 	    break;
 	  case MTEOM:
 	    if (tape_get_feature (TAPE_DRIVE_END_OF_DATA))
@@ -497,7 +497,7 @@ static int _tape_set_pos (HANDLE hTape, int mode, long count)
 }
 
 int
-fhandler_dev_tape::tape_set_pos (int mode, long count, BOOLEAN sfm_func)
+fhandler_dev_tape::tape_set_pos (int mode, long count, bool sfm_func)
 {
   unsigned long pos, tgtpos;
 
@@ -603,7 +603,7 @@ fhandler_dev_tape::tape_erase (int mode)
 	break;
     }
 
-  return tape_error (EraseTape (get_handle (), mode, FALSE), "tape_erase");
+  return tape_error (EraseTape (get_handle (), mode, false), "tape_erase");
 }
 
 int
@@ -617,7 +617,7 @@ fhandler_dev_tape::tape_prepare (int action)
   return tape_error (lasterr, "tape_prepare");
 }
 
-BOOLEAN
+bool
 fhandler_dev_tape::tape_get_feature (DWORD parm)
 {
   DWORD varlen;
@@ -631,7 +631,7 @@ fhandler_dev_tape::tape_get_feature (DWORD parm)
     ;
 
   if (lasterr)
-    return FALSE;
+    return false;
 
   return ((parm & TAPE_DRIVE_HIGH_FEATURES)
 	  ? ((dp.FeaturesHigh & parm) != 0)

@@ -163,7 +163,7 @@ DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 /* Functions
  */
 static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
-static __inline__ BOOL get_proc_lock (DWORD, DWORD);
+static __inline__ bool get_proc_lock (DWORD, DWORD);
 static void __stdcall remove_zombie (int);
 static DWORD WINAPI wait_sig (VOID *arg);
 static int __stdcall stopped_or_terminated (waitq *, _pinfo *);
@@ -172,14 +172,14 @@ static DWORD WINAPI wait_subproc (VOID *);
 /* Determine if the parent process is alive.
  */
 
-BOOL __stdcall
+bool __stdcall
 my_parent_is_alive ()
 {
-  DWORD res;
+  bool res;
   if (!myself->ppid_handle)
     {
       debug_printf ("No myself->ppid_handle");
-      res = FALSE;
+      res = false;
     }
   else
     for (int i = 0; i < 2; i++)
@@ -187,11 +187,11 @@ my_parent_is_alive ()
 	{
 	  case WAIT_OBJECT_0:
 	    debug_printf ("parent dead.");
-	    res = FALSE;
+	    res = false;
 	    goto out;
 	  case WAIT_TIMEOUT:
 	    debug_printf ("parent still alive");
-	    res = TRUE;
+	    res = true;
 	    goto out;
 	  case WAIT_FAILED:
 	    DWORD werr = GetLastError ();
@@ -199,7 +199,7 @@ my_parent_is_alive ()
 	      continue;
 	    system_printf ("WFSO for myself->ppid_handle(%p) failed, error %d",
 			   myself->ppid_handle, werr);
-	    res = FALSE;
+	    res = false;
 	    goto out;
 	}
 out:
@@ -221,31 +221,31 @@ wait_for_sigthread ()
  * Attempt to handle case where process is exiting as we try to grab
  * the mutex.
  */
-static BOOL
+static bool
 get_proc_lock (DWORD what, DWORD val)
 {
   Static int lastwhat = -1;
   if (!sync_proc_subproc)
-    return FALSE;
+    return false;
   if (sync_proc_subproc->acquire (WPSP))
     {
       lastwhat = what;
-      return TRUE;
+      return true;
     }
   if (!sync_proc_subproc)
-    return FALSE;
+    return false;
   system_printf ("Couldn't aquire sync_proc_subproc for(%d,%d), %E, last %d",
 		  what, val, lastwhat);
-  return TRUE;
+  return true;
 }
 
-static BOOL __stdcall
+static bool __stdcall
 proc_can_be_signalled (_pinfo *p)
 {
   if (p == myself_nowait || p == myself)
     {
       assert (!wait_sig_inited);
-      return 1;
+      return true;
     }
 
   return ISSTATE (p, PID_INITIALIZING) ||
@@ -253,7 +253,7 @@ proc_can_be_signalled (_pinfo *p)
 	  (PID_ACTIVE | PID_IN_USE));
 }
 
-BOOL __stdcall
+bool __stdcall
 pid_exists (pid_t pid)
 {
   pinfo p (pid);
@@ -262,7 +262,7 @@ pid_exists (pid_t pid)
 
 /* Test to determine if a process really exists and is processing signals.
  */
-BOOL __stdcall
+bool __stdcall
 proc_exists (_pinfo *p)
 {
   return p && !(p->process_state & (PID_EXITED | PID_ZOMBIE));
@@ -654,7 +654,7 @@ int __stdcall
 sig_send (_pinfo *p, int sig, void *tls)
 {
   int rc = 1;
-  BOOL its_me;
+  bool its_me;
   HANDLE sendsig;
   sigpacket pack;
 
@@ -925,7 +925,7 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
   if (!potential_match)
     return 0;
 
-  BOOL terminated;
+  bool terminated;
 
   if ((terminated = child->process_state == PID_ZOMBIE) ||
       ((w->options & WUNTRACED) && child->stopsig))

@@ -129,7 +129,7 @@ fork_copy (PROCESS_INFORMATION &pi, const char *what, ...)
    time out, set errno = EAGAIN and hope the app tries again.  */
 static int
 sync_with_child (PROCESS_INFORMATION &pi, HANDLE subproc_ready,
-		 BOOL hang_child, const char *s)
+		 bool hang_child, const char *s)
 {
   /* We also add the child process handle to the wait. If the child fails
      to initialize (eg. because of a missing dll). Then this
@@ -238,7 +238,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
      Don't call setuid here! The flags are already set. */
   cygheap->user.reimpersonate ();
 
-  sync_with_parent ("after longjmp.", TRUE);
+  sync_with_parent ("after longjmp", true);
   sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d", hParent,
 		  first_dll, load_dlls);
 
@@ -284,14 +284,14 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     {
       cygheap->fdtab.fixup_after_fork (hParent);
       ProtectHandleINH (hParent);
-      sync_with_parent ("performed fork fixup.", FALSE);
+      sync_with_parent ("performed fork fixup", false);
     }
   else
     {
       dlls.load_after_fork (hParent, first_dll);
       cygheap->fdtab.fixup_after_fork (hParent);
       ProtectHandleINH (hParent);
-      sync_with_parent ("loaded dlls", TRUE);
+      sync_with_parent ("loaded dlls", true);
     }
 
   ForceCloseHandle (hParent);
@@ -541,7 +541,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 #endif
 
   /* Wait for subproc to initialize itself. */
-  if (!sync_with_child (pi, subproc_ready, TRUE, "waiting for longjmp"))
+  if (!sync_with_child (pi, subproc_ready, true, "waiting for longjmp"))
     goto cleanup;
 
   /* CHILD IS STOPPED */

@@ -144,7 +144,7 @@ internal_getpwnam (const char *name, bool check)
 extern "C" struct passwd *
 getpwuid32 (__uid32_t uid)
 {
-  struct passwd *temppw = internal_getpwuid (uid, TRUE);
+  struct passwd *temppw = internal_getpwuid (uid, true);
   pthread_testcancel ();
   return temppw;
 }
@@ -163,7 +163,7 @@ getpwuid_r32 (__uid32_t uid, struct passwd *pwd, char *buffer, size_t bufsize, s
   if (!pwd || !buffer)
     return ERANGE;
 
-  struct passwd *temppw = internal_getpwuid (uid, TRUE);
+  struct passwd *temppw = internal_getpwuid (uid, true);
   pthread_testcancel ();
   if (!temppw)
     return 0;
@@ -202,7 +202,7 @@ getpwuid_r (__uid16_t uid, struct passwd *pwd, char *buffer, size_t bufsize, str
 extern "C" struct passwd *
 getpwnam (const char *name)
 {
-  struct passwd *temppw = internal_getpwnam (name, TRUE);
+  struct passwd *temppw = internal_getpwnam (name, true);
   pthread_testcancel ();
   return temppw;
 }
@@ -220,7 +220,7 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
   if (!pwd || !buffer || !nam)
     return ERANGE;
 
-  struct passwd *temppw = internal_getpwnam (nam, TRUE);
+  struct passwd *temppw = internal_getpwnam (nam, true);
   pthread_testcancel ();
 
   if (!temppw)

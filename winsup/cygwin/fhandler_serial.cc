@@ -526,7 +526,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
     TCSAFLUSH: flush output and discard input, then change attributes.
   */
 
-  BOOL dropDTR = FALSE;
+  bool dropDTR = false;
   COMMTIMEOUTS to;
   DCB ostate, state;
   unsigned int ovtime = vtime_, ovmin = vmin_;
@@ -557,7 +557,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
     case B0:
       /* Drop DTR - but leave DCB-resident bitrate as-is since
 	 0 is an invalid bitrate in Win32 */
-      dropDTR = TRUE;
+      dropDTR = true;
       break;
     case B110:
       state.BaudRate = CBR_110;
@@ -740,7 +740,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   set_r_binary ((t->c_iflag & IGNCR) ? 0 : 1);
   set_w_binary ((t->c_oflag & ONLCR) ? 0 : 1);
 
-  if (dropDTR == TRUE)
+  if (dropDTR)
     {
       EscapeCommFunction (get_handle (), CLRDTR);
       tmpDtr = 0;
@@ -951,7 +951,7 @@ fhandler_serial::tcgetattr (struct termios *t)
   /* -------------- Parity errors ------------------ */
 
   /* fParity combines the function of INPCK and NOT IGNPAR */
-  if (state.fParity == TRUE)
+  if (state.fParity)
     t->c_iflag |= INPCK;
   else
     t->c_iflag |= IGNPAR;	/* not necessarily! */
@@ -976,8 +976,7 @@ fhandler_serial::tcgetattr (struct termios *t)
      this is what we do. */
 
   /* Input flow-control */
-  if ((state.fRtsControl == RTS_CONTROL_HANDSHAKE) &&
-      (state.fOutxCtsFlow == TRUE))
+  if ((state.fRtsControl == RTS_CONTROL_HANDSHAKE) && state.fOutxCtsFlow)
     t->c_cflag |= CRTSCTS;
   if (state.fRtsControl == RTS_CONTROL_HANDSHAKE)
     t->c_cflag |= CRTSXOFF;
@@ -988,7 +987,7 @@ fhandler_serial::tcgetattr (struct termios *t)
   /* FIXME: If tcsetattr() hasn't been called previously, this may
      give a false CLOCAL. */
 
-  if (state.fDsrSensitivity == FALSE)
+  if (!state.fDsrSensitivity)
     t->c_cflag |= CLOCAL;
 
   /* FIXME: need to handle IGNCR */

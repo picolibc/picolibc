@@ -243,7 +243,7 @@ NTReadEARaw (HANDLE hFileSource, int *len)
  *	buf	- pointer to buffer with EA value.
  *	len	- length of buf.
  * Return value:
- *	TRUE if success, FALSE otherwice.
+ *	true if success, false otherwice.
  * Note: if len=0 given EA will be deleted.
  */
 
@@ -255,7 +255,7 @@ NTWriteEA (const char *file, const char *attrname, const char *buf, int len)
   DWORD dwBytesWritten;
   LPVOID lpContext;
   DWORD StreamSize, easize;
-  BOOL bSuccess=FALSE;
+  bool bSuccess = false;
   PFILE_FULL_EA_INFORMATION ea;
 
   hFileSource = CreateFile (file, FILE_WRITE_EA,
@@ -305,7 +305,7 @@ NTWriteEA (const char *file, const char *attrname, const char *buf, int len)
 		    &lpContext))
     goto cleanup;
 
-  bSuccess = TRUE;
+  bSuccess = true;
   /* free context */
 
 cleanup:

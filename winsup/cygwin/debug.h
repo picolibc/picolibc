@@ -13,7 +13,7 @@ details. */
 #include "dlmalloc.h"
 #define MALLOC_CHECK ({\
   debug_printf ("checking malloc pool");\
-  (void)mallinfo ();\
+  (void) mallinfo ();\
 })
 #endif
 
@@ -63,7 +63,7 @@ details. */
 void debug_init ();
 void __stdcall add_handle (const char *, int, HANDLE, const char *, bool = false)
   __attribute__ ((regparm (3)));
-BOOL __stdcall close_handle (const char *, int, HANDLE, const char *, BOOL)
+bool __stdcall close_handle (const char *, int, HANDLE, const char *, bool)
   __attribute__ ((regparm (3)));
 void __stdcall cygbench (const char *s) __attribute__ ((regparm (1)));
 extern "C" void console_printf (const char *fmt,...);

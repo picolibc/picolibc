@@ -447,10 +447,20 @@ fhandler_tty_slave::fhandler_tty_slave ()
 int
 fhandler_tty_slave::open (int flags, mode_t)
 {
+  if (get_device () != FH_TTY)
+    /* nothing to do */;
+  else if (!cygheap->ctty.get_io_handle ())
+    pc.dev.tty_to_real_device ();
+  else
+    {
+      *this = cygheap->ctty;
+      termios_printf ("copied tty fhandler from cygheap");
+      return 1;
+    }
+
   tcinit (cygwin_shared->tty[get_unit ()]);
 
   attach_tty (get_unit ());
-  tc->set_ctty (get_unit (), flags);
 
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   /* Create synchronisation events */
@@ -495,7 +505,7 @@ fhandler_tty_slave::open (int flags, mode_t)
   {
     acquire_output_mutex (500);
     inuse = get_ttyp ()->create_inuse (TTY_SLAVE_ALIVE);
-    get_ttyp ()->was_opened = TRUE;
+    get_ttyp ()->was_opened = true;
     release_output_mutex ();
   }
 
@@ -508,7 +518,8 @@ fhandler_tty_slave::open (int flags, mode_t)
       return 0;
     }
 
-  HANDLE from_master_local, to_master_local;
+  HANDLE from_master_local = NULL;
+  HANDLE to_master_local = NULL;
 
 #ifdef USE_SERVER
   if (!wincap.has_security ()
@@ -557,6 +568,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   set_io_handle (from_master_local);
   set_output_handle (to_master_local);
+  myself->set_ctty (get_ttyp (), flags, this);
 
   set_open_status ();
   if (fhandler_console::open_fhs++ == 0 && !GetConsoleCP ()
@@ -589,6 +601,8 @@ fhandler_tty_slave::close ()
   if (!--fhandler_console::open_fhs && myself->ctty == -1)
     FreeConsole ();
   termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
+  if (!exit_state && get_io_handle () == cygheap->ctty.get_io_handle ())
+    return 1;
   return fhandler_tty_common::close ();
 }
 
@@ -886,7 +900,6 @@ fhandler_tty_common::dup (fhandler_base *child)
   fts->tcinit (get_ttyp ());
 
   attach_tty (get_unit ());
-  tc->set_ctty (get_unit (), openflags);
 
   HANDLE nh;
 
@@ -965,6 +978,10 @@ fhandler_tty_common::dup (fhandler_base *child)
       errind = 9;
       goto err;
     }
+
+  if (get_major () == DEV_TTYS_MAJOR)
+    myself->set_ctty (get_ttyp (), openflags, (fhandler_tty_slave *) this);
+
   return 0;
 
 err:
@@ -1298,18 +1315,24 @@ fhandler_tty_common::set_close_on_exec (int val)
   set_inheritance (get_io_handle (), val);
   set_close_on_exec_flag (val);
 #endif
-  if (output_done_event)
-    set_inheritance (output_done_event, val);
-  if (ioctl_request_event)
-    set_inheritance (ioctl_request_event, val);
-  if (ioctl_done_event)
-    set_inheritance (ioctl_done_event, val);
-  if (inuse)
-    set_inheritance (inuse, val);
-  set_inheritance (output_mutex, val);
-  set_inheritance (input_mutex, val);
-  set_inheritance (input_available_event, val);
-  set_inheritance (output_handle, val);
+  if (get_major () == DEV_TTYS_MAJOR
+      && get_io_handle () == cygheap->ctty.get_io_handle ())
+    set_close_on_exec_flag (val);
+  else
+    {
+      if (output_done_event)
+	set_inheritance (output_done_event, val);
+      if (ioctl_request_event)
+	set_inheritance (ioctl_request_event, val);
+      if (ioctl_done_event)
+	set_inheritance (ioctl_done_event, val);
+      if (inuse)
+	set_inheritance (inuse, val);
+      set_inheritance (output_mutex, val);
+      set_inheritance (input_mutex, val);
+      set_inheritance (input_available_event, val);
+      set_inheritance (output_handle, val);
+    }
 }
 
 void

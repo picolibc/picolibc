@@ -117,7 +117,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
 {
   int count;
   char fmt[80];
-  static NO_COPY int nonewline = FALSE;
+  static NO_COPY bool nonewline = false;
   DWORD err = GetLastError ();
   const char *tn = cygthread::name ();
   char *pn = __progname ?: (myself ? myself->progname : NULL);
@@ -163,7 +163,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
 	  break;
 	case '\b':
 	  *--p = '\0';
-	   nonewline = TRUE;
+	   nonewline = true;
 	  goto done;
 	default:
 	  goto addnl;
@@ -172,7 +172,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
 addnl:
   *p++ = '\n';
   *p = '\0';
-  nonewline = FALSE;
+  nonewline = false;
 
 done:
   return p - buf;

@@ -102,13 +102,13 @@ struct symlink_info
   _mode_t mode;
   int check (char *path, const suffix_info *suffixes, unsigned opt);
   bool parse_device (const char *);
-  BOOL case_check (char *path);
+  bool case_check (char *path);
 };
 
 int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
 
 static char shortcut_header[SHORTCUT_HDR_SIZE];
-static BOOL shortcut_initalized;
+static bool shortcut_initalized;
 
 static void
 create_shortcut_header (void)
@@ -123,7 +123,7 @@ create_shortcut_header (void)
       shortcut_header[19] = 'F';
       shortcut_header[20] = '\f';
       shortcut_header[60] = '\001';
-      shortcut_initalized = TRUE;
+      shortcut_initalized = true;
     }
 }
 
@@ -641,7 +641,7 @@ path_conv::check (const char *src, unsigned opt,
 	    {
 	      if (pcheck_case == PCHECK_STRICT)
 		{
-		  case_clash = TRUE;
+		  case_clash = true;
 		  error = ENOENT;
 		  goto out;
 		}
@@ -650,7 +650,7 @@ path_conv::check (const char *src, unsigned opt,
 		 which shall create files to avoid overriding already existing
 		 files with another case. */
 	      if (!component)
-		case_clash = TRUE;
+		case_clash = true;
 	    }
 	  if (!(opt & PC_SYM_IGNORE))
 	    {
@@ -898,7 +898,7 @@ digits (const char *name)
   return p > name && !*p ? n : -1;
 }
 
-/* Return TRUE if src_path is a valid, internally supported device name.
+/* Return true if src_path is a valid, internally supported device name.
    In that case, win32_path gets the corresponding NT device name and
    dev is appropriately filled with device information. */
 
@@ -2195,7 +2195,7 @@ mount_info::del_item (const char *path, unsigned flags, int reg_p)
   else
     {
       slashify (path, pathtmp, 0);
-      posix_path_p = TRUE;
+      posix_path_p = true;
     }
   nofinalslash (pathtmp, pathtmp);
 
@@ -2378,7 +2378,7 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
       win32_path = NULL;
     }
   else if (!check_null_empty_str_errno (win32_path))
-    res = mount_table->add_item (win32_path, posix_path, flags, TRUE);
+    res = mount_table->add_item (win32_path, posix_path, flags, true);
 
   syscall_printf ("%d = mount (%s, %s, %p)", res, win32_path, posix_path, flags);
   return res;
@@ -2415,7 +2415,7 @@ cygwin_umount (const char *path, unsigned flags)
     }
   else
     {
-      res = mount_table->del_item (path, flags, TRUE);
+      res = mount_table->del_item (path, flags, true);
     }
 
   syscall_printf ("%d = cygwin_umount (%s, %d)", res,  path, flags);
@@ -2455,7 +2455,7 @@ get_symlink_ea (const char* frompath, char* buf, int buf_size)
 }
 
 /* Save symlink to Extended Attribute */
-BOOL
+bool
 set_symlink_ea (const char* frompath, const char* topath)
 {
   if (!NTWriteEA (frompath, SYMLINK_EA_NAME, topath, strlen (topath) + 1))
@@ -2463,14 +2463,14 @@ set_symlink_ea (const char* frompath, const char* topath)
       debug_printf ("Cannot save symlink in EA");
       return false;
     }
-  return TRUE;
+  return true;
 }
 
 /* Create a symlink from FROMPATH to TOPATH. */
 
 /* If TRUE create symlinks as Windows shortcuts, if false create symlinks
    as normal files with magic number and system bit set. */
-int allow_winsymlinks = TRUE;
+bool allow_winsymlinks = true;
 
 extern "C" int
 symlink (const char *topath, const char *frompath)
@@ -2642,7 +2642,7 @@ done:
   return res;
 }
 
-static BOOL
+static bool
 cmp_shortcut_header (const char *file_header)
 {
   create_shortcut_header ();
@@ -3061,7 +3061,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
    Dont't call if pcheck_case == PCHECK_RELAXED.
 */
 
-BOOL
+bool
 symlink_info::case_check (char *path)
 {
   WIN32_FIND_DATA data;
@@ -3082,7 +3082,7 @@ symlink_info::case_check (char *path)
       /* If that part of the component exists, check the case. */
       if (strcmp (c, data.cFileName))
 	{
-	  case_clash = TRUE;
+	  case_clash = true;
 
 	  /* If check is set to STRICT, a wrong case results
 	     in returning a ENOENT. */
@@ -3094,7 +3094,7 @@ symlink_info::case_check (char *path)
 	  strcpy (c, data.cFileName);
 	}
     }
-  return TRUE;
+  return true;
 }
 
 /* readlink system call */

@@ -294,19 +294,19 @@ tty_list::allocate_tty (int with_console)
   return freetty;
 }
 
-BOOL
+bool
 tty::slave_alive ()
 {
   return alive (TTY_SLAVE_ALIVE);
 }
 
-BOOL
+bool
 tty::master_alive ()
 {
   return alive (TTY_MASTER_ALIVE);
 }
 
-BOOL
+bool
 tty::alive (const char *fmt)
 {
   HANDLE ev;
@@ -362,25 +362,25 @@ tty::get_event (const char *fmt, BOOL manual_reset)
   return hev;
 }
 
-int
+bool
 tty::make_pipes (fhandler_pty_master *ptym)
 {
   /* Create communication pipes */
 
   /* FIXME: should this be sec_none_nih? */
-  if (CreatePipe (&from_master, &to_slave, &sec_all, 128 * 1024) == FALSE)
+  if (!CreatePipe (&from_master, &to_slave, &sec_all, 128 * 1024))
     {
       termios_printf ("can't create input pipe");
       set_errno (ENOENT);
-      return FALSE;
+      return false;
     }
 
   // ProtectHandle1INH (to_slave, to_pty);
-  if (CreatePipe (&from_slave, &to_master, &sec_all, 128 * 1024) == FALSE)
+  if (!CreatePipe (&from_slave, &to_master, &sec_all, 128 * 1024))
     {
       termios_printf ("can't create output pipe");
       set_errno (ENOENT);
-      return FALSE;
+      return false;
     }
   // ProtectHandle1INH (from_slave, from_pty);
   termios_printf ("tty%d from_slave %p, to_slave %p", ntty, from_slave,
@@ -391,44 +391,34 @@ tty::make_pipes (fhandler_pty_master *ptym)
     termios_printf ("can't set to_slave to non-blocking mode");
   ptym->set_io_handle (from_slave);
   ptym->set_output_handle (to_slave);
-  return TRUE;
+  return true;
 }
 
-BOOL
+bool
 tty::common_init (fhandler_pty_master *ptym)
 {
   /* Set termios information.  Force initialization. */
-  ptym->tcinit (this, TRUE);
+  ptym->tcinit (this, true);
 
   if (!make_pipes (ptym))
-    return FALSE;
+    return false;
   ptym->need_nl = 0;
 
   /* Save our pid  */
 
   master_pid = GetCurrentProcessId ();
 
-  /* Allow the others to open us (for handle duplication) */
+  /* We do not open allow the others to open us (for handle duplication)
+     but rely on cygheap->inherited_ctty for descendant processes.
+     In the future the cygserver may allow access by others. */
 
-  /* FIXME: we shold NOT set the security wide open when the
-     daemon is running
-   */
+#ifdef USE_SERVER
   if (wincap.has_security ())
     {
-#ifdef USE_SERVER
       if (cygserver_running == CYGSERVER_UNKNOWN)
 	cygserver_init ();
-#endif
-
-      if (
-#ifdef USE_SERVER
-	  cygserver_running != CYGSERVER_OK &&
-#endif
-	  !SetKernelObjectSecurity (hMainProc,
-				       DACL_SECURITY_INFORMATION,
-				       get_null_sd ()))
-	system_printf ("Can't set process security, %E");
     }
+#endif
 
   /* Create synchronisation events */
 
@@ -440,15 +430,15 @@ tty::common_init (fhandler_pty_master *ptym)
   else
     {
       if (!(ptym->output_done_event = get_event (OUTPUT_DONE_EVENT)))
-	return FALSE;
+	return false;
       if (!(ptym->ioctl_done_event = get_event (IOCTL_DONE_EVENT)))
-	return FALSE;
+	return false;
       if (!(ptym->ioctl_request_event = get_event (IOCTL_REQUEST_EVENT)))
-	return FALSE;
+	return false;
     }
 
   if (!(ptym->input_available_event = get_event (INPUT_AVAILABLE_EVENT, TRUE)))
-    return FALSE;
+    return false;
 
   char buf[40];
   __small_sprintf (buf, OUTPUT_MUTEX, ntty);
@@ -456,7 +446,7 @@ tty::common_init (fhandler_pty_master *ptym)
     {
       termios_printf ("can't create %s", buf);
       set_errno (ENOENT);
-      return FALSE;
+      return false;
     }
 
   __small_sprintf (buf, INPUT_MUTEX, ntty);
@@ -464,7 +454,7 @@ tty::common_init (fhandler_pty_master *ptym)
     {
       termios_printf ("can't create %s", buf);
       set_errno (ENOENT);
-      return FALSE;
+      return false;
     }
 
   ProtectHandle1INH (ptym->output_mutex, output_mutex);
@@ -473,5 +463,5 @@ tty::common_init (fhandler_pty_master *ptym)
   winsize.ws_row = 25;
 
   termios_printf ("tty%d opened", ntty);
-  return TRUE;
+  return true;
 }

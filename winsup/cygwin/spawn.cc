@@ -345,11 +345,11 @@ do_cleanup (void *args)
 }
 
 
-static int __stdcall
+static bool __stdcall
 spawn_guts (const char * prog_arg, const char *const *argv,
 	    const char *const envp[], int mode)
 {
-  BOOL rc;
+  bool rc;
   pid_t cygpid;
 
   MALLOC_CHECK;
@@ -832,10 +832,10 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  BOOL exited;
+  bool exited;
 
   res = 0;
-  exited = FALSE;
+  exited = false;
   MALLOC_CHECK;
   if (mode == _P_OVERLAY)
     {
@@ -851,7 +851,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	      if (!GetExitCodeProcess (pi.hProcess, &exitcode))
 		exitcode = 1;
 	      res |= exitcode;
-	      exited = TRUE;
+	      exited = true;
 	      break;
 	    case WAIT_OBJECT_0 + 1:
 	      sigproc_printf ("signal arrived");

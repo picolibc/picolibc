@@ -53,7 +53,7 @@ class lock_debug
 
 muto NO_COPY *lock_debug::locker = NULL;
 
-static bool __stdcall mark_closed (const char *, int, HANDLE, const char *, BOOL);
+static bool __stdcall mark_closed (const char *, int, HANDLE, const char *, bool);
 
 void
 debug_init ()
@@ -167,7 +167,7 @@ debug_fixup_after_fork_exec ()
 }
 
 static bool __stdcall
-mark_closed (const char *func, int ln, HANDLE h, const char *name, BOOL force)
+mark_closed (const char *func, int ln, HANDLE h, const char *name, bool force)
 {
   handle_list *hl;
   lock_debug here;
@@ -179,7 +179,7 @@ mark_closed (const char *func, int ln, HANDLE h, const char *name, BOOL force)
       system_printf ("attempt to close protected handle %s:%d(%s<%p>) winpid %d",
 		     hl->func, hl->ln, hl->name, hl->h, hl->pid);
       system_printf (" by %s:%d(%s<%p>)", func, ln, name, h);
-      return FALSE;
+      return false;
     }
 
   handle_list *hln;
@@ -193,19 +193,19 @@ mark_closed (const char *func, int ln, HANDLE h, const char *name, BOOL force)
   if (hl)
     delete_handle (hl);
 
-  return TRUE;
+  return true;
 }
 
 /* Close a known handle.  Complain if !force and closing a known handle or
    if the name of the handle being closed does not match the registered name. */
-BOOL __stdcall
-close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
+bool __stdcall
+close_handle (const char *func, int ln, HANDLE h, const char *name, bool force)
 {
-  BOOL ret;
+  bool ret;
   lock_debug here;
 
   if (!mark_closed (func, ln, h, name, force))
-    return FALSE;
+    return false;
 
   ret = CloseHandle (h);
 

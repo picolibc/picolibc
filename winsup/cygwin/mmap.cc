@@ -92,7 +92,7 @@ class mmap_record
 
     DWORD find_unused_pages (DWORD pages);
     _off64_t map_pages (_off64_t off, DWORD len);
-    BOOL unmap_pages (caddr_t addr, DWORD len);
+    bool unmap_pages (caddr_t addr, DWORD len);
     int access (caddr_t address);
 
     fhandler_base *alloc_fh ();
@@ -230,7 +230,7 @@ mmap_record::map_pages (_off64_t off, DWORD len)
   return off * getpagesize ();
 }
 
-BOOL
+bool
 mmap_record::unmap_pages (caddr_t addr, DWORD len)
 {
   DWORD old_prot;
@@ -248,8 +248,8 @@ mmap_record::unmap_pages (caddr_t addr, DWORD len)
      the whole chunk. */
   for (len = MAPSIZE (PAGE_CNT (size_to_map_)); len > 0; )
     if (page_map_[--len])
-      return FALSE;
-  return TRUE;
+      return false;
+  return true;
 }
 
 void
@@ -860,7 +860,7 @@ fhandler_base::msync (HANDLE h, caddr_t addr, size_t len, int flags)
   return -1;
 }
 
-BOOL
+bool
 fhandler_base::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 				      DWORD size, void *address)
 {
@@ -969,7 +969,7 @@ fhandler_disk_file::msync (HANDLE h, caddr_t addr, size_t len, int flags)
   return 0;
 }
 
-BOOL
+bool
 fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 					   DWORD size, void *address)
 {
@@ -1021,7 +1021,7 @@ fixup_mmaps_after_fork (HANDLE parent)
 	      rec->get_offset (), rec->get_size (), rec->get_address ());
 
 	  fhandler_base *fh = rec->alloc_fh ();
-	  BOOL ret = fh->fixup_mmap_after_fork (rec->get_handle (),
+	  bool ret = fh->fixup_mmap_after_fork (rec->get_handle (),
 						rec->get_access (),
 						rec->get_offset (),
 						rec->get_size (),

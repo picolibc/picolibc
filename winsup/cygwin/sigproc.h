@@ -51,7 +51,7 @@ typedef struct struct_waitq
 extern HANDLE signal_arrived;
 extern HANDLE sigCONT;
 
-BOOL __stdcall my_parent_is_alive ();
+bool __stdcall my_parent_is_alive ();
 int __stdcall sig_dispatch_pending ();
 #ifdef _PINFO_H
 extern "C" void __stdcall set_signal_mask (sigset_t newmask, sigset_t& = myself->getsigmask ());
@@ -76,8 +76,8 @@ void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
 void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
-BOOL __stdcall proc_exists (_pinfo *) __attribute__ ((regparm(1)));
-BOOL __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
+bool __stdcall proc_exists (_pinfo *) __attribute__ ((regparm(1)));
+bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
 int __stdcall sig_send (_pinfo *, int, void * = NULL) __attribute__ ((regparm(3)));
 void __stdcall signal_fixup_after_fork ();
 void __stdcall signal_fixup_after_exec ();

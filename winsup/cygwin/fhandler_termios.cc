@@ -25,7 +25,7 @@ details. */
 /* Common functions shared by tty/console */
 
 void
-fhandler_termios::tcinit (tty_min *this_tc, int force)
+fhandler_termios::tcinit (tty_min *this_tc, bool force)
 {
   /* Initial termios values */
 
@@ -99,32 +99,6 @@ tty_min::kill_pgrp (int sig)
     }
   if (killself)
     sig_send (myself, sig);
-}
-
-void
-tty_min::set_ctty (int ttynum, int flags)
-{
-  if ((myself->ctty < 0 || myself->ctty == ttynum) && !(flags & O_NOCTTY))
-    {
-      myself->ctty = ttynum;
-      syscall_printf ("attached tty%d sid %d, pid %d, tty->pgid %d, tty->sid %d",
-		      ttynum, myself->sid, myself->pid, pgid, getsid ());
-
-      pinfo p (getsid ());
-      if (myself->sid == myself->pid &&
-	  (p == myself || !proc_exists (p)))
-	{
-	  paranoid_printf ("resetting tty%d sid.  Was %d, now %d.  pgid was %d, now %d.",
-			   ttynum, getsid (), myself->sid, getpgid (), myself->pgid);
-	  /* We are the session leader */
-	  setsid (myself->sid);
-	  setpgid (myself->pgid);
-	}
-      else
-	myself->sid = getsid ();
-      if (getpgid () == 0)
-	setpgid (myself->pgid);
-    }
 }
 
 bg_check_types

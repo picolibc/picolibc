@@ -33,7 +33,7 @@ public:
     { if (cnt_need_fixup_before > 0) --cnt_need_fixup_before; }
   void inc_need_fixup_before ()
     { cnt_need_fixup_before++; }
-  BOOL need_fixup_before ()
+  bool need_fixup_before ()
     { return cnt_need_fixup_before > 0; }
 
   int vfork_child_dup ();

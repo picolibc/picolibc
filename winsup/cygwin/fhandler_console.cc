@@ -32,7 +32,7 @@ details. */
 
 #define CONVERT_LIMIT 16384
 
-static BOOL
+static bool
 cp_convert (UINT destcp, char *dest, UINT srccp, const char *src, DWORD size)
 {
   if (!size)
@@ -46,12 +46,12 @@ cp_convert (UINT destcp, char *dest, UINT srccp, const char *src, DWORD size)
     {
       WCHAR wbuffer[CONVERT_LIMIT]; /* same size as the maximum input, s.b. */
       if (!MultiByteToWideChar (srccp, 0, src, size, wbuffer, sizeof (wbuffer)))
-	return FALSE;
+	return false;
       if (!WideCharToMultiByte (destcp, 0, wbuffer, size, dest, size,
 				NULL, NULL))
-	return FALSE;
+	return false;
     }
-  return TRUE;
+  return true;
 }
 
 /*
@@ -94,7 +94,7 @@ fhandler_console::get_tty_stuff (int flags = 0)
     {
       shared_console_info->tty_min_state.setntty (TTY_CONSOLE);
       shared_console_info->tty_min_state.setsid (myself->sid);
-      shared_console_info->tty_min_state.set_ctty (TTY_CONSOLE, flags);
+      myself->set_ctty (&shared_console_info->tty_min_state, flags);
 
       dev_state->scroll_region.Bottom = -1;
       dev_state->dwLastCursorPosition.X = -1;
@@ -169,28 +169,28 @@ set_console_state_for_spawn ()
 /* The results of GetConsoleCP() and GetConsoleOutputCP() cannot be
    cached, because a program or the user can change these values at
    any time. */
-inline BOOL
+inline bool
 dev_console::con_to_str (char *d, const char *s, DWORD sz)
 {
   return cp_convert (get_cp (), d, GetConsoleCP (), s, sz);
 }
 
-inline BOOL
+inline bool
 dev_console::str_to_con (char *d, const char *s, DWORD sz)
 {
   if (alternate_charset_active)
     {
       /* no translation when alternate charset is active */
       memcpy(d, s, sz);
-      return TRUE;
+      return true;
     }
   return cp_convert (GetConsoleOutputCP (), d, get_cp (), s, sz);
 }
 
-BOOL
-fhandler_console::set_raw_win32_keyboard_mode (BOOL new_mode)
+bool
+fhandler_console::set_raw_win32_keyboard_mode (bool new_mode)
 {
-  BOOL old_mode = dev_state->raw_win32_keyboard_mode;
+  bool old_mode = dev_state->raw_win32_keyboard_mode;
   dev_state->raw_win32_keyboard_mode = new_mode;
   syscall_printf ("raw keyboard mode %sabled", dev_state->raw_win32_keyboard_mode ? "en" : "dis");
   return old_mode;
@@ -544,10 +544,10 @@ fhandler_console::set_input_state ()
     input_tcsetattr (0, &tc->ti);
 }
 
-BOOL
+bool
 fhandler_console::fillin_info (void)
 {
-  BOOL ret;
+  bool ret;
   CONSOLE_SCREEN_BUFFER_INFO linfo;
 
   if ((ret = GetConsoleScreenBufferInfo (get_output_handle (), &linfo)))
@@ -910,7 +910,7 @@ fhandler_console::fhandler_console () :
 void
 fhandler_console::set_default_attr ()
 {
-  dev_state->blink = dev_state->underline = dev_state->reverse = FALSE;
+  dev_state->blink = dev_state->underline = dev_state->reverse = false;
   dev_state->intensity = INTENSITY_NORMAL;
   dev_state->fg = dev_state->default_color & FOREGROUND_ATTR_MASK;
   dev_state->bg = dev_state->default_color & BACKGROUND_ATTR_MASK;
@@ -993,7 +993,7 @@ fhandler_console::clear_screen (int x1, int y1, int x2, int y2)
 }
 
 void
-fhandler_console::cursor_set (BOOL rel_to_top, int x, int y)
+fhandler_console::cursor_set (bool rel_to_top, int x, int y)
 {
   COORD pos;
 
@@ -1021,7 +1021,7 @@ fhandler_console::cursor_rel (int x, int y)
   fillin_info ();
   x += dev_state->info.dwCursorPosition.X;
   y += dev_state->info.dwCursorPosition.Y;
-  cursor_set (FALSE, x, y);
+  cursor_set (false, x, y);
 }
 
 void
@@ -1106,10 +1106,10 @@ fhandler_console::char_command (char c)
 	       dev_state->underline = 1;
 	       break;
 	     case 5:    /* blink mode */
-	       dev_state->blink = TRUE;
+	       dev_state->blink = true;
 	       break;
 	     case 7:    /* reverse */
-	       dev_state->reverse = TRUE;
+	       dev_state->reverse = true;
 	       break;
 	     case 8:    /* invisible */
 	       dev_state->intensity = INTENSITY_INVISIBLE;
@@ -1118,16 +1118,16 @@ fhandler_console::char_command (char c)
 	       dev_state->intensity = INTENSITY_DIM;
 	       break;
              case 10:   /* end alternate charset */
-               dev_state->alternate_charset_active = FALSE;
+               dev_state->alternate_charset_active = false;
 	       break;
              case 11:   /* start alternate charset */
-               dev_state->alternate_charset_active = TRUE;
+               dev_state->alternate_charset_active = true;
 	       break;
 	     case 24:
-	       dev_state->underline = FALSE;
+	       dev_state->underline = false;
 	       break;
 	     case 27:
-	       dev_state->reverse = FALSE;
+	       dev_state->reverse = false;
 	       break;
 	     case 30:		/* BLACK foreground */
 	       dev_state->fg = 0;
@@ -1194,7 +1194,7 @@ fhandler_console::char_command (char c)
 	  switch (dev_state->args_[0])
 	    {
 	    case 4:    /* Insert mode */
-	      dev_state->insert_mode = (c == 'h') ? TRUE : FALSE;
+	      dev_state->insert_mode = (c == 'h') ? true : false;
 	      syscall_printf ("insert mode %sabled", dev_state->insert_mode ? "en" : "dis");
 	      break;
 	    }
@@ -1243,12 +1243,12 @@ fhandler_console::char_command (char c)
 	  break;
 
 	case 1000: /* Mouse support */
-	  dev_state->use_mouse = (c == 'h') ? TRUE : FALSE;
+	  dev_state->use_mouse = (c == 'h') ? true : false;
 	  syscall_printf ("mouse support %sabled", dev_state->use_mouse ? "en" : "dis");
 	  break;
 
 	case 2000: /* Raw keyboard mode */
-	  set_raw_win32_keyboard_mode ((c == 'h') ? TRUE : FALSE);
+	  set_raw_win32_keyboard_mode ((c == 'h') ? true : false);
 	  break;
 
 	default: /* Ignore */
@@ -1269,7 +1269,7 @@ fhandler_console::char_command (char c)
 	  break;
 	case 2:			/* Clear screen */
 	  clear_screen (0, 0, -1, -1);
-	  cursor_set (TRUE, 0,0);
+	  cursor_set (true, 0,0);
 	  break;
 	default:
 	  goto bad_escape;
@@ -1309,27 +1309,27 @@ fhandler_console::char_command (char c)
       break;
     case 'H':
     case 'f':
-      cursor_set (TRUE, (dev_state->args_[1] ? dev_state->args_[1] : 1) - 1,
+      cursor_set (true, (dev_state->args_[1] ? dev_state->args_[1] : 1) - 1,
 			(dev_state->args_[0] ? dev_state->args_[0] : 1) - 1);
       break;
     case 'G':   /* hpa - position cursor at column n - 1 */
       cursor_get (&x, &y);
-      cursor_set (FALSE, (dev_state->args_[0] ? dev_state->args_[0] - 1 : 0), y);
+      cursor_set (false, (dev_state->args_[0] ? dev_state->args_[0] - 1 : 0), y);
       break;
     case 'd':   /* vpa - position cursor at line n */
       cursor_get (&x, &y);
-      cursor_set (TRUE, x, (dev_state->args_[0] ? dev_state->args_[0] - 1 : 0));
+      cursor_set (true, x, (dev_state->args_[0] ? dev_state->args_[0] - 1 : 0));
       break;
     case 's':   /* Save cursor position */
       cursor_get (&dev_state->savex, &dev_state->savey);
       dev_state->savey -= dev_state->info.winTop;
       break;
     case 'u':   /* Restore cursor position */
-      cursor_set (TRUE, dev_state->savex, dev_state->savey);
+      cursor_set (true, dev_state->savex, dev_state->savey);
       break;
     case 'I':	/* TAB */
       cursor_get (&x, &y);
-      cursor_set (FALSE, 8 * (x / 8 + 1), y);
+      cursor_set (false, 8 * (x / 8 + 1), y);
       break;
     case 'L':				/* AL - insert blank lines */
       dev_state->args_[0] = dev_state->args_[0] ? dev_state->args_[0] : 1;
@@ -1368,7 +1368,7 @@ fhandler_console::char_command (char c)
       break;
     case 'Z':				/* Back tab */
       cursor_get (&x, &y);
-      cursor_set (FALSE, ((8 * (x / 8 + 1)) - 8), y);
+      cursor_set (false, ((8 * (x / 8 + 1)) - 8), y);
       break;
     case 'b':				/* Repeat char #1 #2 times */
       if (dev_state->insert_mode)
@@ -1400,7 +1400,7 @@ fhandler_console::char_command (char c)
     case 'r':				/* Set Scroll region */
       dev_state->scroll_region.Top = dev_state->args_[0] ? dev_state->args_[0] - 1 : 0;
       dev_state->scroll_region.Bottom = dev_state->args_[1] ? dev_state->args_[1] - 1 : -1;
-      cursor_set (TRUE, 0, 0);
+      cursor_set (true, 0, 0);
       break;
     case 'g':				/* TAB set/clear */
       break;
@@ -1484,7 +1484,7 @@ fhandler_console::write_normal (const unsigned char *src,
 		  y--;
 		}
 	    }
-	  cursor_set (FALSE, ((tc->ti.c_oflag & ONLCR) ? 0 : x), y + 1);
+	  cursor_set (false, ((tc->ti.c_oflag & ONLCR) ? 0 : x), y + 1);
 	  break;
 	case BAK:
 	  cursor_rel (-1, 0);
@@ -1494,14 +1494,14 @@ fhandler_console::write_normal (const unsigned char *src,
 	  break;
 	case CR:
 	  cursor_get (&x, &y);
-	  cursor_set (FALSE, 0, y);
+	  cursor_set (false, 0, y);
 	  break;
 	case ERR:
 	  WriteFile (get_output_handle (), src, 1, &done, 0);
 	  break;
 	case TAB:
 	  cursor_get (&x, &y);
-	  cursor_set (FALSE, 8 * (x / 8 + 1), y);
+	  cursor_set (false, 8 * (x / 8 + 1), y);
 	  break;
 	}
       src ++;
@@ -1533,7 +1533,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  if (*src == '[')
 	    {
 	      dev_state->state_ = gotsquare;
-	      dev_state->saw_question_mark = FALSE;
+	      dev_state->saw_question_mark = false;
 	      for (dev_state->nargs_ = 0; dev_state->nargs_ < MAXARGS; dev_state->nargs_++)
 		dev_state->args_[dev_state->nargs_] = 0;
 	      dev_state->nargs_ = 0;
@@ -1554,12 +1554,12 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    {
 	      set_default_attr ();
 	      clear_screen (0, 0, -1, -1);
-	      cursor_set (TRUE, 0, 0);
+	      cursor_set (true, 0, 0);
 	      dev_state->state_ = normal;
 	    }
 	  else if (*src == '8')		/* Restore cursor position */
 	    {
-	      cursor_set (TRUE, dev_state->savex, dev_state->savey);
+	      cursor_set (true, dev_state->savex, dev_state->savey);
 	      dev_state->state_ = normal;
 	    }
 	  else if (*src == '7')		/* Save cursor position */
@@ -1641,7 +1641,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  else if (*src != '@' && !isalpha (*src) && !isdigit (*src))
 	    {
 	      if (*src == '?')
-		dev_state->saw_question_mark = TRUE;
+		dev_state->saw_question_mark = true;
 	      /* ignore any extra chars between [ and first arg or command */
 	      src++;
 	    }

@@ -196,14 +196,6 @@ extern int	unlink P((const char * filename));
 ** Finally, some convenience items.
 */
 
-#ifndef TRUE
-#define TRUE	1
-#endif /* !defined TRUE */
-
-#ifndef FALSE
-#define FALSE	0
-#endif /* !defined FALSE */
-
 #ifndef TYPE_BIT
 #define TYPE_BIT(type)	(sizeof (type) * CHAR_BIT)
 #endif /* !defined TYPE_BIT */
@@ -344,13 +336,13 @@ struct tzhead {
 **	tzh_leapcnt repetitions of
 **		one (char [4])		coded leap second transition times
 **		one (char [4])		total correction after above
-**	tzh_ttisstdcnt (char)s		indexed by type; if TRUE, transition
-**					time is standard time, if FALSE,
+**	tzh_ttisstdcnt (char)s		indexed by type; if true, transition
+**					time is standard time, if false,
 **					transition time is wall clock time
 **					if absent, transition times are
 **					assumed to be wall clock time
-**	tzh_ttisgmtcnt (char)s		indexed by type; if TRUE, transition
-**					time is UTC, if FALSE,
+**	tzh_ttisgmtcnt (char)s		indexed by type; if true, transition
+**					time is UTC, if false,
 **					transition time is local time
 **					if absent, transition times are
 **					assumed to be local time
@@ -504,8 +496,8 @@ struct ttinfo {				/* time type information */
 	long		tt_gmtoff;	/* UTC offset in seconds */
 	int		tt_isdst;	/* used to set tm_isdst */
 	int		tt_abbrind;	/* abbreviation list index */
-	int		tt_ttisstd;	/* TRUE if transition is std time */
-	int		tt_ttisgmt;	/* TRUE if transition is UTC */
+	int		tt_ttisstd;	/* true if transition is std time */
+	int		tt_ttisgmt;	/* true if transition is UTC */
 };
 
 struct lsinfo {				/* leap second information */
@@ -745,7 +737,7 @@ tzload(const char *name, struct state *sp)
 			** Set doaccess if '.' (as in "../") shows up in name.
 			*/
 			if (strchr(name, '.') != NULL)
-				doaccess = TRUE;
+				doaccess = true;
 			name = fullname;
 		}
 #if 0
@@ -848,11 +840,11 @@ tzload(const char *name, struct state *sp)
 
 			ttisp = &sp->ttis[i];
 			if (ttisstdcnt == 0)
-				ttisp->tt_ttisstd = FALSE;
+				ttisp->tt_ttisstd = false;
 			else {
 				ttisp->tt_ttisstd = *p++;
-				if (ttisp->tt_ttisstd != TRUE &&
-					ttisp->tt_ttisstd != FALSE)
+				if (ttisp->tt_ttisstd != true &&
+					ttisp->tt_ttisstd != false)
 						return -1;
 			}
 		}
@@ -861,11 +853,11 @@ tzload(const char *name, struct state *sp)
 
 			ttisp = &sp->ttis[i];
 			if (ttisgmtcnt == 0)
-				ttisp->tt_ttisgmt = FALSE;
+				ttisp->tt_ttisgmt = false;
 			else {
 				ttisp->tt_ttisgmt = *p++;
-				if (ttisp->tt_ttisgmt != TRUE &&
-					ttisp->tt_ttisgmt != FALSE)
+				if (ttisp->tt_ttisgmt != true &&
+					ttisp->tt_ttisgmt != false)
 						return -1;
 			}
 		}
@@ -1279,7 +1271,7 @@ tzparse(const char *name, struct state *sp, const int lastditch)
 			/*
 			** Initially we're assumed to be in standard time.
 			*/
-			isdst = FALSE;
+			isdst = false;
 			theiroffset = theirstdoffset;
 			/*
 			** Now juggle transition times and types
@@ -1323,10 +1315,10 @@ tzparse(const char *name, struct state *sp, const int lastditch)
 			** ttisstd and ttisgmt need not be handled.
 			*/
 			sp->ttis[0].tt_gmtoff = -stdoffset;
-			sp->ttis[0].tt_isdst = FALSE;
+			sp->ttis[0].tt_isdst = false;
 			sp->ttis[0].tt_abbrind = 0;
 			sp->ttis[1].tt_gmtoff = -dstoffset;
-			sp->ttis[1].tt_isdst = TRUE;
+			sp->ttis[1].tt_isdst = true;
 			sp->ttis[1].tt_abbrind = stdlen + 1;
 			sp->typecnt = 2;
 		}
@@ -1358,7 +1350,7 @@ static void
 gmtload(struct state *sp)
 {
 	if (tzload(gmt, sp) != 0)
-		(void) tzparse(gmt, sp, TRUE);
+		(void) tzparse(gmt, sp, true);
 }
 
 #ifndef STD_INSPIRED
@@ -1449,7 +1441,7 @@ tzsetwall P((void))
 		    sprintf(cp=strchr(cp, 0), ":%d", tz.StandardDate.wSecond);
 	    }
 	    /* printf("TZ deduced as `%s'\n", buf); */
-	    if (tzparse(buf, lclptr, FALSE) == 0) {
+	    if (tzparse(buf, lclptr, false) == 0) {
 		settzname();
 		lcl_is_set = 1;
 		strlcpy(lcl_TZname, buf, sizeof (lcl_TZname));
@@ -1498,7 +1490,7 @@ tzset P((void))
 		lclptr->ttis[0].tt_abbrind = 0;
 		(void) strcpy(lclptr->chars, gmt);
 	} else if (tzload(name, lclptr) != 0) {
-		if (name[0] == ':' || tzparse(name, lclptr, FALSE) != 0)
+		if (name[0] == ':' || tzparse(name, lclptr, false) != 0)
 			(void) gmtload(lclptr);
 	}
 	settzname();
@@ -1585,7 +1577,7 @@ static void
 gmtsub(const time_t *timep, const long offset, struct tm *tmp)
 {
 	if (!gmt_is_set) {
-		gmt_is_set = TRUE;
+		gmt_is_set = true;
 #ifdef ALL_STATE
 		gmtptr = (struct state *) malloc(sizeof *gmtptr);
 		if (gmtptr != NULL)
@@ -1827,7 +1819,7 @@ time2sub(struct tm *tmp, void (*funcp) P((const time_t*, long, struct tm*)),
 	time_t				t;
 	struct tm			yourtm, mytm;
 
-	*okayp = FALSE;
+	*okayp = false;
 	yourtm = *tmp;
 	if (do_norm_secs) {
 		if (normalize_overflow(&yourtm.tm_min, &yourtm.tm_sec,
@@ -1958,7 +1950,7 @@ label:
 		return WRONG;
 	t = newt;
 	(*funcp)(&t, offset, tmp);
-	*okayp = TRUE;
+	*okayp = true;
 	return t;
 }
 
@@ -1973,8 +1965,8 @@ time2(struct tm *tmp, void (*funcp) P((const time_t*, long, struct tm*)),
 	** (in case tm_sec contains a value associated with a leap second).
 	** If that fails, try with normalization of seconds.
 	*/
-	t = time2sub(tmp, funcp, offset, okayp, FALSE);
-	return *okayp ? t : time2sub(tmp, funcp, offset, okayp, TRUE);
+	t = time2sub(tmp, funcp, offset, okayp, false);
+	return *okayp ? t : time2sub(tmp, funcp, offset, okayp, true);
 }
 
 static time_t

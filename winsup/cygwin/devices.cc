@@ -14822,8 +14822,6 @@ device::parse (const char *s)
 
   if (!dev)
     *this = *fs_dev;
-  else if (dev->devn == FH_TTY)
-    tty_to_real_device ();
   else
     *this = *dev;
 }

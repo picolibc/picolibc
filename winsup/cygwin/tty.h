@@ -61,7 +61,6 @@ public:
   void setpgid (int pid) {pgid = pid;}
   int getsid () {return sid;}
   void setsid (pid_t tsid) {sid = tsid;}
-  void set_ctty (int ttynum, int flags);
   void kill_pgrp (int sig);
   struct termios ti;
   struct winsize winsize;
@@ -98,17 +97,17 @@ public:
   HANDLE from_slave, to_master;
 
   int read_retval;
-  BOOL was_opened;	/* True if opened at least once. */
+  bool was_opened;	/* True if opened at least once. */
 
   void init ();
   HANDLE create_inuse (const char *);
-  BOOL common_init (fhandler_pty_master *);
-  BOOL alive (const char *fmt);
-  BOOL slave_alive ();
-  BOOL master_alive ();
+  bool common_init (fhandler_pty_master *);
+  bool alive (const char *fmt);
+  bool slave_alive ();
+  bool master_alive ();
   HWND gethwnd () {return hwnd;}
   void sethwnd (HWND wnd) {hwnd = wnd;}
-  int make_pipes (fhandler_pty_master *ptym);
+  bool make_pipes (fhandler_pty_master *ptym);
   HANDLE open_output_mutex ()
   {
     char buf[80];
@@ -121,7 +120,7 @@ public:
     __small_sprintf (buf, INPUT_MUTEX, ntty);
     return OpenMutex (MUTEX_ALL_ACCESS, TRUE, buf);
   }
-  BOOL exists ()
+  bool exists ()
   {
     HANDLE h = open_output_mutex ();
     if (h)

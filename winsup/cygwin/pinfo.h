@@ -1,6 +1,6 @@
 /* pinfo.h: process table info
 
-   Copyright 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -112,6 +112,7 @@ public:
   commune_result commune_send (DWORD, ...);
   bool alive ();
   char *cmdline (size_t &);
+  void set_ctty (class tty_min *, int, class fhandler_tty_slave * = NULL);
 
   friend void __stdcall set_myself (pid_t, HANDLE);
 

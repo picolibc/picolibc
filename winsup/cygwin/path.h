@@ -101,7 +101,7 @@ class path_conv
   char *known_suffix;
   int error;
   device dev;
-  BOOL case_clash;
+  bool case_clash;
 
   int isdisk () const { return path_flags & PATH_ISDISK;}
   bool& isremote () {return fs.is_remote_drive ();}
@@ -183,7 +183,7 @@ class path_conv
   DWORD file_attributes () {return fileattr;}
   DWORD drive_type () {return fs.drive_type ();}
   DWORD fs_flags () {return fs.flags ();}
-  BOOL fs_fast_ea () {return fs.sym_opt () & PC_CHECK_EA;}
+  bool fs_fast_ea () {return !!(fs.sym_opt () & PC_CHECK_EA);}
   void set_path (const char *p) {strcpy (path, p);}
   const char * root_dir () const { return fs.root_dir (); }
   DWORD volser () { return fs.serial (); }

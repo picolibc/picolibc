@@ -302,7 +302,7 @@ class fhandler_base
 		       int flags, _off64_t off);
   virtual int munmap (HANDLE h, caddr_t addr, size_t len);
   virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
-  virtual BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
+  virtual bool fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 				      DWORD size, void *address);
 
   void *operator new (size_t, void *p) {return p;}
@@ -333,7 +333,7 @@ class fhandler_base
   virtual HANDLE& get_handle () { return io_handle; }
   virtual HANDLE& get_io_handle () { return io_handle; }
   virtual HANDLE& get_output_handle () { return io_handle; }
-  virtual bool hit_eof () {return FALSE;}
+  virtual bool hit_eof () {return false;}
   virtual select_record *select_read (select_record *s);
   virtual select_record *select_write (select_record *s);
   virtual select_record *select_except (select_record *s);
@@ -584,10 +584,10 @@ class fhandler_dev_tape: public fhandler_dev_raw
  private:
   int tape_write_marks (int marktype, DWORD len);
   int tape_get_pos (unsigned long *ret);
-  int tape_set_pos (int mode, long count, BOOLEAN sfm_func = FALSE);
+  int tape_set_pos (int mode, long count, bool sfm_func = false);
   int tape_erase (int mode);
   int tape_prepare (int action);
-  BOOLEAN tape_get_feature (DWORD parm);
+  bool tape_get_feature (DWORD parm);
   int tape_get_blocksize (long *min, long *def, long *max, long *cur);
   int tape_set_blocksize (long count);
   int tape_status (struct mtget *get);
@@ -610,7 +610,7 @@ class fhandler_disk_file: public fhandler_base
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
-  BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
+  bool fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 			      DWORD size, void *address);
   DIR *opendir ();
   struct dirent *readdir (DIR *);
@@ -709,7 +709,7 @@ class fhandler_termios: public fhandler_base
   HANDLE& get_output_handle () { return output_handle; }
   line_edit_status line_edit (const char *rptr, int nread, termios&);
   void set_output_handle (HANDLE h) { output_handle = h; }
-  void tcinit (tty_min *this_tc, int force = FALSE);
+  void tcinit (tty_min *this_tc, bool force = false);
   virtual int is_tty () { return 1; }
   int tcgetpgrp ();
   int tcsetpgrp (int pid);
@@ -791,8 +791,8 @@ class dev_console
   bool use_mouse;
   bool raw_win32_keyboard_mode;
 
-  BOOL con_to_str (char *d, const char *s, DWORD sz);
-  BOOL str_to_con (char *d, const char *s, DWORD sz);
+  bool con_to_str (char *d, const char *s, DWORD sz);
+  bool str_to_con (char *d, const char *s, DWORD sz);
 
   friend class fhandler_console;
 };
@@ -807,15 +807,15 @@ class fhandler_console: public fhandler_termios
   void set_default_attr ();
   WORD get_win32_attr ();
 
-  BOOL fillin_info ();
+  bool fillin_info ();
   void clear_screen (int, int, int, int);
   void scroll_screen (int, int, int, int, int, int);
-  void cursor_set (BOOL, int, int);
+  void cursor_set (bool, int, int);
   void cursor_get (int *, int *);
   void cursor_rel (int, int);
   const unsigned char *write_normal (unsigned const char*, unsigned const char *);
   void char_command (char);
-  BOOL set_raw_win32_keyboard_mode (BOOL);
+  bool set_raw_win32_keyboard_mode (bool);
   int output_tcsetattr (int a, const struct termios *t);
 
 /* Input calls */
@@ -997,7 +997,7 @@ class fhandler_dev_random: public fhandler_base
   HCRYPTPROV crypt_prov;
   long pseudo;
 
-  BOOL crypt_gen_random (void *ptr, size_t len);
+  bool crypt_gen_random (void *ptr, size_t len);
   int pseudo_write (const void *ptr, size_t len);
   int pseudo_read (void *ptr, size_t len);
 
@@ -1034,7 +1034,7 @@ class fhandler_dev_mem: public fhandler_base
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
-  BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
+  bool fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 			      DWORD size, void *address);
 
   void dump ();

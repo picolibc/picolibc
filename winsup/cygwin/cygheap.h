@@ -125,7 +125,7 @@ public:
      since this class is always allocated statically.  That means that everything
      is zero anyway so there is no need to initialize it to zero.  Since the
      token initialization is always handled during process startup as well,
-     I've removed the constructor entirely.  Please reinstate this f this
+     I've removed the constructor entirely.  Please reinstate this if this
      situation ever changes.
   cygheap_user () : pname (NULL), plogsrv (NULL), pdomain (NULL),
 		    homedrive (NULL), homepath (NULL),
@@ -259,6 +259,8 @@ struct init_cygheap
   cygheap_debug debug;
 #endif
   struct sigaction *sigs;
+
+  fhandler_tty_slave ctty;	/* Current tty */
 };
 
 #define CYGHEAPSIZE (sizeof (init_cygheap) + (20000 * sizeof (fhandler_union)) + (5 * 65536))
