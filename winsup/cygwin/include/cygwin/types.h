@@ -50,6 +50,7 @@ typedef __gid16_t gid_t;
 #endif
 
 #if !defined(__INSIDE_CYGWIN__) || !defined(__cplusplus)
+#if defined(_POSIX_THREADS)
 
 typedef void *pthread_t;
 typedef void *pthread_mutex_t;
@@ -87,6 +88,7 @@ typedef class pthread_rwlockattr *pthread_rwlockattr_t;
 
 /* semaphores types */
 typedef class semaphore *sem_t;
+#endif /* defined(_POSIX_THREADS) */
 #endif /* __INSIDE_CYGWIN__ */
 #endif /* _CYGWIN_TYPES_H */
 
