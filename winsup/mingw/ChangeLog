@@ -1,8 +1,14 @@
-2004-07-10 Danny Smith  <dannysmith@users.sourceforge.net>
+2004-07-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/unistd.h (ftruncate): Add inline definition.
+	* mingwex/ftruncate.c: New file.
+	* mingwex/Makefile.in: Add ftruncate.o to libmingwex.a.
+
+2004-07-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/time.h: Do not include sys/types.h.
 
-2004-07-02 Danny Smith  <dannysmith@users.sourceforge.net>
+2004-07-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/Makefile.in (MATH_DISTFILES): Remove pow.c,
 	(MATH_OBJS): Remove pow,o.
