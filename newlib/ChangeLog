@@ -1,5 +1,22 @@
 2002-12-20  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* NEWS: Update with 1.11.0 info.
+	* README: Ditto.
+	* acinclude.m4: Change version number to 1.11.0.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* doc/aclocal.m4: Ditto.
+	* doc/configure: Ditto.
+	* libc/*/aclocal.m4: Ditto.
+	* libc/*/configure: Ditto.
+	* libc/libc.texinfo: Ditto.
+	* libm/*/aclocal.m4: Ditto.
+	* libm/*/configure: Ditto.
+	* libm/libm.texinfo: Ditto.
+	* libc/sys/linux/shared.ld: Add VERS_1.11.
+
+2002-12-20  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/machine/i386/f_atan2.S: Change copyright from Cygnus
 	Solutions to Red Hat Inc.
 	* libc/machine/i386/f_atan2f.S: Ditto.

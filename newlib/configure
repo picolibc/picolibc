@@ -1014,7 +1014,7 @@ test "$host_alias" != "$target_alias" &&
 
 PACKAGE=newlib
 
-VERSION=1.10.0
+VERSION=1.11.0
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }

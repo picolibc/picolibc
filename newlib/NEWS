@@ -1,4 +1,12 @@
-Support for the Fujitsu FRV architecture added by Red Hat.
+*** Major changes in newlib version 1.11.0:
+
+* enhanced EL/IX support for i[3456]86-pc-linux 
+* new --enable-newlib-elix-level configuration option
+* positional I/O support for printf family (--enable-newlib-io-pos-args)
+* support for the Fujitsu FRV architecture added by Red Hat
+* support for Motorola Altivec and SPE added by Red Hat
+* new small reentrancy structure support
+* dynamic reentrancy structure support
 
 *** Major changes in newlib version 1.10.0:
 

@@ -93,7 +93,7 @@ AC_SUBST(newlib_basedir)
 
 AC_CANONICAL_SYSTEM
 
-AM_INIT_AUTOMAKE(newlib, 1.10.0)
+AM_INIT_AUTOMAKE(newlib, 1.11.0)
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
