@@ -298,7 +298,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   if (prog_arg == NULL)
     {
       syscall_printf ("prog_arg is NULL");
-      set_errno(EINVAL);
+      set_errno (EINVAL);
       return -1;
     }
 
@@ -307,7 +307,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   if (argv == NULL)
     {
       syscall_printf ("argv is NULL");
-      set_errno(EINVAL);
+      set_errno (EINVAL);
       return (-1);
     }
 
@@ -327,7 +327,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   else
     chtype = PROC_EXEC;
 
-  HANDLE spr = CreateEvent(&sec_all, TRUE, FALSE, NULL);
+  HANDLE spr = CreateEvent (&sec_all, TRUE, FALSE, NULL);
   ProtectHandle (spr);
 
   init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1, spr);
@@ -401,7 +401,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       DWORD done;
 
       char buf[2 * MAX_PATH + 1];
-      buf[0] = buf[1] = buf[2] = buf[sizeof(buf) - 1] = '\0';
+      buf[0] = buf[1] = buf[2] = buf[sizeof (buf) - 1] = '\0';
       if (!ReadFile (hnd, buf, sizeof (buf) - 1, &done, 0))
 	{
 	  CloseHandle (hnd);
@@ -620,12 +620,12 @@ skip_arg_parsing:
       char dskname[1024];
 
       ciresrv.moreinfo->uid = USHRT_MAX;
-      hwst = GetProcessWindowStation();
-      SetUserObjectSecurity(hwst, &dsi, get_null_sd ());
-      GetUserObjectInformation(hwst, UOI_NAME, wstname, 1024, &n);
-      hdsk = GetThreadDesktop(GetCurrentThreadId());
-      SetUserObjectSecurity(hdsk, &dsi, get_null_sd ());
-      GetUserObjectInformation(hdsk, UOI_NAME, dskname, 1024, &n);
+      hwst = GetProcessWindowStation ();
+      SetUserObjectSecurity (hwst, &dsi, get_null_sd ());
+      GetUserObjectInformation (hwst, UOI_NAME, wstname, 1024, &n);
+      hdsk = GetThreadDesktop (GetCurrentThreadId ());
+      SetUserObjectSecurity (hdsk, &dsi, get_null_sd ());
+      GetUserObjectInformation (hdsk, UOI_NAME, dskname, 1024, &n);
       strcat (wstname, "\\");
       strcat (wstname, dskname);
       si.lpDesktop = wstname;
@@ -647,7 +647,7 @@ skip_arg_parsing:
 					 : &sec_all_nih;
 
       /* Remove impersonation */
-      uid_t uid = geteuid();
+      uid_t uid = geteuid ();
       if (cygheap->user.impersonated
           && cygheap->user.token != INVALID_HANDLE_VALUE)
 	seteuid (cygheap->user.orig_uid);
@@ -822,7 +822,7 @@ skip_arg_parsing:
 	{
 	  system_printf ("Reparent failed, parent handle %p, %E", h);
 	  system_printf ("my dwProcessId %d, myself->dwProcessId %d",
-			 GetCurrentProcessId(), myself->dwProcessId);
+			 GetCurrentProcessId (), myself->dwProcessId);
 	  system_printf ("old hProcess %p, hProcess %p", oldh, myself->hProcess);
 	}
     }
