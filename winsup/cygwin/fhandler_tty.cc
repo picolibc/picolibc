@@ -601,9 +601,8 @@ fhandler_tty_slave::open (int flags, mode_t)
 out:
   usecount = 0;
   archetype->usecount++;
+  report_tty_counts (this, "opened", "incremented ", "");
   myself->set_ctty (get_ttyp (), flags, arch);
-  termios_printf ("%s opened, incremented open_fhs %d, archetype usecount %d",
-		  pc.dev.name, fhandler_console::open_fhs, archetype->usecount);
 
   return 1;
 }
@@ -613,9 +612,11 @@ fhandler_tty_slave::close ()
 {
   if (!--fhandler_console::open_fhs && myself->ctty == -1)
     FreeConsole ();
-  termios_printf ("decremented open_fhs %d, archetype usecount %d",
-		  fhandler_console::open_fhs, archetype->usecount);
-  if (--archetype->usecount)
+
+  archetype->usecount--;
+  report_tty_counts (this, "closed", "decremented ", "");
+
+  if (archetype->usecount)
     {
 #ifdef DEBUGGING
       if (archetype->usecount < 0)
@@ -909,14 +910,13 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 int
 fhandler_tty_slave::dup (fhandler_base *child)
 {
-  fhandler_console::open_fhs++;
   fhandler_tty_slave *arch = (fhandler_tty_slave *) archetype;
   *(fhandler_tty_slave *) child = *arch;
-  arch->usecount++;
   child->usecount = 0;
+  arch->usecount++;
+  fhandler_console::open_fhs++;
+  report_tty_counts (child, "duped", "incremented ", "");
   myself->set_ctty (get_ttyp (), openflags, arch);
-  termios_printf ("incremented open_fhs %d, archetype usecount %d",
-		  fhandler_console::open_fhs, archetype->usecount);
   return 0;
 }
 

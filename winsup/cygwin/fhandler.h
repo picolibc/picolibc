@@ -122,9 +122,9 @@ class fhandler_base
   DWORD fs_flags;
   HANDLE read_state;
   path_conv pc;
-  class fhandler_base *archetype;
 
  public:
+  class fhandler_base *archetype;
   int usecount;
 
   void set_name (path_conv &pc);
@@ -1193,6 +1193,12 @@ struct fhandler_nodevice: public fhandler_base
   int open (int flags, mode_t mode = 0);
   // int __stdcall fstat (struct __stat64 *buf, path_conv *);
 };
+
+#define report_tty_counts(fh, call, fhs_op, use_op) \
+  termios_printf ("%s %s, %sopen_fhs %d, %susecount %d",\
+		  fh->ttyname (), call,\
+		  fhs_op, fhandler_console::open_fhs,\
+		  use_op, ((fhandler_tty_slave *) fh)->archetype->usecount);
 
 typedef union
 {

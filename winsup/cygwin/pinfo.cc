@@ -293,8 +293,7 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 	    {
 	      arch->usecount++;
 	      fhandler_console::open_fhs++;
-	      debug_printf ("tty%d, open_fhs %d, arch usecount %d", tc->ntty,
-			    fhandler_console::open_fhs, arch->usecount);
+	      report_tty_counts (cygheap->ctty, "ctty", "incremented ", "");
 	    }
 	}
     }

@@ -31,6 +31,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
+#include "tty.h"
 
 static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 					   STD_ERROR_HANDLE};
@@ -701,7 +702,11 @@ dtable::vfork_child_dup ()
   /* Remove impersonation */
   cygheap->user.deimpersonate ();
   if (cygheap->ctty)
-    cygheap->ctty->usecount++;
+    {
+      cygheap->ctty->usecount++;
+      fhandler_console::open_fhs++;
+      report_tty_counts (cygheap->ctty, "vfork dup", "incremented ", "");
+    }
 
   for (size_t i = 0; i < size; i++)
     if (not_open (i))
@@ -737,6 +742,9 @@ dtable::vfork_parent_restore ()
   fds_on_hold = NULL;
   cfree (deleteme);
 
+  if (cygheap->ctty)
+    cygheap->ctty->close ();
+
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "restore");
   return;
 }
@@ -750,6 +758,7 @@ dtable::vfork_child_fixup ()
   fhandler_base **saveme = fds;
   fds = fds_on_hold;
 
+  int old_open_fhs = fhandler_console::open_fhs;
   fhandler_base *fh;
   for (int i = 0; i < (int) size; i++)
     if ((fh = fds[i]) != NULL)
@@ -763,6 +772,10 @@ dtable::vfork_child_fixup ()
 	    release (i);
 	  }
       }
+
+  fhandler_console::open_fhs = old_open_fhs;
+  if (cygheap->ctty)
+    cygheap->ctty->close ();
 
   fds = saveme;
   cfree (fds_on_hold);

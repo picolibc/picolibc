@@ -215,9 +215,7 @@ cygheap_init ()
   if (cygheap->ctty)
     {
       fhandler_console::open_fhs++;
-      debug_printf ("tty%d, open_fhs %d, arch usecount %d",
-		    cygheap->ctty->get_ttyp ()->ntty,
-		    fhandler_console::open_fhs, cygheap->ctty->usecount);
+      report_tty_counts (cygheap->ctty, "inherited", "incremented ", "unchanged ");
     }
 }
 

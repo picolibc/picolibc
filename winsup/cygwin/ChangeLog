@@ -1,3 +1,18 @@
+2003-12-27  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_tty_slave::archetype): Make public.
+	(report_tty_counts): New macro.  Use throughout for reporting tty use
+	counts.
+	* dtable.cc (dtable::vfork_child_dup): Add debugging output for
+	usecount increment.  Increment open_fhs if appropriate.
+	(dtable::vfork_parent_restore): "Close" artificially bumped ctty.
+	(dtable::vfork_child_fixup): Close ctty since it was bumped prior to
+	vfork.  Save open_fhs around close since the closing of these handles
+	has no effect on the console.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Reorganize calls to allow
+	for easier tracking of usecount modification.
+	(fhandler_tty_slave::open): Ditto.
+
 2003-12-26  Christopher Faylor  <cgf@redhat.com>
 
 	* syscalls.cc (close_all_files): Simplify logic around closing ctty.
