@@ -1,4 +1,24 @@
-Mon Mar  3 20:35:58 2003  J"orn Rennecke <joern.rennecke@superh.com>
+2003-04-15  Rohit Kumar Srivastava <rohits@kpitcummins.com>
+
+	* common.h: Replace occurrances of 'Hitachi' with 'Renesas'.
+
+2003-04-01  Bob Wilson  <bob.wilson@acm.org>
+
+        * elf/common.h (EM_XTENSA_OLD): Define.
+        * elf/xtensa.h: New file.
+
+2003-04-01  Nick Clifton  <nickc@redhat.com>
+
+	* arm.h (ARM_NOTE_SECTION): Include .gnu in the string.
+
+2003-03-25  Stan Cox   <scox@redhat.com>
+	    Nick Clifton  <nickc@redhat.com>
+	    
+	Contribute support for Intel's iWMMXt chip - an	ARM variant:
+
+	* arm.h (ARM_NOTE_SECTION): Define.
+
+2003-03-03  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* sh.h (EF_SH_MERGE_MACH): Make sure SH2E & SH3/SH3E merge to SH3E,
 	and SH2E & SH4 merge to SH4, not SH2E.

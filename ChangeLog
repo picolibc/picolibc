@@ -1,3 +1,38 @@
+2003-04-16  David Carlton  <carlton@bactrian.org>
+
+	* Merge with mainline; tag is carlton_dictionary-20030416-merge.
+
+2003-04-11  Alexandre Oliva  <aoliva@redhat.com>
+
+	* libtool.m4 (lt_cv_deplibs_check_method): Use pass_all on mips*.
+	* */configure: Rebuilt.
+
+2003-03-14  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Move .NOEXPORT, MAKEOVERRIDES back down.
+	* Makefile.in: Regenerate.
+
+2003-03-14  Michael Chastain  <mec@shout.net>
+
+	* Makefile.in: Regenerate with correct Makefile.def.
+
+2003-03-12  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Move .NOEXPORT, MAKEOVERRIDES up.  Delete unused
+	Make macro.
+	* Makefile.in: Regenerate.
+	* configure.in: Clean up gxx_include_dir logic.
+	* configure: Regenerate.
+
+2003-03-09  Franz Sirl  <Franz.Sirl-kernel@lauterbach.com>
+
+	* configure.in (gxx_include_dir): Fix typo.
+	* configure: Regenerated.
+
+2003-03-06  Andrew Cagney  <cagney@redhat.com>
+
+	* texinfo/texinfo.tex: Import version 2003-02-03.16.
+
 2003-03-05  David Carlton  <carlton@math.stanford.edu>
 
 	* Merge with mainline.  Tag is carlton_dictionary-20030305-merge.

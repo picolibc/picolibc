@@ -1,3 +1,34 @@
+2003-04-04  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* coff/tic4x.h: Namespace cleanup. Replace s/c4x/tic4x
+	and s/c3x/tic3x/
+	* coff/tc-tic4x.h: Ditto
+	* opcode/tic4x.h: Ditto
+
+2003-04-02  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa-config.h: Remove comment indicating that this is a
+	generated file.
+
+2003-04-01  Bob Wilson  <bob.wilson@acm.org>
+
+        * dis-asm.h (print_insn_xtensa): Declare.
+        * xtensa-config.h: New file.
+        * xtensa-isa-internal.h: Likewise.
+        * xtensa-isa.h: Likewise.
+
+2003-03-17  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* ansidecl.h (ATTRIBUTE_NONNULL, ATTRIBUTE_NULL_PRINTF,
+	ATTRIBUTE_NULL_PRINTF_1, ATTRIBUTE_NULL_PRINTF_2,
+	ATTRIBUTE_NULL_PRINTF_3, ATTRIBUTE_NULL_PRINTF_4,
+	ATTRIBUTE_NULL_PRINTF_5): New.
+	(ATTRIBUTE_PRINTF): Add ATTRIBUTE_NONNULL.
+
+2003-03-17  Jan Hubicka  <jh@suse.cz>
+
+	* hashtab.h (htab_traverse_noresize): Declare.
+
 2003-02-27  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* libiberty.h: Document return value of physmem routines.
