@@ -1,3 +1,9 @@
+2002-12-26  Dimitri Papadopoulos  <dimitri_at@sourceforge.users.net>
+
+	* include/wingdi.h (BALTIC_CHARSET, JOHAB_CHARSET,
+	VIETNAMESE_CHARSET): Remove duplicate defines. 
+	* lib/comctl32.def (ImageList_SetImageCount): Add stub.
+
 2002-12-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/dbt.h (DEV_BROADCAST_PORT): Add UNICODE version.

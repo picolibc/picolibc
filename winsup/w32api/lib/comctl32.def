@@ -86,6 +86,7 @@ ImageList_ReplaceIcon@12
 ImageList_SetBkColor@8
 ImageList_SetDragCursorImage@16
 ImageList_SetIconSize@12
+ImageList_SetImageCount@8
 ImageList_SetOverlayImage@12
 ImageList_Write@8
 InitCommonControls@0
