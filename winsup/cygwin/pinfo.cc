@@ -331,7 +331,7 @@ _pinfo::commune_send (DWORD code)
   res.s = NULL;
   res.n = 0;
 
-  if (!pid || !this)
+  if (!pid || !this || (dwProcessId != (DWORD) pid && !pinfo (myself->dwProcessId)))
     {
       set_errno (ESRCH);
       goto err;

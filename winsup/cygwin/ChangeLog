@@ -1,3 +1,8 @@
+2003-06-20  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::commune_send): Don't attempt to communicate with a
+	pure windows process.
+
 2003-06-18  Pierre Humblet  <pierre.humblet@ieee.org>
 
         * autoload.cc (GetNetworkParams): Add.
