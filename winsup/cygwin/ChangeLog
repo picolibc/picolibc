@@ -1,5 +1,10 @@
 2002-03-04  Robert Collins  <rbtcollins@hotmail.com>
 
+	* cygserver_shm.cc (delete_shmnode): New function.
+	(client_request_shm::serve): Use it.
+
+2002-03-04  Robert Collins  <rbtcollins@hotmail.com>
+
 	* cygserver_shm.cc (client_request_shm::serve): Implement SHM_DETACH.
 	* shm.cc (shmdt): Implement.
 

@@ -170,6 +170,35 @@ static long
   new_private_key =
   0;
 
+static void
+delete_shmnode (shmnode **nodeptr)
+{
+  shmnode *node = *nodeptr;
+
+  // remove from the list
+  if (node == shm_head)
+    shm_head = shm_head->next;
+  else
+    {
+      shmnode *tempnode = shm_head;
+      while (tempnode && tempnode->next != node)
+        tempnode = tempnode->next;
+      if (tempnode)
+        tempnode->next = node->next;
+      // else log the unexpected !
+    }
+
+    // release the shared data view
+    UnmapViewOfFile (node->shmds->mapptr);
+    delete node->shmds;
+    CloseHandle (node->filemap);
+    CloseHandle (node->attachmap);
+
+    // free the memory
+    delete node;
+    nodeptr = NULL;
+}
+  
 void
 client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 {
@@ -326,6 +355,14 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		deleted_head = temp2;
 
 		// FIXME: when/where do we delete the handles?
+		if (temp2->shmds->shm_nattch)
+		  {
+		    // FIXME: add to a pending queue?
+		  }
+		else
+		  {
+		    delete_shmnode (&temp2);
+		  }
 		
 	        header.error_code = 0;
 	        CloseHandle (token_handle);
