@@ -17,6 +17,7 @@ details. */
 #include <stdlib.h>
 #include <errno.h>
 #include "cygerrno.h"
+#include "perprocess.h"
 #include "fhandler.h"
 #include "path.h"
 #include "sync.h"
@@ -92,10 +93,29 @@ _times (struct tms * buf)
 
 /* settimeofday: BSD */
 extern "C" int
-settimeofday (const struct timeval *, const struct timezone *)
+settimeofday (const struct timeval *tv, const struct timezone *tz)
 {
-  set_errno (ENOSYS);
-  return -1;
+  SYSTEMTIME st;
+  struct tm *ptm;
+  int res;
+
+  tz = tz;			/* silence warning about unused variable */
+
+  ptm = gmtime(&tv->tv_sec);
+  st.wYear         = ptm->tm_year + 1900;
+  st.wMonth        = ptm->tm_mon + 1;
+  st.wDayOfWeek    = ptm->tm_wday;
+  st.wDay          = ptm->tm_mday;
+  st.wHour         = ptm->tm_hour;
+  st.wMinute       = ptm->tm_min;
+  st.wSecond       = ptm->tm_sec;
+  st.wMilliseconds = tv->tv_usec / 1000;
+
+  res = !SetSystemTime(&st);
+
+  syscall_printf ("%d = settimeofday (%x, %x)", res, tv, tz);
+
+  return res;
 }
 
 /* timezone: standards? */

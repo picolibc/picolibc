@@ -1,3 +1,7 @@
+2001-02-26  Mike Simons  <msimons@moria.simons-clan.com>
+  
+	* times.cc (settimeofday): Replace function stub with working code.
+
 Mon Feb 26 10:42:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* strace.cc (strace::vprntf): Move prntf functionality to this function
