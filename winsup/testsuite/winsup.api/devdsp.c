@@ -35,8 +35,8 @@ static const char wavfile_okay[] =
   };
 
 /* Globals required by libltp */
-const char *TCID = "devdsp";	/* set test case identifier */
-int TST_TOTAL = 32;
+const char *TCID = "devdsp";   /* set test case identifier */
+int TST_TOTAL = 34;
 
 /* Prototypes */
 void sinegen (void *wave, int rate, int bits, int len, int stride);
@@ -92,6 +92,7 @@ ioctltest (void)
 {
   int audio1;
   int ioctl_par;
+  int channels;
 
   audio1 = open ("/dev/dsp", O_WRONLY);
   if (audio1 < 0)
@@ -99,6 +100,18 @@ ioctltest (void)
       tst_brkm (TFAIL, cleanup, "open W: %s", strerror (errno));
     }
   setpars (audio1, 44100, 1, 16);
+
+  channels = ioctl_par = 1;
+  while (ioctl (audio1, SNDCTL_DSP_CHANNELS, &ioctl_par) == 0)
+    {
+      channels++;
+      ioctl_par = channels;
+    }
+  if (channels == ioctl_par)
+    tst_resm (TFAIL, "Max channels=%d failed", ioctl_par);
+  else
+    tst_resm (TPASS, "Max channels=%d failed, OK=%d", channels, ioctl_par);
+
   /* Note: block size may depend on parameters */
   if (ioctl (audio1, SNDCTL_DSP_GETBLKSIZE, &ioctl_par) < 0)
     {
@@ -110,6 +123,11 @@ ioctltest (void)
       tst_brkm (TFAIL, cleanup, "ioctl GETFMTS: %s", strerror (errno));
     }
   tst_resm (TPASS, "ioctl get formats=%08x", ioctl_par);
+  if (ioctl (audio1, SNDCTL_DSP_GETCAPS, &ioctl_par) < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "ioctl GETCAPS: %s", strerror (errno));
+    }
+  tst_resm (TPASS, "ioctl get caps=%08x", ioctl_par);
   if (close (audio1) < 0)
     {
       tst_brkm (TFAIL, cleanup, "Close audio: %s", strerror (errno));
