@@ -219,7 +219,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	      tmp[1] = ich;
 	      /* Need this check since US code page seems to have a bug when
 		 converting a CTRL-U. */
-	      if ((unsigned char)ich > 0x7f)
+	      if ((unsigned char)ich > 0x7f && current_codepage == ansi_cp)
 		OemToCharBuff (tmp + 1, tmp + 1, 1);
 	      if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
 		toadd = tmp + 1;

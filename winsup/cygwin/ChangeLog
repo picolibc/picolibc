@@ -1,3 +1,8 @@
+Wed Jan  3 09:44:51 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_console.cc (fhandler_console::read): Restore missing test
+	for code page before doing OemToCharBuff.
+
 Wed Jan  3 09:20:20 2001  Jason Tishler <jt@dothill.com>
 
 	* include/cygwin/version.h: Fix typo in CYGWIN_VERSION_DLL_COMBINED
