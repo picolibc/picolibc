@@ -1,5 +1,5 @@
 /* x86_64 ELF support for BFD.
-   Copyright (C) 2000, 2002 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004 Free Software Foundation, Inc.
    Contributed by Jan Hubicka <jh@suse.cz>
 
    This file is part of BFD, the Binary File Descriptor library.

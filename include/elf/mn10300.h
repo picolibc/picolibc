@@ -1,5 +1,5 @@
 /* MN10300 ELF support for BFD.
-   Copyright 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+   Copyright 1998, 1999, 2000, 2003 Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.
 

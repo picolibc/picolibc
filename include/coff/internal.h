@@ -1,7 +1,8 @@
 /* Internal format of COFF object file data structures, for GNU BFD.
    This file is part of BFD, the Binary File Descriptor library.
    
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004
+   Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

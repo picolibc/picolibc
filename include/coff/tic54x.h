@@ -1,7 +1,7 @@
 /* TI COFF information for Texas Instruments TMS320C54X.
    This file customizes the settings in coff/ti.h. 
    
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 2000, 2001 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

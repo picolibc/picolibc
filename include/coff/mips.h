@@ -1,7 +1,7 @@
 /* ECOFF support on MIPS machines.
    coff/ecoff.h must be included before this file.
    
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 1999, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

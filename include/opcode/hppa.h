@@ -1,6 +1,6 @@
 /* Table of opcodes for the PA-RISC.
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1998, 1999, 2000,
-   2001, 2002
+   2001, 2002, 2003
    Free Software Foundation, Inc.
 
    Contributed by the Center for Software Science at the

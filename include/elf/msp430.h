@@ -1,5 +1,5 @@
 /* MSP430 ELF support for BFD.
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
    Contributed by Dmitry Diky <diwil@mail.ru>
 
    This file is part of BFD, the Binary File Descriptor library.

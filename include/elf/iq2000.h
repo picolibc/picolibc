@@ -1,5 +1,5 @@
 /* IQ2000 ELF support for BFD.
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.
 

@@ -1,6 +1,6 @@
 /* Opcode table for the Atmel AVR micro controllers.
 
-   Copyright 2000 Free Software Foundation, Inc.
+   Copyright 2000, 2001, 2004 Free Software Foundation, Inc.
    Contributed by Denis Chertykov <denisc@overta.ru>
    
    This program is free software; you can redistribute it and/or modify
