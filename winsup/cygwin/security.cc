@@ -333,8 +333,8 @@ get_nt_attribute (const char *file, int *attribute,
 	  continue;
 	}
 
-      PSID ace_sid = (PSID) &ace->SidStart;
-      if (owner_sid && EqualSid (ace_sid, owner_sid))
+      cygsid ace_sid ((PSID) &ace->SidStart);
+      if (owner_sid && ace_sid == owner_sid)
 	{
 	  if (ace->Mask & FILE_READ_DATA)
 	    *flags |= S_IRUSR;
@@ -343,7 +343,7 @@ get_nt_attribute (const char *file, int *attribute,
 	  if (ace->Mask & FILE_EXECUTE)
 	    *flags |= S_IXUSR;
 	}
-      else if (group_sid && EqualSid (ace_sid, group_sid))
+      else if (group_sid && ace_sid == group_sid)
 	{
 	  if (ace->Mask & FILE_READ_DATA)
 	    *flags |= S_IRGRP
@@ -355,7 +355,7 @@ get_nt_attribute (const char *file, int *attribute,
 	    *flags |= S_IXGRP
 		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	}
-      else if (EqualSid (ace_sid, get_world_sid ()))
+      else if (ace_sid == get_world_sid ())
 	{
 	  if (ace->Mask & FILE_READ_DATA)
 	    *flags |= S_IROTH
@@ -469,26 +469,22 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 
   /* Get SID and name of new owner. */
   char owner[MAX_USER_NAME];
-  char *owner_sid_buf[MAX_SID_LEN];
-  PSID owner_sid = NULL;
+  cygsid owner_sid;
   struct passwd *pw = getpwuid (uid);
   strcpy (owner, pw ? pw->pw_name : getlogin ());
-  owner_sid = (PSID) owner_sid_buf;
   if ((!pw || !get_pw_sid (owner_sid, pw))
       && !lookup_name (owner, logsrv, owner_sid))
     return NULL;
   debug_printf ("owner: %s [%d]", owner,
-		*GetSidSubAuthority((PSID) owner_sid,
-		*GetSidSubAuthorityCount((PSID) owner_sid) - 1));
+		*GetSidSubAuthority(owner_sid,
+		*GetSidSubAuthorityCount(owner_sid) - 1));
 
   /* Get SID and name of new group. */
-  char *group_sid_buf[MAX_SID_LEN];
-  PSID group_sid = NULL;
+  cygsid group_sid (NULL);
   struct group *grp = getgrgid (gid);
   if (grp)
     {
-      group_sid = (PSID) group_sid_buf;
-      if ((!grp || !get_gr_sid (group_sid, grp))
+      if ((!grp || !get_gr_sid (group_sid.set (), grp))
 	  && !lookup_name (grp->gr_name, logsrv, group_sid))
 	return NULL;
     }
@@ -643,13 +639,13 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
     for (DWORD i = 0; i < oacl->AceCount; ++i)
       if (GetAce (oacl, i, (PVOID *) &ace))
 	{
-	  PSID ace_sid = (PSID) &ace->SidStart;
+	  cygsid ace_sid ((PSID) &ace->SidStart);
 	  /* Check for related ACEs. */
-	  if ((cur_owner_sid && EqualSid (ace_sid, cur_owner_sid))
-	      || (owner_sid && EqualSid (ace_sid, owner_sid))
-	      || (cur_group_sid && EqualSid (ace_sid, cur_group_sid))
-	      || (group_sid && EqualSid (ace_sid, group_sid))
-	      || (EqualSid (ace_sid, get_world_sid ())))
+	  if ((cur_owner_sid && ace_sid == cur_owner_sid)
+	      || (owner_sid && ace_sid == owner_sid)
+	      || (cur_group_sid && ace_sid == cur_group_sid)
+	      || (group_sid && ace_sid == group_sid)
+	      || (ace_sid == get_world_sid ()))
 	    continue;
 	  /*
 	   * Add unrelated ACCESS_DENIED_ACE to the beginning but

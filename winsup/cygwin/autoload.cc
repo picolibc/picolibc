@@ -318,6 +318,7 @@ LoadDLLfunc (SetSecurityDescriptorControl, 12, advapi32)
 LoadDLLfunc (SetSecurityDescriptorDacl, 16, advapi32)
 LoadDLLfunc (SetSecurityDescriptorGroup, 12, advapi32)
 LoadDLLfunc (SetSecurityDescriptorOwner, 12, advapi32)
+LoadDLLfunc (SetTokenInformation, 16, advapi32)
 
 LoadDLLinit (netapi32)
 LoadDLLfunc (NetWkstaUserGetInfo, 12, netapi32)

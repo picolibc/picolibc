@@ -359,6 +359,18 @@ setpassent ()
   return 0;
 }
 
+/* Internal function. ONLY USE THIS INTERNALLY, NEVER `getpwent'!!! */
+struct passwd *
+internal_getpwent (int pos)
+{
+  if (passwd_state  <= initializing)
+    read_etc_passwd ();
+
+  if (pos < curr_lines)
+    return passwd_buf + pos;
+  return NULL;
+}
+
 extern "C" char *
 getpass (const char * prompt)
 {

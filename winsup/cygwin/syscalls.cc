@@ -1977,11 +1977,36 @@ seteuid (uid_t uid)
 		debug_printf ("Impersonate (uid == %d)", uid);
 		RevertToSelf ();
 		if (cygheap->user.token != INVALID_HANDLE_VALUE)
-		  if (!ImpersonateLoggedOnUser (cygheap->user.token))
-		    system_printf ("Impersonate (%d) in set (e)uid failed: %E",
-				   cygheap->user.token);
-		  else
-		    cygheap->user.impersonated = TRUE;
+		  {
+		    struct group *gr;
+		    cygsid sid;
+		    DWORD siz;
+
+		    /* Try setting owner to same value as user. */
+		    if (!GetTokenInformation (cygheap->user.token, TokenUser,
+					      &sid, sizeof sid, &siz))
+		      debug_printf ("GetTokenInformation(): %E");
+		    else if (!SetTokenInformation (cygheap->user.token,
+		    				   TokenOwner,
+						   &sid, sizeof sid))
+		      debug_printf ("SetTokenInformation(user.token, "
+		      		    "TokenOwner): %E");
+		    /* Try setting primary group in token to current group. */
+	            if ((gr = getgrgid (myself->gid)) &&
+		        get_gr_sid (sid, gr) &&
+		        !SetTokenInformation (cygheap->user.token,
+		      			      TokenPrimaryGroup,
+					      &sid, sizeof sid))
+		      debug_printf ("SetTokenInformation(user.token, "
+		    		    "TokenPrimaryGroup): %E");
+
+		    /* Now try to impersonate. */
+		    if (!ImpersonateLoggedOnUser (cygheap->user.token))
+		      system_printf ("Impersonate (%d) in set(e)uid failed: %E",
+				     cygheap->user.token);
+		    else
+		      cygheap->user.impersonated = TRUE;
+	          }
 	      }
 
 	  cygheap_user user;
@@ -2018,12 +2043,35 @@ setegid (gid_t gid)
     {
       if (gid != (gid_t) -1)
 	{
-	  if (!getgrgid (gid))
+	  struct group *gr;
+
+	  if (!(gr = getgrgid (gid)))
 	    {
 	      set_errno (EINVAL);
 	      return -1;
 	    }
 	  myself->gid = gid;
+	  if (allow_ntsec)
+	    {
+	      cygsid gsid;
+	      HANDLE ptok;
+
+	      if (get_gr_sid (gsid, gr))
+	        {
+		  if (!OpenProcessToken (GetCurrentProcess (),
+					 TOKEN_ADJUST_DEFAULT,
+					 &ptok))
+		    debug_printf ("OpenProcessToken(): %E\n");
+		  else
+		    {
+		      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
+		      				&gsid, sizeof gsid))
+			debug_printf ("SetTokenInformation(myself, "
+				      "TokenPrimaryGroup): %E");
+		      CloseHandle (ptok);
+		    }
+	        }
+	    }
 	}
     }
   else

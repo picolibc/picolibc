@@ -101,7 +101,6 @@ extern int dynamically_loaded;
 #define DEFAULT_UID 500
 #define DEFAULT_GID 544
 
-#define MAX_SID_LEN 40
 #define MAX_HOST_NAME 256
 
 /* status bit manipulation */

@@ -12,8 +12,45 @@ details. */
 #define INHERIT_ALL  (CONTAINER_INHERIT_ACE|OBJECT_INHERIT_ACE)
 #define INHERIT_ONLY (INHERIT_ONLY_ACE|CONTAINER_INHERIT_ACE|OBJECT_INHERIT_ACE)
 
+#define MAX_SID_LEN 40
+
+class cygsid {
+  PSID psid;
+  char sbuf[MAX_SID_LEN];
+public:
+  inline cygsid () : psid ((PSID) sbuf) {}
+  inline cygsid (PSID nsid) { *this = nsid; }
+
+  inline PSID set () { return psid = (PSID) sbuf; }
+
+  inline const PSID operator= (PSID nsid)
+    {
+      if (!nsid)
+        psid = NULL;
+      else
+        {
+	  psid = (PSID) sbuf;
+	  CopySid (MAX_SID_LEN, psid, nsid);
+	}
+      return psid;
+    }
+  inline BOOL operator== (PSID nsid)
+    {
+      if (!psid || !nsid)
+        return nsid == psid;
+      return EqualSid (psid, nsid);
+    }
+  inline operator const PSID () { return psid; }
+};
+
 extern BOOL allow_ntsec;
 extern BOOL allow_smbntsec;
+
+/* These both functions are needed to allow walking through the passwd
+   and group lists so they are somehow security related. Besides that
+   I didn't find a better place to declare them. */
+extern struct passwd *internal_getpwent (int);
+extern struct group *internal_getgrent (int);
 
 /* File manipulation */
 int __stdcall set_process_privileges ();

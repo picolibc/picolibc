@@ -115,7 +115,7 @@ internal_getlogin (cygheap_user &user)
 	  HANDLE ptok = user.token; /* Which is INVALID_HANDLE_VALUE if no
 				       impersonation took place. */
 	  DWORD siz;
-	  char tu[1024];
+	  cygsid tu;
 	  int ret = 0;
 
 	  /* Try to get the SID either from already impersonated token
@@ -123,18 +123,14 @@ internal_getlogin (cygheap_user &user)
 	     important, because you can't rely on the user information
 	     in a process token of a currently impersonated process. */
 	  if (ptok == INVALID_HANDLE_VALUE
-	      && !OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+	      && !OpenProcessToken (GetCurrentProcess (),
+	      			    TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
+				    &ptok))
 	    debug_printf ("OpenProcessToken(): %E\n");
-	  else if (!GetTokenInformation (ptok, TokenUser, (LPVOID) &tu,
-					 sizeof tu, &siz))
+	  else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
 	    debug_printf ("GetTokenInformation(): %E");
-	  else if (!(ret = user.set_sid (((TOKEN_USER *) &tu)->User.Sid)))
+	  else if (!(ret = user.set_sid (tu)))
 	    debug_printf ("Couldn't retrieve SID from access token!");
-	  /* Close token only if it's a result from OpenProcessToken(). */
-	  if (ptok != INVALID_HANDLE_VALUE
-	      && user.token == INVALID_HANDLE_VALUE)
-	    CloseHandle (ptok);
-
 	  /* If that failes, try to get the SID from localhost. This can only
 	     be done if a domain is given because there's a chance that a local
 	     and a domain user may have the same name. */
@@ -146,7 +142,7 @@ internal_getlogin (cygheap_user &user)
 		debug_printf ("Couldn't retrieve SID locally!");
 	    }
 
-	  /* If that failes, too, as a last resort try to get the SID from
+	  /* If that fails, too, as a last resort try to get the SID from
 	     the logon server. */
 	  if (!ret && !(ret = lookup_name (user.name (), user.logsrv (),
 					  user.sid ())))
@@ -154,11 +150,11 @@ internal_getlogin (cygheap_user &user)
 
 	  /* If we have a SID, try to get the corresponding Cygwin user name
 	     which can be different from the Windows user name. */
+	  cygsid gsid (NULL);
 	  if (ret)
 	    {
 	      struct passwd *pw;
-	      char psidbuf[MAX_SID_LEN];
-	      PSID psid = (PSID) psidbuf;
+	      cygsid psid;
 
 	      if (!strcasematch (user.name (), "SYSTEM")
 		  && user.domain () && user.logsrv ())
@@ -166,14 +162,35 @@ internal_getlogin (cygheap_user &user)
 		  if (get_registry_hive_path (user.sid (), buf))
 		    setenv ("USERPROFILE", buf, 1);
 		}
-	      while ((pw = getpwent ()) != NULL)
+	      for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
 		if (get_pw_sid (psid, pw) && EqualSid (user.sid (), psid))
 		  {
 		    user.set_name (pw->pw_name);
+		    struct group *gr = getgrgid (pw->pw_gid);
+		    if (gr)
+		      if (!get_gr_sid (gsid.set (), gr))
+			  gsid = NULL;
 		    break;
 		  }
-	      endpwent ();
 	    }
+
+	  /* If this process is started from a non Cygwin process,
+	     set token owner to the same value as token user and
+	     primary group to the group which is set as primary group
+	     in /etc/passwd. */
+	  if (ptok != INVALID_HANDLE_VALUE && myself->ppid == 1)
+	    {
+	      if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
+		debug_printf ("SetTokenInformation(TokenOwner): %E");
+	      if (gsid && !SetTokenInformation (ptok, TokenPrimaryGroup,
+		  			        &gsid, sizeof gsid))
+		debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
+	    }
+
+	  /* Close token only if it's a result from OpenProcessToken(). */
+	  if (ptok != INVALID_HANDLE_VALUE
+	      && user.token == INVALID_HANDLE_VALUE)
+	    CloseHandle (ptok);
 	}
     }
   debug_printf ("Cygwins Username: %s", user.name ());
@@ -198,7 +215,10 @@ uinfo_init ()
     if ((p = getpwnam (internal_getlogin (cygheap->user))) != NULL)
       {
 	myself->uid = p->pw_uid;
-	myself->gid = p->pw_gid;
+	/* Set primary group only if ntsec is off or the process has been
+	   started from a non cygwin process. */
+	if (!allow_ntsec || myself->ppid == 1)
+	  myself->gid = p->pw_gid;
       }
     else
       {

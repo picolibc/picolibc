@@ -68,13 +68,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
       __seterrno ();
       return -1;
     }
-  char owner_buf[MAX_SID_LEN];
-  if (!CopySid (MAX_SID_LEN, (PSID) owner_buf, owner_sid))
-    {
-      __seterrno ();
-      return -1;
-    }
-  owner_sid = (PSID) owner_buf;
+  cygsid owner (owner_sid);
 
   /* Get group SID. */
   PSID group_sid = NULL;
@@ -83,13 +77,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
       __seterrno ();
       return -1;
     }
-  char group_buf[MAX_SID_LEN];
-  if (!CopySid (MAX_SID_LEN, (PSID) group_buf, group_sid))
-    {
-      __seterrno ();
-      return -1;
-    }
-  group_sid = (PSID) group_buf;
+  cygsid group (group_sid);
 
   /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;
@@ -98,13 +86,13 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
       __seterrno ();
       return -1;
     }
-  if (!SetSecurityDescriptorOwner(&sd, owner_sid, FALSE))
+  if (!SetSecurityDescriptorOwner(&sd, owner, FALSE))
     {
       __seterrno ();
       return -1;
     }
-  if (group_sid
-      && !SetSecurityDescriptorGroup(&sd, group_sid, FALSE))
+  if (group
+      && !SetSecurityDescriptorGroup(&sd, group, FALSE))
     {
       __seterrno ();
       return -1;
@@ -116,8 +104,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
   size_t acl_len = sizeof (ACL);
   int ace_off = 0;
 
-  char sidbuf[MAX_SID_LEN];
-  PSID sid = (PSID) sidbuf;
+  cygsid sid;
   struct passwd *pw;
   struct group *gr;
   int pos;
@@ -164,7 +151,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 	case DEF_USER_OBJ:
 	  allow |= STANDARD_RIGHTS_ALL & ~DELETE;
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-					owner_sid, acl_len, inheritance))
+					owner, acl_len, inheritance))
 	    return -1;
 	  break;
 	case USER:
@@ -178,7 +165,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 	case GROUP_OBJ:
 	case DEF_GROUP_OBJ:
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-					group_sid, acl_len, inheritance))
+					group, acl_len, inheritance))
 	    return -1;
 	  break;
 	case GROUP:
@@ -320,21 +307,21 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
       if (!GetAce (acl, i, (PVOID *) &ace))
 	continue;
 
-      PSID ace_sid = (PSID) &ace->SidStart;
+      cygsid ace_sid ((PSID) &ace->SidStart);
       int id;
       int type = 0;
 
-      if (EqualSid (ace_sid, owner_sid))
+      if (ace_sid == owner_sid)
 	{
 	  type = USER_OBJ;
 	  id = uid;
 	}
-      else if (EqualSid (ace_sid, group_sid))
+      else if (ace_sid == group_sid)
 	{
 	  type = GROUP_OBJ;
 	  id = gid;
 	}
-      else if (EqualSid (ace_sid, get_world_sid ()))
+      else if (ace_sid == get_world_sid ())
 	{
 	  type = OTHER_OBJ;
 	  id = 0;
@@ -431,23 +418,20 @@ acl_access (const char *path, int flags)
 	       * Check if user is a NT group:
 	       * Take SID from passwd, search SID in group, check is_grp_member.
 	       */
-	      char owner_sidbuf[MAX_SID_LEN];
-	      PSID owner_sid = (PSID) owner_sidbuf;
-	      char group_sidbuf[MAX_SID_LEN];
-	      PSID group_sid = (PSID) group_sidbuf;
+	      cygsid owner;
+	      cygsid group;
 	      struct passwd *pw;
 	      struct group *gr = NULL;
 
 	      if ((pw = getpwuid (acls[i].a_id)) != NULL
-		  && get_pw_sid (owner_sid, pw))
+		  && get_pw_sid (owner, pw))
 		{
-		  while ((gr = getgrent ()))
-		    if (get_gr_sid (group_sid, gr)
-			&& EqualSid (owner_sid, group_sid)
+		  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+		    if (get_gr_sid (group, gr)
+			&& owner == group
 			&& is_grp_member (myself->uid, gr->gr_gid))
 		      break;
-		  endgrent ();
-		}
+	        }
 	      if (!gr)
 		continue;
 	    }

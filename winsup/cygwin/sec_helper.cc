@@ -120,56 +120,40 @@ get_gr_sid (PSID sid, struct group *gr)
 PSID
 get_admin_sid ()
 {
-  static NO_COPY char admin_sid_buf[MAX_SID_LEN];
-  static NO_COPY PSID admin_sid = NULL;
+  static NO_COPY cygsid admin_sid (NULL);
 
   if (!admin_sid)
-    {
-      admin_sid = (PSID) admin_sid_buf;
-      convert_string_sid_to_sid (admin_sid, "S-1-5-32-544");
-    }
+    convert_string_sid_to_sid (admin_sid.set (), "S-1-5-32-544");
   return admin_sid;
 }
 
 PSID
 get_system_sid ()
 {
-  static NO_COPY char system_sid_buf[MAX_SID_LEN];
-  static NO_COPY PSID system_sid = NULL;
+  static NO_COPY cygsid system_sid (NULL);
 
   if (!system_sid)
-    {
-      system_sid = (PSID) system_sid_buf;
-      convert_string_sid_to_sid (system_sid, "S-1-5-18");
-    }
+    convert_string_sid_to_sid (system_sid.set (), "S-1-5-18");
   return system_sid;
 }
 
 PSID
 get_creator_owner_sid ()
 {
-  static NO_COPY char owner_sid_buf[MAX_SID_LEN];
-  static NO_COPY PSID owner_sid = NULL;
+  static NO_COPY cygsid owner_sid (NULL);
 
   if (!owner_sid)
-    {
-      owner_sid = (PSID) owner_sid_buf;
-      convert_string_sid_to_sid (owner_sid, "S-1-3-0");
-    }
+    convert_string_sid_to_sid (owner_sid.set (), "S-1-3-0");
   return owner_sid;
 }
 
 PSID
 get_world_sid ()
 {
-  static NO_COPY char world_sid_buf[MAX_SID_LEN];
-  static NO_COPY PSID world_sid = NULL;
+  static NO_COPY cygsid world_sid (NULL);
 
   if (!world_sid)
-    {
-      world_sid = (PSID) world_sid_buf;
-      convert_string_sid_to_sid (world_sid, "S-1-1-0");
-    }
+    convert_string_sid_to_sid (world_sid.set (), "S-1-1-0");
   return world_sid;
 }
 
@@ -186,22 +170,20 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
   /* First try to get SID from passwd or group entry */
   if (allow_ntsec)
     {
-      char sidbuf[MAX_SID_LEN];
-      PSID sid = (PSID) sidbuf;
+      cygsid sid;
       int id = -1;
 
       if (!search_grp)
 	{
 	  struct passwd *pw;
-	  while ((pw = getpwent ()) != NULL)
+	  for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
 	    {
-	      if (get_pw_sid (sid, pw) && EqualSid (psid, sid))
+	      if (get_pw_sid (sid, pw) && sid == psid)
 		{
 		  id = pw->pw_uid;
 		  break;
 		}
 	    }
-	  endpwent ();
 	  if (id >= 0)
 	    {
 	      if (type)
@@ -212,15 +194,14 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
       if (search_grp || type)
 	{
 	  struct group *gr;
-	  while ((gr = getgrent ()) != NULL)
+	  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 	    {
-	      if (get_gr_sid (sid, gr) && EqualSid (psid, sid))
+	      if (get_gr_sid (sid, gr) && sid == psid)
 		{
 		  id = gr->gr_gid;
 		  break;
 		}
 	    }
-	  endgrent ();
 	  if (id >= 0)
 	    {
 	      if (type)
@@ -321,8 +302,7 @@ is_grp_member (uid_t uid, gid_t gid)
 BOOL
 lookup_name (const char *name, const char *logsrv, PSID ret_sid)
 {
-  char sidbuf[MAX_SID_LEN];
-  PSID sid = (PSID) sidbuf;
+  cygsid sid;
   DWORD sidlen;
   char domuser[MAX_COMPUTERNAME_LENGTH+MAX_USER_NAME+1];
   char dom[MAX_COMPUTERNAME_LENGTH+1];

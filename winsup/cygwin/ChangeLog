@@ -1,3 +1,32 @@
+Tue Apr 25 11:08:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Add LoadDLLfunc statements for SetTokenInformation@16.
+	* cygheap.cc: Include security.h.
+	* grp.cc (internal_getgrent): New function.
+	(getgroups): Rearranged using `internal_getgrent' and the new
+	`cygsid' class.
+	* passwd.cc (internal_getpwent): New function.
+	* sec_acl.cc: Use new `cygsid' class throughout.
+	(acl_access): Use `internal_getgrent' instead of `getgrent'.
+	* sec_helper.cc: Use new `cygsid' class throughout.
+	(get_id_from_sid): Use `internal_getgrent' instead of `getgrent'.
+	Use `internal_getpwent' instead of `getpwent'.
+	* security.cc: Use new `cygsid' class throughout.
+	* security.h: Move `MAX_SID_LEN' from winsup.h to here.
+	Add extern declarations for `internal_getgrent' and `internal_getpwent'.
+	(class cygsid): New class.
+	* shared.cc (sec_user): Use new `cygsid' class.
+	* syscalls.cc (seteuid): Try to set owner to user and primary group to
+	current group in impersonation token before performing impersonation.
+	(setegid): Try to set primary group in process token to the new group
+	if ntsec is on.
+	* uinfo.cc (internal_getlogin): Use new `cygsid' class.
+	Try to set owner to user and primary group to current group in process
+	token if the process has been started from a non cygwin process.
+	(uinfo_init): Set primary group only if the process has been started
+	from a non cygwin process.
+	* winsup.h: Move define for `MAX_SID_LEN' to security.h.
+
 Mon Apr 16 23:20:00 2001  Andy Younger <andylyounger@hotmail.com>
 
 	* fhandler_dsp.cc: Improved handling of 8 bit playback modes.

@@ -239,11 +239,10 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 			     ((char *) sa_buf + sizeof (*psa));
   PACL acl = (PACL) ((char *) sa_buf + sizeof (*psa) + sizeof (*psd));
 
-  char sid_buf[MAX_SID_LEN];
-  PSID sid = (PSID) sid_buf;
+  cygsid sid;
 
   if (cygheap->user.sid ())
-    CopySid (MAX_SID_LEN, sid, (void *) cygheap->user.sid ());
+    sid = cygheap->user.sid ();
   else if (! lookup_name (getlogin (), cygheap->user.logsrv (), sid))
     return inherit ? &sec_none_nih : &sec_none;
 

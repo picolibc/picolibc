@@ -258,69 +258,86 @@ setgrent ()
   grp_pos = 0;
 }
 
+/* Internal function. ONLY USE THIS INTERNALLY, NEVER `getgrent'!!! */
+struct group *
+internal_getgrent (int pos)
+{
+  if (group_state  <= initializing)
+    read_etc_group();
+
+  if (pos < curr_lines)
+    return group_buf + pos;
+  return NULL;
+}
+
 int
 getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
 {
   HANDLE hToken = NULL;
-  char buf[4096];
   DWORD size;
   int cnt = 0;
+  struct group *gr;
 
   if (group_state  <= initializing)
     read_etc_group();
 
   if (allow_ntsec &&
-      OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken) &&
-      GetTokenInformation (hToken, TokenGroups, buf, 4096, &size))
+      OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken))
     {
-      TOKEN_GROUPS *groups = (TOKEN_GROUPS *) buf;
-      char ssid[MAX_SID_LEN];
-      PSID sid = (PSID) ssid;
-
-      for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+      if (GetTokenInformation (hToken, TokenGroups, NULL, 0, &size)
+          || GetLastError () == ERROR_INSUFFICIENT_BUFFER)
         {
-	  struct group *gr;
-	  while ((gr = getgrent ()) != NULL)
+	  char buf[size];
+	  TOKEN_GROUPS *groups = (TOKEN_GROUPS *) buf;
+
+	  if (GetTokenInformation (hToken, TokenGroups, buf, size, &size))
 	    {
-	      if (get_gr_sid (sid, gr) &&
-	          EqualSid (sid, groups->Groups[pg].Sid))
-	        {
-		  if (cnt < gidsetsize)
-		    grouplist[cnt] = gr->gr_gid;
-		  ++cnt;
-		  if (gidsetsize && cnt > gidsetsize)
-		    goto error;
-		  break;
-		}
+	      cygsid sid;
+
+	      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+		if (get_gr_sid (sid, gr))
+		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+		    if (sid == groups->Groups[pg].Sid)
+		      {
+			if (cnt < gidsetsize)
+			  grouplist[cnt] = gr->gr_gid;
+			++cnt;
+			if (gidsetsize && cnt > gidsetsize)
+			  {
+			    CloseHandle (hToken);
+			    goto error;
+			  }
+			break;
+		      }
 	    }
-	  endgrent ();
         }
+      else
+        debug_printf ("%d = GetTokenInformation(NULL) %E", size);
       CloseHandle (hToken);
-      return cnt;
+      if (cnt)
+        return cnt;
     }
-  else
-    {
-      for (int i = 0; i < curr_lines; ++i)
-	if (gid == group_buf[i].gr_gid)
+
+  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+    if (gid == gr->gr_gid)
+      {
+	if (cnt < gidsetsize)
+	  grouplist[cnt] = gr->gr_gid;
+	++cnt;
+	if (gidsetsize && cnt > gidsetsize)
+	  goto error;
+      }
+    else if (gr->gr_mem)
+      for (int gi = 0; gr->gr_mem[gi]; ++gi)
+	if (strcasematch (username, gr->gr_mem[gi]))
 	  {
 	    if (cnt < gidsetsize)
-	      grouplist[cnt] = group_buf[i].gr_gid;
+	      grouplist[cnt] = gr->gr_gid;
 	    ++cnt;
 	    if (gidsetsize && cnt > gidsetsize)
 	      goto error;
 	  }
-	else if (group_buf[i].gr_mem)
-	  for (int gi = 0; group_buf[i].gr_mem[gi]; ++gi)
-	    if (strcasematch (username, group_buf[i].gr_mem[gi]))
-	      {
-		if (cnt < gidsetsize)
-		  grouplist[cnt] = group_buf[i].gr_gid;
-		++cnt;
-		if (gidsetsize && cnt > gidsetsize)
-		  goto error;
-	      }
-      return cnt;
-    }
+  return cnt;
 
 error:
   set_errno (EINVAL);
