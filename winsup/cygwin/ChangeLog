@@ -1,3 +1,8 @@
+2004-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/ipc.h (IPC_KEY_IS_SHMID): Redefine to a more sensible
+	value.
+
 2004-06-02  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* cygheap.cc (cmalloc): Add debugging hook.

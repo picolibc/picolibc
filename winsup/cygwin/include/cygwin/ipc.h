@@ -32,12 +32,12 @@ struct ipc_perm
 
 /* Mode bits:
  */
-#ifdef _KERNEL
-#define IPC_KEY_IS_SHMID 0x0100	/* Used in shmget when called from shmat. */
-#endif
 #define IPC_CREAT  0x0200	/* Create entry if key does not exist. */
 #define IPC_EXCL   0x0400	/* Fail if key exists. */
 #define IPC_NOWAIT 0x0800	/* Error if request must wait. */
+#ifdef _KERNEL
+#define IPC_KEY_IS_SHMID 0x1000	/* Used in shmget when called from shmat. */
+#endif
 
 /* Keys:
  */
