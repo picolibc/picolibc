@@ -190,7 +190,7 @@ MTinterface::Init (int forked)
   threadcount = 1; /* 1 current thread when Init occurs.*/
 
   pthread::initMainThread (&mainthread, myself->hProcess);
-  pthread_mutex::initMutex ();
+  pthread_mutex::initMutex ();  
 
   if (forked)
     return;
@@ -935,7 +935,8 @@ pthread_cond::fixup_after_fork ()
 
 /* pthread_key */
 /* static members */
-List<pthread_key> pthread_key::keys NO_COPY;
+/* This stores pthread_key information across fork() boundaries */
+List<pthread_key> pthread_key::keys;
 
 void
 pthread_key::saveAKey (pthread_key *key)
@@ -1097,6 +1098,7 @@ pthread_mutex::isGoodInitializerOrObject (pthread_mutex_t const *mutex)
   return true;
 }
 
+/* This is used for mutex creation protection within a single process only */
 pthread_mutex::nativeMutex pthread_mutex::mutexInitializationLock NO_COPY;
 
 /* We can only be called once.
@@ -2640,6 +2642,6 @@ pthreadNull::getsequence_np ()
   return 0;
 }
 
-pthreadNull NO_COPY pthreadNull::_instance;
+pthreadNull pthreadNull::_instance;
 
 #endif // MT_SAFE

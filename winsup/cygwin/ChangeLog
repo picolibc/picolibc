@@ -1,3 +1,10 @@
+2002-10-01  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (pthread_key::keys): Copy on fork. Add a comment explaining
+	why.
+	(pthreadNull::_instance): Copy on fork. Absolutely no state exists
+	in pthreadNull. 
+
 2002-09-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_transport_pipes.cc (transport_layer_pipes::accept):
