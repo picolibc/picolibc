@@ -11,6 +11,7 @@
 	#include "i386mach.h"
 	
 	.global	SYM (memchr)
+       SOTYPE_FUNCTION(memchr)
 
 SYM (memchr):
 	pushl	ebp

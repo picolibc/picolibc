@@ -67,3 +67,17 @@
 #define mm5 REG(mm5)
 #define mm6 REG(mm6)
 #define mm7 REG(mm7)
+
+#ifdef _I386MACH_NEED_SOTYPE_FUNCTION
+#define SOTYPE_FUNCTION(sym) .type SYM(sym),@function
+#else
+#define SOTYPE_FUNCTION(sym)
+#endif
+
+#ifdef _I386MACH_ALLOW_HW_INTERRUPTS
+#define        __CLI
+#define        __STI
+#else
+#define __CLI  cli
+#define __STI  sti
+#endif

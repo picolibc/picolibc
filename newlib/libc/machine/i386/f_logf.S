@@ -20,6 +20,7 @@ There is no error checking or setting of errno.
 	#include "i386mach.h"
 
 	.global SYM (_f_logf)
+       SOTYPE_FUNCTION(_f_logf)
 
 SYM (_f_logf):
 	pushl ebp

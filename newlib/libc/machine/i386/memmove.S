@@ -11,6 +11,7 @@
 	#include "i386mach.h"
 	
 	.global SYM (memmove)
+       SOTYPE_FUNCTION(memmove)
 
 SYM (memmove):
 

@@ -11,6 +11,7 @@
 	#include "i386mach.h"
 	
 	.global SYM (memcpy)
+       SOTYPE_FUNCTION(memcpy)
 
 SYM (memcpy):
 

@@ -11,6 +11,7 @@
 	#include "i386mach.h"
 
 	.global SYM (memset)
+       SOTYPE_FUNCTION(memset)
 
 SYM (memset):
 

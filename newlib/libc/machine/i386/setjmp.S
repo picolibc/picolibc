@@ -3,6 +3,7 @@
  *  This file was modified to use the __USER_LABEL_PREFIX__ and
  *  __REGISTER_PREFIX__ macros defined by later versions of GNU cpp by
  *  Joel Sherrill (joel@OARcorp.com)
+ *  Slight change: now includes i386mach.h for this (Werner Almesberger)
  *
  ** Copyright (C) 1991 DJ Delorie, 24 Kirsten Ave, Rochester NH 03867-2954
  **
@@ -22,61 +23,12 @@
  **	 0   4   8   12  16  20  24  28  32
  */
 
-/* These are predefined by new versions of GNU cpp.  */
- 
-#ifndef __USER_LABEL_PREFIX__
-#define __USER_LABEL_PREFIX__ _
-#endif
- 
-/***************************** TEMPORARY ******************************
- * 
- *  It appears that the i386-coff configuration of gcc 2.6.2 does not
- *  do the __REGISTER_PREFIX__ correctly.  Fix this when it does.
- **********************************************************************/
-#define __REGISTER_PREFIX__ %
-#ifndef __REGISTER_PREFIX__
-#define __REGISTER_PREFIX__ 
-#endif
- 
-/* ANSI concatenation macros.  */
- 
-#define CONCAT1(a, b) CONCAT2(a, b)
-#define CONCAT2(a, b) a ## b
- 
-/* Use the right prefix for global labels.  */
- 
-#define SYM(x) CONCAT1 (__USER_LABEL_PREFIX__, x)
- 
-/* Use the right prefix for registers.  */
- 
-#define REG(x) CONCAT1 (__REGISTER_PREFIX__, x)
- 
-#define eax REG (eax)
-#define ebx REG (ebx)
-#define ecx REG (ecx)
-#define edx REG (edx)
-#define esi REG (esi)
-#define edi REG (edi)
-#define ebp REG (ebp)
-#define esp REG (esp)
- 
-#define ax REG (ax)
-#define bx REG (bx)
-#define cx REG (cx)
-#define dx REG (dx)
-
-#define ah REG (ah)
-#define bh REG (bh)
-#define ch REG (ch)
-#define dh REG (dh)
-
-#define al REG (al)
-#define bl REG (bl)
-#define cl REG (cl)
-#define dl REG (dl)
+       #include "i386mach.h"
 
         .global SYM (setjmp)
         .global SYM (longjmp)
+       SOTYPE_FUNCTION(setjmp)
+       SOTYPE_FUNCTION(longjmp)
  
 SYM (setjmp):
 
@@ -120,7 +72,7 @@ SYM (longjmp):
 
 	movl	24(edi),ebp
 
-	cli
+       __CLI
 	movl	28(edi),esp
 	
 	pushl	32(edi)	
@@ -131,6 +83,6 @@ SYM (longjmp):
 	movl	12(edi),edx
 	movl	16(edi),esi
 	movl	20(edi),edi
-	sti
+       __STI
 
 	ret

@@ -11,6 +11,7 @@
 	#include "i386mach.h"
 	
 	.global SYM (strchr)
+       SOTYPE_FUNCTION(strchr)
 
 SYM (strchr):
 

@@ -1,3 +1,25 @@
+2000-08-27  Werner Almesberger  <Werner.Almesberger@epfl.ch>
+
+        * libc/machine/i386/i386mach.h: added SOTYPE_FUNCTION to set type
+        of global entry points if _I386MACH_NEED_SOTYPE_FUNCTION is defined;
+        Added __CLI and __STI macros (controlled via
+        _I386MACH_ALLOW_HW_INTERRUPTS macro).
+        * libc/machine/i386/f_atan2.S libc/machine/i386/f_atan2f.S
+        libc/machine/i386/f_frexp.S libc/machine/i386/f_frexpf.S
+        libc/machine/i386/f_ldexp.S libc/machine/i386/f_ldexpf.S
+        libc/machine/i386/f_log.S libc/machine/i386/f_log10.S
+        libc/machine/i386/f_log10f.S libc/machine/i386/f_logf.S
+        libc/machine/i386/f_tan.S libc/machine/i386/f_tanf.S
+        libc/machine/i386/memchr.S libc/machine/i386/memcmp.S
+        libc/machine/i386/memcpy.S libc/machine/i386/memmove.S
+        libc/machine/i386/memset.S libc/machine/i386/setjmp.S
+        libc/machine/i386/strchr.S libc/machine/i386/strlen.S:
+        (that's libc/machine/i386/*.S) added SOTYPE_FUNCTION(symbol)
+        for all global entry points.
+        * libc/machine/i386/setjmp.S: removed code replicated in
+        libc/machine/i386/i386mach.h and included i386mach.h instead;
+        Use __CLI and __STI instead of cli and sti.
+
 2000-08-25  DJ Delorie  <dj@redhat.com>
 
 	* libc/include/sys/unistd.h (environ): this one isn't from the

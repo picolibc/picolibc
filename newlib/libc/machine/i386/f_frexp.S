@@ -21,6 +21,7 @@ There is no error checking or setting of errno.
 	#include "i386mach.h"
 
 	.global SYM (_f_frexp)
+       SOTYPE_FUNCTION(_f_frexp)
 
 SYM (_f_frexp):
 	pushl ebp

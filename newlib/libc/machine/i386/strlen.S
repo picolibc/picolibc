@@ -11,6 +11,7 @@
 	#include "i386mach.h"
 
 	.global SYM (strlen)
+       SOTYPE_FUNCTION(strlen)
 
 SYM (strlen):
 
