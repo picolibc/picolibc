@@ -1,3 +1,7 @@
+Wed Apr  4 10:37:44 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* child_info.h: Bump magic number for fork/exec/spawn.
+
 Tue Apr  3 20:06:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* errno.cc (errmap): Map ERROR_FILE_INVALID to ENXIO.
