@@ -274,24 +274,26 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
       GetTokenInformation (hToken, TokenGroups, buf, 4096, &size))
     {
       TOKEN_GROUPS *groups = (TOKEN_GROUPS *) buf;
-      char ssid[256];
+      char ssid[MAX_SID_LEN];
+      PSID sid = (PSID) ssid;
 
       for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
         {
-	  convert_sid_to_string_sid (groups->Groups[pg].Sid, ssid);
-          for (int gg = 0; gg < curr_lines; ++gg)
+	  struct group *gr;
+	  while ((gr = getgrent ()) != NULL)
 	    {
-	      if (group_buf[gg].gr_passwd &&
-	          !strcmp (group_buf[gg].gr_passwd, ssid))
+	      if (get_gr_sid (sid, gr) &&
+	          EqualSid (sid, groups->Groups[pg].Sid))
 	        {
 		  if (cnt < gidsetsize)
-		    grouplist[cnt] = group_buf[gg].gr_gid;
+		    grouplist[cnt] = gr->gr_gid;
 		  ++cnt;
 		  if (gidsetsize && cnt > gidsetsize)
 		    goto error;
 		  break;
 		}
 	    }
+	  endgrent ();
         }
       CloseHandle (hToken);
       return cnt;
