@@ -1,3 +1,7 @@
+2003-07-14  Christian Groessler  <chris@groessler.org>
+
+        * i860.h (AOUTSZ): Define for i860 coff.
+
 2003-06-29  Andreas Jaeger  <aj@suse.de>
 
 	* xcoff.h (struct __rtinit ): Convert to ISO C90 prototypes.
