@@ -20,6 +20,8 @@
 #include "cygwin/include/sys/cygwin.h"
 #include "cygwin/include/mntent.h"
 
+#define alloca __builtin_alloca
+
 int verbose = 0;
 int registry = 0;
 int sysinfo = 0;
@@ -791,7 +793,6 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
   FILE *f = popen (id, "rt");
 
   char buf[16384];
-  static char empty[] = "";
   buf[0] = '\0';
   fgets (buf, sizeof (buf), f);
   pclose (f);
@@ -799,20 +800,33 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
   if (uid)
     uid += strlen ("uid=");
   else
-    uid = empty;
+    {
+      fprintf (stderr, "garbled output from `id' command - no uid= found\n");
+      exit (1);
+    }
   char *gid = strtok (NULL, ")");
   if (gid)
     gid += strlen ("gid=") + 1;
   else
-    gid = empty;
-  char **ng;
-  size_t sz = 0;
-  for (ng = groups; (*ng = strtok (NULL, ",")); ng++)
+    {
+      fprintf (stderr, "garbled output from `id' command - no gid= found\n");
+      exit (1);
+    }
+
+  char **ng = groups - 1;
+  size_t len_uid = strlen (uid);
+  size_t len_gid = strlen (gid);
+  *++ng = groups[0] = (char *) alloca (len_uid += sizeof ("UID: )"));
+  *++ng = groups[1] = (char *) alloca (len_uid += sizeof ("GID: )"));
+  sprintf (groups[0], "UID: %s)", uid);
+  sprintf (groups[1], "GID: %s)", gid);
+  size_t sz = max (len_uid, len_gid);
+  while ((*++ng = strtok (NULL, ",")))
     {
       char *p = strchr (*ng, '\n');
       if (p)
 	*p = '\0';
-      if (ng == groups)
+      if (ng == groups + 2)
 	*ng += strlen (" groups=");
       size_t len = strlen (*ng);
       if (sz < len)
@@ -820,32 +834,17 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
     }
 
   printf ("\nOutput from %s (%s)\n", id, s);
-  size_t szmaybe = strlen ("UID: ") + strlen (uid);
-  if (sz < szmaybe)
-    sz = szmaybe;
-  sz += 1;
   int n = 80 / (int) sz;
-  sz = -sz;
-  ng[0] += strlen ("groups=");
-  printf ("UID: %.*s) GID: %s)\n", sz + (sizeof ("UID: ") - 1), uid, gid);
-  int i = 0;
+  sz = -(sz + 1);
+  int i = n - 2;
   for (char **g = groups; g < ng; g++)
-    {
-      if (i < n)
-	i++;
-      else
-	{
-	  i = 0;
-	  puts ("");
-	}
-      if (++i <= n && g != (ng - 1))
-	printf ("%*s ", sz, *g);
-      else
-	{
-	  printf ("%s\n", *g);
-	  i = 0;
-	}
-    }
+    if ((g != ng - 1) && (++i < n))
+      printf ("%*s ", sz, *g);
+    else
+      {
+	puts (*g);
+	i = 0;
+      }
 }
 
 static void
