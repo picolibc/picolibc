@@ -1,3 +1,10 @@
+2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
+	
+	* localtime.cc: Implement setting __tzrule's offset member using
+	newlib's __gettzinfo () interface.
+	(__tzrule): Remove.
+	(timezone): Define as long according to POSIX.
+
 2005-02-23  Eric Blake  <ebb9@byu.net>
 
 	* devices.in (parsedisk): Fix typo.
