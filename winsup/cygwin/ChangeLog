@@ -1,3 +1,8 @@
+Tue Apr 17 19:05:44 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.h (path_conv::add_ext_from_sym): Declare.
+	* path.cc (path_conv::add_ext_from_sym): Convert to pure inline method.
+
 Tue Apr 17 18:50:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (windows_device_names): Add missing NULL element.

@@ -52,9 +52,11 @@ enum path_types
   PATH_HASACLS =      0x80000000
 };
 
+class symlink_info;
 class path_conv
 {
   char path[MAX_PATH];
+  void add_ext_from_sym (symlink_info&);
  public:
 
   unsigned path_flags;

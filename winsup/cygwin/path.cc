@@ -177,11 +177,8 @@ pathmatch (const char *path1, const char *path2)
   				      : strcasematch (path1, path2);
 }
 
-#define add_ext_from_sym(s) \
-		(add_ext_from_sym_ (this->path, this->known_suffix, s))
-
 inline void
-add_ext_from_sym_ (char *path, char *known_suffix, symlink_info &sym)
+path_conv::add_ext_from_sym (symlink_info &sym)
 {
   if (sym.ext_here && *sym.ext_here)
     {
