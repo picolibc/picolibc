@@ -303,7 +303,7 @@ class fhandler_base
   virtual int tcsetpgrp (const pid_t pid);
   virtual int tcgetpgrp ();
   virtual int is_tty () { return 0; }
-  virtual BOOL is_device () { return TRUE; }
+  virtual bool isdevice () { return true; }
   virtual char *ptsname () { return NULL;}
   virtual class fhandler_socket *is_socket () { return 0; }
   virtual class fhandler_console *is_console () { return 0; }
@@ -342,6 +342,8 @@ class fhandler_base
   virtual void rewinddir (DIR *);
   virtual int closedir (DIR *);
   virtual bool is_slow () {return 0;}
+  bool is_auto_device () {return isdevice () && !dev.isfs ();}
+  bool is_fs_device () {return dev.isfs ();}
 };
 
 class fhandler_socket: public fhandler_base
@@ -566,7 +568,7 @@ class fhandler_disk_file: public fhandler_base
   int open (path_conv *real_path, int flags, mode_t mode);
   int close ();
   int lock (int, struct flock *);
-  BOOL is_device () { return FALSE; }
+  bool isdevice () { return false; }
   int __stdcall fstat (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
   int __stdcall fstat_helper (struct __stat64 *buf, path_conv *pc,
 			      FILETIME ftCreateionTime,
@@ -883,6 +885,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   __off64_t lseek (__off64_t, int) { return 0; }
   select_record *select_read (select_record *s);
   int cygserver_attach_tty (HANDLE*, HANDLE*);
+  int get_unit () __attribute__ ((regparm (1)));
 };
 
 class fhandler_pty_master: public fhandler_tty_common
