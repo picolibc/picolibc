@@ -38,7 +38,7 @@ struct cygheap_entry
 
 #define NBUCKETS (sizeof (cygheap->buckets) / sizeof (cygheap->buckets[0]))
 #define N0 ((_cmalloc_entry *) NULL)
-#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (int) (N0->data)))
+#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (unsigned) (N0->data)))
 
 #define CFMAP_OPTIONS (SEC_RESERVE | PAGE_READWRITE)
 #define MVMAP_OPTIONS (FILE_MAP_WRITE)
@@ -208,18 +208,17 @@ cygheap_init ()
 
 /* Copyright (C) 1997, 2000 DJ Delorie */
 
-static void *_cmalloc (int size) __attribute ((regparm(1)));
-static void *__stdcall _crealloc (void *ptr, int size) __attribute ((regparm(2)));
+static void *_cmalloc (unsigned size) __attribute ((regparm(1)));
+static void *__stdcall _crealloc (void *ptr, unsigned size) __attribute ((regparm(2)));
 
 static void *__stdcall
-_cmalloc (int size)
+_cmalloc (unsigned size)
 {
   _cmalloc_entry *rvc;
   unsigned b, sz;
 
   /* Calculate "bit bucket" and size as a power of two. */
-  for (b = 3, sz = 8; sz && sz < (size + sizeof (_cmalloc_entry));
-       b++, sz <<= 1)
+  for (b = 3, sz = 8; sz && sz < size; b++, sz <<= 1)
     continue;
 
   cygheap_protect->acquire ();
@@ -231,7 +230,7 @@ _cmalloc (int size)
     }
   else
     {
-      rvc = (_cmalloc_entry *) _csbrk (sz);
+      rvc = (_cmalloc_entry *) _csbrk (sz + sizeof (_cmalloc_entry));
       if (!rvc)
 	{
 	  cygheap_protect->release ();
@@ -257,16 +256,15 @@ _cfree (void *ptr)
   cygheap_protect->release ();
 }
 
-static void *__stdcall _crealloc (void *ptr, int size) __attribute__((regparm(2)));
 static void *__stdcall
-_crealloc (void *ptr, int size)
+_crealloc (void *ptr, unsigned size)
 {
   void *newptr;
   if (ptr == NULL)
     newptr = _cmalloc (size);
   else
     {
-      int oldsize = 1 << to_cmalloc (ptr)->b;
+      unsigned oldsize = 1 << to_cmalloc (ptr)->b;
       if (size <= oldsize)
 	return ptr;
       newptr = _cmalloc (size);
@@ -284,7 +282,7 @@ _crealloc (void *ptr, int size)
 #define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - (int) (N->data)))
 
 inline static void *
-creturn (cygheap_types x, cygheap_entry * c, int len)
+creturn (cygheap_types x, cygheap_entry * c, unsigned len)
 {
   if (!c)
     {
