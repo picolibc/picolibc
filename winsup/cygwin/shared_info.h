@@ -156,7 +156,7 @@ class shared_info
 
   tty_list tty;
   delqueue_list delqueue;
-  void initialize (const char *);
+  void initialize ();
   unsigned heap_chunk_size ();
 };
 

@@ -202,7 +202,7 @@ get_registry_hive_path (const PSID psid, char *path)
 
   if (!psid || !path)
     return NULL;
-  cygsid csid (psid);
+  cygpsid csid (psid);
   csid.string (sid);
   strcpy (key,"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList\\");
   strcat (key, sid);
@@ -233,7 +233,7 @@ load_registry_hive (PSID psid)
   if (!psid)
     return;
   /* Check if user hive is already loaded. */
-  cygsid csid (psid);
+  cygpsid csid (psid);
   csid.string (sid);
   if (!RegOpenKeyExA (HKEY_USERS, sid, 0, KEY_READ, &hkey))
     {

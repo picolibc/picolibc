@@ -134,6 +134,7 @@ public:
 
   ~cygheap_user ();
 
+  void init ();
   void set_name (const char *new_name);
   const char *name () const { return pname; }
 

@@ -1,6 +1,6 @@
 /* shared.cc: shared data area support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -67,7 +67,7 @@ static char *offsets[] =
 };
 
 void * __stdcall
-open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, 
+open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
 	     shared_locations m, PSECURITY_ATTRIBUTES psa)
 {
   void *shared;
@@ -145,38 +145,20 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
   return shared;
 }
 
-void 
+void
 user_shared_initialize ()
 {
-  char name[UNLEN + 1] = "";
-  
-  /* Temporary code. Will be cleaned up later */ 
+  char name[UNLEN > 127 ? UNLEN + 1 : 128] = "";
+
   if (wincap.has_security ())
     {
-      HANDLE ptok = NULL;
-      DWORD siz;
-      cygsid tu;
-      
-      if (cygwin_mount_h) /* Reinit */
-	tu = cygheap->user.sid ();
-      else
-        {  
-	  if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
-				 &ptok))
-	    system_printf ("OpenProcessToken(): %E");
-	  else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
-	    system_printf ("GetTokenInformation (TokenUser): %E");
-	  else
-	    tu.string (name);
-	  if (ptok)
-	    CloseHandle (ptok);
-	}
+      cygsid tu (cygheap->user.sid ());
       tu.string (name);
     }
   else
     strcpy (name, cygheap->user.name ());
 
-  if (cygwin_mount_h)
+  if (cygwin_mount_h) /* Reinit */
     {
       if (!UnmapViewOfFile (mount_table))
 	debug_printf("UnmapViewOfFile %E");
@@ -184,7 +166,7 @@ user_shared_initialize ()
 	debug_printf("CloseHandle %E");
       cygwin_mount_h = NULL;
     }
-  
+
   mount_table = (mount_info *) open_shared (name, MOUNT_VERSION,
 					    cygwin_mount_h, sizeof (mount_info),
 					    SH_MOUNT_TABLE, &sec_none);
@@ -211,7 +193,7 @@ user_shared_initialize ()
 }
 
 void
-shared_info::initialize (const char *user_name)
+shared_info::initialize ()
 {
   DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &version, SHARED_VERSION_MAGIC);
   if (!sversion)
@@ -237,7 +219,7 @@ shared_info::initialize (const char *user_name)
   if (!cygheap)
     {
       cygheap_init ();
-      cygheap->user.set_name (user_name);
+      cygheap->user.init ();
     }
 
   heap_init ();
@@ -255,12 +237,6 @@ memory_init ()
 {
   getpagesize ();
 
-  char user_name[UNLEN + 1];
-  DWORD user_name_len = UNLEN + 1;
-
-  if (!GetUserName (user_name, &user_name_len))
-    strcpy (user_name, "unknown");
-
   /* Initialize general shared memory */
   HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
   cygwin_shared = (shared_info *) open_shared ("shared",
@@ -269,8 +245,7 @@ memory_init ()
 					       sizeof (*cygwin_shared),
 					       SH_CYGWIN_SHARED);
 
-  cygwin_shared->initialize (user_name);
-
+  cygwin_shared->initialize ();
   cygheap->shared_h = shared_h;
   ProtectHandleINH (cygheap->shared_h);
 
