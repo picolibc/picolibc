@@ -123,7 +123,7 @@ void AssertResourceOwner (int, int);
 #endif
 }
 
-class nativeMutex
+class native_mutex
 {
 public:
   bool init ();
@@ -189,59 +189,59 @@ typedef enum
 verifyable_object_state verifyable_object_isvalid (void const *, long);
 verifyable_object_state verifyable_object_isvalid (void const *, long, void *);
 
-template <class ListNode> class List {
+template <class list_node> class List {
 public:
   List() : head(NULL)
   {
   }
 
-  void Insert (ListNode *aNode)
+  void insert (list_node *node)
   {
-    if (!aNode)
+    if (!node)
       return;
-    aNode->next = (ListNode *) InterlockedExchangePointer (&head, aNode);
+    node->next = (list_node *) InterlockedExchangePointer (&head, node);
   }
 
-  ListNode *Remove ( ListNode *aNode)
+  list_node *remove ( list_node *node)
   {
-    if (!aNode || !head)
+    if (!node || !head)
       return NULL;
-    if (aNode == head)
-      return Pop ();
+    if (node == head)
+      return pop ();
 
-    ListNode *resultPrev = head;
-    while (resultPrev && resultPrev->next && !(aNode == resultPrev->next))
-      resultPrev = resultPrev->next;
-    if (resultPrev)
-      return (ListNode *)InterlockedExchangePointer (&resultPrev->next, resultPrev->next->next);
+    list_node *result_prev = head;
+    while (result_prev && result_prev->next && !(node == result_prev->next))
+      result_prev = result_prev->next;
+    if (result_prev)
+      return (list_node *)InterlockedExchangePointer (&result_prev->next, result_prev->next->next);
     return NULL;
   }
 
-  ListNode *Pop ()
+  list_node *pop ()
   {
-    return (ListNode *) InterlockedExchangePointer (&head, head->next);
+    return (list_node *) InterlockedExchangePointer (&head, head->next);
   }
 
   /* poor mans generic programming. */
-  void forEach (void (ListNode::*callback) ())
+  void for_each (void (list_node::*callback) ())
   {
-    ListNode *aNode = head;
-    while (aNode)
+    list_node *node = head;
+    while (node)
       {
-        (aNode->*callback) ();
-        aNode = aNode->next;
+        (node->*callback) ();
+        node = node->next;
       }
   }
 
 protected:
-  ListNode *head;
+  list_node *head;
 };
 
 class pthread_key:public verifyable_object
 {
 public:
-  static bool isGoodObject (pthread_key_t const *);
-  DWORD dwTlsIndex;
+  static bool is_good_object (pthread_key_t const *);
+  DWORD tls_index;
 
   int set (const void *);
   void *get () const;
@@ -250,34 +250,34 @@ public:
   ~pthread_key ();
   static void fixup_before_fork()
   {
-    keys.forEach (&pthread_key::saveKeyToBuffer);
+    keys.for_each (&pthread_key::save_key_to_buffer);
   }
 
   static void fixup_after_fork()
   {
-    keys.forEach (&pthread_key::recreateKeyFromBuffer);
+    keys.for_each (&pthread_key::recreate_key_from_buffer);
   }
 
-  static void runAllDestructors ()
+  static void run_all_destructors ()
   {
-    keys.forEach (&pthread_key::runDestructor);
+    keys.for_each (&pthread_key::run_destructor);
   }
 
   /* List support calls */
   class pthread_key *next;
 private:
   static List<pthread_key> keys;
-  void saveKeyToBuffer ();
-  void recreateKeyFromBuffer ();
+  void save_key_to_buffer ();
+  void recreate_key_from_buffer ();
   void (*destructor) (void *);
-  void runDestructor ();
+  void run_destructor ();
   void *fork_buf;
 };
 
 class pthread_attr:public verifyable_object
 {
 public:
-  static bool isGoodObject(pthread_attr_t const *);
+  static bool is_good_object(pthread_attr_t const *);
   int joinable;
   int contentionscope;
   int inheritsched;
@@ -291,7 +291,7 @@ public:
 class pthread_mutexattr:public verifyable_object
 {
 public:
-  static bool isGoodObject(pthread_mutexattr_t const *);
+  static bool is_good_object(pthread_mutexattr_t const *);
   int pshared;
   int mutextype;
   pthread_mutexattr ();
@@ -301,12 +301,12 @@ public:
 class pthread_mutex:public verifyable_object
 {
 public:
-  static bool isGoodObject (pthread_mutex_t const *);
-  static bool isGoodInitializer (pthread_mutex_t const *);
-  static bool isGoodInitializerOrObject (pthread_mutex_t const *);
-  static bool isGoodInitializerOrBadObject (pthread_mutex_t const *mutex);
-  static bool canBeUnlocked (pthread_mutex_t const *mutex);
-  static void initMutex ();
+  static bool is_good_object (pthread_mutex_t const *);
+  static bool is_good_initializer (pthread_mutex_t const *);
+  static bool is_good_initializer_or_object (pthread_mutex_t const *);
+  static bool is_good_initializer_or_bad_object (pthread_mutex_t const *mutex);
+  static bool can_be_unlocked (pthread_mutex_t const *mutex);
+  static void init_mutex ();
   static int init (pthread_mutex_t *, const pthread_mutexattr_t *);
 
   unsigned long lock_counter;
@@ -317,36 +317,36 @@ public:
   int type;
   int pshared;
 
-  pthread_t GetPthreadSelf () const
+  pthread_t get_pthread_self () const
   {
     return PTHREAD_MUTEX_NORMAL == type ? MUTEX_OWNER_ANONYMOUS :
       ::pthread_self ();
   }
 
-  int Lock ()
+  int lock ()
   {
-    return _Lock (GetPthreadSelf ());
+    return _lock (get_pthread_self ());
   }
-  int TryLock ()
+  int trylock ()
   {
-    return _TryLock (GetPthreadSelf ());
+    return _trylock (get_pthread_self ());
   }
-  int UnLock ()
+  int unlock ()
   {
-    return _UnLock (GetPthreadSelf ());
+    return _unlock (get_pthread_self ());
   }
-  int Destroy ()
+  int destroy ()
   {
-    return _Destroy (GetPthreadSelf ());
+    return _destroy (get_pthread_self ());
   }
 
-  void SetOwner (pthread_t self)
+  void set_owner (pthread_t self)
   {
     recursion_counter = 1;
     owner = self;
   }
 
-  int LockRecursive ()
+  int lock_recursive ()
   {
     if (UINT_MAX == recursion_counter)
       return EAGAIN;
@@ -361,19 +361,19 @@ public:
   class pthread_mutex * next;
   static void fixup_after_fork ()
   {
-    mutexes.forEach (&pthread_mutex::FixupAfterFork);
+    mutexes.for_each (&pthread_mutex::_fixup_after_fork);
   }
 
-  void FixupAfterFork ();
-
 private:
-  int _Lock (pthread_t self);
-  int _TryLock (pthread_t self);
-  int _UnLock (pthread_t self);
-  int _Destroy (pthread_t self);
+  int _lock (pthread_t self);
+  int _trylock (pthread_t self);
+  int _unlock (pthread_t self);
+  int _destroy (pthread_t self);
+
+  void _fixup_after_fork ();
 
   static List<pthread_mutex> mutexes;
-  static nativeMutex mutexInitializationLock;
+  static native_mutex mutex_initialization_lock;
 };
 
 #define WAIT_CANCELED   (WAIT_OBJECT_0 + 1)
@@ -401,8 +401,8 @@ public:
   pthread ();
   virtual ~pthread ();
 
-  static void initMainThread (bool);
-  static bool isGoodObject(pthread_t const *);
+  static void init_mainthread (bool);
+  static bool is_good_object(pthread_t const *);
   static void atforkprepare();
   static void atforkparent();
   static void atforkchild();
@@ -446,19 +446,19 @@ private:
   void pop_all_cleanup_handlers (void);
   void precreate (pthread_attr *);
   void postcreate ();
-  void setThreadIdtoCurrent ();
-  static void setTlsSelfPointer (pthread *);
-  static pthread *getTlsSelfPointer ();
+  void set_thread_id_to_current ();
+  static void set_tls_self_pointer (pthread *);
+  static pthread *get_tls_self_pointer ();
   void cancel_self ();
-  DWORD getThreadId ();
-  void initCurrentThread ();
+  DWORD get_thread_id ();
+  void init_current_thread ();
 };
 
-class pthreadNull : public pthread
+class pthread_null : public pthread
 {
   public:
-  static pthread *getNullpthread();
-  ~pthreadNull();
+  static pthread *get_null_pthread();
+  ~pthread_null();
 
   /* From pthread These should never get called
   * as the ojbect is not verifyable
@@ -474,14 +474,14 @@ class pthreadNull : public pthread
   unsigned long getsequence_np();
 
   private:
-  pthreadNull ();
-  static pthreadNull _instance;
+  pthread_null ();
+  static pthread_null _instance;
 };
 
 class pthread_condattr:public verifyable_object
 {
 public:
-  static bool isGoodObject(pthread_condattr_t const *);
+  static bool is_good_object(pthread_condattr_t const *);
   int shared;
 
   pthread_condattr ();
@@ -491,26 +491,26 @@ public:
 class pthread_cond:public verifyable_object
 {
 public:
-  static bool isGoodObject (pthread_cond_t const *);
-  static bool isGoodInitializer (pthread_cond_t const *);
-  static bool isGoodInitializerOrObject (pthread_cond_t const *);
-  static bool isGoodInitializerOrBadObject (pthread_cond_t const *);
-  static void initMutex ();
+  static bool is_good_object (pthread_cond_t const *);
+  static bool is_good_initializer (pthread_cond_t const *);
+  static bool is_good_initializer_or_object (pthread_cond_t const *);
+  static bool is_good_initializer_or_bad_object (pthread_cond_t const *);
+  static void init_mutex ();
   static int init (pthread_cond_t *, const pthread_condattr_t *);
 
   int shared;
 
   unsigned long waiting;
   unsigned long pending;
-  HANDLE semWait;
+  HANDLE sem_wait;
 
-  pthread_mutex mtxIn;
-  pthread_mutex mtxOut;
+  pthread_mutex mtx_in;
+  pthread_mutex mtx_out;
 
-  pthread_mutex_t mtxCond;
+  pthread_mutex_t mtx_cond;
 
-  void UnBlock (const bool all);
-  int Wait (pthread_mutex_t mutex, DWORD dwMilliseconds = INFINITE);
+  void unblock (const bool all);
+  int wait (pthread_mutex_t mutex, DWORD dwMilliseconds = INFINITE);
 
   pthread_cond (pthread_condattr *);
   ~pthread_cond ();
@@ -518,20 +518,20 @@ public:
   class pthread_cond * next;
   static void fixup_after_fork ()
   {
-    conds.forEach (&pthread_cond::FixupAfterFork);
+    conds.for_each (&pthread_cond::_fixup_after_fork);
   }
 
-  void FixupAfterFork ();
-
 private:
+  void _fixup_after_fork ();
+
   static List<pthread_cond> conds;
-  static nativeMutex condInitializationLock;
+  static native_mutex cond_initialization_lock;
 };
 
 class pthread_rwlockattr:public verifyable_object
 {
 public:
-  static bool isGoodObject(pthread_rwlockattr_t const *);
+  static bool is_good_object(pthread_rwlockattr_t const *);
   int shared;
 
   pthread_rwlockattr ();
@@ -541,17 +541,17 @@ public:
 class pthread_rwlock:public verifyable_object
 {
 public:
-  static bool isGoodObject (pthread_rwlock_t const *);
-  static bool isGoodInitializer (pthread_rwlock_t const *);
-  static bool isGoodInitializerOrObject (pthread_rwlock_t const *);
-  static bool isGoodInitializerOrBadObject (pthread_rwlock_t const *);
-  static void initMutex ();
+  static bool is_good_object (pthread_rwlock_t const *);
+  static bool is_good_initializer (pthread_rwlock_t const *);
+  static bool is_good_initializer_or_object (pthread_rwlock_t const *);
+  static bool is_good_initializer_or_bad_object (pthread_rwlock_t const *);
+  static void init_mutex ();
   static int init (pthread_rwlock_t *, const pthread_rwlockattr_t *);
 
   int shared;
 
-  unsigned long waitingReaders;
-  unsigned long waitingWriters;
+  unsigned long waiting_readers;
+  unsigned long waiting_writers;
   pthread_t writer;
   struct RWLOCK_READER
   {
@@ -559,17 +559,17 @@ public:
     pthread_t thread;
   } *readers;
 
-  int RdLock ();
-  int TryRdLock ();
+  int rdlock ();
+  int tryrdlock ();
 
-  int WrLock ();
-  int TryWrLock ();
+  int wrlock ();
+  int trywrlock ();
 
-  int UnLock ();
+  int unlock ();
 
   pthread_mutex mtx;
-  pthread_cond condReaders;
-  pthread_cond condWriters;
+  pthread_cond cond_readers;
+  pthread_cond cond_writers;
 
   pthread_rwlock (pthread_rwlockattr *);
   ~pthread_rwlock ();
@@ -577,22 +577,22 @@ public:
   class pthread_rwlock * next;
   static void fixup_after_fork ()
   {
-    rwlocks.forEach (&pthread_rwlock::FixupAfterFork);
+    rwlocks.for_each (&pthread_rwlock::_fixup_after_fork);
   }
-
-  void FixupAfterFork ();
 
 private:
   static List<pthread_rwlock> rwlocks;
 
-  void addReader (struct RWLOCK_READER *rd);
-  void removeReader (struct RWLOCK_READER *rd);
-  struct RWLOCK_READER *lookupReader (pthread_t thread);
+  void add_reader (struct RWLOCK_READER *rd);
+  void remove_reader (struct RWLOCK_READER *rd);
+  struct RWLOCK_READER *lookup_reader (pthread_t thread);
 
-  static void RdLockCleanup (void *arg);
-  static void WrLockCleanup (void *arg);
+  static void rdlock_cleanup (void *arg);
+  static void wrlock_cleanup (void *arg);
 
-  static nativeMutex rwlockInitializationLock;
+  void _fixup_after_fork ();
+
+  static native_mutex rwlock_initialization_lock;
 };
 
 class pthread_once
@@ -606,7 +606,7 @@ public:
 class semaphore:public verifyable_object
 {
 public:
-  static bool isGoodObject(sem_t const *);
+  static bool is_good_object(sem_t const *);
   /* API calls */
   static int init (sem_t * sem, int pshared, unsigned int value);
   static int destroy (sem_t * sem);
@@ -617,9 +617,6 @@ public:
   HANDLE win32_obj_id;
   int shared;
   long currentvalue;
-  void Wait ();
-  void Post ();
-  int TryWait ();
 
   semaphore (int, unsigned int);
   ~semaphore ();
@@ -627,12 +624,16 @@ public:
   class semaphore * next;
   static void fixup_after_fork ()
   {
-    semaphores.forEach (&semaphore::FixupAfterFork);
+    semaphores.for_each (&semaphore::_fixup_after_fork);
   }
 
-  void FixupAfterFork ();
-
 private:
+  void _wait ();
+  void _post ();
+  int _trywait ();
+
+  void _fixup_after_fork ();
+
   static List<semaphore> semaphores;
 };
 

@@ -1,3 +1,13 @@
+2003-03-27  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h: Change class names, methods, members and local vars
+	according to the GNU coding style.
+	* thread.cc: Ditto.
+	* dcrt0.cc (dll_crt0_1): Rename pthread::initMainThread call to
+	pthread::init_mainthread.
+	* pthread.cc (pthead_getsequence_np): Rename pthread::isGoodObject
+	call to pthread::is_good_object.
+
 2003-03-27  Joe Buehler  <jhpb@draco.hekimian.com>
 
 	* autoload.cc: added RegGetKeySecurity()

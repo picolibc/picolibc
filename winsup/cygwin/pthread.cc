@@ -73,7 +73,7 @@ pthread_continue (pthread_t thread)
 unsigned long
 pthread_getsequence_np (pthread_t * thread)
 {
-  if (!pthread::isGoodObject (thread))
+  if (!pthread::is_good_object (thread))
     return EINVAL;
   return (*thread)->getsequence_np ();
 }

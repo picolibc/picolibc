@@ -72,7 +72,7 @@ _reent_winsup ()
 }
 
 bool
-nativeMutex::init ()
+native_mutex::init ()
 {
   theHandle = CreateMutex (&sec_none_nih, FALSE, NULL);
   if (!theHandle)
@@ -84,7 +84,7 @@ nativeMutex::init ()
 }
 
 bool
-nativeMutex::lock ()
+native_mutex::lock ()
 {
   DWORD waitResult = WaitForSingleObject (theHandle, INFINITE);
   if (waitResult != WAIT_OBJECT_0)
@@ -96,7 +96,7 @@ nativeMutex::lock ()
 }
 
 void
-nativeMutex::unlock ()
+native_mutex::unlock ()
 {
   if (!ReleaseMutex (theHandle))
     system_printf ("Received a unexpected result releasing mutex. %E");
@@ -197,9 +197,9 @@ MTinterface::Init (int forked)
   if (!forked)
     reent_key.set (&reents);
 
-  pthread_mutex::initMutex ();
-  pthread_cond::initMutex ();
-  pthread_rwlock::initMutex ();
+  pthread_mutex::init_mutex ();
+  pthread_cond::init_mutex ();
+  pthread_rwlock::init_mutex ();
 }
 
 void
@@ -215,7 +215,7 @@ MTinterface::fixup_after_fork (void)
   pthread_key::fixup_after_fork ();
 
   threadcount = 1;
-  pthread::initMainThread (true);
+  pthread::init_mainthread (true);
 
   pthread_mutex::fixup_after_fork ();
   pthread_cond::fixup_after_fork ();
@@ -227,12 +227,12 @@ MTinterface::fixup_after_fork (void)
 
 /* static methods */
 void
-pthread::initMainThread (bool do_init)
+pthread::init_mainthread (bool do_init)
 {
   if (!do_init)
     return;
 
-  pthread *thread = getTlsSelfPointer ();
+  pthread *thread = get_tls_self_pointer ();
   if (!thread)
     {
       thread = new pthread ();
@@ -240,26 +240,26 @@ pthread::initMainThread (bool do_init)
 	api_fatal ("failed to create mainthread object");
     }
 
-  thread->initCurrentThread ();
+  thread->init_current_thread ();
 }
 
 pthread *
 pthread::self ()
 {
-  pthread *thread = getTlsSelfPointer ();
+  pthread *thread = get_tls_self_pointer ();
   if (thread)
     return thread;
-  return pthreadNull::getNullpthread ();
+  return pthread_null::get_null_pthread ();
 }
 
 void
-pthread::setTlsSelfPointer (pthread *thisThread)
+pthread::set_tls_self_pointer (pthread *thisThread)
 {
   MT_INTERFACE->thread_self_key.set (thisThread);
 }
 
 pthread *
-pthread::getTlsSelfPointer ()
+pthread::get_tls_self_pointer ()
 {
   return (pthread *) MT_INTERFACE->thread_self_key.get ();
 }
@@ -282,7 +282,7 @@ pthread::~pthread ()
 }
 
 void
-pthread::setThreadIdtoCurrent ()
+pthread::set_thread_id_to_current ()
 {
   thread_id = GetCurrentThreadId ();
 }
@@ -304,7 +304,7 @@ pthread::precreate (pthread_attr *newattr)
       attr.stacksize = newattr->stacksize;
     }
 
-  if (!pthread_mutex::isGoodObject (&verifyable_mutex_obj))
+  if (!pthread_mutex::is_good_object (&verifyable_mutex_obj))
     {
       thread_printf ("New thread object access mutex is not valid. this %p",
 		     this);
@@ -369,16 +369,16 @@ pthread::exit (void *value_ptr)
   // run cleanup handlers
   pop_all_cleanup_handlers ();
 
-  pthread_key::runAllDestructors ();
+  pthread_key::run_all_destructors ();
 
-  mutex.Lock ();
+  mutex.lock ();
   // cleanup if thread is in detached state and not joined
   if (pthread_equal (joiner, thread))
     delete this;
   else
     {
       return_ptr = value_ptr;
-      mutex.UnLock ();
+      mutex.unlock ();
     }
 
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
@@ -393,20 +393,20 @@ pthread::cancel (void)
   class pthread *thread = this;
   class pthread *self = pthread::self ();
 
-  mutex.Lock ();
+  mutex.lock ();
 
   if (canceltype == PTHREAD_CANCEL_DEFERRED ||
       cancelstate == PTHREAD_CANCEL_DISABLE)
     {
       // cancel deferred
-      mutex.UnLock ();
+      mutex.unlock ();
       SetEvent (cancel_event);
       return 0;
     }
 
   else if (pthread_equal (thread, self))
     {
-      mutex.UnLock ();
+      mutex.unlock ();
       cancel_self ();
       return 0; // Never reached
     }
@@ -421,7 +421,7 @@ pthread::cancel (void)
       context.Eip = (DWORD) pthread::static_cancel_self;
       SetThreadContext (win32_obj_id, &context);
     }
-  mutex.UnLock ();
+  mutex.unlock ();
   ResumeThread (win32_obj_id);
 
   return 0;
@@ -624,7 +624,7 @@ pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel)
   HANDLE wait_objects[2];
   pthread_t thread = self ();
 
-  if (!isGoodObject (&thread) || thread->cancelstate == PTHREAD_CANCEL_DISABLE)
+  if (!is_good_object (&thread) || thread->cancelstate == PTHREAD_CANCEL_DISABLE)
     return WaitForSingleObject (object, timeout);
 
   // Do not change the wait order
@@ -645,7 +645,7 @@ pthread::setcancelstate (int state, int *oldstate)
 {
   int result = 0;
 
-  mutex.Lock ();
+  mutex.lock ();
 
   if (state != PTHREAD_CANCEL_ENABLE && state != PTHREAD_CANCEL_DISABLE)
     result = EINVAL;
@@ -656,7 +656,7 @@ pthread::setcancelstate (int state, int *oldstate)
       cancelstate = state;
     }
 
-  mutex.UnLock ();
+  mutex.unlock ();
 
   return result;
 }
@@ -666,7 +666,7 @@ pthread::setcanceltype (int type, int *oldtype)
 {
   int result = 0;
 
-  mutex.Lock ();
+  mutex.lock ();
 
   if (type != PTHREAD_CANCEL_DEFERRED && type != PTHREAD_CANCEL_ASYNCHRONOUS)
     result = EINVAL;
@@ -677,7 +677,7 @@ pthread::setcanceltype (int type, int *oldtype)
       canceltype = type;
     }
 
-  mutex.UnLock ();
+  mutex.unlock ();
 
   return result;
 }
@@ -699,7 +699,7 @@ pthread::pop_cleanup_handler (int const execute)
     // TODO: send a signal or something to the thread ?
     api_fatal ("Attempt to execute a cleanup handler across threads");
 
-  mutex.Lock ();
+  mutex.lock ();
 
   if (cleanup_stack != NULL)
     {
@@ -710,7 +710,7 @@ pthread::pop_cleanup_handler (int const execute)
       cleanup_stack = handler->next;
     }
 
-  mutex.UnLock ();
+  mutex.unlock ();
 }
 
 void
@@ -727,26 +727,26 @@ pthread::cancel_self ()
 }
 
 DWORD
-pthread::getThreadId ()
+pthread::get_thread_id ()
 {
   return thread_id;
 }
 
 void
-pthread::initCurrentThread ()
+pthread::init_current_thread ()
 {
   cancel_event = ::CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
 			GetCurrentProcess (), &win32_obj_id,
 			0, FALSE, DUPLICATE_SAME_ACCESS))
     win32_obj_id = NULL;
-  setThreadIdtoCurrent ();
-  setTlsSelfPointer (this);
+  set_thread_id_to_current ();
+  set_tls_self_pointer (this);
 }
 
 /* static members */
 bool
-pthread_attr::isGoodObject (pthread_attr_t const *attr)
+pthread_attr::is_good_object (pthread_attr_t const *attr)
 {
   if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return false;
@@ -767,7 +767,7 @@ pthread_attr::~pthread_attr ()
 }
 
 bool
-pthread_condattr::isGoodObject (pthread_condattr_t const *attr)
+pthread_condattr::is_good_object (pthread_condattr_t const *attr)
 {
   if (verifyable_object_isvalid (attr, PTHREAD_CONDATTR_MAGIC) != VALID_OBJECT)
     return false;
@@ -786,22 +786,22 @@ pthread_condattr::~pthread_condattr ()
 List<pthread_cond> pthread_cond::conds;
 
 /* This is used for cond creation protection within a single process only */
-nativeMutex NO_COPY pthread_cond::condInitializationLock;
+native_mutex NO_COPY pthread_cond::cond_initialization_lock;
 
 /* We can only be called once.
    TODO: (no rush) use a non copied memory section to
    hold an initialization flag.  */
 void
-pthread_cond::initMutex ()
+pthread_cond::init_mutex ()
 {
-  if (!condInitializationLock.init ())
+  if (!cond_initialization_lock.init ())
     api_fatal ("Could not create win32 Mutex for pthread cond static initializer support.");
 }
 
 pthread_cond::pthread_cond (pthread_condattr *attr) :
   verifyable_object (PTHREAD_COND_MAGIC),
-  shared (0), waiting (0), pending (0), semWait (NULL),
-  mtxCond(NULL), next (NULL)
+  shared (0), waiting (0), pending (0), sem_wait (NULL),
+  mtx_cond(NULL), next (NULL)
 {
   pthread_mutex *verifyable_mutex_obj;
 
@@ -812,54 +812,57 @@ pthread_cond::pthread_cond (pthread_condattr *attr) :
         return;
       }
 
-  verifyable_mutex_obj = &mtxIn;
-  if (!pthread_mutex::isGoodObject (&verifyable_mutex_obj))
+  verifyable_mutex_obj = &mtx_in;
+  if (!pthread_mutex::is_good_object (&verifyable_mutex_obj))
+    {
+      thread_printf ("Internal cond mutex is not valid. this %p", this);
+      magic = 0;
+      return;
+    }
+  /*
+   * Change the mutex type to NORMAL.
+   * This mutex MUST be of type normal
+  */
+  mtx_in.type = PTHREAD_MUTEX_NORMAL;
+
+  verifyable_mutex_obj = &mtx_out;
+  if (!pthread_mutex::is_good_object (&verifyable_mutex_obj))
     {
       thread_printf ("Internal cond mutex is not valid. this %p", this);
       magic = 0;
       return;
     }
   /* Change the mutex type to NORMAL to speed up mutex operations */
-  mtxIn.type = PTHREAD_MUTEX_NORMAL;
+  mtx_out.type = PTHREAD_MUTEX_NORMAL;
 
-  verifyable_mutex_obj = &mtxOut;
-  if (!pthread_mutex::isGoodObject (&verifyable_mutex_obj))
-    {
-      thread_printf ("Internal cond mutex is not valid. this %p", this);
-      magic = 0;
-      return;
-    }
-  /* Change the mutex type to NORMAL to speed up mutex operations */
-  mtxOut.type = PTHREAD_MUTEX_NORMAL;
-
-  semWait = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
-  if (!semWait)
+  sem_wait = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+  if (!sem_wait)
     {
       debug_printf ("CreateSemaphore failed. %E");
       magic = 0;
       return;
     }
 
-  conds.Insert (this);
+  conds.insert (this);
 }
 
 pthread_cond::~pthread_cond ()
 {
-  if (semWait)
-    CloseHandle (semWait);
+  if (sem_wait)
+    CloseHandle (sem_wait);
 
-  conds.Remove (this);
+  conds.remove (this);
 }
 
 void
-pthread_cond::UnBlock (const bool all)
+pthread_cond::unblock (const bool all)
 {
   unsigned long releaseable;
 
   /* 
    * Block outgoing threads (and avoid simultanous unblocks)
    */
-  mtxOut.Lock ();
+  mtx_out.lock ();
 
   releaseable = waiting - pending;
   if (releaseable)
@@ -871,7 +874,7 @@ pthread_cond::UnBlock (const bool all)
           /* 
            * Block incoming threads until all waiting threads are released.
            */
-          mtxIn.Lock ();
+          mtx_in.lock ();
 
           /* 
            * Calculate releaseable again because threads can enter until
@@ -886,40 +889,40 @@ pthread_cond::UnBlock (const bool all)
       /*
        * Signal threads
        */
-      ::ReleaseSemaphore (semWait, released, NULL);
+      ::ReleaseSemaphore (sem_wait, released, NULL);
     }
 
   /*
    * And let the threads release.
    */
-  mtxOut.UnLock ();
+  mtx_out.unlock ();
 }
 
 int
-pthread_cond::Wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
+pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
 {
   DWORD rv;
 
-  mtxIn.Lock ();
+  mtx_in.lock ();
   if (1 == InterlockedIncrement ((long *)&waiting))
-    mtxCond = mutex;
-  else if (mtxCond != mutex)
+    mtx_cond = mutex;
+  else if (mtx_cond != mutex)
     {
       InterlockedDecrement ((long *)&waiting);
-      mtxIn.UnLock ();
+      mtx_in.unlock ();
       return EINVAL;
     }
-  mtxIn.UnLock ();
+  mtx_in.unlock ();
 
   /*
    * Release the mutex and wait on semaphore
    */
   ++mutex->condwaits;
-  mutex->UnLock ();
+  mutex->unlock ();
 
-  rv = pthread::cancelable_wait (semWait, dwMilliseconds, false);
+  rv = pthread::cancelable_wait (sem_wait, dwMilliseconds, false);
 
-  mtxOut.Lock ();
+  mtx_out.lock ();
   
   if (rv != WAIT_OBJECT_0)
     {
@@ -928,7 +931,7 @@ pthread_cond::Wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
        * or timed out. Try to take one.
        * If the thread gets one than a signal|broadcast is in progress.
        */ 
-      if (WAIT_OBJECT_0 == WaitForSingleObject (semWait, 0))
+      if (WAIT_OBJECT_0 == WaitForSingleObject (sem_wait, 0))
         /*
          * thread got cancelled ot timed out while a signalling is in progress.
          * Set wait result back to signaled
@@ -943,11 +946,11 @@ pthread_cond::Wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
      * All signaled threads are released,
      * new threads can enter Wait
      */
-    mtxIn.UnLock ();
+    mtx_in.unlock ();
 
-  mtxOut.UnLock ();
+  mtx_out.unlock ();
  
-  mutex->Lock ();
+  mutex->lock ();
   --mutex->condwaits;
 
   if (rv == WAIT_CANCELED)
@@ -959,22 +962,22 @@ pthread_cond::Wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
 }
 
 void
-pthread_cond::FixupAfterFork ()
+pthread_cond::_fixup_after_fork ()
 {
   waiting = pending = 0;
-  mtxCond = NULL;
+  mtx_cond = NULL;
 
   /* Unlock eventually locked mutexes */
-  mtxIn.UnLock ();
-  mtxOut.UnLock ();
+  mtx_in.unlock ();
+  mtx_out.unlock ();
 
-  semWait = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
-  if (!semWait)
-    api_fatal ("pthread_cond::FixupAfterFork () failed to recreate win32 semaphore");
+  sem_wait = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+  if (!sem_wait)
+    api_fatal ("pthread_cond::_fixup_after_fork () failed to recreate win32 semaphore");
 }
 
 bool
-pthread_rwlockattr::isGoodObject (pthread_rwlockattr_t const *attr)
+pthread_rwlockattr::is_good_object (pthread_rwlockattr_t const *attr)
 {
   if (verifyable_object_isvalid (attr, PTHREAD_RWLOCKATTR_MAGIC) != VALID_OBJECT)
     return false;
@@ -993,22 +996,22 @@ pthread_rwlockattr::~pthread_rwlockattr ()
 List<pthread_rwlock> pthread_rwlock::rwlocks;
 
 /* This is used for rwlock creation protection within a single process only */
-nativeMutex NO_COPY pthread_rwlock::rwlockInitializationLock;
+native_mutex NO_COPY pthread_rwlock::rwlock_initialization_lock;
 
 /* We can only be called once.
    TODO: (no rush) use a non copied memory section to
    hold an initialization flag.  */
 void
-pthread_rwlock::initMutex ()
+pthread_rwlock::init_mutex ()
 {
-  if (!rwlockInitializationLock.init ())
+  if (!rwlock_initialization_lock.init ())
     api_fatal ("Could not create win32 Mutex for pthread rwlock static initializer support.");
 }
 
 pthread_rwlock::pthread_rwlock (pthread_rwlockattr *attr) :
   verifyable_object (PTHREAD_RWLOCK_MAGIC),
-  shared (0), waitingReaders (0), waitingWriters (0), writer (NULL),
-  readers (NULL), mtx (NULL), condReaders (NULL), condWriters (NULL),
+  shared (0), waiting_readers (0), waiting_writers (0), writer (NULL),
+  readers (NULL), mtx (NULL), cond_readers (NULL), cond_writers (NULL),
   next (NULL)
 {
   pthread_mutex *verifyable_mutex_obj = &mtx;
@@ -1021,7 +1024,7 @@ pthread_rwlock::pthread_rwlock (pthread_rwlockattr *attr) :
         return;
       }
 
-  if (!pthread_mutex::isGoodObject (&verifyable_mutex_obj))
+  if (!pthread_mutex::is_good_object (&verifyable_mutex_obj))
     {
       thread_printf ("Internal rwlock mutex is not valid. this %p", this);
       magic = 0;
@@ -1030,16 +1033,16 @@ pthread_rwlock::pthread_rwlock (pthread_rwlockattr *attr) :
   /* Change the mutex type to NORMAL to speed up mutex operations */
   mtx.type = PTHREAD_MUTEX_NORMAL;
 
-  verifyable_cond_obj = &condReaders;
-  if (!pthread_cond::isGoodObject (&verifyable_cond_obj))
+  verifyable_cond_obj = &cond_readers;
+  if (!pthread_cond::is_good_object (&verifyable_cond_obj))
     {
       thread_printf ("Internal rwlock readers cond is not valid. this %p", this);
       magic = 0;
       return;
     }
 
-  verifyable_cond_obj = &condWriters;
-  if (!pthread_cond::isGoodObject (&verifyable_cond_obj))
+  verifyable_cond_obj = &cond_writers;
+  if (!pthread_cond::is_good_object (&verifyable_cond_obj))
     {
       thread_printf ("Internal rwlock writers cond is not valid. this %p", this);
       magic = 0;
@@ -1047,24 +1050,24 @@ pthread_rwlock::pthread_rwlock (pthread_rwlockattr *attr) :
     }
 
 
-  rwlocks.Insert (this);
+  rwlocks.insert (this);
 }
 
 pthread_rwlock::~pthread_rwlock ()
 {
-  rwlocks.Remove (this);
+  rwlocks.remove (this);
 }
 
 int
-pthread_rwlock::RdLock ()
+pthread_rwlock::rdlock ()
 {
   int result = 0;
   struct RWLOCK_READER *reader;
   pthread_t self = pthread::self ();
 
-  mtx.Lock ();
+  mtx.lock ();
 
-  if (lookupReader (self))
+  if (lookup_reader (self))
     {
       result = EDEADLK;
       goto DONE;
@@ -1077,35 +1080,35 @@ pthread_rwlock::RdLock ()
       goto DONE;
     }
 
-  while (writer || waitingWriters)
+  while (writer || waiting_writers)
     {  
-      pthread_cleanup_push (pthread_rwlock::RdLockCleanup, this);
+      pthread_cleanup_push (pthread_rwlock::rdlock_cleanup, this);
 
-      ++waitingReaders;
-      condReaders.Wait (&mtx);
-      --waitingReaders;
+      ++waiting_readers;
+      cond_readers.wait (&mtx);
+      --waiting_readers;
 
       pthread_cleanup_pop (0);
     }
 
   reader->thread = self;
-  addReader (reader);
+  add_reader (reader);
 
  DONE:
-  mtx.UnLock ();
+  mtx.unlock ();
 
   return result;
 }
 
 int
-pthread_rwlock::TryRdLock ()
+pthread_rwlock::tryrdlock ()
 {
   int result = 0;
   pthread_t self = pthread::self ();
 
-  mtx.Lock ();
+  mtx.lock ();
 
-  if (writer || waitingWriters || lookupReader (self))
+  if (writer || waiting_writers || lookup_reader (self))
     result = EBUSY;
   else
     {
@@ -1113,26 +1116,26 @@ pthread_rwlock::TryRdLock ()
       if (reader)
         {
           reader->thread = self;
-          addReader (reader);
+          add_reader (reader);
         }
       else
         result = EAGAIN;
     }
     
-  mtx.UnLock ();
+  mtx.unlock ();
 
   return result;
 }
 
 int
-pthread_rwlock::WrLock ()
+pthread_rwlock::wrlock ()
 {
   int result = 0;
   pthread_t self = pthread::self ();
 
-  mtx.Lock ();
+  mtx.lock ();
 
-  if (writer == self || lookupReader (self))
+  if (writer == self || lookup_reader (self))
     {
       result = EDEADLK;
       goto DONE;
@@ -1140,11 +1143,11 @@ pthread_rwlock::WrLock ()
 
   while (writer || readers)
     {  
-      pthread_cleanup_push (pthread_rwlock::WrLockCleanup, this);
+      pthread_cleanup_push (pthread_rwlock::wrlock_cleanup, this);
 
-      ++waitingWriters;
-      condWriters.Wait (&mtx);
-      --waitingWriters;
+      ++waiting_writers;
+      cond_writers.wait (&mtx);
+      --waiting_writers;
 
       pthread_cleanup_pop (0);
     }
@@ -1152,36 +1155,36 @@ pthread_rwlock::WrLock ()
   writer = self;
 
  DONE:
-  mtx.UnLock ();
+  mtx.unlock ();
 
   return result;
 }
 
 int
-pthread_rwlock::TryWrLock ()
+pthread_rwlock::trywrlock ()
 {
   int result = 0;
   pthread_t self = pthread::self ();
 
-  mtx.Lock ();
+  mtx.lock ();
 
   if (writer || readers)
     result = EBUSY;
   else
     writer = self;
     
-  mtx.UnLock ();
+  mtx.unlock ();
 
   return result;
 }
 
 int
-pthread_rwlock::UnLock ()
+pthread_rwlock::unlock ()
 {
   int result = 0;
   pthread_t self = pthread::self ();
 
-  mtx.Lock ();
+  mtx.lock ();
 
   if (writer)
     {
@@ -1195,7 +1198,7 @@ pthread_rwlock::UnLock ()
     }
   else
     {
-      struct RWLOCK_READER *reader = lookupReader (self);
+      struct RWLOCK_READER *reader = lookup_reader (self);
 
       if (!reader)
         {
@@ -1203,33 +1206,33 @@ pthread_rwlock::UnLock ()
           goto DONE;
         }
 
-      removeReader (reader);
+      remove_reader (reader);
       delete reader;
     }
 
-  if (waitingWriters)
+  if (waiting_writers)
     {
       if (!readers)
-        condWriters.UnBlock (false);
+        cond_writers.unblock (false);
     }
-  else if (waitingReaders)
-    condReaders.UnBlock (true);
+  else if (waiting_readers)
+    cond_readers.unblock (true);
 
  DONE:
-  mtx.UnLock ();
+  mtx.unlock ();
 
   return result;
 }
 
 void
-pthread_rwlock::addReader (struct RWLOCK_READER *rd)
+pthread_rwlock::add_reader (struct RWLOCK_READER *rd)
 {
   rd->next = (struct RWLOCK_READER *)
     InterlockedExchangePointer (&readers, rd);
 }
 
 void
-pthread_rwlock::removeReader (struct RWLOCK_READER *rd)
+pthread_rwlock::remove_reader (struct RWLOCK_READER *rd)
 {
   if (readers == rd)
     InterlockedExchangePointer (&readers, rd->next);
@@ -1244,7 +1247,7 @@ pthread_rwlock::removeReader (struct RWLOCK_READER *rd)
 }
 
 struct pthread_rwlock::RWLOCK_READER *
-pthread_rwlock::lookupReader (pthread_t thread)
+pthread_rwlock::lookup_reader (pthread_t thread)
 {
   struct RWLOCK_READER *temp = readers;
 
@@ -1255,34 +1258,34 @@ pthread_rwlock::lookupReader (pthread_t thread)
 }
 
 void
-pthread_rwlock::RdLockCleanup (void *arg)
+pthread_rwlock::rdlock_cleanup (void *arg)
 {
   pthread_rwlock *rwlock = (pthread_rwlock *) arg;
 
-  --(rwlock->waitingReaders);
-  rwlock->mtx.UnLock ();
+  --(rwlock->waiting_readers);
+  rwlock->mtx.unlock ();
 }
 
 void
-pthread_rwlock::WrLockCleanup (void *arg)
+pthread_rwlock::wrlock_cleanup (void *arg)
 {
   pthread_rwlock *rwlock = (pthread_rwlock *) arg;
 
-  --(rwlock->waitingWriters);
-  rwlock->mtx.UnLock ();
+  --(rwlock->waiting_writers);
+  rwlock->mtx.unlock ();
 }
 
 void
-pthread_rwlock::FixupAfterFork ()
+pthread_rwlock::_fixup_after_fork ()
 {
   pthread_t self = pthread::self ();
   struct RWLOCK_READER **temp = &readers;
 
-  waitingReaders = 0;
-  waitingWriters = 0;
+  waiting_readers = 0;
+  waiting_writers = 0;
 
   /* Unlock eventually locked mutex */
-  mtx.UnLock ();
+  mtx.unlock ();
   /*
    * Remove all readers except self
    */
@@ -1305,7 +1308,7 @@ pthread_rwlock::FixupAfterFork ()
 List<pthread_key> pthread_key::keys;
 
 bool
-pthread_key::isGoodObject (pthread_key_t const *key)
+pthread_key::is_good_object (pthread_key_t const *key)
 {
   if (verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC) != VALID_OBJECT)
     return false;
@@ -1316,11 +1319,11 @@ pthread_key::isGoodObject (pthread_key_t const *key)
 
 pthread_key::pthread_key (void (*aDestructor) (void *)):verifyable_object (PTHREAD_KEY_MAGIC), destructor (aDestructor)
 {
-  dwTlsIndex = TlsAlloc ();
-  if (dwTlsIndex == TLS_OUT_OF_INDEXES)
+  tls_index = TlsAlloc ();
+  if (tls_index == TLS_OUT_OF_INDEXES)
     magic = 0;
   else
-    keys.Insert (this);
+    keys.insert (this);
 }
 
 pthread_key::~pthread_key ()
@@ -1329,8 +1332,8 @@ pthread_key::~pthread_key ()
    */
   if (magic != 0)
     {
-      keys.Remove (this);
-      TlsFree (dwTlsIndex);
+      keys.remove (this);
+      TlsFree (tls_index);
     }
 }
 
@@ -1338,36 +1341,36 @@ int
 pthread_key::set (const void *value)
 {
   /* the OS function doesn't perform error checking */
-  TlsSetValue (dwTlsIndex, (void *) value);
+  TlsSetValue (tls_index, (void *) value);
   return 0;
 }
 
 void *
 pthread_key::get () const
 {
-  int savedError = ::GetLastError ();
-  void *result = TlsGetValue (dwTlsIndex);
-  ::SetLastError (savedError);
+  int saved_error = ::GetLastError ();
+  void *result = TlsGetValue (tls_index);
+  ::SetLastError (saved_error);
   return result;
 }
 
 void
-pthread_key::saveKeyToBuffer ()
+pthread_key::save_key_to_buffer ()
 {
   fork_buf = get ();
 }
 
 void
-pthread_key::recreateKeyFromBuffer ()
+pthread_key::recreate_key_from_buffer ()
 {
-  dwTlsIndex = TlsAlloc ();
-  if (dwTlsIndex == TLS_OUT_OF_INDEXES)
-    api_fatal ("pthread_key::recreateKeyFromBuffer () failed to reallocate Tls storage");
+  tls_index = TlsAlloc ();
+  if (tls_index == TLS_OUT_OF_INDEXES)
+    api_fatal ("pthread_key::recreate_key_from_buffer () failed to reallocate Tls storage");
   set (fork_buf);
 }
 
 void
-pthread_key::runDestructor ()
+pthread_key::run_destructor ()
 {
   if (destructor)
     {
@@ -1405,7 +1408,7 @@ pthread_key::runDestructor ()
 
 /* static members */
 bool
-pthread_mutex::isGoodObject (pthread_mutex_t const *mutex)
+pthread_mutex::is_good_object (pthread_mutex_t const *mutex)
 {
   if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     return false;
@@ -1413,7 +1416,7 @@ pthread_mutex::isGoodObject (pthread_mutex_t const *mutex)
 }
 
 bool
-pthread_mutex::isGoodInitializer (pthread_mutex_t const *mutex)
+pthread_mutex::is_good_initializer (pthread_mutex_t const *mutex)
 {
   if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER) != VALID_STATIC_OBJECT)
     return false;
@@ -1421,7 +1424,7 @@ pthread_mutex::isGoodInitializer (pthread_mutex_t const *mutex)
 }
 
 bool
-pthread_mutex::isGoodInitializerOrObject (pthread_mutex_t const *mutex)
+pthread_mutex::is_good_initializer_or_object (pthread_mutex_t const *mutex)
 {
   if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER) == INVALID_OBJECT)
     return false;
@@ -1429,7 +1432,7 @@ pthread_mutex::isGoodInitializerOrObject (pthread_mutex_t const *mutex)
 }
 
 bool
-pthread_mutex::isGoodInitializerOrBadObject (pthread_mutex_t const *mutex)
+pthread_mutex::is_good_initializer_or_bad_object (pthread_mutex_t const *mutex)
 {
   verifyable_object_state objectState = verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER);
   if (objectState == VALID_OBJECT)
@@ -1438,11 +1441,11 @@ pthread_mutex::isGoodInitializerOrBadObject (pthread_mutex_t const *mutex)
 }
 
 bool
-pthread_mutex::canBeUnlocked (pthread_mutex_t const *mutex)
+pthread_mutex::can_be_unlocked (pthread_mutex_t const *mutex)
 {
   pthread_t self = pthread::self ();
 
-  if (!isGoodObject (mutex))
+  if (!is_good_object (mutex))
     return false;
   /*
    * Check if the mutex is owned by the current thread and can be unlocked
@@ -1453,15 +1456,15 @@ pthread_mutex::canBeUnlocked (pthread_mutex_t const *mutex)
 List<pthread_mutex> pthread_mutex::mutexes;
 
 /* This is used for mutex creation protection within a single process only */
-nativeMutex NO_COPY pthread_mutex::mutexInitializationLock;
+native_mutex NO_COPY pthread_mutex::mutex_initialization_lock;
 
 /* We can only be called once.
    TODO: (no rush) use a non copied memory section to
    hold an initialization flag.  */
 void
-pthread_mutex::initMutex ()
+pthread_mutex::init_mutex ()
 {
-  if (!mutexInitializationLock.init ())
+  if (!mutex_initialization_lock.init ())
     api_fatal ("Could not create win32 Mutex for pthread mutex static initializer support.");
 }
 
@@ -1491,7 +1494,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
       type = attr->mutextype;
     }
 
-  mutexes.Insert (this);
+  mutexes.insert (this);
 }
 
 pthread_mutex::~pthread_mutex ()
@@ -1499,42 +1502,42 @@ pthread_mutex::~pthread_mutex ()
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
 
-  mutexes.Remove (this);
+  mutexes.remove (this);
 }
 
 int
-pthread_mutex::_Lock (pthread_t self)
+pthread_mutex::_lock (pthread_t self)
 {
   int result = 0;
 
   if (1 == InterlockedIncrement ((long *)&lock_counter))
-    SetOwner (self);
+    set_owner (self);
   else if (PTHREAD_MUTEX_NORMAL != type && pthread_equal (owner, self))
     {
       InterlockedDecrement ((long *) &lock_counter);
       if (PTHREAD_MUTEX_RECURSIVE == type)
-	result = LockRecursive ();
+	result = lock_recursive ();
       else
 	result = EDEADLK;
     }
   else
     {
       WaitForSingleObject (win32_obj_id, INFINITE);
-      SetOwner (self);
+      set_owner (self);
     }
 
   return result;
 }
 
 int
-pthread_mutex::_TryLock (pthread_t self)
+pthread_mutex::_trylock (pthread_t self)
 {
   int result = 0;
 
   if (0 == InterlockedCompareExchange ((long *)&lock_counter, 1, 0 ))
-    SetOwner (self);
+    set_owner (self);
   else if (PTHREAD_MUTEX_RECURSIVE == type && pthread_equal (owner, self))
-    result = LockRecursive ();
+    result = lock_recursive ();
   else
     result = EBUSY;
 
@@ -1542,7 +1545,7 @@ pthread_mutex::_TryLock (pthread_t self)
 }
 
 int
-pthread_mutex::_UnLock (pthread_t self)
+pthread_mutex::_unlock (pthread_t self)
 {
   if (!pthread_equal (owner, self))
     return EPERM;
@@ -1559,9 +1562,9 @@ pthread_mutex::_UnLock (pthread_t self)
 }
 
 int
-pthread_mutex::_Destroy (pthread_t self)
+pthread_mutex::_destroy (pthread_t self)
 {
-  if (condwaits || _TryLock (self))
+  if (condwaits || _trylock (self))
     // Do not destroy a condwaited or locked mutex
     return EBUSY;
   else if (recursion_counter != 1)
@@ -1576,11 +1579,11 @@ pthread_mutex::_Destroy (pthread_t self)
 }
 
 void
-pthread_mutex::FixupAfterFork ()
+pthread_mutex::_fixup_after_fork ()
 {
-  debug_printf ("mutex %x in FixupAfterFork", this);
+  debug_printf ("mutex %x in _fixup_after_fork", this);
   if (pshared != PTHREAD_PROCESS_PRIVATE)
-    api_fatal ("pthread_mutex::FixupAfterFork () doesn'tunderstand PROCESS_SHARED mutex's");
+    api_fatal ("pthread_mutex::_fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's");
 
   if (NULL == owner)
     /* mutex has no owner, reset to initial */
@@ -1591,13 +1594,13 @@ pthread_mutex::FixupAfterFork ()
 
   win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
   if (!win32_obj_id)
-    api_fatal ("pthread_mutex::FixupAfterFork () failed to recreate win32 semaphore for mutex");
+    api_fatal ("pthread_mutex::_fixup_after_fork () failed to recreate win32 semaphore for mutex");
 
   condwaits = 0;
 }
 
 bool
-pthread_mutexattr::isGoodObject (pthread_mutexattr_t const * attr)
+pthread_mutexattr::is_good_object (pthread_mutexattr_t const * attr)
 {
   if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     return false;
@@ -1624,7 +1627,7 @@ semaphore::semaphore (int pshared, unsigned int value):verifyable_object (SEM_MA
   this->shared = pshared;
   currentvalue = value;
 
-  semaphores.Insert (this);
+  semaphores.insert (this);
 }
 
 semaphore::~semaphore ()
@@ -1632,11 +1635,11 @@ semaphore::~semaphore ()
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
 
-  semaphores.Remove (this);
+  semaphores.remove (this);
 }
 
 void
-semaphore::Post ()
+semaphore::_post ()
 {
   /* we can't use the currentvalue, because the wait functions don't let us access it */
   ReleaseSemaphore (win32_obj_id, 1, NULL);
@@ -1644,7 +1647,7 @@ semaphore::Post ()
 }
 
 int
-semaphore::TryWait ()
+semaphore::_trywait ()
 {
   /* FIXME: signals should be able to interrupt semaphores...
    *We probably need WaitForMultipleObjects here.
@@ -1659,7 +1662,7 @@ semaphore::TryWait ()
 }
 
 void
-semaphore::Wait ()
+semaphore::_wait ()
 {
   switch (pthread::cancelable_wait (win32_obj_id, INFINITE))
     {
@@ -1673,9 +1676,9 @@ semaphore::Wait ()
 }
 
 void
-semaphore::FixupAfterFork ()
+semaphore::_fixup_after_fork ()
 {
-  debug_printf ("sem %x in FixupAfterFork", this);
+  debug_printf ("sem %x in _fixup_after_fork", this);
   if (shared != PTHREAD_PROCESS_PRIVATE)
     api_fatal ("doesn't understand PROCESS_SHARED semaphores variables");
   /* FIXME: duplicate code here and in the constructor. */
@@ -1755,14 +1758,14 @@ pthread::thread_init_wrapper (void *_arg)
 
   MT_INTERFACE->reent_key.set (&local_reent);
 
-  thread->setThreadIdtoCurrent ();
-  setTlsSelfPointer (thread);
+  thread->set_thread_id_to_current ();
+  set_tls_self_pointer (thread);
 
-  thread->mutex.Lock ();
+  thread->mutex.lock ();
   // if thread is detached force cleanup on exit
   if (thread->attr.joinable == PTHREAD_CREATE_DETACHED && thread->joiner == NULL)
     thread->joiner = thread;
-  thread->mutex.UnLock ();
+  thread->mutex.unlock ();
 
 #ifdef _CYG_THREAD_FAILSAFE
   if (_REENT == _impure_ptr)
@@ -1786,7 +1789,7 @@ pthread::thread_init_wrapper (void *_arg)
 }
 
 bool
-pthread::isGoodObject (pthread_t const *thread)
+pthread::is_good_object (pthread_t const *thread)
 {
   if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return false;
@@ -1796,7 +1799,7 @@ pthread::isGoodObject (pthread_t const *thread)
 unsigned long
 pthread::getsequence_np ()
 {
-  return getThreadId ();
+  return get_thread_id ();
 }
 
 int
@@ -1804,12 +1807,12 @@ pthread::create (pthread_t *thread, const pthread_attr_t *attr,
 		  void *(*start_routine) (void *), void *arg)
 {
   DECLARE_TLS_STORAGE;
-  if (attr && !pthread_attr::isGoodObject (attr))
+  if (attr && !pthread_attr::is_good_object (attr))
     return EINVAL;
 
   *thread = new pthread ();
   (*thread)->create (start_routine, attr ? *attr : NULL, arg);
-  if (!isGoodObject (thread))
+  if (!is_good_object (thread))
     {
       delete (*thread);
       *thread = NULL;
@@ -1846,7 +1849,7 @@ pthread::once (pthread_once_t *once_control, void (*init_routine) (void))
 int
 pthread::cancel (pthread_t thread)
 {
-  if (!isGoodObject (&thread))
+  if (!is_good_object (&thread))
     return ESRCH;
 
   return thread->cancel ();
@@ -1973,7 +1976,7 @@ pthread_attr_init (pthread_attr_t *attr)
   if (check_valid_pointer (attr))
     return EINVAL;
   *attr = new pthread_attr;
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     {
       delete (*attr);
       *attr = NULL;
@@ -1986,7 +1989,7 @@ extern "C" int
 pthread_attr_getinheritsched (const pthread_attr_t *attr,
 				int *inheritsched)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   *inheritsched = (*attr)->inheritsched;
   return 0;
@@ -1996,7 +1999,7 @@ extern "C" int
 pthread_attr_getschedparam (const pthread_attr_t *attr,
 			      struct sched_param *param)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   *param = (*attr)->schedparam;
   return 0;
@@ -2008,7 +2011,7 @@ pthread_attr_getschedparam (const pthread_attr_t *attr,
 extern "C" int
 pthread_attr_getschedpolicy (const pthread_attr_t *attr, int *policy)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   *policy = SCHED_FIFO;
   return 0;
@@ -2018,7 +2021,7 @@ pthread_attr_getschedpolicy (const pthread_attr_t *attr, int *policy)
 extern "C" int
 pthread_attr_getscope (const pthread_attr_t *attr, int *contentionscope)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   *contentionscope = (*attr)->contentionscope;
   return 0;
@@ -2027,7 +2030,7 @@ pthread_attr_getscope (const pthread_attr_t *attr, int *contentionscope)
 extern "C" int
 pthread_attr_setdetachstate (pthread_attr_t *attr, int detachstate)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   if (detachstate < 0 || detachstate > 1)
     return EINVAL;
@@ -2038,7 +2041,7 @@ pthread_attr_setdetachstate (pthread_attr_t *attr, int detachstate)
 extern "C" int
 pthread_attr_getdetachstate (const pthread_attr_t *attr, int *detachstate)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   *detachstate = (*attr)->joinable;
   return 0;
@@ -2047,7 +2050,7 @@ pthread_attr_getdetachstate (const pthread_attr_t *attr, int *detachstate)
 extern "C" int
 pthread_attr_setinheritsched (pthread_attr_t *attr, int inheritsched)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   if (inheritsched != PTHREAD_INHERIT_SCHED
       && inheritsched != PTHREAD_EXPLICIT_SCHED)
@@ -2060,7 +2063,7 @@ extern "C" int
 pthread_attr_setschedparam (pthread_attr_t *attr,
 			      const struct sched_param *param)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   if (!valid_sched_parameters (param))
     return ENOTSUP;
@@ -2072,7 +2075,7 @@ pthread_attr_setschedparam (pthread_attr_t *attr,
 extern "C" int
 pthread_attr_setschedpolicy (pthread_attr_t *attr, int policy)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   if (policy != SCHED_FIFO)
     return ENOTSUP;
@@ -2082,7 +2085,7 @@ pthread_attr_setschedpolicy (pthread_attr_t *attr, int policy)
 extern "C" int
 pthread_attr_setscope (pthread_attr_t *attr, int contentionscope)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   if (contentionscope != PTHREAD_SCOPE_SYSTEM
       && contentionscope != PTHREAD_SCOPE_PROCESS)
@@ -2098,7 +2101,7 @@ pthread_attr_setscope (pthread_attr_t *attr, int contentionscope)
 extern "C" int
 pthread_attr_setstacksize (pthread_attr_t *attr, size_t size)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   (*attr)->stacksize = size;
   return 0;
@@ -2107,7 +2110,7 @@ pthread_attr_setstacksize (pthread_attr_t *attr, size_t size)
 extern "C" int
 pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *size)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   *size = (*attr)->stacksize;
   return 0;
@@ -2116,7 +2119,7 @@ pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *size)
 extern "C" int
 pthread_attr_destroy (pthread_attr_t *attr)
 {
-  if (!pthread_attr::isGoodObject (attr))
+  if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   delete (*attr);
   *attr = NULL;
@@ -2134,27 +2137,27 @@ pthread::join (pthread_t *thread, void **return_val)
    if (return_val)
      *return_val = NULL;
 
-   if (!isGoodObject (&joiner))
+   if (!is_good_object (&joiner))
      return EINVAL;
 
-  if (!isGoodObject (thread))
+  if (!is_good_object (thread))
     return ESRCH;
 
   if (pthread_equal (*thread,joiner))
     return EDEADLK;
 
-  (*thread)->mutex.Lock ();
+  (*thread)->mutex.lock ();
 
   if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
-      (*thread)->mutex.UnLock ();
+      (*thread)->mutex.unlock ();
       return EINVAL;
     }
   else
     {
       (*thread)->joiner = joiner;
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
-      (*thread)->mutex.UnLock ();
+      (*thread)->mutex.unlock ();
 
       switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, false))
 	{
@@ -2182,13 +2185,13 @@ pthread::join (pthread_t *thread, void **return_val)
 int
 pthread::detach (pthread_t *thread)
 {
-  if (!isGoodObject (thread))
+  if (!is_good_object (thread))
     return ESRCH;
 
-  (*thread)->mutex.Lock ();
+  (*thread)->mutex.lock ();
   if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
-      (*thread)->mutex.UnLock ();
+      (*thread)->mutex.unlock ();
       return EINVAL;
     }
 
@@ -2198,12 +2201,12 @@ pthread::detach (pthread_t *thread)
       // force cleanup on exit
       (*thread)->joiner = *thread;
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
-      (*thread)->mutex.UnLock ();
+      (*thread)->mutex.unlock ();
     }
   else
     {
       // thread has already terminated.
-      (*thread)->mutex.UnLock ();
+      (*thread)->mutex.unlock ();
       delete (*thread);
     }
 
@@ -2213,7 +2216,7 @@ pthread::detach (pthread_t *thread)
 int
 pthread::suspend (pthread_t *thread)
 {
-  if (!isGoodObject (thread))
+  if (!is_good_object (thread))
     return ESRCH;
 
   if ((*thread)->suspended == false)
@@ -2229,7 +2232,7 @@ pthread::suspend (pthread_t *thread)
 int
 pthread::resume (pthread_t *thread)
 {
-  if (!isGoodObject (thread))
+  if (!is_good_object (thread))
     return ESRCH;
 
   if ((*thread)->suspended == true)
@@ -2253,7 +2256,7 @@ extern "C" int
 pthread_getschedparam (pthread_t thread, int *policy,
 			 struct sched_param *param)
 {
-  if (!pthread::isGoodObject (&thread))
+  if (!pthread::is_good_object (&thread))
     return ESRCH;
   *policy = SCHED_FIFO;
   /* we don't return the current effective priority, we return the current
@@ -2268,12 +2271,12 @@ pthread_key_create (pthread_key_t *key, void (*destructor) (void *))
 {
   /* The opengroup docs don't define if we should check this or not,
      but creation is relatively rare.  */
-  if (pthread_key::isGoodObject (key))
+  if (pthread_key::is_good_object (key))
     return EBUSY;
 
   *key = new pthread_key (destructor);
 
-  if (!pthread_key::isGoodObject (key))
+  if (!pthread_key::is_good_object (key))
     {
       delete (*key);
       *key = NULL;
@@ -2285,7 +2288,7 @@ pthread_key_create (pthread_key_t *key, void (*destructor) (void *))
 extern "C" int
 pthread_key_delete (pthread_key_t key)
 {
-  if (!pthread_key::isGoodObject (&key))
+  if (!pthread_key::is_good_object (&key))
     return EINVAL;
 
   delete (key);
@@ -2309,7 +2312,7 @@ extern "C" int
 pthread_setschedparam (pthread_t thread, int policy,
 			 const struct sched_param *param)
 {
-  if (!pthread::isGoodObject (&thread))
+  if (!pthread::is_good_object (&thread))
     return ESRCH;
   if (policy != SCHED_FIFO)
     return ENOTSUP;
@@ -2326,7 +2329,7 @@ pthread_setschedparam (pthread_t thread, int policy,
 extern "C" int
 pthread_setspecific (pthread_key_t key, const void *value)
 {
-  if (!pthread_key::isGoodObject (&key))
+  if (!pthread_key::is_good_object (&key))
     return EINVAL;
   (key)->set (value);
   return 0;
@@ -2335,7 +2338,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
 extern "C" void *
 pthread_getspecific (pthread_key_t key)
 {
-  if (!pthread_key::isGoodObject (&key))
+  if (!pthread_key::is_good_object (&key))
     return NULL;
 
   return (key)->get ();
@@ -2344,7 +2347,7 @@ pthread_getspecific (pthread_key_t key)
 
 /* Thread synchronisation */
 bool
-pthread_cond::isGoodObject (pthread_cond_t const *cond)
+pthread_cond::is_good_object (pthread_cond_t const *cond)
 {
   if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
     return false;
@@ -2352,7 +2355,7 @@ pthread_cond::isGoodObject (pthread_cond_t const *cond)
 }
 
 bool
-pthread_cond::isGoodInitializer (pthread_cond_t const *cond)
+pthread_cond::is_good_initializer (pthread_cond_t const *cond)
 {
   if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) != VALID_STATIC_OBJECT)
     return false;
@@ -2360,7 +2363,7 @@ pthread_cond::isGoodInitializer (pthread_cond_t const *cond)
 }
 
 bool
-pthread_cond::isGoodInitializerOrObject (pthread_cond_t const *cond)
+pthread_cond::is_good_initializer_or_object (pthread_cond_t const *cond)
 {
   if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) == INVALID_OBJECT)
     return false;
@@ -2368,7 +2371,7 @@ pthread_cond::isGoodInitializerOrObject (pthread_cond_t const *cond)
 }
 
 bool
-pthread_cond::isGoodInitializerOrBadObject (pthread_cond_t const *cond)
+pthread_cond::is_good_initializer_or_bad_object (pthread_cond_t const *cond)
 {
   verifyable_object_state objectState = verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER);
   if (objectState == VALID_OBJECT)
@@ -2379,9 +2382,9 @@ pthread_cond::isGoodInitializerOrBadObject (pthread_cond_t const *cond)
 extern "C" int
 pthread_cond_destroy (pthread_cond_t *cond)
 {
-  if (pthread_cond::isGoodInitializer (cond))
+  if (pthread_cond::is_good_initializer (cond))
     return 0;
-  if (!pthread_cond::isGoodObject (cond))
+  if (!pthread_cond::is_good_object (cond))
     return EINVAL;
 
   /* reads are atomic */
@@ -2397,38 +2400,38 @@ pthread_cond_destroy (pthread_cond_t *cond)
 int
 pthread_cond::init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 {
-  if (attr && !pthread_condattr::isGoodObject (attr))
+  if (attr && !pthread_condattr::is_good_object (attr))
     return EINVAL;
-  if (!condInitializationLock.lock ())
+  if (!cond_initialization_lock.lock ())
     return EINVAL;
 
-  if (!isGoodInitializerOrBadObject (cond))
+  if (!is_good_initializer_or_bad_object (cond))
     {
-      condInitializationLock.unlock ();
+      cond_initialization_lock.unlock ();
       return EBUSY;
     }
 
   *cond = new pthread_cond (attr ? (*attr) : NULL);
-  if (!isGoodObject (cond))
+  if (!is_good_object (cond))
     {
       delete (*cond);
       *cond = NULL;
-      condInitializationLock.unlock ();
+      cond_initialization_lock.unlock ();
       return EAGAIN;
     }
-  condInitializationLock.unlock ();
+  cond_initialization_lock.unlock ();
   return 0;
 }
 
 extern "C" int
 pthread_cond_broadcast (pthread_cond_t *cond)
 {
-  if (pthread_cond::isGoodInitializer (cond))
+  if (pthread_cond::is_good_initializer (cond))
     return 0;
-  if (!pthread_cond::isGoodObject (cond))
+  if (!pthread_cond::is_good_object (cond))
     return EINVAL;
 
-  (*cond)->UnBlock (true);
+  (*cond)->unblock (true);
 
   return 0;
 }
@@ -2436,12 +2439,12 @@ pthread_cond_broadcast (pthread_cond_t *cond)
 extern "C" int
 pthread_cond_signal (pthread_cond_t *cond)
 {
-  if (pthread_cond::isGoodInitializer (cond))
+  if (pthread_cond::is_good_initializer (cond))
     return 0;
-  if (!pthread_cond::isGoodObject (cond))
+  if (!pthread_cond::is_good_object (cond))
     return EINVAL;
 
-  (*cond)->UnBlock (false);
+  (*cond)->unblock (false);
 
   return 0;
 }
@@ -2450,17 +2453,17 @@ static int
 __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 		       DWORD waitlength)
 {
-  if (!pthread_mutex::isGoodObject (mutex))
+  if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
-  if (!pthread_mutex::canBeUnlocked (mutex))
+  if (!pthread_mutex::can_be_unlocked (mutex))
     return EPERM;
 
-  if (pthread_cond::isGoodInitializer (cond))
+  if (pthread_cond::is_good_initializer (cond))
     pthread_cond::init (cond, NULL);
-  if (!pthread_cond::isGoodObject (cond))
+  if (!pthread_cond::is_good_object (cond))
     return EINVAL;
 
-  return (*cond)->Wait (*mutex, waitlength);
+  return (*cond)->wait (*mutex, waitlength);
 }
 
 extern "C" int
@@ -2497,7 +2500,7 @@ pthread_condattr_init (pthread_condattr_t *condattr)
   if (check_valid_pointer (condattr))
     return EINVAL;
   *condattr = new pthread_condattr;
-  if (!pthread_condattr::isGoodObject (condattr))
+  if (!pthread_condattr::is_good_object (condattr))
     {
       delete (*condattr);
       *condattr = NULL;
@@ -2509,7 +2512,7 @@ pthread_condattr_init (pthread_condattr_t *condattr)
 extern "C" int
 pthread_condattr_getpshared (const pthread_condattr_t *attr, int *pshared)
 {
-  if (!pthread_condattr::isGoodObject (attr))
+  if (!pthread_condattr::is_good_object (attr))
     return EINVAL;
   *pshared = (*attr)->shared;
   return 0;
@@ -2518,7 +2521,7 @@ pthread_condattr_getpshared (const pthread_condattr_t *attr, int *pshared)
 extern "C" int
 pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
 {
-  if (!pthread_condattr::isGoodObject (attr))
+  if (!pthread_condattr::is_good_object (attr))
     return EINVAL;
   if ((pshared < 0) || (pshared > 1))
     return EINVAL;
@@ -2532,7 +2535,7 @@ pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
 extern "C" int
 pthread_condattr_destroy (pthread_condattr_t *condattr)
 {
-  if (!pthread_condattr::isGoodObject (condattr))
+  if (!pthread_condattr::is_good_object (condattr))
     return EINVAL;
   delete (*condattr);
   *condattr = NULL;
@@ -2541,7 +2544,7 @@ pthread_condattr_destroy (pthread_condattr_t *condattr)
 
 /* RW locks */
 bool
-pthread_rwlock::isGoodObject (pthread_rwlock_t const *rwlock)
+pthread_rwlock::is_good_object (pthread_rwlock_t const *rwlock)
 {
   if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC) != VALID_OBJECT)
     return false;
@@ -2549,7 +2552,7 @@ pthread_rwlock::isGoodObject (pthread_rwlock_t const *rwlock)
 }
 
 bool
-pthread_rwlock::isGoodInitializer (pthread_rwlock_t const *rwlock)
+pthread_rwlock::is_good_initializer (pthread_rwlock_t const *rwlock)
 {
   if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) != VALID_STATIC_OBJECT)
     return false;
@@ -2557,7 +2560,7 @@ pthread_rwlock::isGoodInitializer (pthread_rwlock_t const *rwlock)
 }
 
 bool
-pthread_rwlock::isGoodInitializerOrObject (pthread_rwlock_t const *rwlock)
+pthread_rwlock::is_good_initializer_or_object (pthread_rwlock_t const *rwlock)
 {
   if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) == INVALID_OBJECT)
     return false;
@@ -2565,7 +2568,7 @@ pthread_rwlock::isGoodInitializerOrObject (pthread_rwlock_t const *rwlock)
 }
 
 bool
-pthread_rwlock::isGoodInitializerOrBadObject (pthread_rwlock_t const *rwlock)
+pthread_rwlock::is_good_initializer_or_bad_object (pthread_rwlock_t const *rwlock)
 {
   verifyable_object_state objectState = verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER);
   if (objectState == VALID_OBJECT)
@@ -2576,13 +2579,13 @@ pthread_rwlock::isGoodInitializerOrBadObject (pthread_rwlock_t const *rwlock)
 extern "C" int
 pthread_rwlock_destroy (pthread_rwlock_t *rwlock)
 {
-  if (pthread_rwlock::isGoodInitializer (rwlock))
+  if (pthread_rwlock::is_good_initializer (rwlock))
     return 0;
-  if (!pthread_rwlock::isGoodObject (rwlock))
+  if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
 
   if ((*rwlock)->writer || (*rwlock)->readers ||
-      (*rwlock)->waitingReaders || (*rwlock)->waitingWriters)
+      (*rwlock)->waiting_readers || (*rwlock)->waiting_writers)
     return EBUSY;
 
   delete (*rwlock);
@@ -2594,26 +2597,26 @@ pthread_rwlock_destroy (pthread_rwlock_t *rwlock)
 int
 pthread_rwlock::init (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
 {
-  if (attr && !pthread_rwlockattr::isGoodObject (attr))
+  if (attr && !pthread_rwlockattr::is_good_object (attr))
     return EINVAL;
-  if (!rwlockInitializationLock.lock ())
+  if (!rwlock_initialization_lock.lock ())
     return EINVAL;
 
-  if (!isGoodInitializerOrBadObject (rwlock))
+  if (!is_good_initializer_or_bad_object (rwlock))
     {
-      rwlockInitializationLock.unlock ();
+      rwlock_initialization_lock.unlock ();
       return EBUSY;
     }
 
   *rwlock = new pthread_rwlock (attr ? (*attr) : NULL);
-  if (!isGoodObject (rwlock))
+  if (!is_good_object (rwlock))
     {
       delete (*rwlock);
       *rwlock = NULL;
-      rwlockInitializationLock.unlock ();
+      rwlock_initialization_lock.unlock ();
       return EAGAIN;
     }
-  rwlockInitializationLock.unlock ();
+  rwlock_initialization_lock.unlock ();
   return 0;
 }
 
@@ -2622,23 +2625,23 @@ pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
 {
   pthread_testcancel ();
 
-  if (pthread_rwlock::isGoodInitializer (rwlock))
+  if (pthread_rwlock::is_good_initializer (rwlock))
     pthread_rwlock::init (rwlock, NULL);
-  if (!pthread_rwlock::isGoodObject (rwlock))
+  if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
 
-  return (*rwlock)->RdLock ();
+  return (*rwlock)->rdlock ();
 }
 
 extern "C" int
 pthread_rwlock_tryrdlock (pthread_rwlock_t *rwlock)
 {
-  if (pthread_rwlock::isGoodInitializer (rwlock))
+  if (pthread_rwlock::is_good_initializer (rwlock))
     pthread_rwlock::init (rwlock, NULL);
-  if (!pthread_rwlock::isGoodObject (rwlock))
+  if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
 
-  return (*rwlock)->TryRdLock ();
+  return (*rwlock)->tryrdlock ();
 }
 
 extern "C" int
@@ -2646,34 +2649,34 @@ pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
 {
   pthread_testcancel ();
 
-  if (pthread_rwlock::isGoodInitializer (rwlock))
+  if (pthread_rwlock::is_good_initializer (rwlock))
     pthread_rwlock::init (rwlock, NULL);
-  if (!pthread_rwlock::isGoodObject (rwlock))
+  if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
 
-  return (*rwlock)->WrLock ();
+  return (*rwlock)->wrlock ();
 }
 
 extern "C" int
 pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock)
 {
-  if (pthread_rwlock::isGoodInitializer (rwlock))
+  if (pthread_rwlock::is_good_initializer (rwlock))
     pthread_rwlock::init (rwlock, NULL);
-  if (!pthread_rwlock::isGoodObject (rwlock))
+  if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
 
-  return (*rwlock)->TryWrLock ();
+  return (*rwlock)->trywrlock ();
 }
 
 extern "C" int
 pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
 {
-  if (pthread_rwlock::isGoodInitializer (rwlock))
+  if (pthread_rwlock::is_good_initializer (rwlock))
     return 0;
-  if (!pthread_rwlock::isGoodObject (rwlock))
+  if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
 
-  return (*rwlock)->UnLock ();
+  return (*rwlock)->unlock ();
 }
 
 extern "C" int
@@ -2682,7 +2685,7 @@ pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
   if (check_valid_pointer (rwlockattr))
     return EINVAL;
   *rwlockattr = new pthread_rwlockattr;
-  if (!pthread_rwlockattr::isGoodObject (rwlockattr))
+  if (!pthread_rwlockattr::is_good_object (rwlockattr))
     {
       delete (*rwlockattr);
       *rwlockattr = NULL;
@@ -2694,7 +2697,7 @@ pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
 extern "C" int
 pthread_rwlockattr_getpshared (const pthread_rwlockattr_t *attr, int *pshared)
 {
-  if (!pthread_rwlockattr::isGoodObject (attr))
+  if (!pthread_rwlockattr::is_good_object (attr))
     return EINVAL;
   *pshared = (*attr)->shared;
   return 0;
@@ -2703,7 +2706,7 @@ pthread_rwlockattr_getpshared (const pthread_rwlockattr_t *attr, int *pshared)
 extern "C" int
 pthread_rwlockattr_setpshared (pthread_rwlockattr_t *attr, int pshared)
 {
-  if (!pthread_rwlockattr::isGoodObject (attr))
+  if (!pthread_rwlockattr::is_good_object (attr))
     return EINVAL;
   if ((pshared < 0) || (pshared > 1))
     return EINVAL;
@@ -2717,7 +2720,7 @@ pthread_rwlockattr_setpshared (pthread_rwlockattr_t *attr, int pshared)
 extern "C" int
 pthread_rwlockattr_destroy (pthread_rwlockattr_t *rwlockattr)
 {
-  if (!pthread_rwlockattr::isGoodObject (rwlockattr))
+  if (!pthread_rwlockattr::is_good_object (rwlockattr))
     return EINVAL;
   delete (*rwlockattr);
   *rwlockattr = NULL;
@@ -2731,7 +2734,7 @@ pthread_kill (pthread_t thread, int sig)
   // lock myself, for the use of thread2signal
   // two different kills might clash: FIXME
 
-  if (!pthread::isGoodObject (&thread))
+  if (!pthread::is_good_object (&thread))
     return EINVAL;
 
   if (thread->sigs)
@@ -2783,26 +2786,26 @@ int
 pthread_mutex::init (pthread_mutex_t *mutex,
 		      const pthread_mutexattr_t *attr)
 {
-  if (attr && !pthread_mutexattr::isGoodObject (attr) || check_valid_pointer (mutex))
+  if (attr && !pthread_mutexattr::is_good_object (attr) || check_valid_pointer (mutex))
     return EINVAL;
-  if (!mutexInitializationLock.lock ())
+  if (!mutex_initialization_lock.lock ())
     return EINVAL;
 
-  if (!isGoodInitializerOrBadObject (mutex))
+  if (!is_good_initializer_or_bad_object (mutex))
     {
-      mutexInitializationLock.unlock ();
+      mutex_initialization_lock.unlock ();
       return EBUSY;
     }
 
   *mutex = new pthread_mutex (attr ? (*attr) : NULL);
-  if (!isGoodObject (mutex))
+  if (!is_good_object (mutex))
     {
       delete (*mutex);
       *mutex = NULL;
-      mutexInitializationLock.unlock ();
+      mutex_initialization_lock.unlock ();
       return EAGAIN;
     }
-  mutexInitializationLock.unlock ();
+  mutex_initialization_lock.unlock ();
   return 0;
 }
 
@@ -2811,9 +2814,9 @@ pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
 				int *prioceiling)
 {
   pthread_mutex_t *themutex = (pthread_mutex_t *) mutex;
-  if (pthread_mutex::isGoodInitializer (mutex))
+  if (pthread_mutex::is_good_initializer (mutex))
     pthread_mutex::init ((pthread_mutex_t *) mutex, NULL);
-  if (!pthread_mutex::isGoodObject (themutex))
+  if (!pthread_mutex::is_good_object (themutex))
     return EINVAL;
   /* We don't define _POSIX_THREAD_PRIO_PROTECT because we do't currently support
      mutex priorities.
@@ -2829,8 +2832,8 @@ extern "C" int
 pthread_mutex_lock (pthread_mutex_t *mutex)
 {
   pthread_mutex_t *themutex = mutex;
-  /* This could be simplified via isGoodInitializerOrObject
-     and isGoodInitializer, but in a performance critical call like this....
+  /* This could be simplified via is_good_initializer_or_object
+     and is_good_initializer, but in a performance critical call like this....
      no.  */
   switch (verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER))
     {
@@ -2838,7 +2841,7 @@ pthread_mutex_lock (pthread_mutex_t *mutex)
       return EINVAL;
       break;
     case VALID_STATIC_OBJECT:
-      if (pthread_mutex::isGoodInitializer (mutex))
+      if (pthread_mutex::is_good_initializer (mutex))
 	{
 	  int rv = pthread_mutex::init (mutex, NULL);
 	  if (rv && rv != EBUSY)
@@ -2850,28 +2853,28 @@ pthread_mutex_lock (pthread_mutex_t *mutex)
     case VALID_OBJECT:
       break;
     }
-  return (*themutex)->Lock ();
+  return (*themutex)->lock ();
 }
 
 extern "C" int
 pthread_mutex_trylock (pthread_mutex_t *mutex)
 {
   pthread_mutex_t *themutex = mutex;
-  if (pthread_mutex::isGoodInitializer (mutex))
+  if (pthread_mutex::is_good_initializer (mutex))
     pthread_mutex::init (mutex, NULL);
-  if (!pthread_mutex::isGoodObject (themutex))
+  if (!pthread_mutex::is_good_object (themutex))
     return EINVAL;
-  return (*themutex)->TryLock ();
+  return (*themutex)->trylock ();
 }
 
 extern "C" int
 pthread_mutex_unlock (pthread_mutex_t *mutex)
 {
-  if (pthread_mutex::isGoodInitializer (mutex))
+  if (pthread_mutex::is_good_initializer (mutex))
     pthread_mutex::init (mutex, NULL);
-  if (!pthread_mutex::isGoodObject (mutex))
+  if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
-  return (*mutex)->UnLock ();
+  return (*mutex)->unlock ();
 }
 
 extern "C" int
@@ -2879,12 +2882,12 @@ pthread_mutex_destroy (pthread_mutex_t *mutex)
 {
   int rv;
 
-  if (pthread_mutex::isGoodInitializer (mutex))
+  if (pthread_mutex::is_good_initializer (mutex))
     return 0;
-  if (!pthread_mutex::isGoodObject (mutex))
+  if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
 
-  rv = (*mutex)->Destroy ();
+  rv = (*mutex)->destroy ();
   if (rv)
     return rv;
 
@@ -2897,9 +2900,9 @@ pthread_mutex_setprioceiling (pthread_mutex_t *mutex, int prioceiling,
 				int *old_ceiling)
 {
   pthread_mutex_t *themutex = mutex;
-  if (pthread_mutex::isGoodInitializer (mutex))
+  if (pthread_mutex::is_good_initializer (mutex))
     pthread_mutex::init (mutex, NULL);
-  if (!pthread_mutex::isGoodObject (themutex))
+  if (!pthread_mutex::is_good_object (themutex))
     return EINVAL;
   return ENOSYS;
 }
@@ -2910,7 +2913,7 @@ extern "C" int
 pthread_mutexattr_getprotocol (const pthread_mutexattr_t *attr,
 				 int *protocol)
 {
-  if (!pthread_mutexattr::isGoodObject (attr))
+  if (!pthread_mutexattr::is_good_object (attr))
     return EINVAL;
   return ENOSYS;
 }
@@ -2919,7 +2922,7 @@ extern "C" int
 pthread_mutexattr_getpshared (const pthread_mutexattr_t *attr,
 				int *pshared)
 {
-  if (!pthread_mutexattr::isGoodObject (attr))
+  if (!pthread_mutexattr::is_good_object (attr))
     return EINVAL;
   *pshared = (*attr)->pshared;
   return 0;
@@ -2928,7 +2931,7 @@ pthread_mutexattr_getpshared (const pthread_mutexattr_t *attr,
 extern "C" int
 pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *type)
 {
-  if (!pthread_mutexattr::isGoodObject (attr))
+  if (!pthread_mutexattr::is_good_object (attr))
     return EINVAL;
   *type = (*attr)->mutextype;
   return 0;
@@ -2938,11 +2941,11 @@ pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *type)
 extern "C" int
 pthread_mutexattr_init (pthread_mutexattr_t *attr)
 {
-  if (pthread_mutexattr::isGoodObject (attr))
+  if (pthread_mutexattr::is_good_object (attr))
     return EBUSY;
 
   *attr = new pthread_mutexattr ();
-  if (!pthread_mutexattr::isGoodObject (attr))
+  if (!pthread_mutexattr::is_good_object (attr))
     {
       delete (*attr);
       *attr = NULL;
@@ -2954,7 +2957,7 @@ pthread_mutexattr_init (pthread_mutexattr_t *attr)
 extern "C" int
 pthread_mutexattr_destroy (pthread_mutexattr_t *attr)
 {
-  if (!pthread_mutexattr::isGoodObject (attr))
+  if (!pthread_mutexattr::is_good_object (attr))
     return EINVAL;
   delete (*attr);
   *attr = NULL;
@@ -2966,7 +2969,7 @@ pthread_mutexattr_destroy (pthread_mutexattr_t *attr)
 extern "C" int
 pthread_mutexattr_setprotocol (pthread_mutexattr_t *attr, int protocol)
 {
-  if (!pthread_mutexattr::isGoodObject (attr))
+  if (!pthread_mutexattr::is_good_object (attr))
     return EINVAL;
   return ENOSYS;
 }
@@ -2976,7 +2979,7 @@ extern "C" int
 pthread_mutexattr_setprioceiling (pthread_mutexattr_t *attr,
 				    int prioceiling)
 {
-  if (!pthread_mutexattr::isGoodObject (attr))
+  if (!pthread_mutexattr::is_good_object (attr))
     return EINVAL;
   return ENOSYS;
 }
@@ -2985,7 +2988,7 @@ extern "C" int
 pthread_mutexattr_getprioceiling (const pthread_mutexattr_t *attr,
 				    int *prioceiling)
 {
-  if (!pthread_mutexattr::isGoodObject (attr))
+  if (!pthread_mutexattr::is_good_object (attr))
     return EINVAL;
   return ENOSYS;
 }
@@ -2993,7 +2996,7 @@ pthread_mutexattr_getprioceiling (const pthread_mutexattr_t *attr,
 extern "C" int
 pthread_mutexattr_setpshared (pthread_mutexattr_t *attr, int pshared)
 {
-  if (!pthread_mutexattr::isGoodObject (attr))
+  if (!pthread_mutexattr::is_good_object (attr))
     return EINVAL;
   /* we don't use pshared for anything as yet. We need to test PROCESS_SHARED
    *functionality
@@ -3008,7 +3011,7 @@ pthread_mutexattr_setpshared (pthread_mutexattr_t *attr, int pshared)
 extern "C" int
 pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
 {
-  if (!pthread_mutexattr::isGoodObject (attr))
+  if (!pthread_mutexattr::is_good_object (attr))
     return EINVAL;
 
   switch (type)
@@ -3029,7 +3032,7 @@ pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
 
 /* static members */
 bool
-semaphore::isGoodObject (sem_t const * sem)
+semaphore::is_good_object (sem_t const * sem)
 {
   if (verifyable_object_isvalid (sem, SEM_MAGIC) != VALID_OBJECT)
     return false;
@@ -3040,7 +3043,7 @@ int
 semaphore::init (sem_t *sem, int pshared, unsigned int value)
 {
   /* opengroup calls this undefined */
-  if (isGoodObject (sem))
+  if (is_good_object (sem))
     return EBUSY;
 
   if (value > SEM_VALUE_MAX)
@@ -3048,7 +3051,7 @@ semaphore::init (sem_t *sem, int pshared, unsigned int value)
 
   *sem = new semaphore (pshared, value);
 
-  if (!isGoodObject (sem))
+  if (!is_good_object (sem))
     {
       delete (*sem);
       *sem = NULL;
@@ -3060,7 +3063,7 @@ semaphore::init (sem_t *sem, int pshared, unsigned int value)
 int
 semaphore::destroy (sem_t *sem)
 {
-  if (!isGoodObject (sem))
+  if (!is_good_object (sem))
     return EINVAL;
 
   /* FIXME - new feature - test for busy against threads... */
@@ -3075,108 +3078,108 @@ semaphore::wait (sem_t *sem)
 {
   pthread_testcancel ();
 
-  if (!isGoodObject (sem))
+  if (!is_good_object (sem))
     {
       set_errno (EINVAL);
       return -1;
     }
 
-  (*sem)->Wait ();
+  (*sem)->_wait ();
   return 0;
 }
 
 int
 semaphore::trywait (sem_t *sem)
 {
-  if (!isGoodObject (sem))
+  if (!is_good_object (sem))
     {
       set_errno (EINVAL);
       return -1;
     }
 
-  return (*sem)->TryWait ();
+  return (*sem)->_trywait ();
 }
 
 int
 semaphore::post (sem_t *sem)
 {
-  if (!isGoodObject (sem))
+  if (!is_good_object (sem))
     return EINVAL;
 
-  (*sem)->Post ();
+  (*sem)->_post ();
   return 0;
 }
 
-/* pthreadNull */
+/* pthread_null */
 pthread *
-pthreadNull::getNullpthread ()
+pthread_null::get_null_pthread ()
 {
   /* because of weird entry points */
   _instance.magic = 0;
   return &_instance;
 }
 
-pthreadNull::pthreadNull ()
+pthread_null::pthread_null ()
 {
   attr.joinable = PTHREAD_CREATE_DETACHED;
   /* Mark ourselves as invalid */
   magic = 0;
 }
 
-pthreadNull::~pthreadNull ()
+pthread_null::~pthread_null ()
 {
 }
 
 void
-pthreadNull::create (void *(*)(void *), pthread_attr *, void *)
+pthread_null::create (void *(*)(void *), pthread_attr *, void *)
 {
 }
 
 void
-pthreadNull::exit (void *value_ptr)
+pthread_null::exit (void *value_ptr)
 {
   ExitThread (0);
 }
 
 int
-pthreadNull::cancel ()
+pthread_null::cancel ()
 {
   return 0;
 }
 
 void
-pthreadNull::testcancel ()
+pthread_null::testcancel ()
 {
 }
 
 int
-pthreadNull::setcancelstate (int state, int *oldstate)
+pthread_null::setcancelstate (int state, int *oldstate)
 {
   return EINVAL;
 }
 
 int
-pthreadNull::setcanceltype (int type, int *oldtype)
+pthread_null::setcanceltype (int type, int *oldtype)
 {
   return EINVAL;
 }
 
 void
-pthreadNull::push_cleanup_handler (__pthread_cleanup_handler *handler)
+pthread_null::push_cleanup_handler (__pthread_cleanup_handler *handler)
 {
 }
 
 void
-pthreadNull::pop_cleanup_handler (int const execute)
+pthread_null::pop_cleanup_handler (int const execute)
 {
 }
 
 unsigned long
-pthreadNull::getsequence_np ()
+pthread_null::getsequence_np ()
 {
   return 0;
 }
 
-pthreadNull pthreadNull::_instance;
+pthread_null pthread_null::_instance;
 
 #endif // MT_SAFE
