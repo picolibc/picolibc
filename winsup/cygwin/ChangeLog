@@ -1,3 +1,7 @@
+2004-06-08  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* path.cc (fchdir): Pass the Posix path to chdir.
+
 2004-06-07  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* dtable.cc (dtable::find_fifo): Release lock after fifo found (still
