@@ -40,6 +40,12 @@
 #include <sys/param.h>
 
 #ifndef BYTE_ORDER
+#ifndef LITTLE_ENDIAN
+#define LITTLE_ENDIAN 1234
+#endif
+#ifndef BIG_ENDIAN
+#define BIG_ENDIAN 4321
+#endif
 #ifdef __IEEE_LITTLE_ENDIAN
 #define BYTE_ORDER LITTLE_ENDIAN
 #else

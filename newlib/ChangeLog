@@ -1,3 +1,8 @@
+2002-06-21  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/search/hash.h (LITTLE_ENDIAN, BIG_ENDIAN): Define if not
+	previously defined.
+
 2002-06-21  Richard Earnshaw  (rearnsha@arm.com)
 
         * libc/sys/arm/sys/param.h (BIG_ENDIAN, LITTLE_ENDIAN): Define.
@@ -81,7 +86,6 @@
 	* libc/search/hash_page.c: New file.
 	* libc/search/hcreate.3: New file.
 	* libc/search/hcreate.c: New file.
-	* libc/search/hcreate.c~: New file.
 	* libc/search/hcreate_r.c: New file.
 	* libc/search/ndbm.c: New file.
 	* libc/search/page.h: New file.
