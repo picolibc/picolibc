@@ -1,3 +1,7 @@
+2002-12-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Add MINGW_LDFLAGS when linking cygrun.exe.
+
 2002-12-10  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.h (cygthread::stack_ptr): New element.

@@ -325,7 +325,7 @@ cygrun.o: cygrun.c
 
 cygrun.exe : cygrun.o -lgcc $(w32api_lib)/libuser32.a \
 	     $(w32api_lib)/libshell32.a $(w32api_lib)/libkernel32.a
-	$(CC) -mno-cygwin -o $@ $^
+	$(CC) ${MINGW_LDFLAGS} -mno-cygwin -o $@ $^
 
 cygserver_transport_outside.o: cygserver_transport.cc
 	$(COMPILE_CXX) -D__OUTSIDE_CYGWIN__ -o $@ $<

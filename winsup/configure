@@ -917,13 +917,13 @@ CXXFLAGS='$(CFLAGS)'
 
 
 SUBDIRS='cygwin'
+test -d $srcdir/mingw && SUBDIRS="mingw $SUBDIRS"
 if test -d $srcdir/w32api; then
     SUBDIRS="w32api $SUBDIRS"
 else
     echo "*** missing w32api directory" 1>&2
     exit 1
 fi
-test -d $srcdir/mingw && SUBDIRS="$SUBDIRS mingw"
 
 case "$with_cross_host" in
   ""|*cygwin*)
