@@ -1565,9 +1565,7 @@ ttyname (int fd)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0 || !cfd->is_tty ())
-    {
-      return 0;
-    }
+    return 0;
   return (char *) (cfd->ttyname ());
 }
 
