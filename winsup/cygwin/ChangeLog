@@ -1,5 +1,17 @@
 2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* tty.cc (tty::common_init): Reverse logic of cygserver check in
+	call to SetKernelObjectSecurity.
+
+2002-07-03  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* autoload.cc (WSAEventSelect): Define new autoload function.
+	(WSAEnumNetworkEvents): Ditto.
+	* fhandler_socket.cc (fhandler_socket::accept): If socket is
+	in blocking mode wait for incoming connection and signal.
+
+2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* dcrt0.cc: Only check for cygserver if and when required.
 	(dll_crt0_1): Remove call to `cygserver_init ()'.
 	* fhandler_tty.cc (fhandler_tty_slave::open): Change the cygserver
@@ -113,6 +125,19 @@
 	(client_shmmgr::_instance): New static variable.
 	(client_shmmgr::instance): Allocate a new shmmgr on the heap,
 	rather than using a local static object.
+
+2002-07-02  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (init_cheap): Rearrange error message.
+	(cygheap_fixup_in_child): Ditto.
+	* dtable.cc: Remove if 0'ed code.
+	* fhandler_dsp.cc (fhandler_dev_dsp::open): Force binmode.
+	* sec_helper.cc (cygsid::get_id): Use system_printf for error message.
+	* tty.cc (tty::common_init): Ditto.
+
+2002-07-02  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (cygwin_getpeername): Defend against NULL pointer dereference.
 
 2002-07-02  Egor Duda <deo@logos-m.ru>
 

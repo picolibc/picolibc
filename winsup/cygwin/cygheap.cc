@@ -57,9 +57,9 @@ init_cheap ()
       MEMORY_BASIC_INFORMATION m;
       if (!VirtualQuery ((LPCVOID) &_cygheap_start, &m, sizeof m))
 	system_printf ("couldn't get memory info, %E");
-      small_printf ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
-		    m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
-      api_fatal ("Couldn't reserve space for cygwin's heap, %E");
+      system_printf ("Couldn't reserve space for cygwin's heap, %E");
+      api_fatal ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
+		 m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
     }
   cygheap_max = cygheap + 1;
 }
@@ -125,16 +125,16 @@ cygheap_fixup_in_child (bool execed)
       DWORD n = (DWORD) cygheap_max - (DWORD) cygheap;
       /* Reserve cygwin heap in same spot as parent */
       if (!VirtualAlloc (cygheap, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS))
-      {
-	MEMORY_BASIC_INFORMATION m;
-	memset (&m, 0, sizeof m);
-	if (!VirtualQuery ((LPCVOID) cygheap, &m, sizeof m))
-	  system_printf ("couldn't get memory info, %E");
+	{
+	  MEMORY_BASIC_INFORMATION m;
+	  memset (&m, 0, sizeof m);
+	  if (!VirtualQuery ((LPCVOID) cygheap, &m, sizeof m))
+	    system_printf ("couldn't get memory info, %E");
 
-	small_printf ("m.AllocationBase %p, m.BaseAddress %p, m.RegionSize %p, m.State %p\n",
-		      m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
-	api_fatal ("Couldn't reserve space for cygwin's heap (%p <%p>) in child, %E", cygheap, newaddr);
-      }
+	  system_printf ("Couldn't reserve space for cygwin's heap (%p <%p>) in child, %E", cygheap, newaddr);
+	  api_fatal ("m.AllocationBase %p, m.BaseAddress %p, m.RegionSize %p, m.State %p\n",
+		     m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
+	}
 
       /* Allocate same amount of memory as parent */
       if (!VirtualAlloc (cygheap, n, MEM_COMMIT, PAGE_READWRITE))

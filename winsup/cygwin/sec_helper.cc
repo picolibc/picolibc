@@ -149,7 +149,7 @@ cygsid::get_id (BOOL search_grp, int *type)
   if (!IsValidSid (psid))
     {
       __seterrno ();
-      small_printf ("IsValidSid failed with %E");
+      system_printf ("IsValidSid failed with %E");
       return -1;
     }
 

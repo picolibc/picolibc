@@ -1131,7 +1131,7 @@ cygwin_getpeername (int fd, struct sockaddr *name, int *len)
   if (fh)
     res = fh->getpeername (name, len);
 
-  syscall_printf ("%d = getpeername %d", res, fh->get_socket ());
+  syscall_printf ("%d = getpeername %d", res, (fh ? fh->get_socket () : -1));
 
   return res;
 }

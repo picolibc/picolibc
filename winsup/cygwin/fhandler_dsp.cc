@@ -438,7 +438,7 @@ fhandler_dev_dsp::open (path_conv *, int flags, mode_t mode)
       return 0;
     }
 
-  set_flags (flags & ~O_TEXT, O_BINARY);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
 
   if (!s_audio)
     s_audio = new (audio_buf) Audio;

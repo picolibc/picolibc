@@ -403,7 +403,7 @@ tty::common_init (fhandler_pty_master *ptym)
       if (cygserver_running == CYGSERVER_UNKNOWN)
 	cygserver_init ();
 
-      if (cygserver_running == CYGSERVER_OK
+      if (cygserver_running != CYGSERVER_OK
 	  && !SetKernelObjectSecurity (hMainProc,
 				       DACL_SECURITY_INFORMATION,
 				       get_null_sd ()))
