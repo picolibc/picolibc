@@ -1894,9 +1894,15 @@ mount_info::from_registry ()
 /* FIXME: Need a mutex to avoid collisions with other tasks. */
 
 int
-mount_info::add_reg_mount (const char * native_path, const char * posix_path, unsigned mountflags)
+mount_info::add_reg_mount (const char *native_path, const char *posix_path, unsigned mountflags)
 {
   int res = 0;
+
+  if (strchr (posix_path, '\\'))
+    {
+      set_errno (EINVAL);
+      goto err1;
+    }
 
   /* Add the mount to the right registry location, depending on
      whether MOUNT_SYSTEM is set in the mount flags. */
@@ -1948,6 +1954,7 @@ mount_info::add_reg_mount (const char * native_path, const char * posix_path, un
   return 0; /* Success */
  err:
   __seterrno_from_win_error (res);
+ err1:
   return -1;
 }
 
@@ -2497,7 +2504,9 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 {
   int res = -1;
 
-  if (flags & MOUNT_CYGDRIVE) /* normal mount */
+  if (strpbrk (posix_path, "\\:"))
+    set_errno (EINVAL);
+  else if (flags & MOUNT_CYGDRIVE) /* normal mount */
     {
       /* When flags include MOUNT_CYGDRIVE, take this to mean that
 	we actually want to change the cygdrive prefix and flags
