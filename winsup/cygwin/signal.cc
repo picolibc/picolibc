@@ -408,17 +408,6 @@ sigfillset (sigset_t *set)
 }
 
 extern "C" int
-sigpending (sigset_t *set)
-{
-  unsigned bit;
-  *set = 0;
-  for (int sig = 1; sig < NSIG; sig++)
-    if (*myself->getsigtodo (sig) && myself->getsigmask () & (bit = SIGTOMASK (sig)))
-      *set |= bit;
-  return 0;
-}
-
-extern "C" int
 sigsuspend (const sigset_t *set)
 {
   return handle_sigsuspend (*set);

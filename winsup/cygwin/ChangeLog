@@ -1,5 +1,15 @@
 2003-08-19  Christopher Faylor  <cgf@redhat.com>
 
+	* signal.cc (sigpending): Move.
+	* sigproc.cc (sigpending): To here.
+	(getlocal_sigtodo): Return process-local signal array.
+	(sigpending): Accommodate new process-local signal array.
+	(sig_send): Ditto.
+	(sig_set_pending): Ditto.
+	(wait_sig): Ditto.
+
+2003-08-19  Christopher Faylor  <cgf@redhat.com>
+
 	Throughout, eliminate argument to sig_dispatch_pending.
 	* exceptions.cc (setup_handler): Move non-interruptible condition
 	handling (back) to wait_sig (as suggested by Pierre Humblet).
