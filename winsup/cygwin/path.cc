@@ -2775,7 +2775,7 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
   contents[len] = '\0';
   res = len;
   if (res) /* It's a symlink.  */
-    *pflags = PATH_SYMLINK;
+    *pflags = PATH_SYMLINK | PATH_LNK;
   goto close_it;
 
 file_not_symlink:
@@ -2990,11 +2990,11 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
   suffix_scan suffix;
   contents[0] = '\0';
 
-  is_symlink = TRUE;
+  is_symlink = true;
   ext_here = suffix.has (path, suffixes);
   extn = ext_here - path;
 
-  pflags &= ~PATH_SYMLINK;
+  pflags &= ~(PATH_SYMLINK | PATH_LNK);
 
   case_clash = false;
 
@@ -3043,6 +3043,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  (res = get_symlink_ea (suffix.path, contents, sizeof (contents))) > 0)
 	{
 	  pflags = PATH_SYMLINK;
+	  if (sym_check == 1)
+	    pflags |= PATH_LNK;
 	  debug_printf ("Got symlink from EA: %s", contents);
 	  break;
 	}

@@ -81,12 +81,18 @@ create_tty_master (int ttynum)
     {
       /* Log utmp entry */
       struct utmp our_utmp;
+      DWORD len = sizeof our_utmp.ut_host;
 
       bzero ((char *) &our_utmp, sizeof (utmp));
       (void) time (&our_utmp.ut_time);
       strncpy (our_utmp.ut_name, getlogin (), sizeof (our_utmp.ut_name));
-      cygwin_gethostname (our_utmp.ut_host, sizeof (our_utmp.ut_host));
+      GetComputerName (our_utmp.ut_host, &len);
       __small_sprintf (our_utmp.ut_line, "tty%d", ttynum);
+      if ((len = strlen (our_utmp.ut_line)) >= UT_IDLEN)
+	len -= UT_IDLEN;
+      else
+	len = 0;
+      strncpy (our_utmp.ut_id, our_utmp.ut_line + len, UT_IDLEN);
       our_utmp.ut_type = USER_PROCESS;
       our_utmp.ut_pid = myself->pid;
       myself->ctty = ttynum;

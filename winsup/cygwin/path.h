@@ -47,6 +47,7 @@ enum path_types
   PATH_NOTEXEC = MOUNT_NOTEXEC,
   PATH_CYGWIN_EXEC = MOUNT_CYGWIN_EXEC,
   PATH_ALL_EXEC = (PATH_CYGWIN_EXEC | PATH_EXEC),
+  PATH_LNK =	      0x01000000,
   PATH_TEXT =	      0x02000000,
   PATH_ISDISK =	      0x04000000,
   PATH_HAS_SYMLINKS = 0x10000000,
@@ -97,6 +98,7 @@ class path_conv
     return 0;
   }
   int issymlink () const {return path_flags & PATH_SYMLINK;}
+  int is_lnk_symlink () const {return path_flags & PATH_LNK;}
   int issocket () const {return path_flags & PATH_SOCKET;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
   bool exists () const {return fileattr != INVALID_FILE_ATTRIBUTES;}

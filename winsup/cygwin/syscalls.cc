@@ -134,12 +134,8 @@ unlink (const char *ourname)
     }
 
   /* Check for shortcut as symlink condition. */
-  if (win32_name.has_attribute (FILE_ATTRIBUTE_READONLY))
-    {
-      int len = strlen (win32_name);
-      if (len > 4 && strcasematch ((char *) win32_name + len - 4, ".lnk"))
-	SetFileAttributes (win32_name, (DWORD) win32_name & ~FILE_ATTRIBUTE_READONLY);
-    }
+  if (win32_name.issymlink ())
+    SetFileAttributes (win32_name, (DWORD) win32_name & ~FILE_ATTRIBUTE_READONLY);
 
   DWORD lasterr;
   lasterr = 0;
@@ -152,7 +148,7 @@ unlink (const char *ourname)
 	}
 
       lasterr = GetLastError ();
-      if (i || lasterr != ERROR_ACCESS_DENIED || win32_name.issymlink ())
+      if (i || lasterr != ERROR_ACCESS_DENIED)
 	break;		/* Couldn't delete it. */
 
       /* if access denied, chmod to be writable, in case it is not,
@@ -616,8 +612,9 @@ link (const char *a, const char *b)
 {
   int res = -1;
   sigframe thisframe (mainthread);
-  path_conv real_a (a, PC_SYM_FOLLOW | PC_FULL);
+  path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
+  extern BOOL allow_winsymlinks;
 
   if (real_a.error)
     {
@@ -645,14 +642,20 @@ link (const char *a, const char *b)
       goto done;
     }
 
+  /* Shortcut hack. */
+  char new_lnk_buf[MAX_PATH + 5];
+  if (allow_winsymlinks && real_a.is_lnk_symlink () && !real_b.case_clash)
+    {
+      strcpy (new_lnk_buf, b);
+      strcat (new_lnk_buf, ".lnk");
+      b = new_lnk_buf;
+      real_b.check (b, PC_SYM_NOFOLLOW);
+    }
   /* Try to make hard link first on Windows NT */
   if (wincap.has_hard_links ())
     {
       if (CreateHardLinkA (real_b, real_a, NULL))
-	{
-	  res = 0;
-	  goto done;
-	}
+	goto success;
 
       HANDLE hFileSource;
 
@@ -734,7 +737,13 @@ link (const char *a, const char *b)
       if (!bSuccess)
 	goto docopy;
 
+    success:
       res = 0;
+      if (!allow_winsymlinks && real_a.is_lnk_symlink ())
+	SetFileAttributes (real_b, (DWORD) real_a
+			           | FILE_ATTRIBUTE_SYSTEM
+				   | FILE_ATTRIBUTE_READONLY);
+
       goto done;
     }
 docopy:
@@ -923,7 +932,7 @@ chmod (const char *path, mode_t mode)
       else
 	(DWORD) win32_path |= FILE_ATTRIBUTE_READONLY;
 
-      if (S_ISLNK (mode) || S_ISSOCK (mode))
+      if (!win32_path.is_lnk_symlink () && S_ISLNK (mode) || S_ISSOCK (mode))
 	(DWORD) win32_path |= FILE_ATTRIBUTE_SYSTEM;
 
       if (!SetFileAttributes (win32_path, win32_path))
@@ -1257,16 +1266,12 @@ rename (const char *oldpath, const char *newpath)
 
   /* Shortcut hack. */
   char new_lnk_buf[MAX_PATH + 5];
-  if (real_old.issymlink () && !real_new.error && !real_new.case_clash)
+  if (real_old.is_lnk_symlink () && !real_new.error && !real_new.case_clash)
     {
-      int len_old = strlen (real_old.get_win32 ());
-      if (strcasematch (real_old.get_win32 () + len_old - 4, ".lnk"))
-	{
-	  strcpy (new_lnk_buf, newpath);
-	  strcat (new_lnk_buf, ".lnk");
-	  newpath = new_lnk_buf;
-	  real_new.check (newpath, PC_SYM_NOFOLLOW);
-	}
+      strcpy (new_lnk_buf, newpath);
+      strcat (new_lnk_buf, ".lnk");
+      newpath = new_lnk_buf;
+      real_new.check (newpath, PC_SYM_NOFOLLOW);
     }
 
   if (real_new.error || real_new.case_clash)
@@ -1296,9 +1301,8 @@ rename (const char *oldpath, const char *newpath)
     SetFileAttributes (real_new, (DWORD) real_new & ~FILE_ATTRIBUTE_READONLY);
 
   /* Shortcut hack No. 2, part 1 */
-  if (!real_old.issymlink () && !real_new.error && real_new.issymlink () &&
-      real_new.known_suffix && strcasematch (real_new.known_suffix, ".lnk") &&
-      (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
+  if (!real_old.issymlink () && !real_new.error && real_new.is_lnk_symlink ()
+      && (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
      *lnk_suffix = '\0';
 
   if (!MoveFile (real_old, real_new))
@@ -1385,7 +1389,7 @@ static void system_cleanup (void *args)
   signal (SIGINT, cleanup_args->oldint);
   signal (SIGQUIT, cleanup_args->oldquit);
   (void) sigprocmask (SIG_SETMASK, &cleanup_args->old_mask, 0);
-}  
+}
 
 extern "C" int
 system (const char *cmdstring)
@@ -2472,6 +2476,7 @@ login (struct utmp *ut)
   register int fd;
 
   pututline (ut);
+  endutent ();
   if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
     {
       (void) write (fd, (char *) ut, sizeof (struct utmp));
@@ -2519,8 +2524,8 @@ logout (char *line)
 	      /* Found the entry for LINE; mark it as logged out.  */
 	      {
 		/* Zero out entries describing who's logged in.  */
-		bzero (ut->ut_name, sizeof (ut->ut_name));
-		bzero (ut->ut_host, sizeof (ut->ut_host));
+		memset (ut->ut_name, 0, sizeof (ut->ut_name));
+		memset (ut->ut_host, 0, sizeof (ut->ut_host));
 		time (&ut->ut_time);
 
 		/* Now seek back to the position in utmp at which UT occured,
@@ -2551,10 +2556,9 @@ setutent ()
 {
   sigframe thisframe (mainthread);
   if (utmp_fd == -2)
-    {
-      utmp_fd = open (utmp_file, O_RDWR);
-    }
-  lseek (utmp_fd, 0, SEEK_SET);
+    utmp_fd = open (utmp_file, O_RDWR);
+  else
+    lseek (utmp_fd, 0, SEEK_SET);
 }
 
 extern "C" void

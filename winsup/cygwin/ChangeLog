@@ -1,3 +1,24 @@
+2003-03-07  Christopher Faylor  <cgf@redhat.com>
+
+	* path.h (PATH_LNK): New enum val.
+	(path_conv::is_lnk_symlink): New function.  True if path represents
+	.lnk style symlink.
+	* path.cc (check_shortcut): Set PATH_LNK in pflags when appropriate.
+	(symlink_info::check): Ditto.  Remove PATH_LNK from pflags initially.
+	* syscalls.cc (unlink): Always remove readonly attribute from a symlink
+	regardless of type.
+	(link): (from Corinna Vinschen) Allow links to symlinks.  Reset
+	attributes on a symlink after successful link creation.
+	(chmod): Use is_lnk_symlink where appropriate.
+	(rename): Ditto.
+
+2003-03-07  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* tty.cc (create_tty_master): Call GetComputerName instead of
+	cygwin_gethostname.  Set ut_id.
+	* syscalls.cc (login): Call endutent.
+	(setutent): Do not seek after a fresh open.
+
 2003-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (seteuid32): Fix formatting.
@@ -6,7 +27,7 @@
 
 	* thread.cc (MTinterface::fixup_after_fork): Initialize mainthread
 	prior to pthread objects.
-	
+
 2003-03-04  Jason Tishler <jason@tishler.net>
 
 	* fhandler_socket.cc (fhandler_socket::dup): Initialize type.
