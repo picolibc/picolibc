@@ -776,7 +776,10 @@ sig_send (pinfo *p, int sig)
 
   /* Notify the process that a signal has arrived.
    */
+  int prio;
   SetLastError (0);
+  prio = GetThreadPriority (GetCurrentThread ());
+  (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
   if (!ReleaseSemaphore (thiscatch, 1, NULL) && (int) GetLastError () > 0)
     {
       /* Couldn't signal the semaphore.  This probably means that the
@@ -825,6 +828,8 @@ sig_send (pinfo *p, int sig)
 	  WaitForSingleObject (thiscomplete, 0) == WAIT_OBJECT_0)
 	rc = WAIT_OBJECT_0;
     }
+
+  SetThreadPriority (GetCurrentThread (), prio);
 
   if (rc == WAIT_OBJECT_0)
     rc = 0;		// Successful exit

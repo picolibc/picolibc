@@ -1,3 +1,8 @@
+Tue Feb 29 00:46:09 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (sig_send): Temporarily set priority to highest while
+	sending a signal.
+
 Mon Feb 28 11:23:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo.cc (set_myself): Add build date to strace output.
