@@ -1101,8 +1101,10 @@ pthread_key::set (const void *value)
 void *
 pthread_key::get ()
 {
-  set_errno (0);
-  return TlsGetValue (dwTlsIndex);
+  int savedError = ::GetLastError();
+  void *result = TlsGetValue (dwTlsIndex);
+  ::SetLastError (savedError);
+  return result;
 }
 
 void
