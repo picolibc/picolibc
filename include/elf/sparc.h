@@ -128,6 +128,8 @@ START_RELOC_NUMBERS (elf_sparc_reloc_type)
   /* little endian data relocs */
   RELOC_NUMBER (R_SPARC_REV32, 56)
 
+  EMPTY_RELOC  (R_SPARC_max_std)
+
   RELOC_NUMBER (R_SPARC_GNU_VTINHERIT, 250)
   RELOC_NUMBER (R_SPARC_GNU_VTENTRY, 251)
 
