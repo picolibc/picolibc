@@ -1,3 +1,7 @@
+2003-08-08  Gerrit P. Haase  <gp@familiehaase.de>
+
+	* include/stdint.h: Correctly define INT32_MIN.
+
 2003-08-08  David Rothenberger  <daveroth@acm.org>
 
 	* grp.cc (read_group): Set __group32.gr_mem pointer back to &null_ptr
