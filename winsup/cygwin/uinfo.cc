@@ -26,11 +26,12 @@ details. */
 #include "registry.h"
 #include "security.h"
 
-const char *
+struct passwd *
 internal_getlogin (cygheap_user &user)
 {
   char username[MAX_USER_NAME];
   DWORD username_len = MAX_USER_NAME;
+  struct passwd *pw = NULL;
 
   if (!user.name ())
     if (!GetUserName (username, &username_len))
@@ -153,7 +154,6 @@ internal_getlogin (cygheap_user &user)
 	  cygsid gsid (NULL);
 	  if (ret)
 	    {
-	      struct passwd *pw;
 	      cygsid psid;
 
 	      if (!strcasematch (user.name (), "SYSTEM")
@@ -194,7 +194,7 @@ internal_getlogin (cygheap_user &user)
 	}
     }
   debug_printf ("Cygwins Username: %s", user.name ());
-  return user.name ();
+  return pw ?: getpwnam(user.name ());
 }
 
 void
@@ -212,7 +212,7 @@ uinfo_init ()
   /* If uid is USHRT_MAX, the process is started from a non cygwin
      process or the user context was changed in spawn.cc */
   if (myself->uid == USHRT_MAX)
-    if ((p = getpwnam (internal_getlogin (cygheap->user))) != NULL)
+    if ((p = internal_getlogin (cygheap->user)) != NULL)
       {
 	myself->uid = p->pw_uid;
 	/* Set primary group only if ntsec is off or the process has been

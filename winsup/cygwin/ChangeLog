@@ -1,3 +1,9 @@
+2001-04-25  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* uinfo.cc (internal_getlogin): Return pointer to struct passwd.
+	(uinfo_init): Accommodate the above change.
+	* syscalls.cc (seteuid): Ditto.
+
 Tue Apr 25 11:08:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: Add LoadDLLfunc statements for SetTokenInformation@16.

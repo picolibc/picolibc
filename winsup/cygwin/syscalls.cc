@@ -1945,7 +1945,7 @@ setuid (uid_t uid)
   return ret;
 }
 
-extern const char *internal_getlogin (cygheap_user &user);
+extern struct passwd *internal_getlogin (cygheap_user &user);
 
 /* seteuid: standards? */
 extern "C" int
@@ -2015,7 +2015,7 @@ seteuid (uid_t uid)
 	     retrieving user's SID. */
 	  user.token = cygheap->user.impersonated ? cygheap->user.token
 						  : INVALID_HANDLE_VALUE;
-	  struct passwd *pw_cur = getpwnam (internal_getlogin (user));
+	  struct passwd *pw_cur = internal_getlogin (user);
 	  if (pw_cur != pw_new)
 	    {
 	      debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
