@@ -1,3 +1,12 @@
+2003-07-03  Luke Dunstan  <infidel@users.sf.net>
+
+	* include/commdlg.h (CommDlg_OpenSave_*): Add parentheses around
+	macro arguments. Thanks to Tom Bishop <tombishop@users.sf.net>.
+	* include/winuser.h (MONITOR_DEFAULTTONULL, MONITOR_DEFAULTTOPRIMARY,
+	MONITOR_DEFAULTTONEAREST, MONITORINFOF_PRIMARY): Add defines.
+	(TPM_RECURSE): Add guard for Win98/Win2K.
+	Thanks to Magnus Olsen <greatlord@users.sf.net>.
+
 2003-07-01  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/basetyps.h (small, hyper): Change to __small and __hyper to
