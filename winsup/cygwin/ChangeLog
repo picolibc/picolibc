@@ -1,3 +1,7 @@
+2003-10-09  Yitzchak Scott-Thoennes <sthoenna@efn.org>
+
+	* include/sys/mman.h (MAP_FAILED): Define as void *.
+
 2003-10-08  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (hMainProc): Initialize to useful value for use when dll is

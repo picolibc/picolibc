@@ -31,7 +31,7 @@ extern "C" {
 #define MAP_ANONYMOUS 0x20
 #define MAP_ANON MAP_ANONYMOUS
 
-#define MAP_FAILED ((caddr_t)-1)
+#define MAP_FAILED ((void *)-1)
 
 /*
  * Flags for msync.
