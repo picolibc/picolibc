@@ -1,3 +1,11 @@
+2001-08-25  Andreas Jaeger  <aj@suse.de>
+
+	* d30v.h: Fix declaration of reg_name_cnt.
+
+	* d10v.h: Fix declaration of d10v_reg_name_cnt.
+
+	* arc.h: Add prototypes from opcodes/arc-opc.c.
+
 2001-08-16  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
 
 	* mips.h (INSN_10000): Define.
@@ -32,7 +40,7 @@
 2001-05-23  John Healy  <jhealy@redhat.com>
 
 	* cgen.h: Increased CGEN_MAX_SYNTAX_ELEMENTS to 48.
- 
+
 2001-05-15  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
 
 	* mips.h (INSN_ISA_MASK): Define.
@@ -169,7 +177,7 @@
 
 	* i386.h (i386_optab): Replace "Imm" with "EncImm".
 	(i386_regtab): Add flags field.
-	
+
 2000-12-12  Nick Clifton  <nickc@redhat.com>
 
 	* mips.h: Fix formatting.
@@ -194,7 +202,7 @@
         (ISA_UNKNOWN): New constant to indicate unknown ISA.
         (ISA_MIPS1, ISA_MIPS2, ISA_MIPS3, ISA_MIPS4, ISA_MIPS5,
         ISA_MIPS32): New constants, defined to be the mask of INSN_*
-        constants available at that ISA level. 
+        constants available at that ISA level.
         (CPU_UNKNOWN): New constant to indicate unknown CPU.
         (CPU_4K, CPU_MIPS32_4K): Rename the former to the latter,
         define it with a unique value.
@@ -202,7 +210,7 @@
         constant meanings.
 
         * mips.h (INSN_ISA64, ISA_MIPS5, ISA_MIPS64): New
-        definitions. 
+        definitions.
 
         * mips.h (CPU_SB1): New constant.
 
@@ -216,21 +224,21 @@
 	* ia64.h (enum ia64_dependency_semantics): Add IA64_DVS_STOP.
 
 2000-09-13  Anders Norlander  <anorland@acc.umu.se>
-	
+
 	* mips.h: Use defines instead of hard-coded processor numbers.
 	(CPU_R2000, CPU_R3000, CPU_R3900, CPU_R4000, CPU_R4010,
-	CPU_VR4100, CPU_R4111, CPU_R4300, CPU_R4400, CPU_R4600, CPU_R4650, 
+	CPU_VR4100, CPU_R4111, CPU_R4300, CPU_R4400, CPU_R4600, CPU_R4650,
 	CPU_R5000, CPU_R6000, CPU_R8000, CPU_R10000, CPU_MIPS32, CPU_4K,
 	CPU_4KC, CPU_4KM, CPU_4KP): Define..
 	(OPCODE_IS_MEMBER): Use new defines.
- 	(OP_MASK_SEL, OP_SH_SEL): Define.
+	(OP_MASK_SEL, OP_SH_SEL): Define.
 	(OP_MASK_CODE20, OP_SH_CODE20): Define.
- 	Add 'P' to used characters.
- 	Use 'H' for coprocessor select field.
+	Add 'P' to used characters.
+	Use 'H' for coprocessor select field.
 	Use 'm' for 20 bit breakpoint code.
- 	Document new arg characters and add to used characters.
- 	(INSN_MIPS32): New define for MIPS32 extensions.
- 	(OPCODE_IS_MEMBER): Recognize MIPS32 instructions.
+	Document new arg characters and add to used characters.
+	(INSN_MIPS32): New define for MIPS32 extensions.
+	(OPCODE_IS_MEMBER): Recognize MIPS32 instructions.
 
 2000-09-05  Alan Modra  <alan@linuxcare.com.au>
 
@@ -410,7 +418,7 @@ Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
 	* cgen.h (CGEN_INSN_MACH_HAS_P): New macro.
 	(CGEN_CPU_TABLE): flags: new field.
 	Add prototypes for new functions.
-	
+
 2000-02-24  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	* i386.h: Add some more UNIXWARE_COMPAT comments.
@@ -528,7 +536,7 @@ Sun Sep 19 10:40:59 1999  Jeffrey A Law  (law@cygnus.com)
 Sat Sep 18 11:41:16 1999  Jeffrey A Law  (law@cygnus.com)
 
 	* hppa.h (pa_opcodes): Use 'fX' for first register operand
-	in xmpyu.  
+	in xmpyu.
 
 	* hppa.h (pa_opcodes): Fix mask for probe and probei.
 
@@ -614,7 +622,7 @@ Wed Jul 28 02:04:24 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
 	* hppa.h (pa_opcodes): Mark all PA2.0 opcodes with FLAG_STRICT.
 
-	* hppa.h (pa_opcodes):  Change xmpyu, fmpyfadd, 
+	* hppa.h (pa_opcodes):  Change xmpyu, fmpyfadd,
 	and fmpynfadd to use 'J' and 'K' instead of 'E' and 'X'.
 
 1999-07-13  Alan Modra  <alan@spri.levels.unisa.edu.au>
@@ -642,7 +650,7 @@ Fri Jun 25 04:22:04 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 Fri May 28 15:26:11 1999  Jeffrey A Law  (law@cygnus.com)
 
 	* hppa.h (pa_opcodes): Move integer arithmetic instructions after
-	integer logical instructions.  
+	integer logical instructions.
 
 1999-05-28  Linus Nordberg  <linus.nordberg@canit.se>
 
@@ -659,7 +667,7 @@ Thu May 27 04:13:54 1999  Joel Sherrill (joel@OARcorp.com
 
 Wed May 26 16:57:44 1999  Jeffrey A Law  (law@cygnus.com)
 
-	* hppa.h (pa_opcodes): Add second entry for "comb", "comib", 
+	* hppa.h (pa_opcodes): Add second entry for "comb", "comib",
 	"addb", and "addib" to be used by the disassembler.
 
 1999-05-12  Alan Modra  <alan@apri.levels.unisa.edu.au>
@@ -770,7 +778,7 @@ Sat Feb 13 14:13:44 1999  Richard Henderson  <rth@cygnus.com>
 	(CGEN_INSN_ATTR): New type.
 
 Mon Feb  1 21:09:14 1999  Catherine Moore  <clm@cygnus.com>
- 
+
         * i386.h (d_Suf, x_Suf, sld_Suf, sldx_Suf, bwld_Suf):  Define.
         (x_FP, d_FP, dls_FP, sldx_FP):  Define.
         Change *Suf definitions to include x and d suffixes.
@@ -811,16 +819,16 @@ Mon Feb  1 21:09:14 1999  Catherine Moore  <clm@cygnus.com>
 Wed Dec  9 10:38:48 1998  David Taylor  <taylor@texas.cygnus.com>
 
 	The following is part of a change made by Edith Epstein
- 	<eepstein@sophia.cygnus.com> as part of a project to merge in
- 	changes by HP; HP did not create ChangeLog entries.
+	<eepstein@sophia.cygnus.com> as part of a project to merge in
+	changes by HP; HP did not create ChangeLog entries.
 
 	* hppa.h (completer_chars): list of chars to not put a space
- 	after.
+	after.
 
 Sun Dec  6 13:21:34 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 	* i386.h (i386_optab): Permit w suffix on processor control and
- 	status word instructions.
+	status word instructions.
 
 1998-11-30  Doug Evans  <devans@casey.cygnus.com>
 
@@ -881,7 +889,7 @@ Fri Oct  9 13:38:13 1998  Doug Evans  <devans@seba.cygnus.com>
 Mon Oct  5 00:21:07 1998  Jeffrey A Law  (law@cygnus.com)
 
 	* hppa.h: Add "fid".
-	
+
 Sun Oct  4 21:00:00 1998  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	From Robert Andrew Dale <rob@nb.net>
@@ -935,7 +943,7 @@ Fri Jun 26 11:09:06 1998  Jeffrey A Law  (law@cygnus.com)
 
 	* mn10300.h: Add "machine" field for instructions.
 	(MN103, AM30): Define machine types.
-	
+
 Fri Jun 19 16:09:09 1998  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	* i386.h: Use FP, not sl_Suf, for fxsave and fxrstor.
@@ -1540,9 +1548,9 @@ Mon Nov  4 12:52:48 1996  Jeffrey A Law  (law@cygnus.com)
 Fri Nov  1 10:31:02 1996  Richard Henderson  <rth@tamu.edu>
 
 	* alpha.h: Don't include "bfd.h"; private relocation types are now
- 	negative to minimize problems with shared libraries.  Organize
- 	instruction subsets by AMASK extensions and PALcode
- 	implementation.
+	negative to minimize problems with shared libraries.  Organize
+	instruction subsets by AMASK extensions and PALcode
+	implementation.
 	(struct alpha_operand): Move flags slot for better packing.
 
 Tue Oct 29 12:19:10 1996  Jeffrey A Law  (law@cygnus.com)
@@ -1595,9 +1603,9 @@ Fri Aug 23 10:39:08 1996  Jeffrey A Law  (law@cygnus.com)
 Thu Aug 22 16:51:25 1996  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* v850.h (v850_operands): Add insert and extract fields, pointers
- 	to functions used to handle unusual operand encoding.
+	to functions used to handle unusual operand encoding.
 	(V850_OPERAND_REG, V850_OPERAND_SRG, V850_OPERAND_CC,
- 	V850_OPERAND_SIGNED): Defined.
+	V850_OPERAND_SIGNED): Defined.
 
 Wed Aug 21 17:45:10 1996  J.T. Conklin  <jtc@rtl.cygnus.com>
 
@@ -1611,11 +1619,11 @@ Tue Aug 20 14:52:02 1996  J.T. Conklin  <jtc@rtl.cygnus.com>
 Fri Aug 16 14:44:15 1996  James G. Smith  <jsmith@cygnus.co.uk>
 
 	* mips.h (OP_SH_LOCC, OP_SH_HICC, OP_MASK_CC, OP_SH_COP1NORM,
- 	OP_MASK_COP1NORM, OP_SH_COP1SPEC, OP_MASK_COP1SPEC,
- 	OP_MASK_COP1SCLR, OP_MASK_COP1CMP, OP_SH_COP1CMP, OP_SH_FORMAT,
- 	OP_MASK_FORMAT, OP_SH_TRUE, OP_MASK_TRUE, OP_SH_GE, OP_MASK_GE,
- 	OP_SH_UNSIGNED, OP_MASK_UNSIGNED, OP_SH_HINT, OP_MASK_HINT):
- 	Defined.
+	OP_MASK_COP1NORM, OP_SH_COP1SPEC, OP_MASK_COP1SPEC,
+	OP_MASK_COP1SCLR, OP_MASK_COP1CMP, OP_SH_COP1CMP, OP_SH_FORMAT,
+	OP_MASK_FORMAT, OP_SH_TRUE, OP_MASK_TRUE, OP_SH_GE, OP_MASK_GE,
+	OP_SH_UNSIGNED, OP_MASK_UNSIGNED, OP_SH_HINT, OP_MASK_HINT):
+	Defined.
 
 Fri Aug 16 00:15:15 1996  Jeffrey A Law  (law@cygnus.com)
 
@@ -1625,7 +1633,7 @@ Fri Aug 16 00:15:15 1996  Jeffrey A Law  (law@cygnus.com)
 Thu Aug 15 13:11:46 1996  Martin M. Hunt  <hunt@pizza.cygnus.com>
 
 	* d10v.h: Add some additional defines to support the
- 	assembler in determining which operations can be done in parallel.
+	assembler in determining which operations can be done in parallel.
 
 Tue Aug  6 11:13:22 1996  Jeffrey A Law  (law@cygnus.com)
 
@@ -1641,7 +1649,7 @@ Fri Jul 26 11:47:10 1996  Martin M. Hunt  <hunt@pizza.cygnus.com>
 Thu Jul 25 12:06:22 1996  Martin M. Hunt  <hunt@pizza.cygnus.com>
 
 	* d10v.h: Changes for divs, parallel-only instructions, and
- 	signed numbers.
+	signed numbers.
 
 Mon Jul 22 11:21:15 1996  Martin M. Hunt  <hunt@pizza.cygnus.com>
 
@@ -1663,7 +1671,7 @@ Thu Jul 11 12:09:15 1996  Jeffrey A Law  (law@cygnus.com)
 
 Wed Jul  3 14:30:12 1996  J.T. Conklin  <jtc@rtl.cygnus.com>
 
- 	* m68k.h (mcf5200): New macro.
+	* m68k.h (mcf5200): New macro.
 	Document names of coldfire control registers.
 
 Tue Jul  2 23:05:45 1996  Jeffrey A Law  (law@cygnus.com)
@@ -1813,7 +1821,7 @@ Tue Oct 24 10:49:10 1995  Jeffrey A Law  (law@cygnus.com)
 Mon Oct 23 11:09:16 1995  James G. Smith  <jsmith@pasanda.cygnus.co.uk>
 
 	* mips.h: Added INSN_4100 flag to mark NEC VR4100 specific
- 	instructions.
+	instructions.
 
 Mon Oct 16 10:28:15 1995  Michael Meissner  <meissner@tiktok.cygnus.com>
 

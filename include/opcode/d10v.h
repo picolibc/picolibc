@@ -190,7 +190,7 @@ struct pd_reg
 };
 
 extern const struct pd_reg d10v_predefined_registers[];
-int d10v_reg_name_cnt();
+int d10v_reg_name_cnt PARAMS ((void));
 
 /* an expressionS only has one register type, so we fake it */
 /* by setting high bits to indicate type */
