@@ -38,6 +38,7 @@ typedef enum _SECTION_INHERIT {
   ViewShare = 1,
   ViewUnmap = 2
 } SECTION_INHERIT;
+#if !defined(_NTSECAPI_H)
 typedef struct _OBJECT_ATTRIBUTES {
   ULONG Length;
   HANDLE RootDirectory;
@@ -46,4 +47,5 @@ typedef struct _OBJECT_ATTRIBUTES {
   PVOID SecurityDescriptor;              
   PVOID SecurityQualityOfService;
 } OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;
+#endif
 #endif /* _NTDEF_H */
