@@ -144,6 +144,7 @@ struct powerpc_operand
 
   /* One bit syntax flags.  */
   unsigned long flags;
+  int reloc;
 };
 
 /* Elements in the table are retrieved by indexing with values from
