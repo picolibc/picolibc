@@ -117,7 +117,7 @@ void strace_printf (unsigned, const char *func, const char *, ...);
 #define define_strace1(c, ...) define_strace0 ((_STRACE_ ## c | _STRACE_NOTALL), __VA_ARGS__)
 
 #define debug_printf(...)	define_strace (DEBUG, __VA_ARGS__)
-#define paranoid_printf(...)	define_strace (PARANOID, __VA_ARGS__)
+#define paranoid_printf(...)	define_strace1 (PARANOID, __VA_ARGS__)
 #define select_printf(...)	define_strace (SELECT, __VA_ARGS__)
 #define sigproc_printf(...)	define_strace (SIGP, __VA_ARGS__)
 #define syscall_printf(...)	define_strace (SYSCALL, __VA_ARGS__)
