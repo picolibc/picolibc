@@ -405,8 +405,6 @@ bool
 pwdgrp::next_num (unsigned long& n)
 {
   char *p = next_str (':');
-  if (!p)
-    return -1;
   char *cp;
   n = strtoul (p, &cp, 10);
   return p != cp && !*cp;
@@ -418,8 +416,8 @@ pwdgrp::add_line (char *eptr)
   if (eptr)
     {
       lptr = eptr;
-      eptr = strechr (lptr, '\n');
-      if (*eptr)
+      eptr = strchr (lptr, '\n');
+      if (eptr)
 	{
 	  if (eptr > lptr && eptr[-1] == '\r')
 	    eptr[-1] = '\0';
