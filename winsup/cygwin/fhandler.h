@@ -197,6 +197,8 @@ public:
 
   void set_w_binary (int b) { FHCONDSETF (b, WBINARY); FHSETF (WBINSET); }
   void set_r_binary (int b) { FHCONDSETF (b, RBINARY); FHSETF (RBINSET); }
+  void clear_w_binary () {FHCLEARF (WBINARY); FHCLEARF (WBINSET); }
+  void clear_r_binary () {FHCLEARF (RBINARY); FHCLEARF (RBINSET); }
 
   int get_default_fmode (int flags);
 

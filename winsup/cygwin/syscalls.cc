@@ -1646,18 +1646,25 @@ setmode (int fd, int mode)
   int res;
   if (p->get_w_binary () && p->get_r_binary ())
     res = O_BINARY;
+  else if (p->get_w_binset () && p->get_r_binset ())
+    res = O_TEXT;	/* Specifically set O_TEXT */
   else
-    res = O_TEXT;
+    res = 0;
 
   if (mode & O_BINARY)
     {
       p->set_w_binary (1);
       p->set_r_binary (1);
     }
-  else
+  else if (mode & O_TEXT)
     {
       p->set_w_binary (0);
       p->set_r_binary (0);
+    }
+  else
+    {
+      p->clear_w_binary ();
+      p->clear_r_binary ();
     }
 
   if (_cygwin_istext_for_stdio (fd))
