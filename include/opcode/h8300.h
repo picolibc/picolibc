@@ -1,5 +1,5 @@
 /* Opcode table for the H8/300
-   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000, 2002
+   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000, 2002, 2003
    Free Software Foundation, Inc.
    Written by Steve Chamberlain <sac@cygnus.com>.
    
@@ -48,7 +48,7 @@ typedef int op_type;
 #define L_32		0x04
 #define L_P             0x08
 #define L_24		0x10
-#define MEMRELAX 	0x20			/* move insn which may relax */ 
+#define MEMRELAX 	0x20			/* Move insn which may relax.  */ 
 #define SRC             0x40
 #define DST             0x80
 
@@ -66,10 +66,10 @@ typedef int op_type;
 #define DBIT            0x80000
 #define DISPREG         0x100000
 #define IGNORE 		0x200000
-#define E      		0x400000		/* FIXME: end of nibble sequence? */
+#define E      		0x400000		/* FIXME: end of nibble sequence?  */
 #define L_2		0x800000
-#define B30  		0x1000000 		/* bit 3 must be low */
-#define B31  		0x2000000		/* bit 3 must be high */
+#define B30  		0x1000000 		/* Bit 3 must be low.  */
+#define B31  		0x2000000		/* Bit 3 must be high.  */
 #define CCR		0x4000000
 #define ABS             0x8000000
 #define ABSJMP		0x10000000  
@@ -77,54 +77,57 @@ typedef int op_type;
 #define PCREL           0x40000000
 #define MEMIND          0x80000000
 
-#define IMM3 		IMM|L_3
-#define IMM2 		IMM|L_2
+#define IMM3 		IMM | L_3
+#define IMM2 		IMM | L_2
 
-#define SIZE		(L_2|L_3|L_8|L_16|L_32|L_P|L_24)
-#define MODE		(REG|IMM|DISP|IND|INC|DEC|CCR|ABS|MEMIND|EXR)
+#define SIZE		(L_2 | L_3 | L_8 | L_16 | L_32 | L_P | L_24)
+#define MODE		(REG | IMM | DISP | IND | INC | DEC | CCR | ABS | MEMIND | EXR)
 
-#define RD8 		(DST|L_8|REG)
-#define RD16 		(DST|L_16|REG)
-#define RD32 		(DST|L_32|REG)
-#define RS8 		(SRC|L_8|REG)
-#define RS16 		(SRC|L_16|REG)
-#define RS32		(SRC|L_32|REG)
+#define RD8 		(DST | L_8  | REG)
+#define RD16 		(DST | L_16 | REG)
+#define RD32 		(DST | L_32 | REG)
+#define RS8 		(SRC | L_8  | REG)
+#define RS16 		(SRC | L_16 | REG)
+#define RS32		(SRC | L_32 | REG)
 
-#define RSP 		(SRC|L_P|REG)
-#define RDP 		(DST|L_P|REG)
+#define RSP 		(SRC | L_P | REG)
+#define RDP 		(DST | L_P | REG)
 
-#define IMM8 		(IMM|SRC|L_8)
-#define IMM16 		(IMM|SRC|L_16)
-#define IMM32 		(IMM|SRC|L_32)
+#define IMM8 		(IMM | SRC | L_8)
+#define IMM16 		(IMM | SRC | L_16)
+#define IMM32 		(IMM | SRC | L_32)
 
-#define ABS8SRC 	(SRC|ABS|L_8|ABS8MEM)
-#define ABS8DST		(DST|ABS|L_8|ABS8MEM)
+#define ABS8SRC 	(SRC | ABS | L_8 | ABS8MEM)
+#define ABS8DST		(DST | ABS | L_8 | ABS8MEM)
 
-#define DISP8 		(PCREL|L_8)
-#define DISP16 		(PCREL|L_16)
+#define DISP8 		(PCREL | L_8)
+#define DISP16 		(PCREL | L_16)
 
-#define DISP8SRC	(DISP|L_8|SRC)
-#define DISP16SRC	(DISP|L_16|SRC)
+#define DISP8SRC	(DISP | L_8  | SRC)
+#define DISP16SRC	(DISP | L_16 | SRC)
 
-#define DISP8DST	(DISP|L_8|DST)
-#define DISP16DST	(DISP|L_16|DST)
+#define DISP8DST	(DISP | L_8  | DST)
+#define DISP16DST	(DISP | L_16 | DST)
 
-#define ABS16SRC 	(SRC|ABS|L_16)
-#define ABS16DST 	(DST|ABS|L_16)
-#define ABS24SRC 	(SRC|ABS|L_24)
-#define ABS24DST 	(DST|ABS|L_24)
-#define ABS32SRC 	(SRC|ABS|L_32)
-#define ABS32DST 	(DST|ABS|L_32)
+#define ABS16SRC 	(SRC | ABS | L_16)
+#define ABS16DST 	(DST | ABS | L_16)
+#define ABS24SRC 	(SRC | ABS | L_24)
+#define ABS24DST 	(DST | ABS | L_24)
+#define ABS32SRC 	(SRC | ABS | L_32)
+#define ABS32DST 	(DST | ABS | L_32)
 
-#define RDDEC 		(DST|DEC)
-#define RSINC 		(SRC|INC)
-#define RDINC		(DST|INC)
+#define RDDEC 		(DST | DEC)
+#define RSINC 		(SRC | INC)
+#define RDINC		(DST | INC)
 
-#define RDIND 		(DST|IND)
-#define RSIND 		(SRC|IND)
+#define RDIND 		(DST | IND)
+#define RSIND 		(SRC | IND)
+
+#define MS32            (SRC | L_32 | MACREG)
+#define MD32            (DST | L_32 | MACREG)
 
 #if 1
-#define OR8 RS8		/* ??? OR as in One Register? */
+#define OR8 RS8		/* ??? OR as in One Register?  */
 #define OR16 RS16
 #define OR32 RS32
 #else
@@ -211,7 +214,7 @@ struct h8_opcode
 #define PREFIXLDC 0x0,0x1,0x4,0x0
 
 
-#define O(op, size) (op*4+size)
+#define O(op, size) (op * 4 + size)
 
 #define O_RECOMPILE 0
 #define O_ADD  1
@@ -315,7 +318,6 @@ struct h8_opcode
 #define SW 1
 #define SL 2
 #define SN 3
-
 
 /* FIXME: Lots of insns have "E, 0, 0, 0, 0" in the nibble code sequences.
    Methinks the zeroes aren't necessary.  Once confirmed, nuke 'em.  */
@@ -596,8 +598,8 @@ const struct h8_opcode h8_opcodes[] =
 
   NEW_SOP(O(O_CLRMAC,SN),1,2,"clrmac"),{{E, 0, 0}},{{0x0,0x1,0xa,0x0,E}} EOP,
   NEW_SOP(O(O_MAC,SL),1,2,"mac"),{{RSINC,RDINC,E}},{{0x0,0x1,0x6,0x0,0x6,0xd,B30|RSINC,B30|RDINC,E}} EOP,
-  NEW_SOP(O(O_LDMAC,SL),1,2,"ldmac"),{{RS32,MACREG,E}},{{0x0,0x3,MACREG,RS32,E}} EOP,
-  NEW_SOP(O(O_STMAC,SL),1,2,"stmac"),{{MACREG,RD32,E}},{{0x0,0x2,MACREG,RD32,E}} EOP,
+  NEW_SOP(O(O_LDMAC,SL),1,2,"ldmac"),{{RS32,MD32,E}},{{0x0,0x3,MD32,RS32,E}} EOP,
+  NEW_SOP(O(O_STMAC,SL),1,2,"stmac"),{{MS32,RD32,E}},{{0x0,0x2,MS32,RD32,E}} EOP,  
   NEW_SOP(O(O_LDM,SL),0,6,"ldm.l"),{{RSINC, RS32, E}},{{ 0x0,0x1,IGNORE,0x0,0x6,0xD,0x7,IGNORE,E}}EOP,
   NEW_SOP(O(O_STM,SL),0,6,"stm.l"),{{RS32, RDDEC, E}},{{0x0,0x1,IGNORE,0x0,0x6,0xD,0xF,IGNORE,E}}EOP,
   {0, 0, 0, NULL, {{0,0,0}}, {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}}

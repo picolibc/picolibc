@@ -143,7 +143,7 @@ START_RELOC_NUMBERS (elf_ppc64_reloc_type)
 
 END_RELOC_NUMBERS (R_PPC64_max)
 
-#define IS_TLS_RELOC(R) \
+#define IS_PPC64_TLS_RELOC(R) \
   ((R) >= R_PPC64_TLS && (R) <= R_PPC64_DTPREL16_HIGHESTA)
 
 /* Specify the start of the .glink section.  */

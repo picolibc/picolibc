@@ -1,3 +1,104 @@
+2003-03-05  David Carlton  <carlton@math.stanford.edu>
+
+	* Merge with mainline.  Tag is carlton_dictionary-20030305-merge.
+
+2003-03-04  Daniel Jacobowitz  <drow@mvista.com>
+	
+	* configure.in: Include $(build_tooldir)/sys-include in
+	FLAGS_FOR_TARGET.
+	* configure: Regenerated.
+
+2003-03-04  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Reindent.
+	* Makefile.in: Regenerate.
+	* configure.in: Reindent.  Don't set unused variables.
+	* configure: Regenerate.
+
+	* Makefile.tpl: Always pass down RANLIB.
+	* Makefile.in: Regenerate.
+
+	* Makefile.tpl: Don't set unused enable_shared, enable_threads macros.
+	* Makefile.in: Regenerate.
+	* configure.in: Remove unused logic relating to --enable-shared
+	and --enable-threads.  Remove bogus comments.  Remove redundant
+	noconfigdirs.
+	* configure: Regenerate.
+
+	* configure.in: Replace ${libstdcxx_version} by its value.
+	Remove reference to mh-dgux.
+	* configure: Regenerate.
+
+2003-02-28  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Rearrange.
+	* Makefile.in: Regenerate.
+
+2003-02-25  Nick Clifton  <nickc@redhat.com>
+
+	* configure: Remove site-file supprot - it is obsolete.
+
+2003-02-24  Uwe Stieber <uwe@wwws.de>
+
+	* configure.in: Add support for kaOS as cross build target system.
+	* configure: Regenerated.
+
+2003-02-20  Sean McNeil  <sean@blue.mcneil.com>
+
+	* Makefile.tpl: Add definition of CPPFLAGS to pass into
+	configure-target-* as some target builds may require additional
+	flags for preprocessor tests.
+	* Makefile.in: Regenerated.
+
+2003-02-19  Alexandre Oliva  <aoliva@redhat.com>
+
+	* libtool.m4 (LD): Append -melf* option to LD on IRIX with GNU ld.
+	* ltconfig: Handle it.
+	* ltcf-cxx.sh: Use with_gnu_ld passed as a shell variable instead of
+	auto-detecting it.
+
+2003-02-19  Alexandre Oliva  <aoliva@redhat.com>
+
+	* ltcf-cxx.sh: Replace $linker_flags with $compiler_flags wherever
+	it is used as argument to $CC.
+	* ltcf-gcj.sh: Likewise.
+
+2003-02-19  Alexandre Oliva  <aoliva@redhat.com>
+
+	* configure.in: Introduce --enable-maintainer-mode.
+	* configure: Rebuilt.
+	* Makefile.tpl (Makefile.in, configure): Enable dependencies only
+	for maintainer mode.
+	* Makefile.in: Rebuilt.
+
+2003-02-19  Andrew Cagney <ac131313@redhat.com>
+
+	* configure: Regenerate using autoconf 2.13.
+
+2003-02-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* config.guess: Import latest version.
+	* config.sub: Import latest version.
+
+2003-02-18  Jason Merrill  <jason@redhat.com>
+
+	* Makefile.tpl (check-c++): Allow parallelism.
+
+2003-02-17  Andrew Cagney  <ac131313@redhat.com>
+
+	* configure: Regenerate using autoconf 000227.
+
+2003-02-15  Geoffrey Keating  <geoffk@apple.com>
+
+	* configure.in (*-*-darwin*): Rename from powerpc*-*-darwin*,
+	don't configure target-libobjc.
+	* configure: Regenerate.
+
+2003-02-14  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
+
+	* Makefile.tpl (RANLIB): Define.
+	* Makefile.in: Regenerate.
+
 2003-02-06  Keith R Seitz  <keiths@redhat.com>
 
 	* Makefile.def: Remove "snavigator", "grep", and "db" modules.
