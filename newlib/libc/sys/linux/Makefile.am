@@ -9,7 +9,8 @@ SUBLIBS = $(LINUX_MACH_LIB)
 
 LIB_SOURCES = \
 	brk.c getoptlong.c ids.c inode.c io.c linux.c process.c realpath.c \
-	select.c signal.c socket.c sleep.c stack.c sysconf.c systat.c termios.c time.c \
+	select.c signal.c siglongjmp.c socket.c sleep.c stack.c \
+	sysconf.c systat.c termios.c time.c \
 	usleep.c wait.c
 
 # This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)

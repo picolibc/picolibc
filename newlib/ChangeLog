@@ -1,3 +1,11 @@
+2002-04-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/include/setjmp.h: Add sigjmp_buf type,
+	siglongjmp prototype, and sigsetjmp macro definition.
+	* libc/sys/linux/siglongjmp.c: New file.
+	* libc/sys/linux/Makefile.am: Add support for siglongjmp.
+	* libc/sys/linux/Makefile.in: Regenerated.
+
 2002-04-04  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.am: Add support for installing crt1.o if one exists.

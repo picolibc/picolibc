@@ -94,7 +94,8 @@ SUBLIBS = $(LINUX_MACH_LIB)
 
 LIB_SOURCES = \
 	brk.c getoptlong.c ids.c inode.c io.c linux.c process.c realpath.c \
-	select.c signal.c socket.c sleep.c stack.c sysconf.c systat.c termios.c time.c \
+	select.c signal.c siglongjmp.c socket.c sleep.c stack.c \
+	sysconf.c systat.c termios.c time.c \
 	usleep.c wait.c
 
 
@@ -127,16 +128,16 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  brk.o getoptlong.o ids.o inode.o \
 @USE_LIBTOOL_FALSE@io.o linux.o process.o realpath.o select.o signal.o \
-@USE_LIBTOOL_FALSE@socket.o sleep.o stack.o sysconf.o systat.o \
-@USE_LIBTOOL_FALSE@termios.o time.o usleep.o wait.o
+@USE_LIBTOOL_FALSE@siglongjmp.o socket.o sleep.o stack.o sysconf.o \
+@USE_LIBTOOL_FALSE@systat.o termios.o time.o usleep.o wait.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = 
 @USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  brk.lo getoptlong.lo ids.lo \
 @USE_LIBTOOL_TRUE@inode.lo io.lo linux.lo process.lo realpath.lo \
-@USE_LIBTOOL_TRUE@select.lo signal.lo socket.lo sleep.lo stack.lo \
-@USE_LIBTOOL_TRUE@sysconf.lo systat.lo termios.lo time.lo usleep.lo \
-@USE_LIBTOOL_TRUE@wait.lo
+@USE_LIBTOOL_TRUE@select.lo signal.lo siglongjmp.lo socket.lo sleep.lo \
+@USE_LIBTOOL_TRUE@stack.lo sysconf.lo systat.lo termios.lo time.lo \
+@USE_LIBTOOL_TRUE@usleep.lo wait.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
