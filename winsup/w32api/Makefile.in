@@ -58,7 +58,7 @@ FLAGS_TO_PASS = \
 SUBDIRS = lib
 
 PACKAGE = w32api
-VERSION = 0.3
+VERSION = 0.4
 
 DIST_FILES = Makefile.in configure.in configure config.guess config.sub \
 install-sh README ChangeLog TODO CONTRIBUTIONS
@@ -83,7 +83,9 @@ install uninstall:
 
 distdir = $(PACKAGE)-$(VERSION)
 
-dist:
+dist: srcdist bindist
+
+srcdist:
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 755 $(distdir)
@@ -109,17 +111,16 @@ Makefile: Makefile.in config.status configure
 
 mostlyclean-top:
 	rm -f *~
-clean-top:
+clean-top: mostlyclean-top
 	rm -rf $(distdir)
+	rm -f $(distdir)*.tar.gz
 maintainer-clean-top:
 
 mostlyclean: mostlyclean-top mostlyclean-subdirs
 clean: mostlyclean-top clean-subdirs
 distclean: clean-top
 	rm -f Makefile config.status config.log config.cache TAGS *~
-	rm -f include/*~
-	rm -f $(distdir)*.tar.gz
 	$(MAKE) -C lib distclean
 maintainer-clean: maintainer-clean-subdirs
 
-.PHONY: lib test
+.PHONY: lib test 

@@ -1,3 +1,16 @@
+2000-11-06  Earnie Boyd  <earnie_boyd@yahoo.com>
+
+	* Makefile.in: increment VERSION.  
+	(dist:) Rename to srcdist.  Create new dist target to call
+	srcdist and bindist targets.
+	(srcdist:) New target.
+	(clean-top:) add call to mostlyclean-top and add rm of distribution
+	tarballs.
+	* lib/Makefile.in: (uninstall:) modify to remove files from the
+	new w32api subdirectory and to remove w32api subdirectory.
+	(xuninstall:) Ditto.
+	TODO: Add a task to redo the clean targets of Makefile.in
+
 Fri Nov  3 21:50:47 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* lib/Makefile.in: Install header files in w32api subdirectory.

@@ -150,8 +150,9 @@ xuninstall-libraries:
 
 xuninstall-headers:
 	@for i in $(HEADERS); do \
-		rm -f $(tooldir)/include/$$i ; \
+		rm -r $(tooldir)/include/w32api/$$i ; \
 	done
+	rmdir $(tooldir)/include/w32api
 
 # install headers and libraries 
 install: install-libraries install-headers
@@ -179,8 +180,9 @@ uninstall-libraries:
 
 uninstall-headers:
 	@for i in $(HEADERS); do \
-		rm -f $(exec_prefix)/include/$$i ; \
+		rm -f $(exec_prefix)/include/w32api/$$i ; \
 	done
+	rmdir $(exec_prefix)/include/w32api
 
 dist:
 	mkdir $(distdir)/include

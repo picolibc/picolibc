@@ -1,3 +1,5 @@
+Makefile.in: Need to redo the clean targets
+
 **Check to see if the rest of this is still valid?**
 
 winsock2.h - Possible to merge with winsock.h?
