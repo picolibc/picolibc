@@ -22,7 +22,7 @@ details. */
  * destructor and then free(3).
  */
 
-#include <new.h>
+#include <new>
 #include <stdlib.h>
 
 #define safe_new0(T) (new (malloc (sizeof (T))) T)
