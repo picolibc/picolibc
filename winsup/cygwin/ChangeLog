@@ -1,3 +1,10 @@
+2002-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	Patch suggested by Pierre A. Humblet <Pierre.Humblet@ieee.org>:
+	* uinfo.cc (internal_getlogin): Try evaluating user by SID even if
+	ntsec is off.
+	(uinfo_init): Set primary group even if ntsec is off.
+
 2002-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/grp.h: New file.
