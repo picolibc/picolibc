@@ -53,9 +53,9 @@ typedef struct
 /* The floating point environment set by MSVCRT _fpreset (53-bit mantissa) */
 #define FE_PC53_ENV ((const fenv_t *)-2)
 
-/* The FE_DFL_ENV macro is required by standard. *
-/* For now, define the MSVCRT version as default. */
-#define FE_DFL_ENV FE_PC53_ENV
+/* The FE_DFL_ENV macro is required by standard.
+  fesetenv will use the environment set at app startup.*/
+#define FE_DFL_ENV ((const fenv_t *) 0)
 
 #ifndef RC_INVOKED
 #ifdef __cplusplus

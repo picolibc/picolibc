@@ -1,3 +1,25 @@
+2002-04-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* crt1.c: Revert changes of 2002-04-16. Use _fpreset again.
+	* msvcrt.def (_fpreset): Mark as DATA so that only
+	_imp___fpreset is exported.
+	* msvcrt20.def (_fpreset): Likewise.
+	* msvcrt40.def (_fpreset): Likewise.
+	* crtdll.def (_fpreset): Likewise.
+	* CRT_fp10.c (_fpreset): Overide library _fpreset with one
+	that calls fninit.
+	(fpreset): Add alias.
+	(__CRT_PC): Delete definition. _fpreset does it now.
+	*  CRT_fp8.c (_fpreset): Force use of library _imp___fpreset.
+	(fpreset): Add alias.
+	(__CRT_PC): Delete definition.
+	* moldname.def.in: Comment out fpreset.
+	* moldname-msvcrt.def: Regenerate.
+	* moldname-crtdll.def: Regenerate.
+	* include/fenv.h (FE_DFL_ENV): Define as (fenv_t*)0.
+	* mingwex/fesetenv.c (FE_DFL_ENV): Use it to set environment
+	with the _fpreset determined by startup CRT_fp object.
+
 2002-04-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* CRT_fp8.c: New file.

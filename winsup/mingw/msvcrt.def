@@ -210,7 +210,7 @@ _flushall
 _fmode DATA
 _fpclass
 _fpieee_flt
-_fpreset
+_fpreset DATA
 _fputchar
 _fputwchar
 _fsopen

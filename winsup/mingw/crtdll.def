@@ -285,7 +285,7 @@ _flushall
 _fmode_dll DATA
 _fpclass
 _fpieee_flt
-_fpreset
+_fpreset DATA
 _fputchar
 _fputwchar
 _fsopen
