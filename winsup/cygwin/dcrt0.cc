@@ -678,6 +678,9 @@ dll_crt0_1 ()
   }
 #endif
 
+  /* Init global well known SID objects */
+  cygsid::init ();
+
   /* Initialize our process table entry. */
   pinfo_init (envp, envc);
 
@@ -686,9 +689,6 @@ dll_crt0_1 ()
 
   /* Allocate cygheap->fdtab */
   dtable_init ();
-
-  /* Init global well known SID objects */
-  cygsid::init ();
 
   /* Initialize user info. */
   uinfo_init ();

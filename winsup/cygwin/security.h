@@ -256,9 +256,11 @@ SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
 
 /* Various types of security attributes for use in Create* functions. */
 extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
-extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
+extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, 
+						  DWORD access2, BOOL inherit)
   __attribute__ ((regparm (3)));
-extern BOOL sec_acl (PACL acl, BOOL admins, PSID sid1 = NO_SID, PSID sid2 = NO_SID);
+extern BOOL sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID, 
+		     PSID sid2 = NO_SID, DWORD access2 = 0);
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
@@ -266,14 +268,14 @@ PSECURITY_DESCRIPTOR alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 	  PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
 
 extern inline SECURITY_ATTRIBUTES *
-sec_user_nih (char sa_buf[], PSID sid = NULL)
+sec_user_nih (char sa_buf[], PSID sid1 = NULL, PSID sid2 = NULL, DWORD access2 = 0)
 {
-  return allow_ntsec ? __sec_user (sa_buf, sid, FALSE) : &sec_none_nih;
+  return __sec_user (sa_buf, sid1, sid2, access2, FALSE);
 }
 
 extern inline SECURITY_ATTRIBUTES *
-sec_user (char sa_buf[], PSID sid = NULL)
+sec_user (char sa_buf[], PSID sid1 = NULL, PSID sid2 = NULL, DWORD access2 = 0)
 {
-  return allow_ntsec ? __sec_user (sa_buf, sid, TRUE) : &sec_none;
+  return __sec_user (sa_buf, sid1, sid2, access2, TRUE);
 }
 #endif /*_SECURITY_H*/

@@ -906,7 +906,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     goto out;
 
   /* Create default dacl. */
-  if (!sec_acl ((PACL) acl_buf, FALSE,
+  if (!sec_acl ((PACL) acl_buf, false, false,
 		tmp_gsids.contains (well_known_admins_sid) ?
 		well_known_admins_sid : usersid))
     goto out;
@@ -926,7 +926,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   else
     {
       /* Set security descriptor and primary group */
-      psa = __sec_user (sa_buf, usersid, TRUE);
+      psa = sec_user (sa_buf, usersid);
       if (psa->lpSecurityDescriptor &&
 	  !SetSecurityDescriptorGroup ((PSECURITY_DESCRIPTOR)
 				       psa->lpSecurityDescriptor,

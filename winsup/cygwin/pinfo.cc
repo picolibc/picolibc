@@ -164,7 +164,11 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	}
       else
 	{
-	  h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_all_nih,
+	  char sa_buf[1024];
+	  PSECURITY_ATTRIBUTES sec_attribs =
+	    sec_user_nih (sa_buf, cygheap->user.sid(), well_known_world_sid,
+			  FILE_MAP_READ | FILE_MAP_WRITE); /* FIXME */
+	  h = CreateFileMapping (INVALID_HANDLE_VALUE, sec_attribs,
 				 PAGE_READWRITE, 0, mapsize, mapname);
 	  created = h && GetLastError () != ERROR_ALREADY_EXISTS;
 	}

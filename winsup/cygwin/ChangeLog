@@ -1,3 +1,22 @@
+2003-09-15  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.h (__sec_user): Add "access2" argument.
+	(sec_acl): Add "original" and "access2" arguments.
+	(sec_user): Add "sid2" and "access2" argument. Remove dependence on 
+	allow_ntsec.
+	(sec_user_nih): Ditto.
+	* sec_helper.cc (__sec_user): Add "has_security" test.
+	Call sec_acl with new arguments, letting it handle original_sid.
+	(sec_acl): Add "original" and "access2" arguments. Handle original_sid 
+	depending on flag but avoiding duplicates. Use "access2" for sid2.
+	* pinfo.cc (pinfo::init): Use security attributes created by sec_user
+	when creating the mapping.
+	* security.cc (create_token): Adjust arguments in call to sec_acl.
+	Call sec_user instead of __sec_user.
+	* syscall.cc (seteuid32):  Adjust arguments in call to sec_acl. Remove 
+	now unnecessary test. Remove useless conversions to psid.
+	* dcrt0.cc (dll_crt0_1): Call cygsid::init before pinfo_init.
+
 2003-09-13  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Make malloc_wrapper -fomit-frame-pointer.

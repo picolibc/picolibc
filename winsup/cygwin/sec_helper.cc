@@ -372,23 +372,29 @@ get_null_sd ()
 }
 
 BOOL
-sec_acl (PACL acl, BOOL admins, PSID sid1, PSID sid2)
+sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD access2)
 {
   size_t acl_len = MAX_DACL_LEN(5);
+  cygpsid psid;
 
   if (!InitializeAcl (acl, acl_len, ACL_REVISION))
     {
       debug_printf ("InitializeAcl %E");
       return FALSE;
     }
-  if (sid2)
-    if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			      GENERIC_ALL, sid2))
-      debug_printf ("AddAccessAllowedAce(sid2) %E");
   if (sid1)
     if (!AddAccessAllowedAce (acl, ACL_REVISION,
 			      GENERIC_ALL, sid1))
       debug_printf ("AddAccessAllowedAce(sid1) %E");
+  if (original && (psid = cygheap->user.orig_sid ())
+      && psid != sid1 && psid != well_known_system_sid)
+    if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			      GENERIC_ALL, psid))
+      debug_printf ("AddAccessAllowedAce(original) %E");
+  if (sid2)
+    if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			      access2, sid2))
+      debug_printf ("AddAccessAllowedAce(sid2) %E");
   if (admins)
     if (!AddAccessAllowedAce (acl, ACL_REVISION,
 			      GENERIC_ALL, well_known_admins_sid))
@@ -396,26 +402,18 @@ sec_acl (PACL acl, BOOL admins, PSID sid1, PSID sid2)
   if (!AddAccessAllowedAce (acl, ACL_REVISION,
 			    GENERIC_ALL, well_known_system_sid))
     debug_printf ("AddAccessAllowedAce(system) %E");
-#if 0 /* Does not seem to help */
-  if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			    GENERIC_ALL, well_known_creator_owner_sid))
-    debug_printf ("AddAccessAllowedAce(creator_owner) %E");
-#endif
   return TRUE;
 }
 
 PSECURITY_ATTRIBUTES __stdcall
-__sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
+__sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
 {
   PSECURITY_ATTRIBUTES psa = (PSECURITY_ATTRIBUTES) sa_buf;
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR)
 			     ((char *) sa_buf + sizeof (*psa));
   PACL acl = (PACL) ((char *) sa_buf + sizeof (*psa) + sizeof (*psd));
 
-  cygsid sid;
-
-  if (!(sid = cygheap->user.orig_sid ()) ||
-	  (!sec_acl (acl, TRUE, sid, sid2)))
+  if (!wincap.has_security () || !sec_acl (acl, true, true, sid1, sid2, access2))
     return inherit ? &sec_none : &sec_none_nih;
 
   if (!InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION))
