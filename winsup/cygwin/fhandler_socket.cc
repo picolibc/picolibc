@@ -34,15 +34,22 @@
 #include "wsock_event.h"
 #include <unistd.h>
 
-#define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
-#define ENTROPY_SOURCE_NAME "/dev/urandom"
-
 extern bool fdsock (cygheap_fdmanip& fd, const device *, SOCKET soc);
 extern "C" {
 int sscanf (const char *, const char *, ...);
 } /* End of "C" section */
 
 fhandler_dev_random* entropy_source;
+
+static void
+secret_event_name (char *buf, short port, int *secret_ptr)
+{
+  __small_sprintf (buf, "%scygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x",
+		   wincap.has_terminal_services () ? "Global\\" : "",
+  		   port,
+		   secret_ptr [0], secret_ptr [1],
+		   secret_ptr [2], secret_ptr [3]);
+}
 
 /* cygwin internal: map sockaddr into internet domain address */
 static int
@@ -219,7 +226,7 @@ fhandler_socket::set_connect_secret ()
       delete entropy_source;
       entropy_source = NULL;
     }
-  if (!entropy_source)
+  if (entropy_source)
     {
       size_t len = sizeof (connect_secret);
       entropy_source->read (connect_secret, len);
@@ -239,8 +246,6 @@ fhandler_socket::get_connect_secret (char* buf)
 HANDLE
 fhandler_socket::create_secret_event (int* secret)
 {
-  char buf [128];
-  int* secret_ptr = (secret ? : connect_secret);
   struct sockaddr_in sin;
   int sin_len = sizeof (sin);
 
@@ -250,13 +255,12 @@ fhandler_socket::create_secret_event (int* secret)
       return NULL;
     }
 
-  __small_sprintf (buf, SECRET_EVENT_NAME, sin.sin_port,
-		   secret_ptr [0], secret_ptr [1],
-		   secret_ptr [2], secret_ptr [3]);
+  char event_name[MAX_PATH];
+  secret_event_name (event_name, sin.sin_port, secret ?: connect_secret);
   LPSECURITY_ATTRIBUTES sec = get_inheritance (true);
-  secret_event = CreateEvent (sec, FALSE, FALSE, buf);
+  secret_event = CreateEvent (sec, FALSE, FALSE, event_name);
   if (!secret_event && GetLastError () == ERROR_ALREADY_EXISTS)
-    secret_event = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
+    secret_event = OpenEvent (EVENT_ALL_ACCESS, FALSE, event_name);
 
   if (!secret_event)
     /* nothing to do */;
@@ -291,18 +295,15 @@ fhandler_socket::close_secret_event ()
 int
 fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
 {
-  char buf [128];
-  HANDLE ev;
-  int* secret_ptr = (secret ? : connect_secret);
 
-  __small_sprintf (buf, SECRET_EVENT_NAME, peer->sin_port,
-		  secret_ptr [0], secret_ptr [1],
-		  secret_ptr [2], secret_ptr [3]);
-  ev = CreateEvent (&sec_all_nih, FALSE, FALSE, buf);
+  char event_name[MAX_PATH];
+  
+  secret_event_name (event_name, peer->sin_port, secret ?: connect_secret);
+  HANDLE ev = CreateEvent (&sec_all_nih, FALSE, FALSE, event_name);
   if (!ev && GetLastError () == ERROR_ALREADY_EXISTS)
     {
-      debug_printf ("event \"%s\" already exists", buf);
-      ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
+      debug_printf ("event \"%s\" already exists", event_name);
+      ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, event_name);
     }
 
   signal_secret_event ();
@@ -433,14 +434,14 @@ fhandler_socket::fstat (struct __stat64 *buf)
       if (get_socket_type ()) /* fstat */
 	{
 	  buf->st_dev = 0;
-	  buf->st_ino = (ino_t) get_handle ();
+	  buf->st_ino = (__ino64_t) ((DWORD) get_handle ());
 	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
 	}
       else
 	{
 	  path_conv spc ("/dev", PC_SYM_NOFOLLOW | PC_NULLEMPTY, NULL);
 	  buf->st_dev = spc.volser ();
-	  buf->st_ino = (ino_t) get_namehash ();
+	  buf->st_ino = get_namehash ();
 	  buf->st_mode &= ~S_IRWXO;
 	  buf->st_rdev = (get_device () << 16) | get_unit ();
 	}
@@ -553,7 +554,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
 
-  if (!is_nonblocking () && !is_connect_pending ())
+  if (winsock2_active && !is_nonblocking () && !is_connect_pending ())
     if (!evt.load (get_socket (), FD_CONNECT_BIT))
       {
 	set_winsock_errno ();
@@ -562,7 +563,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
   res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
 
-  if (res && !is_nonblocking () && !is_connect_pending () &&
+  if (winsock2_active && res && !is_nonblocking () && !is_connect_pending () &&
       WSAGetLastError () == WSAEWOULDBLOCK)
     switch (evt.wait ())
       {
@@ -673,7 +674,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
     *len = sizeof (struct sockaddr_in);
 
-  if (!is_nonblocking ())
+  if (winsock2_active && !is_nonblocking ())
     {
       sock_event evt;
       if (!evt.load (get_socket (), FD_ACCEPT_BIT))

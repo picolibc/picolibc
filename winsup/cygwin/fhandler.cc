@@ -27,6 +27,7 @@ details. */
 #include "pinfo.h"
 #include <assert.h>
 #include <limits.h>
+#include <winioctl.h>
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
@@ -160,7 +161,7 @@ is_at_eof (HANDLE h, DWORD err)
   DWORD size, upper1, curr;
 
   size = GetFileSize (h, &upper1);
-  if (upper1 != 0xffffffff || GetLastError () == NO_ERROR)
+  if (size != INVALID_FILE_SIZE || GetLastError () == NO_ERROR)
     {
       LONG upper2 = 0;
       curr = SetFilePointer (h, 0, &upper2, FILE_CURRENT);
@@ -581,47 +582,75 @@ fhandler_base::write (const void *ptr, size_t len)
 
   if (get_append_p ())
     SetFilePointer (get_output_handle (), 0, 0, FILE_END);
-  else if (wincap.has_lseek_bug () && get_check_win95_lseek_bug ())
+  else if (get_did_lseek ())
     {
-      /* Note: this bug doesn't happen on NT4, even though the documentation
-	 for WriteFile() says that it *may* happen on any OS. */
-      int actual_length, current_position;
-      set_check_win95_lseek_bug (0); /* don't do it again */
-      actual_length = GetFileSize (get_output_handle (), NULL);
-      current_position = SetFilePointer (get_output_handle (), 0, 0, FILE_CURRENT);
+      _off64_t actual_length, current_position;
+      DWORD size_high = 0;
+      LONG pos_high = 0;
+
+      set_did_lseek (0); /* don't do it again */
+
+      actual_length = GetFileSize (get_output_handle (), &size_high);
+      actual_length += ((_off64_t) size_high) << 32;
+
+      current_position = SetFilePointer (get_output_handle (), 0, &pos_high,
+					 FILE_CURRENT);
+      current_position += ((_off64_t) pos_high) << 32;
+
       if (current_position > actual_length)
 	{
-	  /* Oops, this is the bug case - Win95 uses whatever is on the disk
-	     instead of some known (safe) value, so we must seek back and
-	     fill in the gap with zeros. - DJ */
-	  char zeros[512];
-	  int number_of_zeros_to_write = current_position - actual_length;
-	  memset (zeros, 0, 512);
-	  SetFilePointer (get_output_handle (), 0, 0, FILE_END);
-	  while (number_of_zeros_to_write > 0)
+	  if ((get_fs_flags (FILE_SUPPORTS_SPARSE_FILES))
+	      && current_position >= actual_length + (64 * 1024))
 	    {
-	      DWORD zeros_this_time = (number_of_zeros_to_write > 512
-				     ? 512 : number_of_zeros_to_write);
-	      DWORD written;
-	      if (!WriteFile (get_output_handle (), zeros, zeros_this_time, &written,
-			      NULL))
+	      /* If the file systemn supports sparse files and the application
+	         is writing after a long seek beyond EOF, convert the file to
+		 a sparse file. */
+	      DWORD dw;
+	      HANDLE h = get_output_handle ();
+	      BOOL r = DeviceIoControl (h, FSCTL_SET_SPARSE, NULL, 0, NULL,
+	      				0, &dw, NULL);
+	      syscall_printf ("%d = DeviceIoControl(0x%x, FSCTL_SET_SPARSE, "
+			      "NULL, 0, NULL, 0, &dw, NULL)", r, h);
+	    }
+	  else if (wincap.has_lseek_bug ())
+	    {
+	      /* Oops, this is the bug case - Win95 uses whatever is on the
+	         disk instead of some known (safe) value, so we must seek
+		 back and fill in the gap with zeros. - DJ
+	         Note: this bug doesn't happen on NT4, even though the
+	         documentation for WriteFile() says that it *may* happen
+		 on any OS. */
+	      char zeros[512];
+	      int number_of_zeros_to_write = current_position - actual_length;
+	      memset (zeros, 0, 512);
+	      SetFilePointer (get_output_handle (), 0, NULL, FILE_END);
+	      while (number_of_zeros_to_write > 0)
 		{
-		  __seterrno ();
-		  if (get_errno () == EPIPE)
-		    raise (SIGPIPE);
-		  /* This might fail, but it's the best we can hope for */
-		  SetFilePointer (get_output_handle (), current_position, 0, FILE_BEGIN);
-		  return -1;
+		  DWORD zeros_this_time = (number_of_zeros_to_write > 512
+					 ? 512 : number_of_zeros_to_write);
+		  DWORD written;
+		  if (!WriteFile (get_output_handle (), zeros, zeros_this_time,
+				  &written, NULL))
+		    {
+		      __seterrno ();
+		      if (get_errno () == EPIPE)
+			raise (SIGPIPE);
+		      /* This might fail, but it's the best we can hope for */
+		      SetFilePointer (get_output_handle (), current_position, NULL,
+				      FILE_BEGIN);
+		      return -1;
 
+		    }
+		  if (written < zeros_this_time) /* just in case */
+		    {
+		      set_errno (ENOSPC);
+		      /* This might fail, but it's the best we can hope for */
+		      SetFilePointer (get_output_handle (), current_position, NULL,
+				      FILE_BEGIN);
+		      return -1;
+		    }
+		  number_of_zeros_to_write -= written;
 		}
-	      if (written < zeros_this_time) /* just in case */
-		{
-		  set_errno (ENOSPC);
-		  /* This might fail, but it's the best we can hope for */
-		  SetFilePointer (get_output_handle (), current_position, 0, FILE_BEGIN);
-		  return -1;
-		}
-	      number_of_zeros_to_write -= written;
 	    }
 	}
     }
@@ -847,7 +876,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
     {
       /* When next we write(), we will check to see if *this* seek went beyond
 	 the end of the file, and back-seek and fill with zeros if so - DJ */
-      set_check_win95_lseek_bug ();
+      set_did_lseek ();
 
       /* If this was a SEEK_CUR with offset 0, we still might have
 	 readahead that we have to take into account when calculating
@@ -1138,6 +1167,7 @@ fhandler_base::fhandler_base ():
   raixput (0),
   rabuflen (0),
   open_status (0),
+  fs_flags (0),
   read_state (NULL)
 {
 }

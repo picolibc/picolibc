@@ -25,9 +25,10 @@ enum
   FH_SYMLINK	= 0x00100000,	/* is a symlink */
   FH_EXECABL	= 0x00200000,	/* file looked like it would run:
 				 * ends in .exe or .bat or begins with #! */
-  FH_W95LSBUG	= 0x00400000,	/* set when lseek is called as a flag that
+  FH_LSEEKED	= 0x00400000,	/* set when lseek is called as a flag that
 				 * _write should check if we've moved beyond
-				 * EOF, zero filling if so. */
+				 * EOF, zero filling or making file sparse
+				   if so. */
   FH_NOHANDLE	= 0x00800000,	/* No handle associated with fhandler. */
   FH_NOEINTR	= 0x01000000,	/* Set if I/O should be uninterruptible. */
   FH_FFIXUP	= 0x02000000,	/* Set if need to fixup after fork. */
@@ -104,7 +105,7 @@ class fhandler_base
   int access;
   HANDLE io_handle;
 
-  unsigned long namehash;	/* hashed filename, used as inode num */
+  __ino64_t namehash;	/* hashed filename, used as inode num */
 
  protected:
   /* Full unix path name of this file */
@@ -118,6 +119,7 @@ class fhandler_base
   size_t rabuflen;
 
   DWORD open_status;
+  DWORD fs_flags;
   HANDLE read_state;
   path_conv pc;
 
@@ -192,8 +194,8 @@ class fhandler_base
       return get_close_on_exec () ? &sec_none_nih : &sec_none;
   }
 
-  void set_check_win95_lseek_bug (int b = 1) { FHCONDSETF (b, W95LSBUG); }
-  bool get_check_win95_lseek_bug () { return FHISSETF (W95LSBUG); }
+  void set_did_lseek (int b = 1) { FHCONDSETF (b, LSEEKED); }
+  bool get_did_lseek () { return FHISSETF (LSEEKED); }
 
   bool get_need_fork_fixup () { return FHISSETF (FFIXUP); }
   void set_need_fork_fixup () { FHSETF (FFIXUP); }
@@ -226,6 +228,10 @@ class fhandler_base
   void set_append_p (int val) { FHCONDSETF (val, APPEND); }
   void set_append_p () { FHSETF (APPEND); }
 
+  void set_fs_flags (DWORD flags) { fs_flags = flags; }
+  bool get_fs_flags (DWORD flagval = 0xffffffffUL)
+    { return (fs_flags & (flagval)); }
+
   bool get_query_open () { return FHISSETF (QUERYOPEN); }
   void set_query_open (bool val) { FHCONDSETF (val, QUERYOPEN); }
 
@@ -250,7 +256,7 @@ class fhandler_base
 
   const char *get_name () const { return pc.normalized_path; }
   const char *get_win32_name () { return pc.get_win32 (); }
-  unsigned long get_namehash () { return namehash; }
+  __ino64_t get_namehash () { return namehash; }
 
   virtual void hclose (HANDLE h) {CloseHandle (h);}
   virtual void set_inheritance (HANDLE &h, int not_inheriting);

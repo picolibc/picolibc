@@ -502,6 +502,7 @@ LoadDLLfuncEx (CreateHardLinkA, 12, kernel32, 1)
 LoadDLLfuncEx (CreateToolhelp32Snapshot, 8, kernel32, 1)
 LoadDLLfuncEx2 (GetCompressedFileSizeA, 8, kernel32, 1, 0xffffffff)
 LoadDLLfuncEx (GetConsoleWindow, 0, kernel32, 1)
+LoadDLLfuncEx (GetDiskFreeSpaceEx, 16, kernel32, 1)
 LoadDLLfuncEx (GetSystemTimes, 12, kernel32, 1)
 LoadDLLfuncEx2 (IsDebuggerPresent, 0, kernel32, 1, 1)
 LoadDLLfunc (IsProcessorFeaturePresent, 4, kernel32);

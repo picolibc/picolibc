@@ -341,7 +341,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       return -1;
     }
 
-  syscall_printf ("spawn_guts (%d, %.132s)", mode, prog_arg);
+  syscall_printf ("spawn_guts (%d, %.9500s)", mode, prog_arg);
 
   if (argv == NULL)
     {
@@ -613,7 +613,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
 
-  syscall_printf ("null_app_name %d (%s, %.132s)", null_app_name, runpath, one_line.buf);
+  syscall_printf ("null_app_name %d (%s, %.9500s)", null_app_name, runpath, one_line.buf);
 
   void *newheap;
   /* Preallocated buffer for `sec_user' call */
@@ -727,7 +727,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     cygpid = myself->pid;
 
   /* We print the original program name here so the user can see that too.  */
-  syscall_printf ("%d = spawn_guts (%s, %.132s)",
+  syscall_printf ("%d = spawn_guts (%s, %.9500s)",
 		  rc ? cygpid : (unsigned int) -1, prog_arg, one_line.buf);
 
   /* Name the handle similarly to proc_subproc. */

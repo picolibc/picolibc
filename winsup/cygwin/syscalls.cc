@@ -1014,7 +1014,7 @@ static void
 stat64_to_stat32 (struct __stat64 *src, struct __stat32 *dst)
 {
   dst->st_dev = ((src->st_dev >> 8) & 0xff00) | (src->st_dev & 0xff);
-  dst->st_ino = src->st_ino;
+  dst->st_ino = ((unsigned) (src->st_ino >> 32)) | (unsigned) src->st_ino;
   dst->st_mode = src->st_mode;
   dst->st_nlink = src->st_nlink;
   dst->st_uid = src->st_uid;
@@ -1056,8 +1056,16 @@ fstat64 (int fd, struct __stat64 *buf)
   return res;
 }
 
-extern "C" int _fstat64 (int fd, _off64_t pos, int dir)
-  __attribute__ ((alias ("fstat64")));
+extern "C" int
+_fstat64_r (struct _reent *ptr, int fd, struct __stat64 *buf)
+{
+  int ret;
+
+  set_errno (0);
+  if ((ret = fstat64 (fd, buf)) == -1 && get_errno () != 0)
+    ptr->_errno = get_errno ();
+  return ret;
+}
 
 extern "C" int
 fstat (int fd, struct __stat32 *buf)
@@ -1069,8 +1077,16 @@ fstat (int fd, struct __stat32 *buf)
   return ret;
 }
 
-extern "C" int _fstat (int fd, _off64_t pos, int dir)
-  __attribute__ ((alias ("fstat")));
+extern "C" int
+_fstat_r (struct _reent *ptr, int fd, struct __stat32 *buf)
+{
+  int ret;
+
+  set_errno (0);
+  if ((ret = fstat (fd, buf)) == -1 && get_errno () != 0)
+    ptr->_errno = get_errno ();
+  return ret;
+}
 
 /* fsync: P96 6.6.1.1 */
 extern "C" int
@@ -1149,9 +1165,6 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
   return res;
 }
 
-extern "C" int _stat (int fd, _off64_t pos, int dir)
-  __attribute__ ((alias ("stat")));
-
 extern "C" int
 stat64 (const char *name, struct __stat64 *buf)
 {
@@ -1161,12 +1174,34 @@ stat64 (const char *name, struct __stat64 *buf)
 }
 
 extern "C" int
+_stat64_r (struct _reent *ptr, const char *name, struct __stat64 *buf)
+{
+  int ret;
+
+  set_errno (0);
+  if ((ret = stat64 (name, buf)) == -1 && get_errno () != 0)
+    ptr->_errno = get_errno ();
+  return ret;
+}
+
+extern "C" int
 stat (const char *name, struct __stat32 *buf)
 {
   struct __stat64 buf64;
   int ret = stat64 (name, &buf64);
   if (!ret)
     stat64_to_stat32 (&buf64, buf);
+  return ret;
+}
+
+extern "C" int
+_stat_r (struct _reent *ptr, const char *name, struct __stat32 *buf)
+{
+  int ret;
+
+  set_errno (0);
+  if ((ret = stat (name, buf)) == -1 && get_errno () != 0)
+    ptr->_errno = get_errno ();
   return ret;
 }
 
@@ -1862,13 +1897,27 @@ statfs (const char *fname, struct statfs *sfs)
 
   syscall_printf ("statfs %s", root);
 
-  DWORD spc, bps, freec, totalc;
+  /* GetDiskFreeSpaceEx must be called before GetDiskFreeSpace on
+     WinME, to avoid the MS KB 314417 bug */
+  ULARGE_INTEGER availb, freeb, totalb;
+  BOOL status = GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb);
+
+  DWORD spc, bps, availc, freec, totalc;
 
   if (!GetDiskFreeSpace (root, &spc, &bps, &freec, &totalc))
     {
       __seterrno ();
       return -1;
     }
+
+  if (status)
+    {
+      availc = availb.QuadPart / (spc*bps);
+      totalc = totalb.QuadPart / (spc*bps);
+      freec = freeb.QuadPart / (spc*bps);
+    }
+  else
+    availc = freec;
 
   DWORD vsn, maxlen, flags;
 
@@ -1880,7 +1929,8 @@ statfs (const char *fname, struct statfs *sfs)
   sfs->f_type = flags;
   sfs->f_bsize = spc*bps;
   sfs->f_blocks = totalc;
-  sfs->f_bfree = sfs->f_bavail = freec;
+  sfs->f_bavail = availc;
+  sfs->f_bfree = freec;
   sfs->f_files = -1;
   sfs->f_ffree = -1;
   sfs->f_fsid = vsn;
@@ -2571,7 +2621,9 @@ login (struct utmp *ut)
   pututline (ut);
   endutent ();
   /* Writing to wtmp must be atomic to prevent mixed up data. */
-  HANDLE mutex = CreateMutex (NULL, FALSE, shared_name ("wtmp_mutex", 0));
+  char mutex_name[MAX_PATH];
+  HANDLE mutex = CreateMutex (NULL, FALSE,
+			      shared_name (mutex_name, "wtmp_mutex", 0));
   if (mutex)
     while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
       ;
@@ -2609,7 +2661,9 @@ logout (char *line)
       memset (ut_buf.ut_user, 0, sizeof ut_buf.ut_user);
       time (&ut_buf.ut_time);
       /* Writing to wtmp must be atomic to prevent mixed up data. */
-      HANDLE mutex = CreateMutex (NULL, FALSE, shared_name ("wtmp_mutex", 0));
+      char mutex_name[MAX_PATH];
+      HANDLE mutex = CreateMutex (NULL, FALSE,
+      				  shared_name (mutex_name, "wtmp_mutex", 0));
       if (mutex)
 	while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
 	  ;
@@ -2778,7 +2832,9 @@ pututline (struct utmp *ut)
     return;
   /* Read/write to utmp must be atomic to prevent overriding data
      by concurrent processes. */
-  HANDLE mutex = CreateMutex (NULL, FALSE, shared_name ("utmp_mutex", 0));
+  char mutex_name[MAX_PATH];
+  HANDLE mutex = CreateMutex (NULL, FALSE,
+			      shared_name (mutex_name, "utmp_mutex", 0));
   if (mutex)
     while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
       ;

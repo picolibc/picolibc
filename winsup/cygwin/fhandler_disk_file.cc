@@ -26,7 +26,6 @@ details. */
 #include "pinfo.h"
 #include <assert.h>
 #include <ctype.h>
-#include <winioctl.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -106,6 +105,8 @@ int __stdcall
 fhandler_base::fstat_by_name (struct __stat64 *buf)
 {
   int res;
+  HANDLE handle;
+  WIN32_FIND_DATA local;
 
   if (!pc.exists ())
     {
@@ -113,41 +114,26 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
       set_errno (ENOENT);
       res = -1;
     }
+  else if (pc.isdir () && strlen (pc) <= strlen (pc.root_dir ()))
+    {
+      FILETIME ft = {};
+      res = fstat_helper (buf, ft, ft, ft, 0, 0);
+    }
+  else if ((handle = FindFirstFile (pc, &local)) == INVALID_HANDLE_VALUE)
+    {
+      debug_printf ("FindFirstFile failed for '%s', %E", (char *) pc);
+      __seterrno ();
+      res = -1;
+    }
   else
     {
-      char drivebuf[5];
-      char *name;
-      if ((pc)[3] != '\0' || !isalpha ((pc)[0]) || (pc)[1] != ':' || (pc)[2] != '\\')
-	name = pc;
-      else
-	{
-	  /* FIXME: Does this work on empty disks? */
-	  drivebuf[0] = pc[0];
-	  drivebuf[1] = pc[1];
-	  drivebuf[2] = pc[2];
-	  drivebuf[3] = '*';
-	  drivebuf[4] = '\0';
-	  name = drivebuf;
-	}
-
-      HANDLE h;
-      WIN32_FIND_DATA local;
-      if ((h = FindFirstFile (name, &local)) == INVALID_HANDLE_VALUE)
-	{
-	  debug_printf ("FindFirstFile failed for '%s', %E", name);
-	  __seterrno ();
-	  res = -1;
-	}
-      else
-	{
-	  FindClose (h);
-	  res = fstat_helper (buf,
-			      local.ftCreationTime,
-			      local.ftLastAccessTime,
-			      local.ftLastWriteTime,
-			      local.nFileSizeHigh,
-			      local.nFileSizeLow);
-	}
+      FindClose (handle);
+      res = fstat_helper (buf,
+			  local.ftCreationTime,
+			  local.ftLastAccessTime,
+			  local.ftLastWriteTime,
+			  local.nFileSizeHigh,
+			  local.nFileSizeLow);
     }
   return res;
 }
@@ -256,7 +242,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     case DRIVE_RAMDISK:
       /* Although the documentation indicates otherwise, it seems like
 	 "inodes" on these devices are persistent, at least across reboots. */
-      buf->st_ino = nFileIndexHigh | nFileIndexLow;
+      buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
+                    | (__ino64_t) nFileIndexLow;
       break;
     default:
       /* Either the nFileIndex* fields are unreliable or unavailable.  Use the
@@ -290,7 +277,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     {
       /* symlinks are everything for everyone! */
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
-      get_file_attribute (pc->has_acls (), get_win32_name (), NULL,
+      get_file_attribute (pc.has_acls (), get_win32_name (), NULL,
 			  &buf->st_uid, &buf->st_gid);
       goto done;
     }
@@ -425,18 +412,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
       && !allow_ntsec && allow_ntea)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
-  /* Set newly created and truncated files as sparse files. */
-  if ((pc.fs_flags () & FILE_SUPPORTS_SPARSE_FILES)
-      && (get_access () & GENERIC_WRITE) == GENERIC_WRITE)
-    {
-      DWORD dw;
-      HANDLE h = get_handle ();
-      BOOL r = DeviceIoControl (h , FSCTL_SET_SPARSE, NULL, 0, 	NULL, 0, &dw,
-				NULL);
-      syscall_printf ("%d = DeviceIoControl(0x%x, FSCTL_SET_SPARSE, NULL, 0, "
-		      "NULL, 0, &dw, NULL)", r, h);
-    }
-
+  set_fs_flags (pc.fs_flags ());
   set_symlink_p (pc.issymlink ());
   set_execable_p (pc.exec_state ());
   set_socket_p (pc.issocket ());

@@ -508,6 +508,8 @@ _ftello = ftello
 _ftello64 = ftello64
 ftime
 _ftime = ftime
+ftok
+_ftok = ftok
 ftruncate
 _ftruncate = ftruncate
 _ftruncate64 = ftruncate64

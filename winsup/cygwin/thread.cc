@@ -188,14 +188,12 @@ ResourceLocks::Delete ()
 }
 
 void
-MTinterface::Init (int forked)
+MTinterface::Init ()
 {
   reents._clib = _impure_ptr;
   reents._winsup = &winsup_reent;
   winsup_reent._process_logmask = LOG_UPTO (LOG_DEBUG);
-
-  if (!forked)
-    reent_key.set (&reents);
+  reent_key.set (&reents);
 
   pthread_mutex::init_mutex ();
   pthread_cond::init_mutex ();
@@ -215,7 +213,7 @@ MTinterface::fixup_after_fork (void)
   pthread_key::fixup_after_fork ();
 
   threadcount = 1;
-  pthread::init_mainthread (true);
+  pthread::init_mainthread ();
 
   pthread_mutex::fixup_after_fork ();
   pthread_cond::fixup_after_fork ();
@@ -227,11 +225,8 @@ MTinterface::fixup_after_fork (void)
 
 /* static methods */
 void
-pthread::init_mainthread (bool do_init)
+pthread::init_mainthread ()
 {
-  if (!do_init)
-    return;
-
   pthread *thread = get_tls_self_pointer ();
   if (!thread)
     {

@@ -1,3 +1,163 @@
+2003-05-26  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* syscalls.cc (statfs): Call GetDiskFreeSpaceEx before GetDiskFreeSpace.
+
+2003-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (is_at_eof): Fix conditional.  Use INVALID_FILE_SIZE
+	instead of numeric constant.
+
+2003-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::connect): Guard calls to
+	sock_event methods by a check for WinSock2 availability.
+	(fhandler_socket::accept): Ditto.
+
+2003-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h: Rename FH_W95LSBUG flag to FH_LSEEKED.
+	(fhandler_base::set_did_lseek): Rename from set_check_win95_lseek_bug.
+	(fhandler_base::get_did_lseek): Rename from get_check_win95_lseek_bug.
+	(fhandler_base::set_fs_flags): New method.
+	(fhandler_base::get_fs_flags): Ditto.
+	* fhandler.cc (fhandler_base::write): Make 64 bit clean.  Convert file
+	to a "sparse" file when writing after a long lseek (>64K) beyond EOF.
+	(fhandler_base::lseek): Call set_did_lseek() instead of
+	set_check_win95_lseek_bug().
+	(fhandler_base::fhandler_base): Initialize fs_flags to 0.
+	* fhandler_disk_file.cc (fhandler_disk_file::open): Don't create files  
+	as "sparse" unconditionally.  Set fs_flags member.
+
+2003-05-25  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* autoload.cc (GetDiskFreeSpaceEx): Add.
+	* syscalls.cc (statfs): Call full_path.root_dir() instead of
+	rootdir(full_path). Use GetDiskFreeSpaceEx when available and
+	report space available in addition to free space.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name):
+	Do not call FindFirstFile for disk root directories.
+
+2003-05-24  Joe Buehler  <jhpb@draco.hekimian.com>
+
+	* fhandler_process.cc (format_process_stat): Use PagefileUsage
+	instead of VirtualSize.
+	(get_mem_values): Ditto.
+
+2003-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared_info.h: Match shared_name declaration with below change.
+	* shared.cc (shared_name): Use incoming char * parameter instead of
+	local static buffer.
+	(open_shared): Accomodate new calling convention for shared_name.
+	* exceptions.cc (events_init): Ditto.
+	* sigproc.cc (getsem): Ditto.
+	* syscalls.cc (login): Ditto.
+	(logout): Ditto.
+	(pututline): Ditto.
+
+2003-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (secret_event_name): Return void.  Use incoming
+	char * parameter instead of local static buffer.
+	(fhandler_socket::create_secret_event): Accomodate new calling
+	convention for secret_event_name.
+	(fhandler_socket::close_secret_event): Ditto.
+
+2003-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (SECRET_EVENT_NAME): Remove.
+	(ENTROPY_SOURCE_NAME): Ditto.
+	(secret_event_name): New static function.  Create shared event name
+	with "Global\" prefix on systems supporting terminal services.
+	(fhandler_socket::set_connect_secret): Fix conditional.
+	(fhandler_socket::create_secret_event): Create secret event using
+	secret_event_name().
+	(fhandler_socket::close_secret_event): Ditto.
+	* shared.cc (shared_name): Create shared object name with "Global\"
+	prefix on systems supporting terminal services.
+	* wincap.cc: Set has_terminal_services capability throughout.
+	(wincap_2003): New global object representing Windows 2003 Server
+	capabilities.
+	(wincapc::init): Accomodate Windows 2003 Server.
+	* wincap.h (struct wincaps): Add has_terminal_services capability.
+
+2003-05-20  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	* winsup/cygwin/include/cygwin/version.h: Bump API minor version.
+	* winsup/cygwin/include/cygwin/types.h: Define key_t as long long.
+	* winsup/cygwin/cygwin.din: Add ftok, _ftok.
+	* winsup/cygwin/ipc.cc (ftok): Rework implementation.
+
+2003-05-18  Joe Buehler  <jhpb@hekimian.com>
+
+	* spawn.cc (spawn_guts): Show more of command line in strace output.
+
+2003-05-15  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (pthread::init_mainthread): Remove function parameter.
+	(MTinterface::Init): Ditto.
+	* thread.cc (MTinterface::Init): Remove function parameter.
+	Always initialize reent_key.
+	(pthread::init_mainthread): Remove function parameter.
+	(MTinterface::fixup_after_fork): Fix pthread::init_mainthread call.
+	* dcrt0.cc (dll_crt_0_1) Fix calls to MTinterface::Init and
+	pthread::init_mainthread.
+	Call pthread::init_mainthread only when not forked.
+	
+2003-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_meminfo): Make swap memory output
+	Linux style values.
+
+2003-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/config.h: Define __USE_INTERNAL_STAT64 appropriately.
+
+2003-05-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (CYGWIN_START): Define as crt0.o.  Add to TARGET_LIBS.
+	* fhandler.h (fhandler_virtual::fstat): Remove useless declaration.
+	* fhandler_virtual.cc: Remove _COMPILING_NEWLIB define.
+	* ipc.cc (ftok): Use stat64.
+	* syscalls.cc (_fstat64): Remove alias.
+	(_fstat): Ditto.
+	(_stat): Ditto.
+	(_fstat64_r): New function.
+	(_fstat_r): Ditto.
+	(_stat64_r): Ditto.
+	(stat_r): Ditto.
+	* crt0.o: New file, moved from newlib.
+	* include/sys/param.h: Ditto.
+	* include/sys/utime.h: Ditto.
+	* include/sys/utmp.h: Ditto.
+	* include/sys/dirent.h: Ditto.  Expose different struct dirent,
+	dependening of the environment.
+
+2003-05-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	Replace ino_t by __ino64_t throughout.
+
+2003-05-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/types.h: Add key_t typedef.
+
+2003-05-10  Christopher Faylor  <cgf@redhat.com>
+
+	* dir.cc (readdir): Fill out new old_d_ino field.
+	* fhandler.h (fhandler_base::namehash): Define as ino_t.
+	(fhandler_base::get_namehash): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Accommodate
+	new 64 bit st_ino.
+	* fhandler_socket.cc (fhandler_socket::fstat): Ditto.
+	* path.cc (hash_path_name): Return ino_t.
+	* syscalls.cc (stat64_to_stat32): Convert 64 bit inode to 32 bit.
+	* winsup.h (hash_path_name): Declare as returning ino_t.
+	* include/cygwin/stat.h (__stat32): Use 32 bit st_ino.
+	(__stat64): Use 64 bit st_ino.
+	* include/cygwin/types.h (__ino64_t): Define.
+	(__ino32_t): Ditto.
+	(ino_t): Define appropriately.
+
 2003-05-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (NEW_FUNCTIONS): All 32/64 from 0.79 API get
@@ -202,7 +362,7 @@
 	(cygthread::operator new): Simplify.  Just grab a thread structure from
 	the pool.  Don't try to start the thread.
 	(cygthread::terminate_thread): Don't close event handles.  Just reuse
-	them.  Call MEM_RELEASE rather than MEM_DECOMMIT (from Joe Buehler).
+	them.  Call MEM_RELEASE rather than MEM_DECOMMIT (from Joe uehler).
 
 2003-04-08  Bob Cassels <bcassels@abinitio.com>
 
@@ -440,11 +600,6 @@
 	(semaphores::~semaphore): Use List::Remove rather than custom list
 	code.
 	(semaphore::fixup_after_fork): Rename to FixupAfterFork.
-
-2003-03-22  Christopher Faylor  <cgf@redhat.com>
-
-	* pipe.cc (fhandler_pipe::dup): Don't dup input_handle if it doesn't
-	exist.
 
 2003-03-22  Christopher Faylor  <cgf@redhat.com>
 
