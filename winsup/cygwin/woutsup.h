@@ -38,16 +38,16 @@
 /* The one function we use from winuser.h most of the time */
 extern "C" DWORD WINAPI GetLastError (void);
 
-/* From "winsup.h". */
+extern int cygserver_running;
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
 #define NEW_MACRO_VARARGS
 #endif
 
 /*
- * A reproduction of the api_fatal() and <sys/strace.h> macros.  This
- * allows code that runs both inside and outside the Cygwin DLL to use
- * the same macros for logging messages.
+ * A reproduction of the <sys/strace.h> macros.  This allows code that
+ * runs both inside and outside the Cygwin DLL to use the same macros
+ * for logging messages.
  */
 
 extern "C" void __cygserver__printf (const char *, const char *, ...);
@@ -73,8 +73,6 @@ extern "C" void __cygserver__printf (const char *, const char *, ...);
 #define __noop_printf(args...) do {;} while (false)
 
 #endif /* !NEW_MACRO_VARARGS */
-
-#define api_fatal system_printf
 
 #ifdef DEBUGGING
 #define debug_printf system_printf

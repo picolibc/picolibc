@@ -29,6 +29,7 @@ details. */
 #include <ostream.h>
 
 #include "cygwin_version.h"
+#include "cygerrno.h"
 
 #include "cygserver_shm.h"
 #include "cygwin/cygserver.h"
@@ -118,6 +119,17 @@ __cygserver__printf (const char * const function, const char * const fmt, ...)
 
   return;
 }
+
+#ifdef DEBUGGING
+
+int __stdcall
+__set_errno (const char *func, int ln, int val)
+{
+  debug_printf ("%s:%d val %d", func, ln, val);
+  return _impure_ptr->_errno = val;
+}
+
+#endif /* DEBUGGING */
 
 static BOOL
 setup_privileges ()
@@ -627,39 +639,66 @@ main (const int argc, char *argv[])
 
       case '?':
 	cerr << "Try `" << pgm << " --help' for more information." << endl;
-	return 1;
+	exit (1);
       }
 
   if (optind != argc)
     {
       cerr << pgm << ": too many arguments" << endl;
-      return 1;
+      exit (1);
     }
+
+  /*
+   * This has been run in the cygwin DLL but we use some of the DLL
+   * functions, e.g. client_request::make_request() in the server so
+   * we need to duplicate it all up here.  Sigh.
+   */
+  cygserver_init (false);		// false == don't check version
+
+  assert (   cygserver_running == CYGSERVER_OK		\
+	  || cygserver_running == CYGSERVER_DEAD);
 
   if (shutdown)
     {
+      if (cygserver_running != CYGSERVER_OK)
+	{
+	  cout << pgm << ": cygserver is not running" << endl;
+	  exit (1);
+	}
+
       client_request_shutdown req;
 
       if (req.make_request () == -1 || req.error_code ())
-	return 1;
+	{
+	  cout << pgm << ": shutdown request failed: "
+	       << strerror(errno) << endl;
+	  exit (1);
+	}
+
+      // FIXME: It would be nice to wait here for the daemon to exit.
 
       return 0;
     }
 
-  transport_layer_base * const transport = create_server_transport ();
+  if (cygserver_running == CYGSERVER_OK)
+    {
+      cout << pgm << ": cygserver is already running" << endl;
+      exit (1);
+    }
 
-  assert (transport);
-
-  print_version (pgm);
-  setbuf (stdout, NULL);
-  printf ("daemon starting up");
   if (signal (SIGQUIT, handle_signal) == SIG_ERR)
     {
       system_printf ("could not install signal handler (%d)- aborting startup",
 		     errno);
       exit (1);
     }
-  printf (".");
+
+  transport_layer_base * const transport = create_server_transport ();
+  assert (transport);
+
+  print_version (pgm);
+  setbuf (stdout, NULL);
+  printf ("daemon starting up");
   transport->listen ();
   printf (".");
   class process_cache cache (2);
@@ -691,9 +730,11 @@ main (const int argc, char *argv[])
   printf ("\nShutdown request received - new requests will be denied\n");
   request_queue.cleanup ();
   printf ("All pending requests processed\n");
-  transport->close ();
+  delete transport;
   printf ("No longer accepting requests - cygwin will operate in daemonless mode\n");
   cache.cleanup ();
   printf ("All outstanding process-cache activities completed\n");
   printf ("daemon shutdown\n");
+
+  return 0;
 }

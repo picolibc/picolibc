@@ -24,6 +24,8 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 
+#include "cygerrno.h"
+
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver_transport_pipes.h"
 #include "cygwin/cygserver_transport_sockets.h"
@@ -35,7 +37,7 @@ int cygserver_running = CYGSERVER_UNKNOWN;
 /* On by default during development. For release, we probably want off
  * by default.
  */
-int allow_daemon = TRUE;
+bool allow_daemon = true;
 
 client_request_get_version::client_request_get_version ()
   : client_request (CYGSERVER_REQUEST_GET_VERSION, &version, sizeof (version))
@@ -45,22 +47,35 @@ client_request_get_version::client_request_get_version ()
   syscall_printf ("created");
 }
 
-void
+/*
+ * client_request_get_version::check_version()
+ *
+ * The major version and API version numbers must match exactly.  An
+ * older than expected minor version number is accepted (as long as
+ * the first numbers match, that is).
+ */
+
+bool
 client_request_get_version::check_version () const
 {
-  if (version.major != CYGWIN_SERVER_VERSION_MAJOR ||
-      version.api != CYGWIN_SERVER_VERSION_API ||
-      version.minor > CYGWIN_SERVER_VERSION_MINOR)
-    api_fatal ("incompatible version of cygwin server:\n"
-	       "client version %d.%d.%d.%d, server version %ld.%ld.%ld.%ld",
-	       CYGWIN_SERVER_VERSION_MAJOR,
-	       CYGWIN_SERVER_VERSION_API,
-	       CYGWIN_SERVER_VERSION_MINOR,
-	       CYGWIN_SERVER_VERSION_PATCH,
-	       version.major,
-	       version.api,
-	       version.minor,
-	       version.patch);
+  const bool ok = (version.major == CYGWIN_SERVER_VERSION_MAJOR
+		   && version.api == CYGWIN_SERVER_VERSION_API
+		   && version.minor <= CYGWIN_SERVER_VERSION_MINOR);
+
+  if (!ok)
+    syscall_printf (("incompatible version of cygwin server: "
+		     "client version %d.%d.%d.%d, "
+		     "server version %ld.%ld.%ld.%ld"),
+		    CYGWIN_SERVER_VERSION_MAJOR,
+		    CYGWIN_SERVER_VERSION_API,
+		    CYGWIN_SERVER_VERSION_MINOR,
+		    CYGWIN_SERVER_VERSION_PATCH,
+		    version.major,
+		    version.api,
+		    version.minor,
+		    version.patch);
+
+  return ok;
 }
 
 #ifdef __INSIDE_CYGWIN__
@@ -313,13 +328,21 @@ client_request::~client_request ()
 int
 client_request::make_request ()
 {
+  assert (   cygserver_running == CYGSERVER_OK \
+	  || cygserver_running == CYGSERVER_DEAD);
+
   if (!allow_daemon)
-    return -1;
+    {
+      set_errno (ENOSYS);
+      return -1;
+    }
 
   /* Don't retry every request if the server's not there */
-  if (cygserver_running == CYGSERVER_DEAD
-      && request_code() != CYGSERVER_REQUEST_GET_VERSION)
-    return -1;
+  if (cygserver_running != CYGSERVER_OK)
+    {
+      set_errno (ENOSYS);
+      return -1;
+    }
 
   class transport_layer_base * const transport = create_server_transport ();
 
@@ -452,32 +475,50 @@ client_request::handle (transport_layer_base * const conn,
 
 #endif /* !__INSIDE_CYGWIN__ */
 
-#ifdef __INSIDE_CYGWIN__
-
-#if 0
-BOOL
-check_cygserver_available ()
+bool
+check_cygserver_available (const bool check_version_too)
 {
-  BOOL ret_val = FALSE;
-  HANDLE pipe = CreateFile (pipe_name,
-			    GENERIC_READ | GENERIC_WRITE,
-			    FILE_SHARE_READ | FILE_SHARE_WRITE,
-			    &sec_all_nih,
-			    OPEN_EXISTING,
-			    0,
-			    NULL);
-  if (pipe != INVALID_HANDLE_VALUE || GetLastError () != ERROR_PIPE_BUSY)
-    ret_val = TRUE;
+  client_request_get_version req;
 
-  if (pipe && pipe != INVALID_HANDLE_VALUE)
-    CloseHandle (pipe);
+  // This indicates that we failed to connect to cygserver at all but
+  // that's fine as cygwin doesn't need it to be running.
+  if (req.make_request () == -1)
+    {
+      return false;
+    }
 
-  return (ret_val);
+  // We connected to the server but something went wrong after that
+  // (in sending the message, in cygserver itself, or in receiving the
+  // reply).
+  if (req.error_code () != 0)
+    {
+      syscall_printf ("failure in cygserver version request: %d",
+		      req.error_code ());
+      syscall_printf ("process will continue without cygserver support");
+      return false;
+    }
+  
+  if (check_version_too && !req.check_version ())
+    {
+      return false;
+    }
+
+  return true; 
 }
-#endif
+
+/*
+ * check_cygserver_available()
+ *
+ * FIXME: This is being used for two different purposes: bad.  Used by
+ * the DLL in crt to check for the existence of a compatible
+ * cygserver.Used by cygserver itself at start up to probe for whether
+ * another copy of cygserver is running (w/o checking the version).
+ * These should be separated out: the probing functionality should
+ * probably be moved into the transport layer.
+ */
 
 void
-cygserver_init ()
+cygserver_init (const bool check_version_too)
 {
   if (!allow_daemon)
     {
@@ -486,32 +527,15 @@ cygserver_init ()
     }
 
   if (cygserver_running == CYGSERVER_OK)
-    return;
-
-  client_request_get_version req;
-
-  // This indicates that we failed to connect to cygserver at all but
-  // that's fine as cygwin doesn't need it to be running.
-  if (req.make_request () == -1)
     {
-      cygserver_running = CYGSERVER_DEAD;
       return;
     }
 
-  // We connected to the server but something went wrong after that
-  // (sending the message, cygserver itself, or receiving the reply).
-  if (req.error_code () != 0)
-    {
-      cygserver_running = CYGSERVER_DEAD;
-      debug_printf ("failure in cygserver version request: %d",
-		    req.error_code ());
-      debug_printf ("process will continue without cygserver support");
-      return;
-    }
+  assert (   cygserver_running == CYGSERVER_UNKNOWN \
+	  || cygserver_running == CYGSERVER_DEAD);
 
-  req.check_version ();		// Dies if bad . . .
+  cygserver_running = CYGSERVER_OK; // Needed for make_request() to work.
 
-  cygserver_running = CYGSERVER_OK;
+  if (!check_cygserver_available (check_version_too))
+    cygserver_running = CYGSERVER_DEAD;
 }
-
-#endif /* __INSIDE_CYGWIN__ */

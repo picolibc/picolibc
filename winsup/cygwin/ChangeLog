@@ -1,3 +1,30 @@
+2002-06-18  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* woutsup.h (cygserver_running): Add declaration.
+	(api_fatal): Eliminate.
+	* include/cygwin/cygserver.h
+	(client_request_get_version::check_version): Change return type to
+	bool.
+	(check_cygserver_available): New function.
+	(cygserver_init): Add check_version_too argument.
+	* cygserver_client.cc (allow_daemon): Make a bool.
+	(client_request_get_version::make_request): See errno on error.
+	Remove special case for CYGSERVER_REQUEST_GET_VERSION; this is now
+	handled in cygserver_init().
+	(client_request_get_version::check_version): Use syscall_printf()
+	instead of api_fatal(). Return true if cygserver version is
+	compatible.
+	(check_cygserver_available): New function; code moved here from
+	cygserver_init().
+	(cygserver_init): Move some code into check_cygserver_available().
+	* cygserver.cc (__set_errno): Copy from debug.cc so that
+	set_errno() can be used when __OUTSIDE_CYGWIN__.
+	(main): Call cygserver_init() to set up cygserver_running and add
+	checks against this to (try and) prevent multiple copies of
+	cygserver running simultaneously.  Remember to delete all
+	transport connections so that (one day) the transport classes can
+	tidy up on cygserver shutdown.
+
 2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc (main): Adjust tracing output for a cleaner display

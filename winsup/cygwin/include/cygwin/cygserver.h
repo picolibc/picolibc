@@ -108,7 +108,7 @@ private:
 public:
   client_request_get_version ();
 
-  void check_version () const;
+  bool check_version () const;
 
 private:
   struct request_get_version version;
@@ -173,6 +173,7 @@ private:
 #endif
 };
 
-extern void cygserver_init ();
+extern bool check_cygserver_available (bool check_version_too = true);
+extern void cygserver_init (bool check_version_too = true);
 
 #endif /* _CYGSERVER_H_ */
