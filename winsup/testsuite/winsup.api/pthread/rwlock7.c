@@ -141,7 +141,8 @@ main (int argc, char *argv[])
       threads[count].thread_num = count;
       threads[count].updates = 0;
       threads[count].reads = 0;
-      threads[count].interval = rand_r (&seed) % 71;
+      while (!(threads[count].interval = rand_r (&seed) % 71))
+	continue;
 
       assert(pthread_create (&threads[count].thread_id,
                              NULL, thread_routine, (void*)&threads[count]) == 0);
