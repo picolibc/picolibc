@@ -343,7 +343,7 @@ winpids::enumNT (bool winpid)
 	break;
 
       if (res == STATUS_INFO_LENGTH_MISMATCH)
-	procs =  (SYSTEM_PROCESSES *)realloc (procs, szprocs += 200 * sizeof (*procs));
+	procs =  (SYSTEM_PROCESSES *) realloc (procs, szprocs += 200 * sizeof (*procs));
       else
 	{
 	  system_printf ("error %p reading system process information", res);
@@ -379,7 +379,7 @@ winpids::enum9x (bool winpid)
   PROCESSENTRY32 proc;
   proc.dwSize = sizeof (proc);
 
-  if (myProcess32First(h, &proc))
+  if (myProcess32First (h, &proc))
     do
       {
 	if (proc.th32ProcessID)
@@ -406,13 +406,13 @@ winpids::enum_init (bool winpid)
     enum_processes = &winpids::enumNT;
   else
     {
-      h = GetModuleHandle("kernel32.dll");
+      h = GetModuleHandle ("kernel32.dll");
       myCreateToolhelp32Snapshot = (CREATESNAPSHOT)
 		  GetProcAddress(h, "CreateToolhelp32Snapshot");
       myProcess32First = (PROCESSWALK)
-	      GetProcAddress(h, "Process32First");
+	      GetProcAddress (h, "Process32First");
       myProcess32Next  = (PROCESSWALK)
-	      GetProcAddress(h, "Process32Next");
+	      GetProcAddress (h, "Process32Next");
       if (!myCreateToolhelp32Snapshot || !myProcess32First || !myProcess32Next)
 	{
 	  system_printf ("Couldn't find toolhelp processes, %E");

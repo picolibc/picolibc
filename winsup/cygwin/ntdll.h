@@ -1,4 +1,4 @@
-/* ntdll.h.  Contains ntdll specific stuff which is nowhere defined.
+/* ntdll.h.  Contains ntdll specific stuff not defined elsewhere.
 
    Copyright 2000 Cygnus Solutions.
 
