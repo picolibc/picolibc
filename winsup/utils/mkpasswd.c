@@ -386,7 +386,7 @@ print_special (int print_sids,
 	  else
 	    rid = sub1;
 	  printf ("%s:*:%lu:%lu:%s%s::\n",
-		  name, rid, rid,
+		  name, rid, rid == 18 ? 544 : rid, /* SYSTEM hack */
 		  print_sids ? "," : "",
 		  print_sids ? put_sid (sid) : "");
         }
@@ -573,13 +573,15 @@ main (int argc, char **argv)
       return 1;
     }
 
-  /*
-   * Get `Everyone' group
-  */
   if (disp_username == NULL)
     {
+#if 0
+      /*
+       * Get `Everyone' group
+      */
       print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID,
 		     0, 0, 0, 0, 0, 0, 0);
+#endif
       /*
        * Get `system' group
       */

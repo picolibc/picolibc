@@ -567,11 +567,14 @@ main (int argc, char **argv)
       return 1;
     }
 
+#if 0
   /*
    * Get `Everyone' group
   */
   print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID,
 			     0, 0, 0, 0, 0, 0, 0);
+#endif
+
   /*
    * Get `system' group
   */
