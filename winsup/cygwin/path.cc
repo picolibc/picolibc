@@ -2504,6 +2504,8 @@ check_sysfile (const char *path, DWORD fileattr, HANDLE h,
       }
   syscall_printf ("%d = symlink.check_sysfile (%s, %s) (%p)",
 		  res, path, contents, *pflags);
+
+  CloseHandle (h);
   return res;
 }
 
@@ -2698,29 +2700,29 @@ symlink_info::check (const char *path, const suffix_info *suffixes,
       res = -1;
       if (h == INVALID_HANDLE_VALUE)
 	goto file_not_symlink;
-      else if (sym_check == 1
-               && !(res = check_shortcut (suffix.path, fileattr, h,
-	       				  contents, &error, &pflags)))
+
+      switch (sym_check)
 	{
-	  CloseHandle (h);
+	case 1:
+	  res = check_shortcut (suffix.path, fileattr, h, contents, &error, &pflags);
+	  if (res)
+	    {
+	      ext_tacked_on = 1;
+	      break;
+	    }
 	  /* If searching for `foo' and then finding a `foo.lnk' which is
 	     no shortcut, return the same as if file not found. */
-	  if (suffix.lnk_match ())
-	    {
-	      fileattr = (DWORD)-1;
-	      continue;		/* in case we're going to tack *another* .lnk on this filename. */
-	    }
-	  goto file_not_symlink;
-	}
-      else if (sym_check == 2 &&
-      	       !(res = check_sysfile (suffix.path, fileattr, h,
-	       			      contents, &error, &pflags)))
-	{
-	  CloseHandle (h);
-	  goto file_not_symlink;
-	}
+	  if (!suffix.lnk_match ())
+	    goto file_not_symlink;
 
-      CloseHandle (h);
+	  fileattr = (DWORD) -1;
+	  continue;		/* in case we're going to tack *another* .lnk on this filename. */
+	case 2:
+	  res = check_sysfile (suffix.path, fileattr, h, contents, &error, &pflags);
+	  if (!res)
+	    goto file_not_symlink;
+	  break;
+	}
       break;
     }
   goto out;

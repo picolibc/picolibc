@@ -98,7 +98,7 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
     goto close_it;
   /* Read the files header information. This is used to check for a
      Cygwin or U/WIN shortcut or later to check for executable files. */
-  if (! ReadFile (h, file_header, SHORTCUT_HDR_SIZE, &got, 0))
+  if (!ReadFile (h, file_header, SHORTCUT_HDR_SIZE, &got, 0))
     {
       *error = EIO;
       goto close_it;
@@ -160,8 +160,7 @@ close_it:
     psl->lpVtbl->Release(psl);
   /* Uninitialize COM library. */
   CoUninitialize ();
+  CloseHandle (h);
 
   return res;
 }
-
-

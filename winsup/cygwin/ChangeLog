@@ -1,3 +1,11 @@
+Sun Apr 22 12:17:57 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* shortcut.c (check_shortcut): Close input file handle before
+	returning.
+	* path.cc (check_sysfile): Ditto.
+	(symlink_info::check): Rely on opened file handle being closed by
+	symlink checking routines.  Set ext_tacked_on when .lnk is detected.
+
 Sat Apr 21 19:26:05 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* thread.cc (MTinterface::Init): Remove accidentally checked in code.
