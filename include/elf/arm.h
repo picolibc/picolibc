@@ -37,6 +37,9 @@
 #define EF_ARM_VFP_FLOAT   0x400
 #define EF_ARM_MAVERICK_FLOAT 0x800
 
+/* Frame unwind information */
+#define PT_ARM_EXIDX (PT_LOPROC + 1) 
+
 /* Other constants defined in the ARM ELF spec. version B-01.  */
 #define EF_ARM_SYMSARESORTED 0x04	/* NB conflicts with EF_INTERWORK */
 #define EF_ARM_DYNSYMSUSESEGIDX 0x08	/* NB conflicts with EF_APCS26 */
