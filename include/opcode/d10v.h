@@ -78,6 +78,7 @@ struct d10v_opcode
 #define WF0     128	/* modifies f0 */
 #define WCAR    256	/* write Carry */
 #define BRANCH  512	/* branch, no link */
+#define ALONE  1024	/* short but pack with a NOP if on asm line alone */
 
   /* the opcode */
   long opcode;

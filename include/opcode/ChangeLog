@@ -1,3 +1,7 @@
+Wed Apr 12 17:11:20 2000  Donald Lindsay  <dlindsay@hound.cygnus.com>
+
+	* d10v.h: added ALONE attribute for d10v_opcode.exec_type.
+
 2000-05-23  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
 
 	* i386.h: Allow d suffix on iret, and add DefaultSize modifier.
