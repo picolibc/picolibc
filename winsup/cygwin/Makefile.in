@@ -245,7 +245,7 @@ new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(
 	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC) \
-	-lstdc++ -lgcc -lshell32 -luuid
+	-lsupc++ -lgcc -lshell32 -luuid
 
 # Rule to build libcygwin.a
 $(LIB_NAME): rmsym newsym new-$(DLL_NAME) $(LIBCOS)

@@ -1,3 +1,10 @@
+2002-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (new-cygwin1.dll): Just use -lsupc++ for link.
+	* sigproc.cc (proc_exists): Change existence criteria.
+	* sync.h (new_muto): Add volatile to definition to avoid gcc
+	optimization problems.
+
 2002-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump API minor version to 51.
