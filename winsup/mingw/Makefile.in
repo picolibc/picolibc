@@ -18,7 +18,7 @@
 # This makefile requires GNU make.
 
 PACKAGE = mingw-runtime
-VERSION = 1.2
+VERSION = 1.3
 CYGRELEASE = 1
 
 VPATH = @srcdir@
