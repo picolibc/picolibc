@@ -105,11 +105,6 @@ typedef struct _BATTERY_NOTIFY {
 	ULONG  HighCapacity;
 } BATTERY_NOTIFY, *PBATTERY_NOTIFY;
 
-typedef struct _BATTERY_REPORTING_SCALE {
-  ULONG  Granularity;
-  ULONG  Capacity;
-} BATTERY_REPORTING_SCALE, *PBATTERY_REPORTING_SCALE;
-
 /* BATTERY_STATUS.PowerState flags */
 #define BATTERY_POWER_ON_LINE             0x00000001
 #define BATTERY_DISCHARGING               0x00000002
@@ -128,7 +123,6 @@ typedef struct _BATTERY_STATUS {
   ULONG  Voltage;
   LONG  Rate;
 } BATTERY_STATUS, *PBATTERY_STATUS;
-
 
 /* BATTERY_INFORMATION.Capacity constants */
 #define BATTERY_UNKNOWN_CAPACITY          0xFFFFFFFF

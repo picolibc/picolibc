@@ -2658,6 +2658,51 @@ typedef union _FILE_SEGMENT_ELEMENT {
 	ULONGLONG Alignment;
 }FILE_SEGMENT_ELEMENT, *PFILE_SEGMENT_ELEMENT;
 
+/* JOBOBJECT_BASIC_LIMIT_INFORMATION.LimitFlags constants */
+#define JOB_OBJECT_LIMIT_WORKINGSET                 0x0001
+#define JOB_OBJECT_LIMIT_PROCESS_TIME               0x0002
+#define JOB_OBJECT_LIMIT_JOB_TIME                   0x0004
+#define JOB_OBJECT_LIMIT_ACTIVE_PROCESS             0x0008
+#define JOB_OBJECT_LIMIT_AFFINITY                   0x0010
+#define JOB_OBJECT_LIMIT_PRIORITY_CLASS             0x0020
+#define JOB_OBJECT_LIMIT_PRESERVE_JOB_TIME          0x0040
+#define JOB_OBJECT_LIMIT_SCHEDULING_CLASS           0x0080
+#define JOB_OBJECT_LIMIT_PROCESS_MEMORY             0x0100
+#define JOB_OBJECT_LIMIT_JOB_MEMORY                 0x0200
+#define JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION 0x0400
+#define JOB_OBJECT_BREAKAWAY_OK                     0x0800
+#define JOB_OBJECT_SILENT_BREAKAWAY                 0x1000
+
+/* JOBOBJECT_BASIC_UI_RESTRICTIONS.UIRestrictionsClass constants */
+#define JOB_OBJECT_UILIMIT_HANDLES          0x0001
+#define JOB_OBJECT_UILIMIT_READCLIPBOARD    0x0002
+#define JOB_OBJECT_UILIMIT_WRITECLIPBOARD   0x0004
+#define JOB_OBJECT_UILIMIT_SYSTEMPARAMETERS 0x0008
+#define JOB_OBJECT_UILIMIT_DISPLAYSETTINGS  0x0010
+#define JOB_OBJECT_UILIMIT_GLOBALATOMS      0x0020
+#define JOB_OBJECT_UILIMIT_DESKTOP          0x0040
+#define JOB_OBJECT_UILIMIT_EXITWINDOWS      0x0080
+
+/* JOBOBJECT_SECURITY_LIMIT_INFORMATION.SecurityLimitFlags constants */
+#define JOB_OBJECT_SECURITY_NO_ADMIN          0x0001
+#define JOB_OBJECT_SECURITY_RESTRICTED_TOKEN  0x0002
+#define JOB_OBJECT_SECURITY_ONLY_TOKEN        0x0004
+#define JOB_OBJECT_SECURITY_FILTER_TOKENS     0x0008
+
+/* JOBOBJECT_END_OF_JOB_TIME_INFORMATION.EndOfJobTimeAction constants */
+#define JOB_OBJECT_TERMINATE_AT_END_OF_JOB  0
+#define JOB_OBJECT_POST_AT_END_OF_JOB       1
+
+#define JOB_OBJECT_MSG_END_OF_JOB_TIME        1
+#define JOB_OBJECT_MSG_END_OF_PROCESS_TIME    2
+#define JOB_OBJECT_MSG_ACTIVE_PROCESS_LIMIT   3
+#define JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO    4
+#define JOB_OBJECT_MSG_NEW_PROCESS            6
+#define JOB_OBJECT_MSG_EXIT_PROCESS           7
+#define JOB_OBJECT_MSG_ABNORMAL_EXIT_PROCESS  8
+#define JOB_OBJECT_MSG_PROCESS_MEMORY_LIMIT   9
+#define JOB_OBJECT_MSG_JOB_MEMORY_LIMIT       10
+
 typedef enum _JOBOBJECTINFOCLASS {
 	JobObjectBasicAccountingInformation = 1,
 	JobObjectBasicLimitInformation,
@@ -2730,6 +2775,214 @@ typedef struct _JOBOBJECT_JOBSET_INFORMATION {
 	DWORD MemberLevel;
 } JOBOBJECT_JOBSET_INFORMATION,*PJOBOBJECT_JOBSET_INFORMATION;
 
+/* Fixme: Making these defines conditional on WINVER will break ddk includes */ 
+#if 1 /* (WINVER >= 0x0500) */
+#include <pshpack4.h>
+
+#define ES_SYSTEM_REQUIRED                0x00000001
+#define ES_DISPLAY_REQUIRED               0x00000002
+#define ES_USER_PRESENT                   0x00000004
+#define ES_CONTINUOUS                     0x80000000
+
+typedef enum _LATENCY_TIME {
+	LT_DONT_CARE,
+	LT_LOWEST_LATENCY
+} LATENCY_TIME, *PLATENCY_TIME;
+
+typedef enum _SYSTEM_POWER_STATE {
+	PowerSystemUnspecified,
+	PowerSystemWorking,
+	PowerSystemSleeping1,
+	PowerSystemSleeping2,
+	PowerSystemSleeping3,
+	PowerSystemHibernate,
+	PowerSystemShutdown,
+	PowerSystemMaximum
+} SYSTEM_POWER_STATE, *PSYSTEM_POWER_STATE;
+#define POWER_SYSTEM_MAXIMUM PowerSystemMaximum
+
+typedef enum {
+	PowerActionNone,
+	PowerActionReserved,
+	PowerActionSleep,
+	PowerActionHibernate,
+	PowerActionShutdown,
+	PowerActionShutdownReset,
+	PowerActionShutdownOff,
+	PowerActionWarmEject
+} POWER_ACTION, *PPOWER_ACTION;
+
+typedef enum _DEVICE_POWER_STATE {
+	PowerDeviceUnspecified,
+	PowerDeviceD0,
+	PowerDeviceD1,
+	PowerDeviceD2,
+	PowerDeviceD3,
+	PowerDeviceMaximum
+} DEVICE_POWER_STATE, *PDEVICE_POWER_STATE;
+
+typedef struct {
+	DWORD  Granularity;
+	DWORD  Capacity;
+} BATTERY_REPORTING_SCALE, *PBATTERY_REPORTING_SCALE;
+
+typedef struct _POWER_ACTION_POLICY {
+	POWER_ACTION  Action;
+	ULONG  Flags;
+	ULONG  EventCode;
+} POWER_ACTION_POLICY, *PPOWER_ACTION_POLICY;
+
+/* POWER_ACTION_POLICY.Flags constants */
+#define POWER_ACTION_QUERY_ALLOWED        0x00000001
+#define POWER_ACTION_UI_ALLOWED           0x00000002
+#define POWER_ACTION_OVERRIDE_APPS        0x00000004
+#define POWER_ACTION_LIGHTEST_FIRST       0x10000000
+#define POWER_ACTION_LOCK_CONSOLE         0x20000000
+#define POWER_ACTION_DISABLE_WAKES        0x40000000
+#define POWER_ACTION_CRITICAL             0x80000000
+
+/* POWER_ACTION_POLICY.EventCode constants */
+#define POWER_LEVEL_USER_NOTIFY_TEXT      0x00000001
+#define POWER_LEVEL_USER_NOTIFY_SOUND     0x00000002
+#define POWER_LEVEL_USER_NOTIFY_EXEC      0x00000004
+#define POWER_USER_NOTIFY_BUTTON          0x00000008
+#define POWER_USER_NOTIFY_SHUTDOWN        0x00000010
+#define POWER_FORCE_TRIGGER_RESET         0x80000000
+
+#define DISCHARGE_POLICY_CRITICAL	0
+#define DISCHARGE_POLICY_LOW		1
+#define NUM_DISCHARGE_POLICIES		4
+
+#define PO_THROTTLE_NONE	0
+#define PO_THROTTLE_CONSTANT	1
+#define PO_THROTTLE_DEGRADE	2
+#define PO_THROTTLE_ADAPTIVE	3
+#define PO_THROTTLE_MAXIMUM	4
+
+typedef struct _SYSTEM_POWER_LEVEL {
+	BOOLEAN  Enable;
+	UCHAR  Spare[3];
+	ULONG  BatteryLevel;
+	POWER_ACTION_POLICY  PowerPolicy;
+	SYSTEM_POWER_STATE  MinSystemState;
+} SYSTEM_POWER_LEVEL, *PSYSTEM_POWER_LEVEL;
+
+typedef struct _SYSTEM_POWER_POLICY {
+	ULONG  Revision;
+	POWER_ACTION_POLICY  PowerButton;
+	POWER_ACTION_POLICY  SleepButton;
+	POWER_ACTION_POLICY  LidClose;
+	SYSTEM_POWER_STATE  LidOpenWake;
+	ULONG  Reserved;
+	POWER_ACTION_POLICY  Idle;
+	ULONG  IdleTimeout;
+	UCHAR  IdleSensitivity;
+	UCHAR  DynamicThrottle;
+	UCHAR  Spare2[2];
+	SYSTEM_POWER_STATE  MinSleep;
+	SYSTEM_POWER_STATE  MaxSleep;
+	SYSTEM_POWER_STATE  ReducedLatencySleep;
+	ULONG  WinLogonFlags;
+	ULONG  Spare3;
+	ULONG  DozeS4Timeout;
+	ULONG  BroadcastCapacityResolution;
+	SYSTEM_POWER_LEVEL  DischargePolicy[NUM_DISCHARGE_POLICIES];
+	ULONG  VideoTimeout;
+	BOOLEAN  VideoDimDisplay;
+	ULONG  VideoReserved[3];
+	ULONG  SpindownTimeout;
+	BOOLEAN  OptimizeForPower;
+	UCHAR  FanThrottleTolerance;
+	UCHAR  ForcedThrottle;
+	UCHAR  MinThrottle;
+	POWER_ACTION_POLICY  OverThrottled;
+} SYSTEM_POWER_POLICY, *PSYSTEM_POWER_POLICY;
+
+typedef struct _SYSTEM_POWER_CAPABILITIES {
+	BOOLEAN  PowerButtonPresent;
+	BOOLEAN  SleepButtonPresent;
+	BOOLEAN  LidPresent;
+	BOOLEAN  SystemS1;
+	BOOLEAN  SystemS2;
+	BOOLEAN  SystemS3;
+	BOOLEAN  SystemS4;
+	BOOLEAN  SystemS5;
+	BOOLEAN  HiberFilePresent;
+	BOOLEAN  FullWake;
+	BOOLEAN  VideoDimPresent;
+	BOOLEAN  ApmPresent;
+	BOOLEAN  UpsPresent;
+	BOOLEAN  ThermalControl;
+	BOOLEAN  ProcessorThrottle;
+	UCHAR  ProcessorMinThrottle;
+	UCHAR  ProcessorMaxThrottle;
+	UCHAR  spare2[4];
+	BOOLEAN  DiskSpinDown;
+	UCHAR  spare3[8];
+	BOOLEAN  SystemBatteriesPresent;
+	BOOLEAN  BatteriesAreShortTerm;
+	BATTERY_REPORTING_SCALE  BatteryScale[3];
+	SYSTEM_POWER_STATE  AcOnLineWake;
+	SYSTEM_POWER_STATE  SoftLidWake;
+	SYSTEM_POWER_STATE  RtcWake;
+	SYSTEM_POWER_STATE  MinDeviceWakeState;
+	SYSTEM_POWER_STATE  DefaultLowLatencyWake;
+} SYSTEM_POWER_CAPABILITIES, *PSYSTEM_POWER_CAPABILITIES;
+
+typedef struct _SYSTEM_BATTERY_STATE {
+	BOOLEAN  AcOnLine;
+	BOOLEAN  BatteryPresent;
+	BOOLEAN  Charging;
+	BOOLEAN  Discharging;
+	BOOLEAN  Spare1[4];
+	ULONG  MaxCapacity;
+	ULONG  RemainingCapacity;
+	ULONG  Rate;
+	ULONG  EstimatedTime;
+	ULONG  DefaultAlert1;
+	ULONG  DefaultAlert2;
+} SYSTEM_BATTERY_STATE, *PSYSTEM_BATTERY_STATE;
+
+#if 1 /* (WIN32_WINNT >= 0x0500) */
+typedef struct _SYSTEM_POWER_INFORMATION {
+	ULONG  MaxIdlenessAllowed;
+	ULONG  Idleness;
+	ULONG  TimeRemaining;
+	UCHAR  CoolingMode;
+} SYSTEM_POWER_INFORMATION, *PSYSTEM_POWER_INFORMATION;
+#endif
+
+typedef struct _PROCESSOR_POWER_POLICY_INFO {
+	ULONG  TimeCheck;
+	ULONG  DemoteLimit;
+	ULONG  PromoteLimit;
+	UCHAR  DemotePercent;
+	UCHAR  PromotePercent;
+	UCHAR  Spare[2];
+	ULONG  AllowDemotion : 1;
+	ULONG  AllowPromotion : 1;
+	ULONG  Reserved : 30;
+} PROCESSOR_POWER_POLICY_INFO, *PPROCESSOR_POWER_POLICY_INFO;
+typedef struct _PROCESSOR_POWER_POLICY {
+	ULONG  Revision;
+	UCHAR  DynamicThrottle;
+	UCHAR  Spare[3];
+	ULONG  Reserved;
+	ULONG  PolicyCount;
+	PROCESSOR_POWER_POLICY_INFO  Policy[3];
+} PROCESSOR_POWER_POLICY, *PPROCESSOR_POWER_POLICY;
+typedef struct _ADMINISTRATOR_POWER_POLICY {
+	SYSTEM_POWER_STATE  MinSleep;
+	SYSTEM_POWER_STATE  MaxSleep;
+	ULONG  MinVideoTimeout;
+	ULONG  MaxVideoTimeout;
+	ULONG  MinSpindownTimeout;
+	ULONG  MaxSpindownTimeout;
+} ADMINISTRATOR_POWER_POLICY, *PADMINISTRATOR_POWER_POLICY;
+#include <poppack.h>
+#endif /* WINVER >= 0x0500 */
+
+
 #ifdef UNICODE
 typedef OSVERSIONINFOW OSVERSIONINFO,*POSVERSIONINFO,*LPOSVERSIONINFO;
 typedef OSVERSIONINFOEXW OSVERSIONINFOEX,*POSVERSIONINFOEX,*LPOSVERSIONINFOEX;
@@ -2787,7 +3040,8 @@ extern PVOID GetFiberData(void);
         
 #endif /* __GNUC__ */
 
-#endif
+#endif  /* RC_INVOKED */
+
 #ifdef __cplusplus
 }
 #endif

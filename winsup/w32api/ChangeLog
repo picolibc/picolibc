@@ -1,3 +1,34 @@
+2003-03-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ddk/batclass.h (BATTERY_REPORTING_SCALE)
+	Move structure from here...
+	* include/winnt.h (BATTERY_REPORTING_SCALE): To here.
+
+	* include/ddk/ntapi.h (JOBOBJECT_*):
+	Remove structures and enums definitions.
+  	(JOB_OBJECT*): Move defines from here...
+	* include/winnt.h (JOB_OBJECT* ): To here.
+
+	* include/ddk/ntpoapi.h (LATENCY_TIME, POWER_ACTION_POLICY,
+	SYSTEM_POWER_LEVEL, SYSTEM_POWER_POLICY,
+	PROCESSOR_POWER_POLICY_INFO, PROCESSOR_POWER_POLICY,
+	ADMINISTRATOR_POWER_POLICY, SYSTEM_POWER_INFORMATION,
+	PROCESSOR_POWER_INFORMATION, SYSTEM_BATTERY_STATE,
+	SYSTEM_POWER_CAPABILITIES): Move enums, structures
+	and associated defines from here ...
+	* include/winnt.h: (LATENCY_TIME, POWER_ACTION_POLICY,
+	SYSTEM_POWER_LEVEL, SYSTEM_POWER_POLICY,
+	PROCESSOR_POWER_POLICY_INFO, PROCESSOR_POWER_POLICY,
+	ADMINISTRATOR_POWER_POLICY, SYSTEM_POWER_INFORMATION,
+	PROCESSOR_POWER_INFORMATION, SYSTEM_BATTERY_STATE,
+	SYSTEM_POWER_CAPABILITIES):To here.
+
+	* include/ddk/winddk.h (DEVICE_POWER_STATE,
+	SYSTEM_POWER_STATE, POWER_ACTION): Move enums
+	from here...
+	* include/winnt.h (DEVICE_POWER_STATE,
+	SYSTEM_POWER_STATE, POWER_ACTION): To here.
+
 2003-03-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	*lib/ndis.def (NdisAllocateMemory): Correct stdcall suffix.

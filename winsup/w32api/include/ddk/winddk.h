@@ -562,26 +562,6 @@ typedef ULONG DDKAPI
   IN ULONG  Offset,
   IN ULONG  Length);
 
-typedef enum _DEVICE_POWER_STATE {
-  PowerDeviceUnspecified,
-  PowerDeviceD0,
-  PowerDeviceD1,
-  PowerDeviceD2,
-  PowerDeviceD3,
-  PowerDeviceMaximum
-} DEVICE_POWER_STATE, *PDEVICE_POWER_STATE;
-
-typedef enum _SYSTEM_POWER_STATE {
-  PowerSystemUnspecified,
-  PowerSystemWorking,
-  PowerSystemSleeping1,
-  PowerSystemSleeping2,
-  PowerSystemSleeping3,
-  PowerSystemHibernate,
-  PowerSystemShutdown,
-  PowerSystemMaximum
-} SYSTEM_POWER_STATE, *PSYSTEM_POWER_STATE;
-
 typedef union _POWER_STATE {
   SYSTEM_POWER_STATE  SystemState;
   DEVICE_POWER_STATE  DeviceState;
@@ -591,17 +571,6 @@ typedef enum _POWER_STATE_TYPE {
   SystemPowerState,
   DevicePowerState
 } POWER_STATE_TYPE, *PPOWER_STATE_TYPE;
-
-typedef enum {
-  PowerActionNone,
-  PowerActionReserved,
-  PowerActionSleep,
-  PowerActionHibernate,
-  PowerActionShutdown,
-  PowerActionShutdownReset,
-  PowerActionShutdownOff,
-  PowerActionWarmEject
-} POWER_ACTION, *PPOWER_ACTION;
 
 typedef struct _BUS_INTERFACE_STANDARD {
   USHORT  Size;
