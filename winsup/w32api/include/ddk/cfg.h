@@ -3,7 +3,7 @@
  *
  * PnP Configuration Manager shared definitions between user mode and kernel mode code
  *
- * This file is part of the MinGW package.
+ * This file is part of the w32api package.
  *
  * Contributors:
  *   Created by Casper S. Hornstrup <chorns@users.sourceforge.net>

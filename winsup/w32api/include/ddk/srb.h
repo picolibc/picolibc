@@ -3,7 +3,7 @@
  *
  * Interface between SCSI miniport drivers and the SCSI port driver.
  *
- * This file is part of the MinGW package.
+ * This file is part of the w32api package.
  *
  * Contributors:
  *   Created by Casper S. Hornstrup <chorns@users.sourceforge.net>

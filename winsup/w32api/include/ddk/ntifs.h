@@ -3,7 +3,7 @@
  *
  * Windows NT Filesystem Driver Developer Kit
  *
- * This file is part of the MinGW package.
+ * This file is part of the w32api package.
  *
  * Contributors:
  *   Created by Bo Brantén <bosse@acc.umu.se>
