@@ -791,6 +791,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
   static char empty[] = "";
   buf[0] = '\0';
   fgets (buf, sizeof (buf), f);
+  pclose (f);
   char *uid = strtok (buf, ")");
   if (uid)
     uid += strlen ("uid=");

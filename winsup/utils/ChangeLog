@@ -1,3 +1,7 @@
+2004-10-04  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* cygcheck.cc (pretty_id): Close pipe.
+
 2004-09-23  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* dump_setup.cc (dump_setup): Remove unneeded strlen when check_files
