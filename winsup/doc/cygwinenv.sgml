@@ -139,8 +139,13 @@ time and when handles are inherited.  Defaults to set.</para>
 <para><envar>(no)server</envar> - if set, allows client applications
 to use the Cygserver facilities.  This option must be enabled explicitely
 on the client side, otherwise your applications won't be able to use the
-XSI IPC function calls (msgget, semget, shmget and friends) successfully.
-These function calls will return with ENOSYS, "Bad system call".</para>
+XSI IPC function calls (<function>msgget</function>,
+<function>semget</function>, <function>shmget</function>, and friends)
+successfully.  These function calls will return with
+<literal>ENOSYS</literal>, "Bad system call".
+</para>
+</listitem>
+<listitem>
 <para><envar>(no)strip_title</envar> - if set, strips the directory
 part off the window title, if any.  Default is not set.</para>
 </listitem>
@@ -156,9 +161,9 @@ nostrip_title</literal>.</para>
 <para><envar>(no)tty</envar> - if set, Cygwin enables extra support
 (i.e., termios) for UNIX-like ttys. 
 It is not compatible with some Windows programs.
-Defaults to not set, in which case the tty is opened in text mode 
-with ^Z as EOF. Note that this has been changed such that ^D works as
-expected instead of ^Z, and is settable via stty.
+Defaults to not set, in which case the tty is opened in text mode.
+Note that this has been changed such that ^D works as
+expected instead of ^Z, and is settable via <command>stty</command>.
 This option must be specified before starting a Cygwin shell 
 and it cannot be changed in the shell.</para>
 </listitem>

@@ -6,20 +6,9 @@
 exactly what's in the file on disk and the converse is true for writing.
 The situation is different in the DOS/Windows world where a file can
 be opened in one of two modes, binary or text.  In the binary mode the
-system behaves exactly as in UNIX.  However in text mode there are
-major differences:</para>
-<OrderedList Numeration="Loweralpha" Spacing="Compact">
-<listitem>
-<para>
-On writing in text mode, a NL (\n, ^J) is transformed into the 
-sequence CR (\r, ^M) NL.</para>
-</listitem>
-<listitem>
-<para>
-On reading in text mode, a CR followed by an NL is deleted and a ^Z
-character signals the end of file.</para>
-</listitem>
-</OrderedList>
+system behaves exactly as in UNIX.  However on writing in text mode, a
+NL (\n, ^J) is transformed into the sequence CR (\r, ^M) NL.
+</para>
 
 <para>This can wreak havoc with the seek/fseek calls since the number
 of bytes actually in the file may differ from that seen by the
@@ -140,9 +129,8 @@ should work well in the default mode. </para>
 Windows programs, since Windows programs will usually use the CRLF
 format.  Unfortunately you may still have some problems with text
 mode.  First, some of the utilities included with Cygwin do not yet
-specify binary mode when they should, e.g. <command>cat</command> will
-not work with binary files (input will stop at ^Z, CRs will be
-introduced in the output). Second, you will introduce CRs in text
+specify binary mode when they should.
+Second, you will introduce CRs in text
 files you write, which can cause problems when moving them back to a
 UNIX system. </para>
 

@@ -1,3 +1,9 @@
+2004-02-19  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* cygwinenv.sgml: Remove incorrect ^Z information. Add 
+	some tags to server option description.
+	* textbinary.sgml: Remove incorrect ^Z information.
+
 2004-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Add server option description.
