@@ -1,5 +1,7 @@
 2002-08-23  Andrew Cagney  <ac131313@redhat.com>
 
+	* texinfo/texinfo.tex: Import version 2002-06-04.06.
+
 	* config.guess: Import version 2002-08-23.
 	* config.sub: Import version 2002-08-22.
 
