@@ -1,3 +1,54 @@
+2002-02-08  Alexandre Oliva  <aoliva@redhat.com>
+
+	Contribute sh64-elf.
+	2002-01-23  Alexandre Oliva  <aoliva@redhat.com>
+	* sh.h (R_SH_GOTPLT32, R_SH_GOT_LOW16, R_SH_GOT_MEDLOW16,
+	R_SH_GOT_MEDHI16, R_SH_GOT_HI16, R_SH_GOTPLT_LOW16,
+	R_SH_GOTPLT_MEDLOW16, R_SH_GOTPLT_MEDHI16, R_SH_GOTPLT_HI16,
+	R_SH_PLT_LOW16, R_SH_PLT_MEDLOW16, R_SH_PLT_MEDHI16,
+	R_SH_PLT_HI16, R_SH_GOTOFF_LOW16, R_SH_GOTOFF_MEDLOW16,
+	R_SH_GOTOFF_MEDHI16, R_SH_GOTOFF_HI16, R_SH_GOTPC_LOW16,
+	R_SH_GOTPC_MEDLOW16, R_SH_GOTPC_MEDHI16, R_SH_GOTPC_HI16,
+	R_SH_GOT10BY4, R_SH_GOTPLT10BY4, R_SH_GOT10BY8,
+	R_SH_GOTPLT10BY8, R_SH_COPY64, R_SH_GLOB_DAT64, R_SH_JMP_SLOT64,
+	R_SH_RELATIVE64): New relocs.
+	(R_SH_FIRST_INVALID_RELOC_4): Adjust.
+	2001-05-16  Alexandre Oliva  <aoliva@redhat.com>
+	* sh.h: Renumbered and renamed some SH5 relocations to match
+	official numbers and names; moved unmaching ones to the range
+	0xf2-0xff.
+	2001-01-06  Hans-Peter Nilsson  <hpn@cygnus.com>
+	* sh.h (sh64_get_contents_type): Declare.
+	(sh64_address_is_shmedia): Likewise.
+	2000-12-30  Hans-Peter Nilsson  <hpn@cygnus.com>
+	* sh.h (sh64_elf_crange): New type.
+	(struct sh64_section_data): New.
+	(sh64_elf_section_data): New macro.
+	(EF_SH5): Rename back from EF_SH64.
+	2000-12-18  Hans-Peter Nilsson  <hpn@cygnus.com>
+	* sh.h (SHF_SH5_ISA32_MIXED, SHT_SH5_CR_SORTED,
+	SH64_CRANGES_SECTION_NAME, SH64_CRANGE_SIZE,
+	SH64_CRANGE_CR_ADDR_OFFSET, SH64_CRANGE_CR_SIZE_OFFSET,
+	SH64_CRANGE_CR_TYPE_OFFSET): New macros.
+	2000-12-12  Hans-Peter Nilsson  <hpn@cygnus.com>
+	* sh.h (EF_SH64): Don't define EF_SH64_ABI64.
+	2000-11-27  Hans-Peter Nilsson  <hpn@cygnus.com>
+	* sh.h (EF_SH64_32BIT_ABI, EF_SH64_64BIT_ABI): Delete.
+	(EF_SH64_ABI64): New.
+	2000-11-23  Hans-Peter Nilsson  <hpn@cygnus.com>
+	* sh.h (EF_SH64): Rename from EF_SH5.
+	(EF_SH64_32BIT_ABI): New.
+	(EF_SH64_64BIT_ABI): New.
+	(R_SH_PT_16, R_SH_SHMEDIA_CODE
+	R_SH_IMMU5, R_SH_IMMS6, R_SH_IMMU6, R_SH_IMMS10, R_SH_IMMS10BY2,
+	R_SH_IMMS10BY4, R_SH_IMMS10BY8, R_SH_IMMS16, R_SH_IMMU16,
+	R_SH_IMM_LOW16, R_SH_IMM_LOW16_PCREL, R_SH_IMM_MEDLOW16,
+	R_SH_IMM_MEDLOW16_PCREL, R_SH_IMM_MEDHI16, R_SH_IMM_MEDHI16_PCREL,
+	R_SH_IMM_HI16, R_SH_IMM_HI16_PCREL, R_SH_64, R_SH_64_PCREL): New
+	relocs.
+	2000-09-01  Ben Elliston  <bje@redhat.com>
+	* sh.h (EF_SH5): Define.
+
 2002-02-01  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* mmix.h: Tweak comments.
