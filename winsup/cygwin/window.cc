@@ -18,6 +18,7 @@ details. */
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include <unistd.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
