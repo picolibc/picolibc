@@ -1,3 +1,8 @@
+2004-08-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/unistd.h (getpass): Change prototype to use
+	const instead of __const.
+
 2004-08-16  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* libc/stdio/vfscanf.c (_NO_LONGLONG): Move out of FLOATING_POINT

@@ -73,7 +73,7 @@ char    _EXFUN(*getlogin, (void ));
 #if defined(_POSIX_THREAD_SAFE_FUNCTIONS)
 int _EXFUN(getlogin_r, (char *name, size_t namesize) );
 #endif
-char 	_EXFUN(*getpass, (__const char *__prompt));
+char 	_EXFUN(*getpass, (const char *__prompt));
 size_t  _EXFUN(getpagesize, (void));
 pid_t   _EXFUN(getpgid, (pid_t));
 pid_t   _EXFUN(getpgrp, (void ));
