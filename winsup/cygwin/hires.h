@@ -19,7 +19,7 @@ details. */
    The tv_sec argument in timeval structures cannot exceed
    HIRES_DELAY_MAX / 1000 - 1, so that adding fractional part
    and rounding won't exceed HIRES_DELAY_MAX */
-#define HIRES_DELAY_MAX (((UINT_MAX - 10000) / 1000) * 1000) + 10
+#define HIRES_DELAY_MAX ((((UINT_MAX - 10000) / 1000) * 1000) + 10)
 
 class hires_base
 {

@@ -597,7 +597,7 @@ hires_ms::usecs (bool justdelta)
   if (!minperiod) /* NO_COPY variable */
     prime ();
   DWORD now = timeGetTime ();
-  if (now < initime_ms)
+  if ((now - initime_ms) < 0)
     {
       inited = 0;
       prime ();

@@ -77,7 +77,6 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
   pthread_testcancel ();
 
   if ((unsigned int) rqtp->tv_sec > (HIRES_DELAY_MAX / 1000 - 1)
-      || rqtp->tv_sec < 0
       || (unsigned int) rqtp->tv_nsec > 999999999)
     {
       set_errno (EINVAL);
