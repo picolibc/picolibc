@@ -1,3 +1,9 @@
+2005-03-26  Christopher Faylor  <cgf@timesys.com>
+
+	* timer.cc (nanosleep): Treat tv_sec < 0 as invalid.
+
+	* include/search.h: Make declarations consistent with newlib.
+
 2005-03-26  Pierre Humblet <pierre.humblet@ieee.org>
 	    Christopher Faylor <cgf@timesys.com>
 
