@@ -24,14 +24,22 @@ details. */
 #include "perprocess.h"
 #include "security.h"
 #include "cygthread.h"
+#include "thread.h"
+#include "cygtls.h"
+#include "sync.h"
+#include "wininfo.h"
 
-static NO_COPY UINT timer_active = 0;
-static NO_COPY struct itimerval itv;
-static NO_COPY DWORD start_time;
-static NO_COPY HWND ourhwnd = NULL;
+wininfo NO_COPY winmsg;
 
-static LRESULT CALLBACK
-WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+muto NO_COPY *wininfo::lock;
+
+wininfo::wininfo ()
+{
+  new_muto_name (lock, "!winlock");
+}
+
+int __stdcall
+wininfo::process (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 #ifndef NOSTRACE
   strace.wm (uMsg, wParam, lParam);
@@ -50,9 +58,7 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			itv.it_interval.tv_usec / 1000;
 	  KillTimer (hwnd, timer_active);
 	  if (!elapse)
-	    {
-	      timer_active = 0;
-	    }
+	    timer_active = 0;
 	  else
 	    {
 	      timer_active = SetTimer (hwnd, 1, elapse, NULL);
@@ -73,19 +79,25 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
 }
 
-static HANDLE window_started;
+static LRESULT CALLBACK
+process_window_events (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+  return winmsg.process (hwnd, uMsg, wParam, lParam);
+}
 
-static DWORD WINAPI
-Winmain (VOID *)
+/* Handle windows events.  Inherits ownership of the wininfo lock */
+DWORD WINAPI
+wininfo::winthread ()
 {
   MSG msg;
   WNDCLASS wc;
   static NO_COPY char classname[] = "CygwinWndClass";
 
+  lock->grab ();
   /* Register the window class for the main window. */
 
   wc.style = 0;
-  wc.lpfnWndProc = (WNDPROC) WndProc;
+  wc.lpfnWndProc = (WNDPROC) process_window_events;
   wc.cbClsExtra = 0;
   wc.cbWndExtra = 0;
   wc.hInstance = user_data->hmodule;
@@ -96,60 +108,63 @@ Winmain (VOID *)
   wc.lpszClassName = classname;
 
   if (!RegisterClass (&wc))
-    {
-      system_printf ("Cannot register window class, %E");
-      return FALSE;
-    }
+    api_fatal ("cannot register window class, %E");
 
   /* Create hidden window. */
-  ourhwnd = CreateWindow (classname, classname, WS_POPUP, CW_USEDEFAULT,
-			  CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-			  (HWND) NULL, (HMENU) NULL, user_data->hmodule,
-			  (LPVOID) NULL);
+  hwnd = CreateWindow (classname, classname, WS_POPUP, CW_USEDEFAULT,
+			   CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			   (HWND) NULL, (HMENU) NULL, user_data->hmodule,
+			   (LPVOID) NULL);
+  if (!hwnd)
+    api_fatal ("couldn't create window, %E");
+  lock->release ();
 
-  SetEvent (window_started);
-
-  if (!ourhwnd)
-    {
-      system_printf ("Cannot create window");
-      return FALSE;
-    }
-
-  /* Start the message loop. */
-
-  while (GetMessage (&msg, ourhwnd, 0, 0) == TRUE)
+  while (GetMessage (&msg, hwnd, 0, 0) == TRUE)
     DispatchMessage (&msg);
 
   return 0;
 }
 
-HWND __stdcall
-gethwnd ()
+static DWORD WINAPI
+winthread (VOID *arg)
 {
-  if (ourhwnd != NULL)
-    return ourhwnd;
+  return  ((wininfo *) arg)->winthread ();
+}
 
-  cygthread *h;
+wininfo::operator
+HWND ()
+{
+  if (hwnd)
+    return hwnd;
 
-  window_started = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  h = new cygthread (Winmain, NULL, "win");
-  h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
-  WaitForSingleObject (window_started, INFINITE);
-  CloseHandle (window_started);
-  h->zap_h ();
-  return ourhwnd;
+  lock->acquire ();
+  if (!hwnd)
+    {
+      lock->upforgrabs ();
+      cygthread *h = new cygthread (::winthread, this, "win");
+      h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
+      h->zap_h ();
+      lock->acquire ();
+    }
+  lock->release ();
+  return hwnd;
 }
 
 extern "C" int
 setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
 {
-  UINT elapse;
-
   if (which != ITIMER_REAL)
     {
       set_errno (ENOSYS);
       return -1;
     }
+  return winmsg.setitimer (value, oldvalue);
+}
+
+/* FIXME: Very racy */
+int __stdcall
+wininfo::setitimer (const struct itimerval *value, struct itimerval *oldvalue)
+{
   /* Check if we will wrap */
   if (itv.it_value.tv_sec >= (long) (UINT_MAX / 1000))
     {
@@ -158,7 +173,7 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
     }
   if (timer_active)
     {
-      KillTimer (gethwnd (), timer_active);
+      KillTimer (winmsg, timer_active);
       timer_active = 0;
     }
   if (oldvalue)
@@ -169,13 +184,13 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
       return -1;
     }
   itv = *value;
-  elapse = itv.it_value.tv_sec * 1000 + itv.it_value.tv_usec / 1000;
+  UINT elapse = itv.it_value.tv_sec * 1000 + itv.it_value.tv_usec / 1000;
   if (elapse == 0)
     if (itv.it_value.tv_usec)
       elapse = 1;
     else
       return 0;
-  if (!(timer_active = SetTimer (gethwnd (), 1, elapse, NULL)))
+  if (!(timer_active = SetTimer (winmsg, 1, elapse, NULL)))
     {
       __seterrno ();
       return -1;
@@ -187,8 +202,6 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
 extern "C" int
 getitimer (int which, struct itimerval *value)
 {
-  UINT elapse, val;
-
   if (which != ITIMER_REAL)
     {
       set_errno (EINVAL);
@@ -199,6 +212,13 @@ getitimer (int which, struct itimerval *value)
       set_errno (EFAULT);
       return -1;
     }
+  return winmsg.getitimer (value);
+}
+
+/* FIXME: racy */
+int __stdcall
+wininfo::getitimer (struct itimerval *value)
+{
   *value = itv;
   if (!timer_active)
     {
@@ -206,6 +226,9 @@ getitimer (int which, struct itimerval *value)
       value->it_value.tv_usec = 0;
       return 0;
     }
+
+  UINT elapse, val;
+
   elapse = GetTickCount () - start_time;
   val = itv.it_value.tv_sec * 1000 + itv.it_value.tv_usec / 1000;
   val -= elapse;

@@ -1,5 +1,34 @@
 2004-05-15  Christopher Faylor  <cgf@alum.bu.edu>
 
+	* cygthread.cc (cygthread::is): Eliminate.
+	* cygthread.h (cygthread::is): Eliminate declaratin.
+	* fhandler_console.cc (fhandler_console::read): Only wait for
+	signal_arrived in the main thread.
+	* fhandler_socket.cc: Include new "wininfo.h".
+	(fhandler_socket::ioctl): Use 'winmsg' rather than 'gethwnd()'.
+	* sync.cc (muto::grab): Define new function.
+	(muto::acquire): Use tls pointer rather than tid.
+	(muto::acquired): Ditto.
+	(muto::reset): Delete.
+	(muto::release): Ditto.  Also implement "close on last release".
+	* sync.h (muto::tid): Delete.
+	(muto::tls): New field.
+	(muto::ismine): Delete.
+	(muto::owner): Delete.
+	(muto::unstable): Delete.
+	(muto::reset): Delete.
+	(muto::upforgrabs): New method.
+	(muto::grab): Ditto.
+	(new_muto_name): New define.
+	* wininfo.h: New file.
+	(wininfo): New class.
+	* window.cc: Rework throughout to use winfo class for controlling
+	invisible window operation.
+	(gethwnd): Delete definition.
+	* winsup.h (gethwnd): Delete declaration.
+
+2004-05-15  Christopher Faylor  <cgf@alum.bu.edu>
+
 	* cygheap.h: Remove some parameter names from declarations throughout.
 	(cygheap::set): Reflect changes in declaration for arguments and return
 	value from previous checkin.

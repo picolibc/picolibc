@@ -22,7 +22,7 @@ class muto
   HANDLE bruteforce; /* event handle used to control waiting for lock. */
 public:
   LONG visits;	/* Count of number of times a thread has called acquire. */
-  DWORD tid;	/* Thread Id of lock owner. */
+  void *tls;	/* Tls of lock owner. */
   // class muto *next;
   const char *name;
 
@@ -35,12 +35,9 @@ public:
   int acquire (DWORD ms = INFINITE) __attribute__ ((regparm (2))); /* Acquire the lock. */
   int release () __attribute__ ((regparm (1)));		     /* Release the lock. */
 
-  /* Return true if caller thread owns the lock. */
-  int ismine () {return tid == GetCurrentThreadId ();}
-  DWORD owner () {return tid;}
-  int unstable () {return !tid && (sync || waiters >= 0);}
-  void reset () __attribute__ ((regparm (1)));
-  bool acquired ();
+  bool acquired () __attribute__ ((regparm (1)));
+  void upforgrabs () {tls = this;}  // just set to an invalid address
+  void grab () __attribute__ ((regparm (1)));
   static void set_exiting_thread () {exiting_thread = GetCurrentThreadId ();}
 };
 
@@ -58,5 +55,12 @@ extern muto muto_start;
 ({ \
   static muto __storage __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy1"))); \
   __name = __storage.init (#__name); \
+})
+
+/* Use a statically allocated buffer as the storage for a muto */
+#define new_muto_name(__var, __name) \
+({ \
+  static muto __var##_storage __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy1"))); \
+  __var = __var##_storage.init (__name); \
 })
 #endif /*_SYNC_H*/

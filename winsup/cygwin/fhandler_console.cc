@@ -29,6 +29,7 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 #include "cygthread.h"
+#include "cygtls.h"
 
 #define CONVERT_LIMIT 16384
 
@@ -250,7 +251,7 @@ fhandler_console::read (void *pv, size_t& buflen)
   char tmp[60];
 
   w4[0] = h;
-  if (cygthread::is ())
+  if (&_my_tls != _main_tls)
     nwait = 1;
   else
     {

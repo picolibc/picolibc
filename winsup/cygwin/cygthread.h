@@ -30,7 +30,6 @@ class cygthread
   static void init ();
   bool detach (HANDLE = NULL);
   operator HANDLE ();
-  static bool is ();
   void * operator new (size_t);
   static cygthread *freerange ();
   void exit_thread ();

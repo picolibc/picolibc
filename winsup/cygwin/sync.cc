@@ -22,10 +22,18 @@ details. */
 #include <stdlib.h>
 #include "sync.h"
 #include "security.h"
+#include "thread.h"
+#include "cygtls.h"
 
 #undef WaitForSingleObject
 
 DWORD NO_COPY muto::exiting_thread;
+
+void
+muto::grab ()
+{
+  tls = &_my_tls;
+}
 
 /* Constructor */
 muto *
@@ -69,13 +77,13 @@ muto::~muto ()
 int
 muto::acquire (DWORD ms)
 {
-  DWORD this_tid = GetCurrentThreadId ();
+  void *this_tls = &_my_tls;
 #if 0
   if (exiting_thread)
     return this_tid == exiting_thread;
 #endif
 
-  if (tid != this_tid)
+  if (tls != this_tls)
     {
       /* Increment the waiters part of the class.  Need to do this first to
 	 avoid potential races. */
@@ -97,19 +105,25 @@ muto::acquire (DWORD ms)
       if (!ms)
 	InterlockedIncrement (&waiters);
 
-      tid = this_tid;	/* register this thread. */
+      tls = this_tls;	/* register this thread. */
     }
 
   return ++visits;	/* Increment visit count. */
+}
+
+bool
+muto::acquired ()
+{
+  return tls == &_my_tls;
 }
 
 /* Return the muto lock.  Needs to be called once per every acquire. */
 int
 muto::release ()
 {
-  DWORD this_tid = GetCurrentThreadId ();
+  void *this_tls = &_my_tls;
 
-  if (tid != this_tid || !visits)
+  if (tls != this_tls || !visits)
     {
       SetLastError (ERROR_NOT_OWNER);	/* Didn't have the lock. */
       return 0;	/* failed. */
@@ -118,33 +132,24 @@ muto::release ()
   /* FIXME: Need to check that other thread has not exited, too. */
   if (!--visits)
     {
-      tid = 0;		/* We were the last unlocker. */
+      tls = 0;		/* We were the last unlocker. */
       (void) InterlockedExchange (&sync, 0); /* Reset trigger. */
       /* This thread had incremented waiters but had never decremented it.
 	 Decrement it now.  If it is >= 0 then there are possibly other
 	 threads waiting for the lock, so trigger bruteforce.  */
       if (InterlockedDecrement (&waiters) >= 0)
 	(void) SetEvent (bruteforce); /* Wake up one of the waiting threads */
+      else if (*name == '!')
+	{
+	  CloseHandle (bruteforce);	/* If *name == '!' and there are no
+					   other waiters, then this is the
+					   last time this muto will ever be
+					   used, so close the handle. */
+#ifdef DEBUGGING
+	  bruteforce = NULL;
+#endif
+	}
     }
 
   return 1;	/* success. */
-}
-
-bool
-muto::acquired ()
-{
-  return tid == GetCurrentThreadId ();
-}
-
-/* Call only when we're exiting.  This is not thread safe. */
-void
-muto::reset ()
-{
-  visits = sync = tid = 0;
-  InterlockedExchange (&waiters, -1);
-  if (bruteforce)
-    {
-      CloseHandle (bruteforce);
-      bruteforce = CreateEvent (&sec_none_nih, FALSE, FALSE, name);
-    }
 }

@@ -101,18 +101,6 @@ cygthread::init ()
   main_thread_id = GetCurrentThreadId ();
 }
 
-bool
-cygthread::is ()
-{
-  DWORD tid = GetCurrentThreadId ();
-
-  for (DWORD i = 0; i < NTHREADS; i++)
-    if (threads[i].id == tid)
-      return 1;
-
-  return 0;
-}
-
 cygthread *
 cygthread::freerange ()
 {
