@@ -1,3 +1,8 @@
+2002-07-02  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/search/hcreate.c: Remove advertising clause from license.
+	* libc/search/hcreate_r.c: Likewise.
+
 2002-07-02  Chris Demetriou  <cgd@broadcom.com>
 
         * libc/include/sys/config.h (__IEEE_LITTLE_ENDIAN)
