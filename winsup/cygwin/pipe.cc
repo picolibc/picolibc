@@ -205,6 +205,7 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
 	  fildes[0] = fdr;
 	  fildes[1] = fdw;
 	  fhr->read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+	  fhr->set_need_fork_fixup ();
 
 	  res = 0;
 	  fhr->create_guard (sa);

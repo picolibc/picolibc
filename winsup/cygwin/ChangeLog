@@ -1,5 +1,9 @@
 2002-12-14  Christopher Faylor  <cgf@redhat.com>
 
+	* pipe.cc (make_pipe): Set fork fixup flag for read pipe.
+
+2002-12-14  Christopher Faylor  <cgf@redhat.com>
+
 	* winbase.h: Turn on inline versions of Interlocked* by default.
 
 2002-12-14  Gary R. Van Sickle <g.r.vansickle@worldnet.att.net>
