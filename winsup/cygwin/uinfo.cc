@@ -49,7 +49,7 @@ internal_getlogin (cygheap_user &user)
       else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
 	system_printf ("GetTokenInformation(): %E");
       else if (!(ret = user.set_sid (tu)))
-        system_printf ("Couldn't retrieve SID from access token!");
+	system_printf ("Couldn't retrieve SID from access token!");
        /* We must set the user name, uid and gid.
 	 If we have a SID, try to get the corresponding Cygwin
 	 password entry. Set user name which can be different
@@ -251,7 +251,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
 	      sys_mbstowcs (wlogsrv, env_logsrv (),
 			    sizeof (wlogsrv) / sizeof(*wlogsrv));
-	      sys_mbstowcs (wuser, name (), sizeof (wuser) / sizeof (*wuser));
+	     sys_mbstowcs (wuser, env_name (), sizeof (wuser) / sizeof (*wuser));
 	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui)))
 		{
 		  char *p;
@@ -304,7 +304,7 @@ cygheap_user::env_logsrv ()
   if (plogsrv)
     return plogsrv;
 
-  if (strcasematch (env_name (), "SYSTEM"))
+  if (!env_domain () || strcasematch (env_name (), "SYSTEM"))
     return NULL;
 
   char logsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];

@@ -25,6 +25,7 @@ details. */
 #include "cygheap.h"
 #include "registry.h"
 #include "environ.h"
+#include "child_info.h"
 
 extern BOOL allow_daemon;
 extern BOOL allow_glob;
@@ -712,7 +713,7 @@ environ_init (char **envp, int envc)
       char *eq;
       if ((eq = strchr (newp, '=')) == NULL)
 	eq = strchr (newp, '\0');
-      if (!myself->ppid_handle)
+      if (!child_proc_info)
 	ucenv (newp, eq);
       if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
 	sawTERM = 1;
@@ -765,8 +766,8 @@ char env_dontadd[] = "";
 /* Keep this list in upper case and sorted */
 static NO_COPY spenv spenvs[] =
 {
-  {NL ("HOMEPATH="), &cygheap_user::env_homepath},
   {NL ("HOMEDRIVE="), &cygheap_user::env_homedrive},
+  {NL ("HOMEPATH="), &cygheap_user::env_homepath},
   {NL ("LOGONSERVER="), &cygheap_user::env_logsrv},
   {NL ("SYSTEMDRIVE="), NULL},
   {NL ("SYSTEMROOT="), NULL},
@@ -809,7 +810,7 @@ spenv::retrieve (bool no_envblock, const char *const envname)
       /* Calculate (potentially) value for given environment variable.  */
       p = (cygheap->user.*from_cygheap) ();
       if (!p || (no_envblock && !envname))
-        return env_dontadd;
+	return env_dontadd;
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
       (void) strcpy (s + namelen, p);

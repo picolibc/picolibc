@@ -1,3 +1,10 @@
+2002-06-20  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* uinfo.cc (cygheap_user::ontherange): Use env_name for NetUserGetInfo.
+	(cygheap_user::env_logsrv): Verify env_domain is valid.
+	* environ.cc: Include child_info.h and keep spenvs[] sorted.
+	(environ_init): Check child_proc_info instead of myself->ppid_handle.
+
 2002-06-19  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::set_flags): Change priority of "linked
