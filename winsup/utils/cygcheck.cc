@@ -14,11 +14,11 @@ typedef unsigned short gid_t;
 #include <stdlib.h>
 #include <string.h>
 #include <windows.h>
-#include <sys/cygwin.h>
-#include <mntent.h>
-#include <time.h>
-#include <getopt.h>
-#include <ctype.h>
+#include "cygwin/include/sys/cygwin.h>
+#include "cygwin/include/mntent.h"
+#include "cygwin/include/time.h"
+#include "cygwin/include/getopt.h"
+#include "cygwin/include/ctype.h"
 
 int verbose = 0;
 int registry = 0;
