@@ -58,6 +58,10 @@ int     _EXFUN(pipe, (int __fildes[2] ));
 int     _EXFUN(read, (int __fildes, void *__buf, size_t __nbyte ));
 int     _EXFUN(rmdir, (const char *__path ));
 void *  _EXFUN(sbrk,  (size_t __incr));
+#if defined(__CYGWIN__)
+int     _EXFUN(setegid, (gid_t __gid ));
+int     _EXFUN(seteuid, (uid_t __uid ));
+#endif
 int     _EXFUN(setgid, (gid_t __gid ));
 int     _EXFUN(setpgid, (pid_t __pid, pid_t __pgid ));
 pid_t   _EXFUN(setsid, (void ));
