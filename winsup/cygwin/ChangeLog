@@ -1,3 +1,17 @@
+2003-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* msg.cc (msgctl): Raise SIGSYS if call not available.
+	(msgget): Ditto.
+	(msgrcv): Ditto.
+	(msgsnd): Ditto.
+	* sem.cc (semctl): Ditto.
+	(semget): Ditto.
+	(semop): Ditto.
+	* shm.cc (shmat): Ditto.
+	(shmctl): Ditto.
+	(shmget): Ditto.
+	(shmdt): Ditto.
+
 2003-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver.h (client_request::request_code_t): Add

@@ -204,6 +204,8 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       UnmapViewOfFile (ptr);
       delete sph_entry;
       set_errno (request.error_code ());
+      if (request.error_code () == ENOSYS)
+        raise (SIGSYS);
       return NULL;
     }
   sph_entry->ptr = ptr;
@@ -214,6 +216,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   return ptr;
 #else
   set_errno (ENOSYS);
+  raise (SIGSYS);
   return NULL;
 #endif
 }
@@ -252,6 +255,8 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
     {
       syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
       set_errno (request.error_code ());
+      if (request.error_code () == ENOSYS)
+        raise (SIGSYS);
       return -1;
     }
   if (cmd == IPC_RMID)
@@ -273,6 +278,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
   return request.retval ();
 #else
   set_errno (ENOSYS);
+  raise (SIGSYS);
   return -1;
 #endif
 }
@@ -288,6 +294,8 @@ shmdt (const void *shmaddr)
     {
       syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
       set_errno (request.error_code ());
+      if (request.error_code () == ENOSYS)
+        raise (SIGSYS);
       return -1;
     }
   shm_attached_list *sph_entry, *sph_next_entry;
@@ -306,6 +314,7 @@ shmdt (const void *shmaddr)
   return request.retval ();
 #else
   set_errno (ENOSYS);
+  raise (SIGSYS);
   return -1;
 #endif
 }
@@ -330,6 +339,8 @@ shmget (key_t key, size_t size, int shmflg)
       syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
       delete ssh_new_entry;
       set_errno (request.error_code ());
+      if (request.error_code () == ENOSYS)
+        raise (SIGSYS);
       return -1;
     }
   int shmid = request.retval ();	/* Shared mem ID */
@@ -357,6 +368,7 @@ shmget (key_t key, size_t size, int shmflg)
   return shmid;
 #else
   set_errno (ENOSYS);
+  raise (SIGSYS);
   return -1;
 #endif
 }

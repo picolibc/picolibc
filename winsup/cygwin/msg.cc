@@ -136,11 +136,14 @@ msgctl (int msqid, int cmd, struct msqid_ds *buf)
     {
       syscall_printf ("-1 [%d] = msgctl ()", request.error_code ());
       set_errno (request.error_code ());
+      if (request.error_code () == ENOSYS)
+        raise (SIGSYS);
       return -1;
     }
   return request.retval ();
 #else
   set_errno (ENOSYS);
+  raise (SIGSYS);
   return -1;
 #endif
 }
@@ -156,11 +159,14 @@ msgget (key_t key, int msgflg)
     {
       syscall_printf ("-1 [%d] = msgget ()", request.error_code ());
       set_errno (request.error_code ());
+      if (request.error_code () == ENOSYS)
+        raise (SIGSYS);
       return -1;
     }
   return request.retval ();
 #else
   set_errno (ENOSYS);
+  raise (SIGSYS);
   return -1;
 #endif
 }
@@ -180,11 +186,14 @@ msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
     {
       syscall_printf ("-1 [%d] = msgrcv ()", request.error_code ());
       set_errno (request.error_code ());
+      if (request.error_code () == ENOSYS)
+        raise (SIGSYS);
       return -1;
     }
   return request.rcvval ();
 #else
   set_errno (ENOSYS);
+  raise (SIGSYS);
   return -1;
 #endif
 }
@@ -203,11 +212,14 @@ msgsnd (int msqid, const void *msgp, size_t msgsz, int msgflg)
     {
       syscall_printf ("-1 [%d] = msgsnd ()", request.error_code ());
       set_errno (request.error_code ());
+      if (request.error_code () == ENOSYS)
+        raise (SIGSYS);
       return -1;
     }
   return request.retval ();
 #else
   set_errno (ENOSYS);
+  raise (SIGSYS);
   return -1;
 #endif
 }
