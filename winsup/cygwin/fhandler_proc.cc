@@ -698,14 +698,14 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	  cpuid (&maxf, &vendor_id[0], &vendor_id[2], &vendor_id[1], 0);
 	  maxf &= 0xffff;
 	  vendor_id[3] = 0;
-	  
+
 	  // vendor identification
 	  bool is_amd = false, is_intel = false;
 	  if (!strcmp ((char*)vendor_id, "AuthenticAMD"))
 	    is_amd = true;
 	  else if (!strcmp ((char*)vendor_id, "GenuineIntel"))
 	    is_intel = true;
-	  
+
 	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", (char *)vendor_id);
 	  unsigned cpu_mhz  = 0;
 	  if (wincap.is_winnt ())
@@ -841,9 +841,9 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		print (" psn");
 	      if (features1 & (1 << 19))
 		print (" clfl");
-	      if (features1 & (1 << 21))
+	      if (is_intel && features1 & (1 << 21))
 		print (" dtes");
-	      if (features1 & (1 << 22))
+	      if (is_intel && features1 & (1 << 22))
 		print (" acpi");
 	      if (features1 & (1 << 23))
 		print (" mmx");
@@ -851,45 +851,56 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		print (" fxsr");
 	      if (features1 & (1 << 25))
 		print (" sse");
-	      if (features1 & (1 << 26))
-		print (" sse2");
-	      if (features1 & (1 << 27))
-		print (" ss");
-	      if (features1 & (1 << 28))
-		print (" htt");
-	      if (features1 & (1 << 29))
-		print (" tmi");
-	      if (features1 & (1 << 30))
-		print (" ia-64");
-	      if (features1 & (1 << 31))
-		print (" pbe");
-	      if (features2 & (1 << 0))
-		print (" sse3");
-	      if (features2 & (1 << 3))
-		print (" mon");
-	      if (features2 & (1 << 4))
-		print (" dscpl");
-	      if (features2 & (1 << 8))
-		print (" tm2");
-	      if (features2 & (1 << 10))
-		print (" cid");
-	      
-	      if (is_amd)
+	      if (is_intel)
+	        {
+	          if (features1 & (1 << 26))
+		    print (" sse2");
+	          if (features1 & (1 << 27))
+		    print (" ss");
+	          if (features1 & (1 << 28))
+		    print (" htt");
+	          if (features1 & (1 << 29))
+		    print (" tmi");
+	          if (features1 & (1 << 30))
+		    print (" ia-64");
+	          if (features1 & (1 << 31))
+		    print (" pbe");
+
+	          if (features2 & (1 << 0))
+		    print (" pni");
+	          if (features2 & (1 << 3))
+		    print (" monitor");
+	          if (features2 & (1 << 4))
+		    print (" ds_cpl");
+		  if (features2 & (1 << 7))
+		    print (" tm2");
+	          if (features2 & (1 << 8))
+		    print (" est");
+	         if (features2 & (1 << 10))
+		    print (" cid");
+	        }
+
+	      if (is_amd && maxe >= 0x80000001)
 	        {
 		  // uses AMD extended calls to check
 		  // for 3dnow and 3dnow extended support
 		  // (source: AMD Athlon Processor Recognition Application Note)
-		  unsigned int a = 0, b, c, d;
-		  cpuid (&a, &b, &c, &d, 0x80000000);
-		  
-		  if (a >= 0x80000001)  // has basic capabilities
+
+		  if (maxe >= 0x80000001)  // has basic capabilities
 		    {
-		      cpuid (&a, &b, &c, &d, 0x80000001);
-		      
-		      if(d & (1 << 30)) // 31th bit is on
+		      cpuid (&unused, &unused, &unused, &features2, 0x80000001);
+
+                      if (features2 & (1 << 11))
+		        print (" syscall");
+                      if (features2 & (1 << 19))
+		        print (" mp");
+                      if (features2 & (1 << 22))
+                        print (" mmxext");
+                      if (features2 & (1 << 29))
+                        print (" lm");
+		      if (features2 & (1 << 30)) // 31th bit is on
 			print (" 3dnowext");
-		      
-		      if(d & (1 << 31)) // 32th bit (highest) is on
+		      if (features2 & (1 << 31)) // 32th bit (highest) is on
 			print (" 3dnow");
 		    }
 		}

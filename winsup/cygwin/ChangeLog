@@ -1,3 +1,9 @@
+2004-07-26  Christopher January  <chris@atomice.net>
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Remove Intel-specific flags
+	from /proc/cpuinfo on non-Intel processors. Added new AMD-specific
+	flags. Changed Intel flag names to match Linux.
+
 2004-07-24  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (dll_crt0_0): Use proper boolean arguments.
