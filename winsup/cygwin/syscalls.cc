@@ -29,6 +29,7 @@ details. */
 #include <stdio.h>
 #include <process.h>
 #include <utmp.h>
+#include <utmpx.h>
 #include <sys/uio.h>
 #include <errno.h>
 #include <ctype.h>
@@ -2559,6 +2560,17 @@ static unsigned utix = 0;
   utmp_data_buf + utix++; \
 })
 
+static struct utmpx *
+copy_ut_to_utx (struct utmp *ut, struct utmpx *utx)
+{
+  if (!ut)
+    return NULL;
+  memcpy (utx, ut, sizeof *ut);
+  utx->ut_tv.tv_sec = ut->ut_time;
+  utx->ut_tv.tv_usec = 0;
+  return utx;
+}
+
 extern "C" struct utmp *
 getutent ()
 {
@@ -2635,16 +2647,16 @@ getutline (struct utmp *line)
   return NULL;
 }
 
-extern "C" void
+extern "C" struct utmp *
 pututline (struct utmp *ut)
 {
   if (check_null_invalid_struct (ut))
-    return;
+    return NULL;
   internal_setutent (true);
   if (utmp_fd < 0)
     {
       debug_printf ("error: utmp_fd %d", utmp_fd);
-      return;
+      return NULL;
     }
   debug_printf ("ut->ut_type %d, ut->ut_pid %d, ut->ut_line '%s', ut->ut_id '%s'\n",
 		ut->ut_type, ut->ut_pid, ut->ut_line, ut->ut_id);
@@ -2659,6 +2671,59 @@ pututline (struct utmp *ut)
     }
   else
     locked_append (utmp_fd, ut, sizeof *ut);
+  return ut;
+}
+
+extern "C" void
+setutxent ()
+{
+  internal_setutent (false);
+}
+
+extern "C" void
+endutxent ()
+{
+  endutent ();
+}
+
+extern "C" struct utmpx *
+getutxent ()
+{
+  static struct utmpx utx;
+  return copy_ut_to_utx (getutent (), &utx);
+}
+
+extern "C" struct utmpx *
+getutxid (const struct utmpx *id)
+{
+  static struct utmpx utx;
+
+  if (__check_invalid_read_ptr (id, sizeof *id))
+    return NULL;
+  ((struct utmpx *)id)->ut_time = id->ut_tv.tv_sec;
+  return copy_ut_to_utx (getutid ((struct utmp *) id), &utx);
+}
+
+extern "C" struct utmpx *
+getutxline (const struct utmpx *line)
+{
+  static struct utmpx utx;
+
+  if (__check_invalid_read_ptr (line, sizeof *line))
+    return NULL;
+  ((struct utmpx *)line)->ut_time = line->ut_tv.tv_sec;
+  return copy_ut_to_utx (getutline ((struct utmp *) line), &utx);
+}
+
+extern "C" struct utmpx *
+pututxline (const struct utmpx *utmpx)
+{
+  static struct utmpx utx;
+
+  if (__check_invalid_read_ptr (utmpx, sizeof *utmpx))
+    return NULL;
+  ((struct utmpx *)utmpx)->ut_time = utmpx->ut_tv.tv_sec;
+  return copy_ut_to_utx (pututline ((struct utmp *) utmpx), &utx);
 }
 
 extern "C"

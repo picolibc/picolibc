@@ -244,12 +244,13 @@ details. */
       115: Export flockfile, ftrylockfile, funlockfile, getgrgid_r, getgrnam_r,
            getlogin_r.
       116: Export atoll.
+      117: Export utmpx functions, Return utmp * from pututent.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 116
+#define CYGWIN_VERSION_API_MINOR 117
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

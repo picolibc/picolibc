@@ -404,6 +404,7 @@ endpwent NOSIGFE
 _endpwent = endpwent NOSIGFE
 endutent SIGFE
 _endutent = endutent SIGFE
+endutxent SIGFE
 envz_add SIGFE
 __envz_add = envz_add SIGFE
 envz_entry NOSIGFE
@@ -682,6 +683,9 @@ getutid SIGFE
 _getutid = getutid SIGFE
 getutline SIGFE
 _getutline = getutline SIGFE
+getutxent SIGFE
+getutxid SIGFE
+getutxline SIGFE
 getw SIGFE
 _getw = getw SIGFE
 getwd SIGFE
@@ -1067,6 +1071,7 @@ puts SIGFE
 _puts = puts SIGFE
 pututline SIGFE
 _pututline = pututline SIGFE
+pututxline SIGFE
 putw SIGFE
 _putw = putw SIGFE
 qsort NOSIGFE
@@ -1215,6 +1220,7 @@ _setuid = setuid SIGFE
 _setuid32 = setuid32 SIGFE
 setutent SIGFE
 _setutent = setutent SIGFE
+setutxent SIGFE
 setvbuf SIGFE
 _setvbuf = setvbuf SIGFE
 sexecl = sexecve_is_bad SIGFE
