@@ -1,3 +1,7 @@
+2002-12-30  Christopher Faylor  <cgf@redhat.com>
+
+	* windows.cc (setitimer): Return ENOSYS on invalid argument.
+
 2002-12-28  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_termios.cc (fhandler_termios::line_edit): Perform echo
