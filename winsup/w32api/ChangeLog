@@ -1,3 +1,7 @@
+Thu May 27 15:57:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/wincrypt.h: Add missing CRYPT_MACHINE_KEYSET define.
+
 Thu May 18 11:37:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/winnt.h: Add some missing TAPE_DRIVE_* defines.
