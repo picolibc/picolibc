@@ -1,3 +1,7 @@
+2002-03-05  Paul Koning  <pkoning@equallogic.com>
+
+	* pdp11.h: Add format codes for float instruction formats.
+
 2002-02-25  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (PPC_OPCODE_POWER4, PPC_OPCODE_NOPOWER4): Define.

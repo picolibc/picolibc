@@ -1,5 +1,5 @@
 /* PDP-11 opcde list.
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 2001, 2002 Free Software Foundation, Inc.
 
 This file is part of GDB and GAS.
 
@@ -27,7 +27,7 @@ the Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307
 #define PDP11_OPCODE_REG_OP	 3	/* register and generic operand */
 #define PDP11_OPCODE_REG_OP_REV	 4	/* register and generic operand,
 					   reversed syntax */
-#define PDP11_OPCODE_AC_OP	 5	/* fpu accumulator and generic
+#define PDP11_OPCODE_AC_FOP	 5	/* fpu accumulator and generic float
 					   operand */
 #define PDP11_OPCODE_OP_OP	 6	/* two generic operands */
 #define PDP11_OPCODE_DISPL	 7	/* pc-relative displacement */
@@ -37,6 +37,13 @@ the Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307
 #define PDP11_OPCODE_IMM6	10	/* 6-bit immediate */
 #define PDP11_OPCODE_IMM3	11	/* 3-bit immediate */
 #define PDP11_OPCODE_ILLEGAL	12	/* illegal instruction */
+#define PDP11_OPCODE_FOP_AC	13	/* generic float argument, then fpu
+					   accumulator */
+#define PDP11_OPCODE_FOP	14	/* generic float operand */
+#define PDP11_OPCODE_AC_OP	15	/* fpu accumulator and generic int
+					   operand */
+#define PDP11_OPCODE_OP_AC	16	/* generic int argument, then fpu
+					   accumulator */
 
 /*
  * PDP-11 instruction set extensions.
