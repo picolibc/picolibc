@@ -1,3 +1,10 @@
+2005-03-18  Hans-Peter Nilsson  <hp@axis.com>
+            Corinna Vinschen  <corinna@vinschen.de>
+
+        * libc/include/ctype.h: Remove invalid +1 offset from
+        ctype macro references to __ctype_ptr.
+        (_ctype_): Move declaration outside #ifndef __cplusplus.
+
 2005-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/machine/setjmp.h (sigsetjmp): Use GCC extension to
