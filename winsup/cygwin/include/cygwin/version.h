@@ -132,10 +132,11 @@ details. */
        36: Added _cygwin_S_IEXEC, et al
        37: [f]pathconv support _PC_POSIX_PERMISSIONS and _PC_POSIX_SECURITY
        38: vscanf, vscanf_r, and random pthread functions
+       39: asctime_r, ctime_r, gmtime_r, localtime_r
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 38
+#define CYGWIN_VERSION_API_MINOR 39
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

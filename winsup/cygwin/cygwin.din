@@ -32,6 +32,8 @@ alphasort
 _alphasort = alphasort
 asctime
 _asctime = asctime
+asctime_r
+_asctime_r = asctime_r
 asin
 _asin = asin
 asinf
@@ -119,6 +121,8 @@ creat
 _creat = creat
 ctime
 _ctime = ctime
+ctime_r
+_ctime_r = ctime_r
 cwait
 _cwait = cwait
 difftime
@@ -366,6 +370,8 @@ globfree
 _globfree = globfree
 gmtime
 _gmtime = gmtime
+gmtime_r
+_gmtime_r = gmtime_r
 h_errno DATA
 hypot
 _hypot = hypot
@@ -454,6 +460,8 @@ localeconv
 _localeconv = localeconv
 localtime
 _localtime = localtime
+localtime_r
+_localtime_r = localtime_r
 log
 _log = log
 log10

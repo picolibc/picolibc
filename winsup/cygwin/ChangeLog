@@ -1,3 +1,8 @@
+2001-04-25  Egor Duda  <deo@logos-m.ru>
+
+	* cygwin.din: Export asctime_r, ctime_r, gmtime_r, localtime_r
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 39
+
 Wed Apr 25 10:57:36 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/version.h: Bump minor version number.
