@@ -3,6 +3,8 @@
 	* include/sys/stat.h (_S_IFLNK, S_IFLNK, _S_ISLNK, S_ISLNK, _lstat,
 	lstat): Remove.
 	* include/errno.h (ELOOP): Ditto.
+	* include/_mingw.h: Increment version to 3.7.
+	* Makefile.in: Ditto.
 
 2005-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
