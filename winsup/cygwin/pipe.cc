@@ -138,6 +138,7 @@ fhandler_pipe::dup (fhandler_base *child)
 
   fhandler_pipe *ftp = (fhandler_pipe *) child;
 
+  /* FIXME: This leaks handles in the failing condition */
   if (guard == NULL)
     ftp->guard = NULL;
   else if (!DuplicateHandle (hMainProc, guard, hMainProc, &ftp->guard, 0, 1,
