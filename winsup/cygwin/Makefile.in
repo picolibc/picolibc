@@ -262,7 +262,7 @@ install: install-libs install-headers install-man install_target \
 uninstall: uninstall-libs uninstall-headers uninstall-man
 
 install-libs: $(TARGET_LIBS)
-	$(INSTALL_DATA) $(TEST_DLL_NAME) $(bindir)/$(DLL_NAME); \
+	$(INSTALL_PROGRAM) $(TEST_DLL_NAME) $(bindir)/$(DLL_NAME); \
 	for i in $^; do \
 	    $(INSTALL_DATA) $$i $(tooldir)/lib/`basename $$i` ; \
 	done

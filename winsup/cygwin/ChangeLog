@@ -1,3 +1,7 @@
+2003-06-25  Doru Carastan  <doru.carastan@mvista.com>
+
+	* Makefile.in: Use INSTALL_PROGRAM to install the cygwin DLL.
+
 2003-06-24  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc (MTinterface::fixup_after_fork): Fix thread list after
