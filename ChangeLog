@@ -1,3 +1,8 @@
+2002-04-29  Mark Mitchell  <mark@codesourcery.com>
+
+	* config.guess: Updated to 2002-04-26's version.
+	* config.sub: Updated to 2002-04-26's version.
+
 2002-04-29  Nathanael Nerode  <neroden@doctormoo.dyndns.org>
 
 	* configure.in: delete reference to absent file
