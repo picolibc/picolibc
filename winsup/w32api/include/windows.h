@@ -48,7 +48,7 @@
 #include <windef.h>
 #include <wincon.h>
 #include <winbase.h>
-#ifndef _WINGDI_H
+#if !(defined NOGDI || defined  _WINGDI_H)
 #include <wingdi.h>
 #endif
 #ifndef _WINUSER_H
@@ -71,7 +71,6 @@
 #endif
 
 #ifndef WIN32_LEAN_AND_MEAN
-#include <commdlg.h>
 #include <cderr.h>
 #include <dde.h>
 #include <ddeml.h>
@@ -83,7 +82,10 @@
 #include <rpc.h>
 #include <shellapi.h>
 #include <winperf.h>
+#ifndef NOGDI
+#include <commdlg.h>
 #include <winspool.h>
+#endif
 #if defined(Win32_Winsock)
 #warning "The  Win32_Winsock macro name is deprecated.\
     Please use __USE_W32_SOCKETS instead"
@@ -103,11 +105,14 @@
 #include <winsock.h>
 #endif /*  (_WIN32_WINNT >= 0x0400) */
 #endif
+#ifndef NOGDI
 #if !defined (__OBJC__)
 #if  __GNUC__ >= 3  /* what about Watcom? */
 #include <ole2.h>
 #endif
 #endif /* __OBJC__ */
+#endif
+
 #endif /* WIN32_LEAN_AND_MEAN */
 
 #endif /* RC_INVOKED */

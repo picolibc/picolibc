@@ -2313,6 +2313,7 @@ typedef struct tagHIGHCONTRASTW {
 	DWORD dwFlags;
 	LPWSTR lpszDefaultScheme;
 } HIGHCONTRASTW,*LPHIGHCONTRASTW;
+#ifndef NOGDI
 typedef struct tagICONMETRICSA {
 	UINT cbSize;
 	int iHorzSpacing;
@@ -2327,6 +2328,7 @@ typedef struct tagICONMETRICSW {
 	int iTitleWrap;
 	LOGFONTW lfFont;
 } ICONMETRICSW,*LPICONMETRICSW;
+#endif /*  NOGDI */
 typedef struct tagMINIMIZEDMETRICS {
 	UINT cbSize;
 	int iWidth;
@@ -2343,6 +2345,7 @@ typedef struct tagMOUSEKEYS{
 	DWORD dwReserved1;
 	DWORD dwReserved2;
 } MOUSEKEYS, *LPMOUSEKEYS;
+#ifndef NOGDI
 typedef struct tagNONCLIENTMETRICSA {
 	UINT cbSize;
 	int iBorderWidth;
@@ -2377,6 +2380,7 @@ typedef struct tagNONCLIENTMETRICSW {
 	LOGFONTW lfStatusFont;
 	LOGFONTW lfMessageFont;
 } NONCLIENTMETRICSW,*LPNONCLIENTMETRICSW;
+#endif
 typedef struct tagSERIALKEYSA {
 	UINT cbSize;
 	DWORD dwFlags;
@@ -2742,8 +2746,10 @@ LRESULT WINAPI CallWindowProcA(WNDPROC,HWND,UINT,WPARAM,LPARAM);
 LRESULT WINAPI CallWindowProcW(WNDPROC,HWND,UINT,WPARAM,LPARAM);
 WORD WINAPI CascadeWindows(HWND,UINT,LPCRECT,UINT,const HWND*);
 BOOL WINAPI ChangeClipboardChain(HWND,HWND);
+#ifndef NOGDI
 LONG WINAPI ChangeDisplaySettingsA(PDEVMODEA,DWORD);
 LONG WINAPI ChangeDisplaySettingsW(PDEVMODEW,DWORD);
+#endif
 BOOL WINAPI ChangeMenuA(HMENU,UINT,LPCSTR,UINT,UINT);
 BOOL WINAPI ChangeMenuW(HMENU,UINT,LPCWSTR,UINT,UINT);
 LPSTR WINAPI CharLowerA(LPSTR);
@@ -2789,8 +2795,10 @@ HACCEL WINAPI CreateAcceleratorTableA(LPACCEL,int);
 HACCEL WINAPI CreateAcceleratorTableW(LPACCEL,int);
 BOOL WINAPI CreateCaret(HWND,HBITMAP,int,int);
 HCURSOR WINAPI CreateCursor(HINSTANCE,int,int,int,int,PCVOID,PCVOID);
+#ifndef NOGDI
 HDESK WINAPI CreateDesktopA(LPCSTR,LPCSTR,LPDEVMODEA,DWORD,ACCESS_MASK,LPSECURITY_ATTRIBUTES);
 HDESK WINAPI CreateDesktopW(LPCWSTR,LPCWSTR,LPDEVMODEW,DWORD,ACCESS_MASK,LPSECURITY_ATTRIBUTES);
+#endif
 #define CreateDialogA(h,n,w,f) CreateDialogParamA(h,n,w,f,0)
 #define CreateDialogW(h,n,w,f) CreateDialogParamW(h,n,w,f,0)
 #define CreateDialogIndirectA(h,t,w,f) CreateDialogIndirectParamA(h,t,w,f,0)
@@ -2878,8 +2886,10 @@ BOOL WINAPI EnumDesktopsA(HWINSTA,DESKTOPENUMPROCA,LPARAM);
 BOOL WINAPI EnumDesktopsW(HWINSTA,DESKTOPENUMPROCW,LPARAM);
 BOOL WINAPI EnumDesktopWindows(HDESK,ENUMWINDOWSPROC,LPARAM);
 BOOL WINAPI EnumDisplayMonitors(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
+#ifndef NOGDI
 BOOL WINAPI EnumDisplaySettingsA(LPCSTR,DWORD,PDEVMODEA);
 BOOL WINAPI EnumDisplaySettingsW(LPCWSTR,DWORD,PDEVMODEW);
+#endif
 int WINAPI EnumPropsA(HWND,PROPENUMPROCA);
 int WINAPI EnumPropsW(HWND,PROPENUMPROCW);
 int WINAPI EnumPropsExA(HWND,PROPENUMPROCEXA,LPARAM);
@@ -3296,8 +3306,6 @@ typedef MENUITEMINFOW MENUITEMINFO,*LPMENUITEMINFO;
 typedef LPCMENUITEMINFOW LPCMENUITEMINFO;
 typedef MSGBOXPARAMSW MSGBOXPARAMS,*PMSGBOXPARAMS,*LPMSGBOXPARAMS;
 typedef HIGHCONTRASTW HIGHCONTRAST,*LPHIGHCONTRAST;
-typedef ICONMETRICSW ICONMETRICS,*LPICONMETRICS;
-typedef NONCLIENTMETRICSW NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
 typedef SERIALKEYSW SERIALKEYS,*LPSERIALKEYS;
 typedef SOUNDSENTRYW SOUNDSENTRY,*LPSOUNDSENTRY;
 typedef CREATESTRUCTW CREATESTRUCT, *LPCREATESTRUCT;
@@ -3307,7 +3315,6 @@ typedef MULTIKEYHELPW MULTIKEYHELP,*PMULTIKEYHELP,*LPMULTIKEYHELP;
 typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 #define AppendMenu AppendMenuW
 #define CallWindowProc CallWindowProcW
-#define ChangeDisplaySettings ChangeDisplaySettingsW
 #define ChangeMenu ChangeMenuW
 #define CharLower CharLowerW
 #define CharLowerBuff CharLowerBuffW
@@ -3321,7 +3328,6 @@ typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 #define CharUpperBuff CharUpperBuffW
 #define CopyAcceleratorTable CopyAcceleratorTableW
 #define CreateAcceleratorTable CreateAcceleratorTableW
-#define CreateDesktop CreateDesktopW
 #define CreateDialog CreateDialogW
 #define CreateDialogIndirect CreateDialogIndirectW
 #define CreateDialogIndirectParam CreateDialogIndirectParamW
@@ -3347,7 +3353,6 @@ typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 #define DrawText DrawTextW
 #define DrawTextEx DrawTextExW
 #define EnumDesktops EnumDesktopsW
-#define EnumDisplaySettings EnumDisplaySettingsW
 #define EnumProps EnumPropsW
 #define EnumPropsEx EnumPropsExW
 #define EnumWindowStations EnumWindowStationsW
@@ -3435,7 +3440,14 @@ typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 #define WinHelp WinHelpW
 #define wsprintf wsprintfW
 #define wvsprintf wvsprintfW
-#else
+#ifndef NOGDI
+typedef ICONMETRICSW ICONMETRICS,*LPICONMETRICS;
+typedef NONCLIENTMETRICSW NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
+#define ChangeDisplaySettings ChangeDisplaySettingsW
+#define CreateDesktop CreateDesktopW
+#define EnumDisplaySettings EnumDisplaySettingsW
+#endif /* NOGDI */
+#else /* UNICODE */
 #define EDITWORDBREAKPROC EDITWORDBREAKPROCA
 #define PROPENUMPROC PROPENUMPROCA
 #define PROPENUMPROCEX PROPENUMPROCEXA
@@ -3450,8 +3462,6 @@ typedef MENUITEMINFOA MENUITEMINFO,*LPMENUITEMINFO;
 typedef LPCMENUITEMINFOA LPCMENUITEMINFO;
 typedef MSGBOXPARAMSA MSGBOXPARAMS,*PMSGBOXPARAMS,*LPMSGBOXPARAMS;
 typedef HIGHCONTRASTA HIGHCONTRAST,*LPHIGHCONTRAST;
-typedef ICONMETRICSA ICONMETRICS,*LPICONMETRICS;
-typedef NONCLIENTMETRICSA NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
 typedef SERIALKEYSA SERIALKEYS,*LPSERIALKEYS;
 typedef SOUNDSENTRYA SOUNDSENTRY,*LPSOUNDSENTRY;
 typedef CREATESTRUCTA CREATESTRUCT, *LPCREATESTRUCT;
@@ -3461,7 +3471,6 @@ typedef MULTIKEYHELPA MULTIKEYHELP,*PMULTIKEYHELP,*LPMULTIKEYHELP;
 typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 #define AppendMenu AppendMenuA
 #define CallWindowProc CallWindowProcA
-#define ChangeDisplaySettings ChangeDisplaySettingsA
 #define ChangeMenu ChangeMenuA
 #define CharLower CharLowerA
 #define CharLowerBuff CharLowerBuffA
@@ -3475,7 +3484,6 @@ typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 #define CharUpperBuff CharUpperBuffA
 #define CopyAcceleratorTable CopyAcceleratorTableA
 #define CreateAcceleratorTable CreateAcceleratorTableA
-#define CreateDesktop CreateDesktopA
 #define CreateDialog CreateDialogA
 #define CreateDialogIndirect CreateDialogIndirectA
 #define CreateDialogIndirectParam CreateDialogIndirectParamA
@@ -3501,7 +3509,6 @@ typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 #define DrawText DrawTextA
 #define DrawTextEx DrawTextExA
 #define EnumDesktops EnumDesktopsA
-#define EnumDisplaySettings EnumDisplaySettingsA
 #define EnumProps EnumPropsA
 #define EnumPropsEx EnumPropsExA
 #define EnumWindowStations EnumWindowStationsA
@@ -3589,8 +3596,15 @@ typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 #define WinHelp WinHelpA
 #define wsprintf wsprintfA
 #define wvsprintf wvsprintfA
-#endif
-#endif
+#ifndef NOGDI
+typedef ICONMETRICSA ICONMETRICS,*LPICONMETRICS;
+typedef NONCLIENTMETRICSA NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
+#define ChangeDisplaySettings ChangeDisplaySettingsA
+#define CreateDesktop CreateDesktopA
+#define EnumDisplaySettings EnumDisplaySettingsA
+#endif /* NOGDI */
+#endif /* UNICODE */
+#endif /* RC_INVOKED */
 #ifdef __cplusplus
 }
 #endif
