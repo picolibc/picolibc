@@ -187,6 +187,7 @@ static char *rcsid = "$Id$";
 #include <reent.h>
 #include <wchar.h>
 #include <string.h>
+#include <sys/lock.h>
 
 #ifdef _HAVE_STDC
 #include <stdarg.h>
