@@ -166,8 +166,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	}
       else
 	{
-	  h = CreateFileMapping ((HANDLE) 0xffffffff, &sec_all_nih,
-				  PAGE_READWRITE, 0, mapsize, mapname);
+	  h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_all_nih,
+				 PAGE_READWRITE, 0, mapsize, mapname);
 	  created = h && GetLastError () != ERROR_ALREADY_EXISTS;
 	}
 

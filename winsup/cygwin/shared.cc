@@ -66,7 +66,7 @@ open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
 				       TRUE, mapname);
 	}
       if (!shared_h &&
-	  !(shared_h = CreateFileMappingA ((HANDLE) 0xffffffff,
+	  !(shared_h = CreateFileMappingA (INVALID_HANDLE_VALUE,
 					   &sec_all,
 					   PAGE_READWRITE,
 					   0,

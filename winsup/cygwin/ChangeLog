@@ -1,3 +1,9 @@
+Tue Jan 30  8:55:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* pinfo.cc (pinfo::init): Use INVALID_HANDLE_VALUE instead of
+	explicit cast (HANDLE) 0xffffffff.
+	* shared.cc (open_shared): Ditto.
+
 Mon Jan 29 17:15:22 2001  Bill Hegardt <bill@troyxcd.com>
 
 	* fhandler_serial.cc (raw_write): Use local copy of OVERLAPPED
