@@ -38,6 +38,10 @@
 	(optind): Ditto.
 	(optopt): Ditto.
 
+2003-09-13  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 5.
+
 2003-09-12  Christopher Faylor  <cgf@redhat.com>
 
 	* thread.cc (MTinterface::fixup_after_fork): Remove code which
