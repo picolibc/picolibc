@@ -349,7 +349,7 @@ fhandler_proc::fill_filebuf ()
       }
     case PROC_STAT:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 2048);
+	filebuf = (char *) realloc (filebuf, bufalloc = 16384);
 	filesize = format_proc_stat (filebuf, bufalloc);
 	break;
       }
@@ -456,24 +456,61 @@ out:
 static _off64_t
 format_proc_stat (char *destbuf, size_t maxsize)
 {
-  unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
   unsigned long pages_in = 0UL, pages_out = 0UL, interrupt_count = 0UL,
 		context_switches = 0UL, swap_in = 0UL, swap_out = 0UL;
   time_t boot_time = 0;
 
-  if (wincap.is_winnt ())
+  char *eobuf = destbuf;
+  if (!wincap.is_winnt ())
+    eobuf += __small_sprintf (destbuf, "cpu %U %U %U %U\n", 0, 0, 0, 0);
+  else
     {
       NTSTATUS ret;
-      SYSTEM_PROCESSOR_TIMES spt;
       SYSTEM_PERFORMANCE_INFORMATION spi;
       SYSTEM_TIME_OF_DAY_INFORMATION stodi;
-      ret = NtQuerySystemInformation (SystemProcessorTimes,
-				      (PVOID) &spt,
-				      sizeof spt, NULL);
+
+      SYSTEM_BASIC_INFORMATION sbi;
+      if ((ret = NtQuerySystemInformation (SystemBasicInformation,
+					   (PVOID) &sbi, sizeof sbi, NULL))
+	  != STATUS_SUCCESS)
+	{
+	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+	  debug_printf ("NtQuerySystemInformation: ret = %d, "
+			"Dos(ret) = %d",
+			ret, RtlNtStatusToDosError (ret));
+	  sbi.NumberProcessors = 1;
+	}
+
+      SYSTEM_PROCESSOR_TIMES spt[sbi.NumberProcessors];
+      ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
+				      sizeof spt[0] * sbi.NumberProcessors, NULL);
+      interrupt_count = 0;
       if (ret == STATUS_SUCCESS)
-	ret = NtQuerySystemInformation (SystemPerformanceInformation,
-					(PVOID) &spi,
-					sizeof spi, NULL);
+	{
+	  unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
+	  for (int i = 0; i < sbi.NumberProcessors; i++)
+	    {
+	      kernel_time += (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart) * HZ / 10000000ULL;
+	      user_time += spt[i].UserTime.QuadPart * HZ / 10000000ULL;
+	      idle_time += spt[i].IdleTime.QuadPart * HZ / 10000000ULL;
+	    }
+
+	  eobuf += __small_sprintf (eobuf, "cpu %U %U %U %U\n",
+				    user_time, 0ULL, kernel_time, idle_time);
+	  user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
+	  for (int i = 0; i < sbi.NumberProcessors; i++)
+	    {
+	      interrupt_count += spt[i].InterruptCount;
+	      kernel_time = (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart) * HZ / 10000000ULL;
+	      user_time = spt[i].UserTime.QuadPart * HZ / 10000000ULL;
+	      idle_time = spt[i].IdleTime.QuadPart * HZ / 10000000ULL;
+	      eobuf += __small_sprintf (eobuf, "cpu%d %U %U %U %U\n", i,
+					user_time, 0ULL, kernel_time, idle_time);
+	    }
+
+	  ret = NtQuerySystemInformation (SystemPerformanceInformation,
+					  (PVOID) &spi, sizeof spi, NULL);
+	}
       if (ret == STATUS_SUCCESS)
 	ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
 					(PVOID) &stodi,
@@ -486,10 +523,6 @@ format_proc_stat (char *destbuf, size_t maxsize)
 		       ret, RtlNtStatusToDosError (ret));
 	  return 0;
 	}
-      kernel_time = (spt.KernelTime.QuadPart - spt.IdleTime.QuadPart) * HZ / 10000000ULL;
-      user_time = spt.UserTime.QuadPart * HZ / 10000000ULL;
-      idle_time = spt.IdleTime.QuadPart * HZ / 10000000ULL;
-      interrupt_count = spt.InterruptCount;
       pages_in = spi.PagesRead;
       pages_out = spi.PagefilePagesWritten + spi.MappedFilePagesWritten;
       /*
@@ -512,19 +545,17 @@ format_proc_stat (char *destbuf, size_t maxsize)
    * counters is by no means worth it.
    *   }
    */
-  return __small_sprintf (destbuf, "cpu %U %U %U %U\n"
-				   "page %u %u\n"
+  eobuf += __small_sprintf (eobuf, "page %u %u\n"
 				   "swap %u %u\n"
 				   "intr %u\n"
 				   "ctxt %u\n"
 				   "btime %u\n",
-			  user_time, 0ULL,
-			  kernel_time, idle_time,
-			  pages_in, pages_out,
-			  swap_in, swap_out,
-			  interrupt_count,
-			  context_switches,
-			  boot_time);
+				   pages_in, pages_out,
+				   swap_in, swap_out,
+				   interrupt_count,
+				   context_switches,
+				   boot_time);
+  return eobuf - destbuf;
 }
 
 #define read_value(x,y) \
