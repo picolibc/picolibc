@@ -3,6 +3,7 @@
 #ifndef _INTTYPES_H_
 #define _INTTYPES_H_
 
+#include <_mingw.h>
 #include <stdint.h>
 #define __need_wchar_t
 #include <stddef.h>

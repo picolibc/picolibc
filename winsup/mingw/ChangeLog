@@ -1,4 +1,8 @@
-2003-07-24  Danny Smith  <dannysmith@users.sourceforge.net>
+2003-09-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/inttypes.h: Include _mingw.h.
+
+2003-09-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h (__CRT_INLINE): Define.
 	* include/ctype.h: Replace 'extern inline' with __CRT_INLINE,
