@@ -1,3 +1,7 @@
+Sun Sep  9 13:01:06 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* child_info.h (PROC_MAGIC): Bump magic number.
+
 Sun Sep  9 18:36:00 2001  Corinna Vinschen <corinna@vinschen.de>
 			  Christopher Faylor <cgf@cygnus.com>
 
