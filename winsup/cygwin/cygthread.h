@@ -29,3 +29,5 @@ class cygthread
   void * operator new (size_t);
   void exit_thread ();
 };
+
+#define cygself NULL

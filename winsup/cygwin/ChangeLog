@@ -1,3 +1,54 @@
+2002-08-06  Christopher Faylor  <cgf@redhat.com>
+
+	* spawn.cc (spawn_guts): Don't set mount_h here.
+	* sigproc.cc (init_child_info): Set it here instead.
+	* shared.cc (cygwin_mount_h): Make NO_COPY.
+
+2002-08-06  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Accept flag to pass info structure to
+	thread function.
+	(cygthread::operator new): Add defense debugging output.
+	(cygthread::cygthread): Add debugging output.  Set name after thread
+	has been awakened to avoid a race.
+	(cygthread::exit_thread): Use handle operator rather than using ev
+	directly.
+	(cygthread::exit_thread): Reorganize to provide debugging.  Set __name
+	to NULL.
+	* cygthread.h (cygself): Define.
+	* fhandler_tty.cc (fhandler_tty_master::init): Use cygself as argument
+	so that invoked thread can access its own info.
+	(process_output): Derive cygthread info of thread from thread argument.
+	* sigproc.cc (sigproc_init): Use cygself as argument so that invoked
+	thread can access its own info.
+	(wait_sig): Derive cygthread info of thread from thread argument.
+
+2002-08-06  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* debug.h (handle_list::allocated): Remove field.
+	* debug.cc (newh): Don't malloc extra entries.
+	(add_handle): Downgrade strace message level.
+	(delete_handle): Remove case for `allocated' entries.
+
+2002-08-05  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Change event creation to manual
+	reset.  Set __name after calling SetEvent to prevent races.
+	(cygthread::detach): Always reset event here to prevent races.
+
+2002-08-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* debug.h (WaitForMultipleObjects): Correct typo.
+
+2002-08-01 Pierre Humblet <Pierre.Humblet@ieee.org>
+
+	* security.cc (verify_token): Do not reject a token just because
+	the supplementary group list is missing Everyone or a groupsid
+	equal to usersid, or because the primary group is not in the token,
+	as long as it is equal to the usersid.
+	* syscalls.cc (seteuid32): Use common code for all successful returns.
+	* grp.cc (getgroups32): Never includes Everyone in the output.
+
 2002-08-01  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.cc (cygthread::exit_thread): Define new method.

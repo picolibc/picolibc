@@ -101,17 +101,9 @@ newh ()
 
   for (hl = cygheap->debug.freeh; hl < cygheap->debug.freeh + NFREEH; hl++)
     if (hl->name == NULL)
-      goto out;
+      return hl;
 
-  /* All used up??? */
-  if ((hl = (handle_list *) malloc (sizeof *hl)) != NULL)
-    {
-      memset (hl, 0, sizeof (*hl));
-      hl->allocated = TRUE;
-    }
-
-out:
-  return hl;
+  return NULL;
 }
 
 /* Add a handle to the linked list of known handles. */
@@ -136,8 +128,8 @@ add_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
   if ((hl = newh ()) == NULL)
     {
       here.unlock ();
-      system_printf ("couldn't allocate memory for %s(%d): %s(%p)",
-		     func, ln, name, h);
+      debug_printf ("couldn't allocate memory for %s(%d): %s(%p)",
+		    func, ln, name, h);
       return;
     }
   hl->h = h;
@@ -160,10 +152,7 @@ delete_handle (handle_list *hl)
   handle_list *hnuke = hl->next;
   debug_printf ("nuking handle '%s'", hnuke->name);
   hl->next = hl->next->next;
-  if (hnuke->allocated)
-    free (hnuke);
-  else
-    memset (hnuke, 0, sizeof (*hnuke));
+  memset (hnuke, 0, sizeof (*hnuke));
 }
 
 void

@@ -779,13 +779,16 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
 	      saw[pos] = TRUE;
 	    else if (groups.pgsid == gsid)
 	      sawpg = TRUE;
-	    else
+           else if (gsid != well_known_world_sid &&
+		    gsid != usersid)
 	      goto done;
 	  }
       for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
 	if (!saw[gidx])
 	  goto done;
-      if (sawpg || groups.sgsids.contains (groups.pgsid))
+      if (sawpg || 
+	  groups.sgsids.contains (groups.pgsid) ||
+	  groups.pgsid == usersid)
 	ret = TRUE;
     }
 done:

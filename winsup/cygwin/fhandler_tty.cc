@@ -68,7 +68,7 @@ fhandler_tty_master::init (int ntty)
   h = new cygthread (process_ioctl, NULL, "ttyioctl");
   SetThreadPriority (*h, THREAD_PRIORITY_HIGHEST);
 
-  output_thread = new cygthread (process_output, NULL, "ttyout");
+  output_thread = new cygthread (process_output, cygself, "ttyout");
   SetThreadPriority (*output_thread, THREAD_PRIORITY_HIGHEST);
 
   return 0;
@@ -368,7 +368,7 @@ out:
 }
 
 static DWORD WINAPI
-process_output (void *)
+process_output (void *self)
 {
   char buf[OUT_BUFFER_SIZE*2];
 
@@ -379,7 +379,7 @@ process_output (void *)
 	{
 	  if (n < 0)
 	    termios_printf ("ReadFile %E");
-	  cygthread *t = tty_master->output_thread;
+	  cygthread *t = (cygthread *) self;
 	  tty_master->output_thread = NULL;
 	  t->exit_thread ();
 	}
