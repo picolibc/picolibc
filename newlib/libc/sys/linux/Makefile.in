@@ -178,18 +178,20 @@ SIGNAL_H = /usr/src/$(shell ls /usr/src/ | grep ^linux | head -n 1)/include/asm/
 
 liblinux_la_LDFLAGS = -Xcompiler -nostdlib
 
-add_objs = 
+ADD_OBJS = \
+	$(LINUX_MACH_LIB)
+
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@liblinux.la
 @USE_LIBTOOL_TRUE@liblinux_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@liblinux_la_LIBADD = @USE_LIBTOOL_TRUE@$(LINUX_MACH_LIB) $(add_objs)
-@USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LINUX_MACH_LIB) $(add_objs)
+@USE_LIBTOOL_TRUE@liblinux_la_LIBADD = @USE_LIBTOOL_TRUE@$(ADD_OBJS)
+@USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(ADD_OBJS)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LINUX_MACH_LIB) $(add_objs)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LINUX_MACH_LIB) $(add_objs)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(ADD_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(ADD_OBJS)
 
 AM_CFLAGS = -I $(srcdir)/../../stdio
 ACLOCAL_AMFLAGS = -I ../../..
@@ -585,7 +587,7 @@ clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
 
-@USE_LIBTOOL_FALSE@lib.a:  $(LINUX_MACH_LIB) $(lib_a_OBJECTS) $(add_objs)
+@USE_LIBTOOL_FALSE@lib.a:  $(ADD_OBJS) $(lib_a_OBJECTS)
 @USE_LIBTOOL_FALSE@	rm -f $@
 @USE_LIBTOOL_FALSE@	rm -rf tmp
 @USE_LIBTOOL_FALSE@	mkdir tmp
