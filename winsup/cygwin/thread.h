@@ -212,7 +212,7 @@ private:
   void saveKeyToBuffer ();
   void recreateKeyFromBuffer ();
   void (*destructor) (void *);
-  void run_destructor () const;
+  void run_destructor ();
   void *fork_buf;
 };
 

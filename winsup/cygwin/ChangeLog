@@ -1,3 +1,15 @@
+2002-09-27  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (pthread_key::run_destructor): Run_destructor is not
+	const as it needs to set the key value.
+	* thread.h (pthread_key::run_destructor): Ditto.
+
+2002-09-27  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (pthread_key::run_destructor): Follow opengroup algorithm.
+	I.e. only run the destructor NON-NULL key values, and reset the key
+	to NULL before running the destructor. Reported by Thomas Pfaff.
+
 2002-09-25  Christopher Faylor  <cgf@redhat.com>
 
 	* cygrun.c (main): Fix setting of CYGWIN environment variable.

@@ -1035,10 +1035,17 @@ pthread_key::recreateKeyFromBuffer ()
 }
 
 void
-pthread_key::run_destructor () const
+pthread_key::run_destructor ()
 {
-  if (destructor)
-    destructor (get ());
+  if (destructor) 
+    {
+      void *oldValue = get();
+      if (oldValue)
+	{
+    	  set (NULL);
+    	  destructor (oldValue);
+	}
+    }
 }
 
 /*pshared mutexs:
