@@ -64,7 +64,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define ELFOSABI_LINUX  3       /* GNU/Linux */
 #define ELFOSABI_HURD   4       /* GNU/Hurd */
 #define ELFOSABI_SOLARIS 6      /* Solaris */
-#define ELFOSABI_MONTEREY 7     /* Monterey */
+#define ELFOSABI_AIX    7       /* AIX */
 #define ELFOSABI_IRIX   8       /* IRIX */
 #define ELFOSABI_FREEBSD 9      /* FreeBSD */
 #define ELFOSABI_TRU64  10      /* TRU64 UNIX */

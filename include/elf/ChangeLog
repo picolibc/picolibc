@@ -1,3 +1,8 @@
+2000-11-20  H.J. Lu  <hjl@gnu.org>
+
+	* common.h (ELFOSABI_MONTEREY): Renamed to ...
+	(ELFOSABI_AIX): This.
+
 2000-11-16  Richard Henderson  <rth@redhat.com>
 
 	Update relocations per August psABI docs.
