@@ -134,10 +134,10 @@ __MINGW_IMPORT char**  __argv_dll;
 
 #else		/* ! __DECLSPEC_SUPPORTED */
 # ifdef __MSVCRT__
-   extern int* _imp____mbcur_max
+   extern int* _imp____mbcur_max;
 #  define MB_CUR_MAX (*_imp____mb_cur_max)
 # else		/* not __MSVCRT */
-   extern int*  _imp____mbcur_max_dll
+   extern int*  _imp____mbcur_max_dll;
 #  define MB_CUR_MAX (*_imp____mb_cur_max_dll)
 # endif 	/* not __MSVCRT */
 #endif  	/*  __DECLSPEC_SUPPORTED */
