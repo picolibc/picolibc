@@ -313,7 +313,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define ELF64_ST_TYPE  ELF_ST_TYPE
 #define ELF64_ST_INFO  ELF_ST_INFO
 
-/* These two macros disassemble and assemble a symbol's visibility into
+/* This macro disassembles and assembles a symbol's visibility into
    the st_other field.  The STV_ defines specificy the actual visibility.  */
 
 #define ELF_ST_VISIBILITY(v)		((v) & 0x3)
