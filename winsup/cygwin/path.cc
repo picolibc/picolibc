@@ -2747,6 +2747,7 @@ cygwin_split_path (const char *path, char *dir, char *file)
        (x != CHXOR || !isalpha (ch1))); \
     })
 
+/* Return TRUE if two strings match up to length n */
 int __stdcall
 strncasematch (const char *s1, const char *s2, size_t n)
 {
@@ -2763,6 +2764,7 @@ strncasematch (const char *s1, const char *s2, size_t n)
   return !n || *s2 == '\0';
 }
 
+/* Return TRUE if two strings match */
 int __stdcall
 strcasematch (const char *s1, const char *s2)
 {
