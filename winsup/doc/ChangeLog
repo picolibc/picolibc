@@ -1,3 +1,7 @@
+2003-03-22  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* setup-net.sgml: Document setup.exe
+
 2003-02-07  Christopher Faylor  <cgf@redhat.com>
 
 	* how.texinfo: Add more w32api words.

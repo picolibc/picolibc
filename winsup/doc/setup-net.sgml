@@ -7,6 +7,207 @@ URL="http://cygwin.com/">"Install Cygwin Now!"</ulink>.  This will
 download a GUI installer called <command>setup.exe</command> which can
 be run to download a complete cygwin installation via the internet.
 Follow the instructions on each screen to install Cygwin.</para>
+
+<para>
+The <command>setup.exe</command> installer is designed to be easy
+for new users to understand while remaining flexible for the 
+experienced. The volunteer development team is constantly working
+on <command>setup.exe</command>; before requesting a new feature,
+check the wishlist in the CVS <literal>README</literal>. It may
+already be present in the CVS version!
+</para>
+
+<para>
+Since the default value for each option is the logical choice for
+most installations, you can get a working minimal Cygwin environment
+installed by simply clicking the <literal>Next</literal> button
+at each page. The only exception to this is choosing a Cygwin mirror,
+which you can choose by experimenting with those listed at
+<ulink URL="http://cygwin.com/mirrors.html">
+http://cygwin.com/mirrors.html
+</ulink>. For more details about each of page of the 
+<command>setup.exe</command> installation, read on below.
+</para>
+
+<sect2><title>Download Source</title>
+<para>
+Cygwin uses packages to manage installing various software. When
+the default <literal>Install from Internet</literal> option is chosen,
+<command>setup.exe</command> creates a local directory to store
+the packages before actually installing the contents. 
+<literal>Download from Internet</literal> performs only the first
+part (storing the packages locally), while 
+<literal>Install from Local Directory</literal> performs only the 
+second (installing the contents of the packages). 
+</para>
+<para>
+The <literal>Download from Internet</literal> option is mainly
+for creating a base Cygwin package tree on one computer for 
+installation on several machines with 
+<literal>Install from Local Directory</literal>.
+Though this provides some basic mirroring functionality, if you
+are managing a wide Cygwin installation we recommend using a mirroring
+tool such as <command>wget</command>. A helpful user on the Cygwin
+mailing list created a simple demonstration script to accomplish
+this; search the list for <command>mkcygwget</command> for ideas.
+</para>
+</sect2>
+
+<sect2><title>Selecting an Install Directory</title>
+<para>
+The <literal>Root Directory</literal> for Cygwin (default
+<literal>C:\cygwin</literal>) will become <literal>'/'</literal> 
+within your Cygwin installation. All Windows drives can be accessed
+with the <literal>/cygdrive/X/</literal> virtual directory and
+Cygwin's <command>mount</command> utility. 
+</para>
+<para>
+The <literal>Install For</literal> options of 
+<literal>All Users</literal> or 
+<literal>Just Me</literal> are especially for multiuser systems
+or Domain users. If you have a single-user workstation, this 
+option probably does not concern you. If you are seeking to rollout
+Cygwin on a large Domain, you will want to think carefully
+about the implications of each type and possibly consult the Cygwin
+mailing list archives about others' experiences.
+</para>
+<para>
+The <literal>Default Text File Type</literal> should be left on
+<literal>Unix</literal> (that is, <literal>\n</literal>) unless you
+have a very good reason to switch it to 
+<literal>DOS</literal> (that is, <literal>\r\n</literal>).
+</para>
+</sect2>
+
+<sect2><title>Local Package Directory</title>
+<para>
+The <literal>Local Package Directory</literal> is the cache where 
+<command>setup.exe</command> stores the packages before they are
+installed. The cache should not be the same folder as the Cygwin
+root. Within the cache, a separate directory is created for each
+Cygwin mirror, which allows <command>setup.exe</command> to use 
+multiple mirrors and custom packages. After installing Cygwin,
+the cache is no longer necessary, but you may want to retain the
+packages as backups, for installing Cygwin to another system,
+or in case you need to reinstall a package.
+</para>
+
+<sect2><title>Connection Method</title>
+<para>
+For most users, the <literal>Direct Connection</literal> method
+of downloading is the best choice. If you have a proxy server,
+you can use the <literal>Use IE5 Settings</literal> if it is 
+already set up in Internet Exlporer, or manually type it into 
+the <literal>Use Proxy</literal> section. Unfortunately, 
+<command>setup.exe</command> does not currently support password
+authorization for proxy servers.
+</para>
+</sect2>
+
+<sect2><title>Choosing Mirrors</title>
+<para>
+Since there is no way of knowing from where you will be downloading
+Cygwin, you need to choose at least one mirror site.  Cygwin mirrors 
+are geographically distributed around the world; check the list at <ulink 
+URL="http://cygwin.com/mirrors.html">http://cygwin.com/mirrors.html</ulink>
+to find one near you. You can select multiple mirrors by holding down
+<literal>CTRL</literal> and clicking on each one. If you have the URL of 
+an unlisted mirror (for example, if your organization has an internal Cygwin 
+mirror) you can add it.
+</para>
+</sect2>
+
+<sect2><title>Choosing Packages</title>
+<para>
+For each selected mirror site, <command>setup.exe</command> downloads a 
+small text file called <literal>setup.ini</literal> that contains a list
+of packages available from that site along with some basic information about
+each package (version number, dependencies, checksum, etc.) which 
+<command>setup.exe</command> parses and uses to create the chooser window.
+</para>
+<para>
+The chooser is the most complex part of <command>setup.exe</command>. 
+Packages are divided into categories. By default <command>setup.exe</command>
+will install only the packages in the <literal>Base</literal> category
+and their dependencies, resulting in a very basic Cygwin installation.
+However, this will not include many commonly used tools such as 
+<command>gcc</command> (which you will find in the <literal>Devel</literal> 
+category). 
+</para>
+<para>
+You can change <command>setup.exe</command>'s view style, which is helpful
+if you know the name of a package you want to install but not which 
+category it is in. 
+Click on the <literal>View</literal> button and it will rotate between 
+<literal>Category</literal> (the default), <literal>Full</literal> (all 
+packages), and <literal>Partial</literal> (only packages to be upgraded).
+If you are familiar with Unix, you will probably want to at least glance 
+through the <literal>Full</literal> listing for your favorite tools.
+</para>
+<para>
+Once you have an existing Cygwin installation, the <command>setup.exe</command>
+chooser is also used to manage your Cygwin installation. 
+Information on installed packages is kept in the
+<literal>/etc/setup/</literal> directory of your Cygwin installation; if 
+<command>setup.exe</command> cannot find this directory it will act just like
+you had no Cygwin installation.  If <command>setup.exe</command>
+finds a newer version of an installed package available, it will automatically 
+mark it to be upgraded. 
+To <literal>Uninstall</literal>, <literal>Reinstall</literal>, or get the
+<literal>Source</literal> for an existing package, click on 
+<literal>Keep</literal> to toggle it. 
+Also, to avoid the need to reboot after upgrading, make sure
+to close all Cygwin windows and stop all Cygwin processes before 
+<command>setup.exe</command> begins to install the upgraded package.
+</para>
+<para>
+The final feature of the <command>setup.exe</command> chooser is for
+<literal>Previous</literal> and <literal>Experimental</literal> packages.
+By default the chooser shows only the current version of each package,
+though mirrors have at least one previous version and occasionally there
+is a testing or beta version of a package available. To see these package,
+click on the <literal>Prev</literal> or <literal>Exp</literal> radio button.
+Be warned, however, that the next time you run <command>setup.exe</command> 
+it will try to replace old or experimental versions with the latest. 
+</para>
+</sect2>
+
+<sect2><title>Download and Installation Progress</title>
+<para>
+First, <command>setup.exe</command> will download all selected packages
+to the local directory chosen earlier. Before installing, 
+<command>setup.exe</command> performs a checksum on each package. If the
+local directory is a slow medium (such as a network drive) this can take
+a long time. During the download and installation, <command>setup.exe</command>
+show progress bars for the current task and total remaining disk space.
+</para>
+</sect2>
+
+<sect2><title>Icons</title>
+<para>
+You may choose to install shortcuts on the Desktop and/or Start Menu
+to start a <literal>bash</literal> shell. If you prefer to use a different
+shell or the native Windows version of <literal>rxvt</literal>, you can
+use these shortcuts as a guide to creating your own. 
+</para>
+</sect2>
+
+<sect2><title>Post-Install Scripts</title>
+<para>
+Last of all, <command>setup.exe</command> will run any post-install
+scripts to finish correctly setting up installed packages. Since each
+script is run separately, several windows may pop up. If you are 
+interested in what is being done, the scripts are kept in the 
+<literal>/etc/postinstall/</literal> directory, renamed with a 
+<literal>done</literal> extension after being run. When the last
+post-install script is completed, <command>setup.exe</command> will
+display a box announcing the completion. A few packages, such as
+the OpenSSH server, require some manual site-specific configuration. 
+Relevant documentation can be found in the <literal>/usr/doc/Cygwin</literal> 
+directory.
+</para>
+</sect2>
+
 </sect1>
 
 DOCTOOL-INSERT-setup-env
