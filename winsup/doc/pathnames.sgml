@@ -17,7 +17,7 @@ make it be the <filename>/disk2</filename> directory).</para>
 the existance of a single unified POSIX file system structure, Cygwin
 maintains a special internal POSIX view of the Win32 file system
 that allows these programs to successfully run under Windows.  Cygwin
-uses this mapping to translate between Win32 and POSIX paths as
+uses this mapping to translate from POSIX to Win32 paths as
 necessary.</para>
 
 </sect2>
@@ -38,7 +38,7 @@ information will be retrieved next time the user logs in.  Because it
 is sometimes desirable to have system-wide as well as user-specific
 mounts, there is also a system-wide mount table that all Cygwin users
 inherit.  The system-wide table may only be modified by a user with
-the appropriate priviledges (Administrator priviledges in Windows
+the appropriate privileges (Administrator privileges in Windows
 NT).</para>
 
 <para>The current user's table is located under
@@ -56,11 +56,15 @@ Without a <filename>/</filename> mount, Cygwin processes cannot
 distinguish between the Windows CurrentDrive and SystemDrive.
 </para>
 
-<para>Whenever Cygwin generates a POSIX path from a Win32 one, it uses
+<para>Whenever Cygwin generates a Win32 path from a POSIX one, it uses
 the longest matching prefix in the mount table.  Thus, if
 <filename>C:</filename> is mounted as <filename>/c</filename> and also
 as <filename>/</filename>, then Cygwin would translate
-<filename>C:/foo/bar</filename> to <filename>/c/foo/bar</filename>.</para>
+<filename>C:/foo/bar</filename> to <filename>/c/foo/bar</filename>.
+This translation is normally only used when trying to derive the
+POSIX equivalent current directory.  Otherwise, the handling of MS-DOS
+filenames bypasses the mount table.
+</para>
 
 <para>Invoking <command>mount</command> without any arguments displays
 Cygwin's current set of mount points.

@@ -1,3 +1,8 @@
+2005-03-05  Christopher Faylor  <cgf@timesys.com>
+
+	* pathnames.sgml: Clarify binmode/textmode behavior slightly.
+	* textbinary.sgml: Ditto.
+
 2005-03-03  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-api.texinfo: Add Pierre's security text.

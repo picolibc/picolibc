@@ -35,15 +35,15 @@ are to be opened when the mode is not specified explicitly.
 The rules are evolving, this section gives the design goals.</para>
 <orderedlist numeration="loweralpha">
 <listitem>
-<para>If the file appears to reside on a file system that is mounted
-(i.e. if its pathname starts with a directory displayed by
-<command>mount</command>), then the default is specified by the mount
-flag. If the file is a symbolic link, the mode of the target file system
-applies.</para>
+<para>If the filename is specified as a POSIX path and it appears to
+reside on a file system that is mounted (i.e.  if its pathname starts
+with a directory displayed by <command>mount</command>), then the
+default is specified by the mount flag.  If the file is a symbolic link,
+the mode of the target file system applies.</para>
 </listitem>
 <listitem>
-<para>If the file appears to reside on a file system that is not mounted
-(as can happen when the path contains a drive letter), the default is binary.
+<para>If the file is specified via a MS-DOS pathname (i.e., it contains a
+backslash or a colon), the default is binary.
 </para>
 </listitem>
 <listitem>
@@ -55,9 +55,11 @@ in binary mode if any of the following conditions hold:</para>
 <orderedlist numeration="arabic" spacing="compact">
 <listitem><para>binary mode is specified in the open call</para>
 </listitem>
-<listitem><para><envar>CYGWIN</envar> contains <literal>binmode</literal></para>
+<listitem><para>the filename is a MS-DOS filename
 </listitem>
-<listitem><para>the file resides in a binary mounted partition</para>
+<listitem><para>the file resides on a binary mounted partition</para>
+</listitem>
+<listitem><para><envar>CYGWIN</envar> contains <literal>binmode</literal></para>
 </listitem>
 <listitem><para>the file is not a disk file</para>
 </listitem>
@@ -66,11 +68,7 @@ in binary mode if any of the following conditions hold:</para>
 </listitem>
 
 <listitem>
-<para>When a Cygwin program is launched by a shell, its standard input,
-output and error are in binary mode if the <envar>CYGWIN</envar> variable
-contains <literal>tty</literal>, else in text mode, except if they are piped
-or redirected.</para>
-<para> When redirecting, the Cygwin shells uses rules (a-c). For
+<para> When redirecting, the Cygwin shells uses rules (a-e). For
 these shells the relevant value of <envar>CYGWIN</envar> is that at the time
 the shell was launched and not that at the time the program is executed.
 Non-Cygwin shells always pipe and redirect with binary mode. With
