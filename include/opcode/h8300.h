@@ -301,6 +301,16 @@ struct h8_opcode
 #define O_STM 86
 #define O_STMAC 87
 #define O_LAST 88
+/* Change made for System Call processing.  */
+#define O_SYS_CREAT 100
+#define O_SYS_OPEN 101
+#define O_SYS_READ 102
+#define O_SYS_WRITE 103
+#define O_SYS_LSEEK 104
+#define O_SYS_CLOSE 105
+#define O_SYS_STAT 106
+#define O_SYS_FSTAT 107
+/* End of System Call specific Changes.  */
 #define SB 0
 #define SW 1
 #define SL 2

@@ -1,3 +1,8 @@
+2002-12-30 D.Venkatasubramanian <dvenkat@noida.hcltech.com>
+
+	* h8300.h: Added some more pseudo opcodes for system call
+	processing.
+
 2002-12-19  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips.h (OP_OP_COP0, OP_OP_COP1, OP_OP_COP2, OP_OP_COP3)
