@@ -114,42 +114,44 @@ main (int argc, const char **argv)
 
   for (i = 1; i < argc; ++i)
     {
-     if (argv[i][0] != '-')
-	break;
+      if (argv[i][0] != '-')
+	 break;
 
-     if (strcmp (argv[i], "--change-cygdrive-prefix") == 0)
-       {
-	 if ((i + 2) != argc)
-	   usage ();
+      if (strcmp (argv[i], "--change-cygdrive-prefix") == 0)
+	{
+	  if ((i + 2) != argc)
+	    usage ();
 
-	 change_cygdrive_prefix (argv[i+1], flags);
-       }
-     else if (strcmp (argv[i], "--import-old-mounts") == 0)
-       {
-	 if ((i + 1) != argc)
-	   usage ();
+	  change_cygdrive_prefix (argv[i+1], flags);
+	}
+      else if (strcmp (argv[i], "--import-old-mounts") == 0)
+	{
+	  if ((i + 1) != argc)
+	    usage ();
 
-	 cygwin_internal (CW_READ_V1_MOUNT_TABLES);
-	 exit (0);
-       }
-     else if (strcmp (argv[i], "-b") == 0)
-       flags |= MOUNT_BINARY;
-     else if (strcmp (argv[i], "-t") == 0)
-       flags &= ~MOUNT_BINARY;
+	  cygwin_internal (CW_READ_V1_MOUNT_TABLES);
+	  exit (0);
+	}
+      else if (strcmp (argv[i], "-b") == 0)
+	flags |= MOUNT_BINARY;
+      else if (strcmp (argv[i], "-t") == 0)
+	flags &= ~MOUNT_BINARY;
+      else if  (strcmp (argv[i], "-X") == 0)
+	flags |= MOUNT_CYGWIN_EXEC;
 #if 0
-     else if (strcmp (argv[i], "-c") == 0)
-       create_missing_dirs = TRUE;
+      else if (strcmp (argv[i], "-x") == 0)
+	create_missing_dirs = TRUE;
 #endif
-     else if (strcmp (argv[i], "-s") == 0)
-       flags |= MOUNT_SYSTEM;
-     else if (strcmp (argv[i], "-u") == 0)
-       flags &= ~MOUNT_SYSTEM;
-     else if (strcmp (argv[i], "-x") == 0)
-       flags |= MOUNT_EXEC;
-     else if (strcmp (argv[i], "-f") == 0)
-       force = TRUE;
-     else
-       usage ();
+      else if (strcmp (argv[i], "-s") == 0)
+	flags |= MOUNT_SYSTEM;
+      else if (strcmp (argv[i], "-u") == 0)
+	flags &= ~MOUNT_SYSTEM;
+      else if (strcmp (argv[i], "-x") == 0)
+	flags |= MOUNT_EXEC;
+      else if (strcmp (argv[i], "-f") == 0)
+	force = TRUE;
+      else
+	usage ();
     }
   
   if ((i + 2) != argc)

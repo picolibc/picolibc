@@ -1,14 +1,18 @@
+Wed Apr 26 23:43:25 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* mount.cc (main): Add "-X" option to specify a "Cygwin executable".
+
 Sat Apr 15 23:34:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * mkpasswd.c (main): Use GetDCName instead of GetAnyDCName.
-        Don't create extra passwd entry for administrators group
-        if local_groups is set.
-        (usage): Change usage text slightly.
-        (enum_users): Loop while ERROR_MORE_DATA is returned.
-        (enum_local_groups): Ditto.
-        * mkgroup.c (enum_local_groups): Ditto.
-        (enum_groups) Ditto.
-        (usage): Change usage text slightly.
+	* mkpasswd.c (main): Use GetDCName instead of GetAnyDCName.
+	Don't create extra passwd entry for administrators group
+	if local_groups is set.
+	(usage): Change usage text slightly.
+	(enum_users): Loop while ERROR_MORE_DATA is returned.
+	(enum_local_groups): Ditto.
+	* mkgroup.c (enum_local_groups): Ditto.
+	(enum_groups) Ditto.
+	(usage): Change usage text slightly.
 
 Thu Apr 13 01:22:35 2000  Christopher Faylor <cgf@cygnus.com>
 
