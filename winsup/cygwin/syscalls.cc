@@ -1246,7 +1246,7 @@ _rename (const char *oldpath, const char *newpath)
 
   /* Shortcut hack. */
   char new_lnk_buf[MAX_PATH + 5];
-  if (real_old.issymlink () && !real_new.error)
+  if (real_old.issymlink () && !real_new.error && !real_new.case_clash)
     {
       int len_old = strlen (real_old.get_win32 ());
       if (strcasematch (real_old.get_win32 () + len_old - 4, ".lnk"))
@@ -1258,10 +1258,10 @@ _rename (const char *oldpath, const char *newpath)
 	}
     }
 
-  if (real_new.error)
+  if (real_new.error || real_new.case_clash)
     {
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
-      set_errno (real_new.error);
+      set_errno (real_new.case_clash ? ECASECLASH : real_new.error);
       return -1;
     }
 

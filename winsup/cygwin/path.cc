@@ -324,9 +324,18 @@ path_conv::check (const char *src, unsigned opt,
 
 	  if (sym.case_clash)
 	    {
-	      case_clash = TRUE;
-	      error = ENOENT;
-	      goto out;
+	      if (pcheck_case == PCHECK_STRICT)
+	        {
+		  case_clash = TRUE;
+		  error = ENOENT;
+		  goto out;
+		}
+	      /* If pcheck_case==PCHECK_ADJUST the case_clash is remembered
+	         if the last component is concerned. This allows functions
+		 which shall create files to avoid overriding already existing
+		 files with another case. */
+	      if (!component)
+	        case_clash = TRUE;
 	    }
 
 	  if (!(opt & PC_SYM_IGNORE))
@@ -2754,13 +2763,12 @@ symlink_info::case_check (const char *path, char *orig_path)
       /* If that part of the component exists, check the case. */
       if (strcmp (c, data.cFileName))
 	{
+	  case_clash = TRUE;
+
 	  /* If check is set to STRICT, a wrong case results
 	     in returning a ENOENT. */
 	  if (pcheck_case == PCHECK_STRICT)
-	    {
-	      case_clash = TRUE;
-	      return FALSE;
-	    }
+	    return FALSE;
 
 	  /* PCHECK_ADJUST adjusts the case in the incoming
 	     path which points to the path in *this. */
