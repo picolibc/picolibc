@@ -608,7 +608,6 @@ dll_crt0_1 ()
 				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	      h = NULL;
 	    set_myself (mypid, h);
-	    myself->uid = spawn_info->moreinfo->uid;
 	    __argc = spawn_info->moreinfo->argc;
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
@@ -623,8 +622,6 @@ dll_crt0_1 ()
 	      }
 	    if (child_proc_info->subproc_ready)
 	      ProtectHandle (child_proc_info->subproc_ready);
-	    if (myself->uid == ILLEGAL_UID)
-	      cygheap->user.set_sid (NULL);
 	    break;
 	}
     }
@@ -679,8 +676,9 @@ dll_crt0_1 ()
   /* Allocate cygheap->fdtab */
   dtable_init ();
 
-/* Initialize uid, gid. */
-  uinfo_init ();
+  /* Initialize uid, gid if necessary. */
+  if (child_proc_info == NULL || spawn_info->moreinfo->uid == ILLEGAL_UID)
+    uinfo_init ();
 
   /* Initialize signal/subprocess handling. */
   sigproc_init ();

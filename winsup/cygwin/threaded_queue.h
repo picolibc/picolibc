@@ -1,6 +1,6 @@
 /* threaded_queue.h
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 

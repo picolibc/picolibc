@@ -105,6 +105,13 @@ class cygheap_user
   char  *homepath;	/* User's home path */
   PSID   psid;          /* buffer for user's SID */
   PSID   orig_psid;     /* Remains intact even after impersonation */
+  static char homedrive_env_buf[3]; /* Where the HOMEDRIVE environment variable
+				       info may live. */
+  static char homepath_env_buf[MAX_PATH + 1]; /* Where the HOMEPATH environment
+						 variable info may live. */
+  static char userprofile_env_buf[MAX_PATH + 1]; /* Where the USERPROFILE
+						    environment variable info
+						    may live. */
 public:
   __uid32_t orig_uid;      /* Remains intact even after impersonation */
   __gid32_t orig_gid;      /* Ditto */
@@ -124,28 +131,17 @@ public:
   void set_name (const char *new_name);
   const char *name () const { return pname; }
 
-  void set_logsrv (const char *new_logsrv);
-  const char *logsrv () const { return plogsrv; }
-
   const char *env_logsrv ();
   const char *env_homepath ();
   const char *env_homedrive ();
   const char *env_userprofile ();
-
-  void set_domain (const char *new_domain);
-  const char *domain () const { return pdomain; }
+  const char *env_domain ();
+  const char *env_name ();
 
   BOOL set_sid (PSID new_sid);
+  BOOL set_orig_sid ();
   PSID sid () const { return psid; }
   PSID orig_sid () const { return orig_psid; }
-
-  void operator =(cygheap_user &user)
-  {
-    set_name (user.name ());
-    set_logsrv (user.logsrv ());
-    set_domain (user.domain ());
-    set_sid (user.sid ());
-  }
   const char *ontherange (homebodies what, struct passwd * = NULL);
 };
 

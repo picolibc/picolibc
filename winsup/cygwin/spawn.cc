@@ -567,8 +567,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   ciresrv.moreinfo->argc = newargv.argc;
   ciresrv.moreinfo->argv = newargv;
   ciresrv.hexec_proc = hexec_proc;
-  ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
-				      real_path.iscygexec ());
 
   if (mode != _P_OVERLAY ||
       !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
@@ -610,13 +608,13 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   char sa_buf[1024];
 
   cygbench ("spawn-guts");
+  ciresrv.mount_h = cygwin_mount_h;
+
   if (!cygheap->user.impersonated || cygheap->user.token == INVALID_HANDLE_VALUE)
     {
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
-      ciresrv.moreinfo->uid = getuid32 ();
-      /* FIXME: This leaks a handle in the CreateProcessAsUser case since the
-	 child process doesn't know about cygwin_mount_h. */
-      ciresrv.mount_h = cygwin_mount_h;
+      ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
+					  real_path.iscygexec ());
       newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
@@ -631,16 +629,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     }
   else
     {
-      cygsid sid;
-      DWORD ret_len;
-      if (!GetTokenInformation (cygheap->user.token, TokenUser, &sid,
-				sizeof sid, &ret_len))
-	{
-	  sid = NO_SID;
-	  system_printf ("GetTokenInformation: %E");
-	}
-      /* Retrieve security attributes before setting psid to NULL
-	 since it's value is needed by `sec_user'. */
+      PSID sid = cygheap->user.sid ();
+
+      /* Set security attributes with sid */
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf, sid);
 
       RevertToSelf ();
@@ -655,7 +646,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       char wstname[1024];
       char dskname[1024];
 
-      ciresrv.moreinfo->uid = ILLEGAL_UID;
       hwst = GetProcessWindowStation ();
       SetUserObjectSecurity (hwst, &dsi, get_null_sd ());
       GetUserObjectInformation (hwst, UOI_NAME, wstname, 1024, &n);
@@ -666,6 +656,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       strcat (wstname, dskname);
       si.lpDesktop = wstname;
 
+      ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
+					  real_path.iscygexec ());
       newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcessAsUser (cygheap->user.token,
 		       runpath,		/* image name - with full path */

@@ -27,100 +27,37 @@ details. */
 #include "cygerrno.h"
 #include "cygheap.h"
 #include "registry.h"
+#include "child_info.h"
 
-struct passwd *
+void
 internal_getlogin (cygheap_user &user)
 {
-  char buf[512];
-  char username[UNLEN + 1];
-  DWORD username_len = UNLEN + 1;
   struct passwd *pw = NULL;
-
-  if (!GetUserName (username, &username_len))
-    user.set_name (NULL);
-  else
-    user.set_name (username);
-  debug_printf ("GetUserName() = %s", user.name ());
 
   if (wincap.has_security ())
     {
-      LPWKSTA_USER_INFO_1 wui;
-      NET_API_STATUS ret;
-      char *env;
-
-      user.set_logsrv (NULL);
-      /* First trying to get logon info from environment */
-      if (!*user.name () && (env = getenv ("USERNAME")) != NULL)
-	user.set_name (env);
-      if ((env = getenv ("USERDOMAIN")) != NULL)
-	user.set_domain (env);
-      if ((env = getenv ("LOGONSERVER")) != NULL)
-	user.set_logsrv (env + 2); /* filter leading double backslashes */
-      if (user.name () && user.domain ())
-	debug_printf ("User: %s, Domain: %s, Logon Server: %s",
-		      user.name (), user.domain (), user.logsrv ());
-      else if (!(ret = NetWkstaUserGetInfo (NULL, 1, (LPBYTE *) &wui)))
-	{
-	  sys_wcstombs (buf, wui->wkui1_username, UNLEN + 1);
-	  user.set_name (buf);
-	  sys_wcstombs (buf, wui->wkui1_logon_server,
-			INTERNET_MAX_HOST_NAME_LENGTH + 1);
-	  user.set_logsrv (buf);
-	  sys_wcstombs (buf, wui->wkui1_logon_domain,
-			INTERNET_MAX_HOST_NAME_LENGTH + 1);
-	  user.set_domain (buf);
-	  NetApiBufferFree (wui);
-	}
-      if (!user.logsrv () && user.domain () &&
-          get_logon_server (user.domain (), buf, NULL))
-	user.set_logsrv (buf + 2);
-      debug_printf ("Domain: %s, Logon Server: %s, Windows Username: %s",
-		    user.domain (), user.logsrv (), user.name ());
-
-
-      HANDLE ptok = user.token; /* Which is INVALID_HANDLE_VALUE if no
-				   impersonation took place. */
+      HANDLE ptok = INVALID_HANDLE_VALUE;
       DWORD siz;
       cygsid tu;
-      ret = 0;
+      DWORD ret = 0;
 
-      /* Try to get the SID either from already impersonated token
-	 or from current process first. To differ that two cases is
-	 important, because you can't rely on the user information
-	 in a process token of a currently impersonated process. */
-      if (ptok == INVALID_HANDLE_VALUE
-	  && !OpenProcessToken (GetCurrentProcess (),
-				TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
-				&ptok))
-	debug_printf ("OpenProcessToken(): %E\n");
+      /* Try to get the SID either from current process and
+	 store it in user.psid */
+      if (!OpenProcessToken (GetCurrentProcess (),
+			     TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
+			     &ptok))
+	system_printf ("OpenProcessToken(): %E\n");
       else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
-	debug_printf ("GetTokenInformation(): %E");
+	system_printf ("GetTokenInformation(): %E");
       else if (!(ret = user.set_sid (tu)))
-	debug_printf ("Couldn't retrieve SID from access token!");
-      /* If that failes, try to get the SID from localhost. This can only
-	 be done if a domain is given because there's a chance that a local
-	 and a domain user may have the same name. */
-      if (!ret && user.domain ())
-	{
-	  char domain[DNLEN + 1];
-	  DWORD dlen = sizeof (domain);
-	  siz = sizeof (tu);
-	  SID_NAME_USE use = SidTypeInvalid;
-	  /* Concat DOMAIN\USERNAME for the next lookup */
-	  strcat (strcat (strcpy (buf, user.domain ()), "\\"), user.name ());
-          if (!LookupAccountName (NULL, buf, tu, &siz,
-	                          domain, &dlen, &use) ||
-               !legal_sid_type (use))
-	        debug_printf ("Couldn't retrieve SID locally!");
-	  else user.set_sid (tu);
-
-	}
-
-      /* If we have a SID, try to get the corresponding Cygwin user name
-	 which can be different from the Windows user name. */
-      cygsid gsid (NO_SID);
-      if (ret)
-	{
+        system_printf ("Couldn't retrieve SID from access token!");
+       /* We must set the user name, uid and gid.
+	 If we have a SID, try to get the corresponding Cygwin
+	 password entry. Set user name which can be different
+	 from the Windows user name */
+       if (ret)
+	 {
+	  cygsid gsid (NO_SID);
 	  cygsid psid;
 
 	  for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
@@ -133,72 +70,51 @@ internal_getlogin (cygheap_user &user)
 		      gsid = NO_SID;
 		break;
 	      }
-	}
 
-      /* If this process is started from a non Cygwin process,
-	 set token owner to the same value as token user and
-	 primary group to the group which is set as primary group
-	 in /etc/passwd. */
-      if (ptok != INVALID_HANDLE_VALUE && !myself->ppid_handle)
-	{
+	  /* Set token owner to the same value as token user and
+	     primary group to the group in /etc/passwd. */
 	  if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
 	    debug_printf ("SetTokenInformation(TokenOwner): %E");
 	  if (gsid && !SetTokenInformation (ptok, TokenPrimaryGroup,
 					    &gsid, sizeof gsid))
 	    debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
-	}
+	 }
 
-      /* Close token only if it's a result from OpenProcessToken(). */
-      if (ptok != INVALID_HANDLE_VALUE
-	  && user.token == INVALID_HANDLE_VALUE)
+      if (ptok != INVALID_HANDLE_VALUE)
 	CloseHandle (ptok);
     }
-
-  debug_printf ("Cygwins Username: %s", user.name ());
 
   if (!pw)
     pw = getpwnam (user.name ());
 
-  if (!myself->ppid_handle)
-    (void) cygheap->user.ontherange (CH_HOME, pw);
+  if (pw)
+    {
+      user.real_uid = pw->pw_uid;
+      user.real_gid = pw->pw_gid;
+    }
+  else
+    {
+      user.real_uid = DEFAULT_UID;
+      user.real_gid = DEFAULT_GID;
+    }
 
-  return pw;
+  (void) cygheap->user.ontherange (CH_HOME, pw);
+
+  return;
 }
 
 void
 uinfo_init ()
 {
-  struct passwd *p;
+  if (!child_proc_info)
+    internal_getlogin (cygheap->user); /* Set the cygheap->user. */
 
-  /* Initialize to non impersonated values.
-     Setting `impersonated' to TRUE seems to be wrong but it
-     isn't. Impersonated is thought as "Current User and `token'
-     are coincident". See seteuid() for the mechanism behind that. */
-  if (cygheap->user.token != INVALID_HANDLE_VALUE && cygheap->user.token != NULL)
-    CloseHandle (cygheap->user.token);
-  cygheap->user.token = INVALID_HANDLE_VALUE;
-  cygheap->user.impersonated = TRUE;
+  /* Real and effective uid/gid are identical on process start up. */
+  myself->uid = cygheap->user.orig_uid = cygheap->user.real_uid;
+  myself->gid = cygheap->user.orig_gid = cygheap->user.real_gid;
+  cygheap->user.set_orig_sid();      /* Update the original sid */
 
-  /* If uid is ILLEGAL_UID, the process is started from a non cygwin
-     process or the user context was changed in spawn.cc */
-  if (myself->uid == ILLEGAL_UID)
-    if ((p = internal_getlogin (cygheap->user)) != NULL)
-      {
-	myself->uid = p->pw_uid;
-	/* Set primary group only if process has been started from a
-	   non cygwin process. */
-	if (!myself->ppid_handle)
-	  myself->gid = p->pw_gid;
-      }
-    else
-      {
-	myself->uid = DEFAULT_UID;
-	myself->gid = DEFAULT_GID;
-      }
-  /* Real and effective uid/gid are always identical on process start up.
-     This is at least true for NT/W2K. */
-  cygheap->user.orig_uid = cygheap->user.real_uid = myself->uid;
-  cygheap->user.orig_gid = cygheap->user.real_gid = myself->gid;
+  cygheap->user.token = INVALID_HANDLE_VALUE; /* No token present */
 }
 
 extern "C" char *
@@ -272,11 +188,13 @@ cuserid (char *src)
   return src;
 }
 
+char cygheap_user::homepath_env_buf[MAX_PATH + 1];
+char cygheap_user::homedrive_env_buf[3];
+char cygheap_user::userprofile_env_buf[MAX_PATH + 1];
+
 const char *
 cygheap_user::ontherange (homebodies what, struct passwd *pw)
 {
-  static char buf[MAX_PATH + 1];
-  static char homedrive_buf[3];
   LPUSER_INFO_3 ui = NULL;
   WCHAR wuser[UNLEN + 1];
   NET_API_STATUS ret;
@@ -286,13 +204,13 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
       char *p;
       if ((p = getenv ("HOMEDRIVE")))
 	{
-	  memcpy (homedrive_buf, p, 2);
-	  homedrive = homedrive_buf;
+	  memcpy (homedrive_env_buf, p, 2);
+	  homedrive = homedrive_env_buf;
 	}
       if ((p = getenv ("HOMEPATH")))
 	{
-	  strcpy (buf, p);
-	  homepath = buf;
+	  strcpy (homepath_env_buf, p);
+	  homepath = homepath_env_buf;
 	}
       if ((p = getenv ("HOME")))
 	debug_printf ("HOME is already in the environment %s", p);
@@ -308,6 +226,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	  else if (homedrive && homepath)
 	    {
 	      char home[MAX_PATH];
+	      char buf[MAX_PATH + 1];
 	      strcpy (buf, homedrive);
 	      strcat (buf, homepath);
 	      cygwin_conv_to_full_posix_path (buf, home);
@@ -315,39 +234,41 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	      debug_printf ("Set HOME (from HOMEDRIVE/HOMEPATH) to %s", home);
 	    }
 	}
+      return NULL;
     }
 
-  if (homedrive == NULL)
+  if (homedrive == NULL || !homedrive[0])
     {
       if (!pw)
 	pw = getpwnam (name ());
       if (pw && pw->pw_dir && *pw->pw_dir)
-	cygwin_conv_to_full_win32_path (pw->pw_dir, buf);
+	cygwin_conv_to_full_win32_path (pw->pw_dir, homepath_env_buf);
       else
 	{
 	  sys_mbstowcs (wuser, name (), sizeof (wuser) / sizeof (*wuser));
 	  if ((ret = NetUserGetInfo (NULL, wuser, 3, (LPBYTE *)&ui)))
 	    {
-	      if (logsrv ())
+	      if (env_logsrv ())
 		{
 		  WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-		  strcat (strcpy (buf, "\\\\"), logsrv ());
-		  sys_mbstowcs (wlogsrv, buf, sizeof (wlogsrv) / sizeof(*wlogsrv));
+		  strcpy (homepath_env_buf, env_logsrv ());
+		  sys_mbstowcs (wlogsrv, homepath_env_buf,
+				sizeof (wlogsrv) / sizeof(*wlogsrv));
 		  ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui);
 		}
 	    }
 	  if (!ret)
 	    {
 	      char *p;
-	      sys_wcstombs (buf, ui->usri3_home_dir, MAX_PATH);
-	      if (!buf[0])
+	      sys_wcstombs (homepath_env_buf, ui->usri3_home_dir, MAX_PATH);
+	      if (!homepath_env_buf[0])
 		{
-		  sys_wcstombs (buf, ui->usri3_home_dir_drive, MAX_PATH);
-		  if (buf[0])
-		    strcat (buf, "\\");
-		  else if (!GetSystemDirectory (buf, MAX_PATH))
-		    strcpy (buf, "c:\\");
-		  else if ((p = strchr (buf, '\\')))
+		  sys_wcstombs (homepath_env_buf, ui->usri3_home_dir_drive, MAX_PATH);
+		  if (homepath_env_buf[0])
+		    strcat (homepath_env_buf, "\\");
+		  else if (!GetSystemDirectory (homepath_env_buf, MAX_PATH))
+		    strcpy (homepath_env_buf, "c:\\");
+		  else if ((p = strchr (homepath_env_buf, '\\')))
 		    p[1] = '\0';
 		}
 	    }
@@ -355,18 +276,18 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	    NetApiBufferFree (ui);
 	}
 
-      if (buf[1] != ':')
+      if (homepath_env_buf[1] != ':')
 	{
-	  homedrive_buf[0] = homedrive_buf[1] = '\0';
-	  homepath = buf;
+	  homedrive_env_buf[0] = homedrive_env_buf[1] = '\0';
+	  homepath = homepath_env_buf;
 	}
       else
 	{
-	  homedrive_buf[0] = buf[0];
-	  homedrive_buf[1] = buf[1];
-	  homepath = buf + 2;
+	  homedrive_env_buf[0] = homepath_env_buf[0];
+	  homedrive_env_buf[1] = homepath_env_buf[1];
+	  homepath = homepath_env_buf + 2;
 	}
-      homedrive = homedrive_buf;
+      homedrive = homedrive_env_buf;
     }
 
   switch (what)
@@ -383,21 +304,44 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 const char *
 cygheap_user::env_logsrv ()
 {
-  char *p = plogsrv - 2;
+  if (plogsrv)
+    return plogsrv;
 
-  *p = p[1] = '\\';
-  return p;
+  char logsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+  if (!get_logon_server (env_domain (), logsrv, NULL))
+    return NULL;
+  return plogsrv = cstrdup (logsrv);
+}
+
+const char *
+cygheap_user::env_domain ()
+{
+  if (pdomain)
+    return pdomain;
+
+  char username[UNLEN + 1];
+  DWORD ulen = sizeof (username);
+  char userdomain[DNLEN + 1];
+  DWORD dlen = sizeof (userdomain);
+  SID_NAME_USE use;
+
+  if (!LookupAccountSid (NULL, sid (), username, &ulen,
+			 userdomain, &dlen, &use))
+    {
+      __seterrno ();
+      return NULL;
+    }
+  return pdomain = cstrdup (userdomain);
 }
 
 const char *
 cygheap_user::env_userprofile ()
 {
-  static char buf[512]; /* FIXME: This shouldn't be static. */
-  if (strcasematch (name (), "SYSTEM") || !domain () || !logsrv ())
+  if (strcasematch (name (), "SYSTEM") || !env_domain () || !env_logsrv ())
     return NULL;
 
-  if (get_registry_hive_path (sid (), buf))
-    return buf;
+  if (get_registry_hive_path (sid (), userprofile_env_buf))
+    return userprofile_env_buf;
   else
     return NULL;
 }
@@ -412,4 +356,10 @@ const char *
 cygheap_user::env_homedrive ()
 {
   return ontherange (CH_HOMEDRIVE);
+}
+
+const char *
+cygheap_user::env_name ()
+{
+  return name ();
 }

@@ -1,3 +1,75 @@
+2002-06-14  Christopher Faylor  <cgf@redhat.com>
+
+	* uinfo.cc (cygheap_user::ontherange): Don't set HOMEDRIVE or HOMEPATH
+	unless one or the other is specified.
+
+2002-06-14  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.h (cygheap_user::userprofile_env_buf): New static member.
+	* environ.cc (build_env): Add debugging statement.
+	(spenvs): Switch functions for USERDOMAIN and USERNAME.
+	* spawn.cc (spawn_guts): Move environment initialization prior to
+	cygheap_setup_for_child or environment info will never be copied to
+	child.
+
+2002-06-14  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.h (cygheap_user): Add static members to hold home{drive,path}
+	info.
+	* uinfo.cc (cygheap_user::ontherange): Use static class members for
+	local HOME* storage.
+
+2002-06-14  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (cygheap_user::set_logsrv): Remove.
+	(cygheap_user::set_domain): Ditto.
+	* cygheap.h (cygheap_user::set_logsrv): Remove declaration.
+	(cygheap_user::set_domain): Ditto.
+	(cygheap_user::env_domain): Declare new method.
+	(cygheap_user::env_name): Ditto.
+	* environ.cc (spenvs): Add two environment variables.
+	* spawn.cc (spawn_guts): Call build_env after RevertToSelf.  Always set
+	ciresrv.mount_h.
+	(cygheap_user::ontherange): Recalculate homedrive/homepath if they are
+	empty.  Use env_logsrv to get logon server.
+	(cygheap_user::env_logsrv): Calculate server name here rather than
+	relying on it having been previously calculated.
+	(cygheap_user::env_domain): Ditto for domain name.
+	(cygheap-user::env_name): New method.
+
+2002-06-12  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* syscalls.cc (seteuid32): Do not get or set the environment.  Do not
+	call LookupAccountSid nor internal_getlogin.  Set cygheap->user name
+	and sid from the passwd entry.
+	* uinfo.cc (uinfo_init): Only call internal_getlogin when starting from
+	a non Cygwin process and use the values returned in user.
+	(internal_getlogin): Simplify to case where starting from a non Cygwin
+	process.  Store return values in user and return void.  Do not set the
+	Windows default environment.
+	* dcrt0.cc (dll_crt0_1): Call uinfo_init only when needed.  Do not set
+	myself->uid nor reset user.sid.
+	* spawn.cc (spawn_guts): Get the sid from cygheap->user.  Always
+	RevertToSelf().  Don't set uid in impersonated case.
+	* cygheap.cc (cygheap_user::set_sid): Do not set orig_sig.
+	(cygheap_user::set_orig_sid): New.
+	* cygheap.h: Declare cygheap_user::set_sid.
+	* winsup.h: Add argument to uinfo_init().
+
+2002-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (build_env): If realloc moves envblock, move s with it.
+
+2002-06-13  Nicholas S. Wourms  <nwourms@netscape.net>
+
+	* winver.rc: Add more words to copyright.
+
+2002-06-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_user::set_name): Revert previous change.
+	* environ.cc (spenv::retrieve): Check return value of call to
+	cygheap->user.*from_cygheap().
+
 2002-06-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc (cygheap_user::set_name): Remove setting homedrive and

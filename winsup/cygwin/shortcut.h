@@ -1,4 +1,4 @@
-/* shortcut.h: Hader file for shortcut.c
+/* shortcut.h: Header file for shortcut.c
 
    Copyright 2001 Red Hat, Inc.
 

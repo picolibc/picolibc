@@ -765,6 +765,8 @@ static NO_COPY spenv spenvs[] =
   {"LOGONSERVER=", &cygheap_user::env_logsrv},
   {"SYSTEMDRIVE=", NULL},
   {"SYSTEMROOT=", NULL},
+  {"USERDOMAIN=", &cygheap_user::env_domain},
+  {"USERNAME=", &cygheap_user::env_name},
   {"USERPROFILE=", &cygheap_user::env_userprofile},
 };
 
@@ -786,7 +788,8 @@ spenv::retrieve (bool no_envblock, const char *const envname, int len)
 
       /* Make a FOO=BAR entry from the value returned by the cygheap_user
          method. */
-      p = (cygheap->user.*from_cygheap) ();
+      if (!(p = (cygheap->user.*from_cygheap) ()))
+        return NULL;
       int namelen = strlen (name);
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
@@ -909,7 +912,16 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 
 	  /* See if we need to increase the size of the block. */
 	  if (new_tl > tl)
-	    envblock = (char *) realloc (envblock, 2 + (tl += len + 100));
+	    {
+	      char *new_envblock =
+	      		(char *) realloc (envblock, 2 + (tl += len + 100));
+	      /* If realloc moves the block, move `s' with it. */
+	      if (new_envblock != envblock)
+	        {
+		  s += new_envblock - envblock;
+		  envblock = new_envblock;
+		}
+	    }
 
 	  memcpy (s, p, len + 1);
 
@@ -927,6 +939,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 					   of buffer */
     }
 
+  debug_printf ("envp %p, envc %d", newenv, envc);
   return newenv;
 }
 

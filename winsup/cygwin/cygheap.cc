@@ -443,54 +443,36 @@ cygheap_user::set_name (const char *new_name)
   if (pname)
     cfree (pname);
   pname = cstrdup (new_name ? new_name : "");
-}
-
-void
-cygheap_user::set_logsrv (const char *new_logsrv)
-{
+  homedrive = NULL;
+  homepath = NULL;
   if (plogsrv)
-    cfree (plogsrv - 2);
-  if (!new_logsrv || !*new_logsrv)
-    plogsrv = NULL;
-  else
-    {
-      plogsrv = (char *) cmalloc (HEAP_STR, strlen (new_logsrv) + 3) + 2;
-      strcpy (plogsrv, new_logsrv);
-    }
-}
-
-void
-cygheap_user::set_domain (const char *new_domain)
-{
+    cfree (plogsrv);
   if (pdomain)
     cfree (pdomain);
-  pdomain = (new_domain && *new_domain) ? cstrdup (new_domain) : NULL;
+  plogsrv = pdomain = NULL;
 }
 
 BOOL
 cygheap_user::set_sid (PSID new_sid)
 {
-  if (!new_sid)
-    {
-      if (psid)
-	cfree (psid);
-      if (orig_psid)
-	cfree (orig_psid);
-      psid = NULL;
-      orig_psid = NULL;
-      return TRUE;
-    }
-  else
+  if (new_sid)
     {
       if (!psid)
-	{
-	  if (!orig_psid)
-	    {
-	      orig_psid = cmalloc (HEAP_STR, MAX_SID_LEN);
-	      CopySid (MAX_SID_LEN, orig_psid, new_sid);
-	    }
-	  psid = cmalloc (HEAP_STR, MAX_SID_LEN);
-	}
-      return CopySid (MAX_SID_LEN, psid, new_sid);
+        psid = cmalloc (HEAP_STR, MAX_SID_LEN);
+      if (psid)
+	return CopySid (MAX_SID_LEN, psid, new_sid);
     }
+  return FALSE;
+}
+
+BOOL
+cygheap_user::set_orig_sid ()
+{
+  if (psid)
+    {
+      if (!orig_psid) orig_psid = cmalloc (HEAP_STR, MAX_SID_LEN);
+      if (orig_psid)
+	  return CopySid (MAX_SID_LEN, orig_psid, psid);
+    }
+  return FALSE;
 }

@@ -1,6 +1,6 @@
 /* smallprint.c: small print routines for WIN32
 
-   Copyright 1996, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
