@@ -98,6 +98,14 @@ struct host_callback_struct
   int (*lstat) PARAMS ((host_callback *, const char *, struct stat *));
   int (*ftruncate) PARAMS ((host_callback *, int, long));
   int (*truncate) PARAMS ((host_callback *, const char *, long));
+  int (*pipe) PARAMS ((host_callback *, int *));
+
+  /* Called by the framework when a read call has emptied a pipe buffer.  */
+  void (*pipe_empty) PARAMS ((host_callback *, int read_fd, int write_fd));
+
+  /* Called by the framework when a write call makes a pipe buffer
+     non-empty.  */
+  void (*pipe_nonempty) PARAMS ((host_callback *, int read_fd, int write_fd));
 
   /* When present, call to the client to give it the oportunity to
      poll any io devices for a request to quit (indicated by a nonzero
@@ -136,6 +144,22 @@ struct host_callback_struct
      implement now.  */
   short fd_buddy[MAX_CALLBACK_FDS+1];
 
+  /* 0 = none, >0 = reader (index of writer),
+     <0 = writer (negative index of reader).
+     If abs (ispipe[N]) == N, then N is an end of a pipe whose other
+     end is closed.  */
+  short ispipe[MAX_CALLBACK_FDS];
+
+  /* A writer stores the buffer at its index.  Consecutive writes
+     realloc the buffer and add to the size.  The reader indicates the
+     read part in its .size, until it has consumed it all, at which
+     point it deallocates the buffer and zeroes out both sizes.  */
+  struct pipe_write_buffer
+  {
+    int size;
+    char *buffer;
+  } pipe_buffer[MAX_CALLBACK_FDS];
+
   /* System call numbers.  */
   CB_TARGET_DEFS_MAP *syscall_map;
   /* Errno values.  */
@@ -154,6 +178,14 @@ struct host_callback_struct
   const char *stat_map;
 
   enum bfd_endian target_endian;
+
+  /* Size of an "int" on the target (for syscalls whose ABI uses "int").
+     This must include padding, and only padding-at-higher-address is
+     supported.  For example, a 64-bit target with 32-bit int:s which
+     are padded to 64 bits when in an array, should supposedly set this
+     to 8.  The default is 4 which matches ILP32 targets and 64-bit
+     targets with 32-bit ints and no padding.  */
+  int target_sizeof_int;
 
   /* Marker for those wanting to do sanity checks.
      This should remain the last member of this struct to help catch
@@ -199,6 +231,7 @@ extern host_callback default_callback;
 #define CB_SYS_rename	20
 #define CB_SYS_truncate	21
 #define CB_SYS_ftruncate 22
+#define CB_SYS_pipe 	23
 
 /* Struct use to pass and return information necessary to perform a
    system call.  */

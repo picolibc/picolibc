@@ -1,5 +1,10 @@
 2005-01-28  Hans-Peter Nilsson  <hp@axis.com>
 
+	* callback.h (struct host_callback_struct): New members pipe,
+	pipe_empty, pipe_nonempty, ispipe, pipe_buffer and
+	target_sizeof_int.
+	(CB_SYS_pipe): New macro.
+
 	* callback.h: Include "bfd.h".
 	(struct host_callback_struct): New member target_endian.
 	(cb_store_target_endian): Declare.
