@@ -1,3 +1,81 @@
+2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc: Implement the ipcs(8) interfaces, IPC_INFO,
+	SHM_STAT and SHM_INFO.
+	(server_shmmgr::segment_t::sequence): New static field.
+	(server_shmmgr::segment_t::key): Remove field, use the new
+	ds.shm_perm.key field instead.
+	(server_shmmgr::segment_t::shmid): Remove field.
+	(server_shmmgr::segment_t::intid): New field.
+	(server_shmmgr::segment_t::segment_t): Use the `key' argument to
+	initialise `ds.shm_perm.key'.  Change from using `shmid' to
+	`intid'.
+	(server_shmmgr::_shmseg_cnt): Renamed from `_shmid_cnt'.
+	(server_shmmgr::_intid_max): Renamed from `_shmid_max.
+	(server_shmmgr::shmat): Move the out arguments to the start of the
+	argument list.  Rename the `pid' argument as `cygpid'.  Add
+	tracing.  Pass an intid to `find ()', not a shmid.
+	(server_shmmgr::shmctl): Add separate out arguments.  Rename the
+	`pid' argument as `cygpid'.  Add support for the ipcs(8)
+	interfaces.  Add tracing.  Pass an intid to `find ()', not a
+	shmid.
+	(server_shmmgr::shmdt): Rename the `pid' argument as `cygpid'.
+	Add tracing.  Pass an intid to `find ()', not a shmid.
+	(server_shmmgr::shmget): Add a separate out arguments.  Rename the
+	`pid' argument as `cygpid'.  Add tracing.
+	(server_shmmgr::server_shmmgr): Update for new field names.
+	(server_shmmgr::find_by_key): Update for the new `ds.shm_perm.key'
+	field.
+	(server_shmmgr::find): Update to use the new `segment_t::intid'
+	field.
+	(server_shmmgr::new_segment): Rename the `pid' argument as
+	`cygpid'.  Check that the requested size is within bounds.  Handle
+	new error result from `new_segment (key, HANDLE)'.
+	(server_shmmgr::new_segment): Work with intids, not shmids.  Check
+	that the new intid is within bounds.  Update for new field names.
+	(server_shmmgr::delete_segment): Pass an intid to `find ()', not a
+	shmid.  Update for new field names.
+	(client_request_shm::serve): Check that the incoming message
+	length is the size of the `_parameters.in' struct, not of the
+	whole in/out parameter union.  Likewise, set the outgoing message
+	length to the size of the `_parameters.out' struct.  Update for
+	the new server_shmmgr interfaces.
+	* include/sys/ipc.h (ipc_perm::key): New field.
+	* include/sys/shm.h (SHM_INFO): New constant.
+	* cygserver_ipc.h (IPCMNI): New constant.
+	(ipc_int2ext): Add `sequence' argument and munge this into the
+	external ipc id.
+	(ipc_ext2int_subsys): Unmunge the sequence number from the
+	external ipc id.
+	(ipc_ext2int): Ditto.
+	(ipc_inc_id): Remove.
+	(ipc_dec_id): Remove.
+	* cygserver_shm.h (SHMMAX): New constant.
+	(SHMMIN): Ditto.
+	(SHMMNI): Ditto.
+	(SHMSEG): Ditto.
+	(SHMALL): Ditto.
+	(client_request_shm::_parameters): Re-arrange as a union of two
+	separate structs, one for in arguments, the other for out.
+	(client_request_shm::shmid): Update for the new parameter layout.
+	(client_request_shm::ds): Ditto.
+	(client_request_shm::info): New method.
+	* shm.cc (client_shmmgr::_shmat_cnt): New static field.
+	(client_shmmgr::shmat): Add locking.  Add tracing.
+	(client_shmmgr::shmctl): Update for ipcs(8) commands.  Add
+	tracing.  Add more argument checking.
+	(client_shmmgr::shmdt): Add locking.  Add tracing.  Update the new
+	`_shmat_cnt' field.
+	(client_shmmgr::shmget): Add tracing.
+	(client_shmmgr::fixup_shms_after_fork): Add tracing.  Add
+	consistency checking.
+	(client_shmmgr::attach): Add more tracing.
+	(client_shmmgr::new_segment): Update the new `_shmat_cnt' field.
+	(client_request_shm::client_request_shm): Update for the new
+	parameter layout.  Set the outgoing message length to the size of
+	the `_parameters.in' struct, not of the whole in/out parameter
+	union.
+
 2002-07-02  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* shm.cc: Remove the use of a static client_shmmgr object.

@@ -36,6 +36,7 @@ extern "C"
  * Commands 4000-4fff are reserved for SHM_xxx.
  */
 #define SHM_STAT   0x4000	/* For ipcs(8) */
+#define SHM_INFO   0x4001	/* For ipcs(8) */
 
 typedef long int shmatt_t;
 

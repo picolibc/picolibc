@@ -28,6 +28,7 @@ struct ipc_perm {
   uid_t  cuid;
   gid_t  cgid;
   mode_t mode;
+  key_t  key;
 }; 
 
 /*

@@ -15,6 +15,7 @@ details. */
 
 #include <sys/types.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -98,7 +99,7 @@ public:
   static client_shmmgr & instance ();
 
   void *shmat (int shmid, const void *, int shmflg);
-  int shmctl (int shmid, int cmd, struct shmid_ds *);
+  int shmctl (int shmid, int cmd, shmid_ds *);
   int shmdt (const void *);
   int shmget (key_t, size_t, int shmflg);
 
@@ -108,7 +109,9 @@ private:
   static NO_COPY client_shmmgr *_instance;
 
   CRITICAL_SECTION _segments_lock;
-  static segment_t *_segments_head; // A list sorted by shmaddr.
+  static segment_t *_segments_head; // List of attached segs by shmaddr.
+
+  static long _shmat_cnt;	// No. of attached segs; for info. only.
 
   client_shmmgr ();
   ~client_shmmgr ();
@@ -126,6 +129,7 @@ private:
 
 /* static */ NO_COPY client_shmmgr *client_shmmgr::_instance;
 /* static */ client_shmmgr::segment_t *client_shmmgr::_segments_head;
+/* static */ long client_shmmgr::_shmat_cnt;
 
 /*---------------------------------------------------------------------------*
  * client_shmmgr::instance ()
@@ -151,12 +155,25 @@ client_shmmgr::shmat (const int shmid,
 		      const void *const shmaddr,
 		      const int shmflg)
 {
+  syscall_printf ("shmat (shmid = %d, shmaddr = 0x%p, shmflg = 0%o)",
+		  shmid, shmaddr, shmflg);
+
+  EnterCriticalSection (&_segments_lock);
+
   HANDLE hFileMap = NULL;
 
   void *const ptr = attach (shmid, shmaddr, shmflg, hFileMap);
 
   if (ptr)
     new_segment (shmid, ptr, shmflg, hFileMap);
+
+  LeaveCriticalSection (&_segments_lock);
+
+  if (ptr)
+    syscall_printf ("0x%p = shmat (shmid = %d, shmaddr = 0x%p, shmflg = 0%o)",
+		    ptr, shmid, shmaddr, shmflg);
+  // else
+    // See the syscall_printf in client_shmmgr::attach ().
 
   return (ptr ? ptr : (void *) -1);
 }
@@ -168,26 +185,94 @@ client_shmmgr::shmat (const int shmid,
 int
 client_shmmgr::shmctl (const int shmid,
 		       const int cmd,
-		       struct shmid_ds *const buf)
+		       shmid_ds *const buf)
 {
-  client_request_shm request (shmid, cmd, buf);
+  syscall_printf ("shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)",
+		  shmid, cmd, buf);
+
+  // Check parameters and set up in parameters as required.
+
+  const shmid_ds *in_buf = NULL;
+
+  switch (cmd)
+    {
+    case IPC_SET:
+      if (__check_invalid_read_ptr_errno (buf, sizeof (shmid_ds)))
+	{
+	  syscall_printf (("-1 [EFAULT] = "
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
+			  shmid, cmd, buf);
+	  set_errno (EFAULT);
+	  return -1;
+	}
+      in_buf = buf;
+      break;
+
+    case IPC_STAT:
+    case SHM_STAT:
+      if (__check_null_invalid_struct_errno (buf, sizeof (shmid_ds)))
+	{
+	  syscall_printf (("-1 [EFAULT] = "
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
+			  shmid, cmd, buf);
+	  set_errno (EFAULT);
+	  return -1;
+	}
+      break;
+
+    case IPC_INFO:
+      if (__check_null_invalid_struct_errno (buf, sizeof (shminfo)))
+	{
+	  syscall_printf (("-1 [EFAULT] = "
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
+			  shmid, cmd, buf);
+	  set_errno (EFAULT);
+	  return -1;
+	}
+      break;
+    }
+
+  // Create and issue the command.
+
+  client_request_shm request (shmid, cmd, in_buf);
 
   if (request.make_request () == -1 || request.error_code ())
     {
+      syscall_printf (("-1 [%d] = "
+		       "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
+		      request.error_code (), shmid, cmd, buf);
       set_errno (request.error_code ());
       return -1;
     }
 
-  // Some commands require special processing, e.g. for out parameters.
+  // Some commands require special processing for their out parameters.
+
+  int result = 0;
 
   switch (cmd)
     {
     case IPC_STAT:
       *buf = request.ds ();
       break;
+
+    case IPC_INFO:
+      *(shminfo *) buf = request.info ();
+      break;
+
+    case SHM_STAT:		// ipcs(8) i'face.
+      *buf = request.ds ();
+      result = request.shmid ();
+      break;
+
+    case SHM_INFO:		// ipcs(8) i'face.
+      result = request.shmid ();
+      break;
     }
 
-  return 0;
+  syscall_printf ("%d = shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)",
+		  result, shmid, cmd, buf);
+
+  return result;
 }
 
 /*---------------------------------------------------------------------------*
@@ -202,12 +287,18 @@ client_shmmgr::shmctl (const int shmid,
 int
 client_shmmgr::shmdt (const void *const shmaddr)
 {
+  syscall_printf ("shmdt (shmaddr = 0x%p)", shmaddr);
+
+  EnterCriticalSection (&_segments_lock);
+
   segment_t *previous = NULL;
 
   segment_t *const segptr = find (shmaddr, &previous);
 
   if (!segptr)
     {
+      LeaveCriticalSection (&_segments_lock);
+      syscall_printf ("-1 [EINVAL] = shmdt (shmaddr = 0x%p)", shmaddr);
       set_errno (EINVAL);
       return -1;
     }
@@ -218,6 +309,11 @@ client_shmmgr::shmdt (const void *const shmaddr)
     previous->next = segptr->next;
   else
     _segments_head = segptr->next;
+
+  LeaveCriticalSection (&_segments_lock);
+
+  const long cnt = InterlockedDecrement (&_shmat_cnt);
+  assert (cnt >= 0);
 
   if (!UnmapViewOfFile ((void *) shmaddr))
     with_strerr (msg,
@@ -246,23 +342,39 @@ client_shmmgr::shmdt (const void *const shmaddr)
 
   delete segptr;
 
+  syscall_printf ("0 = shmdt (shmaddr = 0x%p)", shmaddr);
+
   return 0;
 }
 
 /*---------------------------------------------------------------------------*
  * client_shmmgr::shmget ()
+ *
+ * The `key = 0x%08x%08x' contortions in the tracing statements is
+ * because small_printf () doesn't support 64-bit integers.
  *---------------------------------------------------------------------------*/
 
 int
 client_shmmgr::shmget (const key_t key, const size_t size, const int shmflg)
 {
+  syscall_printf ("shmget (key = 0x%08x%08x, size = %u, shmflg = 0%o)",
+		  (unsigned) (key >> 32), (unsigned) key, size, shmflg);
+
   client_request_shm request (key, size, shmflg);
 
   if (request.make_request () == -1 || request.error_code ())
     {
+      syscall_printf (("-1 [%d] = "
+		       "shmget (key = 0x%08x%08x, size = %u, shmflg = 0%o)"),
+		      request.error_code (),
+		      (unsigned) (key >> 32), (unsigned) key, size, shmflg);
       set_errno (request.error_code ());
       return -1;
     }
+
+  syscall_printf (("%d = shmget (key = 0x%08x%08x, size = %u, shmflg = 0%o)"),
+		  request.shmid (),
+		  (unsigned) (key >> 32), (unsigned) key, size, shmflg);
 
   return request.shmid ();
 }
@@ -270,21 +382,44 @@ client_shmmgr::shmget (const key_t key, const size_t size, const int shmflg)
 /*---------------------------------------------------------------------------*
  * client_shmmgr::fixup_shms_after_fork ()
  *
- * The hFileMap handles are non-inheritable: so the 
+ * The hFileMap handles are non-inheritable: so they have to be
+ * re-acquired from cygserver.
+ *
+ * Nb. This routine need not be thread-safe as it is only called at startup.
  *---------------------------------------------------------------------------*/
 
 int
 client_shmmgr::fixup_shms_after_fork ()
 {
+  debug_printf ("re-attaching to shm segments: %d attached", _shmat_cnt);
+
+  {
+    int length = 0;
+    for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
+      length += 1;
+
+    if (_shmat_cnt != length)
+      {
+	system_printf (("state inconsistent: "
+			"_shmat_cnt = %d, length of segments list = %d"),
+		       _shmat_cnt, length);
+	return 1;
+      }
+  }
+
   for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
     if (!attach (segptr->shmid,
 		 segptr->shmaddr,
 		 segptr->shmflg & ~SHM_RND,
 		 segptr->hFileMap))
       {
-	system_printf ("fatal error re-attaching to shared memory segments");
+	system_printf ("fatal error re-attaching to shm segment %d",
+		       segptr->shmid);
 	return 1;
       }
+
+  if (_shmat_cnt)
+    debug_printf ("re-attached all %d shm segments", _shmat_cnt);
 
   return 0;
 }
@@ -344,6 +479,9 @@ client_shmmgr::attach (const int shmid,
 
   if (request.make_request () == -1 || request.error_code ())
     {
+      syscall_printf (("-1 [%d] = "
+		       "shmat (shmid = %d, shmaddr = 0x%p, shmflg = 0%o)"),
+		      request.error_code (), shmid, shmaddr, shmflg);
       set_errno (request.error_code ());
       return NULL;
     }
@@ -444,6 +582,9 @@ client_shmmgr::new_segment (const int shmid,
       _segments_head = segptr;
     }
 
+  const long cnt = InterlockedIncrement (&_shmat_cnt);
+  assert (cnt > 0);
+
   return segptr;
 }
 
@@ -462,7 +603,7 @@ shmat (const int shmid, const void *const shmaddr, const int shmflg)
  *---------------------------------------------------------------------------*/
 
 extern "C" int
-shmctl (const int shmid, const int cmd, struct shmid_ds *const buf)
+shmctl (const int shmid, const int cmd, shmid_ds *const buf)
 {
   return shmmgr.shmctl (shmid, cmd, buf);
 }
@@ -506,13 +647,15 @@ client_request_shm::client_request_shm (const int shmid, const int shmflg)
 {
   _parameters.in.shmop = SHMOP_shmat;
 
-  _parameters.shmid = shmid;
+  _parameters.in.shmid = shmid;
   _parameters.in.shmflg = shmflg;
 
   _parameters.in.cygpid = getpid ();
   _parameters.in.winpid = GetCurrentProcessId ();
   _parameters.in.uid = geteuid ();
   _parameters.in.gid = getegid ();
+
+  msglen (sizeof (_parameters.in));
 }
 
 /*---------------------------------------------------------------------------*
@@ -521,20 +664,22 @@ client_request_shm::client_request_shm (const int shmid, const int shmflg)
 
 client_request_shm::client_request_shm (const int shmid,
 					const int cmd,
-					const struct shmid_ds * const buf)
+					const shmid_ds *const buf)
   : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
 {
   _parameters.in.shmop = SHMOP_shmctl;
 
-  _parameters.shmid = shmid;
-  if (cmd == IPC_SET)
-    _parameters.ds = *buf;
+  _parameters.in.shmid = shmid;
   _parameters.in.cmd = cmd;
+  if (buf)
+    _parameters.in.ds = *buf;
 
   _parameters.in.cygpid = getpid ();
   _parameters.in.winpid = GetCurrentProcessId ();
   _parameters.in.uid = geteuid ();
   _parameters.in.gid = getegid ();
+
+  msglen (sizeof (_parameters.in));
 }
 
 /*---------------------------------------------------------------------------*
@@ -546,12 +691,14 @@ client_request_shm::client_request_shm (const int shmid)
 {
   _parameters.in.shmop = SHMOP_shmdt;
 
-  _parameters.shmid = shmid;
+  _parameters.in.shmid = shmid;
 
   _parameters.in.cygpid = getpid ();
   _parameters.in.winpid = GetCurrentProcessId ();
   _parameters.in.uid = geteuid ();
   _parameters.in.gid = getegid ();
+
+  msglen (sizeof (_parameters.in));
 }
 
 /*---------------------------------------------------------------------------*
@@ -573,4 +720,6 @@ client_request_shm::client_request_shm (const key_t key,
   _parameters.in.winpid = GetCurrentProcessId ();
   _parameters.in.uid = geteuid ();
   _parameters.in.gid = getegid ();
+
+  msglen (sizeof (_parameters.in));
 }

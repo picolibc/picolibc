@@ -15,12 +15,34 @@ details. */
 #define __CYGSERVER_SHM_H__
 
 #include <sys/types.h>
-
-#include <assert.h>
-
 #include <sys/shm.h>
 
+#include <assert.h>
+#include <limits.h>
+
+#include "cygserver_ipc.h"
+
 #include "cygwin/cygserver.h"
+
+/*---------------------------------------------------------------------------*
+ * Values for the shminfo entries.
+ *
+ * Nb. The values are segregated between two enums so that the `small'
+ * values aren't promoted to `unsigned long' equivalents.
+ *---------------------------------------------------------------------------*/
+
+enum
+  {
+    SHMMAX = ULONG_MAX,
+    SHMSEG = ULONG_MAX,
+    SHMALL = ULONG_MAX
+  };
+
+enum
+  {
+    SHMMIN = 1,
+    SHMMNI = IPCMNI		// Must be <= IPCMNI.
+  };
 
 /*---------------------------------------------------------------------------*
  * class client_request_shm
@@ -46,7 +68,7 @@ public:
 
 #ifdef __INSIDE_CYGWIN__
   client_request_shm (int shmid, int shmflg); // shmat
-  client_request_shm (int shmid, int cmd, const struct shmid_ds *); // shmctl
+  client_request_shm (int shmid, int cmd, const shmid_ds *); // shmctl
   client_request_shm (int shmid); // shmdt
   client_request_shm (key_t, size_t, int shmflg); // shmget
 #endif
@@ -56,13 +78,7 @@ public:
   int shmid () const
   {
     assert (!error_code ());
-    return _parameters.shmid;
-  }
-
-  const struct shmid_ds & ds () const
-  {
-    assert (!error_code ());
-    return _parameters.ds;
+    return _parameters.out.shmid;
   }
 
   HANDLE hFileMap () const
@@ -71,32 +87,45 @@ public:
     return _parameters.out.hFileMap;
   }
 
-private:
-  struct
+  const shmid_ds & ds () const
   {
-    int shmid;
-    struct shmid_ds ds;
+    assert (!error_code ());
+    return _parameters.out.ds;
+  }
 
-    union
+  const shminfo & info () const
+  {
+    assert (!error_code ());
+    return _parameters.out.info;
+  }
+
+private:
+  union
+  {
+    struct
     {
-      struct
-      {
-	shmop_t shmop;
-	key_t key;
-	size_t size;
-	int shmflg;
-	int cmd;
-	pid_t cygpid;
-	DWORD winpid;
-	uid_t uid;
-	gid_t gid;
-      } in;
+      shmop_t shmop;
+      key_t key;
+      size_t size;
+      int shmflg;
+      int shmid;
+      int cmd;
+      pid_t cygpid;
+      DWORD winpid;
+      uid_t uid;
+      gid_t gid;
+      shmid_ds ds;
+    } in;
 
-      struct
+    struct {
+      int shmid;
+      HANDLE hFileMap;
+      union
       {
-	HANDLE hFileMap;
-      } out;
-    };
+	shmid_ds ds;
+	shminfo info;
+      };
+    } out;
   } _parameters;
 
 #ifndef __INSIDE_CYGWIN__
