@@ -18,10 +18,6 @@ There is a comprehensive Cygwin User's Guide at
 and an API Reference at
 @file{http://cygwin.com/cygwin-api/cygwin-api.html}.
 
-There is an interesting paper about Cygwin from the 1998 USENIX Windows
-NT Workshop Proceedings at
-@file{http://cygwin.com/usenix-98/cygwin.html}.
-
 You can find documentation for the individual GNU tools at
 @file{http://www.fsf.org/manual/}.  (You should read GNU manuals from a
 local mirror, check @file{http://www.fsf.org/server/list-mirrors.html}

@@ -6,12 +6,15 @@ If you are willing to be a package maintainer, great.  We urgently need
 volunteers to prepare and maintain packages, because the priority of the
 Cygwin Team is Cygwin itself.
 
-There will be a separate web page where all the details are documented,
-but this is not prepared yet.  Meanwhile, pore through the cygwin-apps
-mailing archives (start at @file{http://cygwin.com/lists.html}), and
-subscribe.  Charles Wilson posted a short recipe of what's involved,
-using texinfo as an example,
-at @file{http://cygwin.com/ml/cygwin-apps/2000-11/msg00055.html}.  This
+There's a Cygwin Contributor's Guide on the project web page available
+here @file{http://cygwin.com/setup.html}, which details everything you'll
+need to know about being a package maintainer.  If you need any extra
+help you can ask on cygwin-apps @emph{at} cygwin @emph{dot} com mailing
+list, or alternatively you can search the cygwin-apps archives
+(start at @file{http://http://cygwin.com/lists.html}), as your question
+may well have been asked before.  Charles Wilson posted a short recipe
+of what's involved, using texinfo as an example, available at
+@file{http://cygwin.com/ml/cygwin-apps/2000-11/msg00055.html}.  This
 should give you an idea of what is required.
 
 You should announce your intentions to the general cygwin list, in case

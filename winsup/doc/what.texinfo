@@ -32,17 +32,16 @@ exhibit different limitations, on the various versions of Windows.
 
 @section Where can I get it?
 
-The main location for the Cygwin project is
-@file{http://cygwin.com/}.  There you should find
-everything you need for Cygwin, including links for download and setup,
-a current list of ftp mirror sites, a User's Guide, an API Reference,
-mailing lists and archives, and additional ported software.
+The home page for the Cygwin project is @file{http://cygwin.com/}.
+There you should find everything you need for Cygwin, including links
+for download and setup, a current list of ftp mirror sites,
+a User's Guide, an API Reference, mailing lists and archives, and
+additional ported software.
 
 You can find documentation for the individual GNU tools at
 @file{http://www.fsf.org/manual/}.  (You should read GNU manuals from a
 local mirror.  Check @file{http://www.fsf.org/server/list-mirrors.html}
 for a list of them.)
-
 
 @section Is it free software?
 
