@@ -70,7 +70,7 @@ DUMPER_LDFLAGS:=$(ALL_LDFLAGS) $(DUMPER_LIB)
 PROGS:=mount$(EXEEXT) umount$(EXEEXT) ps$(EXEEXT) kill$(EXEEXT) \
        mkpasswd$(EXEEXT) mkgroup$(EXEEXT) cygpath$(EXEEXT) cygcheck$(EXEEXT) \
        passwd$(EXEEXT) getfacl$(EXEEXT) setfacl$(EXEEXT) strace$(EXEEXT) \
-       regtool$(EXEEXT) cygkeycheck$(EXEEXT)
+       regtool$(EXEEXT)
 
 CLEAN_PROGS:=$(PROGS)
 ifdef build_dumper

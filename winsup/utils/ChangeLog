@@ -1,3 +1,12 @@
+Fri Sep 29 13:12:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygcheck.cc (keyeprint): New function.
+	(check_keys): New function. Perform checking keycodes.
+	(main): Add option `-k' for invoking check_keys.
+	Change option processing to use long options and getopt_long.
+	* cygkeycheck.cc: Removed. Functionality moved to `cygcheck.cc'.
+	* Makefile.in: Remove cygkeycheck from the dependencies.
+
 Wed Sep 27 16:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* cygkeycheck.cc: New file. Utility to retrieve keycodes.

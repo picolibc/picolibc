@@ -15,11 +15,13 @@
 #include <sys/cygwin.h>
 #include <mntent.h>
 #include <time.h>
+#include <getopt.h>
 
 int verbose = 0;
 int registry = 0;
 int sysinfo = 0;
 int givehelp = 0;
+int keycheck = 0;
 
 #ifdef __GNUC__
 typedef long long longlong;
@@ -909,38 +911,155 @@ dump_sysinfo ()
     }
 }
 
+int
+keyeprint (const char *name)
+{
+  fprintf (stderr, "cygcheck: %s failed: %lu\n", name, GetLastError ());
+  return 1;
+}
+
+int
+check_keys ()
+{
+  HANDLE h = CreateFileA ("CONIN$", GENERIC_READ | GENERIC_WRITE,
+                          FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+  if (h == INVALID_HANDLE_VALUE || h == NULL)
+    return keyeprint ("Opening CONIN$");
+
+  DWORD mode;
+
+  if (!GetConsoleMode (h, &mode))
+    keyeprint ("GetConsoleMode");
+  else
+    {
+      mode &= ~ENABLE_PROCESSED_INPUT;
+      if (!SetConsoleMode (h, mode))
+        keyeprint ("GetConsoleMode");
+    }
+
+  fputs ("\nThis key check works only in a console window,", stderr);
+  fputs (" _NOT_ in a terminal session!\n", stderr);
+  fputs ("Abort with Ctrl+C if in a terminal session.\n\n", stderr);
+  fputs ("Press `q' to exit.\n", stderr);
+
+  INPUT_RECORD in, prev_in;
+
+  // Drop first <RETURN> key
+  ReadConsoleInput (h, &in, 1, &mode);
+
+  memset (&in, 0, sizeof in);
+
+  do
+    {
+      prev_in = in;
+      if (!ReadConsoleInput (h, &in, 1, &mode))
+        keyeprint ("ReadConsoleInput");
+
+      if (!memcmp (&in, &prev_in, sizeof in))
+        continue;
+
+      switch (in.EventType)
+        {
+        case KEY_EVENT:
+          printf ("%s %ux VK: 0x%02x VS: 0x%02x A: 0x%02x CTRL: ",
+                  in.Event.KeyEvent.bKeyDown ? "Pressed " : "Released",
+                  in.Event.KeyEvent.wRepeatCount,
+                  in.Event.KeyEvent.wVirtualKeyCode,
+                  in.Event.KeyEvent.wVirtualScanCode,
+                  (unsigned char) in.Event.KeyEvent.uChar.AsciiChar);
+          fputs (in.Event.KeyEvent.dwControlKeyState & CAPSLOCK_ON ?
+                 "CL " : "-- ", stdout);
+          fputs (in.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY ?
+                 "EK " : "-- ", stdout);
+          fputs (in.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED ?
+                 "LA " : "-- ", stdout);
+          fputs (in.Event.KeyEvent.dwControlKeyState & LEFT_CTRL_PRESSED ?
+                 "LC " : "-- ", stdout);
+          fputs (in.Event.KeyEvent.dwControlKeyState & NUMLOCK_ON ?
+                 "NL " : "-- ", stdout);
+          fputs (in.Event.KeyEvent.dwControlKeyState & RIGHT_ALT_PRESSED ?
+                 "RA " : "-- ", stdout);
+          fputs (in.Event.KeyEvent.dwControlKeyState & RIGHT_CTRL_PRESSED ?
+                 "RC " : "-- ", stdout);
+          fputs (in.Event.KeyEvent.dwControlKeyState & SCROLLLOCK_ON ?
+                 "SL " : "-- ", stdout);
+          fputs (in.Event.KeyEvent.dwControlKeyState & SHIFT_PRESSED ?
+                 "SH " : "-- ", stdout);
+          fputc ('\n', stdout);
+          break;
+
+        }
+    }
+  while (in.EventType != KEY_EVENT ||
+         in.Event.KeyEvent.bKeyDown != FALSE ||
+         in.Event.KeyEvent.uChar.AsciiChar != 'q');
+
+  CloseHandle (h);
+  return 0;
+}
 void
 usage ()
 {
-  fprintf (stderr, "Usage: cygcheck [-s] [-v] [-r] [-h] [program ...]\n");
-  fprintf (stderr, "  -s = system information\n");
-  fprintf (stderr, "  -v = verbose output (indented) (for -s or programs)\n");
-  fprintf (stderr, "  -r = registry search (requires -s)\n");
-  fprintf (stderr, "  -h = give help about the info\n");
-  fprintf (stderr, "You must at least give either -s or a program name\n");
+  fprintf (stderr, "Usage: cygcheck [OPTIONS] [program ...]\n");
+  fprintf (stderr, "  -s, --sysinfo  = system information (not with -k)\n");
+  fprintf (stderr, "  -v, --verbose  = verbose output (indented) (for -s or programs)\n");
+  fprintf (stderr, "  -r, --registry = registry search (requires -s)\n");
+  fprintf (stderr, "  -k, --keycheck = perform a keyboard check session (not with -s)\n");
+  fprintf (stderr, "  -h, --help     = give help about the info\n");
+  fprintf (stderr, "You must at least give either -s or -k or a program name\n");
   exit (1);
 }
+
+struct option longopts[] = {
+  { "sysinfo", no_argument, NULL, 's' },
+  { "registry", no_argument, NULL, 'r' },
+  { "verbose", no_argument, NULL, 'v' },
+  { "keycheck", no_argument, NULL, 'k' },
+  { "help", no_argument, NULL, 'h' },
+  { 0, no_argument, NULL, 0 }
+};
+char *opts = "srvkh";
 
 int
 main (int argc, char **argv)
 {
   int i;
-  while (argc > 1 && argv[1][0] == '-')
-    {
-      if (strcmp (argv[1], "-v") == 0)
-	verbose = 1;
-      if (strcmp (argv[1], "-r") == 0)
-	registry = 1;
-      if (strcmp (argv[1], "-s") == 0)
-	sysinfo = 1;
-      if (strcmp (argv[1], "-h") == 0)
-	givehelp = 1;
-      argc--;
-      argv++;
-    }
 
-  if (argc == 1 && !sysinfo)
+  while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+    switch (i)
+      {
+      case 's':
+        sysinfo = 1;
+        break;
+      case 'r':
+        registry = 1;
+        break;
+      case 'v':
+        verbose = 1;
+        break;
+      case 'k':
+        keycheck = 1;
+        break;
+      case 'h':
+        givehelp = 1;
+        break;
+      default:
+        usage ();
+        /*NOTREACHED*/
+      }
+  argc -= optind;
+  argv += optind;
+
+  if (argc == 0 && !sysinfo && !keycheck)
     usage ();
+
+  if (sysinfo && keycheck)
+    usage ();
+
+  if (keycheck)
+    return check_keys();
 
   init_paths ();
 
