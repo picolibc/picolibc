@@ -1,3 +1,76 @@
+2003-09-13  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (path_conv::ndisk_links): Fix potential
+	off-by-one problem when first file in a directory is a directory.
+
+2003-09-13  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* include/sys/cygwin.h: Rename PID_UNUSED to PID_MAP_RW.
+	* pinfo.cc (pinfo_init): Initialize myself->gid.
+	(pinfo::init): Create the "access" variable, set it appropriately and
+	use it to specify the requested access.
+	* exceptions.cc (sig_handle_tty_stop): Add PID_MAP_RW in pinfo parent.
+	* signal.cc (kill_worker): Ditto for pinfo dest.
+	* syscalls.cc (setpgid): Ditto for pinfo p.
+
+2003-09-13  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 5.
+
+2003-09-12  Christopher Faylor  <cgf@redhat.com>
+
+	* thread.cc (MTinterface::fixup_after_fork): Remove code which
+	potentially overwrote _impure pointer with contents of thread which
+	invoked fork since this eliminates important information like the
+	pointer to the atexit queue.
+
+2003-09-12  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (path_conv::ndisk_links): Fix problem where
+	search characters overwrote the path instead of being tacked on the
+	end.
+
+2003-09-12  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (_dll_crt0): Accommodate breaking apart of early_stuff_init.
+	* exceptions.cc (early_stuff_init): Delete.
+	(init_console_handler): New function - top half of early_stuff_init.
+	(init_global_security): New function - bottom half of early_stuff_init.
+	(sig_handle): Avoid special hExeced test for SIGINT.  Just terminate
+	the captive process.
+	(signal_exit): Add debugging output.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Don't allocate a console
+	if one already seems to exist.  Properly initialize ctrl-c handling if
+	we do allocate a console.
+	* winsup.h (early_stuff_init): Delete declaration.
+	(init_console_handler): New declaration.
+	(init_global_security): New declaration.
+
+2003-09-11  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (path_conv::ndisk_links): Rename from
+	num_entries.  Accept an argument and calculate any extra links needed
+	based on missing .  and ..  entries.
+	(fhandler_disk_file::fstat_helper): Always call pc->ndisks_links() to
+	calculate the number of links.
+	* path.h (path_conv::ndisk_links): Declare.
+
+2003-09-11  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (normalize_posix_path): Put check for '//' prefix back to
+	denote a UNC path.
+	(slash_unc_prefix_p): Remove vestige of old //c method for accessing
+	drives.
+
+2003-09-11  Christopher Faylor  <cgf@redhat.com>
+
+	* dir.cc (rmdir): Add more samba workarounds.
+
+2003-09-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared.cc (user_shared_initialize): Revert length attribute for name
+	variable to be just UNLEN + 1.
+
 2003-09-10  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* shared_info.h (shared_info::initialize): Remove argument.

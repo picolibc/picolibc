@@ -224,10 +224,6 @@ MTinterface::fixup_after_fork (void)
   /* As long as the signal handling not multithreaded
      switch reents storage back to _impure_ptr for the mainthread
      to support fork from threads other than the mainthread */
-  struct _reent *reent_old = __getreent ();
-
-  if (reent_old && _impure_ptr != reent_old)
-    *_impure_ptr = *reent_old;
   reents._clib = _impure_ptr;
   reents._winsup = &winsup_reent;
   winsup_reent._process_logmask = LOG_UPTO (LOG_DEBUG);

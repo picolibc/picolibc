@@ -555,8 +555,8 @@ fhandler_tty_slave::open (int flags, mode_t)
   set_output_handle (to_master_local);
 
   set_open_status ();
-  if (fhandler_console::open_fhs++ == 0 && !output_done_event
-      && wincap.pty_needs_alloc_console ())
+  if (fhandler_console::open_fhs++ == 0 && !GetConsoleCP ()
+      && !output_done_event && wincap.pty_needs_alloc_console ())
     {
       BOOL b;
       HWINSTA h = CreateWindowStation (NULL, 0, GENERIC_READ | GENERIC_WRITE, &sec_none_nih);
@@ -567,8 +567,10 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  termios_printf ("SetProcessWindowStation %d, %E", b);
 	}
       b = AllocConsole ();	// will cause flashing if workstation
-			    // stuff fails
-      termios_printf ("%d = AllocConsole ()", b);
+			    	// stuff fails
+      termios_printf ("%d = AllocConsole (), %E", b);
+      if (b)
+	init_console_handler ();
     }
   termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
   termios_printf ("tty%d opened", get_unit ());

@@ -325,12 +325,17 @@ rmdir (const char *dir)
 	SetFileAttributes (real_dir,
 			   (DWORD) real_dir & ~FILE_ATTRIBUTE_READONLY);
 
-      if (RemoveDirectory (real_dir))
+      int rc = RemoveDirectory (real_dir);
+      DWORD att = GetFileAttributes (real_dir);
+
+      /* Sometimes smb indicates failure when it really succeeds, so check for
+	 this case specifically. */
+      if (rc || att == INVALID_FILE_ATTRIBUTES)
 	{
 	  /* RemoveDirectory on a samba drive doesn't return an error if the
 	     directory can't be removed because it's not empty. Checking for
 	     existence afterwards keeps us informed about success. */
-	  if (GetFileAttributes (real_dir) != INVALID_FILE_ATTRIBUTES)
+	  if (att != INVALID_FILE_ATTRIBUTES)
 	    set_errno (ENOTEMPTY);
 	  else
 	    res = 0;

@@ -29,41 +29,65 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-/* The fhandler_base stat calls and helpers are actually only
-   applicable to files on disk.  However, they are part of the
-   base class so that on-disk device files can also access them
-   as appropriate.  */
-
-static int __stdcall
-num_entries (const char *win32_name)
+unsigned __stdcall
+path_conv::ndisk_links (DWORD nNumberOfLinks)
 {
-  WIN32_FIND_DATA buf;
-  HANDLE handle;
-  char buf1[MAX_PATH];
-  int count = 0;
+  if (!isdir () || isremote ())
+    return nNumberOfLinks;
 
-  strcpy (buf1, win32_name);
-  int len = strlen (buf1);
-  if (len == 0 || isdirsep (buf1[len - 1]))
-    strcat (buf1, "*");
-  else
-    strcat (buf1, "/*");	/* */
+  int len = strlen (*this);
+  char fn[len + 3];
+  strcpy (fn, *this);
 
-  handle = FindFirstFileA (buf1, &buf);
-
-  if (handle == INVALID_HANDLE_VALUE)
-    return 2; /* 2 is the minimum number of links to a dir, so... */
-  int saw_dot = 2;
-  while (FindNextFileA (handle, &buf))
+  const char *s;
+  unsigned count;
+  if (nNumberOfLinks <= 1)
     {
-      if (buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-	count++;
-      if (buf.cFileName[0] == '.'
-	  && (buf.cFileName[1] == '\0'
-	      || (buf.cFileName[1] == '.' && buf.cFileName[2] == '\0')))
-	saw_dot--;
+      s = "/*";
+      count = 0;
     }
-  FindClose (handle);
+  else
+    {
+      s = "/..";
+      count = nNumberOfLinks;
+    }
+
+  if (len == 0 || isdirsep (fn[len - 1]))
+    strcpy (fn + len, s + 1);
+  else
+    strcpy (fn + len, s);
+
+  WIN32_FIND_DATA buf;
+  HANDLE h = FindFirstFile (fn, &buf);
+
+  int saw_dot = 2;
+  if (h != INVALID_HANDLE_VALUE)
+    {
+      if (nNumberOfLinks > 1)
+	saw_dot--;
+      else
+	do
+	  {
+	    if (buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	      count++;
+	    if (buf.cFileName[0] == '.'
+		&& (buf.cFileName[1] == '\0'
+		    || (buf.cFileName[1] == '.' && buf.cFileName[2] == '\0')))
+	      saw_dot--;
+	  }
+	while (FindNextFileA (h, &buf));
+      FindClose (h);
+    }
+
+  if (nNumberOfLinks > 1)
+    {
+      fn[len + 2] = '\0';
+      h = FindFirstFile (fn, &buf);
+      if (h)
+	saw_dot--;
+      FindClose (h);
+    }
+
   return count + saw_dot;
 }
 
@@ -218,10 +242,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
      This is too slow on remote drives, so we do without it.
      Setting the count to 2 confuses `find (1)' command. So
      let's try it with `1' as link count. */
-  if (pc.isdir () && !pc.isremote () && nNumberOfLinks == 1)
-    buf->st_nlink = num_entries (pc.get_win32 ());
-  else
-    buf->st_nlink = nNumberOfLinks;
+  buf->st_nlink = pc.ndisk_links (nNumberOfLinks);
 
   /* Assume that if a drive has ACL support it MAY have valid "inodes".
      It definitely does not have valid inodes if it does not have ACL

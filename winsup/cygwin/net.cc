@@ -638,7 +638,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   fd->set_io_handle ((HANDLE) soc);
   fd->set_flags (O_RDWR | O_BINARY);
   fd->set_r_no_interrupt (winsock2_active);
-  // CORINNA - needed? // cygheap->fdtab.inc_need_fixup_before ();
+  cygheap->fdtab.inc_need_fixup_before ();
   debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
   return true;
 }

@@ -1982,7 +1982,7 @@ setpgid (pid_t pid, pid_t pgid)
     }
   else
     {
-      pinfo p (pid);
+      pinfo p (pid, PID_MAP_RW);
       if (!p)
 	{
 	  set_errno (ESRCH);
@@ -2438,7 +2438,7 @@ chroot (const char *newroot)
 
   syscall_printf ("%d = chroot (%s)", ret ? get_errno () : 0,
 				      newroot ? newroot : "NULL");
-  if (path.normalized_path)
+  if (!path.normalized_path_size && path.normalized_path)
     cfree (path.normalized_path);
   return ret;
 }

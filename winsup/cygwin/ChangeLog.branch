@@ -1,3 +1,7 @@
+2003-09-13  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_socket.cc (fhandler_socket::accept): Add debugging output.
+
 2003-09-09  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (set_process_mask): Remove pending_signals setting.

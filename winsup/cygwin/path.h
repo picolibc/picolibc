@@ -194,6 +194,7 @@ class path_conv
     return (sizeof (*this) - sizeof (path)) + strlen (path) + 1 + normalized_path_size;
   }
 
+  unsigned __stdcall ndisk_links (DWORD);
   char *normalized_path;
   size_t normalized_path_size;
   void set_normalized_path (const char *) __attribute__ ((regparm (2)));

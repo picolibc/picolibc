@@ -646,6 +646,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	}
     }
 
+  debug_printf ("res %d", res);
   return res;
 }
 
