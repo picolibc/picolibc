@@ -1,6 +1,6 @@
 /* select.h
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -52,5 +52,4 @@ extern "C" int PASCAL win32_select(int, fd_set*, fd_set*, fd_set*, const struct 
  * type coercion need to appease confused prototypes
  */
 #define WINSOCK_SELECT(nfd, rd, wr, ex, timeo) \
-    win32_select (nfd, (fd_set *)rd, (fd_set *)wr, (fd_set *)ex, timeo)
-
+  win32_select (nfd, (fd_set *) rd, (fd_set *) wr, (fd_set *) ex, timeo)

@@ -2,12 +2,10 @@
 <title>cygwin_posix_to_win32_path_list</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>extern "C" void
 <function>cygwin_posix_to_win32_path_list</function></funcdef>
 <paramdef>const char *<parameter>posix</parameter></paramdef>
 <paramdef>char *<parameter>win32</parameter></paramdef>
-</funcprototype>
 </funcsynopsis>
 
 <para>Given a POSIX path-style string (i.e. /foo:/bar) convert it to
@@ -41,12 +39,10 @@ cygwin_posix_to_win32_path_list_buf_size</link></para>
 <title>cygwin_win32_to_posix_path_list</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>extern "C" void
 <function>cygwin_win32_to_posix_path_list</function></funcdef>
 <paramdef>const char *<parameter>win32</parameter></paramdef>
 <paramdef>char *<parameter>posix</parameter></paramdef>
-</funcprototype>
 </funcsynopsis>
 
 <para>Given a Win32 path-style string (i.e. d:\;e:\bar) convert it to
@@ -62,11 +58,9 @@ cygwin_win32_to_posix_path_list_buf_size</link></para>
 <title>cygwin_posix_to_win32_path_list_buf_size</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>extern "C" int
 <function>cygwin_posix_to_win32_path_list_buf_size</function></funcdef>
 <paramdef>const char *<parameter>path_list</parameter></paramdef>
-</funcprototype>
 </funcsynopsis>
 
 <para>Returns the number of bytes needed to hold the result of calling
@@ -79,11 +73,9 @@ cygwin_posix_to_win32_path_list</link>.</para>
 <title>cygwin_win32_to_posix_path_list_buf_size</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>extern "C" int
 <function>cygwin_win32_to_posix_path_list_buf_size</function></funcdef>
 <paramdef>const char *<parameter>path_list</parameter></paramdef>
-</funcprototype>
 </funcsynopsis>
 
 <para>Tells you how many bytes are needed for the results of <link
@@ -96,12 +88,10 @@ cygwin_win32_to_posix_path_list</link>.</para>
 <title>cygwin_conv_to_posix_path</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>extern "C" void
 <function>cygwin_conv_to_posix_path</function></funcdef>
 <paramdef>const char *<parameter>path</parameter></paramdef>
 <paramdef>char *<parameter>posix_path</parameter></paramdef>
-</funcprototype>
 </funcsynopsis>
 
 <para>Converts a Win32 path to a POSIX path.  If
@@ -117,12 +107,10 @@ size; use MAX_PATH if needed.</para>
 <title>cygwin_conv_to_win32_path</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>extern "C" void
 <function>cygwin_conv_to_win32_path</function></funcdef>
 <paramdef>const char *<parameter>path</parameter></paramdef>
 <paramdef>char *<parameter>win32_path</parameter></paramdef>
-</funcprototype>
 </funcsynopsis>
 
 <para>Converts a POSIX path to a Win32 path.  If
@@ -137,12 +125,10 @@ size; use MAX_PATH if needed.</para>
 <title>cygwin_conv_to_full_posix_path</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>extern "C" void
 <function>cygwin_conv_to_full_posix_path</function></funcdef>
 <paramdef>const char *<parameter>path</parameter></paramdef>
 <paramdef>char *<parameter>posix_path</parameter></paramdef>
-</funcprototype>
 </funcsynopsis>
 
 <para>Converts a Win32 path to a POSIX path.  If
@@ -158,12 +144,10 @@ buffer of sufficient size; use MAX_PATH if needed.</para>
 <title>cygwin_conv_to_full_win32_path</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>extern "C" void
 <function>cygwin_conv_to_full_win32_path</function></funcdef>
 <paramdef>const char *<parameter>path</parameter></paramdef>
 <paramdef>char *<parameter>win32_path</parameter></paramdef>
-</funcprototype>
 </funcsynopsis>
 
 <para>Converts a POSIX path to a Win32 path.  If
@@ -179,11 +163,9 @@ buffer of sufficient size; use MAX_PATH if needed.</para>
 <title>cygwin_posix_path_list_p</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>extern "C" int
 <function>posix_path_list_p</function></funcdef>
 <paramdef>const char *<parameter>path</parameter></paramdef>
-</funcprototype>
 </funcsynopsis>
 
 <para>This function tells you if the supplied
@@ -200,14 +182,12 @@ parameter.</para>
 <title>cygwin_split_path</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>extern "C" void
 <function>cygwin_split_path</function>
 </funcdef>
 <paramdef>const char * <parameter>path</parameter></paramdef>
 <paramdef>char * <parameter>dir</parameter></paramdef>
 <paramdef>char * <parameter>file</parameter></paramdef>
-</funcprototype>
 </funcsynopsis>
 
 <para>Split a path into the directory and the file portions.  Both

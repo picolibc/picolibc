@@ -167,8 +167,8 @@ sync_with_child (PROCESS_INFORMATION &pi, HANDLE subproc_ready,
        */
       if (errcode != STATUS_CONTROL_C_EXIT)
 	{
-	    system_printf ("child %d(%p) died before initialization with status code %p",
-			  pi.dwProcessId, pi.hProcess, errcode);
+	    system_printf ("child %u(%p) died before initialization with status code %p",
+			  cygwin_pid (pi.dwProcessId), pi.hProcess, errcode);
 	    system_printf ("*** child state %s", s);
 #ifdef DEBUGGING
 	    abort ();
@@ -263,7 +263,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (fork_info->stacksize)
     {
       _main_tls = &_my_tls;
-      _main_tls->init_thread (NULL);
+      _main_tls->init_thread (NULL, NULL);
       _main_tls->local_clib = *_impure_ptr;
       _impure_ptr = &_main_tls->local_clib;
     }
@@ -721,6 +721,7 @@ vfork ()
       vf->pgid = myself->pgid;
       cygheap->ctty_on_hold = cygheap->ctty;
       vf->open_fhs = cygheap->open_fhs;
+      debug_printf ("cygheap->ctty_on_hold %p, cygheap->open_fhs %d", cygheap->ctty_on_hold, cygheap->open_fhs);
       int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
       debug_printf ("%d = vfork()", res);
       call_signal_handler_now ();	// FIXME: racy

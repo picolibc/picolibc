@@ -3,11 +3,9 @@
 <title>cygwin_getshared</title>
 
 <funcsynopsis>
-<funcprototype>
 <funcdef>shared_info *
 <function>cygwin_getshared</function></funcdef>
 <void>
-</funcprototype>
 </funcsynopsis>
 
 <para>Returns a pointer to an internal Cygwin memory structure

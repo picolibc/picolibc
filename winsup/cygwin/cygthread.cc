@@ -32,12 +32,6 @@ bool NO_COPY cygthread::exiting;
 DWORD WINAPI
 cygthread::stub (VOID *arg)
 {
-  exception_list except_entry;
-  /* Initialize this thread's ability to respond to things like
-     SIGSEGV or SIGFPE. */
-  init_exceptions (&except_entry);
-  _my_tls.remove ();	// Remove me from signal chain -- not signalable.
-
   cygthread *info = (cygthread *) arg;
   if (info->arg == cygself)
     {
@@ -46,7 +40,7 @@ cygthread::stub (VOID *arg)
 	  CloseHandle (info->ev);
 	  CloseHandle (info->thread_sync);
 	}
-    info->ev = info->thread_sync = info->stack_ptr = NULL;
+      info->ev = info->thread_sync = info->stack_ptr = NULL;
     }
   else
     {
@@ -57,6 +51,7 @@ cygthread::stub (VOID *arg)
 	  info->thread_sync = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 	}
     }
+
   while (1)
     {
       if (!info->__name)
@@ -92,12 +87,6 @@ cygthread::stub (VOID *arg)
 DWORD WINAPI
 cygthread::simplestub (VOID *arg)
 {
-  exception_list except_entry;
-  /* Initialize this thread's ability to respond to things like
-     SIGSEGV or SIGFPE. */
-  init_exceptions (&except_entry);
-  _my_tls.remove ();	// Remove me from signal chain -- not signalable.
-
   cygthread *info = (cygthread *) arg;
   info->stack_ptr = &arg;
   info->ev = info->h;

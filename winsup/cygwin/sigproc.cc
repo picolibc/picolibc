@@ -1,6 +1,6 @@
 /* sigproc.cc: inter/intra signal and sub process handler
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
    Written by Christopher Faylor
 
@@ -32,6 +32,7 @@ details. */
 #include "cygtls.h"
 #include "sigproc.h"
 #include "perthread.h"
+#include "exceptions.h"
 
 /*
  * Convenience defines
@@ -1105,11 +1106,16 @@ wait_sig (VOID *self)
   SetEvent (wait_sig_inited);
   sigtid = GetCurrentThreadId ();
 
+  exception_list el;
+  _my_tls.init_threadlist_exceptions (&el);
+
   for (;;)
     {
       DWORD nb;
       sigpacket pack;
       if (!ReadFile (readsig, &pack, sizeof (pack), &nb, NULL))
+	break;
+      if (myself->sendsig == INVALID_HANDLE_VALUE)
 	break;
 
       if (nb != sizeof (pack))

@@ -33,19 +33,21 @@ details. */
 #include "ntdll.h"
 #include "tty.h"
 
+static const char NO_COPY unknown_file[] = "some disk file";
+
 static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 					   STD_ERROR_HANDLE};
 
 static const char *handle_to_fn (HANDLE, char *);
 
-static const char NO_COPY unknown_file[] = "some disk file";
-
 /* Set aside space for the table of fds */
 void
-dtable_init (void)
+dtable_init ()
 {
   if (!cygheap->fdtab.size)
     cygheap->fdtab.extend (NOFILE_INCR);
+  cygheap->fdtab.init_lock ();
+
 }
 
 void __stdcall
@@ -55,6 +57,12 @@ set_std_handle (int fd)
     SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_handle ());
   else if (fd <= 2)
     SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_output_handle ());
+}
+
+void
+dtable::init_lock ()
+{
+  new_muto (lock_cs);
 }
 
 int
@@ -490,7 +498,7 @@ dtable::dup2 (int oldfd, int newfd)
 
   MALLOC_CHECK;
   debug_printf ("dup2 (%d, %d)", oldfd, newfd);
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+  lock ();
 
   if (not_open (oldfd))
     {
@@ -539,7 +547,7 @@ dtable::dup2 (int oldfd, int newfd)
 
 done:
   MALLOC_CHECK;
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+  unlock ();
   syscall_printf ("%d = dup2 (%d, %d)", res, oldfd, newfd);
 
   return res;
@@ -548,7 +556,7 @@ done:
 fhandler_fifo *
 dtable::find_fifo (ATOM hill)
 {
-  SetResourceLock (LOCK_FD_LIST, READ_LOCK, "dup");
+  lock ();
   for (unsigned i = 0; i < size; i++)
     {
       fhandler_base *fh = fds[i];
@@ -614,7 +622,7 @@ dtable::select_except (int fd, select_record *s)
 void
 dtable::fixup_before_fork (DWORD target_proc_id)
 {
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_fork");
+  lock ();
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
@@ -622,13 +630,13 @@ dtable::fixup_before_fork (DWORD target_proc_id)
 	debug_printf ("fd %d (%s)", i, fh->get_name ());
 	fh->fixup_before_fork_exec (target_proc_id);
       }
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_fork");
+  unlock ();
 }
 
 void
 dtable::fixup_before_exec (DWORD target_proc_id)
 {
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_exec");
+  lock ();
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL && !fh->get_close_on_exec ())
@@ -636,18 +644,18 @@ dtable::fixup_before_exec (DWORD target_proc_id)
 	debug_printf ("fd %d (%s)", i, fh->get_name ());
 	fh->fixup_before_fork_exec (target_proc_id);
       }
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_exec");
+  unlock ();
 }
 
 void
 dtable::set_file_pointers_for_exec ()
 {
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "set_file_pointers_for_exec");
+  lock ();
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL && fh->get_flags () & O_APPEND)
       SetFilePointer (fh->get_handle (), 0, 0, FILE_END);
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_exec");
+  unlock ();
 }
 
 void
@@ -655,6 +663,7 @@ dtable::fixup_after_exec (HANDLE parent)
 {
   first_fd_for_open = 0;
   fhandler_base *fh;
+  cygheap->fdtab.init_lock ();
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
       {
@@ -680,6 +689,7 @@ void
 dtable::fixup_after_fork (HANDLE parent)
 {
   fhandler_base *fh;
+  cygheap->fdtab.init_lock ();
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
       {
@@ -699,7 +709,7 @@ int
 dtable::vfork_child_dup ()
 {
   fhandler_base **newtable;
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+  lock ();
   newtable = (fhandler_base **) ccalloc (HEAP_ARGV, size, sizeof (fds[0]));
   int res = 1;
 
@@ -731,21 +741,21 @@ out:
   /* Restore impersonation */
   cygheap->user.reimpersonate ();
 
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+  unlock ();
   return 1;
 }
 
 void
 dtable::vfork_parent_restore ()
 {
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "restore");
+  lock ();
 
   close_all_files ();
   fhandler_base **deleteme = fds;
   fds = fds_on_hold;
   fds_on_hold = NULL;
   cfree (deleteme);
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "restore");
+  unlock ();
 
   cygheap->ctty = cygheap->ctty_on_hold;	// revert
   if (cygheap->ctty)

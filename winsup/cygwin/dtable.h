@@ -12,6 +12,7 @@ details. */
 #define NOFILE_INCR    32
 
 #include "thread.h"
+#include "sync.h"
 
 class suffix_info;
 class fhandler_fifo;
@@ -19,6 +20,7 @@ class fhandler_fifo;
 #define BFH_OPTS (PC_NULLEMPTY | PC_FULL | PC_POSIX)
 class dtable
 {
+  muto *lock_cs;
   fhandler_base **fds;
   fhandler_base **fds_on_hold;
   fhandler_base **archetypes;
@@ -27,6 +29,9 @@ class dtable
   static const int initial_archetype_size = 8;
   int first_fd_for_open;
   int cnt_need_fixup_before;
+  void lock () {lock_cs->acquire ();}
+  void unlock () {lock_cs->release ();}
+  void init_lock ();
 public:
   size_t size;
 
@@ -50,11 +55,9 @@ public:
   void fixup_after_fork (HANDLE);
   inline int not_open (int fd)
   {
-    SetResourceLock (LOCK_FD_LIST, READ_LOCK, "not_open");
-
+    lock ();
     int res = fd < 0 || fd >= (int) size || fds[fd] == NULL;
-
-    ReleaseResourceLock (LOCK_FD_LIST, READ_LOCK, "not open");
+    unlock ();
     return res;
   }
   int find_unused_handle (int start);
@@ -76,6 +79,11 @@ public:
   fhandler_base *find_archetype (device& dev);
   fhandler_base **add_archetype ();
   void delete_archetype (fhandler_base *);
+  friend void dtable_init ();
+  friend void __stdcall close_all_files ();
+  friend class cygheap_fdmanip;
+  friend class cygheap_fdget;
+  friend class cygheap_fdnew;
 };
 
 fhandler_base *build_fh_dev (const device&, const char * = NULL);

@@ -28,7 +28,7 @@ details. */
 # define UNLEN 256
 #endif
 
-#define TLS_STACK_SIZE 1024
+#define TLS_STACK_SIZE 256
 
 #pragma pack(push,4)
 struct _local_storage
@@ -110,15 +110,16 @@ struct _threadinfo
   __stack_t *stackptr;
   int sig;
   __stack_t stack[TLS_STACK_SIZE];
+  unsigned padding[0];
 
   /*gentls_offsets*/
   static CRITICAL_SECTION protect_linked_list;
   static void init ();
-  void init_thread (void *) __attribute__ ((regparm (2)));
-  static void call (DWORD (*) (void *, void *), void *) __attribute__ ((regparm (3)));
+  void init_thread (void *, DWORD (*) (void *, void *));
+  static void call (DWORD (*) (void *, void *), void *);
   static void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
   static struct _threadinfo *find_tls (int sig);
-  void remove ();
+  void remove (DWORD);
   void push (__stack_t, bool = false);
   __stack_t pop ();
   bool isinitialized () {return initialized == CYGTLS_INITIALIZED || initialized == CYGTLS_EXCEPTION;}
@@ -128,6 +129,7 @@ struct _threadinfo
     __attribute__((regparm(3)));
   void __stdcall interrupt_setup (int sig, void *handler, struct sigaction& siga, __stack_t retaddr)
     __attribute__((regparm(3)));
+  void init_threadlist_exceptions (struct _exception_list *);
   operator HANDLE () const {return tid->win32_obj_id;}
   /*gentls_offsets*/
 };
@@ -140,5 +142,5 @@ extern _threadinfo *_main_tls;
 
 #define __getreent() (&_my_tls.local_clib)
 
-#define CYGTLS_PADSIZE (sizeof (_threadinfo))
+const int CYGTLS_PADSIZE  = (((char *) _main_tls->padding) - ((char *) _main_tls));
 #endif /*_CYGTLS_H*/

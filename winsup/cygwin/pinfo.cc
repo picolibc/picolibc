@@ -610,12 +610,10 @@ pinfo::release ()
   <title>cygwin_winpid_to_pid</title>
 
   <funcsynopsis>
-    <funcprototype>
     <funcdef>extern "C" pid_t
       <function>cygwin_winpid_to_pid</function>
       </funcdef>
       <paramdef>int <parameter>winpid</parameter></paramdef>
-    </funcprototype>
   </funcsynopsis>
 
   <para>Given a windows pid, converts to the corresponding Cygwin

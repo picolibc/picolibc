@@ -8,6 +8,12 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifdef DEBUGIT
+#define spf(a, b, c) small_printf (a, b, c)
+#else
+#define spf(a, b, c) do {} while (0)
+#endif
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -150,11 +156,11 @@ extern HANDLE title_mutex;
     })
 
 /* Convert a signal to a signal mask */
-#define SIGTOMASK(sig)	(1<<((sig) - signal_shift_subtract))
+#define SIGTOMASK(sig)	(1 << ((sig) - signal_shift_subtract))
 extern unsigned int signal_shift_subtract;
 
 #ifdef NEW_MACRO_VARARGS
-# define api_fatal(...) __api_fatal ("%P: *** " __VA_ARGS__)
+# define api_fatal(...) __api_fatal (__VA_ARGS__)
 #else
 # define api_fatal(fmt, args...) __api_fatal ("%P: *** " fmt,## args)
 #endif

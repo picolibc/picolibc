@@ -31,7 +31,6 @@ extern "C" size_t getpagesize ();
 #define MINHEAP_SIZE (4 * 1024 * 1024)
 
 /* Initialize the heap at process start up.  */
-
 void
 heap_init ()
 {
@@ -64,12 +63,11 @@ heap_init ()
       /* total size commited in parent */
       DWORD allocsize = (char *) cygheap->user_heap.top -
 			(char *) cygheap->user_heap.base;
-      /* round up by chunk size */
-      DWORD reserve_size = chunk * ((allocsize + (chunk - 1)) / chunk);
 
       /* Loop until we've managed to reserve an adequate amount of memory. */
       char *p;
-      for (;;)
+      DWORD reserve_size = chunk * ((allocsize + (chunk - 1)) / chunk);
+      while (1)
 	{
 	  p = (char *) VirtualAlloc (cygheap->user_heap.base, reserve_size,
 				     MEM_RESERVE, PAGE_READWRITE);
@@ -78,8 +76,13 @@ heap_init ()
 	  if ((reserve_size -= page_const) <= allocsize)
 	    break;
 	}
+      if (!p)
+	api_fatal ("couldn't allocate cygwin heap, %E, base %p, top %p, "
+		   "reserve_size %d, allocsize %d, page_const %d",
+		   cygheap->user_heap.base, cygheap->user_heap.top,
+		   reserve_size, allocsize, page_const);
       if (p != cygheap->user_heap.base)
-	api_fatal ("heap allocated but not at %p", cygheap->user_heap.base);
+	api_fatal ("heap allocated at wrong address %p (mapped) != %p (expected)", p, cygheap->user_heap.base);
       if (!VirtualAlloc (cygheap->user_heap.base, allocsize, MEM_COMMIT, PAGE_READWRITE))
 	api_fatal ("MEM_COMMIT failed, %E");
     }
@@ -87,7 +90,7 @@ heap_init ()
   debug_printf ("heap base %p, heap top %p", cygheap->user_heap.base,
 		cygheap->user_heap.top);
   page_const--;
-  malloc_init ();
+  // malloc_init ();
 }
 
 #define pround(n) (((size_t)(n) + page_const) & ~page_const)

@@ -172,6 +172,16 @@ cygheap_fixup_in_child (bool execed)
     }
 }
 
+void
+init_cygheap::close_ctty ()
+{
+  debug_printf ("closing cygheap->ctty %p", cygheap->ctty);
+  cygheap->ctty->close ();
+  if (cygheap->ctty_on_hold == cygheap->ctty)
+    cygheap->ctty_on_hold = NULL;
+  cygheap->ctty = NULL;
+}
+
 #define pagetrunc(x) ((void *) (((DWORD) (x)) & ~(4096 - 1)))
 
 static void *__stdcall
@@ -206,6 +216,7 @@ cygheap_init ()
     cygheap->fdtab.init ();
   if (!cygheap->sigs)
     sigalloc ();
+
   if (!cygheap->shared_prefix)
     cygheap->shared_prefix = cstrdup (
 	    wincap.has_terminal_services ()

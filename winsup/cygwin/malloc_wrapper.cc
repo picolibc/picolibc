@@ -316,6 +316,7 @@ void
 malloc_init ()
 {
   new_muto (mallock);
+
   /* Check if mallock is provided by application. If so, redirect all
      calls to malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides

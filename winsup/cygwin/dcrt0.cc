@@ -35,6 +35,7 @@ details. */
 #include "dll_init.h"
 #include "cygthread.h"
 #include "sync.h"
+#include "heap.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
@@ -55,11 +56,13 @@ bool strip_title_path;
 bool allow_glob = true;
 codepage_type current_codepage = ansi_cp;
 
-static NO_COPY int mypid = 0;
 int __argc_safe;
 int _declspec(dllexport) __argc;
 char _declspec(dllexport) **__argv;
-vfork_save NO_COPY *main_vfork = NULL;
+vfork_save NO_COPY *main_vfork;
+
+static int NO_COPY envc;
+char NO_COPY **envp;
 
 extern "C" void __sinit (_reent *);
 
@@ -519,41 +522,127 @@ alloc_stack (child_info_fork *ci)
   return;
 }
 
-/* Take over from libc's crt0.o and start the application. Note the
-   various special cases when Cygwin DLL is being runtime loaded (as
-   opposed to being link-time loaded by Cygwin apps) from a non
-   cygwin app via LoadLibrary.  */
-static void
-dll_crt0_1 (char *)
+#ifdef DEBUGGING
+void
+break_here ()
 {
-  /* According to onno@stack.urc.tue.nl, the exception handler record must
-     be on the stack.  */
-  /* FIXME: Verify forked children get their exception handler set up ok. */
-  exception_list cygwin_except_entry;
+  debug_printf ("break here");
+}
+#endif
 
-  /* Initialize SIGSEGV handling, etc. */
-  init_exceptions (&cygwin_except_entry);
+static void
+initial_env ()
+{
+  char buf[CYG_MAX_PATH + 1];
+#ifdef DEBUGGING
+  DWORD len;
+  if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
+    {
+      DWORD ms = atoi (buf);
+      buf[0] = '\0';
+      len = GetModuleFileName (NULL, buf, CYG_MAX_PATH);
+      console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
+      while (ms--)
+	Sleep (1);
+    }
+  if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
+    {
+      char buf1[CYG_MAX_PATH + 1];
+      len = GetModuleFileName (NULL, buf1, CYG_MAX_PATH);
+      strlwr (buf1);
+      strlwr (buf);
+      char *p = strchr (buf, ':');
+      if (!p)
+	p = (char *) "gdb.exe -nw";
+      else
+	*p++ = '\0';
+      if (strstr (buf1, buf))
+	{
+	  error_start_init (p);
+	  try_to_debug ();
+	  break_here ();
+	}
+    }
+#endif
 
-  /* Set the os_being_run global. */
+  if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
+    _cygwin_testing = 1;
+}
+
+void __stdcall
+dll_crt0_0 ()
+{
   wincap.init ();
+  initial_env ();
+
+  char zeros[sizeof (child_proc_info->zero)] = {0};
+
+  init_console_handler ();
+  init_global_security ();
+  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
+		       GetCurrentProcess (), &hMainProc, 0, FALSE,
+			DUPLICATE_SAME_ACCESS))
+    hMainProc = GetCurrentProcess ();
+
+  DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
+		   &hMainThread, 0, false, DUPLICATE_SAME_ACCESS);
+
+  (void) SetErrorMode (SEM_FAILCRITICALERRORS);
+
+  STARTUPINFO si;
+  GetStartupInfo (&si);
+  child_proc_info = (child_info *) si.lpReserved2;
+
+  int mypid = 0;
+  if (si.cbReserved2 < EXEC_MAGIC_SIZE || !child_proc_info
+      || memcmp (child_proc_info->zero, zeros,
+		 sizeof (child_proc_info->zero)) != 0)
+    child_proc_info = NULL;
+  else
+    {
+      if ((child_proc_info->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
+	multiple_cygwin_problem ("proc", child_proc_info->intro, 0);
+      else if (child_proc_info->intro == PROC_MAGIC_GENERIC
+	       && child_proc_info->magic != CHILD_INFO_MAGIC)
+	multiple_cygwin_problem ("proc", child_proc_info->magic,
+				 CHILD_INFO_MAGIC);
+      else if (child_proc_info->cygheap != (void *) &_cygheap_start)
+	multiple_cygwin_problem ("cygheap", (DWORD) child_proc_info->cygheap,
+				 (DWORD) &_cygheap_start);
+      unsigned should_be_cb = 0;
+      switch (child_proc_info->type)
+	{
+	  case _PROC_FORK:
+	    user_data->forkee = child_proc_info->cygpid;
+	    should_be_cb = sizeof (child_info_fork);
+	    /* fall through */;
+	  case _PROC_SPAWN:
+	  case _PROC_EXEC:
+	    if (!should_be_cb)
+	      should_be_cb = sizeof (child_info);
+	    if (should_be_cb != child_proc_info->cb)
+	      multiple_cygwin_problem ("proc size", child_proc_info->cb, should_be_cb);
+	    else if (sizeof (fhandler_union) != child_proc_info->fhandler_union_cb)
+	      multiple_cygwin_problem ("fhandler size", child_proc_info->fhandler_union_cb, sizeof (fhandler_union));
+	    else
+	      {
+		cygwin_user_h = child_proc_info->user_h;
+		mypid = child_proc_info->cygpid;
+		break;
+	      }
+	  default:
+	    system_printf ("unknown exec type %d", child_proc_info->type);
+	    /* intentionally fall through */
+	  case _PROC_WHOOPS:
+	    child_proc_info = NULL;
+	    break;
+	}
+    }
+
   device::init ();
-  check_sanity_and_sync (user_data);
-
-  do_global_ctors (&__CTOR_LIST__, 1);
-
-  /* Nasty static stuff needed by newlib -- point to a local copy of
-     the reent stuff.
-     Note: this MUST be done here (before the forkee code) as the
-     fork copy code doesn't copy the data in libccrt0.cc (that's why we
-     pass in the per_process struct into the .dll from libccrt0). */
-
-  user_data->resourcelocks->Init ();
-  user_data->threadinterface->Init ();
-
   winpids::init ();
-
-  int envc = 0;
-  char **envp = NULL;
+  do_global_ctors (&__CTOR_LIST__, 1);
+  cygthread::init ();
 
   if (!child_proc_info)
     memory_init ();
@@ -591,6 +680,7 @@ dll_crt0_1 (char *)
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
 	    envc = spawn_info->moreinfo->envc;
+	    envp = spawn_info->moreinfo->envp;
 	    cygheap->fdtab.fixup_after_exec (spawn_info->parent);
 	    signal_fixup_after_exec ();
 	    CloseHandle (spawn_info->parent);
@@ -607,9 +697,44 @@ dll_crt0_1 (char *)
 	CloseHandle (child_proc_info->pppid_handle);
     }
 
+  _threadinfo::init ();
+
+  /* Initialize events */
+  events_init ();
+
+  /* Init global well known SID objects */
+  cygsid::init ();
+  cygheap->cwd.init ();
+}
+
+/* Take over from libc's crt0.o and start the application. Note the
+   various special cases when Cygwin DLL is being runtime loaded (as
+   opposed to being link-time loaded by Cygwin apps) from a non
+   cygwin app via LoadLibrary.  */
+static void
+dll_crt0_1 (char *)
+{
+  /* According to onno@stack.urc.tue.nl, the exception handler record must
+     be on the stack.  */
+  /* FIXME: Verify forked children get their exception handler set up ok. */
+  exception_list cygwin_except_entry;
+
+  check_sanity_and_sync (user_data);
+  malloc_init ();
+
+  /* Initialize SIGSEGV handling, etc. */
+  init_exceptions (&cygwin_except_entry);
+
+  /* Nasty static stuff needed by newlib -- point to a local copy of
+     the reent stuff.
+     Note: this MUST be done here (before the forkee code) as the
+     fork copy code doesn't copy the data in libccrt0.cc (that's why we
+     pass in the per_process struct into the .dll from libccrt0). */
+
+  user_data->resourcelocks->Init ();
+  user_data->threadinterface->Init ();
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
-  cygthread::init ();
 
   /* Initialize pthread mainthread when not forked and it is safe to call new,
      otherwise it is reinitalized in fixup_after_fork */
@@ -629,12 +754,6 @@ dll_crt0_1 (char *)
 
   cygheap->fdtab.vfork_child_fixup ();
 
-  (void) SetErrorMode (SEM_FAILCRITICALERRORS);
-
-  /* Initialize events. */
-  events_init ();
-
-  cygheap->cwd.init ();
   main_vfork = vfork_storage.create ();
 
   cygbench ("pre-forkee");
@@ -662,9 +781,6 @@ dll_crt0_1 (char *)
   fork_init ();
   }
 #endif
-
-  /* Init global well known SID objects */
-  cygsid::init ();
 
   /* Initialize our process table entry. */
   pinfo_init (envp, envc);
@@ -773,60 +889,13 @@ dll_crt0_1 (char *)
     exit (user_data->main (__argc, __argv, *user_data->envptr));
 }
 
-#ifdef DEBUGGING
-void
-break_here ()
-{
-  debug_printf ("break here");
-}
-#endif
-
-void
-initial_env ()
-{
-  char buf[CYG_MAX_PATH + 1];
-#ifdef DEBUGGING
-  DWORD len;
-  if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
-    {
-      DWORD ms = atoi (buf);
-      buf[0] = '\0';
-      len = GetModuleFileName (NULL, buf, CYG_MAX_PATH);
-      console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
-      Sleep (ms);
-    }
-  if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
-    {
-      char buf1[CYG_MAX_PATH + 1];
-      len = GetModuleFileName (NULL, buf1, CYG_MAX_PATH);
-      strlwr (buf1);
-      strlwr (buf);
-      char *p = strchr (buf, ':');
-      if (!p)
-	p = (char *) "gdb.exe -nw";
-      else
-	*p++ = '\0';
-      if (strstr (buf1, buf))
-	{
-	  error_start_init (p);
-	  try_to_debug ();
-	  break_here ();
-	}
-    }
-#endif
-
-  if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
-    _cygwin_testing = 1;
-}
-
 struct _reent *
 initialize_main_tls (char *padding)
 {
   if (!_main_tls)
     {
-      _threadinfo::init ();
       _main_tls = &_my_tls;
-      _main_tls->init_thread (padding);
+      _main_tls->init_thread (padding, NULL);
     }
   return &_main_tls->local_clib;
 }
@@ -836,81 +905,31 @@ initialize_main_tls (char *padding)
 
    UPTR is a pointer to global data that lives on the libc side of the
    line [if one distinguishes the application from the dll].  */
-
+  
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  initial_env ();
-  char zeros[max (CYGTLS_PADSIZE, sizeof (child_proc_info->zero))] = {0};
-  static NO_COPY STARTUPINFO si;
+  extern HANDLE sync_startup;
+  if (sync_startup)
+    {
+      (void) WaitForSingleObject (sync_startup, INFINITE);
+      CloseHandle (sync_startup);
+    }
 
   main_environ = user_data->envptr;
   *main_environ = NULL;
 
-  init_console_handler ();
-  init_global_security ();
-  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
-		       GetCurrentProcess (), &hMainProc, 0, FALSE,
-			DUPLICATE_SAME_ACCESS))
-    hMainProc = GetCurrentProcess ();
+  if (child_proc_info && child_proc_info->type == _PROC_FORK)
+    user_data->forkee = child_proc_info->cygpid;
 
-  DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
-		   &hMainThread, 0, false, DUPLICATE_SAME_ACCESS);
-
-  GetStartupInfo (&si);
-  child_proc_info = (child_info *) si.lpReserved2;
-  if (si.cbReserved2 < EXEC_MAGIC_SIZE || !child_proc_info
-      || memcmp (child_proc_info->zero, zeros,
-		 sizeof (child_proc_info->zero)) != 0)
-    child_proc_info = NULL;
-  else
-    {
-      if ((child_proc_info->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
-	multiple_cygwin_problem ("proc", child_proc_info->intro, 0);
-      else if (child_proc_info->intro == PROC_MAGIC_GENERIC
-	       && child_proc_info->magic != CHILD_INFO_MAGIC)
-	multiple_cygwin_problem ("proc", child_proc_info->magic,
-				 CHILD_INFO_MAGIC);
-      else if (child_proc_info->cygheap != (void *) &_cygheap_start)
-	multiple_cygwin_problem ("cygheap", (DWORD) child_proc_info->cygheap,
-				 (DWORD) &_cygheap_start);
-      unsigned should_be_cb = 0;
-      switch (child_proc_info->type)
-	{
-	  case _PROC_FORK:
-	    user_data->forkee = child_proc_info->cygpid;
-	    should_be_cb = sizeof (child_info_fork);
-	    /* fall through */;
-	  case _PROC_SPAWN:
-	  case _PROC_EXEC:
-	    if (!should_be_cb)
-	      should_be_cb = sizeof (child_info);
-	    if (should_be_cb != child_proc_info->cb)
-	      multiple_cygwin_problem ("proc size", child_proc_info->cb, should_be_cb);
-	    else if (sizeof (fhandler_union) != child_proc_info->fhandler_union_cb)
-	      multiple_cygwin_problem ("fhandler size", child_proc_info->fhandler_union_cb, sizeof (fhandler_union));
-	    else
-	      {
-		cygwin_user_h = child_proc_info->user_h;
-		mypid = child_proc_info->cygpid;
-		break;
-	      }
-	  default:
-	    system_printf ("unknown exec type %d", child_proc_info->type);
-	    /* intentionally fall through */
-	  case _PROC_WHOOPS:
-	    child_proc_info = NULL;
-	    break;
-	}
-    }
-  
+  char padding[CYGTLS_PADSIZE];
   _impure_ptr = &reent_data;
   _impure_ptr->_stdin = &_impure_ptr->__sf[0];
   _impure_ptr->_stdout = &_impure_ptr->__sf[1];
   _impure_ptr->_stderr = &_impure_ptr->__sf[2];
   _impure_ptr->_current_locale = "C";
-  initialize_main_tls (zeros);
-  dll_crt0_1 (zeros);
+  initialize_main_tls (padding);
+  dll_crt0_1 (padding);
 }
 
 void
@@ -970,6 +989,7 @@ do_exit (int status)
     }
 
   EnterCriticalSection (&exit_lock);
+  muto::set_exiting_thread ();
   if (exit_state < ES_EVENTS_TERMINATE)
     {
       exit_state = ES_EVENTS_TERMINATE;
@@ -1090,7 +1110,8 @@ __api_fatal (const char *fmt, ...)
   va_list ap;
 
   va_start (ap, fmt);
-  __small_vsprintf (buf, fmt, ap);
+  int n = __small_sprintf (buf, "%P (%u): *** ", cygwin_pid (GetCurrentProcessId ()));
+  __small_vsprintf (buf + n, fmt, ap);
   va_end (ap);
   strcat (buf, "\n");
   int len = strlen (buf);

@@ -98,16 +98,20 @@ NO_COPY static struct
 // of code that handles exceptions.  The x86 on the other hand uses segment
 // register fs, offset 0 to point to the current exception handler.
 
-asm (".equ __except_list,0");
+extern exception_list *_except_list asm ("%fs:0");
 
-extern exception_list *_except_list asm ("%fs:__except_list");
-
-static void
-init_exception_handler (exception_list *el)
+void
+init_exception_handler (exception_list *el, exception_handler *eh)
 {
-  el->handler = handle_exceptions;
+  el->handler = eh;
   el->prev = _except_list;
   _except_list = el;
+}
+
+extern "C" void
+init_exceptions (exception_list *el)
+{
+  init_exception_handler (el, handle_exceptions);
 }
 
 void
@@ -116,12 +120,6 @@ init_console_handler ()
   (void) SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
   if (!SetConsoleCtrlHandler (ctrl_c_handler, TRUE))
     system_printf ("SetConsoleCtrlHandler failed, %E");
-}
-
-extern "C" void
-init_exceptions (exception_list *el)
-{
-  init_exception_handler (el);
 }
 
 extern "C" void
@@ -363,6 +361,8 @@ try_to_debug (bool waitloop)
 	}
     }
 
+  small_printf ("*** starting debugger for pid %u\n",
+		cygwin_pid (GetCurrentProcessId ()));
   BOOL dbg;
   dbg = CreateProcess (NULL,
 		       debugger_command,
@@ -383,9 +383,9 @@ try_to_debug (bool waitloop)
 	return 1;
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       while (!being_debugged ())
-	Sleep (0);
-      Sleep (2000);
-      small_printf ("*** continuing from debugger call\n");
+	low_priority_sleep (0);
+      small_printf ("*** continuing pid %u from debugger call\n",
+		    cygwin_pid (GetCurrentProcessId ()));
     }
 
   SetThreadPriority (GetCurrentThread (), prio);
@@ -615,7 +615,7 @@ sig_handle_tty_stop (int sig)
 }
 }
 
-int
+bool
 interruptible (DWORD pc)
 {
   int res;
@@ -633,11 +633,11 @@ interruptible (DWORD pc)
      GetThreadContext.  These resolve to a strange allocation base.
      These should *never* be treated as interruptible. */
   if (!h || m.State != MEM_COMMIT)
-    res = 0;
+    res = false;
   else if (h == user_data->hmodule)
-    res = 1;
+    res = true;
   else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
-    res = 0;
+    res = false;
   else
     res = !strncasematch (windows_system_directory, checkdir,
 			  windows_system_directory_length);
@@ -666,7 +666,8 @@ _threadinfo::interrupt_setup (int sig, void *handler,
   /* Clear any waiting threads prior to dispatching to handler function */
   int res = SetEvent (signal_arrived);	// For an EINTR case
   proc_subproc (PROC_CLEARWAIT, 1);
-  sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
+  sigproc_printf ("armed signal_arrived %p, sig %d, res %d", signal_arrived,
+		  sig, res);
 }
 
 bool
@@ -762,26 +763,16 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
 
       // FIXME - add check for reentering of DLL here
 
-      muto *m;
-      /* FIXME: Make multi-thread aware */
-      for (m = muto_start.next;  m != NULL; m = m->next)
-	if (m->unstable () || m->owner () == cygthread::main_thread_id)
-	  {
-	    sigproc_printf ("suspended thread owns a muto (%s)", m->name);
-	    goto resume_thread;
-	  }
-
       cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
       if (!GetThreadContext (hth, &cx))
 	system_printf ("couldn't get context of main thread, %E");
       else if (interruptible (cx.Eip))
 	interrupted = tls->interrupt_now (&cx, sig, handler, siga);
 
-    resume_thread:
       res = ResumeThread (hth);
-
       if (interrupted)
 	break;
+
       sigproc_printf ("couldn't interrupt.  trying again.");
       low_priority_sleep (0);
     }
@@ -801,7 +792,7 @@ static BOOL WINAPI
 ctrl_c_handler (DWORD type)
 {
   static bool saw_close;
-  _my_tls.remove ();
+  _my_tls.remove (INFINITE);
 
   /* Return FALSE to prevent an "End task" dialog box from appearing
      for each Cygwin process window that's open when the computer
@@ -892,19 +883,6 @@ set_signal_mask (sigset_t newmask, sigset_t oldmask)
   return;
 }
 
-extern _threadinfo *_last_thread;
-
-_threadinfo *
-_threadinfo::find_tls (int sig)
-{
-  EnterCriticalSection (&protect_linked_list);
-  for (_threadinfo *t = _last_thread; t ; t = t->prev)
-    if (sigismember (&t->sigwait_mask, sig))
-      return t;
-  LeaveCriticalSection (&protect_linked_list);
-  return NULL;
-}
-
 int __stdcall
 sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
 {
@@ -924,15 +902,15 @@ sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
 
   int rc = 1;
   bool insigwait_mask = tls ? sigismember (&tls->sigwait_mask, sig) : false;
+  bool special_case = ISSTATE (myself, PID_STOPPED) || main_vfork->pid;
+  bool masked = sigismember (&mask, sig);
   if (sig != SIGKILL && sig != SIGSTOP
-      && (sigismember (&mask, sig)
-	  || (tls
-	      && (insigwait_mask || sigismember (&tls->sigmask, sig)))
-	  || main_vfork->pid
-	  || ISSTATE (myself, PID_STOPPED)))
+      && (special_case || main_vfork->pid || masked || insigwait_mask
+	  || (tls && sigismember (&tls->sigmask, sig))))
     {
       sigproc_printf ("signal %d blocked", sig);
-      if (insigwait_mask || (tls = _threadinfo::find_tls (sig)) != NULL)
+      if ((!special_case && !masked)
+	  && (insigwait_mask || (tls = _threadinfo::find_tls (sig)) != NULL))
 	goto thread_specific;
       rc = -1;
       goto done;
@@ -1045,12 +1023,6 @@ signal_exit (int rc)
   (void) SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
   (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
 
-  /* Unlock any main thread mutos since we're executing with prejudice. */
-  muto *m;
-  for (m = muto_start.next;  m != NULL; m = m->next)
-    if (m->unstable () || m->owner () == cygthread::main_thread_id)
-      m->reset ();
-
   user_data->resourcelocks->Delete ();
   user_data->resourcelocks->Init ();
 
@@ -1114,6 +1086,7 @@ call_signal_handler_now ()
       sa_flags = _my_tls.sa_flags;
       int sig = _my_tls.sig;
       void (*sigfunc) (int) = _my_tls.func;
+
       (void) _my_tls.pop ();
 #ifdef DEBUGGING
       if (_my_tls.stackptr > (_my_tls.stack + 1))
