@@ -97,7 +97,7 @@ The main WWW page for the Cygwin project is
 @file{http://sourceware.cygnus.com/cygwin/}.  There you will find a
 great many links to additional resources and related sites.
 
-You can find documentation for the individual Gnu tools at
-@file{http://www.fsf.org/manual/}.  (You should read Gnu manuals from a
+You can find documentation for the individual GNU tools at
+@file{http://www.fsf.org/manual/}.  (You should read GNU manuals from a
 local mirror, check @file{http://www.fsf.org/server/list-mirrors.html}
 for a list of them.)
