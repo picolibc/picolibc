@@ -5,7 +5,7 @@
   way you wish.  Send questions, comments, complaints, performance
   data, etc to dl@cs.oswego.edu
 
-* VERSION 2.7.1 Thu Jul 25 10:58:03 2002  Doug Lea  (dl at gee)
+* VERSION 2.7.2 Sat Aug 17 09:07:30 2002  Doug Lea  (dl at gee)
 
    Note: There may be an updated version of this malloc obtainable at
 	   ftp://gee.cs.oswego.edu/pub/misc/malloc.c
@@ -1567,8 +1567,8 @@ static pthread_mutex_t mALLOC_MUTEx = PTHREAD_MUTEX_INITIALIZER;
 
 /* Substitute anything you like for these */
 
-#define MALLOC_PREACTION   __malloc_lock ()
-#define MALLOC_POSTACTION  __malloc_unlock ()
+#define MALLOC_PREACTION   (0)
+#define MALLOC_POSTACTION  (0)
 
 #endif
 
@@ -2412,8 +2412,8 @@ struct malloc_state {
   /* Normal bins packed as described above */
   mchunkptr        bins[NBINS * 2];
 
-  /* Bitmap of bins */
-  unsigned int     binmap[BINMAPSIZE];
+  /* Bitmap of bins. Trailing zero map handles cases of largest binned size */
+  unsigned int     binmap[BINMAPSIZE+1];
 
   /* Tunable parameters */
   CHUNK_SIZE_T     trim_threshold;
@@ -5433,6 +5433,9 @@ static int cpuinfo (int whole, CHUNK_SIZE_T  *kernel, CHUNK_SIZE_T  *user) {
 
 /* ------------------------------------------------------------
 History:
+    V2.7.2 Sat Aug 17 09:07:30 2002  Doug Lea  (dl at gee)
+      * Fix malloc_state bitmap array misdeclaration
+
     V2.7.1 Thu Jul 25 10:58:03 2002  Doug Lea  (dl at gee)
       * Allow tuning of FIRST_SORTED_BIN_SIZE
       * Use PTR_UINT as type for all ptr->int casts. Thanks to John Belmonte.
