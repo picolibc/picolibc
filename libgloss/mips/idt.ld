@@ -30,21 +30,27 @@ SECTIONS
 {	
   . = 0xA0020000;
   .text : {
-     _ftext = . ;
-    *(.init)
-     eprol  =  .;
+    _ftext = . ;
+    PROVIDE (eprol = .);
     *(.text)
     *(.text.*)
     *(.gnu.linkonce.t*)
     *(.mips16.fn.*)
     *(.mips16.call.*)
+  }
+  .init : {
+    *(.init)
+  }
+  .fini : {
+    *(.fini)
+  }
+  .rel.sdata : {
     PROVIDE (__runtime_reloc_start = .);
     *(.rel.sdata)
     PROVIDE (__runtime_reloc_stop = .);
-    *(.fini)
-     etext  =  .;
-     _etext  =  .;
   }
+  PROVIDE (etext = .);
+  _etext  =  .;
   
   .ctors    :
   {
@@ -106,7 +112,7 @@ SECTIONS
     *(.gnu.linkonce.s*)
   }
   . = ALIGN(4);
-   edata  =  .;
+   PROVIDE (edata  =  .);
    _edata  =  .;
    _fbss = .;
   .sbss : {
@@ -119,8 +125,8 @@ SECTIONS
     *(COMMON)
   }
 
-   end = .;
-   _end = .;
+  PROVIDE (end = .);
+  _end = .;
 
   /* DWARF debug sections.
      Symbols in the DWARF debugging sections are relative to 

@@ -1,3 +1,8 @@
+2001-08-30  Richard Henderson  <rth@redhat.com>
+	    Eric Christopher  <echristo@redhat.com>
+
+	* mips/idt.ld: Rewrite for .init/.fini sections.
+
 2001-08-22  Jonathan Larmour  <jlarmour@redhat.com>
 
 	* mips/Makefile.in (jmr3904-io.o): Remove bogus use of `-mips3.'
@@ -66,7 +71,7 @@ Mon Jan 31 18:45:26 2000  Donald Lindsay  <dlindsay@cygnus.com>
 	* mips/Makefile.in:  Add rule for forming vr5xxx.o.
 	* mips/configure.in:  Add case arm for mips64vr5000 since the
 	default (which was previously used) should not get vr5xxx.o.
-	
+
 Wed Dec 22 19:08:09 1999  Christopher Faylor <cgf@cygnus.com>
 
 	* wince/Makefile.am: Use LDADD from configure.
@@ -229,7 +234,7 @@ Tue May 25 14:35:21 1999  Christopher Faylor <cgf@cygnus.com>
 1999-05-07  Nick Clifton  <nickc@cygnus.com>
 
 	* mcore/syscalls.S (_write): Use 0x50FF instead of trap 1.
-	Tidy up code layout. 
+	Tidy up code layout.
 
 1999-05-06  Nick Clifton  <nickc@cygnus.com>
 
@@ -248,7 +253,7 @@ Tue May 25 14:35:21 1999  Christopher Faylor <cgf@cygnus.com>
 	Use __bss_start__ and __bss_end__ to locate .bss section.
 
 1999-04-26  Angela Marie Thomas <angela@cygnus.com>
- 
+
         * mips/array.ld:  Fix ELF ctor/dtor support.
         * mips/ddb.ld: Likewise.
         * mips/dve.ld: Likewise.
@@ -268,7 +273,7 @@ Tue May 25 14:35:21 1999  Christopher Faylor <cgf@cygnus.com>
 	* mcore/syscalls.s (_exit): Renamed from __exit.
 
 	* fr30/crt0.s (_start): Initialise arg[cv] after calling _init and
-	atexit. 
+	atexit.
 
 1999-04-21  Nick Clifton  <nickc@cygnus.com>
 
@@ -291,7 +296,7 @@ Tue May 25 14:35:21 1999  Christopher Faylor <cgf@cygnus.com>
 	* mcore/crt0.s: New File: mcore startup code.
 	* mcore/syscalls.s: New File: Assembler system call stubs.
 	* mcore/c-syscalls.c: New File: C system call stubs.
-	
+
 Tue Apr 13 17:20:34 1999  Catherine Moore  <clm@cygnus.com>
 
         * mips/array.ld:  Support linkonce sections.
@@ -421,7 +426,7 @@ Thu Feb  4 10:56:59 1999  Jeff Johnston  <jjohnstn@cygnus.com>
 	value to set or is the NULL pointer.
 
 1999-02-03  Keith Seitz  <keiths@cygnus.com>
- 
+
         * m32r/m32r-lib.c (rx_char): Rename rx_uchar and return
         only unsigned chars.
         (getDebugChar2): Remove and integrate support into "M"
@@ -451,14 +456,14 @@ Tue Jan 19 06:19:51 1999  Jeffrey A Law  (law@cygnus.com)
 1999-01-14  Nick Clifton  <nickc@cygnus.com>
 
 	* fr30/Makefile.in: Set target of install to be SIM_INSTALL not
-	MON_INSTALL. 
+	MON_INSTALL.
 
 	* fr30/crt0.s (_start): Use atexit to call C++ global
 	destructors.  Patch from Mark Salter <msalter@cygnus.com>
 
 1999-01-12  Nick Clifton  <nickc@cygnus.com>
 
-	* fr30/crt0.s: Remove .stack section - it is no longer necessary. 
+	* fr30/crt0.s: Remove .stack section - it is no longer necessary.
 
 1999-01-11  Nick Clifton  <nickc@cygnus.com>
 
@@ -469,7 +474,7 @@ Tue Jan 19 06:19:51 1999  Jeffrey A Law  (law@cygnus.com)
 
 	* fr30/crt0.s (_start): Apply patch from Mark Salter
 	<msalter@cygnus.com> to cope with initialising .bss areas that are
-	not word sized. 
+	not word sized.
 
 1998-12-23  Michael Meissner  <meissner@cygnus.com>
 
@@ -512,7 +517,7 @@ Fri Dec 18 22:07:21 1998  Bob Manson  <manson@charmed.cygnus.com>
 1998-12-16  Nick Clifton  <nickc@cygnus.com>
 
 	* fr30/Makefile.in: Add libraries to clean target.
-	
+
 	* fr30/syscalls.c (_write): Save length so that it can be returned
 	to caller.
 
@@ -532,7 +537,7 @@ Fri Dec 18 22:07:21 1998  Bob Manson  <manson@charmed.cygnus.com>
 
 	* configure.in: Add support for fr30 target.
 	* configure: Regenerate.
-	* fr30: New directory.	
+	* fr30: New directory.
 	* fr30/Makefile.am: New file - build crt0.o and libsim.a
 	* fr30/Makefile.in: New file - generate from Makefile.am.
 	* fr30/configure.in: New file - support fr30 target
@@ -598,7 +603,7 @@ Fri Oct 23 11:06:16 1998  John Metzler  <jmetzler@cygnus.com>
 	* configure.in: Add libtx39jmr.c to build target
 
 	* Makefile.in: rules for libtx39jmr.a and jmr3904-io.o
-	
+
 1998-10-15  Ian Molee  <imolee@cygnus.com>
 
 	* m32r/mon.specs: New file
@@ -617,7 +622,7 @@ Tue Oct 13 11:52:03 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 Tue Oct  6 15:17:42 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 
 	* libnosys/sbrk.c (_sbrk): Added reference to config.h.
-	* libnosys/close.c (_close): Added stub warning outside of 
+	* libnosys/close.c (_close): Added stub warning outside of
 	function body and added reference to config.h.
 	* libnosys/execve.c (_execve): Ditto.
 	* libnosys/fork.c (_fork): Ditto.
@@ -702,7 +707,7 @@ Tue Aug 11 13:27:31 1998  Jim Wilson  <wilson@cygnus.com>
 	* m68k/idp.ld (__INIT_SECTION__): Align to 2 byte boundary.
 	* m68k/bcc.ld, m68k/mvme135.ld, m68k/mvme162.ld: Likewise.
 	* m68k/sbc5204.ld, m68k/sbc5206.ld: Likewise.
-	
+
 1998-08-11  Jason Merrill  <jason@yorick.cygnus.com>
 
 	* mn10300/{sim.ld,eval.ld}: Add init_priority support.
@@ -728,7 +733,7 @@ Tue Jul 28 10:57:12 1998  Mark Alexander  <marka@cygnus.com>
 
 Sat Jul 18 07:15:33 1998  Mark Alexander  <marka@cygnus.com>
 
-	* sparc/crt0.S (win_ovf_trap, win_unf_trap): Use correct names for 
+	* sparc/crt0.S (win_ovf_trap, win_unf_trap): Use correct names for
 	extern functions win_ovf and win_unf; fixes unresolved symbols
 	in COFF.
 
@@ -760,7 +765,7 @@ Mon Jul 13 17:50:41 1998  Jeff Johnston  <jjohnstn@cygnus.com>
 	* libnosys/Makefile.in : Makefile.in for creating libnosys Makefile.
 	* libnosys/configure.in: configure.in to create libnosys configure.
 	* libnosys/configure: Configure for libnosys library.
-	
+
 Mon Jul 13 14:13:07 EDT 1998  Jim Lemke  <jlemke@cygnus.com>
 
 	* sim/mips.ld: Clarify a comment.
@@ -919,7 +924,7 @@ Fri May 15 15:59:30 1998  Gavin Koch  <gavin@cygnus.com>
 
  	* mips/configure.in: Add idt to tx39 chain.
 	* mips/configure: Rebuild.
-	
+
 Fri May 15 15:48:28 1998  Gavin Koch  <gavin@cygnus.com>
 
 	* mips/crt0.S (__stackbase): Added.
@@ -983,7 +988,7 @@ Mon Apr  6 13:12:32 1998  Mark Salter  <msalter@chef.cygnus.com>
 
 	* rs6000/Makefile.in: Changed objects used for libads to be
 	new ads specific object files instead of some mvme objects.
-	
+
 	* Added ads-io.c and ads-exit.c to provide function stubs which
 	are safe on ads board (SDS monitor).
 
@@ -1082,7 +1087,7 @@ Mon Mar  2 19:36:12 1998  Michael Meissner  <meissner@cygnus.com>
 	* pa/{op50n,w89k}.ld: Ditto.
 	* sh/{sh1{l,2,3}cevb,sh3bb}.ld: Ditto.
 	* sparc/{erc32,ex93{0,1,4}}.ld: Ditto.
-	
+
 Fri Feb 27 17:15:35 1998  Mark Alexander  <marka@cygnus.com>
 
 	* mn10300/configure.in (AC_INIT): Use crt0.S instead of crt0-eval.S.
@@ -1103,7 +1108,7 @@ Mon Feb 23 16:19:17 1998  Gavin Koch  <gavin@cygnus.com>
 	* mips/Makefile.in (cma101.o): Add rule to explicitly use -mno-mips16.
 	* mips/cma101.c: Reverse my previous change.
 	Add #ifdef __mips16 then #error.
- 	
+
 Mon Feb 23 11:29:33 1998  Mark Alexander  <marka@cygnus.com>
 
 	* mn10300/Makefile.in: Add rules for building libeval.a.
@@ -1415,10 +1420,10 @@ Tue Sep  9 23:35:04 1997  Gavin Koch  <gavin@cygnus.com>
 	* mips/configure.in: Configure the newly configuable
 	SCRIPTS and BSP.
 	* mips/configure: Re-autoconf.
-	
+
 
 Mon Sep  8 16:53:12 1997  Bob Manson  <manson@charmed.cygnus.com>
-	
+
 	* mips/Makefile.in (pmon.o): Added compile command that includes
 	PART_SPECIFIC_DEFINES. Don't include cma101.o by default.
 
@@ -1449,7 +1454,7 @@ Thu Aug 28 17:27:16 1997  Stan Shebs  <shebs@andros.cygnus.com>
 	* rs6000/ads.ld: Define ram region.
 	(__stack): Fix value.
 	* rs6000/crt0.S: Clear the sbss area as well as bss.
-	
+
 Tue Aug 26 16:22:36 1997  Ian Lance Taylor  <ian@cygnus.com>
 
 	* m68k/bcc.ld: Don't use BLOCK for the section addresses.
@@ -1513,7 +1518,7 @@ Mon Mar 17 10:00:29 1997  Gavin Koch  <gavin@cygnus.com>
 Fri Mar 14 14:36:06 1997  J.T. Conklin  <jtc@beauty.cygnus.com>
 
 	* m68k/Makefile.in (install): Fix typo.
-	
+
 	* m68k/crt0.S: Changed to use correct loop condition for coldfire.
 
 Wed Mar 12 16:00:51 1997  Stu Grossman  (grossman@critters.cygnus.com)
@@ -1635,7 +1640,7 @@ Fri Feb 14 11:07:20 1997  J.T. Conklin  <jtc@cygnus.com>
  	differences and changed to consistantly use the IMM macro for
 	immediate constants.  It is now possible to compare these two
 	files without having to filter out insignificant differences.
-	
+
 	* m68k/mvme135-stub.c (set_debug_traps): Renamed from
  	init_debug_traps to match documentation and other sample debugger
 	stubs.
@@ -1672,7 +1677,7 @@ Thu Dec 26 14:59:34 1996  Michael Snyder  <msnyder@cleaver.cygnus.com>
 	* sparc/sparclet-stub.c: Add support for "P" protocol command.
 	  Add support for %cc coprocessor registers, %asr registers.
 	  Work-around broken SAVE instruction on sparclet.
-	
+
 Tue Dec 24 22:15:53 1996  Angela Marie Thomas (angela@cygnus.com)
 
 	* mips/pmon.S: add an INDIRECT for _flush_cache to be the
@@ -1944,7 +1949,7 @@ Sat Jun 29 23:26:39 1996  James G. Smith  <jsmith@cygnus.co.uk>
  	assembly of the "sync" instruction.
 	* mips/Makefile.in: Removed special cma101.o build. Seperate
  	install.sh invocations for the BSP libraries.
-	
+
 Sat Jun 29 08:17:52 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
 
 	* doc/porting.texi (GNU remote protocol): Fix bad texinfo.
@@ -1976,7 +1981,7 @@ Tue Jun 25 22:48:15 1996  Jason Molenda  (crash@godzilla.cygnus.co.jp)
 	* doc/configure.in (AC_PREREQ): autoconf 2.5 or higher.
 	* doc/configure: Rebuilt.
 
-	* {a29k,hp74x,i960,m68k,mips,pa,rs6000,sparc,sparc/libsys}/Makefile.in 
+	* {a29k,hp74x,i960,m68k,mips,pa,rs6000,sparc,sparc/libsys}/Makefile.in
 	(bindir, libdir): Use autoconf-set values.
 	* {a29k,hp74x,i960,m68k,mips,pa,rs6000,sparc,sparc/libsys}/configure.in
 	(AC_PREREQ): autoconf 2.5 or higher.
@@ -1996,11 +2001,11 @@ Mon Jun 24 19:44:45 1996  Ian Lance Taylor  <ian@cygnus.com>
 	* mips/Makefile.in (cma101.o): Use -mips2 option when compiling.
 
 Wed Jun 19 13:57:36 1996  Rob Savoye  <rob@darkstar.cygnus.com>
-	
+
 	* debug.[ch]: New files for GDB stub support.
 	* config/default.mt: Add rules for debug.o.
 	* config/default.mh: Add rule for building C++ source. Add $srcdir
-	to INCLUDES so shared header files can be found. 
+	to INCLUDES so shared header files can be found.
 
 	* sparc/salib.c(exceptionHandler): Range check the vector number
 	so we get a legit %tbr value. Add wrappers so inbyte and outbyte
@@ -2069,12 +2074,12 @@ Mon Jun 17 18:39:17 1996  Rob Savoye  <rob@chinadoll.cygnus.com>
 	* mips/configure.in: Use a target makefile fragment.
 	* mips/configure: Regenerate.
 	* mips/idt.ld: Add a comment on producing srecords. Setup a space
-	for the stack. PROVIDE hardware_init_hook and software_init_hook. 
+	for the stack. PROVIDE hardware_init_hook and software_init_hook.
 	* mips/crt0.S: Make a small stack. Run memsize() using the temp
 	stack, and then set the stack to the top of memory. Also grab some
 	space for the globals. Add __do_global_dtors() to the atexit
 	array. Call _exit from newlib so the atexit array gets run, then
-	exits. 
+	exits.
 
 Thu Jun 13 15:44:46 1996  Ian Lance Taylor  <ian@cygnus.com>
 
@@ -2340,7 +2345,7 @@ Wed Nov  8 16:19:31 1995  James G. Smith  <jsmith@pasanda.cygnus.co.uk>
 	* configure.in (configdirs): Add mips*vr4300*-*-* target.
 
 	* configure: Re-generated.
-	
+
 	* mipsidt/crt0.S: Check for FPU presence.
 
 	* mipsidt/mipsidt.ld: Removed explicit crt0.o from link.
@@ -2381,7 +2386,7 @@ Mon Oct 23 17:57:23 1995  James G. Smith  <jsmith@jaalfrezi.cygnus.co.uk>
 	* mipsidt/syscalls.c: Added local sbrk() function, derived from
  	(libgloss/sbrk.c), but using the monitor routine to ascertain the
  	amount of memory available.
-	
+
 Mon Oct 23 11:58:04 1995  James G. Smith  <jsmith@pasanda.cygnus.co.uk>
 
 	* mipsidt: Added (directory). This is a simple crt0 module for the
@@ -2445,7 +2450,7 @@ Fri Oct  6 15:35:01 1995  Michael Meissner  <meissner@tiktok.cygnus.com>
 
 	* rs6000/{simulator,sim-crt0}.S: Use new function macros.
 	* rs6000/mvme-{crt0,exit,inbyte,outbyte}.S: Ditto.
-	
+
 	* rs6000/Makefile.in: Add asm.h as a dependent for all .S files.
 	Compile the .S files with gcc, so that -mcall-* flags define the
 	appropriate macros.
@@ -2487,7 +2492,7 @@ Tue Sep 12 10:43:41 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
  	Use asm.h.
 
 	* rs6000/{mvme-crt0.S, mvme-exit.S, mvme-inbyte.S, mvme-outbyte.S}:
-	New files, preliminary support for motorola mvme targets running 
+	New files, preliminary support for motorola mvme targets running
 	the ppcbug monitor.
 	* rs6000/Makefile.in: Build mvme support.
 
@@ -2558,7 +2563,7 @@ Fri Jul 28 11:23:24 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 	(outbyte): Removed unconditional delay.
 
 	* m68k/crt0.S: Use SYM(_end) instead of end.  This completes my
-	change of April 18th which makes the "_end" symbol compatible 
+	change of April 18th which makes the "_end" symbol compatible
 	with both a.out and coff toolchains.
 	(zerobss): Handle zero-length bss.
 
@@ -2871,7 +2876,7 @@ Thu Feb 16 21:13:34 1995  Rob Savoye  <rob@darkstar.cygnus.com>
 
 Thu Feb  9 21:45:33 1995  Rob Savoye  <rob@darkstar.cygnus.com>
 
-	* testsuite/libgloss.all{varargs.c,varargs2.c}: Test cases for 
+	* testsuite/libgloss.all{varargs.c,varargs2.c}: Test cases for
 	traditional and ANSI varargs. (which currently fail)
 	* Makefile.in: Build intelligently and use dependancies so we
 	don't rebuild the world for each test run.
@@ -2980,7 +2985,7 @@ Mon Nov 21 20:21:48 1994  Rob Savoye  <rob@darkstar.cygnus.com>
 
 	* hppro/configure.in,config/dos.mh: Work for a canadian cross,
 	 since xgcc is for the wrong architecture.
-	 
+
 Thu Nov 17 21:07:52 1994  Rob Savoye  <rob@darkstar.cygnus.com>
 
 	* config/default.mh: Find the corrrect libgcc2.a.
@@ -3006,7 +3011,7 @@ Wed Nov 16 15:25:03 1994  Rob Savoye  (rob@cygnus.com)
 
 	* config/default.mh: Add default searches for the correct libc and
 	libm.
-	
+
 	* Makefile.in: Use ${LIBC_FOR_TARGET} and ${LIBM_FOR_TARGET}
 
 	* hppro/w89k.ld,op50n.ld,Makefile.in: Don't try to link in libc
@@ -3044,7 +3049,7 @@ Fri Sep 16 21:22:57 1994  Rob Savoye  (rob@darkstar.cygnus.com)
 
 Wed Sep 29 20:42:34 1993  Rob Savoye  (rob@darkstar.cygnus.com)
 
-        * mvme135/crt0.S, mvme135/glue.c: Moved to ../shared. 
+        * mvme135/crt0.S, mvme135/glue.c: Moved to ../shared.
 
 Thu Apr  1 13:18:15 1993  Ian Lance Taylor  (ian@cygnus.com)
 
