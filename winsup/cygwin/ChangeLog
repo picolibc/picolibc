@@ -1,3 +1,9 @@
+2004-12-16  Thomas Wolff  <towo@computer.org>
+
+	* fhandler_console.cc (get_win32_attr): Avoid inappropriate intensity
+	interchanging that used to render reverse output unreadable when
+	non-reversed text is bright.
+
 2004-12-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Add utmpx symbols.

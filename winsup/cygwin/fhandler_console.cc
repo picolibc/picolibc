@@ -938,11 +938,11 @@ fhandler_console::get_win32_attr ()
       win_fg = (win_bg & BACKGROUND_RED   ? FOREGROUND_RED   : 0) |
 	       (win_bg & BACKGROUND_GREEN ? FOREGROUND_GREEN : 0) |
 	       (win_bg & BACKGROUND_BLUE  ? FOREGROUND_BLUE  : 0) |
-	       (win_fg & FOREGROUND_INTENSITY);
+	       (win_bg & BACKGROUND_INTENSITY ? FOREGROUND_INTENSITY : 0);
       win_bg = (save_fg & FOREGROUND_RED   ? BACKGROUND_RED   : 0) |
 	       (save_fg & FOREGROUND_GREEN ? BACKGROUND_GREEN : 0) |
 	       (save_fg & FOREGROUND_BLUE  ? BACKGROUND_BLUE  : 0) |
-	       (win_bg & BACKGROUND_INTENSITY);
+	       (save_fg & FOREGROUND_INTENSITY ? BACKGROUND_INTENSITY : 0);
     }
   if (dev_state->underline)
     win_fg = dev_state->underline_color;
