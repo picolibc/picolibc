@@ -439,6 +439,9 @@ MessageBoxIndirectW@4
 MessageBoxW@16
 ModifyMenuA@20
 ModifyMenuW@20
+MonitorFromPoint@8
+MonitorFromRect@8
+MonitorFromWindow@8
 MoveWindow@24
 MsgWaitForMultipleObjects@20
 MsgWaitForMultipleObjectsEx@20

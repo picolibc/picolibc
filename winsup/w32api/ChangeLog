@@ -1,3 +1,11 @@
+2004-09-05  Hosaka Yuji  <hos@tamanegi.org>
+
+	* include/winuser.h (MonitorFromPoint, MonitorFromRect,
+	MonitorFromWindow): Add prototypes.
+	* lib/user32.def (MonitorFromPoint, MonitorFromRect,
+	MonitorFromWindowMonitorFromWindow): Add stubs.
+	* include/shellapi.h (DuplicateIcon): Add prototype.
+
 2004-09-05   Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (WINUSERAPI): New define.
