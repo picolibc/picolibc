@@ -1,3 +1,7 @@
+Sun Mar 19 12:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * syscalls.cc (stat_worker): Set st_nlink to 1 on remote drives.
+
 Sat Mar 18 23:04:27 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* times.cc: Fix extern declarations for variables that are exported but

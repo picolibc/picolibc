@@ -986,7 +986,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
           /* See the comment 10 lines below */
 	  if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
             buf->st_nlink =
-                (dtype == DRIVE_REMOTE ? 2 : num_entries (win32_name));
+                (dtype == DRIVE_REMOTE ? 1 : num_entries (win32_name));
 	}
     }
   else
@@ -998,7 +998,9 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
          those subdirectories point to it.
          This is too slow on remote drives, so we do without it and
          set the number of links to 2. */
-      buf->st_nlink = (dtype == DRIVE_REMOTE ? 2 : num_entries (win32_name));
+      /* Unfortunately the count of 2 confuses `find(1)' command. So
+         let's try it with `1' as link count. */
+      buf->st_nlink = (dtype == DRIVE_REMOTE ? 1 : num_entries (win32_name));
       buf->st_dev = FHDEVN(FH_DISK) << 8;
       buf->st_ino = hash_path_name (0, real_path.get_win32 ());
       buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
