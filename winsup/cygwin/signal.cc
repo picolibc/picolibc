@@ -239,7 +239,7 @@ kill_pgrp (pid_t pid, int sig)
 }
 
 extern "C" int
-killpg (int pgrp, int sig)
+killpg (pid_t pgrp, int sig)
 {
   return _kill (-pgrp, sig);
 }

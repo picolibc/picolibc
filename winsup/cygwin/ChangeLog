@@ -1,3 +1,7 @@
+Wed Feb  7 18:47:36 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* signal.cc (killpg): Correct first argument.
+
 Wed Feb  7 22:22:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: Add LoadDLLinitfunc for iphlpapi.dll.
