@@ -1,3 +1,8 @@
+Thu May  9  0:47:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (symlink::info): Treat non readable files
+	as normal non symlink files.
+
 2000-05-08  Paul K. Fisher  <pfisher@plexware.com>
 
 	* include/pthread.h (pthread_detach): Add missing prototype.

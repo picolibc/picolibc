@@ -2177,7 +2177,7 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 		       FILE_ATTRIBUTE_NORMAL, 0);
       res = -1;
       if (h == INVALID_HANDLE_VALUE)
-	__seterrno ();
+	goto file_not_symlink;
       else
 	{
 	  char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
