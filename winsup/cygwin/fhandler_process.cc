@@ -226,6 +226,7 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
       goto out;
     }
 
+  fileid = process_file_no;
   fill_filebuf (p);
 
   if (flags & O_APPEND)

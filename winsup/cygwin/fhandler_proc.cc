@@ -317,13 +317,13 @@ fhandler_proc::fill_filebuf ()
       {
 	if (!filebuf)
 	  {
-	struct utsname uts_name;
-	uname (&uts_name);
-	    bufalloc = strlen (uts_name.sysname) + 1 + strlen (uts_name.release) +
-		      1 + strlen (uts_name.version) + 2;
-	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
-	    filesize = __small_sprintf (filebuf, "%s %s %s\n", uts_name.sysname,
-			 uts_name.release, uts_name.version);
+	    struct utsname uts_name;
+	    uname (&uts_name);
+		bufalloc = strlen (uts_name.sysname) + 1 + strlen (uts_name.release) +
+			  1 + strlen (uts_name.version) + 2;
+	    filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
+		filesize = __small_sprintf (filebuf, "%s %s %s\n", uts_name.sysname,
+			     uts_name.release, uts_name.version);
 	  }
 	break;
       }

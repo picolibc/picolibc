@@ -1,3 +1,7 @@
+2002-06-02  Christopher January <chris@atomice.net>
+
+	* fhandler_process.cc (fhandler_process::open): Set fileid.
+
 2002-06-02  Christopher Faylor  <cgf@redhat.com>
 
 	Remove unneeded sigproc.h includes throughout.
