@@ -102,11 +102,11 @@ errmap[] =
   X (SETMARK_DETECTED,		ESPIPE),
   X (NO_DATA_DETECTED,		ENOSPC),
   X (POSSIBLE_DEADLOCK,		EDEADLOCK),
-  X (CRC,                       EIO),
-  X (NEGATIVE_SEEK,             EINVAL),
-  X (NOT_READY,                 ENOMEDIUM),
-  X (DISK_FULL,		        ENOSPC),
-  X (NOACCESS,		        EFAULT),
+  X (CRC,			EIO),
+  X (NEGATIVE_SEEK,		EINVAL),
+  X (NOT_READY,			ENOMEDIUM),
+  X (DISK_FULL,			ENOSPC),
+  X (NOACCESS,			EFAULT),
   { 0, NULL, 0}
 };
 
@@ -130,7 +130,7 @@ geterrno_from_win_error (DWORD code, int deferrno)
 void __stdcall
 seterrno_from_win_error (const char *file, int line, DWORD code)
 {
-  syscall_printf ("%s:%d \b");
+  syscall_printf ("%s:%d \b", file, line);
   set_errno (geterrno_from_win_error (code, EACCES));
   return;
 }
