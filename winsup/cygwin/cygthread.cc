@@ -123,8 +123,15 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
     api_fatal ("name should never be NULL");
 #endif
   thread_printf ("name %s, id %p", name, id);
-  while (ResumeThread (h) == 0)
+  while (!h || ResumeThread (h) != 1)
+#ifndef DEBUGGING
     Sleep (0);
+#else
+    {
+      thread_printf ("waiting for %s<%p> to become active", __name, h);
+      Sleep (0);
+    }
+#endif
   __name = name;	/* Need to set after thread has woken up to
 			   ensure that it won't be cleared by exiting
 			   thread. */

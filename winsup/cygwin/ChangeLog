@@ -1,5 +1,9 @@
 2002-08-11  Christopher Faylor  <cgf@redhat.com>
 
+	* cygthread.cc (cygthread::cygthread): Close another race.
+
+2002-08-11  Christopher Faylor  <cgf@redhat.com>
+
 	* assert.cc (__assert): Call debugger on assertion failure if
 	debugging.
 	* dcrt0.cc (dll_crt0_1): Just wait for signal thread to go live rather
