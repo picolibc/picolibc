@@ -30,6 +30,7 @@ void threadname_init ();
 HANDLE __stdcall makethread (LPTHREAD_START_ROUTINE, LPVOID, DWORD, const char *);
 const char * __stdcall threadname (DWORD, int lockit = TRUE);
 void __stdcall regthread (const char *, DWORD);
+int __stdcall iscygthread ();
 
 #ifndef DEBUGGING
 # define ForceCloseHandle CloseHandle

@@ -37,6 +37,7 @@ public:
   /* Return true if caller thread owns the lock. */
   int ismine () {return tid == GetCurrentThreadId ();}
   DWORD owner () {return tid;}
+  int unstable () {return !tid && (sync || waiters >= 0);}
 };
 
 /* Use a statically allocated buffer as the storage for a muto */

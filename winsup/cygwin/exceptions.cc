@@ -598,7 +598,6 @@ handle_sigsuspend (sigset_t tempmask)
 				//  interested in through.
   sigproc_printf ("old mask %x, new mask %x", oldmask, tempmask);
 
-  sig_dispatch_pending (0);
   WaitForSingleObject (signal_arrived, INFINITE);
 
   set_sig_errno (EINTR);	// Per POSIX
@@ -705,6 +704,7 @@ set_sig_errno (int e)
 {
   set_errno (e);
   sigsave.saved_errno = e;
+  debug_printf ("errno %d", e);
 }
 
 static int
@@ -738,20 +738,20 @@ call_handler (int sig, struct sigaction& siga, void *handler)
   for (;;)
     {
       res = SuspendThread (hth);
-      /* FIXME: Make multi-thread aware */
-      if (sync_proc_subproc->owner () != maintid && mask_sync->owner () != maintid)
-	break;
 
       if (res)
 	goto set_pending;
+
+      /* FIXME: Make multi-thread aware */
+      if (!sync_proc_subproc->unstable () && sync_proc_subproc->owner () != maintid &&
+	  !mask_sync->unstable () && mask_sync->owner () != maintid)
+	break;
+
       ResumeThread (hth);
       Sleep (0);
     }
       
   sigproc_printf ("suspend said %d, %E", res);
-
-  /* Clear any waiting threads prior to dispatching to handler function */
-  proc_subproc(PROC_CLEARWAIT, 0);
 
   if (sigsave.cx)
     {
@@ -782,8 +782,15 @@ call_handler (int sig, struct sigaction& siga, void *handler)
     }
 
   (void) ResumeThread (hth);
+
   if (interrupted)
-    (void) SetEvent (signal_arrived);	// For an EINTR case
+    {
+      /* Clear any waiting threads prior to dispatching to handler function */
+      proc_subproc(PROC_CLEARWAIT, 1);
+      /* Apparently we have to set signal_arrived after resuming the thread or it
+	 is possible that the event will be ignored. */
+      (void) SetEvent (signal_arrived);	// For an EINTR case
+    }
   sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
 
 out:
@@ -840,11 +847,16 @@ ctrl_c_handler (DWORD type)
 extern "C" void __stdcall
 set_process_mask (sigset_t newmask)
 {
+  extern DWORD sigtid;
+
   mask_sync->acquire (INFINITE);
+  sigset_t oldmask = myself->getsigmask ();
   newmask &= ~SIG_NONMASKABLE;
   sigproc_printf ("old mask = %x, new mask = %x", myself->getsigmask (), newmask);
   myself->setsigmask (newmask);	// Set a new mask
   mask_sync->release ();
+  if (oldmask != newmask && GetCurrentThreadId () != sigtid)
+    sig_dispatch_pending ();
   return;
 }
 
@@ -1076,7 +1088,7 @@ _sigreturn:
 	addl	$4,%%esp
 	call	_set_process_mask@4
 	popl	%%eax		# saved errno
-	testl	%%eax,%%eax	# lt 0
+	testl	%%eax,%%eax	# Is it < 0
 	jl	1f		# yup.  ignore it
 	movl	%1,%%ebx
 	movl	%%eax,(%%ebx)

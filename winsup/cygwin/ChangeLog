@@ -1,6 +1,17 @@
-Wed Feb 23 22:51:27 2000  Christopher Faylor <cgf@cygnus.com>
+Thu Feb 24 00:59:15 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Fix final round of gcc warnings relating to unused parameters. 
+	* debug.cc (iscygthread): New function.
+	* debug.h: Declare it.
+	* exceptions.cc (set_process_mask): Flush pending signals.
+	(handle_sigsuspend): No need to flush pending signals.
+	(call_handler): Refine previous tests of muto ownership.  Only clear
+	wait()'s when we have definitely responded to a signal.
+	* fhandler_console.cc (fhandler_console::read): Don't set EINTR if
+	executing in a "cygwin" thread.
+	* sigproc.cc (proc_subproc): Use second argument to control whether
+	CLEARWAIT actually sets "signalled" flag.
+	* sync.h (muto): Add 'unstable' method.
 
 Wed Feb 23 21:59:44 2000  Christopher Faylor <cgf@cygnus.com>
 
@@ -10,7 +21,7 @@ Wed Feb 23 21:34:58 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interruptible): Change method for determining if
 	something is interruptible.
-	(call_handler): Avoid suspending a thread if it owns a mutex.  Only set
+	(call_handler): Avoid suspending a thread if it owns a muto.  Only set
 	signal_arrived if the thread was actually interrupted.
 	(events_init): Initialize module information needed by interruptible().
 	(sigdelayed): Don't call sig_dispatch_pending since it could screw up
@@ -20,8 +31,6 @@ Wed Feb 23 21:34:58 2000  Christopher Faylor <cgf@cygnus.com>
 	bulk of the processing comes from the signal thread.
 	(wait_sig): Force processing of waiting threads if SIGCHLD is not
 	processed.
-	* sync.cc (muto::release): Set tid == 0 after lock is released or
-	signal processor will be confused.
 
 Tue Feb 22 23:06:01 2000  Christopher Faylor <cgf@cygnus.com>
 

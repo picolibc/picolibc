@@ -47,6 +47,17 @@ regthread (const char *name, DWORD tid)
   unlock_threadname ();
 }
 
+int __stdcall
+iscygthread()
+{
+  DWORD tid = GetCurrentThreadId ();
+  if (tid != maintid)
+    for (DWORD i = 0; i < NTHREADS && threads[i].name != NULL; i++)
+      if (threads[i].id == tid)
+	return 1;
+  return 0;
+}
+
 struct thread_start
   {
     LONG notavail;

@@ -151,7 +151,8 @@ fhandler_console::read (void *pv, size_t buflen)
 	case WAIT_OBJECT_0:
 	  break;
 	case WAIT_OBJECT_0 + 1:
-	  set_sig_errno (EINTR);
+	  if (!iscygthread ())
+	    set_sig_errno (EINTR);
 	  return -1;
 	default:
 	  __seterrno ();

@@ -103,11 +103,11 @@ muto::release ()
   /* FIXME: Need to check that other thread has not exited, too. */
   if (!--visits)
     {
+      tid = 0;		/* We were the last unlocker. */
       InterlockedExchange (&sync, 0); /* Reset trigger. */
       /* This thread had incremented waiters but had never decremented it.
 	 Decrement it now.  If it is >= 0 then there are possibly other
 	 threads waiting for the lock, so trigger bruteforce. */
-      tid = 0;		/* We were the last unlocker. */
       if (InterlockedDecrement (&waiters) >= 0)
 	(void) SetEvent (bruteforce); /* Wake up one of the waiting threads */
     }

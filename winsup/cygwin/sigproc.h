@@ -18,8 +18,7 @@ enum procstuff
   PROC_CHILDSTOPPED	= 2,	// a child stopped
   PROC_CHILDTERMINATED	= 3,	// a child died
   PROC_CLEARWAIT	= 4,	// clear all waits - signal arrived
-  PROC_WAIT		= 5,	// setup for wait() for subproc
-  PROC_SIGCHLD		= 6	// saw a non-trapped SIGCHLD
+  PROC_WAIT		= 5	// setup for wait() for subproc
 };
 
 typedef struct struct_waitq

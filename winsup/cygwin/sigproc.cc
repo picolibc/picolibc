@@ -102,7 +102,7 @@ muto NO_COPY *sync_proc_subproc = NULL;	// Control access to
 					//  subproc stuff
 
 DWORD NO_COPY maintid = 0;		// ID of the main thread
-Static DWORD sigtid = 0;		// ID of the signal thread
+DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 
 int NO_COPY pending_signals = 0;	// TRUE if signals pending
 
@@ -245,7 +245,7 @@ proc_subproc (DWORD what, DWORD val)
   int potential_match;
   DWORD exitcode;
   pinfo *child;
-  int clearing = 0;
+  int clearing;
   waitq *w;
 
 #define wval	 ((waitq *) val)
@@ -316,7 +316,7 @@ proc_subproc (DWORD what, DWORD val)
 
       /* Send a SIGCHLD to myself. */
       rc = sig_send (myself_nowait, SIGCHLD);	// Send a SIGCHLD
-      break;	// Don't try to unlock.  We don't have a lock.
+      break;
 
     /* A child is in the stopped state.  Scan wait() queue to see if anyone
      * should be notified.  (Called from wait_sig thread)
@@ -324,6 +324,7 @@ proc_subproc (DWORD what, DWORD val)
     case PROC_CHILDSTOPPED:
       child = myself;		// Just to avoid accidental NULL dereference
       sip_printf ("Received stopped notification");
+      clearing = 0;
       goto scan_wait;
 
     /* Clear all waiting threads.  Called from exceptions.cc prior to
@@ -333,9 +334,8 @@ proc_subproc (DWORD what, DWORD val)
     case PROC_CLEARWAIT:
       /* Clear all "wait"ing threads. */
       sip_printf ("clear waiting threads");
-      clearing = 1;
+      clearing = val;
 
-    case PROC_SIGCHLD:
     scan_wait:
       /* Scan the linked list of wait()ing threads.  If a wait's parameters
        * match this pid, then activate it.
@@ -476,7 +476,7 @@ proc_terminate (void)
       ForceCloseHandle1 (h, hwait_subproc);
 
       sync_proc_subproc->acquire(WPSP);
-      (void) proc_subproc (PROC_CLEARWAIT, 0);
+      (void) proc_subproc (PROC_CLEARWAIT, 1);
 
       lock_pinfo_for_update (INFINITE);
       /* Clean out zombie processes from the pid list. */
@@ -1205,6 +1205,8 @@ wait_sig (VOID *)
        * array looking for any unprocessed signals.
        */
       pending_signals = 0;
+      int saw_sigchld = 0;
+      int dispatched_sigchld = 0;
       for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
 	{
 #ifdef NOSIGQUEUE
@@ -1213,6 +1215,8 @@ wait_sig (VOID *)
 	  while (InterlockedDecrement (myself->getsigtodo(sig)) >= 0)
 #endif
 	    {
+	      if (sig == SIGCHLD)
+		saw_sigchld = 1;
 	      if (sig > 0 && sig != SIGCONT && sig != SIGKILL && sig != SIGSTOP &&
 		  (sigismember (& myself->getsigmask (), sig) ||
 		   myself->process_state & PID_STOPPED))
@@ -1247,9 +1251,8 @@ wait_sig (VOID *)
 		  sip_printf ("Got signal %d", sig);
 		  int wasdispatched = sig_handle (sig);
 		  dispatched |= wasdispatched;
-		  if (sig == SIGCHLD && !wasdispatched)
-		    proc_subproc (PROC_SIGCHLD, 0);
-		  dispatched |= sig_handle (sig);
+		  if (sig == SIGCHLD && wasdispatched)
+		    dispatched_sigchld = 1;
 		  goto nextsig;
 		}
 	    }
@@ -1262,6 +1265,8 @@ wait_sig (VOID *)
 	  continue;
 	}
 
+      if (saw_sigchld && !dispatched_sigchld)
+	proc_subproc (PROC_CLEARWAIT, 0);
       /* Signal completion of signal handling depending on which semaphore
        * woke up the WaitForMultipleObjects above.
        */
