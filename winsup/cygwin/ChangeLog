@@ -1,6 +1,8 @@
-Mon Jul 10 11:28:57 2000  Christopher Faylor <cgf@cygnus.com>
+Mon Jul 10 11:30:00 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in (install): Install textmode.o as well as binmode.o.
+	* fhandler_console.cc (fhandler_console::read): Use UNICODE when
+	reading from the console and translate to ASCII from that.
 
 Sun Jul  9 21:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
