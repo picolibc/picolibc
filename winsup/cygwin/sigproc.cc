@@ -610,7 +610,7 @@ sig_dispatch_pending (int justwake)
 void __stdcall
 sigproc_init ()
 {
-  wait_sig_inited = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+  wait_sig_inited = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (wait_sig_inited);
 
   /* local event signaled when main thread has been dispatched
@@ -914,7 +914,7 @@ init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
   ch->subproc_ready = subproc_ready;
   if (chtype != PROC_EXEC || !parent_alive)
     ch->parent_alive = hwait_subproc;
-  else if (parent_alive)
+  else
     DuplicateHandle (hMainProc, parent_alive, hMainProc, &ch->parent_alive,
 		     0, 1, DUPLICATE_SAME_ACCESS);
 }

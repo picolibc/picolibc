@@ -1,3 +1,9 @@
+Fri Sep  1 16:57:44 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (sigproc_init): Create wait_sig_inited without auto-reset
+	to avoid potential races.
+	(init_child_info): Avoid unneeded test.
+
 Fri Sep  1 16:51:26 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (proc_info): Rename proc_exists which takes a pid to
