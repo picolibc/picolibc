@@ -75,7 +75,7 @@ fhandler_pipe::hit_eof ()
   char buf[80];
   HANDLE ev;
   if (!orig_pid)
-    return bg_ok;
+    return false;
   __small_sprintf (buf, pipeid_fmt, orig_pid, id);
   if ((ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf)))
     CloseHandle (ev);

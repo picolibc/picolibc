@@ -1,3 +1,8 @@
+Fri Sep 28 01:50:09 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* pipe.cc (fhandler_pipe::hit_eof): Return correct value when there is
+	no EOF event available.
+
 Sat Sep 28 00:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (mmap): Move setting the access after evaluating fd.
