@@ -1,3 +1,7 @@
+2003-04-07 Marcel Telka <telka@users.sourceforge.net>
+
+	* include/ddk/winddk.h (KIRQL): Typedef as UCHAR. not ULONG.
+
 2003-03-30  Hans E. Molin  <kvasi@users.sourceforge.net>
 
 	* include/olectl.h (OleLoadPicturePath): Correct prototype.

@@ -127,7 +127,7 @@ static inline struct _KPCR * KeGetCurrentKPCR(
 */
 
 typedef LONG KPRIORITY;
-typedef ULONG KIRQL, *PKIRQL;
+typedef UCHAR KIRQL, *PKIRQL;
 typedef ULONG_PTR KSPIN_LOCK, *PKSPIN_LOCK;
 typedef ULONG KAFFINITY, *PKAFFINITY;
 typedef CCHAR KPROCESSOR_MODE;
