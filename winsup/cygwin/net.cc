@@ -130,6 +130,7 @@ set_socket_inheritance (SOCKET sock)
     system_printf ("DuplicateHandle failed %E");
   else
     debug_printf ("DuplicateHandle succeeded osock %p, sock %p", osock, sock);
+  VerifyHandle ((HANDLE) sock);
   return sock;
 }
 

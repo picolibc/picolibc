@@ -45,10 +45,14 @@ HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
 
 per_thread_waitq NO_COPY waitq_storage;
+#ifdef NEWVFORK
 per_thread_vfork NO_COPY vfork_storage;
+#endif
 
 per_thread NO_COPY *threadstuff[] = {&waitq_storage,
+#ifdef NEWVFORK
 				     &vfork_storage,
+#endif
 				     NULL};
 
 bool display_title;
@@ -59,7 +63,9 @@ codepage_type current_codepage = ansi_cp;
 int __argc_safe;
 int _declspec(dllexport) __argc;
 char _declspec(dllexport) **__argv;
+#ifdef NEWVFORK
 vfork_save NO_COPY *main_vfork;
+#endif
 
 static int NO_COPY envc;
 char NO_COPY **envp;
@@ -759,9 +765,10 @@ dll_crt0_1 (char *)
      Need to do this before any helper threads start. */
   debug_init ();
 
+#ifdef NEWVFORK
   cygheap->fdtab.vfork_child_fixup ();
-
   main_vfork = vfork_storage.create ();
+#endif
 
   cygbench ("pre-forkee");
   if (user_data->forkee)
@@ -988,12 +995,14 @@ do_exit (int status)
 {
   syscall_printf ("do_exit (%d), exit_state %d", status, exit_state);
 
+#ifdef NEWVFORK
   vfork_save *vf = vfork_storage.val ();
   if (vf != NULL && vf->pid < 0)
     {
       exit_state = ES_NOT_EXITING;
       vf->restore_exit (status);
     }
+#endif
 
   EnterCriticalSection (&exit_lock);
   muto::set_exiting_thread ();

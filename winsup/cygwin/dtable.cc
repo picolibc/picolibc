@@ -705,6 +705,7 @@ dtable::fixup_after_fork (HANDLE parent)
       }
 }
 
+#ifdef NEWVFORK
 int
 dtable::vfork_child_dup ()
 {
@@ -803,6 +804,7 @@ dtable::vfork_child_fixup ()
 
   return;
 }
+#endif /*NEWVFORK*/
 
 #define DEVICE_PREFIX "\\device\\"
 #define DEVICE_PREFIX_LEN sizeof (DEVICE_PREFIX) - 1

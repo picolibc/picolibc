@@ -263,7 +263,9 @@ struct init_cygheap
   struct sigaction *sigs;
 
   fhandler_tty_slave *ctty;	/* Current tty */
+#ifdef NEWVFORK
   fhandler_tty_slave *ctty_on_hold;
+#endif
   struct _threadinfo **threadlist;
   size_t sthreads;
   int open_fhs;

@@ -22,7 +22,9 @@ class dtable
 {
   muto *lock_cs;
   fhandler_base **fds;
+#ifdef NEWVFORK
   fhandler_base **fds_on_hold;
+#endif
   fhandler_base **archetypes;
   unsigned narchetypes;
   unsigned farchetype;
@@ -74,7 +76,9 @@ public:
   void stdio_init ();
   void get_debugger_info ();
   void set_file_pointers_for_exec ();
+#ifdef NEWVFORK
   bool in_vfork_cleanup () {return fds_on_hold == fds;}
+#endif
   fhandler_fifo *find_fifo (ATOM);
   fhandler_base *find_archetype (device& dev);
   fhandler_base **add_archetype ();

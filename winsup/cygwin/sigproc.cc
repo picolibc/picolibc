@@ -339,6 +339,7 @@ proc_subproc (DWORD what, DWORD val)
       if (!DuplicateHandle (hMainProc, hMainProc, vchild->hProcess, &vchild->ppid_handle,
 			    SYNCHRONIZE | PROCESS_DUP_HANDLE, TRUE, 0))
 	system_printf ("Couldn't duplicate my handle<%p> for pid %d, %E", hMainProc, vchild->pid);
+      VerifyHandle (vchild->ppid_handle);
       vchild->ppid = myself->pid;
       vchild->uid = myself->uid;
       vchild->gid = myself->gid;
@@ -726,17 +727,19 @@ sig_send (_pinfo *p, int sig, void *tls)
 	  __seterrno ();
 	  goto out;
 	}
+      VerifyHandle (hp);
       for (int i = 0; !p->sendsig && i < 10000; i++)
 	low_priority_sleep (0);
       if (!DuplicateHandle (hp, p->sendsig, hMainProc, &sendsig, false, 0,
 			    DUPLICATE_SAME_ACCESS) || !sendsig)
 	{
+	  CloseHandle (hp);
 	  sigproc_printf ("DuplicateHandle failed, %E");
 	  __seterrno ();
 	  goto out;
 	}
       CloseHandle (hp);
-      pack.wakeup = NULL;
+      VerifyHandle (sendsig);
     }
 
   sigproc_printf ("sendsig %p, pid %d, signal %d, its_me %d", sendsig, p->pid,

@@ -151,7 +151,7 @@ vfork="${enableval}"
 
 case "$vfork" in
 no)	 ;;
-yes|*)	 AC_DEFINE_UNQUOTED(NEWVFORK) ;;
+yes)	 AC_DEFINE_UNQUOTED(NEWVFORK) ;;
 esac
 
 dnl The only time we might want to transform the install names

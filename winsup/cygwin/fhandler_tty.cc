@@ -553,6 +553,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  return 0;
 	}
 
+      VerifyHandle (from_master_local);
       if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master,
 			  hMainProc, &to_master_local, 0, TRUE,
 			  DUPLICATE_SAME_ACCESS))
@@ -561,6 +562,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  __seterrno ();
 	  return 0;
 	}
+      VerifyHandle (to_master_local);
       CloseHandle (tty_owner);
     }
 

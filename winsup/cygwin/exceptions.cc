@@ -906,7 +906,7 @@ sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
 
   int rc = 1;
   bool insigwait_mask = tls ? sigismember (&tls->sigwait_mask, sig) : false;
-  bool special_case = ISSTATE (myself, PID_STOPPED) || main_vfork->pid;
+  bool special_case = ISSTATE (myself, PID_STOPPED) || VFORKPID;
   bool masked = sigismember (&mask, sig);
   if (sig != SIGKILL && sig != SIGSTOP
       && (special_case || main_vfork->pid || masked || insigwait_mask

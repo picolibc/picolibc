@@ -49,6 +49,7 @@ pinfo_fixup_after_fork ()
       system_printf ("couldn't save current process handle %p, %E", hMainProc);
       hexec_proc = NULL;
     }
+  VerifyHandle (hexec_proc);
 }
 
 /* Initialize the process table.

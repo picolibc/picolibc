@@ -37,6 +37,7 @@ details. */
 # define debug_init() do {} while (0)
 # define setclexec(h, nh, b) do {} while (0)
 # define debug_fixup_after_fork_exec() do {} while (0)
+# define VerifyHandle(h) do {} while (0)
 
 #else
 
@@ -59,9 +60,12 @@ details. */
 # define ProtectHandleINH(h) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #h, 1)
 # define ProtectHandle1INH(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #n, 1)
 # define ProtectHandle2INH(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), n, 1)
+# define VerifyHandle(h) verify_handle (__PRETTY_FUNCTION__, __LINE__, (h))
 
 void debug_init ();
 void __stdcall add_handle (const char *, int, HANDLE, const char *, bool = false)
+  __attribute__ ((regparm (3)));
+void __stdcall verify_handle (const char *, int, HANDLE)
   __attribute__ ((regparm (3)));
 bool __stdcall close_handle (const char *, int, HANDLE, const char *, bool)
   __attribute__ ((regparm (3)));
