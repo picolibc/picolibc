@@ -554,12 +554,7 @@ skip_arg_parsing:
   if (real_path.iscygexec ())
     envblock = NULL;
   else
-    {
-      cygheap_root sav_root (cygheap->root);
-      cygheap->root = NULL;
-      envblock = winenv (envp, 0);
-      cygheap->root = sav_root;
-    }
+    envblock = winenv (envp, 0);
 
   ciresrv.cygheap = cygheap;
   ciresrv.cygheap_max = cygheap_max;

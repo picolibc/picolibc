@@ -1,3 +1,8 @@
+Wed Nov 15  9:59:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* spawn.cc (spawn_guts): Revert patch to ignore chroot settings
+	on creating native Win32 environment.
+
 Wed Nov 15 01:44:37 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fork.cc (slow_pid_reuse): Off-by-one.
