@@ -51,6 +51,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 #include <string.h>
 #include "fvwrite.h"
+#include "local.h"
 
 /*
  * Write the given string to the given file.
@@ -69,6 +70,9 @@ _DEFUN(fputs, (s, fp),
   iov.iov_len = uio.uio_resid = strlen (s);
   uio.uio_iov = &iov;
   uio.uio_iovcnt = 1;
+
+  CHECK_INIT(_REENT);
+
   _flockfile (fp);
   result = __sfvwrite (fp, &uio);
   _funlockfile (fp);

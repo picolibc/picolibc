@@ -145,7 +145,7 @@ _DEFUN(viprintf, (fmt, ap),
        _CONST char *fmt _AND
        va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT (_stdout_r (_REENT));
+  _REENT_SMALL_CHECK_INIT (_REENT);
   return _vfiprintf_r (_REENT, _stdout_r (_REENT), fmt, ap);
 }
 
@@ -157,6 +157,6 @@ _DEFUN(_viprintf_r, (ptr, fmt, ap),
        _CONST char *fmt   _AND
        va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT (_stdout_r (ptr));
+  _REENT_SMALL_CHECK_INIT (ptr);
   return _vfiprintf_r (ptr, _stdout_r (ptr), fmt, ap);
 }

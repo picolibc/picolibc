@@ -129,11 +129,11 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
   struct stat st;
   int havepos;
 
-  _flockfile (fp);
-
   /* Make sure stdio is set up.  */
 
-  CHECK_INIT (fp);
+  CHECK_INIT (ptr);
+
+  _flockfile (fp);
 
   /* If we've been doing some writing, and we're in append mode
      then we don't really know where the filepos is.  */

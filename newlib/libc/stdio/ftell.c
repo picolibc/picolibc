@@ -105,11 +105,11 @@ _DEFUN(_ftell_r, (ptr, fp),
 {
   _fpos_t pos;
 
-  _flockfile (fp);
-
   /* Ensure stdio is set up.  */
 
-  CHECK_INIT (fp);
+  CHECK_INIT (ptr);
+
+  _flockfile (fp);
 
   if (fp->_seek == NULL)
     {

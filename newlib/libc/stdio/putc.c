@@ -67,6 +67,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 #include <_ansi.h>
 #include <stdio.h>
+#include "local.h"
 
 /*
  * A subroutine version of the macro putc.
@@ -80,8 +81,8 @@ _DEFUN(putc, (c, fp),
        register FILE *fp)
 {
   int result;
+  CHECK_INIT (_REENT);
   _flockfile (fp);
-  /* CHECK_INIT is (eventually) called by __swbuf.  */
   result = __sputc (c, fp);
   _funlockfile (fp);
   return result;

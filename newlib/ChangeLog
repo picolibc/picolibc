@@ -1,3 +1,64 @@
+2005-02-07  Antony King  <antony.king@st.com>
+
+	* libc/stdio/clearerr.c (clearerr): Ensure CHECK_INIT() is
+	called before _flockfile to prevent lock object use before
+	initialisation. _REENT_SMALL_CHECK_INIT() and CHECK_INIT()
+	take a struct _reent * instead of a FILE *.
+	* libc/stdio/fclose.c (_fclose_r): Ditto.
+	* libc/stdio/feof.c (feof): Ditto.
+	* libc/stdio/ferror.c (ferror): Ditto.
+	* libc/stdio/fflush.c (fflush): Ditto.
+	* libc/stdio/fgetc.c (fgetc): Ditto.
+	* libc/stdio/fgets.c (fgets): Ditto.
+	* libc/stdio/fileno.c (fileno): Ditto.
+	* libc/stdio/fputc.c (fputc): Ditto.
+	* libc/stdio/fputs.c (fputs): Ditto.
+	* libc/stdio/fread.c (fread): Ditto.
+	* libc/stdio/freopen.c (_freopen_r): Ditto.
+	* libc/stdio/fseek.c (_fseek_r): Ditto.
+	* libc/stdio/ftell.c (_ftell_r): Ditto.
+	* libc/stdio/fwrite.c (fwrite): Ditto.
+	* libc/stdio/getc.c (getc): Ditto.
+	* libc/stdio/getdelim.c (__getdelim): Ditto.
+	* libc/stdio/putc.c (putc): Ditto.
+	* libc/stdio/setvbuf.c (setvbuf): Ditto.
+	* libc/stdio/ungetc.c (_ungetc_r): Ditto.
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Ditto.
+	* libc/stdio64/freopen64.c (_freopen64_r): Ditto.
+	* libc/stdio64/fseeko64.c (_fseeko64_r): Ditto.
+	* libc/stdio64/ftello64.c (_ftello64_r): Ditto.
+	* libc/stdio/local.h (CHECK_INIT): Argument is now a struct
+	_reent * instead of a FILE * and so replace incorrect use of
+	_REENT with argument.
+	* libc/sys/arm/syscalls.c (CHECK_INIT): Ditto.
+	* libc/stdio/getchar.c (getchar): _REENT_SMALL_CHECK_INIT() and
+	CHECK_INIT() take a struct _reent * instead of a FILE *.
+	* libc/stdio/iprintf.c (iprintf, _iprintf_r): Ditto.
+	* libc/stdio/iscanf.c (iscanf, _iscanf_r): Ditto.
+	* libc/stdio/perror.c (perror): Ditto.
+	* libc/stdio/printf.c (printf, _printf_r): Ditto.
+	* libc/stdio/putchar.c (putchar): Ditto.
+	* libc/stdio/puts.c (puts): Ditto.
+	* libc/stdio/refill.c (__srefill): Ditto.
+	* libc/stdio/scanf.c (scanf, _scanf_r): Ditto.
+	* libc/stdio/vfscanf.c (VFSCANF, _VFSCANF_R): Ditto.
+	* libc/stdio/viprintf.c (viprintf, _viprintf_r): Ditto.
+	* libc/stdio/viscanf.c (viscanf, _viscanf_r): Ditto.
+	* libc/stdio/vprintf.c (vprintf, _vprintf_r): Ditto.
+	* libc/stdio/vscanf.c (vscanf, _vscanf_r): Ditto.
+	* libc/stdio/wbuf.c (__swbuf): Ditto.
+	* libc/stdio/wsetup.c (__swsetup): Ditto.
+	* libc/stdlib/mallocr.c (malloc_stats): Ditto.
+	* libc/stdlib/mstats.c (_mstats_r): Ditto.
+	* libc/include/sys/reent.h (_REENT_SMALL_CHECK_INIT): Ditto.
+	* libc/machine/powerpc/vfscanf.c (vfscanf): Ditto.
+	* libc/stdio/fgetpos.c (_fgetpos_r): Removed unnecessary calls
+	to _flockfile and _funlockfile; rely on locking in _ftell_r.
+	* libc/stdio64/fgetpos64.c (_fgetpos64_r): Ditto (_ftello64_r).
+	* libc/machine/powerpc/vfprintf.c (__sbprintf): Removed unnecessary
+	initialision of _data field in FILE structure.
+	* libc/machine/powerpc/vfprintf.c (VFPRINTF): Added CHECK_INIT() call.
+
 2005-02-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/findfp.c (__sinit): Protect with new lock.

@@ -121,7 +121,7 @@ _DEFUN(viscanf, (fmt, ap),
        _CONST char *fmt _AND 
        va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT (_stdin_r (_REENT));
+  _REENT_SMALL_CHECK_INIT (_REENT);
   return __svfiscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
 }
 
@@ -133,7 +133,7 @@ _DEFUN(_viscanf_r, (ptr, fmt, ap),
        _CONST char *fmt   _AND 
        va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT (_stdin_r (ptr));
+  _REENT_SMALL_CHECK_INIT (ptr);
   return __svfiscanf_r (ptr, _stdin_r (ptr), fmt, ap);
 }
 

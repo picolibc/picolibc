@@ -64,6 +64,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 #include <_ansi.h>
 #include <stdio.h>
+#include "local.h"
 
 /*
  * A subroutine version of the macro getc.
@@ -76,8 +77,8 @@ _DEFUN(getc, (fp),
        register FILE *fp)
 {
   int result;
+  CHECK_INIT (_REENT);
   _flockfile (fp);
-  /* CHECK_INIT is called (eventually) by __srefill.  */
   result = __sgetc (fp);
   _funlockfile (fp);
   return result;

@@ -239,7 +239,6 @@ __sbprintf(fp, fmt, ap)
 	unsigned char buf[BUFSIZ];
 
 	/* copy the important variables */
-	fake._data = fp->_data;
 	fake._flags = fp->_flags & ~__SNBF;
 	fake._file = fp->_file;
 	fake._cookie = fp->_cookie;
@@ -322,6 +321,7 @@ _DEFUN (VFPRINTF, (fp, fmt0, ap),
 	_CONST char *fmt0 _AND
 	va_list ap)
 {
+  CHECK_INIT (_REENT);
   return _VFPRINTF_R (_REENT, fp, fmt0, ap);
 }
 

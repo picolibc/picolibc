@@ -90,7 +90,7 @@ _DEFUN(_puts_r, (ptr, s),
   uio.uio_iov = &iov[0];
   uio.uio_iovcnt = 2;
 
-  _REENT_SMALL_CHECK_INIT (_stdout_r (ptr));
+  _REENT_SMALL_CHECK_INIT (ptr);
   return (__sfvwrite (_stdout_r (ptr), &uio) ? EOF : '\n');
 }
 

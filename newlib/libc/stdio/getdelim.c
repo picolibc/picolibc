@@ -79,9 +79,9 @@ _DEFUN(__getdelim, (bufptr, n, delim, fp),
       *n = DEFAULT_LINE_SIZE;
     }
 
-  _flockfile (fp);
+  CHECK_INIT (_REENT);
 
-  CHECK_INIT (fp);
+  _flockfile (fp);
 
   numbytes = *n;
   ptr = buf;

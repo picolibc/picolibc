@@ -125,6 +125,8 @@ _DEFUN(fread, (buf, size, count, fp),
   if ((resid = count * size) == 0)
     return 0;
 
+  CHECK_INIT(_REENT);
+
   _flockfile (fp);
   if (fp->_r < 0)
     fp->_r = 0;

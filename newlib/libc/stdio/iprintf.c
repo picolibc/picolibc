@@ -40,7 +40,7 @@ iprintf(fmt, va_alist)
   int ret;
   va_list ap;
 
-  _REENT_SMALL_CHECK_INIT (_stdout_r (_REENT));
+  _REENT_SMALL_CHECK_INIT (_REENT);
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
@@ -67,7 +67,7 @@ _iprintf_r(ptr, fmt, va_alist)
   int ret;
   va_list ap;
 
-  _REENT_SMALL_CHECK_INIT (_stdout_r (ptr));
+  _REENT_SMALL_CHECK_INIT (ptr);
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else

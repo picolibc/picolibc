@@ -49,11 +49,11 @@ extern int   _EXFUN(__srefill,(FILE *fp));
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
 
-#define CHECK_INIT(fp) \
+#define CHECK_INIT(ptr) \
   do						\
     {						\
-      if (_REENT && !_REENT->__sdidinit)	\
-	__sinit (_REENT);			\
+      if ((ptr) && !(ptr)->__sdidinit)		\
+	__sinit (ptr);				\
     }						\
   while (0)
 

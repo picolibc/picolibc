@@ -158,9 +158,9 @@ struct __sFILE_fake {
   struct _reent *_data;
 };
 /* CHECK_INIT() comes from stdio/local.h; be sure to include that.  */
-# define _REENT_SMALL_CHECK_INIT(fp) CHECK_INIT(fp)
+# define _REENT_SMALL_CHECK_INIT(ptr) CHECK_INIT(ptr)
 #else
-# define _REENT_SMALL_CHECK_INIT(fp) /* nothing */
+# define _REENT_SMALL_CHECK_INIT(ptr) /* nothing */
 #endif
 
 struct __sFILE {

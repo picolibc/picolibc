@@ -81,15 +81,12 @@ _DEFUN(_fgetpos_r, (ptr, fp, pos),
        FILE * fp           _AND
        _fpos_t * pos)
 {
-  _flockfile (fp);
   *pos = _ftell_r (ptr, fp);
 
   if (*pos != -1)
     {
-      _funlockfile (fp);
       return 0;
     }
-  _funlockfile (fp);
   return 1;
 }
 

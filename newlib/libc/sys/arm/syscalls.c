@@ -55,20 +55,17 @@ register char * stack_ptr asm ("sp");
 
 /* following is copied from libc/stdio/local.h to check std streams */
 extern void   _EXFUN(__sinit,(struct _reent *));
-#define CHECK_INIT(fp) \
-  do                                    \
-    {                                   \
-      if ((fp)->_data == 0)             \
-        (fp)->_data = _REENT;           \
-      if (!(fp)->_data->__sdidinit)     \
-        __sinit ((fp)->_data);          \
-    }                                   \
+#define CHECK_INIT(ptr) \
+  do						\
+    {						\
+      if ((ptr) && !(ptr)->__sdidinit)		\
+	__sinit (ptr);				\
+    }						\
   while (0)
 
 /* Adjust our internal handles to stay away from std* handles.  */
 #define FILE_HANDLE_OFFSET (0x20)
 
-static int std_files_checked;
 static int monitor_stdin;
 static int monitor_stdout;
 static int monitor_stderr;
@@ -119,13 +116,8 @@ do_AngelSWI (int reason, void * arg)
 static int
 remap_handle (int fh)
 {
-  if (!std_files_checked)
-    {
-       CHECK_INIT(stdin);
-       CHECK_INIT(stdout);
-       CHECK_INIT(stderr);
-       std_files_checked = 1;
-    }
+  CHECK_INIT(_REENT);
+
   if (fh == STDIN_FILENO)
     return monitor_stdin;
   if (fh == STDOUT_FILENO)

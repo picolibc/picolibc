@@ -40,7 +40,7 @@ _DEFUN(__swbuf, (c, fp),
 
   /* Ensure stdio has been initialized.  */
 
-  CHECK_INIT (fp);
+  CHECK_INIT (_REENT);
 
   /*
    * In case we cannot write, or longjmp takes us out early,

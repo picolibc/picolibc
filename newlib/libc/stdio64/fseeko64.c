@@ -111,11 +111,11 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
   struct stat64 st;
   int havepos;
 
-  _flockfile(fp);
-
   /* Make sure stdio is set up.  */
 
-  CHECK_INIT (fp);
+  CHECK_INIT (ptr);
+
+  _flockfile(fp);
 
   curoff = fp->_offset;
 

@@ -74,7 +74,7 @@ _DEFUN(_perror_r, (ptr, s),
 {
   char *error;
 
-  _REENT_SMALL_CHECK_INIT (_stderr_r (ptr));
+  _REENT_SMALL_CHECK_INIT (ptr);
   if (s != NULL && *s != '\0')
     {
       fputs (s, _stderr_r (ptr));

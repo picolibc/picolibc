@@ -80,7 +80,7 @@ _DEFUN(_putchar_r, (ptr, c),
        struct _reent *ptr _AND
        int c)
 {
-  _REENT_SMALL_CHECK_INIT (_stdout_r (ptr));
+  _REENT_SMALL_CHECK_INIT (ptr);
   return putc (c, _stdout_r (ptr));
 }
 

@@ -224,8 +224,8 @@ _DEFUN (vfscanf, (fp, fmt, ap),
     _CONST char *fmt _AND 
     va_list ap)
 {
-  CHECK_INIT(fp);
-  return __svfscanf_r (fp->_data, fp, fmt, ap);
+  CHECK_INIT(_REENT);
+  return __svfscanf_r (_REENT, fp, fmt, ap);
 }
 
 int

@@ -91,9 +91,9 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
 
   __sfp_lock_acquire ();
 
-  _flockfile(fp);
+  CHECK_INIT (ptr);
 
-  CHECK_INIT (fp);
+  _flockfile(fp);
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {

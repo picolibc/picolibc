@@ -77,14 +77,14 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
   if (c == EOF)
     return (EOF);
 
-  _flockfile (fp);
-  
   /* Ensure stdio has been initialized.
      ??? Might be able to remove this as some other stdio routine should
      have already been called to get the char we are un-getting.  */
 
-  CHECK_INIT (fp);
+  CHECK_INIT (rptr);
 
+  _flockfile (fp);
+  
   /* After ungetc, we won't be at eof anymore */
   fp->_flags &= ~__SEOF;
 

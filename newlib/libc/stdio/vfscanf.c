@@ -231,7 +231,7 @@ _DEFUN(VFSCANF, (fp, fmt, ap),
        _CONST char *fmt _AND 
        va_list ap)
 {
-  CHECK_INIT(fp);
+  CHECK_INIT(_REENT);
   return __SVFSCANF_R (_REENT, fp, fmt, ap);
 }
 
@@ -253,6 +253,7 @@ _DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
        _CONST char *fmt    _AND 
        va_list ap)
 {
+  CHECK_INIT(data);
   return __SVFSCANF_R (data, fp, fmt, ap);
 }
 

@@ -55,12 +55,14 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #include <_ansi.h>
 #include <stdio.h>
+#include "local.h"
 
 int
 _DEFUN(fgetc, (fp),
        FILE * fp)
 {
   int result;
+  CHECK_INIT(_REENT);
   _flockfile (fp);
   result = __sgetc (fp);
   _funlockfile (fp);

@@ -76,10 +76,10 @@ _DEFUN(_fclose_r, (rptr, fp),
 
   __sfp_lock_acquire ();
 
+  CHECK_INIT (rptr);
+
   _flockfile (fp);
   
-  CHECK_INIT (fp);
-
   if (fp->_flags == 0)		/* not open! */
     {
       _funlockfile (fp);
