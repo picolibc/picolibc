@@ -334,11 +334,15 @@ kern_shmat(struct thread *td, int shmid, const void *shmaddr, int shmflg)
 	int i, flags;
 	struct shmid_ds *shmseg;
 	struct shmmap_state *shmmap_s = NULL;
+#ifndef __CYGWIN__
 	struct shm_handle *shm_handle;
+#endif
 	vm_offset_t attach_va;
 	vm_prot_t prot;
 	vm_size_t size;
+#ifndef __CYGWIN__
 	int rv;
+#endif
 	int error = 0;
 
 	if (!jail_sysvipc_allowed && jailed(td->td_ucred))

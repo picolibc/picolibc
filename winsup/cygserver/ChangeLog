@@ -1,3 +1,7 @@
+2004-09-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_shm.cc (kern_shmat): Avoid compiler warning.
+
 2004-09-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sysv_shm.cc (vm_object_reference): remove Cygwin specific define.
