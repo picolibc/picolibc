@@ -159,20 +159,20 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 {
   extern int get_ifconf (struct ifconf *ifc, int what); /* net.cc */
   int res;
-  struct ifconf *ifc;
-  struct ifreq *ifr;
+  struct ifconf ifc, *ifcp;
+  struct ifreq *ifr, *ifrp;
   sigframe thisframe (mainthread);
 
   switch (cmd)
     {
     case SIOCGIFCONF:
-      ifc = (struct ifconf *) p;
-      if (ifc == 0)
+      ifcp = (struct ifconf *) p;
+      if (!ifcp)
 	{
 	  set_errno (EINVAL);
 	  return -1;
 	}
-      res = get_ifconf (ifc, cmd);
+      res = get_ifconf (ifcp, cmd);
       if (res)
 	debug_printf ("error in get_ifconf\n");
       break;
@@ -194,14 +194,14 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
     case SIOCGIFBRDADDR:
     case SIOCGIFNETMASK:
     case SIOCGIFADDR:
+    case SIOCGIFHWADDR:
+    case SIOCGIFMETRIC:
+    case SIOCGIFMTU:
       {
-	char buf[2048];
-	struct ifconf ifc;
-	ifc.ifc_len = sizeof (buf);
-	ifc.ifc_buf = buf;
-	struct ifreq *ifrp;
+	ifc.ifc_len = 2048;
+	ifc.ifc_buf = (char *) alloca (2048);
 
-	struct ifreq *ifr = (struct ifreq *) p;
+	ifr = (struct ifreq *) p;
 	if (ifr == 0)
 	  {
 	    debug_printf ("ifr == NULL\n");
@@ -234,6 +234,15 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 		    break;
 		  case SIOCGIFNETMASK:
 		    ifr->ifr_netmask = ifrp->ifr_netmask;
+		    break;
+		  case SIOCGIFHWADDR:
+		    ifr->ifr_hwaddr = ifrp->ifr_hwaddr;
+		    break;
+		  case SIOCGIFMETRIC:
+		    ifr->ifr_metric = ifrp->ifr_metric;
+		    break;
+		  case SIOCGIFMTU:
+		    ifr->ifr_mtu = ifrp->ifr_mtu;
 		    break;
 		  }
 		break;

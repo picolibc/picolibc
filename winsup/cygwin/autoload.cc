@@ -175,6 +175,28 @@ LoadDLLinitfunc (ws2_32)
   return 0;
 }
 
+LoadDLLinitfunc (iphlpapi)
+{
+  HANDLE h;
+  static NO_COPY LONG here = -1L;
+
+  while (InterlockedIncrement (&here))
+    {
+      InterlockedDecrement (&here);
+      Sleep (0);
+    }
+
+  if (iphlpapi_handle)
+    /* nothing to do */;
+  else if ((h = LoadLibrary ("iphlpapi.dll")) != NULL)
+    iphlpapi_handle = h;
+  else if (!iphlpapi_handle)
+    api_fatal ("could not load iphlpapi.dll, %E");
+
+  InterlockedDecrement (&here);
+  return 0;
+}
+
 static void __stdcall dummy_autoload (void) __attribute__ ((unused));
 static void __stdcall
 dummy_autoload (void)
@@ -313,5 +335,9 @@ LoadDLLfunc (socket, 12, wsock32)
 LoadDLLinit (ws2_32)
 LoadDLLfuncEx (WSADuplicateSocketA, 12, ws2_32, 1)
 LoadDLLfuncEx (WSASocketA, 24, ws2_32, 1)
+
+LoadDLLinit (iphlpapi)
+LoadDLLfuncEx (GetIfTable, 12, iphlpapi, 1)
+LoadDLLfuncEx (GetIpAddrTable, 12, iphlpapi, 1)
 }
 }

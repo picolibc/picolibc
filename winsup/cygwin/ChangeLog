@@ -1,3 +1,24 @@
+Wed Feb  7 22:22:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Add LoadDLLinitfunc for iphlpapi.dll.
+	Add LoadDLLfuncEx statements for GetIfTable@12 and GetIpAddrTable@12.
+	* fhandler_socket.cc (fhandler_socket::ioctl): Move variable
+	definitions to the beginning of the function to allow better debugging.
+	Add handling for SIOCGIFHWADDR, SIOCGIFMETRIC and SIOCGIFMTU.
+	* net.cc: Include iphlpapi.h.
+	(get_2k_ifconf): Rewritten. Uses IP Helper API now.
+	(get_nt_ifconf): Add handling for SIOCGIFHWADDR, SIOCGIFMETRIC
+	and SIOCGIFMTU.
+	(get_95_ifconf): Ditto. Renamed from `get_9x_ifconf'.
+	(get_ifconf): Name loopback `lo' instead of `lo0' as in Linux.
+	Add handling for SIOCGIFHWADDR, SIOCGIFMETRIC and SIOCGIFMTU.
+	Call `get_95_ifconf' only on Windows 95, `get_nt_ifconf' only
+	on Windows NT < Service Pack 3, `get_2k_ifconf otherwise.
+	* include/asm/socket.h: Add defines for SIOCGIFHWADDR, SIOCGIFMETRIC
+	and SIOCGIFMTU.
+	* include/cygwin/if.h: Add `ifr_hwaddr', `ifr_metric' and `ifr_mtu'.
+	(struct ifreq): Add `ifru_hwaddr'.
+
 Tue Feb  6 15:04:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (stat_worker): Add a check for the special case when
