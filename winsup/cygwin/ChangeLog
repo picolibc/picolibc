@@ -1,3 +1,16 @@
+2003-11-29  Nicholas Wourms  <nwourms@netscape.net>
+
+	* Makefile.in: (DLL_OFILES): Add flock.o.
+	* cygwin.din: Export flock.
+	* flock.c: New file.
+	* include/sys/file.h: Include sys/cdefs.h.
+	Add function prototype for flock().
+	Add some comments from BSD's header for further clarity.
+	(L_SET, L_CURR, L_INCR, L_XTND): Redefine as the macros
+	SEEK_SET, SEEK_CUR, SEEK_CUR, & SEEK_END respectively.
+	(LOCK_SH,LOCK_EX,LOCK_NB,LOCK_UN): New macros for flock().
+	* include/cygwin/version.h: Bump API minor number.
+
 2003-11-28  Christopher Faylor  <cgf@redhat.com>
 
 	* sigproc.cc (no_signals_available): Fix so that non-zero exit state is

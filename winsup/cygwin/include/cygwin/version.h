@@ -230,12 +230,13 @@ details. */
       103: Export getprogname, setprogname.
       104: Export msgctl, msgget, msgrcv, msgsnd, semctl, semget, semop.
       105: Export sigwait.
+      106: Export flock.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 105
+#define CYGWIN_VERSION_API_MINOR 106
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -500,6 +500,7 @@ finitef NOSIGFE
 _finitef = finitef NOSIGFE
 fiprintf SIGFE
 _fiprintf = fiprintf SIGFE
+flock SIGFE
 floor NOSIGFE
 _floor = floor NOSIGFE
 floorf NOSIGFE
