@@ -1,5 +1,9 @@
 2005-03-15  Christopher Faylor  <cgf@timesys.com>
 
+	* errno.cc (errmap): Correct typo in previous change.
+
+2005-03-15  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.cc (_cygtls::remove): Free process_ident, if it exists.
 
 	* errno.cc (errmap): ERROR_DISK_CORRUPT -> EIO.
