@@ -55,8 +55,10 @@ C:\cygwin           /                   user         binmode
 @end example
 
 Note that /bin and /usr/bin point to the same location, as do /lib and
-/usr/lib.  This is intentional.  Currently, @code{setup.exe} creates
-only binary mounts, but future versions will be more flexible.
+/usr/lib.  This is intentional, and you should not undo these mounts
+unless you @emph{really} know what you are doing.  Currently,
+@code{setup.exe} creates only binary mounts, but future versions will be
+more flexible.
 
 You can let @code{setup.exe} download all the files for you on the fly.
 This is the 'internet' installation.  Or you can download all (or some)
@@ -148,13 +150,66 @@ to delete some things by hand.
 @subsection Adding or updating packages
 
 Later versions of @code{setup.exe} permit you to add and/or update
-packages to an existing cygwin installation.  For the time being, the
-procedure is sufficiently well described in these messages from the cygwin
-mailing list:
+packages to an existing cygwin installation.
 
-@itemize @bullet
-@item @file{http://sourceware.cygnus.com/ml/cygwin/2000-05/msg00433.html}
-@item @file{http://sourceware.cygnus.com/ml/cygwin/2000-05/msg00445.html}
-@end itemize
+To update your installation, create an empty directory, cd to it, and
+download the latest version of @code{setup.exe} from the @code{latest}
+directory at a Cygwin mirror near you.
 
+Once you've downloaded @code{setup.exe}, type
+@example
+	./setup <pkg>
+@end example
+where "<pkg>" is the name of the package you wish to update, such as
+"cygwin" or "gdb" or "make" or ...
+
+Answer the questions as you did when you first installed Cygwin.  This
+will update the package.  As with the initial installation, you can
+update from the (i)nternet or from the (d)irectory.  The latter requires
+that you download the @code{.tar.gz} file of the package ahead of time,
+along with @code{setup.exe}.
+
+If you are updating "cygwin", then you must close @strong{all} Cygwin
+applications (including @code{inetd}, for example), and run
+@code{setup.exe} from the Windows command prompt.
+
+If you supply the @code{-u} option to @code{setup.exe}, then
+@code{setup.exe} will only update the package if an older version is
+currently installed.  For example:
+@example
+	./setup -u gdb
+@end example
+However, if you currently have a development snapshot installed, setup
+may fail to update the package, because development snapshots have their
+version numbers "bumped" to the next release number.  In this case, you
+should not use @code{-u}.  Omitting @code{-u} forces @code{setup.exe} to
+perform the update, regardless of whether @code{setup.exe} deems it
+necessary.
+
+@subsection Problems running @code{setup.exe}
+
+@subsubsection Error message: "Unable to retrieve the list of cygwin mirrors..."
+
+This means that @code{setup.exe} could not make an http connection to
+@file{http://sourceware.cygnus.com/cygwin/mirrors.html}.  This is
+required for an (i)nternet install.  Either sourceware.cygnus.com was
+too busy, or there is a problem with your network.  Note that
+@code{setup.exe} has very limited proxy functionality for firewalls, and
+depends on IE4 or later being installed and configured properly.  If you
+cannot get the (i)nternet installation to work, just download the
+packages yourself and do a (d)irectory install.
+
+@subsubsection System hangs when unpacking tar archives
+
+Your anti-virus software is interfering with @code{setup.exe}.  You will
+have to disable it before running setup.  In that case, you will
+probably want to:
+
+@enumerate
+@item download all the .tar.gz files for the packages, along with @code{setup.exe}
+@item scan it all for viruses
+@item disable the anti-virus software
+@item perform a (d)irectory install
+@item scan everything below your Cygwin root directory (@code{C:\cygwin} by default)
+@end enumerate
 
