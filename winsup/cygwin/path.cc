@@ -184,8 +184,8 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
      in length so that we can hold the expanded symlink plus a
      trailer.  */
   char work_buf[MAX_PATH * 3 + 3];
-  char tmp_buf[MAX_PATH];
   char path_buf[MAX_PATH];
+  char path_copy[MAX_PATH];
 
   char *rel_path, *full_path;
 
@@ -237,7 +237,6 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 	}
 
       /* Make a copy of the path that we can munge up */
-      char path_copy[strlen (full_path) + 2];
       strcpy (path_copy, full_path);
 
       tail = path_copy + 1 + (tail - full_path);   // Point to end of copy
@@ -285,13 +284,6 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 		  fileattr = attr;
 		  if (follow_mode == SYMLINK_CONTENTS)
 		    goto out;
-		  else if (*sym_buf)
-		    {
-		      known_suffix = strchr (this->path, '\0');
-		      strcpy (known_suffix, sym_buf);
-		    }
-		  else if (known_suffix)
-		    known_suffix = this->path + (known_suffix - path_copy);
 		}
 	      goto out;	// file found
 	    }
@@ -302,16 +294,13 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 	     these operations again on the newly derived path. */
 	  else if (len > 0)
 	    {
-	      if (component == 0)
+	      if (component != 0 && follow_mode != SYMLINK_FOLLOW)
 		{
-		  if (follow_mode != SYMLINK_FOLLOW)
-		    {
-		      set_symlink (); // last component of path's a symlink.
-		      fileattr = attr;
-		      if (follow_mode == SYMLINK_CONTENTS)
-			  strcpy (path, sym_buf);
-		      goto out;
-		    }
+		  set_symlink (); // last component of path is a symlink.
+		  fileattr = attr;
+		  if (follow_mode == SYMLINK_CONTENTS)
+		      strcpy (path, sym_buf);
+		  goto found_symlink;
 		}
 	      break;
 	    }
@@ -362,6 +351,7 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 	system_printf ("problem parsing %s - '%s'", src, full_path);
       else
 	{
+	  char tmp_buf[MAX_PATH];
 	  int headlen = 1 + tail - path_copy;
 	  p = sym_buf - headlen;
 	  memcpy (p, path_copy, headlen);
@@ -373,6 +363,16 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 	  src = tmp_buf;
 	}
     }
+
+found_symlink:
+  if (*sym_buf)
+    {
+      known_suffix = strchr (this->path, '\0');
+      strcpy (known_suffix, sym_buf);
+    }
+  else if (known_suffix)
+    known_suffix = this->path + (known_suffix - path_copy);
+
 out:
   DWORD serial, volflags;
 

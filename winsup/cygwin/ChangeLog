@@ -1,3 +1,9 @@
+Wed Apr 12 18:48:33 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (path_conv::path_conv): Ensure that suffix is correctly
+	copied to path when we've found a symlink but aren't following
+	symlinks.
+
 Sat Apr  8 00:46:14 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.cc (fhandler_disk_file::fstat): Allocate enough space for
