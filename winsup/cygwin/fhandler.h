@@ -269,8 +269,23 @@ class fhandler_base
   void fork_fixup (HANDLE parent, HANDLE &h, const char *name);
 
   virtual int open (path_conv *real_path, int flags, mode_t mode = 0);
+  int open_fs (path_conv *real_path, int flags, mode_t mode = 0);
   virtual int close ();
+  int close_fs ();
   virtual int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+  int __stdcall fstat_fs (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+  int __stdcall fstat_helper (struct __stat64 *buf, path_conv *pc,
+			      FILETIME ftCreateionTime,
+			      FILETIME ftLastAccessTime,
+			      FILETIME ftLastWriteTime,
+			      DWORD nFileSizeHigh,
+			      DWORD nFileSizeLow,
+			      DWORD nFileIndexHigh = 0,
+			      DWORD nFileIndexLow = 0,
+			      DWORD nNumberOfLinks = 1)
+    __attribute__ ((regparm (3)));
+  int __stdcall fstat_by_handle (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
+  int __stdcall fstat_by_name (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const *ttyname () { return get_name(); }
@@ -304,6 +319,7 @@ class fhandler_base
   virtual int tcgetpgrp ();
   virtual int is_tty () { return 0; }
   virtual bool isdevice () { return true; }
+  virtual bool isfifo () { return false; }
   virtual char *ptsname () { return NULL;}
   virtual class fhandler_socket *is_socket () { return 0; }
   virtual class fhandler_console *is_console () { return 0; }
@@ -458,6 +474,7 @@ class fhandler_fifo: public fhandler_pipe
 public:
   fhandler_fifo ();
   int open (path_conv *, int flags, mode_t mode = 0);
+  bool isfifo () { return true; }
   bool is_slow () {return 1;}
 };
 
@@ -570,18 +587,6 @@ class fhandler_disk_file: public fhandler_base
   int lock (int, struct flock *);
   bool isdevice () { return false; }
   int __stdcall fstat (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
-  int __stdcall fstat_helper (struct __stat64 *buf, path_conv *pc,
-			      FILETIME ftCreateionTime,
-			      FILETIME ftLastAccessTime,
-			      FILETIME ftLastWriteTime,
-			      DWORD nFileSizeHigh,
-			      DWORD nFileSizeLow,
-			      DWORD nFileIndexHigh = 0,
-			      DWORD nFileIndexLow = 0,
-			      DWORD nNumberOfLinks = 1)
-    __attribute__ ((regparm (3)));
-  int __stdcall fstat_by_handle (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
-  int __stdcall fstat_by_name (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, __off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
