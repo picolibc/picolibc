@@ -1,3 +1,8 @@
+2003-08-17  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* grp.cc (read_group): Revert previous change.
+	* uinfo.cc (pwdgrp::load): Always reset curr_lines.
+
 2003-08-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (errmap): Map ERROR_INVALID_BLOCK_LENGTH to EIO.
