@@ -21,6 +21,7 @@ enum cygheap_types
   HEAP_ARCHETYPES,
   HEAP_TLS,
   HEAP_1_START,
+  HEAP_1_HOOK,
   HEAP_1_STR,
   HEAP_1_ARGV,
   HEAP_1_BUF,
@@ -262,6 +263,13 @@ struct user_heap_info
   unsigned chunk;
 };
 
+struct hook_chain
+{
+  void **loc;
+  const void *func;
+  struct hook_chain *next;
+};
+
 struct init_cygheap
 {
   _cmalloc_entry *chain;
@@ -291,6 +299,7 @@ struct init_cygheap
   int open_fhs;
   pid_t pid;			/* my pid */
   HANDLE pid_handle;		/* handle for my pid */
+  hook_chain hooks;
   void close_ctty ();
 };
 

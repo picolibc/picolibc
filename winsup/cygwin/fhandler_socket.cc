@@ -698,7 +698,9 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
   res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
 
-  if (res)
+  if (!res)
+    err = 0;
+  else
     {
       err = WSAGetLastError ();
       /* Special handling for connect to return the correct error code

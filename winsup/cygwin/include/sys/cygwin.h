@@ -49,6 +49,7 @@ struct __cygwin_perfile
 
 /* External interface stuff */
 
+/* Always add at the bottom.  Do not add new values in the middle. */
 typedef enum
   {
     CW_LOCK_PINFO,
@@ -78,7 +79,8 @@ typedef enum
     CW_GET_SHMLBA,
     CW_GET_UID_FROM_SID,
     CW_GET_GID_FROM_SID,
-    CW_GET_BINMODE
+    CW_GET_BINMODE,
+    CW_HOOK
   } cygwin_getinfo_types;
 
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */

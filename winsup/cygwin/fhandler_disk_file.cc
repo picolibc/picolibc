@@ -429,9 +429,9 @@ fhandler_disk_file::fchmod (mode_t mode)
 
   /* if the mode we want has any write bits set, we can't be read only. */
   if (mode & (S_IWUSR | S_IWGRP | S_IWOTH))
-    (DWORD) pc &= ~FILE_ATTRIBUTE_READONLY;
+    pc &= (DWORD) ~FILE_ATTRIBUTE_READONLY;
   else
-    (DWORD) pc |= FILE_ATTRIBUTE_READONLY;
+    pc |= (DWORD) FILE_ATTRIBUTE_READONLY;
 
   if (!SetFileAttributes (pc, pc))
     __seterrno ();

@@ -108,6 +108,8 @@ respawn_wow64_process ()
 
 extern void __stdcall dll_crt0_0 ();
 
+HMODULE NO_COPY cygwin_hmodule;
+
 extern "C" int WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
@@ -116,6 +118,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
   switch (reason)
     {
     case DLL_PROCESS_ATTACH:
+      cygwin_hmodule = (HMODULE) h;
       /* Is the stack at an unusual high address?  Check if we're running on
 	 a 64 bit machine.  If so, respawn. */
       if (&is_64bit_machine >= (PBOOL) 0x400000

@@ -1394,6 +1394,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 	SetHandleInformation ((HANDLE) si->exitsock, HANDLE_FLAG_INHERIT, 0);
       /* else
 	   too bad? */
+      select_printf ("opened new socket %p", _my_tls.locals.exitsock);
     }
 
   select_printf ("exitsock %p", si->exitsock);

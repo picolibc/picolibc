@@ -1,3 +1,25 @@
+2005-03-22  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.in (DLL_OFILES): Add hookapi.o.  Eliminate some cruft.
+	* cygheap.h (cygheap_types): Add new enum: HEAP_1_HOOK.
+	(hook_chain): New struct.
+	(init_cygheap::hooks): Define new element.
+	* cygheap.cc (cygheap_fixup_in_child): Zero hook chain on exec.
+	* dcrt0.cc (dll_crt0_1): Call ld_preload just before calling main function.
+	* external.cc (cygwin_internal): Implement CW_HOOK.
+	* fork.cc (fork_child): Call fixup_hooks_after_fork.
+	* init.cc (cygwin_hmodule): Reinstate after a long absence.
+	* include/sys/cygwin.h: Define CW_HOOK.
+	* hookapi.cc: New file.
+
+	* select.cc (start_thread_socket): Add debugging output.
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): gcc 4.x
+	accommodation.
+
+	* fhandler_socket.cc (fhandler_socket::connect): Make sure that err is
+	initialized.
+
 2005-03-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (__ctype_ptr): Export.

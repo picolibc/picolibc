@@ -154,6 +154,7 @@ sync_with_parent (const char *s, bool hang_self)
 static int __stdcall
 fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 {
+  extern void fixup_hooks_after_fork ();
   extern void fixup_timers_after_fork ();
   debug_printf ("child is running.  pid %d, ppid %d, stack here %p",
 		myself->pid, myself->ppid, __builtin_frame_address (0));
@@ -232,6 +233,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   pthread::atforkchild ();
   fixup_timers_after_fork ();
+  fixup_hooks_after_fork ();
   cygbench ("fork-child");
   cygwin_finished_initializing = true;
   return 0;

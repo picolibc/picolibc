@@ -28,6 +28,8 @@ details. */
 #include "pwdgrp.h"
 #include "cygtls.h"
 
+void *hook_cygwin (const char *, const void *);
+
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)
 {
@@ -297,6 +299,12 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	      return (unsigned long) -1;
 	    }
 	  return p.binmode ();
+	}
+      case CW_HOOK:
+	{
+	  const char *name = va_arg (arg, const char *);
+	  const void *hookfn = va_arg (arg, const void *);
+	  return (unsigned long) hook_cygwin (name, hookfn);
 	}
       default:
 	return (DWORD) -1;

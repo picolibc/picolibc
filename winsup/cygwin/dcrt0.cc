@@ -41,6 +41,8 @@ details. */
 
 #define PREMAIN_LEN (sizeof (user_data->premain) / sizeof (user_data->premain[0]))
 
+void ld_preload ();
+
 HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
 
@@ -857,6 +859,7 @@ dll_crt0_1 (char *)
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
   wait_for_sigthread ();
+  ld_preload ();
   if (user_data->main)
     exit (user_data->main (__argc, __argv, *user_data->envptr));
 }

@@ -21,7 +21,6 @@
 #include "child_info.h"
 #include "heap.h"
 #include "sync.h"
-#include "shared_info.h"
 #include "sigproc.h"
 
 init_cygheap NO_COPY *cygheap;
@@ -185,6 +184,7 @@ cygheap_fixup_in_child (bool execed)
 
   if (execed)
     {
+      cygheap->hooks.next = NULL;
       cygheap->user_heap.base = NULL;		/* We can allocate the heap anywhere */
       /* Walk the allocated memory chain looking for orphaned memory from
 	 previous execs */
