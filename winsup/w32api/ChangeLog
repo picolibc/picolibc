@@ -1,3 +1,8 @@
+2003-09-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (UpdateLayeredWindow): Protect against NOGDI.
+	Thanks to Will Levine  <willll@users.sourceforge.net>
+
 2003-09-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ws2spi.h (LPWSPBIND): Change CONST LPSOCKADDR to

@@ -3416,7 +3416,9 @@ BOOL WINAPI LockSetForegroundWindow(UINT);
 #endif
 #if(_WIN32_WINNT >= 0x0500)
 BOOL WINAPI SetLayeredWindowAttributes(HWND,COLORREF,BYTE,DWORD);
+#ifndef NOGDI
 BOOL WINAPI UpdateLayeredWindow(HWND,HDC,POINT*,SIZE*,HDC,POINT*,COLORREF,BLENDFUNCTION*,DWORD);
+#endif
 #endif
 #if(_WIN32_WINNT >= 0x0501)
 BOOL WINAPI GetLayeredWindowAttributes(HWND,COLORREF*,BYTE*,DWORD*);
