@@ -1,3 +1,11 @@
+2003-05-30  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (init_cheap): Temporarily remove inline that newer gcc's
+	have problems with.
+
+	* path.cc (path_conv::check): Rework has_acls logic slightly.  Uncouple
+	exec tests away from filesystem tests.
+
 2003-05-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/param.h: Add DEV_BSIZE.

@@ -608,9 +608,8 @@ sig_handle_tty_stop (int sig)
 
   myself->stopsig = sig;
   /* See if we have a living parent.  If so, send it a special signal.
-   * It will figure out exactly which pid has stopped by scanning
-   * its list of subprocesses.
-   */
+     It will figure out exactly which pid has stopped by scanning
+     its list of subprocesses.  */
   if (my_parent_is_alive ())
     {
       pinfo parent (myself->ppid);

@@ -782,32 +782,32 @@ out:
       if (!fs.update (path))
 	{
 	  fs.root_dir[0] = '\0';
-	  set_has_acls (false);
-	  set_has_buggy_open (false);
+	  set_has_acls (false);		// already implied but...
+	  set_has_buggy_open (false);	// ditto
 	}
       else
 	{
 	  set_isdisk ();
 	  debug_printf ("root_dir(%s), this->path(%s), set_has_acls(%d)",
 			fs.root_dir, this->path, fs.flags & FS_PERSISTENT_ACLS);
-	  if (!allow_smbntsec && fs.is_remote_drive)
+	  if (!(fs.flags & FS_PERSISTENT_ACLS) || (!allow_smbntsec && fs.is_remote_drive))
 	    set_has_acls (false);
 	  else
 	    {
-	      set_has_acls (fs.flags & FS_PERSISTENT_ACLS);
-	      if (exec_state () != dont_know_if_executable)
-		/* ok */;
-	      else if (isdir ())
-		set_exec (1);
-	      else if (issymlink () || issocket ()
-		       || allow_ntsec && wincap.has_security ())
+	      set_has_acls (true);
+	      if (allow_ntsec && wincap.has_security ())
 		set_exec (0);
-
 	    }
 	  /* Known file systems with buggy open calls. Further explanation
 	     in fhandler.cc (fhandler_disk_file::open). */
 	  set_has_buggy_open (strcmp (fs.name, "SUNWNFS") == 0);
 	}
+      if (exec_state () != dont_know_if_executable)
+	/* ok */;
+      else if (isdir ())
+	set_exec (1);
+      else if (issymlink () || issocket ())
+	set_exec (0);
     }
   if (issocket ())
     devn = FH_SOCKET;
