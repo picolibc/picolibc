@@ -29,6 +29,7 @@ LIB_SOURCES = \
 	gethostname.c \
 	getoptlong.c \
 	getreent.c \
+	getrlimit64.c \
 	ids.c \
 	inode.c \
 	io.c \
@@ -73,6 +74,7 @@ LIB_SOURCES = \
 	select.c \
 	seteuid.c \
 	sethostname.c \
+	setrlimit64.c \
 	shm_open.c \
 	shm_unlink.c \
 	sig.c \

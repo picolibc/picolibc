@@ -7,6 +7,6 @@
 #define _SYS_RESOURCE_H
 
 #include <sys/types.h>
-#include <linux/resource.h>
+#include <bits/resource.h>
 
 #endif

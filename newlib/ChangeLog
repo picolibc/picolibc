@@ -1,3 +1,16 @@
+2002-07-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/sys/config.h[__i386__][__linux__]: Define
+        _LARGE64FILE_SOURCE to 1.
+        * libc/sys/linux/Makefile.am: Add getrlimit64.c and setrlimit64.c.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/resource.c: Add __getrlimit and __setrlimit aliases.
+        * libc/sys/linux/sys/linux_time.h: Protect struct timeval definition.
+        * libc/sys/linux/sys/resource.h: Include <bits/resource.h> instead
+        of <linux/resource.h>.
+        * libc/sys/linux/getrlimit64.c: New file.
+        * libc/sys/linux/setrlimit64.c: Ditto.
+
 2002-07-19  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/argz/argz_replace.c: Include buf_findstr.h.

@@ -46,10 +46,13 @@ jiffies_to_timespec(unsigned long jiffies, struct timespec *value)
 	value->tv_sec = jiffies / HZ;
 }
  
+#ifndef _STRUCT_TIMEVAL
+#define _STRUCT_TIMEVAL
 struct timeval {
 	time_t		tv_sec;		/* seconds */
 	suseconds_t	tv_usec;	/* microseconds */
 };
+#endif
 
 struct timezone {
 	int	tz_minuteswest;	/* minutes west of Greenwich */

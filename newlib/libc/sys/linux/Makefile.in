@@ -126,6 +126,7 @@ LIB_SOURCES = \
 	gethostname.c \
 	getoptlong.c \
 	getreent.c \
+	getrlimit64.c \
 	ids.c \
 	inode.c \
 	io.c \
@@ -170,6 +171,7 @@ LIB_SOURCES = \
 	select.c \
 	seteuid.c \
 	sethostname.c \
+	setrlimit64.c \
 	shm_open.c \
 	shm_unlink.c \
 	sig.c \
@@ -242,9 +244,10 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@ftok.$(OBJEXT) funlockfile.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@getdate.$(OBJEXT) getdate_err.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@gethostname.$(OBJEXT) getoptlong.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@getreent.$(OBJEXT) ids.$(OBJEXT) inode.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@io.$(OBJEXT) io64.$(OBJEXT) ipc.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@linux.$(OBJEXT) malign.$(OBJEXT) malignr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getreent.$(OBJEXT) getrlimit64.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ids.$(OBJEXT) inode.$(OBJEXT) io.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@io64.$(OBJEXT) ipc.$(OBJEXT) linux.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@malign.$(OBJEXT) malignr.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@mallinfor.$(OBJEXT) mallocr.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@malloptr.$(OBJEXT) mallstatsr.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@mmap.$(OBJEXT) mq_close.$(OBJEXT) \
@@ -261,8 +264,9 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@realpath.$(OBJEXT) rename.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@resource.$(OBJEXT) sched.$(OBJEXT) select.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@seteuid.$(OBJEXT) sethostname.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@shm_open.$(OBJEXT) shm_unlink.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sig.$(OBJEXT) sigaction.$(OBJEXT) sigqueue.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@setrlimit64.$(OBJEXT) shm_open.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@shm_unlink.$(OBJEXT) sig.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sigaction.$(OBJEXT) sigqueue.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@signal.$(OBJEXT) siglongjmp.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sigset.$(OBJEXT) sigwait.$(OBJEXT) socket.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sleep.$(OBJEXT) stack.$(OBJEXT) strsignal.$(OBJEXT) \
@@ -278,21 +282,23 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@clock_gettime.lo clock_settime.lo flockfile.lo \
 @USE_LIBTOOL_TRUE@free.lo freer.lo ftok.lo funlockfile.lo getdate.lo \
 @USE_LIBTOOL_TRUE@getdate_err.lo gethostname.lo getoptlong.lo \
-@USE_LIBTOOL_TRUE@getreent.lo ids.lo inode.lo io.lo io64.lo ipc.lo \
-@USE_LIBTOOL_TRUE@linux.lo malign.lo malignr.lo mallinfor.lo mallocr.lo \
-@USE_LIBTOOL_TRUE@malloptr.lo mallstatsr.lo mmap.lo mq_close.lo \
-@USE_LIBTOOL_TRUE@mq_getattr.lo mq_notify.lo mq_open.lo mq_receive.lo \
-@USE_LIBTOOL_TRUE@mq_send.lo mq_setattr.lo mq_unlink.lo msize.lo \
-@USE_LIBTOOL_TRUE@msizer.lo mstats.lo mtrim.lo mtrimr.lo ntp_gettime.lo \
-@USE_LIBTOOL_TRUE@pread.lo pread64.lo process.lo psignal.lo pvallocr.lo \
-@USE_LIBTOOL_TRUE@pwrite.lo pwrite64.lo raise.lo realloc.lo reallocr.lo \
+@USE_LIBTOOL_TRUE@getreent.lo getrlimit64.lo ids.lo inode.lo io.lo \
+@USE_LIBTOOL_TRUE@io64.lo ipc.lo linux.lo malign.lo malignr.lo \
+@USE_LIBTOOL_TRUE@mallinfor.lo mallocr.lo malloptr.lo mallstatsr.lo \
+@USE_LIBTOOL_TRUE@mmap.lo mq_close.lo mq_getattr.lo mq_notify.lo \
+@USE_LIBTOOL_TRUE@mq_open.lo mq_receive.lo mq_send.lo mq_setattr.lo \
+@USE_LIBTOOL_TRUE@mq_unlink.lo msize.lo msizer.lo mstats.lo mtrim.lo \
+@USE_LIBTOOL_TRUE@mtrimr.lo ntp_gettime.lo pread.lo pread64.lo \
+@USE_LIBTOOL_TRUE@process.lo psignal.lo pvallocr.lo pwrite.lo \
+@USE_LIBTOOL_TRUE@pwrite64.lo raise.lo realloc.lo reallocr.lo \
 @USE_LIBTOOL_TRUE@realpath.lo rename.lo resource.lo sched.lo select.lo \
-@USE_LIBTOOL_TRUE@seteuid.lo sethostname.lo shm_open.lo shm_unlink.lo \
-@USE_LIBTOOL_TRUE@sig.lo sigaction.lo sigqueue.lo signal.lo \
-@USE_LIBTOOL_TRUE@siglongjmp.lo sigset.lo sigwait.lo socket.lo sleep.lo \
-@USE_LIBTOOL_TRUE@stack.lo strsignal.lo sysconf.lo sysctl.lo systat.lo \
-@USE_LIBTOOL_TRUE@system.lo tcdrain.lo tcsendbrk.lo termios.lo time.lo \
-@USE_LIBTOOL_TRUE@usleep.lo utimes.lo vallocr.lo wait.lo
+@USE_LIBTOOL_TRUE@seteuid.lo sethostname.lo setrlimit64.lo shm_open.lo \
+@USE_LIBTOOL_TRUE@shm_unlink.lo sig.lo sigaction.lo sigqueue.lo \
+@USE_LIBTOOL_TRUE@signal.lo siglongjmp.lo sigset.lo sigwait.lo \
+@USE_LIBTOOL_TRUE@socket.lo sleep.lo stack.lo strsignal.lo sysconf.lo \
+@USE_LIBTOOL_TRUE@sysctl.lo systat.lo system.lo tcdrain.lo tcsendbrk.lo \
+@USE_LIBTOOL_TRUE@termios.lo time.lo usleep.lo utimes.lo vallocr.lo \
+@USE_LIBTOOL_TRUE@wait.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
