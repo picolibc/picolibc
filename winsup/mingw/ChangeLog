@@ -1,3 +1,8 @@
+2004-09-08  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/sys/stat.h (_S_ISLNK): Add definition.
+	(S_ISLNG): Ditto.
+
 2004-09-05  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/_mingw.h: Increment minor version for 3.5 release.

@@ -48,6 +48,7 @@
 #define	_S_ISCHR(m)	(((m) & _S_IFMT) == _S_IFCHR)
 #define	_S_ISBLK(m)	(((m) & _S_IFMT) == _S_IFBLK)
 #define	_S_ISREG(m)	(((m) & _S_IFMT) == _S_IFREG)
+#define _S_ISLNK(m)	(false)
 
 #ifndef _NO_OLDNAMES
 
@@ -70,6 +71,7 @@
 #define	S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)
 #define	S_ISBLK(m)	(((m) & S_IFMT) == S_IFBLK)
 #define	S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
+#define S_ISLNK(m)	(false)
 
 #endif	/* Not _NO_OLDNAMES */
 
