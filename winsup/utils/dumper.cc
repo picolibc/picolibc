@@ -1,6 +1,6 @@
 /* dumper.cc
 
-   Copyright 1999,2001 Red Hat Inc.
+   Copyright 1999, 2001, 2002 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -35,6 +35,8 @@ typedef struct _note_header
 __attribute__ ((packed))
 #endif
   note_header;
+
+static const char version[] = "$Revision$";
 
 BOOL verbose = FALSE;
 
@@ -770,14 +772,46 @@ dumper::write_core_dump ()
 }
 
 static void
-usage ()
+usage (FILE *stream, int status)
 {
-  fprintf (stderr, "Usage: dumper [options] filename pid\n");
-  fprintf (stderr, "filename -- dump core to filename.core\n");
-  fprintf (stderr, "pid      -- win32-pid of process to dump\n\n");
-  fprintf (stderr, "Possible options are:\n");
-  fprintf (stderr, "-d       -- be verbose while dumping\n");
-  fprintf (stderr, "-q       -- be quite while dumping (default)\n");
+  fprintf (stream, "\
+Usage: dumper [OPTION] FILENAME WIN32PID\n\
+Dump core from WIN32PID to FILENAME.core\n\
+ -d, --verbose  be verbose while dumping\n\
+ -h, --help     output help information and exit\n\
+ -q, --quiet    be quiet while dumping (default)\n\
+ -v, --version  output version information and exit\n\
+");
+  exit (status);
+}
+
+struct option longopts[] = {
+  {"verbose", no_argument, NULL, 'd'},
+  {"help", no_argument, NULL, 'h'},
+  {"quiet", no_argument, NULL, 'q'},
+  {"version", no_argument, 0, 'v'},
+  {0, no_argument, NULL, 0}
+};
+
+static void 
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+dumper (cygwin) %.*s\n\
+Core Dumper for Cygwin\n\
+Copyright 1999, 2001, 2002 Red Hat, Inc.\n", len, v);
 }
 
 int
@@ -788,7 +822,7 @@ main (int argc, char **argv)
   DWORD pid;
   char win32_name [MAX_PATH];
 
-  while ((opt = getopt (argc, argv, "dq")) != EOF)
+  while ((opt = getopt_long (argc, argv, "dqhv", longopts, NULL) ) != EOF)
     switch (opt)
       {
       case 'd':
@@ -797,8 +831,13 @@ main (int argc, char **argv)
       case 'q':
 	verbose = FALSE;
 	break;
+      case 'h':
+	usage (stdout, 0);
+      case 'v':
+       print_version ();
+       exit (0);
       default:
-	usage ();
+	usage (stderr, 1);
 	break;
       }
 
@@ -814,7 +853,7 @@ main (int argc, char **argv)
     }
   else
     {
-      usage ();
+      usage (stderr, 1);
       return -1;
     }
 
