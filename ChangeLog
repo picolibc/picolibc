@@ -1,5 +1,13 @@
 2002-10-02  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* Bring following over from gcc:
+
+2002-09-30  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* configure.in (s390*-*-linux*): Enable libgcj.
+
+2002-10-02  Nathanael Nerode  <neroden@gcc.gnu.org>
+
 	* Makefile.in: Regenerate.  This really ought to fix things. :sigh:
 
 2002-10-02  Alan Modra  <amodra@bigpond.net.au>
