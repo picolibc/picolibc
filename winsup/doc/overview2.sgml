@@ -1,22 +1,85 @@
-<sect1 id="ov-ex-unix"><title>Expectations for UNIX Programmers</title>
+<sect1 id="ov-ex-win">
+<title>Quick Start Guide for those more experienced with Windows</title>
+<para>
+If you are new to the world of UNIX, you may find it difficult to
+understand at first. This guide is not meant to be comprehensive,
+so we recommend that you use the many available Internet resources
+to become acquainted with UNIX basics (search for "UNIX basics" or
+"UNIX tutorial"). 
+</para>
+<para>
+To install a basic Cygwin environment, run the
+<command>setup.exe</command> program and click <literal>Next</literal>
+at each page.  The default settings are correct for most users. If you
+want to know more about what each option means, see 
+<Xref Linkend="internet-setup">. Use <command>setup.exe</command>
+any time you want to update or install a Cygwin package.  If you are
+installing Cygwin for a specific purpose, use it to install the tools
+that you need. For example, if you want to compile C++ programs, you 
+need the <systemitem>gcc-g++</systemitem> package and probably a text
+editor like <systemitem>nano</systemitem>.  When running
+<command>setup.exe</command>, clicking on categories and packages in the
+package installation screen will provide you with the ability to control
+what is installed or updated. 
+</para>
+<para>
+Another option is to install everything by clicking on the
+<literal>Default</literal> field next to the <literal>All</literal>
+category. However, be advised that this will download and install
+several hundreds of megabytes of software to your computer. The best
+plan is probably to click on individual categories and install either
+entire categories or packages from the categories themselves.
+</para>
+<para>
+Developers coming from a Windows background will find a set of tools capable of
+writing console or GUI executables that rely on the Microsoft Win32 API.  The
+<command>dlltool</command> utility may be used to write Windows Dynamically
+Linked Libraries (DLLs).  The resource compiler <command>windres</command> is
+also provided.  All tools may be used from the Microsoft command prompt,
+with full support for normal Windows pathnames.
+</para>
+</sect1>
 
-<para>Developers coming from a UNIX background will find a set of utilities
+<sect1 id="ov-ex-unix">
+<title>Quick Start Guide for those more experienced with UNIX</title>
+<para>
+If you are an experienced UNIX user who misses a powerful command-line
+environment, you will enjoy Cygwin. Note that there are some workarounds
+that cause Cygwin to behave differently than most UNIX-like operating
+systems; these are described in more detail in 
+<xref linkend="using-effectively">.
+</para>
+<para>
+Any time you want to update or install a Cygwin package, use the
+graphical <command>setup.exe</command> program. By default,
+<command>setup.exe</command> only installs a minimal set of packages, 
+so look around and choose your favorite utilities on the package
+selection screen. You may also search for specfic tools on the Cygwin
+website's <ulink URL="http://cygwin.com/packages/">Setup Package
+Search</ulink> For more information about what each option in
+<command>setup.exe</command> means, see <xref linkend="internet-setup">. 
+</para>
+<para>
+Another option is to install everything by clicking on the
+<literal>Default</literal> field next to the <literal>All</literal>
+category. However, be advised that this will download and install
+several hundreds of megabytes of software to your computer. The best
+plan is probably to click on individual categories and install either
+entire categories or packages from the categories themselves.
+</para>
+<para>
+Developers coming from a UNIX background will find a set of utilities
 they are already comfortable using, including a working UNIX shell.  The
 compiler tools are the standard GNU compilers most people will have previously
 used under UNIX, only ported to the Windows host.  Programmers wishing to port
 UNIX software to Windows NT or 9x will find that the Cygwin library provides
 an easy way to port many UNIX packages, with only minimal source code
-changes.</para>
+changes.
+</para>
+
 </sect1>
 
-<sect1 id="ov-ex-win"><title>Expectations for Windows Programmers</title>
-<para>Developers coming from a Windows background will find a set of tools capable
-of writing console or GUI executables that rely on the Microsoft Win32 API.
-The linker and dlltool utility may be used to write Windows Dynamically Linked
-Libraries (DLLs).  The resource compiler "windres" is also provided with the
-native Windows GNUPro tools.  All tools may be used from the Microsoft command
-line prompt, with full support for normal Windows pathnames.</para>
-</sect1>
+<sect1 id="highlights"><title>Highlights of Cygwin Functionality</title>
 
 <sect2 id="ov-hi-intro"><title>Introduction</title> <para>When a binary linked
 against the library is executed, the Cygwin DLL is loaded into the
@@ -318,3 +381,5 @@ thread to wake up.  This case is now the same as the first one since
 we know at least one descriptor is ready.  So select returns, after
 polling all of the file descriptors one last time.</para>
 </sect2>
+</sect1>
+

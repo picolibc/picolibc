@@ -1,6 +1,7 @@
 <chapter id="setup-net"><title>Setting Up Cygwin</title>
 
-<sect1><title>Internet Setup</title>
+<sect1 id="internet-setup">
+<title>Internet Setup</title>
 <para>To install the Cygwin net release, go to <ulink
 URL="http://cygwin.com/">http://cygwin.com/</ulink> and click on <ulink
 URL="http://cygwin.com/setup.exe">"Install Cygwin Now!"</ulink>.  This will

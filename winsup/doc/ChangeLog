@@ -1,3 +1,11 @@
+2004-01-15  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* setup-net.sgml: Add "internet-setup" id anchor.
+	* overview.sgml: Update "What is it?" section. Add links to
+	"Is it free software?" section. Update "Brief History" section.
+	* overview2.sgml: Rewrite "Expectations for {Windows,Unix}"
+	as "Quick Start for those more experienced with {Windows,Unix}".
+
 2004-01-11  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* Makefile.in: Add new target for single-file User's Guide, use new

@@ -2,32 +2,43 @@
 
 <sect1 id="what-is-it"><title>What is it?</title>
 
-<para>The Cygwin tools are ports of the popular GNU development
-tools and utilities for Windows NT and 9x. They function through the
-use of the Cygwin library which provides the UNIX system calls and
-environment that these programs require.</para>
-
-<para>With the tools installed, programmers may write Win32
-console or GUI applications that make use of the standard Microsoft
-Win32 API and/or the Cygwin API. As a result, it is possible to
-easily port many significant UNIX programs without the need for
-extensive changes to the source code.  This includes configuring and
-building most of the available GNU software (including the development
-tools included with the Cygwin distributions). Even if the
-compiler tools are of little to no use to you, you may have
-interest in the many standard UNIX utilities. They can be used both
-from the bash shell (provided) or from the command.com.</para>
-
+<para>
+Cygwin is a Linux-like environment for Windows. It consists of a DLL
+(<filename>cygwin1.dll</filename>), which acts as an emulation layer
+providing substantial <ulink
+URL="http://www.pasc.org/#POSIX">POSIX</ulink> (Portable Operating
+System Interface) system call functionality, and a collection of tools,
+which provide a Linux look and feel. The Cygwin DLL works with all x86
+versions of Windows since Windows 95.
+</para>
+<para>
+With Cygwin installed, users have access to many standard UNIX
+utilities.  They can be used from one of the provided shells such
+as <command>bash</command> or from the Windows Command Prompt.
+Additionally, programmers may write Win32 console or GUI applications
+that make use of the standard Microsoft Win32 API and/or the Cygwin API.
+As a result, it is possible to easily port many significant UNIX
+programs without the need for extensive changes to the source code.
+This includes configuring and building most of the available GNU
+software (including the development tools included with the Cygwin
+distribution). 
+</para>
 </sect1>
+
+DOCTOOL-INSERT-ov-ex-win
+DOCTOOL-INSERT-ov-ex-unix
 
 <sect1 id="are-free"><title>Are the Cygwin tools free software?</title>
 
-<para>Yes. Parts are GNU software (gcc, gas, ld, etc...), parts are
-covered by the standard X11 license, some of it is public domain,
-some of it was written by Red Hat and placed under the GPL. None of it
-is shareware. You don't have to pay anyone to use it but you should be
-sure to read the copyright section of the FAQ for more information on
-how the GNU General Public License may affect your use of these
+<para>Yes. Parts are <ulink URL="http://www.gnu.org/">GNU</ulink> software 
+(<command>gcc</command>, <command>gas</command>, <command>ld</command>, etc.),
+parts are covered by the standard 
+<ulink URL="http://www.x.org/Downloads_terms.html">X11 license</ulink>, 
+some of it is public domain, some of it was written by Red Hat and placed under
+the <ulink URL="http://www.gnu.org/licenses/gpl.html">GNU General Public 
+License</ulink> (GPL). None of it is shareware. You don't have to pay anyone to
+use it but you should be sure to read the copyright section of the FAQ for more
+information on how the GNU GPL may affect your use of these
 tools. If you intend to port a proprietary application using the Cygwin
 library, you may want the Cygwin proprietary-use license.
 For more information about the proprietary-use license, please go to
@@ -41,20 +52,33 @@ questions should be sent to the project mailing list
 
 <sect1 id="brief-history"><title>A brief history of the Cygwin project</title>
 
-<para>The first thing done was to enhance the development tools (gcc,
-gdb, gas, et al) so that they could generate/interpret Win32 native
-object files.</para>
-
-<para>The next task was to port the tools to Win NT/9x. We could have
+<note>
+<para>
+A more complete historical look Cygwin is Geoffrey J. Noer's 1998 paper,
+"Cygwin32: A Free Win32 Porting Layer for UNIX® Applications" which can be
+found at the <ulink
+URL="http://www.usenix.org/publications/library/proceedings/usenix-nt98/technical.html">
+2nd USENIX Windows NT Symposium Online Proceedings</ulink>.
+</para>
+</note>
+<para>
+Cygwin began development in 1995 at Cygnus Solutions (now part of Red Hat
+Software).  The first thing done was to enhance the development tools 
+(<command>gcc</command>, <command>gdb</command>, <command>gas</command>, 
+etc.) so that they could generate and interpret Win32 native
+object files.
+The next task was to port the tools to Win NT/9x. We could have
 done this by rewriting large portions of the source to work within the
 context of the Win32 API. But this would have meant spending a huge
 amount of time on each and every tool. Instead, we took a
 substantially different approach by writing a shared library
 (the Cygwin DLL) that adds the necessary UNIX-like functionality
-missing from the Win32 API (fork, spawn, signals, select, sockets,
-etc.).  We call this new interface the Cygwin API. Once written, it
-was possible to build working Win32 tools using UNIX-hosted
-cross-compilers, linking against this library.</para>
+missing from the Win32 API (<function>fork</function>,
+<function>spawn</function>, <function>signals</function>,
+<function>select</function>, <function>sockets</function>, etc.).  We call this
+new interface the Cygwin API. Once written, it was possible to build working
+Win32 tools using UNIX-hosted cross-compilers, linking against this
+library.</para>
 
 <para>From this point, we pursued the goal of producing native tools
 capable of rebuilding themselves under Windows 9x and NT (this is
@@ -67,22 +91,19 @@ configuration changes, very few source-level changes had to be
 made. Running bash with the development tools and user tools in place,
 Windows 9x and NT look like a flavor of UNIX from the perspective of
 the GNU configure mechanism. Self hosting was achieved as of the beta
-17.1 release.</para>
+17.1 release in October 1996.</para>
 
+<para>
+The entire Cygwin toolset was available as a monolithic install. In
+April 2000, the project announced a
+<ulink URL="http://www.cygwin.com/ml/cygwin/2000-04/msg00269.html">
+New Cygwin Net Release</ulink> which provided the native Win32 program
+<command>setup.exe</command> to install and upgrade each package
+separately. Since then, the Cygwin DLL and <command>setup.exe</command> 
+have seen continuous development.
+</para>
 </sect1>
 
-DOCTOOL-INSERT-ov-ex-unix
-DOCTOOL-INSERT-ov-ex-win
-<sect1 id="highlights"><title>Highlights of Cygwin Functionality</title>
-DOCTOOL-INSERT-ov-hi-intro
-DOCTOOL-INSERT-ov-hi-win9xnt
-DOCTOOL-INSERT-ov-hi-perm
-DOCTOOL-INSERT-ov-hi-files
-DOCTOOL-INSERT-ov-hi-textvsbinary
-DOCTOOL-INSERT-ov-hi-ansiclib
-DOCTOOL-INSERT-ov-hi-process
-DOCTOOL-INSERT-ov-hi-signals
-DOCTOOL-INSERT-ov-hi-sockets
-DOCTOOL-INSERT-ov-hi-select
-</sect1>
+DOCTOOL-INSERT-highlights
+
 </chapter>
