@@ -21,7 +21,7 @@ PORTABILITY
 <<swab>> requires no supporting OS subroutines.
 */
 
-#include <string.h>
+#include <unistd.h>
 
 void
 _DEFUN (swab, (b1, b2, length),
