@@ -251,8 +251,6 @@ load_registry_hive (const char * name)
       RegCloseKey (hkey);
       return;
     }
-  /* This is only called while deimpersonated */
-  set_process_privilege (SE_RESTORE_NAME);
   if (get_registry_hive_path (name, path))
     {
       if (wincap.is_winnt ())

@@ -409,7 +409,6 @@ fhandler_disk_file::fchmod (mode_t mode)
 
   if (wincap.has_security ())
     {
-      enable_restore_privilege ();
       if (!get_io_handle () && pc.has_acls ())
 	{
 	  query_open (query_write_control);
@@ -461,7 +460,6 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
       return 0;
     }
 
-  enable_restore_privilege ();
   if (!get_io_handle ())
     {
       query_open (query_write_control);
@@ -548,8 +546,6 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
     }
   else
     {
-      if (cmd == SETACL)
-	enable_restore_privilege ();
       if (!get_io_handle ())
 	{
 	  query_open (cmd == SETACL ? query_write_control : query_read_control);

@@ -124,6 +124,9 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
       || (void *) func == (void *) cygthread::simplestub)
     return;
 
+  if (wincap.has_security ())
+    cygheap->user.reimpersonate ();
+
   sentry here (INFINITE);
   if (nthreads >= cygheap->sthreads)
     {

@@ -45,6 +45,7 @@ bool allow_ntsec;
    It's defined here because of it's strong relationship to allow_ntsec.
    The default is TRUE to reflect the old behaviour. */
 bool allow_smbntsec;
+bool allow_traverse;
 
 cygsid *
 cygsidlist::alloc_sids (int n)
@@ -593,36 +594,44 @@ get_setgroups_sidlist (cygsidlist &tmp_list, PTOKEN_GROUPS my_grps,
     tmp_list += pgpsid;
 }
 
-static const char *sys_privs[] = {
-  SE_TCB_NAME,
-  SE_ASSIGNPRIMARYTOKEN_NAME,
-  SE_CREATE_TOKEN_NAME,
-  SE_CHANGE_NOTIFY_NAME,
-  SE_SECURITY_NAME,
-  SE_BACKUP_NAME,
-  SE_RESTORE_NAME,
-  SE_SYSTEMTIME_NAME,
-  SE_SHUTDOWN_NAME,
-  SE_REMOTE_SHUTDOWN_NAME,
-  SE_TAKE_OWNERSHIP_NAME,
-  SE_DEBUG_NAME,
-  SE_SYSTEM_ENVIRONMENT_NAME,
-  SE_SYSTEM_PROFILE_NAME,
-  SE_PROF_SINGLE_PROCESS_NAME,
-  SE_INC_BASE_PRIORITY_NAME,
-  SE_LOAD_DRIVER_NAME,
-  SE_CREATE_PAGEFILE_NAME,
-  SE_INCREASE_QUOTA_NAME
+static const cygpriv_idx sys_privs[] = {
+  SE_TCB_PRIV,
+  SE_ASSIGNPRIMARYTOKEN_PRIV,
+  SE_CREATE_TOKEN_PRIV,
+  SE_CHANGE_NOTIFY_PRIV,
+  SE_SECURITY_PRIV,
+  SE_BACKUP_PRIV,
+  SE_RESTORE_PRIV,
+  SE_SYSTEMTIME_PRIV,
+  SE_SHUTDOWN_PRIV,
+  SE_REMOTE_SHUTDOWN_PRIV,
+  SE_TAKE_OWNERSHIP_PRIV,
+  SE_DEBUG_PRIV,
+  SE_SYSTEM_ENVIRONMENT_PRIV,
+  SE_SYSTEM_PROFILE_PRIV,
+  SE_PROF_SINGLE_PROCESS_PRIV,
+  SE_INC_BASE_PRIORITY_PRIV,
+  SE_LOAD_DRIVER_PRIV,
+  SE_CREATE_PAGEFILE_PRIV,
+  SE_INCREASE_QUOTA_PRIV,
+  SE_LOCK_MEMORY_PRIV,
+  SE_CREATE_PERMANENT_PRIV,
+  SE_AUDIT_PRIV,
+  SE_UNDOCK_PRIV,
+  SE_MANAGE_VOLUME_PRIV,
+  SE_IMPERSONATE_PRIV,
+  SE_CREATE_GLOBAL_PRIV
 };
 
-#define SYSTEM_PERMISSION_COUNT (sizeof sys_privs / sizeof (const char *))
+#define SYSTEM_PRIVILEGES_COUNT (sizeof sys_privs / sizeof *sys_privs)
 
 PTOKEN_PRIVILEGES
 get_system_priv_list (cygsidlist &grp_list)
 {
-  LUID priv;
+  const LUID *priv;
   PTOKEN_PRIVILEGES privs = (PTOKEN_PRIVILEGES)
-    malloc (sizeof (ULONG) + 20 * sizeof (LUID_AND_ATTRIBUTES));
+    malloc (sizeof (ULONG)
+	    + SYSTEM_PRIVILEGES_COUNT * sizeof (LUID_AND_ATTRIBUTES));
   if (!privs)
     {
       debug_printf ("malloc (system_privs) failed.");
@@ -630,10 +639,10 @@ get_system_priv_list (cygsidlist &grp_list)
     }
   privs->PrivilegeCount = 0;
 
-  for (DWORD i = 0; i < SYSTEM_PERMISSION_COUNT; ++i)
-    if (LookupPrivilegeValue (NULL, sys_privs[i], &priv))
+  for (DWORD i = 0; i < SYSTEM_PRIVILEGES_COUNT; ++i)
+    if ((priv = privilege_luid (sys_privs[i])))
       {
-	privs->Privileges[privs->PrivilegeCount].Luid = priv;
+	privs->Privileges[privs->PrivilegeCount].Luid = *priv;
 	privs->Privileges[privs->PrivilegeCount].Attributes =
 	  SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
 	++privs->PrivilegeCount;
@@ -667,17 +676,23 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 	continue;
       for (ULONG i = 0; i < cnt; ++i)
 	{
-	  LUID priv;
+	  const LUID *priv;
 	  PTOKEN_PRIVILEGES tmp;
 	  DWORD tmp_count;
 
 	  lsa2str (buf, privstrs[i], sizeof (buf) - 1);
-	  if (!LookupPrivilegeValue (NULL, buf, &priv))
+	  if (!(priv = privilege_luid_by_name (buf)))
 	    continue;
 
-	  for (DWORD p = 0; privs && p < privs->PrivilegeCount; ++p)
-	    if (!memcmp (&priv, &privs->Privileges[p].Luid, sizeof (LUID)))
-	      goto next_account_right;
+	  if (privs)
+	    {
+	      DWORD pcnt = privs->PrivilegeCount;
+	      LUID_AND_ATTRIBUTES *p = privs->Privileges;
+	      for (; pcnt > 0; --pcnt, ++p)
+		if (priv->HighPart == p->Luid.HighPart
+		    && priv->LowPart == p->Luid.LowPart)
+		  goto next_account_right;
+	    }
 
 	  tmp_count = privs ? privs->PrivilegeCount : 0;
 	  tmp = (PTOKEN_PRIVILEGES)
@@ -693,7 +708,7 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 	    }
 	  tmp->PrivilegeCount = tmp_count;
 	  privs = tmp;
-	  privs->Privileges[privs->PrivilegeCount].Luid = priv;
+	  privs->Privileges[privs->PrivilegeCount].Luid = *priv;
 	  privs->Privileges[privs->PrivilegeCount].Attributes =
 	    SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
 	  ++privs->PrivilegeCount;
@@ -812,16 +827,13 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 {
   NTSTATUS ret;
   LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
-  int old_priv_state;
 
   cygsidlist tmp_gsids (cygsidlist_auto, 12);
 
   SECURITY_QUALITY_OF_SERVICE sqos =
     { sizeof sqos, SecurityImpersonation, SECURITY_STATIC_TRACKING, FALSE };
   OBJECT_ATTRIBUTES oa = { sizeof oa, 0, 0, 0, 0, &sqos };
-  PSECURITY_ATTRIBUTES psa;
   bool special_pgrp = false;
-  char sa_buf[1024];
   LUID auth_luid = SYSTEM_LUID;
   LARGE_INTEGER exp = { QuadPart:INT64_MAX };
 
@@ -840,13 +852,11 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   HANDLE token = INVALID_HANDLE_VALUE;
   HANDLE primary_token = INVALID_HANDLE_VALUE;
 
-  HANDLE my_token = INVALID_HANDLE_VALUE;
   PTOKEN_GROUPS my_tok_gsids = NULL;
   DWORD size;
 
   /* SE_CREATE_TOKEN_NAME privilege needed to call NtCreateToken. */
-  if ((old_priv_state = set_process_privilege (SE_CREATE_TOKEN_NAME)) < 0)
-    goto out;
+  push_self_privilege (SE_CREATE_TOKEN_PRIV, true);
 
   /* Open policy object. */
   if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
@@ -858,35 +868,32 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   owner.Owner = usersid;
 
   /* Retrieve authentication id and group list from own process. */
-  if (!OpenProcessToken (hMainProc, TOKEN_QUERY, &my_token))
-    debug_printf ("OpenProcessToken(my_token), %E");
-  else
+  if (hProcToken)
     {
       /* Switching user context to SYSTEM doesn't inherit the authentication
 	 id of the user account running current process. */
       if (usersid != well_known_system_sid)
-	if (!GetTokenInformation (my_token, TokenStatistics,
+	if (!GetTokenInformation (hProcToken, TokenStatistics,
 				  &stats, sizeof stats, &size))
 	  debug_printf
-	    ("GetTokenInformation(my_token, TokenStatistics), %E");
+	    ("GetTokenInformation(hProcToken, TokenStatistics), %E");
 	else
 	  auth_luid = stats.AuthenticationId;
 
       /* Retrieving current processes group list to be able to inherit
 	 some important well known group sids. */
-      if (!GetTokenInformation (my_token, TokenGroups, NULL, 0, &size) &&
+      if (!GetTokenInformation (hProcToken, TokenGroups, NULL, 0, &size) &&
 	  GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-	debug_printf ("GetTokenInformation(my_token, TokenGroups), %E");
+	debug_printf ("GetTokenInformation(hProcToken, TokenGroups), %E");
       else if (!(my_tok_gsids = (PTOKEN_GROUPS) malloc (size)))
 	debug_printf ("malloc (my_tok_gsids) failed.");
-      else if (!GetTokenInformation (my_token, TokenGroups, my_tok_gsids,
+      else if (!GetTokenInformation (hProcToken, TokenGroups, my_tok_gsids,
 				     size, &size))
 	{
-	  debug_printf ("GetTokenInformation(my_token, TokenGroups), %E");
+	  debug_printf ("GetTokenInformation(hProcToken, TokenGroups), %E");
 	  free (my_tok_gsids);
 	  my_tok_gsids = NULL;
 	}
-      CloseHandle (my_token);
     }
 
   /* Create list of groups, the user is member in. */
@@ -932,18 +939,10 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     }
   else
     {
-      /* Set security descriptor and primary group */
-      psa = sec_user (sa_buf, usersid);
-      if (psa->lpSecurityDescriptor &&
-	  !SetSecurityDescriptorGroup ((PSECURITY_DESCRIPTOR)
-				       psa->lpSecurityDescriptor,
-				       special_pgrp ? new_groups.pgsid
-						    : well_known_null_sid,
-				       FALSE))
-	debug_printf ("SetSecurityDescriptorGroup %E");
       /* Convert to primary token. */
-      if (!DuplicateTokenEx (token, MAXIMUM_ALLOWED, psa, SecurityImpersonation,
-			     TokenPrimary, &primary_token))
+      if (!DuplicateTokenEx (token, MAXIMUM_ALLOWED, &sec_none,
+			     SecurityImpersonation, TokenPrimary,
+			     &primary_token))
 	{
 	  __seterrno ();
 	  debug_printf ("DuplicateTokenEx %E");
@@ -951,8 +950,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     }
 
 out:
-  if (old_priv_state >= 0)
-    set_process_privilege (SE_CREATE_TOKEN_NAME, old_priv_state);
+  pop_self_privilege ();
   if (token != INVALID_HANDLE_VALUE)
     CloseHandle (token);
   if (privs)
@@ -993,13 +991,10 @@ subauth (struct passwd *pw)
   QUOTA_LIMITS quota;
   char nt_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   char nt_user[UNLEN + 1];
-  SECURITY_ATTRIBUTES sa = { sizeof sa, NULL, TRUE };
   HANDLE user_token = INVALID_HANDLE_VALUE;
   HANDLE primary_token = INVALID_HANDLE_VALUE;
-  int old_tcb_state;
 
-  if ((old_tcb_state = set_process_privilege (SE_TCB_NAME)) < 0)
-    return INVALID_HANDLE_VALUE;
+  push_self_privilege (SE_TCB_PRIV, true);
 
   /* Register as logon process. */
   str2lsa (name, "Cygwin");
@@ -1057,12 +1052,12 @@ subauth (struct passwd *pw)
     }
   LsaFreeReturnBuffer (profile);
   /* Convert to primary token. */
-  if (!DuplicateTokenEx (user_token, TOKEN_ALL_ACCESS, &sa,
+  if (!DuplicateTokenEx (user_token, TOKEN_ALL_ACCESS, &sec_none,
 			 SecurityImpersonation, TokenPrimary, &primary_token))
     __seterrno ();
 
 out:
-  set_process_privilege (SE_TCB_NAME, old_tcb_state);
+  pop_self_privilege ();
   if (user_token != INVALID_HANDLE_VALUE)
     CloseHandle (user_token);
   return primary_token;
@@ -1832,7 +1827,7 @@ check_file_access (const char *fn, int flags)
 
   security_descriptor sd;
 
-  HANDLE hToken, hIToken;
+  HANDLE hToken;
   BOOL status;
   char pbuf[sizeof (PRIVILEGE_SET) + 3 * sizeof (LUID_AND_ATTRIBUTES)];
   DWORD desired = 0, granted, plength = sizeof pbuf;
@@ -1845,17 +1840,8 @@ check_file_access (const char *fn, int flags)
 
   if (cygheap->user.issetuid ())
     hToken = cygheap->user.token ();
-  else if (!OpenProcessToken (hMainProc, TOKEN_DUPLICATE, &hToken))
-    {
-      __seterrno ();
-      goto done;
-    }
-  if (!(status = DuplicateToken (hToken, SecurityIdentification, &hIToken)))
-    __seterrno ();
-  if (!cygheap->user.issetuid ())
-    CloseHandle (hToken);
-  if (!status)
-    goto done;
+  else
+    hToken = hProcImpToken;
 
   if (flags & R_OK)
     desired |= FILE_READ_DATA;
@@ -1863,14 +1849,13 @@ check_file_access (const char *fn, int flags)
     desired |= FILE_WRITE_DATA;
   if (flags & X_OK)
     desired |= FILE_EXECUTE;
-  if (!AccessCheck (sd, hIToken, desired, &mapping,
+  if (!AccessCheck (sd, hToken, desired, &mapping,
 		    (PPRIVILEGE_SET) pbuf, &plength, &granted, &status))
     __seterrno ();
   else if (!status)
     set_errno (EACCES);
   else
     ret = 0;
-  CloseHandle (hIToken);
  done:
   debug_printf ("flags %x, ret %d", flags, ret);
   return ret;

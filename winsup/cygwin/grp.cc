@@ -347,8 +347,8 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
       /* If impersonated, use impersonation token. */
       if (cygheap->user.issetuid ())
 	hToken = cygheap->user.token ();
-      else if (!OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken))
-	hToken = NULL;
+      else
+        hToken = hProcImpToken;
     }
   if (hToken)
     {
@@ -379,19 +379,13 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 			    grouplist[cnt] = gr->gr_gid;
 			  ++cnt;
 			  if (gidsetsize && cnt > gidsetsize)
-			    {
-			      if (!cygheap->user.issetuid ())
-				CloseHandle (hToken);
-			      goto error;
-			    }
+			    goto error;
 			  break;
 			}
 	    }
 	}
       else
 	debug_printf ("%d = GetTokenInformation(NULL) %E", size);
-      if (!cygheap->user.issetuid ())
-	CloseHandle (hToken);
       return cnt;
     }
 

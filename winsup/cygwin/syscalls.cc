@@ -1698,6 +1698,7 @@ get_osfhandle (int fd)
 extern "C" int
 statvfs (const char *fname, struct statvfs *sfs)
 {
+  int ret = -1;
   char root[CYG_MAX_PATH];
 
   if (check_null_empty_str_errno (fname)
@@ -1716,47 +1717,47 @@ statvfs (const char *fname, struct statvfs *sfs)
   if (!rootdir (full_path, root))
     return -1;
 
+  ULARGE_INTEGER availb, freeb, totalb;
+  DWORD spc, bps, availc, freec, totalc, vsn, maxlen, flags;
+  BOOL status;
+
+  push_thread_privilege (SE_CHANGE_NOTIFY_PRIV, true);
+
   /* GetDiskFreeSpaceEx must be called before GetDiskFreeSpace on
      WinME, to avoid the MS KB 314417 bug */
-  ULARGE_INTEGER availb, freeb, totalb;
-  BOOL status = GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb);
-
-  DWORD spc, bps, availc, freec, totalc;
-
-  if (!GetDiskFreeSpace (root, &spc, &bps, &freec, &totalc))
+  status = GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb);
+  if (GetDiskFreeSpace (root, &spc, &bps, &freec, &totalc))
     {
-      __seterrno ();
-      return -1;
+      if (status)
+	{
+	  availc = availb.QuadPart / (spc*bps);
+	  totalc = totalb.QuadPart / (spc*bps);
+	  freec = freeb.QuadPart / (spc*bps);
+	}
+      else
+	availc = freec;
+      if (GetVolumeInformation (root, NULL, 0, &vsn, &maxlen, &flags, NULL, 0))
+        {
+	  sfs->f_bsize = spc*bps;
+	  sfs->f_frsize = spc*bps;
+	  sfs->f_blocks = totalc;
+	  sfs->f_bfree = freec;
+	  sfs->f_bavail = availc;
+	  sfs->f_files = ULONG_MAX;
+	  sfs->f_ffree = ULONG_MAX;
+	  sfs->f_favail = ULONG_MAX;
+	  sfs->f_fsid = vsn;
+	  sfs->f_flag = flags;
+	  sfs->f_namemax = maxlen;
+	  ret = 0;
+	}
     }
+  if (ret)
+    __seterrno ();
 
-  if (status)
-    {
-      availc = availb.QuadPart / (spc*bps);
-      totalc = totalb.QuadPart / (spc*bps);
-      freec = freeb.QuadPart / (spc*bps);
-    }
-  else
-    availc = freec;
+  pop_thread_privilege ();
 
-  DWORD vsn, maxlen, flags;
-
-  if (!GetVolumeInformation (root, NULL, 0, &vsn, &maxlen, &flags, NULL, 0))
-    {
-      __seterrno ();
-      return -1;
-    }
-  sfs->f_bsize = spc*bps;
-  sfs->f_frsize = spc*bps;
-  sfs->f_blocks = totalc;
-  sfs->f_bfree = freec;
-  sfs->f_bavail = availc;
-  sfs->f_files = ULONG_MAX;
-  sfs->f_ffree = ULONG_MAX;
-  sfs->f_favail = ULONG_MAX;
-  sfs->f_fsid = vsn;
-  sfs->f_flag = flags;
-  sfs->f_namemax = maxlen;
-  return 0;
+  return ret;
 }
 
 extern "C" int
@@ -1968,11 +1969,9 @@ seteuid32 (__uid32_t uid)
 
   cygsid usersid;
   user_groups &groups = cygheap->user.groups;
-  HANDLE ptok, new_token = INVALID_HANDLE_VALUE;
+  HANDLE new_token = INVALID_HANDLE_VALUE;
   struct passwd * pw_new;
   bool token_is_internal, issamesid = false;
-  char dacl_buf[MAX_DACL_LEN (5)];
-  TOKEN_DEFAULT_DACL tdacl = {};
 
   pw_new = internal_getpwuid (uid);
   if (!wincap.has_security () && pw_new)
@@ -1986,29 +1985,24 @@ seteuid32 (__uid32_t uid)
       return -1;
     }
 
-  RevertToSelf ();
-  if (!OpenProcessToken (hMainProc, TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &ptok))
-    {
-      __seterrno ();
-      goto failed_ptok;;
-    }
+  cygheap->user.deimpersonate ();
 
   /* Verify if the process token is suitable. */
-  if (verify_token (ptok, usersid, groups))
-    new_token = ptok;
+  if (verify_token (hProcToken, usersid, groups))
+    new_token = hProcToken;
   /* Verify if the external token is suitable */
   else if (cygheap->user.external_token != NO_IMPERSONATION
 	   && verify_token (cygheap->user.external_token, usersid, groups))
     new_token = cygheap->user.external_token;
   /* Verify if the current token (internal or former external) is suitable */
-  else if (cygheap->user.current_token != NO_IMPERSONATION
-	   && cygheap->user.current_token != cygheap->user.external_token
-	   && verify_token (cygheap->user.current_token, usersid, groups,
+  else if (cygheap->user.curr_primary_token != NO_IMPERSONATION
+	   && cygheap->user.curr_primary_token != cygheap->user.external_token
+	   && verify_token (cygheap->user.curr_primary_token, usersid, groups,
 			    &token_is_internal))
-    new_token = cygheap->user.current_token;
+    new_token = cygheap->user.curr_primary_token;
   /* Verify if the internal token is suitable */
   else if (cygheap->user.internal_token != NO_IMPERSONATION
-	   && cygheap->user.internal_token != cygheap->user.current_token
+	   && cygheap->user.internal_token != cygheap->user.curr_primary_token
 	   && verify_token (cygheap->user.internal_token, usersid, groups,
 			    &token_is_internal))
     new_token = cygheap->user.internal_token;
@@ -2026,7 +2020,10 @@ seteuid32 (__uid32_t uid)
 	  debug_printf ("create token failed, try subauthentication.");
 	  new_token = subauth (pw_new);
 	  if (new_token == INVALID_HANDLE_VALUE)
-	    goto failed;
+	    {
+	      cygheap->user.reimpersonate ();
+	      return -1;
+	    }
 	}
       /* Keep at most one internal token */
       if (cygheap->user.internal_token != NO_IMPERSONATION)
@@ -2034,17 +2031,7 @@ seteuid32 (__uid32_t uid)
       cygheap->user.internal_token = new_token;
     }
 
-  /* Set process def dacl to allow access to impersonated token */
-  if (sec_acl ((PACL) dacl_buf, true, true, usersid))
-    {
-      tdacl.DefaultDacl = (PACL) dacl_buf;
-      if (!SetTokenInformation (ptok, TokenDefaultDacl,
-				&tdacl, sizeof dacl_buf))
-	debug_printf ("SetTokenInformation"
-		      "(TokenDefaultDacl), %E");
-    }
-
-  if (new_token != ptok)
+  if (new_token != hProcToken)
     {
       /* Avoid having HKCU use default user */
       char name[128];
@@ -2053,26 +2040,48 @@ seteuid32 (__uid32_t uid)
       /* Try setting owner to same value as user. */
       if (!SetTokenInformation (new_token, TokenOwner,
 				&usersid, sizeof usersid))
-	debug_printf ("SetTokenInformation(user.token, "
-		      "TokenOwner), %E");
+	debug_printf ("SetTokenInformation(user.token, TokenOwner), %E");
       /* Try setting primary group in token to current group */
       if (!SetTokenInformation (new_token, TokenPrimaryGroup,
 				&groups.pgsid, sizeof (cygsid)))
-	debug_printf ("SetTokenInformation(user.token, "
-		      "TokenPrimaryGroup), %E");
+	debug_printf ("SetTokenInformation(user.token, TokenPrimaryGroup), %E");
       /* Try setting default DACL */
-      if (tdacl.DefaultDacl
-	  && !SetTokenInformation (new_token, TokenDefaultDacl,
-				   &tdacl, sizeof (tdacl)))
-	debug_printf ("SetTokenInformation (TokenDefaultDacl), %E");
+      char dacl_buf[MAX_DACL_LEN (5)];
+      if (sec_acl ((PACL) dacl_buf, true, true, usersid))
+        {
+	  TOKEN_DEFAULT_DACL tdacl = { (PACL) dacl_buf };
+	  if (!SetTokenInformation (new_token, TokenDefaultDacl,
+				    &tdacl, sizeof (tdacl)))
+	    debug_printf ("SetTokenInformation (TokenDefaultDacl), %E");
+	}
     }
 
-  CloseHandle (ptok);
   issamesid = (usersid == cygheap->user.sid ());
   cygheap->user.set_sid (usersid);
-  cygheap->user.current_token = new_token == ptok ? NO_IMPERSONATION
-						  : new_token;
-  cygheap->user.reimpersonate ();
+  cygheap->user.curr_primary_token = new_token == hProcToken ? NO_IMPERSONATION
+							: new_token;
+  if (cygheap->user.current_token != NO_IMPERSONATION)
+    {
+      CloseHandle (cygheap->user.current_token);
+      cygheap->user.current_token = NO_IMPERSONATION;
+    }
+  if (cygheap->user.curr_primary_token != NO_IMPERSONATION)
+    {
+      if (!DuplicateTokenEx (cygheap->user.curr_primary_token, MAXIMUM_ALLOWED,
+			     &sec_none, SecurityImpersonation,
+			     TokenImpersonation, &cygheap->user.current_token))
+	{
+	  __seterrno ();
+	  cygheap->user.curr_primary_token = NO_IMPERSONATION;
+	  return -1;
+	}
+      set_cygwin_privileges (cygheap->user.current_token);
+    }
+  if (!cygheap->user.reimpersonate ())
+    {
+      __seterrno ();
+      return -1;
+    }
 
 success_9x:
   cygheap->user.set_name (pw_new->pw_name);
@@ -2081,12 +2090,6 @@ success_9x:
   if (!issamesid)
     user_shared_initialize (true);
   return 0;
-
-failed:
-  CloseHandle (ptok);
-failed_ptok:
-  cygheap->user.reimpersonate ();
-  return -1;
 }
 
 extern "C" int
@@ -2151,7 +2154,6 @@ setegid32 (__gid32_t gid)
 
   user_groups * groups = &cygheap->user.groups;
   cygsid gsid;
-  HANDLE ptok;
   struct __group32 * gr = internal_getgrgid (gid);
 
   if (!gsid.getfromgr (gr))
@@ -2162,29 +2164,24 @@ setegid32 (__gid32_t gid)
   myself->gid = gid;
 
   groups->update_pgrp (gsid);
-  /* If impersonated, update primary group and revert */
   if (cygheap->user.issetuid ())
     {
-      if (!SetTokenInformation (cygheap->user.token (),
-				TokenPrimaryGroup,
-				&gsid, sizeof gsid))
-	debug_printf ("SetTokenInformation(thread, "
+      /* If impersonated, update impersonation token... */
+      if (!SetTokenInformation (cygheap->user.primary_token (),
+      				TokenPrimaryGroup, &gsid, sizeof gsid))
+	debug_printf ("SetTokenInformation(primary_token, "
 		      "TokenPrimaryGroup), %E");
-      RevertToSelf ();
-    }
-  if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT, &ptok))
-    debug_printf ("OpenProcessToken(), %E");
-  else
-    {
-      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
+      if (!SetTokenInformation (cygheap->user.token (), TokenPrimaryGroup,
 				&gsid, sizeof gsid))
-	debug_printf ("SetTokenInformation(process, "
-		      "TokenPrimaryGroup), %E");
-      CloseHandle (ptok);
+	debug_printf ("SetTokenInformation(token, TokenPrimaryGroup), %E");
     }
-  if (cygheap->user.issetuid ()
-      && !ImpersonateLoggedOnUser (cygheap->user.token ()))
-    system_printf ("Impersonating in setegid failed, %E");
+  cygheap->user.deimpersonate ();
+  if (!SetTokenInformation (hProcToken, TokenPrimaryGroup, &gsid, sizeof gsid))
+    debug_printf ("SetTokenInformation(hProcToken, TokenPrimaryGroup), %E");
+  if (!SetTokenInformation (hProcImpToken, TokenPrimaryGroup, &gsid,
+			    sizeof gsid))
+    debug_printf ("SetTokenInformation(hProcImpToken, TokenPrimaryGroup), %E");
+  cygheap->user.reimpersonate ();
   return 0;
 }
 

@@ -123,6 +123,7 @@ public:
      to `set_impersonation_token()'. */
   HANDLE external_token;
   HANDLE internal_token;
+  HANDLE curr_primary_token;
   HANDLE current_token;
 
   /* CGF 2002-06-27.  I removed the initializaton from this constructor
@@ -172,40 +173,36 @@ public:
   const char *ontherange (homebodies what, struct passwd * = NULL);
 #define NO_IMPERSONATION NULL
   bool issetuid () const { return current_token != NO_IMPERSONATION; }
+  HANDLE primary_token () { return curr_primary_token; }
   HANDLE token () { return current_token; }
   void deimpersonate ()
   {
     if (issetuid ())
-      RevertToSelf ();
+      {
+	RevertToSelf ();
+	ImpersonateLoggedOnUser (hProcImpToken);
+      }
   }
-  void reimpersonate ()
+  bool reimpersonate ()
   {
-    if (issetuid ()
-	&& !ImpersonateLoggedOnUser (token ()))
-      system_printf ("ImpersonateLoggedOnUser: %E");
+    return ImpersonateLoggedOnUser (issetuid () ? token () : hProcImpToken);
   }
   bool has_impersonation_tokens ()
     { return external_token != NO_IMPERSONATION
 	     || internal_token != NO_IMPERSONATION
-	     || current_token != NO_IMPERSONATION; }
+	     || curr_primary_token != NO_IMPERSONATION; }
   void close_impersonation_tokens ()
   {
     if (current_token != NO_IMPERSONATION)
-      {
-	if( current_token != external_token && current_token != internal_token)
-	  CloseHandle (current_token);
-	current_token = NO_IMPERSONATION;
-      }
+      CloseHandle (current_token);
+    if (curr_primary_token != NO_IMPERSONATION
+    	&& curr_primary_token != external_token
+	&& curr_primary_token != internal_token)
+      CloseHandle (curr_primary_token);
     if (external_token != NO_IMPERSONATION)
-      {
-	CloseHandle (external_token);
-	external_token = NO_IMPERSONATION;
-      }
+      CloseHandle (external_token);
     if (internal_token != NO_IMPERSONATION)
-      {
-	CloseHandle (internal_token);
-	internal_token = NO_IMPERSONATION;
-      }
+      CloseHandle (internal_token);
   }
   char * get_windows_id (char * buf)
   {
@@ -284,6 +281,7 @@ struct init_cygheap
   char *cygwin_regname;
   cwdstuff cwd;
   dtable fdtab;
+  LUID luid[SE_NUM_PRIVS];
   const char *shared_prefix;
 #ifdef DEBUGGING
   cygheap_debug debug;

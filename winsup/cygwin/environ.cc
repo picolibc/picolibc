@@ -22,14 +22,13 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "cygtls.h"
 #include "registry.h"
 #include "environ.h"
 #include "child_info.h"
 
 extern bool allow_glob;
 extern bool ignore_case_with_glob;
-extern bool allow_ntea;
-extern bool allow_smbntsec;
 extern bool allow_winsymlinks;
 extern bool strip_title_path;
 extern int pcheck_case;
@@ -533,9 +532,7 @@ set_ntsec (const char *buf)
 static void
 set_traverse (const char *buf)
 {
-  if (wincap.has_security ())
-    set_process_privilege (SE_CHANGE_NOTIFY_NAME,
-			   !buf || !strcasematch (buf, "yes"));
+  allow_traverse = (buf && strcasematch (buf, "yes") && wincap.has_security ());
 }
 
 static void
@@ -738,7 +735,7 @@ environ_init (char **envp, int envc)
   if (wincap.has_security ())
     {
       allow_ntsec = true;
-      set_process_privilege (SE_CHANGE_NOTIFY_NAME, false);
+      allow_traverse = true;
     }
 
   if (!envp)

@@ -236,6 +236,46 @@ extern cygpsid well_known_authenticated_users_sid;
 extern cygpsid well_known_system_sid;
 extern cygpsid well_known_admins_sid;
 
+/* Order must be same as cygpriv in sec_helper.cc. */
+enum cygpriv_idx {
+  SE_CREATE_TOKEN_PRIV = 0,
+  SE_ASSIGNPRIMARYTOKEN_PRIV,
+  SE_LOCK_MEMORY_PRIV,
+  SE_INCREASE_QUOTA_PRIV,
+  SE_UNSOLICITED_INPUT_PRIV,
+  SE_MACHINE_ACCOUNT_PRIV,
+  SE_TCB_PRIV,
+  SE_SECURITY_PRIV,
+  SE_TAKE_OWNERSHIP_PRIV,
+  SE_LOAD_DRIVER_PRIV,
+  SE_SYSTEM_PROFILE_PRIV,
+  SE_SYSTEMTIME_PRIV,
+  SE_PROF_SINGLE_PROCESS_PRIV,
+  SE_INC_BASE_PRIORITY_PRIV,
+  SE_CREATE_PAGEFILE_PRIV,
+  SE_CREATE_PERMANENT_PRIV,
+  SE_BACKUP_PRIV,
+  SE_RESTORE_PRIV,
+  SE_SHUTDOWN_PRIV,
+  SE_DEBUG_PRIV,
+  SE_AUDIT_PRIV,
+  SE_SYSTEM_ENVIRONMENT_PRIV,
+  SE_CHANGE_NOTIFY_PRIV,
+  SE_REMOTE_SHUTDOWN_PRIV,
+  SE_CREATE_GLOBAL_PRIV,
+  SE_UNDOCK_PRIV,
+  SE_MANAGE_VOLUME_PRIV,
+  SE_IMPERSONATE_PRIV,
+  SE_ENABLE_DELEGATION_PRIV,
+  SE_SYNC_AGENT_PRIV,
+
+  SE_NUM_PRIVS
+};
+
+const LUID *privilege_luid (enum cygpriv_idx idx);
+const LUID *privilege_luid_by_name (const char *pname);
+const char *privilege_name (enum cygpriv_idx idx);
+
 inline BOOL
 legal_sid_type (SID_NAME_USE type)
 {
@@ -246,6 +286,7 @@ legal_sid_type (SID_NAME_USE type)
 extern bool allow_ntea;
 extern bool allow_ntsec;
 extern bool allow_smbntsec;
+extern bool allow_traverse;
 
 /* File manipulation */
 int __stdcall get_file_attribute (int, HANDLE, const char *, mode_t *,
@@ -291,8 +332,37 @@ void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);
 bool get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL);
 
 /* sec_helper.cc: Security helper functions. */
-int set_process_privilege (const char *privilege, bool enable = true, bool use_thread = false);
-void enable_restore_privilege (void);
+int set_privilege (HANDLE token, enum cygpriv_idx privilege, bool enable);
+void set_cygwin_privileges (HANDLE token);
+
+#define set_process_privilege(p,v) set_privilege (hProcImpToken, (p), (v))
+
+#define _push_thread_privilege(_priv, _val, _check) { \
+    HANDLE _token = NULL, _dup_token = NULL; \
+    if (wincap.has_security ()) \
+      { \
+	_token = (cygheap->user.issetuid () && (_check)) \
+		 ? cygheap->user.token () : hProcImpToken; \
+	if (!DuplicateTokenEx (_token, MAXIMUM_ALLOWED, NULL, \
+			       SecurityImpersonation, TokenImpersonation, \
+			       &_dup_token)) \
+	  debug_printf ("DuplicateTokenEx: %E"); \
+	else if (!ImpersonateLoggedOnUser (_dup_token)) \
+	  debug_printf ("ImpersonateLoggedOnUser: %E"); \
+	else \
+	  set_privilege (_dup_token, (_priv), (_val)); \
+      }
+#define push_thread_privilege(_priv, _val) _push_thread_privilege(_priv,_val,1)
+#define push_self_privilege(_priv, _val)   _push_thread_privilege(_priv,_val,0)
+
+#define pop_thread_privilege() \
+    if (_dup_token) \
+      { \
+        ImpersonateLoggedOnUser (_token); \
+	CloseHandle (_dup_token); \
+      } \
+  }
+#define pop_self_privilege()		   pop_thread_privilege()
 
 /* shared.cc: */
 /* Retrieve a security descriptor that allows all access */

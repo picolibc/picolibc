@@ -30,6 +30,7 @@ details. */
 #include "dtable.h"
 #include "pinfo.h"
 #include "cygheap.h"
+#include "cygtls.h"
 #include "pwdgrp.h"
 
 /* General purpose security attribute objects for global use. */
@@ -321,37 +322,95 @@ got_it:
 #undef DOMLEN
 #endif //unused
 
-int
-set_process_privilege (const char *privilege, bool enable, bool use_thread)
+/* Order must be same as cygperm_idx in winsup.h. */
+static const char *cygpriv[] =
 {
-  HANDLE hToken = NULL;
-  LUID priv_luid;
-  TOKEN_PRIVILEGES new_priv, orig_priv;
-  int ret = -1;
-  DWORD size;
+  SE_CREATE_TOKEN_NAME,
+  SE_ASSIGNPRIMARYTOKEN_NAME,
+  SE_LOCK_MEMORY_NAME,
+  SE_INCREASE_QUOTA_NAME,
+  SE_UNSOLICITED_INPUT_NAME,
+  SE_MACHINE_ACCOUNT_NAME,
+  SE_TCB_NAME,
+  SE_SECURITY_NAME,
+  SE_TAKE_OWNERSHIP_NAME,
+  SE_LOAD_DRIVER_NAME,
+  SE_SYSTEM_PROFILE_NAME,
+  SE_SYSTEMTIME_NAME,
+  SE_PROF_SINGLE_PROCESS_NAME,
+  SE_INC_BASE_PRIORITY_NAME,
+  SE_CREATE_PAGEFILE_NAME,
+  SE_CREATE_PERMANENT_NAME,
+  SE_BACKUP_NAME,
+  SE_RESTORE_NAME,
+  SE_SHUTDOWN_NAME,
+  SE_DEBUG_NAME,
+  SE_AUDIT_NAME,
+  SE_SYSTEM_ENVIRONMENT_NAME,
+  SE_CHANGE_NOTIFY_NAME,
+  SE_REMOTE_SHUTDOWN_NAME,
+  SE_CREATE_GLOBAL_NAME,
+  SE_UNDOCK_NAME,
+  SE_MANAGE_VOLUME_NAME,
+  SE_IMPERSONATE_NAME,
+  SE_ENABLE_DELEGATION_NAME,
+  SE_SYNC_AGENT_NAME
+};
 
-  if (!LookupPrivilegeValue (NULL, privilege, &priv_luid))
+const LUID *
+privilege_luid (cygpriv_idx idx)
+{
+  if (idx < 0 || idx >= SE_NUM_PRIVS)
+    return NULL;
+  if (!cygheap->luid[idx].LowPart && !cygheap->luid[idx].HighPart
+      && !LookupPrivilegeValue (NULL, cygpriv[idx], &cygheap->luid[idx]))
     {
       __seterrno ();
-      goto out;
+      return NULL;
     }
+  return &cygheap->luid[idx];
+}
 
-  if ((use_thread
-       && !OpenThreadToken (GetCurrentThread (), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
-			    0, &hToken))
-      ||(!use_thread
-	 && !OpenProcessToken (hMainProc, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
-			     &hToken)))
+const LUID *
+privilege_luid_by_name (const char *pname)
+{
+  int idx;
+
+  if (!pname)
+    return NULL;
+  for (idx = 0; idx < SE_NUM_PRIVS; ++idx)
+    if (!strcmp (pname, cygpriv[idx]))
+      return privilege_luid ((cygpriv_idx) idx);
+  return NULL;
+}
+
+const char *
+privilege_name (cygpriv_idx idx)
+{
+  if (idx < 0 || idx >= SE_NUM_PRIVS)
+    return "<unknown privilege>";
+  return cygpriv[idx];
+}
+
+int
+set_privilege (HANDLE token, cygpriv_idx privilege, bool enable)
+{
+  int ret = -1;
+  const LUID *priv_luid;
+  TOKEN_PRIVILEGES new_priv, orig_priv;
+  DWORD size;
+
+  if (!(priv_luid = privilege_luid (privilege)))
     {
       __seterrno ();
       goto out;
     }
 
   new_priv.PrivilegeCount = 1;
-  new_priv.Privileges[0].Luid = priv_luid;
+  new_priv.Privileges[0].Luid = *priv_luid;
   new_priv.Privileges[0].Attributes = enable ? SE_PRIVILEGE_ENABLED : 0;
 
-  if (!AdjustTokenPrivileges (hToken, FALSE, &new_priv,
+  if (!AdjustTokenPrivileges (token, FALSE, &new_priv,
 			      sizeof orig_priv, &orig_priv, &size))
     {
       __seterrno ();
@@ -365,28 +424,23 @@ set_process_privilege (const char *privilege, bool enable, bool use_thread)
       goto out;
     }
 
-  ret = orig_priv.Privileges[0].Attributes == SE_PRIVILEGE_ENABLED ? 1 : 0;
+  /* If orig_priv.PrivilegeCount is 0, the privilege hasn't been changed. */
+  if (!orig_priv.PrivilegeCount)
+    ret = enable ? 1 : 0;
+  else
+    ret = (orig_priv.Privileges[0].Attributes & SE_PRIVILEGE_ENABLED) ? 1 : 0;
 
 out:
-  if (hToken)
-    CloseHandle (hToken);
-
-  syscall_printf ("%d = set_process_privilege (%s, %d)", ret, privilege, enable);
+  syscall_printf ("%d = set_privilege ((token %x) %s, %d)",
+		  ret, token, privilege_name (privilege), enable);
   return ret;
 }
 
-/* Helper function to set the SE_RESTORE_NAME privilege once. */
 void
-enable_restore_privilege ()
+set_cygwin_privileges (HANDLE token)
 {
-  static int NO_COPY saved_res;
-  bool issetuid = cygheap->user.issetuid ();
-  if (!saved_res || issetuid)
-    {
-      int res = 2 + set_process_privilege (SE_RESTORE_NAME, true, issetuid);
-      if (!issetuid)
-	saved_res = res;
-    }
+  set_privilege (token, SE_RESTORE_PRIV, true);
+  set_privilege (token, SE_CHANGE_NOTIFY_PRIV, !allow_traverse);
 }
 
 /*

@@ -160,10 +160,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   debug_printf ("child is running.  pid %d, ppid %d, stack here %p",
 		myself->pid, myself->ppid, __builtin_frame_address (0));
 
-  /* Restore the inheritance state as in parent
-     Don't call setuid here! The flags are already set. */
-  cygheap->user.reimpersonate ();
-
   sync_with_parent ("after longjmp", true);
   sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d", hParent,
 		  first_dll, load_dlls);
@@ -177,6 +173,12 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
       _main_tls->init_thread (NULL, NULL);
       _main_tls->local_clib = *_impure_ptr;
       _impure_ptr = &_main_tls->local_clib;
+    }
+
+  if (wincap.has_security ())
+    {
+      set_cygwin_privileges (hProcImpToken);
+      cygheap->user.reimpersonate ();
     }
 
 #ifdef DEBUGGING

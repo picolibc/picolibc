@@ -348,6 +348,7 @@ fs_info::update (const char *win32_path)
 {
   char fsname [CYG_MAX_PATH];
   char root_dir [CYG_MAX_PATH];
+  bool ret;
 
   if (!rootdir (win32_path, root_dir))
     {
@@ -372,6 +373,10 @@ fs_info::update (const char *win32_path)
     }
   name_hash = tmp_name_hash;
 
+  /* I have no idea why, but some machines require SeChangeNotifyPrivilege
+     to access volume information. */
+  push_thread_privilege (SE_CHANGE_NOTIFY_PRIV, true);
+
   drive_type (GetDriveType (root_dir));
   if (drive_type () == DRIVE_REMOTE
       || (drive_type () == DRIVE_UNKNOWN
@@ -380,9 +385,12 @@ fs_info::update (const char *win32_path)
   else
     is_remote_drive (false);
 
-  if (!GetVolumeInformation (root_dir, NULL, 0, &status.serial, NULL,
-			     &status.flags, fsname, sizeof (fsname))
-      && !is_remote_drive ())
+  ret = GetVolumeInformation (root_dir, NULL, 0, &status.serial, NULL,
+			      &status.flags, fsname, sizeof (fsname));
+
+  pop_thread_privilege ();
+
+  if (!ret && !is_remote_drive ())
     {
       debug_printf ("Cannot get volume information (%s), %E", root_dir);
       has_buggy_open (false);
@@ -390,6 +398,7 @@ fs_info::update (const char *win32_path)
       flags () = serial () = 0;
       return false;
     }
+
   /* FIXME: Samba by default returns "NTFS" in file system name, but
    * doesn't support Extended Attributes. If there's some fast way to
    * distinguish between samba and real ntfs, it should be implemented

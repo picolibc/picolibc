@@ -343,6 +343,8 @@ extern bool display_title;
 
 extern HANDLE hMainThread;
 extern HANDLE hMainProc;
+extern HANDLE hProcToken;
+extern HANDLE hProcImpToken;
 
 extern bool cygwin_testing;
 

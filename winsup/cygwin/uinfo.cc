@@ -44,51 +44,45 @@ cygheap_user::init ()
   if (!wincap.has_security ())
     return;
 
-  HANDLE ptok;
   DWORD siz;
   PSECURITY_DESCRIPTOR psd;
 
-  if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
-			 &ptok))
-    {
-      system_printf ("OpenProcessToken(), %E");
-      return;
-    }
-  if (!GetTokenInformation (ptok, TokenPrimaryGroup,
+  if (!GetTokenInformation (hProcToken, TokenPrimaryGroup,
 			    &groups.pgsid, sizeof (cygsid), &siz))
     system_printf ("GetTokenInformation (TokenPrimaryGroup), %E");
 
   /* Get the SID from current process and store it in effec_cygsid */
-  if (!GetTokenInformation (ptok, TokenUser, &effec_cygsid, sizeof (cygsid), &siz))
+  if (!GetTokenInformation (hProcToken, TokenUser, &effec_cygsid,
+			    sizeof (cygsid), &siz))
     {
       system_printf ("GetTokenInformation (TokenUser), %E");
-      goto out;
+      return;
     }
 
   /* Set token owner to the same value as token user */
-  if (!SetTokenInformation (ptok, TokenOwner, &effec_cygsid, sizeof (cygsid)))
+  if (!SetTokenInformation (hProcToken, TokenOwner, &effec_cygsid,
+			    sizeof (cygsid)))
     debug_printf ("SetTokenInformation(TokenOwner), %E");
 
   /* Standard way to build a security descriptor with the usual DACL */
   char sa_buf[1024];
-  psd = (PSECURITY_DESCRIPTOR) (sec_user_nih (sa_buf, sid()))->lpSecurityDescriptor;
+  psd = (PSECURITY_DESCRIPTOR)
+  		(sec_user_nih (sa_buf, sid()))->lpSecurityDescriptor;
 
   BOOL acl_exists, dummy;
   TOKEN_DEFAULT_DACL dacl;
-  if (GetSecurityDescriptorDacl (psd, &acl_exists,
-				 &dacl.DefaultDacl, &dummy)
+  if (GetSecurityDescriptorDacl (psd, &acl_exists, &dacl.DefaultDacl, &dummy)
       && acl_exists && dacl.DefaultDacl)
     {
       /* Set the default DACL and the process DACL */
-      if (!SetTokenInformation (ptok, TokenDefaultDacl, &dacl, sizeof (dacl)))
+      if (!SetTokenInformation (hProcToken, TokenDefaultDacl, &dacl,
+      				sizeof (dacl)))
 	system_printf ("SetTokenInformation (TokenDefaultDacl), %E");
       if (!SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION, psd))
 	system_printf ("SetKernelObjectSecurity, %E");
     }
   else
     system_printf("Cannot get dacl, %E");
- out:
-  CloseHandle (ptok);
 }
 
 void
@@ -115,17 +109,17 @@ internal_getlogin (cygheap_user &user)
 	  cygsid gsid;
 	  if (gsid.getfromgr (internal_getgrgid (pw->pw_gid)))
 	    {
-	      HANDLE ptok;
-	      if (gsid != user.groups.pgsid
-		  && OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT, &ptok))
+	      if (gsid != user.groups.pgsid)
 		{
 		  /* Set primary group to the group in /etc/passwd. */
-		  if (!SetTokenInformation (ptok, TokenPrimaryGroup,
+		  if (!SetTokenInformation (hProcToken, TokenPrimaryGroup,
+					    &gsid, sizeof gsid))
+		    debug_printf ("SetTokenInformation(TokenPrimaryGroup), %E");
+		  if (!SetTokenInformation (hProcImpToken, TokenPrimaryGroup,
 					    &gsid, sizeof gsid))
 		    debug_printf ("SetTokenInformation(TokenPrimaryGroup), %E");
 		  else
 		    user.groups.pgsid = gsid;
-		  CloseHandle (ptok);
 		}
 	    }
 	  else
@@ -162,6 +156,7 @@ uinfo_init ()
   cygheap->user.saved_gid = cygheap->user.real_gid = myself->gid;
   cygheap->user.external_token = NO_IMPERSONATION;
   cygheap->user.internal_token = NO_IMPERSONATION;
+  cygheap->user.curr_primary_token = NO_IMPERSONATION;
   cygheap->user.current_token = NO_IMPERSONATION;
   cygheap->user.set_saved_sid ();	/* Update the original sid */
 }

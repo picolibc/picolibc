@@ -268,7 +268,7 @@ cygheap_init ()
   if (!cygheap->shared_prefix)
     cygheap->shared_prefix = cstrdup (
 	    wincap.has_terminal_services ()
-	    && (set_process_privilege (SE_CREATE_GLOBAL_NAME, true) >= 0
+	    && (set_process_privilege (SE_CREATE_GLOBAL_PRIV, true) >= 0
 		|| GetLastError () == ERROR_NO_SUCH_PRIVILEGE)
 	    ? "Global\\" : "");
 }
@@ -511,4 +511,3 @@ cygheap_user::set_name (const char *new_name)
   cfree_and_set (pdomain);
   cfree_and_set (pwinname);
 }
-

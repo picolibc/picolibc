@@ -1,5 +1,104 @@
 2005-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.cc (cygheap_init): Accomodate set_process_privilege change.
+	* cygheap.h (cygheap_user::curr_primary_token): New member.
+	(cygheap_user::primary_token): New method.
+	(cygheap_user::deimpersonate): Always revert to processes'
+	impersonation token.
+	(cygheap_user::reimpersonate): Set processes' or setuid token as
+	necessary.
+	(cygheap_user::has_impersonation_tokens): Look for curr_primary_token
+	value.
+	(cygheap_user::close_impersonation_tokens): Close curr_primary_token
+	here if necessary.  Don't reset token values to NO_IMPERSONATION since
+	that's done in uinfo_init anyway.
+	(init_cygheap::luid): New LUID array keeping privilege LUIDs.
+	* cygtls.cc (_cygtls::init_thread): Call cygheap->user.reimpersonate.
+	* dcrt0.cc (hProcToken): New global variable to keep process token.
+	(hProcImpToken): Ditto for process impersonation token.
+	(dll_crt0_0): Open process token here once.  Duplicate to create
+	hProcImpToken.
+	(dll_crt0_1): Call set_cygwin_privileges.
+	* environ.cc (allow_ntea): Drop duplicate declaration.
+	(allow_smbntsec): Ditto.
+	(set_traverse): Only set allow_traverse here.
+	(environ_init): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Drop call to
+	enable_restore_privilege.
+	(fhandler_disk_file::fchown): Ditto.
+	(fhandler_disk_file::facl): Ditto.
+	* fork.cc (fork_child): Move call to cygheap->user.reimpersonate after
+	syn with parent. Call set_cygwin_privileges.
+	* grp.cc (internal_getgroups): Use hProcImpToken instead of opening
+	process token.
+	* path.cc (fs_info::update): Bypass traverse checking when retrieving
+	volume information using push/pop_thread_privileges.
+	* registry.cc (load_registry_hive): Drop setting restore privilege
+	since it's already set if available.
+	* sec_helper.cc: Include cygtls.h.
+	(cygpriv): Privilege string array.
+	(privilege_luid): New function, evaluate LUID from cygpriv_idx.
+	(privilege_luid_by_name): New function, evaluate LUID from privilege
+	string.
+	(privilege_name): New function, evaluate privilege string from
+	cygpriv_idx.
+	(set_privilege): New static function called by set_process_privilege
+	and set_thread_privilege.  Call privilege_luid to get privilege LUID.
+	Fix bug in return value evaluation. Improve debug output.
+	(set_cygwin_privileges): New function.
+	(set_process_privilege): Remove.
+	(enable_restore_privilege): Remove.
+	* security.cc (allow_traverse): New global variable.
+	(sys_privs): Change type to cygpriv_idx and store privilege indices
+	instead of strings.
+	(SYSTEM_PRIVILEGES_COUNT): Renamed from SYSTEM_PERMISSION_COUNT.
+	(get_system_priv_list): Don't use numerical constant in malloc call.
+	Use privilege_luid to get privilege LUIDs.
+	(get_priv_list): Call privilege_luid_by_name to get LUIDs. Improve
+	inner privilege LUID comparison loop.
+	(create_token): Enable create token privilege using
+	push/pop_self_privileges. Use hProcToken instead of opening process
+	token. Use default DACL when duplicating token.
+	(subauth): Enable tcb privilege using push/pop_self_privileges.
+	Use sec_none instead of homw made security attributes when duplicating
+	token.
+	(check_file_access): Don't duplicate access token, use active
+	impersonation token as is.
+	* security.h (enum cygpriv_idx): New enumeration type enumerating
+	possible privileges.
+	(privilege_luid): Declare new function.
+	(privilege_luid_by_name): Ditto.
+	(privilege_name): Ditto.
+	(allow_traverse): Declare.
+	(set_privilege): Declare function.
+	(set_process_privilege): Define as macro.
+	(enable_restore_privilege): Remove declaration.
+	(_push_thread_privilege): Define macro.
+	(push_thread_privilege): Ditto.
+	(pop_thread_privilege): Ditto.
+	(pop_self_privilege): Ditto.
+	* spawn.cc (spawn_guts): Use cygheap->user.primary_token instead of
+	cygheap->user.token.
+	* syscalls.cc (statvfs): Bypass traverse checking when retrieving
+	volume information using push/pop_thread_privileges. Rearrange code
+	to simplify push/pop bracketing.
+	(seteuid32): Use hProcToken instead of opening process token. Call
+	cygheap->user.deimpersonate instead of RevertToSelf.  Create
+	impersonation token from primary internal or external token.  Set
+	cygheap->user.curr_primary_token and cygheap->user.current_token
+	privileges once here.  Drop "failed" and "failed_ptok" labels. 
+	Drop setting DefaultDacl of process token.
+	(setegid32): Use hProcToken and hProcImpToken instead of opening
+	process token. Always reimpersonate afterwards.
+	* uinfo.cc (cygheap_user::init): Use hProcToken instead of opening
+	process token.
+	(internal_getlogin): Ditto. Set hProcImpToken, too.
+	(uinfo_init): Initialize cygheap->user.curr_primary_token.
+	* winsup.h (hProcToken): Declare.
+	(hProcImpToken): Declare.
+
+2005-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	Unify usage of CYG_MAX_PATH throughout.  Change buffers from
 	size CYG_MAX_PATH + 1 to CYG_MAX_PATH.  Change length tests
 	accordingly.

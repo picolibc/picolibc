@@ -45,6 +45,8 @@ void ld_preload ();
 
 HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
+HANDLE NO_COPY hProcToken;
+HANDLE NO_COPY hProcImpToken;
 
 bool display_title;
 bool strip_title_path;
@@ -589,6 +591,8 @@ dll_crt0_0 ()
 
   DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
 		   &hMainThread, 0, false, DUPLICATE_SAME_ACCESS);
+  if (wincap.has_security ())
+    OpenProcessToken (hMainProc, MAXIMUM_ALLOWED, &hProcToken);
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 
@@ -688,6 +692,12 @@ dll_crt0_0 ()
   events_init ();
 
   cygheap->cwd.init ();
+
+  /* Late duplicate simplifies tweaking the process token in uinfo.cc. */
+  if (wincap.has_security ())
+    DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
+		      SecurityImpersonation, TokenImpersonation,
+		      &hProcImpToken);
 }
 
 /* Take over from libc's crt0.o and start the application. Note the
@@ -758,6 +768,9 @@ dll_crt0_1 (char *)
 
   /* Initialize our process table entry. */
   pinfo_init (envp, envc);
+
+  /* Can be set only after environment has been initialized. */
+  set_cygwin_privileges (hProcImpToken);
 
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
       old_title = title_buf;

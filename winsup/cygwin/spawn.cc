@@ -711,7 +711,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
 					  real_path.iscygexec ());
       newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
-      rc = CreateProcessAsUser (cygheap->user.token (),
+      rc = CreateProcessAsUser (cygheap->user.primary_token (),
 		       runpath,		/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
 		       &sec_none_nih,   /* process security attrs */
