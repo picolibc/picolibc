@@ -87,14 +87,41 @@ munge_threadfunc ()
     }
 }
 
+static void __attribute__ ((noreturn))
+respawn_wow64_process ()
+{
+  PROCESS_INFORMATION pi;
+  STARTUPINFO si;
+  GetStartupInfo (&si);
+  if (!CreateProcessA (NULL, GetCommandLineA (), NULL, NULL, TRUE,
+		       CREATE_DEFAULT_ERROR_MODE
+		       | GetPriorityClass (GetCurrentProcess ()),
+		       NULL, NULL, &si, &pi))
+    api_fatal ("Failed to create process <%s>: %E", GetCommandLineA ());
+  CloseHandle (pi.hThread);
+  if (WaitForSingleObject (pi.hProcess, INFINITE) == WAIT_FAILED)
+    api_fatal ("Waiting for process %d failed: %E", pi.dwProcessId);
+  CloseHandle (pi.hProcess);
+  ExitProcess (0);
+}
+
 extern void __stdcall dll_crt0_0 ();
 
 extern "C" int WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
+  BOOL is_64bit_machine = FALSE;
+
   switch (reason)
     {
     case DLL_PROCESS_ATTACH:
+      /* Is the stack at an unusual high address?  Check if we're running on
+         a 64 bit machine.  If so, respawn. */
+      if (&is_64bit_machine >= (PBOOL) 0x400000
+          && IsWow64Process (hMainProc, &is_64bit_machine)
+          && is_64bit_machine)
+	respawn_wow64_process ();
+
       prime_threads ();
       dynamically_loaded = (static_load == NULL);
       dll_crt0_0 ();

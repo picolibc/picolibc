@@ -1,3 +1,14 @@
+2004-07-24  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <cgf@timesys.com>
+
+	* autoload.cc (GetNativeSystemInfo): Add.
+	(IsWow64Process): Add.
+	* init.cc (respawn_wow64_process): New function.
+	(dll_entry): If process has been started from a 64 bit
+	process, call respawn_wow64_process.
+	* uname.cc (uname): On 64 bit systems, use GetNativeSystemInfo. 
+	Show actual CPU type.
+
 2004-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::get_debugger_info): Make stderr r/w according

@@ -29,7 +29,11 @@ uname (struct utsname *name)
   memset (name, 0, sizeof (*name));
   __small_sprintf (name->sysname, "CYGWIN_%s", wincap.osname ());
 
-  GetSystemInfo (&sysinfo);
+  BOOL is_64bit_machine = FALSE;
+  if (IsWow64Process (hMainProc, &is_64bit_machine) && is_64bit_machine)
+    GetNativeSystemInfo (&sysinfo);
+  else
+    GetSystemInfo (&sysinfo);
 
   /* Computer name */
   cygwin_gethostname (name->nodename, sizeof (name->nodename) - 1);
@@ -74,6 +78,14 @@ uname (struct utsname *name)
 	  }
 	__small_sprintf (name->machine, "i%d86", ptype);
 	break;
+      case PROCESSOR_ARCHITECTURE_IA64:
+        strcpy (name->machine, "ia64");
+	break;
+      case PROCESSOR_ARCHITECTURE_AMD64:
+        strcpy (name->machine, "amd64");
+	break;
+      case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
+      	strcpy (name->machine, "ia32-win64");
       case PROCESSOR_ARCHITECTURE_ALPHA:
 	strcpy (name->machine, "alpha");
 	break;
