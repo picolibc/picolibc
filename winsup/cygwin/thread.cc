@@ -294,7 +294,7 @@ MTinterface::Init (int forked)
   concurrency = 0;
   threadcount = 1; /*1 current thread when Init occurs.*/
 
-  pthread::initMainThread(&mainthread, myself->hProcess);
+  pthread::initMainThread (&mainthread, myself->hProcess);
 
   if (forked)
     return;
@@ -314,10 +314,17 @@ MTinterface::Init (int forked)
 #endif
 }
 
+void
+MTinterface::fixup_before_fork (void)
+{
+  pthread_key::fixup_before_fork ();
+}
+
 /* This function is called from a single threaded process */
 void
 MTinterface::fixup_after_fork (void)
 {
+  pthread_key::fixup_after_fork ();
   pthread_mutex *mutex = mutexs;
   debug_printf ("mutexs is %x",mutexs);
   while (mutex)
@@ -345,11 +352,11 @@ MTinterface::fixup_after_fork (void)
 
 /* static methods */
 void
-pthread::initMainThread(pthread *mainThread, HANDLE win32_obj_id)
+pthread::initMainThread (pthread *mainThread, HANDLE win32_obj_id)
 {
   mainThread->win32_obj_id = win32_obj_id;
   mainThread->setThreadIdtoCurrent ();
-  setTlsSelfPointer(mainThread);
+  setTlsSelfPointer (mainThread);
 }
 
 pthread *
@@ -362,23 +369,25 @@ pthread::self ()
   temp->precreate (NULL);
   if (!temp->magic) {
       delete temp;
-      return pthreadNull::getNullpthread();
+      return pthreadNull::getNullpthread ();
   }
   temp->postcreate ();
   return temp;
 }
 
 void
-pthread::setTlsSelfPointer(pthread *thisThread)
+pthread::setTlsSelfPointer (pthread *thisThread)
 {
   /*the OS doesn't check this for <= 64 Tls entries (pre win2k) */
   TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thisThread);
 }
 
+
+
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-		    cancelstate (0), canceltype (0), cancel_event(0),
-		    joiner (NULL), cleanup_stack(NULL)
+                    cancelstate (0), canceltype (0), cancel_event (0),
+                    joiner (NULL), cleanup_stack (NULL) 
 {
 }
 
@@ -480,7 +489,7 @@ pthread::exit (void *value_ptr)
 
   mutex.Lock ();
   // cleanup if thread is in detached state and not joined
-  if( __pthread_equal(&joiner, &thread ) )
+  if (__pthread_equal (&joiner, &thread ) )
     delete this;
   else
     {
@@ -489,7 +498,7 @@ pthread::exit (void *value_ptr)
     }
 
   /* Prevent DLL_THREAD_DETACH Attempting to clean us up */
-  setTlsSelfPointer(0);
+  setTlsSelfPointer (0);
 
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     ::exit (0);
@@ -514,7 +523,7 @@ pthread::cancel (void)
       return 0;
     }
 
-  else if (__pthread_equal(&thread, &self))
+  else if (__pthread_equal (&thread, &self))
     {
       mutex.UnLock ();
       cancel_self ();
@@ -716,14 +725,14 @@ pthread::testcancel (void)
   if (cancelstate == PTHREAD_CANCEL_DISABLE)
     return;
 
-  if( WAIT_OBJECT_0 == WaitForSingleObject (cancel_event, 0 ) )
+  if (WAIT_OBJECT_0 == WaitForSingleObject (cancel_event, 0 ) )
     cancel_self ();
 }
 
 void
 pthread::static_cancel_self (void)
 {
-  pthread::self()->cancel_self ();
+  pthread::self ()->cancel_self ();
 }
 
 
@@ -776,7 +785,7 @@ pthread::push_cleanup_handler (__pthread_cleanup_handler *handler)
     // TODO: do it?
     api_fatal ("Attempt to push a cleanup handler across threads");
   handler->next = cleanup_stack;
-  InterlockedExchangePointer( &cleanup_stack, handler );
+  InterlockedExchangePointer (&cleanup_stack, handler );
 }
 
 void
@@ -808,13 +817,13 @@ pthread::pop_all_cleanup_handlers ()
 }
 
 void
-pthread::cancel_self()
+pthread::cancel_self ()
 {
   exit (PTHREAD_CANCELED);
 }
 
 DWORD
-pthread::getThreadId()
+pthread::getThreadId ()
 {
   return thread_id;
 }
@@ -1018,6 +1027,35 @@ pthread_cond::fixup_after_fork ()
 #endif
 }
 
+/* pthread_key */
+/* static members */
+pthread_key *pthread_key::keys = NULL;
+
+void
+pthread_key::fixup_before_fork ()
+{
+  pthread_key *key = keys;
+  debug_printf ("keys is %x",keys);
+  while (key)
+    {
+      key->saveKeyToBuffer ();
+      key = key->next;
+    }
+}
+
+void
+pthread_key::fixup_after_fork ()
+{
+  pthread_key *key = keys;
+  debug_printf ("keys is %x",keys);
+  while (key)
+    {
+      key->recreateKeyFromBuffer ();
+      key = key->next;
+    }
+}
+
+/* non-static members */
 
 pthread_key::pthread_key (void (*destructor) (void *)):verifyable_object (PTHREAD_KEY_MAGIC)
 {
@@ -1029,6 +1067,8 @@ pthread_key::pthread_key (void (*destructor) (void *)):verifyable_object (PTHREA
       MT_INTERFACE->destructors.
 	Insert (new pthread_key_destructor (destructor, this));
     }
+  /* threadsafe addition is easy */
+  next = (pthread_key *) InterlockedExchangePointer (&keys, this);
 }
 
 pthread_key::~pthread_key ()
@@ -1036,6 +1076,18 @@ pthread_key::~pthread_key ()
   if (pthread_key_destructor *dest = MT_INTERFACE->destructors.Remove (this))
     delete dest;
   TlsFree (dwTlsIndex);
+
+  /* I'm not 100% sure the next bit is threadsafe. I think it is... */
+  if (keys == this)
+    InterlockedExchangePointer (keys, this->next);
+  else
+    {
+      pthread_key *tempkey = keys;
+      while (tempkey->next && tempkey->next != this)
+        tempkey = tempkey->next;
+      /* but there may be a race between the loop above and this statement */
+      InterlockedExchangePointer (&tempkey->next, this->next);
+    }
 }
 
 int
@@ -1051,6 +1103,21 @@ pthread_key::get ()
 {
   set_errno (0);
   return TlsGetValue (dwTlsIndex);
+}
+
+void
+pthread_key::saveKeyToBuffer ()
+{
+  fork_buf = get ();
+}
+
+void
+pthread_key::recreateKeyFromBuffer ()
+{
+  dwTlsIndex = TlsAlloc ();
+  if (dwTlsIndex == TLS_OUT_OF_INDEXES)
+    api_fatal ("pthread_key::recreateKeyFromBuffer () failed to reallocate Tls storage");
+  set (fork_buf);
 }
 
 /*pshared mutexs:
@@ -1311,7 +1378,7 @@ pthread::thread_init_wrapper (void *_arg)
   pthread *thread = (pthread *) _arg;
   struct __reent_t local_reent;
   struct _winsup_t local_winsup;
-  struct _reent local_clib = _REENT_INIT(local_clib);
+  struct _reent local_clib = _REENT_INIT (local_clib);
 
   struct sigaction _sigs[NSIG];
   sigset_t _sig_mask;		/*one set for everything to ignore. */
@@ -1333,7 +1400,7 @@ pthread::thread_init_wrapper (void *_arg)
   if (!TlsSetValue (MT_INTERFACE->reent_index, &local_reent))
     system_printf ("local storage for thread couldn't be set");
 
-  setTlsSelfPointer(thread);
+  setTlsSelfPointer (thread);
 
   thread->mutex.Lock ();
   // if thread is detached force cleanup on exit
@@ -1448,8 +1515,10 @@ __pthread_cancel (pthread_t thread)
  *If yes, we're safe, if no, we're not.
  */
 void
-__pthread_atforkprepare (void)
+pthread::atforkprepare (void)
 {
+  MT_INTERFACE->fixup_before_fork ();
+
   callback *cb = MT_INTERFACE->pthread_prepare;
   while (cb)
     {
@@ -1459,7 +1528,7 @@ __pthread_atforkprepare (void)
 }
 
 void
-__pthread_atforkparent (void)
+pthread::atforkparent (void)
 {
   callback *cb = MT_INTERFACE->pthread_parent;
   while (cb)
@@ -1470,8 +1539,10 @@ __pthread_atforkparent (void)
 }
 
 void
-__pthread_atforkchild (void)
+pthread::atforkchild (void)
 {
+  MT_INTERFACE->fixup_after_fork ();
+
   callback *cb = MT_INTERFACE->pthread_child;
   while (cb)
     {
@@ -1713,12 +1784,12 @@ __pthread_join (pthread_t *thread, void **return_val)
   if (!pthread::isGoodObject (thread))
     return ESRCH;
 
-  if (__pthread_equal(thread,&joiner))
+  if (__pthread_equal (thread,&joiner))
     return EDEADLK;
 
   (*thread)->mutex.Lock ();
 
-  if((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
+  if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
       (*thread)->mutex.UnLock ();
       return EINVAL;
@@ -2462,20 +2533,20 @@ __sem_post (sem_t *sem)
 
 /* pthreadNull */
 pthread *
-pthreadNull::getNullpthread()
+pthreadNull::getNullpthread ()
 {
   /* because of weird entry points */
   _instance.magic = 0;
   return &_instance;
 }
 
-pthreadNull::pthreadNull()
+pthreadNull::pthreadNull ()
 {
   /* Mark ourselves as invalid */
   magic = 0;
 }
 
-pthreadNull::~pthreadNull()
+pthreadNull::~pthreadNull ()
 {
 }
 
@@ -2522,7 +2593,7 @@ pthreadNull::pop_cleanup_handler (int const execute)
 {
 }
 unsigned long
-pthreadNull::getsequence_np()
+pthreadNull::getsequence_np ()
 {
   return 0;
 }
