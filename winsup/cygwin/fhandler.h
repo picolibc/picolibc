@@ -1107,7 +1107,6 @@ class fhandler_proc: public fhandler_virtual
   void fill_filebuf ();
 };
 
-class pinfo;
 class fhandler_registry: public fhandler_proc
 {
  public:
@@ -1125,9 +1124,10 @@ class fhandler_registry: public fhandler_proc
   void fill_filebuf ();
 };
 
-struct _pinfo;
+class pinfo;
 class fhandler_process: public fhandler_proc
 {
+  pid_t pid;
   pinfo *p;
  public:
   fhandler_process ();

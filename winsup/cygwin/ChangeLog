@@ -1,5 +1,12 @@
 2002-06-30  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.h (fhandler_process::pid): New field.
+	(fhandler_process::fstat): Remove unneeded array.  Set pid element.
+	(fhandler_process::open): Ditto.
+	(fhandler_process::fill_filebuf): Handle case where 'p' field is NULL.
+
+2002-06-30  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.h (fhandler_process::p): New field.
 	(fhandler_process:fill_filebuf): Revert to same definition as virtual
 	in parent class.

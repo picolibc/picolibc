@@ -100,12 +100,11 @@ fhandler_process::fstat (struct __stat64 *buf, path_conv *pc)
   int file_type = exists ();
   (void) fhandler_base::fstat (buf, pc);
   path += proc_len + 1;
-  int pid = atoi (path);
-  winpids pids;
+  pid = atoi (path);
   pinfo p (pid);
   if (!p)
     {
-      set_errno(ENOENT);
+      set_errno (ENOENT);
       return -1;
     }
 
@@ -154,8 +153,7 @@ fhandler_process::readdir (DIR * dir)
 int
 fhandler_process::open (path_conv *pc, int flags, mode_t mode)
 {
-  int process_file_no = -1, pid;
-  winpids pids;
+  int process_file_no = -1;
 
   int res = fhandler_virtual::open (pc, flags, mode);
   if (!res)
@@ -249,6 +247,17 @@ out:
 void
 fhandler_process::fill_filebuf ()
 {
+  pinfo pmaybe;
+
+  if (!p)
+    {
+      pmaybe.init (pid);
+      p = &pmaybe;
+    }
+
+  if (!p)
+    return;
+
   switch (fileid)
     {
     case PROCESS_UID:
@@ -349,6 +358,9 @@ fhandler_process::fill_filebuf ()
 	break;
       }
     }
+
+  if (p == &pmaybe)
+    p = NULL;
 }
 
 static
