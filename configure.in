@@ -656,7 +656,8 @@ case "${target}" in
     ;;
   hppa*-*-*elf* | \
   hppa*-*-linux-gnu* | \
-  hppa*-*-lites*)
+  hppa*-*-lites* | \
+  hppa*64*-*-*)
     # Do configure ld/binutils/gas for the above cases.
     ;;
   hppa*-*-*)
