@@ -643,6 +643,19 @@ extern "C" {
 #define CDRF_NOTIFYPOSTPAINT 16
 #define CDRF_NEWFONT 2
 #define CDRF_SKIPDEFAULT 4
+#if (_WIN32_IE >= 0x0400)
+#define LVBKIF_SOURCE_NONE      0x00000000
+#define LVBKIF_SOURCE_HBITMAP   0x00000001
+#define LVBKIF_SOURCE_URL       0x00000002
+#define LVBKIF_SOURCE_MASK      0x00000003
+#define LVBKIF_STYLE_NORMAL     0x00000000
+#define LVBKIF_STYLE_TILE       0x00000010
+#define LVBKIF_STYLE_MASK       0x00000010
+#endif /* _WIN32_IE >=0x0400 */
+#if (_WIN32_WINNT >= 0x501)
+#define LVBKIF_FLAG_TILEOFFSET  0x00000100
+#define LVBKIF_TYPE_WATERMARK   0x10000000
+#endif /* _WIN32_WINNT >= 0x501 */
 #define LVS_OWNERDATA 4096
 #define LVS_EX_CHECKBOXES 4
 #define LVS_EX_FULLROWSELECT 32
@@ -698,6 +711,12 @@ extern "C" {
 #define LVM_DELETEALLITEMS	(LVM_FIRST+9)
 #define LVM_GETCALLBACKMASK	(LVM_FIRST+10)
 #define LVM_SETCALLBACKMASK	(LVM_FIRST+11)
+#if( _WIN32_IE >= 0x0400 )
+#define LVM_SETBKIMAGEA	(LVM_FIRST + 68)
+#define LVM_SETBKIMAGEW	(LVM_FIRST + 138)
+#define LVM_GETBKIMAGEA	(LVM_FIRST + 69)
+#define LVM_GETBKIMAGEW	(LVM_FIRST + 139)
+#endif /* _WIN32_IE >=0x0400 */
 #define LVNI_ALL	0
 #define LVNI_FOCUSED	1
 #define LVNI_SELECTED	2
@@ -1411,7 +1430,23 @@ typedef struct {
 	LPWSTR pszText;
 	int cchText;
 } TBBUTTONINFOW, *LPTBBUTTONINFOW;
-#endif
+typedef struct tagLVBKIMAGEA {
+	ULONG ulFlags;              
+	HBITMAP hbm;
+	LPSTR pszImage;
+	UINT cchImageMax;
+	int xOffsetPercent;
+	int yOffsetPercent;
+} LVBKIMAGEA, *LPLVBKIMAGEA;
+typedef struct tagLVBKIMAGEW {
+	ULONG ulFlags;             
+	HBITMAP hbm;
+	LPWSTR pszImage;
+	UINT cchImageMax;
+	int xOffsetPercent;
+	int yOffsetPercent;
+} LVBKIMAGEW, *LPLVBKIMAGEW;
+#endif /* _WIN32_IE >= 0x400 */
 typedef struct {
 	NMHDR hdr;
 	int iItem;
@@ -2367,6 +2402,8 @@ WINBOOL WINAPI ImageList_DrawIndirect(IMAGELISTDRAWPARAMS*);
 #define TreeView_SetToolTips(w,wt) (HWND)SNDMSG((w),TVM_SETTOOLTIPS,(WPARAM)(wt),0)
 #endif
 #if (_WIN32_IE >= 0x0400)
+#define ListView_GetBkImage(h,plvbki) (BOOL)SNDMSG((h), LVM_GETBKIMAGE, 0, (LPARAM)(plvbki))
+#define ListView_SetBkImage(h, plvbki) (BOOL)SNDMSG((h), LVM_SETBKIMAGE, 0, (LPARAM)(plvbki))
 #define ListView_SetExtendedListViewStyleEx(w,m,s) (DWORD)SNDMSG((w),LVM_SETEXTENDEDLISTVIEWSTYLE,(m),(s))
 #define TabCtrl_HighlightItem(hwnd, i, fHighlight) SNDMSG((hwnd), TCM_HIGHLIGHTITEM, (WPARAM)i, (LPARAM)MAKELONG (fHighlight, 0))
 #define TabCtrl_SetExtendedStyle(hwnd, dw) SNDMSG((hwnd), TCM_SETEXTENDEDSTYLE, 0, dw)
@@ -2481,6 +2518,12 @@ typedef NMTREEVIEWW NMTREEVIEW,*LPNMTREEVIEW;
 #define LV_ITEM LV_ITEMW
 #define LVITEM LVITEMW
 #define LPSTR_TEXTCALLBACK LPSTR_TEXTCALLBACKW
+#if _WIN32_IE >= 0x0400
+#define LVBKIMAGE	LVBKIMAGEW
+#define LPLVBKIMAGE	LPLVBKIMAGEW
+#define LVM_SETBKIMAGE	LVM_SETBKIMAGEW
+#define LVM_GETBKIMAGE	LVM_GETBKIMAGEW
+#endif /* _WIN32_IE >= 0x400 */
 #define LVM_GETITEM	LVM_GETITEMW
 #define LVM_SETITEM LVM_SETITEMW
 #define LVM_INSERTITEM LVM_INSERTITEMW
@@ -2632,6 +2675,12 @@ typedef NMTREEVIEWA NMTREEVIEW,*LPNMTREEVIEW;
 #define LV_ITEM LV_ITEMA
 #define LVITEM LVITEMA
 #define LPSTR_TEXTCALLBACK LPSTR_TEXTCALLBACKA
+#if _WIN32_IE >= 0x0400
+#define LVBKIMAGE	LVBKIMAGEA
+#define LPLVBKIMAGE	LPLVBKIMAGEA
+#define LVM_SETBKIMAGE	LVM_SETBKIMAGEA
+#define LVM_GETBKIMAGE	LVM_GETBKIMAGEA
+#endif /* _WIN32_IE >= 0x0400 */
 #define LVM_GETITEM	LVM_GETITEMA
 #define LVM_SETITEM LVM_SETITEMA
 #define LVM_INSERTITEM LVM_INSERTITEMA

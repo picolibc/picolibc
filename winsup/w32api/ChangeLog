@@ -1,3 +1,16 @@
+2002-12-02  Ken Fitlike  <kenfitlike@users.sourceforge.net>
+
+	* include/commctrl.h (LVBKIF_*): Add defines.
+	(LVM_SETIMAGE[AW]): Add defines and UNICODE mappings.
+	(LVM_GETIMAGE[AW]): Add defines and UNICODE mappings.
+	(LVBKIMAGE[AW]): Add defines and UNICODE mappings.
+	(LPLVBKIMAGE[AW]): Add defines and UNICODE mappings.
+	(LVM_GETBKIMAGE[AW]): Add defines and UNICODE mappings.
+	(LVM_SETBKIMAGE[AW]): Add defines and UNICODE mappings.
+	(ListView_GetBkImage): Add define.
+	(ListView_SetBkImage): Add define.
+	(LVBKIMAGE): Add structures and typedefs.
+
 2002-11-25  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/w32api.h: Increment to version 2.2
