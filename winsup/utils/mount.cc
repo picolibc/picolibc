@@ -87,6 +87,7 @@ do_mount (const char *dev, const char *where, int flags)
 
 struct option longopts[] =
 {
+  {"help", no_argument, NULL, 'h' },
   {"binary", no_argument, NULL, 'b'},
   {"force", no_argument, NULL, 'f'},
   {"system", no_argument, NULL, 's'},
@@ -100,7 +101,7 @@ struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-char opts[] = "bfstuxXpic";
+char opts[] = "hbfstuxXpic";
 
 static void
 usage (void)
@@ -110,7 +111,7 @@ usage (void)
 				(newline = \\n)\n\
   -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>\n\
   -f, --force                   force mount, don't warn about missing mount\n\
-                                point directories\n\
+				point directories\n\
   -i, --import-old-mounts copy  old registry mount table mounts into the current\n\
 				mount areas\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
@@ -151,7 +152,7 @@ main (int argc, char **argv)
       case 'b':
 	flags |= MOUNT_BINARY;
 	break;
-      case 'c': 
+      case 'c':
 	if (do_what == nada)
 	  do_what = saw_change_cygdrive_prefix;
 	else
@@ -259,24 +260,24 @@ mount_already_exists (const char *posix_path, int flags)
 	{
 	  if (p->mnt_type[0] == 'u')
 	    {
-              if (!(flags & MOUNT_SYSTEM)) /* both current_user */
-                found_matching = 1;
-              else
-	        fprintf (stderr,
-                         "%s: warning: system mount point of '%s' "
-                         "will always be masked by user mount.\n",
-                         progname, posix_path);
+	      if (!(flags & MOUNT_SYSTEM)) /* both current_user */
+		found_matching = 1;
+	      else
+		fprintf (stderr,
+			 "%s: warning: system mount point of '%s' "
+			 "will always be masked by user mount.\n",
+			 progname, posix_path);
 	      break;
-            }
+	    }
 	  else if (p->mnt_type[0] == 's')
 	    {
-              if (flags & MOUNT_SYSTEM) /* both system */
-                found_matching = 1;
-              else
-	        fprintf (stderr,
-                         "%s: warning: user mount point of '%s' "
-                         "masks system mount.\n",
-                         progname, posix_path);
+	      if (flags & MOUNT_SYSTEM) /* both system */
+		found_matching = 1;
+	      else
+		fprintf (stderr,
+			 "%s: warning: user mount point of '%s' "
+			 "masks system mount.\n",
+			 progname, posix_path);
 	      break;
 	    }
 	  else

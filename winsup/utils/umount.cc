@@ -25,6 +25,7 @@ static const char *progname;
 
 struct option longopts[] =
 {
+  {"help", no_argument, NULL, 'h' },
   {"remove-all-mounts", no_argument, NULL, 'A'},
   {"remove-cygdrive-prefix", no_argument, NULL, 'c'},
   {"remove-system-mounts", no_argument, NULL, 'S'},
@@ -34,7 +35,7 @@ struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-char opts[] = "RSUsuc";
+char opts[] = "hASUsuc";
 
 static void
 usage (void)

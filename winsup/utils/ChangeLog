@@ -1,14 +1,21 @@
+2001-04-15  Michael A Chase <mchase@ix.netcom.com>
+  
+	* mount.cc (longopts): Add help to options list.
+	(opts): Add 'h' to options string.
+	* umount.cc (longopts): Add help to options list.
+	(opts): Add 'h' to options string and change 'R' to 'A'.
+
 2001-04-13  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* mkgroup.c (enum_groups): Use RID + offset specified an additional
 	argument as ID.
 	(usage): Add description of -o option.
 	(longopts, opts): Add specifications of -o/--id-offset option.
-	(main): Add -o option. Invoke enum_groups with specified offset.
+	(main): Add -o option.  Invoke enum_groups with specified offset.
 	* mkpasswd.c (enum_users): Just like mkgroup.c.
 	(usage, longopts, opts): Ditto.
-	(main): Add -o option. Invoke enum_users with specified offset
-	only against domain accounts.
+	(main): Add -o option.  Invoke enum_users with specified offset only
+	against domain accounts.
 
 2001-04-11  Egor Duda  <deo@logos-m.ru>
 
@@ -38,9 +45,9 @@ Sat Mar 17 21:46:06 2001  Christopher Faylor <cgf@cygnus.com>
 
 Mon Mar  5 18:50:00 2001  Corinna Vinschen <vinschen@redhat.com>
 
-        * getfacl.c: Add copyright hint.
-        * setfacl.c: Ditto.
-        * strace.cc: Ditto.
+	* getfacl.c: Add copyright hint.
+	* setfacl.c: Ditto.
+	* strace.cc: Ditto.
 
 Tue Jan 09 10:26:23 2001  Tony Sideris  <tonys1110@home.com>
 
