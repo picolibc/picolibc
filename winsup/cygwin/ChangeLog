@@ -1,3 +1,7 @@
+Sun Oct 29 20:52:31 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Bump DLL minor version number to 6.
+
 Sat Oct 28 01:39:53 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Eliminate subdir stuff.
