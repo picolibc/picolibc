@@ -96,7 +96,7 @@ vfprintf.$(oext): vfprintf.c
 	$(LIB_COMPILE) $(INCLUDES) -c $(srcdir)/vfprintf.c
 
 vfiprintf.$(oext): vfprintf.c
-	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
+	$(LIB_COMPILE) $(INCLUDES) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
 CHEWOUT_FILES = \
 	clearerr.def		\
