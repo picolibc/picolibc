@@ -1,3 +1,13 @@
+2004-06-01  Paolo Bonzini <bonzini@gnu.org>
+
+	Merge this patch from the gcc tree:
+
+	2004-05-30  Andreas Jaeger  <aj@suse.de>
+		    Jim Wilson <wilson@specifixinc.com>
+
+	* config-ml.in: Pass FFLAGS and ADAFLAGS for multilibs, handle F77
+	like CC.
+
 2004-06-01  Paolo Bonzini  <bonzini@gnu.org>
 
 	* Makefile.tpl (all.normal): Rename to all.
