@@ -94,10 +94,12 @@ struct symlink_info
 {
   char buf[3 + MAX_PATH * 3];
   char *ext_here;
+  int extn;
   char *contents;
   unsigned pflags;
   DWORD fileattr;
   int is_symlink;
+  bool ext_tacked_on;
   int error;
   symlink_info (): contents (buf + MAX_PATH + 1) {}
   int check (const char *path, const suffix_info *suffixes);
@@ -377,10 +379,11 @@ path_conv::check (const char *src, unsigned opt,
     }
 
 fillin:
-  if (sym.ext_here && !(opt & PC_SYM_CONTENTS))
+  if (sym.ext_here && *sym.ext_here && !(opt & PC_SYM_CONTENTS))
     {
-      known_suffix = strchr (this->path, '\0');
-      strcpy (known_suffix, sym.ext_here);
+      known_suffix = this->path + sym.extn;
+      if (sym.ext_tacked_on)
+	strcpy (known_suffix, sym.ext_here);
     }
 
 out:
@@ -2467,8 +2470,11 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
   suffixes = suffixes_start = in_suffixes;
 
   char *ext_here = strrchr (in_path, '.');
+  path = in_path;
+  eopath = strchr (path, '\0');
+
   if (!ext_here)
-    goto done;
+    goto noext;
 
   if (suffixes)
     {
@@ -2489,10 +2495,11 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
       suffixes = NULL;
     }
 
+ noext:
+  ext_here = eopath;
+
  done:
-  path = in_path;
-  eopath = strchr (path, '\0');
-  return eopath;
+  return ext_here;
 }
 
 int
@@ -2574,6 +2581,9 @@ symlink_info::check (const char *path, const suffix_info *suffixes)
 
   is_symlink = TRUE;
   ext_here = suffix.has (path, suffixes);
+  extn = ext_here - path;
+
+  ext_tacked_on = !*ext_here;
 
   while (suffix.next ())
     {

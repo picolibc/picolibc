@@ -1,3 +1,11 @@
+Tue Apr 10 22:02:53 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (struct symlink_info): Add extn and ext_tacked_on fields.
+	(path_conv::check): Only tack on extension if a known one didn't
+	already exist.
+	(suffix_scan::has): Return pointer to known extension.
+	(symlink_info::check): Record location of extension, if any.
+
 2001-04-09  Egor Duda  <deo@logos-m.ru>
 
 	* fhandler.h (class fhandler_socket): Add members and methods to
