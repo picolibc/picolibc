@@ -1,3 +1,8 @@
+2003-05-09  Alan Modra  <amodra@bigpond.net.au>
+
+	* xtensa-isa-internal.h (xtensa_isa_module_struct): Remove const on
+	gen_num_opcodes_fn return type.
+
 2003-04-28  H.J. Lu <hjl@gnu.org>
 
 	* bfdlink.h (bfd_link_info): Add relax_finalizing.
