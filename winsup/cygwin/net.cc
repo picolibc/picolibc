@@ -428,7 +428,7 @@ cygwin_sendto (int fd,
 {
   fhandler_socket *h = (fhandler_socket *) fdtab[fd];
   sockaddr_in sin;
-  sigframe thisframe (mainthread, 0);
+  sigframe thisframe (mainthread);
 
   if (get_inet_addr (to, tolen, &sin, &tolen) == 0)
     return -1;
@@ -454,7 +454,7 @@ cygwin_recvfrom (int fd,
 		   int *fromlen)
 {
   fhandler_socket *h = (fhandler_socket *) fdtab[fd];
-  sigframe thisframe (mainthread, 0);
+  sigframe thisframe (mainthread);
 
   debug_printf ("recvfrom %d", h->get_socket ());
 
@@ -611,7 +611,7 @@ cygwin_connect (int fd,
   int res;
   fhandler_socket *sock = get (fd);
   sockaddr_in sin;
-  sigframe thisframe (mainthread, 0);
+  sigframe thisframe (mainthread);
 
   if (get_inet_addr (name, namelen, &sin, &namelen) == 0)
     return -1;
@@ -724,7 +724,7 @@ int
 cygwin_accept (int fd, struct sockaddr *peer, int *len)
 {
   int res = -1;
-  sigframe thisframe (mainthread, 0);
+  sigframe thisframe (mainthread);
 
   fhandler_socket *sock = get (fd);
   if (sock)
@@ -910,7 +910,7 @@ int
 cygwin_shutdown (int fd, int how)
 {
   int res = -1;
-  sigframe thisframe (mainthread, 0);
+  sigframe thisframe (mainthread);
 
   fhandler_socket *sock = get (fd);
   if (sock)
@@ -953,7 +953,7 @@ int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
   fhandler_socket *h = (fhandler_socket *) fdtab[fd];
-  sigframe thisframe (mainthread, 0);
+  sigframe thisframe (mainthread);
 
   int res = recv (h->get_socket (), (char *) buf, len, flags);
   if (res == SOCKET_ERROR)
@@ -979,7 +979,7 @@ int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
   fhandler_socket *h = (fhandler_socket *) fdtab[fd];
-  sigframe thisframe (mainthread, 0);
+  sigframe thisframe (mainthread);
 
   int res = send (h->get_socket (), (const char *) buf, len, flags);
   if (res == SOCKET_ERROR)
@@ -1366,7 +1366,7 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 {
   int res = -1;
   SOCKET fd2s;
-  sigframe thisframe (mainthread, 0);
+  sigframe thisframe (mainthread);
 
   int res_fd = fdtab.find_unused_handle ();
   if (res_fd == -1)
@@ -1406,7 +1406,7 @@ int
 cygwin_rresvport (int *port)
 {
   int res = -1;
-  sigframe thisframe (mainthread, 0);
+  sigframe thisframe (mainthread);
 
   int res_fd = fdtab.find_unused_handle ();
   if (res_fd == -1)
@@ -1435,7 +1435,7 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
 {
   int res = -1;
   SOCKET fd2s;
-  sigframe thisframe (mainthread, 0);
+  sigframe thisframe (mainthread);
 
   int res_fd = fdtab.find_unused_handle ();
   if (res_fd == -1)

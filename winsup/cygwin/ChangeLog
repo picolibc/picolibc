@@ -1,3 +1,12 @@
+Thu Sep  7 23:07:21 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.h (sigframe::set): Eliminate second argument.  Default bp to
+	current frame pointer rather than using this within the function, which
+	is unstable when this method is not inlined.
+	* net.cc: Eliminate use of second argument to sigframe.set throughout.
+	* select.cc (cygwin_select): Ditto.
+	* sigproc.cc (sig_send): Ditto.
+
 Thu Sep  7 22:45:16 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Break out more header info into separate files.  Use appropriate
