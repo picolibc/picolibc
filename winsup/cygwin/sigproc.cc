@@ -24,6 +24,8 @@ details. */
 #include "child_info.h"
 #include "perthread.h"
 #include <assert.h>
+#include "tty.h"
+#include "shared_info.h"
 
 /*
  * Convenience defines

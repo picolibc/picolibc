@@ -18,6 +18,8 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
+#include "tty.h"
+#include "shared_info.h"
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 

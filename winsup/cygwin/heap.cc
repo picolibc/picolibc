@@ -15,6 +15,8 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "heap.h"
+#include "tty.h"
+#include "shared_info.h"
 
 #define assert(x)
 

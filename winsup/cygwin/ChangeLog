@@ -1,3 +1,22 @@
+Thu Sep  7 12:14:43 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Split out tty and shared_info stuff into their own headers and use
+	throughout.  Include sys/termios.h for files which need it.
+	* tty.h: New file.
+	* shared_info.h: New file.
+	* fhandler.h: Move inline methods that rely on tty stuff to
+	fhandler_console.cc.
+	* fhandler_tty.cc (fhandler_pty_master::process_slave_output): Set
+	output_done_event immediately after reading data to speed up tty output
+	processing.
+	(process_output): Set write_error to errno or zero.
+	(fhandler_tty_slave::write): Check previous write error prior to
+	writing to slave end of pipe.  This allows tty output to be slightly
+	less synchronous.
+	* fhandler_console.cc (fhandler_console::tcsetpgrp): Moved here from
+	fhandler.h.
+	(fhandler_console::set_input_state): Ditto.
+
 Wed Sep  6 21:11:13 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (signal_exit): Reset all mutos owned by the main

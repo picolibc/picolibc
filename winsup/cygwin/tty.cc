@@ -20,6 +20,8 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "tty.h"
+#include "shared_info.h"
 
 extern fhandler_tty_master *tty_master;
 

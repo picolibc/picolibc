@@ -19,6 +19,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "tty.h"
 
 /* Common functions shared by tty/console */
 

@@ -32,6 +32,8 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include <unistd.h>
+#include "tty.h"
+#include "shared_info.h"
 
 extern BOOL allow_ntsec;
 

@@ -28,6 +28,8 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "thread.h"
+#include "tty.h"
+#include "shared_info.h"
 
 #define MAX_AT_FILE_LEVEL 10
 

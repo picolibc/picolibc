@@ -9,6 +9,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "tty.h"
+#include "shared_info.h"
 
 char cygnus_class[] = "cygnus";
 

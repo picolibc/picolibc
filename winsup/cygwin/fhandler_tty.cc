@@ -23,6 +23,8 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
+#include "tty.h"
+#include "shared_info.h"
 
 /* Tty master stuff */
 
@@ -285,14 +287,12 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	}
 
       termios_printf ("bytes read %u", n);
+      get_ttyp ()->write_error = 0;
+      if (output_done_event != NULL)
+	SetEvent (output_done_event);
 
       if (get_ttyp ()->ti.c_lflag & FLUSHO)
-	{
-	  get_ttyp ()->write_retval = n;
-	  if (output_done_event != NULL)
-	    SetEvent (output_done_event);
-	  continue;
-	}
+	continue;
 
       char *optr;
       optr = buf;
@@ -389,8 +389,7 @@ process_output (void *)
 	  ExitThread (0);
 	}
       n = tty_master->console->write ((void *) buf, (size_t) n);
-      tty_master->get_ttyp ()->write_retval = n == -1 ? -get_errno () : n;
-      SetEvent (tty_master->output_done_event);
+      tty_master->get_ttyp ()->write_error = n == -1 ? get_errno () : 0;
     }
 }
 
@@ -554,6 +553,16 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
       ptr = (char *) ptr + n;
       len -= n;
 
+      /* Previous write may have set write_error to != 0.  Check it here.
+	 This is less than optimal, but the alternative slows down tty
+	 writes enormously. */
+      if (get_ttyp ()->write_error)
+	{
+	  set_errno (get_ttyp ()->write_error);
+	  towrite = (DWORD) -1;
+	  break;
+	}
+
       if (WriteFile (get_output_handle (), buf, n, &n, NULL) == FALSE)
 	{
 	  DWORD err = GetLastError ();
@@ -576,13 +585,6 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
 	  DWORD x = n * 1000;
 	  rc = WaitForSingleObject (output_done_event, x);
 	  termios_printf("waited %d ms for output_done_event, WFSO %d", x, rc);
-	}
-
-      if (get_ttyp ()->write_retval < 0)
-	{
-	  set_errno (-get_ttyp ()->write_retval);
-	  towrite = (DWORD) -1;
-	  break;
 	}
     }
   release_output_mutex ();
@@ -931,12 +933,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 int
 fhandler_pty_master::read (void *ptr, size_t len)
 {
-  int x = process_slave_output ((char *) ptr, len, pktmode);
-
-  if (output_done_event != NULL)
-    SetEvent (output_done_event);
-
-  return x;
+  return process_slave_output ((char *) ptr, len, pktmode);
 }
 
 int

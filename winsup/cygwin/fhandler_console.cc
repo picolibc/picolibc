@@ -24,6 +24,8 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "tty.h"
+#include "shared_info.h"
 
 /*
  * Scroll the screen context.
@@ -248,6 +250,21 @@ fhandler_console::read (void *pv, size_t buflen)
 
   return copied_chars;
 }
+
+int
+fhandler_console::tcsetpgrp (pid_t pid)
+{
+  tc->pgid = pid;
+  return 0;
+}
+
+void
+fhandler_console::set_input_state ()
+{
+  if (TTYISSETF (RSTCONS))
+    input_tcsetattr (0, &tc->ti);
+}
+
 
 static struct
   {

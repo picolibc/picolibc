@@ -16,6 +16,8 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include <exceptions.h>
+#include "tty.h"
+#include "shared_info.h"
 
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)

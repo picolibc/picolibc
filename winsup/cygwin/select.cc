@@ -39,6 +39,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "perthread.h"
+#include "tty.h"
 
 /*
  * All these defines below should be in sys/types.h

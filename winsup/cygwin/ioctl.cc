@@ -17,6 +17,7 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include <sys/termios.h>
 
 extern "C" int
 ioctl (int fd, int cmd, void *buf)

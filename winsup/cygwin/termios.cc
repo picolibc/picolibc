@@ -16,10 +16,10 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include <sys/termios.h>
 
 /* tcsendbreak: POSIX 7.2.2.1 */
-extern "C"
-int
+extern "C" int
 tcsendbreak (int fd, int duration)
 {
   int res = -1;
@@ -47,8 +47,7 @@ out:
 }
 
 /* tcdrain: POSIX 7.2.2.1 */
-extern "C"
-int
+extern "C" int
 tcdrain (int fd)
 {
   int res = -1;
@@ -78,8 +77,7 @@ out:
 }
 
 /* tcflush: POSIX 7.2.2.1 */
-extern "C"
-int
+extern "C" int
 tcflush (int fd, int queue)
 {
   int res = -1;
@@ -107,8 +105,7 @@ out:
 }
 
 /* tcflow: POSIX 7.2.2.1 */
-extern "C"
-int
+extern "C" int
 tcflow (int fd, int action)
 {
   int res = -1;
@@ -136,8 +133,7 @@ out:
 }
 
 /* tcsetattr: POSIX96 7.2.1.1 */
-extern "C"
-int
+extern "C" int
 tcsetattr (int fd, int a, const struct termios *t)
 {
   int res = -1;
@@ -169,8 +165,7 @@ out:
 }
 
 /* tcgetattr: POSIX 7.2.1.1 */
-extern "C"
-int
+extern "C" int
 tcgetattr (int fd, struct termios *in_t)
 {
   int res = -1;
@@ -197,8 +192,7 @@ tcgetattr (int fd, struct termios *in_t)
 }
 
 /* tcgetpgrp: POSIX 7.2.3.1 */
-extern "C"
-int
+extern "C" int
 tcgetpgrp (int fd)
 {
   int res = -1;
@@ -215,8 +209,7 @@ tcgetpgrp (int fd)
 }
 
 /* tcsetpgrp: POSIX 7.2.4.1 */
-extern "C"
-int
+extern "C" int
 tcsetpgrp (int fd, pid_t pgid)
 {
   int res = -1;
@@ -239,24 +232,21 @@ tcsetpgrp (int fd, pid_t pgid)
 #undef cfsetispeed
 
 /* cfgetospeed: POSIX96 7.1.3.1 */
-extern "C"
-speed_t
+extern "C" speed_t
 cfgetospeed (struct termios *tp)
 {
   return __tonew_termios(tp)->c_ospeed;
 }
 
 /* cfgetispeed: POSIX96 7.1.3.1 */
-extern "C"
-speed_t
+extern "C" speed_t
 cfgetispeed (struct termios *tp)
 {
   return __tonew_termios(tp)->c_ispeed;
 }
 
 /* cfsetospeed: POSIX96 7.1.3.1 */
-extern "C"
-int
+extern "C" int
 cfsetospeed (struct termios *in_tp, speed_t speed)
 {
   struct termios *tp = __tonew_termios (in_tp);
@@ -266,8 +256,7 @@ cfsetospeed (struct termios *in_tp, speed_t speed)
 }
 
 /* cfsetispeed: POSIX96 7.1.3.1 */
-extern "C"
-int
+extern "C" int
 cfsetispeed (struct termios *in_tp, speed_t speed)
 {
   struct termios *tp = __tonew_termios (in_tp);

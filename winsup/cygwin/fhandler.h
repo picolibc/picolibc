@@ -511,6 +511,8 @@ public:
 #define release_output_mutex() \
   __release_output_mutex (__PRETTY_FUNCTION__, __LINE__);
 
+class tty;
+class tty_min;
 class fhandler_termios: public fhandler_base
 {
 protected:
@@ -594,7 +596,7 @@ public:
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
 
-  int tcsetpgrp (const pid_t pid) { tc->pgid = pid; return 0; }
+  int tcsetpgrp (const pid_t pid);
 
   /* Special dup as we must dup two handles */
   int dup (fhandler_base *child);
@@ -609,11 +611,7 @@ public:
   void fixup_after_exec (HANDLE);
   void set_close_on_exec (int val);
   void fixup_after_fork (HANDLE parent);
-  void set_input_state ()
-  {
-    if (TTYISSETF (RSTCONS))
-      input_tcsetattr (0, &tc->ti);
-  }
+  void set_input_state ();
 };
 
 class fhandler_tty_common: public fhandler_termios
