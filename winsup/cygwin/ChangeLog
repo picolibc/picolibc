@@ -1,3 +1,10 @@
+2003-10-13  Micha Nelissen  <M.Nelissen@student.tue.nl>
+
+	* fhandler_console.cc (char_command): Add escape sequence for codepage
+	ansi <-> oem switching for ncurses frame drawing capabilities.
+	* dcrt0.cc: Add local variable alternate_charset_active.
+	* winsup.h: Add global external variable alternate_charset_active.
+
 2003-10-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (ctrl_c_handler): Don't send SIGHUP on

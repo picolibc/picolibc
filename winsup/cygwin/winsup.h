@@ -90,6 +90,7 @@ extern "C" DWORD WINAPI GetLastError (void);
 
 enum codepage_type {ansi_cp, oem_cp};
 extern codepage_type current_codepage;
+extern bool alternate_charset_active;
 
 UINT get_cp ();
 

@@ -66,6 +66,12 @@ con_to_str (char *d, const char *s, DWORD sz)
 inline BOOL
 str_to_con (char *d, const char *s, DWORD sz)
 {
+  if (alternate_charset_active)
+    {
+      /* no translation when alternate charset is active */
+      memcpy(d, s, sz);
+      return TRUE;
+    }
   return cp_convert (GetConsoleOutputCP (), d, get_cp (), s, sz);
 }
 
@@ -1110,6 +1116,12 @@ fhandler_console::char_command (char c)
 	       break;
 	     case 9:    /* dim */
 	       dev_state->intensity = INTENSITY_DIM;
+	       break;
+             case 10:   /* end alternate charset */
+               alternate_charset_active = FALSE;
+	       break;
+             case 11:   /* start alternate charset */
+               alternate_charset_active = TRUE;
 	       break;
 	     case 24:
 	       dev_state->underline = FALSE;
