@@ -168,10 +168,6 @@ int _dummy_mallocr = 1;
   MALLOC_ALIGNMENT          (default: NOT defined)
      Define this to 16 if you need 16 byte alignment instead of 8 byte alignment
      which is the normal default.
-  SIZE_T_SMALLER_THAN_LONG (default: NOT defined)
-     Define this when the platform you are compiling has sizeof(long) > sizeof(size_t).
-     The option causes some extra code to be generated to handle operations
-     that use size_t operands and have long results.
   REALLOC_ZERO_BYTES_FREES (default: NOT defined) 
      Define this if you think that realloc(p, 0) should be equivalent
      to free(p). Otherwise, since malloc returns a unique pointer for
@@ -448,11 +444,10 @@ extern void __malloc_unlock();
   fact that assignment from unsigned to signed won't sign extend.
 */
 
-#ifdef SIZE_T_SMALLER_THAN_LONG
-#define long_sub_size_t(x, y) ( (x < y) ? -((long)(y - x)) : (x - y) );
-#else
-#define long_sub_size_t(x, y) ( (long)(x - y) )
-#endif
+#define long_sub_size_t(x, y)				\
+  (sizeof (long) > sizeof (INTERNAL_SIZE_T) && x < y	\
+   ? -(long) (y - x)					\
+   : (long) (x - y))
 
 /*
   REALLOC_ZERO_BYTES_FREES should be set if a call to

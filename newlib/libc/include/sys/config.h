@@ -91,7 +91,6 @@
 #undef UINT_MAX
 #define INT_MAX __INT_MAX__
 #define UINT_MAX (__INT_MAX__ * 2U + 1)
-#define SIZE_T_SMALLER_THAN_LONG
 #define MALLOC_ALIGNMENT 8
 #define _POINTER_INT short
 #define __BUFSIZ__ 16
