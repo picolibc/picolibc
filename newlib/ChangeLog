@@ -1,3 +1,15 @@
+2002-04-19  Bill Siegmund 
+
+	* libc/machine/xscale/memchr.c: Don't use multi-line strings.
+	* libc/machine/xscale/memcmp.c: Ditto.
+	* libc/machine/xscale/memcpy.c: Ditto.
+	* libc/machine/xscale/memmove.c: Ditto.
+	* libc/machine/xscale/memset.c: Ditto.
+	* libc/machine/xscale/strchr.c: Ditto.
+	* libc/machine/xscale/strcmp.c: Ditto.
+	* libc/machine/xscale/strcpy.c: Ditto.
+	* libc/machine/xscale/strlen.c: Ditto.
+
 2002-04-19  Alexandre Oliva  <aoliva@redhat.com>
 
         * libc/include/sys/config.h: Remove include of <limits.h>.

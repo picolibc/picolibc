@@ -42,47 +42,47 @@ memchr (const void *start, int c, size_t len)
          R6 = 0x80808080  */
 
       asm (
-       "mov	r6, #0x80
-	add	r6, r6, #0x8000
-	add	r6, r6, r6, lsl #16
-	mvn	r7, r6, lsl #1
-
-0:
-	cmp	%1, #0x7
-	bls	1f
-
-	ldmia	%0!, { r3, r9 }
-"	PRELOADSTR ("%0") "
-	sub	%1, %1, #8
-	eor	r3, r3, %2
-	eor	r9, r9, %2
-	add	r2, r3, r7
-	add	r8, r9, r7
-	bic	r2, r2, r3
-	bic	r8, r8,	r9
-	and	r1, r2, r6
-	and	r9, r8, r6
-	orrs	r1, r1, r9
-	beq	0b
-
-	add	%1, %1, #8
-	sub	%0, %0, #8
-1:
-	cmp	%1, #0x3
-	bls	2f
-
-	ldr	r3, [%0], #4
-"	PRELOADSTR ("%0") "
-	sub	%1, %1, #4
-	eor	r3, r3, %2
-	add	r2, r3, r7
-	bic	r2, r2, r3
-	ands	r1, r2, r6
-	beq	1b
-
-	sub	%0, %0, #4
-	add	%1, %1, #4
-2:
+       "mov	r6, #0x80\n\
+	add	r6, r6, #0x8000\n\
+	add	r6, r6, r6, lsl #16\n\
+	mvn	r7, r6, lsl #1\n\
+\n\
+0:\n\
+	cmp	%1, #0x7\n\
+	bls	1f\n\
+\n\
+	ldmia	%0!, { r3, r9 }\n\
+"	PRELOADSTR ("%0") "\n\
+	sub	%1, %1, #8\n\
+	eor	r3, r3, %2\n\
+	eor	r9, r9, %2\n\
+	add	r2, r3, r7\n\
+	add	r8, r9, r7\n\
+	bic	r2, r2, r3\n\
+	bic	r8, r8,	r9\n\
+	and	r1, r2, r6\n\
+	and	r9, r8, r6\n\
+	orrs	r1, r1, r9\n\
+	beq	0b\n\
+\n\
+	add	%1, %1, #8\n\
+	sub	%0, %0, #8\n\
+1:\n\
+	cmp	%1, #0x3\n\
+	bls	2f\n\
+\n\
+	ldr	r3, [%0], #4\n\
+"	PRELOADSTR ("%0") "\n\
+	sub	%1, %1, #4\n\
+	eor	r3, r3, %2\n\
+	add	r2, r3, r7\n\
+	bic	r2, r2, r3\n\
+	ands	r1, r2, r6\n\
+	beq	1b\n\
+\n\
+	sub	%0, %0, #4\n\
+	add	%1, %1, #4\n\
+2:\n\
 "
        : "=&r" (str), "=&r" (len)
        : "r" (c2), "0" (str), "1" (len)

@@ -28,25 +28,25 @@ strcpy (char *dest, const char *src)
      R4 = 0xfefefeff [ == ~(0x80808080 << 1) ]
      R5 = 0x80808080  */
 
-  asm ("mov	r5, #0x80
-	ldr	r1, [%1, #0]
-	add	r5, r5, #0x8000
-	add	r5, r5, r5, lsl #16
-	mvn	r4, r5, lsl #1
-
-	add	r3, r1, r5
-	bic	r3, r3, r1
-	ands	r2, r3, r4
-	bne	1f
-0:
-	ldr	r3, [%1, #0]
-	ldr	r1, [%1, #4]!
-"	PRELOADSTR("%1") "
-	str	r3, [%0], #4
-	add	r2, r1, r4
-	bic	r2, r2, r1
-	ands	r3, r2, r5
-	beq	0b
+  asm ("mov	r5, #0x80\n\
+	ldr	r1, [%1, #0]\n\
+	add	r5, r5, #0x8000\n\
+	add	r5, r5, r5, lsl #16\n\
+	mvn	r4, r5, lsl #1\n\
+\n\
+	add	r3, r1, r5\n\
+	bic	r3, r3, r1\n\
+	ands	r2, r3, r4\n\
+	bne	1f\n\
+0:\n\
+	ldr	r3, [%1, #0]\n\
+	ldr	r1, [%1, #4]!\n\
+"	PRELOADSTR("%1") "\n\
+	str	r3, [%0], #4\n\
+	add	r2, r1, r4\n\
+	bic	r2, r2, r1\n\
+	ands	r3, r2, r5\n\
+	beq	0b\n\
 1:"
        : "=&r" (dest), "=&r" (src)
        : "0" (dest), "1" (src)
