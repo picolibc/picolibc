@@ -617,10 +617,10 @@ extern void bfd_mips_elf32_swap_reginfo_out
 /* Special values for the st_other field in the symbol table.  These
    are used in an Irix 5 dynamic symbol table.  */
 
-#define STO_DEFAULT		0x00
-#define STO_INTERNAL		0x01
-#define STO_HIDDEN		0x02
-#define STO_PROTECTED		0x03
+#define STO_DEFAULT		STV_DEFAULT
+#define STO_INTERNAL		STV_INTERNAL
+#define STO_HIDDEN		STV_HIDDEN
+#define STO_PROTECTED		STV_PROTECTED
 
 /* This value is used for a mips16 .text symbol.  */
 #define STO_MIPS16		0xf0

@@ -1,3 +1,8 @@
+1999-12-28  Nick Clifton  <nickc@cygnus.com>
+
+	* mips.h (STO_*): Redefine in terms of STV_* values now in
+	common.h. 
+
 1999-12-27  Nick Clifton  <nickc@cygnus.com>
 
 	* common.h: Upgrade to match Oct4, 1999 Draft ELF ABI Spec.
