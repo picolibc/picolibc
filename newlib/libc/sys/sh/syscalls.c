@@ -191,3 +191,31 @@ _gettimeofday (struct timeval *tv, struct timezone *tz)
   tv->tv_sec = __trap34 (SYS_time);
   return 0;
 }
+
+static inline int
+__setup_argv_for_main (int argc)
+{
+  char **argv;
+  int i = argc;
+
+  argv = __builtin_alloca ((1 + argc) * sizeof (*argv));
+
+  argv[i] = NULL;
+  while (i--) {
+    argv[i] = __builtin_alloca (1 + __trap34 (SYS_argnlen, i));
+    __trap34 (SYS_argn, i, argv[i]);
+  }
+
+  return main (argc, argv);
+}
+
+int
+__setup_argv_and_call_main ()
+{
+  int argc = __trap34 (SYS_argc);
+
+  if (argc <= 0)
+    return main (argc, NULL);
+  else
+    return __setup_argv_for_main (argc);
+}
