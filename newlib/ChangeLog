@@ -1,3 +1,10 @@
+2001-11-01  Arati Dikey  <aratidikey@hotmail.com>
+
+	* libm/mathfp/sf_isinf.c (isinff): Change to use _DEFUN macro.
+	[_DOUBLE_IS_32BITS](isinf): New function that calls isinff.
+	* libm/mathfp/sf_isnan.c (isnanf): Change to use _DEFUN macro.
+	[_DOUBLE_IS_32BITS](isnan): New function that calls isnanf.
+
 2001-10-24  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/stdio/fseek.c: Reset pointer to buffer base

@@ -18,7 +18,9 @@
 #include "fdlibm.h"
 #include "zmath.h"
 
-int isinff (float x)
+int 
+_DEFUN (isinff, (float),
+	float x)
 {
   __uint32_t wx;
   int exp;
@@ -31,3 +33,16 @@ int isinff (float x)
   else
     return (0);
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+int
+_DEFUN (isinf, (double),
+        double x)
+{
+  return isinff ((float) x);
+}
+
+#endif /* defined(_DOUBLE_IS_32BITS) */
+
+
