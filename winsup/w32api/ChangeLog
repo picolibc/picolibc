@@ -1,3 +1,8 @@
+2004-05-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wingdi.h: Correct non-unicode typedefs of
+	ENUMLOGFONTEXDV, PENUMLOGFONTEXDV, LPENUMLOGFONTEXDV.
+
 2004-05-07  Pascal Obry  <obry@act-europe.fr>
 
 	* include/winsock.h (IN_CLASSA): Fix macro.
