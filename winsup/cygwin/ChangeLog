@@ -1,5 +1,9 @@
 2003-07-06  Christopher Faylor  <cgf@redhat.com>
 
+	* newsym: Oops.  Revert below change.
+
+2003-07-06  Christopher Faylor  <cgf@redhat.com>
+
 	* newsym: Use correct prefix for generating imports.
 	* pinfo.cc (_pinfo::commune_send): Don't wait forever for a response
 	from another process.
