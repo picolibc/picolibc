@@ -61,6 +61,8 @@ fhandler_tty_master::init ()
 {
   termios_printf ("Creating master for tty%d", get_unit ());
 
+  slave = dev;
+
   if (init_console ())
     {
       termios_printf ("can't create fhandler");
@@ -1012,13 +1014,14 @@ fhandler_pty_master::open (path_conv *, int flags, mode_t)
   if (ntty < 0)
     return 0;
 
-  dev.setunit (ntty);
+  slave = *ttys_dev;
+  slave.setunit (ntty);
   cygwin_shared->tty[ntty]->common_init (this);
   inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 
-  termios_printf ("opened pty master tty%d<%p>", get_unit (), this);
+  termios_printf ("opened pty master tty%d", get_unit ());
   return 1;
 }
 
