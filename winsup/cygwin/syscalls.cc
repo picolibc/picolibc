@@ -8,11 +8,16 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define fstat __FOOfstat__
+#define stat __FOOstat__
 #define _close __FOO_close__
 #define _lseek __FOO_lseek__
 #define _open __FOO_open__
 #define _read __FOO_read__
 #define _write __FOO_write__
+#define _open64 __FOO_open64__
+#define _lseek64 __FOO_lseek64__
+#define _fstat64 __FOO_fstat64__
 
 #include "winsup.h"
 #include <sys/stat.h>
@@ -26,6 +31,8 @@ details. */
 #include <sys/uio.h>
 #include <errno.h>
 #include <limits.h>
+#include <unistd.h>
+#include <setjmp.h>
 #include <winnls.h>
 #include <wininet.h>
 #include <lmcons.h> /* for UNLEN */
@@ -34,16 +41,18 @@ details. */
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
+
+#undef fstat
+#undef stat
+
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include <unistd.h>
 #include "shared_info.h"
 #include "cygheap.h"
 #define NEED_VFORK
-#include <setjmp.h>
 #include "perthread.h"
 #include "pwdgrp.h"
 
@@ -52,6 +61,9 @@ details. */
 #undef _open
 #undef _read
 #undef _write
+#undef _open64
+#undef _lseek64
+#undef _fstat64
 
 SYSTEM_INFO system_info;
 
@@ -1002,7 +1014,7 @@ fstat64 (int fd, struct __stat64 *buf)
 }
 
 extern "C" int
-_fstat (int fd, struct __stat32 *buf)
+fstat (int fd, struct __stat32 *buf)
 {
   struct __stat64 buf64;
   int ret = fstat64 (fd, &buf64);
@@ -1010,6 +1022,9 @@ _fstat (int fd, struct __stat32 *buf)
     stat64_to_stat32 (&buf64, buf);
   return ret;
 }
+
+extern "C" int _fstat (int fd, __off64_t pos, int dir)
+  __attribute__ ((alias ("fstat")));
 
 /* fsync: P96 6.6.1.1 */
 extern "C" int
@@ -1095,6 +1110,9 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
   return res;
 }
 
+extern "C" int _stat (int fd, __off64_t pos, int dir)
+  __attribute__ ((alias ("stat")));
+
 extern "C" int
 stat64 (const char *name, struct __stat64 *buf)
 {
@@ -1104,7 +1122,7 @@ stat64 (const char *name, struct __stat64 *buf)
 }
 
 extern "C" int
-_stat (const char *name, struct __stat32 *buf)
+stat (const char *name, struct __stat32 *buf)
 {
   struct __stat64 buf64;
   int ret = stat64 (name, &buf64);
