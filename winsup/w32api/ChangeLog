@@ -1,6 +1,48 @@
 
 2001-02-21  Danny Smith <dannysmith@users.sourceforge.net>
 
+	* include/mswsock.h: New file.
+	* include/ws2tcpip.h: New file.
+	* include/winsock.h (IPPROTO_IGMP): New define.
+	(IPPROTO_GGP): Correct value.		
+	(SO_* macros): Remove mswsock defines.
+	(TCP_BSDURGENT): Likewise.
+	(IP_* macros): Add comment warning of WinSock2 incompatibility
+	(WSARecvEx): Remove mswsock prototype.
+	(TransmitFile): Likewise.
+	(AcceptEx): Likewise.
+	(GetAcceptExSockaddrs): Likewise.
+	(struct _TRANSMIT_FILE_BUFFERS): Remove mswsock definition.
+	(#include <mswsock.h>): Add directive and explanatory comment
+	* include/winsock2.h (header guard): add guard for  _WINSOCK_H 
+	(_WINSOCK_H): Define to prevent later inclusion of winsock.h
+	(#include <winsock.h>): Replace directive with winsock.h file content
+	The following changes apply to the merged file: 
+	(FD_SET): Keep winsock2.h definition, delete winsock.h definition
+	(SOMAXCONN): Likewise
+	(#include <nspapi.h>): Move - don't include until LPSOCKADDR defined
+	(IP_* macros): Delete WinSock1 definitions (WinSock2 definitions now 
+	in ws2tcpip.h)
+	(struct ip_mreq): Delete (now defined in ws2tcpip.h for WinSock2)
+	(FD_*_BIT and FD_* defines): Place together and extend to 
+	FD_MAX_EVENTS 10
+	(AF* defines): Extend to AF_MAX 10
+	(WSAIsBlocking): #if 0 out prototype (N/A in WinSock2)
+	(WSAUnhookBlockingHook): Likewise.
+	(WSASetBlockingHook): Likewise.
+	(WSACancelBlockingCall): Likewise.
+	(WSAEINPROGRESS): Comment as not raised in WinSock2.
+	(#include <mswsock.h>): Delete directive inherited from winsock.h
+	(WSA_QOS* defines): Add QualityOfService error codes.
+	(SIO_* defines): Add new macros
+	* include/ipexport.h (IP_STATUS flags): Add definitions.
+	(IP_FLAG_DF): Likewise.
+	(IP_OPT_* ): Likewise.
+	(struct ip_option_information): Likewise.
+	(struct icmp_echo_reply): Likewise.
+
+2001-02-21  Danny Smith <dannysmith@users.sourceforge.net>
+
 	* include/commctrl.h: Revert TEXT change.
 	* include/lmalert.h: Ditto.
 	* include/lmcons.h: Ditto.

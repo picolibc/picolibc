@@ -139,7 +139,8 @@ struct  protoent {
 
 #define IPPROTO_IP	0
 #define IPPROTO_ICMP	1
-#define IPPROTO_GGP	2
+#define IPPROTO_IGMP 2
+#define IPPROTO_GGP 3
 #define IPPROTO_TCP	6
 #define IPPROTO_PUP	12
 #define IPPROTO_UDP	17
@@ -245,27 +246,18 @@ typedef WSADATA *LPWSADATA;
 #define SO_RCVTIMEO	0x1006
 #define SO_ERROR	0x1007
 #define SO_TYPE	0x1008
-#define SO_CONNDATA	0x7000
-#define SO_CONNOPT	0x7001
-#define SO_DISCDATA	0x7002
-#define SO_DISCOPT	0x7003
-#define SO_CONNDATALEN	0x7004
-#define SO_CONNOPTLEN	0x7005
-#define SO_DISCDATALEN	0x7006
-#define SO_DISCOPTLEN	0x7007
-#define SO_OPENTYPE	0x7008
-#define SO_SYNCHRONOUS_ALERT	0x10
-#define SO_SYNCHRONOUS_NONALERT	0x20
-#define SO_MAXDG	0x7009
-#define SO_MAXPATHDG	0x700A
-#define SO_UPDATE_ACCEPT_CONTEXT	0x700B
-#define SO_CONNECT_TIME	0x700C
 #endif
+/*
+ * Note that the next 5 IP defines are specific to WinSock 1.1 (wsock32.dll).
+ * They will cause errors or unexpected results if used with the
+ * (gs)etsockopts exported from the WinSock 2 lib, ws2_32.dll. Refer ws2tcpip.h.
+ */         
 #define IP_MULTICAST_IF	2
 #define IP_MULTICAST_TTL	3
 #define IP_MULTICAST_LOOP	4
 #define IP_ADD_MEMBERSHIP	5
 #define IP_DROP_MEMBERSHIP  6
+
 #define IP_DEFAULT_MULTICAST_TTL   1
 #define IP_DEFAULT_MULTICAST_LOOP  1
 #define IP_MAX_MEMBERSHIPS	 20
@@ -281,7 +273,6 @@ struct ip_mreq {
 #define SOCK_RDM	4
 #define SOCK_SEQPACKET	5
 #define TCP_NODELAY	0x0001
-#define TCP_BSDURGENT	0x7000
 #define AF_UNSPEC	0
 #define AF_UNIX	1
 #define AF_INET	2
@@ -463,16 +454,6 @@ HANDLE PASCAL WSAAsyncGetHostByName(HWND,u_int,const char*,char*,int);
 HANDLE PASCAL WSAAsyncGetHostByAddr(HWND,u_int,const char*,int,int,char*,int);
 int PASCAL WSACancelAsyncRequest(HANDLE);
 int PASCAL WSAAsyncSelect(SOCKET,HWND,u_int,long);
-int PASCAL WSARecvEx(SOCKET,char*,int,int*);
-typedef struct _TRANSMIT_FILE_BUFFERS {
-	PVOID Head;
-	DWORD HeadLength;
-	PVOID Tail;
-	DWORD TailLength;
-} TRANSMIT_FILE_BUFFERS, *PTRANSMIT_FILE_BUFFERS, *LPTRANSMIT_FILE_BUFFERS;
-BOOL PASCAL TransmitFile(SOCKET,HANDLE,DWORD,DWORD,LPOVERLAPPED,LPTRANSMIT_FILE_BUFFERS,DWORD);
-BOOL PASCAL AcceptEx(SOCKET,SOCKET,PVOID,DWORD,DWORD,DWORD,LPDWORD,LPOVERLAPPED);
-VOID PASCAL GetAcceptExSockaddrs(PVOID,DWORD,DWORD,DWORD,struct sockaddr**, LPINT, struct sockaddr**, LPINT);
 #ifndef __INSIDE_CYGWIN__
 u_long PASCAL htonl(u_long);
 u_long PASCAL ntohl(u_long);
@@ -520,4 +501,19 @@ typedef struct timeval *LPTIMEVAL;
 #ifdef __cplusplus
 }
 #endif
+/*
+ * Recent MSDN docs indicate that the MS-specific extensions exported from
+ * mswsock.dll (AcceptEx, TransmitFile. WSARecEx and GetAcceptExSockaddrs) are
+ * declared in mswsock.h. These extensions are not supported on W9x or WinCE.
+ * However, code using WinSock 1.1 API may expect the declarations and
+ * associated defines to be in this header. Thus we include mswsock.h here.
+ *
+ * When linking against the WinSock 1.1 lib, wsock32.dll, the mswsock functions
+ * are automatically routed to mswsock.dll (on platforms with support).
+ * The WinSock 2 lib, ws2_32.dll, does not contain any references to
+ * the mswsock extensions. 
+ */
+
+#include <mswsock.h>
+
 #endif
