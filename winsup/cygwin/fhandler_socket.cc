@@ -903,7 +903,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
     {
       set_errno (EPIPE);
       if (! (flags & MSG_NOSIGNAL))
-	_raise (SIGPIPE);
+	raise (SIGPIPE);
     }
 
   return res;
