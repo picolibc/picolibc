@@ -57,8 +57,13 @@ static char sccsid[] = "@(#)scandir.c	5.10 (Berkeley) 2/23/91";
  * null byte (dp->d_namlen+1), rounded up to a 4 byte boundary.
  */
 #undef DIRSIZ
+#ifdef _DIRENT_HAVE_D_NAMLEN
 #define DIRSIZ(dp) \
     ((sizeof (struct dirent) - (MAXNAMLEN+1)) + (((dp)->d_namlen+1 + 3) &~ 3))
+#else
+#define DIRSIZ(dp) \
+    ((sizeof (struct dirent) - (MAXNAMLEN+1)) + ((strlen((dp)->d_name)+1 + 3) &~ 3))
+#endif
 
 #ifndef __P
 #define __P(args) ()
@@ -103,8 +108,12 @@ scandir(dirname, namelist, select, dcomp)
 			return(-1);
 		p->d_ino = d->d_ino;
 		p->d_reclen = d->d_reclen;
+#ifdef _DIRENT_HAVE_D_NAMLEN
 		p->d_namlen = d->d_namlen;
 		bcopy(d->d_name, p->d_name, p->d_namlen + 1);
+#else
+               strcpy(p->d_name, d->d_name);
+#endif
 		/*
 		 * Check to make sure the array has space left and
 		 * realloc the maximum size.
@@ -132,11 +141,10 @@ scandir(dirname, namelist, select, dcomp)
  */
 int
 alphasort(d1, d2)
-	const void *d1;
-	const void *d2;
+       const struct dirent **d1;
+       const struct dirent **d2;
 {
-	return(strcmp((*(struct dirent **)d1)->d_name,
-	    (*(struct dirent **)d2)->d_name));
+       return(strcmp((*d1)->d_name, (*d2)->d_name));
 }
 
 #endif /* ! HAVE_OPENDIR */

@@ -73,7 +73,7 @@ static struct	ddloc *dd_hash[NDIRHASH];   /* Hash list heads for ddlocs */
  */
 long
 telldir(dirp)
-	const DIR *dirp;
+       DIR *dirp;
 {
 	register int index;
 	register struct ddloc *lp;
