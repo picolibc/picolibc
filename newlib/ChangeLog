@@ -1,3 +1,7 @@
+2001-02-05  Charles Wilson  <cwilson@ece.gatech.edu>
+
+        * libc/include/locale.h: add LC_MESSAGES definition
+
 2001-02-01  Alexandre Oliva  <aoliva@redhat.com>
 
 	* libc/sys/sh/sys/syscall.h (SYS_get_argc, SYS_get_argN_len,
