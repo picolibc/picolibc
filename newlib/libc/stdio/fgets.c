@@ -79,6 +79,25 @@ _DEFUN (fgets, (buf, n, fp),
     return 0;
 
   s = buf;
+
+#ifdef __SCLE
+  if (fp->_flags & __SCLE)
+    {
+      int c;
+      /* Sorry, have to do it the slow way */
+      while (--n > 0 && (c = __sgetc(fp)) != EOF)
+	{
+	  *s++ = c;
+	  if (c == '\n')
+	    break;
+	}
+      if (c == EOF && s == buf)
+	return NULL;
+      *s = 0;
+      return buf;
+    }
+#endif
+
   n--;				/* leave space for NUL */
   do
     {

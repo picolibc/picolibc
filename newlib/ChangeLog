@@ -1,3 +1,7 @@
+2000-05-18  DJ Delorie  <dj@cygnus.com>
+
+	* libc/stdio/fgets.c (fgets): perform CRLF conversions if __SCLE
+	
 Mon May 15 18:54:00 2000  Jeff Johnston  <jjohnstn@cygnus.com>
 
 	* libc/include/ctype.h: Changed tolower and toupper macros
