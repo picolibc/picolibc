@@ -1,3 +1,11 @@
+2002-10-08  Heiko Gerdau  <hg@technosis.de>
+
+	* include/oleacc.h: New file.
+	* include/winuser.h (ENDSESSION_LOGOFF) Add define.
+	(OBJID_*) Add defines.
+	* lib/uuid.c: Add DEFINE_GUID for IID_IAccessible.
+	* lib/test.c: Include oleacc.h.
+
 2002-10-06  Casper Hornstrup  <chorns@it.dk>
 
 	* include/ddk: New subdir.
