@@ -796,9 +796,6 @@ _dll_crt0 ()
   strace.microseconds ();
 #endif
 
-  /* Set the os capabilities. */
-  wincap.init ();
-
   main_environ = user_data->envptr;
   *main_environ = NULL;
 
