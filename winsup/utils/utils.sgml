@@ -736,25 +736,36 @@ find <filename>mtpt</filename>.
 <sect2 id="passwd"><title>passwd</title>
 
 <screen>
-Usage: passwd (-l|-u|-S) [USER]
-       passwd [-i NUM] [-n MINDAYS] [-x MAXDAYS] [-L LEN]
-Change USER's password or password attributes
+Usage: passwd [OPTION] [USER]
+Change USER's password or password attributes.
 
 User operations:
- -l, --lock      lock USER's account
- -u, --unlock    unlock USER's account
- -S, --status    display password status for USER (locked, expired, etc.)
+  -l, --lock               lock USER's account.
+  -u, --unlock             unlock USER's account.
+  -c, --cannot-change      USER can't change password.
+  -C, --can-change         USER can change password.
+  -e, --never-expires      USER's password never expires.
+  -E, --expires            USER's password expires according to system's
+                           password aging rule.
+  -p, --pwd-not-required   no password required for USER.
+  -P, --pwd-required       password is required for USER.
 
 System operations:
- -i, --inactive  set NUM of days before inactive accounts are disabled
-                 (inactive accounts are those with expired passwords)
- -n, --minage    set system minimum password age to MINDAYS
- -x, --maxage    set system maximum password age to MAXDAYS
- -L, --length    set system minimum password length to LEN
+  -i, --inactive NUM       set NUM of days before inactive accounts are disabled
+                           (inactive accounts are those with expired passwords).
+  -n, --minage DAYS        set system minimum password age to DAYS days.
+  -x, --maxage DAYS        set system maximum password age to DAYS days.
+  -L, --length LEN         set system minimum password length to LEN.
 
 Other options:
- -h, --help      output usage information and exit
- -v, --version   output version information and exit
+  -S, --status             display password status for USER (locked, expired,
+                           etc.) plus global system password settings.
+  -h, --help               output usage information and exit.
+  -v, --version            output version information and exit.
+
+If no option is given, change USER's password.  If no user name is given,
+operate on current user.  System operations must not be mixed with user
+operations.  Don't specify a USER when triggering a system operation. 
 </screen>
 
 <para> <command>passwd</command> changes passwords for user accounts.
@@ -763,7 +774,7 @@ but administrators may change passwords on any account.
 <command>passwd</command> also changes account information, such as
 password expiry dates and intervals.</para>
 
-<para>Password changes: The user is first prompted for their old
+<para>For password changes, the user is first prompted for their old
 password, if one is present.  This password is then encrypted and
 compared against the stored password.  The user has only one chance to
 enter the correct password.  The administrators are permitted to
@@ -771,7 +782,7 @@ bypass this step so that forgotten passwords may be changed.</para>
 
 <para>The user is then prompted for a replacement password.
 <command>passwd</command> will prompt twice for this replacement and 
-compare the second entry against the first.  Both entries are require to 
+compare the second entry against the first.  Both entries are required to 
 match in order for the password to be changed.</para>
 
 <para>After the password has been entered, password aging information
@@ -779,13 +790,21 @@ is checked to see if the user is permitted to change their password
 at this time.  If not, <command>passwd</command> refuses to change the
 password and exits.</para>
 
-<para>Account maintenance: User accounts may be locked and unlocked with the
-<literal>-l</literal> and <literal>-u</literal> flags.  The
-<literal>-l</literal> option disables an account.  The <literal>-u</literal>
-option re-enables an account.</para>
-
-<para>The account status may be given with the <literal>-S</literal>
-option.  The status information is self explanatory.</para>
+<para>
+To get current password status information, use the
+<literal>-S</literal> option. Administrators can use
+<command>passwd</command> to perform several account maintenance
+functions (users may perform some of these functions on their own
+accounts).  Accounts may be locked with the <literal>-l</literal> flag
+and unlocked with the <literal>-u</literal> flag.  Similarly,
+<literal>-c</literal> disables a user's ability to change passwords, and
+<literal>-C</literal> allows a user to change passwords.  For password
+expiry, the <literal>-e</literal> option disables expiration, while the
+<literal>-E</literal> option causes the password to expire according to
+the system's normal aging rules.  Use <literal>-p</literal> to disable
+the password requirement for a user, or <literal>-P</literal> to require
+a password.
+</para>
 
 <para>Administrators can also use <command>passwd</command> to change
 system-wide password expiry and length requirements with the
