@@ -1,3 +1,7 @@
+2001-12-30  Ralf Habacker  <Ralf.Habacker@freenet.de>
+
+	* cygmagic: Eliminate unneeded use of 'tr' and 'bc'.
+
 2001-12-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (open_local_policy): Use POLICY_EXECUTE instead of
