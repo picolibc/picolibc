@@ -1,3 +1,38 @@
+2002-06-19  Nathanael Nerode  <neroden@twcny.rr.com>
+
+	* configure.in: Eliminate ${gasdir} variable.
+
+2002-06-18  Dave Brolley  <brolley@redhat.com>
+
+	* configure.in: Add support for frv.
+	* config.sub: Add support for frv.
+
+2002-06-12  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* Makefile.in (CFLAGS_FOR_TARGET): Add -O2.
+
+2002-06-08  Jason Thorpe  <thorpej@wasabisystems.com>
+
+	* configure.in (vax-*-netbsd*): Re-enable gas.
+
+2002-05-31  Nathanael Nerode  <neroden@twcny.rr.com>
+
+	* Makefile.in: Replace HOST_PREFIX, HOST_PREFIX_1 with BUILD_PREFIX,
+	BUILD_PREFIX_1, to correct nomenclature.
+	* configure: Likewise.
+
+	* Makefile.in: Eliminate version-specific references to tcl8.1, tk8.1.
+	* configure.in: Eliminate version-specific references to tcl8.1, tk8.1.
+
+2002-05-31  Olaf Hering  <olh@suse.de>
+
+	* config-ml.in: Propogate DESTDIR also.
+
+2002-05-29  Jason Thorpe  <thorpej@wasabisystems.com>
+
+	* configure.in (vax-*-netbsd*): Don't build gas for this
+	platform.
+
 2002-05-28  Marek Michalkiewicz  <marekm@amelek.gda.pl>
 
 	* configure.in (noconfigdirs): Don't compile libiberty, libstdcxx

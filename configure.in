@@ -42,7 +42,7 @@
 
 # these libraries are used by various programs built for the host environment
 #
-host_libs="intl mmalloc libiberty opcodes bfd readline db tcl tk tcl8.1 tk8.1 tclX itcl tix libgui zlib"
+host_libs="intl mmalloc libiberty opcodes bfd readline db tcl tk tclX itcl tix libgui zlib"
 
 libstdcxx_version="target-libstdc++-v3"
 # Don't use libstdc++-v3's flags to configure/build itself.
@@ -402,7 +402,6 @@ case "${enable_target_optspace}:${target}" in
 esac
 
 skipdirs=
-gasdir=gas
 use_gnu_ld=
 use_gnu_as=
 
@@ -753,6 +752,12 @@ case "${target}" in
     noconfigdirs="$noconfigdirs ${libgcj}"
     if test x${is_cross_compiler} != xno ; then
 	   target_configdirs="${target_configdirs} target-bsp target-libstub target-cygmon"
+    fi
+    ;;
+  frv-*-*)
+    noconfigdirs="$noconfigdirs ${libgcj}"
+    if test x${is_cross_compiler} != xno ; then
+	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
     fi
     ;;
   h8300*-*-*)
@@ -1277,7 +1282,7 @@ fi
 # --without-gnu-ld options for the configure script.
 
 if test x${use_gnu_as} = x ; then
-  if test x${with_gnu_as} != xno && echo " ${configdirs} " | grep " ${gasdir} " > /dev/null 2>&1 && test -d ${srcdir}/${gasdir} ; then
+  if test x${with_gnu_as} != xno && echo " ${configdirs} " | grep " gas " > /dev/null 2>&1 && test -d ${srcdir}/gas ; then
     with_gnu_as=yes
     withoptions="$withoptions --with-gnu-as"
   fi
