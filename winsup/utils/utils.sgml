@@ -8,14 +8,15 @@ specifically for Cygwin.</para>
 <sect2 id="cygcheck"><title>cygcheck</title>
 
 <screen>
-Usage: cygcheck [-s] [-v] [-r] [-h] [program ...]
-  -c   check current package setup
-  -h   give help about the info
-  -s   system information
-  -v   verbose output (indented) (for -s or programs)
-  -r   registry search (requires -s)
-  -V   version info
-You must at least give either -s or a program name
+Usage: cygcheck [OPTIONS] [program ...]
+ -c, --check-setup  check packages installed via setup.exe
+ -s, --sysinfo      system information (not with -k)
+ -v, --verbose      verbose output (indented) (for -s or programs)
+ -r, --registry     registry search (requires -s)
+ -k, --keycheck     perform a keyboard check session (not with -s)
+ -h, --help         give help about the info (not with -c)
+ -V, --version      output version information and exit
+You must at least give either -s or -k or a program name
 </screen>
 
 <para>The <command>cygcheck</command> program is a diagnostic utility
@@ -71,29 +72,32 @@ or if you know what everything is already, just leave this out.</para>
 <sect2 id="cygpath"><title>cygpath</title>
 
 <screen>
-Usage: cygpath [-p|--path] (-w|--windows) ([-s|--short-name]|[-l|--long-name]) filename
-Usage: cygpath [-p|--path] (-u|--unix) filename
-Usage: cygpath (-H|--homeroot)|(-S|--sysdir)|(-W|--windir) [-s|--short-name]
-Usage: cygpath [-A|--allusers] (-D|--desktop)|(-P|--smprograms) [-s|--short-name]
+Usage: cygpath.exe (-u|-w|-t TYPE) [-c HANDLE] [-f FILE] [options] NAME
+       cygpath.exe [-ADHPSW] 
+Output type options (required):
+  -u|--unix             print Unix form of NAME (default)
+  -w|--windows          print Windows form of NAME 
+  -t|--type             print Windows form of NAME with TYPE one of
+     dos                drive letter with backslashes (C:\WINNT)
+     mixed              drive letter with regular slashes (C:/WINNT)
+Path conversion options:
   -a|--absolute         output absolute path
-  -c|--close handle     close handle (for use in captured process)
-  -f|--file file        read file for input path information
+  -c|--close HANDLE     close HANDLE (for use in captured process)
+  -f|--file FILE        read FILE for input; use - to read from STDIN
   -i|--ignore           ignore missing argument
-  -l|--long-name        print Windows long form of filename
-  -p|--path             filename argument is a path
-  -s|--short-name       print Windows short form of filename
-  -u|--unix             print Unix form of filename
-  -t|--type             print Windows form of filename with specified
-     dos                drive letter with backslashes (c:\winnt)
-     mixed              drive letter with regular slashes (c:/winnt)
-  -v|--version          output version information and exit
-  -w|--windows          print Windows form of filename
+  -l|--long-name        print Windows long form of NAME (with -w only)
+  -p|--path             NAME is a PATH list (i.e., '/bin:/usr/bin')
+  -s|--short-name       print Windows short form of NAME (with -w only)
+System information output:
   -A|--allusers         use `All Users' instead of current user for -D, -P
-  -H|--homeroot		output `Profiles' directory (home root) and exit
   -D|--desktop          output `Desktop' directory and exit
+  -H|--homeroot         output `Profiles' directory (home root) and exit
   -P|--smprograms       output Start Menu `Programs' directory and exit
   -S|--sysdir           output system directory and exit
   -W|--windir           output `Windows' directory and exit
+Other options:
+  -h|--help             output usage information and exit
+  -v|--version          output version information and exit
 </screen>
 
 <para>The <command>cygpath</command> program is a utility that
@@ -159,9 +163,13 @@ The <literal>-ws</literal> options can be combined with the capital options.
 <sect2 id="kill"><title>kill</title>
 
 <screen>
-Usage: kill [-f] [-sigN] [-s sigN] pid1 [pid2 ...]
-Usage: kill -l [signal]
-Usage: Kill -h
+Usage: kill [-f] [-signal] [-s signal] pid1 [pid2 ...]
+       kill -l [signal]
+ -f, --force     force, using win32 interface if necessary
+ -l, --list      print a list of signal names
+ -s, --signal    send signal (use kill --list for a list)
+ -h, --help      output usage information and exit
+ -v, --version   output version information and exit
 </screen>
 
 <para>The <command>kill</command> program allows you to send arbitrary
@@ -241,20 +249,25 @@ SIGUSR2     31    user defined signal 2
 <sect2 id="mkgroup"><title>mkgroup</title>
 
 <screen>
-usage: mkgroup [options] [domain]
-  This program prints a /etc/group file to stdout
-  Options:
-     -l,--local             print local group information
-     -d,--domain            print global group information from the domain
-                            specified (or from the current domain if there is
-                            no domain specified)
-     -o,--id-offset offset  change the default offset (10000) added to uids
-                            in domain accounts.
-     -s,--no-sids           don't print SIDs in pwd field
-                            (this affects ntsec)
-     -u,--users             print user list in gr_mem field
-     -?,--help              print this message
-  One of `-l' or `-d' must be given on NT/W2K.
+Usage: mkgroup [OPTION]... [domain]
+
+This program prints a /etc/group file to stdout
+
+Options:
+   -l,--local             print local group information
+   -d,--domain            print global group information from the domain
+                          specified (or from the current domain if there is
+                          no domain specified)
+   -o,--id-offset offset  change the default offset (10000) added to uids
+                          in domain accounts.
+   -s,--no-sids           don't print SIDs in pwd field
+                          (this affects ntsec)
+   -u,--users             print user list in gr_mem field
+   -h,--help              print this message
+
+   -v,--version           print version information and exit
+
+One of `-l' or `-d' must be given on NT/W2K.
 </screen>
 
 <para>The <command>mkgroup</command> program can be used to help
@@ -284,25 +297,27 @@ local machine or the default (or given) domain.</para>
 <sect2 id="mkpasswd"><title>mkpasswd</title>
 
 <screen>
-Usage: mkpasswd [options] [domain]
-  Usage: mkpasswd [OPTION]... [domain]
-  This program prints a /etc/passwd file to stdout
-  Options:
-     -l,--local              print local user accounts
-     -d,--domain             print domain accounts (from current domain
-                             if no domain specified)
-     -o,--id-offset offset   change the default offset (10000) added to uids
-                             in domain accounts.
-     -g,--local-groups       print local group information too
-                             if no domain specified
-     -m,--no-mount           don't use mount points for home dir
-     -s,--no-sids            don't print SIDs in GCOS field
-                             (this affects ntsec)
-     -p,--path-to-home path  if user account has no home dir, use
-                             path instead of /home/
-     -u,--username username  only return information for the specified user
-     -?,--help               displays this message
-  One of `-l', `-d' or `-g' must be given on NT/W2K.
+Usage: mkpasswd [OPTION]... [domain]
+
+This program prints a /etc/passwd file to stdout
+
+Options:
+   -l,--local              print local user accounts
+   -d,--domain             print domain accounts (from current domain
+                           if no domain specified)
+   -o,--id-offset offset   change the default offset (10000) added to uids
+                           in domain accounts.
+   -g,--local-groups       print local group information too
+                           if no domain specified
+   -m,--no-mount           don't use mount points for home dir
+   -s,--no-sids            don't print SIDs in GCOS field
+                           (this affects ntsec)
+   -p,--path-to-home path  use specified path instead of user account home dir
+   -u,--username username  only return information for the specified user
+   -h,--help               displays this message
+   -v,--version            version information and exit
+
+One of `-l', `-d' or `-g' must be given on NT/W2K.
 </screen>
 
 <para>The <command>mkpasswd</command> program can be used to help
@@ -331,16 +346,24 @@ local machine or the default (or given) domain.</para>
 <sect2 id="passwd"><title>passwd</title>
 
 <screen>
-Usage passwd [name]
-      passwd [-x max] [-n min] [-i inact] [-L len]
-      passwd {-l|-u|-S} name
-  -x max   set max age of passwords
-  -n min   set min age of passwords
-  -i inact disables account after inact days of expiry
-  -L len   set min password length
-  -l       lock an account
-  -u       unlock an account
-  -S       show account information
+Usage: passwd (-l|-u|-S) [USER]
+       passwd [-i NUM] [-n MINDAYS] [-x MAXDAYS] [-L LEN]
+
+User operations:
+ -l, --lock      lock USER's account
+ -u, --unlock    unlock USER's account
+ -S, --status    display password status for USER (locked, expired, etc.)
+
+System operations:
+ -i, --inactive  set NUM of days before inactive accounts are disabled
+                 (inactive accounts are those with expired passwords)
+ -n, --minage    set system minimum password age to MINDAYS
+ -x, --maxage    set system maximum password age to MAXDAYS
+ -L, --length    set system minimum password length to LEN
+
+Other options:
+ -h, --help      output usage information and exit
+ -v, --version   output version information and exit
 </screen>
 
 <para> <command>passwd</command> changes passwords for user accounts.
@@ -400,29 +423,25 @@ some systems.</para>
 <sect2 id="mount"><title>mount</title>
 
 <screen>
-Usage mount
-      mount [options] &lt;win32path&gt; &lt;posixpath&gt;
-
+Usage: mount [OPTION] [<win32path> <posixpath>]
   -b, --binary                  text files are equivalent to binary files
                                 (newline = \n)
-  -c, --change-cygdrive-prefix  change the cygdrive path prefix to &lt;posixpath&gt;
+  -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>
   -f, --force                   force mount, don't warn about missing mount
                                 point directories
-  -i, --import-old-mounts copy  old registry mount table mounts into the current
-                                mount areas
-  -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix
-  -s, --system     (default)    add mount point to system-wide registry location
-  -t, --text       (default)    text files get \r\n line endings
-  -u, --user                    add mount point to user registry location
-  -x, --executable              treat all files under mount point as executables
-  -X, --cygwin-executable       treat all files under mount point as cygwin
-                                executables.  Use to speed up file access.
-  -E, --no-executable           don't open files to see if they contain executable
-                                magic.  Use to speed up file access.
+  -h, --help                    output usage information and exit
   -m, --mount-commands          write mount commands to replace user and
                                 system mount points and cygdrive prefixes
-
-  When invoked without any arguments, mount displays the current mount table.
+  -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix
+  -s, --system     (default)    add system-wide mount point
+  -t, --text       (default)    text files get \r\n line endings
+  -u, --user                    add user-only mount point
+  -v, --version                 output version information and exit
+  -x, --executable              treat all files under mount point as executables
+  -E, --no-executable           treat all files under mount point as 
+                                non-executables
+  -X, --cygwin-executable       treat all files under mount point as cygwin
+                                executables
 </screen>
 
 <para>The <command>mount</command> program is used to map your drives
@@ -593,13 +612,17 @@ find <filename>mtpt</filename>.
 <sect2 id="ps"><title>ps</title>
 
 <screen>
-Usage ps [-aefl] [-u uid]
-  -a, -e   show processes of all users
-  -f       show process uids, ppids
-  -l       show process uids, ppids, pgids, winpids
-  -s	   short process listing
-  -u uid   show processes owned by uid
-  -W	   show all windows processes, not just cygwin processes
+Usage: ps [-aefls] [-u UID]
+ -a, --all       show processes of all users
+ -e, --everyone  show processes of all users
+ -f, --full      show process uids, ppids
+ -h, --help      output usage information and exit
+ -l, --long      show process uids, ppids, pgids, winpids
+ -s, --summary   show process summary
+ -u, --user      list processes owned by UID
+ -v, --version   output version information and exit
+ -W, --windows   show windows as well as cygwin processes
+With no options, ps outputs the long format by default
 </screen>
 
 <para>The <command>ps</command> program gives the status of all the
@@ -615,13 +638,15 @@ program.</para>
 <sect2 id="umount"><title>umount</title>
 
 <screen>
-Usage umount [options] &lt;posixpath&gt;
+Usage: umount.exe [OPTION] [<posixpath>]
   -A, --remove-all-mounts       remove all mounts
   -c, --remove-cygdrive-prefix  remove cygdrive prefix
+  -h, --help                    output usage information and exit
   -s, --system                  remove system mount (default)
   -S, --remove-system-mounts    remove all system mounts
   -u, --user                    remove user mount
   -U, --remove-user-mounts      remove all user mounts
+  -v, --version                 output version information and exit
 </screen>
 
 <para>The <command>umount</command> program removes mounts from the
@@ -644,8 +669,8 @@ table.</para>
 <sect2 id="strace"><title>strace</title>
 
 <screen>
-Usage: strace [OPTIONS] <command-line>
-Usage: strace [OPTIONS] -p <pid>
+Usage: strace.exe [OPTIONS] <command-line>
+Usage: strace.exe [OPTIONS] -p <pid>
   -b, --buffer-size=SIZE       set size of output file buffer
   -d, --no-delta               don't display the delta-t microsecond timestamp
   -f, --trace-children         trace child processes (toggle - default true)
@@ -684,11 +709,12 @@ Usage: strace [OPTIONS] -p <pid>
     sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.
     minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.
     exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.
-    system   0x08000 (_STRACE_SYSTEM)   Cache strace messages.
+    system   0x08000 (_STRACE_SYSTEM)   Serious error; goes to console and log.
     nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.
     malloc   0x20000 (_STRACE_MALLOC)   Trace malloc calls.
     thread   0x40000 (_STRACE_THREAD)   Thread-locking calls.
 </screen>
+
 
 <para>The <command>strace</command> program executes a program, and
 optionally the children of the program, reporting any Cygwin DLL output
@@ -699,30 +725,45 @@ the Cygwin DLL itself.</para>
 <sect2 id="regtool"><title>regtool</title>
 
 <screen>
-Regtool Copyright (c) 2000 Red Hat Inc
- regtool -h  - print this message
- regtool [-v|-p|-k|-l] list [key]  - list subkeys and values
-     -p=postfix, like ls -p, appends / postfix to key names
-     -k=keys, lists only keys
-     -l=values, lists only values
- regtool [-v] add [key\subkey]  - add new subkey
- regtool [-v] remove [key]  - remove key
- regtool [-v|-q] check [key]  - exit 0 if key exists, 1 if not
- regtool [-i|-s|-e|-m] set [key\value] [data ...]  - set value
-     -i=integer -s=string -e=expand-string -m=multi-string
- regtool [-v] unset [key\value]  - removes value from key
- regtool [-q] get [key\value]  - prints value to stdout
-     -q=quiet, no error msg, just return nonzero exit if key/value missing
- key is in the format [host]\prefix\KEY\KEY\VALUE, where host is optional
- remote host in either \\hostname or hostname: format and prefix is any of:
- root     HKCR  HKEY_CLASSES_ROOT (local only)
- config   HKCC  HKEY_CURRENT_CONFIG (local only)
- user     HKCU  HKEY_CURRENT_USER (local only)
- machine  HKLM  HKEY_LOCAL_MACHINE
- users    HKU   HKEY_USERS
- You can use forward slash ('/') as a separator instead of backslash, in
- that case backslash is treated as escape character.
- example: \user\software\Microsoft\Clock\iFormat
+Usage: regtool.exe [OPTION] (add | check | get | list | remove | unset) KEY
+
+Actions:
+ add KEY\SUBKEY             add new SUBKEY
+ check KEY                  exit 0 if KEY exists, 1 if not
+ get KEY\VALUE              prints VALUE to stdout
+ list KEY                   list SUBKEYs and VALUEs
+ remove KEY                 remove KEY
+ set KEY\VALUE [data ...]   set VALUE
+ unset KEY\VALUE            removes VALUE from KEY
+
+Options for 'list' Action:
+ -k, --keys           print only KEYs
+ -l, --list           print only VALUEs
+ -p, --postfix        like ls -p, appends '\' postfix to KEY names
+
+Options for 'set' Action:
+ -e, --expand-string  set type to REG_EXPAND_SZ
+ -i, --integer        set type to REG_DWORD
+ -m, --multi-string   set type to REG_MULTI_SZ
+ -s, --string         set type to REG_SZ
+
+Other Options:
+ -h, --help     output usage information and exit
+ -q, --quiet    no error output, just nonzero return if KEY/VALUE missing
+ -v, --verbose  verbose output, including VALUE contents when applicable
+ -V, --version  output version information and exit
+
+KEY is in the format [host]\prefix\KEY\KEY\VALUE, where host is optional
+remote host in either \\hostname or hostname: format and prefix is any of:
+  root     HKCR  HKEY_CLASSES_ROOT (local only)
+  config   HKCC  HKEY_CURRENT_CONFIG (local only)
+  user     HKCU  HKEY_CURRENT_USER (local only)
+  machine  HKLM  HKEY_LOCAL_MACHINE
+  users    HKU   HKEY_USERS
+
+You can use forward slash ('/') as a separator instead of backslash, in
+that case backslash is treated as escape character
+Example: regtool.exe get '\user\software\Microsoft\Clock\iFormat'
 </screen>
 
 <para>The <command>regtool</command> program allows shell scripts
