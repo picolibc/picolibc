@@ -305,7 +305,6 @@ proc_subproc (DWORD what, DWORD val)
   int clearing;
   waitq *w;
   int thiszombie;
-  _pinfo *zombie_proc = NULL;
 
 #define wval	 ((waitq *) val)
 
@@ -378,7 +377,7 @@ proc_subproc (DWORD what, DWORD val)
 		  pchildren[val]->pid, val, hchildren[val], nchildren, nzombies);
 
       thiszombie = nzombies;
-      zombie_proc = zombies[nzombies] = pchildren[val];	// Add to zombie array
+      zombies[nzombies] = pchildren[val];	// Add to zombie array
       zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
 
       sigproc_printf ("zombifying [%d], pid %d, handle %p, nchildren %d",
@@ -478,13 +477,13 @@ proc_subproc (DWORD what, DWORD val)
 	sigproc_printf ("finished processing terminated/stopped child");
       else
 	{
-	  if (zombie_proc && zombies[thiszombie]
-	      && zombies[thiszombie] == zombie_proc
-	      && global_sigs[SIGCHLD].sa_handler == (void *) SIG_IGN)
-	    remove_zombie (thiszombie);
 	  waitq_head.next = NULL;
 	  sigproc_printf ("finished clearing");
 	}
+
+      if (global_sigs[SIGCHLD].sa_handler == (void *) SIG_IGN)
+	while (nzombies)
+	  remove_zombie (0);
       break;
   }
 

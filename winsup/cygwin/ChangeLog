@@ -1,5 +1,10 @@
 2003-12-17  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (proc_subproc): Simplify code to just remove all zombies
+	if SIGCHLD == SIG_IGN.
+
+2003-12-17  Christopher Faylor  <cgf@redhat.com>
+
 	* pinfo.h (pinfo::operator ==): Add a way to check for _pinfo types.
 	* sigproc.cc (proc_subproc): Ensure that zombie is removed when SIGCHLD
 	== SIG_IGN but still allow wait()ing threads to wake up.
