@@ -1,3 +1,8 @@
+Mon Jun 11 13:55:04 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.cc: Use autoloaded ToolHelp functions throughout for Win9x.
+	* autoload.cc: Autoload ToolHelp functions.
+
 Mon Jun 11 11:18:56 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (chdir): Fix call to path_conv constructor so that it REALLY

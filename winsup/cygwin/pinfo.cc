@@ -282,14 +282,6 @@ cygwin_winpid_to_pid (int winpid)
 
 #include <tlhelp32.h>
 
-typedef HANDLE (WINAPI * CREATESNAPSHOT) (DWORD, DWORD);
-typedef BOOL (WINAPI * PROCESSWALK) (HANDLE, LPPROCESSENTRY32);
-typedef BOOL (WINAPI * CLOSESNAPSHOT) (HANDLE);
-
-static NO_COPY CREATESNAPSHOT myCreateToolhelp32Snapshot = NULL;
-static NO_COPY PROCESSWALK myProcess32First = NULL;
-static NO_COPY PROCESSWALK myProcess32Next  = NULL;
-
 #define slop_pidlist 200
 #define size_pidlist(i) (sizeof (pidlist[0]) * ((i) + 1))
 #define size_pinfolist(i) (sizeof (pinfolist[0]) * ((i) + 1))
@@ -369,7 +361,7 @@ winpids::enum9x (bool winpid)
 {
   DWORD nelem = 0;
 
-  HANDLE h = myCreateToolhelp32Snapshot (TH32CS_SNAPPROCESS, 0);
+  HANDLE h = CreateToolhelp32Snapshot (TH32CS_SNAPPROCESS, 0);
   if (!h)
     {
       system_printf ("Couldn't create process snapshot, %E");
@@ -379,13 +371,13 @@ winpids::enum9x (bool winpid)
   PROCESSENTRY32 proc;
   proc.dwSize = sizeof (proc);
 
-  if (myProcess32First (h, &proc))
+  if (Process32First (h, &proc))
     do
       {
 	if (proc.th32ProcessID)
 	  add (nelem, winpid, proc.th32ProcessID);
       }
-    while (myProcess32Next (h, &proc));
+    while (Process32Next (h, &proc));
 
   CloseHandle (h);
   return nelem;
@@ -401,26 +393,10 @@ winpids::init (bool winpid)
 DWORD
 winpids::enum_init (bool winpid)
 {
-  HINSTANCE h;
   if (os_being_run == winNT)
     enum_processes = &winpids::enumNT;
   else
-    {
-      h = GetModuleHandle ("kernel32.dll");
-      myCreateToolhelp32Snapshot = (CREATESNAPSHOT)
-		  GetProcAddress(h, "CreateToolhelp32Snapshot");
-      myProcess32First = (PROCESSWALK)
-	      GetProcAddress (h, "Process32First");
-      myProcess32Next  = (PROCESSWALK)
-	      GetProcAddress (h, "Process32Next");
-      if (!myCreateToolhelp32Snapshot || !myProcess32First || !myProcess32Next)
-	{
-	  system_printf ("Couldn't find toolhelp processes, %E");
-	  return 0;
-	}
-
-      enum_processes = &winpids::enum9x;
-    }
+    enum_processes = &winpids::enum9x;
 
   return (this->*enum_processes) (winpid);
 }

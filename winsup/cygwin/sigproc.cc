@@ -46,7 +46,7 @@ details. */
 
 #define no_signals_available() (!hwait_sig || !sig_loop_wait)
 
-#define ZOMBIEMAX	((int) (sizeof (zombies) / sizeof (zombies[0])))
+#define ZOMBIEMAX	((int) (sizeof (zombies) / sizeof (zombies[0])) - 1)
 
 /*
  * Global variables
@@ -300,13 +300,12 @@ proc_subproc (DWORD what, DWORD val)
 
       sigproc_printf ("pid %d[%d] terminated, handle %p, nchildren %d, nzombies %d",
 		  pchildren[val]->pid, val, hchildren[val], nchildren, nzombies);
-      if (nzombies >= ZOMBIEMAX)
-	sigproc_printf ("Hit zombie maximum %d", nzombies);
-      else
-	{
-	  zombies[nzombies] = pchildren[val];	// Add to zombie array
-	  zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
-	}
+
+      int thiszombie;
+      thiszombie = nzombies;
+      zombies[nzombies] = pchildren[val];	// Add to zombie array
+      zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
+
       sigproc_printf ("removing [%d], pid %d, handle %p, nchildren %d",
 		      val, pchildren[val]->pid, hchildren[val], nchildren);
       if ((int) val < --nchildren)
@@ -314,6 +313,18 @@ proc_subproc (DWORD what, DWORD val)
 	  hchildren[val] = hchildren[nchildren];
 	  pchildren[val] = pchildren[nchildren];
 	}
+
+      /* See if we should care about the this terminated process.  If we've
+	 filled up our table or if we're ignoring SIGCHLD, then we immediately
+	 remove the process and move on. Otherwise, this process becomes a zombie
+	 which must be reaped by a wait() call. */
+      if (nzombies >= ZOMBIEMAX
+	  || myself->getsig (SIGCHLD).sa_handler == (void *) SIG_IGN)
+	{
+	  sigproc_printf ("automatically removing zombie %d", thiszombie);
+	  remove_zombie (thiszombie);
+	}
+
       /* Don't scan the wait queue yet.  Caller will send SIGCHLD to this process.
 	 This will cause an eventual scan of waiters. */
       break;
