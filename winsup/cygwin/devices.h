@@ -168,3 +168,6 @@ extern const device *icmp_dev;
 extern const device *unix_dev;
 extern const device *stream_dev;
 extern const device *dgram_dev;
+extern const device *proc_dev;
+extern const device *cygdrive_dev;
+extern const device *fh_dev;

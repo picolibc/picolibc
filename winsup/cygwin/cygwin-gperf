@@ -78,6 +78,8 @@ static const device piper_dev_storage =
 static const device pipew_dev_storage =
   {"", FH_PIPEW, "", 0, 0, 0, 0};
 
+static const device dev_fs =
+  {"", FH_FS, "", 0, 0, 0, 0};
 EOF
         for my $f (sort keys %fh_declare) {
 	    $_ .= "const device *$f = $fh_declare{$f};\n";

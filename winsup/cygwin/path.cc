@@ -1139,16 +1139,6 @@ set_flags (unsigned *flags, unsigned val)
     }
 }
 
-/* CGF FIXME device */
-static const device dev_proc =
-{"/proc", FH_PROC, "/proc", 0, 0, 0, 0};
-
-static const device dev_cygdrive =
-{"/cygdrive", FH_CYGDRIVE, "/cygdrive", 0, 0, 0, 0};
-
-static const device dev_fs =
-{"", FH_FS, "", 0, 0, 0, 0};
-
 /* conv_to_win32_path: Ensure src_path is a pure Win32 path and store
    the result in win32_path.
 
@@ -1255,7 +1245,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
   MALLOC_CHECK;
   if (isproc (pathbuf))
     {
-      dev = dev_proc;
+      dev = *proc_dev;
       dev.devn = fhandler_proc::get_proc_fhandler (pathbuf);
       if (dev.devn == FH_BAD)
 	return ENOENT;
@@ -1271,7 +1261,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 	  unit = 0;
 	  dst[0] = '\0';
 	  if (mount_table->cygdrive_len > 1)
-	    dev = dev_cygdrive;
+	    dev = *cygdrive_dev;
 	}
       else if (cygdrive_win32_path (pathbuf, dst, unit))
 	{
