@@ -674,7 +674,10 @@ main (int argc, char **_argv)
 	  print_version ();
 	  exit (0);
 	case 'K':
-	  key_sep = *optarg;
+	  if (!optarg)
+	    usage ();
+	  else
+	    key_sep = *optarg;
 	  break;
 	default :
 	  usage ();

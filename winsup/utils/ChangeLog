@@ -1,3 +1,7 @@
+2005-02-27  Christopher Faylor  <cgf@timesys.com>
+
+	* regtool.cc (main): Avoid a SEGV when nothing follows -K.
+
 2005-02-26  Christopher Faylor  <cgf@timesys.com>
 
 	* kill (getsig): Avoid buffer overflow when generating a signal name.
