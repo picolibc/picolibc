@@ -1,3 +1,17 @@
+2003-04-04  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (operator new): Be more defensive when messing with
+	threads that are marked "unavailable".
+
+2003-04-03  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (CONVERT_LIMIT): Use a size for the 21st century.
+
+2003-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (check_ntsec): Return general ntsec state on NULL
+	filename.  Check wincap.is_security() additionally.
+
 2003-04-02  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (EXTRA_OFILES): Remove debugging object.
@@ -118,8 +132,8 @@
 
 2003-03-27  Joe Buehler  <jhpb@draco.hekimian.com>
 
-	* autoload.cc: added RegGetKeySecurity()
-	* security.cc (get_nt_object_attribute): use RegGetKeySecurity() for
+	* autoload.cc: Add RegGetKeySecurity().
+	* security.cc (get_nt_object_attribute): Use RegGetKeySecurity() for
 	performance.
 
 2003-03-25  Christopher Faylor  <cgf@redhat.com>

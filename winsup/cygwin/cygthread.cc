@@ -136,7 +136,9 @@ new (size_t)
 
   /* Search the threads array for an empty slot to use */
   for (info = threads; info < threads + NTHREADS; info++)
-    if ((id = (DWORD) InterlockedExchange ((LPLONG) &info->avail, 0)))
+    if ((LONG) (id = (DWORD) InterlockedExchange ((LPLONG) &info->avail, -1)) < 0)
+      /* being considered */;
+    else if (id > 0)
       {
 #ifdef DEBUGGING
 	if (info->__name)
@@ -146,7 +148,9 @@ new (size_t)
 #endif
 	goto out;
       }
-    else if (!info->id)
+    else if (info->id)
+      InterlockedExchange ((LPLONG) &info->avail, 0);
+    else
       {
 	info->h = CreateThread (&sec_none_nih, 0, cygthread::stub, info,
 				CREATE_SUSPENDED, &info->id);
@@ -162,6 +166,7 @@ new (size_t)
   info = freerange ();	/* exhausted thread pool */
 
 out:
+  InterlockedExchange ((LPLONG) &info->avail, 0);
   cygthread_protect->release ();
   return info;
 }
