@@ -1,3 +1,7 @@
+2005-01-31  Andrew Cagney  <cagney@gnu.org>
+
+	* gettext.m4: Only set ENABLE_NLS when gettext is present.
+
 2005-01-29  Hans-Peter Nilsson  <hp@axis.com>
 
 	* configure.in (noconfigdirs) <crisv32-*-*>: Match like cris-*-*.

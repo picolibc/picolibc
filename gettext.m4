@@ -24,7 +24,6 @@ AC_DEFUN([CY_WITH_NLS],
 
     dnl If we use NLS figure out what method
     if test "$USE_NLS" = "yes"; then
-      AC_DEFINE(ENABLE_NLS, 1, [Define to 1 if NLS is requested])
       AC_MSG_CHECKING([whether included gettext is requested])
       AC_ARG_WITH(included-gettext,
         [  --with-included-gettext use the GNU gettext library included here],
@@ -156,6 +155,9 @@ AC_DEFUN([CY_WITH_NLS],
     AC_SUBST(INTLOBJS)
     AC_SUBST(POFILES)
     AC_SUBST(POSUB)
+    if test "x$CATOBJEXT" != "x"; then
+      AC_DEFINE(ENABLE_NLS, 1, [Define to 1 if NLS is requested])
+    fi
   ])
 
 AC_DEFUN([CY_GNU_GETTEXT],
