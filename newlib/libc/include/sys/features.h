@@ -77,7 +77,7 @@ extern "C" {
 # define _POSIX_VERSION 199009L
 #endif
 
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 # define _POSIX_JOB_CONTROL	1
 # define _POSIX_SAVED_IDS	0
 # define _POSIX_VERSION		199009L
