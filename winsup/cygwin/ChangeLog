@@ -1,5 +1,11 @@
 2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* wincap.h (wincap): Remove unnecessary definition of
+	supports_sparse_files.
+	* wincap.cc: Ditto.
+
+2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Check descriptor
 	created by cygheap_fdnew constructor.
 	* fhandler_virtual.cc (fhandler_virtual::opendir): Ditto.
