@@ -49,7 +49,7 @@ START_RELOC_NUMBERS (elf_s390_reloc_type)
     RELOC_NUMBER (R_390_GLOB_DAT, 10)	/* Create GOT entry.  */
     RELOC_NUMBER (R_390_JMP_SLOT, 11)	/* Create PLT entry.  */
     RELOC_NUMBER (R_390_RELATIVE, 12)	/* Adjust by program base.  */
-    RELOC_NUMBER (R_390_GOTOFF, 13)	/* 32 bit offset to GOT.  */
+    RELOC_NUMBER (R_390_GOTOFF32, 13)	/* 32 bit offset to GOT.  */
     RELOC_NUMBER (R_390_GOTPC, 14)	/* 32 bit PC relative offset to GOT.  */
     RELOC_NUMBER (R_390_GOT16, 15)	/* 16 bit GOT offset.  */
     RELOC_NUMBER (R_390_PC16, 16)	/* PC relative 16 bit.  */
@@ -63,6 +63,16 @@ START_RELOC_NUMBERS (elf_s390_reloc_type)
     RELOC_NUMBER (R_390_GOT64, 24)	/* 64 bit GOT offset.  */
     RELOC_NUMBER (R_390_PLT64, 25)	/* 64 bit PC relative PLT address.  */
     RELOC_NUMBER (R_390_GOTENT, 26)	/* 32 bit PC rel. to GOT entry >> 1. */
+    RELOC_NUMBER (R_390_GOTOFF16, 27)   /* 16 bit offset to GOT. */
+    RELOC_NUMBER (R_390_GOTOFF64, 28)   /* 64 bit offset to GOT. */
+    RELOC_NUMBER (R_390_GOTPLT12, 29)   /* 12 bit offset to jump slot.  */
+    RELOC_NUMBER (R_390_GOTPLT16, 30)   /* 16 bit offset to jump slot.  */
+    RELOC_NUMBER (R_390_GOTPLT32, 31)   /* 32 bit offset to jump slot.  */
+    RELOC_NUMBER (R_390_GOTPLT64, 32)   /* 64 bit offset to jump slot.  */
+    RELOC_NUMBER (R_390_GOTPLTENT, 33)  /* 32 bit rel. offset to jump slot.  */
+    RELOC_NUMBER (R_390_PLTOFF16, 34)   /* 16 bit offset from GOT to PLT. */
+    RELOC_NUMBER (R_390_PLTOFF32, 35)   /* 32 bit offset from GOT to PLT. */
+    RELOC_NUMBER (R_390_PLTOFF64, 36)   /* 16 bit offset from GOT to PLT. */
     /* These are GNU extensions to enable C++ vtable garbage collection.  */
     RELOC_NUMBER (R_390_GNU_VTINHERIT, 250)
     RELOC_NUMBER (R_390_GNU_VTENTRY, 251)
