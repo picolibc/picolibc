@@ -1,3 +1,16 @@
+Thu Nov  2 00:10:23 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.cc (EnumProcessesNT): New function.  Eliminates dependence on
+	psapi.h.
+	(EnumProcesses9x): Rename from EnumProcessesW95.  Change arguments to
+	be more useful for cygwin.
+	(winpids::init): Accomodate argument changes.
+	(enum_init): Ditto.
+	* pinfo.h (winpids): Make pidlist dynamically extendable by storing it
+	as a pointer and remembering the size.
+	* ntdll.h: Add extra definitions needed for EnumProcessesNT.  Reformat
+	via 'indent'.
+
 Wed Nov  1 21:08:23 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interruptible): Remove obsolete tests.

@@ -244,6 +244,7 @@ LoadDLLfuncEx (NtQuerySystemInformation, 16, ntdll, 1)
 LoadDLLfuncEx (NtUnmapViewOfSection, 8, ntdll, 1)
 LoadDLLfuncEx (RtlInitUnicodeString, 8, ntdll, 1)
 LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)
+LoadDLLfuncEx (ZwQuerySystemInformation, 16, ntdll, 1)
 
 LoadDLLinit (user32)
 LoadDLLfunc (CharToOemBuffA, 12, user32)

@@ -186,12 +186,13 @@ public:
 
 class winpids
 {
-  DWORD pidlist[16384];
+  DWORD *pidlist;
+  DWORD npidlist;
 public:
   DWORD npids;
   void reset () { npids = 0; }
   winpids (int) { reset (); }
-  winpids () { init (); };
+  winpids (): pidlist (NULL), npidlist (0) { init (); };
   void init ();
   int operator [] (int i) const {return pidlist[i];}
 };

@@ -24,6 +24,8 @@ details. */
 #include "environ.h"
 #include "security.h"
 #include <assert.h>
+#include <ntdef.h>
+#include "ntdll.h"
 
 static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
 
@@ -279,9 +281,8 @@ cygwin_winpid_to_pid (int winpid)
 }
 
 #include <tlhelp32.h>
-#include <psapi.h>
 
-typedef BOOL (WINAPI * ENUMPROCESSES) (DWORD *, DWORD, DWORD *);
+typedef DWORD (WINAPI * ENUMPROCESSES) (DWORD* &, DWORD &);
 typedef HANDLE (WINAPI * CREATESNAPSHOT) (DWORD, DWORD);
 typedef BOOL (WINAPI * PROCESSWALK) (HANDLE, LPPROCESSENTRY32);
 typedef BOOL (WINAPI * CLOSESNAPSHOT) (HANDLE);
@@ -289,65 +290,101 @@ typedef BOOL (WINAPI * CLOSESNAPSHOT) (HANDLE);
 static NO_COPY CREATESNAPSHOT myCreateToolhelp32Snapshot = NULL;
 static NO_COPY PROCESSWALK myProcess32First = NULL;
 static NO_COPY PROCESSWALK myProcess32Next  = NULL;
-static BOOL WINAPI enum_init (DWORD *lpidProcess, DWORD cb, DWORD *cbneeded);
+static DWORD WINAPI enum_init (DWORD* &, DWORD&);
 
 static NO_COPY ENUMPROCESSES myEnumProcesses = enum_init;
 
-static BOOL WINAPI
-EnumProcessesW95 (DWORD *lpidProcess, DWORD cb, DWORD *cbneeded)
-{
-  HANDLE h;
+#define slop_pidlist 200
+#define size_pidlist(i) (sizeof (pidlist[0]) * ((i) + 1))
 
-  *cbneeded = 0;
-  h = myCreateToolhelp32Snapshot (TH32CS_SNAPPROCESS, 0);
+static DWORD WINAPI
+EnumProcessesNT (DWORD* &pidlist, DWORD &npidlist)
+{
+  static DWORD szprocs = 0;
+  static SYSTEM_PROCESSES *procs;
+
+  DWORD nelem = 0;
+  if (!szprocs)
+    procs = (SYSTEM_PROCESSES *) malloc (szprocs = 200 * sizeof (*procs));
+
+  NTSTATUS res;
+  for (;;)
+    {
+      res = ZwQuerySystemInformation (SystemProcessesAndThreadsInformation,
+				      procs, szprocs, NULL);
+      if (res == 0)
+	break;
+
+      if (res == STATUS_INFO_LENGTH_MISMATCH)
+	procs =  (SYSTEM_PROCESSES *)realloc (procs, szprocs += 200 * sizeof (*procs));
+      else
+	{
+	  system_printf ("error %p reading system process information", res);
+	  return 0;
+	}
+    }
+
+  SYSTEM_PROCESSES *px = procs;
+  for (;;)
+    {
+      if (nelem >= npidlist)
+	{
+	  npidlist += slop_pidlist;
+	  pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist));
+	}
+      pidlist[nelem++] = cygwin_pid (px->ProcessId);
+      if (!px->NextEntryDelta)
+	break;
+      px = (SYSTEM_PROCESSES *) ((char *) px + px->NextEntryDelta);
+    }
+
+  return nelem;
+}
+
+static DWORD WINAPI
+EnumProcesses9x (DWORD* &pidlist, DWORD &npidlist)
+{
+  DWORD nelem = 0;
+
+  HANDLE h = myCreateToolhelp32Snapshot (TH32CS_SNAPPROCESS, 0);
   if (!h)
-    return 0;
+    {
+      system_printf ("Couldn't create process snapshot, %E");
+      return 0;
+    }
 
   PROCESSENTRY32 proc;
-  int i = 0;
   proc.dwSize = sizeof (proc);
+
   if (myProcess32First(h, &proc))
     do
-      lpidProcess[i++] = cygwin_pid (proc.th32ProcessID);
+      {
+	if (nelem >= npidlist)
+	  {
+	    npidlist += slop_pidlist;
+	    pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist));
+	  }
+	pidlist[nelem++] = cygwin_pid (proc.th32ProcessID);
+      }
     while (myProcess32Next (h, &proc));
+
   CloseHandle (h);
-  if (i == 0)
-    return 0;
-  *cbneeded = i * sizeof (DWORD);
-  return 1;
+  return nelem;
 }
 
 void
 winpids::init ()
 {
-  DWORD n;
-  if (!myEnumProcesses (pidlist, sizeof (pidlist) / sizeof (pidlist[0]), &n))
-    npids = 0;
-  else
-    npids = n / sizeof (pidlist[0]);
-
+  npids = myEnumProcesses (pidlist, npidlist);
   pidlist[npids] = 0;
 }
 
-static BOOL WINAPI
-enum_init (DWORD *lpidProcess, DWORD cb, DWORD *cbneeded)
+static DWORD WINAPI
+enum_init (DWORD* &pidlist, DWORD& npidlist)
 {
   HINSTANCE h;
   if (os_being_run == winNT)
-    {
-      h = LoadLibrary ("psapi.dll");
-      if (!h)
-	{
-	  system_printf ("couldn't load psapi.dll, %E");
-	  return 0;
-	}
-      myEnumProcesses = (ENUMPROCESSES) GetProcAddress (h, "EnumProcesses");
-      if (!myEnumProcesses)
-	{
-	  system_printf ("couldn't locate EnumProcesses in psapi.dll, %E");
-	  return 0;
-	}
-    }
+    myEnumProcesses = EnumProcessesNT;
   else
     {
       h = GetModuleHandle("kernel32.dll");
@@ -363,8 +400,8 @@ enum_init (DWORD *lpidProcess, DWORD cb, DWORD *cbneeded)
 	  return 0;
 	}
 
-      myEnumProcesses = EnumProcessesW95;
+      myEnumProcesses = EnumProcesses9x;
     }
 
-  return myEnumProcesses (lpidProcess, cb, cbneeded);
+  return myEnumProcesses (pidlist, npidlist);
 }
