@@ -7,13 +7,14 @@ extern "C" {
 
 enum
 {
-  MOUNT_SYMLINK = 1,	/* "mount point" is a symlink */
-  MOUNT_BINARY =  2,	/* "binary" format read/writes */
-  MOUNT_SYSTEM =  8,	/* mount point came from system table */
-  MOUNT_EXEC   = 16,	/* Any file in the mounted directory gets 'x' bit */
-  MOUNT_AUTO   = 32,	/* mount point refers to auto device mount */
-  MOUNT_CYGWIN_EXEC = 64/* file or directory is or contains a cygwin
-			    executable */
+  MOUNT_SYMLINK =	0x001,	/* "mount point" is a symlink */
+  MOUNT_BINARY =	0x002,	/* "binary" format read/writes */
+  MOUNT_SYSTEM =	0x008,	/* mount point came from system table */
+  MOUNT_EXEC   =	0x010,	/* Any file in the mounted directory gets 'x' bit */
+  MOUNT_AUTO   =	0x020,	/* mount point refers to auto device mount */
+  MOUNT_CYGWIN_EXEC =	0x040,	/* file or directory is or contains a cygwin
+				   executable */
+  MOUNT_MIXED	=	0x080,	/* reads are text, writes are binary */
 };
 
 int mount (const char *, const char *, unsigned __flags);

@@ -483,7 +483,12 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	      for (; (p = strpbrk (a, "\"\\")); a = ++p)
 		{
 		  one_line.add (a, p - a);
-		  if ((*p == '\\' && p[1] == '"') || *p == '"')
+		  if (*p == '\\' && p[1] == '\\')
+		    {
+		      one_line.add ("\\\\\\", 3);
+		      p++;
+		    }
+		  else if ((*p == '\\' && p[1] == '"') || *p == '"')
 		    one_line.add ("\\", 1);
 		  one_line.add (p, 1);
 		}

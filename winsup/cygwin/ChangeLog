@@ -1,3 +1,10 @@
+Mon Nov 20 14:26:38 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (spawn_guts): YA tweak for dealing with arcane rules of
+	quoting in "normal" Microsoft programs.
+	* child_info.h: Bump fork magic number.
+	* include/sys/mount.h: Add an entry for mixed mode.
+
 Fri Nov 17 12:28:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (normalize_posix_path): Special care for root directory
