@@ -245,7 +245,8 @@ out:
 bool
 fhandler_process::fill_filebuf ()
 {
-  pinfo p (pid);
+  pinfo p (pid, PID_MAP_RW);	// PID_MAP_RW for cmdline since it
+  				// needs to signal the other process
 
   if (!p)
     {

@@ -1056,10 +1056,11 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 static void
 talktome ()
 {
-  winpids pids;
+  winpids pids ((DWORD) PID_MAP_RW);
   for (unsigned i = 0; i < pids.npids; i++)
     if (pids[i]->hello_pid == myself->pid)
-      pids[i]->commune_recv ();
+      if (!IsBadWritePtr (pids[i], sizeof (_pinfo)))
+	pids[i]->commune_recv ();
 }
 
 #define RC_MAIN 0

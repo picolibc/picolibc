@@ -1,5 +1,11 @@
 2003-09-16  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_process.cc (fhandler_process::fill_filebuf): Open pinfo with
+	PID_MAP_RW.
+	* sigproc.cc (talktome): Ditto for winpids.
+
+2003-09-16  Christopher Faylor  <cgf@redhat.com>
+
 	* pinfo.h (winpids::pid_access): New element.
 	(winpids::winpids): Rejigger to set pinfo_access.
 	* pinfo.cc (winpids::add): Try to open shared memory region with
