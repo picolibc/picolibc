@@ -1,5 +1,9 @@
 2003-07-01  Christopher Faylor  <cgf@redhat.com>
 
+	* thread.cc: Remove _MT_SAFE conditional.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
 	* configure.in: Fix --enable-server option.
 	* configure: Regenerate.
 

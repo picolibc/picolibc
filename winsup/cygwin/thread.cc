@@ -29,7 +29,6 @@ details. */
 # include "config.h"
 #endif
 
-#ifdef _MT_SAFE
 #include "winsup.h"
 #include <limits.h>
 #include "cygerrno.h"
@@ -3229,5 +3228,3 @@ pthread_null::getsequence_np ()
 }
 
 pthread_null pthread_null::_instance;
-
-#endif // MT_SAFE
