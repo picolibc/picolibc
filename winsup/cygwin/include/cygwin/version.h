@@ -205,12 +205,13 @@ details. */
            underscore.  No problems with backward compatibility since no
            official release has been made so far.  This change removes
            exported symbols like fopen64, which might confuse configure.
+       86: Export ftok
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 85
+#define CYGWIN_VERSION_API_MINOR 86
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

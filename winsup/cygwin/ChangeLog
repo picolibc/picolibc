@@ -1,6 +1,13 @@
+2003-05-20  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	* winsup/cygwin/include/cygwin/version.h: Bump API minor version.
+	* winsup/cygwin/include/cygwin/types.h: Define key_t as long long.
+	* winsup/cygwin/cygwin.din: Add ftok, _ftok.
+	* winsup/cygwin/ipc.cc (ftok): Rework implementation.
+
 2003-05-18  Joe Buehler  <jhpb@hekimian.com>
 
-        * spawn.cc (spawn_guts): Show more of command line in strace output.
+	* spawn.cc (spawn_guts): Show more of command line in strace output.
 
 2003-05-15  Thomas Pfaff  <tpfaff@gmx.net>
 
