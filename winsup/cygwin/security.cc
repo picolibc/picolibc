@@ -200,8 +200,7 @@ static BOOL
 get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
 {
   NET_API_STATUS ret;
-  LPSERVER_INFO_101 buf;
-  DWORD cnt, tot;
+  WCHAR *buf;
   char name[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   WCHAR account[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   WCHAR primary[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -224,11 +223,13 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
     }
   lsa2wchar (primary, pdi->Name, INTERNET_MAX_HOST_NAME_LENGTH + 1);
   LsaFreeMemory (pdi);
-  if ((ret = NetServerEnum (NULL, 101, (LPBYTE *) &buf, MAX_PREFERRED_LENGTH,
-			    &cnt, &tot, SV_TYPE_DOMAIN_CTRL, primary, NULL))
-      == STATUS_SUCCESS && cnt > 0)
+  /* If the SID given in the primary domain info is NULL, the machine is
+     not member of a domain.  The name in the primary domain info is the
+     name of the workgroup then. */
+  if (pdi->Sid &&
+      (ret = NetGetDCName(NULL, primary, (LPBYTE *) &buf)) == STATUS_SUCCESS)
     {
-      sys_wcstombs (name, buf[0].sv101_name, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      sys_wcstombs (name, buf, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (domain)
 	sys_wcstombs (domain, primary, INTERNET_MAX_HOST_NAME_LENGTH + 1);
     }

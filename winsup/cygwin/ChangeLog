@@ -1,3 +1,11 @@
+2002-03-07  Corinna Vinschen  <corina@vinschen.de>
+
+	* autoload.cc (NetGetDCName): Add symbol.
+	(NetServerEnum): Remove symbol.
+	* security.cc (get_lsa_srv_inf): Call NetGetDCName() instead of
+	NetServerEnum() since it's faster.  Don't call it at all if machine
+	is not a domain member.
+
 2002-03-06  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (normalize_posix_path): Avoid runs of '.'s > 2.
