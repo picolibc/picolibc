@@ -1,3 +1,8 @@
+2002-02-14  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/windef.h (PROC,FARPROC,NEARPROC): Remove void
+	parameter.
+
 2002-01-30  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/test.c: Include mapi.h.
