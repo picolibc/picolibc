@@ -1,3 +1,8 @@
+2002-04-19	Joel Sherrill <joel@OARcorp.com>
+
+	* libs/sys/rtems/crt0.c: Satisfy gcc's references to libc functions
+	while autoconf is trying to link main(){}.
+
 2002-04-17  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/linux/signal.c: Remove include of <bits/sigset.h>.

@@ -23,16 +23,13 @@ int rtems_gxx_mutex_lock() { return -1; }
 int rtems_gxx_mutex_unlock() { return -1; }
 int rtems_gxx_once() { return -1; }
 
-/* gcc 2.8.1 implicitly can generate references to these for at
- * least sparc-elf */
-#if (__GNUC__ == 2) && (__GNUC_MINOR__ == 8)
+/* gcc can implicitly generate references to these */
 strcmp() {}
 strcpy() {}
 strlen() {}
 memcmp() {}
 memcpy() {}
 memset() {}
-#endif
 
 /* The PowerPC expects certain symbols to be defined in the linker script. */
 
