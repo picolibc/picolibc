@@ -2884,7 +2884,10 @@ long gethostid(void)
   key.get_string ("ProductId", (char *)&data[6], 24, "00000-000-0000000-00000");
   debug_printf ("Windows Product ID: %s", (char *)&data[6]);
 
-  GetDiskFreeSpaceEx ("C:\\", NULL, (PULARGE_INTEGER) &data[11], NULL);
+  /* Contrary to MSDN, NT4 requires the second argument
+     or a STATUS_ACCESS_VIOLATION is generated */
+  ULARGE_INTEGER availb;
+  GetDiskFreeSpaceEx ("C:\\", &availb, (PULARGE_INTEGER) &data[11], NULL);
   if (GetLastError () == ERROR_PROC_NOT_FOUND)
     GetDiskFreeSpace ("C:\\", NULL, NULL, NULL, (DWORD *)&data[11]);
 

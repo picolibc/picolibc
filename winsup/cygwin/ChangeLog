@@ -1,3 +1,8 @@
+2003-09-16  Brian Ford  <ford@vss.fsi.com>
+
+	* syscalls.cc (gethostid): Add lpFreeBytesAvailable argument to
+	GetDiskFreeSpaceEx call since NT4 requires it.
+
 2003-09-16  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_process.cc (fhandler_process::fill_filebuf): Open pinfo with
