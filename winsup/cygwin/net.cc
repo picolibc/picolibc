@@ -19,7 +19,9 @@ details. */
 #include <iphlpapi.h>
 
 #include <stdlib.h>
+#define gethostname cygwin_gethostname
 #include <unistd.h>
+#undef gethostname
 #include <netdb.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
