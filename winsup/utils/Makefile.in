@@ -35,8 +35,12 @@ include $(srcdir)/../Makefile.common
 
 MINGW_INCLUDES:=-I$(mingw_source)/include -I$(cygwin_source)/include -I$(w32api_include)
 
+DUMPER_INCLUDES:=-I$(bupdir2)/bfd -I$(updir1)/include
+
 MINGW_CXXFLAGS:=$(CXXFLAGS) -mno-cygwin $(MINGW_INCLUDES)
 MINGW_CFLAGS:=$(CFLAGS) -mno-cygwin $(MINGW_INCLUDES)
+
+DUMPER_CFLAGS:=$(CFLAGS) $(INCLUDES) $(DUMPER_INCLUDES)
 
 libcygwin:=$(cygwin_build)/libcygwin.a
 libuser32:=$(w32api_lib)/libuser32.a
@@ -51,16 +55,18 @@ ALL_LDLIBS:=${patsubst $(w32api_lib)/lib%.a,-l%,\
 		${filter-out $(libcygwin), $(ALL_DEP_LDLIBS)}}}}
 
 MINGW_LIB:=$(mingw_build)/libmingw32.a
+DUMPER_LIB:=-L$(bupdir2)/bfd -lbfd -L$(bupdir2)/libiberty -liberty -L$(bupdir2)/intl -lintl
 MINGW_LDLIBS:=$(ALL_LDLIBS) $(MINGW_LIB)
 MINGW_DEP_LDLIBS:=${ALL_DEP_LDLIBS} ${MINGW_LIB}
 ALL_LDFLAGS:=-B$(newlib_build)/libc/ -B$(newlib_build)/libm/ -B$(w32api_lib)/ \
 	     $(LDFLAGS) $(ALL_LDLIBS)
 MINGW_LDFLAGS:=$(ALL_LDFLAGS) $(MINGW_LIB)
+DUMPER_LDFLAGS:=$(ALL_LDFLAGS) $(DUMPER_LIB) 
 
 PROGS:=mount$(EXEEXT) umount$(EXEEXT) ps$(EXEEXT) kill$(EXEEXT) \
        mkpasswd$(EXEEXT) mkgroup$(EXEEXT) cygpath$(EXEEXT) cygcheck$(EXEEXT) \
        passwd$(EXEEXT) getfacl$(EXEEXT) setfacl$(EXEEXT) strace$(EXEEXT) \
-       regtool$(EXEEXT)
+       regtool$(EXEEXT) dumper$(EXEEXT)
 
 .SUFFIXES:
 .NOEXPORT:
@@ -76,6 +82,15 @@ else
 	@echo $(CC) -o $@ ${wordlist 1,2,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)};\
 	$(CC) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 endif
+
+dumper.o: dumper.cc dumper.h
+	-$(CC) -c -o $@ $(DUMPER_CFLAGS) ${firstword $^}
+
+module_info.o: module_info.cc
+	-$(CC) -c -o $@ $(DUMPER_CFLAGS) $^
+
+parse_pe.o: parse_pe.cc dumper.h
+	-$(CC) -c -o $@ $(DUMPER_CFLAGS) ${firstword $^}
 
 mingw_getopt.o: $(cygwin_source)/lib/getopt.c
 	$(CC) -c -o $@ $(MINGW_CFLAGS) $^
@@ -98,6 +113,14 @@ $(cygwin_build)/libcygwin.a: $(cygwin_build)/Makefile
 
 $(mingw_build)/libmingw32.a: $(mingw_build)/Makefile
 	@$(MAKE) -C $(@D) $(@F)
+
+dumper.exe: module_info.o parse_pe.o dumper.o $(ALL_DEP_LDLIBS)
+ifdef VERBOSE
+	$(CC) -o $@ ${wordlist 1,3,$^} -B$(cygwin_build)/ $(DUMPER_LDFLAGS)
+else
+	@echo $(CC) -o $@ ${wordlist 1,3,$^} ${filter-out -B%, $(DUMPER_LDFLAGS)};\
+	$(CC) -o $@ ${wordlist 1,3,$^} -B$(cygwin_build)/ $(DUMPER_LDFLAGS)
+endif
 
 %.exe: %.o $(ALL_DEP_LDLIBS)
 ifdef VERBOSE

@@ -30,7 +30,7 @@ main (int argc, char **argv)
   if (argc == 1)
     usage ();
 
-  while (*(++argv)[0] == '-')
+  while (*++argv && **argv == '-')
     if (strcmp (*argv + 1, "f") == 0)
       force = 1;
     else if (gotsig)

@@ -1,3 +1,11 @@
+Thu Aug 24 15:00:31 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Add dumper.exe target and associated mechanisms for building it.
+	* dumper.cc: New file.
+	* dumper.h: New file.
+	* module_info.cc: New file.
+	* parse_pe.cc: New file.
+
 Mon Jul 31 15:12:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* passwd.c (main): Initialize oldpwd before beeing used.

@@ -261,9 +261,10 @@ main (int argc, char *argv[])
       char pname[MAX_PATH];
       if (p->process_state & PID_ZOMBIE)
         strcpy (pname, "<defunct>");
-      else if (p->progname[0])
+      else if (query != CW_GETPINFO_FULL)
 	{
 	  char *s;
+	  pname[0] = '\0';
 	  cygwin_conv_to_posix_path (p->progname, pname);
 	  s = strchr (pname, '\0') - 4;
 	  if (s > pname && strcasecmp (s, ".exe") == 0)
