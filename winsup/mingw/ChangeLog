@@ -1,5 +1,10 @@
 2002-06-15  Earnie Boyd  <earnie@users.sf.net>
 
+	* include/_mingw.h: Increment to version 2.1.
+	* Makefile.in: Ditto.
+
+2002-06-15  Earnie Boyd  <earnie@users.sf.net>
+
 	* Makefile.in (conf_prefix): New variable.
 	(dist_prefix): Ditto. Conditionally set to $(conf_prefix).
 	(bindist): Use dist_prefix.
