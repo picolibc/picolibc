@@ -23,13 +23,9 @@
 #ifndef _INTERNAL_XCOFF_H
 #define _INTERNAL_XCOFF_H
 
-/*
- * LINKER
- */
+/* Linker */
 
-/*
- * names of "special" sections
- */
+/* Names of "special" sections.  */
 #define _TEXT	".text"
 #define _DATA	".data"
 #define _BSS	".bss"
@@ -49,7 +45,6 @@
 #define	RS6K_AOUTHDR_OMAGIC 0x0107 /* old: text & data writeable */
 #define	RS6K_AOUTHDR_NMAGIC 0x0108 /* new: text r/o, data r/w */
 #define	RS6K_AOUTHDR_ZMAGIC 0x010B /* paged: text r/o, both page-aligned */
-
 
 /* XCOFF relocation types.  
    The relocations are described in the function  
@@ -78,22 +73,15 @@
 #define R_RBR   (0x1a)
 #define R_RBRC  (0x1b)
 
+/* Storage class #defines, from /usr/include/storclass.h that are not already 
+   defined in internal.h */
 
-/* 
- * Storage class #defines, from /usr/include/storclass.h 
- * That are not already defined in internal.h
- */
-#define	C_INFO		110	/* Comment string in .info section */
+/* Comment string in .info section */
+#define	C_INFO		110	
 
-
-/* 
- * AUXILLARY SYMBOL ENTRIES
- *
- * auxemt
- */
+/* Auxillary Symbol Entries  */
 
 /* x_smtyp values:  */
-
 #define	SMTYP_ALIGN(x)	((x) >> 3)	/* log2 of alignment */
 #define	SMTYP_SMTYP(x)	((x) & 0x7)	/* symbol type */
 /* Symbol type values:  */
@@ -105,7 +93,6 @@
 #define	XTY_US	5		/* "Reserved for internal use" */
 
 /* x_smclas values:  */
-
 #define	XMC_PR	0		/* Read-only program code */
 #define	XMC_RO	1		/* Read-only constant */
 #define	XMC_DB	2		/* Read-only debug dictionary table */
@@ -131,30 +118,37 @@
 
 struct internal_ldhdr
 {
-  /* 
-   * The version number: 
-   * 1 : 32 bit
-   * 2 : 64 bit
-   */
+  /* The version number: 
+     1 : 32 bit
+     2 : 64 bit */
   unsigned long l_version;
+
   /* The number of symbol table entries.  */
   bfd_size_type l_nsyms;
+
   /* The number of relocation table entries.  */
   bfd_size_type l_nreloc;
+
   /* The length of the import file string table.  */
   bfd_size_type l_istlen;
+
   /* The number of import files.  */
   bfd_size_type l_nimpid;
+
   /* The offset from the start of the .loader section to the first
      entry in the import file table.  */
   bfd_size_type l_impoff;
+
   /* The length of the string table.  */
   bfd_size_type l_stlen;
+
   /* The offset from the start of the .loader section to the first
      entry in the string table.  */
   bfd_size_type l_stoff;
+
   /* The offset to start of the symbol table, only in XCOFF64 */
   bfd_vma l_symoff;
+
   /* The offset to the start of the relocation table, only in XCOFF64 */
   bfd_vma l_rldoff;
 };
@@ -165,28 +159,37 @@ struct internal_ldhdr
 struct internal_ldsym
 {
   union
+  {
+    /* The symbol name if <= SYMNMLEN characters.  */
+    char _l_name[SYMNMLEN];
+    struct
     {
-      /* The symbol name if <= SYMNMLEN characters.  */
-      char _l_name[SYMNMLEN];
-      struct
-	{
-	  /* Zero if the symbol name is more than SYMNMLEN characters.  */
-	  long _l_zeroes;
-	  /* The offset in the string table if the symbol name is more
-             than SYMNMLEN characters.  */
-	  long _l_offset;
-	} _l_l;
-    } _l;
+      /* Zero if the symbol name is more than SYMNMLEN characters.  */
+	long _l_zeroes;
+      
+      /* The offset in the string table if the symbol name is more
+	 than SYMNMLEN characters.  */
+      long _l_offset;
+    } 
+    _l_l;
+  }
+  _l;
+
   /* The symbol value.  */
   bfd_vma l_value;
+
   /* The symbol section number.  */
   short l_scnum;
+
   /* The symbol type and flags.  */
   char l_smtype;
+
   /* The symbol storage class.  */
   char l_smclas;
+
   /* The import file ID.  */
   bfd_size_type l_ifile;
+
   /* Offset to the parameter type check string.  */
   bfd_size_type l_parm;
 };
@@ -208,10 +211,13 @@ struct internal_ldrel
 {
   /* The reloc address.  */
   bfd_vma l_vaddr;
+
   /* The symbol table index in the .loader section symbol table.  */
   bfd_size_type l_symndx;
+
   /* The relocation type and size.  */
   short l_rtype;
+
   /* The section number this relocation applies to.  */
   short l_rsecnm;
 };
@@ -230,14 +236,16 @@ struct xcoff_link_hash_entry
   asection *toc_section;
 
   union
-    {
-      /* If we have created a TOC entry (the XCOFF_SET_TOC flag is
-	 set), this is the offset in toc_section.  */
-      bfd_vma toc_offset;
-      /* If the TOC entry comes from an input file, this is set to the
-         symbol index of the C_HIDEXT XMC_TC or XMC_TD symbol.  */
-      long toc_indx;
-    } u;
+  {
+    /* If we have created a TOC entry (the XCOFF_SET_TOC flag is
+       set), this is the offset in toc_section.  */
+    bfd_vma toc_offset;
+    
+    /* If the TOC entry comes from an input file, this is set to the
+       symbol index of the C_HIDEXT XMC_TC or XMC_TD symbol.  */
+    long toc_indx;
+  } 
+  u;
 
   /* If this symbol is a function entry point which is called, this
      field holds a pointer to the function descriptor.  If this symbol
@@ -260,77 +268,41 @@ struct xcoff_link_hash_entry
   unsigned char smclas;
 };
 
-/*
- * #define for xcoff_link_hash_entry.flags
- *
- * XCOFF_REF_REGULAR
- * Symbol is referenced by a regular object. 
- *
- * XCOFF_DEF_REGULAR
- * Symbol is defined by a regular object. 
- *
- * XCOFF_DEF_DYNAMIC
- * Symbol is defined by a dynamic object. 
- *
- * XCOFF_LDREL
- * Symbol is used in a reloc being copied into the .loader section.
- *
- * XCOFF_ENTRY
- * Symbol is the entry point.
- *
- * XCOFF_CALLED
- * Symbol is called; this is, it appears in a R_BR reloc. 
- *
- * XCOFF_SET_TOC
- * Symbol needs the TOC entry filled in.
- *
- * XCOFF_IMPORT
- * Symbol is explicitly imported.
- *
- * XCOFF_EXPORT
- * Symbol is explicitly exported.
- *
- * XCOFF_BUILT_LDSYM
- * Symbol has been processed by xcoff_build_ldsyms.
- *
- * XCOFF_MARK
- * Symbol is mentioned by a section which was not garbage collected. 
- *
- * XCOFF_HAS_SIZE
- * Symbol size is recorded in size_list list from hash table. 
- *
- * XCOFF_DESCRIPTOR
- * Symbol is a function descriptor. 
- *
- * XCOFF_MULTIPLY_DEFINED
- * Multiple definitions have been for the symbol. 
- *
- * XCOFF_RTINIT 
- * Symbol is the __rtinit symbol 
- *
- * XCOFF_SYSCALL32 
- * Symbol is an imported 32 bit syscall
- * 
- * XCOFF_SYSCALL64 
- * Symbol is an imported 64 bit syscall
- */
+/*  Flags for xcoff_link_hash_entry.  */
 
+/* Symbol is referenced by a regular object. */
 #define XCOFF_REF_REGULAR      0x00000001
+/* Symbol is defined by a regular object. */
 #define XCOFF_DEF_REGULAR      0x00000002
+/* Symbol is defined by a dynamic object. */
 #define XCOFF_DEF_DYNAMIC      0x00000004
+/* Symbol is used in a reloc being copied into the .loader section.  */
 #define XCOFF_LDREL            0x00000008
+/* Symbol is the entry point.  */
 #define XCOFF_ENTRY            0x00000010
+/* Symbol is called; this is, it appears in a R_BR reloc.  */
 #define XCOFF_CALLED           0x00000020
+/* Symbol needs the TOC entry filled in.  */
 #define XCOFF_SET_TOC          0x00000040
+/* Symbol is explicitly imported.  */
 #define XCOFF_IMPORT           0x00000080
+/* Symbol is explicitly exported.  */
 #define XCOFF_EXPORT           0x00000100
+/* Symbol has been processed by xcoff_build_ldsyms.  */
 #define XCOFF_BUILT_LDSYM      0x00000200
+/* Symbol is mentioned by a section which was not garbage collected. */
 #define XCOFF_MARK             0x00000400
+/* Symbol size is recorded in size_list list from hash table.  */
 #define XCOFF_HAS_SIZE         0x00000800
+/* Symbol is a function descriptor.  */
 #define XCOFF_DESCRIPTOR       0x00001000
+/* Multiple definitions have been for the symbol. */
 #define XCOFF_MULTIPLY_DEFINED 0x00002000
+/* Symbol is the __rtinit symbol.  */
 #define XCOFF_RTINIT           0x00004000
+/* Symbol is an imported 32 bit syscall.  */
 #define XCOFF_SYSCALL32        0x00008000
+/* Symbol is an imported 64 bit syscall.  */
 #define XCOFF_SYSCALL64        0x00010000 
 
 /* The XCOFF linker hash table.  */
@@ -390,11 +362,12 @@ struct xcoff_link_hash_table
 
   /* A linked list of symbols for which we have size information.  */
   struct xcoff_link_size_list
-    {
-      struct xcoff_link_size_list *next;
-      struct xcoff_link_hash_entry *h;
-      bfd_size_type size;
-    } *size_list;
+  {
+    struct xcoff_link_size_list *next;
+    struct xcoff_link_hash_entry *h;
+    bfd_size_type size;
+  } 
+  *size_list;
 
   /* Magic sections: _text, _etext, _data, _edata, _end, end. */
   asection *special_sections[XCOFF_NUMBER_OF_SPECIAL_SECTIONS];
@@ -408,18 +381,25 @@ struct xcoff_loader_info
 {
   /* Set if a problem occurred.  */
   boolean failed;
+
   /* Output BFD.  */
   bfd *output_bfd;
+
   /* Link information structure.  */
   struct bfd_link_info *info;
+
   /* Whether all defined symbols should be exported.  */
   boolean export_defineds;
+
   /* Number of ldsym structures.  */
   size_t ldsym_count;
+
   /* Size of string table.  */
   size_t string_size;
+
   /* String table.  */
   bfd_byte *strings;
+
   /* Allocated size of string table.  */
   size_t string_alc;
 };
@@ -428,37 +408,41 @@ struct xcoff_loader_info
    from smaller values.  Start with zero, widen, *then* decrement.  */
 #define MINUS_ONE       (((bfd_vma) 0) - 1)
 
+/* __rtinit, from /usr/include/rtinit.h.  */
+struct __rtinit 
+{
+  /* Pointer to runtime linker.     
+     XXX: Is the parameter really void?  */
+  int	(*rtl) PARAMS ((void));	
 
-/* 
- * __rtinit 
- * from /usr/include/rtinit.h
- */
-struct __rtinit {
-  int		(*rtl) PARAMS ((void));	/* Pointer to runtime linker.
-					   XXX: Is the parameter really void?  */
-  int		init_offset;		/* Offset to array of init functions
-					   (0 if none). */
-  int		fini_offset;		/* Offset to array of fini functions
-					   (0 if none). */
-  int		__rtinit_descriptor_size; /* Size of __RTINIT_DESCRIPTOR.
-					     This value should be used instead
-					     of sizeof(__RTINIT_DESCRIPTOR). */
+  /* Offset to array of init functions, 0 if none. */
+  int	init_offset;
+
+  /* Offset to array of fini functions, 0 if none. */		   
+  int	fini_offset;		
+
+  /* Size of __RTINIT_DESCRIPTOR. This value should be used instead of 
+     sizeof(__RTINIT_DESCRIPTOR). */
+  int	__rtinit_descriptor_size; 
 };
 
 #define RTINIT_DESCRIPTOR_SIZE (12)
 
-struct __rtinit_descriptor {
-  int	f;		/* Init/fini function. */
-  int			name_offset;	/* Offset (within __rtinit symbol)
-					   to name of function. */
-  unsigned char	flags;		/* Flags */
+struct __rtinit_descriptor 
+{
+  /* Init/fini function. */
+  int	f;
+
+  /* Offset, relative to the start of the __rtinit symbol, to name of the 
+     function. */
+
+  int	name_offset;	
+
+  /* Flags */			   
+  unsigned char	flags;	
 };
 
-
-
-/* 
- * ARCHIVE
- */
+/* Archive */
 
 #define XCOFFARMAG    "<aiaff>\012"
 #define XCOFFARMAGBIG "<bigaf>\012"
