@@ -1,5 +1,10 @@
 2002-06-12  Christopher Faylor  <cgf@redhat.com>
 
+	* environ.cc (build_env): Correctly fill out windows environment block
+	with win32 paths rather than posix paths.
+
+2002-06-12  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (cygheap_user::set_name): Set homedrive and homepath to
 	NULL on user name change.
 	(cygheap_user::set_logsrv): Allocate enough space for leading \\ so

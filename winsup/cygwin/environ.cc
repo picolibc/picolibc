@@ -12,6 +12,7 @@ details. */
 #include <stdlib.h>
 #include <stddef.h>
 #include <ctype.h>
+#include <assert.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
 #include "pinfo.h"
@@ -96,10 +97,9 @@ win_env::add_cache (const char *in_posix, const char *in_native)
 
 
 /* Check for a "special" environment variable name.  *env is the pointer
- * to the beginning of the environment variable name.  n is the length
- * of the name including a mandatory '='.  Returns a pointer to the
- * appropriate conversion structure.
- */
+  to the beginning of the environment variable name.  *in_posix is any
+  known posix value for the environment variable. Returns a pointer to
+  the appropriate conversion structure.  */
 win_env * __stdcall
 getwinenv (const char *env, const char *in_posix)
 {
@@ -111,7 +111,7 @@ getwinenv (const char *env, const char *in_posix)
       {
 	win_env * const we = conv_envvars + i;
 	const char *val;
-	if (!cur_environ () || !(val = in_posix ?: getenv(we->name)))
+	if (!cur_environ () || !(val = in_posix ?: getenv (we->name)))
 	  debug_printf ("can't set native for %s since no environ yet",
 			we->name);
 	else if (!envcache || !we->posix || strcmp (val, we->posix) != 0)
@@ -824,51 +824,53 @@ char ** __stdcall
 build_env (const char * const *envp, char *&envblock, int &envc,
 	   bool no_envblock)
 {
-  int len, n, tl;
+  int len, n;
   const char * const *srcp;
   char **dstp;
   bool saw_spenv[SPENVS_SIZE] = {0};
 
   debug_printf ("envp %p", envp);
 
-  tl = 0;
-
+  /* How many elements? */
   for (n = 0; envp[n]; n++)
     continue;
 
-  char **newenv = (char **) cmalloc (HEAP_1_ARGV, sizeof (char *) * (n + SPENVS_SIZE + 1));
+  /* Allocate a new "argv-style" environ list with room for extra stuff. */
+  char **newenv = (char **) cmalloc (HEAP_1_ARGV, sizeof (char *) *
+						  (n + SPENVS_SIZE + 1));
 
+  int tl = 0;
+  /* Iterate over input list, generating a new environment list and refreshing
+     "special" entries, if necessary. */
   for (srcp = envp, dstp = newenv; *srcp; srcp++, dstp++)
     {
       len = strcspn (*srcp, "=") + 1;
 
+      /* Look for entries that require special attention */
       for (unsigned i = 0; i < SPENVS_SIZE; i++)
-	if (!saw_spenv[i] && (*dstp = spenvs[i].retrieve (no_envblock,*srcp, len)))
+	if (!saw_spenv[i]
+	    && (*dstp = spenvs[i].retrieve (no_envblock, *srcp, len)))
 	  {
 	    saw_spenv[i] = 1;
-	    goto last;
+	    goto next;
 	  }
 
-      win_env *conv;
-      if (!(conv = getwinenv (*srcp, *srcp + len)))
-	*dstp = cstrdup1 (*srcp);
-      else
-	*dstp = cstrdup1 (conv->native);
+      *dstp = cstrdup1 (*srcp);
 
-      if ((*dstp)[0] == '!' && isdrive ((*dstp) + 1) && (*dstp)[3] == '=')
-	**dstp = '=';
-
-     last:
-      tl += strlen (*dstp) + 1;
+    next:
+      if (!no_envblock)
+	tl += strlen (*dstp) + 1;
     }
 
+  /* Fill in any required-but-missing environment variables. */
   for (unsigned i = 0; i < SPENVS_SIZE; i++)
     if (!saw_spenv[i])
       {
 	*dstp = spenvs[i].retrieve (no_envblock);
 	if (*dstp)
 	  {
-	    tl += strlen (*dstp) + 1;
+	    if (!no_envblock)
+	      tl += strlen (*dstp) + 1;
 	    dstp++;
 	  }
       }
@@ -886,15 +888,43 @@ build_env (const char * const *envp, char *&envblock, int &envc,
       qsort (newenv, envc, sizeof (char *), env_sort);
 
       /* Create an environment block suitable for passing to CreateProcess.  */
-      char *ptr;
-      envblock = (char *) malloc (tl + 2);
-      for (srcp = newenv, ptr = envblock; *srcp; srcp++)
+      char *s;
+      envblock = (char *) malloc (2 + tl);
+      int new_tl = 0;
+      for (srcp = newenv, s = envblock; *srcp; srcp++)
 	{
-	  len = strlen (*srcp);
-	  memcpy (ptr, *srcp, len + 1);
-	  ptr += len + 1;
+	  const char *p;
+	  win_env *conv;
+	  len = strcspn (*srcp, "=") + 1;
+
+	  /* See if this entry requires posix->win32 conversion. */
+	  conv = getwinenv (*srcp, *srcp + len);
+	  if (conv)
+	    p = conv->native;	/* Use win32 path */
+	  else
+	    p = *srcp;		/* Don't worry about it */
+
+	  len = strlen (p);
+	  new_tl += len + 1;	/* Keep running total of block length so far */
+
+	  /* See if we need to increase the size of the block. */
+	  if (new_tl > tl)
+	    envblock = (char *) realloc (envblock, 2 + (tl += len + 100));
+
+	  memcpy (s, p, len + 1);
+
+	  /* See if environment variable is "special" in a Windows sense.
+	     Under NT, the current directories for visited drives are stored
+	     as =C:=\bar.  Cygwin converts the '=' to '!' for hopefully obvious
+	     reasons.  We need to convert it back when building the envblock */
+	  if (s[0] == '!' && (isdrive (s + 1) || (s[1] == ':' && s[2] == ':'))
+	      && s[3] == '=')
+	    *s = '=';
+	  s += len + 1;
 	}
-      *ptr = '\0';		/* Two null bytes at the end */
+      *s = '\0';			/* Two null bytes at the end */
+      assert ((s - envblock) <= tl);	/* Detect if we somehow ran over end
+					   of buffer */
     }
 
   return newenv;
