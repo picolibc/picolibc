@@ -656,6 +656,18 @@ For a concise description of the current situation with XEmacs, see
 this message from the Cygwin mailing list:
 @file{http://cygwin.com/ml/cygwin/2002-11/msg00609.html}.
 
+@subsection Is there a better alternative to the standard console window?
+
+Yes!  Use rxvt instead.  It's an optional package in Cygwin Setup.
+You can use it with or without X11.  You can resize it easily by
+dragging an edge or corner.  Copy and paste is easy with the left and
+middle mouse buttons, respectively.  It will honor settings in your
+~/.Xdefaults file, even without X.
+
+Don't invoke as simply ``rxvt'' because that will run /bin/sh (really
+ash) which is not a good interactive shell.  For details see
+@code{/usr/doc/Cygwin/rxvt-<ver>.README}.
+
 @subsection info error "dir: No such file or directory"
 
 Cygwin packages install their info documentation in the /usr/info
