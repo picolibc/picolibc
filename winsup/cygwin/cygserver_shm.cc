@@ -79,6 +79,9 @@ details. */
 
 class server_shmmgr
 {
+  class cleanup_t;
+  friend class cleanup_t;
+
 private:
   class attach_t
   {
@@ -129,7 +132,7 @@ private:
     }
 
     int attach (class process *, HANDLE & hFileMap);
-    int detach (const class process *);
+    int detach (class process *);
 
   private:
     static long _sequence;
@@ -145,20 +148,27 @@ private:
   {
   public:
     cleanup_t (segment_t *const segptr)
-      : _segptr (segptr)
+      : cleanup_routine (segptr)
     {
-      assert (_segptr);
+      assert (key ());
     }
 
-    virtual void cleanup (const class process *const client)
+    segment_t *segptr () { return static_cast<segment_t *>(key ()); }
+
+    virtual void cleanup (class process *const client)
     {
-      assert (_segptr);
+      assert (segptr ());
 
-      shmmgr.shmdt (_segptr->_shmid, client);
+      if (!shmmgr.find (segptr ()))
+	debug_printf ("process cleanup called for non-existent segment");
+      else
+	{
+	  const int res = shmmgr.shmdt (segptr ()->_shmid, client);
+
+	  if (res != 0)
+	    debug_printf ("process cleanup failed: %s", strerror (-res));
+	}
     }
-
-  private:
-    segment_t *const _segptr;
   };
 
 public:
@@ -170,7 +180,7 @@ public:
 	      struct shminfo & out_shminfo, struct shm_info & out_shm_info,
 	      const int shmid, int cmd, const struct shmid_ds &,
 	      class process *);
-  int shmdt (int shmid, const class process *);
+  int shmdt (int shmid, class process *);
   int shmget (int & out_shmid, key_t, size_t, int shmflg, uid_t, gid_t,
 	      class process *);
 
@@ -197,6 +207,8 @@ private:
 
   segment_t *find_by_key (key_t);
   segment_t *find (int intid, segment_t **previous = NULL);
+
+  const segment_t *find (const segment_t *) const;
 
   int new_segment (key_t, size_t, int shmflg, pid_t, uid_t, gid_t);
 
@@ -316,13 +328,24 @@ server_shmmgr::segment_t::attach (class process *const client,
  *---------------------------------------------------------------------------*/
 
 int
-server_shmmgr::segment_t::detach (const class process *const client)
+server_shmmgr::segment_t::detach (class process *const client)
 {
   attach_t *previous = NULL;
   attach_t *const attptr = find (client, &previous);
 
   if (!attptr)
     return -EINVAL;
+
+  if (client->is_active ())
+    {
+      const cleanup_t key (this);
+
+      if (!client->remove (&key))
+	syscall_printf (("failed to remove cleanup routine for %d(%lu) "
+			 "[shmid = %d]"),
+			client->cygpid (), client->winpid (),
+			_shmid);
+    }
 
   attptr->_refcnt -= 1;
 
@@ -540,7 +563,7 @@ server_shmmgr::shmctl (int & out_shmid,
  *---------------------------------------------------------------------------*/
 
 int
-server_shmmgr::shmdt (const int shmid, const class process *const client)
+server_shmmgr::shmdt (const int shmid, class process *const client)
 {
   syscall_printf ("shmdt (shmid = %d) for %d(%lu)",
 		  shmid, client->cygpid (), client->winpid ());
@@ -710,6 +733,27 @@ server_shmmgr::find (const int intid, segment_t **previous)
       return NULL;
     else if (previous)
       *previous = segptr;
+
+  return NULL;
+}
+
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::find ()
+ *
+ * Used to check that a segptr is still valid.  Since it may just be a
+ * random blob of memory, the routine doesn't try to access any of the
+ * "object's" fields.
+ *---------------------------------------------------------------------------*/
+
+const server_shmmgr::segment_t *
+server_shmmgr::find (const segment_t *segptr) const
+{
+  assert (segptr);
+
+  for (segment_t *ptr = _segments_head; ptr; ptr = ptr->_next)
+    if (ptr == segptr)
+      return segptr;
 
   return NULL;
 }

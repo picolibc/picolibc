@@ -85,7 +85,7 @@ process::~process ()
  * client request.
  */
 DWORD
-process::exit_code ()
+process::check_exit_code ()
 {
   if (_hProcess && _hProcess != INVALID_HANDLE_VALUE
       && _exit_status == STILL_ACTIVE
@@ -99,26 +99,56 @@ process::exit_code ()
 }
 
 bool
-process::add (cleanup_routine *const new_cleanup)
+process::add (cleanup_routine *const entry)
 {
-  assert (new_cleanup);
+  assert (entry);
 
-  if (_cleaning_up)
-    return false;
+  bool res = false;
   EnterCriticalSection (&_access);
-  /* Check that we didn't block with ::cleanup ().  This rigmarole is
-   * to get around win9x's glaring missing TryEnterCriticalSection
-   * call which would be a whole lot easier.
-   */
-  if (_cleaning_up)
+
+  if (!_cleaning_up)
     {
-      LeaveCriticalSection (&_access);
-      return false;
+      entry->_next = _routines_head;
+      _routines_head = entry;
+      res = true;
     }
-  new_cleanup->_next = _routines_head;
-  _routines_head = new_cleanup;
+
   LeaveCriticalSection (&_access);
-  return true;
+  return res;
+}
+
+bool
+process::remove (const cleanup_routine *const entry)
+{
+  assert (entry);
+
+  bool res = false;
+  EnterCriticalSection (&_access);
+
+  if (!_cleaning_up)
+    {
+      cleanup_routine *previous = NULL;
+
+      for (cleanup_routine *ptr = _routines_head;
+	   ptr;
+	   previous = ptr, ptr = ptr->_next)
+	{
+	  if (*ptr == *entry)
+	    {
+	      if (previous)
+		previous->_next = ptr->_next;
+	      else
+		_routines_head = ptr->_next;
+
+	      safe_delete (cleanup_routine, ptr);
+	      res = true;
+	      break;
+	    }
+	}
+    }
+
+  LeaveCriticalSection (&_access);
+  return res;
 }
 
 /* This is single threaded. It's called after the process is removed
@@ -129,7 +159,7 @@ void
 process::cleanup ()
 {
   EnterCriticalSection (&_access);
-  assert (_exit_status != STILL_ACTIVE);
+  assert (!is_active ());
   assert (!_cleaning_up);
   InterlockedExchange (&_cleaning_up, true);
   cleanup_routine *entry = _routines_head;
@@ -222,7 +252,7 @@ process_cache::process (const pid_t cygpid, const DWORD winpid)
 	}
 
       entry = safe_new (class process, cygpid, winpid);
-      if (entry->_exit_status != STILL_ACTIVE)
+      if (!entry->is_active ())
 	{
 	  LeaveCriticalSection (&_cache_write_access);
 	  safe_delete (process, entry);
@@ -316,7 +346,7 @@ process_cache::sync_wait_array (const HANDLE interrupt_event)
   for (class process *ptr = _processes_head; ptr; ptr = ptr->_next)
     {
       assert (ptr->_hProcess && ptr->_hProcess != INVALID_HANDLE_VALUE);
-      assert (ptr->_exit_status == STILL_ACTIVE);
+      assert (ptr->is_active ());
 
       _wait_array[index] = ptr->handle ();
       _process_array[index++] = ptr;
@@ -353,7 +383,7 @@ process_cache::check_and_remove_process (const size_t index)
   assert (process);
   assert (process->handle () == _wait_array[index]);
 
-  if (process->exit_code () == STILL_ACTIVE)
+  if (process->check_exit_code () == STILL_ACTIVE)
     return;
 
   debug_printf ("process %d(%lu) has left the building ($? = %lu)",

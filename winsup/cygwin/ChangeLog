@@ -1,5 +1,34 @@
 2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* include/cygwin/cygserver_process.h
+	(cleanup_routine::_key): New field.
+	(cleanup_routine::cleanup_routine): Initialise new field with new
+	argument.
+	(cleanup_routine::operator==): New method.
+	(cleanup_routine::cleanup): Make argument non-const.
+	(process::is_active): New method.
+	(process::remove): Ditto.
+	(process::check_exit_code): Rename method.
+	* cygserver_process.cc (process::add): Reorganize code.
+	(process::remove): New method.
+	(process::check_exit_code): Rename method.
+	(process::cleanup): Use new `process::is_active' method.
+	(process_cache::process): Ditto.
+	(process_cache::sync_wait_array): Ditto.
+	(process_cache::check_and_remove_process): Ditto.
+	* cygserver_shm.cc (server_shmmgr): Make `cleanup_t' a friend.
+	(segment_t::detach): Make argument non-const.  Remove cleanup
+	object from client if appropriate.
+	(cleanup_t::_segptr): Remove field.
+	(cleanup_t::cleanup_t): Initialise parent explicitly.  Remove
+	field.
+	(cleanup_t::segptr): New method.
+	(cleanup_t::cleanup): Add error checking and reporting.
+	(server_shmmgr::shmdt): Make argument non-const.
+	(server_shmmgr::find): New method.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver.cc (client_request_shutdown::client_request_shutdown):
 	Comment out verbose tracing statement.
 	* cygserver_client.cc

@@ -41,13 +41,25 @@ class cleanup_routine
   friend class process;
 
 public:
-  cleanup_routine () : _next (NULL) {}
+  cleanup_routine (void *const key)
+    : _key (key),
+      _next (NULL)
+  {}
+
   virtual ~cleanup_routine ();
 
+  bool operator== (const cleanup_routine &rhs) const
+  {
+    return _key == rhs._key;
+  }
+
+  void *key () { return _key; }
+
   /* MUST BE SYNCHRONOUS */
-  virtual void cleanup (const class process *) = 0;
+  virtual void cleanup (class process *) = 0;
 
 private:
+  void *const _key;
   cleanup_routine *_next;
 };
 
@@ -66,10 +78,13 @@ public:
   DWORD winpid () const { return _winpid; }
   HANDLE handle () const { return _hProcess; }
 
+  bool is_active () const { return _exit_status == STILL_ACTIVE; }
+
   void hold () { EnterCriticalSection (&_access); }
   void release () { LeaveCriticalSection (&_access); }
 
   bool add (cleanup_routine *);
+  bool remove (const cleanup_routine *);
 
 private:
   const pid_t _cygpid;
@@ -82,7 +97,7 @@ private:
   CRITICAL_SECTION _access;
   class process *_next;
   
-  DWORD exit_code ();
+  DWORD check_exit_code ();
   void cleanup ();
 };
 
