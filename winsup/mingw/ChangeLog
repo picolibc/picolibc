@@ -1,3 +1,12 @@
+2003-10-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdio.h (getc): Cast result to unsigned char before
+	return.
+	(putc): Likewise
+	(getchar): Likewise.
+	(putchar): Likewise.
+	Thanks to M.Fujii  <boochang@m4.kcn.ne.jp>
+
 2003-10-10  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/_mingw.h: Increment version to 3.2.

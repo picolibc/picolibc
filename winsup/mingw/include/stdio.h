@@ -265,28 +265,28 @@ _CRTIMP int __cdecl	_flsbuf (int, FILE*);
 __CRT_INLINE int __cdecl getc (FILE* __F)
 {
   return (--__F->_cnt >= 0)
-    ?  (int) *__F->_ptr++
+    ?  (int) (unsigned char) *__F->_ptr++
     : _filbuf (__F);
 }
 
 __CRT_INLINE int __cdecl putc (int __c, FILE* __F)
 {
   return (--__F->_cnt >= 0)
-    ?  (int)(*__F->_ptr++ = (char)__c)
+    ?  (int) (unsigned char) (*__F->_ptr++ = (char)__c)
     :  _flsbuf (__c, __F);
 }
 
 __CRT_INLINE int __cdecl getchar (void)
 {
   return (--stdin->_cnt >= 0)
-    ?  (int) *stdin->_ptr++
+    ?  (int) (unsigned char) *stdin->_ptr++
     : _filbuf (stdin);
 }
 
 __CRT_INLINE int __cdecl putchar(int __c)
 {
   return (--stdout->_cnt >= 0)
-    ?  (int)(*stdout->_ptr++ = (char)__c)
+    ?  (int) (unsigned char) (*stdout->_ptr++ = (char)__c)
     :  _flsbuf (__c, stdout);}
 
 #else  /* Use library functions.  */
