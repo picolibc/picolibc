@@ -529,7 +529,7 @@ EOF
 	echo ${UNAME_MACHINE}-unknown-openbsd`echo ${UNAME_RELEASE}|sed -e 's/[-_].*/\./'`
 	exit 0 ;;
     i*:[Cc][Yy][Gg][Ww][Ii][Nn]*:*)
-	echo ${UNAME_MACHINE}-pc-cygwin32
+	echo ${UNAME_MACHINE}-pc-cygwin
 	exit 0 ;;
     i*:MINGW*:*)
 	echo ${UNAME_MACHINE}-pc-mingw32
