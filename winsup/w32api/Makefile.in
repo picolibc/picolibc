@@ -125,7 +125,7 @@ bindist:
 	chmod 755 $(distdir)
 	$(MAKE) install prefix=../$(distdir) exec_prefix=../$(distdir)
 	rm -f $(distdir)$(TARFILEEXT)
-	cd $(distdir); $(TAR) $(TARFLAGS)cf ../$(distdir)$(TARFILEEXT) .
+	cd $(distdir); $(TAR) $(TARFLAGS)cf ../$(distdir)$(TARFILEEXT) *
 
 snapshot:
 	make dist SNAPDATE=$(shell date '+%Y%m%d')

@@ -1,3 +1,8 @@
+2002-04-09  Earnie Boyd  <earnie@users.sf.net>
+
+	* Makefile.in (bindist): Use * instead of . for file list for tar
+	command.
+
 2002-04-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wtypes.h (enum tagCLSCTX): Change formatting.
