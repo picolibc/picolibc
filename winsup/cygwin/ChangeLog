@@ -1,5 +1,20 @@
 2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver_transport_pipes.cc
+	(MAX_WAIT_NAMED_PIPE_RETRY): New constant.
+	(WAIT_NAMED_PIPE_TIMEOUT): Ditto.
+	(transport_layer_pipes::close): The `pipe' field is now either
+	NULL or a valid handle, and it should never have the value
+	`INVALID_HANDLE_VALUE'.
+	(transport_layer_pipes::read): Ditto.
+	(transport_layer_pipes::write): Ditto.
+	(transport_layer_pipes::connect): Ditto.
+	(transport_layer_pipes::impersonate_client): Ditto.
+	(transport_layer_pipes::connect): Ditto.  New, but still bogus,
+	retry logic.
+
+2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_shm.cc (server_shmmgr::server_shmmgr): All fields have
 	to be initialized now that the singleton is no longer static.
 

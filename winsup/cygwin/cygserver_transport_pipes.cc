@@ -32,9 +32,8 @@ details. */
 #include "cygwin/cygserver.h"
 #endif
 
-//SECURITY_DESCRIPTOR transport_layer_pipes::sd;
-//SECURITY_ATTRIBUTES transport_layer_pipes::sec_none_nih, transport_layer_pipes::sec_all_nih;
-//bool transport_layer_pipes::inited = false;
+static const int MAX_WAIT_NAMED_PIPE_RETRY = 64;
+static const DWORD WAIT_NAMED_PIPE_TIMEOUT = 100; // milliseconds
 
 #ifndef __INSIDE_CYGWIN__
 
@@ -81,7 +80,7 @@ transport_layer_pipes::init_security()
   /* FIXME: pthread_once or equivalent needed */
 
   InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-  SetSecurityDescriptorDacl (&sd, TRUE, 0, FALSE);
+  SetSecurityDescriptorDacl (&sd, TRUE, NULL, FALSE);
 
   sec_none_nih.nLength = sec_all_nih.nLength = sizeof (SECURITY_ATTRIBUTES);
   sec_none_nih.bInheritHandle = sec_all_nih.bInheritHandle = FALSE;
@@ -105,7 +104,7 @@ transport_layer_pipes::listen ()
 }
 
 class transport_layer_pipes *
-transport_layer_pipes::accept (bool * const recoverable)
+transport_layer_pipes::accept (bool *const recoverable)
 {
   assert (!is_accepted_endpoint);
   assert (!pipe);
@@ -154,6 +153,8 @@ transport_layer_pipes::accept (bool * const recoverable)
       return NULL;
     }
 
+  assert (accept_pipe);
+
   if (!ConnectNamedPipe (accept_pipe, NULL)
       && GetLastError () != ERROR_PIPE_CONNECTED)
     {
@@ -172,8 +173,10 @@ void
 transport_layer_pipes::close()
 {
   // verbose: debug_printf ("closing pipe %p", pipe);
-  if (pipe && pipe != INVALID_HANDLE_VALUE)
+  if (pipe)
     {
+      assert (pipe != INVALID_HANDLE_VALUE);
+
       FlushFileBuffers (pipe);
       DisconnectNamedPipe (pipe);
 #ifndef __INSIDE_CYGWIN__
@@ -192,7 +195,7 @@ transport_layer_pipes::close()
 #endif
     }
 
-  pipe = INVALID_HANDLE_VALUE;
+  pipe = NULL;
 }
 
 ssize_t
@@ -200,11 +203,13 @@ transport_layer_pipes::read (void * const buf, const size_t len)
 {
   // verbose: debug_printf ("reading from pipe %p", pipe);
 
-  if (!pipe || pipe == INVALID_HANDLE_VALUE)
+  if (!pipe)
     {
       errno = EBADF;
       return -1;
     }
+
+  assert (pipe != INVALID_HANDLE_VALUE);
 
   DWORD count;
   if (!ReadFile (pipe, buf, len, &count, NULL))
@@ -222,11 +227,13 @@ transport_layer_pipes::write (void * const buf, const size_t len)
 {
   // verbose: debug_printf ("writing to pipe %p", pipe);
 
-  if (!pipe || pipe == INVALID_HANDLE_VALUE)
+  if (!pipe)
     {
       errno = EBADF;
       return -1;
     }
+
+  assert (pipe != INVALID_HANDLE_VALUE);
 
   DWORD count;
   if (!WriteFile (pipe, buf, len, &count, NULL))
@@ -242,13 +249,18 @@ transport_layer_pipes::write (void * const buf, const size_t len)
 bool
 transport_layer_pipes::connect ()
 {
-  if (pipe && pipe != INVALID_HANDLE_VALUE)
+  if (pipe)
     {
+      assert (pipe != INVALID_HANDLE_VALUE);
+
       debug_printf ("Already have a pipe in this %p",this);
       return false;
     }
 
-  while (1)
+  BOOL rc = TRUE;
+  int retries = 0;
+
+  while (rc)
     {
       pipe = CreateFile (pipe_name,
 			 GENERIC_READ | GENERIC_WRITE,
@@ -259,8 +271,11 @@ transport_layer_pipes::connect ()
 			 NULL);
 
       if (pipe != INVALID_HANDLE_VALUE)
-	/* got the pipe */
-	return true;
+	{
+	  assert (pipe);
+	  /* got the pipe */
+	  return true;
+	}
 
       if (GetLastError () != ERROR_PIPE_BUSY)
 	{
@@ -268,12 +283,21 @@ transport_layer_pipes::connect ()
 	  pipe = NULL;
 	  return false;
 	}
-      if (!WaitNamedPipe (pipe_name, 20000))
-	system_printf ( "error connecting to server pipe after 20 seconds (%lu)", GetLastError () );
-      /* We loop here, because the pipe exists but is busy. If it doesn't exist
-       * the != ERROR_PIPE_BUSY will catch it.
-       */
+
+      (void) CloseHandle (pipe);
+      pipe = NULL;
+
+      while (retries != MAX_WAIT_NAMED_PIPE_RETRY
+	     && !(rc = WaitNamedPipe (pipe_name, WAIT_NAMED_PIPE_TIMEOUT)))
+	{
+	  retries += 1;
+	}
     }
+
+  system_printf ("Pipe busy and retry limit reached, error = %lu",
+		 GetLastError ());
+
+  return false;
 }
 
 #ifndef __INSIDE_CYGWIN__
@@ -284,10 +308,11 @@ transport_layer_pipes::impersonate_client ()
   assert (is_accepted_endpoint);
 
   // verbose: debug_printf ("impersonating pipe %p", pipe);
-  if (pipe && pipe != INVALID_HANDLE_VALUE)
+  if (pipe)
     {
-      BOOL rv = ImpersonateNamedPipeClient (pipe);
-      if (!rv)
+      assert (pipe != INVALID_HANDLE_VALUE);
+
+      if (!ImpersonateNamedPipeClient (pipe))
 	debug_printf ("Failed to Impersonate the client, (%lu)", GetLastError ());
     }
   // verbose: debug_printf("I am who you are");
