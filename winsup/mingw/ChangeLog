@@ -1,4 +1,9 @@
 
+Wed Jan 31 17:12:51  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* Makefile.in: Increment version to 0.5
+	* include/_mingw.h: Increment minor version
+
 Tue Jan 30 13:01:01  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/assert.h: (assert): Remove ; from end of definition
