@@ -9,12 +9,6 @@ extern "C" {
 #include <time.h>
 #include <sys/types.h>
 
-#ifdef __i386__
-#ifdef __MSDOS__
-#include "stat-dj.h"
-#endif
-#endif
-
 /* dj's stat defines _STAT_H_ */
 #ifndef _STAT_H_
 

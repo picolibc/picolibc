@@ -1,5 +1,10 @@
 2003-12-05  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/sys/stat.h: No longer include stat-dj.h.
+	* libc/include/sys/stat-dj.h: Removed.
+
+2003-12-05  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/wchar.h: Include <sys/reent.h>.
 
 2003-12-05  Christopher Faylor  <cgf@redhat.com>
