@@ -125,6 +125,16 @@ muto::release ()
 	 threads waiting for the lock, so trigger bruteforce.  */
       if (InterlockedDecrement (&waiters) >= 0)
 	(void) SetEvent (bruteforce); /* Wake up one of the waiting threads */
+      else if (*name == '!')
+	{
+	  CloseHandle (bruteforce);	/* If *name == '!' and there are no
+					   other waiters, then this is the
+					   last time this muto will ever be
+					   used, so close the handle. */
+#ifdef DEBUGGING
+	  bruteforce = NULL;
+#endif
+	}
     }
 
   return 1;	/* success. */

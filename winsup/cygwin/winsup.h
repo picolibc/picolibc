@@ -217,8 +217,6 @@ void events_terminate (void);
 
 void __stdcall close_all_files ();
 
-/* Invisible window initialization/termination. */
-HWND __stdcall gethwnd (void);
 /* Check if running in a visible window station. */
 extern bool has_visible_window_station (void);
 

@@ -82,7 +82,7 @@ public:
     return p;
   }
   bool exists () {return !!m;}
-  void set (const char *posix, const char *native);
+  void set (const char *, const char *);
   size_t posix_length () const { return m->posix_pathlen; }
   const char *posix_path () const { return m->posix_path; }
   size_t native_length () const { return m->native_pathlen; }
@@ -217,12 +217,12 @@ struct cwdstuff
   char *win32;
   DWORD hash;
   muto *cwd_lock;
-  char *get (char *buf, int need_posix = 1, int with_chroot = 0, unsigned ulen = CYG_MAX_PATH);
+  char *get (char *, int = 1, int = 0, unsigned = CYG_MAX_PATH);
   DWORD get_hash ();
   void init ();
-  void fixup_after_exec (char *win32, char *posix, DWORD hash);
+  void fixup_after_exec (char *, char *, DWORD);
   bool get_initial ();
-  void set (const char *win32_cwd, const char *posix_cwd = NULL);
+  int set (const char *, const char *, bool);
 };
 
 #ifdef DEBUGGING

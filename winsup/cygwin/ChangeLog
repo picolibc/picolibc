@@ -1,3 +1,9 @@
+2004-05-15  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* cygheap.h: Remove some parameter names from declarations throughout.
+	(cygheap::set): Reflect changes in declaration for arguments and return
+	value from previous checkin.
+
 2004-05-15  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* cygheap.h (cwdstuff::set): Modify return value and arguments.
@@ -57,7 +63,7 @@
 	variables while issetuid.
 
 2004-05-08  Pierre Humblet <pierre.humblet@ieee.org>
-            Christopher Faylor  <cgf@timesys.com>
+	    Christopher Faylor  <cgf@timesys.com>
 
 	* syscalls.cc: Include environ.h.
 	(chroot): Set errno in case of path error.  Call getwinenv.
@@ -115,7 +121,7 @@
 	* path.cc (path_conv::check): Strip trailing dots and spaces and
 	return error if the final component had only dots and spaces.
 	(normalize_posix_path): Revert 2004-04-30.
-	(chdir): Do not check for trailing spaces. Do not set native_dir 
+	(chdir): Do not check for trailing spaces. Do not set native_dir
 	to c:\ for virtual devices. Pass only native_dir to cwd.set.
 	(cwdstuff::set): Assume posix_cwd is already normalized.
 
