@@ -254,7 +254,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
     {
       /* We need to return a left over \n character, resulting from
 	 \r\n conversion.  Note that we already checked for FLUSHO and
-	 OutputStopped at the time that we read the character, so we
+	 output_stopped at the time that we read the character, so we
 	 don't check again here.  */
       buf[0] = '\n';
       need_nl = 0;
@@ -464,7 +464,7 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
   tcinit (cygwin_shared->tty[ttynum]);
 
   attach_tty (ttynum);
-  set_ctty (ttynum, flags);
+  tc->set_ctty (ttynum, flags);
 
   set_flags (flags);
   /* Create synchronisation events */

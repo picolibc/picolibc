@@ -82,28 +82,28 @@ fhandler_termios::tcgetpgrp ()
 }
 
 void
-fhandler_termios::set_ctty (int ttynum, int flags)
+tty_min::set_ctty (int ttynum, int flags)
 {
   if ((myself->ctty < 0 || myself->ctty == ttynum) && !(flags & O_NOCTTY))
     {
       myself->ctty = ttynum;
       syscall_printf ("attached tty%d sid %d, pid %d, tty->pgid %d, tty->sid %d",
-		      ttynum, myself->sid, myself->pid, tc->pgid, tc->getsid ());
+		      ttynum, myself->sid, myself->pid, pgid, getsid ());
 
-      pinfo p (tc->getsid ());
+      pinfo p (getsid ());
       if (myself->sid == myself->pid &&
 	  (p == myself || !proc_exists (p)))
 	{
 	  paranoid_printf ("resetting tty%d sid.  Was %d, now %d.  pgid was %d, now %d.",
-			   ttynum, tc->getsid(), myself->sid, tc->getpgid (), myself->pgid);
+			   ttynum, getsid(), myself->sid, getpgid (), myself->pgid);
 	  /* We are the session leader */
-	  tc->setsid (myself->sid);
-	  tc->setpgid (myself->pgid);
+	  setsid (myself->sid);
+	  setpgid (myself->pgid);
 	}
       else
-	myself->sid = tc->getsid ();
-      if (tc->getpgid () == 0)
-	tc->setpgid (myself->pgid);
+	myself->sid = getsid ();
+      if (getpgid () == 0)
+	setpgid (myself->pgid);
     }
 }
 
@@ -220,9 +220,9 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	{
 	  if (c == tc->ti.c_cc[VSTOP])
 	    {
-	      if (!tc->OutputStopped)
+	      if (!tc->output_stopped)
 		{
-		  tc->OutputStopped = 1;
+		  tc->output_stopped = 1;
 		  acquire_output_mutex (INFINITE);
 		}
 	      continue;
@@ -230,11 +230,11 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	  else if (c == tc->ti.c_cc[VSTART])
 	    {
     restart_output:
-	      tc->OutputStopped = 0;
+	      tc->output_stopped = 0;
 	      release_output_mutex ();
 	      continue;
 	    }
-	  else if ((tc->ti.c_iflag & IXANY) && tc->OutputStopped)
+	  else if ((tc->ti.c_iflag & IXANY) && tc->output_stopped)
 	    goto restart_output;
 	}
       if (tc->ti.c_lflag & IEXTEN && c == tc->ti.c_cc[VDISCARD])

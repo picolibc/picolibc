@@ -93,19 +93,18 @@ static int path_prefix_p_ (const char *path1, const char *path2, int len1);
 
 struct symlink_info
 {
-  char buf[3 + MAX_PATH * 3];
+  char contents[MAX_PATH + 4];
   char *ext_here;
   int extn;
-  char *contents;
   unsigned pflags;
   DWORD fileattr;
   int is_symlink;
   bool ext_tacked_on;
   int error;
   BOOL case_clash;
-  symlink_info (): contents (buf + MAX_PATH + 1) {}
   int check (const char *path, const suffix_info *suffixes,
-  	     char *orig_path, BOOL sym_ignore);
+  	     char *orig_path, unsigned opt,
+	     DWORD& devn, int& unit, unsigned& path_flags);
   BOOL case_check (const char *path, char *orig_path);
 };
 
@@ -176,511 +175,6 @@ pathmatch (const char *path1, const char *path2)
 {
   return pcheck_case == PCHECK_STRICT ? !strcmp (path1, path2)
   				      : strcasematch (path1, path2);
-}
-
-inline void
-path_conv::add_ext_from_sym (symlink_info &sym)
-{
-  if (sym.ext_here && *sym.ext_here)
-    {
-      known_suffix = path + sym.extn;
-      if (sym.ext_tacked_on)
-        strcpy (known_suffix, sym.ext_here);
-    }
-}
-
-/* Convert an arbitrary path SRC to a pure Win32 path, suitable for
-   passing to Win32 API routines.
-
-   If an error occurs, `error' is set to the errno value.
-   Otherwise it is set to 0.
-
-   follow_mode values:
-	SYMLINK_FOLLOW	    - convert to PATH symlink points to
-	SYMLINK_NOFOLLOW    - convert to PATH of symlink itself
-	SYMLINK_IGNORE	    - do not check PATH for symlinks
-	SYMLINK_CONTENTS    - just return symlink contents
-*/
-
-void
-path_conv::check (const char *src, unsigned opt,
-		  const suffix_info *suffixes)
-{
-  /* This array is used when expanding symlinks.  It is MAX_PATH * 2
-     in length so that we can hold the expanded symlink plus a
-     trailer.  */
-  char path_buf[MAX_PATH];
-  char path_copy[MAX_PATH];
-  char tmp_buf[MAX_PATH];
-  symlink_info sym;
-  bool need_directory = 0;
-  bool saw_symlinks = 0;
-
-#if 0
-  static path_conv last_path_conv;
-  static char last_src[MAX_PATH + 1];
-
-  if (*last_src && strcmp (last_src, src) == 0)
-    {
-      *this = last_path_conv;
-      return;
-    }
-#endif
-
-  char *rel_path, *full_path;
-
-  int loop = 0;
-  path_flags = 0;
-  known_suffix = NULL;
-  fileattr = (DWORD) -1;
-  case_clash = FALSE;
-  devn = unit = 0;
-
-  if (!(opt & PC_NULLEMPTY))
-    error = 0;
-  else if ((error = check_null_empty_path (src)))
-    return;
-
-  if (opt & PC_FULL)
-    rel_path = path_buf, full_path = this->path;
-  else
-    rel_path = this->path, full_path = path_buf;
-
-  /* This loop handles symlink expansion.  */
-  for (;;)
-    {
-      MALLOC_CHECK;
-      assert (src);
-      char *p = strrchr (src, '/');
-      if (p)
-	{
-	  if (p[1] == '\0' || strcmp (p, "/.") == 0)
-	    need_directory = 1;
-	}
-      else if ((p = strrchr (src, '\\')) &&
-	       (p[1] == '\0' || strcmp (p, "\\.") == 0))
-	need_directory = 1;
-      /* Must look up path in mount table, etc.  */
-      error = mount_table->conv_to_win32_path (src, rel_path, full_path, devn,
-					       unit, &path_flags);
-      MALLOC_CHECK;
-      if (error)
-	return;
-      if (devn != FH_BAD)
-	{
-	  fileattr = 0;
-	  return;
-	}
-
-      /* Eat trailing slashes */
-      char *tail = strchr (full_path, '\0');
-      /* If path is only a drivename, Windows interprets it as
-	 the current working directory on this drive instead of
-	 the root dir which is what we want. So we need
-	 the trailing backslash in this case. */
-      while (tail > full_path + 3 && (*--tail == '\\'))
-	*tail = '\0';
-      if (full_path[0] && full_path[1] == ':' && full_path[2] == '\0')
-	strcat (full_path, "\\");
-
-      if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
-	{
-	  fileattr = GetFileAttributesA (path);
-	  goto out;
-	}
-
-      /* Make a copy of the path that we can munge up */
-      strcpy (path_copy, full_path);
-
-      tail = path_copy + 1 + (tail - full_path);   // Point to end of copy
-
-      /* Scan path_copy from right to left looking either for a symlink
-	 or an actual existing file.  If an existing file is found, just
-	 return.  If a symlink is found exit the for loop.
-	 Also: be careful to preserve the errno returned from
-	 symlink.check as the caller may need it. */
-      /* FIXME: Do we have to worry about multiple \'s here? */
-      int component = 0;		// Number of translated components
-      sym.contents[0] = '\0';
-
-      for (;;)
-	{
-	  const suffix_info *suff;
-
-	  /* Don't allow symlink.check to set anything in the path_conv
-	     class if we're working on an inner component of the path */
-	  if (component)
-	    {
-	      suff = NULL;
-	      sym.pflags = 0;
-	    }
-	  else
-	    {
-	      suff = suffixes;
-	      sym.pflags = path_flags;
-	    }
-
-	  int len = sym.check (path_copy, suff, full_path, opt & PC_SYM_IGNORE);
-
-	  if (sym.case_clash)
-	    {
-	      if (pcheck_case == PCHECK_STRICT)
-	        {
-		  case_clash = TRUE;
-		  error = ENOENT;
-		  goto out;
-		}
-	      /* If pcheck_case==PCHECK_ADJUST the case_clash is remembered
-	         if the last component is concerned. This allows functions
-		 which shall create files to avoid overriding already existing
-		 files with another case. */
-	      if (!component)
-	        case_clash = TRUE;
-	    }
-
-	  if (!(opt & PC_SYM_IGNORE))
-	    {
-	      if (!component)
-		path_flags = sym.pflags;
-
-	      /* If symlink.check found an existing non-symlink file, then
-		 it sets the appropriate flag.  It also sets any suffix found
-		 into `ext_here'. */
-	      if (!sym.is_symlink && sym.fileattr != (DWORD) -1)
-		{
-		  error = sym.error;
-		  if (component == 0)
-		    {
-		      fileattr = sym.fileattr;
-		      add_ext_from_sym (sym);
-		    }
-		  if (pcheck_case == PCHECK_RELAXED)
-		    goto out;	// file found
-		  /* Avoid further symlink evaluation. Only case checks are
-		     done now. */
-		  opt |= PC_SYM_IGNORE;
-		}
-	      /* Found a symlink if len > 0.  If component == 0, then the
-		 src path itself was a symlink.  If !follow_mode then
-		 we're done.  Otherwise we have to insert the path found
-		 into the full path that we are building and perform all of
-		 these operations again on the newly derived path. */
-	      else if (len > 0)
-		{
-		  saw_symlinks = 1;
-		  if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
-		    {
-		      set_symlink (); // last component of path is a symlink.
-		      fileattr = sym.fileattr;
-		      if (opt & PC_SYM_CONTENTS)
-		        {
-			  strcpy (path, sym.contents);
-			  goto out;
-			}
-		      add_ext_from_sym (sym);
-		      if (pcheck_case == PCHECK_RELAXED)
-		        goto out;
-		      /* Avoid further symlink evaluation. Only case checks are
-		         done now. */
-		      opt |= PC_SYM_IGNORE;
-		    }
-		  else
-		    break;
-		}
-	      /* No existing file found. */
-
-	    }
-
-	  if (!(tail = strrchr (path_copy, '\\')) ||
-	      (tail > path_copy && tail[-1] == ':'))
-	    goto out;	// all done
-
-	  /* Haven't found an existing pathname component yet.
-	     Pinch off the tail and try again. */
-	  *tail = '\0';
-	  component++;
-	}
-
-      /* Arrive here if above loop detected a symlink. */
-      if (++loop > MAX_LINK_DEPTH)
-	{
-	  error = ELOOP;   // Eep.
-	  return;
-	}
-      MALLOC_CHECK;
-
-      tail = full_path + (tail - path_copy);
-      int taillen = strlen (tail);
-      int buflen = strlen (sym.contents);
-      if (buflen + taillen > MAX_PATH)
-	  {
-	    error = ENAMETOOLONG;
-	    strcpy (path, "::ENAMETOOLONG::");
-	    return;
-	  }
-
-      /* Copy tail of full_path to discovered symlink. */
-      for (p = sym.contents + buflen; *tail; tail++)
-	*p++ = *tail == '\\' ? '/' : *tail;
-      *p = '\0';
-
-      /* If symlink referred to an absolute path, then we
-	 just use sym.contents and loop.  Otherwise tack the head of
-	 path_copy before sym.contents and translate it back from a
-	 Win32-style path to a POSIX-style one. */
-      if (isabspath (sym.contents))
-	src = sym.contents;
-      else if (!(tail = strrchr (path_copy, '\\')))
-	system_printf ("problem parsing %s - '%s'", src, full_path);
-      else
-	{
-	  int headlen = 1 + tail - path_copy;
-	  p = sym.contents - headlen;
-	  memcpy (p, path_copy, headlen);
-	  MALLOC_CHECK;
-	  error = mount_table->conv_to_posix_path (p, tmp_buf, 1);
-	  MALLOC_CHECK;
-	  if (error)
-	    return;
-	  src = tmp_buf;
-	}
-    }
-
-/*fillin:*/
-  if (!(opt & PC_SYM_CONTENTS))
-    add_ext_from_sym (sym);
-
-out:
-  /* Deal with Windows stupidity which considers filename\. to be valid
-     even when "filename" is not a directory. */
-  if (!need_directory || error)
-    /* nothing to do */;
-  else if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
-    path_flags &= ~PATH_SYMLINK;
-  else
-    {
-      debug_printf ("%s is a non-directory", path);
-      error = ENOTDIR;
-      return;
-    }
-
-  DWORD serial, volflags;
-  char fs_name[16];
-
-  strcpy (tmp_buf, full_path);
-  if (!rootdir (tmp_buf) ||
-      !GetVolumeInformation (tmp_buf, NULL, 0, &serial, NULL,
-      			     &volflags, fs_name, 16))
-    {
-      debug_printf ("GetVolumeInformation(%s) = ERR, full_path(%s), set_has_acls(FALSE)",
-		    tmp_buf, full_path, GetLastError ());
-      set_has_acls (FALSE);
-      set_has_buggy_open (FALSE);
-    }
-  else
-    {
-      set_isdisk ();
-      debug_printf ("GetVolumeInformation(%s) = OK, full_path(%s), set_has_acls(%d)",
-		    tmp_buf, full_path, volflags & FS_PERSISTENT_ACLS);
-      if (!allow_smbntsec
-          && ((tmp_buf[0] == '\\' && tmp_buf[1] == '\\')
-              || GetDriveType (tmp_buf) == DRIVE_REMOTE))
-        set_has_acls (FALSE);
-      else
-        set_has_acls (volflags & FS_PERSISTENT_ACLS);
-      /* Known file systems with buggy open calls. Further explanation
-         in fhandler.cc (fhandler_disk_file::open). */
-      set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
-    }
-
-  if (saw_symlinks)
-    set_has_symlinks ();
-
-  if (!error && !(path_flags & (PATH_ALL_EXEC | PATH_NOTEXEC)))
-    {
-      const char *p = strchr (path, '\0') - 4;
-      if (p >= path &&
-	  (strcasematch (".exe", p) ||
-	   strcasematch (".bat", p) ||
-	   strcasematch (".com", p)))
-	path_flags |= PATH_EXEC;
-    }
-
-#if 0
-  if (!error)
-    {
-      last_path_conv = *this;
-      strcpy (last_src, src);
-    }
-#endif
-}
-
-#define deveq(s) (strcasematch (name, (s)))
-#define deveqn(s, n) (strncasematch (name, (s), (n)))
-
-static __inline int
-digits (const char *name)
-{
-  char *p;
-  int n = strtol(name, &p, 10);
-
-  return p > name && !*p ? n : -1;
-}
-
-const char *windows_device_names[] =
-{
-  NULL,
-  "\\dev\\console",
-  "conin",
-  "conout",
-  "\\dev\\ttym",
-  "\\dev\\tty%d",
-  "\\dev\\ptym",
-  "\\\\.\\com%d",
-  "\\dev\\pipe",
-  "\\dev\\piper",
-  "\\dev\\pipew",
-  "\\dev\\socket",
-  "\\dev\\windows",
-  
-  NULL, NULL, NULL,
-
-  "\\dev\\disk",
-  "\\dev\\fd%d",
-  "\\dev\\st%d",
-  "nul",
-  "\\dev\\zero",
-  "\\dev\\%srandom",
-  "\\dev\\mem",
-  "\\dev\\clipboard",
-  "\\dev\\dsp"
-};
-
-static int
-get_raw_device_number (const char *uxname, const char *w32path, int &unit)
-{
-  DWORD devn = FH_BAD;
-
-  if (strncasematch (w32path, "\\\\.\\tape", 8))
-    {
-      devn = FH_TAPE;
-      unit = digits (w32path + 8);
-      // norewind tape devices have leading n in name
-      if (strncasematch (uxname, "/dev/n", 6))
-	unit += 128;
-    }
-  else if (isdrive (w32path + 4))
-    {
-      devn = FH_FLOPPY;
-      unit = cyg_tolower (w32path[4]) - 'a';
-    }
-  else if (strncasematch (w32path, "\\\\.\\physicaldrive", 17))
-    {
-      devn = FH_FLOPPY;
-      unit = digits (w32path + 17) + 128;
-    }
-  return devn;
-}
-
-int __stdcall
-get_device_number (const char *name, int &unit, BOOL from_conv)
-{
-  DWORD devn = FH_BAD;
-  unit = 0;
-
-  if ((*name == '/' && deveqn ("/dev/", 5)) ||
-      (*name == '\\' && deveqn ("\\dev\\", 5)))
-    {
-      name += 5;
-      if (deveq ("tty"))
-	{
-	  if (tty_attached (myself))
-	    {
-	      unit = myself->ctty;
-	      devn = FH_TTYS;
-	    }
-	  else if (myself->ctty > 0)
-	    devn = FH_CONSOLE;
-	}
-      else if (deveqn ("tty", 3) && (unit = digits (name + 3)) >= 0)
-	devn = FH_TTYS;
-      else if (deveq ("ttym"))
-	devn = FH_TTYM;
-      else if (deveq ("ptmx"))
-	devn = FH_PTYM;
-      else if (deveq ("windows"))
-	devn = FH_WINDOWS;
-      else if (deveq ("dsp"))
-	devn = FH_OSS_DSP;
-      else if (deveq ("conin"))
-	devn = FH_CONIN;
-      else if (deveq ("conout"))
-	devn = FH_CONOUT;
-      else if (deveq ("null"))
-	devn = FH_NULL;
-      else if (deveq ("zero"))
-	devn = FH_ZERO;
-      else if (deveq ("random") || deveq ("urandom"))
-	{
-	  devn = FH_RANDOM;
-	  unit = 8 + (deveqn ("u", 1) ? 1 : 0); /* Keep unit Linux conformant */
-	}
-      else if (deveq ("mem"))
-	{
-	  devn = FH_MEM;
-	  unit = 1;
-	}
-      else if (deveq ("clipboard"))
-	devn = FH_CLIPBOARD;
-      else if (deveq ("port"))
-	{
-	  devn = FH_MEM;
-	  unit = 4;
-	}
-      else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
-	devn = FH_SERIAL;
-      else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
-	devn = FH_SERIAL;
-      else if (deveq ("pipe") || deveq ("piper") || deveq ("pipew"))
-	devn = FH_PIPE;
-      else if (deveq ("tcp") || deveq ("udp") || deveq ("streamsocket")
-	       || deveq ("dgsocket"))
-	devn = FH_SOCKET;
-      else if (!from_conv)
-	devn = get_raw_device_number (name - 5,
-				      path_conv (name - 5,
-						 PC_SYM_IGNORE).get_win32 (),
-				      unit);
-    }
-  else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
-    devn = FH_SERIAL;
-  else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
-    devn = FH_SERIAL;
-
-  return devn;
-}
-
-/* Return TRUE if src_path is a Win32 device name, filling out the device
-   name in win32_path */
-
-static BOOL
-win32_device_name (const char *src_path, char *win32_path,
-		   DWORD &devn, int &unit)
-{
-  const char *devfmt;
-
-  devn = get_device_number (src_path, unit, TRUE);
-
-  if (devn == FH_BAD)
-    return FALSE;
-
-  if ((devfmt = windows_device_names[FHDEVN (devn)]) == NULL)
-    return FALSE;
-  if (devn == FH_RANDOM)
-    __small_sprintf (win32_path, devfmt, unit == 8 ? "" : "u");
-  else
-    __small_sprintf (win32_path, devfmt, unit);
-  return TRUE;
 }
 
 /* Normalize a POSIX path.
@@ -798,6 +292,490 @@ done:
 
   debug_printf ("%s = normalize_posix_path (%s)", dst_start, src_start);
   return 0;
+}
+
+inline void
+path_conv::add_ext_from_sym (symlink_info &sym)
+{
+  if (sym.ext_here && *sym.ext_here)
+    {
+      known_suffix = path + sym.extn;
+      if (sym.ext_tacked_on)
+        strcpy (known_suffix, sym.ext_here);
+    }
+}
+
+/* Convert an arbitrary path SRC to a pure Win32 path, suitable for
+   passing to Win32 API routines.
+
+   If an error occurs, `error' is set to the errno value.
+   Otherwise it is set to 0.
+
+   follow_mode values:
+	SYMLINK_FOLLOW	    - convert to PATH symlink points to
+	SYMLINK_NOFOLLOW    - convert to PATH of symlink itself
+	SYMLINK_IGNORE	    - do not check PATH for symlinks
+	SYMLINK_CONTENTS    - just return symlink contents
+*/
+
+void
+path_conv::check (const char *src, unsigned opt,
+		  const suffix_info *suffixes)
+{
+  /* This array is used when expanding symlinks.  It is MAX_PATH * 2
+     in length so that we can hold the expanded symlink plus a
+     trailer.  */
+  char path_copy[MAX_PATH + 3];
+  char tmp_buf[2 * MAX_PATH + 3];
+  symlink_info sym;
+  bool need_directory = 0;
+  bool saw_symlinks = 0;
+
+#if 0
+  static path_conv last_path_conv;
+  static char last_src[MAX_PATH + 1];
+
+  if (*last_src && strcmp (last_src, src) == 0)
+    {
+      *this = last_path_conv;
+      return;
+    }
+#endif
+
+  int loop = 0;
+  path_flags = 0;
+  known_suffix = NULL;
+  fileattr = (DWORD) -1;
+  case_clash = FALSE;
+  devn = unit = 0;
+
+  if (!(opt & PC_NULLEMPTY))
+    error = 0;
+  else if ((error = check_null_empty_path (src)))
+    return;
+
+  /* This loop handles symlink expansion.  */
+  for (;;)
+    {
+      MALLOC_CHECK;
+      assert (src);
+      char *p = strrchr (src, '/');
+      if (p)
+	{
+	  if (p[1] == '\0' || strcmp (p, "/.") == 0)
+	    need_directory = 1;
+	}
+      else if ((p = strrchr (src, '\\')) &&
+	       (p[1] == '\0' || strcmp (p, "\\.") == 0))
+	need_directory = 1;
+
+      error = normalize_posix_path (src, path_copy);
+      if (error)
+	return;
+
+      char *tail = strchr (path_copy, '\0');   // Point to end of copy
+      char *path_end = tail;
+      tail[1] = '\0';
+
+      /* Scan path_copy from right to left looking either for a symlink
+	 or an actual existing file.  If an existing file is found, just
+	 return.  If a symlink is found exit the for loop.
+	 Also: be careful to preserve the errno returned from
+	 symlink.check as the caller may need it. */
+      /* FIXME: Do we have to worry about multiple \'s here? */
+      int component = 0;		// Number of translated components
+      sym.contents[0] = '\0';
+
+      for (;;)
+	{
+	  const suffix_info *suff;
+	  char pathbuf[MAX_PATH];
+	  char *full_path;
+
+	  /* Don't allow symlink.check to set anything in the path_conv
+	     class if we're working on an inner component of the path */
+	  if (component)
+	    {
+	      suff = NULL;
+	      sym.pflags = 0;
+	      full_path = pathbuf;
+	    }
+	  else
+	    {
+	      suff = suffixes;
+	      sym.pflags = path_flags;
+	      full_path = this->path;
+	    }
+
+	  int len = sym.check (path_copy, suff, full_path, opt,
+	     		       devn, unit, path_flags);
+
+	  if (sym.case_clash)
+	    {
+	      if (pcheck_case == PCHECK_STRICT)
+	        {
+		  case_clash = TRUE;
+		  error = ENOENT;
+		  goto out;
+		}
+	      /* If pcheck_case==PCHECK_ADJUST the case_clash is remembered
+	         if the last component is concerned. This allows functions
+		 which shall create files to avoid overriding already existing
+		 files with another case. */
+	      if (!component)
+	        case_clash = TRUE;
+	    }
+
+	  if (!(opt & PC_SYM_IGNORE))
+	    {
+	      if (!component)
+		path_flags = sym.pflags;
+
+	      /* If symlink.check found an existing non-symlink file, then
+		 it sets the appropriate flag.  It also sets any suffix found
+		 into `ext_here'. */
+	      if (!sym.is_symlink && sym.fileattr != (DWORD) -1)
+		{
+		  error = sym.error;
+		  if (component == 0)
+		    {
+		      fileattr = sym.fileattr;
+		      add_ext_from_sym (sym);
+		    }
+		  if (pcheck_case == PCHECK_RELAXED)
+		    goto out;	// file found
+		  /* Avoid further symlink evaluation. Only case checks are
+		     done now. */
+		  opt |= PC_SYM_IGNORE;
+		}
+	      /* Found a symlink if len > 0.  If component == 0, then the
+		 src path itself was a symlink.  If !follow_mode then
+		 we're done.  Otherwise we have to insert the path found
+		 into the full path that we are building and perform all of
+		 these operations again on the newly derived path. */
+	      else if (len > 0)
+		{
+		  saw_symlinks = 1;
+		  if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
+		    {
+		      set_symlink (); // last component of path is a symlink.
+		      fileattr = sym.fileattr;
+		      if (opt & PC_SYM_CONTENTS)
+		        {
+			  strcpy (path, sym.contents);
+			  goto out;
+			}
+		      add_ext_from_sym (sym);
+		      if (pcheck_case == PCHECK_RELAXED)
+		        goto out;
+		      /* Avoid further symlink evaluation. Only case checks are
+		         done now. */
+		      opt |= PC_SYM_IGNORE;
+		    }
+		  else
+		    break;
+		}
+	      /* No existing file found. */
+
+	    }
+
+	  char *newtail = strrchr (path_copy, '/');
+	  if (tail != path_end)
+	    *tail = '/';
+
+	  if (!newtail)
+	    goto out;	// all done
+
+	  tail = newtail;
+
+	  /* Haven't found an existing pathname component yet.
+	     Pinch off the tail and try again. */
+	  *tail = '\0';
+	  component++;
+	}
+
+      /* Arrive here if above loop detected a symlink. */
+      if (++loop > MAX_LINK_DEPTH)
+	{
+	  error = ELOOP;   // Eep.
+	  return;
+	}
+
+      MALLOC_CHECK;
+
+      int taillen = strlen (tail + 1);
+      int buflen = strlen (sym.contents);
+      if (buflen + taillen > MAX_PATH)
+	  {
+	    error = ENAMETOOLONG;
+	    strcpy (path, "::ENAMETOOLONG::");
+	    return;
+	  }
+
+      if ((p = strrchr (path_copy, '/')) == NULL)
+	p = path_copy;
+      *p = '\0';
+
+      char *headptr;
+      if (isabspath (sym.contents))
+	headptr = tmp_buf;
+      else
+	{
+	  strcpy (tmp_buf, path_copy);
+	  headptr = strchr (tmp_buf, '\0');
+	}
+
+      if (headptr > tmp_buf && headptr[-1] != '/')
+	*headptr++ = '/';
+      
+      for (p = sym.contents; *p; p++)
+	*headptr++ = *p == '\\' ? '/' : *p;
+      if (tail == path_end)
+	*headptr = '\0';
+      else
+	{
+	  *headptr++ = '/';
+	  strcpy (headptr, tail);
+	}
+
+      src = tmp_buf;
+    }
+
+/*fillin:*/
+  if (!(opt & PC_SYM_CONTENTS))
+    add_ext_from_sym (sym);
+
+out:
+  /* Deal with Windows stupidity which considers filename\. to be valid
+     even when "filename" is not a directory. */
+  if (!need_directory || error)
+    /* nothing to do */;
+  else if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
+    path_flags &= ~PATH_SYMLINK;
+  else
+    {
+      debug_printf ("%s is a non-directory", path);
+      error = ENOTDIR;
+      return;
+    }
+
+  DWORD serial, volflags;
+  char fs_name[16];
+
+  strcpy (tmp_buf, this->path);
+  if (!rootdir (tmp_buf) ||
+      !GetVolumeInformation (tmp_buf, NULL, 0, &serial, NULL,
+      			     &volflags, fs_name, 16))
+    {
+      debug_printf ("GetVolumeInformation(%s) = ERR, this->path(%s), set_has_acls(FALSE)",
+		    tmp_buf, this->path, GetLastError ());
+      set_has_acls (FALSE);
+      set_has_buggy_open (FALSE);
+    }
+  else
+    {
+      set_isdisk ();
+      debug_printf ("GetVolumeInformation(%s) = OK, this->path(%s), set_has_acls(%d)",
+		    tmp_buf, this->path, volflags & FS_PERSISTENT_ACLS);
+      if (!allow_smbntsec
+          && ((tmp_buf[0] == '\\' && tmp_buf[1] == '\\')
+              || GetDriveType (tmp_buf) == DRIVE_REMOTE))
+        set_has_acls (FALSE);
+      else
+        set_has_acls (volflags & FS_PERSISTENT_ACLS);
+      /* Known file systems with buggy open calls. Further explanation
+         in fhandler.cc (fhandler_disk_file::open). */
+      set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
+    }
+
+  if (saw_symlinks)
+    set_has_symlinks ();
+
+  if (!error && !(path_flags & (PATH_ALL_EXEC | PATH_NOTEXEC)))
+    {
+      const char *p = strchr (path, '\0') - 4;
+      if (p >= path &&
+	  (strcasematch (".exe", p) ||
+	   strcasematch (".bat", p) ||
+	   strcasematch (".com", p)))
+	path_flags |= PATH_EXEC;
+    }
+
+#if 0
+  if (!error)
+    {
+      last_path_conv = *this;
+      strcpy (last_src, src);
+    }
+#endif
+}
+
+#define deveq(s) (strcasematch (name, (s)))
+#define deveqn(s, n) (strncasematch (name, (s), (n)))
+
+static __inline int
+digits (const char *name)
+{
+  char *p;
+  int n = strtol(name, &p, 10);
+
+  return p > name && !*p ? n : -1;
+}
+
+const char *windows_device_names[] =
+{
+  NULL,
+  "\\dev\\console",
+  "conin",
+  "conout",
+  "\\dev\\ttym",
+  "\\dev\\tty%d",
+  "\\dev\\ptym",
+  "\\\\.\\com%d",
+  "\\dev\\pipe",
+  "\\dev\\piper",
+  "\\dev\\pipew",
+  "\\dev\\socket",
+  "\\dev\\windows",
+  
+  NULL, NULL, NULL,
+
+  "\\dev\\disk",
+  "\\dev\\fd%d",
+  "\\dev\\st%d",
+  "nul",
+  "\\dev\\zero",
+  "\\dev\\%srandom",
+  "\\dev\\mem",
+  "\\dev\\clipboard",
+  "\\dev\\dsp"
+};
+
+static int
+get_raw_device_number (const char *uxname, const char *w32path, int &unit)
+{
+  DWORD devn = FH_BAD;
+
+  if (strncasematch (w32path, "\\\\.\\tape", 8))
+    {
+      devn = FH_TAPE;
+      unit = digits (w32path + 8);
+      // norewind tape devices have leading n in name
+      if (strncasematch (uxname, "/dev/n", 6))
+	unit += 128;
+    }
+  else if (isdrive (w32path + 4))
+    {
+      devn = FH_FLOPPY;
+      unit = cyg_tolower (w32path[4]) - 'a';
+    }
+  else if (strncasematch (w32path, "\\\\.\\physicaldrive", 17))
+    {
+      devn = FH_FLOPPY;
+      unit = digits (w32path + 17) + 128;
+    }
+  return devn;
+}
+
+int __stdcall
+get_device_number (const char *name, int &unit, BOOL from_conv)
+{
+  DWORD devn = FH_BAD;
+  unit = 0;
+
+  if ((*name == '/' && deveqn ("/dev/", 5)) ||
+      (*name == '\\' && deveqn ("\\dev\\", 5)))
+    {
+      name += 5;
+      if (deveq ("tty"))
+	{
+	  if (real_tty_attached (myself))
+	    {
+	      unit = myself->ctty;
+	      devn = FH_TTYS;
+	    }
+	  else if (myself->ctty > 0)
+	    devn = FH_CONSOLE;
+	}
+      else if (deveqn ("tty", 3) && (unit = digits (name + 3)) >= 0)
+	devn = FH_TTYS;
+      else if (deveq ("ttym"))
+	devn = FH_TTYM;
+      else if (deveq ("ptmx"))
+	devn = FH_PTYM;
+      else if (deveq ("windows"))
+	devn = FH_WINDOWS;
+      else if (deveq ("dsp"))
+	devn = FH_OSS_DSP;
+      else if (deveq ("conin"))
+	devn = FH_CONIN;
+      else if (deveq ("conout"))
+	devn = FH_CONOUT;
+      else if (deveq ("null"))
+	devn = FH_NULL;
+      else if (deveq ("zero"))
+	devn = FH_ZERO;
+      else if (deveq ("random") || deveq ("urandom"))
+	{
+	  devn = FH_RANDOM;
+	  unit = 8 + (deveqn ("u", 1) ? 1 : 0); /* Keep unit Linux conformant */
+	}
+      else if (deveq ("mem"))
+	{
+	  devn = FH_MEM;
+	  unit = 1;
+	}
+      else if (deveq ("clipboard"))
+	devn = FH_CLIPBOARD;
+      else if (deveq ("port"))
+	{
+	  devn = FH_MEM;
+	  unit = 4;
+	}
+      else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
+	devn = FH_SERIAL;
+      else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
+	devn = FH_SERIAL;
+      else if (deveq ("pipe") || deveq ("piper") || deveq ("pipew"))
+	devn = FH_PIPE;
+      else if (deveq ("tcp") || deveq ("udp") || deveq ("streamsocket")
+	       || deveq ("dgsocket"))
+	devn = FH_SOCKET;
+      else if (!from_conv)
+	devn = get_raw_device_number (name - 5,
+				      path_conv (name - 5,
+						 PC_SYM_IGNORE).get_win32 (),
+				      unit);
+    }
+  else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
+    devn = FH_SERIAL;
+  else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
+    devn = FH_SERIAL;
+
+  return devn;
+}
+
+/* Return TRUE if src_path is a Win32 device name, filling out the device
+   name in win32_path */
+
+static BOOL
+win32_device_name (const char *src_path, char *win32_path,
+		   DWORD &devn, int &unit)
+{
+  const char *devfmt;
+
+  devn = get_device_number (src_path, unit, TRUE);
+
+  if (devn == FH_BAD)
+    return FALSE;
+
+  if ((devfmt = windows_device_names[FHDEVN (devn)]) == NULL)
+    return FALSE;
+  if (devn == FH_RANDOM)
+    __small_sprintf (win32_path, devfmt, unit == 8 ? "" : "u");
+  else
+    __small_sprintf (win32_path, devfmt, unit);
+  return TRUE;
 }
 
 /* Normalize a Win32 path.
@@ -2643,15 +2621,45 @@ suffix_scan::next ()
 
 int
 symlink_info::check (const char *path, const suffix_info *suffixes,
-		     char *orig_path, BOOL sym_ignore)
+		     char *full_path, unsigned opt,
+		     DWORD& devn, int& unit, unsigned& path_flags)
 {
   HANDLE h;
   int res = 0;
   suffix_scan suffix;
+  contents[0] = '\0';
+  char *tail;
+
+  error = mount_table->conv_to_win32_path (path, NULL, full_path, devn,
+					   unit, &path_flags);
+
+  if (devn != FH_BAD)
+    {
+      fileattr = 0;
+      goto out;		/* Found a device.  Stop parsing. */
+    }
+
+  /* Eat trailing slashes */
+  tail = strchr (full_path, '\0');
+
+  /* If path is only a drivename, Windows interprets it as the current working
+     directory on this drive instead of the root dir which is what we want. So
+     we need the trailing backslash in this case. */
+  while (tail > full_path + 3 && (*--tail == '\\'))
+    *tail = '\0';
+
+  if (full_path[0] && full_path[1] == ':' && full_path[2] == '\0')
+    strcat (full_path, "\\");
+
+  if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
+    {
+      fileattr = GetFileAttributesA (path);
+      goto out;
+    }
 
   is_symlink = TRUE;
-  ext_here = suffix.has (path, suffixes);
-  extn = ext_here - path;
+  ext_here = suffix.has (full_path, suffixes);
+  extn = ext_here - full_path;
 
   ext_tacked_on = !*ext_here;
 
@@ -2671,8 +2679,8 @@ symlink_info::check (const char *path, const suffix_info *suffixes,
 	  continue;
 	}
 
-      if (pcheck_case != PCHECK_RELAXED && !case_check (path, orig_path)
-          || sym_ignore)
+      if (pcheck_case != PCHECK_RELAXED && !case_check (path, full_path)
+          || (opt & PC_SYM_IGNORE))
         goto file_not_symlink;
 
       int sym_check = 0;
@@ -2684,13 +2692,13 @@ symlink_info::check (const char *path, const suffix_info *suffixes,
       if (suffix.lnk_match ())
 	sym_check = 1;
 
-      /* The old Cygwin method creating symlinks: */
+      /* This is the old Cygwin method creating symlinks: */
       /* A symlink will have the `system' file attribute. */
       /* Only files can be symlinks (which can be symlinks to directories). */
       if (fileattr & FILE_ATTRIBUTE_SYSTEM)
 	sym_check = 2;
 
-      if (!sym_check && !(pflags & PATH_SYMLINK))
+      if (!sym_check)
 	goto file_not_symlink;
 
       /* Open the file.  */

@@ -87,6 +87,7 @@ dtable::extend (int howmuch)
 void
 stdio_init (void)
 {
+  extern void set_console_ctty ();
   /* Set these before trying to output anything from strace.
      Also, always set them even if we're to pick up our parent's fds
      in case they're missed.  */
@@ -117,6 +118,10 @@ stdio_init (void)
 
       cygheap->fdtab.init_std_file_from_handle (1, out, GENERIC_WRITE, "{stdout}");
       cygheap->fdtab.init_std_file_from_handle (2, err, GENERIC_WRITE, "{stderr}");
+      /* Assign the console as the controlling tty for this process if we actually
+	 have a console and no other controlling tty has been assigned. */
+      if (myself->ctty < 0 && GetConsoleCP () > 0)
+	set_console_ctty ();
     }
 }
 

@@ -890,7 +890,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 #error "Need to supply machine dependent setup_handler"
 #endif
 
-/* Keyboard interrupt handler.  */
+/* CGF Keyboard interrupt handler.  */
 static BOOL WINAPI
 ctrl_c_handler (DWORD type)
 {
@@ -908,7 +908,7 @@ ctrl_c_handler (DWORD type)
   tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);
   /* Ignore this if we're not the process group lead since it should be handled
      *by* the process group leader. */
-  if (t->getpgid () != myself->pid ||
+  if (!t->getpgid () || t->getpgid () != myself->pid ||
       (GetTickCount () - t->last_ctrl_c) < MIN_CTRL_C_SLOP)
     return TRUE;
   else

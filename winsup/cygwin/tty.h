@@ -14,8 +14,7 @@ details. */
 #define INP_BUFFER_SIZE 256
 #define OUT_BUFFER_SIZE 256
 #define NTTYS		128
-#define TTY_CONSOLE	0x40000000
-#define tty_attached(p)	((p)->ctty >= 0 && (p)->ctty != TTY_CONSOLE)
+#define real_tty_attached(p)	((p)->ctty >= 0 && (p)->ctty != TTY_CONSOLE)
 
 /* Input/Output/ioctl events */
 
@@ -52,7 +51,7 @@ class tty_min
 public:
   DWORD status;
   pid_t pgid;
-  int OutputStopped;
+  int output_stopped;
   int ntty;
   DWORD last_ctrl_c;	// tick count of last ctrl-c
 
@@ -62,6 +61,7 @@ public:
   void setpgid (int pid) {pgid = pid;}
   int getsid () {return sid;}
   void setsid (pid_t tsid) {sid = tsid;}
+  void set_ctty (int ttynum, int flags);
   struct termios ti;
   struct winsize winsize;
 

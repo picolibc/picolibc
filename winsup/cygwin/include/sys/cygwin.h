@@ -67,7 +67,7 @@ typedef enum
     CW_GET_CYGDRIVE_INFO
   } cygwin_getinfo_types;
 
-#define CW_NEXTPID 0x80000000	// or with pid to get next one
+#define CW_NEXTPID	0x80000000	// or with pid to get next one
 
 /* Flags associated with process_state */
 enum
@@ -207,6 +207,8 @@ extern int cygwin32_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 
 #include <sys/resource.h>
+
+#define TTY_CONSOLE	0x40000000
 
 struct external_pinfo
   {

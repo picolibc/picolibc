@@ -1034,7 +1034,7 @@ do_exit (int status)
 	}
 
       /* Kill the foreground process group on session leader exit */
-      if (getpgrp () > 0 && myself->pid == myself->sid && tty_attached (myself))
+      if (getpgrp () > 0 && myself->pid == myself->sid && real_tty_attached (myself))
 	{
 	  tty *tp = cygwin_shared->tty[myself->ctty];
 	  sigproc_printf ("%d == sid %d, send SIGHUP to children",

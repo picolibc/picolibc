@@ -317,7 +317,7 @@ tty::create_inuse (const char *fmt, BOOL inherit)
 void
 tty::init (void)
 {
-  OutputStopped = 0;
+  output_stopped = 0;
   setsid (0);
   pgid = 0;
   hwnd = NULL;

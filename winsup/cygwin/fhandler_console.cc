@@ -97,10 +97,10 @@ static tty_min NO_COPY *shared_console_info = NULL;
 
 /* Allocate and initialize the shared record for the current console.
    Returns a pointer to shared_console_info. */
-static __inline tty_min *
-get_tty_stuff (int force = 0)
+static tty_min *
+get_tty_stuff (int flags = 0)
 {
-  if (shared_console_info && !force)
+  if (shared_console_info)
     return shared_console_info;
 
   shared_console_info = (tty_min *) open_shared (NULL, cygheap->console_h,
@@ -109,7 +109,14 @@ get_tty_stuff (int force = 0)
   ProtectHandle (cygheap->console_h);
   shared_console_info->setntty (TTY_CONSOLE);
   shared_console_info->setsid (myself->sid);
+  shared_console_info->set_ctty (TTY_CONSOLE, flags);
   return shared_console_info;
+}
+
+void
+set_console_ctty ()
+{
+  (void) get_tty_stuff ();
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -517,7 +524,7 @@ fhandler_console::open (const char *, int flags, mode_t)
 {
   HANDLE h;
 
-  tcinit (get_tty_stuff ());
+  tcinit (get_tty_stuff (flags));
 
   set_io_handle (INVALID_HANDLE_VALUE);
   set_output_handle (INVALID_HANDLE_VALUE);
@@ -561,7 +568,6 @@ fhandler_console::open (const char *, int flags, mode_t)
     }
 
   TTYCLEARF (RSTCONS);
-  set_ctty (TTY_CONSOLE, flags);
   set_open_status ();
   debug_printf ("opened conin$ %p, conout$ %p",
 		get_io_handle (), get_output_handle ());

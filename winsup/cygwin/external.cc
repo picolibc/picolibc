@@ -57,7 +57,7 @@ fillout_pinfo (pid_t pid, int winpid)
 	}
       else if (nextpid || p->pid == pid || (winpid && thispid == (DWORD) pid))
 	{
-	  ep.ctty = tty_attached (p) ? p->ctty : -1;
+	  ep.ctty = p->ctty;
 	  ep.pid = p->pid;
 	  ep.ppid = p->ppid;
 	  ep.hProcess = p->hProcess;

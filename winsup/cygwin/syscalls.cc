@@ -1544,7 +1544,7 @@ ctermid (char *str)
   static NO_COPY char buf[16];
   if (str == NULL)
     str = buf;
-  if (!tty_attached (myself))
+  if (!real_tty_attached (myself))
     strcpy (str, "/dev/conin");
   else
     __small_sprintf (str, "/dev/tty%d", myself->ctty);

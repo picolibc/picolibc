@@ -1,3 +1,35 @@
+Sat Apr 28 19:36:13 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Throughout, change 'tty_attached' to 'real_tty_attached', for clarity.
+	Throughout, change 'OutputStopped' to 'output_stopped', for
+	consistency.
+	* dtable.cc (stdio_init): Set controlling tty if not set by stdio
+	opens.
+	* exceptions.cc (ctrl_c_handler): Avoid special pgid checking if no tty
+	is associated with the process.
+	(Suggested by Tim Baker <dbaker@direct.ca>)
+	* external.cc (fillout_pinfo): Return actual tty number for ctty.
+	* fhandler_console.cc (get_tty_stuff): Set ctty when shared memory is
+	allocated.  Accept flags input from open().
+	(set_console_ctty): New function.
+	(fhandler_console::open): Pass flags to get_tty_stuff and rely on this
+	function to set the ctty, if appropriate.
+	* fhandler_termios.cc (fhandler_termios::set_ctty): Move to tty_min
+	class.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Use tc field to access
+	set_ctty().
+	* tty.h (TTY_CONSOLE): Move to include/sys/cygwin.h.
+	(tty_min): Add set_ctty class here.
+	* include/sys/cygwin.h (TTY_CONSOLE): New home here.
+
+	* path.cc (symlink_info): Make contents an actual buffer.  Pass more
+	flags to case_check.
+	(path_conv::check): Reorganize to do parsing based on posix path rather
+	than native path.
+	(symlink_info::check): Expect posix path as input.  Translate to native
+	path here.  Accept path_conv flags.  Stop parsing if not a symlink
+	regardless of whether previous path was a symlink.
+
 2001-04-27  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* thread.cc (thread_init_wrapper): Use _REENT_INIT to initialize the
