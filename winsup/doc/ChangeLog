@@ -1,3 +1,7 @@
+2005-02-23  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* README: New file.
+
 2005-01-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Add words for (no)traverse option.
