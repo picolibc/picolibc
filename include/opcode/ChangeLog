@@ -1,5 +1,7 @@
 Sun Sep 19 10:40:59 1999  Jeffrey A Law  (law@cygnus.com)
 
+	* hppa.h (pa_opcodes): Handle PA2.0 fcnv, fcmp and ftest insns.
+
 	* hppa.h (pa_opcodes): Finish support for PA2.0 "b" instructions.
 
 	* hppa.h (pa_opcodes): Handle PA2.0 "bve" instructions.
