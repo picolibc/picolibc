@@ -1,3 +1,8 @@
+Sat Aug 28 00:25:25 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+
+	* hppa.h (pa_opcodes):  Change fmpyfadd, fmpynfadd, fneg,
+	fnegabs to use 'I' instead of 'F'.
+
 1999-08-21  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	* i386.h: Add AMD athlon instructions, pfnacc, pfpnacc, pswapd.
