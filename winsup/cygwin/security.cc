@@ -1267,7 +1267,7 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 	    *flags |= ((!(*anti & S_IXOTH)) ? S_IXOTH : 0)
 		      | ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
 		      | ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	  if ((*attribute & S_IFDIR) &&
+	  if ((S_ISDIR (*attribute)) &&
 	      (ace->Mask & (FILE_WRITE_DATA | FILE_EXECUTE | FILE_DELETE_CHILD))
 	      == (FILE_WRITE_DATA | FILE_EXECUTE))
 	    *flags |= S_ISVTX;
@@ -1404,7 +1404,7 @@ get_file_attribute (int use_ntsec, const char *file,
 	  if (gidret)
 	    *gidret = ILLEGAL_GID;
 	}
-      else if (attribute && (*attribute & S_IFLNK) == S_IFLNK)
+      else if (attribute && S_ISLNK (*attribute))
 	*attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
       return 0;
     }
@@ -1427,7 +1427,7 @@ get_file_attribute (int use_ntsec, const char *file,
     res = 0;
 
   /* symlinks are everything for everyone! */
-  if ((*attribute & S_IFLNK) == S_IFLNK)
+  if (S_ISLNK (*attribute))
     *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
   return res > 0 ? 0 : -1;
@@ -1498,7 +1498,7 @@ get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
     {
       int res = get_nt_object_attribute (handle, object_type, attribute,
 					 uidret, gidret);
-      if (attribute && (*attribute & S_IFLNK) == S_IFLNK)
+      if (attribute && S_ISLNK (*attribute))
 	*attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
       return res;
     }
@@ -1512,7 +1512,7 @@ get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
     return 0;
 
   /* symlinks are everything for everyone! */
-  if ((*attribute & S_IFLNK) == S_IFLNK)
+  if (S_ISLNK (*attribute))
     *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
   return 0;
@@ -1652,8 +1652,8 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     owner_allow |= FILE_GENERIC_WRITE;
   if (attribute & S_IXUSR)
     owner_allow |= FILE_GENERIC_EXECUTE;
-  if ((attribute & (S_IFDIR | S_IWUSR | S_IXUSR))
-      == (S_IFDIR | S_IWUSR | S_IXUSR))
+  if (S_ISDIR (attribute)
+      && (attribute & (S_IWUSR | S_IXUSR)) == (S_IWUSR | S_IXUSR))
     owner_allow |= FILE_DELETE_CHILD;
 
   /* Construct allow attribute for group. */
@@ -1665,8 +1665,9 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     group_allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
   if (attribute & S_IXGRP)
     group_allow |= FILE_GENERIC_EXECUTE;
-  if ((attribute & (S_IFDIR | S_IWGRP | S_IXGRP))
-      == (S_IFDIR | S_IWGRP | S_IXGRP) && !(attribute & S_ISVTX))
+  if (S_ISDIR (attribute)
+      && (attribute & (S_IWGRP | S_IXGRP)) == (S_IWGRP | S_IXGRP)
+      && !(attribute & S_ISVTX))
     group_allow |= FILE_DELETE_CHILD;
 
   /* Construct allow attribute for everyone. */
@@ -1678,8 +1679,8 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     other_allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
   if (attribute & S_IXOTH)
     other_allow |= FILE_GENERIC_EXECUTE;
-  if ((attribute & (S_IFDIR | S_IWOTH | S_IXOTH))
-      == (S_IFDIR | S_IWOTH | S_IXOTH)
+  if (S_ISDIR (attribute)
+      && (attribute & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH)
       && !(attribute & S_ISVTX))
     other_allow |= FILE_DELETE_CHILD;
 
@@ -1788,7 +1789,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 	}
 
   /* Construct appropriate inherit attribute for new directories */
-  if (attribute & S_IFDIR && !acl_exists )
+  if (S_ISDIR (attribute) && !acl_exists )
     {
       const DWORD inherit = SUB_CONTAINERS_AND_OBJECTS_INHERIT | INHERIT_ONLY;
 
