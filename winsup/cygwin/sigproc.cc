@@ -309,15 +309,6 @@ proc_subproc (DWORD what, DWORD val)
 	 This will cause an eventual scan of waiters. */
       break;
 
-    /* A child is in the stopped state.  Scan wait() queue to see if anyone
-     * should be notified.  (Called from wait_sig thread)
-     */
-    case PROC_CHILDSTOPPED:
-      child = myself;		// Just to avoid accidental NULL dereference
-      sigproc_printf ("Received stopped notification");
-      clearing = 0;
-      goto scan_wait;
-
     /* Handle a wait4() operation.  Allocates an event for the calling
      * thread which is signaled when the appropriate pid exits or stops.
      * (usually called from the main thread)
@@ -480,7 +471,7 @@ proc_terminate (void)
 void __stdcall
 sig_clear (int sig)
 {
-  (void) InterlockedExchange (myself->getsigtodo(sig), 0L);
+  (void) InterlockedExchange (myself->getsigtodo (sig), 0L);
   return;
 }
 
@@ -703,7 +694,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp)
 
   /* Increment the sigtodo array to signify which signal to assert.
    */
-  (void) InterlockedIncrement (p->getsigtodo(sig));
+  (void) InterlockedIncrement (p->getsigtodo (sig));
 
   /* Notify the process that a signal has arrived.
    */
@@ -790,7 +781,7 @@ out:
 void __stdcall
 sig_set_pending (int sig)
 {
-  (void) InterlockedIncrement (myself->getsigtodo(sig));
+  (void) InterlockedIncrement (myself->getsigtodo (sig));
   return;
 }
 
@@ -1134,7 +1125,6 @@ wait_sig (VOID *)
 	}
 
       rc -= WAIT_OBJECT_0;
-      int dispatched = FALSE;
       sigproc_printf ("awake");
       /* A sigcatch semaphore has been signaled.  Scan the sigtodo
        * array looking for any unprocessed signals.
@@ -1145,7 +1135,7 @@ wait_sig (VOID *)
       int dispatched_sigchld = 0;
       for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
 	{
-	  while (InterlockedDecrement (myself->getsigtodo(sig)) >= 0)
+	  while (InterlockedDecrement (myself->getsigtodo (sig)) >= 0)
 	    {
 	      if (sig == SIGCHLD)
 		saw_sigchld = 1;
@@ -1171,37 +1161,31 @@ wait_sig (VOID *)
 		  // proc_strace ();	// Dump cached strace.prntf stuff.
 		  break;
 
-		/* Signalled from a child process that it has stopped */
-		case __SIGCHILDSTOPPED:
-		  sigproc_printf ("Received child stopped notification");
-		  dispatched |= sig_handle (SIGCHLD);
-		  if (proc_subproc (PROC_CHILDSTOPPED, 0))
-		    dispatched |= 1;
-		  break;
-
 		/* A normal UNIX signal */
 		default:
 		  sigproc_printf ("Got signal %d", sig);
 		  int wasdispatched = sig_handle (sig);
-		  dispatched |= wasdispatched;
 		  if (sig == SIGCHLD && wasdispatched)
 		    dispatched_sigchld = 1;
+		  /* Need to decrement again to offset increment below since
+		     we really do want to decrement in this case. */
+		  InterlockedDecrement (myself->getsigtodo (sig));
 		  goto nextsig;
 		}
 	    }
-	  /* Decremented too far. */
-	  if (InterlockedIncrement (myself->getsigtodo(sig)) > 0)
-	    saw_pending_signals = 1;
+
 	nextsig:
-	  continue;
+	  /* Decremented too far. */
+	  if (InterlockedIncrement (myself->getsigtodo (sig)) > 0)
+	    saw_pending_signals = 1;
 	}
 
-      /* FIXME: The dispatched stuff probably isn't needed anymore. */
-      if (dispatched >= 0 && pending_signals < 0 && !saw_pending_signals)
+      if (pending_signals < 0 && !saw_pending_signals)
 	pending_signals = 0;
 
-      if (nzombies && saw_sigchld && !dispatched_sigchld)
+      if (saw_sigchld)
 	proc_subproc (PROC_CLEARWAIT, 0);
+
       /* Signal completion of signal handling depending on which semaphore
        * woke up the WaitForMultipleObjects above.
        */
@@ -1209,6 +1193,7 @@ wait_sig (VOID *)
 	{
 	case 0:
 	  SetEvent (sigcomplete_main);
+	  sigproc_printf ("set main thread completion event");
 	  break;
 	case 1:
 	  ReleaseSemaphore (sigcomplete_nonmain, 1, NULL);
@@ -1217,7 +1202,6 @@ wait_sig (VOID *)
 	  /* Signal from another process.  No need to synchronize. */
 	  break;
 	}
-
       sigproc_printf ("looping");
     }
 

@@ -1,6 +1,6 @@
 /* pinfo.h: process table info
 
-   Copyright 2000 Cygnus Solutions.
+   Copyright 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,7 +14,7 @@ enum
 {
   __SIGFLUSH	    = -2,
   __SIGSTRACE	    = -1,
-  __SIGCHILDSTOPPED =  0,
+  __SIGUNUSED	    =  0,
   __SIGOFFSET	    =  3
 };
 

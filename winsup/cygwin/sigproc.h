@@ -17,11 +17,10 @@ details. */
 enum procstuff
 {
   PROC_ADDCHILD		= 1,	// add a new subprocess to list
-  PROC_CHILDSTOPPED	= 2,	// a child stopped
-  PROC_CHILDTERMINATED	= 3,	// a child died
-  PROC_CLEARWAIT	= 4,	// clear all waits - signal arrived
-  PROC_WAIT		= 5,	// setup for wait() for subproc
-  PROC_NOTHING		= 6	// nothing, really
+  PROC_CHILDTERMINATED	= 2,	// a child died
+  PROC_CLEARWAIT	= 3,	// clear all waits - signal arrived
+  PROC_WAIT		= 4,	// setup for wait() for subproc
+  PROC_NOTHING		= 5	// nothing, really
 };
 
 typedef struct struct_waitq

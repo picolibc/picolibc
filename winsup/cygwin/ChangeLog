@@ -1,3 +1,19 @@
+Sat Mar 10 16:52:12 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* shortcut.c (PATH_ALL_EXEC): Add parentheses to avoid a compiler
+	warning.
+
+	* exceptions.cc (setup_handler): Clarify debugging message.
+	* sigproc.cc (proc_subproc): Remove PROC_CHILDSTOPPED test.  It is
+	handled by normal PROC_CLEARWAIT case.
+	(wait_sig): Eliminate "dispatched" tracking.  Remove __SIGCHILDSTOPPED
+	test.  Decrement counter again before jumping out of
+	InterlockedDecrement loop so that subsequent InterlockedIncrement will
+	keep the counter at the correctly decremented value and also detect
+	when there are pending signals.
+	* sigproc.h: Remove __SIGCHILDSTOPPED element.
+	(procstuff): Remove PROC_CHILDSTOPPED element.
+
 Sat Mar 10 15:22:44 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (_rename): Set errno to ENOENT when an old path doesn't

@@ -601,7 +601,7 @@ sig_handle_tty_stop (int sig)
   if (my_parent_is_alive ())
     {
       pinfo parent (myself->ppid);
-      sig_send (parent, __SIGCHILDSTOPPED);
+      sig_send (parent, SIGCHLD);
     }
   sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
 		  myself->pid, sig, myself->ppid_handle);
@@ -875,7 +875,7 @@ set_pending:
     LeaveCriticalSection (&th->lock);
 
   if (!hth)
-    sigproc_printf ("didn't suspend main thread, th %p", th);
+    sigproc_printf ("good.  Didn't suspend main thread, th %p", th);
   else
     {
       res = ResumeThread (hth);
