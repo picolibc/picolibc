@@ -615,12 +615,6 @@ sigthread::init (const char *s)
 static void
 dll_crt0_1 ()
 {
-  /* According to onno@stack.urc.tue.nl, the exception handler record must
-     be on the stack.  */
-  /* FIXME: Verify forked children get their exception handler set up ok. */
-  exception_list cygwin_except_entry;
-  do_global_ctors (&__CTOR_LIST__, 1);
-
 #ifdef DEBUGGING
   if (child_proc_info)
     switch (child_proc_info->type)
@@ -666,7 +660,7 @@ dll_crt0_1 ()
 				  //  should be blocked.
 
   if (mypid)
-    set_myself ((pid_t) mypid);
+    set_myself ((pid_t) mypid, NULL);
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 
@@ -682,11 +676,6 @@ dll_crt0_1 ()
   /* Allow backup semantics. It's better done only once on process start
      instead of each time a file is opened. */
   set_process_privileges ();
-
-  /* Initialize SIGSEGV handling, etc...  Because the exception handler
-     references data in the shared area, this must be done after
-     shared_init. */
-  init_exceptions (&cygwin_except_entry);
 
   if (user_data->forkee)
     {
@@ -812,6 +801,15 @@ extern "C" void __stdcall
 _dll_crt0 ()
 {
   char zeros[sizeof (ciresrv->zero)] = {0};
+  /* According to onno@stack.urc.tue.nl, the exception handler record must
+     be on the stack.  */
+  /* FIXME: Verify forked children get their exception handler set up ok. */
+  exception_list cygwin_except_entry;
+  /* Initialize SIGSEGV handling, etc...  Because the exception handler
+     references data in the shared area, this must be done after
+     shared_init. */
+  init_exceptions (&cygwin_except_entry);
+  do_global_ctors (&__CTOR_LIST__, 1);
 
 #ifdef DEBUGGING
   char buf[80];
@@ -834,6 +832,7 @@ _dll_crt0 ()
   DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
 		   &hMainThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
 
+  HANDLE h;
   GetStartupInfo (&si);
   if (si.cbReserved2 >= EXEC_MAGIC_SIZE &&
       memcmp (ciresrv->zero, zeros, sizeof (zeros)) == 0)
@@ -868,6 +867,14 @@ _dll_crt0 ()
 		  case PROC_EXEC:
 		  case PROC_SPAWN:
 		    info = si.lpReserved2 + ciresrv->cb;
+		    if (child_proc_info->myself_pinfo &&
+			DuplicateHandle (hMainProc, child_proc_info->myself_pinfo,
+					 hMainProc, &h, 0, 0,
+					 DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+		      {
+			set_myself (mypid, h);
+			mypid = 0;
+		      }
 		    break;
 		  case PROC_FORK:
 		  case PROC_FORK1:
@@ -905,6 +912,16 @@ cygwin_dll_init ()
 {
   static char **envp;
   static int _fmode;
+  /* According to onno@stack.urc.tue.nl, the exception handler record must
+     be on the stack.  */
+  /* FIXME: Verify forked children get their exception handler set up ok. */
+  exception_list cygwin_except_entry;
+  /* Initialize SIGSEGV handling, etc...  Because the exception handler
+     references data in the shared area, this must be done after
+     shared_init. */
+  init_exceptions (&cygwin_except_entry);
+  do_global_ctors (&__CTOR_LIST__, 1);
+
   user_data->heapbase = user_data->heapptr = user_data->heaptop = NULL;
 
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),

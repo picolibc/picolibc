@@ -117,7 +117,7 @@ class pinfo
   _pinfo *child;
   int destroy;
 public:
-  void init (pid_t n, DWORD create = 0);
+  void init (pid_t n, DWORD create = 0, HANDLE h = NULL);
   pinfo () {}
   pinfo (_pinfo *x): child (x) {}
   pinfo (pid_t n) {init (n);}
@@ -127,7 +127,7 @@ public:
     if (h)
       {
 	UnmapViewOfFile (child);
-	CloseHandle (h);
+	ForceCloseHandle1 (h, pinfo_shared_handle);
 	h = NULL;
       }
   }
@@ -145,7 +145,9 @@ public:
   int operator == (char *x) const {return (char *) child == x;}
   _pinfo *operator * () const {return child;}
   operator _pinfo * () const {return child;}
+  // operator bool () const {return (int) h;}
   void remember () {destroy = 0; proc_subproc (PROC_ADDCHILD, (DWORD) this);}
+  HANDLE shared_handle () {return h;}
 };
 
 #define ISSTATE(p, f)	(!!((p)->process_state & f))
@@ -168,5 +170,7 @@ cygwin_pid (pid_t pid)
 {
   return (pid_t) (os_being_run == winNT) ? pid : -(int) pid;
 }
-void __stdcall pinfo_init (PBYTE);
+
+void __stdcall pinfo_init (BYTE *);
+void __stdcall set_myself (pid_t pid, HANDLE h = NULL);
 extern pinfo myself;

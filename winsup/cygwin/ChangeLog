@@ -1,3 +1,20 @@
+Wed Aug 23 23:00:24 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Move exception list and constructor stuff
+	earlier in the process.  Use new second argument to set_myself.
+	(cygwin_dll_init): Initialize exception list and constructor stuff
+	here.
+	(_dll_crt0): And here.  Also, deal with inherited pinfo shared memory
+	region from parent.
+	* pinfo.cc (set_myself): Accept a second argument signifying the a
+	shared memory region, passed from an execing parent.
+	(pinfo_init): Ditto.
+	* pinfo.h: Ditto.
+	* shared.h (child_info): Add a handle field to pass to child.
+	* spawn.cc (spawn_guts): Create a shared handle to pass to an execed
+	child.
+	* winsup.h: Remove extraneous declaration.
+
 Wed Aug 23 10:51:57 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/sys/cygwin.h: Protect class definitions.

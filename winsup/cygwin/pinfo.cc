@@ -30,17 +30,17 @@ static pinfo NO_COPY myself_identity ((_pinfo *)&pinfo_dummy);
    This is done once when the dll is first loaded.  */
 
 void __stdcall
-set_myself (pid_t pid)
+set_myself (pid_t pid, HANDLE h)
 {
   DWORD winpid = GetCurrentProcessId ();
   if (pid == 1)
     pid = cygwin_pid (winpid);
-  myself.init (pid, 1);
+  myself.init (pid, 1, h);
   myself->dwProcessId = winpid;
   myself->process_state |= PID_IN_USE;
   myself->start_time = time (NULL); /* Register our starting time. */
   pid_t myself_cyg_pid = cygwin_pid (myself->dwProcessId);
-  if (pid != myself_cyg_pid)
+  if (pid != myself_cyg_pid && parent_alive)
     myself_identity.init (myself_cyg_pid, PID_EXECED);
 
   char buf[30];
@@ -95,7 +95,7 @@ pinfo_init (LPBYTE info)
     {
       /* Invent our own pid.  */
 
-      set_myself (1);
+      set_myself (1, NULL);
       myself->ppid = 1;
       myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;
@@ -197,7 +197,7 @@ _pinfo::record_death ()
 }
 
 void
-pinfo::init (pid_t n, DWORD create)
+pinfo::init (pid_t n, DWORD create, HANDLE in_h)
 {
   if (n == myself->pid)
     {
@@ -217,7 +217,12 @@ pinfo::init (pid_t n, DWORD create)
   else
     mapsize = sizeof (_pinfo);
 
-  if (!create)
+  if (in_h)
+    {
+      h = in_h;
+      created = 0;
+    }
+  else if (!create)
     {
       /* CGF FIXME -- deal with inheritance after an exec */
       h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE, FALSE, mapname);
@@ -225,7 +230,7 @@ pinfo::init (pid_t n, DWORD create)
     }
   else
     {
-      h = CreateFileMapping ((HANDLE) 0xffffffff, &sec_none_nih,
+      h = CreateFileMapping ((HANDLE) 0xffffffff, &sec_all_nih,
 			      PAGE_READWRITE, 0, mapsize, mapname);
       created = h && GetLastError () != ERROR_ALREADY_EXISTS;
     }
@@ -238,11 +243,13 @@ pinfo::init (pid_t n, DWORD create)
       return;
     }
 
+  ProtectHandle1 (h, pinfo_shared_handle);
   child = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
 
   if (child->process_state & PID_EXECED)
     {
       pid_t realpid = child->pid;
+      debug_printf ("execed process windows pid %d, cygwin pid %d", n, realpid);
       release ();
       if (realpid == n)
 	api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
