@@ -1,3 +1,8 @@
+2003-07-03  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::open): Conditionalize a little
+	more of the cygserver stuff so that ttys actually work.
+
 2003-07-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap64): Allow MAP_FIXED with pagesize granularity (4K).
