@@ -108,3 +108,5 @@ int __stdcall slash_unc_prefix_p (const char *path);
     set_errno (__err); \
   __err; \
 })
+
+#define isdrive(s) (isalpha (*(s)) && (s)[1] == ':')
