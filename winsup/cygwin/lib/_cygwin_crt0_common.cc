@@ -26,6 +26,7 @@ int cygwin_attach_noncygwin_dll (HMODULE, MainFunc);
 int main (int, char **, char **);
 struct _reent *_impure_ptr;
 int _fmode;
+void _pei386_runtime_relocator ();
 
 /* Set up pointers to various pieces so the dll can then use them,
    and then jump to the dll.  */
@@ -94,6 +95,8 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->data_end = &_data_end__;
   u->bss_start = &_bss_start__;
   u->bss_end = &_bss_end__;
+
+  _pei386_runtime_relocator ();
   return 1;
 }
 } /* "C" */

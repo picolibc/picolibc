@@ -1,3 +1,9 @@
+2002-12-02  Egor Duda <deo@logos-m.ru>
+
+	* lib/pseudo-reloc.c: New file.
+	* lib/_cygwin_crt0_common.cc: Perform pseudo-relocs during
+	initialization of cygwin binary (.exe or .dll).
+
 2002-12-06  Christopher Faylor  <cgf@redhat.com>
 
 	* cygwin.din: Reflect name change from strtodf to strtof.  Export
