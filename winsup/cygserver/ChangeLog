@@ -1,3 +1,11 @@
+2003-12-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (tunable_params): Add entries for kern.ipc.msgmnb and
+	kern.ipc.msgtql.  Raise max value for kern.ipc.msgseg to 65535.
+	* cygserver.conf: Add kern.ipc.msgmnb and kern.ipc.msgtql.
+	* sysv_msg.cc (msginit): Add TUNABLE_INT_FETCH call for
+	kern.ipc.msgmnb and kern.ipc.msgtql.
+
 2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver.cc (main): Move call to ipcinit() up before installing

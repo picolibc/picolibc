@@ -565,9 +565,11 @@ static tun_struct tunable_params[] =
   { "kern.log.level", TUN_INT, {0}, {1}, {7}, default_tun_check},
 
   /* MSG */
-  { "kern.ipc.msgseg", TUN_INT, {0}, {256}, {32767}, default_tun_check},
+  { "kern.ipc.msgseg", TUN_INT, {0}, {256}, {65535}, default_tun_check},
   { "kern.ipc.msgssz", TUN_INT, {0}, {8}, {1024}, default_tun_check},
+  { "kern.ipc.msgmnb", TUN_INT, {0}, {1}, {65535}, default_tun_check},
   { "kern.ipc.msgmni", TUN_INT, {0}, {1}, {1024}, default_tun_check},
+  { "kern.ipc.msgtql", TUN_INT, {0}, {1}, {1024}, default_tun_check},
 
   /* SEM */
   //{ "kern.ipc.semmap", TUN_INT, {0}, {1}, {1024}, default_tun_check},

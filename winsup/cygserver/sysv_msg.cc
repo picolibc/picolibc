@@ -156,7 +156,9 @@ msginit()
 	TUNABLE_INT_FETCH("kern.ipc.msgseg", &msginfo.msgseg);
 	TUNABLE_INT_FETCH("kern.ipc.msgssz", &msginfo.msgssz);
 	msginfo.msgmax = msginfo.msgseg * msginfo.msgssz;
+	TUNABLE_INT_FETCH("kern.ipc.msgmnb", &msginfo.msgmnb);
 	TUNABLE_INT_FETCH("kern.ipc.msgmni", &msginfo.msgmni);
+	TUNABLE_INT_FETCH("kern.ipc.msgtql", &msginfo.msgtql);
 
 	msgpool = (char *) sys_malloc(msginfo.msgmax, M_MSG, M_WAITOK);
 	if (msgpool == NULL)
