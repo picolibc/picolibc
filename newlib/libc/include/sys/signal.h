@@ -158,7 +158,7 @@ int _EXFUN(sigpending, (sigset_t *));
 int _EXFUN(sigsuspend, (const sigset_t *));
 int _EXFUN(sigpause, (int));
 
-#if defined(_POSIX_THREADS) && !defined(__CYGWIN__)
+#if defined(_POSIX_THREADS)
 int _EXFUN(pthread_kill, (pthread_t thread, int sig));
 #endif
 
