@@ -86,22 +86,28 @@ sys_dir = @sys_dir@
 AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-@MACH_ADD_SETJMP_TRUE@mach_add_src = @MACH_ADD_SETJMP_TRUE@setjmp.S
-@MACH_ADD_SETJMP_FALSE@mach_add_src = 
+@MACH_ADD_SETJMP_TRUE@mach_add_obj = @MACH_ADD_SETJMP_TRUE@setjmp.o
+@MACH_ADD_SETJMP_FALSE@mach_add_obj = 
 
 LIB_SOURCES = \
 	memchr.S memcmp.S memcpy.S memset.S strchr.S \
-	memmove.S strlen.S $(mach_add_src) i386mach.h
+	memmove.S strlen.S i386mach.h
 
 
 libi386_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libi386.la
 @USE_LIBTOOL_TRUE@libi386_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@EXTRA_libi386_la_SOURCES = @USE_LIBTOOL_TRUE@setjmp.S
+@USE_LIBTOOL_TRUE@libi386_la_LIBADD = @USE_LIBTOOL_TRUE@$(mach_add_obj)
+@USE_LIBTOOL_TRUE@libi386_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(mach_add_obj)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(mach_add_obj)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(mach_add_obj)
+@USE_LIBTOOL_FALSE@EXTRA_lib_a_SOURCES = @USE_LIBTOOL_FALSE@setjmp.S
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -114,12 +120,10 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_LIBADD = 
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  memchr.o memcmp.o memcpy.o memset.o \
 @USE_LIBTOOL_FALSE@strchr.o memmove.o strlen.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-libi386_la_LIBADD = 
 @USE_LIBTOOL_TRUE@libi386_la_OBJECTS =  memchr.lo memcmp.lo memcpy.lo \
 @USE_LIBTOOL_TRUE@memset.lo strchr.lo memmove.lo strlen.lo
 CFLAGS = @CFLAGS@
@@ -136,7 +140,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(lib_a_SOURCES) $(libi386_la_SOURCES)
+SOURCES = $(lib_a_SOURCES) $(EXTRA_lib_a_SOURCES) $(libi386_la_SOURCES) $(EXTRA_libi386_la_SOURCES)
 OBJECTS = $(lib_a_OBJECTS) $(libi386_la_OBJECTS)
 
 all: all-redirect

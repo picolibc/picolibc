@@ -1,3 +1,12 @@
+2002-02-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/i386/Makefile.am: (mach_add_src): Remove.
+	(mach_add_obj): Conditionally set to setjmp.o or nothing.
+	(LIB_SOURCES): Remove $(mach_add_src).
+	(lib_a_LIBADD, lib_a_DEPENDENCIES): Add and set to $(mach_add_src).
+	(lib_la_LIBADD, lib_la_DEPENDENCIES): Ditto.
+	* libc/machine/i386/Makefile.in: Regenerate.
+
 2002-02-05  Manik Raina <manik@cisco.com>
 
 	* libc/misc/dprintf.c (parse_number): #if 0 unused function.
