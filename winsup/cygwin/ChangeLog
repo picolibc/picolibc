@@ -1,3 +1,13 @@
+Sun Jul 16 16:03:00 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc: Use new definition of "environ" throughout.
+	(environ_init): Explicitly initialize __cygwin_environ.
+	(cur_environ): New function.  Detects when user has updated
+	their environment.
+	* exec.cc: Use 'environ' define throughout rather than __cygwin_environ.
+	* spawn.cc: Ditto.
+	* winsup.h: Declare cur_environ, main_environ, environ.
+
 Sun Jul 16 13:23:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* acconfig.h: Add support for NEWVFORK.

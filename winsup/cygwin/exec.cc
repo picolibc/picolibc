@@ -44,7 +44,7 @@ execl (const char *path, const char *arg0, ...)
   while (argv[i++] != NULL);
   va_end (args);
   MALLOC_CHECK;
-  return _execve (path, (char * const  *) argv, __cygwin_environ);
+  return _execve (path, (char * const  *) argv, environ);
 }
 
 extern "C"
@@ -52,7 +52,7 @@ int
 execv (const char *path, char * const *argv)
 {
   MALLOC_CHECK;
-  return _execve (path, (char * const *) argv, __cygwin_environ);
+  return _execve (path, (char * const *) argv, environ);
 }
 
 /* the same as a standard exec() calls family, but with NT security support */
@@ -85,7 +85,7 @@ sexecl (HANDLE hToken, const char *path, const char *arg0, ...)
   va_end (args);
 
   MALLOC_CHECK;
-  return sexecve (hToken, path, (char * const *) argv, __cygwin_environ);
+  return sexecve (hToken, path, (char * const *) argv, environ);
 }
 
 extern "C"
@@ -131,7 +131,7 @@ sexeclp (HANDLE hToken, const char *path, const char *arg0, ...)
   va_end (args);
 
   MALLOC_CHECK;
-  return sexecvpe (hToken, path, (const char * const *) argv, __cygwin_environ);
+  return sexecvpe (hToken, path, (const char * const *) argv, environ);
 }
 
 extern "C"
@@ -163,7 +163,7 @@ int
 sexecv (HANDLE hToken, const char *path, const char * const *argv)
 {
   MALLOC_CHECK;
-  return sexecve (hToken, path, argv, __cygwin_environ);
+  return sexecve (hToken, path, argv, environ);
 }
 
 extern "C"
@@ -171,7 +171,7 @@ int
 sexecp (HANDLE hToken, const char *path, const char * const *argv)
 {
   MALLOC_CHECK;
-  return sexecvpe (hToken, path, argv, __cygwin_environ);
+  return sexecvpe (hToken, path, argv, environ);
 }
 
 /*

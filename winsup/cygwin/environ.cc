@@ -13,8 +13,6 @@ details. */
 #include <ctype.h>
 #include <fcntl.h>
 
-#define environ __cygwin_environ
-
 extern BOOL allow_glob;
 extern BOOL allow_ntea;
 extern BOOL strip_title_path;
@@ -228,7 +226,7 @@ setenv (const char *name, const char *value, int rewrite)
 
       for (P = environ, cnt = 0; *P; ++P, ++cnt)
 	;
-      environ = (char **) realloc ((char *) environ,
+      __cygwin_environ = (char **) realloc ((char *) environ,
 				   (size_t) (sizeof (char *) * (cnt + 2)));
       if (!environ)
 	return -1;
@@ -503,7 +501,7 @@ environ_init (int already_posix)
   if (!sawTERM)
     envp[i++] = strdup ("TERM=cygwin");
   envp[i] = NULL;
-  environ = envp;
+  __cygwin_environ = envp;
   update_envptrs ();
   FreeEnvironmentStringsA ((char *) rawenv);
   parse_options (NULL);
@@ -579,4 +577,20 @@ winenv (const char * const *envp, int keep_posix)
   *ptr = '\0';		/* Two null bytes at the end */
 
   return envblock;
+}
+
+/* This idiocy is necessary because the early implementers of cygwin
+   did not seem to know about importing data variables from the DLL.
+   So, we have to synchronize cygwin's idea of the environment with the
+   main program's with each reference to the environment. */
+char ** __stdcall
+cur_environ ()
+{
+  if (*main_environ != __cygwin_environ)
+    {
+      __cygwin_environ = *main_environ;
+      update_envptrs ();
+    }
+
+  return __cygwin_environ;
 }

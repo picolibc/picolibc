@@ -412,7 +412,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       else
 	{
 	  one_line.add ("\"", 1);
-	  for (0; p = strpbrk (a, "\"\\"); a = ++p)
+	  for (; (p = strpbrk (a, "\"\\")); a = ++p)
 	    {
 	      one_line.add (a, p - a);
 	      if (*p == '\\' || *p == '"')
@@ -894,8 +894,7 @@ spawnl (int mode, const char *path, const char *arg0, ...)
 
   va_end (args);
 
-  return _spawnve (NULL, mode, path, (char * const  *) argv,
-		   __cygwin_environ);
+  return _spawnve (NULL, mode, path, (char * const  *) argv, environ);
 }
 
 extern "C"
@@ -940,7 +939,7 @@ spawnlp (int mode, const char *path, const char *arg0, ...)
 
   va_end (args);
 
-  return spawnvpe (mode, path, (char * const *) argv, __cygwin_environ);
+  return spawnvpe (mode, path, (char * const *) argv, environ);
 }
 
 extern "C"
@@ -970,7 +969,7 @@ extern "C"
 int
 spawnv (int mode, const char *path, const char * const *argv)
 {
-  return _spawnve (NULL, mode, path, argv, __cygwin_environ);
+  return _spawnve (NULL, mode, path, argv, environ);
 }
 
 extern "C"
@@ -985,7 +984,7 @@ extern "C"
 int
 spawnvp (int mode, const char *path, const char * const *argv)
 {
-  return spawnvpe (mode, path, argv, __cygwin_environ);
+  return spawnvpe (mode, path, argv, environ);
 }
 
 extern "C"
