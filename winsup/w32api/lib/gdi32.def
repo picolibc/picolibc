@@ -286,6 +286,8 @@ SetBoundsRect@12
 SetBrushOrgEx@16
 SetColorAdjustment@8
 SetColorSpace@8
+SetDCBrushColor@8
+SetDCPenColor@8
 SetDIBColorTable@16
 SetDIBits@28
 SetDIBitsToDevice@48

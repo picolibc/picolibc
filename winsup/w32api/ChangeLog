@@ -1,3 +1,9 @@
+2003-04-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wingdi.h (DC_PEN, DC_BRUSH): Add defines.
+	(SetDCPenColor, SetDCBrushColor): Add prototypes.
+	* lib/gdi32.def (SetDCPenColor, SetDCBrushColor): Add stubs.
+
 2003-04-26  Bang Jun-Young  <junyoung@netbsd.org>
 
 	* include/winioctl.h (DEVICE_TYPE_FROM_CTL_CODE): Add macro.
@@ -89,7 +95,7 @@
 
 2003-04-07  Marcel Telka <telka@users.sourceforge.net>
 
-	* include/ddk/winddk.h (KIRQL): Typedef as UCHAR. not ULONG.
+	* include/ddk/winddk.h (KIRQL): Typedef as UCHAR, not ULONG.
 
 2003-03-30  Hans E. Molin  <kvasi@users.sourceforge.net>
 
