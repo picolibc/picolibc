@@ -113,9 +113,3 @@ main_k:
 exit_k:
 	.long	_exit
 #endif
-
-#ifdef __ELF__
-	.section .stack,"aw"
-#else
-	.section .stack
-#endif

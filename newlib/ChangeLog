@@ -1,3 +1,7 @@
+Wed Jun 26 16:33:25 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/sys/sh/crt0.S: Remove vestigial .section directive.
+
 2002-06-25  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/linux/Makefile.am: Consolidate additional items under
