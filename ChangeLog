@@ -1,3 +1,8 @@
+2005-02-22  Paul Schlie  <schlie@comcast.net>
+
+	* configure.in: Allow darwin targeted ports to build tk, itcl and
+	libgui.
+
 2005-02-21  Eric Botcazou  <ebotcazou@libertysurf.fr>
 
 	PR libgcj/10353
