@@ -5124,24 +5124,6 @@ ExAllocateFromNPagedLookasideList(
   return Entry;
 }
 
-static __inline PVOID
-ExAllocateFromPagedLookasideList(
-  IN PPAGED_LOOKASIDE_LIST  Lookaside)
-{
-  PVOID Entry;
-
-  Lookaside->TotalAllocates++;
-  Entry = ExInterlockedPopEntrySList(&Lookaside->ListHead,
-				     &Lookaside->Obsoleted);
-  if (Entry == NULL) {
-    Lookaside->_DDK_DUMMYUNION_MEMBER(AllocateMisses)++;
-    Entry = (Lookaside->Allocate)(Lookaside->Type,
-				  Lookaside->Size,
-				  Lookaside->Tag);
-  }
-  return Entry;
-}
-
 static __inline VOID
 ExFreeToNPagedLookasideList(
   IN PNPAGED_LOOKASIDE_LIST  Lookaside,
@@ -5158,6 +5140,25 @@ ExFreeToNPagedLookasideList(
   }
 }
 
+#if (__USE_NTOSKRNL__) && (_WIN32_WINNT >= 0x0501)
+
+static __inline PVOID
+ExAllocateFromPagedLookasideList(
+  IN PPAGED_LOOKASIDE_LIST  Lookaside)
+{
+  PVOID Entry;
+
+  Lookaside->TotalAllocates++;
+  Entry = InterlockedPopEntrySList(&Lookaside->ListHead);
+  if (Entry == NULL) {
+    Lookaside->_DDK_DUMMYUNION_MEMBER(AllocateMisses)++;
+    Entry = (Lookaside->Allocate)(Lookaside->Type,
+				  Lookaside->Size,
+				  Lookaside->Tag);
+  }
+  return Entry;
+}
+
 static __inline VOID
 ExFreeToPagedLookasideList(
   IN PPAGED_LOOKASIDE_LIST  Lookaside,
@@ -5168,11 +5169,27 @@ ExFreeToPagedLookasideList(
     Lookaside->_DDK_DUMMYUNION_N_MEMBER(2,FreeMisses)++;
     (Lookaside->Free)(Entry);
   } else {
-    ExInterlockedPushEntrySList(&Lookaside->ListHead,
-				(PSLIST_ENTRY)Entry,
-				&Lookaside->Obsoleted);
+    InterlockedPushEntrySList(&Lookaside->ListHead,
+			      (PSLIST_ENTRY)Entry);
   }
 }
+
+#else /* (__USE_NTOSKRNL__) && (_WIN32_WINNT >= 0x0501) */
+
+NTOSAPI
+PVOID
+DDKAPI
+ExAllocateFromPagedLookasideList(
+  IN PPAGED_LOOKASIDE_LIST  Lookaside);
+
+NTOSAPI
+VOID
+DDKAPI
+ExFreeToPagedLookasideList(
+  IN PPAGED_LOOKASIDE_LIST  Lookaside,
+  IN PVOID  Entry);
+
+#endif /* (__USE_NTOSKRNL__) && (_WIN32_WINNT >= 0x0501) */
 
 NTOSAPI
 PVOID

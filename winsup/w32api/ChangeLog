@@ -1,5 +1,12 @@
 2004-11-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/ddk/winddk.h (ExAllocateFromPagedLookasideList,
+	ExFreeToPagedLookasideList): Guard inline versions with
+	(__USE_NTOSKRNL__) && (_WIN32_WINNT >= 0x0501). Declare as
+	external functions for earlier _WIN32_WINNT.
+
+2004-11-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/ras.h (RASCONN[AW]): Remove dwSessionId field.
 
 2004-11-09  Danny Smith  <dannysmith@users.sourceforge.net>
