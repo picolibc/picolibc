@@ -261,12 +261,11 @@ getacl (HANDLE handle, const char *file, DWORD attr, int nentries,
 {
   security_descriptor sd;
 
-  int ret;
   if (!handle || get_nt_object_security (handle, SE_FILE_OBJECT, sd)
-      && (ret = read_sd (file, sd)) <= 0)
+      && read_sd (file, sd) <= 0)
     {
       debug_printf ("read_sd %E");
-      return ret;
+      return -1;
     }
 
   cygpsid owner_sid;

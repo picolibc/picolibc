@@ -1,5 +1,10 @@
 2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (getacl): Avoid compiler warning.
+	* security.cc (write_sd): Ditto.  Fix error handling.
+
+2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (fstat64): Use get_namehash instead of hash_path_name.
 
 2004-04-14  Corinna Vinschen  <corinna@vinschen.de>

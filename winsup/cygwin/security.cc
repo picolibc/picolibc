@@ -1148,8 +1148,9 @@ write_sd (HANDLE fh, const char *file, security_descriptor &sd)
 	  return -1;
 	}
     }
-  NTSTATUS ret;
+  NTSTATUS ret = STATUS_SUCCESS;
   int retry = 0;
+  res = -1;
   for (; retry < 2; ++retry)
     {
       if (retry && (fh = CreateFile (file, WRITE_OWNER | WRITE_DAC,
@@ -1168,12 +1169,13 @@ write_sd (HANDLE fh, const char *file, security_descriptor &sd)
     }
   if (retry && fh != INVALID_HANDLE_VALUE)
     CloseHandle (fh);
-  if (ret != STATUS_SUCCESS)
-    {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-      return -1;
-    }
-  return 0;
+  if (fh == INVALID_HANDLE_VALUE)	/* CreateFile failed */
+    __seterrno ();
+  else if (ret != STATUS_SUCCESS)	/* NtSetSecurityObject failed */
+    __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+  else					/* Everything's fine. */
+    res = 0;
+  return res;
 }
 
 static void
