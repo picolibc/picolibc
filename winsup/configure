@@ -918,17 +918,13 @@ fi
 CXXFLAGS='$(CFLAGS)'
 
 
-use_cygserver=''
+use_cygserver='yes'
 # Check whether --enable-server or --disable-server was given.
 if test "${enable_server+set}" = set; then
   enableval="$enable_server"
   case "${enableval}" in
-yes)	 cat >> confdefs.h <<\EOF
-#define USE_CYGSERVE 1
-EOF
-
-	 use_cygserver=1 ;;
-no)	 ;;
+yes)	;;
+no)	use_cygserver=;;
 esac
 
 fi
@@ -951,7 +947,7 @@ subdirs="$SUBDIRS"
 
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:955: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:951: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6

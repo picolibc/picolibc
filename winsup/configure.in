@@ -66,13 +66,12 @@ AC_CANONICAL_SYSTEM
 LIB_AC_PROG_CC
 LIB_AC_PROG_CXX
 
-use_cygserver=''
+use_cygserver='yes'
 AC_ARG_ENABLE(server,
 [ --enable-server		Build a cygwin DLL which can communicate with cygserver],
 [case "${enableval}" in
-yes)	 AC_DEFINE(USE_CYGSERVE)
-	 use_cygserver=1 ;;
-no)	 ;;
+yes)	;;
+no)	use_cygserver=;;
 esac
 ])
 
