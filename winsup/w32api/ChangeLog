@@ -1,3 +1,11 @@
+2001-09-17  Earnie Boyd  <earnie@sf.net>
+
+	* lib/Makefile.in (inst_includedir): Add FIXME and remove the usr/
+	portion of the directory from the install.
+	(inst_libdir): Ditto.
+	* Makefile.in (VERSION): Increment.
+	* include/w32api.h: Increment version.
+
 2001-09-13  Earnie Boyd  <earnie@SF.net>
 
 	* lib/Makefile.in (inst_includedir): Change to always use w32api
