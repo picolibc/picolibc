@@ -1,5 +1,10 @@
 2004-03-24  Filip Navara  <xnavara@volny.cz>
 
+	* include/commctrl.h (TB_GETSTRING[AW]): Add defines.
+	(RBBS_HIDETITLE, RBBS_TOPALIGN): Ditto.
+
+2004-03-24  Filip Navara  <xnavara@volny.cz>
+
 	* include/ddk/srb.h (_PORT_CONFIGURATION_INFORMATION):	Rename
 	TaggedQueueing to TaggedQueuing.
 	(_HW_INITIALIZATION_DATA): Likewise.
