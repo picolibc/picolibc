@@ -1,5 +1,7 @@
 2003-02-18  Alan Modra  <amodra@bigpond.net.au>
 
+	* ppc64.h (IS_PPC64_TLS_RELOC): Rename from IS_TLS_RELOC.
+
 	* ppc.h: Replace DTPMOD64, TPREL64, DTPREL64 with DTPMOD32 etc.
 	(IS_PPC_TLS_RELOC): Define.
 
