@@ -56,6 +56,20 @@ extern "C" {
 #define IP_UNBLOCK_SOURCE		18
 #define IP_PKTINFO			19
 
+/*
+ * As with BSD implementation, IPPROTO_IPV6 level socket options have
+ * same values as IPv4 counterparts.
+ */
+#define IPV6_UNICAST_HOPS	4
+#define IPV6_MULTICAST_IF	9
+#define IPV6_MULTICAST_HOPS	10
+#define IPV6_MULTICAST_LOOP	11
+#define IPV6_ADD_MEMBERSHIP	12
+#define IPV6_DROP_MEMBERSHIP	13
+#define IPV6_JOIN_GROUP		IPV6_ADD_MEMBERSHIP
+#define IPV6_LEAVE_GROUP	IPV6_DROP_MEMBERSHIP
+#define IPV6_PKTINFO		19
+
 #define IP_DEFAULT_MULTICAST_TTL 1 
 #define IP_DEFAULT_MULTICAST_LOOP 1 
 #define IP_MAX_MEMBERSHIPS 20 

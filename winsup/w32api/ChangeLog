@@ -1,3 +1,10 @@
+2003-01-23  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/ws2_32.def (getaddrinfo, freeaddrinfo and getnameinfo):
+	Add stubs.
+	* include/ws2tcpip.h (IPV6_*) Add IPPROTO_IPV6 level socket
+	options.
+
 2003-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (IMAGE_FILE_AGGRESIVE_WS_TRIM

@@ -80,9 +80,12 @@ accept@12
 bind@12
 closesocket@4
 connect@12
+freeaddrinfo@4
+getaddrinfo@16
 gethostbyaddr@12
 gethostbyname@4
 gethostname@8
+getnameinfo@28
 getpeername@12
 getprotobyname@4
 getprotobynumber@4
