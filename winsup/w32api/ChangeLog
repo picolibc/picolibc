@@ -1,3 +1,7 @@
+2004-02-11  Pierre A. Humblet  <Pierre.Humblet@ieee.org>
+
+	* include/windns.h: New file.
+
 2004-02-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/sqlucode.h (SQLGetStmtAttr[AW]): Remove duplicate
