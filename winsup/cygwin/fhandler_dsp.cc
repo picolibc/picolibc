@@ -623,6 +623,13 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
       }
       break;
 
+      CASE (SNDCTL_DSP_GETFMTS)
+      {
+	*intptr = AFMT_S16_LE | AFMT_U8 | AFMT_S8; // more?
+	return 0;
+      }
+      break;
+
     default:
       debug_printf ("/dev/dsp: ioctl not handled yet! FIXME:");
       break;

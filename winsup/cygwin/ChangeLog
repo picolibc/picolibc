@@ -1,3 +1,8 @@
+2003-01-14  David Huang  <davehzhr@hotmail.com>
+
+	* fhandler_dsp.cc (fhandler_dsp::ioctl): Add limited support for
+	SNDCTL_DSP_GETFMTS.
+
 2003-01-12  Christopher Faylor  <cgf@redhat.com>
 
 	* ntdll.h: Fix typo.
