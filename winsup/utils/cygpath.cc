@@ -60,29 +60,33 @@ usage (FILE * stream, int status)
 {
   if (!ignore_flag || !status)
     fprintf (stream, "\
-Usage: %s (-u|--unix)|(-w|--windows) [options] filename\n\n\
-  -u|--unix		print Unix form of filename\n\
-  -w|--windows		print Windows form of filename\n\n\
-Other options:\n\
-  -a|--absolute		output absolute path\n\
-  -c|--close handle	close handle (for use in captured process)\n\
-  -f|--file file	read file for input path information\n\
-  -i|--ignore		ignore missing argument\n\
-  -l|--long-name	print Windows long form of filename (with -w only)\n\
-  -p|--path		filename argument is a path\n\
-  -s|--short-name	print Windows short form of filename (with -w only)\n\
-  -t|--type             print Windows form of filename with specified\n\
+Usage: %s (-u|-w|-t TYPE) [-c HANDLE] [-f FILE] [options] NAME\n\n\
+       %s [-ADHPSW] \n\n\
+Output type options (required):\n\
+  -u|--unix		print Unix form of NAME (default)\n\
+  -w|--windows		print Windows form of NAME \n\n\
+  -t|--type             print Windows form of NAME with TYPE one of\n\
      dos                drive letter with backslashes (C:\\WINNT)\n\
      mixed              drive letter with regular slashes (C:/WINNT)\n\
+Path conversion options:\n\
+  -a|--absolute		output absolute path\n\
+  -c|--close HANDLE     close HANDLE (for use in captured process)\n\
+  -f|--file FILE        read FILE for input; use - to read from STDIN\n\
+  -i|--ignore		ignore missing argument\n\
+  -l|--long-name	print Windows long form of NAME (with -w only)\n\
+  -p|--path		NAME is a PATH list (i.e., '/bin:/usr/bin')\n\
+  -s|--short-name	print Windows short form of NAME (with -w only)\n\
+System information output:\n\
   -A|--allusers		use `All Users' instead of current user for -D, -P\n\
   -D|--desktop		output `Desktop' directory and exit\n\
   -H|--homeroot		output `Profiles' directory (home root) and exit\n\
   -P|--smprograms	output Start Menu `Programs' directory and exit\n\
   -S|--sysdir		output system directory and exit\n\
   -W|--windir		output `Windows' directory and exit\n\n\
-Informative output:\n\
-  -h|--help             print this help, then exit\n\
-  -v|--version		output version information and exit\n", prog_name);
+Other options:\n\
+  -h|--help             output usage information and exit\n\
+  -v|--version		output version information and exit\n\
+  ", prog_name, prog_name);
   exit (ignore_flag ? 0 : status);
 }
 
@@ -300,6 +304,33 @@ get_long_name (const char *filename)
 }
 
 static void
+convert_slashes (char* name)
+{
+  while ((name = strchr (name, '\\')) != NULL)
+    {
+      if (*name == '\\')
+	*name = '/';
+       name++;
+   }
+}
+
+static char *
+get_mixed_name (const char* filename)
+{
+  char* mixed_buf = strdup (filename);
+
+  if (mixed_buf == NULL)
+    {
+      fprintf (stderr, "%s: out of memory\n", prog_name);
+      exit (1);
+    }
+
+  convert_slashes (mixed_buf);
+
+  return mixed_buf;
+}
+
+static void
 dowin (char option)
 {
   char *buf, buf1[MAX_PATH], buf2[MAX_PATH];
@@ -342,7 +373,7 @@ dowin (char option)
 	GetProfilesDirectoryAPtr = (BOOL (*) (LPSTR, LPDWORD))
 	  GetProcAddress (hinst, "GetProfilesDirectoryA");
       if (GetProfilesDirectoryAPtr)
-        (*GetProfilesDirectoryAPtr) (buf, &len);
+	(*GetProfilesDirectoryAPtr) (buf, &len);
       else
 	{
 	  GetWindowsDirectory (buf, MAX_PATH);
@@ -372,37 +403,12 @@ dowin (char option)
   else
     {
       if (shortname_flag)
-        buf = get_short_name (buf);
+	buf = get_short_name (buf);
+      if (mixed_flag)
+	buf = get_mixed_name (buf);
     }
   printf ("%s\n", buf);
   exit (0);
-}
-
-static void
-convert_slashes (char* name)
-{
-  while ((name = strchr (name, '\\')) != NULL)
-    {
-      if (*name == '\\')
-	*name = '/';
-       name++;
-   }
-}
-
-static char *
-get_mixed_name (const char* filename)
-{
-  char* mixed_buf = strdup (filename);
-
-  if (mixed_buf == NULL)
-    {
-      fprintf (stderr, "%s: out of memory\n", prog_name);
-      exit (1);
-    }
-
-  convert_slashes (mixed_buf);
-
-  return mixed_buf;
 }
 
 static void
@@ -641,7 +647,6 @@ main (int argc, char **argv)
 	  usage (stderr, 1);
 	  break;
 	}
-
     }
 
   if (options_from_file_flag && !file_arg)
