@@ -1,5 +1,10 @@
 2003-01-06  Charles Wilson  <cwilson@ece.gatech.edu>
 
+	* Makefile.am: Add vasprintf.
+	* Makefile.in: Regenerated.
+
+2003-01-06  Charles Wilson  <cwilson@ece.gatech.edu>
+
 	* asprintf.c (_asprintf_r): insure both declarations
 	are the same.
 

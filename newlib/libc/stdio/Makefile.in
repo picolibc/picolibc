@@ -188,7 +188,8 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	ftello.$(oext) 			\
 @ELIX_LEVEL_1_FALSE@	getw.$(oext)			\
 @ELIX_LEVEL_1_FALSE@	mktemp.$(oext) 			\
-@ELIX_LEVEL_1_FALSE@	putw.$(oext)
+@ELIX_LEVEL_1_FALSE@	putw.$(oext) 			\
+@ELIX_LEVEL_1_FALSE@	vasprintf.$(oext)
 
 LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext)
 

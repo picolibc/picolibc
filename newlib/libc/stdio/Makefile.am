@@ -85,7 +85,8 @@ LIB_OBJS = \
 	ftello.$(oext) 			\
 	getw.$(oext)			\
 	mktemp.$(oext) 			\
-	putw.$(oext)
+	putw.$(oext) 			\
+	vasprintf.$(oext)
 endif
 
 LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext)
