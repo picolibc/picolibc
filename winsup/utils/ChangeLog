@@ -1,3 +1,8 @@
+Tue Oct 17  1:09:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	Patch suggested by Brad Town <btown@ceddec.com>:
+	* cygcheck.cc (main): Fix argument counting.
+
 Sat Oct 14 23:42:58 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* ps.cc (main): Accomodate new PID_ constant.

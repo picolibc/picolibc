@@ -1063,9 +1063,9 @@ main (int argc, char **argv)
 
   init_paths ();
 
-  if (argc > 1 && givehelp)
+  if (argc >= 1 && givehelp)
     {
-      if (argc == 2)
+      if (argc == 1)
 	{
 	  printf ("Here is where the OS will find your program, and which dlls\n");
 	  printf ("will be used for it.  Use -v to see DLL version info\n");
@@ -1080,7 +1080,7 @@ main (int argc, char **argv)
 	printf ("\n");
     }
 
-  for (i = 1; i < argc; i++)
+  for (i = 0; i < argc; i++)
     {
       cygcheck (argv[i]);
       printf ("\n");
