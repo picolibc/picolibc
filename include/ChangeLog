@@ -1,3 +1,8 @@
+1999-06-14  Nick Clifton  <nickc@cygnus.com>
+
+	* dis-asm.h (arm_toggle_regnames): New prototype.
+	(struct diassemble_info): New field: disassembler_options.
+
 1999-04-11  Richard Henderson  <rth@cygnus.com>
 
 	* bfdlink.h (bfd_elf_version_expr): Rename `match' to `pattern'.

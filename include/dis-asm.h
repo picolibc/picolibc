@@ -133,6 +133,9 @@ typedef struct disassemble_info {
 				   zero if unknown.  */
   bfd_vma target2;		/* Second target address for dref2 */
 
+  /* Command line options specific to the target disassembler.  */
+  char * disassembler_options;
+
 } disassemble_info;
 
 
@@ -180,6 +183,8 @@ extern int print_insn_v850		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_tic30		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_vax		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_tic80		PARAMS ((bfd_vma, disassemble_info*));
+
+extern int arm_toggle_regnames          PARAMS ((void));
 
 /* Fetch the disassembler for a given BFD, if that support is available.  */
 extern disassembler_ftype disassembler	PARAMS ((bfd *));
