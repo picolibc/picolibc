@@ -31,10 +31,6 @@
 #define PARAMS(x) x
 #endif
 
-#ifndef CONST
-#define CONST const
-#endif
-
 #define MAX_GPRS 32
 #define PAGE_SIZE 4096
 #undef __HALF_WORD_INSN__

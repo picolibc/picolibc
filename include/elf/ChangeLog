@@ -1,3 +1,35 @@
+2002-06-06  Lars Brinkhoff  <lars@nocrew.org>
+
+	* common.h: Change registry@sco.com to registry@caldera.com.
+	(EM_PDP10, EM_PDP11): Define.
+
+2002-06-04  Jason Thorpe  <thorpej@wasabisystems.com>
+
+	* sh.h (_bfd_sh64_crange_qsort_cmpb, _bfd_sh64_crange_qsort_cmpl)
+	(_bfd_sh64_crange_bsearch_cmpb, _bfd_sh64_crange_bsearch_cmpl): New
+	prototypes.
+
+2002-06-01  Richard Henderson  <rth@redhat.com>
+
+	* alpha.h (LITUSE_ALPHA_ADDR, LITUSE_ALPHA_BASE, LITUSE_ALPHA_BYTOFF,
+	LITUSE_ALPHA_JSR, LITUSE_ALPHA_TLSGD, LITUSE_ALPHA_TLSLDM): New.
+
+2002-05-30  Richard Henderson  <rth@redhat.com>
+
+	* alpha.h (R_ALPHA_TLSGD, R_ALPHA_TLSLDM, R_ALPHA_DTPMOD64,
+	R_ALPHA_GOTDTPREL, R_ALPHA_DTPREL64, R_ALPHA_DTPRELHI,
+	R_ALPHA_DTPRELLO, R_ALPHA_DTPREL16, R_ALPHA_GOTTPREL, R_ALPHA_TPREL64,
+	R_ALPHA_TPRELHI, R_ALPHA_TPRELLO, R_ALPHA_TPREL16): New.
+
+2002-05-29  Matt Thomas  <matt@3am-software.com>
+
+	* vax.h: New file
+
+2002-05-28  Kuang Hwa Lin <kuang@sbcglobal.net>
+
+	* common.h (EM_DLX): Define.
+	* dlx.h: New file.
+
 2002-05-08  Jason Thorpe  <thorpej@wasabisystems.com>
 
 	* common.h (NT_GNU_ABI_TAG): Define.

@@ -92,7 +92,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define ET_HIPROC	0xFFFF	/* Processor-specific */
 
 /* Values for e_machine, which identifies the architecture.  These numbers
-   are officially assigned by registry@sco.com.  See below for a list of
+   are officially assigned by registry@caldera.com.  See below for a list of
    ad-hoc numbers used during initial development.  */
 
 #define EM_NONE		0	/* No machine */
@@ -145,6 +145,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_TINYJ       61	/* Advanced Logic Corp. TinyJ embedded processor */
 #define EM_X86_64      62       /* Advanced Micro Devices X86-64 processor */
 
+#define EM_PDP10       64	/* Digital Equipment Corp. PDP-10 */
+#define EM_PDP11       65	/* Digital Equipment Corp. PDP-11 */
 #define EM_FX66	       66	/* Siemens FX66 microcontroller */
 #define EM_ST9PLUS     67	/* STMicroelectronics ST9+ 8/16 bit microcontroller */
 #define EM_ST7	       68	/* STMicroelectronics ST7 8-bit microcontroller */
@@ -184,7 +186,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    will have a collision.  Instead, pick a random number.
 
    Normally, each entity or maintainer responsible for a machine with an
-   unofficial e_machine number should eventually ask registry@sco.com for
+   unofficial e_machine number should eventually ask registry@caldera.com for
    an officially blessed number to be added to the list above.  */
 
 #define EM_PJ_OLD      99       /* picoJava */
@@ -236,6 +238,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    Written in the absense of an ABI.  */
 #define EM_OPENRISC_OLD		0x3426
 
+/* DLX magic number
+   Written in the absense of an ABI.  */
+#define EM_DLX			0x5aa5
+
 #define EM_XSTORMY16	        0xad45
 
 /* See the above comment before you add a new EM_* value here.  */
@@ -254,6 +260,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define PT_NOTE		4		/* Auxiliary information */
 #define PT_SHLIB	5		/* Reserved, unspecified semantics */
 #define PT_PHDR		6		/* Entry for header table itself */
+#define PT_TLS		7		/* Thread local storage segment */
 #define PT_LOOS         0x60000000	/* OS-specific */
 #define PT_HIOS         0x6fffffff	/* OS-specific */
 #define PT_LOPROC	0x70000000	/* Processor-specific */
@@ -322,6 +329,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define SHF_LINK_ORDER  (1 << 7)	/* Preserve section ordering when linking */
 #define SHF_OS_NONCONFORMING (1 << 8)	/* OS specific processing required */
 #define SHF_GROUP	(1 << 9)	/* Member of a section group */
+#define SHF_TLS		(1 << 10)	/* Thread local storage section */
 
 /* #define SHF_MASKOS	0x0F000000    *//* OS-specific semantics */
 #define SHF_MASKOS	0x0FF00000	/* New value, Oct 4, 1999 Draft */
@@ -417,6 +425,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define STT_SECTION	3		/* Symbol associated with a section */
 #define STT_FILE	4		/* Symbol gives a file name */
 #define STT_COMMON	5		/* An uninitialised common block */
+#define STT_TLS		6		/* Thread local data object */
 #define STT_LOOS        10		/* OS-specific semantics */
 #define STT_HIOS        12		/* OS-specific semantics */
 #define STT_LOPROC	13		/* Application-specific semantics */
@@ -585,6 +594,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DF_SYMBOLIC	(1 << 1)
 #define DF_TEXTREL	(1 << 2)
 #define DF_BIND_NOW	(1 << 3)
+#define DF_STATIC_TLS	(1 << 4)
 
 /* These constants are used for the version number of a Elf32_Verdef
    structure.  */

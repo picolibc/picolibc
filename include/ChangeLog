@@ -1,3 +1,68 @@
+2002-06-09  Andrew Cagney  <cagney@redhat.com>
+
+	* remote-sim.h: Move to directory gdb/.
+	* callback.h: Move to directory gdb/.
+
+2002-06-07  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* bfdlink.h (struct bfd_link_info): Change type of
+	pei386_auto_import field to int so that -1 can mean enabled by
+	default and 1 can mean enabled by command line switch.
+
+2002-06-06  DJ Delorie  <dj@redhat.com>
+
+	* hashtab.h (htab): Rearrange new members for backward
+	compatibility.
+	(htab_create): Don't use a macro that requires other headers.
+
+2002-06-05  Geoffrey Keating  <geoffk@redhat.com>
+
+	* hashtab.h (htab_create): Restore prototype for backward
+	compatibility.
+	(htab_try_create): Likewise.
+
+2002-05-22  Geoffrey Keating  <geoffk@redhat.com>
+
+	* hashtab.h (struct htab): Update for change to length specifier.
+
+2002-05-10  Geoffrey Keating  <geoffk@redhat.com>
+
+	* hashtab.h (GTY): Define if undefined.
+	(htab_alloc): New typedef.
+	(htab_free): New typedef.
+	(struct htab): Support gengtype; allow user-specified memory
+	allocation.
+	(htab_create_alloc): New.
+	(htab_create): Replace with #define.
+	(htab_try_create): Delete.
+
+2002-05-31  Michal Ludvig  <mludvig@suse.cz>
+
+	* elf/dwarf2.h (DW_CFA_low_user, DW_CFA_high_user): Renamed
+	to DW_CFA_lo_user, DW_CFA_hi_user respectively.
+	
+2002-05-28  Kuang Hwa Lin <kuang@sbcglobal.net>
+
+	* dis-asm.h: Prototype print_insn_dlx.
+
+2002-05-23  Andrew Cagney  <ac131313@redhat.com>
+
+	* sim-d10v.h: Delete file.  Moved to include/gdb/.
+
+2002-05-23  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/common.h (PT_TLS, SHF_TLS, STT_TLS, DF_STATIC_TLS): Define.
+	* elf/ia64.h (R_IA64_LTOFF_TPREL22): Renamed from R_IA64_LTOFF_TP22.
+	* elf/i386.h: Add TLS relocs.
+
+2002-05-21  H.J. Lu  (hjl@gnu.org)
+
+	* bfdlink.h (bfd_link_info): Add allow_multiple_definition.
+
+2002-05-17  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* dis-asm.h (print_insn_shl, print_insn_sh64l): Remove prototype.
+
 2002-04-16  David S. Miller  <davem@redhat.com>
 
 	* xregex2.h (__restrict_arr): Define to __restrict on GCC
