@@ -121,7 +121,7 @@ get_cygdrive_prefixes (char *user, char *system)
   return res;
 }
 
-extern "C" DWORD
+extern "C" unsigned long
 cygwin_internal (cygwin_getinfo_types t, ...)
 {
   va_list arg;

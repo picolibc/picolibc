@@ -75,6 +75,7 @@ typedef enum
   } cygwin_getinfo_types;
 
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */
+unsigned long cygwin_internal (cygwin_getinfo_types, ...);
 
 /* Flags associated with process_state */
 enum
@@ -249,7 +250,6 @@ struct external_pinfo
   __gid32_t gid32;
 };
 
-DWORD cygwin_internal (cygwin_getinfo_types, ...);
 #endif /*WINVER*/
 
 #ifdef __cplusplus

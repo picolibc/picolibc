@@ -1,3 +1,13 @@
+2003-03-28  Christopher Faylor  <cgf@redhat.com>
+
+	* include/sys/cygwin.h: Declare cygwin_internal as unsigned long.
+	* external.cc (cygwin_internal): Define as unsigned long.
+
+2003-03-27  Christopher Faylor  <cgf@redhat.com>
+
+	* include/sys/cygwin.h: Move cygwin_internal outside of WINVER
+	conditional.
+
 2003-03-27  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc: Change 1==foo equations to foo==1 throughout.
