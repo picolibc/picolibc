@@ -109,7 +109,7 @@ read_etc_passwd ()
     extern int passwd_sem;
     char linebuf[1024];
     ++passwd_sem;
-    FILE *f = fopen ("/etc/passwd", "r");
+    FILE *f = fopen ("/etc/passwd", "rt");
     --passwd_sem;
 
     if (f)

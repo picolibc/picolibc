@@ -131,7 +131,7 @@ read_etc_group ()
   strncpy (group_name, "Administrators", sizeof (group_name));
 
   ++group_sem;
-  FILE *f = fopen (etc_group, "r");
+  FILE *f = fopen (etc_group, "rt");
   --group_sem;
 
   if (f)

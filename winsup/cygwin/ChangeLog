@@ -1,3 +1,9 @@
+Sat Jun 24 23:43:06 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* grp.cc (read_etc_group): Open file in text mode.
+	* pwd.cc (read_etc_passwd): Ditto.
+	* shared.h: Bump PROC_MAGIC.
+
 Sat Jun 24 19:30:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fork.cc (fork): Fix error in copying SID pointer.
