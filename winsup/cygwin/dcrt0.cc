@@ -40,6 +40,7 @@ BOOL strip_title_path = FALSE;
 BOOL allow_glob = TRUE;
 
 HANDLE NO_COPY parent_alive = NULL;
+int cygwin_finished_initializing = 0;
 
 /* Used in SIGTOMASK for generating a bit for insertion into a sigset_t.
    This is subtracted from the signal number prior to shifting the bit.
@@ -49,10 +50,8 @@ HANDLE NO_COPY parent_alive = NULL;
    measure to allow an orderly transfer to the new, correct sigmask method. */
 unsigned int signal_shift_subtract = 1;
 
-#ifdef _MT_SAFE
 ResourceLocks _reslock NO_COPY;
 MTinterface _mtinterf NO_COPY;
-#endif
 
 extern "C"
 {
@@ -64,6 +63,7 @@ extern "C"
   /* This is an exported copy of environ which can be used by DLLs
      which use cygwin.dll.  */
   char **__cygwin_environ;
+  char ***main_environ;
   /* __progname used in getopt error message */
   char *__progname = NULL;
   struct _reent reent_data;
@@ -192,7 +192,7 @@ host_dependent_constants::init ()
     {
     case winNT:
       win32_upper = 0xffffffff;
-      shared = FILE_SHARE_READ | FILE_SHARE_WRITE;
+      shared = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
       break;
 
     case win98:
@@ -699,16 +699,8 @@ dll_crt0_1 ()
      of the calls below (eg. uinfo_init) do stdio calls - this area must
      be set to zero before then. */
 
-#ifdef _MT_SAFE
   user_data->threadinterface->ClearReent();
   user_data->threadinterface->Init1();
-#else
-  memset (&reent_data, 0, sizeof (reent_data));
-  reent_data._errno = 0;
-  reent_data._stdin =  reent_data.__sf + 0;
-  reent_data._stdout = reent_data.__sf + 1;
-  reent_data._stderr = reent_data.__sf + 2;
-#endif
 
   char *line = GetCommandLineA ();
 
@@ -734,7 +726,10 @@ dll_crt0_1 ()
 
   /* beyond this we only do for cygwin apps or dlls */
   if (dynamically_loaded)
-    return;
+    {
+      cygwin_finished_initializing = 1;
+      return;
+    }
 
   /* Initialize signal/subprocess handling. */
   sigproc_init ();
@@ -766,15 +761,14 @@ dll_crt0_1 ()
   /* Set up __progname for getopt error call. */
   __progname = argv[0];
 
-  /* Call init of loaded dlls. */
-  DllList::the().initAll();
-
-  set_errno (0);
-
   /* Flush signals and ensure that signal thread is up and running. Can't
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
-  sig_send (NULL, __SIGFLUSH);	/* also initializes uid, gid */
+  sig_send (NULL, __SIGFLUSH);
+
+  cygwin_finished_initializing = 1;
+  /* Call init of loaded dlls. */
+  dlls.init ();
 
   /* Execute any specified "premain" functions */
   if (user_data->premain[PREMAIN_LEN / 2])
@@ -782,6 +776,9 @@ dll_crt0_1 ()
       user_data->premain[i] (argc, argv);
 
   debug_printf ("user_data->main %p", user_data->main);
+
+  set_errno (0);
+
   if (user_data->main)
     exit (user_data->main (argc, argv, *user_data->envptr));
 }
@@ -806,6 +803,7 @@ _dll_crt0 ()
     }
 #endif
 
+  main_environ = user_data->envptr;
   user_data->heapbase = user_data->heapptr = user_data->heaptop = NULL;
 
   set_console_handler ();
@@ -874,7 +872,7 @@ void
 dll_crt0 (per_process *uptr)
 {
   /* Set the local copy of the pointer into the user space. */
-  if (uptr)
+  if (uptr && uptr != user_data)
     {
       memcpy (user_data, uptr, per_process_overwrite);
       *(user_data->impure_ptr_ptr) = &reent_data;

@@ -497,8 +497,8 @@ hinfo::linearize_fd_array (unsigned char *in_buf, int buflen)
 LPBYTE
 hinfo::de_linearize_fd_array (LPBYTE buf)
 {
-  int len;
-  size_t max_used_fd, inc_size;
+  int len, max_used_fd;
+  size_t inc_size;
 
   debug_printf ("buf %x", buf);
 
@@ -518,7 +518,7 @@ hinfo::de_linearize_fd_array (LPBYTE buf)
       return NULL;
     }
 
-  for (size_t i = 0; i <= max_used_fd; i++)
+  for (int i = 0; i <= max_used_fd; i++)
     {
       /* 0xFF means closed */
       if (*buf == 0xff)

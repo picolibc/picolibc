@@ -280,6 +280,13 @@ fork ()
       return -1;
     }
 
+  /* Remember the address of the first loaded dll and decide
+     if we need to load dlls.  We do this here so that this
+     information will be available in the parent and, when
+     the stack is copied, in the child. */
+  dll *first_dll = dlls.start.next;
+  int load_dlls = dlls.reload_on_fork && dlls.loaded_dlls;
+
   static child_info_fork ch;
   x = setjmp (ch.jmp);
 
@@ -457,43 +464,41 @@ fork ()
       if (!rc)
 	goto cleanup;
 
-      /* Now fill data/bss of linked dll */
-      DO_LINKED_DLL (p)
-      {
-	debug_printf ("copying data/bss of a linked dll");
-	if (!fork_copy (pi, "linked dll data/bss", p->data_start, p->data_end,
-						   p->bss_start, p->bss_end,
-						   NULL))
-	  goto cleanup;
-      }
-      DLL_DONE;
-
-      proc_register (child);
-      int load_dll = DllList::the().forkeeMustReloadDlls() &&
-		     DllList::the().numberOfOpenedDlls();
-
-      /* Start thread, and wait for it to reload dlls.  */
-      if (!resume_child (pi, forker_finished) ||
-	  !sync_with_child (pi, subproc_ready, load_dll, "child loading dlls"))
-	goto cleanup;
-
-      /* child reload dlls & then write their data and bss */
-      if (load_dll)
-      {
-	/* CHILD IS STOPPED */
-	/* write memory of reloaded dlls */
-	DO_LOADED_DLL (p)
+      /* Now fill data/bss of any DLLs that were linked into the program. */
+      for (dll *d = dlls.istart (DLL_LINK); d; d = dlls.inext ())
 	{
-	  debug_printf ("copying data/bss for a loaded dll");
-	  if (!fork_copy (pi, "loaded dll data/bss", p->data_start, p->data_end,
-						     p->bss_start, p->bss_end,
+	  debug_printf ("copying data/bss of a linked dll");
+	  if (!fork_copy (pi, "linked dll data/bss", d->p.data_start, d->p.data_end,
+						     d->p.bss_start, d->p.bss_end,
 						     NULL))
 	    goto cleanup;
 	}
-	DLL_DONE;
-	/* Start the child up again. */
-	(void) resume_child (pi, forker_finished);
-      }
+
+      proc_register (child);
+
+      /* Start thread, and wait for it to reload dlls.  */
+      if (!resume_child (pi, forker_finished) ||
+	  !sync_with_child (pi, subproc_ready, load_dlls, "child loading dlls"))
+	goto cleanup;
+
+      /* If DLLs were loaded in the parent, then the child has reloaded all
+	 of them and is now waiting to have all of the individual data and
+	 bss sections filled in. */
+      if (load_dlls)
+	{
+	  /* CHILD IS STOPPED */
+	  /* write memory of reloaded dlls */
+	  for (dll *d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
+	    {
+	      debug_printf ("copying data/bss for a loaded dll");
+	      if (!fork_copy (pi, "loaded dll data/bss", d->p.data_start, d->p.data_end,
+							 d->p.bss_start, d->p.bss_end,
+							 NULL))
+		goto cleanup;
+	    }
+	  /* Start the child up again. */
+	  (void) resume_child (pi, forker_finished);
+	}
 
       ForceCloseHandle (subproc_ready);
       ForceCloseHandle (pi.hThread);
@@ -532,6 +537,14 @@ fork ()
       char c;
       if (GetEnvironmentVariable ("FORKDEBUG", &c, 1))
 	try_to_debug ();
+      char buf[80];
+      /* This is useful for debugging fork problems.  Use gdb to attach to
+	 the pid reported here. */
+      if (GetEnvironmentVariable ("CYGWIN_FORK_SLEEP", buf, sizeof (buf)))
+	{
+	  small_printf ("Sleeping %d after fork, pid %u\n", atoi (buf), GetCurrentProcessId ());
+	  Sleep (atoi(buf));
+	}
 #endif
 
       /* If we've played with the stack, stacksize != 0.  That means that
@@ -548,20 +561,22 @@ fork ()
 
       dtable.fixup_after_fork (hParent);
       signal_fixup_after_fork ();
-      ForceCloseHandle (hParent);
 
       MALLOC_CHECK;
 
-      /* reload dlls if necessary */
-      if (!DllList::the().forkeeMustReloadDlls() ||
-	  !DllList::the().numberOfOpenedDlls())
+      /* If we haven't dynamically loaded any dlls, just signal
+	 the parent.  Otherwise, load all the dlls, tell the parent
+	  that we're done, and wait for the parent to fill in the.
+	  loaded dlls' data/bss. */
+      if (!load_dlls)
 	sync_with_parent ("performed fork fixup.", FALSE);
       else
 	{
-	  DllList::the().forkeeLoadDlls();
+	  dlls.load_after_fork (hParent, first_dll);
 	  sync_with_parent ("loaded dlls", TRUE);
 	}
 
+      ForceCloseHandle (hParent);
       (void) ForceCloseHandle (child_proc_info->subproc_ready);
       (void) ForceCloseHandle (child_proc_info->forker_finished);
 

@@ -1,6 +1,6 @@
 /* dll_init.h
 
-   Copyright 1998 Cygnus Solutions
+   Copyright 1998, 1999, 2000 Cygnus Solutions
 
 This file is part of Cygwin.
 
@@ -8,95 +8,84 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-//-----------------------------------------------------------------------------
-// list of loaded DLL (used by fork & init)
-class DllList
+struct per_module
 {
-public:
-  static DllList& the ();
-
-  // return dll index used for freeDll
-  int recordDll (HMODULE, per_process*);
-  void detachDll (int dll_index);
-
-  // called after initialization of main module in dll_crt0
-  void initAll ();
-
-  // global destructors of loaded dlls
-  void doGlobalDestructorsOfDlls ();
-
-  // number of dlls dlopened
-  int numberOfOpenedDlls ();
-
-  // boolean to determine if forked process must reload dlls opened with
-  // LoadLibrary or dlopen ...
-  // default = 0 (FALSE)
-  int forkeeMustReloadDlls ();
-  void forkeeMustReloadDlls (int);
-
-  void forkeeLoadDlls ();
-
-  // set name of current library opened with dlopen
-  void currentDlOpenedLib (const char*);
+  char ***envptr;
+  void (**ctors)(void);
+  void (**dtors)(void);
+  void *data_start;
+  void *data_end;
+  void *bss_start;
+  void *bss_end;
+  int (*main)(int, char **, char **);
+  per_module &operator = (per_process *p)
+  {
+    envptr = p->envptr;
+    ctors = p->ctors;
+    dtors = p->dtors;
+    data_start = p->data_start;
+    data_end = p->data_end;
+    bss_start = p->bss_start;
+    bss_end = p->bss_end;
+    main = p->main;
+    return *this;
+  }
+  void run_ctors ();
+  void run_dtors ();
 };
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 
-class DllListIterator
+typedef enum
 {
-  int _type;
-  int _index;
+  DLL_NONE,
+  DLL_LINK,
+  DLL_LOAD,
+  DLL_ANY
+} dll_type;
 
-protected:
-  DllListIterator (int type);
-  int index () const { return _index; }
-
-public:
-  virtual ~DllListIterator();
-
-  int ok() { return _index!=-1; }
-  void operator++ ();
-  void operator++ (int) { operator++ (); }
-  operator per_process* ();
+struct dll
+{
+  struct dll *next, *prev;
+  per_module p;
+  HMODULE handle;
+  int count;
+  dll_type type;
+  int namelen;
+  char name[MAX_PATH + 1];
+  void detach ();
+  int init ();
 };
 
-//-----------------------------------------------------------------------------
+#define MAX_DLL_BEFORE_INIT     100
 
-class LinkedDllIterator : public DllListIterator
+class dll_list
 {
+  dll *end;
+  dll *hold;
+  dll_type hold_type;
 public:
-  LinkedDllIterator ();
-  ~LinkedDllIterator ();
+  dll start;
+  int tot;
+  int loaded_dlls;
+  int reload_on_fork;
+  dll *operator [] (const char *name);
+  dll *alloc (HINSTANCE, per_process *, dll_type);
+  void detach (dll *);
+  void init ();
+  void load_after_fork (HANDLE, dll *);
+  dll *istart (dll_type t)
+  {
+    hold_type = t;
+    hold = &start;
+    return inext ();
+  }
+  dll *inext ()
+  {
+    while ((hold = hold->next))
+      if (hold_type == DLL_ANY || hold->type == hold_type)
+	break;
+    return hold;
+  }
 };
 
-//-----------------------------------------------------------------------------
-
-class LoadedDllIterator : public DllListIterator
-{
-public:
-  LoadedDllIterator ();
-  ~LoadedDllIterator ();
-};
-
-//-----------------------------------------------------------------------------
-
-#define DO_LINKED_DLL(var)						      \
-{									      \
-LinkedDllIterator iterator;						      \
-while (iterator.ok ())							      \
-{									      \
-  per_process *var = (per_process *) iterator;
-
-#define DO_LOADED_DLL(var)						      \
-{									      \
-LoadedDllIterator iterator;						      \
-while (iterator.ok ())							      \
-{									      \
-  per_process *var = (per_process *) iterator;
-
-#define DLL_DONE							      \
-  iterator++;								      \
-}									      \
-}
-
+extern dll_list dlls;

@@ -56,10 +56,7 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
 
   u->ctors = &__CTOR_LIST__;
   u->dtors = &__DTOR_LIST__;
-  if (!u->envptr)
-    u->envptr = &environ;
-  else
-    environ = *(u->envptr);
+  u->envptr = &environ;
   if (uwasnull)
     _impure_ptr = u->impure_ptr;	/* Use field initialized in newer DLLs. */
   else

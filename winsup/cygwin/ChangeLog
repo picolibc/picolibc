@@ -1,3 +1,27 @@
+Fri Jul 14 22:40:22 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* hinfo.cc (hinfo::linearize_fd_array): Make max_used_fd an int so that
+	we can detect when there are no fds to pass.
+	* dcrt0.cc (host_dependent_constants::init): Revert Sat Mar 18 01:32:04
+	2000 change.
+	(dll_crt0_1): Set "cygwin_finished_initializing" flag.
+	(dll_crt0): Don't perform memcpy if uptr is already set to internal
+	structure.
+	(_dll_crt0): Remember location of programs envptr.
+	* dll_init.h (per_module, dll, dll_list): Revamp.
+	* dll_init.cc: Revamp.  Use new classes.
+	* fork.cc (fork): Use new revamped dll, dll_list, and per_module stuff.
+	* environ.cc: Use __cygwin_environ throughout rather than the
+	user_data->envptr.
+	* exec.cc: Ditto.
+	* spawn.cc: Ditto.
+	* winsup.h: Declare update_envptrs, cygwin_finished_initializing.
+	* lib/_cygwin_crt0_common.cc (_cygwin_crt0_common): Revert previous
+	change.
+	* lib/cygwin_attach_dll.cc (cygwin_attach_dll): Always pass in own
+	per_process structure or we end up overwriting information from the
+	main program.
+
 Wed Jul 12 00:46:00 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* debug.cc (thread_stub): Use impure_ptr in place of reent_data.

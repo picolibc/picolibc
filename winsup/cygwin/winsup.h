@@ -323,6 +323,8 @@ extern HANDLE netapi32_handle;
 extern "C" void error_start_init (const char*);
 extern "C" int try_to_debug ();
 
+extern int cygwin_finished_initializing;
+
 /**************************** Miscellaneous ******************************/
 
 const char * __stdcall find_exec (const char *name, path_conv& buf, const char *winenv = "PATH=",
@@ -473,6 +475,7 @@ struct win_env
 
 win_env * __stdcall getwinenv (const char *name, const char *posix = NULL);
 
+void __stdcall update_envptrs ();
 char * __stdcall winenv (const char * const *, int);
 extern char **__cygwin_environ;
 

@@ -183,13 +183,12 @@ dlopen (const char *name, int)
   if (!name)
     {
       // handle for the current module
-      ret = (void *) GetModuleHandle (0);
+      ret = (void *) GetModuleHandle (NULL);
     }
   else
     {
       // handle for the named library
       const char *fullpath = get_full_path_of_dll (name);
-      DllList::the().currentDlOpenedLib (fullpath);
       ret = (void *) LoadLibrary (fullpath);
     }
 

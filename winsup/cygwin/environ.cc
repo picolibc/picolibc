@@ -13,7 +13,7 @@ details. */
 #include <ctype.h>
 #include <fcntl.h>
 
-#define environ (*user_data->envptr)
+#define environ __cygwin_environ
 
 extern BOOL allow_glob;
 extern BOOL allow_ntea;
@@ -228,11 +228,12 @@ setenv (const char *name, const char *value, int rewrite)
 
       for (P = environ, cnt = 0; *P; ++P, ++cnt)
 	;
-      __cygwin_environ = environ = (char **) realloc ((char *) environ,
-		      (size_t) (sizeof (char *) * (cnt + 2)));
+      environ = (char **) realloc ((char *) environ,
+				   (size_t) (sizeof (char *) * (cnt + 2)));
       if (!environ)
 	return -1;
       environ[cnt + 1] = NULL;
+      update_envptrs ();
       offset = cnt;
     }
 
@@ -502,7 +503,8 @@ environ_init (int already_posix)
   if (!sawTERM)
     envp[i++] = strdup ("TERM=cygwin");
   envp[i] = NULL;
-  __cygwin_environ = environ = envp;
+  environ = envp;
+  update_envptrs ();
   FreeEnvironmentStringsA ((char *) rawenv);
   parse_options (NULL);
   MALLOC_CHECK;
