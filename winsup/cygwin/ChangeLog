@@ -1,3 +1,7 @@
+2002-05-25  Robert Collins   <rbtcollins@hotmail.com>
+
+	* gmon.c (fake_sbrk): Correctly return -1 on failed malloc's.
+
 2002-05-24  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::build_fhandler_from_name): Just pass posix path

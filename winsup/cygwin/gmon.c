@@ -44,6 +44,7 @@ static char rcsid[] = "$OpenBSD: gmon.c,v 1.8 1997/07/23 21:11:27 kstailey Exp $
 #include <gmon.h>
 
 #include <profil.h>
+#include <windows.h>
 
 /* XXX needed? */
 //extern char *minbrk __asm ("minbrk");
@@ -61,7 +62,11 @@ void	moncontrol __P((int));
 static void *
 fake_sbrk(int size)
 {
-    return malloc(size);
+    void *rv = malloc(size);
+    if (rv)
+      return rv;
+    else
+      return (void *) -1;
 }
 
 void
