@@ -44,7 +44,7 @@ public:
   unsigned short type;	// type of record, exec, spawn, fork
   int cygpid;		// cygwin pid of child process
   HANDLE subproc_ready;	// used for synchronization with parent
-  HANDLE mount_h;
+  HANDLE user_h;
   HANDLE parent;
   HANDLE pppid_handle;
   init_cygheap *cygheap;

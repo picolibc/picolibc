@@ -98,7 +98,7 @@ close_all_files (void)
       }
 
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
-  cygwin_shared->delqueue.process_queue ();
+  user_shared->delqueue.process_queue ();
 }
 
 int
@@ -222,7 +222,7 @@ unlink (const char *ourname)
   syscall_printf ("couldn't delete file, err %d", lasterr);
 
   /* Add file to the "to be deleted" queue. */
-  cygwin_shared->delqueue.queue_file (win32_name);
+  user_shared->delqueue.queue_file (win32_name);
 
  /* Success condition. */
  ok:
@@ -2214,7 +2214,7 @@ seteuid32 (__uid32_t uid)
     RegCloseKey(HKEY_CURRENT_USER); 
   cygheap->user.reimpersonate ();
   if (!issamesid)
-    user_shared_initialize ();
+    user_shared_initialize (true);
 
 success_9x:
   cygheap->user.set_name (pw_new->pw_name);

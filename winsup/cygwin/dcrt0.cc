@@ -901,7 +901,7 @@ _dll_crt0 ()
 	      multiple_cygwin_problem ("fhandler size", child_proc_info->fhandler_union_cb, sizeof (fhandler_union));
 	    else
 	      {
-		cygwin_mount_h = child_proc_info->mount_h;
+		cygwin_user_h = child_proc_info->user_h;
 		mypid = child_proc_info->cygpid;
 		break;
 	      }

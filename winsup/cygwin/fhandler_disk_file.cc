@@ -446,7 +446,7 @@ fhandler_base::close_fs ()
 {
   int res = fhandler_base::close ();
   if (!res)
-    cygwin_shared->delqueue.process_queue ();
+    user_shared->delqueue.process_queue ();
   return res;
 }
 

@@ -167,7 +167,7 @@ fhandler_virtual::close ()
     free (filebuf);
   filebuf = NULL;
   bufalloc = (size_t) -1;
-  cygwin_shared->delqueue.process_queue ();
+  user_shared->delqueue.process_queue ();
   return 0;
 }
 

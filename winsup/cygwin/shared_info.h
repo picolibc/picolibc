@@ -42,10 +42,9 @@ class mount_item
    scheme should be satisfactory for a long while yet.  */
 #define MAX_MOUNTS 30
 
-#define MOUNT_VERSION	27	// increment when mount table changes and
-#define MOUNT_VERSION_MAGIC CYGWIN_VERSION_MAGIC (MOUNT_MAGIC, MOUNT_VERSION)
-#define CURR_MOUNT_MAGIC 0x6dd73a3fU
-#define MOUNT_INFO_CB 16488
+#define USER_VERSION	1	// increment when mount table changes and
+#define USER_VERSION_MAGIC CYGWIN_VERSION_MAGIC (MOUNT_MAGIC, USER_VERSION)
+#define CURR_MOUNT_MAGIC 0x4fe431cdU    /* FIXME */
 
 class reg_key;
 struct device;
@@ -133,6 +132,14 @@ public:
   void process_queue ();
 };
 
+class user_info
+{
+public:
+  DWORD version;
+  DWORD cb;
+  delqueue_list delqueue;
+  mount_info mountinfo;
+};
 /******** Shared Info ********/
 /* Data accessible to all tasks */
 
@@ -162,13 +169,14 @@ class shared_info
 };
 
 extern shared_info *cygwin_shared;
-extern mount_info *mount_table;
-extern HANDLE cygwin_mount_h;
+extern user_info *user_shared; 
+#define mount_table (&(user_shared->mountinfo))
+extern HANDLE cygwin_user_h;
 
 enum shared_locations
 {
   SH_CYGWIN_SHARED,
-  SH_MOUNT_TABLE,
+  SH_USER_SHARED,
   SH_SHARED_CONSOLE,
   SH_MYSELF,
   SH_TOTAL_SIZE
@@ -193,5 +201,5 @@ struct console_state
 char *__stdcall shared_name (char *, const char *, int);
 void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, 
 			     shared_locations, PSECURITY_ATTRIBUTES psa = &sec_all);
-extern void user_shared_initialize ();
+extern void user_shared_initialize (bool reinit);
 
