@@ -1,178 +1,160 @@
 @chapter Installation Instructions
 @section Contents
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+Unlike previous net releases such as B20.1 and earlier, there is no
+monolithic "full" or "usertools" installation.  Rather, you can pick and
+choose the packages you wish to install, and update them individually.
 
-The following packages are included in the full release:
+The following packages are available with the latest net release:
 
-Development tools:
-binutils, bison, byacc, dejagnu, diff, expect, flex, gas, gcc, gdb,
-itcl, ld, libstdc++, make, patch, tcl, tix, tk
+ash, bash, binutils, bison, byacc, bzip2, clear, common, cygwin,
+dejagnu, diff, expect, fileutils, findutils, flex, gawk, gcc, gdb,
+gperf, grep, groff, gzip, inetutils, less, libpng, login, m4, make, man,
+patch, sed, shellutils, tar, tcltk, termcap, texinfo, textutils, time,
+zlib
 
-User tools:
-ash, bash, bzip2, diff, fileutils, findutils, gawk, grep, gzip, m4,
-sed, shellutils, tar, textutils, time
+Full source code is available for all packages and tools.
 
-The user tools release only contains the user tools.
+There are a few different ways to install the Cygwin net release, and
+we'll try to cover them all here.  It is strongly recommended to use the
+automatic @code{setup.exe} program if you can.
 
-Full source code is available for these tools.  It is split into
-these two units.
+@section Installation using the @code{setup.exe} program
 
-@section Installing the binary release:
+@strong{IMPORTANT: If you run @code{setup.exe} on an existing Cygwin
+installation, Setup will overwrite the contents of mounted directories.
+There is no recovery from this.  If you are upgrading from an older
+version of Cygwin, you may wish to back up your current installation and
+unmount old mount points in order to isolate them.  Then you can
+re-install Cygwin in a new location with new mount points, if this is
+what you want.}
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+The @code{setup.exe} program is the recommended way to install Cygwin,
+but it is still a work in progress.  Expect features and functionality
+to change.  For this reason, it is a good idea to note the version and
+build time reported by @code{setup.exe} when you run it.  This will help
+diagnose problems, should you have any.  Check the cygwin mailing list
+for the latest news about @code{setup.exe}.
 
-Important!  Be sure to remove any older versions of the Cygwin tools
-from your PATH environment variable so you do not execute them by
-mistake.
+You have a few options when using @code{setup.exe}.  
 
-To download the cygwin files, you may use whatever ftp, browser, or
-other transfer program you are familiar with.  To download multiple
-files without interaction, you may wish to try the @code{wget}
-program.  Visit the cygwin home page's software listings to find a
-pre-built copy of it.
+The @code{setup.exe} program will prompt you for a "root" directory.
+The default is 'C:\cygwin', but you can change it.  (You are strongly
+urged @strong{not} to choose something like 'C:\'.)  It will contain the
+necessary files and directory structure, and will be mounted to '/' as
+part of the installation process.
 
-Connect to one of the ftp servers listed above and cd to the directory
-containing the latest release.  A list of mirror sites is at:
+After a new installation in the default location, your mount points will
+look something like this:
 
-@file{http://sourceware.cygnus.com/cygwin/mirrors.html}.
+@example
+Device              Directory           Type         Flags
+C:\cygwin\bin       /usr/bin            user         binmode
+C:\cygwin\lib       /usr/lib            user         binmode
+C:\cygwin           /                   user         binmode
+@end example
 
-If you want the development tools and the programs necessary to run
-the GNU configure mechanism, you should download the full binary release
-called @file{full.exe}.  If you only care about the user tools
-listed above, download @file{usertools.exe} instead.
+Note that /bin and /usr/bin point to the same location, as do /lib and
+/usr/lib.  This is intentional.  Currently, @code{setup.exe} creates
+only binary mounts, but future versions will be more flexible.
 
-If you have an unreliable connection, download the appropriate binary in
-smaller chunks instead.  For the split cdk installer, get the files in
-the @file{full-split} subdirectory.  Once downloaded, combine the
-split files at the command prompt by doing a:
+You can let @code{setup.exe} download all the files for you on the fly.
+This is the 'internet' installation.  Or you can download all (or some)
+of the packages ahead of time, and instruct @code{setup.exe} to install
+Cygwin from those files.  This is the 'directory' installation.  You
+must use this method if you want to install only a subset of the
+available packages.
 
-@smallexample
-copy /b xaa + xab + xac + ... + xak + xal full.exe
-del xa*.*
-@end smallexample
+Note that you cannot combine methods.  If you use the directory
+installation, @code{setup.exe} will install @strong{only} the packages
+it finds in the directory; it will not also be able to download packages
+from the internet in the same pass.  If you have not carefully chosen
+which packages to download, you may not end up with a working Cygwin
+installation.  You can, however, add and update packages later.  See
+below.
 
-A similar process can be used for the user tools.
+Whichever you choose, the first step is to open an ftp mirror site near
+you from @file{http://sourceware.cygnus.com/cygwin/mirrors.html}.  Then
+go to the 'latest' directory, download @code{setup.exe} and save that to
+an @strong{empty temporary directory}.  While you're there, download the
+README file and read it.  Then read it again.
 
-Once you have an install executable on your system, run it.  If
-a previous version of the software is detected, it will offer to
-uninstall it for you.
+Then proceed according to your choice below.
 
-Next it will ask you to choose an install location.  The default is
-@file{<system-drive>:\cygnus\cygwin-b20}.  Feel free to choose another
-location if you would prefer.
+@subsection Internet installation with @code{setup.exe}
 
-Finally, it will ask you for the name of the Program Files folder
-shortcut to add.  By default, the installer will create
-a @file{Cygwin B20} entry in a
-folder called @file{Cygnus Solutions}.  When this step is completed, it
-will install the tools and exit.
+Shut down @strong{all cygwin applications} (including inetd, etc.).
 
-At this point, you should be able to look under the start menu and
-select "Cygwin B20".  This will pop up a bash shell with all special
-environment variables set up for you.  If you are running Windows 95 or
-98 and are faced with the error message "Out of environment space", you
-need to increase the amount of environment space in your config.sys and
-try again.  Adding the line @code{shell=C:\command.com /e:4096 /p}
-should do the trick if @code{C:} is your system drive letter.
+Then, @strong{in a command window} ("MS-DOS Prompt" in Windows 95/98),
+'@code{cd}' to the temporary directory and type '@code{setup.exe}'.
 
-There are two remaining thing you should do from this prompt.
-First, you need to type @code{mkdir -p /tmp} to ensure that a directory
-for temporary files exists for programs that expect to find one there.
+When prompted, specify the location of the root directory, or accept the
+default.
 
-Second, if you are installing the full distribution
-(@file{full.exe}), various programs will need to be able to find
-@file{/bin/sh}.  You should @file{mkdir -p /bin} and put a copy of
-@file{sh.exe} there, removing the older version, if present.  You can
-use the @file{mount} utility to select which drive letter is mounted as
-@file{/}. See the Frequently Asked Questions (FAQ) file for more
-information on @file{mount}.
+At the next prompt, choose to install from the Internet ('i').  This is
+the default.
 
-If you should ever want to uninstall the tools, you may do so
-via the "Add/Remove Programs" control panel.
+Setup will connect to sourceware.cygnus.com to read a list of mirror
+sites.  Choose one from the list, or choose 'other' to supply your own.
+If you supply your own, you must provide a full URL, not just the ftp
+hostname.  Setup will then proceed to download all packages from the ftp
+site.  Of course this may take a while if you have a slow connection.
 
-@section Installing the source code
+When finished, Setup will have created a "Cygnus Solutions" folder on
+your Start Menu, containing a shortcut to @code{cygwin.bat}, which
+invokes bash with various environment variables set correctly.  The
+"Uninstall Cygwin" shortcut, if present, is unlikely to do a complete
+job.  If you want to completely uninstall Cygwin, you will probably have
+to delete some things by hand.
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+@subsection Directory installation with @code{setup.exe}
 
-Before downloading the source code corresponding to the release,
-you should install the latest release of the tools (either the full
-release or just the user tools).
+Before proceeding, you must download packages into the temporary
+directory containing @code{setup.exe}.  These are in subdirectories of
+'latest' and end in .tar.gz and not in -src.tar.gz.  If there is more
+than one in a given directory, pick the one with the highest version
+number.  Put them together in the temporary directory containing
+@code{setup.exe}.  You may preserve the directory structure of 'latest',
+and include the -src.tar.gz files, without ill effect.
 
-Create the directory that will house the source code.  @file{cd}
-there.
+Whatever subset you think is appropriate, it @strong{must} contain the
+'cygwin' package, or you will not end up with a working Cygwin
+installation.
 
-Connect to one of the ftp servers listed above and cd to the directory
-containing the latest release.  A list of mirror sites is at:
+When you have all the necessary tar files together with
+@code{setup.exe}, proceed as you would for an internet installation,
+except choose directory installation ('d') when prompted.  Setup will
+install from the tar files that it finds there.  Here are the details
+again:
 
-@file{http://sourceware.cygnus.com/cygwin/mirrors.html}.
+Shut down @strong{all cygwin applications} (including inetd, etc.).
 
-If you want the user tools source code, @file{cd} into the
-@file{user-src-split} subdirectory.  Download the files there.  If you
-want the development tools sources, @file{cd} into the
-@file{dev-src-split} subdirectory.  Download the files there.
+Then, @strong{in a command window} ("MS-DOS Prompt" in Windows 95/98),
+'@code{cd}' to the temporary directory and type '@code{setup.exe}'.
 
-Back in the Windows command shell, for the user tools source:
+When prompted, specify the location of the root directory, or accept the
+default.
 
-@smallexample
-copy /b xba + xbb + xbc + xbd + xbe + xbf + xbg user-src.tar.bz2
-del xb*.*
-bunzip2 user-src.tar.bz2
-tar xvf user-src.tar
-@end smallexample
+At the next prompt, choose to install from the current directory ('d').
+This is @strong{not} the default.
 
-For the development tools source:
+When finished, Setup will have created a "Cygnus Solutions" folder on
+your Start Menu, containing a shortcut to @code{cygwin.bat}, which
+invokes bash with various environment variables set correctly.  The
+"Uninstall Cygwin" shortcut, if present, is unlikely to do a complete
+job.  If you want to completely uninstall Cygwin, you will probably have
+to delete some things by hand.
 
-@smallexample
-copy /b xca + xcb + xcc + xcd + ... + xck + xcl dev-src.tar.bz2
-del xc*.*
-bunzip2 dev-src.tar.bz2
-tar xvf dev-src.tar
-@end smallexample
+@subsection Adding or updating packages
 
-Both expand into a directory called @file{src}.
+Later versions of @code{setup.exe} permit you to add and/or update
+packages to an existing cygwin installation.  For the time being, the
+procedure is sufficiently well described in these messages from the cygwin
+mailing list:
 
-Note: if you want the sources corresponding to everything in the
-full.exe binary installer, you will need to download and expand both
-the user-src.tar.bz2 and dev-src.tar.bz2 source archives!
+@itemize @bullet
+@item @file{http://sourceware.cygnus.com/ml/cygwin/2000-05/msg00433.html}
+@item @file{http://sourceware.cygnus.com/ml/cygwin/2000-05/msg00445.html}
+@end itemize
 
-And you should be done...
 
-@section Upgrading to B20.1
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.  Even the section's title is wrong!)}
-
-If you downloaded the original B20.0 release, you should definitely at
-least upgrade the Cygwin library to the version present in B20.1.  To do
-this, download the file
-@file{cygwin-b20/cygwin1-20.1.dll.bz2} from one of our mirror sites,
-decompress it with bunzip2, and then install the dll, replacing
-the file cygwin-b20/H-i586-cygwin32/bin/cygwin1.dll in your original
-installation of 20.0.
-
-There are some additional patches in a few of the other tools
-(including a gcc change that makes -mno-cygwin find the correct header
-files).  In addition, the tools have been built with a compiled-in path
-of /cygnus/cygwin-b20/ which will make some tools such as bison find
-their library files without help from environment variables.
-To install the full 20.1 release, you will need to download the
-correct installer from scratch.  It will offer to uninstall the existing
-release and replace it with 20.1 (You should choose to uninstall b20 and
-proceed).
-
-We have diff files on the ftp site that can be used to upgrade the
-original B20.0 sources.  20.0-20.1-dev-src.diff.bz2 upgrades the
-development tools sources.  20.0-20.1-user-src.diff.bz2 upgrades the
-user tools sources.  They come compressed so you'll need to bunzip2 them
-before proceeding.  As an example, if the development tools are in the
-directory called "src" and the patch is in the directory above it, apply
-the patch as follows:
-
-@smallexample
-cd src
-patch -p1 -E < ../20.0-20.1-dev-src.diff
-@end smallexample
