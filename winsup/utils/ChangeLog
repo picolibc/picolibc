@@ -1,3 +1,7 @@
+2004-11-10  Christopher Faylor  <cgf@timesys.com>
+
+	* cygcheck.cc (main): Allow a '-l' without an additional argument.
+
 2004-11-11  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* cygcheck.cc (keyeprint): New optional parameters: show_error and

@@ -1457,7 +1457,7 @@ main (int argc, char **argv)
   argc -= optind;
   argv += optind;
 
-  if (argc == 0 && !sysinfo && !keycheck && !check_setup)
+  if (argc == 0 && !sysinfo && !keycheck && !check_setup && !list_package)
     if (givehelp)
       usage (stdout, 0);
     else
@@ -1492,17 +1492,11 @@ main (int argc, char **argv)
     }
 
   if (check_setup)
-    {
-      dump_setup (verbose, argv, !dump_only);
-    }
+    dump_setup (verbose, argv, !dump_only);
   else if (find_package)
-    {
-      package_find (verbose, argv);
-    }
+    package_find (verbose, argv);
   else if (list_package)
-    {
-      package_list (verbose, argv);
-    }
+    package_list (verbose, argv);
   else
     for (i = 0; i < argc; i++)
       {
