@@ -88,7 +88,6 @@ enum
   FH_PIPEW   = 0x0000000a,	/* write end of a pipe */
   FH_SOCKET  = 0x0000000b,	/* is a socket */
   FH_WINDOWS = 0x0000000c,	/* is a window */
-  FH_OSS_DSP = 0x0000000d,	/* is the dsp audio device */
   FH_SLOW    = 0x00000010,	/* "slow" device if below this */
 
   /* Fast devices */
@@ -100,8 +99,9 @@ enum
   FH_RANDOM  = 0x00000015,	/* is a random device */
   FH_MEM     = 0x00000016,	/* is a mem device */
   FH_CLIPBOARD = 0x00000017, /* is a clipbaord device */
+  FH_OSS_DSP = 0x00000018,	/* is a dsp audio device */
 
-  FH_NDEV    = 0x00000018,	/* Maximum number of devices */
+  FH_NDEV    = 0x00000019,	/* Maximum number of devices */
   FH_DEVMASK = 0x00000fff,	/* devices live here */
   FH_BAD     = 0xffffffff
 };

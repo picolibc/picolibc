@@ -68,9 +68,6 @@ public:
   int envc;
   char **envp;
   HANDLE myself_pinfo;
-  char *cwd_posix;
-  char *cwd_win32;
-  DWORD cwd_hash;
 };
 
 class child_info_spawn: public child_info
@@ -88,10 +85,6 @@ public:
       {
 	if (moreinfo->old_title)
 	  cfree (moreinfo->old_title);
-	if (moreinfo->cwd_posix)
-	  cfree (moreinfo->cwd_posix);
-	if (moreinfo->cwd_win32)
-	  cfree (moreinfo->cwd_win32);
 	if (moreinfo->envp)
 	  {
 	    for (char **e = moreinfo->envp; *e; e++)

@@ -97,6 +97,24 @@ public:
   }
 };
 
+/* cwd cache stuff.  */
+
+class muto;
+
+struct cwdstuff
+{
+  char *posix;
+  char *win32;
+  DWORD hash;
+  muto *lock;
+  char *get (char *buf, int need_posix = 1, int with_chroot = 0, unsigned ulen = MAX_PATH);
+  DWORD get_hash ();
+  void init ();
+  void fixup_after_exec (char *win32, char *posix, DWORD hash);
+  bool get_initial ();
+  void set (const char *win32_cwd, const char *posix_cwd = NULL);
+};
+
 struct init_cygheap
 {
   _cmalloc_entry *chain;
@@ -105,6 +123,7 @@ struct init_cygheap
   mode_t umask;
   HANDLE shared_h;
   HANDLE console_h;
+  cwdstuff cwd;
 };
 
 extern init_cygheap *cygheap;

@@ -160,26 +160,5 @@ has_exec_chars (const char *buf, int len)
 	  (buf[0] == 'M' && buf[1] == 'Z'));
 }
 
-/* cwd cache stuff.  */
-
-class muto;
-
-struct cwdstuff
-{
-  char *posix;
-  char *win32;
-  DWORD hash;
-  muto *lock;
-  char *get (char *buf, int need_posix = 1, int with_chroot = 0, unsigned ulen = MAX_PATH);
-  DWORD get_hash ();
-  void init ();
-  void fixup_after_exec (char *win32, char *posix, DWORD hash);
-  bool get_initial ();
-  void copy (char * &posix_cwd, char * &win32_cwd, DWORD hash_cwd);
-  void set (const char *win32_cwd, const char *posix_cwd = NULL);
-};
-
-extern cwdstuff cygcwd;
-
 extern int pathmatch (const char *path1, const char *path2);
 extern int pathnmatch (const char *path1, const char *path2, int len);

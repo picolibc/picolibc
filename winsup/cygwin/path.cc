@@ -108,8 +108,6 @@ struct symlink_info
   BOOL case_check (const char *path, char *orig_path);
 };
 
-cwdstuff cygcwd;	/* The current working directory. */
-
 int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
 
 #define path_prefix_p(p1, p2, l1) \
@@ -697,7 +695,7 @@ normalize_posix_path (const char *src, char *dst)
     }
   if (!isslash (src[0]))
     {
-      if (!cygcwd.get (dst))
+      if (!cygheap->cwd.get (dst))
 	return get_errno ();
       dst = strchr (dst, '\0');
       if (*src == '.')
@@ -830,7 +828,7 @@ normalize_win32_path (const char *src, char *dst)
     }
   else if (strchr (src, ':') == NULL && *src != '/')
     {
-      if (!cygcwd.get (dst, 0))
+      if (!cygheap->cwd.get (dst, 0))
 	return get_errno ();
       if (beg_src_slash)
 	{
@@ -1225,7 +1223,7 @@ fillin:
   else if (isrelpath)
     {
       char cwd_win32[MAX_PATH];
-      if (!cygcwd.get (cwd_win32, 0))
+      if (!cygheap->cwd.get (cwd_win32, 0))
 	return get_errno ();
       unsigned cwdlen = strlen (cwd_win32);
       if (!path_prefix_p (cwd_win32, dst, cwdlen))
@@ -2865,7 +2863,7 @@ hash_path_name (unsigned long hash, const char *name)
 
       if (!hash && !isabspath (name))
 	{
-	  hash = cygcwd.get_hash ();
+	  hash = cygheap->cwd.get_hash ();
 	  if (name[0] == '.' && name[1] == '\0')
 	    return hash;
 	  hash += hash_path_name (hash, "\\");
@@ -2889,7 +2887,7 @@ hashit:
 char *
 getcwd (char *buf, size_t ulen)
 {
-  return cygcwd.get (buf, 1, 1, ulen);
+  return cygheap->cwd.get (buf, 1, 1, ulen);
 }
 
 /* getwd: standards? */
@@ -2968,14 +2966,14 @@ chdir (const char *dir)
     __seterrno ();
   else if (!path.has_symlinks () && strpbrk (dir, ":\\") == NULL
            && pcheck_case == PCHECK_RELAXED)
-    cygcwd.set (path, dir);
+    cygheap->cwd.set (path, dir);
   else
-    cygcwd.set (path, NULL);
+    cygheap->cwd.set (path, NULL);
 
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */
-  syscall_printf ("%d = chdir() cygcwd.posix '%s' native '%s'", res,
-		  cygcwd.posix, native_dir);
+  syscall_printf ("%d = chdir() cygheap->cwd.posix '%s' native '%s'", res,
+		  cygheap->cwd.posix, native_dir);
   MALLOC_CHECK;
   return res;
 }
@@ -3268,15 +3266,6 @@ cwdstuff::init ()
   lock = new_muto (FALSE, "cwd");
 }
 
-/* Called to fill in cwd values after an exec. */
-void
-cwdstuff::fixup_after_exec (char *win32_cwd, char *posix_cwd, DWORD hash_cwd)
-{
-  win32 = win32_cwd;
-  posix = posix_cwd;
-  hash = hash_cwd;
-}
-
 /* Get initial cwd.  Should only be called once in a
    process tree. */
 bool
@@ -3388,17 +3377,4 @@ out:
 		  buf, buf, ulen, need_posix, with_chroot, errno);
   MALLOC_CHECK;
   return buf;
-}
-
-/* Get copies of all cwdstuff elements.  Used by spawn_guts. */
-void
-cwdstuff::copy (char * &posix_cwd, char * &win32_cwd, DWORD hash_cwd)
-{
-  lock->acquire ();
-  get_initial (); /* FIXME: Check return someday */
-  posix_cwd = cstrdup (posix);
-  win32_cwd = cstrdup (win32);
-  hash_cwd = hash;
-  MALLOC_CHECK;
-  lock->release ();
 }

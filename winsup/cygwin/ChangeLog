@@ -1,3 +1,19 @@
+Mon Apr 16 23:45:24 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.h (cwdstuff): Move class.
+	* cygheap.h (cwdstuff): To here.
+	(init_cygheap): Add cwd field.
+	* child_info.h (cygheap_exec_info): Eliminate cwd stuff.
+	(child_info_spawn): Ditto.
+	* dcrt0.cc (dll_crt0_1): Remove cygcwd.fixup_after_exec call.  Convert
+	cygcwd reference to cygheap->cwd.
+	* path.cc: Ditto, throughout.
+	(cwdstuff::copy): Eliminate.
+	(cwdstuff::fixup_after_exec): Ditto.
+	* spawn.cc (spawn_guts): Eliminate call to cygcwd.copy.
+
+	* fhandler.h (FH_OSS_DSP): Move into "fast" device category.
+
 Mon Apr 16 19:19:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc: Move fh_paging_file from some functions to be

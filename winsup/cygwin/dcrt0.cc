@@ -701,9 +701,6 @@ dll_crt0_1 ()
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
 	    envc = spawn_info->moreinfo->envc;
-	    cygcwd.fixup_after_exec (spawn_info->moreinfo->cwd_win32,
-				     spawn_info->moreinfo->cwd_posix,
-				     spawn_info->moreinfo->cwd_hash);
 	    fdtab.fixup_after_exec (spawn_info->parent, spawn_info->moreinfo->nfds,
 				    spawn_info->moreinfo->fds);
 	    signal_fixup_after_exec (child_proc_info->type == PROC_SPAWN);
@@ -719,6 +716,7 @@ dll_crt0_1 ()
 	      cygheap->user.set_sid (NULL);
 	    break;
 	}
+      // fdtab.vfork_child_fixup ();
     }
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
@@ -735,7 +733,7 @@ dll_crt0_1 ()
   /* Initialize events. */
   events_init ();
 
-  cygcwd.init ();
+  cygheap->cwd.init ();
 
   cygbench ("pre-forkee");
   if (user_data->forkee)
