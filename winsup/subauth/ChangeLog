@@ -1,3 +1,7 @@
+Sun May 20 00:24:36 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Use 'rm -f' when cleaning.
+
 Fri May  4 15:06:00  Corinna Vinschen <corinna@vinschen.de>
 
 	Initial release of the Cygwin subauthentication DLL.

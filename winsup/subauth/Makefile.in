@@ -70,7 +70,7 @@ realclean: clean
 	rm -f  Makefile config.cache
 
 clean:
-	rm *.o *.dll
+	rm -f *.o *.dll
 
 install: all
 	$(SHELL) $(updir1)/mkinstalldirs $(bindir)
