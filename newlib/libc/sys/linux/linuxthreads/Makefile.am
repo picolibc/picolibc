@@ -53,8 +53,8 @@ SUBDIRS = machine .
 tooldir = $(tooldir)
 toollibdir = $(top_toollibdir)
 
-libpthread_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld `cat extra-libtool-objlist`
-libthread_db_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld 
+libpthread_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -lgcc -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld `cat extra-libtool-objlist`
+libthread_db_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -lgcc -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld 
 
 if USE_LIBTOOL
 
@@ -91,7 +91,10 @@ doc:
 
 install-data-local: install-toollibLIBRARIES
 	-rm -f $(DESTDIR)$(toollibdir)/libthread_db.so.1
-	ln -s $(DESTDIR)$(toollibdir)/libthread_db.so $(DESTDIR)$(toollibdir)/libthread_db.so.1 || cp $(DESTDIR)$(toollibdir)/libthread_db.so $(DESTDIR)$(toollibdir)/libthread_db.so.1 
+	ln -s `readlink $(DESTDIR)$(toollibdir)/libthread_db.so` \
+	  $(DESTDIR)$(toollibdir)/libthread_db.so.1 \
+	  || cp $(DESTDIR)$(toollibdir)/libthread_db.so \
+	  $(DESTDIR)$(toollibdir)/libthread_db.so.1 
 
 AM_CFLAGS = -D_XOPEN_SOURCE=600 -D_GNU_SOURCE=1
 ACLOCAL_AMFLAGS = -I ../../../..

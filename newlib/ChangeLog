@@ -1,3 +1,10 @@
+2004-12-03  Shaun Jackman  <sjackman@gmail.com>
+
+	* libc/sys/linux/linuxthreads/Makefile.am (install-data-local): Fix
+	our link to use readlink so as to preserve any relative link created
+	by install-toollibLIBRARIES.
+	* libc/sys/linux/linuxthreads/Makefile.in: Regenerated.
+
 2004-12-02  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/sys/linux/stdlib/glob.c: Include <sys/types.h> which defines

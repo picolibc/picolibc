@@ -123,8 +123,8 @@ SUBDIRS = machine .
 tooldir = $(tooldir)
 toollibdir = $(top_toollibdir)
 
-libpthread_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld `cat extra-libtool-objlist`
-libthread_db_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld 
+libpthread_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -lgcc -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld `cat extra-libtool-objlist`
+libthread_db_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -lgcc -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld 
 
 @USE_LIBTOOL_TRUE@toollib_LTLIBRARIES = libpthread.la libthread_db.la
 @USE_LIBTOOL_TRUE@libpthread_la_SOURCES = $(LIB_SOURCES)
@@ -642,7 +642,10 @@ doc:
 
 install-data-local: install-toollibLIBRARIES
 	-rm -f $(DESTDIR)$(toollibdir)/libthread_db.so.1
-	ln -s $(DESTDIR)$(toollibdir)/libthread_db.so $(DESTDIR)$(toollibdir)/libthread_db.so.1 || cp $(DESTDIR)$(toollibdir)/libthread_db.so $(DESTDIR)$(toollibdir)/libthread_db.so.1 
+	ln -s `readlink $(DESTDIR)$(toollibdir)/libthread_db.so` \
+	  $(DESTDIR)$(toollibdir)/libthread_db.so.1 \
+	  || cp $(DESTDIR)$(toollibdir)/libthread_db.so \
+	  $(DESTDIR)$(toollibdir)/libthread_db.so.1 
 
 pt-initfini.s: $(srcdir)/pt-initfini.c
 	$(CC) -S $(CFLAGS_pt_initfini) -finhibit-size-directive \
