@@ -1,3 +1,7 @@
+2003-10-17  Christopher Faylor  <cgf@redhat.com>
+
+	* cygcheck.cc (pretty_id): Don't exec if `id' program is not found.
+
 2003-09-20  Christopher Faylor  <cgf@redhat.com>
 
 	* kill.cc (main): Allow negative pids (indicates process groups).

@@ -780,10 +780,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
     *p = '\\';
 
   if (access (id, X_OK))
-    {
-      fprintf (stderr, "`id' program not found\n");
-      exit (1);
-    }
+    fprintf (stderr, "`id' program not found\n");
 
   FILE *f = popen (id, "rt");
 

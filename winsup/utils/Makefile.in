@@ -77,10 +77,10 @@ PROGS:=	cygcheck.exe cygpath.exe getfacl.exe kill.exe mkgroup.exe \
 	ssp.exe strace.exe umount.exe
 
 CLEAN_PROGS:=$(PROGS)
-ifdef build_dumper
-PROGS+=dumper$(EXEEXT)
-else
+ifndef build_dumper
 PROGS:=warn_dumper $(PROGS)
+else
+PROGS+=dumper$(EXEEXT)
 CLEAN_PROGS+=dumper.exe
 endif
 
