@@ -847,9 +847,12 @@ dump_sysinfo ()
       osname = (char *) "??";
       break;
     }
-  printf ("Windows %s Ver %d.%d build %d %s\n\n", osname,
-	  (int) osversion.dwMajorVersion, (int) osversion.dwMinorVersion,
-	  (int) osversion.dwBuildNumber, osversion.szCSDVersion);
+  printf ("Windows %s Ver %lu.%lu Build %lu %s\n\n", osname,
+	  osversion.dwMajorVersion, osversion.dwMinorVersion,
+	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
+	    osversion.dwBuildNumber : (osversion.dwBuildNumber & 0xffff),
+	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
+	    osversion.szCSDVersion : "");
 
   printf ("Path:");
   char *s = getenv ("PATH"), *e;
