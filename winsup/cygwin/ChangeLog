@@ -1,3 +1,8 @@
+Sat Nov 25 11:07:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (cygwin_inet_aton): New function.
+	* cygwin.din: Export cygwin_inet_aton as inet_aton.
+
 Sat Nov 25 01:57:42 2000  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* path.cc (mount_info::read_cygdrive_info_from_registry): Read system

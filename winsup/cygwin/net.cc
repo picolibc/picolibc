@@ -106,7 +106,7 @@ dump_protoent (struct protoent *p)
     debug_printf ("protoent %s %x %x", p->p_name, p->p_aliases, p->p_proto);
 }
 
-/* exported as inet_ntoa: standards? */
+/* exported as inet_ntoa: BSD 4.3 */
 extern "C" char *
 cygwin_inet_ntoa (struct in_addr in)
 {
@@ -114,12 +114,26 @@ cygwin_inet_ntoa (struct in_addr in)
   return res;
 }
 
-/* exported as inet_addr: standards? */
+/* exported as inet_addr: BSD 4.3 */
 extern "C" unsigned long
 cygwin_inet_addr (const char *cp)
 {
   unsigned long res = inet_addr (cp);
   return res;
+}
+
+/* exported as inet_aton: BSD 4.3
+   inet_aton is not exported by wsock32 and ws2_32,
+   so it has to be implemented here. */
+extern "C" int
+cygwin_inet_aton (const char *cp, struct in_addr *inp)
+{
+  unsigned long res = inet_addr (cp);
+  if (res == INADDR_NONE && strcmp (cp, "255.255.255.255"))
+    return -1;
+  if (inp)
+    inp->s_addr = res;
+  return 0;
 }
 
 /* undocumented in wsock32.dll */
