@@ -1,6 +1,6 @@
 /* pe.h  -  PE COFF header information 
 
-   Copyright 2000, 2001, 2003 Free Software Foundation, Inc.
+   Copyright 2000, 2001, 2003, 2004 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -309,5 +309,10 @@ typedef struct
 #define IMPORT_NAME		1
 #define IMPORT_NAME_NOPREFIX	2
 #define IMPORT_NAME_UNDECORATE	3
+
+/* Weak external characteristics.  */
+#define IMAGE_WEAK_EXTERN_SEARCH_NOLIBRARY	1
+#define IMAGE_WEAK_EXTERN_SEARCH_LIBRARY	2
+#define IMAGE_WEAK_EXTERN_SEARCH_ALIAS		3
 
 #endif /* _PE_H */
