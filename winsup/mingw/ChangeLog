@@ -1,4 +1,13 @@
 
+Fri Feb  2 10:34:07  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/tchar.h: (__TEXT): Add private macro.
+	(_TEXT): Modify definition to use __TEXT.
+	(_T): Ditto.
+	This change allows the passing of a MACRO as an argument and have that
+	MACRO resolved first.
+	Thanks to: Eric PAIRE <eric.paire@ri.silicomp.com>
+
 Wed Jan 31 17:12:51  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* Makefile.in: Increment version to 0.5

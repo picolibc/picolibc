@@ -61,14 +61,13 @@ typedef	wchar_t	TCHAR;
 
 
 /*
- * Enclose constant strings and literal characters in the _TEXT macro to make
- * them unicode constant strings when _UNICODE is defined.
+ * __TEXT is a private macro whose specific use is to force the expansion of a
+ * macro passed as an argument to the macros _T or _TEXT.  DO NOT use this
+ * macro within your programs.  It's name and function could change without
+ * notice.
  */
-#define	_TEXT(x)	L ## x
-
-#ifndef	_T
-#define	_T(x)		L ## x
-#endif
+#undef  __TEXT
+#define	__TEXT(x)	L ## x
 
 /*  for porting from other Windows compilers */
 #if 0  // no  wide startup module
@@ -213,13 +212,13 @@ typedef char	TCHAR;
 #endif
 
 /*
- * Enclose constant strings and characters in the _TEXT macro.
+ * __TEXT is a private macro whose specific use is to force the expansion of a
+ * macro passed as an argument to the macros _T or _TEXT.  DO NOT use this
+ * macro within your programs.  It's name and function could change without
+ * notice.
  */
-#define	_TEXT(x)	x
-
-#ifndef	_T
-#define	_T(x)		x
-#endif
+#undef __TEXT
+#define	__TEXT(x)	x
 
 /*  for porting from other Windows compilers */
 #define _tmain      main
@@ -350,6 +349,15 @@ typedef char	TCHAR;
 #endif  /* __MSVCRT__ */
 
 #endif	/* Not _UNICODE */
+
+/*
+ * UNICODE a constant string when _UNICODE is defined else returns the string
+ * unmodified.  Also defined in w32api/winnt.h.
+ */
+#undef  _TEXT
+#define _TEXT(x)	__TEXT(x)
+#undef  _T
+#define	_T(x)		__TEXT(x)
 
 #endif	/* Not _TCHAR_H_ */
 
