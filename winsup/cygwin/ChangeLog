@@ -1,3 +1,9 @@
+Thu Jul 26 15:50:38 2001  Charles Wilson <cwilson@ece.gatech.edu>
+			  Christopher Faylor <cgf@cygnus.com>
+
+	* cygwin.din: Export __signgam.
+	* include/cygwin/version.h: Bump minor version number.
+
 Thu Jul 26 15:19:50 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Throughout, reorganize header file inclusion to put security.h prior to

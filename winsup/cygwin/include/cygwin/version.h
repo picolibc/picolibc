@@ -134,10 +134,11 @@ details. */
        38: vscanf, vscanf_r, and random pthread functions
        39: asctime_r, ctime_r, gmtime_r, localtime_r
        40: fchdir
+       41: __signgam
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 40
+#define CYGWIN_VERSION_API_MINOR 41
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

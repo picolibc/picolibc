@@ -6,6 +6,7 @@ __eprintf
 __errno
 __infinity
 __main
+__signgam
 __srget
 __swbuf
 _check_for_executable DATA
