@@ -1,3 +1,8 @@
+2003-11-24  Artem B. Bityuckiy  <mail_lists@mail.ru>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Fix check for 'C' format
+	specifier to use ch instead of *fmt.
+
 2003-11-21  Artem B. Bityuckiy  <mail_lists@mail.ru>
 
 	* libc/stdio/vfprintf.c (_VFPRINTF_R, get_arg): Move mb-specific

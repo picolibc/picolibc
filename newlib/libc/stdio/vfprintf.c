@@ -746,7 +746,7 @@ reswitch:	switch (ch) {
 		case 'c':
 		case 'C':
 			cp = buf;
-			if (*fmt == 'C' || (flags & LONGINT)) {
+			if (ch == 'C' || (flags & LONGINT)) {
 				mbstate_t ps;
 
 				memset((void *)&ps, '\0', sizeof(mbstate_t));
