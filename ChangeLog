@@ -1,3 +1,7 @@
+2003-07-14  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.in: Regenerate, correctly this time.
+
 2003-07-13  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* Makefile.tpl: Set INSTALL and friends using autoconf.  Remove
