@@ -1,6 +1,6 @@
-/* secacl.cc: Sun compatible ACL functions.
+/* sec_acl.cc: Sun compatible ACL functions.
 
-   Copyright 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -41,7 +41,7 @@ searchace (__aclent16_t *aclp, int nentries, int type, int id = -1)
   int i;
 
   for (i = 0; i < nentries; ++i)
-    if ((aclp[i].a_type == type && (id < 0 || aclp[i].a_id == id))
+    if ((aclp[i].a_type == type && (id == -1 || aclp[i].a_id == id))
 	|| !aclp[i].a_type)
       return i;
   return -1;
@@ -137,24 +137,29 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
        * inheritance bits is created.
        */
       if (!(aclbufp[i].a_type & ACL_DEFAULT)
-	  && (pos = searchace (aclbufp, nentries,
+	  && aclbufp[i].a_type & (USER|GROUP|OTHER_OBJ)
+          && (pos = searchace (aclbufp + i + 1, nentries - i - 1,
 			       aclbufp[i].a_type | ACL_DEFAULT,
 			       (aclbufp[i].a_type & (USER|GROUP))
 			       ? aclbufp[i].a_id : -1)) >= 0
-	  && aclbufp[pos].a_type
 	  && aclbufp[i].a_perm == aclbufp[pos].a_perm)
 	{
 	  inheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
-	  /* This eliminates the corresponding default entry. */
-	  aclbufp[pos].a_type = 0;
+          /* This invalidates the corresponding default entry. */
+          aclbufp[pos].a_type = USER|GROUP|ACL_DEFAULT;
 	}
       switch (aclbufp[i].a_type)
 	{
 	case USER_OBJ:
-	case DEF_USER_OBJ:
 	  allow |= STANDARD_RIGHTS_ALL & ~DELETE;
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
 					owner, acl_len, inheritance))
+	    return -1;
+	  break;
+	case DEF_USER_OBJ:
+	  allow |= STANDARD_RIGHTS_ALL & ~DELETE;
+	  if (!add_access_allowed_ace (acl, ace_off++, allow,
+				       well_known_creator_owner_sid, acl_len, inheritance))
 	    return -1;
 	  break;
 	case USER:
@@ -166,9 +171,13 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	    return -1;
 	  break;
 	case GROUP_OBJ:
-	case DEF_GROUP_OBJ:
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
 					group, acl_len, inheritance))
+	    return -1;
+	  break;
+	case DEF_GROUP_OBJ:
+	  if (!add_access_allowed_ace (acl, ace_off++, allow,
+				       well_known_creator_group_sid, acl_len, inheritance))
 	    return -1;
 	  break;
 	case GROUP:
@@ -336,6 +345,16 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
 	      type = USER_OBJ;
 	      id = uid;
 	    }
+	  else if (ace_sid == well_known_creator_group_sid)
+	    {
+	      type = GROUP_OBJ | ACL_DEFAULT;
+	      id = ILLEGAL_GID;
+	    }
+	  else if (ace_sid == well_known_creator_owner_sid)
+	    {
+	      type = USER_OBJ | ACL_DEFAULT;
+	      id = ILLEGAL_GID;
+	    }
 	  else
 	    {
 	      id = ace_sid.get_id (FALSE, &type);
@@ -352,7 +371,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
 	    }
 	  if (!type)
 	    continue;
-	  if (!(ace->Header.AceFlags & INHERIT_ONLY))
+	  if (!(ace->Header.AceFlags & INHERIT_ONLY || type & ACL_DEFAULT))
 	    {
 	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
 		getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
@@ -360,6 +379,10 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
 	  if ((ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
 	      && (attr & FILE_ATTRIBUTE_DIRECTORY))
 	    {
+	      if (type == USER_OBJ)
+		type = USER;
+	      else if (type == GROUP_OBJ)
+		type = GROUP;
 	      type |= ACL_DEFAULT;
 	      types_def |= type;
 	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
@@ -475,45 +498,30 @@ acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
 	  set_errno (ENOSYS);
 	  break;
 	case GETACL:
-	  if (nentries < 1)
-	    set_errno (EINVAL);
+	  if (!aclbufp)
+	    set_errno(EFAULT);
+	  else if (nentries < MIN_ACL_ENTRIES)
+	    set_errno (ENOSPC);
 	  else if ((nofollow && !lstat64 (path, &st))
 		   || (!nofollow && !stat64 (path, &st)))
 	    {
-	      __aclent16_t lacl[4];
-	      if (nentries > 0)
-		{
-		  lacl[0].a_type = USER_OBJ;
-		  lacl[0].a_id = st.st_uid;
-		  lacl[0].a_perm = (st.st_mode & S_IRWXU) >> 6;
-		}
-	      if (nentries > 1)
-		{
-		  lacl[1].a_type = GROUP_OBJ;
-		  lacl[1].a_id = st.st_gid;
-		  lacl[1].a_perm = (st.st_mode & S_IRWXG) >> 3;
-		}
-	      if (nentries > 2)
-		{
-		  lacl[2].a_type = OTHER_OBJ;
-		  lacl[2].a_id = ILLEGAL_GID;
-		  lacl[2].a_perm = st.st_mode & S_IRWXO;
-		}
-	      if (nentries > 3)
-		{
-		  lacl[3].a_type = CLASS_OBJ;
-		  lacl[3].a_id = ILLEGAL_GID;
-		  lacl[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
-		}
-	      if (nentries > 4)
-		nentries = 4;
-	      if (aclbufp)
-		memcpy (aclbufp, lacl, nentries * sizeof (__aclent16_t));
-	      ret = nentries;
+	      aclbufp[0].a_type = USER_OBJ;
+	      aclbufp[0].a_id = st.st_uid;
+	      aclbufp[0].a_perm = (st.st_mode & S_IRWXU) >> 6;
+	      aclbufp[1].a_type = GROUP_OBJ;
+	      aclbufp[1].a_id = st.st_gid;
+	      aclbufp[1].a_perm = (st.st_mode & S_IRWXG) >> 3;
+	      aclbufp[2].a_type = OTHER_OBJ;
+	      aclbufp[2].a_id = ILLEGAL_GID;
+	      aclbufp[2].a_perm = st.st_mode & S_IRWXO;
+	      aclbufp[3].a_type = CLASS_OBJ;
+	      aclbufp[3].a_id = ILLEGAL_GID;
+	      aclbufp[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
+	      ret = MIN_ACL_ENTRIES;
 	    }
 	  break;
 	case GETACLCNT:
-	  ret = 4;
+	  ret = MIN_ACL_ENTRIES;
 	  break;
 	}
       syscall_printf ("%d = acl (%s)", ret, path);
@@ -527,19 +535,21 @@ acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
 			 nentries, aclbufp);
 	break;
       case GETACL:
-	if (nentries < 1)
-	  break;
-	return getacl (real_path.get_win32 (),
-		       real_path.file_attributes (),
-		       nentries, aclbufp);
+	if (!aclbufp)
+	  set_errno(EFAULT);
+	else
+	  return getacl (real_path.get_win32 (),
+			 real_path.file_attributes (),
+			 nentries, aclbufp);
+	break;
       case GETACLCNT:
 	return getacl (real_path.get_win32 (),
 		       real_path.file_attributes (),
 		       0, NULL);
       default:
+	set_errno (EINVAL);
 	break;
     }
-  set_errno (EINVAL);
   syscall_printf ("-1 = acl (%s)", path);
   return -1;
 }

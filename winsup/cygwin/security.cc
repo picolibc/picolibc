@@ -1,6 +1,6 @@
 /* security.cc: NT security functions
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
    Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
@@ -1142,14 +1142,6 @@ write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
       return -1;
     }
 
-  /* No need to be thread save. */
-  static BOOL first_time = TRUE;
-  if (first_time)
-    {
-      set_process_privilege (SE_RESTORE_NAME);
-      first_time = FALSE;
-    }
-
   HANDLE fh;
   fh = CreateFile (file,
 		   WRITE_OWNER | WRITE_DAC,
@@ -1558,7 +1550,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     debug_printf ("GetSecurityDescriptorGroup %E");
 
   /* Get SID of owner. */
-  cygsid owner_sid (NO_SID);
+  cygsid owner_sid;
   /* Check for current user first */
   if (uid == myself->uid)
     owner_sid = cygheap->user.sid ();
@@ -1571,8 +1563,13 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     }
   owner_sid.debug_print ("alloc_sd: owner SID =");
 
+  /* Must have SE_RESTORE_NAME privilege to change owner */
+  if (cur_owner_sid && owner_sid != cur_owner_sid
+      && set_process_privilege (SE_RESTORE_NAME) < 0 )
+    return NULL;
+
   /* Get SID of new group. */
-  cygsid group_sid (NO_SID);
+  cygsid group_sid;
   /* Check for current user first */
   if (gid == myself->gid)
     group_sid = cygheap->user.groups.pgsid;
@@ -1587,7 +1584,6 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 
   /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;
-  PSECURITY_DESCRIPTOR psd = NULL;
   if (!InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION))
     {
       __seterrno ();
@@ -1684,59 +1680,48 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 
   /* Add owner and group permissions if SIDs are equal
      and construct deny attributes for group and owner. */
-  DWORD group_deny;
-  if (owner_sid == group_sid)
-    {
-      owner_allow |= group_allow;
-      group_allow = group_deny = 0L;
-    }
-  else
-    {
-      group_deny = ~group_allow & other_allow;
-      group_deny &= ~(STANDARD_RIGHTS_READ
-		      | FILE_READ_ATTRIBUTES | FILE_READ_EA);
-    }
+  BOOL isownergroup;
+  if ((isownergroup = (owner_sid == group_sid)))
+    owner_allow |= group_allow;
+
   DWORD owner_deny = ~owner_allow & (group_allow | other_allow);
   owner_deny &= ~(STANDARD_RIGHTS_READ
 		  | FILE_READ_ATTRIBUTES | FILE_READ_EA
 		  | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA);
 
-  /* Construct appropriate inherit attribute. */
-  DWORD inherit = (attribute & S_IFDIR) ? SUB_CONTAINERS_AND_OBJECTS_INHERIT
-					: NO_INHERITANCE;
+  DWORD group_deny = ~group_allow & other_allow;
+  group_deny &= ~(STANDARD_RIGHTS_READ
+		  | FILE_READ_ATTRIBUTES | FILE_READ_EA);
 
   /* Set deny ACE for owner. */
   if (owner_deny
       && !add_access_denied_ace (acl, ace_off++, owner_deny,
-				 owner_sid, acl_len, inherit))
+				 owner_sid, acl_len, NO_INHERITANCE))
     return NULL;
   /* Set deny ACE for group here to respect the canonical order,
      if this does not impact owner */
-  if (group_deny && !(owner_allow & group_deny))
-    {
-      if (!add_access_denied_ace (acl, ace_off++, group_deny,
-				 group_sid, acl_len, inherit))
-	return NULL;
-      group_deny = 0;
-    }
+  if (group_deny && !(group_deny & owner_allow) && !isownergroup
+      && !add_access_denied_ace (acl, ace_off++, group_deny,
+				 group_sid, acl_len, NO_INHERITANCE))
+    return NULL;
   /* Set allow ACE for owner. */
   if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
-			       owner_sid, acl_len, inherit))
+			       owner_sid, acl_len, NO_INHERITANCE))
     return NULL;
   /* Set deny ACE for group, if still needed. */
-  if (group_deny
+  if (group_deny & owner_allow && !isownergroup
       && !add_access_denied_ace (acl, ace_off++, group_deny,
-				 group_sid, acl_len, inherit))
+				 group_sid, acl_len, NO_INHERITANCE))
     return NULL;
   /* Set allow ACE for group. */
-  if (group_allow
+  if (!isownergroup
       && !add_access_allowed_ace (acl, ace_off++, group_allow,
-				  group_sid, acl_len, inherit))
+				  group_sid, acl_len, NO_INHERITANCE))
     return NULL;
 
   /* Set allow ACE for everyone. */
   if (!add_access_allowed_ace (acl, ace_off++, other_allow,
-			       well_known_world_sid, acl_len, inherit))
+			       well_known_world_sid, acl_len, NO_INHERITANCE))
     return NULL;
   /* Set null ACE for special bits. */
   if (null_allow
@@ -1746,7 +1731,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 
   /* Fill ACL with unrelated ACEs from current security descriptor. */
   PACL oacl;
-  BOOL acl_exists;
+  BOOL acl_exists = FALSE;
   ACCESS_ALLOWED_ACE *ace;
   if (GetSecurityDescriptorDacl (sd_ret, &acl_exists, &oacl, &dummy)
       && acl_exists && oacl)
@@ -1755,19 +1740,26 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 	{
 	  cygsid ace_sid ((PSID) &ace->SidStart);
 	  /* Check for related ACEs. */
+	  if (ace_sid == well_known_null_sid)
+	    continue;
 	  if ((ace_sid == cur_owner_sid)
 	      || (ace_sid == owner_sid)
 	      || (ace_sid == cur_group_sid)
 	      || (ace_sid == group_sid)
-	      || (ace_sid == well_known_world_sid)
-	      || (ace_sid == well_known_null_sid))
-	    continue;
+	      || (ace_sid == well_known_world_sid))
+	    {
+	      if (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
+		ace->Header.AceFlags |= INHERIT_ONLY;
+	      else
+		continue;
+	    }
 	  /*
 	   * Add unrelated ACCESS_DENIED_ACE to the beginning but
 	   * behind the owner_deny, ACCESS_ALLOWED_ACE to the end.
+	   * FIXME: this would break the order of the inherit_only ACEs
 	   */
 	  if (!AddAce (acl, ACL_REVISION,
-		       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE ?
+		       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE?
 		       (owner_deny ? 1 : 0) : MAXDWORD,
 		       (LPVOID) ace, ace->Header.AceSize))
 	    {
@@ -1776,6 +1768,46 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 	    }
 	  acl_len += ace->Header.AceSize;
 	}
+
+  /* Construct appropriate inherit attribute for new directories */
+  if (attribute & S_IFDIR && !acl_exists )
+    {
+      const DWORD inherit = SUB_CONTAINERS_AND_OBJECTS_INHERIT | INHERIT_ONLY;
+
+#if 0 /* FIXME: Not done currently as this breaks the canonical order */
+      /* Set deny ACE for owner. */
+      if (owner_deny
+	  && !add_access_denied_ace (acl, ace_off++, owner_deny,
+				     well_known_creator_owner_sid, acl_len, inherit))
+	return NULL;
+      /* Set deny ACE for group here to respect the canonical order,
+	 if this does not impact owner */
+      if (group_deny && !(group_deny & owner_allow)
+	  && !add_access_denied_ace (acl, ace_off++, group_deny,
+				     well_known_creator_group_sid, acl_len, inherit))
+	return NULL;
+#endif
+      /* Set allow ACE for owner. */
+      if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
+				   well_known_creator_owner_sid, acl_len, inherit))
+	return NULL;
+#if 0 /* FIXME: Not done currently as this breaks the canonical order and
+	 won't be preserved on chown and chmod */
+      /* Set deny ACE for group, conflicting with owner_allow. */
+      if (group_deny & owner_allow
+	  && !add_access_denied_ace (acl, ace_off++, group_deny,
+				     well_known_creator_group_sid, acl_len, inherit))
+	return NULL;
+#endif
+      /* Set allow ACE for group. */
+      if (!add_access_allowed_ace (acl, ace_off++, group_allow,
+				   well_known_creator_group_sid, acl_len, inherit))
+	return NULL;
+      /* Set allow ACE for everyone. */
+      if (!add_access_allowed_ace (acl, ace_off++, other_allow,
+				   well_known_world_sid, acl_len, inherit))
+	return NULL;
+    }
 
   /* Set AclSize to computed value. */
   acl->AclSize = acl_len;
@@ -1801,10 +1833,9 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
       __seterrno ();
       return NULL;
     }
-  psd = sd_ret;
   debug_printf ("Created SD-Size: %d", *sd_size_ret);
 
-  return psd;
+  return sd_ret;
 }
 
 void

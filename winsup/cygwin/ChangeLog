@@ -1,3 +1,21 @@
+2003-01-12  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* sec_acl.cc (search_ace): Use id == -1, instead of < 0, as wildcard.
+	(setacl): Start the search for a matching default at the next entry.
+	Invalidate the type of merged entries instead of clearing it.
+	Use well_known_creator for default owner and owning group and do
+	not try to merge non-default and default entries in these cases.
+	(getacl): Recognize well_known_creator for default owner and group.
+	(acl_worker): Improve errno settings and streamline the nontsec case.
+	* security.cc (write_sd): Remove the call to set_process_privilege.
+	(alloc_sd): If the owner changes, call set_process_privilege and return
+	immediately on failure. Change inheritance rules: on new directories add
+	inherit only allow ACEs for creator_owner, creator_group and everyone.
+	Preserve all inheritances through chmod and chown calls. Introduce
+	isownergroup to implement the uid == gid case, to keep the inheritance
+	code simple. Do not initialize owner_sid and group_sid and stop using
+	the variable psd.
+
 2003-01-10  Christopher Faylor  <cgf@redhat.com>
 
 	* net.cc: Use gethostname define from winsock2.h.
