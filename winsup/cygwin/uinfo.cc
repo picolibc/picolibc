@@ -234,6 +234,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	      debug_printf ("Set HOME (from HOMEDRIVE/HOMEPATH) to %s", home);
 	    }
 	}
+      return NULL;
     }
 
   if (homedrive == NULL || !homedrive[0])

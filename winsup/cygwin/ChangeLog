@@ -1,5 +1,10 @@
 2002-06-14  Christopher Faylor  <cgf@redhat.com>
 
+	* uinfo.cc (cygheap_user::ontherange): Don't set HOMEDRIVE or HOMEPATH
+	unless one or the other is specified.
+
+2002-06-14  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.h (cygheap_user::userprofile_env_buf): New static member.
 	* environ.cc (build_env): Add debugging statement.
 	(spenvs): Switch functions for USERDOMAIN and USERNAME.
