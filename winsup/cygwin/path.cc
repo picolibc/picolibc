@@ -849,7 +849,7 @@ get_raw_device_number (const char *unix_path, const char *w32_path, int &unit)
 {
   int devn;
   w32_path += 4;
-  if (wdeveqn ("tape", 8))
+  if (wdeveqn ("tape", 4))
     {
       unit = digits (w32_path + 4);
       // norewind tape devices have leading n in name
@@ -862,7 +862,7 @@ get_raw_device_number (const char *unix_path, const char *w32_path, int &unit)
       unit = cyg_tolower (w32_path[0]) - 'a';
       devn = FH_FLOPPY;
     }
-  else if (wdeveqn ("physicaldrive", 17))
+  else if (wdeveqn ("physicaldrive", 13))
     {
       unit = digits (w32_path + 13) + 128;
       devn = FH_FLOPPY;

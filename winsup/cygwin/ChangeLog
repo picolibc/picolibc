@@ -1,3 +1,8 @@
+Fri Oct  5 14:22:47 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (get_raw_device_number): Correct length arguments for
+	wdeveqn.
+
 Fri Oct  5 11:05:32 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (getcwd): Allow NULL first argument.
