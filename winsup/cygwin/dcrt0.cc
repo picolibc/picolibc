@@ -577,7 +577,6 @@ dll_crt0_0 ()
 
   char zeros[sizeof (child_proc_info->zero)] = {0};
   static NO_COPY STARTUPINFO si;
-  int mypid = 0;
 
   _my_tls.stackptr = NULL;
 
@@ -591,8 +590,12 @@ dll_crt0_0 ()
   DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
 		   &hMainThread, 0, false, DUPLICATE_SAME_ACCESS);
 
+  (void) SetErrorMode (SEM_FAILCRITICALERRORS);
+
   GetStartupInfo (&si);
   child_proc_info = (child_info *) si.lpReserved2;
+
+  int mypid = 0;
   if (si.cbReserved2 < EXEC_MAGIC_SIZE || !child_proc_info
       || memcmp (child_proc_info->zero, zeros,
 		 sizeof (child_proc_info->zero)) != 0)
@@ -641,6 +644,7 @@ dll_crt0_0 ()
   device::init ();
   winpids::init ();
   do_global_ctors (&__CTOR_LIST__, 1);
+  cygthread::init ();
 
   if (!child_proc_info)
     memory_init ();
@@ -696,6 +700,13 @@ dll_crt0_0 ()
     }
 
   _threadinfo::init ();
+
+  /* Initialize events */
+  events_init ();
+
+  /* Init global well known SID objects */
+  cygsid::init ();
+  cygheap->cwd.init ();
 }
 
 /* Take over from libc's crt0.o and start the application. Note the
@@ -710,10 +721,11 @@ dll_crt0_1 (char *)
   /* FIXME: Verify forked children get their exception handler set up ok. */
   exception_list cygwin_except_entry;
 
-  /* Initialize SIGSEGV handling, etc. */
-  init_exceptions (&cygwin_except_entry);
   check_sanity_and_sync (user_data);
   malloc_init ();
+
+  /* Initialize SIGSEGV handling, etc. */
+  init_exceptions (&cygwin_except_entry);
 
   /* Nasty static stuff needed by newlib -- point to a local copy of
      the reent stuff.
@@ -725,7 +737,6 @@ dll_crt0_1 (char *)
   user_data->threadinterface->Init ();
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
-  cygthread::init ();
 
   /* Initialize pthread mainthread when not forked and it is safe to call new,
      otherwise it is reinitalized in fixup_after_fork */
@@ -745,12 +756,6 @@ dll_crt0_1 (char *)
 
   cygheap->fdtab.vfork_child_fixup ();
 
-  (void) SetErrorMode (SEM_FAILCRITICALERRORS);
-
-  /* Initialize events. */
-  events_init ();
-
-  cygheap->cwd.init ();
   main_vfork = vfork_storage.create ();
 
   cygbench ("pre-forkee");
@@ -778,9 +783,6 @@ dll_crt0_1 (char *)
   fork_init ();
   }
 #endif
-
-  /* Init global well known SID objects */
-  cygsid::init ();
 
   /* Initialize our process table entry. */
   pinfo_init (envp, envc);

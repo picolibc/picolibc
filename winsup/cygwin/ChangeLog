@@ -1,3 +1,36 @@
+2004-01-12  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (DLL_IMPORTS): Link advapi32 to ensure proper DLL
+	initialization.
+	* autoload.cc (RegCloseKey): Arbitrarily choose this function as a
+	"seed" to pull the advapi32 link library in.  So, comment out the
+	autoloading.
+	* cygtls.cc (_threadinfo::init_thread): Just clear CYGTLS_PADSIZE.
+	(_threadinfo::remove): Add debugging.
+	(_threadinfo::find_tls): Ditto.
+	* cygtls.h (_threadinfo::padding): Make zero length (for now?).
+	* dcrt0.cc (dll_crt0_0): Move more initialization here from dll_crt0_1.
+	(dll_crt0_1): See above.
+	* dtable.h (dtable::lock): Remove commented out critical section
+	locking.
+	* dtable.h (dtable::init_lock): Remove commented out critical section
+	locking.
+	* dtable.h (dtable::unlock): Remove commented out critical section
+	locking.
+	* exceptions.cc (interruptible): bool'ize.
+	* init.cc (threadfunc_fe): Revert to storing threadfunc at stack
+	bottom.
+	(munge_threadfunc): Ditto.  Avoid adding overhead to
+	calibration_thread.
+	(prime_threads): Don't initialize tls stuff.
+	(dll_entry): Make minor change to initialization order.
+	* tlsoffsets.h: Regenerate.
+
+	* sigproc.cc (wait_sig): Add sanity check for end of process thread
+	exit.
+
+	* select.h: Make minor formatting change.
+
 2004-01-10  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Add still more -fomit-frame-pointer functions.

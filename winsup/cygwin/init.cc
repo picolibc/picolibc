@@ -22,15 +22,15 @@ DWORD tls_func;
 
 HANDLE sync_startup;
 
-#define OLDFUNC_OFFSET -3
+#define OLDFUNC_OFFSET -1
 
 static void WINAPI
 threadfunc_fe (VOID *arg)
 {
-  void *threadfunc = (void *) TlsGetValue (tls_func);
-  TlsFree (tls_func);
-  // _threadinfo::call ((DWORD (*)  (void *, void *)) (((char **) _tlsbase)[OLDFUNC_OFFSET]));
-  _threadinfo::call ((DWORD (*)  (void *, void *)) (threadfunc), arg);
+  _threadinfo::call ((DWORD (*)  (void *, void *)) (((char **) _tlsbase)[OLDFUNC_OFFSET]), arg);
+  // void *threadfunc = (void *) TlsGetValue (tls_func);
+  // TlsFree (tls_func);
+  // _threadinfo::call ((DWORD (*)  (void *, void *)) (threadfunc), arg);
 }
 
 static DWORD WINAPI
@@ -61,20 +61,20 @@ munge_threadfunc (HANDLE cygwin_hmodule)
 
 foundit:
   char *threadfunc = ebp[threadfunc_ix];
-  if (0 & (((DWORD) threadfunc & 0x80000000) == 0x80000000 || threadfunc == (char *) calibration_thread))
-    /*nothing*/;
+  if (threadfunc == (char *) calibration_thread)
+    /* no need for the overhead */;
   else
     {
       ebp[threadfunc_ix] = (char *) threadfunc_fe;
-      // ((char **) _tlsbase)[OLDFUNC_OFFSET] = threadfunc;
-      TlsSetValue (tls_func, (void *) threadfunc);
+      ((char **) _tlsbase)[OLDFUNC_OFFSET] = threadfunc;
+      // TlsSetValue (tls_func, (void *) threadfunc);
     }
 }
 
 void
 prime_threads ()
 {
-  tls_func = TlsAlloc ();
+  // tls_func = TlsAlloc ();
   if (!threadfunc_ix)
     {
       DWORD id;
@@ -93,8 +93,8 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_PROCESS_ATTACH:
       dynamically_loaded = (static_load == NULL);
       // __cygwin_user_data.impure_ptr = &_my_tls.local_clib;
-      prime_threads ();
       dll_crt0_0 ();
+      prime_threads ();
       // small_printf ("%u, %p, %p\n", cygwin_pid (GetCurrentProcessId ()), _tlstop, _tlsbase);
       break;
     case DLL_PROCESS_DETACH:

@@ -316,8 +316,6 @@ cygwin_stackdump ()
 
 #define TIME_TO_WAIT_FOR_DEBUGGER 10000
 
-int keep_looping = 1;
-
 extern "C" int
 try_to_debug (bool waitloop)
 {
@@ -617,7 +615,7 @@ sig_handle_tty_stop (int sig)
 }
 }
 
-int
+bool
 interruptible (DWORD pc)
 {
   int res;
@@ -635,11 +633,11 @@ interruptible (DWORD pc)
      GetThreadContext.  These resolve to a strange allocation base.
      These should *never* be treated as interruptible. */
   if (!h || m.State != MEM_COMMIT)
-    res = 0;
+    res = false;
   else if (h == user_data->hmodule)
-    res = 1;
+    res = true;
   else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
-    res = 0;
+    res = false;
   else
     res = !strncasematch (windows_system_directory, checkdir,
 			  windows_system_directory_length);

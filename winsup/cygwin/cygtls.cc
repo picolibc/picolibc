@@ -98,7 +98,7 @@ _threadinfo::init_thread (void *x, DWORD (*func) (void *, void *))
 {
   if (x)
     {
-      memset (this, 0, ((char *) padding - (char *) this));
+      memset (this, 0, CYGTLS_PADSIZE);
       stackptr = stack;
       if (_GLOBAL_REENT)
 	{
@@ -134,6 +134,7 @@ _threadinfo::init_thread (void *x, DWORD (*func) (void *, void *))
 void
 _threadinfo::remove (DWORD wait)
 {
+  debug_printf ("wait %p\n", wait);
   sentry here (wait);
   if (here.acquired ())
     {
@@ -174,6 +175,7 @@ static size_t NO_COPY threadlist_ix = BAD_IX;
 _threadinfo *
 _threadinfo::find_tls (int sig)
 {
+  debug_printf ("sig %d\n", sig);
   sentry here (INFINITE);
   __asm__ volatile (".equ _threadlist_exception_return,.");
   _threadinfo *res = NULL;

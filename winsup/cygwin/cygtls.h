@@ -110,7 +110,7 @@ struct _threadinfo
   __stack_t *stackptr;
   int sig;
   __stack_t stack[TLS_STACK_SIZE];
-  unsigned padding[256];
+  unsigned padding[0];
 
   /*gentls_offsets*/
   static CRITICAL_SECTION protect_linked_list;
@@ -142,5 +142,5 @@ extern _threadinfo *_main_tls;
 
 #define __getreent() (&_my_tls.local_clib)
 
-#define CYGTLS_PADSIZE (sizeof (_threadinfo))
+enum {CYGTLS_PADSIZE = (((char *) _main_tls->padding) - ((char *) _main_tls))};
 #endif /*_CYGTLS_H*/

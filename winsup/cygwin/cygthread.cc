@@ -40,7 +40,7 @@ cygthread::stub (VOID *arg)
 	  CloseHandle (info->ev);
 	  CloseHandle (info->thread_sync);
 	}
-    info->ev = info->thread_sync = info->stack_ptr = NULL;
+      info->ev = info->thread_sync = info->stack_ptr = NULL;
     }
   else
     {
@@ -51,6 +51,7 @@ cygthread::stub (VOID *arg)
 	  info->thread_sync = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 	}
     }
+
   while (1)
     {
       if (!info->__name)

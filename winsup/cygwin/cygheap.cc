@@ -216,6 +216,7 @@ cygheap_init ()
     cygheap->fdtab.init ();
   if (!cygheap->sigs)
     sigalloc ();
+
   if (!cygheap->shared_prefix)
     cygheap->shared_prefix = cstrdup (
 	    wincap.has_terminal_services ()

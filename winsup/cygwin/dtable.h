@@ -28,9 +28,9 @@ class dtable
   static const int initial_archetype_size = 8;
   int first_fd_for_open;
   int cnt_need_fixup_before;
-  void lock () {/*EnterCriticalSection (&lock_cs); */spf ("%u locked, tid %u\n", GetCurrentProcessId (), GetCurrentThreadId ());}
-  void unlock () {/*LeaveCriticalSection (&lock_cs);*/ spf ("%u ulocked, tid %u\n", GetCurrentProcessId (), GetCurrentThreadId ());}
-  void init_lock () {/*InitializeCriticalSection (&lock_cs); */spf ("%u initialized, tid %u\n", GetCurrentProcessId (), GetCurrentThreadId ());}
+  void lock () {EnterCriticalSection (&lock_cs); spf ("%u locked, tid %u\n", GetCurrentProcessId (), GetCurrentThreadId ());}
+  void unlock () {LeaveCriticalSection (&lock_cs); spf ("%u ulocked, tid %u\n", GetCurrentProcessId (), GetCurrentThreadId ());}
+  void init_lock () {InitializeCriticalSection (&lock_cs); spf ("%u initialized, tid %u\n", GetCurrentProcessId (), GetCurrentThreadId ());}
 public:
   size_t size;
 
