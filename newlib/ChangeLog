@@ -1,3 +1,8 @@
+2001-09-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/sys/cygwin/include/unistd.h: New file, wrapping sys/unistd.h
+	and getopt.h.
+
 2001-09-04  Jason Merrill  <jason_merrill@redhat.com>
 
 	* libc/sys/h8300hms/crt0.S: Support ELF initialization.
