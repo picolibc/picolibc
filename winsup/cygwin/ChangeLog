@@ -1,3 +1,8 @@
+Tue Sep  4 22:14:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* uname.cc (uname): Eliminate os specific retrieving of x86
+	processor type.
+
 2001-09-04  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
         * fhandler_console.cc (fhandler_console::char_command): Save the cursor

@@ -53,31 +53,15 @@ uname (struct utsname *name)
   switch (sysinfo.wProcessorArchitecture)
     {
       case PROCESSOR_ARCHITECTURE_INTEL:
-	/* But which of the x86 chips are we? */
-	/* Default to i386 if the specific chip cannot be determined */
-	switch (os_being_run)
-	  {
-	    case win95:
-	    case win98:
-	    case winME:
-	      /* dwProcessorType only valid in Windows 95 */
-	      if ((sysinfo.dwProcessorType == PROCESSOR_INTEL_386) ||
-		  (sysinfo.dwProcessorType == PROCESSOR_INTEL_486) ||
-		  (sysinfo.dwProcessorType == PROCESSOR_INTEL_PENTIUM))
-		__small_sprintf (name->machine, "i%d", sysinfo.dwProcessorType);
-	      else
-		strcpy (name->machine, "i386");
-	      break;
-	    case winNT:
-	      /* wProcessorLevel only valid in Windows NT */
-	      __small_sprintf (name->machine, "i%d86",
-			       sysinfo.dwProcessorType > 6 ?
-				6 : sysinfo.dwProcessorType);
-	      break;
-	    default:
-	      strcpy (name->machine, "i386");
-	      break;
-	  }
+	unsigned int ptype;
+	if (sysinfo.dwProcessorType < 3) /* Shouldn't happen. */
+	  ptype = 3;
+	else if (sysinfo.dwProcessorType > 9) /* P4 */
+	  ptype = 6;
+	else
+	  ptype = sysinfo.dwProcessorType;
+
+	__small_sprintf (name->machine, "i%d86", ptype);   
 	break;
       case PROCESSOR_ARCHITECTURE_ALPHA:
 	strcpy (name->machine, "alpha");
