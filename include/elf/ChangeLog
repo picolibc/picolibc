@@ -1,3 +1,7 @@
+2001-10-30  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* mmix.h: New file.
+
 2001-10-23  Alan Modra  <amodra@bigpond.net.au>
 
 	* internal.h: White space changes to keep lines under 80 chars.

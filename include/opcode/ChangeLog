@@ -1,3 +1,7 @@
+2001-10-30  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* mmix.h: New file.
+
 2001-10-18  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips.h (OPCODE_IS_MEMBER): Add a no-op term to the end
