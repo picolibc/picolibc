@@ -7762,6 +7762,7 @@ all-target-libgloss: maybe-configure-target-newlib
 configure-target-libiberty: $(ALL_GCC_C)
 configure-target-libtermcap: $(ALL_GCC_C)
 configure-target-newlib: $(ALL_GCC)
+configure-target-rda: $(ALL_GCC_C)
 configure-target-winsup: $(ALL_GCC_C)
 all-target-winsup: maybe-all-target-libiberty maybe-all-target-libtermcap
 
