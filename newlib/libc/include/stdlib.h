@@ -56,7 +56,7 @@ _PTR	_EXFUN(bsearch,(const _PTR __key,
 		       const _PTR __base,
 		       size_t __nmemb,
 		       size_t __size,
-		       int _EXFUN((*_compar),(const _PTR, const _PTR))));
+		       int _EXPARM(_compar,(const _PTR, const _PTR))));
 _PTR	_EXFUN(calloc,(size_t __nmemb, size_t __size));
 div_t	_EXFUN(div,(int __numer, int __denom));
 _VOID	_EXFUN(exit,(int __status) _ATTRIBUTE ((noreturn)));

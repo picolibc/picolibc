@@ -1,3 +1,15 @@
+Wed Sep  6 15:06:40 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.am: Fix space vs. tab problem in install-data-local.
+	* Makefile.in: Regenerate.
+
+Wed Sep  6 13:49:51 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/_ansi.h (_EXFUN): Define specially for __CYGWIN__.
+	(_EXPARM): New macro for defining a function parameter.
+	* libc/include/stdlib.h: Use _EXPARM.
+	* libc/stdlib/mallocr.c: Don't build cfree for Cygwin.
+
 2000-09-05  Manfred Hollstein  <manfredh@redhat.com>
 
         * Makefile.am (install-data-local): Use optional $(DESTDIR) where

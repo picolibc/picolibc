@@ -31,7 +31,13 @@
 #define	_SIGNED		signed
 #define	_DOTS		, ...
 #define _VOID void
+#ifdef __CYGWIN__
+#define	_EXFUN(name, proto)		__cdecl name proto
+#define	_EXPARM(name, proto)		(* __cdecl name) proto
+#else
 #define	_EXFUN(name, proto)		name proto
+#define _EXPARM(name, proto)		(* name) proto
+#endif
 #define	_DEFUN(name, arglist, args)	name(args)
 #define	_DEFUN_VOID(name)		name(_NOARGS)
 #define _CAST_VOID (void)
