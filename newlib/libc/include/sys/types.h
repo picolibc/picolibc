@@ -125,7 +125,9 @@ typedef int32_t register_t;
 /* device numbers are 32-bit major and and 32-bit minor */
 typedef unsigned long long dev_t;
 #else
+#ifndef __CYGWIN__
 typedef	short	dev_t;
+#endif
 #endif
 
 #ifndef __CYGWIN__	/* which defines these types in it's own types.h. */
