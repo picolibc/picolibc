@@ -1,3 +1,18 @@
+2003-09-09  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* shared_info.h: Include security.h.
+	(open_shared): Add psa argument.
+	(user_shared_initialize): New declaration.
+	* security.h: Add _SECURITY_H guard.
+	(sec_user): Use sec_none in the no ntsec case.
+	* spawn.cc (spawn_guts): Remove call to load_registry_hive.
+	* syscalls (seteuid32): If warranted, call load_registry_hive,  
+	user_shared_initialize and RegCloseKey(HKEY_CURRENT_USER).
+	* shared.cc (user_shared_initialize): New.
+	(open_shared): Add and use psa argument.
+	(memory_init): Move mount table initialization to 
+	user_shared_initialize. Call it.
+
 2003-09-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap64): Change address types from caddr_t to void *
