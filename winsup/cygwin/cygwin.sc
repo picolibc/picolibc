@@ -106,6 +106,6 @@ SECTIONS
   .cygheap BLOCK(64 * 1024) :
   {
     __cygheap_start = ABSOLUTE(.) ;
-    __system_dlls__ = ABSOLUTE(.) + 4;
+    __system_dlls__ = ABSOLUTE(.) + 64;
   } 
 }
