@@ -408,13 +408,9 @@ fhandler_disk_file::fchmod (mode_t mode)
       enable_restore_privilege ();
       if (!get_io_handle () && pc.has_acls ())
 	{
-	  /* Open for writing required to be able to set ctime. */
-	  if (!(oret = open (O_WRONLY | O_BINARY, 0)))
-	    {
-	      query_open (query_write_control);
-	      if (!(oret = open (O_BINARY, 0)))
-		return -1;
-	    }
+	  query_open (query_write_control);
+	  if (!(oret = open (O_BINARY, 0)))
+	    return -1;
 	}
 
       if (!allow_ntsec && allow_ntea) /* Not necessary when manipulating SD. */
@@ -440,7 +436,7 @@ fhandler_disk_file::fchmod (mode_t mode)
     res = 0;
 
   /* Set ctime on success. */
-  if (!res && !query_open ())
+  if (!res)
     has_changed (true);
 
   if (oret)
@@ -464,13 +460,9 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
   enable_restore_privilege ();
   if (!get_io_handle ())
     {
-      /* Open for writing required to be able to set ctime. */
-      if (!(oret = open (O_WRONLY | O_BINARY, 0)))
-        {
-	  query_open (query_write_control);
-	  if (!(oret = open (O_BINARY, 0)))
-	    return -1;
-      	}
+      query_open (query_write_control);
+      if (!(oret = open (O_BINARY, 0)))
+	return -1;
     }
 
   mode_t attrib = 0;
@@ -482,7 +474,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
       res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
 				uid, gid, attrib);
       /* Set ctime on success. */
-      if (!res && !query_open ())
+      if (!res)
 	has_changed (true);
     }
 
@@ -556,16 +548,9 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	enable_restore_privilege ();
       if (!get_io_handle ())
 	{
-	  /* Open for writing required to be able to set ctime. */
-	  if (cmd == SETACL)
-	    oret = open (O_WRONLY | O_BINARY, 0);
-	  if (!oret)
-	    {
-	      query_open (cmd == SETACL ? query_write_control
-	      				: query_read_control);
-	      if (!(oret = open (O_BINARY, 0)))
-		return -1;
-	    }
+	  query_open (cmd == SETACL ? query_write_control : query_read_control);
+	  if (!(oret = open (O_BINARY, 0)))
+	    return -1;
 	}
       switch (cmd)
 	{
@@ -588,7 +573,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
     }
 
   /* Set ctime on success. */
-  if (!res && cmd == SETACL && !query_open ())
+  if (!res && cmd == SETACL)
     has_changed (true);
 
   if (oret)
@@ -644,6 +629,173 @@ fhandler_disk_file::ftruncate (_off64_t length)
     }
   return res;
 }
+
+int
+fhandler_disk_file::link (const char *newpath)
+{
+  int res = -1;
+  path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_FULL | PC_POSIX);
+  extern bool allow_winsymlinks;
+
+  if (newpc.error)
+    {
+      set_errno (newpc.case_clash ? ECASECLASH : newpc.error);
+      goto done;
+    }
+
+  if (newpc.exists ())
+    {
+      syscall_printf ("file '%s' exists?", (char *) newpc);
+      set_errno (EEXIST);
+      goto done;
+    }
+
+  if (newpc[strlen (newpc) - 1] == '.')
+    {
+      syscall_printf ("trailing dot, bailing out");
+      set_errno (EINVAL);
+      goto done;
+    }
+
+  /* Shortcut hack. */
+  char new_lnk_buf[CYG_MAX_PATH + 5];
+  if (allow_winsymlinks && pc.is_lnk_symlink () && !newpc.case_clash)
+    {
+      strcpy (new_lnk_buf, newpath);
+      strcat (new_lnk_buf, ".lnk");
+      newpath = new_lnk_buf;
+      newpc.check (newpath, PC_SYM_NOFOLLOW | PC_FULL);
+    }
+
+  query_open (query_write_control);
+  if (!open (O_BINARY, 0))
+    {
+      syscall_printf ("Opening file failed");
+      __seterrno ();
+      goto done;
+    }
+
+  /* Try to make hard link first on Windows NT */
+  if (wincap.has_hard_links ())
+    {
+      if (CreateHardLinkA (newpc, pc, NULL))
+	goto success;
+
+      /* There are two cases to consider:
+	 - The FS doesn't support hard links ==> ERROR_INVALID_FUNCTION
+	   We copy the file.
+	 - CreateHardLinkA is not supported  ==> ERROR_PROC_NOT_FOUND
+	   In that case (<= NT4) we try the old-style method.
+	 Any other error should be taken seriously. */
+      if (GetLastError () == ERROR_INVALID_FUNCTION)
+	{
+	  syscall_printf ("FS doesn't support hard links: Copy file");
+	  goto docopy;
+	}
+      if (GetLastError () != ERROR_PROC_NOT_FOUND)
+	{
+	  syscall_printf ("CreateHardLinkA failed");
+	  __seterrno ();
+	  close ();
+	  goto done;
+	}
+
+      WIN32_STREAM_ID stream_id;
+      DWORD written;
+      LPVOID context;
+      DWORD path_len;
+      DWORD size;
+      WCHAR wbuf[CYG_MAX_PATH];
+      BOOL ret;
+      DWORD write_err;
+
+      path_len = sys_mbstowcs (wbuf, newpc, CYG_MAX_PATH) * sizeof (WCHAR);
+
+      stream_id.dwStreamId = BACKUP_LINK;
+      stream_id.dwStreamAttributes = 0;
+      stream_id.dwStreamNameSize = 0;
+      stream_id.Size.HighPart = 0;
+      stream_id.Size.LowPart = path_len;
+      size = sizeof (WIN32_STREAM_ID) - sizeof (WCHAR**)
+	     + stream_id.dwStreamNameSize;
+      context = NULL;
+      write_err = 0;
+      /* Write WIN32_STREAM_ID */
+      ret = BackupWrite (get_handle (), (LPBYTE) &stream_id, size,	
+			 &written, FALSE, FALSE, &context);
+      if (ret)
+	{
+	  /* write the buffer containing the path */
+	  /* FIXME: BackupWrite sometimes traps if linkname is invalid.
+	     Need to handle. */
+	  ret = BackupWrite (get_handle (), (LPBYTE) wbuf, path_len,
+			     &written, FALSE, FALSE, &context);
+	  if (!ret)
+	    {
+	      write_err = GetLastError ();
+	      syscall_printf ("cannot write linkname, %E");
+	    }
+	  /* Free context */
+	  BackupWrite (get_handle (), NULL, 0, &written,
+		       TRUE, FALSE, &context);
+	}
+      else
+	{
+	  write_err = GetLastError ();
+	  syscall_printf ("cannot write stream_id, %E");
+	}
+
+      if (!ret)
+	{
+	  /* Only copy file if FS doesn't support hard links */
+	  if (write_err == ERROR_INVALID_FUNCTION)
+	    {
+	      syscall_printf ("FS doesn't support hard links: Copy file");
+	      goto docopy;
+	    }
+
+	  close ();
+	  __seterrno_from_win_error (write_err);
+	  goto done;
+	}
+
+    success:
+      res = 0;
+      /* touch st_ctime */
+      has_changed (true);
+      close ();
+      if (!allow_winsymlinks && pc.is_lnk_symlink ())
+	SetFileAttributes (newpc, (DWORD) pc
+				   | FILE_ATTRIBUTE_SYSTEM
+				   | FILE_ATTRIBUTE_READONLY);
+
+      goto done;
+    }
+docopy:
+  /* do this with a copy */
+  if (CopyFileA (pc, newpc, 1))
+    {
+      res = 0;
+      /* touch st_ctime */
+      has_changed (true);
+      close ();
+      fhandler_disk_file fh;
+      fh.set_name (newpc);
+      fh.query_open (query_write_control);
+      if (fh.open (O_BINARY, 0))
+	{
+	  fh.has_changed (true);
+	  fh.close ();
+	}
+    }
+  else
+    __seterrno ();
+
+done:
+  syscall_printf ("%d = link (%s, %s)", res, get_name (), newpath);
+  return res;
+}
+
 
 fhandler_disk_file::fhandler_disk_file () :
   fhandler_base ()

@@ -580,7 +580,7 @@ fhandler_base::open (int flags, mode_t mode)
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
       case query_write_control:
-	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC;
+	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
 	break;
       default:
@@ -1601,6 +1601,13 @@ fhandler_base::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 
 int
 fhandler_base::ftruncate (_off64_t length)
+{
+  set_errno (EINVAL);
+  return -1;
+}
+
+int
+fhandler_base::link (const char *newpath)
 {
   set_errno (EINVAL);
   return -1;

@@ -264,6 +264,7 @@ class fhandler_base
   virtual int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   virtual int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   virtual int __stdcall ftruncate (_off64_t) __attribute__ ((regparm (2)));
+  virtual int __stdcall link (const char *) __attribute__ ((regparm (2)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const *ttyname () { return get_name (); }
@@ -436,6 +437,7 @@ class fhandler_socket: public fhandler_base
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
+  int __stdcall link (const char *) __attribute__ ((regparm (2)));
   bool is_slow () {return 1;}
 };
 
@@ -608,6 +610,7 @@ class fhandler_disk_file: public fhandler_base
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   int __stdcall ftruncate (_off64_t) __attribute__ ((regparm (2)));
+  int __stdcall link (const char *) __attribute__ ((regparm (2)));
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);

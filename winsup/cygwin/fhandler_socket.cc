@@ -449,6 +449,18 @@ fhandler_socket::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 }
 
 int
+fhandler_socket::link (const char *newpath)
+{
+  if (get_device () == FH_UNIX)
+    {
+      fhandler_disk_file fh;
+      fh.set_name (pc);
+      return fh.link (newpath);
+    }
+  return fhandler_base::link (newpath);
+}
+
+int
 fhandler_socket::bind (const struct sockaddr *name, int namelen)
 {
   int res = -1;

@@ -1,5 +1,24 @@
 2005-02-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_base): Declare new method link.
+	(class fhandler_socket): Ditto.
+	(class fhandler_disk_file): Ditto.
+	* fhandler.cc (fhandler_base::open): Add FILE_WRITE_ATTRIBUTES
+	to query_write_control access flags.
+	(fhandler_base::link): New method.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Don't try to
+	open with O_WRONLY since query_write_control includes
+	FILE_WRITE_ATTRIBUTES.
+	(fhandler_disk_file::fchown): Ditto.
+	(fhandler_disk_file::facl): Ditto.
+	(fhandler_disk_file::link): New method.  Touch st_ctime on successful
+	link.
+	* fhandler_socket.cc (fhandler_socket::link): New method.
+	* syscalls.cc (link): Move functionality into fhandler method link.
+	Just call this method from here.
+
+2005-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_socket): Declare new methods fchown,
 	fchmod and facl.
 	* fhandler_socket.cc (fhandler_socket::fstat): Handle AF_LOCAL

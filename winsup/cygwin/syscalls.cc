@@ -668,188 +668,25 @@ isatty (int fd)
 */
 
 extern "C" int
-link (const char *a, const char *b)
+link (const char *oldpath, const char *newpath)
 {
   int res = -1;
-  path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
-  path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
-  extern bool allow_winsymlinks;
+  fhandler_base *fh;
 
-  if (real_a.error)
+  if (!(fh = build_fh_name (oldpath, NULL, PC_SYM_NOFOLLOW)))
+    goto error;
+
+  if (fh->error ())
     {
-      set_errno (real_a.error);
-      goto done;
+      debug_printf ("got %d error from build_fh_name", fh->error ());
+      set_errno (fh->error ());
     }
-
-  if (real_b.error)
-    {
-      set_errno (real_b.case_clash ? ECASECLASH : real_b.error);
-      goto done;
-    }
-
-  if (real_b.exists ())
-    {
-      syscall_printf ("file '%s' exists?", (char *) real_b);
-      set_errno (EEXIST);
-      goto done;
-    }
-
-  if (real_b[strlen (real_b) - 1] == '.')
-    {
-      syscall_printf ("trailing dot, bailing out");
-      set_errno (EINVAL);
-      goto done;
-    }
-
-  /* Shortcut hack. */
-  char new_lnk_buf[CYG_MAX_PATH + 5];
-  if (allow_winsymlinks && real_a.is_lnk_symlink () && !real_b.case_clash)
-    {
-      strcpy (new_lnk_buf, b);
-      strcat (new_lnk_buf, ".lnk");
-      b = new_lnk_buf;
-      real_b.check (b, PC_SYM_NOFOLLOW | PC_FULL);
-    }
-  /* Try to make hard link first on Windows NT */
-  if (wincap.has_hard_links ())
-    {
-      if (CreateHardLinkA (real_b, real_a, NULL))
-	goto success;
-
-      /* There are two cases to consider:
-	 - The FS doesn't support hard links ==> ERROR_INVALID_FUNCTION
-	   We copy the file.
-	 - CreateHardLinkA is not supported  ==> ERROR_PROC_NOT_FOUND
-	   In that case (<= NT4) we try the old-style method.
-	 Any other error should be taken seriously. */
-      if (GetLastError () == ERROR_INVALID_FUNCTION)
-	{
-	  syscall_printf ("FS doesn't support hard links: Copy file");
-	  goto docopy;
-	}
-      if (GetLastError () != ERROR_PROC_NOT_FOUND)
-	{
-	  syscall_printf ("CreateHardLinkA failed");
-	  __seterrno ();
-	  goto done;
-	}
-
-      HANDLE hFileSource;
-
-      WIN32_STREAM_ID StreamId;
-      DWORD dwBytesWritten;
-      LPVOID lpContext;
-      DWORD cbPathLen;
-      DWORD StreamSize;
-      WCHAR wbuf[CYG_MAX_PATH];
-
-      BOOL bSuccess;
-      DWORD write_err;
-
-      hFileSource = CreateFile (real_a, FILE_WRITE_ATTRIBUTES,
-				FILE_SHARE_READ | FILE_SHARE_WRITE /*| FILE_SHARE_DELETE*/,
-				&sec_none_nih, // sa
-				OPEN_EXISTING, 0, NULL);
-
-      if (hFileSource == INVALID_HANDLE_VALUE)
-	{
-	  syscall_printf ("cannot open source, %E");
-	  goto docopy;
-	}
-
-      cbPathLen = sys_mbstowcs (wbuf, real_b, CYG_MAX_PATH) * sizeof (WCHAR);
-
-      StreamId.dwStreamId = BACKUP_LINK;
-      StreamId.dwStreamAttributes = 0;
-      StreamId.dwStreamNameSize = 0;
-      StreamId.Size.HighPart = 0;
-      StreamId.Size.LowPart = cbPathLen;
-
-      StreamSize = sizeof (WIN32_STREAM_ID) - sizeof (WCHAR**) +
-		   StreamId.dwStreamNameSize;
-
-      lpContext = NULL;
-      write_err = 0;
-      /* Write the WIN32_STREAM_ID */
-      bSuccess = BackupWrite (
-	hFileSource,
-	 (LPBYTE) &StreamId,	// buffer to write
-	StreamSize,		// number of bytes to write
-	&dwBytesWritten,
-	FALSE,			// don't abort yet
-	FALSE,			// don't process security
-	&lpContext);
-
-      if (bSuccess)
-	{
-	  /* write the buffer containing the path */
-	  /* FIXME: BackupWrite sometimes traps if linkname is invalid.
-	     Need to handle. */
-	  bSuccess = BackupWrite (
-		hFileSource,
-		 (LPBYTE) wbuf,	// buffer to write
-		cbPathLen,	// number of bytes to write
-		&dwBytesWritten,
-		FALSE,		// don't abort yet
-		FALSE,		// don't process security
-		&lpContext
-		);
-
-	  if (!bSuccess)
-	    {
-	      write_err = GetLastError ();
-	      syscall_printf ("cannot write linkname, %E");
-	    }
-
-	  /* Free context */
-	  BackupWrite (
-	    hFileSource,
-	    NULL,		// buffer to write
-	    0,			// number of bytes to write
-	    &dwBytesWritten,
-	    TRUE,		// abort
-	    FALSE,		// don't process security
-	    &lpContext);
-	}
-      else
-	{
-	  write_err = GetLastError ();
-	  syscall_printf ("cannot write streamId, %E");
-	}
-
-      CloseHandle (hFileSource);
-
-      if (!bSuccess)
-	{
-	  /* Only copy file if FS doesn't support hard links */
-	  if (write_err == ERROR_INVALID_FUNCTION)
-	    {
-	      syscall_printf ("FS doesn't support hard links: Copy file");
-	      goto docopy;
-	    }
-
-	  __seterrno_from_win_error (write_err);
-	  goto done;
-	}
-
-    success:
-      res = 0;
-      if (!allow_winsymlinks && real_a.is_lnk_symlink ())
-	SetFileAttributes (real_b, (DWORD) real_a
-				   | FILE_ATTRIBUTE_SYSTEM
-				   | FILE_ATTRIBUTE_READONLY);
-
-      goto done;
-    }
-docopy:
-  /* do this with a copy */
-  if (CopyFileA (real_a, real_b, 1))
-    res = 0;
   else
-    __seterrno ();
+    res = fh->link (newpath);
 
-done:
-  syscall_printf ("%d = link (%s, %s)", res, a, b);
+  delete fh;
+ error:
+  syscall_printf ("%d = link (%s, %s)", res, oldpath, newpath);
   return res;
 }
 
