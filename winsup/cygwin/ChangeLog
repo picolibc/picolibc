@@ -1,3 +1,24 @@
+2003-02-10  Ralf Habacker <ralf.habacker@freenet.de>
+
+	* include/cygwin/in.h (in_attr_t): Define new type.
+	* include/arpa/inet.h (inet_addr): Change return type to in_addr_t.
+	(inet_lnaof): Ditto.
+	(inet_netof): Ditto.
+	(inet_network): Ditto.
+
+2003-02-10  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/types.h: Move many *_t typedefs here.  Protect them
+	with ifdefs.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat): Change ntsec_atts to mode_t.
+	* security.cc (get_attribute_from_acl): Accept mode_t attribute.
+	(get_nt_attribute): Ditto.
+	(get_file_attribute): Ditto.
+	(get_nt_object_attribute): Ditto.
+	(get_object_attribute): Ditto.
+	* security.h: Reflect above changes.
+	* syscalls.cc (chown_worker): Change attrib to mode_t.
+
 2003-02-08  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 21.

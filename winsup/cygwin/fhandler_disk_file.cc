@@ -174,7 +174,7 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
     oret = 0;
   else if (!(oret = open (pc, open_flags, 0)))
     {
-      int ntsec_atts = 0;
+      mode_t ntsec_atts = 0;
       /* If we couldn't open the file, try a "query open" with no permissions.
 	 This will allow us to determine *some* things about the file, at least. */
       set_query_open (true);

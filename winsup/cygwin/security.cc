@@ -1224,7 +1224,7 @@ write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 }
 
 static void
-get_attribute_from_acl (int * attribute, PACL acl, PSID owner_sid,
+get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 			PSID group_sid, BOOL grp_member)
 {
   ACCESS_ALLOWED_ACE *ace;
@@ -1319,7 +1319,7 @@ get_attribute_from_acl (int * attribute, PACL acl, PSID owner_sid,
 }
 
 static int
-get_nt_attribute (const char *file, int *attribute,
+get_nt_attribute (const char *file, mode_t *attribute,
 		  __uid32_t *uidret, __gid32_t *gidret)
 {
   if (!wincap.has_security ())
@@ -1387,7 +1387,7 @@ get_nt_attribute (const char *file, int *attribute,
 
 int
 get_file_attribute (int use_ntsec, const char *file,
-		    int *attribute, __uid32_t *uidret, __gid32_t *gidret)
+		    mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
   int res;
 
@@ -1435,7 +1435,7 @@ get_file_attribute (int use_ntsec, const char *file,
 
 static int
 get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
-			 int *attribute, __uid32_t *uidret, __gid32_t *gidret)
+			 mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
   if (!wincap.has_security ())
     return 0;
@@ -1492,7 +1492,7 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 
 int
 get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
-		      int *attribute, __uid32_t *uidret, __gid32_t *gidret)
+		      mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
   if (allow_ntsec)
     {
