@@ -45,19 +45,6 @@ Note that bash interprets the backslash '\' as an escape character, so
 you must type it twice in the bash shell if you want it to be recognised
 as such.
 
-@subsection How do I set /etc up?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-If you want a valid /etc set up (so "ls -l" will display correct
-user information for example) and if you are running NT (preferably
-with an NTFS file system), you should just need to create the /etc
-directory on the filesystem mounted as / and then use mkpasswd and
-mkgroup to create /etc/passwd and /etc/group respectively.  Since
-Windows 95/98's Win32 API is less complete, you're out of luck if
-you're running Windows 95/98.
-
 @subsection Why doesn't bash read my .bashrc file on startup?
 
 Your .bashrc is read from your home directory specified by the HOME
