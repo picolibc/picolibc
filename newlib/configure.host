@@ -502,6 +502,9 @@ case "${host}" in
 	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
 	fi
 	;;
+  arc*)
+	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED"
+	;;
   avr*)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
 	;;
