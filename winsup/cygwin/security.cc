@@ -41,11 +41,11 @@ details. */
 #include "lm.h"
 
 extern BOOL allow_ntea;
-BOOL allow_ntsec;
+BOOL allow_ntsec = true;
 /* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
    It's defined here because of it's strong relationship to allow_ntsec.
    The default is TRUE to reflect the old behaviour. */
-BOOL allow_smbntsec = TRUE;
+BOOL allow_smbntsec;
 
 extern "C" void
 cygwin_set_impersonation_token (const HANDLE hToken)
