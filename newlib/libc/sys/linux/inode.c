@@ -21,6 +21,7 @@ __LOCK_INIT(static, umask_lock);
 _syscall2(int,link,const char *,oldpath,const char *,newpath)
 _syscall1(int,unlink,const char *,pathname)
 _syscall1(int,chdir,const char *,path)
+_syscall1(int,fchdir,int,fd)
 _syscall3(int,mknod,const char *,pathname,mode_t,mode,dev_t,dev)
 _syscall2(int,chmod,const char *,path,mode_t,mode)
 _syscall2(int,fchmod,int,filedes,mode_t,mode)

@@ -30,6 +30,8 @@ LIB_SOURCES = \
 	fstatvfs.c \
 	fstatvfs64.c \
 	ftok.c \
+	ftw.c \
+	ftw64.c \
 	funlockfile.c \
 	getdate.c \
 	getdate_err.c \
@@ -37,6 +39,7 @@ LIB_SOURCES = \
 	getoptlong.c \
 	getreent.c \
 	getrlimit64.c \
+	getwd.c \
 	ids.c \
 	inode.c \
 	io.c \
@@ -81,6 +84,7 @@ LIB_SOURCES = \
 	realpath.c \
 	rename.c \
 	resource.c \
+	scandir64.c \
 	sched.c \
 	select.c \
 	seteuid.c \
@@ -101,6 +105,7 @@ LIB_SOURCES = \
 	statvfs.c \
 	statvfs64.c \
 	strsignal.c \
+	strverscmp.c \
 	sysconf.c \
 	sysctl.c \
 	systat.c \
@@ -113,6 +118,8 @@ LIB_SOURCES = \
 	usleep.c \
 	utimes.c \
 	vallocr.c \
+	versionsort.c \
+	versionsort64.c \
 	wait.c
 
 # This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)

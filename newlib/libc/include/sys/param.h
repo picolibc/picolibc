@@ -18,6 +18,9 @@
 # define NOFILE	(60)
 # define PATHSIZE (1024)
 
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+
 #ifndef BYTE_ORDER
 #ifdef __IEEE_LITTLE_ENDIAN
 #define BYTE_ORDER LITTLE_ENDIAN

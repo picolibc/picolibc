@@ -1,5 +1,20 @@
 2002-07-26  Jeff Johnston  <jjohnstn@redhat.com>
 
+	*  libc/include/sys/param.h (MAX, MIN): Added macros.
+	*  libc/sys/linux/Makefile.am: Add new files.
+	*  libc/sys/linux/Makefile.in: Regenerated.
+	*  libc/sys/linux/sys/stat.h: Add *stat64 prototypes.
+	*  libc/sys/linux/inode.c (fchdir): Added syscall.
+	*  libc/sys/linux/ftw.c: New file.
+	*  libc/sys/linux/ftw64.c: Ditto.
+	*  libc/sys/linux/getwd.c: Ditto.
+	*  libc/sys/linux/scandir64.c: Ditto.
+	*  libc/sys/linux/strverscmp.c: Ditto.
+	*  libc/sys/linux/versionsort.c: Ditto.
+	*  libc/sys/linux/versionsort64.c: Ditto.
+
+2002-07-26  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/string/strings.tex: Fix typo for memccpy.
 
 2002-07-25  Jeff Johnston  <jjohnstn@redhat.com>
