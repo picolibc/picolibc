@@ -128,6 +128,11 @@ private:
 };
 
 /* static */ NO_COPY client_shmmgr *client_shmmgr::_instance;
+
+/* The following two variables must be inherited by child processes
+ * since they are used by fixup_shms_after_fork () to re-attach to the
+ * parent's shm segments.
+ */
 /* static */ client_shmmgr::segment_t *client_shmmgr::_segments_head;
 /* static */ long client_shmmgr::_shmat_cnt;
 

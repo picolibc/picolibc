@@ -1,5 +1,36 @@
 2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* dcrt0.cc: Only check for cygserver if and when required.
+	(dll_crt0_1): Remove call to `cygserver_init ()'.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Change the cygserver
+	logic to allow for the fact that `cygserver_init ()' may not yet
+	have been called.
+	(fhandler_tty_slave::cygserver_attach_tty): Tweak the cygserver
+	request logic to conform to the practice elsewhere in the code.
+	* tty.cc (tty::common_init): Add an explicit call to
+	`cygserver_init ()' if it hasn't already been called.
+	* include/cygwin/cygserver.h (CYGSERVER_UNAVAIL): Rename from
+	`CYGSERVER_DEAD'.
+	(client_request_get_version::check_version): Make available in
+	cygserver as well the DLL.
+	(check_cygserver_available): Ditto.  Remove `check_version_too'
+	argument.
+	(cygserver_init): Ditto.  And likewise.
+	* cygserver_client.cc (client_request_get_version::check_version):
+	Make available in cygserver as well the DLL.
+	(client_request::make_request): This may now be called without
+	`cygserver_init ()' having been called first.  Detect this and
+	call it as required.  Add tracing.
+	(check_cygserver_available): Make available in cygserver as well
+	the DLL.  Remove `check_version_too' argument and always check the
+	version information.  And since this is called from within
+	`cygserver_init ()', force `cygserver_running' before calling
+	`client_request::make_request ()'.
+	(cygserver_init): Make available in cygserver as well the DLL.
+	Remove `check_version_too' argument.
+
+2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_shm.cc: Implement the ipcs(8) interfaces, IPC_INFO,
 	SHM_STAT and SHM_INFO.
 	(server_shmmgr::segment_t::sequence): New static field.

@@ -28,12 +28,12 @@ details. */
 #include "cygwin/cygserver.h"
 #include "cygwin/cygserver_transport.h"
 
-int cygserver_running = CYGSERVER_UNKNOWN;
+int cygserver_running = CYGSERVER_UNKNOWN; // Nb: inherited by children.
 
 /* On by default during development. For release, we probably want off
  * by default.
  */
-bool allow_daemon = true;
+bool allow_daemon = true;	// Nb: inherited by children.
 
 client_request_get_version::client_request_get_version ()
   : client_request (CYGSERVER_REQUEST_GET_VERSION, &version, sizeof (version))
@@ -42,8 +42,6 @@ client_request_get_version::client_request_get_version ()
 
   syscall_printf ("created");
 }
-
-#ifdef __INSIDE_CYGWIN__
 
 /*
  * client_request_get_version::check_version()
@@ -75,6 +73,8 @@ client_request_get_version::check_version () const
 
   return ok;
 }
+
+#ifdef __INSIDE_CYGWIN__
 
 client_request_attach_tty::client_request_attach_tty (DWORD nmaster_pid,
 						      HANDLE nfrom_master,
@@ -327,18 +327,20 @@ client_request::~client_request ()
 int
 client_request::make_request ()
 {
-  assert (   cygserver_running == CYGSERVER_OK \
-	  || cygserver_running == CYGSERVER_DEAD);
+  assert (cygserver_running == CYGSERVER_UNKNOWN	\
+	  || cygserver_running == CYGSERVER_OK		\
+	  || cygserver_running == CYGSERVER_UNAVAIL);
 
-  if (!allow_daemon)
-    {
-      error_code (ENOSYS);
-      return -1;
-    }
+  if (cygserver_running == CYGSERVER_UNKNOWN)
+    cygserver_init ();
+
+  assert (cygserver_running == CYGSERVER_OK		\
+	  || cygserver_running == CYGSERVER_UNAVAIL);
 
   /* Don't retry every request if the server's not there */
-  if (cygserver_running != CYGSERVER_OK)
+  if (cygserver_running == CYGSERVER_UNAVAIL)
     {
+      syscall_printf ("cygserver un-available");
       error_code (ENOSYS);
       return -1;
     }
@@ -347,11 +349,6 @@ client_request::make_request ()
 
   assert (transport);
 
-  /* FIXME: have at most one connection per thread. use TLS to store the details */
-  /* logic is:
-   * if not tlskey->conn, new conn,
-   * then; transport=conn;
-   */
   if (!transport->connect ())
     {
       if (errno)
@@ -486,24 +483,27 @@ client_request::handle (transport_layer_base *const conn,
 
 #endif /* !__INSIDE_CYGWIN__ */
 
-#ifdef __INSIDE_CYGWIN__
-
 bool
-check_cygserver_available (const bool check_version_too)
+check_cygserver_available ()
 {
+  assert (cygserver_running == CYGSERVER_UNKNOWN	\
+	  || cygserver_running == CYGSERVER_UNAVAIL);
+
+  cygserver_running = CYGSERVER_OK; // For make_request ().
+
   client_request_get_version req;
 
-  // This indicates that we failed to connect to cygserver at all but
-  // that's fine as cygwin doesn't need it to be running.
+  /* This indicates that we failed to connect to cygserver at all but
+   * that's fine as cygwin doesn't need it to be running.
+   */
   if (req.make_request () == -1)
-    {
-      return false;
-    }
+    return false;
 
-  // We connected to the server but something went wrong after that
-  // (in sending the message, in cygserver itself, or in receiving the
-  // reply).
-  if (req.error_code () != 0)
+  /* We connected to the server but something went wrong after that
+   * (in sending the message, in cygserver itself, or in receiving the
+   * reply).
+   */
+  if (req.error_code ())
     {
       syscall_printf ("failure in cygserver version request: %d",
 		      req.error_code ());
@@ -511,46 +511,30 @@ check_cygserver_available (const bool check_version_too)
       return false;
     }
 
-  if (check_version_too && !req.check_version ())
-    {
-      return false;
-    }
-
-  return true;
+  return req.check_version ();
 }
 
 /*
  * check_cygserver_available()
- *
- * FIXME: This is being used for two different purposes: bad.  Used by
- * the DLL in crt to check for the existence of a compatible
- * cygserver.Used by cygserver itself at start up to probe for whether
- * another copy of cygserver is running (w/o checking the version).
- * These should be separated out: the probing functionality should
- * probably be moved into the transport layer.
  */
 
 void
-cygserver_init (const bool check_version_too)
+cygserver_init ()
 {
   if (!allow_daemon)
     {
-      cygserver_running = CYGSERVER_DEAD;
+      syscall_printf ("cygserver use disabled in client");
+      cygserver_running = CYGSERVER_UNAVAIL;
       return;
     }
+
+  assert (cygserver_running == CYGSERVER_UNKNOWN	\
+	  || cygserver_running == CYGSERVER_OK		\
+	  || cygserver_running == CYGSERVER_UNAVAIL);
 
   if (cygserver_running == CYGSERVER_OK)
-    {
-      return;
-    }
+    return;
 
-  assert (   cygserver_running == CYGSERVER_UNKNOWN \
-	  || cygserver_running == CYGSERVER_DEAD);
-
-  cygserver_running = CYGSERVER_OK; // Needed for make_request() to work.
-
-  if (!check_cygserver_available (check_version_too))
-    cygserver_running = CYGSERVER_DEAD;
+  if (!check_cygserver_available ())
+    cygserver_running = CYGSERVER_UNAVAIL;
 }
-
-#endif /* __INSIDE_CYGWIN__ */

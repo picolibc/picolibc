@@ -27,7 +27,7 @@ details. */
 typedef enum {
   CYGSERVER_UNKNOWN = 0,
   CYGSERVER_OK,
-  CYGSERVER_DEAD
+  CYGSERVER_UNAVAIL
 } cygserver_states;
 
 /*---------------------------------------------------------------------------*
@@ -113,10 +113,7 @@ private:
 
 public:
   client_request_get_version ();
-
-#ifdef __INSIDE_CYGWIN__
   bool check_version () const;
-#endif
 
 private:
   struct request_get_version version;
@@ -181,9 +178,7 @@ private:
 #endif
 };
 
-#ifdef __INSIDE_CYGWIN__
-extern bool check_cygserver_available (bool check_version_too = true);
-extern void cygserver_init (bool check_version_too = true);
-#endif
+extern bool check_cygserver_available ();
+extern void cygserver_init ();
 
 #endif /* _CYGSERVER_H_ */

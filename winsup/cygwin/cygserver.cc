@@ -612,7 +612,9 @@ main (const int argc, char *argv[])
 
   if (shutdown)
     {
-      // Needed for client_request::make_request ().
+      /* Setting `cygserver_running' stops the request code making a
+       * version request, which is not much to the point.
+       */
       cygserver_running = CYGSERVER_OK;
 
       client_request_shutdown req;
