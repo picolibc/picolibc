@@ -1,3 +1,8 @@
+2003-01-27  Christopher Faylor  <cgf@redhat.com>
+
+	* passwd.cc (pwdgrp::parse_passwd): Be more unforgiving about
+	non-numeric fields.
+
 2003-01-26  Christopher Faylor  <cgf@redhat.com>
 
 	* uinfo.cc (pwdgrp::next_num): Remove check for NULL since it is no
