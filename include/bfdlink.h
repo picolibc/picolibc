@@ -85,26 +85,6 @@ struct bfd_link_hash_entry
   /* Type of this entry.  */
   enum bfd_link_hash_type type;
 
-  /* Undefined and common symbols are kept in a linked list through
-     this field.  This field is not in the union because that would
-     force us to remove entries from the list when we changed their
-     type, which would force the list to be doubly linked, which would
-     waste more memory.  When an undefined or common symbol is
-     created, it should be added to this list, the head of which is in
-     the link hash table itself.  As symbols are defined, they need
-     not be removed from the list; anything which reads the list must
-     doublecheck the symbol type.
-
-     Weak symbols are not kept on this list.
-
-     Defined and defweak symbols use this field as a reference marker.
-     If the field is not NULL, or this structure is the tail of the
-     undefined symbol list, the symbol has been referenced.  If the
-     symbol is undefined and becomes defined, this field will
-     automatically be non-NULL since the symbol will have been on the
-     undefined symbol list.  */
-  struct bfd_link_hash_entry *und_next;
-
   /* A union of information depending upon the type.  */
   union
     {
@@ -112,23 +92,46 @@ struct bfd_link_hash_entry
       /* bfd_link_hash_undefined, bfd_link_hash_undefweak.  */
       struct
 	{
+	  /* Undefined and common symbols are kept in a linked list through
+	     this field.  This field is present in all of the union element
+	     so that we don't need to remove entries from the list when we
+	     change their type.  Removing entries would either require the
+	     list to be doubly linked, which would waste more memory, or
+	     require a traversal.  When an undefined or common symbol is
+	     created, it should be added to this list, the head of which is in
+	     the link hash table itself.  As symbols are defined, they need
+	     not be removed from the list; anything which reads the list must
+	     doublecheck the symbol type.
+
+	     Weak symbols are not kept on this list.
+
+	     Defined and defweak symbols use this field as a reference marker.
+	     If the field is not NULL, or this structure is the tail of the
+	     undefined symbol list, the symbol has been referenced.  If the
+	     symbol is undefined and becomes defined, this field will
+	     automatically be non-NULL since the symbol will have been on the
+	     undefined symbol list.  */
+	  struct bfd_link_hash_entry *next;
 	  bfd *abfd;		/* BFD symbol was found in.  */
 	} undef;
       /* bfd_link_hash_defined, bfd_link_hash_defweak.  */
       struct
 	{
-	  bfd_vma value;	/* Symbol value.  */
+	  struct bfd_link_hash_entry *next;
 	  asection *section;	/* Symbol section.  */
+	  bfd_vma value;	/* Symbol value.  */
 	} def;
       /* bfd_link_hash_indirect, bfd_link_hash_warning.  */
       struct
 	{
+	  struct bfd_link_hash_entry *next;
 	  struct bfd_link_hash_entry *link;	/* Real symbol.  */
 	  const char *warning;	/* Warning (bfd_link_hash_warning only).  */
 	} i;
       /* bfd_link_hash_common.  */
       struct
 	{
+	  struct bfd_link_hash_entry *next;
 	  /* The linker needs to know three things about common
 	     symbols: the size, the alignment, and the section in
 	     which the symbol should be placed.  We store the size
@@ -138,12 +141,12 @@ struct bfd_link_hash_entry
 	     directly because we don't want to increase the size of
 	     the union; this structure is a major space user in the
 	     linker.  */
-	  bfd_size_type size;	/* Common symbol size.  */
 	  struct bfd_link_hash_common_entry
 	    {
 	      unsigned int alignment_power;	/* Alignment.  */
 	      asection *section;		/* Symbol section.  */
 	    } *p;
+	  bfd_size_type size;	/* Common symbol size.  */
 	} c;
     } u;
 };
