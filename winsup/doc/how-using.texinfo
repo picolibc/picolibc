@@ -162,15 +162,20 @@ they are executable.  If your script does not start with
 @end example
 
 (or any path to a script interpreter, it does not have to be /bin/sh)
-then Cygwin will not know it is an executable script.  The common Bourne
-shell idiom
+then Cygwin will not know it is an executable script.  The Bourne shell
+idiom
 
 @example
 	:
 	# This is the 2nd line, assume processing by /bin/sh
 @end example
 
-does not work.
+also works.
+
+Note that you can use @samp{mount -x} to force Cygwin to treat all files
+under the mount point as executable.  This can be used for individual
+files as well as directories.  Then Cygwin will not bother to read files
+to determine whether they are executable.
 
 @subsection Why don't cursor keys work under Win95/Win98?
 
