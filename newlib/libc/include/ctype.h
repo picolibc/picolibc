@@ -57,9 +57,9 @@ extern	_CONST char	_ctype_[] __declspec(dllimport);
    slightly slower */
 #ifdef __GNUC__
 # define toupper(c) \
-	({ int __x = (c); islower(__x) ? (__x - 'a' + 'A') : __x;})
+	__extension__ ({ int __x = (c); islower(__x) ? (__x - 'a' + 'A') : __x;})
 # define tolower(c) \
-	({ int __x = (c); isupper(__x) ? (__x - 'A' + 'a') : __x;})
+	__extension__ ({ int __x = (c); isupper(__x) ? (__x - 'A' + 'a') : __x;})
 #endif
 
 #ifndef __STRICT_ANSI__
