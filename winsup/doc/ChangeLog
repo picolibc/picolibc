@@ -1,3 +1,7 @@
+Tue May 29 21:30:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Tweak to attempt to accomodate older texi2html.
+
 Tue May 29 16:24:46 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Accomodate newer versions of docbook and openjade.

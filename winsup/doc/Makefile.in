@@ -104,7 +104,7 @@ faq.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
 	for i in $(srcdir)/*.texinfo ; do \
 		sed < $$i -e 's?@file{\([fth]*p://[^}]*\)}?@strong{<A HREF="\1">\1</A>}?' \
 	    -e 's?\([.+a-zA-Z0-9-]*@@[.a-zA-Z0-9-]*[a-zA-Z0-9]\)?<A HREF="mailto:\1">\1</A>?' >./`basename $$i` ; done; \
-	$(TEXI2HTML) --split -v ./faq.texinfo; \
+	$(TEXI2HTML) -split_chapter ./faq.texinfo; \
 	rm -f *.texinfo; \
 	[ -r faq_toc.html ] && mv faq_toc.html faq.html; exit 0
 
