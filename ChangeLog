@@ -1,3 +1,7 @@
+2001-03-08  Alexandre Oliva  <aoliva@redhat.com>
+
+	* Makefile.in (ALL_GCC, ALL_GCC_C, ALL_GCC_CXX): Set before use.
+
 2001-02-22  Jeff Johnston <jjohnstn@redhat.com>
 
 	* COPYING.NEWLIB: Remove DJ Delorie's address because it is no
