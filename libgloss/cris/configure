@@ -451,7 +451,7 @@ echo > confdefs.h
 
 # A filename unique to this package, relative to the directory that
 # configure is in, which we can look for to find out if srcdir is correct.
-ac_unique_file=close.c
+ac_unique_file=Makefile.in
 
 # Find the source files, if location was not specified.
 if test -z "$srcdir"; then
@@ -522,7 +522,6 @@ fi
 
 
 
-
 if test "${enable_shared}" = "yes" ; then
     echo "Shared libraries not supported for cross compiling, ignored"
 fi
@@ -584,7 +583,7 @@ else { echo "configure: error: can not run $ac_config_sub" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking host system type""... $ac_c" 1>&6
-echo "configure:588: checking host system type" >&5
+echo "configure:587: checking host system type" >&5
 
 host_alias=$host
 case "$host_alias" in
@@ -605,7 +604,7 @@ host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$host" 1>&6
 
 echo $ac_n "checking target system type""... $ac_c" 1>&6
-echo "configure:609: checking target system type" >&5
+echo "configure:608: checking target system type" >&5
 
 target_alias=$target
 case "$target_alias" in
@@ -623,7 +622,7 @@ target_os=`echo $target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$target" 1>&6
 
 echo $ac_n "checking build system type""... $ac_c" 1>&6
-echo "configure:627: checking build system type" >&5
+echo "configure:626: checking build system type" >&5
 
 build_alias=$build
 case "$build_alias" in
@@ -677,7 +676,7 @@ test "$program_transform_name" = "" && program_transform_name="s,x,x,"
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:681: checking for a BSD compatible install" >&5
+echo "configure:680: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -732,188 +731,16 @@ test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
-# are building a library that must be included in all links, so we 
-# can't link an executable until this lib is built.
-# autoconf should provide a way to do this.
+# are probably using a cross compiler, which will not be able to fully
+# link an executable.  This should really be fixed in autoconf
+# itself.
 
 
-
-cat >> confdefs.h <<\EOF
-#define HAVE_GNU_LD 1
-EOF
-
-case "${target}" in
-  *-*-cygwin*)
-	;;
-  a29k-amd-udi)
-	;;
-  arc-*-*)
-	;;
-  arm-*-pe)
-	;;
-  arm-*-*)
-	;;
-  strongarm-*-*)
-	;;
-  cris-*-* | crisv32-*-*)
-	;;
-  d10v*)
-	;;
-  h8300*-*-*)
-	;;	
-  h8500-*-*)
-	;;	
-  i345686-*-sco*)
-	;;
-  m32r-*-*)
-	;;
-  mn10?00-*-*)
-	;;
-  powerpcle-*-pe)
-	;;
-  sh*-*-*)
-	;;
-  sparc-sun-sunos*)
-	;;
-  sparc64-*-*)
-	;;
-  thumb-*-pe)
-	;;
-  thumb-*-*)
-	;;
-  v850-*-*)
-	;;
-  v850e-*-*)
-	;;
-  v850ea-*-*)
-	;;
-  w65-*-*)
-	;;	
-  xstormy16-*-*)
-	;;
-  z8k-*-*)
-	;;
-  *)
-	cat >> confdefs.h <<\EOF
-#define MISSING_SYSCALL_NAMES 1
-EOF
-
-	;;
-esac
-
-case "${target}" in
-  *-*-elf)
-        cat >> confdefs.h <<\EOF
-#define HAVE_ELF 1
-EOF
-
-
-        echo $ac_n "checking for .previous assembler directive""... $ac_c" 1>&6
-echo "configure:813: checking for .previous assembler directive" >&5
-if eval "test \"`echo '$''{'libc_cv_asm_previous_directive'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-          libc_cv_asm_previous_directive=no
-        cat > conftest.s <<EOF
-.section foo_section
-.previous
-EOF
-        if { ac_try='${CC-cc} -c $CFLAGS conftest.s 1>&5'; { (eval echo configure:822: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }; then
-          libc_cv_asm_previous_directive=yes
-          cat >> confdefs.h <<\EOF
-#define HAVE_ASM_PREVIOUS_DIRECTIVE 1
-EOF
-
-        fi
-        rm -f conftest*
-fi
-
-echo "$ac_t""$libc_cv_asm_previous_directive" 1>&6
-
-        echo $ac_n "checking for .popsection assembler directive""... $ac_c" 1>&6
-echo "configure:835: checking for .popsection assembler directive" >&5
-if eval "test \"`echo '$''{'libc_cv_asm_popsection_directive'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-          libc_cv_asm_popsection_directive=no
-        cat > conftest.s <<EOF
-.pushsection foo_section
-.popsection
-EOF
-        if { ac_try='${CC-cc} -c $CFLAGS conftest.s 1>&5'; { (eval echo configure:844: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }; then
-          libc_cv_asm_popsection_directive=yes
-          cat >> confdefs.h <<\EOF
-#define HAVE_ASM_POPSECTION_DIRECTIVE 1
-EOF
-
-        fi
-        rm -f conftest*
-fi
-
-echo "$ac_t""$libc_cv_asm_popsection_directive" 1>&6
-
-        echo $ac_n "checking for section attributes""... $ac_c" 1>&6
-echo "configure:857: checking for section attributes" >&5
-if eval "test \"`echo '$''{'libc_cv_section_attributes'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-          libc_cv_section_attributes=no
-        cat > conftest.c <<EOF
-int secttest __attribute__ ((section (".gnu.warning.secttest"))) = 10;
-int main() {}
-EOF
-        if { ac_try='${CC-cc} -c $CFLAGS conftest.c 1>&5'; { (eval echo configure:866: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; }; then
-          libc_cv_section_attributes=yes
-          cat >> confdefs.h <<\EOF
-#define HAVE_SECTION_ATTRIBUTES 1
-EOF
-
-        fi
-        rm -f conftest*
-fi
-
-echo "$ac_t""$libc_cv_section_attributes" 1>&6
-        ;;
-esac
-
-echo $ac_n "checking for symbol prefix""... $ac_c" 1>&6
-echo "configure:881: checking for symbol prefix" >&5
-if eval "test \"`echo '$''{'libc_symbol_prefix'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  cat > conftest.c <<\EOF
-foo () { }
-EOF
-libc_symbol_prefix=none
-if { ac_try='${CC-cc} -S conftest.c -o - | fgrep "\$foo" > /dev/null'; { (eval echo configure:889: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; };
-then
-  libc_symbol_prefix='$'
-else
-  if { ac_try='${CC-cc} -S conftest.c -o - | fgrep "_foo" > /dev/null'; { (eval echo configure:893: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; };
-  then
-    libc_symbol_prefix=_
-  fi
-fi
-rm -f conftest* 
-fi
-
-echo "$ac_t""$libc_symbol_prefix" 1>&6
-if test $libc_symbol_prefix != none; then
-  cat >> confdefs.h <<EOF
-#define __SYMBOL_PREFIX "$libc_symbol_prefix"
-EOF
-
-else
-  cat >> confdefs.h <<\EOF
-#define __SYMBOL_PREFIX ""
-EOF
-
-fi
 
 # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:917: checking for $ac_word" >&5
+echo "configure:744: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -943,7 +770,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:947: checking for $ac_word" >&5
+echo "configure:774: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -992,7 +819,7 @@ fi
 fi
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:996: checking whether we are using GNU C" >&5
+echo "configure:823: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1001,7 +828,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:1005: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:832: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -1016,7 +843,7 @@ if test $ac_cv_prog_gcc = yes; then
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
   echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:1020: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:847: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1052,7 +879,7 @@ LD=${LD-ld}
 # Extract the first word of "ranlib", so it can be a program name with args.
 set dummy ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1056: checking for $ac_word" >&5
+echo "configure:883: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_RANLIB'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1149,7 +976,19 @@ fi
 
 trap 'rm -f $CONFIG_STATUS conftest*; exit 1' 1 2 15
 
-DEFS=-DHAVE_CONFIG_H
+# Transform confdefs.h into DEFS.
+# Protect against shell expansion while executing Makefile rules.
+# Protect against Makefile macro expansion.
+cat > conftest.defs <<\EOF
+s%#define \([A-Za-z_][A-Za-z0-9_]*\) *\(.*\)%-D\1=\2%g
+s%[ 	`~#$^&*(){}\\|;'"<>?]%\\&%g
+s%\[%\\&%g
+s%\]%\\&%g
+s%\$%$$%g
+EOF
+DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`
+rm -f conftest.defs
+
 
 # Without the "./", some shells look in PATH for config.status.
 : ${CONFIG_STATUS=./config.status}
@@ -1187,7 +1026,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile config.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -1345,113 +1184,6 @@ s%@INSTALL@%$INSTALL%g
 fi; done
 rm -f conftest.s*
 
-# These sed commands are passed to sed as "A NAME B NAME C VALUE D", where
-# NAME is the cpp macro being defined and VALUE is the value it is being given.
-#
-# ac_d sets the value in "#define NAME VALUE" lines.
-ac_dA='s%^\([ 	]*\)#\([ 	]*define[ 	][ 	]*\)'
-ac_dB='\([ 	][ 	]*\)[^ 	]*%\1#\2'
-ac_dC='\3'
-ac_dD='%g'
-# ac_u turns "#undef NAME" with trailing blanks into "#define NAME VALUE".
-ac_uA='s%^\([ 	]*\)#\([ 	]*\)undef\([ 	][ 	]*\)'
-ac_uB='\([ 	]\)%\1#\2define\3'
-ac_uC=' '
-ac_uD='\4%g'
-# ac_e turns "#undef NAME" without trailing blanks into "#define NAME VALUE".
-ac_eA='s%^\([ 	]*\)#\([ 	]*\)undef\([ 	][ 	]*\)'
-ac_eB='$%\1#\2define\3'
-ac_eC=' '
-ac_eD='%g'
-
-if test "${CONFIG_HEADERS+set}" != set; then
-EOF
-cat >> $CONFIG_STATUS <<EOF
-  CONFIG_HEADERS="config.h"
-EOF
-cat >> $CONFIG_STATUS <<\EOF
-fi
-for ac_file in .. $CONFIG_HEADERS; do if test "x$ac_file" != x..; then
-  # Support "outfile[:infile[:infile...]]", defaulting infile="outfile.in".
-  case "$ac_file" in
-  *:*) ac_file_in=`echo "$ac_file"|sed 's%[^:]*:%%'`
-       ac_file=`echo "$ac_file"|sed 's%:.*%%'` ;;
-  *) ac_file_in="${ac_file}.in" ;;
-  esac
-
-  echo creating $ac_file
-
-  rm -f conftest.frag conftest.in conftest.out
-  ac_file_inputs=`echo $ac_file_in|sed -e "s%^%$ac_given_srcdir/%" -e "s%:% $ac_given_srcdir/%g"`
-  cat $ac_file_inputs > conftest.in
-
-EOF
-
-# Transform confdefs.h into a sed script conftest.vals that substitutes
-# the proper values into config.h.in to produce config.h.  And first:
-# Protect against being on the right side of a sed subst in config.status.
-# Protect against being in an unquoted here document in config.status.
-rm -f conftest.vals
-cat > conftest.hdr <<\EOF
-s/[\\&%]/\\&/g
-s%[\\$`]%\\&%g
-s%#define \([A-Za-z_][A-Za-z0-9_]*\) *\(.*\)%${ac_dA}\1${ac_dB}\1${ac_dC}\2${ac_dD}%gp
-s%ac_d%ac_u%gp
-s%ac_u%ac_e%gp
-EOF
-sed -n -f conftest.hdr confdefs.h > conftest.vals
-rm -f conftest.hdr
-
-# This sed command replaces #undef with comments.  This is necessary, for
-# example, in the case of _POSIX_SOURCE, which is predefined and required
-# on some systems where configure will not decide to define it.
-cat >> conftest.vals <<\EOF
-s%^[ 	]*#[ 	]*undef[ 	][ 	]*[a-zA-Z_][a-zA-Z_0-9]*%/* & */%
-EOF
-
-# Break up conftest.vals because some shells have a limit on
-# the size of here documents, and old seds have small limits too.
-
-rm -f conftest.tail
-while :
-do
-  ac_lines=`grep -c . conftest.vals`
-  # grep -c gives empty output for an empty file on some AIX systems.
-  if test -z "$ac_lines" || test "$ac_lines" -eq 0; then break; fi
-  # Write a limited-size here document to conftest.frag.
-  echo '  cat > conftest.frag <<CEOF' >> $CONFIG_STATUS
-  sed ${ac_max_here_lines}q conftest.vals >> $CONFIG_STATUS
-  echo 'CEOF
-  sed -f conftest.frag conftest.in > conftest.out
-  rm -f conftest.in
-  mv conftest.out conftest.in
-' >> $CONFIG_STATUS
-  sed 1,${ac_max_here_lines}d conftest.vals > conftest.tail
-  rm -f conftest.vals
-  mv conftest.tail conftest.vals
-done
-rm -f conftest.vals
-
-cat >> $CONFIG_STATUS <<\EOF
-  rm -f conftest.frag conftest.h
-  echo "/* $ac_file.  Generated automatically by configure.  */" > conftest.h
-  cat conftest.in >> conftest.h
-  rm -f conftest.in
-  if cmp -s $ac_file conftest.h 2>/dev/null; then
-    echo "$ac_file is unchanged"
-    rm -f conftest.h
-  else
-    # Remove last slash and all that follows it.  Not all systems have dirname.
-      ac_dir=`echo $ac_file|sed 's%/[^/][^/]*$%%'`
-      if test "$ac_dir" != "$ac_file" && test "$ac_dir" != .; then
-      # The file is in a subdirectory.
-      test ! -d "$ac_dir" && mkdir "$ac_dir"
-    fi
-    rm -f $ac_file
-    mv conftest.h $ac_file
-  fi
-fi; done
-
 EOF
 cat >> $CONFIG_STATUS <<EOF
 srcdir=${srcdir}
@@ -1462,12 +1194,10 @@ libgloss_topdir=${libgloss_topdir}
 
 EOF
 cat >> $CONFIG_STATUS <<\EOF
-ac_file=Makefile . ${libgloss_topdir}/config-ml.in
+. ${libgloss_topdir}/config-ml.in
 exit 0
 EOF
 chmod +x $CONFIG_STATUS
 rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
-
-
 

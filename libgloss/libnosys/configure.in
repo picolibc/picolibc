@@ -89,6 +89,8 @@ case "${target}" in
 	;;
   strongarm-*-*)
 	;;
+  cris-*-* | crisv32-*-*)
+	;;
   d10v*)
 	;;
   h8300*-*-*)
