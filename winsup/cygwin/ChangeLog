@@ -1,5 +1,11 @@
 2003-01-26  Christopher Faylor  <cgf@redhat.com>
 
+	* uinfo.cc (pwdgrp::next_num): Remove check for NULL since it is no
+	longer a valid return from next_str.
+	(pwdgrp::add_line): Duh. Revert to use strchr.
+
+2003-01-26  Christopher Faylor  <cgf@redhat.com>
+
 	* strings.h (strechr): New function.
 	* uinfo.cc (pwdgrp::next_str): Search only for input char in string.
 	Return EOS on failure.  Don't check for NULL since it shouldn't be
