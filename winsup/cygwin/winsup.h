@@ -240,7 +240,7 @@ int __stdcall stat_dev (DWORD, int, unsigned long, struct __stat64 *);
 
 __ino64_t __stdcall hash_path_name (__ino64_t hash, const char *name) __attribute__ ((regparm(2)));
 void __stdcall nofinalslash (const char *src, char *dst) __attribute__ ((regparm(2)));
-extern "C" char *__stdcall rootdir (char *full_path) __attribute__ ((regparm(1)));
+extern "C" char *__stdcall rootdir (const char *full_path, char *root_path) __attribute__ ((regparm(2)));
 
 /* String manipulation */
 extern "C" char *__stdcall strccpy (char *s1, const char **s2, char c);

@@ -1028,36 +1028,40 @@ fhandler_base::lock (int, struct __flock64 *)
 }
 
 extern "C" char * __stdcall
-rootdir (char *full_path)
+rootdir (const char *full_path, char *root_path)
 {
   /* Possible choices:
    * d:... -> d:/
    * \\server\share... -> \\server\share\
-   * else current drive.
    */
-  char *root = full_path;
+  int len;
+  char *rootp = root_path;
 
   if (full_path[1] == ':')
-    strcpy (full_path + 2, "\\");
+    {
+      *rootp++ = *full_path++;
+      *rootp++ = ':';
+    }
   else if (full_path[0] == '\\' && full_path[1] == '\\')
     {
-      char *cp = full_path + 2;
-      while (*cp && *cp != '\\')
-	cp++;
-      if (!*cp)
-	{
-	  set_errno (ENOTDIR);
-	  return NULL;
-	}
-      cp++;
-      while (*cp && *cp != '\\')
-	cp++;
-      strcpy (cp, "\\");
+      const char *cp = strchr (full_path + 2, '\\');
+      if (!cp)
+	goto error;
+      while (*++cp && *cp != '\\')
+	;
+      memcpy (root_path, full_path, (len = cp - full_path));
+      rootp = root_path + len;
     }
   else
-    root = NULL;
+    {
+    error:
+      set_errno (ENOTDIR);
+      return NULL;
+    }
 
-  return root;
+  *rootp++ = '\\';
+  *rootp = '\0';
+  return root_path;
 }
 
 int __stdcall

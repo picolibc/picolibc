@@ -1,3 +1,11 @@
+2004-04-10  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* fhandler.cc (rootdir): Add and use second argument.
+	* winsup.h (rootdir): Add second argument in declaration.
+	* path.cc (fs_info::update): Modify call to rootdir.
+	* syscalls.cc (check_posix_perm): Ditto.
+	(statfs): Ditto. Move syscall_printf near top.
+
 2004-04-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Use new unified status_flag accessor methods from classes fhandler_*,

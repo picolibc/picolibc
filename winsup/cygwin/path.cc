@@ -361,9 +361,8 @@ fs_info::update (const char *win32_path)
 {
   char fsname [CYG_MAX_PATH];
   char root_dir [CYG_MAX_PATH];
-  strncpy (root_dir, win32_path, CYG_MAX_PATH);
 
-  if (!rootdir (root_dir))
+  if (!rootdir (win32_path, root_dir))
     {
       debug_printf ("Cannot get root component of path %s", win32_path);
       clear ();

@@ -1457,7 +1457,7 @@ check_posix_perm (const char *fname, int v)
   if (!allow_ntsec)
     return 0;
 
-  char *root = rootdir (strcpy ((char *)alloca (strlen (fname)), fname));
+  char *root = rootdir (fname, (char *)alloca (strlen (fname)));
 
   if (!allow_smbntsec
       && ((root[0] == '\\' && root[1] == '\\')
@@ -1793,7 +1793,9 @@ get_osfhandle (int fd)
 extern "C" int
 statfs (const char *fname, struct statfs *sfs)
 {
-  char root_dir[CYG_MAX_PATH];
+  char root[CYG_MAX_PATH];
+
+  syscall_printf ("statfs %s", fname);
 
   if (!sfs)
     {
@@ -1802,10 +1804,8 @@ statfs (const char *fname, struct statfs *sfs)
     }
 
   path_conv full_path (fname, PC_SYM_FOLLOW | PC_FULL);
-  strncpy (root_dir, full_path, CYG_MAX_PATH);
-  const char *root = rootdir (root_dir);
-
-  syscall_printf ("statfs %s", root);
+  if (!rootdir (full_path, root))
+    return -1;
 
   /* GetDiskFreeSpaceEx must be called before GetDiskFreeSpace on
      WinME, to avoid the MS KB 314417 bug */
