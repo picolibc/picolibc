@@ -597,7 +597,7 @@ fhandler_pipe::select_except (select_record *s)
 static int
 peek_console (select_record *me, int ignra)
 {
-  extern const char * get_nonascii_key (INPUT_RECORD& input_rec);
+  extern const char * get_nonascii_key (INPUT_RECORD& input_rec, char *);
   fhandler_console *fh = (fhandler_console *)me->fh;
 
   if (!me->read_selected)
@@ -618,6 +618,7 @@ peek_console (select_record *me, int ignra)
   INPUT_RECORD irec;
   DWORD events_read;
   HANDLE h;
+  char tmpbuf[17];
   set_handle_or_return_if_not_open (h, me);
 
   for (;;)
@@ -630,7 +631,7 @@ peek_console (select_record *me, int ignra)
 	if (irec.EventType == WINDOW_BUFFER_SIZE_EVENT)
 	  kill_pgrp (fh->tc->getpgid (), SIGWINCH);
 	else if (irec.EventType == KEY_EVENT && irec.Event.KeyEvent.bKeyDown == TRUE &&
-		 (irec.Event.KeyEvent.uChar.AsciiChar || get_nonascii_key (irec)))
+		 (irec.Event.KeyEvent.uChar.AsciiChar || get_nonascii_key (irec, tmpbuf)))
 	  return me->read_ready = 1;
 
 	/* Read and discard the event */
