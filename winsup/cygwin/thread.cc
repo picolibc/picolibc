@@ -807,7 +807,10 @@ semaphore::TryWait ()
    *We probably need WaitForMultipleObjects here.
    */
   if (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT)
-    return EAGAIN;
+    {
+      set_errno (EAGAIN);
+      return -1;
+    }
   currentvalue--;
   return 0;
 }
@@ -2213,7 +2216,10 @@ int
 __sem_wait (sem_t *sem)
 {
   if (verifyable_object_isvalid (sem, SEM_MAGIC) != VALID_OBJECT)
-    return EINVAL;
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
   (*sem)->Wait ();
   return 0;
@@ -2223,7 +2229,10 @@ int
 __sem_trywait (sem_t *sem)
 {
   if (verifyable_object_isvalid (sem, SEM_MAGIC) != VALID_OBJECT)
-    return EINVAL;
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
   return (*sem)->TryWait ();
 }

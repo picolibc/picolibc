@@ -1,3 +1,9 @@
+2002-02-28  Robert Collins  <rbtcollins@hotmail.com>
+
+	* thread.cc (semaphore::TryWait): Set errno as required by posix 1003.1.
+	(__sem_wait): Ditto.
+	(__sem_trywait): Ditto.
+
 2002-02-27  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number.
