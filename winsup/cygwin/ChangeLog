@@ -1,3 +1,14 @@
+2002-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (stat64_to_stat32): Transform st_dev correctly.
+	(fstat64): Add evaluating st_ino and st_dev.
+	(stat_worker): Evaluate st_dev as 32 bit value.
+	* include/cygwin/stat.h: Use new dev_t definition throughout.
+	* include/cygwin/types.h: Define __dev16_t and __dev32_t.  Define
+	dev_t according to __CYGWIN_USE_BIG_TYPES__ setting.
+	* include/sys/sysmacros.h: Define major, minor and makedev
+	according to __CYGWIN_USE_BIG_TYPES__ setting.
+
 2002-06-03  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* syscalls.cc (setegid32): Verify the correctness of the gid

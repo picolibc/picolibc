@@ -19,13 +19,13 @@ extern "C" {
 #ifdef __INSIDE_CYGWIN__
 struct __stat32
 {
-  dev_t         st_dev;
+  __dev16_t     st_dev;
   ino_t         st_ino;
   mode_t        st_mode;
   nlink_t       st_nlink;
   __uid16_t     st_uid;
   __gid16_t     st_gid;
-  dev_t         st_rdev;
+  __dev16_t     st_rdev;
   __off32_t     st_size;
   time_t        st_atime;
   long          st_spare1;
@@ -40,13 +40,13 @@ struct __stat32
 
 struct __stat64
 {
-  dev_t         st_dev;
+  __dev32_t     st_dev;
   ino_t         st_ino;
   mode_t        st_mode;
   nlink_t       st_nlink;
   __uid32_t     st_uid;
   __gid32_t     st_gid;
-  dev_t         st_rdev;
+  __dev32_t     st_rdev;
   __off64_t     st_size;
   time_t        st_atime;
   long          st_spare1;

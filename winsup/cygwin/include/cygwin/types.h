@@ -27,6 +27,14 @@ typedef __off64_t off_t;
 typedef __off32_t off_t;
 #endif
 
+typedef short __dev16_t;
+typedef unsigned long __dev32_t;
+#ifdef __CYGWIN_USE_BIG_TYPES__
+typedef __dev32_t dev_t;
+#else
+typedef __dev16_t dev_t;
+#endif
+
 typedef long blksize_t;
 
 typedef long __blkcnt32_t;

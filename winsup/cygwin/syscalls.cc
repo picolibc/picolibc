@@ -985,7 +985,7 @@ fchmod (int fd, mode_t mode)
 static void
 stat64_to_stat32 (struct __stat64 *src, struct __stat32 *dst)
 {
-  dst->st_dev = src->st_dev;
+  dst->st_dev = ((src->st_dev >> 8) & 0xff00) | (src->st_dev & 0xff);
   dst->st_ino = src->st_ino;
   dst->st_mode = src->st_mode;
   dst->st_nlink = src->st_nlink;
@@ -1014,6 +1014,13 @@ fstat64 (int fd, struct __stat64 *buf)
       path_conv pc (cfd->get_win32_name ());
       memset (buf, 0, sizeof (struct __stat64));
       res = cfd->fstat (buf, &pc);
+      if (!res)
+	{
+	  if (!buf->st_ino)
+	    buf->st_ino = hash_path_name (0, cfd->get_win32_name ());
+	  if (!buf->st_dev)
+	    buf->st_dev = (cfd->get_device () << 16) | cfd->get_unit ();
+	}
     }
 
   syscall_printf ("%d = fstat (%d, %p)", res, fd, buf);
@@ -1100,7 +1107,7 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = FHDEVN (fh->get_device ()) << 8 | (fh->get_unit () & 0xff);
+	    buf->st_dev = (fh->get_device () << 16) | fh->get_unit ();
 	}
     }
 
