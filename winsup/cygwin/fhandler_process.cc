@@ -1,6 +1,6 @@
 /* fhandler_process.cc: fhandler for /proc/<pid> virtual filesystem
 
-   Copyright 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
