@@ -331,14 +331,14 @@ client_request::make_request ()
 
   if (!allow_daemon)
     {
-      set_errno (ENOSYS);
+      error_code (ENOSYS);
       return -1;
     }
 
   /* Don't retry every request if the server's not there */
   if (cygserver_running != CYGSERVER_OK)
     {
-      set_errno (ENOSYS);
+      error_code (ENOSYS);
       return -1;
     }
 
@@ -353,6 +353,10 @@ client_request::make_request ()
    */
   if (!transport->connect ())
     {
+      if (errno)
+	error_code (errno);
+      else
+	error_code (ENOSYS);
       delete transport;
       return -1;
     }

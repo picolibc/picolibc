@@ -1,5 +1,10 @@
 2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver_client (client_request::make_request): Replace my
+	inappropriate use of set_errno () with error_code () throughout.
+
+2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* include/cygwin/cygserver.h: Add forward declarations of class
 	transport_layer_base and class process_cache to reduce
 	dependencies between header files.
