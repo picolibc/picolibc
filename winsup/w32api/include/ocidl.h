@@ -41,6 +41,18 @@ DECLARE_INTERFACE_(IOleInPlaceSiteEx,IOleInPlaceSite)
 	STDMETHOD(RequestUIActivate)(THIS) PURE;
 };
 
+EXTERN_C const IID IID_IObjectWithSite;
+#undef INTERFACE
+#define INTERFACE IObjectWithSite
+DECLARE_INTERFACE_(IObjectWithSite,IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(SetSite)(THIS_ IUnknown*) PURE;
+	STDMETHOD(GetSite)(THIS_ REFIID, void**) PURE;
+};
+
 #ifdef __cplusplus
 }
 #endif

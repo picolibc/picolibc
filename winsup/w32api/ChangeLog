@@ -1,4 +1,9 @@
-2003-02-28  Roland Schwingel <roland.schwingel@onevision.de>
+2003-03-01  Heiko Gerdau  <hg@technosis.de> 
+
+	* include/oleidl.h (USERCLASSTYPE): Add enum.
+	* include/ocidl.h (IObjectWithSite): Add interface.
+
+2003-02-28  Roland Schwingel  <roland.schwingel@onevision.de>
 
 	Fixup UNICODE thinko in 2003-02-22 patch.
 	* include/wingdi.h (AddFontMemResourceEx): Add.
