@@ -1,3 +1,7 @@
+2000-06-18  Stephane Carrez  <stcarrez@worldnet.fr>
+
+	* m68hc11.h: New file, definitions for the Motorola 68hc11.
+
 2000-06-06  Alan Modra  <alan@linuxcare.com.au>
 
 	* reloc-macros.h (START_RELOC_NUMBERS): Don't define initial dummy
@@ -119,6 +123,12 @@ Thu Feb 17 00:18:33 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 	* sh.h: (EF_SH_MACH_MASK, EF_SH_UNKNOWN, EF_SH1, EF_SH2): New macros.
 	(EF_SH3, EF_SH_HAS_DSP, EF_SH_DSP, EF_SH3_DSP): Likewise.
 	(EF_SH_HAS_FP, EF_SH3E, EF_SH4, EF_SH_MERGE_MACH): Likewise.
+
+2000-03-10  Geoffrey Keating  <geoffk@cygnus.com>
+
+	* mips.h: Add R_MIPS_GNU_REL_HI16, R_MIPS_GNU_REL_LO16,
+ 	R_MIPS_GNU_REL16_S2, R_MIPS_PC64 and R_MIPS_PC32 relocation
+ 	numbers.
 
 2000-02-03  H.J. Lu  <hjl@gnu.org>
 
@@ -244,6 +254,20 @@ Mon Oct  4 17:42:38 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* pj.h: New file.
 	* common.h (EM_PJ): Define.
+
+Wed Dec  1 03:02:15 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* mn10300.h (E_MN10300_MACH_AM33): Define.
+
+Mon Oct 11 22:42:37 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (PF_HP_PAGE_SIZE): Define.
+	(PF_HP_FAR_SHARED, PF_HP_NEAR_SHARED, PF_HP_CODE): Likewise.
+	(PF_HP_MODIFY, PF_HP_LAZYSWAP, PF_HP_SBP): Likewise.
+
+1999-09-15  Ulrich Drepper  <drepper@cygnus.com>
+
+	* hppa.h: Add DT_HP_GST_SIZE, DT_HP_GST_VERSION, and DT_HP_GST_HASHVAL.
 
 1999-09-02  Ulrich Drepper  <drepper@cygnus.com>
 

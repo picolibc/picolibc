@@ -1,3 +1,8 @@
+2000-06-18  Stephane Carrez  <stcarrez@worldnet.fr>
+
+	* dis-asm.h (print_insn_m68hc12): Define.
+	(print_insn_m68hc11): Likewise.
+
 2000-06-18  Nick Clifton  <nickc@redhat.com>
 
 	* os9k.h: Change values of MODSYNC and CRCCON due to bug report

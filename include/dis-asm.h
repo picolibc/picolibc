@@ -159,6 +159,8 @@ extern int print_insn_i386_att		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_i386_intel	PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_ia64		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_i370		PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_m68hc11		PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_m68hc12		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_m68k		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_z8001		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_z8002		PARAMS ((bfd_vma, disassemble_info*));

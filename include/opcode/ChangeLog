@@ -1,3 +1,7 @@
+2000-06-18  Stephane Carrez  <stcarrez@worldnet.fr>
+
+	* m68hc11.h: New file for support of Motorola 68hc11.
+
 Fri Jun  9 21:51:50 2000  Denis Chertykov  <denisc@overta.ru>
 
 	* avr.h: clr,lsl,rol, ... moved after add,adc, ...
