@@ -1,16 +1,6 @@
 2003-10-13  Andre Auzi  <aauzi@users.sourceforge.net>
 
-	* include/windows.h (CopyCursor): Although MSDN pretends this is
-	a function to be imported from user32.lib, it's actually a macro.
-	From the Delphi FAQ:
-		Question:
-		Where is the Windows API function CopyCursor defined in
-		32-Bit versions of Delphi and C++ Builder?
-		Answer:
-		While the call is documented in the Win32 help file, the
-		function is simply mapped to the Windows API function
-		CopyIcon(). Note that the 32 bit version of CopyIcon
-		does not take a hInstance parameter.
+	* include/windows.h (CopyCursor): Define as macro.
 
 2003-10-13  Steven Edwards  <Steven_Ed4153@yahoo.com>
 
