@@ -51,7 +51,7 @@ public:
 
   void debug_print (const char *prefix = NULL) const
     {
-      char buf[256];
+      char buf[256] __attribute__ ((unused));
       debug_printf ("%s %s", prefix ?: "", string (buf) ?: "NULL");
     }
 };

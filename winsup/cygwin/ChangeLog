@@ -1,3 +1,7 @@
+2003-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.h (cygpsid::debug_print): Avoid compiler warnings.
+
 2003-10-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (normalize_posix_path): Test runs of more than two
