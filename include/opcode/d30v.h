@@ -118,6 +118,7 @@ struct d30v_opcode
 #define LONG_2b		59	/* LONG_2 with modifier of 3 */
 #define LONG_D		60	/* for DBRAI*/
 #define LONG_Db		61	/* for repeati*/
+#define SHORT_AR	62	/* like SHORT_AA but only accept register as third parameter  */
 
   /* the execution unit(s) used */
   int unit;
