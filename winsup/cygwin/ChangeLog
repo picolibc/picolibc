@@ -1,3 +1,10 @@
+2003-08-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (enum cygheap_types): Add HEAP_MMAP.
+	(CYGHEAPSIZE): Add another 64K.
+	* mmap.cc: Use cmalloc, ccalloc and crealloc with HEAP_MMAP type
+	throughout.
+
 2003-08-22  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.cc (user_heap_info::max): New field.
