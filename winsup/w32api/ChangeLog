@@ -1,3 +1,7 @@
+2003-07-17  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* include/mmsystem.h (TIME_KILL_SYNCHRONOUS): Add define.
+
 2003-07-17  Danny Smith <dannysmith@users.sourceforge.net>
 
 	Clean up warnings in ddk.
