@@ -1,4 +1,4 @@
-2002-11-06  Sergey Okhapkin  <sos@prospect.com.ru>
+2002-11-09  Sergey Okhapkin  <sos@prospect.com.ru>
 
 	* fhandler.h (class fhandler_pipe): New ioctl() method.
 	* pipe.cc (fhandler_pipe::ioctl): New.
