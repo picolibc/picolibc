@@ -1,31 +1,145 @@
 2002-03-09  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/accctrl.h, aclapi.h, basetsd.h, basetyps.h, cderr.h,
-	cguid.h, commctrl.h, commdlg.h, cpl.h, cplext.h, custcntl.h,
-	dbt.h, dde.h, ddeml.h, dlgs.h, excpt.h, httpext.h, imagehlp.h,
-	imm.h, initguid.h, intshcut.h, ipexport.h, iphlpapi.h,
-	ipifcons.h, iprtrmib.h, iptypes.h, isguids.h, largeint.h, lm.h,
-	lmaccess.h, lmalert.h, lmapibuf.h, lmat.h, lmaudit.h,
-	lmbrowsr.h, lmchdev.h, lmconfig.h, lmcons.h, lmerr.h,
-	lmerrlog.h, lmmsg.h, lmremutl.h, lmrepl.h, lmserver.h,
-	lmshare.h, lmsname.h, lmstats.h, lmsvc.h, lmuse.h, lmuseflg.h,
-	lmwksta.h, lzexpand.h, mapi.h, mciavi.h, mcx.h, mmsystem.h,
-	mswsock.h, nb30.h, nddeapi.h, nspapi.h, ntdef.h, ntsecapi.h,
-	ntsecpkg.h, oaidl.h, objbase.h, objfwd.h, objidl.h, odbcinst.h,
-	ole.h, ole2.h, ole2ver.h, oleauto.h, olectl.h, olectlid.h,
-	oledlg.h, oleidl.h, pbt.h, prsht.h, psapi.h, rapi.h, ras.h,
-	raserror.h, rassapi.h, regstr.h, richedit.h, richole.h, rpc.h,
-	rpcdce.h, rpcdce2.h, rpcdcep.h, rpcndr.h, rpcnsi.h, rpcnsip.h,
-	rpcnterr.h, rpcproxy.h, schannel.h, schnlsp.h, scrnsave.h,
-	security.h, setupapi.h, shellapi.h, shlguid.h, shlobj.h, sql.h,
-	sqlext.h, sqltypes.h, sqlucode.h, sspi.h, subauth.h,
-	tlhelp32.h, unknwn.h, userenv.h, w32api.h, winbase.h, wincon.h,
-	wincrypt.h, windef.h, windows.h, windowsx.h, winerror.h,
-	wingdi.h, wininet.h, winioctl.h, winnetwk.h, winnls.h, winnt.h,
-	winperf.h, winreg.h, winresrc.h, winsock.h, winsock2.h,
-	winspool.h, winsvc.h, winuser.h, winver.h, ws2tcpip.h,
-	wsnetbs.h, wtypes.h, zmouse.h:	Add #pragma GCC system_header
+	* include/accctrl.h: Add #pragma GCC system_header
 	if __GNUC__ >= 3.
+	* include/aclapi.h: Same.
+	* include/basetsd.h: Same.
+	* include/basetyps.h: Same.
+	* include/cderr.h: Same.
+	* include/cguid.h: Same.
+	* include/commctrl.h: Same.
+	* include/commdlg.h: Same.
+	* include/cpl.h: Same.
+	* include/cplext.h: Same.
+	* include/custcntl.h: Same.
+	* include/dbt.h: Same.
+	* include/dde.h: Same.
+	* include/ddeml.h: Same.
+	* include/dlgs.h: Same.
+	* include/excpt.h: Same.
+	* include/httpext.h: Same.
+	* include/imagehlp.h: Same.
+	* include/imm.h: Same.
+	* include/initguid.h: Same.
+	* include/intshcut.h: Same.
+	* include/ipexport.h: Same.
+	* include/iphlpapi.h: Same.
+	* include/ipifcons.h: Same.
+	* include/iprtrmib.h: Same.
+	* include/iptypes.h: Same.
+	* include/isguids.h: Same.
+	* include/largeint.h: Same.
+	* include/lm.h: Same.
+	* include/lmaccess.h: Same.
+	* include/lmalert.h: Same.
+	* include/lmapibuf.h: Same.
+	* include/lmat.h: Same.
+	* include/lmaudit.h: Same.
+	* include/lmbrowsr.h: Same.
+	* include/lmchdev.h: Same.
+	* include/lmconfig.h: Same.
+	* include/lmcons.h: Same.
+	* include/lmerr.h: Same.
+	* include/lmerrlog.h: Same.
+	* include/lmmsg.h: Same.
+	* include/lmremutl.h: Same.
+	* include/lmrepl.h: Same.
+	* include/lmserver.h: Same.
+	* include/lmshare.h: Same.
+	* include/lmsname.h: Same.
+	* include/lmstats.h: Same.
+	* include/lmsvc.h: Same.
+	* include/lmuse.h: Same.
+	* include/lmuseflg.h: Same.
+	* include/lmwksta.h: Same.
+	* include/lzexpand.h: Same.
+	* include/mapi.h: Same.
+	* include/mciavi.h: Same.
+	* include/mcx.h: Same.
+	* include/mmsystem.h: Same.
+	* include/mswsock.h: Same.
+	* include/nb30.h: Same.
+	* include/nddeapi.h: Same.
+	* include/nspapi.h: Same.
+	* include/ntdef.h: Same.
+	* include/ntsecapi.h: Same.
+	* include/ntsecpkg.h: Same.
+	* include/oaidl.h: Same.
+	* include/objbase.h: Same.
+	* include/objfwd.h: Same.
+	* include/objidl.h: Same.
+	* include/odbcinst.h: Same.
+	* include/ole.h: Same.
+	* include/ole2.h: Same.
+	* include/ole2ver.h: Same.
+	* include/oleauto.h: Same.
+	* include/olectl.h: Same.
+	* include/olectlid.h: Same.
+	* include/oledlg.h: Same.
+	* include/oleidl.h: Same.
+	* include/pbt.h: Same.
+	* include/prsht.h: Same.
+	* include/psapi.h: Same.
+	* include/rapi.h: Same.
+	* include/ras.h: Same.
+	* include/raserror.h: Same.
+	* include/rassapi.h: Same.
+	* include/regstr.h: Same.
+	* include/richedit.h: Same.
+	* include/richole.h: Same.
+	* include/rpc.h: Same.
+	* include/rpcdce.h: Same.
+	* include/rpcdce2.h: Same.
+	* include/rpcdcep.h: Same.
+	* include/rpcndr.h: Same.
+	* include/rpcnsi.h: Same.
+	* include/rpcnsip.h: Same.
+	* include/rpcnterr.h: Same.
+	* include/rpcproxy.h: Same.
+	* include/schannel.h: Same.
+	* include/schnlsp.h: Same.
+	* include/scrnsave.h: Same.
+	* include/security.h: Same.
+	* include/setupapi.h: Same.
+	* include/shellapi.h: Same.
+	* include/shlguid.h: Same.
+	* include/shlobj.h: Same.
+	* include/sql.h: Same.
+	* include/sqlext.h: Same.
+	* include/sqltypes.h: Same.
+	* include/sqlucode.h: Same.
+	* include/sspi.h: Same.
+	* include/subauth.h: Same.
+	* include/tlhelp32.h: Same.
+	* include/unknwn.h: Same.
+	* include/userenv.h: Same.
+	* include/w32api.h: Same.
+	* include/winbase.h: Same.
+	* include/wincon.h: Same.
+	* include/wincrypt.h: Same.
+	* include/windef.h: Same.
+	* include/windows.h: Same.
+	* include/windowsx.h: Same.
+	* include/winerror.h: Same
+	* include/wingdi.h: Same.
+	* include/wininet.h: Same.
+	* include/winioctl.h: Same.
+	* include/winnetwk.h: Same.
+	* include/winnls.h: Same.
+	* include/winnt.h: Same.
+	* include/winperf.h: Same.
+	* include/winreg.h: Same.
+	* include/winresrc.h: Same.
+	* include/winsock.h: Same.
+	* include/winsock2.h: Same.
+	* include/winspool.h: Same.
+	* include/winsvc.h: Same.
+	* include/winuser.h: Same.
+	* include/winver.h: Same.
+	* include/ws2tcpip.h: Same.
+	* include/wsnetbs.h: Same.
+	* include/wtypes.h: Same.
+	* include/zmouse.h: Same.
 	* include/mapi.h: Change header guard name to _MAPI_H  for
 	consistency.
 
