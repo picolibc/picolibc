@@ -1,3 +1,12 @@
+Wed Jul 26 10:59:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* passwd.cc: Change name of passwd_in_memory_p to passwd_state.
+	Change type to enum. Change storage class to static. Adjust comments.
+	(read_etc_passwd): Set passwd_state to different values when loaded
+	from file in contrast to being emulated.
+	(search_for): Return default passwd entry if passwd is emulated or
+	it's a request for the current user. Otherwise return NULL.
+
 Tue Jul 25 21:50:42 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (statfs): Use path_conv method to convert input path.
