@@ -249,7 +249,11 @@ normalize_posix_path (const char *src, char *dst)
 		    break;
 		}
 	      else if (src[2] && !isslash (src[2]))
-		break;
+		{
+		  if (src[2] == '.')
+		    return ENOENT;
+		  break;
+		}
 	      else
 		{
 		  while (dst > dst_start && !isslash (*--dst))

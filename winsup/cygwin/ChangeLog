@@ -1,3 +1,7 @@
+2002-03-06  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (normalize_posix_path): Avoid runs of '.'s > 2.
+
 2002-03-05  Christopher Faylor  <cgf@redhat.com>
 
 	* errno.cc: Change EPERM associated text to "Operation not permitted"
