@@ -87,7 +87,7 @@ fhandler_process::exists ()
   for (int i = 0; process_listing[i]; i++)
     if (pathmatch (path + 1, process_listing[i]))
       return -1;
-  return 1;
+  return 0;
 }
 
 fhandler_process::fhandler_process ():
@@ -104,20 +104,13 @@ fhandler_process::fstat (struct __stat64 *buf, path_conv *pc)
   path += proc_len + 1;
   int pid = atoi (path);
   winpids pids;
-  _pinfo *p;
-  for (unsigned i = 0; i < pids.npids; i++)
+  pinfo p (pid);
+  if (!p)
     {
-      p = pids[i];
-
-      if (!proc_exists (p))
-	continue;
-
-      if (p->pid == pid)
-	goto found;
+      set_errno(ENOENT);
+      return -1;
     }
-  set_errno(ENOENT);
-  return -1;
-found:
+
   buf->st_mode &= ~_IFMT & NO_W;
 
   switch (file_type)

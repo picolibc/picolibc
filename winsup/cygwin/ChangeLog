@@ -1,5 +1,18 @@
 2002-06-01  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.cc (fhandler_base::fstat): Move dev and ino calculation into
+	caller.
+	* syscalls.cc (stat_worker): Calculate dev and ino calculation here, if
+	zero.
+	* fhandler_proc.cc (fhandler_proc::fhandler_proc): Minor reorg for
+	debugging.
+	* fhandler_process.cc (fhandler_process::exists): Return 0 on
+	nonexistence.
+	(fhandler_process::fstat): Simplify pid logic.
+	* fhandler_tape.cc (fhandler_dev_tape::fstat): Minor reformatting.
+
+2002-06-01  Christopher Faylor  <cgf@redhat.com>
+
 	* path.cc (chdir): Don't allow cd'ing to a non-directory virtual path.
 
 2002-05-31  Christopher Faylor  <cgf@redhat.com>

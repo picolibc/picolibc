@@ -1073,18 +1073,17 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
   path_conv real_path;
   fhandler_base *fh = NULL;
 
-  if (!pc)
-    pc = &real_path;
-
-  MALLOC_CHECK;
   if (check_null_invalid_struct_errno (buf))
     goto done;
 
+  if (!pc)
+    pc = &real_path;
+
   fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, *pc,
-						(nofollow ?
-						 PC_SYM_NOFOLLOW
-						 : PC_SYM_FOLLOW)
+						(nofollow ? PC_SYM_NOFOLLOW
+							  : PC_SYM_FOLLOW)
 						| PC_FULL, stat_suffixes);
+
   if (pc->error)
     {
       debug_printf ("got %d error from build_fhandler_from_name", pc->error);
@@ -1094,8 +1093,15 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
     {
       debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
 		    pc, (DWORD) real_path);
-      memset (buf, 0, sizeof (struct __stat64));
+      memset (buf, 0, sizeof (*buf));
       res = fh->fstat (buf, pc);
+      if (!res)
+	{
+	  if (!buf->st_ino)
+	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
+	  if (!buf->st_dev)
+	    buf->st_dev = FHDEVN (fh->get_device ()) << 8 | (fh->get_unit () & 0xff);
+	}
     }
 
  done:
