@@ -141,8 +141,10 @@ fseek (fp, offset, whence)
 	{
 	  curoff = (*seekfn) (fp->_cookie, (fpos_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
-            _funlockfile(fp);
-	    return EOF;
+	    {
+	      _funlockfile(fp);
+	      return EOF;
+	    }
 	}
       if (fp->_flags & __SRD)
 	{
