@@ -103,8 +103,13 @@ do_AngelSWI (int reason, void * arg)
   asm volatile ("mov r0, %1; mov r1, %2; swi %a3; mov %0, r0"
        : "=r" (value) /* Outputs */
        : "r" (reason), "r" (arg), "i" (AngelSWI) /* Inputs */
-       : "r0", "r1", "lr"
+       : "r0", "r1", "r2", "r3", "ip", "lr", "memory"
 		/* Clobbers r0 and r1, and lr if in supervisor mode */);
+                /* Accordingly to page 13-77 of ARM DUI 0040D other registers
+                   can also be clobbered.  Some memory positions may also be
+                   changed by a system call, so they should not be kept in
+                   registers. Note: we are assuming the manual is right and
+                   Angel is respecting the APCS */
   return value;
 }
 #endif /* ARM_RDI_MONITOR */

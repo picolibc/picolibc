@@ -1,3 +1,8 @@
+Thu Mar 22 14:57:00 2000  Fernando Nasser <fnasser@redhat.com>
+
+	* libc/sys/arm/syscalls.c (do_AngelSWI): Prevent registers with valid
+	information to be clobbered by an Angel C library support syscall. 
+
 Tue Mar 21 19:08:00 2000  Jeff Johnston <jjohnstn@cygnus.com>
 
 	* libc/stdlib/envlock.c: Fixed comment typo.
