@@ -61,19 +61,19 @@ __sflags (ptr, mode, optr)
       ptr->_errno = EINVAL;
       return (0);
     }
-  if (mode[1] == '+' || mode[2] == '+')
+  if (mode[1] && (mode[1] == '+' || mode[2] == '+'))
     {
       ret = __SRW;
       m = O_RDWR;
     }
-  if (mode[1] == 'b' || mode[2] == 'b')
+  if (mode[1] && (mode[1] == 'b' || mode[2] == 'b'))
     {
 #ifdef O_BINARY
       m |= O_BINARY;
 #endif
     }
 #ifdef __CYGWIN__
-  else if (mode[1] == 't' || mode[2] == 't')
+  else if (mode[1] && (mode[1] == 't' || mode[2] == 't'))
 #else
   else
 #endif

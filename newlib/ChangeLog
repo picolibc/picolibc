@@ -1,3 +1,8 @@
+Fri Feb 25 14:50:50 2000  Jeff Johnston <jjohnstn@cygnus.com>
+
+	* libc/stdio/flags.c (__sflags): Added check that mode[1]
+	is non-null before looking at mode[2].
+
 Thu Feb 24 11:43:00 2000  Ran Cabell <rcabell@norfolk.infi.net>
 
 	* libm/mathfp/sf_atan2.c: Fix atan2 typo for _DOUBLE_IS_32_BITS.
