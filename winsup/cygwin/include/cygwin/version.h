@@ -186,12 +186,14 @@ details. */
 		  truncf
        76: mallinfo
        77: thread-safe exit/at_exit
+       78: Use stat and fstat rather than _stat, and _fstat.
+	   Export btowc and trunc.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 77
+#define CYGWIN_VERSION_API_MINOR 78
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
