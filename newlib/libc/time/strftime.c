@@ -209,6 +209,7 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    }
 	  break;
 	case 'b':
+	case 'h':
 	  for (i = 0; i < 3; i++)
 	    {
 	      if (count < maxsize - 1)
@@ -271,9 +272,10 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    return 0;
 	  break;
 	case 'H':
+	case 'k':
 	  if (count < maxsize - 2)
 	    {
-	      sprintf (&s[count], "%2.2d",
+	      sprintf (&s[count], *format == 'k' ? "%2d" : "%2.2d",
 		       tim_p->tm_hour);
 	      count += 2;
 	    }
@@ -281,6 +283,7 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    return 0;
 	  break;
 	case 'I':
+	case 'l':
 	  if (count < maxsize - 2)
 	    {
 	      if (tim_p->tm_hour == 0 ||
@@ -291,7 +294,7 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 		}
 	      else
 		{
-		  sprintf (&s[count], "%.2d",
+		  sprintf (&s[count], (*format == 'I') ? "%.2d" : "%2d",
 			   tim_p->tm_hour % 12);
 		  count += 2;
 		}

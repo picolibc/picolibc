@@ -1,3 +1,8 @@
+2003-01-14  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/time/strftime.c (strftime): Add '%h' and '%l, %k' GNU
+	extensions.
+
 2003-01-08  Richard Sandiford  <rsandifo@redhat.com>
 
 	* configure.host (mips64vr-elf, mips64vrel-elf): New config.
