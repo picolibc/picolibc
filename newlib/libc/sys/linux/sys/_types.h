@@ -21,8 +21,6 @@ typedef long _ssize_t;
 #define __need_wint_t
 #include <stddef.h>
 
-#ifndef _MBSTATE_T
-#define _MBSTATE_T
 /* Conversion state information.  */
 typedef struct
 {
@@ -33,7 +31,6 @@ typedef struct
     unsigned char __wchb[4];
   } __value;		/* Value so far.  */
 } _mbstate_t;
-#endif /* _MBSTATE_T */
 
 struct __flock_t_tmp;
 typedef struct

@@ -31,10 +31,10 @@
 #endif
 #endif
 
-#ifndef MBSTATE_T
-#define MBSTATE_T
+#ifndef _MBSTATE_T
+#define _MBSTATE_T
 typedef _mbstate_t mbstate_t;
-#endif /* MBSTATE_T */
+#endif /* _MBSTATE_T */
 
 wint_t	_EXFUN(btowc, (int));
 int	_EXFUN(wctob, (wint_t));
