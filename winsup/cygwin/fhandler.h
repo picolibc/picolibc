@@ -91,8 +91,9 @@ enum
   FH_TAPE    = 0x00000012,	/* is a tape */
   FH_NULL    = 0x00000013,	/* is the null device */
   FH_ZERO    = 0x00000014,	/* is the zero device */
+  FH_RANDOM  = 0x00000015,	/* is a random device */
 
-  FH_NDEV    = 0x00000015,	/* Maximum number of devices */
+  FH_NDEV    = 0x00000016,	/* Maximum number of devices */
   FH_DEVMASK = 0x00000fff,	/* devices live here */
   FH_BAD     = 0xffffffff
 };
@@ -728,6 +729,24 @@ public:
   int read (void *ptr, size_t len);
   off_t lseek (off_t offset, int whence);
   int close (void);
+
+  void dump ();
+};
+
+class fhandler_dev_random: public fhandler_base
+{
+protected:
+  int unit;
+  HCRYPTPROV crypt_prov;
+public:
+  fhandler_dev_random (const char *name, int unit);
+  int get_unit () { return unit; }
+  int open (const char *path, int flags, mode_t mode = 0);
+  int write (const void *ptr, size_t len);
+  int read (void *ptr, size_t len);
+  off_t lseek (off_t offset, int whence);
+  int close (void);
+  int dup (fhandler_base *child);
 
   void dump ();
 };

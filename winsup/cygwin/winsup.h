@@ -51,6 +51,7 @@ return __res;
 }
 
 #include <windows.h>
+#include <wincrypt.h>
 
 /* Used for runtime OS check/decisions. */
 enum os_type {winNT = 1, win95, win98, win32s, unknown};
