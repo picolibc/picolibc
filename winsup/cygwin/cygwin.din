@@ -967,6 +967,8 @@ pclose
 _pclose = pclose
 strftime
 _strftime = strftime
+strptime
+_strptime = strptime
 setgrent
 _setgrent = setgrent
 cuserid

@@ -1,3 +1,8 @@
+2002-04-09  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+	* cygwin.din: Add strptime.
+	* include/cygwin/version.h: Increment API version number.
+
 2002-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fork.cc (fork_child): Call fixup_mmaps_after_fork() somewhat earlier.
