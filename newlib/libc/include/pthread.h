@@ -258,6 +258,8 @@ int	_EXFUN(pthread_key_delete, (pthread_key_t key));
 #define PTHREAD_CANCEL_DEFERRED 0
 #define PTHREAD_CANCEL_ASYNCHRONOUS 1
 
+#define PTHREAD_CANCELED ((void *) -1)
+
 int	_EXFUN(pthread_cancel, (pthread_t thread));
 
 /* Setting Cancelability State, P1003.1c/Draft 10, p. 183 */
