@@ -54,6 +54,7 @@
 	* cygcheck.cc: Reorder includes to avoid compiler error.
 
 2002-09-15  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
 	* cygcheck.cc (print_version) Add final newline.
 	* getfacl.c (print_version) Add final newline.
 	* kill.cc (print_version) Add final newline.
@@ -69,6 +70,7 @@
 	* umount.cc (print_version) Add final newline.
 
 2002-09-12  Igor Pechtchanski <pechtcha@cs.nyu.edu>
+
 	* cygpath.cc (options) New global variable.
 	(main) Make short options global for easier change.
 	(print_version) Add a missing newline.
