@@ -332,19 +332,22 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
       granularity = si.dwAllocationGranularity;
     }
 
-  DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;
-  if (flags & MAP_PRIVATE)
-    access = FILE_MAP_COPY;
-
   /* Error conditions according to SUSv2 */
   if (off % getpagesize ()
+      || (!(flags & MAP_SHARED) && !(flags & MAP_PRIVATE))
+      || ((flags & MAP_SHARED) && (flags & MAP_PRIVATE))
+      || ((flags & MAP_SHARED) && (flags & MAP_ANONYMOUS))
       || ((flags & MAP_FIXED) && ((DWORD)addr % granularity))
       || !len)
     {
       set_errno (EINVAL);
-      syscall_printf ("-1 = mmap(): Invalid parameters");
+      syscall_printf ("-1 = mmap(): EINVAL");
       return MAP_FAILED;
     }
+
+  DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;
+  if (flags & MAP_PRIVATE)
+    access = FILE_MAP_COPY;
 
   SetResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
 
@@ -378,22 +381,6 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   if (flags & MAP_ANONYMOUS)
     fd = -1;
 
-  /* First check if this mapping matches into the chunk of another
-     already performed mapping. */
-  list *l = mmapped_areas->get_list_by_fd (fd);
-  if (l)
-    {
-      mmap_record *rec;
-      if ((rec = l->match (off, len)) != NULL)
-        {
-	  off = rec->map_map (off, len);
-	  caddr_t ret = rec->get_address () + off;
-	  syscall_printf ("%x = mmap() succeeded", ret);
-	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
-	  return ret;
-	}
-    }
-
   /* Map always in multipliers of `granularity'-sized chunks. */
   DWORD gran_off = off & ~(granularity - 1);
   DWORD gran_len = howmany (len, granularity) * granularity;
@@ -403,12 +390,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   caddr_t base = addr;
   HANDLE h;
 
-  if (fd == -1)
-    {
-      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
-      fh = &fh_paging_file;
-    }
-  else
+  if (fd != -1)
     {
       /* Ensure that fd is open */
       if (fdtab.not_open (fd))
@@ -425,6 +407,39 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	  fsiz -= gran_off;
 	  if (gran_len > fsiz)
 	    gran_len = fsiz;
+	}
+      else if (fh->get_device () == FH_ZERO)
+        {
+	  /* mmap /dev/zero is like MAP_ANONYMOUS. */
+	  if (flags & MAP_SHARED)
+	    {
+	      set_errno (EINVAL);
+	      syscall_printf ("-1 = mmap(): EINVAL");
+	      ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	      return MAP_FAILED;
+	    }
+          fd = -1;
+	}
+    }
+  if (fd == -1)
+    {
+      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
+      fh = &fh_paging_file;
+    }
+
+  /* First check if this mapping matches into the chunk of another
+     already performed mapping. */
+  list *l = mmapped_areas->get_list_by_fd (fd);
+  if (l)
+    {
+      mmap_record *rec;
+      if ((rec = l->match (off, len)) != NULL)
+        {
+	  off = rec->map_map (off, len);
+	  caddr_t ret = rec->get_address () + off;
+	  syscall_printf ("%x = mmap() succeeded", ret);
+	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	  return ret;
 	}
     }
 

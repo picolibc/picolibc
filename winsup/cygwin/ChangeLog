@@ -1,3 +1,8 @@
+Mon Jan 15 23:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap): Add more parameter checking. Change error output
+	in case of EINVAL. Treat mmapping /dev/zero like MAP_ANONYMOUS.
+
 Mon Jan 15 20:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc: include <unistd.h>. Define some bit operations for
