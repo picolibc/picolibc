@@ -1,3 +1,8 @@
+2002-01-15  Mark Salter  <msalter@redhat.com>
+
+	* xstormy16/Makefile.in: Rename stub app to eva_stub.elf and
+	add it to install list.
+
 2002-01-07  Mark Salter  <msalter@redhat.com>
 
 	* configure.in: Add support for arm, strongarm, and xscale.
