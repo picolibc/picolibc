@@ -1,3 +1,7 @@
+2002-07-02  Egor Duda <deo@logos-m.ru>
+
+	* include/cygwin/version.h: Bump API minor version.
+
 2002-07-01  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.cc (get_logon_server): Interpret a zero length
