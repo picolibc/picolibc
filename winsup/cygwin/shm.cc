@@ -15,16 +15,36 @@ details. */
 #include <assert.h>
 #include <errno.h>
 #include "cygerrno.h"
+#include <limits.h>
 #include <unistd.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include <stdio.h>
 #include "thread.h"
 #include <sys/shm.h>
 #include "cygserver_shm.h"
+
+/*
+ * FIXME: These must be defined somewhere? i.e. get the high and low
+ * double words of a quad word?  They are required here to allow keys
+ * to be printed out via XXX_printf (i.e. small_printf()).  Note that
+ * even if the key is only 32 bits (the old default), these routine
+ * should still give sensible results, i.e. hi_ulong() => 0.
+ */
+
+inline long int hi_ulong (const key_t key)
+{
+  return (unsigned long)
+    (((unsigned long long) key >> 32) & ULONG_MAX);
+}
+
+inline long int lo_ulong (const key_t key)
+{
+  return (unsigned long)
+    ((unsigned long long) key & ULONG_MAX);
+}
 
 // FIXME IS THIS CORRECT
 /* Implementation notes: We use two shared memory regions per key:
@@ -98,8 +118,8 @@ client_request_shm::client_request_shm (key_t nkey, size_t nsize, int nshmflg)
 			      sizeof (parameters.in.sd_buf));
     }
 
-  debug_printf ("created: key = 0x%0llx, size = %ld, shmflg = %o",
-		nkey, nsize, nshmflg);
+  debug_printf ("created: key = 0x%x%08x, size = %ld, shmflg = %o",
+		hi_ulong(nkey), lo_ulong(nkey), nsize, nshmflg);
 }
 
 static shmnode *shm_head = NULL;
@@ -304,7 +324,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   int rc;
   if ((rc = cygserver_request (req)))
     {
-      debug_printf ("failed to tell deaemon that we have attached");
+      debug_printf ("failed to tell daemon that we have attached");
     }
   delete req;
 
@@ -353,7 +373,7 @@ shmdt (const void *shmaddr)
   int rc;
   if ((rc = cygserver_request (req)))
     {
-      debug_printf ("failed to tell deaemon that we have detached");
+      debug_printf ("failed to tell daemon that we have detached");
     }
   delete req;
 

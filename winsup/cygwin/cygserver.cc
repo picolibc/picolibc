@@ -226,7 +226,8 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
       system_printf ("error getting handle to client (%lu)", GetLastError ());
       goto out;
     }
-  debug_printf ("Duplicated %p to %p", from_handle, *to_handle_ptr);
+
+  // verbose: debug_printf ("Duplicated %p to %p", from_handle, *to_handle_ptr);
 
   ret_val = 0;
 
@@ -256,7 +257,7 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
 
   if (!wincap.has_security ())
     {
-      debug_printf ("this should not be called in a system without security");
+      system_printf ("this should not be called in a system without security");
       header.error_code = EINVAL;
       return;
     }
@@ -267,13 +268,16 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
       return;
     }
 
-  debug_printf ("pid %ld:(%p,%p) -> pid %ld", req.master_pid,
-				req.from_master, req.to_master,
-				req.pid);
+  const HANDLE from_master_orig = req.from_master;
+  const HANDLE to_master_orig = req.to_master;
 
-  debug_printf ("opening process %ld", req.master_pid);
+  // verbose: debug_printf ("pid %ld:(%p,%p) -> pid %ld", req.master_pid,
+  //				req.from_master, req.to_master,
+  //				req.pid);
+
+  // verbose: debug_printf ("opening process %ld", req.master_pid);
   from_process_handle = OpenProcess (PROCESS_DUP_HANDLE, FALSE, req.master_pid);
-  debug_printf ("opening process %ld", req.pid);
+  // verbose: debug_printf ("opening process %ld", req.pid);
   to_process_handle = OpenProcess (PROCESS_DUP_HANDLE, FALSE, req.pid);
   if (!from_process_handle || !to_process_handle)
     {
@@ -282,16 +286,16 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
       goto out;
     }
 
-  debug_printf ("Impersonating client");
+  // verbose: debug_printf ("Impersonating client");
   conn->impersonate_client ();
 
-  debug_printf ("about to open thread token");
+  // verbose: debug_printf ("about to open thread token");
   rc = OpenThreadToken (GetCurrentThread (),
 			TOKEN_QUERY,
 			TRUE,
 			&token_handle);
 
-  debug_printf ("opened thread token, rc=%lu", rc);
+  // verbose: debug_printf ("opened thread token, rc=%lu", rc);
   conn->revert_to_self ();
 
   if (!rc)
@@ -328,8 +332,9 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
 	}
     }
 
-  debug_printf ("%ld -> %ld(%p,%p)", req.master_pid, req.pid,
-		req.from_master, req.to_master);
+  debug_printf ("%lu(%lu, %lu) -> %lu(%lu,%lu)",
+		req.master_pid, from_master_orig, to_master_orig,
+		req.pid, req.from_master, req.to_master);
 
   header.error_code = 0;
 
@@ -435,7 +440,7 @@ server_request::process ()
   ssize_t bytes_read, bytes_written;
   struct request_header* req_ptr = (struct request_header*) &request_buffer;
   client_request *req = NULL;
-  debug_printf ("about to read");
+  // verbose: debug_printf ("about to read");
 
   bytes_read = conn->read (request_buffer, sizeof (struct request_header));
   if (bytes_read != sizeof (struct request_header))
@@ -443,7 +448,7 @@ server_request::process ()
       system_printf ("error reading from connection (%lu)", GetLastError ());
       goto out;
     }
-  debug_printf ("got header (%ld)", bytes_read);
+  // verbose: debug_printf ("got header (%ld)", bytes_read);
 
   switch (req_ptr->req_id)
     {
@@ -458,12 +463,12 @@ server_request::process ()
     default:
       req = new client_request (CYGSERVER_REQUEST_INVALID, 0);
       req->header.error_code = ENOSYS;
-      debug_printf ("Bad client request - returning ENOSYS");
+      system_printf ("Bad client request - returning ENOSYS");
     }
 
   if (req->header.cb != req_ptr->cb)
     {
-      debug_printf ("Mismatch in request buffer sizes");
+      system_printf ("Mismatch in request buffer sizes");
       goto out;
     }
 
@@ -473,10 +478,10 @@ server_request::process ()
       bytes_read = conn->read (req->buffer, req->header.cb);
       if (bytes_read != req->header.cb)
 	{
-	  debug_printf ("error reading from connection (%lu)", GetLastError ());
+	  system_printf ("error reading from connection (%lu)", GetLastError ());
 	  goto out;
 	}
-      debug_printf ("got body (%ld)",bytes_read);
+      // verbose: debug_printf ("got body (%ld)",bytes_read);
     }
 
   /* this is not allowed to fail. We must return ENOSYS at a minimum to the client */
@@ -491,7 +496,7 @@ server_request::process ()
       goto out;
     }
 
-  debug_printf("Sent reply, size (%ld)",bytes_written);
+  // verbose: debug_printf("Sent reply, size (%ld)",bytes_written);
   printf (".");
 
 out:

@@ -86,7 +86,7 @@ transport_layer_sockets::accept ()
 
   if ((new_fd = cygwin_accept(fd, &sockdetails, &sdlen)) < 0)
     {
-      system_printf ("Nup, could' accept. %d",errno);
+      system_printf ("Nup, couldn't accept. %d", errno);
       return NULL;
     }
 

@@ -141,7 +141,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
    */
   if (!from_process_handle)
     {
-      debug_printf ("error opening process (%lu)", GetLastError ());
+      system_printf ("error opening process (%lu)", GetLastError ());
       header.error_code = EACCES;
       return;
     }
@@ -157,7 +157,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 
       if (!rc)
 	{
-	  debug_printf ("error opening thread token (%lu)", GetLastError ());
+	  system_printf ("error opening thread token (%lu)", GetLastError ());
 	  header.error_code = EACCES;
 	  CloseHandle (from_process_handle);
 	  return;
@@ -183,8 +183,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		   DUPLICATE_SAME_ACCESS, tempnode->filemap,
 		   &parameters.out.filemap, TRUE) != 0)
 		{
-		  debug_printf ("error duplicating filemap handle (%lu)",
-				GetLastError ());
+		  system_printf ("error duplicating filemap handle (%lu)",
+				 GetLastError ());
 		  header.error_code = EACCES;
 		}
 	      if (check_and_dup_handle
@@ -192,8 +192,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		   DUPLICATE_SAME_ACCESS, tempnode->attachmap,
 		   &parameters.out.attachmap, TRUE) != 0)
 		{
-		  debug_printf ("error duplicating attachmap handle (%lu)",
-				GetLastError ());
+		  system_printf ("error duplicating attachmap handle (%lu)",
+				 GetLastError ());
 		  header.error_code = EACCES;
 		}
 	      CloseHandle (token_handle);
@@ -313,8 +313,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	  shmname = stringbuf;
 	  snprintf (stringbuf1, 29, "CYGWINSHMD0x%0qx", parameters.in.key);
 	  shmaname = stringbuf1;
-	  debug_printf ("system id strings: %s, %s", shmname,
-			shmaname);
+	  debug_printf ("system id strings: key = %s", shmname);
+	  debug_printf ("system id strings: data = %s", shmaname);
 	  debug_printf ("key input value is 0x%0qx", parameters.in.key);
 	}
 

@@ -241,7 +241,7 @@ DWORD process::exit_code ()
     err = GetExitCodeProcess (thehandle, &_exit_status);
   if (!err)
     {
-      debug_printf ("Failed to retrieve exit code (%ld)", GetLastError ());
+      system_printf ("Failed to retrieve exit code (%ld)", GetLastError ());
       thehandle = INVALID_HANDLE_VALUE;
       return _exit_status;
     }
@@ -353,7 +353,7 @@ process_process_param::request_loop ()
 				    HandlesSize - 2 - offset, offset);
 	  count += copied;
 	}
-      debug_printf ("waiting on %u objects", count);
+      // verbose: debug_printf ("waiting on %u objects", count);
       DWORD rc = WaitForMultipleObjects (count, Handles, FALSE, INFINITE);
       if (rc == WAIT_FAILED)
 	{
