@@ -1,4 +1,10 @@
-2002-11-03  Sergey Okhapkin  <sos@prospect.com.ru>
+2002-11-03  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_serial.cc (fhandler_serial::ioctl): Reformat.  Set errno
+	appropriately.  Exit from the bottom.  Correctly deal with third
+	argument for TCFLSH.  (Suggested by Sergey Okhapkin)
+
+2003-11-03  Sergey Okhapkin  <sos@prospect.com.ru>
 
 	* fhandler_tty.cc (fhandler_tty_slave::ioctl): Do nothing if the new
 	window size is equal to the old one.  Send SIGWINCH if slave connected

@@ -380,92 +380,130 @@ fhandler_serial::tcflow (int action)
 int
 fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 {
+  int res = 0;
+
+# define ibuffer ((int) buffer)
+# define ipbuffer (*(int *) buffer)
 
   DWORD ev;
   COMSTAT st;
-  DWORD action;
-  DWORD modemLines;
-  DWORD mcr;
-  DWORD cbReturned;
-  bool result;
-  int modemStatus;
-  int request;
+  if (ClearCommError (get_handle (), &ev, &st))
+    res = -1;
+  else
+    switch (cmd)
+      {
+      case TCFLSH:
+	res = tcflush (ibuffer);
+	break;
+      case TIOCMGET:
+	DWORD modem_lines;
+	if (GetCommModemStatus (get_handle (), &modem_lines) == 0)
+	  {
+	    __seterrno ();
+	    res = -1;
+	  }
+	else
+	  {
+	    unsigned modem_status = 0;
+	    if (modem_lines & MS_CTS_ON)
+	      modem_status |= TIOCM_CTS;
+	    if (modem_lines & MS_DSR_ON)
+	      modem_status |= TIOCM_DSR;
+	    if (modem_lines & MS_RING_ON)
+	      modem_status |= TIOCM_RI;
+	    if (modem_lines & MS_RLSD_ON)
+	      modem_status |= TIOCM_CD;
+	    if (!wincap.supports_reading_modem_output_lines ())
+	      modem_status |= rts | dtr;
+	    else
+	      {
+		DWORD cb;
+		DWORD mcr;
+		BOOL result = DeviceIoControl (get_handle (), 0x001B0078, NULL,
+					       0, &mcr, 4, &cb, 0);
+		if (!result)
+		  {
+		    __seterrno ();
+		    res = -1;
+		    goto out;
+		  }
+		if (cb != 4)
+		  {
+		    set_errno (EINVAL);	/* FIXME: right errno? */
+		    res = -1;
+		    goto out;
+		  }
+		if (mcr & 2)
+		  modem_status |= TIOCM_RTS;
+		if (mcr & 1)
+		  modem_status |= TIOCM_DTR;
+	      }
+	    ipbuffer = modem_status;
+	  }
+	break;
+      case TIOCMSET:
+	if (ipbuffer & TIOCM_RTS)
+	  {
+	    if (EscapeCommFunction (get_handle (), SETRTS))
+	      rts = TIOCM_RTS;
+	    else
+	      {
+		__seterrno ();
+		res = -1;
+	      }
+	  }
+	else
+	  {
+	    if (EscapeCommFunction (get_handle (), CLRRTS))
+	      rts = 0;
+	    else
+	      {
+		__seterrno ();
+		res = -1;
+	      }
+	  }
+	if (ipbuffer & TIOCM_DTR)
+	  {
+	    if (EscapeCommFunction (get_handle (), SETDTR))
+	      dtr = TIOCM_DTR;
+	    else
+	      {
+		__seterrno ();
+		res = -1;
+	      }
+	  }
+	else
+	  {
+	    if (EscapeCommFunction (get_handle (), CLRDTR))
+	      dtr = 0;
+	    else
+	      {
+		__seterrno ();
+		res = -1;
+	      }
+	  }
+	break;
+     case TIOCINQ:
+       if (ev & CE_FRAME || ev & CE_IOE || ev & CE_OVERRUN || ev & CE_RXOVER
+	   || ev & CE_RXPARITY)
+	 {
+	   set_errno (EINVAL);	/* FIXME: Use correct errno */
+	   res = -1;
+	 }
+       else
+	 ipbuffer = st.cbInQue;
+       break;
+     default:
+       set_errno (ENOSYS);
+       res = -1;
+       break;
+     }
 
-  request = *(int *) buffer;
-  action = 0;
-  modemStatus = 0;
-  if (!ClearCommError (get_handle (), &ev, &st))
-    return -1;
-  switch (cmd)
-    {
-    case TIOCMGET:
-      if (GetCommModemStatus (get_handle (), &modemLines) == 0)
-	return -1;
-      if (modemLines & MS_CTS_ON)
-	modemStatus |= TIOCM_CTS;
-      if (modemLines & MS_DSR_ON)
-	modemStatus |= TIOCM_DSR;
-      if (modemLines & MS_RING_ON)
-	modemStatus |= TIOCM_RI;
-      if (modemLines & MS_RLSD_ON)
-	modemStatus |= TIOCM_CD;
-      if (!wincap.supports_reading_modem_output_lines ())
-	modemStatus |= rts | dtr;
-      else
-	{
-	  result = DeviceIoControl (get_handle (),
-				    0x001B0078,
-				    NULL, 0, &mcr, 4, &cbReturned, 0);
-	  if (!result)
-	    return -1;
-	  if (cbReturned != 4)
-	    return -1;
-	  if (mcr & 2)
-	    modemStatus |= TIOCM_RTS;
-	  if (mcr & 1)
-	    modemStatus |= TIOCM_DTR;
-	}
-      *(int *) buffer = modemStatus;
-      return 0;
-    case TIOCMSET:
-      if (request & TIOCM_RTS)
-	{
-	  if (EscapeCommFunction (get_handle (), SETRTS) == 0)
-	    return -1;
-	  else
-	    rts = TIOCM_RTS;
-	}
-      else
-	{
-	  if (EscapeCommFunction (get_handle (), CLRRTS) == 0)
-	    return -1;
-	  else
-	    rts = 0;
-	}
-      if (request & TIOCM_DTR)
-	{
-	  if (EscapeCommFunction (get_handle (), SETDTR) == 0)
-	    return -1;
-	  else
-	    dtr = TIOCM_DTR;
-	}
-      else
-	{
-	  if (EscapeCommFunction (get_handle (), CLRDTR) == 0)
-	    return -1;
-	  else
-	    dtr = 0;
-	}
-      return 0;
-   case TIOCINQ:
-     if (ev & CE_FRAME | ev & CE_IOE | ev & CE_OVERRUN |
-	 ev & CE_RXOVER | ev & CE_RXPARITY)
-       return -1;
-     *(int *) buffer = st.cbInQue;
-     return 0;
-   default:
-     return -1;
-   }
+out:
+  termios_printf ("%d = ioctl (%p, %p)", res, cmd, buffer);
+# undef ibuffer
+# undef ipbuffer
+  return res;
 }
 
 /* tcflush: POSIX 7.2.2.1 */

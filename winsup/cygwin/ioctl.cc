@@ -52,5 +52,7 @@ ioctl (int fd, int cmd, ...)
 	  return tcsetattr (fd, TCSAFLUSH, (struct termios *) argp);
       }
 
-  return cfd->ioctl (cmd, argp);
+  int res = cfd->ioctl (cmd, argp);
+  debug_printf ("returning %d", res);
+  return res;
 }
