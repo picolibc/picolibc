@@ -6,14 +6,14 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 SUBDIRS = machine \
 	.
-
 SUBLIBS = $(LINUX_MACH_LIB)
 
 LIB_SOURCES = \
 	brk.c flockfile.c funlockfile.c getoptlong.c getreent.c ids.c \
 	inode.c io.c io64.c linux.c mmap.c \
 	pread.c pread64.c process.c pwrite.c pwrite64.c raise.c realpath.c \
-	sched.c select.c signal.c siglongjmp.c socket.c sleep.c stack.c \
+	sched.c select.c shm_open.c shm_unlink.c signal.c siglongjmp.c \
+	socket.c sleep.c stack.c \
 	sysconf.c systat.c system.c tcdrain.c termios.c time.c \
 	usleep.c wait.c
 

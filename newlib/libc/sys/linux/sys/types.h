@@ -13,13 +13,13 @@
 #include <sys/config.h>
 #include <machine/types.h>
 
-#ifndef __time_t_defined
+#if !defined(__time_t_defined) && !defined(_TIME_T)
 #define _TIME_T
 #define __time_t_defined
 typedef _TIME_T_ time_t;
 #endif
 
-#ifndef __clock_t_defined
+#if !defined(__clock_t_defined) && !defined(_CLOCK_T)
 #define _CLOCK_T
 #define __clock_t_defined
 typedef _CLOCK_T_ clock_t;

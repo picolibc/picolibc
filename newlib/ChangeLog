@@ -1,5 +1,15 @@
 2002-05-22  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/sys/linux/shm_open.c: New file.
+	* libc/sys/linux/shm_unlink.c: Ditto.
+	* libc/sys/linux/Makefile.am: Add support for shm_open.c and
+	shm_unlink.c.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/sys/types.h: Add some additional checks to see
+	if clock_t or time_t is already defined.
+
+2002-05-22  Jeff Johnston  <jjohnstn@redhat.com>
+
         * Makefile.am: Don't pass $toollibdir down directly in
         AM_MAKEFLAGS as it causes all multilibs to use the same toollibdir.
         Pass it under the name: top_toollibdir.
