@@ -1,7 +1,7 @@
 2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h: Fix copyright date.
-	* sec_acl.cc (acl_worker): delete allocated fhandler.
+	* sec_acl.cc (acl_worker): Delete allocated fhandler.
 	* syscalls.cc (chown_worker): Ditto.
 	(chmod): Ditto.
 	(stat_worker): Use get_namehash instead of hash_path_name.
