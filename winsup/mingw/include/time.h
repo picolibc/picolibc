@@ -22,11 +22,6 @@
 #endif	/* Not RC_INVOKED */
 
 /*
- * Need a definition of time_t.
- */
-#include <sys/types.h>
-
-/*
  * Number of clock ticks per second. A clock tick is the unit by which
  * processor time is measured and is returned by 'clock'.
  */
@@ -39,7 +34,7 @@
 /*
  * A type for storing the current time and date. This is the number of
  * seconds since midnight Jan 1, 1970.
- * NOTE: Normally this is defined by the above include of sys/types.h
+ * NOTE: This is also defined in non-ISO sys/types.h.
  */
 #ifndef _TIME_T_DEFINED
 typedef	long	time_t;
