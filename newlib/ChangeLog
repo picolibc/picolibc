@@ -1,5 +1,10 @@
 2002-07-19  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/stdio64/Makefile.am: Remove missing files.
+	* libc/stdio64/Makefile.in: Regenerated.
+
+2002-07-19  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/include/sys/config.h[__i386__][__linux__]: Define
         _LARGE64FILE_SOURCE to 1.
         * libc/sys/linux/Makefile.am: Add getrlimit64.c and setrlimit64.c.

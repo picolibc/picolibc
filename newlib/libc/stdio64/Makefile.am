@@ -10,10 +10,7 @@ LIB_SOURCES = \
 	freopen64.c 			\
 	fseeko64.c 			\
 	fsetpos64.c 			\
-	fstat64r.c			\
 	ftello64.c			\
-	lseek64r.c			\
-	open64r.c			\
 	stdio64.c			\
 	tmpfile64.c
 
