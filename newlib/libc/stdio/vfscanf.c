@@ -135,11 +135,6 @@ Supporting OS subroutines required:
 extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #endif
 
-#define _NO_LONGLONG
-#if defined _WANT_IO_LONG_LONG && defined __GNUC__
-# undef _NO_LONGLONG
-#endif
-
 #include "floatio.h"
 
 #if ((MAXEXP+MAXFRACT+3) > MB_LEN_MAX)
@@ -153,6 +148,11 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #define MAX_LONG_LEN ((CHAR_BIT * sizeof (long)  - 1) * 4 / 13 + 2)
 #else
 #define	BUF	40
+#endif
+
+#define _NO_LONGLONG
+#if defined _WANT_IO_LONG_LONG && defined __GNUC__
+# undef _NO_LONGLONG
 #endif
 
 /*
