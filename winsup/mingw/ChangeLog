@@ -1,5 +1,9 @@
 2003-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/stdarg.h: Get rid of namespaces.
+
+2003-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	Merge from mingw trunk (changes since 2003-01-27).
 
 	2003-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
