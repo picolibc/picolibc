@@ -1,3 +1,7 @@
+2003-04-18  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Reorganize to try to allow lack of mingw/w32api to work.
+
 2003-04-11  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.common (w32api_lib): Fix w32api detection.
