@@ -1130,7 +1130,7 @@ write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 
 static int
 get_nt_attribute (const char *file, int *attribute,
-		  __uid16_t *uidret, __gid32_t *gidret)
+		  __uid32_t *uidret, __gid32_t *gidret)
 {
   if (!wincap.has_security ())
     return 0;
@@ -1168,7 +1168,7 @@ get_nt_attribute (const char *file, int *attribute,
       return -1;
     }
 
-  __uid16_t uid = cygsid(owner_sid).get_uid ();
+  __uid32_t uid = cygsid(owner_sid).get_uid ();
   __gid32_t gid = cygsid(group_sid).get_gid ();
   if (uidret)
     *uidret = uid;
@@ -1279,7 +1279,7 @@ get_nt_attribute (const char *file, int *attribute,
 
 int
 get_file_attribute (int use_ntsec, const char *file,
-		    int *attribute, __uid16_t *uidret, __gid32_t *gidret)
+		    int *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
   int res;
 
@@ -1292,7 +1292,7 @@ get_file_attribute (int use_ntsec, const char *file,
     }
 
   if (uidret)
-    *uidret = getuid ();
+    *uidret = getuid32 ();
   if (gidret)
     *gidret = getgid32 ();
 
@@ -1350,7 +1350,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
 }
 
 PSECURITY_DESCRIPTOR
-alloc_sd (__uid16_t uid, __gid32_t gid, const char *logsrv, int attribute,
+alloc_sd (__uid32_t uid, __gid32_t gid, const char *logsrv, int attribute,
 	  PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret)
 {
   BOOL dummy;
@@ -1367,7 +1367,7 @@ alloc_sd (__uid16_t uid, __gid32_t gid, const char *logsrv, int attribute,
   /* Get SID and name of new owner. */
   char owner[UNLEN + 1];
   cygsid owner_sid;
-  struct passwd *pw = getpwuid (uid);
+  struct passwd *pw = getpwuid32 (uid);
   strcpy (owner, pw ? pw->pw_name : getlogin ());
   if ((!pw || !owner_sid.getfrompw (pw))
       && !lookup_name (owner, logsrv, owner_sid))
@@ -1612,14 +1612,14 @@ set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
   psa->lpSecurityDescriptor = sd_buf;
   InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR)sd_buf,
 				SECURITY_DESCRIPTOR_REVISION);
-  psa->lpSecurityDescriptor = alloc_sd (geteuid (), getegid32 (),
+  psa->lpSecurityDescriptor = alloc_sd (geteuid32 (), getegid32 (),
 					cygheap->user.logsrv (),
 					attribute, (PSECURITY_DESCRIPTOR)sd_buf,
 					&sd_buf_size);
 }
 
 static int
-set_nt_attribute (const char *file, __uid16_t uid, __gid32_t gid,
+set_nt_attribute (const char *file, __uid32_t uid, __gid32_t gid,
 		  const char *logsrv, int attribute)
 {
   if (!wincap.has_security ())
@@ -1645,7 +1645,7 @@ set_nt_attribute (const char *file, __uid16_t uid, __gid32_t gid,
 
 int
 set_file_attribute (int use_ntsec, const char *file,
-		    __uid16_t uid, __gid32_t gid,
+		    __uid32_t uid, __gid32_t gid,
 		    int attribute, const char *logsrv)
 {
   int ret = 0;

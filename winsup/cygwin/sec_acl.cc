@@ -158,7 +158,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	  break;
 	case USER:
 	case DEF_USER:
-	  if (!(pw = getpwuid (aclbufp[i].a_id))
+	  if (!(pw = getpwuid32 (aclbufp[i].a_id))
 	      || !sid.getfrompw (pw)
 	      || !add_access_allowed_ace (acl, ace_off++, allow,
 					   sid, acl_len, inheritance))
@@ -255,7 +255,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
   PSID owner_sid;
   PSID group_sid;
   BOOL dummy;
-  __uid16_t uid;
+  __uid32_t uid;
   __gid32_t gid;
 
   if (!GetSecurityDescriptorOwner (psd, &owner_sid, &dummy))
@@ -426,7 +426,7 @@ acl_access (const char *path, int flags)
 	      struct passwd *pw;
 	      struct __group32 *gr = NULL;
 
-	      if ((pw = getpwuid (acls[i].a_id)) != NULL
+	      if ((pw = getpwuid32 (acls[i].a_id)) != NULL
 		  && owner.getfrompw (pw))
 		{
 		  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)

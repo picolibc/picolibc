@@ -211,6 +211,8 @@ extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 #ifndef _SYS_TYPES_H
 typedef unsigned short __uid16_t;
 typedef unsigned short __gid16_t;
+typedef unsigned long __uid32_t;
+typedef unsigned long __gid32_t;
 #endif
 
 struct external_pinfo
@@ -236,6 +238,9 @@ struct external_pinfo
   HANDLE strace_file;
 
   DWORD process_state;
+
+  __uid32_t uid32;
+  __gid32_t gid32;
 };
 
 DWORD cygwin_internal (cygwin_getinfo_types, ...);

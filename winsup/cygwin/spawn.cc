@@ -627,7 +627,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   cygbench ("spawn-guts");
   if (!hToken)
     {
-      ciresrv.moreinfo->uid = getuid ();
+      ciresrv.moreinfo->uid = getuid32 ();
       /* FIXME: This leaks a handle in the CreateProcessAsUser case since the
 	 child process doesn't know about cygwin_mount_h. */
       ciresrv.mount_h = cygwin_mount_h;

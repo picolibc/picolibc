@@ -147,9 +147,18 @@ extern "C" void __stdcall do_exit (int) __attribute__ ((noreturn));
 /* UID/GID */
 void uinfo_init (void);
 
-#define ILLEGAL_UID ((__uid16_t)-1)
+#define ILLEGAL_UID16 ((__uid16_t)-1)
+#define ILLEGAL_UID ((__uid32_t)-1)
+#define ILLEGAL_GID16 ((__gid16_t)-1)
 #define ILLEGAL_GID ((__gid32_t)-1)
 #define ILLEGAL_SEEK ((__off64_t)-1)
+
+#define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(__uid32_t)(u16))
+#define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(__gid32_t)(g16))
+
+extern "C" __uid32_t getuid32 (void);
+extern "C" __uid32_t geteuid32 (void);
+extern "C" struct passwd *getpwuid32 (__uid32_t);
 
 /* various events */
 void events_init (void);

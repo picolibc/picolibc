@@ -1,5 +1,26 @@
 2002-05-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	Change internal uid datatype from __uid16_t to __uid32_t
+	throughout.
+	* cygwin.din: Export new symbols getpwuid32, getpwuid_r32, getuid32,
+	geteuid32, setuid32, seteuid32.
+	* passwd.cc (getpwuid32): New function.
+	(getpwuid_r32): Ditto.
+	* syscalls.cc (seteuid32): Ditto.
+	(setuid32): Ditto.
+	* uinfo.cc (getuid32): Ditto.
+	(geteuid32): Ditto.
+	* winsup.h (uid16touid32): New macro, correclt casting from __uid16_t
+	to __uid32_t.
+	(gid16togid32): Ditto fir gids.
+	(getuid32): Declare.
+	(geteuid32): Ditto.
+	(getpwuid32): Ditto.
+	* include/sys/cygwin.h (struct external_pinfo): Add members uid32 and
+	gid32.
+
+2002-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/socket.h: Protect some symbols against multiple
 	definition.
 	* include/netinet/ip.h: Ditto.

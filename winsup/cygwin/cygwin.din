@@ -349,6 +349,7 @@ _getegid = getegid
 getegid32
 geteuid
 _geteuid = geteuid
+geteuid32
 getgid
 _getgid = getgid
 getgid32
@@ -389,6 +390,7 @@ gettimeofday
 _gettimeofday = gettimeofday
 getuid
 _getuid = getuid
+getuid32
 getutent
 _getutent = getutent
 getutid
@@ -682,11 +684,13 @@ settimeofday
 _settimeofday = settimeofday
 seteuid
 _seteuid = seteuid
+seteuid32
 setegid
 _setegid = setegid
 setegid32
 setuid
 _setuid = setuid
+setuid32
 setutent
 _setutent = setutent
 chroot
@@ -1019,7 +1023,9 @@ _getpwnam = getpwnam
 getpwnam_r
 getpwuid
 _getpwuid = getpwuid
+getpwuid32
 getpwuid_r
+getpwuid_r32
 getpgrp
 _getpgrp = getpgrp
 getgrent

@@ -244,7 +244,7 @@ cygsid::get_id (BOOL search_grp, int *type)
 	}
     }
   if (id == -1)
-    id = getuid ();
+    id = getuid32 ();
   return id;
 }
 
@@ -254,7 +254,7 @@ is_grp_member (__uid32_t uid, __gid32_t gid)
   extern int getgroups32 (int, __gid32_t *, __gid32_t, const char *);
   BOOL grp_member = TRUE;
 
-  struct passwd *pw = getpwuid (uid);
+  struct passwd *pw = getpwuid32 (uid);
   __gid32_t grps[NGROUPS_MAX];
   int cnt = getgroups32 (NGROUPS_MAX, grps,
 			 pw ? pw->pw_gid : myself->gid,

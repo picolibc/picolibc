@@ -282,6 +282,12 @@ getlogin (void)
   return strcpy (this_username, cygheap->user.name ());
 }
 
+extern "C" __uid32_t
+getuid32 (void)
+{
+  return cygheap->user.real_uid;
+}
+
 extern "C" __uid16_t
 getuid (void)
 {
@@ -298,6 +304,12 @@ extern "C" __gid16_t
 getgid (void)
 {
   return cygheap->user.real_gid;
+}
+
+extern "C" __uid32_t
+geteuid32 (void)
+{
+  return myself->uid;
 }
 
 extern "C" __uid16_t

@@ -126,7 +126,7 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
 {
   int res = -1;
   int oret;
-  __uid16_t uid;
+  __uid32_t uid;
   __gid32_t gid;
   int open_flags = O_RDONLY | O_BINARY | O_DIROPEN;
   bool query_open_already;
@@ -237,7 +237,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
   else if (pc->issocket ())
     buf->st_mode = S_IFSOCK;
 
-  __uid16_t uid;
+  __uid32_t uid;
   __gid32_t gid;
   if (get_file_attribute (pc->has_acls (), get_win32_name (), &buf->st_mode,
 			  &uid, &gid) == 0)

@@ -186,7 +186,7 @@ read_etc_passwd ()
 /* Cygwin internal */
 /* If this ever becomes non-reentrant, update all the getpw*_r functions */
 static struct passwd *
-search_for (__uid16_t uid, const char *name)
+search_for (__uid32_t uid, const char *name)
 {
   struct passwd *res = 0;
   struct passwd *default_pw = 0;
@@ -202,7 +202,7 @@ search_for (__uid16_t uid, const char *name)
 	  if (strcasematch (name, res->pw_name))
 	    return res;
 	}
-      else if (uid == res->pw_uid)
+      else if (uid == (__uid32_t) res->pw_uid)
 	return res;
     }
 
@@ -217,7 +217,7 @@ search_for (__uid16_t uid, const char *name)
 }
 
 extern "C" struct passwd *
-getpwuid (__uid16_t uid)
+getpwuid32 (__uid32_t uid)
 {
   if (passwd_state  <= initializing)
     read_etc_passwd ();
@@ -227,8 +227,14 @@ getpwuid (__uid16_t uid)
   return search_for (uid, 0);
 }
 
+extern "C" struct passwd *
+getpwuid (__uid16_t uid)
+{
+  return getpwuid32 (uid16touid32 (uid));
+}
+
 extern "C" int
-getpwuid_r (__uid16_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
+getpwuid_r32 (__uid32_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
 {
   *result = NULL;
 
@@ -267,6 +273,12 @@ getpwuid_r (__uid16_t uid, struct passwd *pwd, char *buffer, size_t bufsize, str
   strcpy (pwd->pw_gecos, temppw->pw_gecos);
   strcpy (pwd->pw_passwd, temppw->pw_passwd);
   return 0;
+}
+
+extern "C" int
+getpwuid_r (__uid16_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
+{
+  return getpwuid_r32 (uid16touid32 (uid), pwd, buffer, bufsize, result);
 }
 
 extern "C" struct passwd *

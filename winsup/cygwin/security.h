@@ -166,9 +166,9 @@ extern struct __group32 *internal_getgrent (int);
 /* File manipulation */
 int __stdcall set_process_privileges ();
 int __stdcall get_file_attribute (int, const char *, int *,
-				  __uid16_t * = NULL, __gid32_t * = NULL);
+				  __uid32_t * = NULL, __gid32_t * = NULL);
 int __stdcall set_file_attribute (int, const char *, int);
-int __stdcall set_file_attribute (int, const char *, __uid16_t, __gid32_t, int, const char *);
+int __stdcall set_file_attribute (int, const char *, __uid32_t, __gid32_t, int, const char *);
 LONG __stdcall read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size);
 LONG __stdcall write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size);
 BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
@@ -209,7 +209,7 @@ extern BOOL sec_acl (PACL acl, BOOL admins, PSID sid1 = NO_SID, PSID sid2 = NO_S
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
-PSECURITY_DESCRIPTOR alloc_sd (__uid16_t uid, __gid32_t gid, const char *logsrv, int attribute,
+PSECURITY_DESCRIPTOR alloc_sd (__uid32_t uid, __gid32_t gid, const char *logsrv, int attribute,
           PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
 
 extern inline SECURITY_ATTRIBUTES *

@@ -86,6 +86,9 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.strace_file = 0;
 
 	  ep.process_state = p->process_state;
+
+	  ep.uid32 = p->uid;
+	  ep.gid32 = p->gid;
 	  break;
 	}
     }

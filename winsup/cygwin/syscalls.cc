@@ -750,10 +750,10 @@ done:
  * systems, it is only a stub that always returns zero.
  */
 static int
-chown_worker (const char *name, unsigned fmode, __uid16_t uid, __gid32_t gid)
+chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 {
   int res;
-  __uid16_t old_uid;
+  __uid32_t old_uid;
   __gid32_t old_gid;
 
   if (check_null_empty_str_errno (name))
@@ -815,7 +815,7 @@ done:
 }
 
 extern "C" int
-chown32 (const char * name, __uid16_t uid, __gid32_t gid)
+chown32 (const char * name, __uid32_t uid, __gid32_t gid)
 {
   sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
@@ -825,11 +825,11 @@ extern "C" int
 chown (const char * name, __uid16_t uid, __gid16_t gid)
 {
   sigframe thisframe (mainthread);
-  return chown_worker (name, PC_SYM_FOLLOW, uid, (__gid32_t) gid);
+  return chown_worker (name, PC_SYM_FOLLOW, uid, gid16togid32 (gid));
 }
 
 extern "C" int
-lchown32 (const char * name, __uid16_t uid, __gid32_t gid)
+lchown32 (const char * name, __uid32_t uid, __gid32_t gid)
 {
   sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid);
@@ -839,11 +839,11 @@ extern "C" int
 lchown (const char * name, __uid16_t uid, __gid16_t gid)
 {
   sigframe thisframe (mainthread);
-  return chown_worker (name, PC_SYM_NOFOLLOW, uid, (__gid32_t) gid);
+  return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid16togid32 (gid));
 }
 
 extern "C" int
-fchown32 (int fd, __uid16_t uid, __gid32_t gid)
+fchown32 (int fd, __uid32_t uid, __gid32_t gid)
 {
   sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
@@ -870,7 +870,7 @@ fchown32 (int fd, __uid16_t uid, __gid32_t gid)
 extern "C" int
 fchown (int fd, __uid16_t uid, __gid16_t gid)
 {
-  return fchown32 (fd, uid, (__gid32_t) gid);
+  return fchown32 (fd, uid, gid16togid32 (gid));
 }
 
 /* umask: POSIX 5.3.3.1 */
@@ -914,7 +914,7 @@ chmod (const char *path, mode_t mode)
       /* temporary erase read only bit, to be able to set file security */
       SetFileAttributes (win32_path, (DWORD) win32_path & ~FILE_ATTRIBUTE_READONLY);
 
-      __uid16_t uid;
+      __uid32_t uid;
       __gid32_t gid;
 
       if (win32_path.isdir ())
@@ -1932,22 +1932,11 @@ mkfifo (const char *_path, mode_t mode)
   return -1;
 }
 
-/* setuid: POSIX 4.2.2.1 */
-extern "C" int
-setuid (__uid16_t uid)
-{
-  int ret = seteuid (uid);
-  if (!ret)
-    cygheap->user.real_uid = myself->uid;
-  debug_printf ("real: %d, effective: %d", cygheap->user.real_uid, myself->uid);
-  return ret;
-}
-
 extern struct passwd *internal_getlogin (cygheap_user &user);
 
 /* seteuid: standards? */
 extern "C" int
-seteuid (__uid16_t uid)
+seteuid32 (__uid32_t uid)
 {
   if (!wincap.has_security ()) return 0;
 
@@ -1974,7 +1963,7 @@ seteuid (__uid16_t uid)
 
   debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
 
-  pw_new = getpwuid (uid);
+  pw_new = getpwuid32 (uid);
   if (!usersid.getfrompw (pw_new) ||
       (!pgrpsid.getfromgr (getgrgid32 (myself->gid))))
     {
@@ -2145,6 +2134,29 @@ seteuid (__uid16_t uid)
   return -1;
 }
 
+extern "C" int
+seteuid (__uid16_t uid)
+{
+  return seteuid32 (uid16touid32 (uid));
+}
+
+/* setuid: POSIX 4.2.2.1 */
+extern "C" int
+setuid32 (__uid32_t uid)
+{
+  int ret = seteuid32 (uid);
+  if (!ret)
+    cygheap->user.real_uid = myself->uid;
+  debug_printf ("real: %d, effective: %d", cygheap->user.real_uid, myself->uid);
+  return ret;
+}
+
+extern "C" int
+setuid (__uid16_t uid)
+{
+  return setuid32 (uid16touid32 (uid));
+}
+
 /* setegid: from System V.  */
 extern "C" int
 setegid32 (__gid32_t gid)
@@ -2197,7 +2209,7 @@ setegid32 (__gid32_t gid)
 extern "C" int
 setegid (__gid16_t gid)
 {
-  return setegid32 ((__gid32_t) gid);
+  return setegid32 (gid16togid32 (gid));
 }
 
 /* setgid: POSIX 4.2.2.1 */
@@ -2213,7 +2225,7 @@ setgid32 (__gid32_t gid)
 extern "C" int
 setgid (__gid16_t gid)
 {
-  int ret = setegid32 ((__gid32_t) gid);
+  int ret = setegid32 (gid16togid32 (gid));
   if (!ret)
     cygheap->user.real_gid = myself->gid;
   return ret;
