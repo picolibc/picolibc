@@ -1,3 +1,10 @@
+2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* profile/profile.h (mcount): Use __builtin_return_address
+	rather than inline __asm statements.
+	* profile/Makefile.in: Remove special rule for mcount.o
+	Specify dependencies for mcount.o profil.o gmon.o.
+
 2003-03-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdlib.h (qsort): Remove const from first parm.

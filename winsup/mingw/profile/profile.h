@@ -46,18 +46,20 @@
 void									\
 mcount()								\
 {									\
-	int selfpc, frompcindex;					\
+	 u_long selfpc, frompcindex;					\
 	/*								\
 	 * find the return address for mcount,				\
 	 * and the return address for mcount's caller.			\
 	 *								\
 	 * selfpc = pc pushed by mcount call				\
 	 */								\
-	__asm("movl 4(%%ebp),%0" : "=r" (selfpc));			\
+	/* __asm volatile ("movl 4(%%ebp),%0" : "=r" (selfpc));	*/	\
+	selfpc = (u_long) __builtin_return_address (0);			\
 	/*								\
 	 * frompcindex = pc pushed by call into self.			\
 	 */								\
-	__asm("movl (%%ebp),%0;movl 4(%0),%0" : "=r" (frompcindex));	\
+	/* __asm ("movl (%%ebp),%0;movl 4(%0),%0" : "=r" (frompcindex)); */	\
+	frompcindex = (u_long) __builtin_return_address (1);		\
 	_mcount(frompcindex, selfpc);					\
 }
 

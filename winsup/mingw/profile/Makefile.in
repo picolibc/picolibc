@@ -89,10 +89,12 @@ gcrt1.o: gcrt0.c
 gcrt2.o: gcrt0.c
 	$(CC) -D__MSVCRT__ -c -o $@ $(CPPFLAGS) $(CFLAGS) $?
 
-#FIXME: Optimizing at higher than -O1 tweaks a bug in gcc 3.2.2
-# and earlier
-mcount.o: mcount.c
-	$(CC)  -D__MSVCRT__ -c -o $@ $(CPPFLAGS) ${filter-out -O%,$(ALL_CFLAGS)} -O1 $?
+#
+# Dependancies
+#
+gmon.o: gmon.c gmon.h profile.h profil.h
+mcount.o: mcount.c gmon.h profile.h
+profil.o: profil.c profil.h
 
 Makefile: Makefile.in config.status configure
 	$(SHELL) config.status
@@ -137,3 +139,4 @@ dist:
 	@for i in $(DISTFILES); do\
 		cp -p $(srcdir)/$$i $(distdir)/profile/$$i ; \
 	done
+
