@@ -304,6 +304,8 @@ proc_subproc (DWORD what, DWORD val)
   _pinfo *child;
   int clearing;
   waitq *w;
+  int thiszombie;
+  _pinfo *zombie_proc = NULL;
 
 #define wval	 ((waitq *) val)
 
@@ -375,9 +377,8 @@ proc_subproc (DWORD what, DWORD val)
       sigproc_printf ("pid %d[%d] terminated, handle %p, nchildren %d, nzombies %d",
 		  pchildren[val]->pid, val, hchildren[val], nchildren, nzombies);
 
-      int thiszombie;
       thiszombie = nzombies;
-      zombies[nzombies] = pchildren[val];	// Add to zombie array
+      zombie_proc = zombies[nzombies] = pchildren[val];	// Add to zombie array
       zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
 
       sigproc_printf ("zombifying [%d], pid %d, handle %p, nchildren %d",
@@ -391,11 +392,11 @@ proc_subproc (DWORD what, DWORD val)
       /* See if we should care about the this terminated process.  If we've
 	 filled up our table or if we're ignoring SIGCHLD, then we immediately
 	 remove the process and move on. Otherwise, this process becomes a zombie
-	 which must be reaped by a wait() call. */
-      if (nzombies >= NZOMBIES
-	  || global_sigs[SIGCHLD].sa_handler == (void *) SIG_IGN)
+	 which must be reaped by a wait() call.  FIXME:  This is a very inelegant
+	 way to deal with this and could lead to process hangs.  */
+      if (nzombies >= NZOMBIES)
 	{
-	  sigproc_printf ("automatically removing zombie %d", thiszombie);
+	  sigproc_printf ("zombie table overflow %d", thiszombie);
 	  remove_zombie (thiszombie);
 	}
 
@@ -477,6 +478,10 @@ proc_subproc (DWORD what, DWORD val)
 	sigproc_printf ("finished processing terminated/stopped child");
       else
 	{
+	  if (zombie_proc && zombies[thiszombie]
+	      && zombies[thiszombie] == zombie_proc
+	      && global_sigs[SIGCHLD].sa_handler == (void *) SIG_IGN)
+	    remove_zombie (thiszombie);
 	  waitq_head.next = NULL;
 	  sigproc_printf ("finished clearing");
 	}

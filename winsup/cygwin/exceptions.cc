@@ -792,7 +792,7 @@ signal_fixup_after_fork ()
 extern "C" void __stdcall
 set_sig_errno (int e)
 {
-  set_errno (e);
+  *_my_tls.errno_addr = e;
   _my_tls.saved_errno = e;
   // sigproc_printf ("errno %d", e);
 }

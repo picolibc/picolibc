@@ -1,3 +1,9 @@
+2003-12-17  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.h (pinfo::operator ==): Add a way to check for _pinfo types.
+	* sigproc.cc (proc_subproc): Ensure that zombie is removed when SIGCHLD
+	== SIG_IGN but still allow wait()ing threads to wake up.
+
 2003-12-16  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (set_signal_mask): Report on input argument rather than

@@ -144,6 +144,7 @@ public:
   _pinfo *operator -> () const {return procinfo;}
   int operator == (pinfo *x) const {return x->procinfo == procinfo;}
   int operator == (pinfo &x) const {return x.procinfo == procinfo;}
+  int operator == (_pinfo *x) const {return x == procinfo;}
   int operator == (void *x) const {return procinfo == x;}
   int operator == (int x) const {return (int) procinfo == (int) x;}
   int operator == (char *x) const {return (char *) procinfo == x;}

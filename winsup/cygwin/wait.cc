@@ -98,8 +98,8 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 
       if (w->status == -1)
 	{
-	  call_signal_handler_now ();
 	  set_sig_errno (EINTR);
+	  call_signal_handler_now ();
 	  sawsig = true;
 	  res = -1;
 	}
