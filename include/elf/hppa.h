@@ -101,7 +101,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Note: PA-ELF is defined to use only RELA relocations.  */
 #include "reloc-macros.h"
 
-START_RELOC_NUMBERS (elf32_hppa_reloc_type)
+START_RELOC_NUMBERS (elf_hppa_reloc_type)
      RELOC_NUMBER (R_PARISC_NONE,      0)	/* No reloc */
      
      /* These relocation types do simple base + offset relocations.  */
@@ -271,7 +271,7 @@ START_RELOC_NUMBERS (elf32_hppa_reloc_type)
 END_RELOC_NUMBERS
 
 #ifndef RELOC_MACROS_GEN_FUNC
-typedef enum elf32_hppa_reloc_type elf32_hppa_reloc_type;
+typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 #endif
 
 #define PT_PARISC_ARCHEXT	0x70000000
