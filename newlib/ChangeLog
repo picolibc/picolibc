@@ -1,5 +1,10 @@
 2002-10-18  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * libc/sys/linux/machine/i386/include/endian.h: New file.
+        * libc/sys/linux/machine/i386/include/param.h: Ditto.
+
+2002-10-18  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libm/machine/i386/aclocal.m4: Regenerated.
 	* libm/machine/i386/configure: Ditto.
 
