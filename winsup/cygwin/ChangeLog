@@ -1,3 +1,13 @@
+2002-01-16  Robert Collins  <rbtcollins@hotmail.com>
+
+	* cygserver.cc (transport): Correct scope.
+	(client_request_attach_tty::serve): Add more debug information.
+	Fix erroneous use of transport instead of conn.
+	* cygserver_transport_pipes.cc (transport_layer_pipes::close): More debug.
+	(transport_layer_pipes::read): Ditto.
+	(transport_layer_pipes::write): Ditto.
+	(transport_layer_pipes::impersonate_client): Ditto.
+
 Mon Oct  8  7:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* cygserver.cc (server_request::process): Rename client_request_shm_get to

@@ -104,6 +104,7 @@ transport_layer_pipes::accept ()
 void
 transport_layer_pipes::close()
 {
+  debug_printf ("closing pipe %p\n", pipe);
   if (pipe && pipe != INVALID_HANDLE_VALUE)
     {
       FlushFileBuffers (pipe);
@@ -115,11 +116,12 @@ transport_layer_pipes::close()
 ssize_t
 transport_layer_pipes::read (char *buf, size_t len)
 {
-  DWORD bytes_read, rc;
+  debug_printf ("reading from pipe %p\n", pipe);
   if (!pipe || pipe == INVALID_HANDLE_VALUE)
     return -1;
 
-  rc = ReadFile (pipe, buf, len, &bytes_read, NULL);
+  DWORD bytes_read;
+  DWORD rc = ReadFile (pipe, buf, len, &bytes_read, NULL);
   if (!rc)
     {
       debug_printf ("error reading from pipe (%lu)\n", GetLastError ());
@@ -131,6 +133,7 @@ transport_layer_pipes::read (char *buf, size_t len)
 ssize_t
 transport_layer_pipes::write (char *buf, size_t len)
 {
+  debug_printf ("writing to pipe %p\n", pipe);
   DWORD bytes_written, rc;
   if (!pipe || pipe == INVALID_HANDLE_VALUE)
     return -1;
@@ -183,8 +186,13 @@ transport_layer_pipes::connect ()
 void
 transport_layer_pipes::impersonate_client ()
 {
+  debug_printf ("impersonating pipe %p\n", pipe);
   if (pipe && pipe != INVALID_HANDLE_VALUE)
-    ImpersonateNamedPipeClient (pipe);
+    {
+      BOOL rv = ImpersonateNamedPipeClient (pipe);
+      if (!rv)
+	debug_printf ("Failed to Impersonate the client, (%lu)\n", GetLastError ());
+    }
   debug_printf("I am who you are\n");
 }
 

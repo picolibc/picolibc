@@ -36,7 +36,7 @@
 #define debug_printf if (DEBUG) printf
 
 GENERIC_MAPPING access_mapping;
-class transport_layer_base *transport;
+static class transport_layer_base *transport;
 
 DWORD request_count = 0;
 
@@ -187,12 +187,14 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
     }
 
 #if DEBUG
-  printf ("%ld:(%p,%p) -> %ld\n", req.master_pid,
+  printf ("pid %ld:(%p,%p) -> pid %ld\n", req.master_pid,
   	  			req.from_master, req.to_master,
 				req.pid);
 #endif
 
+  debug_printf ("opening process %ld\n", req.master_pid);
   from_process_handle = OpenProcess (PROCESS_DUP_HANDLE, FALSE, req.master_pid);
+  debug_printf ("opening process %ld\n", req.pid);
   to_process_handle = OpenProcess (PROCESS_DUP_HANDLE, FALSE, req.pid);
   if (!from_process_handle || !to_process_handle)
     {
@@ -201,14 +203,17 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
       goto out;
     }
 
-  transport->impersonate_client ();
+  debug_printf ("Impersonating client\n");
+  conn->impersonate_client ();
   
+  debug_printf ("about to open thread token\n");
   rc = OpenThreadToken (GetCurrentThread (),
   			TOKEN_QUERY,
                         TRUE,
 			&token_handle);
 
-  transport->revert_to_self ();
+  debug_printf ("opened thread token, rc=%lu\n", rc);
+  conn->revert_to_self ();
 
   if (!rc)
     {
