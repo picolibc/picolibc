@@ -1,5 +1,9 @@
 2000-12-04  Joel Sherrill <joel@OARcorp.com>
 
+        * libc/stdlib/system.c: Avoid compiling do_system() for RTEMS.
+
+2000-12-04  Joel Sherrill <joel@OARcorp.com>
+
         * libc/include/ieeefp.h: Added entries for OpenCores CPUs.
 
 2000-12-04  Joel Sherrill <joel@OARcorp.com>
