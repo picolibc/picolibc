@@ -1,3 +1,8 @@
+2003-03-22  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (unlink): Be more defensive when SetFileAttributes is
+	called.  Fix typo in debugging output.
+
 2003-03-21  Christopher Faylor  <cgf@redhat.com>
 
 	* fork.cc: Conditionalize use of slow_pid_reuse throughout.  It's not
