@@ -46,7 +46,7 @@ internal_getlogin (cygheap_user &user)
 	 store it in user.psid */
       if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
 			     &ptok))
-	system_printf ("OpenProcessToken(): %E\n");
+	system_printf ("OpenProcessToken(): %E");
       else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
 	system_printf ("GetTokenInformation (TokenUser): %E");
       else if (!(ret = user.set_sid (tu)))

@@ -119,7 +119,7 @@ fhandler_dev_tape::close (void)
       if ((has_written) && (! eom_detected))
 	{
 	  /* if last operation was writing, write a filemark */
-	  debug_printf ("writing filemark\n");
+	  debug_printf ("writing filemark");
 	  op.mt_op = MTWEOF;
 	  op.mt_count = 1;
 	  ioctl (MTIOCTOP, &op);
@@ -131,7 +131,7 @@ fhandler_dev_tape::close (void)
 
   if (is_rewind_device ())
     {
-      debug_printf ("rewinding\n");
+      debug_printf ("rewinding");
       op.mt_op = MTREW;
       ioctl (MTIOCTOP, &op);
     }
@@ -167,7 +167,7 @@ fhandler_dev_tape::lseek (__off64_t offset, int whence)
   struct mtop op;
   struct mtpos pos;
 
-  debug_printf ("lseek (%s, %d, %d)\n", get_name (), offset, whence);
+  debug_printf ("lseek (%s, %d, %d)", get_name (), offset, whence);
 
   writebuf ();
   eom_detected = eof_detected = 0;
@@ -444,7 +444,7 @@ static int
 tape_error (DWORD lasterr, const char *txt)
 {
   if (lasterr)
-    debug_printf ("%s: error: %d\n", txt, lasterr);
+    debug_printf ("%s: error: %d", txt, lasterr);
 
   return lasterr;
 }
@@ -452,7 +452,7 @@ tape_error (DWORD lasterr, const char *txt)
 int
 fhandler_dev_tape::tape_write_marks (int marktype, DWORD len)
 {
-  syscall_printf ("write_tapemark\n");
+  syscall_printf ("write_tapemark");
   while (((lasterr = WriteTapemark (get_handle (),
 				    marktype,
 				    len,

@@ -379,7 +379,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 		      fd, iov, iovcnt, wait ? "" : "non", sigcatchers);
 
       if (wait && (!cfd->is_slow () || cfd->get_r_no_interrupt ()))
-	debug_printf ("no need to call ready_for_read\n");
+	debug_printf ("no need to call ready_for_read");
       else if (!cfd->ready_for_read (fd, wait))
 	{
 	  res = -1;
@@ -1576,33 +1576,33 @@ ctermid (char *str)
 extern "C" int
 _cygwin_istext_for_stdio (int fd)
 {
-  syscall_printf ("_cygwin_istext_for_stdio (%d)\n", fd);
+  syscall_printf ("_cygwin_istext_for_stdio (%d)", fd);
   if (CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING)
     {
-      syscall_printf (" _cifs: old API\n");
+      syscall_printf (" _cifs: old API");
       return 0; /* we do it for old apps, due to getc/putc macros */
     }
 
   cygheap_fdget cfd (fd, false, false);
   if (cfd < 0)
     {
-      syscall_printf (" _cifs: fd not open\n");
+      syscall_printf (" _cifs: fd not open");
       return 0;
     }
 
   if (cfd->get_device () != FH_DISK)
     {
-      syscall_printf (" _cifs: fd not disk file\n");
+      syscall_printf (" _cifs: fd not disk file");
       return 0;
     }
 
   if (cfd->get_w_binary () || cfd->get_r_binary ())
     {
-      syscall_printf (" _cifs: get_*_binary\n");
+      syscall_printf (" _cifs: get_*_binary");
       return 0;
     }
 
-  syscall_printf ("_cygwin_istext_for_stdio says yes\n");
+  syscall_printf ("_cygwin_istext_for_stdio says yes");
   return 1;
 }
 
@@ -1617,7 +1617,7 @@ setmode_helper (FILE *f)
 {
   if (fileno (f) != setmode_file)
     return 0;
-  syscall_printf ("setmode: file was %s now %s\n",
+  syscall_printf ("setmode: file was %s now %s",
 		 f->_flags & __SCLE ? "text" : "raw",
 		 setmode_mode & O_TEXT ? "text" : "raw");
   if (setmode_mode & O_TEXT)
@@ -1677,7 +1677,7 @@ setmode (int fd, int mode)
   setmode_file = fd;
   _fwalk (_REENT, setmode_helper);
 
-  syscall_printf ("setmode (%d<%s>, %p) returns %s\n", fd, cfd->get_name (),
+  syscall_printf ("setmode (%d<%s>, %p) returns %s", fd, cfd->get_name (),
 		  mode, res & O_TEXT ? "text" : "binary");
   return res;
 }
@@ -2155,7 +2155,7 @@ setegid32 (__gid32_t gid)
       RevertToSelf ();
     }
   if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT, &ptok))
-    debug_printf ("OpenProcessToken(): %E\n");
+    debug_printf ("OpenProcessToken(): %E");
   else
     {
       if (!SetTokenInformation (ptok, TokenPrimaryGroup,

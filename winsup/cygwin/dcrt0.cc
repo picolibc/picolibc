@@ -333,7 +333,7 @@ globify (char *word, char **&argv, int &argc, int &argvlen)
   char **av = argv + n;
   while (*gv)
     {
-      debug_printf ("argv[%d] = '%s'\n", n++, *gv);
+      debug_printf ("argv[%d] = '%s'", n++, *gv);
       *av++ = *gv++;
     }
 
@@ -403,7 +403,7 @@ build_argv (char *cmd, char **&argv, int &argc, int winshell)
       /* Add word to argv file after (optional) wildcard expansion. */
       if (!winshell || !argc || !globify (word, argv, argc, argvlen))
 	{
-	  debug_printf ("argv[%d] = '%s'\n", argc, word);
+	  debug_printf ("argv[%d] = '%s'", argc, word);
 	  argv[argc++] = word;
 	}
     }
@@ -793,7 +793,7 @@ initial_env ()
       DWORD ms = atoi (buf);
       buf[0] = '\0';
       len = GetModuleFileName (NULL, buf, MAX_PATH);
-      console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
+      console_printf ("Sleeping %d, pid %u %s", ms, GetCurrentProcessId (), buf);
       Sleep (ms);
     }
   if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))

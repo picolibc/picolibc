@@ -93,12 +93,12 @@ Audio::open (int rate, int bits, int channels, bool bCallback)
   nBytesWritten_ = 0L;
   bufferIndex_ = 0;
   buffer_ = 0L;
-  debug_printf ("number devices %d\n", nDevices);
+  debug_printf ("number devices %d", nDevices);
   if (nDevices <= 0)
     return false;
 
   debug_printf ("trying to map device freq %d, bits %d, "
-		"channels %d, callback %d\n", rate, bits, channels,
+		"channels %d, callback %d", rate, bits, channels,
 		bCallback);
 
   int bytesperSample = bits / 8;
@@ -519,7 +519,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
   int *intptr = (int *) ptr;
   switch (cmd)
     {
-#define CASE(a) case a : debug_printf("/dev/dsp: ioctl %s\n", #a);
+#define CASE(a) case a : debug_printf("/dev/dsp: ioctl %s", #a);
 
       CASE (SNDCTL_DSP_RESET)
 	audioformat_ = AFMT_S8;
@@ -624,7 +624,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
       break;
 
     default:
-      debug_printf ("/dev/dsp: ioctl not handled yet! FIXME:\n");
+      debug_printf ("/dev/dsp: ioctl not handled yet! FIXME:");
       break;
 
 #undef CASE

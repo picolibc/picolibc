@@ -754,11 +754,11 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
 
   if (!GetTokenInformation (token, TokenGroups, NULL, 0, &size) &&
       GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-    debug_printf ("GetTokenInformation(token, TokenGroups): %E\n");
+    debug_printf ("GetTokenInformation(token, TokenGroups): %E");
   else if (!(my_grps = (PTOKEN_GROUPS) malloc (size)))
     debug_printf ("malloc (my_grps) failed.");
   else if (!GetTokenInformation (token, TokenGroups, my_grps, size, &size))
-    debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
+    debug_printf ("GetTokenInformation(my_token, TokenGroups): %E");
   else if (!groups.issetgroups ()) /* setgroups was never called */
     {
       ret = sid_in_token_groups (my_grps, groups.pgsid);
@@ -855,7 +855,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 
   /* Retrieve authentication id and group list from own process. */
   if (!OpenProcessToken (hMainProc, TOKEN_QUERY, &my_token))
-    debug_printf ("OpenProcessToken(my_token): %E\n");
+    debug_printf ("OpenProcessToken(my_token): %E");
   else
     {
       /* Switching user context to SYSTEM doesn't inherit the authentication
@@ -864,7 +864,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 	if (!GetTokenInformation (my_token, TokenStatistics,
 				  &stats, sizeof stats, &size))
 	  debug_printf
-	    ("GetTokenInformation(my_token, TokenStatistics): %E\n");
+	    ("GetTokenInformation(my_token, TokenStatistics): %E");
 	else
 	  auth_luid = stats.AuthenticationId;
 
@@ -872,13 +872,13 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 	 some important well known group sids. */
       if (!GetTokenInformation (my_token, TokenGroups, NULL, 0, &size) &&
 	  GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-	debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
+	debug_printf ("GetTokenInformation(my_token, TokenGroups): %E");
       else if (!(my_tok_gsids = (PTOKEN_GROUPS) malloc (size)))
 	debug_printf ("malloc (my_tok_gsids) failed.");
       else if (!GetTokenInformation (my_token, TokenGroups, my_tok_gsids,
 				     size, &size))
 	{
-	  debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
+	  debug_printf ("GetTokenInformation(my_token, TokenGroups): %E");
 	  free (my_tok_gsids);
 	  my_tok_gsids = NULL;
 	}

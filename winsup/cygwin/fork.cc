@@ -245,7 +245,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     }
 
   sync_with_parent ("after longjmp.", TRUE);
-  sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d\n", hParent,
+  sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d", hParent,
 		  first_dll, load_dlls);
 
 #ifdef DEBUGGING

@@ -88,7 +88,7 @@ set_clipboard (const void *buf, size_t len)
   hmem = GlobalAlloc (GMEM_MOVEABLE, len + sizeof (size_t));
   if (!hmem)
     {
-      system_printf ("Couldn't allocate global buffer for write\n");
+      system_printf ("Couldn't allocate global buffer for write");
       return -1;
     }
   clipbuf = (unsigned char *) GlobalLock (hmem);
@@ -101,7 +101,7 @@ set_clipboard (const void *buf, size_t len)
   if (!SetClipboardData (cygnativeformat, hmem))
     {
       system_printf
-	("Couldn't write native format to the clipboard %04x %x\n",
+	("Couldn't write native format to the clipboard %04x %x",
 	 cygnativeformat, hmem);
 /* FIXME: return an appriate error code &| set_errno(); */
       return -1;
@@ -110,7 +110,7 @@ set_clipboard (const void *buf, size_t len)
   if (GlobalFree (hmem))
     {
       system_printf
-	("Couldn't free global buffer after write to the clipboard\n");
+	("Couldn't free global buffer after write to the clipboard");
 /* FIXME: return an appriate error code &| set_errno(); */
       return 0;
     }
@@ -121,7 +121,7 @@ set_clipboard (const void *buf, size_t len)
   hmem = GlobalAlloc (GMEM_MOVEABLE, len + 2);
   if (!hmem)
     {
-      system_printf ("Couldn't allocate global buffer for write\n");
+      system_printf ("Couldn't allocate global buffer for write");
       return -1;
     }
   clipbuf = (unsigned char *) GlobalLock (hmem);
@@ -132,7 +132,7 @@ set_clipboard (const void *buf, size_t len)
   if (!SetClipboardData
       ((current_codepage == ansi_cp ? CF_TEXT : CF_OEMTEXT), hmem))
     {
-      system_printf ("Couldn't write to the clipboard\n");
+      system_printf ("Couldn't write to the clipboard");
 /* FIXME: return an appriate error code &| set_errno(); */
       return -1;
     }
@@ -140,7 +140,7 @@ set_clipboard (const void *buf, size_t len)
   if (GlobalFree (hmem))
     {
       system_printf
-	("Couldn't free global buffer after write to the clipboard\n");
+	("Couldn't free global buffer after write to the clipboard");
 /* FIXME: return an appriate error code &| set_errno(); */
     }
   return 0;
@@ -157,7 +157,7 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
       void *tempbuffer = realloc (membuffer, cursize + len);
       if (!tempbuffer)
 	{
-	  system_printf ("Couldn't realloc() clipboard buffer for write\n");
+	  system_printf ("Couldn't realloc() clipboard buffer for write");
 	  return -1;
 	}
       membuffer = tempbuffer;
@@ -235,7 +235,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t len)
 	{
 	  CloseClipboard ();
 #if 0
-	  system_printf ("a non-accepted format! %d\n", format);
+	  system_printf ("a non-accepted format! %d", format);
 #endif
 	  set_errno (0);
 	  return 0;

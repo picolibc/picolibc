@@ -765,7 +765,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       vmin_ = t->c_cc[VMIN];
     }
 
-  debug_printf ("vtime %d, vmin %d\n", vtime_, vmin_);
+  debug_printf ("vtime %d, vmin %d", vtime_, vmin_);
 
   if (ovmin == vmin_ && ovtime == vtime_)
     return 0;

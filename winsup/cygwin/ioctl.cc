@@ -38,7 +38,7 @@ ioctl (int fd, int cmd, ...)
   char *argp = va_arg (ap, char *);
   va_end (ap);
 
-  debug_printf ("fd %d, cmd %x\n", fd, cmd);
+  debug_printf ("fd %d, cmd %x", fd, cmd);
   if (cfd->is_tty () && cfd->get_device () != FH_PTYM)
     switch (cmd)
       {

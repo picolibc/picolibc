@@ -1810,7 +1810,7 @@ mount_info::read_mounts (reg_key& r)
 	break;
       else if (res != ERROR_SUCCESS)
 	{
-	  debug_printf ("RegEnumKeyEx failed, error %d!\n", res);
+	  debug_printf ("RegEnumKeyEx failed, error %d!", res);
 	  break;
 	}
 

@@ -879,7 +879,7 @@ cygwin_gethostname (char *name, size_t len)
 	  return -1;
 	}
     }
-  debug_printf ("name %s\n", name);
+  debug_printf ("name %s", name);
   h_errno = 0;
   return 0;
 }

@@ -40,7 +40,7 @@ __to_clock_t (FILETIME * src, int flag)
     total -= FACTOR;
 
   total /= (unsigned long long) (NSPERSEC / CLOCKS_PER_SEC);
-  syscall_printf ("total %08x %08x\n", (unsigned)(total>>32), (unsigned)(total));
+  syscall_printf ("total %08x %08x", (unsigned)(total>>32), (unsigned)(total));
   return total;
 }
 

@@ -1,5 +1,9 @@
 2002-09-30  Christopher Faylor  <cgf@redhat.com>
 
+	Remove \n from calls to strace class printfs throughout.
+
+2002-09-30  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (unused_sig_wrapper): Accommodate newer compilers.
 
 2002-09-29  Christopher Faylor  <cgf@redhat.com>

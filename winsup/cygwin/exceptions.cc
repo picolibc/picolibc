@@ -765,7 +765,7 @@ interrupt_on_return (sigthread *th, int sig, void *handler, struct sigaction& si
 	return 1;
       }
 
-  sigproc_printf ("couldn't find a stack frame, i %d\n", i);
+  sigproc_printf ("couldn't find a stack frame, i %d", i);
   return 0;
 }
 

@@ -1104,7 +1104,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	}
       res = get_ifconf (ifcp, cmd);
       if (res)
-	debug_printf ("error in get_ifconf\n");
+	debug_printf ("error in get_ifconf");
       break;
     case SIOCGIFFLAGS:
       ifr = (struct ifreq *) p;
@@ -1134,7 +1134,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	ifr = (struct ifreq *) p;
 	if (ifr == 0)
 	  {
-	    debug_printf ("ifr == NULL\n");
+	    debug_printf ("ifr == NULL");
 	    set_errno (EINVAL);
 	    return -1;
 	  }
@@ -1142,16 +1142,16 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	res = get_ifconf (&ifc, cmd);
 	if (res)
 	  {
-	    debug_printf ("error in get_ifconf\n");
+	    debug_printf ("error in get_ifconf");
 	    break;
 	  }
 
-	debug_printf ("    name: %s\n", ifr->ifr_name);
+	debug_printf ("    name: %s", ifr->ifr_name);
 	for (ifrp = ifc.ifc_req;
 	     (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
 	     ++ifrp)
 	  {
-	    debug_printf ("testname: %s\n", ifrp->ifr_name);
+	    debug_printf ("testname: %s", ifrp->ifr_name);
 	    if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
 	      {
 		switch (cmd)
