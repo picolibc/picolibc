@@ -2742,6 +2742,14 @@ chdir (const char *dir)
   syscall_printf ("dir %s", dir);
   path_conv path (dir, PC_FULL | PC_SYM_FOLLOW);
 
+  char *s;
+  /* Incredibly. Windows allows you to specify a path with trailing
+     whitespace to SetCurrentDirectory.  This doesn't work too well
+     with other parts of the API, though, apparently.  So nuke trailing
+     white space. */
+  for (s = strchr (dir, '\0'); --s >= dir && isspace (*s); )
+    *s = '\0';
+
   if (path.error)
     {
       set_errno (path.error);
