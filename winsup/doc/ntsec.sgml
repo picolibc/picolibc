@@ -252,15 +252,15 @@ able to set primary groups! In these cases, where there is no correlation
 of users to primary groups, NT returns 513 (None) as primary group,
 regardless of the membership to existing local groups.</para>
 
-<para>when using <command>mkpasswd  -l -g</command> on such systems, you
+<para>When using <command>mkpasswd  -l -g</command> on such systems, you
 have to change the primary group by hand if `None' as primary group is
 not what you want (and I'm sure, it's not what you want!)</para>
 
-<para>To get help in creating correct passwd and group files, look at
-the following examples, that are part of my files. With the exception
-of my personal user entry, all entries are well known entries. For a
-better understanding, the names are translated to the equivalents of the
-English NT version.</para> 
+<para>Look at the following examples, which were parts of my files before
+storing SIDs in /etc/passwd and /etc/group has been introduced (See next
+chapter for details).  With the exception of my personal user entry, all
+entries are well known entries.</para> 
+
 <example>
 <title>/etc/passwd</title>
 <screen>
@@ -285,6 +285,10 @@ guests::546:
 powerusers::547:
 </screen>
 </example>
+
+<para>As you can see I've changed my primary group membership from 513 (None)
+to 547 (powerusers).  So all file I created inside of Cygwin were now owned
+by the powerusers group instead of None.  This is the way I liked it.<para>
 
 <para>Groups may be mentioned in the passwd file, too. This has two
 advantages:</para>
@@ -370,8 +374,8 @@ root:S-1-5-32-544:0:
 
 <para>The tools <command>mkpasswd</command> and <command>mkgroup</command>
 create the needed entries by default. If you don't want that you can use
-the options <literal>-s</literal> or <literal>--no-sids</literal>. In this
-case ntsec behaves like the previous version.</para>
+the options <literal>-s</literal> or <literal>--no-sids</literal>. I suggest
+not to do this since ntsec works better when having the SIDs available.</para>
 
 <para>Please note that the pw_gecos field in <filename>/etc/passwd</filename>
 is defined as a comma seperated list. The SID has to be the last field!</para>
@@ -394,8 +398,54 @@ the_king::1:1:Elvis Presley,U-STILLHERE\elvis,S-1-5-21-1234-5678-9012-1000:/bin/
 the_king::1:1:Elvis Presley,U-elvis,S-1-5-21-1234-5678-9012-1000:/bin/sh
 </screen>
 
-<para>In each case the password of the user is taken from the NT user
+<para>In either case the password of the user is taken from the NT user
 database, NOT from the passwd file!</para>
+
+<para>As in the previous chapter I give my personal
+<filename>/etc/passwd</filename> and <filename>/etc/group</filename> as
+examples.  Please note that I've changed these files heavily!  There's no
+need to change them that way, it's just for testing purposes and...
+for fun.</para>
+
+<example>
+<title>/etc/passwd</title>
+<screen>
+root:*:0:0:Administrators group,S-1-5-32-544::
+Everyone:*:1:1:,S-1-1-0::
+SYSTEM:*:18:18:,S-1-5-18:/home/system:/bin/bash
+admin:*:500:513:,S-1-5-21-1844237615-436374069-1060284298-500:/home/Administrator:/bin/bash
+corinna:*:100:0:Corinna Vinschen,S-1-5-21-1844237615-436374069-1060284298-1003:/home/corinna:/bin/tcsh
+Guest:*:501:546:,S-1-5-21-1844237615-436374069-1060284298-501:/home/Guest:/bin/bash
+</screen>
+</example>
+
+<example>
+<title>/etc/group</title>
+<screen>
+root:S-1-5-32-544:0:
+everyone:S-1-1-0:1:
+local:S-1-2-0:2:
+network:S-1-5-2:3:
+interactive:S-1-5-4:4:
+authenticatedusers:S-1-5-11:5:
+SYSTEM:S-1-5-18:18:
+local_svc:S-1-5-19:19:
+netwrk_svc:S-1-5-20:20:
+none:S-1-5-21-1844237615-436374069-1060284298-513:513:
+bckup_op:S-1-5-32-551:551:
+guests:S-1-5-32-546:546:
+pwrusers:S-1-5-32-547:547:
+replicator:S-1-5-32-552:552:
+users:S-1-5-32-545:545:
+</screen>
+</example>
+
+<para>If you want to do similar changes to your files, please do that only
+if you're feeling comfortably with the concepts.  Otherwise don't be surprised
+if some stuff doesn't work anymore.  If you screwed up things, revert to files
+created by mkpasswd and mkgroup.  Especially don't change the uid or the name
+of user SYSTEM.  Even if that works mostly, some Cygwin applications running
+as local service under that account could behave strangly suddenly.</para>
 
 </sect2>
 

@@ -1,3 +1,8 @@
+2002-06-24  Corinna Vinschen <corinna@vinschen.de>
+
+	* ntsec.sgml: Clean up text for examples of /etc/passwd and /etc/group.
+	Add examples with SIDs.  Warn about changing them crudely.
+
 2002-06-21  Christopher Faylor  <cgf@redhat.com>
 
 	* what.texinfo: Fix typo.
