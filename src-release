@@ -219,9 +219,9 @@ do-md5sum:
 .PHONY: do-djunpack
 do-djunpack:
 	echo "==> Adding updated djunpack.bat to top-level directory"
-	echo - 's /gdb-[0-9\.]*/gdb-'"$(VER)"'/'
+	echo - 's /gdb-[0-9\.]*/$(PACKAGE)-'"$(VER)"'/'
 	sed < djunpack.bat > djunpack.new \
-		-e 's/gdb-[0-9][0-9\.]*/gdb-'"$(VER)"'/'
+		-e 's/gdb-[0-9][0-9\.]*/$(PACKAGE)-'"$(VER)"'/'
 	mv djunpack.new djunpack.bat
 	-rm -f proto-toplev/djunpack.bat
 	ln -s ../djunpack.bat proto-toplev/djunpack.bat
@@ -272,7 +272,12 @@ gdb.tar: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 DEJAGNU_SUPPORT_DIRS=  tcl expect libiberty
 .PHONY: dejagnu.tar.bz2
 dejagnu.tar.bz2: $(DIST_SUPPORT) $(DEJAGNU_SUPPORT_DIRS) dejagnu
-	$(MAKE) -f $(SELF) taz TOOL=dejagnu \
+	$(MAKE) -f $(SELF) gdb-taz TOOL=dejagnu \
+		MD5PROG="$(MD5PROG)" \
+		SUPPORT_FILES="$(DEJAGNU_SUPPORT_DIRS)"
+.PHONY: dejagnu.tar
+dejagnu.tar: $(DIST_SUPPORT) $(DEJAGNU_SUPPORT_DIRS) dejagnu
+	$(MAKE) -f $(SELF) gdb-tar TOOL=dejagnu \
 		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(DEJAGNU_SUPPORT_DIRS)"
 

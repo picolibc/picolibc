@@ -1,3 +1,9 @@
+2003-09-14  Andrew Cagney  <cagney@redhat.com>
+
+	* src-release (dejagnu.tar): New target.
+	(dejagnu.tar.bz2): Recursively call "gdb-taz" rule.
+	(do-djunpack): Use $(PACKAGE) for the package name.
+
 2003-08-15  Michael Chastain  <mec@shout.net>
 
 	* src-release (do-proto-toplev): Remove junk files
