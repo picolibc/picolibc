@@ -323,18 +323,18 @@ extern __inline__ int __isnanl (long double __x)
 /* 7.12.3.6 The signbit macro */
 extern __inline__ int __signbit (double __x) {
   unsigned short stw;
-  __asm__ ( "fxam; fstsw %%a__x;": "=a" (stw) : "t" (__x));
+  __asm__ ( "fxam; fstsw %%ax;": "=a" (stw) : "t" (__x));
   return stw & 0x0200;
 }
 
 extern  __inline__ int __signbitf (float __x) {
   unsigned short stw;
-  __asm__ ("fxam; fstsw %%a__x;": "=a" (stw) : "t" (__x));
+  __asm__ ("fxam; fstsw %%ax;": "=a" (stw) : "t" (__x));
   return stw & 0x0200;
 }
 extern  __inline__ int __signbitl (long double __x) {
   unsigned short stw;
-  __asm__ ("fxam; fstsw %%a__x;": "=a" (stw) : "t" (__x));
+  __asm__ ("fxam; fstsw %%ax;": "=a" (stw) : "t" (__x));
   return stw & 0x0200;
 }
 

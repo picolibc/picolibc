@@ -67,7 +67,6 @@ int	iswalpha(wint_t);
 int	iswascii(wint_t);
 int	iswcntrl(wint_t);
 int	iswctype(wint_t, wctype_t);
-int	is_wctype(wint_t, wctype_t);	/* Obsolete! */
 int	iswdigit(wint_t);
 int	iswgraph(wint_t);
 int	iswlower(wint_t);
@@ -105,25 +104,23 @@ extern unsigned short** _imp___ctype;
 # endif	/* CRTDLL */
 #endif		/*  __DECLSPEC_SUPPORTED */
 
-
 #if !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED))
 #define __WCTYPE_INLINES_DEFINED
-extern __inline__ int iswalnum(wint_t__wc) {return (iswctype(__wc,_ALPHA|_DIGIT));}
-extern __inline__ int iswalpha(wint_t__wc) {return (iswctype(__wc,_ALPHA));}
-extern __inline__ int iswascii(wint_t__wc) {return (((unsigned)wc & 0x7F) ==0);}
-extern __inline__ int iswcntrl(wint_t__wc) {return (iswctype(__wc,_CONTROL));}
-extern __inline__ int iswdigit(wint_t__wc) {return (iswctype(__wc,_DIGIT));}
-extern __inline__ int iswgraph(wint_t__wc) {return (iswctype(__wc,_PUNCT|_ALPHA|_DIGIT));}
-extern __inline__ int iswlower(wint_t__wc) {return (iswctype(__wc,_LOWER));}
-extern __inline__ int iswprint(wint_t__wc) {return (iswctype(__wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
-extern __inline__ int iswpunct(wint_t__wc) {return (iswctype(__wc,_PUNCT));}
-extern __inline__ int iswspace(wint_t__wc) {return (iswctype(__wc,_SPACE));}
-extern __inline__ int iswupper(wint_t__wc) {return (iswctype(__wc,_UPPER));}
-extern __inline__ int iswxdigit(wint_t__wc) {return (iswctype(__wc,_HEX));}
+extern __inline__ int iswalnum(wint_t __wc) {return (iswctype(__wc,_ALPHA|_DIGIT));}
+extern __inline__ int iswalpha(wint_t __wc) {return (iswctype(__wc,_ALPHA));}
+extern __inline__ int iswascii(wint_t __wc) {return (((unsigned)__wc & 0x7F) ==0);}
+extern __inline__ int iswcntrl(wint_t __wc) {return (iswctype(__wc,_CONTROL));}
+extern __inline__ int iswdigit(wint_t __wc) {return (iswctype(__wc,_DIGIT));}
+extern __inline__ int iswgraph(wint_t __wc) {return (iswctype(__wc,_PUNCT|_ALPHA|_DIGIT));}
+extern __inline__ int iswlower(wint_t __wc) {return (iswctype(__wc,_LOWER));}
+extern __inline__ int iswprint(wint_t __wc) {return (iswctype(__wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
+extern __inline__ int iswpunct(wint_t __wc) {return (iswctype(__wc,_PUNCT));}
+extern __inline__ int iswspace(wint_t __wc) {return (iswctype(__wc,_SPACE));}
+extern __inline__ int iswupper(wint_t __wc) {return (iswctype(__wc,_UPPER));}
+extern __inline__ int iswxdigit(wint_t __wc) {return (iswctype(__wc,_HEX));}
 extern __inline__ int isleadbyte(int __c)
   {return (_pctype[(unsigned char)(__c)] & _LEADBYTE);}
 #endif /* !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED)) */
-
 
 typedef wchar_t wctrans_t;
 wint_t 		towctrans(wint_t, wctrans_t);
@@ -131,6 +128,12 @@ wctrans_t	wctrans(const char*);
 wctype_t	wctype(const char*);
 
 __END_CSTD_NAMESPACE
+
+#ifndef __STRICT_ANSI__
+__BEGIN_CGLOBAL_NAMESPACE
+int	is_wctype(wint_t, __CSTD wctype_t);	/* Obsolete! */
+__END_CGLOBAL_NAMESPACE
+#endif /* __STRICT_ANSI__ */
 
 #endif	/* Not RC_INVOKED */
 

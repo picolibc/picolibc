@@ -1,3 +1,10 @@
+2002-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h (__signbit); Remove errant '__' added in last
+	patch.
+ 	* include/wctype.h: Add missing space before __wc, throughout.
+	(is_wctype): Move into non-ANSI space.
+
 2002-10-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/cytpe.h: Prefix identifiers used as args of inlines
