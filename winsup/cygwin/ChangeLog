@@ -8,7 +8,7 @@ Sun Apr  8 20:40:58 2001  Christopher Faylor <cgf@cygnus.com>
 	* sigproc.h: Remove obsolete call_signal_handler declaration.
 
 Sun Apr  8 20:36:55 2001  Benjamin Riefenstahl  <Benjamin.Riefenstahl@epost.de>
- 
+
 	* fhandler_console.cc (cp_get_internal): New function.
 	(cp_convert): New function.
 	(con_to_str): New function.
