@@ -562,7 +562,7 @@ dtable::find_fifo (ATOM hill)
   SetResourceLock (LOCK_FD_LIST, READ_LOCK, "dup");
   for (unsigned i = 0; i < size; i++)
     {
-      fhandler_base *fh = fds[0];
+      fhandler_base *fh = fds[i];
       if (fh && fh->isfifo () && ((fhandler_fifo *) fh)->get_atom () == hill)
 	return (fhandler_fifo *) fh;
     }
