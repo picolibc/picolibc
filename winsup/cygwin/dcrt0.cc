@@ -439,7 +439,7 @@ build_argv (char *cmd, char **&argv, int &argc, int winshell)
 	    /* Skip over characters until the closing quote */
 	    {
 	      sawquote = cmd;
-	      cmd = quoted (cmd, argc > 0 && winshell);
+	      cmd = quoted (cmd, winshell && argc > 0);
 	    }
 	  if (issep (*cmd))	// End of argument if space
 	    break;
