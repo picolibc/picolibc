@@ -129,6 +129,97 @@ static const c4x_register_t c4x_registers[] =
 
 const unsigned int c4x_num_registers = (((sizeof c4x_registers) / (sizeof c4x_registers[0])) - 1);
 
+struct c4x_cond
+{
+  char *        name;
+  unsigned long cond;
+};
+
+typedef struct c4x_cond c4x_cond_t;
+
+/* Define conditional branch/load suffixes.  Put desired form for
+   disassembler last.  */
+static const c4x_cond_t c4x_conds[] =
+{
+  { "u",    0x00 },
+  { "c",    0x01 }, { "lo",  0x01 },
+  { "ls",   0x02 },
+  { "hi",   0x03 },
+  { "nc",   0x04 }, { "hs",  0x04 },
+  { "z",    0x05 }, { "eq",  0x05 },
+  { "nz",   0x06 }, { "ne",  0x06 },
+  { "n",    0x07 }, { "l",   0x07 }, { "lt",  0x07 },
+  { "le",   0x08 },
+  { "p",    0x09 }, { "gt",  0x09 },
+  { "nn",   0x0a }, { "ge",  0x0a },
+  { "nv",   0x0c },
+  { "v",    0x0d },
+  { "nuf",  0x0e },
+  { "uf",   0x0f },
+  { "nlv",  0x10 },
+  { "lv",   0x11 },
+  { "nluf", 0x12 },
+  { "luf",  0x13 },
+  { "zuf",  0x14 },
+  /* Dummy entry, not included in num_conds.  This
+     lets code examine entry i+1 without checking
+     if we've run off the end of the table.  */
+  { "",      0x0}
+};
+
+const unsigned int num_conds = (((sizeof c4x_conds) / (sizeof c4x_conds[0])) - 1);
+
+struct c4x_indirect
+{
+  char *        name;
+  unsigned long modn;
+};
+
+typedef struct c4x_indirect c4x_indirect_t;
+
+/* Define indirect addressing modes where:
+   d displacement (signed)
+   y ir0
+   z ir1  */
+
+static const c4x_indirect_t c4x_indirects[] =
+{
+  { "*+a(d)",   0x00 },
+  { "*-a(d)",   0x01 },
+  { "*++a(d)",  0x02 },
+  { "*--a(d)",  0x03 },
+  { "*a++(d)",  0x04 },
+  { "*a--(d)",  0x05 },
+  { "*a++(d)%", 0x06 },
+  { "*a--(d)%", 0x07 },
+  { "*+a(y)",   0x08 },
+  { "*-a(y)",   0x09 },
+  { "*++a(y)",  0x0a },
+  { "*--a(y)",  0x0b },
+  { "*a++(y)",  0x0c },
+  { "*a--(y)",  0x0d },
+  { "*a++(y)%", 0x0e },
+  { "*a--(y)%", 0x0f },
+  { "*+a(z)",   0x10 },
+  { "*-a(z)",   0x11 },
+  { "*++a(z)",  0x12 },
+  { "*--a(z)",  0x13 },
+  { "*a++(z)",  0x14 },
+  { "*a--(z)",  0x15 },
+  { "*a++(z)%", 0x16 },
+  { "*a--(z)%", 0x17 },
+  { "*a",       0x18 },
+  { "*a++(y)b", 0x19 },
+  /* Dummy entry, not included in num_indirects.  This
+     lets code examine entry i+1 without checking
+     if we've run off the end of the table.  */
+  { "",      0x0}
+};
+
+#define C3X_MODN_MAX 0x19
+
+const unsigned int c4x_num_indirects = (((sizeof c4x_indirects) / (sizeof c4x_indirects[0])) - 1);
+
 /* Instruction template.  */
 struct c4x_inst
 {
@@ -163,8 +254,10 @@ typedef struct c4x_inst c4x_inst_t;
    G  register (all)          8--15   [T,TC,T2,T2C] - R0, R7, R11, AR0, DP
    g  register (0-11)         0--7    [S,SC,S2] - R0, R7, R11
    H  register (0-7)         18--16   [LS,M,P,Q] - R0, R7
-   I  indirect (no disp)      0--7    [LL,LS,M,P,Q,QC,S,SC,S2,T,TC,T2,T2C] - *+AR0(1), *+AR0(IR0)
-   J  indirect (no disp)      8--15   [LL,LS,M,P,Q,QC,S,SC,S2,T,TC,T2,T2C] - *+AR0(1), *+AR0(IR0)
+   I  indirect (no disp)      0--7    [S,SC,S2,T,TC,T2,T2C] - *+AR0(1), *+AR0(IR0)
+   i  indirect (enhanced)     0--7    [LL,LS,M,P,Q,QC] - *+AR0(1), R5
+   J  indirect (no disp)      8--15   [LL,LS,P,Q,QC,S,SC,S2,T,TC,T2,T2C] - *+AR0(1), *+AR0(IR0)
+   j  indirect (enhanced)     8--15   [M] - *+AR0(1), R5
    K  register               19--21   [LL,M,Q,QC] - R0, R7
    L  register               22--24   [LL,LS,P,Q,QC] - R0, R7
    M  register (R2,R3)       22--22   [M] R2, R3
@@ -189,15 +282,15 @@ typedef struct c4x_inst c4x_inst_t;
 #define C4X_NAME_MAX 16		/* Max number of chars in parallel name.  */
 
 /* Define the instruction level */
-#define OP_C3X  0x0  /* C30 support - supported by all */
-#define OP_C4X  0x1  /* C40 support - C40, C44 */
-#define OP_C3XE 0x2  /* Class LL,LS,M,P,Q,QC enhancements. Argument type
-                        I and J is enhanced in these classes - C31>=6.0,
-                        C32>=2.0, C33 */
-#define OP_LPWR 0x3  /* Low power support (LOPOWER, MAXSPEED) - C30>=7.0,
-                        LC31, C31>=5.0, C32 */
-#define OP_IDLE 0x4  /* Idle2 support (IDLE2) - C30>=7.0, LC31, C31>=5.0,
-                        C32, C33, C40>=5.0, C44 */
+#define OP_C3X   0x1   /* C30 support - supported by all */
+#define OP_C4X   0x2   /* C40 support - C40, C44 */
+#define OP_ENH   0x4   /* Class LL,LS,M,P,Q,QC enhancements. Argument type
+                          I and J is enhanced in these classes - C31>=6.0,
+                          C32>=2.0, C33 */
+#define OP_LPWR  0x8   /* Low power support (LOPOWER, MAXSPEED) - C30>=7.0,
+                          LC31, C31>=5.0, C32 */
+#define OP_IDLE2 0x10  /* Idle2 support (IDLE2) - C30>=7.0, LC31, C31>=5.0,
+                          C32, C33, C40>=5.0, C44 */
 
 /* The following class definition is a classification scheme for
    putting instructions with similar type of arguments together. It
@@ -430,29 +523,29 @@ typedef struct c4x_inst c4x_inst_t;
    Syntax: <i> src2, dst2 || <i> src1, dst1
        src1 = Indirect 0,1,IR0,IR1 (J)
        dst1 = Register 0-7 (K)
-       src2 = Indirect 0,1,IR0,IR1 (I)
+       src2 = Indirect 0,1,IR0,IR1, ENH: Register (i)
        dst2 = Register 0-7 (L)
    Instr: 2/0 - LDF||LDF, LDI||LDI
    Alias: i||i, i1||i2, i2||i1
 */
 #define LL_CLASS_INSN(name, opcode, level) \
-  { name "_"  name    , opcode, 0xfe000000, "I,L|J,K", level }, \
-  { name "2_" name "1", opcode, 0xfe000000, "I,L|J,K", level }, \
-  { name "1_" name "2", opcode, 0xfe000000, "J,K|I,L", level }
+  { name "_"  name    , opcode, 0xfe000000, "i;L|J,K", level }, \
+  { name "2_" name "1", opcode, 0xfe000000, "i;L|J,K", level }, \
+  { name "1_" name "2", opcode, 0xfe000000, "J,K|i;L", level }
 
 /* LS: Store-store parallell operation
    Syntax: <i> src2, dst2 || <i> src1, dst1
        src1 = Register 0-7 (H)
        dst1 = Indirect 0,1,IR0,IR1 (J)
        src2 = Register 0-7 (L)
-       dst2 = Indirect 0,1,IR0,IR1 (I)
+       dst2 = Indirect 0,1,IR0,IR1, ENH: register (i)
    Instr: 2/0 - STF||STF, STI||STI
    Alias: i||i, i1||i2, i2||i1.
 */
 #define LS_CLASS_INSN(name, opcode, level) \
-  { name "_"  name    , opcode, 0xfe000000, "L,I|H,J", level }, \
-  { name "2_" name "1", opcode, 0xfe000000, "L,I|H,J", level }, \
-  { name "1_" name "2", opcode, 0xfe000000, "H,J|L,I", level }
+  { name "_"  name    , opcode, 0xfe000000, "L;i|H,J", level }, \
+  { name "2_" name "1", opcode, 0xfe000000, "L;i|H,J", level }, \
+  { name "1_" name "2", opcode, 0xfe000000, "H,J|L;i", level }
 
 /* M: General multiply and add/sub operations
    Syntax: <ia> src3,src4,dst1 || <ib> src2,src1,dst2 [00] - Manual
@@ -463,66 +556,66 @@ typedef struct c4x_inst c4x_inst_t;
            <ia> src1,src3,dst1 || <ib> src4,src2,dst2 [03]
        src1 = Register 0-7 (K)
        src2 = Register 0-7 (H)
-       src3 = Indirect 0,1,IR0,IR1 (J)
-       src4 = Indirect 0,1,IR0,IR1 (I)
+       src3 = Indirect 0,1,IR0,IR1, ENH: register (j)
+       src4 = Indirect 0,1,IR0,IR1, ENH: register (i)
        dst1 = Register 0-1 (N)
        dst2 = Register 2-3 (M)
    Instr: 4/0 - MPYF3||ADDF3, MPYF3||SUBF3, MPYI3||ADDI3, MPYI3||SUBI3
    Alias: a||b, a3||n, a||b3, a3||b3, b||a, b3||a, b||a3, b3||a3
 */
 #define M_CLASS_INSN(namea, nameb, opcode, level) \
-  { namea "_" nameb, opcode|0x00000000, 0xff000000, "I,J,N|H,K;M", level }, \
-  { namea "_" nameb, opcode|0x01000000, 0xff000000, "J,K;N|H,I,M", level }, \
-  { namea "_" nameb, opcode|0x01000000, 0xff000000, "K,J,N|H,I,M", level }, \
-  { namea "_" nameb, opcode|0x02000000, 0xff000000, "H,K;N|I,J,M", level }, \
-  { namea "_" nameb, opcode|0x03000000, 0xff000000, "J,K;N|I,H;M", level }, \
-  { namea "_" nameb, opcode|0x03000000, 0xff000000, "K,J,N|I,H;M", level }, \
-  { namea "3_" nameb, opcode|0x00000000, 0xff000000, "I,J,N|H,K;M", level }, \
-  { namea "3_" nameb, opcode|0x01000000, 0xff000000, "J,K;N|H,I,M", level }, \
-  { namea "3_" nameb, opcode|0x01000000, 0xff000000, "K,J,N|H,I,M", level }, \
-  { namea "3_" nameb, opcode|0x02000000, 0xff000000, "H,K;N|I,J,M", level }, \
-  { namea "3_" nameb, opcode|0x03000000, 0xff000000, "J,K;N|I,H;M", level }, \
-  { namea "3_" nameb, opcode|0x03000000, 0xff000000, "K,J,N|I,H;M", level }, \
-  { namea "_" nameb "3", opcode|0x00000000, 0xff000000, "I,J,N|H,K;M", level }, \
-  { namea "_" nameb "3", opcode|0x01000000, 0xff000000, "J,K;N|H,I,M", level }, \
-  { namea "_" nameb "3", opcode|0x01000000, 0xff000000, "K,J,N|H,I,M", level }, \
-  { namea "_" nameb "3", opcode|0x02000000, 0xff000000, "H,K;N|I,J,M", level }, \
-  { namea "_" nameb "3", opcode|0x03000000, 0xff000000, "J,K;N|I,H;M", level }, \
-  { namea "_" nameb "3", opcode|0x03000000, 0xff000000, "K,J,N|I,H;M", level }, \
-  { namea "3_" nameb "3", opcode|0x00000000, 0xff000000, "I,J,N|H,K;M", level }, \
-  { namea "3_" nameb "3", opcode|0x01000000, 0xff000000, "J,K;N|H,I,M", level }, \
-  { namea "3_" nameb "3", opcode|0x01000000, 0xff000000, "K,J,N|H,I,M", level }, \
-  { namea "3_" nameb "3", opcode|0x02000000, 0xff000000, "H,K;N|I,J,M", level }, \
-  { namea "3_" nameb "3", opcode|0x03000000, 0xff000000, "J,K;N|I,H;M", level }, \
-  { namea "3_" nameb "3", opcode|0x03000000, 0xff000000, "K,J,N|I,H;M", level }, \
-  { nameb "_" namea, opcode|0x00000000, 0xff000000, "H,K;M|I,J,N", level }, \
-  { nameb "_" namea, opcode|0x01000000, 0xff000000, "H,I,M|J,K;N", level }, \
-  { nameb "_" namea, opcode|0x01000000, 0xff000000, "H,I,M|K,J,N", level }, \
-  { nameb "_" namea, opcode|0x02000000, 0xff000000, "I,J,M|H,K;N", level }, \
-  { nameb "_" namea, opcode|0x03000000, 0xff000000, "I,H;M|J,K;N", level }, \
-  { nameb "_" namea, opcode|0x03000000, 0xff000000, "I,H;M|K,J,N", level }, \
-  { nameb "3_" namea, opcode|0x00000000, 0xff000000, "H,K;M|I,J,N", level }, \
-  { nameb "3_" namea, opcode|0x01000000, 0xff000000, "H,I,M|J,K;N", level }, \
-  { nameb "3_" namea, opcode|0x01000000, 0xff000000, "H,I,M|K,J,N", level }, \
-  { nameb "3_" namea, opcode|0x02000000, 0xff000000, "I,J,M|H,K;N", level }, \
-  { nameb "3_" namea, opcode|0x03000000, 0xff000000, "I,H;M|J,K;N", level }, \
-  { nameb "3_" namea, opcode|0x03000000, 0xff000000, "I,H;M|K,J,N", level }, \
-  { nameb "_" namea "3", opcode|0x00000000, 0xff000000, "H,K;M|I,J,N", level }, \
-  { nameb "_" namea "3", opcode|0x01000000, 0xff000000, "H,I,M|J,K;N", level }, \
-  { nameb "_" namea "3", opcode|0x01000000, 0xff000000, "H,I,M|K,J,N", level }, \
-  { nameb "_" namea "3", opcode|0x02000000, 0xff000000, "I,J,M|H,K;N", level }, \
-  { nameb "_" namea "3", opcode|0x03000000, 0xff000000, "I,H;M|J,K;N", level }, \
-  { nameb "_" namea "3", opcode|0x03000000, 0xff000000, "I,H;M|K,J,N", level }, \
-  { nameb "3_" namea "3", opcode|0x00000000, 0xff000000, "H,K;M|I,J,N", level }, \
-  { nameb "3_" namea "3", opcode|0x01000000, 0xff000000, "H,I,M|J,K;N", level }, \
-  { nameb "3_" namea "3", opcode|0x01000000, 0xff000000, "H,I,M|K,J,N", level }, \
-  { nameb "3_" namea "3", opcode|0x02000000, 0xff000000, "I,J,M|H,K;N", level }, \
-  { nameb "3_" namea "3", opcode|0x03000000, 0xff000000, "I,H;M|J,K;N", level }, \
-  { nameb "3_" namea "3", opcode|0x03000000, 0xff000000, "I,H;M|K,J,N", level }
+  { namea "_" nameb, opcode|0x00000000, 0xff000000, "i;j;N|H;K;M", level }, \
+  { namea "_" nameb, opcode|0x01000000, 0xff000000, "j;K;N|H;i;M", level }, \
+  { namea "_" nameb, opcode|0x01000000, 0xff000000, "K;j;N|H;i;M", level }, \
+  { namea "_" nameb, opcode|0x02000000, 0xff000000, "H;K;N|i;j;M", level }, \
+  { namea "_" nameb, opcode|0x03000000, 0xff000000, "j;K;N|i;H;M", level }, \
+  { namea "_" nameb, opcode|0x03000000, 0xff000000, "K;j;N|i;H;M", level }, \
+  { namea "3_" nameb, opcode|0x00000000, 0xff000000, "i;j;N|H;K;M", level }, \
+  { namea "3_" nameb, opcode|0x01000000, 0xff000000, "j;K;N|H;i;M", level }, \
+  { namea "3_" nameb, opcode|0x01000000, 0xff000000, "K;j;N|H;i;M", level }, \
+  { namea "3_" nameb, opcode|0x02000000, 0xff000000, "H;K;N|i;j;M", level }, \
+  { namea "3_" nameb, opcode|0x03000000, 0xff000000, "j;K;N|i;H;M", level }, \
+  { namea "3_" nameb, opcode|0x03000000, 0xff000000, "K;j;N|i;H;M", level }, \
+  { namea "_" nameb "3", opcode|0x00000000, 0xff000000, "i;j;N|H;K;M", level }, \
+  { namea "_" nameb "3", opcode|0x01000000, 0xff000000, "j;K;N|H;i;M", level }, \
+  { namea "_" nameb "3", opcode|0x01000000, 0xff000000, "K;j;N|H;i;M", level }, \
+  { namea "_" nameb "3", opcode|0x02000000, 0xff000000, "H;K;N|i;j;M", level }, \
+  { namea "_" nameb "3", opcode|0x03000000, 0xff000000, "j;K;N|i;H;M", level }, \
+  { namea "_" nameb "3", opcode|0x03000000, 0xff000000, "K;j;N|i;H;M", level }, \
+  { namea "3_" nameb "3", opcode|0x00000000, 0xff000000, "i;j;N|H;K;M", level }, \
+  { namea "3_" nameb "3", opcode|0x01000000, 0xff000000, "j;K;N|H;i;M", level }, \
+  { namea "3_" nameb "3", opcode|0x01000000, 0xff000000, "K;j;N|H;i;M", level }, \
+  { namea "3_" nameb "3", opcode|0x02000000, 0xff000000, "H;K;N|i;j;M", level }, \
+  { namea "3_" nameb "3", opcode|0x03000000, 0xff000000, "j;K;N|i;H;M", level }, \
+  { namea "3_" nameb "3", opcode|0x03000000, 0xff000000, "K;j;N|i;H;M", level }, \
+  { nameb "_" namea, opcode|0x00000000, 0xff000000, "H;K;M|i;j;N", level }, \
+  { nameb "_" namea, opcode|0x01000000, 0xff000000, "H;i;M|j;K;N", level }, \
+  { nameb "_" namea, opcode|0x01000000, 0xff000000, "H;i;M|K;j;N", level }, \
+  { nameb "_" namea, opcode|0x02000000, 0xff000000, "i;j;M|H;K;N", level }, \
+  { nameb "_" namea, opcode|0x03000000, 0xff000000, "i;H;M|j;K;N", level }, \
+  { nameb "_" namea, opcode|0x03000000, 0xff000000, "i;H;M|K;j;N", level }, \
+  { nameb "3_" namea, opcode|0x00000000, 0xff000000, "H;K;M|i;j;N", level }, \
+  { nameb "3_" namea, opcode|0x01000000, 0xff000000, "H;i;M|j;K;N", level }, \
+  { nameb "3_" namea, opcode|0x01000000, 0xff000000, "H;i;M|K;j;N", level }, \
+  { nameb "3_" namea, opcode|0x02000000, 0xff000000, "i;j;M|H;K;N", level }, \
+  { nameb "3_" namea, opcode|0x03000000, 0xff000000, "i;H;M|j;K;N", level }, \
+  { nameb "3_" namea, opcode|0x03000000, 0xff000000, "i;H;M|K;j;N", level }, \
+  { nameb "_" namea "3", opcode|0x00000000, 0xff000000, "H;K;M|i;j;N", level }, \
+  { nameb "_" namea "3", opcode|0x01000000, 0xff000000, "H;i;M|j;K;N", level }, \
+  { nameb "_" namea "3", opcode|0x01000000, 0xff000000, "H;i;M|K;j;N", level }, \
+  { nameb "_" namea "3", opcode|0x02000000, 0xff000000, "i;j;M|H;K;N", level }, \
+  { nameb "_" namea "3", opcode|0x03000000, 0xff000000, "i;H;M|j;K;N", level }, \
+  { nameb "_" namea "3", opcode|0x03000000, 0xff000000, "i;H;M|K;j;N", level }, \
+  { nameb "3_" namea "3", opcode|0x00000000, 0xff000000, "H;K;M|i;j;N", level }, \
+  { nameb "3_" namea "3", opcode|0x01000000, 0xff000000, "H;i;M|j;K;N", level }, \
+  { nameb "3_" namea "3", opcode|0x01000000, 0xff000000, "H;i;M|K;j;N", level }, \
+  { nameb "3_" namea "3", opcode|0x02000000, 0xff000000, "i;j;M|H;K;N", level }, \
+  { nameb "3_" namea "3", opcode|0x03000000, 0xff000000, "i;H;M|j;K;N", level }, \
+  { nameb "3_" namea "3", opcode|0x03000000, 0xff000000, "i;H;M|K;j;N", level }
 
 /* P: General 2-operand operation with parallell store
    Syntax: <ia> src2, dst1 || <ib> src3, dst2
-       src2 = Indirect 0,1,IR0,IR1 (I)
+       src2 = Indirect 0,1,IR0,IR1, ENH: register (i)
        dst1 = Register 0-7 (L)
        src3 = Register 0-7 (H)
        dst2 = Indirect 0,1,IR0,IR1 (J)
@@ -532,13 +625,13 @@ typedef struct c4x_inst c4x_inst_t;
    Alias: a||b, b||a
 */
 #define P_CLASS_INSN(namea, nameb, opcode, level) \
-  { namea "_" nameb, opcode, 0xfe000000, "I,L|H,J", level }, \
-  { nameb "_" namea, opcode, 0xfe000000, "H,J|I,L", level }
+  { namea "_" nameb, opcode, 0xfe000000, "i;L|H,J", level }, \
+  { nameb "_" namea, opcode, 0xfe000000, "H,J|i;L", level }
 
 /* Q: General 3-operand operation with parallell store
    Syntax: <ia> src1, src2, dst1 || <ib> src3, dst2
        src1 = Register 0-7 (K)
-       src2 = Indirect 0,1,IR0,IR1 (I)
+       src2 = Indirect 0,1,IR0,IR1, ENH: register (i)
        dst1 = Register 0-7 (L)
        src3 = Register 0-7 (H)
        dst2 = Indirect 0,1,IR0,IR1 (J)
@@ -546,16 +639,16 @@ typedef struct c4x_inst c4x_inst_t;
    Alias: a||b, b||a, a3||b, b||a3
 */
 #define Q_CLASS_INSN(namea, nameb, opcode, level) \
-  { namea "_"  nameb    , opcode, 0xfe000000, "K,I,L|H,J", level }, \
-  { nameb "_"  namea    , opcode, 0xfe000000, "H,J|K,I,L", level }, \
-  { namea "3_" nameb    , opcode, 0xfe000000, "K,I,L|H,J", level }, \
-  { nameb "_"  namea "3", opcode, 0xfe000000, "H,J|K,I,L", level }
+  { namea "_"  nameb    , opcode, 0xfe000000, "K,i;L|H,J", level }, \
+  { nameb "_"  namea    , opcode, 0xfe000000, "H,J|K,i;L", level }, \
+  { namea "3_" nameb    , opcode, 0xfe000000, "K,i;L|H,J", level }, \
+  { nameb "_"  namea "3", opcode, 0xfe000000, "H,J|K,i;L", level }
 
 /* QC: General commutative 3-operand operation with parallell store
    Syntax: <ia> src2, src1, dst1 || <ib> src3, dst2
            <ia> src1, src2, dst1 || <ib> src3, dst2 - Manual
        src1 = Register 0-7 (K)
-       src2 = Indirect 0,1,IR0,IR1 (I)
+       src2 = Indirect 0,1,IR0,IR1, ENH: register (i)
        dst1 = Register 0-7 (L)
        src3 = Register 0-7 (H)
        dst2 = Indirect 0,1,IR0,IR1 (J)
@@ -564,14 +657,14 @@ typedef struct c4x_inst c4x_inst_t;
    Alias: a||b, b||a, a3||b, b||a3
 */
 #define QC_CLASS_INSN(namea, nameb, opcode, level) \
-  { namea "_"  nameb    , opcode, 0xfe000000, "I,K;L|H,J", level }, \
-  { namea "_"  nameb    , opcode, 0xfe000000, "K,I,L|H,J", level }, \
-  { nameb "_"  namea    , opcode, 0xfe000000, "H,J|I,K;L", level }, \
-  { nameb "_"  namea    , opcode, 0xfe000000, "H,J|K,I,L", level }, \
-  { namea "3_" nameb    , opcode, 0xfe000000, "I,K;L|H,J", level }, \
-  { namea "3_" nameb    , opcode, 0xfe000000, "K,I,L|H,J", level }, \
-  { nameb "_"  namea "3", opcode, 0xfe000000, "H,J|I,K;L", level }, \
-  { nameb "_"  namea "3", opcode, 0xfe000000, "H,J|K,I,L", level }
+  { namea "_"  nameb    , opcode, 0xfe000000, "i;K;L|H,J", level }, \
+  { namea "_"  nameb    , opcode, 0xfe000000, "K;i;L|H,J", level }, \
+  { nameb "_"  namea    , opcode, 0xfe000000, "H,J|i;K;L", level }, \
+  { nameb "_"  namea    , opcode, 0xfe000000, "H,J|K;i;L", level }, \
+  { namea "3_" nameb    , opcode, 0xfe000000, "i;K;L|H,J", level }, \
+  { namea "3_" nameb    , opcode, 0xfe000000, "K;i;L|H,J", level }, \
+  { nameb "_"  namea "3", opcode, 0xfe000000, "H,J|i;K;L", level }, \
+  { nameb "_"  namea "3", opcode, 0xfe000000, "H,J|K;i;L", level }
 
 /* R: General register integer operation
    Syntax: <i> dst
@@ -781,7 +874,7 @@ typedef struct c4x_inst c4x_inst_t;
 
 
 /* Define c3x opcodes for assembler and disassembler.  */
-static const c4x_inst_t c3x_insts[] =
+static const c4x_inst_t c4x_insts[] =
 {
   /* Put synonyms after the desired forms in table so that they get
      overwritten in the lookup table.  The disassembler will thus
@@ -792,298 +885,195 @@ static const c4x_inst_t c3x_insts[] =
      the sti1||sti2 form is used.  We also allow sti2||sti1
      which is equivalent to the default sti||sti form.
   */
-  B_CLASS_INSN(  "absf",          0x00000000, OP_C3X ),
-  P_CLASS_INSN(  "absf",  "stf",  0xc8000000, OP_C3X ),
-  A_CLASS_INSN(  "absi",          0x00800000, OP_C3X ),
-  P_CLASS_INSN(  "absi",  "sti",  0xca000000, OP_C3X ),
-  A_CLASS_INSN(  "addc",          0x01000000, OP_C3X ),
-  TC_CLASS_INSN( "addc",          0x00000000, OP_C3X ),
-  B_CLASS_INSN(  "addf",          0x01800000, OP_C3X ),
-  SC_CLASS_INSN( "addf",          0x00800000, OP_C3X ),
-  QC_CLASS_INSN( "addf",  "stf",  0xcc000000, OP_C3X ),
-  A_CLASS_INSN(  "addi",          0x02000000, OP_C3X ),
-  TC_CLASS_INSN( "addi",          0x01000000, OP_C3X ),
-  QC_CLASS_INSN( "addi",  "sti",  0xce000000, OP_C3X ),
-  AU_CLASS_INSN( "and",           0x02800000, OP_C3X ),
-  TC_CLASS_INSN( "and",           0x01800000, OP_C3X ),
-  QC_CLASS_INSN( "and",   "sti",  0xd0000000, OP_C3X ),
-  AU_CLASS_INSN( "andn",          0x03000000, OP_C3X ),
-  T_CLASS_INSN(  "andn",          0x02000000, OP_C3X ),
-  A_CLASS_INSN(  "ash",           0x03800000, OP_C3X ),
-  T_CLASS_INSN(  "ash",           0x02800000, OP_C3X ),
-  Q_CLASS_INSN(  "ash",   "sti",  0xd2000000, OP_C3X ),
-  J_CLASS_INSN(  "bB",    "b",    0x68000000, OP_C3X ),
-  J_CLASS_INSN(  "bBd",   "bd",   0x68200000, OP_C3X ),
-  { "br",     0x60000000, 0xff000000, "B"   , OP_C3X },  /* I_CLASS */
-  { "brd",    0x61000000, 0xff000000, "B"   , OP_C3X },  /* I_CLASS */
-  { "call",   0x62000000, 0xff000000, "B"   , OP_C3X },  /* I_CLASS */
-  { "callB",  0x70000000, 0xffe00000, "Q"   , OP_C3X },  /* JS_CLASS */
-  { "callB",  0x72000000, 0xffe00000, "P"   , OP_C3X },  /* JS_CLASS */
-  B_CLASS_INSN(  "cmpf",          0x04000000, OP_C3X ),
-  S2_CLASS_INSN( "cmpf",          0x03000000, OP_C3X ),
-  A_CLASS_INSN(  "cmpi",          0x04800000, OP_C3X ),
-  T2_CLASS_INSN( "cmpi",          0x03800000, OP_C3X ),
-  D_CLASS_INSN(  "dbB",   "db",   0x6c000000, OP_C3X ),
-  D_CLASS_INSN(  "dbBd",  "dbd",  0x6c200000, OP_C3X ),
-  AF_CLASS_INSN( "fix",           0x05000000, OP_C3X ),
-  P_CLASS_INSN(  "fix",   "sti",  0xd4000000, OP_C3X ),
-  BI_CLASS_INSN( "float",         0x05800000, OP_C3X ),
-  P_CLASS_INSN(  "float", "stf",  0xd6000000, OP_C3X ),
-  { "iack",   0x1b200000, 0xffe00000, "@"   , OP_C3X },  /* Z_CLASS */
-  { "iack",   0x1b400000, 0xffe00000, "*"   , OP_C3X },  /* Z_CLASS */
-  { "idle",   0x06000000, 0xffffffff, ""    , OP_C3X },  /* Z_CLASS */
-  { "idle2",  0x06000001, 0xffffffff, ""    , OP_IDLE }, /* Z_CLASS */
-  B_CLASS_INSN(  "lde",           0x06800000, OP_C3X ),
-  B_CLASS_INSN(  "ldf",           0x07000000, OP_C3X ),
-  LL_CLASS_INSN( "ldf",           0xc4000000, OP_C3X ),
-  P_CLASS_INSN(  "ldf",   "stf",  0xd8000000, OP_C3X ),
-  BB_CLASS_INSN( "ldfC",          0x00000000, OP_C3X ),
-  B6_CLASS_INSN( "ldfi",          0x07800000, OP_C3X ),
-  A_CLASS_INSN(  "ldi",           0x08000000, OP_C3X ),
-  LL_CLASS_INSN( "ldi",           0xc6000000, OP_C3X ),
-  P_CLASS_INSN(  "ldi",   "sti",  0xda000000, OP_C3X ),
-  AB_CLASS_INSN( "ldiC",          0x10000000, OP_C3X ),
-  A6_CLASS_INSN( "ldii",          0x08800000, OP_C3X ),
-  { "ldp",    0x50700000, 0xffff0000, "#"   , OP_C3X },  /* Z_CLASS - synonym for ldiu #,dp */
-  B_CLASS_INSN(  "ldm",           0x09000000, OP_C3X ),
-  { "lopower", 0x10800001,0xffffffff, ""    , OP_LPWR }, /* Z_CLASS */
-  A_CLASS_INSN(  "lsh",           0x09800000, OP_C3X ),
-  T_CLASS_INSN(  "lsh",           0x04000000, OP_C3X ),
-  Q_CLASS_INSN(  "lsh",   "sti",  0xdc000000, OP_C3X ),
-  { "maxspeed",0x10800000,0xffffffff, ""    , OP_LPWR }, /* Z_CLASS */
-  B_CLASS_INSN(  "mpyf",          0x0a000000, OP_C3X ),
-  SC_CLASS_INSN( "mpyf",          0x04800000, OP_C3X ),
-  M_CLASS_INSN(  "mpyf",  "addf", 0x80000000, OP_C3X ),
-  QC_CLASS_INSN( "mpyf",  "stf",  0xde000000, OP_C3X ),
-  M_CLASS_INSN(  "mpyf",  "subf", 0x84000000, OP_C3X ),
-  A_CLASS_INSN(  "mpyi",          0x0a800000, OP_C3X ),
-  TC_CLASS_INSN( "mpyi",          0x05000000, OP_C3X ),
-  M_CLASS_INSN(  "mpyi",  "addi", 0x88000000, OP_C3X ),
-  QC_CLASS_INSN( "mpyi",  "sti",  0xe0000000, OP_C3X ),
-  M_CLASS_INSN(  "mpyi",  "subi", 0x8c000000, OP_C3X ),
-  A_CLASS_INSN(  "negb",          0x0b000000, OP_C3X ),
-  B_CLASS_INSN(  "negf",          0x0b800000, OP_C3X ),
-  P_CLASS_INSN(  "negf",  "stf",  0xe2000000, OP_C3X ),
-  A_CLASS_INSN(  "negi",          0x0c000000, OP_C3X ),
-  P_CLASS_INSN(  "negi",  "sti",  0xe4000000, OP_C3X ),
-  A2_CLASS_INSN( "nop",           0x0c800000, OP_C3X ),
-  B_CLASS_INSN(  "norm",          0x0d000000, OP_C3X ),
-  AU_CLASS_INSN( "not",           0x0d800000, OP_C3X ),
-  P_CLASS_INSN(  "not",   "sti",  0xe6000000, OP_C3X ),
-  AU_CLASS_INSN( "or",            0x10000000, OP_C3X ),
-  TC_CLASS_INSN( "or",            0x05800000, OP_C3X ),
-  QC_CLASS_INSN( "or",    "sti",  0xe8000000, OP_C3X ),
-  R_CLASS_INSN(  "pop",           0x0e200000, OP_C3X ),
-  RF_CLASS_INSN( "popf",          0x0ea00000, OP_C3X ),
-  R_CLASS_INSN(  "push",          0x0f200000, OP_C3X ),
-  RF_CLASS_INSN( "pushf",         0x0fa00000, OP_C3X ),
-  { "retiB",  0x78000000, 0xffe00000, ""    , OP_C3X },  /* Z_CLASS */
-  { "reti",   0x78000000, 0xffe00000, ""    , OP_C3X },  /* Z_CLASS  - Alias for retiu */
-  { "retsB",  0x78800000, 0xffe00000, ""    , OP_C3X },  /* Z_CLASS */
-  { "rets",   0x78800000, 0xffe00000, ""    , OP_C3X },  /* Z_CLASS  - Alias for retsu */
-  B_CLASS_INSN(  "rnd",           0x11000000, OP_C3X ),
-  R_CLASS_INSN(  "rol",           0x11e00001, OP_C3X ),
-  R_CLASS_INSN(  "rolc",          0x12600001, OP_C3X ),
-  R_CLASS_INSN(  "ror",           0x12e0ffff, OP_C3X ),
-  R_CLASS_INSN(  "rorc",          0x1360ffff, OP_C3X ),
-  { "rptb",   0x64000000, 0xff000000, "B"   , OP_C3X },  /* I2_CLASS */
-  { "rptb",   0x79000000, 0xff000000, "Q"   , OP_C4X },  /* I2_CLASS */
-  A3_CLASS_INSN( "rpts",          0x139b0000, OP_C3X ),
-  { "sigi",   0x16000000, 0xffe00000, ""    , OP_C3X },  /* Z_CLASS */
-  A6_CLASS_INSN( "sigi",          0x16000000, OP_C4X ),
-  B7_CLASS_INSN( "stf",           0x14000000, OP_C3X ),
-  LS_CLASS_INSN( "stf",           0xc0000000, OP_C3X ),
-  B7_CLASS_INSN( "stfi",          0x14800000, OP_C3X ),
-  A7_CLASS_INSN( "sti",           0x15000000, OP_C3X ),
-  { "sti",    0x15000000, 0xffe00000, "T,@" , OP_C4X },  /* Class A7 - Alias for stik */
-  { "sti",    0x15600000, 0xffe00000, "T,*" , OP_C4X },  /* Class A7 */
-  LS_CLASS_INSN( "sti",           0xc2000000, OP_C3X ),
-  A7_CLASS_INSN( "stii",          0x15800000, OP_C3X ),
-  A_CLASS_INSN(  "subb",          0x16800000, OP_C3X ),
-  T_CLASS_INSN(  "subb",          0x06000000, OP_C3X ),
-  A_CLASS_INSN(  "subc",          0x17000000, OP_C3X ),
-  B_CLASS_INSN(  "subf",          0x17800000, OP_C3X ),
-  S_CLASS_INSN(  "subf",          0x06800000, OP_C3X ),
-  Q_CLASS_INSN(  "subf",  "stf",  0xea000000, OP_C3X ),
-  A_CLASS_INSN(  "subi",          0x18000000, OP_C3X ),
-  T_CLASS_INSN(  "subi",          0x07000000, OP_C3X ),
-  Q_CLASS_INSN(  "subi",  "sti",  0xec000000, OP_C3X ),
-  A_CLASS_INSN(  "subrb",         0x18800000, OP_C3X ),
-  B_CLASS_INSN(  "subrf",         0x19000000, OP_C3X ),
-  A_CLASS_INSN(  "subri",         0x19800000, OP_C3X ),
-  { "swi",    0x66000000, 0xffffffff, ""    , OP_C3X },  /* Z_CLASS */
-  { "trapB",  0x74000000, 0xffe00000, "V"   , OP_C3X },  /* Z_CLASS */
-  { "trap",   0x74000000, 0xffe00000, "V"   , OP_C3X },  /* Z_CLASS - Alias for trapu */
-  AU_CLASS_INSN( "tstb",          0x1a000000, OP_C3X ),
-  T2C_CLASS_INSN("tstb",          0x07800000, OP_C3X ),
-  AU_CLASS_INSN( "xor",           0x1a800000, OP_C3X ),
-  TC_CLASS_INSN( "xor",           0x08000000, OP_C3X ),
-  QC_CLASS_INSN( "xor",   "sti",  0xee000000, OP_C3X ),
-    
+  B_CLASS_INSN(  "absf",          0x00000000, OP_C3X   ),
+  P_CLASS_INSN(  "absf",  "stf",  0xc8000000, OP_C3X   ),
+  A_CLASS_INSN(  "absi",          0x00800000, OP_C3X   ),
+  P_CLASS_INSN(  "absi",  "sti",  0xca000000, OP_C3X   ),
+  A_CLASS_INSN(  "addc",          0x01000000, OP_C3X   ),
+  TC_CLASS_INSN( "addc",          0x00000000, OP_C3X   ),
+  B_CLASS_INSN(  "addf",          0x01800000, OP_C3X   ),
+  SC_CLASS_INSN( "addf",          0x00800000, OP_C3X   ),
+  QC_CLASS_INSN( "addf",  "stf",  0xcc000000, OP_C3X   ),
+  A_CLASS_INSN(  "addi",          0x02000000, OP_C3X   ),
+  TC_CLASS_INSN( "addi",          0x01000000, OP_C3X   ),
+  QC_CLASS_INSN( "addi",  "sti",  0xce000000, OP_C3X   ),
+  AU_CLASS_INSN( "and",           0x02800000, OP_C3X   ),
+  TC_CLASS_INSN( "and",           0x01800000, OP_C3X   ),
+  QC_CLASS_INSN( "and",   "sti",  0xd0000000, OP_C3X   ),
+  AU_CLASS_INSN( "andn",          0x03000000, OP_C3X   ),
+  T_CLASS_INSN(  "andn",          0x02000000, OP_C3X   ),
+  A_CLASS_INSN(  "ash",           0x03800000, OP_C3X   ),
+  T_CLASS_INSN(  "ash",           0x02800000, OP_C3X   ),
+  Q_CLASS_INSN(  "ash",   "sti",  0xd2000000, OP_C3X   ),
+  J_CLASS_INSN(  "bB",    "b",    0x68000000, OP_C3X   ),
+  J_CLASS_INSN(  "bBd",   "bd",   0x68200000, OP_C3X   ),
+  J_CLASS_INSN(  "bBaf",  "baf",  0x68a00000, OP_C4X   ),
+  J_CLASS_INSN(  "bBat",  "bat",  0x68600000, OP_C4X   ),
+  { "br",     0x60000000, 0xff000000, "B"   , OP_C3X   },  /* I_CLASS */
+  { "brd",    0x61000000, 0xff000000, "B"   , OP_C3X   },  /* I_CLASS */
+  { "call",   0x62000000, 0xff000000, "B"   , OP_C3X   },  /* I_CLASS */
+  { "callB",  0x70000000, 0xffe00000, "Q"   , OP_C3X   },  /* JS_CLASS */
+  { "callB",  0x72000000, 0xffe00000, "P"   , OP_C3X   },  /* JS_CLASS */
+  B_CLASS_INSN(  "cmpf",          0x04000000, OP_C3X   ),
+  S2_CLASS_INSN( "cmpf",          0x03000000, OP_C3X   ),
+  A_CLASS_INSN(  "cmpi",          0x04800000, OP_C3X   ),
+  T2_CLASS_INSN( "cmpi",          0x03800000, OP_C3X   ),
+  D_CLASS_INSN(  "dbB",   "db",   0x6c000000, OP_C3X   ),
+  D_CLASS_INSN(  "dbBd",  "dbd",  0x6c200000, OP_C3X   ),
+  AF_CLASS_INSN( "fix",           0x05000000, OP_C3X   ),
+  P_CLASS_INSN(  "fix",   "sti",  0xd4000000, OP_C3X   ),
+  BI_CLASS_INSN( "float",         0x05800000, OP_C3X   ),
+  P_CLASS_INSN(  "float", "stf",  0xd6000000, OP_C3X   ),
+  B6_CLASS_INSN( "frieee",        0x1c000000, OP_C4X   ),
+  P_CLASS_INSN(  "frieee","stf",  0xf2000000, OP_C4X   ),
+  { "iack",   0x1b200000, 0xffe00000, "@"   , OP_C3X   },  /* Z_CLASS */
+  { "iack",   0x1b400000, 0xffe00000, "*"   , OP_C3X   },  /* Z_CLASS */
+  { "idle",   0x06000000, 0xffffffff, ""    , OP_C3X   },  /* Z_CLASS */
+  { "idlez",  0x06000000, 0xffffffff, ""    , OP_C3X   },  /* Z_CLASS */
+  { "idle2",  0x06000001, 0xffffffff, ""    , OP_IDLE2 },  /* Z_CLASS */
+  { "laj",    0x63000000, 0xff000000, "B"   , OP_C4X   },  /* I_CLASS */
+  { "lajB",   0x70200000, 0xffe00000, "Q"   , OP_C4X   },  /* JS_CLASS */
+  { "lajB",   0x72200000, 0xffe00000, "P"   , OP_C4X   },  /* JS_CLASS */
+  { "latB",   0x74800000, 0xffe00000, "V"   , OP_C4X   },  /* Z_CLASS */
+  A_CLASS_INSN(  "lb0",           0xb0000000, OP_C4X   ),
+  A_CLASS_INSN(  "lb1",           0xb0800000, OP_C4X   ),
+  A_CLASS_INSN(  "lb2",           0xb1000000, OP_C4X   ),
+  A_CLASS_INSN(  "lb3",           0xb1800000, OP_C4X   ),
+  AU_CLASS_INSN( "lbu0",          0xb2000000, OP_C4X   ),
+  AU_CLASS_INSN( "lbu1",          0xb2800000, OP_C4X   ),
+  AU_CLASS_INSN( "lbu2",          0xb3000000, OP_C4X   ),
+  AU_CLASS_INSN( "lbu3",          0xb3800000, OP_C4X   ),
+  AY_CLASS_INSN( "lda",           0x1e800000, OP_C4X   ),
+  B_CLASS_INSN(  "lde",           0x06800000, OP_C3X   ),
+  { "ldep",   0x76000000, 0xffe00000, "X,R" , OP_C4X   },  /* Z_CLASS */
+  B_CLASS_INSN(  "ldf",           0x07000000, OP_C3X   ),
+  LL_CLASS_INSN( "ldf",           0xc4000000, OP_C3X   ),
+  P_CLASS_INSN(  "ldf",   "stf",  0xd8000000, OP_C3X   ),
+  BB_CLASS_INSN( "ldfC",          0x00000000, OP_C3X   ),
+  B6_CLASS_INSN( "ldfi",          0x07800000, OP_C3X   ),
+  { "ldhi",   0x1fe00000, 0xffe00000, "U,r" , OP_C4X   },  /* Z_CLASS */
+  { "ldhi",   0x1fe00000, 0xffe00000, "#,r" , OP_C4X   },  /* Z_CLASS */
+  A_CLASS_INSN(  "ldi",           0x08000000, OP_C3X   ),
+  LL_CLASS_INSN( "ldi",           0xc6000000, OP_C3X   ),
+  P_CLASS_INSN(  "ldi",   "sti",  0xda000000, OP_C3X   ),
+  AB_CLASS_INSN( "ldiC",          0x10000000, OP_C3X   ),
+  A6_CLASS_INSN( "ldii",          0x08800000, OP_C3X   ),
+  { "ldp",    0x50700000, 0xffff0000, "#"   , OP_C3X   },  /* Z_CLASS - synonym for ldiu #,dp */
+  B_CLASS_INSN(  "ldm",           0x09000000, OP_C3X   ),
+  { "ldpe",   0x76800000, 0xffe00000, "Q,Z" , OP_C4X   },  /* Z_CLASS */
+  { "ldpk",   0x1F700000, 0xffff0000, "#"   , OP_C4X   },  /* Z_CLASS */
+  A_CLASS_INSN(  "lh0",           0xba000000, OP_C4X   ),
+  A_CLASS_INSN(  "lh1",           0xba800000, OP_C4X   ),
+  AU_CLASS_INSN( "lhu0",          0xbb000000, OP_C4X   ),
+  AU_CLASS_INSN( "lhu1",          0xbb800000, OP_C4X   ),
+  { "lopower", 0x10800001,0xffffffff, ""    , OP_LPWR  },  /* Z_CLASS */
+  A_CLASS_INSN(  "lsh",           0x09800000, OP_C3X   ),
+  T_CLASS_INSN(  "lsh",           0x04000000, OP_C3X   ),
+  Q_CLASS_INSN(  "lsh",   "sti",  0xdc000000, OP_C3X   ),
+  A_CLASS_INSN(  "lwl0",          0xb4000000, OP_C4X   ),
+  A_CLASS_INSN(  "lwl1",          0xb4800000, OP_C4X   ),
+  A_CLASS_INSN(  "lwl2",          0xb5000000, OP_C4X   ),
+  A_CLASS_INSN(  "lwl3",          0xb5800000, OP_C4X   ),
+  A_CLASS_INSN(  "lwr0",          0xb6000000, OP_C4X   ),
+  A_CLASS_INSN(  "lwr1",          0xb6800000, OP_C4X   ),
+  A_CLASS_INSN(  "lwr2",          0xb7000000, OP_C4X   ),
+  A_CLASS_INSN(  "lwr3",          0xb7800000, OP_C4X   ),
+  { "maxspeed",0x10800000,0xffffffff, ""    , OP_LPWR  },  /* Z_CLASS */
+  A_CLASS_INSN(  "mb0",           0xb8000000, OP_C4X   ),
+  A_CLASS_INSN(  "mb1",           0xb8800000, OP_C4X   ),
+  A_CLASS_INSN(  "mb2",           0xb9000000, OP_C4X   ),
+  A_CLASS_INSN(  "mb3",           0xb9800000, OP_C4X   ),
+  A_CLASS_INSN(  "mh0",           0xbc000000, OP_C4X   ),
+  A_CLASS_INSN(  "mh1",           0xbc800000, OP_C4X   ),
+  A_CLASS_INSN(  "mh2",           0xbd000000, OP_C4X   ),
+  A_CLASS_INSN(  "mh3",           0xbd800000, OP_C4X   ),
+  B_CLASS_INSN(  "mpyf",          0x0a000000, OP_C3X   ),
+  SC_CLASS_INSN( "mpyf",          0x04800000, OP_C3X   ),
+  M_CLASS_INSN(  "mpyf",  "addf", 0x80000000, OP_C3X   ),
+  QC_CLASS_INSN( "mpyf",  "stf",  0xde000000, OP_C3X   ),
+  M_CLASS_INSN(  "mpyf",  "subf", 0x84000000, OP_C3X   ),
+  A_CLASS_INSN(  "mpyi",          0x0a800000, OP_C3X   ),
+  TC_CLASS_INSN( "mpyi",          0x05000000, OP_C3X   ),
+  M_CLASS_INSN(  "mpyi",  "addi", 0x88000000, OP_C3X   ),
+  QC_CLASS_INSN( "mpyi",  "sti",  0xe0000000, OP_C3X   ),
+  M_CLASS_INSN(  "mpyi",  "subi", 0x8c000000, OP_C3X   ),
+  A_CLASS_INSN(  "mpyshi",        0x1d800000, OP_C4X   ),
+  TC_CLASS_INSN( "mpyshi",        0x28800000, OP_C4X   ),
+  A_CLASS_INSN(  "mpyuhi",        0x1e000000, OP_C4X   ),
+  TC_CLASS_INSN( "mpyuhi",        0x29000000, OP_C4X   ),
+  A_CLASS_INSN(  "negb",          0x0b000000, OP_C3X   ),
+  B_CLASS_INSN(  "negf",          0x0b800000, OP_C3X   ),
+  P_CLASS_INSN(  "negf",  "stf",  0xe2000000, OP_C3X   ),
+  A_CLASS_INSN(  "negi",          0x0c000000, OP_C3X   ),
+  P_CLASS_INSN(  "negi",  "sti",  0xe4000000, OP_C3X   ),
+  A2_CLASS_INSN( "nop",           0x0c800000, OP_C3X   ),
+  B_CLASS_INSN(  "norm",          0x0d000000, OP_C3X   ),
+  AU_CLASS_INSN( "not",           0x0d800000, OP_C3X   ),
+  P_CLASS_INSN(  "not",   "sti",  0xe6000000, OP_C3X   ),
+  AU_CLASS_INSN( "or",            0x10000000, OP_C3X   ),
+  TC_CLASS_INSN( "or",            0x05800000, OP_C3X   ),
+  QC_CLASS_INSN( "or",    "sti",  0xe8000000, OP_C3X   ),
+  R_CLASS_INSN(  "pop",           0x0e200000, OP_C3X   ),
+  RF_CLASS_INSN( "popf",          0x0ea00000, OP_C3X   ),
+  R_CLASS_INSN(  "push",          0x0f200000, OP_C3X   ),
+  RF_CLASS_INSN( "pushf",         0x0fa00000, OP_C3X   ),
+  BA_CLASS_INSN( "rcpf",          0x1d000000, OP_C4X   ),
+  { "retiB",  0x78000000, 0xffe00000, ""    , OP_C3X   },  /* Z_CLASS */
+  { "reti",   0x78000000, 0xffe00000, ""    , OP_C3X   },  /* Z_CLASS  - Alias for retiu */
+  { "retiBd", 0x78200000, 0xffe00000, ""    , OP_C4X   },  /* Z_CLASS */
+  { "retid",  0x78200000, 0xffe00000, ""    , OP_C4X   },  /* Z_CLASS - Alias for retiud */
+  { "retsB",  0x78800000, 0xffe00000, ""    , OP_C3X   },  /* Z_CLASS */
+  { "rets",   0x78800000, 0xffe00000, ""    , OP_C3X   },  /* Z_CLASS  - Alias for retsu */
+  B_CLASS_INSN(  "rnd",           0x11000000, OP_C3X   ),
+  R_CLASS_INSN(  "rol",           0x11e00001, OP_C3X   ),
+  R_CLASS_INSN(  "rolc",          0x12600001, OP_C3X   ),
+  R_CLASS_INSN(  "ror",           0x12e0ffff, OP_C3X   ),
+  R_CLASS_INSN(  "rorc",          0x1360ffff, OP_C3X   ),
+  { "rptb",   0x64000000, 0xff000000, "B"   , OP_C3X   },  /* I2_CLASS */
+  { "rptb",   0x79000000, 0xff000000, "Q"   , OP_C4X   },  /* I2_CLASS */
+  { "rptbd",  0x65000000, 0xff000000, "B"   , OP_C4X   },  /* I2_CLASS */ 
+  { "rptbd",  0x79800000, 0xff000000, "Q"   , OP_C4X   },  /* I2_CLASS */
+  A3_CLASS_INSN( "rpts",          0x139b0000, OP_C3X   ),
+  B_CLASS_INSN(  "rsqrf",         0x1c800000, OP_C4X   ),
+  { "sigi",   0x16000000, 0xffe00000, ""    , OP_C3X   },  /* Z_CLASS */
+  A6_CLASS_INSN( "sigi",          0x16000000, OP_C4X   ),
+  B7_CLASS_INSN( "stf",           0x14000000, OP_C3X   ),
+  LS_CLASS_INSN( "stf",           0xc0000000, OP_C3X   ),
+  B7_CLASS_INSN( "stfi",          0x14800000, OP_C3X   ),
+  A7_CLASS_INSN( "sti",           0x15000000, OP_C3X   ),
+  { "sti",    0x15000000, 0xffe00000, "T,@" , OP_C4X   },  /* Class A7 - Alias for stik */
+  { "sti",    0x15600000, 0xffe00000, "T,*" , OP_C4X   },  /* Class A7 */
+  LS_CLASS_INSN( "sti",           0xc2000000, OP_C3X   ),
+  A7_CLASS_INSN( "stii",          0x15800000, OP_C3X   ),
+  { "stik",   0x15000000, 0xffe00000, "T,@" , OP_C4X   },  /* Z_CLASS */
+  { "stik",   0x15600000, 0xffe00000, "T,*" , OP_C4X   },  /* Z_CLASS */
+  A_CLASS_INSN(  "subb",          0x16800000, OP_C3X   ),
+  T_CLASS_INSN(  "subb",          0x06000000, OP_C3X   ),
+  A_CLASS_INSN(  "subc",          0x17000000, OP_C3X   ),
+  B_CLASS_INSN(  "subf",          0x17800000, OP_C3X   ),
+  S_CLASS_INSN(  "subf",          0x06800000, OP_C3X   ),
+  Q_CLASS_INSN(  "subf",  "stf",  0xea000000, OP_C3X   ),
+  A_CLASS_INSN(  "subi",          0x18000000, OP_C3X   ),
+  T_CLASS_INSN(  "subi",          0x07000000, OP_C3X   ),
+  Q_CLASS_INSN(  "subi",  "sti",  0xec000000, OP_C3X   ),
+  A_CLASS_INSN(  "subrb",         0x18800000, OP_C3X   ),
+  B_CLASS_INSN(  "subrf",         0x19000000, OP_C3X   ),
+  A_CLASS_INSN(  "subri",         0x19800000, OP_C3X   ),
+  { "swi",    0x66000000, 0xffffffff, ""    , OP_C3X   },  /* Z_CLASS */
+  B_CLASS_INSN(  "toieee",        0x1b800000, OP_C4X   ),
+  P_CLASS_INSN(  "toieee","stf",  0xf0000000, OP_C4X   ),
+  { "trapB",  0x74000000, 0xffe00000, "V"   , OP_C3X   },  /* Z_CLASS */
+  { "trap",   0x74000000, 0xffe00000, "V"   , OP_C3X   },  /* Z_CLASS - Alias for trapu */
+  AU_CLASS_INSN( "tstb",          0x1a000000, OP_C3X   ),
+  T2C_CLASS_INSN("tstb",          0x07800000, OP_C3X   ),
+  AU_CLASS_INSN( "xor",           0x1a800000, OP_C3X   ),
+  TC_CLASS_INSN( "xor",           0x08000000, OP_C3X   ),
+  QC_CLASS_INSN( "xor",   "sti",  0xee000000, OP_C3X   ),
+
   /* Dummy entry, not included in c3x_num_insts.  This
      lets code examine entry i + 1 without checking
      if we've run off the end of the table.  */
   { "",      0x0, 0x00, "", 0 }
 };
 
-const unsigned int c3x_num_insts = (((sizeof c3x_insts) / (sizeof c3x_insts[0])) - 1);
-
-/* Define c4x additional opcodes for assembler and disassembler.  */
-static const c4x_inst_t c4x_insts[] =
-{
-  J_CLASS_INSN(  "bBaf",  "baf",  0x68a00000, OP_C4X ),
-  J_CLASS_INSN(  "bBat",  "bat",  0x68600000, OP_C4X ),
-  B6_CLASS_INSN( "frieee",        0x1c000000, OP_C4X ),
-  P_CLASS_INSN(  "frieee","stf",  0xf2000000, OP_C4X ),
-  { "laj",    0x63000000, 0xff000000, "B"   , OP_C4X },  /* I_CLASS */
-  { "lajB",   0x70200000, 0xffe00000, "Q"   , OP_C4X },  /* JS_CLASS */
-  { "lajB",   0x72200000, 0xffe00000, "P"   , OP_C4X },  /* JS_CLASS */
-  { "latB",   0x74800000, 0xffe00000, "V"   , OP_C4X },  /* Z_CLASS */
-  A_CLASS_INSN(  "lb0",           0xb0000000, OP_C4X ),
-  A_CLASS_INSN(  "lb1",           0xb0800000, OP_C4X ),
-  A_CLASS_INSN(  "lb2",           0xb1000000, OP_C4X ),
-  A_CLASS_INSN(  "lb3",           0xb1800000, OP_C4X ),
-  AU_CLASS_INSN( "lbu0",          0xb2000000, OP_C4X ),
-  AU_CLASS_INSN( "lbu1",          0xb2800000, OP_C4X ),
-  AU_CLASS_INSN( "lbu2",          0xb3000000, OP_C4X ),
-  AU_CLASS_INSN( "lbu3",          0xb3800000, OP_C4X ),
-  AY_CLASS_INSN( "lda",           0x1e800000, OP_C4X ),
-  { "ldep",   0x76000000, 0xffe00000, "X,R" , OP_C4X },  /* Z_CLASS */
-  { "ldhi",   0x1fe00000, 0xffe00000, "U,r" , OP_C4X },  /* Z_CLASS */
-  { "ldhi",   0x1fe00000, 0xffe00000, "#,r" , OP_C4X },  /* Z_CLASS */
-  { "ldpe",   0x76800000, 0xffe00000, "Q,Z" , OP_C4X },  /* Z_CLASS */
-  { "ldpk",   0x1F700000, 0xffff0000, "#"   , OP_C4X },  /* Z_CLASS */
-  A_CLASS_INSN(  "lh0",           0xba000000, OP_C4X ),
-  A_CLASS_INSN(  "lh1",           0xba800000, OP_C4X ),
-  AU_CLASS_INSN( "lhu0",          0xbb000000, OP_C4X ),
-  AU_CLASS_INSN( "lhu1",          0xbb800000, OP_C4X ),
-  A_CLASS_INSN(  "lwl0",          0xb4000000, OP_C4X ),
-  A_CLASS_INSN(  "lwl1",          0xb4800000, OP_C4X ),
-  A_CLASS_INSN(  "lwl2",          0xb5000000, OP_C4X ),
-  A_CLASS_INSN(  "lwl3",          0xb5800000, OP_C4X ),
-  A_CLASS_INSN(  "lwr0",          0xb6000000, OP_C4X ),
-  A_CLASS_INSN(  "lwr1",          0xb6800000, OP_C4X ),
-  A_CLASS_INSN(  "lwr2",          0xb7000000, OP_C4X ),
-  A_CLASS_INSN(  "lwr3",          0xb7800000, OP_C4X ),
-  A_CLASS_INSN(  "mb0",           0xb8000000, OP_C4X ),
-  A_CLASS_INSN(  "mb1",           0xb8800000, OP_C4X ),
-  A_CLASS_INSN(  "mb2",           0xb9000000, OP_C4X ),
-  A_CLASS_INSN(  "mb3",           0xb9800000, OP_C4X ),
-  A_CLASS_INSN(  "mh0",           0xbc000000, OP_C4X ),
-  A_CLASS_INSN(  "mh1",           0xbc800000, OP_C4X ),
-  A_CLASS_INSN(  "mh2",           0xbd000000, OP_C4X ),
-  A_CLASS_INSN(  "mh3",           0xbd800000, OP_C4X ),
-  A_CLASS_INSN(  "mpyshi",        0x1d800000, OP_C4X ),
-  TC_CLASS_INSN( "mpyshi",        0x28800000, OP_C4X ),
-  A_CLASS_INSN(  "mpyuhi",        0x1e000000, OP_C4X ),
-  TC_CLASS_INSN( "mpyuhi",        0x29000000, OP_C4X ),
-  BA_CLASS_INSN( "rcpf",          0x1d000000, OP_C4X ),
-  { "retiBd", 0x78200000, 0xffe00000, ""    , OP_C4X },  /* Z_CLASS */
-  { "retid",  0x78200000, 0xffe00000, ""    , OP_C4X },  /* Z_CLASS - Alias for retiud */
-  { "rptbd",  0x65000000, 0xff000000, "B"   , OP_C4X },  /* I2_CLASS */ 
-  { "rptbd",  0x79800000, 0xff000000, "Q"   , OP_C4X },  /* I2_CLASS */
-  B_CLASS_INSN(  "rsqrf",         0x1c800000, OP_C4X ),
-  { "stik",   0x15000000, 0xffe00000, "T,@" , OP_C4X },  /* Z_CLASS */
-  { "stik",   0x15600000, 0xffe00000, "T,*" , OP_C4X },  /* Z_CLASS */
-  B_CLASS_INSN(  "toieee",        0x1b800000, OP_C4X ),
-  P_CLASS_INSN(  "toieee","stf",  0xf0000000, OP_C4X ),
-    
-  /* Dummy entry, not included in num_insts.  This
-     lets code examine entry i+1 without checking
-     if we've run off the end of the table.  */
-  { "",      0x0, 0x00, "", 0 }
-};
-
 const unsigned int c4x_num_insts = (((sizeof c4x_insts) / (sizeof c4x_insts[0])) - 1);
-    
-
-struct c4x_cond
-{
-  char *        name;
-  unsigned long cond;
-};
-
-typedef struct c4x_cond c4x_cond_t;
-
-/* Define conditional branch/load suffixes.  Put desired form for
-   disassembler last.  */
-static const c4x_cond_t c4x_conds[] =
-{
-  { "u",    0x00 },
-  { "c",    0x01 }, { "lo",  0x01 },
-  { "ls",   0x02 },
-  { "hi",   0x03 },
-  { "nc",   0x04 }, { "hs",  0x04 },
-  { "z",    0x05 }, { "eq",  0x05 },
-  { "nz",   0x06 }, { "ne",  0x06 },
-  { "n",    0x07 }, { "l",   0x07 }, { "lt",  0x07 },
-  { "le",   0x08 },
-  { "p",    0x09 }, { "gt",  0x09 },
-  { "nn",   0x0a }, { "ge",  0x0a },
-  { "nv",   0x0c },
-  { "v",    0x0d },
-  { "nuf",  0x0e },
-  { "uf",   0x0f },
-  { "nlv",  0x10 },
-  { "lv",   0x11 },
-  { "nluf", 0x12 },
-  { "luf",  0x13 },
-  { "zuf",  0x14 },
-  /* Dummy entry, not included in num_conds.  This
-     lets code examine entry i+1 without checking
-     if we've run off the end of the table.  */
-  { "",      0x0}
-};
-
-const unsigned int num_conds = (((sizeof c4x_conds) / (sizeof c4x_conds[0])) - 1);
-
-struct c4x_indirect
-{
-  char *        name;
-  unsigned long modn;
-};
-
-typedef struct c4x_indirect c4x_indirect_t;
-
-/* Define indirect addressing modes where:
-   d displacement (signed)
-   y ir0
-   z ir1  */
-
-static const c4x_indirect_t c4x_indirects[] =
-{
-  { "*+a(d)",   0x00 },
-  { "*-a(d)",   0x01 },
-  { "*++a(d)",  0x02 },
-  { "*--a(d)",  0x03 },
-  { "*a++(d)",  0x04 },
-  { "*a--(d)",  0x05 },
-  { "*a++(d)%", 0x06 },
-  { "*a--(d)%", 0x07 },
-  { "*+a(y)",   0x08 },
-  { "*-a(y)",   0x09 },
-  { "*++a(y)",  0x0a },
-  { "*--a(y)",  0x0b },
-  { "*a++(y)",  0x0c },
-  { "*a--(y)",  0x0d },
-  { "*a++(y)%", 0x0e },
-  { "*a--(y)%", 0x0f },
-  { "*+a(z)",   0x10 },
-  { "*-a(z)",   0x11 },
-  { "*++a(z)",  0x12 },
-  { "*--a(z)",  0x13 },
-  { "*a++(z)",  0x14 },
-  { "*a--(z)",  0x15 },
-  { "*a++(z)%", 0x16 },
-  { "*a--(z)%", 0x17 },
-  { "*a",       0x18 },
-  { "*a++(y)b", 0x19 },
-  /* Dummy entry, not included in num_indirects.  This
-     lets code examine entry i+1 without checking
-     if we've run off the end of the table.  */
-  { "",      0x0}
-};
-
-#define C3X_MODN_MAX 0x19
-
-const unsigned int num_indirects = (((sizeof c4x_indirects) / (sizeof c4x_indirects[0])) - 1);

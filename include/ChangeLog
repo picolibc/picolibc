@@ -1,3 +1,7 @@
+2002-11-18  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* opcode/tic4x.h: File reordering. Added enhanced opcodes.
+
 2002-11-16  Klee Dienes  <kdienes@apple.com>
 
 	* opcode/m88k.h (INSTAB): Remove 'next' field.
