@@ -1,7 +1,7 @@
 /* Declarations and definitions of codes relating to the DWARF2 symbolic
    debugging information format.
-   Copyright (C) 1992, 1993, 1995, 1996, 1997, 1999, 2000, 2001, 2002
-   Free Software Foundation, Inc.
+   Copyright (C) 1992, 1993, 1995, 1996, 1997, 1999, 2000, 2001, 2002,
+   2003 Free Software Foundation, Inc.
 
    Written by Gary Funck (gary@intrepid.com) The Ada Joint Program
    Office (AJPO), Florida State Unviversity and Silicon Graphics Inc.
@@ -198,7 +198,10 @@ enum dwarf_tag
     /* Extensions for UPC.  See: http://upc.gwu.edu/~upc.  */
     DW_TAG_upc_shared_type = 0x8765,
     DW_TAG_upc_strict_type = 0x8766,
-    DW_TAG_upc_relaxed_type = 0x8767
+    DW_TAG_upc_relaxed_type = 0x8767,
+    /* PGI (STMicroelectronics) extensions.  No documentation available.  */
+    DW_TAG_PGI_kanji_type      = 0xA000,
+    DW_TAG_PGI_interface_block = 0xA020
   };
 
 #define DW_TAG_lo_user	0x4080
@@ -336,7 +339,11 @@ enum dwarf_attribute
     /* VMS extensions.  */
     DW_AT_VMS_rtnbeg_pd_address = 0x2201,
     /* UPC extension.  */
-    DW_AT_upc_threads_scaled = 0x3210
+    DW_AT_upc_threads_scaled = 0x3210,
+    /* PGI (STMicroelectronics) extensions.  */
+    DW_AT_PGI_lbase    = 0x3a00,
+    DW_AT_PGI_soffset  = 0x3a01,
+    DW_AT_PGI_lstride  = 0x3a02
   };
 
 #define DW_AT_lo_user	0x2000	/* Implementation-defined range start.  */

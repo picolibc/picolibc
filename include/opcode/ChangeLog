@@ -1,3 +1,75 @@
+2003-08-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (PPC_OPCODE_440): Define.  Formatting.  Use hex for other
+	PPC_OPCODE_* defines.
+
+2003-08-16  Jason Eckhardt  <jle@rice.edu>
+
+	* i860.h (fmov.ds): Expand as famov.ds.
+	(fmov.sd): Expand as famov.sd.
+	(pfmov.ds): Expand as pfamov.ds.
+
+2003-08-07  Michael Meissner  <gnu@the-meissners.org>
+
+	* cgen.h: Remove PARAM macro usage in all prototypes.
+	(CGEN_EXTRACT_INFO): Use void * instead of PTR.
+	(cgen_print_fn): Ditto.
+	(CGEN_HW_ENTRY): Ditto.
+	(CGEN_MAYBE_MULTI_IFLD): Ditto.
+	(struct cgen_insn): Ditto.
+	(CGEN_CPU_TABLE): Ditto.
+
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* alpha.h: Remove PARAMS macro.
+	* arc.h: Likewise.
+	* d10v.h: Likewise.
+	* d30v.h: Likewise.
+	* i370.h: Likewise.
+	* or32.h: Likewise.
+	* pj.h: Likewise.
+	* ppc.h: Likewise.
+	* sparc.h: Likewise.
+	* tic80.h: Likewise.
+	* v850.h: Likewise.
+
+2003-07-18  Michael Snyder  <msnyder@redhat.com>
+
+	* include/opcode/h8sx.h (DO_MOVA1, DO_MOVA2): Reformatting.
+
+2003-07-15  Richard Sandiford  <rsandifo@redhat.com>
+
+	* mips.h (CPU_RM7000): New macro.
+	(OPCODE_IS_MEMBER): Match CPU_RM7000 against 4650 insns.
+
+2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
+
+	2000-04-01  Alexandre Oliva  <aoliva@cygnus.com>
+	* mn10300.h (AM33_2): Renamed from AM33.
+	2000-03-31  Alexandre Oliva  <aoliva@cygnus.com>
+	* mn10300.h (AM332, FMT_D3): Defined.
+	(MN10300_OPERAND_FSREG, MN10300_OPERAND_FDREG): Likewise.
+	(MN10300_OPERAND_FPCR): Likewise.
+
+2003-07-01  Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* s390.h (s390_opcode_cpu_val): Add enum for cpu type z990.
+
+2003-06-25  Richard Sandiford  <rsandifo@redhat.com>
+
+	* h8300.h (IMM2_NS, IMM8_NS, IMM16_NS): Remove.
+	(IMM8U, IMM8U_NS): Define.
+	(h8_opcodes): Use IMM8U_NS for mov.[wl] #xx:8,@yy.
+
+2003-06-25  Richard Sandiford  <rsandifo@redhat.com>
+
+	* h8300.h (h8_opcodes): Fix the mov.l @(dd:32,ERs),ERd and
+	mov.l ERs,@(dd:32,ERd) entries.
+
+2003-06-23  H.J. Lu <hongjiu.lu@intel.com>
+
+	* i386.h (i386_optab): Support Intel Precott New Instructions.
+
 2003-06-10  Gary Hade <garyhade@us.ibm.com>
 
 	* ppc.h (PPC_OPERAND_DQ): Define.

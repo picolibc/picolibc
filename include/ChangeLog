@@ -1,3 +1,42 @@
+2003-08-20  Nick Clifton  <nickc@redhat.com>
+
+	* bfdlink.h (enum report_method): New enum.  Describes how to
+	report something.
+        (struct bfd_link_info): Delete fields 'no_undefined' and
+	'allow_shlib_undefined'.  Replace with
+	'unresolved_symbols_in_objects' and
+	'unresolved_symbols_in_shared_libs'.
+        
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h: Remove PARAMS macro.  Replace PTR with void *.
+	* dis-asm.h: Likewise.
+
+2003-07-09  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa-config.h: Undef all macros before defining them.
+
+2003-07-06  H.J. Lu <hongjiu.lu@intel.com>
+
+	* demangle.h: Support C++.
+
+2003-07-01  Zack Weinberg  <zack@codesourcery.com>
+
+	* filenames.h: New file imported from binutils.
+
+2003-06-30  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa-config.h: New file imported from binutils.
+
+2003-06-30  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa-config.h (XCHAL_HAVE_CONST16, XCHAL_HAVE_ABS,
+	XCHAL_HAVE_ADDX, XCHAL_HAVE_L32R): Define.
+
+2003-06-25  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h: Correct spelling of "relocatable".
+
 2003-06-22  Zack Weinberg  <zack@codesourcery.com>
 
 	* safe-ctype.h (HC_UNKNOWN, HC_ASCII, HC_EBCDIC): Rename to

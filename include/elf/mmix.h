@@ -1,5 +1,5 @@
 /* MMIX support for BFD.
-   Copyright 2001, 2002 Free Software Foundation, Inc.
+   Copyright 2001, 2002, 2003 Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.
 
@@ -158,11 +158,11 @@ END_RELOC_NUMBERS (R_MMIX_max)
 
 #ifdef BFD_ARCH_SIZE
 extern bfd_boolean _bfd_mmix_prepare_linker_allocated_gregs
- PARAMS ((bfd *, struct bfd_link_info *));
+  (bfd *, struct bfd_link_info *);
 extern bfd_boolean _bfd_mmix_finalize_linker_allocated_gregs
- PARAMS ((bfd *, struct bfd_link_info *));
+  (bfd *, struct bfd_link_info *);
 extern bfd_boolean _bfd_mmix_check_all_relocs
- PARAMS ((bfd *, struct bfd_link_info *));
+  (bfd *, struct bfd_link_info *);
 #endif
 
 #endif /* ELF_MMIX_H */

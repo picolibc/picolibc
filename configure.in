@@ -23,6 +23,9 @@ AC_PREREQ(2.13)
 AC_CANONICAL_SYSTEM
 AC_ARG_PROGRAM
 
+# Get 'install' or 'install-sh' and its variants.
+AC_PROG_INSTALL
+
 sinclude(config/acx.m4)
 
 ### we might need to use some other shell than /bin/sh for running subshells
@@ -63,8 +66,19 @@ progname=$0
 # if PWD already has a value, it is probably wrong.
 if test -n "$PWD" ; then PWD=`${PWDCMD-pwd}`; fi
 
-# Export original configure arguments for use by sub-configures.
-TOPLEVEL_CONFIGURE_ARGUMENTS="$progname $@"
+# Export original configure arguments for use by sub-configures.  These
+# will be expanded once by make, and once by the shell, so they need to
+# have '$' quoted for make, and then each argument quoted for the shell.
+# What's more, the 'echo' below might expand backslashes.
+cat <<\EOF_SED > conftestsed
+s,\\,\\\\,g; s,\$,$$,g
+EOF_SED
+tmp="'$progname'"
+for ac_arg ; do
+  tmp="$tmp '"`echo "$ac_arg" | sed -fconftestsed`
+done
+rm -f conftestsed
+TOPLEVEL_CONFIGURE_ARGUMENTS="$tmp"
 AC_SUBST(TOPLEVEL_CONFIGURE_ARGUMENTS)
 
 moveifchange=${srcdir}/move-if-change
@@ -136,7 +150,7 @@ libgcj="target-libffi \
 # these libraries are built for the target environment, and are built after
 # the host libraries and the host tools (which may be a cross compiler)
 #
-target_libs="target-libiberty \
+target_libraries="target-libiberty \
 		target-libgloss \
 		target-newlib \
 		target-libstdc++-v3 \
@@ -144,10 +158,10 @@ target_libs="target-libiberty \
 		${libgcj} \
 		target-libobjc"
 
-# these tools are built using the target libs, and are intended to run only
-# in the target environment
+# these tools are built using the target libraries, and are intended to
+# run only in the target environment
 #
-# note: any program that *uses* libraries that are in the "target_libs"
+# note: any program that *uses* libraries that are in the "target_libraries"
 # list belongs in this list.  those programs are also very likely
 # candidates for the "native_only" list which follows
 #
@@ -162,7 +176,7 @@ target_tools="target-examples target-groff target-gperf target-rda"
 ## ${target_configdirs} is directories we build using the target tools.
 #
 configdirs=`echo ${host_libs} ${host_tools}`
-target_configdirs=`echo ${target_libs} ${target_tools}`
+target_configdirs=`echo ${target_libraries} ${target_tools}`
 
 # Only make build modules if build != host.
 # This should be done more generally, but at the moment it doesn't matter.
@@ -189,26 +203,8 @@ else
   is_cross_compiler=yes
 fi	
 
-# Find the build and target subdirs.
+# Find the build and target subdir names.
 GCC_TOPLEV_SUBDIRS
-
-if test ! -d ${target_subdir} ; then
-  if mkdir ${target_subdir} ; then true
-  else
-    echo "'*** could not make ${PWD=`${PWDCMD-pwd}`}/${target_subdir}" 1>&2
-    exit 1
-  fi
-fi
-
-if test x"${build_alias}" != x"${host}" ; then
-  if test ! -d ${build_subdir} ; then
-    if mkdir ${build_subdir} ; then true
-    else
-      echo "'*** could not make ${PWD=`${PWDCMD-pwd}`}/${build_subdir}" 1>&2
-      exit 1
-    fi
-  fi
-fi
 
 # Skipdirs are removed silently.
 skipdirs=
@@ -257,7 +253,8 @@ esac
 
 # If both --with-headers and --with-libs are specified, default to
 # --without-newlib.
-if test x"${with_headers}" != x && test x"${with_libs}" != x ; then
+if test x"${with_headers}" != x && test x"${with_headers} != xno \
+   && test x"${with_libs}" != x && test x"${with_libs} != xno ; then
   if test x"${with_newlib}" = x ; then
     with_newlib=no
   fi
@@ -334,6 +331,10 @@ case "${target}" in
   *-*-chorusos)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
     ;;
+  powerpc-*-darwin*)
+    noconfigdirs="$noconfigdirs bfd binutils ld gas opcodes gdb gprof"
+    noconfigdirs="$noconfigdirs target-libobjc"
+    ;;
   *-*-darwin*)
     noconfigdirs="$noconfigdirs bfd binutils ld gas opcodes gdb gprof"
     noconfigdirs="$noconfigdirs target-libobjc ${libgcj}"
@@ -396,6 +397,9 @@ case "${target}" in
     # newlib is not 64 bit ready
     noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
     ;;
+  am33_2.0-*-linux*)
+    noconfigdirs="$noconfigdirs ${libgcj} target-newlib target-libgloss"
+    ;;
   sh-*-linux*)
     noconfigdirs="$noconfigdirs ${libgcj} target-newlib target-libgloss"
     ;;    
@@ -454,22 +458,22 @@ case "${target}" in
     noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj} gcc gdb newlib"
     ;;
   cris-*-*)
-    noconfigdirs="$noconfigdirs ${libgcj}"
+    noconfigdirs="$noconfigdirs ${libgcj} target-newlib target-libgloss"
     ;;
   d10v-*-*)
     noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj}"
     ;;
   d30v-*-*)
-    noconfigdirs="$noconfigdirs ${libgcj}"
+    noconfigdirs="$noconfigdirs ${libgcj} gdb"
     ;;
   fr30-*-elf*)
-    noconfigdirs="$noconfigdirs ${libgcj}"
+    noconfigdirs="$noconfigdirs ${libgcj} gdb"
     ;;
   frv-*-*)
     noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   h8300*-*-*)
-    noconfigdirs="$noconfigdirs target-libgloss"
+    noconfigdirs="$noconfigdirs target-libgloss ${libgcj} target-libf2c"
     ;;
   h8500-*-*)
     noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj} target-libf2c"
@@ -492,6 +496,9 @@ case "${target}" in
     # According to Alexandre Oliva <aoliva@redhat.com>, libjava won't
     # build on HP-UX 10.20.
     noconfigdirs="$noconfigdirs ld shellutils ${libgcj}"
+    ;;
+  i960-*-*)
+    noconfigdirs="$noconfigdirs ${libgcj} gdb"
     ;;
   ia64*-*-elf*)
     # No gdb support yet.
@@ -569,6 +576,9 @@ case "${target}" in
     ;;
   i[[3456789]]86-*-beos*)
     noconfigdirs="$noconfigdirs gdb target-newlib target-libgloss ${libgcj}"
+    ;;
+  m32r-*-*)
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
     noconfigdirs="$noconfigdirs target-libiberty target-libstdc++-v3 ${libgcj}"
@@ -703,6 +713,9 @@ case "${target}" in
   vax-*-*)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
     ;;
+  xtensa-*-*)
+    noconfigdirs="$noconfigdirs ${libgcj}"
+    ;;
   ip2k-*-*)
     noconfigdirs="$noconfigdirs target-libiberty target-libstdc++-v3 ${libgcj}"
     ;;
@@ -749,24 +762,24 @@ enable_languages=`echo "${enable_languages}" | sed -e 's/[[ 	,]][[ 	,]]*/,/g' -e
 # First scan to see if an enabled language requires some other language.
 # We assume that a given config-lang.in will list all the language
 # front ends it requires, even if some are required indirectly.
-for lang in ${srcdir}/gcc/*/config-lang.in ..
-do
-  case $lang in
+for lang_frag in ${srcdir}/gcc/*/config-lang.in .. ; do
+  case ${lang_frag} in
     ..) ;;
     # The odd quoting in the next line works around
     # an apparent bug in bash 1.12 on linux.
     ${srcdir}/gcc/[[*]]/config-lang.in) ;;
     *)
-      lang_alias=`sed -n -e 's,^language=[['"'"'"'"]]\(.*\)[["'"'"'"']].*$,\1,p' -e 's,^language=\([[^ 	]]*\).*$,\1,p' $lang`
-      this_lang_requires=`sed -n -e 's,^lang_requires=[['"'"'"'"]]\(.*\)[["'"'"'"']].*$,\1,p' -e 's,^lang_requires=\([[^ 	]]*\).*$,\1,p' $lang`
-      for other in $this_lang_requires
-      do
+      # From the config-lang.in, get $language, $lang_requires
+      language=
+      lang_requires=
+      . ${lang_frag}
+      for other in ${lang_requires} ; do
         case ,${enable_languages}, in
 	  *,$other,*) ;;
 	  *,all,*) ;;
-	  *,$lang_alias,*)
-	    echo " \`$other' language required by \`$lang_alias'; enabling" 1>&2
-	    enable_languages="$enable_languages,$other"
+	  *,$language,*)
+	    echo " \`$other' language required by \`$language'; enabling" 1>&2
+	    enable_languages="${enable_languages},${other}"
 	    ;;
 	esac
       done
@@ -774,35 +787,44 @@ do
   esac
 done
 
-subdirs=
-for lang in ${srcdir}/gcc/*/config-lang.in ..
-do
-  case $lang in
+for lang_frag in ${srcdir}/gcc/*/config-lang.in .. ; do
+  case ${lang_frag} in
     ..) ;;
     # The odd quoting in the next line works around
     # an apparent bug in bash 1.12 on linux.
     ${srcdir}/gcc/[[*]]/config-lang.in) ;;
     *)
-      lang_alias=`sed -n -e 's,^language=[['"'"'"'"]]\(.*\)[["'"'"'"']].*$,\1,p' -e 's,^language=\([[^ 	]]*\).*$,\1,p' $lang`
-      this_lang_libs=`sed -n -e 's,^target_libs=[['"'"'"'"]]\(.*\)[["'"'"'"']].*$,\1,p' -e 's,^target_libs=\([[^ 	]]*\).*$,\1,p' $lang`
-      this_lang_dirs=`sed -n -e 's,^lang_dirs=[['"'"'"'"]]\(.*\)[["'"'"'"']].*$,\1,p' -e 's,^lang_dirs=\([[^ 	]]*\).*$,\1,p' $lang`
-      build_by_default=`sed -n -e 's,^build_by_default=[['"'"'"'"]]\(.*\)[["'"'"'"']].*$,\1,p' -e 's,^build_by_default=\([[^ 	]]*\).*$,\1,p' $lang`
-      if test "x$lang_alias" = x
-         then
-        echo "$lang doesn't set \$language." 1>&2
+      # From the config-lang.in, get $language, $target_libs, 
+      # $lang_dirs, and $build_by_default
+      language=
+      target_libs=
+      lang_dirs=
+      build_by_default=
+      . ${lang_frag}
+      if test "x$language" = x ; then
+        echo "${lang_frag} doesn't set \$language." 1>&2
         exit 1
       fi
-      case ${build_by_default},${enable_languages}, in
-        *,$lang_alias,*) add_this_lang=yes ;;
-        no,*) add_this_lang=no ;;
-        *,all,*) add_this_lang=yes ;;
+      case ,${enable_languages}, in
+        *,${language},*)
+          # Language was explicitly selected; include it.
+          add_this_lang=yes
+          ;;
+        *,all,*)
+          # 'all' was selected; include 'default' languages.
+          case ${build_by_default} in
+            no) add_this_lang=no ;;
+            *) add_this_lang=yes ;;
+          esac 
+          ;;
         *) add_this_lang=no ;;
       esac
-      if test x"${add_this_lang}" = xyes; then
-        eval target_libs='"$target_libs "'\"$this_lang_libs\"
-      else
-        eval noconfigdirs='"$noconfigdirs "'\"$this_lang_libs $this_lang_dirs\"
-      fi
+      case ${add_this_lang} in
+        no)
+          # Remove language-dependent dirs.
+          eval noconfigdirs='"$noconfigdirs "'\"$target_libs $lang_dirs\"
+          ;;
+      esac
       ;;
   esac
 done
@@ -916,7 +938,7 @@ copy_dirs=
 
 # Handle --with-headers=XXX.  If the value is not "yes", the contents of
 # the named directory are copied to $(tooldir)/sys-include.
-if test x"${with_headers}" != x ; then
+if test x"${with_headers}" != x && test x"${with_headers}" != xno ; then
   if test x${is_cross_compiler} = xno ; then
     echo 1>&2 '***' --with-headers is only supported when cross compiling
     exit 1
@@ -933,7 +955,7 @@ fi
 # Handle --with-libs=XXX.  If the value is not "yes", the contents of
 # the name directories are copied to $(tooldir)/lib.  Multiple directories
 # are permitted.
-if test x"${with_libs}" != x ; then
+if test x"${with_libs}" != x && test x"${with_libs}" != xno ; then
   if test x${is_cross_compiler} = xno ; then
     echo 1>&2 '***' --with-libs is only supported when cross compiling
     exit 1
@@ -1744,20 +1766,24 @@ AC_SUBST_FILE(serialization_dependencies)
 # Base args.  Strip norecursion, cache-file, srcdir, host, build,
 # target and nonopt.  These are the ones we might not want to pass
 # down to subconfigures.
-baseargs=`echo " ${ac_configure_args} " | \
-	sed -e 's/ --no[[^ ]]* / /' \
-	    -e 's/ --c[[a-z-]]*[[= ]][[^ ]]* / /' \
-	    -e 's/ --sr[[a-z-]]*[[= ]][[^ ]]* / /' \
-	    -e 's/ --ho[[a-z-]]*[[= ]][[^ ]]* / /' \
-	    -e 's/ --bu[[a-z-]]*[[= ]][[^ ]]* / /' \
-	    -e 's/ --t[[a-z-]]*[[= ]][[^ ]]* / /' \
-	    -e 's/ -cache-file[[= ]][[^ ]]* / /' \
-	    -e 's/ -srcdir[[= ]][[^ ]]* / /' \
-	    -e 's/ -host[[= ]][[^ ]]* / /' \
-	    -e 's/ -build[[= ]][[^ ]]* / /' \
-	    -e 's/ -target[[= ]][[^ ]]* / /' \
-	    -e "s/ [[^' -][^ ]*] / /" \
-	    -e 's/^ *//;s/ *$//'`
+cat <<\EOF_SED > conftestsed
+s/ --no[[^ ]]* / /
+s/ --c[[a-z-]]*[[= ]][[^ ]]* / /
+s/ --sr[[a-z-]]*[[= ]][[^ ]]* / /
+s/ --ho[[a-z-]]*[[= ]][[^ ]]* / /
+s/ --bu[[a-z-]]*[[= ]][[^ ]]* / /
+s/ --t[[a-z-]]*[[= ]][[^ ]]* / /
+s/ -cache-file[[= ]][[^ ]]* / /
+s/ -srcdir[[= ]][[^ ]]* / /
+s/ -host[[= ]][[^ ]]* / /
+s/ -build[[= ]][[^ ]]* / /
+s/ -target[[= ]][[^ ]]* / /
+s/ [[^' -][^ ]*] / /
+s/^ *//;s/ *$//
+s,\\,\\\\,g; s,\$,$$,g
+EOF_SED
+baseargs=`echo " ${ac_configure_args} " | sed -fconftestsed`
+rm -f conftestsed
 
 # For the build-side libraries, we just need to pretend we're native,
 # and not use the same cache file.  Multilibs are neither needed nor

@@ -37,6 +37,9 @@
 
 #define I860BADMAG(x)   ((x).f_magic != I860MAGIC)
 
+#undef AOUTSZ
+#define AOUTSZ 36
+
 /* FIXME: What are the a.out magic numbers?  */
 
 #define _ETEXT	"etext"
