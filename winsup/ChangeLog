@@ -1,3 +1,7 @@
+2001-03-19  DJ Delorie  <dj@redhat.com>
+
+	* configure: fix regeneration bug.
+
 Thu Feb 22 13:36:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* Makefile.common: Revert previous change.

@@ -924,7 +924,7 @@ fi
   test -z "$CC" && { echo "configure: error: no acceptable cc found in \$PATH" 1>&2; exit 1; }
 fi
 
-CXXFLAGS="$(CFLAGS)"
+CXXFLAGS='$(CFLAGS)'
 
 
 SUBDIRS='w32api cygwin mingw'
