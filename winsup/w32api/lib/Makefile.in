@@ -37,8 +37,8 @@ endif
 datadir = @datadir@
 infodir = @infodir@
 ifneq (,$(findstring cygwin,$(target_alias)))
-inst_includedir:=$(tooldir)/include/w32api
-inst_libdir:=$(tooldir)/lib/w32api
+inst_includedir:=$(tooldir)/usr/include/w32api
+inst_libdir:=$(tooldir)/usr/lib/w32api
 else
 inst_includedir:=$(includedir)
 inst_libdir:=$(libdir)
