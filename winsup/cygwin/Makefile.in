@@ -175,16 +175,18 @@ maintainer-clean realclean: clean
 # Rule to build libcygwin.a
 
 $(LIB_NAME): $(DEF_FILE) $(LIBCOS)
-	$(DLLTOOL) --as=$(AS) --dllname $(DLL_NAME) --def $(DEF_FILE) --output-lib temp.a
-	$(AR) rcv temp.a $(LIBCOS)
-	mv temp.a $(LIB_NAME)
+	$(DLLTOOL) --as=$(AS) --dllname $(DLL_NAME) --def $(DEF_FILE) --output-lib templib.a
+	$(AR) rcv templib.a $(LIBCOS)
+	mv templib.a $(LIB_NAME)
 
 # Rule to make stub library used by testsuite
 
-new-$(LIB_NAME): $(DEF_FILE) $(LIBCOS)
-	$(DLLTOOL) --as=$(AS) --dllname new-$(DLL_NAME) --def $(DEF_FILE) --output-lib temp.a
-	$(AR) rcv temp.a $(LIBCOS)
-	mv temp.a new-$(LIB_NAME)
+# dependency set to $(LIB_NAME) to accomodate make -j2.
+# Otherwise dlltool gets confused. cgf (11-16-2000)
+new-$(LIB_NAME): $(LIB_NAME)
+	$(DLLTOOL) --as=$(AS) --dllname new-$(DLL_NAME) --def $(DEF_FILE) --output-lib new-templib.a
+	$(AR) rcv new-temp.a $(LIBCOS)
+	mv new-templib.a new-$(LIB_NAME)
 
 # Rule to build cygwin.dll
 
