@@ -21,6 +21,9 @@ _syscall0(pid_t,setsid)
 
 weak_alias(__libc_getpid,__getpid);
 
+/* Here we implement vfork in terms of fork, since
+ * Linux's vfork system call is not reliable.
+ */
 pid_t vfork(void)
 {
   pid_t pid;
