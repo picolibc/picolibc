@@ -73,7 +73,13 @@ for (my $i = 0; $i < @lines; $i++) {
 	redo;
     };
 }
-open(OUTPUT, '>', $output) or die "$0: couldn't open $output - $!\n";
+open(OUTPUT, '>', $output) or do {{
+    if (chmod(0664, $output)) {
+	open(OUTPUT, '>', $output);
+	last;
+    }
+    die "$0: couldn't open $output - $!\n";
+}};
 print OUTPUT @lines;
 close OUTPUT;
 

@@ -30,18 +30,24 @@ const device dev_piper_storage =
 const device dev_pipew_storage =
   {"", FH_PIPEW, ""};
 
+const device dev_tcp_storage =
+  {"", FH_TCP, ""};
+
+const device dev_udp_storage =
+  {"", FH_UDP, ""};
+
+const device dev_stream_storage =
+  {"", FH_STREAM, ""};
+
+const device dev_dgram_storage =
+  {"", FH_DGRAM, ""};
+
 const device dev_bad_storage =
-  {":bad:", FH_BAD, ""};
+  {"", FH_BAD, ""};
 
 %storage_here
 }
 %%
-"/dev/inet/tcp", FH_TCP, "", tcp_dev
-"/dev/inet/udp", FH_UDP, "", udp_dev
-"/dev/inet/icmp", FH_ICMP, "", icmp_dev
-"/dev/inet/unix", FH_UNIX, "", unix_dev
-"/dev/inet/stream", FH_STREAM, "", stream_dev
-"/dev/inet/dgram", FH_DGRAM, "", dgram_dev
 "/dev/tty", FH_TTY, "\\dev\\tty"
 "/dev/tty%(0-63)d", FHDEV(DEV_TTYS_MAJOR, {$1}), "\\dev\\tty{$1}", ttys_dev
 "/dev/console", FH_CONSOLE, "\\dev\\console", console_dev

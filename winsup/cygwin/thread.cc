@@ -36,12 +36,14 @@ details. */
 #include <stdlib.h>
 #include <syslog.h>
 #include "pinfo.h"
+#include "sigproc.h"
 #include "perprocess.h"
 #include "security.h"
-#include "exceptions.h"
+#include "cygtls.h"
 #include <semaphore.h>
 #include <stdio.h>
 #include <sys/timeb.h>
+#include <exceptions.h>
 #include <sys/fcntl.h>
 
 extern int threadsafe;
@@ -191,7 +193,6 @@ MTinterface::fixup_after_fork (void)
 {
   pthread_key::fixup_after_fork ();
 
-#ifndef __SIGNALS_ARE_MULTITHREADED__
   /* As long as the signal handling not multithreaded
      switch reents storage back to _impure_ptr for the mainthread
      to support fork from threads other than the mainthread */
@@ -199,9 +200,8 @@ MTinterface::fixup_after_fork (void)
   reents._winsup = &winsup_reent;
   winsup_reent._process_logmask = LOG_UPTO (LOG_DEBUG);
   reent_key.set (&reents);
-#endif
 
-  threadcount = 1;
+  threadcount = 0;
   pthread::init_mainthread ();
 
   pthread::fixup_after_fork ();
@@ -225,7 +225,15 @@ pthread::init_mainthread ()
 	api_fatal ("failed to create mainthread object");
     }
 
-  thread->init_current_thread ();
+  thread->cygtls = &_my_tls;
+  _my_tls.tid = thread;
+  thread->thread_id = GetCurrentThreadId ();
+  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
+			GetCurrentProcess (), &thread->win32_obj_id,
+			0, FALSE, DUPLICATE_SAME_ACCESS))
+    thread->win32_obj_id = NULL;
+  thread->set_tls_self_pointer ();
+  thread->postcreate ();
 }
 
 pthread *
@@ -238,9 +246,9 @@ pthread::self ()
 }
 
 void
-pthread::set_tls_self_pointer (pthread *thisThread)
+pthread::set_tls_self_pointer ()
 {
-  MT_INTERFACE->thread_self_key.set (thisThread);
+  MT_INTERFACE->thread_self_key.set (this);
 }
 
 pthread *
@@ -272,12 +280,6 @@ pthread::~pthread ()
 
   if (this != pthread_null::get_null_pthread ())
     threads.remove (this);
-}
-
-void
-pthread::set_thread_id_to_current ()
-{
-  thread_id = GetCurrentThreadId ();
 }
 
 void
@@ -334,7 +336,7 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
 
   if (!win32_obj_id)
     {
-      thread_printf ("CreateThread failed: this %p LastError %E", this);
+      thread_printf ("CreateThread failed: this %p, %E", this);
       magic = 0;
     }
   else
@@ -347,6 +349,15 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
 void
 pthread::postcreate ()
 {
+  cancel_event = ::CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  if (!cancel_event)
+    {
+      system_printf ("couldn't create cancel event for main thread, %E");
+      /* we need the event for correct behaviour */
+      magic = 0;
+      return;
+    }
+
   valid = true;
 
   InterlockedIncrement (&MT_INTERFACE->threadcount);
@@ -735,19 +746,6 @@ DWORD
 pthread::get_thread_id ()
 {
   return thread_id;
-}
-
-void
-pthread::init_current_thread ()
-{
-  cancel_event = ::CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
-			GetCurrentProcess (), &win32_obj_id,
-			0, FALSE, DUPLICATE_SAME_ACCESS))
-    win32_obj_id = NULL;
-  set_thread_id_to_current ();
-  set_tls_self_pointer (this);
-  valid = true;
 }
 
 void
@@ -1892,26 +1890,18 @@ void *
 pthread::thread_init_wrapper (void *_arg)
 {
   // Setup the local/global storage of this thread
-
+  __uint64_t padding[CYGTLS_PADSIZE];
   pthread *thread = (pthread *) _arg;
+  thread->cygtls = _my_tls.init (padding, &thread);
+  _my_tls.tid = thread;
+
+  exception_list cygwin_except_entry;
+  init_exceptions (&cygwin_except_entry); /* Initialize SIGSEGV handling, etc. */
+
+  thread->set_tls_self_pointer ();
   struct __reent_t local_reent;
   struct _winsup_t local_winsup;
   struct _reent local_clib;
-
-  struct sigaction _sigs[NSIG];
-  sigset_t _sig_mask;		/* one set for everything to ignore. */
-
-  /* According to onno@stack.urc.tue.nl, the exception handler record must
-     be on the stack.  */
-  exception_list cygwin_except_entry;
-
-  /* Initialize SIGSEGV handling, etc. */
-  init_exceptions (&cygwin_except_entry);
-
-  // setup signal structures
-  thread->sigs = _sigs;
-  thread->sigmask = &_sig_mask;
-  thread->sigtodo = NULL;
 
   memset (&local_winsup, 0, sizeof (struct _winsup_t));
 
@@ -1921,9 +1911,6 @@ pthread::thread_init_wrapper (void *_arg)
   local_winsup._process_logmask = LOG_UPTO (LOG_DEBUG);
 
   MT_INTERFACE->reent_key.set (&local_reent);
-
-  thread->set_thread_id_to_current ();
-  set_tls_self_pointer (thread);
 
   thread->mutex.lock ();
   // if thread is detached force cleanup on exit
@@ -1943,13 +1930,6 @@ pthread::thread_init_wrapper (void *_arg)
   void *ret = thread->function (thread->arg);
 
   thread->exit (ret);
-
-#if 0
-// ??? This code only runs if the thread exits by returning.
-// it's all now in __pthread_exit ();
-#endif
-  /* never reached */
-  return 0;
 }
 
 bool
@@ -1970,7 +1950,6 @@ int
 pthread::create (pthread_t *thread, const pthread_attr_t *attr,
 		  void *(*start_routine) (void *), void *arg)
 {
-  DECLARE_TLS_STORAGE;
   if (attr && !pthread_attr::is_good_object (attr))
     return EINVAL;
 
@@ -2904,7 +2883,7 @@ pthread_kill (pthread_t thread, int sig)
   if (!pthread::is_good_object (&thread))
     return EINVAL;
 
-  int rval = raise (sig);
+  int rval = sig ? sig_send (NULL, sig, thread->cygtls) : 0;
 
   // unlock myself
   return rval;
@@ -2913,11 +2892,7 @@ pthread_kill (pthread_t thread, int sig)
 extern "C" int
 pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 {
-  int rval = sigprocmask (operation, set, old_set);
-
-  // unlock this myself
-
-  return rval;
+  return handle_sigprocmask (operation, set, old_set, _my_tls.sigmask);
 }
 
 /* ID */

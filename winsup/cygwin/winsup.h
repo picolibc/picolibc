@@ -274,6 +274,8 @@ int __stdcall __check_invalid_read_ptr_errno (const void *s, unsigned sz) __attr
   __check_null_invalid_struct ((s), sizeof (*(s)))
 #define check_null_invalid_struct_errno(s) \
   __check_null_invalid_struct_errno ((s), sizeof (*(s)))
+#define check_invalid_read_struct_errno(s) \
+  __check_invalid_read_ptr_errno ((s), sizeof (*(s)))
 
 struct iovec;
 ssize_t check_iovec_for_read (const struct iovec *, int) __attribute__ ((regparm(2)));
@@ -296,7 +298,7 @@ int symlink_worker (const char *, const char *, bool, bool)
 class path_conv;
 int access_worker (path_conv&, int) __attribute__ ((regparm (2)));
 
-extern "C" int __stdcall low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
+extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
 #define SLEEP_0_STAY_LOW INFINITE
 
 size_t getshmlba (void);
@@ -339,8 +341,6 @@ extern HANDLE hMainThread;
 extern HANDLE hMainProc;
 
 extern bool cygwin_testing;
-extern unsigned _cygwin_testing_magic;
-extern HMODULE cygwin_hmodule;
 
 extern char almost_null[];
 

@@ -320,7 +320,6 @@ bool
 fhandler_base::device_access_denied (int flags)
 {
   int mode = 0;
-  int access_worker (path_conv&, int);
 
   if (flags & O_RDWR)
     mode |= R_OK | W_OK;

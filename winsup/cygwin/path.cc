@@ -459,7 +459,6 @@ path_conv::check (const char *src, unsigned opt,
   bool saw_symlinks = 0;
   int is_relpath;
   char *tail;
-  sigframe thisframe (mainthread);
 
 #if 0
   static path_conv last_path_conv;
@@ -3337,8 +3336,6 @@ extern "C" int
 fchdir (int fd)
 {
   int res;
-  sigframe thisframe (mainthread);
-
   cygheap_fdget cfd (fd);
   if (cfd >= 0)
     res = chdir (cfd->get_win32_name ());

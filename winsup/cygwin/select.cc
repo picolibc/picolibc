@@ -1,6 +1,6 @@
 /* select.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
    Written by Christopher Faylor of Cygnus Solutions
    cgf@cygnus.com
@@ -102,7 +102,6 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   fd_set *dummy_readfds = allocfd_set (maxfds);
   fd_set *dummy_writefds = allocfd_set (maxfds);
   fd_set *dummy_exceptfds = allocfd_set (maxfds);
-  sigframe thisframe (mainthread);
 
   select_printf ("%d, %p, %p, %p, %p", maxfds, readfds, writefds, exceptfds, to);
 
@@ -1086,6 +1085,7 @@ fhandler_base::ready_for_read (int fd, DWORD howlong)
 
       if (WaitForSingleObject (signal_arrived, avail ? 0 : 10) == WAIT_OBJECT_0)
 	{
+	  debug_printf ("interrupted");
 	  set_sig_errno (EINTR);
 	  avail = 0;
 	  break;

@@ -695,7 +695,6 @@ cygwin_sendto (int fd, const void *buf, int len, int flags,
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   fhandler_socket *fh = get (fd);
 
@@ -719,7 +718,6 @@ cygwin_recvfrom (int fd, void *buf, int len, int flags,
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   fhandler_socket *fh = get (fd);
 
@@ -876,7 +874,6 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   fhandler_socket *fh = get (fd);
 
@@ -950,7 +947,6 @@ extern "C" struct servent *
 cygwin_getservbyname (const char *name, const char *proto)
 {
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   if (check_null_str_errno (name)
       || (proto != NULL && check_null_str_errno (proto)))
     return NULL;
@@ -969,7 +965,6 @@ extern "C" struct servent *
 cygwin_getservbyport (int port, const char *proto)
 {
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   if (proto != NULL && check_null_str_errno (proto))
     return NULL;
 
@@ -986,7 +981,6 @@ extern "C" int
 cygwin_gethostname (char *name, size_t len)
 {
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   if (__check_null_invalid_struct_errno (name, len))
     return -1;
 
@@ -1022,7 +1016,6 @@ cygwin_gethostbyname (const char *name)
   static int a, b, c, d;
 
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   if (check_null_str_errno (name))
     return NULL;
 
@@ -1063,7 +1056,6 @@ extern "C" struct hostent *
 cygwin_gethostbyaddr (const char *addr, int len, int type)
 {
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   if (__check_invalid_read_ptr_errno (addr, len))
     return NULL;
 
@@ -1089,7 +1081,6 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   fhandler_socket *fh = get (fd);
 
@@ -1122,7 +1113,6 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   fhandler_socket *fh = get (fd);
 
   if (__check_invalid_read_ptr_errno (my_addr, addrlen) || !fh)
@@ -1140,7 +1130,6 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   fhandler_socket *fh = get (fd);
 
@@ -1161,7 +1150,6 @@ cygwin_listen (int fd, int backlog)
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   fhandler_socket *fh = get (fd);
 
   if (!fh)
@@ -1179,7 +1167,6 @@ cygwin_shutdown (int fd, int how)
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   fhandler_socket *fh = get (fd);
 
@@ -1245,7 +1232,6 @@ cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   fhandler_socket *fh = get (fd);
 
@@ -1286,7 +1272,6 @@ getdomainname (char *domain, size_t len)
    * Punt for now and assume MS-TCP on Win95.
    */
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   if (__check_null_invalid_struct_errno (domain, len))
     return -1;
 
@@ -1900,7 +1885,6 @@ get_ifconf (struct ifconf *ifc, int what)
   struct sockaddr_in *sa;
 
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   if (check_null_invalid_struct_errno (ifc))
     return -1;
 
@@ -1979,7 +1963,6 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
   SOCKET fd2s;
 
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   if (check_null_invalid_struct_errno (ahost) ||
       check_null_empty_str_errno (*ahost) ||
@@ -2032,7 +2015,6 @@ cygwin_rresvport (int *port)
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   if (check_null_invalid_struct_errno (port))
     return -1;
@@ -2061,7 +2043,6 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
   int res = -1;
   SOCKET fd2s;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   if (check_null_invalid_struct_errno (ahost) ||
       check_null_empty_str_errno (*ahost) ||
@@ -2119,7 +2100,6 @@ socketpair (int family, int type, int protocol, int *sb)
   int len;
 
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   if (__check_null_invalid_struct_errno (sb, 2 * sizeof (int)))
     return -1;
 
@@ -2314,7 +2294,6 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   fhandler_socket *fh = get (fd);
 
@@ -2341,7 +2320,6 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 {
   int res;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   fhandler_socket *fh = get (fd);
 

@@ -1,0 +1,223 @@
+#!/usr/bin/perl
+use strict;
+my $in = shift;
+my $tls_offsets = shift;
+my $out = shift;
+my $sigfe = shift;
+
+$main::first = 0;
+if (!defined($in) || !defined($out) || !defined($sigfe)) {
+    die "usage: $0 deffile.in cygtls.h deffile.def sigfe.s\n";
+}
+
+require $tls_offsets;
+
+open(IN, $in) or die "$0: couldn't open \"$in\" - $!\n";
+my @top = ();
+while (<IN>) {
+    push(@top, $_);
+    last if /^\s*exports\s*$/i;
+}
+my $libline = <IN>;
+my @in = <IN>;
+close(IN);
+
+my %sigfe = ();
+my @data = ();
+my @nosigfuncs = ();
+my @out = ();
+for (@in) {
+    /\sDATA$/o and do {
+	push(@data, $_);
+	next;
+    };
+    chomp;
+    if (/=/o) {
+	if (s/\s+NOSIGFE\s*$//) {
+	} elsif (s/ SIGFE$//) {
+	  my $func = (split(' '))[2];
+	  $sigfe{$func} = '_sigfe_' . $func;
+	}
+    } else {
+	my ($func, $sigfe) = m%^\s*(\S+)(?:\s+((?:NO)?SIGR?FE))?$%o;
+	if (defined($sigfe) && $sigfe =~ /^NO/o) {
+	    $_ = $func;
+	} else {
+	    $sigfe ||= 'sigfe';
+	    $_ = '_' . lc($sigfe) . '_' . $func;
+	    $sigfe{$func} = $_;
+	    $_ = $func . ' = ' . $_;
+	}
+    }
+    s/(\S)\s+(\S)/$1 $2/go;
+    s/(\S)\s+$/$1/o;
+    s/^\s+(\S)/$1/o;
+    push(@out, $_ . "\n");
+}
+
+for (@out) {
+    my ($alias, $func) = /^(\S+) = (\S+)\s*$/o;
+    $_ = $alias . ' = ' . $sigfe{$func} . "\n"
+      if defined($func) && $sigfe{$func};
+}
+open(OUT, '>', $out) or die "$0: couldn't open \"$out\" - $!\n";
+print OUT @top, @data, @out;
+close OUT;
+
+open(SIGFE, '>', $sigfe) or die "$0: couldn't open sigfe file \"$sigfe\" - $!\n";
+
+for my $k (sort keys %sigfe) {
+    print SIGFE fefunc($k, $sigfe{$k});
+}
+close SIGFE;
+
+sub fefunc {
+    my $func = '_' . shift;
+    my $fe = '_' . shift;
+    my $extra;
+    my $res = <<EOF;
+	.extern	_siglist_index
+	.extern	_siglist
+	.extern	$func
+	.global	$fe
+$fe:
+	pushl	\$$func
+	jmp	__sigfe
+
+EOF
+    if (!$main::first++) {
+	$res = <<EOF . longjmp () . $res;
+	.text
+	.global	__sigbe
+	.global	_sigreturn
+	.global	_sigdelayed
+
+	.stabs	"_sigfe:F(0,1)",36,0,0,__sigbe
+__sigfe:
+	pushl	%edx
+	movl	%fs:4,%eax
+	movl	\$4,%edx
+	xadd	%edx,$tls::stackptr(%eax)
+	leal	__sigbe,%eax
+	xchg	%eax,8(%esp)
+	movl	%eax,(%edx)
+	popl	%edx
+	ret
+
+	.stabs	"_sigbe:F(0,1)",36,0,0,__sigbe
+__sigbe:
+	pushl	%eax
+	pushl	%edx
+	movl	\$-4,%edx
+1:	movl	%fs:4,%eax
+	xadd	%edx,$tls::stackptr(%eax)
+	xorl	%eax,%eax
+	lock    xchg %eax,-4(%edx)
+	testl	%eax,%eax
+	jnz	2f
+	call	_low_priority_sleep
+	xorl	%edx,%edx
+	jmp	1b
+2:	xchg	%eax,4(%esp)
+	popl	%edx
+	ret
+
+	.stabs	"sigreturn:F(0,1)",36,0,0,_sigreturn
+_sigreturn:
+	addl	\$4,%esp			# Remove argument
+	call	_set_process_mask\@4
+
+	movl	%fs:4,%eax
+
+	cmpl	\$0,$tls::sig(%eax)	# Did a signal come in?
+	jnz	3f			# Yes, if non-zero
+
+1:	popl	%edx			# saved errno
+	testl	%edx,%edx		# Is it < 0
+	jl	2f			# yup.  ignore it
+	movl	$tls::errno_addr(%eax),%eax
+	movl	%edx,(%eax)
+2:	popl	%eax
+	popl	%ebx
+	popl	%ecx
+	popl	%edx
+	popl	%edi
+	popl	%esi
+	popf
+	popl	%ebp
+	jmp	__sigbe
+
+	.stabs	"sigdelayed:F(0,1)",36,0,0,_sigdelayed
+_sigdelayed:
+	pushl	%ebp
+	movl	%esp,%ebp
+	pushf
+	pushl	%esi
+	pushl	%edi
+	pushl	%edx
+	pushl	%ecx
+	pushl	%ebx
+	pushl	%eax
+	movl	%fs:4,%ebx
+	pushl	$tls::saved_errno(%ebx)	# saved errno
+3:	pushl	$tls::oldmask(%ebx)	# oldmask
+	pushl	$tls::sig(%ebx)		# signal argument
+	pushl	\$_sigreturn
+
+	call	_reset_signal_arrived\@0
+	pushl	$tls::func(%ebx)	# signal func
+	pushl	$tls::newmask(%ebx)	# newmask - eaten by set_process_mask
+
+	call	_set_process_mask\@4
+	movl	\$0,$tls::sig(%ebx)	# zero the signal number as a
+					# flag to the signal handler thread
+					# that it is ok to set up sigsave
+	popl	%ebx
+	jmp	*%ebx
+
+EOF
+    }
+    return $res;
+}
+
+sub longjmp {
+    return <<EOF;
+
+	.globl	_longjmp
+
+_longjmp:
+	pushl	%ebp
+	movl	%esp,%ebp
+	movl	8(%ebp),%edi
+	movl	12(%ebp),%eax
+	testl	%eax,%eax
+	jne	0f
+	incl	%eax
+0:
+	movl	%eax,0(%edi)
+	movl	24(%edi),%ebp
+	pushfl
+	popl	%ebx
+	movw	42(%edi),%ax
+	movw	%ax,%ss
+	movl	28(%edi),%esp
+	pushl	32(%edi)
+	pushl	%ebx
+	movw	36(%edi),%ax
+	movw	%ax,%es
+	movw	40(%edi),%ax
+	movw	%ax,%gs
+	movl	%fs:4,%eax
+	leal	($tls::stack)(%eax),%edx
+	movl	%edx,($tls::stackptr)(%eax)
+	movl	0(%edi),%eax
+	movl	4(%edi),%ebx
+	movl	8(%edi),%ecx
+	movl	12(%edi),%edx
+	movl	16(%edi),%esi
+	movl	20(%edi),%edi
+	popfl
+	ret
+
+EOF
+}

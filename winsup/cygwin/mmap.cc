@@ -39,9 +39,9 @@ static fhandler_disk_file fh_paging_file;
    for duplicating all mmaps after fork() since mmaps are not propagated
    to child processes by Windows.  All information must be duplicated
    by hand, see fixup_mmaps_after_fork().
-  
+
    The class structure:
-  
+
    One member of class map per process, global variable mmapped_areas.
    Contains a dynamic class list array.  Each list entry represents all
    mapping to a file, keyed by file descriptor and file name hash.
@@ -318,13 +318,13 @@ list::add_record (mmap_record r, _off64_t off, DWORD len)
     {
       mmap_record *new_recs;
       if (maxrecs == 0)
-        new_recs = (mmap_record *)
+	new_recs = (mmap_record *)
 			cmalloc (HEAP_MMAP, 5 * sizeof (mmap_record));
       else
 	new_recs = (mmap_record *)
 			crealloc (recs, (maxrecs + 5) * sizeof (mmap_record));
       if (!new_recs)
-        return NULL;
+	return NULL;
       maxrecs += 5;
       recs = new_recs;
     }
@@ -425,11 +425,11 @@ map::add_list (int fd)
     {
       list *new_lists;
       if (maxlists == 0)
-        new_lists = (list *) cmalloc (HEAP_MMAP, 5 * sizeof (list));
+	new_lists = (list *) cmalloc (HEAP_MMAP, 5 * sizeof (list));
       else
 	new_lists = (list *) crealloc (lists, (maxlists + 5) * sizeof (list));
       if (!new_lists)
-        return NULL;
+	return NULL;
       maxlists += 5;
       lists = new_lists;
     }
@@ -444,7 +444,7 @@ map::del_list (int i)
     {
       lists[i].free_recs ();
       for (; i < nlists - 1; i++)
-        lists[i] = lists[i + 1];
+	lists[i] = lists[i + 1];
       nlists--;
     }
 }
@@ -668,16 +668,16 @@ munmap (void *addr, size_t len)
       DWORD u_len;
 
       while ((record_idx = map_list->search_record((caddr_t)addr, len, u_addr,
-      						   u_len, record_idx)) >= 0)
+						   u_len, record_idx)) >= 0)
 	{
 	  mmap_record *rec = map_list->get_record (record_idx);
 	  if (rec->unmap_pages (u_addr, u_len))
 	    {
 	      /* The whole record has been unmapped, so we now actually
-	         unmap it from the system in full length... */
+		 unmap it from the system in full length... */
 	      fhandler_base *fh = rec->alloc_fh ();
 	      fh->munmap (rec->get_handle (),
-	      		  rec->get_address (),
+			  rec->get_address (),
 			  rec->get_size ());
 	      rec->free_fh (fh);
 
@@ -735,7 +735,7 @@ msync (void *addr, size_t len, int flags)
     {
       mmap_record *rec;
       for (int record_idx = 0;
-      	   (rec = map_list->get_record (record_idx));
+	   (rec = map_list->get_record (record_idx));
 	   ++record_idx)
 	{
 	  if (rec->access ((caddr_t)addr))
@@ -746,7 +746,7 @@ msync (void *addr, size_t len, int flags)
 		  goto invalid_address_range;
 	      fhandler_base *fh = rec->alloc_fh ();
 	      int ret = fh->msync (rec->get_handle (), (caddr_t)addr, len,
-	      			   flags);
+				   flags);
 	      rec->free_fh (fh);
 
 	      if (ret)
@@ -1012,7 +1012,7 @@ fixup_mmaps_after_fork (HANDLE parent)
     {
       mmap_record *rec;
       for (int record_idx = 0;
-      	   (rec = map_list->get_record (record_idx));
+	   (rec = map_list->get_record (record_idx));
 	   ++record_idx)
 	{
 

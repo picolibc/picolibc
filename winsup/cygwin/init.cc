@@ -1,6 +1,6 @@
 /* init.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,6 +12,7 @@ details. */
 #include <stdlib.h>
 #include "thread.h"
 #include "perprocess.h"
+#include "cygtls.h"
 
 int NO_COPY dynamically_loaded;
 
@@ -21,17 +22,18 @@ WINAPI dll_entry (HANDLE h, DWORD reason, void *static_load)
   switch (reason)
     {
     case DLL_PROCESS_ATTACH:
-      cygwin_hmodule = (HMODULE) h;
+      _my_tls.stackptr = _my_tls.stack;
       dynamically_loaded = (static_load == NULL);
       break;
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_ATTACH:
+      _my_tls.stackptr = _my_tls.stack;
       if (MT_INTERFACE->reent_key.set (&MT_INTERFACE->reents))
 	    api_fatal ("thread initialization failed");
       break;
     case DLL_THREAD_DETACH:
-      /* not invoked */;
+      _my_tls.remove ();
       break;
     }
   return 1;

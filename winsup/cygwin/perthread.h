@@ -48,6 +48,7 @@ public:
 };
 
 #if defined (NEED_VFORK)
+#include "cygtls.h"
 class vfork_save
 {
   jmp_buf j;
@@ -55,6 +56,7 @@ class vfork_save
  public:
   int pid;
   DWORD frame[100];
+  _threadinfo tls;
   char **vfork_ebp;
   char **vfork_esp;
   int ctty;
@@ -85,29 +87,6 @@ extern per_thread_vfork vfork_storage;
 extern vfork_save *main_vfork;
 #endif
 
-extern "C" {
-struct signal_dispatch
-{
-  int arg;
-  void (*func) (int);
-  int sig;
-  int saved_errno;
-  int sa_flags;
-  DWORD oldmask;
-  DWORD newmask;
-  DWORD retaddr;
-  DWORD *retaddr_on_stack;
-};
-};
-
-struct per_thread_signal_dispatch : public per_thread
-{
-  signal_dispatch *get () { return (signal_dispatch *) per_thread::get (); }
-  signal_dispatch *create () {return (signal_dispatch *) per_thread::create ();}
-  size_t size () {return sizeof (signal_dispatch);}
-};
-
 extern per_thread_waitq waitq_storage;
-extern per_thread_signal_dispatch signal_dispatch_storage;
 
 extern per_thread *threadstuff[];

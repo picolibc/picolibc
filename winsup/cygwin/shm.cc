@@ -149,7 +149,6 @@ extern "C" void *
 shmat (int shmid, const void *shmaddr, int shmflg)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   syscall_printf ("shmat (shmid = %d, shmaddr = %p, shmflg = 0x%x)",
 		  shmid, shmaddr, shmflg);
 
@@ -226,7 +225,6 @@ extern "C" int
 shmctl (int shmid, int cmd, struct shmid_ds *buf)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   syscall_printf ("shmctl (shmid = %d, cmd = %d, buf = 0x%x)",
 		  shmid, cmd, buf);
   switch (cmd)
@@ -288,7 +286,6 @@ extern "C" int
 shmdt (const void *shmaddr)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   syscall_printf ("shmget (shmaddr = %p)", shmaddr);
   client_request_shm request (shmaddr);
   if (request.make_request () == -1 || request.retval () == -1)
@@ -324,7 +321,6 @@ extern "C" int
 shmget (key_t key, size_t size, int shmflg)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   syscall_printf ("shmget (key = %U, size = %d, shmflg = 0x%x)",
 		  key, size, shmflg);
   /* Try allocating memory before calling cygserver. */

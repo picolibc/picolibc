@@ -34,7 +34,7 @@ details. */
    The information is used in shared.cc for the user shared.
    Final initialization occurs in uinfo_init */
 void
-cygheap_user::init()
+cygheap_user::init ()
 {
   char user_name[UNLEN + 1];
   DWORD user_name_len = UNLEN + 1;
@@ -70,7 +70,7 @@ cygheap_user::init()
   if (!SetTokenInformation (ptok, TokenOwner, &effec_cygsid, sizeof (cygsid)))
     debug_printf ("SetTokenInformation(TokenOwner): %E");
 
-  /* Add the user in the default DACL if needed */ 
+  /* Add the user in the default DACL if needed */
   if (!GetTokenInformation (ptok, TokenDefaultDacl, pdacl, sizeof (pdacl_buf), &siz))
     system_printf ("GetTokenInformation (TokenDefaultDacl): %E");
   else if (pdacl->DefaultDacl) /* Running with security */
@@ -80,14 +80,14 @@ cygheap_user::init()
 
       for (int i = 0; i < pAcl->AceCount; i++)
         {
-	  if (!GetAce(pAcl, i, (LPVOID *) &pAce))
+	  if (!GetAce (pAcl, i, (LPVOID *) &pAce))
 	    system_printf ("GetAce: %E");
 	  else if (pAce->Header.AceType == ACCESS_ALLOWED_ACE_TYPE
 		   && effec_cygsid == &pAce->SidStart)
 	    goto out;
 	}
       pAcl->AclSize = &pdacl_buf[sizeof (pdacl_buf)] - (char *) pAcl;
-      if (!AddAccessAllowedAce (pAcl, ACL_REVISION, GENERIC_ALL, effec_cygsid)) 
+      if (!AddAccessAllowedAce (pAcl, ACL_REVISION, GENERIC_ALL, effec_cygsid))
 	system_printf ("AddAccessAllowedAce: %E");
       else if (FindFirstFreeAce (pAcl, (LPVOID *) &pAce), !(pAce))
 	debug_printf ("FindFirstFreeAce %E");
@@ -98,7 +98,7 @@ cygheap_user::init()
 	    system_printf ("SetTokenInformation (TokenDefaultDacl): %E");
         }
     }
- out:	  
+ out:
   CloseHandle (ptok);
 }
 
@@ -115,7 +115,7 @@ internal_getlogin (cygheap_user &user)
 
   if (!pw && !(pw = internal_getpwnam (user.name ()))
       && !(pw = internal_getpwuid (DEFAULT_UID)))
-    debug_printf("user not found in augmented /etc/passwd");
+    debug_printf ("user not found in augmented /etc/passwd");
   else
     {
       myself->uid = pw->pw_uid;
@@ -313,7 +313,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	      sys_mbstowcs (wlogsrv, logsrv (),
 			    sizeof (wlogsrv) / sizeof (*wlogsrv));
 	     sys_mbstowcs (wuser, winname (), sizeof (wuser) / sizeof (*wuser));
-	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui)))
+	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3, (LPBYTE *) &ui)))
 		{
 		  sys_wcstombs (homepath_env_buf, ui->usri3_home_dir, CYG_MAX_PATH);
 		  if (!homepath_env_buf[0])

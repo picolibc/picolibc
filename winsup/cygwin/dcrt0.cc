@@ -42,15 +42,11 @@ details. */
 HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
 
-sigthread NO_COPY mainthread;		// ID of the main thread
-
 per_thread_waitq NO_COPY waitq_storage;
 per_thread_vfork NO_COPY vfork_storage;
-per_thread_signal_dispatch NO_COPY signal_dispatch_storage;
 
 per_thread NO_COPY *threadstuff[] = {&waitq_storage,
 				     &vfork_storage,
-				     &signal_dispatch_storage,
 				     NULL};
 
 bool display_title;
@@ -72,7 +68,6 @@ ResourceLocks _reslock NO_COPY;
 MTinterface _mtinterf;
 
 bool NO_COPY _cygwin_testing;
-unsigned NO_COPY _cygwin_testing_magic;
 
 char NO_COPY almost_null[1];
 
@@ -526,14 +521,9 @@ int _declspec(dllexport) __argc;
 char _declspec(dllexport) **__argv;
 vfork_save NO_COPY *main_vfork = NULL;
 
-void
-sigthread::init (const char *s)
-{
-  InitializeCriticalSection (&lock);
-  id = GetCurrentThreadId ();
-}
-
 extern "C" void __sinit (_reent *);
+
+_threadinfo NO_COPY *_main_tls;
 
 /* Take over from libc's crt0.o and start the application. Note the
    various special cases when Cygwin DLL is being runtime loaded (as
@@ -542,6 +532,9 @@ extern "C" void __sinit (_reent *);
 static void
 dll_crt0_1 ()
 {
+  __uint64_t padding[CYGTLS_PADSIZE];
+  _main_tls = _my_tls.init (padding);
+
   /* According to onno@stack.urc.tue.nl, the exception handler record must
      be on the stack.  */
   /* FIXME: Verify forked children get their exception handler set up ok. */
@@ -567,9 +560,6 @@ dll_crt0_1 ()
 
   user_data->resourcelocks->Init ();
   user_data->threadinterface->Init ();
-
-  mainthread.init ("mainthread"); // For use in determining if signals
-				  //  should be blocked.
 
   winpids::init ();
 
@@ -632,7 +622,7 @@ dll_crt0_1 ()
   ProtectHandle (hMainThread);
   cygthread::init ();
 
-  /* Initialize pthread mainthread when not forked and it is save to call new,
+  /* Initialize pthread mainthread when not forked and it is safe to call new,
      otherwise it is reinitalized in fixup_after_fork */
   if (!user_data->forkee)
     {
@@ -804,9 +794,9 @@ break_here ()
 void
 initial_env ()
 {
-  DWORD len;
   char buf[CYG_MAX_PATH + 1];
 #ifdef DEBUGGING
+  DWORD len;
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
     {
       DWORD ms = atoi (buf);
@@ -836,14 +826,7 @@ initial_env ()
 #endif
 
   if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
-    {
-      _cygwin_testing = 1;
-      if ((len = GetModuleFileName (cygwin_hmodule, buf, CYG_MAX_PATH))
-	  && len > sizeof ("new-cygwin1.dll")
-	  && strcasematch (buf + len - sizeof ("new-cygwin1.dll"),
-			   "\\new-cygwin1.dll"))
-	_cygwin_testing_magic = 0x10;
-    }
+    _cygwin_testing = 1;
 }
 
 /* Wrap the real one, otherwise gdb gets confused about

@@ -98,7 +98,6 @@ extern "C" int
 msgctl (int msqid, int cmd, struct msqid_ds *buf)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   syscall_printf ("msgctl (msqid = %d, cmd = 0x%x, buf = %p)",
 		  msqid, cmd, buf);
   switch (cmd)
@@ -153,7 +152,6 @@ extern "C" int
 msgget (key_t key, int msgflg)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   syscall_printf ("msgget (key = %U, msgflg = 0x%x)", key, msgflg);
   client_request_msg request (key, msgflg);
   if (request.make_request () == -1 || request.retval () == -1)
@@ -176,7 +174,6 @@ extern "C" ssize_t
 msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   syscall_printf ("msgrcv (msqid = %d, msgp = %p, msgsz = %d, "
   		  "msgtyp = %d, msgflg = 0x%x)",
 		  msqid, msgp, msgsz, msgtyp, msgflg);
@@ -203,7 +200,6 @@ extern "C" int
 msgsnd (int msqid, const void *msgp, size_t msgsz, int msgflg)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   syscall_printf ("msgsnd (msqid = %d, msgp = %p, msgsz = %d, msgflg = 0x%x)",
 		  msqid, msgp, msgsz, msgflg);
   if (__check_invalid_read_ptr_errno (msgp, msgsz))

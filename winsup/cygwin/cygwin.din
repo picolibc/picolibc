@@ -25,1527 +25,1504 @@ optind DATA
 optopt DATA
 optreset DATA
 reent_data DATA
-@ALLOCA@
-@DEF_DLL_ENTRY@
-__assert
-__assertfail
-__eprintf
-__errno
-__fpclassifyd
-__fpclassifyf
-__getreent
-__infinity
-__main
-__signbitd
-__signbitf
-__signgam
-__srget
-__swbuf
-_asprintf_r
-asprintf_r = _asprintf_r
-_dll_crt0@0
-_exit
-_f_atan2
-__f_atan2 = _f_atan2
-_f_atan2f
-__f_atan2f = _f_atan2f
-_f_exp
-__f_exp = _f_exp
-_f_expf
-__f_expf = _f_expf
-_f_frexp
-__f_frexp = _f_frexp
-_f_frexpf
-__f_frexpf = _f_frexpf
-_f_ldexp
-__f_ldexp = _f_ldexp
-_f_ldexpf
-__f_ldexpf = _f_ldexpf
-_f_log
-__f_log = _f_log
-_f_log10
-__f_log10 = _f_log10
-_f_log10f
-__f_log10f = _f_log10f
-_f_logf
-__f_logf = _f_logf
-_f_pow
-__f_pow = _f_pow
-_f_powf
-__f_powf = _f_powf
-_f_tan
-__f_tan = _f_tan
-_f_tanf
-__f_tanf = _f_tanf
-_fcloseall_r
-fcloseall_r = _fcloseall_r
-_fscanf_r
-fscanf_r = _fscanf_r
-fstat
-_fstat = fstat
-_pipe
-_pthread_cleanup_pop
-_pthread_cleanup_push
-_scanf_r
-scanf_r = _scanf_r
-_sscanf_r
-sscanf_r = _sscanf_r
-stat
-_stat = stat
-_strtold
-trunc
-_vasprintf_r
-vasprintf_r = _vasprintf_r
-_vfscanf_r
-vfscanf_r = _vfscanf_r
-_vscanf_r
-vscanf_r = _vscanf_r
-_vsscanf_r
-vsscanf_r = _vsscanf_r
-a64l
-abort
-_abort = abort
-abs
-_abs = abs
-access
-_access = access
-acl
-_acl = acl
-_acl32 = acl32
-aclcheck
-_aclcheck = aclcheck
-_aclcheck32 = aclcheck32
-aclfrommode
-_aclfrommode = aclfrommode
-_aclfrommode32 = aclfrommode32
-aclfrompbits
-_aclfrompbits = aclfrompbits
-_aclfrompbits32 = aclfrompbits32
-aclfromtext
-_aclfromtext = aclfromtext
-_aclfromtext32 = aclfromtext32
-aclsort
-_aclsort = aclsort
-_aclsort32 = aclsort32
-acltomode
-_acltomode = acltomode
-_acltomode32 = acltomode32
-acltopbits
-_acltopbits = acltopbits
-_acltopbits32 = acltopbits32
-acltotext
-_acltotext = acltotext
-_acltotext32 = acltotext32
-acos
-_acos = acos
-acosf
-_acosf = acosf
-acosh
-_acosh = acosh
-acoshf
-_acoshf = acoshf
-alarm
-_alarm = alarm
-alphasort
-_alphasort = alphasort
-argz_add
-__argz_add = argz_add
-argz_add_sep
-__argz_add_sep = argz_add_sep
-argz_append
-__argz_append = argz_append
-argz_count
-__argz_count = argz_count
-argz_create
-__argz_create = argz_create
-argz_create_sep
-__argz_create_sep = argz_create_sep
-argz_delete
-__argz_delete = argz_delete
-argz_extract
-__argz_extract = argz_extract
-argz_insert
-__argz_insert = argz_insert
-argz_next
-__argz_next = argz_next
-argz_replace
-__argz_replace = argz_replace
-argz_stringify
-__argz_stringify = argz_stringify
-asctime
-_asctime = asctime
-asctime_r
-_asctime_r = asctime_r
-asin
-_asin = asin
-asinf
-_asinf = asinf
-asinh
-_asinh = asinh
-asinhf
-_asinhf = asinhf
-asprintf
-_asprintf = asprintf
-atan
-_atan = atan
-atan2
-_atan2 = atan2
-atan2f
-_atan2f = atan2f
-atanf
-_atanf = atanf
-atanh
-_atanh = atanh
-atanhf
-_atanhf = atanhf
-atexit = cygwin_atexit
-_atexit = cygwin_atexit
-atof
-_atof = atof
-atoff
-_atoff = atoff
-atoi
-_atoi = atoi
-atol
-_atol = atol
-bcmp
-_bcmp = bcmp
-bcopy
-_bcopy = bcopy
-bsearch
-_bsearch = bsearch
-btowc
-bzero
-_bzero = bzero
-cabs
-_cabs = cabs
-cabsf
-_cabsf = cabsf
-calloc
-_calloc = calloc
-cbrt
-_cbrt = cbrt
-cbrtf
-_cbrtf = cbrtf
-ceil
-_ceil = ceil
-ceilf
-_ceilf = ceilf
-cfgetispeed
-cfgetospeed
-cfsetispeed
-cfsetospeed
-chdir
-_chdir = chdir
-chmod
-_chmod = chmod
-chown
-_chown = chown
-_chown32 = chown32
-chroot
-_chroot = chroot
-cleanup_glue
-clearerr
-_clearerr = clearerr
-clock
-_clock = clock
-close
-_close = close
-closedir
-_closedir = closedir
-closelog
-_closelog = closelog
-copysign
-_copysign = copysign
-copysignf
-_copysignf = copysignf
-cos
-_cos = cos
-cosf
-_cosf = cosf
-cosh
-_cosh = cosh
-coshf
-_coshf = coshf
-creat
-_creat = creat
-ctermid
-ctime
-_ctime = ctime
-ctime_r
-_ctime_r = ctime_r
-cuserid
-_cuserid = cuserid
-cwait
-_cwait = cwait
-accept = cygwin_accept
-cygwin_attach_handle_to_fd
-cygwin32_attach_handle_to_fd = cygwin_attach_handle_to_fd
-bind = cygwin_bind
-connect = cygwin_connect
-cygwin_conv_to_full_posix_path
-cygwin32_conv_to_full_posix_path = cygwin_conv_to_full_posix_path
-cygwin_conv_to_full_win32_path
-cygwin32_conv_to_full_win32_path = cygwin_conv_to_full_win32_path
-cygwin_conv_to_posix_path
-cygwin32_conv_to_posix_path = cygwin_conv_to_posix_path
-cygwin_conv_to_win32_path
-cygwin32_conv_to_win32_path = cygwin_conv_to_win32_path
-cygwin_detach_dll
-cygwin32_detach_dll = cygwin_detach_dll
-cygwin_dll_init
-endprotoent = cygwin_endprotoent
-endservent = cygwin_endservent
-endusershell
-gethostbyaddr = cygwin_gethostbyaddr
-gethostbyname = cygwin_gethostbyname
-_gethostname = cygwin_gethostname
-gethostname = cygwin_gethostname
-getpeername = cygwin_getpeername
-getprotobyname = cygwin_getprotobyname
-getprotobynumber = cygwin_getprotobynumber
-getprotoent = cygwin_getprotoent
-getservbyname = cygwin_getservbyname
-getservbyport = cygwin_getservbyport
-getservent = cygwin_getservent
-getsockname = cygwin_getsockname
-getsockopt = cygwin_getsockopt
-getusershell
-herror = cygwin_herror
-hstrerror = cygwin_hstrerror
-inet_addr = cygwin_inet_addr
-inet_aton = cygwin_inet_aton
-inet_network = cygwin_inet_network
-inet_ntoa = cygwin_inet_ntoa
-cygwin_internal
-cygwin32_internal = cygwin_internal
-listen = cygwin_listen
-cygwin_logon_user
-lstat
-_lstat = lstat
-cygwin_posix_path_list_p
-cygwin32_posix_path_list_p = cygwin_posix_path_list_p
-cygwin_posix_to_win32_path_list
-cygwin32_posix_to_win32_path_list = cygwin_posix_to_win32_path_list
-cygwin_posix_to_win32_path_list_buf_size
-cygwin32_posix_to_win32_path_list_buf_size = cygwin_posix_to_win32_path_list_buf_size
-rcmd = cygwin_rcmd
-recv = cygwin_recv
-recvfrom = cygwin_recvfrom
-recvmsg = cygwin_recvmsg
-rexec = cygwin_rexec
-rresvport = cygwin_rresvport
-_select = cygwin_select
-select = cygwin_select
-send = cygwin_send
-sendmsg = cygwin_sendmsg
-sendto = cygwin_sendto
-cygwin_set_impersonation_token
-setprotoent = cygwin_setprotoent
-setservent = cygwin_setservent
-setsockopt = cygwin_setsockopt
-setusershell
-shutdown = cygwin_shutdown
-socket = cygwin_socket
-cygwin_split_path
-cygwin32_split_path = cygwin_split_path
-cygwin_stackdump
-cygwin_umount
-cygwin_win32_to_posix_path_list
-cygwin32_win32_to_posix_path_list = cygwin_win32_to_posix_path_list
-cygwin_win32_to_posix_path_list_buf_size
-cygwin32_win32_to_posix_path_list_buf_size = cygwin_win32_to_posix_path_list_buf_size
-cygwin_winpid_to_pid
-cygwin32_winpid_to_pid = cygwin_winpid_to_pid
-daemon
-difftime
-_difftime = difftime
-dirfd
-_dirfd = dirfd
-div
-_div = div
-dlclose
-dlerror
-dlfork
-dll_crt0__FP11per_process
-dll_dllcrt0
-dll_noncygwin_dllcrt0
-dlopen
-dlsym
-drand48
-_drand48 = drand48
-drem
-_drem = drem
-dremf
-_dremf = dremf
-dup
-_dup = dup
-dup2
-_dup2 = dup2
-ecvt
-_ecvt = ecvt
-ecvtbuf
-_ecvtbuf = ecvtbuf
-ecvtf
-_ecvtf = ecvtf
-endgrent
-_endgrent = endgrent
-endhostent
-endmntent
-_endmntent = endmntent
-endpwent
-_endpwent = endpwent
-endutent
-_endutent = endutent
-envz_add
-__envz_add = envz_add
-envz_entry
-__envz_entry = envz_entry
-envz_get
-__envz_get = envz_get
-envz_merge
-__envz_merge = envz_merge
-envz_remove
-__envz_remove = envz_remove
-envz_strip
-__envz_strip = envz_strip
-erand48
-_erand48 = erand48
-erf
-_erf = erf
-erfc
-_erfc = erfc
-erfcf
-_erfcf = erfcf
-erff
-_erff = erff
-err
-errx
-verr
-verrx
-warn
-warnx
-vwarn
-vwarnx
-execl
-_execl = execl
-execle
-_execle = execle
-execlp
-_execlp = execlp
-execv
-_execv = execv
-execve
-_execve = execve
-execvp
-_execvp = execvp
-exit = cygwin_exit
-exp
-_exp = exp
-exp2
-exp2f
-expf
-_expf = expf
-expm1
-_expm1 = expm1
-expm1f
-_expm1f = expm1f
-fabs
-_fabs = fabs
-fabsf
-_fabsf = fabsf
-facl
-_facl = facl
-_facl32 = facl32
-fchdir
-_fchdir = fchdir
-fchmod
-_fchmod = fchmod
-fchown
-_fchown = fchown
-_fchown32 = fchown32
-fclose
-_fclose = fclose
-fcloseall
-_fcloseall = fcloseall
-fcntl
-_fcntl = fcntl
-fcvt
-_fcvt = fcvt
-fcvtbuf
-_fcvtbuf = fcvtbuf
-fcvtf
-_fcvtf = fcvtf
-fdim
-fdimf
-fdopen
-_fdopen = fdopen
-_fdopen64 = fdopen64
-feof
-_feof = feof
-ferror
-_ferror = ferror
-fflush
-_fflush = fflush
-ffs
-_ffs = ffs
-fgetc
-_fgetc = fgetc
-fgetpos
-_fgetpos = fgetpos
-_fgetpos64 = fgetpos64
-fgets
-_fgets = fgets
-fileno
-_fileno = fileno
-finite
-_finite = finite
-finitef
-_finitef = finitef
-fiprintf
-_fiprintf = fiprintf
-floor
-_floor = floor
-floorf
-_floorf = floorf
-fma
-fmaf
-fmax
-fmaxf
-fmin
-fminf
-fmod
-_fmod = fmod
-fmodf
-_fmodf = fmodf
-fnmatch
-_fnmatch = fnmatch
-fopen
-_fopen = fopen
-_fopen64 = fopen64
-fork
-_fork = fork
-forkpty
-fpathconf
-fprintf
-_fprintf = fprintf
-fputc
-_fputc = fputc
-fputs
-_fputs = fputs
-fread
-_fread = fread
-free
-_free = free
-freopen
-_freopen = freopen
-_freopen64 = freopen64
-frexp
-_frexp = frexp
-frexpf
-_frexpf = frexpf
-fscanf
-_fscanf = fscanf
-fseek
-_fseek = fseek
-fseeko
-_fseeko = fseeko
-_fseeko64 = fseeko64
-fsetpos
-_fsetpos = fsetpos
-_fsetpos64 = fsetpos64
-_fstat64 = fstat64
-fstatfs
-_fstatfs = fstatfs
-fsync
-_fsync = fsync
-ftell
-_ftell = ftell
-ftello
-_ftello = ftello
-_ftello64 = ftello64
-ftime
-_ftime = ftime
-ftok
-_ftok = ftok
-ftruncate
-_ftruncate = ftruncate
-_ftruncate64 = ftruncate64
-fwrite
-_fwrite = fwrite
-gamma
-_gamma = gamma
-gamma_r
-_gamma_r = gamma_r
-gammaf
-_gammaf = gammaf
-gammaf_r
-_gammaf_r = gammaf_r
-gcvt
-_gcvt = gcvt
-gcvtf
-_gcvtf = gcvtf
-get_osfhandle
-_get_osfhandle = get_osfhandle
-getc
-_getc = getc
-getc_unlocked
-_getc_unlocked = getc_unlocked
-getchar
-_getchar = getchar
-getchar_unlocked
-_getchar_unlocked = getchar_unlocked
-getcwd
-_getcwd = getcwd
-getdomainname
-_getdomainname = getdomainname
-getdtablesize
-_getdtablesize = getdtablesize
-getegid
-_getegid = getegid
-_getegid32 = getegid32
-getenv
-_getenv = getenv
-geteuid
-_geteuid = geteuid
-_geteuid32 = geteuid32
-getgid
-_getgid = getgid
-_getgid32 = getgid32
-getgrent
-_getgrent = getgrent
-_getgrent32 = getgrent32
-getgrgid
-_getgrgid = getgrgid
-_getgrgid32 = getgrgid32
-getgrnam
-_getgrnam = getgrnam
-_getgrnam32 = getgrnam32
-getgroups
-_getgroups = getgroups
-_getgroups32 = getgroups32
-gethostid
-getitimer
-getlogin
-_getlogin = getlogin
-getmntent
-_getmntent = getmntent
-getmode
-_getmode = getmode
-getopt
-getopt_long
-getpagesize
-_getpagesize = getpagesize
-getpass
-_getpass = getpass
-getpgid
-getpgrp
-_getpgrp = getpgrp
-getpid
-_getpid = getpid
-getppid
-_getppid = getppid
-getprogname
-getpwduid
-_getpwduid = getpwduid
-getpwent
-_getpwent = getpwent
-getpwnam
-_getpwnam = getpwnam
-getpwnam_r
-getpwuid
-_getpwuid = getpwuid
-_getpwuid32 = getpwuid32
-getpwuid_r
-_getpwuid_r32 = getpwuid_r32
-getrlimit
-_getrlimit = getrlimit
-getrusage
-_getrusage = getrusage
-gets
-_gets = gets
-getsid
-gettimeofday
-_gettimeofday = gettimeofday
-getuid
-_getuid = getuid
-_getuid32 = getuid32
-getutent
-_getutent = getutent
-getutid
-_getutid = getutid
-getutline
-_getutline = getutline
-getw
-_getw = getw
-getwd
-_getwd = getwd
-glob
-_glob = glob
-globfree
-_globfree = globfree
-gmtime
-_gmtime = gmtime
-gmtime_r
-_gmtime_r = gmtime_r
-grantpt
-hcreate
-hcreate_r
-hdestroy
-hdestroy_r
-hsearch
-hsearch_r
-htonl
-_htonl = htonl
-htons
-_htons = htons
-hypot
-_hypot = hypot
-hypotf
-_hypotf = hypotf
-ilogb
-_ilogb = ilogb
-ilogbf
-_ilogbf = ilogbf
-index
-_index = index
-inet_makeaddr
-inet_netof
-infinity
-_infinity = infinity
-infinityf
-_infinityf = infinityf
-initgroups
-_initgroups32 = initgroups32
-initstate
-ioctl
-_ioctl = ioctl
-iprintf
-_iprintf = iprintf
-iruserok
-ruserok
-isalnum
-_isalnum = isalnum
-isalpha
-_isalpha = isalpha
-isascii
-_isascii = isascii
-isatty
-_isatty = isatty
-isblank
-iscntrl
-_iscntrl = iscntrl
-isdigit
-_isdigit = isdigit
-isgraph
-_isgraph = isgraph
-isinf
-_isinf = isinf
-isinff
-_isinff = isinff
-islower
-_islower = islower
-isnan
-_isnan = isnan
-isnanf
-_isnanf = isnanf
-isprint
-_isprint = isprint
-ispunct
-_ispunct = ispunct
-isspace
-_isspace = isspace
-isupper
-_isupper = isupper
-iswalnum
-iswalpha
-iswblank
-iswcntrl
-iswctype
-iswdigit
-iswgraph
-iswlower
-iswprint
-iswpunct
-iswspace
-iswupper
-iswxdigit
-isxdigit
-_isxdigit = isxdigit
-j0
-_j0 = j0
-j0f
-_j0f = j0f
-j1
-_j1 = j1
-j1f
-_j1f = j1f
-jn
-_jn = jn
-jnf
-_jnf = jnf
-jrand48
-_jrand48 = jrand48
-kill
-_kill = kill
-killpg
-l64a
-labs
-_labs = labs
-lacl
-_lacl = lacl
-lchown
-_lchown = lchown
-_lchown32 = lchown32
-lcong48
-_lcong48 = lcong48
-ldexp
-_ldexp = ldexp
-ldexpf
-_ldexpf = ldexpf
-ldiv
-_ldiv = ldiv
-lgamma
-_lgamma = lgamma
-lgamma_r
-_lgamma_r = lgamma_r
-lgammaf
-_lgammaf = lgammaf
-lgammaf_r
-_lgammaf_r = lgammaf_r
-link
-_link = link
-localeconv
-_localeconv = localeconv
-localtime
-_localtime = localtime
-localtime_r
-_localtime_r = localtime_r
-log
-_log = log
-log10
-_log10 = log10
-log10f
-_log10f = log10f
-log1p
-_log1p = log1p
-log1pf
-_log1pf = log1pf
-logb
-_logb = logb
-logbf
-_logbf = logbf
-logf
-_logf = logf
-login
-login_tty
-logout
-logwtmp
-updwtmp
-longjmp
-_longjmp = longjmp
-lrand48
-_lrand48 = lrand48
-lrint
-lrintf
-lround
-lroundf
-lseek
-_lseek = lseek
-_lseek64 = lseek64
-_lstat64 = lstat64
-mallinfo
-malloc
-_malloc = malloc
-malloc_stats
-malloc_trim
-malloc_usable_size
-mallopt
-matherr
-_matherr = matherr
-mblen
-_mblen = mblen
-mbrlen
-mbrtowc
-mbsinit
-mbsrtowcs
-mbstowcs
-_mbstowcs = mbstowcs
-mbtowc
-_mbtowc = mbtowc
-memalign
-memccpy
-_memccpy = memccpy
-memchr
-_memchr = memchr
-memcmp
-_memcmp = memcmp
-memcpy
-_memcpy = memcpy
-memmove
-_memmove = memmove
-mempcpy
-__mempcpy = mempcpy
-memset
-_memset = memset
-mkdir
-_mkdir = mkdir
-mkfifo
-mknod
-_mknod = mknod
-_mknod32 = mknod32
-mkstemp
-_mkstemp = mkstemp
-mktemp
-_mktemp = mktemp
-mktime
-_mktime = mktime
-mmap
-_mmap64 = mmap64
-modf
-_modf = modf
-modff
-_modff = modff
-mount
-_mount = mount
-mprotect
-mrand48
-msgctl
-msgget
-msgrcv
-msgsnd
-msync
-munmap
-nan
-_nan = nan
-nanf
-_nanf = nanf
-nanosleep
-_nanosleep = nanosleep
-nearbyint
-nearbyintf
-nextafter
-_nextafter = nextafter
-nextafterf
-_nextafterf = nextafterf
-nice
-_nice = nice
-nl_langinfo
-_nl_langinfo = nl_langinfo
-nrand48
-_nrand48 = nrand48
-ntohl
-_ntohl = ntohl
-ntohs
-_ntohs = ntohs
-on_exit
-open
-_open = open
+_alloca NOSIGFE
+dll_entry@12 NOSIGFE
+__assert SIGFE
+__assertfail SIGFE
+__eprintf SIGFE
+__errno NOSIGFE
+__fpclassifyd NOSIGFE
+__fpclassifyf NOSIGFE
+__getreent NOSIGFE
+__infinity NOSIGFE
+__main SIGFE
+__signbitd NOSIGFE
+__signbitf NOSIGFE
+__signgam NOSIGFE
+__srget SIGFE
+__swbuf SIGFE
+_asprintf_r SIGFE
+asprintf_r = _asprintf_r SIGFE
+_dll_crt0@0 NOSIGFE
+_exit SIGFE
+_f_atan2 NOSIGFE
+__f_atan2 = _f_atan2 NOSIGFE
+_f_atan2f NOSIGFE
+__f_atan2f = _f_atan2f NOSIGFE
+_f_exp NOSIGFE
+__f_exp = _f_exp NOSIGFE
+_f_expf NOSIGFE
+__f_expf = _f_expf NOSIGFE
+_f_frexp NOSIGFE
+__f_frexp = _f_frexp NOSIGFE
+_f_frexpf NOSIGFE
+__f_frexpf = _f_frexpf NOSIGFE
+_f_ldexp NOSIGFE
+__f_ldexp = _f_ldexp NOSIGFE
+_f_ldexpf NOSIGFE
+__f_ldexpf = _f_ldexpf NOSIGFE
+_f_log NOSIGFE
+__f_log = _f_log NOSIGFE
+_f_log10 NOSIGFE
+__f_log10 = _f_log10 NOSIGFE
+_f_log10f NOSIGFE
+__f_log10f = _f_log10f NOSIGFE
+_f_logf NOSIGFE
+__f_logf = _f_logf NOSIGFE
+_f_pow NOSIGFE
+__f_pow = _f_pow NOSIGFE
+_f_powf NOSIGFE
+__f_powf = _f_powf NOSIGFE
+_f_tan NOSIGFE
+__f_tan = _f_tan NOSIGFE
+_f_tanf NOSIGFE
+__f_tanf = _f_tanf NOSIGFE
+_fcloseall_r SIGFE
+fcloseall_r = _fcloseall_r SIGFE
+_fscanf_r SIGFE
+fscanf_r = _fscanf_r SIGFE
+fstat SIGFE
+_fstat = fstat SIGFE
+_pipe SIGFE
+_pthread_cleanup_pop NOSIGFE
+_pthread_cleanup_push NOSIGFE
+_scanf_r SIGFE
+scanf_r = _scanf_r SIGFE
+_sscanf_r SIGFE
+sscanf_r = _sscanf_r SIGFE
+stat SIGFE
+_stat = stat SIGFE
+_strtold SIGFE
+trunc NOSIGFE
+_vasprintf_r SIGFE
+vasprintf_r = _vasprintf_r SIGFE
+_vfscanf_r NOSIGFE
+vfscanf_r = _vfscanf_r NOSIGFE
+_vscanf_r SIGFE
+vscanf_r = _vscanf_r SIGFE
+_vsscanf_r SIGFE
+vsscanf_r = _vsscanf_r SIGFE
+a64l NOSIGFE
+abort SIGFE
+_abort = abort SIGFE
+abs NOSIGFE
+_abs = abs NOSIGFE
+access SIGFE
+_access = access SIGFE
+acl SIGFE
+_acl = acl SIGFE
+_acl32 = acl32 SIGFE
+aclcheck NOSIGFE
+_aclcheck = aclcheck NOSIGFE
+_aclcheck32 = aclcheck32 NOSIGFE
+aclfrommode SIGFE
+_aclfrommode = aclfrommode SIGFE
+_aclfrommode32 = aclfrommode32 SIGFE
+aclfrompbits SIGFE
+_aclfrompbits = aclfrompbits SIGFE
+_aclfrompbits32 = aclfrompbits32 SIGFE
+aclfromtext SIGFE
+_aclfromtext = aclfromtext SIGFE
+_aclfromtext32 = aclfromtext32 SIGFE
+aclsort SIGFE
+_aclsort = aclsort SIGFE
+_aclsort32 = aclsort32 SIGFE
+acltomode SIGFE
+_acltomode = acltomode SIGFE
+_acltomode32 = acltomode32 SIGFE
+acltopbits SIGFE
+_acltopbits = acltopbits SIGFE
+_acltopbits32 = acltopbits32 SIGFE
+acltotext SIGFE
+_acltotext = acltotext SIGFE
+_acltotext32 = acltotext32 SIGFE
+acos NOSIGFE
+_acos = acos NOSIGFE
+acosf NOSIGFE
+_acosf = acosf NOSIGFE
+acosh NOSIGFE
+_acosh = acosh NOSIGFE
+acoshf NOSIGFE
+_acoshf = acoshf NOSIGFE
+alarm SIGFE
+_alarm = alarm SIGFE
+alphasort NOSIGFE
+_alphasort = alphasort NOSIGFE
+argz_add SIGFE
+__argz_add = argz_add SIGFE
+argz_add_sep SIGFE
+__argz_add_sep = argz_add_sep SIGFE
+argz_append SIGFE
+__argz_append = argz_append SIGFE
+argz_count NOSIGFE
+__argz_count = argz_count NOSIGFE
+argz_create SIGFE
+__argz_create = argz_create SIGFE
+argz_create_sep SIGFE
+__argz_create_sep = argz_create_sep SIGFE
+argz_delete SIGFE
+__argz_delete = argz_delete SIGFE
+argz_extract NOSIGFE
+__argz_extract = argz_extract NOSIGFE
+argz_insert SIGFE
+__argz_insert = argz_insert SIGFE
+argz_next NOSIGFE
+__argz_next = argz_next NOSIGFE
+argz_replace SIGFE
+__argz_replace = argz_replace SIGFE
+argz_stringify NOSIGFE
+__argz_stringify = argz_stringify NOSIGFE
+asctime SIGFE
+_asctime = asctime SIGFE
+asctime_r SIGFE
+_asctime_r = asctime_r SIGFE
+asin NOSIGFE
+_asin = asin NOSIGFE
+asinf NOSIGFE
+_asinf = asinf NOSIGFE
+asinh NOSIGFE
+_asinh = asinh NOSIGFE
+asinhf NOSIGFE
+_asinhf = asinhf NOSIGFE
+asprintf SIGFE
+_asprintf = asprintf SIGFE
+atan NOSIGFE
+_atan = atan NOSIGFE
+atan2 NOSIGFE
+_atan2 = atan2 NOSIGFE
+atan2f NOSIGFE
+_atan2f = atan2f NOSIGFE
+atanf NOSIGFE
+_atanf = atanf NOSIGFE
+atanh NOSIGFE
+_atanh = atanh NOSIGFE
+atanhf NOSIGFE
+_atanhf = atanhf NOSIGFE
+atexit = cygwin_atexit SIGFE
+_atexit = cygwin_atexit SIGFE
+atof SIGFE
+_atof = atof SIGFE
+atoff SIGFE
+_atoff = atoff SIGFE
+atoi NOSIGFE
+_atoi = atoi NOSIGFE
+atol NOSIGFE
+_atol = atol NOSIGFE
+bcmp NOSIGFE
+_bcmp = bcmp NOSIGFE
+bcopy NOSIGFE
+_bcopy = bcopy NOSIGFE
+bsearch NOSIGFE
+_bsearch = bsearch NOSIGFE
+btowc NOSIGFE
+bzero NOSIGFE
+_bzero = bzero NOSIGFE
+cabs NOSIGFE
+_cabs = cabs NOSIGFE
+cabsf NOSIGFE
+_cabsf = cabsf NOSIGFE
+calloc SIGFE
+_calloc = calloc SIGFE
+cbrt NOSIGFE
+_cbrt = cbrt NOSIGFE
+cbrtf NOSIGFE
+_cbrtf = cbrtf NOSIGFE
+ceil NOSIGFE
+_ceil = ceil NOSIGFE
+ceilf NOSIGFE
+_ceilf = ceilf NOSIGFE
+cfgetispeed NOSIGFE
+cfgetospeed NOSIGFE
+cfsetispeed SIGFE
+cfsetospeed SIGFE
+chdir SIGFE
+_chdir = chdir SIGFE
+chmod SIGFE
+_chmod = chmod SIGFE
+chown SIGFE
+_chown = chown SIGFE
+_chown32 = chown32 SIGFE
+chroot SIGFE
+_chroot = chroot SIGFE
+cleanup_glue NOSIGFE
+clearerr NOSIGFE
+_clearerr = clearerr NOSIGFE
+clock NOSIGFE
+_clock = clock NOSIGFE
+close SIGFE
+_close = close SIGFE
+closedir SIGFE
+_closedir = closedir SIGFE
+closelog NOSIGFE
+_closelog = closelog NOSIGFE
+copysign NOSIGFE
+_copysign = copysign NOSIGFE
+copysignf NOSIGFE
+_copysignf = copysignf NOSIGFE
+cos NOSIGFE
+_cos = cos NOSIGFE
+cosf NOSIGFE
+_cosf = cosf NOSIGFE
+cosh NOSIGFE
+_cosh = cosh NOSIGFE
+coshf NOSIGFE
+_coshf = coshf NOSIGFE
+creat SIGFE
+_creat = creat SIGFE
+ctermid NOSIGFE
+ctime SIGFE
+_ctime = ctime SIGFE
+ctime_r SIGFE
+_ctime_r = ctime_r SIGFE
+cuserid NOSIGFE
+_cuserid = cuserid NOSIGFE
+cwait SIGFE
+_cwait = cwait SIGFE
+accept = cygwin_accept SIGFE
+cygwin_attach_handle_to_fd SIGFE
+cygwin32_attach_handle_to_fd = cygwin_attach_handle_to_fd SIGFE
+bind = cygwin_bind SIGFE
+connect = cygwin_connect SIGFE
+cygwin_conv_to_full_posix_path SIGFE
+cygwin32_conv_to_full_posix_path = cygwin_conv_to_full_posix_path SIGFE
+cygwin_conv_to_full_win32_path SIGFE
+cygwin32_conv_to_full_win32_path = cygwin_conv_to_full_win32_path SIGFE
+cygwin_conv_to_posix_path SIGFE
+cygwin32_conv_to_posix_path = cygwin_conv_to_posix_path SIGFE
+cygwin_conv_to_win32_path SIGFE
+cygwin32_conv_to_win32_path = cygwin_conv_to_win32_path SIGFE
+cygwin_detach_dll SIGFE
+cygwin32_detach_dll = cygwin_detach_dll SIGFE
+cygwin_dll_init SIGFE
+endprotoent = cygwin_endprotoent SIGFE
+endservent = cygwin_endservent SIGFE
+endusershell SIGFE
+err SIGFE
+errx SIGFE
+gethostbyaddr = cygwin_gethostbyaddr SIGFE
+gethostbyname = cygwin_gethostbyname SIGFE
+_gethostname = cygwin_gethostname SIGFE
+gethostname = cygwin_gethostname SIGFE
+getpeername = cygwin_getpeername SIGFE
+getprogname NOSIGFE
+getprotobyname = cygwin_getprotobyname SIGFE
+getprotobynumber = cygwin_getprotobynumber SIGFE
+getprotoent = cygwin_getprotoent SIGFE
+getservbyname = cygwin_getservbyname SIGFE
+getservbyport = cygwin_getservbyport SIGFE
+getservent = cygwin_getservent SIGFE
+getsockname = cygwin_getsockname SIGFE
+getsockopt = cygwin_getsockopt SIGFE
+getusershell SIGFE
+herror = cygwin_herror SIGFE
+hstrerror = cygwin_hstrerror NOSIGFE
+inet_addr = cygwin_inet_addr SIGFE
+inet_aton = cygwin_inet_aton SIGFE
+inet_network = cygwin_inet_network SIGFE
+inet_ntoa = cygwin_inet_ntoa SIGFE
+cygwin_internal SIGFE
+cygwin32_internal = cygwin_internal SIGFE
+listen = cygwin_listen SIGFE
+cygwin_logon_user SIGFE
+lstat SIGFE
+_lstat = lstat SIGFE
+cygwin_posix_path_list_p NOSIGFE
+cygwin32_posix_path_list_p = cygwin_posix_path_list_p NOSIGFE
+cygwin_posix_to_win32_path_list NOSIGFE
+cygwin32_posix_to_win32_path_list = cygwin_posix_to_win32_path_list NOSIGFE
+cygwin_posix_to_win32_path_list_buf_size SIGFE
+cygwin32_posix_to_win32_path_list_buf_size = cygwin_posix_to_win32_path_list_buf_size SIGFE
+rcmd = cygwin_rcmd SIGFE
+recv = cygwin_recv SIGFE
+recvfrom = cygwin_recvfrom SIGFE
+recvmsg = cygwin_recvmsg SIGFE
+rexec = cygwin_rexec SIGFE
+rresvport = cygwin_rresvport SIGFE
+_select = cygwin_select SIGFE
+select = cygwin_select SIGFE
+send = cygwin_send SIGFE
+sendmsg = cygwin_sendmsg SIGFE
+sendto = cygwin_sendto SIGFE
+cygwin_set_impersonation_token SIGFE
+setprogname SIGFE
+setprotoent = cygwin_setprotoent SIGFE
+setservent = cygwin_setservent SIGFE
+setsockopt = cygwin_setsockopt SIGFE
+setusershell SIGFE
+shutdown = cygwin_shutdown SIGFE
+socket = cygwin_socket SIGFE
+cygwin_split_path NOSIGFE
+cygwin32_split_path = cygwin_split_path NOSIGFE
+cygwin_stackdump SIGFE
+cygwin_umount SIGFE
+cygwin_win32_to_posix_path_list NOSIGFE
+cygwin32_win32_to_posix_path_list = cygwin_win32_to_posix_path_list NOSIGFE
+cygwin_win32_to_posix_path_list_buf_size SIGFE
+cygwin32_win32_to_posix_path_list_buf_size = cygwin_win32_to_posix_path_list_buf_size SIGFE
+cygwin_winpid_to_pid SIGFE
+cygwin32_winpid_to_pid = cygwin_winpid_to_pid SIGFE
+daemon SIGFE
+difftime NOSIGFE
+_difftime = difftime NOSIGFE
+dirfd SIGFE
+_dirfd = dirfd SIGFE
+div NOSIGFE
+_div = div NOSIGFE
+dlclose SIGFE
+dlerror NOSIGFE
+dlfork NOSIGFE
+dll_crt0__FP11per_process SIGFE
+dll_dllcrt0 SIGFE
+dll_noncygwin_dllcrt0 SIGFE
+dlopen SIGFE
+dlsym SIGFE
+drand48 NOSIGFE
+_drand48 = drand48 NOSIGFE
+drem NOSIGFE
+_drem = drem NOSIGFE
+dremf NOSIGFE
+_dremf = dremf NOSIGFE
+dup SIGFE
+_dup = dup SIGFE
+dup2 SIGFE
+_dup2 = dup2 SIGFE
+ecvt SIGFE
+_ecvt = ecvt SIGFE
+ecvtbuf SIGFE
+_ecvtbuf = ecvtbuf SIGFE
+ecvtf SIGFE
+_ecvtf = ecvtf SIGFE
+endgrent NOSIGFE
+_endgrent = endgrent NOSIGFE
+endhostent NOSIGFE
+endmntent NOSIGFE
+_endmntent = endmntent NOSIGFE
+endpwent NOSIGFE
+_endpwent = endpwent NOSIGFE
+endutent SIGFE
+_endutent = endutent SIGFE
+envz_add SIGFE
+__envz_add = envz_add SIGFE
+envz_entry NOSIGFE
+__envz_entry = envz_entry NOSIGFE
+envz_get NOSIGFE
+__envz_get = envz_get NOSIGFE
+envz_merge SIGFE
+__envz_merge = envz_merge SIGFE
+envz_remove SIGFE
+__envz_remove = envz_remove SIGFE
+envz_strip SIGFE
+__envz_strip = envz_strip SIGFE
+erand48 NOSIGFE
+_erand48 = erand48 NOSIGFE
+erf NOSIGFE
+_erf = erf NOSIGFE
+erfc NOSIGFE
+_erfc = erfc NOSIGFE
+erfcf NOSIGFE
+_erfcf = erfcf NOSIGFE
+erff NOSIGFE
+_erff = erff NOSIGFE
+execl SIGFE
+_execl = execl SIGFE
+execle SIGFE
+_execle = execle SIGFE
+execlp SIGFE
+_execlp = execlp SIGFE
+execv SIGFE
+_execv = execv SIGFE
+execve SIGFE
+_execve = execve SIGFE
+execvp SIGFE
+_execvp = execvp SIGFE
+exit = cygwin_exit SIGFE
+exp NOSIGFE
+_exp = exp NOSIGFE
+exp2 NOSIGFE
+exp2f NOSIGFE
+expf NOSIGFE
+_expf = expf NOSIGFE
+expm1 NOSIGFE
+_expm1 = expm1 NOSIGFE
+expm1f NOSIGFE
+_expm1f = expm1f NOSIGFE
+fabs NOSIGFE
+_fabs = fabs NOSIGFE
+fabsf NOSIGFE
+_fabsf = fabsf NOSIGFE
+facl SIGFE
+_facl = facl SIGFE
+_facl32 = facl32 SIGFE
+fchdir SIGFE
+_fchdir = fchdir SIGFE
+fchmod SIGFE
+_fchmod = fchmod SIGFE
+fchown SIGFE
+_fchown = fchown SIGFE
+_fchown32 = fchown32 SIGFE
+fclose SIGFE
+_fclose = fclose SIGFE
+fcloseall SIGFE
+_fcloseall = fcloseall SIGFE
+fcntl NOSIGFE
+_fcntl = fcntl NOSIGFE
+fcvt SIGFE
+_fcvt = fcvt SIGFE
+fcvtbuf SIGFE
+_fcvtbuf = fcvtbuf SIGFE
+fcvtf SIGFE
+_fcvtf = fcvtf SIGFE
+fdim NOSIGFE
+fdimf NOSIGFE
+fdopen SIGFE
+_fdopen = fdopen SIGFE
+_fdopen64 = fdopen64 SIGFE
+feof NOSIGFE
+_feof = feof NOSIGFE
+ferror NOSIGFE
+_ferror = ferror NOSIGFE
+fflush NOSIGFE
+_fflush = fflush NOSIGFE
+ffs NOSIGFE
+_ffs = ffs NOSIGFE
+fgetc SIGFE
+_fgetc = fgetc SIGFE
+fgetpos NOSIGFE
+_fgetpos = fgetpos NOSIGFE
+_fgetpos64 = fgetpos64 NOSIGFE
+fgets SIGFE
+_fgets = fgets SIGFE
+fileno NOSIGFE
+_fileno = fileno NOSIGFE
+finite NOSIGFE
+_finite = finite NOSIGFE
+finitef NOSIGFE
+_finitef = finitef NOSIGFE
+fiprintf SIGFE
+_fiprintf = fiprintf SIGFE
+floor NOSIGFE
+_floor = floor NOSIGFE
+floorf NOSIGFE
+_floorf = floorf NOSIGFE
+fma NOSIGFE
+fmaf NOSIGFE
+fmax NOSIGFE
+fmaxf NOSIGFE
+fmin NOSIGFE
+fminf NOSIGFE
+fmod NOSIGFE
+_fmod = fmod NOSIGFE
+fmodf NOSIGFE
+_fmodf = fmodf NOSIGFE
+fnmatch NOSIGFE
+_fnmatch = fnmatch NOSIGFE
+fopen SIGFE
+_fopen = fopen SIGFE
+_fopen64 = fopen64 SIGFE
+fork SIGFE
+_fork = fork SIGFE
+forkpty SIGFE
+fpathconf SIGFE
+fprintf SIGFE
+_fprintf = fprintf SIGFE
+fputc NOSIGFE
+_fputc = fputc NOSIGFE
+fputs SIGFE
+_fputs = fputs SIGFE
+fread SIGFE
+_fread = fread SIGFE
+free SIGFE
+_free = free SIGFE
+freopen SIGFE
+_freopen = freopen SIGFE
+_freopen64 = freopen64 SIGFE
+frexp NOSIGFE
+_frexp = frexp NOSIGFE
+frexpf NOSIGFE
+_frexpf = frexpf NOSIGFE
+fscanf SIGFE
+_fscanf = fscanf SIGFE
+fseek SIGFE
+_fseek = fseek SIGFE
+fseeko SIGFE
+_fseeko = fseeko SIGFE
+_fseeko64 = fseeko64 SIGFE
+fsetpos SIGFE
+_fsetpos = fsetpos SIGFE
+_fsetpos64 = fsetpos64 SIGFE
+_fstat64 = fstat64 SIGFE
+fstatfs SIGFE
+_fstatfs = fstatfs SIGFE
+fsync SIGFE
+_fsync = fsync SIGFE
+ftell NOSIGFE
+_ftell = ftell NOSIGFE
+ftello NOSIGFE
+_ftello = ftello NOSIGFE
+_ftello64 = ftello64 NOSIGFE
+ftime SIGFE
+_ftime = ftime SIGFE
+ftok SIGFE
+_ftok = ftok SIGFE
+ftruncate SIGFE
+_ftruncate = ftruncate SIGFE
+_ftruncate64 = ftruncate64 SIGFE
+fwrite SIGFE
+_fwrite = fwrite SIGFE
+gamma NOSIGFE
+_gamma = gamma NOSIGFE
+gamma_r NOSIGFE
+_gamma_r = gamma_r NOSIGFE
+gammaf NOSIGFE
+_gammaf = gammaf NOSIGFE
+gammaf_r NOSIGFE
+_gammaf_r = gammaf_r NOSIGFE
+gcvt SIGFE
+_gcvt = gcvt SIGFE
+gcvtf SIGFE
+_gcvtf = gcvtf SIGFE
+get_osfhandle SIGFE
+_get_osfhandle = get_osfhandle SIGFE
+getc SIGFE
+_getc = getc SIGFE
+getc_unlocked SIGFE
+_getc_unlocked = getc_unlocked SIGFE
+getchar NOSIGFE
+_getchar = getchar NOSIGFE
+getchar_unlocked NOSIGFE
+_getchar_unlocked = getchar_unlocked NOSIGFE
+getcwd SIGFE
+_getcwd = getcwd SIGFE
+getdomainname SIGFE
+_getdomainname = getdomainname SIGFE
+getdtablesize NOSIGFE
+_getdtablesize = getdtablesize NOSIGFE
+getegid NOSIGFE
+_getegid = getegid NOSIGFE
+_getegid32 = getegid32 NOSIGFE
+getenv NOSIGFE
+_getenv = getenv NOSIGFE
+geteuid NOSIGFE
+_geteuid = geteuid NOSIGFE
+_geteuid32 = geteuid32 NOSIGFE
+getgid NOSIGFE
+_getgid = getgid NOSIGFE
+_getgid32 = getgid32 NOSIGFE
+getgrent SIGFE
+_getgrent = getgrent SIGFE
+_getgrent32 = getgrent32 SIGFE
+getgrgid SIGFE
+_getgrgid = getgrgid SIGFE
+_getgrgid32 = getgrgid32 SIGFE
+getgrnam SIGFE
+_getgrnam = getgrnam SIGFE
+_getgrnam32 = getgrnam32 SIGFE
+getgroups SIGFE
+_getgroups = getgroups SIGFE
+_getgroups32 = getgroups32 SIGFE
+gethostid SIGFE
+getitimer SIGFE
+getlogin NOSIGFE
+_getlogin = getlogin NOSIGFE
+getmntent SIGFE
+_getmntent = getmntent SIGFE
+getmode SIGFE
+_getmode = getmode SIGFE
+getopt SIGFE
+getopt_long SIGFE
+getpagesize SIGFE
+_getpagesize = getpagesize SIGFE
+getpass SIGFE
+_getpass = getpass SIGFE
+getpgid SIGFE
+getpgrp SIGFE
+_getpgrp = getpgrp SIGFE
+getpid NOSIGFE
+_getpid = getpid NOSIGFE
+getppid NOSIGFE
+_getppid = getppid NOSIGFE
+getpwduid NOSIGFE
+_getpwduid = getpwduid NOSIGFE
+getpwent SIGFE
+_getpwent = getpwent SIGFE
+getpwnam SIGFE
+_getpwnam = getpwnam SIGFE
+getpwnam_r SIGFE
+getpwuid SIGFE
+_getpwuid = getpwuid SIGFE
+_getpwuid32 = getpwuid32 SIGFE
+getpwuid_r SIGFE
+_getpwuid_r32 = getpwuid_r32 SIGFE
+getrlimit SIGFE
+_getrlimit = getrlimit SIGFE
+getrusage SIGFE
+_getrusage = getrusage SIGFE
+gets NOSIGFE
+_gets = gets NOSIGFE
+getsid SIGFE
+gettimeofday SIGFE
+_gettimeofday = gettimeofday SIGFE
+getuid NOSIGFE
+_getuid = getuid NOSIGFE
+_getuid32 = getuid32 NOSIGFE
+getutent SIGFE
+_getutent = getutent SIGFE
+getutid SIGFE
+_getutid = getutid SIGFE
+getutline SIGFE
+_getutline = getutline SIGFE
+getw SIGFE
+_getw = getw SIGFE
+getwd SIGFE
+_getwd = getwd SIGFE
+glob SIGFE
+_glob = glob SIGFE
+globfree SIGFE
+_globfree = globfree SIGFE
+gmtime SIGFE
+_gmtime = gmtime SIGFE
+gmtime_r SIGFE
+_gmtime_r = gmtime_r SIGFE
+grantpt NOSIGFE
+hcreate SIGFE
+hcreate_r SIGFE
+hdestroy SIGFE
+hdestroy_r SIGFE
+hsearch SIGFE
+hsearch_r SIGFE
+htonl NOSIGFE
+_htonl = htonl NOSIGFE
+htons NOSIGFE
+_htons = htons NOSIGFE
+hypot NOSIGFE
+_hypot = hypot NOSIGFE
+hypotf NOSIGFE
+_hypotf = hypotf NOSIGFE
+ilogb NOSIGFE
+_ilogb = ilogb NOSIGFE
+ilogbf NOSIGFE
+_ilogbf = ilogbf NOSIGFE
+index NOSIGFE
+_index = index NOSIGFE
+inet_makeaddr NOSIGFE
+inet_netof NOSIGFE
+infinity NOSIGFE
+_infinity = infinity NOSIGFE
+infinityf NOSIGFE
+_infinityf = infinityf NOSIGFE
+initgroups SIGFE
+_initgroups32 = initgroups32 SIGFE
+initstate NOSIGFE
+ioctl SIGFE
+_ioctl = ioctl SIGFE
+iprintf SIGFE
+_iprintf = iprintf SIGFE
+iruserok SIGFE
+ruserok SIGFE
+isalnum NOSIGFE
+_isalnum = isalnum NOSIGFE
+isalpha NOSIGFE
+_isalpha = isalpha NOSIGFE
+isascii NOSIGFE
+_isascii = isascii NOSIGFE
+isatty SIGFE
+_isatty = isatty SIGFE
+isblank NOSIGFE
+iscntrl NOSIGFE
+_iscntrl = iscntrl NOSIGFE
+isdigit NOSIGFE
+_isdigit = isdigit NOSIGFE
+isgraph NOSIGFE
+_isgraph = isgraph NOSIGFE
+isinf NOSIGFE
+_isinf = isinf NOSIGFE
+isinff NOSIGFE
+_isinff = isinff NOSIGFE
+islower NOSIGFE
+_islower = islower NOSIGFE
+isnan NOSIGFE
+_isnan = isnan NOSIGFE
+isnanf NOSIGFE
+_isnanf = isnanf NOSIGFE
+isprint NOSIGFE
+_isprint = isprint NOSIGFE
+ispunct NOSIGFE
+_ispunct = ispunct NOSIGFE
+isspace NOSIGFE
+_isspace = isspace NOSIGFE
+isupper NOSIGFE
+_isupper = isupper NOSIGFE
+iswalnum NOSIGFE
+iswalpha NOSIGFE
+iswblank NOSIGFE
+iswcntrl NOSIGFE
+iswctype NOSIGFE
+iswdigit NOSIGFE
+iswgraph NOSIGFE
+iswlower NOSIGFE
+iswprint NOSIGFE
+iswpunct NOSIGFE
+iswspace NOSIGFE
+iswupper NOSIGFE
+iswxdigit NOSIGFE
+isxdigit NOSIGFE
+_isxdigit = isxdigit NOSIGFE
+j0 NOSIGFE
+_j0 = j0 NOSIGFE
+j0f NOSIGFE
+_j0f = j0f NOSIGFE
+j1 NOSIGFE
+_j1 = j1 NOSIGFE
+j1f NOSIGFE
+_j1f = j1f NOSIGFE
+jn NOSIGFE
+_jn = jn NOSIGFE
+jnf NOSIGFE
+_jnf = jnf NOSIGFE
+jrand48 NOSIGFE
+_jrand48 = jrand48 NOSIGFE
+kill SIGFE
+_kill = kill SIGFE
+killpg SIGFE
+l64a NOSIGFE
+labs NOSIGFE
+_labs = labs NOSIGFE
+lacl SIGFE
+_lacl = lacl SIGFE
+lchown SIGFE
+_lchown = lchown SIGFE
+_lchown32 = lchown32 SIGFE
+lcong48 NOSIGFE
+_lcong48 = lcong48 NOSIGFE
+ldexp NOSIGFE
+_ldexp = ldexp NOSIGFE
+ldexpf NOSIGFE
+_ldexpf = ldexpf NOSIGFE
+ldiv NOSIGFE
+_ldiv = ldiv NOSIGFE
+lgamma NOSIGFE
+_lgamma = lgamma NOSIGFE
+lgamma_r NOSIGFE
+_lgamma_r = lgamma_r NOSIGFE
+lgammaf NOSIGFE
+_lgammaf = lgammaf NOSIGFE
+lgammaf_r NOSIGFE
+_lgammaf_r = lgammaf_r NOSIGFE
+link SIGFE
+_link = link SIGFE
+localeconv NOSIGFE
+_localeconv = localeconv NOSIGFE
+localtime SIGFE
+_localtime = localtime SIGFE
+localtime_r NOSIGFE
+_localtime_r = localtime_r NOSIGFE
+log NOSIGFE
+_log = log NOSIGFE
+log10 NOSIGFE
+_log10 = log10 NOSIGFE
+log10f NOSIGFE
+_log10f = log10f NOSIGFE
+log1p NOSIGFE
+_log1p = log1p NOSIGFE
+log1pf NOSIGFE
+_log1pf = log1pf NOSIGFE
+logb NOSIGFE
+_logb = logb NOSIGFE
+logbf NOSIGFE
+_logbf = logbf NOSIGFE
+logf NOSIGFE
+_logf = logf NOSIGFE
+login SIGFE
+login_tty SIGFE
+logout SIGFE
+logwtmp SIGFE
+updwtmp SIGFE
+longjmp NOSIGFE
+_longjmp = longjmp NOSIGFE
+lrand48 NOSIGFE
+_lrand48 = lrand48 NOSIGFE
+lrint NOSIGFE
+lrintf NOSIGFE
+lround NOSIGFE
+lroundf NOSIGFE
+lseek SIGFE
+_lseek = lseek SIGFE
+_lseek64 = lseek64 SIGFE
+_lstat64 = lstat64 SIGFE
+mallinfo SIGFE
+malloc SIGFE
+_malloc = malloc SIGFE
+malloc_stats SIGFE
+malloc_trim SIGFE
+malloc_usable_size SIGFE
+mallopt SIGFE
+matherr NOSIGFE
+_matherr = matherr NOSIGFE
+mblen NOSIGFE
+_mblen = mblen NOSIGFE
+mbrlen NOSIGFE
+mbrtowc NOSIGFE
+mbsinit NOSIGFE
+mbsrtowcs NOSIGFE
+mbstowcs NOSIGFE
+_mbstowcs = mbstowcs NOSIGFE
+mbtowc NOSIGFE
+_mbtowc = mbtowc NOSIGFE
+memalign SIGFE
+memccpy NOSIGFE
+_memccpy = memccpy NOSIGFE
+memchr NOSIGFE
+_memchr = memchr NOSIGFE
+memcmp NOSIGFE
+_memcmp = memcmp NOSIGFE
+memcpy NOSIGFE
+_memcpy = memcpy NOSIGFE
+memmove NOSIGFE
+_memmove = memmove NOSIGFE
+mempcpy NOSIGFE
+__mempcpy = mempcpy NOSIGFE
+memset NOSIGFE
+_memset = memset NOSIGFE
+mkdir SIGFE
+_mkdir = mkdir SIGFE
+mkfifo SIGFE
+mknod SIGFE
+_mknod = mknod SIGFE
+_mknod32 = mknod32 SIGFE
+mkstemp SIGFE
+_mkstemp = mkstemp SIGFE
+mktemp SIGFE
+_mktemp = mktemp SIGFE
+mktime SIGFE
+_mktime = mktime SIGFE
+mmap SIGFE
+_mmap64 = mmap64 SIGFE
+modf NOSIGFE
+_modf = modf NOSIGFE
+modff NOSIGFE
+_modff = modff NOSIGFE
+mount SIGFE
+_mount = mount SIGFE
+mprotect SIGFE
+mrand48 NOSIGFE
+msync SIGFE
+munmap SIGFE
+nan NOSIGFE
+_nan = nan NOSIGFE
+nanf NOSIGFE
+_nanf = nanf NOSIGFE
+nanosleep SIGFE
+_nanosleep = nanosleep SIGFE
+nearbyint NOSIGFE
+nearbyintf NOSIGFE
+nextafter NOSIGFE
+_nextafter = nextafter NOSIGFE
+nextafterf NOSIGFE
+_nextafterf = nextafterf NOSIGFE
+nice SIGFE
+_nice = nice SIGFE
+nl_langinfo SIGFE
+_nl_langinfo = nl_langinfo SIGFE
+nrand48 NOSIGFE
+_nrand48 = nrand48 NOSIGFE
+ntohl NOSIGFE
+_ntohl = ntohl NOSIGFE
+ntohs NOSIGFE
+_ntohs = ntohs NOSIGFE
+on_exit SIGFE
+open SIGFE
+_open = open SIGFE
 _open64
-opendir
-_opendir = opendir
-openlog
-_openlog = openlog
-openpty
-pathconf
-_pathconf = pathconf
-pause
-pclose
-_pclose = pclose
-perror
-_perror = perror
-pipe
-poll
-_poll = poll
-popen
-_popen = popen
-posix_regcomp
-posix_regerror
-posix_regexec
-posix_regfree
-pow
-_pow = pow
-powf
-_powf = powf
-printf
-_printf = printf
-pthread_atfork
-pthread_attr_destroy
-pthread_attr_getdetachstate
-pthread_attr_getinheritsched
-pthread_attr_getschedparam
-pthread_attr_getschedpolicy
-pthread_attr_getscope
-pthread_attr_getstacksize
-pthread_attr_init
-pthread_attr_setdetachstate
-pthread_attr_setinheritsched
-pthread_attr_setschedparam
-pthread_attr_setschedpolicy
-pthread_attr_setscope
-pthread_attr_setstacksize
-pthread_cancel
-pthread_cond_broadcast
-pthread_cond_destroy
-pthread_cond_init
-pthread_cond_signal
-pthread_cond_timedwait
-pthread_cond_wait
-pthread_condattr_destroy
-pthread_condattr_getpshared
-pthread_condattr_init
-pthread_condattr_setpshared
-pthread_continue
-pthread_create
-pthread_detach
-pthread_equal
-pthread_exit
-pthread_getconcurrency
-pthread_getschedparam
-pthread_getsequence_np
-pthread_getspecific
-pthread_join
-pthread_key_create
-pthread_key_delete
-pthread_kill
-pthread_mutex_destroy
-pthread_mutex_getprioceiling
-pthread_mutex_init
-pthread_mutex_lock
-pthread_mutex_setprioceiling
-pthread_mutex_trylock
-pthread_mutex_unlock
-pthread_mutexattr_destroy
-pthread_mutexattr_getprioceiling
-pthread_mutexattr_getprotocol
-pthread_mutexattr_getpshared
-pthread_mutexattr_gettype
-pthread_mutexattr_init
-pthread_mutexattr_setprioceiling
-pthread_mutexattr_setprotocol
-pthread_mutexattr_setpshared
-pthread_mutexattr_settype
-pthread_once
-pthread_rwlock_destroy
-pthread_rwlock_init
-pthread_rwlock_rdlock
-pthread_rwlock_tryrdlock
-pthread_rwlock_wrlock
-pthread_rwlock_trywrlock
-pthread_rwlock_unlock
-pthread_rwlockattr_init
-pthread_rwlockattr_getpshared
-pthread_rwlockattr_setpshared
-pthread_rwlockattr_destroy
-pthread_self
-pthread_setcancelstate
-pthread_setcanceltype
-pthread_setconcurrency
-pthread_setschedparam
-pthread_setspecific
-pthread_sigmask
-pthread_suspend
-pthread_testcancel
-ptsname
-putc
-_putc = putc
-putc_unlocked
-_putc_unlocked = putc_unlocked
-putchar
-_putchar = putchar
-putchar_unlocked
-_putchar_unlocked = putchar_unlocked
-putenv
-_putenv = putenv
-puts
-_puts = puts
-pututline
-_pututline = pututline
-putw
-_putw = putw
-qsort
-_qsort = qsort
-raise
-_raise = raise
-rand
-_rand = rand
-random
-read
-_read = read
-readdir
-_readdir = readdir
-readlink
-_readlink = readlink
-readv
-_readv = readv
-realloc
-_realloc = realloc
-realpath
-remainder
-_remainder = remainder
-remainderf
-_remainderf = remainderf
-remove
-_remove = remove
-remquo
-remquof
-rename
-_rename = rename
-revoke
-rewind
-_rewind = rewind
-rewinddir
-_rewinddir = rewinddir
-rindex
-_rindex = rindex
-rint
-_rint = rint
-rintf
-_rintf = rintf
-rmdir
-_rmdir = rmdir
-round
-roundf
-sbrk
-_sbrk = sbrk
-scalb
-_scalb = scalb
-scalbf
-_scalbf = scalbf
-scalbln
-scalblnf
-scalbn
-_scalbn = scalbn
-scalbnf
-_scalbnf = scalbnf
-scandir
-_scandir = scandir
-scanf
-_scanf = scanf
-sched_get_priority_max
-sched_get_priority_min
-sched_getparam
-sched_getscheduler
-sched_rr_get_interval
-sched_setparam
-sched_setscheduler
-sched_yield
-seed48
-_seed48 = seed48
-seekdir
-_seekdir = seekdir
-_seekdir64 = seekdir64
-semctl
-semget
-semop
-sem_close
-sem_destroy
-sem_getvalue
-sem_init
-sem_open
-sem_post
-sem_timedwait
-sem_trywait
-sem_wait
-setbuf
-_setbuf = setbuf
-setbuffer
-setdtablesize
-_setdtablesize = setdtablesize
-setegid
-_setegid = setegid
-_setegid32 = setegid32
-setenv
-_setenv = setenv
-seteuid
-_seteuid = seteuid
-_seteuid32 = seteuid32
-setgid
-_setgid = setgid
-_setgid32 = setgid32
-setgrent
-_setgrent = setgrent
-setgroups
-_setgroups = setgroups
-_setgroups32 = setgroups32
-sethostent
-setitimer
-setjmp
-_setjmp = setjmp
-setlinebuf
-setlocale
-_setlocale = setlocale
-setlogmask
-setmntent
-_setmntent = setmntent
-setmode
-_setmode = setmode
-setpassent
-_setpassent = setpassent
-setpgid
-_setpgid = setpgid
-setpgrp
-_setpgrp = setpgrp
-setprogname
-setpwent
-_setpwent = setpwent
-setregid
-_setregid = setregid
-setregid32
-_setregid32 = setregid32
-setreuid
-_setreuid = setreuid
-setreuid32
-_setreuid32 = setreuid32
-setrlimit
-_setrlimit = setrlimit
-setsid
-_setsid = setsid
-setstate
-settimeofday
-_settimeofday = settimeofday
-setuid
-_setuid = setuid
-_setuid32 = setuid32
-setutent
-_setutent = setutent
-setvbuf
-_setvbuf = setvbuf
-sexecl = sexecve_is_bad
-sexecle = sexecve_is_bad
-sexeclp = sexecve_is_bad
-sexeclpe = sexecve_is_bad
-sexecp = sexecve_is_bad
-sexecv = sexecve_is_bad
-sexecve = sexecve_is_bad
-sexecvpe = sexecve_is_bad
-shmat
-shmctl
-shmdt
-shmget
-sigaction
-_sigaction = sigaction
-sigaddset
-_sigaddset = sigaddset
-sigdelset
-_sigdelset = sigdelset
-sigemptyset
-_sigemptyset = sigemptyset
-sigfillset
-_sigfillset = sigfillset
-siginterrupt
-_siginterrupt = siginterrupt
-sigismember
-_sigismember = sigismember
-signal
-_signal = signal
-significand
-_significand = significand
-significandf
-_significandf = significandf
-sigpause
-sigpending
-_sigpending = sigpending
-sigprocmask
-_sigprocmask = sigprocmask
-sigsuspend
-_sigsuspend = sigsuspend
-sin
-_sin = sin
-sincos
-sincosf
-sinf
-_sinf = sinf
-sinh
-_sinh = sinh
-sinhf
-_sinhf = sinhf
-siprintf
-_siprintf = siprintf
-sleep
-_sleep = sleep
-snprintf
-_snprintf = snprintf
-socketpair
-spawnl
-_spawnl = spawnl
-spawnle
-_spawnle = spawnle
-spawnlp
-_spawnlp = spawnlp
-spawnlpe
-_spawnlpe = spawnlpe
-spawnv
-_spawnv = spawnv
-spawnve
-_spawnve = spawnve
-spawnvp
-_spawnvp = spawnvp
-spawnvpe
-_spawnvpe = spawnvpe
-sprintf
-_sprintf = sprintf
-sqrt
-_sqrt = sqrt
-sqrtf
-_sqrtf = sqrtf
-srand
-_srand = srand
-srand48
-_srand48 = srand48
-srandom
-sscanf
-_sscanf = sscanf
-_stat64 = stat64
-statfs
-_statfs = statfs
-strcasecmp
-_strcasecmp = strcasecmp
-strcat
-_strcat = strcat
-strchr
-_strchr = strchr
-strcmp
-_strcmp = strcmp
-strcoll
-_strcoll = strcoll
-strcpy
-_strcpy = strcpy
-strcspn
-_strcspn = strcspn
-strdup
-_strdup = strdup
-strerror
-_strerror = strerror
-strerror_r
-_strerror_r = strerror_r
-strftime
-_strftime = strftime
-strlcat
-_strlcat = strlcat
-strlcpy
-_strlcpy = strlcpy
-strlen
-_strlen = strlen
-strlwr
-_strlwr = strlwr
-strncasecmp
-_strncasecmp = strncasecmp
-strncat
-_strncat = strncat
-strncmp
-_strncmp = strncmp
-strncpy
-_strncpy = strncpy
-strndup
-strnlen
-strpbrk
-_strpbrk = strpbrk
-strptime
-_strptime = strptime
-strrchr
-_strrchr = strrchr
-strsep
-_strsep = strsep
-strsignal
-strspn
-_strspn = strspn
-strstr
-_strstr = strstr
-strtod
-_strtod = strtod
-strtof
-_strtodf = strtof
-strtodf = strtof
-strtok
-_strtok = strtok
-strtok_r
-_strtok_r = strtok_r
-strtol
-_strtol = strtol
-strtoll
-_strtoll = strtoll
-strtosigno
-strtoul
-_strtoul = strtoul
-strtoull
-_strtoull = strtoull
-strupr
-_strupr = strupr
-strxfrm
-_strxfrm = strxfrm
-swab
-_swab = swab
-symlink
-_symlink = symlink
-sync
-_sync = sync
-sysconf
-_sysconf = sysconf
-syslog
-_syslog = syslog
-vsyslog
-system
-_system = system
-tan
-_tan = tan
-tanf
-_tanf = tanf
-tanh
-_tanh = tanh
-tanhf
-_tanhf = tanhf
-tcdrain
-_tcdrain = tcdrain
-tcflow
-_tcflow = tcflow
-tcflush
-_tcflush = tcflush
-tcgetattr
-_tcgetattr = tcgetattr
-tcgetpgrp
-_tcgetpgrp = tcgetpgrp
-tcsendbreak
-_tcsendbreak = tcsendbreak
-tcsetattr
-_tcsetattr = tcsetattr
-tcsetpgrp
-_tcsetpgrp = tcsetpgrp
-tdelete
-tdestroy
-telldir
-_telldir = telldir
-_telldir64 = telldir64
-tempnam
-_tempnam = tempnam
-tfind
-tgamma
-tgammaf
-time
-_time = time
-times
-_times = times
-timezone
-tmpfile
-_tmpfile = tmpfile
-_tmpfile64 = tmpfile64
-tmpnam
-_tmpnam = tmpnam
-toascii
-_toascii = toascii
-tolower
-_tolower = tolower
-toupper
-_toupper = toupper
-towctrans
-towlower
-towupper
-truncate
-_truncate = truncate
-_truncate64 = truncate64
-truncf
-tsearch
-ttyname
-_ttyname = ttyname
-ttyslot
-twalk
-tzset
-_tzset = tzset
-ualarm
-_ualarm = ualarm
-umask
-_umask = umask
-umount
-_umount = umount
-uname
-_uname = uname
-ungetc
-_ungetc = ungetc
-unlink
-_unlink = unlink
-unlockpt
-unsetenv
-_unsetenv = unsetenv
-usleep
-_usleep = usleep
-utime
-_utime = utime
-utimes
-_utimes = utimes
-utmpname
-_utmpname = utmpname
-valloc
-vasprintf
-_vasprintf = vasprintf
-vfiprintf
-_vfiprintf = vfiprintf
-vfork
-_vfork = vfork
-vfprintf
-_vfprintf = vfprintf
-vfscanf
-_vfscanf = vfscanf
-vhangup
-_vhangup = vhangup
-vprintf
-_vprintf = vprintf
-vscanf
-_vscanf = vscanf
-vsnprintf
-_vsnprintf = vsnprintf
-vsprintf
-_vsprintf = vsprintf
-vsscanf
-_vsscanf = vsscanf
-wait
-_wait = wait
-wait3
-wait4
-waitpid
-_waitpid = waitpid
-wcrtomb
-wcscat
-wcschr
-wcscmp
-_wcscmp = wcscmp
-wcscoll
-wcscpy
-wcscspn
-wcslcat
-wcslcpy
-wcslen
-_wcslen = wcslen
-wcsncat
-wcsncmp
-wcsncpy
-wcspbrk
-wcsrchr
-wcsrtombs
-wcsspn
-wcsstr
-wcstombs
-_wcstombs = wcstombs
-wcswidth
-wctob
-wctomb
-_wctomb = wctomb
-wctrans
-wctype
-wcwidth
-wmemchr
-wmemcmp
-wmemcpy
-wmemmove
-wmemset
-wprintf
-_wprintf = wprintf
-write
-_write = write
-writev
-_writev = writev
-y0
-y0f
-y1
-y1f
-yn
-ynf
+opendir SIGFE
+_opendir = opendir SIGFE
+openlog SIGFE
+_openlog = openlog SIGFE
+openpty SIGFE
+pathconf SIGFE
+_pathconf = pathconf SIGFE
+pause SIGFE
+pclose SIGFE
+_pclose = pclose SIGFE
+perror SIGFE
+_perror = perror SIGFE
+pipe SIGFE
+poll SIGFE
+_poll = poll SIGFE
+popen SIGFE
+_popen = popen SIGFE
+posix_regcomp SIGFE
+posix_regerror SIGFE
+posix_regexec SIGFE
+posix_regfree SIGFE
+pow NOSIGFE
+_pow = pow NOSIGFE
+powf NOSIGFE
+_powf = powf NOSIGFE
+printf SIGFE
+_printf = printf SIGFE
+pthread_atfork SIGFE
+pthread_attr_destroy NOSIGFE
+pthread_attr_getdetachstate NOSIGFE
+pthread_attr_getinheritsched NOSIGFE
+pthread_attr_getschedparam NOSIGFE
+pthread_attr_getschedpolicy NOSIGFE
+pthread_attr_getscope NOSIGFE
+pthread_attr_getstacksize NOSIGFE
+pthread_attr_init SIGFE
+pthread_attr_setdetachstate NOSIGFE
+pthread_attr_setinheritsched NOSIGFE
+pthread_attr_setschedparam NOSIGFE
+pthread_attr_setschedpolicy NOSIGFE
+pthread_attr_setscope NOSIGFE
+pthread_attr_setstacksize NOSIGFE
+pthread_cancel NOSIGFE
+pthread_cond_broadcast SIGFE
+pthread_cond_destroy NOSIGFE
+pthread_cond_init SIGFE
+pthread_cond_signal SIGFE
+pthread_cond_timedwait SIGFE
+pthread_cond_wait SIGFE
+pthread_condattr_destroy NOSIGFE
+pthread_condattr_getpshared NOSIGFE
+pthread_condattr_init SIGFE
+pthread_condattr_setpshared NOSIGFE
+pthread_continue SIGFE
+pthread_create SIGFE
+pthread_detach SIGFE
+pthread_equal NOSIGFE
+pthread_exit NOSIGFE
+pthread_getconcurrency NOSIGFE
+pthread_getschedparam NOSIGFE
+pthread_getsequence_np NOSIGFE
+pthread_getspecific NOSIGFE
+pthread_join SIGFE
+pthread_key_create SIGFE
+pthread_key_delete NOSIGFE
+pthread_kill SIGFE
+pthread_mutex_destroy NOSIGFE
+pthread_mutex_getprioceiling SIGFE
+pthread_mutex_init SIGFE
+pthread_mutex_lock SIGFE
+pthread_mutex_setprioceiling SIGFE
+pthread_mutex_trylock SIGFE
+pthread_mutex_unlock SIGFE
+pthread_mutexattr_destroy NOSIGFE
+pthread_mutexattr_getprioceiling NOSIGFE
+pthread_mutexattr_getprotocol NOSIGFE
+pthread_mutexattr_getpshared NOSIGFE
+pthread_mutexattr_gettype NOSIGFE
+pthread_mutexattr_init SIGFE
+pthread_mutexattr_setprioceiling NOSIGFE
+pthread_mutexattr_setprotocol NOSIGFE
+pthread_mutexattr_setpshared NOSIGFE
+pthread_mutexattr_settype NOSIGFE
+pthread_once SIGFE
+pthread_rwlock_destroy NOSIGFE
+pthread_rwlock_init SIGFE
+pthread_rwlock_rdlock SIGFE
+pthread_rwlock_tryrdlock SIGFE
+pthread_rwlock_wrlock SIGFE
+pthread_rwlock_trywrlock SIGFE
+pthread_rwlock_unlock SIGFE
+pthread_rwlockattr_init SIGFE
+pthread_rwlockattr_getpshared NOSIGFE
+pthread_rwlockattr_setpshared NOSIGFE
+pthread_rwlockattr_destroy NOSIGFE
+pthread_self NOSIGFE
+pthread_setcancelstate NOSIGFE
+pthread_setcanceltype NOSIGFE
+pthread_setconcurrency NOSIGFE
+pthread_setschedparam SIGFE
+pthread_setspecific NOSIGFE
+pthread_sigmask SIGFE
+pthread_suspend SIGFE
+pthread_testcancel NOSIGFE
+ptsname SIGFE
+putc SIGFE
+_putc = putc SIGFE
+putc_unlocked SIGFE
+_putc_unlocked = putc_unlocked SIGFE
+putchar NOSIGFE
+_putchar = putchar NOSIGFE
+putchar_unlocked NOSIGFE
+_putchar_unlocked = putchar_unlocked NOSIGFE
+putenv SIGFE
+_putenv = putenv SIGFE
+puts SIGFE
+_puts = puts SIGFE
+pututline SIGFE
+_pututline = pututline SIGFE
+putw SIGFE
+_putw = putw SIGFE
+qsort NOSIGFE
+_qsort = qsort NOSIGFE
+raise SIGFE
+_raise = raise SIGFE
+rand NOSIGFE
+_rand = rand NOSIGFE
+random NOSIGFE
+read SIGFE
+_read = read SIGFE
+readdir SIGFE
+_readdir = readdir SIGFE
+readlink SIGFE
+_readlink = readlink SIGFE
+readv SIGFE
+_readv = readv SIGFE
+realloc SIGFE
+_realloc = realloc SIGFE
+realpath SIGFE
+remainder NOSIGFE
+_remainder = remainder NOSIGFE
+remainderf NOSIGFE
+_remainderf = remainderf NOSIGFE
+remove SIGFE
+_remove = remove SIGFE
+remquo NOSIGFE
+remquof NOSIGFE
+rename SIGFE
+_rename = rename SIGFE
+revoke SIGFE
+rewind SIGFE
+_rewind = rewind SIGFE
+rewinddir SIGFE
+_rewinddir = rewinddir SIGFE
+rindex NOSIGFE
+_rindex = rindex NOSIGFE
+rint NOSIGFE
+_rint = rint NOSIGFE
+rintf NOSIGFE
+_rintf = rintf NOSIGFE
+rmdir SIGFE
+_rmdir = rmdir SIGFE
+round NOSIGFE
+roundf NOSIGFE
+sbrk SIGFE
+_sbrk = sbrk SIGFE
+scalb NOSIGFE
+_scalb = scalb NOSIGFE
+scalbf NOSIGFE
+_scalbf = scalbf NOSIGFE
+scalbln NOSIGFE
+scalblnf NOSIGFE
+scalbn NOSIGFE
+_scalbn = scalbn NOSIGFE
+scalbnf NOSIGFE
+_scalbnf = scalbnf NOSIGFE
+scandir SIGFE
+_scandir = scandir SIGFE
+scanf SIGFE
+_scanf = scanf SIGFE
+sched_get_priority_max SIGFE
+sched_get_priority_min SIGFE
+sched_getparam SIGFE
+sched_getscheduler NOSIGFE
+sched_rr_get_interval SIGFE
+sched_setparam SIGFE
+sched_setscheduler SIGFE
+sched_yield SIGFE
+seed48 NOSIGFE
+_seed48 = seed48 NOSIGFE
+seekdir SIGFE
+_seekdir = seekdir SIGFE
+_seekdir64 = seekdir64 SIGFE
+sem_destroy NOSIGFE
+sem_init SIGFE
+sem_post SIGFE
+sem_trywait SIGFE
+sem_wait SIGFE
+setbuf SIGFE
+_setbuf = setbuf SIGFE
+setbuffer SIGFE
+setdtablesize SIGFE
+_setdtablesize = setdtablesize SIGFE
+setegid SIGFE
+_setegid = setegid SIGFE
+_setegid32 = setegid32 SIGFE
+setenv SIGFE
+_setenv = setenv SIGFE
+seteuid SIGFE
+_seteuid = seteuid SIGFE
+_seteuid32 = seteuid32 SIGFE
+setgid SIGFE
+_setgid = setgid SIGFE
+_setgid32 = setgid32 SIGFE
+setgrent NOSIGFE
+_setgrent = setgrent NOSIGFE
+setgroups SIGFE
+_setgroups = setgroups SIGFE
+_setgroups32 = setgroups32 SIGFE
+sethostent NOSIGFE
+setitimer SIGFE
+setjmp NOSIGFE
+_setjmp = setjmp NOSIGFE
+setlinebuf SIGFE
+setlocale NOSIGFE
+_setlocale = setlocale NOSIGFE
+setlogmask NOSIGFE
+setmntent SIGFE
+_setmntent = setmntent SIGFE
+setmode SIGFE
+_setmode = setmode SIGFE
+setpassent NOSIGFE
+_setpassent = setpassent NOSIGFE
+setpgid SIGFE
+_setpgid = setpgid SIGFE
+setpgrp SIGFE
+_setpgrp = setpgrp SIGFE
+setpwent NOSIGFE
+_setpwent = setpwent NOSIGFE
+setregid SIGFE
+_setregid = setregid SIGFE
+setregid32 SIGFE
+_setregid32 = setregid32 SIGFE
+setreuid SIGFE
+_setreuid = setreuid SIGFE
+setreuid32 SIGFE
+_setreuid32 = setreuid32 SIGFE
+setrlimit SIGFE
+_setrlimit = setrlimit SIGFE
+setsid SIGFE
+_setsid = setsid SIGFE
+setstate NOSIGFE
+settimeofday SIGFE
+_settimeofday = settimeofday SIGFE
+setuid SIGFE
+_setuid = setuid SIGFE
+_setuid32 = setuid32 SIGFE
+setutent SIGFE
+_setutent = setutent SIGFE
+setvbuf SIGFE
+_setvbuf = setvbuf SIGFE
+sexecl = sexecve_is_bad SIGFE
+sexecle = sexecve_is_bad SIGFE
+sexeclp = sexecve_is_bad SIGFE
+sexeclpe = sexecve_is_bad SIGFE
+sexecp = sexecve_is_bad SIGFE
+sexecv = sexecve_is_bad SIGFE
+sexecve = sexecve_is_bad SIGFE
+sexecvpe = sexecve_is_bad SIGFE
+shmat SIGFE
+shmctl SIGFE
+shmdt SIGFE
+shmget SIGFE
+sigaction SIGFE
+sigaddset SIGFE
+sigdelset SIGFE
+sigemptyset NOSIGFE
+sigfillset NOSIGFE
+siginterrupt SIGFE
+sigismember SIGFE
+signal SIGFE
+significand NOSIGFE
+significandf NOSIGFE
+sigpause SIGFE
+sigpending SIGFE
+sigprocmask SIGFE
+sigsuspend SIGFE
+sigwait SIGFE
+sin NOSIGFE
+_sin = sin NOSIGFE
+sincos NOSIGFE
+sincosf NOSIGFE
+sinf NOSIGFE
+_sinf = sinf NOSIGFE
+sinh NOSIGFE
+_sinh = sinh NOSIGFE
+sinhf NOSIGFE
+_sinhf = sinhf NOSIGFE
+siprintf SIGFE
+_siprintf = siprintf SIGFE
+sleep SIGFE
+_sleep = sleep SIGFE
+snprintf SIGFE
+_snprintf = snprintf SIGFE
+socketpair SIGFE
+spawnl SIGFE
+_spawnl = spawnl SIGFE
+spawnle SIGFE
+_spawnle = spawnle SIGFE
+spawnlp SIGFE
+_spawnlp = spawnlp SIGFE
+spawnlpe SIGFE
+_spawnlpe = spawnlpe SIGFE
+spawnv SIGFE
+_spawnv = spawnv SIGFE
+spawnve SIGFE
+_spawnve = spawnve SIGFE
+spawnvp SIGFE
+_spawnvp = spawnvp SIGFE
+spawnvpe SIGFE
+_spawnvpe = spawnvpe SIGFE
+sprintf SIGFE
+_sprintf = sprintf SIGFE
+sqrt NOSIGFE
+_sqrt = sqrt NOSIGFE
+sqrtf NOSIGFE
+_sqrtf = sqrtf NOSIGFE
+srand NOSIGFE
+_srand = srand NOSIGFE
+srand48 NOSIGFE
+_srand48 = srand48 NOSIGFE
+srandom NOSIGFE
+sscanf SIGFE
+_sscanf = sscanf SIGFE
+_stat64 = stat64 SIGFE
+statfs SIGFE
+_statfs = statfs SIGFE
+strcasecmp NOSIGFE
+_strcasecmp = strcasecmp NOSIGFE
+strcat NOSIGFE
+_strcat = strcat NOSIGFE
+strchr NOSIGFE
+_strchr = strchr NOSIGFE
+strcmp NOSIGFE
+_strcmp = strcmp NOSIGFE
+strcoll NOSIGFE
+_strcoll = strcoll NOSIGFE
+strcpy NOSIGFE
+_strcpy = strcpy NOSIGFE
+strcspn NOSIGFE
+_strcspn = strcspn NOSIGFE
+strdup SIGFE
+_strdup = strdup SIGFE
+strerror NOSIGFE
+_strerror = strerror NOSIGFE
+strerror_r NOSIGFE
+_strerror_r = strerror_r NOSIGFE
+strftime SIGFE
+_strftime = strftime SIGFE
+strlcat NOSIGFE
+_strlcat = strlcat NOSIGFE
+strlcpy NOSIGFE
+_strlcpy = strlcpy NOSIGFE
+strlen NOSIGFE
+_strlen = strlen NOSIGFE
+strlwr NOSIGFE
+_strlwr = strlwr NOSIGFE
+strncasecmp NOSIGFE
+_strncasecmp = strncasecmp NOSIGFE
+strncat NOSIGFE
+_strncat = strncat NOSIGFE
+strncmp NOSIGFE
+_strncmp = strncmp NOSIGFE
+strncpy NOSIGFE
+_strncpy = strncpy NOSIGFE
+strndup SIGFE
+strnlen NOSIGFE
+strpbrk NOSIGFE
+_strpbrk = strpbrk NOSIGFE
+strptime SIGFE
+_strptime = strptime SIGFE
+strrchr NOSIGFE
+_strrchr = strrchr NOSIGFE
+strsep NOSIGFE
+_strsep = strsep NOSIGFE
+strsignal SIGFE
+strspn NOSIGFE
+_strspn = strspn NOSIGFE
+strstr NOSIGFE
+_strstr = strstr NOSIGFE
+strtod SIGFE
+_strtod = strtod SIGFE
+strtof SIGFE
+_strtodf = strtof SIGFE
+strtodf = strtof SIGFE
+strtok NOSIGFE
+_strtok = strtok NOSIGFE
+strtok_r NOSIGFE
+_strtok_r = strtok_r NOSIGFE
+strtol NOSIGFE
+_strtol = strtol NOSIGFE
+strtoll NOSIGFE
+_strtoll = strtoll NOSIGFE
+strtosigno SIGFE
+strtoul NOSIGFE
+_strtoul = strtoul NOSIGFE
+strtoull NOSIGFE
+_strtoull = strtoull NOSIGFE
+strupr NOSIGFE
+_strupr = strupr NOSIGFE
+strxfrm NOSIGFE
+_strxfrm = strxfrm NOSIGFE
+swab NOSIGFE
+_swab = swab NOSIGFE
+symlink SIGFE
+_symlink = symlink SIGFE
+sync NOSIGFE
+_sync = sync NOSIGFE
+sysconf SIGFE
+_sysconf = sysconf SIGFE
+syslog SIGFE
+_syslog = syslog SIGFE
+vsyslog SIGFE
+system SIGFE
+_system = system SIGFE
+tan NOSIGFE
+_tan = tan NOSIGFE
+tanf NOSIGFE
+_tanf = tanf NOSIGFE
+tanh NOSIGFE
+_tanh = tanh NOSIGFE
+tanhf NOSIGFE
+_tanhf = tanhf NOSIGFE
+tcdrain SIGFE
+_tcdrain = tcdrain SIGFE
+tcflow SIGFE
+_tcflow = tcflow SIGFE
+tcflush SIGFE
+_tcflush = tcflush SIGFE
+tcgetattr SIGFE
+_tcgetattr = tcgetattr SIGFE
+tcgetpgrp SIGFE
+_tcgetpgrp = tcgetpgrp SIGFE
+tcsendbreak SIGFE
+_tcsendbreak = tcsendbreak SIGFE
+tcsetattr SIGFE
+_tcsetattr = tcsetattr SIGFE
+tcsetpgrp SIGFE
+_tcsetpgrp = tcsetpgrp SIGFE
+tdelete SIGFE
+tdestroy NOSIGFE
+telldir SIGFE
+_telldir = telldir SIGFE
+_telldir64 = telldir64 SIGFE
+tempnam SIGFE
+_tempnam = tempnam SIGFE
+tfind NOSIGFE
+tgamma NOSIGFE
+tgammaf NOSIGFE
+time SIGFE
+_time = time SIGFE
+times SIGFE
+_times = times SIGFE
+timezone SIGFE
+tmpfile SIGFE
+_tmpfile = tmpfile SIGFE
+_tmpfile64 = tmpfile64 SIGFE
+tmpnam SIGFE
+_tmpnam = tmpnam SIGFE
+toascii NOSIGFE
+_toascii = toascii NOSIGFE
+tolower NOSIGFE
+_tolower = tolower NOSIGFE
+toupper NOSIGFE
+_toupper = toupper NOSIGFE
+towctrans NOSIGFE
+towlower NOSIGFE
+towupper NOSIGFE
+truncate SIGFE
+_truncate = truncate SIGFE
+_truncate64 = truncate64 SIGFE
+truncf NOSIGFE
+tsearch SIGFE
+ttyname SIGFE
+_ttyname = ttyname SIGFE
+ttyslot NOSIGFE
+twalk NOSIGFE
+tzset SIGFE
+_tzset = tzset SIGFE
+ualarm SIGFE
+_ualarm = ualarm SIGFE
+umask NOSIGFE
+_umask = umask NOSIGFE
+umount SIGFE
+_umount = umount SIGFE
+uname SIGFE
+_uname = uname SIGFE
+ungetc SIGFE
+_ungetc = ungetc SIGFE
+unlink SIGFE
+_unlink = unlink SIGFE
+unlockpt NOSIGFE
+unsetenv NOSIGFE
+_unsetenv = unsetenv NOSIGFE
+usleep SIGFE
+_usleep = usleep SIGFE
+utime SIGFE
+_utime = utime SIGFE
+utimes SIGFE
+_utimes = utimes SIGFE
+utmpname SIGFE
+_utmpname = utmpname SIGFE
+valloc SIGFE
+vasprintf SIGFE
+_vasprintf = vasprintf SIGFE
+verr SIGFE
+verrx SIGFE
+vwarn SIGFE
+vwarnx SIGFE
+vfiprintf SIGFE
+_vfiprintf = vfiprintf SIGFE
+vfork SIGFE
+_vfork = vfork SIGFE
+vfprintf SIGFE
+_vfprintf = vfprintf SIGFE
+vfscanf SIGFE
+_vfscanf = vfscanf SIGFE
+vhangup SIGFE
+_vhangup = vhangup SIGFE
+vprintf SIGFE
+_vprintf = vprintf SIGFE
+vscanf SIGFE
+_vscanf = vscanf SIGFE
+vsnprintf SIGFE
+_vsnprintf = vsnprintf SIGFE
+vsprintf SIGFE
+_vsprintf = vsprintf SIGFE
+vsscanf SIGFE
+_vsscanf = vsscanf SIGFE
+wait SIGFE
+_wait = wait SIGFE
+wait3 SIGFE
+wait4 SIGFE
+waitpid SIGFE
+_waitpid = waitpid SIGFE
+warn SIGFE
+warnx SIGFE
+wcrtomb NOSIGFE
+wcscat NOSIGFE
+wcschr NOSIGFE
+wcscmp NOSIGFE
+_wcscmp = wcscmp NOSIGFE
+wcscoll NOSIGFE
+wcscpy NOSIGFE
+wcscspn NOSIGFE
+wcslcat NOSIGFE
+wcslcpy NOSIGFE
+wcslen NOSIGFE
+_wcslen = wcslen NOSIGFE
+wcsncat NOSIGFE
+wcsncmp NOSIGFE
+wcsncpy NOSIGFE
+wcspbrk NOSIGFE
+wcsrchr NOSIGFE
+wcsrtombs NOSIGFE
+wcsspn NOSIGFE
+wcsstr NOSIGFE
+wcstombs NOSIGFE
+_wcstombs = wcstombs NOSIGFE
+wcswidth NOSIGFE
+wctob NOSIGFE
+wctomb NOSIGFE
+_wctomb = wctomb NOSIGFE
+wctrans NOSIGFE
+wctype NOSIGFE
+wcwidth NOSIGFE
+wmemchr NOSIGFE
+wmemcmp NOSIGFE
+wmemcpy NOSIGFE
+wmemmove NOSIGFE
+wmemset NOSIGFE
+wprintf SIGFE
+_wprintf = wprintf SIGFE
+write SIGFE
+_write = write SIGFE
+writev SIGFE
+_writev = writev SIGFE
+y0 NOSIGFE
+y0f NOSIGFE
+y1 NOSIGFE
+y1f NOSIGFE
+yn NOSIGFE
+ynf NOSIGFE

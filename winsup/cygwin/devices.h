@@ -148,15 +148,18 @@ struct device
 };
 
 extern const device *console_dev;
-extern const device *dgram_dev;
-extern const device *icmp_dev;
-extern const device *stream_dev;
-extern const device *tcp_dev;
 extern const device *ttym_dev;
 extern const device *ttys_dev;
-extern const device *udp_dev;
-extern const device *unix_dev;
 extern const device *urandom_dev;
+
+extern const device dev_dgram_storage;
+#define dgram_dev (&dev_dgram_storage)
+extern const device dev_stream_storage;
+#define stream_dev (&dev_stream_storage)
+extern const device dev_tcp_storage;
+#define tcp_dev (&dev_tcp_storage)
+extern const device dev_udp_storage;
+#define udp_dev (&dev_udp_storage)
 
 extern const device dev_piper_storage;
 #define piper_dev (&dev_piper_storage)

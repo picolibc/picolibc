@@ -32,7 +32,6 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
   int max_fd = 0;
   fd_set *read_fds, *write_fds, *except_fds;
   struct timeval tv = { timeout / 1000, (timeout % 1000) * 1000 };
-  sigframe thisframe (mainthread);
 
   for (unsigned int i = 0; i < nfds; ++i)
     if (fds[i].fd > max_fd)

@@ -119,8 +119,6 @@ tcsetattr (int fd, int a, const struct termios *t)
 
   while (1)
     {
-      sigframe thisframe (mainthread);
-
       res = -1;
       cygheap_fdget cfd (fd);
       if (cfd < 0)
@@ -148,7 +146,7 @@ tcsetattr (int fd, int a, const struct termios *t)
 	  e = get_errno ();
 	  break;
 	case bg_signalled:
-	  if (thisframe.call_signal_handler ())
+	  if (call_signal_handler_now ())
 	    continue;
 	  res = -1;
 	  /* fall through intentionally */

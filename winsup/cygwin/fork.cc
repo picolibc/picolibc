@@ -634,7 +634,6 @@ fork ()
   } grouped;
 
   MALLOC_CHECK;
-  sigframe thisframe (mainthread);
 
   debug_printf ("entering");
   grouped.hParent = grouped.first_dll = NULL;
@@ -688,7 +687,6 @@ vfork ()
 #ifndef NEWVFORK
   return fork ();
 #else
-  sigframe thisframe;
   vfork_save *vf = get_vfork_val ();
   char **esp, **pp;
 
@@ -697,12 +695,14 @@ vfork ()
   else if (vf->pid)
     return fork ();
 
+  // FIXME the tls stuff could introduce a signal race if a child process
+  // exits quickly.
   if (!setjmp (vf->j))
     {
       vf->pid = -1;
       __asm__ volatile ("movl %%esp,%0": "=r" (vf->vfork_esp):);
       __asm__ volatile ("movl %%ebp,%0": "=r" (vf->vfork_ebp):);
-      for (pp = (char **)vf->frame, esp = vf->vfork_esp;
+      for (pp = (char **) vf->frame, esp = vf->vfork_esp;
 	   esp <= vf->vfork_ebp + 2; pp++, esp++)
 	*pp = *esp;
       vf->ctty = myself->ctty;
@@ -710,16 +710,17 @@ vfork ()
       vf->pgid = myself->pgid;
       int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
       debug_printf ("%d = vfork()", res);
+      call_signal_handler_now (); // FIXME: racy
+      vf->tls = _my_tls;
       return res;
     }
 
   vf = get_vfork_val ();
 
-  for (pp = (char **)vf->frame, esp = vf->vfork_esp;
+  for (pp = (char **) vf->frame, esp = vf->vfork_esp;
        esp <= vf->vfork_ebp + 2; pp++, esp++)
     *esp = *pp;
 
-  thisframe.init (mainthread);
   cygheap->fdtab.vfork_parent_restore ();
 
   myself->ctty = vf->ctty;
@@ -738,6 +739,9 @@ vfork ()
   vf->pid = 0;
   debug_printf ("exiting vfork, pid %d", pid);
   sig_dispatch_pending ();
+
+  call_signal_handler_now (); // FIXME: racy
+  _my_tls = vf->tls;
   return pid;
 #endif
 }

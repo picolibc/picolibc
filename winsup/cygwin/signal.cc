@@ -15,9 +15,11 @@ details. */
 #include <stdlib.h>
 #include "cygerrno.h"
 #include <sys/cygwin.h>
-#include "sigproc.h"
 #include "pinfo.h"
+#include "sigproc.h"
 #include "hires.h"
+#include "security.h"
+#include "cygtls.h"
 
 int sigcatchers;	/* FIXME: Not thread safe. */
 
@@ -71,7 +73,6 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
 {
   int res = 0;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   pthread_testcancel ();
 
   if ((unsigned int) rqtp->tv_sec > (HIRES_DELAY_MAX / 1000 - 1)
@@ -92,7 +93,7 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
     rem = 0;
   if (rc == WAIT_OBJECT_0)
     {
-      (void) thisframe.call_signal_handler ();
+      (void) call_signal_handler_now ();
       set_errno (EINTR);
       res = -1;
     }
@@ -130,20 +131,33 @@ usleep (unsigned int useconds)
 extern "C" int
 sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
 {
+  return handle_sigprocmask (sig, set, oldset, myself->getsigmask ());
+}
+
+int __stdcall
+handle_sigprocmask (int sig, const sigset_t *set, sigset_t *oldset, sigset_t& opmask)
+{
   sig_dispatch_pending ();
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
     {
-      set_errno (EINVAL);
+      set_errno (ESRCH);
       syscall_printf ("SIG_ERR = sigprocmask signal %d out of range", sig);
       return -1;
     }
 
   if (oldset)
-    *oldset = myself->getsigmask ();
+    {
+      if (check_null_invalid_struct_errno (oldset))
+	return -1;
+      *oldset = opmask;
+    }
+
   if (set)
     {
-      sigset_t newmask = myself->getsigmask ();
+      if (check_invalid_read_struct_errno (set))
+	return -1;
+      sigset_t newmask = opmask;
       switch (sig)
 	{
 	case SIG_BLOCK:
@@ -162,7 +176,7 @@ sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
 	  set_errno (EINVAL);
 	  return -1;
 	}
-      (void) set_process_mask (newmask);
+      (void) set_signal_mask (newmask, opmask);
     }
   return 0;
 }
@@ -185,10 +199,7 @@ kill_worker (pid_t pid, int sig)
   if ((sendSIGCONT = (sig < 0)))
     sig = -sig;
 
-#if 0
-  if (dest == myself && !sendSIGCONT)
-    dest = myself_nowait_nonmain;
-#endif
+  DWORD process_state = dest->process_state;
   if (sig == 0)
     {
       res = proc_exists (dest) ? 0 : -1;
@@ -203,7 +214,7 @@ kill_worker (pid_t pid, int sig)
   else if (sendSIGCONT)
     (void) sig_send (dest, SIGCONT);
 
-  syscall_printf ("%d = kill_worker (%d, %d)", res, pid, sig);
+  syscall_printf ("%d = kill_worker (%d, %d), process_state %p", res, pid, sig, process_state);
   return res;
 }
 
@@ -216,7 +227,6 @@ raise (int sig)
 int
 kill (pid_t pid, int sig)
 {
-  sigframe thisframe (mainthread);
   syscall_printf ("kill (%d, %d)", pid, sig);
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
@@ -241,7 +251,6 @@ kill_pgrp (pid_t pid, int sig)
   int res = 0;
   int found = 0;
   int killself = 0;
-  sigframe thisframe (mainthread);
 
   sigproc_printf ("pid %d, signal %d", pid, sig);
 
@@ -289,7 +298,6 @@ extern "C" void
 abort (void)
 {
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   /* Flush all streams as per SUSv2.
      From my reading of this document, this isn't strictly correct.
      The streams are supposed to be flushed prior to exit.  However,
@@ -304,10 +312,10 @@ abort (void)
   sigset_t sig_mask;
   sigfillset (&sig_mask);
   sigdelset (&sig_mask, SIGABRT);
-  set_process_mask (sig_mask);
+  set_signal_mask (sig_mask);
 
   raise (SIGABRT);
-  (void) thisframe.call_signal_handler (); /* Call any signal handler */
+  (void) call_signal_handler_now (); /* Call any signal handler */
   do_exit (1);	/* signal handler didn't exit.  Goodbye. */
 }
 
@@ -436,11 +444,38 @@ extern "C" int
 siginterrupt (int sig, int flag)
 {
   struct sigaction act;
-  (void)sigaction(sig, NULL, &act);
+  (void) sigaction(sig, NULL, &act);
   if (flag)
     act.sa_flags &= ~SA_RESTART;
   else
     act.sa_flags |= SA_RESTART;
-  return sigaction(sig, &act, NULL);
+  return sigaction (sig, &act, NULL);
 }
 
+
+extern "C" int
+sigwait (const sigset_t *set, int *sig)
+{
+  pthread_testcancel ();
+  _my_tls.event = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+  if (!_my_tls.event)
+    {
+      __seterrno ();
+      return -1;
+    }
+
+  _my_tls.sigwait_mask = *set;
+
+  switch (WaitForSingleObject (_my_tls.event, INFINITE))
+    {
+    case WAIT_OBJECT_0:
+      CloseHandle (_my_tls.event);
+      _my_tls.event = NULL;
+      *sig = InterlockedExchange ((LONG *) &_my_tls.sig, (LONG) 0);
+      break;
+    default:
+      __seterrno ();
+      return -1;
+    }
+  return 0;
+}

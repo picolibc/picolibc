@@ -82,7 +82,6 @@ extern "C" int
 semctl (int semid, int semnum, int cmd, ...)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   union semun arg = {0};
   if (cmd == IPC_STAT || cmd == IPC_SET || cmd == IPC_INFO || cmd == SEM_INFO
       || cmd == GETALL || cmd == SETALL || cmd == SETVAL)
@@ -132,7 +131,6 @@ extern "C" int
 semget (key_t key, int nsems, int semflg)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   syscall_printf ("semget (key = %U, nsems = %d, semflg = 0x%x)",
 		  key, nsems, semflg);
   client_request_sem request (key, nsems, semflg);
@@ -156,7 +154,6 @@ extern "C" int
 semop (int semid, struct sembuf *sops, size_t nsops)
 {
 #ifdef USE_SERVER
-  sigframe thisframe (mainthread);
   syscall_printf ("semop (semid = %d, sops = %p, nsops = %d)",
 		  semid, sops, nsops);
   if (__check_null_invalid_struct_errno (sops, nsops * sizeof (struct sembuf)))

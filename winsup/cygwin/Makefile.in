@@ -51,10 +51,10 @@ DEFS:=@DEFS@
 CC:=@CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET:=$(CC)
-CFLAGS=@CFLAGS@
+CFLAGS=@CFLAGS@ -fmerge-constants -ftracer
 override CFLAGS+=-MMD ${$(*F)_CFLAGS}
 CXX=@CXX@
-CXXFLAGS=@CXXFLAGS@
+CXXFLAGS=@CXXFLAGS@ -fmerge-constants
 
 AR:=@AR@
 AR_FLAGS:=qv
@@ -117,6 +117,7 @@ DLL_IMPORTS:=$(w32api_lib)/libkernel32.a
 
 MT_SAFE_OBJECTS:=
 # Please maintain this list in sorted order, with maximum files per 80 col line
+#
 DLL_OFILES:=assert.o autoload.o bsdlib.o cxx.o cygheap.o cygthread.o dcrt0.o \
 	debug.o delqueue.o devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o \
 	errno.o exceptions.o exec.o external.o fcntl.o fhandler.o \
@@ -131,10 +132,10 @@ DLL_OFILES:=assert.o autoload.o bsdlib.o cxx.o cygheap.o cygthread.o dcrt0.o \
 	mmap.o msg.o net.o netdb.o ntea.o passwd.o path.o pinfo.o pipe.o \
 	poll.o pthread.o regcomp.o regerror.o regexec.o regfree.o registry.o \
 	resource.o scandir.o sched.o sec_acl.o sec_helper.o security.o \
-	select.o sem.o shared.o shm.o signal.o sigproc.o smallprint.o spawn.o \
-	strace.o strsep.o sync.o syscalls.o sysconf.o syslog.o termios.o \
-	thread.o times.o tty.o uinfo.o uname.o v8_regexp.o v8_regerror.o \
-	v8_regsub.o wait.o wincap.o window.o \
+	select.o sem.o shared.o shm.o sigfe.o signal.o sigproc.o smallprint.o \
+	spawn.o strace.o strsep.o sync.o syscalls.o sysconf.o syslog.o \
+	termios.o thread.o times.o tty.o uinfo.o uname.o v8_regexp.o \
+	v8_regerror.o v8_regsub.o wait.o wincap.o window.o \
 	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
 
 GMON_OFILES:=gmon.o mcount.o profil.o
@@ -305,7 +306,6 @@ install_target:
 
 install_host:
 
-
 uninstall-libs: $(TARGET_LIBS)
 	rm -f $(bindir)/$(DLL_NAME); \
 	for i in $^; do \
@@ -346,7 +346,7 @@ maintainer-clean realclean: clean
 
 
 # Rule to build cygwin.dll
-$(TEST_DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
+$(TEST_DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DLL_IMPORTS) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
 	$(CXX) $(CXXFLAGS) $(nostdlib) -Wl,-T$(firstword $^) -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(MALLOC_OBJ) $(LIBSERVER) $(LIBM) $(LIBC) \
@@ -376,7 +376,7 @@ $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
 
 $(API_VER): $(srcdir)/cygwin.din
 	@echo Error: Version info is older than DLL API!
-	@false
+#	@false
 
 version.cc winver.o: winver_stamp
 	@ :
@@ -422,8 +422,17 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 
 Makefile: cygwin.din
 
-$(DEF_FILE): cygwin.din config.status
-	$(SHELL) config.status
+$(DEF_FILE): gendef cygwin.din $(srcdir)/tlsoffsets.h
+	$^ $@ sigfe.s
+
+$(srcdir)/tlsoffsets.h: gentls_offsets cygtls.h
+	$^ $@ $(COMPILE_CXX)
+
+sigfe.s: $(DEF_FILE)
+	@touch $@
+
+sigfe.o: sigfe.s
+	$(CC) -c -o $@ $?
 
 winsup.h: config.h
 

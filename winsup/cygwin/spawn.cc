@@ -351,7 +351,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 {
   BOOL rc;
   pid_t cygpid;
-  sigframe thisframe (mainthread);
 
   MALLOC_CHECK;
 
@@ -987,9 +986,11 @@ spawnve (int mode, const char *path, const char *const *argv,
       ret = spawn_guts (path, argv, envp, mode);
       if (vf)
 	{
-	  debug_printf ("longjmping due to vfork");
 	  if (ret > 0)
-	    vf->restore_pid (ret);
+	    {
+	      debug_printf ("longjmping due to vfork");
+	      vf->restore_pid (ret);
+	    }
 	}
       break;
     default:

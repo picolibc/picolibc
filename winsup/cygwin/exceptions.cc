@@ -12,19 +12,20 @@ details. */
 #include <imagehlp.h>
 #include <stdlib.h>
 #include <setjmp.h>
-#include <wingdi.h>
-#include <winuser.h>
+#include <assert.h>
 
 #include "exceptions.h"
 #include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
+#include "cygtls.h"
+#include "sigproc.h"
 #include "cygerrno.h"
 #define NEED_VFORK
 #include "perthread.h"
 #include "shared_info.h"
 #include "perprocess.h"
 #include "security.h"
+#include "cygthread.h"
 
 #define CALL_HANDLER_RETRY 20
 
@@ -32,12 +33,12 @@ char debugger_command[2 * CYG_MAX_PATH + 20];
 
 extern "C" {
 static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
-extern void sigreturn ();
 extern void sigdelayed ();
-extern void sigdelayed0 ();
-extern void siglast ();
-extern DWORD __no_sig_start, __no_sig_end;
 };
+
+_threadinfo NO_COPY dummy_thread;
+_threadinfo NO_COPY *_last_thread = &dummy_thread;
+extern _threadinfo *_main_tls;
 
 extern DWORD sigtid;
 
@@ -53,8 +54,6 @@ static size_t windows_system_directory_length;
 
 static NO_COPY int exit_already = 0;
 static NO_COPY muto *mask_sync = NULL;
-
-HMODULE NO_COPY cygwin_hmodule;
 
 NO_COPY static struct
 {
@@ -97,8 +96,6 @@ NO_COPY static struct
 
 /* Initialization code.  */
 
-#ifdef __i386__
-
 // Set up the exception handler for the current thread.  The PowerPC & Mips
 // use compiler generated tables to set up the exception handlers for each
 // region of code, and the kernel walks the call list until it finds a region
@@ -116,7 +113,6 @@ init_exception_handler (exception_list *el)
   el->prev = _except_list;
   _except_list = el;
 }
-#endif
 
 void
 init_console_handler ()
@@ -130,6 +126,74 @@ extern "C" void
 init_exceptions (exception_list *el)
 {
   init_exception_handler (el);
+}
+
+void
+_threadinfo::set_state (bool is_exception)
+{
+  initialized = CYGTLS_INITIALIZED + is_exception;
+}
+
+void
+_threadinfo::reset_exception ()
+{
+  if (initialized == CYGTLS_EXCEPTION)
+    {
+#ifdef DEBUGGING
+      debug_printf ("resetting stack after an exception stack %p, stackptr %p", stack, stackptr);
+#endif
+      set_state (false);
+      stackptr--;
+    }
+}
+
+_threadinfo *
+_threadinfo::init (void *, void *thread)
+{
+  memset (this, 0, sizeof (*this));
+  stackptr = stack;
+  prev = _last_thread;
+  _last_thread->next = this;
+  _last_thread = this;
+  set_state (false);
+  errno_addr = &errno;
+  return this;
+}
+
+void
+_threadinfo::remove ()
+{
+  _threadinfo *t;
+  for (t = _last_thread; t && t != this; t = t->prev)
+    continue;
+  if (!t)
+    return;
+  t->prev->next = t->next;
+  if (t->next)
+    t->next->prev = t->prev;
+  if (t == _last_thread)
+    _last_thread = t->prev;
+}
+
+void
+_threadinfo::push (__stack_t addr, bool exception)
+{
+  *stackptr++ = (__stack_t) addr;
+  set_state (exception);
+}
+
+__stack_t
+_threadinfo::pop ()
+{
+#ifdef DEBUGGING
+  assert (stackptr > stack);
+#endif
+  __stack_t res = *--stackptr;
+#ifndef DEBUGGING
+  _my_tls.stackptr = 0;
+  debug_printf ("popped %p, stack %p, stackptr %p", res, stack, stackptr);
+#endif
+  return res;
 }
 
 extern "C" void
@@ -241,7 +305,6 @@ public:
 
 /* This is the main stack frame info for this process. */
 static NO_COPY stack_info thestack;
-static signal_dispatch sigsave;
 
 /* Initialize everything needed to start iterating. */
 void
@@ -392,22 +455,19 @@ try_to_debug (bool waitloop)
 	Sleep (0);
       Sleep (2000);
       small_printf ("*** continuing from debugger call\n");
-      SetThreadPriority (GetCurrentThread (), prio);
     }
 
-  /* FIXME: need to know handles of all running threads to
-    resume_all_threads_except (current_thread_id);
-  */
+  SetThreadPriority (GetCurrentThread (), prio);
   return 0;
 }
 
 /* Main exception handler. */
 
+extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
 static int
-handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
+handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 {
-  int sig;
-  static int NO_COPY debugging = 0;
+  static bool NO_COPY debugging = false;
   static int NO_COPY recursed = 0;
 
   if (debugging && ++debugging < 500000)
@@ -421,8 +481,16 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
   if (exit_already)
     return 1;
 
+  EXCEPTION_RECORD e = *e0;
+  CONTEXT in = *in0;
+
+  extern DWORD ret_here[];
+  RtlUnwind (frame, ret_here, e0, 0);
+  __asm__ volatile (".equ _ret_here,.");
+
+  int sig;
   /* Coerce win32 value to posix value.  */
-  switch (e->ExceptionCode)
+  switch (e.ExceptionCode)
     {
     case STATUS_FLOAT_DENORMAL_OPERAND:
     case STATUS_FLOAT_DIVIDE_BY_ZERO:
@@ -476,8 +544,8 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
       return 1;
     }
 
-  debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
-  debug_printf ("In cygwin_except_handler sig = %d at %p", sig, in->Eip);
+  debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e.ExceptionCode, in.Eip, in.Esp);
+  debug_printf ("In cygwin_except_handler sig = %d at %p", sig, in.Eip);
 
   if (myself->getsig (sig).sa_mask & SIGTOMASK (sig))
     syscall_printf ("signal %d, masked %p", sig, myself->getsig (sig).sa_mask);
@@ -485,9 +553,9 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
   debug_printf ("In cygwin_except_handler calling %p",
 		 myself->getsig (sig).sa_handler);
 
-  DWORD *ebp = (DWORD *)in->Esp;
+  DWORD *ebp = (DWORD *)in.Esp;
   for (DWORD *bpend = (DWORD *) __builtin_frame_address (0); ebp > bpend; ebp--)
-    if (*ebp == in->SegCs && ebp[-1] == in->Eip)
+    if (*ebp == in.SegCs && ebp[-1] == in.Eip)
       {
 	ebp -= 2;
 	break;
@@ -500,11 +568,11 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
       || (void *) myself->getsig (sig).sa_handler == (void *) SIG_ERR)
     {
       /* Print the exception to the console */
-      if (e)
+      if (1)
 	{
 	  for (int i = 0; status_info[i].name; i++)
 	    {
-	      if (status_info[i].code == e->ExceptionCode)
+	      if (status_info[i].code == e.ExceptionCode)
 		{
 		  if (!myself->ppid_handle)
 		    system_printf ("Exception: %s", status_info[i].name);
@@ -521,20 +589,21 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 	{
 	  if (try_to_debug (0))
 	    {
-	      debugging = 1;
+	      debugging = true;
 	      return 0;
 	    }
 
 	  open_stackdumpfile ();
-	  exception (e, in);
+	  exception (&e, &in);
 	  stackdump ((DWORD) ebp, 0, 1);
 	}
 
       signal_exit (0x80 | sig);	// Flag signal + core dump
     }
 
-  sig_send (NULL, sig, (DWORD) ebp, 1);		// Signal myself
-  return 0;
+  _my_tls.push ((__stack_t) ebp, true);
+  sig_send (NULL, sig, &_my_tls);	// Signal myself
+  return 1;
 }
 #endif /* __i386__ */
 
@@ -564,10 +633,9 @@ int __stdcall
 handle_sigsuspend (sigset_t tempmask)
 {
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 
-  set_process_mask (tempmask & ~SIG_NONMASKABLE);// Let signals we're
+  set_signal_mask (tempmask & ~SIG_NONMASKABLE);// Let signals we're
 				//  interested in through.
   sigproc_printf ("old mask %x, new mask %x", oldmask, tempmask);
 
@@ -580,7 +648,7 @@ handle_sigsuspend (sigset_t tempmask)
      be hit eventually.  Set the old mask to be restored when the signal
      handler returns. */
 
-  sigsave.oldmask = oldmask;	// Will be restored by signal handler
+  _my_tls.oldmask = oldmask;	// Will be restored by signal handler
   return -1;
 }
 
@@ -617,7 +685,7 @@ sig_handle_tty_stop (int sig)
 }
 
 int
-interruptible (DWORD pc, int testvalid = 0)
+interruptible (DWORD pc)
 {
   int res;
   MEMORY_BASIC_INFORMATION m;
@@ -635,75 +703,47 @@ interruptible (DWORD pc, int testvalid = 0)
      These should *never* be treated as interruptible. */
   if (!h || m.State != MEM_COMMIT)
     res = 0;
-  else if (testvalid)
-    res = 1;	/* All we wanted to know was if this was a valid module. */
   else if (h == user_data->hmodule)
     res = 1;
-  else if (h == cygwin_hmodule)
-    res = 0;
   else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
     res = 0;
   else
     res = !strncasematch (windows_system_directory, checkdir,
 			  windows_system_directory_length);
-  sigproc_printf ("pc %p, h %p, interruptible %d, testvalid %d", pc, h, res, testvalid);
+  sigproc_printf ("pc %p, h %p, interruptible %d", pc, h, res);
 # undef h
   return res;
 }
-
-bool
-sigthread::get_winapi_lock (int test)
+void __stdcall
+_threadinfo::interrupt_setup (int sig, void *handler,
+			      struct sigaction& siga, __stack_t retaddr)
 {
-  if (test)
-    return !InterlockedExchange (&winapi_lock, 1);
-
-  /* Need to do a busy loop because we can't block or a potential SuspendThread
-     will hang. */
-  while (InterlockedExchange (&winapi_lock, 1))
-    low_priority_sleep (0);
-  return 1;
-}
-
-void
-sigthread::release_winapi_lock ()
-{
-  /* Assumes that we have the lock. */
-  InterlockedExchange (&winapi_lock, 0);
-}
-
-static void __stdcall interrupt_setup (int sig, void *handler, DWORD retaddr,
-				       DWORD *retaddr_on_stack,
-				       struct sigaction& siga)
-		      __attribute__((regparm(3)));
-static void __stdcall
-interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
-		 struct sigaction& siga)
-{
-  sigsave.retaddr = retaddr;
-  sigsave.retaddr_on_stack = retaddr_on_stack;
-  /* FIXME: Not multi-thread aware */
-  sigsave.oldmask = myself->getsigmask ();
-  sigsave.newmask = sigsave.oldmask | siga.sa_mask | SIGTOMASK (sig);
-  sigsave.sa_flags = siga.sa_flags;
-  sigsave.func = (void (*)(int)) handler;
-  sigsave.saved_errno = -1;		// Flag: no errno to save
+  __stack_t *retaddr_in_tls = stackptr - 1;
+  push ((__stack_t) sigdelayed);
+  oldmask = myself->getsigmask ();
+  newmask = oldmask | siga.sa_mask | SIGTOMASK (sig);
+  sa_flags = siga.sa_flags;
+  func = (void (*) (int)) handler;
+  saved_errno = -1;		// Flag: no errno to save
   if (handler == sig_handle_tty_stop)
     {
       myself->stopsig = 0;
       myself->process_state |= PID_STOPPED;
     }
+  this->sig = sig;			// Should ALWAYS be second to last setting set to avoid a race
+  *retaddr_in_tls = retaddr;
   /* Clear any waiting threads prior to dispatching to handler function */
-  proc_subproc (PROC_CLEARWAIT, 1);
   int res = SetEvent (signal_arrived);	// For an EINTR case
-  sigsave.sig = sig;			// Should ALWAYS be last thing set to avoid a race
+  proc_subproc (PROC_CLEARWAIT, 1);
   sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
 }
 
-static bool interrupt_now (CONTEXT *, int, void *, struct sigaction&) __attribute__((regparm(3)));
-static bool
-interrupt_now (CONTEXT *ctx, int sig, void *handler, struct sigaction& siga)
+bool
+_threadinfo::interrupt_now (CONTEXT *ctx, int sig, void *handler,
+			    struct sigaction& siga)
 {
-  interrupt_setup (sig, handler, ctx->Eip, 0, siga);
+  push (0);
+  interrupt_setup (sig, handler, siga, (__stack_t) ctx->Eip);
   ctx->Eip = (DWORD) sigdelayed;
   SetThreadContext (myself->getthread2signal (), ctx); /* Restart the thread in a new location */
   return 1;
@@ -712,167 +752,112 @@ interrupt_now (CONTEXT *ctx, int sig, void *handler, struct sigaction& siga)
 void __stdcall
 signal_fixup_after_fork ()
 {
-  if (sigsave.sig)
+  if (_my_tls.sig)
     {
-      sigsave.sig = 0;
-      if (sigsave.retaddr_on_stack)
-	{
-	  *sigsave.retaddr_on_stack = sigsave.retaddr;
-	  set_process_mask (sigsave.oldmask);
-	}
+      _my_tls.sig = 0;
+      _my_tls.stackptr = _my_tls.stack + 1;	// FIXME?
+      set_signal_mask (_my_tls.oldmask);
     }
   sigproc_init ();
-}
-
-static int interrupt_on_return (sigthread *, int, void *, struct sigaction&) __attribute__((regparm(3)));
-static int
-interrupt_on_return (sigthread *th, int sig, void *handler, struct sigaction& siga)
-{
-  int i;
-  DWORD ebp = th->frame;
-
-  if (!ebp)
-    return 0;
-
-  thestack.init (ebp, 0, 1);  /* Initialize from the input CONTEXT */
-  for (i = 0; i < 32 && thestack++ ; i++)
-    if (th->exception || interruptible (thestack.sf.AddrReturn.Offset))
-      {
-	DWORD *addr_retaddr = ((DWORD *)thestack.sf.AddrFrame.Offset) + 1;
-	if (*addr_retaddr  == thestack.sf.AddrReturn.Offset)
-	  {
-	    interrupt_setup (sig, handler, *addr_retaddr, addr_retaddr, siga);
-	    *addr_retaddr = (DWORD) sigdelayed;
-	  }
-	return 1;
-      }
-
-  sigproc_printf ("couldn't find a stack frame, i %d", i);
-  return 0;
 }
 
 extern "C" void __stdcall
 set_sig_errno (int e)
 {
   set_errno (e);
-  sigsave.saved_errno = e;
+  _my_tls.saved_errno = e;
   // sigproc_printf ("errno %d", e);
 }
 
-static int setup_handler (int, void *, struct sigaction&) __attribute__((regparm(3)));
+static int setup_handler (int, void *, struct sigaction&, _threadinfo *tls)
+  __attribute__((regparm(3)));
 static int
-setup_handler (int sig, void *handler, struct sigaction& siga)
+setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
 {
   CONTEXT cx;
   bool interrupted = false;
-  sigthread *th = NULL;		// Initialization needed to shut up gcc
 
-  if (sigsave.sig)
+  if (tls->sig)
     goto out;
 
   for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
-      DWORD res;
-      HANDLE hth;
-
-      EnterCriticalSection (&mainthread.lock);
-      if (mainthread.frame)
+      __stack_t retaddr;
+      __stack_t *retaddr_on_stack = tls->stackptr - 1;
+#ifdef DEBUGGING
+      if (tls->stackptr > (tls->stack + 1))
+	try_to_debug ();
+#endif
+      if (retaddr_on_stack >= tls->stack
+	  && (retaddr = InterlockedExchange ((LONG *) retaddr_on_stack, 0)))
 	{
-	  hth = NULL;
-	  th = &mainthread;
-	}
-      else
-	{
-	  LeaveCriticalSection (&mainthread.lock);
-
-	  if (!mainthread.get_winapi_lock (1))
+	  if (!retaddr)
 	    continue;
+	  tls->reset_exception ();
+	  tls->interrupt_setup (sig, handler, siga, retaddr);
+	  sigproc_printf ("interrupted known cygwin routine");
+	  interrupted = true;
+	  break;
+	}
 
-	  hth = myself->getthread2signal ();
-	  th = NULL;
+      DWORD res;
+      HANDLE hth = myself->getthread2signal ();
 
-	  /* Suspend the thread which will receive the signal.  But first ensure that
-	     this thread doesn't have any mutos.  (FIXME: Someday we should just grab
-	     all of the mutos rather than checking for them)
-	     For Windows 95, we also have to ensure that the addresses returned by GetThreadContext
-	     are valid.
-	     If one of these conditions is not true we loop for a fixed number of times
-	     since we don't want to stall the signal handler.  FIXME: Will this result in
-	     noticeable delays?
-	     If the thread is already suspended (which can occur when a program has called
-	     SuspendThread on itself then just queue the signal. */
+      /* Suspend the thread which will receive the signal.  But first ensure that
+	 this thread doesn't have any mutos.  (FIXME: Someday we should just grab
+	 all of the mutos rather than checking for them)
+	 For Windows 95, we also have to ensure that the addresses returned by GetThreadContext
+	 are valid.
+	 If one of these conditions is not true we loop for a fixed number of times
+	 since we don't want to stall the signal handler.  FIXME: Will this result in
+	 noticeable delays?
+	 If the thread is already suspended (which can occur when a program has called
+	 SuspendThread on itself then just queue the signal. */
 
-	  EnterCriticalSection (&mainthread.lock);
 #ifndef DEBUGGING
-	  sigproc_printf ("suspending mainthread");
+      sigproc_printf ("suspending mainthread");
 #else
-	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-	  if (!GetThreadContext (hth, &cx))
-	    memset (&cx, 0, sizeof cx);
-#if 0
-	  if ((cx.Eip & 0xff000000) == 0x77000000)
-	    try_to_debug ();
+      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+      if (!GetThreadContext (hth, &cx))
+	memset (&cx, 0, sizeof cx);
+      sigproc_printf ("suspending mainthread PC %p", cx.Eip);
 #endif
-	  sigproc_printf ("suspending mainthread PC %p", cx.Eip);
-#endif
-	  res = SuspendThread (hth);
-	  /* Just release the lock now since we hav suspended the main thread and it
-	     definitely can't be grabbing it now.  This will have to change, of course,
-	     if/when we can send signals to other than the main thread. */
-	  LeaveCriticalSection (&mainthread.lock);
+      res = SuspendThread (hth);
+      /* Just release the lock now since we hav suspended the main thread and it
+	 definitely can't be grabbing it now.  This will have to change, of course,
+	 if/when we can send signals to other than the main thread. */
 
-	  /* Just set pending if thread is already suspended */
-	  if (res)
-	    {
-	      mainthread.release_winapi_lock ();
-	      (void) ResumeThread (hth);
-	      break;
-	    }
-
-	  mainthread.release_winapi_lock ();
-	  if (mainthread.frame)
-	    goto resume_thread;	/* We just got the frame.  What are the odds?
-				   Just loop and we'll hopefully pick it up on
-				   the next pass through. */
-
-	  muto *m;
-	  /* FIXME: Make multi-thread aware */
-	  for (m = muto_start.next;  m != NULL; m = m->next)
-	    if (m->unstable () || m->owner () == mainthread.id)
-	      {
-		sigproc_printf ("suspended thread owns a muto (%s)", m->name);
-		goto resume_thread;
-	      }
-
-	  if (mainthread.frame)
-	    th = &mainthread;
-	  else
-	    {
-	      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-	      if (!GetThreadContext (hth, &cx))
-		{
-		  system_printf ("couldn't get context of main thread, %E");
-		  goto resume_thread;
-		}
-	    }
-	}
-
-      if (th)
+      /* Just set pending if thread is already suspended */
+      if (res)
 	{
-	  interrupted = interrupt_on_return (th, sig, handler, siga);
-	  LeaveCriticalSection (&th->lock);
+	  (void) ResumeThread (hth);
+	  break;
 	}
+
+      // FIXME - add check for reentering of DLL here
+
+      muto *m;
+      /* FIXME: Make multi-thread aware */
+      for (m = muto_start.next;  m != NULL; m = m->next)
+	if (m->unstable () || m->owner () == cygthread::main_thread_id)
+	  {
+	    sigproc_printf ("suspended thread owns a muto (%s)", m->name);
+	    goto resume_thread;
+	  }
+
+      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+      if (!GetThreadContext (hth, &cx))
+	system_printf ("couldn't get context of main thread, %E");
       else if (interruptible (cx.Eip))
-	interrupted = interrupt_now (&cx, sig, handler, siga);
+	interrupted = tls->interrupt_now (&cx, sig, handler, siga);
 
     resume_thread:
-      if (hth)
-	res = ResumeThread (hth);
+      res = ResumeThread (hth);
 
       if (interrupted)
 	break;
-
       sigproc_printf ("couldn't interrupt.  trying again.");
+      low_priority_sleep (0);
     }
 
 out:
@@ -921,7 +906,7 @@ ctrl_c_handler (DWORD type)
 	     window station, one which actually represents a visible desktop.
 	     If not, the CTRL_LOGOFF_EVENT doesn't concern this process. */
 	  if (has_visible_window_station ())
-	    sig_send (NULL, SIGHUP);
+	    sig_send (myself_nowait, SIGHUP);
 	  return FALSE;
 	}
     }
@@ -954,14 +939,19 @@ ctrl_c_handler (DWORD type)
   return TRUE;
 }
 
-/* Set the signal mask for this process.
-   Note that some signals are unmaskable, as in UNIX.  */
+/* Function used by low level sig wrappers. */
 extern "C" void __stdcall
 set_process_mask (sigset_t newmask)
 {
-  sigframe thisframe (mainthread);
+  set_signal_mask (newmask);
+}
+
+/* Set the signal mask for this process.
+   Note that some signals are unmaskable, as in UNIX.  */
+extern "C" void __stdcall
+set_signal_mask (sigset_t newmask, sigset_t& oldmask)
+{
   mask_sync->acquire (INFINITE);
-  sigset_t oldmask = myself->getsigmask ();
   newmask &= ~SIG_NONMASKABLE;
   sigproc_printf ("old mask = %x, new mask = %x", myself->getsigmask (), newmask);
   myself->setsigmask (newmask);	// Set a new mask
@@ -969,13 +959,21 @@ set_process_mask (sigset_t newmask)
   if (oldmask & ~newmask)
     sig_dispatch_pending ();
   else
-    sigproc_printf ("not calling sig_dispatch_pending.  sigtid %p current %p",
-		    sigtid, GetCurrentThreadId ());
+    sigproc_printf ("not calling sig_dispatch_pending");
   return;
 }
 
+_threadinfo *
+find_tls (int sig)
+{
+  for (_threadinfo *t = _last_thread; t ; t = t->prev)
+    if (sigismember (&t->sigwait_mask, sig))
+      return t;
+  return NULL;
+}
+
 int __stdcall
-sig_handle (int sig, sigset_t mask)
+sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
 {
   if (sig == SIGCONT)
     {
@@ -991,25 +989,32 @@ sig_handle (int sig, sigset_t mask)
 	SetEvent (sigCONT);
     }
 
+  int rc = 1;
+  bool insigwait_mask = tls ? sigismember (&tls->sigwait_mask, sig) : false;
   if (sig != SIGKILL && sig != SIGSTOP
-      && (sigismember (&mask, sig) || main_vfork->pid
+      && (sigismember (&mask, sig)
+	  || (tls
+	      && (insigwait_mask || sigismember (&tls->sigmask, sig)))
+	  || main_vfork->pid
 	  || ISSTATE (myself, PID_STOPPED)))
     {
       sigproc_printf ("signal %d blocked", sig);
-      return -1;
+      if (insigwait_mask || (tls = find_tls (sig)) != NULL)
+	goto thread_specific;
+      rc = -1;
+      goto done;
     }
-
-  int rc = 1;
-
-  sigproc_printf ("signal %d processing", sig);
-  struct sigaction thissig = myself->getsig (sig);
-  void *handler = (void *) thissig.sa_handler;
-
-  myself->rusage_self.ru_nsignals++;
 
   /* Clear pending SIGCONT on stop signals */
   if (sig == SIGSTOP || sig == SIGTSTP || sig == SIGTTIN || sig == SIGTTOU)
     sig_clear (SIGCONT);
+
+  sigproc_printf ("signal %d processing", sig);
+  struct sigaction thissig = myself->getsig (sig);
+  void *handler;
+  handler = (void *) thissig.sa_handler;
+
+  myself->rusage_self.ru_nsignals++;
 
   if (sig == SIGKILL)
     goto exit_sig;
@@ -1025,6 +1030,8 @@ sig_handle (int sig, sigset_t mask)
 
   if (handler == (void *) SIG_DFL)
     {
+      if (insigwait_mask)
+	goto thread_specific;
       if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
 	  || sig == SIGURG)
 	{
@@ -1059,11 +1066,17 @@ stop:
 dosig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", sig, handler);
-  rc = setup_handler (sig, handler, thissig);
+  rc = setup_handler (sig, handler, thissig, tls ?: _main_tls);
 
 done:
   sigproc_printf ("returning %d", rc);
   return rc;
+
+thread_specific:
+  tls->sig = sig;
+  sigproc_printf ("releasing sigwait for thread");
+  SetEvent (tls->event);
+  goto done;
 
 exit_sig:
   if (sig == SIGQUIT || sig == SIGABRT)
@@ -1102,7 +1115,7 @@ signal_exit (int rc)
   /* Unlock any main thread mutos since we're executing with prejudice. */
   muto *m;
   for (m = muto_start.next;  m != NULL; m = m->next)
-    if (m->unstable () || m->owner () == mainthread.id)
+    if (m->unstable () || m->owner () == cygthread::main_thread_id)
       m->reset ();
 
   user_data->resourcelocks->Delete ();
@@ -1149,7 +1162,6 @@ events_init (void)
   windows_system_directory_length = end - windows_system_directory;
   debug_printf ("windows_system_directory '%s', windows_system_directory_length %d",
 		windows_system_directory, windows_system_directory_length);
-  debug_printf ("cygwin_hmodule %p", cygwin_hmodule);
   InitializeCriticalSection (&exit_lock);
 }
 
@@ -1160,114 +1172,39 @@ events_terminate (void)
 }
 
 extern "C" {
-static int __stdcall
+int __stdcall
 call_signal_handler_now ()
 {
-  if (!sigsave.sig)
+  int sa_flags = 0;
+  while (_my_tls.sig && _my_tls.stackptr > _my_tls.stack)
     {
-      sigproc_printf ("call_signal_handler_now called when no signal active");
-      return 0;
+      sa_flags = _my_tls.sa_flags;
+      int sig = _my_tls.sig;
+      void (*sigfunc) (int) = _my_tls.func;
+      (void) _my_tls.pop ();
+#ifdef DEBUGGING
+      if (_my_tls.stackptr > (_my_tls.stack + 1))
+	try_to_debug ();
+#endif
+      reset_signal_arrived ();
+      sigset_t oldmask = _my_tls.oldmask;
+      int this_errno = _my_tls.saved_errno;
+      set_process_mask (_my_tls.newmask);
+      _my_tls.sig = 0;
+      sigfunc (sig);
+      set_process_mask (oldmask);
+      if (this_errno >= 0)
+	set_errno (this_errno);
     }
 
-  int sa_flags = sigsave.sa_flags;
-  sigproc_printf ("sa_flags %p", sa_flags);
-  *sigsave.retaddr_on_stack = sigsave.retaddr;
-  sigdelayed0 ();
   return sa_flags & SA_RESTART;
-}
-/* This kludge seems to keep a copy of call_signal_handler_now around
-   even when compiling with -finline-functions. */
-static int __stdcall call_signal_handler_now_dummy ()
-  __attribute__((alias ("call_signal_handler_now")));
-};
-
-int
-sigframe::call_signal_handler ()
-{
-  return unregister () ? call_signal_handler_now () : 0;
 }
 
 #define pid_offset (unsigned)(((_pinfo *)NULL)->pid)
-extern "C" {
 void __stdcall
 reset_signal_arrived ()
 {
   (void) ResetEvent (signal_arrived);
   sigproc_printf ("reset signal_arrived");
-}
-
-#undef errno
-#define errno ((DWORD volatile) _impure_ptr) + (((char *) &_impure_ptr->_errno) - ((char *) _impure_ptr))
-
-__attribute__((const, used, noinline)) static void
-unused_sig_wrapper ()
-{
-/* Signal cleanup stuff.  Cleans up stack (too bad that we didn't
-   prototype signal handlers as __stdcall), calls _set_process_mask
-   to restore any mask, restores any potentially clobbered registers
-   and returns to original caller. */
-__asm__ volatile ("\n\
-	.text								\n\
-_sigreturn:								\n\
-	addl	$4,%%esp	# Remove argument			\n\
-	call	_set_process_mask@4					\n\
-									\n\
-	cmpl	$0,%4		# Did a signal come in?			\n\
-	jz	1f		# No, if zero				\n\
-	movl	%2,%%eax						\n\
-	movl	%8,%%ebx	# Where return address lives		\n\
-	movl	%%eax,(%%ebx)	# Restore return address of		\n\
-				# most recent caller			\n\
-	jmp	3f							\n\
-									\n\
-1:	popl	%%eax		# saved errno				\n\
-	testl	%%eax,%%eax	# Is it < 0				\n\
-	jl	2f		# yup.  ignore it			\n\
-	movl	%1,%%ebx						\n\
-	movl	%%eax,(%%ebx)						\n\
-2:	popl	%%eax							\n\
-	popl	%%ebx							\n\
-	popl	%%ecx							\n\
-	popl	%%edx							\n\
-	popl	%%edi							\n\
-	popl	%%esi							\n\
-	popf								\n\
-	popl	%%ebp							\n\
-	ret								\n\
-									\n\
-__no_sig_start:								\n\
-_sigdelayed:								\n\
-	pushl	%2			# original return address	\n\
-_sigdelayed0:								\n\
-	pushl	%%ebp							\n\
-	movl	%%esp,%%ebp						\n\
-	pushf								\n\
-	pushl	%%esi							\n\
-	pushl	%%edi							\n\
-	pushl	%%edx							\n\
-	pushl	%%ecx							\n\
-	pushl	%%ebx							\n\
-	pushl	%%eax							\n\
-	pushl	%6			# saved errno			\n\
-3:	pushl	%3			# oldmask			\n\
-	pushl	%4			# signal argument		\n\
-	pushl	$_sigreturn						\n\
-									\n\
-	call	_reset_signal_arrived@0					\n\
-	pushl	%5			# signal number			\n\
-	pushl	%7			# newmask			\n\
-									\n\
-	call	_set_process_mask@4					\n\
-	movl	$0,%0			# zero the signal number as a	\n\
-					# flag to the signal handler thread\n\
-					# that it is ok to set up sigsave\n\
-	popl	%%eax							\n\
-	jmp	*%%eax							\n\
-__no_sig_end:								\n\
-" : "=m" (sigsave.sig)/*0*/:  "X" ((char *) &_impure_ptr->_errno)/*1*/,
-  "g" (sigsave.retaddr)/*2*/, "g" (sigsave.oldmask)/*3*/, "g" (sigsave.sig)/*4*/,
-    "g" (sigsave.func)/*5*/, "g" (sigsave.saved_errno)/*6*/, "g" (sigsave.newmask)/*7*/,
-    "g" (sigsave.retaddr_on_stack)/*8*/
-);
 }
 }

@@ -20,6 +20,7 @@ details. */
 #include <sys/signal.h>
 #include "cygerrno.h"
 #include "sync.h"
+#include "cygtls.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "security.h"
@@ -37,10 +38,6 @@ details. */
  */
 #define WSSC		   60000 // Wait for signal completion
 #define WPSP		   40000 // Wait for proc_subproc mutex
-#define WSPX		   20000 // Wait for wait_sig to terminate
-#define WWSP		   20000 // Wait for wait_subproc to terminate
-
-#define TOTSIGS	(NSIG + __SIGOFFSET)
 
 #define wake_wait_subproc() SetEvent (events[0])
 
@@ -48,9 +45,11 @@ details. */
 
 #define NZOMBIES	256
 
-class sigelem
+struct sigelem
 {
   int sig;
+  int pid;
+  _threadinfo *tls;
   class sigelem *next;
   friend class pending_signals;
   friend int __stdcall sig_dispatch_pending ();
@@ -66,9 +65,9 @@ class pending_signals
   int empty;
 public:
   void reset () {curr = &start; prev = &start;}
-  void add (int sig);
+  void add (int sig, int pid, _threadinfo *tls);
   void del ();
-  int next ();
+  sigelem *next ();
   friend int __stdcall sig_dispatch_pending ();
 };
 
@@ -78,6 +77,7 @@ struct sigpacket
   pid_t pid;
   HANDLE wakeup;
   sigset_t *mask;
+  _threadinfo *tls;
 };
 
 static pending_signals sigqueue;
@@ -112,10 +112,6 @@ int __sp_ln;
 
 char NO_COPY myself_nowait_dummy[1] = {'0'};// Flag to sig_send that signal goes to
 					//  current process but no wait is required
-char NO_COPY myself_nowait_nonmain_dummy[1] = {'1'};// Flag to sig_send that signal goes to
-					//  current process but no wait is required
-					//  if this is the main thread.
-
 HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 					//  resulted in a user-specified
 					//  function call
@@ -244,7 +240,7 @@ get_proc_lock (DWORD what, DWORD val)
 static BOOL __stdcall
 proc_can_be_signalled (_pinfo *p)
 {
-  if (p == myself_nowait || p == myself_nowait_nonmain || p == myself)
+  if (p == myself_nowait || p == myself)
     {
       assert (!wait_sig_inited);
       return 1;
@@ -549,10 +545,10 @@ sig_clear (int target_sig)
     sig_send (myself, -target_sig);
   else
     {
-      int sig;
       sigqueue.reset ();
-      while ((sig = sigqueue.next ()))
-	if (sig == target_sig)
+      sigelem *q;
+      while ((q = sigqueue.next ()))
+	if (q->sig == target_sig)
 	  {
 	    sigqueue.del ();
 	    break;
@@ -578,9 +574,8 @@ sig_dispatch_pending ()
   if (exit_state || GetCurrentThreadId () == sigtid || !sigqueue.start.next)
     return 0;
 
-  sigframe thisframe (mainthread);
   (void) sig_send (myself, __SIGFLUSH);
-  return thisframe.call_signal_handler ();
+  return call_signal_handler_now ();
 }
 
 /* Message initialization.  Called from dll_crt0_1
@@ -654,18 +649,15 @@ sigproc_terminate (void)
  * completed before returning.
  */
 int __stdcall
-sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
+sig_send (_pinfo *p, int sig, void *tls)
 {
   int rc = 1;
-  DWORD tid = GetCurrentThreadId ();
   BOOL its_me;
   HANDLE sendsig;
-  bool wait_for_completion;
-  sigframe thisframe;
   sigpacket pack;
 
-  if (p == myself_nowait_nonmain)
-    p = (tid == mainthread.id) ? (_pinfo *) myself : myself_nowait;
+  bool wait_for_completion;
+  // FIXMENOW: Avoid using main thread's completion event!
   if (!(its_me = (p == NULL || p == myself || p == myself_nowait)))
     wait_for_completion = false;
   else
@@ -674,7 +666,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 	goto out;		// Either exiting or not yet initializing
       if (wait_sig_inited)
 	wait_for_sigthread ();
-      wait_for_completion = p != myself_nowait;
+      wait_for_completion = p != myself_nowait && _my_tls.isinitialized ();
       p = myself;
     }
 
@@ -695,11 +687,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
     {
       sendsig = myself->sendsig;
       if (wait_for_completion)
-	{
-	  if (tid == mainthread.id)
-	    thisframe.init (mainthread, ebp, exception);
-	  pack.wakeup = sigcomplete_main;
-	}
+	pack.wakeup = sigcomplete_main;
     }
   else
     {
@@ -735,6 +723,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 
   pack.sig = sig;
   pack.pid = myself->pid;
+  pack.tls = (_threadinfo *) tls;
   DWORD nb;
   if (!WriteFile (sendsig, &pack, sizeof (pack), &nb, NULL) || nb != sizeof (pack))
     {
@@ -790,7 +779,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
     }
 
   if (wait_for_completion)
-    thisframe.call_signal_handler ();
+    call_signal_handler_now ();
 
 out:
   if (sig != __SIGPENDING)
@@ -995,7 +984,7 @@ talktome ()
    has been handled, as per POSIX.  */
 
 void
-pending_signals::add (int sig)
+pending_signals::add (int sig, int pid, _threadinfo *tls)
 {
   sigelem *se;
   for (se = start.next; se; se = se->next)
@@ -1007,6 +996,8 @@ pending_signals::add (int sig)
   se = sigs + empty;
   se->sig = sig;
   se->next = NULL;
+  se->tls = tls;
+  se->pid = pid;
   if (end)
     end->next = se;
   end = se;
@@ -1030,16 +1021,16 @@ pending_signals::del ()
   curr = next;
 }
 
-int
+sigelem *
 pending_signals::next ()
 {
-  int sig;
+  sigelem *res;
   prev = curr;
   if (!curr || !(curr = curr->next))
-    sig = 0;
+    res = NULL;
   else
-    sig = curr->sig;
-  return sig;
+    res = curr;
+  return res;
 }
 
 /* Process signals by waiting for signal data to arrive in a pipe.
@@ -1105,7 +1096,12 @@ wait_sig (VOID *self)
 	}
 
       if (!pack.sig)
-	continue;		/* Just checking to see if we exist */
+	{
+#ifdef DEBUGGING
+	  system_printf ("zero signal?");
+#endif
+	  continue;
+	}
 
       sigset_t dummy_mask;
       if (!pack.mask)
@@ -1114,40 +1110,39 @@ wait_sig (VOID *self)
 	  pack.mask = &dummy_mask;
 	}
 
+      sigelem *q;
       switch (pack.sig)
 	{
 	case __SIGCOMMUNE:
 	  talktome ();
-	  continue;
+	  break;
 	case __SIGSTRACE:
 	  strace.hello ();
-	  continue;
+	  break;
 	case __SIGPENDING:
 	  *pack.mask = 0;
 	  unsigned bit;
 	  sigqueue.reset ();
-	  while ((pack.sig = sigqueue.next ()))
-	    if (myself->getsigmask () & (bit = SIGTOMASK (pack.sig)))
+	  while ((q = sigqueue.next ()))
+	    if (myself->getsigmask () & (bit = SIGTOMASK (q->sig)))
 	      *pack.mask |= bit;
+	  break;
+	case __SIGFLUSH:
+	  sigqueue.reset ();
+	  while ((q = sigqueue.next ()))
+	    if (sig_handle (q->sig, *pack.mask, q->pid, q->tls) > 0)
+	      sigqueue.del ();
 	  break;
 	default:
 	  if (pack.sig < 0)
 	    sig_clear (-pack.sig);
 	  else
 	    {
-	      int sh;
-	      for (int i = 0; !(sh = sig_handle (pack.sig, *pack.mask)) && i < 100 ; i++)
-		low_priority_sleep (0);		// hopefully a temporary condition
-	      if (sh <= 0)
-		sigqueue.add (pack.sig);	// FIXME: Shouldn't add this in !sh condition
+	      if (sig_handle (pack.sig, *pack.mask, pack.pid, pack.tls) <= 0)
+		sigqueue.add (pack.sig, pack.pid, pack.tls);// FIXME: Shouldn't add this in !sh condition
 	      if (pack.sig == SIGCHLD)
 		proc_subproc (PROC_CLEARWAIT, 0);
 	    }
-	case __SIGFLUSH:
-	  sigqueue.reset ();
-	  while ((pack.sig = sigqueue.next ()))
-	    if (sig_handle (pack.sig, *pack.mask) > 0)
-	      sigqueue.del ();
 	  break;
 	}
       if (pack.wakeup)
@@ -1230,30 +1225,4 @@ wait_subproc (VOID *)
   events[0] = NULL;
   sigproc_printf ("done");
   ExitThread (0);
-}
-
-extern "C" {
-/* Provide a stack frame when calling WaitFor* functions */
-
-#undef WaitForSingleObject
-
-DWORD __stdcall
-WFSO (HANDLE hHandle, DWORD dwMilliseconds)
-{
-  DWORD ret;
-  sigframe thisframe (mainthread);
-  ret = WaitForSingleObject (hHandle, dwMilliseconds);
-  return ret;
-}
-
-#undef WaitForMultipleObjects
-
-DWORD __stdcall
-WFMO (DWORD nCount, CONST HANDLE *lpHandles, BOOL fWaitAll, DWORD dwMilliseconds)
-{
-  DWORD ret;
-  sigframe thisframe (mainthread);
-  ret = WaitForMultipleObjects (nCount, lpHandles, fWaitAll, dwMilliseconds);
-  return ret;
-}
 }

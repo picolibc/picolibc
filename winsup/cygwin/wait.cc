@@ -55,7 +55,6 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
   while (1)
     {
       sig_dispatch_pending ();
-      sigframe thisframe (mainthread);
       sawsig = 0;
       if (options & ~(WNOHANG | WUNTRACED))
 	{
@@ -100,6 +99,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 
       if (w->status == -1)
 	{
+	  call_signal_handler_now ();
 	  set_sig_errno (EINTR);
 	  sawsig = 1;
 	  res = -1;
@@ -115,7 +115,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 	*status = w->status;
 
     done:
-      if (!sawsig || !thisframe.call_signal_handler ())
+      if (!sawsig || !call_signal_handler_now ())
 	break;
     }
 

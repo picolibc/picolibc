@@ -57,12 +57,12 @@ ilockcmpexch (long *t, long v, long c)
 #undef InterlockedCompareExchange
 #define InterlockedCompareExchange ilockcmpexch
 
+// extern char * volatile *__stackbase __asm__ ("%fs:4");
 #ifndef EXPCGf
 #define DECLARE_TLS_STORAGE do {} while (0)
 #else
 #define DECLARE_TLS_STORAGE char **tls[4096] __attribute__ ((unused))
 extern long tls_ix;
-extern char * volatile *__stackbase __asm__ ("%fs:4");
 
 extern __inline__ DWORD
 my_tlsalloc ()

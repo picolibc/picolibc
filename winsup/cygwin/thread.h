@@ -253,7 +253,7 @@ List_remove (fast_mutex &mx, list_node *&head, list_node *node)
     }
   mx.unlock ();
 }
- 
+
 
 template <class list_node> class List
 {
@@ -305,7 +305,7 @@ protected:
   list_node *head;
 };
 
-class pthread_key:public verifyable_object
+class pthread_key: public verifyable_object
 {
 public:
   static bool is_good_object (pthread_key_t const *);
@@ -343,7 +343,7 @@ private:
   void *fork_buf;
 };
 
-class pthread_attr:public verifyable_object
+class pthread_attr: public verifyable_object
 {
 public:
   static bool is_good_object(pthread_attr_t const *);
@@ -357,7 +357,7 @@ public:
   ~pthread_attr ();
 };
 
-class pthread_mutexattr:public verifyable_object
+class pthread_mutexattr: public verifyable_object
 {
 public:
   static bool is_good_object(pthread_mutexattr_t const *);
@@ -367,7 +367,7 @@ public:
   ~pthread_mutexattr ();
 };
 
-class pthread_mutex:public verifyable_object
+class pthread_mutex: public verifyable_object
 {
 public:
   static bool is_good_object (pthread_mutex_t const *);
@@ -448,7 +448,8 @@ private:
 
 #define WAIT_CANCELED   (WAIT_OBJECT_0 + 1)
 
-class pthread:public verifyable_object
+class _threadinfo;
+class pthread: public verifyable_object
 {
 public:
   HANDLE win32_obj_id;
@@ -459,13 +460,10 @@ public:
   bool valid;
   bool suspended;
   int cancelstate, canceltype;
+  _threadinfo *cygtls;
   HANDLE cancel_event;
   pthread_t joiner;
 
-  /* signal handling */
-  struct sigaction *sigs;
-  sigset_t *sigmask;
-  LONG *sigtodo;
   virtual void create (void *(*)(void *), pthread_attr *, void *);
 
   pthread ();
@@ -488,7 +486,7 @@ public:
   static int suspend (pthread_t * thread);
   static int resume (pthread_t * thread);
 
-  virtual void exit (void *value_ptr);
+  virtual void exit (void *value_ptr) __attribute__ ((noreturn));
 
   virtual int cancel ();
 
@@ -504,7 +502,7 @@ public:
   virtual void pop_cleanup_handler (int const execute);
 
   static pthread* self ();
-  static void *thread_init_wrapper (void *);
+  static void *thread_init_wrapper (void *) __attribute__ ((noreturn));
 
   virtual unsigned long getsequence_np();
 
@@ -545,12 +543,10 @@ private:
   void pop_all_cleanup_handlers (void);
   void precreate (pthread_attr *);
   void postcreate ();
-  void set_thread_id_to_current ();
-  static void set_tls_self_pointer (pthread *);
+  void set_tls_self_pointer ();
   static pthread *get_tls_self_pointer ();
   void cancel_self ();
   DWORD get_thread_id ();
-  void init_current_thread ();
 };
 
 class pthread_null : public pthread
@@ -563,7 +559,7 @@ class pthread_null : public pthread
   * as the ojbect is not verifyable
   */
   void create (void *(*)(void *), pthread_attr *, void *);
-  void exit (void *value_ptr);
+  void exit (void *value_ptr) __attribute__ ((noreturn));
   int cancel ();
   void testcancel ();
   int setcancelstate (int state, int *oldstate);
@@ -577,7 +573,7 @@ class pthread_null : public pthread
   static pthread_null _instance;
 };
 
-class pthread_condattr:public verifyable_object
+class pthread_condattr: public verifyable_object
 {
 public:
   static bool is_good_object(pthread_condattr_t const *);
@@ -587,7 +583,7 @@ public:
   ~pthread_condattr ();
 };
 
-class pthread_cond:public verifyable_object
+class pthread_cond: public verifyable_object
 {
 public:
   static bool is_good_object (pthread_cond_t const *);
@@ -628,7 +624,7 @@ private:
   static fast_mutex cond_initialization_lock;
 };
 
-class pthread_rwlockattr:public verifyable_object
+class pthread_rwlockattr: public verifyable_object
 {
 public:
   static bool is_good_object(pthread_rwlockattr_t const *);
@@ -638,7 +634,7 @@ public:
   ~pthread_rwlockattr ();
 };
 
-class pthread_rwlock:public verifyable_object
+class pthread_rwlock: public verifyable_object
 {
 public:
   static bool is_good_object (pthread_rwlock_t const *);
@@ -717,7 +713,7 @@ public:
 };
 
 /* shouldn't be here */
-class semaphore:public verifyable_object
+class semaphore: public verifyable_object
 {
 public:
   static bool is_good_object(sem_t const *);
@@ -767,9 +763,8 @@ public:
   class callback * next;
 };
 
-class MTinterface
+struct MTinterface
 {
-public:
   // General
   int concurrency;
   long int threadcount;
@@ -789,12 +784,17 @@ public:
   void fixup_before_fork (void);
   void fixup_after_fork (void);
 
+#if 1 // avoid initialization since zero is implied and
+      // only use of this class is static
+  MTinterface () : reent_key (NULL), thread_self_key (NULL) {}
+#else
   MTinterface () :
-    concurrency (0), threadcount (1),
+    concurrency (0), threadcount (0),
     pthread_prepare (NULL), pthread_child (NULL), pthread_parent (NULL),
     reent_key (NULL), thread_self_key (NULL)
   {
   }
+#endif
 };
 
 #define MT_INTERFACE user_data->threadinterface

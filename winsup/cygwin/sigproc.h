@@ -1,6 +1,6 @@
 /* sigproc.h
 
-   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -48,72 +48,23 @@ typedef struct struct_waitq
   HANDLE thread_ev;
 } waitq;
 
-struct sigthread
-{
-  DWORD id;
-  DWORD frame;
-  CRITICAL_SECTION lock;
-  LONG winapi_lock;
-  BOOL exception;
-  bool get_winapi_lock (int test = 0);
-  void release_winapi_lock ();
-  void init (const char *s);
-};
-
-class sigframe
-{
-private:
-  sigthread *st;
-  inline bool unregister ()
-  {
-    if (!st)
-      return 0;
-    EnterCriticalSection (&st->lock);
-    st->frame = 0;
-    st->exception = 0;
-    st->release_winapi_lock ();
-    LeaveCriticalSection (&st->lock);
-    st = NULL;
-    return 1;
-  }
-
-public:
-  inline void set (sigthread &t, DWORD ebp, bool is_exception = 0)
-  {
-    DWORD oframe = t.frame;
-    st = &t;
-    t.frame = ebp;
-    t.exception = is_exception;
-    if (!oframe)
-      t.get_winapi_lock ();
-  }
-  inline void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0), bool is_exception = 0)
-  {
-    if (is_exception || (!t.frame && t.id == GetCurrentThreadId ()))
-      set (t, ebp, is_exception);
-    else
-      st = NULL;
-  }
-
-  sigframe (): st (NULL) {}
-  sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0)) {init (t, ebp);}
-  ~sigframe ()
-  {
-    unregister ();
-  }
-
-  int call_signal_handler ();
-};
-
-extern sigthread mainthread;
 extern HANDLE signal_arrived;
 extern HANDLE sigCONT;
 
 BOOL __stdcall my_parent_is_alive ();
 int __stdcall sig_dispatch_pending ();
-extern "C" void __stdcall set_process_mask (sigset_t newmask);
+#ifdef _PINFO_H
+extern "C" void __stdcall set_signal_mask (sigset_t newmask, sigset_t& = myself->getsigmask ());
+#endif
+int __stdcall handle_sigprocmask (int sig, const sigset_t *set,
+				  sigset_t *oldset, sigset_t& opmask)
+  __attribute__ ((regparm (3)));
+
 extern "C" void __stdcall reset_signal_arrived ();
-int __stdcall sig_handle (int, sigset_t) __attribute__ ((regparm (2)));
+extern "C" int __stdcall call_signal_handler_now ();
+#ifdef _CYGTLS_H
+int __stdcall sig_handle (int, sigset_t, int, _threadinfo *) __attribute__ ((regparm (3)));
+#endif
 void __stdcall sig_clear (int) __attribute__ ((regparm (1)));
 void __stdcall sig_set_pending (int) __attribute__ ((regparm (1)));
 int __stdcall handle_sigsuspend (sigset_t);
@@ -127,18 +78,15 @@ void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
 BOOL __stdcall proc_exists (_pinfo *) __attribute__ ((regparm(1)));
 BOOL __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
-int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_address (0),
-			bool exception = 0)  __attribute__ ((regparm(3)));
+int __stdcall sig_send (_pinfo *, int, void * = NULL) __attribute__ ((regparm(3)));
 void __stdcall signal_fixup_after_fork ();
 void __stdcall signal_fixup_after_exec ();
 void __stdcall wait_for_sigthread ();
 void __stdcall sigalloc ();
 
 extern char myself_nowait_dummy[];
-extern char myself_nowait_nonmain_dummy[];
 
 #define WAIT_SIG_PRIORITY THREAD_PRIORITY_TIME_CRITICAL
 
 #define myself_nowait ((_pinfo *)myself_nowait_dummy)
-#define myself_nowait_nonmain ((_pinfo *)myself_nowait_nonmain_dummy)
 #endif /*_SIGPROC_H*/

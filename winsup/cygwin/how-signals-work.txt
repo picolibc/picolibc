@@ -1,5 +1,6 @@
 Copyright 2001 Red Hat Inc., Christopher Faylor
 
+[this information is currently obsolete -- sorry]
 How do signals work?
 
 On process startup, cygwin starts a secondary thread that deals with signals.

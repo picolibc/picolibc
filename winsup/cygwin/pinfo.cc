@@ -142,7 +142,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 
   int createit = flag & (PID_IN_USE | PID_EXECED);
   DWORD access = FILE_MAP_READ
-                 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW) ? FILE_MAP_WRITE : 0);
+		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW) ? FILE_MAP_WRITE : 0);
   for (int i = 0; i < 10; i++)
     {
       int created;
@@ -243,14 +243,14 @@ pinfo::set_acl()
 {
   char sa_buf[1024];
   SECURITY_DESCRIPTOR sd;
-  
-  sec_acl ((PACL) sa_buf, true, true, cygheap->user.sid (), 
+
+  sec_acl ((PACL) sa_buf, true, true, cygheap->user.sid (),
 	   well_known_world_sid, FILE_MAP_READ);
-  if (!InitializeSecurityDescriptor( &sd, SECURITY_DESCRIPTOR_REVISION))
-    debug_printf("InitializeSecurityDescriptor %E");
-  else if (!SetSecurityDescriptorDacl(&sd, TRUE, (PACL) sa_buf, FALSE)) 
-    debug_printf("SetSecurityDescriptorDacl %E");
-  else if (!SetKernelObjectSecurity(h, DACL_SECURITY_INFORMATION, &sd))
+  if (!InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION))
+    debug_printf ("InitializeSecurityDescriptor %E");
+  else if (!SetSecurityDescriptorDacl (&sd, TRUE, (PACL) sa_buf, FALSE))
+    debug_printf ("SetSecurityDescriptorDacl %E");
+  else if (!SetKernelObjectSecurity (h, DACL_SECURITY_INFORMATION, &sd))
     debug_printf ("SetKernelObjectSecurity %E");
 }
 

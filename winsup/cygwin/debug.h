@@ -17,14 +17,6 @@ details. */
 })
 #endif
 
-extern "C" {
-DWORD __stdcall WFSO (HANDLE, DWORD) __attribute__ ((regparm(2)));
-DWORD __stdcall WFMO (DWORD, CONST HANDLE *, BOOL, DWORD) __attribute__ ((regparm(3)));
-}
-
-#define WaitForSingleObject WFSO
-#define WaitForMultipleObjects WFMO
-
 #if !defined(_DEBUG_H_)
 #define _DEBUG_H_
 

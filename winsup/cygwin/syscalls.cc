@@ -118,7 +118,6 @@ unlink (const char *ourname)
 {
   int res = -1;
   DWORD devn;
-  sigframe thisframe (mainthread);
 
   path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
 
@@ -396,7 +395,6 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
   while (1)
     {
       sig_dispatch_pending ();
-      sigframe thisframe (mainthread);
 
       cygheap_fdget cfd (fd);
       if (cfd < 0)
@@ -451,7 +449,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 	}
 
     out:
-      if (res >= 0 || get_errno () != EINTR || !thisframe.call_signal_handler ())
+      if (res >= 0 || get_errno () != EINTR || !call_signal_handler_now ())
 	break;
       set_errno (e);
     }
@@ -470,7 +468,6 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
   sig_dispatch_pending ();
   const ssize_t tot = check_iovec_for_write (iov, iovcnt);
 
-  sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     goto done;
@@ -524,7 +521,6 @@ open (const char *unix_path, int flags, ...)
   va_list ap;
   mode_t mode = 0;
   sig_dispatch_pending ();
-  sigframe thisframe (mainthread);
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
   if (!check_null_empty_str_errno (unix_path))
@@ -574,7 +570,6 @@ extern "C" _off64_t
 lseek64 (int fd, _off64_t pos, int dir)
 {
   _off64_t res;
-  sigframe thisframe (mainthread);
 
   if (dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END)
     {
@@ -610,7 +605,6 @@ extern "C" int
 close (int fd)
 {
   int res;
-  sigframe thisframe (mainthread);
 
   syscall_printf ("close (%d)", fd);
 
@@ -635,7 +629,6 @@ extern "C" int
 isatty (int fd)
 {
   int res;
-  sigframe thisframe (mainthread);
 
   cygheap_fdget cfd (fd);
   if (cfd < 0)
@@ -657,7 +650,6 @@ extern "C" int
 link (const char *a, const char *b)
 {
   int res = -1;
-  sigframe thisframe (mainthread);
   path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
   extern BOOL allow_winsymlinks;
@@ -787,7 +779,7 @@ link (const char *a, const char *b)
       res = 0;
       if (!allow_winsymlinks && real_a.is_lnk_symlink ())
 	SetFileAttributes (real_b, (DWORD) real_a
-			           | FILE_ATTRIBUTE_SYSTEM
+				   | FILE_ATTRIBUTE_SYSTEM
 				   | FILE_ATTRIBUTE_READONLY);
 
       goto done;
@@ -865,14 +857,12 @@ done:
 extern "C" int
 chown32 (const char * name, __uid32_t uid, __gid32_t gid)
 {
-  sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
 }
 
 extern "C" int
 chown (const char * name, __uid16_t uid, __gid16_t gid)
 {
-  sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_FOLLOW,
 		       uid16touid32 (uid), gid16togid32 (gid));
 }
@@ -880,14 +870,12 @@ chown (const char * name, __uid16_t uid, __gid16_t gid)
 extern "C" int
 lchown32 (const char * name, __uid32_t uid, __gid32_t gid)
 {
-  sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid);
 }
 
 extern "C" int
 lchown (const char * name, __uid16_t uid, __gid16_t gid)
 {
-  sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_NOFOLLOW,
 		       uid16touid32 (uid), gid16togid32 (gid));
 }
@@ -895,7 +883,6 @@ lchown (const char * name, __uid16_t uid, __gid16_t gid)
 extern "C" int
 fchown32 (int fd, __uid32_t uid, __gid32_t gid)
 {
-  sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     {
@@ -945,7 +932,6 @@ extern "C" int
 chmod (const char *path, mode_t mode)
 {
   int res = -1;
-  sigframe thisframe (mainthread);
 
   path_conv win32_path (path);
 
@@ -1009,7 +995,6 @@ done:
 extern "C" int
 fchmod (int fd, mode_t mode)
 {
-  sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     {
@@ -1053,7 +1038,6 @@ extern "C" int
 fstat64 (int fd, struct __stat64 *buf)
 {
   int res;
-  sigframe thisframe (mainthread);
 
   cygheap_fdget cfd (fd);
   if (cfd < 0)
@@ -1113,7 +1097,6 @@ _fstat_r (struct _reent *ptr, int fd, struct __stat32 *buf)
 extern "C" int
 fsync (int fd)
 {
-  sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     {
@@ -1189,7 +1172,6 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
 extern "C" int
 stat64 (const char *name, struct __stat64 *buf)
 {
-  sigframe thisframe (mainthread);
   syscall_printf ("entering");
   return stat_worker (name, buf, 0);
 }
@@ -1230,7 +1212,6 @@ _stat_r (struct _reent *ptr, const char *name, struct __stat32 *buf)
 extern "C" int
 lstat64 (const char *name, struct __stat64 *buf)
 {
-  sigframe thisframe (mainthread);
   syscall_printf ("entering");
   return stat_worker (name, buf, 1);
 }
@@ -1334,7 +1315,6 @@ done:
 extern "C" int
 access (const char *fn, int flags)
 {
-  sigframe thisframe (mainthread);
   // flags were incorrectly specified
   if (flags & ~(F_OK|R_OK|W_OK|X_OK))
     {
@@ -1349,7 +1329,6 @@ access (const char *fn, int flags)
 extern "C" int
 rename (const char *oldpath, const char *newpath)
 {
-  sigframe thisframe (mainthread);
   int res = 0;
   char *lnk_suffix = NULL;
 
@@ -1484,7 +1463,6 @@ system (const char *cmdstring)
   if (check_null_empty_str_errno (cmdstring))
     return -1;
 
-  sigframe thisframe (mainthread);
   int res;
   const char* command[4];
 
@@ -1800,7 +1778,6 @@ setmode (int fd, int mode)
 extern "C" int
 ftruncate64 (int fd, _off64_t length)
 {
-  sigframe thisframe (mainthread);
   int res = -1;
 
   if (length < 0)
@@ -1844,7 +1821,6 @@ ftruncate (int fd, _off_t length)
 extern "C" int
 truncate64 (const char *pathname, _off64_t length)
 {
-  sigframe thisframe (mainthread);
   int fd;
   int res = -1;
 
@@ -1887,7 +1863,6 @@ get_osfhandle (int fd)
 extern "C" int
 statfs (const char *fname, struct statfs *sfs)
 {
-  sigframe thisframe (mainthread);
   if (!sfs)
     {
       set_errno (EFAULT);
@@ -1943,7 +1918,6 @@ statfs (const char *fname, struct statfs *sfs)
 extern "C" int
 fstatfs (int fd, struct statfs *sfs)
 {
-  sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     return -1;
@@ -1954,7 +1928,6 @@ fstatfs (int fd, struct statfs *sfs)
 extern "C" int
 setpgid (pid_t pid, pid_t pgid)
 {
-  sigframe thisframe (mainthread);
   int res = -1;
   if (pid == 0)
     pid = getpid ();
@@ -1996,7 +1969,6 @@ out:
 extern "C" pid_t
 getpgid (pid_t pid)
 {
-  sigframe thisframe (mainthread);
   if (pid == 0)
     pid = getpid ();
 
@@ -2012,21 +1984,18 @@ getpgid (pid_t pid)
 extern "C" int
 setpgrp (void)
 {
-  sigframe thisframe (mainthread);
   return setpgid (0, 0);
 }
 
 extern "C" pid_t
 getpgrp (void)
 {
-  sigframe thisframe (mainthread);
   return getpgid (0);
 }
 
 extern "C" char *
 ptsname (int fd)
 {
-  sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     return 0;
@@ -2123,7 +2092,6 @@ seteuid32 (__uid32_t uid)
       return 0;
     }
 
-  sigframe thisframe (mainthread);
   cygsid usersid;
   user_groups &groups = cygheap->user.groups;
   HANDLE ptok, new_token = INVALID_HANDLE_VALUE;
@@ -2131,7 +2099,7 @@ seteuid32 (__uid32_t uid)
   BOOL token_is_internal, issamesid;
   char dacl_buf[MAX_DACL_LEN (5)];
   TOKEN_DEFAULT_DACL tdacl = {};
-  
+
   pw_new = internal_getpwuid (uid);
   if (!wincap.has_security () && pw_new)
     goto success_9x;
@@ -2202,7 +2170,7 @@ seteuid32 (__uid32_t uid)
     {
       /* Avoid having HKCU use default user */
       load_registry_hive (usersid);
-      
+
       /* Try setting owner to same value as user. */
       if (!SetTokenInformation (new_token, TokenOwner,
 				&usersid, sizeof usersid))
@@ -2221,12 +2189,12 @@ seteuid32 (__uid32_t uid)
     }
 
   CloseHandle (ptok);
-  issamesid = (usersid == cygheap->user.sid ()); 
+  issamesid = (usersid == cygheap->user.sid ());
   cygheap->user.set_sid (usersid);
   cygheap->user.current_token = new_token == ptok ? INVALID_HANDLE_VALUE
-                                                  : new_token;
+						  : new_token;
   if (!issamesid) /* MS KB 199190 */
-    RegCloseKey(HKEY_CURRENT_USER); 
+    RegCloseKey (HKEY_CURRENT_USER);
   cygheap->user.reimpersonate ();
   if (!issamesid)
     user_shared_initialize (true);
@@ -2304,7 +2272,6 @@ setegid32 (__gid32_t gid)
       return 0;
     }
 
-  sigframe thisframe (mainthread);
   user_groups * groups = &cygheap->user.groups;
   cygsid gsid;
   HANDLE ptok;
@@ -2399,7 +2366,6 @@ setregid (__gid16_t rgid, __gid16_t egid)
 extern "C" int
 chroot (const char *newroot)
 {
-  sigframe thisframe (mainthread);
   path_conv path (newroot, PC_SYM_FOLLOW | PC_FULL | PC_POSIX);
 
   int ret;
@@ -2431,7 +2397,6 @@ chroot (const char *newroot)
 extern "C" int
 creat (const char *path, mode_t mode)
 {
-  sigframe thisframe (mainthread);
   return open (path, O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
 
@@ -2444,7 +2409,6 @@ __assertfail ()
 extern "C" int
 getw (FILE *fp)
 {
-  sigframe thisframe (mainthread);
   int w, ret;
   ret = fread (&w, sizeof (int), 1, fp);
   return ret != 1 ? EOF : w;
@@ -2453,7 +2417,6 @@ getw (FILE *fp)
 extern "C" int
 putw (int w, FILE *fp)
 {
-  sigframe thisframe (mainthread);
   int ret;
   ret = fwrite (&w, sizeof (int), 1, fp);
   if (feof (fp) || ferror (fp))
@@ -2524,7 +2487,6 @@ memccpy (_PTR out, const _PTR in, int c, size_t len)
 extern "C" int
 nice (int incr)
 {
-  sigframe thisframe (mainthread);
   DWORD priority[] =
     {
       IDLE_PRIORITY_CLASS,
@@ -2618,7 +2580,6 @@ updwtmp (const char *wtmp_file, const struct utmp *ut)
 extern "C" void
 logwtmp (const char *line, const char *user, const char *host)
 {
-  sigframe thisframe (mainthread);
   struct utmp ut;
   memset (&ut, 0, sizeof ut);
   ut.ut_type = USER_PROCESS;
@@ -2636,7 +2597,6 @@ logwtmp (const char *line, const char *user, const char *host)
 extern "C" void
 login (struct utmp *ut)
 {
-  sigframe thisframe (mainthread);
   pututline (ut);
   endutent ();
   updwtmp (_PATH_WTMP, ut);
@@ -2645,7 +2605,6 @@ login (struct utmp *ut)
 extern "C" int
 logout (char *line)
 {
-  sigframe thisframe (mainthread);
   struct utmp ut_buf, *ut;
 
   memset (&ut_buf, 0, sizeof ut_buf);
@@ -2674,7 +2633,6 @@ static char *utmp_file = (char *) _PATH_UTMP;
 static void
 internal_setutent (bool force_readwrite)
 {
-  sigframe thisframe (mainthread);
   if (force_readwrite && utmp_readonly)
     endutent ();
   if (utmp_fd < 0)
@@ -2703,7 +2661,6 @@ setutent ()
 extern "C" void
 endutent ()
 {
-  sigframe thisframe (mainthread);
   if (utmp_fd >= 0)
     {
       close (utmp_fd);
@@ -2715,7 +2672,6 @@ endutent ()
 extern "C" void
 utmpname (_CONST char *file)
 {
-  sigframe thisframe (mainthread);
   if (check_null_empty_str (file))
     {
       debug_printf ("Invalid file");
@@ -2739,7 +2695,6 @@ static unsigned utix = 0;
 extern "C" struct utmp *
 getutent ()
 {
-  sigframe thisframe (mainthread);
   if (utmp_fd < 0)
     {
       internal_setutent (false);
@@ -2756,7 +2711,6 @@ getutent ()
 extern "C" struct utmp *
 getutid (struct utmp *id)
 {
-  sigframe thisframe (mainthread);
   if (check_null_invalid_struct_errno (id))
     return NULL;
   if (utmp_fd < 0)
@@ -2795,7 +2749,6 @@ getutid (struct utmp *id)
 extern "C" struct utmp *
 getutline (struct utmp *line)
 {
-  sigframe thisframe (mainthread);
   if (check_null_invalid_struct_errno (line))
     return NULL;
   if (utmp_fd < 0)
@@ -2818,7 +2771,6 @@ getutline (struct utmp *line)
 extern "C" void
 pututline (struct utmp *ut)
 {
-  sigframe thisframe (mainthread);
   if (check_null_invalid_struct (ut))
     return;
   internal_setutent (true);
@@ -2853,7 +2805,7 @@ pututline (struct utmp *ut)
 }
 
 extern "C"
-long gethostid(void)
+long gethostid (void)
 {
   unsigned data[13] = {0x92895012,
 		       0x10293412,
@@ -2870,7 +2822,6 @@ long gethostid(void)
 		       0x00290012};
 
   bool has_cpuid = false;
-  sigframe thisframe (mainthread);
 
   DWORD opmask = SetThreadAffinityMask (GetCurrentThread (), 1);
   if (!opmask)
@@ -2993,7 +2944,7 @@ getusershell ()
   if (!shell_fp && !(shell_fp = fopen64 (ETC_SHELLS, "rt")))
     {
       if (def_shells[shell_index])
-        return strcpy (buf, def_shells[shell_index++]);
+	return strcpy (buf, def_shells[shell_index++]);
       return NULL;
     }
   /* Skip white space characters. */
