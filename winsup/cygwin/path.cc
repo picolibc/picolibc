@@ -978,7 +978,7 @@ normalize_win32_path (const char *src, char *dst, char **tail)
 	  src += 2;
 	}
     }
-  else if (strchr (src, ':') == NULL && *src != '/')
+  else if (!isdrive(src) && *src != '/')
     {
       if (beg_src_slash)
 	dst += cygheap->cwd.get_drive (dst);
@@ -1023,6 +1023,7 @@ normalize_win32_path (const char *src, char *dst, char **tail)
 	      int n = strspn (src, ".");
 	      if (!src[n] || isdirsep (src[n])) /* just dots... */
 		return ENOENT;
+	      *dst++ = *src++;
 	    }
 	}
       /* Otherwise, add char to result.  */
@@ -1454,8 +1455,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       int n = mount_table->cygdrive_len - 1;
       int unit;
 
-      if (!src_path[n] ||
-	  (src_path[n] == '/' && src_path[n + 1] == '.' && !src_path[n + 2]))
+      if (!src_path[n])
 	{
 	  unit = 0;
 	  dst[0] = '\0';
@@ -3249,15 +3249,13 @@ hash_path_name (__ino64_t hash, const char *name)
     }
 
 hashit:
-  /* Build up hash.  Ignore single trailing slash or \a\b\ != \a\b or
-     \a\b\.  but allow a single \ if that's all there is. */
+  /* Build up hash. Name is already normalized */
   do
     {
       int ch = cyg_tolower (*name);
       hash = ch + (hash << 6) + (hash << 16) - hash;
     }
-  while (*++name != '\0' &&
-	 !(*name == '\\' && (!name[1] || (name[1] == '.' && !name[2]))));
+  while (*++name != '\0');
   return hash;
 }
 
