@@ -1,5 +1,19 @@
 2002-06-19  Casper S. Hornstrup  <chorns@users.sourceforge.net>
 
+	* include/winuser.h (FLASHW_*,INPUT_MOUSE,INPUT_KEYBOARD,
+	INPUT_HARDWARE): Add defines.
+	(HDEVNOTIFY): Add typedef.
+	(FLASHWINFO,tagMOUSEMOVEPOINT,tagMOUSEINPUT,tagKEYBDINPUT,
+	tagHARDWAREINPUT,tagINPUT,tagGUITHREADINFO): Define structs and
+	typedefs.
+	(CreateDesktop[AW],CreateMDIWindow[AW],GetClassInfo[AW],
+	GetClassInfoEx[AW],GetKeyboardLayoutList,
+	MessageBoxIndirect[AW],MsgWaitForMultipleObjects,
+	MsgWaitForMultipleObjectsEx, RegisterClass[AW],
+	RegisterClassEx[AW]): Correct prototypes.
+
+2002-06-19  Casper S. Hornstrup  <chorns@users.sourceforge.net>
+
 	* include/ddeml.h (DdeCreateStringHandle{AW]:Correct
 	prototypes.
 	* include/winsvc.h (StartServiceW): Correct prototype.
@@ -707,14 +721,6 @@
 
 	* Makefile.in: Increment VERSION.
 	* include/w32api.h: Ditto.
-
-2001-12-07  Danny Smith  <dannysmith@users.sourceforge.net>
-
-	* include/setupi.h (SetupDiCreateDeviceInterfaceRegKey[AW],
-	SetupDiCreateDevRegKey[AW],SetupDiDeleteDeviceInterfaceRegKey,
-	SetupDiDeleteDevRegKey,SetupDiOpenClassRegKey,
-	SetupDiOpenClassRegKeyEx[AW],SetupDiOpenDeviceInterfaceRegKey,
-	SetupDiOpenDevRegKey): Correct function names.
 
 2001-12-07  Earnie Boyd  <earnie@users.sf.net>
 
