@@ -26,6 +26,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 mkinstalldirs = $(SHELL) $(srcdir)/../mkinstalldirs
 DISTFILES = Makefile.in configure configure.in \
+	_Exit.c \
 	atoll.c \
 	dirent.c \
 	feclearexcept.c \
@@ -120,7 +121,8 @@ STDLIB_STUB_OBJS = \
 	lltoa.o ulltoa.o \
 	lltow.o ulltow.o \
 	atoll.o wtoll.o \
-	strtof.o wcstof.o
+	strtof.o wcstof.o \
+	_Exit.o
 STDIO_STUB_OBJS = \
 	snprintf.o snwprintf.o
 MATH_OBJS = \

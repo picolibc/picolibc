@@ -361,10 +361,12 @@ void	_seterrormode (int);
 void	_sleep (unsigned long);
 
 void	_exit	(int) _ATTRIB_NORETURN;
+#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
 /* C99 function name */
-static __inline__ void _Exit(int status)
+void _Exit(int) _ATTRIB_NORETURN; /* Declare to get noreturn attribute.  */
+extern __inline__ void _Exit(int status)
 	{  _exit(status); }
-
+#endif
 /* _onexit is MS extension. Use atexit for portability.  */
 typedef  int (* _onexit_t)(void); 
 _onexit_t _onexit( _onexit_t );

@@ -46,9 +46,22 @@
  */
 
 #ifndef	__STRICT_ANSI__
+#ifndef	_NO_OLDNAMES
+
+#define	DOMAIN		_DOMAIN
+#define	SING		_SING
+#define	OVERFLOW	_OVERFLOW
+#define	UNDERFLOW	_UNDERFLOW
+#define	TLOSS		_TLOSS
+#define	PLOSS		_PLOSS
+
+#endif	/* Not _NO_OLDNAMES */
+#endif	/* Not __STRICT_ANSI__ */
+
 
 /* These are also defined in Mingw float.h; needed here as well to work 
    around GCC build issues.  */
+#ifndef	__STRICT_ANSI__
 #ifndef __MINGW_FPCLASS_DEFINED
 #define __MINGW_FPCLASS_DEFINED 1
 /* IEEE 754 classication */
@@ -63,19 +76,7 @@
 #define	_FPCLASS_PN	0x0100	/* Positive Normal */
 #define	_FPCLASS_PINF	0x0200	/* Positive Infinity */
 #endif /* __MINGW_FPCLASS_DEFINED */
-
-#ifndef	_NO_OLDNAMES
-
-#define	DOMAIN		_DOMAIN
-#define	SING		_SING
-#define	OVERFLOW	_OVERFLOW
-#define	UNDERFLOW	_UNDERFLOW
-#define	TLOSS		_TLOSS
-#define	PLOSS		_PLOSS
-
-#endif	/* Not _NO_OLDNAMES */
 #endif	/* Not __STRICT_ANSI__ */
-
 
 #ifndef RC_INVOKED
 
@@ -174,26 +175,6 @@ int	_matherr (struct _exception *);
 /* These are also declared in Mingw float.h; needed here as well to work 
    around GCC build issues.  */
 /* BEGIN FLOAT.H COPY */
-
-/* Set the FPU control word as cw = (cw & ~unMask) | (unNew & unMask),
- * i.e. change the bits in unMask to have the values they have in unNew,
- * leaving other bits unchanged. */
-unsigned int	_controlfp (unsigned int unNew, unsigned int unMask);
-unsigned int	_control87 (unsigned int unNew, unsigned int unMask);
-
-
-unsigned int	_clearfp ();	/* Clear the FPU status word */
-unsigned int	_statusfp ();	/* Report the FPU status word */
-#define		_clear87	_clearfp
-#define		_status87	_statusfp
-
-void		_fpreset ();	/* Reset the FPU */
-void		fpreset ();
-
-/* Global 'variable' for the current floating point error code. */
-int *	__fpecode();
-#define	_fpecode	(*(__fpecode()))
-
 /*
  * IEEE recommended functions
  */
@@ -241,15 +222,6 @@ double yn (int, double);
 #ifndef __NO_ISOCEXT
 
 #define INFINITY HUGE_VAL
-
-double nan(const char *tagp);
-float nanf(const char *tagp);
-
-#ifndef __STRICT_ANSI__
-#define nan() nan("")
-#define nanf() nanf("")
-#endif
-
 #define NAN (0.0F/0.0F)
 
 /*
@@ -269,6 +241,15 @@ float nanf(const char *tagp);
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+double nan(const char *tagp);
+float nanf(const char *tagp);
+
+#ifndef __STRICT_ANSI__
+#define nan() nan("")
+#define nanf() nanf("")
+#endif
+
 
 /*
   We can't inline float, because we want to ensure truncation

@@ -1,5 +1,19 @@
 2002-04-04  Danny Smith  <dannysmith@sourceforge.users.net>
 
+	* include/math.h (DOMAIN, SING, OVERFLOW, UNDERFLOW,
+	TLOSS, PLOSS): Move oldname defines back, following
+	the underscored names.
+	(_controlfp, _control87, _clearfp, _statusfp, _fpreset,
+	_fpecode): Remove prototypes copied from float.h.
+	(nan, nanf): Move into block protected against RC_INVOKED
+	and __cplusplus.
+	* include/stdlib.h (_Exit): Change from static inline to
+	extern inline.
+	* mingwex/_Exit.c : New file.
+	* mingwex/Makefile.in: Add _Exit.o to libmingwex.a.
+
+2002-04-04  Danny Smith  <dannysmith@sourceforge.users.net>
+
 	Add libgmon.a and libmingwex.a for cygwin -mno-cygwin.
 	* configure.in (SUBDIRS): Add  profile and mingwex to cygwin target.
 	(configdirs): Likewise.
