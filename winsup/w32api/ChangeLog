@@ -1,3 +1,13 @@
+2004-04-24  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* include/winuser.h (SM_IMMENABLED, SM_CXFOCUSBORDER,
+	SM_CYFOCUSBORDER, SM_TABLETPC, SM_MEDIACENTER): Add defines.
+	(SM_CMETRICS): Adjust value.
+	* include/winnt.h (PROCESSOR_ARCHITECTURE_MSIL): Correct define.
+	(PROCESSOR_ARCHITECTURE_AMD64, PROCESSOR_ARCHITECTURE_IA32_ON_WIN64):
+	Add defines.
+	Thanks to Benoit Blanchon <benoit.blanchon@free.fr>
+
 2004-04-24  Justin Forest  <vhex@users.sourceforge.net>
 
 	* include/winsock2.h (LUP_DEEP, LUP_CONTAINERS,
