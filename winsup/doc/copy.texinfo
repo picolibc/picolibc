@@ -4,38 +4,39 @@
 
 Most of the tools are covered by the GNU General Public License (GPL),
 although some are public domain, and others have a X11-style
-copyright.  To cover the GNU GPL
-requirements, the basic rule is if you give out any binaries, you must
-also make the source available.  For the full details, be sure to
-read the text of the GNU GPL which follows.
+copyright.  To cover the GNU GPL requirements, the basic rule is if
+you give out any binaries, you must also make the source available.
+For the full details, be sure to read the text of the GNU GPL which
+follows.
 
-The Cygwin API library found in the winsup subdirectory of the
-source code is also covered by the GNU GPL.  By default, all
-executables link against this library (and in the process include GPL'd
-Cygwin glue code).  This means that unless you modify the tools
-so that compiled executables do not make use of the Cygwin library,
-your compiled programs will also have to be free software distributed
-under the GPL with source code available to all.
+The Cygwin API library found in the winsup subdirectory of the source
+code is also covered by the GNU GPL.  By default, all executables link
+against this library (and in the process include GPL'd Cygwin glue
+code).  This means that unless you modify the tools so that compiled
+executables do not make use of the Cygwin library, your compiled
+programs will also have to be free software distributed under the GPL
+with source code available to all.
 
 Cygwin is currently available for proprietary use only through a
 proprietary-use license.  Please see
 @file{http://www.redhat.com/software/cygwin/} for more information
 about the Red Hat Cygwin Product.
 
-In accordance with section 10 of the GPL, Red Hat, Inc. permits programs whose
-sources are distributed under a license that complies with the Open
-Source definition to be linked with libcygwin.a without libcygwin.a
-itself causing the resulting program to be covered by the GNU GPL.
+In accordance with section 10 of the GPL, Red Hat, Inc. permits
+programs whose sources are distributed under a license that complies
+with the Open Source definition to be linked with libcygwin.a without
+libcygwin.a itself causing the resulting program to be covered by the
+GNU GPL.
 
 This means that you can port an Open Source(tm) application to cygwin,
 and distribute that executable as if it didn't include a copy of
-libcygwin.a linked into it.  Note that this does not apply to the cygwin
-DLL itself.  If you distribute a (possibly modified) version of the DLL
-you must adhere to the terms of the GPL, i.e., you must provide sources
-for the cygwin DLL.
+libcygwin.a linked into it.  Note that this does not apply to the
+cygwin DLL itself.  If you distribute a (possibly modified) version of
+the DLL you must adhere to the terms of the GPL, i.e., you must
+provide sources for the cygwin DLL.
 
-See http://www.opensource.org/osd.html for the precise Open Source
-Definition referenced above.
+See @file{http://www.opensource.org/docs/definition_plain.html} for
+the precise Open Source Definition referenced above.
 
 @section 	   GNU GENERAL PUBLIC LICENSE
 @example
