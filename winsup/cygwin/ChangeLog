@@ -1,11 +1,17 @@
 Sun Jul  2 10:39:00 2000  Corinna Vinschen  <corinna@vinschen.de>
 
+	* winsup.h: Define MAX_SID_LEN and new MAX_HOST_NAME.
+	* fork.cc (fork): Use above defines instead of numerical constants.
+	* shared.cc (sec_user): Ditto.
+	* shared.h (class pinfo): Ditto.
+	* syscall.cc (seteuid): Ditto.
+	* spawn.cc (_spawnve): Ditto. Eliminate conditional.
+	(spawn_guts): Set child->uid = USHRT_MAX when user context will be
+	changed in child process.
 	* uinfo.cc (uinfo_init): Check for myself->uid instead of myself->psid
 	to avoid reloading of /etc/passwd on process startup if ntsec is off.
-	* spawn.cc (_spawnve): Adjust conditional asking for switching
-	user context.
-	(spawn_guts): Ditto.  Set child->uid = USHRT_MAX when user context will
-	change in child process.
+	Use above defines instead of numerical constants.
+	* security.cc: Move define for MAX_SID_LEN to winsup.h.
 
 Sun Jul  2  1:57:00 2000  Corinna Vinschen  <corinna@vinschen.de>
 
