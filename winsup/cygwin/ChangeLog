@@ -1,3 +1,8 @@
+Tue Apr 24 23:51:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* passwd.cc (getpwnam_r): Add pw_passwd handling as well.
+	(getpwuid_r): Ditto.
+
 Tue Apr 24 23:43:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* passwd.cc (getpwnam_r): Use correct offsets into buffer.

@@ -231,7 +231,8 @@ getpwuid_r (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct 
 
   /* check needed buffer size. */
   size_t needsize = strlen (temppw->pw_name) + strlen (temppw->pw_dir) +
-  		    strlen (temppw->pw_shell) + strlen (temppw->pw_gecos) + 4;
+  		    strlen (temppw->pw_shell) + strlen (temppw->pw_gecos) +
+		    strlen (temppw->pw_passwd) + 5;
   if (needsize > bufsize)
     return ERANGE;
 
@@ -243,10 +244,12 @@ getpwuid_r (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct 
   pwd->pw_dir = pwd->pw_name + strlen (temppw->pw_name) + 1;
   pwd->pw_shell = pwd->pw_dir + strlen (temppw->pw_dir) + 1;
   pwd->pw_gecos = pwd->pw_shell + strlen (temppw->pw_shell) + 1;
+  pwd->pw_passwd = pwd->pw_gecos + strlen (temppw->pw_gecos) + 1;
   strcpy (pwd->pw_name, temppw->pw_name);
   strcpy (pwd->pw_dir, temppw->pw_dir);
   strcpy (pwd->pw_shell, temppw->pw_shell);
   strcpy (pwd->pw_gecos, temppw->pw_gecos);
+  strcpy (pwd->pw_passwd, temppw->pw_passwd);
   return 0;
 }
 
@@ -286,7 +289,8 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
 
   /* check needed buffer size. */
   size_t needsize = strlen (temppw->pw_name) + strlen (temppw->pw_dir) +
-  		    strlen (temppw->pw_shell) + strlen (temppw->pw_gecos) + 4;
+  		    strlen (temppw->pw_shell) + strlen (temppw->pw_gecos) +
+		    strlen (temppw->pw_passwd) + 5;
   if (needsize > bufsize)
     return ERANGE;
     
@@ -298,10 +302,12 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
   pwd->pw_dir = pwd->pw_name + strlen (temppw->pw_name) + 1;
   pwd->pw_shell = pwd->pw_dir + strlen (temppw->pw_dir) + 1;
   pwd->pw_gecos = pwd->pw_shell + strlen (temppw->pw_shell) + 1;
+  pwd->pw_passwd = pwd->pw_gecos + strlen (temppw->pw_gecos) + 1;
   strcpy (pwd->pw_name, temppw->pw_name);
   strcpy (pwd->pw_dir, temppw->pw_dir);
   strcpy (pwd->pw_shell, temppw->pw_shell);
   strcpy (pwd->pw_gecos, temppw->pw_gecos);
+  strcpy (pwd->pw_passwd, temppw->pw_passwd);
   return 0;
 }
 
