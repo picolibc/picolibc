@@ -482,14 +482,16 @@ path_conv::check (const char *src, unsigned opt,
 	  /* devn should not be a device.  If it is, then stop parsing now. */
 	  if (devn != FH_BAD)
 	    {
-	      if (component)
-		{
-		  error = ENOTDIR;
-		  return;
-		}
 	      if (devn != FH_CYGDRIVE)
-		fileattr = 0;
-	      else
+		{
+		  fileattr = 0;
+		  if (component)
+		    {
+		      error = ENOTDIR;
+		      return;
+		    }
+		}
+	      else if (!component)
 		fileattr = !unit ? FILE_ATTRIBUTE_DIRECTORY
 				 : GetFileAttributes (full_path);
 	      goto out;		/* Found a device.  Stop parsing. */
@@ -1389,7 +1391,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	  dst[0] = '\0';
 	  if (mount_table->cygdrive_len > 1)
 	    devn = FH_CYGDRIVE;
-	  goto out;
 	}
       else if (cygdrive_win32_path (pathbuf, dst, unit))
 	{
@@ -1466,7 +1467,8 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       *flags = mi->flags;
     }
 
-  win32_device_name (src_path, dst, devn, unit);
+  if (devn != FH_CYGDRIVE)
+    win32_device_name (src_path, dst, devn, unit);
 
  out:
   MALLOC_CHECK;
@@ -3287,11 +3289,12 @@ cygwin_conv_to_win32_path (const char *path, char *win32_path)
   path_conv p (path, PC_SYM_FOLLOW);
   if (p.error)
     {
+      win32_path[0] = '\0';
       set_errno (p.error);
       return -1;
     }
 
-  strcpy (win32_path, p.get_win32 ());
+  strcpy (win32_path, p);
   return 0;
 }
 
@@ -3301,11 +3304,12 @@ cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
   path_conv p (path, PC_SYM_FOLLOW | PC_FULL);
   if (p.error)
     {
+      win32_path[0] = '\0';
       set_errno (p.error);
       return -1;
     }
 
-  strcpy (win32_path, p.get_win32 ());
+  strcpy (win32_path, p);
   return 0;
 }
 
