@@ -246,7 +246,7 @@ details. */
       116: Export atoll.
       117: Export utmpx functions, Return utmp * from pututent.
       118: Export getpriority, setpriority.
-      118: Export fdatasync.
+      119: Export fdatasync.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
