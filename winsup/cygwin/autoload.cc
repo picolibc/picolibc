@@ -123,7 +123,7 @@ noload:									\n\
 	decl	%eax		# Yes.  This is the # of bytes + 1	\n\
 	popl	%edx		# Caller's caller			\n\
 	pushl	%eax		# Save for later			\n\
-	xorl	$0xffff,%eax	# Only want lower word			\n\
+	andl	$0xffff,%eax	# Only want lower word			\n\
 	addl	%eax,%esp	# Pop off bytes				\n\
 	movl	$127,%eax	# ERROR_PROC_NOT_FOUND			\n\
 	pushl	%eax		# First argument			\n\
