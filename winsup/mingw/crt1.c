@@ -26,10 +26,8 @@
  *
  */
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <io.h>
-#include <fcntl.h>
 #include <process.h>
 #include <float.h>
 #include <windows.h>
@@ -54,6 +52,12 @@ extern int main (int, char **, char **);
 #define __GUI_APP        2
 __MINGW_IMPORT void __set_app_type(int);
 #endif /* __MSVCRT__ */
+
+/*  Global _fmode for this .exe, not the one in msvcrt.dll,
+    The default is set in txtmode.o in libmingw32.a */
+#undef _fmode
+extern int _fmode;  
+extern int* __p__fmode(void); /* To access the dll _fmode */
 
 /*
  * Setup the default file handles to have the _CRT_fmode mode, as well as
@@ -89,6 +93,10 @@ _mingw32_init_fmode ()
 	  _setmode (_fileno (stderr), _CRT_fmode);
 	}
     }
+
+    /*  Now sync  the dll _fmode to the  one for this .exe.  */
+    *__p__fmode() = _fmode;	
+
 }
 
 /* This function will be called when a trap occurs. Thanks to Jacob
@@ -180,8 +188,9 @@ __mingw_CRTStartup ()
   _mingw32_init_mainargs ();
 
   /*
-   * Sets the default file mode for stdin, stdout and stderr, as well
-   * as files later opened by the user, to _CRT_fmode.
+   * Sets the default file mode.
+   * If _CRT_fmode is set, also set mode for stdin, stdout
+   * and stderr, as well
    * NOTE: DLLs don't do this because that would be rude!
    */
   _mingw32_init_fmode ();

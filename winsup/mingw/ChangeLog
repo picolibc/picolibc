@@ -1,3 +1,18 @@
+2002-10-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* Makefile.in (CRT0S): Add txtmode.o binmode.o.
+	(MINGW_OBJS): Add txtmode.o.
+	(SRCDIST_FILES): Add txtmode.c binmode.c.
+	crt1.c: Don't include fcntrl.h, stdlib.h.
+	(_fmode): Declare, without dllimport attribute.
+	(__p__fmode): Declare access function for dll's _fmode.
+	(_mingw32_init_fmode): Sync dll _fmode with staticly linked
+	_fmode for app.
+	* txtmode.c: New file.
+	* binmode.c: New file.
+	* samples/fmode/test2.c: New file.
+	* samples/fmode/jamfile: Add test2.exe target.
+
 2002-10-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdint.h (INT64_C, UINT64_C ): Append suffix to let
