@@ -2548,17 +2548,14 @@ logout (char *line)
   strncpy (ut_buf.ut_line, line, sizeof ut_buf.ut_line);
   setutent ();
   ut = getutline (&ut_buf);
+
   if (ut)
     {
       int fd;
 
-      /* We can't use ut further since it's a pointer to the static utmp_data
-	 area (see below) and would get overwritten in pututline().  So we
-	 copy it back to the local ut_buf. */
-      memcpy (&ut_buf, ut, sizeof ut_buf);
-      ut_buf.ut_type = DEAD_PROCESS;
-      memset (ut_buf.ut_user, 0, sizeof ut_buf.ut_user);
-      time (&ut_buf.ut_time);
+      ut->ut_type = DEAD_PROCESS;
+      memset (ut->ut_user, 0, sizeof ut->ut_user);
+      time (&ut->ut_time);
       /* Writing to wtmp must be atomic to prevent mixed up data. */
       char mutex_name[MAX_PATH];
       HANDLE mutex = CreateMutex (NULL, FALSE,
@@ -2569,6 +2566,7 @@ logout (char *line)
       if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
 	{
 	  write (fd, &ut_buf, sizeof ut_buf);
+	  debug_printf ("set logout time for %s", line);
 	  close (fd);
 	}
       if (mutex)
@@ -2576,9 +2574,9 @@ logout (char *line)
 	  ReleaseMutex (mutex);
 	  CloseHandle (mutex);
 	}
-      memset (ut_buf.ut_line, 0, sizeof ut_buf.ut_line);
-      ut_buf.ut_time = 0;
-      pututline (&ut_buf);
+      memset (ut->ut_line, 0, sizeof ut_buf.ut_line);
+      ut->ut_time = 0;
+      pututline (ut);
       endutent ();
     }
   return 1;
@@ -2587,8 +2585,6 @@ logout (char *line)
 static int utmp_fd = -1;
 static bool utmp_readonly = false;
 static char *utmp_file = (char *) _PATH_UTMP;
-
-static struct utmp utmp_data;
 
 static void
 internal_setutent (bool force_readwrite)
@@ -2645,6 +2641,16 @@ utmpname (_CONST char *file)
   debug_printf ("New UTMP file: %s", utmp_file);
 }
 
+/* Note: do not make NO_COPY */
+static struct utmp utmp_data_buf[16];
+static unsigned utix = 0;
+#define nutdbuf (sizeof (utmp_data_buf) / sizeof (utmp_data_buf[0]))
+#define utmp_data ({ \
+  if (utix > nutdbuf) \
+    utix = 0; \
+  utmp_data_buf + utix++; \
+})
+
 extern "C" struct utmp *
 getutent ()
 {
@@ -2655,9 +2661,11 @@ getutent ()
       if (utmp_fd < 0)
 	return NULL;
     }
-  if (read (utmp_fd, &utmp_data, sizeof utmp_data) != sizeof utmp_data)
+
+  utmp *ut = utmp_data;
+  if (read (utmp_fd, ut, sizeof *ut) != sizeof *ut)
     return NULL;
-  return &utmp_data;
+  return ut;
 }
 
 extern "C" struct utmp *
@@ -2672,7 +2680,9 @@ getutid (struct utmp *id)
       if (utmp_fd < 0)
 	return NULL;
     }
-  while (read (utmp_fd, &utmp_data, sizeof utmp_data) == sizeof utmp_data)
+
+  utmp *ut = utmp_data;
+  while (read (utmp_fd, ut, sizeof *ut) == sizeof *ut)
     {
       switch (id->ut_type)
 	{
@@ -2680,15 +2690,15 @@ getutid (struct utmp *id)
 	case BOOT_TIME:
 	case OLD_TIME:
 	case NEW_TIME:
-	  if (id->ut_type == utmp_data.ut_type)
-	    return &utmp_data;
+	  if (id->ut_type == ut->ut_type)
+	    return ut;
 	  break;
 	case INIT_PROCESS:
 	case LOGIN_PROCESS:
 	case USER_PROCESS:
 	case DEAD_PROCESS:
-	   if (strncmp (id->ut_id, utmp_data.ut_id, UT_IDLEN) == 0)
-	    return &utmp_data;
+	   if (strncmp (id->ut_id, ut->ut_id, UT_IDLEN) == 0)
+	    return ut;
 	  break;
 	default:
 	  return NULL;
@@ -2709,14 +2719,14 @@ getutline (struct utmp *line)
       if (utmp_fd < 0)
 	return NULL;
     }
-  while (read (utmp_fd, &utmp_data, sizeof utmp_data) == sizeof utmp_data)
-    {
-      if ((utmp_data.ut_type == LOGIN_PROCESS ||
-	   utmp_data.ut_type == USER_PROCESS) &&
-	  !strncmp (utmp_data.ut_line, line->ut_line,
-		    sizeof utmp_data.ut_line))
-	return &utmp_data;
-    }
+
+  utmp *ut = utmp_data;
+  while (read (utmp_fd, ut, sizeof *ut) == sizeof *ut)
+    if ((ut->ut_type == LOGIN_PROCESS ||
+	 ut->ut_type == USER_PROCESS) &&
+	!strncmp (ut->ut_line, line->ut_line, sizeof (ut->ut_line)))
+      return ut;
+
   return NULL;
 }
 
@@ -2728,7 +2738,14 @@ pututline (struct utmp *ut)
     return;
   internal_setutent (true);
   if (utmp_fd < 0)
-    return;
+    {
+      debug_printf ("error: utmp_fd %d", utmp_fd);
+      return;
+    }
+  debug_printf ("ut->ut_type %d, ut->ut_pid %d, ut->ut_line '%s', ut->ut_id '%s'\n",
+		ut->ut_type, ut->ut_pid, ut->ut_line, ut->ut_id);
+  debug_printf ("ut->ut_user '%s', ut->ut_host '%s'\n",
+		ut->ut_user, ut->ut_host);
   /* Read/write to utmp must be atomic to prevent overriding data
      by concurrent processes. */
   char mutex_name[MAX_PATH];

@@ -2539,8 +2539,7 @@ cygdrive_getmntent ()
 	  break;
 
       __small_sprintf (native_path, "%c:\\", drive);
-      if (GetDriveType (native_path) == DRIVE_REMOVABLE ||
-	  GetFileAttributes (native_path) == INVALID_FILE_ATTRIBUTES)
+      if (GetFileAttributes (native_path) == INVALID_FILE_ATTRIBUTES)
 	{
 	  available_drives &= ~mask;
 	  continue;
