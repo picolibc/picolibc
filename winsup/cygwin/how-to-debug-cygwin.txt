@@ -1,22 +1,25 @@
 Copyright 2001 Red Hat Inc., Egor Duda
 
-So, your favorite program has crashed? And did you say something about
-'stackdump'? Or it just prints its output from left to right and upside-down?
-Well, you can file an angry bug report and wait until some of the core
-developers try to reproduce your problem, try to find what's the matter
-with your program and cygwin and fix the bug, if any. But you can do something
-better than that. You can debug the problem yourself, and even if you can't
-fix it, your analysis may be very helpful. Here's the (incomplete) howto on
-cygwin debugging.
+So, your favorite program has crashed?  And did you say something about
+'stackdump'?  Or it just prints its output from left to right and
+upside-down?  Well, you can file an angry bug report and wait until some
+of the core developers try to reproduce your problem, try to find what's
+the matter with your program and cygwin and fix the bug, if any.  But
+you can do something better than that.  You can debug the problem
+yourself, and even if you can't fix it, your analysis may be very
+helpful.  Here's the (incomplete) howto on cygwin debugging.
 
-1. The first thing you'll need to do is to build cygwin1.dll and your crashed
-application from sources. To debug them you'll need debug information, which
-is normally stripped from executables.
+1.  The first thing you'll need to do is to build cygwin1.dll and your
+    crashed application from sources.  To debug them you'll need debug
+    information, which is normally stripped from executables.  You probably
+    also want to build a version of the dll with more debugging capabilities
+    by reconfiguring your build directory, specifying the --enable-debugging
+    option to configure.
 
 2. Create known-working cygwin debugging environment.
-- create a separate directory, say, c:\cygdeb, and put known-working
-  cygwin1.dll and gdb.exe in it.
-- create a wrapper c:\cygdeb\debug_wrapper.cmd:
+   - create a separate directory, say, c:\cygdeb, and put known-working
+     cygwin1.dll and gdb.exe in it.
+   - create a wrapper c:\cygdeb\debug_wrapper.cmd:
 
 ========= debug_wrapper.cmd =========
 rem setting CYGWIN_TESTING environment variable makes cygwin application
@@ -26,26 +29,30 @@ c:\cygdeb\gdb.exe -nw %1 %2
 ===================================
 
 3. Try to use cygwin's JIT debugging facility:
-- add 'error_start=c:\cygdeb\debug_wrapper.cmd' to CYGWIN environment
-  variable. When some application encounters critical error, cygwin will stop
-  it and execute debug_wrapper.cmd, which will run gdb and make it to attach to
-  the crashed application.
+   add 'error_start=c:\cygdeb\debug_wrapper.cmd' to CYGWIN environment
+   variable. When some application encounters critical error, cygwin will stop
+   it and execute debug_wrapper.cmd, which will run gdb and make it to attach to
+   the crashed application.
 
 4. Strace.
-  You can run your program under 'strace' utility, described if user's manual.
-  If you know where the problem approximately is, you can add a bunch of
-  additional debug_printf()s in the source code and see what they print in
-  strace log. There's one common problem with this method, that some bugs
-  may mysteriously disappear once the program is run under strace. Then the
-  bug is likely a race condition. strace has two useful options to deal with
-  such situation: -b enables buffering of output and reduces additional
-  timeouts introduced by strace, and -m option allows you to mask certain
-  classes of *_printf() functions, reducing timeouts even more.
+   You can run your program under 'strace' utility, described if user's manual.
+   If you know where the problem approximately is, you can add a bunch of
+   additional debug_printf()s in the source code and see what they print in
+   strace log. There's one common problem with this method, that some bugs
+   may mysteriously disappear once the program is run under strace. Then the
+   bug is likely a race condition. strace has two useful options to deal with
+   such situation: -b enables buffering of output and reduces additional
+   timeouts introduced by strace, and -m option allows you to mask certain
+   classes of *_printf() functions, reducing timeouts even more.
+
+   Note that strace does not use the cygwin DLL and so any process that it
+   starts does not inherit a cygwin environment.  It is equivalent to starting
+   a program from the command prompt.
 
 5. Problems at early startup.
-  Sometimes, something crashes at the very early stages of application
-  initialization, when JIT debugging facility is not yet active. Ok, there's
-  another environment variable that may help. Create program_wrapper.cmd:
+   Sometimes, something crashes at the very early stages of application
+   initialization, when JIT debugging facility is not yet active. Ok, there's
+   another environment variable that may help. Create program_wrapper.cmd:
 
 ========= program_wrapper.cmd =========
 rem setting CYGWIN_SLEEP environment variable makes cygwin application
@@ -54,43 +61,43 @@ set CYGWIN_SLEEP=20000
 c:\some\path\bad_program.exe some parameters
 ===================================
 
-  Now, run program_wrapper.cmd. It should print running program pid.
-  After starting program_wrapper.cmd you've got 20 seconds to open another
-  window, cd to c:\cygdeb in it, run gdb there and in gdb prompt type
+   Now, run program_wrapper.cmd. It should print running program pid.
+   After starting program_wrapper.cmd you've got 20 seconds to open another
+   window, cd to c:\cygdeb in it, run gdb there and in gdb prompt type
 
-  (gdb) attach <pid>
+   (gdb) attach <pid>
 
-  where <pid> is the pid that program_wrapper.cmd have printed.
-  After that you can normally step through the code in cygwin1.dll and
-  bad_program.exe
+   where <pid> is the pid that program_wrapper.cmd have printed.
+   After that you can normally step through the code in cygwin1.dll and
+   bad_program.exe
 
 6. Heap corruption.
-  If your program crashes at malloc() or free() or when it references some
-  malloc()'ed memory, it looks like heap corruption. You can configure and
-  build special version of cygwin1.dll which includes heap sanity checking.
-  To do it, just add --enable-malloc-debugging option to configure. Be warned,
-  however, that this version of dll is _very_ slow (10-100 times slower than
-  normal), so use it only when absolutely necessary.
+   If your program crashes at malloc() or free() or when it references some
+   malloc()'ed memory, it looks like heap corruption. You can configure and
+   build special version of cygwin1.dll which includes heap sanity checking.
+   To do it, just add --enable-malloc-debugging option to configure. Be warned,
+   however, that this version of dll is _very_ slow (10-100 times slower than
+   normal), so use it only when absolutely necessary.
 
 7. Program dies when running under strace.
-  If your program crashes when you run it using strace but runs ok (or has a
-  different problem) otherwise, then there may be a problem in one of the
-  strace *_printf statements.  Usually this is caused by a change in arguments
-  resulting in a %s being used with something other than a pointer to a
-  string.
+   If your program crashes when you run it using strace but runs ok (or has a
+   different problem) otherwise, then there may be a problem in one of the
+   strace *_printf statements.  Usually this is caused by a change in arguments
+   resulting in a %s being used with something other than a pointer to a
+   string.
 
-  To debug this scenario, do something like this:
+   To debug this scenario, do something like this:
 
-   bash$ gdb -nw yourapp.exe
-   (gdb) dll cygwin1
-   (gdb) l dll_crt0_1
-   (gdb) bp <<first line in the function>>
-   (gdb) run
-   (gdb) set strace.active=1
-   (gdb) continue
+    bash$ gdb -nw yourapp.exe
+    (gdb) dll cygwin1
+    (gdb) l dll_crt0_1
+    (gdb) bp <<first line in the function>>
+    (gdb) run
+    (gdb) set strace.active=1
+    (gdb) continue
 
-  The program will then run in "strace mode", calling each strace *_printf,
-  just like it does when run under the strace program.  Eventually, the
-  program will crash, probably in small_printf.  At that point, a 'bt'
-  command should show you the offending call to strace_printf with the
-  improper format string.
+   The program will then run in "strace mode", calling each strace *_printf,
+   just like it does when run under the strace program.  Eventually, the
+   program will crash, probably in small_printf.  At that point, a 'bt'
+   command should show you the offending call to strace_printf with the
+   improper format string.
