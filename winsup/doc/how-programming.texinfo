@@ -44,12 +44,30 @@ MAKE_MODE to "UNIX" (actually case is not significant) or "WIN32"
 (actually anything other than "UNIX").  You can also specify the options
 --unix or --win32 on the make command line.
 
-@subsection Why the undefined reference to "WinMain@@16"?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+@subsection Why the undefined reference to @samp{WinMain@@16}?
 
 Try adding an empty main() function to one of your sources.
+
+Or, perhaps you have @samp{-lm} too early in the link command line.  It
+should be at the end:
+
+@example
+    bash$ gcc hello.c -lm
+    bash$ ./a.exe
+    Hello World!
+@end example
+
+works, but
+
+@example
+    bash$  gcc -lm hello.c
+    /c/TEMP/ccjLEGlU.o(.text+0x10):hello.c: multiple definition of `main'
+    /usr/lib/libm.a(libcmain.o)(.text+0x0):libcmain.c: first defined here
+    /usr/lib/libm.a(libcmain.o)(.text+0x6a):libcmain.c: undefined reference to `WinMain@16'
+    collect2: ld returned 1 exit status
+@end example
+
+This is an artifact of libm.a being a symbolic link to libcygwin.a.
 
 @subsection How do I use Win32 API calls?
 
