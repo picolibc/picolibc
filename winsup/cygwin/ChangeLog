@@ -1,5 +1,10 @@
 2002-01-19  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in (new-cygwin1.dll): Revert previous change.  libsupc++.a
+	is only available in libstdc++-v3.
+
+2002-01-19  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (sig_handle_tty_stop): Don't send SIGCHLD if parent
 	doesn't want it.
 	(sig_handle): Don't check for SA_NOCLDSTOP here.  We don't have enough
