@@ -764,7 +764,8 @@ remove_proc (int ci)
 
   sigproc_printf ("removing procs[%d], pid %d, nprocs %d", ci, procs[ci]->pid,
 		  nprocs);
-  procs[ci].release ();
+  if (procs[ci] != myself)
+    procs[ci].release ();
   if (ci < --nprocs)
     procs[ci] = procs[nprocs];
   return 0;

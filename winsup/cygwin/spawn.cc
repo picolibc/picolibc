@@ -633,7 +633,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      parent after CreateProcess and before copying the datastructures
      to the child. So we have to start the child in suspend state,
      unfortunately, to avoid a race condition. */
-  if (cygheap->fdtab.need_fixup_before ())
+  if (!myself->wr_proc_pipe || cygheap->fdtab.need_fixup_before ())
     flags |= CREATE_SUSPENDED;
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
@@ -756,11 +756,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
       cygheap_setup_for_child_cleanup (newheap, &ciresrv, 1);
-      if (mode == _P_OVERLAY)
-	{
-	  ResumeThread (pi.hThread);
-	  cygthread::terminate ();
-	}
     }
 
   if (mode != _P_OVERLAY)
@@ -775,8 +770,10 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   /* Name the handle similarly to proc_subproc. */
   ProtectHandle1 (pi.hProcess, childhProc);
 
+  int wait_for_myself = false;
   if (mode == _P_OVERLAY)
     {
+      CloseHandle (saved_sendsig);
       /* These are both duplicated in the child code.  We do this here,
 	 primarily for strace. */
       strace.execing = 1;
@@ -784,6 +781,12 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       dwExeced = pi.dwProcessId;
       strcpy (myself->progname, real_path);
       close_all_files ();
+      if (!myself->wr_proc_pipe)
+	{
+	  myself.hProcess = pi.hProcess;
+	  myself.remember ();
+	  wait_for_myself = true;
+	}
     }
   else
     {
@@ -816,19 +819,20 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 However, we should try to find another way to do this eventually. */
       (void) DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
 			      NULL, 0, 0, DUPLICATE_SAME_ACCESS);
-      /* Start the child running */
-      ResumeThread (pi.hThread);
     }
 
+  /* Start the child running */
+  if (flags & CREATE_SUSPENDED)
+    ResumeThread (pi.hThread);
   ForceCloseHandle (pi.hThread);
+  ForceCloseHandle1 (pi.hProcess, childhProc);
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  bool exited;
-
-  res = 0;
-  exited = false;
-  ForceCloseHandle1 (pi.hProcess, childhProc);
+  if (!wait_for_myself)
+    res = 0;
+  else
+    waitpid (myself->pid, &res, 0);
 
   switch (mode)
     {

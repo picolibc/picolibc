@@ -666,7 +666,7 @@ static DWORD WINAPI
 proc_waiter (void *arg)
 {
   pinfo& vchild = *(pinfo *) arg;
-  // SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_NORMAL);
+  extern HANDLE hExeced;
 
   siginfo_t si;
   si.si_signo = SIGCHLD;
@@ -699,7 +699,7 @@ proc_waiter (void *arg)
 	{
 	case 0:
 	  if (WIFEXITED (vchild->exitcode))
-	    si.si_sigval.sival_int = CLD_STOPPED;
+	    si.si_sigval.sival_int = CLD_EXITED;
 	  else if (WCOREDUMP (vchild->exitcode))
 	    si.si_sigval.sival_int = CLD_DUMPED;
 	  else
@@ -722,6 +722,13 @@ proc_waiter (void *arg)
 	  continue;
 	}
 
+      if (hExeced)
+	{
+	  /* execing.  no signals available now. */
+	  proc_subproc (PROC_CLEARWAIT, 0);
+	  break;
+	}
+
       /* Send a SIGCHLD to myself.   We do this here, rather than in proc_subproc
 	 to avoid the proc_subproc lock since the signal thread will eventually
 	 be calling proc_subproc and could unnecessarily block. */
@@ -734,6 +741,7 @@ proc_waiter (void *arg)
       else
 	break;
     }
+
   sigproc_printf ("exiting wait thread for pid %d", pid);
   _my_tls._ctinfo->release ();
   return 0;
