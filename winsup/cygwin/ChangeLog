@@ -23,7 +23,7 @@
 	* cygwin.din : Add new aliased exports for service and protocol
 	enumerations in netdb.cc.
 
-2002-11-26  Thomas Pfaff  <tpfaff@gmx.net>
+2002-12-04  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* cxx.cc: New file. Implement new, new[], delete and delete[]
 	operators and  __cxa_pure_virtual if compiled by gcc >=3.
