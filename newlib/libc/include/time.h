@@ -62,6 +62,7 @@ struct tm *_EXFUN(gmtime_r,	(const time_t *, struct tm *));
 struct tm *_EXFUN(localtime_r,	(const time_t *, struct tm *));
 
 #ifdef __CYGWIN__
+char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
 #ifndef __STRICT_ANSI__
 extern __IMPORT time_t _timezone;
 extern __IMPORT int _daylight;

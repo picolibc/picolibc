@@ -1,3 +1,7 @@
+2002-01-18  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+	* libc/include/time.h: Add prototype for strptime for Cygwin.
+
 2002-01-17  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* libc/machine/xscale/memset.c (memset): Fix bug when len == 1 and
