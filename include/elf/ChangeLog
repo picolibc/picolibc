@@ -1,4 +1,4 @@
-1999-08-31  Nick Clifton  <nickc@cygnus.com>
+1999-08-31  Scott Bambrough <scottb@netwinder.org>
 
 	* common.h (NT_TASKSTRUCT): Define.
 
