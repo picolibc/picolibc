@@ -12,7 +12,6 @@ static FILE *passwd_fp;
 
 static char logname[8];
 static char password[1024];
-static char comment[1024];
 static char gecos[1024];
 static char dir[1024];
 static char shell[1024];
@@ -33,11 +32,11 @@ getpwnam (name)
     {
       sscanf (buf, "%[^:]:%[^:]:%d:%d:%[^:]:%[^:]:%s\n",
 	      logname, password, &pw_passwd.pw_uid,
-	      &pw_passwd.pw_gid, comment, gecos,
+             &pw_passwd.pw_gid, gecos,
 	      dir, shell);
       pw_passwd.pw_name = logname;
       pw_passwd.pw_passwd = password;
-      pw_passwd.pw_comment = comment;
+      pw_passwd.pw_comment = "";
       pw_passwd.pw_gecos = gecos;
       pw_passwd.pw_dir = dir;
       pw_passwd.pw_shell = shell;
@@ -67,11 +66,11 @@ getpwuid (uid_t uid)
     {
       sscanf (buf, "%[^:]:%[^:]:%d:%d:%[^:]:%[^:]:%s\n",
 	      logname, password, &pw_passwd.pw_uid,
-	      &pw_passwd.pw_gid, comment, gecos,
+             &pw_passwd.pw_gid, gecos,
 	      dir, shell);
       pw_passwd.pw_name = logname;
       pw_passwd.pw_passwd = password;
-      pw_passwd.pw_comment = comment;
+      pw_passwd.pw_comment = "";
       pw_passwd.pw_gecos = gecos;
       pw_passwd.pw_dir = dir;
       pw_passwd.pw_shell = shell;
@@ -99,11 +98,11 @@ getpwent ()
 
   sscanf (buf, "%[^:]:%[^:]:%d:%d:%[^:]:%[^:]:%s\n",
 	  logname, password, &pw_passwd.pw_uid,
-	  &pw_passwd.pw_gid, comment, gecos,
+         &pw_passwd.pw_gid, gecos,
 	  dir, shell);
   pw_passwd.pw_name = logname;
   pw_passwd.pw_passwd = password;
-  pw_passwd.pw_comment = comment;
+  pw_passwd.pw_comment = "";
   pw_passwd.pw_gecos = gecos;
   pw_passwd.pw_dir = dir;
   pw_passwd.pw_shell = shell;
