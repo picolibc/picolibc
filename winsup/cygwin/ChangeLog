@@ -1,3 +1,11 @@
+2004-09-14  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.h: Add alignment kludge to fix disparity between compilers.
+	* tlsoffsets.h: Regenerate.
+
+	* fork.cc (slow_pid_reuse): Use define to control number of pids held
+	to prevent pid reuse.
+
 2004-09-14  Sam Steingold  <sds@gnu.org>
 
 	* autoload.cc (EnumProcessModules): Add.

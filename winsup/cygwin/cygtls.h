@@ -98,6 +98,8 @@ typedef struct struct_waitq
 
 /* Changes to the below structure may require acompanying changes to the very
    simple parser in the perl script 'gentls_offsets' (<<-- start parsing here).
+   The union in this structure is used to force alignment between the version
+   of the compiler used to generate tlsoffsets.h and the cygwin cross compiler.
 */
 
 typedef __uint32_t __stack_t;
@@ -117,7 +119,11 @@ struct _cygtls
   unsigned threadkill;
   siginfo_t infodata;
   struct pthread *tid;
-  struct _reent local_clib;
+  union
+    {
+      struct _reent local_clib;
+      char __dontuse[8 * ((sizeof(struct _reent) + 4) / 8)];
+    };
   struct _local_storage locals;
   waitq wq;
   struct _cygtls *prev, *next;

@@ -31,6 +31,8 @@ details. */
 #include "cygmalloc.h"
 #include "cygthread.h"
 
+#define NPIDS_HELD 8
+
 /* Timeout to wait for child to start, parent to init child, etc.  */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */
 #define FORK_WAIT_TIMEOUT (300 * 1000)     /* 300 seconds */
@@ -321,7 +323,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 static void
 slow_pid_reuse (HANDLE h)
 {
-  static NO_COPY HANDLE last_fork_procs[8] = {0};
+  static NO_COPY HANDLE last_fork_procs[NPIDS_HELD] = {0};
   static NO_COPY unsigned nfork_procs = 0;
 
   if (nfork_procs >= (sizeof (last_fork_procs) / sizeof (last_fork_procs [0])))
