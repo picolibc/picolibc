@@ -1,3 +1,10 @@
+2002-01-16  H.J. Lu  (hjl@gnu.org)
+
+	* config.guess: Import from master sources, rev 1.225.
+	* config.sub: Import from master sources, rev 1.238.
+
+	* MAINTAINERS: Updated notes on config.guess and config.sub.
+
 2002-01-11  Steve Ellcey  <sje@cup.hp.com>
 
 	* configure.in (ia64*-*-hpux*): New target for IA64 HP-UX,

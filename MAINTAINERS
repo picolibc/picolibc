@@ -28,6 +28,9 @@ readline/support/config.sub; readline/support/config.guess
 	Changes need to be done in tandem with the official CONFIG
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
+	Please notify the following of any committed patches:
+		binutils@sources.redhat.com
+		gdb-patches@sources.redhat.com
 
 dejagnu/
 	Notify http://dejagnu.sourceforge.net/ of generic changes.
