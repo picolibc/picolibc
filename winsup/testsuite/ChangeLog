@@ -1,0 +1,27 @@
+2000-09-02  Egor Duda  <deo@logos-m.ru>
+
+	* moved here everything from cygwin/testsuite/
+	* configure.in: New file
+	* configure: New file, generated from configure.in
+	with autoconf 2.13
+	* Makefile.in: New file
+	* libltp/: New directory. Contains a support library
+	and headers for tests in winsup.api/ltp/
+	* config/default.exp: Print value of CYGWIN environment
+	variable when test completed
+	* winsup.api/samples/xf-sample-fail.c renamed to
+	winsup.api/samples/sample-fail.c
+	* winsup.api/samples/xf-sample-miscompile.c renamed to
+	winsup.api/samples/sample-miscompile.c
+	* winsup.api/known_bugs.tcl: New file.
+	* winsup.api/winsup.exp: Xfail test if its name is in
+	list from known_bugs.tcl
+	* winsup.api/winsup.exp: Don't stop if compiled test executable
+	can't be deleted
+	* winsup.api/winsup.exp: If in verbose mode, write test	output
+	to <testname>.log
+	* winsup.api/ltp/: New directory. Contains cygwin port of testsuite
+	from Linux Testing Project
+	* winsup.api/sigchld.c: New file. Test if process recieves SIGCHLD
+	signal when its child terminates.
+	* winsup.api/waitpid.c: New file. Test if waitpid function works

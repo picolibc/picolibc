@@ -1,0 +1,19 @@
+dnl Autoconf configure script for Cygwin's testsuite.
+dnl Copyright 2000 Red Hat, Inc.
+dnl
+dnl This file is part of Cygwin.
+dnl
+dnl This software is a copyrighted work licensed under the terms of the
+dnl Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+dnl details.
+dnl
+dnl Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.12)
+AC_INIT(Makefile.in)
+
+AC_PROG_CC
+AC_PROG_CPP
+AC_CHECK_TOOL(AR,ar)
+
+AC_OUTPUT(Makefile)

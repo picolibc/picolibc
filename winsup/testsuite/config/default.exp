@@ -1,5 +1,13 @@
 proc winsup_version {} {
-    clone_output "\n[exec grep ^%%% ../new-cygwin1.dll]\n"
+    global env
+    global rootme
+    puts stderr "root=$rootme"
+    clone_output "\n[exec grep ^%%% $rootme/../cygwin/new-cygwin1.dll]\n"
+    if { [info exists env(CYGWIN)] } {
+        clone_output "CYGWIN=$env(CYGWIN)\n"
+    } else {
+        clone_output "CYGWIN=\n"
+    }
 }
 
 proc winsup_exit {} {

@@ -1,4 +1,5 @@
 source "site.exp"
+source "$srcdir/winsup.api/known_bugs.tcl"
 
 if { ! [isnative] } {
     verbose "skipping winsup.api because it's not native"
@@ -6,6 +7,11 @@ if { ! [isnative] } {
 }
 
 set rv ""
+set add_includes ""
+set add_libs ""
+
+set ltp_includes "-I$ltp_includes"
+set ltp_libs "$rootme/libltp.a"
 
 proc ws_spawn {cmd args} {
     global rv
@@ -20,24 +26,45 @@ foreach src [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.c] {
     regsub ".*/" $base "" basename
     regsub "/" $base "-" base
 
-    if { [regexp "^xf-" $basename] } {
+    if { [lsearch -exact $xfail_list $basename] >= 0 } {
+        set xfail_expected 1
 	setup_xfail "*-*-*"
     } else {
+        set xfail_expected 0
 	clear_xfail
     }
 
-    ws_spawn "$CC $src $rootme/new-libcygwin.a -o $base.exe"
+    if { [regexp "^ltp/" $testcase ] } {
+        set add_includes $ltp_includes
+        set add_libs $ltp_libs
+    }
+
+    ws_spawn "$CC -g3 $CFLAGS $src $add_includes $add_libs $runtime_root/new-libcygwin.a -o $base.exe"
     if { $rv != "" } {
 	verbose -log "$rv"
 	fail "$testcase (compile)"
     } else {
-        ws_spawn "../cygrun ./$base.exe > /dev/null"
+        if { $verbose } {
+           set redirect_output "./$base.log"
+        } else {
+           set redirect_output /dev/null
+        }
+        ws_spawn "$runtime_root/cygrun ./$base.exe > $redirect_output"
         if { $rv != "" } {
 	    verbose -log "$testcase: $rv"
 	    fail "$testcase (execute)"
+            if { $xfail_expected } {
+  	        catch { file delete "$base.exe" } err
+                if { $err != "" } {
+                    note "error deleting $base.exe: $err"
+                }
+            }
 	} else {
 	    pass "$testcase"
-	    file delete "$base.exe"
+	    catch { file delete "$base.exe" } err
+            if { $err != "" } {
+                note "error deleting $base.exe: $err"
+            }
 	}
     }
 }
