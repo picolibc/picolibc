@@ -1,3 +1,7 @@
+2002-06-21  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (cygrun.exe): Move -lgcc where it will do some good.
+
 2002-06-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (stat64_to_stat32): Correctly evaluate st_rdev.
