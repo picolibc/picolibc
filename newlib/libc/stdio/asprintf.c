@@ -29,7 +29,7 @@
 
 int
 #ifdef _HAVE_STDC
-_DEFUN (asprintf_r, (ptr, strp, fmt), struct _reent *ptr _AND char **strp _AND _CONST char *fmt _DOTS)
+_DEFUN (_asprintf_r, (ptr, strp, fmt), struct _reent *ptr _AND char **strp _AND _CONST char *fmt _DOTS)
 #else
 _asprintf_r (ptr, strp, fmt, va_alist)
      struct _reent *ptr;

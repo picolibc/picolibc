@@ -1,3 +1,8 @@
+2003-01-06  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* asprintf.c (_asprintf_r): insure both declarations
+	are the same.
+
 2002-12-28  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/sys/unistd.h: Under cygwin, just include getopt.h rather
