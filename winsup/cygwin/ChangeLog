@@ -1,3 +1,13 @@
+2003-02-03  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.h: Add third argument to set_process_privilege.
+	* autoload.cc: Add OpenThreadToken.
+	* sec_helper.cc (set_process_privilege): Add and use use_thread
+	argument.
+	* security.cc (alloc_sd): Modify call to set_process_privilege.
+	Remember the result in each process. If failed and file owner is not
+	the user, fail.
+
 2003-02-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::recvfrom): Return buffer

@@ -294,7 +294,7 @@ got_it:
 #endif //unused
 
 int
-set_process_privilege (const char *privilege, BOOL enable)
+set_process_privilege (const char *privilege, bool enable, bool use_thread)
 {
   HANDLE hToken = NULL;
   LUID restore_priv;
@@ -302,8 +302,12 @@ set_process_privilege (const char *privilege, BOOL enable)
   int ret = -1;
   DWORD size;
 
-  if (!OpenProcessToken (hMainProc, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
-			 &hToken))
+  if ((use_thread
+       && !OpenThreadToken (GetCurrentThread (), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
+			    0, &hToken))
+      ||(!use_thread
+	 && !OpenProcessToken (hMainProc, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
+			     &hToken)))
     {
       __seterrno ();
       goto out;
@@ -329,7 +333,6 @@ set_process_privilege (const char *privilege, BOOL enable)
      be enabled. GetLastError () returns an correct error code, though. */
   if (enable && GetLastError () == ERROR_NOT_ALL_ASSIGNED)
     {
-      debug_printf ("Privilege %s couldn't be assigned", privilege);
       __seterrno ();
       goto out;
     }

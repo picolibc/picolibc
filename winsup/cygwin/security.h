@@ -236,7 +236,7 @@ BOOL get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL
 
 /* sec_helper.cc: Security helper functions. */
 BOOL __stdcall is_grp_member (__uid32_t uid, __gid32_t gid);
-int set_process_privilege (const char *privilege, BOOL enable = TRUE);
+int set_process_privilege (const char *privilege, bool enable = true, bool use_thread = false);
 
 /* shared.cc: */
 /* Retrieve a security descriptor that allows all access */

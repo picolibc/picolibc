@@ -1563,9 +1563,20 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     }
   owner_sid.debug_print ("alloc_sd: owner SID =");
 
-  /* Must have SE_RESTORE_NAME privilege to change owner */
-  if (cur_owner_sid && owner_sid != cur_owner_sid
-      && set_process_privilege (SE_RESTORE_NAME) < 0 )
+  /* Try turning privilege on, may not have WRITE_OWNER or WRITE_DAC access.
+     Must have privilege to set different owner, else BackupWrite misbehaves */
+  static int NO_COPY saved_res; /* 0: never, 1: failed, 2 & 3: OK */
+  int res;
+  if (!saved_res || cygheap->user.issetuid ())
+    {
+      res = 2 + set_process_privilege (SE_RESTORE_NAME, true,
+				       cygheap->user.issetuid ());
+      if (!cygheap->user.issetuid ())
+	saved_res = res;
+    }
+  else
+    res = saved_res;
+  if (res == 1 && owner_sid != cygheap->user.sid ())
     return NULL;
 
   /* Get SID of new group. */
