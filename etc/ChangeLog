@@ -1,3 +1,8 @@
+2002-02-24  Andrew Cagney  <ac131313@redhat.com>
+
+	* standards.texi: Import February 14, 2002 version.
+	* make-stds.texi: Import 2001 version.
+
 2002-01-26  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* Makefile.in (install): Depend on install-info.
