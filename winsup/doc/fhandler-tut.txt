@@ -8,7 +8,7 @@ Files to note:
 fhandler.h - must define a new derived class here and FH_*
 path.cc - to notice "/dev/zero" and mark it
 fhandler_zero.cc - new
-hinfo.cc - to create the fhandler instance
+dtable.cc - to create the fhandler instance
 
 OK, first we have to define what this new fhandler will do.  In our
 example case, we're going to implement the unix "/dev/zero" device,
@@ -45,7 +45,7 @@ to open "/dev/zero".  Look in get_device_number; there's a long list
 of cases, just add one (I added one after "null").  Also remember to
 add an entry to the windows_device_names list in the right spot.
 
-To go along with that change, we'll need to change hinfo.cc.  Look for
+To go along with that change, we'll need to change dtable.cc.  Look for
 FH_NULL and add a case for FH_ZERO as well.
 
 Now we get to fhandler_zero.cc itself.  Create the empty file and copy

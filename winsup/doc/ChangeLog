@@ -1,3 +1,7 @@
+Fri Aug 18 15:51:06 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler-tut.txt: hinfo -> dtable.
+
 Thu Jul 20 13:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* ntsec.sgml: Add description for the new setuid ability
