@@ -54,7 +54,7 @@ extern "C" {
 #define WC_LISTVIEWW	L"SysListView32"
 #define WC_TABCONTROLA	"SysTabControl32"
 #define WC_TABCONTROLW	L"SysTabControl32"
-#define WC_TREEVIEWA	("SysTreeView32")
+#define WC_TREEVIEWA	"SysTreeView32"
 #define WC_TREEVIEWW	L"SysTreeView32"
 #define WC_HEADERA	"SysHeader32"
 #define WC_HEADERW 	L"SysHeader32"

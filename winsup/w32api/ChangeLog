@@ -1,3 +1,7 @@
+2004-08-15  Ken Fitlike  <kenfitlike@users.sourceforge.net>
+
+	* include/commctrl.h (WC_TREEVIEWA): Remove parenthenses.
+
 2004-08-10  Sebastian Nowak  <snowak1@users.sourceforge.net>
 
 	* include/ws2spi.h (LPWSPSELECT): Correct typedef.
