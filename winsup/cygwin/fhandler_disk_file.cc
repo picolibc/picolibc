@@ -807,13 +807,12 @@ fhandler_disk_file::utimes (const struct timeval *tvp)
 	{
 	  syscall_printf ("Opening file failed");
 	  __seterrno ();
-	  if (pc.isdir ()) /* What we can do with directories more? */
-	    return 0;
-	    
-	  __seterrno ();
 	  return -1;
 	}
     }
+
+  if (nohandle ())	/* Directory query_open on 9x. */
+    return 0;
 
   gettimeofday (&tmp[0], 0);
   if (!tvp)

@@ -1,5 +1,10 @@
 2005-03-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::utimes): Handle opening
+	directories under 9x gracefully.
+
+2005-03-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::connect): Always set sun_path
 	in case of a successful or pending connect.
 	(fhandler_socket::accept): Don't run secret event and eid credential
