@@ -1,3 +1,8 @@
+2003-02-18  Christian Groessler  <chris@groessler.org>
+
+	* libc/machine/z8k/setjmp.S (_setjmp / _longjmp): Fix to
+	support z8001 segmented mode.
+
 2003-02-18  Earnie Boyd  <earnie@users.sf.net>
 
 	* libc/stdlib/mallocr.c (unlink): Don't assign a value to a pointer
