@@ -1,3 +1,10 @@
+Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
+			  David Mosberger  <davidm@hpl.hp.com>
+			  Timothy Wall <twall@cygnus.com>
+			  Jim Wilson  <wilson@cygnus.com>
+
+	* ia64.h: New file.
+
 2000-03-27  Nick Clifton  <nickc@cygnus.com>
 
 	* d30v.h (SHORT_A1): Fix value.

@@ -1,3 +1,8 @@
+Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
+			  David Mosberger  <davidm@hpl.hp.com>
+
+	* ia64.h: New file.
+
 2000-04-14  H.J. Lu  <hjl@gnu.org>
 
 	* common.h (ELFOSABI_TRUE64): Renamed to ELFOSABI_TRU64.
