@@ -1,14 +1,14 @@
 /* shm.cc: Single unix specification IPC interface for Cygwin
 
-   Copyright 2001 Red Hat, Inc.
+Copyright 2001, 2002 Red Hat, Inc.
 
-   Originally written by Robert Collins <robert.collins@hotmail.com>
+Originally written by Robert Collins <robert.collins@hotmail.com>
 
-   This file is part of Cygwin.
+This file is part of Cygwin.
 
-   This software is a copyrighted work licensed under the terms of the
-   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-   details. */
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
 
 #include "winsup.h"
 #include <sys/stat.h>
@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include "thread.h"
 #include <sys/shm.h>
-#include "perprocess.h"
 #include "cygserver_shm.h"
 
 // FIXME IS THIS CORRECT
@@ -64,9 +63,9 @@ client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
 }
 
 client_request_shm::client_request_shm (key_t nkey, size_t nsize,
-                                                int nshmflg,
-                                                char psdbuf[4096],
-                                                pid_t npid):
+						int nshmflg,
+						char psdbuf[4096],
+						pid_t npid):
 client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
 {
   buffer = (char *) &parameters;
@@ -134,6 +133,34 @@ build_inprocess_shmds (HANDLE hfilemap, HANDLE hattachmap, key_t key,
   return tempnode;
 }
 
+static void
+delete_inprocess_shmds (shmnode **nodeptr)
+{
+  shmnode *node = *nodeptr;
+
+  // remove from the list
+  if (node == shm_head)
+    shm_head = shm_head->next;
+  else
+    {
+      shmnode *tempnode = shm_head;
+      while (tempnode && tempnode->next != node)
+	tempnode = tempnode->next;
+      if (tempnode)
+	tempnode->next = node->next;
+      // else log the unexpected !
+    }
+
+  // release the shared data view
+  UnmapViewOfFile (node->shmds);
+  CloseHandle (node->filemap);
+  CloseHandle (node->attachmap);
+
+  // free the memory
+  delete node;
+  nodeptr = NULL;
+}
+
 int __stdcall
 fixup_shms_after_fork ()
 {
@@ -194,7 +221,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   if (!tempnode)
     {
       /* couldn't find a currently open shm control area for the key - probably because
-       * shmget hasn't been called. 
+       * shmget hasn't been called.
        * Allocate a new control block - this has to be handled by the daemon */
       client_request_shm *req =
 	new client_request_shm (SHM_REATTACH, shmid, GetCurrentProcessId ());
@@ -229,7 +256,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
 
     }
 
-  class shmid_ds *shm = tempnode->shmds;
+  // class shmid_ds *shm = tempnode->shmds;
 
   if (shmaddr)
     {
@@ -277,10 +304,40 @@ shmdt (const void *shmaddr)
   /* this should be "rare" so a hefty search is ok. If this is common, then we
    * should alter the data structs to allow more optimisation
    */
-  
+  shmnode *tempnode = shm_head;
+  _shmattach *attachnode;
+  while (tempnode)
+    {
+      // FIXME: Race potential
+      attachnode = tempnode->attachhead;
+      while (attachnode && attachnode->data != shmaddr)
+	attachnode = attachnode->next;
+      if (attachnode)
+	break;
+      tempnode = tempnode->next;
+    }
+  if (!tempnode)
+    {
+      // dt cannot be called by an app that hasn't alreadu at'd
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  UnmapViewOfFile (attachnode->data);
+  /* tell the daemon we have attached */
+  client_request_shm *req =
+      new client_request_shm (SHM_DETACH, tempnode->shm_id);
+  int rc;
+  if ((rc = cygserver_request (req)))
+    {
+      debug_printf ("failed to tell deaemon that we have detached\n");
+    }
+  delete req;
+
+  return 0;
 }
 
-//FIXME: who is allowed to perform STAT? 
+//FIXME: who is allowed to perform STAT?
 extern "C" int
 shmctl (int shmid, int cmd, struct shmid_ds *buf)
 {
@@ -338,21 +395,20 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
       break;
     case IPC_RMID:
       {
-	/* TODO: check permissions. Or possibly, the daemon gets to be the only 
+	/* TODO: check permissions. Or possibly, the daemon gets to be the only
 	 * one with write access to the memory area?
 	 */
 	if (tempnode->shmds->shm_nattch)
 	  system_printf
 	    ("call to shmctl with cmd= IPC_RMID when memory area still has"
 	     " attachees\n");
-	/* how does this work? 
+	/* how does this work?
 	   * we mark the ds area as "deleted", and the at and get calls all fail from now on
 	   * on, when nattch becomes 0, the mapped data area is destroyed.
-	   * and each process, as they touch this area detaches. eventually only the 
+	   * and each process, as they touch this area detaches. eventually only the
 	   * daemon has an attach. The daemon gets asked to detach immediately.
 	 */
-#if 0
-//waiting for the daemon to handle terminating process's
+	//waiting for the daemon to handle terminating process's
 	client_request_shm *req =
 	  new client_request_shm (SHM_DEL, shmid, GetCurrentProcessId ());
 	int rc;
@@ -372,8 +428,9 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 
 	/* the daemon has deleted it's references */
 	/* now for us */
-	
-#endif	
+
+	// FIXME: create a destructor
+	delete_inprocess_shmds (&tempnode);
 
       }
       break;
@@ -385,7 +442,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
   return 0;
 }
 
-/* FIXME: evaluate getuid() and getgid() against the requested mode. Then
+/* FIXME: evaluate getuid32() and getgid32() against the requested mode. Then
  * choose PAGE_READWRITE | PAGE_READONLY and FILE_MAP_WRITE  |  FILE_MAP_READ
  * appropriately
  */
@@ -402,7 +459,9 @@ shmget (key_t key, size_t size, int shmflg)
   char sd_buf[4096];
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
   /* create a sd for our open requests based on shmflag & 0x01ff */
-  psd = alloc_sd (getuid (), getgid (), cygheap->user.logsrv (),
+  InitializeSecurityDescriptor (psd,
+				    SECURITY_DESCRIPTOR_REVISION);
+  psd = alloc_sd (getuid32 (), getgid32 (),
 		  shmflg & 0x01ff, psd, &sd_size);
 
   if (key == (key_t) - 1)
@@ -479,9 +538,9 @@ shmget (key_t key, size_t size, int shmflg)
 
 #if 0
   /* fill out the node data */
-  shmtemp->shm_perm.cuid = getuid ();
+  shmtemp->shm_perm.cuid = getuid32 ();
   shmtemp->shm_perm.uid = shmtemp->shm_perm.cuid;
-  shmtemp->shm_perm.cgid = getgid ();
+  shmtemp->shm_perm.cgid = getgid32 ();
   shmtemp->shm_perm.gid = shmtemp->shm_perm.cgid;
   shmtemp->shm_perm.mode = shmflg & 0x01ff;
   shmtemp->shm_lpid = 0;

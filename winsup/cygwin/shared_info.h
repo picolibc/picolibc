@@ -41,7 +41,7 @@ class mount_item
 
 #define MOUNT_VERSION	27	// increment when mount table changes and
 #define MOUNT_VERSION_MAGIC CYGWIN_VERSION_MAGIC (MOUNT_MAGIC, MOUNT_VERSION)
-#define CURR_MOUNT_MAGIC 0x41e0
+#define CURR_MOUNT_MAGIC 0xf4e5
 #define MOUNT_INFO_CB 16488
 
 class reg_key;
@@ -94,13 +94,10 @@ class mount_info
   int get_cygdrive_info (char *user, char *system, char* user_flags,
 			 char* system_flags);
 
-  void import_v1_mounts ();
-
  private:
 
   void sort ();
   void read_mounts (reg_key& r);
-  void read_v1_mounts (reg_key r, unsigned which);
   void mount_slash ();
   void to_registry ();
 

@@ -1,6 +1,6 @@
 /* fhandler_raw.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -10,7 +10,6 @@
 
 #include "winsup.h"
 #include <sys/termios.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 
@@ -171,15 +170,12 @@ fhandler_dev_raw::open (path_conv *real_path, int flags, mode_t)
 				FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
     {
-      set_errno (RtlNtStatusToDosError (status));
-      debug_printf ("NtOpenFile: NTSTATUS: %d, Win32: %E", status);
+      __seterrno_from_win_error (RtlNtStatusToDosError (status));
       return 0;
     }
 
   set_io_handle (h);
-  set_flags (flags);
-  set_r_binary (O_BINARY);
-  set_w_binary (O_BINARY);
+  set_flags (flags & ~O_TEXT, O_BINARY);
 
   if (devbufsiz > 1L)
     devbuf = new char [devbufsiz];

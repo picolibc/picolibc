@@ -1,6 +1,6 @@
 /* fhandler_windows.cc: code to access windows message queues.
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Sergey S. Okhapkin (sos@prospect.com.ru).
    Feedback and testing by Andy Piper (andyp@parallax.co.uk).
@@ -54,7 +54,7 @@ fhandler_windows::fhandler_windows ()
 int
 fhandler_windows::open (path_conv *, int flags, mode_t)
 {
-  set_flags (flags);
+  set_flags (flags & ~O_TEXT, O_BINARY);
   set_close_on_exec_flag (1);
   set_open_status ();
   return 1;

@@ -12,6 +12,7 @@ details. */
 #define _FHANDLER_H_
 
 #include <sys/ioctl.h>
+#include <fcntl.h>
 
 enum
 {
@@ -70,8 +71,11 @@ enum
   FH_CLIPBOARD = 0x00000017,	/* is a clipboard device */
   FH_OSS_DSP = 0x00000018,	/* is a dsp audio device */
   FH_CYGDRIVE= 0x00000019,	/* /cygdrive/x */
+  FH_PROC    = 0x0000001a,      /* /proc */
+  FH_REGISTRY =0x0000001b,      /* /proc/registry */
+  FH_PROCESS = 0x0000001c,      /* /proc/<n> */
 
-  FH_NDEV    = 0x0000001a,	/* Maximum number of devices */
+  FH_NDEV    = 0x0000001d,      /* Maximum number of devices */
   FH_DEVMASK = 0x00000fff,	/* devices live here */
   FH_BAD     = 0xffffffff
 };
@@ -100,6 +104,8 @@ enum
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
 #define __fmode (*(user_data->fmode_ptr))
+extern const char proc[];
+extern const int proc_len;
 
 class select_record;
 class path_conv;
@@ -118,8 +124,8 @@ enum bg_check_types
 enum executable_states
 {
   is_executable,
-  not_executable,
   dont_care_if_executable,
+  not_executable = dont_care_if_executable,
   dont_know_if_executable
 };
 
@@ -144,15 +150,13 @@ class fhandler_base
   size_t raixput;
   size_t rabuflen;
 
-  char *unix_path_name;
-  char *win32_path_name;
+  const char *unix_path_name;
+  const char *win32_path_name;
   DWORD open_status;
 
  public:
-  void set_name (const char * unix_path, const char * win32_path = NULL,
-		 int unit = 0);
+  void set_name (const char * unix_path, const char *win32_path = NULL, int unit = 0);
 
-  void reset_unix_path_name (const char *);
   virtual fhandler_base& operator =(fhandler_base &x);
   fhandler_base (DWORD dev, int unit = 0);
   virtual ~fhandler_base ();
@@ -171,13 +175,13 @@ class fhandler_base
   void set_async (int x) { FHCONDSETF (x, ASYNC); }
 
   int get_flags () { return openflags; }
-  void set_flags (int x) { openflags = x; }
+  void set_flags (int x, int supplied_bin = 0);
 
   bool is_nonblocking ();
   void set_nonblocking (int yes);
 
-  bool get_w_binary () { return FHISSETF (WBINARY); }
-  bool get_r_binary () { return FHISSETF (RBINARY); }
+  bool get_w_binary () { return FHISSETF (WBINSET) ? FHISSETF (WBINARY) : 1; }
+  bool get_r_binary () { return FHISSETF (RBINSET) ? FHISSETF (RBINARY) : 1; }
 
   bool get_w_binset () { return FHISSETF (WBINSET); }
   bool get_r_binset () { return FHISSETF (RBINSET); }
@@ -194,9 +198,9 @@ class fhandler_base
   DWORD get_open_status () {return open_status;}
   void reset_to_open_binmode ()
   {
-    status = status & ~(FH_WBINARY | FH_WBINSET | FH_RBINARY | FH_RBINSET);
-    status = status | ((FH_WBINARY | FH_WBINSET | FH_RBINARY | FH_RBINSET)
-		       & open_status);
+    set_flags ((get_flags () & ~(O_TEXT | O_BINARY))
+	       | ((open_status & (FH_WBINARY | FH_RBINARY)
+		   ? O_BINARY : O_TEXT)));
   }
 
   int get_default_fmode (int flags);
@@ -243,13 +247,14 @@ class fhandler_base
   }
   void set_execable_p () { FHSETF (EXECABL); }
   bool dont_care_if_execable () { return FHISSETF (DCEXEC); }
+  bool exec_state_isknown () { return FHISSETF (DCEXEC) || FHISSETF (EXECABL); }
 
   bool get_append_p () { return FHISSETF (APPEND); }
   void set_append_p (int val) { FHCONDSETF (val, APPEND); }
   void set_append_p () { FHSETF (APPEND); }
 
   bool get_query_open () { return FHISSETF (QUERYOPEN); }
-  void set_query_open (int val) { FHCONDSETF (val, QUERYOPEN); }
+  void set_query_open (bool val) { FHCONDSETF (val, QUERYOPEN); }
 
   bool get_readahead_valid () { return raixget < ralen; }
   int puts_readahead (const char *s, size_t len = (size_t) -1);
@@ -280,7 +285,7 @@ class fhandler_base
   /* fixup fd possibly non-inherited handles after fork */
   void fork_fixup (HANDLE parent, HANDLE &h, const char *name);
 
-  virtual int open (path_conv * real_path, int flags, mode_t mode = 0);
+  virtual int open (path_conv *real_path, int flags, mode_t mode = 0);
   virtual int close ();
   virtual int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
   virtual int ioctl (unsigned int cmd, void *);
@@ -357,6 +362,7 @@ class fhandler_socket: public fhandler_base
 {
  private:
   int addr_family;
+  int type;
   int connect_secret [4];
   HANDLE secret_event;
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
@@ -397,6 +403,8 @@ class fhandler_socket: public fhandler_base
   select_record *select_except (select_record *s);
   void set_addr_family (int af) {addr_family = af;}
   int get_addr_family () {return addr_family;}
+  void set_socket_type (int st) { type = st;}
+  int get_socket_type () {return type;}
   void set_sun_path (const char *path);
   char *get_sun_path () {return sun_path;}
   void set_connect_secret ();
@@ -509,16 +517,16 @@ class fhandler_dev_tape: public fhandler_dev_raw
  public:
   fhandler_dev_tape (int unit);
 
-  int open (path_conv *, int flags, mode_t mode = 0);
-  int close (void);
+  virtual int open (path_conv *, int flags, mode_t mode = 0);
+  virtual int close (void);
 
-  __off64_t lseek (__off64_t offset, int whence);
+  virtual __off64_t lseek (__off64_t offset, int whence);
 
-  int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+  virtual int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
 
-  int dup (fhandler_base *child);
+  virtual int dup (fhandler_base *child);
 
-  int ioctl (unsigned int cmd, void *buf);
+  virtual int ioctl (unsigned int cmd, void *buf);
 
  private:
   int tape_write_marks (int marktype, DWORD len);
@@ -546,7 +554,18 @@ class fhandler_disk_file: public fhandler_base
   int lock (int, struct flock *);
   BOOL is_device () { return FALSE; }
   int __stdcall fstat (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
-  int __stdcall fstat_helper (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int __stdcall fstat_helper (struct __stat64 *buf, path_conv *pc,
+			      FILETIME ftCreateionTime,
+			      FILETIME ftLastAccessTime,
+			      FILETIME ftLastWriteTime,
+			      DWORD nFileSizeHigh,
+			      DWORD nFileSizeLow,
+			      DWORD nFileIndexHigh = 0,
+			      DWORD nFileIndexLow = 0,
+			      DWORD nNumberOfLinks = 1)
+    __attribute__ ((regparm (3)));
+  int __stdcall fstat_by_handle (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
+  int __stdcall fstat_by_name (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, __off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
@@ -657,6 +676,7 @@ class fhandler_termios: public fhandler_base
   void fixup_after_fork (HANDLE);
   void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
   void echo_erase (int force = 0);
+  virtual __off64_t lseek (__off64_t, int);
 };
 
 enum ansi_intensity
@@ -1030,6 +1050,78 @@ class fhandler_dev_dsp : public fhandler_base
   void fixup_after_exec (HANDLE);
 };
 
+class fhandler_virtual : public fhandler_base
+{
+ protected:
+  char *filebuf;
+  size_t bufalloc, filesize;
+  __off64_t position;
+  int fileid; // unique within each class
+ public:
+
+  fhandler_virtual (DWORD devtype);
+  virtual ~fhandler_virtual();
+
+  virtual int exists();
+  DIR *opendir (path_conv& pc);
+  __off64_t telldir (DIR *);
+  void seekdir (DIR *, __off64_t);
+  void rewinddir (DIR *);
+  int closedir (DIR *);
+  int write (const void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  __off64_t lseek (__off64_t, int);
+  int dup (fhandler_base * child);
+  int open (path_conv *, int flags, mode_t mode = 0);
+  int close (void);
+  int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
+  virtual void fill_filebuf ();
+};
+
+class fhandler_proc: public fhandler_virtual
+{
+ public:
+  fhandler_proc ();
+  fhandler_proc (DWORD devtype);
+  int exists();
+  struct dirent *readdir (DIR *);
+  static DWORD get_proc_fhandler(const char *path);
+
+  int open (path_conv *real_path, int flags, mode_t mode = 0);
+  int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+  void fill_filebuf ();
+};
+
+class pinfo;
+class fhandler_registry: public fhandler_proc
+{
+ public:
+  fhandler_registry ();
+  int exists();
+  struct dirent *readdir (DIR *);
+  __off64_t telldir (DIR *);
+  void seekdir (DIR *, __off64_t);
+  void rewinddir (DIR *);
+  int closedir (DIR *);
+
+  int open (path_conv *real_path, int flags, mode_t mode = 0);
+  int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+  HKEY open_key(const char *name, REGSAM access = KEY_READ, bool isValue = false);
+  void fill_filebuf ();
+};
+
+struct _pinfo;
+class fhandler_process: public fhandler_proc
+{
+ public:
+  fhandler_process ();
+  int exists();
+  struct dirent *readdir (DIR *);
+  int open (path_conv *real_path, int flags, mode_t mode = 0);
+  int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+  void fill_filebuf (pinfo& p);
+};
+
 typedef union
 {
   char base[sizeof(fhandler_base)];
@@ -1045,7 +1137,10 @@ typedef union
   char dev_zero[sizeof(fhandler_dev_zero)];
   char disk_file[sizeof(fhandler_disk_file)];
   char pipe[sizeof(fhandler_pipe)];
+  char proc[sizeof(fhandler_proc)];
+  char process[sizeof(fhandler_process)];
   char pty_master[sizeof(fhandler_pty_master)];
+  char registry[sizeof(fhandler_registry)];
   char serial[sizeof(fhandler_serial)];
   char socket[sizeof(fhandler_socket)];
   char termios[sizeof(fhandler_termios)];

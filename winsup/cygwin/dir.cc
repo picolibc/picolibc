@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -18,13 +17,10 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
-#include "perprocess.h"
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
@@ -115,7 +111,42 @@ readdir (DIR *dir)
       return NULL;
     }
 
-  return ((fhandler_base *) dir->__d_u.__d_data.__fh)->readdir (dir);
+  dirent *res = ((fhandler_base *) dir->__d_u.__d_data.__fh)->readdir (dir);
+
+  if (res)
+    {
+      /* Compute d_ino by combining filename hash with the directory hash
+	 (which was stored in dir->__d_dirhash when opendir was called). */
+      if (res->d_name[0] == '.')
+	{
+	  if (res->d_name[1] == '\0')
+	    dir->__d_dirent->d_ino = dir->__d_dirhash;
+	  else if (res->d_name[1] != '.' || res->d_name[2] != '\0')
+	    goto hashit;
+	  else
+	    {
+	      char *p, up[strlen (dir->__d_dirname) + 1];
+	      strcpy (up, dir->__d_dirname);
+	      if (!(p = strrchr (up, '\\')))
+		goto hashit;
+	      *p = '\0';
+	      if (!(p = strrchr (up, '\\')))
+		dir->__d_dirent->d_ino = hash_path_name (0, ".");
+	      else
+		{
+		  *p = '\0';
+		  dir->__d_dirent->d_ino = hash_path_name (0, up);
+		}
+	    }
+	}
+      else
+	{
+      hashit:
+	  ino_t dino = hash_path_name (dir->__d_dirhash, "\\");
+	  dir->__d_dirent->d_ino = hash_path_name (dino, res->d_name);
+	}
+    }
+  return res;
 }
 
 extern "C" __off64_t
@@ -225,7 +256,7 @@ mkdir (const char *dir, mode_t mode)
 #ifdef HIDDEN_DOT_FILES
       char *c = strrchr (real_dir.get_win32 (), '\\');
       if ((c && c[1] == '.') || *real_dir.get_win32 () == '.')
-        SetFileAttributes (real_dir.get_win32 (), FILE_ATTRIBUTE_HIDDEN);
+	SetFileAttributes (real_dir.get_win32 (), FILE_ATTRIBUTE_HIDDEN);
 #endif
       res = 0;
     }
@@ -242,24 +273,19 @@ extern "C" int
 rmdir (const char *dir)
 {
   int res = -1;
+  DWORD devn;
 
   path_conv real_dir (dir, PC_SYM_NOFOLLOW);
 
   if (real_dir.error)
-    {
-      set_errno (real_dir.error);
-      res = -1;
-    }
+    set_errno (real_dir.error);
+  else if ((devn = real_dir.get_devn ()) == FH_PROC || devn == FH_REGISTRY
+	   || devn == FH_PROCESS)
+    set_errno (EROFS);
   else if (!real_dir.exists ())
-    {
-      set_errno (ENOENT);
-      res = -1;
-    }
+    set_errno (ENOENT);
   else if  (!real_dir.isdir ())
-    {
-      set_errno (ENOTDIR);
-      res = -1;
-    }
+    set_errno (ENOTDIR);
   else
     {
       /* Even own directories can't be removed if R/O attribute is set. */
@@ -299,22 +325,20 @@ rmdir (const char *dir)
 	      else if ((res = rmdir (dir)))
 		SetCurrentDirectory (cygheap->cwd.win32);
 	    }
-	  if (GetLastError () == ERROR_ACCESS_DENIED)
+	  if (res)
 	    {
-
-	      /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
-		 a non-empty directory. */
-	      if (wincap.access_denied_on_delete ())
-		set_errno (ENOTEMPTY);
-	      else
+	      if (GetLastError () != ERROR_ACCESS_DENIED
+		  || !wincap.access_denied_on_delete ())
 		__seterrno ();
-	    }
-	  else
-	    __seterrno ();
+	      else
+		set_errno (ENOTEMPTY);	/* On 9X ERROR_ACCESS_DENIED is
+					       returned if you try to remove a
+					       non-empty directory. */
 
-	  /* If directory still exists, restore R/O attribute. */
-	  if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
-	    SetFileAttributes (real_dir, real_dir);
+	      /* If directory still exists, restore R/O attribute. */
+	      if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
+		SetFileAttributes (real_dir, real_dir);
+	    }
 	}
     }
 

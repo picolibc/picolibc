@@ -1,6 +1,6 @@
 /* fhandler_console.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,7 +12,6 @@ details. */
 #include <sys/termios.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <wingdi.h>
@@ -27,7 +26,6 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "shared_info.h"
@@ -548,7 +546,7 @@ fhandler_console::open (path_conv *, int flags, mode_t)
   set_io_handle (INVALID_HANDLE_VALUE);
   set_output_handle (INVALID_HANDLE_VALUE);
 
-  set_flags (flags);
+  set_flags (flags & ~O_TEXT, O_BINARY);
 
   /* Open the input handle as handle_ */
   h = CreateFileA ("CONIN$", GENERIC_READ|GENERIC_WRITE,
@@ -715,12 +713,6 @@ fhandler_console::tcflush (int queue)
 int
 fhandler_console::output_tcsetattr (int, struct termios const *t)
 {
-  /* Ignore the optional_actions stuff, since all output is emitted
-     instantly */
-
-  /* Enable/disable LF -> CRLF conversions */
-  set_w_binary ((t->c_oflag & ONLCR) ? 0 : 1);
-
   /* All the output bits we can ignore */
 
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
@@ -743,8 +735,10 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
     oflags = 0;
   DWORD flags = 0;
 
+#if 0
   /* Enable/disable LF -> CRLF conversions */
   set_r_binary ((t->c_iflag & INLCR) ? 0 : 1);
+#endif
 
   /* There's some disparity between what we need and what's
      available.  We've got ECHO and ICANON, they've
@@ -818,13 +812,6 @@ fhandler_console::tcgetattr (struct termios *t)
   *t = tc->ti;
 
   t->c_cflag |= CS8;
-
-#if 0
-  if (!get_r_binary ())
-    t->c_iflag |= IGNCR;
-  if (!get_w_binary ())
-    t->c_oflag |= ONLCR;
-#endif
 
   DWORD flags;
 
@@ -1195,7 +1182,7 @@ fhandler_console::char_command (char c)
 	      ReadConsoleOutputA (get_output_handle (), savebuf,
 				  savebufsiz, cob, &now.srWindow);
 	    }
-	  else          /* restore */
+	  else		/* restore */
 	    {
 	      CONSOLE_SCREEN_BUFFER_INFO now;
 	      COORD cob = { 0, 0 };
@@ -1444,21 +1431,19 @@ fhandler_console::write_normal (const unsigned char *src,
 	case ESC:
 	  state_ = gotesc;
 	  break;
-	case DWN:		/* WriteFile ("\n") always adds CR... */
+	case DWN:
 	  cursor_get (&x, &y);
 	  if (y >= srBottom)
 	    {
-	      if (y < info.winBottom || scroll_region.Top)
+	      if (y >= info.winBottom && !scroll_region.Top)
+		WriteFile (get_output_handle (), "\n", 1, &done, 0);
+	      else
 		{
 		  scroll_screen (0, srTop + 1, -1, srBottom, 0, srTop);
 		  y--;
 		}
-	      else
-		WriteFile (get_output_handle (), "\n", 1, &done, 0);
 	    }
-	  if (!get_w_binary ())
-	    x = 0;
-	  cursor_set (FALSE, x, y + 1);
+	  cursor_set (FALSE, ((tc->ti.c_oflag & ONLCR) ? 0 : x), y + 1);
 	  break;
 	case BAK:
 	  cursor_rel (-1, 0);
@@ -1699,19 +1684,18 @@ get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
 void
 fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
 {
-  this->fhandler_termios::init (f, bin, a);
-
+  // this->fhandler_termios::init (f, mode, bin);
   /* Ensure both input and output console handles are open */
-  int mode = 0;
+  int flags = 0;
 
   a &= GENERIC_READ | GENERIC_WRITE;
   if (a == GENERIC_READ)
-    mode = O_RDONLY;
+    flags = O_RDONLY;
   if (a == GENERIC_WRITE)
-    mode = O_WRONLY;
+    flags = O_WRONLY;
   if (a == (GENERIC_READ | GENERIC_WRITE))
-    mode = O_RDWR;
-  open ((path_conv *) NULL, mode);
+    flags = O_RDWR;
+  open ((path_conv *) NULL, flags | O_BINARY);
   if (f != INVALID_HANDLE_VALUE)
     CloseHandle (f);	/* Reopened by open */
 

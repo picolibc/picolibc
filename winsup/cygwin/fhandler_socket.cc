@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include "cygerrno.h"
@@ -247,9 +246,10 @@ fhandler_socket::dup (fhandler_base *child)
 int __stdcall
 fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
 {
-  fhandler_disk_file fh;
-  fh.set_name (get_name (), get_win32_name ());
-  return fh.fstat (buf, pc);
+  int res = fhandler_base::fstat (buf, pc);
+  if (!res)
+    buf->st_ino = (ino_t) get_handle ();
+  return res;
 }
 
 int
@@ -352,13 +352,21 @@ fhandler_socket::close ()
   setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
 	      (const char *)&linger, sizeof linger);
 
-  while ((res = closesocket (get_socket ()))
-	 && WSAGetLastError () == WSAEWOULDBLOCK)
-    continue;
-  if (res)
+  while ((res = closesocket (get_socket ())) != 0)
     {
-      set_winsock_errno ();
-      res = -1;
+      if (WSAGetLastError () != WSAEWOULDBLOCK)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	  break;
+	}
+      if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0)
+	{
+	  set_errno (EINTR);
+	  res = -1;
+	  break;
+	}
+      WSASetLastError (0);
     }
 
   close_secret_event ();

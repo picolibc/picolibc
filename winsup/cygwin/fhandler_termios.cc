@@ -1,6 +1,6 @@
 /* fhandler_termios.cc
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,15 +9,14 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <sys/termios.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
 #include <ctype.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "tty.h"
@@ -100,7 +99,7 @@ tty_min::kill_pgrp (int sig)
   if (killself)
     sig_send (myself, sig);
 }
-       
+
 void
 tty_min::set_ctty (int ttynum, int flags)
 {
@@ -226,11 +225,11 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
       if (tc->ti.c_lflag & ISIG)
 	{
 	  int sig;
-	  if (c ==  tc->ti.c_cc[VINTR])
+	  if (CCEQ(tc->ti.c_cc[VINTR], c))
 	    sig = SIGINT;
-	  else if (c == tc->ti.c_cc[VQUIT])
+	  else if (CCEQ(tc->ti.c_cc[VQUIT], c))
 	    sig = SIGQUIT;
-	  else if (c == tc->ti.c_cc[VSUSP])
+	  else if (CCEQ(tc->ti.c_cc[VSUSP], c))
 	    sig = SIGTSTP;
 	  else
 	    goto not_a_sig;
@@ -245,7 +244,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
     not_a_sig:
       if (tc->ti.c_iflag & IXON)
 	{
-	  if (c == tc->ti.c_cc[VSTOP])
+	  if (CCEQ(tc->ti.c_cc[VSTOP], c))
 	    {
 	      if (!tc->output_stopped)
 		{
@@ -254,7 +253,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 		}
 	      continue;
 	    }
-	  else if (c == tc->ti.c_cc[VSTART])
+	  else if (CCEQ(tc->ti.c_cc[VSTART], c))
 	    {
     restart_output:
 	      tc->output_stopped = 0;
@@ -264,20 +263,20 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	  else if ((tc->ti.c_iflag & IXANY) && tc->output_stopped)
 	    goto restart_output;
 	}
-      if (tc->ti.c_lflag & IEXTEN && c == tc->ti.c_cc[VDISCARD])
+      if (iscanon && tc->ti.c_lflag & IEXTEN && CCEQ(tc->ti.c_cc[VDISCARD], c))
 	{
 	  tc->ti.c_lflag ^= FLUSHO;
 	  continue;
 	}
       if (!iscanon)
 	/* nothing */;
-      else if (c == tc->ti.c_cc[VERASE])
+      else if (CCEQ(tc->ti.c_cc[VERASE], c))
 	{
 	  if (eat_readahead (1))
 	    echo_erase ();
 	  continue;
 	}
-      else if (c == tc->ti.c_cc[VWERASE])
+      else if (CCEQ(tc->ti.c_cc[VWERASE], c))
 	{
 	  int ch;
 	  do
@@ -288,7 +287,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	  while ((ch = peek_readahead (1)) >= 0 && !isspace (ch));
 	  continue;
 	}
-      else if (c == tc->ti.c_cc[VKILL])
+      else if (CCEQ(tc->ti.c_cc[VKILL], c))
 	{
 	  int nchars = eat_readahead (-1);
 	  if (tc->ti.c_lflag & ECHO)
@@ -296,7 +295,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	      echo_erase (1);
 	  continue;
 	}
-      else if (c == tc->ti.c_cc[VREPRINT])
+      else if (CCEQ(tc->ti.c_cc[VREPRINT], c))
 	{
 	  if (tc->ti.c_lflag & ECHO)
 	    {
@@ -305,14 +304,14 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	    }
 	  continue;
 	}
-      else if (c == tc->ti.c_cc[VEOF])
+      else if (CCEQ(tc->ti.c_cc[VEOF], c))
 	{
 	  termios_printf ("EOF");
 	  input_done = 1;
 	  continue;
 	}
-      else if (c == tc->ti.c_cc[VEOL] ||
-	       c == tc->ti.c_cc[VEOL2] ||
+      else if (CCEQ(tc->ti.c_cc[VEOL], c) ||
+	       CCEQ(tc->ti.c_cc[VEOL2], c) ||
 	       c == '\n')
 	{
 	  set_input_done (1);
@@ -343,4 +342,11 @@ fhandler_termios::fixup_after_fork (HANDLE parent)
 {
   this->fhandler_base::fixup_after_fork (parent);
   fork_fixup (parent, get_output_handle (), "output_handle");
+}
+
+__off64_t
+fhandler_termios::lseek (__off64_t, int)
+{
+  set_errno (ESPIPE);
+  return -1;
 }

@@ -1,6 +1,6 @@
 /* window.cc: hidden windows for signals/itimer support
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Sergey Okhapkin <sos@prospect.com.ru>
 
@@ -64,7 +64,7 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       return 0;
     case WM_ASYNCIO:
       if (WSAGETSELECTEVENT(lParam) == FD_OOB)
-        raise (SIGURG);
+	raise (SIGURG);
       else
 	raise (SIGIO);
       return 0;

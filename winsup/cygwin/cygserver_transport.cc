@@ -1,6 +1,6 @@
 /* cygserver_transport.cc
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -37,7 +37,7 @@ class transport_layer_base *create_server_transport()
   if (wincap.is_winnt ())
     temp = new transport_layer_pipes ();
   else
-    temp = new transport_layer_base ();
+    temp = new transport_layer_sockets ();
   return temp;
 }
 

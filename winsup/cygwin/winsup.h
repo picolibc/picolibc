@@ -147,9 +147,18 @@ extern "C" void __stdcall do_exit (int) __attribute__ ((noreturn));
 /* UID/GID */
 void uinfo_init (void);
 
-#define ILLEGAL_UID ((__uid16_t)-1)
-#define ILLEGAL_GID ((__gid16_t)-1)
+#define ILLEGAL_UID16 ((__uid16_t)-1)
+#define ILLEGAL_UID ((__uid32_t)-1)
+#define ILLEGAL_GID16 ((__gid16_t)-1)
+#define ILLEGAL_GID ((__gid32_t)-1)
 #define ILLEGAL_SEEK ((__off64_t)-1)
+
+#define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(__uid32_t)(u16))
+#define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(__gid32_t)(g16))
+
+extern "C" __uid32_t getuid32 (void);
+extern "C" __uid32_t geteuid32 (void);
+extern "C" struct passwd *getpwuid32 (__uid32_t);
 
 /* various events */
 void events_init (void);
@@ -197,6 +206,8 @@ extern "C" char *__stdcall strcasestr (const char *searchee, const char *lookfor
 /* Time related */
 void __stdcall totimeval (struct timeval *dst, FILETIME * src, int sub, int flag);
 long __stdcall to_time_t (FILETIME * ptr);
+void __stdcall to_timestruc_t (FILETIME * ptr, timestruc_t * out);
+void __stdcall time_as_timestruc_t (timestruc_t * out);
 
 void __stdcall set_console_title (char *);
 void early_stuff_init ();
@@ -224,9 +235,6 @@ extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
 extern "C" int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__ ((regparm (2)))*/;
 extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
 extern void multiple_cygwin_problem (const char *, unsigned, unsigned);
-
-extern "C" void __malloc_lock (struct _reent *);
-extern "C" void __malloc_unlock (struct _reent *);
 
 extern "C" void __malloc_lock (struct _reent *);
 extern "C" void __malloc_unlock (struct _reent *);
@@ -269,6 +277,9 @@ extern SYSTEM_INFO system_info;
 #define STD_RBITS (S_IRUSR | S_IRGRP | S_IROTH)
 #define STD_WBITS (S_IWUSR)
 #define STD_XBITS (S_IXUSR | S_IXGRP | S_IXOTH)
+#define NO_W ~(S_IWUSR | S_IWGRP | S_IWOTH)
+#define NO_R ~(S_IRUSR | S_IRGRP | S_IROTH)
+#define NO_X ~(S_IXUSR | S_IXGRP | S_IXOTH)
 
 /* The title on program start. */
 extern char *old_title;

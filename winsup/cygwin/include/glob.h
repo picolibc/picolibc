@@ -66,8 +66,13 @@ typedef struct {
 	int (*gl_lstat) __P((const char *, struct stat12 *));
 	int (*gl_stat) __P((const char *, struct stat12 *));
 #else
+#if defined (__INSIDE_CYGWIN__)
+	int (*gl_lstat) ();
+	int (*gl_stat) ();
+#else
 	int (*gl_lstat) __P((const char *, struct stat *));
 	int (*gl_stat) __P((const char *, struct stat *));
+#endif
 #endif
 } glob_t;
 

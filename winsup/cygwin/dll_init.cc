@@ -1,6 +1,6 @@
 /* dll_init.cc
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -9,7 +9,6 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <errno.h>
-#include "exceptions.h"
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "dll_init.h"
@@ -19,6 +18,7 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "pinfo.h"
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 
@@ -184,6 +184,9 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 void
 dll_list::detach (dll *d)
 {
+  if (!myself || myself->process_state == PID_EXITED)
+    return;
+
   if (d->count <= 0)
     system_printf ("WARNING: try to detach an already detached dll ...\n");
   else if (--d->count == 0)
@@ -204,7 +207,6 @@ dll_list::detach (dll *d)
 void
 dll_list::init ()
 {
-  debug_printf ("here");
   /* Make sure that destructors are called on exit. */
   if (!dll_global_dtors_recorded)
     {

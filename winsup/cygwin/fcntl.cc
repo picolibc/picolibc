@@ -1,6 +1,6 @@
 /* fcntl.cc: fcntl syscall
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <fcntl.h>
 #include <stdarg.h>
 #include <errno.h>
 #include <unistd.h>

@@ -1,6 +1,6 @@
 /* sys/cygwin.h
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -69,7 +69,8 @@ typedef enum
     CW_GET_CYGWIN_REGISTRY_NAME,
     CW_STRACE_TOGGLE,
     CW_STRACE_ACTIVE,
-    CW_CYGWIN_PID_TO_WINPID
+    CW_CYGWIN_PID_TO_WINPID,
+    CW_EXTRACT_DOMAIN_AND_USER
   } cygwin_getinfo_types;
 
 #define CW_NEXTPID	0x80000000	// or with pid to get next one
@@ -94,7 +95,7 @@ enum
   PID_USETTY	       = 0x1000, // Setting this enables or disables cygwin's
 				 //  tty support.  This is inherited by
 				 //  all execed or forked processes.
-  PID_UNUSED2	       = 0x2000, // child has execed
+  PID_ALLPIDS	       = 0x2000, // child has execed
   PID_EXECED	       = 0x4000, // redirect to original pid info block
   PID_NOREDIR	       = 0x8000, // don't redirect if execed
   PID_EXITED	       = 0x80000000 // Free entry.
@@ -208,9 +209,15 @@ extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 
 #define TTY_CONSOLE	0x40000000
 
+#define EXTERNAL_PINFO_VERSION_16_BIT 0
+#define EXTERNAL_PINFO_VERSION_32_BIT 1
+#define EXTERNAL_PINFO_VERSION EXTERNAL_PINFO_VERSION_32_BIT
+
 #ifndef _SYS_TYPES_H
 typedef unsigned short __uid16_t;
 typedef unsigned short __gid16_t;
+typedef unsigned long __uid32_t;
+typedef unsigned long __gid32_t;
 #endif
 
 struct external_pinfo
@@ -233,9 +240,13 @@ struct external_pinfo
   char progname[MAX_PATH];
 
   DWORD strace_mask;
-  HANDLE strace_file;
+  DWORD version;
 
   DWORD process_state;
+
+  /* Only available if version >= EXTERNAL_PINFO_VERSION_32_BIT */
+  __uid32_t uid32;
+  __gid32_t gid32;
 };
 
 DWORD cygwin_internal (cygwin_getinfo_types, ...);

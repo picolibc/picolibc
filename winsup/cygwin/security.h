@@ -16,6 +16,8 @@ details. */
 #define DEFAULT_GID DOMAIN_ALIAS_RID_ADMINS
 
 #define MAX_SID_LEN 40
+#define MAX_DACL_LEN(n) (sizeof (ACL) \
+		   + (n) * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + MAX_SID_LEN))
 
 #define NO_SID ((PSID)NULL)
 
@@ -55,7 +57,7 @@ public:
   inline PSID set () { return psid = (PSID) sbuf; }
 
   BOOL getfrompw (const struct passwd *pw);
-  BOOL getfromgr (const struct __group16 *gr);
+  BOOL getfromgr (const struct __group32 *gr);
 
   int get_id (BOOL search_grp, int *type = NULL);
   inline int get_uid () { return get_id (FALSE); }
@@ -159,14 +161,14 @@ extern BOOL allow_smbntsec;
    and group lists so they are somehow security related. Besides that
    I didn't find a better place to declare them. */
 extern struct passwd *internal_getpwent (int);
-extern struct __group16 *internal_getgrent (int);
+extern struct __group32 *internal_getgrent (int);
 
 /* File manipulation */
 int __stdcall set_process_privileges ();
 int __stdcall get_file_attribute (int, const char *, int *,
-				  __uid16_t * = NULL, __gid16_t * = NULL);
+				  __uid32_t * = NULL, __gid32_t * = NULL);
 int __stdcall set_file_attribute (int, const char *, int);
-int __stdcall set_file_attribute (int, const char *, __uid16_t, __gid16_t, int, const char *);
+int __stdcall set_file_attribute (int, const char *, __uid32_t, __gid32_t, int);
 LONG __stdcall read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size);
 LONG __stdcall write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size);
 BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
@@ -179,18 +181,16 @@ void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 HANDLE subauth (struct passwd *pw);
 /* Try creating a token directly. */
 HANDLE create_token (cygsid &usersid, cygsid &pgrpsid);
+/* Verify an existing token */
+BOOL verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern = NULL);
 
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);
-/* Get default logonserver and domain for this box. */
-BOOL get_logon_server_and_user_domain (char *logonserver, char *domain);
+/* Get default logonserver for a domain. */
+BOOL get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL);
 
 /* sec_helper.cc: Security helper functions. */
-BOOL __stdcall is_grp_member (__uid16_t uid, __gid16_t gid);
-/* `lookup_name' should be called instead of LookupAccountName.
- * logsrv may be NULL, in this case only the local system is used for lookup.
- * The buffer for ret_sid (40 Bytes) has to be allocated by the caller! */
-BOOL __stdcall lookup_name (const char *, const char *, PSID);
+BOOL __stdcall is_grp_member (__uid32_t uid, __gid32_t gid);
 int set_process_privilege (const char *privilege, BOOL enable = TRUE);
 
 /* shared.cc: */
@@ -201,10 +201,11 @@ SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
 extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
 extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
   __attribute__ ((regparm (3)));
+extern BOOL sec_acl (PACL acl, BOOL admins, PSID sid1 = NO_SID, PSID sid2 = NO_SID);
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
-PSECURITY_DESCRIPTOR alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
+PSECURITY_DESCRIPTOR alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
           PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
 
 extern inline SECURITY_ATTRIBUTES *

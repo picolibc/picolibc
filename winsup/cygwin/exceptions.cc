@@ -393,7 +393,7 @@ try_to_debug (bool waitloop)
       if (!waitloop)
 	return 1;
       SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
-      while (!IsDebuggerPresent ())
+      while (!being_debugged ())
 	/* spin */;
       Sleep (4000);
       small_printf ("*** continuing from debugger call\n");
@@ -1013,7 +1013,7 @@ sig_handle (int sig, bool thisproc)
   if (handler == (void *) SIG_DFL)
     {
       if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
-          || sig == SIGURG || (thisproc && hExeced && sig == SIGINT))
+	  || sig == SIGURG || (thisproc && hExeced && sig == SIGINT))
 	{
 	  sigproc_printf ("default signal %d ignored", sig);
 	  goto done;

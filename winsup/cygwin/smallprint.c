@@ -135,6 +135,9 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		case 'U':
 		  dst = rn (dst, 10, 0, va_arg (ap, long long), len, pad);
 		  break;
+		case 'o':
+		  dst = rn (dst, 8, 0, va_arg (ap, unsigned), len, pad);
+		  break;
 		case 'p':
 		  *dst++ = '0';
 		  *dst++ = 'x';

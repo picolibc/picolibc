@@ -1,7 +1,7 @@
 /* environ.cc: Cygwin-adopted functions from newlib to manipulate
    process's environment.
 
-   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -12,11 +12,9 @@ details. */
 #include <stdlib.h>
 #include <stddef.h>
 #include <ctype.h>
-#include <fcntl.h>
+#include <assert.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "perprocess.h"
 #include "security.h"
@@ -99,10 +97,9 @@ win_env::add_cache (const char *in_posix, const char *in_native)
 
 
 /* Check for a "special" environment variable name.  *env is the pointer
- * to the beginning of the environment variable name.  n is the length
- * of the name including a mandatory '='.  Returns a pointer to the
- * appropriate conversion structure.
- */
+  to the beginning of the environment variable name.  *in_posix is any
+  known posix value for the environment variable. Returns a pointer to
+  the appropriate conversion structure.  */
 win_env * __stdcall
 getwinenv (const char *env, const char *in_posix)
 {
@@ -114,7 +111,7 @@ getwinenv (const char *env, const char *in_posix)
       {
 	win_env * const we = conv_envvars + i;
 	const char *val;
-	if (!cur_environ () || !(val = in_posix ?: getenv(we->name)))
+	if (!cur_environ () || !(val = in_posix ?: getenv (we->name)))
 	  debug_printf ("can't set native for %s since no environ yet",
 			we->name);
 	else if (!envcache || !we->posix || strcmp (val, we->posix) != 0)
@@ -198,13 +195,12 @@ getenv (const char *name)
   return my_findenv (name, &offset);
 }
 
-extern int __stdcall
-envsize (const char * const *in_envp, int debug_print)
+static int __stdcall
+envsize (const char * const *in_envp)
 {
   const char * const *envp;
   for (envp = in_envp; *envp; envp++)
-    if (debug_print)
-      debug_printf ("%s", *envp);
+    continue;
   return (1 + envp - in_envp) * sizeof (const char *);
 }
 
@@ -676,6 +672,8 @@ environ_init (char **envp, int envc)
     envp_passed_in = 0;
   else
     {
+      envc++;
+      envc *= sizeof (char *);
       char **newenv = (char **) malloc (envc);
       memcpy (newenv, envp, envc);
       cfree (envp);
@@ -752,107 +750,184 @@ env_sort (const void *a, const void *b)
   return strcmp (*p, *q);
 }
 
-/* Keep this list in upper case and sorted */
-static const NO_COPY char* forced_winenv_vars [] =
-  {
-    "SYSTEMDRIVE",
-    "SYSTEMROOT",
-    NULL
-  };
+struct spenv
+{
+  const char *name;
+  const char * (cygheap_user::*from_cygheap) ();
+  char *retrieve (bool, const char * const = NULL, int = 0);
+};
 
-#define FORCED_WINENV_SIZE (sizeof (forced_winenv_vars) / sizeof (forced_winenv_vars[0]))
+/* Keep this list in upper case and sorted */
+static NO_COPY spenv spenvs[] =
+{
+  {"HOMEPATH=", &cygheap_user::env_homepath},
+  {"HOMEDRIVE=", &cygheap_user::env_homedrive},
+  {"LOGONSERVER=", &cygheap_user::env_logsrv},
+  {"SYSTEMDRIVE=", NULL},
+  {"SYSTEMROOT=", NULL},
+  {"USERPROFILE=", &cygheap_user::env_userprofile},
+};
+
+char *
+spenv::retrieve (bool no_envblock, const char *const envname, int len)
+{
+  if (len && !strncasematch (envname, name, len))
+    return NULL;
+  if (from_cygheap)
+    {
+      const char *p;
+      if (!len)
+	return NULL;			/* No need to force these into the
+					   environment */
+
+      if (no_envblock)
+	return cstrdup1 (envname);	/* Don't really care what it's set to
+					   if we're calling a cygwin program */
+
+      /* Make a FOO=BAR entry from the value returned by the cygheap_user
+         method. */
+      p = (cygheap->user.*from_cygheap) ();
+      int namelen = strlen (name);
+      char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
+      strcpy (s, name);
+      (void) strcpy (s + namelen, p);
+      return s;
+    }
+
+  if (len)
+    return cstrdup1 (envname);
+
+  char dum[1];
+  int vallen = GetEnvironmentVariable (name, dum, 0);
+  if (vallen > 0)
+    {
+      int namelen = strlen (name);
+      char *p = (char *) cmalloc (HEAP_1_STR, namelen + ++vallen);
+      strcpy (p, name);
+      if (GetEnvironmentVariable (name, p + namelen, vallen))
+	return p;
+      else
+	cfree (p);
+    }
+
+  debug_printf ("warning: %s not present in environment", name);
+  return NULL;
+}
+
+#define SPENVS_SIZE (sizeof (spenvs) / sizeof (spenvs[0]))
 
 /* Create a Windows-style environment block, i.e. a typical character buffer
    filled with null terminated strings, terminated by double null characters.
    Converts environment variables noted in conv_envvars into win32 form
    prior to placing them in the string.  */
-char * __stdcall
-winenv (const char * const *envp, int keep_posix)
+char ** __stdcall
+build_env (const char * const *envp, char *&envblock, int &envc,
+	   bool no_envblock)
 {
-  int len, n, tl;
+  int len, n;
   const char * const *srcp;
-  const char **dstp;
-  bool saw_forced_winenv[FORCED_WINENV_SIZE] = {0};
-  char *p;
+  char **dstp;
+  bool saw_spenv[SPENVS_SIZE] = {0};
 
-  debug_printf ("envp %p, keep_posix %d", envp, keep_posix);
+  debug_printf ("envp %p", envp);
 
-  tl = 0;
-
+  /* How many elements? */
   for (n = 0; envp[n]; n++)
     continue;
 
-  const char *newenvp[n + 1 + FORCED_WINENV_SIZE];
+  /* Allocate a new "argv-style" environ list with room for extra stuff. */
+  char **newenv = (char **) cmalloc (HEAP_1_ARGV, sizeof (char *) *
+						  (n + SPENVS_SIZE + 1));
 
-  for (srcp = envp, dstp = newenvp; *srcp; srcp++, dstp++)
+  int tl = 0;
+  /* Iterate over input list, generating a new environment list and refreshing
+     "special" entries, if necessary. */
+  for (srcp = envp, dstp = newenv; *srcp; srcp++, dstp++)
     {
-      len = strcspn (*srcp, "=");
-      win_env *conv;
+      len = strcspn (*srcp, "=") + 1;
 
-      if (keep_posix || !(conv = getwinenv (*srcp, *srcp + len + 1)))
-	*dstp = *srcp;
-      else
-	{
-	  p = (char *) alloca (strlen (conv->native) + 1);
-	  strcpy (p, conv->native);
-	  *dstp = p;
-	}
-      tl += strlen (*dstp) + 1;
-      if ((*dstp)[0] == '!' && isdrive ((*dstp) + 1) && (*dstp)[3] == '=')
-	{
-	  p = (char *) alloca (strlen (*dstp) + 1);
-	  strcpy (p, *dstp);
-	  *p = '=';
-	  *dstp = p;
-	}
+      /* Look for entries that require special attention */
+      for (unsigned i = 0; i < SPENVS_SIZE; i++)
+	if (!saw_spenv[i]
+	    && (*dstp = spenvs[i].retrieve (no_envblock, *srcp, len)))
+	  {
+	    saw_spenv[i] = 1;
+	    goto next;
+	  }
 
-      for (int i = 0; forced_winenv_vars[i]; i++)
-	if (!saw_forced_winenv[i])
-	  saw_forced_winenv[i] = strncasematch (forced_winenv_vars[i], *srcp, len);
+      *dstp = cstrdup1 (*srcp);
+
+    next:
+      if (!no_envblock)
+	tl += strlen (*dstp) + 1;
     }
 
-  char dum[1];
-  for (int i = 0; forced_winenv_vars[i]; i++)
-    if (!saw_forced_winenv[i])
+  /* Fill in any required-but-missing environment variables. */
+  for (unsigned i = 0; i < SPENVS_SIZE; i++)
+    if (!saw_spenv[i])
       {
-	int vallen = GetEnvironmentVariable (forced_winenv_vars[i], dum, 0);
-	if (vallen > 0)
+	*dstp = spenvs[i].retrieve (no_envblock);
+	if (*dstp)
 	  {
-	    int namelen = strlen (forced_winenv_vars[i]) + 1;
-	    p = (char *) alloca (namelen + ++vallen);
-	    strcpy (p, forced_winenv_vars[i]);
-	    strcat (p, "=");
-	    if (!GetEnvironmentVariable (forced_winenv_vars[i], p + namelen,
-					 vallen))
-	      debug_printf ("warning: %s not present in environment", *srcp);
-	    else
-	      {
-		*dstp++ = p;
-		tl += strlen (p) + 1;
-	      }
+	    if (!no_envblock)
+	      tl += strlen (*dstp) + 1;
+	    dstp++;
 	  }
       }
 
-  *dstp = NULL;		/* Terminate */
+  envc = dstp - newenv;
+  *dstp = NULL;			/* Terminate */
 
-  int envlen = dstp - newenvp;
-  debug_printf ("env count %d, bytes %d", envlen, tl);
-
-  /* Windows programs expect the environment block to be sorted.  */
-  qsort (newenvp, envlen, sizeof (char *), env_sort);
-
-  /* Create an environment block suitable for passing to CreateProcess.  */
-  char *ptr, *envblock;
-  envblock = (char *) malloc (tl + 2);
-  for (srcp = newenvp, ptr = envblock; *srcp; srcp++)
+  if (no_envblock)
+    envblock = NULL;
+  else
     {
-      len = strlen (*srcp);
-      memcpy (ptr, *srcp, len + 1);
-      ptr += len + 1;
-    }
-  *ptr = '\0';		/* Two null bytes at the end */
+      debug_printf ("env count %d, bytes %d", envc, tl);
 
-  return envblock;
+      /* Windows programs expect the environment block to be sorted.  */
+      qsort (newenv, envc, sizeof (char *), env_sort);
+
+      /* Create an environment block suitable for passing to CreateProcess.  */
+      char *s;
+      envblock = (char *) malloc (2 + tl);
+      int new_tl = 0;
+      for (srcp = newenv, s = envblock; *srcp; srcp++)
+	{
+	  const char *p;
+	  win_env *conv;
+	  len = strcspn (*srcp, "=") + 1;
+
+	  /* See if this entry requires posix->win32 conversion. */
+	  conv = getwinenv (*srcp, *srcp + len);
+	  if (conv)
+	    p = conv->native;	/* Use win32 path */
+	  else
+	    p = *srcp;		/* Don't worry about it */
+
+	  len = strlen (p);
+	  new_tl += len + 1;	/* Keep running total of block length so far */
+
+	  /* See if we need to increase the size of the block. */
+	  if (new_tl > tl)
+	    envblock = (char *) realloc (envblock, 2 + (tl += len + 100));
+
+	  memcpy (s, p, len + 1);
+
+	  /* See if environment variable is "special" in a Windows sense.
+	     Under NT, the current directories for visited drives are stored
+	     as =C:=\bar.  Cygwin converts the '=' to '!' for hopefully obvious
+	     reasons.  We need to convert it back when building the envblock */
+	  if (s[0] == '!' && (isdrive (s + 1) || (s[1] == ':' && s[2] == ':'))
+	      && s[3] == '=')
+	    *s = '=';
+	  s += len + 1;
+	}
+      *s = '\0';			/* Two null bytes at the end */
+      assert ((s - envblock) <= tl);	/* Detect if we somehow ran over end
+					   of buffer */
+    }
+
+  return newenv;
 }
 
 /* This idiocy is necessary because the early implementers of cygwin

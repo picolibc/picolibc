@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _PINFO_H
+#define _PINFO_H
 /* Signal constants (have to define them here, unfortunately) */
 
 enum
@@ -39,7 +41,7 @@ public:
      we only use this handle from the parent. */
   HANDLE hProcess;
 
-#define PINFO_REDIR_SIZE ((DWORD) &(((_pinfo *)NULL)->hProcess) + sizeof (DWORD))
+#define PINFO_REDIR_SIZE ((char *) &myself.procinfo->hProcess - (char *) myself.procinfo)
 
   /* Handle associated with initial Windows pid which started it all. */
   HANDLE pid_handle;
@@ -65,8 +67,8 @@ public:
      if not found.  This data resides in the shared data area (allowing
      tasks to store whatever they want here) so it's for informational
      purposes only. */
-  __uid16_t uid;		/* User ID */
-  __gid16_t gid;		/* Group ID */
+  __uid32_t uid;	/* User ID */
+  __gid32_t gid;	/* Group ID */
   pid_t pgid;		/* Process group ID */
   pid_t sid;		/* Session ID */
   int ctty;		/* Control tty */
@@ -95,7 +97,7 @@ public:
     return thread2signal ? thread2signal->sigs[sig] : sigs[sig];
   }
 
-  inline void copysigs (_pinfo *p) {sigs = p->sigs;}
+  inline void copysigs (_pinfo *p) {memcpy (sigs, p->sigs, sizeof (sigs));}
 
   inline sigset_t& getsigmask ()
   {
@@ -152,7 +154,11 @@ public:
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
   // operator bool () const {return (int) h;}
+#ifdef _SIGPROC_H
   int remember () {destroy = 0; return proc_subproc (PROC_ADDCHILD, (DWORD) this);}
+#else
+  int remember () {system_printf ("remember is not here"); return 0;}
+#endif
   HANDLE shared_handle () {return h;}
 };
 
@@ -193,16 +199,14 @@ void __stdcall set_myself (pid_t pid, HANDLE h = NULL);
 extern pinfo myself;
 
 #define _P_VFORK 0
-extern "C" int _spawnve (HANDLE hToken, int mode, const char *path,
-			 const char *const *argv, const char *const *envp);
-
 extern void __stdcall pinfo_fixup_after_fork ();
 extern HANDLE hexec_proc;
 
 /* For mmaps across fork(). */
-int __stdcall fixup_mmaps_after_fork ();
+int __stdcall fixup_mmaps_after_fork (HANDLE parent);
 /* for shm areas across fork (). */
 int __stdcall fixup_shms_after_fork ();
 
 void __stdcall fill_rusage (struct rusage *, HANDLE);
 void __stdcall add_rusage (struct rusage *, struct rusage *);
+#endif /*_PINFO_H*/

@@ -17,12 +17,9 @@ details. */
 #include <stdlib.h>
 #include <errno.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "hires.h"
 
@@ -49,7 +46,7 @@ __to_clock_t (FILETIME * src, int flag)
 
 /* times: POSIX 4.5.2.1 */
 extern "C" clock_t
-times (struct tms * buf)
+_times (struct tms * buf)
 {
   FILETIME creation_time, exit_time, kernel_time, user_time;
 
@@ -87,12 +84,6 @@ times (struct tms * buf)
     }
 
    return tc;
-}
-
-extern "C" clock_t
-_times (struct tms * buf)
-{
-  return times (buf);
 }
 
 /* settimeofday: BSD */
@@ -152,15 +143,28 @@ totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
 
 /* FIXME: Make thread safe */
 extern "C" int
-gettimeofday(struct timeval *tv, struct timezone *tz)
+gettimeofday (struct timeval *tv, struct timezone *tz)
 {
-  static hires gtod;
+  static hires_ms gtod;
+  static bool tzflag;
   LONGLONG now = gtod.usecs (false);
   if (now == (LONGLONG) -1)
     return -1;
 
   tv->tv_sec = now / 1000000;
   tv->tv_usec = now % 1000000;
+
+  if (tz != NULL)
+    {
+      if (!tzflag)
+	{
+	  tzset();
+	  tzflag = true;
+	}
+      tz->tz_minuteswest = _timezone / 60;
+      tz->tz_dsttime = _daylight;
+    }
+
   return 0;
 }
 
@@ -221,6 +225,47 @@ to_time_t (FILETIME *ptr)
   x /= (long long) NSPERSEC;		/* number of 100ns in a second */
   x += (long long) (rem / NSPERSEC);
   return x;
+}
+
+/* Cygwin internal */
+/* Convert a Win32 time to "UNIX" timestruc_t format. */
+void __stdcall
+to_timestruc_t (FILETIME *ptr, timestruc_t *out)
+{
+  /* A file time is the number of 100ns since jan 1 1601
+     stuffed into two long words.
+     A timestruc_t is the number of seconds and microseconds since jan 1 1970
+     stuffed into a time_t and a long.  */
+
+  long rem;
+  long long x = ((long long) ptr->dwHighDateTime << 32) + ((unsigned)ptr->dwLowDateTime);
+
+  /* pass "no time" as epoch */
+  if (x == 0)
+    {
+      out->tv_sec = 0;
+      out->tv_nsec = 0;
+      return;
+    }
+
+  x -= FACTOR;			/* number of 100ns between 1601 and 1970 */
+  rem = x % ((long long)NSPERSEC);
+  x /= (long long) NSPERSEC;		/* number of 100ns in a second */
+  out->tv_nsec = rem * 100;	/* as tv_nsec is in nanoseconds */
+  out->tv_sec = x;
+}
+
+/* Cygwin internal */
+/* Get the current time as a "UNIX" timestruc_t format. */
+void __stdcall
+time_as_timestruc_t (timestruc_t * out)
+{
+  SYSTEMTIME systemtime;
+  FILETIME filetime;
+
+  GetSystemTime (&systemtime);
+  SystemTimeToFileTime (&systemtime, &filetime);
+  to_timestruc_t (&filetime, out);
 }
 
 /* time: POSIX 4.5.1.1, C 4.12.2.4 */
@@ -427,12 +472,11 @@ utimes (const char *path, struct timeval *tvp)
     }
 
   /* MSDN suggests using FILE_FLAG_BACKUP_SEMANTICS for accessing
-     the times of directories.  FIXME: what about Win95??? */
+     the times of directories.  */
   /* Note: It's not documented in MSDN that FILE_WRITE_ATTRIBUTES is
      sufficient to change the timestamps... */
   HANDLE h = CreateFileA (win32.get_win32 (),
-			  wincap.has_specific_access_rights () ?
-			  FILE_WRITE_ATTRIBUTES : GENERIC_WRITE,
+			  FILE_WRITE_ATTRIBUTES,
 			  FILE_SHARE_READ | FILE_SHARE_WRITE,
 			  &sec_none_nih,
 			  OPEN_EXISTING,
@@ -536,7 +580,7 @@ cygwin_tzset ()
 }
 
 void
-hires::prime ()
+hires_us::prime ()
 {
   LARGE_INTEGER ifreq;
   if (!QueryPerformanceFrequency (&ifreq))
@@ -568,7 +612,7 @@ hires::prime ()
 }
 
 LONGLONG
-hires::usecs (bool justdelta)
+hires_us::usecs (bool justdelta)
 {
   if (!inited)
     prime ();
@@ -588,4 +632,47 @@ hires::usecs (bool justdelta)
   // FIXME: Use round() here?
   now.QuadPart = (LONGLONG) (freq * (double) (now.QuadPart - primed_pc.QuadPart));
   return justdelta ? now.QuadPart : primed_ft.QuadPart + now.QuadPart;
+}
+
+void
+hires_ms::prime ()
+{
+  TIMECAPS tc;
+  FILETIME f;
+  int priority = GetThreadPriority (GetCurrentThread ());
+  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+
+  if (timeGetDevCaps (&tc, sizeof (tc)) != TIMERR_NOERROR)
+    minperiod = 0;
+  else
+    {
+      minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
+      timeBeginPeriod (minperiod);
+    }
+
+  initime_ms = timeGetTime ();
+  GetSystemTimeAsFileTime (&f);
+  SetThreadPriority (GetCurrentThread (), priority);
+
+  inited = 1;
+  initime_us.HighPart = f.dwHighDateTime;
+  initime_us.LowPart = f.dwLowDateTime;
+  initime_us.QuadPart -= FACTOR;
+  initime_us.QuadPart /= 10;
+}
+
+LONGLONG
+hires_ms::usecs (bool justdelta)
+{
+  if (!inited)
+    prime ();
+  DWORD now = timeGetTime ();
+  // FIXME: Not sure how this will handle the 49.71 day wrap around
+  LONGLONG res = initime_us.QuadPart + ((LONGLONG) (now - initime_ms) * 1000);
+  return res;
+}
+
+hires_ms::~hires_ms ()
+{
+  timeEndPeriod (minperiod);
 }

@@ -1,6 +1,6 @@
 /* strace.cc: system/windows tracing
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,8 +14,6 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "perprocess.h"
 #include "cygwin_version.h"
@@ -25,9 +23,6 @@ details. */
 #define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
 
 class NO_COPY strace strace;
-
-/* 'twould be nice to declare this in winsup.h but winsup.h doesn't require
-   stdarg.h, so we declare it here instead. */
 
 #ifndef NOSTRACE
 
@@ -41,6 +36,10 @@ strace::hello()
       active ^= 1;
       return;
     }
+
+  inited = 1;
+  if (!being_debugged ())
+    return;
 
   __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR, &active);
   OutputDebugString (buf);
@@ -64,7 +63,7 @@ strace::hello()
 int
 strace::microseconds ()
 {
-  static hires now;
+  static hires_us now;
   return (int) now.usecs (true);
 }
 

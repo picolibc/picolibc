@@ -1,6 +1,6 @@
 /* uname.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
    Written by Steve Chamberlain of Cygnus Support, sac@cygnus.com
    Rewritten by Geoffrey Noer of Cygnus Solutions, noer@cygnus.com
 
@@ -69,7 +69,7 @@ uname (struct utsname *name)
 	else
 	  {
 	    if (sysinfo.dwProcessorType == PROCESSOR_INTEL_386 ||
-	        sysinfo.dwProcessorType == PROCESSOR_INTEL_486)
+		sysinfo.dwProcessorType == PROCESSOR_INTEL_486)
 	      ptype = sysinfo.dwProcessorType / 100;
 	    else
 	      ptype = PROCESSOR_INTEL_PENTIUM / 100;

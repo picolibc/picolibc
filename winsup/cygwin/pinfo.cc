@@ -18,7 +18,6 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygerrno.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygwin_version.h"
@@ -28,7 +27,7 @@ details. */
 #include <ntdef.h>
 #include "ntdll.h"
 
-static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
+static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 
@@ -183,6 +182,11 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	    api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
 	  n = realpid;
 	  release ();
+	  if (flag & PID_ALLPIDS)
+	    {
+	      set_errno (ENOENT);
+	      break;
+	    }
 	  continue;
 	}
 
@@ -282,7 +286,7 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
       pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
     }
 
-  pinfolist[nelem].init (cygpid, PID_NOREDIR);
+  pinfolist[nelem].init (cygpid, PID_NOREDIR | (winpid ? PID_ALLPIDS : 0));
   if (winpid)
     /* nothing to do */;
   else if (!pinfolist[nelem])
@@ -314,7 +318,7 @@ winpids::enumNT (bool winpid)
   NTSTATUS res;
   for (;;)
     {
-      res = ZwQuerySystemInformation (SystemProcessesAndThreadsInformation,
+      res = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
 				      procs, szprocs, NULL);
       if (res == 0)
 	break;

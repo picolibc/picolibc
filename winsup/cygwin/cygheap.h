@@ -48,7 +48,6 @@ struct cygheap_root_mount_info
 
 /* CGF: FIXME This doesn't belong here */
 
-int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__ ((regparm (3)));
 class cygheap_root
 {
   /* Root directory information.
@@ -86,6 +85,14 @@ public:
   const char *native_path () const { return m->native_path; }
 };
 
+enum homebodies
+{
+  CH_HOMEDRIVE,
+  CH_HOMEPATH,
+  CH_HOME
+};
+
+struct passwd;
 class cygheap_user
 {
   /* Extendend user information.
@@ -94,12 +101,15 @@ class cygheap_user
   char  *pname;         /* user's name */
   char  *plogsrv;       /* Logon server, may be FQDN */
   char  *pdomain;       /* Logon domain of the user */
+  char  *homedrive;	/* User's home drive */
+  char  *homepath;	/* User's home path */
   PSID   psid;          /* buffer for user's SID */
+  PSID   orig_psid;     /* Remains intact even after impersonation */
 public:
-  __uid16_t orig_uid;      /* Remains intact even after impersonation */
-  __uid16_t orig_gid;      /* Ditto */
-  __uid16_t real_uid;      /* Remains intact on seteuid, replaced by setuid */
-  __gid16_t real_gid;      /* Ditto */
+  __uid32_t orig_uid;      /* Remains intact even after impersonation */
+  __gid32_t orig_gid;      /* Ditto */
+  __uid32_t real_uid;      /* Remains intact on seteuid, replaced by setuid */
+  __gid32_t real_gid;      /* Ditto */
 
   /* token is needed if set(e)uid should be called. It can be set by a call
      to `set_impersonation_token()'. */
@@ -107,6 +117,7 @@ public:
   BOOL   impersonated;
 
   cygheap_user () : pname (NULL), plogsrv (NULL), pdomain (NULL),
+		    homedrive (NULL), homepath (NULL),
 		    psid (NULL), token (INVALID_HANDLE_VALUE) {}
   ~cygheap_user ();
 
@@ -116,11 +127,17 @@ public:
   void set_logsrv (const char *new_logsrv);
   const char *logsrv () const { return plogsrv; }
 
+  const char *env_logsrv ();
+  const char *env_homepath ();
+  const char *env_homedrive ();
+  const char *env_userprofile ();
+
   void set_domain (const char *new_domain);
   const char *domain () const { return pdomain; }
 
   BOOL set_sid (PSID new_sid);
   PSID sid () const { return psid; }
+  PSID orig_sid () const { return orig_psid; }
 
   void operator =(cygheap_user &user)
   {
@@ -129,6 +146,7 @@ public:
     set_domain (user.domain ());
     set_sid (user.sid ());
   }
+  const char *ontherange (homebodies what, struct passwd * = NULL);
 };
 
 /* cwd cache stuff.  */

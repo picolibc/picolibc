@@ -1,6 +1,6 @@
 /* shared.cc: shared data area support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -15,8 +15,6 @@ details. */
 #include <grp.h>
 #include <pwd.h>
 #include <errno.h>
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "security.h"
 #include "fhandler.h"
@@ -236,6 +234,39 @@ get_null_sd ()
   return null_sdp;
 }
 
+BOOL
+sec_acl (PACL acl, BOOL admins, PSID sid1, PSID sid2)
+{
+  size_t acl_len = MAX_DACL_LEN(5);
+
+  if (!InitializeAcl (acl, acl_len, ACL_REVISION))
+    {
+      debug_printf ("InitializeAcl %E");
+      return FALSE;
+    }
+  if (sid2)
+    if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			      GENERIC_ALL, sid2))
+      debug_printf ("AddAccessAllowedAce(sid2) %E");
+  if (sid1)
+    if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			      GENERIC_ALL, sid1))
+      debug_printf ("AddAccessAllowedAce(sid1) %E", sid1);
+  if (admins)
+    if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			      GENERIC_ALL, well_known_admins_sid))
+      debug_printf ("AddAccessAllowedAce(admin) %E");
+  if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			    GENERIC_ALL, well_known_system_sid))
+    debug_printf ("AddAccessAllowedAce(system) %E");
+#if 0 /* Does not seem to help */
+  if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			    GENERIC_ALL, well_known_creator_owner_sid))
+    debug_printf ("AddAccessAllowedAce(creator_owner) %E");
+#endif
+  return TRUE;
+}
+
 PSECURITY_ATTRIBUTES __stdcall
 __sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 {
@@ -246,49 +277,9 @@ __sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 
   cygsid sid;
 
-  if (cygheap->user.sid ())
-    sid = cygheap->user.sid ();
-  else if (!lookup_name (getlogin (), cygheap->user.logsrv (), sid))
+  if (!(sid = cygheap->user.orig_sid ()) ||
+	  (!sec_acl (acl, TRUE, sid, sid2)))
     return inherit ? &sec_none : &sec_none_nih;
-
-  size_t acl_len = sizeof (ACL)
-		   + 4 * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD))
-		   + GetLengthSid (sid)
-		   + GetLengthSid (well_known_admins_sid)
-		   + GetLengthSid (well_known_system_sid)
-		   + GetLengthSid (well_known_creator_owner_sid);
-  if (sid2)
-    acl_len += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD)
-	       + GetLengthSid (sid2);
-
-  if (!InitializeAcl (acl, acl_len, ACL_REVISION))
-    debug_printf ("InitializeAcl %E");
-
-  if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			    SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			    sid))
-    debug_printf ("AddAccessAllowedAce(%s) %E", getlogin ());
-
-  if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			    SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			    well_known_admins_sid))
-    debug_printf ("AddAccessAllowedAce(admin) %E");
-
-  if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			    SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			    well_known_system_sid))
-    debug_printf ("AddAccessAllowedAce(system) %E");
-
-  if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			    SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			    well_known_creator_owner_sid))
-    debug_printf ("AddAccessAllowedAce(creator_owner) %E");
-
-  if (sid2)
-    if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			      SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			      sid2))
-      debug_printf ("AddAccessAllowedAce(sid2) %E");
 
   if (!InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION))
     debug_printf ("InitializeSecurityDescriptor %E");

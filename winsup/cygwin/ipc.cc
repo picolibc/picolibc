@@ -1,6 +1,6 @@
 /* ipc.cc: Single unix specification IPC interface for Cygwin
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2002 Red Hat, Inc.
 
    Originally written by Robert Collins <robert.collins@hotmail.com>
 
@@ -27,11 +27,11 @@ ftok(const char *path, int id)
       /* stat set the appropriate errno for us */
       return (key_t) -1;
     }
-  
-  /* dev_t is short for cygwin 
+
+  /* dev_t is short for cygwin
    * ino_t is long for cygwin
    * and we need 8 bits for the id.
-   * thus key_t is long long. 
+   * thus key_t is long long.
    */
   return ((long long) statbuf.st_dev << (5*8)) | (statbuf.st_ino << (8) ) | (id & 0x00ff);
 }

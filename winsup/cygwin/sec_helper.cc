@@ -25,13 +25,10 @@ details. */
 #include <winuser.h>
 #include <wininet.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
 
@@ -129,7 +126,7 @@ cygsid::getfrompw (const struct passwd *pw)
 }
 
 BOOL
-cygsid::getfromgr (const struct __group16 *gr)
+cygsid::getfromgr (const struct __group32 *gr)
 {
   char *sp = (gr && gr->gr_passwd) ? gr->gr_passwd : NULL;
   return (*this = sp ?: "") != NULL;
@@ -176,7 +173,7 @@ cygsid::get_id (BOOL search_grp, int *type)
 	}
       if (search_grp || type)
 	{
-	  struct __group16 *gr;
+	  struct __group32 *gr;
 	  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 	    {
 	      if (sid.getfromgr (gr) && sid == psid)
@@ -226,7 +223,7 @@ cygsid::get_id (BOOL search_grp, int *type)
 	      *type = GROUP;
 	    if (id == -1)
 	      {
-		struct __group16 *gr = getgrnam (account);
+		struct __group32 *gr = getgrnam32 (account);
 		if (gr)
 		  id = gr->gr_gid;
 	      }
@@ -246,21 +243,21 @@ cygsid::get_id (BOOL search_grp, int *type)
 	}
     }
   if (id == -1)
-    id = getuid ();
+    id = getuid32 ();
   return id;
 }
 
 BOOL
-is_grp_member (__uid16_t uid, __gid16_t gid)
+is_grp_member (__uid32_t uid, __gid32_t gid)
 {
-  extern int getgroups (int, __gid16_t *, __gid16_t, const char *);
+  extern int getgroups32 (int, __gid32_t *, __gid32_t, const char *);
   BOOL grp_member = TRUE;
 
-  struct passwd *pw = getpwuid (uid);
-  __gid16_t grps[NGROUPS_MAX];
-  int cnt = getgroups (NGROUPS_MAX, grps,
-		       pw ? pw->pw_gid : myself->gid,
-		       pw ? pw->pw_name : cygheap->user.name ());
+  struct passwd *pw = getpwuid32 (uid);
+  __gid32_t grps[NGROUPS_MAX];
+  int cnt = getgroups32 (NGROUPS_MAX, grps,
+			 pw ? pw->pw_gid : myself->gid,
+			 pw ? pw->pw_name : cygheap->user.name ());
   int i;
   for (i = 0; i < cnt; ++i)
     if (grps[i] == gid)
@@ -269,6 +266,7 @@ is_grp_member (__uid16_t uid, __gid16_t gid)
   return grp_member;
 }
 
+#if 0 // unused
 #define SIDLEN	(sidlen = MAX_SID_LEN, &sidlen)
 #define DOMLEN	(domlen = INTERNET_MAX_HOST_NAME_LENGTH, &domlen)
 
@@ -337,6 +335,7 @@ got_it:
 
 #undef SIDLEN
 #undef DOMLEN
+#endif //unused
 
 int
 set_process_privilege (const char *privilege, BOOL enable)

@@ -1,6 +1,6 @@
 /* cygheap.cc: Cygwin heap manager.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -429,7 +429,7 @@ cygheap_user::~cygheap_user ()
   if (pname)
     cfree (pname);
   if (plogsrv)
-    cfree (plogsrv);
+    cfree (plogsrv - 2);
   if (pdomain)
     cfree (pdomain);
   if (psid)
@@ -449,8 +449,14 @@ void
 cygheap_user::set_logsrv (const char *new_logsrv)
 {
   if (plogsrv)
-    cfree (plogsrv);
-  plogsrv = (new_logsrv && *new_logsrv) ? cstrdup (new_logsrv) : NULL;
+    cfree (plogsrv - 2);
+  if (!new_logsrv || !*new_logsrv)
+    plogsrv = NULL;
+  else
+    {
+      plogsrv = (char *) cmalloc (HEAP_STR, strlen (new_logsrv) + 3) + 2;
+      strcpy (plogsrv, new_logsrv);
+    }
 }
 
 void
@@ -468,13 +474,23 @@ cygheap_user::set_sid (PSID new_sid)
     {
       if (psid)
 	cfree (psid);
+      if (orig_psid)
+	cfree (orig_psid);
       psid = NULL;
+      orig_psid = NULL;
       return TRUE;
     }
   else
     {
       if (!psid)
-	psid = cmalloc (HEAP_STR, MAX_SID_LEN);
+	{
+	  if (!orig_psid)
+	    {
+	      orig_psid = cmalloc (HEAP_STR, MAX_SID_LEN);
+	      CopySid (MAX_SID_LEN, orig_psid, new_sid);
+	    }
+	  psid = cmalloc (HEAP_STR, MAX_SID_LEN);
+	}
       return CopySid (MAX_SID_LEN, psid, new_sid);
     }
 }

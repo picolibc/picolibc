@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,7 +23,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "shared_info.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include <assert.h>
 #include <limits.h>
@@ -57,6 +55,33 @@ fhandler_base::puts_readahead (const char *s, size_t len)
 	 && (success = put_readahead (*s++) > 0))
     continue;
   return success;
+}
+
+void
+fhandler_base::set_flags (int flags, int supplied_bin)
+{
+  int bin;
+  int fmode;
+  debug_printf ("flags %p, supplied_bin %p", flags, supplied_bin);
+  if ((bin = flags & (O_BINARY | O_TEXT)))
+    debug_printf ("O_TEXT/O_BINARY set in flags %p", bin);
+  else if (get_r_binset () && get_w_binset ())
+    bin = get_r_binary () ? O_BINARY : O_TEXT;	// FIXME: Not quite right
+  else if (supplied_bin)
+    bin = supplied_bin;
+  else if ((fmode = get_default_fmode (flags)) & O_BINARY)
+    bin = O_BINARY;
+  else if (fmode & O_TEXT)
+    bin = O_TEXT;
+  else
+    bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT) ?
+      	  O_BINARY : O_TEXT;
+
+  openflags = flags | bin;
+
+  set_r_binary (bin & O_BINARY);
+  set_w_binary (bin & O_BINARY);
+  syscall_printf ("filemode set to %s", bin ? "binary" : "text");
 }
 
 int
@@ -148,7 +173,8 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
 /* Record the file name.
    Filenames are used mostly for debugging messages, and it's hoped that
    in cases where the name is really required, the filename wouldn't ever
-   be too long (e.g. devices or some such).  */
+   be too long (e.g. devices or some such).
+   The unix_path_name is also used by virtual fhandlers.  */
 void
 fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit)
 {
@@ -160,8 +186,9 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
   else
     {
       const char *fmt = get_native_name ();
-      win32_path_name = (char *) cmalloc (HEAP_STR, strlen(fmt) + 16);
-      __small_sprintf (win32_path_name, fmt, unit);
+      char *w =  (char *) cmalloc (HEAP_STR, strlen(fmt) + 16);
+      __small_sprintf (w, fmt, unit);
+      win32_path_name = w;
     }
 
   if (win32_path_name == NULL)
@@ -177,12 +204,15 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
      path_conv. Ideally, we should pass in a format string and build the
      unix_path, too. */
   if (!is_device () || *win32_path_name != '\\')
-    unix_path_name = cstrdup (unix_path);
+    unix_path_name = unix_path;
   else
     {
-      unix_path_name = cstrdup (win32_path_name);
-      for (char *p = unix_path_name; (p = strchr (p, '\\')); p++)
-	*p = '/';
+      char *p = cstrdup (win32_path_name);
+      unix_path_name = p;
+      while ((p = strchr (p, '\\')) != NULL)
+	*p++ = '/';
+      if (unix_path)
+	cfree ((void *) unix_path);
     }
 
   if (unix_path_name == NULL)
@@ -191,13 +221,6 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
       exit (ENOMEM);
     }
   namehash = hash_path_name (0, win32_path_name);
-}
-
-void
-fhandler_base::reset_unix_path_name (const char *unix_path)
-{
-  cfree (unix_path_name);
-  unix_path_name = cstrdup (unix_path);
 }
 
 /* Detect if we are sitting at EOF for conditions where Windows
@@ -311,7 +334,7 @@ fhandler_base::get_default_fmode (int flags)
 
 /* Open system call handler function. */
 int
-fhandler_base::open (path_conv *, int flags, mode_t mode)
+fhandler_base::open (path_conv *pc, int flags, mode_t mode)
 {
   int res = 0;
   HANDLE x;
@@ -320,7 +343,7 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
   int creation_distribution;
   SECURITY_ATTRIBUTES sa = sec_none;
 
-  syscall_printf ("(%s, %p)", get_win32_name (), flags);
+  syscall_printf ("(%s, %p) query_open %d", get_win32_name (), flags, get_query_open ());
 
   if (get_win32_name () == NULL)
     {
@@ -377,21 +400,23 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
     {
       char *c = strrchr (get_win32_name (), '\\');
       if ((c && c[1] == '.') || *get_win32_name () == '.')
-        file_attributes |= FILE_ATTRIBUTE_HIDDEN;
+	file_attributes |= FILE_ATTRIBUTE_HIDDEN;
     }
 #endif
 
   /* CreateFile() with dwDesiredAccess == 0 when called on remote
      share returns some handle, even if file doesn't exist. This code
      works around this bug. */
-  if (get_query_open () &&
-      isremote () &&
-      creation_distribution == OPEN_EXISTING &&
-      GetFileAttributes (get_win32_name ()) == INVALID_FILE_ATTRIBUTES)
+  if (get_query_open () && isremote () &&
+      creation_distribution == OPEN_EXISTING && pc && !pc->exists ())
     {
       set_errno (ENOENT);
       goto done;
     }
+
+  /* If mode has no write bits set, we set the R/O attribute. */
+  if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
+    file_attributes |= FILE_ATTRIBUTE_READONLY;
 
   /* If the file should actually be created and ntsec is on,
      set files attributes. */
@@ -423,37 +448,7 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
   set_io_handle (x);
-  int bin;
-  int fmode;
-  if ((bin = flags & (O_BINARY | O_TEXT)))
-    /* nothing to do */;
-  else if ((fmode = get_default_fmode (flags)) & O_BINARY)
-    bin = O_BINARY;
-  else if (fmode & O_TEXT)
-    bin = O_TEXT;
-  else if (get_device () == FH_DISK)
-    bin = get_w_binary () || get_r_binary ();
-  else
-    bin = (binmode == O_BINARY) || get_w_binary () || get_r_binary ();
-
-  if (bin & O_TEXT)
-    bin = 0;
-
-  set_flags (flags | (bin ? O_BINARY : O_TEXT));
-
-  set_r_binary (bin);
-  set_w_binary (bin);
-  syscall_printf ("filemode set to %s", bin ? "binary" : "text");
-
-  if (get_device () != FH_TAPE
-      && get_device () != FH_FLOPPY
-      && get_device () != FH_SERIAL)
-    {
-      if (flags & O_APPEND)
-	SetFilePointer (get_handle(), 0, 0, FILE_END);
-      else
-	SetFilePointer (get_handle(), 0, 0, FILE_BEGIN);
-    }
+  set_flags (flags, pc ? pc->binmode () : 0);
 
   res = 1;
   set_open_status ();
@@ -727,9 +722,17 @@ fhandler_base::lseek (__off64_t offset, int whence)
 		       : (whence == SEEK_CUR ? FILE_CURRENT : FILE_END);
 
   LONG off_low = offset & 0xffffffff;
-  LONG off_high = wincap.has_64bit_file_access () ? offset >> 32 : 0;
+  LONG *poff_high, off_high;
+  if (!wincap.has_64bit_file_access ())
+    poff_high = NULL;
+  else
+    {
+      off_high =  offset >> 32;
+      poff_high = &off_high;
+    }
 
-  res = SetFilePointer (get_handle(), off_low, &off_high, win32_whence);
+  debug_printf ("setting file pointer to %u (high), %u (low)", off_high, off_low);
+  res = SetFilePointer (get_handle(), off_low, poff_high, win32_whence);
   if (res == INVALID_SET_FILE_POINTER && GetLastError ())
     {
       __seterrno ();
@@ -839,9 +842,8 @@ fhandler_base::fstat (struct __stat64 *buf, path_conv *)
   buf->st_mode |= get_device () == FH_FLOPPY ? S_IFBLK : S_IFCHR;
   buf->st_nlink = 1;
   buf->st_blksize = S_BLKSIZE;
-  buf->st_dev = buf->st_rdev = FHDEVN (get_device ()) << 8 | (get_unit () & 0xff);
-  buf->st_ino = get_namehash ();
-  buf->st_atime = buf->st_mtime = buf->st_ctime = time (NULL) - 1;
+  time_as_timestruc_t (&buf->st_ctim);
+  buf->st_atim = buf->st_mtim = buf->st_ctim;
   return 0;
 }
 
@@ -849,18 +851,18 @@ void
 fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
 {
   set_io_handle (f);
-  set_r_binary (bin);
-  set_w_binary (bin);
   access = a;
   a &= GENERIC_READ | GENERIC_WRITE;
+  int flags = 0;
   if (a == GENERIC_READ)
-    set_flags (O_RDONLY);
-  if (a == GENERIC_WRITE)
-    set_flags (O_WRONLY);
-  if (a == (GENERIC_READ | GENERIC_WRITE))
-    set_flags (O_RDWR);
+    flags = O_RDONLY;
+  else if (a == GENERIC_WRITE)
+    flags = O_WRONLY;
+  else if (a == (GENERIC_READ | GENERIC_WRITE))
+    flags = O_RDWR;
+  set_flags (flags, bin);
   set_open_status ();
-  debug_printf ("created new fhandler_base for handle %p", f);
+  debug_printf ("created new fhandler_base for handle %p, bin %d", f, get_r_binary ());
 }
 
 void
@@ -1020,23 +1022,15 @@ fhandler_base::fhandler_base (DWORD devtype, int unit):
   win32_path_name (NULL),
   open_status (0)
 {
-  int bin = __fmode & O_TEXT ? 0 : 1;
-  if (status != FH_DISK && status != FH_CONSOLE)
-    {
-      if (!get_r_binset ())
-	set_r_binary (bin);
-      if (!get_w_binset ())
-	set_w_binary (bin);
-    }
 }
 
 /* Normal I/O destructor */
 fhandler_base::~fhandler_base (void)
 {
   if (unix_path_name != NULL)
-    cfree (unix_path_name);
+    cfree ((void *) unix_path_name);
   if (win32_path_name != NULL)
-    cfree (win32_path_name);
+    cfree ((void *) win32_path_name);
   if (rabuf)
     free (rabuf);
   unix_path_name = win32_path_name = NULL;

@@ -1,6 +1,6 @@
 /* cygserver_shm.h
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.
@@ -17,6 +17,7 @@ details. */
 #define SHM_REATTACH 1
 #define SHM_ATTACH 2
 #define SHM_DETACH 3
+#define SHM_DEL    4
 
 
 class client_request_shm : public client_request

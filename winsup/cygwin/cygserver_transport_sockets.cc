@@ -1,6 +1,6 @@
 /* cygserver_transport_sockets.cc
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -28,7 +28,7 @@ extern "C" int
 cygwin_socket (int af, int type, int protocol);
 extern "C" int
 cygwin_connect (int fd,
-                const struct sockaddr *name,
+		const struct sockaddr *name,
 		int namelen);
 extern "C" int
 cygwin_accept (int fd, struct sockaddr *peer, int *len);
@@ -86,10 +86,10 @@ transport_layer_sockets::accept ()
       printf ("Nup, could' accept. %d\n",errno);
       return NULL;
     }
-  
+
   transport_layer_sockets *new_conn = new transport_layer_sockets (new_fd);
 
-  return new_conn;  
+  return new_conn;
 
 }
 

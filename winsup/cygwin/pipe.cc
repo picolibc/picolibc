@@ -10,7 +10,6 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
-#include <sys/fcntl.h>
 #include <errno.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -19,7 +18,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "thread.h"
-#include "sigproc.h"
 #include "pinfo.h"
 
 static unsigned pipecount;
@@ -149,7 +147,7 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
 	  fhandler_pipe *fhr = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdr, FH_PIPER, "/dev/piper");
 	  fhandler_pipe *fhw = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdw, FH_PIPEW, "/dev/pipew");
 
-	  int binmode = mode & O_TEXT ? 0 : 1;
+	  int binmode = mode & O_TEXT ?: O_BINARY;
 	  fhr->init (r, GENERIC_READ, binmode);
 	  fhw->init (w, GENERIC_WRITE, binmode);
 	  if (mode & O_NOINHERIT)

@@ -18,10 +18,8 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <errno.h>
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "heap.h"
 #include "cygerrno.h"
 #define NEED_VFORK
 #include "perprocess.h"
@@ -557,11 +555,11 @@ dll_crt0_1 ()
   /* Initialize SIGSEGV handling, etc. */
   init_exceptions (&cygwin_except_entry);
 
-  do_global_ctors (&__CTOR_LIST__, 1);
-
   /* Set the os_being_run global. */
   wincap.init ();
   check_sanity_and_sync (user_data);
+
+  do_global_ctors (&__CTOR_LIST__, 1);
 
   /* Nasty static stuff needed by newlib -- point to a local copy of
      the reent stuff.

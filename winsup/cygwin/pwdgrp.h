@@ -44,12 +44,81 @@ public:
     {
       state = nstate;
     }
-  void set_last_modified (FILE *f)
+  void set_last_modified (HANDLE fh, const char *name)
     {
       if (!file_w32[0])
-	strcpy (file_w32, cygheap->fdtab[fileno (f)]->get_win32_name ());
-
-      GetFileTime (cygheap->fdtab[fileno (f)]->get_handle (),
-		   NULL, NULL, &last_modified);
+	strcpy (file_w32, name);
+      GetFileTime (fh, NULL, NULL, &last_modified);
     }
+};
+
+class pwdgrp_read {
+  path_conv pc;
+  HANDLE fh;
+  char *buf;
+  char *lptr, *eptr;
+
+public:
+  pwdgrp_read ()
+  : fh (INVALID_HANDLE_VALUE), buf (NULL), lptr (NULL), eptr (NULL) {}
+  virtual ~pwdgrp_read ()
+  {
+    close ();
+    if (buf)
+      free (buf);
+  }
+
+  bool open (const char *posix_fname)
+  {
+    if (buf)
+      free (buf);
+    buf = lptr = eptr = NULL;
+
+    pc.check (posix_fname);
+    if (pc.error || !pc.exists () || !pc.isdisk () || pc.isdir ())
+      return false;
+
+    fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL, OPEN_EXISTING,
+		     FILE_ATTRIBUTE_NORMAL, 0);
+    if (fh)
+      {
+	DWORD size = GetFileSize (fh, NULL), read_bytes;
+	buf = (char *) malloc (size + 1);
+	if (!ReadFile (fh, buf, size, &read_bytes, NULL))
+	  {
+	    if (buf)
+	      free (buf);
+	    buf = NULL;
+	    CloseHandle (fh);
+	    fh = INVALID_HANDLE_VALUE;
+	    return false;
+	  }
+        buf[read_bytes] = '\0';
+	return true;
+      }
+    return false;
+  }
+  char *gets ()
+  {
+    if (!buf)
+      return NULL;
+    if (!lptr)
+      lptr = buf;
+    else if (!eptr)
+      return lptr = NULL;
+    else
+      lptr = eptr;
+    eptr = strchr (lptr, '\n');
+    if (eptr)
+      *eptr++ = '\0';
+    return lptr;
+  }
+  inline HANDLE get_fhandle () { return fh; }
+  inline const char *get_fname () { return pc; }
+  void close ()
+  {
+    if (fh != INVALID_HANDLE_VALUE)
+      CloseHandle (fh);
+    fh = INVALID_HANDLE_VALUE;
+  }
 };

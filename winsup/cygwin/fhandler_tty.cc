@@ -1,6 +1,6 @@
 /* fhandler_tty.cc
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -10,7 +10,6 @@ details. */
 
 #include "winsup.h"
 #include <stdio.h>
-#include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -21,7 +20,6 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
@@ -456,7 +454,7 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
   attach_tty (ttynum);
   tc->set_ctty (ttynum, flags);
 
-  set_flags (flags);
+  set_flags (flags & ~O_TEXT, O_BINARY);
   /* Create synchronisation events */
   char buf[40];
 
@@ -521,33 +519,33 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
       termios_printf ("cannot dup handles via server. using old method.");
 
       HANDLE tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
-				         get_ttyp ()->master_pid);
+				      get_ttyp ()->master_pid);
       termios_printf ("tty own handle %p",tty_owner);
       if (tty_owner == NULL)
-        {
-          termios_printf ("can't open tty (%d) handle process %d",
-	 	          ttynum, get_ttyp ()->master_pid);
-          __seterrno ();
-          return 0;
-        }
+	{
+	  termios_printf ("can't open tty (%d) handle process %d",
+			  ttynum, get_ttyp ()->master_pid);
+	  __seterrno ();
+	  return 0;
+	}
 
-      if (!DuplicateHandle (tty_owner, get_ttyp ()->from_master, 
-			  hMainProc, &from_master_local, 0, TRUE,
+      if (!DuplicateHandle (tty_owner, get_ttyp ()->from_master,
+			    hMainProc, &from_master_local, 0, TRUE,
 			    DUPLICATE_SAME_ACCESS))
-        {
-          termios_printf ("can't duplicate input, %E");
-          __seterrno ();
-          return 0;
-        }
+	{
+	  termios_printf ("can't duplicate input, %E");
+	  __seterrno ();
+	  return 0;
+	}
 
-      if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master, 
+      if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master,
 			  hMainProc, &to_master_local, 0, TRUE,
 			  DUPLICATE_SAME_ACCESS))
-        {
-          termios_printf ("can't duplicate output, %E");
-          __seterrno ();
-          return 0;
-        }
+	{
+	  termios_printf ("can't duplicate output, %E");
+	  __seterrno ();
+	  return 0;
+	}
       CloseHandle (tty_owner);
     }
 
@@ -569,12 +567,12 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
 
 int
 fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
-                                        LPHANDLE to_master_ptr)
+					  LPHANDLE to_master_ptr)
 {
   if (!from_master_ptr || !to_master_ptr)
     return 0;
 
-  client_request_attach_tty *request = 
+  client_request_attach_tty *request =
 	new client_request_attach_tty ((DWORD) GetCurrentProcessId (),
 				      (DWORD) get_ttyp ()->master_pid,
 				      (HANDLE) get_ttyp ()->from_master,
@@ -689,7 +687,9 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 
   if (!(get_ttyp ()->ti.c_lflag & ICANON))
     {
-      vmin = min (INP_BUFFER_SIZE, get_ttyp ()->ti.c_cc[VMIN]);
+      vmin = get_ttyp ()->ti.c_cc[VMIN];
+      if (vmin > INP_BUFFER_SIZE)
+	vmin = INP_BUFFER_SIZE;
       vtime = get_ttyp ()->ti.c_cc[VTIME];
       if (vmin < 0) vmin = 0;
       if (vtime < 0) vtime = 0;
@@ -1006,7 +1006,7 @@ fhandler_pty_master::open (path_conv *, int flags, mode_t)
 
   cygwin_shared->tty[ttynum]->common_init (this);
   inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
-  set_flags (flags);
+  set_flags (flags & ~O_TEXT, O_BINARY);
   set_open_status ();
 
   termios_printf ("opened pty master tty%d<%p>", ttynum, this);

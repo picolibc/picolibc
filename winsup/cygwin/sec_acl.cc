@@ -24,13 +24,10 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
 
@@ -109,7 +106,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 
   cygsid sid;
   struct passwd *pw;
-  struct __group16 *gr;
+  struct __group32 *gr;
   int pos;
 
   if (!InitializeAcl (acl, 3072, ACL_REVISION))
@@ -160,7 +157,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	  break;
 	case USER:
 	case DEF_USER:
-	  if (!(pw = getpwuid (aclbufp[i].a_id))
+	  if (!(pw = getpwuid32 (aclbufp[i].a_id))
 	      || !sid.getfrompw (pw)
 	      || !add_access_allowed_ace (acl, ace_off++, allow,
 					   sid, acl_len, inheritance))
@@ -174,7 +171,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	  break;
 	case GROUP:
 	case DEF_GROUP:
-	  if (!(gr = getgrgid (aclbufp[i].a_id))
+	  if (!(gr = getgrgid32 (aclbufp[i].a_id))
 	      || !sid.getfromgr (gr)
 	      || !add_access_allowed_ace (acl, ace_off++, allow,
 					   sid, acl_len, inheritance))
@@ -257,8 +254,8 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
   PSID owner_sid;
   PSID group_sid;
   BOOL dummy;
-  __uid16_t uid;
-  __gid16_t gid;
+  __uid32_t uid;
+  __gid32_t gid;
 
   if (!GetSecurityDescriptorOwner (psd, &owner_sid, &dummy))
     {
@@ -426,9 +423,9 @@ acl_access (const char *path, int flags)
 	      cygsid owner;
 	      cygsid group;
 	      struct passwd *pw;
-	      struct __group16 *gr = NULL;
+	      struct __group32 *gr = NULL;
 
-	      if ((pw = getpwuid (acls[i].a_id)) != NULL
+	      if ((pw = getpwuid32 (acls[i].a_id)) != NULL
 		  && owner.getfrompw (pw))
 		{
 		  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
@@ -996,7 +993,7 @@ aclfromtext (char *acltextp, int *)
 	      c += 5;
 	      if (isalpha (*c))
 		{
-		  struct __group16 *gr = getgrnam (c);
+		  struct __group32 *gr = getgrnam32 (c);
 		  if (!gr)
 		    {
 		      set_errno (EINVAL);

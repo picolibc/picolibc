@@ -1,6 +1,6 @@
 /* termios.cc: termios for WIN32.
 
-   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Doug Evans and Steve Chamberlain of Cygnus Support
    dje@cygnus.com, sac@cygnus.com

@@ -123,9 +123,11 @@ struct msghdr
 #define SOL_UDP		17
 
 /* IP options */
+#ifndef IPTOS_LOWDELAY
 #define	IPTOS_LOWDELAY		0x10
 #define	IPTOS_THROUGHPUT	0x08
 #define	IPTOS_RELIABILITY	0x04
+#endif
 
 /* These need to appear somewhere around here */
 #define IP_DEFAULT_MULTICAST_TTL        1
@@ -148,8 +150,10 @@ struct msghdr
 #define IPX_TYPE	1
 
 /* TCP options - this way around because someone left a set in the c library includes */
+#ifndef TCP_NODELAY
 #define TCP_NODELAY     0x0001
 #define TCP_MAXSEG	2
+#endif
 
 /* The various priorities. */
 #define SOPRI_INTERACTIVE	0

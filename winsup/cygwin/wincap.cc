@@ -1,7 +1,7 @@
 /* wincap.cc -- figure out on which OS we're running. Set the
 		capability class to the appropriate values.
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -22,7 +22,6 @@ static NO_COPY wincaps wincap_unknown = {
   has_security:false,
   has_security_descriptor_control:false,
   has_get_process_times:false,
-  has_specific_access_rights:false,
   has_lseek_bug:false,
   has_lock_file_ex:false,
   has_signal_object_and_wait:false,
@@ -46,6 +45,7 @@ static NO_COPY wincaps wincap_unknown = {
   has_raw_devices:false,
   has_valid_processorlevel:false,
   has_64bit_file_access:false,
+  has_process_io_counters:false,
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -59,7 +59,6 @@ static NO_COPY wincaps wincap_95 = {
   has_security:false,
   has_security_descriptor_control:false,
   has_get_process_times:false,
-  has_specific_access_rights:false,
   has_lseek_bug:true,
   has_lock_file_ex:false,
   has_signal_object_and_wait:false,
@@ -83,6 +82,7 @@ static NO_COPY wincaps wincap_95 = {
   has_raw_devices:false,
   has_valid_processorlevel:false,
   has_64bit_file_access:false,
+  has_process_io_counters:false,
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -96,7 +96,6 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_security:false,
   has_security_descriptor_control:false,
   has_get_process_times:false,
-  has_specific_access_rights:false,
   has_lseek_bug:true,
   has_lock_file_ex:false,
   has_signal_object_and_wait:false,
@@ -120,6 +119,7 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_raw_devices:false,
   has_valid_processorlevel:false,
   has_64bit_file_access:false,
+  has_process_io_counters:false,
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -133,7 +133,6 @@ static NO_COPY wincaps wincap_98 = {
   has_security:false,
   has_security_descriptor_control:false,
   has_get_process_times:false,
-  has_specific_access_rights:false,
   has_lseek_bug:true,
   has_lock_file_ex:false,
   has_signal_object_and_wait:false,
@@ -157,6 +156,7 @@ static NO_COPY wincaps wincap_98 = {
   has_raw_devices:false,
   has_valid_processorlevel:true,
   has_64bit_file_access:false,
+  has_process_io_counters:false,
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -170,7 +170,6 @@ static NO_COPY wincaps wincap_98se = {
   has_security:false,
   has_security_descriptor_control:false,
   has_get_process_times:false,
-  has_specific_access_rights:false,
   has_lseek_bug:true,
   has_lock_file_ex:false,
   has_signal_object_and_wait:false,
@@ -194,6 +193,7 @@ static NO_COPY wincaps wincap_98se = {
   has_raw_devices:false,
   has_valid_processorlevel:true,
   has_64bit_file_access:false,
+  has_process_io_counters:false,
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -207,7 +207,6 @@ static NO_COPY wincaps wincap_me = {
   has_security:false,
   has_security_descriptor_control:false,
   has_get_process_times:false,
-  has_specific_access_rights:false,
   has_lseek_bug:true,
   has_lock_file_ex:false,
   has_signal_object_and_wait:false,
@@ -231,6 +230,7 @@ static NO_COPY wincaps wincap_me = {
   has_raw_devices:false,
   has_valid_processorlevel:true,
   has_64bit_file_access:false,
+  has_process_io_counters:false,
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -244,7 +244,6 @@ static NO_COPY wincaps wincap_nt3 = {
   has_security:true,
   has_security_descriptor_control:false,
   has_get_process_times:true,
-  has_specific_access_rights:true,
   has_lseek_bug:false,
   has_lock_file_ex:true,
   has_signal_object_and_wait:false,
@@ -268,6 +267,7 @@ static NO_COPY wincaps wincap_nt3 = {
   has_raw_devices:true,
   has_valid_processorlevel:true,
   has_64bit_file_access:true,
+  has_process_io_counters:false,
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -281,7 +281,6 @@ static NO_COPY wincaps wincap_nt4 = {
   has_security:true,
   has_security_descriptor_control:false,
   has_get_process_times:true,
-  has_specific_access_rights:true,
   has_lseek_bug:false,
   has_lock_file_ex:true,
   has_signal_object_and_wait:true,
@@ -305,6 +304,7 @@ static NO_COPY wincaps wincap_nt4 = {
   has_raw_devices:true,
   has_valid_processorlevel:true,
   has_64bit_file_access:true,
+  has_process_io_counters:false,
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -318,7 +318,6 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_security:true,
   has_security_descriptor_control:false,
   has_get_process_times:true,
-  has_specific_access_rights:true,
   has_lseek_bug:false,
   has_lock_file_ex:true,
   has_signal_object_and_wait:true,
@@ -342,6 +341,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_raw_devices:true,
   has_valid_processorlevel:true,
   has_64bit_file_access:true,
+  has_process_io_counters:false,
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -355,7 +355,6 @@ static NO_COPY wincaps wincap_2000 = {
   has_security:true,
   has_security_descriptor_control:true,
   has_get_process_times:true,
-  has_specific_access_rights:true,
   has_lseek_bug:false,
   has_lock_file_ex:true,
   has_signal_object_and_wait:true,
@@ -379,6 +378,7 @@ static NO_COPY wincaps wincap_2000 = {
   has_raw_devices:true,
   has_valid_processorlevel:true,
   has_64bit_file_access:true,
+  has_process_io_counters:true,
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -392,7 +392,6 @@ static NO_COPY wincaps wincap_xp = {
   has_security:true,
   has_security_descriptor_control:true,
   has_get_process_times:true,
-  has_specific_access_rights:true,
   has_lseek_bug:false,
   has_lock_file_ex:true,
   has_signal_object_and_wait:true,
@@ -416,9 +415,10 @@ static NO_COPY wincaps wincap_xp = {
   has_raw_devices:true,
   has_valid_processorlevel:true,
   has_64bit_file_access:true,
+  has_process_io_counters:true,
 };
 
-wincapc NO_COPY wincap;
+wincapc wincap;
 
 void
 wincapc::init ()

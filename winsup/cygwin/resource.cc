@@ -1,6 +1,6 @@
 /* resource.cc: getrusage () and friends.
 
-   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Steve Chamberlain (sac@cygnus.com), Doug Evans (dje@cygnus.com),
    Geoffrey Noer (noer@cygnus.com) of Cygnus Support.
@@ -17,8 +17,6 @@ details. */
 #include <unistd.h>
 #include <limits.h>
 #include "cygerrno.h"
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "psapi.h"
 

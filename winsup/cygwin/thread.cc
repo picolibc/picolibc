@@ -1,6 +1,6 @@
 /* thread.cc: Locking and threading module functions
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Originally written by Marco Fuykschot <marco@ddi.nl>
    Substantialy enhanced by Robert Collins <rbtcollins@hotmail.com>
@@ -37,8 +37,6 @@ details. */
 #include <assert.h>
 #include <stdlib.h>
 #include <syslog.h>
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "perprocess.h"
 #include "security.h"
@@ -345,8 +343,19 @@ MTinterface::fixup_after_fork (void)
     }
 }
 
+/* pthread calls */
+
+/* static methods */
+
+pthread *
+pthread::self ()
+{
+  return (pthread *) TlsGetValue (MT_INTERFACE->thread_self_dwTlsIndex);
+}
+
+/* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-cancelstate (0), canceltype (0)
+cancelstate (0), canceltype (0), joiner (NULL), cleanup_handlers(NULL) 
 {
 }
 
@@ -375,6 +384,14 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   function = func;
   arg = threadarg;
 
+  if (verifyable_object_isvalid (&mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
+    {
+      thread_printf ("New thread object access mutex is not valid. this %p",
+		     this);
+      magic = 0;
+      return;
+    }
+
   win32_obj_id = ::CreateThread (&sec_none_nih, attr.stacksize,
 				(LPTHREAD_START_ROUTINE) thread_init_wrapper,
 				this, CREATE_SUSPENDED, &thread_id);
@@ -383,6 +400,7 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
     magic = 0;
   else
     {
+      InterlockedIncrement (&MT_INTERFACE->threadcount);
       /*FIXME: set the priority appropriately for system contention scope */
       if (attr.inheritsched == PTHREAD_EXPLICIT_SCHED)
 	{
@@ -391,6 +409,43 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
 	}
       ResumeThread (win32_obj_id);
     }
+}
+
+void
+pthread::push_cleanup_handler (__pthread_cleanup_handler *handler)
+{
+  if (this != self ())
+    // TODO: do it?
+    api_fatal ("Attempt to push a cleanup handler across threads"); 
+  mutex.Lock();
+  handler->next = cleanup_handlers;
+  cleanup_handlers = handler;
+  mutex.UnLock();
+}
+
+void
+pthread::pop_cleanup_handler (int const execute)
+{
+  if (this != self ())
+    // TODO: send a signal or something to the thread ?
+    api_fatal ("Attempt to execute a cleanup handler across threads");
+  
+  if (cleanup_handlers != NULL )
+    {
+      __pthread_cleanup_handler *handler = cleanup_handlers;
+
+      if (execute)
+	 (*handler->function) (handler->arg);
+
+      cleanup_handlers = handler->next;
+    }
+}
+
+void
+pthread::pop_all_cleanup_handlers ()
+{
+  while (cleanup_handlers != NULL)
+    pop_cleanup_handler (1);
 }
 
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
@@ -878,7 +933,7 @@ verifyable_object_isvalid (void const * objectptr, long magic)
 
 /* Pthreads */
 void *
-thread_init_wrapper (void *_arg)
+pthread::thread_init_wrapper (void *_arg)
 {
   // Setup the local/global storage of this thread
 
@@ -909,6 +964,12 @@ thread_init_wrapper (void *_arg)
 
   /*the OS doesn't check this for <= 64 Tls entries (pre win2k) */
   TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thread);
+
+  thread->mutex.Lock();
+  // if thread is detached force cleanup on exit
+  if (thread->attr.joinable == PTHREAD_CREATE_DETACHED && thread->joiner == NULL)
+    thread->joiner = pthread::self ();
+  thread->mutex.UnLock();
 
 #ifdef _CYG_THREAD_FAILSAFE
   if (_REENT == _impure_ptr)
@@ -947,7 +1008,6 @@ __pthread_create (pthread_t *thread, const pthread_attr_t *attr,
       *thread = NULL;
       return EAGAIN;
     }
-  InterlockedIncrement (&MT_INTERFACE->threadcount);
 
   return 0;
 }
@@ -1189,7 +1249,7 @@ opengroup specs.
 int
 __pthread_setcancelstate (int state, int *oldstate)
 {
-  class pthread *thread = __pthread_self ();
+  class pthread *thread = pthread::self ();
   if (state != PTHREAD_CANCEL_ENABLE && state != PTHREAD_CANCEL_DISABLE)
     return EINVAL;
   *oldstate = thread->cancelstate;
@@ -1200,7 +1260,7 @@ __pthread_setcancelstate (int state, int *oldstate)
 int
 __pthread_setcanceltype (int type, int *oldtype)
 {
-  class pthread *thread = __pthread_self ();
+  class pthread *thread = pthread::self ();
   if (type != PTHREAD_CANCEL_DEFERRED && type != PTHREAD_CANCEL_ASYNCHRONOUS)
     return EINVAL;
   *oldtype = thread->canceltype;
@@ -1212,7 +1272,7 @@ __pthread_setcanceltype (int type, int *oldtype)
 void
 __pthread_testcancel (void)
 {
-  class pthread *thread = __pthread_self ();
+  class pthread *thread = pthread::self ();
   if (thread->cancelstate == PTHREAD_CANCEL_DISABLE)
     return;
   /*check the cancellation event object here - not neededuntil pthread_cancel actually
@@ -1493,11 +1553,23 @@ __pthread_attr_destroy (pthread_attr_t *attr)
 void
 __pthread_exit (void *value_ptr)
 {
-  class pthread *thread = __pthread_self ();
+  pthread * thread = pthread::self ();
+
+  // run cleanup handlers
+  thread->pop_all_cleanup_handlers();
 
   MT_INTERFACE->destructors.IterateNull ();
+  
+  thread->mutex.Lock();
+  // cleanup if thread is in detached state and not joined
+  if( __pthread_equal(&thread->joiner, &thread ) )
+    delete thread;
+  else
+    {  
+      thread->return_ptr = value_ptr;
+      thread->mutex.UnLock();
+    }
 
-  thread->return_ptr = value_ptr;
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     exit (0);
   else
@@ -1507,22 +1579,38 @@ __pthread_exit (void *value_ptr)
 int
 __pthread_join (pthread_t *thread, void **return_val)
 {
+   pthread_t joiner = pthread::self ();
+
   /*FIXME: wait on the thread cancellation event as well - we are a cancellation point*/
   if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
 
-  if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
+  if ( joiner == *thread)    
     {
       if (return_val)
-	*return_val = NULL;
+        *return_val = NULL;
+      return EDEADLK;
+    }
+
+  (*thread)->mutex.Lock ();
+
+  if((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
+    {
+      if (return_val)
+        *return_val = NULL;
+      (*thread)->mutex.UnLock ();
       return EINVAL;
     }
   else
     {
+      (*thread)->joiner = joiner;
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
+      (*thread)->mutex.UnLock ();
       WaitForSingleObject ((*thread)->win32_obj_id, INFINITE);
       if (return_val)
-	*return_val = (*thread)->return_ptr;
+         *return_val = (*thread)->return_ptr;
+      // cleanup
+      delete (*thread);
     }	/*End if */
 
   pthread_testcancel ();
@@ -1536,13 +1624,25 @@ __pthread_detach (pthread_t *thread)
   if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
 
+  (*thread)->mutex.Lock ();
   if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
-      (*thread)->return_ptr = NULL;
+      (*thread)->mutex.UnLock ();
       return EINVAL;
     }
 
-  (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
+  // check if thread is still alive
+  if (WAIT_TIMEOUT == WaitForSingleObject ((*thread)->win32_obj_id, 0) )
+    {
+      // force cleanup on exit
+      (*thread)->joiner = *thread;
+      (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
+      (*thread)->mutex.UnLock ();
+    }
+  else
+    // thread has already terminated.
+      delete (*thread);
+
   return 0;
 }
 
@@ -1791,20 +1891,22 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   InterlockedIncrement (&((*themutex)->condwaits));
   if (pthread_mutex_unlock (&(*cond)->cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %p", *cond);
+  /* At this point calls to Signal will progress evebn if we aren' yet waiting
+   * However, the loop there should allow us to get scheduled and call wait,
+   * and have them call PulseEvent again if we dont' respond.
+   */
   rv = (*cond)->TimedWait (waitlength);
   /* this may allow a race on the mutex acquisition and waits..
    * But doing this within the cond access mutex creates a different race
    */
-  bool last = false;
-  if (InterlockedDecrement (&((*cond)->waiting)) == 0)
-    last = true;
+  InterlockedDecrement (&((*cond)->waiting));
   /* Tell Signal that we have been released */
   InterlockedDecrement (&((*cond)->ExitingWait));
   (*themutex)->Lock ();
-  if (last == true)
-    (*cond)->mutex = NULL;
   if (pthread_mutex_lock (&(*cond)->cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %p", *cond);
+  if ((*cond)->waiting == 0)
+    (*cond)->mutex = NULL;
   InterlockedDecrement (&((*themutex)->condwaits));
   if (pthread_mutex_unlock (&(*cond)->cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %p", *cond);
@@ -1901,7 +2003,7 @@ __pthread_kill (pthread_t thread, int sig)
 int
 __pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 {
-  pthread *thread = __pthread_self ();
+  pthread *thread = pthread::self ();
 
   // lock this myself, for the use of thread2signal
   // two differt kills might clash: FIXME
@@ -1917,11 +2019,6 @@ __pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 }
 
 /* ID */
-pthread_t
-__pthread_self ()
-{
-  return (pthread *) TlsGetValue (MT_INTERFACE->thread_self_dwTlsIndex);
-}
 
 int
 __pthread_equal (pthread_t *t1, pthread_t *t2)

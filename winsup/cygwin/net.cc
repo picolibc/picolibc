@@ -21,7 +21,6 @@ details. */
 #include <stdlib.h>
 #include <unistd.h>
 #include <netdb.h>
-#include <fcntl.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include "cygerrno.h"
@@ -30,7 +29,6 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "registry.h"
@@ -503,11 +501,17 @@ fdsock (int& fd, const char *name, SOCKET soc)
 {
   if (!winsock2_active)
     soc = set_socket_inheritance (soc);
+  else if (wincap.has_set_handle_information ())
+    {
+      /* NT systems apparently set sockets to inheritable by default */
+      SetHandleInformation ((HANDLE)soc, HANDLE_FLAG_INHERIT, 0);
+      debug_printf ("reset socket inheritance since winsock2_active %d", winsock2_active);
+    }
   else
     debug_printf ("not setting socket inheritance since winsock2_active %d", winsock2_active);
   fhandler_socket *fh = (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
   fh->set_io_handle ((HANDLE) soc);
-  fh->set_flags (O_RDWR);
+  fh->set_flags (O_RDWR, O_BINARY);
   debug_printf ("fd %d, name '%s', soc %p", fd, name, soc);
   return fh;
 }
@@ -518,6 +522,7 @@ cygwin_socket (int af, int type, int protocol)
 {
   int res = -1;
   SOCKET soc = 0;
+  fhandler_socket* fh = NULL;
 
   cygheap_fdnew fd;
 
@@ -539,7 +544,12 @@ cygwin_socket (int af, int type, int protocol)
       else
 	name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
 
-      fdsock (fd, name, soc)->set_addr_family (af);
+      fh = fdsock (fd, name, soc);
+      if (fh)
+	{
+	  fh->set_addr_family (af);
+	  fh->set_socket_type (type);
+	}
       res = fd;
     }
 
@@ -881,7 +891,8 @@ cygwin_connect (int fd,
 	    }
 	  set_winsock_errno ();
 	}
-      if (sock->get_addr_family () == AF_LOCAL)
+      if (sock->get_addr_family () == AF_LOCAL &&
+	  sock->get_socket_type () == SOCK_STREAM)
 	{
 	  if (!res || in_progress)
 	    {
@@ -1112,7 +1123,7 @@ cygwin_gethostbyname (const char *name)
       tmp_addr[1] = b;
       tmp_addr[2] = c;
       tmp_addr[3] = d;
-      tmp_addr_list[0] = (char *)tmp_addr;
+      tmp_addr_list[0] = (char *) tmp_addr;
       tmp.h_name = name;
       tmp.h_aliases = tmp_aliases;
       tmp.h_addrtype = 2;
@@ -1199,7 +1210,8 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 	  WSAGetLastError () == WSAEWOULDBLOCK)
 	in_progress = TRUE;
 
-      if (sock->get_addr_family () == AF_LOCAL)
+      if (sock->get_addr_family () == AF_LOCAL &&
+	  sock->get_socket_type () == SOCK_STREAM)
 	{
 	  if ((SOCKET) res != (SOCKET) INVALID_SOCKET || in_progress)
 	    {
@@ -1242,6 +1254,7 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 	  if (sock->get_addr_family () == AF_LOCAL)
 	    res_fh->set_sun_path (sock->get_sun_path ());
 	  res_fh->set_addr_family (sock->get_addr_family ());
+	  res_fh->set_socket_type (sock->get_socket_type ());
 	  res = res_fd;
 	}
     }
@@ -1541,7 +1554,7 @@ cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 
 /* getdomainname: standards? */
 extern "C" int
-getdomainname (char *domain, int len)
+getdomainname (char *domain, size_t len)
 {
   /*
    * This works for Win95 only if the machine is configured to use MS-TCP.
@@ -1615,7 +1628,7 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 		  switch (ift->table[if_cnt].dwType)
 		    {
 		      case MIB_IF_TYPE_TOKENRING:
-		        ++*tok;
+			++*tok;
 			strcpy (ifr->ifr_name, "tok");
 			strcat (ifr->ifr_name, tok);
 			break;
@@ -2266,6 +2279,7 @@ socketpair (int family, int type, int protocol, int *sb)
   struct sockaddr_in sock_in, sock_out;
   int len;
   cygheap_fdnew sb0;
+  fhandler_socket *fh;
 
   if (__check_null_invalid_struct_errno (sb, 2 * sizeof(int)))
     return -1;
@@ -2417,25 +2431,30 @@ socketpair (int family, int type, int protocol, int *sb)
 
   if (family == AF_LOCAL)
     {
-      fhandler_socket *fh;
 
       fh = fdsock (sb[0],
 		   type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket",
 		   insock);
       fh->set_sun_path ("");
       fh->set_addr_family (AF_LOCAL);
+      fh->set_socket_type (type);
       fh = fdsock (sb[1],
 		   type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket",
 		   outsock);
       fh->set_sun_path ("");
       fh->set_addr_family (AF_LOCAL);
+      fh->set_socket_type (type);
     }
   else
     {
-      fdsock (sb[0], type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp",
-	      insock)->set_addr_family (AF_INET);
-      fdsock (sb[1], type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp",
-	      outsock)->set_addr_family (AF_INET);
+      fh = fdsock (sb[0], type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp",
+		   insock);
+      fh->set_addr_family (AF_INET);
+      fh->set_socket_type (type);
+      fh = fdsock (sb[1], type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp",
+		   outsock);
+      fh->set_addr_family (AF_INET);
+      fh->set_socket_type (type);
     }
 
 done:
@@ -2456,7 +2475,7 @@ endhostent (void)
 }
 
 /* exported as recvmsg: standards? */
-extern "C" int 
+extern "C" int
 cygwin_recvmsg(int s, struct msghdr *msg, int flags)
 {
     int ret, nb;
@@ -2468,21 +2487,23 @@ cygwin_recvmsg(int s, struct msghdr *msg, int flags)
     for(i = 0; i < msg->msg_iovlen; ++i)
 	tot += iov[i].iov_len;
     buf = (char *) malloc(tot);
-    if (tot != 0 && buf == NULL) {
+    if (tot != 0 && buf == NULL)
+      {
 	errno = ENOMEM;
 	return -1;
-    }
-    nb = ret = cygwin_recvfrom (s, buf, tot, flags, 
+      }
+    nb = ret = cygwin_recvfrom (s, buf, tot, flags,
       (struct sockaddr *) msg->msg_name, (int *) &msg->msg_namelen);
     p = buf;
-    while (nb > 0) {
+    while (nb > 0)
+      {
 	ssize_t cnt = min(nb, iov->iov_len);
 
 	memcpy (iov->iov_base, p, cnt);
 	p += cnt;
 	nb -= cnt;
 	++iov;
-    }
+      }
     free(buf);
     return ret;
 }
@@ -2500,16 +2521,18 @@ cygwin_sendmsg(int s, const struct msghdr *msg, int flags)
     for(i = 0; i < msg->msg_iovlen; ++i)
 	tot += iov[i].iov_len;
     buf = (char *) malloc(tot);
-    if (tot != 0 && buf == NULL) {
+    if (tot != 0 && buf == NULL)
+      {
 	errno = ENOMEM;
 	return -1;
-    }
+      }
     p = buf;
-    for (i = 0; i < msg->msg_iovlen; ++i) {
+    for (i = 0; i < msg->msg_iovlen; ++i)
+      {
 	memcpy (p, iov[i].iov_base, iov[i].iov_len);
 	p += iov[i].iov_len;
-    }
-    ret = cygwin_sendto (s, buf, tot, flags, 
+      }
+    ret = cygwin_sendto (s, buf, tot, flags,
       (struct sockaddr *) msg->msg_name, msg->msg_namelen);
     free (buf);
     return ret;

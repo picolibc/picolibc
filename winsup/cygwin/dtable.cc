@@ -16,14 +16,13 @@ details. */
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <sys/cygwin.h>
 #include <assert.h>
+#include <ntdef.h>
+#include <winnls.h>
 
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
 #include "perprocess.h"
@@ -32,9 +31,12 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "ntdll.h"
 
 static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 					   STD_ERROR_HANDLE};
+
+static char *handle_to_fn (HANDLE, char *);
 
 /* Set aside space for the table of fds */
 void
@@ -93,7 +95,7 @@ dtable::extend (int howmuch)
 void
 dtable::get_debugger_info ()
 {
-  if (IsDebuggerPresent ())
+  if (being_debugged ())
     {
       char std[3][sizeof ("/dev/ttyNNNN")];
       std[0][0] = std[1][0] = std [2][0] = '\0';
@@ -213,7 +215,6 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 void
 dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 {
-  int bin;
   const char *name;
   CONSOLE_SCREEN_BUFFER_INFO buf;
   struct sockaddr sa;
@@ -225,74 +226,84 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
   if (!not_open (fd))
     return;
 
-  if (!handle || handle == INVALID_HANDLE_VALUE)
-    {
-      fds[fd] = NULL;
-      return;
-    }
-
-  if (__fmode)
-    bin = __fmode;
+  SetLastError (0);
+  DWORD ft = GetFileType (handle);
+  if (ft == FILE_TYPE_UNKNOWN && GetLastError () == ERROR_INVALID_HANDLE)
+    name = NULL;
   else
-    bin = binmode ?: 0;
+    {
+      /* See if we can consoleify it */
+      if (GetConsoleScreenBufferInfo (handle, &buf))
+	{
+	  if (ISSTATE (myself, PID_USETTY))
+	    name = "/dev/tty";
+	  else
+	    name = "/dev/conout";
+	}
+      else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
+	{
+	  if (ISSTATE (myself, PID_USETTY))
+	    name = "/dev/tty";
+	  else
+	    name = "/dev/conin";
+	}
+      else if (ft == FILE_TYPE_PIPE)
+	{
+	  if (fd == 0)
+	    name = "/dev/piper";
+	  else
+	    name = "/dev/pipew";
+	}
+      else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
+	name = "/dev/socket";
+      else if (GetCommState (handle, &dcb))
+	name = "/dev/ttyS0"; // FIXME - determine correct device
+      else
+	name = handle_to_fn (handle, (char *) alloca (MAX_PATH + 100));
+    }
 
-  /* See if we can consoleify it  - if it is a console,
-   don't open it in binary.  That will screw up our crlfs*/
-  if (GetConsoleScreenBufferInfo (handle, &buf))
-    {
-      if (ISSTATE (myself, PID_USETTY))
-	name = "/dev/tty";
-      else
-	name = "/dev/conout";
-      bin = 0;
-    }
-  else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
-    {
-      if (ISSTATE (myself, PID_USETTY))
-	name = "/dev/tty";
-      else
-	name = "/dev/conin";
-      bin = 0;
-    }
-  else if (GetFileType (handle) == FILE_TYPE_PIPE)
-    {
-      if (fd == 0)
-	name = "/dev/piper";
-      else
-	name = "/dev/pipew";
-      if (bin == 0)
-	bin = O_BINARY;
-    }
-  else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
-    name = "/dev/socket";
-  else if (GetCommState (handle, &dcb))
-    name = "/dev/ttyS0"; // FIXME - determine correct device
+  if (!name)
+    fds[fd] = NULL;
   else
-    name = "unknown disk file";
-
-  path_conv pc;
-  build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess, bin);
-  set_std_handle (fd);
-  paranoid_printf ("fd %d, handle %p", fd, handle);
+    {
+      path_conv pc;
+      build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess,
+							     pc.binmode ());
+      set_std_handle (fd);
+      paranoid_printf ("fd %d, handle %p", fd, handle);
+    }
 }
 
 fhandler_base *
 dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
 				  path_conv& pc, unsigned opt, suffix_info *si)
 {
-  pc.check (name, opt | PC_NULLEMPTY | PC_FULL, si);
+  pc.check (name, opt | PC_NULLEMPTY | PC_FULL | PC_POSIX, si);
   if (pc.error)
     {
       set_errno (pc.error);
       return NULL;
     }
 
-  return build_fhandler (fd, pc.get_devn (), name, pc, pc.get_unitn ());
+  if (!pc.exists () && handle)
+    pc.fillin (handle);
+
+  fhandler_base *fh = build_fhandler (fd, pc.get_devn (),
+				      pc.return_and_clear_normalized_path (),
+				      pc, pc.get_unitn ());
+  return fh;
+}
+
+fhandler_base *
+dtable::build_fhandler (int fd, DWORD dev, const char *unix_name,
+			const char *win32_name, int unit)
+{
+  return build_fhandler (fd, dev, cstrdup (unix_name), win32_name, unit);
 }
 
 #define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
-dtable::build_fhandler (int fd, DWORD dev, const char *unix_name,
+dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
 			const char *win32_name, int unit)
 {
   fhandler_base *fh;
@@ -363,6 +374,15 @@ dtable::build_fhandler (int fd, DWORD dev, const char *unix_name,
       case FH_OSS_DSP:
 	fh = cnew (fhandler_dev_dsp) ();
 	break;
+      case FH_PROC:
+	fh = cnew (fhandler_proc) ();
+	break;
+      case FH_REGISTRY:
+	fh = cnew (fhandler_registry) ();
+	break;
+      case FH_PROCESS:
+	fh = cnew (fhandler_process) ();
+	break;
       default:
 	system_printf ("internal error -- unknown device - %p", dev);
 	fh = NULL;
@@ -389,7 +409,7 @@ dtable::build_fhandler (int fd, DWORD dev, const char *unix_name,
 fhandler_base *
 dtable::dup_worker (fhandler_base *oldfh)
 {
-  fhandler_base *newfh = build_fhandler (-1, oldfh->get_device (), NULL);
+  fhandler_base *newfh = build_fhandler (-1, oldfh->get_device ());
   *newfh = *oldfh;
   newfh->set_io_handle (NULL);
   if (oldfh->dup (newfh))
@@ -465,14 +485,6 @@ done:
   syscall_printf ("%d = dup2 (%d, %d)", res, oldfd, newfd);
 
   return res;
-}
-
-void
-dtable::reset_unix_path_name (int fd, const char *name)
-{
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "reset_unix_name");
-  fds[fd]->reset_unix_path_name (name);
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "reset_unix_name");
 }
 
 select_record *
@@ -621,14 +633,14 @@ dtable::vfork_child_dup ()
 	goto out;
       }
 
-  /* Restore impersonation */
-  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
-    ImpersonateLoggedOnUser (cygheap->user.token);
-
   fds_on_hold = fds;
   fds = newtable;
 
 out:
+  /* Restore impersonation */
+  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+    ImpersonateLoggedOnUser (cygheap->user.token);
+
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   return 1;
 }
@@ -678,3 +690,128 @@ dtable::vfork_child_fixup ()
 
   return;
 }
+
+#if 0
+static char *
+handle_to_fn (HANDLE h, char *posix_fn)
+{
+  IO_STATUS_BLOCK io;
+  FILE_NAME_INFORMATION ntfn;
+
+  io.Status = 0;
+  io.Information = 0;
+
+  SetLastError (0);
+  DWORD res = NtQueryInformationFile (h, &io, &ntfn, sizeof (ntfn), 9);
+  if (res || GetLastError () == ERROR_PROC_NOT_FOUND)
+    {
+      strcpy (posix_fn, "some disk file");
+      return posix_fn;
+    }
+  ntfn.FileName[ntfn.FileNameLength / sizeof (WCHAR)] = 0;
+
+  char win32_fn[MAX_PATH + 100];
+  sys_wcstombs (win32_fn, ntfn.FileName, ntfn.FileNameLength);
+  cygwin_conv_to_full_posix_path (win32_fn, posix_fn);
+  return posix_fn;
+}
+#else
+#define DEVICE_PREFIX "\\device\\"
+#define DEVICE_PREFIX_LEN sizeof(DEVICE_PREFIX) - 1
+#define REMOTE "\\Device\\LanmanRedirector\\"
+#define REMOTE_LEN sizeof (REMOTE) - 1
+
+static char *
+handle_to_fn (HANDLE h, char *posix_fn)
+{
+  OBJECT_NAME_INFORMATION *ntfn;
+  char fnbuf[32768];
+
+  memset (fnbuf, 0, sizeof (fnbuf));
+  ntfn = (OBJECT_NAME_INFORMATION *) fnbuf;
+  ntfn->Name.MaximumLength = sizeof (fnbuf) - sizeof (*ntfn);
+  ntfn->Name.Buffer = (WCHAR *) (ntfn + 1);
+
+  DWORD res = NtQueryObject (h, ObjectNameInformation, ntfn, sizeof (fnbuf), NULL);
+
+  if (res)
+    {
+      strcpy (posix_fn, "some disk file");
+      debug_printf ("NtQueryObject failed");
+      return posix_fn;
+    }
+
+  // NT seems to do this on an unopened file
+  if (!ntfn->Name.Buffer)
+    {
+      debug_printf ("nt->Name.Buffer == NULL");
+      return NULL;
+    }
+
+  ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = 0;
+
+  char win32_fn[MAX_PATH + 100];
+  sys_wcstombs (win32_fn, ntfn->Name.Buffer, ntfn->Name.Length);
+  debug_printf ("nt name '%s'", win32_fn);
+  if (!strncasematch (win32_fn, DEVICE_PREFIX, DEVICE_PREFIX_LEN)
+      || !QueryDosDevice (NULL, fnbuf, sizeof (fnbuf)))
+    return strcpy (posix_fn, win32_fn);
+  
+  char *p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\\');
+  if (!p)
+    p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\0');
+
+  int n = p - win32_fn;
+  int maxmatchlen = 0;
+  char *maxmatchdos = NULL;
+  for (char *s = fnbuf; *s; s = strchr (s, '\0') + 1)
+    {
+      char device[MAX_PATH + 10];
+      device[MAX_PATH + 9] = '\0';
+      if (strchr (s, ':') == NULL)
+	continue;
+      if (!QueryDosDevice (s, device, sizeof (device) - 1))
+	continue;
+      char *q = strrchr (device, ';');
+      if (q)
+	{
+	  char *r = strchr (q, '\\');
+	  if (r)
+	    strcpy (q, r + 1);
+	}
+      int devlen = strlen (device);
+      if (device[devlen - 1] == '\\')
+	device[--devlen] = '\0';
+      if (devlen < maxmatchlen)
+	continue;
+      if (!strncasematch (device, win32_fn, devlen) ||
+	  (win32_fn[devlen] != '\0' && win32_fn[devlen] != '\\'))
+	continue;
+      maxmatchlen = devlen;
+      maxmatchdos = s;
+      debug_printf ("current match '%s'", device);
+    }
+
+  char *w32 = win32_fn;
+  if (maxmatchlen)
+    {
+      n = strlen (maxmatchdos);
+      if (maxmatchdos[n - 1] == '\\')
+	n--;
+      w32 += maxmatchlen - n;
+      memcpy (w32, maxmatchdos, n);
+      w32[n] = '\\';
+    }
+  else if (strncasematch (w32, REMOTE, REMOTE_LEN))
+    {
+      w32 += REMOTE_LEN - 2;
+      *w32 = '\\';
+      debug_printf ("remote drive");
+    }
+
+
+  debug_printf ("derived path '%s'", w32);
+  cygwin_conv_to_full_posix_path (w32, posix_fn);
+  return posix_fn;
+}
+#endif

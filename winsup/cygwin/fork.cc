@@ -1,6 +1,6 @@
 /* fork.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,7 +12,6 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <stdarg.h>
 #include <errno.h>
 #include "security.h"
@@ -20,7 +19,6 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygerrno.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
@@ -284,6 +282,9 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   MALLOC_CHECK;
 
+  if (fixup_mmaps_after_fork (hParent))
+    api_fatal ("recreate_mmaps_after_fork_failed");
+
   /* If we haven't dynamically loaded any dlls, just signal
      the parent.  Otherwise, load all the dlls, tell the parent
       that we're done, and wait for the parent to fill in the.
@@ -299,9 +300,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   ForceCloseHandle (hParent);
   (void) ForceCloseHandle (child_proc_info->subproc_ready);
   (void) ForceCloseHandle (child_proc_info->forker_finished);
-
-  if (fixup_mmaps_after_fork ())
-    api_fatal ("recreate_mmaps_after_fork_failed");
 
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
@@ -466,6 +464,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 #endif
 
   char sa_buf[1024];
+  PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   __malloc_lock (_reent_clib ());
@@ -473,8 +472,8 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   newheap = cygheap_setup_for_child (&ch,cygheap->fdtab.need_fixup_before ());
   rc = CreateProcess (myself->progname, /* image to run */
 		      myself->progname, /* what we send in arg0 */
-		      sec_user_nih (sa_buf),
-		      sec_user_nih (sa_buf),
+		      sec_attribs,
+		      sec_attribs,
 		      TRUE,	  /* inherit handles from parent */
 		      c_flags,
 		      NULL,	  /* environment filled in later */

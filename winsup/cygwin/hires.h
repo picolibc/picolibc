@@ -11,14 +11,37 @@ details. */
 #ifndef __HIRES_H__
 #define __HIRES_H__
 
-class hires
+#include <mmsystem.h>
+
+class hires_base
 {
+ protected:
   int inited;
+  virtual void prime () {}
+ public:
+  virtual LONGLONG usecs (bool justdelta) {return 0LL;}
+  virtual ~hires_base () {}
+};
+
+class hires_us : hires_base
+{
   LARGE_INTEGER primed_ft;
   LARGE_INTEGER primed_pc;
   double freq;
-  void prime () __attribute__ ((regparm (1)));
+  void prime ();
  public:
-  LONGLONG usecs (bool justdelta) __attribute__ ((regparm (2)));
+  LONGLONG usecs (bool justdelta);
 };
+
+class hires_ms : hires_base
+{
+  DWORD initime_ms;
+  LARGE_INTEGER initime_us;
+  UINT minperiod;
+  void prime ();
+ public:
+  LONGLONG usecs (bool justdelta);
+  ~hires_ms ();
+};
+  
 #endif /*__HIRES_H__*/

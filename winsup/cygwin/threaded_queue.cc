@@ -1,6 +1,6 @@
 /* threaded_queue.cc
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <windows.h>
 #include <sys/types.h>
+#include <stdlib.h>
 #include "wincap.h"
 #include "threaded_queue.h"
 #define DEBUG 1

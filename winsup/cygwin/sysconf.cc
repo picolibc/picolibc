@@ -1,6 +1,6 @@
 /* sysconf.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -62,7 +62,7 @@ sysconf (int in)
 	/*FALLTHRU*/
       case _SC_PHYS_PAGES:
       case _SC_AVPHYS_PAGES:
-	if (!wincap.supports_smp ())
+	if (wincap.supports_smp ())
 	  {
 	    NTSTATUS ret;
 	    SYSTEM_BASIC_INFORMATION sbi;

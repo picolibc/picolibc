@@ -1,6 +1,6 @@
 /* external.cc: Interface to Cygwin internals from external programs.
 
-   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -14,7 +14,6 @@ details. */
 #include <errno.h>
 #include "security.h"
 #include "fhandler.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include <exceptions.h>
@@ -84,9 +83,12 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.rusage_children = p->rusage_children;
 	  strcpy (ep.progname, p->progname);
 	  ep.strace_mask = 0;
-	  ep.strace_file = 0;
+	  ep.version = EXTERNAL_PINFO_VERSION;
 
 	  ep.process_state = p->process_state;
+
+	  ep.uid32 = p->uid;
+	  ep.gid32 = p->gid;
 	  break;
 	}
     }
@@ -159,9 +161,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	return (DWORD) cygwin_version_strings;
 
       case CW_READ_V1_MOUNT_TABLES:
-	/* Upgrade old v1 registry mounts to new location. */
-	mount_table->import_v1_mounts ();
-	return 0;
+	set_errno (ENOSYS);
+	return 1;
 
       case CW_USER_DATA:
 	return (DWORD) &__cygwin_user_data;
@@ -231,6 +232,14 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	{
 	  pinfo p (va_arg (arg, pid_t));
 	  return p ? p->dwProcessId : 0;
+	}
+      case CW_EXTRACT_DOMAIN_AND_USER:
+        {
+	  struct passwd *pw = va_arg (arg, struct passwd *);
+	  char *domain = va_arg (arg, char *);
+	  char *user = va_arg (arg, char *);
+	  extract_nt_dom_user (pw, domain, user);
+	  return 0;
 	}
       default:
 	return (DWORD) -1;

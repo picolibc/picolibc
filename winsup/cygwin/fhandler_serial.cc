@@ -1,6 +1,6 @@
 /* fhandler_serial.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,14 +9,12 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include <sys/termios.h>
@@ -202,8 +200,7 @@ fhandler_serial::dump (void)
 void
 fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 {
-  fhandler_base::init (f, flags, bin);
-  (void) open (NULL, flags, bin ? O_BINARY : 0);
+  (void) open (NULL, flags, bin & (O_BINARY | O_TEXT));
 }
 
 int

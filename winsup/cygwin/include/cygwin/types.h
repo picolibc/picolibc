@@ -17,12 +17,24 @@ extern "C"
 #ifndef _CYGWIN_TYPES_H
 #define _CYGWIN_TYPES_H
 
+#include <sys/sysmacros.h>
+
+typedef struct timespec timespec_t, timestruc_t;
+
 typedef long __off32_t;
 typedef long long __off64_t;
 #ifdef __CYGWIN_USE_BIG_TYPES__
 typedef __off64_t off_t;
 #else
 typedef __off32_t off_t;
+#endif
+
+typedef short __dev16_t;
+typedef unsigned long __dev32_t;
+#ifdef __CYGWIN_USE_BIG_TYPES__
+typedef __dev32_t dev_t;
+#else
+typedef __dev16_t dev_t;
 #endif
 
 typedef long blksize_t;

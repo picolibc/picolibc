@@ -11,7 +11,6 @@ details. */
 
 #include "winsup.h"
 #include <sys/termios.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/mtio.h>
@@ -155,10 +154,8 @@ fhandler_dev_tape::fstat (struct __stat64 *buf, path_conv *pc)
     {
       struct mtget get;
 
-      if (! ioctl (MTIOCGET, &get))
-	{
-	  buf->st_blocks = get.mt_capacity / buf->st_blksize;
-	}
+      if (!ioctl (MTIOCGET, &get))
+	buf->st_blocks = get.mt_capacity / buf->st_blksize;
     }
 
   return ret;

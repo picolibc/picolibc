@@ -23,7 +23,6 @@ struct wincaps
   unsigned has_security                                 : 1;
   unsigned has_security_descriptor_control              : 1;
   unsigned has_get_process_times                        : 1;
-  unsigned has_specific_access_rights                   : 1;
   unsigned has_lseek_bug                                : 1;
   unsigned has_lock_file_ex                             : 1;
   unsigned has_signal_object_and_wait                   : 1;
@@ -47,6 +46,7 @@ struct wincaps
   unsigned has_raw_devices				: 1;
   unsigned has_valid_processorlevel			: 1;
   unsigned has_64bit_file_access			: 1;
+  unsigned has_process_io_counters                      : 1;
 };
 
 class wincapc
@@ -56,7 +56,6 @@ class wincapc
   void          *caps;
 
 public:
-  wincapc (): caps (NULL) {}
   void init ();
 
   void set_chunksize (DWORD nchunksize);
@@ -75,7 +74,6 @@ public:
   bool  IMPLEMENT (has_security)
   bool  IMPLEMENT (has_security_descriptor_control)
   bool  IMPLEMENT (has_get_process_times)
-  bool  IMPLEMENT (has_specific_access_rights)
   bool  IMPLEMENT (has_lseek_bug)
   bool  IMPLEMENT (has_lock_file_ex)
   bool  IMPLEMENT (has_signal_object_and_wait)
@@ -99,6 +97,7 @@ public:
   bool  IMPLEMENT (has_raw_devices)
   bool  IMPLEMENT (has_valid_processorlevel)
   bool  IMPLEMENT (has_64bit_file_access)
+  bool  IMPLEMENT (has_process_io_counters)
 
 #undef IMPLEMENT
 };

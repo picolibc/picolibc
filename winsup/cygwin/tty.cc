@@ -1,6 +1,6 @@
 /* tty.cc
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -21,8 +21,6 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver.h"

@@ -11,7 +11,6 @@ details. */
 #include "winsup.h"
 #include <sys/stat.h>
 #include <sys/vfs.h> /* needed for statfs */
-#include <fcntl.h>
 #include <pwd.h>
 #include <grp.h>
 #include <stdlib.h>
@@ -32,14 +31,11 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include <unistd.h>
 #include "shared_info.h"
 #include "cygheap.h"
-
-extern int normalize_posix_path (const char *, char *);
 
 SYSTEM_INFO system_info;
 
@@ -85,15 +81,7 @@ check_pty_fds (void)
 int
 dup (int fd)
 {
-  int res;
-  cygheap_fdnew newfd;
-
-  if (newfd < 0)
-    res = -1;
-  else
-    res = dup2 (fd, newfd);
-
-  return res;
+  return cygheap->fdtab.dup2 (fd, cygheap_fdnew ());
 }
 
 int
@@ -106,6 +94,7 @@ extern "C" int
 _unlink (const char *ourname)
 {
   int res = -1;
+  DWORD devn;
   sigframe thisframe (mainthread);
 
   path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
@@ -113,6 +102,13 @@ _unlink (const char *ourname)
   if (win32_name.error)
     {
       set_errno (win32_name.error);
+      goto done;
+    }
+
+  if ((devn = win32_name.get_devn ()) == FH_PROC || devn == FH_REGISTRY
+      || devn == FH_PROCESS)
+    {
+      set_errno (EROFS);
       goto done;
     }
 
@@ -206,7 +202,7 @@ _unlink (const char *ourname)
       /* Everything is fine if the file has disappeared or if we know that the
 	 FILE_FLAG_DELETE_ON_CLOSE will eventually work. */
       if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
-          || delete_on_close_ok)
+	  || delete_on_close_ok)
 	goto ok;	/* The file is either gone already or will eventually be
 			   deleted by the OS. */
     }
@@ -342,6 +338,14 @@ _read (int fd, void *ptr, size_t len)
 	}
 
     out:
+
+      if (res && get_errno () == EACCES &&
+	  !(cfd->get_flags () & (O_RDONLY | O_RDWR)))
+	{
+	  set_errno (EBADF);
+	  break;
+	}
+
       if (res >= 0 || get_errno () != EINTR || !thisframe.call_signal_handler ())
 	break;
       set_errno (e);
@@ -386,6 +390,9 @@ _write (int fd, const void *ptr, size_t len)
       myself->process_state |= PID_TTYOU;
       res = cfd->write (ptr, len);
       myself->process_state &= ~PID_TTYOU;
+      if (res && get_errno () == EACCES &&
+	  !(cfd->get_flags () & (O_WRONLY | O_RDWR)))
+	set_errno (EBADF);
     }
 
 done:
@@ -750,11 +757,11 @@ done:
  * systems, it is only a stub that always returns zero.
  */
 static int
-chown_worker (const char *name, unsigned fmode, __uid16_t uid, __gid16_t gid)
+chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 {
   int res;
-  __uid16_t old_uid;
-  __gid16_t old_gid;
+  __uid32_t old_uid;
+  __gid32_t old_gid;
 
   if (check_null_empty_str_errno (name))
     return -1;
@@ -798,7 +805,7 @@ chown_worker (const char *name, unsigned fmode, __uid16_t uid, __gid16_t gid)
 	  if (win32_path.isdir())
 	    attrib |= S_IFDIR;
 	  res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
-				    gid, attrib, cygheap->user.logsrv ());
+				    gid, attrib);
 	}
       if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
 	{
@@ -815,21 +822,35 @@ done:
 }
 
 extern "C" int
-chown (const char * name, __uid16_t uid, __gid16_t gid)
+chown32 (const char * name, __uid32_t uid, __gid32_t gid)
 {
   sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
 }
 
 extern "C" int
-lchown (const char * name, __uid16_t uid, __gid16_t gid)
+chown (const char * name, __uid16_t uid, __gid16_t gid)
+{
+  sigframe thisframe (mainthread);
+  return chown_worker (name, PC_SYM_FOLLOW, uid, gid16togid32 (gid));
+}
+
+extern "C" int
+lchown32 (const char * name, __uid32_t uid, __gid32_t gid)
 {
   sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid);
 }
 
 extern "C" int
-fchown (int fd, __uid16_t uid, __gid16_t gid)
+lchown (const char * name, __uid16_t uid, __gid16_t gid)
+{
+  sigframe thisframe (mainthread);
+  return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid16togid32 (gid));
+}
+
+extern "C" int
+fchown32 (int fd, __uid32_t uid, __gid32_t gid)
 {
   sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
@@ -851,6 +872,12 @@ fchown (int fd, __uid16_t uid, __gid16_t gid)
   syscall_printf ("fchown (%d,...): calling chown_worker (%s,FOLLOW,...)",
 		  fd, path);
   return chown_worker (path, PC_SYM_FOLLOW, uid, gid);
+}
+
+extern "C" int
+fchown (int fd, __uid16_t uid, __gid16_t gid)
+{
+  return fchown32 (fd, uid, gid16togid32 (gid));
 }
 
 /* umask: POSIX 5.3.3.1 */
@@ -894,8 +921,8 @@ chmod (const char *path, mode_t mode)
       /* temporary erase read only bit, to be able to set file security */
       SetFileAttributes (win32_path, (DWORD) win32_path & ~FILE_ATTRIBUTE_READONLY);
 
-      __uid16_t uid;
-      __gid16_t gid;
+      __uid32_t uid;
+      __gid32_t gid;
 
       if (win32_path.isdir ())
 	mode |= S_IFDIR;
@@ -906,7 +933,7 @@ chmod (const char *path, mode_t mode)
       if (win32_path.isdir ())
 	mode |= S_IFDIR;
       if (!set_file_attribute (win32_path.has_acls (), win32_path, uid, gid,
-				mode, cygheap->user.logsrv ())
+				mode)
 	  && allow_ntsec)
 	res = 0;
 
@@ -965,7 +992,7 @@ fchmod (int fd, mode_t mode)
 static void
 stat64_to_stat32 (struct __stat64 *src, struct __stat32 *dst)
 {
-  dst->st_dev = src->st_dev;
+  dst->st_dev = ((src->st_dev >> 8) & 0xff00) | (src->st_dev & 0xff);
   dst->st_ino = src->st_ino;
   dst->st_mode = src->st_mode;
   dst->st_nlink = src->st_nlink;
@@ -973,9 +1000,9 @@ stat64_to_stat32 (struct __stat64 *src, struct __stat32 *dst)
   dst->st_gid = src->st_gid;
   dst->st_rdev = src->st_rdev;
   dst->st_size = src->st_size;
-  dst->st_atime = src->st_atime;
-  dst->st_mtime = src->st_mtime;
-  dst->st_ctime = src->st_ctime;
+  dst->st_atim = src->st_atim;
+  dst->st_mtim = src->st_mtim;
+  dst->st_ctim = src->st_ctim;
   dst->st_blksize = src->st_blksize;
   dst->st_blocks = src->st_blocks;
 }
@@ -991,8 +1018,16 @@ fstat64 (int fd, struct __stat64 *buf)
     res = -1;
   else
     {
+      path_conv pc (cfd->get_win32_name ());
       memset (buf, 0, sizeof (struct __stat64));
-      res = cfd->fstat (buf, NULL);
+      res = cfd->fstat (buf, &pc);
+      if (!res)
+	{
+	  if (!buf->st_ino)
+	    buf->st_ino = hash_path_name (0, cfd->get_win32_name ());
+	  if (!buf->st_dev)
+	    buf->st_dev = (cfd->get_device () << 16) | cfd->get_unit ();
+	}
     }
 
   syscall_printf ("%d = fstat (%d, %p)", res, fd, buf);
@@ -1052,18 +1087,17 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
   path_conv real_path;
   fhandler_base *fh = NULL;
 
-  if (!pc)
-    pc = &real_path;
-
-  MALLOC_CHECK;
   if (check_null_invalid_struct_errno (buf))
     goto done;
 
+  if (!pc)
+    pc = &real_path;
+
   fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, *pc,
-						(nofollow ?
-						 PC_SYM_NOFOLLOW
-						 : PC_SYM_FOLLOW)
+						(nofollow ? PC_SYM_NOFOLLOW
+							  : PC_SYM_FOLLOW)
 						| PC_FULL, stat_suffixes);
+
   if (pc->error)
     {
       debug_printf ("got %d error from build_fhandler_from_name", pc->error);
@@ -1073,8 +1107,15 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
     {
       debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
 		    pc, (DWORD) real_path);
-      memset (buf, 0, sizeof (struct __stat64));
+      memset (buf, 0, sizeof (*buf));
       res = fh->fstat (buf, pc);
+      if (!res)
+	{
+	  if (!buf->st_ino)
+	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
+	  if (!buf->st_dev)
+	    buf->st_dev = (fh->get_device () << 16) | fh->get_unit ();
+	}
     }
 
  done:
@@ -1148,45 +1189,45 @@ access (const char *fn, int flags)
     {
       if (st.st_uid == myself->uid)
 	{
-	  if (! (st.st_mode & S_IRUSR))
+	  if (!(st.st_mode & S_IRUSR))
 	    goto done;
 	}
       else if (st.st_gid == myself->gid)
 	{
-	  if (! (st.st_mode & S_IRGRP))
+	  if (!(st.st_mode & S_IRGRP))
 	    goto done;
 	}
-      else if (! (st.st_mode & S_IROTH))
+      else if (!(st.st_mode & S_IROTH))
 	goto done;
     }
   if (flags & W_OK)
     {
       if (st.st_uid == myself->uid)
 	{
-	  if (! (st.st_mode & S_IWUSR))
+	  if (!(st.st_mode & S_IWUSR))
 	    goto done;
 	}
       else if (st.st_gid == myself->gid)
 	{
-	  if (! (st.st_mode & S_IWGRP))
+	  if (!(st.st_mode & S_IWGRP))
 	    goto done;
 	}
-      else if (! (st.st_mode & S_IWOTH))
+      else if (!(st.st_mode & S_IWOTH))
 	goto done;
     }
   if (flags & X_OK)
     {
       if (st.st_uid == myself->uid)
 	{
-	  if (! (st.st_mode & S_IXUSR))
+	  if (!(st.st_mode & S_IXUSR))
 	    goto done;
 	}
       else if (st.st_gid == myself->gid)
 	{
-	  if (! (st.st_mode & S_IXGRP))
+	  if (!(st.st_mode & S_IXGRP))
 	    goto done;
 	}
-      else if (! (st.st_mode & S_IXOTH))
+      else if (!(st.st_mode & S_IXOTH))
 	goto done;
     }
   r = 0;
@@ -1308,10 +1349,10 @@ done:
 #ifdef HIDDEN_DOT_FILES
       char *c = strrchr (real_old.get_win32 (), '\\');
       if ((c && c[1] == '.') || *real_old.get_win32 () == '.')
-        attr &= ~FILE_ATTRIBUTE_HIDDEN;
+	attr &= ~FILE_ATTRIBUTE_HIDDEN;
       c = strrchr (real_new.get_win32 (), '\\');
       if ((c && c[1] == '.') || *real_new.get_win32 () == '.')
-        attr |= FILE_ATTRIBUTE_HIDDEN;
+	attr |= FILE_ATTRIBUTE_HIDDEN;
 #endif
       SetFileAttributes (real_new, attr);
 
@@ -1482,7 +1523,7 @@ pathconf (const char *file, int v)
     {
     case _PC_PATH_MAX:
       if (check_null_empty_str_errno (file))
-          return -1;
+	  return -1;
       return PATH_MAX - strlen (file);
     case _PC_NAME_MAX:
       return PATH_MAX;
@@ -1590,8 +1631,8 @@ setmode_helper (FILE *f)
   if (fileno (f) != setmode_file)
     return 0;
   syscall_printf ("setmode: file was %s now %s\n",
-		 f->_flags & __SCLE ? "cle" : "raw",
-		 setmode_mode & O_TEXT ? "cle" : "raw");
+		 f->_flags & __SCLE ? "text" : "raw",
+		 setmode_mode & O_TEXT ? "text" : "raw");
   if (setmode_mode & O_TEXT)
     f->_flags |= __SCLE;
   else
@@ -1639,16 +1680,8 @@ setmode (int fd, int mode)
 
   if (!mode)
     cfd->reset_to_open_binmode ();
-  else if (mode & O_BINARY)
-    {
-      cfd->set_w_binary (1);
-      cfd->set_r_binary (1);
-    }
   else
-    {
-      cfd->set_w_binary (0);
-      cfd->set_r_binary (0);
-    }
+    cfd->set_flags ((cfd->get_flags () & ~(O_TEXT | O_BINARY)) | mode);
 
   if (_cygwin_istext_for_stdio (fd))
     setmode_mode = O_TEXT;
@@ -1657,9 +1690,8 @@ setmode (int fd, int mode)
   setmode_file = fd;
   _fwalk (_REENT, setmode_helper);
 
-  syscall_printf ("setmode (%d<%s>, %s) returns %s\n", fd, cfd->get_name (),
-		  mode & O_TEXT ? "text" : "binary",
-		  res & O_TEXT ? "text" : "binary");
+  syscall_printf ("setmode (%d<%s>, %p) returns %s\n", fd, cfd->get_name (),
+		  mode, res & O_TEXT ? "text" : "binary");
   return res;
 }
 
@@ -1720,7 +1752,7 @@ truncate64 (const char *pathname, __off64_t length)
     set_errno (EBADF);
   else
     {
-      res = ftruncate (fd, length);
+      res = ftruncate64 (fd, length);
       close (fd);
     }
   syscall_printf ("%d = truncate (%s, %d)", res, pathname, length);
@@ -1911,294 +1943,304 @@ mkfifo (const char *_path, mode_t mode)
   return -1;
 }
 
-/* setgid: POSIX 4.2.2.1 */
+extern struct passwd *internal_getlogin (cygheap_user &user);
+
+/* seteuid: standards? */
 extern "C" int
-setgid (__gid16_t gid)
+seteuid32 (__uid32_t uid)
 {
-  int ret = setegid (gid);
-  if (!ret)
-    cygheap->user.real_gid = myself->gid;
-  return ret;
+  if (!wincap.has_security ()) return 0;
+
+  if (uid == ILLEGAL_UID)
+    {
+      debug_printf ("new euid == illegal euid, nothing happens");
+      return 0;
+    }
+
+  sigframe thisframe (mainthread);
+  DWORD ulen = UNLEN + 1;
+  DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+  char orig_username[UNLEN + 1];
+  char orig_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  char username[UNLEN + 1];
+  char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  cygsid usersid, pgrpsid;
+  HANDLE ptok, sav_token;
+  BOOL sav_impersonated, sav_token_is_internal_token;
+  BOOL process_ok, explicitly_created_token = FALSE;
+  struct passwd * pw_new, * pw_cur;
+  cygheap_user user;
+  PSID origpsid, psid2 = NO_SID;
+
+  debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
+
+  pw_new = getpwuid32 (uid);
+  if (!usersid.getfrompw (pw_new) ||
+      (!pgrpsid.getfromgr (getgrgid32 (myself->gid))))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  /* Save current information */
+  sav_token = cygheap->user.token;
+  sav_impersonated = cygheap->user.impersonated;
+  char *env;
+  orig_username[0] = orig_domain[0] = '\0';
+  if ((env = getenv ("USERNAME")))
+    strlcpy (orig_username, env, sizeof(orig_username));
+  if ((env = getenv ("USERDOMAIN")))
+    strlcpy (orig_domain, env, sizeof(orig_domain));
+
+  RevertToSelf();
+  if (!OpenProcessToken (GetCurrentProcess (),
+			 TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &ptok))
+    {
+      __seterrno ();
+      goto failed;
+    }
+  /* Verify if the process token is suitable.
+     Currently we do not try to differentiate between
+	 internal tokens and others */
+  process_ok = verify_token(ptok, usersid, pgrpsid);
+  debug_printf("Process token %sverified", process_ok?"":"not ");
+  if (process_ok)
+    {
+      if (cygheap->user.token == INVALID_HANDLE_VALUE ||
+	  !cygheap->user.impersonated)
+	{
+	  CloseHandle (ptok);
+	  return 0; /* No change */
+	}
+      else cygheap->user.impersonated = FALSE;
+    }
+
+  if (!process_ok && cygheap->user.token != INVALID_HANDLE_VALUE)
+    {
+      /* Verify if the current tokem is suitable */
+      BOOL token_ok = verify_token (cygheap->user.token, usersid, pgrpsid,
+				    & sav_token_is_internal_token);
+      debug_printf("Thread token %d %sverified",
+		   cygheap->user.token, token_ok?"":"not ");
+      if (token_ok)
+	{
+	  /* Return if current token is valid */
+	  if (cygheap->user.impersonated)
+	    {
+	      CloseHandle (ptok);
+	      if (!ImpersonateLoggedOnUser (cygheap->user.token))
+		system_printf ("Impersonating in seteuid failed: %E");
+	      return 0; /* No change */
+	    }
+	}
+      else cygheap->user.token = INVALID_HANDLE_VALUE;
+    }
+
+  /* Set process def dacl to allow access to impersonated token */
+  char dacl_buf[MAX_DACL_LEN(5)];
+  if (usersid != (origpsid =  cygheap->user.orig_sid())) psid2 = usersid;
+  if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
+    {
+      TOKEN_DEFAULT_DACL tdacl;
+      tdacl.DefaultDacl = (PACL) dacl_buf;
+      if (!SetTokenInformation (ptok, TokenDefaultDacl,
+				&tdacl, sizeof dacl_buf))
+	debug_printf ("SetTokenInformation"
+		      "(TokenDefaultDacl): %E");
+    }
+  CloseHandle (ptok);
+
+  if (!process_ok && cygheap->user.token == INVALID_HANDLE_VALUE)
+    {
+      /* If no impersonation token is available, try to
+	 authenticate using NtCreateToken() or subauthentication. */
+      cygheap->user.token = create_token (usersid, pgrpsid);
+      if (cygheap->user.token != INVALID_HANDLE_VALUE)
+	explicitly_created_token = TRUE;
+      else
+	{
+	  /* create_token failed. Try subauthentication. */
+	  debug_printf ("create token failed, try subauthentication.");
+	  cygheap->user.token = subauth (pw_new);
+	  if (cygheap->user.token == INVALID_HANDLE_VALUE) goto failed;
+	}
+    }
+
+  /* Lookup username and domain before impersonating,
+     LookupAccountSid() returns a different answer afterwards. */
+  SID_NAME_USE use;
+  if (!LookupAccountSid (NULL, usersid, username, &ulen,
+			 domain, &dlen, &use))
+    {
+      debug_printf ("LookupAccountSid (): %E");
+      __seterrno ();
+      goto failed;
+    }
+  /* If using the token, set info and impersonate */
+  if (!process_ok)
+    {
+      /* If the token was explicitly created, all information has
+	 already been set correctly. */
+      if (!explicitly_created_token)
+	{
+	  /* Try setting owner to same value as user. */
+	  if (!SetTokenInformation (cygheap->user.token, TokenOwner,
+				    &usersid, sizeof usersid))
+	    debug_printf ("SetTokenInformation(user.token, "
+			  "TokenOwner): %E");
+	  /* Try setting primary group in token to current group */
+	  if (!SetTokenInformation (cygheap->user.token,
+				    TokenPrimaryGroup,
+				    &pgrpsid, sizeof pgrpsid))
+	    debug_printf ("SetTokenInformation(user.token, "
+			  "TokenPrimaryGroup): %E");
+	}
+      /* Now try to impersonate. */
+      if (!ImpersonateLoggedOnUser (cygheap->user.token))
+	{
+	  debug_printf ("ImpersonateLoggedOnUser %E");
+	  __seterrno ();
+	  goto failed;
+	}
+      cygheap->user.impersonated = TRUE;
+    }
+
+  /* user.token is used in internal_getlogin () to determine if
+     impersonation is active. If so, the token is used for
+     retrieving user's SID. */
+  user.token = cygheap->user.impersonated ? cygheap->user.token
+					  : INVALID_HANDLE_VALUE;
+  /* Unsetting these two env vars is necessary to get NetUserGetInfo()
+     called in internal_getlogin ().  Otherwise the wrong path is used
+     after a user switch, probably. */
+  unsetenv ("HOMEDRIVE");
+  unsetenv ("HOMEPATH");
+  setenv ("USERDOMAIN", domain, 1);
+  setenv ("USERNAME", username, 1);
+  pw_cur = internal_getlogin (user);
+  if (pw_cur == pw_new)
+    {
+      /* If sav_token was internally created and is replaced, destroy it. */
+      if (sav_token != INVALID_HANDLE_VALUE &&
+	  sav_token != cygheap->user.token &&
+	  sav_token_is_internal_token)
+	CloseHandle (sav_token);
+      myself->uid = uid;
+      cygheap->user = user;
+      return 0;
+    }
+  debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
+		cygheap->user.token, pw_cur->pw_uid,
+		pw_new->pw_uid, cygheap->user.orig_uid);
+  set_errno (EPERM);
+
+ failed:
+  setenv ("USERNAME", orig_username, 1);
+  setenv ("USERDOMAIN", orig_domain, 1);
+  cygheap->user.token = sav_token;
+  cygheap->user.impersonated = sav_impersonated;
+  if ( cygheap->user.token != INVALID_HANDLE_VALUE &&
+       cygheap->user.impersonated &&
+       !ImpersonateLoggedOnUser (cygheap->user.token))
+    system_printf ("Impersonating in seteuid failed: %E");
+  return -1;
+}
+
+extern "C" int
+seteuid (__uid16_t uid)
+{
+  return seteuid32 (uid16touid32 (uid));
 }
 
 /* setuid: POSIX 4.2.2.1 */
 extern "C" int
-setuid (__uid16_t uid)
+setuid32 (__uid32_t uid)
 {
-  int ret = seteuid (uid);
+  int ret = seteuid32 (uid);
   if (!ret)
     cygheap->user.real_uid = myself->uid;
   debug_printf ("real: %d, effective: %d", cygheap->user.real_uid, myself->uid);
   return ret;
 }
 
-extern struct passwd *internal_getlogin (cygheap_user &user);
-
-/* seteuid: standards? */
 extern "C" int
-seteuid (__uid16_t uid)
+setuid (__uid16_t uid)
 {
-  sigframe thisframe (mainthread);
-  if (wincap.has_security ())
-    {
-      char orig_username[UNLEN + 1];
-      char orig_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-      char username[UNLEN + 1];
-      DWORD ulen = UNLEN + 1;
-      char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-      DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-      SID_NAME_USE use;
-
-      if (uid == ILLEGAL_UID || uid == myself->uid)
-	{
-	  debug_printf ("new euid == current euid, nothing happens");
-	  return 0;
-	}
-      struct passwd *pw_new = getpwuid (uid);
-      if (!pw_new)
-	{
-	  set_errno (EINVAL);
-	  return -1;
-	}
-
-      cygsid tok_usersid;
-      DWORD siz;
-
-      char *env;
-      orig_username[0] = orig_domain[0] = '\0';
-      if ((env = getenv ("USERNAME")))
-	strncat (orig_username, env, UNLEN + 1);
-      if ((env = getenv ("USERDOMAIN")))
-	strncat (orig_domain, env, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-      if (uid == cygheap->user.orig_uid)
-	{
-
-	  debug_printf ("RevertToSelf () (uid == orig_uid, token=%d)",
-			cygheap->user.token);
-	  RevertToSelf ();
-	  if (cygheap->user.token != INVALID_HANDLE_VALUE)
-	    cygheap->user.impersonated = FALSE;
-
-	  HANDLE ptok = INVALID_HANDLE_VALUE;
-	  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
-	    debug_printf ("OpenProcessToken(): %E\n");
-	  else if (!GetTokenInformation (ptok, TokenUser, &tok_usersid,
-					 sizeof tok_usersid, &siz))
-	    debug_printf ("GetTokenInformation(): %E");
-	  else if (!LookupAccountSid (NULL, tok_usersid, username, &ulen,
-				      domain, &dlen, &use))
-	    debug_printf ("LookupAccountSid(): %E");
-	  else
-	    {
-	      setenv ("USERNAME", username, 1);
-	      setenv ("USERDOMAIN", domain, 1);
-	    }
-	  if (ptok != INVALID_HANDLE_VALUE)
-	    CloseHandle (ptok);
-	}
-      else
-	{
-	  cygsid usersid, pgrpsid, tok_pgrpsid;
-	  HANDLE sav_token = INVALID_HANDLE_VALUE;
-	  BOOL sav_impersonation;
-	  BOOL current_token_is_internal_token = FALSE;
-	  BOOL explicitely_created_token = FALSE;
-
-	  struct __group16 *gr = getgrgid (myself->gid);
-	  debug_printf ("myself->gid: %d, gr: %d", myself->gid, gr);
-
-	  usersid.getfrompw (pw_new);
-	  pgrpsid.getfromgr (gr);
-
-	  /* Only when ntsec is ON! */
-	  /* Check if new user == user of impersonation token and
-	     - if reasonable - new pgrp == pgrp of impersonation token. */
-	  if (allow_ntsec && cygheap->user.token != INVALID_HANDLE_VALUE)
-	    {
-	      if (!GetTokenInformation (cygheap->user.token, TokenUser,
-					&tok_usersid, sizeof tok_usersid, &siz))
-		{
-		  debug_printf ("GetTokenInformation(): %E");
-		  tok_usersid = NO_SID;
-		}
-	      if (!GetTokenInformation (cygheap->user.token, TokenPrimaryGroup,
-					&tok_pgrpsid, sizeof tok_pgrpsid, &siz))
-		{
-		  debug_printf ("GetTokenInformation(): %E");
-		  tok_pgrpsid = NO_SID;
-		}
-	      /* Check if the current user token was internally created. */
-	      TOKEN_SOURCE ts;
-	      if (!GetTokenInformation (cygheap->user.token, TokenSource,
-					&ts, sizeof ts, &siz))
-		debug_printf ("GetTokenInformation(): %E");
-	      else if (!memcmp (ts.SourceName, "Cygwin.1", 8))
-		current_token_is_internal_token = TRUE;
-	      if ((usersid && tok_usersid && usersid != tok_usersid) ||
-		  /* Check for pgrp only if current token is an internal
-		     token. Otherwise the external provided token is
-		     very likely overwritten here. */
-		  (current_token_is_internal_token &&
-		   pgrpsid && tok_pgrpsid && pgrpsid != tok_pgrpsid))
-		{
-		  /* If not, RevertToSelf and close old token. */
-		  debug_printf ("tsid != usersid");
-		  RevertToSelf ();
-		  sav_token = cygheap->user.token;
-		  sav_impersonation = cygheap->user.impersonated;
-		  cygheap->user.token = INVALID_HANDLE_VALUE;
-		  cygheap->user.impersonated = FALSE;
-		}
-	    }
-
-	  /* Only when ntsec is ON! */
-	  /* If no impersonation token is available, try to
-	     authenticate using NtCreateToken() or subauthentication. */
-	  if (allow_ntsec && cygheap->user.token == INVALID_HANDLE_VALUE)
-	    {
-	      HANDLE ptok = INVALID_HANDLE_VALUE;
-
-	      ptok = create_token (usersid, pgrpsid);
-	      if (ptok != INVALID_HANDLE_VALUE)
-		explicitely_created_token = TRUE;
-	      else
-		{
-		  /* create_token failed. Try subauthentication. */
-		  debug_printf ("create token failed, try subauthentication.");
-		  ptok = subauth (pw_new);
-		}
-	      if (ptok != INVALID_HANDLE_VALUE)
-		{
-		  cygwin_set_impersonation_token (ptok);
-		  /* If sav_token was internally created, destroy it. */
-		  if (sav_token != INVALID_HANDLE_VALUE &&
-		      current_token_is_internal_token)
-		    CloseHandle (sav_token);
-		}
-	      else if (sav_token != INVALID_HANDLE_VALUE)
-		cygheap->user.token = sav_token;
-	    }
-	  /* If no impersonation is active but an impersonation
-	     token is available, try to impersonate. */
-	  if (cygheap->user.token != INVALID_HANDLE_VALUE &&
-	      !cygheap->user.impersonated)
-	    {
-	      debug_printf ("Impersonate (uid == %d)", uid);
-	      RevertToSelf ();
-
-	      /* If the token was explicitely created, all information has
-		 already been set correctly. */
-	      if (!explicitely_created_token)
-		{
-		  /* Try setting owner to same value as user. */
-		  if (usersid &&
-		      !SetTokenInformation (cygheap->user.token, TokenOwner,
-					    &usersid, sizeof usersid))
-		    debug_printf ("SetTokenInformation(user.token, "
-				  "TokenOwner): %E");
-		  /* Try setting primary group in token to current group
-		     if token not explicitely created. */
-		  if (pgrpsid &&
-		      !SetTokenInformation (cygheap->user.token,
-					    TokenPrimaryGroup,
-					    &pgrpsid, sizeof pgrpsid))
-		    debug_printf ("SetTokenInformation(user.token, "
-				  "TokenPrimaryGroup): %E");
-
-		}
-
-	      /* Now try to impersonate. */
-	      if (!LookupAccountSid (NULL, usersid, username, &ulen,
-				     domain, &dlen, &use))
-		debug_printf ("LookupAccountSid (): %E");
-	      else if (!ImpersonateLoggedOnUser (cygheap->user.token))
-		system_printf ("Impersonating (%d) in set(e)uid failed: %E",
-			       cygheap->user.token);
-	      else
-		{
-		  cygheap->user.impersonated = TRUE;
-		  setenv ("USERNAME", username, 1);
-		  setenv ("USERDOMAIN", domain, 1);
-		}
-	    }
-	}
-
-      cygheap_user user;
-      /* user.token is used in internal_getlogin () to determine if
-	 impersonation is active. If so, the token is used for
-	 retrieving user's SID. */
-      user.token = cygheap->user.impersonated ? cygheap->user.token
-					      : INVALID_HANDLE_VALUE;
-      /* Unsetting these both env vars is necessary to get NetUserGetInfo()
-	 called in internal_getlogin ().  Otherwise the wrong path is used
-	 after a user switch, probably. */
-      unsetenv ("HOMEDRIVE");
-      unsetenv ("HOMEPATH");
-      struct passwd *pw_cur = internal_getlogin (user);
-      if (pw_cur != pw_new)
-	{
-	  debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
-			cygheap->user.token, pw_cur->pw_uid,
-			pw_new->pw_uid, cygheap->user.orig_uid);
-	  setenv ("USERNAME", orig_username, 1);
-	  setenv ("USERDOMAIN", orig_domain, 1);
-	  set_errno (EPERM);
-	  return -1;
-	}
-      myself->uid = uid;
-      cygheap->user = user;
-    }
-  else
-    set_errno (ENOSYS);
-  debug_printf ("real: %d, effective: %d", cygheap->user.real_uid, myself->uid);
-  return 0;
+  return setuid32 (uid16touid32 (uid));
 }
 
 /* setegid: from System V.  */
 extern "C" int
+setegid32 (__gid32_t gid)
+{
+  if ((!wincap.has_security ()) ||
+      (gid == ILLEGAL_GID))
+    return 0;
+
+  sigframe thisframe (mainthread);
+  cygsid gsid;
+  HANDLE ptok;
+
+  struct __group32 * gr = getgrgid32 (gid);
+  if (!gr || gr->gr_gid != gid || !gsid.getfromgr (gr))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  myself->gid = gid;
+
+  /* If impersonated, update primary group and revert */
+  if (cygheap->user.token != INVALID_HANDLE_VALUE
+      && cygheap->user.impersonated)
+    {
+      if (!SetTokenInformation (cygheap->user.token,
+				TokenPrimaryGroup,
+				&gsid, sizeof gsid))
+	debug_printf ("SetTokenInformation(thread, "
+		      "TokenPrimaryGroup): %E");
+      RevertToSelf ();
+    }
+  if (!OpenProcessToken (GetCurrentProcess (),
+			 TOKEN_ADJUST_DEFAULT,
+			 &ptok))
+    debug_printf ("OpenProcessToken(): %E\n");
+  else
+    {
+      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
+				&gsid, sizeof gsid))
+	debug_printf ("SetTokenInformation(process, "
+		      "TokenPrimaryGroup): %E");
+      CloseHandle (ptok);
+    }
+  if (cygheap->user.token != INVALID_HANDLE_VALUE
+      && cygheap->user.impersonated
+      && !ImpersonateLoggedOnUser (cygheap->user.token))
+    system_printf ("Impersonating in setegid failed: %E");
+  return 0;
+}
+
+extern "C" int
 setegid (__gid16_t gid)
 {
-  sigframe thisframe (mainthread);
-  if (wincap.has_security ())
-    {
-      if (gid != ILLEGAL_GID)
-	{
-	  struct __group16 *gr;
+  return setegid32 (gid16togid32 (gid));
+}
 
-	  if (!(gr = getgrgid (gid)))
-	    {
-	      set_errno (EINVAL);
-	      return -1;
-	    }
-	  myself->gid = gid;
-#if 0	  // Setting the primary group in token here isn't foolproof enough.
-	  if (allow_ntsec)
-	    {
-	      cygsid gsid;
-	      HANDLE ptok;
+/* setgid: POSIX 4.2.2.1 */
+extern "C" int
+setgid32 (__gid32_t gid)
+{
+  int ret = setegid32 (gid);
+  if (!ret)
+    cygheap->user.real_gid = myself->gid;
+  return ret;
+}
 
-	      if (gsid.getfromgr (gr))
-		{
-		  if (!OpenProcessToken (GetCurrentProcess (),
-					 TOKEN_ADJUST_DEFAULT,
-					 &ptok))
-		    debug_printf ("OpenProcessToken(): %E\n");
-		  else
-		    {
-		      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
-						&gsid, sizeof gsid))
-			debug_printf ("SetTokenInformation(myself, "
-				      "TokenPrimaryGroup): %E");
-		      CloseHandle (ptok);
-		    }
-		}
-	    }
-#endif
-	}
-    }
-  else
-    set_errno (ENOSYS);
-  return 0;
+extern "C" int
+setgid (__gid16_t gid)
+{
+  int ret = setegid32 (gid16togid32 (gid));
+  if (!ret)
+    cygheap->user.real_gid = myself->gid;
+  return ret;
 }
 
 /* chroot: privileged Unix system call.  */
@@ -2207,7 +2249,7 @@ extern "C" int
 chroot (const char *newroot)
 {
   sigframe thisframe (mainthread);
-  path_conv path (newroot, PC_SYM_FOLLOW | PC_FULL);
+  path_conv path (newroot, PC_SYM_FOLLOW | PC_FULL | PC_POSIX);
 
   int ret;
   if (path.error)
@@ -2224,9 +2266,7 @@ chroot (const char *newroot)
     }
   else
     {
-      char buf[MAX_PATH];
-      normalize_posix_path (newroot, buf);
-      cygheap->root.set (buf, path);
+      cygheap->root.set (path.normalized_path, path);
       ret = 0;
     }
 

@@ -100,13 +100,14 @@ chmod
 _chmod = chmod
 chown
 _chown = chown
+chown32
 cleanup_glue
 clearerr
 _clearerr = clearerr
 clock
 _clock = clock
-close
-_close = close
+_close
+close = _close
 closedir
 _closedir = closedir
 copysign
@@ -205,10 +206,11 @@ fchmod
 _fchmod = fchmod
 fchown
 _fchown = fchown
+fchown32
 fclose
 _fclose = fclose
-fcntl
-_fcntl = fcntl
+_fcntl
+fcntl = _fcntl
 fcvt
 _fcvt = fcvt
 fcvtbuf
@@ -302,8 +304,8 @@ fseek
 _fseek = fseek
 fsetpos
 _fsetpos = fsetpos
-fstat
-_fstat = fstat
+_fstat
+fstat = _fstat
 fstat64
 fstatfs
 _fstatfs = fstatfs
@@ -344,16 +346,22 @@ getdtablesize
 _getdtablesize = getdtablesize
 getegid
 _getegid = getegid
+getegid32
 geteuid
 _geteuid = geteuid
+geteuid32
 getgid
 _getgid = getgid
+getgid32
 getgrgid
 _getgrgid = getgrgid
+getgrgid32
 getgrnam
 _getgrnam = getgrnam
+getgrnam32
 getgroups
 _getgroups = getgroups
+getgroups32
 gethostname = cygwin_gethostname
 _gethostname = cygwin_gethostname
 getlogin
@@ -382,6 +390,7 @@ gettimeofday
 _gettimeofday = gettimeofday
 getuid
 _getuid = getuid
+getuid32
 getutent
 _getutent = getutent
 getutid
@@ -412,6 +421,7 @@ _infinity = infinity
 infinityf
 _infinityf = infinityf
 initgroups
+initgroups32
 ioctl
 _ioctl = ioctl
 iprintf
@@ -462,12 +472,13 @@ jn
 _jn = jn
 jnf
 _jnf = jnf
-kill
-_kill = kill
+_kill
+kill = _kill
 labs
 _labs = labs
 lchown
 _lchown = lchown
+lchown32
 ldexp
 _ldexp = ldexp
 ldexpf
@@ -510,8 +521,8 @@ login
 logout
 longjmp
 _longjmp = longjmp
-lseek
-_lseek = lseek
+_lseek
+lseek = _lseek
 lseek64
 lstat = cygwin_lstat
 _lstat = cygwin_lstat
@@ -564,8 +575,8 @@ nextafter
 _nextafter = nextafter
 nextafterf
 _nextafterf = nextafterf
-open
-_open = open
+_open
+open = _open
 opendir
 _opendir = opendir
 pathconf
@@ -599,8 +610,8 @@ _rand = rand
 random
 initstate
 setstate
-read
-_read = read
+_read
+read = read
 readdir
 _readdir = readdir
 readlink
@@ -619,8 +630,8 @@ remainderf
 _remainderf = remainderf
 remove
 _remove = remove
-rename
-_rename = rename
+_rename
+rename = _rename
 rewind
 _rewind = rewind
 rewinddir
@@ -658,6 +669,7 @@ setdtablesize
 _setdtablesize = setdtablesize
 setgid
 _setgid = setgid
+setgid32
 setjmp
 _setjmp = setjmp
 setlocale
@@ -672,10 +684,13 @@ settimeofday
 _settimeofday = settimeofday
 seteuid
 _seteuid = seteuid
+seteuid32
 setegid
 _setegid = setegid
+setegid32
 setuid
 _setuid = setuid
+setuid32
 setutent
 _setutent = setutent
 chroot
@@ -749,8 +764,8 @@ sscanf
 _sscanf = sscanf
 _sscanf_r
 sscanf_r = _sscanf_r
-stat
-_stat = stat
+_stat
+stat = _stat
 stat64
 statfs
 _statfs = statfs
@@ -853,8 +868,8 @@ tempnam
 _tempnam = tempnam
 time
 _time = time
-times
-_times = times
+_times
+times = _times
 timezone
 tmpfile
 _tmpfile = tmpfile
@@ -881,8 +896,8 @@ uname
 _uname = uname
 ungetc
 _ungetc = ungetc
-unlink
-_unlink = unlink
+_unlink
+unlink = _unlink
 usleep
 _usleep = usleep
 utime
@@ -915,8 +930,8 @@ vsscanf
 _vsscanf = vsscanf
 _vsscanf_r
 vsscanf_r = _vsscanf_r
-wait
-_wait = wait
+_wait
+wait = _wait
 waitpid
 _waitpid = waitpid
 wait3
@@ -925,8 +940,8 @@ wcstombs
 _wcstombs = wcstombs
 wctomb
 _wctomb = wctomb
-write
-_write = write
+_write
+write = _write
 barfly = write
 writev
 _writev = writev
@@ -967,6 +982,12 @@ pclose
 _pclose = pclose
 strftime
 _strftime = strftime
+strlcat
+_strlcat = strlcat
+strlcpy
+_strlcpy = strlcpy
+strptime
+_strptime = strptime
 setgrent
 _setgrent = setgrent
 cuserid
@@ -1002,11 +1023,14 @@ _getpwnam = getpwnam
 getpwnam_r
 getpwuid
 _getpwuid = getpwuid
+getpwuid32
 getpwuid_r
+getpwuid_r32
 getpgrp
 _getpgrp = getpgrp
 getgrent
 _getgrent = getgrent
+getgrent32
 ntohl
 _ntohl = ntohl
 htonl
@@ -1120,14 +1144,14 @@ _tzname DATA
 ptsname
 grantpt
 unlockpt
-sexecve
-sexecl
-sexecle
-sexeclp
-sexeclpe
-sexecv
-sexecp
-sexecvpe
+sexecve = sexecve_is_bad
+sexecl = sexecve_is_bad
+sexecle = sexecve_is_bad
+sexeclp = sexecve_is_bad
+sexeclpe = sexecve_is_bad
+sexecv = sexecve_is_bad
+sexecp = sexecve_is_bad
+sexecvpe = sexecve_is_bad
 ttyslot
 rcmd = cygwin_rcmd
 rresvport = cygwin_rresvport
@@ -1162,6 +1186,8 @@ pthread_attr_setschedpolicy
 pthread_attr_setscope
 pthread_attr_setstacksize
 pthread_cancel
+_pthread_cleanup_push
+_pthread_cleanup_pop
 pthread_cond_broadcast
 pthread_cond_destroy
 pthread_cond_init

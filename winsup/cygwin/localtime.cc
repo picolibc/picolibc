@@ -1396,10 +1396,10 @@ tzsetwall P((void))
 	    dst = cp = buf;
 	    for (src = tz.StandardName; *src; src++)
 	      if (is_upper(*src)) *dst++ = *src;
-	    if (cp == dst)
+	    if ((dst - cp) < 3)
 	      {
-		/* In Asian Windows, tz.StandardName may not contain
-		   the timezone name. */
+		/* In non-english Windows, converted tz.StandardName
+		   may not contain a valid standard timezone name. */
 		strcpy(cp, wildabbr);
 		cp += strlen(wildabbr);
 	      }
@@ -1414,11 +1414,11 @@ tzsetwall P((void))
 		dst = cp;
 		for (src = tz.DaylightName; *src; src++)
 		  if (is_upper(*src)) *dst++ = *src;
-		if (cp == dst)
+		if ((dst - cp) < 3)
 		  {
-		    /* In Asian Windows, tz.StandardName may not contain
-		       the daylight name. */
-		    strcpy(buf, wildabbr);
+		    /* In non-english Windows, converted tz.DaylightName
+		       may not contain a valid daylight timezone name. */
+		    strcpy(cp, wildabbr);
 		    cp += strlen(wildabbr);
 		  }
 		else

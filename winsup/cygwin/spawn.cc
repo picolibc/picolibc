@@ -21,12 +21,10 @@ details. */
 #include <ctype.h>
 #include "cygerrno.h"
 #include <sys/cygwin.h>
-#include "perprocess.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "cygheap.h"
 #include "child_info.h"
@@ -89,7 +87,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 {
   const char *suffix = "";
   debug_printf ("find_exec (%s)", name);
-  char *retval = buf;
+  const char *retval = buf;
   char tmp[MAX_PATH];
   const char *posix = (opt & FE_NATIVE) ? NULL : name;
   bool has_slash = strchr (name, '/');
@@ -166,6 +164,8 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
     retval = NULL;
   else if (opt & FE_NATIVE)
     buf.check (name);
+  else
+    retval = name;
 
  out:
   if (posix)
@@ -316,7 +316,7 @@ av::unshift (const char *what, int conv)
 }
 
 static int __stdcall
-spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
+spawn_guts (const char * prog_arg, const char *const *argv,
 	    const char *const envp[], int mode)
 {
   BOOL rc;
@@ -562,18 +562,14 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       MALLOC_CHECK;
     }
 
+  char *envblock;
   newargv.all_calloced ();
   ciresrv.moreinfo->argc = newargv.argc;
   ciresrv.moreinfo->argv = newargv;
-
-  ciresrv.moreinfo->envc = envsize (envp, 1);
-  ciresrv.moreinfo->envp = (char **) cmalloc (HEAP_1_ARGV, ciresrv.moreinfo->envc);
   ciresrv.hexec_proc = hexec_proc;
-  char **c;
-  const char * const *e;
-  for (c = ciresrv.moreinfo->envp, e = envp; *e;)
-    *c++ = cstrdup1 (*e++);
-  *c = NULL;
+  ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
+				      real_path.iscygexec ());
+
   if (mode != _P_OVERLAY ||
       !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
 			&ciresrv.moreinfo->myself_pinfo, 0,
@@ -605,43 +601,31 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
     flags |= CREATE_SUSPENDED;
 
 
-  /* Build windows style environment list */
-  char *envblock;
-  if (real_path.iscygexec ())
-    envblock = NULL;
-  else
-    envblock = winenv (envp, 0);
+  const char *runpath = null_app_name ? NULL : (const char *) real_path;
 
+  syscall_printf ("null_app_name %d (%s, %.132s)", null_app_name, runpath, one_line.buf);
+
+  void *newheap;
   /* Preallocated buffer for `sec_user' call */
   char sa_buf[1024];
 
-  if (!hToken && cygheap->user.impersonated
-      && cygheap->user.token != INVALID_HANDLE_VALUE)
-    hToken = cygheap->user.token;
-
-  const char *runpath = null_app_name ? NULL : (const char *) real_path;
-
-  syscall_printf ("spawn_guts null_app_name %d (%s, %.132s)", null_app_name, runpath, one_line.buf);
-
-  void *newheap;
   cygbench ("spawn-guts");
-  if (!hToken)
+  if (!cygheap->user.impersonated || cygheap->user.token == INVALID_HANDLE_VALUE)
     {
-      ciresrv.moreinfo->uid = getuid ();
+      PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
+      ciresrv.moreinfo->uid = getuid32 ();
       /* FIXME: This leaks a handle in the CreateProcessAsUser case since the
 	 child process doesn't know about cygwin_mount_h. */
       ciresrv.mount_h = cygwin_mount_h;
       newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
-					  /* process security attrs */
-			  sec_user_nih (sa_buf),
-					  /* thread security attrs */
-			  sec_user_nih (sa_buf),
-			  TRUE,	/* inherit handles from parent */
+			  sec_attribs,	/* process security attrs */
+			  sec_attribs,	/* thread security attrs */
+			  TRUE,		/* inherit handles from parent */
 			  flags,
-			  envblock,/* environment */
-			  0,	/* use current drive/directory */
+			  envblock,	/* environment */
+			  0,		/* use current drive/directory */
 			  &si,
 			  &pi);
     }
@@ -649,7 +633,8 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
     {
       cygsid sid;
       DWORD ret_len;
-      if (!GetTokenInformation (hToken, TokenUser, &sid, sizeof sid, &ret_len))
+      if (!GetTokenInformation (cygheap->user.token, TokenUser, &sid,
+				sizeof sid, &ret_len))
 	{
 	  sid = NO_SID;
 	  system_printf ("GetTokenInformation: %E");
@@ -658,17 +643,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	 since it's value is needed by `sec_user'. */
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf, sid);
 
-      /* Remove impersonation */
-      if (cygheap->user.impersonated
-	  && cygheap->user.token != INVALID_HANDLE_VALUE)
-	RevertToSelf ();
-
-      static BOOL first_time = TRUE;
-      if (first_time)
-	{
-	  set_process_privilege (SE_RESTORE_NAME);
-	  first_time = FALSE;
-	}
+      RevertToSelf ();
 
       /* Load users registry hive. */
       load_registry_hive (sid);
@@ -692,22 +667,20 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       si.lpDesktop = wstname;
 
       newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
-      rc = CreateProcessAsUser (hToken,
+      rc = CreateProcessAsUser (cygheap->user.token,
 		       runpath,		/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
 		       sec_attribs,     /* process security attrs */
 		       sec_attribs,     /* thread security attrs */
-		       TRUE,	/* inherit handles from parent */
+		       TRUE,		/* inherit handles from parent */
 		       flags,
-		       envblock,/* environment */
-		       0,	/* use current drive/directory */
+		       envblock,	/* environment */
+		       0,		/* use current drive/directory */
 		       &si,
 		       &pi);
       /* Restore impersonation. In case of _P_OVERLAY this isn't
 	 allowed since it would overwrite child data. */
-      if (mode != _P_OVERLAY
-	  && cygheap->user.impersonated
-	  && cygheap->user.token != INVALID_HANDLE_VALUE)
+      if (mode != _P_OVERLAY)
 	ImpersonateLoggedOnUser (cygheap->user.token);
     }
 
@@ -792,9 +765,6 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   ForceCloseHandle (pi.hThread);
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
-
-  if (hToken && hToken != cygheap->user.token)
-    CloseHandle (hToken);
 
   DWORD res;
   BOOL exited;
@@ -916,8 +886,8 @@ cwait (int *result, int pid, int)
  */
 
 extern "C" int
-_spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
-	  const char *const *envp)
+spawnve (int mode, const char *path, const char *const *argv,
+	 const char *const *envp)
 {
   int ret;
   vfork_save *vf = vfork_storage.val ();
@@ -927,14 +897,14 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
   else
     vf = NULL;
 
-  syscall_printf ("_spawnve (%s, %s, %x)", path, argv[0], envp);
+  syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
 
   switch (mode)
     {
     case _P_OVERLAY:
       /* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
       /* Just act as an exec if _P_OVERLAY set. */
-      spawn_guts (hToken, path, argv, envp, mode);
+      spawn_guts (path, argv, envp, mode);
       /* Errno should be set by spawn_guts.  */
       ret = -1;
       break;
@@ -944,7 +914,7 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
     case _P_WAIT:
     case _P_DETACH:
       subproc_init ();
-      ret = spawn_guts (hToken, path, argv, envp, mode);
+      ret = spawn_guts (path, argv, envp, mode);
       if (vf && ret > 0)
 	{
 	  debug_printf ("longjmping due to vfork");
@@ -982,7 +952,7 @@ spawnl (int mode, const char *path, const char *arg0, ...)
 
   va_end (args);
 
-  return _spawnve (NULL, mode, path, (char * const  *) argv, cur_environ ());
+  return spawnve (mode, path, (char * const  *) argv, cur_environ ());
 }
 
 extern "C" int
@@ -1004,8 +974,7 @@ spawnle (int mode, const char *path, const char *arg0, ...)
   envp = va_arg (args, const char * const *);
   va_end (args);
 
-  return _spawnve (NULL, mode, path, (char * const *) argv,
-		   (char * const *) envp);
+  return spawnve (mode, path, (char * const *) argv, (char * const *) envp);
 }
 
 extern "C" int
@@ -1053,14 +1022,7 @@ spawnlpe (int mode, const char *path, const char *arg0, ...)
 extern "C" int
 spawnv (int mode, const char *path, const char * const *argv)
 {
-  return _spawnve (NULL, mode, path, argv, cur_environ ());
-}
-
-extern "C" int
-spawnve (int mode, const char *path, char * const *argv,
-					     const char * const *envp)
-{
-  return _spawnve (NULL, mode, path, argv, envp);
+  return spawnve (mode, path, argv, cur_environ ());
 }
 
 extern "C" int
@@ -1074,5 +1036,5 @@ spawnvpe (int mode, const char *file, const char * const *argv,
 					     const char * const *envp)
 {
   path_conv buf;
-  return _spawnve (NULL, mode, find_exec (file, buf), argv, envp);
+  return spawnve (mode, find_exec (file, buf), argv, envp);
 }

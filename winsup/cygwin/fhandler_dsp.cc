@@ -15,7 +15,6 @@ details. */
 #include <errno.h>
 #include <windows.h>
 #include <sys/soundcard.h>
-#include <sys/fcntl.h>
 #include <mmsystem.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -434,9 +433,12 @@ fhandler_dev_dsp::open (path_conv *, int flags, mode_t mode)
 {
   // currently we only support writing
   if ((flags & (O_WRONLY | O_RDONLY | O_RDWR)) != O_WRONLY)
-    return 0;
+    {
+      set_errno (EACCES);
+      return 0;
+    }
 
-  set_flags (flags);
+  set_flags (flags & ~O_TEXT, O_BINARY);
 
   if (!s_audio)
     s_audio = new (audio_buf) Audio;
@@ -448,14 +450,17 @@ fhandler_dev_dsp::open (path_conv *, int flags, mode_t mode)
   audiobits_ = 8;
   audiochannels_ = 1;
 
+  int res;
   if (!s_audio->open (audiofreq_, audiobits_, audiochannels_))
-    debug_printf ("/dev/dsp: failed to open\n");
+    res = 0;
   else
     {
       set_open_status ();
-      debug_printf ("/dev/dsp: successfully opened\n");
+      res = 1;
     }
-  return 1;
+
+  debug_printf ("returns %d", res);
+  return res;
 }
 
 int
