@@ -536,8 +536,8 @@ fhandler_disk_file::lock (int cmd, struct __flock64 *fl)
 
   DWORD off_high, off_low, len_high, len_low;
 
-  off_high = (DWORD)(win32_start & 0xffffffff);
-  off_low = (DWORD)(win32_start >> 32);
+  off_low = (DWORD)(win32_start & 0xffffffff);
+  off_high = (DWORD)(win32_start >> 32);
   if (win32_len == 0)
     {
       /* Special case if len == 0 for POSIX means lock to the end of

@@ -1,3 +1,8 @@
+2003-12-03  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::lock): Interchange
+	values of off_low and off_high.
+
 2003-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fcntl.cc (fcntl_worker): Remove static storage class.
