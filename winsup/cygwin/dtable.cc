@@ -449,19 +449,20 @@ dtable::fixup_after_exec (HANDLE parent, size_t sz, fhandler_base **f)
   size = sz;
   fds = f;
   first_fd_for_open = 0;
+  fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
-    if (fds[i])
+    if ((fh = fds[i]) != NULL)
       {
-	fds[i]->clear_readahead ();
-	if (fds[i]->get_close_on_exec ())
+	fh->clear_readahead ();
+	if (fh->get_close_on_exec ())
 	  release (i);
 	else
 	  {
-	    fds[i]->fixup_after_exec (parent);
+	    fh->fixup_after_exec (parent);
 	    if (i == 0)
-	      SetStdHandle (std_consts[i], fds[i]->get_io_handle ());
+	      SetStdHandle (std_consts[i], fh->get_io_handle ());
 	    else if (i <= 2)
-	      SetStdHandle (std_consts[i], fds[i]->get_output_handle ());
+	      SetStdHandle (std_consts[i], fh->get_output_handle ());
 	  }
       }
 }
@@ -474,7 +475,7 @@ dtable::fixup_after_fork (HANDLE parent)
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
       {
-	if (fds[i]->get_close_on_exec () || fh->get_need_fork_fixup ())
+	if (fh->get_close_on_exec () || fh->get_need_fork_fixup ())
 	  {
 	    debug_printf ("fd %d(%s)", i, fh->get_name ());
 	    fh->fixup_after_fork (parent);
