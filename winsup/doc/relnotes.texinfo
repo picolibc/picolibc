@@ -1,2 +1,29 @@
 @chapter Known/potential Problems in the Latest Net Release
 
+@section Linking with -lm or -lc leads to crash
+
+Currently, @code{/usr/lib/libm.a} and @code{/usr/lib/libc.a} are
+symbolic links to libcygwin.a, where this stuff is actually implemented.
+You need not explicitly link with -lm or -lc.
+
+In fact, you @strong{must not} link with -lm or -lc, or your application
+will crash.  This is a bug, and it is being worked on.
+
+Providing empty stub libraries for libm.a and libc.a is not considered
+workable, because some packages look for symbols there.
+
+There are some discussions of this in the mailing list.  See
+
+@itemize @bullet
+@item
+@file{http://sources.redhat.com/ml/cygwin/2000-05/msg01175.html}
+@item
+@file{http://sources.redhat.com/ml/cygwin/2000-09/msg00290.html}
+@end itemize
+
+and related messages.
+
+@section Ctrl-S hangs rxvt and xterm
+
+This is a bug in the Cygwin pty code.  It should be fixed in the next
+release.
