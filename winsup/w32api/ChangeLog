@@ -1,3 +1,7 @@
+2003-11-15  Manu B  <manubee@users.sourceforge.net>
+
+	* include/commctrl.h (TabCtrl_GetImageList): Add macro.
+
 2003-11-13 Martin Fuchs  <martin-fuchs@gmx.net>
 
 	* include/shlobj.h (ILAppendID, ILClone, ILCloneFirst, ILCombine,

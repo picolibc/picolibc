@@ -3044,6 +3044,7 @@ BOOL WINAPI ShowHideMenuCtl(HWND,UINT,PINT);
 #define TabCtrl_SetToolTips(w,t) (void)SNDMSG((w),TCM_SETTOOLTIPS,(WPARAM)t,0)
 #define TabCtrl_GetCurFocus(w) (int)SNDMSG((w),TCM_GETCURFOCUS,0,0)
 #define TabCtrl_SetCurFocus(w,i) (void)SNDMSG((w),TCM_SETCURFOCUS,i,0)
+#define TabCtrl_GetImageList(w) (HIMAGELIST)SNDMSG((w),TCM_GETIMAGELIST,0,0)
 #define TabCtrl_SetImageList(w,h) (HIMAGELIST)SNDMSG((w),TCM_SETIMAGELIST,0,(LPARAM)(UINT)(h))
 #define TabCtrl_GetItemCount(w) (int)SNDMSG((w),TCM_GETITEMCOUNT,0,0)
 BOOL WINAPI _TrackMouseEvent(LPTRACKMOUSEEVENT);
