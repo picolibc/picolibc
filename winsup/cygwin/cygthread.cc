@@ -68,10 +68,10 @@ cygthread::stub (VOID *arg)
 #endif
       SetEvent (info->ev);
       info->__name = NULL;
-      if (initialized < 0)
-	ExitThread (0);
-      else
+      if (initialized >= 0)
 	SuspendThread (info->h);
+      else
+	ExitThread (0);
     }
 }
 
@@ -160,7 +160,7 @@ new (size_t)
 	{
 #ifdef DEBUGGING
 	  char buf[1024];
-	  if (GetEnvironmentVariable ("CYGWIN_NOFREERANGE", buf, sizeof (buf)))
+	  if (!GetEnvironmentVariable ("CYGWIN_NOFREERANGE_NOCHECK", buf, sizeof (buf)))
 	    api_fatal ("Overflowed cygwin thread pool");
 #endif
 	  return freerange ();
@@ -278,7 +278,8 @@ void
 cygthread::terminate ()
 {
   initialized = -1;
+  /* Signal the event for all running threads */
   for (cygthread *info = threads + NTHREADS - 1; info >= threads; info--)
-    if (!(DWORD) InterlockedExchange ((LPLONG) &info->avail, 0) && info->id)
+    if (!InterlockedExchange ((LPLONG) &info->avail, 0) && info->ev)
       SetEvent (info->ev);
 }

@@ -1,3 +1,12 @@
+2002-10-05  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Very minor cleanup.
+	(cygthread::stub): Report overflows in cygwin thread pool when
+	DEBUGGING is on and special environment variable is not set.
+	(cygthread::terminate): Set event only when event actually exists.
+	* exceptions.cc (signal_exit): Set priority of main thread to low
+	before setting current thread to high.
+
 2002-10-01  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (pthread_key::keys): Copy on fork. Add a comment explaining

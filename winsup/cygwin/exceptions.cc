@@ -1084,8 +1084,8 @@ signal_exit (int rc)
   /* We'd like to stop the main thread from executing but when we do that it
      causes random, inexplicable hangs.  So, instead, we set up the priority
      of this thread really high so that it should do its thing and then exit. */
-  (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
   (void) SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
+  (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
 
   /* Unlock any main thread mutos since we're executing with prejudice. */
   muto *m;
@@ -1166,7 +1166,6 @@ int
 sigframe::call_signal_handler ()
 {
   return unregister () ? call_signal_handler_now () : 0;
-
 }
 
 #define pid_offset (unsigned)(((_pinfo *)NULL)->pid)
