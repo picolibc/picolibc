@@ -2575,7 +2575,7 @@ symlink (const char *topath, const char *frompath)
     }
 
   win32_path.check (frompath, PC_SYM_NOFOLLOW);
-  if (allow_winsymlinks && !win32_path.error)
+  if (allow_winsymlinks && !win32_path.exists ())
     {
       strcpy (from, frompath);
       strcat (from, ".lnk");
@@ -3536,9 +3536,9 @@ DWORD
 cwdstuff::get_hash ()
 {
   DWORD hashnow;
-  lock->acquire ();
+  cwd_lock->acquire ();
   hashnow = hash;
-  lock->release ();
+  cwd_lock->release ();
   return hashnow;
 }
 
@@ -3546,7 +3546,7 @@ cwdstuff::get_hash ()
 void
 cwdstuff::init ()
 {
-  lock = new_muto (false, "cwd");
+  new_muto (cwd_lock);
 }
 
 /* Get initial cwd.  Should only be called once in a
@@ -3554,7 +3554,7 @@ cwdstuff::init ()
 bool
 cwdstuff::get_initial ()
 {
-  lock->acquire ();
+  cwd_lock->acquire ();
 
   if (win32)
     return 1;
@@ -3571,9 +3571,9 @@ cwdstuff::get_initial ()
   if (len == 0)
     {
       __seterrno ();
-      lock->release ();
+      cwd_lock->release ();
       debug_printf ("get_initial_cwd failed, %E");
-      lock->release ();
+      cwd_lock->release ();
       return 0;
     }
   set (NULL);
@@ -3590,7 +3590,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd)
 
   if (win32_cwd)
     {
-      lock->acquire ();
+      cwd_lock->acquire ();
       win32 = (char *) crealloc (win32, strlen (win32_cwd) + 1);
       strcpy (win32, win32_cwd);
     }
@@ -3606,7 +3606,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd)
   hash = hash_path_name (0, win32);
 
   if (win32_cwd)
-    lock->release ();
+    cwd_lock->release ();
 
   return;
 }
@@ -3651,7 +3651,7 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 	strcpy (buf, "/");
     }
 
-  lock->release ();
+  cwd_lock->release ();
 
 out:
   syscall_printf ("(%s) = cwdstuff::get (%p, %d, %d, %d), errno %d",

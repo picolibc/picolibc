@@ -1024,10 +1024,10 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (ioctl_request_event), %E");
   if (inuse && !CloseHandle (inuse))
     termios_printf ("CloseHandle (inuse), %E");
-  if (!ForceCloseHandle (output_mutex))
-    termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
   if (!ForceCloseHandle (input_mutex))
     termios_printf ("CloseHandle (input_mutex<%p>), %E", input_mutex);
+  if (!ForceCloseHandle (output_mutex))
+    termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
 
   /* Send EOF to slaves if master side is closed */
   if (!get_ttyp ()->master_alive ())

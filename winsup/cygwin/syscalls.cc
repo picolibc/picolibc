@@ -527,10 +527,10 @@ _open (const char *unix_path, int flags, ...)
   return res;
 }
 
-extern "C" off_t
-_lseek (int fd, off_t pos, int dir)
+extern "C" __off64_t
+lseek64 (int fd, __off64_t pos, int dir)
 {
-  off_t res;
+  __off64_t res;
   sigframe thisframe (mainthread);
 
   if (dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END)
@@ -546,9 +546,15 @@ _lseek (int fd, off_t pos, int dir)
       else
 	res = -1;
     }
-  syscall_printf ("%d = lseek (%d, %d, %d)", res, fd, pos, dir);
+  syscall_printf ("%d = lseek (%d, %D, %d)", res, fd, pos, dir);
 
   return res;
+}
+
+extern "C" __off32_t
+_lseek (int fd, __off32_t pos, int dir)
+{
+  return lseek64 (fd, (__off64_t) pos, dir);
 }
 
 extern "C" int
@@ -744,11 +750,11 @@ done:
  * systems, it is only a stub that always returns zero.
  */
 static int
-chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
+chown_worker (const char *name, unsigned fmode, __uid16_t uid, __gid16_t gid)
 {
   int res;
-  uid_t old_uid;
-  gid_t old_gid;
+  __uid16_t old_uid;
+  __gid16_t old_gid;
 
   if (check_null_empty_str_errno (name))
     return -1;
@@ -785,9 +791,9 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 				&old_gid);
       if (!res)
 	{
-	  if (uid == (uid_t) -1)
+	  if (uid == ILLEGAL_UID)
 	    uid = old_uid;
-	  if (gid == (gid_t) -1)
+	  if (gid == ILLEGAL_GID)
 	    gid = old_gid;
 	  if (win32_path.isdir())
 	    attrib |= S_IFDIR;
@@ -809,21 +815,21 @@ done:
 }
 
 extern "C" int
-chown (const char * name, uid_t uid, gid_t gid)
+chown (const char * name, __uid16_t uid, __gid16_t gid)
 {
   sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
 }
 
 extern "C" int
-lchown (const char * name, uid_t uid, gid_t gid)
+lchown (const char * name, __uid16_t uid, __gid16_t gid)
 {
   sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid);
 }
 
 extern "C" int
-fchown (int fd, uid_t uid, gid_t gid)
+fchown (int fd, __uid16_t uid, __gid16_t gid)
 {
   sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
@@ -888,8 +894,8 @@ chmod (const char *path, mode_t mode)
       /* temporary erase read only bit, to be able to set file security */
       SetFileAttributes (win32_path, (DWORD) win32_path & ~FILE_ATTRIBUTE_READONLY);
 
-      uid_t uid;
-      gid_t gid;
+      __uid16_t uid;
+      __gid16_t gid;
 
       if (win32_path.isdir ())
 	mode |= S_IFDIR;
@@ -956,8 +962,26 @@ fchmod (int fd, mode_t mode)
   return chmod (path, mode);
 }
 
+static void
+stat64_to_stat32 (struct __stat64 *src, struct __stat32 *dst)
+{
+  dst->st_dev = src->st_dev;
+  dst->st_ino = src->st_ino;
+  dst->st_mode = src->st_mode;
+  dst->st_nlink = src->st_nlink;
+  dst->st_uid = src->st_uid;
+  dst->st_gid = src->st_gid;
+  dst->st_rdev = src->st_rdev;
+  dst->st_size = src->st_size;
+  dst->st_atime = src->st_atime;
+  dst->st_mtime = src->st_mtime;
+  dst->st_ctime = src->st_ctime;
+  dst->st_blksize = src->st_blksize;
+  dst->st_blocks = src->st_blocks;
+}
+
 extern "C" int
-_fstat (int fd, struct stat *buf)
+fstat64 (int fd, struct __stat64 *buf)
 {
   int res;
   sigframe thisframe (mainthread);
@@ -967,12 +991,22 @@ _fstat (int fd, struct stat *buf)
     res = -1;
   else
     {
-      memset (buf, 0, sizeof (struct stat));
+      memset (buf, 0, sizeof (struct __stat64));
       res = cfd->fstat (buf, NULL);
     }
 
   syscall_printf ("%d = fstat (%d, %p)", res, fd, buf);
   return res;
+}
+
+extern "C" int
+_fstat (int fd, struct __stat32 *buf)
+{
+  struct __stat64 buf64;
+  int ret = fstat64 (fd, &buf64);
+  if (!ret)
+    stat64_to_stat32 (&buf64, buf);
+  return ret;
 }
 
 /* fsync: P96 6.6.1.1 */
@@ -1011,7 +1045,8 @@ suffix_info stat_suffixes[] =
 
 /* Cygwin internal */
 int __stdcall
-stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
+stat_worker (const char *name, struct __stat64 *buf, int nofollow,
+	     path_conv *pc)
 {
   int res = -1;
   path_conv real_path;
@@ -1038,7 +1073,7 @@ stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
     {
       debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
 		    pc, (DWORD) real_path);
-      memset (buf, 0, sizeof (struct stat));
+      memset (buf, 0, sizeof (struct __stat64));
       res = fh->fstat (buf, pc);
     }
 
@@ -1051,20 +1086,41 @@ stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
 }
 
 extern "C" int
-_stat (const char *name, struct stat *buf)
+stat64 (const char *name, struct __stat64 *buf)
 {
   sigframe thisframe (mainthread);
   syscall_printf ("entering");
   return stat_worker (name, buf, 0);
 }
 
+extern "C" int
+_stat (const char *name, struct __stat32 *buf)
+{
+  struct __stat64 buf64;
+  int ret = stat64 (name, &buf64);
+  if (!ret)
+    stat64_to_stat32 (&buf64, buf);
+  return ret;
+}
+
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
 extern "C" int
-lstat (const char *name, struct stat *buf)
+lstat64 (const char *name, struct __stat64 *buf)
 {
   sigframe thisframe (mainthread);
   syscall_printf ("entering");
   return stat_worker (name, buf, 1);
+}
+
+/* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
+extern "C" int
+cygwin_lstat (const char *name, struct __stat32 *buf)
+{
+  struct __stat64 buf64;
+  int ret = lstat64 (name, &buf64);
+  if (!ret)
+    stat64_to_stat32 (&buf64, buf);
+  return ret;
 }
 
 extern int acl_access (const char *, int);
@@ -1083,7 +1139,7 @@ access (const char *fn, int flags)
   if (allow_ntsec)
     return acl_access (fn, flags);
 
-  struct stat st;
+  struct __stat64 st;
   int r = stat_worker (fn, &st, 0);
   if (r)
     return -1;
@@ -1607,9 +1663,8 @@ setmode (int fd, int mode)
   return res;
 }
 
-/* ftruncate: P96 5.6.7.1 */
 extern "C" int
-ftruncate (int fd, off_t length)
+ftruncate64 (int fd, __off64_t length)
 {
   sigframe thisframe (mainthread);
   int res = -1;
@@ -1626,7 +1681,7 @@ ftruncate (int fd, off_t length)
 	  if (cfd->get_handle ())
 	    {
 	      /* remember curr file pointer location */
-	      off_t prev_loc = cfd->lseek (0, SEEK_CUR);
+	      __off64_t prev_loc = cfd->lseek (0, SEEK_CUR);
 
 	      cfd->lseek (length, SEEK_SET);
 	      if (!SetEndOfFile (h))
@@ -1635,7 +1690,7 @@ ftruncate (int fd, off_t length)
 		res = 0;
 
 	      /* restore original file pointer location */
-	      cfd->lseek (prev_loc, 0);
+	      cfd->lseek (prev_loc, SEEK_SET);
 	    }
 	}
     }
@@ -1644,9 +1699,16 @@ ftruncate (int fd, off_t length)
   return res;
 }
 
+/* ftruncate: P96 5.6.7.1 */
+extern "C" int
+ftruncate (int fd, __off32_t length)
+{
+  return ftruncate64 (fd, (__off64_t)length);
+}
+
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
 extern "C" int
-truncate (const char *pathname, off_t length)
+truncate64 (const char *pathname, __off64_t length)
 {
   sigframe thisframe (mainthread);
   int fd;
@@ -1664,6 +1726,13 @@ truncate (const char *pathname, off_t length)
   syscall_printf ("%d = truncate (%s, %d)", res, pathname, length);
 
   return res;
+}
+
+/* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
+extern "C" int
+truncate (const char *pathname, __off32_t length)
+{
+  return truncate64 (pathname, (__off64_t)length);
 }
 
 extern "C" long
@@ -1844,7 +1913,7 @@ mkfifo (const char *_path, mode_t mode)
 
 /* setgid: POSIX 4.2.2.1 */
 extern "C" int
-setgid (gid_t gid)
+setgid (__gid16_t gid)
 {
   int ret = setegid (gid);
   if (!ret)
@@ -1854,7 +1923,7 @@ setgid (gid_t gid)
 
 /* setuid: POSIX 4.2.2.1 */
 extern "C" int
-setuid (uid_t uid)
+setuid (__uid16_t uid)
 {
   int ret = seteuid (uid);
   if (!ret)
@@ -1867,7 +1936,7 @@ extern struct passwd *internal_getlogin (cygheap_user &user);
 
 /* seteuid: standards? */
 extern "C" int
-seteuid (uid_t uid)
+seteuid (__uid16_t uid)
 {
   sigframe thisframe (mainthread);
   if (wincap.has_security ())
@@ -1880,7 +1949,7 @@ seteuid (uid_t uid)
       DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
       SID_NAME_USE use;
 
-      if (uid == (uid_t) -1 || uid == myself->uid)
+      if (uid == ILLEGAL_UID || uid == myself->uid)
 	{
 	  debug_printf ("new euid == current euid, nothing happens");
 	  return 0;
@@ -1935,7 +2004,7 @@ seteuid (uid_t uid)
 	  BOOL current_token_is_internal_token = FALSE;
 	  BOOL explicitely_created_token = FALSE;
 
-	  struct group *gr = getgrgid (myself->gid);
+	  struct __group16 *gr = getgrgid (myself->gid);
 	  debug_printf ("myself->gid: %d, gr: %d", myself->gid, gr);
 
 	  usersid.getfrompw (pw_new);
@@ -2087,14 +2156,14 @@ seteuid (uid_t uid)
 
 /* setegid: from System V.  */
 extern "C" int
-setegid (gid_t gid)
+setegid (__gid16_t gid)
 {
   sigframe thisframe (mainthread);
   if (wincap.has_security ())
     {
-      if (gid != (gid_t) -1)
+      if (gid != ILLEGAL_GID)
 	{
-	  struct group *gr;
+	  struct __group16 *gr;
 
 	  if (!(gr = getgrgid (gid)))
 	    {
@@ -2377,7 +2446,8 @@ logout (char *line)
     {
       struct utmp *ut;
       struct utmp ut_buf[100];
-      off_t pos = 0;		/* Position in file */
+      /* FIXME: utmp file access is not 64 bit clean for now. */
+      __off32_t pos = 0;		/* Position in file */
       DWORD rd;
 
       while (!res && ReadFile (ut_fd, ut_buf, sizeof ut_buf, &rd, NULL)

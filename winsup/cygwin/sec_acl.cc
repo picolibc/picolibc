@@ -1,6 +1,6 @@
 /* secacl.cc: Sun compatible ACL functions.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -34,8 +34,11 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 
+extern "C" int aclsort (int nentries, int, __aclent16_t *aclbufp);
+extern "C" int acl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp);
+
 static int
-searchace (aclent_t *aclp, int nentries, int type, int id = -1)
+searchace (__aclent16_t *aclp, int nentries, int type, int id = -1)
 {
   int i;
 
@@ -47,7 +50,7 @@ searchace (aclent_t *aclp, int nentries, int type, int id = -1)
 }
 
 static int
-setacl (const char *file, int nentries, aclent_t *aclbufp)
+setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 {
   DWORD sd_size = 4096;
   char sd_buf[4096];
@@ -106,7 +109,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 
   cygsid sid;
   struct passwd *pw;
-  struct group *gr;
+  struct __group16 *gr;
   int pos;
 
   if (!InitializeAcl (acl, 3072, ACL_REVISION))
@@ -213,7 +216,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 }
 
 static void
-getace (aclent_t &acl, int type, int id, DWORD win_ace_mask, DWORD win_ace_type)
+getace (__aclent16_t &acl, int type, int id, DWORD win_ace_mask, DWORD win_ace_type)
 {
   acl.a_type = type;
   acl.a_id = id;
@@ -238,7 +241,7 @@ getace (aclent_t &acl, int type, int id, DWORD win_ace_mask, DWORD win_ace_type)
 }
 
 static int
-getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
+getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
 {
   DWORD sd_size = 4096;
   char sd_buf[4096];
@@ -254,8 +257,8 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
   PSID owner_sid;
   PSID group_sid;
   BOOL dummy;
-  uid_t uid;
-  gid_t gid;
+  __uid16_t uid;
+  __gid16_t gid;
 
   if (!GetSecurityDescriptorOwner (psd, &owner_sid, &dummy))
     {
@@ -273,8 +276,8 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
     }
   gid = cygsid (group_sid).get_gid ();
 
-  aclent_t lacl[MAX_ACL_ENTRIES];
-  memset (&lacl, 0, MAX_ACL_ENTRIES * sizeof (aclent_t));
+  __aclent16_t lacl[MAX_ACL_ENTRIES];
+  memset (&lacl, 0, MAX_ACL_ENTRIES * sizeof (__aclent16_t));
   lacl[0].a_type = USER_OBJ;
   lacl[0].a_id = uid;
   lacl[1].a_type = GROUP_OBJ;
@@ -298,7 +301,7 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
       for (pos = 0; pos < MIN_ACL_ENTRIES; ++pos)
 	lacl[pos].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
       pos = nentries < MIN_ACL_ENTRIES ? nentries : MIN_ACL_ENTRIES;
-      memcpy (aclbufp, lacl, pos * sizeof (aclent_t));
+      memcpy (aclbufp, lacl, pos * sizeof (__aclent16_t));
       return pos;
     }
 
@@ -389,7 +392,7 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
   if (pos > nentries)
     pos = nentries;
   if (aclbufp)
-    memcpy (aclbufp, lacl, pos * sizeof (aclent_t));
+    memcpy (aclbufp, lacl, pos * sizeof (__aclent16_t));
   aclsort (pos, 0, aclbufp);
   syscall_printf ("%d = getacl (%s)", pos, file);
   return pos;
@@ -398,7 +401,7 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
 int
 acl_access (const char *path, int flags)
 {
-  aclent_t acls[MAX_ACL_ENTRIES];
+  __aclent16_t acls[MAX_ACL_ENTRIES];
   int cnt;
 
   if ((cnt = acl (path, GETACL, MAX_ACL_ENTRIES, acls)) < 1)
@@ -423,7 +426,7 @@ acl_access (const char *path, int flags)
 	      cygsid owner;
 	      cygsid group;
 	      struct passwd *pw;
-	      struct group *gr = NULL;
+	      struct __group16 *gr = NULL;
 
 	      if ((pw = getpwuid (acls[i].a_id)) != NULL
 		  && owner.getfrompw (pw))
@@ -460,7 +463,7 @@ acl_access (const char *path, int flags)
 
 static
 int
-acl_worker (const char *path, int cmd, int nentries, aclent_t *aclbufp,
+acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
 	    int nofollow)
 {
   extern suffix_info stat_suffixes[];
@@ -473,7 +476,7 @@ acl_worker (const char *path, int cmd, int nentries, aclent_t *aclbufp,
     }
   if (!real_path.has_acls ())
     {
-      struct stat st;
+      struct __stat64 st;
       int ret = -1;
 
       switch (cmd)
@@ -484,10 +487,10 @@ acl_worker (const char *path, int cmd, int nentries, aclent_t *aclbufp,
 	case GETACL:
 	  if (nentries < 1)
 	    set_errno (EINVAL);
-	  else if ((nofollow && !lstat (path, &st))
-		   || (!nofollow && !stat (path, &st)))
+	  else if ((nofollow && !lstat64 (path, &st))
+		   || (!nofollow && !stat64 (path, &st)))
 	    {
-	      aclent_t lacl[4];
+	      __aclent16_t lacl[4];
 	      if (nentries > 0)
 		{
 		  lacl[0].a_type = USER_OBJ;
@@ -523,7 +526,7 @@ acl_worker (const char *path, int cmd, int nentries, aclent_t *aclbufp,
 	      if (nentries > 4)
 		nentries = 4;
 	      if (aclbufp)
-		memcpy (aclbufp, lacl, nentries * sizeof (aclent_t));
+		memcpy (aclbufp, lacl, nentries * sizeof (__aclent16_t));
 	      ret = nentries;
 	    }
 	  break;
@@ -561,21 +564,21 @@ acl_worker (const char *path, int cmd, int nentries, aclent_t *aclbufp,
 
 extern "C"
 int
-acl (const char *path, int cmd, int nentries, aclent_t *aclbufp)
+acl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
 {
   return acl_worker (path, cmd, nentries, aclbufp, 0);
 }
 
 extern "C"
 int
-lacl (const char *path, int cmd, int nentries, aclent_t *aclbufp)
+lacl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
 {
   return acl_worker (path, cmd, nentries, aclbufp, 1);
 }
 
 extern "C"
 int
-facl (int fd, int cmd, int nentries, aclent_t *aclbufp)
+facl (int fd, int cmd, int nentries, __aclent16_t *aclbufp)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0)
@@ -596,7 +599,7 @@ facl (int fd, int cmd, int nentries, aclent_t *aclbufp)
 
 extern "C"
 int
-aclcheck (aclent_t *aclbufp, int nentries, int *which)
+aclcheck (__aclent16_t *aclbufp, int nentries, int *which)
 {
   BOOL has_user_obj = FALSE;
   BOOL has_group_obj = FALSE;
@@ -730,7 +733,7 @@ aclcheck (aclent_t *aclbufp, int nentries, int *which)
 extern "C"
 int acecmp (const void *a1, const void *a2)
 {
-#define ace(i) ((const aclent_t *) a##i)
+#define ace(i) ((const __aclent16_t *) a##i)
   int ret = ace(1)->a_type - ace(2)->a_type;
   if (!ret)
     ret = ace(1)->a_id - ace(2)->a_id;
@@ -740,7 +743,7 @@ int acecmp (const void *a1, const void *a2)
 
 extern "C"
 int
-aclsort (int nentries, int, aclent_t *aclbufp)
+aclsort (int nentries, int, __aclent16_t *aclbufp)
 {
   if (aclcheck (aclbufp, nentries, NULL))
     return -1;
@@ -749,13 +752,13 @@ aclsort (int nentries, int, aclent_t *aclbufp)
       set_errno (EINVAL);
       return -1;
     }
-  qsort((void *) aclbufp, nentries, sizeof (aclent_t), acecmp);
+  qsort((void *) aclbufp, nentries, sizeof (__aclent16_t), acecmp);
   return 0;
 }
 
 extern "C"
 int
-acltomode (aclent_t *aclbufp, int nentries, mode_t *modep)
+acltomode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
 {
   int pos;
 
@@ -790,7 +793,7 @@ acltomode (aclent_t *aclbufp, int nentries, mode_t *modep)
 
 extern "C"
 int
-aclfrommode(aclent_t *aclbufp, int nentries, mode_t *modep)
+aclfrommode(__aclent16_t *aclbufp, int nentries, mode_t *modep)
 {
   int pos;
 
@@ -830,14 +833,14 @@ aclfrommode(aclent_t *aclbufp, int nentries, mode_t *modep)
 
 extern "C"
 int
-acltopbits (aclent_t *aclbufp, int nentries, mode_t *pbitsp)
+acltopbits (__aclent16_t *aclbufp, int nentries, mode_t *pbitsp)
 {
   return acltomode (aclbufp, nentries, pbitsp);
 }
 
 extern "C"
 int
-aclfrompbits (aclent_t *aclbufp, int nentries, mode_t *pbitsp)
+aclfrompbits (__aclent16_t *aclbufp, int nentries, mode_t *pbitsp)
 {
   return aclfrommode (aclbufp, nentries, pbitsp);
 }
@@ -856,7 +859,7 @@ permtostr (mode_t perm)
 
 extern "C"
 char *
-acltotext (aclent_t *aclbufp, int aclcnt)
+acltotext (__aclent16_t *aclbufp, int aclcnt)
 {
   if (!aclbufp || aclcnt < 1 || aclcnt > MAX_ACL_ENTRIES
       || aclcheck (aclbufp, aclcnt, NULL))
@@ -932,7 +935,7 @@ permfromstr (char *perm)
 }
 
 extern "C"
-aclent_t *
+__aclent16_t *
 aclfromtext (char *acltextp, int *)
 {
   if (!acltextp)
@@ -941,7 +944,7 @@ aclfromtext (char *acltextp, int *)
       return NULL;
     }
   char buf[strlen (acltextp) + 1];
-  aclent_t lacl[MAX_ACL_ENTRIES];
+  __aclent16_t lacl[MAX_ACL_ENTRIES];
   memset (lacl, 0, sizeof lacl);
   int pos = 0;
   strcpy (buf, acltextp);
@@ -993,7 +996,7 @@ aclfromtext (char *acltextp, int *)
 	      c += 5;
 	      if (isalpha (*c))
 		{
-		  struct group *gr = getgrnam (c);
+		  struct __group16 *gr = getgrnam (c);
 		  if (!gr)
 		    {
 		      set_errno (EINVAL);
@@ -1038,9 +1041,9 @@ aclfromtext (char *acltextp, int *)
 	}
       ++pos;
     }
-  aclent_t *aclp = (aclent_t *) malloc (pos * sizeof (aclent_t));
+  __aclent16_t *aclp = (__aclent16_t *) malloc (pos * sizeof (__aclent16_t));
   if (aclp)
-    memcpy (aclp, lacl, pos * sizeof (aclent_t));
+    memcpy (aclp, lacl, pos * sizeof (__aclent16_t));
   return aclp;
 }
 

@@ -26,6 +26,8 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "wincap.h"
+#include "heap.h"
 
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)
@@ -121,6 +123,16 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 {
   va_list arg;
   va_start (arg, t);
+  if (t != CW_USER_DATA)
+    {
+      wincap.init ();
+      if (!myself)
+	{
+	  memory_init ();
+	  malloc_init ();
+	  set_myself (1);
+	}
+    }
 
   switch (t)
     {
@@ -194,6 +206,32 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 #	  undef cr
 	}
 
+      case CW_STRACE_TOGGLE:
+	{
+	  pid_t pid = va_arg (arg, pid_t);
+	  pinfo p (pid);
+	  if (p)
+	    {
+	      sig_send (p, __SIGSTRACE);
+	      return 0;
+	    }
+	  else
+	    {
+	      set_errno (ESRCH);
+	      return (DWORD) -1;
+	    }
+	}
+
+      case CW_STRACE_ACTIVE:
+	{
+	  return strace.active;
+	}
+
+      case CW_CYGWIN_PID_TO_WINPID:
+	{
+	  pinfo p (va_arg (arg, pid_t));
+	  return p ? p->dwProcessId : 0;
+	}
       default:
 	return (DWORD) -1;
     }

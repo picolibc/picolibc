@@ -56,6 +56,9 @@ ttyslot (void)
 void __stdcall
 tty_init (void)
 {
+  if (!myself->ppid_handle && NOTSTATE (myself, PID_CYGPARENT))
+    cygheap->fdtab.get_debugger_info ();
+
   if (NOTSTATE (myself, PID_USETTY))
     return;
   if (myself->ctty == -1)
@@ -72,8 +75,8 @@ tty_init (void)
 void __stdcall
 create_tty_master (int ttynum)
 {
-  tty_master = (fhandler_tty_master *) cygheap->fdtab.build_fhandler (-1, FH_TTYM,
-							     "/dev/ttym", ttynum);
+  tty_master = (fhandler_tty_master *)
+    cygheap->fdtab.build_fhandler (-1, FH_TTYM, "/dev/ttym", NULL, ttynum);
   if (tty_master->init (ttynum))
     api_fatal ("Can't create master tty");
   else

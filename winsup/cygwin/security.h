@@ -1,6 +1,6 @@
 /* security.h: security declarations
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -55,7 +55,7 @@ public:
   inline PSID set () { return psid = (PSID) sbuf; }
 
   BOOL getfrompw (const struct passwd *pw);
-  BOOL getfromgr (const struct group *gr);
+  BOOL getfromgr (const struct __group16 *gr);
 
   int get_id (BOOL search_grp, int *type = NULL);
   inline int get_uid () { return get_id (FALSE); }
@@ -159,14 +159,14 @@ extern BOOL allow_smbntsec;
    and group lists so they are somehow security related. Besides that
    I didn't find a better place to declare them. */
 extern struct passwd *internal_getpwent (int);
-extern struct group *internal_getgrent (int);
+extern struct __group16 *internal_getgrent (int);
 
 /* File manipulation */
 int __stdcall set_process_privileges ();
 int __stdcall get_file_attribute (int, const char *, int *,
-				  uid_t * = NULL, gid_t * = NULL);
+				  __uid16_t * = NULL, __gid16_t * = NULL);
 int __stdcall set_file_attribute (int, const char *, int);
-int __stdcall set_file_attribute (int, const char *, uid_t, gid_t, int, const char *);
+int __stdcall set_file_attribute (int, const char *, __uid16_t, __gid16_t, int, const char *);
 LONG __stdcall read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size);
 LONG __stdcall write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size);
 BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
@@ -186,7 +186,7 @@ void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);
 BOOL get_logon_server_and_user_domain (char *logonserver, char *domain);
 
 /* sec_helper.cc: Security helper functions. */
-BOOL __stdcall is_grp_member (uid_t uid, gid_t gid);
+BOOL __stdcall is_grp_member (__uid16_t uid, __gid16_t gid);
 /* `lookup_name' should be called instead of LookupAccountName.
  * logsrv may be NULL, in this case only the local system is used for lookup.
  * The buffer for ret_sid (40 Bytes) has to be allocated by the caller! */
@@ -199,10 +199,22 @@ SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
 
 /* Various types of security attributes for use in Create* functions. */
 extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
-extern SECURITY_ATTRIBUTES *__stdcall sec_user (PVOID sa_buf, PSID sid2 = NULL, BOOL inherit = TRUE);
-extern SECURITY_ATTRIBUTES *__stdcall sec_user_nih (PVOID sa_buf, PSID sid2 = NULL);
+extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
+  __attribute__ ((regparm (3)));
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
 PSECURITY_DESCRIPTOR alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
           PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
+
+extern inline SECURITY_ATTRIBUTES *
+sec_user_nih (char sa_buf[], PSID sid = NULL)
+{
+  return allow_ntsec ? __sec_user (sa_buf, sid, FALSE) : &sec_none_nih;
+}
+
+extern inline SECURITY_ATTRIBUTES *
+sec_user (char sa_buf[], PSID sid = NULL)
+{
+  return allow_ntsec ? __sec_user (sa_buf, sid, TRUE) : &sec_none_nih;
+}

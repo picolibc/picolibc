@@ -216,7 +216,7 @@ static NO_COPY muto *mprotect = NULL;
 void
 malloc_init ()
 {
-  mprotect = new_muto (FALSE, "mprotect");
+  new_muto (mprotect);
   /* Check if mallock is provided by application. If so, redirect all
      calls to export_malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides

@@ -635,9 +635,9 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
 					  /* process security attrs */
-			  allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
+			  sec_user_nih (sa_buf),
 					  /* thread security attrs */
-			  allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
+			  sec_user_nih (sa_buf),
 			  TRUE,	/* inherit handles from parent */
 			  flags,
 			  envblock,/* environment */
@@ -656,9 +656,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	}
       /* Retrieve security attributes before setting psid to NULL
 	 since it's value is needed by `sec_user'. */
-      PSECURITY_ATTRIBUTES sec_attribs = allow_ntsec && sid
-					 ? sec_user (sa_buf, sid)
-					 : &sec_all_nih;
+      PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf, sid);
 
       /* Remove impersonation */
       if (cygheap->user.impersonated
@@ -682,7 +680,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       char wstname[1024];
       char dskname[1024];
 
-      ciresrv.moreinfo->uid = USHRT_MAX;
+      ciresrv.moreinfo->uid = ILLEGAL_UID;
       hwst = GetProcessWindowStation ();
       SetUserObjectSecurity (hwst, &dsi, get_null_sd ());
       GetUserObjectInformation (hwst, UOI_NAME, wstname, 1024, &n);

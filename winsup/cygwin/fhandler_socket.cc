@@ -31,6 +31,7 @@
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
+#include "wsock_event.h"
 
 #define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
 #define ENTROPY_SOURCE_NAME "/dev/urandom"
@@ -244,35 +245,95 @@ fhandler_socket::dup (fhandler_base *child)
 }
 
 int __stdcall
-fhandler_socket::fstat (struct stat *buf, path_conv *pc)
+fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
 {
   fhandler_disk_file fh;
   fh.set_name (get_name (), get_win32_name ());
   return fh.fstat (buf, pc);
 }
 
+int
+fhandler_socket::recv (void *ptr, size_t len, unsigned int flags)
+{
+  int res = -1;
+  wsock_event wsock_evt;
+  LPWSAOVERLAPPED ovr;
+
+  sigframe thisframe (mainthread);
+  if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
+    {
+      debug_printf ("Fallback to winsock 1 recv call");
+      if ((res = ::recv (get_socket (), (char *) ptr, len, flags))
+	  == SOCKET_ERROR)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
+    }
+  else
+    {
+      WSABUF wsabuf = { len, (char *) ptr };
+      DWORD ret = 0;
+      if (WSARecv (get_socket (), &wsabuf, 1, &ret, (DWORD *)&flags,
+		   ovr, NULL) != SOCKET_ERROR)
+	res = ret;
+      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
+      else if ((res = wsock_evt.wait (get_socket (), (DWORD *)&flags)) == -1)
+	set_winsock_errno ();
+    }
+  return res;
+}
+
 int __stdcall
 fhandler_socket::read (void *ptr, size_t len)
 {
+  return recv (ptr, len, 0);
+}
+
+int
+fhandler_socket::send (const void *ptr, size_t len, unsigned int flags)
+{
+  int res = -1;
+  wsock_event wsock_evt;
+  LPWSAOVERLAPPED ovr;
+
   sigframe thisframe (mainthread);
-  int res = recv (get_socket (), (char *) ptr, len, 0);
-  if (res == SOCKET_ERROR)
-    set_winsock_errno ();
+  if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
+    {
+      debug_printf ("Fallback to winsock 1 send call");
+      if ((res = ::send (get_socket (), (const char *) ptr, len, flags))
+	  == SOCKET_ERROR)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
+    }
+  else
+    {
+      WSABUF wsabuf = { len, (char *) ptr };
+      DWORD ret = 0;
+      if (WSASend (get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
+		   ovr, NULL) != SOCKET_ERROR)
+	res = ret;
+      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
+      else if ((res = wsock_evt.wait (get_socket (), (DWORD *)&flags)) == -1)
+	set_winsock_errno ();
+    }
   return res;
 }
 
 int
 fhandler_socket::write (const void *ptr, size_t len)
 {
-  sigframe thisframe (mainthread);
-  int res = send (get_socket (), (const char *) ptr, len, 0);
-  if (res == SOCKET_ERROR)
-    {
-      set_winsock_errno ();
-      if (get_errno () == ECONNABORTED || get_errno () == ECONNRESET)
-	_raise (SIGPIPE);
-    }
-  return res;
+  return send (ptr, len, 0);
 }
 
 /* Cygwin internal */

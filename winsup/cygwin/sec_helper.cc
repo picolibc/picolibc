@@ -1,6 +1,6 @@
 /* sec_helper.cc: NT security helper functions
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -129,7 +129,7 @@ cygsid::getfrompw (const struct passwd *pw)
 }
 
 BOOL
-cygsid::getfromgr (const struct group *gr)
+cygsid::getfromgr (const struct __group16 *gr)
 {
   char *sp = (gr && gr->gr_passwd) ? gr->gr_passwd : NULL;
   return (*this = sp ?: "") != NULL;
@@ -176,7 +176,7 @@ cygsid::get_id (BOOL search_grp, int *type)
 	}
       if (search_grp || type)
 	{
-	  struct group *gr;
+	  struct __group16 *gr;
 	  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 	    {
 	      if (sid.getfromgr (gr) && sid == psid)
@@ -226,7 +226,7 @@ cygsid::get_id (BOOL search_grp, int *type)
 	      *type = GROUP;
 	    if (id == -1)
 	      {
-		struct group *gr = getgrnam (account);
+		struct __group16 *gr = getgrnam (account);
 		if (gr)
 		  id = gr->gr_gid;
 	      }
@@ -251,13 +251,13 @@ cygsid::get_id (BOOL search_grp, int *type)
 }
 
 BOOL
-is_grp_member (uid_t uid, gid_t gid)
+is_grp_member (__uid16_t uid, __gid16_t gid)
 {
-  extern int getgroups (int, gid_t *, gid_t, const char *);
+  extern int getgroups (int, __gid16_t *, __gid16_t, const char *);
   BOOL grp_member = TRUE;
 
   struct passwd *pw = getpwuid (uid);
-  gid_t grps[NGROUPS_MAX];
+  __gid16_t grps[NGROUPS_MAX];
   int cnt = getgroups (NGROUPS_MAX, grps,
 		       pw ? pw->pw_gid : myself->gid,
 		       pw ? pw->pw_name : cygheap->user.name ());

@@ -34,6 +34,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "registry.h"
+#include "wsock_event.h"
 #include <sys/uio.h>
 
 extern "C" {
@@ -46,23 +47,6 @@ int __stdcall rexec (char **ahost, unsigned short inport, char *locuser,
 int __stdcall rresvport (int *);
 int sscanf (const char *, const char *, ...);
 } /* End of "C" section */
-
-class wsock_event
-{
-  WSAEVENT		event;
-  WSAOVERLAPPED		ovr;
-public:
-  wsock_event () : event (NULL) {};
-  ~wsock_event ()
-    {
-      if (event)
-	WSACloseEvent (event);
-      event = NULL;
-    };
-
-  LPWSAOVERLAPPED prepare ();
-  int wait (int socket, LPDWORD flags);
-};
 
 LPWSAOVERLAPPED
 wsock_event::prepare ()
@@ -524,7 +508,6 @@ fdsock (int& fd, const char *name, SOCKET soc)
   fhandler_socket *fh = (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR);
-  fh->set_name (name, name);
   debug_printf ("fd %d, name '%s', soc %p", fd, name, soc);
   return fh;
 }
@@ -1375,12 +1358,17 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 	  struct sockaddr_un *sun = (struct sockaddr_un *) addr;
 	  memset (sun, 0, *namelen);
 	  sun->sun_family = AF_LOCAL;
-	  /* According to SUSv2 "If the actual length of the address is greater
-	     than the length of the supplied sockaddr structure, the stored
-	     address will be truncated."  We play it save here so that the
-	     path always has a trailing 0 even if it's truncated. */
-	  strncpy (sun->sun_path, sock->get_sun_path (),
-		   *namelen - sizeof *sun + sizeof sun->sun_path - 1);
+
+	  if (!sock->get_sun_path ())
+	    sun->sun_path[0] = '\0';
+	  else
+	    /* According to SUSv2 "If the actual length of the address is
+	       greater than the length of the supplied sockaddr structure, the
+	       stored address will be truncated."  We play it save here so
+	       that the path always has a trailing 0 even if it's truncated. */
+	    strncpy (sun->sun_path, sock->get_sun_path (),
+		     *namelen - sizeof *sun + sizeof sun->sun_path - 1);
+
 	  *namelen = sizeof *sun - sizeof sun->sun_path
 		     + strlen (sun->sun_path) + 1;
 	  res = 0;
@@ -1522,42 +1510,12 @@ extern "C" int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
   int res;
-  wsock_event wsock_evt;
-  LPWSAOVERLAPPED ovr;
-  fhandler_socket *h = get (fd);
+  fhandler_socket *fh = get (fd);
 
-  if (__check_null_invalid_struct_errno (buf, len) || !h)
+  if (__check_null_invalid_struct_errno (buf, len) || !fh)
     res = -1;
   else
-    {
-      sigframe thisframe (mainthread);
-
-      if (h->is_nonblocking () || !(ovr = wsock_evt.prepare ()))
-	{
-	  debug_printf ("Fallback to winsock 1 recv call");
-	  if ((res = recv (h->get_socket (), (char *) buf, len, flags))
-	      == SOCKET_ERROR)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	}
-      else
-	{
-	  WSABUF wsabuf = { len, (char *) buf };
-	  DWORD ret = 0;
-	  if (WSARecv (h->get_socket (), &wsabuf, 1, &ret, (DWORD *)&flags,
-		       ovr, NULL) != SOCKET_ERROR)
-	    res = ret;
-	  else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	  else if ((res = wsock_evt.wait (h->get_socket (), (DWORD *)&flags)) == -1)
-	    set_winsock_errno ();
-	}
-    }
+    res = fh->recv (buf, len, flags);
 
   syscall_printf ("%d = recv (%d, %x, %x, %x)", res, fd, buf, len, flags);
 
@@ -1569,42 +1527,12 @@ extern "C" int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
   int res;
-  wsock_event wsock_evt;
-  LPWSAOVERLAPPED ovr;
-  fhandler_socket *h = get (fd);
+  fhandler_socket *fh = get (fd);
 
-  if (__check_invalid_read_ptr_errno (buf, len) || !h)
+  if (__check_invalid_read_ptr_errno (buf, len) || !fh)
     res = -1;
   else
-    {
-      sigframe thisframe (mainthread);
-
-      if (h->is_nonblocking () || !(ovr = wsock_evt.prepare ()))
-	{
-	  debug_printf ("Fallback to winsock 1 send call");
-	  if ((res = send (h->get_socket (), (const char *) buf, len, flags))
-	      == SOCKET_ERROR)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	}
-      else
-	{
-	  WSABUF wsabuf = { len, (char *) buf };
-	  DWORD ret = 0;
-	  if (WSASend (h->get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
-		       ovr, NULL) != SOCKET_ERROR)
-	    res = ret;
-	  else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	  else if ((res = wsock_evt.wait (h->get_socket (), (DWORD *)&flags)) == -1)
-	    set_winsock_errno ();
-	}
-    }
+    res = fh->send (buf, len, flags);
 
   syscall_printf ("%d = send (%d, %x, %d, %x)", res, fd, buf, len, flags);
 
@@ -1628,7 +1556,8 @@ getdomainname (char *domain, int len)
   reg_key r (HKEY_LOCAL_MACHINE, KEY_READ,
 	     (!wincap.is_winnt ()) ? "System" : "SYSTEM",
 	     "CurrentControlSet", "Services",
-	     (!wincap.is_winnt ()) ? "MSTCP" : "Tcpip",
+	     (!wincap.is_winnt ()) ? "VxD" : "Tcpip",
+	     (!wincap.is_winnt ()) ? "MSTCP" : "Parameters",
 	     NULL);
 
   /* FIXME: Are registry keys case sensitive? */
@@ -1652,7 +1581,7 @@ static void
 get_2k_ifconf (struct ifconf *ifc, int what)
 {
   int cnt = 0;
-  char eth[2] = "/", ppp[2] = "/", slp[2] = "/", sub[2] = "0";
+  char eth[2] = "/", ppp[2] = "/", slp[2] = "/", sub[2] = "0", tok[2] = "/";
 
   /* Union maps buffer to correct struct */
   struct ifreq *ifr = ifc->ifc_req;
@@ -1685,6 +1614,11 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 		  /* Setup the interface name */
 		  switch (ift->table[if_cnt].dwType)
 		    {
+		      case MIB_IF_TYPE_TOKENRING:
+		        ++*tok;
+			strcpy (ifr->ifr_name, "tok");
+			strcat (ifr->ifr_name, tok);
+			break;
 		      case MIB_IF_TYPE_ETHERNET:
 			if (*sub == '0')
 			  ++*eth;

@@ -118,9 +118,8 @@ readdir (DIR *dir)
   return ((fhandler_base *) dir->__d_u.__d_data.__fh)->readdir (dir);
 }
 
-/* telldir */
-extern "C" off_t
-telldir (DIR *dir)
+extern "C" __off64_t
+telldir64 (DIR *dir)
 {
   if (check_null_invalid_struct_errno (dir))
     return -1;
@@ -130,9 +129,15 @@ telldir (DIR *dir)
   return ((fhandler_base *) dir->__d_u.__d_data.__fh)->telldir (dir);
 }
 
-/* seekdir */
+/* telldir */
+extern "C" __off32_t
+telldir (DIR *dir)
+{
+  return telldir64 (dir);
+}
+
 extern "C" void
-seekdir (DIR *dir, off_t loc)
+seekdir64 (DIR *dir, __off64_t loc)
 {
   if (check_null_invalid_struct_errno (dir))
     return;
@@ -140,6 +145,13 @@ seekdir (DIR *dir, off_t loc)
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
   return ((fhandler_base *) dir->__d_u.__d_data.__fh)->seekdir (dir, loc);
+}
+
+/* seekdir */
+extern "C" void
+seekdir (DIR *dir, __off32_t loc)
+{
+  seekdir64 (dir, (__off64_t)loc);
 }
 
 /* rewinddir: POSIX 5.1.2.1 */

@@ -17,6 +17,9 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "perprocess.h"
+#include "cygwin_version.h"
+#include "hires.h"
 
 #define PROTECT(x) x[sizeof(x)-1] = 0
 #define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
@@ -28,38 +31,41 @@ class NO_COPY strace strace;
 
 #ifndef NOSTRACE
 
-int
-strace::microseconds()
+void
+strace::hello()
 {
-  static NO_COPY int first_microsec = 0;
-  static NO_COPY long long hires_frequency = 0;
-  static NO_COPY int hires_initted = 0;
+  char buf[30];
 
-  int microsec;
+  if (inited)
+    {
+      active ^= 1;
+      return;
+    }
 
-  if (!hires_initted)
+  __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR, &active);
+  OutputDebugString (buf);
+
+  if (active)
     {
-      hires_initted = 1;
-      QueryPerformanceFrequency ((LARGE_INTEGER *) &hires_frequency);
-      if (hires_frequency == 0)
-	  hires_initted = 2;
+      prntf (1, NULL, "**********************************************");
+      prntf (1, NULL, "Program name: %s (%d)", myself->progname, myself->pid);
+      prntf (1, NULL, "App version:  %d.%d, api: %d.%d",
+	     user_data->dll_major, user_data->dll_minor,
+	     user_data->api_major, user_data->api_minor);
+      prntf (1, NULL, "DLL version:  %d.%d, api: %d.%d",
+	     cygwin_version.dll_major, cygwin_version.dll_minor,
+	     cygwin_version.api_major, cygwin_version.api_minor);
+      prntf (1, NULL, "DLL build:    %s", cygwin_version.dll_build_date);
+      prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
+      prntf (1, NULL, "**********************************************");
     }
-  if (hires_initted == 2)
-    {
-      int count = GetTickCount ();
-      microsec = count * 1000;
-    }
-  else
-    {
-      long long thiscount;
-      QueryPerformanceCounter ((LARGE_INTEGER *) &thiscount);
-      thiscount = (long long) (((double) thiscount/(double) hires_frequency)
-			       * 1000000.0);
-      microsec = thiscount;
-    }
-  if (first_microsec == 0)
-    first_microsec = microsec;
-  return microsec - first_microsec;
+}
+
+int
+strace::microseconds ()
+{
+  static hires now;
+  return (int) now.usecs (true);
 }
 
 static int __stdcall

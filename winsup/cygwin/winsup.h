@@ -23,7 +23,7 @@ details. */
 # define memset __builtin_memset
 #endif
 
-#define NO_COPY __attribute__((section(".data_cygwin_nocopy")))
+#define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
 
 #ifdef EXPCGF
 #define DECLARE_TLS_STORAGE char **tls[4096] __attribute__ ((unused))
@@ -147,6 +147,10 @@ extern "C" void __stdcall do_exit (int) __attribute__ ((noreturn));
 /* UID/GID */
 void uinfo_init (void);
 
+#define ILLEGAL_UID ((__uid16_t)-1)
+#define ILLEGAL_GID ((__gid16_t)-1)
+#define ILLEGAL_SEEK ((__off64_t)-1)
+
 /* various events */
 void events_init (void);
 void events_terminate (void);
@@ -177,7 +181,7 @@ extern int cygwin_finished_initializing;
 
 void __stdcall set_std_handle (int);
 int __stdcall writable_directory (const char *file);
-int __stdcall stat_dev (DWORD, int, unsigned long, struct stat *);
+int __stdcall stat_dev (DWORD, int, unsigned long, struct __stat64 *);
 extern BOOL allow_ntsec;
 
 unsigned long __stdcall hash_path_name (unsigned long hash, const char *name) __attribute__ ((regparm(2)));
@@ -228,7 +232,7 @@ extern "C" void __malloc_lock (struct _reent *);
 extern "C" void __malloc_unlock (struct _reent *);
 
 class path_conv;
-int __stdcall stat_worker (const char *name, struct stat *buf, int nofollow,
+int __stdcall stat_worker (const char *name, struct __stat64 *buf, int nofollow,
 			   path_conv *pc = NULL) __attribute__ ((regparm (3)));
 
 /**************************** Exports ******************************/

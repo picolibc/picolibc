@@ -1,6 +1,6 @@
 /* uinfo.cc: user info (uid, gid, etc...)
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -127,91 +127,90 @@ internal_getlogin (cygheap_user &user)
 	    NetApiBufferFree (ui);
 	}
 
-      if (allow_ntsec)
+      HANDLE ptok = user.token; /* Which is INVALID_HANDLE_VALUE if no
+				   impersonation took place. */
+      DWORD siz;
+      cygsid tu;
+      ret = 0;
+
+      /* Try to get the SID either from already impersonated token
+	 or from current process first. To differ that two cases is
+	 important, because you can't rely on the user information
+	 in a process token of a currently impersonated process. */
+      if (ptok == INVALID_HANDLE_VALUE
+	  && !OpenProcessToken (GetCurrentProcess (),
+				TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
+				&ptok))
+	debug_printf ("OpenProcessToken(): %E\n");
+      else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
+	debug_printf ("GetTokenInformation(): %E");
+      else if (!(ret = user.set_sid (tu)))
+	debug_printf ("Couldn't retrieve SID from access token!");
+      /* If that failes, try to get the SID from localhost. This can only
+	 be done if a domain is given because there's a chance that a local
+	 and a domain user may have the same name. */
+      if (!ret && user.domain ())
 	{
-	  HANDLE ptok = user.token; /* Which is INVALID_HANDLE_VALUE if no
-				       impersonation took place. */
-	  DWORD siz;
-	  cygsid tu;
-	  int ret = 0;
-
-	  /* Try to get the SID either from already impersonated token
-	     or from current process first. To differ that two cases is
-	     important, because you can't rely on the user information
-	     in a process token of a currently impersonated process. */
-	  if (ptok == INVALID_HANDLE_VALUE
-	      && !OpenProcessToken (GetCurrentProcess (),
-				    TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
-				    &ptok))
-	    debug_printf ("OpenProcessToken(): %E\n");
-	  else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
-	    debug_printf ("GetTokenInformation(): %E");
-	  else if (!(ret = user.set_sid (tu)))
-	    debug_printf ("Couldn't retrieve SID from access token!");
-	  /* If that failes, try to get the SID from localhost. This can only
-	     be done if a domain is given because there's a chance that a local
-	     and a domain user may have the same name. */
-	  if (!ret && user.domain ())
-	    {
-	      /* Concat DOMAIN\USERNAME for the next lookup */
-	      strcat (strcat (strcpy (buf, user.domain ()), "\\"), user.name ());
-	      if (!(ret = lookup_name (buf, NULL, user.sid ())))
-		debug_printf ("Couldn't retrieve SID locally!");
-	    }
-
-	  /* If that fails, too, as a last resort try to get the SID from
-	     the logon server. */
-	  if (!ret && !(ret = lookup_name (user.name (), user.logsrv (),
-					   user.sid ())))
-	    debug_printf ("Couldn't retrieve SID from '%s'!", user.logsrv ());
-
-	  /* If we have a SID, try to get the corresponding Cygwin user name
-	     which can be different from the Windows user name. */
-	  cygsid gsid (NO_SID);
-	  if (ret)
-	    {
-	      cygsid psid;
-
-	      for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
-		if (psid.getfrompw (pw) && EqualSid (user.sid (), psid))
-		  {
-		    user.set_name (pw->pw_name);
-		    struct group *gr = getgrgid (pw->pw_gid);
-		    if (gr)
-		      if (!gsid.getfromgr (gr))
-			  gsid = NO_SID;
-		    break;
-		  }
-	      if (!strcasematch (user.name (), "SYSTEM")
-		  && user.domain () && user.logsrv ())
-		{
-		  if (get_registry_hive_path (user.sid (), buf))
-		    setenv ("USERPROFILE", buf, 1);
-		  else
-		    unsetenv ("USERPROFILE");
-		}
-	    }
-
-	  /* If this process is started from a non Cygwin process,
-	     set token owner to the same value as token user and
-	     primary group to the group which is set as primary group
-	     in /etc/passwd. */
-	  if (ptok != INVALID_HANDLE_VALUE && myself->ppid == 1)
-	    {
-	      if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
-		debug_printf ("SetTokenInformation(TokenOwner): %E");
-	      if (gsid && !SetTokenInformation (ptok, TokenPrimaryGroup,
-						&gsid, sizeof gsid))
-		debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
-	    }
-
-	  /* Close token only if it's a result from OpenProcessToken(). */
-	  if (ptok != INVALID_HANDLE_VALUE
-	      && user.token == INVALID_HANDLE_VALUE)
-	    CloseHandle (ptok);
+	  /* Concat DOMAIN\USERNAME for the next lookup */
+	  strcat (strcat (strcpy (buf, user.domain ()), "\\"), user.name ());
+	  if (!(ret = lookup_name (buf, NULL, user.sid ())))
+	    debug_printf ("Couldn't retrieve SID locally!");
 	}
+
+      /* If that fails, too, as a last resort try to get the SID from
+	 the logon server. */
+      if (!ret && !(ret = lookup_name (user.name (), user.logsrv (),
+				       user.sid ())))
+	debug_printf ("Couldn't retrieve SID from '%s'!", user.logsrv ());
+
+      /* If we have a SID, try to get the corresponding Cygwin user name
+	 which can be different from the Windows user name. */
+      cygsid gsid (NO_SID);
+      if (ret)
+	{
+	  cygsid psid;
+
+	  for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
+	    if (psid.getfrompw (pw) && EqualSid (user.sid (), psid))
+	      {
+		user.set_name (pw->pw_name);
+		struct __group16 *gr = getgrgid (pw->pw_gid);
+		if (gr)
+		  if (!gsid.getfromgr (gr))
+		      gsid = NO_SID;
+		break;
+	      }
+	  if (!strcasematch (user.name (), "SYSTEM")
+	      && user.domain () && user.logsrv ())
+	    {
+	      if (get_registry_hive_path (user.sid (), buf))
+		setenv ("USERPROFILE", buf, 1);
+	      else
+		unsetenv ("USERPROFILE");
+	    }
+	}
+
+      /* If this process is started from a non Cygwin process,
+	 set token owner to the same value as token user and
+	 primary group to the group which is set as primary group
+	 in /etc/passwd. */
+      if (ptok != INVALID_HANDLE_VALUE && myself->ppid == 1)
+	{
+	  if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
+	    debug_printf ("SetTokenInformation(TokenOwner): %E");
+	  if (gsid && !SetTokenInformation (ptok, TokenPrimaryGroup,
+					    &gsid, sizeof gsid))
+	    debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
+	}
+
+      /* Close token only if it's a result from OpenProcessToken(). */
+      if (ptok != INVALID_HANDLE_VALUE
+	  && user.token == INVALID_HANDLE_VALUE)
+	CloseHandle (ptok);
     }
+
   debug_printf ("Cygwins Username: %s", user.name ());
+
   if (!pw)
     pw = getpwnam(user.name ());
   if (!getenv ("HOME"))
@@ -245,20 +244,20 @@ uinfo_init ()
      Setting `impersonated' to TRUE seems to be wrong but it
      isn't. Impersonated is thought as "Current User and `token'
      are coincident". See seteuid() for the mechanism behind that. */
-  if (cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.token != INVALID_HANDLE_VALUE && cygheap->user.token != NULL)
     CloseHandle (cygheap->user.token);
   cygheap->user.token = INVALID_HANDLE_VALUE;
   cygheap->user.impersonated = TRUE;
 
-  /* If uid is USHRT_MAX, the process is started from a non cygwin
+  /* If uid is ILLEGAL_UID, the process is started from a non cygwin
      process or the user context was changed in spawn.cc */
-  if (myself->uid == USHRT_MAX)
+  if (myself->uid == ILLEGAL_UID)
     if ((p = internal_getlogin (cygheap->user)) != NULL)
       {
 	myself->uid = p->pw_uid;
-	/* Set primary group only if ntsec is off or the process has been
-	   started from a non cygwin process. */
-	if (!allow_ntsec || myself->ppid == 1)
+	/* Set primary group only if process has been started from a
+	   non cygwin process. */
+	if (!myself->ppid_handle)
 	  myself->gid = p->pw_gid;
       }
     else
@@ -278,31 +277,31 @@ getlogin (void)
 #ifdef _MT_SAFE
   char *this_username=_reent_winsup ()->_username;
 #else
-  static NO_COPY char this_username[UNLEN + 1];
+  static char this_username[UNLEN + 1] NO_COPY;
 #endif
 
   return strcpy (this_username, cygheap->user.name ());
 }
 
-extern "C" uid_t
+extern "C" __uid16_t
 getuid (void)
 {
   return cygheap->user.real_uid;
 }
 
-extern "C" gid_t
+extern "C" __gid16_t
 getgid (void)
 {
   return cygheap->user.real_gid;
 }
 
-extern "C" uid_t
+extern "C" __uid16_t
 geteuid (void)
 {
   return myself->uid;
 }
 
-extern "C" gid_t
+extern "C" __gid16_t
 getegid (void)
 {
   return myself->gid;

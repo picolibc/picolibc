@@ -1112,7 +1112,7 @@ events_init (void)
     api_fatal ("can't create title mutex, %E");
 
   ProtectHandle (title_mutex);
-  mask_sync = new_muto (FALSE, "mask_sync");
+  new_muto (mask_sync);
   windows_system_directory[0] = '\0';
   (void) GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);
   char *end = strchr (windows_system_directory, '\0');
@@ -1220,14 +1220,14 @@ _sigdelayed0:								\n\
 	pushl	%%ecx							\n\
 	pushl	%%ebx							\n\
 	pushl	%%eax							\n\
-	pushl	%7			# saved errno			\n\
+	pushl	%6			# saved errno			\n\
 	pushl	%3			# oldmask			\n\
 	pushl	%4			# signal argument		\n\
 	pushl	$_sigreturn						\n\
 									\n\
 	call	_reset_signal_arrived@0					\n\
 	pushl	%5			# signal number			\n\
-	pushl	%8			# newmask			\n\
+	pushl	%7			# newmask			\n\
 	movl	$0,%0			# zero the signal number as a	\n\
 					# flag to the signal handler thread\n\
 					# that it is ok to set up sigsave\n\
@@ -1238,7 +1238,7 @@ _sigdelayed0:								\n\
 __no_sig_end:								\n\
 " : "=m" (sigsave.sig) : "m" (&_impure_ptr->_errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
-    "g" (sigsave.func), "o" (pid_offset), "g" (sigsave.saved_errno), "g" (sigsave.newmask)
+    "g" (sigsave.func), "g" (sigsave.saved_errno), "g" (sigsave.newmask)
 );
 }
 }

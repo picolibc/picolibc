@@ -1,6 +1,6 @@
 /* passwd.cc: getpwnam () and friends
 
-   Copyright 1996, 1997, 1998, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -111,16 +111,23 @@ add_pwd_line (char *line)
 
 class passwd_lock
 {
-  pthread_mutex_t mutex;
+  bool armed;
+  static NO_COPY pthread_mutex_t mutex;
  public:
-  passwd_lock (): mutex ((pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER) {}
-  void arm () {pthread_mutex_lock (&mutex); }
+  passwd_lock (bool doit)
+  {
+    if (doit)
+      pthread_mutex_lock (&mutex);
+    armed = doit;
+  }
   ~passwd_lock ()
   {
-    if (mutex != (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER)
+    if (armed)
       pthread_mutex_unlock (&mutex);
   }
 };
+
+pthread_mutex_t NO_COPY passwd_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 /* Read in /etc/passwd and save contents in the password cache.
    This sets passwd_state to loaded or emulated so functions in this file can
@@ -133,10 +140,7 @@ read_etc_passwd ()
      * for non-shared mutexs in the future. Also, this function will at most be called
      * once from each thread, after that the passwd_state test will succeed
      */
-    static NO_COPY passwd_lock here;
-
-    if (cygwin_finished_initializing)
-      here.arm ();
+    passwd_lock here (cygwin_finished_initializing);
 
     /* if we got blocked by the mutex, then etc_passwd may have been processed */
     if (passwd_state != uninitialized)
@@ -183,7 +187,7 @@ read_etc_passwd ()
 /* Cygwin internal */
 /* If this ever becomes non-reentrant, update all the getpw*_r functions */
 static struct passwd *
-search_for (uid_t uid, const char *name)
+search_for (__uid16_t uid, const char *name)
 {
   struct passwd *res = 0;
   struct passwd *default_pw = 0;
@@ -214,7 +218,7 @@ search_for (uid_t uid, const char *name)
 }
 
 extern "C" struct passwd *
-getpwuid (uid_t uid)
+getpwuid (__uid16_t uid)
 {
   if (passwd_state  <= initializing)
     read_etc_passwd ();
@@ -225,7 +229,7 @@ getpwuid (uid_t uid)
 }
 
 extern "C" int
-getpwuid_r (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
+getpwuid_r (__uid16_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
 {
   *result = NULL;
 
@@ -337,7 +341,7 @@ getpwent (void)
 }
 
 extern "C" struct passwd *
-getpwduid (uid_t)
+getpwduid (__uid16_t)
 {
   return NULL;
 }

@@ -1,6 +1,6 @@
 /* fhandler_mem.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -231,8 +231,8 @@ fhandler_dev_mem::close (void)
   return fhandler_base::close ();
 }
 
-off_t
-fhandler_dev_mem::lseek (off_t offset, int whence)
+__off64_t
+fhandler_dev_mem::lseek (__off64_t offset, int whence)
 {
   switch (whence)
     {
@@ -251,13 +251,13 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
 
     default:
       set_errno (EINVAL);
-      return (off_t) -1;
+      return ILLEGAL_SEEK;
     }
 
   if (pos > mem_size)
     {
       set_errno (EINVAL);
-      return (off_t) -1;
+      return ILLEGAL_SEEK;
     }
 
   return pos;
@@ -265,11 +265,11 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
 
 HANDLE
 fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
-			int flags, off_t off)
+			int flags, __off64_t off)
 {
-  if ((DWORD) off >= mem_size
+  if (off >= mem_size
       || (DWORD) len >= mem_size
-      || (DWORD) off + len >= mem_size)
+      || off + len >= mem_size)
     {
       set_errno (EINVAL);
       syscall_printf ("-1 = mmap(): illegal parameter, set EINVAL");
@@ -402,7 +402,7 @@ fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 }
 
 int
-fhandler_dev_mem::fstat (struct stat *buf, path_conv *pc)
+fhandler_dev_mem::fstat (struct __stat64 *buf, path_conv *pc)
 {
   this->fhandler_base::fstat (buf, pc);
   buf->st_mode = S_IFCHR;

@@ -1,6 +1,6 @@
 /* fhandler_dev_clipboard: code to access /dev/clipboard
 
-   Copyright 2000, 2001 Red Hat, Inc
+   Copyright 2000, 2001, 2002 Red Hat, Inc
 
    Written by Charles Wilson (cwilson@ece.gatech.edu)
 
@@ -246,8 +246,8 @@ fhandler_dev_clipboard::read (void *ptr, size_t len)
     }
 }
 
-off_t
-fhandler_dev_clipboard::lseek (off_t offset, int whence)
+__off64_t
+fhandler_dev_clipboard::lseek (__off64_t offset, int whence)
 {
   /* On reads we check this at read time, not seek time.
    * On writes we use this to decide how to write - empty and write, or open, copy, empty

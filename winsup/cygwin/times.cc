@@ -24,6 +24,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "hires.h"
 
 #define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL
@@ -149,34 +150,21 @@ totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
   dst->tv_sec = x / (long long) (1e6);
 }
 
-/* gettimeofday: BSD */
+/* FIXME: Make thread safe */
 extern "C" int
-gettimeofday (struct timeval *p, struct timezone *z)
+gettimeofday(struct timeval *tv, struct timezone *tz)
 {
-  int res = 0;
+  static hires gtod;
+  LONGLONG now = gtod.usecs (false);
+  if (now == (LONGLONG) -1)
+    return -1;
 
-  if (p != NULL)
-    {
-      FILETIME f;
-
-      GetSystemTimeAsFileTime (&f);
-      totimeval (p, &f, 0, 1);
-    }
-
-  if (z != NULL)
-    {
-      tzset();
-      z->tz_minuteswest = _timezone / 60;
-      z->tz_dsttime = _daylight;
-    }
-
-  syscall_printf ("%d = gettimeofday (%x, %x)", res, p, z);
-
-  return res;
+  tv->tv_sec = now / 1000000;
+  tv->tv_usec = now % 1000000;
+  return 0;
 }
 
-extern "C"
-int
+extern "C" int
 _gettimeofday (struct timeval *p, struct timezone *z)
 {
   return gettimeofday (p, z);
@@ -568,4 +556,59 @@ extern "C"
 void
 cygwin_tzset ()
 {
+}
+
+void
+hires::prime ()
+{
+  LARGE_INTEGER ifreq;
+  if (!QueryPerformanceFrequency (&ifreq))
+    {
+      inited = -1;
+      return;
+    }
+
+  FILETIME f;
+  int priority = GetThreadPriority (GetCurrentThread ());
+  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+  if (!QueryPerformanceCounter (&primed_pc))
+    {
+      SetThreadPriority (GetCurrentThread (), priority);
+      inited = -1;
+      return;
+    }
+
+  GetSystemTimeAsFileTime (&f);
+  SetThreadPriority (GetCurrentThread (), priority);
+
+  inited = 1;
+  primed_ft.HighPart = f.dwHighDateTime;
+  primed_ft.LowPart = f.dwLowDateTime;
+  primed_ft.QuadPart -= FACTOR;
+  primed_ft.QuadPart /= 10;
+  freq = (double) ((double) 1000000. / (double) ifreq.QuadPart);
+  return;
+}
+
+LONGLONG
+hires::usecs (bool justdelta)
+{
+  if (!inited)
+    prime ();
+  if (inited < 0)
+    {
+      set_errno (ENOSYS);
+      return (long long) -1;
+    }
+
+  LARGE_INTEGER now;
+  if (!QueryPerformanceCounter (&now))
+    {
+      set_errno (ENOSYS);
+      return -1;
+    }
+
+  // FIXME: Use round() here?
+  now.QuadPart = (LONGLONG) (freq * (double) (now.QuadPart - primed_pc.QuadPart));
+  return justdelta ? now.QuadPart : primed_ft.QuadPart + now.QuadPart;
 }

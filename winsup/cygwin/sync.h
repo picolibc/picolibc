@@ -23,17 +23,13 @@ public:
   class muto *next;
   const char *name;
 
-  muto() {}
   /* The real constructor. */
-  muto(int inh, const char *name);
+  muto *init(const char *name) __attribute__ ((regparm (3)));
 
-  void *operator new (size_t, void *p) {return p;}
-  void *operator new (size_t) {return ::new muto; }
-  void operator delete (void *) {;} /* can't handle allocated mutos
-					currently */
-
-  ~muto ();
-  int acquire (DWORD ms = INFINITE) __attribute__ ((regparm(1))); /* Acquire the lock. */
+#if 0	/* FIXME: See comment in sync.cc */
+  ~muto ()
+#endif
+  int acquire (DWORD ms = INFINITE) __attribute__ ((regparm (1))); /* Acquire the lock. */
   int release ();		     /* Release the lock. */
 
   /* Return true if caller thread owns the lock. */
@@ -46,11 +42,8 @@ public:
 extern muto muto_start;
 
 /* Use a statically allocated buffer as the storage for a muto */
-#define new_muto(__inh, __name) \
+#define new_muto(__name) \
 ({ \
-  static volatile __attribute__((section(".data_cygwin_nocopy"))) muto __mbuf; \
-  (void) new ((void *) &__mbuf) muto (__inh, __name); \
-  __mbuf.next = muto_start.next; \
-  muto_start.next = (muto *) &__mbuf; \
-  (muto *) &__mbuf; \
+  static muto __name##_storage __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy"))); \
+  __name = __name##_storage.init (#__name); \
 })

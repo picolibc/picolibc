@@ -1,6 +1,6 @@
 /* pinfo.h: process table info
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -65,8 +65,8 @@ public:
      if not found.  This data resides in the shared data area (allowing
      tasks to store whatever they want here) so it's for informational
      purposes only. */
-  uid_t uid;		/* User ID */
-  gid_t gid;		/* Group ID */
+  __uid16_t uid;		/* User ID */
+  __gid16_t gid;		/* Group ID */
   pid_t pgid;		/* Process group ID */
   pid_t sid;		/* Session ID */
   int ctty;		/* Control tty */

@@ -452,7 +452,7 @@ peek_pipe (select_record *s, bool from_select)
       n = -1;
     }
   else if (!n || !guard_mutex)
-    /* no guard mutex or nothing to read fromt he pipe. */;
+    /* no guard mutex or nothing to read from the pipe. */;
   else if (WaitForSingleObject (guard_mutex, 0) != WAIT_OBJECT_0)
     {
       select_printf ("%s, couldn't get mutex %p, %E", fh->get_name (),

@@ -1,6 +1,6 @@
 /* pipe.cc: pipe for Cygwin.
 
-   Copyright 1996, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -31,8 +31,8 @@ fhandler_pipe::fhandler_pipe (DWORD devtype)
 {
 }
 
-off_t
-fhandler_pipe::lseek (off_t offset, int whence)
+__off64_t
+fhandler_pipe::lseek (__off64_t offset, int whence)
 {
   debug_printf ("(%d, %d)", offset, whence);
   set_errno (ESPIPE);

@@ -45,6 +45,7 @@ static NO_COPY wincaps wincap_unknown = {
   has_try_enter_critical_section:false,
   has_raw_devices:false,
   has_valid_processorlevel:false,
+  has_64bit_file_access:false,
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -81,6 +82,7 @@ static NO_COPY wincaps wincap_95 = {
   has_try_enter_critical_section:false,
   has_raw_devices:false,
   has_valid_processorlevel:false,
+  has_64bit_file_access:false,
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -117,6 +119,7 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_try_enter_critical_section:false,
   has_raw_devices:false,
   has_valid_processorlevel:false,
+  has_64bit_file_access:false,
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -153,6 +156,7 @@ static NO_COPY wincaps wincap_98 = {
   has_try_enter_critical_section:false,
   has_raw_devices:false,
   has_valid_processorlevel:true,
+  has_64bit_file_access:false,
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -189,6 +193,7 @@ static NO_COPY wincaps wincap_98se = {
   has_try_enter_critical_section:false,
   has_raw_devices:false,
   has_valid_processorlevel:true,
+  has_64bit_file_access:false,
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -225,6 +230,7 @@ static NO_COPY wincaps wincap_me = {
   has_try_enter_critical_section:false,
   has_raw_devices:false,
   has_valid_processorlevel:true,
+  has_64bit_file_access:false,
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -261,6 +267,7 @@ static NO_COPY wincaps wincap_nt3 = {
   has_try_enter_critical_section:false,
   has_raw_devices:true,
   has_valid_processorlevel:true,
+  has_64bit_file_access:true,
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -297,6 +304,7 @@ static NO_COPY wincaps wincap_nt4 = {
   has_try_enter_critical_section:true,
   has_raw_devices:true,
   has_valid_processorlevel:true,
+  has_64bit_file_access:true,
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -333,6 +341,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_try_enter_critical_section:true,
   has_raw_devices:true,
   has_valid_processorlevel:true,
+  has_64bit_file_access:true,
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -369,6 +378,7 @@ static NO_COPY wincaps wincap_2000 = {
   has_try_enter_critical_section:true,
   has_raw_devices:true,
   has_valid_processorlevel:true,
+  has_64bit_file_access:true,
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -405,6 +415,7 @@ static NO_COPY wincaps wincap_xp = {
   has_try_enter_critical_section:true,
   has_raw_devices:true,
   has_valid_processorlevel:true,
+  has_64bit_file_access:true,
 };
 
 wincapc NO_COPY wincap;
@@ -413,6 +424,9 @@ void
 wincapc::init ()
 {
   const char *os;
+
+  if (caps)
+    return;		// already initialized
 
   memset (&version, 0, sizeof version);
   version.dwOSVersionInfoSize = sizeof version;

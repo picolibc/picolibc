@@ -27,6 +27,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include <assert.h>
+#include <limits.h>
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
@@ -49,7 +50,7 @@ fhandler_base::operator =(fhandler_base &x)
 }
 
 int
-fhandler_base::puts_readahead (const char *s, size_t len = (size_t) -1)
+fhandler_base::puts_readahead (const char *s, size_t len)
 {
   int success = 1;
   while ((*s || (len != (size_t) -1 && len--))
@@ -98,7 +99,7 @@ fhandler_base::peek_readahead (int queryput)
 }
 
 void
-fhandler_base::set_readahead_valid (int val, int ch = -1)
+fhandler_base::set_readahead_valid (int val, int ch)
 {
   if (!val)
     ralen = raixget = raixput = 0;
@@ -693,10 +694,22 @@ fhandler_base::write (const void *ptr, size_t len)
   return res;
 }
 
-off_t
-fhandler_base::lseek (off_t offset, int whence)
+__off64_t
+fhandler_base::lseek (__off64_t offset, int whence)
 {
-  off_t res;
+  __off64_t res;
+
+  /* 9x/Me doesn't support 64bit offsets.  We trap that here and return
+     EINVAL.  It doesn't make sense to simulate bigger offsets by a
+     SetFilePointer sequence since FAT and FAT32 don't support file
+     size >= 4GB anyway. */
+  if (!wincap.has_64bit_file_access ()
+      && (offset < LONG_MIN || offset > LONG_MAX))
+    {
+      debug_printf ("Win9x, offset not 32 bit.");
+      set_errno (EINVAL);
+      return (__off64_t)-1;
+    }
 
   /* Seeks on text files is tough, we rewind and read till we get to the
      right place.  */
@@ -708,70 +721,16 @@ fhandler_base::lseek (off_t offset, int whence)
       set_readahead_valid (0);
     }
 
-  debug_printf ("lseek (%s, %d, %d)", unix_path_name, offset, whence);
-
-#if 0	/* lseek has no business messing about with text-mode stuff */
-
-  if (!get_r_binary ())
-    {
-      int newplace;
-
-      if (whence == 0)
-	{
-	  newplace = offset;
-	}
-      else if (whence ==1)
-	{
-	  newplace = rpos +  offset;
-	}
-      else
-	{
-	  /* Seek from the end of a file.. */
-	  if (rsize == -1)
-	    {
-	      /* Find the size of the file by reading till the end */
-
-	      char b[CHUNK_SIZE];
-	      while (read (b, sizeof (b)) > 0)
-		;
-	      rsize = rpos;
-	    }
-	  newplace = rsize + offset;
-	}
-
-      if (rpos > newplace)
-	{
-	  SetFilePointer (handle, 0, 0, 0);
-	  rpos = 0;
-	}
-
-      /* You can never shrink something more than 50% by turning CRLF into LF,
-	 so we binary chop looking for the right place */
-
-      while (rpos < newplace)
-	{
-	  char b[CHUNK_SIZE];
-	  size_t span = (newplace - rpos) / 2;
-	  if (span == 0)
-	    span = 1;
-	  if (span > sizeof (b))
-	    span = sizeof (b);
-
-	  debug_printf ("lseek (%s, %d, %d) span %d, rpos %d newplace %d",
-		       name, offset, whence,span,rpos, newplace);
-	  read (b, span);
-	}
-
-      debug_printf ("Returning %d", newplace);
-      return newplace;
-    }
-#endif	/* end of deleted code dealing with text mode */
+  debug_printf ("lseek (%s, %D, %d)", unix_path_name, offset, whence);
 
   DWORD win32_whence = whence == SEEK_SET ? FILE_BEGIN
 		       : (whence == SEEK_CUR ? FILE_CURRENT : FILE_END);
 
-  res = SetFilePointer (get_handle(), offset, 0, win32_whence);
-  if (res == -1)
+  LONG off_low = offset & 0xffffffff;
+  LONG off_high = wincap.has_64bit_file_access () ? offset >> 32 : 0;
+
+  res = SetFilePointer (get_handle(), off_low, &off_high, win32_whence);
+  if (res == INVALID_SET_FILE_POINTER && GetLastError ())
     {
       __seterrno ();
     }
@@ -862,7 +821,7 @@ rootdir(char *full_path)
 }
 
 int __stdcall
-fhandler_base::fstat (struct stat *buf, path_conv *)
+fhandler_base::fstat (struct __stat64 *buf, path_conv *)
 {
   switch (get_device ())
     {
@@ -1181,7 +1140,7 @@ fhandler_base::readdir (DIR *)
   return NULL;
 }
 
-off_t
+__off64_t
 fhandler_base::telldir (DIR *)
 {
   set_errno (ENOTDIR);
@@ -1189,7 +1148,7 @@ fhandler_base::telldir (DIR *)
 }
 
 void
-fhandler_base::seekdir (DIR *, off_t)
+fhandler_base::seekdir (DIR *, __off64_t)
 {
   set_errno (ENOTDIR);
   return;

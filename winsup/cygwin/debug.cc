@@ -37,7 +37,7 @@ static NO_COPY thread_info threads[32] = {{0, NULL}};	// increase as necessary
 void
 threadname_init ()
 {
-  threadname_lock = new_muto (FALSE, "threadname_lock");
+  new_muto (threadname_lock);
 }
 
 void __stdcall
@@ -184,18 +184,19 @@ static handle_list NO_COPY freeh[1000] = {{0, NULL, NULL, NULL, 0, 0, NULL}};
 
 static muto NO_COPY *debug_lock = NULL;
 
-#define lock_debug() \
-  do {if (debug_lock) debug_lock->acquire (INFINITE); } while (0)
-
-#define unlock_debug() \
-  do {if (debug_lock) debug_lock->release (); } while (0)
+struct lock_debug
+{
+  lock_debug () {if (debug_lock) debug_lock->acquire (INFINITE);}
+  void unlock () {if (debug_lock) debug_lock->release ();}
+  ~lock_debug () {unlock ();}
+};
 
 static bool __stdcall mark_closed (const char *, int, HANDLE, const char *, BOOL);
 
 void
 debug_init ()
 {
-  debug_lock = new_muto (FALSE, "debug_lock");
+  new_muto (debug_lock);
 }
 
 /* Find a registered handle in the linked list of handles. */
@@ -229,7 +230,8 @@ static handle_list * __stdcall
 newh ()
 {
   handle_list *hl;
-  lock_debug ();
+  lock_debug here;
+
   for (hl = freeh; hl < freeh + NFREEH; hl++)
     if (hl->name == NULL)
       goto out;
@@ -242,7 +244,6 @@ newh ()
     }
 
 out:
-  unlock_debug ();
   return hl;
 }
 
@@ -251,7 +252,7 @@ void __stdcall
 add_handle (const char *func, int ln, HANDLE h, const char *name)
 {
   handle_list *hl;
-  lock_debug ();
+  lock_debug here;
 
   if ((hl = find_handle (h)))
     {
@@ -260,12 +261,12 @@ add_handle (const char *func, int ln, HANDLE h, const char *name)
 		     ln, name, h);
       system_printf (" previously allocated by %s:%d(%s<%p>)",
 		     hl->func, hl->ln, hl->name, hl->h);
-      goto out;		/* Already did this once */
+      return;
     }
 
   if ((hl = newh ()) == NULL)
     {
-      unlock_debug ();
+      here.unlock ();
       system_printf ("couldn't allocate memory for %s(%d): %s(%p)",
 		     func, ln, name, h);
       return;
@@ -278,8 +279,7 @@ add_handle (const char *func, int ln, HANDLE h, const char *name)
   endh->next = hl;
   endh = hl;
 
-out:
-  unlock_debug ();
+  return;
 }
 
 static void __stdcall
@@ -306,11 +306,12 @@ static bool __stdcall
 mark_closed (const char *func, int ln, HANDLE h, const char *name, BOOL force)
 {
   handle_list *hl;
-  lock_debug ();
+  lock_debug here;
+
   if ((hl = find_handle (h)) && !force)
     {
       hl = hl->next;
-      unlock_debug ();	// race here
+      here.unlock ();	// race here
       system_printf ("attempt to close protected handle %s:%d(%s<%p>)",
 		     hl->func, hl->ln, hl->name, hl->h);
       system_printf (" by %s:%d(%s<%p>)", func, ln, name, h);
@@ -328,7 +329,6 @@ mark_closed (const char *func, int ln, HANDLE h, const char *name, BOOL force)
   if (hl)
     delete_handle (hl);
 
-  unlock_debug ();
   return TRUE;
 }
 
@@ -338,14 +338,13 @@ BOOL __stdcall
 close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
 {
   BOOL ret;
-  lock_debug ();
+  lock_debug here;
 
   if (!mark_closed (func, ln, h, name, force))
     return FALSE;
 
   ret = CloseHandle (h);
 
-  unlock_debug ();
 #if 0 /* Uncomment to see CloseHandle failures */
   if (!ret)
     small_printf ("CloseHandle(%s) failed %s:%d\n", name, func, ln);
@@ -353,7 +352,6 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
   return ret;
 }
 
-/* Add a handle to the linked list of known handles. */
 int __stdcall
 __set_errno (const char *func, int ln, int val)
 {

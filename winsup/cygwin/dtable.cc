@@ -34,7 +34,7 @@ details. */
 #include "cygheap.h"
 
 static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
-			     STD_ERROR_HANDLE};
+					   STD_ERROR_HANDLE};
 
 /* Set aside space for the table of fds */
 void
@@ -90,49 +90,75 @@ dtable::extend (int howmuch)
   return 1;
 }
 
+void
+dtable::get_debugger_info ()
+{
+  if (IsDebuggerPresent ())
+    {
+      char std[3][sizeof ("/dev/ttyNNNN")];
+      std[0][0] = std[1][0] = std [2][0] = '\0';
+      char buf[sizeof ("cYgstd %x") + 32];
+      sprintf (buf, "cYgstd %x %x %x", (unsigned) &std, sizeof (std[0]), 3);
+      OutputDebugString (buf);
+      for (int i = 0; i < 3; i++)
+	if (std[i][0])
+	  {
+	    path_conv pc;
+	    HANDLE h = GetStdHandle (std_consts[i]);
+	    fhandler_base *fh = build_fhandler_from_name (i, std[i], NULL, pc);
+	    if (!fh)
+	      continue;
+	    if (!fh->open (&pc, (i ? O_WRONLY : O_RDONLY) | O_BINARY, 0777))
+	      release (i);
+	    else
+	      CloseHandle (h);
+	  }
+    }
+}
+
 /* Initialize the file descriptor/handle mapping table.
    This function should only be called when a cygwin function is invoked
    by a non-cygwin function, i.e., it should only happen very rarely. */
 
 void
-stdio_init (void)
+dtable::stdio_init ()
 {
   extern void set_console_ctty ();
   /* Set these before trying to output anything from strace.
      Also, always set them even if we're to pick up our parent's fds
      in case they're missed.  */
 
-  if (!myself->ppid_handle && NOTSTATE (myself, PID_CYGPARENT))
+  if (myself->ppid_handle || ISSTATE (myself, PID_CYGPARENT))
+    return;
+
+  HANDLE in = GetStdHandle (STD_INPUT_HANDLE);
+  HANDLE out = GetStdHandle (STD_OUTPUT_HANDLE);
+  HANDLE err = GetStdHandle (STD_ERROR_HANDLE);
+
+  init_std_file_from_handle (0, in, GENERIC_READ);
+
+  /* STD_ERROR_HANDLE has been observed to be the same as
+     STD_OUTPUT_HANDLE.  We need separate handles (e.g. using pipes
+     to pass data from child to parent).  */
+  if (out == err)
     {
-      HANDLE in = GetStdHandle (STD_INPUT_HANDLE);
-      HANDLE out = GetStdHandle (STD_OUTPUT_HANDLE);
-      HANDLE err = GetStdHandle (STD_ERROR_HANDLE);
-
-      cygheap->fdtab.init_std_file_from_handle (0, in, GENERIC_READ);
-
-      /* STD_ERROR_HANDLE has been observed to be the same as
-	 STD_OUTPUT_HANDLE.  We need separate handles (e.g. using pipes
-	 to pass data from child to parent).  */
-      if (out == err)
+      /* Since this code is not invoked for forked tasks, we don't have
+	 to worry about the close-on-exec flag here.  */
+      if (!DuplicateHandle (hMainProc, out, hMainProc, &err, 0,
+			     1, DUPLICATE_SAME_ACCESS))
 	{
-	  /* Since this code is not invoked for forked tasks, we don't have
-	     to worry about the close-on-exec flag here.  */
-	  if (!DuplicateHandle (hMainProc, out, hMainProc, &err, 0,
-				 1, DUPLICATE_SAME_ACCESS))
-	    {
-	      /* If that fails, do this as a fall back.  */
-	      err = out;
-	      system_printf ("couldn't make stderr distinct from stdout");
-	    }
+	  /* If that fails, do this as a fall back.  */
+	  err = out;
+	  system_printf ("couldn't make stderr distinct from stdout");
 	}
-
-      cygheap->fdtab.init_std_file_from_handle (1, out, GENERIC_WRITE);
-      cygheap->fdtab.init_std_file_from_handle (2, err, GENERIC_WRITE);
-      /* Assign the console as the controlling tty for this process if we actually
-	 have a console and no other controlling tty has been assigned. */
-      if (myself->ctty < 0 && GetConsoleCP () > 0)
-	set_console_ctty ();
     }
+
+  init_std_file_from_handle (1, out, GENERIC_WRITE);
+  init_std_file_from_handle (2, err, GENERIC_WRITE);
+  /* Assign the console as the controlling tty for this process if we actually
+     have a console and no other controlling tty has been assigned. */
+  if (myself->ctty < 0 && GetConsoleCP () > 0)
+    set_console_ctty ();
 }
 
 int
@@ -196,6 +222,9 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 
   first_fd_for_open = 0;
 
+  if (!not_open (fd))
+    return;
+
   if (!handle || handle == INVALID_HANDLE_VALUE)
     {
       fds[fd] = NULL;
@@ -258,14 +287,13 @@ dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
       return NULL;
     }
 
-  fhandler_base *fh = build_fhandler (fd, pc.get_devn (), name, pc.get_unitn ());
-  fh->set_name (name, pc, pc.get_unitn ());
-  return fh;
+  return build_fhandler (fd, pc.get_devn (), name, pc, pc.get_unitn ());
 }
 
 #define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
-dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
+dtable::build_fhandler (int fd, DWORD dev, const char *unix_name,
+			const char *win32_name, int unit)
 {
   fhandler_base *fh;
 
@@ -340,6 +368,20 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 	fh = NULL;
     }
 
+  if (unix_name)
+    {
+      char new_win32_name[strlen (unix_name) + 1];
+      if (!win32_name)
+	{
+	  char *p;
+	  /* FIXME: ? Should we call win32_device_name here?
+	     It seems like overkill, but... */
+	  win32_name = strcpy (new_win32_name, unix_name);
+	  for (p = (char *) win32_name; (p = strchr (p, '/')); p++)
+	    *p = '\\';
+	}
+      fh->set_name (unix_name, win32_name, fh->get_unit ());
+    }
   debug_printf ("fd %d, fh %p", fd, fh);
   return fd >= 0 ? (fds[fd] = fh) : fh;
 }

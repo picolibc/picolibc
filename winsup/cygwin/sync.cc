@@ -28,18 +28,24 @@ muto NO_COPY muto_start;
 #undef WaitForSingleObject
 
 /* Constructor */
-muto::muto (int inh, const char *s) : sync (0), visits(0), waiters(-1), tid (0), next (NULL)
+muto *
+muto::init (const char *s)
 {
+  waiters = -1;
   /* Create event which is used in the fallback case when blocking is necessary */
-  if (!(bruteforce = CreateEvent (inh ? &sec_all_nih : &sec_none_nih, FALSE, FALSE, name)))
+  if (!(bruteforce = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL)))
     {
       DWORD oerr = GetLastError ();
       SetLastError (oerr);
-      return;
+      return NULL;
     }
   name = s;
+  next = muto_start.next;
+  muto_start.next = this;
+  return this;
 }
 
+#if 0 /* FIXME: Do we need this? mutos aren't destroyed until process exit */
 /* Destructor (racy?) */
 muto::~muto ()
 {
@@ -52,6 +58,7 @@ muto::~muto ()
   if (h)
     CloseHandle (h);
 }
+#endif
 
 /* Acquire the lock.  Argument is the number of milliseconds to wait for
    the lock.  Multiple visits from the same thread are allowed and should

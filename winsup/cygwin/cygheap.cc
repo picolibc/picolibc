@@ -197,7 +197,7 @@ _csbrk (int sbs)
 extern "C" void __stdcall
 cygheap_init ()
 {
-  cygheap_protect = new_muto (FALSE, "cygheap_protect");
+  new_muto (cygheap_protect);
   _csbrk (0);
   if (!cygheap->fdtab)
     cygheap->fdtab.init ();

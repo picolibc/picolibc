@@ -278,6 +278,348 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	* include/sys/ipc.h: New file.
 	* include/sys/shm.h: New file.
 
+2002-02-27  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (fstat64): New symbol.
+	(ftruncate64): Ditto.
+	(lseek64): Ditto.
+	(lstat64): Ditto.
+	(mmap64): Ditto.
+	(seekdir64): Ditto.
+	(stat64): Ditto.
+	(telldir64): Ditto.
+	(truncate64): Ditto.
+	* dir.cc (telldir64): New function.
+	(telldir): Call telldir64().
+	(seekdir64): New function.
+	(seekdir): Call seekdir64().
+	* fhandler.h: Redefine all methods using __off32_t to use __off64_t.
+	* fhandler.cc: Use __off64_t and struct __stat64 throughout.
+	* fhandler_clipboard.cc: Ditto.
+	* fhandler_disk_file.cc: Ditto.
+	* fhandler_dsp.cc: Ditto.
+	* fhandler_floppy.cc: Ditto.
+	* fhandler_mem.cc: Ditto.
+	* fhandler_random.cc: Ditto.
+	* fhandler_socket.cc: Ditto.
+	* fhandler_tape.cc: Ditto.
+	* fhandler_zero.cc: Ditto.
+	* pipe.cc: Ditto.
+	* glob.c: Ditto, call lstat64 and stat64 in Cygwin.
+	* mmap.cc: Use __off64_t throughout.
+	(mmap64): New function.
+	* sec_acl.cc (acl_worker): Use struct __stat64, call stat64 and lstat64.
+	* syscalls.cc (lseek64): New function.
+	(stat64_to_stat32): Ditto.
+	(fstat64): Ditto.
+	(stat64): Ditto.
+	(lstat64): Ditto.
+	(ftruncate64): Ditto.
+	(truncate64): Ditto.
+	(_fstat): Call fstat64.
+	(_stat): Call stat64.
+	(cygwin_lstat): Rename to avoid declaration problem.  Call lstat64.
+	(stat_worker): Use struct __stat64.
+	(access): Ditto.
+	(ftruncate): Call ftruncate64.
+	(truncate): Call truncate64.
+	* wincap.cc: Set flag has_64bit_file_access appropriately.
+	* wincap.h: Add flag has_64bit_file_access.
+	* winsup.h (ILLEGAL_SEEK): Define as __off64_t.
+	(stat_dev): Declare using struct __stat64.
+	(stat_worker): Ditto.
+	* include/cygwin/stat.h (struct __stat32): Define if compiling Cygwin.
+	(struct __stat64): Ditto.
+	(struct stat): Revert definition with explicitly sized datatypes.
+	Eliminate sized field names.
+	* include/cygwin/types.h (blksize_t): New type.
+	(__blkcnt32_t): Ditto.
+	(__blkcnt64_t): Ditto.
+	(blkcnt_t): Ditto.
+
+2002-02-22  Christopher Faylor  <cgf@redhat.com>
+
+	* sync.h (new_muto): Just accept an argument which denotes the name of
+	the muto.  Use this argument to construct static storage.
+	* cygheap.cc (cygheap_init): Reflect above change.
+	* exceptions.cc (events_init): Ditto.
+	* malloc.cc (malloc_init): Ditto.
+	* path.cc (cwdstuff::init): Ditto.
+	* cygheap.h (cwdstuff): Change name of lock element to make it less
+	generic.
+	* path.cc (cwdstuff::get_hash): Ditto.
+	(cwdstuff::get_initial): Ditto.
+	(cwdstuff::set): Ditto.
+	(cwdstuff::get): Ditto.
+	* sigproc.cc (proc_subproc): Ditto.
+
+	* debug.cc (lock_debug): Change to method.  Use method rather than
+	macro throughout.
+
+	* tty.h (tty_min::kill_pgrp): Declare new method.
+	* fhandler_termios.cc (tty_min::kill_pgrp): New method.
+	(fhandler_termios::line_edit): Use new method for killing process.
+	* dcrt0.cc (do_exit): Ditto.
+
+	* dtable.cc (dtable::get_debugger_info): New method for inheriting
+	dtable info from a debugger.
+	* tty.cc (tty_init): Attempt to grab file handle info from parent
+	debugger, if appropriate.
+
+	# dtable.cc (dtable::stdio_init): Make this a method.
+	(dtable::init_std_file_from_handle): Don't set fd unless it's not open.
+	(dtable::build_fhandler_from_name): Move name setting to
+	dtable::build_fhandler.
+	(dtable::build_fhandler): Add win32 name parameter.
+	* dcrt0.cc (dll_crt0_1): Change to use dtable stdio_init.
+	* dtable.h (dtable): Reflect build_fhandler parameter change.
+	* mmap.cc (mmap_record::alloc_fh): Don't set name parameter in
+	build_fhandler.
+	* net.cc (fdsock): Remove set_name call since it is now handled by
+	build_fhandler.
+
+	* sigproc.cc (proc_subproc): Release muto as early as possible.
+
+2001-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprint.c (rn): Allow long long values.
+	(__small_vsprintf): Add 'D', 'U' and 'X' formats for long long
+	parameters.
+
+2002-02-19  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::puts_readahead): Remove default parameter
+	setting.  Newer gcc's complain about this.
+	(fhandler_base::set_readahead_valid): Ditto.
+	* fhandler_dsp.cc (Audio::open): Ditto.
+	(fhandler_dev_dsp::open): Ditto.
+
+2002-02-19  Christopher Faylor  <cgf@redhat.com>
+
+	* fork.cc (fork_parent): Use sec_user_nih to control process/thread
+	inheritance/permission.
+	* spawn.cc (spawn_guts): Ditto.
+	* security.cc (create_token): Initialize token so that it is not tested
+	for bogus value later.  Use sec_user to control process/thread
+	creation.
+	* security.h (__sec_user): Rename declaration from sec_user.
+	(sec_user_nih): Declare here as inline function wrapper for __sec_user.
+	(sec_user): Ditto.
+	* sigproc.cc (czombies): Allocate a character array for zombies to
+	avoid constructor overhead
+	(extremely hackish, I know).
+	(cpchildren): Ditto.
+	(pchildren): New define.
+	(zombies): Ditto.
+	(getsem): Use sec_user_nih to control semaphore inheritance/permission.
+
+2002-02-16  Christopher Faylor  <cgf@redhat.com>
+
+	* times.cc (hires::prime): Restore thread priority on failure
+	condition.
+
+	* uinfo.cc (uinfo_init): Use more robust method for determining if
+	process was invoked from a non-cygwin process.
+
+	* sync.h (muto::init): Eliminate "inheritance" parameter.
+	(new_muto): Reflect removal of parameter.
+	* sync.cc (muto::init): Ditto.
+	* cygheap.cc (cygheap_init): Ditto.
+	* debug.cc (threadname_init): Ditto.
+	* exceptions.cc (events_init): Ditto.
+	* malloc.cc (malloc_init): Ditto.
+	* path.cc (cwdstuff::init): Ditto.
+	* sigproc.cc (sigproc_init): Ditto.
+
+	* grp.cc (group_lock): Use different method for locking with static
+	member.
+	(read_etc_group): REALLY ensure that read lock mutex is released.
+	* passwd.cc (passwd_lock): Use different method for locking with static
+	member.
+	(read_etc_passwd): REALLY ensure that read lock mutex is released.
+
+	* shared.cc (sec_user): Correct reversed inheritance test.
+
+2002-02-15  Christopher Faylor  <cgf@redhat.com>
+
+	* hires.h (hires::usecs): Rename from utime.  Accept an argument.
+	* strace.cc (strace::microseconds): Use hires class for calculating
+	times.
+	* sync.h (new_muto): Use NO_COPY explicitly in declaration.
+	* times.cc (gettimeofday): Reflect change in usecs argument.
+	(hires::usecs): Ditto.  Changed name from utime.
+	* winsup.h (NO_COPY): Add nocommon attribute to force setting aside
+	space for variable.
+	* regcomp.c (REQUIRE): Add a void cast to bypass a warning.
+
+2002-02-15  Christopher Faylor  <cgf@redhat.com>
+
+	* hires.h: New file.
+	* times.cc (gettimeofday): Use hires class for calculating current time.
+	(hires::prime): New method.
+	(hires::utime): Ditto.
+
+2002-02-14  Christopher Faylor  <cgf@redhat.com>
+
+	* include/sys/cygwin.h (cygwin_getinfo_types): New CW_STRACE_ACTIVE.
+	* external.cc (cygwin_internal): Handle CW_STRACE_ACTIVE.
+
+2002-02-14  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (unused_sig_wrapper): Eliminate unused parameter to
+	asm.
+	* external.cc (cygwin_internal): Change CW_STRACE_ON to
+	CW_STRACE_TOGGLE.
+	* strace.cc (strace::hello): Toggle strace on and off.
+	* sync.cc (muto::init): Renamed from constructor.
+	* sync.h (muto::new): Delete.
+	(muto::delete): Ditto.
+	(new_muto): Simplify.  Use muto.init for nearly everything.
+	* uinfo.cc (uinfo_init): Avoid closing a NULL handle.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Rename CW_STRACE_OFF to
+	CW_STRACE_TOGGLE.  Delete CW_STRACE_OFF.
+	* include/sys/strace.h (strace): Add "inited" field.
+
+2001-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/acl.h: Fix definition of aclent_t.
+
+2002-02-10  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (DLL_OFILES): Consolidate object files.
+
+2002-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h, cygheap.h, fhandler_clipboard.cc, fhandler_dsp.cc,
+	fhandler_floppy.cc, fhandler_mem.cc, fhandler_random.cc,
+	fhandler_tape.cc, fhandler_zero.cc, grp.cc, mmap.cc, passwd.cc,
+	pinfo.cc, pinfo.h, pipe.cc, sec_acl.cc, sec_helper.cc, security.cc,
+	security.h, thread.h, uinfo.cc, include/cygwin/acl.h: Fix copyright.
+
+2002-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h, cygheap.h, dcrt0.cc, dir.cc, fhandler.cc, fhandler.h,
+	fhandler_clipboard.cc, fhandler_disk_file.cc, fhandler_dsp.cc,
+	fhandler_floppy.cc, fhandler_mem.cc, fhandler_random.cc,
+	fhandler_tape.cc, fhandler_zero.cc, grp.cc, mmap.cc, passwd.cc,
+	pinfo.cc, pinfo.h, pipe.cc, sec_acl.cc, sec_helper.cc, security.cc,
+	security.h, spawn.cc, syscalls.cc, thread.h, uinfo.cc, winsup.h:
+	Change usage of uid_t to __uid16_t, gid_t to __gid16_t and
+	off_t to __off32_t throughout.  Use INVALID_UID, INVALID_GID and
+	INVALID_SEEK instead casting -1 to the appropriate type.
+	* winsup.h: Define INVALID_UID, INVALID_GID and INVALID_SEEK.
+	* include/cygwin/acl.h: Define internal __aclent16_t and __aclent32_t
+	types.  Don't declare acl functions when compiling Cygwin.
+	* include/cygwin/grp.h: Declare getgrgid() and getgrnam() with
+	correct types for internal usage.
+
+2002-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	Patch suggested by Pierre A. Humblet <Pierre.Humblet@ieee.org>:
+	* uinfo.cc (internal_getlogin): Try evaluating user by SID even if
+	ntsec is off.
+	(uinfo_init): Set primary group even if ntsec is off.
+
+2002-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/grp.h: New file.
+	* include/cygwin/stat.h: Ditto.
+	* include/cygwin/types.h: Add definitions for __off32_t,
+	__off64_t, off_t, __uid16_t, __uid32_t, uid_t, __gid16_t,
+	__gid32_t and gid_t.
+	* include/sys/cygwin.h: Use correct uid and gid types.
+
+2002-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::dup2): Revert previous patch.
+	* fhandler.h: Ditto.
+	(fhandler_socket::recv): Define new method.
+	(fhandler_socket::send): Ditto.
+	* fhandler_socket.cc (fhandler_socket::recv): New method.
+	(fhandler_socket::send): Ditto.
+	(fhandler_socket::read): Call fhandler_socket::recv() now.
+	(fhandler_socket::write): Call fhandler_socket::send() now.
+	* net.cc (class wsock_event): Move definition to wsock_event.h.
+	(fdsock): Revert previous patch.
+	(cygwin_recv): Move implementation to fhandler_socket::recv().
+	(cygwin_send): Move implementation to fhandler_socket::send().
+	* wsock_event.h: New file.
+
+2002-02-06  Alexander Gottwald <Alexander.Gottwald@s1999.tuchemnitz.de>
+
+	* net.cc (get_2k_ifconf): Create interface entries for tokenring cards.
+
+2002-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::dup2): Store fd for fhandler_socket.
+	* fhandler.h (fhandler_base::set_fd): New virtual method.
+	(fhandler_base::get_fd): Ditto.
+	(fhandler_socket::set_fd): Ditto.
+	(fhandler_socket::get_fd): Ditto.
+	* fhandler_socket.cc (fhandler_socket::read): Call cygwin_recv instead
+	of native Winsock recv.
+	(fhandler_socket::write): Call cygwin_send instead of native Winsock
+	send.
+	* net.cc (fdsock): Store fd in fhandler_socket.
+
+2002-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_getsockname): Fix handling of NULL sun_path.
+
+2002-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (getdomainname): Fix registry key for 9x systems, too.
+
+2002-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (getdomainname): Fix registry key for NT systems.
+
+2002-01-28  Christopher Faylor  <cgf@redhat.com>
+
+	* external.cc (cygwin_internal): Initialize various internal settings
+	if required to allow use of some things from user loaded DLL.
+	(CW_STRACE_ON): Add new feature.
+	(CW_CYGWIN_PID_TO_WINPID): Ditto.
+	* pinfo.cc (set_myself): Call "strace.hello" to initiate possible
+	strace session.
+	(pinfo::init): Guard against dereferencing uninitialized myself.
+	* sigproc.cc (wait_sig): Call strace.hello() when __SIGTRACE "signal"
+	received.
+	* strace.cc (strace::hello): New method.
+	* wincap.cc (wincapc::init): Avoid initializing if already initialized.
+	* wincap.h (wincapc::wincapc): New method.
+	* include/sys/cygwin.h: Add new CW_ enums.  Kludge typedefs of
+	{g,u}id_t if required.
+	* strace.h (strace::hello): Declare new method.
+
+2002-01-28  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/sys/strace.h (_STRACE_ON): Define.
+	(_STRACE_OFF): Ditto.
+
+2002-01-24  Christopher Faylor  <cgf@redhat.com>
+
+	* speclib: Ensure that temporary def file is removed.
+
+2002-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* speclib: Use rm -f to remove temp file just to quiet any potential
+	warnings.
+
+2002-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (create_token): Use sec_user() to create
+	SECURITY_ATTRIBUTES structure for primary token.  Use
+	MAXIMUM_ALLOWED access rights instead of TOKEN_ALL_ACCESS.
+
+2002-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink): Fix check for already existing file.
+
 2002-01-21  Christopher Faylor  <cgf@redhat.com>
 
 	* cygmagic: Suppress error output when figuring out if sum takes an

@@ -1,6 +1,6 @@
 /* fhandler_random.cc: code to access /dev/random and /dev/urandom
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Corinna Vinschen (vinschen@cygnus.com)
 
@@ -132,8 +132,8 @@ fhandler_dev_random::read (void *ptr, size_t len)
   return -1;
 }
 
-off_t
-fhandler_dev_random::lseek (off_t, int)
+__off64_t
+fhandler_dev_random::lseek (__off64_t, int)
 {
   return 0;
 }

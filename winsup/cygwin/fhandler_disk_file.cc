@@ -61,12 +61,12 @@ num_entries (const char *win32_name)
 }
 
 int
-fhandler_disk_file::fstat (struct stat *buf, path_conv *pc)
+fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
 {
   int res = -1;
   int oret;
-  uid_t uid;
-  gid_t gid;
+  __uid16_t uid;
+  __gid16_t gid;
   int open_flags = O_RDONLY | O_BINARY | O_DIROPEN;
 
   if (!pc)
@@ -132,17 +132,17 @@ fhandler_disk_file::fstat (struct stat *buf, path_conv *pc)
 	buf->st_mode = S_IFREG;
       if (!pc->has_acls ()
 	  || get_file_attribute (TRUE, pc->get_win32 (),
-				 &buf->st_mode,
-				 &buf->st_uid, &buf->st_gid))
+				 &buf->st_mode, &uid, &gid))
 	{
 	  buf->st_mode |= STD_RBITS | STD_XBITS;
 	  if (!(pc->has_attribute (FILE_ATTRIBUTE_READONLY)))
 	    buf->st_mode |= STD_WBITS;
 	  if (pc->issymlink ())
 	    buf->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
-	  get_file_attribute (FALSE, pc->get_win32 (),
-			      NULL, &buf->st_uid, &buf->st_gid);
+	  get_file_attribute (FALSE, pc->get_win32 (), NULL, &uid, &gid);
 	}
+      buf->st_uid = uid;
+      buf->st_gid = gid;
       if ((handle = FindFirstFile (pc->get_win32 (), &wfd))
 	  != INVALID_HANDLE_VALUE)
 	{
@@ -158,9 +158,10 @@ fhandler_disk_file::fstat (struct stat *buf, path_conv *pc)
 	  buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
 	  buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
 	  buf->st_size    = wfd.nFileSizeLow;
+	  buf->st_size    = ((__off64_t)wfd.nFileSizeHigh << 32)
+			    + wfd.nFileSizeLow;
 	  buf->st_blksize = S_BLKSIZE;
-	  buf->st_blocks  = ((unsigned long) buf->st_size +
-			    S_BLKSIZE-1) / S_BLKSIZE;
+	  buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
 	  FindClose (handle);
 	}
       res = 0;
@@ -170,7 +171,7 @@ fhandler_disk_file::fstat (struct stat *buf, path_conv *pc)
 }
 
 int
-fhandler_disk_file::fstat_helper (struct stat *buf)
+fhandler_disk_file::fstat_helper (struct __stat64 *buf)
 {
   int res = 0;	// avoid a compiler warning
   BY_HANDLE_FILE_INFORMATION local;
@@ -200,7 +201,7 @@ fhandler_disk_file::fstat_helper (struct stat *buf)
       if (lsize == 0xffffffff && GetLastError () != NO_ERROR)
 	buf->st_mode = S_IFCHR;
       else
-	buf->st_size = lsize;
+	buf->st_size = ((__off64_t)hsize << 32) + lsize;
       /* We expect these to fail! */
       buf->st_mode |= STD_RBITS | STD_WBITS;
       buf->st_blksize = S_BLKSIZE;
@@ -228,7 +229,8 @@ fhandler_disk_file::fstat_helper (struct stat *buf)
   buf->st_ctime   = to_time_t (&local.ftCreationTime);
   buf->st_nlink   = local.nNumberOfLinks;
   buf->st_dev     = local.dwVolumeSerialNumber;
-  buf->st_size    = local.nFileSizeLow;
+  buf->st_size    = ((__off64_t)local.nFileSizeHigh << 32)
+		    + local.nFileSizeLow;
 
   /* Allocate some place to determine the root directory. Need to allocate
      enough so that rootdir can add a trailing slash if path starts with \\. */
@@ -256,7 +258,7 @@ fhandler_disk_file::fstat_helper (struct stat *buf)
     }
 
   buf->st_blksize = S_BLKSIZE;
-  buf->st_blocks  = ((unsigned long) buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
+  buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
 
   buf->st_mode = 0;
   /* Using a side effect: get_file_attibutes checks for
@@ -267,8 +269,10 @@ fhandler_disk_file::fstat_helper (struct stat *buf)
     buf->st_mode = S_IFLNK;
   else if (get_socket_p ())
     buf->st_mode = S_IFSOCK;
+  __uid16_t uid;
+  __gid16_t gid;
   if (get_file_attribute (has_acls (), get_win32_name (), &buf->st_mode,
-			  &buf->st_uid, &buf->st_gid) == 0)
+			  &uid, &gid) == 0)
     {
       /* If read-only attribute is set, modify ntsec return value */
       if ((local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
@@ -277,6 +281,9 @@ fhandler_disk_file::fstat_helper (struct stat *buf)
 
       if (!(buf->st_mode & S_IFMT))
 	buf->st_mode |= S_IFREG;
+
+      buf->st_uid = uid;
+      buf->st_gid = gid;
     }
   else
     {
@@ -331,7 +338,7 @@ fhandler_disk_file::fstat_helper (struct stat *buf)
 	  }
     }
 
-  syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%d, st_mode=%p, st_ino=%d, sizeof=%d",
+  syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%D, st_mode=%p, st_ino=%d, sizeof=%d",
 		 buf, buf->st_atime, buf->st_size, buf->st_mode,
 		 (int) buf->st_ino, sizeof (*buf));
 
@@ -429,10 +436,10 @@ fhandler_disk_file::close ()
 int
 fhandler_disk_file::lock (int cmd, struct flock *fl)
 {
-  int win32_start;
+  __off64_t win32_start;
   int win32_len;
   DWORD win32_upper;
-  DWORD startpos;
+  __off64_t startpos;
 
   /*
    * We don't do getlck calls yet.
@@ -455,7 +462,7 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 	startpos = 0;
 	break;
       case SEEK_CUR:
-	if ((off_t) (startpos = lseek (0, SEEK_CUR)) == (off_t)-1)
+	if ((startpos = lseek (0, SEEK_CUR)) == ILLEGAL_SEEK)
 	  return -1;
 	break;
       case SEEK_END:
@@ -466,7 +473,8 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 	      __seterrno ();
 	      return -1;
 	    }
-	  startpos = finfo.nFileSizeLow; /* Nowhere to keep high word */
+	  startpos = ((__off64_t)finfo.nFileSizeHigh << 32)
+		     + finfo.nFileSizeLow;
 	  break;
 	}
       default:
@@ -714,14 +722,14 @@ fhandler_disk_file::readdir (DIR *dir)
   return res;
 }
 
-off_t
+__off64_t
 fhandler_disk_file::telldir (DIR *dir)
 {
   return dir->__d_position;
 }
 
 void
-fhandler_disk_file::seekdir (DIR *dir, off_t loc)
+fhandler_disk_file::seekdir (DIR *dir, __off64_t loc)
 {
     rewinddir (dir);
     while (loc > dir->__d_position)
@@ -771,7 +779,7 @@ fhandler_cygdrive::set_drives ()
 }
 
 int
-fhandler_cygdrive::fstat (struct stat *buf, path_conv *pc)
+fhandler_cygdrive::fstat (struct __stat64 *buf, path_conv *pc)
 {
   if (!iscygdrive_root ())
     return fhandler_disk_file::fstat (buf, pc);
@@ -818,14 +826,14 @@ fhandler_cygdrive::readdir (DIR *dir)
   return dir->__d_dirent;
 }
 
-off_t
+__off64_t
 fhandler_cygdrive::telldir (DIR *dir)
 {
   return fhandler_disk_file::telldir (dir);
 }
 
 void
-fhandler_cygdrive::seekdir (DIR *dir, off_t loc)
+fhandler_cygdrive::seekdir (DIR *dir, __off64_t loc)
 {
   if (!iscygdrive_root ())
     return fhandler_disk_file::seekdir (dir, loc);

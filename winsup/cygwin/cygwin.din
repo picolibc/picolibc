@@ -304,6 +304,7 @@ fsetpos
 _fsetpos = fsetpos
 fstat
 _fstat = fstat
+fstat64
 fstatfs
 _fstatfs = fstatfs
 fsync
@@ -318,6 +319,7 @@ ftime
 _ftime = ftime
 ftruncate
 _ftruncate = ftruncate
+ftruncate64
 fwrite
 _fwrite = fwrite
 gamma
@@ -510,8 +512,10 @@ longjmp
 _longjmp = longjmp
 lseek
 _lseek = lseek
-lstat
-_lstat = lstat
+lseek64
+lstat = cygwin_lstat
+_lstat = cygwin_lstat
+lstat64
 malloc = export_malloc
 _malloc = export_malloc
 matherr
@@ -544,6 +548,7 @@ _mktemp = mktemp
 mktime
 _mktime = mktime
 mmap
+mmap64
 mprotect
 msync
 munmap
@@ -646,6 +651,7 @@ _scanf_r
 scanf_r = _scanf_r
 seekdir
 _seekdir = seekdir
+seekdir64
 setbuf
 _setbuf = setbuf
 setdtablesize
@@ -745,6 +751,7 @@ _sscanf_r
 sscanf_r = _sscanf_r
 stat
 _stat = stat
+stat64
 statfs
 _statfs = statfs
 strcasecmp
@@ -841,6 +848,7 @@ tcsetpgrp
 _tcsetpgrp = tcsetpgrp
 telldir
 _telldir = telldir
+telldir64
 tempnam
 _tempnam = tempnam
 time
@@ -860,6 +868,7 @@ toupper
 _toupper = toupper
 truncate
 _truncate = truncate
+truncate64
 ttyname
 _ttyname = ttyname
 tzset

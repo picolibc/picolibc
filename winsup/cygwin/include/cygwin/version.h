@@ -44,7 +44,7 @@ details. */
   /* The current cygwin version is 1.3.6 */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1003
-#define CYGWIN_VERSION_DLL_MINOR 10
+#define CYGWIN_VERSION_DLL_MINOR 11
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */

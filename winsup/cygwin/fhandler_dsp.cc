@@ -1,6 +1,6 @@
 /* fhandler_dev_dsp: code to emulate OSS sound model /dev/dsp
 
-   Copyright 2001 Red Hat, Inc
+   Copyright 2001, 2002 Red Hat, Inc
 
    Written by Andy Younger (andy@snoogie.demon.co.uk)
 
@@ -86,7 +86,7 @@ Audio::~Audio ()
 }
 
 bool
-Audio::open (int rate, int bits, int channels, bool bCallback = false)
+Audio::open (int rate, int bits, int channels, bool bCallback)
 {
   WAVEFORMATEX format;
   int nDevices = waveOutGetNumDevs ();
@@ -430,7 +430,7 @@ fhandler_dev_dsp::~fhandler_dev_dsp ()
 }
 
 int
-fhandler_dev_dsp::open (path_conv *, int flags, mode_t mode = 0)
+fhandler_dev_dsp::open (path_conv *, int flags, mode_t mode)
 {
   // currently we only support writing
   if ((flags & (O_WRONLY | O_RDONLY | O_RDWR)) != O_WRONLY)
@@ -482,8 +482,8 @@ fhandler_dev_dsp::read (void *ptr, size_t len)
   return len;
 }
 
-off_t
-fhandler_dev_dsp::lseek (off_t offset, int whence)
+__off64_t
+fhandler_dev_dsp::lseek (__off64_t offset, int whence)
 {
   return 0;
 }

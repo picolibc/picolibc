@@ -1,6 +1,6 @@
 /* grp.cc
 
-   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
    Original stubs by Jason Molenda of Cygnus Support, crash@cygnus.com
    First implementation by Gunther Ebert, gunther.ebert@ixos-leipzig.de
@@ -31,8 +31,8 @@ details. */
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */
 
-static NO_COPY const char *etc_group = "/etc/group";
-static struct group *group_buf;		/* group contents in memory */
+static const char *etc_group NO_COPY = "/etc/group";
+static struct __group16 *group_buf;		/* group contents in memory */
 static int curr_lines;
 static int max_lines;
 
@@ -46,7 +46,7 @@ static int grp_pos = 0;
 static pwdgrp_check group_state;
 
 static int
-parse_grp (struct group &grp, const char *line)
+parse_grp (struct __group16 &grp, const char *line)
 {
   int len = strlen(line);
   char *newline = (char *) malloc (len + 1);
@@ -111,7 +111,7 @@ add_grp_line (const char *line)
     if (curr_lines == max_lines)
     {
 	max_lines += 10;
-	group_buf = (struct group *) realloc (group_buf, max_lines * sizeof (struct group));
+	group_buf = (struct __group16 *) realloc (group_buf, max_lines * sizeof (struct __group16));
     }
     if (parse_grp (group_buf[curr_lines], line))
       curr_lines++;
@@ -119,16 +119,22 @@ add_grp_line (const char *line)
 
 class group_lock
 {
-  pthread_mutex_t mutex;
+  bool armed;
+  static NO_COPY pthread_mutex_t mutex;
  public:
-  group_lock (): mutex ((pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER) {}
-  void arm () {pthread_mutex_lock (&mutex); }
+  group_lock (bool doit)
+  {
+    if (armed = doit)
+      pthread_mutex_lock (&mutex);
+  }
   ~group_lock ()
   {
-    if (mutex != (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER)
+    if (armed)
       pthread_mutex_unlock (&mutex);
   }
 };
+
+pthread_mutex_t NO_COPY group_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 /* Cygwin internal */
 /* Read in /etc/group and save contents in the group cache */
@@ -145,9 +151,7 @@ read_etc_group ()
 
   strncpy (group_name, "Administrators", sizeof (group_name));
 
-  static NO_COPY group_lock here;
-  if (cygwin_finished_initializing)
-    here.arm ();
+  group_lock here (cygwin_finished_initializing);
 
   /* if we got blocked by the mutex, then etc_group may have been processed */
   if (group_state != uninitialized)
@@ -208,10 +212,10 @@ read_etc_group ()
 }
 
 extern "C"
-struct group *
-getgrgid (gid_t gid)
+struct __group16 *
+getgrgid (__gid16_t gid)
 {
-  struct group * default_grp = NULL;
+  struct __group16 * default_grp = NULL;
   if (group_state  <= initializing)
     read_etc_group();
 
@@ -227,7 +231,7 @@ getgrgid (gid_t gid)
 }
 
 extern "C"
-struct group *
+struct __group16 *
 getgrnam (const char *name)
 {
   if (group_state  <= initializing)
@@ -249,7 +253,7 @@ endgrent()
 }
 
 extern "C"
-struct group *
+struct __group16 *
 getgrent()
 {
   if (group_state  <= initializing)
@@ -269,7 +273,7 @@ setgrent ()
 }
 
 /* Internal function. ONLY USE THIS INTERNALLY, NEVER `getgrent'!!! */
-struct group *
+struct __group16 *
 internal_getgrent (int pos)
 {
   if (group_state  <= initializing)
@@ -281,12 +285,12 @@ internal_getgrent (int pos)
 }
 
 int
-getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
+getgroups (int gidsetsize, __gid16_t *grouplist, __gid16_t gid, const char *username)
 {
   HANDLE hToken = NULL;
   DWORD size;
   int cnt = 0;
-  struct group *gr;
+  struct __group16 *gr;
 
   if (group_state  <= initializing)
     read_etc_group();
@@ -356,14 +360,14 @@ error:
 
 extern "C"
 int
-getgroups (int gidsetsize, gid_t *grouplist)
+getgroups (int gidsetsize, __gid16_t *grouplist)
 {
   return getgroups (gidsetsize, grouplist, myself->gid, cygheap->user.name ());
 }
 
 extern "C"
 int
-initgroups (const char *, gid_t)
+initgroups (const char *, __gid16_t)
 {
   return 0;
 }

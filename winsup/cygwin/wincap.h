@@ -46,6 +46,7 @@ struct wincaps
   unsigned has_try_enter_critical_section		: 1;
   unsigned has_raw_devices				: 1;
   unsigned has_valid_processorlevel			: 1;
+  unsigned has_64bit_file_access			: 1;
 };
 
 class wincapc
@@ -55,6 +56,7 @@ class wincapc
   void          *caps;
 
 public:
+  wincapc (): caps (NULL) {}
   void init ();
 
   void set_chunksize (DWORD nchunksize);
@@ -96,6 +98,7 @@ public:
   bool  IMPLEMENT (has_try_enter_critical_section)
   bool  IMPLEMENT (has_raw_devices)
   bool  IMPLEMENT (has_valid_processorlevel)
+  bool  IMPLEMENT (has_64bit_file_access)
 
 #undef IMPLEMENT
 };

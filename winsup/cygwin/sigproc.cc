@@ -103,10 +103,13 @@ Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
  */
 Static HANDLE events[PSIZE + 1] = {0};  // All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
-Static pinfo pchildren[PSIZE];		// All my children info
+Static char cpchildren[PSIZE * sizeof (pinfo)];		// All my children info
 Static int nchildren = 0;		// Number of active children
-Static pinfo zombies[NZOMBIES];		// All my deceased children info
+Static char czombies[NZOMBIES * sizeof (pinfo)];		// All my deceased children info
 Static int nzombies = 0;		// Number of deceased children
+
+#define pchildren ((pinfo *) cpchildren)
+#define zombies ((pinfo *) czombies)
 
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 Static waitq waitq_main;		// Storage for main thread
@@ -315,12 +318,14 @@ proc_subproc (DWORD what, DWORD val)
       if (hchildren[val] != pchildren[val]->hProcess)
 	{
 	  sigproc_printf ("pid %d[%d], reparented old hProcess %p, new %p",
-		      pchildren[val]->pid, val, hchildren[val], pchildren[val]->hProcess);
-	  ForceCloseHandle1 (hchildren[val], childhProc);
+			  pchildren[val]->pid, val, hchildren[val], pchildren[val]->hProcess);
+	  HANDLE h = hchildren[val];
 	  hchildren[val] = pchildren[val]->hProcess; /* Filled out by child */
+	  sync_proc_subproc->release ();	// Release the lock ASAP
+	  ForceCloseHandle1 (h, childhProc);
 	  ProtectHandle1 (pchildren[val]->hProcess, childhProc);
 	  rc = 0;
-	  break;			// This was an exec()
+	  goto out;			// This was an exec()
 	}
 
       sigproc_printf ("pid %d[%d] terminated, handle %p, nchildren %d, nzombies %d",
@@ -587,7 +592,7 @@ sigproc_init ()
   /* sync_proc_subproc is used by proc_subproc.  It serialises
    * access to the children and zombie arrays.
    */
-  sync_proc_subproc = new_muto (FALSE, "sync_proc_subproc");
+  new_muto (sync_proc_subproc);
 
   /* Initialize waitq structure for main thread.  A waitq structure is
    * allocated for each thread that executes a wait to allow multiple threads
@@ -939,8 +944,8 @@ getsem (_pinfo *p, const char *str, int init, int max)
       char sa_buf[1024];
 
       DWORD winpid = GetCurrentProcessId ();
-      h = CreateSemaphore (allow_ntsec ? sec_user_nih (sa_buf) : &sec_none_nih,
-			   init, max, str = shared_name (str, winpid));
+      h = CreateSemaphore (sec_user_nih (sa_buf), init, max,
+			   str = shared_name (str, winpid));
       p = myself;
       if (!h)
 	{
@@ -1182,9 +1187,9 @@ wait_sig (VOID *)
 		  /* just forcing the loop */
 		  break;
 
-		/* Internal signal to force a flush of strace data to disk. */
+		/* Internal signal to turn on stracing. */
 		case __SIGSTRACE:
-		  // proc_strace ();	// Dump cached strace.prntf stuff.
+		  strace.hello ();
 		  break;
 
 		/* A normal UNIX signal */

@@ -1,7 +1,7 @@
 /* fhandler_floppy.cc.  See fhandler.h for a description of the
    fhandler classes.
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -77,16 +77,16 @@ fhandler_dev_floppy::close (void)
   return fhandler_dev_raw::close ();
 }
 
-off_t
-fhandler_dev_floppy::lseek (off_t offset, int whence)
+__off64_t
+fhandler_dev_floppy::lseek (__off64_t offset, int whence)
 {
   int ret;
   char buf[512];
-  long long drive_size = 0;
-  long long lloffset = offset;
-  long long current_position;
-  off_t sector_aligned_offset;
-  off_t bytes_left;
+  __off64_t drive_size = 0;
+  __off64_t lloffset = offset;
+  __off64_t current_position;
+  __off64_t sector_aligned_offset;
+  __off64_t bytes_left;
   DWORD low;
   LONG high = 0;
 
@@ -117,11 +117,11 @@ fhandler_dev_floppy::lseek (off_t offset, int whence)
       debug_printf ("partition info: %ld (%ld)",
 		      pi.StartingOffset.LowPart,
 		      pi.PartitionLength.LowPart);
-      drive_size = (long long) pi.PartitionLength.QuadPart;
+      drive_size = pi.PartitionLength.QuadPart;
     }
   else
     {
-      drive_size = (long long) di.Cylinders.QuadPart * di.TracksPerCylinder *
+      drive_size = di.Cylinders.QuadPart * di.TracksPerCylinder *
 		   di.SectorsPerTrack * di.BytesPerSector;
     }
   debug_printf ("drive size: %ld", drive_size);
@@ -140,7 +140,7 @@ fhandler_dev_floppy::lseek (off_t offset, int whence)
 	  __seterrno ();
 	  return -1;
 	}
-      current_position = (long long) low + ((long long) high << 32);
+      current_position = low + ((__off64_t) high << 32);
       if (is_writing)
 	current_position += devbufend - devbufstart;
       else
@@ -156,18 +156,10 @@ fhandler_dev_floppy::lseek (off_t offset, int whence)
       set_errno (EINVAL);
       return -1;
     }
-  high = lloffset >> 32;
-  low = lloffset & 0xffffffff;
-  if (high || (off_t) low < 0)
-    {
-      set_errno (EFBIG);
-      return -1;
-    }
-  offset = (off_t) low;
 
   /* FIXME: sector can possibly be not 512 bytes long */
-  sector_aligned_offset = (offset / 512) * 512;
-  bytes_left = offset - sector_aligned_offset;
+  sector_aligned_offset = (lloffset / 512) * 512;
+  bytes_left = lloffset - sector_aligned_offset;
 
   if (whence == SEEK_SET)
     {
@@ -177,8 +169,10 @@ fhandler_dev_floppy::lseek (off_t offset, int whence)
 	return ret;
       devbufstart = devbufend = 0;
 
-      if (SetFilePointer (get_handle (), sector_aligned_offset, NULL, FILE_BEGIN)
-	  == INVALID_SET_FILE_POINTER)
+      low = sector_aligned_offset & 0xffffffff;
+      high = sector_aligned_offset >> 32;
+      if (SetFilePointer (get_handle (), low, &high, FILE_BEGIN)
+	  == INVALID_SET_FILE_POINTER && GetLastError ())
 	{
 	  __seterrno ();
 	  return -1;

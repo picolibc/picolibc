@@ -48,8 +48,8 @@ public:
   void fixup_before_exec (DWORD win_proc_id);
   void fixup_before_fork (DWORD win_proc_id);
   void fixup_after_fork (HANDLE);
-  fhandler_base *build_fhandler (int fd, DWORD dev, const char *name,
-				 int unit = -1);
+  fhandler_base *build_fhandler (int fd, DWORD dev, const char *unix_name,
+				 const char *win32_name = NULL, int unit = -1);
   fhandler_base *build_fhandler_from_name (int fd, const char *name, HANDLE h,
 					   path_conv& pc,
 					   unsigned opts = PC_SYM_FOLLOW,
@@ -75,6 +75,8 @@ public:
   select_record *select_write (int fd, select_record *s);
   select_record *select_except (int fd, select_record *s);
   operator fhandler_base **() {return fds;}
+  void stdio_init ();
+  void get_debugger_info ();
 };
 
 void dtable_init (void);

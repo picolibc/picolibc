@@ -1,6 +1,6 @@
 /* childinfo.h: shared child info for cygwin
 
-   Copyright 2000 Red Hat, Inc.
+   Copyright 2000, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -70,7 +70,7 @@ class fhandler_base;
 class cygheap_exec_info
 {
 public:
-  uid_t uid;
+  __uid16_t uid;
   char *old_title;
   int argc;
   char **argv;

@@ -1,7 +1,7 @@
 /* fhandler_tape.cc.  See fhandler.h for a description of the fhandler
    classes.
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -147,7 +147,7 @@ fhandler_dev_tape::close (void)
 }
 
 int
-fhandler_dev_tape::fstat (struct stat *buf, path_conv *pc)
+fhandler_dev_tape::fstat (struct __stat64 *buf, path_conv *pc)
 {
   int ret;
 
@@ -164,8 +164,8 @@ fhandler_dev_tape::fstat (struct stat *buf, path_conv *pc)
   return ret;
 }
 
-off_t
-fhandler_dev_tape::lseek (off_t offset, int whence)
+__off64_t
+fhandler_dev_tape::lseek (__off64_t offset, int whence)
 {
   struct mtop op;
   struct mtpos pos;
@@ -179,7 +179,7 @@ fhandler_dev_tape::lseek (off_t offset, int whence)
 
   if (ioctl (MTIOCPOS, &pos))
     {
-      return (off_t) -1;
+      return ILLEGAL_SEEK;
     }
 
   switch (whence)

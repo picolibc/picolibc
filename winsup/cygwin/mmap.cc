@@ -1,6 +1,6 @@
 /* mmap.cc
 
-   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -47,13 +47,13 @@ class mmap_record
     HANDLE mapping_handle_;
     int devtype_;
     DWORD access_mode_;
-    DWORD offset_;
+    __off64_t offset_;
     DWORD size_to_map_;
     caddr_t base_address_;
     DWORD *map_map_;
 
   public:
-    mmap_record (int fd, HANDLE h, DWORD ac, DWORD o, DWORD s, caddr_t b) :
+    mmap_record (int fd, HANDLE h, DWORD ac, __off64_t o, DWORD s, caddr_t b) :
        fdesc_ (fd),
        mapping_handle_ (h),
        devtype_ (0),
@@ -95,7 +95,7 @@ class mmap_record
     void free_map () { if (map_map_) free (map_map_); }
 
     DWORD find_empty (DWORD pages);
-    DWORD map_map (DWORD off, DWORD len);
+    __off64_t map_map (__off64_t off, DWORD len);
     BOOL unmap_map (caddr_t addr, DWORD len);
     void fixup_map (void);
 
@@ -124,8 +124,8 @@ mmap_record::find_empty (DWORD pages)
   return (DWORD)-1;
 }
 
-DWORD
-mmap_record::map_map (DWORD off, DWORD len)
+__off64_t
+mmap_record::map_map (__off64_t off, DWORD len)
 {
   DWORD prot, old_prot;
   switch (access_mode_)
@@ -235,7 +235,7 @@ mmap_record::alloc_fh ()
      the call to fork(). This requires creating a fhandler
      of the correct type to be sure to call the method of the
      correct class. */
-  return cygheap->fdtab.build_fhandler (-1, get_device (), "", 0);
+  return cygheap->fdtab.build_fhandler (-1, get_device (), NULL);
 }
 
 void
@@ -255,8 +255,8 @@ public:
   ~list ();
   mmap_record *add_record (mmap_record r);
   void erase (int i);
-  mmap_record *match (DWORD off, DWORD len);
-  off_t match (caddr_t addr, DWORD len, off_t start);
+  mmap_record *match (__off64_t off, DWORD len);
+  long match (caddr_t addr, DWORD len, long start);
 };
 
 list::list ()
@@ -287,7 +287,7 @@ list::add_record (mmap_record r)
 
 /* Used in mmap() */
 mmap_record *
-list::match (DWORD off, DWORD len)
+list::match (__off64_t off, DWORD len)
 {
   if (fd == -1 && !off)
     {
@@ -307,14 +307,14 @@ list::match (DWORD off, DWORD len)
 }
 
 /* Used in munmap() */
-off_t
-list::match (caddr_t addr, DWORD len, off_t start)
+long
+list::match (caddr_t addr, DWORD len, __off32_t start)
 {
   for (int i = start + 1; i < nrecs; ++i)
     if (addr >= recs[i].get_address ()
 	&& addr + len <= recs[i].get_address () + recs[i].get_size ())
       return i;
-  return (off_t)-1;
+  return -1;
 }
 
 void
@@ -400,9 +400,9 @@ static map *mmapped_areas;
 
 extern "C"
 caddr_t
-mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
+mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
 {
-  syscall_printf ("addr %x, len %d, prot %x, flags %x, fd %d, off %d",
+  syscall_printf ("addr %x, len %d, prot %x, flags %x, fd %d, off %D",
 		  addr, len, prot, flags, fd, off);
 
   static DWORD granularity;
@@ -444,7 +444,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
     fd = -1;
 
   /* Map always in multipliers of `granularity'-sized chunks. */
-  DWORD gran_off = off & ~(granularity - 1);
+  __off64_t gran_off = off & ~(granularity - 1);
   DWORD gran_len = howmany (len, granularity) * granularity;
 
   fhandler_base *fh;
@@ -464,7 +464,9 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
       fh = cfd;
       if (fh->get_device () == FH_DISK)
 	{
-	  DWORD fsiz = GetFileSize (fh->get_handle (), NULL);
+	  DWORD high;
+	  DWORD low = GetFileSize (fh->get_handle (), &high);
+	  __off64_t fsiz = ((__off64_t)high << 32) + low;
 	  fsiz -= gran_off;
 	  if (gran_len > fsiz)
 	    gran_len = fsiz;
@@ -554,6 +556,13 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   return ret;
 }
 
+extern "C"
+caddr_t
+mmap (caddr_t addr, size_t len, int prot, int flags, int fd, __off32_t off)
+{
+  return mmap64 (addr, len, prot, flags, fd, (__off64_t)off);
+}
+
 /* munmap () removes an mmapped area.  It insists that base area
    requested is the same as that mmapped, error if not. */
 
@@ -589,7 +598,7 @@ munmap (caddr_t addr, size_t len)
       list *l = mmapped_areas->lists[it];
       if (l)
 	{
-	  off_t li = -1;
+	  long li = -1;
 	  if ((li = l->match(addr, len, li)) >= 0)
 	    {
 	      mmap_record *rec = l->recs + li;
@@ -695,7 +704,7 @@ msync (caddr_t addr, size_t len, int flags)
 */
 HANDLE
 fhandler_base::mmap (caddr_t *addr, size_t len, DWORD access,
-		     int flags, off_t off)
+		     int flags, __off64_t off)
 {
   set_errno (ENODEV);
   return INVALID_HANDLE_VALUE;
@@ -726,7 +735,7 @@ fhandler_base::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 /* Implementation for disk files. */
 HANDLE
 fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
-			  int flags, off_t off)
+			  int flags, __off64_t off)
 {
   DWORD protect;
 
@@ -769,9 +778,10 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
       return INVALID_HANDLE_VALUE;
     }
 
-  void *base = MapViewOfFileEx (h, access, 0, off, len,
+  DWORD high = off >> 32, low = off & 0xffffffff;
+  void *base = MapViewOfFileEx (h, access, high, low, len,
 			       (flags & MAP_FIXED) ? *addr : NULL);
-  debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%d, len:%d, addr:%x)", base, h, access, off, len, (flags & MAP_FIXED) ? *addr : NULL);
+  debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%D, len:%d, addr:%x)", base, h, access, off, len, (flags & MAP_FIXED) ? *addr : NULL);
   if (!base || ((flags & MAP_FIXED) && base != *addr))
     {
       if (!base)

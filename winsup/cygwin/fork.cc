@@ -473,8 +473,8 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   newheap = cygheap_setup_for_child (&ch,cygheap->fdtab.need_fixup_before ());
   rc = CreateProcess (myself->progname, /* image to run */
 		      myself->progname, /* what we send in arg0 */
-		      allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
-		      allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
+		      sec_user_nih (sa_buf),
+		      sec_user_nih (sa_buf),
 		      TRUE,	  /* inherit handles from parent */
 		      c_flags,
 		      NULL,	  /* environment filled in later */
