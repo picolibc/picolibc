@@ -693,7 +693,6 @@ interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
   sigsave.newmask = sigsave.oldmask | siga.sa_mask | SIGTOMASK (sig);
   sigsave.sa_flags = siga.sa_flags;
   sigsave.func = (void (*)(int)) handler;
-  sigsave.sig = sig;
   sigsave.saved_errno = -1;		// Flag: no errno to save
   if (handler == sig_handle_tty_stop)
     {
@@ -703,6 +702,7 @@ interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
   /* Clear any waiting threads prior to dispatching to handler function */
   proc_subproc (PROC_CLEARWAIT, 1);
   int res = SetEvent (signal_arrived);	// For an EINTR case
+  sigsave.sig = sig;			// Should ALWAYS be last thing set to avoid a race
   sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
 }
 

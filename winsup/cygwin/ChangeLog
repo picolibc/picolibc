@@ -1,3 +1,8 @@
+2003-08-20  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* exceptions.cc (interrupt_setup): Set sigsave.sig last to avoid a
+	race.
+
 2003-08-20  Christopher Faylor  <cgf@redhat.com>
 
 	* sigproc.cc (wait_sig): Ensure that myself->getsigtodo array is
