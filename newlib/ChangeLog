@@ -1,3 +1,12 @@
+2001-06-11  Egor Duda  <deo@logos-m.ru>
+
+        * libc/ctype/ctype_.c: When compiled with gcc on platforms
+        with signed char, make _ctype_[-128] ... _ctype[-1] refer to
+        initialized memory region. Platform can define COMPACT_CTYPE
+        to avoid allocation of the additional 128 bytes of data.
+        Add pointer to _ctype_ array. Always initialize all _ctype_
+        array elements.
+
 2001-06-08  Jonathan Larmour  <jlarmour@redhat.com>
 
 	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Avoid dereferencing
