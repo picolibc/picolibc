@@ -1,3 +1,10 @@
+2003-02-07  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (try_to_debug): Set priority of current thread rather
+	than the main thread.  Make busy waiting loop less busy.  Restore
+	priority when function returns.
+
 2003-02-07  Christopher Faylor  <cgf@redhat.com>
 
 	* malloc.cc (DEFAULT_MMAP_THRESHOLD): Set high to avoid mmaps.

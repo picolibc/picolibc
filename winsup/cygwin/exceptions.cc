@@ -343,7 +343,8 @@ try_to_debug (bool waitloop)
 
   __small_sprintf (strchr (debugger_command, '\0'), " %u", GetCurrentProcessId ());
 
-  SetThreadPriority (hMainThread, THREAD_PRIORITY_HIGHEST);
+  LONG prio = GetThreadPriority (GetCurrentThread ());
+  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST);
   PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
 
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
@@ -391,14 +392,16 @@ try_to_debug (bool waitloop)
     system_printf ("Failed to start debugger: %E");
   else
     {
-      SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
+      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       if (!waitloop)
 	return 1;
       while (!being_debugged ())
-	/* spin */;
-      Sleep (4000);
+	Sleep (0);
+      Sleep (2000);
       small_printf ("*** continuing from debugger call\n");
     }
+
+  SetThreadPriority (GetCurrentThread (), prio);
 
   /* FIXME: need to know handles of all running threads to
     resume_all_threads_except (current_thread_id);
