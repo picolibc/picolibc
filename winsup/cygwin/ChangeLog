@@ -1,3 +1,8 @@
+2002-12-10 Craig McGeachie <slapdau@yahoo.com.au>
+
+	* netdb.cc (parse_alias_list, parse_services_line)
+	(parse_protocol_line): Change strtok calls to strtok_r.
+
 2002-12-10  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* pwdgrp.h (pwdgrp_check::pwdgrp_state): Replace by

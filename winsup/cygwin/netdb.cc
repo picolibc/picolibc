@@ -136,14 +136,14 @@ static const NO_COPY char *SPACE = " \t\n\r\f";
 char** structure terminated by a NULL.
 
 N.B. This routine relies on side effects due to the nature of
-strtok().  strtok() initially takes a char * pointing to the start of
-a line, and then NULL to indicate continued processing.  strtok() does
+strtok_r().  strtok_r() initially takes a char * pointing to the start of
+a line, and then NULL to indicate continued processing.  strtok_r() does
 not provide a mechanism for getting pointer to the unprocessed portion
 of a line.  Alias processing is done part way through a line after
-strtok().  This routine relies on further calls to strtok(), passing
+strtok_r().  This routine relies on further calls to strtok_r(), passing
 NULL as the first parameter, returning alias names from the line. */
 static void
-parse_alias_list (char ***aliases)
+parse_alias_list (char ***aliases, char **lasts)
 {
   struct alias_t
   {
@@ -153,7 +153,7 @@ parse_alias_list (char ***aliases)
   alias_t *alias_list_head = NULL, *alias_list_tail = NULL;
   char *alias;
   int alias_count = 0;
-  alias = strtok (NULL, SPACE);
+  alias = strtok_r (NULL, SPACE, lasts);
 
   while (alias)
     {
@@ -167,7 +167,7 @@ parse_alias_list (char ***aliases)
       new_alias->next = NULL;
       new_alias->alias_name = alias;
       alias_list_tail = new_alias;
-      alias = strtok (NULL, SPACE);
+      alias = strtok_r (NULL, SPACE, lasts);
     }
 
   *aliases = (char**) calloc (alias_count + 1, sizeof (char *));
@@ -201,16 +201,16 @@ parse_services_line (FILE *svc_file, struct servent *sep)
   char *line;
   while ((line = get_entire_line (svc_file)))
     {
-      char *name, *port, *protocol;
+      char *name, *port, *protocol, *lasts;
 
       line[strcspn (line, "#")] = '\0'; // truncate at comment marker.
-      name = strtok (line, SPACE);
+      name = strtok_r (line, SPACE, &lasts);
       if (!name)
 	{
 	  free (line);
 	  continue;
 	}
-      port = strtok (NULL, SPACE);
+      port = strtok_r (NULL, SPACE, &lasts);
       protocol = strchr (port, '/');
       *protocol++ = '\0';
       sep->s_name = strdup (name);
@@ -220,7 +220,7 @@ parse_services_line (FILE *svc_file, struct servent *sep)
       paranoid_printf ("sep->s_proto strdup %p", sep->s_proto);
       /* parse_alias_list relies on side effects.  Read the comments
 	 for that function.*/
-      parse_alias_list (& sep->s_aliases);
+      parse_alias_list (& sep->s_aliases, &lasts);
       free (line);
       return true;
     }
@@ -322,22 +322,22 @@ parse_protocol_line (FILE *proto_file, struct protoent *pep)
   char *line;
   while ((line = get_entire_line (proto_file)))
     {
-      char *name, *protocol;
+      char *name, *protocol, *lasts;
 
       line[strcspn (line, "#")] = '\0'; // truncate at comment marker.
-      name = strtok (line, SPACE);
+      name = strtok_r (line, SPACE, &lasts);
       if (!name)
 	{
 	  free (line);
 	  continue;
 	}
-      protocol = strtok (NULL, SPACE);
+      protocol = strtok_r (NULL, SPACE, &lasts);
       pep->p_name = strdup (name);
       paranoid_printf ("pep->p_name strdup %p", pep->p_name);
       pep->p_proto = atoi (protocol);
       /* parse_alias_list relies on side effects.  Read the comments
 	 for that function.*/
-      parse_alias_list (& pep->p_aliases);
+      parse_alias_list (& pep->p_aliases, &lasts);
       free (line);
       return true;
     }
