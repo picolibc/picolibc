@@ -1,5 +1,8 @@
 2002-04-13  Alexandre Oliva  <aoliva@redhat.com>
 
+	* libc/stdlib/mallocr.c (malloc_extend_top): If correction sbrk
+	fails, don't bail out, and try to correct next time.
+
 	* libc/include/sys/config.h: Include limits.h.
 
 2002-04-12  Eric Norum  <eric.norum@usask.com>

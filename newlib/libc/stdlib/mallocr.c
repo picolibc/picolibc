@@ -2128,6 +2128,7 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
   char*     brk;                  /* return value from sbrk */
   INTERNAL_SIZE_T front_misalign; /* unusable bytes at front of sbrked space */
   INTERNAL_SIZE_T correction;     /* bytes for 2nd sbrk call */
+  int correction_failed = 0;      /* whether we should relax the assertion */
   char*     new_brk;              /* return of 2nd sbrk call */
   INTERNAL_SIZE_T top_size;       /* new size of top chunk */
 
@@ -2152,11 +2153,13 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
   /* Fail if sbrk failed or if a foreign sbrk call killed our space */
   if (brk == (char*)(MORECORE_FAILURE) || 
       (brk < old_end && old_top != initial_top))
-    return;     
+    return;
 
   sbrked_mem += sbrk_size;
 
-  if (brk == old_end) /* can just add bytes to current top */
+  if (brk == old_end /* can just add bytes to current top, unless
+			previous correction failed */
+      && ((POINTER_UINT)old_end & (pagesz - 1)) == 0)
   {
     top_size = sbrk_size + old_top_size;
     set_head(top, top_size | PREV_INUSE);
@@ -2183,7 +2186,12 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
 
     /* Allocate correction */
     new_brk = (char*)(MORECORE (correction));
-    if (new_brk == (char*)(MORECORE_FAILURE)) return; 
+    if (new_brk == (char*)(MORECORE_FAILURE))
+      {
+	correction = 0;
+	correction_failed = 1;
+	new_brk = brk;
+      }
 
     sbrked_mem += correction;
 
@@ -2228,7 +2236,8 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
 #endif
 
   /* We always land on a page boundary */
-  assert(((unsigned long)((char*)top + top_size) & (pagesz - 1)) == 0);
+  assert(((unsigned long)((char*)top + top_size) & (pagesz - 1)) == 0
+	 || correction_failed);
 }
 
 #endif /* DEFINE_MALLOC */
