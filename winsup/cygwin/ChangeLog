@@ -1,5 +1,11 @@
 2001-10-30  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (sigproc_terminate): Don't signal main thread when exiting.
+	* sigproc.h (sigframe): Decorate some methods with `inline'.
+	(new_muto): Coerce pointer to new to void *.
+
+2001-10-30  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.cc (fhandler_base::fork_fixup): Pass old handle to
 	setclexec_pid.
 

@@ -47,7 +47,7 @@ extern muto muto_start;
 #define new_muto(__inh, __name) \
 ({ \
   static __attribute__((section(".data_cygwin_nocopy"))) muto __mbuf; \
-  (void) new ((char *) &__mbuf) muto (__inh, __name); \
+  (void) new ((void *) &__mbuf) muto (__inh, __name); \
   __mbuf.next = muto_start.next; \
   muto_start.next = &__mbuf; \
   &__mbuf; \

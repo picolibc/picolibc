@@ -612,7 +612,7 @@ sigproc_terminate (void)
 				//  finished with anything it is doing
       // sig_dispatch_pending (TRUE);	// wake up and die
       /* In case of a sigsuspend */
-      SetEvent (signal_arrived);
+      // SetEvent (signal_arrived);
 
       /* If !hwait_sig, then the process probably hasn't even finished
        * its initialization phase.
