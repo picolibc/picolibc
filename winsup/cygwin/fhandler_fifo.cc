@@ -110,7 +110,7 @@ fhandler_fifo::open_not_mine (int flags)
 	      __seterrno ();
 	      goto err;
 	    }
-        
+
 	  if (i == 0)
 	    read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 	}

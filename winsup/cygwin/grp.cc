@@ -36,12 +36,7 @@ static char * NO_COPY null_ptr;
 bool
 pwdgrp::parse_group ()
 {
-  char *dp;
-
 # define grp (*group_buf)[curr_lines]
-
-  memset (&grp, 0, sizeof (grp));
-
   grp.gr_name = next_str ();
   if (!*grp.gr_name)
     return false;
@@ -52,14 +47,14 @@ pwdgrp::parse_group ()
     return false;
 
   int n;
-  dp = raw_ptr ();
+  char *dp = raw_ptr ();
   for (n = 0; *next_str (','); n++)
     continue;
 
   grp.gr_mem = &null_ptr;
   if (n)
     {
-      char **namearray = (char **) calloc (n + 2, sizeof (char *));
+      char **namearray = (char **) calloc (n + 1, sizeof (char *));
       if (namearray)
 	{
 	  for (int i = 0; i < n; i++, dp = strchr (dp, '\0') + 1)
@@ -121,7 +116,7 @@ internal_getgrsid (cygsid &sid)
   if (sid.string (sid_string))
     for (int i = 0; i < gr.curr_lines; i++)
       if (!strcmp (sid_string, group_buf[i].gr_passwd))
-        return group_buf + i;
+	return group_buf + i;
   return NULL;
 }
 
@@ -249,9 +244,9 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygsid * srchsid)
     {
       /* If impersonated, use impersonation token. */
       if (cygheap->user.issetuid ())
-        hToken = cygheap->user.token;
+	hToken = cygheap->user.token;
       else if (!OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken))
-        hToken = NULL;
+	hToken = NULL;
     }
   if (hToken)
     {
@@ -266,7 +261,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygsid * srchsid)
 	      cygsid sid;
 
 	      if (srchsid)
-	        {
+		{
 		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 		    if (*srchsid == groups->Groups[pg].Sid)
 		      return 1;
@@ -294,7 +289,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygsid * srchsid)
       else
 	debug_printf ("%d = GetTokenInformation(NULL) %E", size);
       if (hToken != cygheap->user.token)
-        CloseHandle (hToken);
+	CloseHandle (hToken);
       if (cnt)
 	return cnt;
     }

@@ -107,7 +107,7 @@ uinfo_init ()
       if (!child_proc_info)
 	internal_getlogin (cygheap->user); /* Set the cygheap->user. */
       else
-        CloseHandle (cygheap->user.token);
+	CloseHandle (cygheap->user.token);
       cygheap->user.set_orig_sid ();	/* Update the original sid */
       cygheap->user.token = INVALID_HANDLE_VALUE; /* No token present */
     }
@@ -469,7 +469,10 @@ pwdgrp::load (const char *posix_fname)
       HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL,
 			      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
       if (fh == INVALID_HANDLE_VALUE)
-	res = failed;
+	{
+	  paranoid_printf ("%s CreateFile failed, %E");
+	  res = failed;
+	}
       else
 	{
 	  DWORD size = GetFileSize (fh, NULL), read_bytes;
@@ -497,7 +500,7 @@ pwdgrp::load (const char *posix_fname)
 	}
     }
 
-  debug_printf ("load of %s %s", posix_fname, res);
+  debug_printf ("%s load %s", posix_fname, res);
   initialized = true;
   return;
 }

@@ -38,9 +38,6 @@ bool
 pwdgrp::parse_passwd ()
 {
 # define res (*passwd_buf)[curr_lines]
-
-  memset (&res, 0, sizeof (res));
-
   res.pw_name = next_str ();
   res.pw_passwd = next_str ();
 

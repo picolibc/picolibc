@@ -194,10 +194,10 @@ is_grp_member (__uid32_t uid, __gid32_t gid)
     {
       /* If gid == primary group of current user, return immediately. */
       if (gid == myself->gid)
-        return TRUE;
+	return TRUE;
       /* Calling getgroups only makes sense when reading the access token. */
       if (allow_ntsec)
-        {
+	{
 	  __gid32_t grps[NGROUPS_MAX];
 	  int cnt = internal_getgroups (NGROUPS_MAX, grps);
 	  for (idx = 0; idx < cnt; ++idx)
