@@ -1,3 +1,12 @@
+2002-04-09  Danny Smith  <dannysmith@sourceforge.users.net>
+
+	* profile/configure.in (CRT0S): Configure name of gcrt?.o
+	based on target, building gcrt0.o for cygwin -mno-cygwin.
+	* profile/configure: Regenerate.
+	* profile/Makefile.in (CRT0S): Use name from configure.
+	(gcrt0.o): New rule.   
+	(ALL_CRT0S): New define, used to cleanup all gcrt?.o's.
+
 2002-04-04  Danny Smith  <dannysmith@sourceforge.users.net>
 
 	* include/math.h (DOMAIN, SING, OVERFLOW, UNDERFLOW,
