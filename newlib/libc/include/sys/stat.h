@@ -137,10 +137,11 @@ int	_EXFUN(mknod,( const char *__path, mode_t __mode, dev_t __dev ));
 
 /* Provide prototypes for most of the _<systemcall> names that are
    provided in newlib for some compilers.  */
-#ifndef __INSIDE_CYGWIN__
+#ifdef _COMPILING_NEWLIB
 int	_EXFUN(_fstat,( int __fd, struct stat *__sbuf ));
 int	_EXFUN(_stat,( const char *__path, struct stat *__sbuf ));
 #ifdef __LARGE64_FILES
+struct stat64;
 int	_EXFUN(_fstat64,( int __fd, struct stat64 *__sbuf ));
 #endif
 #endif

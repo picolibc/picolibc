@@ -1,3 +1,9 @@
+2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/fcntl.h: Declare syscalls only when building newlib.
+	* libc/include/unistd.h: Ditto.
+	* libc/include/stat.h: Ditto.  Also declare struct stat64.
+
 2003-11-24  Artem B. Bityuckiy  <mail_lists@mail.ru>
 
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Fix check for 'C' format

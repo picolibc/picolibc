@@ -165,6 +165,7 @@ extern char *suboptarg;			/* getsubopt(3) external variable */
 int	 getsubopt(char **, char * const *, char **);
 #endif /* _POSIX_SOURCE */
 
+#ifdef _COMPILING_NEWLIB
 /* Provide prototypes for most of the _<systemcall> names that are
    provided in newlib for some compilers.  */
 int     _EXFUN(_close, (int __fildes ));
@@ -180,6 +181,7 @@ void *  _EXFUN(_sbrk,  (ptrdiff_t __incr));
 int     _EXFUN(_unlink, (const char *__path ));
 _READ_WRITE_RETURN_TYPE _EXFUN(_write, (int __fd, const void *__buf, size_t __nbyte ));
 int     _EXFUN(_execve, (const char *__path, char * const __argv[], char * const __envp[] ));
+#endif
 
 #if defined(__CYGWIN__) || defined(__rtems__) || defined(__sh__)
 #if !defined(__INSIDE_CYGWIN__)

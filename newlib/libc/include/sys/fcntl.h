@@ -169,10 +169,12 @@ extern int fcntl _PARAMS ((int, int, ...));
 
 /* Provide _<systemcall> prototypes for functions provided by some versions
    of newlib.  */
+#ifdef _COMPILING_NEWLIB
 extern int _open _PARAMS ((const char *, int, ...));
 extern int _fcntl _PARAMS ((int, int, ...));
 #ifdef __LARGE64_FILES
 extern int _open64 _PARAMS ((const char *, int, ...));
+#endif
 #endif
 
 #ifdef __cplusplus
