@@ -1166,10 +1166,10 @@ wait_sig (VOID *self)
        * array looking for any unprocessed signals.
        */
       pending_signals = false;
-      bool saw_failed_interrupt = false;
       bool more_signals = false;
+      bool saw_failed_interrupt = false;
       do
-	for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
+	for (int sig = -__SIGOFFSET, more_signals = false; sig < NSIG; sig++)
 	  {
 	    LONG x = InterlockedDecrement (todo + sig);
 	    if (x < 0)
@@ -1232,7 +1232,7 @@ wait_sig (VOID *self)
 		  goto out;
 	      }
 	  }
-      while (more_signals);
+      while (more_signals && !saw_failed_interrupt);
 
     out:
       /* Signal completion of signal handling depending on which semaphore
