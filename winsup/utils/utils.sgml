@@ -710,12 +710,15 @@ Regtool Copyright (c) 2000 Red Hat Inc
  regtool [-v] unset [key\value]  - removes value from key
  regtool [-q] get [key\value]  - prints value to stdout
      -q=quiet, no error msg, just return nonzero exit if key/value missing
- keys are like \prefix\key\key\key\value, where prefix is any of:
-   root     HKCR  HKEY_CLASSES_ROOT
-   config   HKCC  HKEY_CURRENT_CONFIG
-   user     HKCU  HKEY_CURRENT_USER
-   machine  HKLM  HKEY_LOCAL_MACHINE
-   users    HKU   HKEY_USERS
+ key is in the format [host]\prefix\KEY\KEY\VALUE, where host is optional
+ remote host in either \\hostname or hostname: format and prefix is any of:
+ root     HKCR  HKEY_CLASSES_ROOT (local only)
+ config   HKCC  HKEY_CURRENT_CONFIG (local only)
+ user     HKCU  HKEY_CURRENT_USER (local only)
+ machine  HKLM  HKEY_LOCAL_MACHINE
+ users    HKU   HKEY_USERS
+ You can use forward slash ('/') as a separator instead of backslash, in
+ that case backslash is treated as escape character.
  example: \user\software\Microsoft\Clock\iFormat
 </screen>
 

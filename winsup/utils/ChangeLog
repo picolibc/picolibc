@@ -1,3 +1,10 @@
+2002-06-06  Egor Duda <deo@logos-m.ru>
+
+	* regtool.cc (Fail): Be more verbose.
+	(find_key): Add support for remote registry access.
+	(usage): Document it.
+	* utils.sgml: Document it.
+
 2002-06-06  Christopher Faylor  <cgf@redhat.com>
 
 	* strace.cc (main): Make toggle a local variable.

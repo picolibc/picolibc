@@ -91,12 +91,16 @@ usage (FILE *where = stderr)
   "\n");
   if (where == stdout)
     fprintf (where, ""
-    "KEY is in the format \\prefix\\KEY\\KEY\\VALUE, where prefix is any of:\n"
-    "  \\root     HKCR  HKEY_CLASSES_ROOT\n"
-    "  \\config   HKCC  HKEY_CURRENT_CONFIG\n"
-    "  \\user     HKCU  HKEY_CURRENT_USER\n"
-    "  \\machine  HKLM  HKEY_LOCAL_MACHINE\n"
-    "  \\users    HKU   HKEY_USERS\n"
+    "KEY is in the format [host]\\prefix\\KEY\\KEY\\VALUE, where host is optional\n"
+    "remote host in either \\\\hostname or hostname: format and prefix is any of:\n"
+    "  root     HKCR  HKEY_CLASSES_ROOT (local only)\n"
+    "  config   HKCC  HKEY_CURRENT_CONFIG (local only)\n"
+    "  user     HKCU  HKEY_CURRENT_USER (local only)\n"
+    "  machine  HKLM  HKEY_LOCAL_MACHINE\n"
+    "  users    HKU   HKEY_USERS\n"
+    "\n"
+    "You can use forward slash ('/') as a separator instead of backslash, in\n"
+    "that case backslash is treated as escape character\n"
     "");
   fprintf (where, ""
   "Example: %s get '\\user\\software\\Microsoft\\Clock\\iFormat'\n", prog_name);
@@ -136,7 +140,7 @@ Fail (DWORD rv)
       FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER
 		     | FORMAT_MESSAGE_FROM_SYSTEM,
 		     0, rv, 0, (CHAR *) & buf, 0, 0);
-      fprintf (stderr, "Error: %s\n", buf);
+      fprintf (stderr, "Error (%ld): %s\n", rv, buf);
       LocalFree (buf);
     }
   exit (1);
@@ -251,12 +255,38 @@ translate (char *key)
 void
 find_key (int howmanyparts, REGSAM access)
 {
-  char *n = argv[0], *e, c;
+  HKEY base;
+  int rv;
+  char *n = argv[0], *e, *h, c;
+  char* host = NULL;
   int i;
   if (*n == '/')
     translate (n);
-  while (*n == '\\')
+  if (*n != '\\')
+    {
+      /* expect host:/key/value format */
+      host = (char*) malloc (strlen (n) + 1);
+      host[0] = host [1] = '\\'; 
+      for (e = n, h = host + 2; *e && *e != ':'; e++, h++)
+        *h = *e;
+      *h = 0;
+      n = e + 1;
+      if (*n == '/')
+        translate (n);
+    }
+  else if (n[0] == '\\' && n[1] == '\\')
+    {
+      /* expect //host/key/value format */
+      host = (char*) malloc (strlen (n) + 1);
+      host[0] = host[1] = '\\'; 
+      for (e = n + 2, h = host + 2; *e && *e != '\\'; e++, h++)
+        *h = *e;
+      *h = 0;
+      n = e;
+    }
+  while (*n != '\\')
     n++;
+  *n++ = 0;
   for (e = n; *e && *e != '\\'; e++);
   c = *e;
   *e = 0;
@@ -292,14 +322,24 @@ find_key (int howmanyparts, REGSAM access)
 	  value = e + 1;
 	}
     }
-  if (n[0] == 0)
+  if (host)
     {
-      key = wkprefixes[i].key;
-      return;
+      rv = RegConnectRegistry (host, wkprefixes[i].key, &base);
+      if (rv != ERROR_SUCCESS)
+	Fail (rv);
+      free (host);
     }
-  int rv = RegOpenKeyEx (wkprefixes[i].key, n, 0, access, &key);
-  if (rv != ERROR_SUCCESS)
-    Fail (rv);
+  else
+    base = wkprefixes[i].key;
+
+  if (n[0] == 0)
+    key = base;
+  else
+    {
+      rv = RegOpenKeyEx (base, n, 0, access, &key);
+      if (rv != ERROR_SUCCESS)
+	Fail (rv);
+    }
   //printf("key `%s' value `%s'\n", n, value);
 }
 
