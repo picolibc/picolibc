@@ -1,3 +1,15 @@
+2001-04-27  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* thread.cc (thread_init_wrapper): Use _REENT_INIT to initialize the
+	reent structure of newlib.
+
+Fri Apr 27 14:02:24 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.h (sig_send): Add exception parameter to sig_send.
+	* sigproc.cc (sig_send): Ditto.  Use it when setting frame info.
+	* exceptions.cc (handle_exceptions): Use exception flag when calling
+	sig_send.
+
 2001-04-27  Egor Duda  <deo@logos-m.ru>
 
 	* tty.cc (tty::make_pipes): Set to_slave pipe mode to nonblocking.

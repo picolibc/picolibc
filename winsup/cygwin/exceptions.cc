@@ -532,7 +532,7 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
       signal_exit (0x80 | sig);		// Flag signal + core dump
     }
 
-  sig_send (NULL, sig, (DWORD) ebp);		// Signal myself
+  sig_send (NULL, sig, (DWORD) ebp, 1);		// Signal myself
   return 0;
 }
 #endif /* __i386__ */

@@ -737,7 +737,7 @@ thread_init_wrapper (void *_arg)
   pthread *thread = (pthread *) _arg;
   struct __reent_t local_reent;
   struct _winsup_t local_winsup;
-  struct _reent local_clib;
+  struct _reent local_clib = _REENT_INIT(local_clib);
 
   struct sigaction _sigs[NSIG];
   sigset_t _sig_mask;		/* one set for everything to ignore. */
@@ -748,13 +748,7 @@ thread_init_wrapper (void *_arg)
   thread->sigmask = &_sig_mask;
   thread->sigtodo = _sigtodo;
 
-  memset (&local_clib, 0, sizeof (struct _reent));
   memset (&local_winsup, 0, sizeof (struct _winsup_t));
-
-  local_clib._errno = 0;
-  local_clib._stdin = &local_clib.__sf[0];
-  local_clib._stdout = &local_clib.__sf[1];
-  local_clib._stderr = &local_clib.__sf[2];
 
   local_reent._clib = &local_clib;
   local_reent._winsup = &local_winsup;

@@ -631,7 +631,7 @@ sigproc_terminate (void)
  * completed before returning.
  */
 int __stdcall
-sig_send (_pinfo *p, int sig, DWORD ebp)
+sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 {
   int rc = 1;
   DWORD tid = GetCurrentThreadId ();
@@ -680,7 +680,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp)
 	{
 	  thiscatch = sigcatch_main;
 	  thiscomplete = sigcomplete_main;
-	  thisframe.set (mainthread, ebp, 1);
+	  thisframe.set (mainthread, ebp, exception);
 	}
     }
   else if (!(thiscatch = getsem (p, "sigcatch", 0, 0)))

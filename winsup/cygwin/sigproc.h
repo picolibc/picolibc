@@ -110,7 +110,8 @@ void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
 BOOL __stdcall proc_exists (_pinfo *) __attribute__ ((regparm(1)));
 BOOL __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
-int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_address (0))  __attribute__ ((regparm(3)));
+int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_address (0),
+			bool exception = 0)  __attribute__ ((regparm(3)));
 void __stdcall signal_fixup_after_fork ();
 void __stdcall signal_fixup_after_exec (bool);
 
