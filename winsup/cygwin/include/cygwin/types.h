@@ -107,15 +107,20 @@ typedef long long key_t;
 #ifndef __BIT_TYPES_DEFINED
 #define __BIT_TYPES_DEFINED__ 1
 
-#ifndef __vm_offset_t
+#ifndef __vm_offset_t_defined
 #define __vm_offset_t_defined
 typedef unsigned long vm_offset_t;
 #endif /*__vm_offset_t_defined*/
 
-#ifndef __vm_size_t
+#ifndef __vm_size_t_defined
 #define __vm_size_t_defined
 typedef unsigned long vm_size_t;
 #endif /*__vm_size_t_defined*/
+
+#ifndef __vm_object_t_defined
+#define __vm_object_t_defined
+typedef void *vm_object_t;
+#endif /* __vm_object_t_defined */
 
 #ifndef __u_int8_t_defined
 #define __u_int8_t_defined

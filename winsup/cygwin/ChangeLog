@@ -1,3 +1,8 @@
+2003-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/types.h: Fix preprocessor guards for vm_offset_t and
+	vm_size_t.  Add typedef for vm_object_t.
+
 2003-11-05  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Detect attempt
