@@ -1,3 +1,8 @@
+2001-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* lib/getopt.c (getopt_internal): Reset optind to 1 only if optreset
+	is not set.
+
 2001-11-06  Christopher Faylor  <cgf@redhat.com>
 
 	* select.cc (fhandler_tty_slave::ready_for_read): Correct inverted

@@ -214,7 +214,7 @@ getopt_internal(int nargc, char *const * nargv, const char *options)
 	 * XXX re-initialize optind to 0 and have getopt_long(3)
 	 * XXX properly function again.  Work around this braindamage.
 	 */
-	if (optind == 0)
+	if (optind == 0 && optreset == 0)
 		optind = 1;
 
 	if (optreset)
