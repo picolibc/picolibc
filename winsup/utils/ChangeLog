@@ -1,3 +1,8 @@
+2003-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (ALL_LDFLAGS): Remove newlib/libm from tools paths.
+	(MINGW_LDFLAGS): Remove in favor of definition from Makefile.common.
+
 2003-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c: Fix copyright date.
