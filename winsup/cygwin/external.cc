@@ -31,7 +31,7 @@ fillout_pinfo (pid_t pid, int winpid)
 
   static winpids pids (0);
 
-  if (!pids.npids)
+  if (!pids.npids || !nextpid)
     pids.init ();
 
   static unsigned int i = 0;
@@ -48,14 +48,14 @@ fillout_pinfo (pid_t pid, int winpid)
 
       if (!p)
 	{
-	  if (!winpid)
+	  if (!winpid || (!nextpid && thispid != pid))
 	    continue;
 	  ep.pid = thispid;
 	  ep.dwProcessId = cygwin_pid (thispid);
 	  ep.process_state = PID_IN_USE;
 	  ep.ctty = -1;
 	}
-      else if (p->pid)
+      else if (nextpid || p->pid == pid)
 	{
 	  ep.ctty = tty_attached (p) ? p->ctty : -1;
 	  ep.pid = p->pid;
