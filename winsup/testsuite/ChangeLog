@@ -1,3 +1,7 @@
+Thu Oct  4 22:47:51 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* winsup.api/systemcall.c (main): Change some messages for clarity.
+
 Thu Oct  4 22:19:39 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* winsup.api/systemcall.c: New file.  Check for system call problems.

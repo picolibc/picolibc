@@ -40,7 +40,7 @@ main (int argc, char **argv)
   close (fds[1]);
   if (read (fds[0], buf, 4096) != 0)
     {
-      fprintf (stderr, "system call failed?\n%s\n", buf);
+      fprintf (stderr, "system() call failed?\n%s\n", buf);
       exit (1);
     }
 
@@ -51,7 +51,7 @@ main (int argc, char **argv)
     }
   if (n != 0)
     {
-      fprintf (stderr, "system() call returend %p\n", n);
+      fprintf (stderr, "system() call returned %p\n", n);
       exit (1);
     }
   exit (0);
