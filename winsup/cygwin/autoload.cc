@@ -392,7 +392,10 @@ LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)
 LoadDLLfuncEx (RtlIsDosDeviceName_U, 4, ntdll, 1)
 
 LoadDLLfuncEx (EnumProcessModules, 16, psapi, 1)
+LoadDLLfuncEx (GetModuleFileNameExA, 16, psapi, 1)
+LoadDLLfuncEx (GetModuleInformation, 16, psapi, 1)
 LoadDLLfuncEx (GetProcessMemoryInfo, 12, psapi, 1)
+LoadDLLfuncEx (QueryWorkingSet, 12, psapi, 1)
 
 LoadDLLfuncEx (LsaDeregisterLogonProcess, 4, secur32, 1)
 LoadDLLfuncEx (LsaFreeReturnBuffer, 4, secur32, 1)

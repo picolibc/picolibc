@@ -41,6 +41,7 @@ static const int PROC_VERSION  = 6;     // /proc/version
 static const int PROC_UPTIME   = 7;     // /proc/uptime
 static const int PROC_CPUINFO  = 8;     // /proc/cpuinfo
 static const int PROC_PARTITIONS = 9;   // /proc/partitions
+static const int PROC_SELF     = 10;    // /proc/self
 
 /* names of objects in /proc */
 static const char *proc_listing[] = {
@@ -74,7 +75,7 @@ static const DWORD proc_fhandlers[PROC_LINK_COUNT] = {
   FH_PROC,
   FH_PROC,
   FH_PROC,
-  FH_PROCESS,
+  FH_PROC,
 };
 
 /* name of the /proc filesystem */
@@ -143,7 +144,10 @@ fhandler_proc::exists ()
     return 2;
   for (int i = 0; proc_listing[i]; i++)
     if (pathmatch (path + 1, proc_listing[i]))
-      return (proc_fhandlers[i] == FH_PROC) ? -1 : 1;
+      {
+	fileid = i;
+	return (proc_fhandlers[i] == FH_PROC) ? (i == PROC_SELF ? -3 : -1) : 1;
+      }
   return 0;
 }
 
@@ -177,6 +181,8 @@ fhandler_proc::fstat (struct __stat64 *buf)
 	  {
 	    if (proc_fhandlers[i] != FH_PROC)
 	      buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
+	    else if (i == PROC_SELF)
+	      buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
 	    else
 	      {
 		buf->st_mode &= NO_X;
@@ -378,6 +384,11 @@ fhandler_proc::fill_filebuf ()
 	filebuf = (char *) realloc (filebuf, bufalloc = 4096);
 	filesize = format_proc_partitions (filebuf, bufalloc);
 	break;
+      }
+    case PROC_SELF:
+      {
+        filebuf = (char *) realloc (filebuf, bufalloc = 32);
+	filesize = __small_sprintf (filebuf, "%d", getpid ());
       }
     }
     return true;

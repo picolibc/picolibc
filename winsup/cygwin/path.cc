@@ -95,6 +95,7 @@ struct symlink_info
   _minor_t minor;
   _mode_t mode;
   int check (char *path, const suffix_info *suffixes, unsigned opt);
+  int set (char *path, int type);
   bool parse_device (const char *);
   bool case_check (char *path);
 };
@@ -616,6 +617,11 @@ path_conv::check (const char *src, unsigned opt,
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
 	      fhandler_virtual *fh = (fhandler_virtual *) build_fh_dev (dev, path_copy);
 	      int file_type = fh->exists ();
+	      if (file_type == -2 || file_type == -3)
+	        {
+		  fh->fill_filebuf ();
+		  symlen = sym.set (fh->get_filebuf (), file_type);
+		}
 	      delete fh;
 	      switch (file_type)
 		{
@@ -626,9 +632,12 @@ path_conv::check (const char *src, unsigned opt,
 		  case -1:
 		    fileattr = 0;
 		    break;
+		  case -2:	/* /proc/<pid>/symlinks */
+		  case -3:	/* /proc/self */
+		    goto is_virtual_symlink;
 		  default:
 		    fileattr = INVALID_FILE_ATTRIBUTES;
-		    break;
+		    goto virtual_component_retry;
 		}
 	      goto out;
 	    }
@@ -656,6 +665,8 @@ path_conv::check (const char *src, unsigned opt,
 	    }
 
 	  symlen = sym.check (full_path, suff, opt | fs.has_ea ());
+
+is_virtual_symlink:
 
 	  if (sym.minor || sym.major)
 	    {
@@ -739,6 +750,8 @@ path_conv::check (const char *src, unsigned opt,
 		}
 	      /* No existing file found. */
 	    }
+
+virtual_component_retry:
 
 	  /* Find the new "tail" of the path, e.g. in '/for/bar/baz',
 	     /baz is the tail. */
@@ -3115,6 +3128,34 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
   syscall_printf ("%d = symlink.check (%s, %p) (%p)",
 		  res, suffix.path, contents, pflags);
   return res;
+}
+
+/* "path" is the path in a virtual symlink.  Set a symlink_info struct from
+   that and proceed with further path checking afterwards. */
+int
+symlink_info::set (char *path, int type)
+{
+  extern suffix_info stat_suffixes[];
+
+  strcpy (contents, path);
+  pflags = PATH_SYMLINK;
+  if (type == -3) /* /proc/self */
+    {
+      fileattr = FILE_ATTRIBUTE_DIRECTORY;
+      error = 0;
+    }
+  else
+    {
+      /* That's save since a virtual symlink doesn't point to itself. */
+      path_conv pc (contents, PC_SYM_NOFOLLOW | PC_FULL, stat_suffixes);
+      fileattr = pc;
+      error = pc.error;
+    }
+  is_symlink = true;
+  ext_tacked_on = case_clash = false;
+  ext_here = NULL;
+  extn = major = minor = mode = 0;
+  return strlen (path);
 }
 
 /* Check the correct case of the last path component (given in DOS style).

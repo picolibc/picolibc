@@ -25,30 +25,37 @@ details. */
 #include <sys/param.h>
 #include <assert.h>
 #include <sys/sysmacros.h>
+#include <psapi.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
 static const int PROCESS_PPID = 2;
-static const int PROCESS_EXENAME = 3;
-static const int PROCESS_WINPID = 4;
-static const int PROCESS_WINEXENAME = 5;
-static const int PROCESS_STATUS = 6;
-static const int PROCESS_UID = 7;
-static const int PROCESS_GID = 8;
-static const int PROCESS_PGID = 9;
-static const int PROCESS_SID = 10;
-static const int PROCESS_CTTY = 11;
-static const int PROCESS_STAT = 12;
-static const int PROCESS_STATM = 13;
-static const int PROCESS_CMDLINE = 14;
+static const int PROCESS_WINPID = 3;
+static const int PROCESS_WINEXENAME = 4;
+static const int PROCESS_STATUS = 5;
+static const int PROCESS_UID = 6;
+static const int PROCESS_GID = 7;
+static const int PROCESS_PGID = 8;
+static const int PROCESS_SID = 9;
+static const int PROCESS_CTTY = 10;
+static const int PROCESS_STAT = 11;
+static const int PROCESS_STATM = 12;
+static const int PROCESS_CMDLINE = 13;
+static const int PROCESS_MAPS = 14;
+/* Keep symlinks always the last entries. */
+static const int PROCESS_ROOT = 15;
+static const int PROCESS_EXE = 16;
+static const int PROCESS_CWD = 17;
+
+/* The position of "root" defines the beginning of symlik entries. */
+#define is_symlink(nr) ((nr) >= PROCESS_ROOT)
 
 static const char * const process_listing[] =
 {
   ".",
   "..",
   "ppid",
-  "exename",
   "winpid",
   "winexename",
   "status",
@@ -60,12 +67,18 @@ static const char * const process_listing[] =
   "stat",
   "statm",
   "cmdline",
+  "maps",
+  /* Keep symlinks always the last entries. */
+  "root",
+  "exe",
+  "cwd",
   NULL
 };
 
 static const int PROCESS_LINK_COUNT =
   (sizeof (process_listing) / sizeof (const char *)) - 1;
 
+static _off64_t format_process_maps (_pinfo *p, char *destbuf, size_t maxsize);
 static _off64_t format_process_stat (_pinfo *p, char *destbuf, size_t maxsize);
 static _off64_t format_process_status (_pinfo *p, char *destbuf, size_t maxsize);
 static _off64_t format_process_statm (_pinfo *p, char *destbuf, size_t maxsize);
@@ -91,7 +104,10 @@ fhandler_process::exists ()
 
   for (int i = 0; process_listing[i]; i++)
     if (pathmatch (path + 1, process_listing[i]))
-      return -1;
+      {
+	fileid = i;
+	return is_symlink (i) ? -2 : -1;
+      }
   return 0;
 }
 
@@ -137,8 +153,13 @@ fhandler_process::fstat (struct __stat64 *buf)
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
       buf->st_nlink = PROCESS_LINK_COUNT;
       return 0;
-    default:
+    case -2:
+      buf->st_uid = p->uid;
+      buf->st_gid = p->gid;
+      buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
+      return 0;
     case -1:
+    default:
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode |= S_IFREG | S_IRUSR | S_IRGRP | S_IROTH;
@@ -251,6 +272,15 @@ out:
 bool
 fhandler_process::fill_filebuf ()
 {
+  if (!pid)
+    {
+      const char *path;
+      path = get_name () + proc_len + 1;
+      if (path_prefix_p ("self", path, 4))
+	pid = getpid ();
+      else
+	pid = atoi (path);
+    }
   pinfo p (pid);
 
   if (!p)
@@ -298,12 +328,25 @@ fhandler_process::fill_filebuf ()
 	filesize = strlen (filebuf);
 	break;
       }
+    case PROCESS_ROOT:
+    case PROCESS_CWD:
     case PROCESS_CMDLINE:
       {
-	if (filebuf)
+        if (filebuf)
 	  free (filebuf);
-	size_t fs;
-	filebuf = p->cmdline (fs);
+	size_t fs; 
+	switch (fileid)
+	  {
+	  case PROCESS_ROOT:
+	    filebuf = p->root (fs);
+	    break;
+	  case PROCESS_CWD:
+	    filebuf = p->cwd (fs);
+	    break;
+	  case PROCESS_CMDLINE:
+	    filebuf = p->cmdline (fs);
+	    break;
+	  }
 	filesize = fs;
 	if (!filebuf || !*filebuf)
 	  {
@@ -312,7 +355,7 @@ fhandler_process::fill_filebuf ()
 	  }
 	break;
       }
-    case PROCESS_EXENAME:
+    case PROCESS_EXE:
       {
 	filebuf = (char *) realloc (filebuf, bufalloc = CYG_MAX_PATH);
 	if (p->process_state & PID_EXITED)
@@ -365,9 +408,98 @@ fhandler_process::fill_filebuf ()
 	filesize = format_process_statm (*p, filebuf, bufalloc);
 	break;
       }
+    case PROCESS_MAPS:
+      {
+	filebuf = (char *) realloc (filebuf, bufalloc = 2048);
+	filesize = format_process_maps (*p, filebuf, bufalloc);
+	break;
+      }
     }
 
   return true;
+}
+
+static _off64_t
+format_process_maps (_pinfo *p, char *destbuf, size_t maxsize)
+{
+  if (!wincap.is_winnt ())
+    return 0;
+
+  HANDLE proc = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+			     FALSE,
+			     p->dwProcessId);
+  if (!proc)
+    return 0;
+
+  _off64_t len = 0;
+  HMODULE *modules;
+  DWORD needed, i;
+  DWORD_PTR wset_size;
+  DWORD_PTR *workingset = NULL;
+  MODULEINFO info;
+  char modname[CYG_MAX_PATH + 1];
+  char posix_modname[CYG_MAX_PATH + 1];
+
+  if (!EnumProcessModules (proc, NULL, 0, &needed))
+    {
+      __seterrno ();
+      len = -1;
+      goto out;
+    }
+  modules = (HMODULE*) alloca (needed);
+  if (!EnumProcessModules (proc, modules, needed, &needed))
+    {
+      __seterrno ();
+      len = -1;
+      goto out;
+    }
+
+  QueryWorkingSet (proc, (void *) &wset_size, sizeof wset_size);
+  if (GetLastError () == ERROR_BAD_LENGTH)
+    {
+      workingset = (DWORD_PTR *) alloca (sizeof (DWORD_PTR) * ++wset_size);
+      if (!QueryWorkingSet (proc, (void *) workingset,
+			    sizeof (DWORD_PTR) * wset_size))
+	workingset = NULL;
+    }
+  for (i = 0; i < needed / sizeof (HMODULE); i++)
+    if (GetModuleInformation (proc, modules[i], &info, sizeof info)
+	&& GetModuleFileNameEx (proc, modules[i], modname, sizeof modname))
+      {
+	char access[5];
+	strcpy (access, "r--p");
+	cygwin_conv_to_full_posix_path (modname, posix_modname);
+	if (len + strlen (posix_modname) + 50 > maxsize - 1)
+	  break;
+	if (workingset)
+	  for (unsigned i = 1; i <= wset_size; ++i)
+	    {
+	      DWORD_PTR addr = workingset[i] & 0xfffff000UL;
+	      if ((char *)addr >= info.lpBaseOfDll
+		  && (char *)addr < (char *)info.lpBaseOfDll + info.SizeOfImage)
+		{
+		  access[0] = (workingset[i] & 0x5) ? 'r' : '-';
+		  access[1] = (workingset[i] & 0x4) ? 'w' : '-';
+		  access[2] = (workingset[i] & 0x2) ? 'x' : '-';
+		  access[3] = (workingset[i] & 0x100) ? 's' : 'p';
+		}
+	    }
+	int written = __small_sprintf (destbuf + len,
+				"%08lx-%08lx %s %08lx 00:00 %lu   ",
+				info.lpBaseOfDll,
+				(unsigned long)info.lpBaseOfDll
+				+ info.SizeOfImage,
+				access,
+				info.EntryPoint,
+				info.SizeOfImage);
+	while (written++ < 49)
+	  destbuf[len + written] = ' ';
+        len += written;
+	len += __small_sprintf (destbuf + len, "%s\n", posix_modname);
+      }
+out:
+  CloseHandle (proc);
+  return len;
 }
 
 static _off64_t

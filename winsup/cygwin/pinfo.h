@@ -23,7 +23,9 @@ struct commune_result
 enum picom
 {
   PICOM_CMDLINE = 1,
-  PICOM_FIFO = 2
+  PICOM_FIFO = 2,
+  PICOM_CWD = 3,
+  PICOM_ROOT = 4
 };
 
 #define EXITCODE_SET 0x80000000
@@ -106,6 +108,8 @@ public:
   void commune_recv ();
   commune_result commune_send (DWORD, ...);
   bool alive ();
+  char *root (size_t &);
+  char *cwd (size_t &);
   char *cmdline (size_t &);
   void set_ctty (class tty_min *, int, class fhandler_tty_slave *);
   bool dup_proc_pipe (HANDLE) __attribute__ ((regparm(2)));

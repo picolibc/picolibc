@@ -1,3 +1,39 @@
+2005-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetModuleFileNameExA): Add.
+	(GetModuleInformation): Add.
+	(QueryWorkingSet): Add.
+	* fhandler.h (fhandler_virtual::get_filebuf): New method.
+	* fhandler_proc.cc (PROC_SELF): Define.
+	(proc_fhandlers): Change type of self to FH_PROC.
+	(fhandler_proc::exists): Return -3 if self.
+	(fhandler_proc::fstat): Handle self as symlink.
+	(fhandler_proc::fill_filebuf): Handle self.
+	* fhandler_process.cc: Include psapi.h.
+	(PROCESS_EXENAME): Remove.
+	(PROCESS_MAPS): Define.
+	(PROCESS_ROOT): Define.
+	(PROCESS_EXE): Define.
+	(PROCESS_CWD): Define.
+	(process_listing): Remove "exename", add "maps, "root", "exe" and
+	"cwd" elements.
+	(fhandler_process::exists): Return -2 for symlinks.
+	(fhandler_process::fstat): Handle symlinks.
+	(fill_filebuf): Evaluate pid if pid is 0.  Use exename handling for
+	exe.  Handle maps, root and cwd.
+	(format_process_maps): New function evaluating "maps".
+	* path.cc (symlink_info::set): New method to fill symlink_info
+	with data matching virtual symlinks.
+	(path_conv::check): Handle virtual symlinks.
+	* pinfo.cc (_pinfo::commune_recv): Add PICOM_CWD and PICOM_ROOT
+	handling.
+	(_pinfo::commune_send): Ditto.
+	(_pinfo::root): New function.
+	(_pinfo::cwd): New function.
+	* pinfo.h (enum picom): Add PICOM_CWD and PICOM_ROOT.
+	(_pinfo::root): Declare.
+	(_pinfo::cwd): Declare.
+
 2005-01-29  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.cc (new): Add a little more debugging.

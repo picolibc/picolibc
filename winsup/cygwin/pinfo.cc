@@ -380,6 +380,7 @@ extern char **__argv;
 void
 _pinfo::commune_recv ()
 {
+  char pathbuf[CYG_MAX_PATH];
   DWORD nr;
   DWORD code;
   HANDLE hp;
@@ -455,6 +456,32 @@ _pinfo::commune_recv ()
 	    sigproc_printf ("WriteFile null failed, %E");
 	    break;
 	  }
+	break;
+      }
+    case PICOM_CWD:
+      {
+	unsigned int n = strlen (cygheap->cwd.get (pathbuf, 1, 1, CYG_MAX_PATH)) + 1;
+        CloseHandle (__fromthem); __fromthem = NULL;
+	CloseHandle (hp);
+	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	  sigproc_printf ("WriteFile sizeof argv failed, %E");
+	else if (!WriteFile (__tothem, pathbuf, n, &nr, NULL))
+	  sigproc_printf ("WriteFile sizeof argv failed, %E");
+	break;
+      }
+    case PICOM_ROOT:
+      {
+	unsigned int n;
+	if (cygheap->root.exists ())
+	  n = strlen (strcpy (pathbuf, cygheap->root.posix_path ())) + 1;
+	else
+	  n = strlen (strcpy (pathbuf, "/")) + 1;
+        CloseHandle (__fromthem); __fromthem = NULL;
+	CloseHandle (hp);
+	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	  sigproc_printf ("WriteFile sizeof argv failed, %E");
+	else if (!WriteFile (__tothem, pathbuf, n, &nr, NULL))
+	  sigproc_printf ("WriteFile sizeof argv failed, %E");
 	break;
       }
     case PICOM_FIFO:
@@ -588,6 +615,8 @@ _pinfo::commune_send (DWORD code, ...)
   switch (code)
     {
     case PICOM_CMDLINE:
+    case PICOM_CWD:
+    case PICOM_ROOT:
       if (!ReadFile (fromthem, &n, sizeof n, &nr, NULL) || nr != sizeof n)
 	{
 	  __seterrno ();
@@ -652,6 +681,50 @@ out:
   myself->hello_pid = 0;
   myself.unlock ();
   return res;
+}
+
+char *
+_pinfo::root (size_t& n)
+{
+  char *s;
+  if (!this || !pid)
+    return NULL;
+  if (pid != myself->pid)
+    {
+      commune_result cr = commune_send (PICOM_ROOT);
+      s = cr.s;
+      n = cr.n;
+    }
+  else
+    {
+      if (cygheap->root.exists ())
+	s = strdup (cygheap->root.posix_path ());
+      else
+	s = strdup ("/");
+      n = strlen (s) + 1;
+    }
+  return s;
+}
+
+char *
+_pinfo::cwd (size_t& n)
+{
+  char *s;
+  if (!this || !pid)
+    return NULL;
+  if (pid != myself->pid)
+    {
+      commune_result cr = commune_send (PICOM_CWD);
+      s = cr.s;
+      n = cr.n;
+    }
+  else
+    {
+      s = (char *) malloc (CYG_MAX_PATH);
+      cygheap->cwd.get (s, 1, 1, CYG_MAX_PATH);
+      n = strlen (s) + 1;
+    }
+  return s;
 }
 
 char *
