@@ -20,6 +20,33 @@
 #ifndef _ELF_SH_H
 #define _ELF_SH_H
 
+/* Processor specific flags for the ELF header e_flags field.  */
+
+#define EF_SH_MACH_MASK	0x1f
+#define EF_SH_UNKNOWN	   0 /* For backwards compatibility.  */
+#define EF_SH1		   1
+#define EF_SH2		   2
+#define EF_SH3		   3
+#define EF_SH_HAS_DSP(flags) ((flags) & 4)
+#define EF_SH_DSP	   4
+#define EF_SH3_DSP	   5
+#define EF_SH_HAS_FP(flags) ((flags) & 8)
+#define EF_SH3E		   8
+#define EF_SH4		   9
+
+#define EF_SH_MERGE_MACH(mach1, mach2) \
+  (((((mach1) == EF_SH3 || (mach1) == EF_SH_UNKNOWN) && (mach2) == EF_SH_DSP) \
+    || ((mach1) == EF_SH_DSP \
+	&& ((mach2) == EF_SH3 || (mach2) == EF_SH_UNKNOWN))) \
+   ? EF_SH3_DSP \
+   : (((mach1) < EF_SH3 && (mach2) == EF_SH_UNKNOWN) \
+      || ((mach2) < EF_SH3 && (mach1) == EF_SH_UNKNOWN)) \
+   ? EF_SH3 \
+   : (((mach1) == EF_SH3E && (mach2) == EF_SH_UNKNOWN) \
+      || ((mach2) == EF_SH3E && (mach1) == EF_SH_UNKNOWN)) \
+   ? EF_SH4 \
+   : ((mach1) > (mach2) ? (mach1) : (mach2)))
+
 #include "elf/reloc-macros.h"
 
 /* Relocations.  */
