@@ -1,3 +1,8 @@
+2002-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Complain about lack of w32api directory.
+	* configure: Regenerate.
+
 2002-04-25  Christopher Faylor  <cgf@redhat.com>
 
 	* configure.in: Remove cinstall target.
