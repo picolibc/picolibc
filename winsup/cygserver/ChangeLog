@@ -1,3 +1,7 @@
+2003-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.cc (print_usage): Fix scrambled output.
+
 2003-11-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver-config: Slightly modify printed message.
