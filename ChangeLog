@@ -1,3 +1,8 @@
+Thu Apr 27 11:01:48 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* Makefile.in (do-tar-bz2, do-md5sum): Skip CVS directories when
+ 	building file lists.
+
 Wed Apr 26 17:03:53 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* Makefile.in (do-djunpack): New target. Update djunpack.bat with
