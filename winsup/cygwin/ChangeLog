@@ -1,3 +1,9 @@
+Tue Jun  5 19:56:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_console.cc (fhandler_console::dup): Allocate space for
+	savebuf on Cygwin heap.
+	(fhandler_console::char_command): Ditto. Use correct values for size.
+
 2001-06-05  Egor Duda  <deo@logos-m.ru>
 
 	* security.h (NTWriteEA): Change prototype.

@@ -624,7 +624,7 @@ fhandler_console::dup (fhandler_base *child)
   fhc->savebufsiz = savebufsiz;
   if (savebuf)
     {
-      fhc->savebuf = (PCHAR_INFO) malloc (sizeof (CHAR_INFO) *
+      fhc->savebuf = (PCHAR_INFO) cmalloc (HEAP_1_BUF, sizeof (CHAR_INFO) *
 					  savebufsiz.X * savebufsiz.Y);
       memcpy (fhc->savebuf, savebuf, sizeof (CHAR_INFO) *
 				     savebufsiz.X * savebufsiz.Y);
@@ -1174,12 +1174,12 @@ fhandler_console::char_command (char c)
 	      if (!GetConsoleScreenBufferInfo (get_output_handle (), &now))
 		break;
 
-	      savebufsiz.X = now.srWindow.Right - now.srWindow.Left;
-	      savebufsiz.Y = now.srWindow.Bottom - now.srWindow.Top;
+	      savebufsiz.X = now.srWindow.Right - now.srWindow.Left + 1;
+	      savebufsiz.Y = now.srWindow.Bottom - now.srWindow.Top + 1;
 
 	      if (savebuf)
-		free (savebuf);
-	      savebuf = (PCHAR_INFO) malloc (sizeof (CHAR_INFO) *
+		cfree (savebuf);
+	      savebuf = (PCHAR_INFO) cmalloc (HEAP_1_BUF, sizeof (CHAR_INFO) *
 					     savebufsiz.X * savebufsiz.Y);
 
 	      ReadConsoleOutputA (get_output_handle (), savebuf,
@@ -1199,7 +1199,7 @@ fhandler_console::char_command (char c)
 	      WriteConsoleOutputA (get_output_handle (), savebuf,
 				   savebufsiz, cob, &now.srWindow);
 
-	      free (savebuf);
+	      cfree (savebuf);
 	      savebuf = NULL;
 	      savebufsiz.X = savebufsiz.Y = 0;
 	    }
