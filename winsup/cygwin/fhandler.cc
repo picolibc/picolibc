@@ -396,7 +396,7 @@ fhandler_base::open (int flags, mode_t mode)
     file_attributes |= FILE_FLAG_OVERLAPPED;
 
 #ifdef HIDDEN_DOT_FILES
-  if (flags & O_CREAT && dev ().isfs ())
+  if (flags & O_CREAT && get_device () == FH_FS)
     {
       char *c = strrchr (get_win32_name (), '\\');
       if ((c && c[1] == '.') || *get_win32_name () == '.')
@@ -420,7 +420,7 @@ fhandler_base::open (int flags, mode_t mode)
 
   /* If the file should actually be created and ntsec is on,
      set files attributes. */
-  if (flags & O_CREAT && dev ().isfs () && allow_ntsec && has_acls ())
+  if (flags & O_CREAT && get_device () == FH_FS && allow_ntsec && has_acls ())
     set_security_attribute (mode, &sa, sd);
 
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
