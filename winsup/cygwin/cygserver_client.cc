@@ -303,7 +303,10 @@ client_request::handle_request (transport_layer_base *const conn,
   req->handle (conn, cache);
 
   safe_delete (client_request, req);
-  printf (".");
+
+#ifndef DEBUGGING
+  printf (".");			// A little noise when we're being quiet.
+#endif
 }
 
 #endif /* !__INSIDE_CYGWIN__ */
