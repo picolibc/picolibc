@@ -36,11 +36,11 @@ heap_init ()
      as our parent.  If not, we don't care where it ends up.  */
 
   page_const = system_info.dwPageSize;
-  if (brkbase)
+  if (cygheap->heapbase)
     {
-      DWORD chunk = brkchunk;	/* allocation chunk */
+      DWORD chunk = cygwin_shared->heap_chunk_size ();	/* allocation chunk */
       /* total size commited in parent */
-      DWORD allocsize = (char *) brktop - (char *) brkbase;
+      DWORD allocsize = (char *) cygheap->heaptop - (char *) cygheap->heapbase;
       /* round up by chunk size */
       DWORD reserve_size = chunk * ((allocsize + (chunk - 1)) / chunk);
 
@@ -48,7 +48,7 @@ heap_init ()
       char *p;
       for (;;)
 	{
-	  p = (char *) VirtualAlloc (brkbase, reserve_size,
+	  p = (char *) VirtualAlloc (cygheap->heapbase, reserve_size,
 				     MEM_RESERVE, PAGE_READWRITE);
 	  if (p)
 	    break;
@@ -57,23 +57,26 @@ heap_init ()
 	}
       if (p == NULL)
 	api_fatal ("1. unable to allocate heap %p, heap_chunk_size %d, pid %d, %E",
-		   brkbase, brkchunk, myself->pid);
-      if (p != brkbase)
-	api_fatal ("heap allocated but not at %p", brkbase);
-      if (! VirtualAlloc (brkbase, allocsize, MEM_COMMIT, PAGE_READWRITE))
+		   cygheap->heapbase, cygwin_shared->heap_chunk_size (), myself->pid);
+      if (p != cygheap->heapbase)
+	api_fatal ("heap allocated but not at %p", cygheap->heapbase);
+      if (! VirtualAlloc (cygheap->heapbase, allocsize, MEM_COMMIT, PAGE_READWRITE))
 	api_fatal ("MEM_COMMIT failed, %E");
     }
   else
     {
       /* Initialize page mask and default heap size.  Preallocate a heap
        * to assure contiguous memory.  */
-      brk = brktop = brkbase = VirtualAlloc(NULL, brkchunk, MEM_RESERVE, PAGE_NOACCESS);
-      if (brkbase == NULL)
+      cygheap->heapptr = cygheap->heaptop = cygheap->heapbase =
+	VirtualAlloc(NULL, cygwin_shared->heap_chunk_size (), MEM_RESERVE,
+	    	     PAGE_NOACCESS);
+      if (cygheap->heapbase == NULL)
 	api_fatal ("2. unable to allocate heap, heap_chunk_size %d, %E",
-		   brkchunk);
+		   cygwin_shared->heap_chunk_size ());
     }
 
-  debug_printf ("heap base %p, heap top %p", brkbase, brktop);
+  debug_printf ("heap base %p, heap top %p", cygheap->heapbase,
+      		cygheap->heaptop);
   page_const--;
   malloc_init ();
 }
@@ -90,43 +93,43 @@ _sbrk(int n)
   unsigned commitbytes, newbrksize;
 
   if (n == 0)
-    return brk;			/* Just wanted to find current brk address */
+    return cygheap->heapptr;			/* Just wanted to find current cygheap->heapptr address */
 
-  newbrk = (char *) brk + n;	/* Where new brk will be */
-  newtop = (char *) pround (newbrk); /* Actual top of allocated memory -
-				   on page boundary */
+  newbrk = (char *) cygheap->heapptr + n;	/* Where new cygheap->heapptr will be */
+  newtop = (char *) pround (newbrk);		/* Actual top of allocated memory -
+						   on page boundary */
 
-  if (newtop == brktop)
+  if (newtop == cygheap->heaptop)
     goto good;
 
   if (n < 0)
-    {				/* Freeing memory */
-      assert(newtop < brktop);
-      n = (char *) brktop - newtop;
+    {						/* Freeing memory */
+      assert(newtop < cygheap->heaptop);
+      n = (char *) cygheap->heaptop - newtop;
       if (VirtualFree(newtop, n, MEM_DECOMMIT)) /* Give it back to OS */
-	goto good;		/*  Didn't take */
+	goto good;				/*  Didn't take */
       else
 	goto err;
     }
 
-  assert(newtop > brktop);
+  assert(newtop > cygheap->heaptop);
 
   /* Need to grab more pages from the OS.  If this fails it may be because
    * we have used up previously reserved memory.  Or, we're just plumb out
    * of memory.  */
-  commitbytes = pround (newtop - (char *) brktop);
-  if (VirtualAlloc(brktop, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL)
+  commitbytes = pround (newtop - (char *) cygheap->heaptop);
+  if (VirtualAlloc(cygheap->heaptop, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL)
     goto good;
 
   /* Couldn't allocate memory.  Maybe we can reserve some more.
-     Reserve either the maximum of the standard brkchunk or the requested
+     Reserve either the maximum of the standard cygwin_shared->heap_chunk_size () or the requested
      amount.  Then attempt to actually allocate it.  */
 
-  if ((newbrksize = brkchunk) < commitbytes)
+  if ((newbrksize = cygwin_shared->heap_chunk_size ()) < commitbytes)
     newbrksize = commitbytes;
 
-  if ((VirtualAlloc(brktop, newbrksize, MEM_RESERVE, PAGE_NOACCESS) != NULL) &&
-      (VirtualAlloc(brktop, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL))
+  if ((VirtualAlloc(cygheap->heaptop, newbrksize, MEM_RESERVE, PAGE_NOACCESS) != NULL) &&
+      (VirtualAlloc(cygheap->heaptop, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL))
     goto good;
 
 err:
@@ -134,8 +137,8 @@ err:
   return (void *) -1;
 
 good:
-  void *oldbrk = brk;
-  brk = newbrk;
-  brktop = newtop;
+  void *oldbrk = cygheap->heapptr;
+  cygheap->heapptr = newbrk;
+  cygheap->heaptop = newtop;
   return oldbrk;
 }

@@ -15,10 +15,3 @@ void heap_init ();
 void malloc_init ();
 
 #define inheap(s) (brk && ((char *) (s) >= (char *) brkbase) && ((char *) (s) <= (char *) brktop))
-
-#define brksize ((char *) cygheap->heaptop - (char *) cygheap->heapbase)
-#define brk (cygheap->heapptr)
-#define brkbase (cygheap->heapbase)
-#define brktop (cygheap->heaptop)
-#define brkchunk (cygwin_shared->heap_chunk_size ())
-

@@ -103,8 +103,6 @@ open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
 void
 shared_info::initialize ()
 {
-  /* Ya, Win32 provides a way for a dll to watch when it's first loaded.
-     We may eventually want to use it but for now we have this.  */
   if (inited)
     {
       if (inited != SHAREDVER)
@@ -120,23 +118,6 @@ shared_info::initialize ()
 
   /* Initialize tty table.  */
   tty.init ();
-
-  /* Fetch misc. registry entries.  */
-
-  reg_key reg (KEY_READ, NULL);
-
-  /* Note that reserving a huge amount of heap space does not result in
-  the use of swap since we are not committing it. */
-  /* FIXME: We should not be restricted to a fixed size heap no matter
-  what the fixed size is. */
-
-  heap_chunk_in_mb = reg.get_int ("heap_chunk_in_mb", 256);
-  if (heap_chunk_in_mb < 4)
-    {
-      heap_chunk_in_mb = 4;
-      reg.set_int ("heap_chunk_in_mb", heap_chunk_in_mb);
-    }
-
   inited = SHAREDVER;
 }
 
@@ -198,6 +179,25 @@ shared_terminate ()
 unsigned
 shared_info::heap_chunk_size ()
 {
+  if (!heap_chunk_in_mb)
+    {
+      /* Fetch misc. registry entries.  */
+
+      reg_key reg (KEY_READ, NULL);
+
+      /* Note that reserving a huge amount of heap space does not result in
+      the use of swap since we are not committing it. */
+      /* FIXME: We should not be restricted to a fixed size heap no matter
+      what the fixed size is. */
+
+      heap_chunk_in_mb = reg.get_int ("heap_chunk_in_mb", 256);
+      if (heap_chunk_in_mb < 4)
+	{
+	  heap_chunk_in_mb = 4;
+	  reg.set_int ("heap_chunk_in_mb", heap_chunk_in_mb);
+	}
+    }
+
   return heap_chunk_in_mb << 20;
 }
 

@@ -137,8 +137,8 @@ class shared_info
 
   tty_list tty;
   delqueue_list delqueue;
-  void initialize (void);
-  unsigned heap_chunk_size (void);
+  void initialize ();
+  unsigned heap_chunk_size ();
 };
 
 extern shared_info *cygwin_shared;

@@ -1,3 +1,16 @@
+Sun Sep  9 15:02:44 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (cygheap_fixup_in_child): Clear cygheap->base so that heap
+	is not forced to start at the same place in execed process.
+	* heap.cc: Remove brk* macros for clarity throughout.
+	* heap.h: Ditto.
+	* shared.cc (shared_info::initialize): Move heap_chunk test into
+	heap_chunk_size().
+	(heap_chunk_size): Check for chunk size here.  Don't go to registry if
+	heap_chunk_in_mb is already set.
+
+	* smallprint.c (console_printf): Add Windows 95 concessions.
+
 Sun Sep  9 13:01:06 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* child_info.h (PROC_MAGIC): Bump magic number.

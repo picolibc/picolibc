@@ -212,11 +212,15 @@ console_printf (const char *fmt,...)
   va_list ap;
   DWORD done;
   int count;
-  extern SECURITY_ATTRIBUTES sec_none;
 
   if (!console_handle)
-    console_handle = CreateFileA ("CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE,
-				  &sec_none, OPEN_EXISTING, 0, 0);
+    console_handle = CreateFileA ("CON", GENERIC_WRITE,
+				  FILE_SHARE_READ | FILE_SHARE_WRITE,
+				  NULL, OPEN_EXISTING, 0, 0);
+
+  if (console_handle == INVALID_HANDLE_VALUE)
+    console_handle = GetStdHandle (STD_ERROR_HANDLE);
+
   va_start (ap, fmt);
   count = __small_vsprintf (buf, fmt, ap);
   va_end (ap);

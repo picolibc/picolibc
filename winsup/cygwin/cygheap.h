@@ -153,9 +153,12 @@ struct init_cygheap
 {
   _cmalloc_entry *chain;
   char *buckets[32];
-  void *heapbase;
-  void *heapptr;
-  void *heaptop;
+  struct /* User heap stuff. */
+    {
+      void *heapbase;
+      void *heapptr;
+      void *heaptop;
+    };
   cygheap_root root;
   cygheap_user user;
   mode_t umask;
