@@ -133,14 +133,10 @@ _unlink (const char *ourname)
 
       if (i > 0)
 	{
-	  DWORD dtype;
 	  if (os_being_run == winNT || lasterr != ERROR_ACCESS_DENIED)
 	    goto err;
 
-	  char root[MAX_PATH];
-	  strcpy (root, win32_name);
-	  dtype = GetDriveType (rootdir (root));
-	  if (dtype & DRIVE_REMOTE)
+	  if (win32_name.isremote ())
 	    {
 	      syscall_printf ("access denied on remote drive");
 	      goto err;  /* Can't detect this, unfortunately */
@@ -708,7 +704,7 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 	attrib |= S_IFDIR;
       res = get_file_attribute (win32_path.has_acls (),
 				win32_path.get_win32 (),
-				 (int *) &attrib,
+				(int *) &attrib,
 				&old_uid,
 				&old_gid);
       if (!res)
@@ -1016,7 +1012,6 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   uid_t uid;
   gid_t gid;
 
-  char root[MAX_PATH];
   UINT dtype;
   fhandler_disk_file fh (NULL);
 
@@ -1043,8 +1038,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 
   debug_printf ("%d = file_attributes for '%s'", atts, real_path.get_win32 ());
 
-  strcpy (root, real_path.get_win32 ());
-  dtype = GetDriveType (rootdir (root));
+  dtype = real_path.drive_type;
 
   if ((atts == -1 || ! (atts & FILE_ATTRIBUTE_DIRECTORY) ||
        (os_being_run == winNT
@@ -1108,8 +1102,9 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
       else
 	buf->st_mode = S_IFREG;
       if (!real_path.has_acls ()
-	  || get_file_attribute (real_path.has_acls (), real_path.get_win32 (),
-				 &buf->st_mode, &buf->st_uid, &buf->st_gid))
+	  || get_file_attribute (TRUE, real_path.get_win32 (),
+				 &buf->st_mode,
+				 &buf->st_uid, &buf->st_gid))
 	{
 	  buf->st_mode |= STD_RBITS | STD_XBITS;
 	  if ((atts & FILE_ATTRIBUTE_READONLY) == 0)

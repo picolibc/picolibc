@@ -57,19 +57,24 @@ class path_conv
 {
   char path[MAX_PATH];
   void add_ext_from_sym (symlink_info&);
+  bool is_remote_drive;
  public:
 
   unsigned path_flags;
+  DWORD vol_flags;
+  DWORD drive_type;
+  DWORD vol_serial;
 
-  int isdisk () {return path_flags & PATH_ISDISK;}
-  int has_acls () {return path_flags & PATH_HASACLS;}
-  int has_symlinks () {return path_flags & PATH_HAS_SYMLINKS;}
-  int hasgood_inode () {return path_flags & PATH_HASACLS;}  // Not strictly correct
-  int has_buggy_open () {return path_flags & PATH_HASBUGGYOPEN;}
-  int isbinary () {return path_flags & PATH_BINARY;}
-  int issymlink () {return path_flags & PATH_SYMLINK;}
-  int issocket () {return path_flags & PATH_SOCKET;}
-  int iscygexec () {return path_flags & PATH_CYGWIN_EXEC;}
+  int isdisk () const { return path_flags & PATH_ISDISK;}
+  int isremote () const {return is_remote_drive;}
+  int has_acls () const {return path_flags & PATH_HASACLS;}
+  int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
+  int hasgood_inode () const {return path_flags & PATH_HASACLS;}  // Not strictly correct
+  int has_buggy_open () const {return path_flags & PATH_HASBUGGYOPEN;}
+  int isbinary () const {return path_flags & PATH_BINARY;}
+  int issymlink () const {return path_flags & PATH_SYMLINK;}
+  int issocket () const {return path_flags & PATH_SOCKET;}
+  int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
   executable_states exec_state ()
   {
     extern int _check_for_executable;

@@ -920,6 +920,7 @@ fhandler_disk_file::fstat (struct stat *buf)
   buf->st_blksize = S_BLKSIZE;
   buf->st_blocks  = ((unsigned long) buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
 
+  buf->st_mode = 0;
   /* Using a side effect: get_file_attibutes checks for
      directory. This is used, to set S_ISVTX, if needed.  */
   if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -938,9 +939,7 @@ fhandler_disk_file::fstat (struct stat *buf)
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       buf->st_mode &= ~S_IFMT;
-      if (get_symlink_p ())
-	buf->st_mode |= S_IFLNK;
-      else if (get_socket_p ())
+      if (get_socket_p ())
 	buf->st_mode |= S_IFSOCK;
       else if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	buf->st_mode |= S_IFDIR;
@@ -949,16 +948,13 @@ fhandler_disk_file::fstat (struct stat *buf)
     }
   else
     {
-      buf->st_mode = 0;
       buf->st_mode |= STD_RBITS;
 
       if (!(local.dwFileAttributes & FILE_ATTRIBUTE_READONLY))
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
-      if (get_symlink_p ())
-	buf->st_mode |= S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
-      else if (get_socket_p ())
+      if (get_socket_p ())
 	buf->st_mode |= S_IFSOCK;
       else
 	switch (GetFileType (get_handle ()))
@@ -968,11 +964,25 @@ fhandler_disk_file::fstat (struct stat *buf)
 	    buf->st_mode |= S_IFCHR;
 	    break;
 	  case FILE_TYPE_DISK:
-	   if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-	     buf->st_mode |= S_IFDIR | STD_XBITS;
+	    if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	      buf->st_mode |= S_IFDIR | STD_XBITS;
 	   else
 	     {
-	       buf->st_mode |= S_IFREG;
+		buf->st_mode |= S_IFREG;
+		if (!dont_care_if_execable () && !get_execable_p ())
+		  {
+		    DWORD done;
+		    char magic[3];
+		    /* FIXME should we use /etc/magic ? */
+		    magic[0] = magic[1] = magic[2] = '\0';
+		    if (ReadFile (get_handle (), magic, 3, &done, 0)
+			&& done == 3)
+		      {
+			if (has_exec_chars (magic, done))
+			  set_execable_p ();
+			SetFilePointer (get_handle(), -(LONG) done, NULL, FILE_CURRENT);
+		      }
+		  }
 		if (get_execable_p ())
 		  buf->st_mode |= STD_XBITS;
 	     }
@@ -1241,6 +1251,7 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
     }
 
   set_has_acls (real_path.has_acls ());
+  set_isremote (real_path.isremote ());
 
   if (real_path.file_attributes () != (DWORD)-1
       && (real_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
@@ -1264,24 +1275,6 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
       close ();
       set_errno (ENOENT);
       return 0;
-    }
-
-  extern BOOL allow_ntea;
-
-  if (real_path.isdisk ()
-      && !(real_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
-      && (real_path.exec_state () == dont_know_if_executable)
-      && !allow_ntea && (!allow_ntsec || !real_path.has_acls ()))
-    {
-      DWORD done;
-      char magic[3];
-      /* FIXME should we use /etc/magic ? */
-      magic[0] = magic[1] = magic[2] = '\0';
-      ReadFile (get_handle (), magic, 3, &done, 0);
-      if (has_exec_chars (magic, done))
-	real_path.set_exec ();
-      if (!(flags & O_APPEND))
-	SetFilePointer (get_handle(), 0, 0, FILE_BEGIN);
     }
 
   if (flags & O_APPEND)

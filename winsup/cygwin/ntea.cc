@@ -86,7 +86,7 @@ int __stdcall
 NTReadEA (const char *file, const char *attrname, char *attrbuf, int len)
 {
     /* return immediately if NTEA usage is turned off */
-    if (! allow_ntea)
+    if (!allow_ntea)
       return FALSE;
 
     HANDLE hFileSource;
@@ -257,7 +257,7 @@ BOOL __stdcall
 NTWriteEA (const char *file, const char *attrname, char *buf, int len)
 {
   /* return immediately if NTEA usage is turned off */
-  if (! allow_ntea)
+  if (!allow_ntea)
     return TRUE;
 
   HANDLE hFileSource;

@@ -1,3 +1,28 @@
+Wed May 30 23:51:32 2001  Earnie Boyd  <earnie_boyd@yahoo.com>
+
+	* path.cc (chdir): Always send unsigned chars to isspace since newlib's
+	isspace doesn't deal well with "negative" chars.
+
+Wed May 30 23:51:32 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.cc (fhandler_disk_file::open): Propagate remote status of
+	file garnered from path_conv.  Move #! checking to fstat.
+	(fhandler_disk_file::fstat): Reorganize st_mode setting to eliminate
+	duplication.  Move check for #! here from fhandler::open.
+
+	* fhandler.h (fhandler_base::isremote): New method.
+	(fhandler_base::set_isremote): Ditto.
+	(fhandler_base::set_execable_p): Also record "don't care if executable state".
+	(fhandler_base::dont_care_if_execable): New method.
+	* path.cc (path_conv::check): Clear new flags.  Appropriately set
+	vol_flags, drive_type, and is_remote_drive.
+	* path.h: Add new flags and methods for manipulating them.
+	* syscalls.cc (_unlink): Use isremote() to determine if a path is
+	remote rather than calling GetDriveType.
+	(stat_worker): Ditto.
+	* security.cc (get_file_attribute): Or attribute with result of
+	NTReadEA to be consistent with get_nt_attribute.
+
 Tue May 29 19:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* sec_helper.cc (cygsid::getfrompw): Change parameter to `const'.

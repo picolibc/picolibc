@@ -71,6 +71,8 @@ enum
   FH_FFIXUP  = 0x02000000,	/* Set if need to fixup after fork. */
   FH_LOCAL   = 0x04000000,	/* File is unix domain socket */
   FH_FIFO    = 0x08000000,	/* File is FIFO */
+  FH_ISREMOTE= 0x10000000,	/* File is on a remote drive */
+  FH_DCEXEC  = 0x20000000,	/* Don't care if this is executable */
   FH_HASACLS = 0x40000000,	/* True if fs of file has ACLS */
 
   /* Device flags */
@@ -241,8 +243,10 @@ public:
   void set_execable_p (executable_states val)
   {
     FHCONDSETF (val == is_executable, EXECABL);
+    FHCONDSETF (val == dont_care_if_executable, DCEXEC);
   }
   void set_execable_p () { FHSETF (EXECABL); }
+  int dont_care_if_execable () { return FHISSETF (DCEXEC); }
 
   int get_append_p () { return FHISSETF (APPEND); }
   void set_append_p (int val) { FHCONDSETF (val, APPEND); }
@@ -263,6 +267,9 @@ public:
 
   int has_acls () { return FHISSETF (HASACLS); }
   void set_has_acls (int val) { FHCONDSETF (val, HASACLS); }
+
+  int isremote () { return FHISSETF (ISREMOTE); }
+  void set_isremote (int val) { FHCONDSETF (val, ISREMOTE); }
 
   int no_free_names () { return FHISSETF (NOFRNAME); }
   void set_no_free_names (int val) { FHCONDSETF (val, NOFRNAME); }

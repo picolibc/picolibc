@@ -374,6 +374,9 @@ path_conv::check (const char *src, unsigned opt,
   fileattr = (DWORD) -1;
   case_clash = FALSE;
   devn = unit = 0;
+  vol_flags = 0;
+  drive_type = 0;
+  is_remote_drive = 0;
 
   if (!(opt & PC_NULLEMPTY))
     error = 0;
@@ -634,14 +637,13 @@ out:
       return;
     }
 
-  DWORD serial, volflags;
   char fs_name[16];
 
   strcpy (tmp_buf, this->path);
 
   if (!rootdir (tmp_buf) ||
-      !GetVolumeInformation (tmp_buf, NULL, 0, &serial, NULL,
-      			     &volflags, fs_name, 16))
+      !GetVolumeInformation (tmp_buf, NULL, 0, &vol_serial, NULL,
+      			     &vol_flags, fs_name, 16))
     {
       debug_printf ("GetVolumeInformation(%s) = ERR, this->path(%s), set_has_acls(FALSE)",
 		    tmp_buf, this->path, GetLastError ());
@@ -652,13 +654,14 @@ out:
     {
       set_isdisk ();
       debug_printf ("GetVolumeInformation(%s) = OK, this->path(%s), set_has_acls(%d)",
-		    tmp_buf, this->path, volflags & FS_PERSISTENT_ACLS);
-      if (!allow_smbntsec
-          && ((tmp_buf[0] == '\\' && tmp_buf[1] == '\\')
-              || GetDriveType (tmp_buf) == DRIVE_REMOTE))
+		    tmp_buf, this->path, vol_flags & FS_PERSISTENT_ACLS);
+      drive_type = GetDriveType (tmp_buf);
+      if (drive_type == DRIVE_REMOTE || (drive_type == DRIVE_UNKNOWN && (tmp_buf[0] == '\\' && tmp_buf[1] == '\\')))
+	is_remote_drive = 1;
+      if (!allow_smbntsec && is_remote_drive)
         set_has_acls (FALSE);
       else
-        set_has_acls (volflags & FS_PERSISTENT_ACLS);
+        set_has_acls (vol_flags & FS_PERSISTENT_ACLS);
       /* Known file systems with buggy open calls. Further explanation
          in fhandler.cc (fhandler_disk_file::open). */
       set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
@@ -2894,7 +2897,7 @@ chdir (const char *dir)
      whitespace to SetCurrentDirectory.  This doesn't work too well
      with other parts of the API, though, apparently.  So nuke trailing
      white space. */
-  for (s = strchr (dir, '\0'); --s >= dir && isspace (*s); )
+  for (s = strchr (dir, '\0'); --s >= dir && isspace ((unsigned int) *s); )
     *s = '\0';
 
   if (path.error)

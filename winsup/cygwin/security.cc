@@ -1199,7 +1199,9 @@ get_file_attribute (int use_ntsec, const char *file,
   if (!attribute)
     return 0;
 
+  int oatt = *attribute;
   res = NTReadEA (file, ".UNIXATTR", (char *) attribute, sizeof (*attribute));
+  *attribute |= oatt;
 
   /* symlinks are everything for everyone!*/
   if ((*attribute & S_IFLNK) == S_IFLNK)
@@ -1523,8 +1525,7 @@ set_file_attribute (int use_ntsec, const char *file,
 
   if (!use_ntsec || !allow_ntsec)
     {
-      if (!NTWriteEA (file, ".UNIXATTR",
-		       (char *) &attribute, sizeof (attribute)))
+      if (!NTWriteEA (file, ".UNIXATTR", (char *) &attribute, sizeof (attribute)))
 	{
 	  __seterrno ();
 	  return -1;
