@@ -188,6 +188,7 @@ long __stdcall to_time_t (FILETIME * ptr);
 void __stdcall set_console_title (char *);
 void set_console_handler ();
 
+int __stdcall check_null_str (const char *name) __attribute__ ((regparm(1)));
 int __stdcall check_null_empty_str (const char *name) __attribute__ ((regparm(1)));
 int __stdcall check_null_empty_str_errno (const char *name) __attribute__ ((regparm(1)));
 int __stdcall check_null_str_errno (const char *name) __attribute__ ((regparm(1)));

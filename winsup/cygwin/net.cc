@@ -206,6 +206,8 @@ cygwin_inet_ntoa (struct in_addr in)
 extern "C" unsigned long
 cygwin_inet_addr (const char *cp)
 {
+  if (check_null_str_errno (cp))
+    return INADDR_NONE;
   unsigned long res = inet_addr (cp);
   return res;
 }
@@ -234,7 +236,7 @@ extern "C" unsigned int
 cygwin_inet_network (const char *cp)
 {
   if (check_null_str_errno (cp))
-    return 0;
+    return INADDR_NONE;
   unsigned int res = inet_network (cp);
   return res;
 }
@@ -1440,6 +1442,8 @@ cygwin_hstrerror (int err)
 extern "C" void
 cygwin_herror (const char *s)
 {
+  if (check_null_str (s))
+    return;
   if (cygheap->fdtab.not_open (2))
     return;
 
@@ -2229,6 +2233,9 @@ cygwin_rresvport (int *port)
   int res;
   sigframe thisframe (mainthread);
 
+  if (check_null_invalid_struct_errno (port))
+    return -1;
+
   cygheap_fdnew res_fd;
   if (res_fd < 0)
     res = -1;
@@ -2291,6 +2298,9 @@ socketpair (int, int type, int, int *sb)
   SOCKET insock, outsock, newsock;
   struct sockaddr_in sock_in;
   int len = sizeof (sock_in);
+
+  if (__check_null_invalid_struct_errno (sb, 2 * sizeof(int)))
+    return -1;
 
   cygheap_fdnew sb0;
   if (sb0 < 0)
