@@ -159,7 +159,6 @@ unlink (const char *ourname)
 	}
     }
 
-
   /* Try a delete with attributes reset */
   if (DeleteFile (win32_name))
     {

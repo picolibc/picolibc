@@ -75,7 +75,7 @@ fhandler_virtual::opendir (path_conv& pc)
       dir->__d_dirent->d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
       if (fd >= 0)
-        {
+	{
 	  fd = this;
 	  fd->set_nohandle (true);
 	  dir->__d_dirent->d_fd = fd;

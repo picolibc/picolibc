@@ -1968,7 +1968,7 @@ cygwin_rresvport (int *port)
       if (res_fd >= 0)
 	fh = fdsock (res_fd, "/dev/tcp", res);
       if (fh)
-        res = res_fd;
+	res = res_fd;
       else
 	res = -1;
     }
@@ -2213,7 +2213,7 @@ socketpair (int family, int type, int protocol, int *sb)
 
     if (res == -1)
       {
-        closesocket (insock);
+	closesocket (insock);
 	closesocket (outsock);
       }
   }

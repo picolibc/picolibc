@@ -85,7 +85,7 @@ cygwin_strcasematch (const char *cs, const char *ct)
 	jmp	4f				\n\
 3:	xor	%0,%0				\n\
 4:"
-        :"=a" (__res), "=&S" (d0), "=&D" (d1)
+	:"=a" (__res), "=&S" (d0), "=&D" (d1)
 		     : "1" (cs),   "2" (ct));
 
   return __res;

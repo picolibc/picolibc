@@ -115,7 +115,7 @@ public:
   BOOL add (const PSID nsi) /* Only with auto for now */
     {
       if (count >= maxcount)
-        {
+	{
 	  cygsid *tmp = new cygsid [ 2 * maxcount];
 	  if (!tmp)
 	    return FALSE;
@@ -176,7 +176,7 @@ public:
   void clear_supp ()
     {
       if (issetgroups ())
-        {
+	{
 	  sgsids.free_sids ();
 	  ischanged = TRUE;
 	}

@@ -834,7 +834,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       }
 
     debug_printf ("ReadTotalTimeoutConstant %d, ReadIntervalTimeout %d, ReadTotalTimeoutMultiplier %d",
-                  to.ReadTotalTimeoutConstant, to.ReadIntervalTimeout, to.ReadTotalTimeoutMultiplier);
+		  to.ReadTotalTimeoutConstant, to.ReadIntervalTimeout, to.ReadTotalTimeoutMultiplier);
 
     if (!SetCommTimeouts(get_handle (), &to))
       {

@@ -126,7 +126,7 @@ setacl (const char *file, int nentries, __aclent32_t *aclbufp)
       if (aclbufp[i].a_perm & S_IROTH)
 	allow |= FILE_GENERIC_READ;
       if (aclbufp[i].a_perm & S_IWOTH)
-        {
+	{
 	  allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
 	  /* Owner gets DELETE right, too. */
 	  if ((aclbufp[i].a_type & ~ACL_DEFAULT) == USER_OBJ)

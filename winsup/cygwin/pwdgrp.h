@@ -72,7 +72,7 @@ public:
     if (!check && initialized)
       return;
     if (pglock->acquire () == 1 &&
-        (!initialized || (check && etc::file_changed (etc_ix))))
+	(!initialized || (check && etc::file_changed (etc_ix))))
 	(this->*read) ();
     pglock->release ();
   }

@@ -1124,7 +1124,7 @@ win32_device_name (const char *src_path, char *win32_path,
 	strcpy (win32_path, src_path);
 	while (c = strchr (win32_path, '/'))
 	  *c = '\\';
-        break;
+	break;
       case FH_RANDOM:
 	__small_sprintf (win32_path, devfmt, unit == 8 ? "" : "u");
 	break;
