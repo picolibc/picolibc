@@ -513,7 +513,7 @@ static const template i386_optab[] = {
 {"fld",    1,	0xdb, 5, x_FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 <-- mem efloat */
 {"fild",   1,	0xdf, 0, sl_Suf|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} }, /* %st0 <-- mem word(16)/dword(32) */
 /* Intel Syntax */
-{"fild",  1,	0xdf, 5, d_Suf|IgnoreSize|Modrm,{ LLongMem, 0, 0} }, /* %st0 <-- mem qword (64) */
+{"fildd",  1,	0xdf, 5, FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 <-- mem qword (64) */
 {"fildq",  1,	0xdf, 5, FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 <-- mem qword (64) */
 {"fildll", 1,	0xdf, 5, FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 <-- mem qword (64) */
 {"fldt",   1,	0xdb, 5, FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 <-- mem efloat */
@@ -533,7 +533,7 @@ static const template i386_optab[] = {
 {"fstp",   1,	0xdb, 7, x_FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 --> mem efloat */
 {"fistp",  1,	0xdf, 3, sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} }, /* %st0 --> mem word(16)/dword(32) */
 /* Intel Syntax */
-{"fistp", 1,	0xdf, 7, d_FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 --> mem qword (64) */
+{"fistpd", 1,	0xdf, 7, FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 --> mem qword (64) */
 {"fistpq", 1,	0xdf, 7, FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 --> mem qword (64) */
 {"fistpll",1,	0xdf, 7, FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 --> mem qword (64) */
 {"fstpt",  1,	0xdb, 7, FP|Modrm,		{ LLongMem, 0, 0} }, /* %st0 --> mem efloat */

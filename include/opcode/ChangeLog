@@ -1,3 +1,8 @@
+2000-02-25  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h (fild, fistp): Change intel d_Suf form to fildd and
+	fistpd without suffix.
+
 2000-02-24  Nick Clifton  <nickc@cygnus.com>
 
 	* cgen.h (cgen_cpu_desc): Rename field 'flags' to
