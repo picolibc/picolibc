@@ -17,6 +17,11 @@ should give you an idea of what is required.
 You should announce your intentions to the general cygwin list, in case
 others were thinking the same thing.
 
+@subsection How do I contribute to Cygwin?
+
+If you want to contribute to Cygwin itself, see
+@file{http://cygwin.com/contrib.html}.
+
 @subsection Why are compiled executables so huge?!?
 
 By default, gcc compiles in all symbols.  You'll also find that gcc
