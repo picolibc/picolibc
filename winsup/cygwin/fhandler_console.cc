@@ -1297,6 +1297,8 @@ static struct {
   {VK_NUMPAD5,	{"\033[G",	NULL,		NULL,		NULL}},
   {VK_CLEAR,	{"\033[G",	NULL,		NULL,		NULL}},
   {'6',		{NULL,		NULL,		"\036",		NULL}},
+  /* FIXME: Should this be \033OQ? */
+  {VK_DIVIDE,	{"/",		"/",		"/",		"/"}},
   {0,		{"",		NULL,		NULL,		NULL}}
 };
 
@@ -1322,6 +1324,13 @@ get_nonascii_key (INPUT_RECORD& input_rec)
     if (input_rec.Event.KeyEvent.wVirtualKeyCode == keytable[i].vk)
       return keytable[i].val[modifier_index];
 
+  if (input_rec.Event.KeyEvent.wVirtualKeyCode < ' ')
+    {
+      /* FIXME: Probably not thread-safe */
+      static char buf[2];
+      buf[0] = input_rec.Event.KeyEvent.wVirtualKeyCode;
+      return buf;
+    }
   return NULL;
 }
 

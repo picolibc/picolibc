@@ -1,3 +1,8 @@
+Sat Jul 29 14:32:12 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_console.cc: Add VK_DIVIDE detection.  Return virtual keycode
+	if it is not detected and it is less than ' '.
+
 Sat Jul 29 13:33:49 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (chdir): Avoid trailing dot calculation when chdir == '/'
