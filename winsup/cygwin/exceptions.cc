@@ -187,29 +187,17 @@ exception (EXCEPTION_RECORD *e,  CONTEXT *in)
 	}
     }
 
-#ifdef __i386__
-#define HAVE_STATUS
   if (exception_name)
     small_printf ("Exception: %s at eip=%08x\r\n", exception_name, in->Eip);
   else
     small_printf ("Exception %d at eip=%08x\r\n", e->ExceptionCode, in->Eip);
   small_printf ("eax=%08x ebx=%08x ecx=%08x edx=%08x esi=%08x edi=%08x\r\n",
-	      in->Eax, in->Ebx, in->Ecx, in->Edx, in->Esi, in->Edi);
-  small_printf ("ebp=%08x esp=%08x program=%s\r\n",
-	      in->Ebp, in->Esp, myself->progname);
+		in->Eax, in->Ebx, in->Ecx, in->Edx, in->Esi, in->Edi);
+  small_printf ("ebp=%08x esp=%08x program=%s, pid %u, thread %s\r\n",
+		in->Ebp, in->Esp, myself->progname, myself->pid, cygthread::name ());
   small_printf ("cs=%04x ds=%04x es=%04x fs=%04x gs=%04x ss=%04x\r\n",
-	      in->SegCs, in->SegDs, in->SegEs, in->SegFs, in->SegGs, in->SegSs);
-#endif
-
-#ifndef HAVE_STATUS
-  system_printf ("Had an exception");
-#endif
+		in->SegCs, in->SegDs, in->SegEs, in->SegFs, in->SegGs, in->SegSs);
 }
-
-#ifdef __i386__
-/* Print a stack backtrace. */
-
-#define HAVE_STACK_TRACE
 
 /* A class for manipulating the stack. */
 class stack_info
@@ -300,7 +288,7 @@ stackdump (DWORD ebp, int open_file, bool isexception)
 	small_printf ("%s%08x", j == 0 ? " (" : ", ", thestack.sf.Params[j]);
       small_printf (")\r\n");
     }
-  small_printf ("End of stack trace%s",
+  small_printf ("End of stack trace%s\n",
 	      i == 16 ? " (more stack frames may be present)" : "");
 }
 
@@ -526,13 +514,13 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR)
     {
       /* Print the exception to the console */
-      for (int i = 0; status_info[i].name; i++)
-	if (status_info[i].code == e.ExceptionCode)
-	  {
-	    if (!myself->ppid_handle)
+      if (!myself->ppid_handle)
+	for (int i = 0; status_info[i].name; i++)
+	  if (status_info[i].code == e.ExceptionCode)
+	    {
 	      system_printf ("Exception: %s", status_info[i].name);
-	    break;
-	  }
+	      break;
+	    }
 
       /* Another exception could happen while tracing or while exiting.
 	 Only do this once.  */
@@ -565,22 +553,10 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
   sig_send (NULL, si, &_my_tls);	// Signal myself
   return 1;
 }
-#endif /* __i386__ */
-
-#ifndef HAVE_STACK_TRACE
-void
-stack (void)
-{
-  system_printf ("Stack trace not yet supported on this machine.");
-}
-#endif
 
 /* Utilities to call a user supplied exception handler.  */
 
 #define SIG_NONMASKABLE	(SIGTOMASK (SIGKILL) | SIGTOMASK (SIGSTOP))
-
-#ifdef __i386__
-#define HAVE_CALL_HANDLER
 
 /* Non-raceable sigsuspend
  * Note: This implementation is based on the Single UNIX Specification
@@ -692,8 +668,7 @@ interruptible (DWORD pc)
   return res;
 }
 void __stdcall
-_cygtls::interrupt_setup (int sig, void *handler,
-			      struct sigaction& siga)
+_cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
 {
   push ((__stack_t) sigdelayed, false);
   oldmask = myself->getsigmask ();
@@ -718,7 +693,7 @@ _cygtls::interrupt_setup (int sig, void *handler,
 
 bool
 _cygtls::interrupt_now (CONTEXT *ctx, int sig, void *handler,
-			    struct sigaction& siga)
+			struct sigaction& siga)
 {
   push ((__stack_t) ctx->Eip, false);
   interrupt_setup (sig, handler, siga);
@@ -755,9 +730,10 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
       tls->lock ();
       if (tls->incyg || tls->in_exception ())
 	{
+	  sigproc_printf ("controlled interrupt. incyg %d, exception %d, stackptr %p, stack %p, stackptr[-1] %p",
+			  tls->incyg, tls->in_exception (), tls->stackptr, tls->stack, tls->stackptr[-1]);
 	  tls->reset_exception ();
 	  tls->interrupt_setup (sig, handler, siga);
-	  sigproc_printf ("interrupted known cygwin routine");
 	  interrupted = true;
 	  tls->unlock ();
 	  break;
@@ -791,7 +767,10 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	  (void) ResumeThread (hth);
 	  break;
 	}
-      if (!tls->incyg && !tls->in_exception () && !tls->spinning && !tls->locked ())
+      if (tls->incyg || tls->in_exception () || tls->spinning || tls->locked ())
+	sigproc_printf ("incyg %d, in_exception %d, spinning %d, locked %d\n",
+			tls->incyg, tls->in_exception (), tls->spinning, tls->locked ());
+      else
 	{
 	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
 	  if (!GetThreadContext (hth, &cx))
@@ -818,11 +797,6 @@ out:
   sigproc_printf ("signal %d %sdelivered", sig, interrupted ? "" : "not ");
   return interrupted;
 }
-#endif /* i386 */
-
-#ifndef HAVE_CALL_HANDLER
-#error "Need to supply machine dependent setup_handler"
-#endif
 
 /* Keyboard interrupt handler.  */
 static BOOL WINAPI
@@ -1168,10 +1142,10 @@ int
 _cygtls::call_signal_handler ()
 {
   int this_sa_flags = 0;
-  /* Call signal handler.  No need to set stacklock since sig effectively
-     implies that.  */
+  /* Call signal handler.  */
   while (sig)
     {
+      lock (); unlock ();	// make sure synchronized
       this_sa_flags = sa_flags;
       int thissig = sig;
       void (*sigfunc) (int) = func;
@@ -1196,7 +1170,9 @@ _cygtls::call_signal_handler ()
 extern "C" void __stdcall
 reset_signal_arrived ()
 {
+  // NEEDED? WaitForSingleObject (signal_arrived, 10);
   (void) ResetEvent (signal_arrived);
   sigproc_printf ("reset signal_arrived");
-if (_my_tls.stackptr > _my_tls.stack) debug_printf ("stackptr[-1] %p", _my_tls.stackptr[-1]);
+  if (_my_tls.stackptr > _my_tls.stack)
+    debug_printf ("stackptr[-1] %p", _my_tls.stackptr[-1]);
 }

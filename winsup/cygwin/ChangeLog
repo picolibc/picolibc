@@ -1,3 +1,25 @@
+2004-03-11  Christopher Faylor  <cgf@redhat.com>
+
+	* cygtls.cc (_cygtls::fixup_after_fork): Remove unneeded setting of
+	oldmask.
+	* exceptions.cc: Remove some __I386__ conditionals.
+	(handle_exceptions): Move ppid test to outside of a loop for
+	efficiency.
+	(setup_handler): Make debugging output more wordy.
+	(_cygtls::call_signal_handler): To avoid a race, use lock/unlock to
+	synchronize with signal thread and ensure that signal_arrived event has
+	actually been set.
+	* gendef (_sigfe): Use ebx for all sigstack manipulations to ensure
+	that the register is saved.  Move setting of incyg to within stack lock
+	to avoid setup_handler confusion.
+	(_sigbe): Use ebx for all sigstack manipulations to ensure that the
+	register is saved.
+	(_cygtls::pop): Ditto.
+	(_cygtls::lock): Ditto.
+	(stabilize_sig_stack): Ditto.
+	(setjmp): Ditto.
+	(longjmp): Ditto.
+
 2004-03-08  Jaakko Hyvatti  <jaakko.hyvatti@iki.fi>
 
 	* fhandler_serial.cc (fhandler_serial::ioctl): Implement TIOCSBRK and

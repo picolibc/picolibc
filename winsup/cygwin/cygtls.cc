@@ -138,12 +138,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 void
 _cygtls::fixup_after_fork ()
 {
-  if (sig)
-    {
-      set_signal_mask (oldmask);
-      sig = 0;
-    }
-  stacklock = 0;
+  sig = stacklock = 0;
   stackptr = stack + 1;	// FIXME?
 #ifdef DEBUGGING
   memset (stackptr, 0, sizeof (stack) - sizeof (stack[0]));
