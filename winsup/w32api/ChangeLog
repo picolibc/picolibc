@@ -1,3 +1,17 @@
+2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501]
+	(CheckRemoteDebuggerPresent, DebugActiveProcessStop, DebugBreakProcess,
+	DebugSetProcessKillOnExit): Add functions.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0500] (DeleteTimerQueue,
+	DeleteTimerQueueEx, DeleteTimerQueueTimer,
+	DnsHostnameToComputerName[AW]): Add functions.
+
+	* lib/user32.def (CheckRemoteDebuggerPresent, DebugActiveProcessStop,
+	DebugBreakProcess, DebugSetProcessKillOnExit, DeleteTimerQueueEx,
+	DeleteTimerQueueTimer, DnsHostnameToComputerName[AW]): Add functions.
+
 2003-10-07  Kobun Fujimori  <kobun@users.sourceforge.net>
 
 	* include/winbase.h (GetVolumePathNamesForVolumeName): Available

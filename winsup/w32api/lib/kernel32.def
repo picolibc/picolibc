@@ -32,6 +32,7 @@ CancelWaitableTimer@4
 ChangeTimerQueueTimer@16
 CheckNameLegalDOS8Dot3A@20
 CheckNameLegalDOS8Dot3W@20
+CheckRemoteDebuggerPresent@8
 ClearCommBreak@4
 ClearCommError@12
 CloseConsoleHandle@4
@@ -94,7 +95,10 @@ CreateWaitableTimerA@12
 CreateWaitableTimerW@12
 DeactivateActCtx@8
 DebugActiveProcess@4
+DebugActiveProcessStop@4
 DebugBreak@0
+DebugBreakProcess@4
+DebugSetProcessKillOnExit@4
 DefineDosDeviceA@12
 DefineDosDeviceW@12
 DeleteAtom@4
@@ -103,11 +107,15 @@ DeleteFiber@4
 DeleteFileA@4
 DeleteFileW@4
 DeleteTimerQueue@4
+DeleteTimerQueueEx@8
+DeleteTimerQueueTimer@12
 DeleteVolumeMountPointA@4
 DeleteVolumeMountPointW@4
 DeviceIoControl@32
 DisableThreadLibraryCalls@4
 DisconnectNamedPipe@4
+DnsHostnameToComputerNameA@12
+DnsHostnameToComputerNameW@12
 DosDateTimeToFileTime@12
 DuplicateConsoleHandle@16
 DuplicateHandle@28

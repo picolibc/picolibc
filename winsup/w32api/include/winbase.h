@@ -1051,6 +1051,7 @@ BOOL WINAPI CancelWaitableTimer(HANDLE);
 #if (_WIN32_WINNT >= 0x0501)
 BOOL WINAPI CheckNameLegalDOS8Dot3A(LPCSTR,LPSTR,DWORD,PBOOL,PBOOL);
 BOOL WINAPI CheckNameLegalDOS8Dot3W(LPCWSTR,LPSTR,DWORD,PBOOL,PBOOL);
+BOOL WINAPI CheckRemoteDebuggerPresent(HANDLE,PBOOL);
 #endif
 BOOL WINAPI ClearCommBreak(HANDLE);
 BOOL WINAPI ClearCommError(HANDLE,PDWORD,LPCOMSTAT);
@@ -1135,7 +1136,14 @@ HANDLE WINAPI CreateWaitableTimerW(LPSECURITY_ATTRIBUTES,BOOL,LPCWSTR);
 BOOL WINAPI DeactivateActCtx(DWORD,ULONG_PTR);
 #endif
 BOOL WINAPI DebugActiveProcess(DWORD);
+#if (_WIN32_WINNT >= 0x0501)
+BOOL WINAPI DebugActiveProcessStop(DWORD);
+#endif
 void WINAPI DebugBreak(void);
+#if (_WIN32_WINNT >= 0x0501)
+BOOL WINAPI DebugBreakProcess(HANDLE);
+BOOL WINAPI DebugSetProcessKillOnExit(BOOL);
+#endif
 BOOL WINAPI DefineDosDeviceA(DWORD,LPCSTR,LPCSTR);
 BOOL WINAPI DefineDosDeviceW(DWORD,LPCWSTR,LPCWSTR);
 #define DefineHandleTable(w) ((w),TRUE)
@@ -1146,6 +1154,9 @@ void WINAPI DeleteFiber(PVOID);
 BOOL WINAPI DeleteFileA(LPCSTR);
 BOOL WINAPI DeleteFileW(LPCWSTR);
 #if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI DeleteTimerQueue(HANDLE);
+BOOL WINAPI DeleteTimerQueueEx(HANDLE,HANDLE);
+BOOL WINAPI DeleteTimerQueueTimer(HANDLE,HANDLE,HANDLE);
 BOOL WINAPI DeleteVolumeMountPointA(LPCSTR);
 BOOL WINAPI DeleteVolumeMountPointW(LPCWSTR);
 #endif
@@ -1153,6 +1164,10 @@ BOOL WINAPI DeregisterEventSource(HANDLE);
 BOOL WINAPI DestroyPrivateObjectSecurity(PSECURITY_DESCRIPTOR*);
 BOOL WINAPI DeviceIoControl(HANDLE,DWORD,PVOID,DWORD,PVOID,DWORD,PDWORD,POVERLAPPED);
 BOOL WINAPI DisableThreadLibraryCalls(HMODULE);
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI DnsHostnameToComputerNameA(LPCSTR,LPSTR,LPDWORD);
+BOOL WINAPI DnsHostnameToComputerNameW(LPCWSTR,LPWSTR,LPDWORD);
+#endif
 BOOL WINAPI DisconnectNamedPipe(HANDLE);
 BOOL WINAPI DosDateTimeToFileTime(WORD,WORD,LPFILETIME);
 BOOL WINAPI DuplicateHandle(HANDLE,HANDLE,HANDLE,PHANDLE,DWORD,BOOL,DWORD);
@@ -1795,6 +1810,7 @@ typedef PCACTCTXW PCACTCTX;
 #define DeleteFile DeleteFileW
 #if (_WIN32_WINNT >= 0x0500)
 #define DeleteVolumeMountPoint DeleteVolumeMountPointW
+#define DnsHostnameToComputerName DnsHostnameToComputerNameW
 #endif
 #define EncryptFile EncryptFileW
 #define EndUpdateResource EndUpdateResourceW
@@ -1963,6 +1979,7 @@ typedef PCACTCTXA PCACTCTX;
 #define DeleteFile DeleteFileA
 #if (_WIN32_WINNT >= 0x0500)
 #define DeleteVolumeMountPoint DeleteVolumeMountPointA
+#define DnsHostnameToComputerName DnsHostnameToComputerNameA
 #endif
 #define EncryptFile EncryptFileA
 #define EndUpdateResource EndUpdateResourceA
