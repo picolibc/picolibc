@@ -1,3 +1,11 @@
+Fri Apr 21 15:03:37 2000  Jason Eckhardt  <jle@cygnus.com>
+
+	* hppa.h (pa_opcodes): New opcodes for PA2.0 wide mode
+	forms of ld/st{b,h,w,d} and fld/fst{w,d} (16-bit displacements).
+	New operand types l,y,&,fe,fE,fx added to support above forms.
+	(pa_opcodes): Replaced usage of 'x' as source/target for
+	floating point double-word loads/stores with 'fx'.
+
 Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
 			  David Mosberger  <davidm@hpl.hp.com>
 			  Timothy Wall <twall@cygnus.com>
