@@ -1,3 +1,8 @@
+Sun Nov 19 20:50:51 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Install mingw stuff in a subdirectory if building under
+	cygwin.
+
 Sat Jun 17 21:48:23 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in (subdirs): Eliminate for loop.

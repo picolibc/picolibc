@@ -53,6 +53,11 @@ CXXFLAGS = @CXXFLAGS@
 
 # compiling with Cygwin?
 MNO_CYGWIN = @MNO_CYGWIN@
+ifdef MNO_CYGWIN
+libsubdir=/mingw
+else
+libdir=
+endif
 
 # Either crtdll (CRT_ID 1) or msvcrt (CRT_ID 2).
 RUNTIME = @RUNTIME@
@@ -200,14 +205,16 @@ info-html:
 
 install-info: info
 
-install: all $(install_dlls_host)
+install-dirs:
 	$(mkinstalldirs) $(bindir)
-	$(mkinstalldirs) $(tooldir)/lib 
+	$(mkinstalldirs) $(tooldir)/lib$(libsubdir)
+
+install: all install-dirs $(install_dlls_host)
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+		$(INSTALL_DATA) $$i $(tooldir)/lib$(libsubdir)/$$i ; \
 	done
 	for i in $(CRT0S); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+		$(INSTALL_DATA) $$i $(tooldir)/lib/$(libsubdir)/$$i ; \
 	done
 	for sub in . sys ; do \
 		dstdir=$(tooldir)/include/$(HEADER_SUBDIR)/$$sub ; \
