@@ -1,3 +1,12 @@
+
+Tue Jan 16 09:41:41  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/locale.h: Apply Danny Smith patch 101834
+	2000-11-23  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+	(LC_MIN) Add definition.
+ 	(LC_MAX) ditto. 
+	(_wsetlocale) Add prototype.
+
 2000-11-29  Earnie Boyd  <earnie_boyd@yahoo.com>
 
 	* Makefile.in: eliminate the need for RUNTIME and CRT_ID.

@@ -46,6 +46,8 @@
 #define	LC_MONETARY	3
 #define	LC_NUMERIC	4
 #define	LC_TIME		5
+#define	LC_MIN		LC_ALL
+#define	LC_MAX		LC_TIME
 
 #ifndef RC_INVOKED
 
@@ -80,6 +82,13 @@ extern "C" {
 
 char*		setlocale (int, const char*);
 struct lconv*	localeconv (void);
+
+#ifndef _WLOCALE_DEFINED  /* also declared in wchar.h */
+# define __need_wchar_t
+# include <stddef.h>
+  wchar_t* 	_wsetlocale(int, const wchar_t*);
+# define _WLOCALE_DEFINED
+#endif /* ndef _WLOCALE_DEFINED */
 
 #ifdef	__cplusplus
 }
