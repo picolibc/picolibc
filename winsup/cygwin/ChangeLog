@@ -1,3 +1,7 @@
+2003-09-11  Christopher Faylor  <cgf@redhat.com>
+
+	* dir.cc (rmdir): Add more samba workarounds.
+
 2003-09-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared.cc (user_shared_initialize): Revert length attribute for name
