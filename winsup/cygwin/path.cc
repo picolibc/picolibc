@@ -796,7 +796,9 @@ out:
 	    {
 	      set_has_acls (true);
 	      if (allow_ntsec && wincap.has_security ())
-		set_exec (0);
+		set_exec (0);  /* We really don't know if this is executable or not here
+				  but set it to not executable since it will be figured out
+				  later by anything which cares about this. */
 	    }
 	  /* Known file systems with buggy open calls. Further explanation
 	     in fhandler.cc (fhandler_disk_file::open). */
@@ -1442,6 +1444,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 				DWORD &devn, int &unit, unsigned *flags,
 				bool no_normalize)
 {
+  bool chroot_ok = !cygheap->root.exists ();
   while (sys_mount_table_counter < cygwin_shared->sys_mount_table_counter)
     {
       init ();
@@ -1585,8 +1588,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	break;
     }
 
-  bool chroot_ok;
-  chroot_ok = false; // sigh.  stop gcc warning
   if (i >= nmounts)
     {
       backslashify (pathbuf, dst, 0);	/* just convert */

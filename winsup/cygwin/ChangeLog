@@ -1,5 +1,10 @@
 2003-05-30  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc (mount_info::conv_to_win32_path): gcc warning about chroot_ok
+	was actually valid.  Fix it.
+
+2003-05-30  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (init_cheap): Temporarily remove inline that newer gcc's
 	have problems with.
 
