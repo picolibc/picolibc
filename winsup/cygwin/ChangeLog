@@ -1,5 +1,11 @@
 2002-10-07  Christopher Faylor  <cgf@redhat.com>
 
+	* dtable.cc (dtable::init_std_file_from_handle): Try to mimic standard
+	open behavior with files redirected from stdin/stdout/stderr, i.e.,
+	fmode settings take precedence over mount settings.
+
+2002-10-07  Christopher Faylor  <cgf@redhat.com>
+
 	* dtable.cc (unknown_file): New variable.
 	(dtable::init_std_file_from_handle): Don't set binmode if we couldn't
 	determine the actual file name on stdin/stdout/stderr.

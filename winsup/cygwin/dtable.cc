@@ -267,8 +267,13 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
   else
     {
       path_conv pc;
-      build_fhandler_from_name (fd, name, handle, pc)
-	->init (handle, myaccess, (name == unknown_file) ? 0 : pc.binmode ());
+      unsigned bin;
+      fhandler_base *fh = build_fhandler_from_name (fd, name, handle, pc);
+      bin = fh->get_default_fmode (myaccess == GENERIC_READ ? O_RDONLY : O_WRONLY);
+      if (!bin && name != unknown_file)
+	bin = pc.binmode ();
+
+      fh->init (handle, myaccess, bin);
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }
