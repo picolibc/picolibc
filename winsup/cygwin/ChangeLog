@@ -1,5 +1,31 @@
 2003-01-21  Christopher Faylor  <cgf@redhat.com>
 
+	* grp.cc: Call gr.refresh() rather than doing isunitialized tests
+	throughout.
+	(gr): Use constructor (sigh).
+	(pwdgrp::parse_group): Rename from parse_grp.
+	(pwdgrp::read_group): Rename from read_etc_group.  Just call gr.load
+	with a single argument.
+	* passwd.cc: Call pr.refresh() rather than doing isunitialized tests
+	throughout.
+	(pr): Use constructor (sigh).
+	(pwdgrp::parse_passwd): Rename from "parse_pwd".
+	(pwdgrp::read_passwd): Rename from read_etc_passwd.  Just call pr.load
+	with a single argument.
+	* pwdgrp.h (pwdgrp_state): Eliminate.
+	(pwdgrp): Reflect above renamings.
+	(pwdgrp::etc_ix): Rename from pwd_ix.
+	(pwdgrp::read): New element.
+	(pwdgrp::lock): New element.
+	(pwdgrp::refresh): New function.
+	(pwdgrp::load): Eliminate variations which take buffer arguments.
+	(pwdgrp::pwdgrp): New constructors.  Initialize mutex here.
+	* uinfo.cc (pwdgrp::load): Accommodate pwd_ix -> etc_ix renaming.
+	(pwdgrp::load): Set initialized state to true rather than setting state
+	to loaded.
+
+2003-01-21  Christopher Faylor  <cgf@redhat.com>
+
         * include/cygwin/version.h: Bump DLL minor number.
 
 2003-01-21  Pierre Humblet  <pierre.humblet@ieee.org>

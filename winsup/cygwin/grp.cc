@@ -29,19 +29,19 @@ details. */
 /* Position in the group cache */
 #define grp_pos _reent_winsup ()->_grp_pos
 
-static pwdgrp gr;
 static __group32 *group_buf;
+static pwdgrp gr (group_buf);
 static char * NO_COPY null_ptr;
 
 bool
-pwdgrp::parse_grp (char *line)
+pwdgrp::parse_group (char *line)
 {
   char *dp = strchr (line, ':');
 
   if (!dp)
     return false;
 
-# define grp (* group_buf)[curr_lines]
+# define grp (*group_buf)[curr_lines]
   *dp++ = '\0';
   grp.gr_name = line;
 
@@ -83,68 +83,43 @@ pwdgrp::parse_grp (char *line)
 # undef grp
 }
 
-class group_lock
-{
-  bool armed;
-  static NO_COPY pthread_mutex_t mutex;
-public:
-  group_lock (bool doit)
-    {
-      if (armed = doit)
-        pthread_mutex_lock (&mutex);
-    }
-  ~group_lock ()
-    {
-      if (armed)
-        pthread_mutex_unlock (&mutex);
-    }
-};
-
-pthread_mutex_t NO_COPY group_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
-
 /* Cygwin internal */
 /* Read in /etc/group and save contents in the group cache */
 /* This sets group_in_memory_p to 1 so functions in this file can
    tell that /etc/group has been read in */
-static void
-read_etc_group ()
+void
+pwdgrp::read_group ()
 {
-  group_lock here (cygwin_finished_initializing);
+  for (int i = 0; i < gr.curr_lines; i++)
+    if ((*group_buf)[i].gr_mem != &null_ptr)
+      free ((*group_buf)[i].gr_mem);
 
-  /* if we got blocked by the mutex, then etc_group may have been processed */
-  if (gr.isinitializing ())
+  if (!gr.load ("/etc/group"))
+    debug_printf ("gr.load failed");
+
+  /* Complete /etc/group in memory if needed */
+  if (!internal_getgrgid (myself->gid))
     {
-      for (int i = 0; i < gr.curr_lines; i++)
-	if ((group_buf + i)->gr_mem != &null_ptr)
-	  free ((group_buf + i)->gr_mem);
+      static char linebuf [200];
+      char group_name [UNLEN + 1] = "mkgroup";
+      char strbuf[128] = "";
 
-      if (!gr.load ("/etc/group", group_buf))
-	debug_printf ("gr.load failed");
-
-      /* Complete /etc/group in memory if needed */
-      if (!internal_getgrgid (myself->gid))
-        {
-	  static char linebuf [200];
-	  char group_name [UNLEN + 1] = "mkgroup";
-	  char strbuf[128] = "";
-
-	  if (wincap.has_security ())
-            {
-	      struct __group32 *gr;
-
-	      cygheap->user.groups.pgsid.string (strbuf);
-	      if ((gr = internal_getgrsid (cygheap->user.groups.pgsid)))
-		strlcpy (group_name, gr->gr_name, sizeof (group_name));
-	    }
-	  snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:%s",
-		    group_name, strbuf, myself->gid, cygheap->user.name ());
-	  debug_printf ("Completing /etc/group: %s", linebuf);
-	  gr.add_line (linebuf);
-	}
-      static char NO_COPY pretty_ls[] = "????????::-1:";
       if (wincap.has_security ())
-	gr.add_line (pretty_ls);
+	{
+	  struct __group32 *gr;
+
+	  cygheap->user.groups.pgsid.string (strbuf);
+	  if ((gr = internal_getgrsid (cygheap->user.groups.pgsid)))
+	    strlcpy (group_name, gr->gr_name, sizeof (group_name));
+	}
+      snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:%s",
+		group_name, strbuf, myself->gid, cygheap->user.name ());
+      debug_printf ("Completing /etc/group: %s", linebuf);
+      gr.add_line (linebuf);
     }
+  static char NO_COPY pretty_ls[] = "????????::-1:";
+  if (wincap.has_security ())
+    gr.add_line (pretty_ls);
   return;
 }
 
@@ -153,8 +128,7 @@ internal_getgrsid (cygsid &sid)
 {
   char sid_string[128];
 
-  if (gr.isuninitialized ())
-    read_etc_group ();
+  gr.refresh ();
 
   if (sid.string (sid_string))
     for (int i = 0; i < gr.curr_lines; i++)
@@ -166,8 +140,7 @@ internal_getgrsid (cygsid &sid)
 struct __group32 *
 internal_getgrgid (__gid32_t gid, bool check)
 {
-  if (gr.isuninitialized () || (check && gr.isinitializing ()))
-    read_etc_group ();
+  gr.refresh (check);
 
   for (int i = 0; i < gr.curr_lines; i++)
     if (group_buf[i].gr_gid == gid)
@@ -178,8 +151,7 @@ internal_getgrgid (__gid32_t gid, bool check)
 struct __group32 *
 internal_getgrnam (const char *name, bool check)
 {
-  if (gr.isuninitialized () || (check && gr.isinitializing ()))
-    read_etc_group ();
+  gr.refresh (check);
 
   for (int i = 0; i < gr.curr_lines; i++)
     if (strcasematch (group_buf[i].gr_name, name))
@@ -242,8 +214,7 @@ endgrent ()
 extern "C" struct __group32 *
 getgrent32 ()
 {
-  if (gr.isinitializing ())
-    read_etc_group ();
+  gr.refresh ();
 
   if (grp_pos < gr.curr_lines)
     return group_buf + grp_pos++;
@@ -269,8 +240,7 @@ setgrent ()
 struct __group32 *
 internal_getgrent (int pos)
 {
-  if (gr.isuninitialized ())
-    read_etc_group ();
+  gr.refresh ();
 
   if (pos < gr.curr_lines)
     return group_buf + pos;

@@ -429,7 +429,7 @@ pwdgrp::load (const char *posix_fname)
   buf = NULL;
 
   pc.check (posix_fname);
-  pwd_ix = etc::init (pwd_ix, pc);
+  etc_ix = etc::init (etc_ix, pc);
 
   paranoid_printf ("%s", posix_fname);
 
@@ -470,6 +470,6 @@ pwdgrp::load (const char *posix_fname)
 	}
     }
 
-  state = loaded;
+  initialized = true;
   return res;
 }

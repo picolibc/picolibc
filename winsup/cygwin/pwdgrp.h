@@ -21,59 +21,61 @@ extern struct __group32 *internal_getgrnam (const char *, bool = FALSE);
 extern struct __group32 *internal_getgrent (int);
 int internal_getgroups (int, __gid32_t *, cygsid * = NULL);
 
-enum pwdgrp_state {
-  uninitialized = 0,
-  initializing,
-  loaded
-};
-
 class pwdgrp
 {
-  pwdgrp_state state;
-  int pwd_ix;
-  path_conv pc;
-  char *buf;
-  int max_lines;
+  unsigned pwdgrp_buf_elem_size;
   union
   {
     passwd **passwd_buf;
     __group32 **group_buf;
     void **pwdgrp_buf;
   };
-  unsigned pwdgrp_buf_elem_size;
+  void (pwdgrp::*read) ();
   bool (pwdgrp::*parse) (char *);
+  int etc_ix;
+  path_conv pc;
+  char *buf;
+  int max_lines;
+  bool initialized;
+  CRITICAL_SECTION lock;
 
   char *gets (char*&);
-  bool parse_pwd (char *);
-  bool parse_grp (char *);
 
 public:
   int curr_lines;
 
+  bool parse_passwd (char *);
+  bool parse_group (char *);
+  void read_passwd ();
+  void read_group ();
+
   void add_line (char *);
-  bool isinitializing ()
+  void refresh (bool check = true)
   {
-    if (state <= initializing)
-      state = initializing;
-    else if (etc::file_changed (pwd_ix))
-      state = initializing;
-    return state == initializing;
+    if (initialized && check && etc::file_changed (etc_ix))
+      initialized = false;
+    if (!initialized)
+      {
+	EnterCriticalSection (&lock);
+	if (!initialized)
+	  (this->*read) ();
+	LeaveCriticalSection (&lock);
+      }
   }
-  bool isuninitialized () const { return state == uninitialized; }
 
   bool load (const char *);
-  bool load (const char *posix_fname, passwd *&buf)
-  {
-    passwd_buf = &buf;
-    pwdgrp_buf_elem_size = sizeof (*buf);
-    parse = &pwdgrp::parse_pwd;
-    return load (posix_fname);
-  }
-  bool load (const char *posix_fname, __group32 *&buf)
-  {
-    group_buf = &buf;
-    pwdgrp_buf_elem_size = sizeof (*buf);
-    parse = &pwdgrp::parse_grp;
-    return load (posix_fname);
-  }
+  pwdgrp (passwd *&pbuf) :
+    pwdgrp_buf_elem_size (sizeof (*pbuf)), passwd_buf (&pbuf)
+    {
+      read = &pwdgrp::read_passwd;
+      parse = &pwdgrp::parse_passwd;
+      InitializeCriticalSection (&lock);
+    }
+  pwdgrp (__group32 *&gbuf) :
+    pwdgrp_buf_elem_size (sizeof (*gbuf)), group_buf (&gbuf)
+    {
+      read = &pwdgrp::read_group;
+      parse = &pwdgrp::parse_group;
+      InitializeCriticalSection (&lock);
+    }
 };
