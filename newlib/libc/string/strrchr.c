@@ -41,21 +41,19 @@ _DEFUN (strrchr, (s, i),
 	int i)
 {
   _CONST char *last = NULL;
-  char c = i;
 
-  while (*s)
+  if (i)
     {
-      if (*s == c)
+      while (s=strchr(s, i))
 	{
 	  last = s;
+	  s++;
 	}
-      s++;
     }
-
-  if (*s == c)
+  else
     {
-      last = s;
+      last = strchr(s, i);
     }
-
+		  
   return (char *) last;
 }

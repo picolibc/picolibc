@@ -1,3 +1,7 @@
+2001-05-04  Earnie Boyd  <earnie@users.sourceforge.net>
+
+        * libc/string/strrchr.c: Use strchr for the speed improvements.
+
 2001-05-01  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/findfp (__sinit)[HAVE_FCNTL]: For platforms that have
