@@ -32,7 +32,6 @@ details. */
 #ifdef _MT_SAFE
 #include "winsup.h"
 #include <limits.h>
-#include <errno.h>
 #include "cygerrno.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -328,6 +327,8 @@ pthread::precreate (pthread_attr *newattr)
       magic = 0;
       return;
     }
+  /* Change the mutex type to NORMAL to speed up mutex operations */
+  mutex.type = PTHREAD_MUTEX_NORMAL;
 
   cancel_event = ::CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   if (!cancel_event)
@@ -1157,6 +1158,19 @@ pthread_mutex::isGoodInitializerOrBadObject (pthread_mutex_t const *mutex)
   return true;
 }
 
+bool
+pthread_mutex::canBeUnlocked (pthread_mutex_t const *mutex)
+{
+  pthread_t self = pthread::self ();
+
+  if (!isGoodObject (mutex))
+    return false;
+  /*
+   * Check if the mutex is owned by the current thread and can be unlocked
+   */
+  return (__pthread_equal (&(*mutex)->owner, &self)) && 1 == (*mutex)->recursion_counter;
+}
+
 /* This is used for mutex creation protection within a single process only */
 nativeMutex NO_COPY pthread_mutex::mutexInitializationLock;
 
@@ -1172,7 +1186,7 @@ pthread_mutex::initMutex ()
 
 pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
   verifyable_object (PTHREAD_MUTEX_MAGIC),
-  lock_counter (MUTEX_LOCK_COUNTER_INITIAL),
+  lock_counter (0),
   win32_obj_id (NULL), recursion_counter (0),
   condwaits (0), owner (NULL), type (PTHREAD_MUTEX_DEFAULT),
   pshared (PTHREAD_PROCESS_PRIVATE)
@@ -1221,16 +1235,15 @@ pthread_mutex::~pthread_mutex ()
 }
 
 int
-pthread_mutex::Lock ()
+pthread_mutex::_Lock (pthread_t self)
 {
   int result = 0;
-  pthread_t self = pthread::self ();
 
-  if (0 == InterlockedIncrement (&lock_counter))
-    SetOwner ();
-  else if (__pthread_equal (&owner, &self))
+  if (1 == InterlockedIncrement ((long *)&lock_counter))
+    SetOwner (self);
+  else if (PTHREAD_MUTEX_NORMAL != type && __pthread_equal (&owner, &self))
     {
-      InterlockedDecrement (&lock_counter);
+      InterlockedDecrement ((long *) &lock_counter);
       if (PTHREAD_MUTEX_RECURSIVE == type)
 	result = LockRecursive ();
       else
@@ -1239,23 +1252,20 @@ pthread_mutex::Lock ()
   else
     {
       WaitForSingleObject (win32_obj_id, INFINITE);
-      SetOwner ();
+      SetOwner (self);
     }
 
   return result;
 }
 
-/* returns non-zero on failure */
 int
-pthread_mutex::TryLock ()
+pthread_mutex::_TryLock (pthread_t self)
 {
   int result = 0;
-  pthread_t self = pthread::self ();
 
-  if (MUTEX_LOCK_COUNTER_INITIAL ==
-      InterlockedCompareExchange (&lock_counter, 0, MUTEX_LOCK_COUNTER_INITIAL ))
-    SetOwner ();
-  else if (__pthread_equal (&owner, &self) && PTHREAD_MUTEX_RECURSIVE == type)
+  if (0 == InterlockedCompareExchange ((long *)&lock_counter, 1, 0 ))
+    SetOwner (self);
+  else if (PTHREAD_MUTEX_RECURSIVE == type && __pthread_equal (&owner, &self))
     result = LockRecursive ();
   else
     result = EBUSY;
@@ -1264,17 +1274,15 @@ pthread_mutex::TryLock ()
 }
 
 int
-pthread_mutex::UnLock ()
+pthread_mutex::_UnLock (pthread_t self)
 {
-  pthread_t self = pthread::self ();
-
   if (!__pthread_equal (&owner, &self))
     return EPERM;
 
   if (0 == --recursion_counter)
     {
       owner = NULL;
-      if (MUTEX_LOCK_COUNTER_INITIAL != InterlockedDecrement (&lock_counter))
+      if (InterlockedDecrement ((long *)&lock_counter))
 	// Another thread is waiting
 	::ReleaseSemaphore (win32_obj_id, 1, NULL);
     }
@@ -1283,9 +1291,9 @@ pthread_mutex::UnLock ()
 }
 
 int
-pthread_mutex::Destroy ()
+pthread_mutex::_Destroy (pthread_t self)
 {
-  if (condwaits || TryLock ())
+  if (condwaits || _TryLock (self))
     // Do not destroy a condwaited or locked mutex
     return EBUSY;
   else if (recursion_counter != 1)
@@ -1300,22 +1308,6 @@ pthread_mutex::Destroy ()
 }
 
 void
-pthread_mutex::SetOwner ()
-{
-  recursion_counter = 1;
-  owner = pthread::self ();
-}
-
-int
-pthread_mutex::LockRecursive ()
-{
-  if (UINT_MAX == recursion_counter)
-    return EAGAIN;
-  ++recursion_counter;
-  return 0;
-}
-
-void
 pthread_mutex::fixup_after_fork ()
 {
   debug_printf ("mutex %x in fixup_after_fork", this);
@@ -1324,10 +1316,10 @@ pthread_mutex::fixup_after_fork ()
 
   if (NULL == owner)
     /* mutex has no owner, reset to initial */
-    lock_counter = MUTEX_LOCK_COUNTER_INITIAL;
-  else if (lock_counter != MUTEX_LOCK_COUNTER_INITIAL)
-    /* All waiting threads are gone after a fork */
     lock_counter = 0;
+  else if (lock_counter != 0)
+    /* All waiting threads are gone after a fork */
+    lock_counter = 1;
 
   win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
   if (!win32_obj_id)
@@ -2615,6 +2607,7 @@ __pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
     {
     case PTHREAD_MUTEX_ERRORCHECK:
     case PTHREAD_MUTEX_RECURSIVE:
+    case PTHREAD_MUTEX_NORMAL:
       (*attr)->mutextype = type;
       break;
     default:

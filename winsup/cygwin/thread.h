@@ -39,6 +39,8 @@ extern "C"
 #else
 
 #include <pthread.h>
+#include <limits.h>
+#include <errno.h>
 #include <signal.h>
 #include <pwd.h>
 #include <grp.h>
@@ -160,9 +162,9 @@ private:
 #define PTHREAD_COND_MAGIC PTHREAD_MAGIC+5
 #define PTHREAD_CONDATTR_MAGIC PTHREAD_MAGIC+6
 #define SEM_MAGIC PTHREAD_MAGIC+7
-#define PTHREAD_ONCE_MAGIC PTHREAD_MAGIC+8;
+#define PTHREAD_ONCE_MAGIC PTHREAD_MAGIC+8
 
-#define MUTEX_LOCK_COUNTER_INITIAL   (-1)
+#define MUTEX_OWNER_ANONYMOUS        ((pthread_t) -1)
 
 /* verifyable_object should not be defined here - it's a general purpose class */
 
@@ -304,10 +306,11 @@ public:
   static bool isGoodInitializer (pthread_mutex_t const *);
   static bool isGoodInitializerOrObject (pthread_mutex_t const *);
   static bool isGoodInitializerOrBadObject (pthread_mutex_t const *mutex);
+  static bool canBeUnlocked (pthread_mutex_t const *mutex);
   static void initMutex ();
   static int init (pthread_mutex_t *, const pthread_mutexattr_t *);
 
-  LONG lock_counter;
+  unsigned long lock_counter;
   HANDLE win32_obj_id;
   unsigned int recursion_counter;
   LONG condwaits;
@@ -316,12 +319,43 @@ public:
   int pshared;
   class pthread_mutex * next;
 
-  int Lock ();
-  int TryLock ();
-  int UnLock ();
-  int Destroy ();
-  void SetOwner ();
-  int LockRecursive ();
+  pthread_t GetPthreadSelf () const
+  {
+    return PTHREAD_MUTEX_NORMAL == type ? MUTEX_OWNER_ANONYMOUS :
+      ::pthread_self ();
+  }
+
+  int Lock ()
+  {
+    return _Lock (GetPthreadSelf ());
+  }
+  int TryLock ()
+  {
+    return _TryLock (GetPthreadSelf ());
+  }
+  int UnLock ()
+  {
+    return _UnLock (GetPthreadSelf ());
+  }
+  int Destroy ()
+  {
+    return _Destroy (GetPthreadSelf ());
+  }
+
+  void SetOwner (pthread_t self)
+  {
+    recursion_counter = 1;
+    owner = self;
+  }
+
+  int LockRecursive ()
+  {
+    if (UINT_MAX == recursion_counter)
+      return EAGAIN;
+    ++recursion_counter;
+    return 0;
+  }
+
   void fixup_after_fork ();
 
   pthread_mutex (pthread_mutexattr * = NULL);
@@ -329,6 +363,11 @@ public:
   ~pthread_mutex ();
 
 private:
+  int _Lock (pthread_t self);
+  int _TryLock (pthread_t self);
+  int _UnLock (pthread_t self);
+  int _Destroy (pthread_t self);
+
   static nativeMutex mutexInitializationLock;
 };
 

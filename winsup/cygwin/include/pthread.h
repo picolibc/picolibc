@@ -52,6 +52,7 @@ extern "C"
 #define PTHREAD_INHERIT_SCHED 0
 #define PTHREAD_MUTEX_RECURSIVE 0
 #define PTHREAD_MUTEX_ERRORCHECK 1
+#define PTHREAD_MUTEX_NORMAL 2
 #define PTHREAD_MUTEX_DEFAULT PTHREAD_MUTEX_ERRORCHECK
 /* this should be too low to ever be a valid address */
 #define PTHREAD_MUTEX_INITIALIZER (pthread_mutex_t)20

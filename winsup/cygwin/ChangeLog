@@ -1,3 +1,39 @@
+2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* include/pthread.h (PTHREAD_MUTEX_NORMAL): New define.
+	* thread.cc: Remove errno.h include.
+	(pthread::precreate): Change internal mutex type to normal.
+	(pthread_mutex::canBeUnlocked): Implement.
+	(pthread_mutex::pthread_mutex): Initialize lock_counter with 0.
+	(pthread_mutex::Lock): Rename to _Lock. Add self parameter.
+	Change lock_counter logic. Update SetOwner call.
+	(pthread_mutex::TryLock): Rename to _TryLock. Add self parameter.
+	Change lock_counter logic. Update SetOwner call.
+	(pthread_mutex::UnLock): Rename to _UnLock. Add self parameter.
+	Change lock_counter logic.
+	(pthread_mutex::Destroy): Rename to _Destroy. Update TryLock call.
+	(pthread_mutex::SetOwner): Move to thread.h as inline.
+	(pthread_mutex::LockRecursive): Ditto.
+	(pthread_mutex::fixup_after_fork): Change lock_counter logic.
+	(__pthread_mutexattr_settype): Add PTHREAD_MUTEX_NORMAL to valid
+	types check.
+	* thread.h: Include errno.h and limits.h.
+	(MUTEX_LOCK_COUNTER_INITIAL): Remove.
+	(MUTEX_OWNER_ANONYMOUS): New define.
+	(pthread_mutex::canBeUnlocked): New static method.
+	(pthread_mutex::lock_counter): Change type to unsigned long.
+	(pthread_mutex::GetPthreadSelf): New method.
+	(pthread_mutex::Lock): Call _Lock with pthread_self pointer.
+	(pthread_mutex::TryLock): Call _TryLock with pthread_self pointer.
+	(pthread_mutex::UnLock): Call _UnLock with pthread_self pointer.
+	(pthread_mutex::Destroy): Call _Destroy with pthread_self pointer.
+	(pthread_mutex::SetOwner): Moved from thread.cc as inline.
+	(pthread_mutex::LockRecursive): Ditto.
+	(pthread_mutex::_Lock): New method.
+	(pthread_mutex::_TryLock): New method.
+	(pthread_mutex::_UnLock): New method.
+	(pthread_mutex::_Destroy): New method.
+
 2003-03-18  Christopher January  <chris@atomice.net>
 
 	* fhandler_proc.cc (format_proc_cpuinfo): Use IsProcessorFeaturePresent
