@@ -37,13 +37,15 @@ details. */
 
 #define LINE_BUF_CHUNK (MAX_PATH * 2)
 
-suffix_info std_suffixes[] =
+static suffix_info std_suffixes[] =
 {
   suffix_info (".exe", 1), suffix_info ("", 1),
   suffix_info (".com"), suffix_info (".cmd"),
   suffix_info (".bat"), suffix_info (".dll"),
   suffix_info (NULL)
 };
+
+HANDLE hExeced;
 
 /* Add .exe to PROG if not already present and see if that exists.
    If not, return PROG (converted from posix to win32 rules if necessary).
@@ -671,7 +673,8 @@ skip_arg_parsing:
       /* These are both duplicated in the child code.  We do this here,
 	 primarily for strace. */
       strcpy (myself->progname, real_path);
-      myself->dwProcessId = pi.dwProcessId;
+      strace.execing = 1;
+      hExeced = pi.hProcess;
     }
   else
     {

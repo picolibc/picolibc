@@ -133,10 +133,8 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
       if ((p = strrchr (progname, '.')) != NULL && strcasematch (p, ".exe"))
 	*p = '\000';
       p = progname;
-      count = __small_sprintf (buf, fmt, p && *p ? p : "?",
-			       myself->pid,
-			       myself->dwProcessId != GetCurrentProcessId ()
-			       ? "!" : "");
+      count = __small_sprintf (buf, fmt, p && *p ? p : "?", myself->pid,
+			       execing ? "!" : "");
       if (func)
 	count += getfunc (buf + count, func);
     }
@@ -177,6 +175,8 @@ strace::write (unsigned category, const char *buf, int count)
   __small_sprintf (outbuf, "cYg%08x", strlen (outstuff) + 1);
   outstuff[-1] = ' ';
   OutputDebugString (outbuf);
+#undef outstuff
+#undef PREFIX
 }
 
 /* Printf function used when tracing system calls.

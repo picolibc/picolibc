@@ -30,6 +30,7 @@ public:
   int version;
   int active;
   int lmicrosec;
+  int execing;
   strace() : version(1) {}
   void prntf (unsigned, const char *func, const char *, ...);
   void wm (int message, int word, int lon);

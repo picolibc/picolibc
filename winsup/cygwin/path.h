@@ -103,8 +103,6 @@ class path_conv
 /* Maximum depth of symlinks (after which ELOOP is issued).  */
 #define MAX_LINK_DEPTH 10
 
-extern suffix_info std_suffixes[];
-
 int __stdcall get_device_number (const char *name, int &unit, BOOL from_conv = FALSE);
 int __stdcall slash_unc_prefix_p (const char *path);
 int __stdcall check_null_empty_path (const char *name);

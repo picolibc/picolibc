@@ -1,3 +1,15 @@
+Mon Oct 23 21:47:55 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (signal_exit): Kill any executing child process if
+	we're dying.
+	* path.h: Remove unneeded extern.
+	* spawn.cc (std_suffixes): Make static.  Don't set dwProcessId here
+	since it makes the process unsignalable.  Set strace flag that this is
+	an execed process stub.
+	* strace.cc (strace::vsprntf): Use strace flag to indicate when to
+	visually flag that this is an exec stub.
+	* include/sys/strace.h (strace): Add 'execing' flag.
+
 Mon Oct 23 16:43:33 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (proc_subproc): Don't send a false positive if WNOHANG and

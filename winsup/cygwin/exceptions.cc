@@ -1017,6 +1017,8 @@ exit_sig:
 static void
 signal_exit (int rc)
 {
+  extern HANDLE hExeced;
+
   rc = EXIT_SIGNAL | (rc << 8);
   if (exit_already++)
     myself->exit (rc);
@@ -1034,6 +1036,9 @@ signal_exit (int rc)
 
   user_data->resourcelocks->Delete ();
   user_data->resourcelocks->Init ();
+
+  if (hExeced)
+    TerminateProcess (hExeced, rc);
 
   do_exit (rc);
 }
