@@ -29,6 +29,9 @@ int     _EXFUN(chroot, (const char *__path ));
 int     _EXFUN(close, (int __fildes ));
 char    _EXFUN(*ctermid, (char *__s ));
 char    _EXFUN(*cuserid, (char *__s ));
+#if defined(__CYGWIN__)
+int	_EXFUN(daemon, (int nochdir, int noclose));
+#endif
 int     _EXFUN(dup, (int __fildes ));
 int     _EXFUN(dup2, (int __fildes, int __fildes2 ));
 #if defined(__CYGWIN__)

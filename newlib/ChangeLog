@@ -1,15 +1,19 @@
+2003-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/unistd.h: Declare function daemon for Cygwin.
+
 2003-09-09  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * libc/machine/powerpc/fix64.h: Fix typo for _simdldcheck
-        prototype.
-        * libc/machine/powerpc/simdldtoa.c: Remove prototype for
-        _simdldcheck().  Also add unsigned cast for index variable in
-        for loop using sizeof operators.
-        * libc/machine/powerpc/strtoufix32.c: Remove unused variable.
-        * libc/machine/powerpc/strtosfix64.c: Fix call to _simdldcheck.
-        * libc/machine/powerpc/strtoufix64.c (_strtoufix64_r): Ditto
-        plus fix shift calculation for determining if there is a
-        carry from word2.
+	* libc/machine/powerpc/fix64.h: Fix typo for _simdldcheck
+	prototype.
+	* libc/machine/powerpc/simdldtoa.c: Remove prototype for
+	_simdldcheck().  Also add unsigned cast for index variable in
+	for loop using sizeof operators.
+	* libc/machine/powerpc/strtoufix32.c: Remove unused variable.
+	* libc/machine/powerpc/strtosfix64.c: Fix call to _simdldcheck.
+	* libc/machine/powerpc/strtoufix64.c (_strtoufix64_r): Ditto
+	plus fix shift calculation for determining if there is a
+	carry from word2.
 
 2003-09-09  Corinna Vinschen  <corinna@vinschen.de>
 
