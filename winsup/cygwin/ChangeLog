@@ -1,3 +1,10 @@
+Sat Nov 11 23:55:19 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.h: Add __attribute__ ((regparm(x))) to commonly used functions.
+	* pinfo.h: Ditto.
+	* sigproc.h: Ditto.
+	* sync.h: Ditto.
+
 Fri Nov 10 13:48:44 2000 Bradley A. Town <townba@pobox.com>
 
 	* dcrt0.cc: New global variable `ignore_case_with_glob'.

@@ -159,7 +159,7 @@ class pinfo
   _pinfo *procinfo;
   int destroy;
 public:
-  void init (pid_t n, DWORD create = 0, HANDLE h = NULL);
+  void init (pid_t n, DWORD create = 0, HANDLE h = NULL) __attribute__ ((regparm(3)));
   pinfo () {}
   pinfo (_pinfo *x): procinfo (x) {}
   pinfo (pid_t n) {init (n);}

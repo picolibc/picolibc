@@ -96,9 +96,9 @@ void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
 void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
-BOOL __stdcall proc_exists (_pinfo *);
-BOOL __stdcall pid_exists (pid_t);
-int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_address (0));
+BOOL __stdcall proc_exists (_pinfo *) __attribute__ ((regparm(1)));
+BOOL __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
+int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_address (0))  __attribute__ ((regparm(3)));
 void __stdcall signal_fixup_after_fork ();
 void __stdcall signal_fixup_after_exec (bool);
 
@@ -106,8 +106,6 @@ extern char myself_nowait_dummy[];
 extern char myself_nowait_nonmain_dummy[];
 
 #define WAIT_SIG_EXITING (WAIT_OBJECT_0 + 1)
-
-#define allow_sig_dispatch(n) __allow_sig_dispatch (__FILE__, __LINE__, (n))
 
 #define myself_nowait ((_pinfo *)myself_nowait_dummy)
 #define myself_nowait_nonmain ((_pinfo *)myself_nowait_nonmain_dummy)

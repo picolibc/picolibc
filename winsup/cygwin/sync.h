@@ -31,7 +31,7 @@ public:
   /* The real constructor. */
   muto(int inh, const char *name);
   ~muto ();
-  int acquire (DWORD ms = INFINITE); /* Acquire the lock. */
+  int acquire (DWORD ms = INFINITE) __attribute__ ((regparm(1))); /* Acquire the lock. */
   int release ();		     /* Release the lock. */
 
   /* Return true if caller thread owns the lock. */

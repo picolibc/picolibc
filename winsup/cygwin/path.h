@@ -70,7 +70,7 @@ class path_conv
   DWORD fileattr;
 
   void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
-	      const suffix_info *suffixes = NULL);
+	      const suffix_info *suffixes = NULL)  __attribute__ ((regparm(3)));
 
   path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
@@ -103,12 +103,12 @@ class path_conv
 /* Maximum depth of symlinks (after which ELOOP is issued).  */
 #define MAX_LINK_DEPTH 10
 
-int __stdcall get_device_number (const char *name, int &unit, BOOL from_conv = FALSE);
-int __stdcall slash_unc_prefix_p (const char *path);
-int __stdcall check_null_empty_path (const char *name);
+int __stdcall get_device_number (const char *name, int &unit, BOOL from_conv = FALSE)  __attribute__ ((regparm(3)));
+int __stdcall slash_unc_prefix_p (const char *path) __attribute__ ((regparm(1)));
+int __stdcall check_null_empty_path (const char *name) __attribute__ ((regparm(1)));
 
 const char * __stdcall find_exec (const char *name, path_conv& buf, const char *winenv = "PATH=",
-			int null_if_notfound = 0, const char **known_suffix = NULL);
+			int null_if_notfound = 0, const char **known_suffix = NULL)  __attribute__ ((regparm(3)));
 
 /* Common macros for checking for invalid path names */
 
