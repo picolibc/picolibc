@@ -1,5 +1,11 @@
 2002-05-13  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * libc/machine/powerpc/vfprintf.c(__VFPRINTF_R)[__ALTIVEC__]: Don't
+        allow v specifier with n or L specifiers.  For vector c format,
+        move tmp declaration to the top.
+
+2002-05-13  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/machine/powerpc/vfprintf.c(__VFPRINTF_R)[__ALTIVEC__]: Restore
         the original format specifier when looping for vectors to compensate
         for any changes made in vector %g format processing.

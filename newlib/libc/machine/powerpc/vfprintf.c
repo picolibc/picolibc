@@ -615,7 +615,13 @@ reswitch:	switch (ch) {
 			goto reswitch;
 #ifdef FLOATING_POINT
 		case 'L':
-			flags &= ~VECTOR;
+#ifdef __ALTIVEC__
+		        if (flags & VECTOR) 
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+#endif /* __ALTIVEC__ */
 			flags |= LONGDBL;
 			goto rflag;
 #endif
@@ -676,12 +682,12 @@ reswitch:	switch (ch) {
 			if (flags & VECTOR)
 			  {
 			    int k;
+			    vec_16_byte_union tmp;
 		            if (flags & (SHORTINT | LONGINT))
 		              {
 		                fmt = format_anchor;
 		                continue;
 		              }
-			    vec_16_byte_union tmp;
 			    tmp.v = va_arg(ap, vector int);
 			    cp = buf;
 			    for (k = 0; k < 15; ++k)
@@ -858,8 +864,14 @@ reswitch:	switch (ch) {
 			break;
 #endif /* FLOATING_POINT */
 		case 'n':
+#ifdef __ALTIVEC__
+		        if (flags & VECTOR)
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+#endif /* __ALTIVEC__ */
 #ifndef _NO_LONGLONG
-			flags &= ~VECTOR;
 			if (flags & QUADINT)
 				*va_arg(ap, quad_t *) = ret;
 			else 
