@@ -1,4 +1,9 @@
 
+2001.06.11  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/basetsd.h: RC_INVOKED protection and realignment.
+	Thanks to: Colin Peters <colinpeters@users.sourceforge.net>
+
 2001.06.06  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* Makefile.in (bindist): Reassign value of exec_prefix on make command
