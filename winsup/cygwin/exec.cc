@@ -35,8 +35,7 @@ execve (const char *path, char *const argv[], char *const envp[])
   return spawnve (_P_OVERLAY, path, argv, envp);
 }
 
-extern "C" int _execve (const char *, char *const [], char *const [])
-  __attribute__ ((alias ("execve")));
+EXPORT_ALIAS (execve, _execve)
 
 extern "C" int
 execl (const char *path, const char *arg0, ...)

@@ -90,7 +90,7 @@ times (struct tms *buf)
    return tc;
 }
 
-extern "C" clock_t _times (struct tms *) __attribute__((alias ("times")));
+EXPORT_ALIAS (times, _times)
 
 /* settimeofday: BSD */
 extern "C" int
@@ -172,8 +172,7 @@ gettimeofday (struct timeval *tv, struct timezone *tz)
   return 0;
 }
 
-extern "C" int _gettimeofday (struct timeval *, struct timezone *)
-  __attribute__((alias ("gettimeofday")));
+EXPORT_ALIAS (gettimeofday, _gettimeofday)
 
 /* Cygwin internal */
 void

@@ -213,7 +213,7 @@ API_VER:=$(srcdir)/include/cygwin/version.h
 PWD:=${shell pwd}
 LIB_NAME:=$(PWD)/libcygwin.a
 LIBSERVER:=@LIBSERVER@
-SUBLIBS:=$(PWD)/libpthread.a $(PWD)/libm.a $(PWD)/libc.a
+SUBLIBS:=$(PWD)/libpthread.a $(PWD)/libutil.a $(PWD)/libm.a $(PWD)/libc.a
 EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a libtextreadmode.a
 INSTOBJS:=automode.o binmode.o textmode.o textreadmode.o
 TARGET_LIBS:=$(LIB_NAME) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
@@ -414,10 +414,13 @@ $(srcdir)/devices.cc: gendevices devices.in devices.h
 $(PWD)/libpthread.a: speclib $(LIB_NAME) pthread.o thread.o
 	/bin/sh ${word 1, $^} $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
 
+$(PWD)/libutil.a: speclib $(LIB_NAME) bsdlib.o
+	/bin/sh ${word 1, $^} $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
+
 $(PWD)/libm.a: speclib $(LIB_NAME) $(LIBM)
 	/bin/sh ${word 1, $^} $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
 
-$(PWD)/libc.a: speclib $(LIB_NAME) $(PWD)/libm.a libpthread.a
+$(PWD)/libc.a: speclib $(LIB_NAME) $(PWD)/libm.a libpthread.a libutil.a
 	/bin/sh ${word 1, $^} -v $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
 
 lib%.a: %.o

@@ -260,3 +260,52 @@ setprogname (const char *newprogname)
 	__progname = (char *)newprogname;
     }
 }
+
+extern "C" void
+logwtmp (const char *line, const char *user, const char *host)
+{
+  struct utmp ut;
+  memset (&ut, 0, sizeof ut);
+  ut.ut_type = USER_PROCESS;
+  ut.ut_pid = getpid ();
+  if (line)
+    strncpy (ut.ut_line, line, sizeof ut.ut_line);
+  time (&ut.ut_time);
+  if (user)
+    strncpy (ut.ut_user, user, sizeof ut.ut_user);
+  if (host)
+    strncpy (ut.ut_host, host, sizeof ut.ut_host);
+  updwtmp (_PATH_WTMP, &ut);
+}
+
+extern "C" void
+login (struct utmp *ut)
+{
+  pututline (ut);
+  endutent ();
+  updwtmp (_PATH_WTMP, ut);
+}
+
+extern "C" int
+logout (char *line)
+{
+  struct utmp ut_buf, *ut;
+
+  memset (&ut_buf, 0, sizeof ut_buf);
+  strncpy (ut_buf.ut_line, line, sizeof ut_buf.ut_line);
+  setutent ();
+  ut = getutline (&ut_buf);
+
+  if (ut)
+    {
+      ut->ut_type = DEAD_PROCESS;
+      memset (ut->ut_user, 0, sizeof ut->ut_user);
+      memset (ut->ut_host, 0, sizeof ut->ut_host);
+      time (&ut->ut_time);
+      debug_printf ("set logout time for %s", line);
+      pututline (ut);
+      endutent ();
+      return 1;
+    }
+  return 0;
+}

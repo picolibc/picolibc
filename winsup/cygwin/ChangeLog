@@ -1,3 +1,15 @@
+2004-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Create libutil.a from bsdlib.o exports.
+	* bsdlib.cc (logwtmp): Move from syscalls.cc to here.
+	(login): Ditto.
+	(logout): Ditto.
+
+	* winsup.h (EXPORT_ALIAS): New macro.
+	* exec.cc: Define alias symbols using EXPORT_ALIAS macro.
+	* syscalls.cc: Ditto.
+	* times.cc: Ditto.
+
 2004-09-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tape.cc (fhandler_dev_tape::open): Fix typo.

@@ -32,6 +32,8 @@ details. */
 #define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
 #define NO_COPY_INIT __attribute__((section(".data_cygwin_nocopy")))
 
+#define EXPORT_ALIAS(sym,symalias) extern "C" __typeof (sym) symalias __attribute__ ((alias(#sym)));
+
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
 #define NEW_MACRO_VARARGS
 #endif

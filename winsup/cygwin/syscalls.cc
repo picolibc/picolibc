@@ -370,8 +370,7 @@ read (int fd, void *ptr, size_t len)
   return readv (fd, &iov, 1);
 }
 
-extern "C" ssize_t _read (int, void *, size_t)
-  __attribute__ ((alias ("read")));
+EXPORT_ALIAS (read, _read)
 
 extern "C" ssize_t
 write (int fd, const void *ptr, size_t len)
@@ -385,8 +384,7 @@ write (int fd, const void *ptr, size_t len)
   return writev (fd, &iov, 1);
 }
 
-extern "C" ssize_t _write (int fd, const void *ptr, size_t len)
-  __attribute__ ((alias ("write")));
+EXPORT_ALIAS (write, _write)
 
 extern "C" ssize_t
 readv (int fd, const struct iovec *const iov, const int iovcnt)
@@ -572,11 +570,8 @@ open (const char *unix_path, int flags, ...)
   return res;
 }
 
-extern "C" int _open (const char *, int flags, ...)
-  __attribute__ ((alias ("open")));
-
-extern "C" int _open64 (const char *, int flags, ...)
-  __attribute__ ((alias ("open")));
+EXPORT_ALIAS (open, _open )
+EXPORT_ALIAS (open, _open64 )
 
 extern "C" _off64_t
 lseek64 (int fd, _off64_t pos, int dir)
@@ -601,8 +596,7 @@ lseek64 (int fd, _off64_t pos, int dir)
   return res;
 }
 
-extern "C" int _lseek64 (int fd, _off64_t pos, int dir)
-  __attribute__ ((alias ("lseek64")));
+EXPORT_ALIAS (lseek64, _lseek64)
 
 extern "C" _off_t
 lseek (int fd, _off_t pos, int dir)
@@ -610,8 +604,7 @@ lseek (int fd, _off_t pos, int dir)
   return lseek64 (fd, (_off64_t) pos, dir);
 }
 
-extern "C" _off_t _lseek (int, _off_t, int)
-  __attribute__ ((alias ("lseek")));
+EXPORT_ALIAS (lseek, _lseek)
 
 extern "C" int
 close (int fd)
@@ -635,7 +628,7 @@ close (int fd)
   return res;
 }
 
-extern "C" int _close (int) __attribute__ ((alias ("close")));
+EXPORT_ALIAS (close, _close)
 
 extern "C" int
 isatty (int fd)
@@ -2480,55 +2473,6 @@ updwtmp (const char *wtmp_file, const struct utmp *ut)
       locked_append (fd, ut, sizeof *ut);
       close (fd);
     }
-}
-
-extern "C" void
-logwtmp (const char *line, const char *user, const char *host)
-{
-  struct utmp ut;
-  memset (&ut, 0, sizeof ut);
-  ut.ut_type = USER_PROCESS;
-  ut.ut_pid = getpid ();
-  if (line)
-    strncpy (ut.ut_line, line, sizeof ut.ut_line);
-  time (&ut.ut_time);
-  if (user)
-    strncpy (ut.ut_user, user, sizeof ut.ut_user);
-  if (host)
-    strncpy (ut.ut_host, host, sizeof ut.ut_host);
-  updwtmp (_PATH_WTMP, &ut);
-}
-
-extern "C" void
-login (struct utmp *ut)
-{
-  pututline (ut);
-  endutent ();
-  updwtmp (_PATH_WTMP, ut);
-}
-
-extern "C" int
-logout (char *line)
-{
-  struct utmp ut_buf, *ut;
-
-  memset (&ut_buf, 0, sizeof ut_buf);
-  strncpy (ut_buf.ut_line, line, sizeof ut_buf.ut_line);
-  setutent ();
-  ut = getutline (&ut_buf);
-
-  if (ut)
-    {
-      ut->ut_type = DEAD_PROCESS;
-      memset (ut->ut_user, 0, sizeof ut->ut_user);
-      memset (ut->ut_host, 0, sizeof ut->ut_host);
-      time (&ut->ut_time);
-      debug_printf ("set logout time for %s", line);
-      pututline (ut);
-      endutent ();
-      return 1;
-    }
-  return 0;
 }
 
 static int utmp_fd = -1;
