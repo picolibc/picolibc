@@ -1,3 +1,8 @@
+2004-07-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wingdi.h (CMYK): Correct macro. Group CMYK/RGB
+        macros together.
+
 2004-07-24  Brodie Thiesfield  <brofield@users.sourceforge.net>
 
 	* include/shlobj.h (FILEDESCRIPTOR): Unicode it.

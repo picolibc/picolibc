@@ -2499,12 +2499,23 @@ typedef void (CALLBACK *LINEDDAPROC)(int,int,LPARAM);
 typedef UINT (CALLBACK *LPFNDEVMODE)(HWND,HMODULE,LPDEVMODEA,LPSTR,LPSTR,LPDEVMODEA,LPSTR,UINT);
 typedef DWORD (CALLBACK *LPFNDEVCAPS)(LPSTR,LPSTR,UINT,LPSTR,LPDEVMODEA);
 
-
-#define RGB(r,g,b)	((COLORREF)((BYTE)(r) | ((BYTE)(g) << 8) | ((BYTE)(b) << 16)))
 #define MAKEPOINTS(l) (*((POINTS*)&(l)))
 #define MAKEROP4(f,b)	(DWORD)((((b)<<8)&0xFF000000)|(f))
+
+#define GetCValue(cmyk) ((BYTE)(cmyk))
+#define GetMValue(cmyk) ((BYTE)((cmyk)>> 8))
+#define GetYValue(cmyk) ((BYTE)((cmyk)>>16))
+#define GetKValue(cmyk) ((BYTE)((cmyk)>>24))
+#define CMYK(c,m,y,k) ((COLORREF)((BYTE)(k)|((BYTE)(y)<<8)|((BYTE)(m)<<16)|((BYTE)(c)<<24)))
+
+#define GetRValue(c) ((BYTE)(c))
+#define GetGValue(c) ((BYTE)(((WORD)(c))>>8))
+#define GetBValue(c) ((BYTE)((c)>>16))
+#define RGB(r,g,b) ((COLORREF)((BYTE)(r)|((BYTE)(g) << 8)|((BYTE)(b) << 16)))
+
 #define PALETTEINDEX(i)	((0x01000000|(COLORREF)(WORD)(i)))
 #define PALETTERGB(r,g,b)	(0x02000000|RGB(r,g,b))
+
 int WINAPI AbortDoc(HDC);
 BOOL WINAPI AbortPath(HDC);
 int WINAPI AddFontResourceA(LPCSTR);
@@ -2620,14 +2631,6 @@ BOOL WINAPI GdiComment(HDC,UINT,const BYTE*);
 BOOL WINAPI GdiFlush(void);
 DWORD WINAPI GdiGetBatchLimit(void);
 DWORD WINAPI GdiSetBatchLimit(DWORD);
-#define GetCValue(cmyk) ((BYTE)(cmyk))
-#define GetMValue(cmyk) ((BYTE)((cmyk)>> 8))
-#define GetYValue(cmyk) ((BYTE)((cmyk)>>16))
-#define GetKValue(cmyk) ((BYTE)((cmyk)>>24))
-#define CMYK(c,m,y,k) ((COLORREF)((((BYTE)(c)|((WORD)((BYTE)(m))<<8))|(((DWORD)(BYTE)(y))<<16))|(((DWORD)(BYTE)(k))<<24)))
-#define GetRValue(c) ((BYTE)(c))
-#define GetGValue(c) ((BYTE)(((WORD)(c))>>8))
-#define GetBValue(c) ((BYTE)((c)>>16))
 int WINAPI GetArcDirection(HDC);
 BOOL WINAPI GetAspectRatioFilterEx(HDC,LPSIZE);
 LONG WINAPI GetBitmapBits(HBITMAP,LONG,PVOID);
