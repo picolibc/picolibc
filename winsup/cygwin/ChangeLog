@@ -1,8 +1,11 @@
-Fri Sep 14 20:43:01 2001  Christopher Faylor <cgf@cygnus.com>
+Fri Sep 14 20:48:18 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (dll_crt0_1): Create vfork main storage here so that it can
 	be queried in waitsig later.
 	* sigproc.cc (wait_sig): Don't deliver a signal if in a vfork.
+	* sigproc.h (sigframe::init): New method.
+	(sigframe): Use init.
+	* perthread.h: Declare main_vfork.
 	* fork.cc (vfork): Deliver all signals on parent return from vfork.
 
 Fri Sep 14 10:21:00 2001  Corinna Vinschen <corinna@vinschen.de>
