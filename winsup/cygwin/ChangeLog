@@ -1,5 +1,12 @@
 2003-02-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Fix compiler
+	warning.
+	(fhandler_socket::fstat): Simplify.  Set st_uid/st_gid to effective
+	uid/gid of current process in case of open sockets.
+
+2003-02-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::build_fhandler_from_name): Set some fhandler
 	data on sockets to evaluate AF_LOCAL sockets correctly.
 	(dtable::build_fhandler): Set unit number on sockets.
