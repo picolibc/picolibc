@@ -1,3 +1,7 @@
+2002-09-18  Eric R. Krause  <ekrause_98@users.sourceforge.net>
+
+	* include/winuser.h (DS_SHELLFONT): Define.
+
 2002-09-17  Daniel Schlyder  <daniel@dascdev.net>
 
 	* include/winnt.h (VER_SUITE_BLADE): Define.
