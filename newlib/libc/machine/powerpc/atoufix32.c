@@ -2,6 +2,8 @@
  * Jeff Johnston - 02/13/2002
  */
 
+#ifdef __SPE__ 
+
 #include <stdlib.h>
 #include <_ansi.h>
 
@@ -23,3 +25,4 @@ _DEFUN (atoufix32, (s),
 
 #endif /* !_REENT_ONLY */
 
+#endif /* __SPE__ */

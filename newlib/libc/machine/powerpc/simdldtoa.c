@@ -3,6 +3,8 @@
   * This program has been placed in the public domain.
   */
 
+#ifdef __SPE__
+
 #include <_ansi.h>
 #include <reent.h>
 #include <string.h>
@@ -3718,6 +3720,4 @@ for (i=0; i < n; i++)
 	*nan++ = *p++;
 }
 
-
-
-
+#endif /* __SPE__ */

@@ -79,6 +79,8 @@ PORTABILITY
  * Jeff Johnston - 02/13/2002
  */
 
+#ifdef __SPE__
+
 #include <stdlib.h>
 #include <_ansi.h>
 
@@ -100,3 +102,4 @@ _DEFUN (atosfix16, (s),
 
 #endif /* !_REENT_ONLY */
 
+#endif /* __SPE__ */

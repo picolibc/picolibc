@@ -6,6 +6,8 @@
  * Written by Jeff Johnston.
  */
 
+#ifdef __SPE__
+
 #include <_ansi.h>
 #include <limits.h>
 #include <errno.h>
@@ -86,3 +88,4 @@ _DEFUN (_ufix64toa_r, (rptr, value, mode, ndigits, decpt, sign, rve),
   return _simdldtoa_r (rptr, &ldbl, mode, ndigits, decpt, sign, rve);
 }
 
+#endif /* __SPE__ */

@@ -105,6 +105,8 @@ PORTABILITY
         The OS subroutines of <<strtod>> are required.
 */
 
+#ifdef __SPE__
+
 #include <_ansi.h>
 #include <limits.h>
 #include <errno.h>
@@ -195,3 +197,5 @@ _DEFUN (strtoufix16, (s, ptr, base),
 }
 
 #endif
+
+#endif /* __SPE__ */

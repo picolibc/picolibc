@@ -1,3 +1,5 @@
+#ifdef __SPE__
+
 #include <_ansi.h>
 #include <limits.h>
 #include <errno.h>
@@ -111,3 +113,5 @@ _DEFUN (strtosfix64, (s, ptr, base),
 }
 
 #endif
+
+#endif /* __SPE__ */

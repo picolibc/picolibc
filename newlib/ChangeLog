@@ -1,3 +1,9 @@
+2003-04-16  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* newlib/libc/machine/powerpc (ato*fix*.c,strto*fix*.c): Shield
+	all code with #ifdef __SPE__ test.
+	* newlib/libc/machine/powerpc (simdldtoa.c, ufix64toa.c): Ditto.
+
 2003-04-15  Chris January <chris@atomice.net>
 
 	* newlib/libc/include/sys/unistd.h: add declaration for gethostid on
