@@ -471,14 +471,14 @@ path_conv::check (const char *src, unsigned opt,
 	  if (error)
 	    return;
 
-	  update_fs_info (full_path);
-
 	  /* devn should not be a device.  If it is, then stop parsing now. */
 	  if (devn != FH_BAD)
 	    {
 	      fileattr = 0;
 	      goto out;		/* Found a device.  Stop parsing. */
 	    }
+
+	  update_fs_info (full_path);
 
 	  /* Eat trailing slashes */
 	  char *dostail = strchr (full_path, '\0');
@@ -668,24 +668,27 @@ out:
       return;
     }
 
-  update_fs_info (path);
-  if (!fs_name[0])
+  if (devn == FH_BAD)
     {
-      set_has_acls (FALSE);
-      set_has_buggy_open (FALSE);
-    }
-  else
-    {
-      set_isdisk ();
-      debug_printf ("root_dir(%s), this->path(%s), set_has_acls(%d)",
-		    root_dir, this->path, fs_flags & FS_PERSISTENT_ACLS);
-      if (!allow_smbntsec && is_remote_drive)
-	set_has_acls (FALSE);
+      update_fs_info (path);
+      if (!fs_name[0])
+	{
+	  set_has_acls (FALSE);
+	  set_has_buggy_open (FALSE);
+	}
       else
-	set_has_acls (fs_flags & FS_PERSISTENT_ACLS);
-      /* Known file systems with buggy open calls. Further explanation
-	 in fhandler.cc (fhandler_disk_file::open). */
-      set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
+	{
+	  set_isdisk ();
+	  debug_printf ("root_dir(%s), this->path(%s), set_has_acls(%d)",
+			root_dir, this->path, fs_flags & FS_PERSISTENT_ACLS);
+	  if (!allow_smbntsec && is_remote_drive)
+	    set_has_acls (FALSE);
+	  else
+	    set_has_acls (fs_flags & FS_PERSISTENT_ACLS);
+	  /* Known file systems with buggy open calls. Further explanation
+	     in fhandler.cc (fhandler_disk_file::open). */
+	  set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
+	}
     }
 
   if (!(opt & PC_FULL))

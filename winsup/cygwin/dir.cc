@@ -83,15 +83,9 @@ opendir (const char *dirname)
   DIR *res = 0;
   struct stat statbuf;
 
-  path_conv real_dirname (dirname, PC_SYM_FOLLOW | PC_FULL);
+  path_conv real_dirname;
 
-  if (real_dirname.error)
-    {
-      set_errno (real_dirname.error);
-      goto failed;
-    }
-
-  if (stat (real_dirname, &statbuf) == -1)
+  if (stat_worker (dirname, &statbuf, 1, &real_dirname) == -1)
     goto failed;
 
   if (!(statbuf.st_mode & S_IFDIR))

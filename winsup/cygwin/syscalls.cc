@@ -1067,9 +1067,8 @@ suffix_info stat_suffixes[] =
 };
 
 /* Cygwin internal */
-static int
-stat_worker (const char *caller, const char *name, struct stat *buf,
-	     int nofollow)
+int __stdcall
+stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
 {
   int res = -1;
   int oret;
@@ -1078,36 +1077,38 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   path_conv real_path;
   fhandler_base *fh = NULL;
 
+  if (!pc)
+    pc = &real_path;
   MALLOC_CHECK;
   int open_flags = O_RDONLY | O_BINARY | O_DIROPEN
     		   | (nofollow ? O_NOSYMLINK : 0);
 
-  debug_printf ("%s (%s, %p)", caller, name, buf);
-
   if (check_null_invalid_struct_errno (buf))
     goto done;
 
-  fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, real_path,
+  fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, *pc,
 						(nofollow ?
 						 PC_SYM_NOFOLLOW
 						 : PC_SYM_FOLLOW)
 						| PC_FULL, stat_suffixes);
-  if (real_path.error)
+  if (pc->error)
     {
-      set_errno (real_path.error);
+      set_errno (pc->error);
       goto done;
     }
 
+  debug_printf ("(%s, %p, %d, %p)", name, buf, nofollow, pc);
+
   memset (buf, 0, sizeof (struct stat));
 
-  if (real_path.is_device ())
-    return stat_dev (real_path.get_devn (), real_path.get_unitn (),
-		     hash_path_name (0, real_path.get_win32 ()), buf);
+  if (pc->is_device ())
+    return stat_dev (pc->get_devn (), pc->get_unitn (),
+		     hash_path_name (0, pc->get_win32 ()), buf);
 
   debug_printf ("%d = file_attributes for '%s'", (DWORD) real_path,
 		(char *) real_path);
 
-  if ((oret = fh->open (&real_path, open_flags, 0)))
+  if ((oret = fh->open (pc, open_flags, 0)))
     /* ok */;
   else
     {
@@ -1115,9 +1116,9 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
       /* If we couldn't open the file, try a "query open" with no permissions.
 	 This will allow us to determine *some* things about the file, at least. */
       fh->set_query_open (TRUE);
-      if ((oret = fh->open (&real_path, open_flags, 0)))
+      if ((oret = fh->open (pc, open_flags, 0)))
         /* ok */;
-      else if (allow_ntsec && real_path.has_acls () && get_errno () == EACCES
+      else if (allow_ntsec && pc->has_acls () && get_errno () == EACCES
 		&& !get_file_attribute (TRUE, real_path, &ntsec_atts, &uid, &gid)
 		&& !ntsec_atts && uid == myself->uid && gid == myself->gid)
         {
@@ -1127,7 +1128,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	     in a failing open call in the same process. Check that
 	     case. */
 	  set_file_attribute (TRUE, real_path, 0400);
-	  oret = fh->open (&real_path, open_flags, 0);
+	  oret = fh->open (pc, open_flags, 0);
 	  set_file_attribute (TRUE, real_path, ntsec_atts);
         }
     }
@@ -1141,44 +1142,44 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	 set the number of links to 2. */
       /* Unfortunately the count of 2 confuses `find (1)' command. So
 	 let's try it with `1' as link count. */
-      if (real_path.isdir ())
-	buf->st_nlink = (real_path.isremote ()
-			 ? 1 : num_entries (real_path.get_win32 ()));
+      if (pc->isdir ())
+	buf->st_nlink = (pc->isremote ()
+			 ? 1 : num_entries (pc->get_win32 ()));
       fh->close ();
     }
-  else if (real_path.exists ())
+  else if (pc->exists ())
     {
       /* Unfortunately, the above open may fail if the file exists, though.
 	 So we have to care for this case here, too. */
       WIN32_FIND_DATA wfd;
       HANDLE handle;
       buf->st_nlink = 1;
-      if (real_path.isdir () && real_path.isremote ())
-	buf->st_nlink = num_entries (real_path.get_win32 ());
+      if (pc->isdir () && pc->isremote ())
+	buf->st_nlink = num_entries (pc->get_win32 ());
       buf->st_dev = FHDEVN (FH_DISK) << 8;
-      buf->st_ino = hash_path_name (0, real_path.get_win32 ());
-      if (real_path.isdir ())
+      buf->st_ino = hash_path_name (0, pc->get_win32 ());
+      if (pc->isdir ())
 	buf->st_mode = S_IFDIR;
-      else if (real_path.issymlink ())
+      else if (pc->issymlink ())
 	buf->st_mode = S_IFLNK;
-      else if (real_path.issocket ())
+      else if (pc->issocket ())
 	buf->st_mode = S_IFSOCK;
       else
 	buf->st_mode = S_IFREG;
-      if (!real_path.has_acls ()
-	  || get_file_attribute (TRUE, real_path.get_win32 (),
+      if (!pc->has_acls ()
+	  || get_file_attribute (TRUE, pc->get_win32 (),
 				 &buf->st_mode,
 				 &buf->st_uid, &buf->st_gid))
 	{
 	  buf->st_mode |= STD_RBITS | STD_XBITS;
-	  if (!(real_path.has_attribute (FILE_ATTRIBUTE_READONLY)))
+	  if (!(pc->has_attribute (FILE_ATTRIBUTE_READONLY)))
 	    buf->st_mode |= STD_WBITS;
-	  if (real_path.issymlink ())
+	  if (pc->issymlink ())
 	    buf->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
-	  get_file_attribute (FALSE, real_path.get_win32 (),
+	  get_file_attribute (FALSE, pc->get_win32 (),
 			      NULL, &buf->st_uid, &buf->st_gid);
 	}
-      if ((handle = FindFirstFile (real_path.get_win32 (), &wfd))
+      if ((handle = FindFirstFile (pc->get_win32 (), &wfd))
 	  != INVALID_HANDLE_VALUE)
 	{
 	  buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
@@ -1197,7 +1198,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   if (fh)
     delete fh;
   MALLOC_CHECK;
-  syscall_printf ("%d = %s (%s, %p)", res, caller, name, buf);
+  syscall_printf ("%d = (%s, %p)", res, name, buf);
   return res;
 }
 
@@ -1205,7 +1206,8 @@ extern "C" int
 _stat (const char *name, struct stat *buf)
 {
   sigframe thisframe (mainthread);
-  return stat_worker ("stat", name, buf, 0);
+  syscall_printf ("entering");
+  return stat_worker (name, buf, 0);
 }
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
@@ -1213,7 +1215,8 @@ extern "C" int
 lstat (const char *name, struct stat *buf)
 {
   sigframe thisframe (mainthread);
-  return stat_worker ("lstat", name, buf, 1);
+  syscall_printf ("entering");
+  return stat_worker (name, buf, 1);
 }
 
 extern int acl_access (const char *, int);

@@ -1,3 +1,21 @@
+Thu Oct  4 18:49:23 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (stat_worker): Make global.  Accept path_conv parameter
+	for passing information back to caller.
+	* winsup.h: Declare stat_worker.
+	* dir.cc (opendir): Use stat_worker rather than stat and pass path_conv
+	parameter to stat_worker for later inspection.
+
+2001-10-04 Karellen (karellen@boreworms.com)
+
+	* syslog.cc (syslog): Teach syslog about syslog priorities other than
+	LOG_ERR, LOG_WARNING and LOG_INFO
+
+Thu Oct  4 15:50:03 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (path_conv::check): Don't perform file system or rootdir
+	checks on devices.
+
 Wed Oct  3 19:40:36 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (dll_crt0_1): Don't close hexec_proc if it is NULL.
