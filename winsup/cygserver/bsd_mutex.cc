@@ -106,33 +106,6 @@ msleep_event_name (void *ident, char *name)
   return name;
 }
 
-/*
- * Original description from BSD code:
- *
- * General sleep call.  Suspends the current process until a wakeup is
- * performed on the specified identifier.  The process will then be made
- * runnable with the specified priority.  Sleeps at most timo/hz seconds
- * (0 means no timeout).  If pri includes PCATCH flag, signals are checked
- * before and after sleeping, else signals are not checked.  Returns 0 if
- * awakened, EWOULDBLOCK if the timeout expires.  If PCATCH is set and a
- * signal needs to be delivered, ERESTART is returned if the current system
- * call should be restarted if possible, and EINTR is returned if the system
- * call should be interrupted by the signal (return EINTR).
- *
- * The mutex argument is exited before the caller is suspended, and
- * entered before msleep returns.  If priority includes the PDROP
- * flag the mutex is not entered before returning.
- */
-static HANDLE msleep_glob_evt;
-
-void
-msleep_init (void)
-{
-  msleep_glob_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
-  if (!msleep_glob_evt)
-    panic ("CreateEvent in msleep_init failed: %E");
-}
-
 static int
 win_priority (int priority)
 {
@@ -166,11 +139,38 @@ static int
 set_priority (int priority)
 {
   int old_prio = GetThreadPriority (GetCurrentThread ());
-  if (!SetThreadPriority (GetCurrentThread (), win_priority(priority)))
+  if (!SetThreadPriority (GetCurrentThread (), win_priority (priority)))
     log (LOG_WARNING,
     	  "Warning: Setting thread priority to %d failed with error %lu\n",
-	  win_priority(priority), GetLastError ());
+	  win_priority (priority), GetLastError ());
   return old_prio;
+}
+
+/*
+ * Original description from BSD code:
+ *
+ * General sleep call.  Suspends the current process until a wakeup is
+ * performed on the specified identifier.  The process will then be made
+ * runnable with the specified priority.  Sleeps at most timo/hz seconds
+ * (0 means no timeout).  If pri includes PCATCH flag, signals are checked
+ * before and after sleeping, else signals are not checked.  Returns 0 if
+ * awakened, EWOULDBLOCK if the timeout expires.  If PCATCH is set and a
+ * signal needs to be delivered, ERESTART is returned if the current system
+ * call should be restarted if possible, and EINTR is returned if the system
+ * call should be interrupted by the signal (return EINTR).
+ *
+ * The mutex argument is exited before the caller is suspended, and
+ * entered before msleep returns.  If priority includes the PDROP
+ * flag the mutex is not entered before returning.
+ */
+static HANDLE msleep_glob_evt;
+
+void
+msleep_init (void)
+{
+  msleep_glob_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
+  if (!msleep_glob_evt)
+    panic ("CreateEvent in msleep_init failed: %E");
 }
 
 int
@@ -188,7 +188,13 @@ _msleep (void *ident, struct mtx *mtx, int priority,
   if (mtx)
     mtx_unlock (mtx);
   int old_priority = set_priority (priority);
-  HANDLE obj[4] = { evt, td->client->handle (), msleep_glob_evt, td->client->signal_arrived () };
+  HANDLE obj[4] =
+    {
+      evt,
+      msleep_glob_evt,
+      td->client->handle (),
+      td->client->signal_arrived ()
+    };
   /* PCATCH handling.  If PCATCH is given and signal_arrived is a valid
      handle, then it's used in the WaitFor call and EINTR is returned. */
   int obj_cnt = 3;
@@ -200,10 +206,10 @@ _msleep (void *ident, struct mtx *mtx, int priority,
       case WAIT_OBJECT_0:	/* wakeup() has been called. */
 	ret = 0;
         break;
-      case WAIT_OBJECT_0 + 2:	/* Shutdown event (triggered by wakeup_all). */
+      case WAIT_OBJECT_0 + 1:	/* Shutdown event (triggered by wakeup_all). */
         priority |= PDROP;
 	/*FALLTHRU*/
-      case WAIT_OBJECT_0 + 1:	/* The dependent process has exited. */
+      case WAIT_OBJECT_0 + 2:	/* The dependent process has exited. */
 	ret = EIDRM;
         break;
       case WAIT_OBJECT_0 + 3:	/* Signal for calling process arrived. */

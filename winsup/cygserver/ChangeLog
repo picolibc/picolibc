@@ -1,3 +1,9 @@
+2004-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (win_priority): Move to msleep helper function section.
+	(set_priority): Ditto. Fix formatting.
+	(_msleep): Cleanup obj formatting.  Rearrange obj order.
+
 2004-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_mutex.cc (_msleep): Handle PCATCH using signal_arrived event.
