@@ -1,3 +1,8 @@
+2004-10-27  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* cygcheck.cc (dump_sysinfo): Warn about missing or multiple cygwin1
+	dlls.
+
 2004-10-25  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* cygcheck.cc (dump_sysinfo): Add leading newline before legend for

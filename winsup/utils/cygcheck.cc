@@ -1222,6 +1222,7 @@ dump_sysinfo ()
 
   if (givehelp)
     printf ("Looking for various Cygnus DLLs...  (-v gives version info)\n");
+  int cygwin_dll_count = 0;
   for (i = 0; i < num_paths; i++)
     {
       WIN32_FIND_DATA ffinfo;
@@ -1238,7 +1239,10 @@ dump_sysinfo ()
 		{
 		  sprintf (tmp, "%s\\%s", paths[i], f);
 		  if (strcasecmp (f, "cygwin1.dll") == 0)
-		    found_cygwin_dll = strdup (tmp);
+		    {
+		      cygwin_dll_count++;
+		      found_cygwin_dll = strdup (tmp);
+		    }
 		  else
 		    ls (tmp);
 		}
@@ -1253,6 +1257,10 @@ dump_sysinfo ()
 
       FindClose (ff);
     }
+  if (cygwin_dll_count > 1)
+    puts ("Warning: There are multiple cygwin1.dlls on your path");
+  if (!cygwin_dll_count)
+    puts ("Warning: cygwin1.dll not found on your path");
 }
 
 static int
