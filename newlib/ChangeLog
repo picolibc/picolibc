@@ -1,3 +1,10 @@
+2002-08-26  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/malloc.h: On cygwin, define malloc _r functions as
+	wrapper macros to standard malloc functions.
+	* libc/include/stdlib.h: Ditto.
+	* configure.host: Always define MALLOC_PROVIDED on cygwin.
+
 2002-08-22  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/include/langinfo.h: New file.

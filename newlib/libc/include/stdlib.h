@@ -166,14 +166,45 @@ int     _EXFUN(unlockpt,(int));
 #endif /* ! __STRICT_ANSI__ */
 
 char *	_EXFUN(_dtoa_r,(struct _reent *, double, int, int, int *, int*, char**));
+#ifndef __CYGWIN__
 _PTR	_EXFUN(_malloc_r,(struct _reent *, size_t));
 _PTR	_EXFUN(_calloc_r,(struct _reent *, size_t, size_t));
 _VOID	_EXFUN(_free_r,(struct _reent *, _PTR));
 _PTR	_EXFUN(_realloc_r,(struct _reent *, _PTR, size_t));
 _VOID	_EXFUN(_mstats_r,(struct _reent *, char *));
+#endif
 int	_EXFUN(_system_r,(struct _reent *, const char *));
 
 _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *));
+
+#ifdef __CYGWIN__
+#undef _malloc_r
+#define _malloc_r(r, s) malloc (s)
+#undef _free_r
+#define _free_r(r, p) free (p)
+#undef _realloc_r
+#define _realloc_r(r, p, s) realloc (p, s)
+#undef _calloc_r
+#define _calloc_r(r, s1, s2) calloc (s1, s2);
+#undef _memalign_r
+#define _memalign_r(r, s1, s2) memalign (s1, s2);
+#undef _mallinfo_r
+#define _mallinfo_r(r) mallinfo ()
+#undef _malloc_stats_r
+#define _malloc_stats_r(r) malloc_stats ()
+#undef _mallopt_r
+#define _mallopt_r(i1, i2) mallopt (i1, i2)
+#undef _malloc_usable_size_r
+#define _malloc_usable_size_r(r, p) malloc_usable_size (p)
+#undef _valloc_r
+#define _valloc_r(r, s) valloc (s)
+#undef _pvalloc_r
+#define _pvalloc_r(r, s) pvalloc (s)
+#undef _malloc_trim_r
+#define _malloc_trim_r(r, s) malloc_trim (s)
+#undef _mstats_r
+#define _mstats_r(r, p) mstats (p)
+#endif
 
 _END_STD_C
 
