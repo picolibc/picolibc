@@ -1,3 +1,11 @@
+2003-01-01  Christopher Faylor  <cgf@redhat.com>
+
+	* sysconf.cc (sysconf): Return arbitrary values for
+	_SC_GETGR_R_SIZE_MAX, _SC_LOGIN_NAME_MAX, _SC_GETPW_R_SIZE_MAX.
+
+	* passwd.cc (getpwuid_r32): Add uid/gid fields to size check
+	calculation.
+
 2002-12-30  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (events_init): Display name of mutex on failure.

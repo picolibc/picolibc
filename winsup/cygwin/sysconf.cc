@@ -47,6 +47,10 @@ sysconf (int in)
 	return NGROUPS_MAX;
       case _SC_SAVED_IDS:
 	return _POSIX_SAVED_IDS;
+      case _SC_LOGIN_NAME_MAX:
+      case _SC_GETPW_R_SIZE_MAX:
+      case _SC_GETGR_R_SIZE_MAX:
+	return 16*1024;
       case _SC_VERSION:
 	return _POSIX_VERSION;
 #if 0	/* FIXME -- unimplemented */

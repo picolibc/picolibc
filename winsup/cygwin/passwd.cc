@@ -266,7 +266,8 @@ getpwuid_r32 (__uid32_t uid, struct passwd *pwd, char *buffer, size_t bufsize, s
   /* check needed buffer size. */
   size_t needsize = strlen (temppw->pw_name) + strlen (temppw->pw_dir) +
 		    strlen (temppw->pw_shell) + strlen (temppw->pw_gecos) +
-		    strlen (temppw->pw_passwd) + 5;
+		    strlen (temppw->pw_passwd) + 5 +
+		    sizeof (temppw->pw_uid) + sizeof (temppw->pw_gid);
   if (needsize > bufsize)
     return ERANGE;
 
