@@ -1,6 +1,6 @@
 /* pthread.h: POSIX pthread interface
 
-   Copyright 1996, 1997, 1998 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 20000, 2001 Red Hat, Inc.
 
    Written by Marco Fuykschot <marco@ddi.nl>
 
@@ -98,14 +98,14 @@ int pthread_attr_setstacksize (pthread_attr_t *, size_t);
 int pthread_cancel (pthread_t);
 /* Macros for cleanup_push and pop; 
  * The function definitions are
-void pthread_cleanup_push(void (*routine)(void*), void *arg);
-void pthread_cleanup_pop(int execute);
+void pthread_cleanup_push (void (*routine)(void*), void *arg);
+void pthread_cleanup_pop (int execute);
 */
 typedef void __cleanup_routine_type (void *);
 
-#define pthread_cleanup_push (fn, arg) { __cleanup_routine_type __cleanup_routine=fn; \
+#define pthread_cleanup_push(fn, arg) { __cleanup_routine_type __cleanup_routine=fn; \
 void *__cleanup_param=arg;
-#define pthread_cleanup_pop (execute) if (execute) __cleanup_routine(__cleanup_param); }
+#define pthread_cleanup_pop(execute) if (execute) __cleanup_routine(__cleanup_param); }
 
 /* Condition variables */
 int pthread_cond_broadcast (pthread_cond_t *);
@@ -168,7 +168,6 @@ void pthread_testcancel (void);
 
 int pthread_suspend (pthread_t);
 int pthread_continue (pthread_t);
-
 
 #ifdef __cplusplus
 }

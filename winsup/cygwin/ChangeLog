@@ -1,3 +1,9 @@
+Thu May  3 16:37:55 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/pthread.h (pthread_cleanup_push): Eliminate space preceding
+	arguments.
+	(pthread_cleanup_pop): Ditto.
+
 Thu May  3 18:16:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (wsock_init): Rename `was_in_progress' to `wsock_started'
