@@ -559,7 +559,7 @@ path_conv::check (const char *src, unsigned opt,
 	     not by native NT functions. */
           while (tail[-1] == '.' || tail[-1] == ' ') 
 	    tail--;
-          if (isslash (tail[-1]))
+          if (tail > path_copy + 1 && isslash (tail[-1]))
             {
 	      error = ENOENT;
               return;
