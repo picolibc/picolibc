@@ -219,7 +219,7 @@ void uinfo_init (void);
 void events_init (void);
 void events_terminate (void);
 
-void __stdcall close_all_files (void);
+void __stdcall close_all_files ();
 
 /* Invisible window initialization/termination. */
 HWND __stdcall gethwnd (void);
@@ -317,10 +317,6 @@ extern "C" {
 int cygwin_select (int , fd_set *, fd_set *, fd_set *,
 		   struct timeval *to);
 int cygwin_gethostname (char *__name, size_t __len);
-
-int kill_pgrp (pid_t, int);
-int _kill (int, int);
-int _raise (int sig);
 
 extern DWORD binmode;
 extern char _data_start__, _data_end__, _bss_start__, _bss_end__;

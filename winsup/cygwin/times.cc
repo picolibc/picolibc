@@ -1,6 +1,6 @@
 /* times.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -15,6 +15,7 @@ details. */
 #include <utime.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -22,6 +23,9 @@ details. */
 #include "pinfo.h"
 #include "hires.h"
 #include "cygtls.h"
+#include "cygthread.h"
+#include "sigproc.h"
+#include "sync.h"
 
 #define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL
@@ -612,7 +616,8 @@ hires_us::usecs (bool justdelta)
 
   // FIXME: Use round() here?
   now.QuadPart = (LONGLONG) (freq * (double) (now.QuadPart - primed_pc.QuadPart));
-  return justdelta ? now.QuadPart : primed_ft.QuadPart + now.QuadPart;
+  LONGLONG res = justdelta ? now.QuadPart : primed_ft.QuadPart + now.QuadPart;
+  return res;
 }
 
 UINT
@@ -656,4 +661,22 @@ hires_ms::usecs (bool justdelta)
   // FIXME: Not sure how this will handle the 49.71 day wrap around
   LONGLONG res = initime_us.QuadPart + ((LONGLONG) (now - initime_ms) * 1000);
   return res;
+}
+
+extern "C" int
+clock_gettime (clockid_t clk_id, struct timespec *tp)
+{
+  if (clk_id != CLOCK_REALTIME)
+    {
+      set_errno (ENOSYS);
+      return -1;
+    }
+
+  LONGLONG now = gtod.usecs (false);
+  if (now == (LONGLONG) -1)
+    return -1;
+
+  tp->tv_sec = now / 1000000;
+  tp->tv_nsec = (now % 1000000) * 1000;
+  return 0;
 }

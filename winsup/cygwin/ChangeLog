@@ -1,3 +1,91 @@
+2004-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin/include/signal.h: Add copyright notice.
+
+	* cygwin.din: Make clock SIGFE.  Add clock_gettime, sigwaitinfo,
+	timer_create, timer_delete, timer_settime.
+	* include/cygwin/version.h: Reflect above additions.
+	* fork.cc (fork_child): Call fixup_timers_after_fork.
+	* signal.cc (sigwait): Remove unused variable.
+	* timer.cc: New file.
+	(clock_gettime): Define new function.
+	(timer_tracker): Define new struct used by timer functions.
+	(timer_tracker::timer_tracker): New function.
+	(to_us): New function.
+	(timer_thread): New function.
+	(timer_tracker::settime): New function.
+	(timer_create): New function.
+	(timer_settime): New function.
+	(timer_delete): New function.
+	(fixup_timers_after_fork): New function.
+	* cygthread.cc: Bump thread count.
+
+2004-01-17  Christopher Faylor  <cgf@redhat.com>
+
+	* signal.cc (sigwaitinfo): Define new function.
+	(sigwait): Redefine based on sigwaitinfo.
+	* include/cygwin/signal.h (sigwaitinfo): Declare.
+	(sigwait): Ditto.
+
+2004-01-17  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::vfork_parent_restore): Avoid double close of ctty
+	when ctty == ctty_on_hold.
+
+2004-01-16  Christopher Faylor  <cgf@redhat.com>
+
+	* cygtls.h (_threadinfo::threadkill): New element.
+	(_threadinfo::set_threadkill): Declare new function.
+	(_threadinfo::reset_threadkill): Declare new function.
+	* dcrt0.cc (dcrt0_1): Call here so that it will be possible to attach
+	to running process with #(*& Windows Me/9x.
+	(initial_env): Try to initialize strace if uninitialized.
+	* gendef: Don't zero signal if threadkill is set since that will happen
+	in the called function.
+	* signal.cc (sigwait): Ensure cleanup in error conditions.
+	* sigproc.cc (sig_send): Clear packet mask storage.
+	(wait_subproc): Fill in child exit code in siginfo_t structure.
+	* thread.cc (pthread_kill): Set threadkill flag.
+	* tlsoffsets.h: Regenerate.
+
+2004-01-16  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, use siginfo_t to fill out all signal information for
+	"kernel" signals.
+	* cygtls.h (_threadinfo::set_siginfo): Declare new function.
+	* cygtls.cc (_threadinfo::set_siginfo): Define new function.
+	* dcrt0.cc (do_exit): Accommodate siginfo_t considerations.
+	* exceptions.cc (handle_exceptions): Ditto.
+	(sig_handle_tty_stop): Ditto.
+	(ctrl_c_handler): Use killsys() to send signal.
+	(sigpacket::process): Rename from sig_handle.  Use siginfo_t field from
+	sigpacket for everything.
+	(tty_min::kill_pgrp): Accommodate siginfo_t considerations.
+	(fhandler_termios::bg_check): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::ioctl): Use killsys() to send signal.
+	* signal.cc (kill_worker): Rewrite to use siginfo_t second argument.
+	(kill_pgrp): Ditto.
+	(kill0): Define new function pulled from kill().
+	(kill): Rewrite as frontend to kill0.
+	(killsys): Define new function.
+	* sigproc.cc (sigelem): Eliminate.
+	(sigpacket): Move to sigproc.h.  Subsume sigelem.
+	(pending_signals): Use sigpacket rather than sigelem for everything.
+	(sig_clear): Ditto.
+	(wait_sig): Ditto.
+	(sig_send): Rewrite to use siginfo_t argument.
+	(sig_send): New function wratpper to sig_send with siginfo_t argument.
+	(wait_subproc): Accommodate siginfo_t considerations.
+	* thread.cc (pthread_kill): Ditto.
+	* sigproc.h (sigpacket): Move here.
+	(sigpacket::process): Declare "new" function.
+	(sig_handle): Eliminate declaration.
+	(sig_send): Declare with new paramaters.
+	(killsys): Declare new function.
+	(kill_pgrp): Declare.
+	* winsup.h: Move some signal-specific stuff to sigproc.h.
+	* include/cygwin/signal.h: Tweak some siginfo_t stuff.
+
 2004-01-16  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::close): Remove obsolete test

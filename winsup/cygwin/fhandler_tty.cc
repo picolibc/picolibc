@@ -1109,7 +1109,7 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
 	      get_ttyp ()->arg.winsize = *(struct winsize *) arg;
 	      SetEvent (ioctl_request_event);
 	      get_ttyp ()->winsize = *(struct winsize *) arg;
-	      kill (-get_ttyp ()->getpgid (), SIGWINCH);
+	      killsys (-get_ttyp ()->getpgid (), SIGWINCH);
 	      if (ioctl_done_event)
 		WaitForSingleObject (ioctl_done_event, INFINITE);
 	    }
@@ -1307,7 +1307,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	    || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
 	  {
 	    get_ttyp ()->winsize = *(struct winsize *) arg;
-	    kill (-get_ttyp ()->getpgid (), SIGWINCH);
+	    killsys (-get_ttyp ()->getpgid (), SIGWINCH);
 	  }
 	break;
       case FIONBIO:
