@@ -129,6 +129,11 @@ details. */
 #undef OPEN_MAX
 #define OPEN_MAX 256
 
+/* # of bytes in a pipe buf. This is the max # of bytes which can be
+   written to a pipe in one atomic operation. */
+#undef PIPE_BUF
+#define PIPE_BUF 4096
+
 /* POSIX values */
 /* These should never vary from one system type to another */
 /* They represent the minimum values that POSIX systems must support.

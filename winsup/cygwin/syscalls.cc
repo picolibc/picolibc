@@ -1533,7 +1533,7 @@ fpathconf (int fd, int v)
     case _PC_PATH_MAX:
       return PATH_MAX;
     case _PC_PIPE_BUF:
-      return 4096;
+      return PIPE_BUF;
     case _PC_CHOWN_RESTRICTED:
     case _PC_NO_TRUNC:
       return -1;
@@ -1575,7 +1575,7 @@ pathconf (const char *file, int v)
     case _PC_MAX_INPUT:
       return _POSIX_MAX_CANON;
     case _PC_PIPE_BUF:
-      return 4096;
+      return PIPE_BUF;
     case _PC_CHOWN_RESTRICTED:
     case _PC_NO_TRUNC:
       return -1;

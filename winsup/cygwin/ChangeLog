@@ -1,3 +1,9 @@
+Fri Sep  7 10:27:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/limits.h: Define PIPE_BUF.
+	* syscalls.cc (fpathconf): Use PIPE_BUF instead of numerical constant.
+	(pathconf): Ditto.
+
 Thu Sep  6 20:04:05 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Ensure that
