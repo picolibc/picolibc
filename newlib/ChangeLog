@@ -1,3 +1,8 @@
+Wed Dec 13 11:52:00 2000  Corinna Vinschen <vinschen@cygnus.com>
+
+	* libc/include/sys/unistd.h: Add declarations for `chroot' and `getwd'
+	when __CYGWIN__ is defined.
+
 2000-12-13  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/ldtoa.c (_ldcheck): New routine

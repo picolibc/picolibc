@@ -20,6 +20,9 @@ unsigned  _EXFUN(alarm, (unsigned __secs ));
 int     _EXFUN(chdir, (const char *__path ));
 int     _EXFUN(chmod, (const char *__path, mode_t __mode ));
 int     _EXFUN(chown, (const char *__path, uid_t __owner, gid_t __group ));
+#ifdef __CYGWIN__
+int     _EXFUN(chroot, (const char *__path ));
+#endif
 int     _EXFUN(close, (int __fildes ));
 char    _EXFUN(*ctermid, (char *__s ));
 char    _EXFUN(*cuserid, (char *__s ));
@@ -51,6 +54,9 @@ pid_t   _EXFUN(getpgrp, (void ));
 pid_t   _EXFUN(getpid, (void ));
 pid_t   _EXFUN(getppid, (void ));
 uid_t   _EXFUN(getuid, (void ));
+#ifdef __CYGWIN__
+char    _EXFUN(*getwd, (char *__buf ));
+#endif
 int     _EXFUN(isatty, (int __fildes ));
 int     _EXFUN(lchown, (const char *__path, uid_t __owner, gid_t __group ));
 int     _EXFUN(link, (const char *__path1, const char *__path2 ));
