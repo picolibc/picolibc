@@ -37,12 +37,15 @@
    
    Other macros:
 
-   __int64                 define to be long long. Using a typedef can
-                           tweak bugs in the C++ parser.
+   __int64                 define to be long long. Using a typedef doesn't
+                           work for "unsigned __int64"
   
    All headers should include this first, and then use __DECLSPEC_SUPPORTED
    to choose between the old ``__imp__name'' style or __MINGW_IMPORT
    style declarations.  */
+
+/* Try to avoid problems with outdated checks for GCC __attribute__ support.  */ 
+#undef __attribute__
 
 #ifndef __GNUC__
 # ifndef __MINGW_IMPORT
@@ -58,11 +61,11 @@
 #  ifndef __MINGW_IMPORT
    /* Note the extern. This is needed to work around GCC's
       limitations in handling dllimport attribute.  */
-#   define __MINGW_IMPORT  extern __attribute__((dllimport))
+#   define __MINGW_IMPORT  extern __attribute__ ((dllimport))
 #  endif
 #  ifndef _CRTIMP
 #   ifdef __USE_CRTIMP
-#    define _CRTIMP  __attribute__((dllimport))
+#    define _CRTIMP  __attribute__ ((dllimport))
 #   else  
 #    define _CRTIMP
 #   endif
@@ -76,10 +79,10 @@
 #  endif
 # endif /* __declspec */
 # ifndef __cdecl
-#  define __cdecl __attribute__((cdecl))
+#  define __cdecl __attribute__ ((__cdecl__))
 # endif
 # ifndef __stdcall
-#  define __stdcall __attribute__((stdcall))
+#  define __stdcall __attribute__ ((__stdcall__))
 # endif
 # ifndef __int64
 #  define __int64 long long
@@ -111,10 +114,26 @@
 # define __UNUSED_PARAM(x) 
 #else 
 # ifdef __GNUC__
-#  define __UNUSED_PARAM(x) x __attribute__((unused))
+#  define __UNUSED_PARAM(x) x __attribute__ ((__unused__))
 # else
 #  define __UNUSED_PARAM(x) x
 # endif
+#endif
+
+#ifdef __GNUC__
+#define __MINGW_ATTR_NORETURN __attribute__ ((__noreturn__))
+#define __MINGW_ATTR_CONST __attribute__ ((__const__))
+#else
+#define __MINGW_ATTR_NORETURN
+#define __MINGW_ATTR_CONST
+#endif
+
+#if ( __GNUC__ >= 3)
+#define __MINGW_ATTR_MALLOC __attribute__ ((__malloc__))
+#define __MINGW_ATTR_PURE __attribute__ ((__pure__))
+#else
+#define __MINGW_ATTR_MALLOC
+#define __MINGW_ATTR_PURE
 #endif
 
 #ifndef __MSVCRT_VERSION__

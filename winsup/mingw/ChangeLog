@@ -1,3 +1,13 @@
+2004-07-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h: Undefine __attribute__.
+	(__MINGW_ATTR_NORETURN): New define.
+	(__MINGW_ATTR_CONST): New define.
+	(__MINGW_ATTR_MALLOC): New define.
+	(__MINGW_ATTR_PURE): New define.
+	(_CRTIMP, __cdecl, __stdcall, __UNUSED_PARAM): Ansi-fy
+	expansions.
+
 2004-07-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/time.h (__time64_t): Add missing ';'. 
