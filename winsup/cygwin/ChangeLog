@@ -1,3 +1,8 @@
+2000-05-06  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/wchar.h (wcscmp, wcslen): Fix prototypes.
+	* syscalls.cc (wcslen, wcscmp): Adjust.
+
 Fri May  5 23:32:07 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* errno.cc (errmap): Correct DIRECTORY mapping to ENOTDIR.

@@ -1836,7 +1836,7 @@ putw (int w, FILE *fp)
 
 extern "C"
 int
-wcscmp (wchar_t *s1, wchar_t *s2)
+wcscmp (const wchar_t *s1, const wchar_t *s2)
 {
   while (*s1  && *s1 == *s2)
     {
@@ -1848,8 +1848,8 @@ wcscmp (wchar_t *s1, wchar_t *s2)
 }
 
 extern "C"
-int
-wcslen (wchar_t *s1)
+size_t
+wcslen (const wchar_t *s1)
 {
   int l = 0;
   while (s1[l])

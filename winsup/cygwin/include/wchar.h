@@ -19,8 +19,8 @@ details. */
 
 __BEGIN_DECLS
 
-int wcscmp (wchar_t *__s1, wchar_t *__s2);
-int wcslen (wchar_t *__s1);
+int wcscmp (const wchar_t *__s1, const wchar_t *__s2);
+size_t wcslen (const wchar_t *__s1);
 
 __END_DECLS
 
