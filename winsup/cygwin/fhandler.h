@@ -123,8 +123,8 @@ enum bg_check_types
 enum executable_states
 {
   is_executable,
-  not_executable,
   dont_care_if_executable,
+  not_executable = dont_care_if_executable,
   dont_know_if_executable
 };
 

@@ -1,5 +1,16 @@
 2002-05-11  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.h (executable_states): For now, make dont_care_if_executable
+	equivalent to not_executable.
+	* sys/mount.h: Define MOUNT_NOTEXEC.
+	* path.h (fs_info): New class.
+	(path_conv): Move fs-specific fields to new 'fs' structure.
+	(path_conv::update_fs_info): Move to fs_info and rename to just 'update'.
+	* path.cc (fs_info::update): Ditto.  Return 'true' if successful.
+	(fillout_mntent): Add ',noexec' to list of reported options.
+
+2002-05-11  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_virtual.cc (fhandler_virtual::close): Quiet a compiler
 	warning.
 

@@ -324,8 +324,8 @@ mkrelpath (char *path)
     strcpy (path, ".");
 }
 
-void
-path_conv::update_fs_info (const char* win32_path)
+bool
+fs_info::update (const char *win32_path)
 {
   char tmp_buf [MAX_PATH];
   strncpy (tmp_buf, win32_path, MAX_PATH);
@@ -333,39 +333,37 @@ path_conv::update_fs_info (const char* win32_path)
   if (!rootdir (tmp_buf))
     {
       debug_printf ("Cannot get root component of path %s", win32_path);
-      root_dir [0] = fs_name [0] = '\0';
-      fs_flags = fs_serial = 0;
-      sym_opt = 0;
-      return;
+      name [0] = '\0';
+      sym_opt = flags = serial = 0;
+      return false;
     }
 
-  if (strcmp (tmp_buf, root_dir) != 0)
+  if (strcmp (tmp_buf, root_dir) == 0)
+    return 1;
+
+  strncpy (root_dir, tmp_buf, MAX_PATH);
+  drive_type = GetDriveType (root_dir);
+  if (drive_type == DRIVE_REMOTE || (drive_type == DRIVE_UNKNOWN && (root_dir[0] == '\\' && root_dir[1] == '\\')))
+    is_remote_drive = 1;
+  else
+    is_remote_drive = 0;
+
+  if (!GetVolumeInformation (root_dir, NULL, 0, &serial, NULL, &flags,
+				 name, sizeof (name)))
     {
-      strncpy (root_dir, tmp_buf, MAX_PATH);
-      drive_type = GetDriveType (root_dir);
-      if (drive_type == DRIVE_REMOTE || (drive_type == DRIVE_UNKNOWN && (root_dir[0] == '\\' && root_dir[1] == '\\')))
-	is_remote_drive = 1;
-      else
-	is_remote_drive = 0;
-
-      if (!GetVolumeInformation (root_dir, NULL, 0, &fs_serial, NULL, &fs_flags,
-				     fs_name, sizeof (fs_name)))
-	{
-	  debug_printf ("Cannot get volume information (%s), %E", root_dir);
-	  fs_name [0] = '\0';
-	  fs_flags = fs_serial = 0;
-	  sym_opt = 0;
-	}
-      else
-	{
-	  /* FIXME: Samba by default returns "NTFS" in file system name, but
-	   * doesn't support Extended Attributes. If there's some fast way to
-	   * distinguish between samba and real ntfs, it should be implemented
-	   * here.
-	   */
-	  sym_opt = (!is_remote_drive && strcmp (fs_name, "NTFS") == 0) ? PC_CHECK_EA : 0;
-	}
+      debug_printf ("Cannot get volume information (%s), %E", root_dir);
+      name [0] = '\0';
+      sym_opt = flags = serial = 0;
+      return false;
     }
+  /* FIXME: Samba by default returns "NTFS" in file system name, but
+   * doesn't support Extended Attributes. If there's some fast way to
+   * distinguish between samba and real ntfs, it should be implemented
+   * here.
+   */
+  sym_opt = (!is_remote_drive && strcmp (name, "NTFS") == 0) ? PC_CHECK_EA : 0;
+
+  return true;
 }
 
 void
@@ -429,12 +427,12 @@ path_conv::check (const char *src, unsigned opt,
   fileattr = INVALID_FILE_ATTRIBUTES;
   case_clash = false;
   devn = unit = 0;
-  root_dir[0] = '\0';
-  fs_name[0] = '\0';
-  fs_flags = fs_serial = 0;
-  sym_opt = 0;
-  drive_type = 0;
-  is_remote_drive = 0;
+  fs.root_dir[0] = '\0';
+  fs.name[0] = '\0';
+  fs.flags = fs.serial = 0;
+  fs.sym_opt = 0;
+  fs.drive_type = 0;
+  fs.is_remote_drive = 0;
   normalized_path = NULL;
 
   if (!(opt & PC_NULLEMPTY))
@@ -548,7 +546,8 @@ path_conv::check (const char *src, unsigned opt,
 	      goto out;		/* Found a device.  Stop parsing. */
 	    }
 
-	  update_fs_info (full_path);
+	  if (!fs.update (full_path))
+	    fs.root_dir[0] = '\0';
 
 	  /* Eat trailing slashes */
 	  char *dostail = strchr (full_path, '\0');
@@ -572,7 +571,7 @@ path_conv::check (const char *src, unsigned opt,
 	      goto out;
 	    }
 
-	  int len = sym.check (full_path, suff, opt | sym_opt);
+	  int len = sym.check (full_path, suff, opt | fs.sym_opt);
 
 	  if (sym.case_clash)
 	    {
@@ -742,9 +741,9 @@ out:
 
   if (devn == FH_BAD)
     {
-      update_fs_info (path);
-      if (!fs_name[0])
+      if (!fs.update (path))
 	{
+	  fs.root_dir[0] = '\0';
 	  set_has_acls (false);
 	  set_has_buggy_open (false);
 	}
@@ -752,14 +751,14 @@ out:
 	{
 	  set_isdisk ();
 	  debug_printf ("root_dir(%s), this->path(%s), set_has_acls(%d)",
-			root_dir, this->path, fs_flags & FS_PERSISTENT_ACLS);
-	  if (!allow_smbntsec && is_remote_drive)
+			fs.root_dir, this->path, fs.flags & FS_PERSISTENT_ACLS);
+	  if (!allow_smbntsec && fs.is_remote_drive)
 	    set_has_acls (false);
 	  else
-	    set_has_acls (fs_flags & FS_PERSISTENT_ACLS);
+	    set_has_acls (fs.flags & FS_PERSISTENT_ACLS);
 	  /* Known file systems with buggy open calls. Further explanation
 	     in fhandler.cc (fhandler_disk_file::open). */
-	  set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
+	  set_has_buggy_open (strcmp (fs.name, "SUNWNFS") == 0);
 	}
     }
 #if 0
@@ -2418,6 +2417,8 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     strcat (_reent_winsup ()->mnt_opts, (char *) ",cygexec");
   else if (flags & MOUNT_EXEC)
     strcat (_reent_winsup ()->mnt_opts, (char *) ",exec");
+  else if (flags & MOUNT_NOTEXEC)
+    strcat (_reent_winsup ()->mnt_opts, (char *) ",noexec");
 
   if ((flags & MOUNT_AUTO))		/* cygdrive */
     strcat (_reent_winsup ()->mnt_opts, (char *) ",noumount");
