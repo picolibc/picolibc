@@ -1,5 +1,10 @@
 2004-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (wsock_event::wait): Make wsa_err an int.  Don't set
+	ret to 0 if any error has happened.
+
+2004-04-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::sendto): Drop out of loop if
 	has_been_closed gets set.
 	(fhandler_socket::sendmsg): Ditto.

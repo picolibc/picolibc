@@ -69,7 +69,7 @@ int
 wsock_event::wait (int sock, int &closed)
 {
   int ret = SOCKET_ERROR;
-  DWORD wsa_err = 0;
+  int wsa_err = 0;
   WSAEVENT ev[2] = { event, signal_arrived };
   switch (WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE, FALSE))
     {
@@ -94,10 +94,13 @@ wsock_event::wait (int sock, int &closed)
 	    if (evts.lNetworkEvents & FD_CLOSE)
 	      {
 		closed = 1;
-		if (!wsa_err && evts.iErrorCode[FD_CLOSE_BIT])
-		  wsa_err = evts.iErrorCode[FD_CLOSE_BIT];
-		else
-		  ret = 0;
+		if (!wsa_err)
+		  {
+		    if (evts.iErrorCode[FD_CLOSE_BIT])
+		      wsa_err = evts.iErrorCode[FD_CLOSE_BIT];
+		    else
+		      ret = 0;
+		  }
 	      }
 	    if (wsa_err)
 	      WSASetLastError (wsa_err);
