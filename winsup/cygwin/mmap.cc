@@ -82,7 +82,7 @@ class mmap_record
     HANDLE get_handle () const { return mapping_handle_; }
     device& get_device () { return dev; }
     DWORD get_access () const { return access_mode_; }
-    DWORD get_offset () const { return offset_; }
+    _off64_t get_offset () const { return offset_; }
     DWORD get_size () const { return size_to_map_; }
     caddr_t get_address () const { return base_address_; }
 
@@ -273,7 +273,7 @@ mmap_record::fixup_page_map ()
     }
 
   for (DWORD off = PAGE_CNT (size_to_map_); off > 0; --off)
-    VirtualProtect (base_address_ + off * getpagesize (), getpagesize (),
+    VirtualProtect (base_address_ + (off - 1) * getpagesize (), getpagesize (),
 		    MAP_ISSET (off - 1) ? prot : PAGE_NOACCESS, &old_prot);
 }
 
@@ -358,11 +358,11 @@ list::search_record (_off64_t off, DWORD len)
 /* Used in munmap() */
 long
 list::search_record (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
-	     _off_t start)
+		     long start)
 {
   caddr_t low, high;
 
-  for (int i = start + 1; i < nrecs; ++i)
+  for (long i = start + 1; i < nrecs; ++i)
     {
       low = (addr >= recs[i].get_address ()) ? addr : recs[i].get_address ();
       high = recs[i].get_address ()

@@ -1,3 +1,10 @@
+2004-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (class mmap_record): Fix return type of get_offset.
+	(mmap_record::fixup_page_map): Fix off by one error.
+	(list::search_record): Use long as type of "start" argument in both,
+	declaration and definition.  Use long as type for local variable "i".
+
 2004-07-14  Dave Korn  <dk@artimi.com>
 
 	* fhandler_registry.cc (registry_listing): Correct typo.
