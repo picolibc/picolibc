@@ -1,3 +1,7 @@
+2003-05-06  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* signal.cc (nanosleep): Do not wait twice for signal arrival.
+
 2003-05-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/types.h: Fix erroneous definition of ino_t from
