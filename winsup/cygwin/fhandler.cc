@@ -57,33 +57,6 @@ fhandler_base::puts_readahead (const char *s, size_t len)
   return success;
 }
 
-void
-fhandler_base::set_flags (int flags, int supplied_bin)
-{
-  int bin;
-  int fmode;
-  debug_printf ("flags %p, supplied_bin %p", flags, supplied_bin);
-  if ((bin = flags & (O_BINARY | O_TEXT)))
-    debug_printf ("O_TEXT/O_BINARY set in flags %p", bin);
-  else if (get_r_binset () && get_w_binset ())
-    bin = get_r_binary () ? O_BINARY : O_TEXT;	// FIXME: Not quite right
-  else if (supplied_bin)
-    bin = supplied_bin;
-  else if ((fmode = get_default_fmode (flags)) & O_BINARY)
-    bin = O_BINARY;
-  else if (fmode & O_TEXT)
-    bin = O_TEXT;
-  else
-    bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT) ?
-      	  O_BINARY : O_TEXT;
-
-  openflags = flags | bin;
-
-  set_r_binary (bin & O_BINARY);
-  set_w_binary (bin & O_BINARY);
-  syscall_printf ("filemode set to %s", bin ? "binary" : "text");
-}
-
 int
 fhandler_base::put_readahead (char value)
 {
@@ -241,6 +214,34 @@ is_at_eof (HANDLE h, DWORD err)
 
   SetLastError (err);
   return 0;
+}
+
+void
+fhandler_base::set_flags (int flags, int supplied_bin)
+{
+  int bin;
+  int fmode;
+  debug_printf ("flags %p, supplied_bin %p", flags, supplied_bin);
+  if ((bin = flags & (O_BINARY | O_TEXT)))
+    debug_printf ("O_TEXT/O_BINARY set in flags %p", bin);
+  else if (get_r_binset () && get_w_binset ())
+    bin = get_r_binary () ? O_BINARY : O_TEXT;	// FIXME: Not quite right
+  else if ((fmode = get_default_fmode (flags)) & O_BINARY)
+    bin = O_BINARY;
+  else if (fmode & O_TEXT)
+    bin = O_TEXT;
+  else if (supplied_bin)
+    bin = supplied_bin;
+  else
+    bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT) ?
+      	  O_BINARY : O_TEXT;
+
+  openflags = flags | bin;
+
+  bin &= O_BINARY;
+  set_r_binary (bin);
+  set_w_binary (bin);
+  syscall_printf ("filemode set to %s", bin ? "binary" : "text");
 }
 
 /* Normal file i/o handlers.  */
