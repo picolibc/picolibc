@@ -158,20 +158,22 @@ union external_auxent
   } x_tv;			/* info about .tv section (in auxent of symbol .tv)) */
 };
 
-#define GET_FCN_LNNOPTR(abfd, ext) bfd_h_get_32(abfd, (bfd_byte *)ext->x_sym.x_fcnary.x_fcn.x_lnnoptr)
-#define GET_FCN_ENDNDX(abfd, ext) bfd_h_get_32(abfd, (bfd_byte *) ext->x_sym.x_fcnary.x_fcn.x_endndx)
-#define PUT_FCN_LNNOPTR(abfd, in, ext)  bfd_h_put_32(abfd,  in, (bfd_byte *) ext->x_sym.x_fcnary.x_fcn.x_lnnoptr)
-#define PUT_FCN_ENDNDX(abfd, in, ext) bfd_h_put_32(abfd, in, (bfd_byte *)   ext->x_sym.x_fcnary.x_fcn.x_endndx)
-#define GET_LNSZ_SIZE(abfd, ext) bfd_h_get_32(abfd, (bfd_byte *) ext->x_sym.x_misc.x_lnsz.x_size)
-#define GET_LNSZ_LNNO(abfd, ext) bfd_h_get_32(abfd, (bfd_byte *) ext->x_sym.x_misc.x_lnsz.x_lnno)
-#define PUT_LNSZ_LNNO(abfd, in, ext) bfd_h_put_32(abfd, in, (bfd_byte *) ext->x_sym.x_misc.x_lnsz.x_lnno)
-#define PUT_LNSZ_SIZE(abfd, in, ext) bfd_h_put_32(abfd, in, (bfd_byte *) ext->x_sym.x_misc.x_lnsz.x_size)
-#define GET_SCN_SCNLEN(abfd, ext) bfd_h_get_32(abfd, (bfd_byte *) ext->x_scn.x_scnlen)
-#define GET_SCN_NRELOC(abfd, ext) bfd_h_get_32(abfd, (bfd_byte *) ext->x_scn.x_nreloc)
-#define GET_SCN_NLINNO(abfd, ext)  bfd_h_get_32(abfd, (bfd_byte *) ext->x_scn.x_nlinno)
-#define PUT_SCN_SCNLEN(abfd,in, ext) bfd_h_put_32(abfd, in, (bfd_byte *) ext->x_scn.x_scnlen)
-#define PUT_SCN_NRELOC(abfd,in, ext) bfd_h_put_32(abfd, in, (bfd_byte *)ext->x_scn.x_nreloc)
-#define PUT_SCN_NLINNO(abfd,in, ext)  bfd_h_put_32(abfd,in, (bfd_byte *) ext->x_scn.x_nlinno)
+#define GET_LNSZ_SIZE(abfd, ext) \
+  H_GET_32 (abfd, ext->x_sym.x_misc.x_lnsz.x_size)
+#define GET_LNSZ_LNNO(abfd, ext) \
+  H_GET_32 (abfd, ext->x_sym.x_misc.x_lnsz.x_lnno)
+#define PUT_LNSZ_LNNO(abfd, in, ext) \
+  H_PUT_32 (abfd, in, ext->x_sym.x_misc.x_lnsz.x_lnno)
+#define PUT_LNSZ_SIZE(abfd, in, ext) \
+  H_PUT_32 (abfd, in, ext->x_sym.x_misc.x_lnsz.x_size)
+#define GET_SCN_NRELOC(abfd, ext) \
+  H_GET_32 (abfd, ext->x_scn.x_nreloc)
+#define GET_SCN_NLINNO(abfd, ext) \
+  H_GET_32 (abfd, ext->x_scn.x_nlinno)
+#define PUT_SCN_NRELOC(abfd, in, ext) \
+  H_PUT_32 (abfd, in, ext->x_scn.x_nreloc)
+#define PUT_SCN_NLINNO(abfd, in, ext) \
+  H_PUT_32 (abfd,in, ext->x_scn.x_nlinno)
 
 #define	SYMENT	struct external_syment
 #define	SYMESZ	20
