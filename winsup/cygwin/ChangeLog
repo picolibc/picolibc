@@ -1,3 +1,9 @@
+Thu Jun 14 20:19:46 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.cc (fhandler_disk_file::fstat): Properly set executable bits
+	for directory when !ntsec && !ntea.  Also move common code prior to
+	call to get_attributes.
+
 Fri June 15 09:25:00  Robert Collins <rbtcollins@hotmail.com>
   
 	* thread.cc (pthread_cond::Signal): Release the condition access

@@ -928,27 +928,20 @@ fhandler_disk_file::fstat (struct stat *buf)
   /* Using a side effect: get_file_attibutes checks for
      directory. This is used, to set S_ISVTX, if needed.  */
   if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-    buf->st_mode |= S_IFDIR;
-  if (get_symlink_p ())
-    buf->st_mode |= S_IFLNK;
-  if (!get_file_attribute (has_acls (),
-			   get_win32_name (),
-			   &buf->st_mode,
-			   &buf->st_uid,
-			   &buf->st_gid))
+    buf->st_mode = S_IFDIR;
+  else if (get_symlink_p ())
+    buf->st_mode = S_IFLNK;
+  else if (get_socket_p ())
+    buf->st_mode = S_IFSOCK;
+  if (get_file_attribute (has_acls (), get_win32_name (), &buf->st_mode,
+			  &buf->st_uid, &buf->st_gid) == 0)
     {
       /* If read-only attribute is set, modify ntsec return value */
       if ((local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
           && !get_symlink_p ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
-      if (buf->st_mode & S_IFMT)
-	/* already set */;
-      else if (get_socket_p ())
-	buf->st_mode |= S_IFSOCK;
-      else if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-	buf->st_mode |= S_IFDIR;
-      else
+      if (!(buf->st_mode & S_IFMT))
 	buf->st_mode |= S_IFREG;
     }
   else
@@ -959,8 +952,10 @@ fhandler_disk_file::fstat (struct stat *buf)
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
-      if (buf->st_mode & S_IFMT)
-	/* already set */;
+      if (buf->st_mode & S_IFDIR)
+	buf->st_mode |= S_IFDIR | STD_XBITS;
+      else if (buf->st_mode & S_IFMT)
+	/* nothing */;
       else if (get_socket_p ())
 	buf->st_mode |= S_IFSOCK;
       else
@@ -971,35 +966,30 @@ fhandler_disk_file::fstat (struct stat *buf)
 	    buf->st_mode |= S_IFCHR;
 	    break;
 	  case FILE_TYPE_DISK:
-	    if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-	      buf->st_mode |= S_IFDIR | STD_XBITS;
-	   else
-	     {
-		buf->st_mode |= S_IFREG;
-		if (!dont_care_if_execable () && !get_execable_p ())
-		  {
-		    DWORD cur, done;
-		    char magic[3];
+	    buf->st_mode |= S_IFREG;
+	    if (!dont_care_if_execable () && !get_execable_p ())
+	      {
+		DWORD cur, done;
+		char magic[3];
 
-		    /* First retrieve current position, set to beginning
-		       of file if not already there. */
-		    cur = SetFilePointer (get_handle(), 0, NULL, FILE_CURRENT);
-		    if (cur != INVALID_SET_FILE_POINTER &&
-		        (!cur ||
-			 SetFilePointer (get_handle(), 0, NULL, FILE_BEGIN)
-			 != INVALID_SET_FILE_POINTER))
-		      {
-			/* FIXME should we use /etc/magic ? */
-			magic[0] = magic[1] = magic[2] = '\0';
-			if (ReadFile (get_handle (), magic, 3, &done, 0) &&
-			    done == 3 && has_exec_chars (magic, done))
-			    set_execable_p ();
-			SetFilePointer (get_handle(), cur, NULL, FILE_BEGIN);
-		      }
+		/* First retrieve current position, set to beginning
+		   of file if not already there. */
+		cur = SetFilePointer (get_handle(), 0, NULL, FILE_CURRENT);
+		if (cur != INVALID_SET_FILE_POINTER &&
+		    (!cur ||
+		     SetFilePointer (get_handle(), 0, NULL, FILE_BEGIN)
+		     != INVALID_SET_FILE_POINTER))
+		  {
+		    /* FIXME should we use /etc/magic ? */
+		    magic[0] = magic[1] = magic[2] = '\0';
+		    if (ReadFile (get_handle (), magic, 3, &done, 0) &&
+			done == 3 && has_exec_chars (magic, done))
+			set_execable_p ();
+		    SetFilePointer (get_handle(), cur, NULL, FILE_BEGIN);
 		  }
-		if (get_execable_p ())
-		  buf->st_mode |= STD_XBITS;
-	     }
+	      }
+	    if (get_execable_p ())
+	      buf->st_mode |= STD_XBITS;
 	    break;
 	  case FILE_TYPE_PIPE:
 	    buf->st_mode |= S_IFSOCK;
