@@ -119,7 +119,7 @@ typedef enum _SYSTEM_INFORMATION_CLASS {
 	SystemNotImplemented10 = 40,
 	SystemDockInformation = 41,
 	SystemNotImplemented11 = 41,
-	//SystemPowerInformation = 42, Conflicts with POWER_INFORMATION_LEVEL
+	/* SystemPowerInformation = 42, Conflicts with POWER_INFORMATION_LEVEL 1 */
 	SystemInvalidInfoClass2 = 42,
 	SystemProcessorSpeedInformation = 43,
 	SystemInvalidInfoClass3 = 43,
@@ -773,7 +773,7 @@ typedef struct _OBJECT_BASIC_INFORMATION {
 	LARGE_INTEGER  CreateTime;
 } OBJECT_BASIC_INFORMATION, *POBJECT_BASIC_INFORMATION;
 #if 0
-// FIXME: Enable later
+/* FIXME: Enable later */
 typedef struct _OBJECT_TYPE_INFORMATION {
 	UNICODE_STRING  Name;
 	ULONG  ObjectCount;
@@ -1449,7 +1449,7 @@ typedef struct _PROCESS_PRIORITY_CLASS {
 #define DRIVE_RAMDISK                     6
 
 typedef struct _PROCESS_DEVICEMAP_INFORMATION {
-	union {
+	_ANONYMOUS_UNION union {
 		struct {
 		  HANDLE  DirectoryHandle;
 		} Set;
@@ -1457,7 +1457,7 @@ typedef struct _PROCESS_DEVICEMAP_INFORMATION {
 		  ULONG  DriveMap;
 		  UCHAR  DriveType[32];
 		} Query;
-	};
+	} DUMMYUNIONNAME;
 } PROCESS_DEVICEMAP_INFORMATION, *PPROCESS_DEVICEMAP_INFORMATION;
 
 typedef struct _PROCESS_SESSION_INFORMATION {

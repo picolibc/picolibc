@@ -88,10 +88,10 @@ struct _IO_STATUS_BLOCK;
 struct _DEVICE_DESCRIPTION;
 struct _SCATTER_GATHER_LIST;
 
-DECLARE_INTERNAL_OBJECT(ADAPTER_OBJECT);
-DECLARE_INTERNAL_OBJECT(DMA_ADAPTER);
-DECLARE_INTERNAL_OBJECT(IO_STATUS_BLOCK);
-DECLARE_INTERNAL_OBJECT(SECTION_OBJECT);
+DECLARE_INTERNAL_OBJECT(ADAPTER_OBJECT)
+DECLARE_INTERNAL_OBJECT(DMA_ADAPTER)
+DECLARE_INTERNAL_OBJECT(IO_STATUS_BLOCK)
+DECLARE_INTERNAL_OBJECT(SECTION_OBJECT)
 
 #if 1
 /* FIXME: Unknown definitions */
@@ -110,7 +110,7 @@ typedef ULONG LOGICAL;
 #define TAG(_a, _b, _c, _d) (ULONG) \
 	(((_a) << 0) + ((_b) << 8) + ((_c) << 16) + ((_d) << 24))
 
-static inline struct _KPCR * KeGetCurrentKPCR(
+static __inline struct _KPCR * KeGetCurrentKPCR(
   VOID)
 {
   ULONG Value;
@@ -2517,14 +2517,14 @@ typedef struct _IO_STACK_LOCATION {
       ULONG  Length;
       FILE_INFORMATION_CLASS POINTER_ALIGNMENT  FileInformationClass;
       PFILE_OBJECT  FileObject;
-      union {
-        struct {
+      _ANONYMOUS_UNION union {
+        _ANONYMOUS_STRUCT struct {
           BOOLEAN  ReplaceIfExists;
           BOOLEAN  AdvanceOnly;
-        };
+        } DUMMYSTRUCTNAME;
         ULONG  ClusterCount;
         HANDLE  DeleteHandle;
-      };
+      } DUMMYUNIONNAME;
     } SetFile;
     struct {
       ULONG  Length;
@@ -3019,15 +3019,15 @@ typedef VOID DDKAPI
   USHORT  Depth; \
   USHORT  MaximumDepth; \
   ULONG  TotalAllocates; \
-  union { \
+  _ANONYMOUS_UNION union { \
     ULONG  AllocateMisses; \
     ULONG  AllocateHits; \
-  }; \
+  } DUMMYUNIONNAME; \
   ULONG  TotalFrees; \
-  union { \
+  _ANONYMOUS_UNION union { \
     ULONG  FreeMisses; \
     ULONG  FreeHits; \
-  }; \
+  } DUMMYUNIONNAME2; \
   POOL_TYPE  Type; \
   ULONG  Tag; \
   ULONG  Size; \
@@ -3035,23 +3035,23 @@ typedef VOID DDKAPI
   PFREE_FUNCTION  Free; \
   LIST_ENTRY  ListEntry; \
   ULONG  LastTotalAllocates; \
-  union { \
+  _ANONYMOUS_UNION union { \
     ULONG  LastAllocateMisses; \
     ULONG  LastAllocateHits; \
-  }; \
+  } DUMMYUNIONNAME3; \
   ULONG Future[2];
 
 typedef struct _GENERAL_LOOKASIDE {
-  GENERAL_LOOKASIDE_S;
+  GENERAL_LOOKASIDE_S
 } GENERAL_LOOKASIDE, *PGENERAL_LOOKASIDE;
 
 typedef struct _NPAGED_LOOKASIDE_LIST {
-  GENERAL_LOOKASIDE_S;
+  GENERAL_LOOKASIDE_S
   KSPIN_LOCK  Obsoleted;
 } NPAGED_LOOKASIDE_LIST, *PNPAGED_LOOKASIDE_LIST;
 
 typedef struct _PAGED_LOOKASIDE_LIST {
-  GENERAL_LOOKASIDE_S;
+  GENERAL_LOOKASIDE_S
   FAST_MUTEX  Obsoleted;
 } PAGED_LOOKASIDE_LIST, *PPAGED_LOOKASIDE_LIST;
 
@@ -3064,7 +3064,7 @@ typedef VOID DDKAPI (*PCALLBACK_FUNCTION)(
 
 typedef enum _EVENT_TYPE {
   NotificationEvent,
-  SynchronizationEvent,
+  SynchronizationEvent
 } EVENT_TYPE;
 
 typedef enum _KWAIT_REASON {
@@ -4010,7 +4010,7 @@ RtlAssert(
 #define IsListEmpty(_ListHead) \
   ((_ListHead)->Flink == (_ListHead))
 
-static inline PSINGLE_LIST_ENTRY 
+static __inline PSINGLE_LIST_ENTRY 
 PopEntryList(
   IN PSINGLE_LIST_ENTRY  ListHead)
 {
@@ -4054,7 +4054,7 @@ PopEntryList(
   (_Entry)->Blink = NULL; \
 }
 
-static inline PLIST_ENTRY 
+static __inline PLIST_ENTRY 
 RemoveHeadList(
   IN PLIST_ENTRY  ListHead)
 {
@@ -4077,7 +4077,7 @@ RemoveHeadList(
 	return Entry;
 }
 
-static inline PLIST_ENTRY
+static __inline PLIST_ENTRY
 RemoveTailList(
   IN PLIST_ENTRY  ListHead)
 {
@@ -5009,7 +5009,7 @@ ExAcquireSharedWaitForExclusive(
   IN PERESOURCE  Resource,
   IN BOOLEAN  Wait);
 
-static inline PVOID
+static __inline PVOID
 ExAllocateFromNPagedLookasideList(
   IN PNPAGED_LOOKASIDE_LIST  Lookaside)
 {
@@ -5024,7 +5024,7 @@ ExAllocateFromNPagedLookasideList(
   return Entry;
 }
 
-static inline PVOID
+static __inline PVOID
 ExAllocateFromPagedLookasideList(
   IN PPAGED_LOOKASIDE_LIST  Lookaside)
 {
@@ -5142,7 +5142,7 @@ ExFreePoolWithTag(
 
 #define ExQueryDepthSList(ListHead) QueryDepthSList(ListHead)
 
-static inline VOID
+static __inline VOID
 ExFreeToNPagedLookasideList(
   IN PNPAGED_LOOKASIDE_LIST  Lookaside,
   IN PVOID  Entry)
@@ -5157,7 +5157,7 @@ ExFreeToNPagedLookasideList(
 	}
 }
 
-static inline VOID
+static __inline VOID
 ExFreeToPagedLookasideList(
   IN PPAGED_LOOKASIDE_LIST  Lookaside,
   IN PVOID  Entry)

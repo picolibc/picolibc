@@ -1044,14 +1044,14 @@ CM_Get_DevNode_Status_Ex(
 #define CM_Get_DevInst_Status_Ex CM_Get_DevNode_Status_Ex
 
 /* CM_Get_First_Log_Conf.ulFlags constants */
-#define BASIC_LOG_CONF    0x00000000  // Specifies the req list.
-#define FILTERED_LOG_CONF 0x00000001  // Specifies the filtered req list.
-#define ALLOC_LOG_CONF    0x00000002  // Specifies the Alloc Element.
-#define BOOT_LOG_CONF     0x00000003  // Specifies the RM Alloc Element.
-#define FORCED_LOG_CONF   0x00000004  // Specifies the Forced Log Conf
-#define OVERRIDE_LOG_CONF 0x00000005  // Specifies the Override req list.
-#define NUM_LOG_CONF      0x00000006  // Number of Log Conf type
-#define LOG_CONF_BITS     0x00000007  // The bits of the log conf type.
+#define BASIC_LOG_CONF    0x00000000  /* Specifies the req list. */
+#define FILTERED_LOG_CONF 0x00000001  /* Specifies the filtered req list. */
+#define ALLOC_LOG_CONF    0x00000002  /* Specifies the Alloc Element. */
+#define BOOT_LOG_CONF     0x00000003  /* Specifies the RM Alloc Element. */
+#define FORCED_LOG_CONF   0x00000004  /* Specifies the Forced Log Conf */
+#define OVERRIDE_LOG_CONF 0x00000005  /* Specifies the Override req list. */
+#define NUM_LOG_CONF      0x00000006  /* Number of Log Conf type */
+#define LOG_CONF_BITS     0x00000007  /* The bits of the log conf type. */
 
 CMAPI
 CONFIGRET

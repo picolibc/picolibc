@@ -135,16 +135,16 @@ typedef struct _NDIS_WAN_COMPRESS_INFO {
 	ULONG  MSCompType;
 	UCHAR  CompType;
 	USHORT  CompLength;
-	union {
+	_ANONYMOUS_UNION union {
 		struct {
 			UCHAR  CompOUI[3];
 			UCHAR  CompSubType;
 			UCHAR  CompValues[32];
 		} Proprietary;
 		struct {
-      UCHAR  CompValues[32];
+			UCHAR  CompValues[32];
 		} Public;
-	};
+	} DUMMYUNIONNAME;
 } NDIS_WAN_COMPRESS_INFO;
 
 typedef NDIS_WAN_COMPRESS_INFO *PNDIS_WAN_COMPRESS_INFO;

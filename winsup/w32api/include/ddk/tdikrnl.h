@@ -858,7 +858,7 @@ typedef enum _TDI_PNP_OPCODE {
   TDI_PNP_OP_NETREADY,
   TDI_PNP_OP_ADD_IGNORE_BINDING,
   TDI_PNP_OP_DELETE_IGNORE_BINDING,
-  TDI_PNP_OP_MAX,
+  TDI_PNP_OP_MAX
 } TDI_PNP_OPCODE;
 
 /* TDI_PNP_CONTEXT.ContextType */
@@ -920,33 +920,33 @@ typedef VOID DDKAPI
   IN NTSTATUS  ProviderStatus);
 
 typedef struct _TDI20_CLIENT_INTERFACE_INFO {
-  union {
-    struct {
+  _ANONYMOUS_UNION union {
+    _ANONYMOUS_STRUCT struct {
       UCHAR  MajorTdiVersion;
       UCHAR  MinorTdiVersion;
-    };
+    } DUMMYSTRUCTNAME;
     USHORT TdiVersion;
-  };
+  } DUMMYUNIONNAME;
   USHORT  Unused;
   PUNICODE_STRING  ClientName;
   TDI_PNP_POWER_HANDLER  PnPPowerHandler;
-  union {
+  _ANONYMOUS_UNION union {
     TDI_BINDING_HANDLER  BindingHandler;
-    struct {
+    _ANONYMOUS_STRUCT struct {
       TDI_BIND_HANDLER  BindHandler;
       TDI_UNBIND_HANDLER  UnBindHandler;
-    };
-  };
-  union {
-    struct {
+    } DUMMYSTRUCTNAME;
+  }DUMMYUNIONNAME2;
+  _ANONYMOUS_UNION union {
+    _ANONYMOUS_STRUCT struct {
       TDI_ADD_ADDRESS_HANDLER_V2  AddAddressHandlerV2;
       TDI_DEL_ADDRESS_HANDLER_V2  DelAddressHandlerV2;
-    };
-    struct {
+    } DUMMYSTRUCTNAME;
+    _ANONYMOUS_STRUCT struct {
       TDI_ADD_ADDRESS_HANDLER  AddAddressHandler;
       TDI_DEL_ADDRESS_HANDLER  DelAddressHandler;
-    };
-  };
+    } DUMMYSTRUCTNAME2;
+  } DUMMYUNIONNAME3;
 } TDI20_CLIENT_INTERFACE_INFO, *PTDI20_CLIENT_INTERFACE_INFO;
 
 typedef TDI20_CLIENT_INTERFACE_INFO TDI_CLIENT_INTERFACE_INFO;

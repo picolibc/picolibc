@@ -1,3 +1,48 @@
+2003-07-17  Danny Smith <dannysmith@users.sourceforge.net>
+
+	Clean up warnings in ddk.
+
+	* include/ddk/atm.h (_ATM_AAL_OOB_INFO): Add _ANONYMOUS_UNION,
+	conditional on  __cplusplus.
+	* include/ddk/scsi.h: Add _ANONYMOUS_UNION and _ANONYMOUS_STRUCT
+	defines, throughout.
+	(_CDB): Add _ANONYMOUS_UNION, conditional on __cplusplus.
+	* include/ddk/cfg.h (_PNP_VETO_TYPE): Remove extra comma.
+	* include/ddk/cfgmgr32.h: Change C++ comment style to ISO C.
+	* include/ddk/ddkmapi.h (_DDLOCKOUT): Add _ANONYMOUS_UNION defines.
+	* include/ddk/hidpi.h: Add _ANONYMOUS_UNION and _ANONYMOUS_STRUCT
+	defines, throughout.
+	* include/ddk/ndis.h: Add _ANONYMOUS_UNION and _ANONYMOUS_STRUCT
+	defines, throughout. Remove trailing semicolon from *_S 'structure'
+	macro expansion, throughout. Remove trailing semicolon from
+	DECLARE_UNKNOWN_STRUCT macro expansion.
+	* include/ddk/ndiswan.h (_NDIS_WAN_COMPRESS_INFO): Add
+	_ANONYMOUS_UNION.
+	* include/ddk/ntapi.h (_PROCESS_DEVICEMAP_INFORMATION,
+	_PROCESS_SESSION_INFORMATION): Add _ANONYMOUS_UNION.
+	* include/ddk/ntddcdrm.h (CDROM_TOC_CD_TEXT_DATA_BLOCK): 
+	Add _ANONYMOUS_UNION.
+	* include/ddk/ntdddisk.h: Add _ANONYMOUS_UNION, throughout.
+	* include/ddk/ntddmou.h:  Add _ANONYMOUS_UNION, throughout.
+	* include/ddk/ntifs.h:  Add _ANONYMOUS_UNION, throughout.
+	(ZwQueryObject): Change 2nd param to OBJECT_INFORMATION_CLASS, to
+	match proto in ntapi.h.
+	(ZwSetInformationObject): Likewise.
+	* include/ddk/srb.h (SCSI_REQUEST_BLOCK): Add _ANONYMOUS_UNION.
+	(SCSI_ADAPTER_CONTROL_TYPE): Add __extension__.
+	* include/ddk/tdikrnl.h (TDI20_CLIENT_INTERFACE_INFO): Add
+	_ANONYMOUS_UNION and _ANONYMOUS_STRUCT.
+	* include/ddk/usb.h (USB): Add _ANONYMOUS_UNION.
+	* include/ddk/usbcamdi.h (USBCAMD_CamControlFlags): Remove
+	last comma.
+	* include/ddk/video.h (STATUS_BLOCK): Add _ANONYMOUS_UNION.
+	* include/ddk/winddk.h (DECLARE_INTERNAL_OBJECT): Remove
+	trailing semicolon when expanding macro.
+	(GENERAL_LOOKASIDE_S): Likewise.
+	Add _ANONYMOUS_UNION and _ANONYMOUS_STRUCT, throughout.
+	Change inline to __inline, throughout.
+	* include/ddk/winnt4.h: Change inline to __inline, throughout.
+
 2003-07-13  Casper S. Hornstrup  <chorns@users.sourceforge.net>
 
 	* include/ddk/ntifs.h (KeInsertQueueApc): Make return type

@@ -315,10 +315,10 @@ typedef VP_STATUS DDKAPI
   IN PVIDEO_POWER_MANAGEMENT  VideoPowerControl);
 
 typedef struct _STATUS_BLOCK {
-  union {
+   _ANONYMOUS_UNION union {
     VP_STATUS  Status;
     PVOID  Pointer;
-  };
+  } DUMMYUNIONNAME;
   ULONG_PTR Information;
 } STATUS_BLOCK, *PSTATUS_BLOCK;
 

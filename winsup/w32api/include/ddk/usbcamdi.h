@@ -77,7 +77,7 @@ typedef enum {
 	USBCAMD_CamControlFlag_NoVideoRawProcessing = 1,
 	USBCAMD_CamControlFlag_NoStillRawProcessing = 2,
 	USBCAMD_CamControlFlag_AssociatedFormat = 4,
-	USBCAMD_CamControlFlag_EnableDeviceEvents = 8,
+	USBCAMD_CamControlFlag_EnableDeviceEvents = 8
 } USBCAMD_CamControlFlags;
 
 typedef NTSTATUS DDKAPI

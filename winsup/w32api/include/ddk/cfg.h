@@ -111,7 +111,7 @@ typedef enum _PNP_VETO_TYPE {
   PNP_VetoIllegalDeviceRequest,
   PNP_VetoInsufficientPower,
   PNP_VetoNonDisableable,
-  PNP_VetoLegacyDriver,
+  PNP_VetoLegacyDriver
 } PNP_VETO_TYPE, *PPNP_VETO_TYPE;
 
 #pragma pack(pop)

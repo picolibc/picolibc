@@ -701,30 +701,30 @@ typedef struct _DEVICE_MAP {
 #if (VER_PRODUCTBUILD >= 2600)
 
 typedef struct _EX_FAST_REF {
-    union {
+    _ANONYMOUS_UNION union {
         PVOID Object;
         ULONG RefCnt : 3;
         ULONG Value;
-    };
+    } DUMMYUNIONNAME;
 } EX_FAST_REF, *PEX_FAST_REF;
 
 typedef struct _EX_PUSH_LOCK {
-    union {
-        struct {
+    _ANONYMOUS_UNION union {
+        _ANONYMOUS_STRUCT struct {
             ULONG   Waiting     : 1;
             ULONG   Exclusive   : 1;
             ULONG   Shared      : 30;
-        };
+        } DUMMYSTRUCTNAME;
         ULONG   Value;
         PVOID   Ptr;
-    };
+    } DUMMYUNIONNAME;
 } EX_PUSH_LOCK, *PEX_PUSH_LOCK;
 
 typedef struct _EX_RUNDOWN_REF {
-    union {
+    _ANONYMOUS_UNION union {
         ULONG Count;
         PVOID Ptr;
-    };
+    } DUMMYUNIONNAME;
 } EX_RUNDOWN_REF, *PEX_RUNDOWN_REF;
 
 #endif
@@ -1115,14 +1115,14 @@ typedef struct _FILE_NAMES_INFORMATION {
 typedef struct _FILE_OBJECTID_INFORMATION {
     LONGLONG        FileReference;
     UCHAR           ObjectId[16];
-    union {
+    _ANONYMOUS_UNION union {
         struct {
             UCHAR   BirthVolumeId[16];
             UCHAR   BirthObjectId[16];
             UCHAR   DomainId[16];
         } ;
         UCHAR       ExtendedInfo[48];
-    };
+    } DUMMYUNIONNAME;
 } FILE_OBJECTID_INFORMATION, *PFILE_OBJECTID_INFORMATION;
 
 typedef struct _FILE_OLE_CLASSID_INFORMATION {
@@ -1440,11 +1440,11 @@ typedef struct _PRIVATE_CACHE_MAP_FLAGS {
 } PRIVATE_CACHE_MAP_FLAGS, *PPRIVATE_CACHE_MAP_FLAGS;
 
 typedef struct _PRIVATE_CACHE_MAP {
-    union {
+    _ANONYMOUS_UNION union {
         CSHORT                  NodeTypeCode;
         PRIVATE_CACHE_MAP_FLAGS Flags;
         ULONG                   UlongFlags;
-    };
+    } DUMMYUNIONNAME;
     ULONG                       ReadAheadMask;
     PFILE_OBJECT                FileObject;
     LARGE_INTEGER               FileOffset1;
@@ -4435,11 +4435,11 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwQueryObject (
-    IN HANDLE               ObjectHandle,
-    IN OBJECT_INFO_CLASS    ObjectInformationClass,
-    OUT PVOID               ObjectInformation,
-    IN ULONG                Length,
-    OUT PULONG              ResultLength
+    IN HANDLE                      ObjectHandle,
+    IN OBJECT_INFORMATION_CLASS    ObjectInformationClass,
+    OUT PVOID                      ObjectInformation,
+    IN ULONG                       Length,
+    OUT PULONG                     ResultLength
 );
 
 NTSYSAPI
@@ -4564,10 +4564,10 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwSetInformationObject (
-    IN HANDLE               ObjectHandle,
-    IN OBJECT_INFO_CLASS    ObjectInformationClass,
-    IN PVOID                ObjectInformation,
-    IN ULONG                ObjectInformationLength
+    IN HANDLE                       ObjectHandle,
+    IN OBJECT_INFORMATION_CLASS    ObjectInformationClass,
+    IN PVOID                        ObjectInformation,
+    IN ULONG                        ObjectInformationLength
 );
 
 NTSYSAPI

@@ -252,12 +252,12 @@ typedef struct _DISK_EX_INT13_INFO {
 typedef struct _DISK_DETECTION_INFO {
   ULONG  SizeOfDetectInfo;
   DETECTION_TYPE  DetectionType;
-  union {
-    struct {
+  _ANONYMOUS_UNION union {
+    _ANONYMOUS_STRUCT struct {
       DISK_INT13_INFO  Int13;
       DISK_EX_INT13_INFO  ExInt13;
-    };
-  };
+    } DUMMYSTRUCTNAME;
+  } DUMMYUNIONNAME;
 } DISK_DETECTION_INFO, *PDISK_DETECTION_INFO;
 
 typedef struct _DISK_GEOMETRY {
@@ -302,7 +302,7 @@ typedef struct _PARTITION_INFORMATION_GPT {
 typedef struct _DISK_PARTITION_INFO {
   ULONG  SizeOfPartitionInfo;
   PARTITION_STYLE  PartitionStyle;
-  union {
+  _ANONYMOUS_UNION union {
     struct {
       ULONG  Signature;
       ULONG  CheckSum;
@@ -310,7 +310,7 @@ typedef struct _DISK_PARTITION_INFO {
     struct {
       GUID  DiskId;
     } Gpt;
-  };
+  } DUMMYUNIONNAME;
 } DISK_PARTITION_INFO, *PDISK_PARTITION_INFO;
 
 typedef struct _DISK_PERFORMANCE {
@@ -334,10 +334,10 @@ typedef struct _PARTITION_INFORMATION_EX {
   LARGE_INTEGER  PartitionLength;
   ULONG  PartitionNumber;
   BOOLEAN  RewritePartition;
-  union {
+  _ANONYMOUS_UNION union {
     PARTITION_INFORMATION_MBR  Mbr;
     PARTITION_INFORMATION_GPT  Gpt;
-  };
+  } DUMMYUNIONNAME;
 } PARTITION_INFORMATION_EX, *PPARTITION_INFORMATION_EX;
 
 typedef struct _FORMAT_EX_PARAMETERS {
@@ -378,10 +378,10 @@ typedef PARTITION_INFORMATION_GPT SET_PARTITION_INFORMATION_GPT;
 
 typedef struct _SET_PARTITION_INFORMATION_EX {
   PARTITION_STYLE  PartitionStyle;
-  union {
+  _ANONYMOUS_UNION union {
     SET_PARTITION_INFORMATION_MBR  Mbr;
     SET_PARTITION_INFORMATION_GPT  Gpt;
-  };
+  } DUMMYUNIONNAME;
 } SET_PARTITION_INFORMATION_EX, *PSET_PARTITION_INFORMATION_EX;
 
 typedef struct _VERIFY_INFORMATION {
@@ -403,7 +403,7 @@ typedef struct _DISK_CACHE_INFORMATION {
 	DISK_CACHE_RETENTION_PRIORITY  WriteRetentionPriority;
 	USHORT  DisablePrefetchTransferLength;
 	BOOLEAN  PrefetchScalar;
-	union {
+	_ANONYMOUS_UNION union {
 		struct {
 			USHORT  Minimum;
 			USHORT  Maximum;
@@ -413,7 +413,7 @@ typedef struct _DISK_CACHE_INFORMATION {
 			USHORT  Minimum;
 			USHORT  Maximum;
 		} BlockPrefetch;
-	};
+	} DUMMYUNIONNAME;
 } DISK_CACHE_INFORMATION, *PDISK_CACHE_INFORMATION;
 
 typedef struct _DISK_GROW_PARTITION {

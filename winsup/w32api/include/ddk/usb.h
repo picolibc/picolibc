@@ -365,7 +365,7 @@ struct _URB_SET_FRAME_LENGTH {
 };
 
 typedef struct _URB { 
-  union {
+  _ANONYMOUS_UNION union {
 		struct _URB_HEADER  UrbHeader;
 		struct _URB_SELECT_INTERFACE  UrbSelectInterface;
 		struct _URB_SELECT_CONFIGURATION  UrbSelectConfiguration;
@@ -383,7 +383,7 @@ typedef struct _URB {
 		struct _URB_CONTROL_VENDOR_OR_CLASS_REQUEST  UrbControlVendorClassRequest;
 		struct _URB_CONTROL_GET_INTERFACE_REQUEST  UrbControlGetInterfaceRequest;
 		struct _URB_CONTROL_GET_CONFIGURATION_REQUEST  UrbControlGetConfigurationRequest;
-  };
+  } DUMMYUNIONNAME;
 } URB, *PURB;
 
 #define URB_FROM_IRP(Irp) ((IoGetCurrentIrpStackLocation(Irp))->Parameters.Others.Argument1)

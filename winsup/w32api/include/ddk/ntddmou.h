@@ -76,13 +76,13 @@ DEFINE_GUID(GUID_DEVINTERFACE_MOUSE, \
 typedef struct _MOUSE_INPUT_DATA {
 	USHORT  UnitId;
 	USHORT  Flags;
-	union {
+	_ANONYMOUS_UNION union {
 		ULONG Buttons;
-		struct  {
+		_ANONYMOUS_STRUCT struct  {
 			USHORT  ButtonFlags;
 			USHORT  ButtonData;
-		};
-	};
+		} DUMMYSTRUCTNAME;
+	} DUMMYUNIONNAME;
 	ULONG  RawButtons;
 	LONG  LastX;
 	LONG  LastY;

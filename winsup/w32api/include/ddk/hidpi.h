@@ -57,8 +57,8 @@ typedef enum _HIDP_KEYBOARD_DIRECTION {
 } HIDP_KEYBOARD_DIRECTION;
 
 typedef struct _HIDP_KEYBOARD_MODIFIER_STATE {
-  union {
-    struct {
+  _ANONYMOUS_UNION union {
+    _ANONYMOUS_STRUCT struct {
       ULONG  LeftControl : 1;
       ULONG  LeftShift : 1;
       ULONG  LeftAlt : 1;
@@ -71,9 +71,9 @@ typedef struct _HIDP_KEYBOARD_MODIFIER_STATE {
       ULONG  ScollLock : 1;
       ULONG  NumLock : 1;
       ULONG  Reserved : 21;
-    };
+    } DUMMYSTRUCTNAME;
     ULONG ul;
-  };
+  } DUMMYUNIONNAME;
 } HIDP_KEYBOARD_MODIFIER_STATE, *PHIDP_KEYBOARD_MODIFIER_STATE;
 
 typedef BOOLEAN (DDKAPI *PHIDP_INSERT_SCANCODES)(
@@ -121,7 +121,7 @@ typedef struct _HIDP_BUTTON_CAPS {
   BOOLEAN  IsDesignatorRange;
   BOOLEAN  IsAbsolute;
   ULONG  Reserved[10];
-  union {
+  _ANONYMOUS_UNION union {
     struct {
       USAGE  UsageMin, UsageMax;
       USHORT  StringMin, StringMax;
@@ -134,7 +134,7 @@ typedef struct _HIDP_BUTTON_CAPS {
        USHORT  DesignatorIndex, Reserved3;
        USHORT  DataIndex, Reserved4;
     } NotRange;
-  };
+  } DUMMYUNIONNAME;
 } HIDP_BUTTON_CAPS, *PHIDP_BUTTON_CAPS;
 
 typedef struct _HIDP_CAPS {
@@ -159,10 +159,10 @@ typedef struct _HIDP_CAPS {
 typedef struct _HIDP_DATA {
   USHORT  DataIndex;
   USHORT  Reserved;
-  union {
+  _ANONYMOUS_UNION union {
     ULONG  RawValue;
     BOOLEAN  On;
-  };
+  }  DUMMYUNIONNAME;
 } HIDP_DATA, *PHIDP_DATA;
 
 typedef struct _HIDP_EXTENDED_ATTRIBUTES {
@@ -209,7 +209,7 @@ typedef struct _HIDP_VALUE_CAPS {
   ULONG  Units;
   LONG  LogicalMin, LogicalMax;
   LONG  PhysicalMin, PhysicalMax;
-    union {
+    _ANONYMOUS_UNION union {
       struct {
         USAGE  UsageMin, UsageMax;
         USHORT  StringMin, StringMax;
@@ -222,7 +222,7 @@ typedef struct _HIDP_VALUE_CAPS {
         USHORT  DesignatorIndex, Reserved3;
         USHORT  DataIndex, Reserved4;
       } NotRange;
-    };
+    } DUMMYUNIONNAME;
 } HIDP_VALUE_CAPS, *PHIDP_VALUE_CAPS;
 
 typedef enum _HIDP_REPORT_TYPE {
@@ -517,7 +517,7 @@ DDKAPI
 HidP_SetUsages(
   IN HIDP_REPORT_TYPE  ReportType,
   IN USAGE  UsagePage,
-  IN USHORT  LinkCollection, // Optional
+  IN USHORT  LinkCollection, /* Optional */
   IN PUSAGE  UsageList,
   IN OUT PULONG  UsageLength,
   IN PHIDP_PREPARSED_DATA  PreparsedData,
