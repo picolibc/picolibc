@@ -1,5 +1,9 @@
 2002-12-25  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-12-25  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (events_init): Initialize critical section to control
 	exiting via signal.
 	(signal_exit): Enter critical section early to avoid exit races with
