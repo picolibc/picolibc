@@ -1,3 +1,7 @@
+Tue Oct  2 22:25:23 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* how-fhandlers-work.txt: New file.
+
 Mon Oct  1 16:52:23 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dtable.h (dtable::build_fhandler): Make path_conv parameter
