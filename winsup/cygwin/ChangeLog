@@ -1,3 +1,8 @@
+Mon Jan 15 21:07:00 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* wait.cc (wait4): Rename variable for consistency.  Allow restartable
+	signal behavior.
+
 Mon Jan 15 23:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (mmap): Add more parameter checking. Change error output
