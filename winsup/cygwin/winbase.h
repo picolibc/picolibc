@@ -42,28 +42,27 @@ extern __inline__ long ilockexch (long *t, long v)
 #define InterlockedExchange ilockexch
 
 extern long tls_ix;
+extern char * volatile *__stackbase __asm__ ("%fs:4");
 
 extern __inline__ DWORD
 my_tlsalloc ()
 {
-  return (DWORD) ilockincr (&tls_ix);
+  DWORD n = ilockdecr (&tls_ix);
+  __stackbase[tls_ix] = NULL;
+  return n;
 }
 
 extern __inline__ BOOL
 my_tlssetvalue (DWORD ix, void *val)
 {
-  char **stackbase;
-  __asm__ volatile ("movl %%fs:4,%0": "=g" (stackbase));
-  stackbase[-ix] = (char *) val;
+  __stackbase[ix] = (char *) val;
   return 1;
 }
 
 extern __inline__ void *
 my_tlsgetvalue (DWORD ix)
 {
-  char **stackbase;
-  __asm__ volatile ("movl %%fs:4,%0": "=g" (stackbase));
-  return stackbase[-ix];
+  return __stackbase[ix];
 }
 
 extern __inline__ BOOL

@@ -1,3 +1,14 @@
+2001-11-30  Christopher Faylor  <cgf@redhat.com>
+
+	* debug.cc (makethread): Eliminate unneeded function call.
+	* miscfuncs.cc (tls_ix): Predefine.
+	* perthread.h (set_reent): Eliminate.
+	(get_reent): Ditto.
+	* winbase.h (my_tlsalloc): Use global stack base pointer.  Set newly
+	allocated location to NULL.
+	(my_tlssetvalue): Use global stack base pointer.
+	(my_tlsgetvalue): Ditto.
+
 2001-11-27  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.h: Reorganize to avoid use of experimental stuff.
