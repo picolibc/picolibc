@@ -152,8 +152,10 @@ lib_a_SOURCES = \
 	strdup_r.c	\
 	strtod.c	\
 	strtol.c	\
+	strtoll.c	\
 	strtoll_r.c	\
 	strtoul.c	\
+	strtoull.c	\
 	strtoull_r.c	\
 	system.c	\
 	valloc.c	\
@@ -198,7 +200,9 @@ CHEWOUT_FILES = \
 	rand48.def	\
 	strtod.def 	\
 	strtol.def 	\
+	strtoll.def 	\
 	strtoul.def 	\
+	strtoull.def 	\
 	system.def	\
 	wcstombs.def	\
 	wctomb.def	
@@ -231,9 +235,9 @@ labs.o lcong48.o ldiv.o ldtoa.o lrand48.o malign.o malloc.o mblen.o \
 mblen_r.o mbstowcs.o mbstowcs_r.o mbtowc.o mbtowc_r.o mlock.o mprec.o \
 mrand48.o msize.o mstats.o mtrim.o nrand48.o putenv.o putenv_r.o \
 qsort.o rand.o rand48.o rand_r.o realloc.o seed48.o setenv.o setenv_r.o \
-srand48.o strdup.o strdup_r.o strtod.o strtol.o strtoll_r.o strtoul.o \
-strtoull_r.o system.o valloc.o wcstombs.o wcstombs_r.o wctomb.o \
-wctomb_r.o
+srand48.o strdup.o strdup_r.o strtod.o strtol.o strtoll.o strtoll_r.o \
+strtoul.o strtoull.o strtoull_r.o system.o valloc.o wcstombs.o \
+wcstombs_r.o wctomb.o wctomb_r.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)

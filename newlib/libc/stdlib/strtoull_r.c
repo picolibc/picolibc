@@ -2,7 +2,7 @@
   This code is based on strtoul.c which has the following copyright.
   It is used to convert a string into an unsigned long long.
   
-  long long __strtoull_r (struct _reent *rptr, const char *s,
+  long long _strtoull_r (struct _reent *rptr, const char *s,
                         char **ptr, int base);
 
 */
@@ -57,7 +57,7 @@
  * alphabets and digits are each contiguous.
  */
 unsigned long long
-_DEFUN (__strtoull_r, (rptr, nptr, endptr, base),
+_DEFUN (_strtoull_r, (rptr, nptr, endptr, base),
 	struct _reent *rptr _AND
 	_CONST char *nptr _AND
 	char **endptr _AND

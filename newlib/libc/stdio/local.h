@@ -86,12 +86,6 @@ char *_EXFUN(_licvt,(char *, long, char));
 char *_EXFUN(_llicvt,(char *, long long, char));
 #endif
 
-/* The following are found in the stdlib directory, not here */
-#ifdef __GNUC__
-long long _EXFUN(__strtoll_r,(struct _reent *, const char *, char **, int));
-unsigned long long _EXFUN(__strtoull_r,(struct _reent *, const char *, char **, int));
-#endif
-
 #define CVT_BUF_SIZE 128
 
 #define	NDYNAMIC 4	/* add four more whenever necessary */

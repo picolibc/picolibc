@@ -822,9 +822,9 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		{
 		  u_long_long resll;
 		  if (ccfn == _strtoul_r)
-		    resll = __strtoull_r (rptr, buf, (char **) NULL, base);
+		    resll = _strtoull_r (rptr, buf, (char **) NULL, base);
 		  else
-		    resll = __strtoll_r (rptr, buf, (char **) NULL, base);
+		    resll = _strtoll_r (rptr, buf, (char **) NULL, base);
 		  llp = va_arg (ap, long long*);
 		  *llp = resll;
 		}

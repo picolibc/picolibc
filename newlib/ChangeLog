@@ -1,3 +1,22 @@
+2001-10-01  Charles Wilson  <cwilson@ece.gatech.edu>
+
+        * libc/include/stdlib.h: add declarations for
+        _strtoull_r, _strtoll_r, strtoull, and strtoll.
+        * libc/stdio/local.h: remove declarations of
+        __strtoull_r and __strtoll_r.
+        * libc/stdio/vfscanf.c(__svfscanf_r): call
+        _strtoull_r instead of __strtoull_r. Ditto
+        _strtoll_r vs. __strtoll_r.
+        * libc/stdlib/Makefile.am: add new files to
+        .c list and .def list
+        * libc/stdlib/Makefile.in: regenerate
+        * libc/stdlib/strtoll_r.c: rename __strtoll_r
+        as _strtoll_r
+        * libc/stdlib/strtoull_r.c: rename __strtoull_r
+        as _strtoull_r
+        * libc/stdlib/strtoull.c: new file
+        * libc/stdlib/strtoll.c: new file
+
 Mon Sep 17 17:29:47 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/process.h: Add getpid() declaration.

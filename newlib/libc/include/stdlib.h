@@ -88,15 +88,16 @@ _VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, int(*_compar)(co
 int	_EXFUN(rand,(_VOID));
 _PTR	_EXFUN(realloc,(_PTR __r, size_t __size));
 _VOID	_EXFUN(srand,(unsigned __seed));
-double	_EXFUN(strtod,(const char *__n, char **_end_PTR));
-double	_EXFUN(_strtod_r,(struct _reent *,const char *__n, char **_end_PTR));
+double	_EXFUN(strtod,(const char *__n, char **__end_PTR));
+double	_EXFUN(_strtod_r,(struct _reent *,const char *__n, char **__end_PTR));
 #ifndef __STRICT_ANSI__
-float	_EXFUN(strtodf,(const char *__n, char **_end_PTR));
+float	_EXFUN(strtodf,(const char *__n, char **__end_PTR));
 #endif
-long	_EXFUN(strtol,(const char *__n, char **_end_PTR, int __base));
-long	_EXFUN(_strtol_r,(struct _reent *,const char *__n, char **_end_PTR, int __base));
-unsigned long _EXFUN(strtoul,(const char *_n_PTR, char **_end_PTR, int __base));
-unsigned long _EXFUN(_strtoul_r,(struct _reent *,const char *_n_PTR, char **_end_PTR, int __base));
+long	_EXFUN(strtol,(const char *__n, char **__end_PTR, int __base));
+long	_EXFUN(_strtol_r,(struct _reent *,const char *__n, char **__end_PTR, int __base));
+unsigned long _EXFUN(strtoul,(const char *__n, char **__end_PTR, int __base));
+unsigned long _EXFUN(_strtoul_r,(struct _reent *,const char *__n, char **__end_PTR, int __base));
+
 int	_EXFUN(system,(const char *__string));
 
 #ifndef __STRICT_ANSI__
@@ -136,6 +137,10 @@ unsigned short *
        _EXFUN(_seed48_r,(struct _reent *, unsigned short [3]));
 _VOID  _EXFUN(srand48,(long));
 _VOID  _EXFUN(_srand48_r,(struct _reent *, long));
+long long _EXFUN(strtoll,(const char *__n, char **__end_PTR, int __base));
+long long _EXFUN(_strtoll_r,(struct _reent *, const char *__n, char **__end_PTR, int __base));
+unsigned long long _EXFUN(strtoull,(const char *__n, char **__end_PTR, int __base));
+unsigned long long _EXFUN(_strtoull_r,(struct _reent *, const char *__n, char **__end_PTR, int __base));
 
 #ifndef __CYGWIN__
 _VOID	_EXFUN(cfree,(_PTR));

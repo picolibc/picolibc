@@ -70,8 +70,10 @@ lib_a_SOURCES = \
 	strdup_r.c	\
 	strtod.c	\
 	strtol.c	\
+	strtoll.c	\
 	strtoll_r.c	\
 	strtoul.c	\
+	strtoull.c	\
 	strtoull_r.c	\
 	system.c	\
 	valloc.c	\
@@ -150,7 +152,9 @@ CHEWOUT_FILES= \
 	rand48.def	\
 	strtod.def 	\
 	strtol.def 	\
+	strtoll.def 	\
 	strtoul.def 	\
+	strtoull.def 	\
 	system.def	\
 	wcstombs.def	\
 	wctomb.def	
