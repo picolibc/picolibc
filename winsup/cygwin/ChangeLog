@@ -1,3 +1,7 @@
+Tue Oct  9 18:53:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_disk_file::open): Add missing case clash check.
+
 Mon Oct  8 01:47:27 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dtable.cc (dtable::build_fhandler): Allocate correct amount for given

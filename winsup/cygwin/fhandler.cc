@@ -1378,6 +1378,13 @@ fhandler_disk_file::fhandler_disk_file (const char *name) :
 int
 fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
 {
+  if (real_path->case_clash && flags & O_CREAT)
+    {
+      debug_printf ("Caseclash detected.");
+      set_errno (ECASECLASH);
+      return 0;
+    }
+
   if (real_path->isbinary ())
     {
       set_r_binary (1);
