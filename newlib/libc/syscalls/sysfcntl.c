@@ -19,5 +19,5 @@ fcntl (fd, flag, arg)
 #else /* !HAVE_FCNTL */
   errno = ENOSYS;
   return -1;
-#endif /& !HAVE_FCNTL */
+#endif /* !HAVE_FCNTL */
 }

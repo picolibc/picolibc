@@ -1,5 +1,10 @@
 2002-09-19  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/syscalls/sysfcntl.c (fcntl): Fix typo in preprocessor
+	statement comment.
+
+2002-09-19  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/posix/opendir.c (opendir): Change code to check
 	for HAVE_FCNTL before calling fcntl.
 	* libc/search/hash.c (hash_open): Ditto.
