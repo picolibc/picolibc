@@ -1,3 +1,8 @@
+2002-12-16  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::cmdline): Allocate sufficient space for myself
+	command line args.
+
 2002-12-14  Steve Osborn  <bub@io.com>
 
 	* fhandler_termios.cc (fhandler_termios::line_edit): Call

@@ -444,7 +444,7 @@ _pinfo::cmdline (size_t& n)
     {
       n = 1;
       for (char **a = __argv; *a; a++)
-	n += strlen (*a);
+	n += strlen (*a) + 1;
       char *p;
       p = s = (char *) malloc (n);
       for (char **a = __argv; *a; a++)
