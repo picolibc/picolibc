@@ -287,14 +287,22 @@ dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
       return NULL;
     }
 
-  fhandler_base *fh = build_fhandler (fd, pc.get_devn (), pc.normalized_path, pc, pc.get_unitn ());
-  pc.clear_normalized_path ();
+  fhandler_base *fh = build_fhandler (fd, pc.get_devn (),
+				      pc.return_and_clear_normalized_path (),
+				      pc, pc.get_unitn ());
   return fh;
+}
+
+fhandler_base *
+dtable::build_fhandler (int fd, DWORD dev, const char *unix_name,
+			const char *win32_name, int unit)
+{
+  return build_fhandler (fd, dev, cstrdup (unix_name), win32_name, unit);
 }
 
 #define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
-dtable::build_fhandler (int fd, DWORD dev, const char *unix_name,
+dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
 			const char *win32_name, int unit)
 {
   fhandler_base *fh;
@@ -400,7 +408,7 @@ dtable::build_fhandler (int fd, DWORD dev, const char *unix_name,
 fhandler_base *
 dtable::dup_worker (fhandler_base *oldfh)
 {
-  fhandler_base *newfh = build_fhandler (-1, oldfh->get_device (), NULL);
+  fhandler_base *newfh = build_fhandler (-1, oldfh->get_device ());
   *newfh = *oldfh;
   newfh->set_io_handle (NULL);
   if (oldfh->dup (newfh))
@@ -476,14 +484,6 @@ done:
   syscall_printf ("%d = dup2 (%d, %d)", res, oldfd, newfd);
 
   return res;
-}
-
-void
-dtable::reset_unix_path_name (int fd, const char *name)
-{
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "reset_unix_name");
-  fds[fd]->reset_unix_path_name (name);
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "reset_unix_name");
 }
 
 select_record *

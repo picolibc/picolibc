@@ -50,6 +50,8 @@ public:
   void fixup_after_fork (HANDLE);
   fhandler_base *build_fhandler (int fd, DWORD dev, const char *unix_name,
 				 const char *win32_name = NULL, int unit = -1);
+  fhandler_base *build_fhandler (int fd, DWORD dev, char *unix_name = NULL,
+				 const char *win32_name = NULL, int unit = -1);
   fhandler_base *build_fhandler_from_name (int fd, const char *name, HANDLE h,
 					   path_conv& pc,
 					   unsigned opts = PC_SYM_FOLLOW,
@@ -63,7 +65,6 @@ public:
     ReleaseResourceLock (LOCK_FD_LIST, READ_LOCK, "not open");
     return res;
   }
-  void reset_unix_path_name (int fd, const char *name);
   int find_unused_handle (int start);
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
   void release (int fd);

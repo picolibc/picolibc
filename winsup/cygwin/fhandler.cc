@@ -161,8 +161,9 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
   else
     {
       const char *fmt = get_native_name ();
-      win32_path_name = (char *) cmalloc (HEAP_STR, strlen(fmt) + 16);
-      __small_sprintf (win32_path_name, fmt, unit);
+      char *w =  (char *) cmalloc (HEAP_STR, strlen(fmt) + 16);
+      __small_sprintf (w, fmt, unit);
+      win32_path_name = w;
     }
 
   if (win32_path_name == NULL)
@@ -178,12 +179,15 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
      path_conv. Ideally, we should pass in a format string and build the
      unix_path, too. */
   if (!is_device () || *win32_path_name != '\\')
-    unix_path_name = cstrdup (unix_path);
+    unix_path_name = unix_path;
   else
     {
-      unix_path_name = cstrdup (win32_path_name);
-      for (char *p = unix_path_name; (p = strchr (p, '\\')); p++)
-	*p = '/';
+      char *p = cstrdup (win32_path_name);
+      unix_path_name = p;
+      while ((p = strchr (p, '\\')) != NULL)
+	*p++ = '/';
+      if (unix_path)
+	cfree ((void *) unix_path);
     }
 
   if (unix_path_name == NULL)
@@ -192,13 +196,6 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
       exit (ENOMEM);
     }
   namehash = hash_path_name (0, win32_path_name);
-}
-
-void
-fhandler_base::reset_unix_path_name (const char *unix_path)
-{
-  cfree (unix_path_name);
-  unix_path_name = cstrdup (unix_path);
 }
 
 /* Detect if we are sitting at EOF for conditions where Windows
@@ -1047,9 +1044,9 @@ fhandler_base::fhandler_base (DWORD devtype, int unit):
 fhandler_base::~fhandler_base (void)
 {
   if (unix_path_name != NULL)
-    cfree (unix_path_name);
+    cfree ((void *) unix_path_name);
   if (win32_path_name != NULL)
-    cfree (win32_path_name);
+    cfree ((void *) win32_path_name);
   if (rabuf)
     free (rabuf);
   unix_path_name = win32_path_name = NULL;

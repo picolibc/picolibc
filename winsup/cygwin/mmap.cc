@@ -251,7 +251,7 @@ mmap_record::alloc_fh ()
      the call to fork(). This requires creating a fhandler
      of the correct type to be sure to call the method of the
      correct class. */
-  return cygheap->fdtab.build_fhandler (-1, get_device (), NULL);
+  return cygheap->fdtab.build_fhandler (-1, get_device ());
 }
 
 void

@@ -134,7 +134,6 @@ class path_conv
   		unit (0), fileattr (INVALID_FILE_ATTRIBUTES),
 		normalized_path (NULL) {path[0] = '\0';}
 
-  ~path_conv ();
   inline char *get_win32 () { return path; }
   operator char *() {return path;}
   operator const char *() {return path;}
@@ -147,7 +146,7 @@ class path_conv
   DWORD get_drive_type () {return fs.drive_type;}
   BOOL fs_fast_ea () {return fs.sym_opt & PC_CHECK_EA;}
   void set_path (const char *p) {strcpy (path, p);}
-  void clear_normalized_path ();
+  char *return_and_clear_normalized_path ();
 };
 
 /* Symlink marker */

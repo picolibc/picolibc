@@ -775,10 +775,10 @@ void
 fhandler_cygdrive::set_drives ()
 {
   const int len = 1 + 26 * DRVSZ;
-  win32_path_name = (char *) crealloc (win32_path_name, len);
+  char *p = (char *) crealloc ((void *) win32_path_name, len);
 
-  ndrives = GetLogicalDriveStrings (len, win32_path_name) / DRVSZ;
-  pdrive = win32_path_name;
+  win32_path_name = pdrive = p;
+  ndrives = GetLogicalDriveStrings (len, p) / DRVSZ;
 }
 
 int

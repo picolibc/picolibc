@@ -1,3 +1,32 @@
+2002-05-24  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::build_fhandler_from_name): Just pass posix path
+	along to set_name via return_and_clear_normalized_path.
+	(dtable::build_fhandler): New method with const char * argument.
+	(dtable::reset_unix_path_name): Eliminate.
+	(dtable::dup_worker): Use correct build_fhandler method.
+	* mmap.cc (mmap_record::alloc_fh): Ditto.
+	* dtable.h (dtable::build_fhandler): New method.
+	(dtable::reset_unix_path_name): Eliminate.
+	* fhandler.cc (fhandler_base::set_name): Assume that unix_name has
+	already been cmalloced.
+	(fhandler_base::reset_unix_path_name): Eliminate.
+	(fhandler_base::~fhandler_base): Coercion for cfree.
+	* fhandler.h (fhandler_base::unix_path_name): Make const char *.
+	(fhandler_base::win32_path_name): Ditto.
+	(fhandler_base::reset_unix_path_name): Eliminate.
+	* fhandler_disk_file.cc (fhandler_cygdrive::set_drives): Accommodate
+	const char *ness of win32_path_name.
+	* fhandler_socket.cc (fhandler_socket::fstat): Accommodate new set_name
+	requirements.
+	* path.cc (path_conv::return_and_clear_normalized_path): New method.
+	(path_conv::clear_normalized_path): Eliminate.
+	(path_conv::~path_conv): Ditto.
+	(path_conv::check): Accommodate new build_fhandler method.
+	* path.h (path_conv::~path_conv): Eliminate.
+	(path_conv::clear_normalized_path): Ditto.
+	(path_conv::return_and_clear_normalized_path): Declare new method.
+
 2002-05-23  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (path_conv::check): Make sure any trailing path component is

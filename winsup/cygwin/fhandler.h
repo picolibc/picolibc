@@ -149,15 +149,13 @@ class fhandler_base
   size_t raixput;
   size_t rabuflen;
 
-  char *unix_path_name;
-  char *win32_path_name;
+  const char *unix_path_name;
+  const char *win32_path_name;
   DWORD open_status;
 
  public:
-  void set_name (const char * unix_path, const char * win32_path = NULL,
-		 int unit = 0);
+  void set_name (const char * unix_path, const char *win32_path = NULL, int unit = 0);
 
-  void reset_unix_path_name (const char *);
   virtual fhandler_base& operator =(fhandler_base &x);
   fhandler_base (DWORD dev, int unit = 0);
   virtual ~fhandler_base ();

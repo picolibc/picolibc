@@ -366,20 +366,12 @@ fs_info::update (const char *win32_path)
   return true;
 }
 
-void
-path_conv::clear_normalized_path ()
+char *
+path_conv::return_and_clear_normalized_path ()
 {
-  // not thread safe
-  if (normalized_path)
-    {
-      cfree (normalized_path);
-      normalized_path = NULL;
-    }
-}
-
-path_conv::~path_conv ()
-{
-  clear_normalized_path ();
+  char *s = normalized_path;
+  normalized_path = NULL;
+  return s;
 }
 
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
@@ -520,7 +512,7 @@ path_conv::check (const char *src, unsigned opt,
             {
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
               fhandler_virtual *fh =
-                (fhandler_virtual *) cygheap->fdtab.build_fhandler (-1, devn, path_copy, NULL, unit);
+                (fhandler_virtual *) cygheap->fdtab.build_fhandler (-1, devn, (const char *) path_copy, NULL, unit);
               int file_type = fh->exists ();
               switch (file_type)
                 {
@@ -731,7 +723,6 @@ out:
 	*tail = '/';
       normalized_path = cstrdup (path_copy);
       debug_printf ("path_copy %s", path_copy);
-      opt ^= PC_POSIX;
     }
   /* Deal with Windows stupidity which considers filename\. to be valid
      even when "filename" is not a directory. */
