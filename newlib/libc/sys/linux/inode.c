@@ -11,7 +11,7 @@
 #include <linux/dirent.h>
 #include <machine/syscall.h>
 
-#define _LIBC
+#define _LIBC 1
 #include <sys/lock.h>
 
 __LOCK_INIT(static, umask_lock);

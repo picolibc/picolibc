@@ -14,3 +14,7 @@ _syscall2(int,munlock,const void *,addr,size_t,len);
 _syscall3(int,mprotect,void *,addr,size_t,len,int,prot);
 _syscall3(int,msync,void *,addr,size_t,len,int,flags);
 _syscall4(void *,mremap,void *,addr,size_t,oldlen,size_t,newlen,int,maymove);
+
+weak_alias(__libc_mmap,__mmap)
+weak_alias(__libc_munmap,__munmap)
+weak_alias(__libc_mremap,__mremap)

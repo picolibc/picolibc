@@ -1,3 +1,61 @@
+2002-07-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/sys/linux/Makefile.am: Add new files.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/bp-sym.h: Moved to include directory.
+        * libc/sys/linux/mmap.c: Add weak aliases: __mmap, __munmap, __mremap.
+        * libc/sys/linux/inode.c: Set _LIBC to 1.
+        * libc/sys/linux/mq_close.c: Ditto.
+        * libc/sys/linux/mq_getattr.c: Ditto.
+        * libc/sys/linux/mq_open.c: Ditto.
+        * libc/sys/linux/mq_receive.c: Ditto.
+        * libc/sys/linux/mq_send.c: Ditto.
+        * libc/sys/linux/mq_setattr.c: Ditto.
+        * libc/sys/linux/mq_unlink.c: Ditto.
+        * libc/sys/linux/calloc.c: New file.
+        * libc/sys/linux/callocr.c: Ditto.
+        * libc/sys/linux/cfreer.c: Ditto.
+        * libc/sys/linux/config.h: Ditto.
+        * libc/sys/linux/free.c: Ditto.
+        * libc/sys/linux/freer.c: Ditto.
+        * libc/sys/linux/msize.c: Ditto.
+        * libc/sys/linux/msizer.c: Ditto.
+        * libc/sys/linux/mstats.c: Ditto.
+        * libc/sys/linux/mtrim.c: Ditto.
+        * libc/sys/linux/mtrimr.c: Ditto.
+        * libc/sys/linux/pvallocr.c: Ditto.
+        * libc/sys/linux/realloc.c: Ditto.
+        * libc/sys/linux/reallocr.c: Ditto.
+        * libc/sys/linux/thread-m.h: Ditto.
+        * libc/sys/linux/vallocr.c: Ditto.
+        * libc/sys/linux/bp-checks.h: Ditto.
+        * libc/sys/linux/libc-symbols.h: Ditto.
+        * libc/sys/linux/libc-tsd.h: Ditto.
+        * libc/sys/linux/libintl.h: Ditto.
+        * libc/sys/linux/malign.c: Ditto.
+        * libc/sys/linux/malignr.c: Ditto.
+        * libc/sys/linux/mallinfor.c: Ditto.
+        * libc/sys/linux/malloc.c: Ditto.
+        * libc/sys/linux/mallocr.c: Ditto.
+        * libc/sys/linux/malloptr.c: Ditto.
+        * libc/sys/linux/mallstatsr.c: Ditto.
+        * libc/sys/linux/mcheck.c: Ditto.
+        * libc/sys/linux/mhooks.h: Ditto.
+        * libc/sys/linux/include/bp-sym.h: Ditto.
+        * libc/sys/linux/include/malloc.h: Ditto.
+        * libc/sys/linux/include/mcheck.h: Ditto.
+        * libc/sys/linux/linuxthreads/machine/i386/Makefile.am: Remove
+        getpagesize.c.
+        * libc/sys/linux/linuxthreads/machine/i386/Makefile.in: Regenerated.
+        * libc/sys/linux/linuxthreads/machine/i386/getpagesize.c: Moved.
+        * libc/sys/linux/machine/i386/getpagesize.c: New file.
+        * libc/sys/linux/machine/i386/Makefile.am: Add getpagesize.c.
+        * libc/sys/linux/machine/i386/Makefile.in: Regenerated.
+        * libc/sys/linux/machine/i386/sysdep.h: New file.
+        * libc/sys/linux/machine/i386/weakalias.h: Add weak_function support.
+        * libc/sys/linux/sys/dirent.h: Set _LIBC to 1.
+        * libc/sys/linux/sys/lock.h: Include <machine/weakalias.h>.
+
 2002-07-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/include/mqueue.h: Change to use <bits/siginfo.h>

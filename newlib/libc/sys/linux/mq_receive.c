@@ -6,7 +6,7 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <string.h>
-#define _LIBC
+#define _LIBC 1
 #include <sys/lock.h>
 #undef _LIBC
 

@@ -8,7 +8,7 @@
 
 #include <sys/types.h>
 #include <linux/dirent.h>
-#define _LIBC
+#define _LIBC 1
 #include <sys/lock.h>
 #undef _LIBC
 

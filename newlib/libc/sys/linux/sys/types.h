@@ -147,4 +147,36 @@ typedef	long	fd_mask;
 typedef __uint32_t uintptr_t;
 typedef __int32_t intptr_t;
 
+#if !defined(_ANSI_SOURCE) && !defined(_POSIX_SOURCE)
+typedef	struct _physadr {
+	int	r[1];
+} *physadr;
+
+typedef	struct label_t {
+	int	val[6];
+} label_t;
+#endif
+
+typedef	unsigned int	vm_offset_t;
+typedef	__int64_t	vm_ooffset_t;
+typedef	unsigned int	vm_pindex_t;
+typedef	unsigned int	vm_size_t;
+
+typedef	__int32_t	register_t;
+typedef	__uint32_t	u_register_t;
+
+#ifdef _KERNEL
+typedef	int		intfptr_t;
+typedef	unsigned int	uintfptr_t;
+#endif
+
+/* Critical section value */
+typedef	register_t	critical_t;
+
+/* Interrupt mask (spl, xxx_imask, etc) */
+typedef	__uint32_t	intrmask_t;
+
+/* Interrupt handler function type. */
+typedef	void		ointhand2_t(int _device_id);
+
 #endif

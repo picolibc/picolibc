@@ -12,11 +12,16 @@ SUBLIBS = \
 LIB_SOURCES = \
 	aio.c \
 	brk.c \
+	calloc.c \
+	callocr.c \
+	cfreer.c \
 	cfspeed.c \
 	clock_getres.c \
 	clock_gettime.c \
 	clock_settime.c \
 	flockfile.c \
+	free.c \
+	freer.c \
 	ftok.c \
 	funlockfile.c \
 	getdate.c \
@@ -30,6 +35,12 @@ LIB_SOURCES = \
 	io64.c \
 	ipc.c \
 	linux.c \
+	malign.c \
+	malignr.c \
+	mallinfor.c \
+	mallocr.c \
+	malloptr.c \
+	mallstatsr.c \
 	mmap.c \
 	mq_close.c \
 	mq_getattr.c \
@@ -39,14 +50,22 @@ LIB_SOURCES = \
 	mq_send.c \
 	mq_setattr.c \
 	mq_unlink.c \
+	msize.c \
+	msizer.c \
+	mstats.c \
+	mtrim.c \
+	mtrimr.c \
 	ntp_gettime.c \
 	pread.c \
 	pread64.c \
 	process.c \
 	psignal.c \
+	pvallocr.c \
 	pwrite.c \
 	pwrite64.c \
 	raise.c \
+	realloc.c \
+	reallocr.c \
 	realpath.c \
 	rename.c \
 	resource.c \
@@ -77,6 +96,7 @@ LIB_SOURCES = \
 	time.c \
 	usleep.c \
 	utimes.c \
+	vallocr.c \
 	wait.c
 
 # This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)
@@ -86,6 +106,8 @@ SIGNAL_H = /usr/src/$(shell ls /usr/src/ | grep ^linux | head -n 1)/include/asm/
 liblinux_la_LDFLAGS = -Xcompiler -nostdlib
 
 ADD_OBJS = \
+	malloc.$(oext) \
+	mcheck.$(oext) \
 	$(LINUX_MACH_LIB)
 
 if USE_LIBTOOL
@@ -93,12 +115,14 @@ noinst_LTLIBRARIES = liblinux.la
 liblinux_la_SOURCES = $(LIB_SOURCES)
 liblinux_la_LIBADD = $(ADD_OBJS)
 liblinux_la_DEPENDENCIES = $(ADD_OBJS)
+LIBC_COMPILE = $(LTCOMPILE)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
 lib_a_LIBADD = $(ADD_OBJS)
 lib_a_DEPENDENCIES = $(ADD_OBJS)
+LIBC_COMPILE = $(COMPILE)
 noinst_DATA =
 
 lib.a:  $(ADD_OBJS) $(lib_a_OBJECTS)
@@ -126,6 +150,11 @@ crt0.o: machine/crt0.o
 
 machine/crt0.o: ; @true
 
+malloc.$(oext): $(srcdir)/malloc.c
+	$(LIBC_COMPILE) -D_LIBC=1 -c $< -o $@
+
+mcheck.$(oext): $(srcdir)/mcheck.c
+	$(LIBC_COMPILE) -D_LIBC=1 -c $< -o $@
 
 sig.$(oext):	siglist.inc
 
