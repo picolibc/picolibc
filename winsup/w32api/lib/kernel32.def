@@ -7,6 +7,8 @@ AddConsoleAliasA@12
 AddConsoleAliasW@12
 AddLocalAlternateComputerNameA@8
 AddLocalAlternateComputerNameW@8
+AddRefActCtx@4
+AddVectoredExceptionHandler@8
 AllocConsole@0
 AllocateUserPhysicalPages@12
 AreFileApisANSI@0
@@ -55,6 +57,8 @@ CopyFileA@12
 CopyFileW@12
 CopyFileExA@24
 CopyFileExW@24
+CreateActCtxA@4
+CreateActCtxW@4
 CreateConsoleScreenBuffer@20
 CreateDirectoryA@8
 CreateDirectoryExA@12
@@ -586,6 +590,7 @@ Process32NextW@8
 ProcessIdToSessionId@8
 PulseEvent@4
 PurgeComm@8
+QueryActCtxW@28
 QueryDosDeviceA@12
 QueryDosDeviceW@12
 QueryInformationJobObject@20
@@ -650,6 +655,8 @@ SetCommState@8
 SetCommTimeouts@8
 SetComputerNameA@4
 SetComputerNameW@4
+SetComputerNameExA@8
+SetComputerNameExW@8
 SetConsoleActiveScreenBuffer@4
 SetConsoleCP@4
 SetConsoleCommandHistoryMode@4
@@ -681,6 +688,8 @@ SetCurrentDirectoryA@4
 SetCurrentDirectoryW@4
 SetDefaultCommConfigA@12
 SetDefaultCommConfigW@12
+SetDllDirectoryA@4
+SetDllDirectoryW@4
 SetEndOfFile@4
 SetEnvironmentVariableA@8
 SetEnvironmentVariableW@8
@@ -692,7 +701,10 @@ SetFileAttributesA@8
 SetFileAttributesW@8
 SetFilePointer@16
 SetFilePointerEx@20
+SetFileShortNameA@8
+SetFileShortNameW@8
 SetFileTime@16
+SetFileValidData@12
 SetHandleCount@4
 SetHandleInformation@12
 SetInformationJobObject@16
@@ -763,12 +775,14 @@ UnlockFileEx@20
 UnmapViewOfFile@4
 UnmapViewOfFileVlm@4
 UnregisterWait@4
+UnregisterWaitEx@8
 UpdateResourceA@24
 UpdateResourceW@24
 VDMConsoleOperation@8
 VDMOperationStarted@4
 VerLanguageNameA@12
 VerLanguageNameW@12
+VerSetConditionMask@13
 VerifyConsoleIoHandle@4
 VerifyVersionInfoA@16
 VerifyVersionInfoW@16
@@ -825,6 +839,7 @@ WriteProfileSectionW@8
 WriteProfileStringA@12
 WriteProfileStringW@12
 WriteTapemark@16
+ZombifyActCtx@4
 _hread@12
 _hwrite@12
 _lclose@4

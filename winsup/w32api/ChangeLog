@@ -1,4 +1,49 @@
-2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+2003-10-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0500] (SetComputerNameEx[AW],
+	UnregisterWaitEx): Add functions.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0500]
+	(AddVectoredExceptionHandler, RemoveVectoredExceptionHandler): Add
+	or guard function. The MSDN says it is available on Windows XP and
+	better, and then it says it is declared for _WIN32_WINNT >= 0x0500.
+	Huh?
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501] (AddRefActCtx,
+	CreateActCtx[AW], SetFileShortName[AW], SetFileValidData,
+	ZombifyActCtx, QueryActCtxW): Add functions.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501]
+	(QUERY_ACTCTX_FLAG_USE_ACTIVE_ACTCTX,
+	QUERY_ACTCTX_FLAG_ACTCTX_IS_HMODULE,
+	QUERY_ACTCTX_FLAG_ACTCTX_IS_ADDRESS): Add constants.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0502] (SetDllDirectory[AW],
+	SetFirmwareEnvironmentVariable[AW]): Add functions.
+
+	* include/winnt.h [_WIN32_WINNT >= 0x0500] (VER_BUILDNUMBER,
+	VER_MAJORVERSION, VER_MINORVERSION, VER_PLATFORMID,
+	VER_SERVICEPACKMAJOR, VER_SERVICEPACKMINOR, VER_SUITENAME,
+	VER_PRODUCT_TYPE, VER_EQUAL, VER_GREATER, VER_GREATER_EQUAL,
+	VER_LESS, VER_LESS_EQUAL, VER_AND, VER_OR): Add constants.
+
+	* include/winnt.h [_WIN32_WINNT >= 0x0501]
+	(PVECTORED_EXCEPTION_HANDLER): Add callback.
+
+	* include/winnt.h [_WIN32_WINNT >= 0x0501]
+	(ACTIVATION_CONTEXT_INFO_CLASS,
+	ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION,
+	ACTIVATION_CONTEXT_DETAILED_INFORMATION,
+	ACTIVATION_CONTEXT_QUERY_INDEX, ASSEMBLY_FILE_DETAILED_INFORMATION):
+	Add structures.
+
+	* lib/user32.def (AddRefActCtx, AddVectoredExceptionHandler,
+	CreateActCtx[AW], SetComputerNameEx[AW], SetDllDirectory[AW],
+	SetFileShortName[AW], SetFileValidData,
+	SetFirmwareEnvironmentVariable[AW], UnregisterWaitEx,
+	VerSetConditionMask, ZombifyActCtx, QueryActCtxW): Add functions.
+
+2003-10-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winbase.h (GetWriteWatch, IsSystemResumeAutomatic,
 	ResetWriteWatch): Add function.
@@ -35,7 +80,7 @@
 	RemoveVectoredExceptionHandler, ReplaceFile[AW], ResetWriteWatch,
 	RestoreLastError): Add functions.
 
-2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+2003-10-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winbase.h [_WIN32_WINNT >= 0x0500] (GetComputerNameEx[AW],
 	GetProcessIoCounters): Add functions.
@@ -71,7 +116,7 @@
 	GetNativeSystemInfo, GetProcessHandleCount, GetProcessIoCounters):
 	Add functions.
 
-2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+2003-10-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winbase.h [_WIN32_WINNT >= 0x0501]
 	(CheckRemoteDebuggerPresent, DebugActiveProcessStop, DebugBreakProcess,

@@ -1250,6 +1250,23 @@ typedef DWORD FLONG;
 #define TAPE_LOCK 3
 #define TAPE_UNLOCK 4
 #define TAPE_FORMAT 5
+#if (_WIN32_WINNT >= 0x0500)
+#define VER_MINORVERSION 0x0000001
+#define VER_MAJORVERSION 0x0000002
+#define VER_BUILDNUMBER 0x0000004
+#define VER_PLATFORMID 0x0000008
+#define VER_SERVICEPACKMINOR 0x0000010
+#define VER_SERVICEPACKMAJOR 0x0000020
+#define VER_SUITENAME 0x0000040
+#define VER_PRODUCT_TYPE 0x0000080
+#define VER_EQUAL 1
+#define VER_GREATER 2
+#define VER_GREATER_EQUAL 3
+#define VER_LESS 4
+#define VER_LESS_EQUAL 5
+#define VER_AND 6
+#define VER_OR 7
+#endif
 #define VER_PLATFORM_WIN32s 0
 #define VER_PLATFORM_WIN32_WINDOWS 1
 #define VER_PLATFORM_WIN32_NT 2
@@ -2058,7 +2075,8 @@ typedef enum tagTOKEN_TYPE {
 	TokenImpersonation
 } TOKEN_TYPE,*PTOKEN_TYPE;
 #if (_WIN32_WINNT >= 0x0501)
-typedef enum {
+typedef LONG (WINAPI *PVECTORED_EXCEPTION_HANDLER)(PEXCEPTION_POINTERS);
+typedef enum _HEAP_INFORMATION_CLASS {
 	HeapCompatibilityInformation
 } HEAP_INFORMATION_CLASS;
 #endif
@@ -3155,8 +3173,66 @@ typedef struct _SYSTEM_POWER_INFORMATION {
 	ULONG  Idleness;
 	ULONG  TimeRemaining;
 	UCHAR  CoolingMode;
-} SYSTEM_POWER_INFORMATION, *PSYSTEM_POWER_INFORMATION;
+} SYSTEM_POWER_INFORMATION,*PSYSTEM_POWER_INFORMATION;
 #endif
+
+#if (WIN32_WINNT >= 0x0501)
+typedef enum _ACTIVATION_CONTEXT_INFO_CLASS {
+	ActivationContextBasicInformation = 1,
+	ActivationContextDetailedInformation,
+	AssemblyDetailedInformationInActivationContext,
+	FileInformationInAssemblyOfAssemblyInActivationContext
+} ACTIVATION_CONTEXT_INFO_CLASS;
+typedef struct _ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION {
+	DWORD ulFlags;
+	DWORD ulEncodedAssemblyIdentityLength;
+	DWORD ulManifestPathType;
+	DWORD ulManifestPathLength;
+	LARGE_INTEGER liManifestLastWriteTime;
+	DWORD ulPolicyPathType;
+	DWORD ulPolicyPathLength;
+	LARGE_INTEGER liPolicyLastWriteTime;
+	DWORD ulMetadataSatelliteRosterIndex;
+	DWORD ulManifestVersionMajor;
+	DWORD ulManifestVersionMinor;
+	DWORD ulPolicyVersionMajor;
+	DWORD ulPolicyVersionMinor;
+	DWORD ulAssemblyDirectoryNameLength;
+	PCWSTR lpAssemblyEncodedAssemblyIdentity;
+	PCWSTR lpAssemblyManifestPath;
+	PCWSTR lpAssemblyPolicyPath;
+	PCWSTR lpAssemblyDirectoryName;
+} ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION,*PACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION;
+typedef const ACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION *PCACTIVATION_CONTEXT_ASSEMBLY_DETAILED_INFORMATION;
+typedef struct _ACTIVATION_CONTEXT_DETAILED_INFORMATION {
+	DWORD dwFlags;
+	DWORD ulFormatVersion;
+	DWORD ulAssemblyCount;
+	DWORD ulRootManifestPathType;
+	DWORD ulRootManifestPathChars;
+	DWORD ulRootConfigurationPathType;
+	DWORD ulRootConfigurationPathChars;
+	DWORD ulAppDirPathType;
+	DWORD ulAppDirPathChars;
+	PCWSTR lpRootManifestPath;
+	PCWSTR lpRootConfigurationPath;
+	PCWSTR lpAppDirPath;
+} ACTIVATION_CONTEXT_DETAILED_INFORMATION,*PACTIVATION_CONTEXT_DETAILED_INFORMATION;
+typedef const ACTIVATION_CONTEXT_DETAILED_INFORMATION *PCACTIVATION_CONTEXT_DETAILED_INFORMATION;
+typedef struct _ACTIVATION_CONTEXT_QUERY_INDEX {
+	ULONG ulAssemblyIndex;
+	ULONG ulFileIndexInAssembly;
+} ACTIVATION_CONTEXT_QUERY_INDEX,*PACTIVATION_CONTEXT_QUERY_INDEX;
+typedef const ACTIVATION_CONTEXT_QUERY_INDEX *PCACTIVATION_CONTEXT_QUERY_INDEX;
+typedef struct _ASSEMBLY_FILE_DETAILED_INFORMATION {
+	DWORD ulFlags;
+	DWORD ulFilenameLength;
+	DWORD ulPathLength;
+	PCWSTR lpFileName;
+	PCWSTR lpFilePath;
+} ASSEMBLY_FILE_DETAILED_INFORMATION,*PASSEMBLY_FILE_DETAILED_INFORMATION;
+typedef const ASSEMBLY_FILE_DETAILED_INFORMATION *PCASSEMBLY_FILE_DETAILED_INFORMATION;
+#endif /* (WIN32_WINNT >= 0x0501) */
 
 typedef struct _PROCESSOR_POWER_POLICY_INFO {
 	ULONG  TimeCheck;

@@ -524,7 +524,10 @@ extern "C" {
 #define ACTCTX_FLAG_HMODULE_VALID 0x00000080
 #define DEACTIVATE_ACTCTX_FLAG_FORCE_EARLY_DEACTIVATION 0x00000001
 #define FIND_ACTCTX_SECTION_KEY_RETURN_HACTCTX 0x00000001
-#endif
+#define QUERY_ACTCTX_FLAG_USE_ACTIVE_ACTCTX 0x00000004
+#define QUERY_ACTCTX_FLAG_ACTCTX_IS_HMODULE 0x00000008
+#define QUERY_ACTCTX_FLAG_ACTCTX_IS_ADDRESS 0x00000010
+#endif /* (_WIN32_WINNT >= 0x0501) */
 #if (_WIN32_WINNT >= 0x0500)
 #define REPLACEFILE_WRITE_THROUGH 0x00000001
 #define REPLACEFILE_IGNORE_MERGE_ERRORS 0x00000002
@@ -994,7 +997,7 @@ typedef enum {
 	LowMemoryResourceNotification ,
 	HighMemoryResourceNotification
 } MEMORY_RESOURCE_NOTIFICATION_TYPE;
-#endif / (_WIN32_WINNT >= 0x0501) */
+#endif /* (_WIN32_WINNT >= 0x0501) */
 #if (_WIN32_WINNT >= 0x0500)
 typedef enum _COMPUTER_NAME_FORMAT {
 	ComputerNameNetBIOS, 
@@ -1007,7 +1010,7 @@ typedef enum _COMPUTER_NAME_FORMAT {
 	ComputerNamePhysicalDnsFullyQualified, 
 	ComputerNameMax
 } COMPUTER_NAME_FORMAT;
-#endif / (_WIN32_WINNT >= 0x0500) */
+#endif /* (_WIN32_WINNT >= 0x0500) */
 
 typedef DWORD(WINAPI *LPPROGRESS_ROUTINE)(LARGE_INTEGER,LARGE_INTEGER,LARGE_INTEGER,LARGE_INTEGER,DWORD,DWORD,HANDLE,HANDLE,LPVOID);
 typedef void(WINAPI *LPFIBER_START_ROUTINE)(PVOID);
@@ -1055,6 +1058,12 @@ BOOL WINAPI AddAce(PACL,DWORD,DWORD,PVOID,DWORD);
 ATOM WINAPI AddAtomA(LPCSTR);
 ATOM WINAPI AddAtomW(LPCWSTR);
 BOOL WINAPI AddAuditAccessAce(PACL,DWORD,DWORD,PSID,BOOL,BOOL);
+#if (_WIN32_WINNT >= 0x0501)
+void WINAPI AddRefActCtx(HANDLE);
+#endif
+#if (_WIN32_WINNT >= 0x0500)
+PVOID WINAPI AddVectoredExceptionHandler(ULONG,PVECTORED_EXCEPTION_HANDLER);
+#endif
 BOOL WINAPI AdjustTokenGroups(HANDLE,BOOL,PTOKEN_GROUPS,DWORD,PTOKEN_GROUPS,PDWORD);
 BOOL WINAPI AdjustTokenPrivileges(HANDLE,BOOL,PTOKEN_PRIVILEGES,DWORD,PTOKEN_PRIVILEGES,PDWORD);
 BOOL WINAPI AllocateAndInitializeSid(PSID_IDENTIFIER_AUTHORITY,BYTE,DWORD,DWORD,DWORD,DWORD,DWORD,DWORD,DWORD,DWORD,PSID*);
@@ -1112,6 +1121,10 @@ BOOL WINAPI CopyFileExW(LPCWSTR,LPCWSTR,LPPROGRESS_ROUTINE,LPVOID,LPBOOL,DWORD);
 #define FillMemory RtlFillMemory
 #define ZeroMemory RtlZeroMemory
 BOOL WINAPI CopySid(DWORD,PSID,PSID);
+#if (_WIN32_WINNT >= 0x0501)
+HANDLE WINAPI CreateActCtxA(PCACTCTXA);
+HANDLE WINAPI CreateActCtxW(PCACTCTXW);
+#endif
 BOOL WINAPI CreateDirectoryA(LPCSTR,LPSECURITY_ATTRIBUTES);
 BOOL WINAPI CreateDirectoryW(LPCWSTR,LPSECURITY_ATTRIBUTES);
 BOOL WINAPI CreateDirectoryExA(LPCSTR,LPCSTR,LPSECURITY_ATTRIBUTES);
@@ -1695,6 +1708,9 @@ BOOL WINAPI ProcessIdToSessionId(DWORD,DWORD*);
 #endif
 BOOL WINAPI PulseEvent(HANDLE);
 BOOL WINAPI PurgeComm(HANDLE,DWORD);
+#if (_WIN32_WINNT >= 0x0501)
+BOOL WINAPI QueryActCtxW(DWORD,HANDLE,PVOID,ULONG,PVOID,SIZE_T,SIZE_T*);
+#endif
 DWORD WINAPI QueryDosDeviceA(LPCSTR,LPSTR,DWORD);
 DWORD WINAPI QueryDosDeviceW(LPCWSTR,LPWSTR,DWORD);
 #if (_WIN32_WINNT >= 0x0501)
@@ -1720,7 +1736,7 @@ BOOL WINAPI ReleaseMutex(HANDLE);
 BOOL WINAPI ReleaseSemaphore(HANDLE,LONG,LPLONG);
 BOOL WINAPI RemoveDirectoryA(LPCSTR);
 BOOL WINAPI RemoveDirectoryW(LPCWSTR);
-#if (_WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0500)
 ULONG WINAPI RemoveVectoredExceptionHandler(PVOID);
 #endif
 #if (_WIN32_WINNT >= 0x0500)
@@ -1746,10 +1762,18 @@ BOOL WINAPI SetCommState(HANDLE,LPDCB);
 BOOL WINAPI SetCommTimeouts(HANDLE,LPCOMMTIMEOUTS);
 BOOL WINAPI SetComputerNameA(LPCSTR);
 BOOL WINAPI SetComputerNameW(LPCWSTR);
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI SetComputerNameExA(COMPUTER_NAME_FORMAT,LPCSTR);
+BOOL WINAPI SetComputerNameExW(COMPUTER_NAME_FORMAT,LPCWSTR);
+#endif
 BOOL WINAPI SetCurrentDirectoryA(LPCSTR);
 BOOL WINAPI SetCurrentDirectoryW(LPCWSTR);
 BOOL WINAPI SetDefaultCommConfigA(LPCSTR,LPCOMMCONFIG,DWORD);
 BOOL WINAPI SetDefaultCommConfigW(LPCWSTR,LPCOMMCONFIG,DWORD);
+#if (_WIN32_WINNT >= 0x0502)
+BOOL WINAPI SetDllDirectoryA(LPCSTR);
+BOOL WINAPI SetDllDirectoryW(LPCWSTR);
+#endif
 BOOL WINAPI SetEndOfFile(HANDLE);
 BOOL WINAPI SetEnvironmentVariableA(LPCSTR,LPCSTR);
 BOOL WINAPI SetEnvironmentVariableW(LPCWSTR,LPCWSTR);
@@ -1763,7 +1787,18 @@ DWORD WINAPI SetFilePointer(HANDLE,LONG,PLONG,DWORD);
 BOOL WINAPI SetFilePointerEx(HANDLE,LARGE_INTEGER,PLARGE_INTEGER,DWORD);
 BOOL WINAPI SetFileSecurityA(LPCSTR,SECURITY_INFORMATION,PSECURITY_DESCRIPTOR);
 BOOL WINAPI SetFileSecurityW(LPCWSTR,SECURITY_INFORMATION,PSECURITY_DESCRIPTOR);
+#if (_WIN32_WINNT >= 0x0501)
+BOOL WINAPI SetFileShortNameA(HANDLE,LPCSTR);
+BOOL WINAPI SetFileShortNameW(HANDLE,LPCWSTR);
+#endif
 BOOL WINAPI SetFileTime(HANDLE,const FILETIME*,const FILETIME*,const FILETIME*);
+#if (_WIN32_WINNT >= 0x0501)
+BOOL WINAPI SetFileValidData(HANDLE,LONGLONG);
+#endif
+#if (_WIN32_WINNT >= 0x0502)
+BOOL WINAPI SetFirmwareEnvironmentVariableA(LPCSTR,LPCSTR,PVOID,DWORD);
+BOOL WINAPI SetFirmwareEnvironmentVariableW(LPCWSTR,LPCWSTR,PVOID,DWORD);
+#endif
 UINT WINAPI SetHandleCount(UINT);
 BOOL WINAPI SetHandleInformation(HANDLE,DWORD,DWORD);
 BOOL WINAPI SetKernelObjectSecurity(HANDLE,SECURITY_INFORMATION,PSECURITY_DESCRIPTOR);
@@ -1831,6 +1866,9 @@ BOOL WINAPI UnlockFileEx(HANDLE,DWORD,DWORD,DWORD,LPOVERLAPPED);
 #define UnlockResource(h) (h)
 #define UnlockSegment(w) GlobalUnfix((HANDLE)(w)) /* Obsolete: Has no effect. */
 BOOL WINAPI UnmapViewOfFile(PVOID);
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI UnregisterWaitEx(HANDLE,HANDLE);
+#endif
 BOOL WINAPI UpdateResourceA(HANDLE,LPCSTR,LPCSTR,WORD,PVOID,DWORD);
 BOOL WINAPI UpdateResourceW(HANDLE,LPCWSTR,LPCWSTR,WORD,PVOID,DWORD);
 BOOL WINAPI VerifyVersionInfoA(LPOSVERSIONINFOEXA,DWORD,DWORDLONG);
@@ -1870,6 +1908,9 @@ BOOL WINAPI WriteProfileStringA(LPCSTR,LPCSTR,LPCSTR);
 BOOL WINAPI WriteProfileStringW(LPCWSTR,LPCWSTR,LPCWSTR);
 DWORD WINAPI WriteTapemark(HANDLE,DWORD,DWORD,BOOL);
 #define Yield()
+#if (_WIN32_WINNT >= 0x0501)
+BOOL WINAPI ZombifyActCtx(HANDLE);
+#endif
 #if (_WIN32_WINNT >= 0x0500)
 BOOL WINAPI AllocateUserPhysicalPages(HANDLE,PULONG_PTR,PULONG_PTR);
 BOOL WINAPI FreeUserPhysicalPages(HANDLE,PULONG_PTR,PULONG_PTR);
@@ -1899,6 +1940,9 @@ typedef PCACTCTXW PCACTCTX;
 #define CommConfigDialog CommConfigDialogW
 #define CopyFile CopyFileW
 #define CopyFileEx CopyFileExW
+#if (_WIN32_WINNT >= 0x0501)
+#define CreateActCtx CreateActCtxW
+#endif
 #define CreateDirectory CreateDirectoryW
 #define CreateDirectoryEx CreateDirectoryExW
 #define CreateEvent CreateEventW
@@ -2048,9 +2092,18 @@ typedef PCACTCTXW PCACTCTX;
 #define SetComputerName SetComputerNameW
 #define SetCurrentDirectory SetCurrentDirectoryW
 #define SetDefaultCommConfig SetDefaultCommConfigW
+#if (_WIN32_WINNT >= 0x0502)
+#define SetDllDirectory SetDllDirectoryW
+#endif
 #define SetEnvironmentVariable SetEnvironmentVariableW
 #define SetFileAttributes SetFileAttributesW
 #define SetFileSecurity SetFileSecurityW
+#if (_WIN32_WINNT >= 0x0501)
+#define SetFileShortName SetFileShortNameW
+#endif
+#if (_WIN32_WINNT >= 0x0502)
+#define SetFirmwareEnvironmentVariable SetFirmwareEnvironmentVariableW
+#endif
 #define SetVolumeLabel SetVolumeLabelW
 #define SetVolumeMountPoint SetVolumeMountPointW
 #define UpdateResource UpdateResourceW
@@ -2083,6 +2136,9 @@ typedef PCACTCTXA PCACTCTX;
 #define CommConfigDialog CommConfigDialogA
 #define CopyFile CopyFileA
 #define CopyFileEx CopyFileExA
+#if (_WIN32_WINNT >= 0x0501)
+#define CreateActCtx CreateActCtxA
+#endif
 #define CreateDirectory CreateDirectoryA
 #define CreateDirectoryEx CreateDirectoryExA
 #define CreateEvent CreateEventA
@@ -2231,9 +2287,18 @@ typedef PCACTCTXA PCACTCTX;
 #define SetComputerName SetComputerNameA
 #define SetCurrentDirectory SetCurrentDirectoryA
 #define SetDefaultCommConfig SetDefaultCommConfigA
+#if (_WIN32_WINNT >= 0x0502)
+#define SetDllDirectory SetDllDirectoryA
+#endif
 #define SetEnvironmentVariable SetEnvironmentVariableA
 #define SetFileAttributes SetFileAttributesA
 #define SetFileSecurity SetFileSecurityA
+#if (_WIN32_WINNT >= 0x0501)
+#define SetFileShortName SetFileShortNameA
+#endif
+#if (_WIN32_WINNT >= 0x0502)
+#define SetFirmwareEnvironmentVariable SetFirmwareEnvironmentVariableA
+#endif
 #define SetVolumeLabel SetVolumeLabelA
 #define SetVolumeMountPoint SetVolumeMountPointA
 #define UpdateResource UpdateResourceA
