@@ -175,6 +175,7 @@ extern int print_insn_little_arm	PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_sparc		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_big_a29k		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_little_a29k	PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_i860		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_i960		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_sh		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_shl		PARAMS ((bfd_vma, disassemble_info*));
