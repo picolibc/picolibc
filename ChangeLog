@@ -1,3 +1,8 @@
+1999-07-11  Ian Lance Taylor  <ian@zembu.com>
+
+	* configure: Add -W -Wall to the default CFLAGS when compiling with
+	gcc.
+
 Thu Jul  8 12:32:23 1999  John David Anglin <dave@hiauly1.hia.nrc.ca>
 
 	* configure.in: Build ld, binutils & gas for hppa*-*-linux-gnu*.
