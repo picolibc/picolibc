@@ -27,6 +27,7 @@ main (int argc, char **argv)
   int sig = SIGTERM;
   int force = 0;
   int gotsig = 0;
+  int ret = 0;
 
   if (argc == 1)
     usage ();
@@ -81,12 +82,13 @@ sig0:
 		  char buf[1000];
 		  sprintf (buf, "kill %d", pid);
 		  perror (buf);
+		  ret = 1;
 		}
 	    }
 	}
       argv++;
     }
-  return 0;
+  return ret;
 }
 
 static void

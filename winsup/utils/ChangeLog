@@ -1,3 +1,7 @@
+Thu Nov  2  2:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* kill.cc (main): Return 1 in case of errors.
+
 Sat Oct 28 01:37:55 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Accomodate newer gcc's which require linking of c++
