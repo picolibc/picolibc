@@ -7,8 +7,6 @@
 #pragma GCC system_header
 #endif
 
-#include <rpc.h>
-#include <rpcndr.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -1,3 +1,22 @@
+2002-07-17   Bart Oldeman  <bart.oldeman@btinternet.com>
+
+	* include/ddeml.h (MH_*) Add defines.
+	(MONHSZSTRUCT): Add structure and typedefs.
+	(MONLINKSTRUCT): Ditto.
+	(MONCONVSTRUCT): Ditto.
+	(MONCBSTRUCT): Ditto.
+	(MONERRSTRUCT): Ditto.
+	(MONMSGSTRUCT): Ditto.
+	* include/windef.h: Don't define __cdecl or _cdecl for
+	__WATCOM__.
+	Don't define _export or __export for __WATCOM__.
+	* include/windows.h (imm.h): #include.
+	* include/winnt.h (LPEXCEPTION_RECORD): Add typedef.
+
+2002-07-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wtypes.h: Remove duplicate #includes of rhc.h and
+
 2002-07-05  Luke Dunstan  <infidel@users.sourceforge.net>
 
 	* include/winbase.h (OpenThread): Add prototype.
@@ -14,8 +33,7 @@
 	* include/wtypes.h: Include <rpc.h> and <rpcndr.h> before
 	header guard.
 
-
-2002-07-02  Danny Smith <dannysmith@users.sourceforge.net>
+2002-07-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commctrl.h (WC_*): Remove some duplicate defines.
 

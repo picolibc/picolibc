@@ -77,6 +77,7 @@
 #include <dde.h>
 #include <ddeml.h>
 #include <dlgs.h>
+#include <imm.h>
 #include <lzexpand.h>
 #include <mmsystem.h>
 #include <nb30.h>

@@ -75,6 +75,8 @@ extern "C" {
 #ifndef _declspec
 #define _declspec(e) __attribute__((e))
 #endif
+#elif defined(__WATCOMC__)
+#define PACKED
 #else
 #define PACKED
 #define _cdecl
@@ -113,11 +115,13 @@ extern "C" {
 #define LOBYTE(w)	((BYTE)(w))
 #define HIBYTE(w)	((BYTE)(((WORD)(w)>>8)&0xFF))
 
+#ifndef __WATCOMC__
 #ifndef _export
 #define _export
 #endif
 #ifndef __export
 #define __export
+#endif
 #endif
 
 #ifndef NOMINMAX

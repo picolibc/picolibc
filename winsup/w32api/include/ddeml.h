@@ -137,6 +137,10 @@ extern "C" {
 #define MF_LINKS	0x20000000
 #define MF_CONV	0x40000000
 #define MF_MASK 0xFF000000
+#define MH_CREATE	1
+#define MH_KEEP	2
+#define MH_DELETE	3
+#define MH_CLEANUP	4
 
 DECLARE_HANDLE(HCONVLIST);
 DECLARE_HANDLE(HCONV);
@@ -181,6 +185,71 @@ typedef struct tagDDEML_MSG_HOOK_DATA {
 	DWORD	cbData;
 	DWORD	Data[8];
 } DDEML_MSG_HOOK_DATA;
+typedef struct tagMONHSZSTRUCT {
+	UINT	cb;
+	BOOL	fsAction;
+	DWORD	dwTime;
+	HSZ	hsz;
+	HANDLE	hTask;
+	TCHAR	str[1];
+} MONHSZSTRUCT, *PMONHSZSTRUCT;
+typedef struct tagMONLINKSTRUCT {
+	UINT	cb;
+	DWORD	dwTime;
+	HANDLE	hTask;
+	BOOL	fEstablished;
+	BOOL	fNoData;
+	HSZ	hszSvc;
+	HSZ	hszTopic;
+	HSZ	hszItem;
+	UINT	wFmt;
+	BOOL	fServer;
+	HCONV	hConvServer;
+	HCONV	hConvClient;
+} MONLINKSTRUCT, *PMONLINKSTRUCT;
+typedef struct tagMONCONVSTRUCT {
+	UINT	cb;
+	BOOL	fConnect;
+	DWORD	dwTime;
+	HANDLE	hTask;
+	HSZ	hszSvc;
+	HSZ	hszTopic;
+	HCONV	hConvClient;
+	HCONV	hConvServer;
+} MONCONVSTRUCT, *PMONCONVSTRUCT;
+typedef struct tagMONCBSTRUCT {
+	UINT	cb;
+	DWORD	dwTime;
+	HANDLE	hTask;
+	DWORD	dwRet;
+	UINT	wType;
+	UINT	wFmt;
+	HCONV	hConv;
+	HSZ	hsz1;
+	HSZ	hsz2;
+	HDDEDATA	hData;
+	ULONG_PTR	dwData1;
+	ULONG_PTR	dwData2;
+	CONVCONTEXT	cc;
+	DWORD	cbData;
+	DWORD	Data[8];
+} MONCBSTRUCT, *PMONCBSTRUCT;
+typedef struct tagMONERRSTRUCT {
+	UINT	cb;
+	UINT	wLastError;
+	DWORD	dwTime;
+	HANDLE	hTask;
+} MONERRSTRUCT, *PMONERRSTRUCT;
+typedef struct tagMONMSGSTRUCT {
+	UINT	cb;
+	HWND	hwndTo;
+	DWORD	dwTime;
+	HANDLE	hTask;
+	UINT	wMsg;
+	WPARAM	wParam;
+	LPARAM	lParam;
+	DDEML_MSG_HOOK_DATA dmhd;
+} MONMSGSTRUCT, *PMONMSGSTRUCT;
 
 BOOL WINAPI DdeAbandonTransaction(DWORD,HCONV,DWORD);
 PBYTE WINAPI DdeAccessData(HDDEDATA,PDWORD);
