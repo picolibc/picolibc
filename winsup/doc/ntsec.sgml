@@ -737,21 +737,33 @@ etc.
 Context</title>
 
 <para>
-Since Cygwin release 1.3.3, applications having the
-<command>Create a process level token</command> user right can switch user
+Since Cygwin release 1.3.3, applications that are members of the
+Administrators group and have the <command>Create a token
+object</command>, <command>Replace a process level token</command> and
+<command>Increase Quota</command> user rights can switch user
 context without giving a password by just calling the usual
 <command>setuid</command>, <command>seteuid</command>,
-<command>setgid</command> and <command>setegid</command> functions.  This is
-typically only given to the SYSTEM user. However, this now allows to switch
-the user context using e. g. rhosts authentication or (when running sshd
-under SYSTEM account as service) public key authentication.
+<command>setgid</command> and <command>setegid</command> functions.  
 </para>
 <para>
-An important restriction of this method is that a process started under
-SYSTEM account can't access network shares which require authentication.
-This also applies to the subprocesses which switched the user context 
-without a password.  People using network home drives are typically not
-able to access it when trying to login using ssh or rsh without password.
+On NT and Windows 2000 the <systemitem
+class="username">SYSTEM</systemitem> user has these privileges and can
+run services such as <command>sshd</command>. However, on Windows 2003
+<systemitem class="username">SYSTEM</systemitem> lacks the
+<command>Create a token object</command> right, so it is necessary to
+create a special user with all the necessary rights, as
+well as <command>Logon as a service</command>, to run such services.
+For security reasons this user should be denied the rights to logon
+interactively or over the network. All this is done by configuration
+scripts such as <command>ssh-host-config</command>.
+</para>
+<para>
+An important restriction of this method is that a process started
+without a password cannot access network shares which require
+authentication.  This also applies to subprocesses which switched user
+context without a password.  Therefore, when using
+<command>ssh</command> or <command>rsh</command> without a password, it
+is typically not possible to access network drives.
 </para>
 
 </sect2>

@@ -50,6 +50,7 @@ install:	all
 cygwin-ug-net.html : cygwin-ug-net.sgml doctool
 	-xmlto html-nochunks -m $(srcdir)/cygwin.dsl $<
 	-cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
+	-rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
 	-gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
 cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.sgml doctool

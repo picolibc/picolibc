@@ -13,7 +13,7 @@ that the GUI installer is a "work in progress", so there might be a few
 difficulties, especially if you are behind a firewall or have other
 specific requirements.  If something doesn't work right for you, and
 it's not covered here or in the latest development snapshot at
-@file{http://cygwin.com/setup-snapshots/}, then by all means report it to the
+@file{http://cygwin.com/setup/}, then by all means report it to the
 mailing list.
 
 For a searchable list of packages that can be installed with Cygwin,

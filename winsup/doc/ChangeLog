@@ -1,3 +1,8 @@
+2005-01-29  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* install.texinfo: Update setup.exe snapshot URL.
+	* ntsec.sgml: Add Pierre's Windows 2003 text.
+
 2005-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* how-using.texinfo: Change text about using shortcuts.
