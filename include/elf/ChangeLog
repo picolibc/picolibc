@@ -1,3 +1,7 @@
+2000-09-29  Hans-Peter Nilsson  <hp@axis.com>
+
+	* cris.h (EF_CRIS_UNDERSCORE): New.
+
 2000-09-27  Alan Modra  <alan@linuxcare.com.au>
 
 	* hppa.h (R_PARISC_DIR14F): Add.

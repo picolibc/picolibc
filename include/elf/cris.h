@@ -41,4 +41,7 @@ START_RELOC_NUMBERS (elf_cris_reloc_type)
 
 END_RELOC_NUMBERS (R_CRIS_max)
 
+/* User symbols in this file have a leading underscore.  */
+#define EF_CRIS_UNDERSCORE		0x00000001
+
 #endif /* _ELF_CRIS_H */
