@@ -59,6 +59,7 @@ class threaded_queue
     void cleanup ();
     void add (queue_request *);
     void process_requests (queue_process_param *, threaded_queue_thread_function *);
+    threaded_queue () : active (false), request (NULL), initial_workers (1), running (0), process_head (NULL) {};
   private:
     queue_request *process_head;
 };

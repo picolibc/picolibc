@@ -1,3 +1,31 @@
+Thu Oct  4 14:12:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* cygserver.cc (request_loop): Make static.
+	(main): Use new cache constructor syntax.
+	Start cache worker threads.
+	Cleanup the cache at shutdown.
+	* cygserver_process.cc: Run indent.
+	(process_cache::process_cache): Add a trigger to use when adding a process.
+	(process_cache::process): Move process_entry to process.
+	Insert at the end of the list.
+	Trigger the request loop when new process's inserted.
+	(process_cache::process_requests): Do it.
+	(process_cache::add): New method.
+	(process_cache::handle_snapshot): New method.
+	(process::process): Merge in the process_entry fields.
+	(process::handle): Make a stub function.
+	(process::exit_code): New method.
+	(process_request::process): New method.
+	(process_process_param::request_loop): New method.
+	* cygserver_shm.cc: New header dependency - threaded_queue.h.
+	* threaded_queue.cc (threaded_queue::cleanup): Clearer messages.
+	(queue_process_param::stop): Short spinlock on interruptible threads.
+	* threaded_queue.h (class threaded_queue): New constructor.
+	* include/cygwin/cygserver_process.h (process_request): New class.
+	(process_entry): Remove.
+	(process): Merge in process_entry.
+	(process_cache): Inherit from threaded_queue.
+
 Tue Oct  2 23:24:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* cygserver.cc (class server_process_param): Use new constructor syntax.

@@ -26,11 +26,10 @@
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver_transport_pipes.h"
 #include "cygwin/cygserver_transport_sockets.h"
+#include "threaded_queue.h"
 #include "cygwin/cygserver_process.h"
 #include "cygwin/cygserver.h"
 #include "cygserver_shm.h"
-
-#include "threaded_queue.h"
 
 /* for quieter operation, set to 0 */
 #define DEBUG 0
@@ -301,7 +300,7 @@ class server_request_queue : public threaded_queue
 };
 class server_request_queue request_queue;
 
-DWORD WINAPI
+static DWORD WINAPI
 request_loop (LPVOID LpParam)
 {
   class server_process_param *params = (server_process_param *) LpParam;
@@ -429,6 +428,8 @@ server_request_queue::add (transport_layer_base *conn)
     {
       conn->close ();
       delete conn;
+      LeaveCriticalSection (&queuelock);
+      return;
     }
   queue_request * listrequest = new server_request (conn, cache);
   threaded_queue::add (listrequest);
@@ -516,12 +517,16 @@ main (int argc, char **argv)
   printf (".");
   transport->listen ();
   printf (".");
-  class process_cache cache;
+  class process_cache cache (2);
   request_queue.initial_workers = 10;
   request_queue.cache = &cache;
   request_queue.create_workers ();
   printf (".");
   request_queue.process_requests (transport);
+  printf (".");
+  cache.create_workers ();
+  printf (".");
+  cache.process_requests ();
   printf (".complete\n");
   /* TODO: wait on multiple objects - the thread handle for each request loop +
    * all the process handles. This should be done by querying the request_queue and
@@ -531,12 +536,19 @@ main (int argc, char **argv)
    * and pipes simply by making a new transport, and then calling
    * request_queue.process_requests (transport2);
    */
+  /* WaitForMultipleObjects abort && request_queue && process_queue && signal
+     -- if signal event then retrigger it
+   */
   while (1 && request_queue.active) 
-    sleep (1);
-  printf ("\nShutdown request recieved. No longer accepting requests.\n");
+    {
+      sleep (1);
+    }
+  printf ("\nShutdown request recieved - new requests will be denied\n");
   request_queue.cleanup ();
   printf ("All pending requests processed\n");
   transport->close ();
-  printf ("request port closed\n");
+  printf ("No longer accepting requests - cygwin will operate in daemonless mode\n");
+  cache.cleanup ();
+  printf ("All outstanding process-cache activities completed\n");
   printf ("daemon shutdown\n");
 }

@@ -113,7 +113,7 @@ threaded_queue::cleanup ()
   LeaveCriticalSection (&queuelock);
   if (!running)
     return;
-  printf ("Waiting for current connections to terminate\n");
+  printf ("Waiting for current queue threads to terminate\n");
   for (int n = running; n; n--)
     PulseEvent (event);
   while (running)
@@ -179,7 +179,6 @@ interruptible
 
 queue_process_param::~queue_process_param ()
 {
-  debug_printf ("aaaargh\n");
   if (running)
     stop ();
   if (!interruptible)
@@ -213,7 +212,9 @@ queue_process_param::stop ()
        * scheduled again, we print an error and exit. We _should_ loop or
        * try resignalling. We don't want to hand here though...
        */
-      if (WaitForSingleObject (hThread, 200) == WAIT_TIMEOUT)
+      int n = 5;
+      while (n-- && WaitForSingleObject (hThread, 1000) == WAIT_TIMEOUT);
+      if (!n)
 	{
 	  printf ("Process thread didn't shutdown cleanly after 200ms!\n");
 	  exit (1);

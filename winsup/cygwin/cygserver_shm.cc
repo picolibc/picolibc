@@ -45,6 +45,7 @@
 #endif
 //#include "perprocess.h"
 #include "cygserver_shm.h"
+#include <threaded_queue.h>
 #include <cygwin/cygserver_process.h>
 
 // FIXME IS THIS CORRECT
