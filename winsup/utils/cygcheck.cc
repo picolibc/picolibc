@@ -158,7 +158,12 @@ init_paths ()
 {
   char tmp[4000], *sl;
   add_path ((char *) ".", 1);	/* to be replaced later */
-  add_path ((char *) ".", 1);	/* the current directory */
+  
+  if (GetCurrentDirectory (4000, tmp))
+    add_path (tmp, strlen (tmp));
+  else
+    display_error ("init_paths: GetCurrentDirectory()");  
+  
   if (GetSystemDirectory (tmp, 4000))
     add_path (tmp, strlen (tmp));
   else
@@ -180,7 +185,8 @@ init_paths ()
       while (1)
 	{
 	  for (e = b; *e && *e != ';'; e++);
-	  add_path (b, e - b);
+	  if (strncmp(b, ".", 1) && strncmp(b, ".\\", 2))
+	    add_path (b, e - b);
 	  if (!*e)
 	    break;
 	  b = e + 1;
@@ -1237,7 +1243,7 @@ dump_sysinfo ()
   if (givehelp)
     printf ("Looking for various Cygnus DLLs...  (-v gives version info)\n");
   int cygwin_dll_count = 0;
-  for (i = 0; i < num_paths; i++)
+  for (i = 1; i < num_paths; i++)
     {
       WIN32_FIND_DATA ffinfo;
       sprintf (tmp, "%s/*.*", paths[i]);

@@ -1,3 +1,9 @@
+2005-03-24  Brian Dessent  <brian@dessent.net>
+
+	* cygcheck.cc (init_paths): Use full path instead of "." for the
+	current directory.  Do not add "." if present in $PATH.
+	(dump_sysinfo): Skip placeholder first value of paths[].
+
 2005-03-07  Christopher Faylor  <cgf@timesys.com>
 
 	* kill.cc (getsig): Rectify bug introduced by 2005-02-26 change.  Don't
