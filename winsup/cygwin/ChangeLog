@@ -1,3 +1,8 @@
+2002-12-21  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Default fhandler objects to -fomit-frame-pointer.
+	Eliminate redundant CFLAGS settings.
+
 2002-12-20  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (line_edit_status): Reorganize so that tests for error

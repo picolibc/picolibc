@@ -52,12 +52,32 @@ malloc_CFLAGS:=-fomit-frame-pointer
 shared_CFLAGS:=-fomit-frame-pointer
 cygthread_CFLAGS:=-fomit-frame-pointer
 miscfuncs_CFLAGS:=-fomit-frame-pointer
+fhandler_CFLAGS:=-fomit-frame_pointer
+fhandler_clipboard_CFLAGS:=-fomit-frame-pointer
+fhandler_console_CFLAGS:=-fomit-frame-pointer
+fhandler_disk_file_CFLAGS:=-fomit-frame-pointer
+fhandler_dsp_CFLAGS:=-fomit-frame-pointer
+fhandler_floppy_CFLAGS:=-fomit-frame-pointer
+fhandler_mem_CFLAGS:=-fomit-frame-pointer
+fhandler_proc_CFLAGS:=-fomit-frame-pointer
+fhandler_process_CFLAGS:=-fomit-frame-pointer
+fhandler_random_CFLAGS:=-fomit-frame-pointer
+fhandler_raw_CFLAGS:=-fomit-frame-pointer
+fhandler_registry_CFLAGS:=-fomit-frame-pointer
+fhandler_serial_CFLAGS:=-fomit-frame-pointer
+fhandler_socket_CFLAGS:=-fomit-frame-pointer
+fhandler_tape_CFLAGS:=-fomit-frame-pointer
+fhandler_termios_CFLAGS:=-fomit-frame-pointer
+fhandler_tty_CFLAGS:=-fomit-frame-pointer
+fhandler_virtual_CFLAGS:=-fomit-frame-pointer
+fhandler_windows_CFLAGS:=-fomit-frame-pointer
+fhandler_zero_CFLAGS:=-fomit-frame-pointer
 
 CC:=@CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET:=$(CC)
 CFLAGS=@CFLAGS@
-override CFLAGS+=-MMD -fbuiltin ${$(*F)_CFLAGS}
+override CFLAGS+=-MMD ${$(*F)_CFLAGS}
 CXX:=@CXX@
 CXXFLAGS=@CXXFLAGS@
 
