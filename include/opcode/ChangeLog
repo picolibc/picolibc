@@ -1,3 +1,11 @@
+1999-05-28  Linus Nordberg  <linus.nordberg@canit.se>
+
+	* m68k.h: Document new formats `E', `G', `H' and new places `N',
+	`n', `o'.
+
+	* m68k.h: Define mcf5206e, mcf5307, mcf.  Document new format `u'
+	and new places `m', `M', `h'.
+
 Thu May 27 04:13:54 1999  Joel Sherrill (joel@OARcorp.com
 
 	* hppa.h (pa_opcodes): Add several processor specific system
