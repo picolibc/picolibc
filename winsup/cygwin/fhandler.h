@@ -657,6 +657,7 @@ class fhandler_termios: public fhandler_base
   void fixup_after_fork (HANDLE);
   void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
   void echo_erase (int force = 0);
+  virtual __off64_t lseek (__off64_t, int);
 };
 
 enum ansi_intensity

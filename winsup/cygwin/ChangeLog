@@ -1,3 +1,8 @@
+2002-03-15  Robert Collins  <rbtcollins@hotmail.com>
+
+	* fhandler.h (fhandler_termios::lseek): Override lseek.
+	* fhandler_termios.cc (fhandler_termios::lseek): Implement this.
+
 2002-03-15  Christopher Faylor  <cgf@redhat.com>
 
 	* cygserver.cc: Include stdlib.h for exit declaration.
