@@ -1,3 +1,7 @@
+Wed Feb 21 22:41:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* Makefile.common: Add `-fvtable-thunks' to COMPILE_CXX.
+
 Sun Dec  3 00:21:31 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.common: Eliminate checks for libgcc.a and libstdc++.a.  Use

@@ -89,7 +89,7 @@ libgcc:=${subst \,/,${shell $(CC_FOR_TARGET) -print-libgcc-file-name}}
 GCC_INCLUDE:=${word 1,${dir $(libgcc)}}/include
 
 COMPILE_CXX:=$(CXX) $c -nostdinc++ $(ALL_CXXFLAGS) -I$(GCC_INCLUDE) \
-	     -fno-rtti -fno-exceptions
+	     -fno-rtti -fno-exceptions -fvtable-thunks
 COMPILE_CC:=$(CC) $c -nostdinc $(ALL_CFLAGS) -I$(GCC_INCLUDE)
 
 vpath %.a	$(cygwin_build):$(w32api_lib):$(newlib_build)/libc:$(newlib_build)/libm
