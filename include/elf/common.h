@@ -119,6 +119,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_COLDFIRE    52       /* Motorola Coldfire */
 #define EM_68HC12      53       /* Motorola M68HC12 */
 
+#define EM_PJ          99       /* picoJava */
+
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
    with official or non-GNU unofficial values.

@@ -1,3 +1,8 @@
+1999-09-04  Steve Chamberlain  <sac@pobox.com>
+
+	* pj.h: New file.
+	* common.h (EM_PJ): Define.
+
 1999-09-02  Ulrich Drepper  <drepper@cygnus.com>
 
 	* hppa.h: Add HPUX specific symbol type definitions.
