@@ -77,7 +77,7 @@ else
 	$(CC) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 endif
 
-mingw_getopt.o: $(cygwin_source)/getopt.c
+mingw_getopt.o: $(cygwin_source)/lib/getopt.c
 	$(CC) -c -o $@ $(MINGW_CFLAGS) $^
 
 clean:
