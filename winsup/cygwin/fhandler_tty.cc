@@ -568,7 +568,7 @@ fhandler_tty_slave::close ()
   if (!output_done_event)
     {
       fhandler_console::open_fhs--;
-      termios_printf ("decremeted open_fhs %d", fhandler_console::open_fhs);
+      termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
     }
   return fhandler_tty_common::close ();
 }

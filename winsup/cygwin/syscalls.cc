@@ -152,8 +152,8 @@ unlink (const char *ourname)
       (void) SetFileAttributes (win32_name, (DWORD) win32_name);
       BOOL res = CloseHandle (h);
       syscall_printf ("%d = CloseHandle (%p)", res, h);
-      if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
-	  || (!win32_name.isremote () && wincap.has_delete_on_close ()))
+      if (!win32_name.isremote ()
+	  || GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES)
 	{
 	  syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) succeeded");
 	  goto ok;
