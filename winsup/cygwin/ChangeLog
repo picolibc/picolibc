@@ -1,3 +1,8 @@
+2004-06-08  Egor Duda <deo@corpit.ru>
+
+	* include/cygwin/ipc.h: Make IPC_INFO visible only for ipc system
+	utilities, to make it consistent with declaration of struct seminfo.
+
 2004-06-08  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* path.cc (fchdir): Pass the Posix path to chdir.

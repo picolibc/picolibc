@@ -48,7 +48,9 @@ struct ipc_perm
 #define IPC_RMID 0x1000		/* Remove identifier. */
 #define IPC_SET  0x1001		/* Set options. */
 #define IPC_STAT 0x1002		/* Get options. */
+#ifdef _KERNEL
 #define IPC_INFO 0x1003		/* For ipcs(8). */
+#endif
 
 #ifdef _KERNEL
 #define IPCID_TO_IX(id)         ((id) & 0xffff)
