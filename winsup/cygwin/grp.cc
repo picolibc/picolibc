@@ -106,12 +106,14 @@ pwdgrp::read_group ()
   return;
 }
 
+muto NO_COPY pwdgrp::pglock;
+
 pwdgrp::pwdgrp (passwd *&pbuf) :
   pwdgrp_buf_elem_size (sizeof (*pbuf)), passwd_buf (&pbuf)
 {
   read = &pwdgrp::read_passwd;
   parse = &pwdgrp::parse_passwd;
-  pglock.initforce ("pwd_lock");
+  pglock.init ("pglock");
 }
 
 pwdgrp::pwdgrp (__group32 *&gbuf) :
@@ -119,7 +121,7 @@ pwdgrp::pwdgrp (__group32 *&gbuf) :
 {
   read = &pwdgrp::read_group;
   parse = &pwdgrp::parse_group;
-  pglock.initforce ("grp_lock");
+  pglock.init ("pglock");
 }
 
 struct __group32 *

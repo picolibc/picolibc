@@ -70,7 +70,7 @@ Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];// All my children info
 					// constructor operation  at DLL startup
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 
-muto NO_COPY sync_proc_subproc;		// Control access to subproc stuff
+static muto NO_COPY sync_proc_subproc;	// Control access to subproc stuff
 
 DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 

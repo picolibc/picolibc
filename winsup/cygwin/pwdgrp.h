@@ -39,7 +39,7 @@ class pwdgrp
   char *buf, *lptr;
   int max_lines;
   bool initialized;
-  muto pglock;
+  static muto pglock;
 
   bool parse_passwd ();
   bool parse_group ();

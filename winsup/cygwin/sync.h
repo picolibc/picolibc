@@ -28,7 +28,6 @@ public:
   void *tls;	/* Tls of lock owner. */
   // class muto *next;
 
-  muto *initforce (const char *s) {name = NULL; return init (s);}
   /* The real constructor. */
   muto *init (const char *) __attribute__ ((regparm (2)));
 

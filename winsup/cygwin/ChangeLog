@@ -1,5 +1,11 @@
 2005-04-05  Christopher Faylor  <cgf@timesys.com>
 
+	* sync.h (muto::initforce): Delete flawed implementation.
+	* pwdgrp.h (pwdgrp::pglock): Make static.
+	* grp.cc (pwdgrp::pwdgrp): Eliminate use of initforce.
+
+2005-04-05  Christopher Faylor  <cgf@timesys.com>
+
 	* sync.h (muto::initforce): Force initialization even when name !=
 	NULL.
 	* grp.cc (pwdgrp::pwdgrp): Use initforce since the enclosing structure
