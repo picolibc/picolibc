@@ -31,7 +31,8 @@
         * crx/und_hndl.c: Ditto.
         * crx/unlink.c: Ditto.
         * crx/write.c: Ditto.
-                                                              2004-01-01  Paul Brook  <paul@codesourcery.com>
+
+2004-10-01  Paul Brook  <paul@codesourcery.com>
 
 	* arm/configure.in: Add *-*-aebi target.
 	* arm/configure: Regenerate.
