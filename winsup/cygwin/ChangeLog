@@ -1,5 +1,9 @@
 2003-08-27  Christopher Faylor  <cgf@redhat.com>
 
+	* specdir: Correctly remove temporary directory prior to use.
+
+2003-08-27  Christopher Faylor  <cgf@redhat.com>
+
 	* sigproc.cc (wait_sig): Count number of iterations through
 	'more_signals' loop and issue a warning if DEBUGGING and excessive.
 	(WFSO): When debugging and infinite timeout, loop.
