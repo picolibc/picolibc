@@ -1,3 +1,8 @@
+2002-01-23  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/include/sys/signal.h: Remove pthread_kill declaration
+	when __CYGWIN__ is defined.
+
 2002-01-18  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
 
 	* libc/include/time.h: Add prototype for strptime for Cygwin.
