@@ -1,3 +1,7 @@
+2004-08-11  Christopher Faylor  <cgf@timesys.com>
+
+	* net.cc (cygwin_gethostbyname): Show failing host name on error.
+
 2004-08-10  Christopher Faylor  <cgf@redhat.com>
 
 	* select.cc (select_stuff::wait): Correctly check for w4 array bounds.

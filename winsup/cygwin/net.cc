@@ -967,6 +967,7 @@ cygwin_gethostbyname (const char *name)
 				     is_hostent);
   if (!_my_tls.locals.hostent_buf)
     {
+      debug_printf ("name %s", name);
       set_winsock_errno ();
       set_host_errno ();
     }
