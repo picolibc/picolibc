@@ -1,3 +1,11 @@
+2001-10-22  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/posix/execvp.c: Remove obsolete CYGWIN32 considerations
+	throughout.
+	* signal.h: Change comment to reflect __CYGWIN__ rather than __CYGWIN32__.
+	* popen.c (popen): Use __CYGWIN_ rather than __CYGWIN32__.
+	* system.c (_system_r): Ditto.
+
 2001-10-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Add prototype for fchdir() when

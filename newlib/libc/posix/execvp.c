@@ -11,12 +11,7 @@
 #include <errno.h>
 #include <ctype.h>
 
-#ifdef __CYGWIN32__
-static char path_delim;
-#define PATH_DELIM path_delim
-#else
 #define PATH_DELIM ':'
-#endif
 
 /*
  * Copy string, until c or <nul> is encountered.
@@ -52,24 +47,8 @@ _DEFUN (execvp, (file, argv),
 
   /* If FILE contains a directory, don't search $PATH.  */
   if (strchr (file, '/')
-#ifdef __CYGWIN32__
-      || strchr (file, '\\')
-#endif
       )
     return execv (file, argv);
-
-#ifdef __CYGWIN32__
-  /* If a drive letter is passed, the path is still an absolute one.
-     Technically this isn't true, but Cygwin is currently defined so
-     that it is.  */
-  if ((isalpha (file[0]) && file[1] == ':')
-      || file[0] == '\\')
-    return execv (file, argv);
-#endif
-
-#ifdef __CYGWIN32__
-  path_delim = cygwin_posix_path_list_p (path) ? ':' : ';';
-#endif
 
   while (*path)
     {

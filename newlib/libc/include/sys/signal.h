@@ -178,7 +178,7 @@ int _EXFUN(sigqueue, (pid_t pid, int signo, const union sigval value));
 
 #endif /* defined(_POSIX_REALTIME_SIGNALS) */
 
-#endif /* defined(__CYGWIN32__) || defined(__rtems__) */
+#endif /* defined(__CYGWIN__) || defined(__rtems__) */
 
 /* #endif __STRICT_ANSI__ */
 

@@ -106,7 +106,7 @@ popen(program, type)
 			(void)close(pdes[1]);
 		}
 		execl(_PATH_BSHELL, "sh", "-c", program, NULL);
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 		/* On cygwin32, we may not have /bin/sh.  In that
                    case, try to find sh on PATH.  */
 		execlp("sh", "sh", "-c", program, NULL);

@@ -81,7 +81,7 @@ _system_r (ptr, s)
      For now we always return 0 and leave it to each target to explicitly
      handle otherwise (this can always be relaxed in the future).  */
 
-#if defined (unix) || defined (__CYGWIN32__)
+#if defined (unix) || defined (__CYGWIN__)
   if (s == NULL)
     return 1;
   return do_system (ptr, s);
