@@ -22,7 +22,7 @@
 #define ENTRY(name)	\
 	_ENTRY(_C_LABEL(name))
 
-#if (defined (__sh2__) || defined (__sh3__) || defined (__SH3E__) \
+#if (defined (__sh2__) || defined (__SH2E__) || defined (__sh3__) || defined (__SH3E__) \
      || defined (__SH4_SINGLE__) || defined (__SH4__)) \
      || defined (__SH4_SINGLE_ONLY__) || defined (__SH5__)
 #define DELAYED_BRANCHES

@@ -72,7 +72,7 @@ ENTRY(setjmp)
 	movi	0, r2
 	blink	tr0, r63
 #else
-#if defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY__)
+#if defined (__SH2E__) || defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY__)
 	add	#(13*4),r4
 #else
 	add	#(9*4),r4
@@ -80,7 +80,7 @@ ENTRY(setjmp)
 
 	sts.l	pr,@-r4
 
-#if defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY__)
+#if defined (__SH2E__) || defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY__)
 	fmov.s	fr15,@-r4	! call saved floating point registers
 	fmov.s	fr14,@-r4
 	fmov.s	fr13,@-r4
@@ -173,7 +173,7 @@ ENTRY(longjmp)
 	mov.l	@r4+,r14
 	mov.l	@r4+,r15
 
-#if defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY__)
+#if defined (__SH2E__) || defined (__SH3E__) || defined(__SH4_SINGLE__) || defined(__SH4__) || defined(__SH4_SINGLE_ONLY__)
 	fmov.s	@r4+,fr12	! call saved floating point registers
 	fmov.s	@r4+,fr13
 	fmov.s	@r4+,fr14

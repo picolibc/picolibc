@@ -94,7 +94,7 @@
 #else
 #define __IEEE_BIG_ENDIAN
 #endif
-#if defined(__SH3E__) || defined(__SH4_SINGLE_ONLY__)
+#if defined(__SH2E__) || defined(__SH3E__) || defined(__SH4_SINGLE_ONLY__)
 #define _DOUBLE_IS_32BITS
 #endif
 #endif

@@ -1,3 +1,13 @@
+2003-01-24  Nick Clifton  <nickc@redhat.com>
+
+	* Add sh2e support:
+
+	2002-04-02  Alexandre Oliva  <aoliva@redhat.com>
+
+		* libc/machine/sh/asm.h: Added __SH2E__ next to __SH3E__.
+		* libc/machine/sh/setjmp.S: Likewise.
+		* libc/include/machine/ieeefp.h: Likewise.
+
 2003-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Add setregid and setreuid declarations
