@@ -2,7 +2,7 @@
 
 @section Aware of the problem, no solution known.
 
-@subsection Pipe key (@samp{|}) doesn't work on non-US keyboards in Win9x
+@subsection Pipe key (@samp{|}) doesn't work on non-US keyboards in Win9x/ME
 
 This might get fixed someday, but meanwhile, just use rxvt, which does
 not have this problem.  This is no real loss, because rxvt has many
