@@ -743,6 +743,53 @@ fhandler_tty_common::select_except (select_record *s)
   return ((fhandler_pipe *)this)->fhandler_pipe::select_except (s);
 }
 
+static int
+verify_tty_slave (select_record *me, fd_set *readfds, fd_set *writefds,
+	   fd_set *exceptfds)
+{
+  if (WaitForSingleObject (me->h, 0) == WAIT_OBJECT_0)
+    me->read_ready = 1;
+  return set_bits (me, readfds, writefds, exceptfds);
+}
+
+select_record *
+fhandler_tty_slave::select_read (select_record *s)
+{
+  if (!s)
+    s = new select_record;
+  s->h = input_available_event;
+  s->startup = no_startup;
+  s->poll = poll_pipe;
+  s->verify = verify_tty_slave;
+  s->read_selected = TRUE;
+  s->cleanup = NULL;
+  return s;
+}
+
+int
+fhandler_tty_slave::ready_for_read (int fd, DWORD howlong, int ignra)
+{
+  HANDLE w4[2];
+  if (!ignra && get_readahead_valid ())
+    {
+      select_printf ("readahead");
+      return 1;
+    }
+  w4[0] = signal_arrived;
+  w4[1] = input_available_event;
+  switch (WaitForMultipleObjects (2, w4, FALSE, howlong))
+    {
+    case WAIT_OBJECT_0 + 1:
+      return 1;
+    case WAIT_FAILED:
+      select_printf ( "wait failed %E" );
+    case WAIT_OBJECT_0:
+    case WAIT_TIMEOUT:
+    default:
+      return 0;
+    }
+}
+
 select_record *
 fhandler_dev_null::select_read (select_record *s)
 {

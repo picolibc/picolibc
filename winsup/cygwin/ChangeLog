@@ -1,3 +1,18 @@
+2001-03-18  Egor Duda <deo@logos-m.ru>
+
+	* fhandler.h (fhandler_tty_slave): Declare new methods.
+	* select.cc (fhandler_tty_slave::select_read): New method.
+	* select.cc (fhandler_tty_slave::ready_for_read): Ditto.
+	* select.cc (verify_tty_slave): New function.
+	* fhandler_termios.cc (fhandler_termios::line_edit): Empty input
+	buffer on signal.
+	* fhandler_tty.cc (fhandler_tty_slave::read): Check for input data
+	after reading from pipe. Reset event if input pipe is empty.
+	* tty.h (class tty): Allow creating events with manual reset.
+	* tty.cc (tty::get_event): Use manual_reset flag.
+	* tty.cc (tty::common_init): Create input_available_event with
+	manual reset.
+
 Sat Mar 17 21:48:03 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* external.cc (fillout_pinfo): Match windows pid, as well as cygwin pid

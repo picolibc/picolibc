@@ -209,6 +209,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	    goto not_a_sig;
 
 	  termios_printf ("got interrupt %d, sending signal %d", c, sig);
+	  eat_readahead (-1);
 	  kill_pgrp (tc->getpgid (), sig);
 	  tc->ti.c_lflag &= ~FLUSHO;
 	  sawsig = 1;

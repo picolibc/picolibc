@@ -761,6 +761,8 @@ public:
   int ioctl (unsigned int cmd, void *);
 
   off_t lseek (off_t, int) { return 0; }
+  select_record *select_read (select_record *s);
+  int ready_for_read (int fd, DWORD howlong, int ignra);
 };
 
 class fhandler_pty_master: public fhandler_tty_common
