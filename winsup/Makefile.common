@@ -161,10 +161,10 @@ $(bupdir1)/libiberty/%.o: $(updir1)/libiberty/%.c
 $(w32api_lib)/%.a: $(w32api_lib)/Makefile
 	@$(MAKE) --no-print-dir -C $(@D) $(@F)
 
-$(bz2lib)/%a: $(bz2lib)/Makefile
+$(bz2lib)/%.a: $(bz2lib)/Makefile
 	@$(MAKE) --no-print-dir -C $(@D) $(@F)
 
-$(zlib)/%a: $(zlib)/Makefile
+$(zlib)/%.a: $(zlib)/Makefile
 	@$(MAKE) --no-print-dir -C $(@D) $(@F)
 
 all:

@@ -1,6 +1,9 @@
 2001-12-14  Christopher Faylor  <cgf@redhat.com>
 
+	* configure.in: Detect zlib subdirectory.
+	* configure: Regenerate
 	* Makefile.in: Exit immediately if a sub-make fails.
+	* Makefile.common: Add automatic rules for bz2lib and zlib.
 
 2001-11-04  Christopher Faylor  <cgf@redhat.com>
 
