@@ -148,7 +148,7 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
 
   if (which != ITIMER_REAL)
     {
-      set_errno (EINVAL);
+      set_errno (ENOSYS);
       return -1;
     }
   /* Check if we will wrap */
