@@ -1,11 +1,26 @@
+2003-05-23  Jason Eckhardt  <jle@rice.edu>
+
+	* i860.h (expand_type): Add XP_ONLY.
+	(scyc.b): New XP instruction.
+	(ldio.l): Likewise.
+	(ldio.s): Likewise.
+	(ldio.b): Likewise.
+	(ldint.l): Likewise.
+	(ldint.s): Likewise.
+	(ldint.b): Likewise.
+	(stio.l): Likewise.
+	(stio.s): Likewise.
+	(stio.b): Likewise.
+	(pfld.q): Likewise.
+
 2003-05-20  Jason Eckhardt  <jle@rice.edu>
 
-	opcode/i860.h (flush): Set lower 3 bits properly and use 'L'
+	* i860.h (flush): Set lower 3 bits properly and use 'L'
 	for the immediate operand type instead of 'i'.
 
 2003-05-20  Jason Eckhardt  <jle@rice.edu>
 
-	opcode/i860.h (fzchks): Both S and R bits must be set.
+	* i860.h (fzchks): Both S and R bits must be set.
 	(pfzchks): Likewise.
 	(faddp): Likewise.
 	(pfaddp): Likewise.

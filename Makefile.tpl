@@ -1270,6 +1270,7 @@ cross: all-texinfo all-bison all-byacc all-binutils all-gas all-ld
 	  LANGUAGES="c c++" all
 
 .PHONY: check-gcc
+maybe-check-gcc:
 check-gcc:
 	@if [ -f ./gcc/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
@@ -1433,7 +1434,7 @@ configure-target-zlib: $(ALL_GCC_C)
 configure-target-examples: $(ALL_GCC_C)
 configure-target-libgloss: $(ALL_GCC)
 all-target-libgloss: maybe-configure-target-newlib
-configure-target-libiberty: $(ALL_GCC_C)
+configure-target-libiberty: $(ALL_GCC)
 configure-target-libtermcap: $(ALL_GCC_C)
 configure-target-newlib: $(ALL_GCC)
 configure-target-rda: $(ALL_GCC_C)
