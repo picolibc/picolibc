@@ -1,3 +1,7 @@
+2001-09-04  Richard Henderson  <rth@redhat.com>
+
+	* alpha.h (struct alpha_operand): Pack elements into bitfields.
+
 2001-08-31  Eric Christopher  <echristo@redhat.com>
 
 	* mips.h: Remove CPU_MIPS32_4K.
