@@ -1,3 +1,8 @@
+2005-02-08  Antony King  <antony.king@st.com>
+
+	* arm/syscalls.c: Change CHECK_INIT to pass reentrant struct
+	instead of file pointer.
+
 2005-02-01  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris/Makefile.in (ALL_INSTALL_FILES): New macro.
