@@ -26,6 +26,8 @@ int sysinfo = 0;
 int givehelp = 0;
 int keycheck = 0;
 int check_setup = 0;
+int find_package = 0;
+int list_package = 0;
 
 #ifdef __GNUC__
 typedef long long longlong;
@@ -34,6 +36,8 @@ typedef __int64 longlong;
 #endif
 
 void dump_setup (int, char **, bool);
+void package_find (int, char **);
+void package_list (int, char **);
 
 static const char version[] = "$Revision$";
 
@@ -1317,13 +1321,15 @@ usage (FILE * stream, int status)
 Usage: cygcheck [OPTIONS] [PROGRAM...]\n\
 Check system information or PROGRAM library dependencies\n\
 \n\
- -c, --check-setup  check packages installed via setup.exe\n\
- -s, --sysinfo      system information (not with -k)\n\
- -v, --verbose      verbose output (indented) (for -s or programs)\n\
- -r, --registry     registry search (requires -s)\n\
- -k, --keycheck     perform a keyboard check session (not with -s)\n\
- -h, --help         give help about the info (not with -c)\n\
- -V, --version      output version information and exit\n\
+ -c, --check-setup   check packages installed via setup.exe\n\
+ -s, --sysinfo       system information (not with -k)\n\
+ -v, --verbose       verbose output (indented) (for -s or programs)\n\
+ -r, --registry      registry search (requires -s)\n\
+ -k, --keycheck      perform a keyboard check session (not with -[scfl])\n\
+ -f, --find-package  find installed packages containing files (not with -[cl])\n\
+ -l, --list-package  list the contents of installed packages (not with -[cf])\n\
+ -h, --help          give help about the info (not with -[cfl])\n\
+ -V, --version       output version information and exit\n\
 You must at least give either -s or -k or a program name\n");
   exit (status);
 }
@@ -1334,12 +1340,14 @@ struct option longopts[] = {
   {"registry", no_argument, NULL, 'r'},
   {"verbose", no_argument, NULL, 'v'},
   {"keycheck", no_argument, NULL, 'k'},
+  {"find-package", no_argument, NULL, 'f'},
+  {"list-package", no_argument, NULL, 'l'},
   {"help", no_argument, NULL, 'h'},
   {"version", no_argument, 0, 'V'},
   {0, no_argument, NULL, 0}
 };
 
-static char opts[] = "chkrsvV";
+static char opts[] = "cfhklrsvV";
 
 static void
 print_version ()
@@ -1387,6 +1395,12 @@ main (int argc, char **argv)
       case 'k':
 	keycheck = 1;
 	break;
+      case 'f':
+	find_package = 1;
+	break;
+      case 'l':
+	list_package = 1;
+	break;
       case 'h':
 	givehelp = 1;
 	break;
@@ -1405,7 +1419,13 @@ main (int argc, char **argv)
     else
       usage (stderr, 1);
 
-  if ((check_setup || sysinfo) && keycheck)
+  if ((check_setup || sysinfo || find_package || list_package) && keycheck)
+    usage (stderr, 1);
+
+  if ((find_package || list_package) && check_setup)
+    usage (stderr, 1);
+
+  if (find_package && list_package)
     usage (stderr, 1);
 
   if (keycheck)
@@ -1413,21 +1433,12 @@ main (int argc, char **argv)
 
   init_paths ();
 
-  /* FIXME: Add help for check_setup */
-  if (argc >= 1 && givehelp && !check_setup)
+  /* FIXME: Add help for check_setup and {list,find}_package */
+  if (argc >= 1 && givehelp && !check_setup && !find_package && !list_package)
     {
-      if (argc == 1)
-	{
-	  printf
-	    ("Here is where the OS will find your program, and which dlls\n");
-	  printf ("will be used for it.  Use -v to see DLL version info\n");
-	}
-      else
-	{
-	  printf
-	    ("Here is where the OS will find your programs, and which dlls\n");
-	  printf ("will be used for them.  Use -v to see DLL version info\n");
-	}
+      printf("Here is where the OS will find your program%s, and which dlls\n",
+	     argc > 1 ? "s" : "");
+      printf ("will be used for it.  Use -v to see DLL version info\n");
 
       if (!sysinfo)
 	printf ("\n");
@@ -1436,13 +1447,21 @@ main (int argc, char **argv)
   if (check_setup)
     {
       dump_setup (verbose, argv, true);
-      puts ("");
+    }
+  else if (find_package)
+    {
+      package_find (verbose, argv);
+    }
+  else if (list_package)
+    {
+      package_list (verbose, argv);
     }
   else
     for (i = 0; i < argc; i++)
       {
+	if (i)
+	  puts ("");
 	cygcheck (argv[i]);
-	puts ("");
       }
 
   if (sysinfo)
@@ -1452,12 +1471,11 @@ main (int argc, char **argv)
 	{
 	  puts ("");
 	  dump_setup (verbose, NULL, false);
-	  puts ("");
 	}
-    }
 
-  if (!givehelp)
-    puts ("Use -h to see help about each section");
+      if (!givehelp)
+	puts ("Use -h to see help about each section");
+    }
 
   return 0;
 }

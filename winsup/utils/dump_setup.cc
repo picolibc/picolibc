@@ -1,4 +1,4 @@
-/* path.cc
+/* dump_setup.cc
 
    Copyright 2001 Red Hat, Inc.
 
@@ -165,15 +165,15 @@ compar (const void *a, const void *b)
 }
 }
 
-bool
+int
 match_argv (char **argv, const char *name)
 {
   if (!argv || !*argv)
-    return true;
+    return -1;
   for (char **a = argv; *a; a++)
     if (strcasecmp (*a, name) == 0)
-      return true;
-  return false;
+      return a - argv + 1;
+  return 0;
 }
 
 static bool
@@ -234,17 +234,13 @@ file_exists (int verbose, char *filename, const char *alt, char *package)
   return true;
 }
 
-static bool
-check_package_files (int verbose, char *package)
+static FILE *
+open_package_list (char *package)
 {
   char filelist[MAX_PATH + 1] = "etc/setup/";
   strcat (strcat (filelist, package), ".lst.gz");
   if (!file_exists (false, filelist, NULL, NULL))
-    {
-      if (verbose)
-	printf ("Missing file list /%s for package %s\n", filelist, package);
-      return false;
-    }
+    return NULL;
 
   static char *zcat;
   static char *zcat_end;
@@ -259,6 +255,21 @@ check_package_files (int verbose, char *package)
 
   strcpy (zcat_end, filelist);
   FILE *fp = popen (zcat, "rt");
+
+  return fp;
+}
+
+static bool
+check_package_files (int verbose, char *package)
+{
+  FILE *fp = open_package_list (package);
+  if (!fp)
+    {
+      if (verbose)
+	printf ("Can't open file list /etc/setup/%s.lst.gz for package %s\n",
+                package, package);
+      return false;
+    }
 
   bool result = true;
   char buf[MAX_PATH + 1];
@@ -286,25 +297,17 @@ check_package_files (int verbose, char *package)
   return result;
 }
 
-void
-dump_setup (int verbose, char **argv, bool check_files)
-{
+/**
+ * Returns a calloc'd sorted list of packages or NULL if no info.
+ * The last entry in the list is {NULL,NULL}.
+ */
+static pkgver *
+get_packages (char **argv) {
   char *setup = cygpath ("/etc/setup/installed.db", NULL);
   FILE *fp = fopen (setup, "rt");
 
-  puts ("Cygwin Package Information");
   if (fp == NULL)
-    {
-      puts ("No package information found");
-      goto err;
-    }
-
-  if (verbose)
-    {
-      bool need_nl = dump_file ("Last downloaded files to: ", "last-cache");
-      if (dump_file ("Last downloaded files from: ", "last-mirror") || need_nl)
-	puts ("");
-    }
+    return NULL;
 
   int nlines;
   nlines = 0;
@@ -312,12 +315,15 @@ dump_setup (int verbose, char **argv, bool check_files)
   while (fgets (buf, 4096, fp))
     nlines += 2;	/* potentially binary + source */
   if (!nlines)
-    goto err;
+    {
+      fclose (fp);
+      return NULL;
+    }
   rewind (fp);
 
   pkgver *packages;
 
-  packages = (pkgver *) calloc (nlines, sizeof(packages[0]));
+  packages = (pkgver *) calloc (nlines + 1, sizeof(packages[0]));
   int n;
   for (n = 0; fgets (buf, 4096, fp) && n < nlines;)
     {
@@ -349,23 +355,139 @@ dump_setup (int verbose, char **argv, bool check_files)
 	}
     }
 
+  packages[n].name = packages[n].ver = NULL;
+
   qsort (packages, n, sizeof (packages[0]), compar);
 
+  fclose (fp);
+
+  return packages;
+}
+
+void
+dump_setup (int verbose, char **argv, bool check_files)
+{
+  pkgver *packages = get_packages(argv);
+
+  puts ("Cygwin Package Information");
+  if (packages == NULL)
+    {
+      puts ("No setup information found");
+      return;
+    }
+
+  if (verbose)
+    {
+      bool need_nl = dump_file ("Last downloaded files to: ", "last-cache");
+      if (dump_file ("Last downloaded files from: ", "last-mirror") || need_nl)
+	puts ("");
+    }
+
   printf ("%-*s %-*s     %s\n", package_len, "Package", version_len, "Version", check_files?"Status":"");
-  for (int i = 0; i < n; i++)
+  for (int i = 0; packages[i].name; i++)
     {
       printf ("%-*s %-*s     %s\n", package_len, packages[i].name, version_len,
 	      packages[i].ver, check_files ?
 	      (check_package_files (verbose, packages[i].name) ? "OK" : "Incomplete") : "");
       fflush(stdout);
     }
-  fclose (fp);
 
-  return;
+  free (packages);
 
-err:
-  puts ("No setup information found");
-  if (fp)
-    fclose (fp);
   return;
 }
+
+void
+package_list (int verbose, char **argv)
+{
+  pkgver *packages = get_packages(argv);
+  if (packages == NULL)
+    {
+      puts ("No setup information found");
+      return;
+    }
+
+  for (int i = 0; packages[i].name; i++)
+    {
+      FILE *fp = open_package_list (packages[i].name);
+      if (!fp)
+      {
+	if (verbose)
+	  printf ("Can't open file list /etc/setup/%s.lst.gz for package %s\n",
+	      packages[i].name, packages[i].name);
+	return;
+      }
+
+      printf ("Package: %s-%s\n", packages[i].name, packages[i].ver);
+
+      char buf[MAX_PATH + 1];
+      while (fgets (buf, MAX_PATH, fp))
+	{
+	  char *lastchar = strchr(buf, '\n');
+	  if (lastchar[-1] != '/')
+	    printf ("    /%s", buf);
+	}
+
+      fclose (fp);
+    }
+
+  free (packages);
+
+  return;
+}
+
+void
+package_find (int verbose, char **argv)
+{
+  pkgver *packages = get_packages(NULL);
+  if (packages == NULL)
+    {
+      puts ("No setup information found");
+      return;
+    }
+
+  for (int i = 0; packages[i].name; i++)
+    {
+      FILE *fp = open_package_list (packages[i].name);
+      if (!fp)
+      {
+	if (verbose)
+	  printf ("Can't open file list /etc/setup/%s.lst.gz for package %s\n",
+	      packages[i].name, packages[i].name);
+	return;
+      }
+
+      char buf[MAX_PATH + 2];
+      buf[0] = '/';
+      while (fgets (buf + 1, MAX_PATH, fp))
+	{
+	  char *filename = strtok(buf, "\n");
+	  int flen = strlen (filename);
+	  if (filename[flen - 1] != '/')
+	    {
+	      // FIXME: verify that /bin is mounted on /usr/bin; ditto for /lib
+	      bool is_alias = !strncmp(filename, "/usr/bin/", 9) ||
+			      !strncmp(filename, "/usr/lib", 9);
+	      int a = match_argv (argv, filename);
+	      if (!a && is_alias)
+		a = match_argv (argv, filename + 4);
+	      if (!a && !strcmp(filename + flen - 4, ".exe"))
+		{
+		  filename[flen - 4] = '\0';
+		  a = match_argv (argv, filename);
+		}
+	      if (!a && is_alias)
+		a = match_argv (argv, filename + 4);
+	      if (a > 0)
+		printf ("%s-%s\n", packages[i].name, packages[i].ver);
+	    }
+	}
+
+      fclose (fp);
+    }
+
+  free (packages);
+
+  return;
+}
+

@@ -1,5 +1,31 @@
 2003-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygcheck.cc (main): Fix some formatting and help text printing.
+
+2003-08-15  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* cygcheck.cc (find_package,list_package): New global
+	variables.
+	(usage): Add "--find-package" and "--list-package" options,
+	reformat output.
+	(longopts, opts): Add "--find-package" and "--list-package"
+	options.
+	(main): Process the "--find-package" and "--list-package"
+	flags.  Add new semantic checks.  Add calls to find_package()
+	and list_package().
+	* dump_setup.cc: Fix header comment.
+	(match_argv): Change return type to int to distinguish
+	between real matches and default ones.
+	(open_package_list): New static function.
+	(check_package_files): Factor out opening the package list
+	file into open_package_list().
+	(get_packages): New static function.
+	(dump_setup): Factor out getting a list of packages into
+	get_packages().
+	(package_list, package_find): New global functions.
+
+2003-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* regtool.cc (usage): Add missing linefeed.  Move example to --help
 	text.  Fix forward slash description.
 
