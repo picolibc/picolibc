@@ -1,3 +1,7 @@
+2001-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/string/wcscoll.c: Fix comment.
+
 2001-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h: Add definition for wcscoll.
