@@ -14,6 +14,6 @@ extern int _fmode;
 void
 cygwin_premain0(int argc, char **argv)
 {
-  _fmode &= _O_BINARY;
+  _fmode &= ~_O_BINARY;
   _fmode |= _O_TEXT;
 }

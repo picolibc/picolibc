@@ -1,3 +1,8 @@
+Sat Jul  1 11:43:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* binmode.c (cygwin_premain0): Fix erroneous clearing of bit.
+	* textmode.c (cygwin_premain0): Ditto.
+
 Sat Jul  1 00:24:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (_dll_crt0): Renamed from dll_crt0 ().
