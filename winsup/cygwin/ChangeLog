@@ -1,5 +1,10 @@
 2002-10-20  Christopher Faylor  <cgf@redhat.com>
 
+	* cygthread.cc (cygthread::stub): Fix typo.
+	(cygthread::terminate): Don't zero thread handle prior to using it.
+
+2002-10-20  Christopher Faylor  <cgf@redhat.com>
+
 	* sigproc.cc (wait_sig): Remove obsolete sigchld logic.
 
 2002-10-20  Christopher Faylor  <cgf@redhat.com>

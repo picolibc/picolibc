@@ -45,7 +45,7 @@ cygthread::stub (VOID *arg)
   while (1)
     {
       if (!info->__name)
-	system_printf ("errnoneous thread activation");
+	system_printf ("erroneous thread activation");
       else
 	{
 	  if (!info->func || initialized < 0)
@@ -319,8 +319,9 @@ cygthread::terminate ()
       for (unsigned i = 0; i < NTHREADS; i++)
 	if (threads[i].h)
 	  {
-	    hthreads[n++] = threads[i].h;
-	    TerminateThread (threads[i].h, 0);
+	    hthreads[n] = threads[i].h;
+	    threads[i].h = NULL;
+	    TerminateThread (hthreads[n++], 0);
 	  }
       if (n)
 	{
