@@ -115,45 +115,7 @@ you write to the correct address in the first place.
 Beyond that, perhaps nobody has time to answer your question.  Perhaps
 nobody knows the answer.
 
-@section Installation and Setup
-
-@subsection Why is the install of the tools failing?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-If you are getting an error message saying "The decompression of
-%s failed.  There may not be enough free disk space in the TEMP
-directory.", read on.
-
-InstallShield has a bug where it fails with this message if there
-are more than a certain number of files in your TEMP directory.
-You can also get this message if you have files in your TEMP dir
-named the same thing InstallShield wishes to name its files (probably
-from past runs of other InstallShield install scripts) which it cannot,
-for some reason, write over.  Perhaps this will be fixed in a future
-release of InstallShield.
-
-Until then, clearing out your TEMP directory entirely should do it.
-That will get rid of any files with conflicting names and solve the
-"too many files" problem as well.
-
-@subsection Help! I haven't created /tmp and tools are behaving strangely!
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-Many Unix tools (bash, byacc, etc.) expect that /tmp always exists.
-This is not guaranteed in Win32 land.  You should create /tmp or "mount"
-the directory of your choice to /tmp to avoid this problem.
-
-@subsection Why does bash spew out "49054596: No such file or directory"?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-Are you sure you created a /tmp?  The bash shell will print a
-warning if it doesn't find a /tmp directory.
+@section Using Cygwin
 
 @subsection How do I set /etc up?
 
@@ -168,24 +130,7 @@ mkgroup to create /etc/passwd and /etc/group respectively.  Since
 Windows 95/98's Win32 API is less complete, you're out of luck if
 you're running Windows 95/98.
 
-@subsection Bash says that it can't vfork (or just hangs).  Why?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-Most often this is because it can't find itself in the path.  Make sure
-that your path includes the directory where bash lives, before you start
-it.
-
-Also make sure you have a valid @code{/bin/sh.exe}.  If you get errors
-like 'no such file or directory' when you're trying to run a shell
-script, which you know is there, then your problem is probably that bash
-can't find @code{/bin/sh}.
-
-@subsection How can I get bash to read my .bashrc file on startup?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+@subsection Why doesn't bash read my .bashrc file on startup?
 
 Your .bashrc is read from your home directory specified by the HOME
 environment variable.  It uses /.bashrc if HOME is not set.  So you need
@@ -194,15 +139,9 @@ mounted as / in Cygwin.
 
 @subsection How can I get bash filename completion to be case insensitive?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 "shopt -s nocaseglob" should do the trick.
 
 @subsection Can I use paths/filenames containing spaces in them?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 Cygwin does support spaces in filenames and paths.  That said, some
 utilities that use the library may not, since files don't typically
@@ -210,14 +149,24 @@ contain spaces in Unix.  If you stumble into problems with this, you
 will need to either fix the utilities or stop using spaces in filenames
 used by Cygwin tools.
 
+In particular, bash interprets space as a word separator.  You would have
+to quote a filename containing spaces, or escape the space character.
+For example:
+
+@example
+	bash-2.03$ cd '/cygdrive/c/Program Files'
+@end example
+
+or
+
+@example
+	bash-2.03$ cd /cygdrive/c/Program\ Files
+@end example
+
 @subsection Why can't I cd into a shortcut to a directory?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-Cygwin does not follow MS Windows Explorer Shortcuts (*.lnk
-files) yet.  It sees a shortcut as a regular file and this you
-cannot "cd" into it.
+Cygwin does not follow MS Windows Explorer Shortcuts (*.lnk files).  It
+sees a shortcut as a regular file and this you cannot "cd" into it.
 
 Some people have suggested replacing the current symbolic link scheme
 with shortcuts.  The major problem with this is that .LNK files would
@@ -226,13 +175,9 @@ under native Win32 non-Cygwin applications such as Explorer.
 
 @subsection I'm having basic problems with find.  Why?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-Make sure you are using the find that came with the Cygwin tools
-and that you aren't picking up the Win32 find command instead.  You
-can verify that you are getting the right one by doing a "type find"
-in bash.
+Make sure you are using the find that came with Cygwin and that you
+aren't picking up the Win32 find command instead.  You can verify that
+you are getting the right one by doing a "type find" in bash.
 
 @subsection Why don't cursor keys work under Win95/Win98?
 
@@ -266,107 +211,83 @@ properly).
 
 @subsection Is it OK to have multiple copies of the DLL?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+It is a very bad idea to have multiple *versions* of the cygwin DLL in
+your path.  They often conflict in funny ways.  If you have multiple
+versions, get rid of (or rename) all the older versions, keeping only
+the newest one.
 
-It's a bad idea to have multiple versions of the cygwin DLL in
-your path.  They often conflict in funny ways.  If you have
-multiple versions, it's usually OK to get rid of (or rename)
-all the older versions, keeping only the newest one.
-
-It should be OK to have multiple copies of the *same* DLL
-in your path, though.
-
-@section Using Cygwin Releases
-
-@subsection Why aren't man, groff, etc. included in the betas?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-For obvious reasons, it isn't feasible for us to maintain and provide
-binary distributions of every tool ported to work with the Cygwin
-tools.  However, it's likely that a man command will show up in a
-distribution soon.
-
-Many other tools have been ported and are referenced on the Cygwin web
-site.  man, groff, info, and many many other packages are all
-available for download there.
-
-@subsection Where can I find "less"?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-The less pager binary is available for the first time in the 20.1
-release.  You will get it if you upgrade.  It is also available from
-various ftp locations on the Net.  Search the mailing list archives for
-the details.
+It should be OK to have multiple copies of the *same* DLL in your path,
+though.
 
 @subsection Where can I find "more"?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 If you are looking for the "more" pager, you should use the "less" pager
-instead.  See the last question and answer for more information.
+instead.
 
 @subsection Where can I find "which"?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-While we don't include a which command, you can use the bash built
-in "type" command which does something fairly similar.
+There is no "which" command with Cygwin.  However, you can use the bash
+shell builtin "type" which does something similar.
 
 @subsection How can I access other drives?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+You have some flexibility here.
 
-The best way is to use the "mount" command to mount the drive letter so
-that you can refer to it with only single slashes:
+Cygwin has a builtin "cygdrive prefix" for drives that are not mounted.
+You can access any drive, say Z:, as '/cygdrive/z/'.
+
+In some applications (notably bash), you can use the familiar windows
+<drive>:/path/, using posix forward-slashes ('/') instead of Windows
+backward-slashes ('\').  (But see the warning below!)  This maps in the
+obvious way to the Windows path, but will be converted internally to use
+the Cygwin path, following mounts (default or explicit).  For example:
 
 @example
-bash$ mkdir /c
-bash$ mount c:/ /c
-bash$ ls /c
-....
+	bash-2.03$ cd C:/Windows
+	bash-2.03$ pwd
+        /cygdrive/c/Windows
 @end example
 
-This is done with textual substitution whenever a file is opened.
-So if you're going to do @code{ls /c/bar} on a mount like the above
-the guts will turn that into @code{ls c:/bar}.
+and
+
+@example
+	bash-2.03$ cd C:/cygwin
+	bash-2.03$ pwd
+        /
+@end example
+
+for a default setup.  (You could also use backward-slashes in the
+Windows path, but these would have to be escaped from the shell.)
+
+@strong{Warning:} There is some ambiguity in going from a Windows path
+to the posix path, because different posix paths, through different
+mount points, could map to the same Windows directory.  This matters
+because different mount points may be binmode or textmode, so the
+behaviour of Cygwin apps will vary depending on the posix path used to
+get there.
+
+You can avoid the ambiguity of Windows paths, and avoid typing
+"/cygdrive", by explicitly mounting drives to posix paths.  For example:
+
+@example
+	bash$ mkdir /c
+	bash$ mount c:/ /c
+	bash$ ls /c
+	@end example
 
 Note that you only need to mount drives once.  The mapping is kept
 in the registry so mounts stay valid pretty much indefinitely.
 You can only get rid of them with umount (or the registry editor).
 
-The '-b' option to mount mounts the mountpoint in binary mode where text
-and binary files are treated equivalently.  This should only be
-necessary for badly ported Unix programs where binary flags are missing
-from open calls.
-
-Since the beta 16 release, we also support a special means of accessing
-other drive letters without using the @code{mount} command.  This
-support may disappear in a future Cygwin release because of the
-collision between this scheme and UNC pathname support (one character
-machine names don't work currently).
-
-To do an "ls" on drive letter f:, do the following:
-
-@example
-bash$ ls //f/
-@end example
-
-Note that you can also access UNC paths in the standard way.  Because of
-the drive letter shortcut mentioned above, machine names in UNC paths
-must be more than one character long.
+The '-b' option to mount mounts the mountpoint in binary mode
+("binmode") where text and binary files are treated equivalently.  This
+should only be necessary for badly ported Unix programs where binary
+flags are missing from open calls.  It is also the setting for /,
+/usr/bin and /usr/lib in a default Cygwin installation.  The default for
+new mounts is text mode ("textmode"), which is also the mode for all
+"cygdrive" mounts.
 
 @subsection How can I copy and paste into Cygwin console windows?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 Under Windows NT, open the properties dialog of the console window.
 The options contain a toggle button, named "Quick edit mode".  It must
@@ -394,9 +315,6 @@ where <version> is the latest registry version associated with the
 Cygwin library.
 
 @subsection How can I share files between Unix and Windows?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 During development, we have both Unix boxes running Samba and
 NT/Windows 95/98 machines.  We often build with cross-compilers
@@ -498,7 +416,7 @@ it's worth it for people with more complex installations.
 @strong{(Please note: This section has not yet been updated for the latest
 net release.)}
 
-One person reported that McAfee VirusScan for NT (and others?) is
+Users have reported that McAfee VirusScan for NT (and others?) is
 incompatible with Cygwin.  This is because it tries to scan the
 newly loaded shared memory in the cygwin.dll, which can cause fork()s
 to fail, wreaking havoc on many of the tools.
@@ -530,16 +448,6 @@ not yet providing a man page or info reader.  Both types of
 documentation are available in a tar file available from the project ftp
 site.  Or consult the online documentation over the WWW.
 
-@subsection Why can't B20's "cygcheck -s" find cpp?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-This is a confusingly worded warning that will be reworded in future
-versions.  In fact, cygcheck should normally *not* find cpp; if it does,
-it may be a problem (e.g. it might pick up Borland's cpp, which would
-cause problems).
-
 @subsection Why do I get a message saying Out of Queue slots?
 
 @strong{(Please note: This section has not yet been updated for the latest
@@ -558,9 +466,6 @@ close of a file, or other such thing.  (Thanks to Larry Hall for
 this explanation).
 
 @subsection Why don't symlinks work on samba-mounted filesystems?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 Symlinks are marked with "system" file attribute.  Samba does not
 enable this attribute by default.  To enable it, consult your Samba
