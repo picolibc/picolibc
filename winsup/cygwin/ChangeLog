@@ -1,3 +1,8 @@
+2002-10-16  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::read): Attempt #527 to properly
+	implement VMIN/VTIME.
+
 2002-10-15  Christopher Faylor  <cgf@redhat.com>
 
 	* shared.cc (open_shared): Revert to "old" method for shared memory

@@ -632,9 +632,8 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
 int __stdcall
 fhandler_tty_slave::read (void *ptr, size_t len)
 {
-  DWORD n;
   int totalread = 0;
-  int vmin = INT_MAX;
+  int vmin = 0;
   int vtime = 0;	/* Initialized to prevent -Wuninitialized warning */
   size_t readlen;
   DWORD bytes_in_pipe;
@@ -646,7 +645,9 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 
   termios_printf ("read(%x, %d) handle %p", ptr, len, get_handle ());
 
-  if (!(get_ttyp ()->ti.c_lflag & ICANON))
+  if ((get_ttyp ()->ti.c_lflag & ICANON))
+    time_to_wait = INFINITE;
+  else
     {
       vmin = get_ttyp ()->ti.c_cc[VMIN];
       if (vmin > INP_BUFFER_SIZE)
@@ -656,17 +657,29 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	vmin = 0;
       if (vtime < 0)
 	vtime = 0;
-      time_to_wait = vtime == 0 ? INFINITE : 100 * vtime;
+      if (!vmin && !vtime)
+	time_to_wait = 0;
+      else
+	time_to_wait = !vtime ? INFINITE : 100 * vtime;
     }
-  else
-    time_to_wait = INFINITE;
 
   w4[0] = signal_arrived;
   w4[1] = input_available_event;
 
+  DWORD waiter = INFINITE;
   while (len)
     {
-      rc = WaitForMultipleObjects (2, w4, FALSE, time_to_wait);
+      rc = WaitForMultipleObjects (2, w4, FALSE, waiter);
+
+      if (rc == WAIT_TIMEOUT)
+	break;
+
+      if (rc == WAIT_FAILED)
+	{
+	  termios_printf ("wait for input event failed, %E");
+	  break;
+	}
+
       if (rc == WAIT_OBJECT_0)
 	{
 	  /* if we've received signal after successfully reading some data,
@@ -676,13 +689,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	  set_sig_errno (EINTR);
 	  return -1;
 	}
-      else if (rc == WAIT_FAILED)
-	{
-	  termios_printf ("wait for input event failed, %E");
-	  break;
-	}
-      else if (rc == WAIT_TIMEOUT)
-	break;
+
       rc = WaitForSingleObject (input_mutex, 1000);
       if (rc == WAIT_FAILED)
 	{
@@ -700,7 +707,19 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	  _raise (SIGHUP);
 	  bytes_in_pipe = 0;
 	}
+
+      if (!vmin && !time_to_wait)
+	{
+	  ReleaseMutex (input_mutex);
+	  return bytes_in_pipe;
+	}
+
       readlen = min (bytes_in_pipe, min (len, sizeof (buf)));
+
+      if (vmin && readlen > (unsigned) vmin)
+	readlen = vmin;
+
+      DWORD n = 0;
       if (readlen)
 	{
 	  termios_printf ("reading %d bytes (vtime %d)", readlen, vtime);
@@ -746,7 +765,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	}
       if (get_ttyp ()->ti.c_lflag & ICANON || is_nonblocking ())
 	break;
-      if (totalread >= vmin && (vmin > 0 || totalread > 0))
+      if (vmin && totalread >= vmin)
 	break;
 
       /* vmin == 0 && vtime == 0:
@@ -766,6 +785,9 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 
       if (vmin == 0)
 	break;
+
+      if (n)
+	waiter = time_to_wait;
     }
   termios_printf ("%d=read(%x, %d)", totalread, ptr, len);
   return totalread;
