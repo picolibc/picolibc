@@ -1,3 +1,7 @@
+2003-01-10  Christopher Faylor  <cgf@redhat.com>
+
+	* include/winsock2.h: Remove gethostname from INSIDE_CYGWIN protection.
+
 2003-01-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/dxguid.c: Don't #include <objbase.h>.

@@ -517,8 +517,9 @@ u_long PASCAL ntohl(u_long);
 u_short PASCAL htons(u_short);
 u_short PASCAL ntohs(u_short);
 int PASCAL select(int nfds,fd_set*,fd_set*,fd_set*,const struct timeval*);
-int PASCAL gethostname(char*,int);
 #endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
+
+int PASCAL gethostname(char*,int);
 
 #define WSAMAKEASYNCREPLY(b,e)	MAKELONG(b,e)
 #define WSAMAKESELECTREPLY(e,error)	MAKELONG(e,error)
