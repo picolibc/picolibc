@@ -1,3 +1,13 @@
+2002-03-05  dannysmith@users.sourceforge.net
+
+	* include/mswsock.h (TP_*): Add new defines.
+	(TRANSMIT_PACKETS_ELEMENT): Define new structure.
+	(WSAMSG): Likewise.
+	(WSACMSGHDR): Likewise.
+	(DisconnectEx): Add new prototype.
+	(WSARecvMsg): Likewise.
+	(WSA_CMSG_*) Add empty macros, guarded by #if 0.
+
 2002-03-02  dannysmith@users.sourceforge.net
 
 	* ChangeLog: Fix typo in last entry. 
