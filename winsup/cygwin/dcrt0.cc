@@ -613,15 +613,6 @@ dll_crt0_1 ()
   /* Set the os_being_run global. */
   set_os_type ();
 
-  /* If we didn't call SetFileApisToOEM, console I/O calls would use a
-     different codepage than other Win32 API calls.  In some languages
-     (not English), this would result in "cat > filename" creating a file
-     by a different name than if CreateFile was used to create filename.
-     SetFileApisToOEM prevents this problem by making all calls use the
-     OEM codepage. */
-
-  SetFileApisToOEM ();
-
   /* Initialize the host dependent constants object. */
   host_dependent.init ();
 
@@ -698,7 +689,6 @@ dll_crt0_1 ()
 #endif
 
   char *line = GetCommandLineA ();
-  CharToOem (line, line);
 
   line = strcpy ((char *) alloca (strlen (line) + 1), line);
 
@@ -1156,7 +1146,7 @@ static void
 dummy_autoload (void)
 {
 LoadDLLinit (user32)
-LoadDLLfunc (CharToOemA, 8, user32)
+LoadDLLfunc (CharToOemBuffA, 12, user32)
 LoadDLLfunc (CreateWindowExA, 48, user32)
 LoadDLLfunc (DefWindowProcA, 16, user32)
 LoadDLLfunc (DispatchMessageA, 4, user32)
@@ -1168,8 +1158,7 @@ LoadDLLfunc (GetUserObjectInformationA, 20, user32)
 LoadDLLfunc (KillTimer, 8, user32)
 LoadDLLfunc (MessageBoxA, 16, user32)
 LoadDLLfunc (MsgWaitForMultipleObjects, 20, user32)
-LoadDLLfunc (OemToCharA, 8, user32)
-LoadDLLfunc (OemToCharW, 8, user32)
+LoadDLLfunc (OemToCharBuffA, 12, user32)
 LoadDLLfunc (PeekMessageA, 20, user32)
 LoadDLLfunc (PostMessageA, 16, user32)
 LoadDLLfunc (PostQuitMessage, 4, user32)

@@ -179,7 +179,9 @@ fhandler_console::read (void *pv, size_t buflen)
 	  !input_rec.Event.KeyEvent.bKeyDown)
 	continue;
 
-      if (ich == 0 || (ich & 0xff) == 0xe0)  /* arrow/function keys */
+      if (ich == 0 ||
+	  /* arrow/function keys */
+	  (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
 	{
 	  toadd = get_nonascii_key (input_rec);
 	  if (!toadd)
@@ -187,7 +189,10 @@ fhandler_console::read (void *pv, size_t buflen)
 	  nread = strlen (toadd);
 	}
       else if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
-	toadd = &ich;
+	{
+	  OemToCharBuff (&ich, &ich, 1);
+	  toadd = &ich;
+	}
       else
 	{
 	  static char tmp[2];
@@ -1024,13 +1029,20 @@ fhandler_console::write_normal (const unsigned char *src,
   /* Print all the base ones out */
   if (found != src)
     {
-      if (! WriteFile (get_output_handle (), src,  found - src, &done, 0))
+      char buf[256];
+      int len = found - src;
+      do {
+	int l2 = min (256, len);
+	CharToOemBuff ((LPCSTR)src, buf, l2);
+	if (! WriteFile (get_output_handle (), buf, l2, &done, 0))
 	{
 	  debug_printf ("write failed, handle %p", get_output_handle ());
 	  __seterrno ();
 	  return 0;
 	}
-      src += done;
+	len -= done;
+	src += done;
+      } while (len > 0);
     }
   if (src < end)
     {

@@ -1,3 +1,14 @@
+2000-07-04  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* dcrt0.cc (dll_crt0_1): Eliminate SetFileApisToOEM and CharToOem.
+	* (dummy_autoload): Add functions used in fhandler_console.
+	* fhandler_console.cc (fhandler_console::read): Use ENCHANCED_KEY flag
+	to distinguish extended keys.  Translate an input character from the
+	OEM code page to the ANSI code page.
+	* (fhandler_console::write_normal): Translate output characters from
+	the ANSI code page to the OEM code page.
+	* syscalls.cc (_link): Use MultiByteToWideChar instead of OemToCharW.
+
 Mon Jul  3 16:09:16 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (stack_info::walk): Use method to find offset.
