@@ -1,3 +1,7 @@
+Sat Apr 21 19:26:05 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* thread.cc (MTinterface::Init): Remove accidentally checked in code.
+
 Sun Apr 22 00:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* passwd.cc (getpwuid): Check for thread cancellation.

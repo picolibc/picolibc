@@ -297,8 +297,6 @@ MTinterface::Init (int forked)
   if (forked)
     return;
 
-  /* shm areas a inherited when forking */
-  shm_head = NULL;
   /* possible the atfork lists should be inited here as well */
 
   mainthread.win32_obj_id = myself->hProcess;
