@@ -25,6 +25,7 @@ details. */
 #include "ntdll.h"
 #include <sys/param.h>
 #include <assert.h>
+#include <sys/sysmacros.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -486,8 +487,8 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 				   "%lu",
 			  p->pid, cmd,
 			  state,
-			  p->ppid, p->pgid, p->sid, p->ctty, -1,
-			  0, fault_count, fault_count, 0, 0, utime, stime,
+			  p->ppid, p->pgid, p->sid, makedev (FH_TTYS, p->ctty),
+			  -1, 0, fault_count, fault_count, 0, 0, utime, stime,
 			  utime, stime, priority, 0, 0, 0,
 			  start_time, vmsize,
 			  vmrss, vmmaxrss
@@ -556,6 +557,9 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
       vmsize *= page_size; vmrss *= page_size; vmdata *= page_size;
       vmtext *= page_size; vmlib *= page_size;
     }
+  // The real uid value for *this* process is stored at cygheap->user.real_uid
+  // but we can't get at the real uid value for any other process, so
+  // just fake it as p->uid. Similar for p->gid.
   return __small_sprintf (destbuf, "Name:   %s\n"
 				   "State:  %c (%s)\n"
 				   "Tgid:   %d\n"
@@ -578,8 +582,8 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
 			  p->pgid,
 			  p->pid,
 			  p->ppid,
-			  p->uid, cygheap->user.real_uid, cygheap->user.real_uid, p->uid,
-			  p->gid, cygheap->user.real_gid, cygheap->user.real_gid, p->gid,
+			  p->uid, p->uid, p->uid, p->uid,
+			  p->gid, p->gid, p->gid, p->gid,
 			  vmsize >> 10, 0, vmrss >> 10, vmdata >> 10, 0, vmtext >> 10, vmlib >> 10,
 			  0, 0, p->getsigmask ()
 			  );

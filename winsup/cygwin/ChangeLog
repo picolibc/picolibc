@@ -1,3 +1,10 @@
+2002-09-24  Christopher January <chris@atomice.net>
+
+	* fhandler_proc.cc (format_process_stat): make ctty a real device
+	number.
+	(format_process_status): use effective uid/gid as real and saved
+	uid/gid.
+
 2002-09-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (errmap): Map ERROR_INVALID_ADDRESS to new errno code
@@ -1603,7 +1610,7 @@
 	(fhandler_socket::close): Ditto.
 	(fhandler_socket::ioctl): Ditto.
 	* ioctl.cc (ioctl): Add sigframe.
-	*net.cc (cygwin_sendto): Ditto.
+	* net.cc (cygwin_sendto): Ditto.
 	(cygwin_recvfrom): Ditto.
 	(cygwin_recvfrom): Ditto.
 	(cygwin_connect): Ditto.

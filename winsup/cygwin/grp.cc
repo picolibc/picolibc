@@ -237,8 +237,7 @@ grp32togrp16 (struct __group16 *gp16, struct __group32 *gp32)
   return gp16;
 }
 
-extern "C"
-struct __group32 *
+extern "C" struct __group32 *
 getgrgid32 (__gid32_t gid)
 {
   struct __group32 * default_grp = NULL;
@@ -256,8 +255,7 @@ getgrgid32 (__gid32_t gid)
   return allow_ntsec ? NULL : default_grp;
 }
 
-extern "C"
-struct __group16 *
+extern "C" struct __group16 *
 getgrgid (__gid16_t gid)
 {
   static struct __group16 g16;
@@ -265,8 +263,7 @@ getgrgid (__gid16_t gid)
   return grp32togrp16 (&g16, getgrgid32 ((__gid32_t) gid));
 }
 
-extern "C"
-struct __group32 *
+extern "C" struct __group32 *
 getgrnam32 (const char *name)
 {
   if (group_state  <= initializing)
@@ -280,8 +277,7 @@ getgrnam32 (const char *name)
   return NULL;
 }
 
-extern "C"
-struct __group16 *
+extern "C" struct __group16 *
 getgrnam (const char *name)
 {
   static struct __group16 g16;
@@ -289,15 +285,13 @@ getgrnam (const char *name)
   return grp32togrp16 (&g16, getgrnam32 (name));
 }
 
-extern "C"
-void
+extern "C" void
 endgrent ()
 {
   grp_pos = 0;
 }
 
-extern "C"
-struct __group32 *
+extern "C" struct __group32 *
 getgrent32 ()
 {
   if (group_state  <= initializing)
@@ -309,8 +303,7 @@ getgrent32 ()
   return NULL;
 }
 
-extern "C"
-struct __group16 *
+extern "C" struct __group16 *
 getgrent ()
 {
   static struct __group16 g16;
@@ -318,8 +311,7 @@ getgrent ()
   return grp32togrp16 (&g16, getgrent32 ());
 }
 
-extern "C"
-void
+extern "C" void
 setgrent ()
 {
   grp_pos = 0;
@@ -413,16 +405,14 @@ error:
   return -1;
 }
 
-extern "C"
-int
+extern "C" int
 getgroups32 (int gidsetsize, __gid32_t *grouplist)
 {
   return getgroups32 (gidsetsize, grouplist, myself->gid,
 		      cygheap->user.name ());
 }
 
-extern "C"
-int
+extern "C" int
 getgroups (int gidsetsize, __gid16_t *grouplist)
 {
   __gid32_t *grouplist32 = NULL;
@@ -445,8 +435,7 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
   return ret;
 }
 
-extern "C"
-int
+extern "C" int
 initgroups32 (const char *, __gid32_t)
 {
   if (wincap.has_security ())
@@ -454,16 +443,14 @@ initgroups32 (const char *, __gid32_t)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 initgroups (const char * name, __gid16_t gid)
 {
   return initgroups32 (name, gid16togid32(gid));
 }
 
 /* setgroups32: standards? */
-extern "C"
-int
+extern "C" int
 setgroups32 (int ngroups, const __gid32_t *grouplist)
 {
   if (ngroups < 0 || (ngroups > 0 && !grouplist))
@@ -504,8 +491,7 @@ setgroups32 (int ngroups, const __gid32_t *grouplist)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 setgroups (int ngroups, const __gid16_t *grouplist)
 {
   __gid32_t *grouplist32 = NULL;
