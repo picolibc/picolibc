@@ -1,3 +1,7 @@
+Wed Jun 21 13:18:23 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Add *.exe to clean operation.
+
 Wed Jun 21 01:02:38 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* mkvers.sh: Fix sed usage for older seds.
