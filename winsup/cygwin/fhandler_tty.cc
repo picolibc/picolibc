@@ -479,13 +479,13 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
   __small_sprintf (buf, OUTPUT_DONE_EVENT, ttynum);
   output_done_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
 
-  if (!(output_mutex = get_ttyp ()->open_output_mutex (TRUE)))
+  if (!(output_mutex = get_ttyp ()->open_output_mutex ()))
     {
       termios_printf ("open output mutex failed, %E");
       __seterrno ();
       return 0;
     }
-  if (!(input_mutex = get_ttyp ()->open_input_mutex (TRUE)))
+  if (!(input_mutex = get_ttyp ()->open_input_mutex ()))
     {
       termios_printf ("open input mutex failed, %E");
       __seterrno ();

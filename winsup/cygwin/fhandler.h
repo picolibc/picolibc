@@ -400,8 +400,8 @@ public:
   int get_socket () { return (int) get_handle(); }
   fhandler_socket * is_socket () { return this; }
 
-  int saw_shutdown_read () const {return FHISSETF (SHUTRD);}
-  int saw_shutdown_write () const {return FHISSETF (SHUTWR);}
+  bool saw_shutdown_read () const {return FHISSETF (SHUTRD);}
+  bool saw_shutdown_write () const {return FHISSETF (SHUTWR);}
 
   void set_shutdown_read () {FHSETF (SHUTRD);}
   void set_shutdown_write () {FHSETF (SHUTWR);}

@@ -179,13 +179,14 @@ typedef struct _h
     const char *name;
     const char *func;
     int ln;
+    DWORD clexec_pid;
     struct _h *next;
   } handle_list;
 
-static NO_COPY handle_list starth = {0, NULL, NULL, NULL, 0, NULL};
+static NO_COPY handle_list starth = {0, NULL, NULL, NULL, 0, 0, NULL};
 static NO_COPY handle_list *endh = NULL;
 
-static handle_list NO_COPY freeh[1000] = {{0, NULL, NULL, NULL, 0, NULL}};
+static handle_list NO_COPY freeh[1000] = {{0, NULL, NULL, NULL, 0, 0, NULL}};
 #define NFREEH (sizeof (freeh) / sizeof (freeh[0]))
 
 static muto NO_COPY *debug_lock = NULL;
@@ -195,6 +196,8 @@ static muto NO_COPY *debug_lock = NULL;
 
 #define unlock_debug() \
   do {if (debug_lock) debug_lock->release (); } while (0)
+
+static bool __stdcall mark_closed (const char *, int, HANDLE, const char *, BOOL);
 
 void
 debug_init ()
@@ -215,6 +218,14 @@ find_handle (HANDLE h)
 
 out:
   return hl;
+}
+
+void
+setclexec_pid (HANDLE h, bool setit)
+{
+  handle_list *hl = find_handle (h);
+  if (hl)
+    hl->clexec_pid = setit ? GetCurrentProcessId () : 0;
 }
 
 /* Create a new handle record */
@@ -275,8 +286,28 @@ out:
   unlock_debug ();
 }
 
-bool __stdcall
-debug_mark_closed (const char *func, int ln, HANDLE h, const char *name, BOOL force)
+static void __stdcall
+delete_handle (handle_list *hl)
+{
+  handle_list *hnuke = hl->next;
+  hl->next = hl->next->next;
+  if (hnuke->allocated)
+    free (hnuke);
+  else
+    memset (hnuke, 0, sizeof (*hnuke));
+}
+
+void
+debug_fixup_after_fork ()
+{
+  handle_list *hl;
+  for (hl = &starth; hl->next != NULL; hl = hl->next)
+    if (hl->next->clexec_pid)
+      delete_handle (hl);
+}
+
+static bool __stdcall
+mark_closed (const char *func, int ln, HANDLE h, const char *name, BOOL force)
 {
   handle_list *hl;
   lock_debug ();
@@ -299,14 +330,7 @@ debug_mark_closed (const char *func, int ln, HANDLE h, const char *name, BOOL fo
     }
 
   if (hl)
-    {
-      handle_list *hnuke = hl->next;
-      hl->next = hl->next->next;
-      if (hnuke->allocated)
-	free (hnuke);
-      else
-	memset (hnuke, 0, sizeof (*hnuke));
-    }
+    delete_handle (hl);
 
   unlock_debug ();
   return TRUE;
@@ -320,7 +344,7 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
   BOOL ret;
   lock_debug ();
 
-  if (!debug_mark_closed (func, ln, h, name, force))
+  if (!mark_closed (func, ln, h, name, force))
     return FALSE;
 
   ret = CloseHandle (h);

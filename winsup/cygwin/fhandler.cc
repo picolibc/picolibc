@@ -785,7 +785,7 @@ fhandler_base::lseek (off_t offset, int whence)
 }
 
 int
-fhandler_base::close (void)
+fhandler_base::close ()
 {
   int res = -1;
 
@@ -1317,8 +1317,8 @@ out:
 int
 fhandler_disk_file::close ()
 {
-  int res;
-  if ((res = this->fhandler_base::close ()) == 0)
+  int res = this->fhandler_base::close ();
+  if (!res)
     cygwin_shared->delqueue.process_queue ();
   return res;
 }
@@ -1545,6 +1545,7 @@ fhandler_base::set_inheritance (HANDLE &h, int not_inheriting, const char *namep
       h = newh;
       ProtectHandle2 (h, name);
     }
+  setclexec_pid (h, not_inheriting);
 #endif
 }
 

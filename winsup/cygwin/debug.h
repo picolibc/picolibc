@@ -43,8 +43,8 @@ int __stdcall iscygthread ();
 # define ProtectHandle1(h,n) do {} while (0)
 # define ProtectHandle2(h,n) do {} while (0)
 # define debug_init() do {} while (0)
-# define MarkCLosed(h) do {} while (0)
-# define debug_mark_closed(func, ln, h, name, force) (1)
+# define setclexec_pid(h, b) do {} while (0)
+# define debug_fixup_after_fork() do {} while (0)
 
 #else
 
@@ -59,23 +59,22 @@ int __stdcall iscygthread ();
 	close_handle (__PRETTY_FUNCTION__, __LINE__, (h), #n, TRUE)
 #   define ForceCloseHandle2(h,n) \
 	close_handle (__PRETTY_FUNCTION__, __LINE__, (h), n, TRUE)
-#   define MarkClosed(h) \
-	debug_mark_closed (__PRETTY_FUNCTION__, __LINE__, (h), #h, TRUE)
-#   define lock_pinfo_for_update(n) lpfu(__PRETTY_FUNCTION__, __LINE__, n)
 # endif
 
 # define ProtectHandle(h) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #h)
-# define ProtectHandle1(h,n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #n)
-# define ProtectHandle2(h,n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), n)
+# define ProtectHandle1(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #n)
+# define ProtectHandle2(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), n)
 
 void debug_init ();
-void __stdcall add_handle (const char *, int, HANDLE, const char *);
-BOOL __stdcall close_handle (const char *, int, HANDLE, const char *, BOOL);
-int __stdcall lpfu (const char *, int, DWORD timeout);
-void __stdcall cygbench (const char *s);
-extern int pinger;
+void __stdcall add_handle (const char *, int, HANDLE, const char *)
+  __attribute__ ((regparm (3)));
+BOOL __stdcall close_handle (const char *, int, HANDLE, const char *, BOOL)
+  __attribute__ ((regparm (3)));
+void __stdcall cygbench (const char *s) __attribute__ ((regparm (1)));
 extern "C" void console_printf (const char *fmt,...);
-bool debug_mark_closed (const char *, int, HANDLE, const char *, BOOL);
+void setclexec_pid (HANDLE, bool);
+void debug_fixup_after_fork ();
+extern int pinger;
 
 #endif /*DEBUGGING*/
 #endif /*_DEBUG_H_*/

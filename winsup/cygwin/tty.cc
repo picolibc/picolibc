@@ -327,13 +327,13 @@ tty::init (void)
 }
 
 HANDLE
-tty::get_event (const char *fmt, BOOL inherit, BOOL manual_reset)
+tty::get_event (const char *fmt, BOOL manual_reset)
 {
   HANDLE hev;
   char buf[40];
 
   __small_sprintf (buf, fmt, ntty);
-  if (!(hev = CreateEvent (inherit ? &sec_all : &sec_all_nih, manual_reset, FALSE, buf)))
+  if (!(hev = CreateEvent (&sec_all, manual_reset, FALSE, buf)))
     {
       termios_printf ("couldn't create %s", buf);
       set_errno (ENOENT);	/* FIXME this can't be the right errno */
@@ -406,15 +406,15 @@ tty::common_init (fhandler_pty_master *ptym)
     }
   else
     {
-      if (!(ptym->output_done_event = get_event (OUTPUT_DONE_EVENT, FALSE)))
+      if (!(ptym->output_done_event = get_event (OUTPUT_DONE_EVENT)))
 	return FALSE;
-      if (!(ptym->ioctl_done_event = get_event (IOCTL_DONE_EVENT, FALSE)))
+      if (!(ptym->ioctl_done_event = get_event (IOCTL_DONE_EVENT)))
 	return FALSE;
-      if (!(ptym->ioctl_request_event = get_event (IOCTL_REQUEST_EVENT, FALSE)))
+      if (!(ptym->ioctl_request_event = get_event (IOCTL_REQUEST_EVENT)))
 	return FALSE;
     }
 
-  if (!(ptym->input_available_event = get_event (INPUT_AVAILABLE_EVENT, FALSE, TRUE)))
+  if (!(ptym->input_available_event = get_event (INPUT_AVAILABLE_EVENT, TRUE)))
     return FALSE;
 
   char buf[40];

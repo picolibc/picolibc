@@ -1,3 +1,28 @@
+Sat Sep  1 01:10:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* debug.cc (mark_closed): Rename from debug_mark_closed and make
+	static.
+	(setclexec_pid): New function for marking saved handle as
+	close-on-exec.
+	(delete_handle): New function.
+	(debug_fixup_after_fork): New function.
+	* debug.h: Declare new functions, remove obsolete ones.
+	* fork.cc (debug_fixup_after_fork): Call to cleanup close-on-exec
+	handles.
+
+	* fhandler.cc (fhandler_disk_file::close): Minor reorg.
+	(fhandler_base::set_inheritance): Set flag appropriately for debugging
+	when close-on-exec so forked process can delete closed handles.
+	* tty.h (open_output_mutex): Eliminate unneeded argument.
+	(open_input_mutex): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::open): reflect open_*_mutex
+	argument changes.
+	* fhandler.h (fhandler_socket): Make saw_shutdown_* functions type
+	bool.
+	* tty.cc (tty::get_event): Eliminate unneeded argument.
+	(tty::common_init): Reflect change to get_event.  Events should always
+	be inherited.
+
 Fri Aug 31 21:39:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (create_token): Change initialization of `exp' to comply
