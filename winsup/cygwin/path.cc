@@ -453,7 +453,7 @@ path_conv::check (const char *src, unsigned opt,
   known_suffix = NULL;
   fileattr = INVALID_FILE_ATTRIBUTES;
   case_clash = false;
-  devn = unit = 0;
+  memset (&dev, 0, sizeof (dev));
   fs.root_dir[0] = '\0';
   fs.name[0] = '\0';
   fs.flags = fs.serial = 0;
@@ -524,28 +524,28 @@ path_conv::check (const char *src, unsigned opt,
 	    }
 
 	  /* Convert to native path spec sans symbolic link info. */
-	  error = mount_table->conv_to_win32_path (path_copy, full_path, devn,
-						   unit, &sym.pflags, 1);
+	  error = mount_table->conv_to_win32_path (path_copy, full_path, dev,
+						   &sym.pflags, 1);
 
 	  if (error)
 	    return;
 
-	  if (devn == FH_CYGDRIVE)
+	  if (dev.devn >= FH_CYGDRIVE && dev.devn <= FH_CYGDRIVE_Z)
 	    {
 	      if (!component)
 		fileattr = FILE_ATTRIBUTE_DIRECTORY;
 	      else
 		{
-		  devn = FH_BAD;
+		  dev.devn = FH_BAD;
 		  fileattr = GetFileAttributes (this->path);
 		}
 	      goto out;
 	    }
-	  else if (isvirtual_dev (devn))
+	  else if (isvirtual_dev (dev.devn))
 	    {
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
 	      fhandler_virtual *fh =
-		(fhandler_virtual *) cygheap->fdtab.build_fhandler (-1, devn, (const char *) path_copy, NULL, unit);
+		(fhandler_virtual *) cygheap->fdtab.build_fhandler (-1, dev, (const char *) path_copy, NULL);
 	      int file_type = fh->exists ();
 	      switch (file_type)
 		{
@@ -564,7 +564,7 @@ path_conv::check (const char *src, unsigned opt,
 	      goto out;
 	    }
 	  /* devn should not be a device.  If it is, then stop parsing now. */
-	  else if (devn != FH_BAD)
+	  else if (dev.devn != FH_BAD)
 	    {
 	      fileattr = 0;
 	      path_flags = sym.pflags;
@@ -772,7 +772,7 @@ out:
       return;
     }
 
-  if (devn == FH_BAD)
+  if (dev.devn == FH_BAD)
     {
       if (!fs.update (path))
 	{
@@ -884,257 +884,40 @@ const char *windows_device_names[] NO_COPY =
 #define udeveq(s) (strcasematch (unix_path, (s)))
 #define udeveqn(s, n) (strncasematch (unix_path, (s), (n)))
 
-static int __stdcall
-get_devn (const char *name, int &unit)
-{
-  int devn = FH_BAD;
-  name += 5;
-  if (deveq ("tty"))
-    {
-      if (real_tty_attached (myself))
-	{
-	  unit = myself->ctty;
-	  devn = FH_TTYS;
-	}
-      else if (myself->ctty > 0)
-	devn = FH_CONSOLE;
-    }
-  else if (deveqn ("tty", 3) && (unit = digits (name + 3)) >= 0)
-    devn = FH_TTYS;
-  else if (deveq ("ttym"))
-    devn = FH_TTYM;
-  else if (deveq ("ptmx"))
-    devn = FH_PTYM;
-  else if (deveq ("windows"))
-    devn = FH_WINDOWS;
-  else if (deveq ("dsp"))
-    devn = FH_OSS_DSP;
-  else if (deveq ("conin"))
-    devn = FH_CONIN;
-  else if (deveq ("conout"))
-    devn = FH_CONOUT;
-  else if (deveq ("null"))
-    devn = FH_NULL;
-  else if (deveq ("zero"))
-    devn = FH_ZERO;
-  else if (deveq ("random") || deveq ("urandom"))
-    {
-      devn = FH_RANDOM;
-      unit = 8 + (deveqn ("u", 1) ? 1 : 0); /* Keep unit Linux conformant */
-    }
-  else if (deveq ("mem"))
-    {
-      devn = FH_MEM;
-      unit = 1;
-    }
-  else if (deveq ("clipboard"))
-    devn = FH_CLIPBOARD;
-  else if (deveq ("port"))
-    {
-      devn = FH_MEM;
-      unit = 4;
-    }
-  else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0 && unit < 100)
-    devn = FH_SERIAL;
-  else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
-    {
-      devn = FH_SERIAL;
-      unit++;
-    }
-  else if (deveq ("pipe"))
-    devn = FH_PIPE;
-  else if (deveq ("piper"))
-    devn = FH_PIPER;
-  else if (deveq ("pipew"))
-    devn = FH_PIPEW;
-  else if (deveq ("tcp") || deveq ("udp") || deveq ("streamsocket")
-	   || deveq ("dgsocket"))
-    devn = FH_SOCKET;
-
-  return devn;
-}
-
-/*
-    major      minor    POSIX filename	NT filename
-    -----      -----	--------------	-------------------------
-    FH_TAPE	  0	/dev/st0	\device\tape0
-    FH_TAPE	  1	/dev/st1	\device\tape1
-    ...
-    FH_TAPE	128	/dev/nst0	\device\tape0
-    FH_TAPE	129	/dev/nst1	\device\tape1
-    ...
-
-    FH_FLOPPY     0	/dev/fd0	\device\floppy0
-    FH_FLOPPY	  1	/dev/fd1	\device\floppy1
-    ...
-
-    FH_FLOPPY	 16	/dev/scd0	\device\cdrom0
-    FH_FLOPPY	 17	/dev/scd0	\device\cdrom1
-    ...
-
-    FH_FLOPPY	 32	/dev/sda	\device\harddisk0\partition0
-    FH_FLOPPY	 33	/dev/sda1	\device\harddisk0\partition1
-    ...
-    FH_FLOPPY	 47	/dev/sda15	\device\harddisk0\partition15
-
-    FH_FLOPPY	 48	/dev/sdb	\device\harddisk1\partition0
-    FH_FLOPPY    33     /dev/sdb1       \device\harddisk1\partition1
-    ...
-    FH_FLOPPY	208	/dev/sdl	\device\harddisk11\partition0
-    ...
-    FH_FLOPPY	223	/dev/sdl15	\device\harddisk11\partition15
-
-    The following are needed to maintain backward compatibility with
-    the old Win32 partitioning scheme on W2K/XP.
-
-    FH_FLOPPY	224	from mount tab	\\.\A:
-    ...
-    FH_FLOPPY	250	from mount tab	\\.\Z:
-*/
-static int
-get_raw_device_number (const char *name, const char *w32_path, int &unit)
-{
-  DWORD devn = FH_BAD;
-
-  if (!w32_path)  /* New approach using fixed device names. */
-    {
-      if (deveqn ("st", 2))
-	{
-	  unit = digits (name + 2);
-	  if (unit >= 0 && unit < 128)
-	    devn = FH_TAPE;
-	}
-      else if (deveqn ("nst", 3))
-	{
-	  unit = digits (name + 3) + 128;
-	  if (unit >= 128 && unit < 256)
-	    devn = FH_TAPE;
-	}
-      else if (deveqn ("fd", 2))
-	{
-	  unit = digits (name + 2);
-	  if (unit >= 0 && unit < 16)
-	    devn = FH_FLOPPY;
-	}
-      else if (deveqn ("scd", 3))
-	{
-	  unit = digits (name + 3) + 16;
-	  if (unit >= 16 && unit < 32)
-	    devn = FH_FLOPPY;
-	}
-      else if (deveqn ("sd", 2) && isalpha (name[2]))
-	{
-	  unit = (cyg_tolower (name[2]) - 'a') * 16 + 32;
-	  if (unit >= 32 && unit < 224)
-	    if (!name[3])
-	      devn = FH_FLOPPY;
-	    else
-	      {
-		int d = digits (name + 3);
-		if (d >= 1 && d < 16)
-		  {
-		    unit += d;
-		    devn = FH_FLOPPY;
-		  }
-	      }
-	}
-    }
-  else /* Backward compatible checking of mount table device mapping. */
-    {
-      if (wdeveqn ("tape", 4))
-	{
-	  unit = digits (w32_path + 4);
-	  /* Norewind tape devices have leading n in name. */
-	  if (deveqn ("n", 1))
-	    unit += 128;
-	  devn = FH_TAPE;
-	}
-      else if (wdeveqn ("physicaldrive", 13))
-	{
-	  unit = digits (w32_path + 13) * 16 + 32;
-	  devn = FH_FLOPPY;
-	}
-      else if (isdrive (w32_path))
-	{
-	  unit = cyg_tolower (w32_path[0]) - 'a' + 224;
-	  devn = FH_FLOPPY;
-	}
-    }
-  return devn;
-}
-
-static int __stdcall get_device_number (const char *unix_path,
-					const char *w32_path, int &unit)
-  __attribute__ ((regparm(3)));
-static int __stdcall
-get_device_number (const char *unix_path, const char *w32_path, int &unit)
-{
-  DWORD devn = FH_BAD;
-  unit = 0;
-
-  if (*unix_path == '/' && udeveqn ("/dev/", 5))
-    {
-      devn = get_devn (unix_path, unit);
-      if (devn == FH_BAD && *w32_path == '\\' && wdeveqn ("\\dev\\", 5))
-	devn = get_devn (w32_path, unit);
-      if (devn == FH_BAD && wdeveqn ("\\\\.\\", 4))
-	devn = get_raw_device_number (unix_path + 5, w32_path + 4, unit);
-      if (devn == FH_BAD)
-	devn = get_raw_device_number (unix_path + 5, NULL, unit);
-    }
-  else
-    {
-      char *p = strrchr (unix_path, '/');
-      if (p)
-	unix_path = p + 1;
-      if (udeveqn ("com", 3)
-	 && (unit = digits (unix_path + 3)) >= 0 && unit < 100)
-	devn = FH_SERIAL;
-    }
-
-  return devn;
-}
-
 /* Return TRUE if src_path is a Win32 device name, filling out the device
    name in win32_path */
 
 static BOOL
-win32_device_name (const char *src_path, char *win32_path,
-		   DWORD &devn, int &unit)
+win32_device_name (const char *src_path, char *win32_path, device& dev)
 {
-  const char *devfmt;
+  dev.parse (src_path);
 
-  devn = get_device_number (src_path, win32_path, unit);
-
-  if (devn == FH_BAD)
+  if (dev.devn == FH_BAD)
     return false;
 
-  if ((devfmt = windows_device_names[FHDEVN (devn)]) == NULL)
-    return false;
-  switch (devn)
+  switch (dev.devn)
     {
-      case FH_RANDOM:
-	__small_sprintf (win32_path, devfmt, unit == 8 ? "" : "u");
-	break;
       case FH_TAPE:
-	__small_sprintf (win32_path, "\\Device\\Tape%d", unit % 128);
+	__small_sprintf (win32_path, dev.fmt, dev.minor % 128);
 	break;
-      case FH_FLOPPY:
-	if (unit < 16)
-	  __small_sprintf (win32_path, "\\Device\\Floppy%d", unit);
-	else if (unit < 32)
-	  __small_sprintf (win32_path, "\\Device\\CdRom%d", unit - 16);
-	else if (unit < 224)
-	  __small_sprintf (win32_path, "\\Device\\Harddisk%d\\Partition%d",
-				       (unit - 32) / 16, unit % 16);
-	else
-	  __small_sprintf (win32_path, "\\DosDevices\\%c:", unit - 224 + 'A');
+      case FH_RAWDRIVE:
+	  __small_sprintf (win32_path, dev.fmt, dev.minor - 224 + 'A');
 	break;
+      case FH_TTY:
+	{
+	  if (!real_tty_attached (myself))
+	    dev = *console_dev;
+	  else
+	    {
+	      dev = *ttys_dev;
+	      dev.setunit (myself->ctty);
+	    }
+	}
       default:
-	__small_sprintf (win32_path, devfmt, unit);
+	__small_sprintf (win32_path, dev.fmt, dev.minor);
 	break;
     }
-  return TRUE;
+  return true;
 }
 
 /* Normalize a Win32 path.
@@ -1367,6 +1150,16 @@ set_flags (unsigned *flags, unsigned val)
     }
 }
 
+/* CGF FIXME device */
+static const device dev_proc =
+{"/proc", FH_PROC, "/proc", 0, 0, 0, 0};
+
+static const device dev_cygdrive =
+{"/cygdrive", FH_CYGDRIVE, "/cygdrive", 0, 0, 0, 0};
+
+static const device dev_fs =
+{"", FH_FS, "", 0, 0, 0, 0};
+
 /* conv_to_win32_path: Ensure src_path is a pure Win32 path and store
    the result in win32_path.
 
@@ -1381,9 +1174,8 @@ set_flags (unsigned *flags, unsigned val)
    {,full_}win32_path must have sufficient space (i.e. MAX_PATH bytes).  */
 
 int
-mount_info::conv_to_win32_path (const char *src_path, char *dst,
-				DWORD &devn, int &unit, unsigned *flags,
-				bool no_normalize)
+mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
+				unsigned *flags, bool no_normalize)
 {
   while (sys_mount_table_counter < cygwin_shared->sys_mount_table_counter)
     {
@@ -1395,8 +1187,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
   unsigned dummy_flags;
   int chroot_ok = !cygheap->root.exists ();
 
-  devn = FH_BAD;
-  unit = 0;
+  dev.devn = FH_BAD;
 
   if (!flags)
     flags = &dummy_flags;
@@ -1463,7 +1254,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
     }
 
   /* See if this is a cygwin "device" */
-  if (win32_device_name (pathbuf, dst, devn, unit))
+  if (win32_device_name (pathbuf, dst, dev))
     {
       *flags = MOUNT_BINARY;	/* FIXME: Is this a sensible default for devices? */
       rc = 0;
@@ -1475,20 +1266,23 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
   MALLOC_CHECK;
   if (isproc (pathbuf))
     {
-      devn = fhandler_proc::get_proc_fhandler (pathbuf);
-      if (devn == FH_BAD)
+      dev = dev_proc;
+      dev.devn = fhandler_proc::get_proc_fhandler (pathbuf);
+      if (dev.devn == FH_BAD)
 	return ENOENT;
     }
   else if (iscygdrive (pathbuf))
     {
       int n = mount_table->cygdrive_len - 1;
+      int unit;
+
       if (!pathbuf[n] ||
 	  (pathbuf[n] == '/' && pathbuf[n + 1] == '.' && !pathbuf[n + 2]))
 	{
 	  unit = 0;
 	  dst[0] = '\0';
 	  if (mount_table->cygdrive_len > 1)
-	    devn = FH_CYGDRIVE;
+	    dev = dev_cygdrive;
 	}
       else if (cygdrive_win32_path (pathbuf, dst, unit))
 	{
@@ -1565,8 +1359,8 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       set_flags (flags, (unsigned) mi->flags);
     }
 
-  if (!isvirtual_dev (devn))
-    win32_device_name (src_path, dst, devn, unit);
+  if (!isvirtual_dev (dev.devn))
+    win32_device_name (src_path, dst, dev);
 
  out:
   MALLOC_CHECK;
@@ -1621,7 +1415,7 @@ mount_info::cygdrive_win32_path (const char *src, char *dst, int& unit)
   const char *p = src + cygdrive_len;
   if (!isalpha (*p) || (!isdirsep (p[1]) && p[1]))
     {
-      unit = -1;
+      unit = -1; /* FIXME: should be zero, maybe? */
       dst[0] = '\0';
       res = 0;
     }
