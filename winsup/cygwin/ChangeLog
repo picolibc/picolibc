@@ -1,5 +1,14 @@
 2004-01-26  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (sig_handle_tty_stop): Avoid races by waiting for both
+	signal_arrived and for sigCONT.
+	(sigpacket::process): Enforce sending of both signal_arrived and
+	sigCONT, where appropriate.
+	* gendef (sigreturn): Save tls pointer in ebx so that it can jump into
+	sigdelayed and use the same register.
+
+2004-01-26  Christopher Faylor  <cgf@redhat.com>
+
 	* cygtls.cc (_threadinfo::init_thread): Add more local reent stdio
 	initialization.
 	* dcrt0.cc (initial_env): Can it really be true that XP doesn't allow

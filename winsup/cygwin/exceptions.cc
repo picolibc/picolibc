@@ -644,8 +644,19 @@ sig_handle_tty_stop (int sig)
     }
   sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
 		  myself->pid, sig, myself->ppid_handle);
-  if (WaitForSingleObject (sigCONT, INFINITE) != WAIT_OBJECT_0)
-    api_fatal ("WaitSingleObject failed, %E");
+  HANDLE w4[2];
+  w4[0] = sigCONT;
+  w4[1] = signal_arrived;
+  switch (WaitForMultipleObjects (2, w4, TRUE, INFINITE))
+    {
+    case WAIT_OBJECT_0:
+    case WAIT_OBJECT_0 + 1:
+      reset_signal_arrived ();
+      break;
+    default:
+      api_fatal ("WaitSingleObject failed, %E");
+      break;
+    }
   return;
 }
 }
@@ -925,9 +936,12 @@ set_signal_mask (sigset_t newmask, sigset_t oldmask)
 int __stdcall
 sigpacket::process ()
 {
-  if (si.si_signo == SIGCONT)
+  DWORD continue_now;
+  if (si.si_signo != SIGCONT)
+    continue_now = false;
+  else
     {
-      DWORD stopped = myself->process_state & PID_STOPPED;
+      continue_now = myself->process_state & PID_STOPPED;
       myself->stopsig = 0;
       myself->process_state &= ~PID_STOPPED;
       /* Clear pending stop signals */
@@ -935,8 +949,6 @@ sigpacket::process ()
       sig_clear (SIGTSTP);
       sig_clear (SIGTTIN);
       sig_clear (SIGTTOU);
-      if (stopped)
-	SetEvent (sigCONT);
     }
 
   int rc = 1;
@@ -1001,6 +1013,8 @@ sigpacket::process ()
 	  || si.si_signo == SIGURG)
 	{
 	  sigproc_printf ("default signal %d ignored", si.si_signo);
+	  if (continue_now)
+	    SetEvent (signal_arrived);
 	  goto done;
 	}
 
@@ -1037,6 +1051,8 @@ dosig1:
   rc = setup_handler (si.si_signo, handler, thissig, tls);
 
 done:
+  if (continue_now)
+    SetEvent (sigCONT);
   sigproc_printf ("returning %d", rc);
   return rc;
 
