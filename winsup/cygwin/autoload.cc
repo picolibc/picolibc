@@ -89,7 +89,7 @@ _win32_" mangle (name, n) ":				\n\
 1:movl		(2f),%eax				\n\
   call		*(%eax)					\n\
 2:.long		." #dllname "_info			\n\
-  .long		(" #n "+" #notimp ") | " #err "<<16	\n\
+  .long		(" #n "+" #notimp ") | (((" #err ") & 0xffff) <<16)	\n\
   .asciz	\"" #name "\"				\n\
   .text							\n\
 ");
@@ -128,7 +128,7 @@ noload:									\n\
 	pushl	%eax		# First argument			\n\
 	call	_SetLastError@4	# Set it				\n\
 	popl	%eax		# Get back argument			\n\
-	shrl	$16,%eax	# return value in high order word	\n\
+	sarl	$16,%eax	# return value in high order word	\n\
 	jmp	*%edx		# Return				\n\
 1:									\n\
 	movl	(%edx),%eax	# Handle value				\n\

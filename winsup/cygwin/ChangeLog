@@ -1,5 +1,10 @@
 2005-03-02  Christopher Faylor  <cgf@timesys.com>
 
+	* autoload.cc (LoadDLLprime): Mask error code to low-order 16 bits.
+	(noload): Preserve sign when returning error code.
+
+2005-03-02  Christopher Faylor  <cgf@timesys.com>
+
 	* spawn.cc (do_cleanup): Properly restore SIGINT/SIGQUIT even if they
 	had previously been SIG_DFL.
 
