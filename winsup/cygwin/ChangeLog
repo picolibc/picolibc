@@ -1,3 +1,7 @@
+Tue Mar 27 11:31:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap): Fix conditional for previous patch.
+
 Mon Mar 26 18:48:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (mmap): Outflank copy-on-write problem on 9x by

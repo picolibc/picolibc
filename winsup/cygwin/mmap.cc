@@ -383,7 +383,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   /* copy-on-write doesn't work correctly on 9x. To have at least read
      access we use *READ mapping on 9x when appropriate. It will still
      fail when needing write access, though. */
-  if ((flags & MAP_PRIVATE) && (os_being_run == winNT || !(prot & PROT_READ)))
+  if ((flags & MAP_PRIVATE) && (os_being_run == winNT || (prot & ~PROT_READ)))
     access = FILE_MAP_COPY;
 
   SetResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
