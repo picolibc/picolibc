@@ -189,6 +189,7 @@ _read (int fd, void *ptr, size_t len)
       return -1;
     }
 
+  // set_sig_errno (0);
   fhandler_base *fh = dtable[fd];
 
   /* Could block, so let user know we at least got here.  */

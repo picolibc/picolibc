@@ -1,3 +1,7 @@
+Thu Feb 24 15:56:00 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.c (_read): Clear errno before doing any read operation.
+
 Thu Feb 24 14:45:06 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (call_handler): Use new muto linked list to look for
