@@ -84,13 +84,15 @@ typedef struct {
  *      application should not use both simultaneously.
  */
 
+typedef void (*_sig_func_ptr)();
+
 struct sigaction {
   int         sa_flags;       /* Special flags to affect behavior of signal */
   sigset_t    sa_mask;        /* Additional set of signals to be blocked */
                               /*   during execution of signal-catching */
                               /*   function. */
   union {
-    void      (*_handler)();  /* SIG_DFL, SIG_IGN, or pointer to a function */
+    _sig_func_ptr _handler;  /* SIG_DFL, SIG_IGN, or pointer to a function */
 #if defined(_POSIX_REALTIME_SIGNALS)
     void      (*_sigaction)( int, siginfo_t *, void * );
 #endif
@@ -104,9 +106,11 @@ struct sigaction {
 
 #else
 
+typedef void (*_sig_func_ptr)(int);
+
 struct sigaction 
 {
-	void (*sa_handler)(int);
+	_sig_func_ptr sa_handler;
 	sigset_t sa_mask;
 	int sa_flags;
 };

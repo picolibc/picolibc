@@ -1,3 +1,12 @@
+2002-07-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/signal.h (SIG_IGN, SIG_DFL, SIG_ERR): Change
+	to use _sig_func_ptr type casted constants.
+	(_sig_func_ptr): Typedef moved to sys/signal.h.
+	* libc/include/sys/signal.h (_sig_func_ptr): Typedef added.
+	For __rtems, use POSIX definition, otherwise default to ANSI.
+	* libc/sys/linux/sys/signal.h (_sig_func_ptr): Typedef added.
+
 2002-07-24  Stephane Carrez  <stcarrez@nerim.fr>
 
         * configure.host: Recognize m6811-elf and m6812-elf targets.

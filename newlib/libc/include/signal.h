@@ -8,17 +8,9 @@ _BEGIN_STD_C
 
 typedef int	sig_atomic_t;		/* Atomic entity type (ANSI) */
 
-#if defined(__STDC__) || defined(__cplusplus)
-#define SIG_DFL ((void (*)(int))0)	/* Default action */
-#define SIG_IGN ((void (*)(int))1)	/* Ignore action */
-#define SIG_ERR ((void (*)(int))-1)	/* Error return */
-#else
-#define SIG_DFL ((void (*)())0)		/* Default action */
-#define SIG_IGN ((void (*)())1)		/* Ignore action */
-#define SIG_ERR ((void (*)())-1)	/* Error return */
-#endif
-
-typedef void (*_sig_func_ptr) (int);
+#define SIG_DFL ((_sig_func_ptr)0)	/* Default action */
+#define SIG_IGN ((_sig_func_ptr)1)	/* Ignore action */
+#define SIG_ERR ((_sig_func_ptr)-1)	/* Error return */
 
 struct _reent;
 

@@ -19,7 +19,8 @@
 #undef sigset_t
 #define sigset_t __sigset_t
 
-typedef void (*__sighandler_t) (int);
+typedef void (*_sig_func_ptr) (int);
+typedef _sig_func_ptr __sighandler_t;
 
 #include <bits/siginfo.h>
 #include <bits/sigaction.h>
