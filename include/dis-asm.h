@@ -192,6 +192,7 @@ extern int print_insn_mcore		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_mn10200		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_mn10300		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_ns32k		PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_pdp11		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_big_powerpc	PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_little_powerpc	PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_rs6000		PARAMS ((bfd_vma, disassemble_info*));

@@ -1,3 +1,7 @@
+2001-02-18  lars brinkhoff  <lars@nocrew.org>
+
+	* dis-asm.h: Add PDP-11 target.
+
 2001-02-09  Martin Schwidefsky  <schwidefsky@de.ibm.com>
 
 	* dis-asm.h: Add linux target for S/390.
