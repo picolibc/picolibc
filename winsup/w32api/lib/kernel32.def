@@ -692,6 +692,8 @@ VDMOperationStarted@4
 VerLanguageNameA@12
 VerLanguageNameW@12
 VerifyConsoleIoHandle@4
+VerifyVersionInfoA@16
+VerifyVersionInfoW@16
 VirtualAlloc@16
 VirtualAllocEx@20
 VirtualAllocVlm@24
