@@ -1,3 +1,105 @@
+2005-03-28  Paul Brook  <paul@codesourcery.com>
+	Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/Makefile.in: arm-tdep.o depends on $(observer_h).
+	* gdb/arm-linux-nat.c (fetch_fpregister, fetch_fpregs,
+	store_fpregister, store_fpregs): Rename...
+	(fetch_fpa_register, fetch_fpa_regs, store_fpa_register,
+	store_fpa_regs): ... to this.
+	* gdb/arm-linux-tdep.c (arm_linux_init_abi): Provide ABI specific
+	overrides.
+	* gdb/arm-tdep.c: Include opserver.h.
+	(struct gdbarch_tdep_info): Add.
+	(arm_push_dummy_call): Handle doubleword alignment.
+	(arm_register_type): Handle iWMMXt and VFP regs.
+	(arm_register_byte): Ditto.
+	(arm_pseudo_register_read): New function.
+	(arm_pseudo_register_write): New function.
+	(arm_dwarf_reg_to_regnum): New function.
+	(arm_register_sim_regno): Handle iWMMXT regs.
+	(arm_register_remote_regno): New function.
+	(arm_extract_return_value): Use new macro names.
+	(arm_register_name): Handle iWMMXt and VFP registers.
+	(arm_sim_available_registers): New function.
+	(arm_update_architecture): New function.
+	(arm_gdbarch_init): Handle optional register sets.  Register new
+	hooks.  Fix misleading error message.
+	(_initialize_arm_tdep): Call observer_attach_inferior_created.
+	* gdb/arm-tdep.h (ARM_NUM_FP_ARG_REGS, ARM_LAST_FP_ARG_REGNUM,
+	FP_REGISTER_SIZE, NUM_FREGS): Rename ...
+	(ARM_NUM_FPA_ARG_REGS, ARM_LAST_FPA_ARG_REGNUM, FPA_REGISTER_SIZE,
+	NUM_FPA_REGS): ... to this.
+	(NUM_IWMMXT_COP0REGS, NUM_IWMMXT_COP1REGS, NUM_IWMMXT_REGS,
+	IWMMXT_COP0_REGSIZE, IWMMXT_COP1_REGSIZE, NUM_VFP_XREGS,
+	VFP_XREG_SIZE, NUM_VFP_SREGS, VFP_SREG_SIZE, NUM_VFP_PSEUDOS): Define.
+	(struct gdbarch_tdep): Add target_has_iwmmxt_regs,
+	target_has_vfp_regs, first_iwmmxt_regnum, target_iwmmxt_regnum,
+	first_vfp_regnum, first_vfp_pseudo and target_vfp_regnum.
+	* gdb/gdbarch.c (struct gdbarch): Add remote_num_g_packet_regs,
+	sim_available_registers and register_remote_regno.
+	(startup_gdbarch, verify_gdbarch): Ditto.
+	(gdbarch_dump): Dump new fields.
+	(gdbarch_remote_num_g_packet_regs_p, gdbarch_remote_num_g_packet_regs,
+	set_gdbarch_remote_num_g_packet_regs,
+	gdbarch_sim_available_registers_p, gdbarch_sim_available_registers,
+	set_gdbarch_sim_available_registers, gdbarch_register_remote_regno_p,
+	gdbarch_register_remote_regno, set_gdbarch_register_remote_regno):
+	New functions.
+	* gdb/gdbarch.h: Add prototypes.
+	* gdb/gdbarch.sh: Add new fields.
+	(deprecated_current_gdbarch_select_hack): Call flush_cached_frames.
+	* gdb/remote-sim.h (gdbsim_create_inferior): Call
+	observer_notify_inferior_created.
+	(gdbsim_xfer_partial): New function.
+	(init_gdbsim_ops): Use it.
+	* gdb/remote.c (struct remote_state): Add num_g_regs.
+	(init_remote_state): Only consider hard regs.  Allow target to provide
+	register mapping.
+	(packet_reg_from_regnum): Don't check pseudo regs.
+	(packet_reg_from_pnum): Ditto.
+	(remote_protocol_qPart_availableRegisters): Add.
+	(set_remote_protocol_qPart_availableRegisters_packet_cmd,
+	show_remote_protocol_qPart_availableRegisters_packet_cmd): New
+	functions.
+	(fetch_register_using_p, store_register_using_P): Handle arbitrary
+	register mappings.
+	(fetch_registers_using_g): New function.
+	(remote_fetch_registers): Use it.
+	(store_registers_using_G): New function.
+	(remote_store_registers): Use it.
+	(remote_xfer_partial): Handle TARGET_OBJECT_AVAILABLE_REGISTERS.
+	(show_remote_cmd): Display availableRegisters.
+	(_initialize_remote): Register qPart_availableRegisters.
+	* gdb/target.h (enum target_object): Add
+	TARGET_OBJECT_AVAILABLE_REGISTERS.
+	* gdb/gdbserver/configure.srv (arm*-*-linux*): set
+	srv_linux_regsets=yes.
+	* gdb/gdbserver/linux-arm-low.c (PTRACE_GETWMMXREGS,
+	PTRACE_SETWMMXREGS): Define.
+	(arm_fill_gregset, arm_store_gregset, arm_fill_wmmxregset,
+	arm_store_wmmxregset, arm_available_registers): New functions.
+	(target_regsets): Add.
+	(the_low_target): Use arm_available_registers.
+	* gdb/gdbserver/linux-low.c (linux_available_registers): New function.
+	(linux_target_op): Use it.
+	* gdb/gdbserver/linux-low.h (gdbserver/linux-low.h): Add
+	available_registers.
+	(use_regsets_p): Declare.
+	* gdb/gdbserver/regcache.c (g_register_bytes): Add.
+	(regcache_invalidate, registers_to_string, registers_from_string):
+	Use it.
+	(set_register_cache): Set g_register_bytes.
+	(supply_register_as_string): New function.
+	* gdb/gdbserver/regcache.h (supply_register_as_string): Add prototype.
+	* gdb/gdbserver/server.c (handle_query): Handle
+	qPart:availableRegisters.
+	(handle_p_packet, handle_P_packet): New functions.
+	(main): Handle 'p' and 'P' packets.
+	* gdb/gdbserver/target.h (struct target_ops): Add available_registers.
+	* gdb/regformats/reg-arm.dat: Add last_g_reg and iWMMXT regs.
+	* gdb/regformats/regdat.sh: Handle last_g_reg.
+	* gdb/regformats/regdef.h (set_register_cache): Update prototype.
+
 2005-03-28  Mark Mitchell <mark@codesourcery.com>
 
 	* include/libiberty.h (ffs): Declare.
