@@ -12,8 +12,8 @@ ANSI_SYNOPSIS
 TRAD_SYNOPSIS
 	#include <string.h>
 	char * strchr(<[string]>, <[c]>);
-	char *<[string]>;
-	int *<[c]>;
+	const char *<[string]>;
+	int <[c]>;
 
 DESCRIPTION
 	This function finds the first occurence of <[c]> (converted to

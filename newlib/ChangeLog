@@ -1,3 +1,7 @@
+2002-05-10  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/string/strchr.c: Fix comment typo.
+
 2002-05-08  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* acinclude.m4: Add support for --enable-newlib-multithread.
