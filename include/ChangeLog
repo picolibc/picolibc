@@ -1,3 +1,7 @@
+2004-10-27  Richard Earnshaw  <rearnsha@arm.com>
+
+	* elf/arm.h: Add R_ARM_CALL and R_ARM_JUMP32.
+
 2004-10-27  Tomer Levi  <Tomer.Levi@nsc.com>
 
 	* opcode/crx.h (enum reg): Rearrange registers, remove 'ccfg' and `'pc'.
