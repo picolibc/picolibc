@@ -1,3 +1,8 @@
+2002-05-18  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (path_conv::check): Always set executable bit for executable
+	extension.
+
 2002-05-17  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::lseek): Avoid calling SetFilePointer with

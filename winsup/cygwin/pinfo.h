@@ -95,7 +95,7 @@ public:
     return thread2signal ? thread2signal->sigs[sig] : sigs[sig];
   }
 
-  inline void copysigs (_pinfo *p) {sigs = p->sigs;}
+  inline void copysigs (_pinfo *p) {memcpy (sigs, p->sigs, sizeof (sigs));}
 
   inline sigset_t& getsigmask ()
   {

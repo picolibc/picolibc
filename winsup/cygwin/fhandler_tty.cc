@@ -689,7 +689,9 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 
   if (!(get_ttyp ()->ti.c_lflag & ICANON))
     {
-      vmin = min (INP_BUFFER_SIZE, get_ttyp ()->ti.c_cc[VMIN]);
+      vmin = get_ttyp ()->ti.c_cc[VMIN];
+      if (vmin > INP_BUFFER_SIZE)
+	vmin = INP_BUFFER_SIZE;
       vtime = get_ttyp ()->ti.c_cc[VTIME];
       if (vmin < 0) vmin = 0;
       if (vtime < 0) vtime = 0;

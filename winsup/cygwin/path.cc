@@ -787,7 +787,7 @@ out:
   if (saw_symlinks)
     set_has_symlinks ();
 
-  if (!error && !(path_flags & (PATH_ALL_EXEC | PATH_NOTEXEC)))
+  if (!error && !(path_flags & PATH_ALL_EXEC))
     {
       const char *p = strchr (path, '\0') - 4;
       if (p >= path &&
