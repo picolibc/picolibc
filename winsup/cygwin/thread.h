@@ -263,12 +263,15 @@ class pthread_mutex:public verifyable_object
 public:
   HANDLE win32_obj_id;
   LONG condwaits;
+  int pshared;
 
   int Lock ();
   int TryLock ();
   int UnLock ();
-
+ 
+    pthread_mutex (unsigned short);
     pthread_mutex (pthread_mutexattr *);
+    pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
    ~pthread_mutex ();
 };
 
@@ -344,6 +347,11 @@ public:
   callback *pthread_prepare;
   callback *pthread_child;
   callback *pthread_parent;
+
+  /* this is an associative array for the _exclusive_ use of pshared mutex's
+   * normal mutex's don't go here to reduce overhead and prevent serialisation.
+   */
+  class pthread_mutex * pshared_mutexs[256];
 
   void Init (int);
 

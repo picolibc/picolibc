@@ -1,3 +1,31 @@
+Sun Apr 22 00:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* passwd.cc (getpwuid): Check for thread cancellation.
+	(getpwuid_r): Ditto.
+	(getpwname): Ditto.
+	(getpwnam_r): Ditto.
+	* thread.h (pthread_mutex): New constructors for pshared operation.
+	(MTinterface): Associative array for pshared mutex's.
+	* thread.cc (MTinterface::Init): Initailize pshared mutex array.
+	(pthread_cond::BroadCast): Implementation notes.
+	(pthread_cond::TimedWait): Remove use of SignalObjectAndWait on non-NT systems.
+	(pthread_mutex::pthread_mutex(unsigned short)): New function.
+	(pthread_mutex::pthread_mutex (pthread_mutex_t *, pthread_mutexattr *)):New function.
+	(pthread_mutex::pthread_mutex(pthread_mutexattr *)): Fail on pshared mutex's.
+	(__pthread_mutex_getpshared): New function.
+	(__pthread_join): Check for thread cancellation.
+	(__pthread_cond_timedwait): Support pshared mutex's.
+	(__pthread_cond_wait): Ditto.
+	(__pthread_condattr_setpshared): Error on PROCESS_SHARED requests.
+	(__pthread_mutex_init): Support pshared mutex's.
+	(__pthread_mutex_getprioceiling): Ditto.
+	(__pthread_mutex_lock): Ditto.
+	(__pthread_mutex_trylock): Ditto.
+	(__pthread_mutex_unlock): Ditto.
+	(__pthread_mutex_destroy): Ditto.
+	(__pthread_mutex_setprioceiling): Ditto.
+	(__pthread_mutexattr_setpshared): Support PTHREAD_PROCESS_PSHARED requests. 
+
 Fri Apr 20 19:38:29 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygwin.din: Add *scanf and *scan_r functions.

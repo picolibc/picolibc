@@ -43,6 +43,7 @@ details. */
 #include "perprocess.h"
 #include "security.h"
 #include <semaphore.h>
+#include <stdio.h>
 
 extern int threadsafe;
 
@@ -296,11 +297,17 @@ MTinterface::Init (int forked)
   if (forked)
     return;
 
+  /* shm areas a inherited when forking */
+  shm_head = NULL;
+  /* possible the atfork lists should be inited here as well */
 
   mainthread.win32_obj_id = myself->hProcess;
   mainthread.setThreadIdtoCurrent ();
   /* store the main thread's self pointer */
   TlsSetValue (thread_self_dwTlsIndex, &mainthread);
+  
+  for (int i =0;i<256;i++)pshared_mutexs[i]=NULL;
+
 #if 0
   item->function = NULL;
 
@@ -401,6 +408,8 @@ pthread_cond::~pthread_cond ()
 void
 pthread_cond::BroadCast ()
 {
+  // This potentially has an unfairness bug. We should
+  // consider preventing the wakeups from resuming until we finish signalling.
   if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
     return;
   PulseEvent (win32_obj_id);
@@ -420,8 +429,16 @@ pthread_cond::Signal ()
 int
 pthread_cond::TimedWait (DWORD dwMilliseconds)
 {
-  DWORD rv =
-    SignalObjectAndWait (mutex->win32_obj_id, win32_obj_id, dwMilliseconds,
+  DWORD rv;
+  if (os_being_run != winNT)
+    {
+      // FIXME: race condition (potentially drop events
+      // Possible solution (single process only) - place this in a critical section.
+      ReleaseMutex(mutex->win32_obj_id);
+      rv = WaitForSingleObject(win32_obj_id, dwMilliseconds);
+    }
+  else
+    rv = SignalObjectAndWait (mutex->win32_obj_id, win32_obj_id, dwMilliseconds,
 			 false);
   switch (rv)
     {
@@ -450,11 +467,6 @@ pthread_key::pthread_key (void (*destructor) (void *)):verifyable_object (PTHREA
 
 pthread_key::~pthread_key ()
 {
-/* FIXME: New feature completeness.
- * bracketed code is to called when the thread exists, not when delete is called
- * if (destructor && TlsGetValue(dwTlsIndex))
- *   destructor (TlsGetValue(dwTlsIndex));
- */
   if (pthread_key_destructor * dest = MT_INTERFACE->destructors.Remove (this))
     delete dest;
   TlsFree (dwTlsIndex);
@@ -475,18 +487,126 @@ pthread_key::get ()
   return TlsGetValue (dwTlsIndex);
 }
 
+#define SYS_BASE (unsigned char) 0xC0
+// Note: the order is important. This is an overloaded pthread_mutex_t from 
+// userland
+typedef struct _pshared_mutex {
+ unsigned char id;
+ unsigned char reserved;
+ unsigned char reserved2;
+ unsigned char flags;
+} pshared_mutex;
+
+/* pshared mutexs:
+ * the mutex_t (size 4) is not used as a verifyable object because we cannot
+ * guarantee the same address space for all processes.
+ * we use the following:
+ * high bit set (never a valid address).
+ * second byte is reserved for the priority.
+ * third byte is reserved
+ * fourth byte is the mutex id. (max 255 cygwin mutexs system wide).
+ * creating mutex's does get slower and slower, but as creation is a one time
+ * job, it should never become an issue
+ *
+ * And if you're looking at this and thinking, why not an array in cygwin for all mutexs,
+ * - you incur a penalty on _every_ mutex call and you have toserialise them all.
+ * ... Bad karma.
+ *
+ * option 2? put everything in userspace and update the ABI?
+ * - bad karma as well - the HANDLE, while identical across process's,
+ * Isn't duplicated, it's reopened.
+ */
+
+pthread_mutex::pthread_mutex (unsigned short id):verifyable_object (PTHREAD_MUTEX_MAGIC)
+{
+  //FIXME: set an appropriate security mask - probably everyone.
+  if (MT_INTERFACE->pshared_mutexs[id])
+    return;
+  char stringbuf[29];
+  snprintf(stringbuf, 29, "CYGWINMUTEX0x%0x", id & 0x000f);
+  system_printf("name of mutex to transparently open %s\n",stringbuf);
+  this->win32_obj_id =::CreateMutex (&sec_none_nih, false, stringbuf);
+  if (win32_obj_id==0 || (win32_obj_id && GetLastError() != ERROR_ALREADY_EXISTS))
+    {
+      // the mutex has been deleted or we couldn't get access. 
+	// the error_already_exists test is because we are only opening an
+	// existint mutex here
+      system_printf("couldn't get pshared mutex %x, %d\n",win32_obj_id, GetLastError());
+      CloseHandle(win32_obj_id);
+      magic=0;
+      win32_obj_id=NULL;
+      return;
+    }
+  pshared = PTHREAD_PROCESS_SHARED;
+
+  MT_INTERFACE->pshared_mutexs[id]=this;
+}
+
+pthread_mutex::pthread_mutex (pthread_mutex_t *mutex, pthread_mutexattr * attr):verifyable_object (PTHREAD_MUTEX_MAGIC)
+{
+  /* attr checked in the C call */
+  if (attr && attr->pshared==PTHREAD_PROCESS_SHARED)
+    {
+      //FIXME: set an appropriate security mask - probably everyone.
+      // This does open a D.O.S. - the name is guessable (if you are willing to run
+      // thru all possible address values :]
+      char stringbuf[29];
+      unsigned short id=1;
+      while (id < 256)
+        {
+          snprintf(stringbuf, 29, "CYGWINMUTEX0x%0x", id & 0x000f);
+          system_printf("name of mutex to create %s\n",stringbuf);
+          this->win32_obj_id =::CreateMutex (&sec_none_nih, false, stringbuf);
+          if (this->win32_obj_id && GetLastError() != ERROR_ALREADY_EXISTS)
+            {
+              MT_INTERFACE->pshared_mutexs[id]=this;
+	      pshared_mutex *pmutex=(pshared_mutex *)(mutex);
+	      pmutex->id=id;
+              pmutex->flags=SYS_BASE;
+	      pshared=PTHREAD_PROCESS_SHARED;
+	      condwaits = 0;
+	      return;
+	    }
+	  id++;
+	  CloseHandle(win32_obj_id);
+        }
+      magic=0;
+      win32_obj_id=NULL;
+    }
+  else
+    {
+      this->win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
+
+      if (!win32_obj_id)
+        magic = 0;
+      condwaits = 0;
+      pshared = PTHREAD_PROCESS_PRIVATE;
+    }
+}
+
 pthread_mutex::pthread_mutex (pthread_mutexattr * attr):verifyable_object (PTHREAD_MUTEX_MAGIC)
 {
+  /* attr checked in the C call */
+  if (attr && attr->pshared==PTHREAD_PROCESS_SHARED)
+    {
+      /* for pshared mutex's we need the mutex address */
+      magic = 0;
+      return;
+    }
+
   this->win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
-  if (!this->win32_obj_id)
+    
+  if (!win32_obj_id)
     magic = 0;
   condwaits = 0;
+  pshared = PTHREAD_PROCESS_PRIVATE;
 }
 
 pthread_mutex::~pthread_mutex ()
 {
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
+  win32_obj_id=NULL;
 }
 
 int
@@ -505,6 +625,26 @@ int
 pthread_mutex::UnLock ()
 {
   return ReleaseMutex (win32_obj_id);
+}
+
+pthread_mutex **
+__pthread_mutex_getpshared(pthread_mutex_t *mutex)
+{
+  if ((((pshared_mutex *)(mutex))->flags & SYS_BASE) != SYS_BASE )
+    return (pthread_mutex **)mutex;
+  pshared_mutex *pmutex=(pshared_mutex *)(mutex);
+  if ((MT_INTERFACE->pshared_mutexs[pmutex->id]) != NULL )
+    return &(MT_INTERFACE->pshared_mutexs[pmutex->id]);
+  /* attempt to get the existing mutex */
+  pthread_mutex * newmutex;
+  newmutex = new pthread_mutex (pmutex->id);
+  if (!verifyable_object_isvalid (newmutex, PTHREAD_MUTEX_MAGIC))
+  {
+    delete (newmutex);
+    MT_INTERFACE->pshared_mutexs[pmutex->id]=NULL;
+    return &(MT_INTERFACE->pshared_mutexs[0]);
+  }    
+  return &(MT_INTERFACE->pshared_mutexs[pmutex->id]);
 }
 
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),
@@ -730,10 +870,10 @@ __pthread_cancel (pthread_t thread)
   we return ESRCH until all the required functions call testcancel();
   this will give applications predictable behaviour.
 
-  the required function list is:
+  the required function list is: * indicates done, X indicates not present in cygwin.
 aio_suspend()
-close()
-creat()
+*close()
+*creat()
 fcntl()
 fsync()
 getmsg()
@@ -751,7 +891,7 @@ poll()
 pread()
 pthread_cond_timedwait()
 pthread_cond_wait()
-pthread_join()
+*pthread_join()
 pthread_testcancel()
 putmsg()
 putpmsg()
@@ -765,10 +905,10 @@ sigsuspend()
 sigtimedwait()
 sigwait()
 sigwaitinfo()
-sleep()
+*sleep()
 system()
 tcdrain()
-usleep()
+*usleep()
 wait()
 wait3()
 waitid()
@@ -834,10 +974,10 @@ getgrnam_r()
 getlogin()
 getlogin_r()
 getpwent()
-getpwnam()
-getpwnam_r()
-getpwuid()
-getpwuid_r()
+* getpwnam()
+* getpwnam_r()
+* getpwuid()
+* getpwuid_r() 
 gets()
 getutxent()
 getutxid()
@@ -1227,6 +1367,7 @@ __pthread_exit (void *value_ptr)
 int
 __pthread_join (pthread_t * thread, void **return_val)
 {
+  /* FIXME: wait on the thread cancellation event as well - we are a cancellation point*/
   if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
     return ESRCH;
 
@@ -1242,7 +1383,9 @@ __pthread_join (pthread_t * thread, void **return_val)
       WaitForSingleObject ((*thread)->win32_obj_id, INFINITE);
       if (return_val)
 	*return_val = (*thread)->return_ptr;
-    }				/* End if */
+    }	/* End if */
+
+  pthread_testcancel();
 
   return 0;
 }
@@ -1466,6 +1609,8 @@ __pthread_cond_signal (pthread_cond_t * cond)
   return 0;
 }
 
+// FIXME: pshared mutexs have the cond count in the shared memory area.
+// We need to accomodate that.
 int
 __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
 			  const struct timespec *abstime)
@@ -1473,25 +1618,30 @@ __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
   int rv;
   if (!abstime)
     return EINVAL;
+  pthread_mutex **themutex=NULL;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
-  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+  if (( ((pshared_mutex *)(mutex))->flags & SYS_BASE == SYS_BASE ))
+    // a pshared mutex
+    themutex = __pthread_mutex_getpshared(mutex);
+
+  if (!verifyable_object_isvalid (*themutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
     return EINVAL;
 
   if ((*cond)->waiting)
-    if ((*cond)->mutex && ((*cond)->mutex != (*mutex)))
+    if ((*cond)->mutex && ((*cond)->mutex != (*themutex)))
       return EINVAL;
   InterlockedIncrement (&((*cond)->waiting));
 
-  (*cond)->mutex = (*mutex);
-  InterlockedIncrement (&((*mutex)->condwaits));
+  (*cond)->mutex = (*themutex);
+  InterlockedIncrement (&((*themutex)->condwaits));
   rv = (*cond)->TimedWait (abstime->tv_sec * 1000);
   (*cond)->mutex->Lock ();
   if (InterlockedDecrement (&((*cond)->waiting)) == 0)
     (*cond)->mutex = NULL;
-  InterlockedDecrement (&((*mutex)->condwaits));
+  InterlockedDecrement (&((*themutex)->condwaits));
 
   return rv;
 }
@@ -1500,25 +1650,29 @@ int
 __pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
 {
   int rv;
+  pthread_mutex_t *themutex=mutex;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
-  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+  if (( ((pshared_mutex *)(mutex))->flags & SYS_BASE == SYS_BASE ))
+    // a pshared mutex
+    themutex = __pthread_mutex_getpshared(mutex);
+  if (!verifyable_object_isvalid (*themutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
     return EINVAL;
 
   if ((*cond)->waiting)
-    if ((*cond)->mutex && ((*cond)->mutex != (*mutex)))
+    if ((*cond)->mutex && ((*cond)->mutex != (*themutex)))
       return EINVAL;
   InterlockedIncrement (&((*cond)->waiting));
 
-  (*cond)->mutex = (*mutex);
-  InterlockedIncrement (&((*mutex)->condwaits));
+  (*cond)->mutex = (*themutex);
+  InterlockedIncrement (&((*themutex)->condwaits));
   rv = (*cond)->TimedWait (INFINITE);
   (*cond)->mutex->Lock ();
   if (InterlockedDecrement (&((*cond)->waiting)) == 0)
     (*cond)->mutex = NULL;
-  InterlockedDecrement (&((*mutex)->condwaits));
+  InterlockedDecrement (&((*themutex)->condwaits));
 
   return rv;
 }
@@ -1551,6 +1705,9 @@ __pthread_condattr_setpshared (pthread_condattr_t * attr, int pshared)
   if (!verifyable_object_isvalid (*attr, PTHREAD_CONDATTR_MAGIC))
     return EINVAL;
   if ((pshared < 0) || (pshared > 1))
+    return EINVAL;
+  /* shared cond vars not currently supported */
+  if (pshared != PTHREAD_PROCESS_PRIVATE)
     return EINVAL;
   (*attr)->shared = pshared;
   return 0;
@@ -1631,12 +1788,28 @@ int
 __pthread_mutex_init (pthread_mutex_t * mutex,
 		      const pthread_mutexattr_t * attr)
 {
+  if (( ((pshared_mutex *)(mutex))->flags & SYS_BASE == SYS_BASE ))
+    // a pshared mutex
+    return EBUSY;
   if (attr && !verifyable_object_isvalid (*attr, PTHREAD_MUTEXATTR_MAGIC))
     return EINVAL;
 
   if (verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EBUSY;
 
+  if (attr && (*attr)->pshared == PTHREAD_PROCESS_SHARED)
+    {
+      pthread_mutex_t throwaway = new pthread_mutex (mutex, (*attr));
+      mutex = __pthread_mutex_getpshared((pthread_mutex_t *)mutex);
+	
+      if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+        {
+          delete throwaway;
+          *mutex = NULL;
+          return EAGAIN;
+        }
+      return 0;
+    }
   *mutex = new pthread_mutex (attr ? (*attr) : NULL);
   if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     {
@@ -1651,9 +1824,13 @@ int
 __pthread_mutex_getprioceiling (const pthread_mutex_t * mutex,
 				int *prioceiling)
 {
+  pthread_mutex_t *themutex=(pthread_mutex_t *)mutex;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init ((pthread_mutex_t *) mutex, NULL);
-  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+  if (( ((pshared_mutex *)(mutex))->flags & SYS_BASE == SYS_BASE ))
+    // a pshared mutex
+    themutex = __pthread_mutex_getpshared((pthread_mutex_t *)mutex);
+  if (!verifyable_object_isvalid (*themutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   /* We don't define _POSIX_THREAD_PRIO_PROTECT because we do't currently support
    * mutex priorities.
@@ -1669,22 +1846,30 @@ __pthread_mutex_getprioceiling (const pthread_mutex_t * mutex,
 int
 __pthread_mutex_lock (pthread_mutex_t * mutex)
 {
+  pthread_mutex_t *themutex=mutex;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
-  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+  if (( ((pshared_mutex *)(mutex))->flags & SYS_BASE) == SYS_BASE )
+    // a pshared mutex
+    themutex = __pthread_mutex_getpshared(mutex);
+  if (!verifyable_object_isvalid (*themutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
-  (*mutex)->Lock ();
+  (*themutex)->Lock ();
   return 0;
 }
 
 int
 __pthread_mutex_trylock (pthread_mutex_t * mutex)
 {
+  pthread_mutex_t *themutex=mutex;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
-  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+  if (( ((pshared_mutex *)(mutex))->flags & SYS_BASE) == SYS_BASE )
+    // a pshared mutex
+    themutex = __pthread_mutex_getpshared(mutex);
+  if (!verifyable_object_isvalid (*themutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
-  if ((*mutex)->TryLock () == WAIT_TIMEOUT)
+  if ((*themutex)->TryLock () == WAIT_TIMEOUT)
     return EBUSY;
   return 0;
 }
@@ -1694,6 +1879,9 @@ __pthread_mutex_unlock (pthread_mutex_t * mutex)
 {
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
+  if (( ((pshared_mutex *)(mutex))->flags & SYS_BASE) == SYS_BASE )
+    // a pshared mutex
+    mutex = __pthread_mutex_getpshared(mutex);
   if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   (*mutex)->UnLock ();
@@ -1705,6 +1893,9 @@ __pthread_mutex_destroy (pthread_mutex_t * mutex)
 {
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     return 0;
+  if (( ((pshared_mutex *)(mutex))->flags & SYS_BASE) == SYS_BASE )
+    // a pshared mutex
+    mutex = __pthread_mutex_getpshared(mutex);
   if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
 
@@ -1721,9 +1912,13 @@ int
 __pthread_mutex_setprioceiling (pthread_mutex_t * mutex, int prioceiling,
 				int *old_ceiling)
 {
+  pthread_mutex_t *themutex=mutex;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
-  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+  if (( ((pshared_mutex *)(mutex))->flags & SYS_BASE == SYS_BASE ))
+    // a pshared mutex
+    themutex = __pthread_mutex_getpshared(mutex);
+  if (!verifyable_object_isvalid (*themutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   return ENOSYS;
 }
@@ -1830,7 +2025,7 @@ __pthread_mutexattr_setpshared (pthread_mutexattr_t * attr, int pshared)
   /* we don't use pshared for anything as yet. We need to test PROCESS_SHARED 
    * functionality 
    */
-  if (pshared != PTHREAD_PROCESS_PRIVATE)
+  if (pshared != PTHREAD_PROCESS_PRIVATE && pshared != PTHREAD_PROCESS_SHARED)
     return EINVAL;
   (*attr)->pshared = pshared;
   return 0;

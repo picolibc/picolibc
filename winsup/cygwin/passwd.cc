@@ -205,6 +205,8 @@ getpwuid (uid_t uid)
 {
   if (passwd_state  <= initializing)
     read_etc_passwd ();
+  
+  pthread_testcancel();
 
   return search_for (uid, 0);
 }
@@ -219,6 +221,8 @@ getpwuid_r (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct 
 
   if (passwd_state  <= initializing)
     read_etc_passwd ();
+
+  pthread_testcancel();
 
   struct passwd *temppw = search_for (uid, 0);
 
@@ -248,6 +252,8 @@ getpwnam (const char *name)
 {
   if (passwd_state  <= initializing)
     read_etc_passwd ();
+  
+  pthread_testcancel();
 
   return search_for (0, name);
 }
@@ -267,6 +273,8 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
 
   if (passwd_state  <= initializing)
     read_etc_passwd ();
+
+  pthread_testcancel();
 
   struct passwd *temppw = search_for (0, nam);
 
