@@ -1,3 +1,9 @@
+Fri Aug 25 13:37:11 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/stdlib/system.c (do_system): Eliminate explicit declaration of
+	environ when compiling under cygwin since it is already declared in
+	unistd.h.
+
 2000-08-23  Werner Almesberger  <Werner.Almesberger@epfl.ch>
 
 	* libc/stdlib/mprec.c (ulp, b2d, d2b): changed a few expressions

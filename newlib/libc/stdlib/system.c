@@ -60,7 +60,7 @@ Supporting OS subroutines required: <<_exit>>, <<_execve>>, <<_fork_r>>,
 #include <_syslist.h>
 #include <reent.h>
 
-#if defined (unix) || defined (__CYGWIN32__)
+#if defined (unix) || defined (__CYGWIN__)
 static int do_system ();
 #endif
 
@@ -106,7 +106,7 @@ system (s)
 
 #endif
 
-#if defined (unix) && !defined (__CYGWIN32__)
+#if defined (unix) && !defined (__CYGWIN__)
 static int
 do_system (ptr, s)
      struct _reent *ptr;
@@ -139,7 +139,7 @@ do_system (ptr, s)
 }
 #endif
 
-#if defined (__CYGWIN32__)
+#if defined (__CYGWIN__)
 static int
 do_system (ptr, s)
      struct _reent *ptr;
@@ -147,7 +147,6 @@ do_system (ptr, s)
 {
   char *argv[4];
   int pid, status;
-  extern char *environ[];
 
   argv[0] = "sh";
   argv[1] = "-c";
