@@ -1,3 +1,8 @@
+Mon Feb 12 17:40:54 CET 2001  Jan Hubicka  <jh@suse.cz>
+
+	* i386.h (i386_optab): SSE integer converison instructions have
+	64bit versions on x86-64.
+
 2001-02-10  Nick Clifton  <nickc@redhat.com>
 
 	* mips.h: Remove extraneous whitespace.  Formating change to allow
