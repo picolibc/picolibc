@@ -193,6 +193,9 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, __uid32_t * uidret, __gid32
   struct __group32 *gr = NULL;
   bool ret = false;
 
+  owner_sid.debug_print ("get_sids_info: owner SID =");
+  group_sid.debug_print ("get_sids_info: group SID =");
+
   if (group_sid == cygheap->user.groups.pgsid)
     *gidret = myself->gid;
   else if ((gr = internal_getgrsid (group_sid)))

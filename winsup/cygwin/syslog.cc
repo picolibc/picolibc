@@ -406,9 +406,6 @@ syslog (int priority, const char *message, ...)
 	fputs (timestamp, fp);
 	fputs (msg_strings[0], fp);
 	fputc ('\n', fp);
-	UnlockFile (fHandle, 0, 0, 1, 0);
-	if (ferror (fp))
-	  debug_printf ("error in writing syslog");
 	fclose (fp);
       }
 }

@@ -288,7 +288,7 @@ cygthread::detach (HANDLE sigwait)
 	  w4[1] = *this;
 	  res = WaitForSingleObject (sigwait, INFINITE);
 	  if (res != WAIT_OBJECT_0)
-	    system_printf ("WFSO sigwait failed, res %u", res);
+	    system_printf ("WFSO sigwait %p failed, res %u, %E", sigwait, res);
 	  res = WaitForMultipleObjects (2, w4, FALSE, INFINITE);
 	  if (res != WAIT_OBJECT_0)
 	    /* nothing */;

@@ -34,13 +34,7 @@ struct device;
 "/dev/com", FH_SERIAL, "\\.\\com%d", 1, 99
 "/dev/ttyS", FH_SERIAL, "\\.\\com%d", 0, 99, -1
 "/dev/pipe", FH_PIPE, "\\dev\\pipe", 0, 0, 0, 0
-"/dev/piper", FH_PIPER, "\\dev\\piper", 0, 0, 0, 0
-"/dev/pipew", FH_PIPEW, "\\dev\\pipew", 0, 0, 0, 0
 "/dev/fifo", FH_FIFO, "\\dev\\fifo", 0, 0, 0, 0
-"/dev/streamsocket", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
-"/dev/tcp", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
-"/dev/udp", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
-"/dev/dgsocket", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
 "/dev/st", FH_TAPE, "\\Device\\Tape%d", 0, 127
 "/dev/nst", FH_NTAPE, "\\Device\\Tape%d", 0, 127
 "/dev/fd", FH_FLOPPY, "\\Device\\Floppy%d", 0, 15

@@ -1,3 +1,8 @@
+2003-02-24  Christopher Faylor  <cgf@redhat.com>
+
+	* device.gperf: Remove nonsensical devices.
+	* cygwin-gperf: Special case some devices.
+
 2003-02-23  Christopher Faylor  <cgf@redhat.com>
 
 	* cygwin-gperf: Fix typo in FH_FS static storage.

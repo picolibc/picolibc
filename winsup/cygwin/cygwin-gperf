@@ -18,7 +18,10 @@ my %fh_declare = (
     'fs_dev' => '&fs_dev_storage',
     'proc_dev' => '&proc_dev_storage',
     'registry_dev' => '&registry_dev_storage',
-    'process_dev' => '&process_dev_storage'
+    'process_dev' => '&process_dev_storage',
+    'piper_dev' => '&piper_dev_storage',
+    'pipew_dev' => '&pipew_dev_storage',
+    'socket_dev' => '&socket_dev_storage'
 );
 
 foreach (@lines) {
@@ -45,6 +48,15 @@ static const device registry_dev_storage =
 
 static const device process_dev_storage =
   {"", FH_PROCESS, "", 0, 0, 0, 0};
+
+static const device socket_dev_storage =
+  {"", FH_SOCKET, "", 0, 0, 0, 0};
+
+static const device piper_dev_storage =
+  {"", FH_PIPER, "", 0, 0, 0, 0};
+
+static const device pipew_dev_storage =
+  {"", FH_PIPEW, "", 0, 0, 0, 0};
 
 EOF
         for my $f (sort keys %fh_declare) {
