@@ -1,3 +1,7 @@
+2003-05-18  Joe Buehler  <jhpb@hekimian.com>
+
+        * spawn.cc (spawn_guts): Show more of command line in strace output.
+
 2003-05-15  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.h (pthread::init_mainthread): Remove function parameter.
@@ -268,7 +272,7 @@
 	(cygthread::operator new): Simplify.  Just grab a thread structure from
 	the pool.  Don't try to start the thread.
 	(cygthread::terminate_thread): Don't close event handles.  Just reuse
-	them.  Call MEM_RELEASE rather than MEM_DECOMMIT (from Joe Buehler).
+	them.  Call MEM_RELEASE rather than MEM_DECOMMIT (from Joe uehler).
 
 2003-04-08  Bob Cassels <bcassels@abinitio.com>
 
