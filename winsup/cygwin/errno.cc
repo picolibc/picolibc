@@ -107,6 +107,7 @@ errmap[] =
   X (NOT_READY,			ENOMEDIUM),
   X (DISK_FULL,			ENOSPC),
   X (NOACCESS,			EFAULT),
+  X (FILE_INVALID,		ENXIO),
   { 0, NULL, 0}
 };
 

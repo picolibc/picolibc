@@ -1,3 +1,7 @@
+Tue Apr  3 20:06:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* errno.cc (errmap): Map ERROR_FILE_INVALID to ENXIO.
+
 Mon Apr  2 22:48:58 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygrun.c (main): Fix compiler warning.
