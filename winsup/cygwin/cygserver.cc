@@ -10,16 +10,18 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#include "woutsup.h"
+
+#include <assert.h>
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <windows.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <signal.h>
 #include <stdlib.h>
-#include "wincap.h"
 #include "cygwin_version.h"
 
 #include "getopt.h"
@@ -32,14 +34,84 @@
 #include "cygwin/cygserver.h"
 #include "cygserver_shm.h"
 
-/* for quieter operation, set to 0 */
-#define DEBUG 0
-#define debug_printf if (DEBUG) printf
-
 GENERIC_MAPPING access_mapping;
 static class transport_layer_base *transport;
 
 DWORD request_count = 0;
+
+/*
+ * Support function for the XXX_printf() macros in "woutsup.h".
+ * Copied verbatim from "strace.cc".
+ */
+static int
+getfunc (char *in_dst, const char *func)
+{
+  const char *p;
+  const char *pe;
+  char *dst = in_dst;
+  for (p = func; (pe = strchr (p, '(')); p = pe + 1)
+    if (isalnum ((int)pe[-1]) || pe[-1] == '_')
+      break;
+    else if (isspace((int)pe[-1]))
+      {
+	pe--;
+	break;
+      }
+  if (!pe)
+    pe = strchr (func, '\0');
+  for (p = pe; p > func; p--)
+    if (p != pe && *p == ' ')
+      {
+	p++;
+	break;
+      }
+  if (*p == '*')
+    p++;
+  while (p < pe)
+    *dst++ = *p++;
+
+  *dst++ = ':';
+  *dst++ = ' ';
+  *dst = '\0';
+
+  return dst - in_dst;
+}
+
+/*
+ * Support function for the XXX_printf() macros in "woutsup.h".
+ */
+extern "C" void
+__cygserver__printf (const char * const function, const char * const fmt, ...)
+{
+  const DWORD lasterror = GetLastError ();
+  const int lasterrno = errno;
+
+  va_list ap;
+
+  char * const buf = (char *) alloca(BUFSIZ);
+
+  assert (buf);
+
+  int len = 0;
+
+  if (function)
+    len += getfunc(buf, function);
+
+  va_start (ap, fmt);
+  len += vsnprintf (buf + len, BUFSIZ - len, fmt, ap);
+  va_end (ap);
+
+  len += snprintf (buf + len, BUFSIZ - len, "\n");
+
+  const int actual = (len > BUFSIZ ? BUFSIZ : len);
+
+  write (2, buf, actual);
+
+  errno = lasterrno;
+  SetLastError (lasterror);
+
+  return;
+}
 
 BOOL
 setup_privileges ()
@@ -51,14 +123,14 @@ setup_privileges ()
   rc = OpenProcessToken (GetCurrentProcess() , TOKEN_ALL_ACCESS , &hToken) ;
   if (!rc)
     {
-      printf ("error opening process token (%lu)\n", GetLastError ());
+      system_printf ("error opening process token (%lu)", GetLastError ());
       ret_val = FALSE;
       goto out;
     }
   rc = LookupPrivilegeValue (NULL, SE_DEBUG_NAME, &sPrivileges.Privileges[0].Luid);
   if (!rc)
     {
-      printf ("error getting prigilege luid (%lu)\n", GetLastError ());
+      system_printf ("error getting privilege luid (%lu)", GetLastError ());
       ret_val = FALSE;
       goto out;
     }
@@ -67,7 +139,8 @@ setup_privileges ()
   rc = AdjustTokenPrivileges (hToken, FALSE, &sPrivileges, 0, NULL, NULL) ;
   if (!rc)
     {
-      printf ("error adjusting prigilege level. (%lu)\n", GetLastError ());
+      system_printf ("error adjusting privilege level. (%lu)",
+		     GetLastError ());
       ret_val = FALSE;
       goto out;
     }
@@ -108,7 +181,8 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 			0, bInheritHandle,
 			DUPLICATE_SAME_ACCESS))
     {
-      printf ("error getting handle(%u) to server (%lu)\n", (unsigned int)from_handle, GetLastError ());
+      system_printf ("error getting handle(%u) to server (%lu)",
+		     (unsigned int)from_handle, GetLastError ());
       goto out;
     }
 } else
@@ -118,7 +192,7 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 				OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION	| DACL_SECURITY_INFORMATION,
 				sd, sizeof (sd_buf), &bytes_needed))
     {
-      printf ("error getting handle SD (%lu)\n", GetLastError ());
+      system_printf ("error getting handle SD (%lu)", GetLastError ());
       goto out;
     }
 
@@ -127,13 +201,13 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
   if (!AccessCheck (sd, from_process_token, access, &access_mapping,
 		    &ps, &ps_len, &access, &status))
     {
-      printf ("error checking access rights (%lu)\n", GetLastError ());
+      system_printf ("error checking access rights (%lu)", GetLastError ());
       goto out;
     }
 
   if (!status)
     {
-      printf ("access to object denied\n");
+      system_printf ("access to object denied");
       goto out;
     }
 
@@ -141,10 +215,10 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 			to_process, to_handle_ptr,
 			access, bInheritHandle, 0))
     {
-      printf ("error getting handle to client (%lu)\n", GetLastError ());
+      system_printf ("error getting handle to client (%lu)", GetLastError ());
       goto out;
     }
-  debug_printf ("Duplicated %p to %p\n", from_handle, *to_handle_ptr);
+  debug_printf ("Duplicated %p to %p", from_handle, *to_handle_ptr);
 
   ret_val = 0;
 
@@ -158,9 +232,9 @@ out:
 void
 client_request::serve (transport_layer_base *conn, class process_cache *cache)
 {
-  printf ("*****************************************\n"
-	  "A call to the base client_request class has occured\n"
-	  "This indicates a mismatch in a virtual function definition somewhere\n");
+  system_printf ("*****************************************\n"
+		 "A call to the base client_request class has occurred\n"
+		 "This indicates a mismatch in a virtual function definition somewhere");
   exit (1);
 }
 
@@ -178,36 +252,36 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
       return;
     }
 
-  debug_printf ("pid %ld:(%p,%p) -> pid %ld\n", req.master_pid,
+  debug_printf ("pid %ld:(%p,%p) -> pid %ld", req.master_pid,
 				req.from_master, req.to_master,
 				req.pid);
 
-  debug_printf ("opening process %ld\n", req.master_pid);
+  debug_printf ("opening process %ld", req.master_pid);
   from_process_handle = OpenProcess (PROCESS_DUP_HANDLE, FALSE, req.master_pid);
-  debug_printf ("opening process %ld\n", req.pid);
+  debug_printf ("opening process %ld", req.pid);
   to_process_handle = OpenProcess (PROCESS_DUP_HANDLE, FALSE, req.pid);
   if (!from_process_handle || !to_process_handle)
     {
-      printf ("error opening process (%lu)\n", GetLastError ());
+      system_printf ("error opening process (%lu)", GetLastError ());
       header.error_code = EACCES;
       goto out;
     }
 
-  debug_printf ("Impersonating client\n");
+  debug_printf ("Impersonating client");
   conn->impersonate_client ();
 
-  debug_printf ("about to open thread token\n");
+  debug_printf ("about to open thread token");
   rc = OpenThreadToken (GetCurrentThread (),
 			TOKEN_QUERY,
 			TRUE,
 			&token_handle);
 
-  debug_printf ("opened thread token, rc=%lu\n", rc);
+  debug_printf ("opened thread token, rc=%lu", rc);
   conn->revert_to_self ();
 
   if (!rc)
     {
-      printf ("error opening thread token (%lu)\n", GetLastError ());
+      system_printf ("error opening thread token (%lu)", GetLastError ());
       header.error_code = EACCES;
       goto out;
     }
@@ -218,7 +292,8 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
 			    req.from_master,
 			    &req.from_master, TRUE) != 0)
     {
-      printf ("error duplicating from_master handle (%lu)\n", GetLastError ());
+      system_printf ("error duplicating from_master handle (%lu)",
+		     GetLastError ());
       header.error_code = EACCES;
       goto out;
     }
@@ -231,16 +306,15 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
 				req.to_master,
 				&req.to_master, TRUE) != 0)
 	{
-	  printf ("error duplicating to_master handle (%lu)\n", GetLastError ());
+	  system_printf ("error duplicating to_master handle (%lu)",
+			 GetLastError ());
 	  header.error_code = EACCES;
 	  goto out;
 	}
     }
 
-#if DEBUG
-  printf ("%ld -> %ld(%p,%p)\n", req.master_pid, req.pid,
-				req.from_master, req.to_master);
-#endif
+  debug_printf ("%ld -> %ld(%p,%p)", req.master_pid, req.pid,
+		req.from_master, req.to_master);
 
   header.error_code = 0;
 
@@ -346,15 +420,15 @@ server_request::process ()
   ssize_t bytes_read, bytes_written;
   struct request_header* req_ptr = (struct request_header*) &request_buffer;
   client_request *req = NULL;
-  debug_printf ("about to read\n");
+  debug_printf ("about to read");
 
   bytes_read = conn->read (request_buffer, sizeof (struct request_header));
   if (bytes_read != sizeof (struct request_header))
     {
-      printf ("error reading from connection (%lu)\n", GetLastError ());
+      system_printf ("error reading from connection (%lu)", GetLastError ());
       goto out;
     }
-  debug_printf ("got header (%ld)\n", bytes_read);
+  debug_printf ("got header (%ld)", bytes_read);
 
   switch (req_ptr->req_id)
     {
@@ -369,12 +443,12 @@ server_request::process ()
     default:
       req = new client_request (CYGSERVER_REQUEST_INVALID, 0);
       req->header.error_code = ENOSYS;
-      debug_printf ("Bad client request - returning ENOSYS\n");
+      debug_printf ("Bad client request - returning ENOSYS");
     }
 
   if (req->header.cb != req_ptr->cb)
     {
-      debug_printf ("Mismatch in request buffer sizes\n");
+      debug_printf ("Mismatch in request buffer sizes");
       goto out;
     }
 
@@ -384,10 +458,10 @@ server_request::process ()
       bytes_read = conn->read (req->buffer, req->header.cb);
       if (bytes_read != req->header.cb)
 	{
-	  debug_printf ("error reading from connection (%lu)\n", GetLastError ());
+	  debug_printf ("error reading from connection (%lu)", GetLastError ());
 	  goto out;
 	}
-      debug_printf ("got body (%ld)\n",bytes_read);
+      debug_printf ("got body (%ld)",bytes_read);
     }
 
   /* this is not allowed to fail. We must return ENOSYS at a minimum to the client */
@@ -398,11 +472,11 @@ server_request::process ()
     (bytes_written = conn->write (req->buffer, req->header.cb)) != req->header.cb))
     {
       req->header.error_code = -1;
-      printf ("error writing to connection (%lu)\n", GetLastError ());
+      system_printf ("error writing to connection (%lu)", GetLastError ());
       goto out;
     }
 
-  debug_printf("Sent reply, size (%ld)\n",bytes_written);
+  debug_printf("Sent reply, size (%ld)",bytes_written);
   printf (".");
 
 out:
@@ -475,7 +549,7 @@ main (int argc, char **argv)
     {
       if (!transport->connect())
 	{
-	  printf ("couldn't establish connection with server\n");
+	  system_printf ("couldn't establish connection with server");
 	  exit (1);
 	}
       client_request_shutdown *request =
@@ -506,7 +580,8 @@ main (int argc, char **argv)
   printf ("daemon version %s starting up", version);
   if (signal (SIGQUIT, handle_signal) == SIG_ERR)
     {
-      printf ("\ncould not install signal handler (%d)- aborting startup\n", errno);
+      system_printf ("could not install signal handler (%d)- aborting startup",
+		     errno);
       exit (1);
     }
   printf (".");
@@ -538,7 +613,7 @@ main (int argc, char **argv)
     {
       sleep (1);
     }
-  printf ("\nShutdown request recieved - new requests will be denied\n");
+  printf ("\nShutdown request received - new requests will be denied\n");
   request_queue.cleanup ();
   printf ("All pending requests processed\n");
   transport->close ();

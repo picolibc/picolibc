@@ -203,7 +203,7 @@ install-man:
 
 install_target: cygserver.exe
 	$(INSTALL_PROGRAM) cygserver.exe $(bindir)/cygserver.exe
-	
+
 install_host:
 
 
@@ -318,9 +318,6 @@ cygserver_transport_sockets_outside.o: cygserver_transport_sockets.cc
 
 cygserver_client_outside.o: cygserver_client.cc
 	 $(COMPILE_CXX) -D__OUTSIDE_CYGWIN__ -o $@ $<
-
-cygserver_shm.o: cygserver_shm.cc
-	$(COMPILE_CXX) -D__OUTSIDE_CYGWIN__ -o $@ $<
 
 cygserver.exe: cygserver.o cygserver_shm.o cygserver_transport_outside.o cygserver_transport_pipes_outside.o cygserver_transport_sockets_outside.o cygserver_client_outside.o cygserver_process.o threaded_queue.o wincap.o version.o smallprint.o
 	$(CXX) -o $@ $^

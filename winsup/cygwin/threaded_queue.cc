@@ -10,16 +10,14 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#include "woutsup.h"
+
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <windows.h>
 #include <sys/types.h>
 #include <stdlib.h>
-#include "wincap.h"
 #include "threaded_queue.h"
-#define DEBUG 1
-#define debug_printf if (DEBUG) printf
 
 /* threaded_queue */
 
@@ -38,7 +36,7 @@ worker_function (LPVOID LpParam)
 	  DWORD rc = WaitForSingleObject (queue->event, INFINITE);
 	  if (rc == WAIT_FAILED)
 	    {
-	      printf ("Wait for event failed\n");
+	      system_printf ("Wait for event failed");
 	      queue->running--;
 	      ExitThread (0);
 	    }
@@ -69,8 +67,8 @@ threaded_queue::create_workers ()
   InitializeCriticalSection (&queuelock);
   if ((event = CreateEvent (NULL, FALSE, FALSE, NULL)) == NULL)
     {
-      printf ("Failed to create event queue (%lu), terminating\n",
-	      GetLastError ());
+      system_printf ("Failed to create event queue (%lu), terminating",
+		     GetLastError ());
       exit (1);
     }
   active = true;
@@ -85,8 +83,8 @@ threaded_queue::create_workers ()
       hThread = CreateThread (NULL, 0, worker_function, this, 0, &tid);
       if (hThread == NULL)
 	{
-	  printf ("Failed to create thread (%lu), terminating\n",
-		  GetLastError ());
+	  system_printf ("Failed to create thread (%lu), terminating",
+			 GetLastError ());
 	  exit (1);
 	}
       CloseHandle (hThread);
@@ -114,7 +112,7 @@ threaded_queue::cleanup ()
   LeaveCriticalSection (&queuelock);
   if (!running)
     return;
-  printf ("Waiting for current queue threads to terminate\n");
+  system_printf ("Waiting for current queue threads to terminate");
   for (int n = running; n; n--)
     PulseEvent (event);
   while (running)
@@ -132,7 +130,7 @@ threaded_queue::add (queue_request * therequest)
   EnterCriticalSection (&queuelock);
   if (!running)
     {
-      printf ("No worker threads to handle request!\n");
+      system_printf ("No worker threads to handle request!");
     }
   if (!request)
     request = therequest;
@@ -169,11 +167,11 @@ interruptible
 {
   if (!interruptible)
     return;
-  debug_printf ("creating an interruptible processing thread\n");
+  debug_printf ("creating an interruptible processing thread");
   if ((interrupt = CreateEvent (NULL, FALSE, FALSE, NULL)) == NULL)
     {
-      printf ("Failed to create interrupt event (%lu), terminating\n",
-	      GetLastError ());
+      system_printf ("Failed to create interrupt event (%lu), terminating",
+		     GetLastError ());
       exit (1);
     }
 }
@@ -198,7 +196,8 @@ bool
       running = true;
       return true;
     }
-  printf ("Failed to create thread (%lu), terminating\n", GetLastError ());
+  system_printf ("Failed to create thread (%lu), terminating",
+		 GetLastError ());
   return false;
 }
 
@@ -217,7 +216,7 @@ queue_process_param::stop ()
       while (n-- && WaitForSingleObject (hThread, 1000) == WAIT_TIMEOUT);
       if (!n)
 	{
-	  printf ("Process thread didn't shutdown cleanly after 200ms!\n");
+	  system_printf ("Process thread didn't shutdown cleanly after 200ms!");
 	  exit (1);
 	}
       else
@@ -225,11 +224,11 @@ queue_process_param::stop ()
     }
   else
     {
-      printf ("killing request loop thread %ld\n", tid);
+      system_printf ("killing request loop thread %ld", tid);
       int rc;
       if (!(rc = TerminateThread (hThread, 0)))
 	{
-	  printf ("error shutting down request loop worker thread\n");
+	  system_printf ("error shutting down request loop worker thread");
 	}
       running = false;
     }
@@ -244,7 +243,7 @@ queue_request::queue_request ():next (NULL)
 void
 queue_request::process (void)
 {
-  printf ("\n**********************************************\n"
-	  "Oh no! we've hit the base queue_request process() function, and this indicates a coding\n"
-	  "fault !!!\n" "***********************************************\n");
+  system_printf ("**********************************************\n"
+		 "Oh no! we've hit the base queue_request process() function, and this indicates a coding\n"
+		 "fault !!!" "***********************************************");
 }

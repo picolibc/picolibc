@@ -10,24 +10,21 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+/* to allow this to link into cygwin and the .dll, a little magic is needed. */
+#ifdef __OUTSIDE_CYGWIN__
+#include "woutsup.h"
+#else
+#include "winsup.h"
+#endif
+
 #include <errno.h>
-#include <stdio.h>
 #include <unistd.h>
-#include <windows.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include "wincap.h"
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver_transport_pipes.h"
 #include "cygwin/cygserver_transport_sockets.h"
-
-/* to allow this to link into cygwin and the .dll, a little magic is needed. */
-#ifndef __OUTSIDE_CYGWIN__
-#include "winsup.h"
-#else
-#define debug_printf printf
-#endif
 
 /* The factory */
 class transport_layer_base *create_server_transport()

@@ -101,7 +101,7 @@ build_inprocess_shmds (HANDLE hfilemap, HANDLE hattachmap, key_t key,
   shmid_ds *shmtemp = new shmid_ds;
   if (!shmtemp)
     {
-      system_printf ("failed to malloc shm node\n");
+      system_printf ("failed to malloc shm node");
       set_errno (ENOMEM);
       UnmapViewOfFile (mapptr);
       CloseHandle (filemap);
@@ -172,7 +172,7 @@ fixup_shms_after_fork ()
       if (!newshmds)
 	{
 	  /* don't worry about handle cleanup, we're dying! */
-	  system_printf ("failed to reattach to shm control file view %x\n",
+	  system_printf ("failed to reattach to shm control file view %x",
 			 tempnode);
 	  return 1;
 	}
@@ -188,7 +188,7 @@ fixup_shms_after_fork ()
 	  if (newdata != attachnode->data)
 	    {
 	      /* don't worry about handle cleanup, we're dying! */
-	      system_printf ("failed to reattach to mapped file view %x\n",
+	      system_printf ("failed to reattach to mapped file view %x",
 			     attachnode->data);
 	      return 1;
 	    }
@@ -281,7 +281,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   int rc;
   if ((rc = cygserver_request (req)))
     {
-      debug_printf ("failed to tell deaemon that we have attached\n");
+      debug_printf ("failed to tell deaemon that we have attached");
     }
   delete req;
 
@@ -330,7 +330,7 @@ shmdt (const void *shmaddr)
   int rc;
   if ((rc = cygserver_request (req)))
     {
-      debug_printf ("failed to tell deaemon that we have detached\n");
+      debug_printf ("failed to tell deaemon that we have detached");
     }
   delete req;
 
@@ -401,7 +401,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 	if (tempnode->shmds->shm_nattch)
 	  system_printf
 	    ("call to shmctl with cmd= IPC_RMID when memory area still has"
-	     " attachees\n");
+	     " attachees");
 	/* how does this work?
 	   * we mark the ds area as "deleted", and the at and get calls all fail from now on
 	   * on, when nattch becomes 0, the mapped data area is destroyed.

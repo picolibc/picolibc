@@ -1,3 +1,20 @@
+2002-06-15  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* woutsup.h: New file.
+	* cygserver.cc: Use "woutsup.h" and new XXX_printf macros.
+	(getfunc): New function, copied verbatim from "strace.cc".
+	(__cygserver__printf): New function.
+	* cygserver_client.cc: Use "woutsup.h" and new XXX_printf macros.
+	* cygserver_process.cc: Ditto.
+	* cygserver_shm.cc: Ditto.
+	* cygserver_transport.cc: Ditto.
+	* cygserver_transport_pipes.cc: Ditto.
+	* cygserver_transport_sockets.cc: Ditto.
+	* threaded_queue.cc: Ditto.
+	* shm.cc: Remove trailing \n from XXX_printf format strings.
+	* Makefile.in: Remove special __OUTSIDE_CYGWIN__ case for
+	cygserver_shm.cc.
+
 2002-06-14  Christopher Faylor  <cgf@redhat.com>
 
 	* uinfo.cc (cygheap_user::ontherange): Don't set HOMEDRIVE or HOMEPATH

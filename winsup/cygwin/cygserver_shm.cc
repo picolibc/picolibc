@@ -10,38 +10,22 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifdef __OUTSIDE_CYGWIN__
-#undef __INSIDE_CYGWIN__
-#else
-#include "winsup.h"
-#endif
+#include "woutsup.h"
 
-#ifndef __INSIDE_CYGWIN__
-#define DEBUG 0
-#define system_printf printf
-#define debug_printf if (DEBUG) printf
-#define api_fatal printf
-#include <stdio.h>
-#include <windows.h>
-#endif
-
-#include <sys/stat.h>
+// #include <sys/stat.h>
 #include <errno.h>
+#include <stdio.h>
+#include <time.h>
 #include "cygerrno.h"
 #include <unistd.h>
 #include "security.h"
 //#include "fhandler.h"
 //#include "dtable.h"
 //#include "cygheap.h"
-#include <stdio.h>
 //#include "thread.h"
-#ifndef __INSIDE_CYGWIN__
 #define __INSIDE_CYGWIN__
 #include <sys/shm.h>
 #undef __INSIDE_CYGWIN__
-#else
-#include <sys/shm.h>
-#endif
 //#include "perprocess.h"
 #include <threaded_queue.h>
 #include <cygwin/cygserver_process.h>
@@ -220,7 +204,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
    */
   if (!from_process_handle)
     {
-      debug_printf ("error opening process (%lu)\n", GetLastError ());
+      debug_printf ("error opening process (%lu)", GetLastError ());
       header.error_code = EACCES;
       return;
     }
@@ -234,7 +218,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 
   if (!rc)
     {
-      debug_printf ("error opening thread token (%lu)\n", GetLastError ());
+      debug_printf ("error opening thread token (%lu)", GetLastError ());
       header.error_code = EACCES;
       CloseHandle (from_process_handle);
       return;
@@ -270,7 +254,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		   DUPLICATE_SAME_ACCESS, tempnode->filemap,
 		   &parameters.out.filemap, TRUE) != 0)
 		{
-		  debug_printf ("error duplicating filemap handle (%lu)\n",
+		  debug_printf ("error duplicating filemap handle (%lu)",
 				GetLastError ());
 		  header.error_code = EACCES;
 		}
@@ -279,7 +263,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		   DUPLICATE_SAME_ACCESS, tempnode->attachmap,
 		   &parameters.out.attachmap, TRUE) != 0)
 		{
-		  debug_printf ("error duplicating attachmap handle (%lu)\n",
+		  debug_printf ("error duplicating attachmap handle (%lu)",
 				GetLastError ());
 		  header.error_code = EACCES;
 		}
@@ -400,9 +384,9 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	  shmname = stringbuf;
 	  snprintf (stringbuf1, 29, "CYGWINSHMD0x%0qx", parameters.in.key);
 	  shmaname = stringbuf1;
-	  debug_printf ("system id strings are \n%s\n%s\n", shmname,
+	  debug_printf ("system id strings: %s, %s", shmname,
 			shmaname);
-	  debug_printf ("key input value is 0x%0qx\n", parameters.in.key);
+	  debug_printf ("key input value is 0x%0qx", parameters.in.key);
 	}
 
       /* attempt to open the key */
@@ -440,7 +424,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		{
 		  header.error_code = EEXIST;
 		  debug_printf
-		    ("attempt to exclusively create already created shm_area with key 0x%0qx\n",
+		    ("attempt to exclusively create already created shm_area with key 0x%0qx",
 		     parameters.in.key);
 		  // FIXME: free the mutex
 		  CloseHandle (token_handle);
@@ -461,8 +445,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		   DUPLICATE_SAME_ACCESS, tempnode->filemap,
 		   &parameters.out.filemap, TRUE) != 0)
 		{
-		  printf ("error duplicating filemap handle (%lu)\n",
-			  GetLastError ());
+		  system_printf ("error duplicating filemap handle (%lu)",
+				 GetLastError ());
 		  header.error_code = EACCES;
 /*mutex*/
 		  CloseHandle (token_handle);
@@ -473,8 +457,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		   DUPLICATE_SAME_ACCESS, tempnode->attachmap,
 		   &parameters.out.attachmap, TRUE) != 0)
 		{
-		  printf ("error duplicating attachmap handle (%lu)\n",
-			  GetLastError ());
+		  system_printf ("error duplicating attachmap handle (%lu)",
+				 GetLastError ());
 		  header.error_code = EACCES;
 /*mutex*/
 		  CloseHandle (token_handle);
@@ -505,7 +489,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
       if (filemap == NULL)
 	{
 	  /* We failed to open the filemapping ? */
-	  system_printf ("failed to open file mapping: %lu\n",
+	  system_printf ("failed to open file mapping: %lu",
 			 GetLastError ());
 	  // free the mutex
 	  // we can assume that it exists, and that it was an access problem.
@@ -573,7 +557,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 
       if (attachmap == NULL)
 	{
-	  system_printf ("failed to get shm attachmap\n");
+	  system_printf ("failed to get shm attachmap");
 	  header.error_code = ENOMEM;
 	  UnmapViewOfFile (mapptr);
 	  CloseHandle (filemap);
@@ -585,7 +569,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
       shmid_ds *shmtemp = new shmid_ds;
       if (!shmtemp)
 	{
-	  system_printf ("failed to malloc shm node\n");
+	  system_printf ("failed to malloc shm node");
 	  header.error_code = ENOMEM;
 	  UnmapViewOfFile (mapptr);
 	  CloseHandle (filemap);
@@ -631,8 +615,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 				tempnode->filemap, &parameters.out.filemap,
 				TRUE) != 0)
 	{
-	  printf ("error duplicating filemap handle (%lu)\n",
-		  GetLastError ());
+	  system_printf ("error duplicating filemap handle (%lu)",
+			 GetLastError ());
 	  header.error_code = EACCES;
 	  CloseHandle (token_handle);
 /* mutex et al */
@@ -644,8 +628,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 				tempnode->attachmap,
 				&parameters.out.attachmap, TRUE) != 0)
 	{
-	  printf ("error duplicating attachmap handle (%lu)\n",
-		  GetLastError ());
+	  system_printf ("error duplicating attachmap handle (%lu)",
+			 GetLastError ());
 	  header.error_code = EACCES;
 	  CloseHandle (from_process_handle);
 	  CloseHandle (token_handle);

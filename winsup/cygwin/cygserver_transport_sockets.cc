@@ -10,20 +10,24 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+/* to allow this to link into cygwin and the .dll, a little magic is needed. */
+#ifdef __OUTSIDE_CYGWIN__
+#include "woutsup.h"
+#else
+#include "winsup.h"
+#endif
+
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <windows.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include "wincap.h"
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver_transport_sockets.h"
 
 /* to allow this to link into cygwin and the .dll, a little magic is needed. */
 #ifndef __OUTSIDE_CYGWIN__
-#include "winsup.h"
 extern "C" int
 cygwin_socket (int af, int type, int protocol);
 extern "C" int
@@ -43,7 +47,6 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen);
 #define cygwin_listen(A,B)    ::listen(A,B)
 #define cygwin_bind(A,B,C)    ::bind(A,B,C)
 #define cygwin_connect(A,B,C) ::connect(A,B,C)
-#define debug_printf printf
 #endif
 
 transport_layer_sockets::transport_layer_sockets (int newfd): fd(newfd)
@@ -68,11 +71,11 @@ transport_layer_sockets::listen ()
 {
   /* we want a thread pool based approach. */
   if ((fd = cygwin_socket (AF_UNIX, SOCK_STREAM,0)) < 0)
-    printf ("Socket not created error %d\n", errno);
+    system_printf ("Socket not created error %d", errno);
   if (cygwin_bind(fd, &sockdetails, sdlen))
-    printf ("Bind doesn't like you. Tsk Tsk. Bind said %d\n", errno);
+    system_printf ("Bind doesn't like you. Tsk Tsk. Bind said %d", errno);
   if (cygwin_listen(fd, 5) < 0)
-    printf ("And the OS just isn't listening, all it says is %d\n", errno);
+    system_printf ("And the OS just isn't listening, all it says is %d", errno);
 }
 
 class transport_layer_sockets *
@@ -83,7 +86,7 @@ transport_layer_sockets::accept ()
 
   if ((new_fd = cygwin_accept(fd, &sockdetails, &sdlen)) < 0)
     {
-      printf ("Nup, could' accept. %d\n",errno);
+      system_printf ("Nup, could' accept. %d",errno);
       return NULL;
     }
 
@@ -123,7 +126,7 @@ transport_layer_sockets::connect ()
   fd = cygwin_socket (AF_UNIX, SOCK_STREAM, 0);
   if (cygwin_connect (fd, &sockdetails, sdlen) < 0)
     {
-      debug_printf("client connect failure %d\n", errno);
+      debug_printf("client connect failure %d", errno);
       ::close (fd);
       return false;
     }

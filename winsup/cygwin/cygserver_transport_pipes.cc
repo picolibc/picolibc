@@ -10,24 +10,21 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+/* to allow this to link into cygwin and the .dll, a little magic is needed. */
+#ifdef __OUTSIDE_CYGWIN__
+#include "woutsup.h"
+#else
+#include "winsup.h"
+#endif
+
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <windows.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include "wincap.h"
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver_transport_pipes.h"
-
-/* to allow this to link into cygwin and the .dll, a little magic is needed. */
-#ifndef __OUTSIDE_CYGWIN__
-#include "winsup.h"
-#else
-#define DEBUG 0
-#define debug_printf if (DEBUG) printf
-#endif
 
 //SECURITY_DESCRIPTOR transport_layer_pipes::sd;
 //SECURITY_ATTRIBUTES transport_layer_pipes::sec_none_nih, transport_layer_pipes::sec_all_nih;
@@ -75,7 +72,7 @@ transport_layer_pipes::accept ()
 {
   if (pipe)
     {
-      debug_printf ("Already have a pipe in this %p\n",this);
+      debug_printf ("Already have a pipe in this %p",this);
       return NULL;
     }
 
@@ -87,14 +84,14 @@ transport_layer_pipes::accept ()
 			  &sec_all_nih );
   if (pipe == INVALID_HANDLE_VALUE)
     {
-      debug_printf ("error creating pipe (%lu)\n.", GetLastError ());
+      debug_printf ("error creating pipe (%lu).", GetLastError ());
       return NULL;
     }
 
   if ( !ConnectNamedPipe ( pipe, NULL ) &&
      GetLastError () != ERROR_PIPE_CONNECTED)
     {
-      printf ("error connecting to pipe (%lu)\n.", GetLastError ());
+      system_printf ("error connecting to pipe (%lu).", GetLastError ());
       CloseHandle (pipe);
       pipe = NULL;
       return NULL;
@@ -109,7 +106,7 @@ transport_layer_pipes::accept ()
 void
 transport_layer_pipes::close()
 {
-  debug_printf ("closing pipe %p\n", pipe);
+  debug_printf ("closing pipe %p", pipe);
   if (pipe && pipe != INVALID_HANDLE_VALUE)
     {
       FlushFileBuffers (pipe);
@@ -121,7 +118,7 @@ transport_layer_pipes::close()
 ssize_t
 transport_layer_pipes::read (char *buf, size_t len)
 {
-  debug_printf ("reading from pipe %p\n", pipe);
+  debug_printf ("reading from pipe %p", pipe);
   if (!pipe || pipe == INVALID_HANDLE_VALUE)
     return -1;
 
@@ -129,7 +126,7 @@ transport_layer_pipes::read (char *buf, size_t len)
   DWORD rc = ReadFile (pipe, buf, len, &bytes_read, NULL);
   if (!rc)
     {
-      debug_printf ("error reading from pipe (%lu)\n", GetLastError ());
+      debug_printf ("error reading from pipe (%lu)", GetLastError ());
       return -1;
     }
   return bytes_read;
@@ -138,7 +135,7 @@ transport_layer_pipes::read (char *buf, size_t len)
 ssize_t
 transport_layer_pipes::write (char *buf, size_t len)
 {
-  debug_printf ("writing to pipe %p\n", pipe);
+  debug_printf ("writing to pipe %p", pipe);
   DWORD bytes_written, rc;
   if (!pipe || pipe == INVALID_HANDLE_VALUE)
     return -1;
@@ -146,7 +143,7 @@ transport_layer_pipes::write (char *buf, size_t len)
   rc = WriteFile (pipe, buf, len, &bytes_written, NULL);
   if (!rc)
     {
-      debug_printf ("error writing to pipe (%lu)\n", GetLastError ());
+      debug_printf ("error writing to pipe (%lu)", GetLastError ());
       return -1;
     }
   return bytes_written;
@@ -157,7 +154,7 @@ transport_layer_pipes::connect ()
 {
   if (pipe && pipe != INVALID_HANDLE_VALUE)
     {
-      debug_printf ("Already have a pipe in this %p\n",this);
+      debug_printf ("Already have a pipe in this %p",this);
       return false;
     }
 
@@ -176,12 +173,12 @@ transport_layer_pipes::connect ()
 
       if (GetLastError () != ERROR_PIPE_BUSY)
 	{
-	  debug_printf ("Error opening the pipe (%lu)\n", GetLastError ());
+	  debug_printf ("Error opening the pipe (%lu)", GetLastError ());
 	  pipe = NULL;
 	  return false;
 	}
       if (!WaitNamedPipe (pipe_name, 20000))
-	debug_printf ( "error connecting to server pipe after 20 seconds (%lu)\n", GetLastError () );
+	system_printf ( "error connecting to server pipe after 20 seconds (%lu)", GetLastError () );
       /* We loop here, because the pipe exists but is busy. If it doesn't exist
        * the != ERROR_PIPE_BUSY will catch it.
        */
@@ -191,20 +188,20 @@ transport_layer_pipes::connect ()
 void
 transport_layer_pipes::impersonate_client ()
 {
-  debug_printf ("impersonating pipe %p\n", pipe);
+  debug_printf ("impersonating pipe %p", pipe);
   if (pipe && pipe != INVALID_HANDLE_VALUE)
     {
       BOOL rv = ImpersonateNamedPipeClient (pipe);
       if (!rv)
-	debug_printf ("Failed to Impersonate the client, (%lu)\n", GetLastError ());
+	debug_printf ("Failed to Impersonate the client, (%lu)", GetLastError ());
     }
-  debug_printf("I am who you are\n");
+  debug_printf("I am who you are");
 }
 
 void
 transport_layer_pipes::revert_to_self ()
 {
   RevertToSelf ();
-  debug_printf("I am who I yam\n");
+  debug_printf("I am who I yam");
 }
 

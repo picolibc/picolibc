@@ -10,21 +10,18 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#include "woutsup.h"
+
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <windows.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include "wincap.h"
 #include <pthread.h>
 #include <threaded_queue.h>
 #include <cygwin/cygserver_process.h>
-
-#define debug_printf if (DEBUG) printf
-#define DEBUG 1
 
 /* the cache structures and classes are designed for one cache per server process.
  * To make multiple process caches, a redesign will be needed
@@ -38,8 +35,8 @@ head (NULL)
   InitializeCriticalSection (&cache_write_access);
   if ((cache_add_trigger = CreateEvent (NULL, FALSE, FALSE, NULL)) == NULL)
     {
-      printf ("Failed to create cache add trigger (%lu), terminating\n",
-	      GetLastError ());
+      system_printf ("Failed to create cache add trigger (%lu), terminating",
+		     GetLastError ());
       exit (1);
     }
   initial_workers = num_initial_workers;
@@ -118,7 +115,7 @@ process_cache::remove_process (class process *theprocess)
       entry = (class process *) InterlockedExchangePointer (&head, theprocess->next);
       if (entry != theprocess)
 	{
-	  printf ("Bug encountered, process cache corrupted\n");
+	  system_printf ("Bug encountered, process cache corrupted");
 	  exit (1);
 	}
     }
@@ -129,7 +126,7 @@ process_cache::remove_process (class process *theprocess)
       class process *temp = (class process *) InterlockedExchangePointer (&entry->next, theprocess->next);
       if (temp != theprocess)
 	{
-	  printf ("Bug encountered, process cache corrupted\n");
+	  system_printf ("Bug encountered, process cache corrupted");
 	  exit (1);
 	}
     }
@@ -198,10 +195,10 @@ winpid (pid), next (NULL), cleaning_up (0), head (NULL), _exit_status (STILL_ACT
   thehandle = OpenProcess (PROCESS_ALL_ACCESS, FALSE, pid);
   if (!thehandle)
     {
-      printf ("unable to obtain handle for new cache process %ld\n", pid);
+      system_printf ("unable to obtain handle for new cache process %ld", pid);
       thehandle = INVALID_HANDLE_VALUE;
     }
-  debug_printf ("Got handle %p for new cache process %ld\n", thehandle, pid);
+  debug_printf ("Got handle %p for new cache process %ld", thehandle, pid);
   InitializeCriticalSection (&access);
   LeaveCriticalSection (&process_access);
 }
@@ -221,10 +218,10 @@ process::handle ()
   /* FIXME: call the cleanup list ? */
 
 //  CloseHandle (thehandle);
-//  debug_printf ("Process id %ld has terminated, attempting to open a new handle\n",
+//  debug_printf ("Process id %ld has terminated, attempting to open a new handle",
 //       winpid);
 //  thehandle = OpenProcess (PROCESS_ALL_ACCESS, FALSE, winpid);
-//  debug_printf ("Got handle %p when refreshing cache process %ld\n", thehandle, winpid);
+//  debug_printf ("Got handle %p when refreshing cache process %ld", thehandle, winpid);
 //  /* FIXME: what if OpenProcess fails ? */
 //  if (thehandle)
 //    {
@@ -244,7 +241,7 @@ DWORD process::exit_code ()
     err = GetExitCodeProcess (thehandle, &_exit_status);
   if (!err)
     {
-      debug_printf ("Failed to retrieve exit code (%ld)\n", GetLastError ());
+      debug_printf ("Failed to retrieve exit code (%ld)", GetLastError ());
       thehandle = INVALID_HANDLE_VALUE;
       return _exit_status;
     }
@@ -333,8 +330,8 @@ process_process_param::request_loop ()
 						 HandlesSize + 10);
 	      if (!temp)
 		{
-		  printf
-		    ("cannot allocate more storage for the handle array!\n");
+		  system_printf
+		    ("cannot allocate more storage for the handle array!");
 		  exit (1);
 		}
 	      Handles = temp;
@@ -343,8 +340,8 @@ process_process_param::request_loop ()
 						      HandlesSize + 10);
 	      if (!ptemp)
 		{
-		  printf
-		    ("cannot allocate more storage for the handle array!\n");
+		  system_printf
+		    ("cannot allocate more storage for the handle array!");
 		  exit (1);
 		}
 	      Entries = ptemp;
@@ -356,18 +353,18 @@ process_process_param::request_loop ()
 				    HandlesSize - 2 - offset, offset);
 	  count += copied;
 	}
-      debug_printf ("waiting on %u objects\n", count);
+      debug_printf ("waiting on %u objects", count);
       DWORD rc = WaitForMultipleObjects (count, Handles, FALSE, INFINITE);
       if (rc == WAIT_FAILED)
 	{
-	  printf ("Could not wait on the process handles (%ld)!\n",
-		  GetLastError ());
+	  system_printf ("Could not wait on the process handles (%ld)!",
+			 GetLastError ());
 	  exit (1);
 	}
       int objindex = rc - WAIT_OBJECT_0;
       if (objindex > 1 && objindex < count)
 	{
-	  debug_printf ("Process %ld has left the building\n",
+	  debug_printf ("Process %ld has left the building",
 			Entries[objindex]->winpid);
 	  /* fire off the termination routines */
 	  cache->remove_process (Entries[objindex]);
@@ -379,8 +376,8 @@ process_process_param::request_loop ()
 	}
       else
 	{
-	  printf
-	    ("unexpected return code from WaitForMultiple objects in process_process_param::request_loop\n");
+	  system_printf
+	    ("unexpected return code from WaitForMultiple objects in process_process_param::request_loop");
 	}
     }
   running = false;

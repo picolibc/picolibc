@@ -10,18 +10,13 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+/* to allow this to link into cygwin and the .dll, a little magic is needed. */
 #ifdef __OUTSIDE_CYGWIN__
-#undef __INSIDE_CYGWIN__
+#include "woutsup.h"
 #else
 #include "winsup.h"
 #endif
 
-#ifndef __INSIDE_CYGWIN__
-#define debug_printf printf
-#define api_fatal printf
-#include <stdio.h>
-#include <windows.h>
-#endif
 #include <sys/socket.h>
 #include <errno.h>
 #include <unistd.h>
@@ -82,29 +77,29 @@ client_request::send (transport_layer_base *conn)
 {
   if (!conn)
     return;
-  debug_printf("this=%p, conn=%p\n",this, conn);
+  debug_printf("this=%p, conn=%p",this, conn);
   ssize_t bytes_written, bytes_read;
-  debug_printf("header.cb = %ld\n",header.cb);
+  debug_printf("header.cb = %ld",header.cb);
   if ((bytes_written = conn->write ((char *)&header, sizeof (header)))
     != sizeof(header) || (header.cb &&
     (bytes_written = conn->write (buffer, header.cb)) != header.cb))
     {
       header.error_code = -1;
-      debug_printf ("bytes written != request size\n");
+      debug_printf ("bytes written != request size");
       return;
     }
 
-  debug_printf("Sent request, size (%ld)\n",bytes_written);
+  debug_printf("Sent request, size (%ld)",bytes_written);
 
   if ((bytes_read = conn->read ((char *)&header, sizeof (header)))
     != sizeof (header) || (header.cb &&
     (bytes_read = conn->read (buffer, header.cb)) != header.cb))
     {
       header.error_code = -1;
-      debug_printf("failed reading response \n");
+      debug_printf("failed reading response ");
       return;
     }
-  debug_printf ("completed ok\n");
+  debug_printf ("completed ok");
 }
 
 /* Oh, BTW: Fix the procedural basis and make this more intuitive. */
@@ -134,7 +129,7 @@ cygserver_request (client_request * req)
       return -1;
     }
 
-  debug_printf ("connected to server %p\n", transport);
+  debug_printf ("connected to server %p", transport);
 
   req->send(transport);
 
@@ -192,7 +187,7 @@ cygserver_init ()
   else if (req->version.major != CYGWIN_SERVER_VERSION_MAJOR ||
 	   req->version.api != CYGWIN_SERVER_VERSION_API ||
 	   req->version.minor > CYGWIN_SERVER_VERSION_MINOR)
-    api_fatal ("incompatible version of cygwin server.\n\
+    api_fatal ("incompatible version of cygwin server.\
  client version %d.%d.%d.%d, server version%ld.%ld.%ld.%ld",
     CYGWIN_SERVER_VERSION_MAJOR,
     CYGWIN_SERVER_VERSION_API,
