@@ -28,6 +28,7 @@ struct proc {
   __gid32_t *gidlist;
   bool is_admin;
   struct vmspace *p_vmspace;
+  HANDLE signal_arrived;
 };
 
 #ifdef __INSIDE_CYGWIN__
@@ -41,6 +42,7 @@ ipc_set_proc_info (proc &blk)
   blk.gidcnt = 0;
   blk.gidlist = NULL;
   blk.is_admin = false;
+  blk.signal_arrived = signal_arrived;
 }
 #endif /* __INSIDE_CYGWIN__ */
 

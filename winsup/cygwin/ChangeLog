@@ -1,3 +1,9 @@
+2004-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.h (CYGWIN_SERVER_VERSION_API): Bump.
+	* cygserver_ipc.h (struct proc): Add signal_arrived member.
+	(ipc_set_proc_info): Inititalize blk.signal_arrived.
+
 2004-02-06  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* uinfo.cc (cygheap_user::init): Use sec_user_nih to build a
