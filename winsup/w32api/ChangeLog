@@ -1,3 +1,13 @@
+2005-02-10  Jiri Malak  <Jiri.Malak@iol.cz>
+            Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/directx/dinput_private.h (ATTRIBUTE_TEXT_SECTION): New
+	define for Open Watcom portability.
+	* lib/directx/(dinput_joy.c, dinput_joy2.c, dinput_kbd.c, 
+	dinput_mouse.c, dinput_mouse2.c): Use new macro in definition
+	of local c_rgodfDI* objects. Replace .rdata section attribute
+	with 'const' keyword in definition of global c_dfDI* objects.
+
 2005-02-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winioctl.h (IOCTL_VOLUME_BASE,

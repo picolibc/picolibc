@@ -12,7 +12,7 @@
 
 #include "dinput_private.h"
 
-static DIOBJECTDATAFORMAT c_rgodfDIMouse[] __attribute__ ((section(".text"))) =
+static DIOBJECTDATAFORMAT ATTRIBUTE_TEXT_SECTION c_rgodfDIMouse[] =
 {
 	{&GUID_XAxis,0x0,DIDFT_ABSAXIS|DIDFT_RELAXIS|DIDFT_ANYINSTANCE,0x0},
 	{&GUID_YAxis,0x4,DIDFT_ABSAXIS|DIDFT_RELAXIS|DIDFT_ANYINSTANCE,0x0},
@@ -23,4 +23,4 @@ static DIOBJECTDATAFORMAT c_rgodfDIMouse[] __attribute__ ((section(".text"))) =
 	{NULL,0xf,DIDFT_BUTTON|DIDFT_ANYINSTANCE|DIDFT_OPTIONAL,0x0}
 };
 
-DIDATAFORMAT c_dfDIMouse __attribute__ ((section(".rdata"))) = {sizeof(DIDATAFORMAT),sizeof(DIOBJECTDATAFORMAT),DIDF_RELAXIS,16,sizeof(c_rgodfDIMouse)/sizeof(c_rgodfDIMouse[0]),c_rgodfDIMouse};
+const DIDATAFORMAT c_dfDIMouse = {sizeof(DIDATAFORMAT),sizeof(DIOBJECTDATAFORMAT),DIDF_RELAXIS,16,sizeof(c_rgodfDIMouse)/sizeof(c_rgodfDIMouse[0]),c_rgodfDIMouse};
