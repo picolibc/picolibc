@@ -56,6 +56,16 @@ AC_ARG_ENABLE(newlib-mb,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-mb option) ;;
  esac], [newlib_mb=no])dnl
 
+dnl Support --disable-newlib-io-float
+AC_ARG_ENABLE(newlib-io-float,
+[  --disable-newlib-io-float disable printf/scanf family float support],
+[case "${enableval}" in
+  yes) newlib_io_float=yes ;;
+  no)  newlib_io_float=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-float option) ;;
+ esac], [newlib_io_float=yes])dnl
+
+
 dnl We may get other options which we don't document:
 dnl --with-target-subdir, --with-multisrctop, --with-multisubdir
 
@@ -74,7 +84,7 @@ AC_SUBST(newlib_basedir)
 
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE(newlib, 1.9.0)
+AM_INIT_AUTOMAKE(newlib, 1.10.0)
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
@@ -160,6 +170,14 @@ newlib_cflags="[$]{newlib_cflags} -fno-builtin"
 NEWLIB_CFLAGS=${newlib_cflags}
 AC_SUBST(NEWLIB_CFLAGS)
 
+LDFLAGS=${ldflags}
+AC_SUBST(LDFLAGS)
+
+AM_CONDITIONAL(USE_LIBTOOL, test x[$]{use_libtool} = xyes)
+AC_SUBST(oext)
+AC_SUBST(aext)
+
+AC_SUBST(libm_machine_dir)
 AC_SUBST(machine_dir)
 AC_SUBST(sys_dir)
 ])

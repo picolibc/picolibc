@@ -1,3 +1,14 @@
+2002-04-17  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configure.in (CRT0_DIR): Set to libc/.
+	(CRT1_DIR): Set to ${crt1_dir}/ if crt1_dir is non-empty.
+	* Makefile.am: Change all occurrences of $(CRT0_DIR)/$(CRT0) to
+	$(CRT0_DIR)$(CRT0) to prevent make warnings.  Likewise for
+	$(CRT1_DIR)/$(CRT1).
+	* libc/machine/xstormy16/Makefile.in: Regenerated.
+	* libc/machine/xstormy16/aclocal.m4: Regenerated.
+	* libc/machine/xstormy16/configure: Regenerated.
+
 2002-04-13  Alexandre Oliva  <aoliva@redhat.com>
 
 	* libc/stdlib/mallocr.c (malloc_extend_top): If correction sbrk

@@ -64,14 +64,18 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 EXEEXT = @EXEEXT@
+LDFLAGS = @LDFLAGS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
+aext = @aext@
+libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
+oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
@@ -87,7 +91,9 @@ lib_a_SOURCES = setjmp.S
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
-lib_a_LIBADD = malloc.o free.o realloc.o calloc.o cfree.o malign.o 	valloc.o pvalloc.o mallinfo.o mallstats.o msize.o mallopt.o 	mallocr.o freer.o reallocr.o callocr.o
+lib_a_LIBADD = malloc.o free.o realloc.o calloc.o cfree.o malign.o \
+	valloc.o pvalloc.o mallinfo.o mallstats.o msize.o mallopt.o \
+	mallocr.o freer.o reallocr.o callocr.o
 
 
 MALLOC_COMPILE = $(COMPILE)
@@ -99,7 +105,6 @@ LIBRARIES =  $(noinst_LIBRARIES)
 
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 lib_a_DEPENDENCIES =  malloc.o free.o realloc.o calloc.o cfree.o \
 malign.o valloc.o pvalloc.o mallinfo.o mallstats.o msize.o mallopt.o \

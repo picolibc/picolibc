@@ -2366,13 +2366,16 @@ CRT0=
 CRT0_DIR=
 if test -n "${sys_dir}"; then
   CRT0=crt0.o
-  CRT0_DIR=libc
+  CRT0_DIR=libc/
 fi
 
 
 
 CRT1=${crt1}
-CRT1_DIR=${crt1_dir}
+CRT1_DIR=
+if test -n "${crt1_dir}"; then
+  CRT1_DIR=${crt1_dir}/
+fi
 
 
 

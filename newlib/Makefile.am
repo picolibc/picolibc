@@ -162,19 +162,19 @@ libm/libm.a: ; @true
 
 endif # USE_LIBTOOL
 
-crt0.o: $(CRT0_DIR)/$(CRT0)
+crt0.o: $(CRT0_DIR)$(CRT0)
 	rm -f $@
-	ln $(CRT0_DIR)/$(CRT0) $@ >/dev/null 2>/dev/null \
-	 || cp $(CRT0_DIR)/$(CRT0) $@
+	ln $(CRT0_DIR)$(CRT0) $@ >/dev/null 2>/dev/null \
+	 || cp $(CRT0_DIR)$(CRT0) $@
 
-$(CRT0_DIR)/$(CRT0): ; @true
+$(CRT0_DIR)$(CRT0): ; @true
 
-crt1.o: $(CRT1_DIR)/$(CRT1)
+crt1.o: $(CRT1_DIR)$(CRT1)
 	rm -f $@
-	ln $(CRT0_DIR)/$(CRT0) $@ >/dev/null 2>/dev/null \
-	 || cp $(CRT0_DIR)/$(CRT0) $@
+	ln $(CRT0_DIR)$(CRT0) $@ >/dev/null 2>/dev/null \
+	 || cp $(CRT0_DIR)$(CRT0) $@
 
-$(CRT1_DIR)/$(CRT1): ; @true
+$(CRT1_DIR)$(CRT1): ; @true
 
 
 all-recursive: stmp-targ-include
