@@ -1,5 +1,18 @@
 2002-08-28  Christopher Faylor  <cgf@redhat.com>
 
+	* cygthread.cc (hthreads): Remove unneeded global.
+	(cygthread::simplestub): New static member function.
+	(cygthread::runner): Don't set hthreads.
+	(cygthread::freerange): New member function.
+	(cygthread::operator new): Call freerange if all cygwin slots are used
+	up.
+	(cygthread::exit_thread): Don't mess with event if freerange thread.
+	(cygthread::detach): Ditto.
+	* cygthread.h (class cygthread): Declare new member functions and
+	variables.
+
+2002-08-28  Christopher Faylor  <cgf@redhat.com>
+
 	* malloc.cc: Protect some definitions to avoid a compile time warning.
 
 2002-08-27  Nicholas Wourms  <nwourms@netscape.net>
