@@ -842,7 +842,7 @@ fhandler_console::tcgetattr (struct termios *t)
 }
 
 fhandler_console::fhandler_console () :
-  fhandler_termios (FH_CONSOLE)
+  fhandler_termios ()
 {
 }
 
