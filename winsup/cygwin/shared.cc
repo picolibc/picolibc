@@ -18,6 +18,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
+#include "heap.h"
 #include "shared_info.h"
 #include "registry.h"
 #include "cygwin_version.h"
@@ -46,26 +47,6 @@ shared_name (const char *str, int num)
   if (GetEnvironmentVariable("CYGWIN_TESTING", envbuf, 5))
     strcat(buf, cygwin_version.dll_build_date);
   return buf;
-}
-
-static void
-mount_table_init ()
-{
-  void *addr = mount_table_address;
-  debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
-		mount_table_address);
-  mount_table = (mount_info *) open_shared (cygheap->user.name (),
-					    cygwin_mount_h, sizeof (mount_info),
-					    addr);
-  ProtectHandle (cygwin_mount_h);
-
-  debug_printf ("mount table version %x at %p", mount_table->version, mount_table);
-  if (!mount_table->version)
-    {
-      mount_table->version = MOUNT_VERSION;
-      debug_printf ("initializing mount table");
-      mount_table->init ();	/* Initialize the mount table.  */
-    }
 }
 
 void * __stdcall
@@ -143,11 +124,11 @@ shared_info::initialize ()
   reg_key reg (KEY_READ, NULL);
 
   /* Note that reserving a huge amount of heap space does not result in
-  swapping since we are not committing it. */
+  the use of swap since we are not committing it. */
   /* FIXME: We should not be restricted to a fixed size heap no matter
   what the fixed size is. */
 
-  heap_chunk_in_mb = reg.get_int ("heap_chunk_in_mb", 128);
+  heap_chunk_in_mb = reg.get_int ("heap_chunk_in_mb", 1024);
   if (heap_chunk_in_mb < 4)
     {
       heap_chunk_in_mb = 4;
@@ -158,21 +139,47 @@ shared_info::initialize ()
 }
 
 void __stdcall
-shared_init ()
+memory_init ()
 {
+  /* Initialize general shared memory */
   HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
   cygwin_shared = (shared_info *) open_shared ("shared",
 					       shared_h,
 					       sizeof (*cygwin_shared),
 					       cygwin_shared_address);
-  if (!cygheap)
-    cygheap_init ();
- 
-  mount_table_init ();
 
+  cygwin_shared->initialize ();
+  heap_init ();
+
+  /* Allocate memory for the per-user mount table */
+  char user_name[MAX_USER_NAME];
+  DWORD user_name_len = MAX_USER_NAME;
+
+  if (!GetUserName (user_name, &user_name_len))
+    strcpy (user_name, "unknown");
+  mount_table = (mount_info *) open_shared (user_name, cygwin_mount_h,
+					    sizeof (mount_info), 0);
+  debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
+		mount_table_address);
+  ProtectHandle (cygwin_mount_h);
+  debug_printf ("mount table version %x at %p", mount_table->version, mount_table);
+
+  /* Initialize the Cygwin heap, if necessary */
+  if (!cygheap)
+    {
+      cygheap_init ();
+      cygheap->user.set_name (user_name);
+    }
   cygheap->shared_h = shared_h;
   ProtectHandle (cygheap->shared_h);
-  cygwin_shared->initialize ();
+
+  /* Initialize the Cygwin per-user mount table, if necessary */
+  if (!mount_table->version)
+    {
+      mount_table->version = MOUNT_VERSION;
+      debug_printf ("initializing mount table");
+      mount_table->init ();	/* Initialize the mount table.  */
+    }
 }
 
 void __stdcall

@@ -11,8 +11,8 @@ details. */
 #include "perprocess.h"
 
 /* Heap management. */
-void heap_init (void);
-void malloc_init (void);
+void heap_init ();
+void malloc_init ();
 
 #define inheap(s) (brk && ((char *) (s) >= (char *) brkbase) && ((char *) (s) <= (char *) brktop))
 

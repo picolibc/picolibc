@@ -153,7 +153,7 @@ extern shared_info *cygwin_shared;
 extern mount_info *mount_table;
 extern HANDLE cygwin_mount_h;
 
-void __stdcall shared_init (void);
+void __stdcall memory_init (void);
 void __stdcall shared_terminate (void);
 
 #define shared_align_past(p) \

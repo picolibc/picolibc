@@ -531,6 +531,13 @@ _link (const char *a, const char *b)
       set_errno (real_b.error);
       goto done;
     }
+
+  if (real_b.file_attributes () != (DWORD)-1)
+    {
+      syscall_printf ("file '%s' exists?", (char *)real_b);
+      set_errno (EEXIST);
+      goto done;
+    }
   if (real_b.get_win32 ()[strlen (real_b.get_win32 ()) - 1] == '.')
     {
       syscall_printf ("trailing dot, bailing out");

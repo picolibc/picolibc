@@ -723,13 +723,10 @@ dll_crt0_1 ()
   host_dependent.init ();
 
   /* Initialize the cygwin subsystem if this is the first process,
-     or attach to the shared data structure if it's already running. */
-  shared_init ();
+     or attach to shared data structures if it's already running. */
+  memory_init ();
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
-
-  /* Initialize the heap. */
-  heap_init ();
 
   /* Initialize events. */
   events_init ();

@@ -52,8 +52,8 @@ heap_init ()
 	    break;
 	}
       if (p == NULL)
-	api_fatal ("1. unable to allocate heap, heap_chunk_size %d, pid %d, %E",
-		   brkchunk, myself->pid);
+	api_fatal ("1. unable to allocate heap %p, heap_chunk_size %d, pid %d, %E",
+		   brkbase, brkchunk, myself->pid);
       if (p != brkbase)
 	api_fatal ("heap allocated but not at %p", brkbase);
       if (! VirtualAlloc (brkbase, allocsize, MEM_COMMIT, PAGE_READWRITE))

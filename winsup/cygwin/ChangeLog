@@ -1,3 +1,22 @@
+Sun Jan 28 19:40:40 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (_link): Make sure that newpath does not exist.  Set
+	errno if it does.
+
+Sun Jan 28 19:29:08 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (init_cheap): Don't specify a load address for the heap.
+	It doesn't work on #!*& Windows 9x.
+	(cygheap_init): Move GetUserName to memory_init.
+	* dcrt0.cc (dll_crt0_1): Call new memory_init functin, eliminate call
+	to heap_init.
+	* heap.cc (heap_init): Improve error output.
+	* heap.h: Correct some declarations.
+	* shared.cc (mount_table_init): Remove.
+	(memory_init): Renamed from shared_init.  Reorganize to accomodate
+	strange Windows 9x problems with cygheap/heap interaction.
+	* shared_info.h: Rename shared_init to memory_init.
+
 Sun Jan 28 01:25:33 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/version.h: Bump API version.
@@ -30,24 +49,29 @@ Sun Jan 28 00:28:30 2001  Christopher Faylor <cgf@cygnus.com>
 	initialization.
 	* fhandler_console.cc (console_shared_h): Eliminate.
 	(get_tty_stuff): Use cygheap->console_h rather than console_shared_h.
-	* heap.cc (heap_init): Use page size constant calculated earlier in initialization.
+	* heap.cc (heap_init): Use page size constant calculated earlier in
+	initialization.
 	* shared.cc: Eliminate cygwin_shared_h.  Add cygwin_mount_h.
 	(mount_table_init): New function for initializing a user mount table.
-	(open_shared_file_map): Use constant for shared memory region.  Initialize cygheap and mount table here.
+	(open_shared_file_map): Use constant for shared memory region.
+	Initialize cygheap and mount table here.
 	(open_shared): Improve debugging output.
 	(shared_info::initialize): Eliminate call to mount.init.
 	(shared_terminate): Use cygheap->shared_h.  Close cygwin_mount_h.
 	(open_shared_file_map): Eliminate.
 	* shared_info.h (mount_info): Add a version field.
-	(shared_align_past): New macro for calculating location for shared memory regions.
+	(shared_align_past): New macro for calculating location for shared
+	memory regions.
 	* sigproc.cc (init_child_info): Eliminate shared_h, console_h.
-	* spawn.cc (spawn_guts): Pass on cygwin_mount_h iff not a different user.
+	* spawn.cc (spawn_guts): Pass on cygwin_mount_h iff not a different
+	user.
 	* syscalls.cc (system_info): New global holding system memory defaults.
 	(getpagesize): Use system_info.
 	* uinfo.cc (internal_getlogin): Only fill in user name if nonexistent.
 	* winsup.h: Declare system_info.
 
-	* passwd.cc (read_etc_passwd): Use cygheap->user.name () rather than retrieving the name again.
+	* passwd.cc (read_etc_passwd): Use cygheap->user.name () rather than
+	retrieving the name again.
 
 Sat Jan 27 10:18:02 2001  Christopher Faylor <cgf@cygnus.com>
 
@@ -176,11 +200,13 @@ Fri Jan 12 00:35:15 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* signal.cc (sigaction): Don't treat SIGCONT specially.
 
-	* exceptions.cc (interrupt_setup): Save sa_flags of interrupted signal for later use.
+	* exceptions.cc (interrupt_setup): Save sa_flags of interrupted signal
+	for later use.
 	(sig_handler): Default any stopping signal to SIGSTOP.
 	(call_signal_handler): New function.
 	(sigdelayed0): New function.
-	* sigproc.cc (sigproc_init): Initialize SIGSTOP sigaction for special behavior.
+	* sigproc.cc (sigproc_init): Initialize SIGSTOP sigaction for special
+	behavior.
 	* sigproc.h: Define call_signal_handler.
 	* syscalls.cc (_read): Allow restartable signal behavior.
 
@@ -192,14 +218,15 @@ Thu Jan 11 13:17:00 2001  Corinna Vinschen <corinna@vinschen.de>
 	* fhandler_mem.cc (fhandler_dev_mem::open): Set OBJ_INHERIT attribute
 	for device\physicalmemory handle.
 	(fhandler_dev_mem::mmap): Ditto.
-	* fhandler_mem.cc (fhandler_dev_mem::fixup_mmap_after_fork): New method.
-	* mmap.cc (mmap_record): Add private `fdesc_' member. Change constructor
-	accordingly.
+	* fhandler_mem.cc (fhandler_dev_mem::fixup_mmap_after_fork): New
+	method.
+	* mmap.cc (mmap_record): Add private `fdesc_' member.  Change
+	constructor accordingly.
 	(get_fd): New method.
 	(mmap): Use new mmap_record constructor.
 	(fhandler_base::fixup_mmap_after_fork): New method.
 	(fhandler_disk_file::fixup_mmap_after_fork): Ditto.
-	(fixup_mmaps_after_fork): Call `fixup_mmap_after_fork' of appropriate 
+	(fixup_mmaps_after_fork): Call `fixup_mmap_after_fork' of appropriate
 	fhandler class.
 
 Wed Jan 10 22:08:30 2001  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
