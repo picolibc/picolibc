@@ -85,6 +85,9 @@ case "${target}" in
   mn10300-*-*)
 	configdirs="${configdirs} mn10300 testsuite"
 	;;
+  crx-*-*)
+	configdirs="${configdirs} crx"
+	;;
   d30v-*-*)
 	configdirs="${configdirs} d30v testsuite"
 	;;

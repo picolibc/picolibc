@@ -1,4 +1,37 @@
-2004-01-01  Paul Brook  <paul@codesourcery.com>
+2004-10-05  Tomer Levi  <Tomer.Levi@nsc.com>
+
+        * configure.in: Support crx-*-*.
+        * configure: regenerate.
+        * crx/_exit.c: New file.
+        * crx/_getenv.c: Ditto.
+        * crx/_rename: Ditto.
+        * crx/close.c: Ditto.
+        * crx/configure.in: Ditto.
+        * crx/crti.S: Ditto.
+        * crx/crtn.S: Ditto.
+        * crx/crt0.S: Ditto.
+        * crx/dvz_hndl.c: Ditto.
+        * crx/flg_hndl.c: Ditto.
+        * crx/fstat.c: Ditto.
+        * crx/getpid.c: Ditto.
+        * crx/iad_hndl.c: Ditto.
+        * crx/intable.c: Ditto.
+        * crx/isatty.c: Ditto.
+        * crx/kill.c: Ditto.
+        * crx/lseek.c: Ditto.
+        * crx/Makefile.in: Ditto.
+        * crx/open.c: Ditto.
+        * crx/putnum.c: Ditto.
+        * crx/read.c: Ditto.
+        * crx/sbrk.c: Ditto.
+        * crx/sim.ld: Ditto.
+        * crx/stat.c: Ditto.
+        * crx/svc_hndl.c: Ditto.
+        * crx/time.c: Ditto.
+        * crx/und_hndl.c: Ditto.
+        * crx/unlink.c: Ditto.
+        * crx/write.c: Ditto.
+                                                              2004-01-01  Paul Brook  <paul@codesourcery.com>
 
 	* arm/configure.in: Add *-*-aebi target.
 	* arm/configure: Regenerate.
