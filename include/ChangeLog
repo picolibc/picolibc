@@ -1,3 +1,7 @@
+2003-04-23  H.J. Lu <hjl@gnu.org>
+
+	* bfdlink.h (bfd_link_callbacks): Add error_handler.
+
 2003-04-04  Svein E. Seldal  <Svein.Seldal@solidas.com>
 
 	* coff/tic4x.h: Namespace cleanup. Replace s/c4x/tic4x
