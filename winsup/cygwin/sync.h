@@ -38,6 +38,7 @@ public:
   /* Return true if caller thread owns the lock. */
   int ismine () {return tid == GetCurrentThreadId ();}
   DWORD owner () {return tid;}
+  int unstable () {return !tid && (sync || waiters >= 0);}
   void reset () __attribute__ ((regparm (1)));
   bool acquired ();
   static void set_exiting_thread () {exiting_thread = GetCurrentThreadId ();}
@@ -57,12 +58,5 @@ extern muto muto_start;
 ({ \
   static muto __storage __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy1"))); \
   __name = __storage.init (#__name); \
-})
-
-/* Use a statically allocated buffer as the storage for a muto */
-#define new_muto_name(__var, __name) \
-({ \
-  static muto __var##_storage __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy1"))); \
-  __var = __var##_storage.init (__name); \
 })
 #endif /*_SYNC_H*/

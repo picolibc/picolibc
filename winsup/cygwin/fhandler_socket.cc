@@ -32,7 +32,6 @@
 #include "sigproc.h"
 #include "cygthread.h"
 #include "select.h"
-#include "wininfo.h"
 #include <unistd.h>
 
 extern bool fdsock (cygheap_fdmanip& fd, const device *, SOCKET soc);
@@ -1375,7 +1374,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	break;
       }
     case FIOASYNC:
-      res = WSAAsyncSelect (get_socket (), winmsg, WM_ASYNCIO,
+      res = WSAAsyncSelect (get_socket (), gethwnd (), WM_ASYNCIO,
 	      *(int *) p ? ASYNC_MASK : 0);
       syscall_printf ("Async I/O on socket %s",
 	      *(int *) p ? "started" : "cancelled");
@@ -1391,7 +1390,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
        * blocking mode
        */
       if (cmd == FIONBIO && *(int *) p == 0)
-	WSAAsyncSelect (get_socket (), winmsg, 0, 0);
+	WSAAsyncSelect (get_socket (), gethwnd (), 0, 0);
       res = ioctlsocket (get_socket (), cmd, (unsigned long *) p);
       if (res == SOCKET_ERROR)
 	  set_winsock_errno ();
@@ -1401,7 +1400,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 			    *(int *) p ? "non" : "");
 	  /* Start AsyncSelect if async socket unblocked */
 	  if (*(int *) p && async_io ())
-	    WSAAsyncSelect (get_socket (), winmsg, WM_ASYNCIO, ASYNC_MASK);
+	    WSAAsyncSelect (get_socket (), gethwnd (), WM_ASYNCIO, ASYNC_MASK);
 
 	  set_nonblocking (*(int *) p);
 	}

@@ -41,7 +41,6 @@ class cygthread
     (void) CloseHandle (h);
     h = NULL;
   }
-  DWORD tid () const {return id;}
 };
 
 #define cygself NULL
