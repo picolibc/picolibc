@@ -1,3 +1,8 @@
+Mon Feb 28 17:08:03 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/rapi.h: New file.
+	* lib/rapi.def: New file.
+
 2000-02-11  Axel Riese  <ariese@andromeda.risc.uni-linz.ac.at>
 
 	* oaidl.h (LPTYPECOMP): Remove multiple definition.
