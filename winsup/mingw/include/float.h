@@ -32,13 +32,13 @@
  *
  */
 
+#include_next<float.h>
+
 #ifndef _MINGW_FLOAT_H_
 #define _MINGW_FLOAT_H_
 
 /* All the headers include this file. */
 #include <_mingw.h>
-
-#include_next<float.h>
 
 /*
  * Functions and definitions for controlling the FPU.

@@ -1,3 +1,7 @@
+2002-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/float.h: #include_next<float.h> before header guard.
+
 2002-06-18  Casper S. Hornstrup  <chorns@users.sourceforge.net>
 
 	* include/_mingw.h (__MINGW_IMPORT): Check for prior definition before
