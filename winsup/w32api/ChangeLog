@@ -1,3 +1,10 @@
+2003-08-17  Martin Fuchs  <Martin-Fuchs@gmx.net>
+
+	* include/commctrl.h (TreeView_GetScrollTime,
+	TreeView_SetScrollTime): Define macros.
+	* include/winuser.h (GetShellWindow): Add prototype.
+	* include/objidl.h (STGMEDIUM): Correct lpszFileName type.
+
 2003-08-15  Martin Fuchs  <Martin-Fuchs@gmx.net>
 
 	* include/shguid.h (CLSID_DragDropHelper, IID_IDropTargetHelper,
