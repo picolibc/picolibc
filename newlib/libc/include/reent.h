@@ -50,6 +50,7 @@ extern "C" {
 #include <machine/types.h>
 
 #define __need_size_t
+#define __need_ptrdiff_t
 #include <stddef.h>
 
 /* FIXME: not namespace clean */
@@ -71,7 +72,7 @@ extern int _link_r _PARAMS ((struct _reent *, const char *, const char *));
 extern _off_t _lseek_r _PARAMS ((struct _reent *, int, _off_t, int));
 extern int _open_r _PARAMS ((struct _reent *, const char *, int, int));
 extern _ssize_t _read_r _PARAMS ((struct _reent *, int, void *, size_t));
-extern void *_sbrk_r _PARAMS ((struct _reent *, size_t));
+extern void *_sbrk_r _PARAMS ((struct _reent *, ptrdiff_t));
 extern int _stat_r _PARAMS ((struct _reent *, const char *, struct stat *));
 extern _CLOCK_T_ _times_r _PARAMS ((struct _reent *, struct tms *));
 extern int _unlink_r _PARAMS ((struct _reent *, const char *));

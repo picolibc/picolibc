@@ -28,7 +28,7 @@ int brk(void *end_data_segment)
 }
 
 
-void *sbrk(size_t increment) /* SHOULD be ptrdiff_t */
+void *sbrk(ptrdiff_t increment) /* SHOULD be ptrdiff_t */
 {
     char *old_brk,*new_brk;
 

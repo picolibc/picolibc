@@ -104,22 +104,9 @@ extern __IMPORT char *_tzname[2];
 #define tzname _tzname
 #endif
 
-/* CYGWIN also exposes daylight and timezone in the name space */
-#ifdef __CYGWIN__
-#ifndef daylight
-#define daylight _daylight
-#endif
-#if timezonevar
-#ifndef timezone
-#define timezone ((long int) _timezone)
-#endif
-#else
-char *_EXFUN(timezone, (void));
-#endif
-#endif /* __CYGWIN__ */
 #endif /* !__STRICT_ANSI__ */
 
-#include <bits/posix_opt.h>
+#include <sys/features.h>
 
 #if defined(_POSIX_TIMERS)
 
@@ -187,7 +174,7 @@ int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
    the identifier of the CPU_time clock associated with the PROCESS
    making the function call.  */
 
-#define CLOCK_PROCESS_CPUTIME (clockid_t)2
+#define CLOCK_PROCESS_CPUTIME_ID (clockid_t)2
 
 #endif
 
@@ -197,7 +184,7 @@ int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
     the identifier of the CPU_time clock associated with the THREAD
     making the function call.  */
 
-#define CLOCK_THREAD_CPUTIME (clockid_t)3
+#define CLOCK_THREAD_CPUTIME_ID (clockid_t)3
 
 #endif
 
