@@ -1,3 +1,8 @@
+Mon Mar  3 20:35:58 2003  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* sh.h (EF_SH_MERGE_MACH): Make sure SH2E & SH3/SH3E merge to SH3E,
+	and SH2E & SH4 merge to SH4, not SH2E.
+
 2003-02-21  Ian Wienand  <ianw@gelato.unsw.edu.au>
 
 	* ia64.h (SHT_IA_64_LOPSREG, SHT_IA_64_HIPSREG,
