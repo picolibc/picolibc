@@ -97,18 +97,18 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 The function <<iconv>> converts characters from <[in]> which are in one
-character set and converts them to characters of another character set,
-outputting them to <[out]>.  The value <[inleft]> specifies the number
-of input bytes to convert whereas the value <[outleft]> specifies the
-size remaining in the <[out]> buffer.  The conversion descriptor <[cd]>
-specifies the conversion being performed and is created via <<iconv_open>>.
+encoding to characters of another encoding, outputting them to <[out]>.
+The value <[inleft]> specifies the number of input bytes to convert whereas
+the value <[outleft]> specifies the size remaining in the <[out]> buffer. 
+The conversion descriptor <[cd]> specifies the conversion being performed
+and is created via <<iconv_open>>.
 
 An <<iconv>> conversion stops if: the input bytes are exhausted, the output
 buffer is full, an invalid input character sequence occurs, or the
 conversion specifier is invalid.
 
 The function <<iconv_open>> is used to specify a conversion from one
-character set: <[from]> to another: <[to]>.  The result of the call is
+encoding: <[from]> to another: <[to]>.  The result of the call is
 to create a conversion specifier that can be used with <<iconv>>.
 
 The function <<iconv_close>> is used to close a conversion specifier after
@@ -346,4 +346,3 @@ _DEFUN(_iconv_close_r, (rptr, cd),
   return res;
 }
 #endif /* !_REENT_ONLY */
-

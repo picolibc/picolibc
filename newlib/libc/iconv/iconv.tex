@@ -1,42 +1,864 @@
 @node Iconv
-@chapter Character-set conversions (@file{iconv.h})
+@chapter Encoding conversions (@file{iconv.h})
 
 This chapter describes the Newlib iconv library.
 The iconv functions declarations are in
 @file{iconv.h}.
 
 @menu
-* iconv::                 Character set conversion routines
-* iconv configuration::   Newlib iconv-specific configure options
+* iconv::                  Encoding conversion routines
+* Introduction::           Introduction to iconv and encodings
+* Supported encodings::    The list of currently supported encodings
+* iconv design decisions:: General iconv library design issues and decisions
+* iconv configuration::    iconv-related configure script options
 @end menu
 
 @page
 @include iconv/iconv.def
 
 @page
+@node Introduction
+@section Introduction
+@findex encoding
+@findex character set
+@findex charset
+@findex CES
+@findex CCS
+@*
+The iconv library is intended to convert characters from one encoding to
+another. It implements iconv(), iconv_open() and iconv_close() calls
+defined by the Single Unix Specification.
+
+@*
+In addition to these user-level interfaces, the iconv library also has
+several useful internal interfaces which are needed to support coding
+capabilities of the Locale infrastructure. Since Locale also needs to
+convert various character sets to and from Wide characters set, iconv
+library shares it's capabilities with Locale subsystem. Moreover, iconv
+supports several features which are only needed for Locale infrastructure
+(for example, the MB_CUR_MAX value).
+
+@*
+The Newlib iconv library was created using ideas of another iconv
+library implemented by Konstantin Chuguev (ver 2.0). Thus, the Newlib iconv
+library has double Copyright. The Newlib iconv library was rewritten from
+scratch by Artem B. Bityuckiy and contains a lot of improvements with respect
+to original iconv library.
+
+@*
+Terms like @dfn{encoding} or @dfn{character set} aren't well defined and
+are used with various meanings. The following is definitions of terms
+used in this documentation as well as in iconv library implementation:
+
+@itemize @bullet
+@item
+@dfn{encoding} - a machine representation of characters by means of bits;
+
+@item
+@dfn{Character Set} or @dfn{Charset} - just a collection of
+characters, i.e. encoding is a machine representation of character set; 
+
+@item
+@dfn{CCS} (@dfn{Coded Character Set}) - a mapping from an character set to a
+set of integers @dfn{character codes};
+
+@item
+@dfn{CES} (@dfn{Character Encoding Scheme}) - a mapping from a set of character
+codes to a sequence of bytes;
+@end itemize
+
+@*
+Users usually deal with encodings, for example, KOI8-R, Unicode, UTF-8,
+ASCII, etc. Encodings are formed by the following chain:
+
+@enumerate
+@item
+User has a set of characters specific to his language (character set).
+
+@item
+Each character from this set uniquely numbered, resulting in CCS.
+
+@item
+Each number from CCS is converted to a sequence of bits or bytes by means
+of CES resulting in some encoding. Thus, CES may be considered as a
+function of CCS which produces some encoding. Note, that CES may be
+applied to more than one CCS.
+@end enumerate
+
+@*
+Thus, an encoding may be considered as one or more CCS + CES.
+
+@*
+Sometimes, there is no CES and in such cases Encoding is equivalent to CCS,
+e.g. KOI8-R or ASCII.
+
+@*
+The example of more complicated encoding is UTF-8 which is the UCS
+(or Unicode) CCS plus UTF-8 CES.
+
+@*
+The following is a brief list of iconv library features:
+@itemize
+@item
+Generic architecture
+@item
+Locale infrastructure support
+@item
+Automatic generation of code which handles various CES/CCS/Encoding/Names/Aliases
+dependencies.
+@item
+The possibility to choose size- or speed-optimazed configuration
+@item
+The possibility to exclude almost all unneeded code from linking.
+@end itemize
+
+
+
+
+@page
+@node Supported encodings
+@section Supported encodings
+@findex big5
+@findex cp775
+@findex cp850
+@findex cp852
+@findex cp855
+@findex cp866
+@findex euc_jp
+@findex euc_kr
+@findex euc_tw
+@findex iso_8859_1
+@findex iso_8859_10
+@findex iso_8859_11
+@findex iso_8859_13
+@findex iso_8859_14
+@findex iso_8859_15
+@findex iso_8859_2
+@findex iso_8859_3
+@findex iso_8859_4
+@findex iso_8859_5
+@findex iso_8859_6
+@findex iso_8859_7
+@findex iso_8859_8
+@findex iso_8859_9
+@findex iso_ir_111
+@findex koi8_r
+@findex koi8_ru
+@findex koi8_u
+@findex koi8_uni
+@findex ucs_2
+@findex ucs_2_internal
+@findex ucs_2be
+@findex ucs_2le
+@findex ucs_4
+@findex ucs_4_internal
+@findex ucs_4be
+@findex ucs_4le
+@findex us_ascii
+@findex utf_16
+@findex utf_16be
+@findex utf_16le
+@findex utf_8
+@findex win_1250
+@findex win_1251
+@findex win_1252
+@findex win_1253
+@findex win_1254
+@findex win_1255
+@findex win_1256
+@findex win_1257
+@findex win_1258
+@*
+The following is a list of currently supported encodings. The first column
+corresponds to encoding name, the second to the list of its aliases, third
+- to its CES and CCS components names, fourth - to its short description.
+
+@multitable @columnfractions .20 .26 .24 .30
+@item
+Name
+@tab
+Aliases
+@tab
+CES/CCS
+@tab
+Short description
+@item
+@tab
+@tab
+@tab
+
+
+@item
+big5
+@tab
+csbig5, big_five, bigfive, cn_big5, cp950
+@tab
+table_pcs / big5, us_ascii 
+@tab
+An encoding for Traditional Chinese.
+
+
+@item
+cp775
+@tab
+ibm775, cspc775baltic
+@tab
+table / cp775
+@tab
+An updated version of CP 437 that supports balitic languages.
+
+
+@item
+cp850
+@tab
+ibm850, 850, cspc850multilingual
+@tab
+table / cp850
+@tab
+IBM 850 - an updated version of CP 437 where several Latin 1 characters have been
+added instead of some less-often used characters like line-drawing and greek ones.
+
+
+@item
+cp852
+@tab
+ibm852, 852, cspcp852
+@tab
+@tab
+IBM 852 - an updated version of CP 437 where several Latin 2 characters have been added
+instead of some less-often used characters like line-drawing and greek ones.
+
+
+@item
+cp855
+@tab
+ibm855, 855, csibm855
+@tab
+table / cp855
+@tab
+IBM 855 - an updated version of CP 437 that supports Cyrillic.
+
+
+@item
+cp866
+@tab
+866, IBM866, CSIBM866
+@tab
+table / cp866
+@tab
+IBM 866 - an updated version of CP 855 which followes the more logical Russian alphabet 
+ordering of the alternativny variant that is preferred by many Russian users.
+
+
+@item
+euc_jp
+@tab
+eucjp
+@tab
+euc / jis_x0208_1990, jis_x0201_1976, jis_x0212_1990
+@tab
+EUC-JP - The EUC for Japanese.
+
+
+@item
+euc_kr
+@tab
+euckr
+@tab
+euc / ksx1001
+@tab
+EUC-KR - The EUC for Korean.
+
+
+@item
+euc_tw
+@tab
+euctw
+@tab
+euc / cns11643_plane1, cns11643_plane2, cns11643_plane14
+@tab
+EUC-TW - The EUC for Traditional Chinese.
+
+
+@item
+iso_8859_1
+@tab
+iso8859_1, iso88591, iso_8859_1:1987, iso_ir_100, latin1, l1, ibm819, cp819, csisolatin1
+@tab
+table / iso_8859_1
+@tab
+ISO 8859-1:1987 - Latin 1, West European.
+
+
+@item
+iso_8859_10
+@tab
+iso_8859_10:1992, iso_ir_157, iso885910, latin6, l6, csisolatin6, iso8859_10
+@tab
+table / iso_8859_10
+@tab
+ISO 8859-10:1992 - Latin 6, Nordic.
+
+
+@item
+iso_8859_11
+@tab
+iso8859_11, iso885911
+@tab
+table / iso_8859_11
+@tab
+ISO 8859-11 - Thai.
+
+
+@item
+iso_8859_13
+@tab
+iso_8859_13:1998, iso8859_13, iso885913
+@tab
+table / iso_8859_13
+@tab
+ISO 8859-13:1998 - Latin 7, Baltic Rim.
+
+
+@item
+iso_8859_14
+@tab
+iso_8859_14:1998, iso885914, iso8859_14
+@tab
+table / iso_8859_14
+@tab
+ISO 8859-14:1998 - Latin 8, Celtic.
+
+
+@item
+iso_8859_15
+@tab
+iso885915, iso_8859_15:1998, iso8859_15, 
+@tab
+table / iso_8859_15
+@tab
+ISO 8859-15:1998 - Latin 9, West Europe, successor of Latin 1.
+
+
+@item
+iso_8859_2
+@tab
+iso8859_2, iso88592, iso_8859_2:1987, iso_ir_101, latin2, l2, csisolatin2
+@tab
+table / iso_8859_2
+@tab
+ISO 8859-2:1987 - Latin 2, East European.
+
+
+@item
+iso_8859_3
+@tab
+iso_8859_3:1988, iso_ir_109, iso8859_3, latin3, l3, csisolatin3, iso88593
+@tab
+table / iso_8859_3
+@tab
+ISO 8859-3:1988 - Latin 3, South European.
+
+
+@item
+iso_8859_4
+@tab
+iso8859_4, iso88594, iso_8859_4:1988, iso_ir_110, latin4, l4, csisolatin4
+@tab
+table / iso_8859_4
+@tab
+ISO 8859-4:1988 - Latin 4, North European.
+
+
+@item
+iso_8859_5
+@tab
+iso8859_5, iso88595, iso_8859_5:1988, iso_ir_144, cyrillic, csisolatincyrillic
+@tab
+table / iso_8859_5
+@tab
+ISO 8859-5:1988 - Cyrillic.
+
+
+@item
+iso_8859_6
+@tab
+iso_8859_6:1987, iso_ir_127, iso8859_6, ecma_114, asmo_708, arabic, csisolatinarabic, iso88596
+@tab
+table / iso_8859_6
+@tab
+ISO i8859-6:1987 - Arabic.
+
+
+@item
+iso_8859_7
+@tab
+iso_8859_7:1987, iso_ir_126, iso8859_7, elot_928, ecma_118, greek, greek8, csisolatingreek, iso88597
+@tab
+table / iso_8859_7
+@tab
+ISO 8859-7:1987 - Greek.
+
+
+@item
+iso_8859_8
+@tab
+iso_8859_8:1988, iso_ir_138, iso8859_8, hebrew, csisolatinhebrew, iso88598
+@tab
+table / iso_8859_8
+@tab
+ISO 8859-8:1988 - Hebrew.
+
+
+@item
+iso_8859_9
+@tab
+iso_8859_9:1989, iso_ir_148, iso8859_9, latin5, l5, csisolatin5, iso88599
+@tab
+table / iso_8859_9
+@tab
+ISO 8859-9:1989 - Latin 5, Turkish.
+
+
+@item
+iso_ir_111
+@tab
+ecma_cyrillic, koi8_e, koi8e, csiso111ecmacyrillic
+@tab
+table / iso_ir_111
+@tab
+ISO IR 111/ECMA Cyrillic.
+
+
+@item
+koi8_r
+@tab
+cskoi8r, koi8r, koi8
+@tab
+table / koi8_r
+@tab
+RFC 1489 Cyrillic.
+
+
+@item
+koi8_ru
+@tab
+koi8ru
+@tab
+table / koi8_ru
+@tab
+Obsoleted Ukrainian.
+
+
+@item
+koi8_u
+@tab
+koi8u
+@tab
+table / koi8_u
+@tab
+RFC 2319 Ukrainian.
+
+
+@item
+koi8_uni
+@tab
+koi8uni
+@tab
+table / koi8_uni
+@tab
+KOI8 Unified.
+
+
+@item
+ucs_2
+@tab
+ucs2, iso_10646_ucs_2, iso10646_ucs_2, iso_10646_ucs2, iso10646_ucs2, iso10646ucs2, csUnicode
+@tab
+ucs_2 / (UCS)
+@tab
+ISO-10646-UCS-2. Big Endian, NBSP is always interpreted as NBSP (BOM isn't supported).
+
+
+@item
+ucs_2_internal
+@tab
+ucs2_internal, ucs_2internal, ucs2internal
+@tab
+ucs_2_internal / (UCS)
+@tab
+ISO-10646-UCS-2 in system byte order.
+NBSP is always interpreted as NBSP (BOM isn't supported).
+
+
+@item
+ucs_2be
+@tab
+ucs2be
+@tab
+ucs_2 / (UCS)
+@tab
+Big Endian version of ISO-10646-UCS-2 (in fact, equivalent to ucs_2).
+Big Endian, NBSP is always interpreted as NBSP (BOM isn't supported).
+
+
+@item
+ucs_2le
+@tab
+ucs2le
+@tab
+ucs_2 / (UCS)
+@tab
+Little Endian version of ISO-10646-UCS-2.
+Little Endian, NBSP is always interpreted as NBSP (BOM isn't supported).
+
+
+@item
+ucs_4
+@tab
+ucs4, iso_10646_ucs_4, iso10646_ucs_4, iso_10646_ucs4, iso10646_ucs4, iso10646ucs4
+@tab
+ucs_4 / (UCS)
+@tab
+ISO-10646-UCS-4. Big Endian, NBSP is always interpreted as NBSP (BOM isn't supported).
+
+
+@item
+ucs_4_internal
+@tab
+ucs4_internal, ucs_4internal, ucs4internal
+@tab
+ucs_4_internal / (UCS)
+@tab
+ISO-10646-UCS-4 in system byte order.
+NBSP is always interpreted as NBSP (BOM isn't supported).
+
+
+@item
+ucs_4be
+@tab
+ucs4be
+@tab
+ucs_4 / (UCS)
+@tab
+Big Endian version of ISO-10646-UCS-4 (in fact, equivalent to ucs_4).
+Big Endian, NBSP is always interpreted as NBSP (BOM isn't supported).
+
+
+@item
+ucs_4le
+@tab
+ucs4le
+@tab
+ucs_4 / (UCS)
+@tab
+Little Endian version of ISO-10646-UCS-4.
+Little Endian, NBSP is always interpreted as NBSP (BOM isn't supported).
+
+
+@item
+us_ascii
+@tab
+ansi_x3.4_1968, ansi_x3.4_1986, iso_646.irv:1991, ascii, iso646_us, us, ibm367, cp367, csascii
+@tab
+us_ascii / (ASCII)
+@tab
+7-bit ASCII.
+
+
+@item
+utf_16
+@tab
+utf16
+@tab
+utf_16 / (UCS)
+@tab
+RFC 2781 UTF-16. The very first NBSP code in stream is interpreted as BOM.
+
+
+@item
+utf_16be
+@tab
+utf16be
+@tab
+utf_16 / (UCS)
+@tab
+Big Endian version of RFC 2781 UTF-16.
+NBSP is always interpreted as NBSP (BOM isn't supported).
+
+
+@item
+utf_16le
+@tab
+utf16le
+@tab
+utf_16 / (UCS)
+@tab
+Little Endian version of RFC 2781 UTF-16.
+NBSP is always interpreted as NBSP (BOM isn't supported).
+
+
+@item
+utf_8
+@tab
+utf8
+@tab
+utf_8 / (UCS)
+@tab
+RFC 3629 UTF-8.
+
+
+@item
+win_1250
+@tab
+cp1250
+@tab
+@tab
+Win-1250 Croatian.
+
+
+@item
+win_1251
+@tab
+cp1251
+@tab
+table / win_1251
+@tab
+Win-1251 - Cyrillic.
+
+
+@item
+win_1252
+@tab
+cp1252
+@tab
+table / win_1252
+@tab
+Win-1252 - Latin 1.
+
+
+@item
+win_1253
+@tab
+cp1253
+@tab
+table / win_1253
+@tab
+Win-1253 - Greek.
+
+
+@item
+win_1254
+@tab
+cp1254
+@tab
+table / win_1254
+@tab
+Win-1254 - Turkish.
+
+
+@item
+win_1255
+@tab
+cp1255
+@tab
+table / win_1255
+@tab
+Win-1255 - Hebrew.
+
+
+@item
+win_1256
+@tab
+cp1256
+@tab
+table / win_1256
+@tab
+Win-1256 - Arabic.
+
+
+@item
+win_1257
+@tab
+cp1257
+@tab
+table / win_1257
+@tab
+Win-1257 - Baltic.
+
+
+@item
+win_1258
+@tab
+cp1258
+@tab
+table / win_1258
+@tab
+Win-1258 - Vietnamese7 that supports Cyrillic.
+@end multitable
+
+
+
+
+@page
+@node iconv design decisions
+@section iconv design decisions
+@findex CCS table
+@findex CES converter
+@*
+The first iconv library design issue arises when considering the
+following two design approaches:
+
+@enumerate
+@item
+Have modules which implement conversion from encoding A to encoding B
+and vice versa, i.e., one conversion module relates to any two
+encodings.
+@item
+Have modules which implement conversion from encoding A to fixed
+encoding C and vice versa, i.e., on conversion module relates to any
+one encoding A and one fixed encoding C. In this case, to convert from
+encoding A to encoding B, two modules are needed in order to convert
+from A to C and then from C to B.
+@end enumerate
+
+@*
+It's obvious, that we have a tradeoff between commonness/flexibility and
+efficiency: the first method is more efficient since it converts
+directly. But from other hand, it isn't so flexible since for each
+encoding pair distinct module is needed.
+
+@*
+The Newlib iconv uses the second method and always converts through 32
+bit UCS. But its design also allows to write specialized conversion
+modules if the conversion speed is critical.
+
+@*
+The second design issue is how to decompose encodings.
+The Newlib iconv library uses the fact that any encoding may be
+considered as one or more CCS plus CES. It also decomposes its
+conversion modules on @dfn{CES converter} plus one or more @dfn{CCS
+tables}. CCS tables maps CCS to UCS and vice versa, CES converters
+map CCS to encoding and vice versa.
+
+@*
+As an example, consider conversion from big5 encoding to EUC-TW
+encoding. big5 encoding may be decomposed on ASCII and BIG5 CCSes plus
+BIG5 CES. EUC-TW may be decomposed on CNS11643_PLANE1, CNS11643_PLANE2,
+and CNS11643_PLANE14 CCSes plus EUC CES.
+
+@*
+The euc_jp -> big5 conversion happens as follows:
+
+@enumerate
+@item
+EUC converter performs EUC-TW encoding to correspondent CCSes transformation
+(CNS11643_PLANE1, CNS11643_PLANE2 and CNS11643_PLANE14 CCSes);
+@item
+Obtained CCS codes are transformed to UCS codes using CNS11643_PLANE1,
+CNS11643_PLANE2 and CNS11643_PLANE14 CCS tables;
+@item
+Resulting UCS codes are transformed to ASCII and BIG5 codes using
+correspondent CCS tables;
+@item
+Obtained CCS codes are transformed to big5 encoding using correspondent
+CES converter.
+@end enumerate
+
+@*
+Analogously, the backward conversion is performed as follows:
+
+@enumerate
+@item
+BIG converter performs big5 encoding -> correspondent CCSes transformation
+(ASCII and BIG5 CCSes);
+@item
+Obtained CCS codes are transformed to UCS codes using ASCII and BIG5 CCS tables;
+@item
+Resulting UCS codes are transformed to ASCII and BIG5 codes using
+correspondent CCS tables;
+@item
+Obtained CCS codes are transformed to EUC-TW encoding using correspondent
+CES converter.
+@end enumerate
+
+@*
+Note, the above is just an example and real names (implemented in Newlib
+iconv) of CES converters and CCS tables are slightly different.
+
+@*
+The third design issue also relates to flexibility. Obviously, it isn't
+wanted to always link all CES converters and CCS tables to the library
+but instead, it is wanted to be able to load needed converters and tables
+dynamically on demand. This isn't a problem on "big" machines like PC
+but may be very problematical within "small" embedded systems.
+
+@*
+Since the CCS tables are just data, it is possible to load them
+dynamically from external files. Instead, CES converters are algorithms
+and contain some code and the dynamic library loading capability is needed.
+
+@*
+Apart from possible restrictions applied by embedded systems (too few
+RAM for example), the  Newlib itself  has no dynamic libraries support and,
+therefore, all CES converters which will ever be uses must be linked into
+the library. But the dynamic CCS tables loading is possible and is
+implemented in the Newlib iconv library and may be enabled via Newlib
+configure script options.
+
+@*
+The next design decision is the possibility to of fine iconv library
+configuring. This means, that iconv isn't always link all it's
+converters and tables (if no dynamical loading enabled) but instead, it
+gives the possibility to enable only those encodings which are planned
+to be used (see section about configure script options).
+
+@*
+Moreover, the Newlib iconv library configure options distinguish between
+coding directions. This means, that not only supported encodings are
+selectable, but the coding direction too. For example, if user wants
+configuration which allows conversions from UTF-8 to UTF-16 and he
+doesn't plan to use UTF-16 to UTF-8 conversions, he can enable exactly
+that conversion direction (i.e., no UTF-16 -> UTF-8 -related code will
+be included) thus saving some memory (note, that such technique allows to
+exclude one half of CCS table from linking which may be big enough).
+
+@*
+One more design decision is speed- and size- optimized tables. Used can
+select between them using s configure script option. Speed CCS tables
+are the same as Size ones in case of 8 bit CCS (e.g.m KOI8-R), but for 16
+bit CCS Size-optimized table may be in 1.5-2 time less then
+Speed-optimized ones. From the other hand, the conversion with speed
+tables is in several times faster.
+
+@*
+Its worth to stress, that new encodings support can't be
+dynamically added into already compiled Newlib library. Even if this
+needs only additional CCS table and iconv is configured to use external
+files with CCS tables (this isn't a fundamental restriction and the
+possibility to add new Table-based encodings support dynamically, by
+copying new .cct file, may be easily added).
+
+@*
+Theoretically, the compiled-in CCS tables may be more appropriate foe
+embedded solutions since they are read-only and are placed to ROM,
+whereas the dynamic loading needs more RAM. Moreover, in current
+implementation, distinct copy of CCS file is loaded for each fore each
+opened iconv descriptor even in case of the same encoding.
+This means, for example, that if two iconv descriptors for
+KOI8-R -> UCS-4BE and KOI8-R -> UTF-16BE are opened, two copies of
+koi8-r .cct file will be loaded (actually, iconv loads only needed part
+of these files).
+
+
+@page
 @node iconv configuration
 @section iconv configuration
 @findex iconv configuration
-@findex encoding
-@*
-To enable iconv, the --enable-newlib-iconv configuration option should be
-used when configuring Newlib. 
-
-@*
-Iconv library is intended to perform conversions from one encoding to
-another encoding. Thus, the only user-visible abstraction is encoding.
-To enable particular encoding support user should enable it using
-Newlib's configure script options. Encoding's support is divided into
-two parts: "to" and "from". For example, if it is only wanted to have
-UTF-8 -> UCS-4 coding capabilities, "from" UTF-8 and "to" UCS-4 support
-should be enabled. In this case backward (UCS-4 -> UTF-8) conversion 
-won't be possible (iconv_open will return error). Such division on "to"
-and "from" parts helps to save memory.
-
 @*
 To enable encoding support --enable-newlib-iconv-encodings configure
 script option should be used. This option accepts a comma-separated list
-of encodins that should be enabled. Option enables each encoding in both
+of encodings that should be enabled. Option enables each encoding in both
 ("to" and "from") directions.
 
 @*
@@ -56,30 +878,8 @@ code and data will be linked) is to configure Newlib with
 --enable-newlib-iconv-to-encodings=KOI8-R,ISO-8859-5
 
 @*
-There is one more configue script option for iconv library:
---enable-newlib-iconv-external-ccs. This options enables iconv's
-capabilities to work with external CCS files. Exteral CCS files are just
-conversion tables used by iconv. Without this option all conversion
-tables are linked-in and occupy a lot of ROM. If target system has
-some fyle-system, it can benefit using external CCS files which are
-loaded on iconv_open and unloaded on iconv_close. But this way require
-more RAM. Moreover, in current implementation, distinct copy of CCS file
-is loaded for each fore each opended iconv decriptor for the same
-encoding. This means that if, for example, two iconv descriptors for
-KOI8-R -> UCS-4BE and KOI8-R -> UTF-16BE are opened, two copies of
-koi8-r.cct file will be loaded. 
-
-@*
-Note: not evry encoding needs CCS tiles. For example, UTF-8, UTF-16,
-UCS-2, UCS-4 doesn't use such files at all.
-
-@*
-Note: CCS file contains a number of tables, and only several needed tables
-are loaded from this file. This means, that there is a possibility to save
-some "fyle-system space" not including unneeded tables to that CCS
-files. Such task may be performed using "mktbl.pl" Perl script
-destributed with iconv library.
+--enable-newlib-iconv-external-ccs option enables iconv's
+capabilities to work with external CCS files.
 
 @*
 Note: CCS files are searched by iconv_open in $NLSPATH/iconv_data/ directory.
-

@@ -1,3 +1,8 @@
+2004-07-07  Artem B. Bityuckiy  <dedekind@oktetlabs.ru>
+
+	* libc/iconv/iconv.tex: Updated to represent recent changes.
+	* libc/iconv/lib/iconv.c: Documentation updated.
+
 2004-07-07  Nick Clifton  <nickc@redhat.com>
 
 	* configure.host (newlib_cflags): Define PREFER_SIZE_OVER_SPEED
