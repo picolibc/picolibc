@@ -305,7 +305,7 @@ cygheap_root::operator =(const char *new_root)
     {
       root = cstrdup (new_root);
       rootlen = strlen (root);
-      if (rootlen > 1 && root[rootlen - 1] == '/')
+      if (rootlen >= 1 && root[rootlen - 1] == '/')
 	root[--rootlen] = '\0';
       if (!rootlen)
 	{
