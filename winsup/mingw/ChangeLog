@@ -1,5 +1,9 @@
 2004-07-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/math.h: Add pragma GCC system_header.
+
+2004-07-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/complex/cargs.c: New file.
 	* mingwex/Makefile.in: Really add carg.o to libmingwex.a.
 

@@ -8,8 +8,13 @@
  *
  */
 
+
 #ifndef _MATH_H_
 #define _MATH_H_
+
+#if __GNUC__ >= 3
+#pragma GCC system_header
+#endif
 
 /* All the headers include this file. */
 #include <_mingw.h>
