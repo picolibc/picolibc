@@ -1,3 +1,7 @@
+Sat Mar 18 12:45:10 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Make CXXFLAGS consistent with cygwin.
+
 Wed Mar 15 00:53:58 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Use MINGW_CXXFLAGS when compiling strace.
