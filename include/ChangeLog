@@ -1,3 +1,7 @@
+2004-10-26  Paul Brook  <paul@codesourcery.com>
+
+	* bfdlink.h (struct bfd_link_info): Add create_default_symver.
+
 2004-10-21  Tomer Levi  <Tomer.Levi@nsc.com>
 
 	* opcode/crx.h (operand_type): Remove redundant types i3, i4,

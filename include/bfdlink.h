@@ -262,6 +262,9 @@ struct bfd_link_info
   /* TRUE if ok to have version with no definition.  */
   unsigned int allow_undefined_version: 1;
 
+  /* TRUE id a fedault symbol version should be created and used.  */
+  unsigned int create_default_symver: 1;
+
   /* TRUE if symbols should be retained in memory, FALSE if they
      should be freed and reread.  */
   unsigned int keep_memory: 1;
