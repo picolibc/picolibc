@@ -43,7 +43,7 @@ __sread (cookie, buf, n)
     oldmode = setmode(fp->_file, O_BINARY);
 #endif
 
-  ret = _read_r (fp->_data, fp->_file, buf, n);
+  ret = _read_r (_REENT, fp->_file, buf, n);
 
 #ifdef __SCLE
   if (oldmode)
@@ -72,7 +72,7 @@ __swrite (cookie, buf, n)
 #endif
 
   if (fp->_flags & __SAPP)
-    (void) _lseek_r (fp->_data, fp->_file, (_off_t) 0, SEEK_END);
+    (void) _lseek_r (_REENT, fp->_file, (_off_t) 0, SEEK_END);
   fp->_flags &= ~__SOFF;	/* in case O_APPEND mode is set */
 
 #ifdef __SCLE
@@ -80,7 +80,7 @@ __swrite (cookie, buf, n)
     oldmode = setmode(fp->_file, O_BINARY);
 #endif
 
-  w = _write_r (fp->_data, fp->_file, buf, n);
+  w = _write_r (_REENT, fp->_file, buf, n);
 
 #ifdef __SCLE
   if (oldmode)
@@ -99,7 +99,7 @@ __sseek (cookie, offset, whence)
   register FILE *fp = (FILE *) cookie;
   register _off_t ret;
 
-  ret = _lseek_r (fp->_data, fp->_file, (_off_t) offset, whence);
+  ret = _lseek_r (_REENT, fp->_file, (_off_t) offset, whence);
   if (ret == -1L)
     fp->_flags &= ~__SOFF;
   else
@@ -116,7 +116,7 @@ __sclose (cookie)
 {
   FILE *fp = (FILE *) cookie;
 
-  return _close_r (fp->_data, fp->_file);
+  return _close_r (_REENT, fp->_file);
 }
 
 #ifdef __SCLE

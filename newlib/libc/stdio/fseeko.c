@@ -18,11 +18,25 @@
 #include <stdio.h>
 
 int
+_DEFUN (_fseeko_r, (ptr, fp, offset, whence),
+        struct _reent *ptr _AND
+        register FILE *fp _AND
+        _off_t offset _AND
+        int whence)
+{
+  return _fseek_r (ptr, fp, (long)offset, whence);
+}
+
+#ifndef _REENT_ONLY
+
+int
 fseeko (fp, offset, whence)
         register FILE *fp;
         _off_t offset;
         int whence;
 {
   /* for now we simply cast since off_t should be long */
-  return fseek (fp, (long)offset, whence);
+  return _fseek_r (_REENT, fp, (long)offset, whence);
 }
+
+#endif /* !_REENT_ONLY */

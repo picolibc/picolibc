@@ -89,7 +89,7 @@ _DEFUN (_fopen64_r, (ptr, file, mode),
   if ((fp = __sfp (ptr)) == NULL)
     return NULL;
 
-  if ((f = _open64_r (fp->_data, file, oflags, 0666)) < 0)
+  if ((f = _open64_r (ptr, file, oflags, 0666)) < 0)
     {
       fp->_flags = 0;		/* release */
       return NULL;
@@ -105,7 +105,7 @@ _DEFUN (_fopen64_r, (ptr, file, mode),
   fp->_close = __sclose;
 
   if (fp->_flags & __SAPP)
-    fseeko64 (fp, 0, SEEK_END);
+    _fseeko64_r (ptr, fp, 0, SEEK_END);
 
 #ifdef __SCLE
   if (__stextmode (fp->_file))

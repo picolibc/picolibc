@@ -59,9 +59,9 @@ _DEFUN (_tmpfile_r, (ptr),
 
   if ((f = _tmpnam_r (ptr, buf)) == NULL)
     return NULL;
-  fp = fopen (f, "wb+");
+  fp = _fopen_r (ptr, f, "wb+");
   e = ptr->_errno;
-  _CAST_VOID remove (f);
+  _CAST_VOID _remove_r (ptr, f);
   ptr->_errno = e;
   return fp;
 }

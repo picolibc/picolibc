@@ -48,9 +48,9 @@ __smakebuf (fp)
       return;
     }
 #ifdef __USE_INTERNAL_STAT64
-  if (fp->_file < 0 || _fstat64_r (fp->_data, fp->_file, &st) < 0)
+  if (fp->_file < 0 || _fstat64_r (_REENT, fp->_file, &st) < 0)
 #else
-  if (fp->_file < 0 || _fstat_r (fp->_data, fp->_file, &st) < 0)
+  if (fp->_file < 0 || _fstat_r (_REENT, fp->_file, &st) < 0)
 #endif
     {
       couldbetty = 0;
@@ -82,7 +82,7 @@ __smakebuf (fp)
       else
 	fp->_flags |= __SNPT;
     }
-  if ((p = _malloc_r (fp->_data, size)) == NULL)
+  if ((p = _malloc_r (_REENT, size)) == NULL)
     {
       fp->_flags |= __SNBF;
       fp->_bf._base = fp->_p = fp->_nbuf;
@@ -90,7 +90,7 @@ __smakebuf (fp)
     }
   else
     {
-      fp->_data->__cleanup = _cleanup_r;
+      _REENT->__cleanup = _cleanup_r;
       fp->_flags |= __SMBF;
       fp->_bf._base = fp->_p = (unsigned char *) p;
       fp->_bf._size = size;

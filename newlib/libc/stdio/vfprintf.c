@@ -242,7 +242,6 @@ __sbprintf(fp, fmt, ap)
 	unsigned char buf[BUFSIZ];
 
 	/* copy the important variables */
-	fake._data = fp->_data;
 	fake._flags = fp->_flags & ~__SNBF;
 	fake._file = fp->_file;
 	fake._cookie = fp->_cookie;
@@ -323,7 +322,8 @@ union arg_val
   u_quad_t val_u_quad_t;
 };
 
-static union arg_val *get_arg (int n, char *fmt, va_list *ap, int *numargs, union arg_val *args, 
+static union arg_val *get_arg (struct _reent *data, int n, char *fmt, 
+                               va_list *ap, int *numargs, union arg_val *args, 
 			       int *arg_type, char **last_fmt);
 #endif /* !_NO_POS_ARGS */
 
@@ -364,7 +364,7 @@ _DEFUN (VFPRINTF, (fp, fmt0, ap),
   int result;
   _flockfile(fp);
   CHECK_INIT (fp);
-  result = _VFPRINTF_R (fp->_data, fp, fmt0, ap);
+  result = _VFPRINTF_R (_REENT, fp, fmt0, ap);
   _funlockfile(fp);
   return result;
 }
@@ -478,7 +478,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
   ( is_pos_arg \
       ? n < numargs \
          ? args[n].val_##type \
-         : get_arg (n, fmt_anchor, &ap, &numargs, args, arg_type, &saved_fmt)->val_##type \
+         : get_arg (data, n, fmt_anchor, &ap, &numargs, args, arg_type, &saved_fmt)->val_##type \
       : arg_index++ < numargs \
          ? args[n].val_##type \
          : numargs < MAX_POS_ARGS \
@@ -542,7 +542,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	 */
 	for (;;) {
 	        cp = fmt;
-	        while ((n = _mbtowc_r(_REENT, &wc, fmt, MB_CUR_MAX, &state)) > 0) {
+	        while ((n = _mbtowc_r(data, &wc, fmt, MB_CUR_MAX, &state)) > 0) {
 			fmt += n;
 			if (wc == '%') {
 				fmt--;
@@ -1360,8 +1360,9 @@ const static ACTION action_table[MAX_STATE][MAX_CH_CLASS] = {
 
 /* function to get positional parameter N where n = N - 1 */
 static union arg_val *
-get_arg (int n, char *fmt, va_list *ap, int *numargs_p, union arg_val *args, 
-	int *arg_type, char **last_fmt) 
+get_arg (struct _reent *data, int n, char *fmt, va_list *ap, 
+         int *numargs_p, union arg_val *args, 
+	 int *arg_type, char **last_fmt) 
 {
   int ch;
   wchar_t wc;
@@ -1386,7 +1387,7 @@ get_arg (int n, char *fmt, va_list *ap, int *numargs_p, union arg_val *args,
      read the desired parameter from the vararg list. */
   while (*fmt && n >= numargs)
     {
-      while ((nbytes = _mbtowc_r(_REENT, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0) 
+      while ((nbytes = _mbtowc_r(data, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0) 
 	{
 	  fmt += nbytes;
 	  if (wc == '%') 

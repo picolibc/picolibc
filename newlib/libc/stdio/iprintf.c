@@ -40,85 +40,61 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #include "local.h"
 
+#ifdef _HAVE_STDC
+#include <stdarg.h>
+#else
+#include <varargs.h>
+#endif
+
 #ifndef _REENT_ONLY
 
 #ifdef _HAVE_STDC
-
-#include <stdarg.h>
-
 int
 iprintf (const char *fmt,...)
-{
-  int ret;
-  va_list ap;
-
-  _REENT_SMALL_CHECK_INIT(_stdout_r (_REENT));
-  va_start (ap, fmt);
-  _stdout_r (_REENT)->_data = _REENT;
-  ret = vfiprintf (stdout, fmt, ap);
-  va_end (ap);
-  return ret;
-}
-
 #else
-
-#include <varargs.h>
-
 int
 iprintf (fmt, va_alist)
      char *fmt;
      va_dcl
+#endif
 {
   int ret;
   va_list ap;
 
   _REENT_SMALL_CHECK_INIT(_stdout_r (_REENT));
+#ifdef _HAVE_STDC
+  va_start (ap, fmt);
+#else
   va_start (ap);
-  _stdout_r (_REENT)->_data = _REENT;
+#endif
   ret = vfiprintf (stdout, fmt, ap);
   va_end (ap);
   return ret;
 }
 
-#endif /* ! _HAVE_STDC */
 #endif /* ! _REENT_ONLY */
 
 #ifdef _HAVE_STDC
-
-#include <stdarg.h>
-
 int
 _iprintf_r (struct _reent *ptr, const char *fmt, ...)
-{
-  int ret;
-  va_list ap;
-
-  _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
-  va_start (ap, fmt);
-  ret = vfiprintf (_stdout_r (ptr), fmt, ap);
-  va_end (ap);
-  return ret;
-}
-
 #else
-
-#include <varargs.h>
-
 int
 _iprintf_r (data, fmt, va_alist)
      char *data;
      char *fmt;
      va_dcl
+#endif
 {
   int ret;
-  struct _reent *ptr = data;
   va_list ap;
 
   _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
+#ifdef _HAVE_STDC
+  va_start (ap, fmt);
+#else
   va_start (ap);
+#endif
   ret = vfiprintf (_stdout_r (ptr), fmt, ap);
   va_end (ap);
   return ret;
 }
-
-#endif

@@ -44,7 +44,7 @@ __submore (fp)
       /*
        * Get a new buffer (rather than expanding the old one).
        */
-      if ((p = (unsigned char *) _malloc_r (fp->_data, (size_t) BUFSIZ)) == NULL)
+      if ((p = (unsigned char *) _malloc_r (_REENT, (size_t) BUFSIZ)) == NULL)
 	return EOF;
       fp->_ub._base = p;
       fp->_ub._size = BUFSIZ;
@@ -55,7 +55,7 @@ __submore (fp)
       return 0;
     }
   i = fp->_ub._size;
-  p = (unsigned char *) _realloc_r (fp->_data, (_PTR) (fp->_ub._base), i << 1);
+  p = (unsigned char *) _realloc_r (_REENT, (_PTR) (fp->_ub._base), i << 1);
   if (p == NULL)
     return EOF;
   (void) memcpy ((void *) (p + i), (void *) p, (size_t) i);

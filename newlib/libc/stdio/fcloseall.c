@@ -82,7 +82,7 @@ _fcloseall_r (ptr)
 int
 fcloseall (void)
 {
-  return _fcloseall_r (_REENT);
+  return _fcloseall_r (_GLOBAL_REENT);
 }
 
 #endif

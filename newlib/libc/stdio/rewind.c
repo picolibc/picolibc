@@ -21,14 +21,21 @@ FUNCTION
 
 INDEX
 	rewind
+INDEX
+	_rewind_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	void rewind(FILE *<[fp]>);
+	void _rewind_r(struct _reent *<[ptr]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	void rewind(<[fp]>)
+	FILE *<[fp]>;
+
+	void _rewind_r(<[ptr]>, <[fp]>)
+	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 
 DESCRIPTION
@@ -52,9 +59,21 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <stdio.h>
 
 void
+_DEFUN (_rewind_r, (ptr, fp),
+	struct _reent * ptr _AND
+	register FILE * fp)
+{
+	(void) _fseek_r (ptr, fp, 0L, SEEK_SET);
+	clearerr(fp);
+}
+
+#ifndef _REENT_ONLY
+
+void
 _DEFUN (rewind, (fp),
 	register FILE * fp)
 {
-	(void) fseek(fp, 0L, SEEK_SET);
-	clearerr(fp);
+	(void) _fseek_r (_REENT, fp, 0L, SEEK_SET);
 }
+
+#endif /* !_REENT_ONLY */

@@ -23,11 +23,19 @@ INDEX
 	fseek
 INDEX
 	fseeko
+INDEX
+	_fseek_r
+INDEX
+	_fseeko_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fseek(FILE *<[fp]>, long <[offset]>, int <[whence]>)
 	int fseeko(FILE *<[fp]>, off_t <[offset]>, int <[whence]>)
+	int _fseek_r(struct _reent *<[ptr]>, FILE *<[fp]>, 
+	             long <[offset]>, int <[whence]>)
+	int _fseeko_r(struct _reent *<[ptr]>, FILE *<[fp]>, 
+	             off_t <[offset]>, int <[whence]>)
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -37,6 +45,18 @@ TRAD_SYNOPSIS
 	int <[whence]>;
 
 	int fseeko(<[fp]>, <[offset]>, <[whence]>)
+	FILE *<[fp]>;
+	off_t <[offset]>;
+	int <[whence]>;
+
+	int _fseek_r(<[ptr]>, <[fp]>, <[offset]>, <[whence]>)
+	struct _reent *<[ptr]>;
+	FILE *<[fp]>;
+	long <[offset]>;
+	int <[whence]>;
+
+	int _fseeko_r(<[ptr]>, <[fp]>, <[offset]>, <[whence]>)
+	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 	off_t <[offset]>;
 	int <[whence]>;
@@ -94,12 +114,12 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 int
-fseek (fp, offset, whence)
-     register FILE *fp;
-     long offset;
-     int whence;
+_DEFUN (_fseek_r, (ptr, fp, offset, whence),
+     struct _reent *ptr _AND
+     register FILE *fp _AND
+     long offset _AND
+     int whence)
 {
-  struct _reent *ptr;
   _fpos_t _EXFUN ((*seekfn), (void *, _fpos_t, int));
   _fpos_t target, curoff;
   size_t n;
@@ -111,7 +131,6 @@ fseek (fp, offset, whence)
   /* Make sure stdio is set up.  */
 
   CHECK_INIT (fp);
-  ptr = fp->_data;
 
   /* If we've been doing some writing, and we're in append mode
      then we don't really know where the filepos is.  */
@@ -340,3 +359,16 @@ dumb:
   _funlockfile(fp);
   return 0;
 }
+
+#ifndef _REENT_ONLY
+
+int
+_DEFUN (fseek, (fp, offset, whence),
+     register FILE *fp _AND
+     long offset _AND
+     int whence)
+{
+  return _fseek_r (_REENT, fp, offset, whence);
+}
+
+#endif /* !_REENT_ONLY */

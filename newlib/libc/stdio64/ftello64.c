@@ -21,14 +21,21 @@ FUNCTION
 
 INDEX
 	ftello64
+INDEX
+	_ftello64_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	_off64_t ftello64(FILE *<[fp]>);
+	_off64_t _ftello64_r(struct _reent *<[ptr]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	_off64_t ftello64(<[fp]>)
+	FILE *<[fp]>;
+
+	_off64_t _ftello64_r(<[ptr]>, <[fp]>)
+	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 
 DESCRIPTION
@@ -78,7 +85,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #ifdef __LARGE64_FILES
 
 _off64_t
-_DEFUN (ftello64, (fp),
+_DEFUN (_ftello64_r, (ptr, fp),
+	struct _reent *ptr _AND
 	register FILE * fp)
 {
   _fpos64_t pos;
@@ -91,7 +99,7 @@ _DEFUN (ftello64, (fp),
 
   if (fp->_seek64 == NULL)
     {
-      fp->_data->_errno = ESPIPE;
+      ptr->_errno = ESPIPE;
       _funlockfile(fp);
       return -1L;
     }
@@ -134,5 +142,16 @@ _DEFUN (ftello64, (fp),
   _funlockfile(fp);
   return pos;
 }
+
+#ifndef _REENT_ONLY
+
+_off64_t
+_DEFUN (ftello64, (fp),
+	register FILE * fp)
+{
+  return _ftello64_r (_REENT, fp);
+}
+
+#endif /* !_REENT_ONLY */
 
 #endif /* __LARGE64_FILES */

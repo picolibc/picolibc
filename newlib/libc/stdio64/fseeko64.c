@@ -21,15 +21,24 @@ FUNCTION
 
 INDEX
 	fseeko64
+INDEX
+	_fseeko64_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fseeko64(FILE *<[fp]>, _off64_t <[offset]>, int <[whence]>)
-
+	int _fseeko64_r (struct _reent *<[ptr]>, FILE *<[fp]>, 
+                         _off64_t <[offset]>, int <[whence]>)
 TRAD_SYNOPSIS
 	#include <stdio.h>
 
 	int fseeko64(<[fp]>, <[offset]>, <[whence]>)
+	FILE *<[fp]>;
+	_off64_t <[offset]>;
+	int <[whence]>;
+
+	int _fseeko64_r (<[ptr]>, <[fp]>, <[offset]>, <[whence]>)
+	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 	_off64_t <[offset]>;
 	int <[whence]>;
@@ -89,15 +98,17 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
  */
 
 _off64_t
-fseeko64 (fp, offset, whence)
-     register FILE *fp;
-     _off64_t offset;
-     int whence;
+_DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
+     struct _reent *ptr _AND
+     register FILE *fp _AND
+     _off64_t offset _AND
+     int whence)
 {
-  struct _reent *ptr;
   _fpos64_t _EXFUN ((*seekfn), (void *, _fpos64_t, int));
   _fpos64_t target, curoff;
   size_t n;
+
+  /* FIXME: this should be stat64. */
   struct stat st;
   int havepos;
 
@@ -106,7 +117,8 @@ fseeko64 (fp, offset, whence)
   /* Make sure stdio is set up.  */
 
   CHECK_INIT (fp);
-  ptr = fp->_data;
+
+  curoff = fp->_offset;
 
   /* If we've been doing some writing, and we're in append mode
      then we don't really know where the filepos is.  */
@@ -193,7 +205,7 @@ fseeko64 (fp, offset, whence)
     {
       if (seekfn != __sseek64
 	  || fp->_file < 0
-	  || _fstat64_r (ptr, fp->_file, &st)
+	  || _fstat_r (ptr, fp->_file, &st)
 	  || (st.st_mode & S_IFMT) != S_IFREG)
 	{
 	  fp->_flags |= __SNPT;
@@ -327,5 +339,18 @@ dumb:
   _funlockfile(fp);
   return 0;
 }
+
+#ifndef _REENT_ONLY
+
+_off64_t
+_DEFUN (fseeko64_r, (fp, offset, whence),
+     register FILE *fp _AND
+     _off64_t offset _AND
+     int whence)
+{
+  return _fseeko64_r (_REENT, fp, offset, whence);
+}
+
+#endif /* !_REENT_ONLY */
 
 #endif /* __LARGE64_FILES */

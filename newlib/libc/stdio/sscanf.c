@@ -408,7 +408,6 @@ sscanf (str, fmt, va_alist)
   f._read = eofread;
   f._ub._base = NULL;
   f._lb._base = NULL;
-  f._data = _REENT;
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
@@ -443,7 +442,6 @@ _sscanf_r (ptr, str, fmt, va_alist)
   f._read = eofread;
   f._ub._base = NULL;
   f._lb._base = NULL;
-  f._data = _REENT;
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else

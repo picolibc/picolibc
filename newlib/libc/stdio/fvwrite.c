@@ -125,7 +125,8 @@ __sfvwrite (fp, uio)
 		{ /* must be asprintf family */
 		  unsigned char *ptr;
 		  int curpos = (fp->_p - fp->_bf._base);
-		  ptr = (unsigned char *)_realloc_r (fp->_data, fp->_bf._base, 
+		  ptr = (unsigned char *)_realloc_r (_REENT, 
+                                                     fp->_bf._base, 
                                                      curpos + len);
 		  if (!ptr)
 		    goto err;

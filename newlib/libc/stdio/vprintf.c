@@ -28,14 +28,18 @@
 
 #include "local.h"
 
+#ifndef _REENT_ONLY
+
 int
 _DEFUN (vprintf, (fmt, ap),
      _CONST char *fmt _AND
      va_list ap)
 {
   _REENT_SMALL_CHECK_INIT(_stdout_r (_REENT));
-  return vfprintf (_stdout_r (_REENT), fmt, ap);
+  return _vfprintf_r (_REENT, _stdout_r (_REENT), fmt, ap);
 }
+
+#endif /* !_REENT_ONLY */
 
 int
 _DEFUN (_vprintf_r, (ptr, fmt, ap),

@@ -26,7 +26,8 @@
 
 #ifdef __LARGE64_FILES
 _fpos64_t
-__sseek64 (cookie, offset, whence)
+__sseek64_r (ptr, cookie, offset, whence)
+     struct _reent *ptr;
      _PTR cookie;
      _fpos64_t offset;
      int whence;
@@ -34,7 +35,7 @@ __sseek64 (cookie, offset, whence)
   register FILE *fp = (FILE *) cookie;
   register _off64_t ret;
 
-  ret = _lseek64_r (fp->_data, fp->_file, (_off64_t) offset, whence);
+  ret = _lseek64_r (ptr, fp->_file, (_off64_t) offset, whence);
   if (ret == (_fpos64_t)-1L)
     fp->_flags &= ~__SOFF;
   else
@@ -46,7 +47,8 @@ __sseek64 (cookie, offset, whence)
 }
 
 _READ_WRITE_RETURN_TYPE
-__swrite64 (cookie, buf, n)
+__swrite64_r (ptr, cookie, buf, n)
+     struct _reent *ptr;
      _PTR cookie;
      char _CONST *buf;
      int n;
@@ -58,7 +60,7 @@ __swrite64 (cookie, buf, n)
 #endif
 
   if (fp->_flags & __SAPP)
-    (void) _lseek64_r (fp->_data, fp->_file, (_off64_t)0, SEEK_END);
+    (void) _lseek64_r (ptr, fp->_file, (_off64_t)0, SEEK_END);
   fp->_flags &= ~__SOFF;	/* in case O_APPEND mode is set */
 
 #ifdef __SCLE
@@ -66,7 +68,7 @@ __swrite64 (cookie, buf, n)
     oldmode = setmode(fp->_file, O_BINARY);
 #endif
 
-  w = _write_r (fp->_data, fp->_file, buf, n);
+  w = _write_r (ptr, fp->_file, buf, n);
 
 #ifdef __SCLE
   if (oldmode)
@@ -75,5 +77,27 @@ __swrite64 (cookie, buf, n)
 
   return w;
 }
+
+#ifndef _REENT_ONLY
+_fpos64_t
+__sseek64 (cookie, offset, whence)
+     _PTR cookie;
+     _fpos64_t offset;
+     int whence;
+{
+  return __sseek64_r (_REENT, cookie, offset, whence);
+}
+
+_READ_WRITE_RETURN_TYPE
+__swrite64 (cookie, buf, n)
+     _PTR cookie;
+     char _CONST *buf;
+     int n;
+{
+  return __swrite64_r (_REENT, cookie, buf, n);
+}
+
+#endif /* !_REENT_ONLY */
+
 #endif /* __LARGE64_FILES */
 

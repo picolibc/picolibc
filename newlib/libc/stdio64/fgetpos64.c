@@ -4,14 +4,22 @@ FUNCTION
 
 INDEX
 	fgetpos64
+INDEX
+	_fgetpos64_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fgetpos64(FILE *<[fp]>, _fpos64_t *<[pos]>);
+	int _fgetpos64_r(struct _reent *<[ptr]>, FILE *<[fp]>, 
+	                 _fpos64_t *<[pos]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int fgetpos64(<[fp]>, <[pos]>)
+	FILE *<[fp]>;
+	_fpos64_t *<[pos]>;
+
+	int _fgetpos64_r(<[ptr]>, <[fp]>, <[pos]>)
 	FILE *<[fp]>;
 	_fpos64_t *<[pos]>;
 
@@ -47,12 +55,13 @@ No supporting OS subroutines are required.
 #ifdef __LARGE64_FILES
 
 int
-_DEFUN (fgetpos64, (fp, pos),
+_DEFUN (_fgetpos64_r, (ptr, fp, pos),
+	struct _reent * ptr _AND
 	FILE * fp _AND
 	_fpos64_t * pos)
 {
   _flockfile(fp);
-  *pos = (_fpos64_t)ftello64 (fp);
+  *pos = (_fpos64_t)_ftello64_r (ptr, fp);
 
   if (*pos != -1)
     {
@@ -62,5 +71,17 @@ _DEFUN (fgetpos64, (fp, pos),
   _funlockfile(fp);
   return 1;
 }
+
+#ifndef _REENT_ONLY
+
+int
+_DEFUN (fgetpos64, (fp, pos),
+	FILE * fp _AND
+	_fpos64_t * pos)
+{
+  return _fgetpos64_r (_REENT, fp, pos);
+}
+
+#endif /* !_REENT_ONLY */
 
 #endif /* __LARGE64_FILES */

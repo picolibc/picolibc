@@ -48,10 +48,8 @@ extern int   _EXFUN(__srefill,(FILE *fp));
 #define CHECK_INIT(fp) \
   do					\
     {					\
-      if ((fp)->_data == 0)		\
-	(fp)->_data = _REENT;		\
-      if (!(fp)->_data->__sdidinit)	\
-	__sinit ((fp)->_data);		\
+      if (!_REENT->__sdidinit)		\
+	__sinit (_REENT);		\
     }					\
   while (0)
 
@@ -67,14 +65,14 @@ extern int   _EXFUN(__srefill,(FILE *fp));
 #define	HASUB(fp) ((fp)->_ub._base != NULL)
 #define	FREEUB(fp) { \
 	if ((fp)->_ub._base != (fp)->_ubuf) \
-		_free_r(fp->_data, (char *)(fp)->_ub._base); \
+		_free_r(_REENT, (char *)(fp)->_ub._base); \
 	(fp)->_ub._base = NULL; \
 }
 
 /* Test for an fgetline() buffer.  */
 
 #define	HASLB(fp) ((fp)->_lb._base != NULL)
-#define	FREELB(fp) { _free_r(fp->_data,(char *)(fp)->_lb._base); (fp)->_lb._base = NULL; }
+#define	FREELB(fp) { _free_r(_REENT,(char *)(fp)->_lb._base); (fp)->_lb._base = NULL; }
 
 /* WARNING: _dcvt is defined in the stdlib directory, not here!  */
 

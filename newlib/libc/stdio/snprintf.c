@@ -48,13 +48,12 @@ _snprintf_r (ptr, str, size, fmt, va_alist)
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
-  f._data = ptr;
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
   va_start (ap);
 #endif
-  ret = vfprintf (&f, fmt, ap);
+  ret = _vfprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   if (size > 0)
     *f._p = 0;
@@ -81,13 +80,12 @@ snprintf (str, size, fmt, va_alist)
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
-  f._data = _REENT;
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
   va_start (ap);
 #endif
-  ret = vfprintf (&f, fmt, ap);
+  ret = _vfprintf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   if (size > 0)
     *f._p = 0;

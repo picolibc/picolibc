@@ -23,11 +23,17 @@ INDEX
 	ftell
 INDEX
 	ftello
+INDEX
+	_ftell_r
+INDEX
+	_ftello_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	long ftell(FILE *<[fp]>);
 	off_t ftello(FILE *<[fp]>);
+	long _ftell_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+	off_t _ftello_r(struct _reent *<[ptr]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -35,6 +41,14 @@ TRAD_SYNOPSIS
 	FILE *<[fp]>;
 
 	off_t ftello(<[fp]>)
+	FILE *<[fp]>;
+
+	long _ftell_r(<[ptr]>, <[fp]>)
+	struct _reent *<[ptr]>;
+	FILE *<[fp]>;
+
+	off_t _ftello_r(<[ptr]>, <[fp]>)
+	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 
 DESCRIPTION
@@ -84,7 +98,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include "local.h"
 
 long
-_DEFUN (ftell, (fp),
+_DEFUN (_ftell_r, (ptr, fp),
+	struct _reent *ptr _AND
 	register FILE * fp)
 {
   _fpos_t pos;
@@ -97,7 +112,7 @@ _DEFUN (ftell, (fp),
 
   if (fp->_seek == NULL)
     {
-      fp->_data->_errno = ESPIPE;
+      ptr->_errno = ESPIPE;
       _funlockfile(fp);
       return -1L;
     }
@@ -140,3 +155,14 @@ _DEFUN (ftell, (fp),
   _funlockfile(fp);
   return pos;
 }
+
+#ifndef _REENT_ONLY
+
+long
+_DEFUN (ftell, (fp),
+	register FILE * fp)
+{
+  return _ftell_r (_REENT, fp);
+}
+
+#endif /* !_REENT_ONLY */

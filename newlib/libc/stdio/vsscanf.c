@@ -70,7 +70,6 @@ _DEFUN (_vsscanf_r, (ptr, str, fmt, ap),
   f._read = eofread1;
   f._ub._base = NULL;
   f._lb._base = NULL;
-  f._data = ptr;
   return __svfscanf_r (ptr, &f, fmt, ap);    
 }
 

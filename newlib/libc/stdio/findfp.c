@@ -45,7 +45,6 @@ std (ptr, flags, file, data)
   ptr->_write = __swrite;
   ptr->_seek = __sseek;
   ptr->_close = __sclose;
-  ptr->_data = data;
 #ifndef __SINGLE_THREAD__
   __lock_init_recursive (*(_LOCK_RECURSIVE_T *)&ptr->_lock);
 #endif
@@ -87,9 +86,9 @@ __sfp (d)
   int n;
   struct _glue *g;
 
-  if (!d->__sdidinit)
-    __sinit (d);
-  for (g = &d->__sglue;; g = g->_next)
+  if (!_GLOBAL_REENT->__sdidinit)
+    __sinit (_GLOBAL_REENT);
+  for (g = &_GLOBAL_REENT->__sglue;; g = g->_next)
     {
       for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
 	if (fp->_flags == 0)
@@ -115,7 +114,6 @@ found:
   fp->_ub._size = 0;
   fp->_lb._base = NULL;		/* no line buffer */
   fp->_lb._size = 0;
-  fp->_data = d;
   return fp;
 }
 
@@ -139,7 +137,7 @@ _cleanup_r (ptr)
 void
 _cleanup ()
 {
-  _cleanup_r (_REENT);
+  _cleanup_r (_GLOBAL_REENT);
 }
 #endif
 

@@ -21,15 +21,25 @@ FUNCTION
 
 INDEX
 	freopen
+INDEX
+	_freopen_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	FILE *freopen(const char *<[file]>, const char *<[mode]>,
 		      FILE *<[fp]>);
+	FILE *_freopen_r(struct _reent *<[ptr]>, const char *<[file]>, 
+	              const char *<[mode]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	FILE *freopen(<[file]>, <[mode]>, <[fp]>)
+	char *<[file]>;
+	char *<[mode]>;
+	FILE *<[fp]>;
+
+	FILE *_freopen_r(<[ptr]>, <[file]>, <[mode]>, <[fp]>)
+	struct _reent *<[ptr]>;
 	char *<[file]>;
 	char *<[mode]>;
 	FILE *<[fp]>;
@@ -67,19 +77,18 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 FILE *
-_DEFUN (freopen, (file, mode, fp),
+_DEFUN (_freopen_r, (ptr, file, mode, fp),
+	struct _reent *ptr _AND
 	_CONST char *file _AND
 	_CONST char *mode _AND
 	register FILE *fp)
 {
   register int f;
   int flags, oflags, e;
-  struct _reent *ptr;
 
   _flockfile(fp);
 
   CHECK_INIT (fp);
-  ptr = fp->_data;
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
@@ -160,3 +169,16 @@ _DEFUN (freopen, (file, mode, fp),
   _funlockfile(fp);
   return fp;
 }
+
+#ifndef _REENT_ONLY
+
+FILE *
+_DEFUN (freopen, (file, mode, fp),
+	_CONST char *file _AND
+	_CONST char *mode _AND
+	register FILE *fp)
+{
+  return _freopen_r (_REENT, file, mode, fp);
+}
+
+#endif /*!_REENT_ONLY */

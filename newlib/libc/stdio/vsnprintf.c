@@ -33,6 +33,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <varargs.h>
 #endif
 
+#ifndef _REENT_ONLY
+
 int
 _DEFUN (vsnprintf, (str, size, fmt, ap),
      char *str _AND
@@ -46,12 +48,13 @@ _DEFUN (vsnprintf, (str, size, fmt, ap),
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
-  f._data = _REENT;
-  ret = vfprintf (&f, fmt, ap);
+  ret = _vfprintf_r (_REENT, &f, fmt, ap);
   if (size > 0)
     *f._p = 0;
   return ret;
 }
+
+#endif /* !_REENT_ONLY */
 
 int
 _DEFUN (_vsnprintf_r, (ptr, str, size, fmt, ap),
@@ -67,7 +70,6 @@ _DEFUN (_vsnprintf_r, (ptr, str, size, fmt, ap),
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
-  f._data = ptr;
   ret = _vfprintf_r (ptr, &f, fmt, ap);
   if (size > 0)
     *f._p = 0;

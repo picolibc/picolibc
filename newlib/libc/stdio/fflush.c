@@ -63,11 +63,8 @@ _DEFUN (fflush, (fp),
   register unsigned char *p;
   register int n, t;
 
-
-
-
   if (fp == NULL)
-    return _fwalk (_REENT, fflush);
+    return _fwalk (_GLOBAL_REENT, fflush);
 
   _flockfile(fp);
 

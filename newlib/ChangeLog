@@ -1,3 +1,62 @@
+2003-08-22  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h: Add _GLOBAL_REENT macro.
+	* libc/stdio: Globally remove/replace all references to fp->_data.
+	Replace with _REENT or _GLOBAL_REENT where appropriate.
+	* libc/stdio/asprintf.c: Ditto.
+	* libc/stdio/fclose.c: Ditto.
+	* libc/stdio/fvwrite.c: Ditto.
+	* libc/stdio/makebuf.c: Ditto.
+	* libc/stdio/refill.c: Ditto.
+	* libc/stdio/local.h: Ditto.
+	* libc/stdio/setvbuf.c: Ditto.
+	* libc/stdio/sscanf.c: Ditto.
+	* libc/stdio/stdio.c: Ditto.
+	* libc/stdio/ungetc.c: Ditto.
+	* libc/stdio/vfscanf.c: Ditto.
+	* libc/stdio/vsscanf.c: Ditto.
+	* libc/stdio/fopen.c: Ditto.  Also use _fseek_r in _fopen_r.
+	* libc/stdio/vasprintf.c: Ditto.  Also call _vfprintf_r directly.
+	* libc/stdio/vsnprintf.c: Ditto.
+	* libc/stdio/vsprintf.c: Ditto.
+	* libc/stdio/fcloseall.c(fcloseall): Use _GLOBAL_REENT macro
+	instead of _REENT to walk file list.
+	* libc/stdio/fflush.c: Ditto.
+	* libc/stdio/fgetpos.c: Add reentrant version and have regular
+	version call reentrant version with _REENT argument.
+	* libc/stdio/fsetpos.c: Ditto.
+	* libc/stdio/fseek.c: Ditto.
+	* libc/stdio/fseeko.c: Ditto.
+	* libc/stdio/ftell.c: Ditto.
+	* libc/stdio/ftello.c: Ditto.
+	* libc/stdio/freopen.c: Ditto.
+	* libc/stdio/findfp.c: Use _GLOBAL_REENT pointer when adding
+	new files to chain.  Also use _GLOBAL_REENT pointer for
+	cleaning up.
+	* libc/stdio/fiprintf.c: Reformatted to minimize duplicate code.
+	* libc/stdio/siprintf.c: Ditto.
+	* libc/stdio/iprintf.c: Ditto.
+	* libc/stdio/fprintf.c: Ditto.
+	* libc/stdio/printf.c: Ditto.
+	* libc/stdio/snprintf.c: Call _vfprintf_r directly.
+	* libc/stdio/sprintf.c: Ditto.
+	* libc/stdio/vprintf.c: Ditto.  Also add _REENT_ONLY check.
+	* libc/stdio/rewind.c: Call _fseek_r directly.
+	* libc/stdio/tmpfile.c: Call _fopen_r and _remove_r directly.
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Change _r routines to use
+	data pointer.
+	(get_arg): Add extra struct _reent pointer argument.
+	* libc/stdio64/fgetpos64.c: Add _r versions, remove any reference
+	to fp->_data.
+	* libc/stdio64/fopen64.c: Ditto.
+	* libc/stdio64/freopen64.c: Ditto.
+	* libc/stdio64/fsetpos64.c: Ditto.
+	* libc/stdio64/ftello64.c: Ditto.
+	* libc/stdio64/local64.h: Ditto.
+	* libc/stdio64/stdio64.c: Ditto.
+	* libc/stdio64/fseeko64.c: Ditto plus use _fstat_r instead of
+	_fstat64_r for the meantime.
+
 2003-08-19  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/mallocr.c (mALLOc, rEALLOc, mEMEALIGn): Enhance

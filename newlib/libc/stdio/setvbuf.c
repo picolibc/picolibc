@@ -130,7 +130,7 @@ _DEFUN (setvbuf, (fp, buf, mode, size),
   fp->_r = 0;
   fp->_lbfsize = 0;
   if (fp->_flags & __SMBF)
-    _free_r (fp->_data, (void *) fp->_bf._base);
+    _free_r (_REENT, (void *) fp->_bf._base);
   fp->_flags &= ~(__SLBF | __SNBF | __SMBF);
 
   if (mode == _IONBF)
@@ -180,7 +180,7 @@ nbf:
 
     case _IOFBF:
       /* no flag */
-      fp->_data->__cleanup = _cleanup_r;
+      _REENT->__cleanup = _cleanup_r;
       fp->_bf._base = fp->_p = (unsigned char *) buf;
       fp->_bf._size = size;
       break;

@@ -4,14 +4,22 @@ FUNCTION
 
 INDEX
 	fgetpos
+INDEX
+	_fgetpos_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fgetpos(FILE *<[fp]>, fpos_t *<[pos]>);
+	int _fgetpos_r(struct _reent *<[ptr]>, FILE *<[fp]>, fpos_t *<[pos]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int fgetpos(<[fp]>, <[pos]>)
+	FILE *<[fp]>;
+	fpos_t *<[pos]>;
+
+	int _fgetpos_r(<[ptr]>, <[fp]>, <[pos]>)
+	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 	fpos_t *<[pos]>;
 
@@ -49,12 +57,13 @@ No supporting OS subroutines are required.
 #include <stdio.h>
 
 int
-_DEFUN (fgetpos, (fp, pos),
+_DEFUN (_fgetpos_r, (ptr, fp, pos),
+	struct _reent * ptr _AND
 	FILE * fp _AND
 	_fpos_t * pos)
 {
   _flockfile(fp);
-  *pos = ftell (fp);
+  *pos = _ftell_r (ptr, fp);
 
   if (*pos != -1)
     {
@@ -64,3 +73,15 @@ _DEFUN (fgetpos, (fp, pos),
   _funlockfile(fp);
   return 1;
 }
+
+#ifndef _REENT_ONLY
+
+int
+_DEFUN (fgetpos, (fp, pos),
+	FILE * fp _AND
+	_fpos_t * pos)
+{
+  return _fgetpos_r (_REENT, fp, pos);
+}
+
+#endif /* !_REENT_ONLY */

@@ -21,15 +21,25 @@ FUNCTION
 
 INDEX
 	freopen64
+INDEX
+	_freopen64_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	FILE *freopen64(const char *<[file]>, const char *<[mode]>,
 		        FILE *<[fp]>);
+	FILE *_freopen64_r(struct _reent *<[ptr]>, const char *<[file]>, 
+		        const char *<[mode]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	FILE *freopen64(<[file]>, <[mode]>, <[fp]>)
+	char *<[file]>;
+	char *<[mode]>;
+	FILE *<[fp]>;
+
+	FILE *_freopen64_r(<[ptr]>, <[file]>, <[mode]>, <[fp]>)
+	struct _reent *<[ptr]>;
 	char *<[file]>;
 	char *<[mode]>;
 	FILE *<[fp]>;
@@ -69,19 +79,18 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifdef __LARGE64_FILES
 
 FILE *
-_DEFUN (freopen64, (file, mode, fp),
+_DEFUN (_freopen64_r, (ptr, file, mode, fp),
+	struct _reent *ptr _AND
 	_CONST char *file _AND
 	_CONST char *mode _AND
 	register FILE *fp)
 {
   register int f;
   int flags, oflags, e;
-  struct _reent *ptr;
 
   _flockfile(fp);
 
   CHECK_INIT (fp);
-  ptr = fp->_data;
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
@@ -165,5 +174,18 @@ _DEFUN (freopen64, (file, mode, fp),
   _funlockfile(fp);
   return fp;
 }
+
+#ifndef _REENT_ONLY
+
+FILE *
+_DEFUN (freopen64, (file, mode, fp),
+	_CONST char *file _AND
+	_CONST char *mode _AND
+	register FILE *fp)
+{
+  return _freopen64_r (_REENT, file, mode, fp);
+}
+
+#endif /* !_REENT_ONLY */
 
 #endif /* __LARGE64_FILES */

@@ -4,14 +4,23 @@ FUNCTION
 
 INDEX
 	fsetpos64
+INDEX
+	_fsetpos64_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fsetpos64(FILE *<[fp]>, const _fpos64_t *<[pos]>);
+	int _fsetpos64_r(struct _reent *<[ptr]>, FILE *<[fp]>, 
+	                 const _fpos64_t *<[pos]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int fsetpos64(<[fp]>, <[pos]>)
+	FILE *<[fp]>;
+	_fpos64_t *<[pos]>;
+
+	int _fsetpos64_r(<[ptr]>, <[fp]>, <[pos]>)
+	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 	_fpos64_t *<[pos]>;
 
@@ -43,15 +52,28 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifdef __LARGE64_FILES
 
 int
-_DEFUN (fsetpos64, (iop, pos),
+_DEFUN (_fsetpos64_r, (ptr, iop, pos),
+	struct _reent *ptr _AND
 	FILE * iop _AND
 	_CONST _fpos64_t * pos)
 {
-  int x = fseeko64 (iop, (_off64_t)(*pos), SEEK_SET);
+  int x = _fseeko64_r (ptr, iop, (_off64_t)(*pos), SEEK_SET);
 
   if (x != 0)
     return 1;
   return 0;
 }
+
+#ifndef _REENT_ONLY
+
+int
+_DEFUN (fsetpos64, (iop, pos),
+	FILE * iop _AND
+	_CONST _fpos64_t * pos)
+{
+  return _fsetpos64_r (_REENT, iop, pos);
+}
+
+#endif /* !_REENT_ONLY */
 
 #endif /* __LARGE64_FILES */

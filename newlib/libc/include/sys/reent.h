@@ -744,6 +744,8 @@ void _reclaim_reent _PARAMS ((struct _reent *));
 
 #endif /* !_REENT_ONLY */
 
+#define _GLOBAL_REENT _impure_ptr
+
 #ifdef __cplusplus
 }
 #endif

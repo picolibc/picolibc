@@ -210,7 +210,7 @@ _DEFUN (vfscanf, (fp, fmt, ap),
     va_list ap)
 {
   CHECK_INIT(fp);
-  return __svfscanf_r (fp->_data, fp, fmt, ap);
+  return __svfscanf_r (_REENT, fp, fmt, ap);
 }
 
 int

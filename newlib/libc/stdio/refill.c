@@ -94,7 +94,7 @@ _DEFUN (__srefill, (fp),
    */
 
   if (fp->_flags & (__SLBF | __SNBF))
-    (void) _fwalk (fp->_data, lflush);
+    (void) _fwalk (_GLOBAL_REENT, lflush);
   fp->_p = fp->_bf._base;
   fp->_r = (*fp->_read) (fp->_cookie, (char *) fp->_p, fp->_bf._size);
   fp->_flags &= ~__SMOD;	/* buffer contents are again pristine */

@@ -77,7 +77,7 @@ _DEFUN (fclose, (fp),
   if (fp->_close != NULL && (*fp->_close) (fp->_cookie) < 0)
     r = EOF;
   if (fp->_flags & __SMBF)
-    _free_r (fp->_data, (char *) fp->_bf._base);
+    _free_r (_REENT, (char *) fp->_bf._base);
   if (HASUB (fp))
     FREEUB (fp);
   if (HASLB (fp))

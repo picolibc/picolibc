@@ -4,14 +4,23 @@ FUNCTION
 
 INDEX
 	fsetpos
+INDEX
+	_fsetpos_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fsetpos(FILE *<[fp]>, const fpos_t *<[pos]>);
+	int _fsetpos_r(struct _reent *<[ptr]>, FILE *<[fp]>, l
+	               const fpos_t *<[pos]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int fsetpos(<[fp]>, <[pos]>)
+	FILE *<[fp]>;
+	fpos_t *<[pos]>;
+
+	int _fsetpos_r(<[ptr]>, <[fp]>, <[pos]>)
+	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 	fpos_t *<[pos]>;
 
@@ -42,13 +51,26 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 
 int
-_DEFUN (fsetpos, (iop, pos),
+_DEFUN (_fsetpos_r, (ptr, iop, pos),
+	struct _reent * ptr _AND
 	FILE * iop _AND
 	_CONST _fpos_t * pos)
 {
-  int x = fseek (iop, *pos, SEEK_SET);
+  int x = _fseek_r (ptr, iop, *pos, SEEK_SET);
 
   if (x != 0)
     return 1;
   return 0;
 }
+
+#ifndef _REENT_ONLY
+
+int
+_DEFUN (fsetpos, (iop, pos),
+	FILE * iop _AND
+	_CONST _fpos_t * pos)
+{
+  return _fsetpos_r (_REENT, iop, pos);
+}
+
+#endif /* !_REENT_ONLY */
