@@ -1,3 +1,7 @@
+2004-05-29  Filip Navara  <xnavara@volny.cz>
+
+	* include/winnt.h (IMAGE_EXPORT_DIRECTORY): Fixed declaration.
+
 2004-05-25  Al Slater  <al.slater@scluk.com>
 
 	* include/httpext.h (HSE_SEND_HEADER_EX_INFO,
