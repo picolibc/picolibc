@@ -1,3 +1,8 @@
+Thu Nov 29 18:11:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (cygwin_inet_aton): Return nonzero if the address
+	is valid, zero if not according to Linux man page.
+
 Mon Nov 27 21:09:50 2000  Kelley Cook <kelley.cook@home.com>
 
 	* mmap.cc (munmap): Check that mmap and munmap length match.

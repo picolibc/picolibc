@@ -130,10 +130,10 @@ cygwin_inet_aton (const char *cp, struct in_addr *inp)
 {
   unsigned long res = inet_addr (cp);
   if (res == INADDR_NONE && strcmp (cp, "255.255.255.255"))
-    return -1;
+    return 0;
   if (inp)
     inp->s_addr = res;
-  return 0;
+  return 1;
 }
 
 /* undocumented in wsock32.dll */
