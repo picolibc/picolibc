@@ -1,5 +1,10 @@
 2001-11-27  Christopher Faylor  <cgf@redhat.com>
 
+	* winsup.h: Reorganize to avoid use of experimental stuff.
+	* shortcut.cc: Move winsup.h first in include order.
+
+2001-11-27  Christopher Faylor  <cgf@redhat.com>
+
 	* cygwin.din (ualarm): New export.
 	* dcrt0.cc (_dll_crt0): Add experimental tls storage declaration.
 	(dll_crt0): Ditto.

@@ -25,6 +25,13 @@ details. */
 
 #define NO_COPY __attribute__((section(".data_cygwin_nocopy")))
 
+#ifdef EXPCGF
+#define DECLARE_TLS_STORAGE char **tls[4096] __attribute__ ((unused))
+#else
+#define DECLARE_TLS_STORAGE do {} while (0)
+#define _WINBASE2_H
+#endif
+
 #ifdef __cplusplus
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
@@ -271,12 +278,5 @@ extern HMODULE cygwin_hmodule;
 #define winsock2_active (wsadata.wVersion >= 512)
 #define winsock_active (wsadata.wVersion < 512)
 extern struct WSAData wsadata;
-
-#ifdef EXPCGF
-#define DECLARE_TLS_STORAGE char **tls[4096] __attribute__ ((unused))
-#else
-#define DECLARE_TLS_STORAGE do {} while (0)
-#define _WINBASE2_H
-#endif
 
 #endif /* defined __cplusplus */
