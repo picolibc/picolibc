@@ -160,14 +160,46 @@ read_etc_passwd ()
 	}
       else
 	{
-	  static char linebuf[400];
+	  static char linebuf[1024];
 
-	  debug_printf ("Emulating /etc/passwd");
-	  snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh",
-	  	    cygheap->user.name (), (unsigned) DEFAULT_UID,
-		    (unsigned) DEFAULT_GID, getenv ("HOME") ?: "/");
-	  add_pwd_line (linebuf);
-	  passwd_state = emulated;
+	  if (wincap.has_security ())
+	    {
+	      HANDLE ptok;
+	      cygsid tu, tg;
+	      DWORD siz;
+
+	      if (OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+	        {
+		  if (GetTokenInformation (ptok, TokenUser, &tu, sizeof tu,
+		                           &siz)
+		      && GetTokenInformation (ptok, TokenPrimaryGroup, &tg,
+					      sizeof tg, &siz))
+		    {
+		      char strbuf[100];
+		      snprintf (linebuf, sizeof (linebuf),
+				"%s::%u:%u:%s:%s:/bin/sh",
+				cygheap->user.name (),
+				*GetSidSubAuthority(tu,
+				             *GetSidSubAuthorityCount(tu) - 1),
+				*GetSidSubAuthority(tg,
+				             *GetSidSubAuthorityCount(tg) - 1),
+				tu.string (strbuf), getenv ("HOME") ?: "/");
+		      debug_printf ("Emulating /etc/passwd: %s", linebuf);
+		      add_pwd_line (linebuf);
+		      passwd_state = emulated;
+		    }
+		  CloseHandle (ptok);
+	        }
+	    }
+	  if (passwd_state != emulated)
+	    {
+	      snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh",
+			cygheap->user.name (), (unsigned) DEFAULT_UID,
+			(unsigned) DEFAULT_GID, getenv ("HOME") ?: "/");
+	      debug_printf ("Emulating /etc/passwd: %s", linebuf);
+	      add_pwd_line (linebuf);
+	      passwd_state = emulated;
+	    }
 	}
 
     }

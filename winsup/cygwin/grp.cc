@@ -171,19 +171,49 @@ read_etc_group ()
 	  SID_NAME_USE acType;
 	  static char linebuf [200];
 
-	  debug_printf ("Emulating /etc/group");
-	  strncpy (group_name, "Administrators", sizeof (group_name));
-	  if (! LookupAccountSidA (NULL, well_known_admins_sid, group_name,
-				   &group_name_len, domain_name,
-				   &domain_name_len, &acType))
+	  if (wincap.has_security ())
 	    {
-	      strcpy (group_name, "unknown");
-	      debug_printf ("Failed to get local admins group name. %E");
+	      HANDLE ptok;
+	      cygsid tg;
+	      DWORD siz;
+
+	      if (OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+	        {
+		  if (GetTokenInformation (ptok, TokenPrimaryGroup, &tg,
+					   sizeof tg, &siz)
+		      && LookupAccountSidA (NULL, tg, group_name,
+					    &group_name_len, domain_name,
+				            &domain_name_len, &acType))
+		    {
+		      char strbuf[100];
+		      snprintf (linebuf, sizeof (linebuf), "%s:%s:%u:",
+		      		group_name, 
+				tg.string (strbuf),
+				*GetSidSubAuthority(tg,
+				             *GetSidSubAuthorityCount(tg) - 1));
+		      debug_printf ("Emulating /etc/group: %s", linebuf);
+		      add_grp_line (linebuf);
+		      group_state = emulated;
+		    }
+		  CloseHandle (ptok);
+		}
 	    }
-	  snprintf (linebuf, sizeof (linebuf), "%s::%u:\n", group_name,
-		    (unsigned) DEFAULT_GID);
-	  add_grp_line (linebuf);
-	  group_state = emulated;
+	  if (group_state != emulated)
+	    {
+	      strncpy (group_name, "Administrators", sizeof (group_name));
+	      if (!LookupAccountSidA (NULL, well_known_admins_sid, group_name,
+				      &group_name_len, domain_name,
+				      &domain_name_len, &acType))
+		{
+		  strcpy (group_name, "unknown");
+		  debug_printf ("Failed to get local admins group name. %E");
+		}
+	      snprintf (linebuf, sizeof (linebuf), "%s::%u:", group_name,
+			(unsigned) DEFAULT_GID);
+	      debug_printf ("Emulating /etc/group: %s", linebuf);
+	      add_grp_line (linebuf);
+	      group_state = emulated;
+	    }
 	}
     }
 
