@@ -1,3 +1,8 @@
+2003-11-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.h (low_priority_sleep): Fix declaration to avoid linker
+	warning.
+
 2003-11-10  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc (__reent_t::init_clib): Set thread local clib
