@@ -1367,6 +1367,8 @@ static const template i386_optab[] = {
 {"xcryptcbc", 0, 0xf30fa7d0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
 {"xcryptcfb", 0, 0xf30fa7e0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
 {"xcryptofb", 0, 0xf30fa7e8, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
+/* alias for xstorerng */
+{"xstore", 0, 0x0fa7c0, X, Cpu686|CpuPadLock, NoSuf|IsString, { 0, 0, 0} },
 
 /* sentinel */
 {NULL, 0, 0, 0, 0, 0, { 0, 0, 0} }
