@@ -1,5 +1,9 @@
 2002-10-13  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-10-13  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc (cygthread::stub): Don't create event for long-running
 	threads.  Initialize thread_sync event here which is used to Suspend
 	using an event rather than relying on SuspendThread/ResumeThread.
@@ -61,7 +65,7 @@
 	(wait_sig): Use GetCurrentThread() as SetThreadPriority call rather
 	than *event* handle.  Call ExitThread directly on termination.
 	(wait_subproc): Call ExitThread directly on termination.
-	* tty.cc (tty_list::terminate): Don't attempt t detach from
+	* tty.cc (tty_list::terminate): Don't attempt to detach from
 	output_thread.
 
 2002-10-08  Christopher Faylor  <cgf@redhat.com>

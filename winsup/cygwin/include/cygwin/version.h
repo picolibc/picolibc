@@ -41,10 +41,8 @@ details. */
 	 the Cygwin library".  This version is used to track important
 	 changes to the DLL and is mainly informative in nature. */
 
-  /* The current cygwin version is 1.3.6 */
-
 #define CYGWIN_VERSION_DLL_MAJOR 1003
-#define CYGWIN_VERSION_DLL_MINOR 13
+#define CYGWIN_VERSION_DLL_MINOR 14
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
