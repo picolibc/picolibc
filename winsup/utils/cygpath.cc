@@ -13,11 +13,11 @@ details. */
 #include <stdlib.h>
 #include <limits.h>
 #include <getopt.h>
+#include <windows.h>
 #include <io.h>
 #include <sys/fcntl.h>
 #include <sys/cygwin.h>
 #include <ctype.h>
-#include <windows.h>
 
 static char *prog_name;
 static char *file_arg;

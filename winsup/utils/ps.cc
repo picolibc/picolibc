@@ -9,14 +9,13 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include <stdio.h>
+#include <windows.h>
 #include <time.h>
 #include <getopt.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <pwd.h>
 #include <sys/cygwin.h>
-#include "winsup.h"
-#include "external.h"
 
 static char *
 start_time (external_pinfo *child)

@@ -1,3 +1,13 @@
+Thu May 18 14:38:26 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Eliminate WINSUP_DEPS.
+	* cygpath.cc: Reorganize includes to accomodate sys/cygwin.h changes.
+	* mkgroup.c: Ditto.
+	* mkpasswd.c: Ditto.
+	* mount.cc: Ditto. Eliminate use of cygwin source specific includes.
+	* ps.cc: Ditto.
+	* cygwin.cc: Eliminate obsolete file.
+
 Wed Apr 26 23:43:25 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* mount.cc (main): Add "-X" option to specify a "Cygwin executable".

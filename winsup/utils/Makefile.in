@@ -62,8 +62,6 @@ PROGS:=mount$(EXEEXT) umount$(EXEEXT) ps$(EXEEXT) kill$(EXEEXT) \
        passwd$(EXEEXT) getfacl$(EXEEXT) setfacl$(EXEEXT) strace$(EXEEXT) \
        regtool$(EXEEXT)
 
-WINSUP_DEPS:=$(cygwin_source)/winsup.h
-
 .SUFFIXES:
 .NOEXPORT:
 

@@ -12,8 +12,8 @@
 #include <stdlib.h>
 #include <wchar.h>
 #include <stdio.h>
-#include <sys/cygwin.h>
 #include <windows.h>
+#include <sys/cygwin.h>
 #include <lmaccess.h>
 #include <lmapibuf.h>
 
