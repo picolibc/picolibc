@@ -1,5 +1,12 @@
 2004-06-03  Christopher Faylor  <cgf@alum.bu.edu>
 
+	* autoload.cc (IsDosDeviceName_U): Define.
+	* ntdll.h (IsDosDeviceName_U): Declare.
+	* fhandler.cc (fhandler_base::open): Check to see if win32_name is a
+	dos device and just call the 9x open if so.
+
+2004-06-03  Christopher Faylor  <cgf@alum.bu.edu>
+
 	* winbase.h (ilockincr): More changes from the inexplicable world of
 	gcc asm magic.
 	(ilockdecr): Ditto.
