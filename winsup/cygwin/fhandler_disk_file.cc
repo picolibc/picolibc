@@ -389,9 +389,6 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
       return 0;
     }
 
-  if (flags & O_APPEND)
-    SetFilePointer (get_handle(), 0, 0, FILE_END);
-
   set_symlink_p (real_path->issymlink ());
   set_execable_p (real_path->exec_state ());
   set_socket_p (real_path->issocket ());

@@ -1,3 +1,9 @@
+2002-07-11  Pavel Tsekov  <ptsekov@gmx.net>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::open): Don't
+	move the file pointer to the end of file if O_APPEND is
+	specified in the open flags.
+
 2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* safe_memory.h: New file extracted from "woutsup.h".
