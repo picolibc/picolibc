@@ -28,7 +28,7 @@ static void CALLBACK wave_callback(HWAVE hWave, UINT msg, DWORD instance,
 class Audio
 {
 public:
-  enum { MAX_BLOCKS = 8, BLOCK_SIZE = 16384 };
+  enum { MAX_BLOCKS = 12, BLOCK_SIZE = 16384 };
 
   Audio ();
   ~Audio ();
@@ -40,7 +40,7 @@ public:
   bool write (const void *pSampleData, int nBytes);
   int blocks ();
   void callback_sampledone (void *pData);
-  
+  void setformat(int format) { formattype_ = format; }
   int numbytesoutput ();
   
 private:
@@ -55,6 +55,7 @@ private:
   int bufferIndex_;
   CRITICAL_SECTION lock_;
   char *freeblocks_[MAX_BLOCKS];
+  int formattype_;
 
   char bigwavebuffer_[MAX_BLOCKS * BLOCK_SIZE];
 };
@@ -293,6 +294,17 @@ Audio::flush()
   // Send internal buffer out to the soundcard
   WAVEHDR *pHeader = ((WAVEHDR *)buffer_) - 1;
   pHeader->dwBufferLength = bufferIndex_;
+
+  // Quick bit of sample buffer conversion
+  if (formattype_ == AFMT_S8)
+    {
+      unsigned char *p = ((unsigned char *)buffer_);
+      for (int i = 0; i < bufferIndex_; i++)
+        {
+	  p[i] -= 0x7f;
+        }
+    }
+  
   if (waveOutPrepareHeader(dev_, pHeader, sizeof(WAVEHDR)) == S_OK &&
       waveOutWrite(dev_, pHeader, sizeof (WAVEHDR)) == S_OK)
     {	    
@@ -516,10 +528,13 @@ fhandler_dev_dsp::ioctl(unsigned int cmd, void *ptr)
 	  int nBits = 0;
 	  if (*intptr == AFMT_S16_LE)
 	      nBits = 16;
+	  else if (*intptr == AFMT_U8)
+	      nBits = 8;	  
 	  else if (*intptr == AFMT_S8)
 	      nBits = 8;	  
 	  if (nBits)
 	    {
+	      s_audio.setformat(*intptr);
 	      s_audio.close();
 	      if (s_audio.open(audiofreq_, nBits, audiochannels_) == true)
 		{
@@ -589,7 +604,14 @@ fhandler_dev_dsp::ioctl(unsigned int cmd, void *ptr)
 	  
 	  return 1;
 	} break;
-      
+
+      CASE(SNDCTL_DSP_SETFRAGMENT)
+        {
+	  // Fake!! esound & mikmod require this on non PowerPC platforms.
+	  // 
+	  return 1;
+	} break;
+        
       default:
 	debug_printf("/dev/dsp: ioctl not handled yet! FIXME:\n"); 
 	break;

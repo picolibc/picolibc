@@ -1,3 +1,8 @@
+Mon Apr 16 23:20:00 2001  Andy Younger <andylyounger@hotmail.com>
+
+	* fhandler_dsp.cc: Improved handling of 8 bit playback modes.
+	Put in mock support for SNDCTL_DSP_SETFRAGMENT.
+
 Tue Apr 24 23:51:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* passwd.cc (getpwnam_r): Add pw_passwd handling as well.
