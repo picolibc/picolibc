@@ -675,7 +675,7 @@ _threadinfo::interrupt_now (CONTEXT *ctx, int sig, void *handler,
 {
   push (0);
   interrupt_setup (sig, handler, siga, (__stack_t) ctx->Eip);
-  ctx->Eip = (DWORD) sigdelayed;
+  ctx->Eip = pop ();
   SetThreadContext (*this, ctx); /* Restart the thread in a new location */
   return 1;
 }
@@ -1133,7 +1133,6 @@ call_signal_handler_now ()
   return sa_flags & SA_RESTART;
 }
 
-#define pid_offset (unsigned)(((_pinfo *)NULL)->pid)
 void __stdcall
 reset_signal_arrived ()
 {

@@ -1,3 +1,10 @@
+2004-01-03  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (_threadinfo::interrupt_now): Avoid double call to
+	sigdelayed.
+	* pinfo.cc (_pinfo::commune_send): Avoid inexplicable test which caused
+	most pids to be shown as "<defunct>" on Win9x.
+
 2004-01-02  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.h (init_cygheap): Play more vfork shell games and move
