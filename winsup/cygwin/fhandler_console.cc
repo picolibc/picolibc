@@ -213,7 +213,13 @@ fhandler_console::send_winch_maybe ()
   fillin_info ();
 
   if (y != dev_state->info.dwWinSize.Y || x != dev_state->info.dwWinSize.X)
-    tc->kill_pgrp (SIGWINCH);
+    {
+      extern fhandler_tty_master *tty_master;
+      if (tty_master)
+	tty_master->set_winsize (true);
+      else
+	tc->kill_pgrp (SIGWINCH);
+    }
 }
 
 void __stdcall

@@ -948,6 +948,7 @@ class fhandler_tty_master: public fhandler_pty_master
   fhandler_tty_master (int unit);
   int init (int);
   int init_console ();
+  void set_winsize (bool);
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec (HANDLE);
 };

@@ -40,6 +40,16 @@ fhandler_tty_master::fhandler_tty_master (int unit)
 {
 }
 
+void
+fhandler_tty_master::set_winsize (bool sendSIGWINCH)
+{
+  winsize w;
+  console->ioctl (TIOCGWINSZ, &w);
+  get_ttyp ()->winsize = w;
+  if (sendSIGWINCH)
+    tc->kill_pgrp (SIGWINCH);
+}
+
 int
 fhandler_tty_master::init (int ntty)
 {
@@ -54,13 +64,12 @@ fhandler_tty_master::init (int ntty)
   termios ti;
   memset (&ti, 0, sizeof (ti));
   console->tcsetattr (0, &ti);
-  winsize w;
-  console->ioctl (TIOCGWINSZ, &w);
-  this->ioctl (TIOCSWINSZ, &w);
 
   ttynum = ntty;
 
   cygwin_shared->tty[ttynum]->common_init (this);
+
+  set_winsize (false);
 
   inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
 
@@ -1134,7 +1143,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	pktmode = * (int *) arg;
 	break;
       case TIOCGWINSZ:
-	* (struct winsize *) arg = get_ttyp ()->winsize;
+	*(struct winsize *) arg = get_ttyp ()->winsize;
 	break;
       case TIOCSWINSZ:
 	if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
