@@ -176,6 +176,14 @@ _pipe (int *fd)
   return __trap34 (SYS_pipe, fd);
 }
 
+/* This is only provided because _gettimeofday_r and _times_r are
+   defined in the same module, so we avoid a link error.  */
+clock_t
+_times (struct tms *tp)
+{
+  return -1;
+}
+
 int
 _gettimeofday (struct timeval *tv, struct timezone *tz)
 {
