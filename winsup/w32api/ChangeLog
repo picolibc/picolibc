@@ -1,3 +1,8 @@
+2002-03-26  Phil Krylov  <likewolf@users.sourceforge.net>
+
+	* include/richedit.h (EM_GETSCROLLPOS, EM_SETSCROLLPSPOS):
+	Add defines.
+
 2002-03-14  Gunnar Degnbol <gdegnbol@users.sourceforge.net>
 
 	* include/richedit.h (RICHEDIT_CLASS): UNICODE it.
