@@ -1,4 +1,10 @@
 
+Tue Jan 16 13:53:30  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/sqlucode.h: Apply Danny Smith patch 102443
+	2000-11-20  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+	New file.
+
 Tue Jan 16 13:36:45  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* lib/odbccp32.def: Apply Danny Smith patch 102442
