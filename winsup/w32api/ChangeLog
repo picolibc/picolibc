@@ -1,3 +1,75 @@
+2004-04-13  Filip Navara  <xnavara@volny.cz>
+
+	* include/winuser.h (IS_INTRESOURCE, MB_CANCELTRYCONTINUE,
+	WM_NCXBUTTONDOWN, WM_NCXBUTTONUP, WM_NCXBUTTONDBLCLK,
+	WM_XBUTTONDOWN, WM_XBUTTONUP, WM_XBUTTONDBLCLK,
+	DCX_INTERSECTUPDATE, MK_XBUTTON1, MK_XBUTTON2,
+	HELP_SETWINPOS): Define.
+	(WM_MOUSELAST): Different value for _WIN32_WINNT >= 0x0500.
+	(SPI_*): Add new definitions for WINVER >= 0x500.
+	(CallMsgFilter[AW], SetWindowsHookA): Correct prototype.
+	(InternalGetWindowText, SetWindowsHookW): Declare.
+	* include/winbase.h (InitializeSListHead): Avoid conflicting
+	definition with DDK headers.
+
+2004-04-13  Gé van Geldorp  <xnavara@volny.cz>
+
+	* include/winuser.h (GetLastError): Move from here...
+	* include/winbase.h: ... to here.
+
+2004-04-13  Filip Navara  <xnavara@volny.cz>
+
+	* include/winspool.h (DocumentPropertiesW): Correct prototype.
+
+2004-04-13  Filip Navara  <xnavara@volny.cz>
+
+	* include/wingdi.h (ENHMETAHEADER): Add definitions for
+	WINVER >= 0x400.
+	(WCRANGE, GLYPHSET, LPPOLYTEXT[AW]): Declare.
+	(ENUMLOGFONTEXW): Fix definition.
+	(ENUMLOGFONTEXDV[AW]): Declare.
+
+2004-04-13  Filip Navara  <xnavara@volny.cz>
+
+	* include/wingdi.h: Declare the DirectDraw structures only if
+	the DirectDraw kernel mode headers aren't included.
+	(EMFINFO): Declare.
+	(EngStretchBlt, EngTextOut, FONTOBJ_cGetGlyphs,
+	STROBJ_bEnumPositionsOnly): Correct prototypes.
+
+2004-04-13  Filip Navara  <xnavara@volny.cz>
+
+	* include/objidl.h (PRPCOLEMESSAGE): Declare.
+	* include/rpc.h	(RPCRTAPI): Define.
+	* include/rpcdce.h (RpcServerRegisterIf2): Declare.
+	* include/rpcdcep.h (RPC_BLOCKING_FN, I_RpcSend): Declare.
+	(RPC_BLOCKING_FUNCTION): Remove, replaced by RPC_BLOCKING_FN.
+	(I_RpcBindingSetAsync): Correct prototype.
+	* include/rpcndr.h (MIDL_STUB_MESSAGE): Rename 'Reserved' field
+	to w2kReserved.
+	(USER_MARSHAL_SIZING_ROUTINE, USER_MARSHAL_MARSHALLING_ROUTINE,
+	USER_MARSHAL_UNMARSHALLING_ROUTINE, USER_MARSHAL_FREEING_ROUTINE,
+	USER_MARSHAL_ROUTINE_QUADRUPLE, NDR_NOTIFY_ROUTINE, IDL_CS_CONVERT,
+	CS_TYPE_NET_SIZE_ROUTINE, CS_TYPE_LOCAL_SIZE_ROUTINE,
+	CS_TYPE_TO_NETCS_ROUTINE, CS_TYPE_FROM_NETCS_ROUTINE,
+	CS_TAG_GETTING_ROUTINE, NDR_CS_SIZE_CONVERT_ROUTINES,
+	NDR_CS_ROUTINES, NdrUserMarshalMarshall, NdrUserMarshalUnmarshall,
+	NdrUserMarshalBufferSize, NdrUserMarshalMemorySize,
+	NdrUserMarshalFree): Declare.
+	(MIDL_STUB_DESC): Add new fields that were added in W2K.
+	* include/rpcproxy.h (CStdStubBuffer): Ditto.
+
+2004-04-13  Filip Navara  <xnavara@volny.cz>, David Welch  <welch@cwcom.net>
+
+	* include/ddk/ntapi.h (NtCurrentProcess, NtCurrentThread,
+	LPC_MESSAGE_BASE_SIZE):	Define.
+	* include/ddk/ntifs.h: Move the pack pragma under header inclusion.
+
+2004-04-13  Filip Navara  <xnavara@volny.cz>
+
+	* include/commctrl.h (TB_MARKBUTTON, NMTBGETINFOTIP[AW]):
+	Declare.
+
 2004-04-18  Allan Bazinet  <bazineta@users.sourceforge.net>
 
 	* include/winuser.h (MONITORINFOEX[AW]): Change to be derived from

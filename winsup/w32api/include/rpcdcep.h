@@ -77,10 +77,11 @@ typedef struct _RPC_TRANSFER_SYNTAX {
 	unsigned short VersMajor;
 	unsigned short VersMinor;
 } RPC_TRANSFER_SYNTAX;
-typedef long(__stdcall *RPC_BLOCKING_FUNCTION)(void*,void*);
+typedef RPC_STATUS (*RPC_BLOCKING_FN)(void*,void*,void*);
 
 long __stdcall I_RpcGetBuffer(RPC_MESSAGE*);
 long __stdcall I_RpcSendReceive(RPC_MESSAGE*);
+long __stdcall I_RpcSend(RPC_MESSAGE*);
 long __stdcall I_RpcFreeBuffer(RPC_MESSAGE*);
 void __stdcall I_RpcRequestMutex(I_RPC_MUTEX*);
 void __stdcall I_RpcClearMutex(I_RPC_MUTEX);
@@ -110,7 +111,7 @@ void __stdcall I_RpcSsDontSerializeContext(void);
 long __stdcall I_RpcServerRegisterForwardFunction(RPC_FORWARD_FUNCTION*);
 long __stdcall I_RpcConnectionInqSockBuffSize(unsigned long*,unsigned long*);
 long __stdcall I_RpcConnectionSetSockBuffSize(unsigned long,unsigned long);
-long __stdcall I_RpcBindingSetAsync(HANDLE,RPC_BLOCKING_FUNCTION);
+long __stdcall I_RpcBindingSetAsync(HANDLE,RPC_BLOCKING_FN);
 long __stdcall I_RpcAsyncSendReceive(RPC_MESSAGE*,void*);
 long __stdcall I_RpcGetThreadWindowHandle(void**);
 long __stdcall I_RpcServerThreadPauseListening(void);
