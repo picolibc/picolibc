@@ -98,9 +98,9 @@ typedef wchar_t _TCHAR;
 #define	_fputtchar	_fputwchar
 #define	_fputts		fputws
 #define	_gettc		getwc
-#define	_getts		getws
+#define	_getts		_getws
 #define	_puttc		putwc
-#define	_putts		putws
+#define	_putts		_putws
 #define	_ungettc	ungetwc
 #define	_tcstod		wcstod
 #define	_tcstol		wcstol

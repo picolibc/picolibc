@@ -1,3 +1,9 @@
+2002-06-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/tchar.h (_getts): Define as _getws for _UNICODE.
+	(_putts): Define as _putws for _UNICODE.
+	Thanks to: Tomasz Pona  <cochisek@poczta.onet.pl>  for report.
+
 2002-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/float.h: #include_next<float.h> before header guard.
