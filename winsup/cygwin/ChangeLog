@@ -1,3 +1,44 @@
+2003-07-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Allow MAP_FIXED with pagesize granularity (4K).
+	If a non-zero addr is given, align it to the next lower 64K boundary.
+	(fhandler_disk_file::mmap): If a non-zero address is given, try
+	mapping using the given address first.  If it fails and flags is not
+	MAP_FIXED, try again with NULL address.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* thread.cc: Remove _MT_SAFE conditional.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Fix --enable-server option.
+	* configure: Regenerate.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Remove cygserver stuff.
+	* acconfig.h: Add USE_CYGSERVER define.
+	* config.h.in: Regenerate.
+	* configure.in: Add --enable-server setting.
+	* configure: Regenerate.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Conditionalize
+	compilation of cygserver stuff.
+	* fork.cc (fork_child): Ditto.
+	* shm.cc: Ditto.
+	* tty.cc (tty::common_init): Ditto.
+
+	* dcrt0.cc: Use bool rather than BOOL for CYGWIN environment variable
+	definitions.
+	* environ.cc: Ditto.
+	* ntea.cc: Ditto.
+	* security.cc: Ditto.
+	* security.h: Ditto.
+	* syscalls.cc (check_posix_perm): Remove externs that were already
+	declared in a header.
+	* winsup.h: Ditto.  Declare _MT_SAFE here.  Delete it someday since
+	cygwin should always be _MT_SAFE.
+
 2003-07-01  Christopher Faylor  <cgf@redhat.com>
 
 	* thread.cc: Remove _MT_SAFE conditional.

@@ -438,7 +438,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
   if (off % getpagesize ()
       || (!(flags & MAP_SHARED) && !(flags & MAP_PRIVATE))
       || ((flags & MAP_SHARED) && (flags & MAP_PRIVATE))
-      || ((flags & MAP_FIXED) && ((DWORD)addr % granularity))
+      || ((flags & MAP_FIXED) && ((DWORD)addr % getpagesize ()))
       || !len)
     {
       set_errno (EINVAL);
@@ -469,8 +469,6 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
   DWORD gran_len = howmany (off + len, granularity) * granularity - gran_off;
 
   fhandler_base *fh;
-  caddr_t base = addr;
-  HANDLE h;
 
   if (fd != -1)
     {
@@ -540,7 +538,13 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
       && (wincap.has_working_copy_on_write () || fd != -1))
     access = FILE_MAP_COPY;
 
-  h = fh->mmap (&base, gran_len, access, flags, gran_off);
+  caddr_t base = addr;
+  /* This shifts the base address to the next lower 64K boundary.
+     The offset is re-added when evaluating the return value. */
+  if (base)
+    base -= off - gran_off;
+  
+  HANDLE h = fh->mmap (&base, gran_len, access, flags, gran_off);
 
   if (h == INVALID_HANDLE_VALUE)
     {
@@ -813,9 +817,15 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
     }
 
   DWORD high = off >> 32, low = off & 0xffffffff;
-  void *base = MapViewOfFileEx (h, access, high, low, len,
-			       (flags & MAP_FIXED) ? *addr : NULL);
-  debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%D, len:%d, addr:%x)", base, h, access, off, len, (flags & MAP_FIXED) ? *addr : NULL);
+  void *base = NULL;
+  /* If a non-zero address is given, try mapping using the given address first.
+     If it fails and flags is not MAP_FIXED, try again with NULL address. */
+  if (addr)
+    base = MapViewOfFileEx (h, access, high, low, len, *addr);
+  if (!base && !(flags & MAP_FIXED))
+    base = MapViewOfFileEx (h, access, high, low, len, NULL);
+  debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%D, "
+  		"len:%d, addr:%x)", base, h, access, off, len, *addr);
   if (!base || ((flags & MAP_FIXED) && base != *addr))
     {
       if (!base)
