@@ -1,3 +1,12 @@
+Sun Sep 10 20:23:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (init_cheap): Just use any old address for the cygwin
+	heap.
+	* exceptions.cc (signal_exit): Don't terminate the main thread.  Just
+	try to exit in this thread really quickly.
+	* signal.cc (kill_pgrp): Fix typo which caused pinfo structure to be
+	assigned incorrectly.
+
 Sun Sep 10 12:40:49 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (dll_crt0_1): Initialize thread and debug stuff before

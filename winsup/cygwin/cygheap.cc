@@ -16,13 +16,13 @@
 #include "heap.h"
 #include "cygerrno.h"
 
-#define HEAP_START ((void *) 0x12010000)
 inline static void
 init_cheap ()
 {
-  if (!VirtualAlloc (HEAP_START, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS))
-    api_fatal ("Couldn't reserve space for child's heap, %E");
-  cygheap = cygheap_max = HEAP_START;
+  cygheap = VirtualAlloc (NULL, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS);
+  if (!cygheap)
+    api_fatal ("Couldn't reserve space for cygwin's heap, %E");
+  cygheap_max = cygheap;
 }
 
 #define pagetrunc(x) ((void *) (((DWORD) (x)) & ~(4096 - 1)))
@@ -155,7 +155,7 @@ cygheap_fixup_in_child (HANDLE parent)
   DWORD m, n;
   n = (DWORD) cygheap_max - (DWORD) cygheap;
   if (!VirtualAlloc (cygheap, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS))
-    api_fatal ("Couldn't reserve space for child's heap, %E");
+    api_fatal ("Couldn't reserve space for cygwin's heap in child, %E");
 
   if (!VirtualAlloc (cygheap, n, MEM_COMMIT, PAGE_READWRITE))
     api_fatal ("Couldn't allocate space for child's heap %p, size %d, %E",
