@@ -51,7 +51,7 @@ struct tm *
 _DEFUN (localtime, (tim_p),
 	_CONST time_t * tim_p)
 {
-  return localtime_r (tim_p, &(_REENT->_new._reent._localtime_buf));
+  return localtime_r (tim_p, (struct tm *)&(_REENT->_new._reent._localtime_buf));
 }
 
 #endif

@@ -1,3 +1,16 @@
+2001-08-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h: Add include of <sys/_types.h>.
+	No longer include time.h.  Add struct __tm to use for
+	_localtime_buf in the reentrant structure.  Add a
+	_NULL definition to use in initializing the reentrant struct.
+	* libc/include/sys/config.h: For CYGWIN32 and RTEMS, change
+	the _READ_WRITE_RETURN_TYPE to _ssize_t which is found in
+	<sys/_types.h>.
+	* libc/include/sys/unistd.h: Include <sys/_types.h>.
+	* libc/time/lcltime.c (localtime): Cast the reentrant struct
+	_localtime_buf to be struct tm *.
+
 Wed Aug 29 14:17:38 2001  J"orn Rennecke <amylaar@redhat.com>
 
 	* configure.host (h8300-*-elf*, h8500-*-elf*): New cases.

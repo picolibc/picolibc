@@ -11,7 +11,7 @@ extern "C" {
 #define _SYS_REENT_H_
 
 #include <_ansi.h>
-#include <time.h>
+#include <sys/_types.h>
 
 #ifndef __Long
 #if __LONG_MAX__ == 2147483647L
@@ -40,6 +40,20 @@ struct _Bigint
   struct _Bigint *_next;
   int _k, _maxwds, _sign, _wds;
   __ULong _x[1];
+};
+
+/* needed by reentrant structure */
+struct __tm
+{
+  int   __tm_sec;
+  int   __tm_min;
+  int   __tm_hour;
+  int   __tm_mday;
+  int   __tm_mon;
+  int   __tm_year;
+  int   __tm_wday;
+  int   __tm_yday;
+  int   __tm_isdst;
 };
 
 /*
@@ -208,7 +222,7 @@ struct _reent
           unsigned int _unused_rand;
           char * _strtok_last;
           char _asctime_buf[26];
-          struct tm _localtime_buf;
+          struct __tm _localtime_buf;
           int _gamma_signgam;
           __extension__ unsigned long long _rand_next;
           struct _rand48 _r48;
@@ -238,9 +252,11 @@ struct _reent
   struct __sFILE __sf[3];		/* first three file descriptors */
 };
 
+#define _NULL 0
+
 #define _REENT_INIT(var) \
   { 0, &var.__sf[0], &var.__sf[1], &var.__sf[2], 0, "", 0, "C", \
-    0, NULL, NULL, 0, NULL, NULL, 0, NULL, { {0, NULL, "", \
+    0, _NULL, _NULL, 0, _NULL, _NULL, 0, _NULL, { {0, _NULL, "", \
     { 0,0,0,0,0,0,0,0}, 0, 1, \
     {{_RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2}, \
      {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, _RAND48_ADD}} } }

@@ -7,6 +7,7 @@ extern "C" {
 
 #include <_ansi.h>
 #include <sys/types.h>
+#include <sys/_types.h>
 #define __need_size_t
 #define __need_ptrdiff_t
 #include <stddef.h>
