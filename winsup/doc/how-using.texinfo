@@ -359,19 +359,36 @@ discussed in that FAQ entry.
 
 @subsection Why can't I run bash as a shell under NT Emacs?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+The Windows port of GNU Emacs (aka "NT emacs") uses the Windows command
+shell by default.  Also, since Emacs is not a Cygwin application, it has
+no knowledge of Cygwin mounts.  With those points in mind, you need to
+add the following code to your ~/.emacs or ~/_emacs file in order to use
+bash.  This is particularly useful for the JDE package
+(@file{http://sunsite.dk/jde/}).
 
-Place the following code in your startup file and try again:
-
-@smallexample
-(load "comint")
-(fset 'original-comint-exec-1 (symbol-function 'comint-exec-1))
-(defun comint-exec-1 (name buffer command switches)
-  (let ((binary-process-input t)
-        (binary-process-output nil))
-    (original-comint-exec-1 name buffer command switches)))
-@end smallexample
+@example
+	;; This assumes that Cygwin is installed in C:\cygwin (the
+	;; default) and that C:\cygwin\bin is not already in your
+	;; Windows Path (it generally should not be).
+	;;
+	(setq exec-path (cons "C:/cygwin/bin" exec-path))
+	(setenv "PATH" (concat "C:\\cygwin\\bin;" (getenv "PATH")))
+	;;
+	;; NT-emacs assumes a Windows command shell, which you change
+	;; here.
+	;;
+	(setq process-coding-system-alist '(("bash" . undecided-unix)))
+	(setq w32-quote-process-args ?\")
+	(setq shell-file-name "bash")
+	(setenv "SHELL" shell-file-name) 
+	(setq explicit-shell-file-name shell-file-name) 
+	;;
+	;; This removes unsightly ^M characters that would otherwise
+	;; appear in the output of java applications.
+	;;
+	(add-hook 'comint-output-filter-functions
+	          'comint-strip-ctrl-m)
+@end example
 
 @subsection info error "dir: No such file or directory"
 
