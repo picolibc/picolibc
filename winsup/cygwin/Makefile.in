@@ -51,7 +51,7 @@ CC:=@CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET:=$(CC)
 CFLAGS:=@CFLAGS@
-CFLAGS+=-MD -fbuiltin
+CFLAGS+=-MMD -fbuiltin
 CXX:=@CXX@
 CXXFLAGS:=@CXXFLAGS@
 
@@ -230,6 +230,16 @@ $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
 version.cc winver.o: winver_stamp
 	@ :
 
+shared_info_magic.h: cygmagic shared_info.h
+	/bin/sh ${word 1,$^} $@ $(CC) ${word 2,$^} MOUNT_MAGIC 'class mount_info' SHARED_MAGIC 'class shared_info'
+
+child_info_magic.h: cygmagic child_info.h
+	/bin/sh ${word 1,$^} $@ $(CC) ${word 2,$^} CHILD_INFO_MAGIC 'class child_info'
+
+dcrt0.o sigproc.o: child_info_magic.h
+
+shared.o: shared_info_magic.h
+
 winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	@echo "Making version.o and winver.o";\
 	$(SHELL) ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) && \
@@ -239,8 +249,6 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 cygrun.exe : cygrun.o $(LIB_NAME) $(w32api_lib)/libuser32.a \
 	     $(w32api_lib)/libshell32.a $(w32api_lib)/libkernel32.a
 	$(CC) -nodefaultlibs -o $@ $^
-
-#
 
 Makefile: cygwin.din
 

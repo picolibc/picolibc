@@ -117,14 +117,17 @@ pinfo_init (char **envp, int envc)
 void
 _pinfo::exit (UINT n, bool norecord)
 {
-  if (!norecord)
-    process_state = PID_EXITED;
+  if (this)
+    {
+      if (!norecord)
+	process_state = PID_EXITED;
 
-  /* FIXME:  There is a potential race between an execed process and its
-     parent here.  I hated to add a mutex just for this, though.  */
-  struct rusage r;
-  fill_rusage (&r, hMainProc);
-  add_rusage (&rusage_self, &r);
+      /* FIXME:  There is a potential race between an execed process and its
+	 parent here.  I hated to add a mutex just for this, though.  */
+      struct rusage r;
+      fill_rusage (&r, hMainProc);
+      add_rusage (&rusage_self, &r);
+    }
 
   sigproc_printf ("Calling ExitProcess %d", n);
   ExitProcess (n);

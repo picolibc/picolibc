@@ -25,12 +25,9 @@ details. */
 #include "cygerrno.h"
 #include "cygheap.h"
 #include "heap.h"
-#include "shared_info.h"
+#include "shared_info_magic.h"
 #include "registry.h"
 #include "cygwin_version.h"
-
-#define SHAREDVER (unsigned)(cygwin_version.api_major << 16 | \
-		   cygwin_version.api_minor)
 
 shared_info NO_COPY *cygwin_shared = NULL;
 mount_info NO_COPY *mount_table = NULL;
@@ -108,8 +105,8 @@ shared_info::initialize ()
 {
   if (inited)
     {
-      if (inited != SHAREDVER)
-	multiple_cygwin_die ();
+      if (inited != SHARED_VERSION_MAGIC)
+	multiple_cygwin_problem ("shared", inited, SHARED_VERSION);
       return;
     }
 
@@ -118,7 +115,7 @@ shared_info::initialize ()
 
   /* Initialize tty table.  */
   tty.init ();
-  inited = SHAREDVER;
+  inited = SHARED_VERSION_MAGIC;
 }
 
 void __stdcall
@@ -163,12 +160,12 @@ memory_init ()
   /* Initialize the Cygwin per-user mount table, if necessary */
   if (!mount_table->version)
     {
-      mount_table->version = MOUNT_VERSION;
+      mount_table->version = MOUNT_VERSION_MAGIC;
       debug_printf ("initializing mount table");
       mount_table->init ();	/* Initialize the mount table.  */
     }
-  else if (mount_table->version != MOUNT_VERSION)
-    multiple_cygwin_die ();
+  else if (mount_table->version != MOUNT_VERSION_MAGIC)
+    multiple_cygwin_problem ("mount", mount_table->version, MOUNT_VERSION);
 
 }
 

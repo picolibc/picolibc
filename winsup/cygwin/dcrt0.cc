@@ -30,7 +30,7 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "child_info.h"
+#include "child_info_magic.h"
 #include "perthread.h"
 #include "shared_info.h"
 #include "cygwin_version.h"
@@ -585,7 +585,7 @@ dll_crt0_1 ()
 
   if (child_proc_info)
     {
-      switch (child_proc_info->type - _cygwin_testing_magic)
+      switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:
 	    cygheap_fixup_in_child (child_proc_info, 0);
@@ -826,7 +826,12 @@ _dll_crt0 ()
   if (si.cbReserved2 >= EXEC_MAGIC_SIZE &&
       memcmp (fork_info->zero, zeros, sizeof (zeros)) == 0)
     {
-      switch (fork_info->type - _cygwin_testing_magic)
+      if ((fork_info->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
+	multiple_cygwin_problem ("proc", fork_info->intro, 0);
+      else if (fork_info->intro == PROC_MAGIC_GENERIC
+	       && fork_info->magic != CHILD_INFO_MAGIC)
+	multiple_cygwin_problem ("proc", fork_info->magic, CHILD_INFO_MAGIC);
+      switch (fork_info->type)
 	{
 	  case _PROC_FORK:
 	    user_data->forkee = fork_info->cygpid;
@@ -841,10 +846,8 @@ _dll_crt0 ()
 	      break;
 	    }
 	  default:
-	    if (_cygwin_testing)
-	      fork_info = NULL;
-	    else if ((fork_info->type & PROC_MAGIC_MASK) == PROC_MAGIC_GENERIC)
-	      multiple_cygwin_die ();
+	    system_printf ("unknown exec type %d", fork_info->type);
+	    fork_info = NULL;
 	    break;
 	}
     }
@@ -1020,14 +1023,19 @@ __api_fatal (const char *fmt, ...)
 }
 
 void
-multiple_cygwin_die ()
+multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned version)
 {
-  api_fatal ("\
+  if (CYGWIN_VERSION_MAGIC_VERSION (magic_version) != version)
+    api_fatal ("%s version mismatch detected - %p/%p.\n\
 You have multiple copies of cygwin1.dll on your system.\n\
 Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
-and delete all but the most recent version.  This will probably be\n\
-the one that resides in x:\\cygwin\\bin, where 'x' is the drive on which\n\
-you have installed the cygwin distribution.\n");
+and delete all but the most recent version.  The most recent version *should*\n\
+reside in x:\\cygwin\\bin, where 'x' is the drive on which you have\n\
+installed the cygwin distribution.", what, magic_version, version);
+
+  char buf[1024];
+  if (!GetEnvironmentVariable ("CYGWIN_MISMATCH_OK", buf, sizeof (buf)))
+    system_printf ("%s magic number mismatch detected - %p/%p", what, magic_version, version);
 }
 
 #ifdef DEBUGGING

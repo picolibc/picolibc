@@ -26,7 +26,7 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "child_info.h"
+#include "child_info_magic.h"
 #define NEED_VFORK
 #include "perthread.h"
 #include <assert.h>
@@ -858,6 +858,8 @@ init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
 {
   memset (ch, 0, sizeof *ch);
   ch->cb = sizeof *ch;
+  ch->intro = PROC_MAGIC_GENERIC;
+  ch->magic = CHILD_INFO_MAGIC;
   ch->type = chtype;
   ch->cygpid = pid;
   ch->subproc_ready = subproc_ready;

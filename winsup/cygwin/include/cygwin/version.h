@@ -148,6 +148,8 @@ details. */
        48: Export "posix" regex functions
      */
 
+     /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
+
 #define CYGWIN_VERSION_API_MAJOR 0
 #define CYGWIN_VERSION_API_MINOR 48
 
@@ -214,3 +216,5 @@ details. */
 	cygwin_internal (CW_GETVERSIONINFO).
      */
 
+#define CYGWIN_VERSION_MAGIC(a, b) ((unsigned) (((unsigned short) a) | (unsigned short) b))
+#define CYGWIN_VERSION_MAGIC_VERSION(a) ((unsigned) ((unsigned)a & 0xffff))

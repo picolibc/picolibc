@@ -12,28 +12,32 @@ details. */
 
 enum
 {
-  PROC_MAGIC = 0xaf12f000,
-  _PROC_EXEC = PROC_MAGIC + 2,
-  _PROC_SPAWN = PROC_MAGIC + 3,
-  _PROC_FORK = PROC_MAGIC + 4,	// Newer versions provide stack
-				// location information
+  _PROC_EXEC,
+  _PROC_SPAWN,
+  _PROC_FORK
 };
 
-#define PROC_MAGIC_MASK 0xff00f000
-#define PROC_MAGIC_GENERIC 0xaf00f000
-#define PROC_MAGIC_VER_MASK 0x0ff0000
+#define OPROC_MAGIC_MASK 0xff00ff00
+#define OPROC_MAGIC_GENERIC 0xaf00f000
 
-#define PROC_EXEC (_PROC_EXEC + _cygwin_testing_magic)
-#define PROC_SPAWN (_PROC_SPAWN + _cygwin_testing_magic)
-#define PROC_FORK (_PROC_FORK + _cygwin_testing_magic)
+#define PROC_MAGIC_GENERIC 0xaf00fa00
+
+#define PROC_EXEC (_PROC_EXEC)
+#define PROC_SPAWN (_PROC_SPAWN)
+#define PROC_FORK (_PROC_FORK)
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
+
+#define CURR_CHILD_INFO_MAGIC 0xba17
+
 class child_info
 {
 public:
   DWORD zero[4];	// must be zeroed
   DWORD cb;		// size of this record
-  DWORD type;		// type of record
+  DWORD intro;		// improbable string
+  unsigned short magic;	// magic number unique to child_info
+  unsigned short type;	// type of record, exec, spawn, fork
   int cygpid;		// cygwin pid of child process
   HANDLE subproc_ready;	// used for synchronization with parent
   HANDLE mount_h;

@@ -40,7 +40,9 @@ class mount_item
    scheme should be satisfactory for a long while yet.  */
 #define MAX_MOUNTS 30
 
-#define MOUNT_VERSION	27	// increment when mount table changes
+#define MOUNT_VERSION	27	// increment when mount table changes and
+#define MOUNT_VERSION_MAGIC CYGWIN_VERSION_MAGIC (MOUNT_MAGIC, MOUNT_VERSION)
+#define CURR_MOUNT_MAGIC 0xfe35
 
 class reg_key;
 class mount_info
@@ -127,6 +129,12 @@ public:
 
 /******** Shared Info ********/
 /* Data accessible to all tasks */
+
+#define SHARED_VERSION (unsigned)(cygwin_version.api_major << 8 | \
+				  cygwin_version.api_minor)
+#define SHARED_VERSION_MAGIC CYGWIN_VERSION_MAGIC (SHARED_MAGIC, SHARED_VERSION)
+
+#define CURR_SHARED_MAGIC 0x6f6e
 
 class shared_info
 {
