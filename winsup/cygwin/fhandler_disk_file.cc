@@ -617,15 +617,20 @@ fhandler_disk_file::opendir ()
     set_errno (ENOMEM);
   else if ((dir->__d_dirname = (char *) malloc (len + 3)) == NULL)
     {
-      free (dir);
       set_errno (ENOMEM);
+      free (dir);
     }
   else if ((dir->__d_dirent =
 	    (struct dirent *) malloc (sizeof (struct dirent))) == NULL)
     {
-      free (dir->__d_dirname);
-      free (dir);
       set_errno (ENOMEM);
+      free (dir);
+      free (dir->__d_dirname);
+    }
+  else if (access_worker (pc, R_OK) != 0)
+    {
+      free (dir);
+      free (dir->__d_dirname);
     }
   else
     {
