@@ -1,5 +1,9 @@
 2003-03-09  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Bump DLL minor number to 21.
+
+2003-03-09  Christopher Faylor  <cgf@redhat.com>
+
 	Do some minor reformatting of 'extern "C"' use throughout.
 
 2003-03-06  Christopher January  <chris@atomice.net>
