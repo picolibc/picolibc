@@ -1,27 +1,13 @@
 #ifndef __SYS_CONFIG_H__
 #define __SYS_CONFIG_H__
 
+#include <machine/ieeefp.h>  /* floating point macros */
+
 /* exceptions first */
-/* ??? Why is much of this stuff duplicated with machine/ieeefp.h?  */
 #if defined(__H8300__) || defined(__H8500__) || defined (__H8300H__) ||  defined(__W65__) || defined (__H8300S__)
-#define _FLOAT_ARG float
-#define __SMALL_BITFIELDS
-#define _DOUBLE_IS_32BITS
-#define __IEEE_BIG_ENDIAN
 /* ???  This conditional is true for the h8500 and the w65, defining H8300
    in those cases probably isn't the right thing to do.  */
 #define H8300 1
-#endif
-
-#ifdef __W65__
-#define _DOUBLE_IS_32BITS
-#define __SMALL_BITFIELDS
-#define __IEEE_BIG_ENDIAN
-#undef INT_MAX
-#undef UINT_MAX
-#define INT_MAX 32767
-#define UINT_MAX 65535
-
 #endif
 
 /* 16 bit integer machines */
@@ -33,27 +19,17 @@
 #define UINT_MAX 65535
 #endif
 
+#ifdef __W65__
+#define __SMALL_BITFIELDS
+#endif
+
 #if defined(__D10V__)
+#define __SMALL_BITFIELDS
 #undef INT_MAX
 #undef UINT_MAX
 #define INT_MAX __INT_MAX__
 #define UINT_MAX (__INT_MAX__ * 2U + 1)
-#if __DOUBLE__ == 32
-#define _DOUBLE_IS_32BITS
-#endif
 #define _POINTER_INT short
-#define __IEEE_BIG_ENDIAN
-#endif
-
-#ifdef __sh__
-#ifdef __LITTLE_ENDIAN__
-#define __IEEE_LITTLE_ENDIAN
-#else
-#define __IEEE_BIG_ENDIAN
-#endif
-#if defined(__SH3E__) || defined(__SH4_SINGLE_ONLY__)
-#define _DOUBLE_IS_32BITS
-#endif
 #endif
 
 #ifdef ___AM29K__
@@ -61,7 +37,6 @@
 #endif
 
 #ifdef __i386__
-#define __IEEE_LITTLE_ENDIAN
 #ifndef __unix__
 /* in other words, go32 */
 #define _FLOAT_RET double
@@ -75,70 +50,17 @@
 #endif
 #endif
 
-#ifdef __M32R__
-#define __IEEE_BIG_ENDIAN
-#endif
-
-#ifdef __m68k__
-/* This is defined in machine/ieeefp.h; need to check is it redundant here? */
-#define __IEEE_BIG_ENDIAN
-#endif
-
-#ifdef __mn10300__
-#define __IEEE_LITTLE_ENDIAN
-#endif
-
 #ifdef __mn10200__
-#define _DOUBLE_IS_32BITS
 #define __SMALL_BITFIELDS
-#define __IEEE_LITTLE_ENDIAN
-#endif
-
-#ifdef __MIPSEL__
-#define __IEEE_LITTLE_ENDIAN
-#endif
-#ifdef __MIPSEB__
-#define __IEEE_BIG_ENDIAN
-#endif
-
-#ifdef __MMIX__
-#define __IEEE_BIG_ENDIAN
 #endif
 
 #ifdef __AVR__
-#define _DOUBLE_IS_32BITS
 #define __SMALL_BITFIELDS
-#define __IEEE_LITTLE_ENDIAN
 #define _POINTER_INT short
 #endif
 
-#ifdef __TIC80__
-#define __IEEE_LITTLE_ENDIAN
-#endif
-
-#ifdef __v800
-#define __IEEE_LITTLE_ENDIAN
-#endif
-
 #ifdef __v850
-#define __IEEE_LITTLE_ENDIAN
 #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__sda__))
-#endif
-
-#ifdef __ia64__
-#ifdef __BIG_ENDIAN__
-#define __IEEE_BIG_ENDIAN
-#else
-#define __IEEE_LITTLE_ENDIAN
-#endif
-#endif
-
-#ifdef __D30V__
-#define __IEEE_BIG_ENDIAN
-#endif
-
-#ifdef __m88k__
-#define __IEEE_BIG_ENDIAN
 #endif
 
 /* For the PowerPC eabi, force the _impure_ptr to be in .sdata */
@@ -146,43 +68,9 @@
 #if defined(_CALL_SYSV)
 #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
 #endif
-#if (defined(_BIG_ENDIAN) && _BIG_ENDIAN) || (defined(_AIX) && _AIX)
-#define __IEEE_BIG_ENDIAN
-#else
-#if (defined(_LITTLE_ENDIAN) && _LITTLE_ENDIAN) || (defined(__sun__) && __sun__) || (defined(_WIN32) && _WIN32)
-#define __IEEE_LITTLE_ENDIAN
 #endif
-#endif
-#endif
-
-#if defined(__arm__) || defined(__thumb__)
-/* ARM always has big-endian words.  Within those words the byte ordering
-   will be big or little endian depending upon the target.  */
-#define __IEEE_BIG_ENDIAN
-#ifdef __ARMEL__
-#define __IEEE_BYTES_LITTLE_ENDIAN
-#endif
-#endif
-
-#ifdef __hppa__
-#define __IEEE_BIG_ENDIAN
-#endif
-
-#ifdef __sparc__
-#ifdef __LITTLE_ENDIAN_DATA__
-#define __IEEE_LITTLE_ENDIAN
-#else
-#define __IEEE_BIG_ENDIAN
-#endif
-#endif
-
-#if defined(__or32__) || defined(__or1k__) || defined(__or16__)
-#define __IEEE_BIG_ENDIAN
-#endif
-
 
 #ifdef __xstormy16__
-#define __IEEE_LITTLE_ENDIAN
 #define __SMALL_BITFIELDS
 #undef INT_MAX
 #undef UINT_MAX
@@ -226,24 +114,7 @@
 #define _POINTER_INT long
 #endif
 
-#ifdef __arc__
-#ifdef __big_endian__
-#define __IEEE_BIG_ENDIAN
-#else
-#define __IEEE_LITTLE_ENDIAN
-#endif
-#endif
-
-#ifdef __fr30__
-#define __IEEE_BIG_ENDIAN
-#endif
-
-#ifdef __mcore__
-#define __IEEE_BIG_ENDIAN
-#endif
-
 #ifdef __frv__
-#define __IEEE_BIG_ENDIAN
 #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
 #endif
 #undef __RAND_MAX
@@ -279,11 +150,5 @@
 #ifndef _READ_WRITE_RETURN_TYPE
 #define _READ_WRITE_RETURN_TYPE int
 #endif
-
-#ifndef __IEEE_BIG_ENDIAN
-#ifndef __IEEE_LITTLE_ENDIAN
-#error Endianess not declared!!
-#endif /* not __IEEE_LITTLE_ENDIAN */
-#endif /* not __IEEE_BIG_ENDIAN */
 
 #endif /* __SYS_CONFIG_H__ */

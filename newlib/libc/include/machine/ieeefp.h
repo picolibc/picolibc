@@ -15,9 +15,40 @@
 
 	Defined if the float format does not support IEEE denormals.  Every
 	float with a zero exponent is taken to be a zero representation.
+ 
+   ??? At the moment, there are no equivalent macros above for doubles and
+   the macros are not fully supported by --enable-newlib-hw-fp.
 
-   ??? At the moment, there are no equivalent macros for doubles and
-   the macros are not fully supported by --enable-newlib-hw-fp.  */
+   __IEEE_BIG_ENDIAN
+
+        Defined if the float format is big endian.  This is mutually exclusive
+        with __IEEE_LITTLE_ENDIAN.
+
+   __IEEE_LITTLE_ENDIAN
+ 
+        Defined if the float format is little endian.  This is mutually exclusive
+        with __IEEE_BIG_ENDIAN.
+
+   Note that one of __IEEE_BIG_ENDIAN or __IEEE_LITTLE_ENDIAN must be specified for a
+   platform or error will occur.
+
+   __IEEE_BYTES_LITTLE_ENDIAN
+
+        This flag is used in conjunction with __IEEE_BIG_ENDIAN to describe a situation 
+	whereby multiple words of an IEEE floating point are in big endian order, but the
+	words themselves are little endian with respect to the bytes.
+
+   _DOUBLE_IS_32_BITS 
+
+        This is used on platforms that support double by using the 32-bit IEEE
+        float type.
+
+   _FLOAT_ARG
+
+        This represents what type a float arg is passed as.  It is used when the type is
+        not promoted to double.
+	
+*/
 
 #if defined(__arm__) || defined(__thumb__)
 /* ARM always has big-endian words.  Within those words the byte ordering
@@ -44,15 +75,9 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
-#if defined (__H8300__) || defined (__H8300H__) || defined (__H8300S__)
+#if defined (__H8300__) || defined (__H8300H__) || defined (__H8300S__) || defined (__H8500__)
 #define __IEEE_BIG_ENDIAN
-#define __SMALL_BITFIELDS
-#define _DOUBLE_IS_32BITS
-#endif
-
-#ifdef __H8500__
-#define __IEEE_BIG_ENDIAN
-#define __SMALL_BITFIELDS
+#define _FLOAT_ARG float
 #define _DOUBLE_IS_32BITS
 #endif
 
@@ -102,11 +127,14 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __D30V__
+#define __IEEE_BIG_ENDIAN
+#endif
+
 /* necv70 was __IEEE_LITTLE_ENDIAN. */
 
 #ifdef __W65__
 #define __IEEE_LITTLE_ENDIAN
-#define __SMALL_BITFIELDS
 #define _DOUBLE_IS_32BITS
 #endif
 
@@ -124,7 +152,6 @@
 
 #ifdef __mn10200__
 #define __IEEE_LITTLE_ENDIAN
-#define __SMALL_BITFIELDS
 #define _DOUBLE_IS_32BITS
 #endif
 
@@ -141,7 +168,6 @@
 #if __DOUBLE__ == 32
 #define _DOUBLE_IS_32BITS
 #endif
-#define __SMALL_BITFIELDS
 #endif
 
 #ifdef __PPC__
@@ -152,6 +178,10 @@
 #define __IEEE_LITTLE_ENDIAN
 #endif
 #endif
+#endif
+
+#ifdef __xstormy16__
+#define __IEEE_LITTLE_ENDIAN
 #endif
 
 #ifdef __arc__
@@ -184,17 +214,11 @@
 
 #ifdef __AVR__
 #define __IEEE_LITTLE_ENDIAN
-#define __SMALL_BITFIELDS
 #define _DOUBLE_IS_32BITS
 #endif
 
 #if defined(__or32__) || defined(__or1k__) || defined(__or16__)
 #define __IEEE_BIG_ENDIAN
-#endif
-
-#ifdef __xstormy16__
-#define __IEEE_LITTLE_ENDIAN
-#define __SMALL_BITFIELDS
 #endif
 
 #ifndef __IEEE_BIG_ENDIAN

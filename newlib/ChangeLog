@@ -1,5 +1,13 @@
 2002-07-15  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/machine/ieeefp.h: Change to only define
+	floating point defines (e.g one of __IEEE_BIG_ENDIAN or 
+	__IEEE_LITTLE_ENDIAN must be defined for each platform).
+	* libc/include/sys/config.h: Include <machine/ieeefp.h> and
+	remove redundant floating point definitions.
+
+2002-07-15  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/sys/linux/callocr.c: Fix so code references
         calloc.
 
