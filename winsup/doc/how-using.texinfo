@@ -86,8 +86,8 @@ Just tell bash where to find it, when you type it on the command line:
 
 @subsection How do I convert between Windows and UNIX paths?
 
-Use the 'cygpath' utility.  Type '@code{cygpath}' with no arguments to
-get usage information.  For example (on my installation):
+Use the 'cygpath' utility.  Type '@code{cygpath --help}' for
+information.  For example (on my installation):
 @example
 	bash$ cygpath --windows ~/.bashrc
         D:\starksb\.bashrc
@@ -595,15 +595,26 @@ contents are exempt from scanning.  In a default installation, this
 would be @samp{@code{C:\cygwin\bin}}.  Obviously, this could be
 exploited by a hostile non-Cygwin program, so do this at your own risk.
 
-@subsection How do I run bash as a shell under NT Emacs?
+@subsection Is there a Cygwin port of GNU Emacs?
 
-The Windows port of GNU Emacs (aka "NT emacs") uses the Windows command
-shell by default.  Also, since Emacs is not a Cygwin application, it has
-no knowledge of Cygwin mounts.  With those points in mind, you need to
-add the following code to your ~/.emacs or ~/_emacs file in order to use
-bash.  This is particularly useful for the JDEE package
-(@file{http://jdee.sunsite.dk/}).  The following settings are for
-Emacs 21.1:
+Yes!  It uses the X11 (@file{http://cygwin.com/xfree/}) Windows
+interface.  From a remote login shell, this ``emacs -nw'' works fine.
+There is also a non-X11 version which just provides the text-only
+terminal interface.  Use Cygwin Setup to install either one (or both).
+
+@subsection What about NT Emacs?
+
+If you want GNU Emacs with a native Microsoft Windows interface, but
+without X, then you must use the native Windows port, commonly known
+as ``NT Emacs''.  You get NT Emacs from any GNU mirror.  It is not
+available from Cygwin Setup.
+
+NT Emacs uses the Windows command shell by default.  Since it is not a
+Cygwin application, it has no knowledge of Cygwin mounts.  With those
+points in mind, you need to add the following code to your ~/.emacs
+(or ~/_emacs) file in order to use Cygwin bash.  This is particularly useful
+for the JDEE package (@file{http://jdee.sunsite.dk/}).  The following
+settings are for Emacs 21.1:
 
 @example
 	;; This assumes that Cygwin is installed in C:\cygwin (the
@@ -628,16 +639,17 @@ Emacs 21.1:
 	          'comint-strip-ctrl-m)
 @end example
 
-@subsection Is there a Cygwin port of GNU Emacs?
-
-No.  If you want NT Emacs to understand Cygwin paths, get
+If you want NT Emacs to understand Cygwin paths, get
 cygwin-mount.el from @file{http://www.emacswiki.org/elisp/index.html}.
 
-If you want to run ``emacs -nw'', say from a remote login shell, you
-can't.  (The error is ``emacs: standard input is not a tty''.)
-Instead, use a Cygwin version of XEmacs, from
-@file{http://www.xemacs.org/}.  Using ``xemacs -nw'' from a remote
-shell works fine.
+Note that all of this ``just works'' if you use the Cygwin port of
+Emacs from Cygwin Setup.
+
+@subsection What about XEmacs?
+
+For a concise description of the current situation with XEmacs, see
+this message from the Cygwin mailing list:
+@file{http://cygwin.com/ml/cygwin/2002-11/msg00609.html}.
 
 @subsection info error "dir: No such file or directory"
 
