@@ -1,3 +1,24 @@
+2002-09-30  Robert Collins <rbtcollins@hotmail.com>
+
+	* pthread.cc (pthread_mutex_init): Use new pthread_mutex::init.
+	* thread.cc: Change __pthread_mutex_init to pthread_mutex::init
+	throughout.
+       	(MTinterface::Init): Initialise pthread_mutex support.
+	(pthread_mutex::mutexInitializationLock): Instantiate.
+	(pthread_mutex::initMutex): New method.
+	(__pthread_cond_dowait): Don't dereference untrusted pointers.
+	Use the new pthread_mutex::init method.
+	(__pthread_condattr_init): Don't dereference untrusted pointers.
+	(__pthread_mutex_init): Rename to pthread_mutex::init.
+	Lock and release mutexInitializationLock to prevent races on
+	mutex initialisation.
+	* thread.h (pthread_mutex::initMutex): New method, initialise 
+	pthread_mutex supporting state on process initialisation.
+	(pthread_mutex::init): Initialise a single mutex.
+	(pthread_mutex::mutexInitializationLock): A win32 mutex for
+	syncronising pthread mutex initialisation.
+	(__pthread_mutex_init): Remove this.
+
 2002-09-28  Christopher Faylor  <cgf@redhat.com>
 
 	* thread.h (verifyable_object:~verifyable_object): Make virtual.

@@ -291,6 +291,9 @@ public:
   static bool isGoodObject(pthread_mutex_t const *);
   static bool isGoodInitializer(pthread_mutex_t const *);
   static bool isGoodInitializerOrObject(pthread_mutex_t const *);
+  static void initMutex ();
+  static int init (pthread_mutex_t *, const pthread_mutexattr_t *);
+  
   CRITICAL_SECTION criticalsection;
   HANDLE win32_obj_id;
   LONG condwaits;
@@ -305,6 +308,8 @@ public:
   pthread_mutex (pthread_mutexattr * = NULL);
   pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
   ~pthread_mutex ();
+private:
+  static HANDLE mutexInitializationLock;
 };
 
 class pthread:public verifyable_object
@@ -561,7 +566,6 @@ int __pthread_sigmask (int operation, const sigset_t * set,
 int __pthread_equal (pthread_t * t1, pthread_t * t2);
 
 /* Mutexes  */
-int __pthread_mutex_init (pthread_mutex_t *, const pthread_mutexattr_t *);
 int __pthread_mutex_lock (pthread_mutex_t *);
 int __pthread_mutex_trylock (pthread_mutex_t *);
 int __pthread_mutex_unlock (pthread_mutex_t *);

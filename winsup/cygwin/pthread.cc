@@ -234,7 +234,7 @@ pthread_equal (pthread_t t1, pthread_t t2)
 int
 pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
 {
-  return __pthread_mutex_init (mutex, attr);
+  return pthread_mutex::init (mutex, attr);
 }
 
 int

@@ -190,6 +190,7 @@ MTinterface::Init (int forked)
   threadcount = 1; /*1 current thread when Init occurs.*/
 
   pthread::initMainThread (&mainthread, myself->hProcess);
+  pthread_mutex::initMutex ();
 
   if (forked)
     return;
@@ -1095,6 +1096,21 @@ pthread_mutex::isGoodInitializerOrObject (pthread_mutex_t const *mutex)
   if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER) == INVALID_OBJECT)
     return false;
   return true;
+}
+
+HANDLE pthread_mutex::mutexInitializationLock;
+
+/* We can only be called once.
+ * TODO: (no rush) use a non copied memory section to 
+ * hold an initialization flag.
+ */
+void
+pthread_mutex::initMutex ()
+{
+  mutexInitializationLock = CreateMutex (NULL, FALSE, NULL);
+  if (!mutexInitializationLock)
+    api_fatal ("Could not create win32 Mutex for pthread mutex static initializer support. The error code was %d\n", GetLastError());
+  
 }
 
 pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREAD_MUTEX_MAGIC)
@@ -2034,8 +2050,8 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 // broadcast occurs -  we miss the broadcast. the functions aren't split properly.
   int rv;
   pthread_mutex **themutex = NULL;
-  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
-    __pthread_mutex_init (mutex, NULL);
+  if (pthread_mutex::isGoodInitializer (mutex))
+    pthread_mutex::init (mutex, NULL);
   themutex = mutex;
   if (pthread_cond::isGoodInitializer (cond))
     __pthread_cond_init (cond, NULL);
@@ -2109,7 +2125,8 @@ pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
 int
 __pthread_condattr_init (pthread_condattr_t *condattr)
 {
-  /* FIXME: we dereference blindly! */
+  if (check_valid_pointer (condattr))
+    return EINVAL;
   *condattr = new pthread_condattr;
   if (!pthread_condattr::isGoodObject (condattr))
     {
@@ -2210,23 +2227,37 @@ __pthread_equal (pthread_t *t1, pthread_t *t2)
  */
 
 int
-__pthread_mutex_init (pthread_mutex_t *mutex,
+pthread_mutex::init (pthread_mutex_t *mutex,
 		      const pthread_mutexattr_t *attr)
 {
   if (attr && !pthread_mutexattr::isGoodObject (attr) || check_valid_pointer (mutex))
     return EINVAL;
+  DWORD waitResult = WaitForSingleObject (mutexInitializationLock, INFINITE);
+  if (waitResult != WAIT_OBJECT_0)
+    {
+      system_printf ("Recieved a unexpected wait result on mutexInitializationLock %d\n", waitResult);
+      return EINVAL;
+    }
 
   /* FIXME: bugfix: we should check *mutex being a valid address */
-  if (pthread_mutex::isGoodObject (mutex))
-    return EBUSY;
+  if (isGoodObject (mutex))
+    {
+      if (! ReleaseMutex(mutexInitializationLock))
+	  system_printf ("Recieved a unexpected result releasing mutexInitializationLock %d\n", GetLastError());
+      return EBUSY;
+    }
 
   *mutex = new pthread_mutex (attr ? (*attr) : NULL);
-  if (!pthread_mutex::isGoodObject (mutex))
+  if (!isGoodObject (mutex))
     {
       delete (*mutex);
       *mutex = NULL;
+      if (! ReleaseMutex(mutexInitializationLock))
+	  system_printf ("Recieved a unexpected result releasing mutexInitializationLock %d\n", GetLastError());
       return EAGAIN;
     }
+  if (! ReleaseMutex(mutexInitializationLock))
+      system_printf ("Recieved a unexpected result releasing mutexInitializationLock %d\n", GetLastError());
   return 0;
 }
 
@@ -2236,7 +2267,7 @@ __pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
 {
   pthread_mutex_t *themutex = (pthread_mutex_t *) mutex;
   if (pthread_mutex::isGoodInitializer (mutex))
-    __pthread_mutex_init ((pthread_mutex_t *) mutex, NULL);
+    pthread_mutex::init ((pthread_mutex_t *) mutex, NULL);
   if (!pthread_mutex::isGoodObject (themutex))
     return EINVAL;
   /*We don't define _POSIX_THREAD_PRIO_PROTECT because we do't currently support
@@ -2266,10 +2297,13 @@ __pthread_mutex_lock (pthread_mutex_t *mutex)
     case VALID_STATIC_OBJECT:
       if (pthread_mutex::isGoodInitializer (mutex))
 	{
-	  int rv = __pthread_mutex_init (mutex, NULL);
+	  int rv = pthread_mutex::init (mutex, NULL);
 	  if (rv)
 	    return rv;
 	}
+      /* No else needed. If it's been initialized while we waited,
+       * we can just attempt to lock it
+       */
       break;
     case VALID_OBJECT:
       break;
@@ -2283,7 +2317,7 @@ __pthread_mutex_trylock (pthread_mutex_t *mutex)
 {
   pthread_mutex_t *themutex = mutex;
   if (pthread_mutex::isGoodInitializer (mutex))
-    __pthread_mutex_init (mutex, NULL);
+    pthread_mutex::init (mutex, NULL);
   if (!pthread_mutex::isGoodObject (themutex))
     return EINVAL;
   if ((*themutex)->TryLock ())
@@ -2295,7 +2329,7 @@ int
 __pthread_mutex_unlock (pthread_mutex_t *mutex)
 {
   if (pthread_mutex::isGoodInitializer (mutex))
-    __pthread_mutex_init (mutex, NULL);
+    pthread_mutex::init (mutex, NULL);
   if (!pthread_mutex::isGoodObject (mutex))
     return EINVAL;
   (*mutex)->UnLock ();
@@ -2325,7 +2359,7 @@ __pthread_mutex_setprioceiling (pthread_mutex_t *mutex, int prioceiling,
 {
   pthread_mutex_t *themutex = mutex;
   if (pthread_mutex::isGoodInitializer (mutex))
-    __pthread_mutex_init (mutex, NULL);
+    pthread_mutex::init (mutex, NULL);
   if (!pthread_mutex::isGoodObject (themutex))
     return EINVAL;
   return ENOSYS;
