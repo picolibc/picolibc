@@ -41,7 +41,8 @@ static const int PROCESS_CTTY = 11;
 static const int PROCESS_STAT = 12;
 static const int PROCESS_STATM = 13;
 
-static const char *process_listing[] = {
+static const char * const process_listing[] =
+{
   ".",
   "..",
   "ppid",
@@ -59,14 +60,17 @@ static const char *process_listing[] = {
   NULL
 };
 
-static const int PROCESS_LINK_COUNT = (sizeof(process_listing) / sizeof(const char *)) - 1;
+static const int PROCESS_LINK_COUNT =
+  (sizeof(process_listing) / sizeof(const char *)) - 1;
 
 static off_t format_process_stat (_pinfo *p, char *destbuf, size_t maxsize);
 static off_t format_process_status (_pinfo *p, char *destbuf, size_t maxsize);
 static off_t format_process_statm (_pinfo *p, char *destbuf, size_t maxsize);
 static int get_process_state (DWORD dwProcessId);
-static bool get_mem_values(DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss, unsigned long *vmtext,
-			   unsigned long *vmdata, unsigned long *vmlib, unsigned long *vmshare);
+static bool get_mem_values(DWORD dwProcessId, unsigned long *vmsize,
+			   unsigned long *vmrss, unsigned long *vmtext,
+			   unsigned long *vmdata, unsigned long *vmlib,
+			   unsigned long *vmshare);
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
  * <0 if path is a file.
@@ -159,6 +163,8 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
   if (!res)
     goto out;
 
+  set_nohandle (true);
+
   const char *path;
   path = get_name () + proc_len + 1;
   pid = atoi (path);
@@ -215,48 +221,37 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
       goto out;
     }
 
-  {
-  pinfo p (pid);
-  if (!p)
-    {
-      set_errno (ENOENT);
-      res = 0;
-      goto out;
-    }
-
   fileid = process_file_no;
-  this->p = &p;
-  fill_filebuf ();
+  if (!fill_filebuf ())
+  	{
+	  res = 0;
+	  goto out;
+	}
 
   if (flags & O_APPEND)
     position = filesize;
   else
     position = 0;
-  this->p = NULL;
-  }
 
 success:
   res = 1;
-  set_flags (flags & ~O_TEXT, O_BINARY);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
   syscall_printf ("%d = fhandler_proc::open (%p, %d)", res, flags, mode);
   return res;
 }
 
-void
+bool
 fhandler_process::fill_filebuf ()
 {
-  pinfo pmaybe;
+  pinfo p (pid);
 
   if (!p)
     {
-      pmaybe.init (pid);
-      p = &pmaybe;
+      set_errno (ENOENT);
+      return false;
     }
-
-  if (!p)
-    return;
 
   switch (fileid)
     {
@@ -268,27 +263,27 @@ fhandler_process::fill_filebuf ()
     case PROCESS_PPID:
       {
 	if (!filebuf)
-	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
 	int num;
 	switch (fileid)
 	  {
 	  case PROCESS_PPID:
-	    num = (*p)->ppid;
+	    num = p->ppid;
 	    break;
 	  case PROCESS_UID:
-	    num = (*p)->uid;
+	    num = p->uid;
 	    break;
 	  case PROCESS_PGID:
-	    num = (*p)->pgid;
+	    num = p->pgid;
 	    break;
 	  case PROCESS_SID:
-	    num = (*p)->sid;
+	    num = p->sid;
 	    break;
 	  case PROCESS_GID:
-	    num = (*p)->gid;
+	    num = p->gid;
 	    break;
 	  case PROCESS_CTTY:
-	    num = (*p)->ctty;
+	    num = p->ctty;
 	    break;
 	  default: // what's this here for?
 	    num = 0;
@@ -301,12 +296,12 @@ fhandler_process::fill_filebuf ()
     case PROCESS_EXENAME:
       {
 	if (!filebuf)
-	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = MAX_PATH);
-	if ((*p)->process_state & (PID_ZOMBIE | PID_EXITED))
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = MAX_PATH);
+	if (p->process_state & (PID_ZOMBIE | PID_EXITED))
 	  strcpy (filebuf, "<defunct>");
 	else
 	  {
-	    mount_table->conv_to_posix_path ((*p)->progname, filebuf, 1);
+	    mount_table->conv_to_posix_path (p->progname, filebuf, 1);
 	    int len = strlen (filebuf);
 	    if (len > 4)
 	      {
@@ -321,17 +316,17 @@ fhandler_process::fill_filebuf ()
     case PROCESS_WINPID:
       {
 	if (!filebuf)
-	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
-	__small_sprintf (filebuf, "%d\n", (*p)->dwProcessId);
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
+	__small_sprintf (filebuf, "%d\n", p->dwProcessId);
 	filesize = strlen (filebuf);
 	break;
       }
     case PROCESS_WINEXENAME:
       {
-	int len = strlen ((*p)->progname);
+	int len = strlen (p->progname);
 	if (!filebuf)
-	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = (len + 2));
-	strcpy (filebuf, (*p)->progname);
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = (len + 2));
+	strcpy (filebuf, p->progname);
 	filebuf[len] = '\n';
 	filesize = len + 1;
 	break;
@@ -340,27 +335,26 @@ fhandler_process::fill_filebuf ()
       {
 	if (!filebuf)
 	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-	filesize = format_process_status ((*p), filebuf, bufalloc);
+	filesize = format_process_status (*p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_STAT:
       {
 	if (!filebuf)
 	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-	filesize = format_process_stat ((*p), filebuf, bufalloc);
+	filesize = format_process_stat (*p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_STATM:
       {
 	if (!filebuf)
 	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-	filesize = format_process_statm ((*p), filebuf, bufalloc);
+	filesize = format_process_statm (*p, filebuf, bufalloc);
 	break;
       }
     }
 
-  if (p == &pmaybe)
-    p = NULL;
+  return true;
 }
 
 static
@@ -375,7 +369,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 		vmsize = 0UL, vmrss = 0UL, vmmaxrss = 0UL;
   int priority = 0;
   if (p->process_state & (PID_ZOMBIE | PID_EXITED))
-    strcpy (cmd, "<defunct");
+    strcpy (cmd, "<defunct>");
   else
     {
       strcpy(cmd, p->progname);
@@ -598,11 +592,12 @@ static
 off_t
 format_process_statm (_pinfo *p, char *destbuf, size_t maxsize)
 {
-  unsigned long vmsize = 0UL, vmrss = 0UL, vmtext = 0UL, vmdata = 0UL, vmlib = 0UL,
-		vmshare = 0UL;
+  unsigned long vmsize = 0UL, vmrss = 0UL, vmtext = 0UL, vmdata = 0UL,
+  		vmlib = 0UL, vmshare = 0UL;
   if (wincap.is_winnt ())
     {
-      if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata, &vmlib, &vmshare))
+      if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
+			   &vmlib, &vmshare))
 	return 0;
     }
   return __small_sprintf (destbuf, "%ld %ld %ld %ld %ld %ld %ld",

@@ -31,12 +31,6 @@ shared_info NO_COPY *cygwin_shared = NULL;
 mount_info NO_COPY *mount_table = NULL;
 HANDLE cygwin_mount_h;
 
-/* General purpose security attribute objects for global use. */
-SECURITY_ATTRIBUTES NO_COPY sec_none;
-SECURITY_ATTRIBUTES NO_COPY sec_none_nih;
-SECURITY_ATTRIBUTES NO_COPY sec_all;
-SECURITY_ATTRIBUTES NO_COPY sec_all_nih;
-
 char * __stdcall
 shared_name (const char *str, int num)
 {
@@ -211,94 +205,4 @@ shared_info::heap_chunk_size ()
     }
 
   return heap_chunk_in_mb << 20;
-}
-
-/*
- * Function to return a common SECURITY_DESCRIPTOR * that
- * allows all access.
- */
-
-static NO_COPY SECURITY_DESCRIPTOR *null_sdp = 0;
-
-SECURITY_DESCRIPTOR *__stdcall
-get_null_sd ()
-{
-  static NO_COPY SECURITY_DESCRIPTOR sd;
-
-  if (null_sdp == 0)
-    {
-      InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-      SetSecurityDescriptorDacl (&sd, TRUE, 0, FALSE);
-      null_sdp = &sd;
-    }
-  return null_sdp;
-}
-
-BOOL
-sec_acl (PACL acl, BOOL admins, PSID sid1, PSID sid2)
-{
-  size_t acl_len = MAX_DACL_LEN(5);
-
-  if (!InitializeAcl (acl, acl_len, ACL_REVISION))
-    {
-      debug_printf ("InitializeAcl %E");
-      return FALSE;
-    }
-  if (sid2)
-    if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			      GENERIC_ALL, sid2))
-      debug_printf ("AddAccessAllowedAce(sid2) %E");
-  if (sid1)
-    if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			      GENERIC_ALL, sid1))
-      debug_printf ("AddAccessAllowedAce(sid1) %E", sid1);
-  if (admins)
-    if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			      GENERIC_ALL, well_known_admins_sid))
-      debug_printf ("AddAccessAllowedAce(admin) %E");
-  if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			    GENERIC_ALL, well_known_system_sid))
-    debug_printf ("AddAccessAllowedAce(system) %E");
-#if 0 /* Does not seem to help */
-  if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			    GENERIC_ALL, well_known_creator_owner_sid))
-    debug_printf ("AddAccessAllowedAce(creator_owner) %E");
-#endif
-  return TRUE;
-}
-
-PSECURITY_ATTRIBUTES __stdcall
-__sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
-{
-  PSECURITY_ATTRIBUTES psa = (PSECURITY_ATTRIBUTES) sa_buf;
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR)
-			     ((char *) sa_buf + sizeof (*psa));
-  PACL acl = (PACL) ((char *) sa_buf + sizeof (*psa) + sizeof (*psd));
-
-  cygsid sid;
-
-  if (!(sid = cygheap->user.orig_sid ()) ||
-	  (!sec_acl (acl, TRUE, sid, sid2)))
-    return inherit ? &sec_none : &sec_none_nih;
-
-  if (!InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION))
-    debug_printf ("InitializeSecurityDescriptor %E");
-
-/*
- * Setting the owner lets the created security attribute not work
- * on NT4 SP3 Server. Don't know why, but the function still does
- * what it should do also if the owner isn't set.
-*/
-#if 0
-  if (!SetSecurityDescriptorOwner (psd, sid, FALSE))
-    debug_printf ("SetSecurityDescriptorOwner %E");
-#endif
-
-  if (!SetSecurityDescriptorDacl (psd, TRUE, acl, FALSE))
-    debug_printf ("SetSecurityDescriptorDacl %E");
-
-  psa->nLength = sizeof (SECURITY_ATTRIBUTES);
-  psa->lpSecurityDescriptor = psd;
-  psa->bInheritHandle = inherit;
-  return psa;
 }

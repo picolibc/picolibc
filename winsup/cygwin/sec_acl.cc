@@ -128,7 +128,8 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	allow |= FILE_DELETE_CHILD;
       /* Set inherit property. */
       DWORD inheritance = (aclbufp[i].a_type & ACL_DEFAULT)
-			  ? INHERIT_ONLY : DONT_INHERIT;
+			  ? (SUB_CONTAINERS_AND_OBJECTS_INHERIT | INHERIT_ONLY)
+			  : NO_INHERITANCE;
       /*
        * If a specific acl contains a corresponding default entry with
        * identical permissions, only one Windows ACE with proper
@@ -142,7 +143,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	  && pos < nentries
 	  && aclbufp[i].a_perm == aclbufp[pos].a_perm)
 	{
-	  inheritance = INHERIT_ALL;
+	  inheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
 	  /* This eliminates the corresponding default entry. */
 	  aclbufp[pos].a_type = 0;
 	}
@@ -344,12 +345,12 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
 	}
       if (!type)
 	continue;
-      if (!(ace->Header.AceFlags & INHERIT_ONLY_ACE))
+      if (!(ace->Header.AceFlags & INHERIT_ONLY))
 	{
 	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
 	    getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
 	}
-      if ((ace->Header.AceFlags & INHERIT_ALL)
+      if ((ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
 	  && (attr & FILE_ATTRIBUTE_DIRECTORY))
 	{
 	  type |= ACL_DEFAULT;

@@ -257,7 +257,6 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	     sys_mbstowcs (wuser, winname (), sizeof (wuser) / sizeof (*wuser));
 	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui)))
 		{
-		  char *p;
 		  sys_wcstombs (homepath_env_buf, ui->usri3_home_dir, MAX_PATH);
 		  if (!homepath_env_buf[0])
 		    {
@@ -265,10 +264,8 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 				    MAX_PATH);
 		      if (homepath_env_buf[0])
 			strcat (homepath_env_buf, "\\");
-		      else if (!GetSystemDirectory (homepath_env_buf, MAX_PATH))
-			strcpy (homepath_env_buf, "c:\\");
-		      else if ((p = strchr (homepath_env_buf, '\\')))
-			p[1] = '\0';
+		      else
+			cygwin_conv_to_full_win32_path ("/", homepath_env_buf);
 		    }
 		}
 	    }

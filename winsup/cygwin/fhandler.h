@@ -1090,7 +1090,7 @@ class fhandler_virtual : public fhandler_base
   int open (path_conv *, int flags, mode_t mode = 0);
   int close (void);
   int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
-  virtual void fill_filebuf ();
+  virtual bool fill_filebuf ();
 };
 
 class fhandler_proc: public fhandler_virtual
@@ -1104,11 +1104,13 @@ class fhandler_proc: public fhandler_virtual
 
   int open (path_conv *real_path, int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
-  void fill_filebuf ();
+  bool fill_filebuf ();
 };
 
 class fhandler_registry: public fhandler_proc
 {
+ private:
+  char *value_name;
  public:
   fhandler_registry ();
   int exists();
@@ -1120,22 +1122,21 @@ class fhandler_registry: public fhandler_proc
 
   int open (path_conv *real_path, int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
-  HKEY open_key(const char *name, REGSAM access = KEY_READ, bool isValue = false);
-  void fill_filebuf ();
+  bool fill_filebuf ();
+  int close (void);
 };
 
 class pinfo;
 class fhandler_process: public fhandler_proc
 {
   pid_t pid;
-  pinfo *p;
  public:
   fhandler_process ();
   int exists();
   struct dirent *readdir (DIR *);
   int open (path_conv *real_path, int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
-  void fill_filebuf ();
+  bool fill_filebuf ();
 };
 
 typedef union

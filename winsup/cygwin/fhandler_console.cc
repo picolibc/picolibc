@@ -538,7 +538,7 @@ fhandler_console::open (path_conv *, int flags, mode_t)
   set_io_handle (INVALID_HANDLE_VALUE);
   set_output_handle (INVALID_HANDLE_VALUE);
 
-  set_flags (flags & ~O_TEXT, O_BINARY);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
 
   /* Open the input handle as handle_ */
   h = CreateFileA ("CONIN$", GENERIC_READ|GENERIC_WRITE,

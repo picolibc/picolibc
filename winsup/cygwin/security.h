@@ -8,9 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#define DONT_INHERIT (0)
-#define INHERIT_ALL  (CONTAINER_INHERIT_ACE|OBJECT_INHERIT_ACE)
-#define INHERIT_ONLY (INHERIT_ONLY_ACE|CONTAINER_INHERIT_ACE|OBJECT_INHERIT_ACE)
+#include <accctrl.h>
 
 #define DEFAULT_UID DOMAIN_USER_RID_ADMIN
 #define DEFAULT_GID DOMAIN_ALIAS_RID_ADMINS
@@ -169,6 +167,8 @@ int __stdcall get_file_attribute (int, const char *, int *,
 				  __uid32_t * = NULL, __gid32_t * = NULL);
 int __stdcall set_file_attribute (int, const char *, int);
 int __stdcall set_file_attribute (int, const char *, __uid32_t, __gid32_t, int);
+int __stdcall get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, int *,
+				  __uid32_t * = NULL, __gid32_t * = NULL);
 LONG __stdcall read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size);
 LONG __stdcall write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size);
 BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);

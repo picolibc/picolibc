@@ -4,8 +4,12 @@ EXPORTS
 __assert
 __eprintf
 __errno
+__fpclassifyd
+__fpclassifyf
 __infinity
 __main
+__signbitd
+__signbitf
 __signgam
 __srget
 __swbuf

@@ -33,7 +33,7 @@ static const int registry_len = sizeof ("registry") - 1;
  * make up the value index if we are enuerating values.
  */
 static const __off32_t REG_ENUM_VALUES_MASK = 0x8000000;
-static const __off32_t REG_POSITION_MASK    = 0xffff;
+static const __off32_t REG_POSITION_MASK = 0xffff;
 
 /* List of root keys in /proc/registry.
  * Possibly we should filter out those not relevant to the flavour of Windows
@@ -49,7 +49,7 @@ static const char *registry_listing[] =
   "HKEY_LOCAL_MACHINE",
   "HKEY_USERS",
   "HKEY_DYN_DATA",		// 95/98/Me
-  "HKEY_PERFOMANCE_DATA",       // NT/2000/XP
+  "HKEY_PERFOMANCE_DATA",	// NT/2000/XP
   NULL
 };
 
@@ -66,7 +66,7 @@ static const HKEY registry_keys[] =
   HKEY_PERFORMANCE_DATA
 };
 
-static const int ROOT_KEY_COUNT = sizeof(registry_keys) / sizeof(HKEY);
+static const int ROOT_KEY_COUNT = sizeof (registry_keys) / sizeof (HKEY);
 
 /* These get added to each subdirectory in /proc/registry.
  * If we wanted to implement writing, we could maybe add a '.writable' entry or
@@ -79,10 +79,13 @@ static const char *special_dot_files[] =
   NULL
 };
 
-static const int SPECIAL_DOT_FILE_COUNT = (sizeof(special_dot_files) / sizeof(const char *)) - 1;
+static const int SPECIAL_DOT_FILE_COUNT =
+  (sizeof (special_dot_files) / sizeof (const char *)) - 1;
 
 /* Name given to default values */
 static const char *DEFAULT_VALUE_NAME = "@";
+
+static HKEY open_key (const char *name, REGSAM access, bool isValue);
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
  * <0 if path is a file.
@@ -103,10 +106,7 @@ fhandler_registry::exists ()
 
   const char *path = get_name ();
   debug_printf ("exists (%s)", path);
-  path += proc_len + 1 + registry_len;
-
-  while (SLASH_P (*path))
-    path++;
+  path += proc_len + registry_len + 2;
   if (*path == 0)
     {
       file_type = 2;
@@ -132,44 +132,52 @@ fhandler_registry::exists ()
       goto out;
     }
 
-  hKey = open_key (path, KEY_READ, true);
-  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
-    return 0;
+  hKey = open_key (path, KEY_READ, false);
+  if (hKey != (HKEY) INVALID_HANDLE_VALUE)
+    file_type = 1;
+  else
+    {
+      hKey = open_key (path, KEY_READ, true);
+      if (hKey == (HKEY) INVALID_HANDLE_VALUE)
+	return 0;
 
-  while (ERROR_SUCCESS ==
-	 (error = RegEnumKeyEx (hKey, index++, buf, &buf_size, NULL, NULL,
-				NULL, NULL)) || (error == ERROR_MORE_DATA))
-    {
-      if (pathmatch (buf, file))
+      while (ERROR_SUCCESS ==
+	     (error = RegEnumKeyEx (hKey, index++, buf, &buf_size, NULL, NULL,
+				    NULL, NULL))
+	     || (error == ERROR_MORE_DATA))
 	{
-	  file_type = 1;
+	  if (pathmatch (buf, file))
+	    {
+	      file_type = 1;
+	      goto out;
+	    }
+	  buf_size = MAX_PATH;
+	}
+      if (error != ERROR_NO_MORE_ITEMS)
+	{
+	  seterrno_from_win_error (__FILE__, __LINE__, error);
 	  goto out;
 	}
+      index = 0;
       buf_size = MAX_PATH;
-    }
-  if (error != ERROR_NO_MORE_ITEMS)
-    {
-      seterrno_from_win_error (__FILE__, __LINE__, error);
-      goto out;
-    }
-  index = 0;
-  buf_size = MAX_PATH;
-  while (ERROR_SUCCESS ==
-	 (error = RegEnumValue (hKey, index++, buf, &buf_size, NULL, NULL,
-				NULL, NULL)) || (error == ERROR_MORE_DATA))
-    {
-      if (pathmatch (buf, file) || (buf[0] == '\0' &&
-				    pathmatch (file, DEFAULT_VALUE_NAME)))
+      while (ERROR_SUCCESS ==
+	     (error = RegEnumValue (hKey, index++, buf, &buf_size, NULL, NULL,
+				    NULL, NULL))
+	     || (error == ERROR_MORE_DATA))
 	{
-	  file_type = -1;
+	  if (pathmatch (buf, file) || (buf[0] == '\0' &&
+					pathmatch (file, DEFAULT_VALUE_NAME)))
+	    {
+	      file_type = -1;
+	      goto out;
+	    }
+	  buf_size = MAX_PATH;
+	}
+      if (error != ERROR_NO_MORE_ITEMS)
+	{
+	  seterrno_from_win_error (__FILE__, __LINE__, error);
 	  goto out;
 	}
-      buf_size = MAX_PATH;
-    }
-  if (error != ERROR_NO_MORE_ITEMS)
-    {
-      seterrno_from_win_error (__FILE__, __LINE__, error);
-      goto out;
     }
 out:
   if (hKey != (HKEY) INVALID_HANDLE_VALUE)
@@ -178,12 +186,12 @@ out:
 }
 
 fhandler_registry::fhandler_registry ():
-  fhandler_proc (FH_REGISTRY)
+fhandler_proc (FH_REGISTRY)
 {
 }
 
 int
-fhandler_registry::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_registry::fstat (struct __stat64 *buf, path_conv * pc)
 {
   this->fhandler_base::fstat (buf, pc);
   buf->st_mode &= ~_IFMT & NO_W;
@@ -205,6 +213,61 @@ fhandler_registry::fstat (struct __stat64 *buf, path_conv *pc)
       buf->st_mode |= S_IFREG;
       buf->st_mode &= NO_X;
       break;
+    }
+  if (file_type != 0 && file_type != 2)
+    {
+      HKEY hKey;
+      const char *path = get_name () + proc_len + registry_len + 2;
+      hKey =
+	open_key (path, STANDARD_RIGHTS_READ | KEY_QUERY_VALUE,
+		  (file_type < 0) ? true : false);
+
+      if (hKey != (HKEY) INVALID_HANDLE_VALUE)
+	{
+	  FILETIME ftLastWriteTime;
+	  DWORD subkey_count;
+	  if (ERROR_SUCCESS ==
+	      RegQueryInfoKey (hKey, NULL, NULL, NULL, &subkey_count, NULL,
+			       NULL, NULL, NULL, NULL, NULL,
+			       &ftLastWriteTime))
+	    {
+	      to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
+	      buf->st_ctim = buf->st_mtim;
+	      time_as_timestruc_t (&buf->st_atim);
+	      if (file_type > 0)
+		buf->st_nlink = subkey_count;
+	      else
+		{
+		  int pathlen = strlen (path);
+		  const char *value_name = path + pathlen - 1;
+		  if (SLASH_P (*value_name) && pathlen > 1)
+		    value_name--;
+		  while (!SLASH_P (*value_name))
+		    value_name--;
+		  value_name++;
+		  DWORD dwSize;
+		  if (ERROR_SUCCESS ==
+		      RegQueryValueEx (hKey, value_name, NULL, NULL, NULL,
+				       &dwSize))
+		    buf->st_size = dwSize;
+		}
+	      __uid32_t uid;
+	      __gid32_t gid;
+	      if (get_object_attribute
+		  ((HANDLE) hKey, SE_REGISTRY_KEY, &buf->st_mode, &uid,
+		   &gid) == 0)
+		{
+		  buf->st_uid = uid;
+		  buf->st_gid = gid;
+		  buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
+		  if (file_type > 0)
+		    buf->st_mode |= S_IFDIR;
+		  else
+		    buf->st_mode &= NO_X;
+		}
+	    }
+	  RegCloseKey (hKey);
+	}
     }
   return 0;
 }
@@ -230,14 +293,15 @@ fhandler_registry::readdir (DIR * dir)
   if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE
       && dir->__d_position == 0)
     {
-      handle = open_key (path + 1);
-      dir->__d_u.__d_data.__handle = handle;;
+      handle = open_key (path + 1, KEY_READ, false);
+      dir->__d_u.__d_data.__handle = handle;
     }
   if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE)
     goto out;
   if (dir->__d_position < SPECIAL_DOT_FILE_COUNT)
     {
-      strcpy (dir->__d_dirent->d_name, special_dot_files[dir->__d_position++]);
+      strcpy (dir->__d_dirent->d_name,
+	      special_dot_files[dir->__d_position++]);
       res = dir->__d_dirent;
       goto out;
     }
@@ -252,7 +316,8 @@ retry:
   else
     error =
       RegEnumKeyEx ((HKEY) dir->__d_u.__d_data.__handle, dir->__d_position -
-		    SPECIAL_DOT_FILE_COUNT, buf, &buf_size, NULL, NULL, NULL, NULL);
+		    SPECIAL_DOT_FILE_COUNT, buf, &buf_size, NULL, NULL, NULL,
+		    NULL);
   if (error == ERROR_NO_MORE_ITEMS
       && (dir->__d_position & REG_ENUM_VALUES_MASK) == 0)
     {
@@ -280,7 +345,7 @@ retry:
     dir->__d_position += 0x10000;
   res = dir->__d_dirent;
 out:
-  syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir, buf);
+  syscall_printf ("%p = readdir (%p)", &dir->__d_dirent, dir);
   return res;
 }
 
@@ -329,13 +394,11 @@ fhandler_registry::closedir (DIR * dir)
 }
 
 int
-fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
+fhandler_registry::open (path_conv * pc, int flags, mode_t mode)
 {
-  DWORD type, size;
-  LONG error;
-  HKEY hKey = (HKEY) INVALID_HANDLE_VALUE;
   int pathlen;
   const char *file;
+  HKEY handle;
 
   int res = fhandler_virtual::open (pc, flags, mode);
   if (!res)
@@ -418,33 +481,88 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
       goto out;
     }
 
-  hKey = open_key (path, KEY_READ, true);
-  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
+  handle = open_key (path, KEY_READ, true);
+  if (handle == (HKEY) INVALID_HANDLE_VALUE)
     {
       res = 0;
       goto out;
     }
-  if (pathmatch (file, DEFAULT_VALUE_NAME))
-    file = "";
 
-  if (hKey != HKEY_PERFORMANCE_DATA)
+  set_io_handle (handle);
+
+  if (pathmatch (file, DEFAULT_VALUE_NAME))
+    value_name = cstrdup ("");
+  else
+    value_name = cstrdup (file);
+
+  if (!fill_filebuf ())
     {
-      error = RegQueryValueEx (hKey, file, NULL, &type, NULL, &size);
+      RegCloseKey (handle);
+      res = 0;
+      goto out;
+    }
+
+  if (flags & O_APPEND)
+    position = filesize;
+  else
+    position = 0;
+
+success:
+  res = 1;
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
+  set_open_status ();
+out:
+  syscall_printf ("%d = fhandler_registry::open (%p, %d)", res, flags, mode);
+  return res;
+}
+
+int
+fhandler_registry::close ()
+{
+  int res = fhandler_virtual::close ();
+  if (res != 0)
+    return res;
+  HKEY handle = (HKEY) get_handle ();
+  if (handle != (HKEY) INVALID_HANDLE_VALUE)
+    {
+      if (RegCloseKey (handle) != ERROR_SUCCESS)
+	{
+	  __seterrno ();
+	  res = -1;
+	}
+    }
+  if (value_name)
+    cfree (value_name);
+  return 0;
+}
+
+bool
+fhandler_registry::fill_filebuf ()
+{
+  DWORD type, size;
+  LONG error;
+  HKEY handle = (HKEY) get_handle ();
+  if (handle != HKEY_PERFORMANCE_DATA)
+    {
+      error = RegQueryValueEx (handle, value_name, NULL, &type, NULL, &size);
       if (error != ERROR_SUCCESS)
 	{
-	  seterrno_from_win_error (__FILE__, __LINE__, error);
-	  res = -1;
-	  goto out;
+	  if (error != ERROR_FILE_NOT_FOUND)
+	    {
+	      seterrno_from_win_error (__FILE__, __LINE__, error);
+	      return false;
+	    }
+	  goto value_not_found;
 	}
       bufalloc = size;
       filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
       error =
-	RegQueryValueEx (hKey, file, NULL, NULL, (BYTE *) filebuf, &size);
+	RegQueryValueEx (handle, value_name, NULL, NULL, (BYTE *) filebuf,
+			 &size);
       if (error != ERROR_SUCCESS)
 	{
 	  seterrno_from_win_error (__FILE__, __LINE__, error);
-	  res = 0;
-	  goto out;
+	  return true;
 	}
       filesize = size;
     }
@@ -460,43 +578,49 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
 	      filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
 	    }
 	  error =
-	    RegQueryValueEx (hKey, file, NULL, &type, (BYTE *) filebuf,
-			     &size);
-	  if (error != ERROR_SUCCESS && res != ERROR_MORE_DATA)
+	    RegQueryValueEx (handle, value_name, NULL, &type,
+			     (BYTE *) filebuf, &size);
+	  if (error != ERROR_SUCCESS && error != ERROR_MORE_DATA)
 	    {
-	      seterrno_from_win_error (__FILE__, __LINE__, error);
-	      res = 0;
-	      goto out;
+	      if (error != ERROR_FILE_NOT_FOUND)
+		{
+		  seterrno_from_win_error (__FILE__, __LINE__, error);
+		  return true;
+		}
+	      goto value_not_found;
 	    }
 	}
       while (error == ERROR_MORE_DATA);
       filesize = size;
     }
-
-  if (flags & O_APPEND)
-    position = filesize;
-  else
-    position = 0;
-
-success:
-  res = 1;
-  set_flags (flags & ~O_TEXT, O_BINARY);
-  set_open_status ();
-out:
-  if (hKey != (HKEY) INVALID_HANDLE_VALUE)
-    RegCloseKey (hKey);
-  syscall_printf ("%d = fhandler_registry::open (%p, %d)", res, flags, mode);
-  return res;
-}
-
-void
-fhandler_registry::fill_filebuf ()
-{
+  return true;
+value_not_found:
+  DWORD buf_size = MAX_PATH;
+  char buf[buf_size];
+  int index = 0;
+  while (ERROR_SUCCESS ==
+	 (error = RegEnumKeyEx (handle, index++, buf, &buf_size, NULL, NULL,
+				NULL, NULL)) || (error == ERROR_MORE_DATA))
+    {
+      if (pathmatch (buf, value_name))
+	{
+	  set_errno (EISDIR);
+	  return false;
+	}
+      buf_size = MAX_PATH;
+    }
+  if (error != ERROR_NO_MORE_ITEMS)
+    {
+      seterrno_from_win_error (__FILE__, __LINE__, error);
+      return false;
+    }
+  set_errno (ENOENT);
+  return false;
 }
 
 /* Auxillary member function to open registry keys.  */
-HKEY
-fhandler_registry::open_key (const char *name, REGSAM access, bool isValue)
+static HKEY
+open_key (const char *name, REGSAM access, bool isValue)
 {
   HKEY hKey = (HKEY) INVALID_HANDLE_VALUE;
   HKEY hParentKey = (HKEY) INVALID_HANDLE_VALUE;
@@ -517,10 +641,15 @@ fhandler_registry::open_key (const char *name, REGSAM access, bool isValue)
 
       if (hParentKey != (HKEY) INVALID_HANDLE_VALUE)
 	{
-	  hKey = (HKEY) INVALID_HANDLE_VALUE;
-	  LONG error = RegOpenKeyEx (hParentKey, component, 0, access, &hKey);
-	  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
+	  REGSAM effective_access = KEY_READ;
+	  if ((strchr (name, '/') == NULL && isValue == true) || *name == 0)
+	    effective_access = access;
+	  LONG
+	    error =
+	    RegOpenKeyEx (hParentKey, component, 0, effective_access, &hKey);
+	  if (error != ERROR_SUCCESS)
 	    {
+	      hKey = (HKEY) INVALID_HANDLE_VALUE;
 	      seterrno_from_win_error (__FILE__, __LINE__, error);
 	      return hKey;
 	    }

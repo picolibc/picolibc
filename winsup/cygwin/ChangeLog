@@ -1,3 +1,146 @@
+2002-07-02  Egor Duda <deo@logos-m.ru>
+
+	* include/cygwin/version.h: Bump API minor version.
+
+2002-07-01  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (get_logon_server): Interpret a zero length
+	domain as the local domain.
+	(get_group_sidlist): Add authenticated users SID to SYSTEM's group
+	list instead of SYSTEM itself.
+	(verify_token): Accept the primary group sid if it equals
+	the token user sid.
+
+2002-07-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (__fpclassifyd): Add symbol.
+	(__fpclassifyf): Ditto.
+	(__signbitd): Ditto.
+	(__signbitf): Ditto.
+
+2002-07-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.h (DONT_INHERIT): Eliminate definition.
+	(INHERIT_ALL): Ditto.
+	(INHERIT_ONLY): Ditto.
+	* sec_acl.cc: Use appropriate defines from accctrl.h instead of the
+	above throughout.
+	* security.cc: Ditto.
+
+2002-07-01  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* syscalls.c (seteuid32): Return immediately if the program is not
+	impersonated and both uid and gid are original.
+	(setegid32): Return immediately if the new gid is the current egid.
+
+2002-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (seteuid32): Fix incorrect placement of Pierre's patch
+	below.
+
+2002-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (seteuid32): Fix incorrect use of system_printf.
+
+2002-07-02  Christopher January  <chris@atomice.net>
+
+	* autoload.cc (GetSecurityInfo): Define new autoload function.
+	(RegQueryInfoKeyA): Ditto.
+	* fhandler.h (fhandler_virtual::fill_filebuf): Change return type to
+	bool.
+	(fhandler_proc::fill_filebuf): Ditto.
+	(fhandler_registry::fill_filebuf): Ditto.
+	(fhandler_process::fill_filebuf): Ditto.
+	(fhandler_registry::value_name): Add new member.
+	(fhandler_registry::close): Add new method.
+	(fhandler_process::p): Remove member.
+	* fhandler_proc.cc (fhandler_proc::open): Add set_nohandle after
+	calling superclass method.  Check return value of fill_filebuf.
+	(fhandler_proc::fill_filebuf): Change return type to bool.  Add return
+	statement.
+	* fhandler_process.cc (fhandler_process::open): Add set_nohandle after
+	calling superclass method.  Remove references to p.  Check return value
+	of fill_filebuf.
+	(fhandler_process::fill_filebuf): Change return type to bool.  Don't
+	use dereference operator on p.  Add return statement.
+	(fhandler_process::format_process_stat): Fix typo.
+	* fhandler_registry.cc: Add static open_key declaration.
+	(fhandler_registry::exists): Assume path is already normalised.  Try
+	opening the path as a key in its own right first, before reverting to
+	enumerating subkeys and values of the parent key.
+	(fhandler_registry::fstat): Add additional code to return more relevant
+	information about the registry key/value.
+	(fhandler_registry::readdir): Explicitly set desired access when
+	opening registry key.  Remove output of buf from debug_printf format
+	string.
+	(fhandler_registry::open): Use set_io_handle to store registry key
+	handle.  Set value_name member.  Move code to read a value from the
+	registry to fill_filebuf.  Add call to fill_filebuf.
+	(fhandler_registry::close): New method.
+	(fhandler_registry::fill_filebuf): Change return type to bool.  Add
+	code to read a value from registry.
+	(fhandler_registry::open_key): Make function static.  Use KEY_READ as
+	desired access unless this is the last path component.  Check the
+	return value of RegOpenKeyEx for an error instead of hKey.
+	* fhandler_virtual.cc (fhandler_virtual::lseek): Check the return value
+	of fill_filebuf.
+	(fhandler_virtual::open): Remove call to set_nohandle.
+	(fhandler_virtual::fill_filebuf): Change return type to bool.  Add
+	return statement.
+	* security.cc (get_nt_object_attribute): New function.
+	(get_object_attribute): New function.
+	* security.h (get_object_attribute): New function declaration.
+
+2002-07-01  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* syscalls.c (seteuid32): Do not return an error when the token cannot
+	be created only because of a problem with the gid.
+
+2002-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_clipboard.c (fhandler_dev_clipboard::open): Force text mode.
+	* fhandler_console.cc (fhandler_console::open): *Really* force binary
+	mode rather than make it optional.
+	* fhandler_proc.cc (fhandler_proc::open): Ditto.
+	* fhandler_process.cc (fhandler_process::open): Ditto.
+	* fhandler_random.cc (fhandler_dev_random::fhandler_dev_random): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::open): Ditto.
+	* fhandler_registry.cc (fhandler_registry::open): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Ditto.
+	* fhandler_virtual.cc (fhandler_virtual::open): Ditto.
+	* fhandler_windows.cc (fhandler_windows::open): Ditto.
+	* fhandler_zero.cc (fhandler_dev_zero::open): Ditto.
+	* net.cc (fdsock): Ditto.
+	* path.cc (set_flags): Add more debugging.
+
+2002-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* debug.cc (threads): Avoid initialization.
+	* uinfo.cc (cygheap_user::ontherange): (from Corinna Vinschen) Actually
+	make below changes work.
+
+2002-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* uinfo.cc (cygheap_user::ontherange): Make cygwin root the last resort
+	for HOMEPATH/HOMEDRIVE for consistency with HOME.
+
+2002-07-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared.cc (sec_none): Move to sec_helper.cc.
+	(sec_none_nih): Ditto.
+	(sec_all): Ditto.
+	(sec_all_nih): Ditto.
+	(get_null_sd): Ditto.
+	(sec_acl): Ditto.
+	(__sec_user): Ditto.
+	* sec_helper.cc (sec_none): Move from shared.cc to here.
+	(sec_none_nih): Ditto.
+	(sec_all): Ditto.
+	(sec_all_nih): Ditto.
+	(get_null_sd): Ditto.
+	(sec_acl): Ditto.
+	(__sec_user): Ditto.
+
 2002-07-01  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_transport.cc (create_server_transport): Fix
