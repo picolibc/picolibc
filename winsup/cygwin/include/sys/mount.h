@@ -21,7 +21,7 @@ enum
   MOUNT_BINARY =	0x002,	/* "binary" format read/writes */
   MOUNT_SYSTEM =	0x008,	/* mount point came from system table */
   MOUNT_EXEC   =	0x010,	/* Any file in the mounted directory gets 'x' bit */
-  MOUNT_CYGDRIVE   =	0x020,	/* mount point refers to cygdriv device mount */
+  MOUNT_CYGDRIVE   =	0x020,	/* mount point refers to cygdrive device mount */
   MOUNT_CYGWIN_EXEC =	0x040,	/* file or directory is or contains a cygwin
 				   executable */
   MOUNT_MIXED	=	0x080,	/* reads are text, writes are binary
