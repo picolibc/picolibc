@@ -412,6 +412,7 @@ process_ioctl (void *)
 fhandler_tty_slave::fhandler_tty_slave (int num)
   : fhandler_tty_common (FH_TTYS, num)
 {
+  set_r_no_interrupt (1);
 }
 
 fhandler_tty_slave::fhandler_tty_slave ()
@@ -666,12 +667,11 @@ fhandler_tty_slave::read (void *ptr, size_t len)
       if (vmin > INP_BUFFER_SIZE)
 	vmin = INP_BUFFER_SIZE;
       vtime = get_ttyp ()->ti.c_cc[VTIME];
-      if (vmin < 0) vmin = 0;
-      if (vtime < 0) vtime = 0;
-      if (vmin == 0)
-	time_to_wait = INFINITE;
-      else
-	time_to_wait = (vtime == 0 ? INFINITE : 100 * vtime);
+      if (vmin < 0)
+	vmin = 0;
+      if (vtime < 0)
+	vtime = 0;
+      time_to_wait = vtime == 0 ? INFINITE : 100 * vtime;
     }
   else
     time_to_wait = INFINITE;
@@ -910,8 +910,8 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
 {
   termios_printf ("ioctl (%x)", cmd);
 
-  if (myself->pgid && get_ttyp ()->getpgid () != myself->pgid &&
-	 myself->ctty == ttynum && (get_ttyp ()->ti.c_lflag & TOSTOP))
+  if (myself->pgid && get_ttyp ()->getpgid () != myself->pgid
+      && myself->ctty == ttynum && (get_ttyp ()->ti.c_lflag & TOSTOP))
     {
       /* background process */
       termios_printf ("bg ioctl pgid %d, tpgid %d, ctty %d",

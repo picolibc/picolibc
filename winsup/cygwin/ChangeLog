@@ -1,8 +1,21 @@
+2002-08-30  Christopher Faylor  <cgf@redhat.com>
+
+	(inspired by a patch from Egor Duda)
+	* select.cc (fhandler_tty_slave::ready_for_read): Remove.
+	* fhandler.h (fhandler_tty_slave::ready_for_read): Remove declaration.
+	* fhandler_tty.cc (fhandler_tty_slave::read): Don't do anything special
+	with vtime when vmin == 0.
+
+2002-07-25  Egor Duda  <deo@logos-m.ru>
+
+	* autoload.cc (GetConsoleWindow): Correct parameter count.
+
 2002-08-30  Christopher January  <chris@atomice.net>
 	    Christopher Faylor  <cgf@redhat.com>
 
 	* tty.cc (tty_list::allocate_tty): Use GetConsoleWindow, if available.
 	Call FindWindow in a loop.
+	* autoload.cc (GetConsoleWindow): Export
 
 2002-08-30  Christopher Faylor  <cgf@redhat.com>
 
