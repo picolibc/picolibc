@@ -1,3 +1,7 @@
+2003-11-25  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.api/known_bugs.tcl: Remove lseek10 since mknod now works.
+
 2003-11-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.api/msgtest.c (main): Revert to use the SIGSYS signal handler.
