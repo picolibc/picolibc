@@ -388,7 +388,7 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 
   DWORD ev;
   COMSTAT st;
-  if (ClearCommError (get_handle (), &ev, &st))
+  if (!ClearCommError (get_handle (), &ev, &st))
     {
       __seterrno ();
       res = -1;
