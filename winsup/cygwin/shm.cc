@@ -94,24 +94,24 @@ client_request_shm::client_request_shm (proc *p1)
 
 /* List of shmid's with file mapping HANDLE and size, returned by shmget. */
 struct shm_shmid_list {
-  SLIST_ENTRY(shm_shmid_list) ssh_next;
+  SLIST_ENTRY (shm_shmid_list) ssh_next;
   int shmid;
   vm_object_t hdl;
   size_t size;
 };
 
-static SLIST_HEAD(, shm_shmid_list) ssh_list;
+static SLIST_HEAD (, shm_shmid_list) ssh_list;
 
 /* List of attached mappings, as returned by shmat. */
 struct shm_attached_list {
-  SLIST_ENTRY(shm_attached_list) sph_next;
+  SLIST_ENTRY (shm_attached_list) sph_next;
   vm_object_t ptr;
   vm_object_t hdl;
   size_t size;
   int access;
 };
 
-static SLIST_HEAD(, shm_attached_list) sph_list;
+static SLIST_HEAD (, shm_attached_list) sph_list;
 
 int __stdcall
 fixup_shms_after_fork ()
@@ -132,8 +132,8 @@ fixup_shms_after_fork ()
   /* Remove map from list... */
   SLIST_FOREACH (sph_entry, &sph_list, sph_next)
     {
-      vm_object_t ptr = MapViewOfFileEx(sph_entry->hdl, sph_entry->access,
-					0, 0, sph_entry->size, sph_entry->ptr);
+      vm_object_t ptr = MapViewOfFileEx (sph_entry->hdl, sph_entry->access,
+					 0, 0, sph_entry->size, sph_entry->ptr);
       if (ptr != sph_entry->ptr)
 	api_fatal ("MapViewOfFileEx (%p), %E.  Terminating.", sph_entry->ptr);
     }
@@ -204,8 +204,8 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       return (void *) -1;
     }
   DWORD access = (shmflg & SHM_RDONLY) ? FILE_MAP_READ : FILE_MAP_WRITE;
-  vm_object_t ptr = MapViewOfFileEx(ssh_entry->hdl, access, 0, 0,
-				    ssh_entry->size, attach_va);
+  vm_object_t ptr = MapViewOfFileEx (ssh_entry->hdl, access, 0, 0,
+				     ssh_entry->size, attach_va);
   if (!ptr)
     {
       __seterrno ();
