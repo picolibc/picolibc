@@ -65,7 +65,7 @@ typedef struct icmp_echo_reply {
   unsigned short    Reserved;
   void* Data;
   struct ip_option_information   Options;
-} ICMP_ECHO_REPLY, *PICMP_ECHO_REPLY;;
+} ICMP_ECHO_REPLY, *PICMP_ECHO_REPLY;
 typedef struct {
   ULONG Index;
   WCHAR  Name[MAX_ADAPTER_NAME];

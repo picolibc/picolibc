@@ -1,3 +1,17 @@
+2001-09-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (_[U]LARGE_INTEGER): Mark nameless structure
+	field as _ANONYMOUS_STRUCT.
+	* include/setupapi.h (SP_DEVINSTALL_PARAMS): Add missing typedef
+	for UNICODE.
+	* include/ipexport.h (icmp_echo_reply): Remove extra ';'.
+	* lib/makefile.in: Add -pedantic switch to TEST_OPTIONS for header
+	test.
+ 
+2001-09-17  Mattia Barbon  <mbarbon@dsi.unive.it>
+
+	* include/commctrl.h: Add some ListView constants.
+
 2001-09-17  Earnie Boyd  <earnie@sf.net>
 
 	* lib/Makefile.in (inst_includedir): Add FIXME and remove the usr/
