@@ -59,21 +59,42 @@ static win_env conv_envvars[] =
     {NL ("PATH="), NULL, NULL, cygwin_win32_to_posix_path_list,
      cygwin_posix_to_win32_path_list,
      cygwin_win32_to_posix_path_list_buf_size,
-     cygwin_posix_to_win32_path_list_buf_size},
+     cygwin_posix_to_win32_path_list_buf_size, true},
     {NL ("HOME="), NULL, NULL, cygwin_conv_to_full_posix_path,
-     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
+     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH, false},
     {NL ("LD_LIBRARY_PATH="), NULL, NULL, cygwin_conv_to_full_posix_path,
-     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
+     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH, true},
     {NL ("TMPDIR="), NULL, NULL, cygwin_conv_to_full_posix_path,
-     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
+     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH, false},
     {NL ("TMP="), NULL, NULL, cygwin_conv_to_full_posix_path,
-     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
+     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH, false},
     {NL ("TEMP="), NULL, NULL, cygwin_conv_to_full_posix_path,
-     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
+     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH, false},
     {NULL, 0, NULL, NULL, NULL, NULL, 0, 0}
   };
 
 static unsigned char conv_start_chars[256] = {0};
+
+struct win_env&
+win_env::operator = (struct win_env& x)
+{
+  name = x.name;
+  namelen = x.namelen;
+  toposix = x.toposix;
+  towin32 = x.towin32;
+  posix_len = x.posix_len;
+  win32_len = x.win32_len;
+  immediate = false;
+  return *this;
+}
+
+win_env::~win_env ()
+{
+  if (posix)
+    free (posix);
+  if (native)
+    free (native);
+}
 
 void
 win_env::add_cache (const char *in_posix, const char *in_native)
@@ -94,6 +115,14 @@ win_env::add_cache (const char *in_posix, const char *in_native)
       towin32 (in_posix, native + namelen);
     }
   MALLOC_CHECK;
+  if (immediate)
+    {
+      char s[namelen];
+      size_t n = namelen - 1;
+      memcpy (s, name, n);
+      s[n] = '\0';
+      SetEnvironmentVariable (s, native + namelen);
+    }
   debug_printf ("posix %s", posix);
   debug_printf ("native %s", native);
 }
@@ -104,7 +133,7 @@ win_env::add_cache (const char *in_posix, const char *in_native)
   known posix value for the environment variable. Returns a pointer to
   the appropriate conversion structure.  */
 win_env * __stdcall
-getwinenv (const char *env, const char *in_posix)
+getwinenv (const char *env, const char *in_posix, win_env *temp)
 {
   if (!conv_start_chars[(unsigned char)*env])
     return NULL;
@@ -112,13 +141,20 @@ getwinenv (const char *env, const char *in_posix)
   for (int i = 0; conv_envvars[i].name != NULL; i++)
     if (strncmp (env, conv_envvars[i].name, conv_envvars[i].namelen) == 0)
       {
-	win_env * const we = conv_envvars + i;
+	win_env *we = conv_envvars + i;
 	const char *val;
 	if (!cur_environ () || !(val = in_posix ?: getenv (we->name)))
 	  debug_printf ("can't set native for %s since no environ yet",
 			we->name);
 	else if (!envcache || !we->posix || strcmp (val, we->posix) != 0)
-	      we->add_cache (val);
+	  {
+	    if (temp)
+	      {
+		*temp = *we;
+		we = temp;
+	      }
+	    we->add_cache (val);
+	  }
 	return we;
       }
   return NULL;
@@ -825,6 +861,7 @@ struct spenv
   const char *name;
   size_t namelen;
   bool add_always;	/* If true, always add to env if missing */
+  bool force;	/* if true, retrieve value from cache */
   const char * (cygheap_user::*from_cygheap) (const char *, size_t);
 
   char *retrieve (bool, const char * const = NULL)
@@ -836,20 +873,21 @@ struct spenv
 /* Keep this list in upper case and sorted */
 static NO_COPY spenv spenvs[] =
 {
-  {NL ("HOMEDRIVE="), false, &cygheap_user::env_homedrive},
-  {NL ("HOMEPATH="), false, &cygheap_user::env_homepath},
-  {NL ("LOGONSERVER="), false, &cygheap_user::env_logsrv},
-  {NL ("SYSTEMDRIVE="), false, NULL},
-  {NL ("SYSTEMROOT="), true, &cygheap_user::env_systemroot},
-  {NL ("USERDOMAIN="), false, &cygheap_user::env_domain},
-  {NL ("USERNAME="), false, &cygheap_user::env_name},
-  {NL ("USERPROFILE="), false, &cygheap_user::env_userprofile},
+  {NL ("HOMEDRIVE="), false, false, &cygheap_user::env_homedrive},
+  {NL ("HOMEPATH="), false, false, &cygheap_user::env_homepath},
+  {NL ("LOGONSERVER="), false, false, &cygheap_user::env_logsrv},
+  {NL ("PATH="), false, true, NULL},
+  {NL ("SYSTEMDRIVE="), false, false, NULL},
+  {NL ("SYSTEMROOT="), true, false, &cygheap_user::env_systemroot},
+  {NL ("USERDOMAIN="), false, false, &cygheap_user::env_domain},
+  {NL ("USERNAME="), false, false, &cygheap_user::env_name},
+  {NL ("USERPROFILE="), false, false, &cygheap_user::env_userprofile}
 };
 
 char *
-spenv::retrieve (bool no_envblock, const char *const envname)
+spenv::retrieve (bool no_envblock, const char *const env)
 {
-  if (envname && !strncasematch (envname, name, namelen))
+  if (env && !strncasematch (env, name, namelen))
     return NULL;
 
   debug_printf ("no_envblock %d", no_envblock);
@@ -857,16 +895,16 @@ spenv::retrieve (bool no_envblock, const char *const envname)
   if (from_cygheap)
     {
       const char *p;
-      if (envname && !cygheap->user.issetuid ())
+      if (env && !cygheap->user.issetuid ())
 	{
 	  debug_printf ("duping existing value for '%s'", name);
-	  return cstrdup1 (envname);	/* Don't really care what it's set to
-					   if we're calling a cygwin program */
+	  /* Don't really care what it's set to if we're calling a cygwin program */
+	  return (no_envblock && !force) ? env_dontadd : cstrdup1 (env);
 	}
 
       /* Calculate (potentially) value for given environment variable.  */
       p = (cygheap->user.*from_cygheap) (name, namelen);
-      if (!p || (no_envblock && !envname) || (p == env_dontadd))
+      if (!p || (p == env_dontadd) || (!force && (no_envblock && !env)))
 	return env_dontadd;
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
@@ -875,8 +913,10 @@ spenv::retrieve (bool no_envblock, const char *const envname)
       return s;
     }
 
-  if (envname)
-    return cstrdup1 (envname);
+  if (!force && no_envblock)
+    return env_dontadd;
+  if (env)
+    return cstrdup1 (env);
 
   return getwinenveq (name, namelen, HEAP_1_STR);
 }
@@ -916,11 +956,13 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	if (!saw_spenv[i] && (*dstp = spenvs[i].retrieve (no_envblock, *srcp)))
 	  {
 	    saw_spenv[i] = 1;
-	    if (*dstp == env_dontadd)
-	      goto next1;
-	    goto  next0;
+	    if (*dstp != env_dontadd)
+	      goto next0;
+	    goto  next1;
 	  }
 
+      if (no_envblock)
+	goto next1;
       /* Add entry to new environment */
       *dstp = cstrdup1 (*srcp);
 
@@ -950,11 +992,13 @@ build_env (const char * const *envp, char *&envblock, int &envc,
   assert ((size_t) envc <= (n + SPENVS_SIZE));
   *dstp = NULL;			/* Terminate */
 
-  if (no_envblock)
+  if (!envc)
     envblock = NULL;
   else
     {
       debug_printf ("env count %d, bytes %d", envc, tl);
+      win_env temp;
+      temp.reset ();
 
       /* Windows programs expect the environment block to be sorted.  */
       qsort (newenv, envc, sizeof (char *), env_sort);
@@ -978,7 +1022,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	    continue;
 
 	  /* See if this entry requires posix->win32 conversion. */
-	  conv = getwinenv (*srcp, *srcp + len);
+	  conv = getwinenv (*srcp, *srcp + len, &temp);
 	  if (conv)
 	    p = conv->native;	/* Use win32 path */
 	  else
@@ -1016,6 +1060,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
       assert ((s - envblock) <= tl);	/* Detect if we somehow ran over end
 					   of buffer */
     }
+
 
   debug_printf ("envp %p, envc %d", newenv, envc);
   return newenv;

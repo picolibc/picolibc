@@ -1,3 +1,26 @@
+2005-03-30  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.h (win_env::immediate): Declare new field.
+	(win_env::operator = ): Declare new operator.
+	(win_env::reset): Declare new function.
+	(win_env::~win_env): Declare new destructor.
+	(getwinenv): Add optional third argument to declaration.
+	* environ.cc (conv_envvars): Accommodate immediate field.
+	(win_env::operator =): Define new operator.
+	(win_env::~win_env): Define new destructor.
+	(win_env::add_cache): Add value to environment immediately if
+	"immediate" is set.
+	(getwinenv): Accept optional third argument which will be used to store
+	"cached" values to avoid overwriting real cache.
+	(spenv::force): Declare new field.
+	(spenvs): Accommodate force field.  Add "PATH=" with force set to true.
+	(spenv::retrieve): Avoid duping anything if we're not building an
+	envblock.
+	(build_env): Ditto.  Use size of potentially constructed new
+	environment block to determine if we need to create an environment
+	block.  Pass getwinenv temporary storage to avoid inappropriately
+	overwriting the environment cache.
+
 2005-03-29  Eric Blake  <ebb9@byu.net>
 
 	* include/limits.h (NAME_MAX): New define.
