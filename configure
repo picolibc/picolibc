@@ -1281,7 +1281,7 @@ if [ -f ${srcdir}/${Makefile_in} ] ; then
       -e "s|@mandir@|${mandir}|" \
       -e "s|@CC@|${CC}|" \
       -e "s|@CXX@|${CXX}|" \
-      -e "s|@CC@|${CFLAGS}|" \
+      -e "s|@CFLAGS@|${CFLAGS}|" \
       -e "s|@CXXFLAGS@|${CXXFLAGS}|" \
       -e "s|@config_shell@|${config_shell}|" \
       -e "s|@srcdir@|${srcdir}|" \

@@ -1,5 +1,7 @@
 2002-12-10  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* configure: Fix bug put in by gremlins.
+
 	* Makefile.tpl: Substitute more autoconfily.
 	* configure: Substitute more autoconfily.
 	* Makefile.in: Regenerate.
