@@ -1,3 +1,8 @@
+Thu Apr 12 23:11:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* libc/include/sys/errno.h: Add ECASECLASH to indicate case clash
+	on case insensitve file systems.
+
 2001-04-12  Robert Collins <rbtcollins@hotmail.com>
 
 	* libc/include/sys/features.h: Add appropriate defines for Cygwin
