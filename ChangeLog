@@ -1,3 +1,9 @@
+2005-02-21  Eric Botcazou  <ebotcazou@libertysurf.fr>
+
+	PR libgcj/10353
+	* configure.in (noconfigdirs) <sparc-*-solaris2.[0-6]>: Add libgcj.
+	* configure: Regenerate.
+
 2005-02-08  Andrew Cagney  <cagney@gnu.org>
 
 	* MAINTAINERS: Delete reference to dejagnu/ and mmalloc/ from the
