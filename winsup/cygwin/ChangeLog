@@ -1,3 +1,7 @@
+2002-11-23  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
 2002-11-22  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (handle_sigsuspend): Force pending signal delivery
