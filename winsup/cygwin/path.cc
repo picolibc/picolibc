@@ -3240,7 +3240,7 @@ chdir (const char *in_dir)
       res = 0;
     }
 
-  /* If res < 0, we didn't change to a new directory.
+  /* If res != 0, we didn't change to a new directory.
      Otherwise, set the current windows and posix directory cache from input.
      If the specified directory is a MS-DOS style directory or if the directory
      was symlinked, convert the MS-DOS path back to posix style.  Otherwise just
@@ -3250,7 +3250,7 @@ chdir (const char *in_dir)
      do when we detect a symlink?  Should we instead rebuild the posix path from
      the input by traversing links?  This would be an expensive operation but
      we'll see if Cygwin mailing list users whine about the current behavior. */
-  if (res == -1)
+  if (res)
     __seterrno ();
   else if ((!path.has_symlinks () && strpbrk (dir, ":\\") == NULL
 	    && pcheck_case == PCHECK_RELAXED) || isvirtual_dev (devn))
