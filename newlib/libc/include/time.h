@@ -74,9 +74,9 @@ struct tm *_EXFUN(localtime_r,	(const time_t *, struct tm *));
 
 #ifdef __CYGWIN__
 #ifndef __STRICT_ANSI__
-extern time_t _timezone __declspec(dllimport);
-extern int _daylight __declspec(dllimport);
-extern char *_tzname[2] __declspec(dllimport);
+extern __IMPORT time_t _timezone;
+extern __IMPORT int _daylight;
+extern __IMPORT char *_tzname[2];
 
 char *_EXFUN(timezone, (void));
 void _EXFUN(tzset, (void));

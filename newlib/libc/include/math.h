@@ -23,19 +23,8 @@ union __dmath
 
 /* Declare this as an array without bounds so that no matter what small data
    support a port and/or library has, this reference will be via the general
-   method for accessing globals.
-
-   Also under Cygwin, the library exports a pointer to the real value, so we
-   need to properly dereference it.  */
-#ifndef __INFINITY_DECL__
-#if !defined(__CYGWIN__) || defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
-#define __INFINITY_DECL__
-#else
-#define __INFINITY_DECL__ __declspec(dllimport)
-#endif
-#endif
-
-extern __INFINITY_DECL__ const union __dmath __infinity[];
+   method for accessing globals. */
+extern __IMPORT const union __dmath __infinity[];
 
 #define HUGE_VAL (__infinity[0].d)
 
@@ -197,7 +186,7 @@ extern float dremf _PARAMS((float, float));
 
 /* The gamma functions use a global variable, signgam.  */
 
-extern int signgam;
+extern __IMPORT int signgam;
 
 /* The exception structure passed to the matherr routine.  */
 
@@ -268,7 +257,7 @@ enum __fdlibm_version
 #define _LIB_VERSION_TYPE enum __fdlibm_version
 #define _LIB_VERSION __fdlib_version
 
-extern _CONST _LIB_VERSION_TYPE _LIB_VERSION;
+extern __IMPORT _CONST _LIB_VERSION_TYPE _LIB_VERSION;
 
 #define _IEEE_  __fdlibm_ieee
 #define _SVID_  __fdlibm_svid

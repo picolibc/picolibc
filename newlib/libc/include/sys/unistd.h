@@ -10,7 +10,7 @@ extern "C" {
 #define __need_size_t
 #include <stddef.h>
 
-extern char **environ;
+extern __IMPORT char **environ;
 
 void	_EXFUN(_exit, (int __status ) _ATTRIBUTE ((noreturn)));
 

@@ -125,4 +125,18 @@ typedef unsigned int __uint32_t;
 #define __RAND_MAX 0x7fffffff
 #endif
 
+
+#if defined(__CYGWIN32__) || defined(__CYGWIN__)
+#if defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
+#define __IMPORT
+#else
+#define __IMPORT __declspec(dllimport)
+#endif
+#endif
+
+#ifndef __IMPORT
+#define __IMPORT
+#endif
+
+
 #endif /* __SYS_CONFIG_H__ */

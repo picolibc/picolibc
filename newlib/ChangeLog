@@ -1,3 +1,14 @@
+2000-08-01  DJ Delorie  <dj@redhat.com>
+
+	* libc/include/sys/config.h: define __IMPORT appropriately
+	* libc/include/ctype.h (_ctype_): use __IMPORT
+	* libc/include/math.h (__infinity, signam, _LIB_VERSION): ditto
+	* libc/include/math.h (__mb_cur_max): ditto
+	* libc/include/time.h (_timezone, _daylight, _tzname): ditto
+	* libc/include/unctrl.h (__unctrl, __unctrllen): ditto
+	* libc/include/errno.h (_sys_errlist, _sys_nerr): ditto
+	* libc/include/unistd.h (environ): ditto
+
 2000-07-28  Michael Meissner  <meissner@redhat.com>
 
 	* libc/include/math.h (__infinity): Declare as an array without

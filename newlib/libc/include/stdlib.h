@@ -39,11 +39,7 @@ typedef struct
 
 #define RAND_MAX __RAND_MAX
 
-#if (defined(__CYGWIN__) || defined(__CYGWIN__)) && ! defined(_COMPILING_NEWLIB)
-extern __declspec(dllimport) int __mb_cur_max;
-#else
-extern int __mb_cur_max;
-#endif
+extern __IMPORT int __mb_cur_max;
 
 #define MB_CUR_MAX __mb_cur_max
 
