@@ -1,3 +1,8 @@
+Wed May 17 16:03:48 2000  Alexandre Oliva  <aoliva@cygnus.com>
+
+	* Makefile.in (configure-target-libiberty): Depend on
+	configure-target-newlib.
+
 Tue May 16 10:06:21 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	Thu Apr 27 11:01:48 2000 Andrew Cagney <cagney@b1.cygnus.com>:
