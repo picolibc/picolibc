@@ -80,7 +80,7 @@ DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 /* Function declarations */
 static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
 static __inline__ bool get_proc_lock (DWORD, DWORD);
-static void __stdcall remove_proc (int);
+static bool __stdcall remove_proc (int);
 static bool __stdcall stopped_or_terminated (waitq *, _pinfo *);
 static DWORD WINAPI wait_sig (VOID *arg);
 
@@ -364,9 +364,8 @@ proc_subproc (DWORD what, DWORD val)
 
       // FIXMENOW: What is supposed to happen here?
       if (global_sigs[SIGCHLD].sa_handler == (void *) SIG_IGN)
-	while (nprocs)
-	  remove_proc (0);
-      break;
+	for (int i = 0; i < nprocs; i += remove_proc (i))
+	  continue;
   }
 
 out:
@@ -750,6 +749,7 @@ checkstate (waitq *parent_w)
 	goto out;
       }
 
+  sigproc_printf ("no matching terminated children found");
   potential_match = -!!nprocs;
 
 out:
@@ -759,17 +759,18 @@ out:
 
 /* Remove a proc from procs by swapping it with the last child in the list.
    Also releases shared memory of exited processes.  */
-static void __stdcall
+static bool __stdcall
 remove_proc (int ci)
 {
-  if (!proc_exists (procs[ci]))
-    { 
-      sigproc_printf ("removing procs[%d], pid %d, nprocs %d", ci, procs[ci]->pid,
-		      nprocs);
-      procs[ci].release ();
-      if (ci < --nprocs)
-	procs[ci] = procs[nprocs];
-    }
+  if (proc_exists (procs[ci]))
+    return true;
+
+  sigproc_printf ("removing procs[%d], pid %d, nprocs %d", ci, procs[ci]->pid,
+		  nprocs);
+  procs[ci].release ();
+  if (ci < --nprocs)
+    procs[ci] = procs[nprocs];
+  return 0;
 }
 
 /* Check status of child process vs. waitq member.
