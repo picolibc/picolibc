@@ -925,6 +925,7 @@ _dll_crt0 ()
 	  default:
 	    if ((fork_info->type & PROC_MAGIC_MASK) == PROC_MAGIC_GENERIC)
 	      api_fatal ("conflicting versions of cygwin1.dll detected.  Use only the most recent version.\n");
+	    break;
 	}
     }
   dll_crt0_1 ();
