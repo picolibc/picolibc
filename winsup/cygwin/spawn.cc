@@ -1,6 +1,6 @@
 /* spawn.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -21,8 +21,8 @@ details. */
 #include "cygerrno.h"
 #include <sys/cygwin.h>
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "sigproc.h"
 #include "cygheap.h"
@@ -686,6 +686,22 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 		       &si,
 		       &pi);
     }
+
+  /* FIXME: There is a small race here */
+
+  sigset_t old_mask;
+  _sig_func_ptr oldint = (_sig_func_ptr) NULL;
+  _sig_func_ptr oldquit = (_sig_func_ptr) NULL;
+  if (mode == _P_SYSTEM)
+    {
+      sigset_t child_block;
+      oldint = signal (SIGINT, SIG_IGN);
+      oldquit = signal (SIGQUIT, SIG_IGN);
+      sigemptyset (&child_block);
+      sigaddset (&child_block, SIGCHLD);
+      (void) sigprocmask (SIG_BLOCK, &child_block, &old_mask);
+    }
+
   /* Restore impersonation. In case of _P_OVERLAY this isn't
      allowed since it would overwrite child data. */
   if (mode != _P_OVERLAY)
@@ -867,7 +883,14 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       myself->exit (res, 1);
       break;
     case _P_WAIT:
+    case _P_SYSTEM:
       waitpid (cygpid, (int *) &res, 0);
+      if (mode == _P_SYSTEM)
+	{
+	  signal (SIGINT, oldint);
+	  signal (SIGQUIT, oldquit);
+	  sigprocmask (SIG_SETMASK, &old_mask, NULL);
+	}
       break;
     case _P_DETACH:
       res = 0;	/* Lose all memory of this child. */
@@ -923,6 +946,7 @@ spawnve (int mode, const char *path, const char *const *argv,
     case _P_NOWAITO:
     case _P_WAIT:
     case _P_DETACH:
+    case _P_SYSTEM:
       subproc_init ();
       ret = spawn_guts (path, argv, envp, mode);
       if (vf)

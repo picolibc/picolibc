@@ -1769,6 +1769,16 @@ verifyable_object_isvalid (void const * objectptr, long magic)
   return verifyable_object_isvalid (objectptr, magic, NULL);
 }
 
+inline void
+__reent_t::init_clib (struct _reent& var)
+{
+  var = ((struct _reent) _REENT_INIT (var));
+  var._stdin = _GLOBAL_REENT->_stdin;
+  var._stdout = _GLOBAL_REENT->_stdout;
+  var._stderr = _GLOBAL_REENT->_stderr;
+  _clib = &var;
+};
+
 /* Pthreads */
 void *
 pthread::thread_init_wrapper (void *_arg)
@@ -1778,7 +1788,7 @@ pthread::thread_init_wrapper (void *_arg)
   pthread *thread = (pthread *) _arg;
   struct __reent_t local_reent;
   struct _winsup_t local_winsup;
-  struct _reent local_clib = _REENT_INIT (local_clib);
+  struct _reent local_clib;
 
   struct sigaction _sigs[NSIG];
   sigset_t _sig_mask;		/* one set for everything to ignore. */
@@ -1791,7 +1801,7 @@ pthread::thread_init_wrapper (void *_arg)
 
   memset (&local_winsup, 0, sizeof (struct _winsup_t));
 
-  local_reent._clib = &local_clib;
+  local_reent.init_clib (local_clib);
   local_reent._winsup = &local_winsup;
 
   local_winsup._process_logmask = LOG_UPTO (LOG_DEBUG);

@@ -1450,21 +1450,6 @@ done:
   return res;
 }
 
-struct system_cleanup_args
-{
-  _sig_func_ptr oldint, oldquit;
-  sigset_t old_mask;
-};
-
-static void system_cleanup (void *args)
-{
-  struct system_cleanup_args *cleanup_args = (struct system_cleanup_args *) args;
-
-  signal (SIGINT, cleanup_args->oldint);
-  signal (SIGQUIT, cleanup_args->oldquit);
-  (void) sigprocmask (SIG_SETMASK, &cleanup_args->old_mask, 0);
-}
-
 extern "C" int
 system (const char *cmdstring)
 {
@@ -1476,33 +1461,21 @@ system (const char *cmdstring)
   sigframe thisframe (mainthread);
   int res;
   const char* command[4];
-  struct system_cleanup_args cleanup_args;
-  sigset_t child_block;
 
   if (cmdstring == (const char *) NULL)
-	return 1;
-
-  cleanup_args.oldint = signal (SIGINT, SIG_IGN);
-  cleanup_args.oldquit = signal (SIGQUIT, SIG_IGN);
-  sigemptyset (&child_block);
-  sigaddset (&child_block, SIGCHLD);
-  (void) sigprocmask (SIG_BLOCK, &child_block, &cleanup_args.old_mask);
+    return 1;
 
   command[0] = "sh";
   command[1] = "-c";
   command[2] = cmdstring;
   command[3] = (const char *) NULL;
 
-  pthread_cleanup_push (system_cleanup, (void *) &cleanup_args);
-
-  if ((res = spawnvp (_P_WAIT, "sh", command)) == -1)
+  if ((res = spawnvp (_P_SYSTEM, "sh", command)) == -1)
     {
       // when exec fails, return value should be as if shell
       // executed exit (127)
       res = 127;
     }
-
-  pthread_cleanup_pop (1);
 
   return res;
 }
