@@ -1,3 +1,8 @@
+2004-10-23  Daniel Jacobowitz  <dan@debian.org>
+
+	* configure.in: Use an absolute path to install-sh.
+	* configure: Regenerated.
+
 2004-10-19  Andrew Cagney  <cagney@gnu.org>
 
 	* src-release (do-djunpack, do-md5sum): Install the generated file
