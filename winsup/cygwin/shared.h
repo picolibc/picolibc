@@ -187,7 +187,7 @@ pinfo *__stdcall procinfo (int n);
 
 enum
 {
-  PROC_MAGIC = 0xaf05f000,
+  PROC_MAGIC = 0xaf06f000,
   PROC_FORK = PROC_MAGIC + 1,
   PROC_EXEC = PROC_MAGIC + 2,
   PROC_SPAWN = PROC_MAGIC + 3,

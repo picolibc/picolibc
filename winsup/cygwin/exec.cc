@@ -198,7 +198,7 @@ int
 sexecvpe (HANDLE hToken, const char *file, const char * const *argv,
 	  const char *const *envp)
 {
-  char buf[MAXNAMLEN];
+  path_conv buf;
   MALLOC_CHECK;
   return sexecve (hToken, find_exec (file, buf), argv, envp);
 }

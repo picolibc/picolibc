@@ -31,6 +31,7 @@ enum
   PATH_SYMLINK = MOUNT_SYMLINK,
   PATH_BINARY = MOUNT_BINARY,
   PATH_EXEC = MOUNT_EXEC,
+  PATH_CYGWIN_EXEC = MOUNT_CYGWIN_EXEC,
   PATH_SOCKET =  0x40000000,
   PATH_HASACLS = 0x80000000
 };
@@ -49,6 +50,7 @@ class path_conv
   int issymlink () {return path_flags & PATH_SYMLINK;}
   int issocket () {return path_flags & PATH_SOCKET;}
   int isexec () {return path_flags & PATH_EXEC;}
+  int iscygexec () {return path_flags & PATH_CYGWIN_EXEC;}
 
   void set_binary () {path_flags |= PATH_BINARY;}
   void set_symlink () {path_flags |= PATH_SYMLINK;}
@@ -63,8 +65,16 @@ class path_conv
 
   DWORD fileattr;
 
-  path_conv (const char * const, symlink_follow follow_mode = SYMLINK_FOLLOW,
-	     int use_full_path = 0, const suffix_info *suffixes = NULL);
+  void check (const char *src, symlink_follow follow_mode = SYMLINK_FOLLOW,
+	      int use_full_path = 0, const suffix_info *suffixes = NULL);
+  path_conv (const char *src, symlink_follow follow_mode = SYMLINK_FOLLOW,
+	     int use_full_path = 0, const suffix_info *suffixes = NULL)
+  {
+    check (src, follow_mode, use_full_path, suffixes);
+  }
+
+  path_conv (): path_flags (0), known_suffix (NULL), error (0), devn (0), unit (0), fileattr (0xffffffff) {path[0] = '\0';}
+
   inline char *get_win32 () { return path; }
   operator char *() {return path; }
   BOOL is_device () {return devn != FH_BAD;}

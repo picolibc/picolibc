@@ -186,8 +186,9 @@ path_prefix_p_ (const char *path1, const char *path2, int len1)
 	SYMLINK_CONTENTS    - just return symlink contents
 */
 
-path_conv::path_conv (const char *src, symlink_follow follow_mode,
-		      int use_full_path, const suffix_info *suffixes)
+void
+path_conv::check (const char *src, symlink_follow follow_mode,
+		  int use_full_path, const suffix_info *suffixes)
 {
   /* This array is used when expanding symlinks.  It is MAX_PATH * 2
      in length so that we can hold the expanded symlink plus a
@@ -1891,8 +1892,11 @@ mount_item::getmntent ()
   else
     strcpy (cygwin_shared->mount.mnt_opts, (char *) "binmode");
 
-  if (flags & MOUNT_EXEC)
+  if (flags & MOUNT_CYGWIN_EXEC)
+    strcat (cygwin_shared->mount.mnt_opts, (char *) ",cygexec");
+  else if (flags & MOUNT_EXEC)
     strcat (cygwin_shared->mount.mnt_opts, (char *) ",exec");
+
 
   ret.mnt_opts = cygwin_shared->mount.mnt_opts;
 
@@ -2190,9 +2194,6 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 
       h = CreateFileA (path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih, OPEN_EXISTING,
 		       FILE_ATTRIBUTE_NORMAL, 0);
-
-syscall_printf ("opened '%s'(%p)", path, h);
-
       res = -1;
       if (h == INVALID_HANDLE_VALUE)
 	__seterrno ();
@@ -2201,7 +2202,6 @@ syscall_printf ("opened '%s'(%p)", path, h);
 	  char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
 	  DWORD got;
 
-syscall_printf ("ReadFile");
 	  if (! ReadFile (h, cookie_buf, sizeof (cookie_buf), &got, 0))
 	    set_errno (EIO);
 	  else if (got == sizeof (cookie_buf)
@@ -2238,18 +2238,16 @@ syscall_printf ("ReadFile");
 	  else
 	    {
 	      /* Not a symlink, see if executable.  */
-	      if (!(pflags & PATH_EXEC) && got >= 2 &&
+	      if (!(pflags & (PATH_EXEC | PATH_CYGWIN_EXEC)) && got >= 2 &&
 		  ((cookie_buf[0] == '#' && cookie_buf[1] == '!') ||
 		   (cookie_buf[0] == ':' && cookie_buf[1] == '\n')))
 		pflags |= PATH_EXEC;
 	    close_and_return:
-syscall_printf ("close_and_return");
 	      CloseHandle (h);
 	      goto file_not_symlink;
 	    }
 	}
 
-syscall_printf ("breaking from loop");
       CloseHandle (h);
       break;
     }

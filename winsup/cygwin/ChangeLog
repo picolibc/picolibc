@@ -1,3 +1,36 @@
+Wed Apr 26 01:07:16 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (interruptible): Allocate slightly more space for
+	directory name check.  Windows 95 seems to null-terminate the directory
+	otherwise.
+	(interrupt_on_return): Issue a fatal error if we can't find the
+	caller's stack.
+
+Tue Apr 25 16:50:54 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (find_exec): Accept a path_conv argument rather than a
+	buffer so that the caller can find things out about a translated path.
+	(perhaps_suffix): Ditto.
+	(spawn_guts): Allocate path_conv stuff here so that we can find out
+	stuff about the translated path (this is work in progress).
+	* environ.cc (environ_init): Accept an as-yet unused argument
+	indicating whether we were invoked from a cygwin parent or not.
+	(winenv): Ditto.
+	(posify): Accept an argument indicating whether the path has already
+	been translated.
+	* dlfcn.cc (check_access): Provide a path_conv buffer to find_exec.
+	* exec.cc (sexecvpe): Ditto.
+	* path.cc (path_conv::check): Rename from path_conv::path_conv.
+	(mount_item::getmntent): Recognize "Cygwin executable" bit.
+	(symlink_info::check): Remove debugging statements.
+	* path.h (class path_conv): Add iscygexec method.  Rewrite constructor
+	to call "check" method to allow multiple operations on a path_conv
+	variable.
+	* pinfo.cc (pinfo_init): Pass argument to environ_init.
+	* shared.h: Bump PROC_MAGIC.
+	* winsup.h: Reflect above changes to function arguments.
+	* include/sys/mount.h: Add MOUNT_CYGWIN_EXEC type.
+
 Thu Apr 25 21:35:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * syscalls.cc (stat_worker): Previous patch failed to stat

@@ -568,13 +568,13 @@ interruptible (DWORD pc)
       if (!VirtualQuery ((LPCVOID) pc, &m, sizeof m))
 	sigproc_printf ("couldn't get memory info, %E");
 
-      char *checkdir = (char *) alloca (windows_system_directory_length);
+      char *checkdir = (char *) alloca (windows_system_directory_length + 2);
 #     define h ((HMODULE) m.AllocationBase)
       if (h == user_data->hmodule)
 	res = 1;
       else if (h == cygwin_hmodule)
 	res = 0;
-      else if (!GetModuleFileName (h, checkdir, windows_system_directory_length))
+      else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
 	res = 0;
       else
         res = !strncasematch (windows_system_directory, checkdir,
@@ -642,10 +642,11 @@ interrupt_on_return (DWORD ebp, int sig, struct sigaction& siga, void *handler)
 	    interrupt_setup (sig, siga, handler, *addr_retaddr, addr_retaddr);
 	    *addr_retaddr = (DWORD) sigdelayed;
 	  }
-	break;
+	return 1;
       }
 
-  return 1;
+  api_fatal ("couldn't send signal %d", sig);
+  return 0;
 }
 
 extern "C" void __stdcall

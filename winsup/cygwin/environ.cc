@@ -94,7 +94,7 @@ getwinenv (const char *env, const char *in_posix)
 /* Convert windows path specs to POSIX, if appropriate.
  */
 static void __stdcall
-posify (char **here, const char *value)
+posify (int already_posix, char **here, const char *value)
 {
   char *src = *here;
   win_env *conv;
@@ -103,17 +103,22 @@ posify (char **here, const char *value)
   if (!(conv = getwinenv (src)))
     return;
 
-  /* Turn all the items from c:<foo>;<bar> into their
-     mounted equivalents - if there is one.  */
+  if (already_posix)
+    conv->add_cache (value, NULL);
+  else
+    {
+      /* Turn all the items from c:<foo>;<bar> into their
+	 mounted equivalents - if there is one.  */
 
-  char *outenv = (char *) malloc (1 + len + conv->posix_len (value));
-  memcpy (outenv, src, len);
-  conv->toposix (value, outenv + len);
-  conv->add_cache (outenv + len, value);
+      char *outenv = (char *) malloc (1 + len + conv->posix_len (value));
+      memcpy (outenv, src, len);
+      conv->toposix (value, outenv + len);
+      conv->add_cache (outenv + len, value);
 
-  debug_printf ("env var converted to %s", outenv);
-  *here = outenv;
-  free (src);
+      debug_printf ("env var converted to %s", outenv);
+      *here = outenv;
+      free (src);
+    }
 }
 
 /*
@@ -435,7 +440,7 @@ regopt (const char *name)
  * environment variable and set appropriate options from it.
  */
 void
-environ_init (void)
+environ_init (int already_posix)
 {
   const char * const rawenv = GetEnvironmentStrings ();
   int envsize, i;
@@ -479,7 +484,7 @@ environ_init (void)
       if (strncmp (newp, "CYGWIN=", sizeof("CYGWIN=") - 1) == 0)
 	parse_options (newp + sizeof("CYGWIN=") - 1);
       if (*eq)
-	posify (envp + i, *++eq ? eq : --eq);
+	posify (already_posix, envp + i, *++eq ? eq : --eq);
       debug_printf ("%s", envp[i]);
     }
 
@@ -509,7 +514,7 @@ env_sort (const void *a, const void *b)
  * prior to placing them in the string.
  */
 char * __stdcall
-winenv (const char * const *envp)
+winenv (const char * const *envp, int keep_posix)
 {
   int len, n, tl;
   const char * const *srcp;
@@ -520,12 +525,14 @@ winenv (const char * const *envp)
 
   const char *newenvp[n + 1];
 
+  debug_printf ("envp %p, keep_posix %d", envp, keep_posix);
+
   for (tl = 0, srcp = envp, dstp = newenvp; *srcp; srcp++, dstp++)
     {
       len = strcspn (*srcp, "=") + 1;
       win_env *conv;
 
-      if ((conv = getwinenv (*srcp, *srcp + len)))
+      if (!keep_posix && (conv = getwinenv (*srcp, *srcp + len)))
 	*dstp = conv->native;
       else
 	*dstp = *srcp;

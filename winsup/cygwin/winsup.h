@@ -373,7 +373,7 @@ extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
 extern "C" void __stdcall do_exit (int) __attribute__ ((noreturn));
 
 /* Initialize the environment */
-void environ_init (void);
+void environ_init (int);
 
 /* Heap management. */
 void heap_init (void);
@@ -411,7 +411,7 @@ extern "C" int try_to_debug ();
 
 /**************************** Miscellaneous ******************************/
 
-const char * __stdcall find_exec (const char *name, char *buf, const char *winenv = "PATH=",
+const char * __stdcall find_exec (const char *name, path_conv& buf, const char *winenv = "PATH=",
 			int null_if_notfound = 0, const char **known_suffix = NULL);
 
 /* File manipulation */
@@ -556,7 +556,7 @@ struct win_env
 
 win_env * __stdcall getwinenv (const char *name, const char *posix = NULL);
 
-char * __stdcall winenv (const char * const *);
+char * __stdcall winenv (const char * const *, int);
 extern char **__cygwin_environ;
 
 /* The title on program start. */

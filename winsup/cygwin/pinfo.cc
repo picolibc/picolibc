@@ -77,7 +77,7 @@ pinfo_init (LPBYTE info)
     {
       /* The process was execed.  Reuse entry from the original
 	 owner of this pid. */
-      environ_init ();	  /* Needs myself but affects calls below */
+      environ_init (0);	  /* Needs myself but affects calls below */
 
       /* spawn has already set up a pid structure for us so we'll use that */
 
@@ -100,7 +100,7 @@ pinfo_init (LPBYTE info)
       myself->ctty = -1;
       myself->uid = USHRT_MAX;
 
-      environ_init ();		/* call after myself has been set up */
+      environ_init (0);		/* call after myself has been set up */
     }
 
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);

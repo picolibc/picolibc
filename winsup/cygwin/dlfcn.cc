@@ -60,7 +60,7 @@ check_access (const char *dir, const char *name)
 static const char * __stdcall
 check_path_access (const char *mywinenv, const char *name)
 {
-  static char buf[MAX_PATH];
+  path_conv buf;
   return find_exec (name, buf, mywinenv, TRUE);
 }
 

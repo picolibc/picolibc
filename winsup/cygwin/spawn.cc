@@ -38,22 +38,21 @@ suffix_info std_suffixes[] =
    Returns (possibly NULL) suffix */
 
 static const char *
-perhaps_suffix (const char *prog, char *buf)
+perhaps_suffix (const char *prog, path_conv &buf)
 {
   char *ext;
 
   debug_printf ("prog '%s'", prog);
-  path_conv temp (prog, SYMLINK_FOLLOW, 1, std_suffixes);
-  strcpy (buf, temp.get_win32 ());
+  buf.check (prog, SYMLINK_FOLLOW, 1, std_suffixes);
 
-  if (temp.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
+  if (buf.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
     ext = NULL;
-  else if (temp.known_suffix)
-    ext = buf + (temp.known_suffix - temp.get_win32 ());
+  else if (buf.known_suffix)
+    ext = buf + (buf.known_suffix - buf.get_win32 ());
   else
     ext = strchr (buf, '\0');
 
-  debug_printf ("buf %s, suffix found '%s'", buf, ext);
+  debug_printf ("buf %s, suffix found '%s'", (char *) buf, ext);
   return ext;
 }
 
@@ -66,7 +65,7 @@ perhaps_suffix (const char *prog, char *buf)
    is undefined and NULL is returned.  */
 
 const char * __stdcall
-find_exec (const char *name, char *buf, const char *mywinenv,
+find_exec (const char *name, path_conv& buf, const char *mywinenv,
 	   int null_if_notfound, const char **known_suffix)
 {
   const char *suffix = "";
@@ -120,10 +119,10 @@ errout:
   if (null_if_notfound)
     retval = NULL;
   else
-    strcpy (buf, path_conv (name).get_win32 ());
+    buf.check (name);
 
 out:
-  debug_printf ("%s = find_exec (%s)", buf, name);
+  debug_printf ("%s = find_exec (%s)", (char *) buf, name);
   if (known_suffix)
     *known_suffix = suffix ?: strchr (buf, '\0');
   return retval;
@@ -257,7 +256,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
     /* nothing */;
 
   char *real_path;
-  char real_path_buf[MAX_PATH];
+  path_conv real_path_buf;
 
   linebuf one_line;
 
@@ -274,15 +273,13 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       goto skip_arg_parsing;
     }
 
-  MALLOC_CHECK;
-
   real_path = real_path_buf;
 
   const char *saved_prog_arg;
   const char *newargv0, **firstarg;
   const char *ext;
 
-  if ((ext = perhaps_suffix (prog_arg, real_path)) == NULL)
+  if ((ext = perhaps_suffix (prog_arg, real_path_buf)) == NULL)
     {
       set_errno (ENOENT);
       return -1;
@@ -381,7 +378,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	  one_line.prepend (" \"", 2);
 	}
 
-      find_exec (pgm, real_path, "PATH=", 0, &ext);
+      find_exec (pgm, real_path_buf, "PATH=", 0, &ext);
       cygwin_conv_to_posix_path (real_path, buf2);
       one_line.prepend (buf2, strlen (buf2));
 
@@ -500,10 +497,8 @@ skip_arg_parsing:
   if (mode == _P_DETACH || !set_console_state_for_spawn ())
     flags |= DETACHED_PROCESS;
 
-  MALLOC_CHECK;
   /* Build windows style environment list */
-  char *envblock = winenv (envp);
-  MALLOC_CHECK;
+  char *envblock = winenv (envp, 0);
 
   /* Preallocated buffer for `sec_user' call */
   char sa_buf[1024];
@@ -977,6 +972,6 @@ int
 spawnvpe (int mode, const char *file, const char * const *argv,
 					     const char * const *envp)
 {
-  char buf[MAXNAMLEN];
+  path_conv buf;
   return _spawnve (NULL, mode, find_exec (file, buf), argv, envp);
 }
