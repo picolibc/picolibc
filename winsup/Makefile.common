@@ -27,7 +27,6 @@ else
 endif
 endif
 
-
 pwd:=${shell pwd}
 ifneq (,${filter-out /%,$(pwd)})
     bupdir:=..
