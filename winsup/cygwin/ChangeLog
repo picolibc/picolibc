@@ -1,3 +1,8 @@
+Sat Jul 29 13:33:49 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (chdir): Avoid trailing dot calculation when chdir == '/'
+	or we end up with an empty string.
+
 Sat Jul 29 12:11:33 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 5 due

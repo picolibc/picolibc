@@ -2642,7 +2642,7 @@ chdir (const char *dir)
          of dots > 2 here instead of returning an error code.  Counts of dots
          <= 2 are already eliminated by normalize_posix_path. */
       char *last_slash = strrchr (pathbuf, '/');
-      if (last_slash && strspn (last_slash + 1, ".") == strlen (last_slash + 1))
+      if (last_slash > pathbuf && strspn (last_slash + 1, ".") == strlen (last_slash + 1))
         *last_slash = '\0';
       free (cwd_posix);
       cwd_posix = strdup (pathbuf);
