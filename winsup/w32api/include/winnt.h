@@ -2578,7 +2578,8 @@ typedef struct _IMAGE_SEPARATE_DEBUG_HEADER {
 	DWORD NumberOfSections;
 	DWORD ExportedNamesSize;
 	DWORD DebugDirectorySize;
-	DWORD Reserved[3];
+	DWORD SectionAlignment;
+	DWORD Reserved[2];
 } IMAGE_SEPARATE_DEBUG_HEADER,*PIMAGE_SEPARATE_DEBUG_HEADER;
 #pragma pack(pop)
 typedef enum _CM_SERVICE_NODE_TYPE {
