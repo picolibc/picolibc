@@ -711,7 +711,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   /* Restore impersonation. In case of _P_OVERLAY this isn't
      allowed since it would overwrite child data. */
-  if (mode != _P_OVERLAY)
+  if (mode != _P_OVERLAY || !rc)
       cygheap->user.reimpersonate ();
 
   MALLOC_CHECK;
@@ -734,7 +734,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   /* FIXME: There is a small race here */
 
-  DWORD res;
+  int res;
   pthread_cleanup cleanup;
   pthread_cleanup_push (do_cleanup, (void *) &cleanup);
   if (mode == _P_SYSTEM)
@@ -788,16 +788,24 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       myself->set_has_pgid_children ();
       ProtectHandle (pi.hThread);
-      pinfo child (cygpid, 1);
+      pinfo child (cygpid, PID_IN_USE);
       if (!child)
 	{
+	  syscall_printf ("pinfo failed");
 	  set_errno (EAGAIN);
-	  syscall_printf ("-1 = spawnve (), process table full");
-	  return -1;
+	  res = -1;
+	  goto out;
 	}
       child->dwProcessId = pi.dwProcessId;
       child->hProcess = pi.hProcess;
-      child.remember ();
+      if (!child.remember ())
+	{
+	  syscall_printf ("process table full");
+	  set_errno (EAGAIN);
+	  res = -1;
+	  goto out;
+	}
+
       strcpy (child->progname, real_path);
       /* FIXME: This introduces an unreferenced, open handle into the child.
 	 The purpose is to keep the pid shared memory open so that all of
@@ -919,6 +927,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       break;
     }
 
+out:
   pthread_cleanup_pop (1);
   return (int) res;
 }

@@ -1,3 +1,11 @@
+2003-09-25  Pierre Humblet <pierre.humblet@ieee.org>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* spawn.cc (spawn_guts): Catch potential error from pinfo.remember.
+	Change debug messages to make sense.  Pass correct value to pinfo
+	constructor.  Ensure cleanup after errors.  Always reimpersonate after
+	errors.
+
 2003-09-25  Christopher Faylor  <cgf@redhat.com>
 
 	* spawn.cc (spawn_guts): Move system signal handling stuff after
