@@ -50,7 +50,8 @@ DEFS = @DEFS@
 CC:=@CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET:=$(CC)
-CFLAGS:=@CFLAGS@ -MD -fno-implement-inlines
+CFLAGS:=@CFLAGS@
+CFLAGS+=-MD
 CXXFLAGS:=@CXXFLAGS@
 
 # For linking mount, etc. crt0.o isn't accessable in a fresh build.
