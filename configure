@@ -1356,8 +1356,7 @@ EOF
                 rm -f ${subdir}/Makefile.tm2
                 sedtemp=sed.$$
                 cat >$sedtemp <<EOF
-s:^SUBDIRS[ 	]*=.*$:SUBDIRS = ${configdirs}:
-s:^NONSUBDIRS[ 	]*=.*$:NONSUBDIRS = ${noconfigdirs}:
+s:@configdirs@:${configdirs}:
 EOF
                 sed -f $sedtemp \
                     ${subdir}/Makefile.tem > ${subdir}/Makefile.tm2

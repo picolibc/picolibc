@@ -331,6 +331,12 @@ case "${target}" in
   arc-*-*)
     noconfigdirs="$noconfigdirs target-libgloss ${libgcj}"
     ;;
+  arm-*-coff | strongarm-*-coff | xscale-*-coff)
+    noconfigdirs="$noconfigdirs ${libgcj}"
+    ;;
+  arm-*-elf* | strongarm-*-elf* | xscale-*-elf*)
+    noconfigdirs="$noconfigdirs target-libffi target-qthreads"
+    ;;
   arm-*-pe*)
     noconfigdirs="$noconfigdirs target-libgloss ${libgcj}"
     ;;
@@ -346,18 +352,6 @@ case "${target}" in
   thumb-*-oabi)
     noconfigdirs="$noconfigdirs target-libgloss ${libgcj}"
     ;;
-  strongarm-*-elf)
-    noconfigdirs="$noconfigdirs ${libgcj}"
-    ;;
-  strongarm-*-coff)
-    noconfigdirs="$noconfigdirs ${libgcj}"
-    ;;
-  xscale-*-elf)
-    noconfigdirs="$noconfigdirs target-libffi target-qthreads"
-    ;;
-  xscale-*-coff)
-    noconfigdirs="$noconfigdirs ${libgcj}"
-    ;;
   thumb-*-pe)
     noconfigdirs="$noconfigdirs target-libgloss ${libgcj}"
     ;;
@@ -367,7 +361,7 @@ case "${target}" in
   avr-*-*)
     noconfigdirs="$noconfigdirs target-libiberty ${libstdcxx_version} ${libgcj}"
     ;;
-  c4x-*-*)
+  c4x-*-* | tic4x-*-*)
     noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj}"
     ;;
   c54x*-*-* | tic54x-*-*)
@@ -426,10 +420,6 @@ case "${target}" in
     ;;
   i[34567]86-*-freebsd*)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
-    ;;
-  s390*-*-linux*)
-    # The libffi port is not yet in the GCC tree
-    noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
     ;;
   i[3456]86-*-linux*)
     # This section makes it possible to build newlib natively on linux.
@@ -526,6 +516,9 @@ case "${target}" in
     ;;
   powerpc-*-beos*)
     noconfigdirs="$noconfigdirs gdb target-newlib target-libgloss ${libgcj}"
+    ;;
+  powerpc-*-darwin*)
+    noconfigdirs="$noconfigdirs bfd binutils ld gas opcodes gdb tk itcl tix libgui gprof ${libgcj}"
     ;;
   powerpc-*-eabi)
     noconfigdirs="$noconfigdirs ${libgcj}"
@@ -1328,20 +1321,23 @@ esac
 # If --enable-shared was set, we must set LD_LIBRARY_PATH so that the
 # binutils tools will find libbfd.so.
 if test "${shared}" = "yes" ; then
-  sed -e 's/^SET_LIB_PATH[ 	]*=.*$/SET_LIB_PATH = $(REALLY_SET_LIB_PATH)/' \
-      Makefile > Makefile.tem
-  rm -f Makefile
-  mv -f Makefile.tem Makefile
-
-  case "${host}" in
-  *-*-hpux*)
-    sed -e 's/^RPATH_ENVVAR[ 	]*=.*$/RPATH_ENVVAR = SHLIB_PATH/' \
-	Makefile > Makefile.tem
-    rm -f Makefile
-    mv -f Makefile.tem Makefile
-    ;;
-  esac
+  SET_LIB_PATH="\$(REALLY_SET_LIB_PATH)"
+else
+  SET_LIB_PATH=
 fi
+sed -e "s/@SET_LIB_PATH@/${SET_LIB_PATH}/" Makefile > Makefile.tem
+rm -f Makefile
+mv -f Makefile.tem Makefile
+
+
+case "${host}" in
+  *-*-hpux*) RPATH_ENVVAR=SHLIB_PATH ;;
+  *) RPATH_ENVVAR=LD_LIBRARY_PATH ;;
+esac
+sed -e "s/@RPATH_ENVVAR@/${RPATH_ENVVAR}/" Makefile > Makefile.tem
+rm -f Makefile
+mv -f Makefile.tem Makefile
+
 
 # Base args.  Strip norecursion, cache-file, srcdir, host, build, target.
 # These are the ones we might not want to pass down to subconfigures.

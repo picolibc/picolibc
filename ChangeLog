@@ -1,3 +1,86 @@
+2002-10-07  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* configure.in: Add tic4x target.
+
+2002-10-03  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Make SET_LIB_PATH substitution more autoconfy.
+	* Makefile.tpl: Make RPATH_ENVVAR substitution more autoconfy.
+	* configure.in: Make SET_LIB_PATH substitution more autoconfy.
+	* configure.in: Make RPATH_ENVVAR substitution more autoconfy.
+	* Makefile.in: Regenerate.
+
+2002-10-02  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Eliminate reference to all-gui, all-libproc.
+	* Makefile.in: Regenerate.
+
+	* Makefile.def: Remove order dependency comments.
+	* Makefile.tpl: Add explicit install-install dependencies.
+	* Makefile.in: Regenerate.
+
+	* Makefile.tpl: Remove material now in src-release.  (Finally!)
+	* Makefile.in: Regenerate.
+
+	* configure: Restore my original patch by syncing with gcc version.
+
+	* Bring following over from gcc:
+
+2002-09-30  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* configure.in (s390*-*-linux*): Enable libgcj.
+
+2002-10-02  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.in: Regenerate.  This really ought to fix things. :sigh:
+
+2002-10-02  Alan Modra  <amodra@bigpond.net.au>
+
+	* configure: Move stray lines back to where they belong.
+
+2002-10-01  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Insert configure-target target, for src-release.
+
+	* configure: Finish reverting change which Andrew Cagney started
+	reverting.  Should fix bustage.
+
+	* src-release (BINUTILS_SUPPORT_DIRS): Add cpu directory.
+	* src-release: New file.  Contains material for making net
+	releases for gdb, binutils, et al., formerly in Makefile.in.
+
+2002-09-30  Nick Clifton  <nickc@redhat.com>
+
+	* cpu: New top level directory.  Intended to hold input files for
+	CGEN which have FSF copyright assignment.
+	* Makefile.in (BINUTILS_SUPPORT_DIRS): Add cpu directory.
+
+2002-09-29  Andrew Cagney  <ac131313@redhat.com>
+
+	Revert below (note that src does not contain Makefile.tpl):
+	* Makefile.tpl: Make subsituted variables more autoconfy.
+	* Makefile.in: Regenerate.
+
+2002-09-29  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure: Revert accidentally applied changes.
+
+	* Makefile.tpl: Make more autoconf-friendly.
+	* Makefile.in: Regenerate.
+	* configure: Make substitution more autoconf-like.
+
+2002-09-28  Richard Earnshaw  <rearnsha@arm.com>
+
+	* configure.in (arm-*-coff, strongarm-*-coff, xscale-*-coff): Use a
+	single entry to handle all these.
+	(arm-*-elf, strongarm-*-elf, xscale-*-elf): Likewise.  Also enable
+	libjava on arm-*-elf.
+
+2002-09-27  Geoffrey Keating  <geoffk@apple.com>
+
+	* configure.in (powerpc-*-darwin*): Don't configure BFD, TK, or the
+	things that depend on them.
+
 2002-09-25  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* Makefile.tpl: Make subsituted variables more autoconfy.
