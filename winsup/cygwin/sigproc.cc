@@ -1182,6 +1182,8 @@ wait_sig (VOID *self)
 	  else
 	    {
 	      int sig = pack.si.si_signo;
+	      // FIXME: Not quite right when taking threads into consideration.
+	      // Do we need a per-thread queue?
 	      if (sigq.sigs[sig].si.si_signo)
 		sigproc_printf ("sig %d already queued", pack.si.si_signo);
 	      else
