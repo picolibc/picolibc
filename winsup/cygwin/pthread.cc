@@ -1,6 +1,6 @@
 /* pthread.cc: posix pthread interface for Cygwin
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Originally written by Marco Fuykschot <marco@ddi.nl>
 
@@ -12,6 +12,7 @@
 
 #include "winsup.h"
 #include "thread.h"
+#include "errno.h"
 
 extern "C"
 {
@@ -173,7 +174,9 @@ pthread_continue (pthread_t thread)
 unsigned long
 pthread_getsequence_np (pthread_t * thread)
 {
-  return __pthread_getsequence_np (thread);
+  if (!pthread::isGoodObject (thread))
+    return EINVAL;
+  return (*thread)->getsequence_np();
 }
 
 /* Thread SpecificData */

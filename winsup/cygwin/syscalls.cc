@@ -1943,12 +1943,16 @@ seteuid32 (__uid32_t uid)
   debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
 
   if (!wincap.has_security ()
-      || (uid == myself->uid
-	  && !cygheap->user.groups.ischanged)
-      || uid == ILLEGAL_UID)
+      || (uid == myself->uid && !cygheap->user.groups.ischanged))
     {
       debug_printf ("Nothing happens");
       return 0;
+    }
+
+  if (uid == ILLEGAL_UID)
+    {
+      set_errno (EINVAL);
+      return -1;
     }
 
   sigframe thisframe (mainthread);
@@ -2122,10 +2126,14 @@ setuid (__uid16_t uid)
 extern "C" int
 setegid32 (__gid32_t gid)
 {
-  if ((!wincap.has_security ()) ||
-      (gid == myself->gid) ||
-      (gid == ILLEGAL_GID))
+  if (!wincap.has_security () || gid == myself->gid)
     return 0;
+
+  if (gid == ILLEGAL_GID)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
   sigframe thisframe (mainthread);
   user_groups * groups = &cygheap->user.groups;
