@@ -1,4 +1,4 @@
-2000-12-19  Nick Clifton  <nickc@redhat.com>
+2000-12-19  Graham Stott <grahams@redhat.com>
 
         * libc/machine/xscale/memcmp.c (memcmp): Add clobber for "lr".
 
