@@ -1,8 +1,12 @@
+Sat Nov  4 14:24:10 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (wait_subproc): Still more debugging cleanup.
+
 Sat Nov  4 00:51:38 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo.cc (EnumProcessesNT): Avoid 0 pids.
 	(EnumProcesses9x): Ditto.
-	* sigproc.cc (remove_childe): Eliminate.
+	* sigproc.cc (remove_child): Eliminate.
 	(proc_subproc): Move remove_child stuff here.
 	(wait_subproc): Synchronize with proc_subproc when error occurs.  Add
 	more debugging info.

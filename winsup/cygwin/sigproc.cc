@@ -1246,14 +1246,14 @@ wait_subproc (VOID *)
 	  system_printf ("wait failed. nchildren %d, wait %d, %E",
 			nchildren, proc_loop_wait);
 
-	  for (int i = 0; i < nchildren + 1; i++)
+	  for (int i = 0; i <= nchildren; i++)
 	    if ((rc = WaitForSingleObject (events[i], 0)) == WAIT_OBJECT_0 ||
 		rc == WAIT_TIMEOUT)
 	      continue;
 	    else
 	      {
-		system_printf ("nchildren %d, event[%d] %p, pchildren[%d] %p, %E",
-			       nchildren, i, events[0], i, (_pinfo *) pchildren[i]);
+		system_printf ("nchildren %d, event[%d] %p, pchildren[%d] %p, events[0] %p, %E",
+			       nchildren, i, events[i], i, (_pinfo *) pchildren[i], events[0]);
 		system_printf ("pid %d, dwProcessId %u, progname '%s'",
 			       pchildren[i]->pid, pchildren[i]->dwProcessId,
 			       pchildren[i]->progname);
