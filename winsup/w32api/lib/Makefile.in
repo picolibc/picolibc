@@ -135,7 +135,7 @@ ddk:
 
 TEST_OPTIONS = $(ALL_CFLAGS) -DWINVER=0x0666  \
 	-Wall -pedantic -Wsystem-headers -c $(srcdir)/test.c -o test.o
-.PHONY: test
+.PHONY: test ddk
 test:
 	@echo "Testing w32api..."
 	@for lang in c c++ objective-c ; do \
@@ -193,7 +193,7 @@ install-headers:
 	done
 
 install-ddk: install-libraries install-headers
-	(cd ddk && $(MAKE) install $(FLAGS_TO_PASS) prefix=../$(prefix) exec_prefix=../$(exec_prefix))
+	cd ddk && $(MAKE) install $(FLAGS_TO_PASS)
 
 # uninstall headers and libraries from a target specified directory
 uninstall: uninstall-ddk uninstall-libraries uninstall-headers

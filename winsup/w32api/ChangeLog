@@ -1,3 +1,12 @@
+2003-03-11  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/winsvc.h (SERVICE_NO_CHANGE): Use hex constant to avoid
+	warnings.
+	Thanks to Fabricio D. Rossi <gurusoda@users.sf.net>.
+	* Makefile.in (bindist): Correct process.
+	* lib/Makefile.in (install): Ditto.
+	Thanks to Jeff Bonnggren <jbon@users.sf.net>.
+
 2003-03-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/rasdlg.h: New file.
