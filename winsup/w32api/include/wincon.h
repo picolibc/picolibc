@@ -72,6 +72,10 @@ typedef struct _COORD {
 	SHORT X;
 	SHORT Y;
 } COORD;
+typedef struct _CONSOLE_FONT_INFO {
+	DWORD nFont;
+	COORD dwFontSize;
+} CONSOLE_FONT_INFO, *PCONSOLE_FONT_INFO;
 typedef struct _CONSOLE_SCREEN_BUFFER_INFO {
 	COORD	dwSize;
 	COORD	dwCursorPosition;

@@ -1,3 +1,10 @@
+2003-03-17  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* include/winbase.h (EnumResourceLanguages[AW]): Correct prototypes.
+	(EnumResourceNames[AW]): Ditto.
+	(EnumResourceTypes[AW]): Ditto.
+	* include/wincon.h (CONSOLE_FONT_INFO): Add struct.
+
 2003-03-16  Toby Malone  <malone@users.sourceforge.net>
 
 	* include/winuser.h (SendInput): Add prototype.
