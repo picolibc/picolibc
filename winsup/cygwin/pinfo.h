@@ -29,11 +29,13 @@ struct commune_result
 {
   char *s;
   int n;
+  HANDLE handles[2];
 };
 
 enum picom
 {
-  PICOM_CMDLINE = 1
+  PICOM_CMDLINE = 1,
+  PICOM_FIFO = 2
 };
 
 class _pinfo
@@ -136,7 +138,7 @@ public:
 
   inline void setthread2signal (void *thr) {thread2signal = (pthread *) thr;}
   void commune_recv ();
-  commune_result commune_send (DWORD);
+  commune_result commune_send (DWORD, ...);
   bool alive ();
   char *cmdline (size_t &);
 
