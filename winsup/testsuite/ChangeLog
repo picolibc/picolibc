@@ -1,3 +1,8 @@
+2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
+	
+	* winsup.api/pthread/cancel6.c: New test. Port from pthreads-win32 
+	project.
+
 2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
 	
 	* winsup.api/pthread/mutex1d.c: New test. Port from pthreads-win32 
