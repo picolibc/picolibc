@@ -18,12 +18,15 @@
 # This makefile requires GNU make.
 
 PACKAGE = mingw-runtime
-VERSION = 1.0
+VERSION = 1.1
+CYGRELEASE = 1
 
 VPATH = @srcdir@
 srcdir = @srcdir@
 objdir = .
 
+host_alias = @host_alias@
+build_alias = @build_alias@
 target_alias = @target_alias@
 prefix = @prefix@
 
@@ -31,10 +34,27 @@ program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
-tooldir = $(exec_prefix)/$(target_alias)
+ifeq ($(target_alias),$(host_alias))
+ifeq ($(build_alias),$(host_alias))
+tooldir:=$(exec_prefix)
+else
+tooldir:=$(exec_prefix)/$(target_alias)
+endif
+else
+tooldir:=$(exec_prefix)/$(target_alias)
+endif
 datadir = @datadir@
 infodir = @infodir@
 includedir = @includedir@
+ifneq (,$(findstring cygwin,$(target_alias)))
+inst_bindir:=$(tooldir)/usr/bin
+inst_includedir:=$(tooldir)/usr/include/mingw
+inst_libdir:=$(tooldir)/usr/lib/mingw
+else
+inst_bindir:=$(bindir)
+inst_includedir:=$(includedir)
+inst_libdir:=$(libdir)
+endif
 
 # The Mingw headers are installed under a subdirectory of 
 # $(tooldir)/include when configuring in Cygwin.
@@ -113,6 +133,9 @@ FLAGS_TO_PASS:=\
 	datadir="$(datadir)" \
 	infodir="$(infodir)" \
 	includedir="$(includedir)" \
+	inst_bindir="$(inst_bindir)" \
+	inst_includedir="$(inst_includedir)" \
+	inst_libdir="$(inst_libdir)" \
 	prefix="$(prefix)" \
 	target_alias="$(target_alias)"
 
@@ -143,7 +166,7 @@ all_dlls_host: $(DLLS)
 
 install_dlls_host:
 	for i in $(DLLS); do \
-		$(INSTALL_PROGRAM) $$i $(bindir)/$$i ; \
+		$(INSTALL_PROGRAM) $$i $(inst_bindir)/$$i ; \
 	done
 
 _libm_dummy.o:
@@ -237,9 +260,13 @@ distclean:
 	-rm -f Makefile
 
 ifdef SNAPDATE
-   distdir=$(PACKAGE)-$(VERSION)-$(SNAPDATE)
+      distdir=$(PACKAGE)-$(VERSION)-$(SNAPDATE)
 else
-   distdir=$(PACKAGE)-$(VERSION)
+   ifneq (,$(findstring cygwin, $(target_alias)))
+      distdir=$(PACKAGE)-$(VERSION)-$(CYGRELEASE)
+   else
+      distdir=$(PACKAGE)-$(VERSION)
+   endif
 endif
 
 dist: srcdist bindist
@@ -270,16 +297,8 @@ bindist:
 	chmod 755 $(distdir)
 	$(MAKE) install prefix=$(shell pwd)/$(distdir)
 	rm -f $(distdir).tar.gz
-#FIXME does the install process really need to install into the $(tooldir)? 
-	cd $(distdir) ; \
-	cd $(target_alias); \
-	for i in *; do \
-	   mv $$i ../; \
-        done; \
-	cd ..; \
-	rmdir $(target_alias); \
+	cd $(distdir); \
 	$(TAR) czf ../$(distdir).tar.gz *
-#end FIXME
 
 snapshot: 
 	make dist SNAPDATE=$(shell date '+%Y%m%d')
@@ -291,18 +310,19 @@ info-html:
 install-info: info
 
 install-dirs:
-	$(mkinstalldirs) $(bindir)
-	$(mkinstalldirs) $(tooldir)/lib$(subdirforlib)
+	$(mkinstalldirs) $(inst_bindir)
+	$(mkinstalldirs) $(inst_includedir)
+	$(mkinstalldirs) $(inst_libdir)
 
 install: all install-dirs $(install_dlls_host)
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib$(subdirforlib)/$$i ; \
+		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
 	done
 	for i in $(CRT0S); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$(subdirforlib)/$$i ; \
+		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
 	done
 	for sub in . sys ; do \
-		dstdir=$(tooldir)/include/$(HEADER_SUBDIR)/$$sub ; \
+		dstdir=$(inst_includedir)/$$sub ; \
 		$(mkinstalldirs) $$dstdir ; \
 		for i in $(srcdir)/include/$$sub/*.h ; do \
 		  $(INSTALL_DATA) $$i $$dstdir/`basename $$i` ; \

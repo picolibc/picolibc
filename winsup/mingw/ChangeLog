@@ -1,3 +1,8 @@
+2001-09-17  Earnie Boyd  <earnie@SF.net>
+
+	* Makefile.in: Increment version.
+	* include/_mingw.h: Ditto.
+
 2001-09-10  Earnie Boyd  <earnie@SF.net>
 
 	* dossh: Remove inadvertantly imported file.
