@@ -491,7 +491,7 @@ fhandler_base::read (void *in_ptr, size_t in_len)
   rpos_ += copied_chars;
 
 #ifndef NOSTRACE
-  if (strace_active)
+  if (strace.active)
     {
       char buf[16 * 6 + 1];
       char *p = buf;

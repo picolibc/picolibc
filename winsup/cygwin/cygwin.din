@@ -11,7 +11,6 @@ __swbuf
 __vc__10pinfo_listi
 @ALLOCA@
 cygwin_stackdump
-_strace_wm
 abort
 _abort = abort
 abs

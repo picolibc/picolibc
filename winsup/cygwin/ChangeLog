@@ -1,3 +1,11 @@
+Tue Mar  7 00:29:34 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Throughout use strace class in place of individual functions and
+	variables.
+	* cygwin.din: Eliminate _strace_wm.
+	* sigproc.cc (wait_sig): Temporarily add more debugging output.
+	* include/cygwin/version.h: Bump minor api to reflect export change.
+
 Sun Mar  5 01:17:05 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (call_handler): Streamline to use only one call to

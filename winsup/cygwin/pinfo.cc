@@ -43,26 +43,26 @@ set_myself (pinfo *p)
   myself->start_time = time (NULL); /* Register our starting time. */
 
   char buf[30];
-  __small_sprintf (buf, "cYg%8x %x %x", _STRACE_INTERFACE_ACTIVATE_ADDR,
-		   &strace_active);
+  __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR,
+		   &strace.active);
   OutputDebugString (buf);
 
   (void) GetModuleFileName (NULL, myself->progname,
 			    sizeof(myself->progname));
-  if (strace_active)
+  if (strace.active)
     {
       extern char osname[];
-      strace_printf (1, "**********************************************");
-      strace_printf (1, "Program name: %s", myself->progname);
-      strace_printf (1, "App version:  %d.%d, api: %d.%d",
+      strace.prntf (1, "**********************************************");
+      strace.prntf (1, "Program name: %s", myself->progname);
+      strace.prntf (1, "App version:  %d.%d, api: %d.%d",
 			user_data->dll_major, user_data->dll_minor,
 			user_data->api_major, user_data->api_minor);
-      strace_printf (1, "DLL version:  %d.%d, api: %d.%d",
+      strace.prntf (1, "DLL version:  %d.%d, api: %d.%d",
 			cygwin_version.dll_major, cygwin_version.dll_minor,
 			cygwin_version.api_major, cygwin_version.api_minor);
-      strace_printf (1, "DLL build:    %s", cygwin_version.dll_build_date);
-      strace_printf (1, "OS version:   Windows %s", osname);
-      strace_printf (1, "**********************************************");
+      strace.prntf (1, "DLL build:    %s", cygwin_version.dll_build_date);
+      strace.prntf (1, "OS version:   Windows %s", osname);
+      strace.prntf (1, "**********************************************");
     }
 
   return myself;

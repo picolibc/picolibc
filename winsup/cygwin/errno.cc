@@ -119,15 +119,15 @@ seterrno_from_win_error (const char *file, int line, int code)
 
   if (errmap[i].w != 0)
     {
-      if (strace_active)
-	strace_printf (_STRACE_SYSCALL, "%s:%d seterrno: %d (%s) -> %d",
+      if (strace.active)
+	strace.prntf (_STRACE_SYSCALL, "%s:%d seterrno: %d (%s) -> %d",
 		      file, line, code, errmap[i].s, errmap[i].e);
       set_errno (errmap[i].e);
     }
   else
     {
-      if (strace_active)
-	strace_printf (_STRACE_SYSCALL, "%s:%d seterrno: unknown error %d", file, line, code);
+      if (strace.active)
+	strace.prntf (_STRACE_SYSCALL, "%s:%d seterrno: unknown error %d", file, line, code);
       set_errno (EACCES);
     }
 }

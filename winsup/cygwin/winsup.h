@@ -392,8 +392,7 @@ void events_terminate (void);
 
 void __stdcall close_all_files (void);
 
-/* Strace facility.  See strace.cc, sys/strace.h and utils/strace.cc. */
-extern DWORD strace_active;
+extern class strace strace;
 
 /* Invisible window initialization/termination. */
 HWND __stdcall gethwnd (void);

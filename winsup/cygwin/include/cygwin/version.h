@@ -93,10 +93,11 @@ details. */
        15: Export glob
        16: Export cygwin_stackdump
        17: Export fast math stuff
+       18: Stop exporting _strace_wm
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 17
+#define CYGWIN_VERSION_API_MINOR 18
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

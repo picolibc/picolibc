@@ -142,9 +142,7 @@ hinfo::release (int fd)
 {
   if (!not_open (fd))
     {
-MALLOC_CHECK;
       delete (fds[fd]);
-MALLOC_CHECK;
       fds[fd] = NULL;
     }
 }

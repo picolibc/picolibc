@@ -7,9 +7,6 @@
 /* CYGNUS LOCAL */
 #define lint
 #include <windows.h>
-#include <sys/strace.h>
-
-extern DWORD strace_active;
 
 #define USG_COMPAT
 

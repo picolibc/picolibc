@@ -1262,7 +1262,7 @@ wait_sig (VOID *)
 
 		/* Internal signal to force a flush of strace data to disk. */
 		case __SIGSTRACE:
-		  // proc_strace ();	// Dump cached strace_printf stuff.
+		  // proc_strace ();	// Dump cached strace.prntf stuff.
 		  break;
 
 		/* Signalled from a child process that it has stopped */
@@ -1301,11 +1301,14 @@ wait_sig (VOID *)
 	{
 	case 0:
 	  SetEvent (sigcomplete_main);
+sigproc_printf ("signalled sigcomplete_main");
 	  break;
 	case 1:
 	  ReleaseSemaphore (sigcomplete_nonmain, 1, NULL);
+sigproc_printf ("signalled sigcomplete_nonmain");
 	  break;
 	default:
+sigproc_printf ("Did not signal anyone");
 	  /* Signal from another process.  No need to synchronize. */
 	  break;
 	}

@@ -105,8 +105,8 @@ DWORD
 fhandler_tty_common::__acquire_output_mutex (const char *fn, int ln,
 					   DWORD ms)
 {
-  if (strace_active)
-    strace_printf (_STRACE_TERMIOS, "%F (%d): tty output_mutex: waiting %d ms", fn, ln, ms);
+  if (strace.active)
+    strace.prntf (_STRACE_TERMIOS, "%F (%d): tty output_mutex: waiting %d ms", fn, ln, ms);
   DWORD res = WaitForSingleObject (output_mutex, ms);
   if (res == WAIT_OBJECT_0)
     {
@@ -118,8 +118,8 @@ fhandler_tty_common::__acquire_output_mutex (const char *fn, int ln,
       osi++;
 #endif
     }
-  if (strace_active)
-    strace_printf (_STRACE_TERMIOS, "%F (%d): tty output_mutex: acquired", fn, ln, res);
+  if (strace.active)
+    strace.prntf (_STRACE_TERMIOS, "%F (%d): tty output_mutex: acquired", fn, ln, res);
   return res;
 }
 
@@ -136,8 +136,8 @@ fhandler_tty_common::__release_output_mutex (const char *fn, int ln)
       ostack[osi].ln = -ln;
 #endif
     }
-  if (strace_active)
-    strace_printf (_STRACE_TERMIOS, "%F (%d): tty output_mutex released", fn, ln);
+  if (strace.active)
+    strace.prntf (_STRACE_TERMIOS, "%F (%d): tty output_mutex released", fn, ln);
 }
 
 #define acquire_output_mutex(ms) \

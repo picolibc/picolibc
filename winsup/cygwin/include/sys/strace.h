@@ -19,11 +19,25 @@
 #ifndef _SYS_STRACE_H
 #define _SYS_STRACE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stdarg.h>
 
-#define _STRACE_INTERFACE_ACTIVATE_ADDR -1
+class strace
+{
+  friend void __system_printf (const char *fmt, ...);
+  int microseconds ();
+  int vsprntf (char *buf, const char *infmt, va_list ap);
+  void write (unsigned category, const char *buf, int count);
+public:
+  int version;
+  int active;
+  int lmicrosec;
+  strace() : version(1) {}
+  void prntf (unsigned category, const char *fmt,...);
+  void wm (int message, int word, int lon);
+};
+
+#define _STRACE_INTERFACE_ACTIVATE_ADDR  -1
+#define _STRACE_INTERFACE_ACTIVATE_ADDR1 -2
 
 /* Bitmasks of tracing messages to print.  */
 
@@ -47,33 +61,23 @@ extern "C" {
 #define _STRACE_THREAD	 0x40000 // thread-locking calls
 #define _STRACE_NOTALL	 0x80000 // don't include if _STRACE_ALL
 
-void small_printf (const char *, ...);
+extern "C" void small_printf (const char *, ...);
 
-#ifdef NOSTRACE
-#define strace_printf(category, fmt...) 0
-#define strace_printf_wrap(category, fmt...) 0
-#define strace_printf_wrap1(category, fmt...) 0
-#define strace_wm(category, msg...) 0
-#else
+#ifndef NOSTRACE
 /* Output message to strace log */
-void strace_printf (unsigned, const char *, ...);
-void __system_printf (const char *, ...);
-
 #define system_printf(fmt, args...) \
   __system_printf("%F: " fmt, __PRETTY_FUNCTION__ , ## args)
 
-void _strace_wm (int __message, int __word, int __lon);
-
 #define strace_printf_wrap(what, fmt, args...) \
    ((void) ({\
-	if (strace_active) \
-	  strace_printf(_STRACE_ ## what, "%F: " fmt, __PRETTY_FUNCTION__ , ## args); \
+	if (strace.active) \
+	  strace.prntf(_STRACE_ ## what, "%F: " fmt, __PRETTY_FUNCTION__ , ## args); \
 	0; \
     }))
 #define strace_printf_wrap1(what, fmt, args...) \
     ((void) ({\
-	if (strace_active) \
-	  strace_printf((_STRACE_ ## what) | _STRACE_NOTALL, "%F: " fmt, __PRETTY_FUNCTION__ , ## args); \
+	if (strace.active) \
+	  strace.prntf((_STRACE_ ## what) | _STRACE_NOTALL, "%F: " fmt, __PRETTY_FUNCTION__ , ## args); \
 	0; \
     }))
 #endif /*NOSTRACE*/
@@ -88,9 +92,5 @@ void _strace_wm (int __message, int __word, int __lon);
 #define minimal_printf(fmt, args...) strace_printf_wrap1(MINIMAL, fmt , ## args)
 #define malloc_printf(fmt, args...) strace_printf_wrap1(MALLOC, fmt , ## args)
 #define thread_printf(fmt, args...) strace_printf_wrap1(THREAD, fmt , ## args)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _SYS_STRACE_H */

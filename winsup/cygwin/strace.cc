@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include <ctype.h>
-#include <stdarg.h>
 #include <stdlib.h>
 #include <time.h>
 #include "winsup.h"
@@ -17,7 +16,8 @@ details. */
 #define PROTECT(x) x[sizeof(x)-1] = 0
 #define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
 
-DWORD NO_COPY strace_active = 0;
+
+class strace NO_COPY strace;
 
 /* 'twould be nice to declare this in winsup.h but winsup.h doesn't require
    stdarg.h, so we declare it here instead. */
@@ -25,13 +25,15 @@ DWORD NO_COPY strace_active = 0;
 #ifndef NOSTRACE
 
 #ifndef STRACE_HHMMSS
-static long long hires_frequency = 0;
-static int hires_initted = 0;
-
-static int strace_microseconds()
+int
+strace::microseconds()
 {
   static int first_microsec = 0;
+  static long long hires_frequency = 0;
+  static int hires_initted = 0;
+
   int microsec;
+
   if (!hires_initted)
     {
       hires_initted = 1;
@@ -59,8 +61,8 @@ static int strace_microseconds()
 #endif
 
 /* sprintf analog for use by output routines. */
-static int
-strace_vsprintf (char *buf, const char *infmt, va_list ap)
+int
+strace::vsprntf (char *buf, const char *infmt, va_list ap)
 {
   int count;
   char fmt[80];
@@ -68,8 +70,7 @@ strace_vsprintf (char *buf, const char *infmt, va_list ap)
   DWORD err = GetLastError ();
   const char *tn = threadname (0);
 
-  static int lmicrosec = 0;
-  int microsec = strace_microseconds ();
+  int microsec = microseconds ();
   lmicrosec = microsec;
 
   __small_sprintf (fmt, "%7d [%s] %s ", microsec, tn, "%s %d%s");
@@ -125,8 +126,8 @@ done:
 }
 
 /* Write to strace file or strace queue. */
-static void
-strace_write (unsigned category, const char *buf, int count)
+void
+strace::write (unsigned category, const char *buf, int count)
 {
 # define PREFIX (3 + 8 + 1 + 8 + 1)
   char outbuf[PREFIX + 1 + count + 1];
@@ -141,10 +142,10 @@ strace_write (unsigned category, const char *buf, int count)
    Warning: DO NOT SET ERRNO HERE! */
 
 void
-strace_printf (unsigned category, const char *fmt,...)
+strace::prntf (unsigned category, const char *fmt,...)
 {
   DWORD err = GetLastError ();
-  if (strace_active)
+  if (active)
     {
       int count;
       va_list ap;
@@ -153,11 +154,11 @@ strace_printf (unsigned category, const char *fmt,...)
       PROTECT(buf);
       va_start (ap, fmt);
       SetLastError (err);
-      count = strace_vsprintf (buf, fmt, ap);
+      count = this->vsprntf (buf, fmt, ap);
       va_end (ap);
       CHECK(buf);
 
-      strace_write (category, buf, count);
+      this->write (category, buf, count);
     }
   SetLastError (err);
 }
@@ -325,9 +326,10 @@ ta[] =
   {  WM_ASYNCIO, "ASYNCIO"  },
   {  0, 0  }};
 
-void _strace_wm (int message, int word, int lon)
+void
+strace::wm (int message, int word, int lon)
 {
-  if (strace_active)
+  if (active)
     {
       int i;
 
@@ -335,11 +337,11 @@ void _strace_wm (int message, int word, int lon)
 	{
 	  if (ta[i].v == message)
 	    {
-	      strace_printf (_STRACE_WM, "wndproc %d %s %d %d", message, ta[i].n, word, lon);
+	      this->prntf (_STRACE_WM, "wndproc %d %s %d %d", message, ta[i].n, word, lon);
 	      return;
 	    }
 	}
-      strace_printf (_STRACE_WM, "wndproc %d unknown  %d %d", message, word, lon);
+      this->prntf (_STRACE_WM, "wndproc %d unknown  %d %d", message, word, lon);
     }
 }
 
@@ -356,7 +358,7 @@ __system_printf (const char *fmt,...)
 
   PROTECT (buf);
   va_start (ap, fmt);
-  count = strace_vsprintf (buf, fmt, ap);
+  count = strace.vsprntf (buf, fmt, ap);
   va_end (ap);
   CHECK (buf);
 
@@ -365,25 +367,12 @@ __system_printf (const char *fmt,...)
   FlushFileBuffers (GetStdHandle (STD_ERROR_HANDLE));
 
 #ifndef NOSTRACE
-  if (strace_active)
-    strace_write (1, buf, count);
+  if (strace.active)
+    strace.write (1, buf, count);
 #endif
 
 #ifdef DEBUGGING
 //  try_to_debug ();
 #endif
-}
-
-#else
-
-/* empty functions for when strace is disabled */
-
-void
-strace_init (const char *buf)
-{}
-
-extern "C" {
-void _strace_wm (int message, int word, int lon)
-{}
 }
 #endif /*NOSTRACE*/

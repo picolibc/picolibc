@@ -24,7 +24,7 @@ static LRESULT CALLBACK
 WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 #ifndef NOSTRACE
-  _strace_wm (uMsg, wParam, lParam);
+  strace.wm (uMsg, wParam, lParam);
 #endif
   switch (uMsg)
     {
