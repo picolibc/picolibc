@@ -34,10 +34,15 @@ _syscall1(int,chroot,const char *,path)
 _syscall2(int,symlink,const char *,oldpath,const char *,newpath)
 _syscall3(int,readlink,const char *,path,char *,buf,size_t,bufsiz)
 _syscall2(int,stat,const char *,file_name,struct stat *,buf)
+_syscall2(int,statfs,const char *,file_name,struct statfs *,buf)
 _syscall2(int,lstat,const char *,file_name,struct stat *,buf)
 _syscall2(int,fstat,int,filedes,struct stat *,buf)
+_syscall2(int,fstatfs,int,filedes,struct statfs *,buf)
 _syscall3(int,getdents,int,fd,struct dirent *,dirp,unsigned int,count)
 _syscall1(mode_t,__umask,mode_t,mask)
+
+weak_alias(__libc_statfs,__statfs)
+weak_alias(__libc_fstatfs,__fstatfs)
 
 static _syscall3(int,fchown32,int,fd,uid_t,owner,gid_t,group)
 

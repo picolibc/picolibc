@@ -24,6 +24,9 @@ LIB_SOURCES = \
 	fpathconf.c \
 	free.c \
 	freer.c \
+	fstab.c \
+	fstatvfs.c \
+	fstatvfs64.c \
 	ftok.c \
 	funlockfile.c \
 	getdate.c \
@@ -45,6 +48,8 @@ LIB_SOURCES = \
 	malloptr.c \
 	mallstatsr.c \
 	mmap.c \
+	mntent.c \
+	mntent_r.c \
 	mq_close.c \
 	mq_getattr.c \
 	mq_notify.c \
@@ -91,6 +96,8 @@ LIB_SOURCES = \
 	socket.c \
 	sleep.c \
 	stack.c \
+	statvfs.c \
+	statvfs64.c \
 	strsignal.c \
 	sysconf.c \
 	sysctl.c \

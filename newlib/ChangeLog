@@ -1,5 +1,22 @@
 2002-07-24  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/sys/linux/Makefile.am: Add new files.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/fstab.c: New file.
+	* libc/sys/linux/fstatvfs.c: Ditto.
+	* libc/sys/linux/fstatvfs64.c: Ditto.
+	* libc/sys/linux/internal_statvfs.c: Ditto.
+	* libc/sys/linux/mntent.c: Ditto.
+	* libc/sys/linux/mntent_r.c: Ditto.
+	* libc/sys/linux/statvfs.c: Ditto.
+	* libc/sys/linux/statvfs64.c: Ditto.
+	* libc/sys/linux/include/paths.h: Ditto.
+	* libc/sys/linux/inode.c (statfs, fstatfs): New syscalls
+	with double-underscore weak-aliases.
+	* libc/sys/linux/sys/stat.h: Add *stat64 prototypes.
+
+2002-07-24  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/signal.h (SIG_IGN, SIG_DFL, SIG_ERR): Change
 	to use _sig_func_ptr type casted constants.
 	(_sig_func_ptr): Typedef moved to sys/signal.h.

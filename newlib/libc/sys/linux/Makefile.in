@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -121,6 +121,9 @@ LIB_SOURCES = \
 	fpathconf.c \
 	free.c \
 	freer.c \
+	fstab.c \
+	fstatvfs.c \
+	fstatvfs64.c \
 	ftok.c \
 	funlockfile.c \
 	getdate.c \
@@ -142,6 +145,8 @@ LIB_SOURCES = \
 	malloptr.c \
 	mallstatsr.c \
 	mmap.c \
+	mntent.c \
+	mntent_r.c \
 	mq_close.c \
 	mq_getattr.c \
 	mq_notify.c \
@@ -188,6 +193,8 @@ LIB_SOURCES = \
 	socket.c \
 	sleep.c \
 	stack.c \
+	statvfs.c \
+	statvfs64.c \
 	strsignal.c \
 	sysconf.c \
 	sysctl.c \
@@ -247,21 +254,23 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@clock_gettime.$(OBJEXT) clock_settime.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@ctermid.$(OBJEXT) flockfile.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@fpathconf.$(OBJEXT) free.$(OBJEXT) freer.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@ftok.$(OBJEXT) funlockfile.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@getdate.$(OBJEXT) getdate_err.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@gethostname.$(OBJEXT) getoptlong.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@getreent.$(OBJEXT) getrlimit64.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@ids.$(OBJEXT) inode.$(OBJEXT) io.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@io64.$(OBJEXT) ipc.$(OBJEXT) linux.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@malign.$(OBJEXT) malignr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fstab.$(OBJEXT) fstatvfs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fstatvfs64.$(OBJEXT) ftok.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@funlockfile.$(OBJEXT) getdate.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getdate_err.$(OBJEXT) gethostname.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getoptlong.$(OBJEXT) getreent.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getrlimit64.$(OBJEXT) ids.$(OBJEXT) inode.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@io.$(OBJEXT) io64.$(OBJEXT) ipc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@linux.$(OBJEXT) malign.$(OBJEXT) malignr.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@mallinfor.$(OBJEXT) mallocr.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@malloptr.$(OBJEXT) mallstatsr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mmap.$(OBJEXT) mq_close.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mq_getattr.$(OBJEXT) mq_notify.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mq_open.$(OBJEXT) mq_receive.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mq_send.$(OBJEXT) mq_setattr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mq_unlink.$(OBJEXT) msize.$(OBJEXT) msizer.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mstats.$(OBJEXT) mtrim.$(OBJEXT) mtrimr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mmap.$(OBJEXT) mntent.$(OBJEXT) mntent_r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mq_close.$(OBJEXT) mq_getattr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mq_notify.$(OBJEXT) mq_open.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mq_receive.$(OBJEXT) mq_send.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mq_setattr.$(OBJEXT) mq_unlink.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@msize.$(OBJEXT) msizer.$(OBJEXT) mstats.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mtrim.$(OBJEXT) mtrimr.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@ntp_gettime.$(OBJEXT) pathconf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@pread.$(OBJEXT) pread64.$(OBJEXT) process.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@psignal.$(OBJEXT) pvallocr.$(OBJEXT) \
@@ -275,7 +284,8 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@sig.$(OBJEXT) sigaction.$(OBJEXT) sigqueue.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@signal.$(OBJEXT) siglongjmp.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sigset.$(OBJEXT) sigwait.$(OBJEXT) socket.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sleep.$(OBJEXT) stack.$(OBJEXT) strsignal.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sleep.$(OBJEXT) stack.$(OBJEXT) statvfs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@statvfs64.$(OBJEXT) strsignal.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sysconf.$(OBJEXT) sysctl.$(OBJEXT) systat.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@system.$(OBJEXT) tcdrain.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@tcsendbrk.$(OBJEXT) termios.$(OBJEXT) time.$(OBJEXT) \
@@ -286,23 +296,25 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  aio.lo brk.lo calloc.lo \
 @USE_LIBTOOL_TRUE@callocr.lo cfreer.lo cfspeed.lo clock_getres.lo \
 @USE_LIBTOOL_TRUE@clock_gettime.lo clock_settime.lo ctermid.lo \
-@USE_LIBTOOL_TRUE@flockfile.lo fpathconf.lo free.lo freer.lo ftok.lo \
-@USE_LIBTOOL_TRUE@funlockfile.lo getdate.lo getdate_err.lo \
-@USE_LIBTOOL_TRUE@gethostname.lo getoptlong.lo getreent.lo \
-@USE_LIBTOOL_TRUE@getrlimit64.lo ids.lo inode.lo io.lo io64.lo ipc.lo \
-@USE_LIBTOOL_TRUE@linux.lo malign.lo malignr.lo mallinfor.lo mallocr.lo \
-@USE_LIBTOOL_TRUE@malloptr.lo mallstatsr.lo mmap.lo mq_close.lo \
-@USE_LIBTOOL_TRUE@mq_getattr.lo mq_notify.lo mq_open.lo mq_receive.lo \
-@USE_LIBTOOL_TRUE@mq_send.lo mq_setattr.lo mq_unlink.lo msize.lo \
-@USE_LIBTOOL_TRUE@msizer.lo mstats.lo mtrim.lo mtrimr.lo ntp_gettime.lo \
-@USE_LIBTOOL_TRUE@pathconf.lo pread.lo pread64.lo process.lo psignal.lo \
-@USE_LIBTOOL_TRUE@pvallocr.lo pwrite.lo pwrite64.lo raise.lo \
-@USE_LIBTOOL_TRUE@readdir64.lo realloc.lo reallocr.lo realpath.lo \
-@USE_LIBTOOL_TRUE@rename.lo resource.lo sched.lo select.lo seteuid.lo \
-@USE_LIBTOOL_TRUE@sethostname.lo setrlimit64.lo shm_open.lo \
-@USE_LIBTOOL_TRUE@shm_unlink.lo sig.lo sigaction.lo sigqueue.lo \
-@USE_LIBTOOL_TRUE@signal.lo siglongjmp.lo sigset.lo sigwait.lo \
-@USE_LIBTOOL_TRUE@socket.lo sleep.lo stack.lo strsignal.lo sysconf.lo \
+@USE_LIBTOOL_TRUE@flockfile.lo fpathconf.lo free.lo freer.lo fstab.lo \
+@USE_LIBTOOL_TRUE@fstatvfs.lo fstatvfs64.lo ftok.lo funlockfile.lo \
+@USE_LIBTOOL_TRUE@getdate.lo getdate_err.lo gethostname.lo \
+@USE_LIBTOOL_TRUE@getoptlong.lo getreent.lo getrlimit64.lo ids.lo \
+@USE_LIBTOOL_TRUE@inode.lo io.lo io64.lo ipc.lo linux.lo malign.lo \
+@USE_LIBTOOL_TRUE@malignr.lo mallinfor.lo mallocr.lo malloptr.lo \
+@USE_LIBTOOL_TRUE@mallstatsr.lo mmap.lo mntent.lo mntent_r.lo \
+@USE_LIBTOOL_TRUE@mq_close.lo mq_getattr.lo mq_notify.lo mq_open.lo \
+@USE_LIBTOOL_TRUE@mq_receive.lo mq_send.lo mq_setattr.lo mq_unlink.lo \
+@USE_LIBTOOL_TRUE@msize.lo msizer.lo mstats.lo mtrim.lo mtrimr.lo \
+@USE_LIBTOOL_TRUE@ntp_gettime.lo pathconf.lo pread.lo pread64.lo \
+@USE_LIBTOOL_TRUE@process.lo psignal.lo pvallocr.lo pwrite.lo \
+@USE_LIBTOOL_TRUE@pwrite64.lo raise.lo readdir64.lo realloc.lo \
+@USE_LIBTOOL_TRUE@reallocr.lo realpath.lo rename.lo resource.lo \
+@USE_LIBTOOL_TRUE@sched.lo select.lo seteuid.lo sethostname.lo \
+@USE_LIBTOOL_TRUE@setrlimit64.lo shm_open.lo shm_unlink.lo sig.lo \
+@USE_LIBTOOL_TRUE@sigaction.lo sigqueue.lo signal.lo siglongjmp.lo \
+@USE_LIBTOOL_TRUE@sigset.lo sigwait.lo socket.lo sleep.lo stack.lo \
+@USE_LIBTOOL_TRUE@statvfs.lo statvfs64.lo strsignal.lo sysconf.lo \
 @USE_LIBTOOL_TRUE@sysctl.lo systat.lo system.lo tcdrain.lo tcsendbrk.lo \
 @USE_LIBTOOL_TRUE@termios.lo time.lo ttyname_r.lo usleep.lo utimes.lo \
 @USE_LIBTOOL_TRUE@vallocr.lo wait.lo
@@ -444,7 +456,7 @@ maintainer-clean-recursive:
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \
-	  test "$$subdir" = "." && dot_seen=yes; \
+	  test "$$subdir" != "." || dot_seen=yes; \
 	done; \
 	test "$$dot_seen" = "no" && rev=". $$rev"; \
 	target=`echo $@ | sed s/-recursive//`; \
