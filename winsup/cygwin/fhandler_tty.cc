@@ -153,7 +153,6 @@ fhandler_pty_master::accept_input ()
   rc = WaitForSingleObject (input_mutex, INFINITE);
 
   bytes_left = n = eat_readahead (-1);
-  get_ttyp ()->read_retval = 0;
   p = rabuf;
 
   if (n != 0)
@@ -165,9 +164,12 @@ fhandler_pty_master::accept_input ()
 	  if (!rc)
 	    {
 	      debug_printf ("error writing to pipe %E");
+	      get_ttyp ()->read_retval = -1;
 	      break;
 	    }
-	  get_ttyp ()->read_retval += written;
+	  else 
+	    get_ttyp ()->read_retval = 1;
+
 	  p += written;
 	  bytes_left -= written;
 	  if (bytes_left > 0)
@@ -181,10 +183,13 @@ fhandler_pty_master::accept_input ()
 	}
     }
   else
-    termios_printf ("sending EOF to slave");
+    {
+      termios_printf ("sending EOF to slave");
+      get_ttyp ()->read_retval = 0;
+    }
   SetEvent (input_available_event);
   ReleaseMutex (input_mutex);
-  return get_ttyp ()->read_retval;
+  return 1;
 }
 
 static DWORD WINAPI
