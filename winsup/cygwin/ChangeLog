@@ -1,3 +1,7 @@
+2002-03-21  Christopher Faylor  <cgf@redhat.com>
+
+	* spawn.cc (find_exec): Return input if file not found.
+
 2002-03-19  Boris Schaeling  <boriss@web.de>
 
         * poll.cc (poll): Add support for invalid descriptors.

@@ -89,7 +89,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 {
   const char *suffix = "";
   debug_printf ("find_exec (%s)", name);
-  char *retval = buf;
+  const char *retval = buf;
   char tmp[MAX_PATH];
   const char *posix = (opt & FE_NATIVE) ? NULL : name;
   bool has_slash = strchr (name, '/');
@@ -166,6 +166,8 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
     retval = NULL;
   else if (opt & FE_NATIVE)
     buf.check (name);
+  else
+    retval = name;
 
  out:
   if (posix)
