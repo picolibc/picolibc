@@ -1,5 +1,25 @@
 2004-12-02  Christopher Faylor  <cgf@timesys.com>
 
+	* child_info.h (child_info_fork::parent_wr_proc_pipe): New element.
+	* fork.cc (fork_parent): Set parent_wr_proc.
+	* pinfo.cc (set_myself): Close child_proc_info->parent_wr_proc if it
+	exists rather than trying to get value from parent _pinfo.
+
+2004-12-02  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.h (enum parent_aleter): New enum.
+	(pinfo::alert_parent): Declare as returning a value.
+	(pinfo::parent_alive): New function.
+	* pinfo.cc (pinfo::alert_parent): Set wr_proc_pipe to invalid non-NULL
+	value when parent disappears.  Return success of operation.
+	(proc_waiter): Use __ALERT_* enum for control since these are not really signals.
+	Implement __ALERT_ALIVE.
+	* sigproc.cc (my_parent_is_alive): Eliminate.
+	* sigproc.h (my_parent_is_alive): Ditto for declaration.
+	(__SIGREPARENT): Eliminate.
+
+2004-12-02  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (pinfo::wait): Use better name for cygthread.
 
 2004-12-03  Pierre Humblet <pierre.humblet@ieee.org>

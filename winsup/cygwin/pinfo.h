@@ -118,6 +118,12 @@ public:
   friend class pinfo;
 };
 
+enum parent_alerter
+{
+  __ALERT_REPARENT = 111,		// arbitrary non-signal value
+  __ALERT_ALIVE   =  112
+};
+
 class pinfo
 {
   HANDLE h;
@@ -153,7 +159,8 @@ public:
   operator _pinfo * () const {return procinfo;}
   // operator bool () const {return (int) h;}
   void preserve () { destroy = false; }
-  void alert_parent (char);
+  bool alert_parent (char);
+  bool parent_alive () { return alert_parent (__ALERT_ALIVE); }
 #ifndef _SIGPROC_H
   int remember () {system_printf ("remember is not here"); return 0;}
 #else

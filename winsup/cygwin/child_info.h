@@ -29,7 +29,7 @@ enum
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0x83e9a7b7U
+#define CURR_CHILD_INFO_MAGIC 0x694cd4b8U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -49,6 +49,7 @@ public:
   void *cygheap_max;
   DWORD cygheap_reserve_sz;
   HANDLE cygheap_h;
+  HANDLE parent_wr_proc_pipe;
   unsigned fhandler_union_cb;
 };
 

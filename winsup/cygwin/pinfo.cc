@@ -32,6 +32,7 @@ details. */
 #include "fhandler.h"
 #include "cygmalloc.h"
 #include "cygtls.h"
+#include "child_info.h"
 
 static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
@@ -43,6 +44,8 @@ pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 void __stdcall
 set_myself (HANDLE h)
 {
+  extern child_info *child_proc_info;
+
   if (!h)
     cygheap->pid = cygwin_pid (GetCurrentProcessId ());
   myself.init (cygheap->pid, PID_IN_USE | PID_MYSELF, h);
@@ -61,22 +64,19 @@ set_myself (HANDLE h)
       static pinfo NO_COPY myself_identity;
       myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED);
     }
-  else if (myself->ppid)
+  else if (myself->wr_proc_pipe)
     {
-      /* here if forked/spawned */
-      pinfo parent (myself->ppid);
       /* We've inherited the parent's wr_proc_pipe.  We don't need it,
-	 so close it.  This could cause problems for the spawn case since there
-	 is no guarantee that a parent will still be around by the time we get
-	 here.  If so, we would have a handle leak.  FIXME?  */
-      if (parent && parent->wr_proc_pipe)
-	CloseHandle (parent->wr_proc_pipe);
+	 so close it. */
+      if (child_proc_info->parent_wr_proc_pipe)
+	CloseHandle (child_proc_info->parent_wr_proc_pipe);
       if (cygheap->pid_handle)
 	{
 	  ForceCloseHandle (cygheap->pid_handle);
 	  cygheap->pid_handle = NULL;
 	}
     }
+# undef child_proc_info
   return;
 }
 
@@ -704,6 +704,8 @@ proc_waiter (void *arg)
 
       switch (buf)
 	{
+	case __ALERT_ALIVE:
+	  continue;
 	case 0:
 	  /* Child exited.  Do some cleanup and signal myself.  */
 	  CloseHandle (vchild.rd_proc_pipe);
@@ -733,7 +735,7 @@ proc_waiter (void *arg)
 	  break;
 	case SIGCONT:
 	  continue;
-	case __SIGREPARENT: /* sigh */
+	case __ALERT_REPARENT: /* sigh */
 	  /* spawn_guts has signalled us that it has just started a new
 	     subprocess which will take over this cygwin pid.  */
 
@@ -830,23 +832,26 @@ pinfo::wait ()
 
 /* function to send a "signal" to the parent when something interesting happens
    in the child. */
-void
+bool
 pinfo::alert_parent (char sig)
 {
-  DWORD nb;
+  DWORD nb = 0;
   /* Send something to our parent.  If the parent has gone away,
      close the pipe. */
-  if (myself->wr_proc_pipe
-      && WriteFile (myself->wr_proc_pipe, &sig, 1, &nb, NULL))
+  if (myself->wr_proc_pipe == INVALID_HANDLE_VALUE)
+    /* no parent */;
+  else if (myself->wr_proc_pipe
+	   && WriteFile (myself->wr_proc_pipe, &sig, 1, &nb, NULL))
     /* all is well */;
   else if (GetLastError () != ERROR_BROKEN_PIPE)
     debug_printf ("sending %d notification to parent failed, %E", sig);
   else
     {
       HANDLE closeit = myself->wr_proc_pipe;
-      myself->wr_proc_pipe = NULL;
+      myself->wr_proc_pipe = INVALID_HANDLE_VALUE;
       CloseHandle (closeit);
     }
+  return (bool) nb;
 }
 
 void

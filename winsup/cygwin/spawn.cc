@@ -636,6 +636,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	ProtectHandle (cygheap->pid_handle);
       else
 	system_printf ("duplicate to pid_handle failed, %E");
+      ciresrv.parent_wr_proc_pipe = myself->wr_proc_pipe;
     }
 
   /* Start the process in a suspended state.  Needed so that any potential parent will
@@ -643,7 +644,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      to handle exec'ed windows processes since cygwin processes are smart enough that
      the parent doesn't have to bother but what are you gonna do?  Cygwin lives in
      a windows world. */
-  flags |= CREATE_SUSPENDED;
+  if (mode != _P_OVERLAY || !real_path.iscygexec ())
+    flags |= CREATE_SUSPENDED;
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
 
@@ -784,21 +786,24 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   DWORD exec_cygstarted;
   if (mode == _P_OVERLAY)
     {
-      /* Store the old exec_cygstarted since this is used as a crude semaphore for
-	 detecting when the parent has noticed the change in windows pid for this
-	 cygwin pid. */
-      exec_cygstarted = myself->cygstarted;
-      myself->dwProcessId = dwExeced = pi.dwProcessId;  /* Reparenting needs this */
-      myself.alert_parent (__SIGREPARENT);
+      if (!real_path.iscygexec ())
+	{
+	  /* Store the old exec_cygstarted since this is used as a crude semaphore for
+	     detecting when the parent has noticed the change in windows pid for this
+	     cygwin pid. */
+	  exec_cygstarted = myself->cygstarted;
+	  myself->dwProcessId = dwExeced = pi.dwProcessId;  /* Reparenting needs this */
+	  myself.alert_parent (__ALERT_REPARENT);
+	}
       CloseHandle (saved_sendsig);
       strace.execing = 1;
       hExeced = pi.hProcess;
-      strcpy (myself->progname, real_path);
+      strcpy (myself->progname, real_path); // FIXME: race?
       close_all_files ();
-      /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
+      /* If wr_proc_pipe is NULL then this process was not started by a cygwin
 	 process.  So, we need to wait around until the process we've just "execed"
 	 dies.  Use our own wait facility to wait for our own pid to exit (there
-	 is some minor special case code in proc_waiter and friends to accommodeate
+	 is some minor special case code in proc_waiter and friends to accommodate
 	 this). */
       if (!myself->wr_proc_pipe)
 	{
@@ -854,9 +859,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   else
     {
       /* Loop, waiting for parent to notice pid change, if exec_cygstarted.
-         In theory this wait should be a no-op.  */
+         In theory this wait should usually be a no-op.  */
       if (exec_cygstarted)
-	while (myself->cygstarted == exec_cygstarted)
+	while (myself->cygstarted == exec_cygstarted && myself.parent_alive ())
 	  low_priority_sleep (0);
       res = 42;
     }

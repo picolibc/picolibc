@@ -22,8 +22,7 @@ enum
   __SIGDELETE	    = -(NSIG + 5),
   __SIGFLUSHFAST    = -(NSIG + 6),
   __SIGHOLD	    = -(NSIG + 7),
-  __SIGNOHOLD	    = -(NSIG + 8),
-  __SIGREPARENT	    = (NSIG + 2)
+  __SIGNOHOLD	    = -(NSIG + 8)
 };
 #endif
 
@@ -55,7 +54,6 @@ struct sigpacket
 extern HANDLE signal_arrived;
 extern HANDLE sigCONT;
 
-bool __stdcall my_parent_is_alive ();
 void __stdcall sig_dispatch_pending (bool fast = false);
 #ifdef _PINFO_H
 extern "C" void __stdcall set_signal_mask (sigset_t newmask, sigset_t = myself->getsigmask ());

@@ -125,23 +125,6 @@ signal_fixup_after_exec ()
     }
 }
 
-/* Determine if the parent process is alive.
- */
-
-bool __stdcall
-my_parent_is_alive ()
-{
-  bool res;
-  if (myself->cygstarted)
-    res = pid_exists (myself->ppid);
-  else
-    {
-      debug_printf ("Not started by cygwin app");
-      res = false;
-    }
-  return res;
-}
-
 void __stdcall
 wait_for_sigthread ()
 {

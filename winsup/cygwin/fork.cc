@@ -401,6 +401,8 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   init_child_info (PROC_FORK, &ch, subproc_ready);
 
   ch.forker_finished = forker_finished;
+  ch.parent_wr_proc_pipe = myself->wr_proc_pipe == INVALID_HANDLE_VALUE
+    			   ? NULL : myself->wr_proc_pipe;
 
   stack_base (ch);
 
