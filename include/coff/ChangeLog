@@ -1,3 +1,8 @@
+2000-04-13  Alan Modra  <alan@linuxcare.com.au>
+
+	* ti.h (ADDR_MASK): Don't use ul suffix on constants.
+	(PG_MASK): Ditto.
+
 2000-04-11  Timothy Wall  <twall@cygnus.com>
 
 	* ti.h: Remove load page references until load pages are

@@ -252,10 +252,10 @@ PUT_SCNHDR_FLAGS(ABFD,((struct internal_scnhdr *)(INT))->s_flags, \
 
 #define LONG_ADDRESSES  1
 #define PG_SHIFT        (LONG_ADDRESSES ? 30 : 16)
-#define ADDR_MASK       ((1ul<<PG_SHIFT)-1)/* 16 or 24-bit addresses */
-#define PG_MASK         (3ul<<PG_SHIFT)
-#define PG_TO_FLAG(p)   ((p)<<PG_SHIFT)
-#define FLAG_TO_PG(f)   (((f)&PG_MASK)>>PG_SHIFT)
+#define ADDR_MASK       (((unsigned long) 1 << PG_SHIFT) - 1)
+#define PG_MASK         ((unsigned long) 3 << PG_SHIFT)
+#define PG_TO_FLAG(p)   ((p) << PG_SHIFT)
+#define FLAG_TO_PG(f)   (((f) & PG_MASK) >> PG_SHIFT)
 
 /*
  * names of "special" sections
