@@ -1,3 +1,8 @@
+Wed Jan  3 13:47:23 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* thread.cc (MTinterface::CreateSemaphore): Correctly set semaphore
+	max.
+
 Wed Jan  3 09:44:51 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_console.cc (fhandler_console::read): Restore missing test

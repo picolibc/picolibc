@@ -434,7 +434,7 @@ MTinterface::CreateSemaphore (sem_t * _s, int pshared, int _v)
   item->used = true;
   item->shared = pshared;
 
-  item->win32_obj_id = ::CreateSemaphore (&sec_none_nih, _v, _v, NULL);
+  item->win32_obj_id = ::CreateSemaphore (&sec_none_nih, _v, LONG_MAX, NULL);
 
   CHECKHANDLE (NULL, 1);
 
