@@ -26,6 +26,7 @@
  *	citrus Id: wmemchr.c,v 1.2 2000/12/20 14:08:31 itojun Exp
  */
 
+#include <_ansi.h>
 #include <stdlib.h>
 #include <wchar.h>
 
