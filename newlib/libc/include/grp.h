@@ -66,18 +66,24 @@ extern "C" {
 #ifndef __INSIDE_CYGWIN__
 struct group	*getgrgid (gid_t);
 struct group	*getgrnam (const char *);
+#ifndef __CYGWIN__
 int		 getgrnam_r (const char *, struct group *,
 			char *, size_t, struct group **);
 int		 getgrgid_r (gid_t, struct group *,
 			char *, size_t, struct group **);
+#endif /* !__CYGWIN__ */
 #ifndef _POSIX_SOURCE
 struct group	*getgrent (void);
 void		 setgrent (void);
 void		 endgrent (void);
+#ifndef __CYGWIN__
 void		 setgrfile (const char *);
+#endif /* !__CYGWIN__ */
 #ifndef _XOPEN_SOURCE
+#ifndef __CYGWIN__
 char		*group_from_gid (gid_t, int);
 int		 setgroupent (int);
+#endif /* !__CYGWIN__ */
 int		 initgroups (const char *, gid_t);
 #endif /* !_XOPEN_SOURCE */
 #endif /* !_POSIX_SOURCE */

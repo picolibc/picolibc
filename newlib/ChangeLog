@@ -1,3 +1,8 @@
+2003-09-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/grp.h: Don't define setgrfile, group_from_gid and
+	setgroupent for Cygwin.
+
 2003-09-05  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/exit.c (exit): Setting of struct _atexit ptr p
