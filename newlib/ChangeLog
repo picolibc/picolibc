@@ -1,3 +1,8 @@
+2001-08-21  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/mallocr.c [!defined(MALLOC_ALIGNMENT)]: Add conditional
+	for SIZE_SZ so that alignment ends up a minimum of 8.
+
 Mon Aug 13 22:26:01 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/machine/setjmp.h: Protect sigsetjmp/siglongjmp macro

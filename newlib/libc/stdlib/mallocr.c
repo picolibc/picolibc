@@ -1384,7 +1384,7 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 #define SIZE_SZ                (sizeof(INTERNAL_SIZE_T))
 #ifndef MALLOC_ALIGNMENT
 #define MALLOC_ALIGN           8
-#define MALLOC_ALIGNMENT       (SIZE_SZ + SIZE_SZ)
+#define MALLOC_ALIGNMENT       (SIZE_SZ < 4 ? 8 : (SIZE_SZ + SIZE_SZ))
 #else
 #define MALLOC_ALIGN           MALLOC_ALIGNMENT
 #endif
