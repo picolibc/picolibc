@@ -1,5 +1,17 @@
 2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
 
+	2001-05-16  Alexandre Oliva  <aoliva@redhat.com>
+	* mn10300.h: Introduce GOTPC16, GOTOFF24, GOTOFF16 and
+	PLT16, and rename GOTPC to GOTPC32 and GOTOFF to GOTOFF32.
+	Renumbered all relocs.
+	2001-04-12  Alexandre Oliva  <aoliva@redhat.com>
+	* mn10300.h (R_MN10300_GOTPC, R_MN10300_GOTOFF,
+	R_MN10300_PLT32, R_MN10300_GOT32, R_MN10300_GOT24,
+	R_MN10300_GOT16, R_MN10300_COPY, R_MN10300_GLOB_DAT,
+	R_MN10300_JMP_SLOT, R_MN10300_RELATIVE): New relocs.
+
+2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
+
 	2000-04-01  Alexandre Oliva  <aoliva@cygnus.com>
 	* mn10300.h (E_MN10300_MACH_AM33_2): Renamed from
 	E_MN10300_MACH_AM332.
