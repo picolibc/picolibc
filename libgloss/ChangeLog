@@ -1,5 +1,6 @@
 2004-03-23  Eric Christopher  <echristo@redhat.com>
 
+	* frv/crt0.S: Fix comment.
 	* mips/configure.in: Add mipsisa64-*-* to target support.
 	* mips/configure: Regenerate.
 
