@@ -1,3 +1,12 @@
+Tue Apr 17 13:44:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Set case_clash even if pcheck_case
+	is set to PCHECK_ADJUST when a case clash is given for the last
+	component in path.
+	(symlink_info::case_check): Ditto.
+	* syscalls.cc (_rename): Avoid overwriting an already existing file
+	if a case clash is given even if pcheck_case is set to PCHECK_ADJUST.
+
 Tue Apr 17  2:07:07 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* config.h.in: Turn off VFORK again.
