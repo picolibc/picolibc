@@ -409,6 +409,12 @@ peek_pipe (select_record *s, int ignra)
 
   if (s->read_selected)
     {
+      if (s->read_ready)
+	{
+	  select_printf ("already ready");
+	  gotone = 1;
+	  goto out;
+	}
       if (fh->bg_check (SIGTTIN) <= 0)
 	{
 	  gotone = s->read_ready = 1;
@@ -594,6 +600,12 @@ peek_console (select_record *me, int ignra)
       return me->read_ready = 1;
     }
 
+  if (me->read_ready)
+    {
+      select_printf ("already ready");
+      return 1;
+    }
+
   INPUT_RECORD irec;
   DWORD events_read;
   HANDLE h;
@@ -777,6 +789,14 @@ peek_serial (select_record *s, int)
   HANDLE h;
   set_handle_or_return_if_not_open (h, s);
   int ready = 0;
+
+  if (s->read_selected && s->read_ready || (s->write_selected && s->write_ready))
+    {
+      select_printf ("already ready");
+      ready = 1;
+      goto out;
+    }
+
   (void) SetCommMask (h, EV_RXCHAR);
 
   if (!fh->overlapped_armed)
@@ -843,6 +863,7 @@ peek_serial (select_record *s, int)
       goto err;
     }
 
+out:
   return ready;
 
 err:
@@ -1078,11 +1099,11 @@ peek_socket (select_record *me, int)
       return 0;
     }
 
-  if (WINSOCK_FD_ISSET (h, &ws_readfds))
+  if (WINSOCK_FD_ISSET (h, &ws_readfds) || (me->read_selected && me->read_ready))
     gotone = me->read_ready = TRUE;
-  if (WINSOCK_FD_ISSET (h, &ws_writefds))
+  if (WINSOCK_FD_ISSET (h, &ws_writefds) || (me->write_selected && me->write_ready))
     gotone = me->write_ready = TRUE;
-  if (WINSOCK_FD_ISSET (h, &ws_exceptfds))
+  if (WINSOCK_FD_ISSET (h, &ws_exceptfds) || (me->except_selected && me->except_ready))
     gotone = me->except_ready = TRUE;
   return gotone;
 }
@@ -1308,6 +1329,10 @@ peek_windows (select_record *me, int)
   MSG m;
   HANDLE h;
   set_handle_or_return_if_not_open (h, me);
+
+  if (me->read_selected && me->read_ready)
+    return 1;
+
   if (PeekMessage (&m, (HWND) h, 0, 0, PM_NOREMOVE))
     {
       me->read_ready = TRUE;

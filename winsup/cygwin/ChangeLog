@@ -1,3 +1,12 @@
+Fri May 12 21:35:54 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (build_argv): Remove unneeded variable.
+	* select.cc (peek_pipe): Don't check for "ready" if it's already set.
+	(peek_console): Ditto.
+	(peek_serial): Ditto.
+	(peek_socket): Ditto.
+	(peek_windows): Ditto.
+
 Fri May 12 20:31:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_raw.cc (write_file, read_file): New wrapper functions

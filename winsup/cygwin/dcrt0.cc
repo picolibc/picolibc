@@ -382,7 +382,6 @@ static void __stdcall
 build_argv (char *cmd, char **&argv, int &argc, int winshell)
 {
   int argvlen = 0;
-  int alloc_cmd = 0;	// command allocated by insert_file
   int nesting = 0;		// monitor "nesting" from insert_file
 
   argc = 0;
