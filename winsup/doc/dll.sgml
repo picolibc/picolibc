@@ -39,19 +39,18 @@ For this example, we'll use a single file
 <filename>mydll.c</filename> for the contents of the dll
 (<filename>mydll.dll</filename>).</para>
 
-<para>Now compile everything to objects:</para>
-
-<screen>gcc -c myprog.c
-gcc -c mydll.c</screen>
-
 <para>Fortunately, with the latest gcc and binutils the process for building a dll
 is now pretty simple. Say you want to build this minimal function in mydll.c:</para>
 
-<screen>int WINAPI
-mydll_init(HANDLE h, DWORD reason, void *foo)
+<screen>
+#include &lt;stdio.h&gt;
+
+int
+hello()
 {
-  return 1;
-}</screen>
+  printf ("Hello World!\n");
+}  
+</screen>
 
 <para>First compile mydll.c to object code:</para>
 
@@ -61,7 +60,26 @@ mydll_init(HANDLE h, DWORD reason, void *foo)
 
 <screen>gcc -shared -o mydll.dll mydll.o</screen>
 
-<para>That's it! However, if you are building a dll as an export library,
+<para>
+That's it! To finish up the example, you can now link to the
+dll with a simple program:
+</para>
+
+<screen>
+int 
+main ()
+{
+  hello ();
+}  
+</screen>
+
+<para>
+Then link to your dll with a command like:
+</para>
+
+<screen>gcc -o myprog myprog.ca -L./ -lmydll</screen>
+
+<para>However, if you are building a dll as an export library,
 you will probably want to use the complete syntax:</para>
 
 <screen>gcc -shared -o cyg${module}.dll \
@@ -80,9 +98,10 @@ link against, e.g '-lpng -lz -L/usr/local/special -lmyspeciallib'.</para>
 <sect2 id="dll-link"><title>Linking Against DLLs</title>
 
 <para>If you have an existing DLL already, you need to build a
-Cygwin-compatible import library (The supplied ones should work, but
-you might not have them) to link against.  Unfortunately, there is not
-yet any tool to do this automatically.  However, you can get most of
+Cygwin-compatible import library.  If you have the source to compile
+the DLL, see <Xref Linkend="dll-build"> for details on having 
+<filename>gcc</filename> build one for you.  If you do not have the
+source or a supplied working import library, you can get most of
 the way by creating a .def file with these commands (you might need to
 do this in <filename>bash</filename> for the quoting to work
 correctly):</para>

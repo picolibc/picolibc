@@ -1,3 +1,7 @@
+2002-10-22  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* dll.sgml: Simplify dll build instructions.
+
 2002-09-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntsec.html: Add chapter for switching user context w/o password.
