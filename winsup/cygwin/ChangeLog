@@ -1,8 +1,12 @@
 2003-07-07  Christopher Faylor  <cgf@redhat.com>
 
+	* rmsym: Don't use ranlib.
+
+2003-07-07  Christopher Faylor  <cgf@redhat.com>
+
 	* newsym: Reenable removal of tmp directory.  Just use ar to generate
 	archive index.
-	* Makefile.in: Don't send ranlib to newsym.
+	* Makefile.in: Don't send ranlib to newsym or rmsym.
 
 2003-07-07  Christopher Faylor  <cgf@redhat.com>
 
