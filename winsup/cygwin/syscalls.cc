@@ -1939,9 +1939,10 @@ mknod (const char *_path, mode_t mode, __dev16_t dev)
 }
 
 extern "C" int
-mkfifo (const char *path, mode_t mode)
+mkfifo (const char *_path, mode_t mode)
 {
-  return mknod32 (path, (mode & ~S_IFMT) | S_IFIFO, 0);
+  set_errno (ENOSYS);  // FIXME
+  return -1;
 }
 
 /* seteuid: standards? */
