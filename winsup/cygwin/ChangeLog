@@ -1,3 +1,45 @@
+2002-05-02  Christopher Faylor  <cgf@redhat.com>
+
+	* path.h (pathconv_arg): Add PC_POSIX.
+	(path_conv): Add normalized_path field.
+	* path.cc (path_conv::~path_conv): New destructor.
+	(path_conv::check): Set normalized_path, where appropriate.
+	* dtable.cc (build_fhandler_from_name): Use normalized path from
+	path_conv.
+	* syscalls.cc (chroot): Ditto.
+
+	* cygheap.h: Remove path_prefix_p declaration.
+
+2002-02-26  Christopher January <chris@atomice.net>
+	    Christopher Faylor <cgf@redhat.com> (minor fixups)
+
+	* Makefile.in: Add fhandler_proc.o, fhandler_registry.o,
+	fhandler_process.o and fhandler_virtual.o.
+	* dtable.cc (dtable::build_fhandler): Add entries for FH_PROC,
+	FH_REGISTRY and FH_PROCESS.  Set unix_name to the normalized posix
+	path.
+	* fhandler.h: Add constants for FH_PROC, FH_REGISTRY and FH_PROCESS.
+	Add class declarations for fhandler_virtual, fhandler_proc,
+	fhandler_registry and fhandler_virtual.  Update fhandler_union
+	accordingly.
+	* fhandler_proc.cc: New file.  Add implementation for fhandler_proc.
+	* fhandler_virtual.cc: New file.  Add implementation for
+	fhandler_virtual.
+	* fhandler_process.cc: New file.  Add implementation for
+	fhandler_process.
+	* fhandler_registry.cc: New file.  Add implementation for
+	fhandler_registry.
+	* path.cc: Add isproc and isvirtual_dev macros.
+	* path.cc (path_conv::check): Add check for virtual devices.
+	* path.cc (mount_info::conv_to_win32_path): Convert paths in /proc to
+	empty Win32 paths.
+	* path.cc (chdir): Replace check for FH_CYGDRIVE with more generic
+	isvirtual_dev macro.  Force setting of posix path for virtual
+	fhandlers.
+	* path.h: Add externally visible path_prefix_p and
+	normalized_posix_path prototypes.
+
+
 Wed May  1 16:06:02 2002  Jason Tishler <jason@tishler.net>
 
 	* include/cygwin/types.h: Include <sys/sysmacros.h>.
@@ -14,7 +56,7 @@ Wed Apr 17 11:27:04 2002  Jason Tishler <jason@tishler.net>
 
 2002-04-12  Egor Duda  <deo@logos-m.ru>
 
-	* fhandler.h (class fhandler_socket): New member to store socket type.  
+	* fhandler.h (class fhandler_socket): New member to store socket type.
 	(fhandler_socket::get_socket_type): Access it.
 	(fhandler_socket::set_socket_type): Ditto.
 	* net.cc (cygwin_socket): Store socket type.
@@ -55,7 +97,7 @@ Wed Apr 17 11:27:04 2002  Jason Tishler <jason@tishler.net>
 
 2002-03-19  Boris Schaeling  <boriss@web.de>
 
-        * poll.cc (poll): Add support for invalid descriptors.
+	* poll.cc (poll): Add support for invalid descriptors.
 
 2002-03-15  Robert Collins  <rbtcollins@hotmail.com>
 
@@ -76,7 +118,7 @@ Wed Apr 17 11:27:04 2002  Jason Tishler <jason@tishler.net>
 
 2002-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
-	* glob.c (stat32_to_STAT): New function.   
+	* glob.c (stat32_to_STAT): New function.
 	(g_lstat): Call user space functions always with 32 bit struct stat
 	as a workaround.
 	(g_stat): Ditto.
@@ -144,10 +186,10 @@ Wed Apr 17 11:27:04 2002  Jason Tishler <jason@tishler.net>
 
 2002-03-05  Robert Collins  <rbtcollins@hotmail.com>
 
-	* cygserver_transport_pipes.cc (transport_layer_pipes::transport_layer_pipes): 
+	* cygserver_transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
 	Always init - until static members work correctly.
 	* shm.cc (shmget): Initialize the security descriptor - thanks Corinna!
-	* include/sys/ipc.h: Make the ipc control constants partitioned off from the sem 
+	* include/sys/ipc.h: Make the ipc control constants partitioned off from the sem
 	control constants.
 
 2002-03-04  Christian Lestrade  <christian.lestrade@free.fr>
@@ -211,7 +253,7 @@ Wed Apr 17 11:27:04 2002  Jason Tishler <jason@tishler.net>
 
 2002-01-17  Robert Collins  <rbtcollins@hotmail.com>
 
-	* cygserver.cc (check_and_dup_handle): Consolidate the two variants for 
+	* cygserver.cc (check_and_dup_handle): Consolidate the two variants for
 	simplicity.
 	Add Some basic debug output.
 	(client_request_attach_tty::serve): Use the new debug_printf for clarity.
@@ -249,7 +291,7 @@ Mon Oct  8  7:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	* shm.cc: Globally rename client_request_shm_get to client_request_shm.
 	(client_request_shm::client_request_shm): New constructor for attach requests.
 	(shmat): Use it.
-	* include/cygwin/cygserver_process.h (class process_request): Rename to 
+	* include/cygwin/cygserver_process.h (class process_request): Rename to
 	process_cleanup.
 	(class cleanup_routine): New class.
 	(class process): New members and methods to allow calling back when the process
@@ -294,7 +336,7 @@ Tue Oct  2 23:24:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(queue_process_param::~queue_process_param): Ditto.
 	(queue_process_param::start): Ditto.
 	(queue_process_param::stop): Ditto.
-	* threaded_queue.h (class queue_process_param): Add support for 
+	* threaded_queue.h (class queue_process_param): Add support for
 	interruptible request loops.
 	* cygwin/include/cygwin/cygserver_process.h (class process_cache): Add
 	destructor.
@@ -312,7 +354,7 @@ Tue Oct  2 23:00:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 Tue Oct  2 16:06:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
-	* Makefile.in: Remove cygserver_shm.o from cygwin1.dll. 
+	* Makefile.in: Remove cygserver_shm.o from cygwin1.dll.
 	Rename cygserver_shm_outside.o to cygserver_shm.o.
 	* cygserver.cc (server_request::process): Use the new client_request
 	constructor.
@@ -322,7 +364,7 @@ Tue Oct  2 16:06:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	client_request constructor.
 	(client_request_shutdown::client_request_shutdown): Ditto.
 	(client_request::client_request): Ditto.
-	* cygserver_shm.cc (client_request_shm_get::serve): Remove the 
+	* cygserver_shm.cc (client_request_shm_get::serve): Remove the
 	#ifdef'd stub for in-cygwin builds.
 	(client_request_shm_get::client_request_shm_get): Use the new
 	client_request constructor, and remove the in-cygwin variants.
@@ -330,7 +372,7 @@ Tue Oct  2 16:06:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	serve method - it's only used in cygserver.
 	* shm.cc (client_request_shm_get::client_request_shm_get): New function.
 	* include/cygwin/cygserver.h (request_header): New constructor.
-	(class client_request): Use it. 
+	(class client_request): Use it.
 	New constructor accepting the header size.
 	#ifndef test the server method - it's only used within cygserver.
 	(client_request_get_version): #ifdef test the server method.
@@ -345,7 +387,7 @@ Tue Oct  2  9:57:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(class server_process_param): Inherit from queue_process_param.
 	(class server_request_queue): Inherit from threaded_queue.
 	(request_loop): Adjust for new types.
-	(server_request_queue::process_requests): Remove guts to 
+	(server_request_queue::process_requests): Remove guts to
 	threaded_queue::process_requests.
 	(server_request::server_request): Adjust for new types.
 	(worker_function): Delete.
@@ -360,10 +402,10 @@ Mon Oct  1 12:38:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	* cygserver.cc (client_request::serve): New function.
 	* cygserver_process.cc: Inlude <pthread.h> for pthread_once.
 	(process_cache::process_cache): Initialise a crtiical section for write access.
-	(process_cache::process): Use the critical section. Also add missing entries to 
+	(process_cache::process): Use the critical section. Also add missing entries to
 	the cache.
 	(do_process_init): New function to initalise class process static variables.
-	(process::process): Ensure that the process access critical section is 
+	(process::process): Ensure that the process access critical section is
 	initialised.
 	(process::handle): Close the handle of old process's when they have terminated
 	and we are returning the handle for a process with the same pid.
@@ -372,13 +414,13 @@ Mon Oct  1 12:38:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(client_request_shm_get::serve): New parameter for process cache support.
 	Use the process cache, not OpenProcess to get a handle to the originating process.
 	Fix a handle leak with token_handle.
-	* cygserver_shm.h (class client_request_shm_get): Update ::serve for process 
+	* cygserver_shm.h (class client_request_shm_get): Update ::serve for process
 	cache support.
 	* cygserver_transport_pipes.cc: Redefine debug_printf to be conditional on DEBUG.
-	* include/cygwin/cygserver.h: Do not implement client_request::serve in the 
+	* include/cygwin/cygserver.h: Do not implement client_request::serve in the
 	header.
-	* include/cygwin/cygserver_process.h (class process_cache): Add a write access 
-	critical section to prevent races when requests from a  multithreaded 
+	* include/cygwin/cygserver_process.h (class process_cache): Add a write access
+	critical section to prevent races when requests from a  multithreaded
 	application arrive.
 
 Sun Sep 30 23:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
@@ -398,7 +440,7 @@ Sun Sep 30 23:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(server_request_queue::process_requests): Initiator for threaded request loops.
 	(client_request_shutdown::serve): Add beginning of process cache support.
 	(server_request::server_request): Ditto.
-	(server_request::process): Use debug_printf. Add beginning of process cache 
+	(server_request::process): Use debug_printf. Add beginning of process cache
 	support.
 	(server_request_queue::cleanup): Kill off any request loop threads.
 	(server_request_queue::add): Add beginning of process cache support.
@@ -407,7 +449,7 @@ Sun Sep 30 23:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	Add process cache support.
 	Spawn a separate thread for the transport request loop, thus allowing concurrent
 	support for multiple transports.
-	* cygserver_client.cc (client_request_get_version::serve): Add process cache 
+	* cygserver_client.cc (client_request_get_version::serve): Add process cache
 	support.
 	(client_request_attach_tty::serve): Add process cache support.
 	(client_request_shutdown::serve): Add process cache support.
@@ -444,7 +486,7 @@ Sat Sep 29 20:40:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(transport_layer_base::read): Ditto.
 	(transport_layer_base::write): Ditto.
 	(transport_layer_base::connect): Ditto.
-	* cygserver_transport_pipes.cc: Include new header 
+	* cygserver_transport_pipes.cc: Include new header
 	"cygwin/cygserver_transport_pipes.h".
 	* cygserver_transport_sockets.cc: New file.
 	* dcrt0.cc: No need to include <sys/socket.h> now.
@@ -846,7 +888,7 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 2002-01-21  DJ Delorie  <dj@redhat.com>
 
 	* Makefile.in (libpthread.a): Pass the assembler also.
- 	(libm.a): Ditto.
+	(libm.a): Ditto.
 	(libc.a): Ditto.
 	* speclib: Specify the assembler to dlltool.
 
@@ -911,9 +953,9 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 2002-01-19  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
 
-        * cygwin.din: Add recvmsg and sendmsg.
-        * net.cc: Add cygwin_recvmsg and cygwin_sendmsg.
-        * /usr/include/sys/socket.h: Add recvmsg and sendmsg.
+	* cygwin.din: Add recvmsg and sendmsg.
+	* net.cc: Add cygwin_recvmsg and cygwin_sendmsg.
+	* /usr/include/sys/socket.h: Add recvmsg and sendmsg.
 
 2002-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -965,7 +1007,7 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	file parameter.
 
 2002-01-09  Christopher Faylor  <cgf@redhat.com>
-            Robert Collins  <rbtcollins@hotmail.com>
+	    Robert Collins  <rbtcollins@hotmail.com>
 
 	* exceptions.cc (early_stuff_init): Rename from misnamed
 	set_console_handler.
@@ -1042,7 +1084,7 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 2002-01-01  Christopher Faylor  <cgf@redhat.com>
 
-        * speclib: Remove temp files automatically.
+	* speclib: Remove temp files automatically.
 
 2002-01-01  Corinna Vinschen  <corinna@vinschen.de>
 	* fhandler.h (fhandler_socket::sun_path): New private member.

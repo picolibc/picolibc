@@ -48,7 +48,6 @@ struct cygheap_root_mount_info
 
 /* CGF: FIXME This doesn't belong here */
 
-int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__ ((regparm (3)));
 class cygheap_root
 {
   /* Root directory information.

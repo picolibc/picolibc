@@ -269,6 +269,9 @@ extern SYSTEM_INFO system_info;
 #define STD_RBITS (S_IRUSR | S_IRGRP | S_IROTH)
 #define STD_WBITS (S_IWUSR)
 #define STD_XBITS (S_IXUSR | S_IXGRP | S_IXOTH)
+#define NO_W ~(S_IWUSR | S_IWGRP | S_IWOTH)
+#define NO_R ~(S_IRUSR | S_IRGRP | S_IROTH)
+#define NO_X ~(S_IXUSR | S_IXGRP | S_IXOTH)
 
 /* The title on program start. */
 extern char *old_title;

@@ -118,6 +118,12 @@ int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
    (isdirsep(path[mount_table->cygdrive_len + 1]) || \
     !path[mount_table->cygdrive_len + 1]))
 
+#define isproc(path) \
+  (path_prefix_p (proc, (path), proc_len))
+
+#define isvirtual_dev(devn) \
+  (devn == FH_CYGDRIVE || devn == FH_PROC || devn == FH_REGISTRY || devn == FH_PROCESS)
+
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
    Neither may be "".
@@ -173,7 +179,7 @@ pathmatch (const char *path1, const char *path2)
 
 #define isslash(c) ((c) == '/')
 
-int
+static int
 normalize_posix_path (const char *src, char *dst)
 {
   const char *src_start = src;
@@ -362,6 +368,12 @@ path_conv::update_fs_info (const char* win32_path)
     }
 }
 
+path_conv::~path_conv ()
+{
+  if (normalized_path)
+    cfree (normalized_path);
+}
+
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
    passing to Win32 API routines.
 
@@ -413,6 +425,7 @@ path_conv::check (const char *src, unsigned opt,
   sym_opt = 0;
   drive_type = 0;
   is_remote_drive = 0;
+  normalized_path = NULL;
 
   if (!(opt & PC_NULLEMPTY))
     error = 0;
@@ -494,6 +507,28 @@ path_conv::check (const char *src, unsigned opt,
 		}
 	      goto out;
 	    }
+          else if (isvirtual_dev (devn))
+            {
+              fhandler_virtual *fh =
+                (fhandler_virtual *) cygheap->fdtab.build_fhandler (-1, devn, path_copy, NULL, unit);
+              int file_type = fh->exists (path_copy);
+              switch (file_type)
+                {
+                  case 0:
+                    error = ENOENT;
+		    break;
+                  case 1:
+                  case 2:
+                    fileattr = FILE_ATTRIBUTE_DIRECTORY;
+		    break;
+                  case -1:
+                    fileattr = 0;
+                }
+              delete fh;
+	      if (!error)
+		strcpy (path, path_copy);
+	      goto out;
+            }
 	  /* devn should not be a device.  If it is, then stop parsing now. */
 	  else if (devn != FH_BAD)
 	    {
@@ -683,6 +718,8 @@ path_conv::check (const char *src, unsigned opt,
     add_ext_from_sym (sym);
 
 out:
+  if (opt & PC_POSIX)
+    normalized_path = cstrdup (path_copy);
   /* Deal with Windows stupidity which considers filename\. to be valid
      even when "filename" is not a directory. */
   if (!need_directory || error)
@@ -1409,6 +1446,14 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       else if (mount_table->cygdrive_len > 1)
 	return ENOENT;
     }
+  if (isproc (pathbuf))
+    {
+      devn = fhandler_proc::get_proc_fhandler (pathbuf);
+      dst[0] = '\0';
+      if (devn == FH_BAD)
+        return ENOENT;
+      goto out;
+    }
 
   int chrooted_path_len;
   chrooted_path_len = 0;
@@ -1476,7 +1521,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       *flags = mi->flags;
     }
 
-  if (devn != FH_CYGDRIVE)
+  if (!isvirtual_dev (devn))
     win32_device_name (src_path, dst, devn, unit);
 
  out:
@@ -3237,7 +3282,8 @@ chdir (const char *in_dir)
       path.get_win32 ()[3] = '\0';
     }
   int res;
-  if (path.get_devn () != FH_CYGDRIVE)
+  int devn = path.get_devn();
+  if (!isvirtual_dev (devn))
     res = SetCurrentDirectory (native_dir) ? 0 : -1;
   else
     {
@@ -3257,8 +3303,8 @@ chdir (const char *in_dir)
      we'll see if Cygwin mailing list users whine about the current behavior. */
   if (res == -1)
     __seterrno ();
-  else if (!path.has_symlinks () && strpbrk (dir, ":\\") == NULL
-	   && pcheck_case == PCHECK_RELAXED)
+  else if ((!path.has_symlinks () && strpbrk (dir, ":\\") == NULL
+            && pcheck_case == PCHECK_RELAXED) || isvirtual_dev (devn))
     cygheap->cwd.set (native_dir, dir);
   else
     cygheap->cwd.set (native_dir, NULL);

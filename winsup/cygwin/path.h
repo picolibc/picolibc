@@ -23,7 +23,8 @@ enum pathconv_arg
   PC_SYM_CONTENTS	= 0x0008,
   PC_FULL		= 0x0010,
   PC_NULLEMPTY		= 0x0020,
-  PC_CHECK_EA		= 0x0040
+  PC_CHECK_EA		= 0x0040,
+  PC_POSIX		= 0x0080
 };
 
 enum case_checking
@@ -75,6 +76,7 @@ class path_conv
   int unit;
   DWORD fileattr;
   BOOL case_clash;
+  char *normalized_path;
 
   int isdisk () const { return path_flags & PATH_ISDISK;}
   int isremote () const {return is_remote_drive;}
@@ -126,9 +128,11 @@ class path_conv
 
   path_conv (): path_flags (0), known_suffix (NULL), error (0), devn (0), unit (0), fileattr (INVALID_FILE_ATTRIBUTES) {path[0] = '\0';}
 
+  ~path_conv ();
   inline char *get_win32 () { return path; }
-  operator char *() {return path; }
-  operator DWORD &() {return fileattr; }
+  operator char *() {return path;}
+  operator const char *() {return path;}
+  operator DWORD &() {return fileattr;}
   operator int &() {return (int) fileattr; }
   BOOL is_device () {return devn != FH_BAD && devn != FH_DISK;}
   DWORD get_devn () {return devn == FH_BAD ? (DWORD) FH_DISK : devn;}
@@ -178,3 +182,5 @@ has_exec_chars (const char *buf, int len)
 
 int pathmatch (const char *path1, const char *path2) __attribute__ ((regparm (2)));
 int pathnmatch (const char *path1, const char *path2, int len) __attribute__ ((regparm (2)));
+
+int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__ ((regparm (3)));

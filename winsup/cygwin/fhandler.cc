@@ -148,7 +148,8 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
 /* Record the file name.
    Filenames are used mostly for debugging messages, and it's hoped that
    in cases where the name is really required, the filename wouldn't ever
-   be too long (e.g. devices or some such).  */
+   be too long (e.g. devices or some such).
+   The unix_path_name is also used by virtual fhandlers.  */
 void
 fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit)
 {

@@ -39,7 +39,7 @@ public:
      we only use this handle from the parent. */
   HANDLE hProcess;
 
-#define PINFO_REDIR_SIZE ((DWORD) &(((_pinfo *)NULL)->hProcess) + sizeof (DWORD))
+#define PINFO_REDIR_SIZE ((char *) &myself.procinfo->hProcess - (char *) myself.procinfo)
 
   /* Handle associated with initial Windows pid which started it all. */
   HANDLE pid_handle;

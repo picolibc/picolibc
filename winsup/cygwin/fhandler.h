@@ -70,8 +70,11 @@ enum
   FH_CLIPBOARD = 0x00000017,	/* is a clipboard device */
   FH_OSS_DSP = 0x00000018,	/* is a dsp audio device */
   FH_CYGDRIVE= 0x00000019,	/* /cygdrive/x */
+  FH_PROC    = 0x0000001a,      /* /proc */
+  FH_REGISTRY =0x0000001b,      /* /proc/registry */
+  FH_PROCESS = 0x0000001c,      /* /proc/<n> */
 
-  FH_NDEV    = 0x0000001a,	/* Maximum number of devices */
+  FH_NDEV    = 0x0000001d,      /* Maximum number of devices */
   FH_DEVMASK = 0x00000fff,	/* devices live here */
   FH_BAD     = 0xffffffff
 };
@@ -100,6 +103,8 @@ enum
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
 #define __fmode (*(user_data->fmode_ptr))
+extern const char proc[];
+extern const int proc_len;
 
 class select_record;
 class path_conv;
@@ -280,7 +285,7 @@ class fhandler_base
   /* fixup fd possibly non-inherited handles after fork */
   void fork_fixup (HANDLE parent, HANDLE &h, const char *name);
 
-  virtual int open (path_conv * real_path, int flags, mode_t mode = 0);
+  virtual int open (path_conv *real_path, int flags, mode_t mode = 0);
   virtual int close ();
   virtual int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
   virtual int ioctl (unsigned int cmd, void *);
@@ -512,16 +517,16 @@ class fhandler_dev_tape: public fhandler_dev_raw
  public:
   fhandler_dev_tape (int unit);
 
-  int open (path_conv *, int flags, mode_t mode = 0);
-  int close (void);
+  virtual int open (path_conv *, int flags, mode_t mode = 0);
+  virtual int close (void);
 
-  __off64_t lseek (__off64_t offset, int whence);
+  virtual __off64_t lseek (__off64_t offset, int whence);
 
-  int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+  virtual int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
 
-  int dup (fhandler_base *child);
+  virtual int dup (fhandler_base *child);
 
-  int ioctl (unsigned int cmd, void *buf);
+  virtual int ioctl (unsigned int cmd, void *buf);
 
  private:
   int tape_write_marks (int marktype, DWORD len);
@@ -1034,6 +1039,71 @@ class fhandler_dev_dsp : public fhandler_base
   void fixup_after_exec (HANDLE);
 };
 
+class fhandler_virtual : public fhandler_base
+{
+ protected:
+  char *filebuf;
+  int bufalloc, filesize;
+  __off32_t position;
+ public:
+
+  fhandler_virtual (DWORD devtype);
+  virtual ~fhandler_virtual();
+
+  virtual int exists(const char *path);
+  DIR *opendir (path_conv& pc);
+  __off64_t telldir (DIR *);
+  void seekdir (DIR *, __off32_t);
+  void rewinddir (DIR *);
+  int closedir (DIR *);
+  int write (const void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  __off64_t lseek (__off32_t, int);
+  int dup (fhandler_base * child);
+  int open (path_conv *, int flags, mode_t mode = 0);
+  int close (void);
+  int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
+};
+
+class fhandler_proc: public fhandler_virtual
+{
+ public:
+  fhandler_proc ();
+  fhandler_proc (DWORD devtype);
+  int exists(const char *path);
+  struct dirent *readdir (DIR *);
+  static DWORD get_proc_fhandler(const char *path);
+
+  int open (path_conv *real_path, int flags, mode_t mode = 0);
+  int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+};
+
+class fhandler_registry: public fhandler_proc
+{
+ public:
+  fhandler_registry ();
+  int exists(const char *path);
+  struct dirent *readdir (DIR *);
+  __off64_t telldir (DIR *);
+  void seekdir (DIR *, __off32_t);
+  void rewinddir (DIR *);
+  int closedir (DIR *);
+
+  int open (path_conv *real_path, int flags, mode_t mode = 0);
+  int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+  HKEY open_key(const char *name, REGSAM access = KEY_READ, bool isValue = false);
+};
+
+class fhandler_process: public fhandler_proc
+{
+ public:
+  fhandler_process ();
+  int exists(const char *path);
+  struct dirent *readdir (DIR *);
+  int open (path_conv *real_path, int flags, mode_t mode = 0);
+  int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+};
+
 typedef union
 {
   char base[sizeof(fhandler_base)];
@@ -1049,7 +1119,10 @@ typedef union
   char dev_zero[sizeof(fhandler_dev_zero)];
   char disk_file[sizeof(fhandler_disk_file)];
   char pipe[sizeof(fhandler_pipe)];
+  char proc[sizeof(fhandler_proc)];
+  char process[sizeof(fhandler_process)];
   char pty_master[sizeof(fhandler_pty_master)];
+  char registry[sizeof(fhandler_registry)];
   char serial[sizeof(fhandler_serial)];
   char socket[sizeof(fhandler_socket)];
   char termios[sizeof(fhandler_termios)];

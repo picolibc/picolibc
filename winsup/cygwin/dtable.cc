@@ -280,14 +280,14 @@ fhandler_base *
 dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
 				  path_conv& pc, unsigned opt, suffix_info *si)
 {
-  pc.check (name, opt | PC_NULLEMPTY | PC_FULL, si);
+  pc.check (name, opt | PC_NULLEMPTY | PC_FULL | PC_POSIX, si);
   if (pc.error)
     {
       set_errno (pc.error);
       return NULL;
     }
 
-  return build_fhandler (fd, pc.get_devn (), name, pc, pc.get_unitn ());
+  return build_fhandler (fd, pc.get_devn (), pc.normalized_path, pc, pc.get_unitn ());
 }
 
 #define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
@@ -363,6 +363,15 @@ dtable::build_fhandler (int fd, DWORD dev, const char *unix_name,
       case FH_OSS_DSP:
 	fh = cnew (fhandler_dev_dsp) ();
 	break;
+      case FH_PROC:
+        fh = cnew (fhandler_proc) ();
+        break;
+      case FH_REGISTRY:
+        fh = cnew (fhandler_registry) ();
+        break;
+      case FH_PROCESS:
+        fh = cnew (fhandler_process) ();
+        break;
       default:
 	system_printf ("internal error -- unknown device - %p", dev);
 	fh = NULL;

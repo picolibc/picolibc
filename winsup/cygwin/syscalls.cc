@@ -39,8 +39,6 @@ details. */
 #include "shared_info.h"
 #include "cygheap.h"
 
-extern int normalize_posix_path (const char *, char *);
-
 SYSTEM_INFO system_info;
 
 /* Close all files and process any queued deletions.
@@ -2207,7 +2205,7 @@ extern "C" int
 chroot (const char *newroot)
 {
   sigframe thisframe (mainthread);
-  path_conv path (newroot, PC_SYM_FOLLOW | PC_FULL);
+  path_conv path (newroot, PC_SYM_FOLLOW | PC_FULL | PC_POSIX);
 
   int ret;
   if (path.error)
@@ -2224,9 +2222,7 @@ chroot (const char *newroot)
     }
   else
     {
-      char buf[MAX_PATH];
-      normalize_posix_path (newroot, buf);
-      cygheap->root.set (buf, path);
+      cygheap->root.set (path.normalized_path, path);
       ret = 0;
     }
 
