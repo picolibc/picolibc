@@ -63,7 +63,7 @@ perhaps_suffix (const char *prog, path_conv &buf)
   debug_printf ("prog '%s'", prog);
   buf.check (prog, PC_SYM_FOLLOW | PC_FULL, std_suffixes);
 
-  if (buf.isdir ())
+  if (!buf.exists () || buf.isdir ())
     ext = NULL;
   else if (buf.known_suffix)
     ext = (char *) buf + (buf.known_suffix - buf.get_win32 ());

@@ -1,3 +1,9 @@
+Thu Oct  4 21:37:57 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (perhaps_suffix): Return NULL on non-existence of file as
+	well as "directoryness".  Previous code modified on 2001/09/30 actually
+	had an arguable bug which was unmasked by the change on that day.
+
 Thu Oct  4 20:52:42 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (path_conv::check): Return ENOTDIR when leading device and
