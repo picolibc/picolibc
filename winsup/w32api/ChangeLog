@@ -1,3 +1,22 @@
+2003-05-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/olectl.h (IOleControl,IOleControlSite,ISimpleFrameSite,
+	IErrorLog,IPropertyBag,IPersistPropertyBag,IPersistStreamInit,
+	IPersistMemory,IPropertyNotifySink,IProvideClassInfo,
+	IProvideClassInfo2,IConnectionPointContainer,
+	IEnumConnectionPoints,IConnectionPoint,IEnumConnections,
+	IClassFactory2,ISpecifyPropertyPages,IPerPropertyBrowsing,
+	IPropertyPageSite,IPropertyPage,IPropertyPage2,IFont,IFontDisp,
+	IPicture,IPictureDisp): Move from here to...
+	* include/ocidl.h (IOleControl,IOleControlSite,ISimpleFrameSite,
+	IErrorLog,IPropertyBag,IPersistPropertyBag,IPersistStreamInit,
+	IPersistMemory,IPropertyNotifySink,IProvideClassInfo,
+	IProvideClassInfo2,IConnectionPointContainer,
+	IEnumConnectionPoints,IConnectionPoint,IEnumConnections,
+	IClassFactory2,ISpecifyPropertyPages,IPerPropertyBrowsing,
+	IPropertyPageSite,IPropertyPage,IPropertyPage2,IFont,IFontDisp,
+	IPicture,IPictureDisp): Here, as per documentation.
+
 2003-05-12  Mattia Barbon  <mbarbon@dsi.unive.it>
 
 	* include/oleauto.h (VarR8FromDec, VarDecFromR8): Add prototypes.
