@@ -1,3 +1,9 @@
+2002-08-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winsock2.h (WSAIsBlocking,WSAUnhookBlockingHook,
+	WSASetBlockingHook,WSACancelBlockingCall): Expose deprecated
+	functions.
+
 2002-08-17  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (CURSOR_SHOWING) Add define.

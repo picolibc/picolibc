@@ -492,14 +492,14 @@ int PASCAL WSACleanup(void);
 void PASCAL WSASetLastError(int);
 int PASCAL WSAGetLastError(void);
 /*
- * Pesudo-blocking functions N/A in ws2_32.dll (use threads instead)
+ * Pseudo-blocking functions are deprecated in WinSock2
+ * spec. Use threads instead.
  */
-#if 0
 BOOL PASCAL WSAIsBlocking(void);
 int PASCAL WSAUnhookBlockingHook(void);
 FARPROC PASCAL WSASetBlockingHook(FARPROC);
 int PASCAL WSACancelBlockingCall(void);
-#endif
+
 HANDLE PASCAL WSAAsyncGetServByName(HWND,u_int,const char*,const char*,char*,int);
 HANDLE PASCAL WSAAsyncGetServByPort(HWND,u_int,int,const char*,char*,int);
 HANDLE PASCAL WSAAsyncGetProtoByName(HWND,u_int,const char*,char*,int);
