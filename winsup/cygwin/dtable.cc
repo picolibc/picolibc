@@ -333,22 +333,22 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
     switch (dev.major)
       {
       case DEV_TTYS_MAJOR:
-	fh = cnew (fhandler_tty_slave) (dev.minor);
+	fh = cnew (fhandler_tty_slave) ();
 	break;
       case DEV_TTYM_MAJOR:
-	fh = cnew (fhandler_tty_master) (dev.minor);
+	fh = cnew (fhandler_tty_master) ();
 	break;
       case DEV_CYGDRIVE_MAJOR:
-	fh = cnew (fhandler_cygdrive) (dev.minor);
+	fh = cnew (fhandler_cygdrive) ();
 	break;
       case DEV_FLOPPY_MAJOR:
       case DEV_CDROM_MAJOR:
       case DEV_SD_MAJOR:
       case DEV_RAWDRIVE_MAJOR:
-	fh = cnew (fhandler_dev_floppy) (dev.minor);
+	fh = cnew (fhandler_dev_floppy) ();
 	break;
       case DEV_TAPE_MAJOR:
-	fh = cnew (fhandler_dev_tape) (dev.minor);
+	fh = cnew (fhandler_dev_tape) ();
 	break;
       }
   else
@@ -367,12 +367,12 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
 	fh = cnew (fhandler_windows) ();
 	break;
       case FH_SERIAL:
-	fh = cnew (fhandler_serial) (dev.minor);
+	fh = cnew (fhandler_serial) ();
 	break;
       case FH_PIPE:
       case FH_PIPER:
       case FH_PIPEW:
-	fh = cnew (fhandler_pipe) (dev);
+	fh = cnew (fhandler_pipe) ();
 	break;
       case FH_SOCKET:
 	if ((fh = cnew (fhandler_socket) ()))
@@ -389,11 +389,11 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
 	break;
       case FH_RANDOM:
       case FH_URANDOM:
-	fh = cnew (fhandler_dev_random) (dev.minor);
+	fh = cnew (fhandler_dev_random) ();
 	break;
       case FH_MEM:
       case FH_PORT:
-	fh = cnew (fhandler_dev_mem) (dev.minor);
+	fh = cnew (fhandler_dev_mem) ();
 	break;
       case FH_CLIPBOARD:
 	fh = cnew (fhandler_dev_clipboard) ();
