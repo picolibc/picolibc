@@ -1,3 +1,8 @@
+2003-09-15  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/_mingw.h: Increment version to 3.2.
+	* Makefile.in: Ditto.
+
 2003-07-03  Earnie Boyd  <earnie@users.sf.net>
 
 	* config.guess, config.sub: Update with versions from ftp.gnu.org.
