@@ -1,3 +1,11 @@
+2004-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc (shmat): If shmid is unknown, call a special variation
+	of shmget to retrieve the shared memory segment from Cygserver
+	instead of failing immediately.
+	* include/cygwin/ipc.h (IPC_KEY_IS_SHMID): New internal flag for 
+	shmget when called from shmat.
+
 2004-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_socket): Add has_been_closed member.

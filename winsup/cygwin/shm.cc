@@ -160,9 +160,26 @@ shmat (int shmid, const void *shmaddr, int shmflg)
     }
   if (!ssh_entry)
     {
-      /* Invalid shmid */
-      set_errno (EINVAL);
-      return (void *) -1;
+      /* The shmid is unknown to this process so far.  Try to get it from
+         the server if it exists.  Use special internal call to shmget,
+	 which interprets the key as a shmid and only returns a valid
+	 shmid if one exists.  Since shmctl inserts a new entry for this
+	 shmid into ssh_list automatically, we just have to go through
+	 that list again.  If that still fails, well, bad luck. */
+      if (shmid && shmget ((key_t) shmid, 0, IPC_KEY_IS_SHMID) != -1)
+        {
+	  SLIST_FOREACH (ssh_entry, &ssh_list, ssh_next)
+	    {
+	      if (ssh_entry->shmid == shmid)
+		break;
+	    }
+	}
+      if (!ssh_entry)
+        {
+	  /* Invalid shmid */
+	  set_errno (EINVAL);
+	  return (void *) -1;
+	}
     }
   vm_object_t attach_va = NULL;
   if (shmaddr)
