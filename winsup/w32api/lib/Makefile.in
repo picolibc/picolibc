@@ -115,6 +115,8 @@ res.rc test.c kernel32.c
 
 DISTFILES = Makefile.in $(DEF_FILES) $(SOURCES)
 
+.NOTPARALLEL:
+
 # targets
 all: $(LIBS) $(EXTRA_OBJS)
 
