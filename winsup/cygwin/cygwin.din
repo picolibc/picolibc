@@ -1419,6 +1419,7 @@ wcscat
 wcschr
 wcscmp
 _wcscmp = wcscmp
+wcscoll
 wcscpy
 wcscspn
 wcslcat
@@ -1435,11 +1436,13 @@ wcsspn
 wcsstr
 wcstombs
 _wcstombs = wcstombs
+wcswidth
 wctob
 wctomb
 _wctomb = wctomb
 wctrans
 wctype
+wcwidth
 wmemchr
 wmemcmp
 wmemcpy
