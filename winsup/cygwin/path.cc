@@ -282,8 +282,7 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 	      if (component == 0)
 		{
 		  fileattr = attr;
-		  if (follow_mode == SYMLINK_CONTENTS)
-		    goto out;
+		  goto fillin;
 		}
 	      goto out;	// file found
 	    }
@@ -300,7 +299,7 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 		  fileattr = attr;
 		  if (follow_mode == SYMLINK_CONTENTS)
 		      strcpy (path, sym_buf);
-		  goto found_symlink;
+		  goto fillin;
 		}
 	      break;
 	    }
@@ -364,7 +363,7 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 	}
     }
 
-found_symlink:
+fillin:
   if (*sym_buf)
     {
       known_suffix = strchr (this->path, '\0');
