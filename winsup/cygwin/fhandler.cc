@@ -480,9 +480,14 @@ fhandler_base::open_9x (int flags, mode_t mode)
     }
 #endif
 
-  /* If mode has no write bits set, we set the R/O attribute. */
-  if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
-    file_attributes |= FILE_ATTRIBUTE_READONLY;
+  if (flags & O_CREAT && get_device () == FH_FS)
+    {
+      /* If mode has no write bits set, we set the R/O attribute. */
+      if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
+        file_attributes |= FILE_ATTRIBUTE_READONLY;
+      /* The file attributes are needed for later use in, e.g. fchmod. */
+      pc.file_attributes (file_attributes & FILE_ATTRIBUTE_VALID_SET_FLAGS);
+    } 
 
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
 		  file_attributes, 0);
