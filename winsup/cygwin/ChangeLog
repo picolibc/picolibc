@@ -1,3 +1,8 @@
+Wed Sep 26 16:02:35 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (peek_pipe): REALLY only grab mutex when we actually got
+	something from the pipe.
+
 Tue Sep 25 21:25:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (pthread_cond::BroadCast): Use address with verifyable_object_isvalid().
