@@ -1,3 +1,9 @@
+Wed May 27 15:57:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_random.cc (read): Use CRYPT_MACHINE_KEYSET in
+	call to CryptAcquireContext() to serve users that did not
+	log in interactively.
+
 Wed May 26 11:16:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* errno.cc (errmap): Map ERROR_BAD_NET_NAME to errno ENOSHARE.
