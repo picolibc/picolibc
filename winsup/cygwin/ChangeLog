@@ -1,3 +1,10 @@
+2002-10-17  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::set_file_pointers_for_exec): New function.
+	* dtable.h (dtable::set_file_pointers_for_exec): Declare new function.
+	* spawn.cc (spawn_guts): Call dtable::set_file_pointers_for_exec to set
+	pointers to EOF when execing non-cygwin applications.
+
 2002-10-17  Robert Collins  <rbtcollins@hotmail.com>
 
 	* thread.h (pthread_mutex::isGoodInitializerOrBadObject): Declare.

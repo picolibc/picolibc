@@ -78,6 +78,7 @@ public:
   operator fhandler_base **() {return fds;}
   void stdio_init ();
   void get_debugger_info ();
+  void set_file_pointers_for_exec ();
 };
 
 void dtable_init (void);

@@ -621,6 +621,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   cygbench ("spawn-guts");
 
+  cygheap->fdtab.set_file_pointers_for_exec ();
   if (!cygheap->user.issetuid ())
     {
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);

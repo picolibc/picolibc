@@ -575,6 +575,17 @@ dtable::fixup_before_exec (DWORD target_proc_id)
 }
 
 void
+dtable::set_file_pointers_for_exec ()
+{
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "set_file_pointers_for_exec");
+  fhandler_base *fh;
+  for (size_t i = 0; i < size; i++)
+    if ((fh = fds[i]) != NULL && fh->get_flags () & O_APPEND)
+      SetFilePointer (fh->get_handle (), 0, 0, FILE_END);
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fixup_before_exec");
+}
+
+void
 dtable::fixup_after_exec (HANDLE parent)
 {
   first_fd_for_open = 0;
