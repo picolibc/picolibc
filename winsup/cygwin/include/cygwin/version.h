@@ -159,10 +159,10 @@ details. */
        60: MSG_NOSIGNAL
        61: Export getc_unlocked, getchar_unlocked, putc_unlocked,
 	   putchar_unlocked
-       62: Erroneously bumped.
-       63: Export pututline.
+       62: Erroneously bumped
+       63: Export pututline
        64: Export fseeko, ftello
-       65: Export fseeko, ftello
+       65: Export siginterrupt
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
