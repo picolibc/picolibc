@@ -1,3 +1,8 @@
+2003-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (ctrl_c_handler): Don't send a signal on
+	CTRL_SHUTDOWN_EVENT.  Add a comment to rationalize the patch.
+
 2003-06-11  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc (pthread_attr_init): Return 0 if attribute is already
