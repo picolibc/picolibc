@@ -1,3 +1,15 @@
+2001-11-03  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::read): Return just read ahead characters
+	if slow device.
+	* fhandler.h (fhandler_base::set_eof): New virtual method.
+	(fhandler_pipe::set_eof): New method.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Clear saweof flag.
+	(fhandler_pipe::read): Return immediately if hit eof.
+	(fhandler_pipe::hit_eof): Return true if saweof flag is set.
+	* select.cc (peek_pipe): Don't call PeekNamedPipe if we couldn't grab
+	the guard mutex.
+
 2001-11-02  Egor Duda  <deo@logos-m.ru>
 
 	* dll_init.h (class dll_list): Reorder functions to avoid compiler

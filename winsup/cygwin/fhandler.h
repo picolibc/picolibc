@@ -13,41 +13,6 @@ details. */
 
 #include <sys/ioctl.h>
 
-/* Classes
-
-  Code is located in fhandler.cc unless another file name is given.
-
-  fhandler_base		  normal I/O
-
-     fhandler_disk_file
-     fhandler_serial      Adds vmin and vtime.
-     fhandler_dev_null    Not really I/O
-     fhandler_dev_zero    Faked
-
-     fhandler_dev_raw     (fhandler_raw.cc)
-     fhandler_dev_floppy  (fhandler_floppy.cc)
-     fhandler_dev_tape    (fhandler_tape.cc)
-
-     fhandler_pipe
-     fhandler_socket      (fhandler_socket.cc)
-
-     fhandler_tty_slave   (tty.cc)
-     fhandler_pty_master  (tty.cc)
-     fhandler_tty_master  (tty.cc)
-
-     fhandler_console     Out with ansi control. (console.cc)
-
-     fhandler_windows	  Windows messages I/O (fhandler_windows.cc)
-
-     fhandler_dev_random  /dev/[u]random implementation (fhandler_random.cc)
-
-     fhandler_dev_mem     /dev/mem implementation (fhandler_mem.cc)
-
-     fhandler_dev_clipboard	/dev/clipboard implementation (fhandler_clipboard.cc)
-
-     fhandler_proc	  Interesting possibility, not implemented yet
-*/
-
 enum
 {
   FH_RBINARY	= 0x00001000,	/* binary read mode */
@@ -372,6 +337,7 @@ class fhandler_base
   }
   void operator delete (void *);
   virtual HANDLE get_guard () const {return NULL;}
+  virtual void set_eof () {}
 };
 
 class fhandler_socket: public fhandler_base
@@ -425,6 +391,7 @@ class fhandler_socket: public fhandler_base
 class fhandler_pipe: public fhandler_base
 {
   HANDLE guard;
+  bool saweof;
   HANDLE writepipe_exists;
   DWORD orig_pid;
   unsigned id;
@@ -441,6 +408,7 @@ class fhandler_pipe: public fhandler_base
   int dup (fhandler_base *child);
   void fixup_after_fork (HANDLE);
   bool hit_eof ();
+  void set_eof () {saweof = true;}
   friend int make_pipe (int fildes[2], unsigned int psize, int mode);
   HANDLE get_guard () const {return guard;}
 };

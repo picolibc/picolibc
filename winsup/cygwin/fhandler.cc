@@ -479,6 +479,9 @@ fhandler_base::read (void *in_ptr, size_t in_len)
 	len--;
       }
 
+  if (copied_chars && is_slow ())
+    return copied_chars;
+
   if (len)
     {
       int readlen = raw_read (ptr + copied_chars, len);

@@ -26,7 +26,7 @@ static unsigned pipecount;
 static const NO_COPY char pipeid_fmt[] = "stupid_pipe.%u.%u";
 
 fhandler_pipe::fhandler_pipe (DWORD devtype)
-  : fhandler_base (devtype), guard (NULL), writepipe_exists(0),
+  : fhandler_base (devtype), guard (NULL), saweof (false), writepipe_exists(0),
     orig_pid (0), id (0)
 {
 }
@@ -52,8 +52,10 @@ fhandler_pipe::set_close_on_exec (int val)
 int __stdcall
 fhandler_pipe::read (void *in_ptr, size_t in_len)
 {
+  if (hit_eof ())
+    return 0;
   int res = this->fhandler_base::read (in_ptr, in_len);
-  ReleaseMutex (guard);
+  (void) ReleaseMutex (guard);
   return res;
 }
 
@@ -72,6 +74,8 @@ fhandler_pipe::hit_eof ()
 {
   char buf[80];
   HANDLE ev;
+  if (saweof)
+    return 1;
   if (!orig_pid)
     return false;
   __small_sprintf (buf, pipeid_fmt, orig_pid, id);
