@@ -1,5 +1,10 @@
 2003-07-01  Earnie Boyd  <earnie@users.sf.net>
 
+	* include/basetyps.h (small, hyper): Change to __small and __hyper to
+	avoid user namespace conflicts.
+
+2003-07-01  Earnie Boyd  <earnie@users.sf.net>
+
 	* include/w32api.h (_NT4, _W98, _WME, _NT5, _W2000, _WXP, _W2003,
 	_IE3, _IE4, _IE5, _IE6): Add definitions.
 	* include/winbase.h (GetLongPathName[AW]): Add guard for OS >= NT5 or
