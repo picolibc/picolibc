@@ -802,7 +802,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
   else
     {
       fprintf (stderr, "garbled output from `id' command - no uid= found\n");
-      exit (1);
+      return;
     }
   char *gid = strtok (NULL, ")");
   if (gid)
@@ -810,14 +810,14 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
   else
     {
       fprintf (stderr, "garbled output from `id' command - no gid= found\n");
-      exit (1);
+      return;
     }
 
   char **ng = groups - 1;
   size_t len_uid = strlen (uid);
   size_t len_gid = strlen (gid);
-  *++ng = groups[0] = (char *) alloca (len_uid += sizeof ("UID: )"));
-  *++ng = groups[1] = (char *) alloca (len_uid += sizeof ("GID: )"));
+  *++ng = groups[0] = (char *) alloca (len_uid += sizeof ("UID: )") - 1);
+  *++ng = groups[1] = (char *) alloca (len_gid += sizeof ("GID: )") - 1);
   sprintf (groups[0], "UID: %s)", uid);
   sprintf (groups[1], "GID: %s)", gid);
   size_t sz = max (len_uid, len_gid);
@@ -832,13 +832,14 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
       if (sz < len)
 	sz = len;
     }
+  ng--;
 
   printf ("\nOutput from %s (%s)\n", id, s);
-  int n = 80 / (int) sz;
-  sz = -(sz + 1);
-  int i = n - 2;
-  for (char **g = groups; g < ng; g++)
-    if ((g != ng - 1) && (++i < n))
+  int n = 80 / (int) ++sz;
+  int i = n ? n - 2 : 0;
+  sz = -sz;
+  for (char **g = groups; g <= ng; g++)
+    if ((g != ng) && (++i < n))
       printf ("%*s ", sz, *g);
     else
       {
