@@ -496,6 +496,7 @@ poll_pipe (select_record *me, fd_set *readfds, fd_set *writefds,
 	 set_bits (me, readfds, writefds, exceptfds) :
 	 0;
 }
+
 int
 fhandler_pipe::ready_for_read (int fd, DWORD howlong, int ignra)
 {
@@ -745,12 +746,16 @@ fhandler_console::select_except (select_record *s)
 int
 fhandler_tty_common::ready_for_read (int fd, DWORD howlong, int ignra)
 {
-#if 0
-  if (myself->pgid && get_ttyp ()->getpgid () != myself->pgid &&
-	myself->ctty == ttynum) // background process?
-    return 1;	// Yes. Let read return an error
-#endif
-  return ((fhandler_pipe*)this)->fhandler_pipe::ready_for_read (fd, howlong, ignra);
+  select_record me (this);
+  me.fd = fd;
+  (void) select_read (&me);
+  while (!peek_pipe (&me, ignra) && howlong == INFINITE)
+    if (fd >= 0 && cygheap->fdtab.not_open (fd))
+      break;
+    else if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0)
+      break;
+  select_printf ("returning %d", me.read_ready);
+  return me.read_ready;
 }
 
 select_record *
