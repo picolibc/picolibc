@@ -1,3 +1,19 @@
+2003-04-14  Phil Krylov  <likewolf@users.sourceforge.net>
+
+	* include/winuser.h (VK_*): Add missing defines.
+
+2003-04-14  Vincent Béron  <papineau@users.sourceforge.net>
+
+	* include/commctrl.h (NMUPDOWN, LPNMUPDOWN): Use currently
+	documented typedefs for struct _NM_UPDOWN.
+	Add defines for backward comapatibility.
+	* include/commdlg.h (OFN_ENABLESIZING): Add define.
+	* include/wininet.h (IRF_*): Add issing defines.
+
+2003-04-14  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* lib/ntdll.def (Csr*, Dbg*, Ki*, Ldr*, Rtl*): Add W2K exports.
+
 2003-04-11  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/sspi.h: Add comment for FreeCredentialsHandle.

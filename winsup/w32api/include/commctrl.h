@@ -1802,7 +1802,10 @@ typedef struct _NM_UPDOWN {
 	NMHDR hdr;
 	int iPos;
 	int iDelta;
-} NM_UPDOWN,*LPNM_UPDOWN;
+} NMUPDOWN,*LPNMUPDOWN;
+/* for backward compatability */
+#define NM_UPDOWN NMUPDOWN 
+#define LPNM_UPDOWN LPNMUPDOWN 
 typedef struct _LVITEMA {
 	UINT mask;
 	int iItem;

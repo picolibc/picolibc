@@ -1584,17 +1584,31 @@ extern "C" {
 #define VK_RBUTTON	2
 #define VK_CANCEL	3
 #define VK_MBUTTON	4
+#if (_WIN32_WINNT >= 0x0500)
+#define VK_XBUTTON1	5
+#define VK_XBUTTON2	6
+#endif
 #define VK_BACK	8
 #define VK_TAB	9
 #define VK_CLEAR	12
 #define VK_RETURN	13
-#define VK_KANA		15
 #define VK_SHIFT	16
 #define VK_CONTROL	17
 #define VK_MENU	18
 #define VK_PAUSE	19
 #define VK_CAPITAL	20
+#define VK_KANA	0x15
+#define VK_HANGEUL	0x15
+#define VK_HANGUL	0x15
+#define VK_JUNJA	0x17
+#define VK_FINAL	0x18
+#define VK_HANJA	0x19
+#define VK_KANJI	0x19
 #define VK_ESCAPE	0x1B
+#define VK_CONVERT	0x1C
+#define VK_NONCONVERT	0x1D
+#define VK_ACCEPT	0x1E
+#define VK_MODECHANGE	0x1F
 #define VK_SPACE	32
 #define VK_PRIOR	33
 #define VK_NEXT	34
@@ -1614,6 +1628,7 @@ extern "C" {
 #define VK_LWIN	0x5B
 #define VK_RWIN	0x5C
 #define VK_APPS	0x5D
+#define VK_SLEEP	0x5F
 #define VK_NUMPAD0	0x60
 #define VK_NUMPAD1	0x61
 #define VK_NUMPAD2	0x62
@@ -1662,7 +1677,47 @@ extern "C" {
 #define VK_RCONTROL	0xA3
 #define VK_LMENU	0xA4
 #define VK_RMENU	0xA5
+#if (_WIN32_WINNT >= 0x0500)
+#define VK_BROWSER_BACK	0xA6
+#define VK_BROWSER_FORWARD	0xA7
+#define VK_BROWSER_REFRESH	0xA8
+#define VK_BROWSER_STOP	0xA9
+#define VK_BROWSER_SEARCH	0xAA
+#define VK_BROWSER_FAVORITES	0xAB
+#define VK_BROWSER_HOME	0xAC
+#define VK_VOLUME_MUTE	0xAD
+#define VK_VOLUME_DOWN	0xAE
+#define VK_VOLUME_UP	0xAF
+#define VK_MEDIA_NEXT_TRACK	0xB0
+#define VK_MEDIA_PREV_TRACK	0xB1
+#define VK_MEDIA_STOP	0xB2
+#define VK_MEDIA_PLAY_PAUSE	0xB3
+#define VK_LAUNCH_MAIL	0xB4
+#define VK_LAUNCH_MEDIA_SELECT	0xB5
+#define VK_LAUNCH_APP1	0xB6
+#define VK_LAUNCH_APP2	0xB7
+#endif
+#define VK_OEM_1	0xBA
+#if (_WIN32_WINNT >= 0x0500)
+#define VK_OEM_PLUS	0xBB
+#define VK_OEM_COMMA	0xBC
+#define VK_OEM_MINUS	0xBD
+#define VK_OEM_PERIOD	0xBE
+#endif
+#define VK_OEM_2	0xBF
+#define VK_OEM_3	0xC0
+#define VK_OEM_4	0xDB
+#define VK_OEM_5	0xDC
+#define VK_OEM_6	0xDD
+#define VK_OEM_7	0xDE
+#define VK_OEM_8	0xDF
+#if (_WIN32_WINNT >= 0x0500)
+#define VK_OEM_102	0xE2
+#endif
 #define VK_PROCESSKEY	0xE5
+#if (_WIN32_WINNT >= 0x0500)
+#define VK_PACKET	0xE7
+#endif
 #define VK_ATTN	0xF6
 #define VK_CRSEL	0xF7
 #define VK_EXSEL	0xF8
