@@ -1,3 +1,7 @@
+Fri 13 Jul 2001 08:08:49 PM EDT  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (stat_worker): Simplify previous change.
+
 Fri Jul 13 13:13:09 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (_unlink): Correct (?) logic which determines when

@@ -1032,7 +1032,6 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   int attribute = 0;
   uid_t uid;
   gid_t gid;
-  int err;
 
   UINT dtype;
   fhandler_disk_file fh (NULL);
@@ -1050,11 +1049,9 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
       goto done;
     }
 
-  if ((err = check_null_invalid_struct_errno (buf)))
-    {
-      set_errno (err);
-      goto done;
-    }
+  if (check_null_invalid_struct_errno (buf))
+    goto done;
+
   memset (buf, 0, sizeof (struct stat));
 
   if (real_path.is_device ())
