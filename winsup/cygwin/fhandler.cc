@@ -152,7 +152,6 @@ fhandler_base::set_name (path_conv &in_pc)
 {
   memcpy (&pc, &in_pc, in_pc.size ());
   pc.set_normalized_path (in_pc.normalized_path);
-  namehash = hash_path_name (0, get_win32_name ());
 }
 
 /* Detect if we are sitting at EOF for conditions where Windows
@@ -435,7 +434,6 @@ fhandler_base::open_9x (int flags, mode_t mode)
   int shared;
   int creation_distribution;
   SECURITY_ATTRIBUTES sa = sec_none;
-  security_descriptor sd;
 
   syscall_printf ("(%s, %p)", get_win32_name (), flags);
 
@@ -492,17 +490,12 @@ fhandler_base::open_9x (int flags, mode_t mode)
   if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
     file_attributes |= FILE_ATTRIBUTE_READONLY;
 
-  /* If the file should actually be created and ntsec is on,
-     set files attributes. */
-  if (flags & O_CREAT && get_device () == FH_FS && allow_ntsec && has_acls ())
-    set_security_attribute (mode, &sa, sd);
-
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
 		  file_attributes, 0);
 
   if (x == INVALID_HANDLE_VALUE)
     {
-      if (!wincap.can_open_directories () && pc.isdir ())
+      if (pc.isdir ())
 	{
 	  if (flags & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
 	    set_errno (EEXIST);

@@ -387,16 +387,19 @@ fhandler_disk_file::fchmod (mode_t mode)
 	  if (!(oret = open_fs (O_BINARY, 0)))
 	    return -1;
 	}
-    }
 
-  if (!allow_ntsec && allow_ntea) /* Not necessary when manipulating SD. */
-    SetFileAttributes (pc, (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
-  if (pc.isdir ())
-    mode |= S_IFDIR;
-  if (!set_file_attribute (pc.has_acls (), get_io_handle (), pc,
-			   ILLEGAL_UID, ILLEGAL_GID, mode)
-      && allow_ntsec)
-    res = 0;
+      if (!allow_ntsec && allow_ntea) /* Not necessary when manipulating SD. */
+	SetFileAttributes (pc, (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
+      if (pc.isdir ())
+	mode |= S_IFDIR;
+      if (!set_file_attribute (pc.has_acls (), get_io_handle (), pc,
+			       ILLEGAL_UID, ILLEGAL_GID, mode)
+	  && allow_ntsec)
+	res = 0;
+      
+      if (oret)
+	close_fs ();
+    }
 
   /* if the mode we want has any write bits set, we can't be read only. */
   if (mode & (S_IWUSR | S_IWGRP | S_IWOTH))
@@ -404,17 +407,11 @@ fhandler_disk_file::fchmod (mode_t mode)
   else
     (DWORD) pc |= FILE_ATTRIBUTE_READONLY;
 
-  if (!pc.is_lnk_symlink () && S_ISLNK (mode) || S_ISSOCK (mode))
-    (DWORD) pc |= FILE_ATTRIBUTE_SYSTEM;
-
   if (!SetFileAttributes (pc, pc))
     __seterrno ();
   else if (!allow_ntsec)
     /* Correct NTFS security attributes have higher priority */
     res = 0;
-
-  if (oret)
-    close_fs ();
 
   return res;
 }
@@ -423,6 +420,13 @@ int __stdcall
 fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 {
   int oret = 0;
+
+  if (!pc.has_acls () || !allow_ntsec)
+    {
+      /* fake - if not supported, pretend we're like win95
+         where it just works */
+      return 0;
+    }
 
   enable_restore_privilege ();
   if (!get_io_handle ())
@@ -439,12 +443,6 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
   if (!res)
     res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
 			      uid, gid, attrib);
-  if (res && (!pc.has_acls () || !allow_ntsec))
-    {
-      /* fake - if not supported, pretend we're like win95
-         where it just works */
-      res = 0;
-    }
 
   if (oret)
     close_fs ();
@@ -587,7 +585,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
   if (flags & O_CREAT
       && GetLastError () != ERROR_ALREADY_EXISTS
       && !allow_ntsec && allow_ntea)
-    set_file_attribute (has_acls (), NULL, get_win32_name (), mode);
+    set_file_attribute (false, NULL, get_win32_name (), mode);
 
   set_fs_flags (pc.fs_flags ());
 

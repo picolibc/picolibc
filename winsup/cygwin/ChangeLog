@@ -1,3 +1,20 @@
+2004-04-20  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* fhandler_disk_file.cc (fhandler_base::open_fs): Change
+	set_file_attribute call to indicate that NT security isn't used.
+	(fhandler_disk_file::fchmod): Rearrange to isolate 9x related
+	statements.
+	Do not set FILE_ATTRIBUTE_SYSTEM.
+	(fhandler_disk_file::fchown): Check noop case first.
+	* fhandler.cc (fhandler_base::open9x): Remove ntsec related statements.
+	(fhandler_base::set_name): Do not set namehash.
+	* fhandler.h (fhandler_base::get_namehash): Compute and set namehash if
+	needed.
+	* syscalls.cc (access): Verify that fh is not NULL. Do not set PC_FULL.
+	(chmod): Ditto.
+	(chown_worker): Ditto.
+	(stat_worker): Ditto. Verify if the path exists.
+
 2004-04-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Remove special DEV_FLOPPY_MAJOR

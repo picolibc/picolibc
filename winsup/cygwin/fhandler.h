@@ -217,7 +217,7 @@ class fhandler_base
   bool has_attribute (DWORD x) const {return pc.has_attribute (x);}
   const char *get_name () const { return pc.normalized_path; }
   const char *get_win32_name () { return pc.get_win32 (); }
-  __ino64_t get_namehash () { return namehash; }
+    __ino64_t get_namehash () { return namehash ?: namehash = hash_path_name (0, get_win32_name ()); }
 
   virtual void hclose (HANDLE h) {CloseHandle (h);}
   virtual void set_no_inheritance (HANDLE &h, int not_inheriting);

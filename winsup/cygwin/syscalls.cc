@@ -827,8 +827,11 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
     return 0;			// return zero (and do nothing) under Windows 9x
 
   int res = -1;
-  fhandler_base *fh = build_fh_name (name, NULL, fmode | PC_FULL,
-				     stat_suffixes);
+  fhandler_base *fh;
+
+  if (!(fh = build_fh_name (name, NULL, fmode, stat_suffixes)))
+    goto error;
+
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());
@@ -838,6 +841,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
     res = fh->fchown (uid, gid);
 
   delete fh;
+ error:
   syscall_printf ("%d = %schown (%s,...)",
 		  res, (fmode & PC_SYM_NOFOLLOW) ? "l" : "", name);
   return res;
@@ -916,8 +920,10 @@ extern "C" int
 chmod (const char *path, mode_t mode)
 {
   int res = -1;
-  fhandler_base *fh = build_fh_name (path, NULL, PC_SYM_FOLLOW | PC_FULL,
-				     stat_suffixes);
+  fhandler_base *fh;
+  if (!(fh = build_fh_name (path, NULL, PC_SYM_FOLLOW, stat_suffixes)))
+    goto error;
+      
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());
@@ -927,6 +933,7 @@ chmod (const char *path, mode_t mode)
     res = fh->fchmod (mode);
 
   delete fh;
+ error:
   syscall_printf ("%d = chmod (%s, %p)", res, path, mode);
   return res;
 }
@@ -1056,17 +1063,18 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
   fhandler_base *fh = NULL;
 
   if (check_null_invalid_struct_errno (buf))
-    goto done;
+    goto error;
 
-  fh = build_fh_name (name, NULL, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
-		      		  | PC_FULL, stat_suffixes);
-
+  if (!(fh = build_fh_name (name, NULL, nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW, 
+			    stat_suffixes)))
+    goto error;
+  
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());
       set_errno (fh->error ());
     }
-  else
+  else if (fh->exists ())
     {
       debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
 		    fh, (DWORD) *fh);
@@ -1082,10 +1090,11 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
 	    buf->st_rdev = buf->st_dev;
 	}
     }
+  else
+    set_errno (ENOENT);
 
- done:
-  if (fh)
-    delete fh;
+  delete fh;
+ error:
   MALLOC_CHECK;
   syscall_printf ("%d = (%s, %p)", res, name, buf);
   return res;
@@ -1158,9 +1167,12 @@ access (const char *fn, int flags)
     set_errno (EINVAL);
   else
     {
-      fhandler_base *fh = build_fh_name (fn, NULL, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
-      res =  fh->fhaccess (flags);
-      delete fh;
+      fhandler_base *fh = build_fh_name (fn, NULL, PC_SYM_FOLLOW, stat_suffixes);
+      if (fh)
+        {
+	  res =  fh->fhaccess (flags);
+	  delete fh;
+	}
     }
   debug_printf ("returning %d", res);
   return res;
