@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #define CHECK(a) { \
   if (!(a)) \
     { \
