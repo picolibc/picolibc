@@ -46,8 +46,7 @@ cygheap_user::init ()
 
   HANDLE ptok;
   DWORD siz;
-  char pdacl_buf [sizeof (PTOKEN_DEFAULT_DACL) + ACL_DEFAULT_SIZE];
-  PTOKEN_DEFAULT_DACL pdacl = (PTOKEN_DEFAULT_DACL) pdacl_buf;
+  PSECURITY_DESCRIPTOR psd;
 
   if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
 			 &ptok))
@@ -70,34 +69,24 @@ cygheap_user::init ()
   if (!SetTokenInformation (ptok, TokenOwner, &effec_cygsid, sizeof (cygsid)))
     debug_printf ("SetTokenInformation(TokenOwner): %E");
 
-  /* Add the user in the default DACL if needed */
-  if (!GetTokenInformation (ptok, TokenDefaultDacl, pdacl, sizeof (pdacl_buf), &siz))
-    system_printf ("GetTokenInformation (TokenDefaultDacl): %E");
-  else if (pdacl->DefaultDacl) /* Running with security */
-    {
-      PACL pAcl = pdacl->DefaultDacl;
-      PACCESS_ALLOWED_ACE pAce;
+  /* Standard way to build a security descriptor with the usual DACL */
+  char sa_buf[1024];
+  psd = (PSECURITY_DESCRIPTOR) (sec_user_nih (sa_buf, sid()))->lpSecurityDescriptor;
 
-      for (int i = 0; i < pAcl->AceCount; i++)
-        {
-	  if (!GetAce (pAcl, i, (LPVOID *) &pAce))
-	    system_printf ("GetAce: %E");
-	  else if (pAce->Header.AceType == ACCESS_ALLOWED_ACE_TYPE
-		   && effec_cygsid == &pAce->SidStart)
-	    goto out;
-	}
-      pAcl->AclSize = &pdacl_buf[sizeof (pdacl_buf)] - (char *) pAcl;
-      if (!AddAccessAllowedAce (pAcl, ACL_REVISION, GENERIC_ALL, effec_cygsid))
-	system_printf ("AddAccessAllowedAce: %E");
-      else if (FindFirstFreeAce (pAcl, (LPVOID *) &pAce), !(pAce))
-	debug_printf ("FindFirstFreeAce %E");
-      else
-        {
-          pAcl->AclSize = (char *) pAce - (char *) pAcl;
-	  if (!SetTokenInformation (ptok, TokenDefaultDacl, pdacl, sizeof (* pdacl)))
-	    system_printf ("SetTokenInformation (TokenDefaultDacl): %E");
-        }
+  BOOL acl_exists, dummy;
+  TOKEN_DEFAULT_DACL dacl;
+  if (GetSecurityDescriptorDacl (psd, &acl_exists, 
+				 &dacl.DefaultDacl, &dummy)
+      && acl_exists && dacl.DefaultDacl)
+    {
+      /* Set the default DACL and the process DACL */
+      if (!SetTokenInformation (ptok, TokenDefaultDacl, &dacl, sizeof (dacl)))
+	system_printf ("SetTokenInformation (TokenDefaultDacl): %E");
+      if (!SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION, psd))
+	system_printf ("SetKernelObjectSecurity: %E");
     }
+  else
+    system_printf("Cannot get dacl: %E");
  out:
   CloseHandle (ptok);
 }

@@ -639,8 +639,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   syscall_printf ("null_app_name %d (%s, %.9500s)", null_app_name, runpath, one_line.buf);
 
   void *newheap;
-  /* Preallocated buffer for `sec_user' call */
-  char sa_buf[1024];
 
   cygbench ("spawn-guts");
 
@@ -656,14 +654,13 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  && cygheap->user.saved_gid == cygheap->user.real_gid
 	  && !cygheap->user.groups.issetgroups ()))
     {
-      PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
       ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
 					  real_path.iscygexec ());
       newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
-			  sec_attribs,	/* process security attrs */
-			  sec_attribs,	/* thread security attrs */
+			  &sec_none_nih,/* process security attrs */
+			  &sec_none_nih,/* thread security attrs */
 			  TRUE,		/* inherit handles from parent */
 			  flags,
 			  envblock,	/* environment */
@@ -673,13 +670,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     }
   else
     {
-      PSID sid = cygheap->user.sid ();
       /* Give access to myself */
       if (mode == _P_OVERLAY)
 	myself.set_acl();
-
-      /* Set security attributes with sid */
-      PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf, sid);
 
       /* allow the child to interact with our window station/desktop */
       HANDLE hwst, hdsk;
@@ -704,8 +697,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       rc = CreateProcessAsUser (cygheap->user.token (),
 		       runpath,		/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
-		       sec_attribs,     /* process security attrs */
-		       sec_attribs,     /* thread security attrs */
+		       &sec_none_nih,   /* process security attrs */
+		       &sec_none_nih,   /* thread security attrs */
 		       TRUE,		/* inherit handles from parent */
 		       flags,
 		       envblock,	/* environment */

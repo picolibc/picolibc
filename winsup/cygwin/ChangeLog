@@ -1,3 +1,10 @@
+2004-02-06  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* uinfo.cc (cygheap_user::init): Use sec_user_nih to build a
+	security descriptor. Set both the process and the default DACLs.
+	* fork.cc (fork_parent): Use sec_none_nih security attributes.
+	* spawn.cc (spawn_guts): Ditto.
+
 2004-02-05  Christopher Faylor  <cgf@redhat.com>
 
 	* cygwin.din: Make many more functions SIGFE.
