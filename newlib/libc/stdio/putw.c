@@ -37,10 +37,7 @@ DESCRIPTION
 to write a word to the file or stream identified by <[fp]>.  As a side
 effect, <<putw>> advances the file's current position indicator.
 
-RETURNS The written word, unless the host system reports a write
-error, in which case <<putw>> returns <<EOF>>.  Since <<EOF>> is a
-valid <<int>>, you must use <<ferror>> or <<feof>> to distinguish
-these situations when writing the integer equal to <<EOF>>.
+RETURNS Zero on success, <<EOF>> on failure.
 
 PORTABILITY
 <<putw>> is a remnant of K&R C, it is not part of any ISO C Standard.
@@ -62,5 +59,5 @@ putw (w, fp)
 {
   if (fwrite((const char*)&w, sizeof(w), 1, fp) != 1)
     return EOF;
-  return w;
+  return 0;
 }

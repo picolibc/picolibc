@@ -1,3 +1,8 @@
+Fri Mar 10 14:53:50 2000  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
+
+	* libc/stdio/putw.c (putw): Return 0 on success, to be compliant
+	with XSH5, not SVID.
+
 Thu Mar  9 17:20:41 2000  Jeff Johnston <jjohnstn@cygnus.com>
 
         * libc/include/string.h: Changed last argument back to ssize_t
