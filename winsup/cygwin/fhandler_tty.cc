@@ -522,6 +522,7 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
 
       HANDLE tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
 				         get_ttyp ()->master_pid);
+      termios_printf ("tty own handle %p",tty_owner);
       if (tty_owner == NULL)
         {
           termios_printf ("can't open tty (%d) handle process %d",
@@ -538,8 +539,6 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
           __seterrno ();
           return 0;
         }
-      termios_printf ("duplicated from_master %p->%p from tty_owner %p",
-		     get_ttyp ()->from_master, from_master_local, tty_owner);
 
       if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master, 
 			  hMainProc, &to_master_local, 0, TRUE,
@@ -549,10 +548,13 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
           __seterrno ();
           return 0;
         }
-      termios_printf ("duplicated to_master %p->%p from tty_owner %p",
-      		     get_ttyp ()->to_master, to_master_local, tty_owner);
       CloseHandle (tty_owner);
     }
+
+  termios_printf ("duplicated from_master %p->%p from tty_owner",
+      get_ttyp ()->from_master, from_master_local);
+  termios_printf ("duplicated to_master %p->%p from tty_owner",
+      get_ttyp ()->to_master, to_master_local);
 
   set_io_handle (from_master_local);
   ProtectHandle1 (from_master_local, from_pty);
@@ -683,7 +685,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
   DWORD rc;
   HANDLE w4[2];
 
-  termios_printf ("read(%x, %d) handle %d", ptr, len, get_handle ());
+  termios_printf ("read(%x, %d) handle %p", ptr, len, get_handle ());
 
   if (!(get_ttyp ()->ti.c_lflag & ICANON))
     {

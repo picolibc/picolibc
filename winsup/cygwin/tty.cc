@@ -395,6 +395,9 @@ tty::common_init (fhandler_pty_master *ptym)
 
   /* Allow the others to open us (for handle duplication) */
 
+  /* FIXME: we shold NOT set the security wide open when the
+     daemon is running
+   */
   if (wincap.has_security () && cygserver_running==CYGSERVER_OK &&
       (SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION,
 			       get_null_sd ()) == FALSE))

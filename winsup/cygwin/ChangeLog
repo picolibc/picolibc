@@ -1,3 +1,9 @@
+2002-02-28  Robert Collins  <rbtcollins@hotmail.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::open): More debugging.
+	(fhandler_tty_slave::read): Fix printf type for the handle.
+	* tty.cc (tty::common_init): Add a FIXME for security.
+
 2002-01-29  Robert Collins  <rbtcollins@hotmail.com>
 
 	* Makefile.in (OBJS): Remove duplicate localtime.o.
