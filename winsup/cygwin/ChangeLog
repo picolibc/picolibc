@@ -1,3 +1,25 @@
+2004-11-21  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (child_info_spawn::hexec_proc): Eliminate.
+	* dcrt0.cc (dll_crt0_0): Remove hexec_proc stuff.
+	* fork.cc (fork_child): Remove call to pinfo_fixup_after_fork.
+	* pinfo.cc (set_myself): Close and zero pid_handle if set.
+	(pinfo_fixup_after_fork): Delete.
+	(proc_waiter): Don't close vchild.hProcess here.  Do that when we are
+	remove the vchild from procs.  Save hProcess as pid_handle only on
+	first reparent operation.
+	(pinfo::wait): Don't set pid_handle here.
+	(pinfo::alert_parent): Always try to send signal.  If unsuccessful then
+	close and zero wr_proc_pipe.
+	* pinfo.h (pinfo::pinfo): Make sure that appropriate parts of the class
+	are zeroed on construction.
+	(pinfo::alert_parent): Take char argument.
+	(pinfo_fixup_after_fork): Delete declaration.
+	(hexec_proc): Ditto.
+	* sigproc.cc (remove_proc): Close pid_handle and hProcess if
+	appropriate.
+	* spawn.cc (spawn_guts): Set cygheap->pid_handle on first exec.
+
 2004-11-20  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.h (init_cygheap::pid_handle): New element.

@@ -284,7 +284,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   (void) ForceCloseHandle1 (fork_info->subproc_ready, subproc_ready);
   (void) ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
-  pinfo_fixup_after_fork ();
   _my_tls.fixup_after_fork ();
   sigproc_init ();
 

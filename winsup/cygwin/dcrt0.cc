@@ -645,7 +645,6 @@ dll_crt0_0 ()
     memory_init ();
   else
     {
-      bool close_hexec_proc = false;
       switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:
@@ -655,12 +654,7 @@ dll_crt0_0 ()
 	    set_myself (NULL);
 	    break;
 	  case _PROC_SPAWN:
-	    /* Have to delay closes until after cygheap is setup */
-	    close_hexec_proc = !!spawn_info->hexec_proc;
-	    goto around;
 	  case _PROC_EXEC:
-	    hexec_proc = spawn_info->hexec_proc;
-	  around:
 	    HANDLE h;
 	    cygheap_fixup_in_child (true);
 	    memory_init ();
@@ -683,8 +677,6 @@ dll_crt0_0 ()
 	      }
 	    break;
 	}
-      if (close_hexec_proc)
-	CloseHandle (spawn_info->hexec_proc);
     }
 
   _cygtls::init ();

@@ -303,8 +303,8 @@ proc_subproc (DWORD what, DWORD val)
        */
       if ((wval->ev = wval->thread_ev) == NULL)
 	{
-	  wval->ev = wval->thread_ev = CreateEvent (&sec_none_nih, TRUE,
-						    FALSE, NULL);
+	  wval->ev = wval->thread_ev = CreateEvent (&sec_none_nih, TRUE, FALSE,
+						    NULL);
 	  ProtectHandle1 (wval->ev, wq_ev);
 	}
 
@@ -765,7 +765,13 @@ remove_proc (int ci)
   sigproc_printf ("removing procs[%d], pid %d, nprocs %d", ci, procs[ci]->pid,
 		  nprocs);
   if (procs[ci] != myself)
-    procs[ci].release ();
+    {
+      procs[ci].release ();
+      if (procs[ci].pid_handle)
+	ForceCloseHandle1 (procs[ci].pid_handle, childhProc);
+      if (procs[ci].hProcess)
+	ForceCloseHandle1 (procs[ci].hProcess, childhProc);
+    }
   if (ci < --nprocs)
     procs[ci] = procs[nprocs];
   return 0;

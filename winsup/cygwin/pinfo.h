@@ -131,9 +131,9 @@ public:
   HANDLE pid_handle;
   void init (pid_t, DWORD, HANDLE = NULL) __attribute__ ((regparm(3)));
   pinfo () {}
-  pinfo (_pinfo *x): procinfo (x) {}
-  pinfo (pid_t n) {init (n, 0);}
-  pinfo (pid_t n, DWORD flag) {init (n, flag);}
+  pinfo (_pinfo *x): procinfo (x), hProcess (NULL), pid_handle (NULL) {}
+  pinfo (pid_t n) : rd_proc_pipe (NULL), hProcess (NULL), pid_handle (NULL) {init (n, 0);}
+  pinfo (pid_t n, DWORD flag) : rd_proc_pipe (NULL), hProcess (NULL), pid_handle (NULL)  {init (n, flag);}
   void release ();
   int wait () __attribute__ ((regparm (1)));
   ~pinfo ()
@@ -153,7 +153,7 @@ public:
   operator _pinfo * () const {return procinfo;}
   // operator bool () const {return (int) h;}
   void preserve () { destroy = false; }
-  void alert_parent (int);
+  void alert_parent (char);
 #ifndef _SIGPROC_H
   int remember () {system_printf ("remember is not here"); return 0;}
 #else
@@ -212,9 +212,6 @@ extern pinfo myself;
 
 #define _P_VFORK 0
 #define _P_SYSTEM 512
-
-extern void __stdcall pinfo_fixup_after_fork ();
-extern HANDLE hexec_proc;
 
 /* For mmaps across fork(). */
 int __stdcall fixup_mmaps_after_fork (HANDLE parent);

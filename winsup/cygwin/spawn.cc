@@ -592,7 +592,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   ciresrv.moreinfo->argc = newargv.argc;
   ciresrv.moreinfo->argv = newargv;
-  ciresrv.hexec_proc = hexec_proc;
 
   if (mode != _P_OVERLAY ||
       !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
@@ -624,9 +623,12 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       saved_sendsig = myself->sendsig;
       myself->sendsig = INVALID_HANDLE_VALUE;
-      if (!cygheap->pid_handle
-	  && !DuplicateHandle (hMainProc, hMainProc, hMainProc, &cygheap->pid_handle,
-			   0, TRUE, DUPLICATE_SAME_ACCESS))
+      if (cygheap->pid_handle)
+	/* ok */;
+      else if (DuplicateHandle (hMainProc, hMainProc, hMainProc, &cygheap->pid_handle,
+				PROCESS_QUERY_INFORMATION, TRUE, 0))
+	ProtectHandle (cygheap->pid_handle);
+      else
 	system_printf ("duplicate to pid_handle failed, %E");
     }
 

@@ -29,7 +29,7 @@ enum
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0x568a5527U
+#define CURR_CHILD_INFO_MAGIC 0x83e9a7b7U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -82,7 +82,6 @@ class child_info_spawn: public child_info
 {
 public:
   cygheap_exec_info *moreinfo;
-  HANDLE hexec_proc;
 
   child_info_spawn (): moreinfo (NULL) {}
   ~child_info_spawn ()

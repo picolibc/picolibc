@@ -37,8 +37,6 @@ static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 
-HANDLE hexec_proc;
-
 /* Initialize the process table.
    This is done once when the dll is first loaded.  */
 
@@ -70,7 +68,10 @@ set_myself (HANDLE h)
       if (parent && parent->wr_proc_pipe)
 	CloseHandle (parent->wr_proc_pipe);
       if (cygheap->pid_handle)
-	CloseHandle (cygheap->pid_handle);
+	{
+	  ForceCloseHandle (cygheap->pid_handle);
+	  cygheap->pid_handle = NULL;
+	}
     }
   return;
 }
@@ -100,21 +101,6 @@ pinfo_init (char **envp, int envc)
     }
 
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
-}
-
-void __stdcall
-pinfo_fixup_after_fork ()
-{
-  if (hexec_proc)
-    CloseHandle (hexec_proc);
-  /* Keeps the cygpid from being reused.  No rights required */
-  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hexec_proc, 0,
-			TRUE, 0))
-    {
-      system_printf ("couldn't save current process handle %p, %E", hMainProc);
-      hexec_proc = NULL;
-    }
-  VerifyHandle (hexec_proc);
 }
 
 void
@@ -711,7 +697,6 @@ proc_waiter (void *arg)
 	      if (GetExitCodeProcess (vchild.hProcess, &exit_code))
 		vchild->exitcode = (exit_code & 0xff) << 8;
 	    }
-	  ForceCloseHandle1 (vchild.hProcess, childhProc);
 	  if (WIFEXITED (vchild->exitcode))
 	    si.si_sigval.sival_int = CLD_EXITED;
 	  else if (WCOREDUMP (vchild->exitcode))
@@ -730,15 +715,18 @@ proc_waiter (void *arg)
 	case SIGCONT:
 	  continue;
 	case __SIGREPARENT: /* sigh */
-	  if (vchild.hProcess)
+	  if (!vchild.hProcess)
+	    /* something went wrong.  oh well. */;
+	  else if (vchild.pid_handle)
 	    ForceCloseHandle1 (vchild.hProcess, childhProc);
+	  else
+	    vchild.pid_handle = vchild.hProcess;
 	  vchild.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, FALSE,
 					 vchild->dwProcessId);
 	  vchild->cygstarted++;
 	  if (vchild.hProcess)
 	    ProtectHandle1 (vchild.hProcess, childhProc);
 	  continue;
-	  break;
 	default:
 	  system_printf ("unknown value %d on proc pipe", buf);
 	  continue;
@@ -788,13 +776,6 @@ pinfo::wait ()
 		     hProcess);
       return 0;
     }
-  if (!DuplicateHandle (hMainProc, hProcess, hMainProc, &pid_handle, 0,
-			FALSE, DUPLICATE_SAME_ACCESS))
-    {
-      system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid,
-		     hProcess);
-      return 0;
-    }
   CloseHandle (out);
 
   preserve ();
@@ -813,21 +794,21 @@ pinfo::wait ()
 }
 
 void
-pinfo::alert_parent (int sig)
+pinfo::alert_parent (char sig)
 {
-  /* See if we have a living parent.  If so, send it a special signal.
-     It will figure out exactly which pid has stopped by scanning
-     its list of subprocesses.  */
-  if (my_parent_is_alive ())
+  DWORD nb;
+  /* Send something to our parent.  If the parent has gone away,
+     close the pipe. */
+  if (myself->wr_proc_pipe
+      && WriteFile (myself->wr_proc_pipe, &sig, 1, &nb, NULL))
+    /* all is well */;
+  else if (GetLastError () != ERROR_BROKEN_PIPE)
+    debug_printf ("sending %d notification to parent failed, %E", sig);
+  else
     {
-      pinfo parent (myself->ppid);
-      if (NOTSTATE (parent, PID_NOCLDSTOP))
-	{
-	  DWORD nb;
-	  unsigned char pipesig = sig;
-	  if (!WriteFile (myself->wr_proc_pipe, &pipesig, 1, &nb, NULL))
-	    debug_printf ("sending %d notification to parent failed, %E", sig);
-	}
+      HANDLE closeit = myself->wr_proc_pipe;
+      myself->wr_proc_pipe = NULL;
+      CloseHandle (closeit);
     }
 }
 
