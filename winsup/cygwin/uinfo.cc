@@ -103,18 +103,29 @@ internal_getlogin (cygheap_user &user)
 void
 uinfo_init ()
 {
-  if (!child_proc_info || cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (child_proc_info && cygheap->user.token == INVALID_HANDLE_VALUE)
+    return;
+
+  if (!child_proc_info)
+    internal_getlogin (cygheap->user); /* Set the cygheap->user. */
+  /* Conditions must match those in spawn to allow starting child
+     processes with ruid != euid and rgid != egid. */
+  else if (cygheap->user.issetuid ()
+  	   && cygheap->user.orig_uid == cygheap->user.real_uid
+	   && cygheap->user.orig_gid == cygheap->user.real_gid
+	   && !cygheap->user.groups.issetgroups ())
     {
-      if (!child_proc_info)
-	internal_getlogin (cygheap->user); /* Set the cygheap->user. */
-      else
-	CloseHandle (cygheap->user.token);
-      cygheap->user.set_orig_sid ();	/* Update the original sid */
-      cygheap->user.token = INVALID_HANDLE_VALUE; /* No token present */
+      if (!ImpersonateLoggedOnUser (cygheap->user.token))
+	system_printf ("ImpersonateLoggedOnUser: %E");
+      return;
     }
-  /* Real and effective uid/gid are identical on process start up. */
+  else
+    CloseHandle (cygheap->user.token);
+
   cygheap->user.orig_uid = cygheap->user.real_uid = myself->uid;
   cygheap->user.orig_gid = cygheap->user.real_gid = myself->gid;
+  cygheap->user.set_orig_sid ();	/* Update the original sid */
+  cygheap->user.token = INVALID_HANDLE_VALUE; /* No token present */
 }
 
 extern "C" char *

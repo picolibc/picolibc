@@ -154,7 +154,7 @@ error_start_init (const char *buf)
   for (char *p = strchr (pgm, '\\'); p; p = strchr (p, '\\'))
     *p = '/';
 
-  __small_sprintf (debugger_command, "%s %s", buf, pgm);
+  __small_sprintf (debugger_command, "%s \"%s\"", buf, pgm);
 }
 
 static void

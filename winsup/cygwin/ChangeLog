@@ -1,3 +1,14 @@
+2003-06-09  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* spawn.cc (spawn_guts): Call CreateProcess while impersonated,
+	when the real {u,g}ids and the groups are original.
+	Move RevertToSelf and ImpersonateLoggedOnUser to the main line.
+	* uinfo.cc (uinfo_init): Reorganize. If CreateProcess was called
+	while impersonated, preserve the uids and gids and call
+	ImpersonateLoggedOnUser. Preserve the uids and gids on Win9X.
+
+	* exceptions.cc (error_start_init): Quote the pgm in the command.
+
 2003-06-07  Christopher Faylor  <cgf@redhat.com>
 
 	* poll.cc: Define FD_SETSIZE to ridiculously large number so that there
@@ -42,10 +53,10 @@
 
 2003-06-03  Pierre Humblet  <pierre.humblet@ieee.org>
 
-        * fhandler_disk_file.cc (fhandler_disk_file::fstat): Mark the pc
-        as non-executable if the file cannot be opened for read. Retry query
-        open only if errno is EACCES. Never change the mode, even if it is 000
-        when query open() fails.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat): Mark the pc
+	as non-executable if the file cannot be opened for read. Retry query
+	open only if errno is EACCES. Never change the mode, even if it is 000
+	when query open() fails.
 
 2003-06-03  Christopher Faylor  <cgf@redhat.com>
 

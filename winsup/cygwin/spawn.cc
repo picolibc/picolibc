@@ -622,7 +622,17 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   cygbench ("spawn-guts");
 
   cygheap->fdtab.set_file_pointers_for_exec ();
-  if (!cygheap->user.issetuid ())
+  if (cygheap->user.issetuid ())
+    RevertToSelf ();
+  /* When ruid != euid we create the new process under the current original
+     account and impersonate in child, this way maintaining the different
+     effective vs. real ids.
+     FIXME: If ruid != euid and ruid != orig_uid we currently give
+     up on ruid. The new process will have ruid == euid. */
+  if (!cygheap->user.issetuid ()
+      || (cygheap->user.orig_uid == cygheap->user.real_uid
+	  && cygheap->user.orig_gid == cygheap->user.real_gid
+	  && !cygheap->user.groups.issetgroups ()))
     {
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
       ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
@@ -645,8 +655,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
       /* Set security attributes with sid */
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf, sid);
-
-      RevertToSelf ();
 
       /* Load users registry hive. */
       load_registry_hive (sid);
@@ -682,11 +690,11 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 		       0,		/* use current drive/directory */
 		       &si,
 		       &pi);
-      /* Restore impersonation. In case of _P_OVERLAY this isn't
-	 allowed since it would overwrite child data. */
-      if (mode != _P_OVERLAY)
-	ImpersonateLoggedOnUser (cygheap->user.token);
     }
+  /* Restore impersonation. In case of _P_OVERLAY this isn't
+     allowed since it would overwrite child data. */
+  if (mode != _P_OVERLAY && cygheap->user.issetuid ())
+    ImpersonateLoggedOnUser (cygheap->user.token);
 
   MALLOC_CHECK;
   if (envblock)
