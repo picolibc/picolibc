@@ -1025,6 +1025,7 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
       raise (SIGTTOU);
     }
 
+  int retval;
   switch (cmd)
     {
     case TIOCGWINSZ:
@@ -1033,6 +1034,7 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
       break;
     case FIONBIO:
       set_nonblocking (*(int *) arg);
+      retval = 0;
       goto out;
     default:
       set_errno (EINVAL);
@@ -1086,14 +1088,14 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
     }
 
   release_output_mutex ();
-
-out:
-  int retval = get_ttyp ()->ioctl_retval;
+  retval = get_ttyp ()->ioctl_retval;
   if (retval < 0)
     {
       set_errno (-retval);
       retval = -1;
     }
+
+out:
   termios_printf ("%d = ioctl (%x)", retval, cmd);
   return retval;
 }
