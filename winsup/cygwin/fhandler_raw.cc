@@ -329,7 +329,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 	}
     }
 
-  (ssize_t) ulen = bytes_read;
+  ulen = (size_t) bytes_read;
   return;
 
 err:

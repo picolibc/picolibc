@@ -1,3 +1,26 @@
+2003-09-07  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* signal.cc (nanosleep): Improve test for valid values.  Round delay up
+	to resolution.  Fix test for negative remainder.  Use timeGetTime
+	through gtod.
+	(sleep): Round up return value.
+
+2003-09-07  Pierre Humblet <pierre.humblet@ieee.org>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* hires.h (HIRES_DELAY_MAX): Define.
+	(hires_ms::minperiod): Declare static.
+	(hires_ms::resolution): New.
+	(hires_ms::dmsecs): New.
+	(hires_ms::prime): Return UINT.
+	(gtod): Declare.
+	* times.cc (hires_ms::prime): Always calculate minperiod and set it to
+	1 in case of failure.  Return minperiod.
+	(hires_ms::resolution): Define.
+	(hires_ms::~hires_ms): Delete.
+	(hires_ms::usecs): Check minperiod to prime.
+	(gtod) Define as global.
+
 2003-09-06  Christopher Faylor  <cgf@redhat.com>
 
 	Remove left coercion throughout.
