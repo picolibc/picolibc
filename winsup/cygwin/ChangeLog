@@ -28,7 +28,7 @@
 	live.
 	(sig_dispatch): Ditto.
 	(sig_send): Ditto.
-	(wait_for_sigthread): Renamed from "wait_for_me".  Assume that
+	(wait_for_sigthread): Rename from "wait_for_me".  Assume that
 	wait_sig_inited has been set and that this function is only called from
 	the main thread.
 	* winsup.h (wait_for_sigthread): Declare new function.
@@ -342,7 +342,7 @@
 	dtr and rts.  Important for Win 9x only.
 	(fhandler_serial::ioctl): New function.  Implements commands TIOCMGET,
 	TIOCMSET and TIOCINQ.
-	(fhandler_serial::tcflush): Fixed found error.
+	(fhandler_serial::tcflush): Fix found error.
 	(fhandler_serial::tcsetattr): Add settings of rts and dtr.  Important
 	for Win 9x only.
 	* termios.h: Add new defines as a support for ioctl() function on
@@ -871,7 +871,7 @@
 
 2002-06-27  Thomas Pfaff  <tpfaff@gmx.net>
 
-	* thread.cc (pthread::create): Added trace printf to get CreateThread
+	* thread.cc (pthread::create): Add trace printf to get CreateThread
 	LastError.
 
 2002-06-27  Corinna Vinschen  <corinna@vinschen.de>
@@ -970,7 +970,7 @@
 
 2002-06-25  Thomas Pfaff  <tpfaff@gmx.net>
 
-	* include/pthread.h (PTHREAD_CANCELED): Defined a reasonable value.
+	* include/pthread.h (PTHREAD_CANCELED): Define a reasonable value.
 	* pthread.cc (pthread_exit): Call method instead of function.
 	(pthread_setcancelstate): Ditto.
 	(pthread_setcanceltype): Ditto.
@@ -1000,7 +1000,7 @@
 	__pthread_setcancelstate.
 	(pthread::setcanceltype): New method.  Replacement for
 	__pthread_setcanceltype.
-	(pthread::pop_cleanup_handler): Added lock for async cancel safe
+	(pthread::pop_cleanup_handler): Add lock for async cancel safe
 	cancellation.
 	(pthread::thread_init_wrapper): Change __pthread_exit to
 	thread->exit().
@@ -1073,19 +1073,18 @@
 
 2002-06-12  Thomas Pfaff  <tpfaff@gmx.net>
 
-	* thread.h (pthread::cleanup_stack): Renamed cleanup_handlers to
+	* thread.h (pthread::cleanup_stack): Rename cleanup_handlers to
 	cleanup_stack.
 	* thread.cc (pthread::pthread): Ditto.
-	(pthread::create): Fixed mutex verification.
-	(pthread::push_cleanup_handler): Renamed cleanup_handlers to
-	cleanup_stack.
-	Mutex calls removed, used InterlockedExchangePointer instead.
-	(pthread::pop_cleanup_handler): Renamed cleanup_handlers to
+	(pthread::create): Fix mutex verification.
+	(pthread::push_cleanup_handler): Renam cleanup_handlers to
+	cleanup_stack.  Remvoe Mutex calls, use InterlockedExchangePointer
+	instead.
+	(pthread::pop_cleanup_handler): Rename cleanup_handlers to
 	cleanup_stack.
 	(pthread::pop_all_cleanup_handlers): Ditto.
 	(__pthread_once): Check state first and return if already done.
-	(__pthread_join): DEADLOCK test reverted to __pthread_equal
-	call.
+	(__pthread_join): Revert DEADLOCK test to __pthread_equal call.
 	(__pthread_detach): Unlock mutex before deletion.
 
 2002-06-21  Christopher Faylor  <cgf@redhat.com>
@@ -1317,7 +1316,7 @@
 	(environ_init): Assume that envc counts number of elments not total
 	size.
 	(spenv): New class.
-	(spenvs): New array, renamed from forced_winenv_vars, using spenv.
+	(spenvs): New array, rename from forced_winenv_vars, using spenv.
 	(spenv::retrieve): New method.
 	(build_env): Rename from 'winenv' -- one stop shopping for building new
 	environment blocks for both windows and "unix".
@@ -1494,13 +1493,13 @@
 	(timeGetTime): Ditto.
 	(timeBeginPeriod): Ditto.
 	(timeEndPeriod): Ditto.
-	* hires.h (hires_base): New class.  Renamed from hires.
+	* hires.h (hires_base): New class.  Rename from hires.
 	(hires_us): New class.
 	(hires_ms): New class.
 	* strace.cc (strace::microseconds): Use hires_us class.
 	* times.cc (gettimeofday): Use hires-ms class.
-	(hires_us::prime): Renamed from hires::prime.
-	(hires_us::usecs): Renamed from hires:usecs.
+	(hires_us::prime): Rename from hires::prime.
+	(hires_us::usecs): Rename from hires:usecs.
 	(hires_ms::prime): New method.
 	(hires_ms::usecs): New method.
 	(hires_ms::~hires_ms): New destructor.
@@ -1568,7 +1567,7 @@
 	* path.cc (get_devn): Only consider first 99 potential com devices.
 	(get_device_number): Ditto.
 	* times.cc (_times): Eliminate.
-	(_times): Renamed from times().
+	(_times): Rename from times().
 
 2002-06-05  Christopher Faylor  <cgf@redhat.com>
 
@@ -2012,7 +2011,7 @@
 2002-05-27  Christopher Faylor  <cgf@redhat.com>
 
 	* autoload.cc (LoadFuncEx): Define via new LoadFuncEx2 macro.
-	(LoadFuncEx2): Adapted from LoadFuncEx.  Provides control of return
+	(LoadFuncEx2): Adapt from LoadFuncEx.  Provides control of return
 	value for nonexistent function.
 	(NtQueryObject): Declare.
 	(IsDebuggerPresent): Declare via LoadFuncEx2 and always return true if
@@ -2648,7 +2647,7 @@ Wed Apr 17 11:27:04 2002  Jason Tishler <jason@tishler.net>
 
 2002-02-28  Robert Collins  <rbtcollins@hotmail.com>
 
-	* Merged cygwin_daemon into head minus the new shm and ipc exports.
+	* Merge cygwin_daemon into head minus the new shm and ipc exports.
 
 2002-02-28  Robert Collins  <rbtcollins@hotmail.com>
 
@@ -3140,7 +3139,7 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	* external.cc (cygwin_internal): Change CW_STRACE_ON to
 	CW_STRACE_TOGGLE.
 	* strace.cc (strace::hello): Toggle strace on and off.
-	* sync.cc (muto::init): Renamed from constructor.
+	* sync.cc (muto::init): Rename from constructor.
 	* sync.h (muto::new): Delete.
 	(muto::delete): Ditto.
 	(new_muto): Simplify.  Use muto.init for nearly everything.
