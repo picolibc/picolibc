@@ -40,12 +40,13 @@ public:
    scheme should be satisfactory for a long while yet.  */
 #define MAX_MOUNTS 30
 
+#define MOUNT_VERSION	0x01010102
+
 class reg_key;
 class mount_info
 {
-  int posix_sorted[MAX_MOUNTS];
-  int native_sorted[MAX_MOUNTS];
 public:
+  DWORD version;
   int nmounts;
   mount_item mount[MAX_MOUNTS];
 
@@ -61,7 +62,11 @@ public:
   char cygdrive[MAX_PATH];
   size_t cygdrive_len;
   unsigned cygdrive_flags;
+private:
+  int posix_sorted[MAX_MOUNTS];
+  int native_sorted[MAX_MOUNTS];
 
+public:
   /* Increment when setting up a reg_key if mounts area had to be
      created so we know when we need to import old mount tables. */
   int had_to_create_mount_areas;
@@ -135,9 +140,6 @@ class shared_info
   DWORD inited;
 
 public:
-  /* FIXME: Doesn't work if more than one user on system. */
-  mount_info mount;
-
   int heap_chunk_in_mb;
   unsigned heap_chunk_size (void);
 
@@ -147,11 +149,20 @@ public:
 };
 
 extern shared_info *cygwin_shared;
-extern HANDLE cygwin_shared_h;
-extern HANDLE console_shared_h;
+extern mount_info *mount_table;
+extern HANDLE cygwin_mount_h;
 
 void __stdcall shared_init (void);
 void __stdcall shared_terminate (void);
+
+#define shared_align_past(p) \
+  ((char *) (system_info.dwAllocationGranularity * \
+	     (((DWORD) ((p) + 1) + system_info.dwAllocationGranularity - 1) / \
+	      system_info.dwAllocationGranularity)))
+
+#define cygwin_shared_address	((void *) 0xa000000)
+#define mount_table_address	shared_align_past (cygwin_shared)
+#define cygheap_address		shared_align_past ((mount_info *) shared_align_past (cygwin_shared))
 
 char *__stdcall shared_name (const char *, int);
 void *__stdcall open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr);

@@ -1,3 +1,36 @@
+Sun Jan 28 00:28:30 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Throughout, change 'cygwin_shared.mount' to 'mount_table'.
+	* child_info.h (child_info): Move shared_h, console_h to cygheap.  Add
+	mount_h.
+	* cygheap.h (init_cygheap): Add shared_h, console_h.
+	* cygheap.cc (init_cheap): Initialize heap at a fixed location after
+	the shared memory regions.  Initialize cygheap->user name here.
+	* dcrt0.cc (dll_crt0_1): Call getpagesize () to initialize constants.
+	Remove cygheap_init since it is done in shared_init now.
+	(_dll_crt0): Initialize mount_h, remove shared_h and console_h
+	initialization.
+	* fhandler_console.cc (console_shared_h): Eliminate.
+	(get_tty_stuff): Use cygheap->console_h rather than console_shared_h.
+	* heap.cc (heap_init): Use page size constant calculated earlier in initialization.
+	* shared.cc: Eliminate cygwin_shared_h.  Add cygwin_mount_h.
+	(mount_table_init): New function for initializing a user mount table.
+	(open_shared_file_map): Use constant for shared memory region.  Initialize cygheap and mount table here.
+	(open_shared): Improve debugging output.
+	(shared_info::initialize): Eliminate call to mount.init.
+	(shared_terminate): Use cygheap->shared_h.  Close cygwin_mount_h.
+	(open_shared_file_map): Eliminate.
+	* shared_info.h (mount_info): Add a version field.
+	(shared_align_past): New macro for calculating location for shared memory regions.
+	* sigproc.cc (init_child_info): Eliminate shared_h, console_h.
+	* spawn.cc (spawn_guts): Pass on cygwin_mount_h iff not a different user.
+	* syscalls.cc (system_info): New global holding system memory defaults.
+	(getpagesize): Use system_info.
+	* uinfo.cc (internal_getlogin): Only fill in user name if nonexistent.
+	* winsup.h: Declare system_info.
+
+	* passwd.cc (read_etc_passwd): Use cygheap->user.name () rather than retrieving the name again.
+
 Sat Jan 27 10:18:02 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (path_conv::check): Detect when path has symlinks.

@@ -38,6 +38,8 @@ details. */
 #include "security.h"
 #include "cygheap.h"
 
+SYSTEM_INFO system_info;
+
 /* Close all files and process any queued deletions.
    Lots of unix style applications will open a tmp file, unlink it,
    but never call close.  This function is called by _exit to
@@ -835,7 +837,7 @@ chmod (const char *path, mode_t mode)
 			  NULL, &uid, &gid);
       if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
 	mode |= S_IFDIR;
-      if (! set_file_attribute (win32_path.has_acls (),
+      if (!set_file_attribute (win32_path.has_acls (),
 				win32_path.get_win32 (),
 				uid, gid,
 				mode, cygheap->user.logsrv ())
@@ -1233,8 +1235,8 @@ _rename (const char *oldpath, const char *newpath)
       return -1;
     }
 
-  if (! writable_directory (real_old.get_win32 ())
-      || ! writable_directory (real_new.get_win32 ()))
+  if (!writable_directory (real_old.get_win32 ())
+      || !writable_directory (real_new.get_win32 ()))
     {
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
       return -1;
@@ -1360,15 +1362,9 @@ getdtablesize ()
 extern "C" size_t
 getpagesize ()
 {
-  static DWORD sys_page_size = 0;
-
-  if (!sys_page_size)
-    {
-      SYSTEM_INFO si;
-      GetSystemInfo(&si);
-      sys_page_size = si.dwPageSize;
-    }
-  return (int)sys_page_size;
+  if (!system_info.dwPageSize)
+    GetSystemInfo(&system_info);
+  return (int) system_info.dwPageSize;
 }
 
 /* FIXME: not all values are correct... */
@@ -1952,8 +1948,7 @@ chroot (const char *newroot)
       goto done;
     }
   char buf[MAX_PATH + 1];
-  ret = cygwin_shared->mount.conv_to_posix_path (path.get_win32 (),
-						 buf, 0);
+  ret = mount_table->conv_to_posix_path (path.get_win32 (), buf, 0);
   if (ret)
     {
       set_errno (ret);

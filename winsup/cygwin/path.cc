@@ -102,12 +102,12 @@ cwdstuff cygcwd;	/* The current working directory. */
 
 /* Determine if path prefix matches current cygdrive */
 #define iscygdrive(path) \
-  (path_prefix_p (cygwin_shared->mount.cygdrive, (path), cygwin_shared->mount.cygdrive_len))
+  (path_prefix_p (mount_table->cygdrive, (path), mount_table->cygdrive_len))
 
 #define iscygdrive_device(path) \
-  (iscygdrive(path) && isalpha(path[cygwin_shared->mount.cygdrive_len]) && \
-   (isdirsep(path[cygwin_shared->mount.cygdrive_len + 1]) || \
-    !path[cygwin_shared->mount.cygdrive_len + 1]))
+  (iscygdrive(path) && isalpha(path[mount_table->cygdrive_len]) && \
+   (isdirsep(path[mount_table->cygdrive_len + 1]) || \
+    !path[mount_table->cygdrive_len + 1]))
 
 #define ischrootpath(p) \
 	(cygheap->root.length () && \
@@ -214,9 +214,8 @@ path_conv::check (const char *src, unsigned opt,
 	       (p[1] == '\0' || strcmp (p, "\\.") == 0))
 	need_directory = 1;
       /* Must look up path in mount table, etc.  */
-      error = cygwin_shared->mount.conv_to_win32_path (src, rel_path,
-						       full_path,
-						       devn, unit, &path_flags);
+      error = mount_table->conv_to_win32_path (src, rel_path, full_path, devn,
+					       unit, &path_flags);
       MALLOC_CHECK;
       if (error)
 	return;
@@ -360,7 +359,7 @@ path_conv::check (const char *src, unsigned opt,
 	  p = sym.contents - headlen;
 	  memcpy (p, path_copy, headlen);
 	  MALLOC_CHECK;
-	  error = cygwin_shared->mount.conv_to_posix_path (p, tmp_buf, 1);
+	  error = mount_table->conv_to_posix_path (p, tmp_buf, 1);
 	  MALLOC_CHECK;
 	  if (error)
 	    return;
@@ -949,8 +948,6 @@ conv_path_list (const char *src, char *dst, int to_posix_p)
   while (s != NULL);
 }
 
-/************************* mount_info class ****************************/
-
 /* init: Initialize the mount table.  */
 
 void
@@ -1035,7 +1032,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
 	{
 	  char posix_path[MAX_PATH + 1];
 
-	  rc = cygwin_shared->mount.conv_to_posix_path (dst, posix_path, 0);
+	  rc = mount_table->conv_to_posix_path (dst, posix_path, 0);
 	  if (rc)
 	    {
 	      debug_printf ("conv_to_posix_path failed, rc %d", rc);
@@ -1397,7 +1394,7 @@ mount_info::read_mounts (reg_key& r)
       mount_flags = subkey.get_int ("flags", 0);
 
       /* Add mount_item corresponding to registry mount point. */
-      res = cygwin_shared->mount.add_item (native_path, posix_path, mount_flags, FALSE);
+      res = mount_table->add_item (native_path, posix_path, mount_flags, FALSE);
       if (res && get_errno () == EMFILE)
 	break; /* The number of entries exceeds MAX_MOUNTS */
     }
@@ -1625,11 +1622,11 @@ mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsign
        1. setting user path prefix, or
        2. overwriting (a previous) system path prefix */
   if ((flags & MOUNT_SYSTEM) == 0 ||
-      (cygwin_shared->mount.cygdrive_flags & MOUNT_SYSTEM) != 0)
+      (mount_table->cygdrive_flags & MOUNT_SYSTEM) != 0)
     {
-      slashify (cygdrive_prefix, cygwin_shared->mount.cygdrive, 1);
-      cygwin_shared->mount.cygdrive_flags = flags;
-      cygwin_shared->mount.cygdrive_len = strlen(cygwin_shared->mount.cygdrive);
+      slashify (cygdrive_prefix, mount_table->cygdrive, 1);
+      mount_table->cygdrive_flags = flags;
+      mount_table->cygdrive_len = strlen(mount_table->cygdrive);
     }
 
   return 0;
@@ -1962,7 +1959,7 @@ mount_info::read_v1_mounts (reg_key r, unsigned which)
 	     we're reading. */
 	  mountflags |= which;
 
-	  int res = cygwin_shared->mount.add_item (win32path, unixpath, mountflags, TRUE);
+	  int res = mount_table->add_item (win32path, unixpath, mountflags, TRUE);
 	  if (res && get_errno () == EMFILE)
 	    break; /* The number of entries exceeds MAX_MOUNTS */
 	}
@@ -2010,42 +2007,42 @@ mount_item::getmntent ()
   static NO_COPY struct mntent ret;
 #endif
 
-  /* Pass back pointers to mount_info strings reserved for use by
+  /* Pass back pointers to mount_table strings reserved for use by
      getmntent rather than pointers to strings in the internal mount
      table because the mount table might change, causing weird effects
      from the getmntent user's point of view. */
 
-  strcpy (cygwin_shared->mount.mnt_fsname, native_path);
-  ret.mnt_fsname = cygwin_shared->mount.mnt_fsname;
-  strcpy (cygwin_shared->mount.mnt_dir, posix_path);
-  ret.mnt_dir = cygwin_shared->mount.mnt_dir;
+  strcpy (mount_table->mnt_fsname, native_path);
+  ret.mnt_fsname = mount_table->mnt_fsname;
+  strcpy (mount_table->mnt_dir, posix_path);
+  ret.mnt_dir = mount_table->mnt_dir;
 
   if (!(flags & MOUNT_SYSTEM))		/* user mount */
-    strcpy (cygwin_shared->mount.mnt_type, (char *) "user");
+    strcpy (mount_table->mnt_type, (char *) "user");
   else					/* system mount */
-    strcpy (cygwin_shared->mount.mnt_type, (char *) "system");
+    strcpy (mount_table->mnt_type, (char *) "system");
 
   if ((flags & MOUNT_AUTO))		/* cygdrive */
-    strcat (cygwin_shared->mount.mnt_type, (char *) ",auto");
+    strcat (mount_table->mnt_type, (char *) ",auto");
 
-  ret.mnt_type = cygwin_shared->mount.mnt_type;
+  ret.mnt_type = mount_table->mnt_type;
 
   /* mnt_opts is a string that details mount params such as
      binary or textmode, or exec.  We don't print
      `silent' here; it's a magic internal thing. */
 
   if (! (flags & MOUNT_BINARY))
-    strcpy (cygwin_shared->mount.mnt_opts, (char *) "textmode");
+    strcpy (mount_table->mnt_opts, (char *) "textmode");
   else
-    strcpy (cygwin_shared->mount.mnt_opts, (char *) "binmode");
+    strcpy (mount_table->mnt_opts, (char *) "binmode");
 
   if (flags & MOUNT_CYGWIN_EXEC)
-    strcat (cygwin_shared->mount.mnt_opts, (char *) ",cygexec");
+    strcat (mount_table->mnt_opts, (char *) ",cygexec");
   else if (flags & MOUNT_EXEC)
-    strcat (cygwin_shared->mount.mnt_opts, (char *) ",exec");
+    strcat (mount_table->mnt_opts, (char *) ",exec");
 
 
-  ret.mnt_opts = cygwin_shared->mount.mnt_opts;
+  ret.mnt_opts = mount_table->mnt_opts;
 
   ret.mnt_freq = 1;
   ret.mnt_passno = 1;
@@ -2086,11 +2083,11 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
       /* When flags include MOUNT_AUTO, take this to mean that
 	we actually want to change the cygdrive prefix and flags
 	without actually mounting anything. */
-      res = cygwin_shared->mount.write_cygdrive_info_to_registry (posix_path, flags);
+      res = mount_table->write_cygdrive_info_to_registry (posix_path, flags);
       win32_path = NULL;
     }
   else
-    res = cygwin_shared->mount.add_item (win32_path, posix_path, flags, TRUE);
+    res = mount_table->add_item (win32_path, posix_path, flags, TRUE);
 
   syscall_printf ("%d = mount (%s, %s, %p)", res, win32_path, posix_path, flags);
   return res;
@@ -2123,11 +2120,11 @@ cygwin_umount (const char *path, unsigned flags)
       /* When flags include MOUNT_AUTO, take this to mean that we actually want
 	 to remove the cygdrive prefix and flags without actually unmounting
 	 anything. */
-      res = cygwin_shared->mount.remove_cygdrive_info_from_registry (path, flags);
+      res = mount_table->remove_cygdrive_info_from_registry (path, flags);
     }
   else
     {
-      res = cygwin_shared->mount.del_item (path, flags, TRUE);
+      res = mount_table->del_item (path, flags, TRUE);
     }
 
   syscall_printf ("%d = cygwin_umount (%s, %d)", res,  path, flags);
@@ -2152,7 +2149,7 @@ extern "C"
 struct mntent *
 getmntent (FILE *)
 {
-  return cygwin_shared->mount.getmntent (iteration++);
+  return mount_table->getmntent (iteration++);
 }
 
 extern "C"
@@ -2643,7 +2640,7 @@ cygwin_conv_to_posix_path (const char *path, char *posix_path)
 {
   if (check_null_empty_path_errno (path))
     return -1;
-  cygwin_shared->mount.conv_to_posix_path (path, posix_path, 1);
+  mount_table->conv_to_posix_path (path, posix_path, 1);
   return 0;
 }
 
@@ -2653,7 +2650,7 @@ cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 {
   if (check_null_empty_path_errno (path))
     return -1;
-  cygwin_shared->mount.conv_to_posix_path (path, posix_path, 0);
+  mount_table->conv_to_posix_path (path, posix_path, 0);
   return 0;
 }
 
@@ -2671,7 +2668,7 @@ realpath (const char *path, char *resolved)
     err = real_path.error;
   else
     {
-      err = cygwin_shared->mount.conv_to_posix_path (real_path.get_win32 (), resolved, 0);
+      err = mount_table->conv_to_posix_path (real_path.get_win32 (), resolved, 0);
       if (err == 0)
 	return resolved;
     }
@@ -2728,11 +2725,11 @@ conv_path_list_buf_size (const char *path_list, int to_posix_p)
     ++p;
 
   /* 7: strlen ("//c") + slop, a conservative initial value */
-  for (max_mount_path_len = 7, i = 0; i < cygwin_shared->mount.nmounts; ++i)
+  for (max_mount_path_len = 7, i = 0; i < mount_table->nmounts; ++i)
     {
       int mount_len = (to_posix_p
-		       ? cygwin_shared->mount.mount[i].posix_pathlen
-		       : cygwin_shared->mount.mount[i].native_pathlen);
+		       ? mount_table->mount[i].posix_pathlen
+		       : mount_table->mount[i].native_pathlen);
       if (max_mount_path_len < mount_len)
 	max_mount_path_len = mount_len;
     }
@@ -2944,7 +2941,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd)
     }
 
   if (!posix_cwd)
-    cygwin_shared->mount.conv_to_posix_path (win32, pathbuf, 0);
+    mount_table->conv_to_posix_path (win32, pathbuf, 0);
   else
     (void) normalize_posix_path (posix_cwd, pathbuf);
 

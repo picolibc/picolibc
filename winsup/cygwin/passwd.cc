@@ -42,7 +42,7 @@ static pwd_state passwd_state = uninitialized;
 
 /* Position in the passwd cache */
 #ifdef _MT_SAFE
-#define pw_pos  _reent_winsup()->_pw_pos
+#define pw_pos  _reent_winsup ()->_pw_pos
 #else
 static int pw_pos = 0;
 #endif
@@ -92,7 +92,7 @@ parse_pwd (struct passwd &res, char *buf)
   if (mybuf[--len] == '\n')
     mybuf[len] = '\0';
 
-  res.pw_name = strlwr(grab_string (&mybuf));
+  res.pw_name = strlwr (grab_string (&mybuf));
   res.pw_passwd = grab_string (&mybuf);
   res.pw_uid = grab_int (&mybuf);
   res.pw_gid = grab_int (&mybuf);
@@ -140,14 +140,7 @@ read_etc_passwd ()
     else
       {
 	debug_printf ("Emulating /etc/passwd");
-	char user_name [ MAX_USER_NAME ];
-	DWORD user_name_len = MAX_USER_NAME;
-	if (! GetUserNameA (user_name, &user_name_len))
-	  {
-	    strncpy (user_name, "Administrator", MAX_USER_NAME);
-	    debug_printf ("Failed to get current user name. %E");
-	  }
-	snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh", user_name,
+	snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh", cygheap->user.name (),
 		  DEFAULT_UID, DEFAULT_GID, getenv ("HOME") ?: "/");
 	add_pwd_line (linebuf);
 	passwd_state = emulated;
@@ -180,7 +173,7 @@ search_for (uid_t uid, const char *name)
      request for the current user. */
   if (passwd_state != loaded
       || (!name && uid == myself->uid)
-      || (name && strcasematch(name, cygheap->user.name ())))
+      || (name && strcasematch (name, cygheap->user.name ())))
     return default_pw;
 
   return NULL;
@@ -190,7 +183,7 @@ extern "C" struct passwd *
 getpwuid (uid_t uid)
 {
   if (passwd_state == uninitialized)
-    read_etc_passwd();
+    read_etc_passwd ();
 
   return search_for (uid, 0);
 }
@@ -199,7 +192,7 @@ extern "C" struct passwd *
 getpwnam (const char *name)
 {
   if (passwd_state == uninitialized)
-    read_etc_passwd();
+    read_etc_passwd ();
 
   return search_for (0, name);
 }
@@ -208,7 +201,7 @@ extern "C" struct passwd *
 getpwent (void)
 {
   if (passwd_state == uninitialized)
-    read_etc_passwd();
+    read_etc_passwd ();
 
   if (pw_pos < curr_lines)
     return passwd_buf + pw_pos++;
@@ -220,7 +213,7 @@ extern "C" struct passwd *
 getpwduid (uid_t)
 {
   if (passwd_state == uninitialized)
-    read_etc_passwd();
+    read_etc_passwd ();
 
   return NULL;
 }
@@ -229,7 +222,7 @@ extern "C" void
 setpwent (void)
 {
   if (passwd_state == uninitialized)
-    read_etc_passwd();
+    read_etc_passwd ();
 
   pw_pos = 0;
 }
@@ -238,7 +231,7 @@ extern "C" void
 endpwent (void)
 {
   if (passwd_state == uninitialized)
-    read_etc_passwd();
+    read_etc_passwd ();
 
   pw_pos = 0;
 }
@@ -247,7 +240,7 @@ extern "C" int
 setpassent ()
 {
   if (passwd_state == uninitialized)
-    read_etc_passwd();
+    read_etc_passwd ();
 
   return 0;
 }
@@ -256,14 +249,14 @@ extern "C" char *
 getpass (const char * prompt)
 {
 #ifdef _MT_SAFE
-  char *pass=_reent_winsup()->_pass;
+  char *pass=_reent_winsup ()->_pass;
 #else
   static char pass[_PASSWORD_LEN];
 #endif
   struct termios ti, newti;
 
   if (passwd_state == uninitialized)
-    read_etc_passwd();
+    read_etc_passwd ();
 
   if (fdtab.not_open (0))
     {

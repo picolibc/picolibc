@@ -91,9 +91,8 @@ static DWORD
 get_cygdrive_info (char *user, char *system, char *user_flags,
 	           char *system_flags)
 {
-  shared_info *info = cygwin_getshared();
-  int res = info->mount.get_cygdrive_info (user, system, user_flags,
-				          system_flags);
+  int res = mount_table->get_cygdrive_info (user, system, user_flags,
+					    system_flags);
   return (res == ERROR_SUCCESS) ? 1 : 0;
 }
 
@@ -138,7 +137,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 
       case CW_READ_V1_MOUNT_TABLES:
 	/* Upgrade old v1 registry mounts to new location. */
-	cygwin_shared->mount.import_v1_mounts ();
+	mount_table->import_v1_mounts ();
 	return 0;
 
       case CW_USER_DATA:

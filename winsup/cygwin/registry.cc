@@ -86,7 +86,7 @@ reg_key::build_reg (HKEY top, REGSAM access, va_list av)
 	 be created and set had_to_create appropriately. */
       if (strcmp (name, CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME) == 0)
 	if (disp == REG_CREATED_NEW_KEY)
-	  cygwin_shared->mount.had_to_create_mount_areas++;
+	  mount_table->had_to_create_mount_areas++;
     }
 }
 

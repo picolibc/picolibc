@@ -12,7 +12,7 @@ details. */
 
 enum
 {
-  PROC_MAGIC = 0xaf0bf000,
+  PROC_MAGIC = 0xaf0cf000,
   PROC_FORK = PROC_MAGIC + 1,
   PROC_EXEC = PROC_MAGIC + 2,
   PROC_SPAWN = PROC_MAGIC + 3,
@@ -34,8 +34,7 @@ public:
   DWORD type;		// type of record
   int cygpid;		// cygwin pid of child process
   HANDLE subproc_ready;	// used for synchronization with parent
-  HANDLE shared_h;
-  HANDLE console_h;
+  HANDLE mount_h;
   HANDLE parent;
   HANDLE pppid_handle;
   init_cygheap *cygheap;

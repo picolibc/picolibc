@@ -103,6 +103,8 @@ struct init_cygheap
   cygheap_root root;
   cygheap_user user;
   mode_t umask;
+  HANDLE shared_h;
+  HANDLE console_h;
 };
 
 extern init_cygheap *cygheap;

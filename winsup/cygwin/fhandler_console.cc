@@ -20,6 +20,7 @@ details. */
 #include <wincon.h>
 #include <ctype.h>
 #include <sys/cygwin.h>
+#include "cygheap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "sync.h"
@@ -49,8 +50,6 @@ const char * get_nonascii_key (INPUT_RECORD&, char *);
 
 static BOOL use_mouse = FALSE;
 
-HANDLE console_shared_h;
-
 static tty_min NO_COPY *shared_console_info = NULL;
 
 /* Allocate and initialize the shared record for the current console.
@@ -61,10 +60,10 @@ get_tty_stuff (int force = 0)
   if (shared_console_info && !force)
     return shared_console_info;
 
-  shared_console_info = (tty_min *) open_shared (NULL, console_shared_h,
+  shared_console_info = (tty_min *) open_shared (NULL, cygheap->console_h,
 						 sizeof (*shared_console_info),
 						 NULL);
-  ProtectHandle (console_shared_h);
+  ProtectHandle (cygheap->console_h);
   shared_console_info->setntty (TTY_CONSOLE);
   shared_console_info->setsid (myself->sid);
   return shared_console_info;

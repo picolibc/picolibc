@@ -299,7 +299,7 @@ static int NO_COPY keep_looping = 0;
 extern "C" int
 try_to_debug ()
 {
-  debug_printf ("debugger_command %s", debugger_command);
+  debug_printf ("debugger_command '%s'", debugger_command);
   if (*debugger_command == '\0')
     return 0;
 
@@ -358,7 +358,7 @@ try_to_debug ()
     }
   else
     {
-      char event_name [ sizeof ("cygwin_error_start_event") + 9 ];
+      char event_name [sizeof ("cygwin_error_start_event") + 9];
       DWORD win32_pid = GetCurrentProcessId ();
       __small_sprintf (event_name, "cygwin_error_start_event%x", win32_pid);
       HANDLE sync_with_dbg = CreateEvent (NULL, TRUE, FALSE, event_name);

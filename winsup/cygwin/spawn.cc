@@ -28,6 +28,7 @@ details. */
 #include "sigproc.h"
 #include "cygheap.h"
 #include "child_info.h"
+#include "shared_info.h"
 #include "pinfo.h"
 #define NEED_VFORK
 #include "perthread.h"
@@ -592,6 +593,9 @@ skip_arg_parsing:
   if (!hToken)
     {
       ciresrv.moreinfo->uid = getuid ();
+      /* FIXME: This leaks a handle in the CreateProcessAsUser case since the
+	 child process doesn't know about cygwin_mount_h. */
+      ciresrv.mount_h = cygwin_mount_h;
       rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
 					  /* process security attrs */

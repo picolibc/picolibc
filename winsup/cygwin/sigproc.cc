@@ -821,8 +821,6 @@ init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
   ch->cb = sizeof *ch;
   ch->type = chtype;
   ch->cygpid = pid;
-  ch->shared_h = cygwin_shared_h;
-  ch->console_h = console_shared_h;
   ch->subproc_ready = subproc_ready;
   ch->pppid_handle = myself->ppid_handle;
 }

@@ -632,9 +632,7 @@ dll_crt0_1 ()
   /* FIXME: Verify forked children get their exception handler set up ok. */
   exception_list cygwin_except_entry;
 
-  /* Initialize SIGSEGV handling, etc...  Because the exception handler
-     references data in the shared area, this must be done after
-     shared_init. */
+  /* Initialize SIGSEGV handling, etc. */
   init_exceptions (&cygwin_except_entry);
 
   do_global_ctors (&__CTOR_LIST__, 1);
@@ -656,6 +654,7 @@ dll_crt0_1 ()
 
   threadname_init ();
   debug_init ();
+  (void) getpagesize ();	/* initialize page size constant */
 
   regthread ("main", GetCurrentThreadId ());
   mainthread.init ("mainthread"); // For use in determining if signals
@@ -734,9 +733,6 @@ dll_crt0_1 ()
 
   /* Initialize events. */
   events_init ();
-
-  if (!child_proc_info)
-    cygheap_init ();
 
   cygcwd.init ();
 
@@ -918,9 +914,8 @@ _dll_crt0 ()
 	  case PROC_EXEC:
 	    {
 	      child_proc_info = fork_info;
+	      cygwin_mount_h = child_proc_info->mount_h;
 	      mypid = child_proc_info->cygpid;
-	      cygwin_shared_h = child_proc_info->shared_h;
-	      console_shared_h = child_proc_info->console_h;
 	      break;
 	    }
 	  default:

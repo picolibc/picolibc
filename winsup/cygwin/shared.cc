@@ -27,9 +27,8 @@ details. */
 		   cygwin_version.api_minor)
 
 shared_info NO_COPY *cygwin_shared = NULL;
-
-/* The handle of the shared data area.  */
-HANDLE cygwin_shared_h = NULL;
+mount_info NO_COPY *mount_table = NULL;
+HANDLE cygwin_mount_h = NULL;
 
 /* General purpose security attribute objects for global use. */
 SECURITY_ATTRIBUTES NO_COPY sec_none;
@@ -49,15 +48,24 @@ shared_name (const char *str, int num)
   return buf;
 }
 
-/* Open the shared memory map.  */
-static void __stdcall
-open_shared_file_map ()
+static void
+mount_table_init ()
 {
-  cygwin_shared = (shared_info *) open_shared ("shared",
-					       cygwin_shared_h,
-					       sizeof (*cygwin_shared),
-					       (void *)0xa000000);
-  ProtectHandle (cygwin_shared);
+  void *addr = mount_table_address;
+  debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
+		mount_table_address);
+  mount_table = (mount_info *) open_shared (cygheap->user.name (),
+					    cygwin_mount_h, sizeof (mount_info),
+					    addr);
+  ProtectHandle (cygwin_mount_h);
+
+  debug_printf ("mount table version %x at %p", mount_table->version, mount_table);
+  if (!mount_table->version)
+    {
+      mount_table->version = MOUNT_VERSION;
+      debug_printf ("initializing mount table");
+      mount_table->init ();	/* Initialize the mount table.  */
+    }
 }
 
 void * __stdcall
@@ -99,9 +107,9 @@ open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
     }
 
   if (!shared)
-    api_fatal ("MapViewOfFileEx, %E.  Terminating.");
+    api_fatal ("MapViewOfFileEx '%s'(%p), %E.  Terminating.", name, shared_h);
 
-  debug_printf ("name %s, shared %p, h %p", name, shared, shared_h);
+  debug_printf ("name %s, shared %p (wanted %p), h %p", name, shared, addr, shared_h);
 
   /* FIXME: I couldn't find anywhere in the documentation a note about
      whether the memory is initialized to zero.  The code assumes it does
@@ -123,9 +131,6 @@ shared_info::initialize ()
 		   inited, SHAREDVER);
       return;
     }
-
-  /* Initialize the mount table.  */
-  mount.init ();
 
   /* Initialize the queue of deleted files.  */
   delqueue.init ();
@@ -155,16 +160,28 @@ shared_info::initialize ()
 void __stdcall
 shared_init ()
 {
-  open_shared_file_map ();
+  HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
+  cygwin_shared = (shared_info *) open_shared ("shared",
+					       shared_h,
+					       sizeof (*cygwin_shared),
+					       cygwin_shared_address);
+  if (!cygheap)
+    cygheap_init ();
+ 
+  mount_table_init ();
 
+  cygheap->shared_h = shared_h;
+  ProtectHandle (cygheap->shared_h);
   cygwin_shared->initialize ();
 }
 
 void __stdcall
 shared_terminate ()
 {
-  if (cygwin_shared_h)
-    ForceCloseHandle (cygwin_shared_h);
+  if (cygheap->shared_h)
+    ForceCloseHandle (cygheap->shared_h);
+  if (cygwin_mount_h)
+    ForceCloseHandle (cygwin_mount_h);
 }
 
 unsigned
@@ -292,4 +309,3 @@ sec_user_nih (PVOID sa_buf, PSID sid2)
 {
   return sec_user (sa_buf, sid2, FALSE);
 }
-

@@ -31,7 +31,7 @@ heap_init ()
   /* If we're the forkee, we must allocate the heap at exactly the same place
      as our parent.  If not, we don't care where it ends up.  */
 
-  page_const = getpagesize ();
+  page_const = system_info.dwPageSize;
   if (brkbase)
     {
       DWORD chunk = brkchunk;	/* allocation chunk */

@@ -31,10 +31,12 @@ internal_getlogin (cygheap_user &user)
   char username[MAX_USER_NAME];
   DWORD username_len = MAX_USER_NAME;
 
-  if (! GetUserName (username, &username_len))
-    user.set_name ("unknown");
-  else
-    user.set_name (username);
+  if (!user.name ())
+    if (!GetUserName (username, &username_len))
+      user.set_name ("unknown");
+    else
+      user.set_name (username);
+
   if (os_being_run == winNT)
     {
       LPWKSTA_USER_INFO_1 wui;

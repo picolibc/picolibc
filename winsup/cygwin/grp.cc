@@ -130,8 +130,8 @@ void
 read_etc_group ()
 {
   extern int group_sem;
-  char linebuf [ 200 ];
-  char group_name [ MAX_USER_NAME ];
+  char linebuf [200];
+  char group_name [MAX_USER_NAME];
   DWORD group_name_len = MAX_USER_NAME;
 
   strncpy (group_name, "Administrators", sizeof (group_name));
@@ -152,7 +152,7 @@ read_etc_group ()
     }
   else /* /etc/group doesn't exist -- create default one in memory */
     {
-      char domain_name [ MAX_DOMAIN_NAME ];
+      char domain_name [MAX_DOMAIN_NAME];
       DWORD domain_name_len = MAX_DOMAIN_NAME;
       SID_NAME_USE acType;
       debug_printf ("Emulating /etc/group");

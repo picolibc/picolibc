@@ -17,6 +17,7 @@
 #include "heap.h"
 #include "cygerrno.h"
 #include "sync.h"
+#include "shared_info.h"
 
 init_cygheap NO_COPY *cygheap;
 void NO_COPY *cygheap_max = NULL;
@@ -26,10 +27,19 @@ static NO_COPY muto *cygheap_protect = NULL;
 inline static void
 init_cheap ()
 {
-  cygheap = (init_cygheap *) VirtualAlloc (NULL, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS);
+  void *addr = cygheap_address;
+  cygheap = (init_cygheap *) VirtualAlloc (addr, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS);
   if (!cygheap)
     api_fatal ("Couldn't reserve space for cygwin's heap, %E");
   cygheap_max = cygheap + 1;
+
+  char username[MAX_USER_NAME];
+  DWORD username_len = MAX_USER_NAME;
+
+  if (!GetUserName (username, &username_len))
+    cygheap->user.set_name ("unknown");
+  else
+    cygheap->user.set_name (username);
 }
 
 #define pagetrunc(x) ((void *) (((DWORD) (x)) & ~(4096 - 1)))
