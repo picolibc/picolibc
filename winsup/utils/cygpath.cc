@@ -9,8 +9,6 @@ details. */
 
 #define NOCOMATTRIBUTE
 
-#define _WIN32_IE 0x0400
-
 #include <shlobj.h>
 #include <stdio.h>
 #include <string.h>
@@ -332,6 +330,7 @@ dowin (char option)
   char *buf, buf1[MAX_PATH], buf2[MAX_PATH];
   DWORD len = MAX_PATH;
   WIN32_FIND_DATA w32_fd;
+  LPITEMIDLIST id;
   HINSTANCE k32;
   BOOL (*GetProfilesDirectoryAPtr) (LPSTR, LPDWORD) = 0;
 
@@ -339,15 +338,27 @@ dowin (char option)
   switch (option)
     {
     case 'D':
-      if (!SHGetSpecialFolderPath (NULL, buf, allusers_flag ?
-	      CSIDL_COMMON_DESKTOPDIRECTORY : CSIDL_DESKTOPDIRECTORY, FALSE))
-	SHGetSpecialFolderPath (NULL, buf, CSIDL_DESKTOPDIRECTORY, FALSE);
+      SHGetSpecialFolderLocation (NULL, allusers_flag ?
+	CSIDL_COMMON_DESKTOPDIRECTORY : CSIDL_DESKTOPDIRECTORY, &id);
+      SHGetPathFromIDList (id, buf);
+      /* This if clause is a Fix for Win95 without any "All Users" */
+      if (strlen (buf) == 0)
+	{
+	  SHGetSpecialFolderLocation (NULL, CSIDL_DESKTOPDIRECTORY, &id);
+	  SHGetPathFromIDList (id, buf);
+	}
       break;
 
     case 'P':
-      if (!SHGetSpecialFolderPath (NULL, buf, allusers_flag ?
-			    CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS, FALSE))
-	SHGetSpecialFolderPath (NULL, buf, CSIDL_PROGRAMS, FALSE);
+      SHGetSpecialFolderLocation (NULL, allusers_flag ?
+	CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS, &id);
+      SHGetPathFromIDList (id, buf);
+      /* This if clause is a Fix for Win95 without any "All Users" */
+      if (strlen (buf) == 0)
+	{
+	  SHGetSpecialFolderLocation (NULL, CSIDL_PROGRAMS, &id);
+	  SHGetPathFromIDList (id, buf);
+	}
       break;
 
     case 'H':
