@@ -29,7 +29,7 @@
   signbit = w & 0x80000000;
 
   /* Extract exponent field. */
-  exponent_less_127 = ((w & 0x7f800000) >> 23) - 127;
+  exponent_less_127 = (int)((w & 0x7f800000) >> 23) - 127;
 
   if (exponent_less_127 < 23)
     {
