@@ -1,3 +1,5 @@
+#ifndef _DIRENT_H_
+#define _DIRENT_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -10,3 +12,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#endif /*_DIRENT_H_*/
