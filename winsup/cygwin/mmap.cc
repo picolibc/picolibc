@@ -422,29 +422,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
       return MAP_FAILED;
     }
 
-  DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;
-  /* copy-on-write doesn't work correctly on 9x. To have at least read
-     access we use *READ mapping on 9x when appropriate. It will still
-     fail when needing write access, though. */
-  if ((flags & MAP_PRIVATE) && (wincap.has_working_copy_on_write ()
-  				|| (prot & ~PROT_READ)))
-    access = FILE_MAP_COPY;
-
   SetResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
-
-#if 0
-  /* Windows 95 does not have fixed addresses */
-  /*
-   * CV: This assumption isn't correct. See Microsoft Platform SDK, Memory,
-   * description of call `MapViewOfFileEx'.
-   */
-  if ((!wincap.is_winnt ()) && (flags & MAP_FIXED))
-    {
-      set_errno (EINVAL);
-      syscall_printf ("-1 = mmap(): win95 and MAP_FIXED");
-      return MAP_FAILED;
-    }
-#endif
 
   if (mmapped_areas == NULL)
     {
@@ -515,6 +493,21 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	  return ret;
 	}
     }
+
+  DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;
+  /* copy-on-write doesn't work at all on 9x using anonymous maps.
+     Workaround: Anonymous mappings always use normal READ or WRITE
+		 access and don't use named file mapping.
+     copy-on-write doesn't also work properly on 9x with real files.
+     While the changes are not propagated to the file, they are
+     visible to other processes sharing the same file mapping object.
+     Workaround: Don't use named file mapping.  That should work since
+     		 sharing file mappings only works reliable using named
+		 file mapping on 9x.
+  */
+  if ((flags & MAP_PRIVATE)
+      && (wincap.has_working_copy_on_write () || fd != -1))
+    access = FILE_MAP_COPY;
 
   h = fh->mmap (&base, gran_len, access, flags, gran_off);
 
@@ -748,7 +741,6 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
      objects between processes by name. What a mess... */
   if (wincap.share_mmaps_only_by_name ()
       && get_handle () != INVALID_HANDLE_VALUE
-      && get_device () == FH_DISK
       && !(access & FILE_MAP_COPY))
     {
       /* Grrr, the whole stuff is just needed to try to get a reliable
@@ -759,6 +751,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
       for (int i = strlen (namebuf) - 1; i >= 0; --i)
 	namebuf[i] = cyg_tolower (namebuf [i]);
 
+      debug_printf ("named sharing");
       if (!(h = OpenFileMapping (access, TRUE, namebuf)))
 	h = CreateFileMapping (get_handle(), &sec_none, protect, 0, 0, namebuf);
     }
@@ -775,7 +768,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
 
   void *base = MapViewOfFileEx (h, access, 0, off, len,
 			       (flags & MAP_FIXED) ? *addr : NULL);
-
+  debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%d, len:%d, addr:%x)", base, h, access, off, len, (flags & MAP_FIXED) ? *addr : NULL);
   if (!base || ((flags & MAP_FIXED) && base != *addr))
     {
       if (!base)

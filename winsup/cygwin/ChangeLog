@@ -1,3 +1,12 @@
+Sat Sep 28 00:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap): Move setting the access after evaluating fd.
+	Remove useless comment.  Explain copy-on-write problem of 9x
+	more detailed.  Don't set access to FILE_MAP_COPY on 9x only
+	when anonymous mapping is requested.
+	(fhandler_disk_file::mmap): Remove useless device check.
+	Add debug output.
+
 Fri Sep 27 07:35:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* Makefile.in: Only stamp winver_stamp on success.
