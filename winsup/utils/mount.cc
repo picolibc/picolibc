@@ -22,6 +22,7 @@ details. */
 #include <errno.h>
 
 static void show_mounts (void);
+static void show_cygdrive_prefixes (void);
 static void change_cygdrive_prefix (const char *new_prefix, int flags);
 static int mount_already_exists (const char *posix_path, int flags);
 
@@ -96,6 +97,8 @@ usage (void)
 
 [-bs] --change-cygdrive-prefix <posixpath>
     change the cygdrive path prefix to <posixpath>
+--show-cygdrive-prefixes
+    show user and/or system cygdrive path prefixes
 --import-old-mounts
     copy old registry mount table mounts into the current mount areas
 ", progname);
@@ -135,6 +138,13 @@ main (int argc, const char **argv)
 
 	  cygwin_internal (CW_READ_V1_MOUNT_TABLES);
 	  exit (0);
+	}
+      else if (strcmp (argv[i], "--show-cygdrive-prefixes") == 0)
+	{
+	  if ((i + 1) != argc)
+	    usage ();
+
+	  show_cygdrive_prefixes ();
 	}
       else if (strcmp (argv[i], "-b") == 0)
 	flags |= MOUNT_BINARY;
@@ -250,5 +260,26 @@ change_cygdrive_prefix (const char *new_prefix, int flags)
   if (mount (NULL, new_prefix, flags))
     error (new_prefix);
   
+  exit (0);
+}
+
+/* show_cygdrive_prefixes: Show the user and/or cygdrive path prefixes */
+static void
+show_cygdrive_prefixes ()
+{
+  /* Get the Cygdrive user and system path prefixes */
+  char user[MAX_PATH];
+  char system[MAX_PATH];
+  cygwin_internal (CW_GET_CYGDRIVE_PREFIXES, user, system);
+
+  /* Display the user and system cygdrive path prefixes, if necessary
+     (ie, not empty) */
+  const char *format = "%-18s  %-11s\n";
+  printf (format, "Prefix", "Type");
+  if (strlen (user) > 0)
+    printf (format, user, "user");
+  if (strlen (system) > 0)
+    printf (format, system, "system");
+
   exit (0);
 }

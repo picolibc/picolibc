@@ -1,3 +1,11 @@
+Thu Jul 27 22:54:28 2000  Jason Tishler <jt@dothill.com>
+
+	* utils/mount.cc (main): Add --show-cygdrive-prefixes option.
+	(show_cygdrive_prefixes): New function.
+	* utils/umount.cc (main): Add --remove_cygdrive_prefix option.
+	(error): Change signature from 'char *' to 'const char *'.
+	(remove_cygdrive_prefix): New function.
+
 Thu Jul 13 22:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* mount.cc (mount_already_exists): Slightly rearrange.
