@@ -1,3 +1,7 @@
+Mon Aug 20 11:56:19 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (init_cheap): Allocate cygheap in shared memory for Windows NT.
+
 Thu Aug 16 09:38:59 2001  Jason Tishler <jason@tishler.net>
 
 	* fhandler_socket.cc (fhandler_socket::create_secret_event): Relax

@@ -51,10 +51,25 @@ static void __stdcall _cfree (void *ptr) __attribute__((regparm(1)));
 inline static void
 init_cheap ()
 {
-  cygheap = (init_cygheap *) VirtualAlloc (NULL, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS);
-  if (!cygheap)
-	api_fatal ("Couldn't reserve space for cygwin's heap, %E");
-    cygheap_max = cygheap + 1;
+  if (!iswinnt)
+    {
+      cygheap = (init_cygheap *) VirtualAlloc (NULL, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS);
+      if (!cygheap)
+	    api_fatal ("Couldn't reserve space for cygwin's heap, %E");
+    }
+  else
+    {
+      HANDLE h;
+      h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none, PAGE_READWRITE,
+      			     0, CYGHEAPSIZE, NULL);
+      if (!h)
+        api_fatal ("CreateFileMapping failed, %E");
+      cygheap = (init_cygheap *) MapViewOfFile (h, FILE_MAP_WRITE, 0, 0, 0);
+      if (!cygheap)
+        api_fatal ("Couldn't allocate shared memory for cygwin heap, %E");
+      CloseHandle (h);
+    }
+  cygheap_max = cygheap + 1;
 }
 
 void __stdcall
