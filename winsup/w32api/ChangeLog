@@ -1,5 +1,12 @@
 2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h [WINVER >= 0x0500] (AW_SLIDE, AW_ACTIVATE,
+	AW_BLEND, AW_HIDE, AW_CENTER, AW_HOR_POSITIVE, AW_HOR_NEGATIVE,
+	AW_VER_POSITIVE, AW_VER_NEGATIVE): Add constants. For use by
+	AnimateWindow().
+
+2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h [WINVER >= 0x0500] (GetGUIThreadInfo,
 	LPGUITHREADINFO): Add function and associated typedef...
 
