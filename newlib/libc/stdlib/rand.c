@@ -78,9 +78,12 @@ _DEFUN (srand, (seed), unsigned int seed)
 int
 _DEFUN_VOID (rand)
 {
-        return ((_REENT->_new._reent._rand_next = 
-                 _REENT->_new._reent._rand_next * 1103515245 + 12345 )
-                & RAND_MAX );
+  /* This multiplier was obtained from Knuth, D.E., "The Art of
+     Computer Programming," Vol 2, Seminumerical Algorithms, Third
+     Edition, Addison-Wesley, 1998, p. 106 (line 26) & p. 108 */
+  _REENT->_new._reent._rand_next = 
+    _REENT->_new._reent._rand_next * 6364136223846793005LL + 1;
+  return (int)((_REENT->_new._reent._rand_next >> 32) & RAND_MAX);
 }
 
 #endif /* _REENT_ONLY */

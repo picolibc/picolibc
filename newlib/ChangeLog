@@ -1,3 +1,11 @@
+Fri Jun  9 14:28:00 2000  Jeff Johnston  <jjohnstn@cygnus.com>
+
+        * libc/include/sys/reent.h (_rand_next): Changed to
+        unsigned long long and moved to end of _reent struct in _new union.
+        (_REENT_INIT): Changed to move _rand_next initialization.
+        * libc/stdlib/rand.c (rand): Changed to use unsigned long long
+        linear congruential algorithm that is used by DJGPP.
+
 Thu Jun  8 21:18:00 2000  Ranjith Kumaran  <ranjith@cygnus.com>
 
 	* libc/include/stdlib.h: Set RAND_MAX to __RAND_MAX.

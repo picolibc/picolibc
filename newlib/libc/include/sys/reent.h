@@ -177,11 +177,13 @@ struct _reent
     {
       struct
         {
-          unsigned int _rand_next;
+          unsigned int _unused_rand;
           char * _strtok_last;
           char _asctime_buf[26];
           struct tm _localtime_buf;
           int _gamma_signgam;
+          unsigned long long _rand_next;
+
         } _reent;
   /* Two next two fields were once used by malloc.  They are no longer
      used. They are used to preserve the space used before so as to
@@ -210,8 +212,8 @@ struct _reent
 
 #define _REENT_INIT(var) \
   { 0, &var.__sf[0], &var.__sf[1], &var.__sf[2], 0, "", 0, "C", \
-    0, NULL, NULL, 0, NULL, NULL, 0, NULL, { {1, NULL, "", \
-    { 0,0,0,0,0,0,0,0}, 0 } } }
+    0, NULL, NULL, 0, NULL, NULL, 0, NULL, { {0, NULL, "", \
+    { 0,0,0,0,0,0,0,0}, 0, 1} } }
 
 /*
  * All references to struct _reent are via this pointer.
