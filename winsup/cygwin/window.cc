@@ -13,6 +13,7 @@ details. */
 #include <sys/time.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <limits.h>
 #include "winsup.h"
 
 static NO_COPY UINT timer_active = 0;
@@ -150,6 +151,12 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
   UINT elapse;
 
   if (which != ITIMER_REAL)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  /* Check if we will wrap */
+  if (itv.it_value.tv_sec >= (long) (UINT_MAX / 1000))
     {
       set_errno (EINVAL);
       return -1;

@@ -1,3 +1,9 @@
+Thu May  9  15:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	Patch suggested by <lha@stacken.kth.se>
+	* window.cc (setitimer): Check for overflow condition
+        in tv_sec.
+
 Thu May  9  0:47:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	Patch suggested by Eric Fifer <EFifer@sanwaint.com>
