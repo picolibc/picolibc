@@ -543,7 +543,7 @@ fhandler_base::open (int flags, mode_t mode)
   int res = 0;
   HANDLE x;
   ULONG file_attributes = 0;
-  ULONG shared = wincap.shared ();
+  ULONG shared = (get_major () == DEV_TAPE_MAJOR ? 0 : wincap.shared ());
   ULONG create_disposition;
   ULONG create_options;
   SECURITY_ATTRIBUTES sa = sec_none;

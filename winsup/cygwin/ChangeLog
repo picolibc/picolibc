@@ -1,5 +1,10 @@
 2004-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Set shared flags to 0 when
+	opening a tape device.
+
+2004-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::dup): Increment dtable's
 	need_fixup_before counter on successful dup.
 	* net.cc (cygwin_getpeername): Add file descriptor to debug output.
