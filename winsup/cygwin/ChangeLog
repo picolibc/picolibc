@@ -1,3 +1,8 @@
+2005-01-29  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.cc (new): Add a little more debugging.
+	* thread.cc (pthread_null::exit): Add a _my_tls.remove() for safety.
+
 2005-01-28  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (cygtls::call2): Move socket cleanup.

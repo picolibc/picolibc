@@ -3288,6 +3288,7 @@ pthread_null::create (void *(*)(void *), pthread_attr *, void *)
 void
 pthread_null::exit (void *value_ptr)
 {
+  _my_tls.remove (INFINITE);
   ExitThread (0);
 }
 

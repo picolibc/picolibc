@@ -141,7 +141,7 @@ new (size_t)
 	/* available */
 #ifdef DEBUGGING
 	if (info->__name)
-	  api_fatal ("name not NULL? id %p, i %d", info->id, info - threads);
+	  api_fatal ("name not NULL? %s, id %p, i %d", info->__name, info->id, info - threads);
 #endif
 	goto out;
       }
