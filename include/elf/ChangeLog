@@ -1,3 +1,8 @@
+2001-09-04  Richard Henderson  <rth@redhat.com>
+
+	* alpha.h (R_ALPHA_OP*, R_ALPHA_IMMED*, R_ALPHA_GPVALUE): Remove.
+	(R_ALPHA_GPREL16): Rename from R_ALPHA_IMMED_GP_16.
+
 2001-08-30  Eric Christopher  <echristo@redhat.com>
 
 	* mips.h: Remove E_MIPS_MACH_MIPS32_4K.
