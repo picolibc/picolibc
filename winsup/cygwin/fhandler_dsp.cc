@@ -457,12 +457,12 @@ fhandler_dev_dsp::Audio_out::stop (bool immediately)
       debug_printf ("waveOutClose rc=%d", rc);
 
       clearOwner ();
+    }
 
-      if (bigwavebuffer_)
-	{
-	  delete[] bigwavebuffer_;
-	  bigwavebuffer_ = NULL;
-	}
+  if (bigwavebuffer_)
+    {
+      delete[] bigwavebuffer_;
+      bigwavebuffer_ = NULL;
     }
 }
 
@@ -859,12 +859,12 @@ fhandler_dev_dsp::Audio_in::stop ()
       debug_printf ("waveInClose rc=%d", rc);
 
       clearOwner ();
+    }
 
-      if (bigwavebuffer_)
-	{
-	  delete[] bigwavebuffer_;
-	  bigwavebuffer_ = NULL;
-	}
+  if (bigwavebuffer_)
+    {
+      delete[] bigwavebuffer_;
+      bigwavebuffer_ = NULL;
     }
 }
 
@@ -1207,6 +1207,11 @@ fhandler_dev_dsp::close (void)
     }
   if (audio_out_)
     {
+      if (exit_state != ES_NOT_EXITING)
+       { // emergency close due to call to exit() or Ctrl-C:
+         // do not wait for all pending audio to be played
+         audio_out_->stop (true);
+       }
       delete audio_out_;
       audio_out_ = NULL;
     }
