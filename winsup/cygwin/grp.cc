@@ -372,7 +372,8 @@ getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
 			++cnt;
 			if (gidsetsize && cnt > gidsetsize)
 			  {
-			    CloseHandle (hToken);
+			    if (hToken != cygheap->user.token)
+			      CloseHandle (hToken);
 			    goto error;
 			  }
 			break;
