@@ -66,9 +66,9 @@ mode_t getperm (char *in)
       || !strchr ("w-", in[1])
       || !strchr ("x-", in[2]))
     return ILLEGAL_MODE;
-  return (in[0] == 'r' ? S_IRUSR | S_IRGRP | S_IROTH : 0)
-         | (in[1] == 'w' ? S_IWUSR | S_IWGRP | S_IWOTH : 0)
-         | (in[2] == 'x' ? S_IXUSR | S_IXGRP | S_IXOTH : 0);
+  return (in[0] == 'r' ? S_IROTH : 0)
+         | (in[1] == 'w' ? S_IWOTH : 0)
+         | (in[2] == 'x' ? S_IXOTH : 0);
 }
 
 BOOL
@@ -77,7 +77,7 @@ getaclentry (action_t action, char *c, aclent_t *ace)
   char *c2;
 
   ace->a_type = 0;
-  ace->a_id = 0;
+  ace->a_id = -1;
   ace->a_perm = 0;
 
   if (!strncmp (c, "default:", 8)

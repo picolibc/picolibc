@@ -1,5 +1,10 @@
 2002-11-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setfacl.c (getperm): Set only `other' permission bits.
+	(getaclentry): Set a_id to -1 by default.
+
+2002-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* getfacl.c (permstr): Use `other' permission bits for requesting
 	ace permissions.
 
