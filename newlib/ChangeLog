@@ -1,3 +1,11 @@
+2005-01-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/string.h: Remove Linux-specific declaration of
+	strsignal and add #include <sys/string.h>.
+	* libc/include/sys/string.h: New file.
+	* libc/include/sys/linux/sys/string.h: New file with strsignal
+	declaration deleted above.
+
 2005-01-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/time/strftime.c (strftime): Change %r and %x to be compliant
