@@ -1,6 +1,6 @@
 2001-10-20  Christopher Faylor  <cgf@redhat.com>
 
-	* miscfuncs.cc (+__check_invalid_read_ptr_errno): New function.
+	* miscfuncs.cc (__check_invalid_read_ptr_errno): New function.
 	* syscalls.c (_write): Validate that write buffer is accessible for
 	reading, not writing.
 	* winsup.h: Declare new function, increase regparmization of check_*
