@@ -296,7 +296,7 @@ int symlink_worker (const char *, const char *, bool, bool)
   __attribute__ ((regparm (3)));
 
 class path_conv;
-int access_worker (path_conv&, int) __attribute__ ((regparm (2)));
+int access_worker (path_conv&, int, class fhandler_base * = NULL) __attribute__ ((regparm (3)));
 
 int fcntl_worker (int fd, int cmd, void *arg);
 

@@ -1,5 +1,16 @@
 2003-12-14  Christopher Faylor  <cgf@redhat.com>
 
+	* winsup.h (access_worker): Declare with added fhandler_base parameter.
+	* syscalls.cc (access_worker): Accommodate extra fhandler_base
+	argument.  Use it instead of stat_worker to determine stat information,
+	when appropriate.
+	* fhandler.cc (fhandler_base::device_access_denied): Pass fhandler
+	pointer to access_worker so that it can use the proper method for
+	determining stat information.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Ditto.
+
+2003-12-14  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (ctrl_c_handler): Remove this thread from the signal
 	handler chain.
 

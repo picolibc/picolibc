@@ -328,7 +328,7 @@ fhandler_base::device_access_denied (int flags)
   if (!mode)
     mode |= R_OK;
 
-  return access_worker (pc, mode);
+  return access_worker (pc, mode, this);
 }
 
 /* Open system call handler function. */

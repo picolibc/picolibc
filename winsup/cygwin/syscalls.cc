@@ -1240,7 +1240,7 @@ lstat (const char *name, struct __stat32 *buf)
 }
 
 int
-access_worker (path_conv& real_path, int flags)
+access_worker (path_conv& real_path, int flags, fhandler_base *fh)
 {
   if (real_path.error)
     {
@@ -1268,7 +1268,7 @@ access_worker (path_conv& real_path, int flags)
     return check_file_access (real_path, flags);
 
   struct __stat64 st;
-  int r = stat_worker (real_path, &st, 0);
+  int r = fh ? fh->fstat (&st) : stat_worker (real_path, &st, 0);
   if (r)
     return -1;
   r = -1;

@@ -632,7 +632,7 @@ fhandler_disk_file::opendir ()
       set_errno (ENOMEM);
       goto free_dirname;
     }
-  else if (access_worker (pc, R_OK) != 0)
+  else if (access_worker (pc, R_OK, this) != 0)
     goto free_dirent;
   else
     {

@@ -556,7 +556,7 @@ path_conv::check (const char *src, unsigned opt,
 	  if (dev.major == DEV_CYGDRIVE_MAJOR)
 	    {
 	      if (!component)
-		fileattr = FILE_ATTRIBUTE_DIRECTORY;
+		fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
 	      else
 		{
 		  dev.devn = FH_FS;
