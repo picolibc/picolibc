@@ -25,9 +25,9 @@ details. */
 #include "dtable.h"
 #include "sync.h"
 #include "sigproc.h"
+#include "cygheap.h"
 #include "child_info.h"
 #include "pinfo.h"
-#include "cygheap.h"
 #include "perthread.h"
 
 #define LINE_BUF_CHUNK (MAX_PATH * 2)

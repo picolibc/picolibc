@@ -1,3 +1,9 @@
+Wed Sep  6 16:56:38 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc: Add include file for proper definitions.
+	* spawn.cc: Ditto.
+	* winsup.h: Define cfree to avoid newlib pollution.
+
 Wed Sep  6 14:11:51 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in (CFLAGS): Ensure that -MD is always added even when

@@ -20,6 +20,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygheap.h"
 #include "child_info.h"
 #include "perthread.h"
 #include <assert.h>
