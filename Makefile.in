@@ -1578,7 +1578,7 @@ all-automake: all-m4 all-texinfo
 all-bash:
 all-bfd: all-libiberty all-intl
 all-binutils: all-libiberty all-opcodes all-bfd all-flex all-bison all-byacc all-intl
-all-bison: 
+all-bison: all-texinfo
 configure-target-boehm-gc: $(ALL_GCC_CXX) configure-target-qthreads
 all-target-boehm-gc: configure-target-boehm-gc
 configure-target-bsp: $(ALL_GCC_C)
