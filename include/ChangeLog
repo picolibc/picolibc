@@ -1,3 +1,7 @@
+1999-09-04  Steve Chamberlain  <sac@pobox.com>
+
+	* dis-asm.h (print_insn_pj): Declare.
+
 1999-07-11  Ian Lance Taylor  <ian@zembu.com>
 
 	* ansidecl.h: Copy attribute support macros from egcs.
