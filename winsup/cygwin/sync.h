@@ -40,10 +40,15 @@ public:
   void upforgrabs () {tls = this;}  // just set to an invalid address
   void grab () __attribute__ ((regparm (1)));
   static void set_exiting_thread () {exiting_thread = GetCurrentThreadId ();}
-  static void init ();
 };
 
-extern muto muto_start;
+class locker
+{
+  muto *room;
+public:
+  locker (muto *m) {room = m; room->acquire ();}
+  ~locker () {room->release ();}
+};
 
 /* Use a statically allocated buffer as the storage for a muto */
 #define new_muto(__name) \

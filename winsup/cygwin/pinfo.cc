@@ -173,7 +173,8 @@ void
 pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 {
   h = NULL;
-  if (myself && n == myself->pid)
+  if (myself && !(flag & PID_EXECED)
+      && (n == myself->pid || (DWORD) n == myself->dwProcessId))
     {
       procinfo = myself;
       destroy = 0;

@@ -31,12 +31,6 @@ DWORD NO_COPY muto::exiting_thread;
 CRITICAL_SECTION NO_COPY muto::init_lock;
 
 void
-muto::init ()
-{
-  InitializeCriticalSection (&init_lock);
-}
-
-void
 muto::grab ()
 {
   tls = &_my_tls;
@@ -46,23 +40,19 @@ muto::grab ()
 muto *
 muto::init (const char *s)
 {
-  muto *res = this;
-  EnterCriticalSection (&init_lock);
-  if (!bruteforce)
+  char *already_exists = (char *) InterlockedExchangePointer (&name, s);
+  if (already_exists)
+    while (!bruteforce)
+      low_priority_sleep (0);
+  else
     {
       waiters = -1;
-      bruteforce = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
       /* Create event which is used in the fallback case when blocking is necessary */
-      if (bruteforce)
-	name = s;
-      else
-	{
-	  DWORD oerr = GetLastError ();
-	  SetLastError (oerr);
-	  res = NULL;
-	}
+      bruteforce = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+      if (!bruteforce)
+	  api_fatal ("couldn't allocate muto '%s', %E", s);
     }
-  LeaveCriticalSection (&init_lock);
+
   return this;
 }
 

@@ -1,3 +1,15 @@
+2005-03-08  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (dll_crt0_0): Eliminate muto::init call.
+	* sync.h (locker): New, currently unused class.
+	(muto::init): Eliminate.
+	* sync.cc (muto::init): Ditto.
+	(muto::init): Eliminate critical section lock and instead use name as a
+	guard to prevent against multiple attempts to initialize the same muto.
+
+	* pinfo.cc (pinfo::init): Set myself procinfo when not execing and pid
+	matches windows pid or cygwin pid.
+
 2005-03-06  Pavel Tsekov  <ptsekov@gmx.net>
 
 	* path.cc (mount_info::read_cygdrive_info_from_registry): Use the user
