@@ -193,7 +193,7 @@ install-man:
 install_host:
 
 clean:
-	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp*
+	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp* *_magic.h
 
 maintainer-clean realclean: clean
 	@echo "This command is intended for maintainers to use;"
@@ -210,8 +210,8 @@ new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(
 
 # Rule to build libcygwin.a
 $(LIB_NAME): rmsym newsym new-$(DLL_NAME) $(LIBCOS)
-	/bin/sh ${word 1,$^} ./cygdll.a $(NM) $(AR) $(RANLIB) $(OBSOLETE_FUNCTIONS) || exit 0
-	/bin/sh ${word 2,$^} ./cygdll.a $(AS) $(AR) $(RANLIB) $(NEW_FUNCTIONS) || exit 0
+	/bin/sh ${word 1,$^} ./cygdll.a "$(NM)" "$(AR)" "$(RANLIB)" $(OBSOLETE_FUNCTIONS) || exit 0
+	/bin/sh ${word 2,$^} ./cygdll.a "$(AS)" "$(AR)" "$(RANLIB)" $(NEW_FUNCTIONS) || exit 0
 	(echo create $(LIB_NAME); echo addmod $(LIBCOS); echo addlib cygdll.a; echo save) | $(AR) -M
 
 # Rule to make stub library used by testsuite
@@ -231,10 +231,10 @@ version.cc winver.o: winver_stamp
 	@ :
 
 shared_info_magic.h: cygmagic shared_info.h
-	/bin/sh ${word 1,$^} $@ $(CC) ${word 2,$^} MOUNT_MAGIC 'class mount_info' SHARED_MAGIC 'class shared_info'
+	/bin/sh ${word 1,$^} $@ "$(CC)" ${word 2,$^} MOUNT_MAGIC 'class mount_info' SHARED_MAGIC 'class shared_info'
 
 child_info_magic.h: cygmagic child_info.h
-	/bin/sh ${word 1,$^} $@ $(CC) ${word 2,$^} CHILD_INFO_MAGIC 'class child_info'
+	/bin/sh ${word 1,$^} $@ "$(CC)" ${word 2,$^} CHILD_INFO_MAGIC 'class child_info'
 
 dcrt0.o sigproc.o: child_info_magic.h
 
