@@ -1,3 +1,13 @@
+2000-04-14  H.J. Lu  <hjl@gnu.org>
+
+	* common.h (ELFOSABI_NETBSD): Defined.
+	(ELFOSABI_HURD): Likewise.
+	(ELFOSABI_SOLARIS): Likewise.
+	(ELFOSABI_MONTEREY): Likewise.
+	(ELFOSABI_IRIX): Likewise.
+	(ELFOSABI_FREEBSD): Likewise.
+	(ELFOSABI_TRUE64): Likewise.
+
 2000-04-07  Nick Clifton  <nickc@cygnus.com>
 
 	* arm-oabi.h: Delete.
