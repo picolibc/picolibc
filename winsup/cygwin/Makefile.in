@@ -168,7 +168,7 @@ install: install-libs install-headers install-man $(install_host) $(install_targ
 install-libs: $(TARGET_LIBS)
 	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME); \
 	for i in $^; do \
-	    $(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+	    $(INSTALL_DATA) $$i $(tooldir)/lib/`basename $$i` ; \
 	done
 
 install-headers:
