@@ -39,9 +39,7 @@ struct sigthread
 {
   DWORD id;
   DWORD frame;
-#if 0
-  muto *lock;			// FIXME: Use for multi-thread signalling someday
-#endif
+  CRITICAL_SECTION lock;
   void init (const char *s);
 };
 
@@ -69,7 +67,9 @@ public:
   {
     if (st)
       {
+	EnterCriticalSection (&st->lock);
 	st->frame = 0;
+	LeaveCriticalSection (&st->lock);
 	st = NULL;
       }
   }

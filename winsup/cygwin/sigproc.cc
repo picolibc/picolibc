@@ -258,6 +258,7 @@ proc_subproc (DWORD what, DWORD val)
 			    0, TRUE, DUPLICATE_SAME_ACCESS))
 	system_printf ("Couldn't duplicate my handle<%p> for pid %d, %E", hMainProc, vchild->pid);
       vchild->ppid = myself->pid;
+      vchild->uid = myself->uid;
       vchild->gid = myself->gid;
       vchild->pgid = myself->pgid;
       vchild->sid = myself->sid;

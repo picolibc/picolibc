@@ -613,9 +613,7 @@ char _declspec(dllexport) **__argv = NULL;
 void
 sigthread::init (const char *s)
 {
-#if 0 /* FIXME: Someday we'll need this for inter-thread signalling */
-  lock = new_muto (FALSE, s);
-#endif
+  InitializeCriticalSection (&lock);
   id = GetCurrentThreadId ();
 }
 
@@ -658,6 +656,8 @@ dll_crt0_1 ()
   cygheap_init ();	/* Initialize cygheap muto */
 
   regthread ("main", GetCurrentThreadId ());
+  mainthread.init ("mainthread"); // For use in determining if signals
+				  //  should be blocked.
 
   int envc = 0;
   char **envp = NULL;
@@ -724,9 +724,6 @@ dll_crt0_1 ()
   /* Initialize the cygwin subsystem if this is the first process,
      or attach to the shared data structure if it's already running. */
   shared_init ();
-
-  mainthread.init ("mainthread"); // For use in determining if signals
-				  //  should be blocked.
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 

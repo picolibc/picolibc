@@ -1,3 +1,18 @@
+Mon Nov  6 15:11:57 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (sigthread::init): Reinstitute sigthread lock as a critical
+	section.
+	(dll_crt0_1): Move sigthread lock initialization to earlier in startup.
+	* exceptions.cc (interrupt_on_return): Remove previous kludgy attempt
+	to detect an invalid frame.
+	(call_handler): Eliminate inner for loop.  Grab signal critical section
+	lock where appropriate.
+	* sigproc.cc (proc_subproc): Restore uid setting.
+	* sigproc.h (sigthread): Reinstitute sigthread lock as a critical
+	section.
+	(sigframe): Grab the sigthread lock before clearing frame to avoid
+	having the signal thread use an invalid frame.
+
 Mon Nov  6 11:11:42 2000 Jason Tishler <jt@dothill.com>
 
 	* path.cc (mount_info::read_cygdrive_info_from_registry): Use

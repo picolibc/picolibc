@@ -23,6 +23,8 @@ details. */
 #include "perprocess.h"
 #include "security.h"
 
+#define CALL_HANDLER_RETRY 20
+
 char debugger_command[2 * MAX_PATH + 20];
 
 extern "C" {
@@ -680,11 +682,6 @@ interrupt_on_return (sigthread *th, int sig, struct sigaction& siga, void *handl
 	if (*addr_retaddr  == thestack.sf.AddrReturn.Offset)
 	  {
 	    interrupt_setup (sig, siga, handler, *addr_retaddr, addr_retaddr);
-	    if (ebp != th->frame)
-	      {
-		sigsave.sig = 0;
-		break;
-	      }
 	    *addr_retaddr = (DWORD) sigdelayed;
 	  }
 	return 1;
@@ -701,8 +698,6 @@ set_sig_errno (int e)
   // sigproc_printf ("errno %d", e);
 }
 
-#define SUSPEND_TRIES 10000
-
 static int
 call_handler (int sig, struct sigaction& siga, void *handler)
 {
@@ -710,28 +705,24 @@ call_handler (int sig, struct sigaction& siga, void *handler)
   bool interrupted = 0;
   HANDLE hth = NULL;
   int res;
-  sigthread *th;
-
-#if 0
-  mainthread.lock->acquire ();
-#endif
+  sigthread *th = NULL;		// Initialization needed to shut up gcc
 
   if (sigsave.sig)
     goto set_pending;
 
-  for (int i = 0; !interrupted && i < 10; i++)
+  for (int i = 0; !interrupted && i < CALL_HANDLER_RETRY; i++)
     {
+      EnterCriticalSection (&mainthread.lock);
       if (mainthread.frame)
 	th = &mainthread;
       else
 	{
-	  int i;
+	  LeaveCriticalSection (&mainthread.lock);
+
 	  th = NULL;
-    #if 0
-	  mainthread.lock->release ();
-    #endif
 
 	  hth = myself->getthread2signal ();
+
 	  /* Suspend the thread which will receive the signal.  But first ensure that
 	     this thread doesn't have any mutos.  (FIXME: Someday we should just grab
 	     all of the mutos rather than checking for them)
@@ -742,64 +733,54 @@ call_handler (int sig, struct sigaction& siga, void *handler)
 	     noticeable delays?
 	     If the thread is already suspended (which can occur when a program is stopped) then
 	     just queue the signal. */
-	  for (i = 0; i < SUSPEND_TRIES; i++)
-	    {
-	      sigproc_printf ("suspending mainthread");
-	      res = SuspendThread (hth);
 
-	      /* Just set pending if thread is already suspended */
-	      if (res)
-		goto set_pending;
+	  sigproc_printf ("suspending mainthread");
+	  res = SuspendThread (hth);
 
-	      muto *m;
-	      /* FIXME: Make multi-thread aware */
-	      for (m = muto_start.next;  m != NULL; m = m->next)
-		if (m->unstable () || m->owner () == mainthread.id)
-		  goto owns_muto;
-
-    #if 0
-	      mainthread.lock->acquire ();
-    #endif
-	      if (mainthread.frame)
-		{
-		  th = &mainthread;
-		  goto next;
-		}
-    #if 0
-	      mainthread.lock->release ();
-    #endif
-
-	      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-	      if (!GetThreadContext (hth, &cx))
-		{
-		  system_printf ("couldn't get context of main thread, %E");
-		  goto out;
-		}
-
-	      if (interruptible (cx.Eip, 1))
-		break;
-
-	      sigproc_printf ("suspended thread in a strange state pc %p, sp %p",
-			      cx.Eip, cx.Esp);
-	      goto resume_thread;
-
-	    owns_muto:
-	      sigproc_printf ("suspended thread owns a muto (%s)", m->name);
-
-	    resume_thread:
-	      ResumeThread (hth);
-	      Sleep (0);
-	    }
-
-	  if (i >= SUSPEND_TRIES)
+	  /* Just set pending if thread is already suspended */
+	  if (res)
 	    goto set_pending;
 
-	  sigproc_printf ("SuspendThread returned %d", res);
+	  muto *m;
+	  /* FIXME: Make multi-thread aware */
+	  for (m = muto_start.next;  m != NULL; m = m->next)
+	    if (m->unstable () || m->owner () == mainthread.id)
+	      {
+		sigproc_printf ("suspended thread owns a muto (%s)", m->name);
+		goto resume_thread;
+	      }
+
+	  EnterCriticalSection (&mainthread.lock);
+	  if (mainthread.frame)
+	    {
+	      th = &mainthread;
+	      goto try_to_interrupt;
+	    }
+
+	  LeaveCriticalSection (&mainthread.lock);
+
+	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	  if (!GetThreadContext (hth, &cx))
+	    system_printf ("couldn't get context of main thread, %E");
+	  else if (!interruptible (cx.Eip, 1))
+	    sigproc_printf ("suspended thread in a strange state pc %p, sp %p",
+			    cx.Eip, cx.Esp);
+	  else
+	    goto try_to_interrupt;
+
+	resume_thread:
+	  ResumeThread (hth);
+	  Sleep (0);
+	  continue;
 	}
 
-    next:
+    try_to_interrupt:
       if (th)
-	interrupted = interrupt_on_return (th, sig, siga, handler);
+	{
+	  interrupted = interrupt_on_return (th, sig, siga, handler);
+	  if (!interrupted)
+	    LeaveCriticalSection (&th->lock);
+	}
       else if (interruptible (cx.Eip))
 	interrupted = interrupt_now (&cx, sig, siga, handler);
       else
@@ -821,7 +802,9 @@ set_pending:
       proc_subproc (PROC_CLEARWAIT, 1);
     }
 
-out:
+  if (th)
+    LeaveCriticalSection (&th->lock);
+
   if (!hth)
     sigproc_printf ("modified main-thread stack");
   else
@@ -829,10 +812,6 @@ out:
       res = ResumeThread (hth);
       sigproc_printf ("ResumeThread returned %d", res);
     }
-
-#if 0
-  mainthread.lock->release ();
-#endif
 
   sigproc_printf ("returning %d", interrupted);
   return interrupted;
