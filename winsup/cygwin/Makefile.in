@@ -204,8 +204,8 @@ version.cc winver.o: winver_stamp
 
 winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	@echo "Making version.o and winver.o";\
-	$(SHELL) ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES); \
-	touch $@; \
+	$(SHELL) ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) && \
+	touch $@ && \
 	$(COMPILE_CXX) -o version.o version.cc
 
 cygrun.exe : cygrun.o $(LIB_NAME) $(w32api_lib)/libuser32.a \
