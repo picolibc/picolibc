@@ -160,7 +160,7 @@ kill_worker (pid_t pid, int sig)
       sigproc_printf ("%d = sig_send, %E ", res);
       res = -1;
     }
-  else if (sendSIGCONT && ISSTATE(dest, PID_STOPPED))
+  else if (sendSIGCONT)
     (void) sig_send (dest, SIGCONT);
 
   syscall_printf ("%d = kill_worker (%d, %d)", res, pid, sig);
@@ -216,6 +216,8 @@ kill_pgrp (pid_t pid, int sig)
       if (pid == 0 && (p->pgid != myself->pgid || p->ctty != myself->ctty))
 	continue;
       if (pid > 1 && p->pgid != pid)
+	continue;
+      if (sig < 0 && NOTSTATE(p, PID_STOPPED))
 	continue;
       sigproc_printf ("killing pid %d, pgrp %d, p->ctty %d, myself->ctty %d",
 		      p->pid, p->pgid, p->ctty, myself->ctty);

@@ -1,3 +1,8 @@
+Mon Oct 30 16:54:26 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* signal.cc (kill_pgrp): Revert 25-Oct change.
+	(kill_worker): Ditto.
+
 Sun Oct 29 20:52:31 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 6.
