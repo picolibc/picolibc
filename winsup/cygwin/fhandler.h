@@ -255,6 +255,7 @@ public:
   virtual int close ();
   virtual int fstat (struct stat *buf) { return stat_dev (get_device (), get_unit (), get_namehash (), buf); }
   virtual int ioctl (unsigned int cmd, void *);
+  virtual int fcntl (int cmd, void *);
   virtual char const * ttyname () { return get_name(); }
   virtual int read (void *ptr, size_t len);
   virtual int write (const void *ptr, size_t len);
@@ -327,6 +328,7 @@ public:
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);
+  int fcntl (int cmd, void *);
   off_t lseek (off_t, int) { return 0; }
   int close ();
   void hclose (HANDLE) {close ();}

@@ -1,3 +1,12 @@
+Mon Oct 23 21:43:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fcntl.cc (_fcntl): Rearrange as wrapper function. Move all
+	functionality except F_DUPFD to fhandler classes.
+	* fhandler.cc (fhandler_base::fcntl): New method.
+	* net.cc (fhandler_socket::fcntl): Ditto.
+	* fhandler.h (class fhandler_base): Add method prototype for fcntl().
+	(class fhandler_socket): Ditto.
+
 Mon Oct 23 12:44:35 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (proc_subproc): Correctly handle flags for WNOHANG case.

@@ -1957,7 +1957,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       set_async (*(int *) p);
       break;
     default:
-      /* We must cancel WSAAsyncSelect (if any) before settting socket to
+      /* We must cancel WSAAsyncSelect (if any) before setting socket to
        * blocking mode
        */
       if (cmd == FIONBIO && *(int *) p == 0)
@@ -1976,6 +1976,31 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       break;
     }
   syscall_printf ("%d = ioctl_socket (%x, %x)", res, cmd, p);
+  return res;
+}
+
+int
+fhandler_socket::fcntl (int cmd, void *arg)
+{
+  int res = 0;
+  int request, current;
+
+  switch (cmd)
+    {
+    case F_SETFL:
+      request = ((int) arg & O_NONBLOCK) ? 1 : 0;
+      current = (get_flags () & O_NONBLOCK) ? 1 : 0;
+      if (request != current && (res = ioctl (FIONBIO, &request)))
+        break;
+      if (request)
+        set_flags (get_flags () | O_NONBLOCK);
+      else
+        set_flags (get_flags () & ~O_NONBLOCK);
+      break;
+    default:
+      res = fhandler_base::fcntl (cmd, arg);
+      break;
+    }
   return res;
 }
 

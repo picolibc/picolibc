@@ -997,6 +997,50 @@ fhandler_base::dup (fhandler_base *child)
   return 0;
 }
 
+int fhandler_base::fcntl (int cmd, void *arg)
+{
+  int res;
+
+  /*int temp = 0;*/
+
+  switch (cmd)
+    {
+    case F_GETFD:
+      res = get_close_on_exec () ? FD_CLOEXEC : 0;
+      break;
+    case F_SETFD:
+      set_close_on_exec ((int) arg);
+      res = 0;
+      break;
+    case F_GETFL:
+      res = get_flags ();
+      break;
+    case F_SETFL:
+      /* Only O_APPEND, O_NONBLOCK and O_ASYNC may be set. */
+      /*
+      if (arg & O_RDONLY)
+	temp |= GENERIC_READ;
+      if (arg & O_WRONLY)
+	temp |= GENERIC_WRITE;
+      syscall_printf ("fcntl (F_SETFL, %d)", (int) arg);
+      set_access (temp);
+      */
+      set_flags ((int) arg);
+      res = 0;
+      break;
+    case F_GETLK:
+    case F_SETLK:
+    case F_SETLKW:
+      res = lock (cmd, (struct flock *) arg);
+      break;
+    default:
+      set_errno (EINVAL);
+      res = -1;
+      break;
+    }
+  return res;
+}
+
 /* Base terminal handlers.  These just return errors.  */
 
 int
