@@ -1,5 +1,13 @@
 2002-02-19  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.cc (fhandler_base::puts_readahead): Remove default parameter
+	setting.  Newer gcc's complain about this.
+	(fhandler_base::set_readahead_valid): Ditto.
+	* fhandler_dsp.cc (Audio::open): Ditto.
+	(fhandler_dev_dsp::open): Ditto.
+
+2002-02-19  Christopher Faylor  <cgf@redhat.com>
+
 	* fork.cc (fork_parent): Use sec_user_nih to control process/thread
 	inheritance/permission.
 	* spawn.cc (spawn_guts): Ditto.

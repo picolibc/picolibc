@@ -49,7 +49,7 @@ fhandler_base::operator =(fhandler_base &x)
 }
 
 int
-fhandler_base::puts_readahead (const char *s, size_t len = (size_t) -1)
+fhandler_base::puts_readahead (const char *s, size_t len)
 {
   int success = 1;
   while ((*s || (len != (size_t) -1 && len--))
@@ -98,7 +98,7 @@ fhandler_base::peek_readahead (int queryput)
 }
 
 void
-fhandler_base::set_readahead_valid (int val, int ch = -1)
+fhandler_base::set_readahead_valid (int val, int ch)
 {
   if (!val)
     ralen = raixget = raixput = 0;
