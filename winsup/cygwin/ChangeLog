@@ -1,3 +1,10 @@
+2002-03-13  Corinna Vinschen  <corina@vinschen.de>
+
+	* mmap.cc (mmap_record::map_map): Return -1 if VirtualProtect fails.
+	(list::erase): New method with no argument.  Erase latest record
+	added.
+	(mmap64): Fail if map_map() fails.
+
 2002-03-12  Corinna Vinschen  <corina@vinschen.de>
 
 	* sysconf.cc (sysconf): Fix condition.

@@ -151,7 +151,10 @@ mmap_record::map_map (__off64_t off, DWORD len)
 	  if (wincap.virtual_protect_works_on_shared_pages ()
 	      && !VirtualProtect (base_address_ + off * getpagesize (),
 				  len * getpagesize (), prot, &old_prot))
-	    syscall_printf ("-1 = map_map (): %E");
+	    {
+	      debug_printf ("-1 = map_map (): %E");
+	      return (__off64_t)-1;
+	    }
 
 	  while (len-- > 0)
 	    MAP_SET (off + len);
@@ -164,7 +167,10 @@ mmap_record::map_map (__off64_t off, DWORD len)
   if (wincap.virtual_protect_works_on_shared_pages ()
       && !VirtualProtect (base_address_ + start * getpagesize (),
 			  len * getpagesize (), prot, &old_prot))
-    syscall_printf ("-1 = map_map (): %E");
+    {
+      debug_printf ("-1 = map_map (): %E");
+      return (__off64_t)-1;
+    }
 
   for (; len-- > 0; ++start)
     MAP_SET (start);
@@ -265,6 +271,7 @@ public:
   ~list ();
   mmap_record *add_record (mmap_record r);
   void erase (int i);
+  void erase ();
   mmap_record *match (__off64_t off, DWORD len);
   long match (caddr_t addr, DWORD len, long start);
 };
@@ -334,6 +341,12 @@ list::erase (int i)
   for (; i < nrecs-1; i++)
     recs[i] = recs[i+1];
   nrecs--;
+}
+
+void
+list::erase ()
+{
+  erase (nrecs-1);
 }
 
 class map {
@@ -501,7 +514,13 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
       mmap_record *rec;
       if ((rec = l->match (off, len)) != NULL)
 	{
-	  off = rec->map_map (off, len);
+	  if ((off = rec->map_map (off, len)) == (__off64_t)-1)
+	    {
+	      set_errno (ENOMEM);
+	      syscall_printf ("-1 = mmap(): ENOMEM");
+	      ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK|WRITE_LOCK, "mmap");
+	      return MAP_FAILED;
+	    }
 	  caddr_t ret = rec->get_address () + off;
 	  syscall_printf ("%x = mmap() succeeded", ret);
 	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
@@ -559,7 +578,15 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
 
   /* Insert into the list */
   mmap_record *rec = l->add_record (mmap_rec);
-  off = rec->map_map (off, len);
+  if ((off = rec->map_map (off, len)) == (__off64_t)-1)
+    {
+      fh->munmap (h, base, gran_len);
+      l->erase ();
+      set_errno (ENOMEM);
+      syscall_printf ("-1 = mmap(): ENOMEM");
+      ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+      return MAP_FAILED;
+    }
   caddr_t ret = rec->get_address () + off;
   syscall_printf ("%x = mmap() succeeded", ret);
   ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
