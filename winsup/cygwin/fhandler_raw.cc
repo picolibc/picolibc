@@ -116,8 +116,8 @@ fhandler_dev_raw::writebuf (void)
   return ret;
 }
 
-fhandler_dev_raw::fhandler_dev_raw (DWORD devtype, int nunit)
-  : fhandler_base (devtype), unit (nunit)
+fhandler_dev_raw::fhandler_dev_raw (DWORD devtype)
+  : fhandler_base (devtype)
 {
   clear ();
   set_need_fork_fixup ();
@@ -476,7 +476,6 @@ fhandler_dev_raw::dup (fhandler_base *child)
       fhc->eof_detected = eof_detected;
       fhc->lastblk_to_read = 0;
       fhc->varblkop = varblkop;
-      fhc->unit = unit;
     }
   return ret;
 }
