@@ -109,8 +109,10 @@ enum
    SIZEOF_PER_PROCESS) to make sure you remember to make the adjustment.
 */
 
+#ifdef __cplusplus
 class ResourceLocks;
 class MTinterface;
+#endif
 
 struct per_process
 {

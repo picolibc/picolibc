@@ -1,3 +1,7 @@
+Wed Aug 23 10:51:57 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/sys/cygwin.h: Protect class definitions.
+
 Tue Aug 22 13:57:36 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (symlink_info::check): Clear error on each iteration of
