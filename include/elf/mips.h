@@ -102,7 +102,7 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 /* Code in file uses new ABI (-n32 on Irix 6).  */
 #define EF_MIPS_ABI2		0x00000020
 
-/* Indicates code compiled for a 64-bit machine in 32-bit mode. 
+/* Indicates code compiled for a 64-bit machine in 32-bit mode.
    (regs are 32-bits wide.) */
 #define EF_MIPS_32BITMODE       0x00000100
 

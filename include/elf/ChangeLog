@@ -1,3 +1,7 @@
+2001-03-23  Nick Clifton  <nickc@redhat.com>
+
+	* mips.h: Remove extraneous whitespace.
+
 2001-03-22  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris.h: Add leading comment about PC-relative location.
