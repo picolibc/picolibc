@@ -1088,12 +1088,15 @@ sig_handle (int sig, bool thisproc)
   /* Never returns */
 }
 
+CRITICAL_SECTION NO_COPY exit_lock;
+
 /* Cover function to `do_exit' to handle exiting even in presence of more
    exceptions.  We used to call exit, but a SIGSEGV shouldn't cause atexit
    routines to run.  */
 static void
 signal_exit (int rc)
 {
+  EnterCriticalSection (&exit_lock);
   rc = EXIT_SIGNAL | (rc << 8);
   if (exit_already++)
     myself->exit (rc);
@@ -1149,6 +1152,7 @@ events_init (void)
   debug_printf ("windows_system_directory '%s', windows_system_directory_length %d",
 		windows_system_directory, windows_system_directory_length);
   debug_printf ("cygwin_hmodule %p", cygwin_hmodule);
+  InitializeCriticalSection (&exit_lock);
 }
 
 void

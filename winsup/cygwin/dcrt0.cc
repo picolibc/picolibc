@@ -967,10 +967,12 @@ enum exit_states
   };
 
 exit_states NO_COPY exit_state;
+extern CRITICAL_SECTION exit_lock;
 
 extern "C" void __stdcall
 do_exit (int status)
 {
+  EnterCriticalSection (&exit_lock);
   UINT n = (UINT) status;
 
   syscall_printf ("do_exit (%d)", n);

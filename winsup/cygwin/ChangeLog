@@ -1,5 +1,13 @@
 2002-12-25  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (events_init): Initialize critical section to control
+	exiting via signal.
+	(signal_exit): Enter critical section early to avoid exit races with
+	main thread.
+	* dcrt0.cc (do_exit): Use exit_lock critical section to avoid races.
+
+2002-12-25  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc (cygthread::detach): Set errno with set_sig_errno so
 	that EINTR is properly restored after signal.
 
