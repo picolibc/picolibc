@@ -1,3 +1,8 @@
+2002-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/sys/cygwin/sys/dirent.h (struct __DIR): Use __off32_t instead
+	of off_t.
+
 2002-02-20  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* libc/machine/xscale/strchr.c (strchr): Add 'r1' to the list of

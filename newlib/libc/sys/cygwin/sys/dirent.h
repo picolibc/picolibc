@@ -33,7 +33,7 @@ typedef struct __DIR
   unsigned long __d_cookie;
   struct dirent *__d_dirent;
   char *__d_dirname;		/* directory name with trailing '*' */
-  off_t __d_position;		/* used by telldir/seekdir */
+  __off32_t __d_position;	/* used by telldir/seekdir */
   unsigned long __d_dirhash;	/* hash of directory name for use by
 				   readdir */
   union
