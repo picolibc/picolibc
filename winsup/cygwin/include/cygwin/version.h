@@ -186,12 +186,12 @@ details. */
 		  truncf
        76: mallinfo
        77: thread-safe exit/at_exit
-       78: Export acl32 aclcheck32 aclfrommode32 aclfrompbits32 aclfromtext32
+       78: Use stat and fstat rather than _stat, and _fstat.
+           Export btowc and trunc.
+       79: Export acl32 aclcheck32 aclfrommode32 aclfrompbits32 aclfromtext32
 		  aclsort32 acltomode32 acltopbits32 acltotext32 facl32
 		  fgetpos64 fopen64 freopen64 fseeko64 fsetpos64 ftello64
 		  _open64 _lseek64 _fstat64 _stat64 mknod32
-       79: Use stat and fstat rather than _stat, and _fstat.
-           Export btowc and trunc
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */

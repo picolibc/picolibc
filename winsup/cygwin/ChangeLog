@@ -1,5 +1,12 @@
 2003-03-17  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Reorganize last two api versions so that
+	btowc and trunc exports show up before previous bump since there has
+	been no exported version of the DLL with the 64 bit changes yet but
+	1.3.22 will have the btowc and trunc.
+
+2003-03-17  Christopher Faylor  <cgf@redhat.com>
+
 	* cygwin.din: Export btowc, trunc.
 	* include/cygwin/version.h: Reflect new exports.
 	* syscalls.cc (_stat): Rename to stat to avoid newlib wrapper.
