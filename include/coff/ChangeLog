@@ -1,3 +1,11 @@
+2001-12-24  Tom Rix  <trix@redhat.com>
+
+	* xcoff.h (xcoff_big_format_p): Make <bigaf> the default archive 
+	format.
+	(XCOFFARMAG_ELEMENT_SIZE, XCOFFARMAGBIG_ELEMENT_SIZE): Define for 
+	archive header ascii elements.  
+
+
 2001-12-17  Tom Rix  <trix@redhat.com>
 
 	* xcoff.h :  Add .except and .typchk section string and styp flags.

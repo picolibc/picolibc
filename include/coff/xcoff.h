@@ -459,6 +459,10 @@ struct __rtinit_descriptor
 #define XCOFFARMAGBIG "<bigaf>\012"
 #define SXCOFFARMAG   8
 
+/* The size of the ascii archive elements */
+#define XCOFFARMAG_ELEMENT_SIZE 12
+#define XCOFFARMAGBIG_ELEMENT_SIZE 20
+
 /* This terminates an XCOFF archive member name.  */
 
 #define XCOFFARFMAG "`\012"
@@ -472,23 +476,23 @@ struct xcoff_ar_file_hdr
   char magic[SXCOFFARMAG];
 
   /* Offset of the member table (decimal ASCII string).  */
-  char memoff[12];
+  char memoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* Offset of the global symbol table (decimal ASCII string).  */
-  char symoff[12];
+  char symoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* Offset of the first member in the archive (decimal ASCII string).  */
-  char firstmemoff[12];
+  char firstmemoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* Offset of the last member in the archive (decimal ASCII string).  */
-  char lastmemoff[12];
+  char lastmemoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* Offset of the first member on the free list (decimal ASCII
      string).  */
-  char freeoff[12];
+  char freeoff[XCOFFARMAG_ELEMENT_SIZE];
 };
 
-#define SIZEOF_AR_FILE_HDR (5 * 12 + SXCOFFARMAG)
+#define SIZEOF_AR_FILE_HDR (SXCOFFARMAG + 5 * XCOFFARMAG_ELEMENT_SIZE)
 
 /* This is the equivalent data structure for the big archive format.  */
 
@@ -498,42 +502,41 @@ struct xcoff_ar_file_hdr_big
   char magic[SXCOFFARMAG];
 
   /* Offset of the member table (decimal ASCII string).  */
-  char memoff[20];
+  char memoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* Offset of the global symbol table for 32-bit objects (decimal ASCII
      string).  */
-  char symoff[20];
+  char symoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* Offset of the global symbol table for 64-bit objects (decimal ASCII
      string).  */
-  char symoff64[20];
+  char symoff64[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* Offset of the first member in the archive (decimal ASCII string).  */
-  char firstmemoff[20];
+  char firstmemoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* Offset of the last member in the archive (decimal ASCII string).  */
-  char lastmemoff[20];
+  char lastmemoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* Offset of the first member on the free list (decimal ASCII
      string).  */
-  char freeoff[20];
+  char freeoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 };
 
-#define SIZEOF_AR_FILE_HDR_BIG (6 * 20 + SXCOFFARMAG)
-
+#define SIZEOF_AR_FILE_HDR_BIG (SXCOFFARMAG + 6 * XCOFFARMAGBIG_ELEMENT_SIZE)
 
 /* Each XCOFF archive member starts with this (printable) structure.  */
 
 struct xcoff_ar_hdr
 {
   /* File size not including the header (decimal ASCII string).  */
-  char size[12];
+  char size[XCOFFARMAG_ELEMENT_SIZE];
 
   /* File offset of next archive member (decimal ASCII string).  */
-  char nextoff[12];
+  char nextoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* File offset of previous archive member (decimal ASCII string).  */
-  char prevoff[12];
+  char prevoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* File mtime (decimal ASCII string).  */
   char date[12];
@@ -558,20 +561,20 @@ struct xcoff_ar_hdr
      bytes is given in the size field.  */
 };
 
-#define SIZEOF_AR_HDR (7 * 12 + 4)
+#define SIZEOF_AR_HDR (3 * XCOFFARMAG_ELEMENT_SIZE + 4 * 12 + 4)
 
 /* The equivalent for the big archive format.  */
 
 struct xcoff_ar_hdr_big
 {
   /* File size not including the header (decimal ASCII string).  */
-  char size[20];
+  char size[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* File offset of next archive member (decimal ASCII string).  */
-  char nextoff[20];
+  char nextoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* File offset of previous archive member (decimal ASCII string).  */
-  char prevoff[20];
+  char prevoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* File mtime (decimal ASCII string).  */
   char date[12];
@@ -596,15 +599,25 @@ struct xcoff_ar_hdr_big
      bytes is given in the size field.  */
 };
 
-#define SIZEOF_AR_HDR_BIG (3 * 20 + 4 * 12 + 4)
+#define SIZEOF_AR_HDR_BIG (3 * XCOFFARMAGBIG_ELEMENT_SIZE + 4 * 12 + 4)
 
 /* We often have to distinguish between the old and big file format.
    Make it a bit cleaner.  We can use `xcoff_ardata' here because the
-   `hdr' member has the same size and position in both formats.  */
+   `hdr' member has the same size and position in both formats.  
+   <bigaf> is the default format, return true even when xcoff_ardata is 
+   NULL. */
 #define xcoff_big_format_p(abfd) \
-  ((NULL != bfd_ardata(abfd)) && \
-   (NULL != xcoff_ardata(abfd)) && \
-   (xcoff_ardata (abfd)->magic[1] == 'b'))
+  ((NULL != bfd_ardata (abfd) && NULL == xcoff_ardata (abfd)) || \
+   ((NULL != bfd_ardata (abfd)) && \
+    (NULL != xcoff_ardata (abfd)) && \
+    (xcoff_ardata (abfd)->magic[1] == 'b')))
+
+/* For testing old format * /
+#undef xcoff_big_format_p
+#define xcoff_big_format_p(abfd) \
+  (((NULL != bfd_ardata (abfd)) && \
+    (NULL != xcoff_ardata (abfd)) && \
+    (xcoff_ardata (abfd)->magic[1] == 'b'))) / **/
 
 /* We store a copy of the xcoff_ar_file_hdr in the tdata field of the
    artdata structure.  Similar for the big archive.  */
