@@ -50,7 +50,6 @@ Wed May  1 16:06:02 2002  Jason Tishler <jason@tishler.net>
 
 	* include/cygwin/types.h: Include <sys/sysmacros.h>.
 
->>>>>>> 1.1179
 Wed Apr 17 11:27:04 2002  Jason Tishler <jason@tishler.net>
 
 	* security.cc (get_lsa_srv_inf): Prevent extraneous backslashes for
