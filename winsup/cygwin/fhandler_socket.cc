@@ -169,11 +169,12 @@ fhandler_socket::fixup_before_fork_exec (DWORD win_proc_id)
       debug_printf ("Without Winsock 2.0");
     }
   else if (!WSADuplicateSocketA (get_socket (), win_proc_id, prot_info_ptr))
-    debug_printf ("WSADuplicateSocket went fine, dwServiceFlags1=%d",
-		  prot_info_ptr->dwServiceFlags1);
+    debug_printf ("WSADuplicateSocket went fine, sock %p, win_proc_id %d, prot_info_ptr %p",
+		  get_socket (), win_proc_id, prot_info_ptr);
   else
     {
-      debug_printf ("WSADuplicateSocket error");
+      debug_printf ("WSADuplicateSocket error, sock %p, win_proc_id %d, prot_info_ptr %p",
+	  	    get_socket (), win_proc_id, prot_info_ptr);
       set_winsock_errno ();
     }
 }
@@ -203,7 +204,7 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
     }
   else
     {
-      debug_printf ("WSASocket went fine %p", new_sock);
+      debug_printf ("WSASocket went fine new_sock %p, old_sock %p", new_sock, get_io_handle ());
       set_io_handle ((HANDLE) new_sock);
     }
 
@@ -230,6 +231,9 @@ fhandler_socket::dup (fhandler_base *child)
   fhandler_socket *fhs = (fhandler_socket *) child;
   fhs->addr_family = addr_family;
   fhs->set_io_handle (get_io_handle ());
+
+  fhs->prot_info_ptr = (LPWSAPROTOCOL_INFOA)
+    cmalloc (HEAP_BUF, sizeof (WSAPROTOCOL_INFOA));
   fhs->fixup_before_fork_exec (GetCurrentProcessId ());
   if (winsock2_active)
     {
@@ -287,11 +291,9 @@ fhandler_socket::close ()
   setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
 	      (const char *)&linger, sizeof linger);
 
-  if (closesocket (get_socket ()))
-    {
-      set_winsock_errno ();
-      res = -1;
-    }
+  while (closesocket (get_socket ())
+         && WSAGetLastError () == WSAEWOULDBLOCK)
+    continue;
 
   close_secret_event ();
 

@@ -1026,10 +1026,11 @@ stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
 	  	    pc, (DWORD) real_path);
       memset (buf, 0, sizeof (struct stat));
       res = fh->fstat (buf, pc);
-      delete fh;
     }
 
  done:
+  if (fh)
+    delete fh;
   MALLOC_CHECK;
   syscall_printf ("%d = (%s, %p)", res, name, buf);
   return res;

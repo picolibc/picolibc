@@ -1,3 +1,13 @@
+2001-10-30  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::dup2): Add some debugging.  Use methods from
+	passed in class rather than cygheap->fdtab.
+	* fhandler_socket.cc (fhandler_socket::fixup_before_fork_exec): Add
+	more debugging output.
+	(fhandler_socket::dup): Allocate new space for prot_info_ptr for
+	duplicated entry.
+	* syscalls.cc (stat_worker): Always delete fh if it has been created.
+
 2001-10-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (is_group_member): Call NetLocalGroupGetMembers() for

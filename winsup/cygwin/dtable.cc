@@ -383,6 +383,7 @@ dtable::dup2 (int oldfd, int newfd)
       goto done;
     }
 
+  debug_printf ("newfh->io_handle %p, oldfh->io_handle %p", newfh->get_io_handle (), fds[oldfd]->get_io_handle ());
   SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
 
   if (newfd < 0)
@@ -392,11 +393,11 @@ dtable::dup2 (int oldfd, int newfd)
       goto done;
     }
 
-  if ((size_t) newfd >= cygheap->fdtab.size)
+  if ((size_t) newfd >= size)
    {
      int inc_size = NOFILE_INCR * ((newfd + NOFILE_INCR - 1) / NOFILE_INCR) -
-		    cygheap->fdtab.size;
-     cygheap->fdtab.extend (inc_size);
+		    size;
+     extend (inc_size);
    }
 
   if (!not_open (newfd))
