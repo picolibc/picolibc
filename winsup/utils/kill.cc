@@ -112,7 +112,7 @@ listsig (const char *in_sig)
 {
   int sig;
   if (!in_sig)
-    for (sig = 1; sig < NSIG; sig++)
+    for (sig = 1; sig < NSIG - 1; sig++)
       printf ("%s%c", strsigno (sig) + 3, (sig < NSIG - 1) ? ' ' : '\n');
   else
     {
