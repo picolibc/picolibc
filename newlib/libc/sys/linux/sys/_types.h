@@ -35,14 +35,18 @@ typedef struct
 } _mbstate_t;
 #endif /* _MBSTATE_T */
 
-#ifdef __CYGWIN__
-# ifndef MBSTATE_T
-#  define MBSTATE_T
-typedef _mbstate_t mbstate_t;
-# endif /* MBSTATE_T */
-# define WEOF (0xffffffffu)
-#endif /* __CYGWIN__ */
-
-typedef int _flock_t;
+struct __flock_t_tmp;
+typedef struct
+{
+  int __a;
+  int __b;
+  struct
+  {
+    long int __c1;
+    int __c2;
+  } __c;
+  int __d;
+  struct __flock_t_tmp * __e;
+} _flock_t;
 
 #endif	/* _SYS__TYPES_H */

@@ -94,16 +94,6 @@ typedef struct
 
 typedef int clockid_t;
 
-/* Time Value Specification Structures, P1003.1b-1993, p. 261 */
-
-#ifndef _STRUCT_TIMESPEC
-#define _STRUCT_TIMESPEC
-struct timespec {
-  time_t  tv_sec;   /* Seconds */
-  long    tv_nsec;  /* Nanoseconds */
-};
-#endif /* !_STRUCT_TIMESPEC */
-
 #  define _SYS_TYPES_FD_SET
 #  define	NBBY	8		/* number of bits in a byte */
 /*

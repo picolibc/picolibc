@@ -14,6 +14,8 @@ typedef int _LOCK_RECURSIVE_T;
 #define __lock_close_recursive(lock) {}
 #define __lock_acquire(lock) {}
 #define __lock_acquire_recursive(lock) {}
+#define __lock_try_acquire(lock) {}
+#define __lock_try_acquire_recursive(lock) {}
 #define __lock_release(lock) {}
 #define __lock_release_recursive(lock) {}
 

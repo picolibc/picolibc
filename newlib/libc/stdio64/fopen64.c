@@ -70,6 +70,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #ifdef __CYGWIN__
 #include <fcntl.h>
 #endif
+#include <sys/lock.h>
 
 #ifdef __LARGE64_FILES
 
@@ -112,6 +113,10 @@ _DEFUN (_fopen64_r, (ptr, file, mode),
 #endif
 
   fp->_flags |= __SL64;
+
+#ifndef __SINGLE_THREAD__
+  __lock_init_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
+#endif
 
   return fp;
 }

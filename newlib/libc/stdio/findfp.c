@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <string.h>
 #include <fcntl.h>
+#include <sys/lock.h>
 #include "local.h"
 
 static void
@@ -45,6 +46,9 @@ std (ptr, flags, file, data)
   ptr->_seek = __sseek;
   ptr->_close = __sclose;
   ptr->_data = data;
+#ifndef __SINGLE_THREAD__
+  __lock_init_recursive (*(_LOCK_RECURSIVE_T *)&ptr->_lock);
+#endif
 
 #ifdef __SCLE
   if (__stextmode(ptr->_file))

@@ -119,6 +119,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #ifdef __CYGWIN__
 #include <fcntl.h>
 #endif
+#include <sys/lock.h>
 
 FILE *
 _DEFUN (_fopen_r, (ptr, file, mode),
@@ -155,6 +156,10 @@ _DEFUN (_fopen_r, (ptr, file, mode),
 #ifdef __SCLE
   if (__stextmode (fp->_file))
     fp->_flags |= __SCLE;
+#endif
+
+#ifndef __SINGLE_THREAD__
+  __lock_init_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
 #endif
 
   return fp;

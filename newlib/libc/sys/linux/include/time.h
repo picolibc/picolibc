@@ -5,7 +5,6 @@
  */
 
 #ifndef _TIME_H_
-#define _TIME_H_
 
 #include "_ansi.h"
 #include <sys/reent.h>
@@ -21,6 +20,20 @@ extern "C" {
 
 /* Get _CLOCKS_PER_SEC_ */
 #include <machine/time.h>
+#include <sys/types.h>
+
+/* Time Value Specification Structures, P1003.1b-1993, p. 261 */
+#ifndef _STRUCT_TIMESPEC
+#define _STRUCT_TIMESPEC
+struct timespec {
+  time_t  tv_sec;   /* Seconds */
+  long    tv_nsec;  /* Nanoseconds */
+};
+#endif /* !_STRUCT_TIMESPEC */
+
+#ifndef __need_timespec
+
+#define _TIME_H_ 1
 
 #ifndef _CLOCKS_PER_SEC_
 #define _CLOCKS_PER_SEC_ 1000
@@ -30,8 +43,6 @@ extern "C" {
 #define CLK_TCK CLOCKS_PER_SEC
 #define __need_size_t
 #include <stddef.h>
-
-#include <sys/types.h>
 
 struct tm
 {
@@ -208,5 +219,10 @@ int _EXFUN(clock_getenable_attr, (clockid_t clock_id, int *attr));
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* ! __need_timespec */
+
+#undef __need_timespec
+
 #endif /* _TIME_H_ */
 

@@ -1,3 +1,21 @@
+2002-09-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/sys/_types.h (_flock_t): Added.
+        * libc/include/sys/lock.h (__lock_try_acquire): New interface.
+        (__lock_try_acquire_recursive): Ditto.
+        * libc/include/sys/reent.h (__sFILE, __sFILE64): Add new
+        _lock field.
+        * libc/stdio/findfp.c (std)[!__SINGLE_THREAD__]: Initialize _lock
+        field.
+        * libc/stdio/fopen.c (_fopen_r)[!__SINGLE_THREAD__]: Ditto.
+        * libc/stdio64/fopen64.c (_fopen64_r)[!__SINGLE_THREAD__]: Ditto.
+        * libc/sys/linux/include/time.h (struct timespec): Moved from
+        <sys/types.h> and added check for __need_timespec flag so type
+        can be defined by itself.
+        * libc/sys/linux/sys/_types.h (_flock_t): New type.
+        * libc/sys/linux/sys/types.h (struct timespec): Moved to
+        <time.h>.
+
 2002-08-29  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/sys/linux/argp: New directory.

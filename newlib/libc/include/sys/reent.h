@@ -192,7 +192,11 @@ struct __sFILE {
   int	_offset;	/* current lseek offset */
 
 #ifndef _REENT_SMALL
-  struct _reent *_data;		/* Here for binary compatibility? Remove? */
+  struct _reent *_data;	/* Here for binary compatibility? Remove? */
+#endif
+
+#ifndef __SINGLE_THREAD__
+  _flock_t _lock;	/* for thread-safety locking */
 #endif
 };
 
@@ -232,8 +236,13 @@ struct __sFILE64 {
   /* Unix stdio files get aligned to block boundaries on fseek() */
   int	_blksize;	/* stat.st_blksize (may be != _bf._size) */
   int   _flags2;        /* for future use */
+
   _off64_t _offset;     /* current lseek offset */
   _fpos64_t _EXFUN((*_seek64),(_PTR _cookie, _fpos64_t _offset, int _whence));
+
+#ifndef __SINGLE_THREAD__
+  _flock_t _lock;	/* for thread-safety locking */
+#endif
 };
 typedef struct __sFILE64 __FILE;
 #else
