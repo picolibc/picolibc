@@ -404,6 +404,10 @@
 
 #define NT_NETBSD_IDENT		1
 
+/* Values for OpenBSD .note.openbsd.ident notes.  Note name is "OpenBSD".  */
+
+#define NT_OPENBSD_IDENT	1
+
 /* Values for FreeBSD .note.ABI-tag notes.  Note name is "FreeBSD".  */
 
 #define NT_FREEBSD_ABI_TAG	1
@@ -533,7 +537,7 @@
    values outside of the new range (see below).	 */
 #define OLD_DT_LOOS	0x60000000
 #define DT_LOOS		0x6000000d
-#define DT_HIOS		0x6fff0000
+#define DT_HIOS		0x6ffff000
 #define OLD_DT_HIOS	0x6fffffff
 
 #define DT_LOPROC	0x70000000

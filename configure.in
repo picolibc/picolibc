@@ -67,19 +67,13 @@ progname=$0
 if test -n "$PWD" ; then PWD=`${PWDCMD-pwd}`; fi
 
 # Export original configure arguments for use by sub-configures.  These
-# will be expanded once by make, and once by the shell, so they need to
-# have '$' quoted for make, and then each argument quoted for the shell.
-# What's more, the 'echo' below might expand backslashes.
-cat <<\EOF_SED > conftestsed
-s,\\,\\\\,g; s,\$,$$,g
+# will be expanded by make, so quote '$'.
+tmp="$progname $@"
+sed -e 's,\$,$$,g' <<EOF_SED > conftestsed.out
+$tmp
 EOF_SED
-tmp="'$progname'"
-for ac_arg
-do
-  tmp="$tmp '"`echo "$ac_arg" | sed -f conftestsed`
-done
-rm -f conftestsed
-TOPLEVEL_CONFIGURE_ARGUMENTS="$tmp"
+TOPLEVEL_CONFIGURE_ARGUMENTS=`cat conftestsed.out`
+rm -f conftestsed.out
 AC_SUBST(TOPLEVEL_CONFIGURE_ARGUMENTS)
 
 moveifchange=${srcdir}/move-if-change
@@ -375,8 +369,11 @@ case "${target}" in
         *) ;;
     esac
     ;;
+  *-*-uclinux*)
+    noconfigdirs="$noconfigdirs target-newlib target-libgloss target-rda ${libgcj}"
+    ;;
   *-*-vxworks*)
-    noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs target-newlib target-libgloss target-libiberty ${libgcj}"
     ;;
   alpha*-dec-osf*)
     # ld works, but does not support shared libraries.
@@ -507,7 +504,7 @@ case "${target}" in
     ;;
   ia64*-**-hpux*)
     # No gdb or ld support yet.
-    noconfigdirs="$noconfigdirs tix readline mmalloc libgui itcl gdb ld"
+    noconfigdirs="$noconfigdirs ${libgcj} tix readline mmalloc libgui itcl gdb ld"
     ;;
   i[[3456789]]86-*-coff | i[[3456789]]86-*-elf)
     noconfigdirs="$noconfigdirs ${libgcj}"
@@ -1766,7 +1763,14 @@ AC_SUBST_FILE(serialization_dependencies)
 
 # Base args.  Strip norecursion, cache-file, srcdir, host, build,
 # target and nonopt.  These are the ones we might not want to pass
-# down to subconfigures.
+# down to subconfigures.  Also strip program-prefix, program-suffix,
+# and program-transform-name, so that we can pass down a consistent
+# program-transform-name.  If autoconf has put single quotes around
+# any of these arguments (because they contain shell metacharacters)
+# then this will fail; in practice this only happens for
+# --program-transform-name, so be sure to override --program-transform-name
+# at the end of the argument list.
+# These will be expanded by make, so quote '$'.
 cat <<\EOF_SED > conftestsed
 s/ --no[[^ ]]* / /
 s/ --c[[a-z-]]*[[= ]][[^ ]]* / /
@@ -1774,17 +1778,38 @@ s/ --sr[[a-z-]]*[[= ]][[^ ]]* / /
 s/ --ho[[a-z-]]*[[= ]][[^ ]]* / /
 s/ --bu[[a-z-]]*[[= ]][[^ ]]* / /
 s/ --t[[a-z-]]*[[= ]][[^ ]]* / /
+s/ --program-[[pst]][[a-z-]]*[[= ]][[^ ]]* / /
 s/ -cache-file[[= ]][[^ ]]* / /
 s/ -srcdir[[= ]][[^ ]]* / /
 s/ -host[[= ]][[^ ]]* / /
 s/ -build[[= ]][[^ ]]* / /
 s/ -target[[= ]][[^ ]]* / /
+s/ -program-prefix[[= ]][[^ ]]* / /
+s/ -program-suffix[[= ]][[^ ]]* / /
+s/ -program-transform-name[[= ]][[^ ]]* / /
 s/ [[^' -][^ ]*] / /
 s/^ *//;s/ *$//
-s,\\,\\\\,g; s,\$,$$,g
+s,\$,$$,g
 EOF_SED
-baseargs=`echo " ${ac_configure_args} " | sed -f conftestsed`
-rm -f conftestsed
+sed -f conftestsed <<EOF_SED > conftestsed.out
+ ${ac_configure_args} 
+EOF_SED
+baseargs=`cat conftestsed.out`
+rm -f conftestsed conftestsed.out
+
+# Add in --program-transform-name, after --program-prefix and
+# --program-suffix have been applied to it.  Autoconf has already
+# doubled dollar signs and backslashes in program_transform_name; we want
+# the backslashes un-doubled, and then the entire thing wrapped in single
+# quotes, because this will be expanded first by make and then by the shell. 
+# Also, because we want to override the logic in subdir configure scripts to
+# choose program_transform_name, replace any s,x,x, with s,y,y,.
+sed -e "s,\\\\\\\\,\\\\,g; s,','\\\\'',g; s/s,x,x,/s,y,y,/" <<EOF_SED > conftestsed.out
+${program_transform_name}
+EOF_SED
+gcc_transform_name=`cat conftestsed.out`
+rm -f conftestsed.out
+baseargs="$baseargs --program-transform-name='${gcc_transform_name}'"
 
 # For the build-side libraries, we just need to pretend we're native,
 # and not use the same cache file.  Multilibs are neither needed nor
@@ -1801,7 +1826,9 @@ case "${cache_file}" in
   cache_file_option="--cache-file=../${cache_file}" ;;
 esac
 
-host_configargs="${cache_file_option} --build=${build_alias} --host=${host_alias} --target=${target_alias} ${extra_host_args} ${baseargs}"
+# Host dirs don't like to share a cache file either, horribly enough.
+# This seems to be due to autoconf 2.5x stupidity.
+host_configargs="--cache-file=./config.cache --build=${build_alias} --host=${host_alias} --target=${target_alias} ${extra_host_args} ${baseargs}"
 
 target_configargs=${baseargs}
 
@@ -1825,8 +1852,17 @@ if test x${with_newlib} != xno && echo " ${target_configdirs} " | grep " newlib 
   target_configargs="--with-newlib ${target_configargs}"
 fi
 
+# Different target subdirs use different values of certain variables
+# (notably CXX).  Worse, multilibs use *lots* of different values.
+# Worse yet, autoconf 2.5x makes some of these 'precious', meaning that
+# it doesn't automatically accept command-line overrides of them.
+# This means it's not safe for target subdirs to share a cache file,
+# which is disgusting, but there you have it.  Hopefully this can be
+# fixed in future.  It's still worthwhile to use a cache file for each
+# directory.  I think.
+
 # Pass the appropriate --host, --build, and --cache-file arguments.
-target_configargs="--cache-file=../config.cache --host=${target_alias} --build=${build_alias} ${target_configargs}"
+target_configargs="--cache-file=./config.cache --host=${target_alias} --build=${build_alias} ${target_configargs}"
 
 # provide a proper gxx_include_dir.
 # Note, if you change the default, make sure to fix both here and in
@@ -1897,6 +1933,10 @@ case " $target_configdirs " in
   ;;
 esac
 
+# Allow the user to override the flags for
+# our build compiler if desired.
+CFLAGS_FOR_BUILD=${CFLAGS_FOR_BUILD-${CFLAGS}}
+
 # On Canadian crosses, we'll be searching the right directories for
 # the previously-installed cross compiler, so don't bother to add
 # flags for directories within the install tree of the compiler
@@ -1936,7 +1976,7 @@ GCJ_FOR_TARGET=$GCJ_FOR_TARGET' $(FLAGS_FOR_TARGET)'
 
 # Don't use libstdc++-v3's flags to configure/build itself.
 libstdcxx_flags='`test ! -f $$r/$(TARGET_SUBDIR)/libstdc++-v3/scripts/testsuite_flags || $(SHELL) $$r/$(TARGET_SUBDIR)/libstdc++-v3/scripts/testsuite_flags --build-includes` -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs'
-raw_libstdcxx_flags=' -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs'
+raw_libstdcxx_flags='-L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs'
 
 if test "x${CXX_FOR_TARGET+set}" = xset; then
   if test "x${RAW_CXX_FOR_TARGET+set}" != xset; then
@@ -2038,6 +2078,7 @@ NCN_STRICT_CHECK_TOOL(OBJDUMP, objdump)
 AC_SUBST(CC)
 AC_SUBST(CXX)
 AC_SUBST(CFLAGS)
+AC_SUBST(CFLAGS_FOR_BUILD)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(DEFAULT_YACC)
 AC_SUBST(DEFAULT_LEX)

@@ -81,6 +81,7 @@ struct bfd_link_hash_entry
 {
   /* Base hash table entry structure.  */
   struct bfd_hash_entry root;
+
   /* Type of this entry.  */
   enum bfd_link_hash_type type;
 
@@ -102,7 +103,8 @@ struct bfd_link_hash_entry
      symbol is undefined and becomes defined, this field will
      automatically be non-NULL since the symbol will have been on the
      undefined symbol list.  */
-  struct bfd_link_hash_entry *next;
+  struct bfd_link_hash_entry *und_next;
+
   /* A union of information depending upon the type.  */
   union
     {
@@ -283,8 +285,8 @@ struct bfd_link_info
   /* TRUE if global symbols in discarded sections should be stripped.  */
   unsigned int strip_discarded: 1;
 
-  /* TRUE if relaxation is being finalized.  */
-  unsigned int relax_finalizing: 1;
+  /* TRUE if the final relax pass is needed.  */
+  unsigned int need_relax_finalize: 1;
 
   /* TRUE if generating a position independent executable.  */
   unsigned int pie: 1;
@@ -365,11 +367,6 @@ struct bfd_link_info
   /* The function to call when the executable or shared object is
      unloaded.  */
   const char *fini_function;
-
-  /* If non-zero, specifies that branches which are problematic for the
-     MPC860 C0 (or earlier) should be checked for and modified.  It gives the
-     number of bytes that should be checked at the end of each text page.  */
-  int mpc860c0;
 
   /* Non-zero if auto-import thunks for DATA items in pei386 DLLs
      should be generated/linked against.  Set to 1 if this feature
@@ -617,20 +614,37 @@ extern struct bfd_link_order *bfd_new_link_order (bfd *, asection *);
    BFD, but it would be a pain.  Instead, the regular linker sets up
    these structures, and then passes them into BFD.  */
 
-/* Regular expressions for a version.  */
+/* Glob pattern for a version.  */
 
 struct bfd_elf_version_expr
 {
-  /* Next regular expression for this version.  */
+  /* Next glob pattern for this version.  */
   struct bfd_elf_version_expr *next;
-  /* Regular expression.  */
+  /* Glob pattern.  */
   const char *pattern;
-  /* Matching function.  */
-  int (*match) (struct bfd_elf_version_expr *, const char *);
+  /* NULL for a glob pattern, otherwise a straight symbol.  */
+  const char *symbol;
   /* Defined by ".symver".  */
-  unsigned int symver: 1;
+  unsigned int symver : 1;
   /* Defined by version script.  */
   unsigned int script : 1;
+  /* Pattern type.  */
+#define BFD_ELF_VERSION_C_TYPE		1
+#define BFD_ELF_VERSION_CXX_TYPE	2
+#define BFD_ELF_VERSION_JAVA_TYPE	4
+  unsigned int mask : 3;
+};
+
+struct bfd_elf_version_expr_head
+{
+  /* List of all patterns, both wildcards and non-wildcards.  */
+  struct bfd_elf_version_expr *list;
+  /* Hash table for non-wildcards.  */
+  void *htab;
+  /* Remaining patterns.  */
+  struct bfd_elf_version_expr *remaining;
+  /* What kind of pattern types are present in list (bitmask).  */
+  unsigned int mask;
 };
 
 /* Version dependencies.  */
@@ -654,15 +668,19 @@ struct bfd_elf_version_tree
   /* Version number.  */
   unsigned int vernum;
   /* Regular expressions for global symbols in this version.  */
-  struct bfd_elf_version_expr *globals;
+  struct bfd_elf_version_expr_head globals;
   /* Regular expressions for local symbols in this version.  */
-  struct bfd_elf_version_expr *locals;
+  struct bfd_elf_version_expr_head locals;
   /* List of versions which this version depends upon.  */
   struct bfd_elf_version_deps *deps;
   /* Index of the version name.  This is used within BFD.  */
   unsigned int name_indx;
   /* Whether this version tree was used.  This is used within BFD.  */
   int used;
+  /* Matching hook.  */
+  struct bfd_elf_version_expr *(*match)
+    (struct bfd_elf_version_expr_head *head,
+     struct bfd_elf_version_expr *prev, const char *sym);
 };
 
 #endif
