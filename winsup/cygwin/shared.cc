@@ -43,10 +43,10 @@ char * __stdcall
 shared_name (const char *str, int num)
 {
   static NO_COPY char buf[MAX_PATH] = {0};
-  char envbuf[6];
+  extern bool _cygwin_testing;
 
   __small_sprintf (buf, "%s.%s.%d", cygwin_version.shared_id, str, num);
-  if (GetEnvironmentVariable ("CYGWIN_TESTING", envbuf, 5))
+  if (!_cygwin_testing)
     strcat (buf, cygwin_version.dll_build_date);
   return buf;
 }

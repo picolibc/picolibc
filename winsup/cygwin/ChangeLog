@@ -1,3 +1,14 @@
+Sun Sep  2 22:09:31 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* child_info.h: Modify magic number.
+	* dcrt0.cc (_cygwin_testing): Define.
+	(_dll_crt0): Set _cygwin_testing if CYGWIN_TESTING environment variable
+	exists.  Don't issue "conflicting versions" error if _cygwin_testing is
+	true.
+	* shared.cc (shared_name): Use _cygwin_testing global rather than
+	testing the environment.
+	* syscalls.cc (_write): Remove debugging info.
+
 Sat Sep  1 01:37:13 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* tty.cc (tty::create_inuse): Eliminate unneeded argument.
@@ -342,8 +353,8 @@ Fri Aug  3 14:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 Fri Aug  3 13:04:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
-	* path.cc (fchdir): Set the fhandler's path to absolute value to
-	ensure changing to the correct directory even if the fhandler originally
+	* path.cc (fchdir): Set the fhandler's path to absolute value to ensure
+	changing to the correct directory even if the fhandler originally
 	points to a relative path.
 
 Thu Aug  2 17:59:00 2001  Corinna Vinschen <corinna@vinschen.de>
@@ -447,7 +458,7 @@ Wed 18 Jul 2001 12:54:17  Corinna Vinschen <corinna@vinschen.de>
 
 Wed 18 Jul 2001 11:56:00  Corinna Vinschen <corinna@vinschen.de>
 
-	* syscalls.cc (_unlink): Explicitely check for non-existant file.
+	* syscalls.cc (_unlink): Explicitly check for non-existant file.
 
 Tue 17 Jul 2001 10:19:00  Corinna Vinschen <corinna@vinschen.de>
 
@@ -793,7 +804,7 @@ Sat Jun  2 23:11:52 2001  Christopher Faylor <cgf@cygnus.com>
 
 Sat Jun  2 14:07:28 2001  Christopher Faylor <cgf@cygnus.com>
 
-	* cygheap.cc (cygheap_root::cygheap_rot): Remove constructor.
+	* cygheap.cc (cygheap_root::cygheap_root): Remove constructor.
 	(cygheap_root::~cygheap_root): Remove destructor.
 	(cygheap_root::operator =): Remove.
 	(cygheap_root::set): New method.
@@ -851,7 +862,8 @@ Wed May 30 23:51:32 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (fhandler_base::isremote): New method.
 	(fhandler_base::set_isremote): Ditto.
-	(fhandler_base::set_execable_p): Also record "don't care if executable state".
+	(fhandler_base::set_execable_p): Also record "don't care if executable
+	state".
 	(fhandler_base::dont_care_if_execable): New method.
 	* path.cc (path_conv::check): Clear new flags.  Appropriately set
 	vol_flags, drive_type, and is_remote_drive.

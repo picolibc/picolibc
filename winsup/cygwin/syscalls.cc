@@ -348,7 +348,7 @@ _write (int fd, const void *ptr, size_t len)
   fh = cygheap->fdtab[fd];
 
   res = fh->bg_check (SIGTTOU);
-syscall_printf ("write fh %p, name '%s' bg_check %d, bg_eof %d", fh, fh->get_name(), res, bg_eof);
+
   if (res > bg_eof)
     {
       myself->process_state |= PID_TTYOU;

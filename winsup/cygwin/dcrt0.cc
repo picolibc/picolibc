@@ -72,6 +72,8 @@ unsigned int signal_shift_subtract = 1;
 ResourceLocks _reslock NO_COPY;
 MTinterface _mtinterf NO_COPY;
 
+bool NO_COPY _cygwin_testing;
+
 extern "C"
 {
   void *export_malloc (unsigned int);
@@ -872,14 +874,17 @@ dll_crt0_1 ()
 extern "C" void __stdcall
 _dll_crt0 ()
 {
+  char envbuf[8];
 #ifdef DEBUGGING
-  char buf[80];
-  if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf)))
+  if (GetEnvironmentVariable ("CYGWIN_SLEEP", envbuf, sizeof (envbuf) - 1))
     {
-      console_printf ("Sleeping %d, pid %u\n", atoi (buf), GetCurrentProcessId ());
-      Sleep (atoi (buf));
+      console_printf ("Sleeping %d, pid %u\n", atoi (envbuf), GetCurrentProcessId ());
+      Sleep (atoi (envbuf));
     }
 #endif
+
+  if (GetEnvironmentVariable ("CYGWIN_TESTING", envbuf, sizeof (envbuf) - 1))
+    _cygwin_testing = 1;
 
   char zeros[sizeof (fork_info->zero)] = {0};
 #ifdef DEBUGGING
@@ -921,7 +926,9 @@ _dll_crt0 ()
 	      break;
 	    }
 	  default:
-	    if ((fork_info->type & PROC_MAGIC_MASK) == PROC_MAGIC_GENERIC)
+	    if (_cygwin_testing)
+	      fork_info = NULL;
+	    else if ((fork_info->type & PROC_MAGIC_MASK) == PROC_MAGIC_GENERIC)
 	      api_fatal ("conflicting versions of cygwin1.dll detected.  Use only the most recent version.\n");
 	    break;
 	}
