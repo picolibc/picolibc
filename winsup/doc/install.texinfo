@@ -265,7 +265,7 @@ everything else.
         tar jxvf /posix/path/to/cygwin-inst-YYYYMMDD.tar.bz2 usr/bin/cygwin1.dll
 @end example
 
-@item After closing all Cygwin apps (see below), use Explorer or the
+@item After closing all Cygwin apps (see above), use Explorer or the
 Windows command shell to move @code{C:\cygwin\tmp\usr\bin\cygwin1.dll}
 to @code{C:\cygwin\bin\cygwin1.dll}.
 
