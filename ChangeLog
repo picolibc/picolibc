@@ -1,3 +1,7 @@
+2001-09-03  Jeff Holcomb  <jeffh@redhat.com>
+
+	* configure.in: Enable libstdc++-v3 for h8300 targets.
+
 2001-08-30  Eric Christopher  <echristo@redhat.com>
 	    Jason Eckhardt  <jle@redhat.com>
 
