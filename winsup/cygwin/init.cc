@@ -24,26 +24,18 @@ WINAPI dll_entry (HANDLE h, DWORD reason, void *static_load)
       cygwin_hmodule = (HMODULE) h;
       dynamically_loaded = (static_load == NULL);
       break;
+    case DLL_PROCESS_DETACH:
+      break;
     case DLL_THREAD_ATTACH:
       if (user_data->threadinterface)
 	{
 	  if (!TlsSetValue (user_data->threadinterface->reent_index,
 			    &user_data->threadinterface->reents))
-	    api_fatal ("Sig proc MT init failed\n");
+	    api_fatal ("thread initialization failed");
 	}
       break;
-    case DLL_PROCESS_DETACH:
-      break;
     case DLL_THREAD_DETACH:
-#if 0
-      pthread *thisthread = (pthread *)
-	TlsGetValue (user_data->threadinterface->thread_self_dwTlsIndex);
-      if (thisthread) {
-	  /* Some non-pthread call created this thread,
-	   * but we need to clean it up */
-	  thisthread->exit (0);
-      }
-#endif
+      /* not invoked */;
       break;
     }
   return 1;

@@ -958,6 +958,10 @@ do_exit (int status)
   UINT n = (UINT) status;
   static int NO_COPY exit_state = 0;
 
+  if (!DisableThreadLibraryCalls (cygwin_hmodule))
+    system_printf ("DisableThreadLibraryCalls (%p) failed, %E",
+		   cygwin_hmodule);
+
   syscall_printf ("do_exit (%d)", n);
 
   vfork_save *vf = vfork_storage.val ();
