@@ -1948,7 +1948,7 @@ typedef struct tagCWPSTRUCT {
 	WPARAM wParam;
 	UINT message;
 	HWND hwnd;
-} CWPSTRUCT,*PWCWPSTRUCT;
+} CWPSTRUCT,*PCWPSTRUCT;
 typedef struct tagDEBUGHOOKINFO {
 	DWORD idThread;
 	DWORD idThreadInstaller;
