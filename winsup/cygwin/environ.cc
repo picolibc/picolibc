@@ -61,6 +61,8 @@ static win_env conv_envvars[] =
     {NULL, 0, NULL, NULL, NULL, NULL, 0, 0}
   };
 
+static unsigned char conv_start_chars[256] = {0};
+
 void
 win_env::add_cache (const char *in_posix, const char *in_native)
 {
@@ -91,6 +93,9 @@ win_env::add_cache (const char *in_posix, const char *in_native)
 win_env * __stdcall
 getwinenv (const char *env, const char *in_posix)
 {
+  if (!conv_start_chars[(unsigned char)*env])
+    return NULL;
+
   for (int i = 0; conv_envvars[i].name != NULL; i++)
     if (strncasematch (env, conv_envvars[i].name, conv_envvars[i].namelen))
       {
@@ -528,6 +533,17 @@ environ_init (char **envp, int envc)
   bool envp_passed_in;
   static char cygterm[] = "TERM=cygwin";
 
+  static int initted = 0;
+  if (!initted)
+    {
+      for (int i = 0; conv_envvars[i].name != NULL; i++)
+	{
+	  conv_start_chars[tolower(conv_envvars[i].name[0])] = 1;
+	  conv_start_chars[toupper(conv_envvars[i].name[0])] = 1;
+	}
+      initted = 1;
+    }
+
   regopt ("default");
   if (myself->progname[0])
     regopt (myself->progname);
@@ -571,11 +587,11 @@ environ_init (char **envp, int envc)
 	eq = strchr (newp, '\0');
       if (!parent_alive)
 	ucenv (newp, eq);
-      if (strncmp (newp, "TERM=", 5) == 0)
+      if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
 	sawTERM = 1;
-      if (strncmp (newp, "CYGWIN=", sizeof("CYGWIN=") - 1) == 0)
+      if (*newp == 'C' && strncmp (newp, "CYGWIN=", sizeof("CYGWIN=") - 1) == 0)
 	parse_options (newp + sizeof("CYGWIN=") - 1);
-      if (*eq)
+      if (*eq && conv_start_chars[(unsigned char)envp[i][0]])
 	posify (envp + i, *++eq ? eq : --eq);
       debug_printf ("%s", envp[i]);
     }

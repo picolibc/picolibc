@@ -739,6 +739,8 @@ dll_crt0_1 ()
      instead of each time a file is opened. */
   set_process_privileges ();
 
+  cygcwd.init ();
+
   cygbench ("pre-forkee");
 
   if (user_data->forkee)
@@ -758,8 +760,6 @@ dll_crt0_1 ()
 
       longjmp (fork_info->jmp, fork_info->cygpid);
     }
-
-  cygcwd.init ();
 
   /* Initialize our process table entry. */
   pinfo_init (envp, envc);

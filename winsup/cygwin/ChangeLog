@@ -1,3 +1,15 @@
+2000-10-18  DJ Delorie  <dj@redhat.com>
+
+	* dcrt0.cc (dll_crt0_1): init cygcwd before forkee branch
+	
+	* environ.cc (conv_start_chars): Cache a table of "first
+	characters" for environment variables needing conversion.
+	(getwinenv): Use it.
+	(environ_init): Create it, also check first chars for TERM and
+	CYGWIN.
+	
+	* path.cc: Use lookup table for case insensitive comparisons.
+
 Wed Oct 18 00:48:49 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (call_handler): Make signal pending if sigsave.sig is
