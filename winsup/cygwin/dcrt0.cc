@@ -75,6 +75,8 @@ MTinterface _mtinterf;
 bool NO_COPY _cygwin_testing;
 unsigned NO_COPY _cygwin_testing_magic;
 
+char NO_COPY almost_null[1];
+
 extern "C"
 {
   void *export_malloc (unsigned int);

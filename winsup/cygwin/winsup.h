@@ -288,6 +288,8 @@ extern bool cygwin_testing;
 extern unsigned _cygwin_testing_magic;
 extern HMODULE cygwin_hmodule;
 
+extern char almost_null[];
+
 #define winsock2_active (wsadata.wVersion >= 512)
 #define winsock_active (wsadata.wVersion < 512)
 extern struct WSAData wsadata;

@@ -1969,7 +1969,6 @@ seteuid32 (__uid32_t uid)
   BOOL sav_impersonated, sav_token_is_internal_token;
   BOOL process_ok, explicitly_created_token = FALSE;
   struct passwd * pw_new;
-  cygheap_user user;
   PSID origpsid, psid2 = NO_SID;
 
   debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
