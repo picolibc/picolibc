@@ -1,3 +1,8 @@
+2000-02-03  H.J. Lu  <hjl@gnu.org>
+
+	* arm-oabi.h: Duplicate changes made to arm.h on Jan. 27,
+	2000 by Thomas de Lellis  <tdel@windriver.com>.
+
 2000-01-27  Thomas de Lellis  <tdel@windriver.com>
 
         * arm.h (STT_ARM_TFUNC): Define in terms of STT_LOPROC.
