@@ -1,3 +1,7 @@
+Sat Mar 18 23:04:27 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* times.cc: Remove unneeded (and incorrect) externs.
+
 Sat Mar 18 01:32:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (host_dependent_constants::init): Eliminate DELETE flag

@@ -17,9 +17,6 @@ details. */
 #include <errno.h>
 #include "winsup.h"
 
-extern time_t __declspec(dllexport) _timezone;
-extern int __declspec(dllexport) _daylight;
-
 #define FACTOR (0x19db1ded53ea710LL)
 #define NSPERSEC 10000000LL
 
