@@ -1,3 +1,9 @@
+2004-05-17  Zack Weinberg  <zack@codesourcery.com>
+
+	* Makefile.def, Makefile.tpl, configure.in: Remove all mention
+	of libf2c.
+	* configure, Makefile.in: Regenerate.
+
 2004-05-13  Diego Novillo  <dnovillo@redhat.com>
 
 	Merge from tree-ssa-20020619-branch.
@@ -54,11 +60,11 @@
 
 2004-04-26  Paolo Bonzini  <bonzini@gnu.org>
 
-        * configure.in: Invoke ACX_PROG_CMP_IGNORE_INITIAL.
-        * configure: Regenerate.
-        * config/acx.m4: Mutuate ACX_PROG_CMP_IGNORE_INITIAL from gcc.
-        * gcc/Makefile.tpl (compare): Use the result of the test.
-        * gcc/Makefile.in: Regenerate.
+	* configure.in: Invoke ACX_PROG_CMP_IGNORE_INITIAL.
+	* configure: Regenerate.
+	* config/acx.m4: Mutuate ACX_PROG_CMP_IGNORE_INITIAL from gcc.
+	* gcc/Makefile.tpl (compare): Use the result of the test.
+	* gcc/Makefile.in: Regenerate.
 
 2004-04-23  Paolo Bonzini  <bonzini@gnu.org>
 
@@ -102,9 +108,9 @@
 
 2004-04-06  David Edelsohn  <edelsohn@gnu.org>
 
-        * configure.in (powerpc-*-aix*): Remove target-libada from noconfigdirs.
-        (rs6000-*-aix*): Same.
-        * configure: Regenerate.
+	* configure.in (powerpc-*-aix*): Remove target-libada from noconfigdirs.
+	(rs6000-*-aix*): Same.
+	* configure: Regenerate.
 
 2004-03-25  Stan Shebs  <shebs@apple.com>
 
@@ -168,10 +174,10 @@
 	* Makefile.in: Regenerate.
 
 2004-03-15  Paolo Bonzini  <bonzini@gnu.org>
-            Nathanael Nerode  <neroden@gcc.gnu.org>
+	    Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in (DEFAULT_YACC, DEFAULT_M4, DEFAULT_LEX):
-        Set with AC_CHECK_PROGS.
+	Set with AC_CHECK_PROGS.
 	* configure.in: Fix comment typo from last patch.
 	* configure: Regenerate.
 
@@ -183,14 +189,14 @@
 	* configure: Regenerate.
 
 2004-03-12  Eric Botcazou  <ebotcazou@gcc.gnu.org>
-            Paolo Bonzini  <bonzini@gnu.org>
+	    Paolo Bonzini  <bonzini@gnu.org>
 
 	PR bootstrap/14522
 	* configure.in: Cope with shells that do not support unquoted ^
 	* configure: Regenerate.
 
 2004-03-11  Eric Botcazou  <ebotcazou@gcc.gnu.org>
-            Paolo Bonzini  <bonzini@gnu.org>
+	    Paolo Bonzini  <bonzini@gnu.org>
 
 	PR bootstrap/14522
 	* configure.in: Cope with shell that do not support nesting
@@ -265,7 +271,7 @@
 	    Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	PR ada/6637, PR ada/5911
-        Merge with libada-branch:
+	Merge with libada-branch:
 	* configure.in, Makefile.tpl, Makefile.def: Add target-libada,
 	with appropriate dependencies. Add --enable-libada configure switch.
 	* configure, Makefile.in: Regenerate.
@@ -278,14 +284,14 @@
 2004-02-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.NEWLIB: Update Red Hat license to 2004.
-	
+
 2004-01-23  DJ Delorie  <dj@redhat.com>
 
 	* Makefile.def (target_modules) [libiberty]: Don't stage.
 	* Makefile.in: Rebuilt.
 
 2004-01-23  Jeff Johnston  <jjohnstn@redhat.com>
-	
+
 	* COPYING.NEWLIB: Update to include copyrights for new
 	iconv code.
 
@@ -337,7 +343,7 @@
 	* configure: Regenerated.
 
 2003-12-21  Bernardo Innocenti  <bernie@develer.com>
- 
+
  	* configure.in (*-*-uclinux): Exclude newlib, libgloss and rda.
  	* configure: Regenerated.
 
@@ -357,7 +363,7 @@
 
 2003-11-27  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * COPYING.NEWLIB: Add license info for long long routines added to
+	* COPYING.NEWLIB: Add license info for long long routines added to
 	stdlib.
 
 2003-11-14  Arnaud Charlet  <charlet@act-europe.fr>
@@ -437,7 +443,7 @@
 2003-09-04  Robert Millan  <robertmh@gnu.org>
 
 	* configure.in: Match GNU/KFreeBSD with new kfreebsd*-gnu triplet.
-	
+
 2003-09-02  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* configure.in: Ensure arguments to sed are properly spaced.
@@ -468,7 +474,7 @@
 	* configure.in: When testing with_libs and with_headers, treat
 	'no' as unset.  Based on a patch by Dan Kegel <dank@kegel.com>.
 	* configure: Regenerate.
-	
+
 	* configure.in (TOPLEVEL_CONFIGURE_ARGUMENTS): Quote properly for
 	make, shell, etc.
 	(baseargs): Likewise.
@@ -600,14 +606,14 @@
 
 	* configure.in: Update testsuite_flags to new location.
 	* configure. Regenerate.
-	
+
 2003-06-18  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* Makefile.tpl: Remove BUILD_CC stuff.
 	* Makefile.in: Regenerate.
 
 2003-06-14  H.J. Lu <hongjiu.lu@intel.com>
- 
+
 	* config.guess: Update to 2003-06-12 version.
 	* config.sub: Update to 2003-06-13 version.
 
@@ -616,7 +622,7 @@
 	* MAINTAINERS: Add myself as MIPS co-maintainer.
 
 2003-06-12  H.J. Lu <hongjiu.lu@intel.com>
- 
+
 	* config.guess: Update to 2003-06-06 version.
 	* config.sub: Update to 2003-06-06 version.
 
@@ -681,10 +687,10 @@
 
 2003-05-28  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * COPYING.NEWLIB: Add license info for newlib/libc/sys/linux/stdlib.
+	* COPYING.NEWLIB: Add license info for newlib/libc/sys/linux/stdlib.
 
 2003-05-21  DJ Delorie  <dj@redhat.com>
-	
+
 	* Makefile.tpl (configure-target-libiberty): Depend only on gcc, not
 	newlib or libgloss.
 	* Makefile.in: Regenerate.
@@ -702,7 +708,7 @@
 2003-05-19  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in: Switch more things to use maybe dependencies.
-	* Makefile.tpl: Switch more things to use maybe dependencies.  
+	* Makefile.tpl: Switch more things to use maybe dependencies.
 	Factor out common code from autogen IF statements.
 	* configure: Regenerate.
 	* Makefile.in: Regenerate.
@@ -748,8 +754,8 @@
 
 2003-05-02  Chris Demetriou  <cgd@broadcom.com>
 
-        * Makefile.tpl: Require "makeinfo" from texinfo 4.2 or later.
-        * Makefile.in: Regenerate.
+	* Makefile.tpl: Require "makeinfo" from texinfo 4.2 or later.
+	* Makefile.in: Regenerate.
 
 2003-04-27  Daniel Jacobowitz  <drow@mvista.com>
 
@@ -996,8 +1002,8 @@
 
 2003-01-07  Christopher Faylor  <cgf@redhat.com>
 
-        * configure.in: Add AC_PREREQ for consistency.
-        * configure: Regenerate.
+	* configure.in: Add AC_PREREQ for consistency.
+	* configure: Regenerate.
 
 2003-01-06  Andrew Cagney  <ac131313@redhat.com>
 
@@ -1168,9 +1174,9 @@
 
 2002-12-12  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * COPYING.NEWLIB: Update list of alternate Regent of California
-        licenses and discuss official revoking of advertising clause.
-        * COPYING.LIBGLOSS: Ditto.
+	* COPYING.NEWLIB: Update list of alternate Regent of California
+	licenses and discuss official revoking of advertising clause.
+	* COPYING.LIBGLOSS: Ditto.
 
 2002-12-12  Alexandre Oliva  <aoliva@redhat.com>
 
@@ -3289,7 +3295,7 @@ Thu Jul  8 12:32:23 1999  John David Anglin <dave@hiauly1.hia.nrc.ca>
 	Bad merge removed these two changes.
 
 Tue Apr 13 22:50:54 1999  Donn Terry (donn@interix.com)
-	                  Martin Heller (Ing.-Buero_Heller@t-online.de)
+			  Martin Heller (Ing.-Buero_Heller@t-online.de)
 
 	* config.guess (interix Alpha): Add.
 
@@ -5598,8 +5604,8 @@ Mon Jun 24 15:01:12 1996  Joel Sherrill  <joel@merlin.gcs.redstone.army.mil>
 Sun Jun 23 22:41:54 1996  Geoffrey Noer  <noer@cygnus.com>
 
 	* configure.in: enable dosrel for cygwin32-hosted builds,
-	        remove diff from the list of things not buildable
-	        via Canadian Cross
+		remove diff from the list of things not buildable
+		via Canadian Cross
 
 Sat Jun 22 11:39:01 1996  Jason Merrill  <jason@yorick.cygnus.com>
 
