@@ -1,4 +1,11 @@
-2004-03-02  Danny Smith  <dannysmith@users.sourceforge.net>
+2004-03-05  Filip Navara  <xnavara@volny.cz>
+
+	* include/ddk/scsi.h: Replace assert with ASSERT.
+	* include/ddk/video.h: Ditto.
+	* include/ddk/winddk.h: Ditto. Remove the assert macro.
+	* include/ddk/tdi.h: Correct packing.
+
+2004-03-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wtypes.h (DECIMAL_SETZERO): Add definition for
 	NONAMELESSUNION case.
