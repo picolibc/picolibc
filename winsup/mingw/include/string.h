@@ -61,7 +61,7 @@ int	strcoll (const char*, const char*);	/* Compare using locale */
 char*	strcpy (char*, const char*);
 size_t	strcspn (const char*, const char*);
 char*	strerror (int); /* NOTE: NOT an old name wrapper. */
-char*	_strerror (const char *);
+
 size_t	strlen (const char*);
 char*	strncat (char*, const char*, size_t);
 int	strncmp (const char*, const char*, size_t);
@@ -77,6 +77,7 @@ size_t	strxfrm (char*, const char*, size_t);
 /*
  * Extra non-ANSI functions provided by the CRTDLL library
  */
+char*	_strerror (const char *);
 void*	_memccpy (void*, const void*, int, size_t);
 int 	_memicmp (const void*, const void*, size_t);
 char* 	_strdup (const char*);
