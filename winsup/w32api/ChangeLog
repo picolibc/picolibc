@@ -1,3 +1,9 @@
+2002-08-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ws2spi.h: Modify comment about being part of
+	mingw32 package.
+	(winsock2.h): Change "" to <>.
+
 2002-08-20  Casper S. Hornstrup  <chorns@users.sourceforge.net>
 
 	* include/ws2spi.h: New file.

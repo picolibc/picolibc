@@ -3,7 +3,6 @@
  *
  * Winsock 2 Service Provider interface.
  *
- * This file is part of the Mingw32 package.
  *
  * THIS SOFTWARE IS NOT COPYRIGHTED
  *
@@ -19,7 +18,7 @@
 #ifndef _WS2SPI_H
 #define _WS2SPI_H
 
-#include "winsock2.h"
+#include <winsock2.h>
 
 #ifdef __cplusplus
 extern "C" {
