@@ -34,9 +34,7 @@ enum procstuff
   PROC_CHILDTERMINATED	= 2,	// a child died
   PROC_CLEARWAIT	= 3,	// clear all waits - signal arrived
   PROC_WAIT		= 4,	// setup for wait() for subproc
-  PROC_CHILDSTOPPED	= 5,	// register process as "stopped"
-  PROC_CHILDCONTINUED	= 6,	// remove process from "stopped" list
-  PROC_NOTHING		= 7	// nothing, really
+  PROC_NOTHING		= 5	// nothing, really
 };
 
 struct sigpacket
