@@ -2047,6 +2047,25 @@ typedef struct _LIST_ENTRY {
 	struct _LIST_ENTRY *Flink;
 	struct _LIST_ENTRY *Blink;
 } LIST_ENTRY,*PLIST_ENTRY;
+typedef struct _SINGLE_LIST_ENTRY {
+	struct _SINGLE_LIST_ENTRY *Next;
+} SINGLE_LIST_ENTRY,*PSINGLE_LIST_ENTRY;
+
+#ifndef _SLIST_HEADER_
+#define _SLIST_HEADER_
+#define SLIST_ENTRY SINGLE_LIST_ENTRY
+#define _SLIST_ENTRY _SINGLE_LIST_ENTRY
+#define PSLIST_ENTRY PSINGLE_LIST_ENTRY
+typedef union _SLIST_HEADER {
+	ULONGLONG Alignment;
+	struct {
+		SLIST_ENTRY Next;
+		WORD Depth;
+		WORD Sequence;
+	};
+} SLIST_HEADER,*PSLIST_HEADER;
+#endif /* !_SLIST_HEADER_ */
+
 typedef struct _RTL_CRITICAL_SECTION_DEBUG {
 	WORD Type;
 	WORD CreatorBackTraceIndex;

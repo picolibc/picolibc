@@ -1,3 +1,9 @@
+2003-05-30  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* include/winbase.h (HeapCompact): Correct prototype.
+	* include/winnt.h (SINGLE_LIST_ENTRY, SLIST_ENTRY,
+	SLIST_HEADER): Add.
+
 2003-05-27  Andrew C. Stadt <acstadt@sympatico.ca>
 
 	* include/winuser.h (LWA_COLORKEY, LWA_ALPHA): Add defines.
