@@ -1,3 +1,9 @@
+2003-09-14  Andrew Cagney  <cagney@redhat.com>
+
+	* src-release (dejagnu.tar): New target.
+	(dejagnu.tar.bz2): Recursively call "gdb-taz" rule.
+	(do-djunpack): Use $(PACKAGE) for the package name.
+
 2003-09-04  DJ Delorie  <dj@redhat.com>
 
 	* configure: Regenerate.
