@@ -1,3 +1,38 @@
+2002-07-10  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* msg.cc: New file of stub functions, no functionality.
+	* sem.cc: Ditto.
+	* shm.cc (client_shmmgr::shmctl): Add support for an out shm_info
+	buffer for the SHM_INFO command.
+	(client_shmmgr::shmget): Use %X to print keys.
+	* include/sys/ipc.h: Comment all fields and values.
+	(IPC_PRIVATE): Change to be non-negative.
+	* include/sys/msg.h: New file with SUSv3 and ipcs(8) interfaces.
+	* include/sys/sem.h: Ditto.
+	* include/sys/shm.h: Comment all fields and values.
+	(struct shm_info): New struct.
+	* cygserver_shm.h (client_request_shm::shminfo): Rename.
+	(client_request_shm::shm_info): New method.
+	(client_request_shm::_parameters.out.hFileMap): Move into union.
+	(client_request_shm::_parameters.out.shminfo): Rename.
+	(client_request_shm::_parameters.out.shm_info): New field.
+	* cygserver_shm.cc (server_shmmgr::_shm_ids): Rename.
+	(server_shmmgr::_shm_tot): New field.
+	(server_shmmgr::shmctl): Rename `out_shminfo' argument.  Add
+	`out_shm_info' argument.  Fill in the `out_shm_info' argument in
+	the SHM_INFO command.
+	(server_shmmgr::shmget): Check `shmflg' against the mode of
+	existing segments as per Stevens 1990, p. 123.
+	(server_shmmgr::server_shmmgr): Initialize the new `_shm_tot'
+	field.
+	(server_shmmgr::new_segment): Set ENOMEM if CreateFileMapping
+	fails.  Pass `size' to new_segment.
+	(server_shmmgr::new_segment): Add size argument and use it to
+	check against and update the new `_shm_tot' field.
+	(server_shmmgr::delete_segment): Update the new `_shm_tot' field.
+	* cygwin.din: Add the SysV IPC msg and sem interfaces.
+	* Makefile.in (DLL_OFILES): Add new DLL object files.
+
 2002-07-09  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_transport_pipes.cc: The main change is to make the
