@@ -1,3 +1,8 @@
+2002-04-09  Earnie Boyd  <earnie@users.sf.net>
+
+	* moldname-crtdll.def: Remove CR from end of line.
+	* moldname-msvcrt.def: Ditto.
+
 2002-04-04  Danny Smith  <dannysmith@sourceforge.users.net>
 
 	* include/math.h (DOMAIN, SING, OVERFLOW, UNDERFLOW,
