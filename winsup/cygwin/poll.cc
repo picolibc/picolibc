@@ -48,36 +48,36 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
   for (unsigned int i = 0; i < nfds; ++i)
     if (!fdtab.not_open (fds[i].fd))
       {
-        FD_SET (fds[i].fd, open_fds);
-        if (fds[i].events & POLLIN)
-          FD_SET (fds[i].fd, read_fds);
-        if (fds[i].events & POLLOUT)
-          FD_SET (fds[i].fd, write_fds);
-        if (fds[i].events & POLLPRI)
-          FD_SET (fds[i].fd, except_fds);
+	FD_SET (fds[i].fd, open_fds);
+	if (fds[i].events & POLLIN)
+	  FD_SET (fds[i].fd, read_fds);
+	if (fds[i].events & POLLOUT)
+	  FD_SET (fds[i].fd, write_fds);
+	if (fds[i].events & POLLPRI)
+	  FD_SET (fds[i].fd, except_fds);
       }
 
   int ret = cygwin_select (max_fd + 1, read_fds, write_fds, except_fds,
-                           timeout < 0 ? NULL : &tv);
+			   timeout < 0 ? NULL : &tv);
 
   for (unsigned int i = 0; i < nfds; ++i)
     {
       if (!FD_ISSET (fds[i].fd, open_fds))
-        fds[i].revents = POLLNVAL;
+	fds[i].revents = POLLNVAL;
       else if (fdtab.not_open(fds[i].fd))
-        fds[i].revents = POLLHUP;
+	fds[i].revents = POLLHUP;
       else if (ret < 0)
-        fds[i].revents = POLLERR;
+	fds[i].revents = POLLERR;
       else
-        {
-          fds[i].revents = 0;
-          if (FD_ISSET (fds[i].fd, read_fds))
-            fds[i].revents |= POLLIN;
-          if (FD_ISSET (fds[i].fd, write_fds))
-            fds[i].revents |= POLLOUT;
-          if (FD_ISSET (fds[i].fd, except_fds))
-            fds[i].revents |= POLLPRI;
-        }
+	{
+	  fds[i].revents = 0;
+	  if (FD_ISSET (fds[i].fd, read_fds))
+	    fds[i].revents |= POLLIN;
+	  if (FD_ISSET (fds[i].fd, write_fds))
+	    fds[i].revents |= POLLOUT;
+	  if (FD_ISSET (fds[i].fd, except_fds))
+	    fds[i].revents |= POLLPRI;
+	}
     }
 
   return ret;

@@ -13,6 +13,9 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <assert.h>
+#include "cygheap.h"
+#include "heap.h"
 #include "sync.h"
 
 /* we provide these stubs to call into a user's
@@ -60,6 +63,8 @@ extern "C" void
 _free_r (struct _reent *, void *p)
 {
   export_malloc_called = 1;
+  assert (!incygheap (p));
+  assert (inheap (p));
   free (p);
 }
 #undef free
@@ -68,6 +73,8 @@ extern "C" void *
 _realloc_r (struct _reent *, void *p, size_t size)
 {
   export_malloc_called = 1;
+  assert (!incygheap (p));
+  assert (inheap (p));
   return realloc (p, size);
 }
 #undef realloc
@@ -121,6 +128,22 @@ calloc (size_t nmemb, size_t size)
   void *res;
   res = user_data->calloc (nmemb, size);
   return res;
+}
+
+extern "C" char *
+strdup (const char *s)
+{
+  char *p;
+  size_t len = strlen (s) + 1;
+  if ((p = (char *) malloc (len)) != NULL)
+      memcpy (p, s, len);
+  return p;
+}
+
+extern "C" char *
+_strdup_r (struct _reent *, const char *s)
+{
+  return strdup (s);
 }
 #endif
 
@@ -176,22 +199,6 @@ export_calloc (size_t nmemb, size_t size)
     res = user_data->calloc (nmemb, size);
   malloc_printf ("(%d, %d) = %x, called by %x", nmemb, size, res, ((int *)&nmemb)[-1]);
   return res;
-}
-
-extern "C" char *
-strdup (const char *s)
-{
-  char *p;
-  size_t len = strlen (s) + 1;
-  if ((p = (char *) malloc (len)) != NULL)
-      memcpy (p, s, len);
-  return p;
-}
-
-extern "C" char *
-_strdup_r (struct _reent *, const char *s)
-{
-  return strdup (s);
 }
 
 /* We use a critical section to lock access to the malloc data

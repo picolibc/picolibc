@@ -13,6 +13,7 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include "cygheap.h"
 #include <string.h>
 #include "cygerrno.h"
 #include "fhandler.h"
@@ -26,12 +27,26 @@ struct __cygwin_perfile *perfile_table = NULL;
 
 DWORD binmode = 0;
 
+inline fhandler_base&
+fhandler_base::operator =(fhandler_base &x)
+{
+  memcpy (this, &x, sizeof *this);
+  unix_path_name_ = x.unix_path_name_ ? cstrdup (x.unix_path_name_) : NULL;
+  win32_path_name_ = x.win32_path_name_ ? cstrdup (x.win32_path_name_) : NULL;
+  rabuf = NULL;
+  ralen = 0;
+  raixget = 0;
+  raixput = 0;
+  rabuflen = 0;
+  return *this;
+}
+
 int
 fhandler_base::puts_readahead (const char *s, size_t len = (size_t) -1)
 {
   int success = 1;
   while ((*s || (len != (size_t) -1 && len--))
-         && (success = put_readahead (*s++) > 0))
+	 && (success = put_readahead (*s++) > 0))
     continue;
   return success;
 }
@@ -137,16 +152,16 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
   if (!no_free_names ())
     {
       if (unix_path_name_ != NULL && unix_path_name_ != fhandler_disk_dummy_name)
-	free (unix_path_name_);
+	cfree (unix_path_name_);
       if (win32_path_name_ != NULL && unix_path_name_ != fhandler_disk_dummy_name)
-	free (win32_path_name_);
+	cfree (win32_path_name_);
     }
 
   unix_path_name_ = win32_path_name_ = NULL;
   if (unix_path == NULL || !*unix_path)
     return;
 
-  unix_path_name_ = strdup (unix_path);
+  unix_path_name_ = cstrdup (unix_path);
   if (unix_path_name_ == NULL)
     {
       system_printf ("fatal error. strdup failed");
@@ -154,11 +169,11 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
     }
 
   if (win32_path)
-    win32_path_name_ = strdup (win32_path);
+    win32_path_name_ = cstrdup (win32_path);
   else
     {
       const char *fmt = get_native_name ();
-      win32_path_name_ = (char *) malloc (strlen(fmt) + 16);
+      win32_path_name_ = (char *) cmalloc (HEAP_STR, strlen(fmt) + 16);
       __small_sprintf (win32_path_name_, fmt, unit);
     }
 
@@ -196,44 +211,13 @@ fhandler_base::raw_read (void *ptr, size_t ulen)
 	  break;
 	default:
 	  syscall_printf ("ReadFile %s failed, %E", unix_path_name_);
-          __seterrno_from_win_error (errcode);
+	  __seterrno_from_win_error (errcode);
 	  return -1;
 	  break;
 	}
     }
 
   return bytes_read;
-}
-
-int
-fhandler_base::linearize (unsigned char *buf)
-{
-  unsigned char *orig_buf = buf;
-#define cbuf ((char *)buf)
-  strcpy (cbuf, get_name() ?: "");
-  char *p = strcpy (strchr (cbuf, '\0') + 1, get_win32_name ());
-  buf = (unsigned char *)memcpy (strchr (p, '\0') + 1, this, cb);
-  debug_printf ("access_ %p, status %p, io_handle %p, output_handle %p",
-		access_, status, get_io_handle (), get_output_handle ());
-  return (buf + cb) - orig_buf;
-#undef cbuf
-}
-
-int
-fhandler_base::de_linearize (const char *buf, const char *unix_name,
-			     const char *win32_name)
-{
-  int thiscb = cb;
-  memcpy(this, buf, cb);
-  unix_path_name_ = win32_path_name_ = NULL;
-  set_name (unix_name, win32_name);
-  debug_printf ("access_ %p, status %p, io_handle %p, output_handle %p",
-		access_, status, get_io_handle (), get_output_handle ());
-  if (thiscb != cb)
-    system_printf ("mismatch in linearize/delinearize %d != %d", thiscb, cb);
-  raixput = raixget = ralen = rabuflen = 0;
-  rabuf = NULL;
-  return cb;
 }
 
 /* Cover function to WriteFile to provide Posix interface and semantics
@@ -954,11 +938,11 @@ fhandler_disk_file::fstat (struct stat *buf)
      directory. This is used, to set S_ISVTX, if needed.  */
   if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
     buf->st_mode |= S_IFDIR;
-  if (! get_file_attribute (has_acls (),
-                            get_win32_name (),
-                            &buf->st_mode,
-                            &buf->st_uid,
-                            &buf->st_gid))
+  if (!get_file_attribute (has_acls (),
+			   get_win32_name (),
+			   &buf->st_mode,
+			   &buf->st_uid,
+			   &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
@@ -979,7 +963,7 @@ fhandler_disk_file::fstat (struct stat *buf)
       buf->st_mode = 0;
       buf->st_mode |= STD_RBITS;
 
-      if (! (local.dwFileAttributes & FILE_ATTRIBUTE_READONLY))
+      if (!(local.dwFileAttributes & FILE_ATTRIBUTE_READONLY))
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
@@ -1124,6 +1108,13 @@ fhandler_base::tcgetpgrp (void)
   return -1;
 }
 
+void
+fhandler_base::operator delete (void *p)
+{
+  cfree (p);
+  return;
+}
+
 /* Normal I/O constructor */
 fhandler_base::fhandler_base (DWORD devtype, const char *name, int unit):
   access_ (0),
@@ -1157,10 +1148,12 @@ fhandler_base::~fhandler_base (void)
   if (!no_free_names ())
     {
       if (unix_path_name_ != NULL && unix_path_name_ != fhandler_disk_dummy_name)
-	free (unix_path_name_);
+	cfree (unix_path_name_);
       if (win32_path_name_ != NULL && win32_path_name_ != fhandler_disk_dummy_name)
-	free (win32_path_name_);
+	cfree (win32_path_name_);
     }
+  if (rabuf)
+    free (rabuf);
   unix_path_name_ = win32_path_name_ = NULL;
 }
 

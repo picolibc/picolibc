@@ -23,6 +23,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygheap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
@@ -62,7 +63,7 @@ dtable::extend (int howmuch)
   /* Try to allocate more space for fd table. We can't call realloc()
      here to preserve old table if memory allocation fails */
 
-  if (!(newfds = (fhandler_base **) calloc (new_size, sizeof newfds[0])))
+  if (!(newfds = (fhandler_base **) ccalloc (HEAP_ARGV, new_size, sizeof newfds[0])))
     {
       debug_printf ("calloc failed");
       return 0;
@@ -70,7 +71,7 @@ dtable::extend (int howmuch)
   if (fds)
     {
       memcpy (newfds, fds, size * sizeof (fds[0]));
-      free (fds);
+      cfree (fds);
     }
 
   size = new_size;
@@ -151,7 +152,7 @@ dtable::release (int fd)
 {
   if (!not_open (fd))
     {
-      delete (fds[fd]);
+      delete fds[fd];	/* CGF FIXME */
       fds[fd] = NULL;
     }
 }
@@ -240,7 +241,7 @@ fhandler_base *
 dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 {
   fhandler_base *fh;
-  void *buf = calloc (1, sizeof (fhandler_union) + 100);
+  void *buf = ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_union) + 100);
 
   dev &= FH_DEVMASK;
   switch (dev)
@@ -312,7 +313,7 @@ dtable::dup_worker (fhandler_base *oldfh)
   newfh->set_io_handle (NULL);
   if (oldfh->dup (newfh))
     {
-      free (newfh);
+      cfree (newfh);
       newfh = NULL;
       return NULL;
     }
@@ -351,18 +352,21 @@ dtable::dup2 (int oldfd, int newfd)
     }
 
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
-  if ((size_t) newfd >= fdtab.size)
-    {
-      int inc_size = NOFILE_INCR * ((newfd + NOFILE_INCR - 1) / NOFILE_INCR) -
-                     fdtab.size;
-      fdtab.extend (inc_size);
-    }
+
   if ((size_t) newfd >= fdtab.size || newfd < 0)
     {
       syscall_printf ("new fd out of bounds: %d", newfd);
       set_errno (EBADF);
       goto done;
     }
+
+  if ((size_t) newfd >= fdtab.size)
+   {
+     int inc_size = NOFILE_INCR * ((newfd + NOFILE_INCR - 1) / NOFILE_INCR) -
+		    fdtab.size;
+     fdtab.extend (inc_size);
+   }
+
   if (!not_open (newfd))
     _close (newfd);
   fds[newfd] = newfh;
@@ -382,12 +386,12 @@ done:
 select_record *
 dtable::select_read (int fd, select_record *s)
 {
-  if (fdtab.not_open (fd))
+  if (not_open (fd))
     {
       set_errno (EBADF);
       return NULL;
     }
-  fhandler_base *fh = fdtab[fd];
+  fhandler_base *fh = fds[fd];
   s = fh->select_read (s);
   s->fd = fd;
   s->fh = fh;
@@ -399,12 +403,12 @@ dtable::select_read (int fd, select_record *s)
 select_record *
 dtable::select_write (int fd, select_record *s)
 {
-  if (fdtab.not_open (fd))
+  if (not_open (fd))
     {
       set_errno (EBADF);
       return NULL;
     }
-  fhandler_base *fh = fdtab[fd];
+  fhandler_base *fh = fds[fd];
   s = fh->select_write (s);
   s->fd = fd;
   s->fh = fh;
@@ -416,12 +420,12 @@ dtable::select_write (int fd, select_record *s)
 select_record *
 dtable::select_except (int fd, select_record *s)
 {
-  if (fdtab.not_open (fd))
+  if (not_open (fd))
     {
       set_errno (EBADF);
       return NULL;
     }
-  fhandler_base *fh = fdtab[fd];
+  fhandler_base *fh = fds[fd];
   s = fh->select_except (s);
   s->fd = fd;
   s->fh = fh;
@@ -430,151 +434,33 @@ dtable::select_except (int fd, select_record *s)
   return s;
 }
 
-/*
- * Function to take an existant dtable array
- * and linearize it into a memory buffer.
- * If memory buffer is NULL, it returns the size
- * of memory buffer needed to do the linearization.
- * On error returns -1.
- */
-
-int
-dtable::linearize_fd_array (unsigned char *in_buf, int buflen)
+/* Function to walk the fd table after an exec and perform
+   per-fhandler type fixups. */
+void
+dtable::fixup_after_exec (HANDLE parent, size_t sz, fhandler_base **f)
 {
-  /* If buf == NULL, just precalculate length */
-  if (in_buf == NULL)
-    {
-      buflen = sizeof (size_t);
-      for (int i = 0, max_used_fd = -1; i < (int)size; i++)
-	if (!not_open (i) && !fds[i]->get_close_on_exec ())
-	  {
-	    buflen += i - (max_used_fd + 1);
-	    buflen += fds[i]->cb + strlen (fds[i]->get_name ()) + 1
-				 + strlen (fds[i]->get_win32_name ()) + 1;
-	    max_used_fd = i;
-	  }
-      debug_printf ("needed buflen %d", buflen);
-      return buflen;
-    }
-
-  debug_printf ("in_buf = %x, buflen = %d", in_buf, buflen);
-
-  /*
-   * Now linearize each open fd (write a 0xff byte for a closed fd).
-   * Write the name of the open fd first (null terminated). This
-   * allows the de_linearizeing code to determine what kind of fhandler_xxx
-   * to create.
-   */
-
-  size_t i;
-  int len, total_size;
-
-  total_size = sizeof (size_t);
-  if (total_size > buflen)
-    {
-      system_printf ("FATAL: linearize_fd_array exceeded buffer size");
-      return -1;
-    }
-
-  unsigned char *buf = in_buf;
-  buf += sizeof (size_t);	/* skip over length which is added later */
-
-  for (i = 0, total_size = sizeof (size_t); total_size < buflen; i++)
-    {
-      if (not_open (i) || fds[i]->get_close_on_exec ())
-	{
-	  debug_printf ("linearizing closed fd %d",i);
-	  *buf = 0xff;		/* place holder */
-	  len = 1;
-	}
+  size = sz;
+  fds = f;
+  first_fd_for_open = 0;
+  for (size_t i = 0; i < size; i++)
+    if (fds[i])
+      if (fds[i]->get_close_on_exec ())
+	release (i);
       else
 	{
-	  len = fds[i]->linearize (buf);
-	  debug_printf ("fd %d, len %d, name %s, device %p", i, len, buf,
-			fds[i]->get_device ());
+	  fds[i]->clear_readahead ();
+	  fds[i]->fixup_after_exec (parent);
 	}
-
-      total_size += len;
-      buf += len;
-    }
-
-  i--;
-  memcpy (in_buf, &i, sizeof (size_t));
-  if (total_size != buflen)
-    system_printf ("out of sync %d != %d", total_size, buflen);
-  return total_size;
-}
-
-/*
- * Function to take a linearized dtable array in a memory buffer and
- * re-create the original dtable array.
- */
-
-LPBYTE
-dtable::de_linearize_fd_array (LPBYTE buf)
-{
-  int len, max_used_fd;
-  size_t inc_size;
-
-  debug_printf ("buf %x", buf);
-
-  /* First get the number of fd's - use this to set the fdtabsize.
-     NB. This is the only place in the code this should be done !!
-  */
-
-  memcpy ((char *) &max_used_fd, buf, sizeof (int));
-  buf += sizeof (size_t);
-
-  inc_size = NOFILE_INCR * ((max_used_fd + NOFILE_INCR - 1) / NOFILE_INCR) -
-	     size;
-  debug_printf ("max_used_fd %d, inc size %d", max_used_fd, inc_size);
-  if (inc_size > 0 && !extend (inc_size))
-    {
-      system_printf ("out of memory");
-      return NULL;
-    }
-
-  for (int i = 0; i <= max_used_fd; i++)
-    {
-      /* 0xFF means closed */
-      if (*buf == 0xff)
-	{
-	  fds[i] = NULL;
-	  buf++;
-	  debug_printf ("closed fd %d", i);
-	  continue;
-	}
-      /* fd was open - de_linearize it */
-      /* Get the null-terminated name.  It is followed by an image of
-	 the actual fhandler_* structure.  Use the status field from
-	 this to build a new fhandler type. */
-
-      DWORD status;
-      LPBYTE obuf = buf;
-      char *win32;
-      win32 = strchr ((char *)obuf, '\0') + 1;
-      buf = (LPBYTE)strchr ((char *)win32, '\0') + 1;
-      memcpy ((char *)&status, buf + FHSTATOFF, sizeof(DWORD));
-      debug_printf ("fd %d, name %s, win32 name %s, status %p",
-		    i, obuf, win32, status);
-      len = build_fhandler (i, status, (const char *) NULL)->
-	    de_linearize ((char *) buf, (char *) obuf, win32);
-      set_std_handle (i);
-      buf += len;
-      debug_printf ("len %d", buf - obuf);
-    }
-  first_fd_for_open = 0;
-  return buf;
 }
 
 void
 dtable::fixup_after_fork (HANDLE parent)
 {
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
-    if (!not_open (i))
+    if ((fh = fds[i]) != NULL)
       {
-	fhandler_base *fh = fds[i];
 	if (fh->get_close_on_exec () || fh->get_need_fork_fixup ())
 	  {
 	    debug_printf ("fd %d(%s)", i, fh->get_name ());
@@ -588,7 +474,7 @@ int
 dtable::vfork_child_dup ()
 {
   fhandler_base **newtable;
-  newtable = (fhandler_base **) calloc (size, sizeof(fds[0]));
+  newtable = (fhandler_base **) ccalloc (HEAP_ARGV, size, sizeof(fds[0]));
   int res = 1;
 
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
@@ -601,6 +487,7 @@ dtable::vfork_child_dup ()
 	set_errno (EBADF);
 	goto out;
       }
+
   fds_on_hold = fds;
   fds = newtable;
 out:
@@ -617,7 +504,7 @@ dtable::vfork_parent_restore ()
   fhandler_base **deleteme = fds;
   fds = fds_on_hold;
   fds_on_hold = NULL;
-  free (deleteme);
+  cfree (deleteme);
 
   ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
   return;

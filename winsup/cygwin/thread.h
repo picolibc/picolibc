@@ -74,9 +74,6 @@ struct _winsup_t
 
 /* path.cc */
   struct mntent _ret;
-  char *_cwd_win32;
-  char *_cwd_posix;
-  unsigned long _cwd_hash;
   int _iteration;
 
 /* strerror */
@@ -306,6 +303,6 @@ int __sem_post (sem_t * sem);
 
 };
 
-#endif                          // MT_SAFE
+#endif // MT_SAFE
 
-#endif                          // _CYGNUS_THREADS_
+#endif // _CYGNUS_THREADS_

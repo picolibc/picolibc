@@ -20,7 +20,7 @@ details. */
 #define URANDOM  9
 
 #define PSEUDO_MULTIPLIER       (6364136223846793005LL)
-#define PSEUDO_SHIFTVAL         (21)
+#define PSEUDO_SHIFTVAL		(21)
 
 fhandler_dev_random::fhandler_dev_random (const char *name, int nunit)
   : fhandler_base (FH_RANDOM, name),
@@ -42,10 +42,10 @@ fhandler_dev_random::crypt_gen_random (void *ptr, size_t len)
 {
   if (!crypt_prov
       && !CryptAcquireContext (&crypt_prov, NULL, MS_DEF_PROV, PROV_RSA_FULL,
-                               CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET)
+			       CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET)
       && !CryptAcquireContext (&crypt_prov, NULL, MS_DEF_PROV, PROV_RSA_FULL,
-                               CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET
-                               | CRYPT_NEWKEYSET))
+			       CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET
+			       | CRYPT_NEWKEYSET))
     {
       debug_printf ("%E = CryptAquireContext()");
       return FALSE;
@@ -144,7 +144,7 @@ fhandler_dev_random::close (void)
 {
   if (crypt_prov)
     while (!CryptReleaseContext (crypt_prov, 0)
-           && GetLastError () == ERROR_BUSY)
+	   && GetLastError () == ERROR_BUSY)
       Sleep(10);
   return 0;
 }

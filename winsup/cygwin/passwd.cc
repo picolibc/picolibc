@@ -134,22 +134,22 @@ read_etc_passwd ()
 	  }
 
 	fclose (f);
-        passwd_state = loaded;
+	passwd_state = loaded;
       }
     else
       {
-        debug_printf ("Emulating /etc/passwd");
-        char user_name [ MAX_USER_NAME ];
-        DWORD user_name_len = MAX_USER_NAME;
-        if (! GetUserNameA (user_name, &user_name_len))
-          {
-            strncpy (user_name, "Administrator", MAX_USER_NAME);
-            debug_printf ("Failed to get current user name. %E");
-          }
-        snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh", user_name,
+	debug_printf ("Emulating /etc/passwd");
+	char user_name [ MAX_USER_NAME ];
+	DWORD user_name_len = MAX_USER_NAME;
+	if (! GetUserNameA (user_name, &user_name_len))
+	  {
+	    strncpy (user_name, "Administrator", MAX_USER_NAME);
+	    debug_printf ("Failed to get current user name. %E");
+	  }
+	snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh", user_name,
 		  DEFAULT_UID, DEFAULT_GID, getenv ("HOME") ?: "/");
-        add_pwd_line (linebuf);
-        passwd_state = emulated;
+	add_pwd_line (linebuf);
+	passwd_state = emulated;
       }
 }
 
@@ -164,7 +164,7 @@ search_for (uid_t uid, const char *name)
     {
       res = passwd_buf + i;
       if (res->pw_uid == DEFAULT_UID)
-        default_pw = res;
+	default_pw = res;
       /* on Windows NT user names are case-insensitive */
       if (name)
 	{

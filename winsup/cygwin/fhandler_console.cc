@@ -8,10 +8,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-/* FIXMES:
-   Should the constructor call tcinit() explicitly rather than having
-   it sprinkled throughout here? */
-
 #include "winsup.h"
 #include <sys/termios.h>
 #include <stdio.h>
@@ -21,6 +17,7 @@ details. */
 #include <unistd.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include <wincon.h>
 #include <ctype.h>
 #include "cygerrno.h"
 #include "fhandler.h"
@@ -1404,11 +1401,9 @@ set_console_title (char *title)
   debug_printf ("title '%s'", buf);
 }
 
-int
-fhandler_console::de_linearize (const char *buf, const char *unix_name,
-			        const char *win32_name)
+void
+fhandler_console::fixup_after_exec (HANDLE)
 {
-  int res = fhandler_base::de_linearize (buf, unix_name, win32_name);
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
@@ -1432,5 +1427,5 @@ fhandler_console::de_linearize (const char *buf, const char *unix_name,
 
   CloseHandle (h);
   CloseHandle (oh);
-  return res;
+  return;
 }

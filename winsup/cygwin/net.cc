@@ -354,18 +354,18 @@ cygwin_socket (int af, int type, int protocol)
       soc = socket (AF_INET, type, 0);
 
       if (soc == INVALID_SOCKET)
-        {
-          set_winsock_errno ();
-          goto done;
-        }
+	{
+	  set_winsock_errno ();
+	  goto done;
+	}
 
       soc = duplicate_socket (soc);
 
       const char *name;
       if (af == AF_INET)
-        name = (type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp");
+	name = (type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp");
       else
-        name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
+	name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
 
       fdsock (fd, name, soc);
       res = fd;
@@ -781,11 +781,11 @@ cygwin_bind (int fd, struct sockaddr *my_addr, int addrlen)
 	  int len = sizeof sin;
 	  int fd;
 
-          if (strlen (un_addr->sun_path) >= UNIX_PATH_LEN)
-            {
-              set_errno (ENAMETOOLONG);
-              goto out;
-            }
+	  if (strlen (un_addr->sun_path) >= UNIX_PATH_LEN)
+	    {
+	      set_errno (ENAMETOOLONG);
+	      goto out;
+	    }
 	  sin.sin_family = AF_INET;
 	  sin.sin_port = 0;
 	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
@@ -805,36 +805,36 @@ cygwin_bind (int fd, struct sockaddr *my_addr, int addrlen)
 	  sin.sin_port = ntohs (sin.sin_port);
 	  debug_printf ("AF_UNIX: socket bound to port %u", sin.sin_port);
 
-          /* bind must fail if file system socket object already exists
-             so _open() is called with O_EXCL flag. */
+	  /* bind must fail if file system socket object already exists
+	     so _open() is called with O_EXCL flag. */
 	  fd = _open (un_addr->sun_path,
-                      O_WRONLY | O_CREAT | O_EXCL | O_BINARY,
-                      0);
+		      O_WRONLY | O_CREAT | O_EXCL | O_BINARY,
+		      0);
 	  if (fd < 0)
-            {
-              if (get_errno () == EEXIST)
-                set_errno (EADDRINUSE);
+	    {
+	      if (get_errno () == EEXIST)
+		set_errno (EADDRINUSE);
 	      goto out;
-            }
+	    }
 
-          char buf[sizeof (SOCKET_COOKIE) + 10];
-          __small_sprintf (buf, "%s%u", SOCKET_COOKIE, sin.sin_port);
-          len = strlen (buf) + 1;
+	  char buf[sizeof (SOCKET_COOKIE) + 10];
+	  __small_sprintf (buf, "%s%u", SOCKET_COOKIE, sin.sin_port);
+	  len = strlen (buf) + 1;
 
-          /* Note that the terminating nul is written.  */
-          if (_write (fd, buf, len) != len)
-            {
+	  /* Note that the terminating nul is written.  */
+	  if (_write (fd, buf, len) != len)
+	    {
 	      save_errno here;
-              _close (fd);
-              _unlink (un_addr->sun_path);
-            }
-          else
-            {
-              _close (fd);
-              chmod (un_addr->sun_path,
-                (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~myself->umask);
+	      _close (fd);
+	      _unlink (un_addr->sun_path);
+	    }
+	  else
+	    {
+	      _close (fd);
+	      chmod (un_addr->sun_path,
+		(S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~myself->umask);
 	      res = 0;
-            }
+	    }
 #undef un_addr
 	}
       else if (bind (sock->get_socket (), my_addr, addrlen))
@@ -1032,7 +1032,7 @@ getdomainname (char *domain, int len)
  * \Device\<Netcard>, where netcard is the name of the net device.
  * Then look under:
  * HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\<NetCard>\
- *                                                  Parameters\Tcpip
+ *							Parameters\Tcpip
  * at the IPAddress, Subnetmask and DefaultGateway values for the
  * required values.
  *
@@ -1709,36 +1709,36 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
     case SIOCGIFNETMASK:
     case SIOCGIFADDR:
       {
-        char buf[2048];
-        struct ifconf ifc;
-        ifc.ifc_len = sizeof(buf);
-        ifc.ifc_buf = buf;
-        struct ifreq *ifrp;
+	char buf[2048];
+	struct ifconf ifc;
+	ifc.ifc_len = sizeof(buf);
+	ifc.ifc_buf = buf;
+	struct ifreq *ifrp;
 
-        struct ifreq *ifr = (struct ifreq *) p;
-        if (ifr == 0)
-          {
-            debug_printf("ifr == NULL\n");
-            set_errno (EINVAL);
-            return -1;
-          }
+	struct ifreq *ifr = (struct ifreq *) p;
+	if (ifr == 0)
+	  {
+	    debug_printf("ifr == NULL\n");
+	    set_errno (EINVAL);
+	    return -1;
+	  }
 
 	res = get_ifconf (&ifc, cmd);
-        if (res)
+	if (res)
 	  {
 	    debug_printf ("error in get_ifconf\n");
 	    break;
 	  }
 
-        debug_printf("    name: %s\n", ifr->ifr_name);
-        for (ifrp = ifc.ifc_req;
-             (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
-             ++ifrp)
-          {
-            debug_printf("testname: %s\n", ifrp->ifr_name);
-            if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
-              {
-                switch (cmd)
+	debug_printf("    name: %s\n", ifr->ifr_name);
+	for (ifrp = ifc.ifc_req;
+	     (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
+	     ++ifrp)
+	  {
+	    debug_printf("testname: %s\n", ifrp->ifr_name);
+	    if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
+	      {
+		switch (cmd)
 		  {
 		  case SIOCGIFADDR:
 		    ifr->ifr_addr = ifrp->ifr_addr;
@@ -1750,15 +1750,15 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 		    ifr->ifr_netmask = ifrp->ifr_netmask;
 		    break;
 		  }
-                break;
-              }
-          }
-        if ((caddr_t) ifrp >= ifc.ifc_buf + ifc.ifc_len)
-          {
-            set_errno (EINVAL);
-            return -1;
-          }
-        break;
+		break;
+	      }
+	  }
+	if ((caddr_t) ifrp >= ifc.ifc_buf + ifc.ifc_len)
+	  {
+	    set_errno (EINVAL);
+	    return -1;
+	  }
+	break;
       }
     case FIOASYNC:
       res = WSAAsyncSelect (get_socket (), gethwnd (), WM_ASYNCIO,

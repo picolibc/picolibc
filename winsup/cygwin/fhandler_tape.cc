@@ -80,12 +80,12 @@ fhandler_dev_tape::open (const char *path, int flags, mode_t)
       struct mtpos pos;
 
       if (! ioctl (MTIOCGET, &get))
-        /* Tape drive supports and is set to variable block size. */
-        if (get.mt_dsreg == 0)
-          devbufsiz = get.mt_maxblksize;
-        else
+	/* Tape drive supports and is set to variable block size. */
+	if (get.mt_dsreg == 0)
+	  devbufsiz = get.mt_maxblksize;
+	else
 	  devbufsiz = get.mt_dsreg;
-        varblkop = get.mt_dsreg == 0;
+	varblkop = get.mt_dsreg == 0;
 
       if (devbufsiz > 1L)
 	devbuf = new char [ devbufsiz ];
@@ -324,36 +324,36 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		  break;
 		}
 	      if ((op->mt_count == 0
-                   && !tape_get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
-                  || (op->mt_count > 0
-                      && (op->mt_count < min || op->mt_count > max)))
+		   && !tape_get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
+		  || (op->mt_count > 0
+		      && (op->mt_count < min || op->mt_count > max)))
 		{
 		  ret = ERROR_INVALID_PARAMETER;
 		  break;
 		}
 	      if (devbuf && op->mt_count > 0
-                  && (size_t) op->mt_count < devbufend - devbufstart)
+		  && (size_t) op->mt_count < devbufend - devbufstart)
 		{
 		  ret = ERROR_MORE_DATA;
 		  break;
 		}
 	      if (! (ret = tape_set_blocksize (op->mt_count)))
 		{
-                  size_t size = 0;
-                  if (op->mt_count == 0)
-                    {
-                      struct mtget get;
-                      if ((ret = tape_status (&get)) != NO_ERROR)
-                        break;
-                      size = get.mt_maxblksize;
-                      ret = NO_ERROR;
-                    }
+		  size_t size = 0;
+		  if (op->mt_count == 0)
+		    {
+		      struct mtget get;
+		      if ((ret = tape_status (&get)) != NO_ERROR)
+			break;
+		      size = get.mt_maxblksize;
+		      ret = NO_ERROR;
+		    }
 		  char *buf = new char [ size ];
-                  if (!buf)
-                    {
-                      ret = ERROR_OUTOFMEMORY;
-                      break;
-                    }
+		  if (!buf)
+		    {
+		      ret = ERROR_OUTOFMEMORY;
+		      break;
+		    }
 		  if (devbuf)
 		    {
 		      memcpy(buf,devbuf + devbufstart, devbufend - devbufstart);
@@ -365,7 +365,7 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		  devbufstart = 0;
 		  devbuf = buf;
 		  devbufsiz = size;
-                  varblkop = op->mt_count == 0;
+		  varblkop = op->mt_count == 0;
 		}
 	    }
 	    break;

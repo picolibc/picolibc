@@ -21,7 +21,6 @@ details. */
 #include <sys/uio.h>
 #include <errno.h>
 #include <limits.h>
-#include <unistd.h>
 #include <winnls.h>
 #include <lmcons.h> /* for UNLEN */
 #include "cygerrno.h"
@@ -32,6 +31,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include <unistd.h>
 
 extern BOOL allow_ntsec;
 
@@ -1015,8 +1015,8 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 
   debug_printf ("%s (%s, %p)", caller, name, buf);
 
-  path_conv real_path (name, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW) | PC_FULL,
-		       stat_suffixes);
+  path_conv real_path (name, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW) |
+					 PC_FULL, stat_suffixes);
 
   if (real_path.error)
     {
@@ -1422,6 +1422,16 @@ pathconf (const char *file, int v)
 }
 
 extern "C" char *
+ttyname (int fd)
+{
+  if (fdtab.not_open (fd) || !fdtab[fd]->is_tty ())
+    {
+      return 0;
+    }
+  return (char *)(fdtab[fd]->ttyname ());
+}
+
+extern "C" char *
 ctermid (char *str)
 {
   static NO_COPY char buf[16];
@@ -1434,20 +1444,8 @@ ctermid (char *str)
   return str;
 }
 
-extern "C"
-char *
-ttyname (int fd)
-{
-  if (fdtab.not_open (fd) || !fdtab[fd]->is_tty ())
-    {
-      return 0;
-    }
-  return (char *)(fdtab[fd]->ttyname ());
-}
-
 /* Tells stdio if it should do the cr/lf conversion for this file */
-extern "C" int _cygwin_istext_for_stdio (int fd);
-int
+extern "C" int
 _cygwin_istext_for_stdio (int fd)
 {
   syscall_printf("_cygwin_istext_for_stdio (%d)\n", fd);
@@ -1570,8 +1568,7 @@ setmode (int fd, int mode)
 }
 
 /* ftruncate: P96 5.6.7.1 */
-extern "C"
-int
+extern "C" int
 ftruncate (int fd, off_t length)
 {
   int res = -1;
@@ -1609,8 +1606,7 @@ ftruncate (int fd, off_t length)
 
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
 /* FIXME: untested */
-extern "C"
-int
+extern "C" int
 truncate (const char *pathname, off_t length)
 {
   int fd;
@@ -1632,8 +1628,7 @@ truncate (const char *pathname, off_t length)
   return res;
 }
 
-extern "C"
-long
+extern "C" long
 get_osfhandle (int fd)
 {
   long res = -1;
@@ -1651,8 +1646,7 @@ get_osfhandle (int fd)
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 statfs (const char *fname, struct statfs *sfs)
 {
   if (!sfs)
@@ -1692,8 +1686,7 @@ statfs (const char *fname, struct statfs *sfs)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 fstatfs (int fd, struct statfs *sfs)
 {
   if (fdtab.not_open (fd))
@@ -1706,8 +1699,7 @@ fstatfs (int fd, struct statfs *sfs)
 }
 
 /* setpgid: POSIX 4.3.3.1 */
-extern "C"
-int
+extern "C" int
 setpgid (pid_t pid, pid_t pgid)
 {
   int res = -1;
@@ -1746,8 +1738,7 @@ out:
   return res;
 }
 
-extern "C"
-pid_t
+extern "C" pid_t
 getpgid (pid_t pid)
 {
   if (pid == 0)
@@ -1762,22 +1753,19 @@ getpgid (pid_t pid)
   return p->pgid;
 }
 
-extern "C"
-int
+extern "C" int
 setpgrp (void)
 {
   return setpgid (0, 0);
 }
 
-extern "C"
-pid_t
+extern "C" pid_t
 getpgrp (void)
 {
   return getpgid (0);
 }
 
-extern "C"
-char *
+extern "C" char *
 ptsname (int fd)
 {
   if (fdtab.not_open (fd))
@@ -1789,8 +1777,7 @@ ptsname (int fd)
 }
 
 /* FIXME: what is this? */
-extern "C"
-int
+extern "C" int
 regfree ()
 {
   return 0;
@@ -1802,8 +1789,7 @@ regfree ()
    Although mknod hasn't been implemented yet, some GNU tools (e.g. the
    fileutils) assume its existence so we must provide a stub that always
    fails. */
-extern "C"
-int
+extern "C" int
 mknod ()
 {
   set_errno (ENOSYS);
@@ -1811,8 +1797,7 @@ mknod ()
 }
 
 /* setgid: POSIX 4.2.2.1 */
-extern "C"
-int
+extern "C" int
 setgid (gid_t gid)
 {
   int ret = setegid (gid);
@@ -1822,8 +1807,7 @@ setgid (gid_t gid)
 }
 
 /* setuid: POSIX 4.2.2.1 */
-extern "C"
-int
+extern "C" int
 setuid (uid_t uid)
 {
   int ret = seteuid (uid);
@@ -1836,8 +1820,7 @@ setuid (uid_t uid)
 extern char *internal_getlogin (_pinfo *pi);
 
 /* seteuid: standards? */
-extern "C"
-int
+extern "C" int
 seteuid (uid_t uid)
 {
   if (os_being_run == winNT)

@@ -27,6 +27,8 @@ extern DWORD chunksize;
 BOOL reset_com = TRUE;
 static BOOL envcache = TRUE;
 
+static char **lastenviron = NULL;
+
 /* List of names which are converted from dos to unix
  * on the way in and back again on the way out.
  *
@@ -102,7 +104,7 @@ getwinenv (const char *env, const char *in_posix)
 /* Convert windows path specs to POSIX, if appropriate.
  */
 static void __stdcall
-posify (int already_posix, char **here, const char *value)
+posify (char **here, const char *value)
 {
   char *src = *here;
   win_env *conv;
@@ -111,22 +113,17 @@ posify (int already_posix, char **here, const char *value)
   if (!(conv = getwinenv (src)))
     return;
 
-  if (already_posix)
-    conv->add_cache (value, NULL);
-  else
-    {
-      /* Turn all the items from c:<foo>;<bar> into their
-	 mounted equivalents - if there is one.  */
+  /* Turn all the items from c:<foo>;<bar> into their
+     mounted equivalents - if there is one.  */
 
-      char *outenv = (char *) malloc (1 + len + conv->posix_len (value));
-      memcpy (outenv, src, len);
-      conv->toposix (value, outenv + len);
-      conv->add_cache (outenv + len, value);
+  char *outenv = (char *) malloc (1 + len + conv->posix_len (value));
+  memcpy (outenv, src, len);
+  conv->toposix (value, outenv + len);
+  conv->add_cache (outenv + len, value);
 
-      debug_printf ("env var converted to %s", outenv);
-      *here = outenv;
-      free (src);
-    }
+  debug_printf ("env var converted to %s", outenv);
+  *here = outenv;
+  free (src);
 }
 
 /*
@@ -175,6 +172,16 @@ getenv (const char *name)
   return my_findenv (name, &offset);
 }
 
+extern int __stdcall
+envsize (const char * const *in_envp, int debug_print)
+{
+  const char * const *envp;
+  for (envp = in_envp; *envp; envp++)
+    if (debug_print) 
+      debug_printf ("%s", *envp);
+  return (1 + envp - in_envp) * sizeof (const char *);
+}
+
 /* Takes similar arguments to setenv except that overwrite is
    either -1, 0, or 1.  0 or 1 signify that the function should
    perform similarly to setenv.  Otherwise putenv is assumed. */
@@ -202,17 +209,19 @@ _addenv (const char *name, const char *value, int overwrite)
     }
   else
     {				/* Create new slot. */
-      char **env;
+      int sz = envsize (cur_environ ());
+      int allocsz = sz + sizeof (char *);
 
-      /* Search for the end of the environment. */
-      for (env = cur_environ (); *env; env++)
-	continue;
-
-      offset = env - cur_environ ();	/* Number of elements currently in environ. */
+      offset = (sz - 1) / sizeof (char *);
 
       /* Allocate space for additional element plus terminating NULL. */
-      __cygwin_environ = (char **) realloc (cur_environ (), (sizeof (char *) *
-						     (offset + 2)));
+      if (__cygwin_environ == lastenviron)
+	lastenviron = __cygwin_environ = (char **) realloc (cur_environ (),
+							    allocsz);
+      else if ((lastenviron = (char **) malloc (allocsz)) != NULL)
+	__cygwin_environ = (char **) memcpy ((char **) lastenviron,
+					     __cygwin_environ, sz);
+
       if (!__cygwin_environ)
 	return -1;		/* Oops.  No more memory. */
 
@@ -261,7 +270,7 @@ putenv (const char *str)
   if ((res = check_null_empty_path (str)))
     {
       if (res == ENOENT)
-        return 0;
+	return 0;
       set_errno (res);
       return  -1;
     }
@@ -292,7 +301,7 @@ setenv (const char *name, const char *value, int overwrite)
   if ((res = check_null_empty_path (name)))
     {
       if (res == ENOENT)
-        return 0;
+	return 0;
       set_errno (res);
       return  -1;
     }
@@ -503,17 +512,14 @@ regopt (const char *name)
  * environment variable and set appropriate options from it.
  */
 void
-environ_init (int already_posix)
+environ_init (char **envp)
 {
-  char *rawenv = GetEnvironmentStrings ();
-  int envsize, i;
+  char *rawenv;
+  int sz, i;
   char *p;
-  char *newp, **envp;
+  char *newp;
   int sawTERM = 0;
   static char cygterm[] = "TERM=cygwin";
-
-  /* Allocate space for environment + trailing NULL + CYGWIN env. */
-  envp = (char **) malloc ((4 + (envsize = 100)) * sizeof (char *));
 
   regopt ("default");
   if (myself->progname[0])
@@ -525,6 +531,19 @@ environ_init (int already_posix)
     allow_ntsec = TRUE;
 #endif
 
+  if (envp)
+    {
+      sz = envsize (envp, 1);
+      char **newenv = (char **) malloc (sz);
+      envp = (char **) memcpy (newenv, envp, sz);
+      cfree (envp);
+      goto out;
+    }
+
+  /* Allocate space for environment + trailing NULL + CYGWIN env. */
+  lastenviron = envp = (char **) malloc ((4 + (sz = 100)) * sizeof (char *));
+  rawenv = GetEnvironmentStrings ();
+
   /* Current directory information is recorded as variables of the
      form "=X:=X:\foo\bar; these must be changed into something legal
      (we could just ignore them but maybe an application will
@@ -532,8 +551,8 @@ environ_init (int already_posix)
   for (i = 0, p = rawenv; *p != '\0'; p = strchr (p, '\0') + 1, i++)
     {
       newp = strdup (p);
-      if (i >= envsize)
-	envp = (char **) realloc (envp, (4 + (envsize += 100)) *
+      if (i >= sz)
+	envp = (char **) realloc (envp, (4 + (sz += 100)) *
 					    sizeof (char *));
       envp[i] = newp;
       if (*newp == '=')
@@ -548,13 +567,16 @@ environ_init (int already_posix)
       if (strncmp (newp, "CYGWIN=", sizeof("CYGWIN=") - 1) == 0)
 	parse_options (newp + sizeof("CYGWIN=") - 1);
       if (*eq)
-	posify (already_posix, envp + i, *++eq ? eq : --eq);
+	posify (envp + i, *++eq ? eq : --eq);
       debug_printf ("%s", envp[i]);
     }
 
   if (!sawTERM)
     envp[i++] = cygterm;
   envp[i] = NULL;
+  FreeEnvironmentStrings (rawenv);
+
+out:
   __cygwin_environ = envp;
   update_envptrs ();
   parse_options (NULL);

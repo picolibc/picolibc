@@ -20,6 +20,8 @@ details. */
 #include "sigproc.h"
 #include "perthread.h"
 #include "pinfo.h"
+#include "cygheap.h"
+#include "heap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "child_info.h"
@@ -121,7 +123,7 @@ do_global_ctors (void (**in_pfunc)(), int force)
   if (!force)
     {
       if (user_data->forkee || user_data->run_ctors_p)
-	return;         // inherit constructed stuff from parent pid
+	return;		// inherit constructed stuff from parent pid
       user_data->run_ctors_p = 1;
     }
 
@@ -293,58 +295,38 @@ quoted (char *cmd, int winshell)
   char *p;
   char quote = *cmd;
 
-  /* If this is being run from a Windows shell then we have
-     to preserve quotes for globify to play with later. */
-  if (winshell)
+  if (!winshell)
     {
-      while (*++cmd)
-	if ((p = strchr (cmd, quote)) == NULL)
-	  {
-	    cmd = strchr (cmd, '\0');	// no closing quote
-	    break;
-	  }
-	else if (p[1] == quote && p[-1] != '\\')
-	  {
-	    *p = '\\';
-	    cmd = ++p;			// a quoted quote
-	  }
-	else
-	  {
-	    cmd = p + 1;		// point to after end
-	    break;
-	  }
-      return cmd;
+      char *p;
+      strcpy (cmd, cmd + 1);
+      if ((p = strchr (cmd, quote)) != NULL)
+	strcpy (p, p + 1);
+      return p + 1;
     }
 
-  /* When running as a child of a cygwin process, the quoted
-     characters should have been placed here by spawn_guts, so
-     we'll just pinch them out of the command string unless
-     they're quoted with a preceding \ */
-  p = cmd + 1;
-  while (*p)
-    {
-      if (*p == '\\' && p[1] == '\\')
-	{
-	  strcpy (p, p + 1);
-	  p++;
-	}
-      else if (*p != quote)
-	p++;
-      else if (p[-1] == '\\')
-	strcpy (p - 1, p);
-      else if (p[1] == quote)
-	{
-	  strcpy (p, p + 1);
-	  p++;
-	}
-      else
-	{
-	  strcpy (p, p + 1);
-	  break;
-	}
-    }
-  strcpy (cmd, cmd + 1);
-  return p - 1;
+  /* This must have been run from a Windows shell, so preserve
+     quotes for globify to play with later. */
+  while (*++cmd)
+    if ((p = strpbrk (cmd, "\\\"")) == NULL)
+      {
+	cmd = strchr (cmd, '\0');	// no closing quote
+	break;
+      }
+    else if (quote == '\'')
+      continue;
+    else if (*p == '\\')
+      cmd = ++p;
+    else if (p[1] == quote)
+      {
+	*p = '\\';
+	cmd = ++p;			// a quoted quote
+      }
+    else
+      {
+	cmd = p + 1;		// point to after end
+	break;
+      }
+  return cmd;
 }
 
 /* Perform a glob on word if it contains wildcard characters.
@@ -494,7 +476,8 @@ build_argv (char *cmd, char **&argv, int &argc, int winshell)
     }
 
   argv[argc] = NULL;
-  debug_printf ("argv[%d] = '%s'\n", argc, argv[argc]);
+
+  debug_printf ("argc %d", argc);
 }
 
 /* sanity and sync check */
@@ -532,22 +515,35 @@ check_sanity_and_sync (per_process *p)
 }
 
 static NO_COPY STARTUPINFO si;
-# define ciresrv ((struct child_info_fork *)(si.lpReserved2))
+# define fork_info ((struct child_info_fork *)(si.lpReserved2))
+# define spawn_info ((struct child_info_spawn *)(si.lpReserved2))
 child_info_fork NO_COPY *child_proc_info = NULL;
 static MEMORY_BASIC_INFORMATION sm;
 
-#define EBP	6
-#define ESP	7
-
-extern __inline__ void
+// __inline__ void
+extern void
 alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
 {
   void *new_stack_pointer;
   MEMORY_BASIC_INFORMATION m;
+  void *newbase;
+  int newlen;
+  LPBYTE curbot = (LPBYTE) sm.BaseAddress + sm.RegionSize;
+  bool noguard;
 
-  if (!VirtualAlloc (ci->stacktop,
-		     (DWORD) ci->stackbottom - (DWORD) ci->stacktop,
-		     MEM_RESERVE, PAGE_NOACCESS))
+  if (ci->stacktop > (LPBYTE) sm.AllocationBase && ci->stacktop < curbot)
+    {
+      newbase = curbot;
+      newlen = (LPBYTE) ci->stackbottom - (LPBYTE) curbot;
+      noguard = 1;
+    }
+  else
+    {
+      newbase = ci->stacktop;
+      newlen = (DWORD) ci->stackbottom - (DWORD) ci->stacktop;
+      noguard = 0;
+    }
+  if (!VirtualAlloc (newbase, newlen, MEM_RESERVE, PAGE_NOACCESS))
     api_fatal ("fork: can't reserve memory for stack %p - %p, %E",
 		ci->stacktop, ci->stackbottom);
 
@@ -559,11 +555,14 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
 	       new_stack_pointer, ci->stacksize);
   if (!VirtualQuery ((LPCVOID) new_stack_pointer, &m, sizeof m))
     api_fatal ("fork: couldn't get new stack info, %E");
-  m.BaseAddress = (LPVOID)((DWORD)m.BaseAddress - 1);
-  if (!VirtualAlloc ((LPVOID) m.BaseAddress, 1, MEM_COMMIT,
-		     PAGE_EXECUTE_READWRITE|PAGE_GUARD))
-    api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
-	       m.BaseAddress);
+  if (!noguard)
+    {
+      m.BaseAddress = (LPVOID)((DWORD)m.BaseAddress - 1);
+      if (!VirtualAlloc ((LPVOID) m.BaseAddress, 1, MEM_COMMIT,
+			 PAGE_EXECUTE_READWRITE|PAGE_GUARD))
+	api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
+		   m.BaseAddress);
+    }
   if (!VirtualQuery ((LPCVOID) m.BaseAddress, &m, sizeof m))
     api_fatal ("fork: couldn't get new stack info, %E");
   ci->stacktop = m.BaseAddress;
@@ -572,7 +571,7 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
 
 /* extend the stack prior to fork longjmp */
 
-extern __inline__ void
+static void
 alloc_stack (child_info_fork *ci)
 {
   /* FIXME: adding 16384 seems to avoid a stack copy problem during
@@ -595,12 +594,9 @@ alloc_stack (child_info_fork *ci)
   return;
 }
 
-/* These must be static due to the way we have to deal with forked
-   processes. */
-static NO_COPY LPBYTE info = NULL;
 static NO_COPY int mypid = 0;
-static int argc = 0;
-static char **argv = NULL;
+int _declspec(dllexport) __argc = 0;
+char _declspec(dllexport) **__argv = NULL;
 
 void
 sigthread::init (const char *s)
@@ -616,22 +612,20 @@ sigthread::init (const char *s)
 static void
 dll_crt0_1 ()
 {
-#ifdef DEBUGGING
-  if (child_proc_info)
-    switch (child_proc_info->type)
-      {
-	case PROC_FORK:
-	case PROC_FORK1:
-	  ProtectHandle (child_proc_info->forker_finished);
-	case PROC_EXEC:
-	  ProtectHandle (child_proc_info->subproc_ready);
-      }
-  ProtectHandle (hMainProc);
-  ProtectHandle (hMainThread);
-#endif
+  /* According to onno@stack.urc.tue.nl, the exception handler record must
+     be on the stack.  */
+  /* FIXME: Verify forked children get their exception handler set up ok. */
+  exception_list cygwin_except_entry;
 
-  regthread ("main", GetCurrentThreadId ());
+  /* Initialize SIGSEGV handling, etc...  Because the exception handler
+     references data in the shared area, this must be done after
+     shared_init. */
+  init_exceptions (&cygwin_except_entry);
 
+  do_global_ctors (&__CTOR_LIST__, 1);
+
+  /* Set the os_being_run global. */
+  set_os_type ();
   check_sanity_and_sync (user_data);
 
   /* Nasty static stuff needed by newlib -- point to a local copy of
@@ -642,10 +636,58 @@ dll_crt0_1 ()
 
   _impure_ptr = &reent_data;
 
-#ifdef _MT_SAFE
-  user_data->resourcelocks->Init();
-  user_data->threadinterface->Init0();
-#endif
+  user_data->resourcelocks->Init ();
+  user_data->threadinterface->Init0 ();
+  regthread ("main", GetCurrentThreadId ());
+
+  char **envp = NULL;
+
+  if (child_proc_info)
+    {
+      switch (child_proc_info->type)
+	{
+	  case PROC_FORK:
+	  case PROC_FORK1:
+	    alloc_stack (fork_info);
+	    set_myself (mypid);
+	    user_data->forkee = child_proc_info->cygpid;
+	    user_data->heaptop = child_proc_info->heaptop;
+	    user_data->heapbase = child_proc_info->heapbase;
+	    user_data->heapptr = child_proc_info->heapptr;
+	    ProtectHandle (child_proc_info->forker_finished);
+	    break;
+	  case PROC_EXEC:
+	  case PROC_SPAWN:
+	    HANDLE h;
+	    cygheap = spawn_info->cygheap;
+	    cygheap_max = spawn_info->cygheap_max;
+	    cygheap_fixup_in_child (spawn_info->parent);
+	    if (!spawn_info->moreinfo->myself_pinfo ||
+		!DuplicateHandle (hMainProc, spawn_info->moreinfo->myself_pinfo,
+				 hMainProc, &h, 0, 0,
+				 DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+	      h = NULL;
+	    set_myself (mypid, h);
+	    __argc = spawn_info->moreinfo->argc;
+	    __argv = spawn_info->moreinfo->argv;
+	    envp = spawn_info->moreinfo->environ;
+	    cwd_fixup_after_exec (spawn_info->moreinfo->cwd_win32,
+				  spawn_info->moreinfo->cwd_posix,
+				  spawn_info->moreinfo->cwd_hash);
+	    fdtab.fixup_after_exec (spawn_info->parent, spawn_info->moreinfo->nfds,
+				    spawn_info->moreinfo->fds);
+	    CloseHandle (spawn_info->parent);
+	    if (spawn_info->moreinfo->old_title)
+	      {
+		old_title = strcpy (title_buf, spawn_info->moreinfo->old_title);
+		cfree (spawn_info->moreinfo->old_title);
+	      }
+	    ProtectHandle (child_proc_info->subproc_ready);
+	    break;
+	}
+    }
+  ProtectHandle (hMainProc);
+  ProtectHandle (hMainThread);
 
   /* Initialize the host dependent constants object. */
   host_dependent.init ();
@@ -656,9 +698,6 @@ dll_crt0_1 ()
 
   mainthread.init ("mainthread"); // For use in determining if signals
 				  //  should be blocked.
-
-  if (mypid)
-    set_myself ((pid_t) mypid, NULL);
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 
@@ -684,18 +723,20 @@ dll_crt0_1 ()
 
 	 NOTE: Don't do anything that involves the stack until you've completed
 	 this step. */
-      if (ciresrv->stacksize)
+      if (fork_info->stacksize)
 	{
-	  asm ("movl %0,%%fs:4" : : "r" (ciresrv->stackbottom));
-	  asm ("movl %0,%%fs:8" : : "r" (ciresrv->stacktop));
+	  asm ("movl %0,%%fs:4" : : "r" (fork_info->stackbottom));
+	  asm ("movl %0,%%fs:8" : : "r" (fork_info->stacktop));
 	}
 
-      longjmp (ciresrv->jmp, ciresrv->cygpid);
+      longjmp (fork_info->jmp, fork_info->cygpid);
     }
 
-  /* Initialize our process table entry. Don't use the parent info for
-     dynamically loaded case. */
-  pinfo_init ((dynamically_loaded) ? NULL : info);
+  cygheap_init ();	/* Initialize cygwin's heap */
+  cwd_init ();
+
+  /* Initialize our process table entry. */
+  pinfo_init (envp);
 
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
       old_title = title_buf;
@@ -740,26 +781,32 @@ dll_crt0_1 ()
   /* Set up standard fds in file descriptor table. */
   stdio_init ();
 
-  if (user_data->premain[0])
-    for (unsigned int i = 0; i < PREMAIN_LEN / 2; i++)
-      user_data->premain[i] (argc, argv);
-
-  /* Scan the command line and build argv.  Expand wildcards if not
-     called from another cygwin process. */
-  build_argv (line, argv, argc,
-	      NOTSTATE (myself, PID_CYGPARENT) && allow_glob);
-
-  /* Convert argv[0] to posix rules if it's currently blatantly
-     win32 style. */
-  if ((strchr (argv[0], ':')) || (strchr (argv[0], '\\')))
+  if (!__argc)
     {
-      char *new_argv0 = (char *) alloca (MAX_PATH);
-      cygwin_conv_to_posix_path (argv[0], new_argv0);
-      argv[0] = new_argv0;
+      /* Scan the command line and build argv.  Expand wildcards if not
+	 called from another cygwin process. */
+      build_argv (line, __argv, __argc,
+		  NOTSTATE (myself, PID_CYGPARENT) && allow_glob);
+
+      /* Convert argv[0] to posix rules if it's currently blatantly
+	 win32 style. */
+      if ((strchr (__argv[0], ':')) || (strchr (__argv[0], '\\')))
+	{
+	  char *new_argv0 = (char *) alloca (MAX_PATH);
+	  cygwin_conv_to_posix_path (__argv[0], new_argv0);
+	  char *p = strchr (new_argv0, '\0') - 4;
+	  if (p > new_argv0 && strcasematch (p, ".exe"))
+	    *p = '\0';
+	  __argv[0] = new_argv0;
+	}
     }
 
+  if (user_data->premain[0])
+    for (unsigned int i = 0; i < PREMAIN_LEN / 2; i++)
+      user_data->premain[i] (__argc, __argv);
+
   /* Set up __progname for getopt error call. */
-  __progname = argv[0];
+  __progname = __argv[0];
 
   cygwin_finished_initializing = 1;
   /* Call init of loaded dlls. */
@@ -768,7 +815,7 @@ dll_crt0_1 ()
   /* Execute any specified "premain" functions */
   if (user_data->premain[PREMAIN_LEN / 2])
     for (unsigned int i = PREMAIN_LEN / 2; i < PREMAIN_LEN; i++)
-      user_data->premain[i] (argc, argv);
+      user_data->premain[i] (__argc, __argv);
 
   debug_printf ("user_data->main %p", user_data->main);
 
@@ -785,8 +832,9 @@ dll_crt0_1 ()
 
   set_errno (0);
 
+  MALLOC_CHECK;
   if (user_data->main)
-    exit (user_data->main (argc, argv, *user_data->envptr));
+    exit (user_data->main (__argc, __argv, *user_data->envptr));
 }
 
 /* Wrap the real one, otherwise gdb gets confused about
@@ -798,16 +846,7 @@ dll_crt0_1 ()
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  char zeros[sizeof (ciresrv->zero)] = {0};
-  /* According to onno@stack.urc.tue.nl, the exception handler record must
-     be on the stack.  */
-  /* FIXME: Verify forked children get their exception handler set up ok. */
-  exception_list cygwin_except_entry;
-  /* Initialize SIGSEGV handling, etc...  Because the exception handler
-     references data in the shared area, this must be done after
-     shared_init. */
-  init_exceptions (&cygwin_except_entry);
-  do_global_ctors (&__CTOR_LIST__, 1);
+  char zeros[sizeof (fork_info->zero)] = {0};
 
   /* Set the os_being_run global. */
   set_os_type ();
@@ -833,62 +872,35 @@ _dll_crt0 ()
   DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
 		   &hMainThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
 
-  HANDLE h;
   GetStartupInfo (&si);
   if (si.cbReserved2 >= EXEC_MAGIC_SIZE &&
-      memcmp (ciresrv->zero, zeros, sizeof (zeros)) == 0)
+      memcmp (fork_info->zero, zeros, sizeof (zeros)) == 0)
     {
-      switch (ciresrv->type)
+      switch (fork_info->type)
 	{
 	  case PROC_EXEC:
 	  case PROC_SPAWN:
 	  case PROC_FORK:
 	  case PROC_FORK1:
 	    {
-	      HANDLE me = hMainProc;
-	      child_proc_info = ciresrv;
+	      child_proc_info = fork_info;
 	      mypid = child_proc_info->cygpid;
 	      cygwin_shared_h = child_proc_info->shared_h;
 	      console_shared_h = child_proc_info->console_h;
 
 	      /* We don't want subprocesses to inherit this */
-	      if (!dynamically_loaded)
-		{
-		  if (!DuplicateHandle (me, child_proc_info->parent_alive,
-					me, &parent_alive, 0, 0,
+	      if (dynamically_loaded)
+		parent_alive = NULL;
+	      else if (!DuplicateHandle (hMainProc, child_proc_info->parent_alive,
+					hMainProc, &parent_alive, 0, 0,
 					DUPLICATE_SAME_ACCESS
 					| DUPLICATE_CLOSE_SOURCE))
-		    system_printf ("parent_alive DuplicateHandle failed, %E");
-		}
-	      else if (parent_alive)
-		parent_alive = NULL;
+		  system_printf ("parent_alive DuplicateHandle failed, %E");
 
-	      switch (child_proc_info->type)
-		{
-		  case PROC_EXEC:
-		  case PROC_SPAWN:
-		    info = si.lpReserved2 + ciresrv->cb;
-		    if (child_proc_info->myself_pinfo &&
-			DuplicateHandle (hMainProc, child_proc_info->myself_pinfo,
-					 hMainProc, &h, 0, 0,
-					 DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-		      {
-			set_myself (mypid, h);
-			mypid = 0;
-		      }
-		    break;
-		  case PROC_FORK:
-		  case PROC_FORK1:
-		    user_data->forkee = child_proc_info->cygpid;
-		    user_data->heaptop = child_proc_info->heaptop;
-		    user_data->heapbase = child_proc_info->heapbase;
-		    user_data->heapptr = child_proc_info->heapptr;
-		    alloc_stack (ciresrv);		// may never return
-		}
 	      break;
 	    }
 	  default:
-	    if ((ciresrv->type & PROC_MAGIC_MASK) == PROC_MAGIC_GENERIC)
+	    if ((fork_info->type & PROC_MAGIC_MASK) == PROC_MAGIC_GENERIC)
 	      api_fatal ("conflicting versions of cygwin1.dll detected.  Use only the most recent version.\n");
 	}
     }
@@ -913,19 +925,6 @@ cygwin_dll_init ()
 {
   static char **envp;
   static int _fmode;
-  /* According to onno@stack.urc.tue.nl, the exception handler record must
-     be on the stack.  */
-  /* FIXME: Verify forked children get their exception handler set up ok. */
-  exception_list cygwin_except_entry;
-  /* Initialize SIGSEGV handling, etc...  Because the exception handler
-     references data in the shared area, this must be done after
-     shared_init. */
-  init_exceptions (&cygwin_except_entry);
-  do_global_ctors (&__CTOR_LIST__, 1);
-
-  /* Set the os_being_run global. */
-  set_os_type ();
-
   user_data->heapbase = user_data->heapptr = user_data->heaptop = NULL;
 
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),

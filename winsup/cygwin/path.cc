@@ -88,6 +88,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygheap.h"
 
 static int normalize_win32_path (const char *cwd, const char *src, char *dst);
 static char *getcwd_inner (char *buf, size_t ulen, int posix_p, int with_chroot);
@@ -150,15 +151,71 @@ struct symlink_info
 /* Cache getcwd value.  FIXME: We need a lock for these in order to
    support multiple threads.  */
 
-#ifdef _MT_SAFE
-#define cwd_win32  _reent_winsup()->_cwd_win32
-#define cwd_posix _reent_winsup()->_cwd_posix
-#define cwd_hash _reent_winsup()->_cwd_hash
-#else
-static char *cwd_win32;
-static char *cwd_posix;
-static unsigned long cwd_hash;
-#endif
+#define TMPCWD	((char *) alloca (MAX_PATH + 1))
+
+struct cwdstuff
+{
+  char *posix;
+  char *win32;
+  DWORD hash;
+  muto *lock;
+};
+
+cwdstuff cwd;
+
+char * __stdcall
+cwd_win32 (char *buf)
+{
+  char *ret;
+  cwd.lock->acquire ();
+  if (cwd.win32 == NULL)
+    ret = NULL;
+  else if (buf == NULL)
+    ret = cwd.win32;
+  else
+    ret = strcpy (buf, cwd.win32);
+  cwd.lock->release ();
+  return ret;
+}
+
+char * __stdcall
+cwd_posix (char *buf)
+{
+  char *ret;
+  cwd.lock->acquire ();
+  if (cwd.posix == NULL)
+    ret = NULL;
+  else if (buf == NULL)
+    ret = cwd.posix;
+  else
+    ret = strcpy (buf, cwd.posix);
+  cwd.lock->release ();
+  return ret;
+}
+
+DWORD __stdcall
+cwd_hash ()
+{
+  DWORD hashnow;
+  cwd.lock->acquire ();
+  hashnow = cwd.hash;
+  cwd.lock->release ();
+  return hashnow;
+}
+
+void __stdcall
+cwd_init ()
+{
+  cwd.lock = new_muto (FALSE, "cwd");
+}
+
+void __stdcall
+cwd_fixup_after_exec (char *win32, char *posix, DWORD hash)
+{
+  cwd.win32 = win32;
+  cwd.posix = posix;
+  cwd.hash = hash;
+}
 
 #define ischrootpath(path) \
 	(myself->rootlen && \
@@ -965,7 +1022,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
   if (strpbrk (src_path, ":\\") != NULL)
     {
       debug_printf ("%s already win32", src_path);
-      rc = normalize_win32_path (cwd_win32, src_path, dst);
+      rc = normalize_win32_path (cwd_win32 (TMPCWD), src_path, dst);
       if (rc)
 	{
 	  debug_printf ("normalize_win32_path failed, rc %d", rc);
@@ -1082,10 +1139,12 @@ fillin:
   /* Compute relative path if asked to and able to.  */
   unsigned cwdlen;
   cwdlen = 0;	/* avoid a (hopefully) bogus compiler warning */
+  char *cwd_win32_now;
+  cwd_win32_now = cwd_win32 (TMPCWD);
   if (win32_path == NULL)
     /* nothing to do */;
   else if (isrelpath &&
-	   path_prefix_p (cwd_win32, dst, cwdlen = strlen (cwd_win32)))
+	   path_prefix_p (cwd_win32_now, dst, cwdlen = strlen (cwd_win32_now)))
     {
       size_t n = strlen (dst);
       if (n < cwdlen)
@@ -1095,7 +1154,7 @@ fillin:
 	  if (n == cwdlen)
 	    dst += cwdlen;
 	  else
-	    dst += isdirsep (cwd_win32[cwdlen - 1]) ? cwdlen : cwdlen + 1;
+	    dst += isdirsep (cwd_win32_now[cwdlen - 1]) ? cwdlen : cwdlen + 1;
 
 	  memmove (win32_path, dst, strlen (dst) + 1);
 	  if (!*win32_path)
@@ -2453,10 +2512,9 @@ hash_path_name (unsigned long hash, const char *name)
 	 Otherwise the inodes same will differ depending on whether a file is
 	 referenced with an absolute value or relatively. */
 
-      if (*name != '\\' && (cwd_win32 == NULL ||
-			    get_cwd_win32 ()))
+      if (*name != '\\' && (cwd_win32 (TMPCWD) == NULL || get_cwd_win32 ()))
 	{
-	  hash = cwd_hash;
+	  hash = cwd_hash ();
 	  if (name[0] == '.' && name[1] == '\0')
 	    return hash;
 	  hash = hash_path_name (hash, "\\");
@@ -2481,18 +2539,20 @@ get_cwd_win32 ()
 {
   DWORD dlen, len;
 
+  cwd.lock->acquire ();
   for (dlen = 256; ; dlen *= 2)
     {
-      cwd_win32 = (char *) realloc (cwd_win32, dlen + 2);
-      if ((len = GetCurrentDirectoryA (dlen, cwd_win32)) < dlen)
+      cwd.win32 = (char *) crealloc (cwd.win32, dlen + 2);
+      if ((len = GetCurrentDirectoryA (dlen, cwd.win32)) < dlen)
 	break;
     }
 
   if (len == 0)
     __seterrno ();
   else
-    cwd_hash = hash_path_name (0, cwd_win32);
+    cwd.hash = hash_path_name (0, cwd.win32);
 
+  cwd.lock->release ();
   return len;
 }
 
@@ -2504,16 +2564,18 @@ getcwd_inner (char *buf, size_t ulen, int posix_p, int with_chroot)
   char *resbuf = NULL;
   size_t len = ulen;
 
-  if (cwd_win32 == NULL && !get_cwd_win32 ())
+  if (cwd_win32 (TMPCWD) == NULL && !get_cwd_win32 ())
     return NULL;
 
+  char *cwd_win32_now = cwd_win32 (TMPCWD);
+  char *cwd_posix_now = cwd_posix (TMPCWD);
   if (!posix_p)
     {
-      if (strlen (cwd_win32) >= len)
+      if (strlen (cwd_win32_now) >= len)
 	set_errno (ERANGE);
       else
 	{
-	  strcpy (buf, cwd_win32);
+	  strcpy (buf, cwd_win32_now);
 	  resbuf = buf;
 	}
 
@@ -2521,21 +2583,21 @@ getcwd_inner (char *buf, size_t ulen, int posix_p, int with_chroot)
 		      resbuf, resbuf ? resbuf : "", buf, len);
       return resbuf;
     }
-  else if (cwd_posix != NULL)
+  else if (cwd_posix_now != NULL)
     {
-      debug_printf("myself->root: %s, cwd_posix: %s", myself->root, cwd_posix);
-      if (strlen (cwd_posix) >= len)
+      debug_printf("myself->root: %s, cwd_posix: %s", myself->root, cwd_posix_now);
+      if (strlen (cwd_posix_now) >= len)
 	set_errno (ERANGE);
-      else if (with_chroot && ischrootpath(cwd_posix))
+      else if (with_chroot && ischrootpath(cwd_posix_now))
 	{
-	  strcpy (buf, cwd_posix + myself->rootlen);
+	  strcpy (buf, cwd_posix_now + myself->rootlen);
 	  if (!buf[0])
 	    strcpy (buf, "/");
 	  resbuf = buf;
 	}
       else
 	{
-	  strcpy (buf, cwd_posix);
+	  strcpy (buf, cwd_posix_now);
 	  resbuf = buf;
 	}
 
@@ -2549,30 +2611,29 @@ getcwd_inner (char *buf, size_t ulen, int posix_p, int with_chroot)
   char temp[MAX_PATH];
 
   /* Turn from Win32 style to our style.  */
-  cygwin_shared->mount.conv_to_posix_path (cwd_win32, temp, 0);
+  cygwin_shared->mount.conv_to_posix_path (cwd_win32_now, temp, 0);
 
   size_t tlen = strlen (temp);
 
   if (with_chroot && ischrootpath (temp))
     tlen -= myself->rootlen;
 
-  cwd_posix = (char *) realloc (
-				  cwd_posix, tlen + 1);
-  if (cwd_posix != NULL)
+  cwd.lock->acquire ();
+  cwd.posix = (char *) crealloc (cwd.posix, tlen + 1);
+  if (cwd.posix != NULL)
     if (with_chroot && ischrootpath (temp))
       {
-	strcpy (cwd_posix, temp + myself->rootlen);
+	strcpy (cwd.posix, temp + myself->rootlen);
 	if (!buf[0])
 	  strcpy (buf, "/");
       }
     else
-      strcpy (cwd_posix, temp);
+      strcpy (cwd.posix, temp);
+
+  cwd.lock->release ();
 
   if (tlen >= ulen)
-    {
-      /* len was too small */
-      set_errno (ERANGE);
-    }
+    set_errno (ERANGE);	/* len was too small */
   else
     {
       strcpy (buf, temp);
@@ -2643,12 +2704,13 @@ chdir (const char *dir)
     __seterrno ();
   else
     {
+      cwd.lock->acquire ();
       /* Store new cache information */
-      free (cwd_win32);
-      cwd_win32 = strdup (path);
+      cfree (cwd.win32);
+      cwd.win32 = cstrdup (path);
 
       char pathbuf[MAX_PATH];
-      (void) normalize_posix_path (cwd_posix, dir, pathbuf);
+      (void) normalize_posix_path (cwd.posix, dir, pathbuf);
       /* Look for trailing path component consisting entirely of dots.  This
 	 is needed only in case of chdir since Windows simply ignores count
 	 of dots > 2 here instead of returning an error code.  Counts of dots
@@ -2656,11 +2718,12 @@ chdir (const char *dir)
       char *last_slash = strrchr (pathbuf, '/');
       if (last_slash > pathbuf && strspn (last_slash + 1, ".") == strlen (last_slash + 1))
 	*last_slash = '\0';
-      free (cwd_posix);
-      cwd_posix = strdup (pathbuf);
+      cfree (cwd.posix);
+      cwd.posix = cstrdup (pathbuf);
+      cwd.lock->release ();
     }
 
-  syscall_printf ("%d = chdir() cwd_posix '%s' native '%s'", res, cwd_posix, native_dir);
+  syscall_printf ("%d = chdir() cwd.posix '%s' native '%s'", res, cwd.posix, native_dir);
   return res;
 }
 

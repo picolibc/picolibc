@@ -14,8 +14,9 @@ enum
   PROC_FORK = PROC_MAGIC + 1,
   PROC_EXEC = PROC_MAGIC + 2,
   PROC_SPAWN = PROC_MAGIC + 3,
-  PROC_FORK1 = PROC_MAGIC + 4	// Newer versions provide stack
+  PROC_FORK1 = PROC_MAGIC + 4,	// Newer versions provide stack
 				// location information
+  PROC_SPAWN1 = PROC_MAGIC + 5
 };
 
 #define PROC_MAGIC_MASK 0xff00f000
@@ -34,12 +35,6 @@ public:
   HANDLE shared_h;
   HANDLE console_h;
   HANDLE parent_alive;	// handle of thread used to track children
-  HANDLE myself_pinfo;
-  ~child_info ()
-  {
-    if (myself_pinfo)
-      CloseHandle (myself_pinfo);
-  }
 };
 
 class child_info_fork: public child_info
@@ -55,9 +50,53 @@ public:
   void *stackbottom;	// location of bottom of parent stack
 };
 
+class fhandler_base;
+
+class cygheap_exec_info
+{
+public:
+  char *old_title;
+  fhandler_base **fds;
+  size_t nfds;
+  int argc;
+  char **argv;
+  char **environ;
+  HANDLE myself_pinfo;
+  char *cwd_posix;
+  char *cwd_win32;
+  DWORD cwd_hash;
+};
+
+class child_info_spawn: public child_info
+{
+public:
+  HANDLE parent;
+  void *cygheap;
+  void *cygheap_max;
+  cygheap_exec_info *moreinfo;
+
+  child_info_spawn (): parent (NULL), cygheap (NULL),
+    cygheap_max (NULL), moreinfo (NULL) {}
+  ~child_info_spawn ()
+  {
+    if (parent)
+      CloseHandle (parent);
+    if (moreinfo)
+      {
+	if (moreinfo->old_title)
+	  cfree (moreinfo->old_title);
+	if (moreinfo->environ)
+	  {
+	    for (char **e = moreinfo->environ; *e; e++)
+	      cfree (*e);
+	    cfree (moreinfo->environ);
+	  }
+	CloseHandle (moreinfo->myself_pinfo);
+	cfree (moreinfo);
+      }
+  }
+};
+
 void __stdcall init_child_info (DWORD, child_info *, int, HANDLE);
 
 extern child_info_fork *child_proc_info;
-
-/* non-NULL if this process is a child of a cygwin process */
-extern HANDLE parent_alive;

@@ -196,7 +196,7 @@ MTinterface::Find (void *_value, int (*comp) (void *, void *), register int &_in
     {
       current = _list->items[_index];
       if (current->used && comp (current, _value))
-        break;
+	break;
       current = NULL;
     }
   return current;
@@ -211,7 +211,7 @@ MTinterface::Find (MTitem & _item, MTList * _list)
     {
       current = _list->items[_index];
       if (current->used && current == &_item)
-        break;
+	break;
     }
   return (_index == _list->index ? -1 : _index);
 };
@@ -481,7 +481,7 @@ thread_init_wrapper (void *_arg)
   struct _reent local_clib;
 
   struct sigaction _sigs[NSIG];
-  sigset_t _sig_mask;           /* one set for everything to ignore. */
+  sigset_t _sig_mask;		/* one set for everything to ignore. */
   LONG _sigtodo[NSIG + __SIGOFFSET];
 
 // setup signal structures
@@ -520,7 +520,7 @@ thread_init_wrapper (void *_arg)
 
 // FIX ME : cleanup code
 
-//  thread->used = false;         // release thread entry
+//  thread->used = false;	// release thread entry
     thread->return_ptr = ret;
   ExitThread (0);
 }
@@ -595,7 +595,7 @@ __pthread_join (pthread_t * thread, void **return_val)
   if (item->joinable == 'N')
   {
      if (return_val)
-        *return_val = NULL;
+	*return_val = NULL;
      return EINVAL;
   }
   else
@@ -603,7 +603,7 @@ __pthread_join (pthread_t * thread, void **return_val)
      item->joinable = 'N';
      WaitForSingleObject ((HANDLE)*thread, INFINITE);
      if (return_val)
-        *return_val = item->return_ptr;
+	*return_val = item->return_ptr;
   }/* End if*/
 
   return 0;
@@ -651,7 +651,7 @@ __pthread_continue (pthread_t * thread)
      return ESRCH;
 
   if (item->suspended == true)
-        ResumeThread ((HANDLE)*thread);
+	ResumeThread ((HANDLE)*thread);
   item->suspended = false;
 
   return 0;
@@ -994,4 +994,4 @@ extern "C"
   }
 }
 
-#endif                          // MT_SAFE
+#endif // MT_SAFE

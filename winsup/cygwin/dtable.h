@@ -30,8 +30,7 @@ public:
   void release (int fd);
   void init_std_file_from_handle (int fd, HANDLE handle, DWORD access, const char *name);
   int dup2 (int oldfd, int newfd);
-  int linearize_fd_array (unsigned char *buf, int buflen);
-  LPBYTE de_linearize_fd_array (LPBYTE buf);
+  void fixup_after_exec (HANDLE, size_t, fhandler_base **);
   fhandler_base *operator [](int fd) { return fds[fd]; }
   select_record *select_read (int fd, select_record *s);
   select_record *select_write (int fd, select_record *s);

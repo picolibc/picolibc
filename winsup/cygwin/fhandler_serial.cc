@@ -503,7 +503,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
     state.Parity = NOPARITY;
 
   state.fBinary = TRUE;     /* Binary transfer */
-  state.EofChar = 0;        /* No end-of-data in binary mode */
+  state.EofChar = 0;	    /* No end-of-data in binary mode */
   state.fNull = FALSE;      /* Don't discard nulls in binary mode */
 
   /* -------------- Parity errors ------------------ */
@@ -867,14 +867,12 @@ fhandler_serial::fixup_after_fork (HANDLE parent)
   debug_printf ("io_status.hEvent %p", io_status.hEvent);
 }
 
-int
-fhandler_serial::de_linearize (const char *buf, const char *unix_name,
-			       const char *win32_name)
+void
+fhandler_serial::fixup_after_exec (HANDLE)
 {
-  int res = fhandler_base::de_linearize (buf, unix_name, win32_name);
   overlapped_setup ();
   debug_printf ("io_status.hEvent %p", io_status.hEvent);
-  return res;
+  return;
 }
 
 int

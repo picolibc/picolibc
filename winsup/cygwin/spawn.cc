@@ -19,7 +19,6 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
-#include <paths.h>
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
@@ -28,9 +27,8 @@ details. */
 #include "sigproc.h"
 #include "child_info.h"
 #include "pinfo.h"
+#include "cygheap.h"
 #include "perthread.h"
-
-extern BOOL allow_ntsec;
 
 #define LINE_BUF_CHUNK (MAX_PATH * 2)
 
@@ -171,7 +169,6 @@ handle (int n, int direction)
 */
 
 HANDLE NO_COPY hExeced = NULL;
-DWORD NO_COPY exec_exit = 0;
 
 int
 iscmd (const char *argv0, const char *what)
@@ -242,19 +239,66 @@ exec_fixup_after_fork ()
   hexec_proc = NULL;
 }
 
+struct av
+{
+  int argc;
+  int calloced;
+private:
+  char **argv;
+public:
+  av (int ac, const char * const *av) : argc (ac), calloced (0)
+  {
+    argv = (char **) cmalloc (HEAP_ARGV, (argc + 1) * sizeof (char *));
+    memcpy (argv, av, (argc + 1) * sizeof (char *));
+  }
+  ~av ()
+  {
+    for (int i = 0; i < calloced; i++)
+      cfree (argv[i]);
+    cfree (argv);
+  }
+  int unshift (const char *what, int conv = 0);
+  operator char **() {return argv;}
+};
+
+int
+av::unshift (const char *what, int conv)
+{
+  char **av;
+  av = (char **) crealloc (argv, (argc + 2) * sizeof (char *));
+  if (!av)
+    return 0;
+
+  argv = av;
+  memmove (argv + 1, argv, (argc + 1) * sizeof (char *));
+  char buf[MAX_PATH + 1];
+  if (conv)
+    {
+      cygwin_conv_to_posix_path (what, buf);
+      char *p = strchr (buf, '\0') - 4;
+      if (p > buf && strcasematch (p, ".exe"))
+	*p = '\0';
+      what = buf;
+    }
+  *argv = cstrdup (what);
+  argc++;
+  calloced++;
+  return 1;
+}
+
 static int __stdcall
 spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	    const char *const envp[], int mode)
 {
   int i;
   BOOL rc;
-  int argc;
   pid_t cygpid;
 
   hExeced = NULL;
 
   MALLOC_CHECK;
 
+// if (strstr (prog_arg, "dopath")) try_to_debug ();
   if (prog_arg == NULL)
     {
       syscall_printf ("prog_arg is NULL");
@@ -271,46 +315,69 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       return (-1);
     }
 
-  /* CreateProcess takes one long string that is the command line (sigh).
-     We need to quote any argument that has whitespace or embedded "'s.  */
-
-  for (argc = 0; argv[argc]; argc++)
-    /* nothing */;
-
-  char *real_path;
-  path_conv real_path_buf;
+  path_conv real_path;
 
   linebuf one_line;
 
-  if (argc == 3 && argv[1][0] == '/' && argv[1][1] == 'c' &&
+  STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
+
+  child_info_spawn ciresrv;
+  si.lpReserved2 = (LPBYTE) &ciresrv;
+  si.cbReserved2 = sizeof (ciresrv);
+
+  HANDLE spr = NULL;
+  DWORD chtype;
+  if (mode != _P_OVERLAY && mode != _P_VFORK)
+    chtype = PROC_SPAWN;
+  else
+    {
+      spr = CreateEvent(&sec_all, TRUE, FALSE, NULL);
+      ProtectHandle (spr);
+      chtype = PROC_EXEC;
+    }
+
+  init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1, spr);
+  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &ciresrv.parent, 0, 1,
+			DUPLICATE_SAME_ACCESS))
+     {
+       system_printf ("couldn't create handle to myself for child, %E");
+       return -1;
+     }
+
+  ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_EXEC, 1, sizeof (cygheap_exec_info));
+  ciresrv.moreinfo->old_title = old_title ? cstrdup (old_title) : NULL;
+  ciresrv.moreinfo->fds = fdtab;
+  ciresrv.moreinfo->nfds = fdtab.size;
+
+  /* CreateProcess takes one long string that is the command line (sigh).
+     We need to quote any argument that has whitespace or embedded "'s.  */
+
+  int ac;
+  for (ac = 0; argv[ac]; ac++)
+    /* nothing */;
+
+  av newargv (ac, argv);
+
+  if (ac == 3 && argv[1][0] == '/' && argv[1][1] == 'c' &&
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
     {
       one_line.add (argv[0]);
       one_line.add (" ");
       one_line.add (argv[1]);
       one_line.add (" ");
-      real_path = NULL;
       one_line.add (argv[2]);
-      strcpy (real_path_buf, argv[0]);
+      strcpy (real_path, argv[0]);
       goto skip_arg_parsing;
     }
 
-  real_path = real_path_buf;
-
-  const char *saved_prog_arg;
-  const char *newargv0, **firstarg;
   const char *ext;
-
-  if ((ext = perhaps_suffix (prog_arg, real_path_buf)) == NULL)
+  if ((ext = perhaps_suffix (prog_arg, real_path)) == NULL)
     {
       set_errno (ENOENT);
       return -1;
     }
 
   MALLOC_CHECK;
-  saved_prog_arg = prog_arg;
-  newargv0 = argv[0];
-  firstarg = &newargv0;
 
   /* If the file name ends in either .exe, .com, .bat, or .cmd we assume
      that it is NOT a script file */
@@ -351,8 +418,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 
       if (buf[0] != '#' || buf[1] != '!')
 	{
-	  strcpy (buf, "sh");         /* shell script without magic */
-	  pgm = buf;
+	  pgm = (char *) "/bin/sh";
 	  ptr = buf + 2;
 	  arg1 = NULL;
 	}
@@ -379,87 +445,84 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 		ptr = newptr - 1;
 	      }
 
-
 	  *ptr = '\0';
 	}
-
-      char buf2[MAX_PATH + 1];
 
       /* pointers:
        * pgm	interpreter name
        * arg1	optional string
        * ptr	end of string
        */
+      if (arg1)
+	newargv.unshift (arg1);
 
-      if (!arg1)
-	one_line.prepend (" ", 1);
-      else
-	{
-	  one_line.prepend ("\" ", 2);
-	  one_line.prepend (arg1, strlen (arg1));
-	  one_line.prepend (" \"", 2);
-	}
-
-      find_exec (pgm, real_path_buf, "PATH=", 0, &ext);
-      cygwin_conv_to_posix_path (real_path, buf2);
-      one_line.prepend (buf2, strlen (buf2));
-
-      /* If script had absolute path, add it to script name now!
-       * This is necessary if script has been found via PATH.
-       * For example, /usr/local/bin/tkman started as "tkman":
-       * #!/usr/local/bin/wish -f
-       * ...
-       * We should run /usr/local/bin/wish -f /usr/local/bin/tkman,
-       * but not /usr/local/bin/wish -f tkman!
-       * We don't modify anything, if script has qulified path.
-       */
-      if (firstarg)
-	*firstarg = saved_prog_arg;
-
-      debug_printf ("prog_arg '%s', copy '%s'", prog_arg, one_line.buf);
-      firstarg = NULL;
+      find_exec (pgm, real_path, "PATH=", 0, &ext);
+      newargv.unshift (real_path, 1);
     }
 
-  for (; *argv; argv++)
-    {
-      char *p = NULL;
-      const char *a = newargv0 ?: *argv;
-
-      MALLOC_CHECK;
-
-      newargv0 = NULL;
-      int len = strlen (a);
-      if (len != 0 && !strpbrk (a, " \t\n\r\""))
-	one_line.add (a, len);
-      else
-	{
-	  one_line.add ("\"", 1);
-	  for (; (p = strpbrk (a, "\"\\")); a = ++p)
-	    {
-	      one_line.add (a, p - a);
-	      if (*p == '\\' || *p == '"')
-		one_line.add ("\\", 1);
-	      one_line.add (p, 1);
-	    }
-	  if (*a)
-	    one_line.add (a);
-	  one_line.add ("\"", 1);
-	}
-      MALLOC_CHECK;
-      one_line.add (" ", 1);
-      MALLOC_CHECK;
-    }
-
-  MALLOC_CHECK;
-  if (one_line.ix)
-    one_line.buf[one_line.ix - 1] = '\0';
+  if (real_path.iscygexec ())
+    for (int i = newargv.calloced; i < newargv.argc; i++)
+      newargv[i] = cstrdup (newargv[i]);
   else
-    one_line.add ("", 1);
-  MALLOC_CHECK;
+    {
+      for (int i = 0; i < newargv.argc; i++)
+	{
+	  char *p = NULL;
+	  const char *a;
+
+	  if (i >= newargv.calloced)
+	    newargv[i] = cstrdup (newargv[i]);
+	  a = newargv[i];
+	  int len = strlen (a);
+	  if (len != 0 && !strpbrk (a, " \t\n\r\""))
+	    one_line.add (a, len);
+	  else
+	    {
+	      one_line.add ("\"", 1);
+	      for (; (p = strpbrk (a, "\"\\")); a = ++p)
+		{
+		  one_line.add (a, p - a);
+		  if (*p == '\\' || *p == '"')
+		    one_line.add ("\\", 1);
+		  one_line.add (p, 1);
+		}
+	      if (*a)
+		one_line.add (a);
+	      one_line.add ("\"", 1);
+	    }
+	  MALLOC_CHECK;
+	  one_line.add (" ", 1);
+	  MALLOC_CHECK;
+	}
+
+      MALLOC_CHECK;
+      if (one_line.ix)
+	one_line.buf[one_line.ix - 1] = '\0';
+      else
+	one_line.add ("", 1);
+      MALLOC_CHECK;
+    }
+  ciresrv.moreinfo->argc = newargv.argc;
+  ciresrv.moreinfo->argv = newargv;
+
+  /* FIXME: Should lock cwd access here. */
+  ciresrv.moreinfo->cwd_posix = cwd_posix (NULL);
+  ciresrv.moreinfo->cwd_win32 = cwd_win32 (NULL);
+  ciresrv.moreinfo->cwd_hash = cwd_hash ();
+
+  ciresrv.moreinfo->environ = (char **) cmalloc (HEAP_ARGV, envsize (envp, 1));
+  char **c;
+  const char * const *e;
+  for (c = ciresrv.moreinfo->environ, e = envp; *e; )
+    *c++ = cstrdup (*e++);
+  *c = NULL;
+  if (mode != _P_OVERLAY ||
+      !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc, &ciresrv.moreinfo->myself_pinfo, 0,
+			TRUE, DUPLICATE_SAME_ACCESS))
+    ciresrv.moreinfo->myself_pinfo = NULL;
 
 skip_arg_parsing:
   PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
-  STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
   si.lpReserved = NULL;
   si.lpDesktop = NULL;
   si.dwFlags = STARTF_USESTDHANDLES;
@@ -470,53 +533,7 @@ skip_arg_parsing:
 
   /* Pass fd table to a child */
 
-  MALLOC_CHECK;
-  int len = fdtab.linearize_fd_array (0, 0);
-  MALLOC_CHECK;
-  if (len == -1)
-    {
-      system_printf ("FATAL error in linearize_fd_array");
-      return -1;
-    }
-  int titlelen = 1 + (old_title && mode == _P_OVERLAY ? strlen (old_title) : 0);
-  si.cbReserved2 = len + titlelen + sizeof(child_info);
-  si.lpReserved2 = (LPBYTE) alloca (si.cbReserved2);
-
-# define ciresrv ((child_info *)si.lpReserved2)
-  HANDLE spr = NULL;
-  DWORD chtype;
-  if (mode != _P_OVERLAY)
-    chtype = PROC_SPAWN;
-  else
-    {
-      spr = CreateEvent(&sec_all, TRUE, FALSE, NULL);
-      ProtectHandle (spr);
-      chtype = PROC_EXEC;
-    }
-
-  init_child_info (chtype, ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1, spr);
-  if (mode != _P_OVERLAY ||
-      !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
-			&ciresrv->myself_pinfo, 0,
-			TRUE, DUPLICATE_SAME_ACCESS))
-   ciresrv->myself_pinfo = NULL;
-
-  LPBYTE resrv = si.lpReserved2 + sizeof *ciresrv;
-
-  if (fdtab.linearize_fd_array (resrv, len) < 0)
-    {
-      system_printf ("FATAL error in second linearize_fd_array");
-      return -1;
-    }
-
-  if (titlelen > 1)
-    strcpy ((char *) resrv + len, old_title);
-  else
-    resrv[len] = '\0';
-
-  /* We print the translated program and arguments here so the user can see
-     what was done to it.  */
-  syscall_printf ("spawn_guts (%s, %.132s)", real_path, one_line.buf);
+  syscall_printf ("spawn_guts (%s, %.132s)", (char *) real_path, one_line.buf);
 
   int flags = CREATE_DEFAULT_ERROR_MODE | CREATE_SUSPENDED |
 	      GetPriorityClass (hMainProc);
@@ -525,7 +542,14 @@ skip_arg_parsing:
     flags |= DETACHED_PROCESS;
 
   /* Build windows style environment list */
-  char *envblock = winenv (envp, 0);
+  char *envblock;
+  if (real_path.iscygexec ())
+    envblock = NULL;
+  else
+    envblock = winenv (envp, 0);
+
+  ciresrv.cygheap = cygheap;
+  ciresrv.cygheap_max = cygheap_max;
 
   /* Preallocated buffer for `sec_user' call */
   char sa_buf[1024];
@@ -533,9 +557,12 @@ skip_arg_parsing:
   if (!hToken && myself->token != INVALID_HANDLE_VALUE)
     hToken = myself->token;
 
+  /* FIXME:  This leaves a handle to the process open so that the pid is not
+     duplicated.  However, if a process execs another process two handles are
+     left open, which is unnecessary. */
   if (mode == _P_OVERLAY && !hexec_proc &&
       !DuplicateHandle (hMainProc, hMainProc, hMainProc, &hexec_proc, 0,
-		        TRUE, DUPLICATE_SAME_ACCESS))
+			TRUE, DUPLICATE_SAME_ACCESS))
     system_printf ("couldn't save current process handle %p, %E", hMainProc);
 
   if (hToken)
@@ -561,22 +588,22 @@ skip_arg_parsing:
       PSID sid = NULL;
       DWORD ret_len;
       if (GetTokenInformation (hToken, TokenUser,
-                               (LPVOID) &tu, sizeof tu,
-                               &ret_len))
-        sid = ((TOKEN_USER *) &tu)->User.Sid;
+			       (LPVOID) &tu, sizeof tu,
+			       &ret_len))
+	sid = ((TOKEN_USER *) &tu)->User.Sid;
       else
-        system_printf ("GetTokenInformation: %E");
+	system_printf ("GetTokenInformation: %E");
 
       /* Retrieve security attributes before setting psid to NULL
-         since it's value is needed by `sec_user'. */
+	 since it's value is needed by `sec_user'. */
       PSECURITY_ATTRIBUTES sec_attribs = allow_ntsec && sid
-                                         ? sec_user (sa_buf, sid)
-                                         : &sec_all_nih;
+					 ? sec_user (sa_buf, sid)
+					 : &sec_all_nih;
 
       /* Remove impersonation */
       uid_t uid = geteuid();
       if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
-        seteuid (myself->orig_uid);
+	seteuid (myself->orig_uid);
 
       /* Load users registry hive. */
       load_registry_hive (sid);
@@ -584,8 +611,8 @@ skip_arg_parsing:
       rc = CreateProcessAsUser (hToken,
 		       real_path,	/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
-                       sec_attribs,     /* process security attrs */
-                       sec_attribs,     /* thread security attrs */
+		       sec_attribs,     /* process security attrs */
+		       sec_attribs,     /* thread security attrs */
 		       TRUE,	/* inherit handles from parent */
 		       flags,
 		       envblock,/* environment */
@@ -593,18 +620,18 @@ skip_arg_parsing:
 		       &si,
 		       &pi);
       /* Restore impersonation. In case of _P_OVERLAY this isn't
-         allowed since it would overwrite child data. */
-      if (mode != _P_OVERLAY
-          && myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
-        seteuid (uid);
+	 allowed since it would overwrite child data. */
+      if (mode != _P_OVERLAY && mode != _P_VFORK
+	  && myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+	seteuid (uid);
     }
   else
     rc = CreateProcessA (real_path,	/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
-                                        /* process security attrs */
-                       allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
-                                        /* thread security attrs */
-                       allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
+					/* process security attrs */
+		       allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
+					/* thread security attrs */
+		       allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
 		       TRUE,	/* inherit handles from parent */
 		       flags,
 		       envblock,/* environment */
@@ -613,17 +640,13 @@ skip_arg_parsing:
 		       &pi);
 
   MALLOC_CHECK;
-  free (envblock);
+  if (envblock)
+    free (envblock);
   MALLOC_CHECK;
-
-  if (ciresrv->myself_pinfo)
-    CloseHandle (ciresrv->myself_pinfo);
 
   /* Set errno now so that debugging messages from it appear before our
      final debugging message [this is a general rule for debugging
      messages].  */
-  if (!rc)
-
   if (!rc)
     {
       if (spr)
@@ -651,8 +674,8 @@ skip_arg_parsing:
 
   if (mode == _P_OVERLAY)
     {
-      close_all_files ();
-      strcpy (myself->progname, real_path_buf);
+      strcpy (myself->progname, real_path);
+      // close_all_files ();
       proc_terminate ();
       hExeced = pi.hProcess;
 
@@ -676,8 +699,6 @@ skip_arg_parsing:
 	}
       child->username[0] = '\0';
       child->progname[0] = '\0';
-      // CGF FIXME -- need to do this? strcpy (child->progname, path);
-      // CGF FIXME -- need to do this? memcpy (child->username, myself->username, MAX_USER_NAME);
       child->ppid = myself->pid;
       child->uid = myself->uid;
       child->gid = myself->gid;
@@ -723,7 +744,7 @@ skip_arg_parsing:
 
   DWORD res;
 
-  if (mode == _P_OVERLAY)
+  if (mode == _P_OVERLAY || mode == _P_VFORK)
     {
       BOOL exited;
 
@@ -732,54 +753,45 @@ skip_arg_parsing:
 
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST);
       res = 0;
-      DWORD timeout = INFINITE;
-      exec_exit = 1;
       exited = FALSE;
       MALLOC_CHECK;
       for (int i = 0; i < 100; i++)
 	{
-	  switch (WaitForMultipleObjects (nwait, waitbuf, FALSE, timeout))
+	  switch (WaitForMultipleObjects (nwait, waitbuf, FALSE, INFINITE))
 	    {
-	    case WAIT_TIMEOUT:
-	      syscall_printf ("WFMO timed out after signal");
-	      if (WaitForSingleObject (pi.hProcess, 0) != WAIT_OBJECT_0)
-		{
-		  sigproc_printf ("subprocess still alive after signal");
-		  res = exec_exit;
-		}
-	      else
-		{
-		  sigproc_printf ("subprocess exited after signal");
 	    case WAIT_OBJECT_0:
-		  sigproc_printf ("subprocess exited");
-		  if (!GetExitCodeProcess (pi.hProcess, &res))
-		    res = exec_exit;
-		  exited = TRUE;
-		 }
-	      if (nwait > 2)
-		if (WaitForSingleObject (spr, 1) == WAIT_OBJECT_0)
-		  res |= EXIT_REPARENTING;
-		else if (!(res & EXIT_REPARENTING))
-		  {
-		    MALLOC_CHECK;
-		    close_all_files ();
-		    MALLOC_CHECK;
-		  }
+	      sigproc_printf ("subprocess exited");
+	      if (!GetExitCodeProcess (pi.hProcess, &res))
+		res = 1;
+	      exited = TRUE;
+
+	      if (nwait <= 2 || mode != _P_OVERLAY)
+		/* nothing to do */;
+	      else if (WaitForSingleObject (spr, 1) == WAIT_OBJECT_0)
+		goto reparent;
+	      else if (!(res & EXIT_REPARENTING))
+		{
+		  MALLOC_CHECK;
+		  close_all_files ();
+		  MALLOC_CHECK;
+		}
 	      break;
 	    case WAIT_OBJECT_0 + 1:
 	      sigproc_printf ("signal arrived");
 	      ResetEvent (signal_arrived);
 	      continue;
 	    case WAIT_OBJECT_0 + 2:
-	      res = EXIT_REPARENTING;
-	      MALLOC_CHECK;
-	      ForceCloseHandle (spr);
-	      MALLOC_CHECK;
-	      if (!parent_alive)
+	      if (mode == _P_OVERLAY)
 		{
-		  nwait = 1;
-		  sigproc_terminate ();
-		  continue;
+	      reparent:
+		  res |= EXIT_REPARENTING;
+		  close_all_files ();
+		  if (!parent_alive)
+		    {
+		      nwait = 1;
+		      sigproc_terminate ();
+		      continue;
+		    }
 		}
 	      break;
 	    case WAIT_FAILED:
@@ -796,8 +808,7 @@ skip_arg_parsing:
 	  break;
 	}
 
-      if (nwait > 2)
-	ForceCloseHandle (spr);
+      ForceCloseHandle (spr);
 
       sigproc_printf ("res = %x", res);
 
@@ -813,18 +824,19 @@ skip_arg_parsing:
 	    /* nothing */;
 	  else
 	    {
+	      int rc;
 	      HANDLE hP = OpenProcess (PROCESS_ALL_ACCESS, FALSE,
 				       parent->dwProcessId);
 	      sigproc_printf ("parent handle %p, pid %d", hP, parent->dwProcessId);
 	      if (hP == NULL && GetLastError () == ERROR_INVALID_PARAMETER)
-		res = 1;
+		rc = 1;
 	      else if (hP)
 		{
 		  ProtectHandle (hP);
-		  res = DuplicateHandle (hMainProc, pi.hProcess, hP,
-					 &myself->hProcess, 0, FALSE,
-					 DUPLICATE_SAME_ACCESS);
-		  sigproc_printf ("Dup hP %d", res);
+		  rc = DuplicateHandle (hMainProc, pi.hProcess, hP,
+					&myself->hProcess, 0, FALSE,
+					DUPLICATE_SAME_ACCESS);
+		  sigproc_printf ("Dup hP %d", rc);
 		  ForceCloseHandle (hP);
 		}
 	      if (!res)
@@ -837,7 +849,6 @@ skip_arg_parsing:
 		  system_printf ("myself->hProcess %x", myself->hProcess);
 		}
 	    }
-	  res = EXIT_REPARENTING;
 	  ForceCloseHandle1 (hExeced, childhProc);
 	  hExeced = INVALID_HANDLE_VALUE;
 	}
@@ -848,15 +859,26 @@ skip_arg_parsing:
 	}
 
       MALLOC_CHECK;
-      do_exit (res | EXIT_NOCLOSEALL);
+      if (mode == _P_OVERLAY)
+	do_exit (res | EXIT_NOCLOSEALL);
     }
 
-  if (mode == _P_WAIT)
-    waitpid (cygpid, (int *) &res, 0);
-  else if (mode == _P_DETACH)
-    res = 0;	/* Lose all memory of this child. */
-  else if ((mode == _P_NOWAIT) || (mode == _P_NOWAITO))
-    res = cygpid;
+  switch (mode)
+    {
+    case _P_WAIT:
+      waitpid (cygpid, (int *) &res, 0);
+      break;
+    case _P_DETACH:
+      res = 0;	/* Lose all memory of this child. */
+      break;
+    case _P_NOWAIT:
+    case _P_NOWAITO:
+    case _P_VFORK:
+      res = cygpid;
+      break;
+    default:
+      break;
+    }
 
   return (int) res;
 }
@@ -889,29 +911,30 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
 
   switch (mode)
     {
-      case _P_OVERLAY:
-	/* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
-	/* Just act as an exec if _P_OVERLAY set. */
-	spawn_guts (hToken, path, argv, envp, mode);
-	/* Errno should be set by spawn_guts.  */
-	ret = -1;
-	break;
-      case _P_NOWAIT:
-      case _P_NOWAITO:
-      case _P_WAIT:
-      case _P_DETACH:
-	subproc_init ();
-	ret = spawn_guts (hToken, path, argv, envp, mode);
-	if (vf && ret > 0)
-	  {
-	    vf->pid = ret;
-	    longjmp (vf->j, 1);
-	  }
-	break;
-      default:
-	set_errno (EINVAL);
-	ret = -1;
-	break;
+    case _P_OVERLAY:
+      /* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
+      /* Just act as an exec if _P_OVERLAY set. */
+      spawn_guts (hToken, path, argv, envp, mode);
+      /* Errno should be set by spawn_guts.  */
+      ret = -1;
+      break;
+    case _P_VFORK:
+    case _P_NOWAIT:
+    case _P_NOWAITO:
+    case _P_WAIT:
+    case _P_DETACH:
+      subproc_init ();
+      ret = spawn_guts (hToken, path, argv, envp, 0);
+      if (vf && ret > 0)
+	{
+	  vf->pid = ret;
+	  longjmp (vf->j, 1);
+	}
+      break;
+    default:
+      set_errno (EINVAL);
+      ret = -1;
+      break;
     }
   return ret;
 }

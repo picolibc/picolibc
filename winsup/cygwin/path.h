@@ -110,6 +110,11 @@ int __stdcall check_null_empty_path (const char *name);
 
 const char * __stdcall find_exec (const char *name, path_conv& buf, const char *winenv = "PATH=",
 			int null_if_notfound = 0, const char **known_suffix = NULL);
+void __stdcall cwd_init ();
+char * __stdcall cwd_posix (char *);
+char * __stdcall cwd_win32 (char *);
+DWORD __stdcall cwd_hash ();
+void __stdcall cwd_fixup_after_exec (char *, char *, DWORD);
 
 /* Common macros for checking for invalid path names */
 

@@ -75,7 +75,7 @@ opendir (const char *dirname)
     }
 
   if (stat (myself->rootlen ? dirname : real_dirname.get_win32 (),
-            &statbuf) == -1)
+	    &statbuf) == -1)
     goto failed;
 
   if (!(statbuf.st_mode & S_IFDIR))
@@ -296,7 +296,7 @@ mkdir (const char *dir, mode_t mode)
   if (CreateDirectoryA (real_dir.get_win32 (), 0))
     {
       set_file_attribute (real_dir.has_acls (), real_dir.get_win32 (),
-                          S_IFDIR | ((mode & 0777) & ~myself->umask));
+			  S_IFDIR | ((mode & 0777) & ~myself->umask));
       res = 0;
     }
   else
@@ -324,18 +324,18 @@ rmdir (const char *dir)
   if (RemoveDirectoryA (real_dir.get_win32 ()))
     {
       /* RemoveDirectory on a samba drive doesn't return an error if the
-         directory can't be removed because it's not empty. Checking for
-         existence afterwards keeps us informed about success. */
+	 directory can't be removed because it's not empty. Checking for
+	 existence afterwards keeps us informed about success. */
       if (GetFileAttributesA (real_dir.get_win32 ()) != (DWORD) -1)
-        set_errno (ENOTEMPTY);
+	set_errno (ENOTEMPTY);
       else
-        res = 0;
+	res = 0;
     }
   else if (GetLastError() == ERROR_ACCESS_DENIED)
     {
       /* Under Windows 9X or on a samba share, ERROR_ACCESS_DENIED is
-         returned if you try to remove a file. On 9X the same error is
-         returned if you try to remove a non-empty directory. */
+	 returned if you try to remove a file. On 9X the same error is
+	 returned if you try to remove a non-empty directory. */
      if (real_dir.file_attributes () != (DWORD) -1 &&
 	 !(real_dir.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
        set_errno (ENOTDIR);

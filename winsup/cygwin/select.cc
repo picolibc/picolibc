@@ -841,10 +841,10 @@ peek_serial (select_record *s, int)
     {
     case WAIT_OBJECT_0:
       if (!ClearCommError (h, &ev, &st))
-        {
-          debug_printf ("ClearCommError");
-          goto err;
-        }
+	{
+	  debug_printf ("ClearCommError");
+	  goto err;
+	}
       else if (!st.cbInQue)
 	Sleep (to);
       else

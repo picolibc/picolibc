@@ -16,6 +16,7 @@
 
 #include <cygwin/rdevio.h>
 #include <sys/mtio.h>
+#include "cygheap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
@@ -25,7 +26,7 @@
    also related to the used tape device.  */
 
 static BOOL write_file (HANDLE fh, const void *buf, DWORD to_write,
-                        DWORD *written, int *err)
+			DWORD *written, int *err)
 {
   BOOL ret;
 
@@ -33,20 +34,20 @@ static BOOL write_file (HANDLE fh, const void *buf, DWORD to_write,
   if (!(ret = WriteFile (fh, buf, to_write, written, 0)))
     {
       if ((*err = GetLastError ()) == ERROR_MEDIA_CHANGED
-          || *err == ERROR_BUS_RESET)
-        {
-          *err = 0;
-          if (!(ret = WriteFile (fh, buf, to_write, written, 0)))
-            *err = GetLastError ();
-        }
+	  || *err == ERROR_BUS_RESET)
+	{
+	  *err = 0;
+	  if (!(ret = WriteFile (fh, buf, to_write, written, 0)))
+	    *err = GetLastError ();
+	}
     }
   syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
-                  ret, *err, fh, buf, to_write, *written);
+		  ret, *err, fh, buf, to_write, *written);
   return ret;
 }
 
 static BOOL read_file (HANDLE fh, void *buf, DWORD to_read,
-                       DWORD *read, int *err)
+		       DWORD *read, int *err)
 {
   BOOL ret;
 
@@ -54,15 +55,15 @@ static BOOL read_file (HANDLE fh, void *buf, DWORD to_read,
   if (!(ret = ReadFile(fh, buf, to_read, read, 0)))
     {
       if ((*err = GetLastError ()) == ERROR_MEDIA_CHANGED
-          || *err == ERROR_BUS_RESET)
-        {
-          *err = 0;
-          if (!(ret = ReadFile (fh, buf, to_read, read, 0)))
-            *err = GetLastError ();
-        }
+	  || *err == ERROR_BUS_RESET)
+	{
+	  *err = 0;
+	  if (!(ret = ReadFile (fh, buf, to_read, read, 0)))
+	    *err = GetLastError ();
+	}
     }
   syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
-                  ret, *err, fh, buf, to_read, *read);
+		  ret, *err, fh, buf, to_read, *read);
   return ret;
 }
 
@@ -96,13 +97,13 @@ fhandler_dev_raw::writebuf (void)
 
       memset (devbuf + devbufend, 0, devbufsiz - devbufend);
       if (get_device () != FH_TAPE)
-        to_write = ((devbufend - 1) / 512 + 1) * 512;
+	to_write = ((devbufend - 1) / 512 + 1) * 512;
       else if (varblkop)
-        to_write = devbufend;
+	to_write = devbufend;
       else
-        to_write = devbufsiz;
+	to_write = devbufsiz;
       if (!write_file (get_handle (), devbuf, to_write, &written, &ret)
-          && is_eom (ret))
+	  && is_eom (ret))
 	eom_detected = 1;
       if (written)
 	has_written = 1;
@@ -120,21 +121,9 @@ fhandler_dev_raw::fhandler_dev_raw (DWORD devtype, const char *name, int unit) :
 
 fhandler_dev_raw::~fhandler_dev_raw (void)
 {
-  delete[]devbuf;
+  if (devbufsiz >= 1L)
+    cfree (devbuf);
   clear ();
-}
-
-int
-fhandler_dev_raw::de_linearize (const char *buf, const char *unix_name,
-			        const char *win32_name)
-{
-  int ret = fhandler_base::de_linearize (buf, unix_name, win32_name);
-  if (devbufsiz > 1L)
-    {
-      devbuf = new char[devbufsiz];
-      devbufstart = devbufend = 0;
-    }
-  return ret;
 }
 
 int
@@ -150,7 +139,7 @@ fhandler_dev_raw::open (const char *path, int flags, mode_t)
   if (ret)
     {
       if (devbufsiz > 1L)
-	devbuf = new char[devbufsiz];
+	devbuf = (char *) cmalloc (HEAP_BUF, devbufsiz);
     }
   else
     devbufsiz = 0;
@@ -174,9 +163,9 @@ fhandler_dev_raw::fstat (struct stat *buf)
 
   memset (buf, 0, sizeof *buf);
   buf->st_mode = S_IFCHR |
-                 S_IRUSR | S_IWUSR |
-                 S_IRGRP | S_IWGRP |
-                 S_IROTH | S_IWOTH;
+		 S_IRUSR | S_IWUSR |
+		 S_IRGRP | S_IWGRP |
+		 S_IROTH | S_IWOTH;
   buf->st_nlink = 1;
   buf->st_blksize = devbuf ? devbufsiz : 1;
   buf->st_dev = buf->st_rdev = get_device () << 8 | (unit & 0xff);
@@ -241,9 +230,9 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 	    {
 	      if (!varblkop && len >= devbufsiz)
 		{
-                  if (get_device () == FH_TAPE)
+		  if (get_device () == FH_TAPE)
 		    bytes_to_read = (len / devbufsiz) * devbufsiz;
-                  else
+		  else
 		    bytes_to_read = (len / 512) * 512;
 		  tgt = (char *) ptr;
 		  debug_printf ("read %d bytes direct from file",bytes_to_read);
@@ -252,9 +241,9 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 		{
 		  bytes_to_read = devbufsiz;
 		  tgt = devbuf;
-                  if (varblkop)
+		  if (varblkop)
 		    debug_printf ("read variable bytes from file into buffer");
-                  else
+		  else
 		    debug_printf ("read %d bytes from file into buffer",
 				  bytes_to_read);
 		}
@@ -262,7 +251,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 		{
 		  if (!is_eof (ret) && !is_eom (ret))
 		    {
-                      debug_printf ("return -1, set errno to EACCES");
+		      debug_printf ("return -1, set errno to EACCES");
 		      set_errno (EACCES);
 		      return -1;
 		    }
@@ -276,7 +265,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 		    {
 		      if (!bytes_read && is_eom (ret))
 			{
-                          debug_printf ("return -1, set errno to ENOSPC");
+			  debug_printf ("return -1, set errno to ENOSPC");
 			  set_errno (ENOSPC);
 			  return -1;
 			}
@@ -304,7 +293,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
     {
       if (!is_eof (ret) && !is_eom (ret))
 	{
-          debug_printf ("return -1, set errno to EACCES");
+	  debug_printf ("return -1, set errno to EACCES");
 	  set_errno (EACCES);
 	  return -1;
 	}
@@ -317,7 +306,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 	}
       else if (is_eom (ret))
 	{
-          debug_printf ("return -1, set errno to ENOSPC");
+	  debug_printf ("return -1, set errno to ENOSPC");
 	  set_errno (ENOSPC);
 	  return -1;
 	}
@@ -352,7 +341,7 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
       while (len > 0)
 	{
 	  if (!varblkop &&
-              (len < devbufsiz || devbufend > 0) && devbufend < devbufsiz)
+	      (len < devbufsiz || devbufend > 0) && devbufend < devbufsiz)
 	    {
 	      bytes_to_write = min (len, devbufsiz - devbufend);
 	      memcpy (devbuf + devbufend, p, bytes_to_write);
@@ -456,7 +445,7 @@ fhandler_dev_raw::dup (fhandler_base *child)
       fhc->devbufsiz = devbufsiz;
       if (devbufsiz > 1L)
 	{
-	  fhc->devbuf = new char[devbufsiz];
+	  fhc->devbuf = (char *) cmalloc (HEAP_BUF, devbufsiz);
 	  memcpy (fhc->devbuf, devbuf, devbufend);
 	}
       fhc->devbufstart = devbufstart;
@@ -499,12 +488,12 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 	      ret = ERROR_INVALID_PARAMETER;
 	    else if (!devbuf || op->rd_parm != devbufsiz)
 	      {
-		char *buf = new char[op->rd_parm];
+		char *buf = (char *) cmalloc (HEAP_BUF, op->rd_parm);
 		if (devbuf)
 		  {
 		    memcpy (buf, devbuf + devbufstart, devbufend - devbufstart);
 		    devbufend -= devbufstart;
-		    delete[]devbuf;
+		    cfree (devbuf);
 		  }
 		else
 		  devbufend = 0;

@@ -209,7 +209,7 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 
   PSECURITY_ATTRIBUTES psa = (PSECURITY_ATTRIBUTES) sa_buf;
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR)
-                             ((char *) sa_buf + sizeof (*psa));
+			     ((char *) sa_buf + sizeof (*psa));
   PACL acl = (PACL) ((char *) sa_buf + sizeof (*psa) + sizeof (*psd));
 
   char sid_buf[MAX_SID_LEN];
@@ -221,46 +221,46 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
     return inherit ? &sec_none_nih : &sec_none;
 
   size_t acl_len = sizeof (ACL)
-                   + 4 * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD))
-                   + GetLengthSid (sid)
-                   + GetLengthSid (get_admin_sid ())
-                   + GetLengthSid (get_system_sid ())
-                   + GetLengthSid (get_creator_owner_sid ());
+		   + 4 * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD))
+		   + GetLengthSid (sid)
+		   + GetLengthSid (get_admin_sid ())
+		   + GetLengthSid (get_system_sid ())
+		   + GetLengthSid (get_creator_owner_sid ());
   if (sid2)
     acl_len += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD)
-               + GetLengthSid (sid2);
+	       + GetLengthSid (sid2);
 
   if (! InitializeAcl (acl, acl_len, ACL_REVISION))
     debug_printf("InitializeAcl %E");
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
-                             SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-                             sid))
+			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
+			     sid))
     debug_printf("AddAccessAllowedAce(%s) %E", getlogin());
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
-                             SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-                             get_admin_sid ()))
+			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
+			     get_admin_sid ()))
     debug_printf("AddAccessAllowedAce(admin) %E");
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
-                             SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-                             get_system_sid ()))
+			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
+			     get_system_sid ()))
     debug_printf("AddAccessAllowedAce(system) %E");
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
-                             SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-                             get_creator_owner_sid ()))
+			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
+			     get_creator_owner_sid ()))
     debug_printf("AddAccessAllowedAce(creator_owner) %E");
 
   if (sid2)
     if (! AddAccessAllowedAce (acl, ACL_REVISION,
-                               SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-                               sid2))
+			       SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
+			       sid2))
       debug_printf("AddAccessAllowedAce(sid2) %E");
 
   if (! InitializeSecurityDescriptor (psd,
-                                      SECURITY_DESCRIPTOR_REVISION))
+				      SECURITY_DESCRIPTOR_REVISION))
     debug_printf("InitializeSecurityDescriptor %E");
 
 /*

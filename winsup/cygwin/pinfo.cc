@@ -68,24 +68,13 @@ set_myself (pid_t pid, HANDLE h)
 /* Initialize the process table entry for the current task.
    This is not called for fork'd tasks, only exec'd ones.  */
 void __stdcall
-pinfo_init (LPBYTE info)
+pinfo_init (char **envp)
 {
-  if (info != NULL)
+  if (envp)
     {
-      /* The process was execed.  Reuse entry from the original
-	 owner of this pid. */
-      environ_init (0);	  /* Needs myself but affects calls below */
-
+      environ_init (envp);
       /* spawn has already set up a pid structure for us so we'll use that */
-
       myself->process_state |= PID_CYGPARENT;
-
-      /* Inherit file descriptor information from parent in info.
-       */
-      LPBYTE b = fdtab.de_linearize_fd_array (info);
-      extern char title_buf[];
-      if (b && *b)
-	old_title = strcpy (title_buf, (char *)b);
     }
   else
     {
@@ -97,7 +86,7 @@ pinfo_init (LPBYTE info)
       myself->ctty = -1;
       myself->uid = USHRT_MAX;
 
-      environ_init (0);		/* call after myself has been set up */
+      environ_init (NULL);	/* call after myself has been set up */
     }
 
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);

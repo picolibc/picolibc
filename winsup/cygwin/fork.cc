@@ -22,6 +22,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygheap.h"
 #include "child_info.h"
 #include "perthread.h"
 
@@ -37,14 +38,14 @@ DWORD NO_COPY chunksize = 0;
 
 void
 per_thread::set (void *s)
-  {
-    if (s == PER_THREAD_FORK_CLEAR)
-      {
-        tls = TlsAlloc ();
-	s = NULL;
-      }
-    TlsSetValue (get_tls (), s);
-  }
+{
+  if (s == PER_THREAD_FORK_CLEAR)
+    {
+      tls = TlsAlloc ();
+      s = NULL;
+    }
+  TlsSetValue (get_tls (), s);
+}
 
 static void
 stack_base (child_info_fork &ch)
@@ -356,7 +357,7 @@ fork ()
 
       hParent = NULL;
       if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hParent, 0, 1,
-			   DUPLICATE_SAME_ACCESS))
+			    DUPLICATE_SAME_ACCESS))
 	{
 	  system_printf ("couldn't create handle to myself for child, %E");
 	  goto cleanup;
@@ -365,13 +366,13 @@ fork ()
       /* Remove impersonation */
       uid_t uid = geteuid();
       if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
-        seteuid (myself->orig_uid);
+	seteuid (myself->orig_uid);
 
       char sa_buf[1024];
       rc = CreateProcessA (myself->progname, /* image to run */
 			   myself->progname, /* what we send in arg0 */
-                           allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
-                           allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
+			   allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
+			   allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
 			   TRUE,	  /* inherit handles from parent */
 			   c_flags,
 			   NULL,	  /* environment filled in later */
@@ -388,9 +389,9 @@ fork ()
 	  ForceCloseHandle(subproc_ready);
 	  ForceCloseHandle(forker_finished);
 	  subproc_ready = forker_finished = NULL;
-          /* Restore impersonation */
-          if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
-            seteuid (uid);
+	  /* Restore impersonation */
+	  if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+	    seteuid (uid);
 	  return -1;
 	}
 
@@ -402,7 +403,7 @@ fork ()
 
       /* Restore impersonation */
       if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
-        seteuid (uid);
+	seteuid (uid);
 
       ProtectHandle (pi.hThread);
       /* Protect the handle but name it similarly to the way it will
@@ -413,7 +414,7 @@ fork ()
 	  if (last_fork_proc)
 	    CloseHandle (last_fork_proc);
 	  if (!DuplicateHandle (hMainProc, pi.hProcess, hMainProc, &last_fork_proc,
-			        0, FALSE, DUPLICATE_SAME_ACCESS))
+				0, FALSE, DUPLICATE_SAME_ACCESS))
 	    system_printf ("couldn't create last_fork_proc, %E");
 	}
 
@@ -528,15 +529,15 @@ fork ()
       debug_printf ("pid %d, ppid %d", x, myself->ppid);
 
       /* Restore the inheritance state as in parent
-         Don't call setuid here! The flags are already set. */
+	 Don't call setuid here! The flags are already set. */
       if (myself->impersonated)
-        {
-          debug_printf ("Impersonation of child, token: %d", myself->token);
-          if (myself->token == INVALID_HANDLE_VALUE)
-            RevertToSelf (); // probably not needed
-          else if (!ImpersonateLoggedOnUser (myself->token))
-            system_printf ("Impersonate for forked child failed: %E");
-        }
+	{
+	  debug_printf ("Impersonation of child, token: %d", myself->token);
+	  if (myself->token == INVALID_HANDLE_VALUE)
+	    RevertToSelf (); // probably not needed
+	  else if (!ImpersonateLoggedOnUser (myself->token))
+	    system_printf ("Impersonate for forked child failed: %E");
+	}
 
       sync_with_parent ("after longjmp.", TRUE);
       ProtectHandle (hParent);
@@ -567,6 +568,7 @@ fork ()
 
       MALLOC_CHECK;
 
+      cygheap_fixup_in_child (hParent);
       fdtab.fixup_after_fork (hParent);
       signal_fixup_after_fork ();
       exec_fixup_after_fork ();

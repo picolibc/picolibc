@@ -73,11 +73,11 @@ scandir (const char *dir,
     {
       closedir (dirp);
       if (nl)
-        {
-          while (count > 0)
-            free (nl[--count]);
-          free (nl);
-        }
+	{
+	  while (count > 0)
+	    free (nl[--count]);
+	  free (nl);
+	}
       /* Ignore errors from closedir() and what not else. */
       set_errno (prior_errno);
       return -1;

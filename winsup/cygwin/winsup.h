@@ -1,6 +1,6 @@
 /* winsup.h: main Cygwin header file.
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -83,9 +83,9 @@ extern os_type os_being_run;
 extern int dynamically_loaded;
 
 #define sys_wcstombs(tgt,src,len) \
-                    WideCharToMultiByte(CP_ACP,0,(src),-1,(tgt),(len),NULL,NULL)
+		    WideCharToMultiByte(CP_ACP,0,(src),-1,(tgt),(len),NULL,NULL)
 #define sys_mbstowcs(tgt,src,len) \
-                    MultiByteToWideChar(CP_ACP,0,(src),-1,(tgt),(len))
+		    MultiByteToWideChar(CP_ACP,0,(src),-1,(tgt),(len))
 
 #include <cygwin/version.h>
 
@@ -200,11 +200,7 @@ extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
 extern "C" void __stdcall do_exit (int) __attribute__ ((noreturn));
 
 /* Initialize the environment */
-void environ_init (int);
-
-/* Heap management. */
-void heap_init (void);
-void malloc_init (void);
+void environ_init (char **);
 
 /* UID/GID */
 void uinfo_init (void);
@@ -236,7 +232,7 @@ extern int cygwin_finished_initializing;
 /* File manipulation */
 int __stdcall set_process_privileges ();
 int __stdcall get_file_attribute (int, const char *, int *,
-                                  uid_t * = NULL, gid_t * = NULL);
+				  uid_t * = NULL, gid_t * = NULL);
 int __stdcall set_file_attribute (int, const char *, int);
 int __stdcall set_file_attribute (int, const char *, uid_t, gid_t, int, const char *);
 void __stdcall set_std_handle (int);
@@ -258,6 +254,7 @@ extern "C" char *__stdcall rootdir (char *full_path);
 
 void __stdcall mark (const char *, int);
 
+#define _P_VFORK 0
 extern "C" int _spawnve (HANDLE hToken, int mode, const char *path,
 			 const char *const *argv, const char *const *envp);
 
@@ -277,12 +274,6 @@ char *__stdcall strcasestr (const char *searchee, const char *lookfor);
 /* Time related */
 void __stdcall totimeval (struct timeval *dst, FILETIME * src, int sub, int flag);
 long __stdcall to_time_t (FILETIME * ptr);
-
-/* pinfo table manipulation */
-#ifndef lock_pinfo_for_update
-int __stdcall lock_pinfo_for_update (DWORD timeout);
-#endif
-void unlock_pinfo (void);
 
 /* Retrieve a security descriptor that allows all access */
 SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
@@ -375,6 +366,7 @@ void __stdcall update_envptrs ();
 char * __stdcall winenv (const char * const *, int);
 extern char **__cygwin_environ, ***main_environ;
 extern "C" char __stdcall **cur_environ ();
+int __stdcall envsize (const char * const *, int debug_print = 0);
 
 /* The title on program start. */
 extern char *old_title;

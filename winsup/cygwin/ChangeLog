@@ -1,3 +1,70 @@
+Sun Sep  3 00:07:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Add cygheap.o.
+	* child_info.h: Add specific exec class.
+	* cygheap.h: New file.  Contains declarations for cygwin heap.
+	* cygheap.cc: New file.  Implements cygwin heap functions.
+	* dcrt0.cc (quoted): Simplify due to new method for passing arguments
+	between cygwin programs.
+	(alloc_stack_hard_way): Attempt to handle overlapped stack.
+	(dll_crt0_1): Move child_info processing here.  Accomodate new method
+	for passing arguments between cygwin programs.  Initialize cygwin heap.
+	Establish __argc and __argv variables.
+	(_dll_crt0): Move most of child_info processing to dll_crt0_1.
+	(cygwin_dll_init): Remove duplication.
+	* dtable.cc (dtable::extend): Allocate dtable using cygwin heap.
+	(dtable::build_fhandler): Ditto for fhandler type being constructed.
+	(dtable::dup_worker): Free new fhandler from cygwin heap on error.
+	(dtable::select_*): Don't assume that this == fdtab.
+	(dtable::linearize_fd_array): Delete.
+	(dtable::delinearize_fd_array): Delete.
+	(dtable::fixup_after_exec): New file.
+	(dtable::vfork_child_dup): Use cygwin heap.
+	(dtable::vfork_parent_restore): Ditto.
+	* dtable.h: Remove obsolete methods.  Add new method.
+	* environ.cc (posify): Eliminate already_posix parameter and logic.
+	(envsize): New function.
+	(_addenv): Use envsize.
+	(environ_init): Accept an argument pointing to an existing environment
+	list.  If supplied, allocate space for this in the the program's heap.
+	* fhandler.cc (fhandler_base::operator =): Move here from fhandler.h.
+	Use cygwin heap to allocate filenames.
+	(fhandler_base::set_name): Allocate/free names from cygwin heap.
+	(fhandler_base::linearize): Delete.
+	(fhandler_base::de_linearize): Delete.
+	(fhandler_base::operator delete): Free from cygwin heap.
+	(fhandler_base::~fhandler_base): Ditto.
+	* fhandler.h: Accomodate elimination of *linearize and other changes
+	above.
+	* fhandler_console.cc (fhandler_console::fixup_after_exec): Rename from
+	de_linearize.
+	* heap.h: New file.
+	* fhandler_tty.cc (fhandler_tty_slave::fhandler_tty_slave): Use cygwin
+	heap for name.  fhandler_tty::fixup_after_exec): Rename from
+	de_linearize.
+	* fork.cc (fork): Call cygheap_fixup_in_child.
+	* heap.cc: Use declarations in heap.h.
+	* malloc.cc: Sprinkle assertions throughout to catch attempts to
+	free/realloc something from the cygwin heap.
+	* path.cc: Throughout, eliminate use of per-thread cache for cwd.  Use
+	cwd_* functions rather than cwd_* variables to access cwd_win32 and
+	cwd_posix.
+	(cwd_win32): New function.
+	(cwd_posix): New function.
+	(cwd_hash): New function.
+	(cwd_fixup_after_exec): New function.
+	* path.h: Accomodate path.cc changes.
+	* pinfo.cc (pinfo_init): Accept a pointer to an environment table.
+	Pass this to environ_init.  Eliminate old 'title' tests.
+	* pinfo.h: Accomodate above change in argument.
+	* spawn.cc (struct av): New method for building argv list.
+	(av::unshift): New method.
+	(spawn_guts): Allocate everything that the child process needs in the
+	cygwin heap and pass a pointer to this to the child.  Build argv list
+	using new method.  Eliminate delinearize stuff.
+	* thread.h: Eliminate _cwd_win32 and _cwd_posix buffers.
+	* winsup.h: Eliminate obsolete functions.  Add envsize() declaration.
+
 2000-09-02  Egor Duda  <deo@logos-m.ru>
 
 	* Makefile.in: Remove "make check" support. It is now in

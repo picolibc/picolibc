@@ -149,13 +149,7 @@ public:
   void set_name (const char * unix_path, const char * win32_path = NULL,
 		 int unit = 0);
 
-  virtual fhandler_base& operator =(fhandler_base &x)
-  {
-    memcpy (this, &x, sizeof *this);
-    unix_path_name_ = x.unix_path_name_ ? strdup (x.unix_path_name_) : NULL;
-    win32_path_name_ = x.win32_path_name_ ? strdup (x.win32_path_name_) : NULL;
-    return *this;
-  };
+  virtual fhandler_base& operator =(fhandler_base &x);
   fhandler_base (DWORD dev, const char *name = 0, int unit = 0);
   virtual ~fhandler_base ();
 
@@ -243,7 +237,8 @@ public:
   unsigned long get_namehash () { return namehash_; }
 
   virtual void hclose (HANDLE h) {CloseHandle (h);}
-  virtual void set_inheritance (HANDLE &h, int not_inheriting, const char *name = NULL);
+  virtual void set_inheritance (HANDLE &h, int not_inheriting,
+				const char *name = NULL);
 
   /* fixup fd possibly non-inherited handles after fork */
   void fork_fixup (HANDLE parent, HANDLE &h, const char *name);
@@ -287,10 +282,7 @@ public:
   virtual int raw_read (void *ptr, size_t ulen);
   virtual int raw_write (const void *ptr, size_t ulen);
 
-  /* Function to save state of a fhandler_base into memory. */
-  virtual int linearize (unsigned char *);
-  /* Function to de-linearize into a fd */
-  virtual int de_linearize (const char *, const char *, const char *);
+  virtual void fixup_after_exec (HANDLE) {}
 
   /* Virtual accessor functions to hide the fact
      that some fd's have two handles. */
@@ -307,6 +299,12 @@ public:
     return windows_device_names[FHDEVN (status)];
   }
   virtual int bg_check (int) {return 1;}
+  void clear_readahead ()
+  {
+    raixput = raixget = ralen = rabuflen = 0;
+    rabuf = NULL;
+  }
+  void operator delete (void *);
 };
 
 class fhandler_socket: public fhandler_base
@@ -376,9 +374,6 @@ protected:
 
 public:
   ~fhandler_dev_raw (void);
-
-  /* Function to de-linearize into a fd */
-  int de_linearize (const char *, const char *, const char *);
 
   int open (const char *path, int flags, mode_t mode = 0);
   int close (void);
@@ -497,7 +492,7 @@ public:
   void dump ();
   int is_tty () { return 1; }
   void fixup_after_fork (HANDLE parent);
-  int de_linearize (const char *, const char *, const char *);
+  void fixup_after_exec (HANDLE);
 
   /* We maintain a pgrp so that tcsetpgrp and tcgetpgrp work, but we
      don't use it for permissions checking.  fhandler_tty_slave does
@@ -604,7 +599,7 @@ public:
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
   int ready_for_read (int fd, DWORD howlong, int ignra);
-  int de_linearize (const char *, const char *, const char *);
+  void fixup_after_exec (HANDLE);
   void set_close_on_exec (int val);
   void fixup_after_fork (HANDLE parent);
   void set_input_state ()
@@ -712,7 +707,7 @@ public:
   int init (int);
   int init_console ();
   void fixup_after_fork (HANDLE parent);
-  int de_linearize (const char *, const char *, const char *);
+  void fixup_after_exec (HANDLE);
 };
 
 class fhandler_dev_null: public fhandler_base

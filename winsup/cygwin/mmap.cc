@@ -210,7 +210,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	{
 	  set_errno (EBADF);
 	  syscall_printf ("-1 = mmap(): EBADF");
-          ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
 	  return (caddr_t) -1;
 	}
       hFile = fdtab[fd]->get_handle ();
@@ -235,7 +235,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	  __seterrno ();
 	  syscall_printf ("-1 = mmap(): MapViewOfFileEx failed with %E");
 	  CloseHandle (h);
-          ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
 	  return (caddr_t) -1;
 	}
     }
@@ -247,7 +247,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	  __seterrno ();
 	  syscall_printf ("-1 = mmap(): MapViewOfFile failed with %E");
 	  CloseHandle (h);
-          ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
 	  return (caddr_t) -1;
 	}
     }
@@ -273,7 +273,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	  CloseHandle (h);
 	  set_errno (ENOMEM);
 	  syscall_printf ("-1 = mmap(): ENOMEM");
-          ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
 	  return (caddr_t) -1;
 	}
       l = mmapped_areas->add_list (l, fd);
@@ -327,7 +327,7 @@ munmap (caddr_t addr, size_t len)
 		  /* Delete the entry. */
 		  l->erase (li);
 		  syscall_printf ("0 = munmap(): %x", addr);
-                  ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
+		  ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
 		  return 0;
 		}
 	     }

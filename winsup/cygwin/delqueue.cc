@@ -86,7 +86,7 @@ delqueue_list::process_queue ()
 	    int res = GetLastError ();
 	    empty = 0;
 	    if (res == ERROR_SHARING_VIOLATION ||
-	        (os_being_run != winNT && res == ERROR_ACCESS_DENIED))
+		(os_being_run != winNT && res == ERROR_ACCESS_DENIED))
 	      {
 		/* File still inuse, that's ok */
 		syscall_printf ("Still using %s", name[i]);
@@ -94,7 +94,7 @@ delqueue_list::process_queue ()
 	    else
 	      {
 		syscall_printf ("Hmm, don't know what to do with '%s', %E", name[i]);
-	        inuse[i] = 0;
+		inuse[i] = 0;
 	      }
 	  }
       }

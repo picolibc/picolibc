@@ -72,10 +72,10 @@ public:
      to `set_impersonation_token()'. */
   HANDLE token;
   BOOL impersonated;
-  uid_t orig_uid;        /* Remains intact also after impersonation */
-  uid_t orig_gid;        /* Ditto */
-  uid_t real_uid;        /* Remains intact on seteuid, replaced by setuid */
-  gid_t real_gid;	 /* Ditto */
+  uid_t orig_uid;	/* Remains intact also after impersonation */
+  uid_t orig_gid;	/* Ditto */
+  uid_t real_uid;	/* Remains intact on seteuid, replaced by setuid */
+  gid_t real_gid;	/* Ditto */
 
   /* Filled when chroot() is called by the process or one of it's parents.
      Saved without trailing backslash. */
@@ -163,6 +163,6 @@ cygwin_pid (pid_t pid)
   return (pid_t) (os_being_run == winNT) ? pid : -(int) pid;
 }
 
-void __stdcall pinfo_init (BYTE *);
+void __stdcall pinfo_init (char **);
 void __stdcall set_myself (pid_t pid, HANDLE h = NULL);
 extern pinfo myself;

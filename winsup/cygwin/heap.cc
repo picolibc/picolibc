@@ -14,12 +14,8 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "heap.h"
 
-#define brksize ((char *) user_data->heaptop - (char *) user_data->heapbase)
-#define brk (user_data->heapptr)
-#define brkbase (user_data->heapbase)
-#define brktop (user_data->heaptop)
-#define brkchunk (cygwin_shared->heap_chunk_size ())
 #define assert(x)
 
 static unsigned page_const = 0;

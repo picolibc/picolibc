@@ -22,6 +22,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygheap.h"
 
 /* Tty master stuff */
 
@@ -433,7 +434,7 @@ fhandler_tty_slave::fhandler_tty_slave(int num, const char *name) :
   ttynum = num;
   /* FIXME: This is wasteful.  We should rewrite the set_name path to eliminate the
      need for double allocates. */
-  unix_path_name_ = (char *) realloc (unix_path_name_, strlen(win32_path_name_) + 1);
+  unix_path_name_ = (char *) crealloc (unix_path_name_, strlen(win32_path_name_) + 1);
   strcpy (unix_path_name_, win32_path_name_);
   unix_path_name_[0] = unix_path_name_[4] = '/';
   debug_printf ("unix '%s', win32 '%s'", unix_path_name_, win32_path_name_);
@@ -1075,14 +1076,12 @@ fhandler_tty_master::fixup_after_fork (HANDLE child)
   console->fixup_after_fork (child);
 }
 
-int
-fhandler_tty_master::de_linearize (const char *buf, const char *unix_name,
-				   const char *win32_name)
+void
+fhandler_tty_master::fixup_after_exec (HANDLE)
 {
-  int res = fhandler_base::de_linearize (buf, unix_name, win32_name);
   console->close ();
   init_console ();
-  return res;
+  return;
 }
 
 int

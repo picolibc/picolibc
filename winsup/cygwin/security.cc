@@ -34,12 +34,12 @@ extern BOOL allow_ntea;
 BOOL allow_ntsec = FALSE;
 
 SID_IDENTIFIER_AUTHORITY sid_auth[] = {
-        {SECURITY_NULL_SID_AUTHORITY},
-        {SECURITY_WORLD_SID_AUTHORITY},
-        {SECURITY_LOCAL_SID_AUTHORITY},
-        {SECURITY_CREATOR_SID_AUTHORITY},
-        {SECURITY_NON_UNIQUE_AUTHORITY},
-        {SECURITY_NT_AUTHORITY}
+	{SECURITY_NULL_SID_AUTHORITY},
+	{SECURITY_WORLD_SID_AUTHORITY},
+	{SECURITY_LOCAL_SID_AUTHORITY},
+	{SECURITY_CREATOR_SID_AUTHORITY},
+	{SECURITY_NON_UNIQUE_AUTHORITY},
+	{SECURITY_NT_AUTHORITY}
 };
 
 #define DONT_INHERIT (0)
@@ -195,53 +195,53 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
       int id = -1;
 
       if (! search_grp)
-        {
-          if (passwd_sem > 0)
-            return 0;
-          ++passwd_sem;
+	{
+	  if (passwd_sem > 0)
+	    return 0;
+	  ++passwd_sem;
 
-          struct passwd *pw;
-          while ((pw = getpwent ()) != NULL)
-            {
-              if (get_pw_sid (sid, pw) && EqualSid (psid, sid))
-                {
-                  id = pw->pw_uid;
-                  break;
-                }
-            }
-          endpwent ();
-          --passwd_sem;
-          if (id >= 0)
-            {
-              if (type)
-                *type = USER;
-              return id;
-            }
-        }
+	  struct passwd *pw;
+	  while ((pw = getpwent ()) != NULL)
+	    {
+	      if (get_pw_sid (sid, pw) && EqualSid (psid, sid))
+		{
+		  id = pw->pw_uid;
+		  break;
+		}
+	    }
+	  endpwent ();
+	  --passwd_sem;
+	  if (id >= 0)
+	    {
+	      if (type)
+		*type = USER;
+	      return id;
+	    }
+	}
       if (search_grp || type)
-        {
-          if (group_sem > 0)
-            return 0;
-          ++group_sem;
+	{
+	  if (group_sem > 0)
+	    return 0;
+	  ++group_sem;
 
-          struct group *gr;
-          while ((gr = getgrent ()) != NULL)
-            {
-              if (get_gr_sid (sid, gr) && EqualSid (psid, sid))
-                {
-                  id = gr->gr_gid;
-                  break;
-                }
-            }
-          endgrent ();
-          --group_sem;
-          if (id >= 0)
-            {
-              if (type)
-                *type = GROUP;
-              return id;
-            }
-        }
+	  struct group *gr;
+	  while ((gr = getgrent ()) != NULL)
+	    {
+	      if (get_gr_sid (sid, gr) && EqualSid (psid, sid))
+		{
+		  id = gr->gr_gid;
+		  break;
+		}
+	    }
+	  endgrent ();
+	  --group_sem;
+	  if (id >= 0)
+	    {
+	      if (type)
+		*type = GROUP;
+	      return id;
+	    }
+	}
     }
 
   /* We use the RID as default UID/GID */
@@ -261,7 +261,7 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
       SID_NAME_USE acc_type;
 
       if (!LookupAccountSid (NULL, psid, account, &acc_len,
-                             domain, &dom_len, &acc_type))
+			     domain, &dom_len, &acc_type))
 	{
 	  __seterrno ();
 	  return -1;
@@ -272,27 +272,27 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
 	  case SidTypeGroup:
 	  case SidTypeAlias:
 	  case SidTypeWellKnownGroup:
-            if (type)
-              *type = GROUP;
-            if (id == -1)
-              {
-                struct group *gr = getgrnam (account);
-                if (gr)
-                  id = gr->gr_gid;
-              }
-            break;
-	  case SidTypeUser:
-            if (type)
-              *type = USER;
-            if (id == -1)
-              {
-	        struct passwd *pw = getpwnam (account);
-                if (pw)
-                  id = pw->pw_uid;
+	    if (type)
+	      *type = GROUP;
+	    if (id == -1)
+	      {
+		struct group *gr = getgrnam (account);
+		if (gr)
+		  id = gr->gr_gid;
 	      }
-            break;
+	    break;
+	  case SidTypeUser:
+	    if (type)
+	      *type = USER;
+	    if (id == -1)
+	      {
+		struct passwd *pw = getpwnam (account);
+		if (pw)
+		  id = pw->pw_uid;
+	      }
+	    break;
 	  default:
-            break;
+	    break;
 	}
     }
   if (id == -1)
@@ -310,7 +310,7 @@ static BOOL
 legal_sid_type (SID_NAME_USE type)
 {
   return type == SidTypeUser || type == SidTypeGroup
-                 || SidTypeAlias || SidTypeWellKnownGroup;
+		 || SidTypeAlias || SidTypeWellKnownGroup;
 }
 
 BOOL
@@ -324,12 +324,12 @@ is_grp_member (uid_t uid, gid_t gid)
       struct passwd *pw = getpwuid (uid);
       gid_t grps[NGROUPS_MAX];
       int cnt = getgroups (NGROUPS_MAX, grps,
-                           pw ? pw->pw_gid : myself->gid,
-                           pw ? pw->pw_name : myself->username);
+			   pw ? pw->pw_gid : myself->gid,
+			   pw ? pw->pw_name : myself->username);
       int i;
       for (i = 0; i < cnt; ++i)
-        if (grps[i] == gid)
-          break;
+	if (grps[i] == gid)
+	  break;
       grp_member = (i < cnt);
     }
   return grp_member;
@@ -355,51 +355,51 @@ lookup_name (const char *name, const char *logsrv, PSID ret_sid)
     {
       strcat (strcat (strcpy (domuser, myself->domain), "\\"), name);
       if (LookupAccountName (NULL, domuser,
-                             sid, (sidlen = MAX_SID_LEN, &sidlen),
-                             dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
-                             &acc_type)
-          && legal_sid_type (acc_type))
-        goto got_it;
+			     sid, (sidlen = MAX_SID_LEN, &sidlen),
+			     dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
+			     &acc_type)
+	  && legal_sid_type (acc_type))
+	goto got_it;
       if (logsrv && *logsrv
-          && LookupAccountName (logsrv, domuser,
-                                sid, (sidlen = MAX_SID_LEN, &sidlen),
-                                dom, (domlen = MAX_COMPUTERNAME_LENGTH,&domlen),
-                                &acc_type)
-          && legal_sid_type (acc_type))
-        goto got_it;
+	  && LookupAccountName (logsrv, domuser,
+				sid, (sidlen = MAX_SID_LEN, &sidlen),
+				dom, (domlen = MAX_COMPUTERNAME_LENGTH,&domlen),
+				&acc_type)
+	  && legal_sid_type (acc_type))
+	goto got_it;
     }
   if (logsrv && *logsrv)
     {
       if (LookupAccountName (logsrv, name,
-                             sid, (sidlen = MAX_SID_LEN, &sidlen),
-                             dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
-                             &acc_type)
-          && legal_sid_type (acc_type))
-        goto got_it;
+			     sid, (sidlen = MAX_SID_LEN, &sidlen),
+			     dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
+			     &acc_type)
+	  && legal_sid_type (acc_type))
+	goto got_it;
       if (acc_type == SidTypeDomain)
-        {
-          strcat (strcat (strcpy (domuser, dom), "\\"), name);
-          if (LookupAccountName (logsrv, domuser,
-                                 sid,(sidlen = MAX_SID_LEN, &sidlen),
-                                 dom,(domlen = MAX_COMPUTERNAME_LENGTH,&domlen),
-                                 &acc_type))
-            goto got_it;
-        }
+	{
+	  strcat (strcat (strcpy (domuser, dom), "\\"), name);
+	  if (LookupAccountName (logsrv, domuser,
+				 sid,(sidlen = MAX_SID_LEN, &sidlen),
+				 dom,(domlen = MAX_COMPUTERNAME_LENGTH,&domlen),
+				 &acc_type))
+	    goto got_it;
+	}
     }
   if (LookupAccountName (NULL, name,
-                         sid, (sidlen = MAX_SID_LEN, &sidlen),
-                         dom, (domlen = 100, &domlen),
-                         &acc_type)
+			 sid, (sidlen = MAX_SID_LEN, &sidlen),
+			 dom, (domlen = 100, &domlen),
+			 &acc_type)
       && legal_sid_type (acc_type))
     goto got_it;
   if (acc_type == SidTypeDomain)
     {
       strcat (strcat (strcpy (domuser, dom), "\\"), name);
       if (LookupAccountName (NULL, domuser,
-                             sid, (sidlen = MAX_SID_LEN, &sidlen),
-                             dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
-                             &acc_type))
-        goto got_it;
+			     sid, (sidlen = MAX_SID_LEN, &sidlen),
+			     dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
+			     &acc_type))
+	goto got_it;
     }
   debug_printf ("LookupAccountName(%s) %E", name);
   __seterrno ();
@@ -407,7 +407,7 @@ lookup_name (const char *name, const char *logsrv, PSID ret_sid)
 
 got_it:
   debug_printf ("sid : [%d]", *GetSidSubAuthority((PSID) sid,
-                              *GetSidSubAuthorityCount((PSID) sid) - 1));
+			      *GetSidSubAuthorityCount((PSID) sid) - 1));
 
   if (ret_sid)
     memcpy (ret_sid, sid, sidlen);
@@ -423,7 +423,7 @@ cygwin_set_impersonation_token (const HANDLE hToken)
   if (myself->token != hToken)
     {
       if (myself->token != INVALID_HANDLE_VALUE)
-        CloseHandle (myself->token);
+	CloseHandle (myself->token);
       myself->token = hToken;
       myself->impersonated = FALSE;
     }
@@ -452,13 +452,13 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
   if (pw->pw_gecos)
     {
       if ((c = strstr (pw->pw_gecos, "U-")) != NULL &&
-          (c == pw->pw_gecos || c[-1] == ','))
-        {
-          usernamebuf[0] = '\0';
-          strncat (usernamebuf, c + 2, 255);
-          if ((c = strchr (usernamebuf, ',')) != NULL)
-            *c = '\0';
-        }
+	  (c == pw->pw_gecos || c[-1] == ','))
+	{
+	  usernamebuf[0] = '\0';
+	  strncat (usernamebuf, c + 2, 255);
+	  if ((c = strchr (usernamebuf, ',')) != NULL)
+	    *c = '\0';
+	}
     }
   nt_user = usernamebuf;
   if ((c = strchr (nt_user, '\\')) != NULL)
@@ -468,12 +468,12 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
       nt_user = c + 1;
     }
   if (! LogonUserA (nt_user, nt_domain, (char *) password,
-                    LOGON32_LOGON_INTERACTIVE,
-                    LOGON32_PROVIDER_DEFAULT,
-                    &hToken)
+		    LOGON32_LOGON_INTERACTIVE,
+		    LOGON32_PROVIDER_DEFAULT,
+		    &hToken)
       || !SetHandleInformation (hToken,
-                                HANDLE_FLAG_INHERIT,
-                                HANDLE_FLAG_INHERIT))
+				HANDLE_FLAG_INHERIT,
+				HANDLE_FLAG_INHERIT))
     {
       __seterrno ();
       return INVALID_HANDLE_VALUE;
@@ -512,10 +512,10 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
 
   DWORD len = 0;
   if (! GetFileSecurity (file,
-                         OWNER_SECURITY_INFORMATION
-                         | GROUP_SECURITY_INFORMATION
-                         | DACL_SECURITY_INFORMATION,
-                         sd_buf, *sd_size, &len))
+			 OWNER_SECURITY_INFORMATION
+			 | GROUP_SECURITY_INFORMATION
+			 | DACL_SECURITY_INFORMATION,
+			 sd_buf, *sd_size, &len))
     {
       __seterrno ();
       return -1;
@@ -541,12 +541,12 @@ write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 
   HANDLE fh;
   fh = CreateFile (file,
-                   WRITE_OWNER | WRITE_DAC,
-                   FILE_SHARE_READ | FILE_SHARE_WRITE,
-                   &sec_none_nih,
-                   OPEN_EXISTING,
-                   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-                   NULL);
+		   WRITE_OWNER | WRITE_DAC,
+		   FILE_SHARE_READ | FILE_SHARE_WRITE,
+		   &sec_none_nih,
+		   OPEN_EXISTING,
+		   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+		   NULL);
 
   if (fh == INVALID_HANDLE_VALUE)
     {
@@ -580,8 +580,8 @@ write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 		    &bytes_written, FALSE, TRUE, &context))
     {
       /* Samba returns ERROR_NOT_SUPPORTED.
-         FAT returns ERROR_INVALID_SECURITY_DESCR.
-         This shouldn't return as error, but better be ignored. */
+	 FAT returns ERROR_INVALID_SECURITY_DESCR.
+	 This shouldn't return as error, but better be ignored. */
       DWORD ret = GetLastError ();
       if (ret != ERROR_NOT_SUPPORTED && ret != ERROR_INVALID_SECURITY_DESCR)
 	{
@@ -664,7 +664,7 @@ out:
 
 static int
 get_nt_attribute (const char *file, int *attribute,
-                  uid_t *uidret, gid_t *gidret)
+		  uid_t *uidret, gid_t *gidret)
 {
   if (os_being_run != winNT)
     return 0;
@@ -721,7 +721,7 @@ get_nt_attribute (const char *file, int *attribute,
     {
       *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
       syscall_printf ("file: %s No ACL = %x, uid %d, gid %d",
-                      file, *attribute, uid, gid);
+		      file, *attribute, uid, gid);
       return 0;
     }
 
@@ -733,68 +733,68 @@ get_nt_attribute (const char *file, int *attribute,
   for (DWORD i = 0; i < acl->AceCount; ++i)
     {
       if (!GetAce (acl, i, (PVOID *) &ace))
-        continue;
+	continue;
       if (ace->Header.AceFlags & INHERIT_ONLY_ACE)
-        continue;
+	continue;
       switch (ace->Header.AceType)
-        {
-        case ACCESS_ALLOWED_ACE_TYPE:
-          flags = &allow;
-          anti = &deny;
-          break;
-        case ACCESS_DENIED_ACE_TYPE:
-          flags = &deny;
-          anti = &allow;
-          break;
-        default:
-          continue;
-        }
+	{
+	case ACCESS_ALLOWED_ACE_TYPE:
+	  flags = &allow;
+	  anti = &deny;
+	  break;
+	case ACCESS_DENIED_ACE_TYPE:
+	  flags = &deny;
+	  anti = &allow;
+	  break;
+	default:
+	  continue;
+	}
 
       PSID ace_sid = (PSID) &ace->SidStart;
       if (owner_sid && EqualSid (ace_sid, owner_sid))
-        {
-          if (ace->Mask & FILE_READ_DATA)
-            *flags |= S_IRUSR;
-          if (ace->Mask & FILE_WRITE_DATA)
-            *flags |= S_IWUSR;
-          if (ace->Mask & FILE_EXECUTE)
-            *flags |= S_IXUSR;
-        }
+	{
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_IRUSR;
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_IWUSR;
+	  if (ace->Mask & FILE_EXECUTE)
+	    *flags |= S_IXUSR;
+	}
       else if (group_sid && EqualSid (ace_sid, group_sid))
-        {
-          if (ace->Mask & FILE_READ_DATA)
-            *flags |= S_IRGRP
-                      | ((grp_member && !(*anti & S_IRUSR)) ? S_IRUSR : 0);
-          if (ace->Mask & FILE_WRITE_DATA)
-            *flags |= S_IWGRP
-                      | ((grp_member && !(*anti & S_IWUSR)) ? S_IWUSR : 0);
-          if (ace->Mask & FILE_EXECUTE)
-            *flags |= S_IXGRP
-                      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
-        }
+	{
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_IRGRP
+		      | ((grp_member && !(*anti & S_IRUSR)) ? S_IRUSR : 0);
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_IWGRP
+		      | ((grp_member && !(*anti & S_IWUSR)) ? S_IWUSR : 0);
+	  if (ace->Mask & FILE_EXECUTE)
+	    *flags |= S_IXGRP
+		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
+	}
       else if (EqualSid (ace_sid, get_world_sid ()))
-        {
-          if (ace->Mask & FILE_READ_DATA)
-            *flags |= S_IROTH
-                      | ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
-                      | ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
-          if (ace->Mask & FILE_WRITE_DATA)
-            *flags |= S_IWOTH
-                      | ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
-                      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
-          if (ace->Mask & FILE_EXECUTE)
-            {
-              *flags |= S_IXOTH
-                        | ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
-                        | ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
-              // Sticky bit for directories according to linux rules.
-              // No sense for files.
-              if (! (ace->Mask & FILE_DELETE_CHILD)
-                  && S_ISDIR(*attribute)
-                  && !(*anti & S_ISVTX))
-                *flags |= S_ISVTX;
-            }
-        }
+	{
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_IROTH
+		      | ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
+		      | ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_IWOTH
+		      | ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
+		      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
+	  if (ace->Mask & FILE_EXECUTE)
+	    {
+	      *flags |= S_IXOTH
+			| ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
+			| ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
+	      // Sticky bit for directories according to linux rules.
+	      // No sense for files.
+	      if (! (ace->Mask & FILE_DELETE_CHILD)
+		  && S_ISDIR(*attribute)
+		  && !(*anti & S_ISVTX))
+		*flags |= S_ISVTX;
+	    }
+	}
     }
   *attribute &= ~(S_IRWXU|S_IRWXG|S_IRWXO|S_ISVTX);
   *attribute |= allow;
@@ -805,7 +805,7 @@ get_nt_attribute (const char *file, int *attribute,
 
 int
 get_file_attribute (int use_ntsec, const char *file,
-                    int *attribute, uid_t *uidret, gid_t *gidret)
+		    int *attribute, uid_t *uidret, gid_t *gidret)
 {
   if (use_ntsec && allow_ntsec)
     return get_nt_attribute (file, attribute, uidret, gidret);
@@ -819,7 +819,7 @@ get_file_attribute (int use_ntsec, const char *file,
     return 0;
 
   int res = NTReadEA (file, ".UNIXATTR",
-                      (char *) attribute, sizeof (*attribute));
+		      (char *) attribute, sizeof (*attribute));
 
   // symlinks are anything for everyone!
   if ((*attribute & S_IFLNK) == S_IFLNK)
@@ -831,7 +831,7 @@ get_file_attribute (int use_ntsec, const char *file,
 }
 
 BOOL add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
-                             PSID sid, size_t &len_add, DWORD inherit)
+			     PSID sid, size_t &len_add, DWORD inherit)
 {
   if (! AddAccessAllowedAce (acl, ACL_REVISION, attributes, sid))
     {
@@ -842,12 +842,12 @@ BOOL add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
   if (GetAce(acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD)
-             + GetLengthSid (sid);
+	     + GetLengthSid (sid);
   return TRUE;
 }
 
 BOOL add_access_denied_ace (PACL acl, int offset, DWORD attributes,
-                            PSID sid, size_t &len_add, DWORD inherit)
+			    PSID sid, size_t &len_add, DWORD inherit)
 {
   if (! AddAccessDeniedAce (acl, ACL_REVISION, attributes, sid))
     {
@@ -858,7 +858,7 @@ BOOL add_access_denied_ace (PACL acl, int offset, DWORD attributes,
   if (GetAce(acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD)
-             + GetLengthSid (sid);
+	     + GetLengthSid (sid);
   return TRUE;
 }
 
@@ -888,7 +888,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
       && ! lookup_name (owner, logsrv, owner_sid))
     return NULL;
   debug_printf ("owner: %s [%d]", owner,
-                *GetSidSubAuthority((PSID) owner_sid,
+		*GetSidSubAuthority((PSID) owner_sid,
 		*GetSidSubAuthorityCount((PSID) owner_sid) - 1));
 
   // Get SID and name of new group
@@ -899,8 +899,8 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
     {
       group_sid = (PSID) group_sid_buf;
       if ((! grp || ! get_gr_sid (group_sid, grp))
-          && ! lookup_name (grp->gr_name, logsrv, group_sid))
-        return NULL;
+	  && ! lookup_name (grp->gr_name, logsrv, group_sid))
+	return NULL;
     }
   else
     debug_printf ("no group");
@@ -949,7 +949,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 
   // Construct allow attribute for owner
   DWORD owner_allow = (STANDARD_RIGHTS_ALL & ~DELETE)
-                      | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA;
+		      | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA;
   if (attribute & S_IRUSR)
     owner_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWUSR)
@@ -961,7 +961,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 
   // Construct allow attribute for group
   DWORD group_allow = STANDARD_RIGHTS_READ
-                      | FILE_READ_ATTRIBUTES | FILE_READ_EA;
+		      | FILE_READ_ATTRIBUTES | FILE_READ_EA;
   if (attribute & S_IRGRP)
     group_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWGRP)
@@ -973,7 +973,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 
   // Construct allow attribute for everyone
   DWORD other_allow = STANDARD_RIGHTS_READ
-                      | FILE_READ_ATTRIBUTES | FILE_READ_EA;
+		      | FILE_READ_ATTRIBUTES | FILE_READ_EA;
   if (attribute & S_IROTH)
     other_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWOTH)
@@ -990,8 +990,8 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   else
     owner_deny = ~owner_allow & other_allow;
   owner_deny &= ~(STANDARD_RIGHTS_READ
-                  | FILE_READ_ATTRIBUTES | FILE_READ_EA
-                  | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA);
+		  | FILE_READ_ATTRIBUTES | FILE_READ_EA
+		  | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA);
   DWORD group_deny = ~group_allow & other_allow;
   group_deny &= ~(STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES | FILE_READ_EA);
 
@@ -1001,20 +1001,20 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   // Set deny ACE for owner
   if (owner_deny
       && ! add_access_denied_ace (acl, ace_off++, owner_deny,
-                                  owner_sid, acl_len, inherit))
+				  owner_sid, acl_len, inherit))
       return NULL;
   // Set allow ACE for owner
   if (! add_access_allowed_ace (acl, ace_off++, owner_allow,
-                                owner_sid, acl_len, inherit))
+				owner_sid, acl_len, inherit))
     return NULL;
   // Set deny ACE for group
   if (group_deny
       && ! add_access_denied_ace (acl, ace_off++, group_deny,
-                                  group_sid, acl_len, inherit))
+				  group_sid, acl_len, inherit))
       return NULL;
   // Set allow ACE for group
   if (! add_access_allowed_ace (acl, ace_off++, group_allow,
-                                group_sid, acl_len, inherit))
+				group_sid, acl_len, inherit))
     return NULL;
 
   // Get owner and group from current security descriptor
@@ -1033,33 +1033,33 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
       && acl_exists && oacl)
     for (DWORD i = 0; i < oacl->AceCount; ++i)
       if (GetAce (oacl, i, (PVOID *) &ace))
-        {
-          PSID ace_sid = (PSID) &ace->SidStart;
-          // Check for related ACEs
-          if ((cur_owner_sid && EqualSid (ace_sid, cur_owner_sid))
-              || (owner_sid && EqualSid (ace_sid, owner_sid))
-              || (cur_group_sid && EqualSid (ace_sid, cur_group_sid))
-              || (group_sid && EqualSid (ace_sid, group_sid))
-              || (EqualSid (ace_sid, get_world_sid ())))
-            continue;
-          // Add unrelated ACCESS_DENIED_ACE to the beginning but
-          // behind the owner_deny, ACCESS_ALLOWED_ACE to the end
-          // but in front of the `everyone' ACE.
-          if (! AddAce(acl, ACL_REVISION,
-                       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE ?
-                       (owner_deny ? 1 : 0) : MAXDWORD,
-                       (LPVOID) ace, ace->Header.AceSize))
-            {
-              __seterrno ();
-              return NULL;
-            }
-          acl_len += ace->Header.AceSize;
-          ++ace_off;
-        }
+	{
+	  PSID ace_sid = (PSID) &ace->SidStart;
+	  // Check for related ACEs
+	  if ((cur_owner_sid && EqualSid (ace_sid, cur_owner_sid))
+	      || (owner_sid && EqualSid (ace_sid, owner_sid))
+	      || (cur_group_sid && EqualSid (ace_sid, cur_group_sid))
+	      || (group_sid && EqualSid (ace_sid, group_sid))
+	      || (EqualSid (ace_sid, get_world_sid ())))
+	    continue;
+	  // Add unrelated ACCESS_DENIED_ACE to the beginning but
+	  // behind the owner_deny, ACCESS_ALLOWED_ACE to the end
+	  // but in front of the `everyone' ACE.
+	  if (! AddAce(acl, ACL_REVISION,
+		       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE ?
+		       (owner_deny ? 1 : 0) : MAXDWORD,
+		       (LPVOID) ace, ace->Header.AceSize))
+	    {
+	      __seterrno ();
+	      return NULL;
+	    }
+	  acl_len += ace->Header.AceSize;
+	  ++ace_off;
+	}
 
   // Set allow ACE for everyone
   if (! add_access_allowed_ace (acl, ace_off++, other_allow,
-                                get_world_sid (), acl_len, inherit))
+				get_world_sid (), acl_len, inherit))
     return NULL;
 
   // Set AclSize to computed value
@@ -1094,7 +1094,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 
 static int
 set_nt_attribute (const char *file, uid_t uid, gid_t gid,
-                  const char *logsrv, int attribute)
+		  const char *logsrv, int attribute)
 {
   if (os_being_run != winNT)
     return 0;
@@ -1119,8 +1119,8 @@ set_nt_attribute (const char *file, uid_t uid, gid_t gid,
 
 int
 set_file_attribute (int use_ntsec, const char *file,
-                    uid_t uid, gid_t gid,
-                    int attribute, const char *logsrv)
+		    uid_t uid, gid_t gid,
+		    int attribute, const char *logsrv)
 {
   // symlinks are anything for everyone!
   if ((attribute & S_IFLNK) == S_IFLNK)
@@ -1129,7 +1129,7 @@ set_file_attribute (int use_ntsec, const char *file,
   if (!use_ntsec || !allow_ntsec)
     {
       if (! NTWriteEA (file, ".UNIXATTR",
-                       (char *) &attribute, sizeof (attribute)))
+		       (char *) &attribute, sizeof (attribute)))
 	{
 	  __seterrno ();
 	  return -1;
@@ -1147,8 +1147,8 @@ int
 set_file_attribute (int use_ntsec, const char *file, int attribute)
 {
   return set_file_attribute (use_ntsec, file,
-                             myself->uid, myself->gid,
-                             attribute, myself->logsrv);
+			     myself->uid, myself->gid,
+			     attribute, myself->logsrv);
 }
 
 static int
@@ -1158,7 +1158,7 @@ searchace (aclent_t *aclp, int nentries, int type, int id = -1)
 
   for (i = 0; i < nentries; ++i)
     if ((aclp[i].a_type == type && (id < 0 || aclp[i].a_id == id))
-        || !aclp[i].a_type)
+	|| !aclp[i].a_type)
       return i;
   return -1;
 }
@@ -1247,70 +1247,70 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
   for (int i = 0; i < nentries; ++i)
     {
       DWORD allow = STANDARD_RIGHTS_READ
-                    | FILE_READ_ATTRIBUTES | FILE_READ_EA;
+		    | FILE_READ_ATTRIBUTES | FILE_READ_EA;
       if (aclbufp[i].a_perm & S_IROTH)
-        allow |= FILE_GENERIC_READ;
+	allow |= FILE_GENERIC_READ;
       if (aclbufp[i].a_perm & S_IWOTH)
-        allow |= STANDARD_RIGHTS_ALL | FILE_GENERIC_WRITE
-                 | DELETE | FILE_DELETE_CHILD;
+	allow |= STANDARD_RIGHTS_ALL | FILE_GENERIC_WRITE
+		 | DELETE | FILE_DELETE_CHILD;
       if (aclbufp[i].a_perm & S_IXOTH)
-        allow |= FILE_GENERIC_EXECUTE;
+	allow |= FILE_GENERIC_EXECUTE;
       // Set inherit property
       DWORD inheritance = (aclbufp[i].a_type & ACL_DEFAULT)
-                          ? INHERIT_ONLY : DONT_INHERIT;
+			  ? INHERIT_ONLY : DONT_INHERIT;
       // If a specific acl contains a corresponding default entry with
       // identical permissions, only one Windows ACE with proper
       // inheritance bits is created.
       if (!(aclbufp[i].a_type & ACL_DEFAULT)
-          && (pos = searchace (aclbufp, nentries,
-                               aclbufp[i].a_type | ACL_DEFAULT,
-                               (aclbufp[i].a_type & (USER|GROUP))
-                               ? aclbufp[i].a_id : -1)) >= 0
-          && pos < nentries
-          && aclbufp[i].a_perm == aclbufp[pos].a_perm)
-        {
-          inheritance = INHERIT_ALL;
-          // This eliminates the corresponding default entry.
-          aclbufp[pos].a_type = 0;
-        }
+	  && (pos = searchace (aclbufp, nentries,
+			       aclbufp[i].a_type | ACL_DEFAULT,
+			       (aclbufp[i].a_type & (USER|GROUP))
+			       ? aclbufp[i].a_id : -1)) >= 0
+	  && pos < nentries
+	  && aclbufp[i].a_perm == aclbufp[pos].a_perm)
+	{
+	  inheritance = INHERIT_ALL;
+	  // This eliminates the corresponding default entry.
+	  aclbufp[pos].a_type = 0;
+	}
       switch (aclbufp[i].a_type)
-        {
-        case USER_OBJ:
-        case DEF_USER_OBJ:
-          allow |= STANDARD_RIGHTS_ALL & ~DELETE;
-          if (! add_access_allowed_ace (acl, ace_off++, allow,
-                                        owner_sid, acl_len, inheritance))
-            return -1;
-          break;
-        case USER:
-        case DEF_USER:
-          if (!(pw = getpwuid (aclbufp[i].a_id))
-              || ! get_pw_sid (sid, pw)
-              || ! add_access_allowed_ace (acl, ace_off++, allow,
-                                           sid, acl_len, inheritance))
-            return -1;
-          break;
-        case GROUP_OBJ:
-        case DEF_GROUP_OBJ:
-          if (! add_access_allowed_ace (acl, ace_off++, allow,
-                                        group_sid, acl_len, inheritance))
-            return -1;
-          break;
-        case GROUP:
-        case DEF_GROUP:
-          if (!(gr = getgrgid (aclbufp[i].a_id))
-              || ! get_gr_sid (sid, gr)
-              || ! add_access_allowed_ace (acl, ace_off++, allow,
-                                           sid, acl_len, inheritance))
-            return -1;
-          break;
-        case OTHER_OBJ:
-        case DEF_OTHER_OBJ:
-          if (! add_access_allowed_ace (acl, ace_off++, allow,
-                                        get_world_sid(), acl_len, inheritance))
-            return -1;
-          break;
-        }
+	{
+	case USER_OBJ:
+	case DEF_USER_OBJ:
+	  allow |= STANDARD_RIGHTS_ALL & ~DELETE;
+	  if (! add_access_allowed_ace (acl, ace_off++, allow,
+					owner_sid, acl_len, inheritance))
+	    return -1;
+	  break;
+	case USER:
+	case DEF_USER:
+	  if (!(pw = getpwuid (aclbufp[i].a_id))
+	      || ! get_pw_sid (sid, pw)
+	      || ! add_access_allowed_ace (acl, ace_off++, allow,
+					   sid, acl_len, inheritance))
+	    return -1;
+	  break;
+	case GROUP_OBJ:
+	case DEF_GROUP_OBJ:
+	  if (! add_access_allowed_ace (acl, ace_off++, allow,
+					group_sid, acl_len, inheritance))
+	    return -1;
+	  break;
+	case GROUP:
+	case DEF_GROUP:
+	  if (!(gr = getgrgid (aclbufp[i].a_id))
+	      || ! get_gr_sid (sid, gr)
+	      || ! add_access_allowed_ace (acl, ace_off++, allow,
+					   sid, acl_len, inheritance))
+	    return -1;
+	  break;
+	case OTHER_OBJ:
+	case DEF_OTHER_OBJ:
+	  if (! add_access_allowed_ace (acl, ace_off++, allow,
+					get_world_sid(), acl_len, inheritance))
+	    return -1;
+	  break;
+	}
     }
   // Set AclSize to computed value
   acl->AclSize = acl_len;
@@ -1422,7 +1422,7 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
   if (! acl_exists || ! acl)
     {
       for (pos = 0; pos < MIN_ACL_ENTRIES; ++pos)
-        lacl[pos].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
+	lacl[pos].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
       pos = nentries < MIN_ACL_ENTRIES ? nentries : MIN_ACL_ENTRIES;
       memcpy (aclbufp, lacl, pos * sizeof (aclent_t));
       return pos;
@@ -1433,64 +1433,64 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
       ACCESS_ALLOWED_ACE *ace;
 
       if (!GetAce (acl, i, (PVOID *) &ace))
-        continue;
+	continue;
 
       PSID ace_sid = (PSID) &ace->SidStart;
       int id;
       int type = 0;
 
       if (EqualSid (ace_sid, owner_sid))
-        {
-          type = USER_OBJ;
-          id = uid;
-        }
+	{
+	  type = USER_OBJ;
+	  id = uid;
+	}
       else if (EqualSid (ace_sid, group_sid))
-        {
-          type = GROUP_OBJ;
-          id = gid;
-        }
+	{
+	  type = GROUP_OBJ;
+	  id = gid;
+	}
       else if (EqualSid (ace_sid, get_world_sid ()))
-        {
-          type = OTHER_OBJ;
-          id = 0;
-        }
+	{
+	  type = OTHER_OBJ;
+	  id = 0;
+	}
       else
-        {
-          id = get_id_from_sid (ace_sid, FALSE, &type);
-          if (type != GROUP)
-            {
-              int type2 = 0;
-              int id2 = get_id_from_sid (ace_sid, TRUE, &type2);
-              if (type2 == GROUP)
-                {
-                  id = id2;
-                  type = GROUP;
-                }
-            }
-        }
+	{
+	  id = get_id_from_sid (ace_sid, FALSE, &type);
+	  if (type != GROUP)
+	    {
+	      int type2 = 0;
+	      int id2 = get_id_from_sid (ace_sid, TRUE, &type2);
+	      if (type2 == GROUP)
+		{
+		  id = id2;
+		  type = GROUP;
+		}
+	    }
+	}
       if (!type)
-        continue;
+	continue;
       if (!(ace->Header.AceFlags & INHERIT_ONLY_ACE))
-        {
-          if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
-            getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
-        }
+	{
+	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
+	    getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
+	}
       if ((ace->Header.AceFlags & INHERIT_ALL)
-          && (attr & FILE_ATTRIBUTE_DIRECTORY))
-        {
-          type |= ACL_DEFAULT;
-          if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
-            getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
-        }
+	  && (attr & FILE_ATTRIBUTE_DIRECTORY))
+	{
+	  type |= ACL_DEFAULT;
+	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
+	    getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
+	}
     }
   if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
     pos = MAX_ACL_ENTRIES;
   for (i = 0; i < pos; ++i)
     {
       lacl[i].a_perm = (lacl[i].a_perm & S_IRWXU)
-                       & ~((lacl[i].a_perm & S_IRWXG) << 3);
+		       & ~((lacl[i].a_perm & S_IRWXG) << 3);
       lacl[i].a_perm |= (lacl[i].a_perm & S_IRWXU) >> 3
-                        | (lacl[i].a_perm & S_IRWXU) >> 6;
+			| (lacl[i].a_perm & S_IRWXU) >> 6;
     }
   if ((searchace (lacl, MAX_ACL_ENTRIES, USER) >= 0
        || searchace (lacl, MAX_ACL_ENTRIES, GROUP) >= 0)
@@ -1498,7 +1498,7 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
     {
       lacl[pos].a_type = CLASS_OBJ;
       lacl[pos].a_perm =
-          lacl[searchace (lacl, MAX_ACL_ENTRIES, GROUP_OBJ)].a_perm;
+	  lacl[searchace (lacl, MAX_ACL_ENTRIES, GROUP_OBJ)].a_perm;
     }
   int dgpos;
   if ((searchace (lacl, MAX_ACL_ENTRIES, DEF_USER) >= 0
@@ -1537,53 +1537,53 @@ acl_access (const char *path, int flags)
   for (int i = 0; i < cnt; ++i)
     {
       switch (acls[i].a_type)
-        {
-        case USER_OBJ:
-        case USER:
-          if (acls[i].a_id != myself->uid)
-            {
-              // Check if user is a NT group:
-              // Take SID from passwd, search SID in group, check is_grp_member
-              char owner_sidbuf[MAX_SID_LEN];
-              PSID owner_sid = (PSID) owner_sidbuf;
-              char group_sidbuf[MAX_SID_LEN];
-              PSID group_sid = (PSID) group_sidbuf;
-              struct passwd *pw;
-              struct group *gr = NULL;
+	{
+	case USER_OBJ:
+	case USER:
+	  if (acls[i].a_id != myself->uid)
+	    {
+	      // Check if user is a NT group:
+	      // Take SID from passwd, search SID in group, check is_grp_member
+	      char owner_sidbuf[MAX_SID_LEN];
+	      PSID owner_sid = (PSID) owner_sidbuf;
+	      char group_sidbuf[MAX_SID_LEN];
+	      PSID group_sid = (PSID) group_sidbuf;
+	      struct passwd *pw;
+	      struct group *gr = NULL;
 
-              if (group_sem > 0)
-                continue;
-              ++group_sem;
-              if ((pw = getpwuid (acls[i].a_id)) != NULL
-                  && get_pw_sid (owner_sid, pw))
-                {
-                  while ((gr = getgrent ()))
-                    if (get_gr_sid (group_sid, gr)
-                        && EqualSid (owner_sid, group_sid)
-                        && is_grp_member (myself->uid, gr->gr_gid))
-                      break;
-                  endgrent ();
-                }
-              --group_sem;
-              if (! gr)
-                continue;
-            }
-          break;
-        case GROUP_OBJ:
-        case GROUP:
-          if (acls[i].a_id != myself->gid &&
-              !is_grp_member (myself->uid, acls[i].a_id))
-            continue;
-          break;
-        case OTHER_OBJ:
-          break;
-        default:
-          continue;
-        }
+	      if (group_sem > 0)
+		continue;
+	      ++group_sem;
+	      if ((pw = getpwuid (acls[i].a_id)) != NULL
+		  && get_pw_sid (owner_sid, pw))
+		{
+		  while ((gr = getgrent ()))
+		    if (get_gr_sid (group_sid, gr)
+			&& EqualSid (owner_sid, group_sid)
+			&& is_grp_member (myself->uid, gr->gr_gid))
+		      break;
+		  endgrent ();
+		}
+	      --group_sem;
+	      if (! gr)
+		continue;
+	    }
+	  break;
+	case GROUP_OBJ:
+	case GROUP:
+	  if (acls[i].a_id != myself->gid &&
+	      !is_grp_member (myself->uid, acls[i].a_id))
+	    continue;
+	  break;
+	case OTHER_OBJ:
+	  break;
+	default:
+	  continue;
+	}
       if ((!(flags & R_OK) || (acls[i].a_perm & S_IREAD))
-          && (!(flags & W_OK) || (acls[i].a_perm & S_IWRITE))
-          && (!(flags & X_OK) || (acls[i].a_perm & S_IEXEC)))
-        return 0;
+	  && (!(flags & W_OK) || (acls[i].a_perm & S_IWRITE))
+	  && (!(flags & X_OK) || (acls[i].a_perm & S_IEXEC)))
+	return 0;
     }
   set_errno (EACCES);
   return -1;
@@ -1592,7 +1592,7 @@ acl_access (const char *path, int flags)
 static
 int
 acl_worker (const char *path, int cmd, int nentries, aclent_t *aclbufp,
-            int nofollow)
+	    int nofollow)
 {
   extern suffix_info stat_suffixes[];
   path_conv real_path (path, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW) | PC_FULL, stat_suffixes);
@@ -1608,82 +1608,82 @@ acl_worker (const char *path, int cmd, int nentries, aclent_t *aclbufp,
       int ret = -1;
 
       switch (cmd)
-        {
-        case SETACL:
-          set_errno (ENOSYS);
-          break;
-        case GETACL:
-          if (nentries < 1)
-            set_errno (EINVAL);
-          else if ((nofollow && ! lstat (path, &st))
-                   || (!nofollow && ! stat (path, &st)))
-            {
-              aclent_t lacl[4];
-              if (nentries > 0)
-                {
-                  lacl[0].a_type = USER_OBJ;
-                  lacl[0].a_id = st.st_uid;
-                  lacl[0].a_perm = (st.st_mode & S_IRWXU)
-                                   | (st.st_mode & S_IRWXU) >> 3
-                                   | (st.st_mode & S_IRWXU) >> 6;
-                }
-              if (nentries > 1)
-                {
-                  lacl[1].a_type = GROUP_OBJ;
-                  lacl[1].a_id = st.st_gid;
-                  lacl[1].a_perm = (st.st_mode & S_IRWXG)
-                                   | (st.st_mode & S_IRWXG) << 3
-                                   | (st.st_mode & S_IRWXG) >> 3;
-                }
-              if (nentries > 2)
-                {
-                  lacl[2].a_type = OTHER_OBJ;
-                  lacl[2].a_id = 0;
-                  lacl[2].a_perm = (st.st_mode & S_IRWXO)
-                                   | (st.st_mode & S_IRWXO) << 6
-                                   | (st.st_mode & S_IRWXO) << 3;
-                }
-              if (nentries > 3)
-                {
-                  lacl[3].a_type = CLASS_OBJ;
-                  lacl[3].a_id = 0;
-                  lacl[3].a_perm = (st.st_mode & S_IRWXG)
-                                   | (st.st_mode & S_IRWXG) << 3
-                                   | (st.st_mode & S_IRWXG) >> 3;
-                }
-              if (nentries > 4)
-                nentries = 4;
-              if (aclbufp)
-                memcpy (aclbufp, lacl, nentries * sizeof (aclent_t));
-              ret = nentries;
-            }
-          break;
-        case GETACLCNT:
-          ret = 4;
-          break;
-        }
+	{
+	case SETACL:
+	  set_errno (ENOSYS);
+	  break;
+	case GETACL:
+	  if (nentries < 1)
+	    set_errno (EINVAL);
+	  else if ((nofollow && ! lstat (path, &st))
+		   || (!nofollow && ! stat (path, &st)))
+	    {
+	      aclent_t lacl[4];
+	      if (nentries > 0)
+		{
+		  lacl[0].a_type = USER_OBJ;
+		  lacl[0].a_id = st.st_uid;
+		  lacl[0].a_perm = (st.st_mode & S_IRWXU)
+				   | (st.st_mode & S_IRWXU) >> 3
+				   | (st.st_mode & S_IRWXU) >> 6;
+		}
+	      if (nentries > 1)
+		{
+		  lacl[1].a_type = GROUP_OBJ;
+		  lacl[1].a_id = st.st_gid;
+		  lacl[1].a_perm = (st.st_mode & S_IRWXG)
+				   | (st.st_mode & S_IRWXG) << 3
+				   | (st.st_mode & S_IRWXG) >> 3;
+		}
+	      if (nentries > 2)
+		{
+		  lacl[2].a_type = OTHER_OBJ;
+		  lacl[2].a_id = 0;
+		  lacl[2].a_perm = (st.st_mode & S_IRWXO)
+				   | (st.st_mode & S_IRWXO) << 6
+				   | (st.st_mode & S_IRWXO) << 3;
+		}
+	      if (nentries > 3)
+		{
+		  lacl[3].a_type = CLASS_OBJ;
+		  lacl[3].a_id = 0;
+		  lacl[3].a_perm = (st.st_mode & S_IRWXG)
+				   | (st.st_mode & S_IRWXG) << 3
+				   | (st.st_mode & S_IRWXG) >> 3;
+		}
+	      if (nentries > 4)
+		nentries = 4;
+	      if (aclbufp)
+		memcpy (aclbufp, lacl, nentries * sizeof (aclent_t));
+	      ret = nentries;
+	    }
+	  break;
+	case GETACLCNT:
+	  ret = 4;
+	  break;
+	}
       syscall_printf ("%d = acl (%s)", ret, path);
       return ret;
     }
   switch (cmd)
     {
       case SETACL:
-        if (!aclsort(nentries, 0, aclbufp))
-          return setacl (real_path.get_win32 (),
-                         nentries, aclbufp);
-        break;
+	if (!aclsort(nentries, 0, aclbufp))
+	  return setacl (real_path.get_win32 (),
+			 nentries, aclbufp);
+	break;
       case GETACL:
-        if (nentries < 1)
-          break;
-        return getacl (real_path.get_win32 (),
-                       real_path.file_attributes (),
-                       nentries, aclbufp);
+	if (nentries < 1)
+	  break;
+	return getacl (real_path.get_win32 (),
+		       real_path.file_attributes (),
+		       nentries, aclbufp);
       case GETACLCNT:
-        return getacl (real_path.get_win32 (),
-                       real_path.file_attributes (),
-                       0, NULL);
+	return getacl (real_path.get_win32 (),
+		       real_path.file_attributes (),
+		       0, NULL);
       default:
-        break;
+	break;
     }
   set_errno (EINVAL);
   syscall_printf ("-1 = acl (%s)", path);
@@ -1745,101 +1745,101 @@ aclcheck (aclent_t *aclbufp, int nentries, int *which)
     switch (aclbufp[pos].a_type)
       {
       case USER_OBJ:
-        if (has_user_obj)
-          {
-            if (which)
-              *which = pos;
-            return USER_ERROR;
-          }
-        has_user_obj = TRUE;
-        break;
+	if (has_user_obj)
+	  {
+	    if (which)
+	      *which = pos;
+	    return USER_ERROR;
+	  }
+	has_user_obj = TRUE;
+	break;
       case GROUP_OBJ:
-        if (has_group_obj)
-          {
-            if (which)
-              *which = pos;
-            return GRP_ERROR;
-          }
-        has_group_obj = TRUE;
-        break;
+	if (has_group_obj)
+	  {
+	    if (which)
+	      *which = pos;
+	    return GRP_ERROR;
+	  }
+	has_group_obj = TRUE;
+	break;
       case OTHER_OBJ:
-        if (has_other_obj)
-          {
-            if (which)
-              *which = pos;
-            return OTHER_ERROR;
-          }
-        has_other_obj = TRUE;
-        break;
+	if (has_other_obj)
+	  {
+	    if (which)
+	      *which = pos;
+	    return OTHER_ERROR;
+	  }
+	has_other_obj = TRUE;
+	break;
       case CLASS_OBJ:
-        if (has_class_obj)
-          {
-            if (which)
-              *which = pos;
-            return CLASS_ERROR;
-          }
-        has_class_obj = TRUE;
-        break;
+	if (has_class_obj)
+	  {
+	    if (which)
+	      *which = pos;
+	    return CLASS_ERROR;
+	  }
+	has_class_obj = TRUE;
+	break;
       case USER:
       case GROUP:
-        if ((pos2 = searchace (aclbufp + pos + 1, nentries - pos - 1,
-                               aclbufp[pos].a_type, aclbufp[pos].a_id)) >= 0)
-          {
-            if (which)
-              *which = pos2;
-            return DUPLICATE_ERROR;
-          }
-        has_ug_objs = TRUE;
-        break;
+	if ((pos2 = searchace (aclbufp + pos + 1, nentries - pos - 1,
+			       aclbufp[pos].a_type, aclbufp[pos].a_id)) >= 0)
+	  {
+	    if (which)
+	      *which = pos2;
+	    return DUPLICATE_ERROR;
+	  }
+	has_ug_objs = TRUE;
+	break;
       case DEF_USER_OBJ:
-        if (has_def_user_obj)
-          {
-            if (which)
-              *which = pos;
-            return USER_ERROR;
-          }
-        has_def_user_obj = TRUE;
-        break;
+	if (has_def_user_obj)
+	  {
+	    if (which)
+	      *which = pos;
+	    return USER_ERROR;
+	  }
+	has_def_user_obj = TRUE;
+	break;
       case DEF_GROUP_OBJ:
-        if (has_def_group_obj)
-          {
-            if (which)
-              *which = pos;
-            return GRP_ERROR;
-          }
-        has_def_group_obj = TRUE;
-        break;
+	if (has_def_group_obj)
+	  {
+	    if (which)
+	      *which = pos;
+	    return GRP_ERROR;
+	  }
+	has_def_group_obj = TRUE;
+	break;
       case DEF_OTHER_OBJ:
-        if (has_def_other_obj)
-          {
-            if (which)
-              *which = pos;
-            return OTHER_ERROR;
-          }
-        has_def_other_obj = TRUE;
-        break;
+	if (has_def_other_obj)
+	  {
+	    if (which)
+	      *which = pos;
+	    return OTHER_ERROR;
+	  }
+	has_def_other_obj = TRUE;
+	break;
       case DEF_CLASS_OBJ:
-        if (has_def_class_obj)
-          {
-            if (which)
-              *which = pos;
-            return CLASS_ERROR;
-          }
-        has_def_class_obj = TRUE;
-        break;
+	if (has_def_class_obj)
+	  {
+	    if (which)
+	      *which = pos;
+	    return CLASS_ERROR;
+	  }
+	has_def_class_obj = TRUE;
+	break;
       case DEF_USER:
       case DEF_GROUP:
-        if ((pos2 = searchace (aclbufp + pos + 1, nentries - pos - 1,
-                               aclbufp[pos].a_type, aclbufp[pos].a_id)) >= 0)
-          {
-            if (which)
-              *which = pos2;
-            return DUPLICATE_ERROR;
-          }
-        has_def_ug_objs = TRUE;
-        break;
+	if ((pos2 = searchace (aclbufp + pos + 1, nentries - pos - 1,
+			       aclbufp[pos].a_type, aclbufp[pos].a_id)) >= 0)
+	  {
+	    if (which)
+	      *which = pos2;
+	    return DUPLICATE_ERROR;
+	  }
+	has_def_ug_objs = TRUE;
+	break;
       default:
-        return ENTRY_ERROR;
+	return ENTRY_ERROR;
       }
   if (!has_user_obj
       || !has_group_obj
@@ -1852,7 +1852,7 @@ aclcheck (aclent_t *aclbufp, int nentries, int *which)
      )
     {
       if (which)
-        *which = -1;
+	*which = -1;
       return MISS_ERROR;
     }
   return 0;
@@ -1936,8 +1936,8 @@ aclfrommode(aclent_t *aclbufp, int nentries, mode_t *modep)
       return -1;
     }
   aclbufp[pos].a_perm = (*modep & S_IRWXU)
-                        | (*modep & S_IRWXU) >> 3
-                        | (*modep & S_IRWXU) >> 6;
+			| (*modep & S_IRWXU) >> 3
+			| (*modep & S_IRWXU) >> 6;
   if ((pos = searchace (aclbufp, nentries, GROUP_OBJ)) < 0)
     {
       set_errno (EINVAL);
@@ -1946,16 +1946,16 @@ aclfrommode(aclent_t *aclbufp, int nentries, mode_t *modep)
   if (searchace (aclbufp, nentries, CLASS_OBJ) < 0)
     pos = searchace (aclbufp, nentries, CLASS_OBJ);
   aclbufp[pos].a_perm = (*modep & S_IRWXG)
-                        | (*modep & S_IRWXG) << 3
-                        | (*modep & S_IRWXG) >> 3;
+			| (*modep & S_IRWXG) << 3
+			| (*modep & S_IRWXG) >> 3;
   if ((pos = searchace (aclbufp, nentries, OTHER_OBJ)) < 0)
     {
       set_errno (EINVAL);
       return -1;
     }
   aclbufp[pos].a_perm = (*modep & S_IRWXO)
-                        | (*modep & S_IRWXO) << 6
-                        | (*modep & S_IRWXO) << 3;
+			| (*modep & S_IRWXO) << 6
+			| (*modep & S_IRWXO) << 3;
   return 0;
 }
 
@@ -2002,40 +2002,40 @@ acltotext (aclent_t *aclbufp, int aclcnt)
   for (int pos = 0; pos < aclcnt; ++pos)
     {
       if (!first)
-        strcat (buf, ",");
+	strcat (buf, ",");
       first = FALSE;
       if (aclbufp[pos].a_type & ACL_DEFAULT)
-        strcat (buf, "default");
+	strcat (buf, "default");
       switch (aclbufp[pos].a_type)
-        {
-        case USER_OBJ:
-          __small_sprintf (buf + strlen (buf), "user::%s",
-                   permtostr (aclbufp[pos].a_perm));
-          break;
-        case USER:
-          __small_sprintf (buf + strlen (buf), "user:%d:%s",
-                   aclbufp[pos].a_id, permtostr (aclbufp[pos].a_perm));
-          break;
-        case GROUP_OBJ:
-          __small_sprintf (buf + strlen (buf), "group::%s",
-                   permtostr (aclbufp[pos].a_perm));
-          break;
-        case GROUP:
-          __small_sprintf (buf + strlen (buf), "group:%d:%s",
-                   aclbufp[pos].a_id, permtostr (aclbufp[pos].a_perm));
-          break;
-        case CLASS_OBJ:
-          __small_sprintf (buf + strlen (buf), "mask::%s",
-                   permtostr (aclbufp[pos].a_perm));
-          break;
-        case OTHER_OBJ:
-          __small_sprintf (buf + strlen (buf), "other::%s",
-                   permtostr (aclbufp[pos].a_perm));
-          break;
-        default:
-          set_errno (EINVAL);
-          return NULL;
-        }
+	{
+	case USER_OBJ:
+	  __small_sprintf (buf + strlen (buf), "user::%s",
+		   permtostr (aclbufp[pos].a_perm));
+	  break;
+	case USER:
+	  __small_sprintf (buf + strlen (buf), "user:%d:%s",
+		   aclbufp[pos].a_id, permtostr (aclbufp[pos].a_perm));
+	  break;
+	case GROUP_OBJ:
+	  __small_sprintf (buf + strlen (buf), "group::%s",
+		   permtostr (aclbufp[pos].a_perm));
+	  break;
+	case GROUP:
+	  __small_sprintf (buf + strlen (buf), "group:%d:%s",
+		   aclbufp[pos].a_id, permtostr (aclbufp[pos].a_perm));
+	  break;
+	case CLASS_OBJ:
+	  __small_sprintf (buf + strlen (buf), "mask::%s",
+		   permtostr (aclbufp[pos].a_perm));
+	  break;
+	case OTHER_OBJ:
+	  __small_sprintf (buf + strlen (buf), "other::%s",
+		   permtostr (aclbufp[pos].a_perm));
+	  break;
+	default:
+	  set_errno (EINVAL);
+	  return NULL;
+	}
     }
   return strdup (buf);
 }
@@ -2078,91 +2078,91 @@ aclfromtext (char *acltextp, int *)
   for (char *c = strtok (buf, ","); c; c = strtok (NULL, ","))
     {
       if (!strncmp (c, "default", 7))
-        {
-          lacl[pos].a_type |= ACL_DEFAULT;
-          c += 7;
-        }
+	{
+	  lacl[pos].a_type |= ACL_DEFAULT;
+	  c += 7;
+	}
       if (!strncmp (c, "user:", 5))
-        {
-          if (c[5] == ':')
-            lacl[pos].a_type |= USER_OBJ;
-          else
-            {
-              lacl[pos].a_type |= USER;
-              c += 5;
-              if (isalpha (*c))
-                {
-                  struct passwd *pw = getpwnam (c);
-                  if (!pw)
-                    {
-                      set_errno (EINVAL);
-                      return NULL;
-                    }
-                  lacl[pos].a_id = pw->pw_uid;
-                  c = strchr (c, ':');
-                }
-              else if (isdigit (*c))
-                lacl[pos].a_id = strtol (c, &c, 10);
-              if (!c || *c != ':')
-                {
-                  set_errno (EINVAL);
-                  return NULL;
-                }
-            }
-        }
+	{
+	  if (c[5] == ':')
+	    lacl[pos].a_type |= USER_OBJ;
+	  else
+	    {
+	      lacl[pos].a_type |= USER;
+	      c += 5;
+	      if (isalpha (*c))
+		{
+		  struct passwd *pw = getpwnam (c);
+		  if (!pw)
+		    {
+		      set_errno (EINVAL);
+		      return NULL;
+		    }
+		  lacl[pos].a_id = pw->pw_uid;
+		  c = strchr (c, ':');
+		}
+	      else if (isdigit (*c))
+		lacl[pos].a_id = strtol (c, &c, 10);
+	      if (!c || *c != ':')
+		{
+		  set_errno (EINVAL);
+		  return NULL;
+		}
+	    }
+	}
       else if (!strncmp (c, "group:", 6))
-        {
-          if (c[5] == ':')
-            lacl[pos].a_type |= GROUP_OBJ;
-          else
-            {
-              lacl[pos].a_type |= GROUP;
-              c += 5;
-              if (isalpha (*c))
-                {
-                  struct group *gr = getgrnam (c);
-                  if (!gr)
-                    {
-                      set_errno (EINVAL);
-                      return NULL;
-                    }
-                  lacl[pos].a_id = gr->gr_gid;
-                  c = strchr (c, ':');
-                }
-              else if (isdigit (*c))
-                lacl[pos].a_id = strtol (c, &c, 10);
-              if (!c || *c != ':')
-                {
-                  set_errno (EINVAL);
-                  return NULL;
-                }
-            }
-        }
+	{
+	  if (c[5] == ':')
+	    lacl[pos].a_type |= GROUP_OBJ;
+	  else
+	    {
+	      lacl[pos].a_type |= GROUP;
+	      c += 5;
+	      if (isalpha (*c))
+		{
+		  struct group *gr = getgrnam (c);
+		  if (!gr)
+		    {
+		      set_errno (EINVAL);
+		      return NULL;
+		    }
+		  lacl[pos].a_id = gr->gr_gid;
+		  c = strchr (c, ':');
+		}
+	      else if (isdigit (*c))
+		lacl[pos].a_id = strtol (c, &c, 10);
+	      if (!c || *c != ':')
+		{
+		  set_errno (EINVAL);
+		  return NULL;
+		}
+	    }
+	}
       else if (!strncmp (c, "mask:", 5))
-        {
-          if (c[5] == ':')
-            lacl[pos].a_type |= CLASS_OBJ;
-          else
-            {
-              set_errno (EINVAL);
-              return NULL;
-            }
-        }
+	{
+	  if (c[5] == ':')
+	    lacl[pos].a_type |= CLASS_OBJ;
+	  else
+	    {
+	      set_errno (EINVAL);
+	      return NULL;
+	    }
+	}
       else if (!strncmp (c, "other:", 6))
-        {
-          if (c[5] == ':')
-            lacl[pos].a_type |= OTHER_OBJ;
-          else
-            {
-              set_errno (EINVAL);
-              return NULL;
-            }
-        }
+	{
+	  if (c[5] == ':')
+	    lacl[pos].a_type |= OTHER_OBJ;
+	  else
+	    {
+	      set_errno (EINVAL);
+	      return NULL;
+	    }
+	}
       if ((lacl[pos].a_perm = permfromstr (c)) == 01000)
-        {
-          set_errno (EINVAL);
-          return NULL;
-        }
+	{
+	  set_errno (EINVAL);
+	  return NULL;
+	}
       ++pos;
     }
   aclent_t *aclp = (aclent_t *) malloc (pos * sizeof (aclent_t));

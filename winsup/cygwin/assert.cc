@@ -42,10 +42,10 @@ __assert (const char *file, int line, const char *failedexpr)
     {
       CloseHandle (h);
       small_printf ("assertion \"%s\" failed: file \"%s\", line %d\n",
-                   failedexpr, file, line);
+		    failedexpr, file, line);
     }
 
-  abort ();
+  abort ();	// FIXME: Someday this should work.
 
   /* NOTREACHED */
 }
