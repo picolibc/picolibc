@@ -447,13 +447,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DT_PLTPADSZ	0x6ffffdf9
 #define DT_MOVEENT	0x6ffffdfa
 #define DT_MOVESZ	0x6ffffdfb
-#define DT_FEATURE_1	0x6ffffdfc
+#define DT_FEATURE	0x6ffffdfc
 #define DT_POSFLAG_1	0x6ffffdfd
 #define DT_SYMINSZ	0x6ffffdfe
 #define DT_SYMINENT	0x6ffffdff
 #define DT_VALRNGHI	0x6ffffdff
 
 #define DT_ADDRRNGLO	0x6ffffe00
+#define DT_CONFIG	0x6ffffefa
+#define DT_DEPAUDIT	0x6ffffefb
+#define DT_AUDIT	0x6ffffefc
+#define DT_PLTPAD	0x6ffffefd
+#define DT_MOVETAB	0x6ffffefe
 #define DT_SYMINFO	0x6ffffeff
 #define DT_ADDRRNGHI	0x6ffffeff
 
@@ -478,8 +483,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DT_USED		0x7ffffffe
 #define DT_FILTER	0x7fffffff
 
-/* Values used in DT_FEATURE_1 .dynamic entry.  */
+/* FIXME: From
+
+   http://docs.sun.com:80/ab2/coll.45.13/LLM/@Ab2PageView/21165?Ab2Lang=C&Ab2Enc=iso-8859-1
+
+   DT_CHECKSUM is mentioned. But it is not in the table. Someone should
+   check <sys/link.h> on Solaris 8. */
+#define DT_CHECKSUM	0
+
+
+/* Values used in DT_FEATURE .dynamic entry.  */
 #define DTF_1_PARINIT	0x00000001
+/* FIXME: From
+
+   http://docs.sun.com:80/ab2/coll.45.13/LLM/@Ab2PageView/21165?Ab2Lang=C&Ab2Enc=iso-8859-1
+
+   DTF_1_CONFEXP is the same as DTF_1_PARINIT. I think it is a typo.
+   Someone should check <sys/link.h> on Solaris 8. */
+#define DTF_1_CONFEXP	0x00000002
 
 /* Flag values used in the DT_POSFLAG_1 .dynamic entry.  */
 #define DF_P1_LAZYLOAD	0x00000001
@@ -497,6 +518,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DF_1_DIRECT	0x00000100
 #define DF_1_TRANS	0x00000200
 #define DF_1_INTERPOSE	0x00000400
+#define DF_1_NODEPLIB	0x00000800
+#define DF_1_NODUMP	0x00001000
+#define DF_1_CONLFAT	0x00002000
 
 /* Flag values for the DT_FLAGS entry.  */
 #define DF_ORIGIN	(1 << 0)
