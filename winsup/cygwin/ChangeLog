@@ -399,6 +399,23 @@
 	* Makefile.in: Remove special __OUTSIDE_CYGWIN__ case for
 	cygserver_shm.cc.
 
+2002-06-12  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (pthread::cleanup_stack): Renamed cleanup_handlers to
+	cleanup_stack.
+	* thread.cc (pthread::pthread): Ditto.
+	(pthread::create): Fixed mutex verification.
+	(pthread::push_cleanup_handler): Renamed cleanup_handlers to
+	cleanup_stack.
+	Mutex calls removed, used InterlockedExchangePointer instead.
+	(pthread::pop_cleanup_handler): Renamed cleanup_handlers to
+	cleanup_stack.
+	(pthread::pop_all_cleanup_handlers): Ditto.
+	(__pthread_once): Check state first and return if already done.
+	(__pthread_join): DEADLOCK test reverted to __pthread_equal
+	call.
+	(__pthread_detach): Unlock mutex before deletion.
+
 2002-06-21  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (cygrun.exe): Move -lgcc where it will do some good.

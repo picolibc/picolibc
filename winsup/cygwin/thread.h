@@ -295,7 +295,7 @@ public:
 
 private:
     DWORD thread_id;
-    __pthread_cleanup_handler *cleanup_handlers;
+    __pthread_cleanup_handler *cleanup_stack;
     pthread_mutex mutex;
 
     friend void __pthread_exit (void *value_ptr);
