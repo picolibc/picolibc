@@ -221,6 +221,8 @@ install: all $(install_dlls_host)
 subdirs: $(SUBDIRS)
 	@true
 
+# The . is here because SUBDIRS may be empty
+
 . $(SUBDIRS): force
 	@if [ -d ./$@ ]; then \
 	  echo "Making $(DO) in $@..." ; \
