@@ -884,7 +884,8 @@ mount_info::mount_slash ()
 
 int
 mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
-				char *full_win32_path, DWORD &devn, int &unit, unsigned *flags)
+				char *full_win32_path, DWORD &devn, int &unit,
+                                unsigned *flags)
 {
   int src_path_len = strlen (src_path);
   int trailing_slash_p = (src_path_len > 0
@@ -915,7 +916,10 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
 
   /* The rule is :'s can't appear in [our] POSIX path names so this is a safe
      test; if ':' is present it already be in Win32 form.  */
-  if (strchr (src_path, ':') != NULL)
+  /* Additional test: If the path has \'s in it, we assume that it's a Win32
+     path, either. */
+  if (strchr (src_path, ':') != NULL
+      || (strchr (src_path, '\\')/* && !strchr (src_path, '/')*/))
     {
       debug_printf ("%s already win32", src_path);
       rc = normalize_win32_path ("", src_path, pathbuf);
@@ -923,9 +927,25 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
 	return rc;
       /* FIXME: Do we have to worry about trailing_slash_p here? */
       if (win32_path != NULL)
-	strcpy (win32_path, pathbuf);
+        {
+          /* If src_path is a relativ win32 path, normalize_win32_path
+             adds a leading slash, nevertheless. So we have to test
+             that here */
+	  strcpy (win32_path, strchr("/\\", src_path[0]) || src_path[1] == ':'
+                              ? pathbuf : pathbuf + 1);
+        }
       if (full_win32_path != NULL)
-	strcpy (full_win32_path, pathbuf);
+        {
+          *full_win32_path = '\0';
+          /* Add drive if it's a local relative Win32 path */
+          if (! strchr(src_path, ':') && strncmp (src_path, "\\\\", 2))
+            {
+              GetCurrentDirectory (MAX_PATH, full_win32_path);
+              if (src_path[0] == '\\')     // drive relative absolute path
+                full_win32_path[2] = '\0';
+            }
+	  strcat (full_win32_path, pathbuf);
+        }
       *flags = set_flags_from_win32_path (pathbuf);
       goto out;
     }
