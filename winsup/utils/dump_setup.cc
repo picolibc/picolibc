@@ -237,7 +237,7 @@ file_exists (int verbose, char *filename, const char *alt, char *package)
 static bool
 check_package_files (int verbose, char *package)
 {
-  char filelist[MAX_PATH + 1] = "/etc/setup/";
+  char filelist[MAX_PATH + 1] = "etc/setup/";
   strcat (strcat (filelist, package), ".lst.gz");
   if (!file_exists (false, filelist, NULL, NULL))
     {
@@ -253,8 +253,8 @@ check_package_files (int verbose, char *package)
       zcat = cygpath ("/bin/gzip.exe", NULL);
       while (char *p = strchr (zcat, '/'))
 	*p = '\\';
-      zcat = (char *) realloc (zcat, strlen (zcat) + sizeof (" -dc ") + 4096);
-      zcat_end = strchr (strcat (zcat, " -dc "), '\0');
+      zcat = (char *) realloc (zcat, strlen (zcat) + sizeof (" -dc /") + MAX_PATH);
+      zcat_end = strchr (strcat (zcat, " -dc /"), '\0');
     }
 
   strcpy (zcat_end, filelist);
@@ -262,7 +262,7 @@ check_package_files (int verbose, char *package)
 
   bool result = true;
   char buf[MAX_PATH + 1];
-  while (fgets (buf, 4096, fp))
+  while (fgets (buf, MAX_PATH, fp))
     {
       char *filename = strtok(buf, "\n");
       if (filename[strlen (filename) - 1] == '/')
