@@ -503,6 +503,9 @@ _finitef = finitef NOSIGFE
 fiprintf SIGFE
 _fiprintf = fiprintf SIGFE
 flock SIGFE
+flockfile SIGFE
+ftrylockfile SIGFE
+funlockfile SIGFE
 floor NOSIGFE
 _floor = floor NOSIGFE
 floorf NOSIGFE
@@ -614,9 +617,11 @@ _getgid32 = getgid32 NOSIGFE
 getgrent SIGFE
 _getgrent = getgrent SIGFE
 _getgrent32 = getgrent32 SIGFE
+getgrgid_r SIGFE
 getgrgid SIGFE
 _getgrgid = getgrgid SIGFE
 _getgrgid32 = getgrgid32 SIGFE
+getgrnam_r SIGFE
 getgrnam SIGFE
 _getgrnam = getgrnam SIGFE
 _getgrnam32 = getgrnam32 SIGFE
@@ -625,6 +630,7 @@ _getgroups = getgroups SIGFE
 _getgroups32 = getgroups32 SIGFE
 gethostid SIGFE
 getitimer SIGFE
+getlogin_r NOSIGFE
 getlogin NOSIGFE
 _getlogin = getlogin NOSIGFE
 getmntent SIGFE

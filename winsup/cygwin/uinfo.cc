@@ -166,6 +166,20 @@ uinfo_init ()
   cygheap->user.set_saved_sid ();	/* Update the original sid */
 }
 
+extern "C" int
+getlogin_r (char *name, size_t namesize)
+{
+  char *login = getlogin ();
+  size_t len = strlen (login) + 1;
+  if (len > namesize)
+    return ERANGE;
+  int err = __check_null_invalid_struct (name, len);
+  if (err)
+    return err;
+  strncpy (name, login, len);
+  return 0;
+}
+
 extern "C" char *
 getlogin (void)
 {

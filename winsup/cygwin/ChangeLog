@@ -1,3 +1,22 @@
+2004-05-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Add symbols flockfile, ftrylockfile, funlockfile,
+	getgrgid_r, getgrnam_r and getlogin_r.
+	* grp.cc (getgrgid_r): New function.
+	(getgrnam_r): Ditto.
+	* syscalls.cc (flockfile): Ditto.
+	(ftrylockfile): Ditto.
+	(funlockfile): Ditto.
+	* sysconf.cc (sysconf): Return LOGIN_NAME_MAX in case of
+	_SC_LOGIN_NAME_MAX.
+	* thread.cc (__cygwin_lock_trylock): Define int.  Return value from
+	call to pthread_mutex_trylock.
+	* uinfo.cc (getlogin_r): New function.
+	* include/limits.h: Define LOGIN_NAME_MAX.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/lock.h: Add declarations for __cygwin_lock_xxx functions.
+	* include/sys/stdio.h: Add define for _ftrylockfile.
+
 2004-05-17  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* tty.cc (tty_list::init): Move hmaster initialization earlier to

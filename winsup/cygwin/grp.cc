@@ -175,6 +175,49 @@ grp32togrp16 (struct __group16 *gp16, struct __group32 *gp32)
   return gp16;
 }
 
+extern "C" int
+getgrgid_r (__gid32_t gid, struct group *grp, char *buffer, size_t bufsize,
+	    struct group **result)
+{
+  *result = NULL;
+
+  if (!grp || !buffer)
+    return ERANGE;
+
+  struct __group32 *tempgr = internal_getgrgid (gid, true);
+  pthread_testcancel (); 
+  if (!tempgr)
+    return 0;
+
+  /* check needed buffer size. */
+  int i;
+  size_t needsize = strlen (tempgr->gr_name) + strlen (tempgr->gr_passwd)
+		    + 2 + sizeof (char *);
+  for (i = 0; tempgr->gr_mem[i]; ++i)
+    needsize += strlen (tempgr->gr_mem[i]) + 1 + sizeof (char *);
+  if (needsize > bufsize)
+    return ERANGE;
+
+  /* make a copy of tempgr */
+  *result = grp;
+  grp->gr_gid = tempgr->gr_gid;
+  grp->gr_name = buffer;
+  grp->gr_passwd = grp->gr_name + strlen (tempgr->gr_name) + 1;
+  grp->gr_mem = (char **) (grp->gr_passwd + strlen (tempgr->gr_passwd) + 1);
+  char *mem = (char *) grp->gr_mem + (i + 1) * sizeof (char *);
+  for (i = 0; tempgr->gr_mem[i]; ++i)
+    {
+      grp->gr_mem[i] = mem;
+      mem += strlen (tempgr->gr_mem[i]) + 1;
+    }
+  grp->gr_mem[i] = NULL;
+  strcpy (grp->gr_name, tempgr->gr_name);
+  strcpy (grp->gr_passwd, tempgr->gr_passwd);
+  for (i = 0; tempgr->gr_mem[i]; ++i)
+    strcpy (grp->gr_mem[i], tempgr->gr_mem[i]);
+  return 0;
+}
+
 extern "C" struct __group32 *
 getgrgid32 (__gid32_t gid)
 {
@@ -187,6 +230,49 @@ getgrgid (__gid16_t gid)
   static struct __group16 g16;	/* FIXME: thread-safe? */
 
   return grp32togrp16 (&g16, getgrgid32 (gid16togid32 (gid)));
+}
+
+extern "C" int
+getgrnam_r (const char *nam, struct group *grp, char *buffer, size_t bufsize,
+	    struct group **result)
+{
+  *result = NULL;
+
+  if (!grp || !buffer)
+    return ERANGE;
+
+  struct __group32 *tempgr = internal_getgrnam (nam, true);
+  pthread_testcancel (); 
+  if (!tempgr)
+    return 0;
+
+  /* check needed buffer size. */
+  int i;
+  size_t needsize = strlen (tempgr->gr_name) + strlen (tempgr->gr_passwd)
+		    + 2 + sizeof (char *);
+  for (i = 0; tempgr->gr_mem[i]; ++i)
+    needsize += strlen (tempgr->gr_mem[i]) + 1 + sizeof (char *);
+  if (needsize > bufsize)
+    return ERANGE;
+
+  /* make a copy of tempgr */
+  *result = grp;
+  grp->gr_gid = tempgr->gr_gid;
+  grp->gr_name = buffer;
+  grp->gr_passwd = grp->gr_name + strlen (tempgr->gr_name) + 1;
+  grp->gr_mem = (char **) (grp->gr_passwd + strlen (tempgr->gr_passwd) + 1);
+  char *mem = (char *) grp->gr_mem + (i + 1) * sizeof (char *);
+  for (i = 0; tempgr->gr_mem[i]; ++i)
+    {
+      grp->gr_mem[i] = mem;
+      mem += strlen (tempgr->gr_mem[i]) + 1;
+    }
+  grp->gr_mem[i] = NULL;
+  strcpy (grp->gr_name, tempgr->gr_name);
+  strcpy (grp->gr_passwd, tempgr->gr_passwd);
+  for (i = 0; tempgr->gr_mem[i]; ++i)
+    strcpy (grp->gr_mem[i], tempgr->gr_mem[i]);
+  return 0;
 }
 
 extern "C" struct __group32 *

@@ -37,4 +37,18 @@ typedef void *_LOCK_T;
 #define __lock_release(__lock) __cygwin_lock_unlock(&__lock)
 #define __lock_release_recursive(__lock) __cygwin_lock_unlock(&__lock)
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+void __cygwin_lock_init(_LOCK_T *);
+void __cygwin_lock_init_recursive(_LOCK_T *);
+void __cygwin_lock_fini(_LOCK_T *);
+void __cygwin_lock_lock(_LOCK_T *);
+int __cygwin_lock_trylock(_LOCK_T *);
+void __cygwin_lock_unlock(_LOCK_T *);
+#ifdef __cplusplus
+}
+#endif
+
 #endif

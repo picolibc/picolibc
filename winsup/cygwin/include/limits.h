@@ -151,6 +151,10 @@ details. */
 #undef TIMER_MAX
 #define TIMER_MAX 32
 
+/* Maximum number of characters in a login name. */
+#undef LOGIN_NAME_MAX
+#define LOGIN_NAME_MAX 256	/* equal to UNLEN defined in w32api/lmcons.h */
+
 /* Maximum number of characters in a tty name. */
 #undef TTY_NAME_MAX
 #define TTY_NAME_MAX 12

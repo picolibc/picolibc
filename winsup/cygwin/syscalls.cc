@@ -2840,3 +2840,21 @@ endusershell ()
     fclose (shell_fp);
   shell_index = 0;
 }
+
+extern "C" void
+flockfile (FILE *file)
+{
+  _flockfile (file);
+}
+
+extern "C" int
+ftrylockfile (FILE *file)
+{
+  return _ftrylockfile (file);
+}
+
+extern "C" void
+funlockfile (FILE *file)
+{
+  _funlockfile (file);
+}

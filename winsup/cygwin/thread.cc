@@ -82,10 +82,10 @@ __cygwin_lock_lock (_LOCK_T *lock)
   pthread_mutex_lock ((pthread_mutex_t*) lock);
 }
 
-extern "C" void
+extern "C" int
 __cygwin_lock_trylock (_LOCK_T *lock)
 {
-  pthread_mutex_trylock ((pthread_mutex_t*) lock);
+  return pthread_mutex_trylock ((pthread_mutex_t*) lock);
 }
 
 
