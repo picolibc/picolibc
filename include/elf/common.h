@@ -151,6 +151,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_SVX         73	/* Silicon Graphics SVx */
 #define EM_ST19        74	/* STMicroelectronics ST19 8-bit microcontroller */
 #define EM_VAX         75	/* Digital VAX */
+#define EM_CRIS	       76	/* Axis Communications 32-bit embedded processor */
 
 #define EM_PJ          99       /* picoJava */
 
