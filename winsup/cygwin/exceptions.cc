@@ -1142,8 +1142,8 @@ static int __stdcall call_signal_handler_now_dummy ()
 int
 sigframe::call_signal_handler ()
 {
-  unregister ();
-  return call_signal_handler_now ();
+  return unregister () ? call_signal_handler_now () : 0;
+
 }
 
 #define pid_offset (unsigned)(((_pinfo *)NULL)->pid)

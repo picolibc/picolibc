@@ -1,3 +1,10 @@
+Tue Sep 11 21:55:37 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.h (sigframe::unregister): Return true/false whether this
+	frame is capable of responding to signals.
+	* exceptions.cc (sigframe::call_signal_handler): Don't call signal
+	handler if it is not armed for this thread.
+
 Tue Sep 11 11:23:10 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygwin.din: Remove cygwin_getshared.

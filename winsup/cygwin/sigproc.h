@@ -50,17 +50,17 @@ class sigframe
 {
 private:
   sigthread *st;
-  void unregister ()
+  bool unregister ()
   {
-    if (st)
-      {
-	EnterCriticalSection (&st->lock);
-	st->frame = 0;
-	st->exception = 0;
-	st->release_winapi_lock ();
-	LeaveCriticalSection (&st->lock);
-	st = NULL;
-      }
+    if (!st)
+      return 0;
+    EnterCriticalSection (&st->lock);
+    st->frame = 0;
+    st->exception = 0;
+    st->release_winapi_lock ();
+    LeaveCriticalSection (&st->lock);
+    st = NULL;
+    return 1;
   }
 
 public:
