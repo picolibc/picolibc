@@ -1,5 +1,9 @@
 2004-02-10  Christopher Faylor  <cgf@redhat.com>
 
+	* strace.cc (main): Guard against previous setting of POSIXLY_CORRECT.
+
+2004-02-10  Christopher Faylor  <cgf@redhat.com>
+
 	* strace.cc: Update copyrights.
 	* cygcheck.cc: Update copyrights.
 
