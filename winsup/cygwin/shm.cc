@@ -229,7 +229,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
 
     }
 
-  class shmid_ds *shm = tempnode->shmds;
+  // class shmid_ds *shm = tempnode->shmds;
 
   if (shmaddr)
     {
@@ -277,7 +277,8 @@ shmdt (const void *shmaddr)
   /* this should be "rare" so a hefty search is ok. If this is common, then we
    * should alter the data structs to allow more optimisation
    */
-  
+  set_errno (ENOTSUP);
+  return -1;
 }
 
 //FIXME: who is allowed to perform STAT? 

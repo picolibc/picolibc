@@ -1,3 +1,8 @@
+2002-03-03  Robert Collins  <rbtcollins@hotmail.com>
+
+	* shm.cc (shmat): Prevent a compile error.
+	(shmdt): Set errno as this function is incomplete.
+
 2002-02-28  Christopher Faylor  <cgf@redhat.com>
 
 	* times.cc: Remove if 0'd code.  Clean up slightly.
