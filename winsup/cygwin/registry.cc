@@ -210,13 +210,14 @@ void
 load_registry_hive (PSID psid)
 {
   char sid[256];
-  char path[256];
+  char path[MAX_PATH + 1];
   HKEY hkey;
+  LONG ret;
 
   if (!psid)
     return;
-  /* Check if user hive already exists */
-  if (!RegOpenKeyExA (HKEY_LOCAL_MACHINE, convert_sid_to_string_sid (psid, sid),
+  /* Check if user hive is already loaded. */
+  if (!RegOpenKeyExA (HKEY_USERS, convert_sid_to_string_sid (psid, sid),
                       0, KEY_READ, &hkey))
     {
       debug_printf ("User registry hive for %s already exists", sid);
@@ -226,8 +227,8 @@ load_registry_hive (PSID psid)
   if (get_registry_hive_path (psid, path))
     {
       strcat (path, "\\NTUSER.DAT");
-      if (RegLoadKeyA (HKEY_USERS, sid, path))
-        debug_printf ("Loading user registry hive for %s failed: %E", sid);
+      if ((ret = RegLoadKeyA (HKEY_USERS, sid, path)) != ERROR_SUCCESS)
+        debug_printf ("Loading user registry hive for %s failed: %d", sid, ret);
     }
 }
 

@@ -1,3 +1,10 @@
+Thu Jun 22 20:45:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* registry.cc (load_registry_hive): Use HKEY_USERS when checking
+	for existing user hive.
+	Use MAX_PATH instead of numerical constant for array size.
+	Use return code of RegLoadKeyA instead of GetLastError for error output.
+
 Thu Jun 22 14:27:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Add new-libcygwin.a back to all_host target.
