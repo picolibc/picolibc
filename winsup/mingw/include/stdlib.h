@@ -369,12 +369,13 @@ _CRTIMP void __cdecl	free	(void*);
 _CRTIMP void __cdecl	abort	(void) _ATTRIB_NORETURN;
 _CRTIMP void __cdecl	exit	(int) _ATTRIB_NORETURN;
 
-/* Note: This in startup code, not imported directly from dll */
+/* Note: This is in startup code, not imported directly from dll */
 int __cdecl	atexit	(void (*)(void));
 
 _CRTIMP int __cdecl	system	(const char*);
 _CRTIMP char* __cdecl	getenv	(const char*);
 
+/* bsearch and qsort are also in non-ANSI header search.h  */
 _CRTIMP void* __cdecl	bsearch	(const void*, const void*, size_t, size_t, 
 				 int (*)(const void*, const void*));
 _CRTIMP void __cdecl	qsort	(void*, size_t, size_t,

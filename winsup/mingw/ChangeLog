@@ -1,5 +1,13 @@
 2003-07-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/search.h: New file.
+	* include/stdlib.h: Add comment about qsort, bsearch in
+	search.h.
+	* test_headers.c: Include search.h.
+	* moldname.def.in (lfind, lsearch): Add. 
+
+2003-07-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/process.h (_execv, _execvp, _spawnv, _spawnvp, _execve,
 	_execvpe, _spawnve, _spawnvpe, execv, execvp, spawnv, spawnvp,
 	execve, execvpe, spawnve, spawnvpe): Const-ify all the char params.

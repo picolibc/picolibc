@@ -22,6 +22,7 @@
 #include <mem.h>
 #include <memory.h>
 #include <process.h>
+#include <search.h>
 #include <setjmp.h>
 #include <share.h>
 #include <signal.h>

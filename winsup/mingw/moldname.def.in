@@ -69,6 +69,8 @@ heapwalk
 isatty
 itoa
 kbhit
+lfind
+lsearch
 lseek
 ltoa
 memccpy
