@@ -69,7 +69,7 @@ int     _EXFUN(rmdir, (const char *__path ));
 #if defined(__rtems__)
 void *  _EXFUN(sbrk,  (ptrdiff_t __incr));
 #else
-void *  _EXFUN(sbrk, (size_t __incr));
+void *  _EXFUN(sbrk,  (size_t __incr));
 #endif
 #if defined(__CYGWIN__)
 int     _EXFUN(setegid, (gid_t __gid ));
@@ -156,10 +156,12 @@ long _EXFUN(sysconf, (int __name));
 #define _SC_SAVED_IDS               6
 #define _SC_VERSION                 7
 #define _SC_PAGESIZE                8
-#define _SC_AIO_LISTIO_MAX          9
-#define _SC_AIO_MAX                10
-#define _SC_AIO_PRIO_DELTA_MAX     11
-#define _SC_DELAYTIMER_MAX         12
+/* CYGWIN-specific values .. do not touch */
+#define _SC_NPROCESSORS_CONF        9
+#define _SC_NPROCESSORS_ONLN       10
+#define _SC_PHYS_PAGES             11
+#define _SC_AVPHYS_PAGES           12
+/* end of CYGWIN-specific values */
 #define _SC_MQ_OPEN_MAX            13
 #define _SC_MQ_PRIO_MAX            14
 #define _SC_RTSIG_MAX              15
@@ -182,15 +184,15 @@ long _EXFUN(sysconf, (int __name));
 #define _SC_SHARED_MEMORY_OBJECTS  31
 #define _SC_SYNCHRONIZED_IO        32
 #define _SC_TIMERS                 33
+#define _SC_AIO_LISTIO_MAX         34
+#define _SC_AIO_MAX                35
+#define _SC_AIO_PRIO_DELTA_MAX     36
+#define _SC_DELAYTIMER_MAX         37
 
 /*
  *  P1003.1c/D10, p. 52 adds the following.
  */
 
-#define _SC_GETGR_R_SIZE_MAX             34
-#define _SC_GETPW_R_SIZE_MAX             35
-#define _SC_LOGIN_NAME_MAX               36
-#define _SC_THREAD_DESTRUCTOR_ITERATIONS 37
 #define _SC_THREAD_KEYS_MAX              38
 #define _SC_THREAD_STACK_MIN             39
 #define _SC_THREAD_THREADS_MAX           40
@@ -206,6 +208,10 @@ long _EXFUN(sysconf, (int __name));
 #define _SC_THREAD_PRIO_CEILING          _SC_THREAD_PRIO_PROTECT
 #define _SC_THREAD_PROCESS_SHARED        48
 #define _SC_THREAD_SAFE_FUNCTIONS        49
+#define _SC_GETGR_R_SIZE_MAX             50
+#define _SC_GETPW_R_SIZE_MAX             51
+#define _SC_LOGIN_NAME_MAX               52
+#define _SC_THREAD_DESTRUCTOR_ITERATIONS 53
   
 # define	_PC_LINK_MAX	        0
 # define	_PC_MAX_CANON	        1

@@ -1,3 +1,9 @@
+2000-12-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/unistd.h: Restored Cygwin _SC
+	constants and moved new constants appropriately
+	so Cygwin will build.
+
 2000-12-11  Joel Sherrill <joel@OARcorp.com>
 
         * Merge RTEMS specific .h files into main libc/include.
