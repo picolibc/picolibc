@@ -1,3 +1,41 @@
+2002-06-12  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (cygheap_user::set_name): Set homedrive and homepath to
+	NULL on user name change.
+	(cygheap_user::set_logsrv): Allocate enough space for leading \\ so
+	that we can put this in the environment, if needed.
+	* cygheap.h (homebodies): New enum.
+	(cygheap_user::homedrive): New field.
+	(cygheap_user::homepath): Ditto.
+	(cygheap_user::env_logsrv): New method.
+	(cygheap_user::env_homepath): New method.
+	(cygheap_user::env_homedrive): New method.
+	(cygheap_user::env_userprofile): New method.
+	(cygheap_user::ontherange): New method.
+	* environ.cc (envsize): Eliminate debugging argument.
+	(environ_init): Assume that envc counts number of elments not total
+	size.
+	(spenv): New class.
+	(spenvs): New array, renamed from forced_winenv_vars, using spenv.
+	(spenv::retrieve): New method.
+	(build_env): Rename from 'winenv' -- one stop shopping for building new
+	environment blocks for both windows and "unix".
+	* environ.h (build_env: Declare.
+	(winenv): Delete declaration.
+	(envsize): Ditto.
+	* spawn.cc (spawn_guts): Use build_env to build windows and cygwin
+	environment blocks.
+	* uinfo.cc (internal_getlogin): Eliminate environment manipulation.
+	Default to info from GetUserName if it exists.  Move HOMEPATH and
+	HOMEDRIVE stuff elsewhere.  Move HOME setting elsewhere.  Only set HOME
+	environment variable in processes that are not parented by a cygwin
+	process.
+	(cygheap_user::ontherange): Define new method.
+	(cygheap_user::env_logsrv): Ditto.
+	(cygheap_user::env_homepath): Ditto.
+	(cygheap_user::env_homedrive): Ditto.
+	(cygheap_user::env_userprofile): Ditto.
+
 2002-06-11  Christopher Faylor  <cgf@redhat.com>
 
 	* spawn.cc (spawn_guts): More hToken removal cleanup.

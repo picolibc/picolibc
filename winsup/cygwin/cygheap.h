@@ -85,6 +85,14 @@ public:
   const char *native_path () const { return m->native_path; }
 };
 
+enum homebodies
+{
+  CH_HOMEDRIVE,
+  CH_HOMEPATH,
+  CH_HOME
+};
+
+struct passwd;
 class cygheap_user
 {
   /* Extendend user information.
@@ -93,6 +101,8 @@ class cygheap_user
   char  *pname;         /* user's name */
   char  *plogsrv;       /* Logon server, may be FQDN */
   char  *pdomain;       /* Logon domain of the user */
+  char  *homedrive;	/* User's home drive */
+  char  *homepath;	/* User's home path */
   PSID   psid;          /* buffer for user's SID */
   PSID   orig_psid;     /* Remains intact even after impersonation */
 public:
@@ -116,6 +126,11 @@ public:
   void set_logsrv (const char *new_logsrv);
   const char *logsrv () const { return plogsrv; }
 
+  const char *env_logsrv ();
+  const char *env_homepath ();
+  const char *env_homedrive ();
+  const char *env_userprofile ();
+
   void set_domain (const char *new_domain);
   const char *domain () const { return pdomain; }
 
@@ -130,6 +145,7 @@ public:
     set_domain (user.domain ());
     set_sid (user.sid ());
   }
+  const char *ontherange (homebodies what, struct passwd * = NULL);
 };
 
 /* cwd cache stuff.  */

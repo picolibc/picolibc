@@ -562,18 +562,14 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       MALLOC_CHECK;
     }
 
+  char *envblock;
   newargv.all_calloced ();
   ciresrv.moreinfo->argc = newargv.argc;
   ciresrv.moreinfo->argv = newargv;
-
-  ciresrv.moreinfo->envc = envsize (envp, 1);
-  ciresrv.moreinfo->envp = (char **) cmalloc (HEAP_1_ARGV, ciresrv.moreinfo->envc);
   ciresrv.hexec_proc = hexec_proc;
-  char **c;
-  const char * const *e;
-  for (c = ciresrv.moreinfo->envp, e = envp; *e;)
-    *c++ = cstrdup1 (*e++);
-  *c = NULL;
+  ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
+				      real_path.iscygexec ());
+
   if (mode != _P_OVERLAY ||
       !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
 			&ciresrv.moreinfo->myself_pinfo, 0,
@@ -604,13 +600,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (cygheap->fdtab.need_fixup_before ())
     flags |= CREATE_SUSPENDED;
 
-
-  /* Build windows style environment list */
-  char *envblock;
-  if (real_path.iscygexec ())
-    envblock = NULL;
-  else
-    envblock = winenv (envp, 0);
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
 
