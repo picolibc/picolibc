@@ -50,30 +50,32 @@ details. */
 
 enum
 {
-  FH_RBINARY = 0x00001000,	/* binary read mode */
-  FH_WBINARY = 0x00002000,	/* binary write mode */
-  FH_CLOEXEC = 0x00004000,	/* close-on-exec */
-  FH_RBINSET = 0x00008000,	/* binary read mode has been explicitly set */
-  FH_WBINSET = 0x00010000,	/* binary write mode has been explicitly set */
-  FH_APPEND  = 0x00020000,	/* always append */
-  FH_ASYNC   = 0x00040000,	/* async I/O */
-  FH_HADEOF  = 0x00080000,	/* EOF seen */
+  FH_RBINARY	= 0x00001000,	/* binary read mode */
+  FH_WBINARY	= 0x00002000,	/* binary write mode */
+  FH_CLOEXEC	= 0x00004000,	/* close-on-exec */
+  FH_RBINSET	= 0x00008000,	/* binary read mode has been explicitly set */
+  FH_WBINSET	= 0x00010000,	/* binary write mode has been explicitly set */
+  FH_APPEND	= 0x00020000,	/* always append */
+  FH_ASYNC	= 0x00040000,	/* async I/O */
+  FH_HADEOF	= 0x00080000,	/* EOF seen */
 
-  FH_SYMLINK = 0x00100000,	/* is a symlink */
-  FH_EXECABL = 0x00200000,	/* file looked like it would run:
+  FH_SYMLINK	= 0x00100000,	/* is a symlink */
+  FH_EXECABL	= 0x00200000,	/* file looked like it would run:
 				 * ends in .exe or .bat or begins with #! */
-  FH_W95LSBUG= 0x00400000,	/* set when lseek is called as a flag that
+  FH_W95LSBUG	= 0x00400000,	/* set when lseek is called as a flag that
 				 * _write should check if we've moved beyond
 				 * EOF, zero filling if so. */
-  FH_NOFRNAME= 0x00800000,	/* Set if shouldn't free unix_path_name and
+  FH_NOFRNAME	= 0x00800000,	/* Set if shouldn't free unix_path_name and
 				   windows_path_name_ on destruction. */
-  FH_NOEINTR = 0x01000000,	/* Set if I/O should be uninterruptible. */
-  FH_FFIXUP  = 0x02000000,	/* Set if need to fixup after fork. */
-  FH_LOCAL   = 0x04000000,	/* File is unix domain socket */
-  FH_FIFO    = 0x08000000,	/* File is FIFO */
-  FH_ISREMOTE= 0x10000000,	/* File is on a remote drive */
-  FH_DCEXEC  = 0x20000000,	/* Don't care if this is executable */
-  FH_HASACLS = 0x40000000,	/* True if fs of file has ACLS */
+  FH_NOEINTR	= 0x01000000,	/* Set if I/O should be uninterruptible. */
+  FH_FFIXUP	= 0x02000000,	/* Set if need to fixup after fork. */
+  FH_LOCAL	= 0x04000000,	/* File is unix domain socket */
+  FH_FIFO	= 0x08000000,	/* File is FIFO */
+  FH_ISREMOTE	= 0x10000000,	/* File is on a remote drive */
+  FH_DCEXEC	= 0x20000000,	/* Don't care if this is executable */
+  FH_HASACLS	= 0x40000000,	/* True if fs of file has ACLS */
+  FH_QUERYOPEN	= 0x80000000,	/* open file without requesting either read
+				   or write access */
 
   /* Device flags */
 
@@ -251,6 +253,9 @@ public:
   int get_append_p () { return FHISSETF (APPEND); }
   void set_append_p (int val) { FHCONDSETF (val, APPEND); }
   void set_append_p () { FHSETF (APPEND); }
+
+  int get_query_open () { return FHISSETF (QUERYOPEN); }
+  void set_query_open (int val) { FHCONDSETF (val, QUERYOPEN); }
 
   int get_readahead_valid () { return raixget < ralen; }
   int puts_readahead (const char *s, size_t len = (size_t) -1);

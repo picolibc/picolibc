@@ -308,7 +308,11 @@ fhandler_base::open (int flags, mode_t mode)
       goto done;
     }
 
-  if (get_device () == FH_TAPE)
+  if (get_query_open ())
+    {
+      access = 0;
+    }
+  else if (get_device () == FH_TAPE)
     {
       access = GENERIC_READ | GENERIC_WRITE;
     }
