@@ -37,6 +37,7 @@ typedef struct __DIR DIR;
 struct dirent;
 struct iovec;
 struct __acl32;
+class cygthread;
 
 enum dirent_states
 {
@@ -365,15 +366,19 @@ class fhandler_socket: public fhandler_base
   int connect_secret [4];
   HANDLE secret_event;
 
-  HANDLE sec_pipe;
   pid_t     sec_pid;
   __uid32_t sec_uid;
   __gid32_t sec_gid;
   pid_t     sec_peer_pid;
   __uid32_t sec_peer_uid;
   __gid32_t sec_peer_gid;
-  char *eid_pipe_name (char *buf);
+  void eid_setblocking (bool &, bool &);
+  void eid_unsetblocking (bool, bool);
+  bool eid_recv (void);
+  bool eid_send (void);
+  void eid_accept (void);
  public:
+  void eid_connect (void);
   void set_socketpair_eids (void);
 
  private:

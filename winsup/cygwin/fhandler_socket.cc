@@ -36,6 +36,8 @@
 #include <unistd.h>
 #include <sys/acl.h>
 
+#define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
+
 extern bool fdsock (cygheap_fdmanip& fd, const device *, SOCKET soc);
 extern "C" {
 int sscanf (const char *, const char *, ...);
@@ -51,22 +53,6 @@ secret_event_name (char *buf, short port, int *secret_ptr)
 		   port,
 		   secret_ptr [0], secret_ptr [1],
 		   secret_ptr [2], secret_ptr [3]);
-}
-
-char *
-fhandler_socket::eid_pipe_name (char *buf)
-{
-  __small_sprintf (buf, "\\\\.\\pipe\\cygwin-unix-%s", get_sun_path ());
-  debug_printf ("%s", buf);
-  return buf;
-}
-
-void
-fhandler_socket::set_socketpair_eids (void)
-{
-  sec_pid = sec_peer_pid = getpid ();
-  sec_uid = sec_peer_uid = geteuid32 ();
-  sec_gid = sec_peer_gid = getegid32 ();
 }
 
 /* cygwin internal: map sockaddr into internet domain address */
@@ -140,7 +126,6 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 
 fhandler_socket::fhandler_socket () :
   fhandler_base (),
-  sec_pipe (INVALID_HANDLE_VALUE),
   sun_path (NULL),
   status ()
 {
@@ -163,12 +148,119 @@ fhandler_socket::~fhandler_socket ()
     cfree (prot_info_ptr);
   if (sun_path)
     cfree (sun_path);
-  /* Close eid credentials pipe handle. */
-  if (sec_pipe != INVALID_HANDLE_VALUE)
-    CloseHandle (sec_pipe);
 }
 
-char *fhandler_socket::get_proc_fd_name (char *buf)
+void
+fhandler_socket::set_socketpair_eids (void)
+{
+  sec_pid = sec_peer_pid = getpid ();
+  sec_uid = sec_peer_uid = geteuid32 ();
+  sec_gid = sec_peer_gid = getegid32 ();
+}
+
+void
+fhandler_socket::eid_setblocking (bool &async, bool &nonblocking)
+{
+  async = async_io ();
+  nonblocking = is_nonblocking ();
+  if (async || nonblocking)
+  WSAAsyncSelect (get_socket (), winmsg, 0, 0);
+  unsigned long p = 0;
+  ioctlsocket (get_socket (), FIONBIO, &p);
+  set_nonblocking (false);
+  async_io (false);
+}
+
+void
+fhandler_socket::eid_unsetblocking (bool async, bool nonblocking)
+{
+  if (nonblocking)
+    {
+      unsigned long p = 1;
+      ioctlsocket (get_socket (), FIONBIO, &p);
+      set_nonblocking (true);
+    }
+  if (async)
+    {
+      WSAAsyncSelect (get_socket (), winmsg, WM_ASYNCIO, ASYNC_MASK);
+      async_io (true);
+    }
+}
+
+bool
+fhandler_socket::eid_recv (void)
+{
+  struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
+  int rest = sizeof out;
+  char *ptr = (char *) &out;
+  while (rest > 0)
+    {
+      int ret = recvfrom (ptr, rest, 0, NULL, NULL);
+      if (ret <= 0)
+	break;
+      rest -= ret;
+      ptr += ret;
+    }
+  if (rest == 0)
+    {
+      debug_printf ("Received eid credentials: pid: %d, uid: %d, gid: %d",
+		    out.pid, out.uid, out.gid);
+      sec_peer_pid = out.pid;
+      sec_peer_uid = out.uid;
+      sec_peer_gid = out.gid;
+    }
+  else
+    debug_printf ("Receiving eid credentials failed");
+  return rest == 0;
+}
+
+bool
+fhandler_socket::eid_send (void)
+{
+  struct ucred in = { sec_pid, sec_uid, sec_gid };
+  int rest = sizeof in;
+  char *ptr = (char *) &in;
+  while (rest > 0)
+    {
+      int ret = sendto (ptr, rest, 0, NULL, 0);
+      if (ret <= 0)
+	break;
+      rest -= ret;
+      ptr += ret;
+    }
+  if (rest == 0)
+    debug_printf ("Sending eid credentials succeeded");
+  else
+    debug_printf ("Sending eid credentials failed");
+  return rest == 0;
+}
+
+void
+fhandler_socket::eid_connect (void)
+{
+  /* This test allows to keep select.cc clean from boring implementation
+     details. */
+  if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
+    return;
+  debug_printf ("eid_connect called");
+  bool orig_async_io, orig_is_nonblocking;
+  eid_setblocking (orig_async_io, orig_is_nonblocking);
+  eid_send () && eid_recv ();
+  eid_unsetblocking (orig_async_io, orig_is_nonblocking);
+}
+
+void
+fhandler_socket::eid_accept (void)
+{
+  debug_printf ("eid_accept called");
+  bool orig_async_io, orig_is_nonblocking;
+  eid_setblocking (orig_async_io, orig_is_nonblocking);
+  eid_recv () && eid_send ();
+  eid_unsetblocking (orig_async_io, orig_is_nonblocking);
+}
+
+char *
+fhandler_socket::get_proc_fd_name (char *buf)
 {
   __small_sprintf (buf, "socket:[%d]", get_socket ());
   return buf;
@@ -370,18 +462,6 @@ fhandler_socket::dup (fhandler_base *child)
 	  fhs->sec_peer_pid = sec_peer_pid;
 	  fhs->sec_peer_uid = sec_peer_uid;
 	  fhs->sec_peer_gid = sec_peer_gid;
-	  if (sec_pipe != INVALID_HANDLE_VALUE)
-	    {
-	      if (!DuplicateHandle (hMainProc, sec_pipe, hMainProc, &nh, 0,
-				    TRUE, DUPLICATE_SAME_ACCESS))
-		{
-		  system_printf ("!DuplicateHandle(%x) failed, %E", sec_pipe);
-		  __seterrno ();
-		  return -1;
-		}
-	      else
-	        fhs->sec_pipe = nh;
-	    }
 	}
     }
   fhs->connect_state (connect_state ());
@@ -420,8 +500,6 @@ fhandler_socket::dup (fhandler_base *child)
     {
       system_printf ("!DuplicateHandle(%x) failed, %E", get_io_handle ());
       __seterrno ();
-      if (fhs->sec_pipe != INVALID_HANDLE_VALUE)
-        CloseHandle (fhs->sec_pipe);
       return -1;
     }
   VerifyHandle (nh);
@@ -622,18 +700,18 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
   if (res)
     {
+      err = WSAGetLastError ();
       /* Special handling for connect to return the correct error code
 	 when called on a non-blocking socket. */
       if (is_nonblocking () || connect_state () == connect_pending)
 	{
-	  err = WSAGetLastError ();
 	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
 	    in_progress = true;
 
 	  if (err == WSAEWOULDBLOCK)
-	    WSASetLastError (WSAEINPROGRESS);
+	    WSASetLastError (err = WSAEINPROGRESS);
 	  else if (err == WSAEINVAL)
-	    WSASetLastError (WSAEISCONN);
+	    WSASetLastError (err = WSAEISCONN);
 	}
       set_winsock_errno ();
     }
@@ -671,38 +749,23 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	  res = -1;
 	}
 
-      if (!res || in_progress)
+      /* Prepare eid credential transaction. */
+      sec_pid = getpid ();
+      sec_uid = geteuid32 ();
+      sec_gid = getegid32 ();
+      sec_peer_pid = (pid_t) 0;
+      sec_peer_uid = (__uid32_t) -1;
+      sec_peer_gid = (__gid32_t) -1;
+
+      if (!res)
         {
-	  /* eid credential transaction. */
-	  if (wincap.has_named_pipes ())
-	    {
-	      struct ucred in = { getpid (), geteuid32 (), getegid32 () };
-	      struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
-	      DWORD bytes = 0;
-	      debug_printf ("Calling CallNamedPipe");
-	      if (CallNamedPipe(eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
-				&in, sizeof in, &out, sizeof out, &bytes, 1000))
-		{
-		  debug_printf ("Received eid credentials: pid: %d, uid: %d"
-		  		", gid: %d", out.pid, out.uid, out.gid);
-		  sec_peer_pid = out.pid;
-		  sec_peer_uid = out.uid;
-		  sec_peer_gid = out.gid;
-		}
-	      else
-		debug_printf ("Receiving eid credentials failed: %E");
-	    }
-	  else /* 9x */
-	    {
-	      /* Incorrect but wrong pid at least doesn't break getpeereid. */
-	      sec_peer_pid = getpid ();
-	      sec_peer_uid = geteuid32 ();
-	      sec_peer_gid = getegid32 ();
-	    }
+	  /* eid credential transaction.  If connect is in progress,
+	    we're deferring the eid transaction to the successful select,
+	    see select.cc, function set_bits(). */
+	  eid_connect ();
 	}
     }
 
-  err = WSAGetLastError ();
   if (err == WSAEINPROGRESS || err == WSAEALREADY)
     connect_state (connect_pending);
   else
@@ -728,16 +791,6 @@ fhandler_socket::listen (int backlog)
 	  sec_peer_pid = (pid_t) 0;
 	  sec_peer_uid = (__uid32_t) -1;
 	  sec_peer_gid = (__gid32_t) -1;
-	  /* A listening socket can call listen again, but that shouldn't
-	     result in trying to create another pipe. */
-	  if (wincap.has_named_pipes () && sec_pipe == INVALID_HANDLE_VALUE)
-	    sec_pipe =
-	    CreateNamedPipe (eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
-			     PIPE_ACCESS_DUPLEX,
-			     PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
-			     PIPE_UNLIMITED_INSTANCES, sizeof (struct ucred),
-			     sizeof (struct ucred), 1000, &sec_all);
-	  debug_printf ("sec_pipe: %x", sec_pipe);
 	}
       connect_state (connected);
     }
@@ -749,8 +802,6 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 {
   int res = -1;
   bool secret_check_failed = false;
-  struct ucred in = { sec_pid, sec_uid, sec_gid };
-  struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
 
   /* Allows NULL peer and len parameters. */
   struct sockaddr_in peer_dummy;
@@ -794,34 +845,6 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	  set_errno (ECONNABORTED);
 	  return -1;
 	}
-
-      /* eid credential transaction. */
-      if (wincap.has_named_pipes ())
-	{
-	  DWORD bytes = 0;
-	  debug_printf ("Calling ConnectNamedPipe");
-	  bool ret = ConnectNamedPipe (sec_pipe, NULL);
-	  if (ret || GetLastError () == ERROR_PIPE_CONNECTED)
-	    {
-	      if (!ReadFile (sec_pipe, &out, sizeof out, &bytes, NULL))
-		debug_printf ("Receiving eid credentials failed: %E");
-	      else
-		debug_printf ("Received eid credentials: pid: %d, uid: %d"
-			      ", gid: %d", out.pid, out.uid, out.gid);
-	      if (!WriteFile (sec_pipe, &in, sizeof in, &bytes, NULL))
-		debug_printf ("Sending eid credentials failed: %E");
-	      DisconnectNamedPipe (sec_pipe);
-	    }
-	  else
-	    debug_printf ("Connecting the eid credential pipe failed: %E");
-	}
-      else /* 9x */
-	{
-	  /* Incorrect but wrong pid at least doesn't break getpeereid. */
-	  out.pid = sec_pid;
-	  out.uid = sec_uid;
-	  out.gid = sec_gid;
-	}
     }
 
   if ((SOCKET) res == INVALID_SOCKET)
@@ -831,19 +854,29 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
       cygheap_fdnew res_fd;
       if (res_fd >= 0 && fdsock (res_fd, &dev (), res))
 	{
-	  ((fhandler_socket *) res_fd)->set_addr_family (get_addr_family ());
-	  ((fhandler_socket *) res_fd)->set_socket_type (get_socket_type ());
+	  fhandler_socket *sock = (fhandler_socket *) res_fd;
+	  sock->set_addr_family (get_addr_family ());
+	  sock->set_socket_type (get_socket_type ());
+	  sock->async_io (async_io ());
+	  sock->set_nonblocking (is_nonblocking ());
 	  if (get_addr_family () == AF_LOCAL)
 	    {
-	      ((fhandler_socket *) res_fd)->set_sun_path (get_sun_path ());
+	      sock->set_sun_path (get_sun_path ());
 	      if (get_socket_type () == SOCK_STREAM)
-		{
-		  ((fhandler_socket *) res_fd)->sec_peer_pid = out.pid;
-		  ((fhandler_socket *) res_fd)->sec_peer_uid = out.uid;
-		  ((fhandler_socket *) res_fd)->sec_peer_gid = out.gid;
-		}
+	        {
+		  /* Don't forget to copy credentials from accepting
+		     socket to accepted socket and start transaction
+		     on accepted socket! */
+		  sock->sec_pid = sec_pid;
+		  sock->sec_uid = sec_uid;
+		  sock->sec_gid = sec_gid;
+		  sock->sec_peer_pid = sec_peer_pid;
+		  sock->sec_peer_uid = sec_peer_uid;
+		  sock->sec_peer_gid = sec_peer_gid;
+		  sock->eid_accept ();
+	        }
 	    }
-	  ((fhandler_socket *) res_fd)->connect_state (connected);
+	  sock->connect_state (connected);
 	  res = res_fd;
 	}
       else
@@ -1475,8 +1508,6 @@ fhandler_socket::close ()
   return res;
 }
 
-#define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
-
 int
 fhandler_socket::ioctl (unsigned int cmd, void *p)
 {
@@ -1673,21 +1704,28 @@ fhandler_socket::set_sun_path (const char *path)
 int
 fhandler_socket::getpeereid (pid_t *pid, __uid32_t *euid, __gid32_t *egid)
 {
-  if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
+  if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
     {
-      if (connect_state () == connected && sec_peer_pid != (pid_t) -1)
-        {
-	  if (!check_null_invalid_struct (pid))
-	    *pid = sec_peer_pid;
-	  if (!check_null_invalid_struct (euid))
-	    *euid = sec_peer_uid;
-	  if (!check_null_invalid_struct (egid))
-	    *egid = sec_peer_gid;
-	  return 0;
-	}
-      set_errno (ENOTCONN);
+      set_errno (EINVAL);
+      return -1;
     }
-  else
-    set_errno (EINVAL);
-  return -1;
+  if (connect_state () != connected)
+    {
+      set_errno (ENOTCONN);
+      return -1;
+    }
+  if (sec_peer_pid == (pid_t) 0)
+    {
+      set_errno (ENOTCONN);	/* Usually when calling getpeereid on
+      				   accepting (instead of accepted) socket. */
+      return -1;
+    }
+
+  if (!check_null_invalid_struct (pid))
+    *pid = sec_peer_pid;
+  if (!check_null_invalid_struct (euid))
+    *euid = sec_peer_uid;
+  if (!check_null_invalid_struct (egid))
+    *egid = sec_peer_gid;
+  return 0;
 }

@@ -326,6 +326,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
 	  fd_set *exceptfds)
 {
   int ready = 0;
+  fhandler_socket *sock;
   select_printf ("me %p, testing fd %d (%s)", me, me->fd, me->fh->get_name ());
   if (me->read_selected && me->read_ready)
     {
@@ -335,8 +336,15 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
   if (me->write_selected && me->write_ready)
     {
       UNIX_FD_SET (me->fd, writefds);
-      if (me->except_on_write && me->fh->is_socket ())
-	((fhandler_socket *) me->fh)->connect_state (connected);
+      if (me->except_on_write && (sock = me->fh->is_socket ()))
+	{
+	  /* eid credential transaction on successful non-blocking connect.
+	     Since the read bit indicates an error, don't start transaction
+	     if it's set. */
+	  if (!me->read_ready && sock->connect_state () == connect_pending)
+	    sock->eid_connect ();
+	  sock->connect_state (connected);
+	}
       ready++;
     }
   if ((me->except_selected || me->except_on_write) && me->except_ready)
@@ -344,8 +352,12 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
       if (me->except_on_write) /* Only on sockets */
 	{
 	  UNIX_FD_SET (me->fd, writefds);
-	  if (me->fh->is_socket ())
-	    ((fhandler_socket *) me->fh)->connect_state (connected);
+	  if ((sock = me->fh->is_socket ()))
+	    {
+	      if (!me->read_ready && sock->connect_state () == connect_pending)
+	        sock->eid_connect ();
+	      sock->connect_state (connected);
+	    }
 	}
       if (me->except_selected)
 	UNIX_FD_SET (me->fd, exceptfds);

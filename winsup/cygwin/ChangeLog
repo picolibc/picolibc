@@ -1,3 +1,37 @@
+2005-03-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class cygthread): Forward declare.
+	(fhandler_socket::sec_pipe): Remove.
+	(fhandler_socket::eid_pipe_name): Remove.
+	(fhandler_socket::eid_setblocking): New private method.
+	(fhandler_socket::eid_unsetblocking): Ditto
+	(fhandler_socket::eid_recv): Ditto
+	(fhandler_socket::eid_send): Ditto
+	(fhandler_socket::eid_accept): Ditto
+	(fhandler_socket::eid_connect): New public method.
+	* fhandler_socket.cc (ASYNC_MASK): Move to beginning of file.
+	(fhandler_socket::eid_pipe_name): Remove.
+	(fhandler_socket::set_socketpair_eids): Move down to fhandler_socket
+	methods.
+	(fhandler_socket::fhandler_socket): Drop initializing sec_pipe.
+	(fhandler_socket::~fhandler_socket): Drop closing sec_pipe.
+	(fhandler_socket::eid_setblocking): New method.
+	(fhandler_socket::eid_unsetblocking): New method.
+	(fhandler_socket::eid_recv): New method.
+	(fhandler_socket::eid_send): New method.
+	(fhandler_socket::eid_connect): New method.
+	(fhandler_socket::eid_accept): New method.
+	(fhandler_socket::dup): Drop sec_pipe handling.
+	(fhandler_socket::connect): Fix WinSock error handling. Prepare
+	eid credential transaction. Call eid_connect on successful connect.
+	(fhandler_socket::listen): Drop creating sec_pipe.
+	(fhandler_socket::accept): Slightly simplify code. Call eid_accept
+	on accepted socket.
+	(fhandler_socket::getpeereid): Reshuffle code for readability. Fix
+	test for invalid pid.
+	* select.cc (set_bits): Call eid_connect on successfully connected
+	socket.
+
 2005-03-19  Christopher Faylor  <cgf@timesys.com>
 
 	* child_info.h (fork_info): Use different method to alias variable.
