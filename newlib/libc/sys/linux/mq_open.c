@@ -210,7 +210,11 @@ mq_open (const char *name, int oflag, ...)
 	    }
 	}
       else /* just open it */
-	msgqid = msgget (key, 0);
+        {
+	  msgqid = msgget (key, 0);
+	  wrbuf = (MSG *)malloc (attr->mq_msgsize + sizeof(int));
+	  rdbuf = (MSG *)malloc (attr->mq_msgsize + sizeof(int));
+        }
       
       /* release semaphore acquired earlier */
       sb.sem_op = 1;

@@ -1,3 +1,8 @@
+2003-06-26  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/mq_open.c (mq_open): Must allocate rdbuf and
+	wrbuf for a non-creating open.
+
 2003-06-24  Kazu Hirata  <kazu@cs.umass.edu>
 
 	* libc/machine/h8300/setarch.h: New.
