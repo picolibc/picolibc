@@ -1,3 +1,8 @@
+2004-06-25  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libnosys/_exit.c: New file.
+	* libnosys/Makefile.in: Add _exit.o.
+
 2004-06-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* arm/configure.in: Check the value of newlib-may-supply-syscalls
