@@ -663,9 +663,9 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	{
 	  if (no_signals_available ())
 	    sigproc_printf ("I'm going away now");
-	  else if (!hExeced)
+	  else if (!p->exec_sendsig)
 	    system_printf ("error sending signal %d to pid %d, pipe handle %p, %E",
-			  si.si_signo, p->pid, sendsig);
+			   si.si_signo, p->pid, sendsig);
 	  set_errno (EACCES);
 	}
       goto out;
