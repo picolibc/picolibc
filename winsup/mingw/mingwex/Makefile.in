@@ -31,6 +31,9 @@ DISTFILES = Makefile.in configure configure.in \
 	atoll.c \
 	copysignl.S \
 	dirent.c \
+	fdim.c \
+	fdimf.c \
+	fdiml.c \
 	feclearexcept.c \
 	fegetenv.c \
 	fegetexceptflag.c \
@@ -155,6 +158,7 @@ MATH_OBJS = \
 	trunc.o truncf.o truncl.o \
 	isnan.o  isnanf.o isnanl.o \
 	fp_consts.o \
+	fdim.o fdimf.o fdiml.o \
 	fmax.o  fmaxf.o fmaxl.o \
 	fmin.o fminf.o fminl.o \
 	fma.o  fmaf.o fmal.o \

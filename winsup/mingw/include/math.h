@@ -429,6 +429,11 @@ extern double fma (double, double, double);
 extern float fmaf (float, float, float);
 extern long double fmal (long double, long double, long double);
 
+/*  x > y ? (x - y) : 0.0  */
+extern double fdim (double, double);
+extern float fdimf (float, float);
+extern long double fdiml (long double, long double);
+
 /* one lonely transcendental */
 extern double log2 (double _x);
 extern float log2f (float _x);

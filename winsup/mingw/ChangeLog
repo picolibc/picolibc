@@ -1,3 +1,13 @@
+2002-06-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h (fdim, fdimf, fdiml): Add prototypes.
+	* mingwex/fdim.c: New file.
+	* mingwex/fdimf.c: New file.
+	* mingwex/fdiml.c: New file.
+	* mingwex/Makefile.in (DISTFILES): Add fdim.c, fdimf.c,
+	fdiml.c.
+	(MATHOBJS):Add fdim.o, fdimf.o. fdiml.o.
+
 2002-05-23  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/Makefile.in (DISTFILES): Add truncf.c, truncl.c.
