@@ -14,6 +14,7 @@ details. */
 #include <errno.h>
 #include <process.h>
 #include "perprocess.h"
+#include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "sync.h"

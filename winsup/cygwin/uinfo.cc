@@ -21,11 +21,11 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "registry.h"
-#include "security.h"
 
 struct passwd *
 internal_getlogin (cygheap_user &user)

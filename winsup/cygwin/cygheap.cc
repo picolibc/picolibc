@@ -11,9 +11,9 @@
 #include "winsup.h"
 #include <string.h>
 #include <errno.h>
-#include <fhandler.h>
 #include <assert.h>
 #include <stdlib.h>
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
@@ -22,7 +22,6 @@
 #include "cygerrno.h"
 #include "sync.h"
 #include "shared_info.h"
-#include "security.h"
 
 init_cygheap NO_COPY *cygheap;
 void NO_COPY *cygheap_max = NULL;

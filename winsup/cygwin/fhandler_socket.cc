@@ -23,6 +23,7 @@
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
@@ -98,7 +99,7 @@ fhandler_socket::create_secret_event (int* secret)
   __small_sprintf (buf, SECRET_EVENT_NAME, sin.sin_port,
 		   secret_ptr [0], secret_ptr [1],
 		   secret_ptr [2], secret_ptr [3]);
-  secret_event = CreateEvent ( NULL, FALSE, FALSE, buf);
+  secret_event = CreateEvent (get_inheritance (), FALSE, FALSE, buf);
   if (!secret_event && GetLastError () == ERROR_ALREADY_EXISTS)
     secret_event = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
 
@@ -133,7 +134,7 @@ fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
   __small_sprintf (buf, SECRET_EVENT_NAME, peer->sin_port,
                   secret_ptr [0], secret_ptr [1],
                   secret_ptr [2], secret_ptr [3]);
-  ev = CreateEvent (NULL, FALSE, FALSE, buf);
+  ev = CreateEvent (&sec_none_nih, FALSE, FALSE, buf);
   if (!ev && GetLastError () == ERROR_ALREADY_EXISTS)
     {
       debug_printf ("%s event already exist");

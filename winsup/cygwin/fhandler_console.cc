@@ -22,6 +22,7 @@ details. */
 #include <ctype.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
@@ -29,7 +30,6 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "shared_info.h"
-#include "security.h"
 
 #define CONVERT_LIMIT 4096
 

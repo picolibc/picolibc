@@ -15,10 +15,11 @@ details. */
 #include <errno.h>
 #include <signal.h>
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include <cygwin/version.h>
+#include "cygwin/version.h"
 #include "perprocess.h"
 #include <sys/termios.h>
 

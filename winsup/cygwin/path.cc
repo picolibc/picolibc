@@ -65,6 +65,7 @@ details. */
 #include <cygwin/version.h>
 #include "cygerrno.h"
 #include "perprocess.h"
+#include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "sync.h"
@@ -74,7 +75,6 @@ details. */
 #include "cygheap.h"
 #include "shared_info.h"
 #include "registry.h"
-#include "security.h"
 #include <assert.h>
 #include "shortcut.h"
 

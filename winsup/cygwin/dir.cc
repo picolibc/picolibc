@@ -21,10 +21,10 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 #include "perprocess.h"
 #include "path.h"
-#include "security.h"
 #include "dtable.h"
 #include "cygheap.h"
 

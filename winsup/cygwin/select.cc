@@ -34,6 +34,7 @@ details. */
 #include <winsock.h>
 #include "select.h"
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"

@@ -16,6 +16,7 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 
 /*

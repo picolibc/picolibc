@@ -20,11 +20,11 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "cygerrno.h"
-#include "security.h"
 
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */

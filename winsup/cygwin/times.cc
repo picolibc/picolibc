@@ -18,12 +18,12 @@ details. */
 #include <errno.h>
 #include "cygerrno.h"
 #include "perprocess.h"
+#include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "security.h"
 
 #define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL

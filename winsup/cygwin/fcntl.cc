@@ -13,6 +13,7 @@ details. */
 #include <stdarg.h>
 #include <errno.h>
 #include <unistd.h>
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"

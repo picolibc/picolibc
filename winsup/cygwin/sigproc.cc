@@ -21,6 +21,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
@@ -28,7 +29,6 @@ details. */
 #include "perthread.h"
 #include <assert.h>
 #include "shared_info.h"
-#include "security.h"
 
 /*
  * Convenience defines

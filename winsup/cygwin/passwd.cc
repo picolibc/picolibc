@@ -14,13 +14,13 @@ details. */
 #include <stdio.h>
 #include <errno.h>
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
-#include "security.h"
 #include <sys/termios.h>
 
 /* Read /etc/passwd only once for better performance.  This is done

@@ -22,6 +22,7 @@ details. */
 #include "cygerrno.h"
 #include <sys/cygwin.h>
 #include "perprocess.h"
+#include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
@@ -35,7 +36,6 @@ details. */
 #include "perthread.h"
 #include "registry.h"
 #include "environ.h"
-#include "security.h"
 
 #define LINE_BUF_CHUNK (MAX_PATH * 2)
 

@@ -25,6 +25,7 @@ details. */
 #include <winuser.h>
 #include "cygerrno.h"
 #include "perprocess.h"
+#include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
@@ -32,7 +33,6 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
-#include "security.h"
 
 static int
 searchace (aclent_t *aclp, int nentries, int type, int id = -1)

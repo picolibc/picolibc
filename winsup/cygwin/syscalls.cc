@@ -28,6 +28,7 @@ details. */
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "perprocess.h"
+#include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
@@ -36,7 +37,6 @@ details. */
 #include "pinfo.h"
 #include <unistd.h>
 #include "shared_info.h"
-#include "security.h"
 #include "cygheap.h"
 
 extern int normalize_posix_path (const char *, char *);

@@ -17,6 +17,7 @@ details. */
 #include <ctype.h>
 #include <limits.h>
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "sync.h"

@@ -13,12 +13,13 @@ details. */
 #include "winsup.h"
 #include <stdio.h>
 #include <errno.h>
-#include "cygerrno.h"
-#include "fhandler.h"
 #include <windows.h>
 #include <sys/soundcard.h>
 #include <sys/fcntl.h>
 #include <mmsystem.h>
+#include "cygerrno.h"
+#include "security.h"
+#include "fhandler.h"
 
 //------------------------------------------------------------------------
 // Simple encapsulation of the win32 audio device.

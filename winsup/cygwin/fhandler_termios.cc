@@ -15,6 +15,7 @@ details. */
 #include <errno.h>
 #include <ctype.h>
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 #include "sync.h"
 #include "sigproc.h"

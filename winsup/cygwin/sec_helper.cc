@@ -26,6 +26,7 @@ details. */
 #include <wininet.h>
 #include "cygerrno.h"
 #include "perprocess.h"
+#include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
@@ -33,7 +34,6 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
-#include "security.h"
 
 SID_IDENTIFIER_AUTHORITY sid_auth[] = {
         {SECURITY_NULL_SID_AUTHORITY},

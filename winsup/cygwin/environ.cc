@@ -19,6 +19,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "perprocess.h"
+#include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "cygerrno.h"

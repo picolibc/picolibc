@@ -15,6 +15,7 @@ details. */
 #include <fcntl.h>
 #include <stdarg.h>
 #include <errno.h>
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
@@ -27,7 +28,6 @@ details. */
 #include "perthread.h"
 #include "perprocess.h"
 #include "dll_init.h"
-#include "security.h"
 
 #ifdef DEBUGGING
 static int npid = 0;

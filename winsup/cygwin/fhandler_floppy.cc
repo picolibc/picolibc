@@ -14,9 +14,10 @@ details. */
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#include <winioctl.h>
+#include "security.h"
 #include "fhandler.h"
 #include "cygerrno.h"
-#include <winioctl.h>
 
 /**********************************************************************/
 /* fhandler_dev_floppy */

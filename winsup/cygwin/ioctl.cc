@@ -15,6 +15,7 @@ details. */
 #include <sys/ioctl.h>
 #include <errno.h>
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"

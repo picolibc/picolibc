@@ -13,6 +13,7 @@ details. */
 #include <time.h>
 #include <errno.h>
 #include <limits.h>
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
@@ -22,7 +23,6 @@ details. */
 #include "cygwin_version.h"
 #include "perprocess.h"
 #include "environ.h"
-#include "security.h"
 #include <assert.h>
 #include <ntdef.h>
 #include "ntdll.h"

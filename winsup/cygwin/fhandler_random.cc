@@ -14,6 +14,7 @@ details. */
 #include <errno.h>
 #include <limits.h>
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 
 #define RANDOM   8

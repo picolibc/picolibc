@@ -17,13 +17,13 @@ details. */
 #include <signal.h>
 #include "cygerrno.h"
 #include "perprocess.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "path.h"
 #include "shared_info.h"
 #include "host_dependent.h"
-#include "security.h"
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 

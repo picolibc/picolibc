@@ -13,11 +13,11 @@ details. */
 #include <sys/fcntl.h>
 #include <errno.h>
 #include "cygerrno.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "thread.h"
-#include "security.h"
 
 static int
 make_pipe (int fildes[2], unsigned int psize, int mode)

@@ -14,6 +14,7 @@ details. */
 #include <time.h>
 #include <limits.h>
 #include <ntdef.h>
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"

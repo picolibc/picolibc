@@ -14,6 +14,7 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <assert.h>
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"

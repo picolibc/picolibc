@@ -24,6 +24,7 @@ details. */
 #include "cygerrno.h"
 #define NEED_VFORK
 #include "perprocess.h"
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "path.h"
@@ -34,7 +35,6 @@ details. */
 #include "cygwin_version.h"
 #include "dll_init.h"
 #include "host_dependent.h"
-#include "security.h"
 
 #define MAX_AT_FILE_LEVEL 10
 

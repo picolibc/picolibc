@@ -13,6 +13,7 @@ details. */
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
+#include "security.h"
 #include "fhandler.h"
 #include "perprocess.h"
 #include "path.h"

@@ -221,6 +221,14 @@ public:
   int get_close_on_exec () { return FHISSETF (CLOEXEC); }
   int set_close_on_exec_flag (int b) { return FHCONDSETF (b, CLOEXEC); }
 
+  LPSECURITY_ATTRIBUTES get_inheritance (bool all = 0)
+  {
+    if (all)
+      return get_close_on_exec () ? &sec_all_nih : &sec_all;
+    else
+      return get_close_on_exec () ? &sec_none_nih : &sec_none;
+  }
+
   void set_check_win95_lseek_bug (int b = 1) { FHCONDSETF (b, W95LSBUG); }
   int get_check_win95_lseek_bug () { return FHISSETF (W95LSBUG); }
 

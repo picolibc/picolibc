@@ -14,6 +14,7 @@ details. */
 #include <stddef.h>
 #include <sys/mman.h>
 #include <errno.h>
+#include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
@@ -21,7 +22,6 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "security.h"
 #include "sys/cygwin.h"
 
 #define PAGE_CNT(bytes) howmany(bytes,getpagesize())

@@ -1,3 +1,13 @@
+Thu Jul 26 15:19:50 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Throughout, reorganize header file inclusion to put security.h prior to
+	fhandler.h.
+	* fhandler.h (fhandler_base::get_inheritance): New method.
+	* fhandler_socket.cc (fhandler_socket::create_secret_event): Use proper
+	close-on-exec inheritance when creating.
+	(fhandler_socket::check_peer_secret_event): Create handle as
+	non-inheritable.
+
 2001-07-25  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* syscalls.cc (setsid): Detach process from its console if the current

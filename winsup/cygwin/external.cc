@@ -11,6 +11,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "security.h"
 #include "fhandler.h"
 #include "sync.h"
 #include "sigproc.h"

@@ -15,11 +15,12 @@ details. */
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
-#include "cygerrno.h"
-#include "fhandler.h"
 #include <windows.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include "cygerrno.h"
+#include "security.h"
+#include "fhandler.h"
 
 /*
  * Robert Collins:
