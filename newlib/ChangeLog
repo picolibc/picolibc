@@ -1,3 +1,12 @@
+2004-07-05  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/Makefile.am (libc.dvi): Add target and specify
+	same dependencies as libc.info.
+	* libc/Makefile.in: Regenerated.
+	* libm/Makefile.am (libm.dvi): Add target and specify
+	same dependencies as libm.info.
+	* libm/Makefile.in: Regenerated.
+
 2004-06-29  Artem B. Bityuckiy  <dedekind@oktetlabs.ru>
 
 	* acinclude.m4: Move --enable-newlib-iconv option back here.

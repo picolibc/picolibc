@@ -39,6 +39,8 @@ info_TEXINFOS = libm.texinfo
 
 libm.info: targetdep.tex math/stmp-def
 
+libm.dvi: targetdep.tex math/stmp-def
+
 stmp-targetdep: force
 	rm -f tmp.texi
 	targetdoc=`pwd`/tmp.texi; \

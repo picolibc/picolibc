@@ -134,6 +134,9 @@ SUBDEFS = \
 libc.info: sigset.texi extra.texi stdio64.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
+libc.dvi: sigset.texi extra.texi stdio64.texi iconvset.texi \
+	targetdep.tex $(SUBDEFS)
+
 stmp-sigset: config.status
 	if test -n "$(LIBC_SIGNAL_LIB)"; then \
 	  echo "@set SIGNALS" >tmp.texi; \
