@@ -101,6 +101,8 @@ case "${host_cpu}" in
 		;;
 	esac
 	;;
+  ia64*)
+	;;
   m32r*)
 	machine_dir=m32r
 	;;
