@@ -1,3 +1,8 @@
+2001-12-07  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (path_conv::check): Use full path name for determining
+	attributes when /cygdrive/x/foo.
+
 2001-12-06  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (path_conv::check): Reset FH_CYGDRIVE if iterating through
