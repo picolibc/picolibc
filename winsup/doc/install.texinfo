@@ -5,22 +5,8 @@ Unlike previous net releases such as B20.1 and earlier, there is no
 monolithic "full" or "usertools" installation.  Rather, you can pick and
 choose the packages you wish to install, and update them individually.
 
-The following packages are available with the current release:
-
-@example
-
-ash autoconf automake bash binutils bison byacc bzip2 clear cpio cron
-crypt ctags cvs cygrunsrv cygwin dejagnu diff expect file fileutils
-findutils flex gawk gcc gdb gdbm gettext ghostscript gperf grep groff
-gzip inetutils irc jbigkit jpeg less libpng login lynx m4 make man
-mingw mingw-runtime mt mutt ncftp ncurses opengl openssh openssl patch
-pcre perl popt postgresql psutils python readline regex rsync rxvt sed
-sh-utils squid ssmtp tar tcltk tcsh termcap tetex texinfo textutils
-tiff time unzip vim w32api wget which xpm-nox zip zlib
-
-@end example
-
-(This list becomes out of date as new packages are added.)
+For a searchable list of packages that can be installed with Cygwin,
+see @file{http://cygwin.com/packages/}.
 
 Full source code is available for all packages and tools.
 
