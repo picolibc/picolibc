@@ -52,7 +52,7 @@ fhandler_pipe::set_close_on_exec (int val)
 int __stdcall
 fhandler_pipe::read (void *in_ptr, size_t in_len)
 {
-  if (hit_eof ())
+  if (saweof)
     return 0;
   int res = this->fhandler_base::read (in_ptr, in_len);
   (void) ReleaseMutex (guard);

@@ -1,5 +1,10 @@
 2001-11-04  Christopher Faylor  <cgf@redhat.com>
 
+	* pipe.cc (fhandler_pipe::read): Narrow eof return to just the "broken
+	pipe" test.
+
+2001-11-04  Christopher Faylor  <cgf@redhat.com>
+
 	* select.cc: Add more comments throughout.  Use bool 'true' where
 	appropriate throughout.
 	(fhandler_socket::select_read): Remove duplicate setting for *_ready
