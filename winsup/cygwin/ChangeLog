@@ -1,3 +1,9 @@
+Tue Apr 24 23:43:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* passwd.cc (getpwnam_r): Use correct offsets into buffer.
+	Copy pw_gecos field as well.
+	(getpwuid_r): Ditto.
+
 2001-04-24  Egor Duda  <deo@logos-m.ru>
 
 	* dlmalloc.c: New file. Port of Doug Lea's malloc
