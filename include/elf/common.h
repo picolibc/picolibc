@@ -90,7 +90,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define ET_LOPROC	0xFF00	/* Processor-specific */
 #define ET_HIPROC	0xFFFF	/* Processor-specific */
 
-/* Values for e_machine, which identifies the architecture.  */
+/* Values for e_machine, which identifies the architecture.  These numbers
+   are officially assigned by registry@sco.com.  See below for a list of
+   ad-hoc numbers used during initial development.  */
 
 #define EM_NONE		0	/* No machine */
 #define EM_M32		1	/* AT&T WE 32100 */
@@ -151,15 +153,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_SVX         73	/* Silicon Graphics SVx */
 #define EM_ST19        74	/* STMicroelectronics ST19 8-bit cpu */
 #define EM_VAX         75	/* Digital VAX */
-#define EM_CRIS	       76	/* Axis Communications 32-bit embedded cpu */
+#define EM_CRIS	       76	/* Axis Communications 32-bit embedded processor */
 #define EM_JAVELIN     77	/* Infineon Technologies 32-bit embedded cpu */
 #define EM_FIREPATH    78	/* Element 14 64-bit DSP processor */
 #define EM_ZSP         79	/* LSI Logic's 16-bit DSP processor */
-#define EM_MMIX	       80	/* Donald Knuth's education 64-bit processor */
+#define EM_MMIX	       80	/* Donald Knuth's educational 64-bit processor */
 #define EM_HUANY       81	/* Harvard's machine-independent format */
 #define EM_PRISM       82	/* SiTera Prism */
-
-#define EM_PJ          99       /* picoJava */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
@@ -167,7 +167,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
    NOTE: Do not just increment the most recent number by one.
    Somebody else somewhere will do exactly the same thing, and you
-   will have a collision.  Instead, pick a random number.  */
+   will have a collision.  Instead, pick a random number.
+
+   Normally, each entity or maintainer responsible for a machine with an
+   unofficial e_machine number should eventually ask registry@sco.com for
+   an officially blessed number to be added to the list above.  */
+
+#define EM_PJ          99       /* picoJava */
 
 /* Cygnus PowerPC ELF backend.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_POWERPC 0x9025

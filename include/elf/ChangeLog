@@ -1,3 +1,11 @@
+2000-11-27  Hans-Peter Nilsson  <hp@axis.com>
+
+	* common.h (e_machine numbers): Clarify comments to describe how
+	EM_* constants are assigned.  Move EM_PJ from official section to
+	ad-hoc section.
+	(EM_CRIS): Correct comment to match official description.
+	(EM_MMIX): Ditto.
+
 2000-11-22  Nick Clifton  <nickc@redhat.com>
 
 	* common.h (EM_JAVELIN): New machine number.
