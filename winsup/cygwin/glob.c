@@ -63,10 +63,6 @@
  *	Number of matches in the current invocation of glob.
  */
 
-/* CYGNUS LOCAL: don't include */
-/* #include "namespace.h" */
-/* end CYGNUS LOCAL */
-
 #include "winsup.h"
 
 #include <sys/param.h>
