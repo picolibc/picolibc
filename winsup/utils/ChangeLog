@@ -1,6 +1,7 @@
 2002-10-19  Christopher Faylor  <cgf@redhat.com>
 
 	* mount.cc (usage): Correctly report default mode.
+	* strace.cc (main): Use strtoul as appropriate.
 
 2002-09-29  Christopher Faylor  <cgf@redhat.com>
 
