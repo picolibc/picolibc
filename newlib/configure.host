@@ -209,6 +209,12 @@ case "${host_cpu}" in
 	;;
 esac
 
+# Disable thread support if requested.
+
+if [ "${newlib_multithread}" = "no" ] ; then
+	newlib_cflags="${newlib_cflags} -D__SINGLE_THREAD__"
+fi
+
 # Enable multibyte support if requested.
 
 if [ "${newlib_mb}" = "yes" ] ; then

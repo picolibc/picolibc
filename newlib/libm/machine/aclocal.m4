@@ -56,6 +56,15 @@ AC_ARG_ENABLE(newlib-mb,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-mb option) ;;
  esac], [newlib_mb=no])dnl
 
+dnl Support --enable-newlib-multithread
+AC_ARG_ENABLE(newlib-multithread,
+[  --enable-newlib-multithread        enable support for multiple threads],
+[case "${enableval}" in
+  yes) newlib_multithread=yes ;;
+  no)  newlib_multithread=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-multithread option) ;;
+ esac], [newlib_multithread=yes])dnl
+
 dnl Support --disable-newlib-io-float
 AC_ARG_ENABLE(newlib-io-float,
 [  --disable-newlib-io-float disable printf/scanf family float support],

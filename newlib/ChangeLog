@@ -1,5 +1,9 @@
 2002-05-08  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
+	* acinclude.m4: Add support for --enable-newlib-multithread.
+	* configure.host (newlib_cflags): Add -D__SINGLE_THREAD__ if
+	--enable-newlib-multithread=no.
+
 	* libc/stdio/getc_u.c: New file.
 	* libc/stdio/getchar_u.c: New file.
 	* libc/stdio/putc_u.c: New file.
