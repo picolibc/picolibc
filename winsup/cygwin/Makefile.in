@@ -79,8 +79,8 @@ INSTALL_DATA:=$(SHELL) $(updir1)/install-sh -c
 
 # Setup the testing framework, if you have one
 EXPECT = `if [ -f $${rootme}/../../expect/expect$(EXEEXT) ] ; then \
-            echo $${rootme}/../../expect/expect$(EXEEXT) ; \
-          else echo expect ; fi`
+	    echo $${rootme}/../../expect/expect$(EXEEXT) ; \
+	  else echo expect ; fi`
 
 RUNTEST = `if [ -f $${srcdir}/../dejagnu/runtest ] ; then \
 	       echo $${srcdir}/../dejagnu/runtest ; \
@@ -207,7 +207,7 @@ install-man:
 
 install_target: cygserver.exe
 	$(INSTALL_PROGRAM) cygserver.exe $(bindir)/cygserver.exe
-	
+
 install_host:
 
 
@@ -255,7 +255,7 @@ new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(
 	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(MALLOC_OBJ) $(LIBM) $(LIBC) \
-	-lstdc++ -lgcc $(DLL_IMPORTS) 
+	-lstdc++ -lgcc $(DLL_IMPORTS)
 
 # Rule to build libcygwin.a
 $(LIB_NAME): rmsym newsym new-$(DLL_NAME) $(LIBCOS)
