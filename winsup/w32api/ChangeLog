@@ -1,3 +1,71 @@
+2003-08-25  Filip Navara  <xnavara@volny.cz>
+
+	* include/commctrl.h (ILCF_*): Add defines.
+	(ILD_*): Ditto.
+	(HDS_*); Ditto.
+	(IPN_FIRST, IPN_LAST): Cast to UINT.
+	(SBN_FIRST, SBN_LAST): Add defines.
+	(PGN_*): Ditto.
+	(HDF_JUSTIFYMASK): Fix typo.
+	(HDM_*): Add defines.
+	(HICF_*): Ditto.
+	(I_INDENTCALLBACK,I_IMAGENONE): Ditto.
+	(TBSTATE_MARKED): Add define.
+	(TBSTYLE_EX_*): Add defines.
+	(TBCDRF_*): Ditto.
+	(IDB_HIST_SMALL_COLOR,IDB_HIST_LARGE_COLOR): Ditto.
+	(TB_*): Ditto.
+	(TBN_*): Ditto.
+	(TBNRF_*): Ditto.
+	(TTF_*): Ditto.
+	(TBCD_*): Ditto.
+	(TBDDRET_*): Ditto.
+	(TBIMHT_*): Ditto.
+	(TTM_*): Ditto.
+	(UDM_*): Ditto.
+	(TBIF_BYINDEX): Define as hex constant.
+	(CDIS_*): Add defines.
+	(CDDS_SUBITEM): Add define.
+	(LVIF_*): Add defines.
+	(LVM_*): Ditto.
+	(LVGIT_UNFOLDED): Add define.
+	(TVM_): Add defines.
+	(TVE_EXPANDPARTIAL): Add define.
+	(TVGN_LASTVISIBLE): Ditto.
+	(TVN_*): Add defines.
+	(TVNRET_*): Add defines.
+	(TCIF_STATE): Add define.
+	(NM_TOOLTIPSCREATED): Ditto.
+	(CCM_*): Add defines.
+	(INFOTIPSIZE): Add numeric value.
+	(ODT_LISTVIEW): Ditto.
+	(MCM_GETMAXTODAYWIDTH): Ditto.
+	(MCHT_*): Add defines.
+	(UDM_SETRANGE32,UDM_GETRANGE32): Define in terms of WM_USER.
+	(PGF_*): Add defines.
+	(PGM_*): Ditto.
+	(TBINSERTMARK): Add structure.
+	(LPIMAGEINFO) Add typedef.
+	(LPHDHITTESTINFO): Ditto.
+	(NMLVGETINFOTIP[AW]: Add structures.
+	(NMTBCUSTOMDRAW): Add structure.
+	(TTTOOLINFOA_V*_SIZE): Add macros.
+	(TTTOOLINFOW_V1_SIZE): Ditto.
+	(IMAGELISTDRAWPARAMS): Add new members for WXP.
+	(LVITEM[AW]: Ditto.
+	(TCITEM[AW]):Ditto.
+	(CCSIZEOF_STRUCT): Correct macro definition.
+	(ListView_*): Add new macros.
+	(HIMAGELIST): Correct typedef.
+	(HTREEITEM): Ditto.
+
+2003-08-25   Danny Smith <dannysmith@users.sourceforge.net>
+
+	* commctrl.h (TC_HITTESTINFO): Remove. Add defines for
+	TCHITTESTINFO for backward compatibility.
+	(TC_ITEM[AW]): Rename to TCITEM[AW]. Add defines for backward
+	compatibility.
+
 2003-08-24   Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/objidl.h (COBJMACROS): Define macros only
