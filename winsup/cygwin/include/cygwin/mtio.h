@@ -153,6 +153,7 @@ struct	mtpos {
 #define GMT_AUTO_LOCK(x)        ((x) & 0x00000020)  /* auto door lock on r/w */
 #define GMT_SYSV(x)		((x) & 0x00000010)  /* SYSV read semantics */
 #define GMT_NOWAIT(x)		((x) & 0x00000008)  /* don't wait for positioning commands */
+#define GMT_ASYNC(x)		((x) & 0x00000004)  /* asynchronous writes */
 
 
 /* SCSI-tape specific definitions */
@@ -175,7 +176,7 @@ struct	mtpos {
 #define MT_ST_EOT_WZ_SIZE	0xf0000000	/* Cygwin only */
 
 #define MT_ST_BUFFER_WRITES     0x00000001
-#define MT_ST_ASYNC_WRITES	0x00000002	/* Not supported */
+#define MT_ST_ASYNC_WRITES	0x00000002
 #define MT_ST_READ_AHEAD        0x00000004	/* Not supported */
 #define MT_ST_DEBUGGING         0x00000008	/* Not supported */
 #define MT_ST_TWO_FM		0x00000010

@@ -1,5 +1,10 @@
 2004-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/mtio.h (GMT_ASYNC): New define.
+	(MT_ST_ASYNC_WRITES): Remove "Not supported" comment.
+
+2004-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* errno.cc (errmap): Handle ERROR_IO_PENDING.
 	* fhandler.cc (fhandler_base::open): Make tape I/O asynchronous.
 	* fhandler.h (class fhandler_dev_tape): Add mt_evt member.
