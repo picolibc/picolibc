@@ -288,11 +288,10 @@ munmap (caddr_t addr, size_t len)
       list *l = mmapped_areas->lists[it];
       if (l != 0)
 	{
-	  int li;
-	  for (li = 0; li < l->nrecs; ++li)
+	  for (int li = 0; li < l->nrecs; ++li)
 	    {
 	      mmap_record rec = l->recs[li];
-	      if (rec.get_address () == addr)
+	      if (rec.get_address () == addr && rec.get_size () == len)
 		{
                   int fd = l->fd;
                   fhandler_disk_file fh_paging_file (NULL);
