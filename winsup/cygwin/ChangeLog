@@ -1,3 +1,13 @@
+2002-03-11  Corinna Vinschen  <corina@vinschen.de>
+
+	* fork.cc (fork_child): Call fixup_mmaps_after_fork() before
+	closing parent process handle.  Call fixup_mmaps_after_fork()
+	with parent process handle as parameter.
+	* mmap.cc (mmap_record::access): New method.
+	(fixup_mmaps_after_fork): Take process handle as parameter.
+	In case of FILE_MAP_COPY access, copy valid memory regions to child.
+	* pinfo.h (fixup_mmaps_after_fork): Change prototype accordingly.
+
 2002-03-07  Corinna Vinschen  <corina@vinschen.de>
 
 	* autoload.cc (NetGetDCName): Add symbol.

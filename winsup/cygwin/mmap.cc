@@ -98,6 +98,7 @@ class mmap_record
     __off64_t map_map (__off64_t off, DWORD len);
     BOOL unmap_map (caddr_t addr, DWORD len);
     void fixup_map (void);
+    int access (char *address);
 
     fhandler_base *alloc_fh ();
     void free_fh (fhandler_base *fh);
@@ -217,6 +218,15 @@ mmap_record::fixup_map ()
 		    getpagesize (),
 		    MAP_ISSET (off - 1) ? prot : PAGE_NOACCESS,
 		    &old_prot);
+}
+
+int
+mmap_record::access (char *address)
+{
+  if (address < base_address_ || address >= base_address_ + size_to_map_)
+    return 0;
+  DWORD off = (address - base_address_) / getpagesize ();
+  return MAP_ISSET (off);
 }
 
 static fhandler_disk_file fh_paging_file;
@@ -887,7 +897,7 @@ mprotect (caddr_t addr, size_t len, int prot)
  */
 
 int __stdcall
-fixup_mmaps_after_fork ()
+fixup_mmaps_after_fork (HANDLE parent)
 {
 
   debug_printf ("recreate_mmaps_after_fork, mmapped_areas %p", mmapped_areas);
@@ -925,6 +935,20 @@ fixup_mmaps_after_fork ()
 				 rec->get_address ());
 		  return -1;
 		}
+	      if (rec->get_access () == FILE_MAP_COPY)
+	        {
+		  for (char *address = rec->get_address ();
+		       address < rec->get_address () + rec->get_size ();
+		       address += getpagesize ())
+		    if (rec->access (address)
+		        && !ReadProcessMemory (parent, address, address,
+					       getpagesize (), NULL))
+		      {
+			system_printf ("ReadProcessMemory failed for MAP_PRIVATE address %p, %E",
+				       rec->get_address ());
+			return -1;
+		      }
+	        }
 	      rec->fixup_map ();
 	    }
 	}

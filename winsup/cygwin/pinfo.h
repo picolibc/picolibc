@@ -200,7 +200,7 @@ extern void __stdcall pinfo_fixup_after_fork ();
 extern HANDLE hexec_proc;
 
 /* For mmaps across fork(). */
-int __stdcall fixup_mmaps_after_fork ();
+int __stdcall fixup_mmaps_after_fork (HANDLE parent);
 /* for shm areas across fork (). */
 int __stdcall fixup_shms_after_fork ();
 

@@ -296,12 +296,12 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
       sync_with_parent ("loaded dlls", TRUE);
     }
 
+  if (fixup_mmaps_after_fork (hParent))
+    api_fatal ("recreate_mmaps_after_fork_failed");
+
   ForceCloseHandle (hParent);
   (void) ForceCloseHandle (child_proc_info->subproc_ready);
   (void) ForceCloseHandle (child_proc_info->forker_finished);
-
-  if (fixup_mmaps_after_fork ())
-    api_fatal ("recreate_mmaps_after_fork_failed");
 
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
