@@ -392,6 +392,30 @@ _CRTIMP int __cdecl	fileno (FILE*);
 #define fileno(__F) ((__F)->_file)
 #endif
 
+#if defined (__MSVCRT__) && !defined (__NO_MINGW_LFS)
+#include <sys/types.h>
+__CRT_INLINE FILE* __cdecl fopen64 (const char* filename, const char* mode)
+{
+  return fopen (filename, mode); 
+}
+
+int __cdecl fseeko64 (FILE*, off64_t, int);
+
+#ifdef __USE_MINGW_FSEEK
+int __cdecl __mingw_fseeko64 (FILE *, off64_t, int);
+#define fseeko64(fp, offset, whence)  __mingw_fseeko64(fp, offset, whence)
+#endif
+
+__CRT_INLINE off64_t __cdecl ftello64 (FILE * stream)
+{
+  fpos_t pos;
+  if (fgetpos(stream, &pos))
+    return  -1LL;
+  else
+   return ((off64_t) pos);
+}
+#endif /* __NO_MINGW_LFS */
+
 #endif	/* Not __STRICT_ANSI__ */
 
 /* Wide  versions */

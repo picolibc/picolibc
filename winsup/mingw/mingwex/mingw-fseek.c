@@ -30,35 +30,53 @@ __mingw_fseek (FILE *fp, long offset, int whence)
 }
 
 int
+__mingw_fseeko64 (FILE *fp, off64_t offset, int whence)
+{
+# undef fseeko64
+  __mingw_fseek_called = 1;
+  return fseeko64 (fp, offset, whence);
+}
+
+int
 __mingw_fwrite (const void *buffer, size_t size, size_t count, FILE *fp)
 {
 # undef fwrite 
   if ((_osver & 0x8000) &&  __mingw_fseek_called)
     {
-      DWORD actual_length, current_position;
+      ULARGE_INTEGER actual_length;
+      LARGE_INTEGER current_position = {{0LL}};
       __mingw_fseek_called = 0;
       fflush (fp);
-      actual_length = GetFileSize ((HANDLE) _get_osfhandle (fileno (fp)), 
-                                   NULL);
-      current_position = SetFilePointer ((HANDLE) _get_osfhandle (fileno (fp)),
-                                         0, 0, FILE_CURRENT);
+      actual_length.LowPart = GetFileSize ((HANDLE) _get_osfhandle (fileno (fp)), 
+					   &actual_length.HighPart);
+      if (actual_length.LowPart == 0xFFFFFFFF 
+          && GetLastError() != NO_ERROR )
+        return -1;
+      current_position.LowPart = SetFilePointer ((HANDLE) _get_osfhandle (fileno (fp)),
+                                         	 current_position.LowPart,
+					 	 &current_position.HighPart,
+						 FILE_CURRENT);
+      if (current_position.LowPart == 0xFFFFFFFF 
+          && GetLastError() != NO_ERROR )
+        return -1;
+
 #ifdef DEBUG
-      printf ("__mingw_fwrite: current %ld, actual %ld\n", 
-	      current_position, actual_length);
+      printf ("__mingw_fwrite: current %I64u, actual %I64u\n", 
+	      current_position.QuadPart, actual_length.QuadPart);
 #endif /* DEBUG */
-      if (current_position > actual_length)
+      if (current_position.QuadPart > actual_length.QuadPart)
 	{
 	  static char __mingw_zeros[ZEROBLOCKSIZE];
-	  long numleft;
+	  long long numleft;
 
 	  SetFilePointer ((HANDLE) _get_osfhandle (fileno (fp)), 
 	                  0, 0, FILE_END);
-	  numleft = current_position - actual_length;
+	  numleft = current_position.QuadPart - actual_length.QuadPart;
 
 #ifdef DEBUG
-	  printf ("__mingw_fwrite: Seeking %ld bytes past end\n", numleft);
+	  printf ("__mingw_fwrite: Seeking %I64d bytes past end\n", numleft);
 #endif /* DEBUG */
-	  while (numleft > 0)
+	  while (numleft > 0LL)
 	    {
 	      DWORD nzeros = (numleft > ZEROBLOCKSIZE)
 	                     ? ZEROBLOCKSIZE : numleft;

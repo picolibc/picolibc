@@ -105,6 +105,15 @@ typedef _ssize_t ssize_t;
 #endif
 #endif /* Not _SSIZE_T_ */ 
 
+#ifndef _FPOS64_T_
+#define _FPOS64_T_
+typedef long long fpos64_t;
+#endif
+
+#ifndef _OFF64_T_
+#define _OFF64_T_
+typedef long long off64_t;
+#endif
 
 #endif	/* Not RC_INVOKED */
 

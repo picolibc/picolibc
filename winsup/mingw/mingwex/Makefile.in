@@ -62,6 +62,7 @@ MATH_DISTFILES = \
 	tgammaf.c tgammal.c trunc.c truncf.c truncl.c
 
 STDIO_DISTFILES = \
+	fopen64.c fseeko64.c ftello64.c lseek64.c \
 	snprintf.c snwprintf.c vsnprintf.c vsnwprintf.c \
 	vfscanf.c vfwscanf.c vscanf.c vsscanf.c vswscanf.c vwscanf.c
 
@@ -113,6 +114,7 @@ STDLIB_STUB_OBJS = \
 	strtof.o wcstof.o \
 	_Exit.o
 STDIO_OBJS = \
+	fopen64.o fseeko64.o ftello64.o lseek64.o \
 	snprintf.o  vsnprintf.o snwprintf.o vsnwprintf.o \
 	vfscanf.o vfwscanf.o vscanf.o vsscanf.o vswscanf.o vwscanf.o
 MATH_OBJS = \
