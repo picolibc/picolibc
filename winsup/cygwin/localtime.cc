@@ -777,8 +777,8 @@ tzload(const char *name, struct state *sp)
 
 		if (fid == -2)
 		  {
-		    memcpy(u.buf, _posixrules_data, sizeof(_posixrules_data));
-		    i = sizeof(_posixrules_data);
+		    memcpy(u.buf, _posixrules_data, sizeof (_posixrules_data));
+		    i = sizeof (_posixrules_data);
 		  }
 		else
 		  {
@@ -1473,7 +1473,7 @@ tzset P((void))
 
 	if (lcl_is_set > 0  &&  strcmp(lcl_TZname, name) == 0)
 		return;
-	lcl_is_set = (strlen(name) < sizeof(lcl_TZname));
+	lcl_is_set = (strlen(name) < sizeof (lcl_TZname));
 	if (lcl_is_set)
 		(void) strcpy(lcl_TZname, name);
 

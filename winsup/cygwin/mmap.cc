@@ -25,8 +25,8 @@ details. */
 
 #define PAGE_CNT(bytes) howmany((bytes),getpagesize())
 
-#define PGBITS		(sizeof(DWORD)*8)
-#define MAPSIZE(pages)	howmany((pages),PGBITS)
+#define PGBITS		(sizeof (DWORD)*8)
+#define MAPSIZE(pages)	howmany ((pages), PGBITS)
 
 #define MAP_SET(n)	(map_map_[(n)/PGBITS] |= (1L << ((n) % PGBITS)))
 #define MAP_CLR(n)	(map_map_[(n)/PGBITS] &= ~(1L << ((n) % PGBITS)))
@@ -80,7 +80,7 @@ class mmap_record
     void alloc_map ()
       {
 	/* Allocate one bit per page */
-	map_map_ = (DWORD *) calloc (MAPSIZE(PAGE_CNT (size_to_map_)),
+	map_map_ = (DWORD *) calloc (MAPSIZE (PAGE_CNT (size_to_map_)),
 				     sizeof (DWORD));
 	if (wincap.virtual_protect_works_on_shared_pages ())
 	  {
@@ -191,7 +191,7 @@ mmap_record::unmap_map (caddr_t addr, DWORD len)
     MAP_CLR (off);
   /* Return TRUE if all pages are free'd which may result in unmapping
      the whole chunk. */
-  for (len = MAPSIZE(PAGE_CNT (size_to_map_)); len > 0; )
+  for (len = MAPSIZE (PAGE_CNT (size_to_map_)); len > 0; )
     if (map_map_[--len])
       return FALSE;
   return TRUE;
@@ -277,7 +277,7 @@ public:
 list::list ()
 : nrecs (0), maxrecs (10), fd (0), hash (0)
 {
-  recs = (mmap_record *) malloc (10 * sizeof(mmap_record));
+  recs = (mmap_record *) malloc (10 * sizeof (mmap_record));
 }
 
 list::~list ()
@@ -362,7 +362,7 @@ public:
 
 map::map ()
 {
-  lists = (list **) malloc (10 * sizeof(list *));
+  lists = (list **) malloc (10 * sizeof (list *));
   nlists = 0;
   maxlists = 10;
 }

@@ -240,7 +240,7 @@ mkdir (const char *dir, mode_t mode)
       goto done;
     }
 
-  nofinalslash(real_dir.get_win32 (), real_dir.get_win32 ());
+  nofinalslash (real_dir.get_win32 (), real_dir.get_win32 ());
   if (! writable_directory (real_dir.get_win32 ()))
     goto done;
 

@@ -691,7 +691,7 @@ dtable::vfork_child_fixup ()
 }
 
 #define DEVICE_PREFIX "\\device\\"
-#define DEVICE_PREFIX_LEN sizeof(DEVICE_PREFIX) - 1
+#define DEVICE_PREFIX_LEN sizeof (DEVICE_PREFIX) - 1
 #define REMOTE "\\Device\\LanmanRedirector\\"
 #define REMOTE_LEN sizeof (REMOTE) - 1
 

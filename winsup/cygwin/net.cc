@@ -918,7 +918,7 @@ dup_hostent_ptr (struct hostent *src)
   if (src->h_aliases && !(dst->h_aliases = dup_char_list (src->h_aliases)))
     goto out;
   if (src->h_addr_list
-      && !(dst->h_addr_list = dup_addr_list(src->h_addr_list, src->h_length)))
+      && !(dst->h_addr_list = dup_addr_list (src->h_addr_list, src->h_length)))
     goto out;
 
   debug_printf ("hostent: copied %s", dst->h_name);

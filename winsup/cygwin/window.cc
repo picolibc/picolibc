@@ -64,7 +64,7 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
       return 0;
     case WM_ASYNCIO:
-      if (WSAGETSELECTEVENT(lParam) == FD_OOB)
+      if (WSAGETSELECTEVENT (lParam) == FD_OOB)
 	raise (SIGURG);
       else
 	raise (SIGIO);

@@ -202,7 +202,7 @@ _kill (pid_t pid, int sig)
 
   /* Silently ignore stop signals from a member of orphaned process group.
      FIXME: Why??? */
-  if (ISSTATE(myself, PID_ORPHANED) &&
+  if (ISSTATE (myself, PID_ORPHANED) &&
       (sig == SIGTSTP || sig == SIGTTIN || sig == SIGTTOU))
     sig = 0;
 
@@ -230,7 +230,7 @@ kill_pgrp (pid_t pid, int sig)
       /* Is it a process we want to kill?  */
       if ((pid == 0 && (p->pgid != myself->pgid || p->ctty != myself->ctty)) ||
 	  (pid > 1 && p->pgid != pid) ||
-	  (sig < 0 && NOTSTATE(p, PID_STOPPED)))
+	  (sig < 0 && NOTSTATE (p, PID_STOPPED)))
 	continue;
       sigproc_printf ("killing pid %d, pgrp %d, p->ctty %d, myself->ctty %d",
 		      p->pid, p->pgid, p->ctty, myself->ctty);

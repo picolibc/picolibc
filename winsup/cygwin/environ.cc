@@ -622,7 +622,7 @@ regopt (const char *name)
   /* FIXME: should not be under mount */
   reg_key r (KEY_READ, CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
   char buf[MAX_PATH];
-  char lname[strlen(name) + 1];
+  char lname[strlen (name) + 1];
   strlwr (strcpy (lname, name));
 
   if (r.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
@@ -665,8 +665,8 @@ environ_init (char **envp, int envc)
     {
       for (int i = 0; conv_envvars[i].name != NULL; i++)
 	{
-	  conv_start_chars[cyg_tolower(conv_envvars[i].name[0])] = 1;
-	  conv_start_chars[cyg_toupper(conv_envvars[i].name[0])] = 1;
+	  conv_start_chars[cyg_tolower (conv_envvars[i].name[0])] = 1;
+	  conv_start_chars[cyg_toupper (conv_envvars[i].name[0])] = 1;
 	}
       initted = 1;
     }
@@ -728,8 +728,8 @@ environ_init (char **envp, int envc)
 	ucenv (newp, eq);
       if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
 	sawTERM = 1;
-      if (*newp == 'C' && strncmp (newp, "CYGWIN=", sizeof("CYGWIN=") - 1) == 0)
-	parse_options (newp + sizeof("CYGWIN=") - 1);
+      if (*newp == 'C' && strncmp (newp, "CYGWIN=", sizeof ("CYGWIN=") - 1) == 0)
+	parse_options (newp + sizeof ("CYGWIN=") - 1);
       if (*eq && conv_start_chars[(unsigned char)envp[i][0]])
 	posify (envp + i, *++eq ? eq : --eq);
       debug_printf ("%p: %s", envp[i], envp[i]);

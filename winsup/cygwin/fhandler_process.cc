@@ -62,7 +62,7 @@ static const char * const process_listing[] =
 };
 
 static const int PROCESS_LINK_COUNT =
-  (sizeof(process_listing) / sizeof(const char *)) - 1;
+  (sizeof (process_listing) / sizeof (const char *)) - 1;
 
 static off_t format_process_stat (_pinfo *p, char *destbuf, size_t maxsize);
 static off_t format_process_status (_pinfo *p, char *destbuf, size_t maxsize);
@@ -475,7 +475,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
     }
   else
     {
-      start_time = (GetTickCount() / 1000 - time(NULL) + p->start_time) * HZ;
+      start_time = (GetTickCount () / 1000 - time (NULL) + p->start_time) * HZ;
     }
   return __small_sprintf (destbuf, "%d (%s) %c "
 				   "%d %d %d %d %d "

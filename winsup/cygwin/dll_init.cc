@@ -29,7 +29,7 @@ static int dll_global_dtors_recorded;
 
 /* Run destructors for all DLLs on exit. */
 static void
-dll_global_dtors()
+dll_global_dtors ()
 {
   for (dll *d = dlls.istart (DLL_ANY); d; d = dlls.inext ())
     d->p.run_dtors ();

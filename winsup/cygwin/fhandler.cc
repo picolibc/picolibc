@@ -617,7 +617,7 @@ fhandler_base::write (const void *ptr, size_t len)
 	     fill in the gap with zeros. - DJ */
 	  char zeros[512];
 	  int number_of_zeros_to_write = current_position - actual_length;
-	  memset(zeros, 0, 512);
+	  memset (zeros, 0, 512);
 	  SetFilePointer (get_handle (), 0, 0, FILE_END);
 	  while (number_of_zeros_to_write > 0)
 	    {

@@ -19,10 +19,10 @@ extern "C"
 
 /* Notes: we return a valid key even if id's low order 8 bits are 0. */
 key_t
-ftok(const char *path, int id)
+ftok (const char *path, int id)
 {
   struct stat statbuf;
-  if (stat(path, &statbuf))
+  if (stat (path, &statbuf))
     {
       /* stat set the appropriate errno for us */
       return (key_t) -1;

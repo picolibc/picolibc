@@ -24,7 +24,7 @@ void
 delqueue_list::init ()
 {
   empty = 1;
-  memset(inuse, 0, MAX_DELQUEUES_PENDING);
+  memset (inuse, 0, MAX_DELQUEUES_PENDING);
 }
 
 void
@@ -43,7 +43,7 @@ delqueue_list::queue_file (const char *dosname)
   {
     /* check for duplicates */
     for (int i=0; i < MAX_DELQUEUES_PENDING; i++)
-      if (inuse[i] && strcmp(name[i], temp) == 0)
+      if (inuse[i] && strcmp (name[i], temp) == 0)
 	return;
   }
 
@@ -52,7 +52,7 @@ delqueue_list::queue_file (const char *dosname)
       {
 	/* set the name first, in case someone else is running the
 	   queue they'll get a valid name */
-	strcpy(name[i], temp);
+	strcpy (name[i], temp);
 	inuse[i] = 1;
 	empty = 0;
 	debug_printf ("adding '%s' to queue %d", temp, i);

@@ -334,7 +334,7 @@ corelocaltime (const time_t * tim_p)
   int yleap;
   _CONST int *ip;
 #ifdef _MT_SAFE
-  struct tm &localtime_buf=_reent_winsup()->_localtime_buf;
+  struct tm &localtime_buf=_reent_winsup ()->_localtime_buf;
 #else
   static NO_COPY struct tm localtime_buf = {0};
 #endif
@@ -416,7 +416,7 @@ localtime (const time_t *tim_p)
   time_t tim = *tim_p;
   struct tm *rtm;
 
-  tzset();
+  tzset ();
 
   tim -= _timezone;
 

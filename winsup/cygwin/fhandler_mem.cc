@@ -116,7 +116,7 @@ fhandler_dev_mem::open (path_conv *, int flags, mode_t)
 
   HANDLE mem;
   NTSTATUS ret = NtOpenSection (&mem, section_access, &attr);
-  if (!NT_SUCCESS(ret))
+  if (!NT_SUCCESS (ret))
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       set_io_handle (NULL);
@@ -166,7 +166,7 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
 
   memcpy ((char *) viewmem + (pos - phys.QuadPart), ptr, ulen);
 
-  if (!NT_SUCCESS(ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
+  if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       return -1;
@@ -214,7 +214,7 @@ fhandler_dev_mem::read (void *ptr, size_t ulen)
 
   memcpy (ptr, (char *) viewmem + (pos - phys.QuadPart), ulen);
 
-  if (!NT_SUCCESS(ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
+  if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       return -1;
@@ -304,7 +304,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
 
   HANDLE h;
   NTSTATUS ret = NtOpenSection (&h, section_access, &attr);
-  if (!NT_SUCCESS(ret))
+  if (!NT_SUCCESS (ret))
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       syscall_printf ("-1 = mmap(): NtOpenSection failed with %E");
@@ -348,7 +348,7 @@ int
 fhandler_dev_mem::munmap (HANDLE h, caddr_t addr, size_t len)
 {
   NTSTATUS ret;
-  if (!NT_SUCCESS(ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, addr)))
+  if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, addr)))
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       return -1;

@@ -555,9 +555,9 @@ out:
 static int
 start_thread_pipe (select_record *me, select_stuff *stuff)
 {
-  if (stuff->device_specific[FHDEVN(FH_PIPE)])
+  if (stuff->device_specific[FHDEVN (FH_PIPE)])
     {
-      me->h = *((pipeinf *) stuff->device_specific[FHDEVN(FH_PIPE)])->thread;
+      me->h = *((pipeinf *) stuff->device_specific[FHDEVN (FH_PIPE)])->thread;
       return 1;
     }
   pipeinf *pi = new pipeinf;
@@ -567,20 +567,20 @@ start_thread_pipe (select_record *me, select_stuff *stuff)
   me->h = *pi->thread;
   if (!me->h)
     return 0;
-  stuff->device_specific[FHDEVN(FH_PIPE)] = (void *)pi;
+  stuff->device_specific[FHDEVN (FH_PIPE)] = (void *)pi;
   return 1;
 }
 
 static void
 pipe_cleanup (select_record *, select_stuff *stuff)
 {
-  pipeinf *pi = (pipeinf *)stuff->device_specific[FHDEVN(FH_PIPE)];
+  pipeinf *pi = (pipeinf *)stuff->device_specific[FHDEVN (FH_PIPE)];
   if (pi && pi->thread)
     {
       pi->stop_thread_pipe = true;
       pi->thread->detach ();
       delete pi;
-      stuff->device_specific[FHDEVN(FH_PIPE)] = NULL;
+      stuff->device_specific[FHDEVN (FH_PIPE)] = NULL;
     }
 }
 
@@ -976,9 +976,9 @@ thread_serial (void *arg)
 static int
 start_thread_serial (select_record *me, select_stuff *stuff)
 {
-  if (stuff->device_specific[FHDEVN(FH_SERIAL)])
+  if (stuff->device_specific[FHDEVN (FH_SERIAL)])
     {
-      me->h = *((serialinf *) stuff->device_specific[FHDEVN(FH_SERIAL)])->thread;
+      me->h = *((serialinf *) stuff->device_specific[FHDEVN (FH_SERIAL)])->thread;
       return 1;
     }
   serialinf *si = new serialinf;
@@ -986,20 +986,20 @@ start_thread_serial (select_record *me, select_stuff *stuff)
   si->stop_thread_serial = FALSE;
   si->thread = new cygthread (thread_serial, (LPVOID)si, "select_serial");
   me->h = *si->thread;
-  stuff->device_specific[FHDEVN(FH_SERIAL)] = (void *)si;
+  stuff->device_specific[FHDEVN (FH_SERIAL)] = (void *)si;
   return 1;
 }
 
 static void
 serial_cleanup (select_record *, select_stuff *stuff)
 {
-  serialinf *si = (serialinf *)stuff->device_specific[FHDEVN(FH_SERIAL)];
+  serialinf *si = (serialinf *)stuff->device_specific[FHDEVN (FH_SERIAL)];
   if (si && si->thread)
     {
       si->stop_thread_serial = true;
       si->thread->detach ();
       delete si;
-      stuff->device_specific[FHDEVN(FH_SERIAL)] = NULL;
+      stuff->device_specific[FHDEVN (FH_SERIAL)] = NULL;
     }
 }
 
@@ -1247,7 +1247,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 {
   socketinf *si;
 
-  if ((si = (socketinf *)stuff->device_specific[FHDEVN(FH_SOCKET)]))
+  if ((si = (socketinf *)stuff->device_specific[FHDEVN (FH_SOCKET)]))
     {
       me->h = *si->thread;
       return 1;
@@ -1315,7 +1315,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   select_printf ("exitsock %p", si->exitsock);
   WINSOCK_FD_SET ((HANDLE) si->exitsock, &si->readfds);
   WINSOCK_FD_SET ((HANDLE) si->exitsock, &si->exceptfds);
-  stuff->device_specific[FHDEVN(FH_SOCKET)] = (void *) si;
+  stuff->device_specific[FHDEVN (FH_SOCKET)] = (void *) si;
   si->start = &stuff->start;
   select_printf ("stuff_start %p", &stuff->start);
   si->thread = new cygthread (thread_socket, (LPVOID)si, "select_socket");
@@ -1331,7 +1331,7 @@ err:
 void
 socket_cleanup (select_record *, select_stuff *stuff)
 {
-  socketinf *si = (socketinf *)stuff->device_specific[FHDEVN(FH_SOCKET)];
+  socketinf *si = (socketinf *)stuff->device_specific[FHDEVN (FH_SOCKET)];
   select_printf ("si %p si->thread %p", si, si ? si->thread : NULL);
   if (si && si->thread)
     {
@@ -1359,7 +1359,7 @@ socket_cleanup (select_record *, select_stuff *stuff)
       si->thread->detach ();
       shutdown (si->exitsock, SD_BOTH);
       closesocket (si->exitsock);
-      stuff->device_specific[FHDEVN(FH_SOCKET)] = NULL;
+      stuff->device_specific[FHDEVN (FH_SOCKET)] = NULL;
       delete si;
     }
   select_printf ("returning");

@@ -1,6 +1,6 @@
 /* sched.cc: scheduler interface for Cygwin
 
-   Copyright 2001  Red Hat, Inc.
+   Copyright 2001, 2002  Red Hat, Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -81,7 +81,7 @@ sched_get_priority_min (int policy)
 
 /* Check a scheduler parameter struct for valid settings */
 int
-valid_sched_parameters(const struct sched_param *param)
+valid_sched_parameters (const struct sched_param *param)
 {
   if (param->sched_priority < -14 || param->sched_priority > 15)
     {
@@ -283,7 +283,7 @@ sched_setparam (pid_t pid, const struct sched_param *param)
       return -1;
     }
 
-  if (!valid_sched_parameters(param))
+  if (!valid_sched_parameters (param))
     {
       set_errno (EINVAL);
       return -1;
@@ -400,7 +400,7 @@ sched_setparam (pid_t pid, const struct sched_param *param)
  * a wide range of values is to allow more flexible code in the future.
  */
 int
-sched_set_thread_priority(HANDLE thread, int priority)
+sched_set_thread_priority (HANDLE thread, int priority)
 {
   int real_pri;
   real_pri = 16 - ((priority + 16) >> 1);
@@ -418,7 +418,7 @@ sched_set_thread_priority(HANDLE thread, int priority)
   else
     real_pri = THREAD_PRIORITY_HIGHEST;
 
-  if (!SetThreadPriority(thread, real_pri))
+  if (!SetThreadPriority (thread, real_pri))
     /* invalid handle, no access are the only expected errors. */
     return EPERM;
   return 0;

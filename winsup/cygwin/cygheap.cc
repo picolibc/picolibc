@@ -263,7 +263,7 @@ _crealloc (void *ptr, int size)
 
 /* End Copyright (C) 1997 DJ Delorie */
 
-#define sizeof_cygheap(n) ((n) + sizeof(cygheap_entry))
+#define sizeof_cygheap(n) ((n) + sizeof (cygheap_entry))
 
 #define N ((cygheap_entry *) NULL)
 #define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - (int) (N->data)))

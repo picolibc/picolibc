@@ -20,8 +20,8 @@ details. */
 #include "hires.h"
 #include "cygthread.h"
 
-#define PROTECT(x) x[sizeof(x)-1] = 0
-#define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf ("array bound exceeded %d\n", __LINE__); ExitProcess (1); }
+#define PROTECT(x) x[sizeof (x)-1] = 0
+#define CHECK(x) if (x[sizeof (x)-1] != 0) { small_printf ("array bound exceeded %d\n", __LINE__); ExitProcess (1); }
 
 class strace NO_COPY strace;
 
@@ -77,7 +77,7 @@ getfunc (char *in_dst, const char *func)
   for (p = func; (pe = strchr (p, '(')); p = pe + 1)
     if (isalnum ((int)pe[-1]) || pe[-1] == '_')
       break;
-    else if (isspace((int)pe[-1]))
+    else if (isspace ((int)pe[-1]))
       {
 	pe--;
 	break;

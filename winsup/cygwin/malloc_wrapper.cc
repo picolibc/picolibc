@@ -35,11 +35,6 @@ details. */
 static int export_malloc_called;
 static int use_internal_malloc = 1;
 
-#undef in
-#undef out
-#define in(x)
-#define out(x)
-
 #ifdef MALLOC_DEBUG
 extern "C" void * _sbrk (size_t incr_arg);
 

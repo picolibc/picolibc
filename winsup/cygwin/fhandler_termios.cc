@@ -225,11 +225,11 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
       if (tc->ti.c_lflag & ISIG)
 	{
 	  int sig;
-	  if (CCEQ(tc->ti.c_cc[VINTR], c))
+	  if (CCEQ (tc->ti.c_cc[VINTR], c))
 	    sig = SIGINT;
-	  else if (CCEQ(tc->ti.c_cc[VQUIT], c))
+	  else if (CCEQ (tc->ti.c_cc[VQUIT], c))
 	    sig = SIGQUIT;
-	  else if (CCEQ(tc->ti.c_cc[VSUSP], c))
+	  else if (CCEQ (tc->ti.c_cc[VSUSP], c))
 	    sig = SIGTSTP;
 	  else
 	    goto not_a_sig;
@@ -244,7 +244,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
     not_a_sig:
       if (tc->ti.c_iflag & IXON)
 	{
-	  if (CCEQ(tc->ti.c_cc[VSTOP], c))
+	  if (CCEQ (tc->ti.c_cc[VSTOP], c))
 	    {
 	      if (!tc->output_stopped)
 		{
@@ -253,7 +253,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 		}
 	      continue;
 	    }
-	  else if (CCEQ(tc->ti.c_cc[VSTART], c))
+	  else if (CCEQ (tc->ti.c_cc[VSTART], c))
 	    {
     restart_output:
 	      tc->output_stopped = 0;
@@ -263,20 +263,20 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	  else if ((tc->ti.c_iflag & IXANY) && tc->output_stopped)
 	    goto restart_output;
 	}
-      if (iscanon && tc->ti.c_lflag & IEXTEN && CCEQ(tc->ti.c_cc[VDISCARD], c))
+      if (iscanon && tc->ti.c_lflag & IEXTEN && CCEQ (tc->ti.c_cc[VDISCARD], c))
 	{
 	  tc->ti.c_lflag ^= FLUSHO;
 	  continue;
 	}
       if (!iscanon)
 	/* nothing */;
-      else if (CCEQ(tc->ti.c_cc[VERASE], c))
+      else if (CCEQ (tc->ti.c_cc[VERASE], c))
 	{
 	  if (eat_readahead (1))
 	    echo_erase ();
 	  continue;
 	}
-      else if (CCEQ(tc->ti.c_cc[VWERASE], c))
+      else if (CCEQ (tc->ti.c_cc[VWERASE], c))
 	{
 	  int ch;
 	  do
@@ -287,7 +287,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	  while ((ch = peek_readahead (1)) >= 0 && !isspace (ch));
 	  continue;
 	}
-      else if (CCEQ(tc->ti.c_cc[VKILL], c))
+      else if (CCEQ (tc->ti.c_cc[VKILL], c))
 	{
 	  int nchars = eat_readahead (-1);
 	  if (tc->ti.c_lflag & ECHO)
@@ -295,7 +295,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	      echo_erase (1);
 	  continue;
 	}
-      else if (CCEQ(tc->ti.c_cc[VREPRINT], c))
+      else if (CCEQ (tc->ti.c_cc[VREPRINT], c))
 	{
 	  if (tc->ti.c_lflag & ECHO)
 	    {
@@ -304,14 +304,14 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	    }
 	  continue;
 	}
-      else if (CCEQ(tc->ti.c_cc[VEOF], c))
+      else if (CCEQ (tc->ti.c_cc[VEOF], c))
 	{
 	  termios_printf ("EOF");
 	  input_done = 1;
 	  continue;
 	}
-      else if (CCEQ(tc->ti.c_cc[VEOL], c) ||
-	       CCEQ(tc->ti.c_cc[VEOL2], c) ||
+      else if (CCEQ (tc->ti.c_cc[VEOL], c) ||
+	       CCEQ (tc->ti.c_cc[VEOL2], c) ||
 	       c == '\n')
 	{
 	  set_input_done (1);
