@@ -13,9 +13,12 @@ details. */
 
 #include "winsup.h"
 #include <errno.h>
+#include <signal.h>
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include <cygwin/version.h>
+#include "perprocess.h"
 #include <sys/termios.h>
 
 /* tcsendbreak: POSIX 7.2.2.1 */

@@ -24,6 +24,8 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "perprocess.h"
+#include "security.h"
 
 extern int threadsafe;
 

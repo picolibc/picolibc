@@ -20,6 +20,7 @@ details. */
 #include <winuser.h>
 #include <ctype.h>
 #include "cygerrno.h"
+#include <sys/cygwin.h>
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
@@ -28,7 +29,11 @@ details. */
 #include "cygheap.h"
 #include "child_info.h"
 #include "pinfo.h"
+#define NEED_VFORK
 #include "perthread.h"
+#include "registry.h"
+#include "environ.h"
+#include "security.h"
 
 #define LINE_BUF_CHUNK (MAX_PATH * 2)
 

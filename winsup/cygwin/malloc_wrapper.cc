@@ -17,6 +17,7 @@ details. */
 #include "cygheap.h"
 #include "heap.h"
 #include "sync.h"
+#include "perprocess.h"
 
 /* we provide these stubs to call into a user's
    provided malloc if there is one - otherwise

@@ -8,6 +8,9 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+/* Initial and increment values for cygwin's fd table */
+#define NOFILE_INCR    32
+
 class dtable
 {
   fhandler_base **fds;
@@ -41,3 +44,6 @@ public:
 void dtable_init (void);
 void stdio_init (void);
 extern dtable fdtab;
+
+extern "C" int getfdtabsize ();
+extern "C" void setfdtabsize (int);

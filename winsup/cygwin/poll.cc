@@ -9,6 +9,7 @@
    details. */
 
 #include "winsup.h"
+#include <sys/time.h>
 #include <sys/poll.h>
 #include <errno.h>
 #include "fhandler.h"

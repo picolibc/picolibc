@@ -22,6 +22,8 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "registry.h"
+#include "security.h"
 
 char *
 internal_getlogin (_pinfo *pi)

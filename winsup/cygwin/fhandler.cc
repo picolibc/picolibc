@@ -15,11 +15,15 @@ details. */
 #include <stdlib.h>
 #include "cygheap.h"
 #include <string.h>
+#include <sys/cygwin.h>
+#include <signal.h>
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
-#include "tty.h"
 #include "shared_info.h"
+#include "host_dependent.h"
+#include "perprocess.h"
+#include "security.h"
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 

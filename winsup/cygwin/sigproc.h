@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include <signal.h>
+
 #define EXIT_SIGNAL    	 0x010000
 #define EXIT_REPARENTING 0x020000
 #define EXIT_NOCLOSEALL  0x040000
@@ -81,6 +83,9 @@ public:
 
 extern sigthread mainthread;
 extern HANDLE signal_arrived;
+
+/* non-NULL if this process is a child of a cygwin process */
+extern HANDLE parent_alive;
 
 BOOL __stdcall my_parent_is_alive ();
 extern "C" int __stdcall sig_dispatch_pending (int force = FALSE) __asm__ ("sig_dispatch_pending");

@@ -16,6 +16,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "thread.h"
+#include "security.h"
 
 static int
 make_pipe (int fildes[2], unsigned int psize, int mode)

@@ -201,11 +201,6 @@ strace::prntf (unsigned category, const char *func, const char *fmt, ...)
   SetLastError (err);
 }
 
-void __stdcall
-mark (const char *, int)
-{
-}
-
 static const struct tab
 {
   int v;

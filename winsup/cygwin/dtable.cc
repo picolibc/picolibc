@@ -18,6 +18,7 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/cygwin.h>
 
 #include <winsock.h>
 #include "sync.h"

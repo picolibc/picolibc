@@ -20,6 +20,10 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygwin_version.h"
+#include "perprocess.h"
+#include "environ.h"
+#include "security.h"
 
 static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
 

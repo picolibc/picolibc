@@ -14,14 +14,15 @@ details. */
 #include <utmp.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "tty.h"
 #include "shared_info.h"
+#include "security.h"
 
 extern fhandler_tty_master *tty_master;
 

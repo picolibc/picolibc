@@ -20,8 +20,9 @@ details. */
 #include "cygerrno.h"
 #include "thread.h"
 #include "perthread.h"
-#include "tty.h"
 #include "shared_info.h"
+#include "perprocess.h"
+#include "security.h"
 
 char debugger_command[2 * MAX_PATH + 20];
 

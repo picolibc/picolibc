@@ -17,8 +17,10 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "tty.h"
 #include "shared_info.h"
+#include "registry.h"
+#include "cygwin_version.h"
+#include "security.h"
 
 #define SHAREDVER (unsigned)(cygwin_version.api_major << 16 | \
 		   cygwin_version.api_minor)

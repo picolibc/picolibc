@@ -12,6 +12,8 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "perthread.h"
+#include "perprocess.h"
+#include "security.h"
 
 #undef CloseHandle
 

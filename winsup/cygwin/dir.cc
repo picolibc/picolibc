@@ -23,6 +23,7 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
+#include "security.h"
 
 /* Cygwin internal */
 /* Return whether the directory of a file is writable.  Return 1 if it

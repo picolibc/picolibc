@@ -842,5 +842,6 @@ public:
 
 uid_t __stdcall get_file_owner (int, const char *);
 gid_t __stdcall get_file_group (int, const char *);
+int __stdcall set_console_state_for_spawn ();
 
 #endif /* _FHANDLER_H_ */

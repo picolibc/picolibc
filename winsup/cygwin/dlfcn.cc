@@ -13,11 +13,12 @@ details. */
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "dlfcn.h"
-#include "dll_init.h"
 #include "fhandler.h"
 #include "path.h"
 #include "thread.h"
+#include "perprocess.h"
+#include "dlfcn.h"
+#include "dll_init.h"
 
 #define _dl_error _reent_winsup()->_dl_error
 #define _dl_buffer _reent_winsup()->_dl_buffer

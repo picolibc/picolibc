@@ -1,3 +1,16 @@
+Thu Sep  7 22:45:16 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Break out more header info into separate files.  Use appropriate
+	header files throughout.
+	* shared.h: Remove.
+	* cygwin_version.h: New file.
+	* delqueue.h: New file.
+	* environ.h: New file.
+	* host_dependent.h: New file.
+	* perprocess.h: New file.
+	* registry.h: New file.
+	* security.h: New file.
+
 Thu Sep  7 12:14:43 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Split out tty and shared_info stuff into their own headers and use

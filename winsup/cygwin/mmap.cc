@@ -20,6 +20,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "security.h"
 
 /*
  * Simple class used to keep a record of all current

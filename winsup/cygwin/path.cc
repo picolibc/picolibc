@@ -57,6 +57,8 @@ details. */
 #include <errno.h>
 #include <ctype.h>
 #include <winioctl.h>
+#include <sys/cygwin.h>
+#include <cygwin/version.h>
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
@@ -65,8 +67,9 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
-#include "tty.h"
 #include "shared_info.h"
+#include "registry.h"
+#include "security.h"
 
 static int normalize_win32_path (const char *src, char *dst);
 static void slashify (const char *src, char *dst, int trailing_slash_p);

@@ -15,6 +15,10 @@ details. */
 #include <process.h>
 #include "fhandler.h"
 #include "path.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
+#include "environ.h"
 
 /* This is called _execve and not execve because the real execve is defined
    in libc/posix/execve.c.  It calls us.  */

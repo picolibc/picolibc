@@ -62,7 +62,7 @@ set -$- ''
 # Output the initial part of version.cc
 #
 cat <<EOF 1>&9
-#include <winsup.h>
+#include "cygwin_version.h"
 
 #define strval(x) #x
 #define str(x) strval(x)

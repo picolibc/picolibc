@@ -29,6 +29,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "security.h"
 
 extern BOOL allow_ntea;
 BOOL allow_ntsec = FALSE;

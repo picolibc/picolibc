@@ -13,6 +13,8 @@ details. */
 #include <stddef.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <sys/cygwin.h>
+#include <cygwin/version.h>
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -20,6 +22,8 @@ details. */
 #include "path.h"
 #include "cygerrno.h"
 #include "cygheap.h"
+#include "registry.h"
+#include "environ.h"
 
 extern BOOL allow_glob;
 extern BOOL allow_ntea;

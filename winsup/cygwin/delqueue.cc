@@ -9,6 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "shared_info.h"
 
 /* FIXME: this delqueue module is very flawed and should be rewritten.
 	First, having an array of a fixed size for keeping track of the

@@ -21,6 +21,7 @@ details. */
 #include <errno.h>
 #include <stdlib.h>
 #include "sync.h"
+#include "security.h"
 
 muto NO_COPY muto_start;
 

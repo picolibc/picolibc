@@ -68,6 +68,7 @@ public:
   size_t size () {return sizeof (waitq);}
 };
 
+#ifdef NEED_VFORK
 struct vfork_save
 {
   int pid;
@@ -85,6 +86,8 @@ public:
   vfork_save *create () {return (vfork_save *) this->per_thread::create ();}
   size_t size () {return sizeof (vfork_save);}
 };
+extern per_thread_vfork vfork_storage;
+#endif
 
 extern "C" {
 struct signal_dispatch
@@ -107,7 +110,6 @@ struct per_thread_signal_dispatch : public per_thread
 };
 
 extern per_thread_waitq waitq_storage;
-extern per_thread_vfork vfork_storage;
 extern per_thread_signal_dispatch signal_dispatch_storage;
 
 extern per_thread *threadstuff[];

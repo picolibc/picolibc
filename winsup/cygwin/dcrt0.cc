@@ -13,23 +13,27 @@ details. */
 #include <stdlib.h>
 #include "glob.h"
 #include "exceptions.h"
-#include "dll_init.h"
 #include "autoload.h"
 #include <ctype.h>
 #include "sync.h"
 #include "sigproc.h"
-#include "perthread.h"
 #include "pinfo.h"
 #include "cygheap.h"
 #include "heap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "child_info.h"
+#define NEED_VFORK
+#include "perthread.h"
 #include "path.h"
 #include "dtable.h"
 #include "thread.h"
-#include "tty.h"
 #include "shared_info.h"
+#include "cygwin_version.h"
+#include "perprocess.h"
+#include "dll_init.h"
+#include "host_dependent.h"
+#include "security.h"
 
 #define MAX_AT_FILE_LEVEL 10
 

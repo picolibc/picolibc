@@ -23,7 +23,6 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
-#include "tty.h"
 #include "shared_info.h"
 
 /* Tty master stuff */

@@ -15,7 +15,6 @@ details. */
 #include <fcntl.h>
 #include <stdarg.h>
 #include <errno.h>
-#include "dll_init.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
@@ -24,7 +23,11 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "child_info.h"
+#define NEED_VFORK
 #include "perthread.h"
+#include "perprocess.h"
+#include "dll_init.h"
+#include "security.h"
 
 DWORD NO_COPY chunksize = 0;
 /* Timeout to wait for child to start, parent to init child, etc.  */

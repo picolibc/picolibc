@@ -19,13 +19,14 @@ details. */
 #include <winuser.h>
 #include <wincon.h>
 #include <ctype.h>
+#include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "tty.h"
 #include "shared_info.h"
+#include "security.h"
 
 /*
  * Scroll the screen context.

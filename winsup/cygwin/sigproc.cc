@@ -16,6 +16,7 @@ details. */
 #include <sys/wait.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "sync.h"
 #include "sigproc.h"
@@ -24,8 +25,8 @@ details. */
 #include "child_info.h"
 #include "perthread.h"
 #include <assert.h>
-#include "tty.h"
 #include "shared_info.h"
+#include "security.h"
 
 /*
  * Convenience defines

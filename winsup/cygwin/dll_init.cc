@@ -9,8 +9,10 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include "exceptions.h"
-#include "dll_init.h"
 #include "cygerrno.h"
+#include "perprocess.h"
+#include "dll_init.h"
+#include "environ.h"
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 

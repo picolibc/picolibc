@@ -31,10 +31,6 @@ details. */
 
 #include <sys/types.h>
 #include <sys/strace.h>
-#include <sys/resource.h>
-#include <setjmp.h>
-#include <signal.h>
-#include <string.h>
 
 #undef strchr
 #define strchr cygwin_strchr
@@ -89,8 +85,6 @@ extern int dynamically_loaded;
 #define sys_mbstowcs(tgt,src,len) \
 		    MultiByteToWideChar(CP_ACP,0,(src),-1,(tgt),(len))
 
-#include <cygwin/version.h>
-
 #define TITLESIZE 1024
 #define MAX_USER_NAME 20
 #define DEFAULT_UID 500
@@ -109,45 +103,7 @@ extern int dynamically_loaded;
 #define __CONDSETF(n, what, x, prefix) \
   ((n) ? __SETF (what, x, prefix) : __CLEARF (what, x, prefix))
 
-#include "shared.h"
-
-extern HANDLE hMainThread;
-extern HANDLE hMainProc;
-
 #include "debug.h"
-#include <sys/cygwin.h>
-
-/********************** Application Interface **************************/
-
-extern "C" per_process __cygwin_user_data; /* Pointer into application's static data */
-#define user_data (&__cygwin_user_data)
-
-/* We use the following to test that sizeof hasn't changed.  When adding
-   or deleting members, insert fillers or use the reserved entries.
-   Do not change this value. */
-#define SIZEOF_PER_PROCESS (42 * 4)
-
-/******************* Host-dependent constants **********************/
-/* Portions of the cygwin DLL require special constants whose values
-   are dependent on the host system.  Rather than dynamically
-   determine those values whenever they are required, initialize these
-   values once at process start-up. */
-
-class host_dependent_constants
-{
- public:
-  void init (void);
-
-  /* Used by fhandler_disk_file::lock which needs a platform-specific
-     upper word value for locking entire files. */
-  DWORD win32_upper;
-
-  /* fhandler_base::open requires host dependent file sharing
-     attributes. */
-  int shared;
-};
-
-extern host_dependent_constants host_dependent;
 
 /* Events/mutexes */
 extern HANDLE title_mutex;
@@ -167,12 +123,6 @@ extern HANDLE title_mutex;
 #define SIGTOMASK(sig)	(1<<((sig) - signal_shift_subtract))
 extern unsigned int signal_shift_subtract;
 
-#ifdef NOSTRACE
-#define MARK() 0
-#else
-#define MARK() mark (__FILE__,__LINE__)
-#endif
-
 #ifdef NEW_MACRO_VARARGS
 # define api_fatal(...) __api_fatal ("%P: *** " __VA_ARGS__)
 #else
@@ -188,21 +138,19 @@ extern unsigned int signal_shift_subtract;
 
 /******************** Initialization/Termination **********************/
 
+class per_process;
 /* cygwin .dll initialization */
 void dll_crt0 (per_process *);
 extern "C" void __stdcall _dll_crt0 ();
 
 /* dynamically loaded dll initialization */
-extern "C" int dll_dllcrt0 (HMODULE, per_process*);
+extern "C" int dll_dllcrt0 (HMODULE, per_process *);
 
 /* dynamically loaded dll initialization for non-cygwin apps */
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
 
 /* exit the program */
 extern "C" void __stdcall do_exit (int) __attribute__ ((noreturn));
-
-/* Initialize the environment */
-void environ_init (char **);
 
 /* UID/GID */
 void uinfo_init (void);
@@ -231,41 +179,14 @@ extern int cygwin_finished_initializing;
 
 /**************************** Miscellaneous ******************************/
 
-/* File manipulation */
-int __stdcall set_process_privileges ();
-int __stdcall get_file_attribute (int, const char *, int *,
-				  uid_t * = NULL, gid_t * = NULL);
-int __stdcall set_file_attribute (int, const char *, int);
-int __stdcall set_file_attribute (int, const char *, uid_t, gid_t, int, const char *);
 void __stdcall set_std_handle (int);
 int __stdcall writable_directory (const char *file);
 int __stdcall stat_dev (DWORD, int, unsigned long, struct stat *);
 extern BOOL allow_ntsec;
 
-/* `lookup_name' should be called instead of LookupAccountName.
- * logsrv may be NULL, in this case only the local system is used for lookup.
- * The buffer for ret_sid (40 Bytes) has to be allocated by the caller! */
-BOOL __stdcall lookup_name (const char *, const char *, PSID);
-char *__stdcall convert_sid_to_string_sid (PSID, char *);
-PSID __stdcall convert_string_sid_to_sid (PSID, const char *);
-BOOL __stdcall get_pw_sid (PSID, struct passwd *);
-
 unsigned long __stdcall hash_path_name (unsigned long hash, const char *name);
 void __stdcall nofinalslash (const char *src, char *dst);
 extern "C" char *__stdcall rootdir (char *full_path);
-
-void __stdcall mark (const char *, int);
-
-#define _P_VFORK 0
-extern "C" int _spawnve (HANDLE hToken, int mode, const char *path,
-			 const char *const *argv, const char *const *envp);
-
-extern void __stdcall exec_fixup_after_fork ();
-
-class _pinfo;
-/* For mmaps across fork(). */
-int __stdcall recreate_mmaps_after_fork (void *);
-void __stdcall set_child_mmap_ptr (_pinfo *);
 
 /* String manipulation */
 char *__stdcall strccpy (char *s1, const char **s2, char c);
@@ -277,23 +198,15 @@ char *__stdcall strcasestr (const char *searchee, const char *lookfor);
 void __stdcall totimeval (struct timeval *dst, FILETIME * src, int sub, int flag);
 long __stdcall to_time_t (FILETIME * ptr);
 
-/* Retrieve a security descriptor that allows all access */
-SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
-
-int __stdcall get_id_from_sid (PSID, BOOL);
-extern inline int get_uid_from_sid (PSID psid) { return get_id_from_sid (psid, FALSE);}
-extern inline int get_gid_from_sid (PSID psid) { return get_id_from_sid (psid, TRUE); }
-
-int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
-BOOL __stdcall NTWriteEA (const char *file, const char *attrname, char *buf, int len);
-
 void __stdcall set_console_title (char *);
 void set_console_handler ();
 
-void __stdcall fill_rusage (struct rusage *, HANDLE);
-void __stdcall add_rusage (struct rusage *, struct rusage *);
-
 void set_winsock_errno ();
+
+/* Printf type functions */
+extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
+extern "C" int __small_sprintf (char *dst, const char *fmt, ...);
+extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap);
 
 /**************************** Exports ******************************/
 
@@ -305,9 +218,6 @@ int cygwin_gethostname (char *__name, size_t __len);
 int kill_pgrp (pid_t, int);
 int _kill (int, int);
 int _raise (int sig);
-
-int getfdtabsize ();
-void setfdtabsize (int);
 
 extern DWORD binmode;
 extern char _data_start__, _data_end__, _bss_start__, _bss_end__;
@@ -328,11 +238,6 @@ extern void (*__DTOR_LIST__) (void);
    issue and is neither of the Unixy ones [so we can punt on which
    one is the right one to use].  */
 
-/* Initial and increment values for cygwin's fd table */
-#define NOFILE_INCR    32
-
-#include <sys/reent.h>
-
 #define STD_RBITS (S_IRUSR | S_IRGRP | S_IROTH)
 #define STD_WBITS (S_IWUSR)
 #define STD_XBITS (S_IXUSR | S_IXGRP | S_IXOTH)
@@ -340,38 +245,11 @@ extern void (*__DTOR_LIST__) (void);
 #define O_NOSYMLINK 0x080000
 #define O_DIROPEN   0x100000
 
-/*************************** Environment ******************************/
-
-/* The structure below is used to control conversion to/from posix-style
- * file specs.  Currently, only PATH and HOME are converted, but PATH
- * needs to use a "convert path list" function while HOME needs a simple
- * "convert to posix/win32".  For the simple case, where a calculated length
- * is required, just return MAX_PATH.  *FIXME*
- */
-struct win_env
-  {
-    const char *name;
-    size_t namelen;
-    char *posix;
-    char *native;
-    int (*toposix) (const char *, char *);
-    int (*towin32) (const char *, char *);
-    int (*posix_len) (const char *);
-    int (*win32_len) (const char *);
-    void add_cache (const char *in_posix, const char *in_native = NULL);
-    const char * get_native () {return native ? native + namelen : NULL;}
-  };
-
-win_env * __stdcall getwinenv (const char *name, const char *posix = NULL);
-
-void __stdcall update_envptrs ();
-char * __stdcall winenv (const char * const *, int);
-extern char **__cygwin_environ, ***main_environ;
-extern "C" char __stdcall **cur_environ ();
-int __stdcall envsize (const char * const *, int debug_print = 0);
-
 /* The title on program start. */
 extern char *old_title;
 extern BOOL display_title;
+
+extern HANDLE hMainThread;
+extern HANDLE hMainProc;
 
 #endif /* defined __cplusplus */

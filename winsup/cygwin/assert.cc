@@ -9,6 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "security.h"
 #include <wingdi.h>
 #include <winuser.h>
 

@@ -13,6 +13,7 @@ details. */
 #include "winsup.h"
 #include <stdio.h>
 #include <sys/utsname.h>
+#include "cygwin_version.h"
 
 /* uname: POSIX 4.4.1.1 */
 extern "C" int

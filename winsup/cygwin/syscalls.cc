@@ -23,6 +23,8 @@ details. */
 #include <limits.h>
 #include <winnls.h>
 #include <lmcons.h> /* for UNLEN */
+#include <cygwin/version.h>
+#include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
@@ -32,8 +34,9 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include <unistd.h>
-#include "tty.h"
 #include "shared_info.h"
+#include "perprocess.h"
+#include "security.h"
 
 extern BOOL allow_ntsec;
 

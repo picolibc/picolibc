@@ -1,4 +1,12 @@
-/******** Process Table ********/
+/* pinfo.h: process table info
+
+   Copyright 2000 Cygnus Solutions.
+
+This file is part of Cygwin.
+
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
 
 /* Signal constants (have to define them here, unfortunately) */
 
@@ -13,6 +21,7 @@ enum
 #define PSIZE 1024
 
 class ThreadItem;
+#include <sys/resource.h>
 
 class _pinfo
 {
@@ -166,3 +175,16 @@ cygwin_pid (pid_t pid)
 void __stdcall pinfo_init (char **);
 void __stdcall set_myself (pid_t pid, HANDLE h = NULL);
 extern pinfo myself;
+
+#define _P_VFORK 0
+extern "C" int _spawnve (HANDLE hToken, int mode, const char *path,
+			 const char *const *argv, const char *const *envp);
+
+extern void __stdcall exec_fixup_after_fork ();
+
+/* For mmaps across fork(). */
+int __stdcall recreate_mmaps_after_fork (void *);
+void __stdcall set_child_mmap_ptr (_pinfo *);
+
+void __stdcall fill_rusage (struct rusage *, HANDLE);
+void __stdcall add_rusage (struct rusage *, struct rusage *);

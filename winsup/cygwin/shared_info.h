@@ -1,12 +1,14 @@
-/* shared_sec.h: shared info for cygwin
+/* shared_info.h: shared info for cygwin
 
-   Copyright 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 2000 Cygnus Solutions.
 
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
+
+#include "tty.h"
 
 /* Mount table entry */
 
@@ -38,6 +40,7 @@ public:
    scheme should be satisfactory for a long while yet.  */
 #define MAX_MOUNTS 30
 
+class reg_key;
 class mount_info
 {
   int posix_sorted[MAX_MOUNTS];
@@ -98,6 +101,29 @@ private:
   void cygdrive_posix_path (const char *src, char *dst, int trailing_slash_p);
   void slash_drive_to_win32_path (const char *path, char *buf, int trailing_slash_p);
   void read_cygdrive_info_from_registry ();
+};
+
+/******** Close-on-delete queue ********/
+
+/* First pass at a file deletion queue structure.
+
+   We can't keep this list in the per-process info, since
+   one process may open a file, and outlive a process which
+   wanted to unlink the file - and the data would go away.
+*/
+
+#define MAX_DELQUEUES_PENDING 100
+
+class delqueue_list
+{
+  char name[MAX_DELQUEUES_PENDING][MAX_PATH];
+  char inuse[MAX_DELQUEUES_PENDING];
+  int empty;
+
+public:
+  void init ();
+  void queue_file (const char *dosname);
+  void process_queue ();
 };
 
 /******** Shared Info ********/

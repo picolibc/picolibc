@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "perprocess.h"
+
 /* Heap management. */
 void heap_init (void);
 void malloc_init (void);
