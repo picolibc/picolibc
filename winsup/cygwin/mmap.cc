@@ -587,10 +587,12 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
       DWORD high;
       DWORD low = GetFileSize (fh->get_handle (), &high);
       _off64_t fsiz = ((_off64_t)high << 32) + low;
+
       /* Don't allow mappings beginning beyond EOF since Windows can't
-	 handle that POSIX like.  FIXME: Still looking for a good idea
-	 to allow that nevertheless. */
-      if (gran_off >= fsiz)
+	 handle that POSIX like, unless MAP_AUTOGROW flag is set, which
+	 mimics Windows behaviour.  FIXME: Still looking for a good idea
+	 to allow that under POSIX rules. */
+      if (gran_off >= fsiz && !(flags & MAP_AUTOGROW))
 	{
 	  set_errno (ENXIO);
 	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
@@ -598,10 +600,30 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  return MAP_FAILED;
 	}
       /* Don't map beyond EOF.  Windows would change the file to the
-         new length otherwise, in contrast to POSIX. */
+         new length otherwise, in contrast to POSIX.  Allow mapping
+	 beyon EOF if MAP_AUTOGROW flag is set. */
       fsiz -= gran_off;
       if (gran_len > fsiz)
-	gran_len = fsiz;
+        {
+	  if ((flags & MAP_AUTOGROW) && (off - gran_off) + len > fsiz)
+	    {
+	      /* Check if file has been opened for writing. */
+	      if (!(fh->get_access () & GENERIC_WRITE))
+		{
+		  set_errno (EINVAL);
+		  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
+				       "mmap");
+		  return MAP_FAILED;
+		}
+	      gran_len = (off - gran_off) + len;
+	    }
+	  else
+	    gran_len = fsiz;
+	}
+      /* If the requested len is <= file size, drop the MAP_AUTOGROW flag.
+         This simplifes fhandler::mmap's job. */
+      if ((flags & MAP_AUTOGROW) && gran_len <= fsiz)
+        flags &= ~MAP_AUTOGROW;
     }
 
   DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;
@@ -1019,6 +1041,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
     }
 
   HANDLE h;
+  DWORD high, low;
 
   /* On 9x/ME try first to open the mapping by name when opening a
      shared file object. This is needed since 9x/ME only shares
@@ -1037,12 +1060,37 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
 
       debug_printf ("named sharing");
       if (!(h = OpenFileMapping (access, TRUE, namebuf)))
-	h = CreateFileMapping (get_handle (), &sec_none, protect, 0, 0, namebuf);
+	h = CreateFileMapping (get_handle (), &sec_none, protect, 0, 0,
+			       namebuf);
+    }
+  else if (get_handle () == INVALID_HANDLE_VALUE)
+    {
+      /* Standard anonymous mapping needs non-zero len. */
+      h = CreateFileMapping (get_handle (), &sec_none, protect, 0, len, NULL);
+    }
+  else if (flags & MAP_AUTOGROW)
+    {
+      high = (off + len) >> 32;
+      low = (off + len) & UINT32_MAX;
+      /* Auto-grow in CreateFileMapping only works if the protection is
+         PAGE_READWRITE.  So, first we call CreateFileMapping with
+	 PAGE_READWRITE, then, if the requested protection is different, we
+	 close the mapping and reopen it again with the correct protection,
+	 *iff* auto-grow worked. */
+      h = CreateFileMapping (get_handle (), &sec_none, PAGE_READWRITE,
+			     high, low, NULL);
+      if (h && protect != PAGE_READWRITE)
+        {
+	  CloseHandle (h);
+	  h = CreateFileMapping (get_handle (), &sec_none, protect,
+				 high, low, NULL);
+	}
     }
   else
-    h = CreateFileMapping (get_handle (), &sec_none, protect, 0,
-			   get_handle () == INVALID_HANDLE_VALUE ? len : 0,
-			   NULL);
+    {
+      /* Zero len creates mapping for whole file. */
+      h = CreateFileMapping (get_handle (), &sec_none, protect, 0, 0, NULL);
+    }
   if (!h)
     {
       __seterrno ();
@@ -1050,7 +1098,8 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
       return INVALID_HANDLE_VALUE;
     }
 
-  DWORD high = off >> 32, low = off & UINT32_MAX;
+  high = off >> 32;
+  low = off & UINT32_MAX;
   void *base = NULL;
   /* If a non-zero address is given, try mapping using the given address first.
      If it fails and flags is not MAP_FIXED, try again with NULL address. */

@@ -250,12 +250,13 @@ details. */
       120: Export basename, dirname.
       122: Export statvfs, fstatvfs.
       123: Export utmpxname.
+      124: Add MAP_AUTOGROW flag to mmap.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 123
+#define CYGWIN_VERSION_API_MINOR 124
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -1,3 +1,10 @@
+2005-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Handle MAP_AUTOGROW flag.
+	(fhandler_disk_file::mmap): Ditto. Clean conditional for readability.
+	* include/sys/mman.h: Add MAP_AUTOGROW flag.
+	* include/cygwin/version.h: Bump API minor version.
+
 2005-03-08  Christopher Faylor  <cgf@timesys.com>
 
 	* dcrt0.cc (dll_crt0_0): Eliminate muto::init call.

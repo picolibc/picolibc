@@ -30,6 +30,9 @@ extern "C" {
 #define MAP_FIXED 0x10
 #define MAP_ANONYMOUS 0x20
 #define MAP_ANON MAP_ANONYMOUS
+/* Non-standard flag */
+#define MAP_AUTOGROW 0x8000	/* Grow underlying object to mapping size.
+				   File must be opened for writing. */
 
 #define MAP_FAILED ((void *)-1)
 
