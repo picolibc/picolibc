@@ -439,6 +439,7 @@ struct _reent
 #define _REENT_CHECK_MP(ptr)		/* nothing */
 #define _REENT_CHECK_TM(ptr)		/* nothing */
 #define _REENT_CHECK_ASCTIME_BUF(ptr)	/* nothing */
+#define _REENT_CHECK_EMERGENCY(ptr)	/* nothing */
 
 #define _REENT_SIGNGAM(ptr)	((ptr)->_new._reent._gamma_signgam)
 #define _REENT_RAND_NEXT(ptr)	((ptr)->_new._reent._rand_next)

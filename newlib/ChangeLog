@@ -1,3 +1,8 @@
+2002-02-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h [(!_REENT_SMALL]: Add
+	_REENT_CHECK_EMERGENCY macro.
+
 2002-02-03  matthew green  <mrg@redhat.com>
 
 	* libc/reent/signgam.c (__signgam): Fix error in previous.
