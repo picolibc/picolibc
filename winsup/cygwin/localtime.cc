@@ -6,6 +6,7 @@
 
 /* CYGNUS LOCAL */
 #include "winsup.h"
+#include "cygerrno.h"
 #include <windows.h>
 #define lint
 
@@ -97,7 +98,6 @@ static char	privatehid[] = "@(#)private.h	7.48";
 
 #include "sys/types.h"	/* for time_t */
 #include "stdio.h"
-#include "errno.h"
 #include "limits.h"	/* for CHAR_BIT */
 #include "time.h"
 #include "stdlib.h"
@@ -194,28 +194,6 @@ static char	privatehid[] = "@(#)private.h	7.48";
 extern int	unlink P((const char * filename));
 #define remove	unlink
 #endif /* !defined remove */
-
-/*
-** Some ancient errno.h implementations don't declare errno.
-** But some newer errno.h implementations define it as a macro.
-** Fix the former without affecting the latter.
-*/
-#ifndef errno
-extern int errno;
-#endif /* !defined errno */
-
-/*
-** Private function declarations.
-*/
-char *	icalloc P((int nelem, int elsize));
-char *	icatalloc P((char * old, const char * new));
-char *	icpyalloc P((const char * string));
-char *	imalloc P((int n));
-void *	irealloc P((void * pointer, int size));
-void	icfree P((char * pointer));
-void	ifree P((char * pointer));
-char *	scheck P((const char *string, const char *format));
-
 
 /*
 ** Finally, some convenience items.
@@ -671,8 +649,7 @@ time_t			altzone = 0;
 #endif /* defined ALTZONE */
 
 static long
-detzcode(codep)
-const char * const	codep;
+detzcode(const char *codep)
 {
 	register long	result;
 	register int	i;
@@ -736,13 +713,12 @@ settzname P((void))
 #include "tz_posixrules.h"
 
 static int
-tzload(name, sp)
-register const char *		name;
-register struct state * const	sp;
+tzload(const char *name, struct state *sp)
 {
 	register const char *	p;
 	register int		i;
 	register int		fid;
+	save_errno		save;
 
 	if (name == NULL && (name = TZDEFAULT) == NULL)
 		return -1;
@@ -916,8 +892,7 @@ static const int	year_lengths[2] = {
 */
 
 static const char *
-getzname(strp)
-register const char *	strp;
+getzname(const char *strp)
 {
 	register char	c;
 
@@ -935,11 +910,7 @@ register const char *	strp;
 */
 
 static const char *
-getnum(strp, nump, min, max)
-register const char *	strp;
-int * const		nump;
-const int		min;
-const int		max;
+getnum(const char *strp, int *nump, const int min, const int max)
 {
 	register char	c;
 	register int	num;
@@ -968,9 +939,7 @@ const int		max;
 */
 
 static const char *
-getsecs(strp, secsp)
-register const char *	strp;
-long * const		secsp;
+getsecs(const char *strp, long *secsp)
 {
 	int	num;
 
@@ -1010,9 +979,7 @@ long * const		secsp;
 */
 
 static const char *
-getoffset(strp, offsetp)
-register const char *	strp;
-long * const		offsetp;
+getoffset(const char *strp, long *offsetp)
 {
 	register int	neg = 0;
 
@@ -1037,9 +1004,7 @@ long * const		offsetp;
 */
 
 static const char *
-getrule(strp, rulep)
-const char *			strp;
-register struct rule * const	rulep;
+getrule(const char *strp, struct rule *rulep)
 {
 	if (*strp == 'J') {
 		/*
@@ -1091,11 +1056,8 @@ register struct rule * const	rulep;
 */
 
 static time_t
-transtime(janfirst, year, rulep, offset)
-const time_t				janfirst;
-const int				year;
-register const struct rule * const	rulep;
-const long				offset;
+transtime(const time_t janfirst, const int year, const struct rule *rulep,
+		long offset)
 {
 	register int	leapyear;
 	register time_t	value;
@@ -1186,10 +1148,7 @@ const long				offset;
 */
 
 static int
-tzparse(name, sp, lastditch)
-const char *			name;
-register struct state * const	sp;
-const int			lastditch;
+tzparse(const char *name, struct state *sp, const int lastditch)
 {
 	const char *			stdname;
 	const char *			dstname;
@@ -1399,8 +1358,7 @@ const int			lastditch;
 }
 
 static void
-gmtload(sp)
-struct state * const	sp;
+gmtload(struct state *sp)
 {
 	if (tzload(gmt, sp) != 0)
 		(void) tzparse(gmt, sp, TRUE);
@@ -1506,7 +1464,7 @@ tzsetwall P((void))
 	settzname();
 }
 
-void
+extern "C" void
 tzset P((void))
 {
 	const char *	name = getenv("TZ");
@@ -1559,7 +1517,7 @@ tzset P((void))
 /*ARGSUSED*/
 static void
 localsub (const time_t * const	timep,
-	  const long offset __attribute__ ((unused)),
+	  const long offset,
 	  struct tm * const tmp)
 {
 	register struct state *		sp;
@@ -1602,9 +1560,8 @@ localsub (const time_t * const	timep,
 #endif /* defined TM_ZONE */
 }
 
-struct tm *
-localtime(timep)
-const time_t * const	timep;
+extern "C" struct tm *
+localtime(const time_t *timep)
 {
 	tzset();
 	localsub(timep, 0L, &tm);
@@ -1614,10 +1571,8 @@ const time_t * const	timep;
 /*
  * Re-entrant version of localtime
  */
-struct tm *
-localtime_r(timep, tm)
-const time_t * const	timep;
-struct tm *		tm;
+extern "C" struct tm *
+localtime_r(const time_t *timep, struct tm *tm)
 {
 	localsub(timep, 0L, tm);
 	return tm;
@@ -1628,10 +1583,7 @@ struct tm *		tm;
 */
 
 static void
-gmtsub(timep, offset, tmp)
-const time_t * const	timep;
-const long		offset;
-struct tm * const	tmp;
+gmtsub(const time_t *timep, const long offset, struct tm *tmp)
 {
 	if (!gmt_is_set) {
 		gmt_is_set = TRUE;
@@ -1663,9 +1615,8 @@ struct tm * const	tmp;
 #endif /* defined TM_ZONE */
 }
 
-struct tm *
-gmtime(timep)
-const time_t * const	timep;
+extern "C" struct tm *
+gmtime(const time_t *timep)
 {
 	gmtsub(timep, 0L, &tm);
 	return &tm;
@@ -1674,10 +1625,8 @@ const time_t * const	timep;
 /*
  * Re-entrant version of gmtime
  */
-struct tm *
-gmtime_r(timep, tm)
-const time_t * const	timep;
-struct tm *		tm;
+extern "C" struct tm *
+gmtime_r(const time_t *timep, struct tm *tm)
 {
 	gmtsub(timep, 0L, tm);
 	return tm;
@@ -1685,10 +1634,8 @@ struct tm *		tm;
 
 #ifdef STD_INSPIRED
 
-struct tm *
-offtime(timep, offset)
-const time_t * const	timep;
-const long		offset;
+extern "C" struct tm *
+offtime(const time_t *timep, const long offset)
 {
 	gmtsub(timep, offset, &tm);
 	return &tm;
@@ -1697,11 +1644,8 @@ const long		offset;
 #endif /* defined STD_INSPIRED */
 
 static void
-timesub(timep, offset, sp, tmp)
-const time_t * const			timep;
-const long				offset;
-register const struct state * const	sp;
-register struct tm * const		tmp;
+timesub(const time_t *timep, const long offset, const struct state *sp,
+	struct tm *tmp)
 {
 	register const struct lsinfo *	lp;
 	register long			days;
@@ -1797,9 +1741,8 @@ register struct tm * const		tmp;
 #endif /* defined TM_GMTOFF */
 }
 
-char *
-ctime(timep)
-const time_t * const	timep;
+extern "C" char *
+ctime(const time_t *timep)
 {
 /*
 ** Section 4.12.3.2 of X3.159-1989 requires that
@@ -1810,10 +1753,8 @@ const time_t * const	timep;
 	return asctime(localtime(timep));
 }
 
-char *
-ctime_r(timep, buf)
-const time_t * const	timep;
-char *			buf;
+extern "C" char *
+ctime_r(const time_t *timep, char *buf)
 {
 	struct tm	tm;
 
@@ -1839,9 +1780,7 @@ char *			buf;
 */
 
 static int
-increment_overflow(number, delta)
-int *	number;
-int	delta;
+increment_overflow(int *number, int delta)
 {
 	int	number0;
 
@@ -1851,10 +1790,7 @@ int	delta;
 }
 
 static int
-normalize_overflow(tensptr, unitsptr, base)
-int * const	tensptr;
-int * const	unitsptr;
-const int	base;
+normalize_overflow(int *tensptr, int *unitsptr, const int base)
 {
 	register int	tensdelta;
 
@@ -1866,9 +1802,7 @@ const int	base;
 }
 
 static int
-tmcomp(atmp, btmp)
-register const struct tm * const atmp;
-register const struct tm * const btmp;
+tmcomp(register const struct tm *atmp, register const struct tm *btmp)
 {
 	register int	result;
 
@@ -1882,12 +1816,8 @@ register const struct tm * const btmp;
 }
 
 static time_t
-time2sub(tmp, funcp, offset, okayp, do_norm_secs)
-struct tm * const	tmp;
-void (* const		funcp) P((const time_t*, long, struct tm*));
-const long		offset;
-int * const		okayp;
-const int		do_norm_secs;
+time2sub(struct tm *tmp, void (*funcp) P((const time_t*, long, struct tm*)),
+	 const long offset, int *okayp, const int do_norm_secs)
 {
 	register const struct state *	sp;
 	register int			dir;
@@ -2034,11 +1964,8 @@ label:
 }
 
 static time_t
-time2(tmp, funcp, offset, okayp)
-struct tm * const	tmp;
-void (* const		funcp) P((const time_t*, long, struct tm*));
-const long		offset;
-int * const		okayp;
+time2(struct tm *tmp, void (*funcp) P((const time_t*, long, struct tm*)),
+      const long offset, int *okayp)
 {
 	time_t	t;
 
@@ -2052,10 +1979,8 @@ int * const		okayp;
 }
 
 static time_t
-time1(tmp, funcp, offset)
-struct tm * const	tmp;
-void (* const		funcp) P((const time_t *, long, struct tm *));
-const long		offset;
+time1(struct tm *tmp, void (*funcp) P((const time_t *, long, struct tm *)),
+      const long offset)
 {
 	register time_t			t;
 	register const struct state *	sp;
@@ -2113,9 +2038,8 @@ const long		offset;
 	return WRONG;
 }
 
-time_t
-mktime(tmp)
-struct tm * const	tmp;
+extern "C" time_t
+mktime(struct tm *tmp)
 {
 	tzset();
 	return time1(tmp, localsub, 0L);
@@ -2123,26 +2047,22 @@ struct tm * const	tmp;
 
 #ifdef STD_INSPIRED
 
-time_t
-timelocal(tmp)
-struct tm * const	tmp;
+extern "C" time_t
+timelocal(struct tm *tmp)
 {
 	tmp->tm_isdst = -1;	/* in case it wasn't initialized */
 	return mktime(tmp);
 }
 
-time_t
-timegm(tmp)
-struct tm * const	tmp;
+extern "C" time_t
+timegm(struct tm *tmp)
 {
 	tmp->tm_isdst = 0;
 	return time1(tmp, gmtsub, 0L);
 }
 
-time_t
-timeoff(tmp, offset)
-struct tm * const	tmp;
-const long		offset;
+extern "C" time_t
+timeoff(struct tm *tmp, const long offset)
 {
 	tmp->tm_isdst = 0;
 	return time1(tmp, gmtsub, offset);
@@ -2157,9 +2077,8 @@ const long		offset;
 ** previous versions of the CMUCS runtime library.
 */
 
-long
-gtime(tmp)
-struct tm * const	tmp;
+extern "C" long
+gtime(struct tm *tmp)
 {
 	const time_t	t = mktime(tmp);
 
@@ -2185,8 +2104,7 @@ struct tm * const	tmp;
 */
 
 static long
-leapcorr(timep)
-time_t *	timep;
+leapcorr(time_t *timep)
 {
 	register struct state *		sp;
 	register struct lsinfo *	lp;
@@ -2202,17 +2120,15 @@ time_t *	timep;
 	return 0;
 }
 
-time_t
-time2posix(t)
-time_t	t;
+extern "C" time_t
+time2posix(time_t t)
 {
 	tzset();
 	return t - leapcorr(&t);
 }
 
-time_t
-posix2time(t)
-time_t	t;
+extern "C" time_t
+posix2time(time_t t)
 {
 	time_t	x;
 	time_t	y;

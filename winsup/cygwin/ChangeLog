@@ -1,3 +1,9 @@
+Wed 25 Jul 2001 23:46:00  Corinna Vinschen <corinna@vinschen.de>
+
+	* localtime.c: Changed whole file to become C++ clean. Rename to
+	localtime.cc.
+	* localtime.cc (tzload): Preserve errno.
+
 Fri 20 Jul 2001 11:15:50 PM EDT  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (cygheap_fixup_in_child): Attempt Win95 workaround.
