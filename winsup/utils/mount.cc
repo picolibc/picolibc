@@ -1,6 +1,6 @@
 /* mount.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -33,6 +33,7 @@ static int mount_already_exists (const char *posix_path, int flags);
 // static short create_missing_dirs = FALSE;
 static short force = FALSE;
 
+static const char version[] = "$Revision$";
 static const char *progname;
 
 static void
@@ -111,46 +112,73 @@ do_mount (const char *dev, const char *where, int flags)
 
 static struct option longopts[] =
 {
-  {"help", no_argument, NULL, 'h' },
   {"binary", no_argument, NULL, 'b'},
+  {"change-cygdrive-prefix", no_argument, NULL, 'c'},
+  {"cygwin-executable", no_argument, NULL, 'X'},
+  {"executable", no_argument, NULL, 'x'},
   {"force", no_argument, NULL, 'f'},
+  {"help", no_argument, NULL, 'h' },
+  {"import-old-mounts", no_argument, NULL, 'i'},
+  {"mount-commands", no_argument, NULL, 'm'},
+  {"no-executable", no_argument, NULL, 'E'},
+  {"show-cygdrive-prefix", no_argument, NULL, 'p'},
   {"system", no_argument, NULL, 's'},
   {"text", no_argument, NULL, 't'},
   {"user", no_argument, NULL, 'u'},
-  {"executable", no_argument, NULL, 'x'},
-  {"no-executable", no_argument, NULL, 'E'},
-  {"change-cygdrive-prefix", no_argument, NULL, 'c'},
-  {"cygwin-executable", no_argument, NULL, 'X'},
-  {"show-cygdrive-prefix", no_argument, NULL, 'p'},
-  {"import-old-mounts", no_argument, NULL, 'i'},
-  {"mount-commands", no_argument, NULL, 'm'},
+  {"version", no_argument, NULL, 'v'},
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "hbfstuxXEpicm";
+static char opts[] = "bcfhimpstuvxEX";
 
 static void
-usage (void)
+usage (FILE *where = stderr)
 {
-  fprintf (stderr, "Usage: %s [OPTION] [<win32path> <posixpath>]\n\
+  fprintf (where, "Usage: %s [OPTION] [<win32path> <posixpath>]\n\
   -b, --binary                  text files are equivalent to binary files\n\
 				(newline = \\n)\n\
   -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>\n\
   -f, --force                   force mount, don't warn about missing mount\n\
 				point directories\n\
+  -h, --help                    output usage information and exit\n\
   -i, --import-old-mounts       copy old registry mount table mounts into the\n\
                                 current mount areas\n\
+  -m, --mount-commands          write mount commands to replace user and\n\
+				system mount points and cygdrive prefixes\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
   -s, --system     (default)    add system-wide mount point\n\
   -t, --text       (default)    text files get \\r\\n line endings\n\
   -u, --user                    add user-only mount point\n\
+  -v, --version                 output version information and exit\n\
   -x, --executable              treat all files under mount point as executables\n\
+  -E, --no-executable           treat all files under mount point as \n\
+				non-executables\n\
   -X, --cygwin-executable       treat all files under mount point as cygwin\n\
 				executables\n\
-  -m, --mount-commands          write mount commands to replace user and\n\
-				system mount points and cygdrive prefixes\n\
 ", progname);
-  exit (1);
+  exit (where == stderr ? 1 : 0);
+}
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+%s (cygwin) %.*s\n\
+Filesystem Utility\n\
+Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", progname, len, v, __DATE__);
 }
 
 int
@@ -168,7 +196,13 @@ main (int argc, char **argv)
     saw_mount_commands
   } do_what = nada;
 
-  progname = argv[0];
+  progname = strrchr (argv[0], '/');
+  if (progname == NULL)
+    progname = strrchr (argv[0], '\\');
+  if (progname == NULL)
+    progname = argv[0];
+  else
+    progname++;
 
   if (argc == 1)
     {
@@ -191,9 +225,18 @@ main (int argc, char **argv)
       case 'f':
 	force = TRUE;
 	break;
+      case 'h':
+	usage (stdout);
+	break;
       case 'i':
 	if (do_what == nada)
 	  do_what = saw_import_old_mounts;
+	else
+	  usage ();
+	break;
+      case 'm':
+	if (do_what == nada)
+	  do_what = saw_mount_commands;
 	else
 	  usage ();
 	break;
@@ -213,8 +256,9 @@ main (int argc, char **argv)
 	flags &= ~MOUNT_SYSTEM;
 	default_flag = 0;
 	break;
-      case 'X':
-	flags |= MOUNT_CYGWIN_EXEC;
+      case 'v':
+	print_version ();
+	return 0;
 	break;
       case 'x':
 	flags |= MOUNT_EXEC;
@@ -222,11 +266,8 @@ main (int argc, char **argv)
       case 'E':
 	flags |= MOUNT_NOTEXEC;
 	break;
-      case 'm':
-	if (do_what == nada)
-	  do_what = saw_mount_commands;
-	else
-	  usage ();
+      case 'X':
+	flags |= MOUNT_CYGWIN_EXEC;
 	break;
       default:
 	usage ();
