@@ -1,3 +1,11 @@
+2005-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winnt.h (SE_UNDOCK_NAME TEXT): Define.
+	(SE_MANAGE_VOLUME_NAME TEXT): Ditto.
+	(SE_IMPERSONATE_NAME TEXT): Ditto.
+	(SE_ENABLE_DELEGATION_NAME TEXT): Ditto.
+	(SE_SYNC_AGENT_NAME TEXT): Ditto.
+
 2005-03-16  Christopher Faylor  <cgf@timesys.com>
 
 	* winclude/winnt.h (SYSTEM_LUID): Fix definitition invalidated by below
