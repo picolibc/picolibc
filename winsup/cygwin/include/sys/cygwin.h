@@ -42,10 +42,6 @@ struct __cygwin_perfile
   unsigned flags;
 };
 
-#ifdef _PATH_PASSWD
-extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
-#endif
-
 /* External interface stuff */
 
 typedef enum
@@ -94,6 +90,10 @@ enum
 };
 
 #ifdef WINVER
+#ifdef _PATH_PASSWD
+extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
+#endif
+
 /* This lives in the app and is initialized before jumping into the DLL.
    It should only contain stuff which the user's process needs to see, or
    which is needed before the user pointer is initialized, or is needed to

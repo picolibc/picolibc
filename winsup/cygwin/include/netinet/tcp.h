@@ -1,6 +1,6 @@
 #ifndef _NETINET_TCP_H
 #define _NETINET_TCP_H
 
-#include <winsock.h>
+/* Maybe add some definitions, someday */
 
 #endif
