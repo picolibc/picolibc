@@ -1,3 +1,8 @@
+2002-02-25  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/config.h: Add __extension__ in front of
+	long long references.
+
 2002-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/stat.h (_fstat): Don't declare when compiling Cygwin.

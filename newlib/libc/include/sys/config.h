@@ -141,8 +141,8 @@ typedef unsigned int __uint32_t;
 typedef long int __int64_t;
 typedef unsigned long int __uint64_t;
 #else
-typedef long long __int64_t;
-typedef unsigned long long __uint64_t;
+__extension__ typedef long long __int64_t;
+__extension__ typedef unsigned long long __uint64_t;
 #endif
 
 #ifndef _POINTER_INT
