@@ -1,3 +1,7 @@
+2002-09-20  Nathanael Nerode  <neroden@doctor.moo.mud.org>
+
+	* configure.in: Rearrange.
+
 2002-09-12  Nick Clifton  <nickc@redhat.com>
 
 	* Import these changes from the config master repository:
