@@ -62,33 +62,14 @@ set_myself (pid_t pid, HANDLE h)
   myself->process_state |= PID_IN_USE;
   myself->start_time = time (NULL); /* Register our starting time. */
 
-  char buf[30];
-  __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR,
-		   &strace.active);
-  OutputDebugString (buf);
-
   (void) GetModuleFileName (NULL, myself->progname,
 			    sizeof(myself->progname));
-  if (strace.active)
-    {
-      strace.prntf (1, NULL, "**********************************************");
-      strace.prntf (1, NULL, "Program name: %s (%d)", myself->progname, myself->pid);
-      strace.prntf (1, NULL, "App version:  %d.%d, api: %d.%d",
-		       user_data->dll_major, user_data->dll_minor,
-		       user_data->api_major, user_data->api_minor);
-      strace.prntf (1, NULL, "DLL version:  %d.%d, api: %d.%d",
-		       cygwin_version.dll_major, cygwin_version.dll_minor,
-		       cygwin_version.api_major, cygwin_version.api_minor);
-      strace.prntf (1, NULL, "DLL build:    %s", cygwin_version.dll_build_date);
-      strace.prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
-      strace.prntf (1, NULL, "**********************************************");
-    }
-
+  strace.hello ();
   return;
 }
 
 /* Initialize the process table entry for the current task.
-   This is not called for fork'd tasks, only exec'd ones.  */
+   This is not called for forked tasks, only execed ones.  */
 void __stdcall
 pinfo_init (char **envp, int envc)
 {
@@ -136,7 +117,7 @@ _pinfo::exit (UINT n, bool norecord)
 void
 pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 {
-  if (n == myself->pid)
+  if (myself && n == myself->pid)
     {
       procinfo = myself;
       destroy = 0;
@@ -276,7 +257,7 @@ a cygwin pid.</para>
 extern "C" pid_t
 cygwin_winpid_to_pid (int winpid)
 {
-  pinfo p (winpid);
+  pinfo p (cygwin_pid (winpid));
   if (p)
     return p->pid;
 

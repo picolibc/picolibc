@@ -414,6 +414,9 @@ wincapc::init ()
 {
   const char *os;
 
+  if (caps)
+    return;		// already initialized
+
   memset (&version, 0, sizeof version);
   version.dwOSVersionInfoSize = sizeof version;
   GetVersionEx (&version);

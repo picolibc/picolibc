@@ -66,7 +66,10 @@ typedef enum
     CW_INIT_EXCEPTIONS,
     CW_GET_CYGDRIVE_INFO,
     CW_SET_CYGWIN_REGISTRY_NAME,
-    CW_GET_CYGWIN_REGISTRY_NAME
+    CW_GET_CYGWIN_REGISTRY_NAME,
+    CW_STRACE_ON,
+    CW_STRACE_OFF,
+    CW_CYGWIN_PID_TO_WINPID
   } cygwin_getinfo_types;
 
 #define CW_NEXTPID	0x80000000	// or with pid to get next one
@@ -204,6 +207,11 @@ extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 #include <sys/resource.h>
 
 #define TTY_CONSOLE	0x40000000
+
+#ifndef _SYS_TYPES_H
+typedef short uid_t;
+typedef short gid_t;
+#endif
 
 struct external_pinfo
   {

@@ -1184,7 +1184,7 @@ wait_sig (VOID *)
 
 		/* Internal signal to force a flush of strace data to disk. */
 		case __SIGSTRACE:
-		  // proc_strace ();	// Dump cached strace.prntf stuff.
+		  strace.hello ();
 		  break;
 
 		/* A normal UNIX signal */

@@ -1,3 +1,21 @@
+2002-01-28  Christopher Faylor  <cgf@redhat.com>
+
+	* external.cc (cygwin_internal): Initialize various internal settings
+	if required to allow use of some things from user loaded DLL.
+	(CW_STRACE_ON): Add new feature.
+	(CW_CYGWIN_PID_TO_WINPID): Ditto.
+	* pinfo.cc (set_myself): Call "strace.hello" to initiate possible
+	strace session.
+	(pinfo::init): Guard against dereferencing uninitialized myself.
+	* sigproc.cc (wait_sig): Call strace.hello() when __SIGTRACE "signal"
+	received.
+	* strace.cc (strace::hello): New method.
+	* wincap.cc (wincapc::init): Avoid initializing if already initialized.
+	* wincap.h (wincapc::wincapc): New method.
+	* include/sys/cygwin.h: Add new CW_ enums.  Kludge typedefs of
+	{g,u}id_t if required.
+	* strace.h (strace::hello): Declare new method.
+
 2002-01-28  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/sys/strace.h (_STRACE_ON): Define.

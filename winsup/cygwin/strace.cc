@@ -17,6 +17,8 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "perprocess.h"
+#include "cygwin_version.h"
 
 #define PROTECT(x) x[sizeof(x)-1] = 0
 #define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
@@ -27,6 +29,29 @@ class NO_COPY strace strace;
    stdarg.h, so we declare it here instead. */
 
 #ifndef NOSTRACE
+
+void
+strace::hello()
+{
+  char buf[30];
+  __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR, &active);
+  OutputDebugString (buf);
+
+  if (active)
+    {
+      prntf (1, NULL, "**********************************************");
+      prntf (1, NULL, "Program name: %s (%d)", myself->progname, myself->pid);
+      prntf (1, NULL, "App version:  %d.%d, api: %d.%d",
+	     user_data->dll_major, user_data->dll_minor,
+	     user_data->api_major, user_data->api_minor);
+      prntf (1, NULL, "DLL version:  %d.%d, api: %d.%d",
+	     cygwin_version.dll_major, cygwin_version.dll_minor,
+	     cygwin_version.api_major, cygwin_version.api_minor);
+      prntf (1, NULL, "DLL build:    %s", cygwin_version.dll_build_date);
+      prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
+      prntf (1, NULL, "**********************************************");
+    }
+}
 
 int
 strace::microseconds()
