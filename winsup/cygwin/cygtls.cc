@@ -92,6 +92,10 @@ _cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
   _my_tls.init_thread (buf, func);
   DWORD res = func (arg, buf);
   _my_tls.remove (INFINITE);
+  // FIXME: Need some sort of atthreadexit function to allow things like
+  // select to control this themselves
+  if (_my_tls.locals.exitsock != INVALID_SOCKET)
+    closesocket (_my_tls.locals.exitsock);
   ExitThread (res);
 }
 
@@ -114,6 +118,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 	}
       local_clib._current_locale = "C";
       locals.process_logmask = LOG_UPTO (LOG_DEBUG);
+      locals.exitsock = INVALID_SOCKET;
     }
 
   set_state (false);

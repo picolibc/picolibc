@@ -11,11 +11,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-/*
- * The following line means that the BSD socket
- * definitions for fd_set, FD_ISSET etc. are used in this
- * file.
- */
+/* The following line means that the BSD socket definitions for
+   fd_set, FD_ISSET etc. are used in this file.  */
 
 #define  __INSIDE_CYGWIN_NET__
 
@@ -43,6 +40,8 @@ details. */
 #include "tty.h"
 #include "cygthread.h"
 #include "ntdll.h"
+#include "cygtls.h"
+#include <asm/byteorder.h>
 
 /*
  * All these defines below should be in sys/types.h
@@ -1211,7 +1210,6 @@ struct socketinf
     cygthread *thread;
     winsock_fd_set readfds, writefds, exceptfds;
     SOCKET exitsock;
-    struct sockaddr_in sin;
     select_record *start;
   };
 
@@ -1306,11 +1304,8 @@ thread_socket (void *arg)
 
   if (WINSOCK_FD_ISSET (si->exitsock, &si->readfds))
     select_printf ("saw exitsock read");
-
   return 0;
 }
-
-extern "C" unsigned long htonl (unsigned long);
 
 static int
 start_thread_socket (select_record *me, select_stuff *stuff)
@@ -1350,36 +1345,43 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 	  }
       }
 
-  if ((si->exitsock = socket (PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+  if (_my_tls.locals.exitsock != INVALID_SOCKET)
     {
-      set_winsock_errno ();
-      select_printf ("cannot create socket, %E");
-      return -1;
+      char buf[1];
+      si->exitsock = _my_tls.locals.exitsock;
+      select_printf ("read a byte from %p", si->exitsock);
+      recv (si->exitsock, buf, 1, 0);
     }
-  /* Allow rapid reuse of the port. */
-  int tmp = 1;
-  (void) setsockopt (si->exitsock, SOL_SOCKET, SO_REUSEADDR, (char *) &tmp, sizeof (tmp));
-
-  int sin_len = sizeof (si->sin);
-  memset (&si->sin, 0, sizeof (si->sin));
-  si->sin.sin_family = AF_INET;
-  si->sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-  if (bind (si->exitsock, (struct sockaddr *) &si->sin, sizeof (si->sin)) < 0)
+  else 
     {
-      select_printf ("cannot bind socket, %E");
-      goto err;
-    }
+      si->exitsock = _my_tls.locals.exitsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+      if (_my_tls.locals.exitsock == INVALID_SOCKET)
+	{
+	  set_winsock_errno ();
+	  select_printf ("cannot create socket, %E");
+	  return -1;
+	}
+#if 0
+      /* Allow rapid reuse of the port. */
+      int tmp = 1;
+      (void) setsockopt (si->exitsock, SOL_SOCKET, SO_REUSEADDR, (char *) &tmp, sizeof (tmp));
+#endif
 
-  if (getsockname (si->exitsock, (struct sockaddr *) &si->sin, &sin_len) < 0)
-    {
-      select_printf ("getsockname error");
-      goto err;
-    }
+      int sin_len = sizeof (_my_tls.locals.exitsock_sin);
+      memset (&_my_tls.locals.exitsock_sin, 0, sin_len);
+      _my_tls.locals.exitsock_sin.sin_family = AF_INET;
+      _my_tls.locals.exitsock_sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+      if (bind (si->exitsock, (struct sockaddr *) &_my_tls.locals.exitsock_sin, sin_len) < 0)
+	{
+	  select_printf ("cannot bind socket %p, %E", si->exitsock);
+	  goto err;
+	}
 
-  if (listen (si->exitsock, 1))
-    {
-      select_printf ("listen failed, %E");
-      goto err;
+      if (getsockname (si->exitsock, (struct sockaddr *) &_my_tls.locals.exitsock_sin, &sin_len) < 0)
+	{
+	  select_printf ("getsockname error");
+	  goto err;
+	}
     }
 
   select_printf ("exitsock %p", si->exitsock);
@@ -1405,30 +1407,13 @@ socket_cleanup (select_record *, select_stuff *stuff)
   select_printf ("si %p si->thread %p", si, si ? si->thread : NULL);
   if (si && si->thread)
     {
-      select_printf ("connection to si->exitsock %p", si->exitsock);
-      SOCKET s = socket (AF_INET, SOCK_STREAM, 0);
-
-      /* Set LINGER with 0 timeout for hard close */
-      struct linger tmp = {1, 0}; /* On, 0 delay */
-      (void) setsockopt (s, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof (tmp));
-      (void) setsockopt (si->exitsock, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof (tmp));
-
-      /* Connecting to si->exitsock will cause any executing select to wake
-	 up.  When this happens then the exitsock condition will cause the
-	 thread to terminate. */
-      if (connect (s, (struct sockaddr *) &si->sin, sizeof (si->sin)) < 0)
-	{
-	  set_winsock_errno ();
-	  select_printf ("connect failed");
-	  /* FIXME: now what? */
-	}
-      shutdown (s, SD_BOTH);
-      closesocket (s);
-
+      char buf[] = "";
+      int res = sendto (_my_tls.locals.exitsock, buf, 1, 0,
+			(sockaddr *) &_my_tls.locals.exitsock_sin,
+			sizeof (_my_tls.locals.exitsock_sin));
+      select_printf ("sent a byte to the exit sock %p, res %d", _my_tls.locals.exitsock, res);
       /* Wait for thread to go away */
       si->thread->detach ();
-      shutdown (si->exitsock, SD_BOTH);
-      closesocket (si->exitsock);
       stuff->device_specific_socket = NULL;
       delete si;
     }

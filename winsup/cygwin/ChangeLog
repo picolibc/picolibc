@@ -1,9 +1,23 @@
+2004-10-10  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.h (exitsock): New element.
+	(exitsock_sin): Ditto.
+	* cygtls.cc (_cygtls::init_thread): Initialize exitsock to invalid handle.
+	(_cygtls::call2): Close exitsock if it is valid.
+	* select.cc (struct socketinf): Remove sin element.
+	(start_thread_socket): Initialize one SOCK_DGRAM socket per thread
+	instead of (apparently) expensive opening and closing of socket with
+	each select call.
+	(socket_cleanup): Send a byte to the exitsock socket as a way to
+	potentially signal a waiting-for-socket thread to exit.
+	* tlsoffsets.h: Regenerate.
+
 2004-10-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (class cygheap_user): Add psystemroot member and
 	env_systemroot method.
 	* environ.cc (struct spenv): Add add_always member.
-	(spenvs): Accomodate new add_always member.  Add
+	(spenvs): Accommodate new add_always member.  Add
 	cygheap_user::env_systemroot method to SYSTEMROOT entry.
 	(build_env): Check add_always member when adding missing environment
 	variables from spenvs.
@@ -46,7 +60,7 @@
 	(path_conv::isdisk): Delete method.
 	(path_conv::set_isdisk): Ditto.
 	* path.cc (path_conv::check): Do not call set_isdisk.
-	* uinfo.cc(pwdgrp::load): Do not call pc.isdisk. 
+	* uinfo.cc(pwdgrp::load): Do not call pc.isdisk.
 
 2004-09-28  Christopher Faylor  <cgf@timesys.com>
 
@@ -1029,7 +1043,7 @@
 
 	* fhandler_tape.cc (mtinfo_drive::_set_pos): Take additional dont_wait
 	parameter.  Use in call to SetTapePosition.
-	(mtinfo_drive::set_pos): Accomodate _set_pos calls to above change.
+	(mtinfo_drive::set_pos): Accommodate _set_pos calls to above change.
 	(mtinfo_drive::set_partition): Ditto.
 	* mtinfo.h (mtinfo_drive::_set_pos): Change declaration accordingly.
 
@@ -1119,7 +1133,7 @@
 
 2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
 
-	* fhandler.cc (fhandler_base::open): Accomodate query_write_control
+	* fhandler.cc (fhandler_base::open): Accommodate query_write_control
 	query_state.
 	(fhandler_base::fchown): New method.
 	* fhandler.h: Declare fchown method in fhandler_base,
@@ -1305,7 +1319,7 @@
 	(fhandler_disk_file::readdir): Use pc.isencoded() directly.
 	* mtinfo.h (class mtinfo_drive): Const'ify all read accessor methods.
 	* path.cc (fsinfo_cnt): Add.
-	(fs_info::update): Accomodate class changes. Evaluate file system
+	(fs_info::update): Accommodate class changes. Evaluate file system
 	name specific flags right here. Add thread safety for reading and
 	writing global fsinfo array.
 	* path.h (enum path_types): Drop values for flags kept in fs already.
@@ -1394,7 +1408,7 @@
 	(fhandler_base::open_status): Ditto.
 	(class fhandler_socket): Move status bits into private bitfield struct
 	type status_flags.  Change accessor methods appropriately.
-	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Accomodate
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Accommodate
 	above status bit changes.
 	* tty.h: Remove status bit enumerator.
 	(TTYISSETF): Remove.
@@ -1414,7 +1428,7 @@
 
 	* fhandler.cc (fhandler_base::write): Use bool parameter in calls to
 	set_did_lseek.
-	(fhandler_base::fhandler_base): Accomodate new status and open_status
+	(fhandler_base::fhandler_base): Accommodate new status and open_status
 	constructor.
 	* fhandler.h: Remove status bit enumerator.
 	(FHDEVN): Remove.
@@ -1426,10 +1440,10 @@
 	(UNCONNECTED, CONNECT_PENDING, CONNECTED): Substitute by enum
 	connect_state.
 	(fhandler_base::status): Define as bitfield struct type status_flags.
-	Remove unused flags entirely.  Accomodate all status access methods.
+	Remove unused flags entirely.  Accommodate all status access methods.
 	(open_status): Define as bitfield struct type status_flags.
 	(fhandler_socket): Move socket related status bits to here.  Redefine
-	had_connect_or_listen to be part of these status bits.  Accomodate
+	had_connect_or_listen to be part of these status bits.  Accommodate
 	related access methods.
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Use pc.issymlink
 	instead of dropped method get_symlink_p.
@@ -1476,7 +1490,7 @@
 	to allow calling get_nt_object_attribute in case a non-NULL handle
 	is given.
 	* security.h (get_file_attribute): Add handle to argument list.
-	* syscalls.cc (chown_worker): Accomodate new definition of
+	* syscalls.cc (chown_worker): Accommodate new definition of
 	get_file_attribute.
 
 2004-04-07  Pierre Humblet  <pierre.humblet@ieee.org>
@@ -1624,7 +1638,7 @@
 	* net.cc (wsock_event::prepare): Reimplement using asynchronous I/O.
 	(wsock_event::wait): Ditto.
 	(wsock_event::release): New method.
-	* wsock_event.h (class wsock_event): Remove ovr member.  Accomodate
+	* wsock_event.h (class wsock_event): Remove ovr member.  Accommodate
 	new implementation of prepare and wait methods.  Add release method.
 
 2004-03-29  Thomas Pfaff  <tpfaff@gmx.net>
@@ -1926,7 +1940,7 @@
 	Handle ERROR_FILEMARK_DETECTED.
 	* fhandler_tape.cc (TAPE_FUNC): Add comment that ERROR_BUS_RESET
 	has still to be handled correctly.
-	(fhandler_dev_tape::open): Accomodate fact that get.mt_dsreg
+	(fhandler_dev_tape::open): Accommodate fact that get.mt_dsreg
 	also contains density code.
 	(fhandler_dev_tape::ioctl): Rearrange slightly.  Reset devbuf also on
 	MTNOP, MTWSM, MTSETBLK, MTSETDRVBUFFER, MTSETPART and MTMKPART.
@@ -1975,12 +1989,12 @@
 	* fhandler_raw.cc (fhandler_dev_raw::write_file): New method, created
 	from former static function.
 	(fhandler_dev_raw::read_file): Ditto.
-	(fhandler_dev_raw::writebuf): Accomodate the fact that no devbuf
+	(fhandler_dev_raw::writebuf): Accommodate the fact that no devbuf
 	exists under variable block size condition.
 	(fhandler_dev_raw::raw_read): Ditto. Add local p pointer to simplify
 	pointer arithmetic.
 	(fhandler_dev_raw::raw_write): Always set devbufend to 0 when starting
-	with writing. Accomodate the fact that no devbuf exists under
+	with writing. Accommodate the fact that no devbuf exists under
 	variable block size condition.
 	* fhandler_tape.cc: Various formatting changes.
 	(TAPE_FUNC): New macro. Use throughout as tape function loop.
@@ -2014,7 +2028,7 @@
 	(fhandler_dev_tape::tape_set_blocksize): Don't call tape_get_blocksize.
 	Error handling already done in fhandler_dev_tape::ioctl.
 	(fhandler_dev_tape::tape_status): Remove local `dp' variable.
-	Accomodate logical tape reporting.  Call tape_get_feature instead
+	Accommodate logical tape reporting.  Call tape_get_feature instead
 	of accessing feature words directly.
 	(fhandler_dev_tape::tape_compression): Use dp instead of calling
 	GetTapeParameters.  Fix resetting datcompression.
@@ -2244,7 +2258,7 @@
 	* thread.cc (pthread::cancelable_wait): Rearrange slightly.
 	Add do_sig_wait parameter.  Wait for signal_arrived if set to true.
 	Return WAIT_SIGNALED if signal arrived.
-	(pthread_cond::wait): Accomodate change to pthread::cancelable_wait.
+	(pthread_cond::wait): Accommodate change to pthread::cancelable_wait.
 	(pthread::join): Ditto.
 	(semaphore::_timedwait): Ditto.
 	(semaphore::_wait): Ditto.  Change to return int to allow status

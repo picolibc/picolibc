@@ -16,6 +16,8 @@ details. */
 #define _NOMNTENT_FUNCS
 #include <mntent.h>
 #undef _NOMNTENT_FUNCS
+#define USE_SYS_TYPES_FD_SET
+#include <winsock.h>
 
 #define CYGTLS_INITIALIZED 0x43227
 #define CYGTLS_EXCEPTION (0x43227 + true)
@@ -60,6 +62,10 @@ struct _local_storage
   char mnt_opts[80];
   char mnt_fsname[CYG_MAX_PATH];
   char mnt_dir[CYG_MAX_PATH];
+
+  /* select.cc */
+  SOCKET exitsock;
+  struct sockaddr_in exitsock_sin;
 
   /* strerror */
   char strerror_buf[20];
