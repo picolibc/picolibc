@@ -193,6 +193,8 @@ extern host_callback default_callback;
 /* More standard syscalls.  */
 #define CB_SYS_lstat    19
 #define CB_SYS_rename	20
+#define CB_SYS_truncate	21
+#define CB_SYS_ftruncate 22
 
 /* Struct use to pass and return information necessary to perform a
    system call.  */

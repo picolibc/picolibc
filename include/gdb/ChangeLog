@@ -1,3 +1,7 @@
+2004-12-15  Hans-Peter Nilsson  <hp@axis.com>
+
+	* callback.h (CB_SYS_truncate, CB_SYS_ftruncate): New macros.
+
 2004-12-13  Hans-Peter Nilsson  <hp@axis.com>
 
 	* callback.h (struct host_callback_struct): New member lstat.
