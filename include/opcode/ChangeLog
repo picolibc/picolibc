@@ -1,3 +1,10 @@
+2002-11-19  Klee Dienes  <kdienes@apple.com>
+
+	* h8300.h (h8_opcode): Remove 'noperands', 'idx', and 'size'
+	fields.
+	(h8_opcodes). Modify initializer and initializer macros to no
+	longer initialize the removed fields.
+	
 2002-11-19  Svein E. Seldal  <Svein.Seldal@solidas.com>
 
 	* tic4x.h (c4x_insts): Fixed LDHI constraint
