@@ -34,6 +34,7 @@ details. */
 #include "cygwin_version.h"
 #include "dll_init.h"
 #include "cygthread.h"
+#include "sync.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
@@ -1062,6 +1063,28 @@ do_exit (int status)
 
   minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
   myself->exit (n);
+}
+
+static muto *atexit_lock;
+
+extern "C" int
+cygwin_atexit (void (*function)(void))
+{
+  int res;
+  if (!atexit_lock)
+    new_muto (atexit_lock);
+  atexit_lock->acquire ();
+  res = atexit (function);
+  atexit_lock->release ();
+  return res;
+}
+
+extern "C" void
+cygwin_exit (int n)
+{
+  if (atexit_lock)
+    atexit_lock->acquire ();
+  exit (n);
 }
 
 extern "C" void

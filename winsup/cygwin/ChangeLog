@@ -1,7 +1,13 @@
+2003-02-28  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Wrap atexit and exit with cygwin, thread-safe functions.
+	* dcrt0.cc (cygwin_atexit): New function.
+	(cygwin_exit): Ditto.
+
 2003-02-28  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* syscalls.cc (fstat64): Pass get_name () to pc.
-	(access): Pass fn to stat_worker. 
+	(access): Pass fn to stat_worker.
 
 2003-03-27  Corinna Vinschen <corinna@vinschen.de>
 
@@ -11,7 +17,7 @@
 	class sock_event.  Use class object instead.
 	(fhandler_socket::accept): Ditto.  Remove useless casts.
 
-2003-03-27  Thomas Pfaff  <tpfaff@gmx.net>   
+2003-03-27  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* fhandler_socket.cc (fhandler_socket::connect): Add support for
 	an interruptable connect.
@@ -139,8 +145,8 @@
 	(wincap_2000): Ditto.
 	(wincap_xp): Ditto.
 	* path.h (path_conv::fs_flags): New method.
-	* fhandler_disk_file.cc: Include winioctl.h for DeviceIoControl.   
-	(fhandler_disk_file::open): Set newly created and truncated files as    
+	* fhandler_disk_file.cc: Include winioctl.h for DeviceIoControl.
+	(fhandler_disk_file::open): Set newly created and truncated files as
 	sparse on platforms that support it.
 
 2003-02-17  Pierre Humblet  <pierre.humblet@ieee.org>
@@ -168,7 +174,7 @@
 	from non-waitloop call.
 
 2003-02-13  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
-            Christopher Faylor  <cgf@redhat.com>
+	    Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::write_normal): Use MessageBeep
 	for bell sound.

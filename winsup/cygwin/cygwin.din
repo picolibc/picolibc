@@ -156,8 +156,8 @@ atanh
 _atanh = atanh
 atanhf
 _atanhf = atanhf
-atexit
-_atexit = atexit
+atexit = cygwin_atexit
+_atexit = cygwin_atexit
 atof
 _atof = atof
 atoff
@@ -372,7 +372,7 @@ execve
 _execve = execve
 execvp
 _execvp = execvp
-exit
+exit = cygwin_exit
 exp
 _exp = exp
 exp2
