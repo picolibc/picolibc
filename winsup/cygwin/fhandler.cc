@@ -529,11 +529,11 @@ fhandler_base::open (int flags, mode_t mode)
 	    set_nohandle (true);
 	}
       else if (GetLastError () == ERROR_INVALID_HANDLE)
-       set_errno (ENOENT);
+	set_errno (ENOENT);
       else
-       __seterrno ();
+	__seterrno ();
       if (!get_nohandle ())
-       goto done;
+	goto done;
    }
 
   syscall_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
