@@ -148,6 +148,13 @@ HANDLE ()
 }
 
 void
+cygthread::exit_thread ()
+{
+  SetEvent (ev);
+  ExitThread (0);
+}
+
+void
 cygthread::detach ()
 {
   if (!avail)
