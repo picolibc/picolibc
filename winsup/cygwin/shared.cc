@@ -239,7 +239,7 @@ get_null_sd ()
 PSECURITY_ATTRIBUTES __stdcall
 sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 {
-  if (! sa_buf)
+  if (!sa_buf)
     return inherit ? &sec_none_nih : &sec_none;
 
   PSECURITY_ATTRIBUTES psa = (PSECURITY_ATTRIBUTES) sa_buf;
@@ -251,7 +251,7 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 
   if (cygheap->user.sid ())
     sid = cygheap->user.sid ();
-  else if (! lookup_name (getlogin (), cygheap->user.logsrv (), sid))
+  else if (!lookup_name (getlogin (), cygheap->user.logsrv (), sid))
     return inherit ? &sec_none_nih : &sec_none;
 
   size_t acl_len = sizeof (ACL)
@@ -264,37 +264,36 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
     acl_len += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD)
 	       + GetLengthSid (sid2);
 
-  if (! InitializeAcl (acl, acl_len, ACL_REVISION))
+  if (!InitializeAcl (acl, acl_len, ACL_REVISION))
     debug_printf ("InitializeAcl %E");
 
-  if (! AddAccessAllowedAce (acl, ACL_REVISION,
-			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     sid))
+  if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			    SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
+			    sid))
     debug_printf ("AddAccessAllowedAce(%s) %E", getlogin ());
 
-  if (! AddAccessAllowedAce (acl, ACL_REVISION,
-			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     well_known_admins_sid))
+  if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			    SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
+			    well_known_admins_sid))
     debug_printf ("AddAccessAllowedAce(admin) %E");
 
-  if (! AddAccessAllowedAce (acl, ACL_REVISION,
-			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     well_known_system_sid))
+  if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			    SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
+			    well_known_system_sid))
     debug_printf ("AddAccessAllowedAce(system) %E");
 
-  if (! AddAccessAllowedAce (acl, ACL_REVISION,
-			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     well_known_creator_owner_sid))
+  if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			    SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
+			    well_known_creator_owner_sid))
     debug_printf ("AddAccessAllowedAce(creator_owner) %E");
 
   if (sid2)
-    if (! AddAccessAllowedAce (acl, ACL_REVISION,
-			       SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			       sid2))
+    if (!AddAccessAllowedAce (acl, ACL_REVISION,
+			      SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
+			      sid2))
       debug_printf ("AddAccessAllowedAce(sid2) %E");
 
-  if (! InitializeSecurityDescriptor (psd,
-				      SECURITY_DESCRIPTOR_REVISION))
+  if (!InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION))
     debug_printf ("InitializeSecurityDescriptor %E");
 
 /*
@@ -303,11 +302,11 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
  * what it should do also if the owner isn't set.
 */
 #if 0
-  if (! SetSecurityDescriptorOwner (psd, sid, FALSE))
+  if (!SetSecurityDescriptorOwner (psd, sid, FALSE))
     debug_printf ("SetSecurityDescriptorOwner %E");
 #endif
 
-  if (! SetSecurityDescriptorDacl (psd, TRUE, acl, FALSE))
+  if (!SetSecurityDescriptorDacl (psd, TRUE, acl, FALSE))
     debug_printf ("SetSecurityDescriptorDacl %E");
 
   psa->nLength = sizeof (SECURITY_ATTRIBUTES);
