@@ -2036,6 +2036,14 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   static NO_COPY struct mntent ret;
 #endif
 
+  /* Remove drivenum from list if we see a x: style path */
+  if (strlen (native_path) == 2 && native_path[1] == ':')
+    {
+      int drivenum = tolower (native_path[0]) - 'a';
+      if (drivenum >= 0 && drivenum <= 31)
+	available_drives &= ~(1 << drivenum);
+    }
+
   /* Pass back pointers to mount_table strings reserved for use by
      getmntent rather than pointers to strings in the internal mount
      table because the mount table might change, causing weird effects
@@ -2087,22 +2095,31 @@ mount_item::getmntent ()
 static struct mntent *
 cygdrive_getmntent ()
 {
-  if (!available_drives)
-    return NULL;
-
-  DWORD mask, drive;
-  for (mask = 1, drive = 'a'; drive <= 'z'; mask <<= 1, drive++)
-    if (available_drives & mask)
-      {
-	available_drives &= ~mask;
-	break;
-      }
-
-  char native_path[3];
+  char native_path[4];
   char posix_path[MAX_PATH];
-  __small_sprintf (native_path, "%c:", drive);
-  __small_sprintf (posix_path, "%s%c", mount_table->cygdrive, drive);
-  return fillout_mntent (native_path, posix_path, mount_table->cygdrive_flags);
+  DWORD mask = 1, drive = 'a';
+  struct mntent *ret = NULL;
+
+  while (available_drives)
+    {
+      for (/* nothing */; drive <= 'z'; mask <<= 1, drive++)
+	if (available_drives & mask)
+	  break;
+
+      __small_sprintf (native_path, "%c:\\", drive);
+      if (GetDriveType (native_path) == DRIVE_REMOVABLE ||
+	  GetFileAttributes (native_path) == (DWORD) -1)
+        {
+	  available_drives &= ~mask;
+	  continue;
+        }
+      native_path[2] = '\0';
+      __small_sprintf (posix_path, "%s%c", mount_table->cygdrive, drive);
+      ret = fillout_mntent (native_path, posix_path, mount_table->cygdrive_flags);
+      break;
+    }
+
+  return ret;
 }
   
 struct mntent *

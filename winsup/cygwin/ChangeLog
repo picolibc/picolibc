@@ -1,3 +1,10 @@
+Sun Apr  1 00:08:15 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (fillout_mntent): Always remove drive root directories from
+	future consideration by "/cygdrive" reporting.
+	(cygdrive_getmnt): Avoid reporting removable drives or drives with no
+	media mounted.
+
 Sat Mar 31 21:56:19 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* thread.h (struct _winsup_t): Remove obsolete elements.  Add
