@@ -72,7 +72,7 @@ win_env::add_cache (const char *in_posix, const char *in_native)
  * of the name including a mandatory '='.  Returns a pointer to the
  * appropriate conversion structure.
  */
-win_env *
+win_env * __stdcall
 getwinenv (const char *env, const char *in_posix)
 {
   for (int i = 0; conv_envvars[i].name != NULL; i++)
@@ -153,8 +153,7 @@ my_findenv (const char *name, int *offset)
  *	Returns ptr to value associated with name, if any, else NULL.
  */
 
-extern "C"
-char *
+extern "C" char *
 getenv (const char *name)
 {
   int offset;
@@ -166,8 +165,7 @@ getenv (const char *name)
  *	Sets an environment variable
  */
 
-extern "C"
-int
+extern "C" int
 putenv (const char *str)
 {
   register char *p, *equal;
@@ -192,8 +190,7 @@ putenv (const char *str)
  *	"value".  If rewrite is set, replace any current value.
  */
 
-extern "C"
-int
+extern "C" int
 setenv (const char *name, const char *value, int rewrite)
 {
   register char *C;
@@ -249,8 +246,7 @@ setenv (const char *name, const char *value, int rewrite)
  *	Delete environment variable "name".
  */
 
-extern "C"
-void
+extern "C" void
 unsetenv (const char *name)
 {
   register char **P;
@@ -490,7 +486,7 @@ environ_init (void)
   if (!sawTERM)
     envp[i++] = strdup ("TERM=cygwin");
   envp[i] = NULL;
-  __cygwin_environ = *user_data->envptr = envp;
+  __cygwin_environ = environ = envp;
   FreeEnvironmentStringsA ((char *) rawenv);
   parse_options (NULL);
   MALLOC_CHECK;
@@ -512,7 +508,7 @@ env_sort (const void *a, const void *b)
  * Converts environment variables noted in conv_envvars into win32 form
  * prior to placing them in the string.
  */
-char *
+char * __stdcall
 winenv (const char * const *envp)
 {
   int len, n, tl;

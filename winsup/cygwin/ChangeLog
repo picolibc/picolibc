@@ -1,7 +1,19 @@
-Sun Feb 18 21:31:00 2000  Corinna Vinschen <corinna@vinschen.de>
+Sun Feb 20 22:10:21 2000  Christopher Faylor <cgf@cygnus.com>
 
-        * fhandler.cc (fhandler_disk_file::fstat): Modify get_file_attribute
-        return value if FILE_ATTRIBUTE_READONLY is set.
+	* environ.cc (getwinenv): Make __stdcall.
+	(winenv): Ditto.
+	* malloc.cc (strdup): New function.  Occludes newlib version.
+	(_strdup_r): Ditto.
+	* winsup.h: Reflect above __stdcall changes.
+
+Sun Feb 20 21:31:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_disk_file::fstat): Modify get_file_attribute
+	return value if FILE_ATTRIBUTE_READONLY is set.
+
+Thu Feb 17 11:00:23 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc (environ_init): Cosmetic change.
 
 Mon Feb  7 16:50:44 2000  Christopher Faylor <cgf@cygnus.com>
 

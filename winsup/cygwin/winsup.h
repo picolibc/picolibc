@@ -557,9 +557,9 @@ struct win_env
     const char * get_native () {return native ? native + namelen : NULL;}
   };
 
-win_env *getwinenv (const char *name, const char *posix = NULL);
+win_env * __stdcall getwinenv (const char *name, const char *posix = NULL);
 
-char *winenv (const char * const *);
+char * __stdcall winenv (const char * const *);
 extern char **__cygwin_environ;
 
 /* The title on program start. */
