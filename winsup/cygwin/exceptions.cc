@@ -40,7 +40,7 @@ static size_t windows_system_directory_length;
 static NO_COPY int exit_already = 0;
 static NO_COPY muto *mask_sync = NULL;
 
-HMODULE cygwin_hmodule;
+HMODULE NO_COPY cygwin_hmodule;
 HANDLE NO_COPY console_handler_thread_waiter = NULL;
 
 static const struct
@@ -226,7 +226,7 @@ public:
 
 /* This is the main stack frame info for this process. */
 static NO_COPY stack_info thestack;
-signal_dispatch NO_COPY sigsave;
+signal_dispatch sigsave;
 
 /* Initialize everything needed to start iterating. */
 void
@@ -558,12 +558,7 @@ extern int pending_signals;
 int
 interruptible (DWORD pc)
 {
-#if 0
-  DWORD pchigh = pc & 0xf0000000;
-  return ((pc >= (DWORD) &__sigfirst) && (pc <= (DWORD) &__siglast)) ||
-	 !(pchigh == 0xb0000000 || pchigh == 0x70000000 || pchigh == 0x60000000);
-#else
-  int res = 1;
+  int res;
   if ((pc >= (DWORD) &__sigfirst) && (pc <= (DWORD) &__siglast))
     res = 0;
   else
@@ -575,25 +570,29 @@ interruptible (DWORD pc)
 
       char *checkdir = (char *) alloca (windows_system_directory_length);
 #     define h ((HMODULE) m.AllocationBase)
-      if (h == cygwin_hmodule)
+      if (h == user_data->hmodule)
+	res = 1;
+      else if (h == cygwin_hmodule)
 	res = 0;
       else if (!GetModuleFileName (h, checkdir, windows_system_directory_length))
 	res = 0;
       else
         res = !strncasematch (windows_system_directory, checkdir,
 			      windows_system_directory_length);
+      minimal_printf ("h %p", h);
+#     undef h
     }
 
-  sigproc_printf ("interruptible %d", res);
+  minimal_printf ("interruptible %d", res);
   return res;
-# undef h
-#endif
 }
 
 static void __stdcall
-interrupt_setup (int sig, struct sigaction& siga, void *handler, DWORD retaddr)
+interrupt_setup (int sig, struct sigaction& siga, void *handler,
+		 DWORD retaddr, DWORD *retaddr_on_stack)
 {
   sigsave.retaddr = retaddr;
+  sigsave.retaddr_on_stack = retaddr_on_stack;
   sigsave.oldmask = myself->getsigmask ();	// Remember for restoration
   /* FIXME: Not multi-thread aware */
   set_process_mask (myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig));
@@ -606,11 +605,25 @@ interrupt_setup (int sig, struct sigaction& siga, void *handler, DWORD retaddr)
 static void
 interrupt_now (CONTEXT *ctx, int sig, struct sigaction& siga, void *handler)
 {
-  interrupt_setup (sig, siga, handler, ctx->Eip);
+  interrupt_setup (sig, siga, handler, ctx->Eip, 0);
   ctx->Eip = (DWORD) sigdelayed;
   SetThreadContext (myself->getthread2signal(), ctx); /* Restart the thread */
 }
 
+void __cdecl
+signal_fixup_after_fork ()
+{
+  if (!sigsave.sig)
+    return;
+
+  sigsave.sig = 0;
+  if (sigsave.retaddr_on_stack)
+    {
+      *sigsave.retaddr_on_stack = sigsave.retaddr;
+      set_process_mask (sigsave.oldmask);
+    }
+}
+  
 static int
 interrupt_on_return (DWORD ebp, int sig, struct sigaction& siga, void *handler)
 {
@@ -626,7 +639,7 @@ interrupt_on_return (DWORD ebp, int sig, struct sigaction& siga, void *handler)
 	DWORD *addr_retaddr = ((DWORD *)thestack.sf.AddrFrame.Offset) + 1;
 	if (*addr_retaddr  == thestack.sf.AddrReturn.Offset)
 	  {
-	    interrupt_setup (sig, siga, handler, *addr_retaddr);
+	    interrupt_setup (sig, siga, handler, *addr_retaddr, addr_retaddr);
 	    *addr_retaddr = (DWORD) sigdelayed;
 	  }
 	break;
@@ -1055,8 +1068,6 @@ _sigdelayed:
 	pushl	$_sigreturn
 
 	call	_reset_signal_arrived@0
-#	pushl	_signal_arrived	# Everybody waiting for this should
-#	call	_ResetEvent@4	# have woken up by now.
 	movl	$0,%0
 
 	cmpl	$0,_pending_signals

@@ -14,7 +14,6 @@ details. */
 extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
 extern "C" int __small_sprintf (char *dst, const char *fmt, ...);
 extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap);
-extern "C" int __small_sprintf (char *dst, const char *fmt, ...);
 
 /******** Deletion Queue Class ********/
 

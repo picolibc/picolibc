@@ -17,7 +17,7 @@ details. */
 #include "winsup.h"
 #include "dll_init.h"
 
-DWORD chunksize = 0;
+DWORD NO_COPY chunksize = 0;
 /* Timeout to wait for child to start, parent to init child, etc.  */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */
 #define FORK_WAIT_TIMEOUT (300 * 1000)     /* 300 seconds */
@@ -516,6 +516,7 @@ fork ()
       MALLOC_CHECK;
 
       dtable.fixup_after_fork (hParent);
+      signal_fixup_after_fork ();
       ForceCloseHandle (hParent);
 
       MALLOC_CHECK;

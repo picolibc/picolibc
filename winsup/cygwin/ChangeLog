@@ -1,3 +1,19 @@
+Sat Apr  8 00:08:53 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (sigsave): Copy on fork so that we can restore correct
+	behavior in forked process.
+	(interruptible): Flag as interruptible when running in main process
+	module.
+	(interrupt_setup): Save return address and address of return address.
+	(signal_fixup_after_fork): New function.  Uses above two values to
+	restore proper behavior to forked process.
+	(interrupt_on_return): Pass return address address to interupt_setup.
+	(interrupt_now): Pass NULL for return address address to
+	interrupt_setup.
+	* fork.cc (fork): Call signal_fixup_after_fork.
+	* shared.h: Lint cleanups.
+	* winsup.h: Ditto.
+
 Mon Apr  3 14:10:44 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (select_stuff): Eliminate use of 'total'.
@@ -7,28 +23,28 @@ Mon Apr  3 14:10:44 2000  Christopher Faylor <cgf@cygnus.com>
 
 Mon Apr 03 13:58:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * grp.cc (parse_grp): Save empty array instead of
-        NULL in gr_mem if no supplementary group is given.
+	* grp.cc (parse_grp): Save empty array instead of
+	NULL in gr_mem if no supplementary group is given.
 
 Sun Apr 02 16:02:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * syscalls.cc (chown_worker): Use previous uid/gid if
-        new uid/gid is -1.
+	* syscalls.cc (chown_worker): Use previous uid/gid if
+	new uid/gid is -1.
 
 Fry Mar 31 22:55:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * syscalls.cc (chown_worker): New static function with
-        chown functionality.
-        (chown): Call chown_worker with SYMLINK_FOLLOW.
-        (fchown): New function. Call chown_worker with SYMLINK_FOLLOW.
-        (lchown): New function. Call chown_worker with SYMLINK_IGNORE.
-        * cygwin.din: Add symbols for fchown, lchown.
+	* syscalls.cc (chown_worker): New static function with
+	chown functionality.
+	(chown): Call chown_worker with SYMLINK_FOLLOW.
+	(fchown): New function. Call chown_worker with SYMLINK_FOLLOW.
+	(lchown): New function. Call chown_worker with SYMLINK_IGNORE.
+	* cygwin.din: Add symbols for fchown, lchown.
 
 Fry Mar 31 11:18:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * path.cc (symlink): Call `set_file_attribute()' and
-        `SetFileAttributeA()' instead of `chmod()' to set
-        uid/gid correct.
+	* path.cc (symlink): Call `set_file_attribute()' and
+	`SetFileAttributeA()' instead of `chmod()' to set
+	uid/gid correct.
 
 Wed Mar 29 22:49:56 2000  Christopher Faylor <cgf@cygnus.com>
 

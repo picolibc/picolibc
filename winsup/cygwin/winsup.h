@@ -310,6 +310,7 @@ struct signal_dispatch
   DWORD ebp;
   DWORD oldmask;
   DWORD retaddr;
+  DWORD *retaddr_on_stack;
 };
 };
 
@@ -501,9 +502,6 @@ extern void (*__DTOR_LIST__) (void);
 
 /*************************** Unsorted ******************************/
 
-/* The size of the console title */
-#define TITLESIZE 1024
-
 #define WM_ASYNCIO	0x8000		// WM_APP
 
 /* Note that MAX_PATH is defined in the windows headers */
@@ -523,9 +521,9 @@ extern "C" {
 #endif
 #include <sys/reent.h>
 
-#define STD_RBITS S_IRUSR | S_IRGRP | S_IROTH
-#define STD_WBITS S_IWUSR
-#define STD_XBITS S_IXUSR | S_IXGRP | S_IXOTH
+#define STD_RBITS (S_IRUSR | S_IRGRP | S_IROTH)
+#define STD_WBITS (S_IWUSR)
+#define STD_XBITS (S_IXUSR | S_IXGRP | S_IXOTH)
 
 #define O_NOSYMLINK 0x080000
 #define O_DIROPEN   0x100000

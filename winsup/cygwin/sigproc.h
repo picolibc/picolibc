@@ -49,6 +49,7 @@ void __stdcall sigproc_terminate ();
 BOOL __stdcall proc_exists (pinfo *);
 int __stdcall proc_subproc (DWORD, DWORD);
 int __stdcall sig_send (pinfo *, int, DWORD ebp = 0);
+void __stdcall signal_fixup_after_fork ();
 
 extern char myself_nowait_dummy[];
 extern char myself_nowait_nonmain_dummy[];
