@@ -54,6 +54,16 @@ bool strip_title_path;
 bool allow_glob = true;
 codepage_type current_codepage = ansi_cp;
 
+static NO_COPY int mypid = 0;
+int __argc_safe;
+int _declspec(dllexport) __argc;
+char _declspec(dllexport) **__argv;
+vfork_save NO_COPY *main_vfork = NULL;
+
+extern "C" void __sinit (_reent *);
+
+_threadinfo NO_COPY *_main_tls;
+
 int cygwin_finished_initializing;
 
 /* Used in SIGTOMASK for generating a bit for insertion into a sigset_t.
@@ -507,23 +517,17 @@ alloc_stack (child_info_fork *ci)
   if (!VirtualQuery ((LPCVOID) &b, &sm, sizeof sm))
     api_fatal ("fork: couldn't get stack info, %E");
 
-  if (sm.AllocationBase != ci->stacktop)
-    alloc_stack_hard_way (ci, b + sizeof (b) - 1);
-  else
+  if (sm.AllocationBase == ci->stacktop)
     ci->stacksize = 0;
+  else
+    {
+      alloc_stack_hard_way (ci, b + sizeof (b) - 1);
+      _main_tls = &_my_tls;
+      _main_tls->init_thread (NULL);
+    }
 
   return;
 }
-
-static NO_COPY int mypid = 0;
-int __argc_safe;
-int _declspec(dllexport) __argc;
-char _declspec(dllexport) **__argv;
-vfork_save NO_COPY *main_vfork = NULL;
-
-extern "C" void __sinit (_reent *);
-
-_threadinfo NO_COPY *_main_tls;
 
 /* Take over from libc's crt0.o and start the application. Note the
    various special cases when Cygwin DLL is being runtime loaded (as

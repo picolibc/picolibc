@@ -1,3 +1,7 @@
+2003-12-12  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (alloc_stack): Move _main_tls if stack is relocated.
+
 2003-12-11  Christopher Faylor  <cgf@redhat.com>
 
 	* miscfuncs.cc (low_priority_sleep): Correct thinko which caused
