@@ -1,5 +1,13 @@
 2002-01-28  Christopher Faylor  <cgf@redhat.com>
 
+	* cygcheck.cc: Fix typo.  Remove uid_t kludge.  Rely on kludge in
+	sys/cygwin.h instead.
+	* getfacl.c: Add include to remove warning.
+	* mkgroup.c (main): Assign variables outside of parameter passing.
+	This seems to eliminate some compiler warnings.
+
+2002-01-28  Christopher Faylor  <cgf@redhat.com>
+
 	* cygcheck.cc: Use specific cygwin includes, as required.
 
 2002-01-28  Christopher Faylor  <cgf@redhat.com>

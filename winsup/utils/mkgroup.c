@@ -528,11 +528,14 @@ main (int argc, char **argv)
       /*
        * Get `None' group
       */
-      GetComputerName (name, (len = 256, &len));
+      len = 256;
+      GetComputerName (name, &len);
       csid = (PSID) malloc (1024);
+      len = 1024;
+      len2 = 256;
       LookupAccountName (NULL, name,
-			 csid, (len = 1024, &len),
-			 dom, (len2 = 256, &len),
+			 csid, &len,
+			 dom, &len,
 			 &use);
       print_special (print_sids, GetSidIdentifierAuthority (csid), 5,
 				 *GetSidSubAuthority (csid, 0),

@@ -8,17 +8,15 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-typedef unsigned short uid_t;
-typedef unsigned short gid_t;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <windows.h>
-#include "cygwin/include/sys/cygwin.h>
+#include "cygwin/include/sys/cygwin.h"
 #include "cygwin/include/mntent.h"
-#include "cygwin/include/time.h"
 #include "cygwin/include/getopt.h"
-#include "cygwin/include/ctype.h"
+#include "time.h"
+#include "ctype.h"
 
 int verbose = 0;
 int registry = 0;

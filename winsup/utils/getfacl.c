@@ -18,6 +18,7 @@ details. */
 #include <sys/types.h>
 #include <sys/acl.h>
 #include <sys/stat.h>
+#include <string.h>
 
 char *
 permstr (mode_t perm)
