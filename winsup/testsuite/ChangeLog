@@ -1,3 +1,8 @@
+2001-03-10  Egor Duda  <deo@logos-m.ru>
+
+	* winsup.api/ltp/access01.c: Avoid compilation error if X_OK
+	isn't declared as a constant.
+
 2001-03-09  Egor Duda  <deo@logos-m.ru>
 
 	* config/default.exp: Remove unneeded debugging output.
