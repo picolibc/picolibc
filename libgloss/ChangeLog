@@ -1,3 +1,25 @@
+2002-07-12  Chris Demetriou  <cgd@broadcom.com>
+
+        * mips/array.ld (hardware_exit_hook, hardware_hazard_hook): New
+        symbols for optionally-provided functions.
+        * mips/ddb-kseg0.ld: Likewise.
+        * mips/ddb.ld: Likewise.
+        * mips/dve.ld: Likewise.
+        * mips/idt.ld: Likewise.
+        * mips/idt32.ld: Likewise.
+        * mips/idt64.ld: Likewise.
+        * mips/idtecoff.ld: Likewise.
+        * mips/jmr3904app-java.ld: Likewise.
+        * mips/jmr3904app.ld: Likewise.
+        * mips/jmr3904dram-java.ld: Likewise.
+        * mips/jmr3904dram.ld: Likewise.
+        * mips/lsi.ld: Likewise.
+        * mips/nullmon.ld: Likewise.
+        * mips/pmon.ld: Likewise.
+        * mips/crt0.S: Invoke hardware_exit_hook and hardware_hazard_hook
+        functions if they are provided.
+        (_exit): Handle __embedded_pic properly.
+
 2002-06-18  Dave Brolley  <brolley@redhat.com>
 
 	From Catherine Moore, Michael Meissner, Richard Sandiford:

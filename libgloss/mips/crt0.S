@@ -54,11 +54,13 @@
  */
 	nop
 
+	.globl	hardware_hazard_hook .text
 	.globl	_start
 	.ent	_start
 _start:
 	.set	noreorder
 #ifdef __mips_embedded_pic
+#define PICBASE start_PICBASE
 	PICBASE = .+8
         bal	PICBASE
 	nop
@@ -74,6 +76,14 @@ _start:
 	mtc0	v0, C0_SR
 	mtc0	zero, C0_CAUSE
 	nop
+
+	/* Avoid hazard from FPU enable and other SR changes.  */
+	LA (t0, hardware_hazard_hook)
+	beq	t0,zero,1f
+	nop
+	jal	t0
+	nop
+1:
 
 /* Check for FPU presence.  Don't check if we know that soft_float is
    being used.  (This also avoids illegal instruction exceptions.)  */
@@ -96,6 +106,12 @@ _start:
 	/* FPU is not present.  Set status register to say that. */
 	li	v0, (STATUS_MASK-(STATUS_MASK & SR_CU1))
 	mtc0	v0, C0_SR
+	nop
+	/* Avoid hazard from FPU disable.  */
+	LA (t0, hardware_hazard_hook)
+	beq	t0,zero,2f
+	nop
+	jal	t0
 	nop
 2:
 
@@ -205,6 +221,11 @@ init:
 						# destructors
 	move	a0,v0				# pass through the exit code
 	.end	init
+
+/* Assume the PICBASE set up above is no longer valid below here.  */
+#ifdef __mips_embedded_pic
+#undef PICBASE
+#endif
 	
 /*
  * _exit -- Exit from the application. Normally we cause a user trap
@@ -214,19 +235,42 @@ init:
  *          executables that contain a complete world to be linked with
  *          just the crt0.o object.
  */
+	.globl	hardware_exit_hook .text
 	.globl	_exit
 	.ent _exit
 _exit:
 7:
+#ifdef __mips_embedded_pic
+	/* Need to reinit PICBASE, since we might be called via exit()
+	   rather than via a return path which would restore old s0.  */
+#define PICBASE exit_PICBASE
+	PICBASE = .+8
+	bal	PICBASE
+	nop
+	move	s0,$31
+#endif
 #ifdef GCRT0
-	jal	_mcleanup
+	LA (t0, _mcleanup)
+	jal	t0
 	nop
 #endif
+	LA (t0, hardware_exit_hook)
+	beq	t0,zero,1f
+	nop
+	jal	t0
+	nop
+1:
+
 	# break instruction can cope with 0xfffff, but GAS limits the range:
 	break	1023
 	nop
 	b	7b				# but loop back just in-case
 	nop
 	.end _exit
+
+/* Assume the PICBASE set up above is no longer valid below here.  */
+#ifdef __mips_embedded_pic
+#undef PICBASE
+#endif
 
 /* EOF crt0.S */

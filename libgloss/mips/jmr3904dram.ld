@@ -20,6 +20,8 @@ PROVIDE (_mem_size = 0x100000); /* JMR3904 comes as standard with 512k of RAM */
  * We have to initalize them twice, so we multiple object file
  * formats, as some prepend an underscore.
  */
+PROVIDE (hardware_exit_hook = 0);
+PROVIDE (hardware_hazard_hook = 0);
 PROVIDE (hardware_init_hook = 0);
 PROVIDE (software_init_hook = 0);
 
