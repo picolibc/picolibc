@@ -1,3 +1,8 @@
+Fri May 11 01:04:17 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (handle_exceptions): Don't print message when executing
+	from a cygwin program.
+
 2001-05-10  Egor Duda  <deo@logos-m.ru>
 	    Christopher Faylor <cgf@redhat.com>
 

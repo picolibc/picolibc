@@ -358,7 +358,6 @@ try_to_debug (bool waitloop)
     {
       if (strncmp (p, "CYGWIN=", sizeof ("CYGWIN=") - 1) == 0)
 	{
-	  system_printf ("%s", p);
 	  char* q = strstr (p, "error_start") ;
 	  /* replace 'error_start=...' with '_rror_start=...' */
 	  if (q) *q = '_' ;
@@ -502,7 +501,8 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 	    {
 	      if (status_info[i].code == e->ExceptionCode)
 		{
-		  system_printf ("Exception: %s", status_info[i].name);
+		  if (!myself->ppid_handle)
+		    system_printf ("Exception: %s", status_info[i].name);
 		  break;
 		}
 	    }
