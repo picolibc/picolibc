@@ -54,7 +54,9 @@ endif
 
 w32api_source:=$(updir)/w32api
 w32api_build:=$(bupdir)/w32api
-w32api_include:=$(w32api_source)/include
+ifeq (,${findstring $(w32api_source),$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
+w32api_include:=-I$(w32api_source)/include
+endif
 w32api_lib:=$(w32api_build)/lib
 newlib_source:=$(updir1)/newlib
 newlib_build:=$(bupdir1)/newlib
@@ -64,8 +66,16 @@ mingw_build:=$(bupdir)/mingw
 mingw_source:=$(updir)/mingw
 utils_build:=$(bupdir)/utils
 utils_source:=$(updir)/utils
+ifeq (,${findstring $(newlib_source),$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
+newlib_include:=-I$(newlib_source)/libc/include
+newlib_sys_include:=-I$(newlib_source)/libc/sys
+endif
+ifeq (,${findstring $(cygwin_source)/include,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
+cygwin_include:=-I$(cygwin_source)/include
+endif
+cygwin_include:=-I$(cygwin_source)/include
 
-INCLUDES:=-I. -I$(cygwin_source)/include -I$(cygwin_source) -I$(newlib_source)/libc/sys/cygwin -I$(newlib_source)/libc/include -I$(w32api_include)
+INCLUDES:=-I. $(cygwin_include) -I$(cygwin_source) $(newlib_sys_include) $(newlib_include) $(w32api_include)
 ifdef CONFIG_DIR
 INCLUDES+=-I$(CONFIG_DIR)
 endif
@@ -92,11 +102,14 @@ o=.E
 endif
 
 libgcc:=${subst \,/,${shell $(CC_FOR_TARGET) -print-libgcc-file-name}}
-GCC_INCLUDE:=${word 1,${dir $(libgcc)}}/include
+gcc_libdir:=${word 1,${dir $(libgcc)}}
+ifeq (,${findstring $(gcc_libdir),$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
+GCC_INCLUDE:=-I$(gcc_libdir)/include
+endif
 
-COMPILE_CXX:=$(CXX) $c -nostdinc++ $(ALL_CXXFLAGS) -I$(GCC_INCLUDE) \
+COMPILE_CXX:=$(CXX) $c -nostdinc++ $(ALL_CXXFLAGS) $(GCC_INCLUDE) \
 	     -fno-rtti -fno-exceptions
-COMPILE_CC:=$(CC) $c -nostdinc $(ALL_CFLAGS) -I$(GCC_INCLUDE)
+COMPILE_CC:=$(CC) $c -nostdinc $(ALL_CFLAGS) $(GCC_INCLUDE)
 
 vpath %.a	$(cygwin_build):$(w32api_lib):$(newlib_build)/libc:$(newlib_build)/libm
 
