@@ -50,6 +50,7 @@ struct dirent
 /*
  * This is an internal data structure. Good programmers will not use it
  * except as an argument to one of the functions below.
+ * dd_stat field is now int (was short in older versions).
  */
 typedef struct
 {
@@ -70,13 +71,11 @@ typedef struct
 	 *  -1 = off the end
 	 *   positive = 0 based index of next entry
 	 */
-	short			dd_stat;
+	int			dd_stat;
 
 	/* given path for dir with search pattern (struct is extended) */
 	char			dd_name[1];
 } DIR;
-
-
 
 DIR*		opendir (const char*);
 struct dirent*	readdir (DIR*);
@@ -94,8 +93,7 @@ struct _wdirent
 	unsigned short	d_reclen;	/* Always zero. */
 	unsigned short	d_namlen;	/* Length of name in d_name. */
 	wchar_t*	d_name;		/* File name. */
-	/* NOTE: The name in the dirent structure points to the name in the
-	 *       wfinddata_t structure in the _WDIR. */
+	/* NOTE: The name in the dirent structure points to the name in the	 *       wfinddata_t structure in the _WDIR. */
 };
 
 /*
@@ -121,7 +119,7 @@ typedef struct
 	 *  -1 = off the end
 	 *   positive = 0 based index of next entry
 	 */
-	short			dd_stat;
+	int			dd_stat;
 
 	/* given path for dir with search pattern (struct is extended) */
 	wchar_t			dd_name[1];

@@ -1,3 +1,8 @@
+2002-05-15  Pascal Obry  <obry@gnat.com>
+
+	* include/dirent.h (DIR): Change dd_stat type to int.
+	(_WDIR): Likewise.
+
 2002-05-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdio.h (vsnprintf): Change inline to __inline__;
