@@ -127,10 +127,11 @@ $(mingw_build)/libmingw32.a: $(mingw_build)/Makefile
 	@$(MAKE) -C $(@D) $(@F)
 
 warn_dumper:
-	@echo '*** Not building dumper.exe since some required libraries or headers'
-	@echo '*** are missing (libbfd.a, libintl.a, and include/).'
-	@echo '*** Check out and build these libraries from sources.redhat.com if you'
-	@echo '*** need dumper.exe.  Otherwise, you can safely ignore this warning.'
+	@echo '*** Not building dumper.exe since some required libraries are'
+	@echo '*** missing: libbfd.a and libintl.a.'
+	@echo '*** If you need this program, check out the naked-bfd and naked-intl'
+	@echo '*** sources from sources.redhat.com.  Then, configure and build these'
+	@echo '*** libraries.  Otherwise, you can safely ignore this warning.'
 
 dumper.exe: module_info.o parse_pe.o dumper.o $(ALL_DEP_LDLIBS)
 ifdef VERBOSE

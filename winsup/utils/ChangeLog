@@ -1,3 +1,7 @@
+Sun Sep 10 12:50:02 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Refine dumper.exe message.
+
 Mon Aug 28 21:55:56 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* kill.c (main): Avoid skipping next argument when a signal number is
