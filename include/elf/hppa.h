@@ -290,6 +290,9 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 #define DT_HP_NEEDED		(DT_LOOS + 0x7)
 #define DT_HP_TIME_STAMP	(DT_LOOS + 0x8)
 #define DT_HP_CHECKSUM		(DT_LOOS + 0x9)
+#define DT_HP_GST_SIZE		(DT_LOOS + 0xa)
+#define DT_HP_GST_VERSION	(DT_LOOS + 0xb)
+#define DT_HP_GST_HASHVAL	(DT_LOOS + 0xc)
 
 /* Values for DT_HP_DLD_FLAGS.  */
 #define DT_HP_DEBUG_PRIVATE		0x0001 /* Map text private */

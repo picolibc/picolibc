@@ -1,3 +1,7 @@
+1999-09-15  Ulrich Drepper  <drepper@cygnus.com>
+
+	* hppa.h: Add DT_HP_GST_SIZE, DT_HP_GST_VERSION, and DT_HP_GST_HASHVAL.
+
 1999-09-04  Steve Chamberlain  <sac@pobox.com>
 
 	* pj.h: New file.
@@ -85,9 +89,9 @@ Wed Jun  9 15:16:34 1999  Jeffrey A Law  (law@cygnus.com)
 	* mcore.h (R_MCORE_RELATIVE): Define.
 
 999-05-05  Catherine Moore  <clm@cygnus.com>
- 
+
         * m68k.h (EF_CPU32): Define.
- 
+
 1999-04-21  Nick Clifton  <nickc@cygnus.com>
 
 	* reloc-macros.h (START_RELOC_NUMBERS): Prepend an underscore to
@@ -101,21 +105,21 @@ Wed Jun  9 15:16:34 1999  Jeffrey A Law  (law@cygnus.com)
 1999-04-08  Nick Clifton  <nickc@cygnus.com>
 
 	* mcore.h: New header file.  Defines for Motorolla's MCore
-	processor. 
+	processor.
 
 1999-04-08  Nick Clifton  <nickc@cygnus.com>
 
 	* common.h: Add new constants defined in: "System V Application
-	Binary Interface - DRAFT - April 29, 1998" found at the web site: 
+	Binary Interface - DRAFT - April 29, 1998" found at the web site:
 	http://www.sco.com/developer/gabi/contents.html
 
 	(EM_MMA): Removed.  Replaced with EM_MCORE as Motorolla own this
-	value. 
+	value.
 
 1999-03-31  Nick Clifton  <nickc@cygnus.com>
 
 	* reloc-macros.h: Fixed to not generate an enum with a trailing
-	comma. 
+	comma.
 
 1999-03-16  Gavin Romig-Koch  <gavin@cygnus.com>
 
