@@ -1,3 +1,11 @@
+2001-11-12  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/alloca.h: Move libc/sys/linux/include/alloca.h
+	to here.  Rearrange for general inclusion by stdlib.h.
+	* libc/include/stdlib.h: Include <alloca.h> if __STRICT_ANSI__
+	isn't defined.
+	* libc/sys/linux/include/alloca.h: Move to libc/include.
+
 2001-11-12  Anthony Green  <green@redhat.com>
 
 	* libc/sys/arm/crt0.S (__stack_base__): New symbol.

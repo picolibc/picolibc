@@ -18,6 +18,10 @@ extern "C" {
 
 #include <sys/reent.h>
 
+#ifndef __STRICT_ANSI__
+#include <alloca.h>
+#endif
+
 typedef struct 
 {
   int quot; /* quotient */
