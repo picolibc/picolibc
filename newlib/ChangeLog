@@ -1,3 +1,7 @@
+2003-07-03  Shaun Jackman  <sjackman@pathwayconnect.com>
+
+	* libc/include/stdbool.h: New header file defined by C99.
+
 2003-07-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/types.h (int8_t): Make signed.
