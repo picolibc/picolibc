@@ -1,5 +1,10 @@
 2005-01-11  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (pinfo::init): Don't close input handle on temporary (?)
+	failure.
+
+2005-01-11  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.h (_pinfo::set_exit_state): Declare new function.
 	(pinfo::exit): Move here from _pinfo::exit.
 	* sigproc.cc (child_info::sync): Use new function to set exitcode and

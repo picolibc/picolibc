@@ -230,7 +230,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	  else
 	    {
 	      debug_printf ("MapViewOfFileEx(%p, in_h %p) failed, %E", h, in_h);
-	      CloseHandle (h);
+	      if (h != in_h)
+		CloseHandle (h);
 	    }
 	  if (i < 9)
 	    continue;
