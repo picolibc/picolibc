@@ -1,5 +1,9 @@
 2002-08-01  Christopher Faylor  <cgf@redhat.com>
 
+	* syscalls.cc (link): Properly deal with a link to a symlink.
+
+2002-08-01  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc: Remove cruft.
 
 2002-08-01  Christopher Faylor  <cgf@redhat.com>

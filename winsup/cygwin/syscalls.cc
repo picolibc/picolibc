@@ -617,6 +617,7 @@ _link (const char *a, const char *b)
   sigframe thisframe (mainthread);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
   path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
+  extern BOOL allow_winsymlinks;
 
   if (real_a.error)
     {
@@ -647,6 +648,8 @@ _link (const char *a, const char *b)
   /* Try to make hard link first on Windows NT */
   if (wincap.has_hard_links ())
     {
+      if (allow_winsymlinks && real_b.issymlink ())
+	strcat (real_a, ".lnk");
       if (CreateHardLinkA (real_b, real_a, NULL))
 	{
 	  res = 0;
