@@ -1,3 +1,8 @@
+2003-08-08  David Rothenberger  <daveroth@acm.org>
+
+	* grp.cc (read_group): Set __group32.gr_mem pointer back to &null_ptr
+	after free() is called.
+
 2003-08-05  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Rework to accommodate new speclib arguments.

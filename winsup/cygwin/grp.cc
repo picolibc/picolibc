@@ -75,7 +75,10 @@ pwdgrp::read_group ()
 {
   for (int i = 0; i < gr.curr_lines; i++)
     if ((*group_buf)[i].gr_mem != &null_ptr)
-      free ((*group_buf)[i].gr_mem);
+      {
+        free ((*group_buf)[i].gr_mem);
+        (*group_buf)[i].gr_mem = &null_ptr;
+      }
 
   load ("/etc/group");
 
