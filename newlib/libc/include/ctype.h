@@ -38,6 +38,7 @@ int _EXFUN(_toupper, (int __c));
 
 extern	__IMPORT _CONST char	_ctype_[];
 
+#ifndef __cplusplus
 #define	isalpha(c)	((_ctype_+1)[(unsigned)(c)]&(_U|_L))
 #define	isupper(c)	((_ctype_+1)[(unsigned)(c)]&_U)
 #define	islower(c)	((_ctype_+1)[(unsigned)(c)]&_L)
@@ -57,6 +58,7 @@ extern	__IMPORT _CONST char	_ctype_[];
 # define tolower(c) \
 	__extension__ ({ int __x = (c); isupper(__x) ? (__x - 'A' + 'a') : __x;})
 #endif
+#endif /* !__cplusplus */
 
 #ifndef __STRICT_ANSI__
 #define isascii(c)	((unsigned)(c)<=0177)

@@ -1,3 +1,7 @@
+2001-06-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+        * /libc/include/ctype.h (is* and to* macros): Do not define if C++.
+
 2001-06-11  Egor Duda  <deo@logos-m.ru>
 
         * libc/ctype/ctype_.c: When compiled with gcc on platforms
