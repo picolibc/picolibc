@@ -1,5 +1,10 @@
 2002-10-22  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Always
+	consider .exe files and '#!' shell scripts to be executable.
+
+2002-10-22  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc (cygthread::exiting): New variable.
 	(cygthread::initialized): Delete.
 	(cygthread::stub): Use exiting variable to determine when to exit.
