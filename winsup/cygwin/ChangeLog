@@ -1,3 +1,8 @@
+Sun Sep  3 00:38:40 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc (environ_init): Don't free the new environment table after
+	we've just copied stuff to it.
+
 Sun Sep  3 00:07:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Add cygheap.o.

@@ -19,6 +19,7 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 
 extern BOOL allow_glob;
 extern BOOL allow_ntea;
@@ -535,8 +536,9 @@ environ_init (char **envp)
     {
       sz = envsize (envp, 1);
       char **newenv = (char **) malloc (sz);
-      envp = (char **) memcpy (newenv, envp, sz);
+      memcpy (newenv, envp, sz);
       cfree (envp);
+      envp = newenv;
       goto out;
     }
 
