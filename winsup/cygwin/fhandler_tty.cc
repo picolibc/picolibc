@@ -456,6 +456,7 @@ fhandler_tty_slave::open (int flags, mode_t)
     {
       *this = *(fhandler_tty_slave *) arch;
       termios_printf ("copied tty fhandler archetype");
+      set_flags ((flags & ~O_TEXT) | O_BINARY);
       cygheap->open_fhs++;
       goto out;
     }
