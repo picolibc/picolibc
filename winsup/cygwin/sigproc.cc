@@ -99,8 +99,8 @@ Static int nzombies = 0;		// Number of deceased children
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 Static waitq waitq_main;		// Storage for main thread
 
-muto NO_COPY *sync_proc_subproc = NULL;	// Control access to
-					//  subproc stuff
+muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
+muto NO_COPY *sync_sig_send = NULL;	// Control access to sig_send
 
 DWORD NO_COPY maintid = 0;		// ID of the main thread
 DWORD NO_COPY sigtid = 0;		// ID of the signal thread
@@ -618,6 +618,7 @@ sigproc_init ()
    * access to the children and zombie arrays.
    */
   sync_proc_subproc = new_muto (FALSE, NULL);
+  sync_sig_send = new_muto (FALSE, NULL);
 
   /* Initialize waitq structure for main thread.  A waitq structure is
    * allocated for each thread that executes a wait to allow multiple threads
@@ -770,18 +771,25 @@ sig_send (pinfo *p, int sig)
   if (sd == NULL)
     sd = signal_dispatch_storage.create ();
 #endif
+
+  sync_sig_send->acquire ();
   /* Increment the sigtodo array to signify which signal to assert.
    */
   (void) InterlockedIncrement (p->getsigtodo(sig));
 
   /* Notify the process that a signal has arrived.
    */
-  int prio;
   SetLastError (0);
+
+#if 0
+  int prio;
   prio = GetThreadPriority (GetCurrentThread ());
   (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+#endif
+
   if (!ReleaseSemaphore (thiscatch, 1, NULL) && (int) GetLastError () > 0)
     {
+sigproc_printf ("ReleaseSemaphore failed, %E");
       /* Couldn't signal the semaphore.  This probably means that the
        * process is exiting.
        */
@@ -799,6 +807,7 @@ sig_send (pinfo *p, int sig)
 	}
       goto out;
     }
+sigproc_printf ("ReleaseSemaphore succeeded");
 
   /* No need to wait for signal completion unless this was a signal to
    * this process.
@@ -809,16 +818,19 @@ sig_send (pinfo *p, int sig)
    */
   if (!wait_for_completion)
     {
-    rc = WAIT_OBJECT_0;
-    sip_printf ("Not waiting for sigcomplete.  its_me %d sig %d", its_me, sig);
-    if (!its_me)
-      ForceCloseHandle (thiscatch);
+      rc = WAIT_OBJECT_0;
+      sip_printf ("Not waiting for sigcomplete.  its_me %d sig %d", its_me, sig);
+      sync_sig_send->release ();
+      if (!its_me)
+	ForceCloseHandle (thiscatch);
     }
   else
     {
       sip_printf ("Waiting for thiscomplete %p", thiscomplete);
 
       SetLastError (0);
+      sync_sig_send->release ();
+Sleep (0);
       rc = WaitForSingleObject (thiscomplete, WSSC);
       /* Check for strangeness due to this thread being redirected by the
 	 signal handler.  Sometimes a WAIT_TIMEOUT will occur when the
@@ -829,7 +841,9 @@ sig_send (pinfo *p, int sig)
 	rc = WAIT_OBJECT_0;
     }
 
+#if 0
   SetThreadPriority (GetCurrentThread (), prio);
+#endif
 
   if (rc == WAIT_OBJECT_0)
     rc = 0;		// Successful exit

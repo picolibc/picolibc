@@ -1,3 +1,10 @@
+Sun Mar  5 01:17:05 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (call_handler): Streamline to use only one call to
+	ResumeThread.
+	* sigproc.cc (sig_send): Use a muto around the ReleaseSemaphore.
+	Remove priority setting since it didn't solve anything.
+
 Tue Feb 29 00:46:09 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (sig_send): Temporarily set priority to highest while

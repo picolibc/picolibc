@@ -719,7 +719,7 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       SetEvent (signal_arrived);	// For an EINTR case
       sigproc_printf ("armed signal_arrived");
       exec_exit = sig;			// Maybe we'll exit with this value
-      goto out;
+      goto out1;
     }
   hth = myself->getthread2signal ();
 
@@ -749,7 +749,7 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       Sleep (0);
     }
 
-  sigproc_printf ("suspend said %d, %E", res);
+  sigproc_printf ("SuspendThread returned %d", res);
 
   if (sigsave.cx)
     {
@@ -764,7 +764,6 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       if (!GetThreadContext (hth, cx))
 	{
 	  system_printf ("couldn't get context of main thread, %E");
-	  ResumeThread (hth);
 	  goto out;
 	}
     }
@@ -787,9 +786,11 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       proc_subproc(PROC_CLEARWAIT, 1);
     }
 
-  (void) ResumeThread (hth);
-
 out:
+  res = ResumeThread (hth);
+  sigproc_printf ("ResumeThread returned %d", res);
+
+out1:
   sigproc_printf ("returning %d", interrupted);
   return interrupted;
 }
@@ -1046,6 +1047,9 @@ events_init (void)
       *end = '\0';
     }
   windows_system_directory_length = end - windows_system_directory;
+  debug_printf ("windows_system_directory '%s', windows_system_directory_length %d",
+		windows_system_directory, windows_system_directory_length);
+  debug_printf ("cygwin_hmodule %p", cygwin_hmodule);
 }
 
 void
