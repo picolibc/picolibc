@@ -197,7 +197,7 @@ struct mips_opcode
   unsigned long membership;
 };
 
-/* These are the characters which may appears in the args field of an
+/* These are the characters which may appear in the args field of an
    instruction.  They appear in the order in which the fields appear
    when the instruction is used.  Commas and parentheses in the args
    string are ignored when assembling, and written into the output
