@@ -1,3 +1,8 @@
+2002-12-02  Andrew Stadt  <acstadt@sympatico.ca>
+
+	* include/shellapi.h (_SHFILEOPSTRUCTA,_SHFILEOPSTRUCTW):
+	Wrap with pshpack2.h/poppack.h to correct alignment.
+
 2002-12-02  Ken Fitlike  <kenfitlike@users.sourceforge.net>
 
 	* include/commctrl.h (LVBKIF_*): Add defines.

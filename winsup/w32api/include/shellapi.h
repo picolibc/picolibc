@@ -154,6 +154,7 @@ typedef struct _SHELLEXECUTEINFOW {
 	HANDLE hIcon;
 	HANDLE hProcess;
 } SHELLEXECUTEINFOW,*LPSHELLEXECUTEINFOW;
+#include <pshpack2.h>
 typedef struct _SHFILEOPSTRUCTA {
 	HWND hwnd;
 	UINT wFunc;
@@ -174,6 +175,7 @@ typedef struct _SHFILEOPSTRUCTW {
 	PVOID hNameMappings;
 	LPCWSTR lpszProgressTitle;
 } SHFILEOPSTRUCTW,*LPSHFILEOPSTRUCTW;
+#include <poppack.h>
 typedef struct _SHFILEINFOA {
 	HICON hIcon;
 	int iIcon;
