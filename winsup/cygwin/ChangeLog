@@ -1,3 +1,7 @@
+2002-01-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (fchdir): Call chdir with full windows path.
+
 2002-01-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dir.cc: Use INVALID_FILE_ATTRIBUTES instead of "(DWORD) -1"
