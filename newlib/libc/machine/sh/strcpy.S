@@ -27,9 +27,11 @@ ENTRY(strcpy)
 	pta/l loop, tr0
 	ori r2,-8,r22
 	mcmpeq.b r5, r63, r6
-	bge/u r22, r23, tr2 // no_lddst
+	bgt/u r22, r23, tr2 // no_lddst
 
-	// r22 < r23 ;  Need to do a load from the destination.
+	// r22 < r23 :  Need to do a load from the destination.
+	// r22 == r23 : Doesn't actually need to load from destination,
+	//              but still can be handled here.
 	ldlo.q r2, 0, r9
 	movi -1, r8
 	SHLO r8, r7, r8
@@ -41,6 +43,8 @@ ENTRY(strcpy)
 	addi r0, 8, r0
 	blink tr1, r63 // shortstring
 no_lddst:
+	// r22 > r23: note that for r22 == r23 the sthi.q would clobber
+	//            bytes before the destination region.
 	stlo.q r2, 0, r4
 	SHHI r4, r7, r4
 	sthi.q r0, -1, r4

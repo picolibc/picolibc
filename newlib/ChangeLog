@@ -1,4 +1,8 @@
-Thu Jun 13 15:52:03 2002  J"orn Rennecke <joern.rennecke@superh.com>
+Thu Jun 13 19:23:40 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/machine/sh/strcpy.S (strcpy, __SHMEDIA__ code):
+	Fix clobbering bytes before destination if src and dst have same
+	non-zero misalignment.
 
 	* libc/machine/sh/memset.S (memset, __SHMEDIA__ code):
 	Fixed bug in writing end of set region.
