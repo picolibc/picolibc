@@ -67,7 +67,7 @@ SUBDIRS = lib
 
 PACKAGE = w32api
 VERSION = 1.4
-CYGRELEASE = 1
+CYGRELEASE = 2
 
 DIST_FILES = Makefile.in configure.in configure config.guess config.sub \
 install-sh README ChangeLog TODO CONTRIBUTIONS

@@ -87,6 +87,7 @@ LD = @LD@
 # headers
 
 HEADERS = $(notdir $(wildcard $(srcdir)/../include/*.h))
+GL_HEADERS = $(notdir $(wildcard $(srcdir)/../include/GL/*.h))
 
 # libraries
 
@@ -157,6 +158,10 @@ install-headers:
 	$(mkinstalldirs) $(inst_includedir)
 	for i in $(HEADERS); do \
 		$(INSTALL_DATA) $(srcdir)/../include/$$i $(inst_includedir)/$$i ; \
+	done
+	$(mkinstalldirs) $(inst_includedir)/GL
+	for i in $(GL_HEADERS); do \
+		$(INSTALL_DATA) $(srcdir)/../include/GL/$$i $(inst_includedir)/GL/$$i ; \
 	done
 
 # uninstall headers and libraries from a target specified directory
