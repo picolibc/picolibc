@@ -13,7 +13,6 @@ struct per_module
   char ***envptr;
   void (**ctors)(void);
   void (**dtors)(void);
-  bool dtors_run;
   void *data_start;
   void *data_end;
   void *bss_start;

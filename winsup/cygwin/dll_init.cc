@@ -59,11 +59,6 @@ void
 per_module::run_dtors ()
 {
   void (**pfunc)() = dtors;
-
-  if( dtors_run )
-     return;
-  dtors_run = true;
-
   for (int i = 1; pfunc[i]; i++)
     (pfunc[i]) ();
 }
@@ -76,8 +71,6 @@ dll::init ()
 
   /* Why didn't we just import this variable? */
   *(p.envptr) = __cygwin_environ;
-
-  p.dtors_run = false;
 
   /* Don't run constructors or the "main" if we've forked. */
   if (!in_forkee)

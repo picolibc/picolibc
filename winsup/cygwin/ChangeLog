@@ -1,9 +1,3 @@
-2002-04-16  Thomas Pfaff  <tpfaff@gmx.net>
-	
-	* dll_init.h (per_process::dtors_run): New member.
-	* dll_init.cc (per_module::run_dtors): Run dtors only once.
-	(dll::init): Initialize dtors_run flag.
-
 Wed Apr 17 11:27:04 2002  Jason Tishler <jason@tishler.net>
 
 	* security.cc (get_lsa_srv_inf): Prevent extraneous backslashes for
