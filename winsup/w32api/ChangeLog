@@ -1,12 +1,29 @@
+2001-08-31  Earnie Boyd  <earnie@SF.Net>
+
+	* config.guess: Remove the \r from the end of line.
+	* config.sub: Ditto.
+
+2001-08-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h: Allow anonymous struct in [U]LARGE_INTEGER
+	if __cplusplus as well as if _ANONYMOUS_STRUCT.
+
+2001-08-29  Earnie Boyd  <earnie@SF.Net>
+
+	* config.guess: Add the MSYS system.
+	* config.sub: Ditto.
+	* include/winsock.h: Add the __INSIDE_MSYS__ protections.
+	* incldue/winsock2.h: Ditto.
+
 2001-08-29  Eric Kohl  <ekohl@users.sourceforge.net>
 
-	* include\winnt.h: Allow anonymous (Xxx.LowPart) or
+	* include/winnt.h: Allow anonymous (Xxx.LowPart) or
 	non-anonymous (Xxx.u.LowPart) access to HighPart and
 	LowPart of a LARGE_INTEGER or ULARGE_INTEGER.
 
 2001-08-24  TAMURA Kent  <tkent@users.sourceforge.net>
 
-    * include/wingdi.h (HANGUL_CHARSET): Add define.
+	* include/wingdi.h (HANGUL_CHARSET): Add define.
 
 2001-08-21  Earnie Boyd  <earnie@SF.Net>
 

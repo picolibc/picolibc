@@ -91,7 +91,7 @@ if (__i == ((fd_set *)(set))->fd_count) {\
 #warning "fd_set and associated macros have been defined in sys/types.  \
     This may cause runtime problems with W32 sockets" 
 #endif /* ndef _SYS_TYPES_FD_SET */
-#ifndef __INSIDE_CYGWIN__
+#if !(defined (__INSIDE_CYGWIN__) || (__INSIDE_MSYS__))
 struct timeval {
 	long    tv_sec;
 	long    tv_usec;
@@ -114,19 +114,19 @@ struct linger {
 	((tvp)->tv_sec cmp (uvp)->tv_sec) : \
 	((tvp)->tv_usec cmp (uvp)->tv_usec))
 #define timerclear(tvp)	 (tvp)->tv_sec = (tvp)->tv_usec = 0
-#endif /* ndef __INSIDE_CYGWIN__ */
+#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 #define IOCPARM_MASK	0x7f
 #define IOC_VOID	0x20000000
 #define IOC_OUT	0x40000000
 #define IOC_IN	0x80000000
 #define IOC_INOUT	(IOC_IN|IOC_OUT)
 
-#ifndef __INSIDE_CYGWIN__
+#if ! (defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 #define _IO(x,y)	(IOC_VOID|((x)<<8)|(y))
 #define _IOR(x,y,t)	(IOC_OUT|(((long)sizeof(t)&IOCPARM_MASK)<<16)|((x)<<8)|(y))
 #define _IOW(x,y,t)	(IOC_IN|(((long)sizeof(t)&IOCPARM_MASK)<<16)|((x)<<8)|(y))
 #define FIONBIO	_IOW('f', 126, u_long)
-#endif /* ndef __INSIDE_CYGWIN__ */
+#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
 #define FIONREAD	_IOR('f', 127, u_long)
 #define FIOASYNC	_IOW('f', 125, u_long)
@@ -136,7 +136,7 @@ struct linger {
 #define SIOCGLOWAT	_IOR('s',  3, u_long)
 #define SIOCATMARK	_IOR('s',  7, u_long)
 
-#ifndef __INSIDE_CYGWIN__
+#if ! (defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 struct netent {
 	char	* n_name;
 	char	**n_aliases;
@@ -154,7 +154,7 @@ struct  protoent {
 	char	**p_aliases;
 	short	p_proto;
 };
-#endif /* __INSIDE_CYGWIN__ */
+#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
 #define IPPROTO_IP	0
 #define IPPROTO_ICMP 1
@@ -245,7 +245,7 @@ typedef struct WSAData {
 } WSADATA;
 typedef WSADATA *LPWSADATA;
 
-#ifndef __INSIDE_CYGWIN__
+#if ! (defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 #define IP_OPTIONS	1
 #define SO_DEBUG	1
 #define SO_ACCEPTCONN	2
@@ -265,7 +265,7 @@ typedef WSADATA *LPWSADATA;
 #define SO_RCVTIMEO	0x1006
 #define SO_ERROR	0x1007
 #define SO_TYPE	0x1008
-#endif
+#endif ./* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
 #define INVALID_SOCKET (SOCKET)(~0)
 #define SOCKET_ERROR	(-1)
@@ -305,13 +305,13 @@ typedef WSADATA *LPWSADATA;
 #define AF_12844    25
 #define AF_IRDA     26
 #define AF_NETDES   28                     
-#ifndef __INSIDE_CYGWIN__
+#if !(defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 #define AF_MAX	29
 struct sockaddr {
 	u_short sa_family;
 	char	sa_data[14];
 };
-#endif /* ndef __INSIDE_CYGWIN__ */
+#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
 struct sockproto {
 	u_short sp_family;
@@ -344,12 +344,12 @@ struct sockproto {
 #define PF_INET6	AF_INET6
 #define PF_MAX	AF_MAX
 #define SOL_SOCKET	0xffff
-#ifndef __INSIDE_CYGWIN__
+#if ! (defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 #define SOMAXCONN	0x7fffffff /* (5) in WinSock1.1 */
 #define MSG_OOB	1
 #define MSG_PEEK	2
 #define MSG_DONTROUTE	4
-#endif  /* ndef __INSIDE_CYGWIN__ */
+#endif  /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 #define MSG_MAXIOVLEN	16
 #define MSG_PARTIAL	0x8000
 #define MAXGETHOSTSTRUCT	1024
@@ -431,14 +431,14 @@ struct sockproto {
 #define WSANO_RECOVERY	(WSABASEERR+1003)
 #define WSANO_DATA	(WSABASEERR+1004)
 #define WSANO_ADDRESS	WSANO_DATA
-#ifndef __INSIDE_CYGWIN__
+#if !(defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 #define h_errno WSAGetLastError()
 #define HOST_NOT_FOUND	WSAHOST_NOT_FOUND
 #define TRY_AGAIN	WSATRY_AGAIN
 #define NO_RECOVERY	WSANO_RECOVERY
 #define NO_DATA	WSANO_DATA
 #define NO_ADDRESS	WSANO_ADDRESS
-#endif
+#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 SOCKET PASCAL accept(SOCKET,struct sockaddr*,int*);
 int PASCAL bind(SOCKET,const struct sockaddr*,int);
 int PASCAL closesocket(SOCKET);
@@ -484,14 +484,14 @@ HANDLE PASCAL WSAAsyncGetHostByName(HWND,u_int,const char*,char*,int);
 HANDLE PASCAL WSAAsyncGetHostByAddr(HWND,u_int,const char*,int,int,char*,int);
 int PASCAL WSACancelAsyncRequest(HANDLE);
 int PASCAL WSAAsyncSelect(SOCKET,HWND,u_int,long);
-#ifndef __INSIDE_CYGWIN__
+#if ! (defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 u_long PASCAL htonl(u_long);
 u_long PASCAL ntohl(u_long);
 u_short PASCAL htons(u_short);
 u_short PASCAL ntohs(u_short);
 int PASCAL select(int nfds,fd_set*,fd_set*,fd_set*,const struct timeval*);
 int PASCAL gethostname(char*,int);
-#endif /* ndef __INSIDE_CYGWIN__ */
+#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
 #define WSAMAKEASYNCREPLY(b,e)	MAKELONG(b,e)
 #define WSAMAKESELECTREPLY(e,error)	MAKELONG(e,error)

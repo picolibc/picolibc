@@ -1705,7 +1705,7 @@ typedef union _LARGE_INTEGER {
     DWORD LowPart;
     LONG  HighPart;
   } u;
-#if _ANONYMOUS_STRUCT
+#if _ANONYMOUS_STRUCT || defined __cplusplus
   struct {
     DWORD LowPart;
     LONG  HighPart;
@@ -1718,7 +1718,7 @@ typedef union _ULARGE_INTEGER {
     DWORD LowPart;
     DWORD HighPart;
   } u;
-#if _ANONYMOUS_STRUCT
+#if _ANONYMOUS_STRUCT || defined __cplusplus
   struct {
     DWORD LowPart;
     DWORD HighPart;
