@@ -129,9 +129,34 @@
 typedef short int __int16_t;
 typedef unsigned short int __uint16_t;
 
-#include <limits.h>
+/* This block should be kept in sync with GCC's limits.h.  The point
+   of having these definitions here is to not include limits.h, which
+   would pollute the user namespace, while still using types of the
+   the correct widths when deciding how to define __int32_t and
+   __int64_t.  */
+#ifndef __INT_MAX__
+# ifdef INT_MAX
+#  define __INT_MAX__ INT_MAX
+# else
+#  define __INT_MAX__ 2147483647
+# endif
+#endif
 
-#if INT_MAX == 32767
+#ifndef __LONG_MAX__
+# ifdef LONG_MAX
+#  define __LONG_MAX__ LONG_MAX
+# else
+#  if defined (__alpha__) || (defined (__sparc__) && defined(__arch64__)) \
+      || defined (__sparcv9)
+#   define __LONG_MAX__ 9223372036854775807L
+#  else
+#   define __LONG_MAX__ 2147483647L
+#  endif /* __alpha__ || sparc64 */
+# endif
+#endif
+/* End of block that should be kept in sync with GCC's limits.h.  */
+
+#if __INT_MAX__ == 32767
 typedef long int __int32_t;
 typedef unsigned long int __uint32_t;
 #else
@@ -139,7 +164,7 @@ typedef int __int32_t;
 typedef unsigned int __uint32_t;
 #endif
 
-#if LONG_MAX > 2147483647 || !defined(__GNUC__)
+#if __LONG_MAX__ > 2147483647 || !defined(__GNUC__)
 typedef long int __int64_t;
 typedef unsigned long int __uint64_t;
 #else
@@ -152,7 +177,7 @@ __extension__ typedef unsigned long long __uint64_t;
 #endif
 
 #undef __RAND_MAX
-#if INT_MAX == 32767
+#if __INT_MAX__ == 32767
 #define __RAND_MAX 32767
 #else
 #define __RAND_MAX 0x7fffffff
