@@ -42,20 +42,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EI_NIDENT	16		/* Size of e_ident[] */
 
 typedef struct elf_internal_ehdr {
-  unsigned char		e_ident[EI_NIDENT];	/* ELF "magic number" */
-  bfd_vma		e_entry;		/* Entry point virtual address */
-  bfd_size_type		e_phoff;		/* Program header table file offset */
-  bfd_size_type		e_shoff;		/* Section header table file offset */
-  unsigned long		e_version;		/* Identifies object file version */
-  unsigned long		e_flags;		/* Processor-specific flags */
-  unsigned short	e_type;			/* Identifies object file type */
-  unsigned short	e_machine;		/* Specifies required architecture */
-  unsigned short	e_ehsize;		/* ELF header size in bytes */
-  unsigned short	e_phentsize;		/* Program header table entry size */
-  unsigned short	e_phnum;		/* Program header table entry count */
-  unsigned short	e_shentsize;		/* Section header table entry size */
-  unsigned short	e_shnum;		/* Section header table entry count */
-  unsigned short	e_shstrndx;		/* Section header string table index */
+  unsigned char		e_ident[EI_NIDENT]; /* ELF "magic number" */
+  bfd_vma		e_entry;	/* Entry point virtual address */
+  bfd_size_type		e_phoff;	/* Program header table file offset */
+  bfd_size_type		e_shoff;	/* Section header table file offset */
+  unsigned long		e_version;	/* Identifies object file version */
+  unsigned long		e_flags;	/* Processor-specific flags */
+  unsigned short	e_type;		/* Identifies object file type */
+  unsigned short	e_machine;	/* Specifies required architecture */
+  unsigned short	e_ehsize;	/* ELF header size in bytes */
+  unsigned short	e_phentsize;	/* Program header table entry size */
+  unsigned short	e_phnum;	/* Program header table entry count */
+  unsigned short	e_shentsize;	/* Section header table entry size */
+  unsigned short	e_shnum;	/* Section header table entry count */
+  unsigned short	e_shstrndx;	/* Section header string table index */
 } Elf_Internal_Ehdr;
 
 #define elf32_internal_ehdr elf_internal_ehdr
