@@ -10,9 +10,20 @@ extern "C" {
 
 #ifndef WINVER
 #define WINVER 0x0400
+/*
+ * If you need Win32 API features newer the Win95 and WinNT then you must
+ * define WINVER before including windows.h or any other method of including
+ * the windef.h header.
+ */
 #endif
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT WINVER
+/*
+ * There may be the need to define _WIN32_WINNT to a value different from
+ * the value of WINVER.  I don't have any example of why you would do that.
+ * However, if you must then define _WIN32_WINNT to the value required before
+ * including windows.h or any other method of including the windef.h header.
+ */
 #endif
 #ifndef WIN32
 #define WIN32
