@@ -92,14 +92,6 @@ enum homebodies
   CH_HOME
 };
 
-enum impersonation
-{
-  IMP_BAD = -1,
-  IMP_NONE = 0,
-  IMP_EXTERNAL,
-  IMP_INTERNAL
-};
-
 class cygheap_user
 {
   /* Extendend user information.
@@ -125,7 +117,7 @@ public:
      to `set_impersonation_token()'. */
   HANDLE external_token;
   HANDLE internal_token;
-  enum impersonation impersonation_state;
+  HANDLE current_token;
 
   /* CGF 2002-06-27.  I removed the initializaton from this constructor
      since this class is always allocated statically.  That means that everything
@@ -170,41 +162,40 @@ public:
   PSID sid () const { return psid; }
   PSID orig_sid () const { return orig_psid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);
-  bool issetuid () const
-  {
-    return impersonation_state > IMP_NONE;
-  }
-  HANDLE token ()
-  {
-    if (impersonation_state == IMP_EXTERNAL)
-      return external_token;
-    if (impersonation_state == IMP_INTERNAL)
-      return internal_token;
-    return INVALID_HANDLE_VALUE;
-  }
+  bool issetuid () const { return current_token != INVALID_HANDLE_VALUE; }
+  HANDLE token () { return current_token; }
   void deimpersonate ()
   {
-    if (impersonation_state > IMP_NONE)
+    if (issetuid ())
       RevertToSelf ();
   }
   void reimpersonate ()
   {
-    if (impersonation_state > IMP_NONE
+    if (issetuid ()
 	&& !ImpersonateLoggedOnUser (token ()))
       system_printf ("ImpersonateLoggedOnUser: %E");
   }
-  bool has_impersonation_tokens () { return external_token || internal_token; }
+  bool has_impersonation_tokens ()
+    { return external_token != INVALID_HANDLE_VALUE
+             || internal_token != INVALID_HANDLE_VALUE
+	     || current_token != INVALID_HANDLE_VALUE; }
   void close_impersonation_tokens ()
   {
-    if (external_token)
+    if (current_token != INVALID_HANDLE_VALUE)
+      {
+	if( current_token != external_token && current_token != internal_token)
+	  CloseHandle (current_token);
+	current_token = INVALID_HANDLE_VALUE;
+      }
+    if (external_token != INVALID_HANDLE_VALUE)
       {
 	CloseHandle (external_token);
-	external_token = 0;
+	external_token = INVALID_HANDLE_VALUE;
       }
-    if (internal_token)
+    if (internal_token != INVALID_HANDLE_VALUE)
       {
 	CloseHandle (internal_token);
-	internal_token = 0;
+	internal_token = INVALID_HANDLE_VALUE;
       }
   }
   const char *cygheap_user::test_uid (char *&, const char *, size_t)

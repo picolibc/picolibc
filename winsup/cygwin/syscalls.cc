@@ -2058,7 +2058,6 @@ seteuid32 (__uid32_t uid)
   HANDLE ptok, new_token = INVALID_HANDLE_VALUE;
   struct passwd * pw_new;
   PSID origpsid, psid2 = NO_SID;
-  enum impersonation new_state = IMP_BAD;
   BOOL token_is_internal;
 
   pw_new = internal_getpwuid (uid);
@@ -2079,48 +2078,47 @@ seteuid32 (__uid32_t uid)
 
   /* Verify if the process token is suitable. */
   if (verify_token (ptok, usersid, groups))
-    new_state = IMP_NONE;
-  /* Verify if a current token is suitable */
-  else if (cygheap->user.external_token
+    new_token = ptok;
+  /* Verify if the external token is suitable */
+  else if (cygheap->user.external_token != INVALID_HANDLE_VALUE
 	   && verify_token (cygheap->user.external_token, usersid, groups))
-    {
-      new_token = cygheap->user.external_token;
-      new_state = IMP_EXTERNAL;
-    }
-  else if (cygheap->user.internal_token
+    new_token = cygheap->user.external_token;
+  /* Verify if the current token (internal or former external) is suitable */
+  else if (cygheap->user.current_token != INVALID_HANDLE_VALUE
+	   && cygheap->user.current_token != cygheap->user.external_token
+	   && verify_token (cygheap->user.current_token, usersid, groups,
+			    &token_is_internal))
+    new_token = cygheap->user.current_token;
+  /* Verify if the internal token is suitable */
+  else if (cygheap->user.internal_token != INVALID_HANDLE_VALUE
+	   && cygheap->user.internal_token != cygheap->user.current_token
 	   && verify_token (cygheap->user.internal_token, usersid, groups,
 			    &token_is_internal))
-    {
-      new_token = cygheap->user.internal_token;
-      new_state = IMP_INTERNAL;
-    }
+    new_token = cygheap->user.internal_token;
 
-  debug_printf ("New token %d, state %d", new_token, new_state);
-  /* Return if current token is valid */
-  if (cygheap->user.impersonation_state == new_state)
-    {
-      cygheap->user.reimpersonate ();
-      goto success; /* No change */
-    }
+  debug_printf ("Found token %d", new_token);
 
   /* Set process def dacl to allow access to impersonated token */
-  char dacl_buf[MAX_DACL_LEN (5)];
-  if (usersid != (origpsid = cygheap->user.orig_sid ()))
-    psid2 = usersid;
-  if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
+  if (cygheap->user.current_token != new_token)
     {
-      TOKEN_DEFAULT_DACL tdacl;
-      tdacl.DefaultDacl = (PACL) dacl_buf;
-      if (!SetTokenInformation (ptok, TokenDefaultDacl,
-				&tdacl, sizeof dacl_buf))
-	debug_printf ("SetTokenInformation"
-		      "(TokenDefaultDacl): %E");
+      char dacl_buf[MAX_DACL_LEN (5)];
+      if (usersid != (origpsid = cygheap->user.orig_sid ()))
+	psid2 = usersid;
+      if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
+        {
+	  TOKEN_DEFAULT_DACL tdacl;
+	  tdacl.DefaultDacl = (PACL) dacl_buf;
+	  if (!SetTokenInformation (ptok, TokenDefaultDacl,
+				    &tdacl, sizeof dacl_buf))
+	    debug_printf ("SetTokenInformation"
+			  "(TokenDefaultDacl): %E");
+	}
     }
 
-  if (new_state == IMP_BAD)
+  /* If no impersonation token is available, try to
+     authenticate using NtCreateToken () or subauthentication. */
+  if (new_token == INVALID_HANDLE_VALUE)
     {
-      /* If no impersonation token is available, try to
-	 authenticate using NtCreateToken () or subauthentication. */
       new_token = create_token (usersid, groups, pw_new);
       if (new_token == INVALID_HANDLE_VALUE)
 	{
@@ -2130,48 +2128,31 @@ seteuid32 (__uid32_t uid)
 	  if (new_token == INVALID_HANDLE_VALUE)
 	    goto failed;
 	}
-      new_state = IMP_INTERNAL;
-    }
-
-  /* If using the token, set info and impersonate */
-  if (new_state != IMP_NONE)
-    {
-      /* If the token was explicitly created, all information has
-	 already been set correctly. */
-      if (new_state == IMP_EXTERNAL)
-	{
-	  /* Try setting owner to same value as user. */
-	  if (!SetTokenInformation (new_token, TokenOwner,
-				    &usersid, sizeof usersid))
-	    debug_printf ("SetTokenInformation(user.token, "
-			  "TokenOwner): %E");
-	  /* Try setting primary group in token to current group */
-	  if (!SetTokenInformation (new_token,
-				    TokenPrimaryGroup,
-				    &groups.pgsid, sizeof (cygsid)))
-	    debug_printf ("SetTokenInformation(user.token, "
-			  "TokenPrimaryGroup): %E");
-	}
-      /* Try to impersonate. */
-      if (!ImpersonateLoggedOnUser (new_token))
-	{
-	  debug_printf ("ImpersonateLoggedOnUser %E");
-	  __seterrno ();
-	  goto failed;
-	}
       /* Keep at most one internal token */
-      if (new_state == IMP_INTERNAL)
-        {
-	  if (cygheap->user.internal_token)
-	    CloseHandle (cygheap->user.internal_token);
-	  cygheap->user.internal_token = new_token;
-	}
+      if (cygheap->user.internal_token != INVALID_HANDLE_VALUE)
+	CloseHandle (cygheap->user.internal_token);
+      cygheap->user.internal_token = new_token;
     }
-  cygheap->user.set_sid (usersid);
+  else if (new_token != ptok)
+    {
+      /* Try setting owner to same value as user. */
+      if (!SetTokenInformation (new_token, TokenOwner,
+				&usersid, sizeof usersid))
+	debug_printf ("SetTokenInformation(user.token, "
+		      "TokenOwner): %E");
+      /* Try setting primary group in token to current group */
+      if (!SetTokenInformation (new_token,
+				TokenPrimaryGroup,
+				&groups.pgsid, sizeof (cygsid)))
+	debug_printf ("SetTokenInformation(user.token, "
+		      "TokenPrimaryGroup): %E");
+    }
 
-success:
   CloseHandle (ptok);
-  cygheap->user.impersonation_state = new_state;
+  cygheap->user.set_sid (usersid);
+  cygheap->user.current_token = new_token == ptok ? INVALID_HANDLE_VALUE
+						  : new_token;
+  cygheap->user.reimpersonate ();
 success_9x:
   cygheap->user.set_name (pw_new->pw_name);
   myself->uid = uid;

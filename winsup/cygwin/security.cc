@@ -69,17 +69,8 @@ extern "C" void
 cygwin_set_impersonation_token (const HANDLE hToken)
 {
   debug_printf ("set_impersonation_token (%d)", hToken);
-  if (cygheap->user.impersonation_state == IMP_EXTERNAL
-      && cygheap->user.external_token != hToken)
-    {
-      set_errno (EPERM);
-      return;
-    }
-  else
-    {
-      cygheap->user.external_token = hToken;
-      return;
-    }
+  cygheap->user.external_token = hToken;
+  return;
 }
 
 void
@@ -741,13 +732,13 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
   if (intern && !groups.issetgroups ())
     {
       char sd_buf[MAX_SID_LEN + sizeof (SECURITY_DESCRIPTOR)];
-      PSID gsid = NO_SID;
+      cygpsid gsid (NO_SID);
       if (!GetKernelObjectSecurity (token, GROUP_SECURITY_INFORMATION,
 				    (PSECURITY_DESCRIPTOR) sd_buf,
 				    sizeof sd_buf, &size))
 	debug_printf ("GetKernelObjectSecurity(): %E");
       else if (!GetSecurityDescriptorGroup ((PSECURITY_DESCRIPTOR) sd_buf,
-					    &gsid, (BOOL *) &size))
+					    (PSID *) &gsid, (BOOL *) &size))
 	debug_printf ("GetSecurityDescriptorGroup(): %E");
       if (well_known_null_sid != gsid)
 	return gsid == groups.pgsid;
@@ -1414,9 +1405,9 @@ get_file_attribute (int use_ntsec, const char *file,
     }
 
   if (uidret)
-    *uidret = getuid32 ();
+    *uidret = myself->uid;
   if (gidret)
-    *gidret = getgid32 ();
+    *gidret = myself->gid;
 
   if (!attribute)
     return 0;

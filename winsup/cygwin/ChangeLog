@@ -1,3 +1,29 @@
+2003-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (class cygheap_user): Use INVALID_HANDLE_VALUE as invalid
+	value for tokens.
+	* syscalls.cc (seteuid32): Ditto.  Set new_token to process token if
+	process token is suitable.
+	* uinfo.cc (uinfo_init): Initialize tokens in cygheap user info
+	to INVALID_HANDLE_VALUE.
+
+2003-07-14  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* cygheap.h (enum impersonation): Delete.
+	(cygheap_user::impersonation_state): Delete.
+	(cygheap_user::current_token): New.
+	(cygheap_user::issetuid): Modify to use current_token.
+	(cygheap_user::token): Ditto.
+	(cygheap_user::deimpersonate): Ditto.
+	(cygheap_user::reimpersonate): Ditto.
+	(cygheap_user::has_impersonation_tokens): Ditto.
+	(cygheap_user::close_impersonation_tokens): Ditto.
+	* security.cc (cygwin_set_impersonation_token): Always set the token.
+	(verify_token): Change type of gsid to cygpsid.
+	(get_file_attribute): Use the effective ids.
+	* syscalls.cc (seteuid32): Modify to use cygheap_user::current_token.
+	* uinfo.cc (uinfo_init) Do not set cygheap->user.impersonation_state.
+
 2003-07-12  Christopher Faylor  <cgf@redhat.com>
 
 	* pinfo.cc (_pinfo::commune_send): Fix bounds test so that poll of
