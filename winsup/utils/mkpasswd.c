@@ -102,7 +102,8 @@ uni2ansi (LPWSTR wcs, char *mbs)
 }
 
 int
-enum_users (LPWSTR servername, int print_sids, int print_cygpath)
+enum_users (LPWSTR servername, int print_sids, int print_cygpath,
+	    const char * passed_home_path)
 {
   USER_INFO_3 *buffer;
   DWORD entriesread = 0;
@@ -159,6 +160,12 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath)
 	    cygwin_conv_to_posix_path (homedir_w32, homedir_psx);
 	  else
 	    psx_dir (homedir_w32, homedir_psx);
+
+	  if (homedir_psx[0] == '\0')
+	    {
+	      strcat (homedir_psx, passed_home_path);
+	      strcat (homedir_psx, username);
+	    }
 
 	  if (print_sids)
 	    {
@@ -309,15 +316,17 @@ usage ()
   fprintf (stderr, "Usage: mkpasswd [OPTION]... [domain]\n\n");
   fprintf (stderr, "This program prints a /etc/passwd file to stdout\n\n");
   fprintf (stderr, "Options:\n");
-  fprintf (stderr, "   -l,--local           print local user accounts\n");
-  fprintf (stderr, "   -d,--domain          print domain accounts (from current domain\n");
-  fprintf (stderr, "                        if no domain specified)\n");
-  fprintf (stderr, "   -g,--local-groups    print local group information too\n");
-  fprintf (stderr, "                        if no domain specified\n");
-  fprintf (stderr, "   -m,--no-mount        don't use mount points for home dir\n");
-  fprintf (stderr, "   -s,--no-sids         don't print SIDs in GCOS field\n");
-  fprintf (stderr, "                        (this affects ntsec)\n");
-  fprintf (stderr, "   -?,--help            displays this message\n\n");
+  fprintf (stderr, "   -l,--local              print local user accounts\n");
+  fprintf (stderr, "   -d,--domain             print domain accounts (from current domain\n");
+  fprintf (stderr, "                           if no domain specified)\n");
+  fprintf (stderr, "   -g,--local-groups       print local group information too\n");
+  fprintf (stderr, "                           if no domain specified\n");
+  fprintf (stderr, "   -m,--no-mount           don't use mount points for home dir\n");
+  fprintf (stderr, "   -s,--no-sids            don't print SIDs in GCOS field\n");
+  fprintf (stderr, "                           (this affects ntsec)\n");
+  fprintf (stderr, "   -p,--path-to-home path  if user account has no home dir, use\n");
+  fprintf (stderr, "                           path instead of /home/\n");
+  fprintf (stderr, "   -?,--help               displays this message\n\n");
   fprintf (stderr, "One of `-l', `-d' or `-g' must be given on NT/W2K.\n");
   return 1;
 }
@@ -325,14 +334,15 @@ usage ()
 struct option longopts[] = {
   {"local", no_argument, NULL, 'l'},
   {"domain", no_argument, NULL, 'd'},
-  {"loca-groups", no_argument, NULL, 'g'},
+  {"local-groups", no_argument, NULL, 'g'},
   {"no-mount", no_argument, NULL, 'm'},
   {"no-sids", no_argument, NULL, 's'},
+  {"path-to-home",required_argument, NULL, 'p'},
   {"help", no_argument, NULL, 'h'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "ldgsmh";
+char opts[] = "ldgsmhp:";
 
 int
 main (int argc, char **argv)
@@ -348,10 +358,12 @@ main (int argc, char **argv)
   int print_cygpath = 1;
   int i;
 
-  char name[256], dom[256];
+  char name[256], dom[256], passed_home_path[MAX_PATH];
   DWORD len, len2;
   PSID sid;
   SID_NAME_USE use;
+
+  passed_home_path[0] = '\0';
 
   if (GetVersion () < 0x80000000)
     if (argc == 1)
@@ -376,6 +388,17 @@ main (int argc, char **argv)
 	    case 'm':
 	      print_cygpath = 0;
 	      break;
+            case 'p':
+              if (optarg[0] != '/')
+	        {
+                  fprintf (stderr, "%s: `%s' is not a fully qualified path.\n",
+                           argv[0], optarg);
+                  return 1;
+                }
+              strcpy (passed_home_path, optarg);
+              if (optarg[strlen (optarg)-1] != '/')
+                strcat (passed_home_path, "/");
+              break;
 	    case 'h':
 	      return usage ();
 	    default:
@@ -400,6 +423,9 @@ main (int argc, char **argv)
 	  }
       }
 
+  if (passed_home_path[0] == '\0')
+      strcpy (passed_home_path, "/home/");
+
   /* This takes Windows 9x/ME into account. */
   if (GetVersion () >= 0x80000000)
     {
@@ -407,10 +433,11 @@ main (int argc, char **argv)
       if (!GetUserName (name, (len = 256, &len)))
 	strcpy (name, "unknown");
 
-      printf ("%s::%ld:%ld::/home/%s:/bin/sh\n", name,
-						 DOMAIN_USER_RID_ADMIN,
-						 DOMAIN_ALIAS_RID_ADMINS,
-						 name);
+      printf ("%s::%ld:%ld::%s%s:/bin/sh\n", name,
+					     DOMAIN_USER_RID_ADMIN,
+					     DOMAIN_ALIAS_RID_ADMINS,
+					     passed_home_path,
+					     name);
 
       return 0;
     }
@@ -496,11 +523,11 @@ main (int argc, char **argv)
 	  exit (1);
 	}
 
-      enum_users (servername, print_sids, print_cygpath);
+      enum_users (servername, print_sids, print_cygpath, passed_home_path);
     }
 
   if (print_local)
-    enum_users (NULL, print_sids, print_cygpath);
+    enum_users (NULL, print_sids, print_cygpath, passed_home_path);
 
   if (servername)
     netapibufferfree (servername);

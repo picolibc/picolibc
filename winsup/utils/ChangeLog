@@ -1,3 +1,15 @@
+Tue Dec  7 11:15:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* mkpasswd.c: Slight formatting changes to the below patch.
+	(longopts): Fix typo in `local-groups' option.
+	(main): Initialize `passed_home_path' before first usage.
+
+Tue Dec  7 11:15:00 2000  Chris Abbey <cabbey@bresnanlink.net>
+
+	* mkpasswd.c: make default home directory /home/$user if one
+	can't be found in user registry. Allow user to override
+	that with command line arg.
+
 Sun Dec  3 00:40:47 2000  Christopher Faylor <cgf@cygnus.com>
 
         * Makefile.in: Use CXX to build the DLL.
