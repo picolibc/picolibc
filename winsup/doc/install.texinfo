@@ -102,7 +102,7 @@ procedure should be a fairly safe way to do that:
 @item Re-activate your anti-virus software and scan everything 
 in C:\cygwin (or wherever you chose to install).
 
-@end itemize
+@end enumerate
 
 This should be safe, as long as nobody substitutes a malicious
 @code{setup.exe}!
