@@ -297,6 +297,14 @@ struct bfd_link_info
   /* TRUE if generating an executable, position independent or not.  */
   unsigned int executable : 1;
 
+  /* TRUE if PT_GNU_STACK segment should be created with PF_R|PF_W|PF_X
+     flags.  */
+  unsigned int execstack: 1;
+
+  /* TRUE if PT_GNU_STACK segment should be created with PF_R|PF_W
+     flags.  */
+  unsigned int noexecstack: 1;
+
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
 
