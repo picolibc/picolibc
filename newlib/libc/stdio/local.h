@@ -33,7 +33,7 @@ extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
 extern int    _EXFUN(__srefill,(FILE *));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(void *, char *, int));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite,(void *, char const *, int));
-extern fpos_t _EXFUN(__sseek,(void *, fpos_t, int));
+extern _fpos_t _EXFUN(__sseek,(void *, _fpos_t, int));
 extern int    _EXFUN(__sclose,(void *));
 extern int    _EXFUN(__stextmode,(int));
 extern void   _EXFUN(__sinit,(struct _reent *));

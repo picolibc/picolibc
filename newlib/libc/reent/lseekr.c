@@ -52,10 +52,10 @@ _lseek_r (ptr, fd, pos, whence)
      _off_t pos;
      int whence;
 {
-  off_t ret;
+  _off_t ret;
 
   errno = 0;
-  if ((ret = _lseek (fd, pos, whence)) == (off_t) -1 && errno != 0)
+  if ((ret = _lseek (fd, pos, whence)) == (_off_t) -1 && errno != 0)
     ptr->_errno = errno;
   return ret;
 }

@@ -17,10 +17,10 @@
 
 #include <stdio.h>
 
-off_t
+_off_t
 _DEFUN (ftello, (fp),
 	register FILE * fp)
 {
   /* for now we simply cast since off_t should be long */
-  return (off_t)ftell (fp);
+  return (_off_t)ftell (fp);
 }

@@ -195,9 +195,17 @@ int	_EXFUN(puts, (const char *));
 int	_EXFUN(ungetc, (int, FILE *));
 size_t	_EXFUN(fread, (_PTR, size_t _size, size_t _n, FILE *));
 size_t	_EXFUN(fwrite, (const _PTR , size_t _size, size_t _n, FILE *));
+#ifdef _COMPILING_NEWLIB
+int	_EXFUN(fgetpos, (FILE *, _fpos_t *));
+#else
 int	_EXFUN(fgetpos, (FILE *, fpos_t *));
+#endif
 int	_EXFUN(fseek, (FILE *, long, int));
+#ifdef _COMPILING_NEWLIB
+int	_EXFUN(fsetpos, (FILE *, const _fpos_t *));
+#else
 int	_EXFUN(fsetpos, (FILE *, const fpos_t *));
+#endif
 long	_EXFUN(ftell, ( FILE *));
 void	_EXFUN(rewind, (FILE *));
 void	_EXFUN(clearerr, (FILE *));
@@ -212,8 +220,13 @@ int	_EXFUN(rename, (const char *, const char *));
 #endif
 #ifndef __STRICT_ANSI__
 int	_EXFUN(asprintf, (char **, const char *, ...));
+#ifdef _COMPILING_NEWLIB
+int	_EXFUN(fseeko, (FILE *, _off_t, int));
+_off_t	_EXFUN(ftello, ( FILE *));
+#else
 int	_EXFUN(fseeko, (FILE *, off_t, int));
 off_t	_EXFUN(ftello, ( FILE *));
+#endif
 int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST));
 int	_EXFUN(iprintf, (const char *, ...));
 int	_EXFUN(fiprintf, (FILE *, const char *, ...));

@@ -44,7 +44,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 int
 _DEFUN (fsetpos, (iop, pos),
 	FILE * iop _AND
-	_CONST fpos_t * pos)
+	_CONST _fpos_t * pos)
 {
   int x = fseek (iop, *pos, SEEK_SET);
 

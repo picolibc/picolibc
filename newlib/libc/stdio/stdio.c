@@ -72,7 +72,7 @@ __swrite (cookie, buf, n)
 #endif
 
   if (fp->_flags & __SAPP)
-    (void) _lseek_r (fp->_data, fp->_file, (off_t) 0, SEEK_END);
+    (void) _lseek_r (fp->_data, fp->_file, (_off_t) 0, SEEK_END);
   fp->_flags &= ~__SOFF;	/* in case O_APPEND mode is set */
 
 #ifdef __SCLE
@@ -90,16 +90,16 @@ __swrite (cookie, buf, n)
   return w;
 }
 
-fpos_t
+_fpos_t
 __sseek (cookie, offset, whence)
      _PTR cookie;
-     fpos_t offset;
+     _fpos_t offset;
      int whence;
 {
   register FILE *fp = (FILE *) cookie;
-  register off_t ret;
+  register _off_t ret;
 
-  ret = _lseek_r (fp->_data, fp->_file, (off_t) offset, whence);
+  ret = _lseek_r (fp->_data, fp->_file, (_off_t) offset, whence);
   if (ret == -1L)
     fp->_flags &= ~__SOFF;
   else

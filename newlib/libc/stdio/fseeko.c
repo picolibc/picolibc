@@ -20,7 +20,7 @@
 int
 fseeko (fp, offset, whence)
         register FILE *fp;
-        off_t offset;
+        _off_t offset;
         int whence;
 {
   /* for now we simply cast since off_t should be long */

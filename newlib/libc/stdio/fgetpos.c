@@ -51,7 +51,7 @@ No supporting OS subroutines are required.
 int
 _DEFUN (fgetpos, (fp, pos),
 	FILE * fp _AND
-	fpos_t * pos)
+	_fpos_t * pos)
 {
   _flockfile(fp);
   *pos = ftell (fp);

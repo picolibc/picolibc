@@ -1,3 +1,19 @@
+2003-03-10  Corinna Vinschen  <corinna@vinschen.de>     
+
+	* libc/include/stdio.h: Declare fgetpos, fsetpos, fseeko and ftello
+	with internal (_fpos_t and _off_t) datatypes when compiling newlib.
+	* libc/include/sys/unistd.h: Declare _lseek using _off_t.
+	* libc/reent/lseekr.c (_lseek_r): Use _off_t instead of off_t.
+	* libc/stdio/fseeko.c (fseeko): Ditto.
+	* libc/stdio/ftello.c (ftello): Ditto.
+	* libc/stdio/stdio.c (__swrite): Ditto.
+	(__sseek): Ditto.
+	* libc/stdio/fgetpos.c (fgetpos): Use _fpos_t instead of fpos_t.
+	* libc/stdio/fseek.c (fseek): Ditto.
+	* libc/stdio/fsetpos.c (fsetpos): Ditto.
+	* libc/stdio/ftell.c (ftell): Ditto.
+	* libc/stdio/local.h: Declare __sseek using _off_t.
+
 2003-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/reent/lseekr.c (lseek_r): Use _off_t instead of off_t.

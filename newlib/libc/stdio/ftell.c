@@ -87,7 +87,7 @@ long
 _DEFUN (ftell, (fp),
 	register FILE * fp)
 {
-  fpos_t pos;
+  _fpos_t pos;
 
   _flockfile(fp);
 
@@ -109,7 +109,7 @@ _DEFUN (ftell, (fp),
     pos = fp->_offset;
   else
     {
-      pos = (*fp->_seek) (fp->_cookie, (fpos_t) 0, SEEK_CUR);
+      pos = (*fp->_seek) (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
       if (pos == -1L)
         {
           _funlockfile(fp);

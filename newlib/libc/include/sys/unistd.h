@@ -165,7 +165,7 @@ int     _EXFUN(_close, (int __fildes ));
 pid_t   _EXFUN(_fork, (void ));
 pid_t   _EXFUN(_getpid, (void ));
 int     _EXFUN(_link, (const char *__path1, const char *__path2 ));
-off_t   _EXFUN(_lseek, (int __fildes, off_t __offset, int __whence ));
+_off_t   _EXFUN(_lseek, (int __fildes, _off_t __offset, int __whence ));
 _READ_WRITE_RETURN_TYPE _EXFUN(_read, (int __fd, void *__buf, size_t __nbyte ));
 void *  _EXFUN(_sbrk,  (ptrdiff_t __incr));
 int     _EXFUN(_unlink, (const char *__path ));

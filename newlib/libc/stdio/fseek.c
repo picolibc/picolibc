@@ -86,7 +86,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <sys/stat.h>
 #include "local.h"
 
-#define	POS_ERR	(-(fpos_t)1)
+#define	POS_ERR	(-(_fpos_t)1)
 
 /*
  * Seek the given file to the given offset.
@@ -100,8 +100,8 @@ fseek (fp, offset, whence)
      int whence;
 {
   struct _reent *ptr;
-  fpos_t _EXFUN ((*seekfn), (void *, fpos_t, int));
-  fpos_t target, curoff;
+  _fpos_t _EXFUN ((*seekfn), (void *, _fpos_t, int));
+  _fpos_t target, curoff;
   size_t n;
   struct stat st;
   int havepos;
@@ -149,7 +149,7 @@ fseek (fp, offset, whence)
 	curoff = fp->_offset;
       else
 	{
-	  curoff = (*seekfn) (fp->_cookie, (fpos_t) 0, SEEK_CUR);
+	  curoff = (*seekfn) (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
 	    {
 	      _funlockfile(fp);
