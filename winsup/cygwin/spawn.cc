@@ -847,8 +847,9 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
         if (!hToken && !myself->token)
           {
             memcpy (child->username, myself->username, MAX_USER_NAME);
-            child->psid = myself->psid;
             memcpy (child->sidbuf, myself->sidbuf, 40);
+            if (myself->psid)
+              child->psid = child->sidbuf;
             memcpy (child->logsrv, myself->logsrv, 256);
             memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
           }

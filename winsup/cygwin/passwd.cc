@@ -24,7 +24,7 @@ static int max_lines = 0;
 /* Set to 1 when /etc/passwd has been read in by read_etc_passwd (). */
 /* Functions in this file need to check the value of passwd_in_memory_p
    and read in the password file if it isn't set. */
-static int passwd_in_memory_p = 0;
+int passwd_in_memory_p = 0;
 
 /* Position in the passwd cache */
 #ifdef _MT_SAFE
@@ -103,7 +103,7 @@ add_pwd_line (char *line)
 /* Read in /etc/passwd and save contents in the password cache.
    This sets passwd_in_memory_p to 1 so functions in this file can
    tell that /etc/passwd has been read in */
-static void
+void
 read_etc_passwd ()
 {
     extern int passwd_sem;

@@ -18,11 +18,6 @@ details. */
 #include <wchar.h>
 #include <lm.h>
 
-/* FIXME: shouldn't violate internal object space -- these two
-   should be static inside grp.cc */
-void read_etc_group ();
-extern int group_in_memory_p;
-
 char *
 internal_getlogin (struct pinfo *pi)
 {
@@ -95,21 +90,42 @@ internal_getlogin (struct pinfo *pi)
         }
       if (allow_ntsec)
         {
-          /* Try to get the SID from localhost first. This can only
-             be done if a domain is given because there's a chance that
-             a local and a domain user may have the same name. */
+          HANDLE ptok = INVALID_HANDLE_VALUE; 
+          DWORD siz;
+          char tu[1024];
           int ret = 0;
+            
+          /* Try to get the SID from current process first */
+          if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+            debug_printf ("OpenProcessToken(): %E\n");
+          else if (!GetTokenInformation (ptok, TokenUser, (LPVOID) &tu,
+                                         sizeof tu, &siz))
+            debug_printf ("GetTokenInformation(): %E");
+          else if (!(ret = CopySid (40, (PSID) pi->sidbuf,
+                                    ((TOKEN_USER *) &tu)->User.Sid)))
+            debug_printf ("Couldn't retrieve SID from access token!");
+          if (ptok != INVALID_HANDLE_VALUE)
+            CloseHandle (ptok);
 
-          if (pi->domain[0])
+          /* If that failes, try to get the SID from localhost. This can only
+             be done if a domain is given because there's a chance that a local
+             and a domain user may have the same name. */
+          if (!ret && pi->domain[0])
             {
               /* Concat DOMAIN\USERNAME for the next lookup */
               strcat (strcat (strcpy (buf, pi->domain), "\\"), pi->username);
               if (!(ret = lookup_name (buf, NULL, (PSID) pi->sidbuf)))
                 debug_printf ("Couldn't retrieve SID locally!");
             }
+
+          /* If that failes, too, as a last resort try to get the SID from
+             the logon server. */
           if (!ret && !(ret = lookup_name(pi->username, pi->logsrv,
                                           (PSID)pi->sidbuf)))
             debug_printf ("Couldn't retrieve SID from '%s'!", pi->logsrv);
+
+          /* If we have a SID, try to get the corresponding Cygwin user name
+             which can be different from the Windows user name. */
           if (ret)
             {
               struct passwd *pw;
@@ -140,6 +156,11 @@ internal_getlogin (struct pinfo *pi)
 void
 uinfo_init ()
 {
+  void read_etc_passwd ();
+  extern int passwd_in_memory_p;
+  void read_etc_group ();
+  extern int group_in_memory_p;
+
   char *username;
   struct passwd *p;
 
@@ -147,8 +168,14 @@ uinfo_init ()
      another cygwin process without changing the user context.
      So all user infos in myself as well as the environment are
      (perhaps) valid. */
-  username = myself->psid ? myself->username : internal_getlogin (myself);
-  if ((p = getpwnam (username)) != NULL)
+  if (myself->psid)
+    {
+      if (!passwd_in_memory_p)
+        read_etc_passwd();
+      if (!group_in_memory_p)
+        read_etc_group ();
+    }
+  else if ((p = getpwnam (username = internal_getlogin (myself))) != NULL)
     {
       /* calling getpwnam assures us that /etc/password has been
          read in, but we can't be sure about /etc/group */

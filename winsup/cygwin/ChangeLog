@@ -1,3 +1,15 @@
+Sat Jun 24 19:30:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fork.cc (fork): Fix error in copying SID pointer.
+	* spawn.cc (_spawnve): Ditto.
+	* passwd.cc: Remove static from `passwd_in_memory_p'.
+	(read_etc_passwd): Remove static.
+	* uinfo.cc: Move global declaration of `read_etc_group' and
+	`group_in_memory_p' into `uinfo_init'.
+	(internal_getlogin): Try to get SID from current process first.
+	(uinfo_init): Don't set uid and gid if `myself' has a valid SID.
+	Only load /etc/passwd and /etc/group in that case.
+
 Sat Jun 24 12:29:59 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* shared.cc (shared_info::initialize): Improve error message clarity.
