@@ -808,8 +808,16 @@ dump_sysinfo ()
 	    {
 	      if (!more_info)
 		osname = (char *) "2000";
-	      else if (osversionex.wProductType == VER_NT_SERVER)
-	        osname = (char *) "2000 Server";
+	      else if (osversionex.wProductType == VER_NT_SERVER
+		       || osversionex.wProductType == VER_NT_DOMAIN_CONTROLLER)
+	        {
+		  if (osversionex.wSuiteMask & VER_SUITE_DATACENTER)
+		    osname = (char *) "2000 Datacenter Server";
+		  else if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
+		    osname = (char *) "2000 Advanced Server";
+		  else
+		    osname = (char *) "2000 Server";
+	        }
 	      else
 	        osname = (char *) "2000 Professional";
 	    }
@@ -817,8 +825,14 @@ dump_sysinfo ()
 	    {
 	      if (!more_info)
 		osname = (char *) "XP";
-	      else if (osversionex.wProductType == VER_NT_SERVER)
-		osname = (char *) ".NET Server";
+	      else if (osversionex.wProductType == VER_NT_SERVER
+		       || osversionex.wProductType == VER_NT_DOMAIN_CONTROLLER)
+	        {
+		  if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
+		    osname = (char *) ".NET Enterprise Server";
+		  else
+		    osname = (char *) ".NET Server";
+		}
 	      else if (osversionex.wSuiteMask & VER_SUITE_PERSONAL)
 	        osname = (char *) "XP Home Edition";
 	      else
