@@ -1,5 +1,9 @@
 2003-01-01  Christopher Faylor  <cgf@redhat.com>
 
+	* passwd.cc (getpwuid_r32): Revert previous change.
+
+2003-01-01  Christopher Faylor  <cgf@redhat.com>
+
 	* sysconf.cc (sysconf): Return arbitrary values for
 	_SC_GETGR_R_SIZE_MAX, _SC_LOGIN_NAME_MAX, _SC_GETPW_R_SIZE_MAX.
 
