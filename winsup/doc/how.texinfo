@@ -252,17 +252,13 @@ properly).
 
 @subsection Is it OK to have multiple copies of the DLL?
 
-It is a very bad idea to have multiple *versions* of the cygwin DLL in
-your path.  They often conflict in funny ways.
+You should only have one copy of the Cygwin DLL on your system.  If you
+have multiple versions, they will conflict and cause problems.
 
 If you get the error "shared region is corrupted" it means you have
-multiple versions of cygwin1.dll running at the same time.
-
-If you do have multiple versions, get rid of (or rename) all the older
-versions, keeping only the newest one.
-
-It should be OK to have multiple copies of the *same* DLL in your path,
-though.
+multiple versions of cygwin1.dll running at the same time.  This could
+happen, for example, if you update cygwin1.dll without exiting @emph{all}
+Cygwin apps (including inetd) beforehand.
 
 @subsection Where can I find "more"?
 
