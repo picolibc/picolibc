@@ -437,7 +437,6 @@ fhandler_tty_slave::fhandler_tty_slave(const char *name) :
 	fhandler_tty_common (FH_TTYS, name, 0)
 {
   set_cb (sizeof *this);
-  debug_printf ("here");
   inuse = NULL;
 }
 
@@ -682,7 +681,6 @@ fhandler_tty_common::dup (fhandler_base *child)
   fhandler_tty_slave *fts = (fhandler_tty_slave *) child;
   int errind;
 
-  termios_printf ("here");
   fts->ttynum = ttynum;
   fts->tcinit (get_ttyp ());
 
@@ -867,7 +865,6 @@ fhandler_pty_master::open (const char *, int flags, mode_t)
 int
 fhandler_tty_common::close ()
 {
-termios_printf ("here %p", this);
   if (output_done_event && !CloseHandle (output_done_event))
     termios_printf ("CloseHandle (output_done_event), %E");
   if (ioctl_done_event && !CloseHandle (ioctl_done_event))

@@ -652,14 +652,6 @@ call_handler (int sig, struct sigaction& siga, void *handler, int nonmain)
   HANDLE hth = NULL;
   int res;
 
-  if (hExeced != NULL && hExeced != INVALID_HANDLE_VALUE)
-    {
-      SetEvent (signal_arrived);	// For an EINTR case
-      sigproc_printf ("armed signal_arrived");
-      exec_exit = sig;			// Maybe we'll exit with this value
-      goto out1;
-    }
-
   if (!nonmain)
     ebp = sigsave.ebp;
   else
@@ -675,15 +667,16 @@ call_handler (int sig, struct sigaction& siga, void *handler, int nonmain)
 	  sigproc_printf ("suspending mainthread");
 	  res = SuspendThread (hth);
 
+	  muto *m;
 	  /* FIXME: Make multi-thread aware */
-	  for (muto *m = muto_start.next;  m != NULL; m = m->next)
+	  for (m = muto_start.next;  m != NULL; m = m->next)
 	    if (m->unstable () || m->owner () == maintid)
 	      goto keep_looping;
 
 	  break;
 
 	keep_looping:
-	  sigproc_printf ("suspended thread owns a muto");
+	  sigproc_printf ("suspended thread owns a muto (%s)", m->name);
 	  if (res)
 	      goto set_pending;
 
@@ -702,7 +695,7 @@ call_handler (int sig, struct sigaction& siga, void *handler, int nonmain)
       ebp = cx.Ebp;
     }
 
-  if (nonmain && interruptible (cx.Eip))
+  if (hExeced != NULL || (nonmain && interruptible (cx.Eip)))
     interrupt_now (&cx, sig, siga, handler);
   else if (!interrupt_on_return (ebp, sig, siga, handler))
     {
@@ -729,7 +722,6 @@ out:
       sigproc_printf ("ResumeThread returned %d", res);
     }
 
-out1:
   sigproc_printf ("returning %d", interrupted);
   return interrupted;
 }
@@ -974,7 +966,7 @@ events_init (void)
     api_fatal ("can't create title mutex, %E");
 
   ProtectHandle (title_mutex);
-  mask_sync = new_muto (FALSE, NULL);
+  mask_sync = new_muto (FALSE, "mask_sync");
   windows_system_directory[0] = '\0';
   (void) GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);
   char *end = strchr (windows_system_directory, '\0');

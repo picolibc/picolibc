@@ -24,7 +24,6 @@ class strace NO_COPY strace;
 
 #ifndef NOSTRACE
 
-#ifndef STRACE_HHMMSS
 int
 strace::microseconds()
 {
@@ -58,7 +57,6 @@ strace::microseconds()
     first_microsec = microsec;
   return microsec - first_microsec;
 }
-#endif
 
 /* sprintf analog for use by output routines. */
 int

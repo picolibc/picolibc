@@ -233,7 +233,8 @@ hinfo::build_fhandler (int fd, DWORD dev, const char *name, int unit)
   fhandler_base *fh;
   void *buf = calloc (1, sizeof (fhandler_union) + 100);
 
-  switch (dev & FH_DEVMASK)
+  dev &= FH_DEVMASK;
+  switch (dev)
     {
       case FH_TTYM:
 	fh = new (buf) fhandler_tty_master (name, unit);
@@ -256,12 +257,12 @@ hinfo::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 	fh = new (buf) fhandler_windows (name);
 	break;
       case FH_SERIAL:
-	fh = new (buf) fhandler_serial (name, FH_SERIAL, unit);
+	fh = new (buf) fhandler_serial (name, dev, unit);
 	break;
       case FH_PIPE:
       case FH_PIPER:
       case FH_PIPEW:
-	fh = new (buf) fhandler_pipe (name);
+	fh = new (buf) fhandler_pipe (name, dev);
 	break;
       case FH_SOCKET:
 	fh = new (buf) fhandler_socket (name);

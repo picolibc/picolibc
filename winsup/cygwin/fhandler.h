@@ -327,7 +327,7 @@ public:
 class fhandler_pipe: public fhandler_base
 {
 public:
-  fhandler_pipe (const char *name = 0);
+  fhandler_pipe (const char *name = 0, DWORD devtype = FH_PIPE);
   off_t lseek (off_t offset, int whence);
   /* This strange test is due to the fact that we can't rely on
      Windows shells to "do the right thing" with pipes.  Apparently

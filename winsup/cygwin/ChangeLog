@@ -1,3 +1,26 @@
+Tue Mar 14 23:41:16 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Pipe changes throughout suggested by Eric Fifer <EFifer@sanwaint.com>
+	* debug.cc (threadname_init): Pass name of lock as arg 2 of new_muto.
+	* malloc.cc (malloc_init): Ditto.
+	* sigproc.cc (sigproc_init): Ditto.
+	* exceptions.cc (events_init): Ditto.
+	(call_handler): Eliminate special case for hExeced.  Report locked
+	thread in debugging output.
+	* fhandler.cc (fhandker_pipe::fhandler_pipe): Propagate device type to
+	base class.
+	* fhandler.h (fhandler_pipe): Ditto.
+	* hinfo.cc (hinfo::build_fhandler): Pass specific type of pipe to
+	constructor.
+	* spawn.cc (spawn_guts): Eliminate dependency on signal when waiting
+	for subprocess.
+	* strace.cc: Remove obsolete #ifdef.
+	* sync.cc (muto::muto): Save the name of the muto.
+	(muto:~muto): Also release the muto.
+	* sync.h: Add a muto name field.
+	* select.cc (peek_pipe): Avoid doing a PeekNamedPipe on the write end
+	of a pipe.
+
 Sun Mar 12 01:14:33 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.cc (fhandler_base::get_readahead_into_buffer): New function.

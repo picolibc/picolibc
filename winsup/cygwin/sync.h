@@ -21,6 +21,7 @@ class muto
   DWORD tid;	/* Thread Id of lock owner. */
 public:
   class muto *next;
+  const char *name;
   void *operator new (size_t, void *p) {return p;}
   void *operator new (size_t) {return ::new muto; }
   void operator delete (void *) {;} /* can't handle allocated mutos

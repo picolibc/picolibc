@@ -30,8 +30,8 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
     __seterrno ();
   else
     {
-      fhandler_base *fhr = dtable.build_fhandler (fdr, FH_PIPE, "/dev/piper");
-      fhandler_base *fhw = dtable.build_fhandler (fdw, FH_PIPE, "/dev/pipew");
+      fhandler_base *fhr = dtable.build_fhandler (fdr, FH_PIPER, "/dev/piper");
+      fhandler_base *fhw = dtable.build_fhandler (fdw, FH_PIPEW, "/dev/pipew");
 
       int binmode = mode & O_TEXT ? 0 : 1;
       fhr->init (r, GENERIC_READ, binmode);

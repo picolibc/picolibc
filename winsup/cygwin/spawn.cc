@@ -635,8 +635,8 @@ skip_arg_parsing:
     {
       BOOL exited;
 
-      HANDLE waitbuf[3] = {pi.hProcess, signal_arrived, spr};
-      int nwait = 3;
+      HANDLE waitbuf[2] = {pi.hProcess, spr};
+      int nwait = 2;
 
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST);
       res = 0;
@@ -644,61 +644,60 @@ skip_arg_parsing:
       exec_exit = 1;
       exited = FALSE;
       MALLOC_CHECK;
-  waitfor:
-      switch (WaitForMultipleObjects (nwait, waitbuf, FALSE, timeout))
+      for (int i = 0; i < 100; i++)
 	{
-	case WAIT_TIMEOUT:
-	  syscall_printf ("WFMO timed out after signal");
-	  if (WaitForSingleObject (pi.hProcess, 0) != WAIT_OBJECT_0)
+	  switch (WaitForMultipleObjects (nwait, waitbuf, FALSE, timeout))
 	    {
-	      sigproc_printf ("subprocess still alive after signal");
-	      res = exec_exit;
+	    case WAIT_TIMEOUT:
+	      syscall_printf ("WFMO timed out after signal");
+	      if (WaitForSingleObject (pi.hProcess, 0) != WAIT_OBJECT_0)
+		{
+		  sigproc_printf ("subprocess still alive after signal");
+		  res = exec_exit;
+		}
+	      else
+		{
+		  sigproc_printf ("subprocess exited after signal");
+	    case WAIT_OBJECT_0:
+		  sigproc_printf ("subprocess exited");
+		  if (!GetExitCodeProcess (pi.hProcess, &res))
+		    res = exec_exit;
+		  exited = TRUE;
+		 }
+	      if (nwait > 2)
+		if (WaitForSingleObject (spr, 1) == WAIT_OBJECT_0)
+		  res |= EXIT_REPARENTING;
+		else if (!(res & EXIT_REPARENTING))
+		  {
+		    MALLOC_CHECK;
+		    close_all_files ();
+		    MALLOC_CHECK;
+		  }
+	      break;
+	    case WAIT_OBJECT_0 + 1:
+	      res = EXIT_REPARENTING;
+	      MALLOC_CHECK;
+	      ForceCloseHandle (spr);
+	      MALLOC_CHECK;
+	      if (!parent_alive)
+		{
+		  nwait = 1;
+		  sigproc_terminate ();
+		  continue;
+		}
+	      break;
+	    case WAIT_FAILED:
+	      DWORD r;
+	      system_printf ("wait failed: nwait %d, pid %d, winpid %d, %E",
+			     nwait, myself->pid, myself->dwProcessId);
+	      system_printf ("waitbuf[0] %p %d", waitbuf[0],
+			     GetHandleInformation (waitbuf[0], &r));
+	      system_printf ("waitbuf[1] %p = %d", waitbuf[1],
+			     GetHandleInformation (waitbuf[1], &r));
+	      set_errno (ECHILD);
+	      return -1;
 	    }
-	  else
-	    {
-	      sigproc_printf ("subprocess exited after signal");
-	case WAIT_OBJECT_0:
-	      sigproc_printf ("subprocess exited");
-	      if (!GetExitCodeProcess (pi.hProcess, &res))
-		res = exec_exit;
-	      exited = TRUE;
-	     }
-	  if (nwait > 2)
-	    if (WaitForSingleObject (spr, 1) == WAIT_OBJECT_0)
-	      res |= EXIT_REPARENTING;
-	    else if (!(res & EXIT_REPARENTING))
-	      {
-		MALLOC_CHECK;
-		close_all_files ();
-		MALLOC_CHECK;
-	      }
 	  break;
-	case WAIT_OBJECT_0 + 1:
-	  sigproc_printf ("signal arrived");
-	  timeout = 10;
-	  goto waitfor;
-	case WAIT_OBJECT_0 + 2:
-	  res = EXIT_REPARENTING;
-	  MALLOC_CHECK;
-	  ForceCloseHandle (spr);
-	  MALLOC_CHECK;
-	  if (!parent_alive)
-	    {
-	      nwait = 1;
-	      sigproc_terminate ();
-	      goto waitfor;
-	    }
-	  break;
-	case WAIT_FAILED:
-	  DWORD r;
-	  system_printf ("wait failed: nwait %d, pid %d, winpid %d, %E",
-			 nwait, myself->pid, myself->dwProcessId);
-	  system_printf ("waitbuf[0] %p %d", waitbuf[0],
-			 GetHandleInformation (waitbuf[0], &r));
-	  system_printf ("waitbuf[1] %p = %d", waitbuf[1],
-			 GetHandleInformation (waitbuf[1], &r));
-	  set_errno (ECHILD);
-	  return -1;
 	}
 
       if (nwait > 2)

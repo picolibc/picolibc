@@ -25,7 +25,7 @@ details. */
 muto NO_COPY muto_start;
 
 /* Constructor */
-muto::muto(int inh, const char *name) : sync (0), visits(0), waiters(-1), tid (0), next (NULL)
+muto::muto(int inh, const char *s) : sync (0), visits(0), waiters(-1), tid (0), next (NULL)
 {
   /* Create event which is used in the fallback case when blocking is necessary */
   if (!(bruteforce = CreateEvent (inh ? &sec_all_nih : &sec_none_nih, FALSE, FALSE, name)))
@@ -34,14 +34,20 @@ muto::muto(int inh, const char *name) : sync (0), visits(0), waiters(-1), tid (0
       SetLastError (oerr);
       return;
     }
+  name = s;
 }
 
-/* Destructor */
+/* Destructor (racy?) */
 muto::~muto ()
 {
+  while (visits)
+    release ();
+
+  HANDLE h = bruteforce;
+  h = NULL;
   /* Just need to close the event handle */
-  if (bruteforce)
-    CloseHandle (bruteforce);
+  if (h)
+    CloseHandle (h);
 }
 
 /* Acquire the lock.  Argument is the number of milliseconds to wait for

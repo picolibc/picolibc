@@ -30,7 +30,7 @@ static NO_COPY thread_info threads[32] = {{0, NULL}};	// increase as necessary
 void
 threadname_init ()
 {
-  threadname_lock = new_muto (FALSE, NULL);
+  threadname_lock = new_muto (FALSE, "threadname_lock");
 }
 
 void __stdcall
@@ -202,7 +202,7 @@ static muto NO_COPY *debug_lock = NULL;
 void
 debug_init ()
 {
-  debug_lock = new_muto (FALSE, NULL);
+  debug_lock = new_muto (FALSE, "debug_lock");
 }
 
 /* Find a registered handle in the linked list of handles. */

@@ -426,7 +426,8 @@ peek_pipe (select_record *s, int ignra)
 	}
     }
 
-  if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
+  if (fh->get_device() != FH_PIPEW &&
+      !PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
     {
       select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
       n = -1;

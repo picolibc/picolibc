@@ -1456,8 +1456,8 @@ fhandler_dev_null::dump (void)
 /**********************************************************************/
 /* fhandler_pipe */
 
-fhandler_pipe::fhandler_pipe (const char *name) :
-	fhandler_base (FH_PIPE, name)
+fhandler_pipe::fhandler_pipe (const char *name, DWORD devtype) :
+	fhandler_base (devtype, name)
 {
   set_cb (sizeof *this);
 }
