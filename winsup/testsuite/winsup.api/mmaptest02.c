@@ -29,7 +29,7 @@ int fd;
 void
 perror_exit (char *str, int code)
 {
-  perror (str);
+  printf ("%s: %s\n", str, strerror (errno));
   exit (code);
 }
 
@@ -149,7 +149,7 @@ test_3 ()
       }
   if (y == 0)
     {
-      fputs ("test 3: couldn't get two consecutive pages, giving up\n", stderr);
+      fputs ("test 3: couldn't get two consecutive pages, giving up\n", stdout);
       exit (65);
     }
   

@@ -23,7 +23,7 @@ char const line[] = "y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1";
 void
 perror_exit (char *str)
 {    
-  perror (str);
+  printf ("%s: %s\n", str, strerror (errno));
   exit (1);
 }
 

@@ -99,7 +99,10 @@ int main ()
 
   /* the buffers have to be different */
   if (buf1 == buf2 || !memcmp (buf1, buf2, 20))
-    return 1;
+    {
+      printf ("buffers are not different!\n");
+      return 1;
+    }
 
   return 0;
 }

@@ -1,3 +1,9 @@
+2001-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.api/mmaptest01.c: Add log output.
+	* winsup.api/mmaptest02.c: Write log output to stdout.
+	* winsup.api/mmaptest03.c: Ditto.
+
 2001-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.api/winsup.exp: Force linking all tests against binmode.o.
