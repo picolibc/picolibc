@@ -1,3 +1,8 @@
+Wed Sep  5 11:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::close): Change 2MSL value
+	according to MSDN.
+
 Wed Sep  5 10:14:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (cygwin_connect): Add WSAEALREADY and WSAEINVAL handling
