@@ -194,7 +194,7 @@ all: all_target $(all_host)
 
 all_target: $(TARGET_LIBS) cygserver.exe
 
-all_host: new-$(LIB_NAME) cygrun.exe
+all_host: new-$(LIB_NAME)
 
 force:
 
@@ -339,13 +339,6 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	$(SHELL) ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) && \
 	$(COMPILE_CXX) -o version.o version.cc && \
 	touch $@
-
-cygrun.o: cygrun.c
-	$(CC) $(MINGW_CFLAGS) -o $@ -c $<
-
-cygrun.exe : cygrun.o -lgcc $(w32api_lib)/libuser32.a \
-	     $(w32api_lib)/libshell32.a $(w32api_lib)/libkernel32.a
-	$(CC) ${MINGW_LDFLAGS} -mno-cygwin -o $@ $^
 
 cygserver_transport_outside.o: cygserver_transport.cc
 	$(COMPILE_CXX) -D__OUTSIDE_CYGWIN__ -o $@ $<

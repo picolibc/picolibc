@@ -1,3 +1,8 @@
+2003-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygrun.c: Move from here to ../testsuite.
+	* Makefile.in: Remove cygrun.exe dependencies.
+
 2003-01-21  Jason Tishler  <jason@tishler.net>
 
 	* cygwin.din: Export nanosleep().
