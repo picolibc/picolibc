@@ -116,7 +116,7 @@ struct _threadinfo
   static CRITICAL_SECTION protect_linked_list;
   static void init ();
   void init_thread (void *, DWORD (*) (void *, void *));
-  static void call (DWORD (*) (void *, void *), void *) __attribute__ ((regparm (3)));
+  static void call (DWORD (*) (void *, void *), void *);
   static void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
   static struct _threadinfo *find_tls (int sig);
   void remove (DWORD);

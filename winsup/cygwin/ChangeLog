@@ -1,3 +1,8 @@
+2004-01-14  Christopher Faylor  <cgf@redhat.com>
+
+	* cygtls.h (_threadinfo::call): Remove regparm declaration to work
+	around compiler bug.
+
 2004-01-13  Christopher Faylor  <cgf@redhat.com>
 
 	* autoload.cc (TryEnterCriticalSection): Remove.
