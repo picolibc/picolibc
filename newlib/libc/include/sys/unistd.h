@@ -202,7 +202,11 @@ unsigned _EXFUN(usleep, (unsigned int __useconds));
  int	_EXFUN(gethostname, (char *__name, size_t __len));
 #endif
 char *	_EXFUN(mktemp, (char *));
+#if defined(__CYGWIN__)
+void    _EXFUN(sync, (void));
+#else /* defined(__rtems__) */
 int     _EXFUN(sync, (void));
+#endif
 int     _EXFUN(readlink, (const char *__path, char *__buf, int __buflen));
 int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 #endif
