@@ -115,7 +115,7 @@ GENERAL_SOURCES =  	clearerr.c 				fclose.c 				fdopen.c 				feof.c 					ferror.
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
 @ELIX_LEVEL_1_FALSE@LIB_OBJS = 	asiprintf.$(oext)			asprintf.$(oext)			fcloseall.$(oext)			fseeko.$(oext) 				ftello.$(oext) 				getw.$(oext)				mktemp.$(oext) 				putw.$(oext) 				vasiprintf.$(oext)			vasprintf.$(oext)
 
-LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext) vfiscanf.$(oext)
+LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext) vfscanf.$(oext) vfiscanf.$(oext)
 
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 

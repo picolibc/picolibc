@@ -100,7 +100,7 @@ LIB_OBJS = \
 	vasprintf.$(oext)
 endif
 
-LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext) vfiscanf.$(oext)
+LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext) vfscanf.$(oext) vfiscanf.$(oext)
 
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 
