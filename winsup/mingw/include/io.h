@@ -138,9 +138,9 @@ extern "C" {
  * and 0 if a match was found. Call _findclose when you are finished.
  */
 /*  FIXME: Should these all use intptr_t, as per recent MSDN docs?  */
-_CRTIMP int __cdecl _findfirst (const char*, struct _finddata_t*);
-_CRTIMP int __cdecl _findnext (int, struct _finddata_t*);
-_CRTIMP int __cdecl _findclose (int);
+_CRTIMP long __cdecl _findfirst (const char*, struct _finddata_t*);
+_CRTIMP int __cdecl _findnext (long, struct _finddata_t*);
+_CRTIMP int __cdecl _findclose (long);
 
 _CRTIMP int __cdecl _chdir (const char*);
 _CRTIMP char* __cdecl _getcwd (char*, int);

@@ -1,3 +1,11 @@
+2004-03-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/io.h: (_findfirst): Correct prototype.
+
+2004-03-30  Hans Leidekker  <hans@it.vu.nl>
+
+	* include/io.h: (_findnext, _findclose): Correct prototype.
+
 2004-03-28  Hans Leidekker  <hans@it.vu.nl>
 
 	* include/math.h (FP_*): Add defines.
