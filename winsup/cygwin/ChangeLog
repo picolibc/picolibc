@@ -1,3 +1,9 @@
+Tue May  2  2:22:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * dcrt0.cc: Add dynamic load code for `OemToCharA' from user32.dll.
+        * security.cc (read_sd): Call `OemToCharA' to make
+        `GetFileSecurity' happy on filenames with umlauts.
+
 Wed Apr 26 23:23:23 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (normalize_win32_path): Don't add a trailing slash when one

@@ -398,7 +398,9 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
   debug_printf("file = %s", file);
 
   DWORD len = 0;
-  if (! GetFileSecurity (file,
+  char fbuf[PATH_MAX];
+  OemToChar(file, fbuf);
+  if (! GetFileSecurity (fbuf,
                          OWNER_SECURITY_INFORMATION
                          | GROUP_SECURITY_INFORMATION
                          | DACL_SECURITY_INFORMATION,
@@ -407,6 +409,7 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
       __seterrno ();
       return -1;
     }
+  debug_printf("file = %s: len=%d", file, len);
   if (len > *sd_size)
     {
       *sd_size = len;
