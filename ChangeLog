@@ -1,3 +1,8 @@
+2002-01-07  Mark Salter  <msalter@redhat.com>
+
+	* configure.in: Remove target-bsp and target-cygmon from arm builds.
+	  Allow target-libgloss to be built for arm, strongarm, and xscale.
+
 2002-01-03  Ben Elliston  <bje@redhat.com>
 
 	* MAINTAINERS: Update URL for config.* scripts.

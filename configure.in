@@ -644,18 +644,6 @@ case "${target}" in
   arm-*-pe*)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
-  arm-*-coff*)
-    noconfigdirs="$noconfigdirs target-libgloss"
-    if [ x${is_cross_compiler} != xno ] ; then
-	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
-    fi
-    ;;
-  arm-*-elf*)
-    noconfigdirs="$noconfigdirs target-libgloss"
-    if [ x${is_cross_compiler} != xno ] ; then
-	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
-    fi
-    ;;
   arm-*-oabi*)
     noconfigdirs="$noconfigdirs target-libgloss target-libffi"
     ;;
@@ -669,28 +657,16 @@ case "${target}" in
     noconfigdirs="$noconfigdirs target-libgloss target-libffi"
     ;;
   strongarm-*-elf)
-    noconfigdirs="$noconfigdirs target-libgloss target-libffi"
-    if [ x${is_cross_compiler} != xno ] ; then
-	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
-    fi
+    noconfigdirs="$noconfigdirs target-libffi"
     ;;
   strongarm-*-coff)
-    noconfigdirs="$noconfigdirs target-libgloss target-libffi"
-    if [ x${is_cross_compiler} != xno ] ; then
-	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
-    fi
+    noconfigdirs="$noconfigdirs target-libffi"
     ;;
   xscale-*-elf)
-    noconfigdirs="$noconfigdirs target-libgloss target-libffi"
-    if [ x${is_cross_compiler} != xno ] ; then
-	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
-    fi
+    noconfigdirs="$noconfigdirs target-libffi"
     ;;
   xscale-*-coff)
-    noconfigdirs="$noconfigdirs target-libgloss target-libffi"
-    if [ x${is_cross_compiler} != xno ] ; then
-	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
-    fi
+    noconfigdirs="$noconfigdirs target-libffi"
     ;;
   thumb-*-pe)
     noconfigdirs="$noconfigdirs target-libgloss target-libffi"
