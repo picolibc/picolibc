@@ -643,9 +643,9 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
       sock_thread_data ad = { get_socket (), peer, len, -1 };
       cygthread *thread = new cygthread (accept_thread, &ad, "accept");
       HANDLE waitevt = CreateEvent(&sec_none_nih, FALSE, TRUE, NULL);
-      bool signalled = thread->detach (waitevt);
+      BOOL interrupted = thread->detach (waitevt);
       CloseHandle (waitevt);
-      if (signalled)
+      if (interrupted)
 	return -1;
       res = ad.ret;
     }
