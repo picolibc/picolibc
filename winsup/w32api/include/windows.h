@@ -141,7 +141,16 @@
 #endif
 #endif
 #if defined(__USE_W32_SOCKETS) || !(defined(__INSIDE_CYGWIN__) || defined(__CYGWIN__) || defined(__CYGWIN32__) || defined(_UWIN))
+#if (_WIN32_WINNT >= 0x0400)  && (__W32API_MAJOR_VERSION > 0)
+#include <winsock2.h>
+/*
+ * MS likes to include mswsock.h here as well,
+ * but that can cause undefined symbols if
+ * winsock2.h is included before windows.h
+ */
+#else
 #include <winsock.h>
+#endif /*  (_WIN32_WINNT >= 0x0400)  && (__W32API_MAJOR_VERSION > 0) */
 #endif
 #endif /* WIN32_LEAN_AND_MEAN */
 

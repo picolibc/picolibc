@@ -1,4 +1,9 @@
 
+2001-04-11 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/windows.h (#include <winsock.h>): Include <winsock2.h>
+	instead if (_WIN32_WINNT >= 0x0400)&&(__W32API_MAJOR_VERSION > 0).
+ 
 2001-04-11  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
 
 	* include/winuser.h (WM_IME_*): Remove defines (now in imm.h).
