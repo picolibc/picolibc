@@ -1,5 +1,10 @@
 2002-07-25  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/sys/linux/io64.c (truncate64, ftruncate64): Added.
+	* libc/sys/linux/sys/types.h (off64_t): Definition added.
+
+2002-07-25  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/Makefile.am: Add fclean.c.
 	* libc/sys/linux/Makefile.in: Regenerated.
 	* libc/sys/linux/fclean.c: New file.
