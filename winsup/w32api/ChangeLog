@@ -1,3 +1,12 @@
+2004-02-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/sqlucode.h (SQLGetStmtAttr[AW]): Remove duplicate
+	defines.
+	(SQLSetStmtAttr[AW]): Move into ODBCVER >= 0x0300 block.
+	(SQLSetDescFieldW): Correct prototype.
+	(SQLSetDescFieldA): Add prototype.
+	(SQLGetDescFieldW): Add prototype.
+
 2004-02-11  Pat Thoyts  <patthoyts@users.sourceforge.net>
 
 	* include/winuser.h (DFC_POPUPMENU): Add define.
