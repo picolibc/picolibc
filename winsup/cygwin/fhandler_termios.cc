@@ -324,6 +324,8 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
 	c = cyg_tolower (c);
 
       put_readahead (c);
+      if (ti.c_lflag & ECHO)
+	doecho (&c, 1);
       if (!iscanon || input_done)
 	{
 	  int status = accept_input ();
@@ -336,8 +338,6 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
 	  ret = line_edit_input_done;
 	  input_done = 0;
 	}
-      if (ti.c_lflag & ECHO)
-	doecho (&c, 1);
     }
 
   if (!iscanon && ralen > 0)

@@ -1,3 +1,8 @@
+2002-12-28  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Perform echo
+	before input is accepted or suffer a "race".
+
 2002-12-27  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (fhandler_tty_master::set_winsize): Declare new function.
