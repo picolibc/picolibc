@@ -29,10 +29,8 @@ endif
 
 pwd:=${shell pwd}
 ifneq "${filter winsup%,${notdir $(pwd)}}" ""
-a:=${shell ${filter winsup%,${notdir $(pwd)}} >/dev/tty}
     here:=${pwd}/cygwin
 else
-a:=${shell ${filter winsup%,${notdir $(pwd)}} >/dev/tty}
     here:=${dir $(pwd)}cygwin
 endif
 bupdir:=${shell cd $(here)/..; pwd}

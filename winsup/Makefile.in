@@ -1,5 +1,5 @@
 # Makefile.in for windows stuff
-# Copyright 1995, 1996, 1997, 1998, 1999, 2000 Red Hat, Inc.
+# Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -113,3 +113,5 @@ install_utils: cygwin mingw
 install_mingw: w32api
 
 install_cygwin: w32api
+
+install_cygserver: cygwin

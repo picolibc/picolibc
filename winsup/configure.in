@@ -1,5 +1,5 @@
 dnl Autoconf configure script for Cygwin.
-dnl Copyright 1996, 1997, 1998, 1999, 2000 Red Hat, Inc.
+dnl Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 dnl
 dnl This file is part of Cygwin.
 dnl
@@ -74,6 +74,7 @@ case "$with_cross_host" in
     # test -d $srcdir/bz2lib && SUBDIRS="$SUBDIRS bz2lib"
     # test -d $srcdir/zlib && SUBDIRS="$SUBDIRS zlib"
     # test -d $srcdir/subauth && SUBDIRS="$SUBDIRS subauth"
+    test -d $srcdir/cygserver && SUBDIRS="$SUBDIRS cygserver"
     SUBDIRS="$SUBDIRS utils doc"
     ;;
 esac
