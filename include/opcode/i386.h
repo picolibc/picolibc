@@ -105,21 +105,21 @@ static const template i386_optab[] = {
 {"movzx",  2, 0x0fb6, X, b_Suf|Modrm,			{ Reg8|ByteMem, WordReg, 0} },
 
 /* push instructions */
-{"push",   1,	0x50, X, wl_Suf|ShortForm,	{ WordReg,0,0 } },
+{"push",   1,	0x50, X, wl_Suf|ShortForm,	{ WordReg, 0, 0 } },
 {"push",   1,	0xff, 6, wl_Suf|Modrm,		{ WordReg|WordMem, 0, 0 } },
 {"push",   1,	0x6a, X, wl_Suf,		{ Imm8S, 0, 0} },
 {"push",   1,	0x68, X, wl_Suf,		{ Imm16|Imm32, 0, 0} },
-{"push",   1,	0x06, X, wl_Suf|Seg2ShortForm,	{ SReg2,0,0 } },
-{"push",   1, 0x0fa0, X, wl_Suf|Seg3ShortForm,	{ SReg3,0,0 } },
+{"push",   1,	0x06, X, wl_Suf|Seg2ShortForm,	{ SReg2, 0, 0 } },
+{"push",   1, 0x0fa0, X, wl_Suf|Seg3ShortForm,	{ SReg3, 0, 0 } },
 /* push all */
 {"pusha",  0,	0x60, X, wl_Suf,		{ 0, 0, 0 } },
 
 /* pop instructions */
-{"pop",	   1,	0x58, X, wl_Suf|ShortForm,	{ WordReg,0,0 } },
+{"pop",	   1,	0x58, X, wl_Suf|ShortForm,	{ WordReg, 0, 0 } },
 {"pop",	   1,	0x8f, 0, wl_Suf|Modrm,		{ WordReg|WordMem, 0, 0 } },
 #define POP_SEG_SHORT 0x07
-{"pop",	   1,	0x07, X, wl_Suf|Seg2ShortForm,	{ SReg2,0,0 } },
-{"pop",	   1, 0x0fa1, X, wl_Suf|Seg3ShortForm,	{ SReg3,0,0 } },
+{"pop",	   1,	0x07, X, wl_Suf|Seg2ShortForm,	{ SReg2, 0, 0 } },
+{"pop",	   1, 0x0fa1, X, wl_Suf|Seg3ShortForm,	{ SReg3, 0, 0 } },
 /* pop all */
 {"popa",   0,	0x61, X, wl_Suf,		{ 0, 0, 0 } },
 
@@ -766,7 +766,7 @@ static const template i386_optab[] = {
 
 /* 486 extensions */
 
-{"bswap",   1, 0x0fc8, X, l_Suf|ShortForm,	{ Reg32,0,0 } },
+{"bswap",   1, 0x0fc8, X, l_Suf|ShortForm,	{ Reg32, 0, 0 } },
 {"xadd",    2, 0x0fc0, X, bwl_Suf|W|Modrm,	{ Reg, Reg|AnyMem, 0 } },
 {"cmpxchg", 2, 0x0fb0, X, bwl_Suf|W|Modrm,	{ Reg, Reg|AnyMem, 0 } },
 {"invd",    0, 0x0f08, X, NoSuf,		{ 0, 0, 0} },
@@ -1007,6 +1007,7 @@ static const template i386_optab[] = {
 {"femms",    0, 0x0f0e,	   X, FP,		{ 0, 0, 0 } },
 {"pavgusb",  2, 0x0f0f, 0xbf, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } },
 {"pf2id",    2, 0x0f0f, 0x1d, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } },
+{"pf2iw",    2, 0x0f0f, 0x1c, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } }, /* Unofficial! See http://www.x86.org/articles/3dnow/amd_3dnow.html */
 {"pfacc",    2, 0x0f0f, 0xae, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } },
 {"pfadd",    2, 0x0f0f, 0x9e, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } },
 {"pfcmpeq",  2, 0x0f0f, 0xb0, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } },
@@ -1023,7 +1024,9 @@ static const template i386_optab[] = {
 {"pfsub",    2, 0x0f0f, 0x9a, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } },
 {"pfsubr",   2, 0x0f0f, 0xaa, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } },
 {"pi2fd",    2, 0x0f0f, 0x0d, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } },
+{"pi2fw",    2, 0x0f0f, 0x0c, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } }, /* Unofficial! */
 {"pmulhrw",  2, 0x0f0f, 0xb7, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } },
+{"pswapw",   2, 0x0f0f, 0xbb, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } }, /* Unofficial! */
 
 {NULL, 0, 0, 0, 0, { 0, 0, 0} }	/* sentinel */
 };
