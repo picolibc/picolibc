@@ -5,7 +5,9 @@ used to manage the UNIX emulation portion of the Cygwin environment.
 While many of these reflect their UNIX counterparts, each was written
 specifically for Cygwin.  You may use the long or short option names 
 interchangeably; for example, <literal>--help</literal> and 
-<literal>-h</literal> function identically.
+<literal>-h</literal> function identically. All of the Cygwin 
+command-line utilities support the <literal>--help</literal> and
+<literal>--version</literal> options. 
 </para>
 
 <sect2 id="cygcheck"><title>cygcheck</title>
@@ -522,7 +524,7 @@ and shares onto Cygwin's simulated POSIX directory tree, much like as is
 done by mount commands on typical UNIX systems.  Please see
 <Xref Linkend="mount-table"> for more information on the concepts
 behind the Cygwin POSIX file system and strategies for using
-mounts.</para>
+mounts. To remove mounts, use <command>umount</command></para>
 
 <sect3><title>Using mount</title>
 
@@ -816,93 +818,6 @@ option.
 
 </sect2>
 
-<sect2 id="umount"><title>umount</title>
-
-<screen>
-Usage: umount.exe [OPTION] [<posixpath>]
-  -A, --remove-all-mounts       remove all mounts
-  -c, --remove-cygdrive-prefix  remove cygdrive prefix
-  -h, --help                    output usage information and exit
-  -s, --system                  remove system mount (default)
-  -S, --remove-system-mounts    remove all system mounts
-  -u, --user                    remove user mount
-  -U, --remove-user-mounts      remove all user mounts
-  -v, --version                 output version information and exit
-</screen>
-
-<para>The <command>umount</command> program removes mounts from the
-mount table.  If you specify a POSIX path that corresponds to a
-current mount point, <command>umount</command> will remove it from the
-user-specific registry area.  The -s flag may be used to specify
-removing the mount from the system-wide registry area instead
-(Administrator priviledges are required).</para>
-
-<para>The <command>umount</command> utility may also be used to remove
-all mounts of a particular type.  With the extended options it is
-possible to remove all mounts, all automatically-mounted mounts, all
-mounts in the current user's registry area, or all mounts in the
-system-wide registry area (with Administrator privileges).</para>
-
-<para>See <Xref Linkend="mount">) for more information on the mount
-table.</para>
-</sect2>
-
-<sect2 id="strace"><title>strace</title>
-
-<screen>
-Usage: strace.exe [OPTIONS] <command-line>
-Usage: strace.exe [OPTIONS] -p <pid>
-  -b, --buffer-size=SIZE       set size of output file buffer
-  -d, --no-delta               don't display the delta-t microsecond timestamp
-  -f, --trace-children         trace child processes (toggle - default true)
-  -h, --help                   output usage information and exit
-  -m, --mask=MASK              set message filter mask
-  -n, --crack-error-numbers    output descriptive text instead of error
-                               numbers for Windows errors
-  -o, --output=FILENAME        set output file to FILENAME
-  -p, --pid=n                  attach to executing program with cygwin pid n
-  -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs
-  -t, --timestamp              use an absolute hh:mm:ss timestamp insted of 
-                               the default microsecond timestamp.  Implies -d
-  -T, --toggle                 toggle tracing in a process already being
-                               traced. Requires -p <pid>
-  -v, --version                output version information and exit
-  -w, --new-window             spawn program under test in a new window
-
-    MASK can be any combination of the following mnemonics and/or hex values
-    (0x is optional).  Combine masks with '+' or ',' like so:
-
-                      --mask=wm+system,malloc+0x00800
-
-    Mnemonic Hex     Corresponding Def  Description
-    =========================================================================
-    all      0x00001 (_STRACE_ALL)      All strace messages.
-    flush    0x00002 (_STRACE_FLUSH)    Flush output buffer after each message.
-    inherit  0x00004 (_STRACE_INHERIT)  Children inherit mask from parent.
-    uhoh     0x00008 (_STRACE_UHOH)     Unusual or weird phenomenon.
-    syscall  0x00010 (_STRACE_SYSCALL)  System calls.
-    startup  0x00020 (_STRACE_STARTUP)  argc/envp printout at startup.
-    debug    0x00040 (_STRACE_DEBUG)    Info to help debugging. 
-    paranoid 0x00080 (_STRACE_PARANOID) Paranoid info.
-    termios  0x00100 (_STRACE_TERMIOS)  Info for debugging termios stuff.
-    select   0x00200 (_STRACE_SELECT)   Info on ugly select internals.
-    wm       0x00400 (_STRACE_WM)       Trace Windows msgs (enable _strace_wm).
-    sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.
-    minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.
-    exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.
-    system   0x08000 (_STRACE_SYSTEM)   Serious error; goes to console and log.
-    nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.
-    malloc   0x20000 (_STRACE_MALLOC)   Trace malloc calls.
-    thread   0x40000 (_STRACE_THREAD)   Thread-locking calls.
-</screen>
-
-
-<para>The <command>strace</command> program executes a program, and
-optionally the children of the program, reporting any Cygwin DLL output
-from the program(s) to file.  This program is mainly useful for debugging
-the Cygwin DLL itself.</para>
-</sect2>
-
 <sect2 id="regtool"><title>regtool</title>
 
 <screen>
@@ -958,33 +873,498 @@ Conversely, the <literal>-q</literal> option supresses error messages,
 so you can use the exit status of the program to detect if a key
 exists or not (for example).</para>
 
-<para>The <literal>list</literal> command lists the subkeys and values
-belonging to the given key.  The <literal>add</literal> command adds a
-new key.  The <literal>remove</literal> command removes a key.  Note
-that you may need to remove everything in the key before you may
-remove it, but don't rely on this stopping you from accidentally
-removing too much.  The <literal>check</literal> command checks to see
-if a key exists (the exit code of the program is zero if it does,
-nonzero if it does not).</para>
+<para>You must provide <command>regtool</command> with an 
+<emphasis>action</emphasis> following options (if any). Currently,
+the action must be <literal>add</literal>, <literal>set</literal>,
+<literal>check</literal>, <literal>get</literal>, <literal>list</literal>,
+<literal>remove</literal>, <literal>set</literal>, or <literal>unset</literal>.
+</para>
 
-<para>The <literal>set</literal> command sets a value within a key.
-<literal>-i</literal> means the value is an integer (DWORD).
-<literal>-s</literal> means the value is a string.
-<literal>-e</literal> means it's an expanding string (it contains
-embedded environment variables).  <literal>-m</literal> means it's a
-multi-string (list).  If you don't specify one of these, it tries to
-guess the type based on the value you give.  If it looks like a
-number, it's a number.  If it starts with a percent, it's an expanding
-string.  If you give multiple values, it's a multi-string.  Else, it's
-a regular string.</para>
-
-<para>The <literal>unset</literal> command removes a value from a key.
-The <literal>get</literal> command gets the value of a value of a key,
+<para>The <literal>add</literal> action adds a new key.  The 
+<literal>check</literal> action checks to see if a key exists (the 
+exit code of the program is zero if it does, nonzero if it does not).
+The <literal>get</literal> action gets the value of a value of a key,
 and prints it (and nothing else) to stdout.  Note: if the value
 doesn't exist, an error message is printed and the program returns a
 non-zero exit code.  If you give <literal>-q</literal>, it doesn't
 print the message but does return the non-zero exit code.</para>
 
+<para>
+The <literal>list</literal> action lists the subkeys and values
+belonging to the given key. With <literal>list</literal>, the 
+<literal>-k</literal> option instructs <command>regtool</command>
+to print only KEYs, and the <literal>-l</literal> option to print
+only VALUEs. The <literal>-p</literal> option postfixes a 
+<literal>'/'</literal> to each KEY, but leave VALUEs with no
+postfix.  The <literal>remove</literal> action 
+removes a key.  Note that you may need to remove everything in the key 
+before you may remove it, but don't rely on this stopping you from 
+accidentally removing too much.  
+</para>
+
+<para>The <literal>set</literal> action sets a value within a key.
+<literal>-e</literal> means it's an expanding string (REG_EXPAND_SZ)
+that contains embedded environment variables.  
+<literal>-i</literal> means the value is an integer (REG_DWORD).
+<literal>-m</literal> means it's a multi-string (REG_MULTI_SZ).  
+<literal>-s</literal> means the value is a string (REG_SZ).
+If you don't specify one of these, <command>regtool</command> tries to
+guess the type based on the value you give.  If it looks like a
+number, it's a DWORD.  If it starts with a percent, it's an expanding
+string.  If you give multiple values, it's a multi-string.  Else, it's
+a regular string.
+The <literal>unset</literal> action removes a value from a key.
+</para>
+
+</sect2>
+
+<sect2 id="setfacl"><title>setfacl</title>
+
+<screen>
+Usage: setfacl [-r] (-f ACL_FILE | -s acl_entries) FILE...
+       setfacl [-r] ([-d acl_entries] [-m acl_entries]) FILE...
+
+Modify file and directory access control lists (ACLs)
+
+  -d, --delete     delete one or more specified ACL entries
+  -f, --file       set ACL entries for FILE to ACL entries read
+                   from a ACL_FILE
+  -m, --modify     modify one or more specified ACL entries
+  -r, --replace    replace mask entry with maximum permissions
+                   needed for the file group class
+  -s, --substitute substitute specified ACL entries for the
+                   ACL of FILE
+  -h, --help       output usage information and exit
+  -v, --version    output version information and exit
+
+At least one of (-d, -f, -m, -s) must be specified
+</screen>
+
+<para>
+For each file given as parameter, <command>setfacl</command> will 
+either replace its complete ACL (<literal>-s</literal>, <literal>-f</literal>), 
+or it will add, modify, or delete ACL entries.
+For more information on Cygwin and Windows ACLs, see
+see <Xref Linkend="ntsec"> in the Cygwin User's Guide.
+</para>
+
+<para>
+Acl_entries are one or more comma-separated ACL entries 
+from the following list:
+<screen>
+         u[ser]::perm
+         u[ser]:uid:perm
+         g[roup]::perm
+         g[roup]:gid:perm
+         m[ask]::perm
+         o[ther]::perm
+</screen>
+Default entries are like the above with the additional
+default identifier. For example: 
+<screen>
+         d[efault]:u[ser]:uid:perm
+</screen>
+</para>
+
+<para>
+<emphasis>perm</emphasis> is either a 3-char permissions string in the form
+"rwx" with the character <literal>'-'</literal> for no permission
+or it is the octal representation of the permissions, a
+value from 0 (equivalent to "---") to 7 ("rwx").
+<emphasis>uid</emphasis> is a user name or a numerical uid.
+<emphasis>gid</emphasis> is a group name or a numerical gid.
+</para>
+
+<para>
+The following options are supported:
+</para>
+
+<para>
+<literal>-d</literal>
+Delete one or more specified entries from the file's ACL.
+The owner, group and others entries must not be deleted.
+Acl_entries to be deleted should be specified without
+permissions, as in the following list:
+<screen>
+         u[ser]:uid
+         g[roup]:gid
+         d[efault]:u[ser]:uid
+         d[efault]:g[roup]:gid
+         d[efault]:m[ask]:
+         d[efault]:o[ther]:
+</screen>
+</para>
+
+<para>
+<literal>-f</literal>
+Take the Acl_entries from ACL_FILE one per line. Whitespace
+characters are ignored, and the character "#" may be used
+to start a comment.  The special filename "-" indicates
+reading from stdin. Note that you can use this with 
+<command>getfacl</command> and <command>setfacl</command> to copy 
+ACLs from one file to another:
+<screen>
+$ getfacl source_file | setfacl -f - target_file
+</screen>
+</para>
+
+<para>
+Required entries are: 
+one user entry for the owner of the file,
+one group entry for the group of the file, and
+one other entry.
+</para>
+
+<para>
+If additional user and group entries are given:
+a mask entry for the file group class of the file, and 
+no duplicate user or group entries with the same uid/gid.
+</para>
+
+<para>
+If it is a directory:
+one default user entry for the owner of the file,
+one default group entry for the group of the file,
+one default mask entry for the file group class, and
+one default other entry.
+</para>
+
+<para>
+<literal>-m</literal>
+Add or modify one or more specified ACL entries.  Acl_entries is a 
+comma-separated list of entries from the same list as above.
+</para>
+
+<para>
+<literal>-r</literal>   
+Causes the permissions specified in the mask 
+entry to be ignored and replaced by the maximum permissions needed for 
+the file group class.
+</para>
+
+<para>
+<literal>-s</literal>   
+Like <literal>-f</literal>, but substitute the 
+file's ACL with Acl_entries specified in a comma-separated list on the 
+command line.
+</para>
+
+<para>
+While the <literal>-d</literal> and <literal>-m</literal> options may be used 
+in the same command, the <literal>-f</literal> and <literal>-s</literal> 
+options may be used only exclusively.
+</para>
+
+<para>
+Directories may contain default ACL entries.  Files created
+in a directory that contains default ACL entries will have
+permissions according to the combination of the current umask,
+the explicit permissions requested and the default ACL entries
+</para>
+
+<para>
+Limitations: Under Cygwin, the default ACL entries are not taken into
+account currently.
+</para>
+
+</sect2>
+
+<sect2 id="ssp"><title>ssp</title>
+
+<screen>
+Usage: ssp [options] low_pc high_pc command...
+ -c, --console-trace  trace every EIP value to the console. *Lots* slower.
+ -d, --disable        disable single-stepping by default; use
+                      OutputDebugString ("ssp on") to enable stepping
+ -e, --enable         enable single-stepping by default; use
+                      OutputDebugString ("ssp off") to disable stepping
+ -h, --help           output usage information and exit
+ -l, --dll            enable dll profiling.  A chart of relative DLL usage
+                      is produced after the run.
+ -s, --sub-threads    trace sub-threads too.  Dangerous if you have
+                      race conditions.
+ -t, --trace-eip      trace every EIP value to a file TRACE.SSP.  This
+                      gets big *fast*.
+ -v, --verbose        output verbose messages about debug events.
+ -V, --version        output version information and exit
+
+Example: ssp 0x401000 0x403000 hello.exe
+</screen>
+
+<para>
+SSP - The Single Step Profiler
+</para>
+
+<para>
+Original Author:  DJ Delorie 
+</para>
+
+<para>
+The SSP is a program that uses the Win32 debug API to run a program
+one ASM instruction at a time.  It records the location of each
+instruction used, how many times that instruction is used, and all
+function calls.  The results are saved in a format that is usable by
+the profiling program <command>gprof</command>, although 
+<command>gprof</command> will claim the values
+are seconds, they really are instruction counts.  More on that later.
+</para>
+
+<para>
+Because the SSP was originally designed to profile the cygwin DLL, it
+does not automatically select a block of code to report statistics on.
+You must specify the range of memory addresses to keep track of
+manually, but it's not hard to figure out what to specify.  Use the
+"objdump" program to determine the bounds of the target's ".text"
+section.  Let's say we're profiling cygwin1.dll.  Make sure you've
+built it with debug symbols (else <command>gprof</command> won't run) 
+and run objdump like this:
+
+<screen>
+$ objdump -h cygwin1.dll
+</screen>
+
+It will print a report like this:
+<screen>
+cygwin1.dll:     file format pei-i386
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0007ea00  61001000  61001000  00000400  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE, DATA
+  1 .data         00008000  61080000  61080000  0007ee00  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  . . .
+</screen>
+</para>
+
+<para>
+The only information we're concerned with are the VMA of 
+the .text section and the VMA of the section after it 
+(sections are usually contiguous; you can also add the 
+Size to the VMA to get the end address).  In this case, 
+the VMA is 0x61001000 and the ending address is either 
+0x61080000 (start of .data method) or 0x0x6107fa00 (VMA+Size
+method).
+</para>
+
+<para>
+There are two basic ways to use SSP - either profiling a whole
+program, or selectively profiling parts of the program.
+</para>
+
+<para>
+To profile a whole program, just run <command>ssp</command> without options.  
+By default, it will step the whole program.  Here's a simple example, using 
+the numbers above:
+
+<screen>
+$ ssp 0x61001000 0x61080000 hello.exe
+</screen>
+
+This will step the whole program.  It will take at least 8 minutes on
+a PII/300 (yes, really).  When it's done, it will create a file called
+"gmon.out".  You can turn this data file into a readable report with
+<command>gprof</command>:
+
+<screen>
+$ gprof -b cygwin1.dll
+</screen>
+
+The "-b" means 'skip the help pages'.  You can omit this until you're
+familiar with the report layout.  The <command>gprof</command> documentation 
+explains a lot about this report, but <command>ssp</command> changes a few 
+things.  For example, the first part of the report reports the amount of time 
+spent in each function, like this:
+
+<screen>
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total
+ time   seconds   seconds    calls  ms/call  ms/call  name
+ 10.02    231.22    72.43       46  1574.57  1574.57  strcspn
+  7.95    288.70    57.48      130   442.15   442.15  strncasematch
+</screen>
+
+The "seconds" columns are really CPU opcodes, 1/100 second per opcode.
+So, "231.22" above means 23,122 opcodes.  The ms/call values are 10x
+too big; 1574.57 means 157.457 opcodes per call.  Similar adjustments
+need to be made for the "self" and "children" columns in the second
+part of the report.
+</para>
+
+<para>
+OK, so now we've got a huge report that took a long time to generate,
+and we've identified a spot we want to work on optimizing.  Let's say
+it's the time() function.  We can use SSP to selectively profile this
+function by using OutputDebugString() to control SSP from within the
+program.  Here's a sample program:
+
+<screen>
+	#include &lt;windows.h&gt;
+	main()
+	{
+	  time_t t;
+	  OutputDebugString("ssp on");
+	  time(&amp;t);
+	  OutputDebugString("ssp off");
+	}
+</screen>
+</para>
+
+<para>
+Then, add the <literal>-d</literal> option to ssp to default to 
+*disabling* profiling.  The program will run at full speed until the first 
+OutputDebugString, then step until the second.
+You can then use <command>gprof</command> (as usual) to see the performance 
+profile for just that portion of the program's execution.
+</para>
+
+<para>
+There are many options to ssp.  Since step-profiling makes your
+program run about 1,000 times slower than normal, it's best to
+understand all the options so that you can narrow down the parts
+of your program you need to single-step.
+</para>
+
+<para>
+<literal>-v</literal> - verbose.  This prints messages about threads 
+starting and stopping, OutputDebugString calls, DLLs loading, etc.
+</para>
+
+<para>
+<literal>-t</literal> and <literal>-c</literal> - tracing.  
+With <literal>-t</literal>, *every* step's address is written
+to the file "trace.ssp".  This can be used to help debug functions,
+since it can trace multiple threads.  Clever use of scripts can match
+addresses with disassembled opcodes if needed.  Warning: creates
+*huge* files, very quickly.  <literal>-c</literal> prints each address to 
+the console, useful for debugging key chunks of assembler.  Use 
+<literal>addr2line -C -f -s -e foo.exe &lt; trace.ssp &gt; lines.ssp</literal>
+and then <literal>perl cvttrace</literal> to convert to symbolic traces.
+</para>
+
+<para>
+<literal>-s</literal> - subthreads.  Usually, you only need to trace the 
+main thread, but sometimes you need to trace all threads, so this enables that.
+It's also needed when you want to profile a function that only a
+subthread calls.  However, using OutputDebugString automatically
+enables profiling on the thread that called it, not the main thread.
+</para>
+
+<para>
+<literal>-l</literal> - dll profiling.  Generates a pretty table of how much 
+time was spent in each dll the program used.  No sense optimizing a function in
+your program if most of the time is spent in the DLL.
+I usually use the <literal>-v</literal>, <literal>-s</literal>, and 
+<literal>-l</literal> options:
+
+<screen>
+$ ssp <literal>-v</literal> <literal>-s</literal> <literal>-l</literal> <literal>-d</literal> 0x61001000 0x61080000 hello.exe
+</screen>
+
+</sect2>
+
+<sect2 id="strace"><title>strace</title>
+
+<screen>
+Usage: strace.exe [OPTIONS] <command-line>
+Usage: strace.exe [OPTIONS] -p <pid>
+  -b, --buffer-size=SIZE       set size of output file buffer
+  -d, --no-delta               don't display the delta-t microsecond timestamp
+  -f, --trace-children         trace child processes (toggle - default true)
+  -h, --help                   output usage information and exit
+  -m, --mask=MASK              set message filter mask
+  -n, --crack-error-numbers    output descriptive text instead of error
+                               numbers for Windows errors
+  -o, --output=FILENAME        set output file to FILENAME
+  -p, --pid=n                  attach to executing program with cygwin pid n
+  -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs
+  -t, --timestamp              use an absolute hh:mm:ss timestamp insted of 
+                               the default microsecond timestamp.  Implies -d
+  -T, --toggle                 toggle tracing in a process already being
+                               traced. Requires -p <pid>
+  -v, --version                output version information and exit
+  -w, --new-window             spawn program under test in a new window
+
+    MASK can be any combination of the following mnemonics and/or hex values
+    (0x is optional).  Combine masks with '+' or ',' like so:
+
+                      --mask=wm+system,malloc+0x00800
+
+    Mnemonic Hex     Corresponding Def  Description
+    =========================================================================
+    all      0x00001 (_STRACE_ALL)      All strace messages.
+    flush    0x00002 (_STRACE_FLUSH)    Flush output buffer after each message.
+    inherit  0x00004 (_STRACE_INHERIT)  Children inherit mask from parent.
+    uhoh     0x00008 (_STRACE_UHOH)     Unusual or weird phenomenon.
+    syscall  0x00010 (_STRACE_SYSCALL)  System calls.
+    startup  0x00020 (_STRACE_STARTUP)  argc/envp printout at startup.
+    debug    0x00040 (_STRACE_DEBUG)    Info to help debugging. 
+    paranoid 0x00080 (_STRACE_PARANOID) Paranoid info.
+    termios  0x00100 (_STRACE_TERMIOS)  Info for debugging termios stuff.
+    select   0x00200 (_STRACE_SELECT)   Info on ugly select internals.
+    wm       0x00400 (_STRACE_WM)       Trace Windows msgs (enable _strace_wm).
+    sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.
+    minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.
+    exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.
+    system   0x08000 (_STRACE_SYSTEM)   Serious error; goes to console and log.
+    nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.
+    malloc   0x20000 (_STRACE_MALLOC)   Trace malloc calls.
+    thread   0x40000 (_STRACE_THREAD)   Thread-locking calls.
+</screen>
+
+<para>The <command>strace</command> program executes a program, and
+optionally the children of the program, reporting any Cygwin DLL output
+from the program(s) to stdout, or to a file with the <literal>-o</literal>
+option.  With the <literal>-w</literal> option, you can start an strace
+session in a new window, for example:
+
+<screen>
+$ strace -o tracing_output -w sh -c 'while true; do echo "tracing..."; done' &
+</screen>
+This is particularly useful for <command>strace</command> sessions that
+take a long time to complete.
+</para>
+
+<para>
+Note that <command>strace</command> is a standalone Windows program and so does 
+not rely on the Cygwin DLL itself (you can verify this with 
+<command>cygcheck</command>). As a result it does not understand POSIX
+pathnames or symlinks.  This program is mainly useful for debugging the 
+Cygwin DLL itself.</para>
+
+</sect2>
+
+<sect2 id="umount"><title>umount</title>
+
+<screen>
+Usage: umount.exe [OPTION] [<posixpath>]
+  -A, --remove-all-mounts       remove all mounts
+  -c, --remove-cygdrive-prefix  remove cygdrive prefix
+  -h, --help                    output usage information and exit
+  -s, --system                  remove system mount (default)
+  -S, --remove-system-mounts    remove all system mounts
+  -u, --user                    remove user mount
+  -U, --remove-user-mounts      remove all user mounts
+  -v, --version                 output version information and exit
+</screen>
+
+<para>The <command>umount</command> program removes mounts from the
+mount table.  If you specify a POSIX path that corresponds to a
+current mount point, <command>umount</command> will remove it from the
+system registry area.  (Administrator priviledges are required).
+The <literal>-u</literal> flag may be used to specify removing the mount 
+from the user-specific registry area instead.</para>
+
+<para>The <command>umount</command> utility may also be used to remove
+all mounts of a particular type.  With the extended options it is
+possible to remove all mounts (<literal>-A</literal>), all 
+cygdrive automatically-mounted mounts (<literal>-c</literal>), all
+mounts in the current user's registry area (<literal>-U</literal>), 
+or all mounts in the system-wide registry area (<literal>-S</literal>) 
+(with Administrator privileges).</para>
+
+<para>See <Xref Linkend="mount"> for more information on the mount
+table.</para>
 </sect2>
 
 </sect1>
