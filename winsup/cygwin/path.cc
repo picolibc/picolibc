@@ -499,7 +499,7 @@ path_conv::check (const char *src, unsigned opt,
   bool need_directory = 0;
   bool saw_symlinks = 0;
   int is_relpath;
-  char *tail;
+  char *tail, *path_end;
 
 #if 0
   static path_conv last_path_conv;
@@ -544,7 +544,7 @@ path_conv::check (const char *src, unsigned opt,
 	  need_directory = 1;
 	  *--tail = '\0';
 	}
-      char *path_end = tail;
+      path_end = tail;
 
       /* Scan path_copy from right to left looking either for a symlink
 	 or an actual existing file.  If an existing file is found, just
@@ -872,7 +872,7 @@ out:
     normalized_path_size = 0;
   else
     {
-      if (tail[1] != '\0')
+      if (tail < path_end && tail > path_copy + 1)
 	*tail = '/';
       set_normalized_path (path_copy);
     }

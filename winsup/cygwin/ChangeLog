@@ -1,3 +1,7 @@
+2004-04-12  Pierre Humblet <pierre.humblet@ieee.org>
+
+        * path.cc (path_conv::check): Fix "tail filling" logic.
+
 2004-04-11  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* cygheap.h: Replace inexplicably removed closing brace.
