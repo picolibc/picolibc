@@ -1,3 +1,11 @@
+2003-12-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdio.h:(_fileno): Define macro version after both
+	fileno and _fileno functions declared.
+
+	* include/stdio.h (_rmtmp, rmtmp): Add prototypes.
+	* moldnames.def.in (rmtmp) Add stub.
+
 2003-11-27  Dimitry Sibiryakov  <aafemt@users.sourceforge.net>
 
 	* include/signal.h (SIG_SGE, SIG_ACK): Add defines.

@@ -85,6 +85,7 @@ putenv
 putw
 read
 rmdir
+rmtmp
 searchenv
 seterrormode
 setmode

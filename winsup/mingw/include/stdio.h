@@ -197,11 +197,16 @@ _CRTIMP int __cdecl	remove (const char*);
 _CRTIMP int __cdecl	rename (const char*, const char*);
 _CRTIMP FILE* __cdecl	tmpfile (void);
 _CRTIMP char* __cdecl	tmpnam (char*);
+
+#ifndef __STRICT_ANSI__
 _CRTIMP char* __cdecl	_tempnam (const char*, const char*);
+_CRTIMP int  __cdecl    _rmtmp(void);
 
 #ifndef	NO_OLDNAMES
 _CRTIMP char* __cdecl	tempnam (const char*, const char*);
+_CRTIMP int __cdecl     rmtmp(void);
 #endif
+#endif /* __STRICT_ANSI__ */
 
 _CRTIMP int __cdecl	setvbuf (FILE*, char*, int, size_t);
 
@@ -379,17 +384,17 @@ _CRTIMP int __cdecl	_getmaxstdio(void);
 _CRTIMP int __cdecl	_setmaxstdio(int);
 #endif
 
-#define _fileno(__F) ((__F)->_file)
-
 #ifndef _NO_OLDNAMES
 _CRTIMP int __cdecl	fgetchar (void);
 _CRTIMP int __cdecl	fputchar (int);
 _CRTIMP FILE* __cdecl	fdopen (int, const char*);
 _CRTIMP int __cdecl	fileno (FILE*);
-
-#define fileno(__F) ((__F)->_file)
-
 #endif	/* Not _NO_OLDNAMES */
+
+#define _fileno(__F) ((__F)->_file)
+#ifndef _NO_OLDNAMES
+#define fileno(__F) ((__F)->_file)
+#endif
 
 #endif	/* Not __STRICT_ANSI__ */
 
