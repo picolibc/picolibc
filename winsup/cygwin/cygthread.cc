@@ -258,10 +258,15 @@ cygthread::terminate_thread ()
     system_printf ("VirtualFree of allocation base %p<%p> failed, %E",
 		   stack_ptr, m.AllocationBase);
 
-  h = NULL;
-  __name = NULL;
-  stack_ptr = NULL;
-  (void) InterlockedExchange (&inuse, 0); /* No longer in use */
+  if (is_freerange)
+    free (this);
+  else
+    {
+      h = NULL;
+      __name = NULL;
+      stack_ptr = NULL;
+      (void) InterlockedExchange (&inuse, 0); /* No longer in use */
+    }
 }
 
 /* Detach the cygthread from the current thread.  Note that the

@@ -1,3 +1,9 @@
+2003-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.h (cygthread::terminate_thread): Mark private.
+	* cygthread.cc (cygthread::terminate_thread): Deallocate free_range
+	thread stuff.
+
 2003-06-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::accept): Rename `signalled'
