@@ -75,9 +75,9 @@ struct _winsup_t
 
 /* path.cc */
   struct mntent _ret;
-  char *_current_directory_name;
-  char *_current_directory_posix_name;
-  unsigned long _current_directory_hash;
+  char *_cwd_win32;
+  char *_cwd_posix;
+  unsigned long _cwd_hash;
   int _iteration;
 
 /* strerror */

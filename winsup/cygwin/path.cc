@@ -87,7 +87,7 @@ static char *getcwd_inner (char *buf, size_t ulen, int posix_p);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
 static void backslashify (const char *src, char *dst, int trailing_slash_p);
 static int path_prefix_p_ (const char *path1, const char *path2, int len1);
-static int get_current_directory_name ();
+static int get_cwd_win32 ();
 
 static NO_COPY const char escape_char = '^';
 
@@ -143,13 +143,13 @@ struct symlink_info
    support multiple threads.  */
 
 #ifdef _MT_SAFE
-#define current_directory_name  _reent_winsup()->_current_directory_name
-#define current_directory_posix_name _reent_winsup()->_current_directory_posix_name
-#define current_directory_hash _reent_winsup()->_current_directory_hash
+#define cwd_win32  _reent_winsup()->_cwd_win32
+#define cwd_posix _reent_winsup()->_cwd_posix
+#define cwd_hash _reent_winsup()->_cwd_hash
 #else
-static char *current_directory_name;
-static char *current_directory_posix_name;
-static unsigned long current_directory_hash;
+static char *cwd_win32;
+static char *cwd_posix;
+static unsigned long cwd_hash;
 #endif
 
 static int
@@ -555,6 +555,7 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
   const char *src_start = src;
   char *dst_start = dst;
 
+  syscall_printf ("cwd %s, src %s", cwd, src);
   if (!isslash (src[0]))
     {
       if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
@@ -873,7 +874,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
                                 unsigned *flags)
 {
   int src_path_len = strlen (src_path);
-  int trailing_slash_p = (src_path_len > 0
+  int trailing_slash_p = (src_path_len > 1
 			  && SLASH_P (src_path[src_path_len - 1]));
   MALLOC_CHECK;
   int isrelpath;
@@ -916,7 +917,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
   if (strpbrk (src_path, ":\\") != NULL)
     {
       debug_printf ("%s already win32", src_path);
-      rc = normalize_win32_path (current_directory_name, src_path, dst);
+      rc = normalize_win32_path (cwd_win32, src_path, dst);
       if (rc)
 	{
 	  debug_printf ("normalize_win32_path failed, rc %d", rc);
@@ -1020,8 +1021,7 @@ fillin:
   if (win32_path == NULL)
     /* nothing to do */;
   else if (isrelpath &&
-	   path_prefix_p (current_directory_name, dst,
-			  cwdlen = strlen (current_directory_name)))
+	   path_prefix_p (cwd_win32, dst, cwdlen = strlen (cwd_win32)))
     {
       size_t n = strlen (dst);
       if (n < cwdlen)
@@ -1031,7 +1031,7 @@ fillin:
 	  if (n == cwdlen)
 	    dst += cwdlen;
 	  else
-	    dst += isdirsep (current_directory_name[cwdlen - 1]) ? cwdlen : cwdlen + 1;
+	    dst += isdirsep (cwd_win32[cwdlen - 1]) ? cwdlen : cwdlen + 1;
 
 	  memmove (win32_path, dst, strlen (dst) + 1);
 	  if (!*win32_path)
@@ -2279,10 +2279,10 @@ hash_path_name (unsigned long hash, const char *name)
 	 Otherwise the inodes same will differ depending on whether a file is
 	 referenced with an absolute value or relatively. */
 
-      if (*name != '\\' && (current_directory_name == NULL ||
-			    get_current_directory_name ()))
+      if (*name != '\\' && (cwd_win32 == NULL ||
+			    get_cwd_win32 ()))
 	{
-	  hash = current_directory_hash;
+	  hash = cwd_hash;
 	  if (name[0] == '.' && name[1] == '\0')
 	    return hash;
 	  hash = hash_path_name (hash, "\\");
@@ -2303,21 +2303,21 @@ hashit:
 }
 
 static int
-get_current_directory_name ()
+get_cwd_win32 ()
 {
   DWORD dlen, len;
 
   for (dlen = 256; ; dlen *= 2)
     {
-      current_directory_name = (char *) realloc (current_directory_name, dlen + 2);
-      if ((len = GetCurrentDirectoryA (dlen, current_directory_name)) < dlen)
+      cwd_win32 = (char *) realloc (cwd_win32, dlen + 2);
+      if ((len = GetCurrentDirectoryA (dlen, cwd_win32)) < dlen)
 	break;
     }
 
   if (len == 0)
     __seterrno ();
   else
-    current_directory_hash = hash_path_name (0, current_directory_name);
+    cwd_hash = hash_path_name (0, cwd_win32);
 
   return len;
 }
@@ -2330,16 +2330,16 @@ getcwd_inner (char *buf, size_t ulen, int posix_p)
   char *resbuf = NULL;
   size_t len = ulen;
 
-  if (current_directory_name == NULL && !get_current_directory_name ())
+  if (cwd_win32 == NULL && !get_cwd_win32 ())
     return NULL;
 
   if (!posix_p)
     {
-      if (strlen (current_directory_name) >= len)
+      if (strlen (cwd_win32) >= len)
 	set_errno (ERANGE);
       else
 	{
-	  strcpy (buf, current_directory_name);
+	  strcpy (buf, cwd_win32);
 	  resbuf = buf;
 	}
 
@@ -2347,13 +2347,13 @@ getcwd_inner (char *buf, size_t ulen, int posix_p)
 		      resbuf, resbuf ? resbuf : "", buf, len);
       return resbuf;
     }
-  else if (current_directory_posix_name != NULL)
+  else if (cwd_posix != NULL)
     {
-      if (strlen (current_directory_posix_name) >= len)
+      if (strlen (cwd_posix) >= len)
 	set_errno (ERANGE);
       else
 	{
-	  strcpy (buf, current_directory_posix_name);
+	  strcpy (buf, cwd_posix);
 	  resbuf = buf;
 	}
 
@@ -2362,19 +2362,19 @@ getcwd_inner (char *buf, size_t ulen, int posix_p)
       return resbuf;
     }
 
-  /* posix_p required and current_directory_posix_name == NULL */
+  /* posix_p required and cwd_posix == NULL */
 
   char temp[MAX_PATH];
 
   /* Turn from Win32 style to our style.  */
-  cygwin_shared->mount.conv_to_posix_path (current_directory_name, temp, 0);
+  cygwin_shared->mount.conv_to_posix_path (cwd_win32, temp, 0);
 
   size_t tlen = strlen (temp);
 
-  current_directory_posix_name = (char *) realloc (
-				  current_directory_posix_name, tlen + 1);
-  if (current_directory_posix_name != NULL)
-    strcpy (current_directory_posix_name, temp);
+  cwd_posix = (char *) realloc (
+				  cwd_posix, tlen + 1);
+  if (cwd_posix != NULL)
+    strcpy (cwd_posix, temp);
 
   if (tlen >= ulen)
     {
@@ -2425,6 +2425,7 @@ extern "C"
 int
 chdir (const char *dir)
 {
+  syscall_printf ("dir %s", dir);
   path_conv path (dir);
 
   if (path.error)
@@ -2450,18 +2451,15 @@ chdir (const char *dir)
     __seterrno ();
 
   /* Clear the cache until we need to retrieve the directory again.  */
-  if (current_directory_name != NULL)
-    {
-      free (current_directory_name);
-      current_directory_name = NULL;
-    }
-  if (current_directory_posix_name != NULL)
-    {
-      free (current_directory_posix_name);
-      current_directory_posix_name = NULL;
-    }
+  free (cwd_win32);
+  cwd_win32 = strdup (path);;
 
-  syscall_printf ("%d = chdir (%s) (dos %s)", res, dir, native_dir);
+  char pathbuf[MAX_PATH];
+  (void) normalize_posix_path (cwd_posix, dir, pathbuf);
+  free (cwd_posix);
+  cwd_posix = strdup (pathbuf);
+
+  syscall_printf ("%d = chdir (%s <dos %s>)", res, cwd_posix, cwd_win32);
   return res;
 }
 
