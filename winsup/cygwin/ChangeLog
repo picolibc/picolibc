@@ -16,8 +16,8 @@
 	(client_shmmgr::shmdt): Remove calls to with_strerr.
 	(client_shmmgr::attach): Ditto.
 
-2002-09-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
- 
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* include/sys/ipc.h: Move to "include/cygwin/ipc.h".
 	* include/sys/msg.h: Move to "include/cygwin/msg.h".
 	* include/sys/sem.h: Move to "include/cygwin/sem.h".
@@ -29,8 +29,8 @@
 	* cygserver_shm.h: Update includes.
 	* msg.cc: Ditto.
 	* sem.cc: Ditto.
- 
-2002-09-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* safe_memory.h (safe_delete): Make a templated function.
 	* cygserver.cc (~server_request): Update use of safe_delete.
@@ -46,14 +46,14 @@
 	* shm.cc (client_shmmgr::shmdt): Ditto.
 	* threaded_queue.cc (~threaded_queue): Ditto.
 	(threaded_queue::worker_loop): Ditto.
- 
-2002-08-29  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* safe_memory.h: Replace #include <new> with an explicit
 	definition of the placement new operator.
 	(safe_delete): Remove unnecessary ## operator.
 
-2002-07-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.cc (class server_shmmgr): Remove `cleanup_t'
 	friend declaration.
@@ -66,7 +66,7 @@
 	* include/cygwin/cygserver_process.h (cleanup_routine::key): Make
 	method const.
 
-2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/cygwin/cygserver_process.h
 	(cleanup_routine::_key): New field.
@@ -96,7 +96,7 @@
 	(server_shmmgr::shmdt): Make argument non-const.
 	(server_shmmgr::find (segment_t *)): New method.
 
-2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc (client_request_shutdown::client_request_shutdown):
 	Comment out verbose tracing statement.
@@ -106,12 +106,12 @@
 	* cygserver_shm.cc (client_request_shm::client_request_shm):
 	Ditto.
 
-2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_transport_pipes.cc (transport_layer_pipes::listen):
 	Set `_is_listening_endpoint' appropriately.
 
-2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/cygwin/cygserver_transport.h
 	(transport_layer_base::listen): Change return type.
@@ -163,7 +163,7 @@
 	* cygserver_client.cc (client_request::make_request): Check new
 	return value on connect method call.
 
-2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/cygwin/cygserver_transport_pipes.h
 	(cygserver_transport_pipes::_sd): Rename field.
@@ -196,7 +196,7 @@
 	(transport_layer_sockets::write): Ditto.
 	(transport_layer_sockets::connect): Ditto.
 
-2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.cc (with_strerr): Fix use of %p format.
 	* shm.cc (client_shmmgr::shmat): Ditto.
@@ -204,34 +204,34 @@
 	(client_shmmgr::shmdt): Ditto.
 	(client_shmmgr::attach): Ditto.
 
-2002-07-14  Christopher Faylor  <cgf@redhat.com>
+2002-09-22  Christopher Faylor  <cgf@redhat.com>
 
 	* woutsup.h (system_printf): Remove extraneous semicolon from macro
 	definition.
 
-2002-07-14  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_transport_pipes.cc
 	(transport_layer_pipes::connect): Use ProtectHandle in DLL code.
 	(transport_layer_pipes::close): Use ForceCloseHandle in DLL code.
 
-2002-07-13  Nicholas Wourms  <nwourms@netscape.com>
+2002-09-22  Nicholas Wourms  <nwourms@netscape.com>
 
 	* threaded_queue.h (class queue_submission_loop): Correct friend
 	declaration for GCC 3.1.1.
 	* include/cygwin/cygserver_process.h (class process): Ditto.
 	(class process_cache): Ditto.
 
-2002-07-12  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.cc (server_shmmgr::shmdt): Only call
 	delete_segment if the segment exists [sic].
 
-2002-07-12  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* safe_memory.h: Include <new> rather than <new.h> for gcc 3.
 
-2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* safe_memory.h: New file extracted from "woutsup.h".
 	* woutsup.h: Move the "safe" new/delete macros into the new
@@ -251,7 +251,7 @@
 	(client_shmmgr::shmdt): Ditto.
 	(client_shmmgr::new_segment): Ditto.
 
-2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_process (process::process): Add the client's cygpid
 	and winpid to all tracing statements as appropriate.
@@ -266,7 +266,7 @@
 	(client_request_shm::serve): Update for the new signature of the
 	shmctl and shmget methods.
 
-2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc (client_request_shutdown::serve): Don't set the
 	shutdown flag directly, but send a SIGINT, as the signal handler
@@ -280,7 +280,7 @@
 	(shmdt): Ditto.
 	(shmget): Ditto.
 
-2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.cc: Automatically detach processes from any
 	segments they are attached to at exit.
@@ -340,12 +340,12 @@
 	* include/sys/shm.h (shmatt_t): Make unsigned as per SUSv3.
 	(shm_info::shm_atts): New field.
 
-2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.cc (class server_shmmgr::segment_t): Add `_'
 	prefix to the names of all fields.
 
-2002-07-10  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* msg.cc: New file of stub functions, no functionality.
 	* sem.cc: Ditto.
@@ -379,7 +379,7 @@
 	(server_shmmgr::delete_segment): Update the new `_shm_tot' field.
 	* Makefile.in (DLL_OFILES): Add new DLL object files.
 
-2002-07-09  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_transport_pipes.cc: The main change is to make the
 	client try harder to connect to the server if it's previously
@@ -401,7 +401,7 @@
 	the situation where WaitNamedPipe fails to wait [sic] and add a
 	`Sleep (0)' so that the server gets a chance to run.
 
-2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* dcrt0.cc: Only check for cygserver if and when required.
 	(dll_crt0_1): Remove call to `cygserver_init ()'.
@@ -432,7 +432,7 @@
 	(cygserver_init): Make available in cygserver as well the DLL.
 	Remove `check_version_too' argument.
 
-2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.cc: Implement the ipcs(8) interfaces, IPC_INFO,
 	SHM_STAT and SHM_INFO.
@@ -510,25 +510,25 @@
 	the `_parameters.in' struct, not of the whole in/out parameter
 	union.
 
-2002-07-02  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* shm.cc: Remove the use of a static client_shmmgr object.
 	(client_shmmgr::_instance): New static variable.
 	(client_shmmgr::instance): Allocate a new shmmgr on the heap,
 	rather than using a local static object.
 
-2002-07-01  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_transport.cc (create_server_transport): Fix
 	cut-and-paste error.
 
-2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_client.cc (client_request::handle_request): Don't
 	bother with the client request activity marker when compiled with
 	debugging output.
 
-2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_transport_pipes.cc
 	(MAX_WAIT_NAMED_PIPE_RETRY): New constant.
@@ -543,12 +543,12 @@
 	(transport_layer_pipes::connect): Ditto.  New, but still bogus,
 	retry logic.
 
-2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.cc (server_shmmgr::server_shmmgr): All fields have
 	to be initialized now that the singleton is no longer static.
 
-2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.cc (server_shmmgr::_instance): New static field.
 	(server_shmmgr::_instance_once): Ditto.
@@ -556,7 +556,7 @@
 	(server_shmmgr::instance): Use a pthread_once_t rather than
 	relying on a local static variable.
 
-2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* woutsup.h: Remove all uses of the C++ new and delete operators
 	throughout cygserver until they are fully thread-safe.
@@ -589,13 +589,13 @@
 	(print_usage): Replace iostreams with FILEs.
 	(print_version): Ditto.
 
-2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_transport_sockets.cc
 	(transport_layer_sockets::accept): Rename local variable
 	`accept_fd' to avoid shadowing the `fd' field.
 
-2002-06-29  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygwin_ipc.h: Moved (back) to "include/sys/ipc.h".
 	* cygwin_shm.h: Moved (back) to "include/sys/shm.h".
@@ -604,7 +604,7 @@
 	* cygserver_shm.h: Update for new header file locations.
 	* ipc.cc: Ditto.
 
-2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_client.cc (client_request::make_request): Comment out
 	a verbose tracing statement.
@@ -616,14 +616,14 @@
 	(class client_request_shutdown): Ditto.
 	(class client_request_attach_tty): Ditto.
 
-2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_ipc.h: New file.
 	* cygserver_shm.h: Re-written from scratch.
 	* cygserver_shm.cc: Ditto.
 	* shm.cc: Ditto.
 
-2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* threaded_queue.h (class queue_request): Re-write.
 	(threaded_queue_thread_function): Remove.
@@ -668,7 +668,7 @@
 	* cygserver_shm.cc (client_request_shm::serve): Release the
 	process object after use.
 
-2002-06-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_client.cc (client_request::handle_request): Correct
 	tracing statement.
@@ -678,12 +678,12 @@
 	* cygwin_shm.h: Ditto.
 	* woutsup.h: Add definition of _WIN32_WINNT.
 
-2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_client (client_request::make_request): Replace my
 	inappropriate use of set_errno () with error_code () throughout.
 
-2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/cygwin/cygserver.h: Add forward declarations of class
 	transport_layer_base and class process_cache to reduce
@@ -700,7 +700,7 @@
 	* fhandler_tty.cc: Ditto.
 	* tty.cc: Ditto.
 
-2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.h: Replace <sys/shm.h> with "cygwin_shm.h" after
 	merge from HEAD.
@@ -708,7 +708,7 @@
 	merge from HEAD.
 	* cygwin_shm.h: Ditto.
 
-2002-06-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc: The tests for a duplicate server instance are now
 	the responsibility of the transport layer.
@@ -769,7 +769,7 @@
 	appropriate.
 	(transport_layer_pipes::close): Update the `pipe_instance' count.
 
-2002-06-18  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* woutsup.h (cygserver_running): Add declaration.
 	(api_fatal): Eliminate.
@@ -796,7 +796,7 @@
 	transport connections so that (one day) the transport classes can
 	tidy up on cygserver shutdown.
 
-2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc (main): Adjust tracing output for a cleaner display
 	when compiled without --enable-debugging.
@@ -812,7 +812,7 @@
 	(client_request::make_request): Remove the explicit close of
 	`transport' as it is closed on deletion.
 
-2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/cygwin/cygserver.h: Change the client_request classes to
 	give greater encapsulation and to allow variable length requests
@@ -897,7 +897,7 @@
 	(shmget): Ditto.
 	* fhandler_tty.cc (fhandler_tty_slave::cygserver_attach_tty): Ditto.
 
-2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/cygwin/cygserver_transport.h
 	(cygserver_transport::read): Change buffer type to void *.
@@ -916,7 +916,7 @@
 	match behaviour of cygserver_transport_sockets class.
 	(cygserver_transport_pipes::write): Ditto.
 
-2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc (version): New static variable.
 	(server_request_queue::add_connection): Remove my gratuitous use
@@ -930,7 +930,7 @@
 	for inspiration here).
 	(main): More argument checking.  Add --help and --version options.
 
-2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/cygwin/cygserver.h (client_request::serve): Make pure
 	virtual.
@@ -940,7 +940,7 @@
 	(server_request::process): Use new client_request_invalid
 	class. And remove goto's.
 
-2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc (class server_request): Add virtual destructor.
 	(server_request_queue::addConnection): New method to replace bad
@@ -985,7 +985,7 @@
 	(queue_request::process): Remove definition of pure virtual
 	method.
 
-2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/cygwin/cygserver.h (client_request::send): Make
 	non-virtual.
@@ -994,7 +994,7 @@
 	* cygserver_client.cc: Ditto.
 	(cygserver_init): Fix error handling.
 
-2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc: Throughout the code, check and correct level of
 	the XXX_printf() functions used. Comment out several of the
@@ -1010,12 +1010,12 @@
 	(client_request_shm::client_request_shm): Use hi_ulong() and
 	lo_ulong() in call to debug_printf().
 
-2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.cc: Remove #define __INSIDE_CYGWIN__ from around
 	<sys/shm.h> as it no longer contains any internal code.
 
-2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/sys/ipc.h (IPC_PRIVATE): Add cast to key_t.
 	(IPC_INFO): New flag for ipcs(8).
@@ -1042,7 +1042,7 @@
 	(shmctl): Ditto.
 	(shmget): Ditto. Remove obsolete #if 0 ... #endif code.
 
-2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/cygwin/cygserver_transport.h
 	(transport_layer_base::transport_layer_base): Remove since it is
@@ -1064,7 +1064,7 @@
 	(transport_layer_base::write): Ditto.
 	(transport_layer_base::connect): Ditto.
 
-2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc (check_and_dup_handle): Only use security code if
 	running on NT, i.e. if wincap.has_security().
@@ -1092,7 +1092,7 @@
 	Change winpid type to DWORD.
 	(class process): Ditto.
 
-2002-06-15  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* woutsup.h: New file.
 	* cygserver.cc: Use "woutsup.h" and new XXX_printf macros.
@@ -1139,7 +1139,7 @@
 
 	* pthread.cc: Use class::call for converted pthread and semaphore
 	calls.
-	* thread.cc: Convert various __pthread_call and __sem_call to 
+	* thread.cc: Convert various __pthread_call and __sem_call to
 	pthread::call and sem::call throughout.
 	* pthread.h (__pthread_cancel): Convert to pthread::cancel.
 	(__pthread_join): Convert to pthread::join.
@@ -1188,7 +1188,7 @@
 
 2002-09-21  Robert Collins <rbtcollins@hotmail.com>
 
-	* thread.cc: Partial refactoring of pthread_key destructor 
+	* thread.cc: Partial refactoring of pthread_key destructor
 	handling. Loosely based on Thomas Pfaff's work.
 	(pthread_key_destructor_list::Insert): Remove.
 	(pthread_key_destructor_list::Pop): Remove.
@@ -1226,10 +1226,10 @@
 
 2002-09-21  Robert Collins <rbtcollins@hotmail.com>
 
-	* thread.cc: Change verifyable_object_isvalid calls with 
+	* thread.cc: Change verifyable_object_isvalid calls with
 	PTHREAD_MUTEX_MAGIC and PTHREAD_KEY_MAGIC and PTHREAD_ATTR_MAGIC to
 	::isGoodObject() calls throughout.
-       	(MTinterface::Init): Remove dead code.
+	(MTinterface::Init): Remove dead code.
 	(pthread_attr::isGoodObject): Implement.
 	(pthread_key::isGoodObject): Implement.
 	(pthread_mutex::isGoodObject): Implement.
@@ -1294,7 +1294,7 @@
 	adsorbed by pthread::atforkchild.
 	Rename __pthread_atforkchild to pthread::atforkchild to give
 	access to private members.
-	(fork_parent): Rename __pthread_atforkparent to 
+	(fork_parent): Rename __pthread_atforkparent to
 	pthread::atforkparent to give it access to private members.
 	Ditto for __pthread_atforkprepare.
 	* thread.cc: Fix some formatting problems throughout.
