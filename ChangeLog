@@ -1,3 +1,8 @@
+2003-07-30  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* configure.in: Enable libgcj for darwin.
+	* configure: Rebuild.
+
 2003-07-29  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* mkinstalldirs: Import autoconf 2.57 / automake 1.7 version.
