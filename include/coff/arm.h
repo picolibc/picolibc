@@ -54,7 +54,7 @@ struct external_filehdr {
 #define F_ARM_3M	(0x4000)
 #define F_ARM_4		(0x4400)
 #define F_ARM_4T	(0x4800)
-#define F_ARM_spare	(0x4c00)
+#define F_ARM_5		(0x4c00)
 
 /*
  * ARMMAGIC ought to encoded the procesor type,

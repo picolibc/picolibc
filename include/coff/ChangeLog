@@ -1,3 +1,7 @@
+1999-07-05  Nick Clifton  <nickc@cygnus.com>
+
+	* arm.h (F_ARM_5): Define.
+
 Wed Jun  2 18:08:18 1999  Richard Henderson  <rth@cygnus.com>
 
 	* internal.h (BEOS_EXE_IMAGE_BASE, BEOS_DLL_IMAGE_BASE): New.
