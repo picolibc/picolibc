@@ -1,3 +1,9 @@
+2003-09-02  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* libc/stdlib/atexit.c: Rename _REENT to _GLOBAL_REENT throughout.
+	* libc/stdlib/exit.c : Ditto.
+	* libc/stdlib/on_exit.c: Ditto.
+
 2003-08-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/reent.h: Define stat64 as __stat64 when

@@ -64,7 +64,7 @@ _DEFUN (exit, (code),
   register int n;
   int i;
 
-  p = &_REENT->_atexit;
+  p = &_GLOBAL_REENT->_atexit;
 
 #ifdef _REENT_SMALL
   args = p->_on_exit_args_ptr;
@@ -98,8 +98,8 @@ _DEFUN (exit, (code),
   while (p);
 #endif
 
-  if (_REENT->__cleanup)
-    (*_REENT->__cleanup) (_REENT);
+  if (_GLOBAL_REENT->__cleanup)
+    (*_GLOBAL_REENT->__cleanup) (_GLOBAL_REENT);
   _exit (code);
 }
 

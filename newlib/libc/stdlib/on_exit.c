@@ -74,7 +74,7 @@ _DEFUN (on_exit,
 
 /* _REENT_SMALL on_exit() doesn't allow more than the required 32 entries.  */
 #ifdef _REENT_SMALL
-  p = &_REENT->_atexit;
+  p = &_GLOBAL_REENT->_atexit;
   if (p->_ind >= _ATEXIT_SIZE)
     return -1;
   args = p->_on_exit_args_ptr;
@@ -87,16 +87,16 @@ _DEFUN (on_exit,
       p->_on_exit_args_ptr = args;
     }
 #else
-  if ((p = _REENT->_atexit) == NULL)
-    _REENT->_atexit = p = &_REENT->_atexit0;
+  if ((p = _GLOBAL_REENT->_atexit) == NULL)
+    _GLOBAL_REENT->_atexit = p = &_GLOBAL_REENT->_atexit0;
   if (p->_ind >= _ATEXIT_SIZE)
     {
       if ((p = (struct _atexit *) malloc (sizeof *p)) == NULL)
         return -1;
       p->_ind = 0;
       p->_on_exit_args._fntypes = 0;
-      p->_next = _REENT->_atexit;
-      _REENT->_atexit = p;
+      p->_next = _GLOBAL_REENT->_atexit;
+      _GLOBAL_REENT->_atexit = p;
     }
   args = & p->_on_exit_args;
 #endif
