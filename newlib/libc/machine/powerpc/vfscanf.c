@@ -370,7 +370,11 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      flags |= LONGDBL;
 	    }
 	  else
-	    flags |= LONG;
+	    {
+	      flags |= LONG;
+	      if (flags & VECTOR)
+		vec_read_count = 4;
+	    }
 	  goto again;
 	case 'L':
 	  flags |= LONGDBL;
@@ -384,7 +388,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 #ifdef __ALTIVEC__
 	case 'v':
 	  flags |= VECTOR;
-	  vec_read_count = (flags & SHORT) ? 8 : 4;
+	  vec_read_count = (flags & SHORT) ? 8 : ((flags & LONG) ? 4 : 16);
 	  goto again;
 #endif
 	case '0':
@@ -485,7 +489,6 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 
 	case 'p':		/* pointer format is like hex */
 	  flags |= POINTER | PFXOK;
-	  flags &= ~VECTOR;
 	  type = CT_INT;
 	  ccfn = _strtoul_r;
 	  base = 16;
@@ -918,7 +921,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 
 	      *p = 0;
 	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
-	      if (flags & POINTER)
+	      if ((flags & POINTER) && !(flags & VECTOR))
 		*(va_arg (ap, _PTR *)) = (_PTR) (unsigned _POINTER_INT) res;
 	      else if (flags & SHORT)
 		{
@@ -951,10 +954,16 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      else
 		{
 		  if (!(flags & VECTOR))
-		    ip = va_arg (ap, int *);
-		  else if (!looped)
-		    ip = vec_buf.i;
-		  *ip++ = res;
+		    {
+		      ip = va_arg (ap, int *);
+		      *ip++ = res;
+		    }
+		  else 
+		    {
+		      if (!looped)
+			ch_dest = vec_buf.c;
+		      *ch_dest++ = (char)res;
+		    }
 		}
 	      if (!(flags & VECTOR))
 		nassigned++;

@@ -196,7 +196,7 @@ typedef union
   int   i[16 / sizeof(int)];
   long  l[4];
   short s[8];
-  char  c[16];
+  signed char  c[16];
 } vec_16_byte_union;
 #endif /* __ALTIVEC__ */
 
@@ -448,15 +448,15 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 
 #define GET_INT(ap) \
 	(flags&VECTOR ? \
-	    (vec_print_count < (16 / sizeof(int)) ? \
-                vec_tmp.i[16 / sizeof(int) - vec_print_count] : \
-	        (vec_tmp.v = va_arg(ap, vector int), vec_tmp.i[0])) : \
+	    (vec_print_count < 16 ? \
+                vec_tmp.c[16 - vec_print_count] : \
+	        (vec_tmp.v = va_arg(ap, vector int), (int)vec_tmp.c[0])) : \
 	    va_arg(ap, int))
 #define GET_UINT(ap) \
 	(flags&VECTOR ? \
-	    (vec_print_count < (16 / sizeof(int)) ? \
-                (u_int)vec_tmp.i[16 / sizeof(int) - vec_print_count] : \
-	        (vec_tmp.v = va_arg(ap, vector int), (u_int)vec_tmp.i[0])) : \
+	    (vec_print_count < 16 ? \
+                (u_int)((unsigned char)vec_tmp.c[16 - vec_print_count]) : \
+	        (vec_tmp.v = va_arg(ap, vector int), (u_int)((unsigned char)vec_tmp.c[0]))) : \
 	    (u_int)va_arg(ap, unsigned int))
 #else /* !__ALTIVEC__ */
 #define GET_SHORT(ap) ((short)va_arg(ap, int))
@@ -634,7 +634,7 @@ reswitch:	switch (ch) {
 		case 'v':
 			flags |= VECTOR;
 			vec_print_count = (flags & SHORTINT) ? 8 : 
-			  ((flags & LONGINT) ? 4 : (16 / sizeof(int)));
+			  ((flags & LONGINT) ? 4 : 16);
 			goto rflag;
 #endif
                 case 'q':
@@ -704,8 +704,11 @@ reswitch:	switch (ch) {
 				_fpvalue = (double) va_arg(ap, _LONG_DOUBLE);
 #ifdef __ALTIVEC__
 			} else if (flags & VECTOR) {
-				if (vec_print_count == 4)
-				  vec_tmp.v = va_arg(ap, vector int);
+				if (vec_print_count >= 4)
+				  {
+				    vec_print_count = 4;
+				    vec_tmp.v = va_arg(ap, vector int);
+				  }
 				_fpvalue = (double)vec_tmp.f[4 - vec_print_count];
 #endif /* __ALTIVEC__ */
 			} else {
@@ -736,8 +739,11 @@ reswitch:	switch (ch) {
 				_fpvalue = va_arg(ap, _LONG_DOUBLE);
 #ifdef __ALTIVEC__
 			} else if (flags & VECTOR) {
-				if (vec_print_count == 4)
-				  vec_tmp.v = va_arg(ap, vector int);
+				if (vec_print_count >= 4)
+				  {
+				    vec_print_count = 4;
+				    vec_tmp.v = va_arg(ap, vector int);
+				  }
 				_fpvalue = (_LONG_DOUBLE)k.f[4 - vec_print_count];
 #endif /* __ALTIVEC__ */
 			} else {
@@ -832,8 +838,12 @@ reswitch:	switch (ch) {
 			 *	-- ANSI X3J11
 			 */
 			/* NOSTRICT */
-			flags &= ~VECTOR;
-			_uquad = (u_long)(unsigned _POINTER_INT)va_arg(ap, void *);
+#ifdef __ALTIVEC__
+		        if (flags & VECTOR)
+		          _uquad = UARG();
+		        else
+#endif /* __ALTIVEC__ */
+		          _uquad = (u_long)(unsigned _POINTER_INT)va_arg(ap, void *);
 			base = HEX;
 			xdigs = "0123456789abcdef";
 			flags |= HEXPREFIX;

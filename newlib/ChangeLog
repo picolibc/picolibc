@@ -28,8 +28,15 @@
 
 2002-05-06  Jeff Johnston  <jjohnstn@redhat.com>
 
-        *  libc/include/stdlib.h (a64l, l64a, _l64a_r): Added prototypes.
-        
+	* libc/machine/powerpc/vfprintf.c[__ALTIVEC__]: Add vector
+	support for 'p' format.  Fix code to print bytes for vector
+	integer formats that do not specify 'h' or 'l'.
+	* libc/machine/powerpc/vfscanf.c[__ALTIVEC__]: Add vector support
+	for 'p' specifier.  Fix code to scan 16 bytes for vector integer
+	formats that do not specify 'h' or 'l'.
+
+	* libc/include/stdlib.h (a64l, l64a, _l64a_r): Added prototypes.
+
 2002-05-06  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* libc/sys/arm/syscalls.c (_rename): Add parameter names.
