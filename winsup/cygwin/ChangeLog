@@ -1,3 +1,19 @@
+2001-11-03  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_base::ready_for_read): Remove unused argument.
+	(fhandler_tty_slave::ready_for_read): Ditto.
+	(select_record): Remove poll, initialize peek.
+	* select.cc: Remove all poll functions, throughout.  Change second
+	argument of peek_* functions to 'bool' throughout.  Specifically
+	initialize *_ready variables throughout.
+	(select_stuff::poll): Subsume previous poll functionality.
+	(peek_pipe): Don't grab guard mutex when in select loop.
+	select()/read() is racy by design so there is no need to worry about a
+	race in select().
+	(fhandler_base::ready_for_read): Remove unused argument.
+	(fhandler_tty_slave::ready_for_read): Ditto.
+	* syscalls.cc (_read): Eliminate third argument in ready_for_read call.
+
 2001-11-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (get_supplementary_group_sidlist): New function.

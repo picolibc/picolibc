@@ -312,7 +312,7 @@ _read (int fd, void *ptr, size_t len)
 
       if (wait && (!cfd->is_slow () || cfd->get_r_no_interrupt ()))
 	debug_printf ("non-interruptible read\n");
-      else if (!cfd->ready_for_read (fd, wait, 0))
+      else if (!cfd->ready_for_read (fd, wait))
 	{
 	  res = -1;
 	  goto out;

@@ -324,7 +324,7 @@ class fhandler_base
   virtual select_record *select_read (select_record *s);
   virtual select_record *select_write (select_record *s);
   virtual select_record *select_except (select_record *s);
-  virtual int ready_for_read (int fd, DWORD howlong, int ignra);
+  virtual int ready_for_read (int fd, DWORD howlong);
   virtual const char * get_native_name ()
   {
     return windows_device_names[FHDEVN (status)];
@@ -793,7 +793,7 @@ class fhandler_tty_slave: public fhandler_tty_common
 
   off_t lseek (off_t, int) { return 0; }
   select_record *select_read (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
+  int ready_for_read (int fd, DWORD howlong);
 };
 
 class fhandler_pty_master: public fhandler_tty_common
@@ -1017,9 +1017,7 @@ struct select_record
   bool read_ready, write_ready, except_ready;
   bool read_selected, write_selected, except_selected;
   int (*startup) (select_record *me, class select_stuff *stuff);
-  int (*poll) (select_record *me, fd_set *readfds, fd_set *writefds,
-	       fd_set *exceptfds);
-  int (*peek) (select_record *, int);
+  int (*peek) (select_record *, bool);
   int (*verify) (select_record *me, fd_set *readfds, fd_set *writefds,
 		 fd_set *exceptfds);
   void (*cleanup) (select_record *me, class select_stuff *stuff);
@@ -1029,7 +1027,7 @@ struct select_record
 		 fh (in_fh), saw_error (0), windows_handle (0),
 		 read_ready (0), write_ready (0), except_ready (0),
 		 read_selected (0), write_selected (0), except_selected (0),
-		 startup (NULL), poll (NULL), verify (NULL), cleanup (NULL),
+		 startup (NULL), peek (NULL), verify (NULL), cleanup (NULL),
 		 next (NULL) {}
 };
 
