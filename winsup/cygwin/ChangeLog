@@ -1,3 +1,12 @@
+2003-09-26  Pavel Tsekov  <ptsekov@gmx.net>
+
+	* fhandler_console.c (fhandler_console::read): Record the state of the
+	SHIFT, CTRL and ALT keys at the time of the last keyboard input event.
+	(fhandler_console::ioctl): Handle requests to retrieve the keyboard
+	modifiers via the TIOCLINUX command.
+	* fhandler_tty.c (fhandler_tty_slave::read): Ditto.
+	* include/sys/termios.h (TIOCLINUX): New macro definition.
+
 2003-09-26  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* pinfo.cc (pinfo::init): Do not give FILE_MAP_WRITE access to Everybody.
@@ -16,7 +25,7 @@
 2003-09-26  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* uinfo.cc (cygheap_user::init): Make sure the current user appears
-	in the default DACL. Rearrange to decrease the indentation levels. 
+	in the default DACL. Rearrange to decrease the indentation levels.
 	Initialize the effec_cygsid directly.
 	(internal_getlogin): Do not reinitialize myself->gid. Open the process
 	token with the required access.

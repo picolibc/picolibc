@@ -330,5 +330,6 @@ struct winsize
 
 #define TIOCGWINSZ (('T' << 8) | 1)
 #define TIOCSWINSZ (('T' << 8) | 2)
+#define TIOCLINUX  (('T' << 8) | 3)
 
 #endif	/* _SYS_TERMIOS_H */

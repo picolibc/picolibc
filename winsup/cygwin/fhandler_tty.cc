@@ -1028,6 +1028,7 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
     {
     case TIOCGWINSZ:
     case TIOCSWINSZ:
+    case TIOCLINUX:
       break;
     case FIONBIO:
       set_nonblocking (*(int *) arg);
@@ -1069,6 +1070,21 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
 	    }
 	  if (ioctl_done_event)
 	    WaitForSingleObject (ioctl_done_event, INFINITE);
+	}
+      break;
+    case TIOCLINUX:
+      int val = * (unsigned char *) arg;
+      if (val == 6 && ioctl_request_event && ioctl_done_event)
+	{
+	  get_ttyp ()->arg.value = val; 
+	  SetEvent (ioctl_request_event);
+	  WaitForSingleObject (ioctl_done_event, INFINITE);
+	  * (unsigned char *) arg = get_ttyp ()->arg.value & 0xFF;
+	}
+      else
+	{
+	  get_ttyp ()->ioctl_retval = -1;
+	  set_errno (EINVAL);
 	}
       break;
     }

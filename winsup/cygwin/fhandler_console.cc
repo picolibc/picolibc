@@ -294,6 +294,8 @@ fhandler_console::read (void *pv, size_t& buflen)
 #define virtual_key_code (input_rec.Event.KeyEvent.wVirtualKeyCode)
 #define control_key_state (input_rec.Event.KeyEvent.dwControlKeyState)
 
+	  dev_state->nModifiers = 0;
+
 #ifdef DEBUGGING
 	  /* allow manual switching to/from raw mode via ctrl-alt-scrolllock */
 	  if (input_rec.Event.KeyEvent.bKeyDown &&
@@ -340,13 +342,25 @@ fhandler_console::read (void *pv, size_t& buflen)
 		&& input_rec.Event.KeyEvent.wVirtualScanCode == 0x38))
 	    continue;
 
+	  if (control_key_state & SHIFT_PRESSED)
+	    dev_state->nModifiers |= 1;
+	  if (control_key_state & RIGHT_ALT_PRESSED)
+	    dev_state->nModifiers |= 2;
+	  if (control_key_state & CTRL_PRESSED)
+	    dev_state->nModifiers |= 4;
+	  if (control_key_state & LEFT_ALT_PRESSED)
+	    dev_state->nModifiers |= 8;
+
 	  if (wch == 0 ||
 	      /* arrow/function keys */
 	      (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
 	    {
 	      toadd = get_nonascii_key (input_rec, tmp);
 	      if (!toadd)
-		continue;
+		{
+		  dev_state->nModifiers = 0;
+		  continue;
+		}
 	      nread = strlen (toadd);
 	    }
 	  else
@@ -379,6 +393,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 		  tmp[1] = cyg_tolower (tmp[1]);
 		  toadd = tmp;
 		  nread++;
+		  dev_state->nModifiers &= ~4;
 		}
 	    }
 #undef ich
@@ -715,6 +730,17 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
       case TIOCSWINSZ:
 	(void) bg_check (SIGTTOU);
 	return 0;
+      case TIOCLINUX:
+	if (* (int *) buf == 6)
+	  {
+	    * (int *) buf = dev_state->nModifiers;
+	    return 0;
+	  }
+	else
+	  {
+	    set_errno (EINVAL);
+	    return -1;
+	  }
     }
 
   return fhandler_base::ioctl (cmd, buf);
