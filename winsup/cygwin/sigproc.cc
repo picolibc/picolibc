@@ -1232,7 +1232,7 @@ wait_sig (VOID *self)
 		  goto out;
 	      }
 	  }
-      while (more_signals && !saw_failed_interrupt);
+      while (more_signals);
 
     out:
       /* Signal completion of signal handling depending on which semaphore

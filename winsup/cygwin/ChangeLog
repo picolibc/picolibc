@@ -1,5 +1,9 @@
 2003-08-21  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (wait_sig): Remove redundant test in do/while.
+
+2003-08-21  Christopher Faylor  <cgf@redhat.com>
+
 	* sigproc.cc (wait_sig): Avoid infinite loop.
 
 2003-08-20  Christopher Faylor  <cgf@redhat.com>
