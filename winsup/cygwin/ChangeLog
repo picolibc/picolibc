@@ -18,14 +18,14 @@
 	* child_info.h (init_child_info): Remove pid argument from declaration.
 	* cygheap.h (init_cygheap::pid): New element.
 	* dcrt0.cc (dll_crt0_0): Eliminate handling of now-noexistent cygpid
-	parameter in child_info struct.  Set forkee to 'true' rather than cygpid
-	since the pid value was never used.
+	parameter in child_info struct.  Set forkee to 'true' rather than
+	cygpid since the pid value was never used.
 	(dll_crt0_1): Ditto.
 	(_dll_crt0): Ditto.
 	* fork.cc (fork_child): Don't wait for sigthread.  This is handled in
 	the fork call now.
-	(fork_parent): Remove obsolete pid argument from init_child_info call.  Don't
-	do anything special with cygpid when DEBUGGING.
+	(fork_parent): Remove obsolete pid argument from init_child_info call.
+	Don't do anything special with cygpid when DEBUGGING.
 	(fork): Delay all signals during fork.
 	(fork_init): Don't do anything special when DEBUGGING.
 	* pinfo.cc (set_myself): Remove pid parameter.  Use new pid field in
