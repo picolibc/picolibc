@@ -460,7 +460,7 @@ cygheap_user::set_sid (PSID new_sid)
   if (new_sid)
     {
       if (!psid)
-        psid = cmalloc (HEAP_STR, MAX_SID_LEN);
+	psid = cmalloc (HEAP_STR, MAX_SID_LEN);
       if (psid)
 	return CopySid (MAX_SID_LEN, psid, new_sid);
     }

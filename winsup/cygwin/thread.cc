@@ -1588,7 +1588,7 @@ __pthread_join (pthread_t *thread, void **return_val)
   if ( joiner == *thread)    
     {
       if (return_val)
-        *return_val = NULL;
+	*return_val = NULL;
       return EDEADLK;
     }
 
@@ -1597,7 +1597,7 @@ __pthread_join (pthread_t *thread, void **return_val)
   if((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
       if (return_val)
-        *return_val = NULL;
+	*return_val = NULL;
       (*thread)->mutex.UnLock ();
       return EINVAL;
     }
@@ -1608,7 +1608,7 @@ __pthread_join (pthread_t *thread, void **return_val)
       (*thread)->mutex.UnLock ();
       WaitForSingleObject ((*thread)->win32_obj_id, INFINITE);
       if (return_val)
-         *return_val = (*thread)->return_ptr;
+	 *return_val = (*thread)->return_ptr;
       // cleanup
       delete (*thread);
     }	/*End if */

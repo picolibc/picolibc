@@ -399,6 +399,17 @@
 	* Makefile.in: Remove special __OUTSIDE_CYGWIN__ case for
 	cygserver_shm.cc.
 
+2002-06-21  Christopher Faylor  <cgf@redhat.com>
+
+	* errno.cc: Change text description for EBADF throughout.
+
+2002-06-20  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* uinfo.cc (cygheap_user::ontherange): Use env_name for NetUserGetInfo.
+	(cygheap_user::env_logsrv): Verify env_domain is valid.
+	* environ.cc: Include child_info.h and keep spenvs[] sorted.
+	(environ_init): Check child_proc_info instead of myself->ppid_handle.
+
 2002-06-19  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::set_flags): Change priority of "linked
@@ -407,7 +418,7 @@
 
 2002-06-19  Christopher Faylor  <cgf@redhat.com>
 
-	Use hMainProc where appropriate, throughout. 
+	Use hMainProc where appropriate, throughout.
 	* environ.cc (spenv::retrieve): Add debugging statements.
 
 	* pinfo.cc (set_myself): Don't call strace.hello if already stracing.
@@ -667,7 +678,7 @@
 2002-06-10  Robert Collins  <rbtcollins@hotmail.com>
 
 	* thread.cc: Variation of a patch from Thomas Pffaf.
-       	(__pthread_detach): Cleanup thread object if the thread has terminated.
+	(__pthread_detach): Cleanup thread object if the thread has terminated.
 	(__pthread_join): Change order of error checks, and lock against
 	join/detach/exit races.
 	(__pthread_exit): Lock object against join/detach/exit races.

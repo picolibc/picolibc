@@ -268,7 +268,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
     {
       server[0] = server[1] = '\\';
       if (wserver)
-        sys_mbstowcs (wserver, server, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+	sys_mbstowcs (wserver, server, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       return TRUE;
     }
 
@@ -512,7 +512,7 @@ get_group_sidlist (cygsidlist &grp_list,
   else
     {
       if (!get_logon_server (domain, server, wserver))
-        return FALSE;
+	return FALSE;
       if (my_grps)
 	{
 	  if (sid_in_token_groups (my_grps, well_known_local_sid))
@@ -544,8 +544,8 @@ get_group_sidlist (cygsidlist &grp_list,
 	  auth_pos = grp_list.count - 1;
 	}
       if (!get_user_groups (wserver, grp_list, user, domain) ||
-          !get_user_local_groups (grp_list, usersid))
-        return FALSE;
+	  !get_user_local_groups (grp_list, usersid))
+	return FALSE;
     }
   /* special_pgrp true if pgrpsid is not null and not in normal groups */
   if (!pgrpsid)
