@@ -1,3 +1,7 @@
+Saturday Mar 17 3:45 2001 Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (MTinterface::CreateCond): Check for null attr pointer.
+
 Fri Mar 16 21:13:23 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_termios.cc (fhandler_termios::line_edit): Don't accept input

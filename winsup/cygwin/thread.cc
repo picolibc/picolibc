@@ -483,7 +483,7 @@ MTinterface::CreateCond (pthread_cond_t * cond, const pthread_condattr_t * attr)
   if (!item)
     system_printf ("cond creation failed");
   item->used = true;
-  item->shared = attr->shared;
+  item->shared = attr ? attr->shared: PTHREAD_PROCESS_PRIVATE;
   item->mutexitem=NULL;
   item->waiting=0;
 
