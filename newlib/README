@@ -28,11 +28,8 @@ ChangeLog        configure*       mpw-README       texinfo/
 Makefile.in      configure.in     mpw-build.in
 README           etc/             mpw-config.in
 
-To build NEWLIB, you can just do:
-
-	cd newlib-1.8.2
-	./configure --target=<your target>
-	make all install
+To build NEWLIB, you must follow the instructions in the section entitled
+"Compiling NEWLIB in another directory".
 
 This will configure and build all the libraries and crt0 (if one exists).
 If `configure' can't determine your host system type, specify one as its

@@ -1,3 +1,8 @@
+Thu Jun 22 18:35:00 2000  Ranjith Kumaran  <ranjith@cygnus.com>
+
+	* README: Newlib 1.8.2 must be built in a separate directory
+	than the sources.
+
 Tue Jun 20 14:30:00 2000  Jeff Johnston  <jjohnstn@cygnus.com>
 
         * libc/include/sys/reent.h (_rand_next): Added __extension__
