@@ -285,6 +285,9 @@ struct bfd_link_info
      should be created.  */
   unsigned int eh_frame_hdr: 1;
 
+  /* TRUE if global symbols in discarded sections should be stripped.  */
+  unsigned int strip_discarded: 1;
+
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
 
