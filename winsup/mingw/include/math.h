@@ -436,11 +436,13 @@ extern long double log2l (long double _x);
 #endif /* __STDC_VERSION__ >= 199901L */
 
 
-/* The underscored versions are in MSVCRT.dll.
-   The stubs for these are in libmingwex.a */
+/* The underscored versions for double are in MSVCRT.dll.
+   The stubs for float and double versions are in libmingwex.a */
 
 double copysign (double, double);
 float copysignf (float, float);
+long double copysignl (long double, long double);
+
 double logb (double);
 float logbf (float);
 double nextafter (double, double);

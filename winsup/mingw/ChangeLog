@@ -1,6 +1,12 @@
+2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h (copysignl): Declare.
+	* mingwex/Makefile.in (DISTFILES): Add copysignl.S.
+	(MATHOBJS):Add copysignl.o.
+
 2002-04-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/math.h (__signbitl, __isnanl, copysignl): Declare.
+	* include/math.h (__signbitl, __isnanl): Declare.
 
 2002-04-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -38,11 +44,11 @@
 	* mingwex/Makefile.in (DISTFILES): Add fmaxl.c, fminl.c,
 	fpclassifyf.c, fpclassifyl.c, rintf.c, rintl.c, roundf.c,
 	roundl.c, truncf.c truncl.c, signbitf.c signbitl.c,
-	fmal.c, copysignl.S, log2l.c
+	fmal.c, log2l.c
 	(MATHOBJS): Add fmaxl.o, fminl.o, fpclassifyf.o,
 	fpclassifyl.o, rintf.o, rintl.o, roundf.o, roundl.o,
 	truncf.o truncl.o, signbitf.o signbitl.o, fmal.o,
-	copysignl.o, log2l.o.
+	log2l.o.
 
 	* mingwex/snwprintf.c (snwprintf, vsnwprintf): Correct typo.
 	

@@ -29,6 +29,7 @@ DISTFILES = Makefile.in configure configure.in \
 	mingw-fseek.c \
 	_Exit.c \
 	atoll.c \
+	copysignl.S \
 	dirent.c \
 	feclearexcept.c \
 	fegetenv.c \
@@ -153,7 +154,9 @@ MATH_OBJS = \
 	fmax.o  fmaxf.o fmaxl.o \
 	fmin.o fminf.o fminl.o \
 	fma.o  fmaf.o fmal.o \
-	log2.o log2f.o log2l.o 
+	log2.o log2f.o log2l.o  \
+	copysignl.o
+
 MATH_STUB_OBJS = \
 	math_stubs.o
 FENV_OBJS = fesetround.o  fegetround.o \
