@@ -235,11 +235,7 @@ struct internal_aouthdr
 #define C_ALIAS	 	105	/* duplicate tag		*/
 #define C_HIDDEN	106	/* ext symbol in dmert public lib */
 
-#if defined _AIX52 || defined AIX_WEAK_SUPPORT
-#define C_WEAKEXT	111	/* weak symbol -- AIX standard.  */
-#else
-#define C_WEAKEXT	127	/* weak symbol -- GNU extension.  */
-#endif
+#define C_WEAKEXT	127	/* weak symbol -- GNU extension */
 
 /* New storage classes for TI COFF */
 #define C_UEXT		19	/* Tentative external definition */
