@@ -21,7 +21,7 @@
 	setting since it is no longer used.
 
 	* miscfuncs.cc (check_null_str): New function.
-	(+check_null_str_errno): Ditto.
+	(check_null_str_errno): Ditto.
 	* net.cc: Add defensive buffer checking throughout.
 	(cygwin_sendto): Protect against invalid fd.
 	(cygwin_recvfrom): Ditto.
