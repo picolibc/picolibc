@@ -34,6 +34,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "registry.h"
+#include <sys/uio.h>
 
 extern "C" {
 int h_errno;
@@ -2518,4 +2519,64 @@ sethostent (int)
 extern "C" void
 endhostent (void)
 {
+}
+
+/* exported as recvmsg: standards? */
+extern "C" int 
+cygwin_recvmsg(int s, struct msghdr *msg, int flags)
+{
+    int ret, nb;
+    size_t tot = 0;
+    int i;
+    char *buf, *p;
+    struct iovec *iov = msg->msg_iov;
+
+    for(i = 0; i < msg->msg_iovlen; ++i)
+	tot += iov[i].iov_len;
+    buf = (char *) malloc(tot);
+    if (tot != 0 && buf == NULL) {
+	errno = ENOMEM;
+	return -1;
+    }
+    nb = ret = cygwin_recvfrom (s, buf, tot, flags, 
+      (struct sockaddr *) msg->msg_name, (int *) &msg->msg_namelen);
+    p = buf;
+    while (nb > 0) {
+	ssize_t cnt = min(nb, iov->iov_len);
+
+	memcpy (iov->iov_base, p, cnt);
+	p += cnt;
+	nb -= cnt;
+	++iov;
+    }
+    free(buf);
+    return ret;
+}
+
+/* exported as sendmsg: standards? */
+extern "C" int
+cygwin_sendmsg(int s, const struct msghdr *msg, int flags)
+{
+    int ret;
+    size_t tot = 0;
+    int i;
+    char *buf, *p;
+    struct iovec *iov = msg->msg_iov;
+
+    for(i = 0; i < msg->msg_iovlen; ++i)
+	tot += iov[i].iov_len;
+    buf = (char *) malloc(tot);
+    if (tot != 0 && buf == NULL) {
+	errno = ENOMEM;
+	return -1;
+    }
+    p = buf;
+    for (i = 0; i < msg->msg_iovlen; ++i) {
+	memcpy (p, iov[i].iov_base, iov[i].iov_len);
+	p += iov[i].iov_len;
+    }
+    ret = cygwin_sendto (s, buf, tot, flags, 
+      (struct sockaddr *) msg->msg_name, msg->msg_namelen);
+    free (buf);
+    return ret;
 }

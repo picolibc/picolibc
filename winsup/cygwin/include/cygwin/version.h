@@ -44,7 +44,7 @@ details. */
   /* The current cygwin version is 1.3.6 */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1003
-#define CYGWIN_VERSION_DLL_MINOR 7
+#define CYGWIN_VERSION_DLL_MINOR 10
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -147,12 +147,14 @@ details. */
        47: Report EOTWarningZoneSize in struct mtget.
        48: Export "posix" regex functions
        49: Export setutent, endutent, utmpname, getutent, getutid, getutline.
+       50: Export fnmatch.
+       51: Export recvmsg, sendmsg.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 49
+#define CYGWIN_VERSION_API_MINOR 51
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

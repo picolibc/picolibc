@@ -48,9 +48,9 @@ extern muto muto_start;
 /* Use a statically allocated buffer as the storage for a muto */
 #define new_muto(__inh, __name) \
 ({ \
-  static __attribute__((section(".data_cygwin_nocopy"))) muto __mbuf; \
+  static volatile __attribute__((section(".data_cygwin_nocopy"))) muto __mbuf; \
   (void) new ((void *) &__mbuf) muto (__inh, __name); \
   __mbuf.next = muto_start.next; \
-  muto_start.next = &__mbuf; \
-  &__mbuf; \
+  muto_start.next = (muto *) &__mbuf; \
+  (muto *) &__mbuf; \
 })

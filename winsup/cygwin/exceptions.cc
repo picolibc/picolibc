@@ -600,6 +600,7 @@ sig_handle_tty_stop (int sig)
       myself->process_state &= ~PID_STOPPED;
       return;
     }
+
   myself->stopsig = sig;
   /* See if we have a living parent.  If so, send it a special signal.
    * It will figure out exactly which pid has stopped by scanning
@@ -608,7 +609,8 @@ sig_handle_tty_stop (int sig)
   if (my_parent_is_alive ())
     {
       pinfo parent (myself->ppid);
-      sig_send (parent, SIGCHLD);
+      if (!(parent->getsig (SIGCHLD).sa_flags & SA_NOCLDSTOP))
+	sig_send (parent, SIGCHLD);
     }
   sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
 		  myself->pid, sig, myself->ppid_handle);
@@ -921,7 +923,7 @@ ctrl_c_handler (DWORD type)
 
   /* We're only the process group leader when we have a valid pinfo structure.
      If we don't have one, then the parent "stub" will handle the signal. */
-  if (!pinfo (GetCurrentProcessId ()))
+  if (!pinfo (cygwin_pid (GetCurrentProcessId ())))
     return TRUE;
 
   tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);
@@ -1031,9 +1033,6 @@ sig_handle (int sig, bool thisproc)
 
   if (handler == (void *) SIG_ERR)
     goto exit_sig;
-
-  if ((sig == SIGCHLD) && (thissig.sa_flags & SA_NOCLDSTOP))
-    goto done;
 
   goto dosig;
 

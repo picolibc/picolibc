@@ -126,7 +126,8 @@ DLL_OFILES:=assert.o autoload.o cygheap.o cygserver_client.o \
 	fhandler_disk_file.o fhandler_dsp.o fhandler_floppy.o fhandler_mem.o \
 	fhandler_random.o fhandler_raw.o fhandler_serial.o fhandler_socket.o \
 	fhandler_tape.o fhandler_termios.o fhandler_tty.o fhandler_windows.o \
-	fhandler_zero.o fork.o glob.o grp.o heap.o init.o ioctl.o ipc.o \
+	fhandler_zero.o fnmatch.o \
+	fork.o glob.o grp.o heap.o init.o ioctl.o ipc.o localtime.o \
 	localtime.o malloc.o miscfuncs.o mmap.o net.o ntea.o passwd.o path.o \
 	pinfo.o pipe.o poll.o pthread.o regcomp.o regerror.o regexec.o \
 	regfree.o registry.o resource.o scandir.o sched.o sec_acl.o \
@@ -286,13 +287,13 @@ dcrt0.o sigproc.o: child_info_magic.h
 shared.o: shared_info_magic.h
 
 libpthread.a: speclib cygwin.def pthread.o thread.o
-	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" "${AS}" ${wordlist 2, 99, $^}
 
 $(PWD)/libm.a: speclib cygwin.def $(LIBM)
-	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" "${AS}" ${wordlist 2, 99, $^}
 
 $(PWD)/libc.a: speclib cygwin.def $(PWD)/libm.a libpthread.a
-	/bin/sh ${word 1, $^} -v $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+	/bin/sh ${word 1, $^} -v $@ "${NM}" "${DLLTOOL}" "${AS}" ${wordlist 2, 99, $^}
 
 lib%.a: %.o
 	$(AR) cru $@ $?

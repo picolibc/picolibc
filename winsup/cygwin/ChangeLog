@@ -268,6 +268,100 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	* include/sys/ipc.h: New file.
 	* include/sys/shm.h: New file.
 
+2002-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* cygmagic: Suppress error output when figuring out if sum takes an
+	option.
+
+2002-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* cygmagic: Attempt to figure out if sum takes an option.
+
+2002-01-21  DJ Delorie  <dj@redhat.com>
+
+	* Makefile.in (libpthread.a): Pass the assembler also.
+ 	(libm.a): Ditto.
+	(libc.a): Ditto.
+	* speclib: Specify the assembler to dlltool.
+
+2002-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (getgrgid): Don't return default gid entry when ntsec is on.
+	* syscalls.cc (setegid): Don't set primary group in process token.
+
+2002-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* speclib: Don't use /dev/null as DLL name.  Just default to what's
+	already in .def file.
+
+2002-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sig_handle): Remove last vestiges of SA_NOCLDSTOP code
+	which caused SIGCHLD to be ignored.
+
+2002-01-20  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-01-20  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (regfree): Make dll_export.
+
+2002-01-20  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (ctrl_c_handler): Convert windows pid to cygwin pid
+	when detecting if we should actually handle CTRL-C.
+
+2002-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (new-cygwin1.dll): Revert previous change.  libsupc++.a
+	is only available in libstdc++-v3.
+
+2002-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sig_handle_tty_stop): Don't send SIGCHLD if parent
+	doesn't want it.
+	(sig_handle): Don't check for SA_NOCLDSTOP here.  We don't have enough
+	information.
+
+2002-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (new-cygwin1.dll): Just use -lsupc++ for link.
+	* sigproc.cc (proc_exists): Change existence criteria.
+	* sync.h (new_muto): Add volatile to definition to avoid gcc
+	optimization problems.
+
+2002-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h: Bump API minor version to 51.
+
+2002-01-19  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+        * cygwin.din: Add recvmsg and sendmsg.
+        * net.cc: Add cygwin_recvmsg and cygwin_sendmsg.
+        * /usr/include/sys/socket.h: Add recvmsg and sendmsg.
+
+2002-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (create_token): Close processes token handle as soon
+	as it's not used anymore.
+
+2002-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Add fnmatch.o to DLL_OFILES.
+	* cygwin.din: Add fnmatch export symbol.
+	* fnmatch.c: New file.
+	* include/fnmatch.h: Ditto.
+	* include/cygwin/version.h: Bump API minor version to 50.
+
 2002-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (fchdir): Call chdir with full windows path.

@@ -35,7 +35,9 @@ extern "C"
   int recv (int, void *__buff, int __len, unsigned int __flags);
   int recvfrom (int, char *__buff, int __len, int __flags,
 			 struct sockaddr *__from, int *__fromlen);
+  int recvmsg(int s, struct msghdr *msg, int flags);
   int send (int, const void *__buff, int __len, unsigned int __flags);
+  int sendmsg(int s, const struct msghdr *msg, int flags);
   int sendto (int, const void *, int, unsigned int, const struct sockaddr *, int);
   int setsockopt (int __s, int __level, int __optname, const void *optval, int __optlen);
   int getsockopt (int __s, int __level, int __optname, void *__optval, int *__optlen);

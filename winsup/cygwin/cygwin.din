@@ -263,6 +263,8 @@ floor
 _floor = floor
 floorf
 _floorf = floorf
+fnmatch
+_fnmatch = fnmatch
 fmod
 _fmod = fmod
 fmodf
@@ -1034,6 +1036,8 @@ setsockopt = cygwin_setsockopt
 inet_aton = cygwin_inet_aton
 inet_ntoa = cygwin_inet_ntoa
 recvfrom = cygwin_recvfrom
+recvmsg = cygwin_recvmsg
+sendmsg = cygwin_sendmsg
 sendto = cygwin_sendto
 shutdown = cygwin_shutdown
 sethostent
