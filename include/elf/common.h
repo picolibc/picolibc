@@ -162,6 +162,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_MMIX	       80	/* Donald Knuth's educational 64-bit processor */
 #define EM_HUANY       81	/* Harvard's machine-independent format */
 #define EM_PRISM       82	/* SiTera Prism */
+#define EM_AVR         83	/* Atmel AVR 8-bit microcontroller */
+#define EM_FR30        84	/* Fujitsu FR30 */
+#define EM_D10V        85	/* Mitsubishi D10V */
+#define EM_D30V        86	/* Mitsubishi D30V */
+#define EM_V850        87	/* NEC v850 */
+#define EM_M32R        88	/* Mitsubishi M32R */
+#define EM_MN10300     89	/* Matsushita MN10300 */
+#define EM_MN10200     90	/* Matsushita MN10200 */
+#define EM_PJ          91	/* picoJava */
+#define EM_OPENRISC    92	/* OpenRISC 32-bit embedded processor */
+#define EM_ARC_A5      93	/* ARC Cores Tangent-A5 */
+#define EM_XTENSA      94	/* Tensilica Xtensa Architecture */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
@@ -175,7 +187,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    unofficial e_machine number should eventually ask registry@sco.com for
    an officially blessed number to be added to the list above.  */
 
-#define EM_PJ          99       /* picoJava */
+#define EM_PJ_OLD      99       /* picoJava */
 
 /* Cygnus PowerPC ELF backend.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_POWERPC 0x9025
@@ -186,9 +198,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* Old version of PowerPC, this should be removed shortly. */
 #define EM_PPC_OLD	17
-
-/* Cygnus ARC ELF backend.  Written in the absence of an ABI.  */
-#define EM_CYGNUS_ARC 0x9040
 
 /* Cygnus M32R ELF backend.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_M32R 0x9041
@@ -218,7 +227,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* AVR magic number
    Written in the absense of an ABI.  */
-#define EM_AVR			0x1057
+#define EM_AVR_OLD		0x1057
 
 /* OpenRISC magic number
    Written in the absense of an ABI.  */

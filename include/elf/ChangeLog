@@ -1,3 +1,14 @@
+2001-09-12  Alexandre Oliva  <aoliva@redhat.com>
+
+	* common.h (EM_AVR_OLD): Renamed from...
+	(EM_AVR): this, redefined as in the current ELF standard.
+	(EM_PJ_OLD): Renamed from...
+	(EM_PJ): this, redefined as in the current ELF standard.
+	(EM_R30, EM_D10V, EM_D30V, EM_V850, EM_M32R, EM_MN10300,
+	EM_MN10200, EM_OPENRISC, EM_ARC_A5, EM_XTENSA): Defined as in
+	the current ELF standard.
+	(EM_CYGNUS_ARC): Removed, unused for a long time.
+
 2001-09-04  Richard Henderson  <rth@redhat.com>
 
 	* alpha.h (R_ALPHA_OP*, R_ALPHA_IMMED*, R_ALPHA_GPVALUE): Remove.
