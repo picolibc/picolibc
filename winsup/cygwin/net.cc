@@ -2483,21 +2483,23 @@ cygwin_recvmsg(int s, struct msghdr *msg, int flags)
     for(i = 0; i < msg->msg_iovlen; ++i)
 	tot += iov[i].iov_len;
     buf = (char *) malloc(tot);
-    if (tot != 0 && buf == NULL) {
+    if (tot != 0 && buf == NULL)
+      {
 	errno = ENOMEM;
 	return -1;
-    }
+      }
     nb = ret = cygwin_recvfrom (s, buf, tot, flags,
       (struct sockaddr *) msg->msg_name, (int *) &msg->msg_namelen);
     p = buf;
-    while (nb > 0) {
+    while (nb > 0)
+      {
 	ssize_t cnt = min(nb, iov->iov_len);
 
 	memcpy (iov->iov_base, p, cnt);
 	p += cnt;
 	nb -= cnt;
 	++iov;
-    }
+      }
     free(buf);
     return ret;
 }
@@ -2515,15 +2517,17 @@ cygwin_sendmsg(int s, const struct msghdr *msg, int flags)
     for(i = 0; i < msg->msg_iovlen; ++i)
 	tot += iov[i].iov_len;
     buf = (char *) malloc(tot);
-    if (tot != 0 && buf == NULL) {
+    if (tot != 0 && buf == NULL)
+      {
 	errno = ENOMEM;
 	return -1;
-    }
+      }
     p = buf;
-    for (i = 0; i < msg->msg_iovlen; ++i) {
+    for (i = 0; i < msg->msg_iovlen; ++i)
+      {
 	memcpy (p, iov[i].iov_base, iov[i].iov_len);
 	p += iov[i].iov_len;
-    }
+      }
     ret = cygwin_sendto (s, buf, tot, flags,
       (struct sockaddr *) msg->msg_name, msg->msg_namelen);
     free (buf);

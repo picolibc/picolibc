@@ -165,10 +165,11 @@ gettimeofday(struct timeval *tv, struct timezone *tz)
 
   if (tz != NULL)
     {
-      if (!tzflag) {
-        tzset();
-        tzflag = true;
-      }
+      if (!tzflag)
+	{
+	  tzset();
+	  tzflag = true;
+	}
       tz->tz_minuteswest = _timezone / 60;
       tz->tz_dsttime = _daylight;
     }
