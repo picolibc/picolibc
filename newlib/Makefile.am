@@ -255,10 +255,11 @@ doc/makedoc:
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 # Multilib support.
-.PHONY: all-multi mostlyclean-multi clean-multi distclean-multi \
+.PHONY: all-multi check-multi mostlyclean-multi clean-multi distclean-multi \
 	maintainer-clean-multi
 
 all-recursive: all-multi
+check-recursive: check-multi
 mostlyclean-recursive: mostlyclean-multi
 clean-recursive: clean-multi
 distclean-recursive: distclean-multi
@@ -266,6 +267,8 @@ maintainer-clean-recursive: maintainer-clean-multi
 
 all-multi:
 	$(MULTIDO) $(AM_MAKEFLAGS) DO=all multi-do
+check-multi:
+	$(MULTIDO) $(AM_MAKEFLAGS) DO=check multi-do
 mostlyclean-multi:
 	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=mostlyclean multi-clean
 clean-multi:
@@ -334,7 +337,8 @@ check-DEJAGNU: site.exp
 	echo "Found runtest: $${RUNTEST}" ; \
 	cd testsuite ; \
 	if $(SHELL) -c "$$RUNTEST --version" > /dev/null 2>&1 ; then \
-	   $$RUNTEST --tool $(DEJATOOL) --srcdir $${srcdir}/testsuite $(RUNTESTFLAGS); \
+	   $$RUNTEST --tool $(DEJATOOL) --srcdir $${srcdir}/testsuite $(RUNTESTFLAGS) ; \
+	   : ; \
 	else \
 	   echo "WARNING: could not find \`runtest'" 1>&2 ; \
 	fi

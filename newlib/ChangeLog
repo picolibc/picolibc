@@ -1,5 +1,7 @@
 2002-05-01  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
+	* Makefile.am: Add support for checking multilibs.
+
 	* libc/Makefile.am (SUBLIBS): Add LIBC_EXTRA_LIB.
 	(SUBDEFS): Add LIBC_EXTRA_DEF.
 	* libc/configure.in (LIBC_EXTRA_LIB): New variable.
