@@ -1,3 +1,7 @@
+2002-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	* how-programming.texinfo: Add more words to the "how to build".
+
 2002-03-01  Christopher Faylor  <cgf@redhat.com>
 
 	* overview.sgml: Fix 'more more' typo.

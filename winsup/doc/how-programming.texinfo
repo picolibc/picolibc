@@ -233,11 +233,21 @@ rewriting the runtime library in question from specs...
 
 @subsection How do I rebuild the tools on my NT box?
 
-@strong{Note:} You must build in a directory @emph{outside} the source
-tree.
+Install all required components in one directory (we'll call it /src).
+Ideally, you should check out what you need from CVS (@file{http://cygwin.com/cvs.html}) but
+otherwise, you can install the appropriate source packages from the
+cygwin distribution.
 
-Assuming that you have the src installed as /src, will build in
-the directory /obj, and want to install the tools in /install:
+As of this writing, you need to install at least the cygwin source
+package and the w32api source package.
+
+It is possible that the cygwin source package may require a newer
+version of the w32api package since the release of the packages is
+not always in lock step (another reason to just use CVS).
+
+You @emph{must} build cygwin in a separate directory from the source.
+So, create something like a /obj directory.  You'll be performing
+your build in that directory:
 
 @example
 bash
@@ -247,9 +257,9 @@ make > make.log 2>&1
 make install > install.log 2>&1
 @end example
 
-Normally, this will also attempt to build the documentation, which
-additionally requires db2html, and possibly other tools, which are not
-included in the Cygwin distribution.  You can get db2html as part of
+Normally, this procedure will also attempt to build the documentation,
+which additionally requires db2html, and possibly other tools, which are
+not included in the Cygwin distribution.  You can get db2html as part of
 docbook, from @file{http://sources.redhat.com/docbook-tools/}.
 
 To check a cygwin1.dll, run "make check" in the winsup/cygwin directory.
