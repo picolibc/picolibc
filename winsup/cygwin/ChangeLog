@@ -1,3 +1,9 @@
+2001-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprint.c (rn): Allow long long values.
+	(__small_vsprintf): Add 'D', 'U' and 'X' formats for long long
+	parameters.
+
 2002-02-19  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::puts_readahead): Remove default parameter
