@@ -1027,6 +1027,11 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   int res = -1;
   int oret = 1;
   int atts;
+
+  int attribute = 0;
+  uid_t uid;
+  gid_t gid;
+
   char root[MAX_PATH];
   UINT dtype;
   fhandler_disk_file fh (NULL);
@@ -1060,25 +1065,44 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   if ((atts == -1 || !(atts & FILE_ATTRIBUTE_DIRECTORY) ||
        (os_being_run == winNT
 	&& dtype != DRIVE_NO_ROOT_DIR
-	&& dtype != DRIVE_UNKNOWN))
-      && (oret = fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
-			  (nofollow ? O_NOSYMLINK : 0), 0)))
+	&& dtype != DRIVE_UNKNOWN)))
     {
-      res = fh.fstat (buf);
-      fh.close ();
-      /* The number of links to a directory includes the
-	 number of subdirectories in the directory, since all
-	 those subdirectories point to it.
-	 This is too slow on remote drives, so we do without it and
-	 set the number of links to 2. */
-      /* Unfortunately the count of 2 confuses `find(1)' command. So
-	 let's try it with `1' as link count. */
-      if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
-	buf->st_nlink =
-	    (dtype == DRIVE_REMOTE ? 1 : num_entries (real_path.get_win32 ()));
+      oret = fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
+				 (nofollow ? O_NOSYMLINK : 0), 0);
+      /* Check a special case here. If ntsec is ON it happens
+	 that a process creates a file using mode 000 to disallow
+	 other processes access. In contrast to UNIX, this results
+	 in a failing open call in the same process. Check that
+	 case. */
+      if (!oret && allow_ntsec && get_errno () == EACCES
+          && !get_file_attribute (TRUE, real_path, &attribute, &uid, &gid)
+	  && !attribute && uid == myself->uid && gid == myself->gid)
+	{
+	  set_file_attribute (TRUE, real_path, 0400);
+	  oret = fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
+				     (nofollow ? O_NOSYMLINK : 0), 0);
+	  set_file_attribute (TRUE, real_path.get_win32 (), 0);
+	}
+      if (oret)
+        {
+	  res = fh.fstat (buf);
+	  fh.close ();
+	  /* The number of links to a directory includes the
+	     number of subdirectories in the directory, since all
+	     those subdirectories point to it.
+	     This is too slow on remote drives, so we do without it and
+	     set the number of links to 2. */
+	  /* Unfortunately the count of 2 confuses `find(1)' command. So
+	     let's try it with `1' as link count. */
+	  if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
+	    buf->st_nlink = (dtype == DRIVE_REMOTE
+	                     ? 1
+			     : num_entries (real_path.get_win32 ()));
+	  goto done;
+        }
     }
-  else if (atts != -1 || (!oret && get_errno () != ENOENT
-				&& get_errno () != ENOSHARE))
+  if (atts != -1 || (!oret && get_errno () != ENOENT
+			   && get_errno () != ENOSHARE))
     {
       /* Unfortunately, the above open may fail if the file exists, though.
 	 So we have to care for this case here, too. */
