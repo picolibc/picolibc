@@ -1,3 +1,8 @@
+2004-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fork.cc (fork_child): Move fixup_shms_after_fork so that
+	signal_arrived is initialized when calling it.
+
 2004-02-17  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (clean): Clean libserver, too.

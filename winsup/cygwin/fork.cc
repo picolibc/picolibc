@@ -300,14 +300,14 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   (void) ForceCloseHandle1 (fork_info->subproc_ready, subproc_ready);
   (void) ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
+  pinfo_fixup_after_fork ();
+  _my_tls.fixup_after_fork ();
+  sigproc_init ();
+
 #ifdef USE_SERVER
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
 #endif
-
-  pinfo_fixup_after_fork ();
-  _my_tls.fixup_after_fork ();
-  sigproc_init ();
 
   /* Set thread local stuff to zero.  Under Windows 95/98 this is sometimes
      non-zero, for some reason.
