@@ -1,3 +1,7 @@
+2002-05-29  Matt Thomas  <matt@3am-software.com>
+
+	* vax.h: New file
+
 2002-05-28  Kuang Hwa Lin <kuang@sbcglobal.net>
 
 	* common.h (EM_DLX): Define.
