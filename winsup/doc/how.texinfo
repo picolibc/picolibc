@@ -135,7 +135,8 @@ Effectively, this @strong{prepends} /usr/bin and /usr/local/bin to your
 Windows system path.  If you choose to reset your PATH, say in
 $HOME/.bashrc, then you should follow this rule.  You @strong{must} have
 @code{/usr/bin} in your PATH @strong{before} any Windows system
-directories.  Otherwise you will likely encounter all sorts of problems
+directories.  (And you must not omit the Windows system directories!)
+Otherwise you will likely encounter all sorts of problems
 running Cygwin applications.
 
 If you haven't messed up the default mounts, then @code{/bin} and
