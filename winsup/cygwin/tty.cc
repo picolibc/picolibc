@@ -200,6 +200,7 @@ tty_list::allocate_tty (bool with_console)
 {
   HWND console;
   int freetty = -1;
+  HANDLE hmaster = NULL;
 
   /* FIXME: This whole function needs a protective mutex. */
 
@@ -237,7 +238,6 @@ tty_list::allocate_tty (bool with_console)
 	}
     }
 
-  HANDLE hmaster = NULL;
   /* Is a tty allocated for console? */
   for (int i = 0; i < NTTYS; i++)
     {
