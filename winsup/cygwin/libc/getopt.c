@@ -1,4 +1,4 @@
-/*	$NetBSD: getopt_long.c,v 1.15 2002/01/31 22:43:40 tv Exp $	*/
+/*	$NetBSD: getopt_long.c,v 1.16 2003/10/27 00:12:42 lukem Exp $	*/
 
 /*-
  * Copyright (c) 2000 The NetBSD Foundation, Inc.
@@ -36,46 +36,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "winsup.h"
+#include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$NetBSD: getopt_long.c,v 1.16 2003/10/27 00:12:42 lukem Exp $");
+#endif /* LIBC_SCCS and not lint */
+
+#ifndef __CYGWIN__
+#include "namespace.h"
+#endif
+
 #include <assert.h>
+#include <err.h>
 #include <errno.h>
+#include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
-#include <getopt.h>
-#include <stdarg.h>
-#include <stdio.h>
 
-#define REPLACE_GETOPT
-
+#ifdef __CYGWIN__
 #define _DIAGASSERT(x) do {} while (0)
+#define HAVE_NBTOOL_CONFIG_H 1
+#define HAVE_GETOPT_LONG 0
+#define HAVE_DECL_OPTIND 0
+#endif
+
+#if HAVE_NBTOOL_CONFIG_H && !HAVE_GETOPT_LONG && !HAVE_DECL_OPTIND
+#define REPLACE_GETOPT
+#endif
 
 #ifdef REPLACE_GETOPT
 #ifdef __weak_alias
 __weak_alias(getopt,_getopt)
 #endif
-int __declspec(dllexport) opterr = 1;	/* if error message should be printed */
-int __declspec(dllexport) optind = 1;	/* index into parent argv vector */
-int __declspec(dllexport) optopt = '?';	/* character checked for validity */
-int __declspec(dllexport) optreset;	/* reset getopt */
-char __declspec(dllexport) *optarg;	/* argument associated with option */
+int	opterr = 1;		/* if error message should be printed */
+int	optind = 1;		/* index into parent argv vector */
+int	optopt = '?';		/* character checked for validity */
+int	optreset;		/* reset getopt */
+char    *optarg;		/* argument associated with option */
+#elif HAVE_NBTOOL_CONFIG_H && !HAVE_DECL_OPTRESET
+static int optreset;
 #endif
 
 #ifdef __weak_alias
 __weak_alias(getopt_long,_getopt_long)
 #endif
 
-#ifndef __CYGWIN__
-#define __progname __argv[0]
-#else
-extern char *__progname;
-#endif
-
+#if !HAVE_GETOPT_LONG
 #define IGNORE_FIRST	(*options == '-' || *options == '+')
 #define PRINT_ERROR	((opterr) && ((*options != ':') \
 				      || (IGNORE_FIRST && options[1] != ':')))
-
-#define IS_POSIXLY_CORRECT (getenv("POSIXLY_INCORRECT_GETOPT") == NULL)
-
+#define IS_POSIXLY_CORRECT (getenv("POSIXLY_CORRECT") != NULL)
 #define PERMUTE         (!IS_POSIXLY_CORRECT && !IGNORE_FIRST)
 /* XXX: GNU ignores PC if *options == '-' */
 #define IN_ORDER        (!IS_POSIXLY_CORRECT && *options == '-')
@@ -86,11 +95,15 @@ extern char *__progname;
 			 || (*options == ':') ? (int)':' : (int)'?')
 #define INORDER (int)1
 
+#ifdef __CYGWIN__
 static char EMSG[1];
+#else
+#define	EMSG	""
+#endif
 
-static int getopt_internal (int, char * const *, const char *);
-static int gcd (int, int);
-static void permute_args (int, int, int, char * const *);
+static int getopt_internal __P((int, char * const *, const char *));
+static int gcd __P((int, int));
+static void permute_args __P((int, int, int, char * const *));
 
 static char *place = EMSG; /* option letter processing */
 
@@ -106,23 +119,6 @@ static const char noarg[] = "option doesn't take an argument -- %.*s";
 static const char illoptchar[] = "unknown option -- %c";
 static const char illoptstring[] = "unknown option -- %s";
 
-static void
-_vwarnx(const char *fmt, va_list ap)
-{
-  (void)fprintf(stderr, "%s: ", __progname);
-  if (fmt != NULL)
-    (void)vfprintf(stderr, fmt, ap);
-  (void)fprintf(stderr, "\n");
-}
-
-static void
-warnx(const char *fmt, ...)
-{
-  va_list ap;
-  va_start(ap, fmt);
-  _vwarnx(fmt, ap);
-  va_end(ap);
-}
 
 /*
  * Compute the greatest common divisor of a and b.
@@ -140,7 +136,7 @@ gcd(a, b)
 		b = c;
 		c = a % b;
 	}
-
+	   
 	return b;
 }
 
@@ -241,7 +237,7 @@ start:
 			place = EMSG;
 			if (IN_ORDER) {
 				/*
-				 * GNU extension:
+				 * GNU extension: 
 				 * return non-option as argument to option 1
 				 */
 				optarg = nargv[optind++];
@@ -287,7 +283,7 @@ start:
 	}
 	if (optchar == 'W' && oli[1] == ';') {		/* -W long-option */
 		/* XXX: what if no long options provided (called by getopt)? */
-		if (*place)
+		if (*place) 
 			return -2;
 
 		if (++optind >= nargc) {	/* no arg */
@@ -414,7 +410,7 @@ getopt_long(nargc, nargv, options, long_options, idx)
 			has_equal++;
 		} else
 			current_argv_len = strlen(current_argv);
-
+	    
 		for (i = 0; long_options[i].name; i++) {
 			/* find matching long option */
 			if (strncmp(current_argv, long_options[i].name,
@@ -439,7 +435,7 @@ getopt_long(nargc, nargv, options, long_options, idx)
 			}
 		}
 		if (match != -1) {			/* option found */
-			if (long_options[match].has_arg == no_argument
+		        if (long_options[match].has_arg == no_argument
 			    && has_equal) {
 				if (PRINT_ERROR)
 					warnx(noarg, (int)current_argv_len,
@@ -495,10 +491,11 @@ getopt_long(nargc, nargv, options, long_options, idx)
 		if (long_options[match].flag) {
 			*long_options[match].flag = long_options[match].val;
 			retval = 0;
-		} else
+		} else 
 			retval = long_options[match].val;
 		if (idx)
 			*idx = match;
 	}
 	return retval;
 }
+#endif /* !GETOPT_LONG */

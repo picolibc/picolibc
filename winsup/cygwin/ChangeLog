@@ -1,3 +1,8 @@
+2004-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* getopt.c: Replace with latest NetBSD version 1.16.  Keep Cygwin
+	specific changes as minimal as possible.
+
 2004-02-13  Christopher Faylor  <cgf@redhat.com>
 
 	* sigproc.cc (proc_subproc): Change warning back to silent debug
