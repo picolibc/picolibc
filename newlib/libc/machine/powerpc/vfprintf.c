@@ -155,11 +155,6 @@ static char *rcsid = "$Id$";
 #endif
 #endif
 
-#define _NO_LONGLONG
-#if defined WANT_PRINTF_LONG_LONG && defined __GNUC__
-# undef _NO_LONGLONG
-#endif
-
 #include <_ansi.h>
 #include <limits.h>
 #include <stdio.h>
@@ -186,8 +181,13 @@ static char *rcsid = "$Id$";
    This could be changed in the future should the _ldtoa_r code be
    preferred over _dtoa_r.  */
 #define _NO_LONGDBL
-#if defined WANT_IO_LONG_DBL && (LDBL_MANT_DIG > DBL_MANT_DIG)
+#if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
+#endif
+
+#define _NO_LONGLONG
+#if defined _WANT_IO_LONG_LONG && defined __GNUC__
+# undef _NO_LONGLONG
 #endif
 
 #ifdef __ALTIVEC__

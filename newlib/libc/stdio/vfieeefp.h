@@ -29,6 +29,7 @@
 /* This header file is a modification of mprec.h that only contains floating
    point union code. */
 
+#include <newlib.h>
 #include <ieeefp.h>
 #include <math.h>
 #include <float.h>
@@ -57,7 +58,7 @@
 Exactly one of IEEE_8087, IEEE_MC68k, VAX, or IBM should be defined.
 #endif
 
-#ifdef WANT_IO_LONG_DBL
+#ifdef _WANT_IO_LONG_DOUBLE
 /* If we are going to examine or modify specific bits in a long double using
    the lword0 or lwordx macros, then we must wrap the long double inside
    a union.  This is necessary to avoid undefined behavior according to
@@ -134,7 +135,7 @@ struct ldieee
 };
 #endif /* LDBL_MANT_DIG */
 #endif /* !IEEE_8087 */
-#endif /* WANT_IO_LONG_DBL */
+#endif /* _WANT_IO_LONG_DOUBLE */
 
 /* If we are going to examine or modify specific bits in a double using
    the word0 and/or word1 macros, then we must wrap the double inside

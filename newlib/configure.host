@@ -24,6 +24,8 @@
 #   target_optspace	--enable-target-optspace ("yes", "no", "")
 #   newlib_multithread	--enable-newlib-multithread ("yes", "no", "yes")
 #   newlib_elix_level	--enable-newlib-elix-level ("1","2","3","4") ("4")
+#   newlib_io_long_long --enable-newlib-io-long-long ("yes", "no", "")
+#   newlib_io_long_double --enable-newlib-io-long-double ("yes", "no", "")
 
 # It sets the following shell variables:
 #   newlib_cflags	Special CFLAGS to use when building
@@ -55,6 +57,9 @@ crt1=
 crt1_dir=
 use_libtool=no
 have_sys_mach_dir=no
+default_newlib_io_long_long=no
+default_newlib_io_long_double=no
+default_newlib_io_pos_args=no
 aext=a
 oext=o
 
@@ -256,12 +261,6 @@ if [ "${newlib_io_float}" = "no" ] ; then
 	newlib_cflags="${newlib_cflags} -DNO_FLOATING_POINT"
 fi
 
-# Enable printf positional argument support if requested.
-
-if [ "${newlib_io_pos_args}" = "yes" ] ; then
-	newlib_cflags="${newlib_cflags} -DWANT_IO_POS_ARGS"
-fi
-
 # Verify if shared newlib support is allowed and set appropriate variables
 # We don't want to use libtool for platforms that we are not going to
 # support shared libraries.  This is because it adds executable tests which
@@ -343,11 +342,13 @@ case "${host}" in
 	crt1=crt1.o
 	crt1_dir=libc/sys/${sys_dir}	
 	gcc_dir=`gcc -print-search-dirs | awk '/^install:/{print $2}'`
+	default_newlib_io_long_double="yes"
+	default_newlib_io_long_long="yes"
+	default_newlib_io_pos_args="yes"
 	#newlib_cflags="${newlib_cflags} -Werror" # DEBUGGING ONLY;BREAKS BUILD
 	newlib_cflags="${newlib_cflags} -Wall"
 	newlib_cflags="${newlib_cflags} -D_I386MACH_ALLOW_HW_INTERRUPTS"
 	newlib_cflags="${newlib_cflags} -DHAVE_FCNTL"
-	newlib_cflags="${newlib_cflags} -DWANT_IO_POS_ARGS -DWANT_IO_LONG_DBL"
 	# --- Required when building a shared library ------------------------
 	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
 	# --- The three lines below are optional ------------------------------
@@ -431,7 +432,10 @@ case "${host}" in
   *-*-cygwin*)
 	test -z "$cygwin_srcdir" && cygwin_srcdir=`cd ${srcdir}/../winsup/cygwin; pwd`
 	export cygwin_srcdir
-	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_POS_ARGS -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB -DHAVE_FCNTL -DMALLOC_PROVIDED -I${cygwin_srcdir}/include"
+	default_newlib_io_long_long="yes"
+	default_newlib_io_long_double="yes"
+	default_newlib_io_pos_args="yes"
+	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -D_COMPILING_NEWLIB -DHAVE_FCNTL -DMALLOC_PROVIDED -I${cygwin_srcdir}/include"
 	syscall_dir=syscalls
 	;;
 # RTEMS supplies its own versions of some routines:
@@ -442,7 +446,8 @@ case "${host}" in
 #
 #  NOTE: When newlib malloc uses a semaphore, RTEMS will switch to that.
   *-*-rtems*)
-	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY -DMALLOC_PROVIDED -DEXIT_PROVIDED -DMISSING_SYSCALL_NAMES -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_OPENDIR -DNO_EXEC -DWANT_PRINTF_LONG_LONG -DHAVE_FCNTL"
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY -DMALLOC_PROVIDED -DEXIT_PROVIDED -DMISSING_SYSCALL_NAMES -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_OPENDIR -DNO_EXEC -DHAVE_FCNTL"
 	;;
 # VxWorks supplies its own version of malloc, and the newlib one
 # doesn't work because VxWorks does not have sbrk.
@@ -491,12 +496,11 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
 	;;
   fr30-*-*)
-	newlib_cflags="${newlib_cflags}"
 	syscall_dir=syscalls
 	;;
   frv-*-*)
         syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DWANT_PRINTF_LONG_LONG"
+	default_newlib_io_long_long="yes"
         ;;
   h8300*-*-*)
 	syscall_dir=syscalls	
@@ -517,7 +521,7 @@ case "${host}" in
 	;;
   iq2000*)
 	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DWANT_PRINTF_LONG_LONG"
+	default_newlib_io_long_long="yes"
 	;;
   m32r-*-*)
 	# Pass -msdata=sdata so _impure_ptr goes in .sdata.
@@ -531,11 +535,11 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DABORT_PROVIDED -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
 	;;
   mcore-*-*)
-	newlib_cflags="${newlib_cflags}"
 	syscall_dir=syscalls
 	;;
   mips64vr*-*-*)
-	newlib_cflags="${newlib_cflags} -DWANT_PRINTF_LONG_LONG -DMISSING_SYSCALL_NAMES"
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
 	;;
   mmix-*)
 	syscall_dir=syscalls
@@ -547,10 +551,12 @@ case "${host}" in
 	syscall_dir=syscalls
 	;;
   powerpc*-*-eabialtivec*)
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DWANT_PRINTF_LONG_LONG"
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
 	;;
   powerpc*-*-eabispe*)
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DWANT_PRINTF_LONG_LONG"
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
 	;;
   powerpc*-*-eabi* | \
   powerpc*-*-elf* | \
@@ -558,14 +564,16 @@ case "${host}" in
   powerpc*-*-rtem* | \
   powerpc*-*-sysv* | \
   powerpc*-*-solaris*)
-	newlib_cflags="${newlib_cflags} -mrelocatable-lib -mno-eabi -mstrict-align -DMISSING_SYSCALL_NAMES -DWANT_PRINTF_LONG_LONG"
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -mrelocatable-lib -mno-eabi -mstrict-align -DMISSING_SYSCALL_NAMES"
 	;;
   powerpcle-*-pe)
 	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DHAVE_FCNTL"
 	syscall_dir=syscalls
 	;;
   sh*-*-*)
-	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY -DWANT_PRINTF_LONG_LONG"
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 	syscall_dir=syscalls
 	;;
   sparc-sun-sunos*)
@@ -638,3 +646,26 @@ case "${host}" in
 	syscall_dir=
 	;;
 esac
+
+# Use defaults for certain settings if not specified by user
+
+# Enable long long support in I/O routines if requested.
+if [ "x${newlib_io_long_long}" = "x" ]; then
+	if [ ${default_newlib_io_long_long} = "yes" ]; then
+		newlib_io_long_long="yes";
+	fi
+fi
+
+# Enable long double support in I/O routines if requested.
+if [ "x${newlib_io_long_double}" = "x" ]; then
+	if [ ${default_newlib_io_long_double} = "yes" ]; then
+		newlib_io_long_double="yes";
+	fi
+fi
+
+# Enable printf positional argument support if requested.
+if [ "x${newlib_io_pos_args}" = "x" ]; then
+	if [ ${default_newlib_io_pos_args} = "yes" ]; then
+		newlib_io_pos_args="yes";
+	fi
+fi

@@ -103,6 +103,7 @@ Supporting OS subroutines required:
  */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <newlib.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -128,13 +129,13 @@ Supporting OS subroutines required:
    This could be changed in the future should the _ldtoa_r code be
    preferred over _dtoa_r.  */
 #define _NO_LONGDBL
-#if defined WANT_IO_LONG_DBL && (LDBL_MANT_DIG > DBL_MANT_DIG)
+#if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
 extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #endif
 
 #define _NO_LONGLONG
-#if defined WANT_PRINTF_LONG_LONG && defined __GNUC__
+#if defined _WANT_IO_LONG_LONG && defined __GNUC__
 # undef _NO_LONGLONG
 #endif
 

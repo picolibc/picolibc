@@ -8,6 +8,15 @@
 /* Newlib version */
 #undef _NEWLIB_VERSION
 
+/* long long type support in IO functions like printf/scanf enabled */
+#undef _WANT_IO_LONG_LONG
+
+/* long double type support in IO functions like printf/scanf enabled */
+#undef _WANT_IO_LONG_DOUBLE
+
+/* Positional argument support in printf functions enabled.  */
+#undef _WANT_IO_POS_ARGS
+
 /* Multibyte supported */
 #undef _MB_CAPABLE
 

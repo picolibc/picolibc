@@ -17,8 +17,25 @@ AC_ARG_ENABLE(newlib-io-pos-args,
   yes) newlib_io_pos_args=yes ;;
   no)  newlib_io_pos_args=no ;;
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-pos-args option) ;;
- esac], [newlib_io_pos_args=no])dnl
+ esac], [newlib_io_pos_args=])dnl
 
+dnl Support --enable-newlib-io-long-long
+AC_ARG_ENABLE(newlib-io-long-long,
+[  --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf],
+[case "${enableval}" in
+  yes) newlib_io_long_long=yes;;
+  no)  newlib_io_long_long=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-long-long option) ;;
+ esac], [newlib_io_long_long=])dnl
+
+dnl Support --enable-newlib-io-long-double
+AC_ARG_ENABLE(newlib-io-long-double,
+[  --enable-newlib-io-long-double   enable long double type support in IO functions printf/scanf],
+[case "${enableval}" in
+  yes) newlib_io_long_double=yes;;
+  no)  newlib_io_long_double=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-long-double option) ;;
+ esac], [newlib_io_long_double=])dnl
 
 NEWLIB_CONFIGURE(.)
 
@@ -142,6 +159,18 @@ AC_SUBST(CC_FOR_BUILD)
 
 if test "${newlib_elix_level}" -gt "0"; then
 AC_DEFINE_UNQUOTED(_ELIX_LEVEL,${newlib_elix_level})
+fi
+
+if test "${newlib_io_long_long}" = "yes"; then
+AC_DEFINE_UNQUOTED(_WANT_IO_LONG_LONG)
+fi
+
+if test "${newlib_io_long_double}" = "yes"; then
+AC_DEFINE_UNQUOTED(_WANT_IO_LONG_DOUBLE)
+fi
+
+if test "${newlib_io_pos_args}" = "yes"; then
+AC_DEFINE_UNQUOTED(_WANT_IO_POS_ARGS)
 fi
 
 if test "${newlib_mb}" = "yes"; then

@@ -1,3 +1,23 @@
+2004-05-25  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* newlib.hin: (_WANT_IO_POS_ARGS): New define.
+	(_WANT_IO_LONG_LONG): Ditto.
+	(_WANT_IO_LONG_DOUBLE): Ditto.
+	* configure.in: Add new configuration options
+	--enable-newlib-io-long-long and --enable-newlib-io-long-double
+	which tie to new defines in newlib.hin.
+	* configure: Regenerated.
+	* configure.host: Add checks for new configuration options.  Also
+	fix up check for --enable-newlib-io-pos-args so configuration
+	option will override any default for a given platform.
+	Remove defining compiler flags for the _WANT_IO* options.
+	* libc/stdio/vfprintf.c: Change to use new newlib.hin defines
+	instead of looking for old compiler flags.
+	* libc/stdio/vfscanf.c: Ditto.
+	* libc/stdio/vfieeefp.h: Ditto.
+	* libc/machine/powerpc/vfprintf.c: Ditto.
+	* libc/machine/powerpc/vfscanf.c: Ditto.
+
 2004-05-25  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* testsuite/include/check.h: Add include of <stdio.h>.
