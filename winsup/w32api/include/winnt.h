@@ -1764,12 +1764,22 @@ typedef struct _SECURITY_DESCRIPTOR {
 typedef enum _TOKEN_INFORMATION_CLASS {
 	TokenUser=1,TokenGroups,TokenPrivileges,TokenOwner,
 	TokenPrimaryGroup,TokenDefaultDacl,TokenSource,TokenType,
-	TokenImpersonationLevel,TokenStatistics
+	TokenImpersonationLevel,TokenStatistics,TokenRestrictedSids,
+        TokenSessionId
 } TOKEN_INFORMATION_CLASS;
 typedef enum _SID_NAME_USE {
 	SidTypeUser=1,SidTypeGroup,SidTypeDomain,SidTypeAlias,SidTypeWellKnownGroup,
 	SidTypeDeletedAccount,SidTypeInvalid,SidTypeUnknown
 } SID_NAME_USE,*PSID_NAME_USE;
+typedef struct _QUOTA_LIMITS {
+	size_t PagedPoolLimit;
+	size_t NonPagedPoolLimit;
+	DWORD MinimumWorkingSetSize;
+	DWORD MaximumWorkingSetSize;
+	size_t PagefileLimit;
+	LARGE_INTEGER TimeLimit;
+} QUOTA_LIMITS;
+typedef QUOTA_LIMITS *PQUOTA_LIMITS;
 typedef struct _FILE_NOTIFY_INFORMATION {
 	DWORD NextEntryOffset;
 	DWORD Action;
