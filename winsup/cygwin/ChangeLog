@@ -1,3 +1,8 @@
+2002-07-25  Egor Duda  <deo@logos-m.ru>
+
+	* Makefile.in: Check if API version is updated when exports are 
+	changed and stop if not so.
+
 2002-07-24  Egor Duda  <deo@logos-m.ru>
 
 	* include/cygwin/version.h: Bump minor API version.
