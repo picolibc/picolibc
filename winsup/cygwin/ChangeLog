@@ -1,5 +1,31 @@
 2005-01-15  Christopher Faylor  <cgf@timesys.com>
 
+	* init.cc (dll_entry): Remove unused extern.
+
+	* include/sys/cygwin.h: Remove PID_ZOMBIE.
+	* pinfo.h: Rename EXITCODE_* defines.
+	(pinfo::set_exit_state): Remove parameter.
+	* pinfo.cc (set_exit_state): Remove parameter.  Reverse sense of test
+	so that exitcode is checked for having been set rather than not having
+	been set.  Set flag when exitcode has been established.  Don't set
+	PID_STATE here.
+	(pinfo::init): Remove exitcode initialization.
+	(pinfo::exit): Reflect change in EXITCODE_* naming.  Set flag when
+	exitcode has been established.  Reflect change in arguments to
+	set_process_state.
+	(proc_waiter): Reflect change in arguments to set_process_state.  Set
+	process_state here and only here.
+	* fhandler_process.cc (fhandler_process::fill_filebuf): Reflect removal
+	of PID_ZOMBIE define.
+	(format_process_stat): Ditto.
+	(format_process_status): Ditto.
+	* sigproc.cc (pid_exists): Ditto.
+	(stopped_or_terminated): Ditto.  Make sure that only low-order 16 bits of
+	exitcode are used.
+	* spawn.cc (spawn_guts): Reflect change in EXITCODE_* naming.
+
+2005-01-15  Christopher Faylor  <cgf@timesys.com>
+
 	* sigproc.cc (sig_send): Don't complain if attempt to send signal to
 	myself fails after I've "execed".
 

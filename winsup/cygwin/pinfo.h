@@ -26,9 +26,8 @@ enum picom
   PICOM_FIFO = 2
 };
 
-#define EXITCODE_UNSET 0x80000000
-#define EXITCODE_NOSET EXITCODE_UNSET
-#define EXITCODE_EXEC EXITCODE_UNSET
+#define EXITCODE_SET 0x80000000
+#define EXITCODE_NOSET 0x40000000
 
 class _pinfo
 {
@@ -156,7 +155,7 @@ public:
       release ();
   }
   void exit (DWORD n) __attribute__ ((noreturn, regparm(2)));
-  void set_exit_state (DWORD) __attribute__ ((regparm(2)));
+  void set_exit_state () __attribute__ ((regparm(2)));
   void initialize_lock () {InitializeCriticalSection (&_lock);}
   void lock () {EnterCriticalSection (&_lock);}
   void unlock () {LeaveCriticalSection (&_lock);}

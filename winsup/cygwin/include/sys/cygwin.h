@@ -88,7 +88,7 @@ unsigned long cygwin_internal (cygwin_getinfo_types, ...);
 enum
 {
   PID_IN_USE	       = 0x00001, /* Entry in use. */
-  PID_ZOMBIE	       = 0x00002, /* Child exited: no parent wait. */
+  PID_UNUSED	       = 0x00002, /* Available. */
   PID_STOPPED	       = 0x00004, /* Waiting for SIGCONT. */
   PID_TTYIN	       = 0x00008, /* Waiting for terminal input. */
   PID_TTYOU	       = 0x00010, /* Waiting for terminal output. */

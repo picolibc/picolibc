@@ -873,7 +873,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  myself.remember (false);
 	  waitpid (myself->pid, &res, 0);
 	}
-      myself.exit (EXITCODE_EXEC);
+      myself.exit (EXITCODE_NOSET);
       break;
     case _P_WAIT:
     case _P_SYSTEM:

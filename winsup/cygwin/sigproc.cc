@@ -200,7 +200,7 @@ pid_exists (pid_t pid)
 bool __stdcall
 proc_exists (_pinfo *p)
 {
-  return p && !(p->process_state & (PID_EXITED | PID_ZOMBIE));
+  return p && !(p->process_state & PID_EXITED);
 }
 
 /* Return true if this is one of our children, false otherwise.  */
@@ -891,7 +891,7 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 
   int terminated;
 
-  if (!((terminated = (child->process_state == PID_ZOMBIE)) ||
+  if (!((terminated = (child->process_state == PID_EXITED)) ||
       ((w->options & WUNTRACED) && child->stopsig)))
     return 0;
 
@@ -904,9 +904,9 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
       w->status = (child->stopsig << 8) | 0x7f;
       child->stopsig = 0;
     }
-  else /* Should only get here when child has been moved to the procs array */
+  else
     {
-      w->status = child->exitcode;
+      w->status = (__uint16_t) child->exitcode;
 
       add_rusage (&myself->rusage_children, &child->rusage_children);
       add_rusage (&myself->rusage_children, &child->rusage_self);

@@ -315,7 +315,7 @@ fhandler_process::fill_filebuf ()
     case PROCESS_EXENAME:
       {
 	filebuf = (char *) realloc (filebuf, bufalloc = CYG_MAX_PATH);
-	if (p->process_state & (PID_ZOMBIE | PID_EXITED))
+	if (p->process_state & PID_EXITED)
 	  strcpy (filebuf, "<defunct>");
 	else
 	  {
@@ -380,7 +380,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 		start_time = 0UL,
 		vmsize = 0UL, vmrss = 0UL, vmmaxrss = 0UL;
   int priority = 0;
-  if (p->process_state & (PID_ZOMBIE | PID_EXITED))
+  if (p->process_state & PID_EXITED)
     strcpy (cmd, "<defunct>");
   else
     {
@@ -400,7 +400,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
    * Note: under Windows, a _process_ is always running - it's only _threads_
    * that get suspended. Therefore the default state is R (runnable).
    */
-  if (p->process_state & PID_ZOMBIE)
+  if (p->process_state & PID_EXITED)
     state = 'Z';
   else if (p->process_state & PID_STOPPED)
     state = 'T';
@@ -513,7 +513,7 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
   const char *state_str = "unknown";
   unsigned long vmsize = 0UL, vmrss = 0UL, vmdata = 0UL, vmlib = 0UL, vmtext = 0UL,
 		vmshare = 0UL;
-  if (p->process_state & (PID_ZOMBIE | PID_EXITED))
+  if (p->process_state & PID_EXITED)
     strcpy (cmd, "<defunct>");
   else
     {
@@ -533,7 +533,7 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
    * Note: under Windows, a _process_ is always running - it's only _threads_
    * that get suspended. Therefore the default state is R (runnable).
    */
-  if (p->process_state & PID_ZOMBIE)
+  if (p->process_state & PID_EXITED)
     state = 'Z';
   else if (p->process_state & PID_STOPPED)
     state = 'T';

@@ -111,7 +111,6 @@ extern "C" int WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
   BOOL is_64bit_machine = FALSE;
-  extern HANDLE hExeced;
 
   switch (reason)
     {

@@ -105,19 +105,17 @@ pinfo_init (char **envp, int envc)
 
 # define self (*this)
 void
-pinfo::set_exit_state (DWORD pidstate)
+pinfo::set_exit_state ()
 {
   DWORD x = 0xdeadbeef;
   DWORD oexitcode = self->exitcode;
-  if (hProcess && self->exitcode == EXITCODE_UNSET)
+  if (hProcess && !(self->exitcode & EXITCODE_SET))
     {
       GetExitCodeProcess (hProcess, &x);
-      self->exitcode = (x & 0xff) << 8;
+      self->exitcode = EXITCODE_SET | (x & 0xff) << 8;
     }
   sigproc_printf ("exit value - old %p, windows %p, cygwin %p", oexitcode, x,
 		  self->exitcode);
-  if (self->exitcode != EXITCODE_NOSET)
-    self->process_state = pidstate;
 }
 
 void
@@ -125,10 +123,10 @@ pinfo::exit (DWORD n)
 {
   exit_state = ES_FINAL;
   cygthread::terminate ();
-  if (n != EXITCODE_EXEC)
+  if (n != EXITCODE_NOSET)
     {
-      sigproc_terminate ();	/* Just terminate signal and process stuff */
-      self->exitcode = n;	/* We're really exiting.  Record the UNIX exit code. */
+      sigproc_terminate ();		/* Just terminate signal and process stuff */
+      self->exitcode = EXITCODE_SET | n;/* We're really exiting.  Record the UNIX exit code. */
     }
 
   /* FIXME:  There is a potential race between an execed process and its
@@ -137,8 +135,8 @@ pinfo::exit (DWORD n)
   fill_rusage (&r, hMainProc);
   add_rusage (&self->rusage_self, &r);
 
-  set_exit_state (PID_EXITED);
-  if (n != EXITCODE_EXEC)
+  set_exit_state ();
+  if (n != EXITCODE_NOSET)
     self->alert_parent (0);
   int exitcode = self->exitcode;
   release ();
@@ -279,10 +277,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       if (!created)
 	/* nothing */;
       else if (!(flag & PID_EXECED))
-	{
-	  procinfo->pid = n;
-	  procinfo->exitcode = EXITCODE_UNSET;
-	}
+	procinfo->pid = n;
       else
 	{
 	  procinfo->process_state |= PID_IN_USE | PID_EXECED;
@@ -719,7 +714,8 @@ proc_waiter (void *arg)
 	  /* Child exited.  Do some cleanup and signal myself.  */
 	  CloseHandle (vchild.rd_proc_pipe);
 	  vchild.rd_proc_pipe = NULL;
-	  vchild.set_exit_state (PID_ZOMBIE);
+	  vchild.set_exit_state ();
+	  vchild->process_state = PID_EXITED;
 	  if (WIFEXITED (vchild->exitcode))
 	    si.si_sigval.sival_int = CLD_EXITED;
 	  else if (WCOREDUMP (vchild->exitcode))
