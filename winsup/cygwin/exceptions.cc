@@ -497,7 +497,7 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 		 myself->getsig(sig).sa_handler);
 
   DWORD *ebp = (DWORD *)in->Esp;
-  for (DWORD *bpend = ebp - 8; ebp > bpend; ebp--)
+  for (DWORD *bpend = ebp - 16; ebp > bpend; ebp--)
     if (*ebp == in->SegCs && ebp[-1] == in->Eip)
       {
 	ebp -= 2;
