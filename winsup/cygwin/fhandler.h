@@ -626,7 +626,7 @@ class fhandler_cygdrive: public fhandler_disk_file
 class fhandler_serial: public fhandler_base
 {
  private:
-  unsigned int vmin_;			/* from termios */
+  size_t vmin_;				/* from termios */
   unsigned int vtime_;			/* from termios */
   pid_t pgrp_;
   int rts;				/* for Windows 9x purposes only */
@@ -1107,7 +1107,6 @@ class fhandler_virtual : public fhandler_base
   int close (void);
   int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
   virtual bool fill_filebuf ();
-  void fixup_after_exec (HANDLE);
 };
 
 class fhandler_proc: public fhandler_virtual
