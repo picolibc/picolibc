@@ -1,3 +1,25 @@
+2002-09-21  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc: Change verifyable_object_isvalid calls with 
+	PTHREAD_MUTEX_MAGIC and PTHREAD_KEY_MAGIC and PTHREAD_ATTR_MAGIC to
+	::isGoodObject() calls throughout.
+       	(MTinterface::Init): Remove dead code.
+	(pthread_attr::isGoodObject): Implement.
+	(pthread_key::isGoodObject): Implement.
+	(pthread_mutex::isGoodObject): Implement.
+	(pthread_mutex::isGoodInitializerOrObject): Implement.
+	(pthread::isGoodObject): Update signature.
+	* thread.h (pthread_key::isGoodObject): Declare.
+	(pthread_attr::isGoodObject): Ditto.
+	(pthread_mutex::isGoodObject): Ditto.
+	(pthread_mutex::isGoodInitializerOrObject): Ditto.
+	(pthread::isGoodObject): Change to a const parameter for const
+	correctness.
+	(pthread_mutexattr::isGoodObject): Declare.
+	(pthread_condattr::isGoodObject): Ditto.
+	(pthread_cond::isGoodObject): Ditto.
+	(semaphore::isGoodObject): Ditto.
+
 2002-09-19  Christopher Faylor  <cgf@redhat.com>
 
 	Cleanup calls to CreateFile throughout.
