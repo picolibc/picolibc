@@ -94,13 +94,10 @@ class mount_info
   int get_cygdrive_info (char *user, char *system, char* user_flags,
 			 char* system_flags);
 
-  void import_v1_mounts ();
-
  private:
 
   void sort ();
   void read_mounts (reg_key& r);
-  void read_v1_mounts (reg_key r, unsigned which);
   void mount_slash ();
   void to_registry ();
 

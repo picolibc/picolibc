@@ -1334,7 +1334,6 @@ void
 mount_info::init ()
 {
   nmounts = 0;
-  had_to_create_mount_areas = 0;
 
   /* Fetch the mount table and cygdrive-related information from
      the registry.  */
@@ -1835,11 +1834,6 @@ mount_info::from_registry ()
 	      CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
 	      NULL);
   read_mounts (r1);
-
-  /* If we had to create both user and system mount areas, import
-     old mounts. */
-  if (had_to_create_mount_areas == 2)
-    import_v1_mounts ();
 }
 
 /* add_reg_mount: Add mount item to registry.  Return zero on success,
@@ -2313,81 +2307,6 @@ mount_info::del_item (const char *path, unsigned flags, int reg_p)
     }
   set_errno (EINVAL);
   return -1;
-}
-
-/* read_v1_mounts: Given a reg_key to an old mount table registry area,
-   read in the mounts.  The "which" arg contains zero if we're reading
-   the user area and MOUNT_SYSTEM if we're reading the system area.
-   This way we can store the mounts read in the appropriate place when
-   they are written back to the new registry layout. */
-
-void
-mount_info::read_v1_mounts (reg_key r, unsigned which)
-{
-  unsigned mountflags = 0;
-
-  /* MAX_MOUNTS was 30 when we stopped using the v1 layout */
-  for (int i = 0; i < 30; i++)
-    {
-      char key_name[10];
-      char win32path[MAX_PATH];
-      char unixpath[MAX_PATH];
-
-      __small_sprintf (key_name, "%02x", i);
-
-      reg_key k (r.get_key (), KEY_ALL_ACCESS, key_name, NULL);
-
-      /* The registry names are historical but useful so are left alone.  */
-      k.get_string ("native", win32path, sizeof (win32path), "");
-      k.get_string ("unix", unixpath, sizeof (unixpath), "");
-
-      /* Does this entry contain something?  */
-      if (*win32path != 0)
-	{
-	  mountflags = 0;
-
-	  if (k.get_int ("fbinary", 0))
-	    mountflags |= MOUNT_BINARY;
-
-	  /* Or in zero or MOUNT_SYSTEM depending on which table
-	     we're reading. */
-	  mountflags |= which;
-
-	  int res = mount_table->add_item (win32path, unixpath, mountflags, TRUE);
-	  if (res && get_errno () == EMFILE)
-	    break; /* The number of entries exceeds MAX_MOUNTS */
-	}
-    }
-}
-
-/* import_v1_mounts: If v1 mounts are present, load them and write
-   the new entries to the new registry area. */
-
-void
-mount_info::import_v1_mounts ()
-{
-  reg_key r (HKEY_CURRENT_USER, KEY_ALL_ACCESS,
-	     "SOFTWARE",
-	     "Cygnus Solutions",
-	     "CYGWIN.DLL setup",
-	     "b15.0",
-	     "mounts",
-	     NULL);
-
-  nmounts = 0;
-
-  /* First read mounts from user's table. */
-  read_v1_mounts (r, 0);
-
-  /* Then read mounts from system-wide mount table. */
-  reg_key r1 (HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS,
-	      "SOFTWARE",
-	      "Cygnus Solutions",
-	      "CYGWIN.DLL setup",
-	      "b15.0",
-	      "mounts",
-	      NULL);
-  read_v1_mounts (r1, MOUNT_SYSTEM);
 }
 
 /************************* mount_item class ****************************/

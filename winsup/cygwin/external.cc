@@ -161,9 +161,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	return (DWORD) cygwin_version_strings;
 
       case CW_READ_V1_MOUNT_TABLES:
-	/* Upgrade old v1 registry mounts to new location. */
-	mount_table->import_v1_mounts ();
-	return 0;
+	set_errno (ENOSYS);
+	return 1;
 
       case CW_USER_DATA:
 	return (DWORD) &__cygwin_user_data;

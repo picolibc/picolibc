@@ -1,5 +1,16 @@
 2002-06-08  Christopher Faylor  <cgf@redhat.com>
 
+	* external.cc (cygwin_internal): Make v1 mount table access invalid.
+	* path.cc (mount_info::init): Remove had_to_create_mount_areas initialization.
+	(mount_info::from_registry): Remove v1 table import.
+	(mount_info::read_v1_mounts): Eliminate.
+	(mount_info::import_v1_mounts): Ditto.
+	* shared_info.h (mount_info): Ditto for both of above.
+	* sys/mount.h (MOUNT_DEVFS): New enum.
+	(MOUNT_PROC): Ditto.
+
+2002-06-08  Christopher Faylor  <cgf@redhat.com>
+
 	* include/wchar.h: Define __need_size_t.
 
 2002-06-07  Christopher Faylor  <cgf@redhat.com>
