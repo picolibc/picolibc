@@ -349,6 +349,10 @@ void	_sleep (unsigned long);
 
 void	_exit	(int) _ATTRIB_NORETURN;
 
+/* _onexit is MS extension. Use atexit for portability.  */
+typedef  int (* _onexit_t)(void); 
+_onexit_t _onexit( _onexit_t );
+
 int	_putenv	(const char*);
 void	_searchenv (const char*, const char*, char*);
 
