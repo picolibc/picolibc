@@ -64,6 +64,24 @@ END_RELOC_NUMBERS (R_M68HC11_max)
 /* Uses 68HC12 memory banks.  */
 #define E_M68HC12_BANKS 0x000000004
 
+#define EF_M68HC11_MACH_MASK 0xF0
+#define EF_M68HC11_GENERIC   0x00 /* Generic 68HC12/backward compatibility.  */
+#define EF_M68HC12_MACH      0x10 /* 68HC12 microcontroller.  */
+#define EF_M68HCS12_MACH     0x20 /* 68HCS12 microcontroller.  */
+#define EF_M68HC11_MACH(mach) ((mach) & EF_M68HC11_MACH_MASK)
+
+/* True if we can merge machines.  A generic HC12 can work on any proc
+   but once we have specific code, merge is not possible.  */
+#define EF_M68HC11_CAN_MERGE_MACH(mach1, mach2) \
+  ((EF_M68HC11_MACH (mach1) == EF_M68HC11_MACH (mach2)) \
+   || (EF_M68HC11_MACH (mach1) == EF_M68HC11_GENERIC) \
+   || (EF_M68HC11_MACH (mach2) == EF_M68HC11_GENERIC))
+
+#define EF_M68HC11_MERGE_MACH(mach1, mach2) \
+  (((EF_M68HC11_MACH (mach1) == EF_M68HC11_MACH (mach2)) \
+    || (EF_M68HC11_MACH (mach1) == EF_M68HC11_GENERIC)) ? \
+      EF_M68HC11_MACH (mach2) : EF_M68HC11_MACH (mach1))
+
 
 /* Special values for the st_other field in the symbol table.  These
    are used for 68HC12 to identify far functions (must be called with

@@ -1,3 +1,9 @@
+2002-12-01  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* m68hc11.h (EF_M68HC12_MACH, EF_M68HCS12_MACH): Define.
+	(EF_M68HC11_MACH_MASK, EF_M68HC11_MACH): Define.
+	(EF_M68HC11_MERGE_MACH, EF_M68HC11_CAN_MERGE_MACH): Define.
+
 2002-11-30  Alan Modra  <amodra@bigpond.net.au>
 
 	* mmix.h: Replace boolean with bfd_boolean.
