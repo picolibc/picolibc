@@ -1086,7 +1086,7 @@ mtinfo::initialize (void)
 
   shared_name (name, "mtinfo_mutex", 0);
   if (!(mtx = CreateMutex (&sec_all_nih, FALSE, name)))
-    api_fatal ("CreateMutex '%s'(%p), %E.  Terminating.", name);
+    api_fatal ("CreateMutex '%s', %E.  Terminating.", name);
   WaitForSingleObject (mtx, INFINITE);
   if (!magic)
     {
