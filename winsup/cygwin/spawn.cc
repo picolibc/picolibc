@@ -326,7 +326,7 @@ struct pthread_cleanup
   _sig_func_ptr oldint;
   _sig_func_ptr oldquit;
   sigset_t oldmask;
-  pthread_cleanup (): oldint (NULL), oldquit (NULL), oldmask (0) {}
+  pthread_cleanup (): oldint (NULL), oldquit (NULL), oldmask ((sigset_t) -1) {}
 };
 
 static void
@@ -337,7 +337,7 @@ do_cleanup (void *args)
     signal (SIGINT, cleanup->oldint);
   if (cleanup->oldquit)
     signal (SIGQUIT, cleanup->oldquit);
-  if (cleanup->oldmask)
+  if (cleanup->oldmask != (sigset_t) -1)
     sigprocmask (SIG_SETMASK, &(cleanup->oldmask), NULL);
 # undef cleanup
 }
