@@ -1,3 +1,7 @@
+2003-03-04  Jason Tishler <jason@tishler.net>
+
+	* fhandler_socket.cc (fhandler_socket::dup): Initialize type.
+
 2003-03-03  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (fhandler_tty_slave::close): Declare new function.
