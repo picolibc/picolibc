@@ -1,3 +1,8 @@
+2001-12-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* config.sub: Import latest version.
+	* config.guess: Likewise.
+
 2001-12-13  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* configure.in (FLAGS_FOR_TARGET): Remove -nostdinc and -isystem
