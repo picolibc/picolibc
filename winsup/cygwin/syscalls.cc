@@ -1816,7 +1816,7 @@ ptsname (int fd)
 }
 
 /* FIXME: what is this? */
-extern "C" int
+extern "C" int __declspec(dllexport)
 regfree ()
 {
   return 0;
