@@ -452,6 +452,7 @@ public:
   int close ();
   void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
   int dup (fhandler_base *child);
+  void fixup_after_fork (HANDLE);
   bool hit_eof ();
   friend int make_pipe (int fildes[2], unsigned int psize, int mode);
 };

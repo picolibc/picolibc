@@ -117,6 +117,19 @@ add_grp_line (const char *line)
       curr_lines++;
 }
 
+class group_lock
+{
+  pthread_mutex_t mutex;
+ public:
+  group_lock (): mutex ((pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER) {}
+  void arm () {pthread_mutex_lock (&mutex); }
+  ~group_lock ()
+  {
+    if (mutex != (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER)
+      pthread_mutex_unlock (&mutex);
+  }
+};
+
 /* Cygwin internal */
 /* Read in /etc/group and save contents in the group cache */
 /* This sets group_in_memory_p to 1 so functions in this file can
@@ -132,15 +145,13 @@ read_etc_group ()
 
   strncpy (group_name, "Administrators", sizeof (group_name));
 
-  static NO_COPY pthread_mutex_t etc_group_mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
-  pthread_mutex_lock (&etc_group_mutex);
+  static NO_COPY group_lock here;
+  if (cygwin_finished_initializing)
+    here.arm ();
 
   /* if we got blocked by the mutex, then etc_group may have been processed */
   if (group_state != uninitialized)
-    {
-      pthread_mutex_unlock(&etc_group_mutex);
-      return;
-    }
+    return;
 
   if (group_state != initializing)
     {
@@ -193,7 +204,7 @@ read_etc_group ()
 	}
     }
 
-  pthread_mutex_unlock(&etc_group_mutex);
+  return;
 }
 
 extern "C"

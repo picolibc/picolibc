@@ -109,6 +109,19 @@ add_pwd_line (char *line)
     parse_pwd (passwd_buf[curr_lines++], line);
 }
 
+class passwd_lock
+{
+  pthread_mutex_t mutex;
+ public:
+  passwd_lock (): mutex ((pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER) {}
+  void arm () {pthread_mutex_lock (&mutex); }
+  ~passwd_lock ()
+  {
+    if (mutex != (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER)
+      pthread_mutex_unlock (&mutex);
+  }
+};
+
 /* Read in /etc/passwd and save contents in the password cache.
    This sets passwd_state to loaded or emulated so functions in this file can
    tell that /etc/passwd has been read in or will be emulated. */
@@ -120,15 +133,14 @@ read_etc_passwd ()
      * for non-shared mutexs in the future. Also, this function will at most be called
      * once from each thread, after that the passwd_state test will succeed
      */
-    static NO_COPY pthread_mutex_t etc_passwd_mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
-    pthread_mutex_lock (&etc_passwd_mutex);
+    static NO_COPY passwd_lock here;
+
+    if (cygwin_finished_initializing)
+      here.arm ();
 
     /* if we got blocked by the mutex, then etc_passwd may have been processed */
     if (passwd_state != uninitialized)
-      {
-	pthread_mutex_unlock(&etc_passwd_mutex);
-	return;
-      }
+      return;
 
     if (passwd_state != initializing)
       {
@@ -165,7 +177,7 @@ read_etc_passwd ()
 
       }
 
-  pthread_mutex_unlock (&etc_passwd_mutex);
+  return;
 }
 
 /* Cygwin internal */

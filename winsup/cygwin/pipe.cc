@@ -63,9 +63,7 @@ int fhandler_pipe::close ()
   if (guard)
     CloseHandle (guard);
   if (writepipe_exists)
-{debug_printf ("writepipe_exists closed");
     CloseHandle (writepipe_exists);
-}
   return res;
 }
 
@@ -75,12 +73,22 @@ fhandler_pipe::hit_eof ()
   char buf[80];
   HANDLE ev;
   if (!orig_pid)
-    return bg_ok;
+    return false;
   __small_sprintf (buf, pipeid_fmt, orig_pid, id);
   if ((ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf)))
     CloseHandle (ev);
   debug_printf ("%s %p", buf, ev);
   return ev == NULL;
+}
+
+void
+fhandler_pipe::fixup_after_fork (HANDLE parent)
+{
+  this->fhandler_base::fixup_after_fork (parent);
+  if (guard)
+    fork_fixup (parent, guard, "guard");
+  if (writepipe_exists)
+    fork_fixup (parent, writepipe_exists, "guard");
 }
 
 int
@@ -96,14 +104,20 @@ fhandler_pipe::dup (fhandler_base *child)
     ftp->guard = NULL;
   else if (!DuplicateHandle (hMainProc, guard, hMainProc, &ftp->guard, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
-    return -1;
+    {
+      debug_printf ("couldn't duplicate guard %p, %E", guard);
+      return -1;
+    }
 
   if (writepipe_exists == NULL)
     ftp->writepipe_exists = NULL;
   else if (!DuplicateHandle (hMainProc, writepipe_exists, hMainProc,
 			     &ftp->writepipe_exists, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
-    return -1;
+    {
+      debug_printf ("couldn't duplicate writepipe_exists %p, %E", writepipe_exists);
+      return -1;
+    }
 
   ftp->id = id;
   ftp->orig_pid = orig_pid;

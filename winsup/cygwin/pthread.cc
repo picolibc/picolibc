@@ -362,20 +362,6 @@ pthread_cond_broadcast (pthread_cond_t * cond)
 }
 
 int
-pthread_cond_timedwait (pthread_cond_t * cond,
-			pthread_mutex_t * mutex,
-			const struct timespec *abstime)
-{
-  return __pthread_cond_timedwait (cond, mutex, abstime);
-}
-
-int
-pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
-{
-  return __pthread_cond_wait (cond, mutex);
-}
-
-int
 pthread_condattr_init (pthread_condattr_t * condattr)
 {
   return __pthread_condattr_init (condattr);

@@ -29,6 +29,120 @@ Tue Sep 25 16:22:00 2001 Robert Collins <rbtcollins@hotmail.com>
 	* include/sys/ipc.h: New file.
 	* include/sys/shm.h: New file.
 
+Sat Sep 29 18:26:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* pthread.cc (pthread_cond_timedwait): Deleted - exported from thread.cc.
+	(pthread_cond_wait): Deleted - exported from thread.cc.
+	* thread.cc (pthread_cond::BroadCast): Update to use the new syntax for
+	verifyable_object_isvalid ().
+	(pthread_cond::Signal): Ditto. Also attempt to fix the lost signal race
+	with pthread_cond::TimedWait().
+	(check_valid_pointer): Change definiton to void const *.
+	(verifyable_object_isvalid): Add new parameter to allow identification of
+	static initializers, and return a enum rather than magic numbers.
+	(__pthread_create): Ditto.
+	(__pthread_cleanup): Ditto.
+	(__pthread_attr_init): Ditto.
+	(__pthread_attr_getinheritsched): Ditto.
+	(__pthread_attr_getschedparam): Ditto.
+	(__pthread_attr_getschedpolicy): Ditto.
+	(__pthread_attr_getscope): Ditto.
+	(__pthread_attr_setdetachstate): Ditto.
+	(__pthread_attr_getdetachstate): Ditto.
+	(__pthread_attr_setinheritsched): Ditto.
+	(__pthread_attr_setschedparam): Ditto.
+	(__pthread_attr_setschedpolicy): Ditto.
+	(__pthread_attr_setscope): Ditto.
+	(__pthread_attr_setstacksize): Ditto.
+	(__pthread_attr_getstacksize): Ditto.
+	(__pthread_attr_destroy): Ditto.
+	(__pthread_join): Ditto.
+	(__pthread_detach): Ditto.
+	(__pthread_suspend): Ditto.
+	(__pthread_continue): Ditto.
+	(__pthread_getschedparam): Ditto.
+	(__pthread_getsequence_np): Ditto.
+	(__pthread_key_create): Ditto.
+	(__pthread_key_delete): Ditto.
+	(__pthread_setschedparam): Ditto.
+	(__pthread_setspecific): Ditto.
+	(__pthread_getspecific): Ditto.
+	(__pthread_cond_destroy): Ditto.
+	(__pthread_cond_init): Ditto.
+	(__pthread_cond_broadcast): Ditto.
+	(__pthread_cond_signal): Ditto.
+	(__pthread_condattr_init): Ditto.
+	(__pthread_condattr_getpshared): Ditto.
+	(__pthread_condattr_setpshared): Ditto.
+	(__pthread_condattr_destroy): Ditto.
+	(__pthread_kill): Ditto.
+	(__pthread_mutex_init): Ditto.
+	(__pthread_mutex_getprioceiling): Ditto.
+	(__pthread_mutex_lock): Ditto.
+	(__pthread_mutex_trylock): Ditto.
+	(__pthread_mutex_unlock): Ditto.
+	(__pthread_mutex_destroy): Ditto.
+	(__pthread_mutex_setprioceiling): Ditto.
+	(__pthread_mutexattr_getprotocol): Ditto.
+	(__pthread_mutexattr_getpshared): Ditto.
+	(__pthread_mutexattr_gettype): Ditto.
+	(__pthread_mutexattr_init): Ditto.
+	(__pthread_mutexattr_destroy): Ditto.
+	(__pthread_mutexattr_setprotocol): Ditto.
+	(__pthread_mutexattr_setprioceiling): Ditto.
+	(__pthread_mutexattr_getprioceiling): Ditto.
+	(__pthread_mutexattr_setpshared): Ditto.
+	(__pthread_mutexattr_settype): Ditto.
+	(__sem_init): Ditto.
+	(__sem_destroy): Ditto.
+	(__sem_wait): Ditto.
+	(__sem_trywait): Ditto.
+	(__sem_post): Ditto.
+	(__pthread_cond_dowait): New function, contains core logic from
+	__pthread_cond_wait and __pthread_cond_timedwait. Decrement (*cond)->waiting
+	before reentering the cond access mutex to allow detection of lost signals.
+	(__pthread_cond_timedwait): Rename to pthread_cond_timedwait, and call 
+	__pthread_cond_dowait after calculating the wait length.
+	(__pthread_cond_wait): Rename to pthread_cond_wait, and call 
+	__pthread_cond_dowait.
+	* thread.h: New enum for use with verifyable_object_isvalid.
+	Remove the extern exporting of __pthread_cond_timedwait and __pthread_cond_wait.
+
+Fri Sep 28 21:18:50 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* pipe.cc (fhandler_pipe::fixup_after_fork): New method.
+	* fhandler.h (fhandler_pipe::fixup_after_fork): Declare new method.
+
+Fri Sep 28 03:23:04 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* passwd.cc (read_etc_passwd): Bother with unlocking when not
+	in cygwin initialization.
+	* grp.cc (read_etc_group): Ditto.
+
+Fri Sep 28 02:57:03 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* passwd.cc (read_etc_passwd): Don't bother with locking when
+	in cygwin initialization since there is only one thread.
+	* grp.cc (read_etc_group): Ditto.
+
+Fri Sep 28 01:50:09 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* pipe.cc (fhandler_pipe::hit_eof): Return correct value when there is
+	no EOF event available.
+
+Sat Sep 28 00:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap): Move setting the access after evaluating fd.
+	Remove useless comment.  Explain copy-on-write problem of 9x
+	more detailed.  Don't set access to FILE_MAP_COPY on 9x only
+	when anonymous mapping is requested.
+	(fhandler_disk_file::mmap): Remove useless device check.
+	Add debug output.
+
+Fri Sep 27 07:35:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* Makefile.in: Only stamp winver_stamp on success.
+
 Wed Sep 26 16:02:35 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (peek_pipe): REALLY only grab mutex when we actually got
