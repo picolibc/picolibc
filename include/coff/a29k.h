@@ -55,6 +55,7 @@
 #define NMAGIC		0410	/* separate i/d executable */
 #define SHMAGIC	0406		/* NYU/Ultra3 shared data executable 
 				   (writable text) */
+#undef  _ETEXT
 #define _ETEXT   	"_etext"
 
 /*--------------------------------------------------------------*/

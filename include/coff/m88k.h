@@ -172,8 +172,6 @@ union external_auxent
 #define PUT_SCN_SCNLEN(abfd,in, ext) bfd_h_put_32(abfd, in, (bfd_byte *) ext->x_scn.x_scnlen)
 #define PUT_SCN_NRELOC(abfd,in, ext) bfd_h_put_32(abfd, in, (bfd_byte *)ext->x_scn.x_nreloc)
 #define PUT_SCN_NLINNO(abfd,in, ext)  bfd_h_put_32(abfd,in, (bfd_byte *) ext->x_scn.x_nlinno)
-#define GET_LINENO_LNNO(abfd, ext)  bfd_h_get_32(abfd, (bfd_byte *) (ext->l_lnno))
-#define PUT_LINENO_LNNO(abfd,val, ext)  bfd_h_put_32(abfd,val,  (bfd_byte *) (ext->l_lnno));
 
 #define	SYMENT	struct external_syment
 #define	SYMESZ	20
