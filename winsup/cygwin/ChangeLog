@@ -1,5 +1,12 @@
 2004-12-22  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.cc (proc_waiter): Zero wait_thread in child to avoid races with
+	process termination.
+	* cygthread.cc (cygthread::terminate): Clumsily detect when h has gone away
+	and attempt no further action.
+
+2004-12-22  Christopher Faylor  <cgf@timesys.com>
+
 	* cygthread.h (cygthread::release): Just declare here.
 	* cygthread.cc (cygthread::release): Define here.  Use
 	InterlockedExchange to set inuse or suffer potential races.

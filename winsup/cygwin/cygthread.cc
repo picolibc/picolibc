@@ -226,17 +226,32 @@ cygthread::release ()
 void
 cygthread::terminate_thread ()
 {
+  /* FIXME: The if (!h) stuff below should be handled better.  The
+     problem is that terminate_thread could be called while a thread
+     is terminating and either the thread could be handling its own
+     release or, if this is being called during exit, some other
+     thread may be attempting to free up this resource.  In the former
+     case, setting some kind of "I deal with my own exit" type of
+     flag may be the way to handle this. */
   if (!is_freerange)
     {
       ResetEvent (*this);
       ResetEvent (thread_sync);
     }
+  if (!h)
+    return;
   (void) TerminateThread (h, 0);
   (void) WaitForSingleObject (h, INFINITE);
+  if (!h)
+    return;
+
   CloseHandle (h);
 
-  while (!stack_ptr)
+  while (h && !stack_ptr)
     low_priority_sleep (0);
+
+  if (!h)
+    return;
 
   MEMORY_BASIC_INFORMATION m;
   memset (&m, 0, sizeof (m));
