@@ -13,7 +13,13 @@ _start:
 	adds	#2,r0
 	cmp	r1,r0
 	blo	.loop
+#ifdef __ELF__
+	mov.w   #__fini,r0
+	jsr     @_atexit
+	jsr     @__init
+#else
 	jsr	@___main
+#endif
 	jsr	@_main
 	jsr	@_exit
 
@@ -36,7 +42,13 @@ _start:
 	adds	#2,er0
 	cmp.l	er1,er0
 	blo	.loop
+#ifdef __ELF__
+	mov.w   #__fini,r0
+	jsr     @_atexit
+	jsr     @__init
+#else
 	jsr	@___main
+#endif
 	jsr	@_main
 	jsr	@_exit
 
@@ -59,7 +71,13 @@ _start:
 	adds	#2,er0
 	cmp.l	er1,er0
 	blo	.loop
+#ifdef __ELF__
+	mov.w   #__fini,r0
+	jsr     @_atexit
+	jsr     @__init
+#else
 	jsr	@___main
+#endif
 	jsr	@_main
 	jsr	@_exit
 
