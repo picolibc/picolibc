@@ -830,7 +830,9 @@ reswitch:	switch (ch) {
 					if (prec || flags & ALT)
 						size += prec + 1;
 				} else	/* "0.X" */
-					size = prec + 2;
+					size = (prec || flags & ALT)
+						  ? prec + 2
+						  : 1;
 			} else if (expt >= ndig) {	/* fixed g fmt */
 				size = expt;
 				if (flags & ALT)

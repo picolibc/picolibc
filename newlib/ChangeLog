@@ -1,3 +1,8 @@
+2003-07-29  Honda Hiroki  <hhonda@ipflex.com>
+
+	* libc/stdio/vfprintf.c: Set output size to 1 when
+	we have %f format with precision 0 and # flag not specified.
+
 2003-07-29  Alexandre Oliva  <aoliva@redhat.com>
 
 	* libc/machine/mn10300/setjmp.S: Never emit both .am33 and
