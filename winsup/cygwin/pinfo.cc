@@ -286,8 +286,7 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 	    {
 	      syscall_printf ("ctty %p, usecount %d", cygheap->ctty,
 			      cygheap->ctty->usecount);
-	      if (!--cygheap->ctty->usecount)
-		cygheap->ctty->close ();
+	      cygheap->ctty->close ();
 	    }
 	  cygheap->ctty = arch;
 	  if (arch)

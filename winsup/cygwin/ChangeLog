@@ -1,5 +1,10 @@
 2003-12-26  Christopher Faylor  <cgf@redhat.com>
 
+	* pinfo.cc (_pinfo::set_ctty): *Always* call close on opened ctty since
+	it counts as an opened handle.
+
+2003-12-26  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.h (fhandler_tty_master::fixup_after_fork): Remove
 	declaration.
 	(fhandler_tty_master::fixup_after_exec): Ditto.
