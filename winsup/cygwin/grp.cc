@@ -111,7 +111,7 @@ pwdgrp::pwdgrp (passwd *&pbuf) :
 {
   read = &pwdgrp::read_passwd;
   parse = &pwdgrp::parse_passwd;
-  pglock.init ("pwd_lock");
+  pglock.initforce ("pwd_lock");
 }
 
 pwdgrp::pwdgrp (__group32 *&gbuf) :
@@ -119,7 +119,7 @@ pwdgrp::pwdgrp (__group32 *&gbuf) :
 {
   read = &pwdgrp::read_group;
   parse = &pwdgrp::parse_group;
-  pglock.init ("grp_lock");
+  pglock.initforce ("grp_lock");
 }
 
 struct __group32 *

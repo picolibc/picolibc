@@ -1,5 +1,12 @@
 2005-04-05  Christopher Faylor  <cgf@timesys.com>
 
+	* sync.h (muto::initforce): Force initialization even when name !=
+	NULL.
+	* grp.cc (pwdgrp::pwdgrp): Use initforce since the enclosing structure
+	is !NO_COPY.
+
+2005-04-05  Christopher Faylor  <cgf@timesys.com>
+
 	* sync.h (muto::operator int): New operator.
 	(locker): Remove unused class.
 	(new_muto): Delete.
