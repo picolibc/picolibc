@@ -9,6 +9,9 @@
 	(main): Use getopt_long for option parsing.  Implement -l, and -s
 	options.  Use test_for_unknown_sig() to test for signal validity.
 
+	* mount.cc (longopts): Make static.
+	(opts): Ditto.
+
 2002-05-12  Christopher Faylor  <cgf@redhat.com>
 
 	* mount.cc (do_mount): Default to non-exec option for remote drives.
