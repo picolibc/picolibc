@@ -1129,12 +1129,13 @@ HANDLE NO_COPY title_mutex = NULL;
 void
 events_init (void)
 {
+  char *name;
   /* title_mutex protects modification of console title. It's neccessary
      while finding console window handle */
 
   if (!(title_mutex = CreateMutex (&sec_all_nih, FALSE,
-				   shared_name ("title_mutex", 0))))
-    api_fatal ("can't create title mutex, %E");
+				   name = shared_name ("title_mutex", 0))))
+    api_fatal ("can't create title mutex '%s', %E", name);
 
   ProtectHandle (title_mutex);
   new_muto (mask_sync);

@@ -1,5 +1,9 @@
 2002-12-30  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (events_init): Display name of mutex on failure.
+
+2002-12-30  Christopher Faylor  <cgf@redhat.com>
+
 	* windows.cc (setitimer): Return ENOSYS on invalid argument.
 
 2002-12-28  Christopher Faylor  <cgf@redhat.com>
