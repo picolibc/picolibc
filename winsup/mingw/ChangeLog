@@ -1,7 +1,14 @@
+2002-03-29  Danny Smith  <dannysmith@sourceforge.users.net>
+
+	* include/stdio.h (_snwprintf): Correct spelling.
+	(_vsnwprintf): Likewise.
+	* include/wchar.h (_snwprintf): Correct spelling.
+	(_vsnwprintf): Likewise.
+
 2002-03-26  Danny Smith  <dannysmith@sourceforge.users.net>
 
-	* moldname.def.in (__MSVCRT__): Replace with !(__CRTDLL).
-	(wpopen): Add if !(__CRTDLL).
+	* moldname.def.in (__MSVCRT__): Replace with !(__CRTDLL__).
+	(wpopen): Add if !(__CRTDLL__).
 	* Makefile.in (moldname-msvcrt.def rule): Use -C, not -c to
 	preserve comments.
 	(moldname-crtdll.def rule): Likewise.
@@ -9,7 +16,7 @@
 	* moldname-crtdll.def: Regenerate.
 	* include/stdio.h (wpopen):Use prototype, not a define.
 	(_swnprintf): Add prototype.
-	(_vswnprintf}: Likewise.
+	(_vswnprintf): Likewise.
 	Tidy up whitespace.
 	* include/wchar.h (_swnprintf): Add prototype.
 	(_vswnprintf): Likewise.
