@@ -1,3 +1,11 @@
+2004-09-09  Daniel Berlin  <dberlin@dberlin.org>
+	
+	* Makefile.def: Remove libbanshee.
+	* Makefile.tpl: Ditto.
+	* configure.in: Ditto.
+	* Makefile.in: Regen.
+	* configure: Ditto.
+
 2004-09-07  Paolo Bonzini  <bonzini@gnu.org>
 
 	* missing: Import latest version from master repository.
