@@ -81,10 +81,41 @@ _CRTIMP int __cdecl  _strncoll(const char*, const char*, size_t);
 _CRTIMP int __cdecl  _strnicoll(const char*, const char*, size_t);
 #endif
 
+#ifndef	_NO_OLDNAMES
+/*
+ * Non-underscored versions of non-ANSI functions. They live in liboldnames.a
+ * and provide a little extra portability. Also a few extra UNIX-isms like
+ * strcasecmp.
+ */
+_CRTIMP void* __cdecl	memccpy (void*, const void*, int, size_t);
+_CRTIMP int __cdecl	memicmp (const void*, const void*, size_t);
+_CRTIMP char* __cdecl	strdup (const char*);
+_CRTIMP int __cdecl	strcmpi (const char*, const char*);
+_CRTIMP int __cdecl	stricmp (const char*, const char*);
+__CRT_INLINE int __cdecl
+strcasecmp (const char * __sz1, const char * __sz2)
+  {return _stricmp (__sz1, __sz2);}
+_CRTIMP int __cdecl	stricoll (const char*, const char*);
+_CRTIMP char* __cdecl	strlwr (char*);
+_CRTIMP int __cdecl	strnicmp (const char*, const char*, size_t);
+__CRT_INLINE int __cdecl
+strncasecmp (const char * __sz1, const char * __sz2, size_t __sizeMaxCompare)
+  {return _strnicmp (__sz1, __sz2, __sizeMaxCompare);}
+_CRTIMP char* __cdecl	strnset (char*, int, size_t);
+_CRTIMP char* __cdecl	strrev (char*);
+_CRTIMP char* __cdecl	strset (char*, int);
+_CRTIMP char* __cdecl	strupr (char*);
+#ifndef _UWIN
+_CRTIMP void __cdecl	swab (const char*, char*, size_t);
+#endif /* _UWIN */
+#endif /* _NO_OLDNAMES */
+
 #endif	/* Not __STRICT_ANSI__ */
 
+#ifndef _WSTRING_DEFINED
 /*
  * Unicode versions of the standard calls.
+ * Also in wchar.h, where they belong according to ISO standard.
  */
 _CRTIMP wchar_t* __cdecl wcscat (wchar_t*, const wchar_t*);
 _CRTIMP wchar_t* __cdecl wcschr (const wchar_t*, wchar_t);
@@ -92,7 +123,7 @@ _CRTIMP int __cdecl	wcscmp (const wchar_t*, const wchar_t*);
 _CRTIMP int __cdecl	wcscoll (const wchar_t*, const wchar_t*);
 _CRTIMP wchar_t* __cdecl wcscpy (wchar_t*, const wchar_t*);
 _CRTIMP size_t __cdecl	wcscspn (const wchar_t*, const wchar_t*);
-/* Note: No wcserror in CRTDLL. */
+/* Note:  _wcserror requires __MSVCRT_VERSION__ >= 0x0700.  */
 _CRTIMP size_t __cdecl	wcslen (const wchar_t*);
 _CRTIMP wchar_t* __cdecl wcsncat (wchar_t*, const wchar_t*, size_t);
 _CRTIMP int __cdecl	wcsncmp(const wchar_t*, const wchar_t*, size_t);
@@ -106,7 +137,7 @@ _CRTIMP size_t __cdecl	wcsxfrm(wchar_t*, const wchar_t*, size_t);
 
 #ifndef	__STRICT_ANSI__
 /*
- * Unicode versions of non-ANSI functions provided by CRTDLL.
+ * Unicode versions of non-ANSI string functions provided by CRTDLL.
  */
 
 /* NOTE: _wcscmpi not provided by CRTDLL, this define is for portability */
@@ -131,41 +162,7 @@ _CRTIMP  wchar_t* __cdecl __wcserror(const wchar_t*);
 #endif
 #endif
 
-
-#endif	/* Not __STRICT_ANSI__ */
-
-
-#ifndef	__STRICT_ANSI__
 #ifndef	_NO_OLDNAMES
-
-/*
- * Non-underscored versions of non-ANSI functions. They live in liboldnames.a
- * and provide a little extra portability. Also a few extra UNIX-isms like
- * strcasecmp.
- */
-
-_CRTIMP void* __cdecl	memccpy (void*, const void*, int, size_t);
-_CRTIMP int __cdecl	memicmp (const void*, const void*, size_t);
-_CRTIMP char* __cdecl	strdup (const char*);
-_CRTIMP int __cdecl	strcmpi (const char*, const char*);
-_CRTIMP int __cdecl	stricmp (const char*, const char*);
-__CRT_INLINE int __cdecl
-strcasecmp (const char * __sz1, const char * __sz2)
-  {return _stricmp (__sz1, __sz2);}
-_CRTIMP int __cdecl	stricoll (const char*, const char*);
-_CRTIMP char* __cdecl	strlwr (char*);
-_CRTIMP int __cdecl	strnicmp (const char*, const char*, size_t);
-__CRT_INLINE int __cdecl
-strncasecmp (const char * __sz1, const char * __sz2, size_t __sizeMaxCompare)
-  {return _strnicmp (__sz1, __sz2, __sizeMaxCompare);}
-_CRTIMP char* __cdecl	strnset (char*, int, size_t);
-_CRTIMP char* __cdecl	strrev (char*);
-_CRTIMP char* __cdecl	strset (char*, int);
-_CRTIMP char* __cdecl	strupr (char*);
-#ifndef _UWIN
-_CRTIMP void __cdecl	swab (const char*, char*, size_t);
-#endif /* _UWIN */
-
 /* NOTE: There is no _wcscmpi, but this is for compatibility. */
 __CRT_INLINE int __cdecl
 wcscmpi (const wchar_t * __ws1, const wchar_t * __ws2)
@@ -179,10 +176,12 @@ _CRTIMP wchar_t* __cdecl wcsnset (wchar_t*, wchar_t, size_t);
 _CRTIMP wchar_t* __cdecl wcsrev (wchar_t*);
 _CRTIMP wchar_t* __cdecl wcsset (wchar_t*, wchar_t);
 _CRTIMP wchar_t* __cdecl wcsupr (wchar_t*);
-
 #endif	/* Not _NO_OLDNAMES */
+
 #endif	/* Not strict ANSI */
 
+#define _WSTRING_DEFINED
+#endif  /* _WSTRING_DEFINED */
 
 #ifdef __cplusplus
 }
@@ -191,4 +190,3 @@ _CRTIMP wchar_t* __cdecl wcsupr (wchar_t*);
 #endif	/* Not RC_INVOKED */
 
 #endif	/* Not _STRING_H_ */
-

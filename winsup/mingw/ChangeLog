@@ -1,5 +1,10 @@
 2004-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/string.h: Group wide string functions together,
+	and protect with _WSTRING_DEFINED.
+
+2004-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/_mingw.h (_MINGW_ATTR_*):  Replace with
 	__MINGW_ATTRIB_*.
 	* include/stdlib.h (_ATTRIB_NORETURN): Replace with
