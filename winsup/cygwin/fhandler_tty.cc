@@ -552,6 +552,7 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
   set_output_handle (to_master_local);
 
   set_open_status ();
+  fhandler_console::open_fhs++;
   termios_printf ("tty%d opened", ttynum);
 
   return 1;
@@ -1057,6 +1058,7 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
   inuse = NULL;
+  fhandler_console::open_fhs++;
   termios_printf ("tty%d <%p,%p> closed", ttynum, get_handle (), get_output_handle ());
   return 0;
 }

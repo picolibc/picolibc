@@ -1,3 +1,9 @@
+2003-03-03  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_pty_slave::open): Grudgingly increment
+	fhandler_console::open_fhs here.
+	(fhandler_pty_slave::close): Ditto for close.
+
 2003-03-02  Christopher Faylor  <cgf@redhat.com>
 
 	* lib/getopt.c: Refresh from NetBSD sources.
