@@ -1,5 +1,9 @@
 2004-05-25  Christopher Faylor  <cgf@alum.bu.edu>
 
+	* include/cygwin/version.h: Bump DLL minor number to 11.
+
+2004-05-25  Christopher Faylor  <cgf@alum.bu.edu>
+
 	* winbase.h: Add proper attributions for memory operands throughout.
 
 2004-05-24  Christopher Faylor  <cgf@alum.bu.edu>
