@@ -1,3 +1,29 @@
+2004-06-27  Hideki Iwamoto <h-iwamoto@kit.hi-ho.ne.jp>
+
+	* Makefile.in: Support $(DESTDIR).
+	* arm/Makefile.in: Ditto.
+	* d30v/Makefile.in: Ditto.
+	* doc/Makefile.in: Ditto.
+	* fr30/Makefile.in: Ditto.
+	* frv/Makefile.in: Ditto.
+	* hp74x/Makefile.in: Ditto.
+	* i386/Makefile.in: Ditto.
+	* i960/Makefile.in: Ditto.
+	* iq2000/Makefile.in: Ditto.
+	* libnosys/Makefile.in: Ditto.
+	* m32r/Makefile.in: Ditto.
+	* m68hc11/Makefile.in: Ditto.
+	* m68k/Makefile.in: Ditto.
+	* mcore/Makefile.in: Ditto.
+	* mips/Makefile.in: Ditto.
+	* mn10200/Makefile.in: Ditto.
+	* mn10300/Makefile.in: Ditto.
+	* pa/Makefile.in: Ditto.
+	* rs6000/Makefile.in: Ditto.
+	* sparc/Makefile.in: Ditto.
+	* sparc/libsys/Makefile.in: Ditto.
+	* xstormy16/Makefile.in: Ditto.
+
 2004-06-25  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libnosys/_exit.c: New file.

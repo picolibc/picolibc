@@ -11,6 +11,7 @@
 # they apply.
 #
 
+DESTDIR =
 srcdir = @srcdir@
 VPATH = @srcdir@
 
@@ -131,7 +132,7 @@ install:
 
 install-info: info
 	for i in *.info* ; do \
-		$(INSTALL_DATA) $$i $(infodir)/$$i ; \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(infodir)/$$i ; \
 	done
 
 clean-info:

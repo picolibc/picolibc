@@ -1,6 +1,7 @@
 #
 #
 
+DESTDIR =
 VPATH = @srcdir@ @srcdir@/..
 srcdir = @srcdir@
 objdir = .
@@ -125,11 +126,11 @@ distclean maintainer-clean realclean: clean
 install: ${SIM_INSTALL}
 
 install-mon:
-	set -e; for x in ${MON_CRT0} ${MON_BSP}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
-	set -e; for x in ${MON_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${MON_CRT0} ${MON_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${MON_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-sim:
-	set -e; for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do ${INSTALL_DATA} $$x ${tooldir}/lib/$$x; done
+	set -e; for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib/$$x; done
 
 doc:
 info:

@@ -14,6 +14,7 @@
 # IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
+DESTDIR =
 VPATH = @srcdir@ @srcdir@/..
 srcdir = @srcdir@
 objdir = .
@@ -96,15 +97,15 @@ libmon.a: $(MONLIBOBJS)
 	$(RANLIB) $@
 
 install:
-	mkdir -p $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(CRT0) $(tooldir)/lib${MULTISUBDIR}/$(CRT0)
-	$(INSTALL_DATA) $(LIBGLOSS) $(tooldir)/lib${MULTISUBDIR}/$(LIBGLOSS)
-	$(INSTALL_DATA) $(MONLIBGLOSS) $(tooldir)/lib${MULTISUBDIR}/$(MONLIBGLOSS)
-	$(INSTALL_DATA) $(GDBLIB) $(tooldir)/lib${MULTISUBDIR}/$(GDBLIB)
-	$(INSTALL_DATA) $(GDBSTUB) $(tooldir)/lib${MULTISUBDIR}/$(GDBSTUB)
-	$(INSTALL_DATA) $(srcdir)/$(EVASCRIPT) $(tooldir)/lib/$(EVASCRIPT)
-	$(INSTALL_DATA) $(srcdir)/$(STUBSCRIPT) $(tooldir)/lib/$(STUBSCRIPT)
-	$(INSTALL_DATA) $(srcdir)/$(MONSPECS) $(tooldir)/lib/$(MONSPECS)
+	mkdir -p $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
+	$(INSTALL_DATA) $(LIBGLOSS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(LIBGLOSS)
+	$(INSTALL_DATA) $(MONLIBGLOSS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(MONLIBGLOSS)
+	$(INSTALL_DATA) $(GDBLIB) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(GDBLIB)
+	$(INSTALL_DATA) $(GDBSTUB) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(GDBSTUB)
+	$(INSTALL_DATA) $(srcdir)/$(EVASCRIPT) $(DESTDIR)$(tooldir)/lib/$(EVASCRIPT)
+	$(INSTALL_DATA) $(srcdir)/$(STUBSCRIPT) $(DESTDIR)$(tooldir)/lib/$(STUBSCRIPT)
+	$(INSTALL_DATA) $(srcdir)/$(MONSPECS) $(DESTDIR)$(tooldir)/lib/$(MONSPECS)
 
 clean mostlyclean:
 	rm -f *~ *.[oa]

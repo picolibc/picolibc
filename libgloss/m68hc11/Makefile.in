@@ -14,6 +14,7 @@
 # This currently works with Motorola's 68HC11 based target boards.
 # (should work with 68HC12 but not tested yet)
 
+DESTDIR =
 srcdir = @srcdir@
 objdir = .
 srcroot = $(srcdir)/../..
@@ -140,9 +141,9 @@ distclean maintainer-clean realclean: clean
 
 .PHONY: install info install-info clean-info
 install:	install-scripts
-	$(INSTALL_PROGRAM) $(CRT0) $(tooldir)/lib${MULTISUBDIR}/$(CRT0)
+	$(INSTALL_PROGRAM) $(CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
 	@for bsp in ${BSP}; do\
-	 $(INSTALL_PROGRAM) $${bsp} $(tooldir)/lib${MULTISUBDIR}; \
+	 $(INSTALL_PROGRAM) $${bsp} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
 	done
 
 # Install the linker script in the correct place.
@@ -156,10 +157,10 @@ install-scripts:
 	name=`$$objdump -f $(CRT0) | sed '/^$$/d'`; \
 	case $$name in \
 	*elf32-m68hc11*) \
-	   $(INSTALL_DATA) ${srcdir}/sim-valid-m68hc11.ld $(tooldir)/lib${MULTISUBDIR}/sim-valid.ld \
+	   $(INSTALL_DATA) ${srcdir}/sim-valid-m68hc11.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sim-valid.ld \
 	   ;; \
 	*elf32-m68hc12*) \
-	   $(INSTALL_DATA) ${srcdir}/sim-valid-m68hc12.ld $(tooldir)/lib${MULTISUBDIR}/sim-valid.ld \
+	   $(INSTALL_DATA) ${srcdir}/sim-valid-m68hc12.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sim-valid.ld \
 	   ;; \
 	esac
 

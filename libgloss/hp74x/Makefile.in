@@ -22,6 +22,7 @@
 # for the HP-PRO hppa embedded boards. <rob@cygnus.com>
 #
 
+DESTDIR =
 VPATH = @srcdir@
 srcdir = @srcdir@
 objdir = .
@@ -100,9 +101,9 @@ hpstub: $(OBJS)
 	$(OBJS) -lc -m >stub.map
 
 install:
-	$(INSTALL_PROGRAM) $(STUBLIB) $(tooldir)/lib/$(MULTISUBDIR)$(STUBLIB)
-	$(INSTALL_PROGRAM) $(SHARED_DIR)/$(STUBCRT0) $(tooldir)/lib/$(MULTISUBDIR)$(STUBCRT0)
-	$(INSTALL_PROGRAM) $(srcdir)/$(LDSCRIPT) $(tooldir)/lib/$(LDSCRIPT)
+	$(INSTALL_PROGRAM) $(STUBLIB) $(DESTDIR)$(tooldir)/lib/$(MULTISUBDIR)$(STUBLIB)
+	$(INSTALL_PROGRAM) $(SHARED_DIR)/$(STUBCRT0) $(DESTDIR)$(tooldir)/lib/$(MULTISUBDIR)$(STUBCRT0)
+	$(INSTALL_PROGRAM) $(srcdir)/$(LDSCRIPT) $(DESTDIR)$(tooldir)/lib/$(LDSCRIPT)
 
 .c.o:
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -c $<

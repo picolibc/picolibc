@@ -13,6 +13,7 @@
 # Makefile for libgloss/frv. This is the board support
 # code for the various frv targets.
 
+DESTDIR =
 VPATH = @srcdir@ @srcdir@/..
 srcdir = @srcdir@
 objdir = .
@@ -103,8 +104,8 @@ sim-write.o: $(srcdir)/sim-write.S
 stat.o: $(srcdir)/stat.c
 
 install: $($(CPU)_INSTALL)
-	$(INSTALL_DATA) $(CRT0) $(tooldir)/lib${MULTISUBDIR}/$(CRT0)
-	$(INSTALL_DATA) $(SIM_BSP) $(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
+	$(INSTALL_DATA) $(CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
+	$(INSTALL_DATA) $(SIM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
 
 clean mostlyclean:
 	rm -f *.o *.a

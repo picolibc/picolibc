@@ -14,6 +14,7 @@
 # target boards.
 #
 
+DESTDIR =
 VPATH = @srcdir@
 srcdir = @srcdir@
 objdir = .
@@ -258,30 +259,30 @@ unlink.o: $(srcdir)/../unlink.c
 .PHONY: install info dvi doc install-info clean-info
 install:
 	# install SIM stuff
-	$(INSTALL_PROGRAM) $(SIM_CRT0) $(tooldir)/lib${MULTISUBDIR}/$(SIM_CRT0)
-	$(INSTALL_PROGRAM) $(SIM_BSP) $(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
-	$(INSTALL_DATA) ${srcdir}/sim.ld $(tooldir)/lib${MULTISUBDIR}/sim.ld
+	$(INSTALL_PROGRAM) $(SIM_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_CRT0)
+	$(INSTALL_PROGRAM) $(SIM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
+	$(INSTALL_DATA) ${srcdir}/sim.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sim.ld
 	#
-	$(INSTALL_PROGRAM) $(CRT0) $(tooldir)/lib${MULTISUBDIR}/$(CRT0)
+	$(INSTALL_PROGRAM) $(CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
 	# install BCC stuff
-	$(INSTALL_PROGRAM) $(BCC_BSP) $(tooldir)/lib${MULTISUBDIR}/$(BCC_BSP)
-	$(INSTALL_DATA) ${srcdir}/bcc.ld $(tooldir)/lib${MULTISUBDIR}/bcc.ld
+	$(INSTALL_PROGRAM) $(BCC_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(BCC_BSP)
+	$(INSTALL_DATA) ${srcdir}/bcc.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/bcc.ld
 	# install IDP stuff
-	$(INSTALL_PROGRAM) $(IDP_BSP) $(tooldir)/lib${MULTISUBDIR}/$(IDP_BSP)
-	$(INSTALL_DATA) ${srcdir}/idp.ld $(tooldir)/lib${MULTISUBDIR}/idp.ld
+	$(INSTALL_PROGRAM) $(IDP_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(IDP_BSP)
+	$(INSTALL_DATA) ${srcdir}/idp.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/idp.ld
 	# install IDPGDB stuff
-	$(INSTALL_PROGRAM) $(IDPGDB_BSP) $(tooldir)/lib${MULTISUBDIR}/$(IDPGDB_BSP)
-	$(INSTALL_DATA) ${srcdir}/idpgdb.ld $(tooldir)/lib${MULTISUBDIR}/idpgdb.ld
+	$(INSTALL_PROGRAM) $(IDPGDB_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(IDPGDB_BSP)
+	$(INSTALL_DATA) ${srcdir}/idpgdb.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/idpgdb.ld
 	# install MVME135 stuff
-	$(INSTALL_PROGRAM) $(MVME135_BSP) $(tooldir)/lib${MULTISUBDIR}/$(MVME135_BSP)
-	$(INSTALL_DATA) ${srcdir}/mvme135.ld $(tooldir)/lib${MULTISUBDIR}/mvme135.ld
+	$(INSTALL_PROGRAM) $(MVME135_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(MVME135_BSP)
+	$(INSTALL_DATA) ${srcdir}/mvme135.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/mvme135.ld
 	# install MVME162lx stuff
-	$(INSTALL_PROGRAM) $(MVME162_BSP) $(tooldir)/lib${MULTISUBDIR}/$(MVME162_BSP)
-	$(INSTALL_DATA) ${srcdir}/mvme162.ld $(tooldir)/lib${MULTISUBDIR}/mvme162.ld
+	$(INSTALL_PROGRAM) $(MVME162_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(MVME162_BSP)
+	$(INSTALL_DATA) ${srcdir}/mvme162.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/mvme162.ld
 	# install DBUG stuff
-	$(INSTALL_PROGRAM) $(DBUG_BSP) $(tooldir)/lib${MULTISUBDIR}/$(DBUG_BSP)
-	$(INSTALL_DATA) ${srcdir}/sbc5204.ld $(tooldir)/lib${MULTISUBDIR}/sbc5204.ld
-	$(INSTALL_DATA) ${srcdir}/sbc5206.ld $(tooldir)/lib${MULTISUBDIR}/sbc5206.ld
+	$(INSTALL_PROGRAM) $(DBUG_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(DBUG_BSP)
+	$(INSTALL_DATA) ${srcdir}/sbc5204.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5204.ld
+	$(INSTALL_DATA) ${srcdir}/sbc5206.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/sbc5206.ld
 
 # target specific makefile fragment comes in here.
 @target_makefile_frag@

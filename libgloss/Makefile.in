@@ -13,6 +13,7 @@
 # they apply.
 #
 
+DESTDIR =
 VPATH = @srcdir@
 srcdir = @srcdir@
 objdir = .
@@ -84,7 +85,8 @@ FLAGS_TO_PASS = \
 	"tooldir=$(tooldir)" \
 	"INSTALL=$(INSTALL)" \
 	"INSTALL_PROGRAM=$(INSTALL_PROGRAM)" \
-	"INSTALL_DATA=$(INSTALL_DATA)"
+	"INSTALL_DATA=$(INSTALL_DATA)" \
+	"DESTDIR=$(DESTDIR)"
 
 all: stmp-bsp force
 	@rootpre=`pwd`/; export rootpre; \

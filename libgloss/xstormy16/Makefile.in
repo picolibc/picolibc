@@ -1,6 +1,7 @@
 #
 #
 
+DESTDIR =
 VPATH = @srcdir@ @srcdir@/..
 srcdir = @srcdir@
 objdir = .
@@ -111,10 +112,10 @@ distclean maintainer-clean realclean: clean
 .PHONY: install info install-info clean-info
 install: 
 	set -e; for x in ${SIM_BSP} ${CRT} ${EVA_APP_BSP} ${EVA_STUB_HEX} ${EVA_STUB} ; do\
-	  ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; \
+	  ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; \
 	done
 	@for script in ${SCRIPTS} ${SIM_SCRIPTS} ${EVA_APP_SCRIPTS}; do\
-	  ${INSTALL_DATA} ${srcdir}/$${script} ${tooldir}/lib${MULTISUBDIR}/$${script}; \
+	  ${INSTALL_DATA} ${srcdir}/$${script} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$${script}; \
 	done
 
 

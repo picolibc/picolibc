@@ -10,6 +10,7 @@
 # the new terms are clearly indicated on the first page of each file where
 # they apply.
 
+DESTDIR =
 VPATH = @srcdir@
 srcdir = @srcdir@
 objdir = .
@@ -201,10 +202,10 @@ distclean maintainer-clean realclean: clean
 .PHONY: install info install-info clean-info
 install:
 	@for file in $(CRT0) $(PCRT0) $(BSP); do \
-	  $(INSTALL_DATA) $${file} $(tooldir)/lib${MULTISUBDIR}; \
+	  $(INSTALL_DATA) $${file} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
 	done
 	@for script in ${SCRIPTS}; do\
-	  $(INSTALL_DATA) ${srcdir}/$${script}.ld $(tooldir)/lib${MULTISUBDIR}/$${script}.ld; \
+	  $(INSTALL_DATA) ${srcdir}/$${script}.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$${script}.ld; \
 	done
 
 info:

@@ -13,6 +13,7 @@
 # Makefile for libgloss/sparc. This is the board support
 # code for the various sparc targets.
 
+DESTDIR =
 VPATH = @srcdir@
 srcdir = @srcdir@
 objdir = .
@@ -171,36 +172,36 @@ $(objdir)/cygmon.ld: @CYGMONLDSCRIPTTEMPL@
 	sed 's/TARGET_OBJ_FORMAT/$($(CPU)_OBJ_FORMAT)/g;s/TARGET_RAM_START/$($(CPU)_RAM_START)/g;' < $(<) > $(objdir)/cygmon.ld
 
 install: $($(CPU)_INSTALL)
-	$(INSTALL_DATA) $(CRT0) $(tooldir)/lib${MULTISUBDIR}/$(CRT0)
+	$(INSTALL_DATA) $(CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
 
 sparc-install:
-	$(INSTALL_DATA) $(CYGMON_BSP) $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(CYGMON_OBJS) $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(objdir)/cygmon.ld $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(CYGMON_CRT0) $(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(CYGMON_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(CYGMON_OBJS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(objdir)/cygmon.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(CYGMON_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 
 slite-install:
-	$(INSTALL_DATA) $(930_BSP) $(tooldir)/lib${MULTISUBDIR}/$(930_BSP)
-	$(INSTALL_DATA) $(931_BSP) $(tooldir)/lib${MULTISUBDIR}/$(931_BSP)
-	$(INSTALL_DATA) $(934_BSP) $(tooldir)/lib${MULTISUBDIR}/$(934_BSP)
-	$(INSTALL_DATA) $(86X_BSP) $(tooldir)/lib${MULTISUBDIR}/$(86X_BSP)
-	$(INSTALL_DATA) $(srcdir)/ex930.ld $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(srcdir)/ex931.ld $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(srcdir)/ex934.ld $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(srcdir)/sparc86x.ld $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(srcdir)/elfsim.ld $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(ERC32_CRT0) $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(ERC32_BSP) $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(objdir)/traps.o $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(CYGMON_BSP) $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(CYGMON_OBJS) $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(objdir)/cygmon.ld $(tooldir)/lib${MULTISUBDIR}
-	$(INSTALL_DATA) $(CYGMON_CRT0) $(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(930_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(930_BSP)
+	$(INSTALL_DATA) $(931_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(931_BSP)
+	$(INSTALL_DATA) $(934_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(934_BSP)
+	$(INSTALL_DATA) $(86X_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(86X_BSP)
+	$(INSTALL_DATA) $(srcdir)/ex930.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(srcdir)/ex931.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(srcdir)/ex934.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(srcdir)/sparc86x.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(srcdir)/elfsim.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(ERC32_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(ERC32_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(objdir)/traps.o $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(CYGMON_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(CYGMON_OBJS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(objdir)/cygmon.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(CYGMON_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 
 splet-install:
-	$(INSTALL_DATA) $(701_CRT0) $(tooldir)/lib${MULTISUBDIR}/$(701_CRT0)
-	$(INSTALL_DATA) $(701_BSP) $(tooldir)/lib${MULTISUBDIR}/$(701_BSP)
-	$(INSTALL_DATA) $(srcdir)/tsc701.ld $(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(701_CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(701_CRT0)
+	$(INSTALL_DATA) $(701_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(701_BSP)
+	$(INSTALL_DATA) $(srcdir)/tsc701.ld $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 
 # Make a simple test case to test the linker script, startup code, and
 # I/O code

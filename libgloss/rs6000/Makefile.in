@@ -15,6 +15,7 @@
 # This currently works with the PPC simulator.
 #
 
+DESTDIR =
 VPATH = @srcdir@ @srcdir@/..
 srcdir = @srcdir@
 objdir = .
@@ -315,28 +316,28 @@ distclean maintainer-clean realclean: clean
 install: ${SIM_INSTALL} ${MVME_INSTALL} ${SOLARIS_INSTALL} ${LINUX_INSTALL} ${YELLOWKNIFE_INSTALL} ${ADS_INSTALL} ${MBX_INSTALL}
 
 install-sim:
-	set -e; for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-mvme:
-	set -e; for x in ${MVME_CRT0} ${MVME_BSP} ${MVME_SCRIPTS}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${MVME_CRT0} ${MVME_BSP} ${MVME_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-solaris:
-	set -e; for x in ${SOLARIS_CRT0} ${SOLARIS_BSP} ${SOLARIS_SCRIPTS}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${SOLARIS_CRT0} ${SOLARIS_BSP} ${SOLARIS_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-linux:
-	set -e; for x in ${LINUX_CRT0} ${LINUX_BSP} ${LINUX_SCRIPTS}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${LINUX_CRT0} ${LINUX_BSP} ${LINUX_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-yellowknife:
-	set -e; for x in ${YELLOWKNIFE_CRT0} ${YELLOWKNIFE_BSP}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
-	set -e; for x in ${YELLOWKNIFE_SCRIPTS}; do ${INSTALL_DATA} $(srcdir)/$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${YELLOWKNIFE_CRT0} ${YELLOWKNIFE_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${YELLOWKNIFE_SCRIPTS}; do ${INSTALL_DATA} $(srcdir)/$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-ads:
-	set -e; for x in ${ADS_CRT0} ${ADS_BSP}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
-	set -e; for x in ${ADS_SCRIPTS}; do ${INSTALL_DATA} $(srcdir)/$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${ADS_CRT0} ${ADS_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${ADS_SCRIPTS}; do ${INSTALL_DATA} $(srcdir)/$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-mbx:
-	set -e; for x in ${MBX_CRT0} ${MBX_BSP}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
-	set -e; for x in ${MBX_SCRIPTS} ${MBX_SPECS}; do ${INSTALL_DATA} $(srcdir)/$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${MBX_CRT0} ${MBX_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${MBX_SCRIPTS} ${MBX_SPECS}; do ${INSTALL_DATA} $(srcdir)/$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 doc:
 info:

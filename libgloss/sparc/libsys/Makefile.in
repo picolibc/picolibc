@@ -14,6 +14,7 @@
 # IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
+DESTDIR =
 VPATH = @srcdir@
 srcdir = @srcdir@
 objdir = .
@@ -91,8 +92,8 @@ libsys.a: $(OFILES)
 	$(AR) $(AR_FLAGS) $@ $(OFILES)
 
 install:
-	$(INSTALL_DATA) libsys-crt0.o $(tooldir)/lib/libsys-crt0.o
-	$(INSTALL_DATA) libsys.a $(tooldir)/lib/libsys.a
+	$(INSTALL_DATA) libsys-crt0.o $(DESTDIR)$(tooldir)/lib/libsys-crt0.o
+	$(INSTALL_DATA) libsys.a $(DESTDIR)$(tooldir)/lib/libsys.a
 
 doc:
 
