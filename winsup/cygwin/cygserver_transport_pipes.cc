@@ -107,6 +107,9 @@ transport_layer_pipes::listen ()
   assert (!_hPipe);
   assert (!_is_accepted_endpoint);
   assert (!_is_listening_endpoint);
+
+  _is_listening_endpoint = true;
+
   /* no-op */
   return 0;
 }

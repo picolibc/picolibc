@@ -1,5 +1,10 @@
 2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver_transport_pipes.cc (transport_layer_pipes::listen):
+	Set `_is_listening_endpoint' appropriately.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* include/cygwin/cygserver_transport.h
 	(transport_layer_base::listen): Change return type.
 	(transport_layer_base::connect): Ditto.
