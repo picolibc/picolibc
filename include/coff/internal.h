@@ -639,7 +639,7 @@ struct internal_reloc
 #define R_JMP1     	0x43
 
 /* This reloc identifies a bra with an 8-bit pc-relative
-   target that was formerlly a jmp insn with a 16bit target.  */
+   target that was formerly a jmp insn with a 16bit target.  */
 #define R_JMP2 		0x44
 
 /* ??? */
@@ -651,7 +651,7 @@ struct internal_reloc
 #define R_JMPL1     	0x46
 
 /* This reloc identifies a bra with an 8-bit pc-relative
-   target that was formerlly a jmp insn with a 24bit target.  */
+   target that was formerly a jmp insn with a 24bit target.  */
 #define R_JMPL2		0x47
 
 /* This reloc identifies mov.b instructions with a 24bit absolute
@@ -679,7 +679,7 @@ struct internal_reloc
    insn with a 16bit absolute address.  */
 #define R_MOVL1    	0x4c
 
-/* This reloc identifies mov.[wl] insns which formerlly had
+/* This reloc identifies mov.[wl] insns which formerly had
    a 32/24bit absolute address and now have a 16bit absolute address.  */
 #define R_MOVL2 	0x4d
 
