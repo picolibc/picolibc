@@ -583,7 +583,8 @@ fhandler_tty_slave::close ()
 {
   if (!output_done_event)
     {
-      fhandler_console::open_fhs--;
+      if (!--fhandler_console::open_fhs && myself->ctty == -1)
+	FreeConsole ();
       termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
     }
   return fhandler_tty_common::close ();

@@ -1,3 +1,8 @@
+2003-06-07  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::close): Free the console when
+	last tty closes.
+
 2003-06-07  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* fhandler_socket.cc (fhandler_socket::connect): Change error
