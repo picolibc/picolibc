@@ -1294,9 +1294,6 @@ case "${target}" in
   cris-*-*)
     noconfigdirs="$noconfigdirs ${libgcj} target-newlib target-libgloss"
     ;;
-  crx-*-*)
-    noconfigdirs="$noconfigdirs target-libgloss target-libstdc++-v3 target-libmudflap ${libgcj}"
-    ;;
   d10v-*-*)
     noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj}"
     ;;
@@ -1783,7 +1780,7 @@ else
   # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1787: checking for $ac_word" >&5
+echo "configure:1784: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1813,7 +1810,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1817: checking for $ac_word" >&5
+echo "configure:1814: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1864,7 +1861,7 @@ fi
       # Extract the first word of "cl", so it can be a program name with args.
 set dummy cl; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1868: checking for $ac_word" >&5
+echo "configure:1865: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1896,7 +1893,7 @@ fi
 fi
 
 echo $ac_n "checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works""... $ac_c" 1>&6
-echo "configure:1900: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works" >&5
+echo "configure:1897: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works" >&5
 
 ac_ext=c
 # CFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
@@ -1907,12 +1904,12 @@ cross_compiling=$ac_cv_prog_cc_cross
 
 cat > conftest.$ac_ext << EOF
 
-#line 1911 "configure"
+#line 1908 "configure"
 #include "confdefs.h"
 
 main(){return(0);}
 EOF
-if { (eval echo configure:1916: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1913: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   ac_cv_prog_cc_works=yes
   # If we can't run a trivial program, we are probably using a cross compiler.
   if (./conftest; exit) 2>/dev/null; then
@@ -1938,12 +1935,12 @@ if test $ac_cv_prog_cc_works = no; then
   { echo "configure: error: installation or configuration problem: C compiler cannot create executables." 1>&2; exit 1; }
 fi
 echo $ac_n "checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler""... $ac_c" 1>&6
-echo "configure:1942: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler" >&5
+echo "configure:1939: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler" >&5
 echo "$ac_t""$ac_cv_prog_cc_cross" 1>&6
 cross_compiling=$ac_cv_prog_cc_cross
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:1947: checking whether we are using GNU C" >&5
+echo "configure:1944: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1952,7 +1949,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:1956: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:1953: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -1971,7 +1968,7 @@ ac_test_CFLAGS="${CFLAGS+set}"
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS=
 echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:1975: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:1972: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2038,7 +2035,7 @@ fi
 # Extract the first word of "${ac_tool_prefix}gnatbind", so it can be a program name with args.
 set dummy ${ac_tool_prefix}gnatbind; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2042: checking for $ac_word" >&5
+echo "configure:2039: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_GNATBIND'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2070,7 +2067,7 @@ if test -n "$ac_tool_prefix"; then
   # Extract the first word of "gnatbind", so it can be a program name with args.
 set dummy gnatbind; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2074: checking for $ac_word" >&5
+echo "configure:2071: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_GNATBIND'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2103,7 +2100,7 @@ fi
 fi
 
 echo $ac_n "checking whether compiler driver understands Ada""... $ac_c" 1>&6
-echo "configure:2107: checking whether compiler driver understands Ada" >&5
+echo "configure:2104: checking whether compiler driver understands Ada" >&5
 if eval "test \"`echo '$''{'acx_cv_cc_gcc_supports_ada'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2136,7 +2133,7 @@ else
 fi
 
 echo $ac_n "checking how to compare bootstrapped objects""... $ac_c" 1>&6
-echo "configure:2140: checking how to compare bootstrapped objects" >&5
+echo "configure:2137: checking how to compare bootstrapped objects" >&5
 if eval "test \"`echo '$''{'gcc_cv_prog_cmp_skip'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2209,9 +2206,9 @@ saved_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $gmpinc"
 # Check GMP actually works
 echo $ac_n "checking for correct version of gmp.h""... $ac_c" 1>&6
-echo "configure:2213: checking for correct version of gmp.h" >&5
+echo "configure:2210: checking for correct version of gmp.h" >&5
 cat > conftest.$ac_ext <<EOF
-#line 2215 "configure"
+#line 2212 "configure"
 #include "confdefs.h"
 #include "gmp.h"
 int main() {
@@ -2222,7 +2219,7 @@ choke me
 
 ; return 0; }
 EOF
-if { (eval echo configure:2226: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:2223: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   echo "$ac_t""yes" 1>&6
 else
@@ -2235,19 +2232,19 @@ rm -f conftest*
 
 if test x"$have_gmp" = xyes; then
   echo $ac_n "checking for mpf_init in -lgmp""... $ac_c" 1>&6
-echo "configure:2239: checking for mpf_init in -lgmp" >&5
+echo "configure:2236: checking for mpf_init in -lgmp" >&5
 
   saved_LIBS="$LIBS"
   LIBS="$LIBS $gmplibs"
   cat > conftest.$ac_ext <<EOF
-#line 2244 "configure"
+#line 2241 "configure"
 #include "confdefs.h"
 #include <gmp.h>
 int main() {
 mpf_t n; mpf_init(n);
 ; return 0; }
 EOF
-if { (eval echo configure:2251: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2248: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   echo "$ac_t""yes" 1>&6
 else
@@ -2720,7 +2717,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2724: checking for $ac_word" >&5
+echo "configure:2721: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_BISON'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2755,7 +2752,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2759: checking for $ac_word" >&5
+echo "configure:2756: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_YACC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2790,7 +2787,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2794: checking for $ac_word" >&5
+echo "configure:2791: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_M4'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2825,7 +2822,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2829: checking for $ac_word" >&5
+echo "configure:2826: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_FLEX'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2860,7 +2857,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2864: checking for $ac_word" >&5
+echo "configure:2861: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_LEX'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2895,7 +2892,7 @@ do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2899: checking for $ac_word" >&5
+echo "configure:2896: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_MAKEINFO'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3493,7 +3490,7 @@ test -n "$target_alias" && ncn_target_tool_prefix=$target_alias-
   # Extract the first word of "${ncn_tool_prefix}ar", so it can be a program name with args.
 set dummy ${ncn_tool_prefix}ar; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3497: checking for $ac_word" >&5
+echo "configure:3494: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_AR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3526,7 +3523,7 @@ if test -z "$ac_cv_prog_AR" ; then
     # Extract the first word of "ar", so it can be a program name with args.
 set dummy ar; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3530: checking for $ac_word" >&5
+echo "configure:3527: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_AR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3565,7 +3562,7 @@ fi
   # Extract the first word of "${ncn_tool_prefix}as", so it can be a program name with args.
 set dummy ${ncn_tool_prefix}as; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3569: checking for $ac_word" >&5
+echo "configure:3566: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_AS'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3598,7 +3595,7 @@ if test -z "$ac_cv_prog_AS" ; then
     # Extract the first word of "as", so it can be a program name with args.
 set dummy as; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3602: checking for $ac_word" >&5
+echo "configure:3599: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_AS'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3637,7 +3634,7 @@ fi
   # Extract the first word of "${ncn_tool_prefix}dlltool", so it can be a program name with args.
 set dummy ${ncn_tool_prefix}dlltool; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3641: checking for $ac_word" >&5
+echo "configure:3638: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_DLLTOOL'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3670,7 +3667,7 @@ if test -z "$ac_cv_prog_DLLTOOL" ; then
     # Extract the first word of "dlltool", so it can be a program name with args.
 set dummy dlltool; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3674: checking for $ac_word" >&5
+echo "configure:3671: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_DLLTOOL'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3709,7 +3706,7 @@ fi
   # Extract the first word of "${ncn_tool_prefix}ld", so it can be a program name with args.
 set dummy ${ncn_tool_prefix}ld; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3713: checking for $ac_word" >&5
+echo "configure:3710: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_LD'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3742,7 +3739,7 @@ if test -z "$ac_cv_prog_LD" ; then
     # Extract the first word of "ld", so it can be a program name with args.
 set dummy ld; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3746: checking for $ac_word" >&5
+echo "configure:3743: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_LD'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3781,7 +3778,7 @@ fi
   # Extract the first word of "${ncn_tool_prefix}nm", so it can be a program name with args.
 set dummy ${ncn_tool_prefix}nm; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3785: checking for $ac_word" >&5
+echo "configure:3782: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_NM'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3814,7 +3811,7 @@ if test -z "$ac_cv_prog_NM" ; then
     # Extract the first word of "nm", so it can be a program name with args.
 set dummy nm; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3818: checking for $ac_word" >&5
+echo "configure:3815: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_NM'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3853,7 +3850,7 @@ fi
   # Extract the first word of "${ncn_tool_prefix}ranlib", so it can be a program name with args.
 set dummy ${ncn_tool_prefix}ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3857: checking for $ac_word" >&5
+echo "configure:3854: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_RANLIB'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3886,7 +3883,7 @@ if test -z "$ac_cv_prog_RANLIB" ; then
     # Extract the first word of "ranlib", so it can be a program name with args.
 set dummy ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3890: checking for $ac_word" >&5
+echo "configure:3887: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_RANLIB'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3925,7 +3922,7 @@ fi
   # Extract the first word of "${ncn_tool_prefix}windres", so it can be a program name with args.
 set dummy ${ncn_tool_prefix}windres; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3929: checking for $ac_word" >&5
+echo "configure:3926: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_WINDRES'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3958,7 +3955,7 @@ if test -z "$ac_cv_prog_WINDRES" ; then
     # Extract the first word of "windres", so it can be a program name with args.
 set dummy windres; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3962: checking for $ac_word" >&5
+echo "configure:3959: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_WINDRES'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3997,7 +3994,7 @@ fi
   # Extract the first word of "${ncn_tool_prefix}objcopy", so it can be a program name with args.
 set dummy ${ncn_tool_prefix}objcopy; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4001: checking for $ac_word" >&5
+echo "configure:3998: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_OBJCOPY'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4030,7 +4027,7 @@ if test -z "$ac_cv_prog_OBJCOPY" ; then
     # Extract the first word of "objcopy", so it can be a program name with args.
 set dummy objcopy; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4034: checking for $ac_word" >&5
+echo "configure:4031: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_OBJCOPY'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4069,7 +4066,7 @@ fi
   # Extract the first word of "${ncn_tool_prefix}objdump", so it can be a program name with args.
 set dummy ${ncn_tool_prefix}objdump; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4073: checking for $ac_word" >&5
+echo "configure:4070: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_OBJDUMP'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4102,7 +4099,7 @@ if test -z "$ac_cv_prog_OBJDUMP" ; then
     # Extract the first word of "objdump", so it can be a program name with args.
 set dummy objdump; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4106: checking for $ac_word" >&5
+echo "configure:4103: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_OBJDUMP'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4148,7 +4145,7 @@ fi
   # Extract the first word of "${ncn_target_tool_prefix}ar", so it can be a program name with args.
 set dummy ${ncn_target_tool_prefix}ar; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4152: checking for $ac_word" >&5
+echo "configure:4149: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_AR_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4181,7 +4178,7 @@ if test -z "$ac_cv_prog_CONFIGURED_AR_FOR_TARGET" ; then
     # Extract the first word of "ar", so it can be a program name with args.
 set dummy ar; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4185: checking for $ac_word" >&5
+echo "configure:4182: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_CONFIGURED_AR_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4220,7 +4217,7 @@ fi
   # Extract the first word of "${ncn_target_tool_prefix}as", so it can be a program name with args.
 set dummy ${ncn_target_tool_prefix}as; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4224: checking for $ac_word" >&5
+echo "configure:4221: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_AS_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4253,7 +4250,7 @@ if test -z "$ac_cv_prog_CONFIGURED_AS_FOR_TARGET" ; then
     # Extract the first word of "as", so it can be a program name with args.
 set dummy as; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4257: checking for $ac_word" >&5
+echo "configure:4254: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_CONFIGURED_AS_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4292,7 +4289,7 @@ fi
   # Extract the first word of "${ncn_target_tool_prefix}dlltool", so it can be a program name with args.
 set dummy ${ncn_target_tool_prefix}dlltool; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4296: checking for $ac_word" >&5
+echo "configure:4293: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_DLLTOOL_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4325,7 +4322,7 @@ if test -z "$ac_cv_prog_CONFIGURED_DLLTOOL_FOR_TARGET" ; then
     # Extract the first word of "dlltool", so it can be a program name with args.
 set dummy dlltool; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4329: checking for $ac_word" >&5
+echo "configure:4326: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_CONFIGURED_DLLTOOL_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4364,7 +4361,7 @@ fi
   # Extract the first word of "${ncn_target_tool_prefix}ld", so it can be a program name with args.
 set dummy ${ncn_target_tool_prefix}ld; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4368: checking for $ac_word" >&5
+echo "configure:4365: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_LD_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4397,7 +4394,7 @@ if test -z "$ac_cv_prog_CONFIGURED_LD_FOR_TARGET" ; then
     # Extract the first word of "ld", so it can be a program name with args.
 set dummy ld; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4401: checking for $ac_word" >&5
+echo "configure:4398: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_CONFIGURED_LD_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4436,7 +4433,7 @@ fi
   # Extract the first word of "${ncn_target_tool_prefix}nm", so it can be a program name with args.
 set dummy ${ncn_target_tool_prefix}nm; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4440: checking for $ac_word" >&5
+echo "configure:4437: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_NM_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4469,7 +4466,7 @@ if test -z "$ac_cv_prog_CONFIGURED_NM_FOR_TARGET" ; then
     # Extract the first word of "nm", so it can be a program name with args.
 set dummy nm; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4473: checking for $ac_word" >&5
+echo "configure:4470: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_CONFIGURED_NM_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4508,7 +4505,7 @@ fi
   # Extract the first word of "${ncn_target_tool_prefix}ranlib", so it can be a program name with args.
 set dummy ${ncn_target_tool_prefix}ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4512: checking for $ac_word" >&5
+echo "configure:4509: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_RANLIB_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4541,7 +4538,7 @@ if test -z "$ac_cv_prog_CONFIGURED_RANLIB_FOR_TARGET" ; then
     # Extract the first word of "ranlib", so it can be a program name with args.
 set dummy ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4545: checking for $ac_word" >&5
+echo "configure:4542: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_CONFIGURED_RANLIB_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4580,7 +4577,7 @@ fi
   # Extract the first word of "${ncn_target_tool_prefix}windres", so it can be a program name with args.
 set dummy ${ncn_target_tool_prefix}windres; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4584: checking for $ac_word" >&5
+echo "configure:4581: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CONFIGURED_WINDRES_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4613,7 +4610,7 @@ if test -z "$ac_cv_prog_CONFIGURED_WINDRES_FOR_TARGET" ; then
     # Extract the first word of "windres", so it can be a program name with args.
 set dummy windres; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:4617: checking for $ac_word" >&5
+echo "configure:4614: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_ncn_cv_CONFIGURED_WINDRES_FOR_TARGET'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4698,7 +4695,7 @@ RANLIB_FOR_TARGET=${RANLIB_FOR_TARGET}${extra_ranlibflags_for_target}
 NM_FOR_TARGET=${NM_FOR_TARGET}${extra_nmflags_for_target}
 
 echo $ac_n "checking whether to enable maintainer-specific portions of Makefiles""... $ac_c" 1>&6
-echo "configure:4702: checking whether to enable maintainer-specific portions of Makefiles" >&5
+echo "configure:4699: checking whether to enable maintainer-specific portions of Makefiles" >&5
 # Check whether --enable-maintainer-mode or --disable-maintainer-mode was given.
 if test "${enable_maintainer_mode+set}" = set; then
   enableval="$enable_maintainer_mode"
@@ -4745,7 +4742,7 @@ esac
 # gcc for stageN-gcc and stage-prev for stage(N-1).  In case this is not
 # possible, however, we can resort to mv.
 echo $ac_n "checking if symbolic links between directories work""... $ac_c" 1>&6
-echo "configure:4749: checking if symbolic links between directories work" >&5
+echo "configure:4746: checking if symbolic links between directories work" >&5
 if eval "test \"`echo '$''{'gcc_cv_prog_ln_s_dir'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else

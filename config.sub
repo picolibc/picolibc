@@ -455,10 +455,6 @@ case $basic_machine in
 	cris | cris-* | etrax*)
 		basic_machine=cris-axis
 		;;
-	crx)
-                basic_machine=crx-unknown
-                os=-elf
-                ;;
 	da30 | da30-*)
 		basic_machine=m68k-da30
 		;;
