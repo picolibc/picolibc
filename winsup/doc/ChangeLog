@@ -1,3 +1,7 @@
+2003-02-07  Igor Pechtchanski <pechtcha@cs.nyu.edu>
+
+	* ntsec.sgml: Add note on special names for missing user/group.
+
 2002-12-18  Christopher Faylor  <cgf@redhat.com>
 
 	* overview2.sgml: Remove CTRL-Z discussion.

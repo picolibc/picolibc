@@ -731,4 +731,67 @@ able to access it when trying to login using ssh or rsh without password.
 
 </sect2>
 
+<sect2 id="ntsec-release1.3.20"><title>Special values of user and group
+ids</title>
+
+<para>
+If the current user is not present in <filename>/etc/passwd</filename>,
+that user's user id is set to a special value of 400.  The user name for
+the current user will always be shown correctly.  If another user
+(or a Windows group, treated as a user) is not present in
+<filename>/etc/passwd</filename>, the user id of that user will have a
+special value of -1 (which would be shown by <command>ls</command> as
+65535).  The user name shown in this case will be '????????'.
+</para>
+
+<para>
+If the current user is not present in <filename>/etc/passwd</filename>,
+that user's login group id is set to a special value of 401.  If another
+user is not present in <filename>/etc/passwd</filename>, that user's login
+group id is set to a special value of -1.  If the user is present in
+<filename>/etc/passwd</filename>, but that user's group is not in
+<filename>/etc/group</filename> and is not the login group of that user,
+the group id is set to a special value of -1.  The name of this group
+(id -1) will be shown as '????????'.
+In releases of Cygwin before 1.3.20, the group id 401 had a group name
+'None'.  Since Cygwin release 1.3.20, the group id 401 is shown as
+'mkpasswd', indicating the command that should be run to alleviate the
+situation.
+</para>
+
+<para>
+Also, since Cygwin release 1.3.20, if the current user is present in
+<filename>/etc/passwd</filename>, but that user's login group is not
+present in <filename>/etc/group</filename>, the group name will be shown
+as 'mkgroup', again indicating the appropriate command.
+</para>
+
+<para>To summarize:</para>
+<itemizedlist spacing="compact">
+
+<listitem><para>If the current user doesn't show up in
+<filename>/etc/passwd</filename>, it's <emphasis>group</emphasis> will
+be named 'mkpasswd'.</para></listitem>
+
+<listitem><para>Otherwise, if the login group of the current user isn't
+in <filename>/etc/group</filename>, it will be named 'mkgroup'.</para>
+</listitem>
+
+<listitem><para>Otherwise a group not in <filename>/etc/group</filename>
+will be shown as '????????' and a user not in
+<filename>/etc/passwd</filename> will be shown as "????????".</para>
+</listitem>
+
+</itemizedlist>
+
+<para>
+Note that, since the special user and group names are just indicators,
+nothing prevents you from actually having a user named `mkpasswd' in
+<filename>/etc/passwd</filename> (or a group named `mkgroup' in
+<filename>/etc/group</filename>).  If you do that, however, be aware of
+the possible confusion.
+</para>
+
+</sect2>
+
 </sect1>
