@@ -1,3 +1,42 @@
+2001-11-23  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::vfork_parent_restore): Add debugging statement.
+
+	* exceptions.cc (try_to_debug): Spin only as long as we don't have a
+	debugger attached.
+
+	* fhandler.h (fhandler_base::set_nohandle): New method.
+	(fhandler_base::get_nohandle): New method.
+	* fhandler.cc (fhandler_base::dup): Avoid duplicating handle if there
+	is no handle.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Set nohandle
+	flag on dummy fd.
+
+2001-11-23  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Make intermediate library for eventual inclusion in
+	libcygwin.a
+
+	* fhandler.h (fhandler_pipe::fhandler_pipe): Remove default argument
+	setting since it is no longer used.
+
+	* miscfuncs.cc (check_null_str): New function.
+	(+check_null_str_errno): Ditto.
+	* net.cc: Add defensive buffer checking throughout.
+	(cygwin_sendto): Protect against invalid fd.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_getpeername): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	* winsup.h: Declare a new function.
+
+2001-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* select.cc (set_bits): Fix conditional for setting fd in exceptfds.
+	* dtable.cc (dtable::build_fhandler): Create fhandler_pipe using
+	correct device type.
+	* path.cc (get_devn): Set correct pipe device type from device name.
+
 2001-11-22  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (conv_path_list): Fix wild indexing into path due to

@@ -916,7 +916,9 @@ fhandler_base::dup (fhandler_base *child)
   debug_printf ("in fhandler_base dup");
 
   HANDLE nh;
-  if (!DuplicateHandle (hMainProc, get_handle(), hMainProc, &nh, 0, TRUE,
+  if (get_nohandle ())
+    nh = NULL;
+  else if (!DuplicateHandle (hMainProc, get_handle(), hMainProc, &nh, 0, TRUE,
 			DUPLICATE_SAME_ACCESS))
     {
       system_printf ("dup(%s) failed, handle %x, %E",
@@ -1151,7 +1153,7 @@ fhandler_base::fixup_after_fork (HANDLE parent)
   fork_fixup (parent, io_handle, "io_handle");
 }
 
-int
+bool
 fhandler_base::is_nonblocking ()
 {
   return (openflags & O_NONBLOCK_MASK) != 0;

@@ -116,6 +116,15 @@ strcasestr (const char *searchee, const char *lookfor)
 }
 
 int __stdcall
+check_null_str (const char *name)
+{
+  if (name && !IsBadStringPtr (name, MAX_PATH))
+    return 0;
+
+  return EFAULT;
+}
+
+int __stdcall
 check_null_empty_str (const char *name)
 {
   if (name && !IsBadStringPtr (name, MAX_PATH))
@@ -129,6 +138,15 @@ check_null_empty_str_errno (const char *name)
 {
   int __err;
   if ((__err = check_null_empty_str (name)))
+    set_errno (__err);
+  return __err;
+}
+
+int __stdcall
+check_null_str_errno (const char *name)
+{
+  int __err;
+  if ((__err = check_null_str (name)))
     set_errno (__err);
   return __err;
 }

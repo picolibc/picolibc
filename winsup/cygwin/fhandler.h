@@ -30,7 +30,7 @@ enum
   FH_W95LSBUG	= 0x00400000,	/* set when lseek is called as a flag that
 				 * _write should check if we've moved beyond
 				 * EOF, zero filling if so. */
-  FH_UNUSED	= 0x00800000,	/* currently unused. */
+  FH_NOHANDLE	= 0x00800000,	/* No handle associated with fhandler. */
   FH_NOEINTR	= 0x01000000,	/* Set if I/O should be uninterruptible. */
   FH_FFIXUP	= 0x02000000,	/* Set if need to fixup after fork. */
   FH_LOCAL	= 0x04000000,	/* File is unix domain socket */
@@ -167,25 +167,29 @@ class fhandler_base
   int get_access () { return access; }
   void set_access (int x) { access = x; }
 
-  int get_async () { return FHISSETF (ASYNC); }
+  bool get_async () { return FHISSETF (ASYNC); }
   void set_async (int x) { FHCONDSETF (x, ASYNC); }
 
   int get_flags () { return openflags; }
   void set_flags (int x) { openflags = x; }
 
-  int is_nonblocking ();
+  bool is_nonblocking ();
   void set_nonblocking (int yes);
 
-  int get_w_binary () { return FHISSETF (WBINARY); }
-  int get_r_binary () { return FHISSETF (RBINARY); }
+  bool get_w_binary () { return FHISSETF (WBINARY); }
+  bool get_r_binary () { return FHISSETF (RBINARY); }
 
-  int get_w_binset () { return FHISSETF (WBINSET); }
-  int get_r_binset () { return FHISSETF (RBINSET); }
+  bool get_w_binset () { return FHISSETF (WBINSET); }
+  bool get_r_binset () { return FHISSETF (RBINSET); }
 
   void set_w_binary (int b) { FHCONDSETF (b, WBINARY); FHSETF (WBINSET); }
   void set_r_binary (int b) { FHCONDSETF (b, RBINARY); FHSETF (RBINSET); }
   void clear_w_binary () {FHCLEARF (WBINARY); FHCLEARF (WBINSET); }
   void clear_r_binary () {FHCLEARF (RBINARY); FHCLEARF (RBINSET); }
+
+  bool get_nohandle () { return FHISSETF (NOHANDLE); }
+  void set_nohandle (int x) { FHCONDSETF (x, NOHANDLE); }
+
   void set_open_status () {open_status = status;}
   DWORD get_open_status () {return open_status;}
   void reset_to_open_binmode ()
@@ -197,10 +201,10 @@ class fhandler_base
 
   int get_default_fmode (int flags);
 
-  int get_r_no_interrupt () { return FHISSETF (NOEINTR); }
+  bool get_r_no_interrupt () { return FHISSETF (NOEINTR); }
   void set_r_no_interrupt (int b) { FHCONDSETF (b, NOEINTR); }
 
-  int get_close_on_exec () { return FHISSETF (CLOEXEC); }
+  bool get_close_on_exec () { return FHISSETF (CLOEXEC); }
   int set_close_on_exec_flag (int b) { return FHCONDSETF (b, CLOEXEC); }
 
   LPSECURITY_ATTRIBUTES get_inheritance (bool all = 0)
@@ -212,9 +216,9 @@ class fhandler_base
   }
 
   void set_check_win95_lseek_bug (int b = 1) { FHCONDSETF (b, W95LSBUG); }
-  int get_check_win95_lseek_bug () { return FHISSETF (W95LSBUG); }
+  bool get_check_win95_lseek_bug () { return FHISSETF (W95LSBUG); }
 
-  int get_need_fork_fixup () { return FHISSETF (FFIXUP); }
+  bool get_need_fork_fixup () { return FHISSETF (FFIXUP); }
   void set_need_fork_fixup () { FHSETF (FFIXUP); }
 
   virtual void set_close_on_exec (int val);
@@ -223,31 +227,31 @@ class fhandler_base
   virtual void fixup_after_fork (HANDLE);
   virtual void fixup_after_exec (HANDLE) {}
 
-  int get_symlink_p () { return FHISSETF (SYMLINK); }
+  bool get_symlink_p () { return FHISSETF (SYMLINK); }
   void set_symlink_p (int val) { FHCONDSETF (val, SYMLINK); }
   void set_symlink_p () { FHSETF (SYMLINK); }
 
-  int get_socket_p () { return FHISSETF (LOCAL); }
+  bool get_socket_p () { return FHISSETF (LOCAL); }
   void set_socket_p (int val) { FHCONDSETF (val, LOCAL); }
   void set_socket_p () { FHSETF (LOCAL); }
 
-  int get_execable_p () { return FHISSETF (EXECABL); }
+  bool get_execable_p () { return FHISSETF (EXECABL); }
   void set_execable_p (executable_states val)
   {
     FHCONDSETF (val == is_executable, EXECABL);
     FHCONDSETF (val == dont_care_if_executable, DCEXEC);
   }
   void set_execable_p () { FHSETF (EXECABL); }
-  int dont_care_if_execable () { return FHISSETF (DCEXEC); }
+  bool dont_care_if_execable () { return FHISSETF (DCEXEC); }
 
-  int get_append_p () { return FHISSETF (APPEND); }
+  bool get_append_p () { return FHISSETF (APPEND); }
   void set_append_p (int val) { FHCONDSETF (val, APPEND); }
   void set_append_p () { FHSETF (APPEND); }
 
-  int get_query_open () { return FHISSETF (QUERYOPEN); }
+  bool get_query_open () { return FHISSETF (QUERYOPEN); }
   void set_query_open (int val) { FHCONDSETF (val, QUERYOPEN); }
 
-  int get_readahead_valid () { return raixget < ralen; }
+  bool get_readahead_valid () { return raixget < ralen; }
   int puts_readahead (const char *s, size_t len = (size_t) -1);
   int put_readahead (char value);
 
@@ -260,10 +264,10 @@ class fhandler_base
 
   int get_readahead_into_buffer (char *buf, size_t buflen);
 
-  int has_acls () { return FHISSETF (HASACLS); }
+  bool has_acls () { return FHISSETF (HASACLS); }
   void set_has_acls (int val) { FHCONDSETF (val, HASACLS); }
 
-  int isremote () { return FHISSETF (ISREMOTE); }
+  bool isremote () { return FHISSETF (ISREMOTE); }
   void set_isremote (int val) { FHCONDSETF (val, ISREMOTE); }
 
   const char *get_name () { return unix_path_name; }
@@ -405,7 +409,7 @@ class fhandler_pipe: public fhandler_base
   DWORD orig_pid;
   unsigned id;
  public:
-  fhandler_pipe (DWORD devtype = FH_PIPE);
+  fhandler_pipe (DWORD devtype);
   off_t lseek (off_t offset, int whence);
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);

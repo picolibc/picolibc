@@ -857,8 +857,12 @@ get_devn (const char *name, int &unit)
       devn = FH_SERIAL;
       unit++;
     }
-  else if (deveq ("pipe") || deveq ("piper") || deveq ("pipew"))
+  else if (deveq ("pipe"))
     devn = FH_PIPE;
+  else if (deveq ("piper"))
+    devn = FH_PIPER;
+  else if (deveq ("pipew"))
+    devn = FH_PIPEW;
   else if (deveq ("tcp") || deveq ("udp") || deveq ("streamsocket")
 	   || deveq ("dgsocket"))
     devn = FH_SOCKET;

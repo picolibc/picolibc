@@ -339,7 +339,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
       UNIX_FD_SET (me->fd, writefds);
       ready++;
     }
-  if (me->except_ready && me->except_ready)
+  if (me->except_selected && me->except_ready)
     {
       UNIX_FD_SET (me->fd, exceptfds);
       ready++;

@@ -383,19 +383,19 @@ try_to_debug (bool waitloop)
 		       &si,
 		       &pi);
 
-  static int NO_COPY keep_looping = 0;
-
-  if (dbg)
+  if (!dbg)
+    system_printf ("Failed to start debugger: %E");
+  else
     {
       if (!waitloop)
 	return 1;
       SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
-      while (keep_looping)
+      while (!IsDebuggerPresent ())
 	/* spin */;
+      Sleep (4000);
+      small_printf ("*** continuing from debugger call\n");
     }
 
-
-  system_printf ("Failed to start debugger: %E");
   /* FIXME: need to know handles of all running threads to
     resume_all_threads_except (current_thread_id);
   */

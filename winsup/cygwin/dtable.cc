@@ -18,6 +18,7 @@ details. */
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/cygwin.h>
+#include <assert.h>
 
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
@@ -292,7 +293,7 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
       case FH_PIPE:
       case FH_PIPER:
       case FH_PIPEW:
-	fh = cnew (fhandler_pipe) ();
+	fh = cnew (fhandler_pipe) (dev);
 	break;
       case FH_SOCKET:
 	if ((fh = cnew (fhandler_socket) ()))
@@ -591,6 +592,7 @@ dtable::vfork_parent_restore ()
 
   close_all_files ();
   fhandler_base **deleteme = fds;
+  assert (fds_on_hold != NULL);
   fds = fds_on_hold;
   fds_on_hold = NULL;
   cfree (deleteme);

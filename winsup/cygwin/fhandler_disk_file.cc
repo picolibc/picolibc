@@ -599,6 +599,7 @@ fhandler_disk_file::opendir (path_conv& real_name)
       dir->__d_dirent->d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
       fd = this;
+      fd->set_nohandle (true);
       dir->__d_dirent->d_fd = fd;
       dir->__d_u.__d_data.__fh = this;
       /* FindFirstFile doesn't seem to like duplicate /'s. */

@@ -191,14 +191,14 @@ new-$(LIB_NAME): $(LIB_NAME)
 # Rule to build cygwin.dll
 
 new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
-	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -Wl,--out-implib,$(LIB_NAME) -shared -o $@ \
+	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC) \
 	-lstdc++ -lgcc -lshell32 -luuid
 	@rm -f stamp-cygwin-lib
 
 $(LIB_NAME): new-$(DLL_NAME) $(LIBCOS) stamp-cygwin-lib
-	$(AR) rcv $(LIB_NAME) $(LIBCOS)
+	$(AR) rcv $(LIB_NAME) $(LIBCOS) cygdll.a
 
 stamp-cygwin-lib:
 	@touch stamp-cygwin-lib
