@@ -23,7 +23,7 @@
 #ifndef __WINDDK_H
 #define __WINDDK_H
 
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
@@ -1010,6 +1010,27 @@ typedef struct _IRP *PIRP;
   ((DeviceType) << 16) | ((Access) << 14) | ((Function) << 2) | (Method))
 
 #define DEVICE_TYPE_FROM_CTL_CODE(ctl) (((ULONG) (ctl & 0xffff0000)) >> 16)
+
+enum
+{
+   IRP_NOCACHE = 0x1,
+   IRP_PAGING_IO = 0x2,
+   IRP_MOUNT_COMPLETION = 0x2,
+   IRP_SYNCHRONOUS_API = 0x4,
+   IRP_ASSOCIATED_IRP = 0x8,
+   IRP_BUFFERED_IO = 0x10,
+   IRP_DEALLOCATE_BUFFER = 0x20,
+   IRP_INPUT_OPERATION = 0x40,
+   IRP_SYNCHRONOUS_PAGING_IO = 0x40,
+   IRP_CREATE_OPERATION = 0x80,
+   IRP_READ_OPERATION = 0x100,
+   IRP_WRITE_OPERATION = 0x200,
+   IRP_CLOSE_OPERATION = 0x400,
+   IRP_DEFER_IO_COMPLETION = 0x800,
+   IRP_OB_QUERY_NAME = 0x1000,
+   IRP_HOLD_DEVICE_QUEUE = 0x2000,
+   IRP_RETRY_IO_COMPLETION = 0x4000
+};
 
 
 typedef struct _DRIVE_LAYOUT_INFORMATION_MBR {

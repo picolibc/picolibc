@@ -1,6 +1,6 @@
 #ifndef _WINGDI_H
 #define _WINGDI_H
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
@@ -1295,73 +1295,107 @@ typedef struct  tagCOLORADJUSTMENT {
 	SHORT	caColorfulness;
 	SHORT	caRedGreenTint;
 } COLORADJUSTMENT,*LPCOLORADJUSTMENT;
-typedef struct _devicemodeA {
-	BYTE dmDeviceName[CCHDEVICENAME];
-	WORD dmSpecVersion;
-	WORD dmDriverVersion;
-	WORD dmSize;
-	WORD dmDriverExtra;
-	DWORD dmFields;
-	short dmOrientation;
-	short dmPaperSize;
-	short dmPaperLength;
-	short dmPaperWidth;
-	short dmScale;
-	short dmCopies;
-	short dmDefaultSource;
-	short dmPrintQuality;
-	short dmColor;
-	short dmDuplex;
-	short dmYResolution;
-	short dmTTOption;
-	short dmCollate;
-	BYTE dmFormName[CCHFORMNAME];
-	WORD dmLogPixels;
-	DWORD dmBitsPerPel;
-	DWORD dmPelsWidth;
-	DWORD dmPelsHeight;
-	DWORD dmDisplayFlags;
-	DWORD dmDisplayFrequency;
-	DWORD dmICMMethod;
-	DWORD dmICMIntent;
-	DWORD dmMediaType;
-	DWORD dmDitherType;
-	DWORD dmICCManufacturer;
-	DWORD dmICCModel;
+typedef struct _devicemodeA { 
+  BYTE   dmDeviceName[CCHDEVICENAME]; 
+  WORD   dmSpecVersion; 
+  WORD   dmDriverVersion; 
+  WORD   dmSize; 
+  WORD   dmDriverExtra; 
+  DWORD  dmFields; 
+  _ANONYMOUS_UNION union {
+    _ANONYMOUS_STRUCT struct {
+      short dmOrientation;
+      short dmPaperSize;
+      short dmPaperLength;
+      short dmPaperWidth;
+      short dmScale; 
+      short dmCopies; 
+      short dmDefaultSource; 
+      short dmPrintQuality; 
+    } DUMMYSTRUCTNAME;
+    POINTL dmPosition;
+    DWORD  dmDisplayOrientation;
+    DWORD  dmDisplayFixedOutput;
+  } DUMMYUNIONNAME;
+
+  short  dmColor; 
+  short  dmDuplex; 
+  short  dmYResolution; 
+  short  dmTTOption; 
+  short  dmCollate; 
+  BYTE   dmFormName[CCHFORMNAME]; 
+  WORD   dmLogPixels; 
+  DWORD  dmBitsPerPel; 
+  DWORD  dmPelsWidth; 
+  DWORD  dmPelsHeight; 
+  _ANONYMOUS_UNION union {
+    DWORD  dmDisplayFlags; 
+    DWORD  dmNup;
+  } DUMMYUNIONNAME2;
+  DWORD  dmDisplayFrequency; 
+#if(WINVER >= 0x0400) 
+  DWORD  dmICMMethod;
+  DWORD  dmICMIntent;
+  DWORD  dmMediaType;
+  DWORD  dmDitherType;
+  DWORD  dmReserved1;
+  DWORD  dmReserved2;
+#if (WINVER >= 0x0500) || (_WIN32_WINNT >= 0x0400)
+  DWORD  dmPanningWidth;
+  DWORD  dmPanningHeight;
+#endif
+#endif /* WINVER >= 0x0400 */
 } DEVMODEA,*LPDEVMODEA,*PDEVMODEA;
-typedef struct _devicemodeW {
-	WCHAR dmDeviceName[CCHDEVICENAME];
-	WORD dmSpecVersion;
-	WORD dmDriverVersion;
-	WORD dmSize;
-	WORD dmDriverExtra;
-	DWORD dmFields;
-	short dmOrientation;
-	short dmPaperSize;
-	short dmPaperLength;
-	short dmPaperWidth;
-	short dmScale;
-	short dmCopies;
-	short dmDefaultSource;
-	short dmPrintQuality;
-	short dmColor;
-	short dmDuplex;
-	short dmYResolution;
-	short dmTTOption;
-	short dmCollate;
-	WCHAR dmFormName[CCHFORMNAME];
-	WORD dmLogPixels;
-	DWORD dmBitsPerPel;
-	DWORD dmPelsWidth;
-	DWORD dmPelsHeight;
-	DWORD dmDisplayFlags;
-	DWORD dmDisplayFrequency;
-	DWORD dmICMMethod;
-	DWORD dmICMIntent;
-	DWORD dmMediaType;
-	DWORD dmDitherType;
-	DWORD dmICCManufacturer;
-	DWORD dmICCModel;
+typedef struct _devicemodeW { 
+  WCHAR   dmDeviceName[CCHDEVICENAME]; 
+  WORD   dmSpecVersion; 
+  WORD   dmDriverVersion; 
+  WORD   dmSize; 
+  WORD   dmDriverExtra; 
+  DWORD  dmFields; 
+  _ANONYMOUS_UNION union {
+    _ANONYMOUS_STRUCT struct {
+      short dmOrientation;
+      short dmPaperSize;
+      short dmPaperLength;
+      short dmPaperWidth;
+      short dmScale; 
+      short dmCopies; 
+      short dmDefaultSource; 
+      short dmPrintQuality; 
+    } DUMMYSTRUCTNAME;
+    POINTL dmPosition;
+    DWORD  dmDisplayOrientation;
+    DWORD  dmDisplayFixedOutput;
+  } DUMMYUNIONNAME;
+
+  short  dmColor; 
+  short  dmDuplex; 
+  short  dmYResolution; 
+  short  dmTTOption; 
+  short  dmCollate; 
+  WCHAR  dmFormName[CCHFORMNAME]; 
+  WORD   dmLogPixels; 
+  DWORD  dmBitsPerPel; 
+  DWORD  dmPelsWidth; 
+  DWORD  dmPelsHeight; 
+  _ANONYMOUS_UNION union {
+    DWORD  dmDisplayFlags; 
+    DWORD  dmNup;
+  } DUMMYUNIONNAME2;
+  DWORD  dmDisplayFrequency; 
+#if(WINVER >= 0x0400) 
+  DWORD  dmICMMethod;
+  DWORD  dmICMIntent;
+  DWORD  dmMediaType;
+  DWORD  dmDitherType;
+  DWORD  dmReserved1;
+  DWORD  dmReserved2;
+#if (WINVER >= 0x0500) || (_WIN32_WINNT >= 0x0400)
+  DWORD  dmPanningWidth;
+  DWORD  dmPanningHeight;
+#endif
+#endif /* WINVER >= 0x0400 */
 } DEVMODEW,*LPDEVMODEW,*PDEVMODEW;
 typedef struct tagDIBSECTION {
 	BITMAP dsBm;

@@ -26,7 +26,7 @@
 #ifndef __NTAPI_H
 #define __NTAPI_H
 
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
@@ -1952,6 +1952,7 @@ typedef enum _LPC_TYPE {
 	LPC_DEBUG_EVENT,
 	LPC_ERROR_EVENT,
 	LPC_CONNECTION_REQUEST,
+	LPC_CONNECTION_REFUSED,
   LPC_MAXIMUM
 } LPC_TYPE;
 

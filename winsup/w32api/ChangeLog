@@ -1,3 +1,9 @@
+2003-08-15  Andrew Greenwood  <lists@silverblade.co.uk>
+
+	* include/wingdi.h (DEVMODE[AW]) Correct structure definition.
+	* include/ddk/ntapi.h (LPC_TYPE): Add LPC_CONNECTION_REFUSED.
+	* include/ddk/winddk.h (IRP_*): Add constants as anonymous enum.
+
 2003-08-10  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* lib/uuid.c (CGID_Explorer, CGID_ShellDocView,
