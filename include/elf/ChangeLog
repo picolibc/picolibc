@@ -1,3 +1,7 @@
+2001-04-24  Todd Fries  <todd@fries.net>
+
+	* sparc.h: Fix typo.
+
 2001-04-20  Johan Rydberg  <jrydberg@opencores.org>
 
 	* openrisc.h: New file.
