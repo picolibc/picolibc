@@ -83,12 +83,12 @@ fhandler_dev_mem::fhandler_dev_mem (const char *name, int nunit)
         }
       else
         mem_size = sbi.PhysicalPageSize * sbi.NumberOfPhysicalPages;
-      debug_printf ("MemSize: %d MB", mem_size >>= 20);
+      debug_printf ("MemSize: %d MB", mem_size >> 20);
     }
   else if (unit == 2) /* /dev/kmem - Not yet supported */
     {
       mem_size = 0;
-      debug_printf ("KMemSize: %d MB", mem_size >>= 20);
+      debug_printf ("KMemSize: %d MB", mem_size >> 20);
     }
   else if (unit == 4) /* /dev/port == First 64K of /dev/mem */
     {

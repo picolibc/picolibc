@@ -1,3 +1,8 @@
+Mon Oct  9 16:44:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_mem.cc (fhandler_dev_mem::fhandler_dev_mem):
+	Fix debug output.
+
 Mon Oct  9 15:58:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_mem.cc: Eliminate unused include statements.
