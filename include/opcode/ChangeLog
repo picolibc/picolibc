@@ -1,3 +1,7 @@
+Thu Oct  7 00:12:25 MDT 1999	Diego Novillo <dnovillo@cygnus.com>
+
+	* d10v.h: Add flag RESTRICTED_NUM3 for imm3 operands.
+
 Thu Sep 23 07:08:38 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
 	* hppa.h (pa_opcodes): Add "call" and "ret".  Clean up "b", "bve"

@@ -176,6 +176,10 @@ extern const struct d10v_operand d10v_operands[];
 /* general purpose register */
 #define OPERAND_GPR	(0x40000)
 
+/* special imm3 values with range restricted to -2 <= imm3 <= 3 */
+/* needed for rac/rachi */
+#define RESTRICTED_NUM3	(0x80000)
+
 /* Structure to hold information about predefined registers.  */
 struct pd_reg
 {
