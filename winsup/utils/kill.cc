@@ -17,6 +17,7 @@ details. */
 #include <windows.h>
 #include <sys/cygwin.h>
 #include <getopt.h>
+#include <limits.h>
 
 static const char version[] = "$Revision$";
 static char *prog_name;
@@ -157,19 +158,24 @@ forcekill (int pid, int sig, int wait)
   // try to acquire SeDebugPrivilege
   get_debug_priv();
 
-  external_pinfo *p = (external_pinfo *) cygwin_internal (CW_GETPINFO_FULL, pid);
+  external_pinfo *p = NULL;
+  /* cygwin_internal misinterprets negative pids (Win9x pids) */
+  if (pid > 0)
+    p = (external_pinfo *) cygwin_internal (CW_GETPINFO_FULL, pid);
   DWORD dwpid = p ? p->dwProcessId : (DWORD) pid;
   HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) dwpid);
   if (!h)
     {
-      fprintf (stderr, "couldn't open pid %u\n", (unsigned) dwpid);
+      if (!wait || GetLastError () != ERROR_INVALID_PARAMETER) 
+        fprintf (stderr, "%s: couldn't open pid %u\n", 
+	         prog_name, (unsigned) dwpid);
       return;
     }
   if (!wait || WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
-    if (!TerminateProcess (h, sig << 8)
+    if (sig && !TerminateProcess (h, sig << 8)
 	&& WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
-      fprintf (stderr, "couldn't kill pid %u, %u\n", (unsigned) dwpid,
-	       (unsigned) GetLastError ());
+      fprintf (stderr, "%s: couldn't kill pid %u, %lu\n", 
+	       prog_name, (unsigned) dwpid, GetLastError ());
   CloseHandle (h);
 }
 
@@ -195,7 +201,7 @@ main (int argc, char **argv)
   opterr = 0;
 
   char *p;
-  int pid = 0;
+  long long int pid = 0;
 
   for (;;)
     {
@@ -235,7 +241,7 @@ main (int argc, char **argv)
 	case '?':
 	  if (gotasig)
 	    {
-	      pid = strtol (argv[optind], &p, 10);
+	      pid = strtoll (argv[optind], &p, 10);
 	      if (pid < 0)
 		goto out;
 	      usage ();
@@ -258,23 +264,25 @@ out:
   while (*argv != NULL)
     {
       if (!pid)
-	pid = strtol (*argv, &p, 10);
-      if (*p != '\0')
+	pid = strtoll (*argv, &p, 10);
+      if (*p != '\0'
+          || (!force && (pid < LONG_MIN || pid > LONG_MAX))
+          || (force && (pid <= 0 || pid > ULONG_MAX))) 
 	{
 	  fprintf (stderr, "%s: illegal pid: %s\n", prog_name, *argv);
 	  ret = 1;
 	}
-      else if (kill (pid, sig) == 0)
+      else if (pid <= LONG_MAX && kill ((pid_t) pid, sig) == 0)
 	{
 	  if (force)
-	    forcekill (pid, sig, 1);
+	    forcekill ((pid_t) pid, sig, 1);
 	}
-      else if (force && sig != 0)
-	forcekill (pid, sig, 0);
+      else if (force)
+	forcekill ((pid_t) pid, sig, 0);
       else
 	{
 	  char buf[1000];
-	  sprintf (buf, "%s %d", prog_name, pid);
+	  sprintf (buf, "%s: %lld", prog_name, pid);
 	  perror (buf);
 	  ret = 1;
 	}

@@ -1,3 +1,10 @@
+2004-11-13  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* kill.cc (forcekill): Do not pass negative pids to 
+	cygwin_internal. Check if sig == 0. Improve error messages.
+	(main): Make pid a long long and distinguish between pids, gpids 
+	(i.e. negative pids) and Win9x pids.
+
 2004-11-11  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* cygcheck.cc: Change "keyeprint" to "display_error" throughout.
