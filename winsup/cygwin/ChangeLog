@@ -1,3 +1,7 @@
+2002-07-24  David MacMahon  <davidm@smartsc.com>
+
+	* times.cc (to_time_t): Always round time_t down to nearest second.
+
 2002-07-25  Egor Duda  <deo@logos-m.ru>
 
 	* Makefile.in: Check if API version is updated when exports are 
