@@ -2,6 +2,8 @@
 
 	* include/_mingw.h (__int32, __int16, __int8, small, hyper): Define.
 	Note: Also added to w32api/include/basetyps.h.
+	* mingwex/math/tgamma.c, tgammaf.c, tgammal.c (small): 
+	Rename to Small (case difference).
 
 2003-06-18  Earnie Boyd  <earnie@users.sf.net>
 

@@ -456,7 +456,7 @@ while( x < -0.03125L )
 	}
 
 if( x <= 0.03125L )
-	goto small;
+	goto Small;
 
 while( x < 2.0L )
 	{
@@ -472,7 +472,7 @@ p = polevll( x, P, 7 );
 q = polevll( x, Q, 8 );
 return( z * p / q );
 
-small:
+Small:
 if( x == 0.0L )
 	{
 	goto gsing;

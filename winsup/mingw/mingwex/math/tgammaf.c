@@ -214,7 +214,7 @@ while( x >= 3.0 )
 while( x < 0.0 )
 	{
 	if( x > -1.E-4 )
-		goto small;
+		goto Small;
 	z *=x;
 	x += 1.0;
 	}
@@ -222,7 +222,7 @@ while( x < 0.0 )
 while( x < 2.0 )
 	{
 	if( x < 1.e-4 )
-		goto small;
+		goto Small;
 	z *=x;
 	x += 1.0;
 	}
@@ -244,7 +244,7 @@ if( negative )
 	}
 return(p);
 
-small:
+Small:
 if( x == 0.0 )
 	{
 	goto gsing;

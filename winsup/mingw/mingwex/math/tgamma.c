@@ -346,7 +346,7 @@ while( x >= 3.0 )
 while( x < 0.0 )
 	{
 	if( x > -1.E-9 )
-		goto small;
+		goto Small;
 	z /= x;
 	x += 1.0;
 	}
@@ -354,7 +354,7 @@ while( x < 0.0 )
 while( x < 2.0 )
 	{
 	if( x < 1.e-9 )
-		goto small;
+		goto Small;
 	z /= x;
 	x += 1.0;
 	}
@@ -367,7 +367,7 @@ p = polevl( x, P, 6 );
 q = polevl( x, Q, 7 );
 return( z * p / q );
 
-small:
+Small:
 if( x == 0.0 )
 	{
 	goto gsing;
