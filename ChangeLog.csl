@@ -1,3 +1,15 @@
+2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/Makefile.in (arm-linux-nat.o): Update dependencies.
+	* gdb/arm-linux-nat.c: Include "gdb_proc_service.h".
+	(PTRACE_GET_THREAD_AREA): Define.
+	(ps_get_thread_area): New function.
+
+	* gdb/gdbserver/Makefile.in (linux-arm-low.o): Update dependencies.
+	* gdb/gdbserver/linux-arm-low.c: Include "../gdb_proc_service.h".
+	(PTRACE_GET_THREAD_AREA): Define.
+	(ps_get_thread_area): New function.
+
 2005-03-25  Paul Brook  <paul@codesourcery.com>
 	    Daniel Jacobowitz  <dan@codesourcery.com>
 
