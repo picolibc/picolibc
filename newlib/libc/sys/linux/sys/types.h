@@ -50,6 +50,7 @@
  * libc/include/sys/types.h.  Repeat those here and
  * skip the kernel's definitions. */
 
+#include <features.h>
 #include <sys/config.h>
 #include <machine/types.h>
 #include <sys/_types.h>
@@ -112,7 +113,9 @@ typedef	long	fd_mask;
 #	define	howmany(x,y)	(((x)+((y)-1))/(y))
 #  endif
 
-#define fd_set _types_fd_set
+typedef struct {
+        unsigned long fds_bits [(1024/(8 * sizeof(unsigned long)))];
+} __fd_set;
 
 #  define	FD_SET(n, p)	((p)->fds_bits[(n)/NFDBITS] |= (1L << ((n) % NFDBITS)))
 #  define	FD_CLR(n, p)	((p)->fds_bits[(n)/NFDBITS] &= ~(1L << ((n) % NFDBITS)))
@@ -135,11 +138,57 @@ typedef	long	fd_mask;
 #define __off_t_defined
 #define __off64_t_defined
 
+typedef __ino_t ino_t;
 typedef __ino64_t ino64_t;
 typedef __uint32_t uintptr_t;
 typedef __int32_t intptr_t;
 typedef __off64_t off64_t;
 typedef __off_t off_t;
+typedef __loff_t loff_t;
+typedef __mode_t mode_t;
+typedef __pid_t pid_t;
+typedef __uid_t uid_t;
+typedef __gid_t gid_t;
+typedef __key_t key_t;
+typedef __suseconds_t suseconds_t;
+typedef __useconds_t useconds_t;
+typedef __daddr_t daddr_t;
+typedef __caddr_t caddr_t;
+typedef __dev_t dev_t;
+typedef __fd_set fd_set;
+typedef __nlink_t nlink_t;
+
+typedef __u_char u_char;
+typedef __u_short u_short;
+typedef __u_int u_int;
+typedef __u_long u_long;
+typedef __uint8_t u_int8_t;
+typedef __uint16_t u_int16_t;
+typedef __uint32_t u_int32_t;
+typedef __uint64_t u_int64_t;
+typedef __int16_t int16_t;
+typedef __int32_t int32_t;
+typedef __int64_t int64_t;
+
+#ifndef _UINT8_T_DECLARED
+typedef __uint8_t               uint8_t; 
+#define _UINT8_T_DECLARED
+#endif
+
+#ifndef _UINT16_T_DECLARED
+typedef __uint16_t              uint16_t; 
+#define _UINT16_T_DECLARED
+#endif
+
+#ifndef _UINT32_T_DECLARED
+typedef __uint32_t              uint32_t; 
+#define _UINT32_T_DECLARED
+#endif
+
+#ifndef _UINT64_T_DECLARED
+typedef __uint64_t              uint64_t; 
+#define _UINT64_T_DECLARED
+#endif
 
 #if !defined(_ANSI_SOURCE) && !defined(_POSIX_SOURCE)
 typedef	struct _physadr {

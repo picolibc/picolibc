@@ -145,6 +145,9 @@ ELIX_3_OBJS = \
 	wait.$(oext)
 
 ELIX_4_OBJS = \
+	getlogin.$(oext) \
+	getpwnam.$(oext) \
+	getpwuid.$(oext) \
 	stack.$(oext)
 
 if ELIX_LEVEL_1

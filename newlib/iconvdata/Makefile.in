@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -105,6 +105,9 @@ EUC_JP_la_SOURCES = dummy.c
 EUC_JP_la_LIBADD = $(LIB_OBJS)
 EUC_JP_la_DEPENDENCIES = $(LIB_OBJS)
 EUC_JP_la_LDFLAGS = -module -no-undefined -Xcompiler -Wl,-rpath-link=.. -Xcompiler -nostdlib -L.. -lc
+
+ACLOCAL_AMFLAGS = -I ..
+CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -140,8 +143,9 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in 
-	cd $(srcdir) && $(ACLOCAL)
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in  ../acinclude.m4 \
+		../aclocal.m4 ../libtool.m4
+	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck

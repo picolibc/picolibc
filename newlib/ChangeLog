@@ -1,5 +1,25 @@
 2003-11-07  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* configure.host: Remove -DLOOSE_KERNEL_NAMES flag for linux 
+	x86 build.
+	* iconvdata/Makefile.am: Make dependent on newlib's configure.host
+	and set up default flags to pass to aclocal.
+	* iconvdata/Makefile.in: Regenerated.
+	* libc/sys/linux/Makefile.am: Add _ELIX_LEVEL_4 getlogin, getpwnam,
+	and getpwuid routines.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/getlogin.c: New stub file to allow x86-linux
+	applications to link with newlib's shared libc library.
+	* libc/sys/linux/getpwnam.c: Ditto.
+	* libc/sys/linux/getpwuid.c: Ditto.
+	* libc/sys/linux/sys/types.h: Include <features.h> and supply types
+	that were formerly supplied by /usr/include/linux/types.h with
+	kernel types.
+	* testsuite/newlib.wctype/twctype.c: Fix testcase to properly
+	test _ELIX_LEVEL macro.
+
+2003-11-07  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Fix typos that should be
 	referring to _NO_LONGLONG macro.
 

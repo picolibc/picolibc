@@ -8,9 +8,8 @@
 
 int main()
 {
-  if (_ELIX_LEVEL == 1)
-    { /* no testing..wctype functions aren't present */ }
-  else if (_MB_LEN_MAX == 1)
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL > 1
+  if (_MB_LEN_MAX == 1)
     {
       CHECK (iswalpha(L'a'));
       CHECK (!iswalpha(L'3'));
@@ -59,6 +58,7 @@ int main()
       CHECK (iswxdigit(L'A'));
       CHECK (!iswxdigit(0x1f48));
     }
+#endif
 
   exit (0);
 }

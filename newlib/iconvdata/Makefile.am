@@ -23,3 +23,5 @@ EUC_JP_la_LDFLAGS = -module -no-undefined -Xcompiler -Wl,-rpath-link=.. -Xcompil
 install-data-local: install-pkglibLTLIBRARIES $(srcdir)/gconv-modules
 	$(INSTALL_DATA) $(srcdir)/gconv-modules $(DESTDIR)$(pkglibdir)/gconv-modules
 
+ACLOCAL_AMFLAGS = -I ..
+CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
