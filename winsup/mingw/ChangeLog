@@ -1,3 +1,8 @@
+2004-01-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdint.h  Fix __STDC_CONSTANT_MACROS for 8 and 16 bit
+	types. (Thanks to John Maddock for report.)
+
 2004-01-14  Greg Chicares  <chicares@users.sourceforge.net>
 
 	* include/tchar.h (_puttchar): Define.

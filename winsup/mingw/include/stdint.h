@@ -163,25 +163,21 @@ typedef unsigned long long   uintmax_t;
 	an integer constant with width less than that of type int.
 	TC1 changed this to require just an integer constant
 	*expression* with *promoted* type."
-
-	The trick used here is from Clive D W Feather.
 */
 
-#define INT8_C(val) (INT_LEAST8_MAX-INT_LEAST8_MAX+(val))
-#define INT16_C(val) (INT_LEAST16_MAX-INT_LEAST16_MAX+(val))
-#define INT32_C(val) (INT_LEAST32_MAX-INT_LEAST32_MAX+(val))
-/*  The 'trick' doesn't work in C89 for long long because, without
-    suffix, (val) will be evaluated as int, not intmax_t */ 
-#define INT64_C(val) val##LL
+#define INT8_C(val) ((int8_t) + (val))
+#define UINT8_C(val) ((uint8_t) + (val##U))
+#define INT16_C(val) ((int16_t) + (val))
+#define UINT16_C(val) ((uint16_t) + (val##U))
 
-#define UINT8_C(val) (UINT_LEAST8_MAX-UINT_LEAST8_MAX+(val))
-#define UINT16_C(val) (UINT_LEAST16_MAX-UINT_LEAST16_MAX+(val))
-#define UINT32_C(val) (UINT_LEAST32_MAX-UINT_LEAST32_MAX+(val))
+#define INT32_C(val) val##L
+#define UINT32_C(val) val##UL
+#define INT64_C(val) val##LL
 #define UINT64_C(val) val##ULL
 
 /* 7.18.4.2  Macros for greatest-width integer constants */
-#define INTMAX_C(val) val##LL
-#define UINTMAX_C(val) val##ULL
+#define INTMAX_C(val)  INT64_C(val)
+#define UINTMAX_C(val) UINT64_C(val)
 
 #endif  /* !defined ( __cplusplus) || defined __STDC_CONSTANT_MACROS */
 
