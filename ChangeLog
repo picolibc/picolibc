@@ -1,4 +1,9 @@
 2001-08-30  Eric Christopher  <echristo@redhat.com>
+	    Jason Eckhardt  <jle@redhat.com>
+
+	* config.sub: Add support for mipsisa32.
+
+2001-08-30  Eric Christopher  <echristo@redhat.com>
 
 	* config.sub, config.guess: Import latest from subversions.
 
