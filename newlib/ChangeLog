@@ -1,3 +1,9 @@
+2004-12-13  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/fread.c (fread): For unbuffered I/O, attempt
+	a low-level read if we don't get the full amount of bytes so
+	EOF or error flags will be set.
+
 2004-12-09  Alex Mogilnikov  <alx@intellectronika.ru>
 
 	* libc/time/tzset_r (_tzset_r): Properly skip over
