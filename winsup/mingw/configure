@@ -757,9 +757,9 @@ echo "$ac_t""$ac_cv_prog_cc_g" 1>&6
   if test "$ac_test_CFLAGS" = set; then
     CFLAGS="$ac_save_CFLAGS"
   elif test $ac_cv_prog_cc_g = yes; then
-    CFLAGS="-g -O2"
+    CFLAGS="-g -O2 -D__USE_CRTIMP"
   else
-    CFLAGS="-O2"
+    CFLAGS="-O2 -D__USE_CRTIMP"
   fi
   if test "$ac_test_CXXFLAGS" != set; then
     CXXFLAGS='$(CFLAGS)'
@@ -1665,6 +1665,8 @@ HEADER_SUBDIR=""
 
 LIBGMON_A=libgmon.a
 
+W32API_INCLUDE='$(srcdir)/../w32api/include'
+
 case "$target_os" in
 *cygwin*)
   MNO_CYGWIN=-mno-cygwin
@@ -1700,6 +1702,7 @@ MKINSTALLDIRS=$ac_aux_dir/mkinstalldirs
 
 
 
+
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
 # incompatible versions:
@@ -1712,7 +1715,7 @@ MKINSTALLDIRS=$ac_aux_dir/mkinstalldirs
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:1716: checking for a BSD compatible install" >&5
+echo "configure:1719: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1944,6 +1947,7 @@ s%@LIBM_A@%$LIBM_A%g
 s%@LIBGMON_A@%$LIBGMON_A%g
 s%@SUBDIRS@%$SUBDIRS%g
 s%@HEADER_SUBDIR@%$HEADER_SUBDIR%g
+s%@W32API_INCLUDE@%$W32API_INCLUDE%g
 s%@INSTALL_PROGRAM@%$INSTALL_PROGRAM%g
 s%@INSTALL_SCRIPT@%$INSTALL_SCRIPT%g
 s%@INSTALL_DATA@%$INSTALL_DATA%g

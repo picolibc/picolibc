@@ -47,9 +47,9 @@ dnl normal versions of a library), tasteless as that idea is.
   if test "$ac_test_CFLAGS" = set; then
     CFLAGS="$ac_save_CFLAGS"
   elif test $ac_cv_prog_cc_g = yes; then
-    CFLAGS="-g -O2"
+    CFLAGS="-g -O2 -D__USE_CRTIMP=1"
   else
-    CFLAGS="-O2"
+    CFLAGS="-O2 -D__USE_CRTIMP=1"
   fi
   if test "$ac_test_CXXFLAGS" != set; then
     CXXFLAGS='$(CFLAGS)'
@@ -94,6 +94,8 @@ HEADER_SUBDIR=""
 
 LIBGMON_A=libgmon.a
 
+W32API_INCLUDE='$(srcdir)/../w32api/include'
+
 case "$target_os" in
 *cygwin*)
   MNO_CYGWIN=-mno-cygwin
@@ -127,6 +129,7 @@ AC_SUBST(LIBM_A)
 AC_SUBST(LIBGMON_A)
 AC_SUBST(SUBDIRS)
 AC_SUBST(HEADER_SUBDIR)
+AC_SUBST(W32API_INCLUDE)
 
 AC_PROG_INSTALL
 AC_OUTPUT(Makefile)
