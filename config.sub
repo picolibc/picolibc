@@ -230,7 +230,7 @@ case $basic_machine in
 		| mips16 | mips64 | mipsel | mips64el \
 		| mips64orion | mips64orionel | mipstx39 | mipstx39el \
 		| mips64vr4300 | mips64vr4300el | mips64vr4100 | mips64vr4100el \
-		| mips64vr5000 | miprs64vr5000el | mcore | s390 | s390x \
+		| mips64vr5000 | miprs64vr5000el | mcore \
 		| sparc | sparclet | sparclite | sparc64 | sparcv9 | v850 | c4x \
 		| thumb | d10v | d30v | fr30 | avr | openrisc | tic80 \
 		| pj | pjl | h8500)
@@ -275,7 +275,7 @@ case $basic_machine in
 	      | mips64el-* | mips64orion-* | mips64orionel-* \
 	      | mips64vr4100-* | mips64vr4100el-* | mips64vr4300-* | mips64vr4300el-* \
 	      | mipstx39-* | mipstx39el-* | mcore-* \
-	      | f30[01]-* | f700-* | s390-* | s390x-* | sv1-* | t3e-* \
+	      | f30[01]-* | f700-* | sv1-* | t3e-* \
 	      | [cjt]90-* \
 	      | m88110-* | m680[01234]0-* | m683?2-* | m68360-* | z8k-* | d10v-* \
 	      | thumb-* | v850-* | d30v-* | tic30-* | tic80-* | c30-* | fr30-* \
@@ -741,6 +741,12 @@ case $basic_machine in
 		;;
 	rtpc | rtpc-*)
 		basic_machine=romp-ibm
+		;;
+	s390 | s390-* )
+		basic_machine=s390-ibm
+		;;
+	s390x | s390x-* )
+		basic_machine=s390x-ibm
 		;;
 	sa29200)
 		basic_machine=a29k-amd

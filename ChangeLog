@@ -1,3 +1,8 @@
+2001-11-11  Andrew Cagney  <ac131313@redhat.com>
+
+	From Denis Joseph Barrow:
+	* config.sub: Map s390 and s390x onto s390-ibm and s390x-ibm.
+
 2001-10-03  Alan Modra  <amodra@bigpond.net.au>
 
 	* gettext.m4: Test po/POTFILES.in exists before trying to read.
