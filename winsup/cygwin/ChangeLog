@@ -1,3 +1,8 @@
+2003-04-04  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (operator new): Be more defensive when messing with
+	threads that are marked "unavailable".
+
 2003-04-03  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (CONVERT_LIMIT): Use a size for the 21st century.
