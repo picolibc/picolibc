@@ -1,3 +1,37 @@
+2004-10-27  Richard Earnshaw  <rearnsha@arm.com>
+
+	* elf/arm.h: Add R_ARM_CALL and R_ARM_JUMP32.
+
+2004-10-27  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* opcode/crx.h (enum reg): Rearrange registers, remove 'ccfg' and `'pc'.
+	(enum reg_type): Remove CRX_PC_REGTYPE, CRX_MTPR_REGTYPE.
+	(enum operand_type): Rearrange operands, edit comments.
+	replace us<N> with ui<N> for unsigned immediate.
+	replace d<N> with disps<N>/dispu<N>/dispe<N> for signed/unsigned/escaped 
+	displacements (respectively).
+	replace rbase_ridx_scl2_dispu<N> with rindex_disps<N> for register index.
+	(instruction type): Add NO_TYPE_INS.
+	(instruction flags): Add USER_REG, CST4MAP, NO_SP, NO_RPTR.
+	(operand_entry): New field - 'flags'.
+	(operand flags): New.
+
+2004-10-26  Paul Brook  <paul@codesourcery.com>
+
+	* bfdlink.h (struct bfd_link_info): Add create_default_symver.
+
+2004-10-21  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* opcode/crx.h (operand_type): Remove redundant types i3, i4,
+	i5, i8, i12.
+	Add new unsigned immediate types us3, us4, us5, us16.
+
+2004-10-21  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR 463
+	* bfdlink.h (bfd_link_callbacks): Add a pointer to struct
+	bfd_link_hash_entry to reloc_overflow.
+
 2004-10-12  Paul Brook  <paul@codesourcery.com>
 
 	* elf/arm.h (EF_ARM_EABI_VER4): Define.

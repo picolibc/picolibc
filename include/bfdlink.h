@@ -262,6 +262,9 @@ struct bfd_link_info
   /* TRUE if ok to have version with no definition.  */
   unsigned int allow_undefined_version: 1;
 
+  /* TRUE id a fedault symbol version should be created and used.  */
+  unsigned int create_default_symver: 1;
+
   /* TRUE if symbols should be retained in memory, FALSE if they
      should be freed and reread.  */
   unsigned int keep_memory: 1;
@@ -481,16 +484,18 @@ struct bfd_link_callbacks
   bfd_boolean (*undefined_symbol)
     (struct bfd_link_info *, const char *name, bfd *abfd,
      asection *section, bfd_vma address, bfd_boolean fatal);
-  /* A function which is called when a reloc overflow occurs.  NAME is
-     the name of the symbol or section the reloc is against,
-     RELOC_NAME is the name of the relocation, and ADDEND is any
-     addend that is used.  ABFD, SECTION and ADDRESS identify the
+  /* A function which is called when a reloc overflow occurs. ENTRY is
+     the link hash table entry for the symbol the reloc is against.
+     NAME is the name of the local symbol or section the reloc is
+     against, RELOC_NAME is the name of the relocation, and ADDEND is
+     any addend that is used.  ABFD, SECTION and ADDRESS identify the
      location at which the overflow occurs; if this is the result of a
      bfd_section_reloc_link_order or bfd_symbol_reloc_link_order, then
      ABFD will be NULL.  */
   bfd_boolean (*reloc_overflow)
-    (struct bfd_link_info *, const char *name, const char *reloc_name,
-     bfd_vma addend, bfd *abfd, asection *section, bfd_vma address);
+    (struct bfd_link_info *, struct bfd_link_hash_entry *entry,
+     const char *name, const char *reloc_name, bfd_vma addend,
+     bfd *abfd, asection *section, bfd_vma address);
   /* A function which is called when a dangerous reloc is performed.
      The canonical example is an a29k IHCONST reloc which does not
      follow an IHIHALF reloc.  MESSAGE is an appropriate message.

@@ -1,3 +1,40 @@
+2004-11-04  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR other/17783
+	* configure.in: Set up LD_LIBRARY_PATH by default for gcc.
+	* configure: Regenerated.
+
+2004-11-04  Daniel Jacobowitz  <dan@debian.org>
+
+	* configure.in (arm-*-oabi*, thumb-*-oabi*): Remove.
+	* configure: Regenerated.
+
+2004-10-28  Eric B. Weddington  <ericw@evcohs.com>
+
+	PR target/18151
+	* configure.in (case ${target}): Do not build fixincludes for avr.
+	* configure: Regenerated.
+
+2004-10-26  Paolo Bonzini  <bonzini@gnu.org>
+
+	* configure.in (case ${target}): Do not build fixincludes
+	on platforms where it is not used.
+	* configure: Regenerated.
+
+2004-10-23  Daniel Jacobowitz  <dan@debian.org>
+
+	* configure.in: Use an absolute path to install-sh.
+	* configure: Regenerated.
+
+2004-10-19  Andrew Cagney  <cagney@gnu.org>
+
+	* src-release (do-djunpack, do-md5sum): Install the generated file
+	directly into the proto-toplev/ directory.
+	
+2004-10-19  Andrew Cagney  <cagney@gnu.org>
+
+	* src-release (GDB_SUPPORT_DIRS): Remove utils and intl.
+
 2004-10-12  Kelley Cook  <kcook@gcc.gnu.org>
 
 	* configure.in (*-*-cygwin*): Supress warning if newlib not present.
