@@ -36,6 +36,14 @@ Cygwin does not provide glibc.  It uses newlib instead, which provides
 much (but not all) of the same functionality.  Porting glibc to Cygwin
 would be difficult.
 
+@subsection Where is Objective C?
+
+Objective C is not distributed with the Cygwin version of gcc, and there
+are no plans to do so.  The gcc package maintainer had difficulty
+building it, and once built there were problems using it.  It appears
+that there is only minimual support for the Objective C front-end in the
+main GCC distribution, anyway.
+
 @subsection Why is make behaving badly?
 
 First of all, if you are using @samp{make -j[N]}, then stop.  It doesn't
