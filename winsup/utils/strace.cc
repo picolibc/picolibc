@@ -10,7 +10,10 @@
 
 static const char *pgm;
 static int forkdebug = 0;
-static int texterror = 0;
+static int numerror = 1;
+static int usecs = 1;
+static int delta = 1;
+static int hhmmss = 0;
 
 static BOOL close_handle (HANDLE h, DWORD ok);
 
@@ -23,7 +26,7 @@ struct child_list
     struct child_list *next;
   };
 
-child_list children = {0};
+child_list children = {0, NULL, NULL};
 
 static void
 warn (int geterrno, const char *fmt, ...)
@@ -200,7 +203,7 @@ make_command_line (linebuf& one_line, char **argv)
 static DWORD child_pid;
 
 static BOOL WINAPI
-ctrl_c (DWORD type)
+ctrl_c (DWORD)
 {
   static int tic = 1;
   if ((tic ^= 1) && !GenerateConsoleCtrlEvent (CTRL_C_EVENT, 0))
@@ -295,6 +298,18 @@ output_winerror (FILE *ofile, char *s)
   return 1;
 }
 
+static SYSTEMTIME *
+syst (long long t)
+{
+  FILETIME n;
+  static SYSTEMTIME st;
+  long long now = t + ((long long) usecs * 10);
+  n.dwHighDateTime = now >> 32;
+  n.dwLowDateTime = now & 0xffffffff;
+  FileTimeToSystemTime (&n, &st);
+  return &st;
+}
+
 static void __stdcall
 handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 {
@@ -304,6 +319,10 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   DWORD nbytes;
   HANDLE hchild = get_child_handle (id);
   #define INTROLEN (sizeof (alen) - 1)
+  static int saw_stars = 0;
+  static char nfields = 0;
+  static long long start_time;
+  static DWORD last_usecs;
 
   if (id == lastid && hchild != lasth)
     warn (0, "%p != %p", hchild, lasth);
@@ -331,8 +350,9 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
       if (special == _STRACE_INTERFACE_ACTIVATE_ADDR)
 	len = 17;
     }
-    
-  char *buf = (char *) alloca (len + 1);
+
+  char *buf;
+  buf = (char *) alloca (len + 65) + 10;
 
   if (!ReadProcessMemory (hchild, ((char *) p) + INTROLEN, buf, len, &nbytes))
     error (0, "couldn't get message from subprocess, windows error %d",
@@ -355,12 +375,114 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
       return;
     }
 
+  char *origs = s;
+
   if (mask & n)
     /* got it */;
   else if (!(mask & _STRACE_ALL) || (n & _STRACE_NOTALL))
     return;		/* This should not be included in "all" output */
 
-  if (!texterror || !output_winerror (ofile, s))
+  DWORD dusecs, usecs;
+  char *ptusec, *ptrest;
+
+  dusecs = strtoul (s, &ptusec, 10);
+  char *q = ptusec;
+  while (*q == ' ')
+    q++;
+  if (*q != '[')
+    {
+      usecs = strtoul (q, &ptrest, 10);
+      while (*ptrest == ' ')
+	ptrest++;
+    }
+  else
+    {
+      ptrest = q;
+      ptusec = s;
+      usecs = dusecs;
+    }
+
+  if (saw_stars == 0)
+    {
+      FILETIME st;
+      char *news;
+
+      GetSystemTimeAsFileTime (&st);
+      FileTimeToLocalFileTime (&st, &st);
+      start_time = st.dwHighDateTime;
+      start_time <<= 32;
+      start_time |= st.dwLowDateTime;
+      if (*(news = ptrest) != '[')
+	saw_stars = 2;
+      else
+	{
+	  saw_stars++;
+	  while ((news = strchr (news, ' ')) != NULL && *++news != '*')
+	    nfields++;
+	  if (news == NULL)
+	    saw_stars++;
+	  else
+	    {
+	      s = news;
+	      nfields++;
+	    }
+	}
+    }
+  else if (saw_stars < 2)
+    {
+      int i;
+      char *news;
+      if (*(news = ptrest) != '[')
+	saw_stars = 2;
+      else
+	{
+	  for (i = 0; i < nfields; i++)
+	    if ((news = strchr (news, ' ')) == NULL)
+	      break; 	// Should never happen
+	    else
+	      news++;
+
+	  if (news == NULL)
+	    saw_stars = 2;
+	  else
+	    {
+	      s = news;
+	      if (*s == '*')
+		{
+		  SYSTEMTIME *st = syst (start_time);
+		  fprintf (ofile, "Date/Time:    %d-%02d-%02d %02d:%02d:%02d\n",
+			   st->wYear, st->wMonth, st->wDay, st->wHour, st->wMinute, st->wSecond);
+		  saw_stars++;
+		}
+	    }
+	}
+    }
+
+  long long d = usecs - last_usecs;
+  char intbuf[40];
+
+  if (saw_stars < 2 || s != origs)
+    /* Nothing */;
+  else if (hhmmss)
+    {
+      s = ptrest - 9;
+      SYSTEMTIME *st = syst (start_time + (long long) usecs * 10);
+      sprintf (s, "%02d:%02d:%02d", st->wHour, st->wMinute, st->wSecond);
+      *strchr (s, '\0') = ' ';
+    }
+  else if (!delta)
+    s = ptusec;
+  else
+    {
+      s = ptusec;
+      sprintf (intbuf, "%5d ", (int) d);
+      int len = strlen (intbuf);
+
+      memcpy ((s -= len), intbuf, len);
+    }
+
+  last_usecs = usecs;
+  if (numerror || !output_winerror (ofile, s))
     fputs (s, ofile);
   fflush (ofile);
 }
@@ -438,7 +560,7 @@ main(int argc, char **argv)
   else
     pgm++;
 
-  while ((opt = getopt (argc, argv, "m:o:ft")) != EOF)
+  while ((opt = getopt (argc, argv, "m:o:fndut")) != EOF)
     switch (opt)
       {
       case 'f':
@@ -454,9 +576,17 @@ main(int argc, char **argv)
 	(void) fcntl (fileno (ofile), F_SETFD, 0);
 #endif
 	break;
-      case 't':
-	texterror ^= 1;
+      case 'n':
+	numerror ^= 1;
 	break;
+      case 't':
+	hhmmss ^= 1;
+	break;
+      case 'd':
+	delta ^= 1;
+	break;
+      case 'u':
+	usecs ^= 1;
       }
 
   if (!mask)

@@ -35,8 +35,8 @@ include $(srcdir)/../Makefile.common
 
 MINGW_INCLUDES:=-I$(updir)/mingw/include
 
-MINGW_CXXFLAGS:=-mno-cygwin $(CXXFLAGS) $(MINGW_INCLUDES)
-MINGW_CFLAGS:=-mno-cygwin $(CFLAGS) $(MINGW_INCLUDES)
+MINGW_CXXFLAGS:=$(CXXFLAGS) -mno-cygwin $(CXXFLAGS) $(MINGW_INCLUDES)
+MINGW_CFLAGS:=$(CFLAGS) -mno-cygwin $(CFLAGS) $(MINGW_INCLUDES)
 
 libcygwin:=$(cygwin_build)/libcygwin.a
 libuser32:=$(w32api_lib)/libuser32.a

@@ -1,3 +1,8 @@
+Sun Feb 27 23:37:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* strace.cc (handle_output_debug_string): Parse strace output to allow
+	various types of time output.
+
 Fri Jan 21 02:10:26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* utils/regtool.cc (translate): Added unix like backslash
