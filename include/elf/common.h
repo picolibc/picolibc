@@ -317,12 +317,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    the st_other field.  The STV_ defines specificy the actual visibility.  */
 
 #define ELF_ST_VISIBILITY(v)		((v) & 0x3)
-#define ELF_ST_OTHER(o)			((o) & ~0x3)
+/* The remaining bits in the st_other field are not currently used.
+   They should be set to zero.  */
 
 #define ELF32_ST_VISIBILITY  ELF_ST_VISIBILITY
-#define ELF32_ST_OTHER       ELF_ST_OTHER
 #define ELF64_ST_VISIBILITY  ELF_ST_VISIBILITY
-#define ELF64_ST_OTHER       ELF_ST_OTHER
 
 
 #define STN_UNDEF	0		/* undefined symbol index */
