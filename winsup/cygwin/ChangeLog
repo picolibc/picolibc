@@ -1,3 +1,8 @@
+2001-12-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (open_local_policy): Use POLICY_EXECUTE instead of
+	enumerating user rights.
+
 2001-12-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (open_local_policy): Initialize lsa handle to NULL.

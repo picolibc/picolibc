@@ -183,8 +183,7 @@ open_local_policy ()
   LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
   LSA_HANDLE lsa = NULL;
 
-  NTSTATUS ret = LsaOpenPolicy(NULL, &oa, POLICY_VIEW_LOCAL_INFORMATION
-  					  | POLICY_LOOKUP_NAMES, &lsa);
+  NTSTATUS ret = LsaOpenPolicy(NULL, &oa, POLICY_EXECUTE, &lsa);
   if (ret != STATUS_SUCCESS)
     set_errno (LsaNtStatusToWinError (ret));
   return lsa;
