@@ -687,7 +687,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     { sizeof oa, 0, 0, 0, 0, &sqos };
   SECURITY_ATTRIBUTES sa = { sizeof sa, NULL, TRUE };
   LUID auth_luid = SYSTEM_LUID;
-  LARGE_INTEGER exp = { 0x7fffffffffffffffLL } ;
+  LARGE_INTEGER exp = { QuadPart:0x7fffffffffffffffLL  };
 
   TOKEN_USER user;
   PTOKEN_GROUPS grps = NULL;

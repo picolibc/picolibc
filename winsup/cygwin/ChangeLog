@@ -1,3 +1,8 @@
+Fri Aug 31 21:39:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (create_token): Change initialization of `exp' to comply
+	with new LARGE_INTEGER definition in winnt.h.
+
 Fri Aug 31 13:58:51 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygwin.sc: Revert to previous NO_COPY behavior.
