@@ -127,6 +127,8 @@ packages are added rather frequently, so you'll have to regularly
 check the list for any ``Skip'' entries if you want to stay up to date
 with a complete installation.
 
+This should become much easier in a future version of @samp{setup.exe}.
+
 @subsection How much disk space does Cygwin require?
 
 That depends, obviously, on what you've chosen to download and install.
