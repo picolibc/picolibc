@@ -42,9 +42,7 @@ struct dirent
 	long		d_ino;		/* Always zero. */
 	unsigned short	d_reclen;	/* Always zero. */
 	unsigned short	d_namlen;	/* Length of name in d_name. */
-	char*		d_name;		/* File name. */
-	/* NOTE: The name in the dirent structure points to the name in the
-	 *       finddata_t structure in the DIR. */
+	char		d_name[FILENAME_MAX]; /* File name. */
 };
 
 /*
@@ -92,7 +90,7 @@ struct _wdirent
 	long		d_ino;		/* Always zero. */
 	unsigned short	d_reclen;	/* Always zero. */
 	unsigned short	d_namlen;	/* Length of name in d_name. */
-	wchar_t*	d_name;		/* File name. */
+	wchar_t		d_name[FILENAME_MAX]; /* File name. */
 	/* NOTE: The name in the dirent structure points to the name in the	 *       wfinddata_t structure in the _WDIR. */
 };
 

@@ -113,7 +113,7 @@ _topendir (const _TCHAR *szPath)
   nd->dd_dir.d_ino = 0;
   nd->dd_dir.d_reclen = 0;
   nd->dd_dir.d_namlen = 0;
-  nd->dd_dir.d_name = nd->dd_dta.name;
+  memset (nd->dd_dir.d_name, 0, FILENAME_MAX);
 
   return nd;
 }
@@ -134,13 +134,6 @@ _treaddir (_TDIR * dirp)
   if (!dirp)
     {
       errno = EFAULT;
-      return (struct _tdirent *) 0;
-    }
-
-  if (dirp->dd_dir.d_name != dirp->dd_dta.name)
-    {
-      /* The structure does not seem to be set up correctly. */
-      errno = EINVAL;
       return (struct _tdirent *) 0;
     }
 
@@ -190,7 +183,8 @@ _treaddir (_TDIR * dirp)
       /* Successfully got an entry. Everything about the file is
        * already appropriately filled in except the length of the
        * file name. */
-      dirp->dd_dir.d_namlen = _tcslen (dirp->dd_dir.d_name);
+      dirp->dd_dir.d_namlen = _tcslen (dirp->dd_dta.name);
+      _tcscpy (dirp->dd_dir.d_name, dirp->dd_dta.name);
       return &dirp->dd_dir;
     }
 

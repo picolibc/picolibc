@@ -157,8 +157,15 @@ MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o  dllmain.o gccmain.o \
 MOLD_OBJS = isascii.o iscsym.o iscsymf.o toascii.o \
 	strcasecmp.o strncasecmp.o wcscmpi.o
 
-LIBS = libcrtdll.a libmsvcrt.a libmsvcrtd.a libmingw32.a \
-       libcoldname.a libmoldname.a libmoldnamed.a $(LIBM_A) libmingwthrd.a
+LIBS = libcrtdll.a \
+       libmsvcrt.a libmsvcrtd.a \
+       libmsvcr70.a libmsvcr70d.a \
+       libmsvcr71.a libmsvcr71d.a \
+       libmingw32.a \
+       libcoldname.a \
+       libmoldname.a libmoldnamed.a \
+       $(LIBM_A) \
+       libmingwthrd.a
 
 DLLS = $(THREAD_DLL_NAME)
 
@@ -234,7 +241,10 @@ libmingw32.a: $(MINGW_OBJS)
 	$(AR) rc $@ $(MINGW_OBJS)
 	$(RANLIB) $@
 
-msvcrt.def msvcrtd.def: msvcrt.def.in
+msvcrt.def msvcrtd.def \
+msvcr70.def msvcr70d.def \
+msvcr71.def msvcr71d.def \
+: msvcrt.def.in
 	$(CC) -DRUNTIME=$(basename $(notdir $@)) \
 		-D__FILENAME__=$@ \
 		-D__MSVCRT__ -C -E -P \
