@@ -1,4 +1,15 @@
-2003-07-04  N Stephens  <nigel@mips.com>
+2003-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (list::match): Add parameters to return valid address and
+	length back to munmap().  Evaluate intersection between given
+	area and mapped area and return it, if any.
+	(mmap64): On regular files, don't allow mappings beginning beyond
+	EOF.  Return with errno set to ENXIO instead.
+	(munmap): Rewrite SUSv3 conformant.  Check if given memory area is
+	valid.  Unmap all maps inside given memory area.  Don't return error
+	if no mapping has been unmapped.
+
+2003-07-05  N Stephens  <nigel@mips.com>
 
 	* fhandler.h (fhandler_socket::get_connect_state): New method to
 	return socket connection state.
