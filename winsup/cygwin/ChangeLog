@@ -1,6 +1,11 @@
+2003-02-16  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Export all appropriate newlibc libm functions.  Sort.
+	* include/cygwin/version.h: Bump API minor number.
+
 2003-02-15  Christopher Faylor  <cgf@redhat.com>
 
-	* cygwin.din: Export all appropriate newlib functions.
+	* cygwin.din: Export all appropriate newlib libc functions.
 	* include/cygwin/version.h: Bump API minor number.
 
 2003-02-14  Jason Tishler  <jason@tishler.net>

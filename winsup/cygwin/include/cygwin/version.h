@@ -180,12 +180,16 @@ details. */
 		  wcschr wcscpy wcscspn wcslcat wcslcpy wcsncat wcsncmp wcsncpy
 		  wcspbrk wcsrchr wcsrtombs wcsspn wcsstr wctob wctob wctrans
 		  wctype wmemchr wmemcmp wmemcpy wmemmove wmemset
+       75: Export exp2 exp2f fdim fdimf fma fmaf fmax fmaxf fmin fminf lrint
+		  lrintf lround lroundf nearbyint nearbyintf remquo remquof
+		  round roundf scalbln scalblnf sincos sincosf tgamma tgammaf
+		  truncf
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 74
+#define CYGWIN_VERSION_API_MINOR 75
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
