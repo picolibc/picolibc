@@ -64,14 +64,10 @@ man7dir = $(mandir)/man7
 man8dir = $(mandir)/man8
 man9dir = $(mandir)/man9
 
-# INSTALL_PROGRAM_ARGS is changed by configure.in to use -x for a
-# cygwin host.
-INSTALL_PROGRAM_ARGS =
-
-INSTALL = $(SHELL) $$s/install-sh -c
-INSTALL_PROGRAM = $(INSTALL) $(INSTALL_PROGRAM_ARGS)
-INSTALL_SCRIPT = $(INSTALL)
-INSTALL_DATA = $(INSTALL) -m 644
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_DATA = @INSTALL_DATA@
 
 # -------------------------------------------------
 # Miscellaneous non-standard autoconf-set variables
@@ -1285,12 +1281,13 @@ gcc-no-fixedincludes:
 
 # Host modules specific to gcc.
 # GCC needs to identify certain tools.
-configure-gcc: maybe-configure-binutils maybe-configure-gas maybe-configure-ld maybe-configure-bison maybe-configure-flex
-all-gcc: maybe-all-libiberty maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
+# GCC also needs the information exported by the intl configure script.
+configure-gcc: maybe-configure-intl maybe-configure-binutils maybe-configure-gas maybe-configure-ld maybe-configure-bison maybe-configure-flex
+all-gcc: maybe-all-libiberty maybe-all-intl maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
 # This is a slightly kludgy method of getting dependencies on 
 # all-build-libiberty correct; it would be better to build it every time.
 all-gcc: maybe-all-build-libiberty
-all-bootstrap: maybe-all-libiberty maybe-all-texinfo maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
+all-bootstrap: maybe-all-libiberty maybe-all-intl maybe-all-texinfo maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
 
 # Host modules specific to gdb.
 # GDB needs to know that the simulator is being built.
