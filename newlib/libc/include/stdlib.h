@@ -63,6 +63,7 @@ float	_EXFUN(atoff,(const char *__nptr));
 #endif
 int	_EXFUN(atoi,(const char *__nptr));
 long	_EXFUN(atol,(const char *__nptr));
+long	_EXFUN(_atol_r,(struct _reent *, const char *__nptr));
 _PTR	_EXFUN(bsearch,(const _PTR __key,
 		       const _PTR __base,
 		       size_t __nmemb,
@@ -164,6 +165,7 @@ unsigned short *
 _VOID  _EXFUN(srand48,(long));
 _VOID  _EXFUN(_srand48_r,(struct _reent *, long));
 long long _EXFUN(atoll,(const char *__nptr));
+long long _EXFUN(_atoll_r,(struct _reent *, const char *__nptr));
 long long _EXFUN(llabs,(long long));
 lldiv_t	_EXFUN(lldiv,(long long __numer, long long __denom));
 long long _EXFUN(strtoll,(const char *__n, char **__end_PTR, int __base));

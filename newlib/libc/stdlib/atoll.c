@@ -4,21 +4,32 @@ FUNCTION
 
 INDEX
         atoll
+INDEX
+        _atoll_r
 
 ANSI_SYNOPSIS
         #include <stdlib.h>
         long long atoll(const char *<[str]>);
+        long long _atoll_r(struct _reent *<[ptr]>, const char *<[str]>);
 
 TRAD_SYNOPSIS
         #include <stdlib.h>
         long long atoll(<[str]>)
         const char *<[str]>;
 
+        long long _atoll_r(<[ptr]>, <[str]>)
+	struct _reent *<[ptr]>;
+        const char *<[str]>;
+
 DESCRIPTION
 The function <<atoll>> converts the initial portion of the string 
-pointed to by <<*<[str]>>> to a type <<long long>>. The call to
-atoll(str) should be equivalent to strtoll(str, (char **)NULL, 10)
-except that <<atoll>> doesn't detect errors.
+pointed to by <<*<[str]>>> to a type <<long long>>.  A call to
+atoll(str) in this implementation is equivalent to 
+strtoll(str, (char **)NULL, 10) including behavior on error.
+
+The alternate function <<_atoll_r>> is a reentrant version.  The
+extra argument <[reent]> is a pointer to a reentrancy structure.
+
 
 RETURNS
 The converted value.
@@ -65,9 +76,19 @@ No supporting OS subroutines are required.
 #include <stdlib.h>
 #include <stddef.h>
 
+#ifndef _REENT_ONLY
 long long
 _DEFUN(atoll, (str),
        _CONST char *str)
 {
 	return strtoll(str, (char **)NULL, 10);
+}
+#endif /* !_REENT_ONLY */
+
+long long
+_DEFUN(_atoll_r, (ptr, str),
+       struct _reent *ptr _AND
+       _CONST char *str)
+{
+	return _strtoll_r(ptr, str, (char **)NULL, 10);
 }
