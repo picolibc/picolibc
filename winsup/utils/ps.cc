@@ -210,7 +210,8 @@ Usage: %s [-aefls] [-u UID]\n\
  -u, --user      list processes owned by UID\n\
  -v, --version   output version information and exit\n\
  -W, --windows   show windows as well as cygwin processes\n\
-With options, %s outputs the long format by default\n", prog_name, prog_name);
+With no options, %s outputs the long format by default\n",
+	   prog_name, prog_name);
   exit (status);
 }
 
