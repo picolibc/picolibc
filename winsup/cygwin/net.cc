@@ -1375,12 +1375,17 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 	  struct sockaddr_un *sun = (struct sockaddr_un *) addr;
 	  memset (sun, 0, *namelen);
 	  sun->sun_family = AF_LOCAL;
-	  /* According to SUSv2 "If the actual length of the address is greater
-	     than the length of the supplied sockaddr structure, the stored
-	     address will be truncated."  We play it save here so that the
-	     path always has a trailing 0 even if it's truncated. */
-	  strncpy (sun->sun_path, sock->get_sun_path (),
-		   *namelen - sizeof *sun + sizeof sun->sun_path - 1);
+
+	  if (!sock->get_sun_path ())
+	    sun->sun_path[0] = '\0';
+	  else
+	    /* According to SUSv2 "If the actual length of the address is
+	       greater than the length of the supplied sockaddr structure, the
+	       stored address will be truncated."  We play it save here so
+	       that the path always has a trailing 0 even if it's truncated. */
+	    strncpy (sun->sun_path, sock->get_sun_path (),
+		     *namelen - sizeof *sun + sizeof sun->sun_path - 1);
+
 	  *namelen = sizeof *sun - sizeof sun->sun_path
 		     + strlen (sun->sun_path) + 1;
 	  res = 0;

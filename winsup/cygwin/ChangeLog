@@ -1,3 +1,7 @@
+2002-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_getsockname): Fix handling of NULL sun_path.
+
 2002-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (getdomainname): Fix registry key for 9x systems, too.
