@@ -23,6 +23,7 @@ details. */
 #include "cygheap.h"
 #include "cygwin/version.h"
 #include "perprocess.h"
+#include "sigproc.h"
 #include <sys/termios.h>
 
 /* tcsendbreak: POSIX 7.2.2.1 */
@@ -111,21 +112,55 @@ out:
 extern "C" int
 tcsetattr (int fd, int a, const struct termios *t)
 {
-  int res = -1;
-
-  cygheap_fdget cfd (fd);
-  if (cfd < 0)
-    goto out;
-
+  int res;
   t = __tonew_termios (t);
+  int e = get_errno ();
 
-  if (!cfd->is_tty ())
-    set_errno (ENOTTY);
-  else if ((res = cfd->bg_check (-SIGTTOU)) > bg_eof)
-    res = cfd->tcsetattr (a, t);
+  while (1)
+    {
+      sigframe thisframe (mainthread);
 
-out:
-  termios_printf ("iflag %x, oflag %x, cflag %x, lflag %x, VMIN %d, VTIME %d",
+      res = -1;
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
+	{
+	  e = get_errno ();
+	  break;
+	}
+
+      if (!cfd->is_tty ())
+	{
+	  e = ENOTTY;
+	  break;
+	}
+
+      res = cfd->bg_check (-SIGTTOU);
+
+      switch (res)
+	{
+	case bg_eof:
+	  e = get_errno ();
+	  break;
+	case bg_ok:
+	  if (cfd.isopen ())
+	    res = cfd->tcsetattr (a, t);
+	  else
+	    e = get_errno ();
+	  break;
+	case bg_signalled:
+	  if (thisframe.call_signal_handler ())
+	    continue;
+	  res = -1;
+	  /* fall through intentionally */
+	default:
+	  e = get_errno ();
+	  break;
+	}
+      break;
+    }
+
+  set_errno (e);
+  termios_printf ("iflag %p, oflag %p, cflag %p, lflag %p, VMIN %d, VTIME %d",
 	t->c_iflag, t->c_oflag, t->c_cflag, t->c_lflag, t->c_cc[VMIN],
 	t->c_cc[VTIME]);
   termios_printf ("%d = tcsetattr (%d, %d, %x)", res, fd, a, t);

@@ -416,7 +416,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	  break;
 
 	case WINDOW_BUFFER_SIZE_EVENT:
-	  kill_pgrp (tc->getpgid (), SIGWINCH);
+	  tc->kill_pgrp (SIGWINCH);
 	  continue;
 
 	default:

@@ -661,7 +661,7 @@ peek_console (select_record *me, bool)
     else
       {
 	if (irec.EventType == WINDOW_BUFFER_SIZE_EVENT)
-	  kill_pgrp (fh->tc->getpgid (), SIGWINCH);
+	  fh->tc->kill_pgrp (SIGWINCH);
 	else if (irec.EventType == MOUSE_EVENT &&
 		 (irec.Event.MouseEvent.dwEventFlags == 0 ||
 		  irec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK))

@@ -169,7 +169,7 @@ fhandler_termios::bg_check (int sig)
   /* Don't raise a SIGTT* signal if we have already been interrupted
      by another signal. */
   if (WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
-    _raise (sig);
+    kill_pgrp (myself->pgid, sig);
   return bg_signalled;
 
 setEIO:

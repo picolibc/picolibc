@@ -1,3 +1,13 @@
+2002-07-28  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (fhandler_console::read): Use appropriate
+	kill_pgrp method.
+	* select.cc (peek_console): Ditto.
+	* fhandler_termios.cc (fhandler_termios::bg_check): Send "stopped"
+	signal to entire process group as dictated by SUSv3.
+	* termios.cc (tcsetattr): Detect when stopped signal sent and force a
+	stop before setting anything.
+
 2002-07-26  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump API version to indicate that ntsec is

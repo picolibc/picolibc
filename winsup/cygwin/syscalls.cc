@@ -325,7 +325,7 @@ _read (int fd, void *ptr, size_t len)
 	 sending a SIGTTIN, if appropriate */
       res = cfd->bg_check (SIGTTIN);
 
-      if (!cfd.isopen())
+      if (!cfd.isopen ())
 	return -1;
 
       if (res > bg_eof)
