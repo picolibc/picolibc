@@ -235,7 +235,7 @@ proc_subproc (DWORD what, DWORD val)
 
   if (!get_proc_lock (what, val))	// Serialize access to this function
     {
-      sigproc_printf ("I am not ready");
+      system_printf ("couldn't get proc lock.  Something is wrong.");
       goto out1;
     }
 
@@ -253,6 +253,33 @@ proc_subproc (DWORD what, DWORD val)
 			    0, 0, DUPLICATE_SAME_ACCESS))
 	system_printf ("Couldn't duplicate child handle for pid %d, %E", vchild->pid);
       ProtectHandle1 (vchild->pid_handle, pid_handle);
+
+      if (!DuplicateHandle (hMainProc, hMainProc, vchild->hProcess, &vchild->ppid_handle,
+			    0, TRUE, DUPLICATE_SAME_ACCESS))
+	system_printf ("Couldn't duplicate my handle<%p> for pid %d, %E", hMainProc, vchild->pid);
+      vchild->ppid = myself->pid;
+      vchild->gid = myself->gid;
+      vchild->pgid = myself->pgid;
+      vchild->sid = myself->sid;
+      vchild->ctty = myself->ctty;
+      vchild->umask = myself->umask;
+      vchild->orig_uid = myself->orig_uid;
+      vchild->orig_gid = myself->orig_gid;
+      vchild->real_uid = myself->real_uid;
+      vchild->real_gid = myself->real_gid;
+      vchild->impersonated = myself->impersonated;
+      if (myself->use_psid)
+        {
+          vchild->use_psid = 1;
+          memcpy (vchild->psid, myself->psid, MAX_SID_LEN);
+        }
+      memcpy (vchild->logsrv, myself->logsrv, MAX_HOST_NAME);
+      memcpy (vchild->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
+      memcpy (vchild->root, myself->root, MAX_PATH+1);
+      vchild->token = myself->token;
+      vchild->rootlen = myself->rootlen;
+      vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
+
       sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",
 		  vchild->pid, nchildren, vchild->dwProcessId,
 		  vchild->hProcess);
@@ -810,6 +837,7 @@ init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
   ch->shared_h = cygwin_shared_h;
   ch->console_h = console_shared_h;
   ch->subproc_ready = subproc_ready;
+  ch->pppid_handle = myself->ppid_handle;
   if (chtype != PROC_EXEC || !parent_alive)
     ch->parent_alive = hwait_subproc;
   else
@@ -1100,7 +1128,7 @@ wait_sig (VOID *)
 
   HANDLE catchem[] = {sigcatch_main, sigcatch_nonmain, sigcatch_nosync};
   sigproc_printf ("Ready.  dwProcessid %d", myself->dwProcessId);
-  for (;;)
+  for (int i = 0; ; i++)
     {
       DWORD rc = WaitForMultipleObjects (3, catchem, FALSE, sig_loop_wait);
 
@@ -1128,7 +1156,8 @@ wait_sig (VOID *)
       /* A sigcatch semaphore has been signaled.  Scan the sigtodo
        * array looking for any unprocessed signals.
        */
-      pending_signals = 0;
+      pending_signals = -1;
+      int saw_pending_signals = 0;
       int saw_sigchld = 0;
       int dispatched_sigchld = 0;
       for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
@@ -1179,9 +1208,24 @@ wait_sig (VOID *)
 	    }
 	  /* Decremented too far. */
 	  if (InterlockedIncrement (myself->getsigtodo(sig)) > 0)
-	    pending_signals = 1;
+	    saw_pending_signals = 1;
 	nextsig:
 	  continue;
+	}
+
+      /* FIXME: The dispatched stuff probably isn't needed anymore. */
+      if (dispatched >= 0 && pending_signals < 0 && !saw_pending_signals)
+	{
+	  pending_signals = 0;
+	  /* FIXME FIXME FIXME FIXME FIXME
+	     This is a real kludge designed to handle runaway processes who
+	     missed a signal and never processed a signal handler.  We have
+	     to reset signal_arrived or stuff goes crazy. */
+	  if (i >= 20)
+	    {
+	      i = 0;
+	      ResetEvent (signal_arrived);
+	    }
 	}
 
       if (nzombies && saw_sigchld && !dispatched_sigchld)
@@ -1202,8 +1246,6 @@ wait_sig (VOID *)
 	  break;
 	}
 
-      if (dispatched < 0)
-	pending_signals = 1;
       sigproc_printf ("looping");
     }
 
@@ -1258,7 +1300,6 @@ wait_subproc (VOID *)
 		system_printf ("pid %d, dwProcessId %u, hProcess %p, progname '%s'",
 			       pchildren[i - 1]->pid, pchildren[i - 1]->dwProcessId,
 			       pchildren[i - 1]->hProcess, pchildren[i - 1]->progname);
-		Sleep (10000);
 	      }
 	  break;
 	}

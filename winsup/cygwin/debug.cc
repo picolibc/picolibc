@@ -228,7 +228,7 @@ newh ()
       goto out;
 
   /* All used up??? */
-  if ((hl = (handle_list *)malloc (sizeof *hl)) != NULL)
+  if ((hl = (handle_list *) malloc (sizeof *hl)) != NULL)
     {
       memset (hl, 0, sizeof (*hl));
       hl->allocated = TRUE;
@@ -248,6 +248,7 @@ add_handle (const char *func, int ln, HANDLE h, const char *name)
 
   if ((hl = find_handle (h)))
     {
+      hl = hl->next;
       system_printf ("%s:%d - multiple attempts to add handle %s<%p>", func,
 		     ln, name, h);
       system_printf (" previously allocated by %s:%d(%s<%p>)",

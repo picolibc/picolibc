@@ -898,8 +898,9 @@ _dll_crt0 ()
 	  case PROC_FORK:
 	  case PROC_FORK1:
 	    user_data->forkee = fork_info->cygpid;
-	  case PROC_EXEC:
 	  case PROC_SPAWN:
+	    CloseHandle (fork_info->pppid_handle);
+	  case PROC_EXEC:
 	    {
 	      child_proc_info = fork_info;
 	      mypid = child_proc_info->cygpid;

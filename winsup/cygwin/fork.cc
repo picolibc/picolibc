@@ -471,35 +471,12 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
     system_printf ("couldn't create last_fork_proc, %E");
 
   /* Fill in fields in the child's process table entry.  */
-  forked->ppid = myself->pid;
   forked->hProcess = pi.hProcess;
   forked->dwProcessId = pi.dwProcessId;
-  forked->uid = myself->uid;
-  forked->gid = myself->gid;
-  forked->pgid = myself->pgid;
-  forked->sid = myself->sid;
-  forked->ctty = myself->ctty;
-  forked->umask = myself->umask;
   forked->copysigs(myself);
-  forked->process_state |= PID_INITIALIZING |
-			  (myself->process_state & PID_USETTY);
   memcpy (forked->username, myself->username, MAX_USER_NAME);
-  if (myself->use_psid)
-    {
-      memcpy (forked->psid, myself->psid, MAX_SID_LEN);
-      forked->use_psid = 1;
-    }
-  memcpy (forked->logsrv, myself->logsrv, MAX_HOST_NAME);
-  memcpy (forked->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
-  forked->token = myself->token;
-  forked->impersonated = myself->impersonated;
-  forked->orig_uid = myself->orig_uid;
-  forked->orig_gid = myself->orig_gid;
-  forked->real_uid = myself->real_uid;
-  forked->real_gid = myself->real_gid;
-  strcpy (forked->root, myself->root);
-  forked->rootlen = myself->rootlen;
   set_child_mmap_ptr (forked);
+  forked.remember ();
 
   /* Wait for subproc to initialize itself. */
   if (!sync_with_child(pi, subproc_ready, TRUE, "waiting for longjmp"))
@@ -535,8 +512,6 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
 						 NULL))
 	goto cleanup;
     }
-
-  forked.remember ();
 
   /* Start thread, and wait for it to reload dlls.  */
   if (!resume_child (pi, forker_finished) ||

@@ -30,6 +30,7 @@ static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
 extern void sigreturn ();
 extern void sigdelayed ();
 extern void siglast ();
+extern DWORD __no_sig_start, __no_sig_end;
 };
 
 extern DWORD sigtid;
@@ -627,12 +628,13 @@ interrupt_setup (int sig, struct sigaction& siga, void *handler,
   sigsave.saved_errno = -1;		// Flag: no errno to save
 }
 
-static void
+static bool
 interrupt_now (CONTEXT *ctx, int sig, struct sigaction& siga, void *handler)
 {
   interrupt_setup (sig, siga, handler, ctx->Eip, 0);
   ctx->Eip = (DWORD) sigdelayed;
   SetThreadContext (myself->getthread2signal (), ctx); /* Restart the thread */
+  return 1;
 }
 
 void __stdcall
@@ -662,12 +664,13 @@ signal_fixup_after_exec (bool isspawn)
 }
 
 static int
-interrupt_on_return (DWORD ebp, int sig, struct sigaction& siga, void *handler)
+interrupt_on_return (sigthread *th, int sig, struct sigaction& siga, void *handler)
 {
   int i;
+  DWORD ebp = th->frame;
 
-  if (sigsave.sig)
-    return 0;	/* Already have a signal stacked up */
+  if (!ebp)
+    return 0;
 
   thestack.init (ebp);  /* Initialize from the input CONTEXT */
   for (i = 0; i < 32 && thestack++ ; i++)
@@ -677,12 +680,16 @@ interrupt_on_return (DWORD ebp, int sig, struct sigaction& siga, void *handler)
 	if (*addr_retaddr  == thestack.sf.AddrReturn.Offset)
 	  {
 	    interrupt_setup (sig, siga, handler, *addr_retaddr, addr_retaddr);
+	    if (ebp != th->frame)
+	      {
+		sigsave.sig = 0;
+		break;
+	      }
 	    *addr_retaddr = (DWORD) sigdelayed;
 	  }
 	return 1;
       }
 
-  api_fatal ("couldn't send signal %d", sig);
   return 0;
 }
 
@@ -700,11 +707,10 @@ static int
 call_handler (int sig, struct sigaction& siga, void *handler)
 {
   CONTEXT cx;
-  int interrupted = 1;
+  bool interrupted = 0;
   HANDLE hth = NULL;
-  DWORD ebp;
   int res;
-  int using_mainthread_frame;
+  sigthread *th;
 
 #if 0
   mainthread.lock->acquire ();
@@ -713,98 +719,101 @@ call_handler (int sig, struct sigaction& siga, void *handler)
   if (sigsave.sig)
     goto set_pending;
 
-  if (mainthread.frame)
+  for (int i = 0; !interrupted && i < 10; i++)
     {
-      ebp = mainthread.frame;
-      using_mainthread_frame = 1;
-    }
-  else
-    {
-      int i;
-      using_mainthread_frame = 0;
-#if 0
-      mainthread.lock->release ();
-#endif
-
-      hth = myself->getthread2signal ();
-      /* Suspend the thread which will receive the signal.  But first ensure that
-	 this thread doesn't have any mutos.  (FIXME: Someday we should just grab
-	 all of the mutos rather than checking for them)
-	 For Windows 95, we also have to ensure that the addresses returned by GetThreadContext
-	 are valid.
-	 If one of these conditions is not true we loop for a fixed number of times
-	 since we don't want to stall the signal handler.  FIXME: Will this result in
-	 noticeable delays?
-	 If the thread is already suspended (which can occur when a program is stopped) then
-	 just queue the signal. */
-      for (i = 0; i < SUSPEND_TRIES; i++)
+      if (mainthread.frame)
+	th = &mainthread;
+      else
 	{
-	  sigproc_printf ("suspending mainthread");
-	  res = SuspendThread (hth);
-
-	  muto *m;
-	  /* FIXME: Make multi-thread aware */
-	  for (m = muto_start.next;  m != NULL; m = m->next)
-	    if (m->unstable () || m->owner () == mainthread.id)
-	      goto owns_muto;
-
-#if 0
-	  mainthread.lock->acquire ();
-#endif
-	  if (mainthread.frame)
-	    {
-	      ebp = mainthread.frame;	/* try to avoid a race */
-	      using_mainthread_frame = 1;
-	      goto next;
-	    }
-#if 0
+	  int i;
+	  th = NULL;
+    #if 0
 	  mainthread.lock->release ();
-#endif
+    #endif
 
-	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-	  if (!GetThreadContext (hth, &cx))
+	  hth = myself->getthread2signal ();
+	  /* Suspend the thread which will receive the signal.  But first ensure that
+	     this thread doesn't have any mutos.  (FIXME: Someday we should just grab
+	     all of the mutos rather than checking for them)
+	     For Windows 95, we also have to ensure that the addresses returned by GetThreadContext
+	     are valid.
+	     If one of these conditions is not true we loop for a fixed number of times
+	     since we don't want to stall the signal handler.  FIXME: Will this result in
+	     noticeable delays?
+	     If the thread is already suspended (which can occur when a program is stopped) then
+	     just queue the signal. */
+	  for (i = 0; i < SUSPEND_TRIES; i++)
 	    {
-	      system_printf ("couldn't get context of main thread, %E");
-	      goto out;
+	      sigproc_printf ("suspending mainthread");
+	      res = SuspendThread (hth);
+
+	      /* Just set pending if thread is already suspended */
+	      if (res)
+		goto set_pending;
+
+	      muto *m;
+	      /* FIXME: Make multi-thread aware */
+	      for (m = muto_start.next;  m != NULL; m = m->next)
+		if (m->unstable () || m->owner () == mainthread.id)
+		  goto owns_muto;
+
+    #if 0
+	      mainthread.lock->acquire ();
+    #endif
+	      if (mainthread.frame)
+		{
+		  th = &mainthread;
+		  goto next;
+		}
+    #if 0
+	      mainthread.lock->release ();
+    #endif
+
+	      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	      if (!GetThreadContext (hth, &cx))
+		{
+		  system_printf ("couldn't get context of main thread, %E");
+		  goto out;
+		}
+
+	      if (interruptible (cx.Eip, 1))
+		break;
+
+	      sigproc_printf ("suspended thread in a strange state pc %p, sp %p",
+			      cx.Eip, cx.Esp);
+	      goto resume_thread;
+
+	    owns_muto:
+	      sigproc_printf ("suspended thread owns a muto (%s)", m->name);
+
+	    resume_thread:
+	      ResumeThread (hth);
+	      Sleep (0);
 	    }
 
-	  if (interruptible (cx.Eip, 1))
-	    break;
-
-	  sigproc_printf ("suspended thread in a strange state pc %p, sp %p",
-			  cx.Eip, cx.Esp);
-	  goto resume_thread;
-
-	owns_muto:
-	  sigproc_printf ("suspended thread owns a muto (%s)", m->name);
-
-	  if (res)
+	  if (i >= SUSPEND_TRIES)
 	    goto set_pending;
 
-	resume_thread:
-	  ResumeThread (hth);
-	  Sleep (0);
+	  sigproc_printf ("SuspendThread returned %d", res);
 	}
 
-      if (i >= SUSPEND_TRIES)
-	goto set_pending;
-
-      sigproc_printf ("SuspendThread returned %d", res);
-      ebp = cx.Ebp;
+    next:
+      if (th)
+	interrupted = interrupt_on_return (th, sig, siga, handler);
+      else if (interruptible (cx.Eip))
+	interrupted = interrupt_now (&cx, sig, siga, handler);
+      else
+	break;
     }
 
-next:
-  if (!using_mainthread_frame && interruptible (cx.Eip))
-    interrupt_now (&cx, sig, siga, handler);
-  else if (!interrupt_on_return (ebp, sig, siga, handler))
+set_pending:
+  if (!interrupted)
     {
-    set_pending:
       pending_signals = 1;	/* FIXME: Probably need to be more tricky here */
       sig_set_pending (sig);
-      interrupted = 0;
+      sigproc_printf ("couldn't send signal %d", sig);
     }
-
-  if (interrupted)
+  else
     {
       res = SetEvent (signal_arrived);	// For an EINTR case
       sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
@@ -882,6 +891,9 @@ set_process_mask (sigset_t newmask)
   mask_sync->release ();
   if (oldmask != newmask && GetCurrentThreadId () != sigtid)
     sig_dispatch_pending ();
+  else
+    sigproc_printf ("not calling sig_dispatch_pending.  sigtid %p current %p",
+		    sigtid, GetCurrentThreadId ());
   return;
 }
 
@@ -1099,7 +1111,7 @@ __asm__ volatile ("
 	.text
 
 _sigreturn:
-	addl	$4,%%esp
+	addl	$4,%%esp	# Remove argument
 	movl	%%esp,%%ebp
 	addl	$36,%%ebp
 	call	_set_process_mask@4
@@ -1118,6 +1130,7 @@ _sigreturn:
 	popf
 	ret
 
+__no_sig_start:
 _sigdelayed:
 	pushl	%2	# original return address
 	pushf
@@ -1132,6 +1145,8 @@ _sigdelayed:
 	pushl	%3	# oldmask
 	pushl	%4	# signal argument
 	pushl	$_sigreturn
+	pushl	%%ebp
+	movl	%%esp,%%esp
 
 	call	_reset_signal_arrived@0
 	movl	$0,%0
@@ -1141,7 +1156,9 @@ _sigdelayed:
 	pushl	$0
 	call	_sig_dispatch_pending@4
 
-2:	jmp	*%5
+2:	popl	%%ebp
+	jmp	*%5
+__no_sig_end:
 
 " : "=m" (sigsave.sig) : "m" (&_impure_ptr->_errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),

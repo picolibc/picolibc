@@ -44,6 +44,9 @@ public:
   /* Handle associated with initial Windows pid which started it all. */
   HANDLE pid_handle;
 
+  /* Handle to the logical parent of this pid. */
+  HANDLE ppid_handle;
+
   /* Parent process id.  */
   pid_t ppid;
 

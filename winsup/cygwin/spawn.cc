@@ -707,22 +707,6 @@ skip_arg_parsing:
 	}
       child->username[0] = '\0';
       child->progname[0] = '\0';
-      child->ppid = myself->pid;
-      child->gid = myself->gid;
-      child->pgid = myself->pgid;
-      child->sid = myself->sid;
-      child->ctty = myself->ctty;
-      child->umask = myself->umask;
-      child->process_state |= PID_INITIALIZING;
-      if (myself->use_psid)
-	{
-	  child->use_psid = 1;
-	  memcpy (child->psid, myself->psid, MAX_SID_LEN);
-	}
-      memcpy (child->logsrv, myself->logsrv, MAX_HOST_NAME);
-      memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
-      memcpy (child->root, myself->root, MAX_PATH+1);
-      child->rootlen = myself->rootlen;
       child->dwProcessId = pi.dwProcessId;
       child->hProcess = pi.hProcess;
       child.remember ();
@@ -808,20 +792,17 @@ skip_arg_parsing:
 	{
 	  int rc = 0;
 	  HANDLE oldh = myself->hProcess;
-	  HANDLE h = OpenProcess (PROCESS_ALL_ACCESS, FALSE,
-				  parent->dwProcessId);
+	  HANDLE h = myself->ppid_handle;
 	  sigproc_printf ("parent handle %p, pid %d", h, parent->dwProcessId);
 	  if (h == NULL && GetLastError () == ERROR_INVALID_PARAMETER)
-	    rc = 1;
+	    rc = 0;
 	  else if (h)
 	    {
-	      ProtectHandle (h);
 	      rc = DuplicateHandle (hMainProc, pi.hProcess,
 				    h, &myself->hProcess, 0, FALSE,
 				    DUPLICATE_SAME_ACCESS);
 	      sigproc_printf ("%d = DuplicateHandle, oldh %p, newh %p",
 			      rc, oldh, myself->hProcess);
-	      ForceCloseHandle (h);
 	    }
 	  if (!rc)
 	    {
