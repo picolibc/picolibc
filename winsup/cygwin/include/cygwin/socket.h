@@ -40,6 +40,10 @@ struct msghdr
 	int		msg_accrightslen;	/* Length of rights list */
 };
 
+#ifndef socklen_t
+#define socklen_t int
+#endif
+
 /* Socket types. */
 #define SOCK_STREAM	1		/* stream (connection) socket	*/
 #define SOCK_DGRAM	2		/* datagram (conn.less) socket	*/

@@ -900,6 +900,17 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
   fhandler_socket *sock = get (fd);
   if (sock)
     {
+      /* Allows NULL peer and len parameters. */
+      struct sockaddr_in peer_dummy;
+      int len_dummy;
+      if (!peer)
+        peer = (struct sockaddr *) &peer_dummy;
+      if (!len)
+        {
+	  len_dummy = sizeof (struct sockaddr_in);
+	  len = &len_dummy;
+	}
+
       /* accept on NT fails if len < sizeof (sockaddr_in)
        * some programs set len to
        * sizeof (name.sun_family) + strlen (name.sun_path) for UNIX domain
