@@ -1,5 +1,10 @@
 2002-04-17  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * libc/sys/linux/signal.c: Remove include of <bits/sigset.h>.
+        * libc/sys/linux/sys/signal.h: Add include of <bits/sigset.h>.
+
+2002-04-17  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/time/time.tex: Add tzset info.
 
 2002-04-17  Jeff Johnston  <jjohnstn@redhat.com>

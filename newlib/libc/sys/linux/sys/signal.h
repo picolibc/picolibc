@@ -8,6 +8,7 @@
 
 #include <sys/types.h>
 #include <linux/signal.h>
+#include <bits/sigset.h>
 
 /* --- include/signal.h thinks it knows better :-( --- */
 

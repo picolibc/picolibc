@@ -6,7 +6,6 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <bits/sigset.h>
 #include <machine/syscall.h>
 
 /* avoid name space pollution */
