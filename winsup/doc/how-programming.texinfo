@@ -235,8 +235,8 @@ rewriting the runtime library in question from specs...
 
 Install all required components in one directory (we'll call it /src).
 Ideally, you should check out what you need from CVS
-(@file{http://cygwin.com/cvs.html}).  This is the @emph(preferred
-method) for acquiring the sources.  Otherwise, you can install the
+(@file{http://cygwin.com/cvs.html}).  This is the @emph{preferred
+method} for acquiring the sources.  Otherwise, you can install the
 appropriate source packages from the cygwin distribution.
 
 As of this writing, you need to install at least the cygwin source
