@@ -397,8 +397,8 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
   GlobalMemoryStatus (&memory_status);
   mem_total = memory_status.dwTotalPhys;
   mem_free = memory_status.dwAvailPhys;
-  swap_total = memory_status.dwTotalPageFile;
-  swap_free = memory_status.dwAvailPageFile;
+  swap_total = memory_status.dwTotalPageFile - mem_total;
+  swap_free = memory_status.dwAvailPageFile - mem_total;
   return __small_sprintf (destbuf, "         total:      used:      free:\n"
 				   "Mem:  %10lu %10lu %10lu\n"
 				   "Swap: %10lu %10lu %10lu\n"
