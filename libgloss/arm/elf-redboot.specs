@@ -4,5 +4,5 @@
 -T redboot.ld%s -Ttext 0x20000 %(old_link)
 
 *startfile:
-crtbegin%O%s redboot-crt0%O%s redboot-syscalls%O%s
+crti%O%s crtbegin%O%s redboot-crt0%O%s redboot-syscalls%O%s
 
