@@ -1076,6 +1076,7 @@ cygwin_attach_handle_to_fd
 cygwin32_attach_handle_to_fd = cygwin_attach_handle_to_fd
 cygwin_internal
 cygwin32_internal = cygwin_internal
+pthread_atfork
 pthread_attr_destroy
 pthread_attr_getdetachstate
 pthread_attr_getinheritsched

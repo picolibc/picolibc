@@ -1,3 +1,16 @@
+Fri Apr 13 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* fork.cc (fork_child): Call the __pthread_atforkchild function.
+	(fork_parent): Call the __pthread_atforkparent function.
+	* cygwin.din: Export pthread_atfork.
+	* thread.h (callback): New class.
+	(MTinterface): Use it.
+	* thread.cc (__pthread_atforkprepare): New function.
+	(__pthread_atforkparent): New function.
+	(__pthread_atforkchild): New function.
+	(__pthread_atfork): New function.
+	* pthread.cc (pthread_atfork): New function.
+
 Fri Apr 13  9:52:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (add_ext_from_sym): New define evaluating `known'suffix'.

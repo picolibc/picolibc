@@ -935,6 +935,124 @@ __pthread_testcancel (void)
    * does something*/
 }
 
+/*
+ * Races in pthread_atfork:
+ * We are race safe in that any additions to the lists are made via 
+ * InterlockedExchangePointer.
+ * However, if the user application doesn't perform syncronisation of some sort
+ * It's not guaranteed that a near simultaneous call to pthread_atfork and fork 
+ * will result in the new atfork handlers being calls.
+ * More rigorous internal syncronisation isn't needed as the user program isn't 
+ * guaranteeing their own state. 
+ *
+ * as far as multiple calls to pthread_atfork, the worst case is simultaneous calls
+ * will result in an indeterminate order for parent and child calls (what gets inserted
+ * first isn't guaranteed.)
+ *
+ * There is one potential race... Does the result of InterlockedExchangePointer 
+ * get committed to the return location _before_ any context switches can occur?
+ * If yes, we're safe, if no, we're not.
+ */
+void
+__pthread_atforkprepare(void)
+{
+  callback *cb=MT_INTERFACE->pthread_prepare;
+  while (cb)
+    {
+      cb->cb();
+      cb=cb->next;
+    }
+}
+
+void 
+__pthread_atforkparent(void)
+{
+  callback *cb=MT_INTERFACE->pthread_parent;
+  while (cb)
+    {
+      cb->cb();
+      cb=cb->next;
+    }
+}
+
+void
+__pthread_atforkchild(void)
+{
+  callback *cb=MT_INTERFACE->pthread_child;
+  while (cb)
+    {
+      cb->cb();
+      cb=cb->next;
+    }
+}
+
+/* FIXME: implement InterlockExchangePointer and get rid of the silly typecasts below
+ */
+#define InterlockedExchangePointer InterlockedExchange
+
+/* Register a set of functions to run before and after fork. 
+ * prepare calls are called in LI-FC order.
+ * parent and child calls are called in FI-FC order.
+ */
+int
+__pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
+{
+  callback * prepcb=NULL, * parentcb=NULL, * childcb=NULL;
+  if (prepare)
+    {
+      prepcb = new callback;
+      if (!prepcb)
+	return ENOMEM;
+    }
+  if (parent)
+    {
+      parentcb = new callback;
+      if (!parentcb)
+	{
+	  if (prepcb)
+	    delete prepcb;
+	  return ENOMEM;
+	}
+    }
+  if (child)
+    {
+      childcb = new callback;
+      if (!childcb)
+	{
+	  if (prepcb)
+	    delete prepcb;
+	  if (parentcb)
+	    delete parentcb;
+	  return ENOMEM;
+	}
+    }
+
+  if (prepcb)
+  {
+    prepcb->cb = prepare;
+    prepcb->next=(callback *)InterlockedExchangePointer((LONG *) &MT_INTERFACE->pthread_prepare, (long int) prepcb);
+  }
+  if (parentcb)
+  {
+    parentcb->cb = parent;
+    callback ** t = &MT_INTERFACE->pthread_parent;
+    while (*t)
+      t = &(*t)->next;
+    /* t = pointer to last next in the list */
+    parentcb->next=(callback *)InterlockedExchangePointer((LONG *)t, (long int) parentcb);
+  }
+  if (childcb)
+  {
+    childcb->cb = child;
+    callback ** t = &MT_INTERFACE->pthread_child;
+    while (*t)
+      t = &(*t)->next;
+    /* t = pointer to last next in the list */
+    childcb->next=(callback *)InterlockedExchangePointer((LONG *)t, (long int) childcb);
+  }
+  return 0;
+}
+
 int
 __pthread_attr_init (pthread_attr_t * attr)
 {

@@ -370,9 +370,8 @@ fhandler_base::open (int flags, mode_t mode)
 		   file_attributes,
 		   0);
 
-  syscall_printf ("%d = CreateFileA (%s, %p, %p, %p, %p, %p, 0)",
-		  x,
-		  get_win32_name (), access_, shared,
+  syscall_printf ("%p = CreateFileA (%s, %p, %p, %p, %p, %p, 0)",
+		  x, get_win32_name (), access_, shared,
 		  &sec_none, creation_distribution,
 		  file_attributes);
 

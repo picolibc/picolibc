@@ -30,6 +30,12 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 }
 
 int
+pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
+{
+  return __pthread_atfork(prepare, parent, child);
+}
+
+int
 pthread_attr_init (pthread_attr_t * attr)
 {
   return __pthread_attr_init (attr);

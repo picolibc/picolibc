@@ -317,6 +317,13 @@ public:
    ~semaphore ();
 };
 
+class callback
+{
+public:
+  void (*cb)(void);
+  class callback * next;
+};
+
 class MTinterface
 {
 public:
@@ -333,14 +340,23 @@ public:
   pthread mainthread;
 
   pthread_key_destructor_list destructors;
+  callback *pthread_prepare;
+  callback *pthread_child;
+  callback *pthread_parent;
 
   void Init (int);
 
-    MTinterface ():reent_index (0), indexallocated (0)
+    MTinterface ():reent_index (0), indexallocated (0) 
   {
+    pthread_prepare = NULL;
+    pthread_child   = NULL;
+    pthread_parent  = NULL;
   }
 };
 
+void __pthread_atforkprepare(void);
+void __pthread_atforkparent(void);
+void __pthread_atforkchild(void);
 
 extern "C"
 {
@@ -350,6 +366,7 @@ void *thread_init_wrapper (void *);
 int __pthread_create (pthread_t * thread, const pthread_attr_t * attr,
 		      void *(*start_routine) (void *), void *arg);
 int __pthread_once (pthread_once_t *, void (*)(void));
+int __pthread_atfork(void (*)(void), void (*)(void), void (*)(void));
 
 int __pthread_attr_init (pthread_attr_t * attr);
 int __pthread_attr_destroy (pthread_attr_t * attr);
