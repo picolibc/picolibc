@@ -712,7 +712,7 @@ middle mouse buttons, respectively.  It will honor settings in your
 
 Don't invoke as simply ``rxvt'' because that will run /bin/sh (really
 ash) which is not a good interactive shell.  For details see
-@code{/usr/share/doc/Cygwin/rxvt-<ver>.README}.
+@code{/usr/doc/Cygwin/rxvt-<ver>.README}.
 
 @subsection info error "dir: No such file or directory"
 

@@ -301,13 +301,12 @@ rewriting the runtime library in question from specs...
 
 Thanks to Jacob Navia (root at jacob dot remcomp dot fr) for this explanation.
 
-@subsection How do I rebuild the tools on my NT box?
+@subsection How do I build Cygwin on my own?
 
-Install all required components in one directory (we'll call it /src).
-Ideally, you should check out what you need from CVS
-(@file{http://cygwin.com/cvs.html}).  This is the @emph{preferred
-method} for acquiring the sources.  Otherwise, you can install the
-appropriate source packages from the cygwin distribution.
+First, you need to get the Cygwin source.  Ideally, you should check out
+what you need from CVS (@file{http://cygwin.com/cvs.html}).  This is the
+@emph{preferred method} for acquiring the sources.  Otherwise, you can
+install the cygwin source package from the distribution.
 
 If you are trying to duplicate a cygwin release then you should just
 download the corresponding source package and use "tar xjf" to unpack
@@ -315,63 +314,65 @@ it.  This will unpack the sources into a directory named cygwin-x.y.z-n,
 where x.y.z-n correspond to the version numbering of the tar.bz2
 package.
 
-You @emph{must} build cygwin in a separate directory from the source.
-So, create something like a /obj directory.  You'll be performing
-your build in that directory:
+@example
+tar xjf cygwin-1.5.12-1-src.tar.bz2
+cd cygwin-1.5.12-1
+@end example
+
+You @emph{must} build cygwin in a separate directory from the source,
+so create something like a @samp{build/} directory.  You will also want
+to install to a temporary location:
 
 @example
-bash
-cd /obj
-/src/configure --prefix=/install -v > configure.log 2>&1
-make > make.log 2>&1
+mkdir build
+mkdir /install 
+cd build
+(../configure --prefix=/install -v; make) >& make.out
 make install > install.log 2>&1
 @end example
 
-Normally, this procedure ignore errors in building the documentation,
-which requires tools which are not included in the Cygwin distribution.
-If you want to build the documentation on Linux, on most distributions a
-package named docbook-utils should get you most of what you need. For
-more information on building the documentation, see the README included
-in the cygwin-doc package.
+Normally, this procedure ignore errors in building the documentation.
+which requires the @samp{docbook-xml}, @samp{docbook-xsl}, and
+@samp{xmlto} packages.  For more information on building the
+documentation, see the README included in the cygwin-doc package.
 
-To check a cygwin1.dll, run "make check" in the winsup/testsuite directory.
-If that works, install everything @emph{except} the dll (if you can).
-Then, close down all cygwin programs (including bash windows, inetd,
-etc.), save your old dll, and copy the new dll to the correct place.
-Then start up a bash window, or  run a cygwin program from the Windows
-command prompt, and see what happens.
+To check a cygwin1.dll, run "make check" in the winsup/testsuite
+directory.  If that works, install everything @emph{except} the dll (if
+you can).  Then, close down all cygwin programs (including bash windows,
+inetd, etc.), save your old dll, and copy the new dll to the correct
+place.  Then start up a bash window, or  run a cygwin program from the
+Windows command prompt, and see what happens.
 
 If you get the error "shared region is corrupted" it means that two
 different versions of cygwin1.dll are running on your machine at the
 same time. Remove all but one. 
 
-@subsection How can I compile a powerpc NT toolchain?
+@subsection I may have found a bug in Cygwin, how can I debug it (the symbols in gdb look funny)?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+Debugging symbols are stripped from distibuted Cygwin binaries, so any
+symbols that you see in gdb are basically meaningless. It is also a good
+idea to use the latest code in case the bug has been fixed, so we
+recommend trying the latest snapshot from
+@file{http://cygwin.com/snapshots/} or build the DLL from CVS.
 
-Unfortunately, this will be difficult.  It hasn't been built for
-some time (late 1996) since Microsoft has dropped development of
-powerpc NT.  Exception handling/signals support semantics/args have been
-changed for x86 and not updated for ppc so the ppc specific support would
-have to be rewritten.  We don't know of any other incompatibilities.
-Please send us patches if you do this work!
+To build a debugging version of the Cygwin DLL, you will need to follow
+the instructions at @file{http://cygwin.com/faq/faq_3.html#SEC102},
+adding the @samp{--enable-debugging} option to @samp{../configure}.  You
+can also contact the mailing list for pointers (a simple test case that
+demonstrates the bug is always welcome).
 
-@subsection How can I compile an Alpha NT toolchain?
+@subsection How can I compile Cygwin for an unsupported platform (PowerPC, Alpha, ARM, Itanium)?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-We have not ported the tools to Alpha NT and do not have plans to
-do so at the present time.  We would be happy to add support
-for Alpha NT if someone contributes the changes to us.
+Unfortunately, this will be difficult.  Exception handling and signals
+support semantics and args have been designed for x86 so you would need
+to write specific support for your platform.  We don't know of any other
+incompatibilities. Please send us patches if you do this work!
 
 @subsection How can I adjust the heap/stack size of an application?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-Pass heap/stack linker arguments to gcc.  To create foo.exe with
+If you need to change the maximum amount of memory available to Cygwin, see
+@file{http://cygwin.com/cygwin-ug-net/setup-maxmem.html}. Otherwise,
+just pass heap/stack linker arguments to gcc.  To create foo.exe with
 a heap size of 1024 and a stack size of 4096, you would invoke
 gcc as:
 
@@ -398,11 +399,8 @@ bash.)
 
 @subsection How do I build a DLL?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-There's documentation that explains the process on the main Cygwin
-project web page (http://cygwin.com/).
+There's documentation that explains the process in the Cygwin User's
+Guide here: @file{http://cygwin.com/cygwin-ug-net/dll.html}
 
 @subsection How can I set a breakpoint at MainCRTStartup?
 
@@ -541,9 +539,6 @@ SIGINT may work, SIGFPE may work, SIGSEGV definitely does.  You cannot
 process being debugged.
 
 @subsection The linker complains that it can't find something.
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 A common error is to put the library on the command line before
 the thing that needs things from it.

@@ -272,6 +272,10 @@ It's up to you to deal with other changes you made to your system, such
 as installing the inetd service, altering system paths, etc.  Setup
 would not have done any of these things for you.
 
+If you want to save your mount points for a later reinstall, save the
+output of @samp{mount -m} as described at
+@file{http://cygwin.com/cygwin-ug-net/using-utils.html#mount}.
+
 @subsection How do I install snapshots?
 
 First, are you sure you want to do this?  Snapshots are risky.  They
