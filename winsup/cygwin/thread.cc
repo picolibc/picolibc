@@ -1,9 +1,9 @@
-/*thread.cc: Locking and threading module functions
+/* thread.cc: Locking and threading module functions
 
    Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
 
    Originally written by Marco Fuykschot <marco@ddi.nl>
-   Substantialy enhanced by Robert Collins <<rbtcollins@hotmail.com>
+   Substantialy enhanced by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.
 
@@ -435,7 +435,7 @@ pthread_cond::pthread_cond (pthread_condattr *attr):verifyable_object (PTHREAD_C
   if (!this->win32_obj_id)
     magic = 0;
   /* threadsafe addition is easy */
-  next = (pthread_cond *)InterlockedExchangePointer (&MT_INTERFACE->conds, this);
+  next = (pthread_cond *) InterlockedExchangePointer (&MT_INTERFACE->conds, this);
 }
 
 pthread_cond::~pthread_cond ()
@@ -658,7 +658,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREA
   condwaits = 0;
   pshared = PTHREAD_PROCESS_PRIVATE;
   /* threadsafe addition is easy */
-  next = (pthread_mutex *)InterlockedExchangePointer (&MT_INTERFACE->mutexs, this);
+  next = (pthread_mutex *) InterlockedExchangePointer (&MT_INTERFACE->mutexs, this);
 }
 
 pthread_mutex::~pthread_mutex ()
@@ -759,7 +759,7 @@ semaphore::semaphore (int pshared, unsigned int value):verifyable_object (SEM_MA
   this->shared = pshared;
   currentvalue = value;
   /* threadsafe addition is easy */
-  next = (semaphore *)InterlockedExchangePointer (&MT_INTERFACE->semaphores, this);
+  next = (semaphore *) InterlockedExchangePointer (&MT_INTERFACE->semaphores, this);
 }
 
 semaphore::~semaphore ()
@@ -1294,7 +1294,7 @@ __pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(voi
   if (prepcb)
   {
     prepcb->cb = prepare;
-    prepcb->next = (callback *)InterlockedExchangePointer ((LONG *) &MT_INTERFACE->pthread_prepare, (long int) prepcb);
+    prepcb->next = (callback *) InterlockedExchangePointer ((LONG *) &MT_INTERFACE->pthread_prepare, (long int) prepcb);
   }
   if (parentcb)
   {
@@ -1303,7 +1303,7 @@ __pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(voi
     while (*t)
       t = &(*t)->next;
     /*t = pointer to last next in the list */
-    parentcb->next = (callback *)InterlockedExchangePointer ((LONG *) t, (long int) parentcb);
+    parentcb->next = (callback *) InterlockedExchangePointer ((LONG *) t, (long int) parentcb);
   }
   if (childcb)
   {
@@ -1312,7 +1312,7 @@ __pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(voi
     while (*t)
       t = &(*t)->next;
     /*t = pointer to last next in the list */
-    childcb->next = (callback *)InterlockedExchangePointer ((LONG *) t, (long int) childcb);
+    childcb->next = (callback *) InterlockedExchangePointer ((LONG *) t, (long int) childcb);
   }
   return 0;
 }
