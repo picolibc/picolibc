@@ -351,7 +351,7 @@ fhandler_disk_file::fhandler_disk_file (DWORD devtype) :
 }
 
 fhandler_disk_file::fhandler_disk_file () :
-  fhandler_base (FH_DISK)
+  fhandler_base (FH_FS)
 {
 }
 
@@ -717,8 +717,8 @@ fhandler_disk_file::closedir (DIR *dir)
   return 0;
 }
 
-fhandler_cygdrive::fhandler_cygdrive (int unit) :
-  fhandler_disk_file (FH_CYGDRIVE), unit (unit), ndrives (0), pdrive (NULL)
+fhandler_cygdrive::fhandler_cygdrive () :
+  fhandler_disk_file (FH_CYGDRIVE), ndrives (0), pdrive (NULL)
 {
 }
 
