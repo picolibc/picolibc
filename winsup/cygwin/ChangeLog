@@ -1,5 +1,10 @@
 2001-10-30  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (signal_exit): Weight the odds against the main thread
+	running when signal thread is exiting.
+
+2001-10-30  Christopher Faylor  <cgf@redhat.com>
+
 	* sigproc.cc (sigproc_terminate): Don't signal main thread when exiting.
 	* sigproc.h (sigframe): Decorate some methods with `inline'.
 	(new_muto): Coerce pointer to new to void *.
@@ -58,10 +63,6 @@
 	(fhandler_base::open): Remove namehash setting.
 	(fhandler_base::fstat): Subtract 1 from arbitrary time setting to avoid
 	strange ls -l granularity problem.
-
-2001-10-24  Christopher Faylor  <cgf@redhat.com>
-
-        * shared_info.h (MOUNT_VE
 
 2001-10-29  Christopher Faylor  <cgf@redhat.com>
 
