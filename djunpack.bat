@@ -17,8 +17,8 @@ Rem
 Rem The following 2 lines need to be changed with each new GDB release, to
 Rem be identical to the name of the top-level directory where the GDB
 Rem distribution unpacks itself.
-set GDBVER=gdb-gdb-4.95.0
-if "%GDBVER%"=="gdb-gdb-4.95.0" GoTo EnvOk
+set GDBVER=gdb-4.95.0
+if "%GDBVER%"=="gdb-4.95.0" GoTo EnvOk
 Rem If their environment space is too small, re-exec with a larger one
 command.com /e:4096 /c %0 %1
 GoTo End
@@ -31,7 +31,7 @@ Rem an empty fnchange.tmp even if the command failed for some reason.
 copy fnchange.tmp junk.tmp > nul
 if not exist junk.tmp GoTo NoDjTar
 del junk.tmp
-sed -e 's,^,%GDBVER%,' -e 's,  *, %GDBVER%,' < fnchange.tmp > fnchange.lst
+sed -e 's,@V@,%GDBVER%,g' < fnchange.tmp > fnchange.lst
 Rem See the comment above about the reason for using COPY.
 copy fnchange.lst junk.tmp > nul
 if not exist junk.tmp GoTo NoSed

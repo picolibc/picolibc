@@ -1,3 +1,8 @@
+2000-05-08  Eli Zaretskii  <eliz@is.elta.co.il>
+
+	* djunpack.bat: Change the Sed script to replace @V@ in fnchange.lst
+        with the version name.
+
 Thu Apr 27 11:01:48 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* Makefile.in (do-tar-bz2, do-md5sum): Skip CVS directories when
