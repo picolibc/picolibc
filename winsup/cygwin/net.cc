@@ -90,7 +90,13 @@ wsock_event::wait (int socket, LPDWORD flags)
 	ret = (int) len;
       break;
     case WSA_WAIT_EVENT_0 + 1:
-      WSASetLastError (WSAEINTR);
+      if (!CancelIo ((HANDLE)socket))
+	{
+	  debug_printf ("CancelIo() %E, fallback to blocking io");
+	  WSAGetOverlappedResult(socket, &ovr, &len, TRUE, flags);
+        }
+      else
+        WSASetLastError (WSAEINTR);
       break;
     case WSA_WAIT_FAILED:
       break;
