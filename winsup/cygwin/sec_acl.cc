@@ -107,7 +107,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 
   cygsid sid;
   struct passwd *pw;
-  struct __group16 *gr;
+  struct __group32 *gr;
   int pos;
 
   if (!InitializeAcl (acl, 3072, ACL_REVISION))
@@ -172,7 +172,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	  break;
 	case GROUP:
 	case DEF_GROUP:
-	  if (!(gr = getgrgid (aclbufp[i].a_id))
+	  if (!(gr = getgrgid32 (aclbufp[i].a_id))
 	      || !sid.getfromgr (gr)
 	      || !add_access_allowed_ace (acl, ace_off++, allow,
 					   sid, acl_len, inheritance))
@@ -256,7 +256,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
   PSID group_sid;
   BOOL dummy;
   __uid16_t uid;
-  __gid16_t gid;
+  __gid32_t gid;
 
   if (!GetSecurityDescriptorOwner (psd, &owner_sid, &dummy))
     {
@@ -424,7 +424,7 @@ acl_access (const char *path, int flags)
 	      cygsid owner;
 	      cygsid group;
 	      struct passwd *pw;
-	      struct __group16 *gr = NULL;
+	      struct __group32 *gr = NULL;
 
 	      if ((pw = getpwuid (acls[i].a_id)) != NULL
 		  && owner.getfrompw (pw))
@@ -994,7 +994,7 @@ aclfromtext (char *acltextp, int *)
 	      c += 5;
 	      if (isalpha (*c))
 		{
-		  struct __group16 *gr = getgrnam (c);
+		  struct __group32 *gr = getgrnam32 (c);
 		  if (!gr)
 		    {
 		      set_errno (EINVAL);

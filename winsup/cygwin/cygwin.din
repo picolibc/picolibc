@@ -100,6 +100,7 @@ chmod
 _chmod = chmod
 chown
 _chown = chown
+chown32
 cleanup_glue
 clearerr
 _clearerr = clearerr
@@ -205,6 +206,7 @@ fchmod
 _fchmod = fchmod
 fchown
 _fchown = fchown
+fchown32
 fclose
 _fclose = fclose
 fcntl
@@ -344,16 +346,21 @@ getdtablesize
 _getdtablesize = getdtablesize
 getegid
 _getegid = getegid
+getegid32
 geteuid
 _geteuid = geteuid
 getgid
 _getgid = getgid
+getgid32
 getgrgid
 _getgrgid = getgrgid
+getgrgid32
 getgrnam
 _getgrnam = getgrnam
+getgrnam32
 getgroups
 _getgroups = getgroups
+getgroups32
 gethostname = cygwin_gethostname
 _gethostname = cygwin_gethostname
 getlogin
@@ -412,6 +419,7 @@ _infinity = infinity
 infinityf
 _infinityf = infinityf
 initgroups
+initgroups32
 ioctl
 _ioctl = ioctl
 iprintf
@@ -468,6 +476,7 @@ labs
 _labs = labs
 lchown
 _lchown = lchown
+lchown32
 ldexp
 _ldexp = ldexp
 ldexpf
@@ -658,6 +667,7 @@ setdtablesize
 _setdtablesize = setdtablesize
 setgid
 _setgid = setgid
+setgid32
 setjmp
 _setjmp = setjmp
 setlocale
@@ -674,6 +684,7 @@ seteuid
 _seteuid = seteuid
 setegid
 _setegid = setegid
+setegid32
 setuid
 _setuid = setuid
 setutent
@@ -1013,6 +1024,7 @@ getpgrp
 _getpgrp = getpgrp
 getgrent
 _getgrent = getgrent
+getgrent32
 ntohl
 _ntohl = ntohl
 htonl

@@ -750,11 +750,11 @@ done:
  * systems, it is only a stub that always returns zero.
  */
 static int
-chown_worker (const char *name, unsigned fmode, __uid16_t uid, __gid16_t gid)
+chown_worker (const char *name, unsigned fmode, __uid16_t uid, __gid32_t gid)
 {
   int res;
   __uid16_t old_uid;
-  __gid16_t old_gid;
+  __gid32_t old_gid;
 
   if (check_null_empty_str_errno (name))
     return -1;
@@ -815,21 +815,35 @@ done:
 }
 
 extern "C" int
-chown (const char * name, __uid16_t uid, __gid16_t gid)
+chown32 (const char * name, __uid16_t uid, __gid32_t gid)
 {
   sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
 }
 
 extern "C" int
-lchown (const char * name, __uid16_t uid, __gid16_t gid)
+chown (const char * name, __uid16_t uid, __gid16_t gid)
+{
+  sigframe thisframe (mainthread);
+  return chown_worker (name, PC_SYM_FOLLOW, uid, (__gid32_t) gid);
+}
+
+extern "C" int
+lchown32 (const char * name, __uid16_t uid, __gid32_t gid)
 {
   sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid);
 }
 
 extern "C" int
-fchown (int fd, __uid16_t uid, __gid16_t gid)
+lchown (const char * name, __uid16_t uid, __gid16_t gid)
+{
+  sigframe thisframe (mainthread);
+  return chown_worker (name, PC_SYM_NOFOLLOW, uid, (__gid32_t) gid);
+}
+
+extern "C" int
+fchown32 (int fd, __uid16_t uid, __gid32_t gid)
 {
   sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
@@ -851,6 +865,12 @@ fchown (int fd, __uid16_t uid, __gid16_t gid)
   syscall_printf ("fchown (%d,...): calling chown_worker (%s,FOLLOW,...)",
 		  fd, path);
   return chown_worker (path, PC_SYM_FOLLOW, uid, gid);
+}
+
+extern "C" int
+fchown (int fd, __uid16_t uid, __gid16_t gid)
+{
+  return fchown32 (fd, uid, (__gid32_t) gid);
 }
 
 /* umask: POSIX 5.3.3.1 */
@@ -895,7 +915,7 @@ chmod (const char *path, mode_t mode)
       SetFileAttributes (win32_path, (DWORD) win32_path & ~FILE_ATTRIBUTE_READONLY);
 
       __uid16_t uid;
-      __gid16_t gid;
+      __gid32_t gid;
 
       if (win32_path.isdir ())
 	mode |= S_IFDIR;
@@ -1912,16 +1932,6 @@ mkfifo (const char *_path, mode_t mode)
   return -1;
 }
 
-/* setgid: POSIX 4.2.2.1 */
-extern "C" int
-setgid (__gid16_t gid)
-{
-  int ret = setegid (gid);
-  if (!ret)
-    cygheap->user.real_gid = myself->gid;
-  return ret;
-}
-
 /* setuid: POSIX 4.2.2.1 */
 extern "C" int
 setuid (__uid16_t uid)
@@ -1966,7 +1976,7 @@ seteuid (__uid16_t uid)
 
   pw_new = getpwuid (uid);
   if (!usersid.getfrompw (pw_new) ||
-      (!pgrpsid.getfromgr (getgrgid (myself->gid))))
+      (!pgrpsid.getfromgr (getgrgid32 (myself->gid))))
     {
       set_errno (EINVAL);
       return -1;
@@ -2137,7 +2147,7 @@ seteuid (__uid16_t uid)
 
 /* setegid: from System V.  */
 extern "C" int
-setegid (__gid16_t gid)
+setegid32 (__gid32_t gid)
 {
   if ((!wincap.has_security ()) ||
       (gid == ILLEGAL_GID))
@@ -2147,7 +2157,7 @@ setegid (__gid16_t gid)
   cygsid gsid;
   HANDLE ptok;
 
-  if (!(gsid.getfromgr (getgrgid (gid))))
+  if (!(gsid.getfromgr (getgrgid32 (gid))))
     {
       set_errno (EINVAL);
       return -1;
@@ -2182,6 +2192,31 @@ setegid (__gid16_t gid)
       && !ImpersonateLoggedOnUser (cygheap->user.token))
     system_printf ("Impersonating in setegid failed: %E");
   return 0;
+}
+
+extern "C" int
+setegid (__gid16_t gid)
+{
+  return setegid32 ((__gid32_t) gid);
+}
+
+/* setgid: POSIX 4.2.2.1 */
+extern "C" int
+setgid32 (__gid32_t gid)
+{
+  int ret = setegid32 (gid);
+  if (!ret)
+    cygheap->user.real_gid = myself->gid;
+  return ret;
+}
+
+extern "C" int
+setgid (__gid16_t gid)
+{
+  int ret = setegid32 ((__gid32_t) gid);
+  if (!ret)
+    cygheap->user.real_gid = myself->gid;
+  return ret;
 }
 
 /* chroot: privileged Unix system call.  */

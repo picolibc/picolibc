@@ -97,9 +97,9 @@ class cygheap_user
   PSID   orig_psid;     /* Remains intact even after impersonation */
 public:
   __uid16_t orig_uid;      /* Remains intact even after impersonation */
-  __uid16_t orig_gid;      /* Ditto */
+  __gid32_t orig_gid;      /* Ditto */
   __uid16_t real_uid;      /* Remains intact on seteuid, replaced by setuid */
-  __gid16_t real_gid;      /* Ditto */
+  __gid32_t real_gid;      /* Ditto */
 
   /* token is needed if set(e)uid should be called. It can be set by a call
      to `set_impersonation_token()'. */

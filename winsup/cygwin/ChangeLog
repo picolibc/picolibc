@@ -1,3 +1,27 @@
+2002-05-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	Change internal gid datatype from __gid16_t to __gid32_t
+	throughout.
+	* cygwin.din: Export new symbols chown32, fchown32, getegid32,
+	getgid32, getgrgid32, getgrnam32, getgroups32, initgroups32, lchown32,
+	setgid32, setegid32, getgrent32.
+	* grp.cc (grp32togrp16): New static function.
+	(getgrgid32): New function.
+	(getgrnam32): Ditto.
+	(getgrent32): Ditto.
+	(getgroups32): Change name of internal function from getgroups.
+	(getgroups32): New function.
+	(initgroups32): Ditto.
+	* syscalls.cc (chown32): Ditto.
+	(lchown32): Ditto.
+	(fchown32): Ditto.
+	(setegid32): Ditto.
+	(setgid32): Ditto.
+	* uinfo.cc (getgid32): Ditto.
+	(getegid32): Ditto.
+	* include/cygwin/grp.h: Remove declaration of getgrgid() and getgrnam().
+	Declare getgrgid32() and getgrnam32() instead.  Declare getgid32().
+
 2002-05-27  Christopher Faylor  <cgf@redhat.com>
 
 	* autoload.cc (noload): Properly mask low order word for determining

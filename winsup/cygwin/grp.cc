@@ -31,7 +31,7 @@ details. */
    on the first call that needs information from it. */
 
 static const char *etc_group NO_COPY = "/etc/group";
-static struct __group16 *group_buf;		/* group contents in memory */
+static struct __group32 *group_buf;		/* group contents in memory */
 static int curr_lines;
 static int max_lines;
 
@@ -45,7 +45,7 @@ static int grp_pos = 0;
 static pwdgrp_check group_state;
 
 static int
-parse_grp (struct __group16 &grp, const char *line)
+parse_grp (struct __group32 &grp, const char *line)
 {
   int len = strlen(line);
   char *newline = (char *) malloc (len + 1);
@@ -110,7 +110,7 @@ add_grp_line (const char *line)
     if (curr_lines == max_lines)
     {
 	max_lines += 10;
-	group_buf = (struct __group16 *) realloc (group_buf, max_lines * sizeof (struct __group16));
+	group_buf = (struct __group32 *) realloc (group_buf, max_lines * sizeof (struct __group32));
     }
     if (parse_grp (group_buf[curr_lines], line))
       curr_lines++;
@@ -210,11 +210,28 @@ read_etc_group ()
   return;
 }
 
-extern "C"
+static
 struct __group16 *
-getgrgid (__gid16_t gid)
+grp32togrp16 (struct __group16 *gp16, struct __group32 *gp32)
 {
-  struct __group16 * default_grp = NULL;
+  if (!gp16 || !gp32)
+    return NULL;
+
+  /* Copying the pointers is actually unnecessary.  Just having the correct
+     return type is important. */
+  gp16->gr_name = gp32->gr_name;
+  gp16->gr_passwd = gp32->gr_passwd;
+  gp16->gr_gid = (__gid16_t) gp32->gr_gid;		/* Not loss-free */
+  gp16->gr_mem = gp32->gr_mem;
+
+  return gp16;
+}
+
+extern "C"
+struct __group32 *
+getgrgid32 (__gid32_t gid)
+{
+  struct __group32 * default_grp = NULL;
   if (group_state  <= initializing)
     read_etc_group();
 
@@ -231,7 +248,16 @@ getgrgid (__gid16_t gid)
 
 extern "C"
 struct __group16 *
-getgrnam (const char *name)
+getgrgid (__gid16_t gid)
+{
+  static struct __group16 g16;
+
+  return grp32togrp16 (&g16, getgrgid32 ((__gid32_t) gid));
+}
+
+extern "C"
+struct __group32 *
+getgrnam32 (const char *name)
 {
   if (group_state  <= initializing)
     read_etc_group();
@@ -245,6 +271,15 @@ getgrnam (const char *name)
 }
 
 extern "C"
+struct __group16 *
+getgrnam (const char *name)
+{
+  static struct __group16 g16;
+
+  return grp32togrp16 (&g16, getgrnam32 (name));
+}
+
+extern "C"
 void
 endgrent()
 {
@@ -252,8 +287,8 @@ endgrent()
 }
 
 extern "C"
-struct __group16 *
-getgrent()
+struct __group32 *
+getgrent32()
 {
   if (group_state  <= initializing)
     read_etc_group();
@@ -265,6 +300,15 @@ getgrent()
 }
 
 extern "C"
+struct __group16 *
+getgrent()
+{
+  static struct __group16 g16;
+
+  return grp32togrp16 (&g16, getgrent32 ());
+}
+
+extern "C"
 void
 setgrent ()
 {
@@ -272,7 +316,7 @@ setgrent ()
 }
 
 /* Internal function. ONLY USE THIS INTERNALLY, NEVER `getgrent'!!! */
-struct __group16 *
+struct __group32 *
 internal_getgrent (int pos)
 {
   if (group_state  <= initializing)
@@ -284,12 +328,13 @@ internal_getgrent (int pos)
 }
 
 int
-getgroups (int gidsetsize, __gid16_t *grouplist, __gid16_t gid, const char *username)
+getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
+	     const char *username)
 {
   HANDLE hToken = NULL;
   DWORD size;
   int cnt = 0;
-  struct __group16 *gr;
+  struct __group32 *gr;
 
   if (group_state  <= initializing)
     read_etc_group();
@@ -359,9 +404,41 @@ error:
 
 extern "C"
 int
+getgroups32 (int gidsetsize, __gid32_t *grouplist)
+{
+  return getgroups32 (gidsetsize, grouplist, myself->gid,
+		      cygheap->user.name ());
+}
+
+extern "C"
+int
 getgroups (int gidsetsize, __gid16_t *grouplist)
 {
-  return getgroups (gidsetsize, grouplist, myself->gid, cygheap->user.name ());
+  __gid32_t *grouplist32 = NULL;
+
+  if (gidsetsize < 0)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  if (gidsetsize > 0 && grouplist)
+    grouplist32 = (__gid32_t *) alloca (gidsetsize * sizeof (__gid32_t));
+
+  int ret = getgroups32 (gidsetsize, grouplist32, myself->gid,
+			 cygheap->user.name ());
+
+  if (gidsetsize > 0 && grouplist)
+    for (int i = 0; i < ret; ++ i)
+      grouplist[i] = grouplist32[i];
+
+  return ret;
+}
+
+extern "C"
+int
+initgroups32 (const char *, __gid32_t)
+{
+  return 0;
 }
 
 extern "C"

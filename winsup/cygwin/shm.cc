@@ -442,7 +442,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
   return 0;
 }
 
-/* FIXME: evaluate getuid() and getgid() against the requested mode. Then
+/* FIXME: evaluate getuid() and getgid32() against the requested mode. Then
  * choose PAGE_READWRITE | PAGE_READONLY and FILE_MAP_WRITE  |  FILE_MAP_READ
  * appropriately
  */
@@ -461,7 +461,7 @@ shmget (key_t key, size_t size, int shmflg)
   /* create a sd for our open requests based on shmflag & 0x01ff */
   InitializeSecurityDescriptor (psd,
 				    SECURITY_DESCRIPTOR_REVISION);
-  psd = alloc_sd (getuid (), getgid (), cygheap->user.logsrv (),
+  psd = alloc_sd (getuid (), getgid32 (), cygheap->user.logsrv (),
 		  shmflg & 0x01ff, psd, &sd_size);
 
   if (key == (key_t) - 1)
@@ -540,7 +540,7 @@ shmget (key_t key, size_t size, int shmflg)
   /* fill out the node data */
   shmtemp->shm_perm.cuid = getuid ();
   shmtemp->shm_perm.uid = shmtemp->shm_perm.cuid;
-  shmtemp->shm_perm.cgid = getgid ();
+  shmtemp->shm_perm.cgid = getgid32 ();
   shmtemp->shm_perm.gid = shmtemp->shm_perm.cgid;
   shmtemp->shm_perm.mode = shmflg & 0x01ff;
   shmtemp->shm_lpid = 0;

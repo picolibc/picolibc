@@ -173,7 +173,7 @@ internal_getlogin (cygheap_user &user)
 	    if (psid.getfrompw (pw) && EqualSid (user.sid (), psid))
 	      {
 		user.set_name (pw->pw_name);
-		struct __group16 *gr = getgrgid (pw->pw_gid);
+		struct __group32 *gr = getgrgid32 (pw->pw_gid);
 		if (gr)
 		  if (!gsid.getfromgr (gr))
 		      gsid = NO_SID;
@@ -288,6 +288,12 @@ getuid (void)
   return cygheap->user.real_uid;
 }
 
+extern "C" __gid32_t
+getgid32 (void)
+{
+  return cygheap->user.real_gid;
+}
+
 extern "C" __gid16_t
 getgid (void)
 {
@@ -298,6 +304,12 @@ extern "C" __uid16_t
 geteuid (void)
 {
   return myself->uid;
+}
+
+extern "C" __gid32_t
+getegid32 (void)
+{
+  return myself->gid;
 }
 
 extern "C" __gid16_t
