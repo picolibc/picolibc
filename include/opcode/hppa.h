@@ -70,9 +70,9 @@ struct pa_opcode
 
    In the args field, the following characters are unused:
 
-	'  "# %&    +-  /          :;< > @'
+	'  "#  &     -  /          :;< > @'
 	' BC        LM       U   YZ[\]  '
-	'   de gh   lm   q         {|} '
+	'   de gh   lm             { } '
 
    Here are all the characters:
 
@@ -168,7 +168,10 @@ Also these:
         31-p
    ~    6 bit shift count at 20,22:26 encoded as 63-~.
    P    5 bit bit position at 26
+   q    6 bit bit position at 20,22:26
    T    5 bit field length at 31 (encoded as 32-T)
+   %	6 bit field length at 23,27:31 (variable extract/deposit)
+   |	6 bit field length at 19,27:31 (fixed extract/deposit)
    A    13 bit immediate at 18 (to support the BREAK instruction)
    ^	like b, but describes a control register
    !    sar (cr11) register
@@ -427,10 +430,22 @@ static const struct pa_opcode pa_opcodes[] =
 { "shrpw",      0xd0000800, 0xfc001c00, "?xx,b,p,t", pa10, FLAG_STRICT},
 { "vshd",       0xd0000000, 0xfc001fe0, "?xx,b,t", pa10},
 { "shd",        0xd0000800, 0xfc001c00, "?xx,b,p,t", pa10},
+{ "extrd",      0xd0001200, 0xfc001ae0, "cS?Xb,!,%,x", pa20, FLAG_STRICT},
+{ "extrd",      0xd8000000, 0xfc000000, "cS?Xb,q,|,x", pa20, FLAG_STRICT},
+{ "extrw",      0xd0001000, 0xfc001be0, "cS?xb,!,T,x", pa10, FLAG_STRICT},
+{ "extrw",      0xd0001800, 0xfc001800, "cS?xb,P,T,x", pa10, FLAG_STRICT},
 { "vextru",     0xd0001000, 0xfc001fe0, "?xb,T,x", pa10},
 { "vextrs",     0xd0001400, 0xfc001fe0, "?xb,T,x", pa10},
 { "extru",      0xd0001800, 0xfc001c00, "?xb,P,T,x", pa10},
 { "extrs",      0xd0001c00, 0xfc001c00, "?xb,P,T,x", pa10},
+{ "depd",       0xd4000200, 0xfc001ae0, "cz?Xx,!,%,b", pa20, FLAG_STRICT},
+{ "depd",       0xf0000000, 0xfc000000, "cz?Xx,~,|,b", pa20, FLAG_STRICT},
+{ "depdi",      0xd4001200, 0xfc001ae0, "cz?X5,!,%,b", pa20, FLAG_STRICT},
+{ "depdi",      0xf4000000, 0xfc000000, "cz?X5,~,|,b", pa20, FLAG_STRICT},
+{ "depw",       0xd4000000, 0xfc001be0, "cz?xx,!,T,b", pa10, FLAG_STRICT},
+{ "depw",       0xd4000800, 0xfc001800, "cz?xx,p,T,b", pa10, FLAG_STRICT},
+{ "depwi",      0xd4001000, 0xfc001be0, "cz?x5,!,T,b", pa10, FLAG_STRICT},
+{ "depwi",      0xd4001800, 0xfc001be0, "cz?x5,p,T,b", pa10, FLAG_STRICT},
 { "zvdep",      0xd4000000, 0xfc001fe0, "?xx,T,b", pa10},
 { "vdep",       0xd4000400, 0xfc001fe0, "?xx,T,b", pa10},
 { "zdep",       0xd4000800, 0xfc001c00, "?xx,p,T,b", pa10},

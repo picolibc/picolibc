@@ -1,5 +1,8 @@
 Sat Aug 28 00:25:25 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
+	* hppa.h (pa_opcodes): Add extrd, extrw, depd, depdi, depw, depwi.
+	Add supporting args.
+
 	* hppa.h:  Document new completers and args.
 	* hppa.h (pa_opcodes):  Add 64 bit patterns and pa2.0 syntax for uxor,
 	uaddcm, dcor, addi, add, sub, subi, shladd, rfi, and probe.  Add pa2.0
