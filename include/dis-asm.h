@@ -9,6 +9,10 @@
 #ifndef DIS_ASM_H
 #define DIS_ASM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include "bfd.h"
 
@@ -245,5 +249,9 @@ extern int generic_symbol_at_address
   (INFO).bytes_per_chunk = 0, \
   (INFO).display_endian = BFD_ENDIAN_UNKNOWN, \
   (INFO).insn_info_valid = 0
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* ! defined (DIS_ASM_H) */

@@ -1,3 +1,7 @@
+1999-12-15  Doug Evans  <dje@transmeta.com>
+
+	* dis-asm.h: Enclose in extern "C" ifdef __cplusplus.
+
 Sun Oct 24 19:11:32 1999  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* sim-d10v.h (SIM_D10V_TS2_DMAP_REGNUM): Define.
