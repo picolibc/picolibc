@@ -1,3 +1,10 @@
+Wed Apr 19 12:46:26 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* Makefile.in (taz, gdb-taz, gas.tar.bz2, binutils.tar.bz2,
+ 	gas+binutils.tar.bz2, libg++.tar.bz2, gnats.tar.bz2, gdb.tar.bz2,
+ 	dejagnu.tar.bz2, gdb+dejagnu.tar.bz2, insight.tar.bz2,
+ 	insight+dejagnu.tar.bz2, newlib.tar.bz2): Pass MD5PROG to sub-make.
+
 Wed Apr 12 16:42:48 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* Makefile.in (gdb-taz): New target.  GDB specific archive.

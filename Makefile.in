@@ -1704,18 +1704,22 @@ PACKAGE = $(TOOL)
 taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	$(MAKE) -f Makefile.in do-proto-toplev \
 		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(SUPPORT_FILES)"
 	$(MAKE) -f Makefile.in do-md5sum \
 		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(SUPPORT_FILES)"
 	$(MAKE) -f Makefile.in do-tar-bz2 \
 		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(SUPPORT_FILES)"
 
 .PHONY: gdb-taz
 gdb-taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	$(MAKE) -f Makefile.in taz \
 		TOOL=$(TOOL) PACKAGE="$(PACKAGE)" VER="$(VER)" \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(SUPPORT_FILES)"
 
 .PHONY: do-proto-toplev
@@ -1793,6 +1797,7 @@ DIST_SUPPORT= $(DEVO_SUPPORT) $(TEXINFO_SUPPORT)
 GAS_SUPPORT_DIRS= bfd include libiberty opcodes intl setup.com makefile.vms mkdep
 gas.tar.bz2: $(DIST_SUPPORT) $(GAS_SUPPORT_DIRS) gas
 	$(MAKE) -f Makefile.in taz TOOL=gas \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(GAS_SUPPORT_DIRS)"
 
 # The FSF "binutils" release includes gprof and ld.
@@ -1800,53 +1805,62 @@ gas.tar.bz2: $(DIST_SUPPORT) $(GAS_SUPPORT_DIRS) gas
 BINUTILS_SUPPORT_DIRS= bfd gas include libiberty opcodes ld gprof intl setup.com makefile.vms mkdep
 binutils.tar.bz2: $(DIST_SUPPORT) $(BINUTILS_SUPPORT_DIRS) binutils
 	$(MAKE) -f Makefile.in taz TOOL=binutils \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(BINUTILS_SUPPORT_DIRS)"
 
 .PHONY: gas+binutils.tar.bz2
 GASB_SUPPORT_DIRS= $(GAS_SUPPORT_DIRS) binutils ld gprof
 gas+binutils.tar.bz2: $(DIST_SUPPORT) $(GASB_SUPPORT_DIRS) gas
 	$(MAKE) -f Makefile.in taz TOOL=gas \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(GASB_SUPPORT_DIRS)"
 
 .PHONY: libg++.tar.bz2
 LIBGXX_SUPPORT_DIRS=include libstdc++ libio librx libiberty
 libg++.tar.bz2: $(DIST_SUPPORT) libg++
 	$(MAKE) -f Makefile.in taz TOOL=libg++ \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(LIBGXX_SUPPORT_DIRS)"
 
 GNATS_SUPPORT_DIRS=include libiberty send-pr
 gnats.tar.bz2: $(DIST_SUPPORT) $(GNATS_SUPPORT_DIRS) gnats
 	$(MAKE) -f  Makefile.in taz TOOL=gnats \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(GNATS_SUPPORT_DIRS)"
 
 .PHONY: gdb.tar.bz2
 GDB_SUPPORT_DIRS= bfd include libiberty mmalloc opcodes readline sim utils intl
 gdb.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f Makefile.in gdb-taz TOOL=gdb \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(GDB_SUPPORT_DIRS)"
 
 .PHONY: dejagnu.tar.bz2
 DEJAGNU_SUPPORT_DIRS=  tcl expect libiberty
 dejagnu.tar.bz2: $(DIST_SUPPORT) $(DEJAGNU_SUPPORT_DIRS) dejagnu
 	$(MAKE) -f Makefile.in taz TOOL=dejagnu \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(DEJAGNU_SUPPORT_DIRS)"
 
 .PHONY: gdb+dejagnu.tar.bz2
 GDBD_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl expect dejagnu
 gdb+dejagnu.tar.bz2: $(DIST_SUPPORT) $(GDBD_SUPPORT_DIRS) gdb
 	$(MAKE) -f Makefile.in gdb-taz TOOL=gdb PACKAGE=gdb+dejagnu \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(GDBD_SUPPORT_DIRS)"
 
 .PHONY: insight.tar.bz2
 INSIGHT_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl tk itcl tix libgui
 insight.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f Makefile.in gdb-taz TOOL=gdb PACKAGE=insight \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(INSIGHT_SUPPORT_DIRS)"
 
 .PHONY: insight+dejagnu.tar.bz2
 INSIGHTD_SUPPORT_DIRS= $(INSIGHT_SUPPORT_DIRS) expect dejagnu
 insight+dejagnu.tar.bz2: $(DIST_SUPPORT) $(INSIGHTD_SUPPORT_DIRS) gdb
 	$(MAKE) -f Makefile.in gdb-taz TOOL=gdb PACKAGE="insight+dejagnu" \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(INSIGHTD_SUPPORT_DIRS)"
 
 .PHONY: newlib.tar.bz2
@@ -1864,6 +1878,7 @@ NEWLIB_SUPPORT_DIRS=libgloss
 # supports newlib (if only minimally).
 newlib.tar.bz2: $(DIST_SUPPORT) $(NEWLIB_SUPPORT_DIRS) newlib
 	$(MAKE) -f Makefile.in taz TOOL=newlib \
+		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(NEWLIB_SUPPORT_DIRS)" \
 		DEVO_SUPPORT="$(DEVO_SUPPORT) COPYING.NEWLIB" newlib
 
