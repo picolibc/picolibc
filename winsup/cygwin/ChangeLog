@@ -1,3 +1,8 @@
+2004-09-13  Christopher Faylor  <cgf@timesys.com>
+
+	* fork.cc (slow_pid_reuse): Temporarily double the number of pids held
+	to prevent pid reuse.
+
 2004-09-12  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (wait_sig): Ensure that waiting threads are awoken after
