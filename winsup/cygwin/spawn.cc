@@ -607,7 +607,15 @@ skip_arg_parsing:
      final debugging message [this is a general rule for debugging
      messages].  */
   if (!rc)
-    __seterrno ();
+
+  if (!rc)
+    {
+      if (spr)
+	ForceCloseHandle (spr);
+      __seterrno ();
+      syscall_printf ("CreateProcess failed, %E");
+      return -1;
+    }
 
   if (mode == _P_OVERLAY)
     cygpid = myself->pid;
@@ -618,13 +626,6 @@ skip_arg_parsing:
   syscall_printf ("%d = spawn_guts (%s, %.132s)",
 		  rc ? cygpid : (unsigned int) -1,
 		  prog_arg, one_line.buf);
-
-  if (!rc)
-    {
-      if (spr)
-	ForceCloseHandle (spr);
-      return -1;
-    }
 
   MALLOC_CHECK;
   /* Name the handle similarly to proc_subproc. */
@@ -884,7 +885,7 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
       case _P_DETACH:
 	subproc_init ();
 	ret = spawn_guts (hToken, path, argv, envp, mode);
-	if (vf)
+	if (vf && ret > 0)
 	  {
 	    vf->pid = ret;
 	    longjmp (vf->j, 1);

@@ -224,9 +224,9 @@ struct vfork_save
 {
   int pid;
   jmp_buf j;
+  DWORD frame[100];
   char **vfork_ebp;
-  char *caller_ebp;
-  char *retaddr;
+  char **vfork_esp;
   int is_active () { return pid < 0; }
 };
 
@@ -460,9 +460,6 @@ extern void (*__DTOR_LIST__) (void);
 /* Initial and increment values for cygwin's fd table */
 #define NOFILE_INCR    32
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include <sys/reent.h>
 
 #define STD_RBITS (S_IRUSR | S_IRGRP | S_IROTH)
@@ -471,10 +468,6 @@ extern "C" {
 
 #define O_NOSYMLINK 0x080000
 #define O_DIROPEN   0x100000
-
-#ifdef __cplusplus
-}
-#endif
 
 /*************************** Environment ******************************/
 

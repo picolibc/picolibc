@@ -1,3 +1,14 @@
+Wed Aug  2 22:58:07 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fork.cc (vfork): Store complete stack frame in vfork_save structure
+	for later recovery.
+	* spawn.cc (spawn_guts): Reorganize slightly to consolidate handling
+	when there is a CreateProcess error.
+	(_spawnve): Only longjmp back to vfork handling when a process has been
+	successfuly started.
+	* winsup.h (vfork_save): Extend to include frame info.  Remove obsolete
+	cpplus conditionals.
+
 Wed Aug  2 15:14:51 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* strace.cc (strace::prntf): Make second argument the function name,

@@ -639,6 +639,7 @@ vfork ()
   return fork ();
 #else
   vfork_save *vf = get_vfork_val ();
+  char **esp, **pp;
 
   if (vf == NULL)
     vf = vfork_storage.create ();
@@ -646,9 +647,11 @@ vfork ()
   if (!setjmp (vf->j))
     {
       vf->pid = -1;
+      __asm__ volatile ("movl %%esp,%0": "=r" (vf->vfork_esp):);
       __asm__ volatile ("movl %%ebp,%0": "=r" (vf->vfork_ebp):);
-      __asm__ volatile ("movl (%%ebp),%0": "=r" (vf->caller_ebp):);
-      __asm__ volatile ("movl 4(%%ebp),%0": "=r" (vf->retaddr):);
+      for (pp = (char **)vf->frame, esp = vf->vfork_esp;
+	   esp <= vf->vfork_ebp + 1; pp++, esp++)
+	*pp = *esp;
       return dtable.vfork_child_dup () ? 0 : -1;
     }
 
@@ -662,8 +665,11 @@ vfork ()
 	exit (exitval);
     }
 
-  vf->vfork_ebp[0] = vf->caller_ebp;
-  vf->vfork_ebp[1] = vf->retaddr;
+  __asm__ volatile ("movl %%esp,%0": "=r" (esp):);
+  for (pp = (char **)vf->frame, esp = vf->vfork_esp;
+       esp <= vf->vfork_ebp + 1; pp++, esp++)
+    *esp = *pp;
+
   return vf->pid;
 #endif
 }
