@@ -259,9 +259,6 @@ fhandler_console::read (void *pv, size_t buflen)
 #define virtual_key_code (input_rec.Event.KeyEvent.wVirtualKeyCode)
 #define control_key_state (input_rec.Event.KeyEvent.dwControlKeyState)
 
-	  if (!input_rec.Event.KeyEvent.bKeyDown)
-	    continue;
-
 #ifdef DEBUGGING
 	  /* allow manual switching to/from raw mode via ctrl-alt-scrolllock */
 	  if (input_rec.Event.KeyEvent.bKeyDown &&

@@ -1,3 +1,8 @@
+2001-11-12  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (fhandler_console::read): Revert 2001-10-23
+	change to only honor keydown events.
+
 2001-11-11  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump version to 1.3.6.
