@@ -1,3 +1,32 @@
+2004-06-11  Antony King  <antony.king@st.com>
+
+	* libc/include/sys/_types.h: Include <sys/lock.h> and change
+	_flock_t to be of type _LOCK_RECURSIVE_T.
+	* libc/include/sys/reent.h: (_REENT_INIT): Reformat.
+	(_REENT_INIT_PTR): Ditto.  Use memset where appropriate.
+	(_global_impure_ptr): New declaration.
+	(_GLOBAL_REENT): Change to be _global_impure_ptr.
+	* libc/include/sys/stdio.h: Include <sys/lock.h> and
+	<sys/reent.h>.
+	(_flockfile)[!_SINGLE_THREAD]: Add code for lock call.
+	(_funlockfile)[!SINGLE_THREAD]: Ditto.
+	* libc/reent/impure.c: Set _global_impure_ptr to _impure_ptr.
+	* libc/stdio/fclose.c: Remove casting of fp lock to
+	_LOCK_RECURSIVE_T.
+	* libc/stdio/findfp.c: Ditto.
+	* libc/stdio/fopen.c: Ditto.
+	* libc/stdio/freopen.c: Ditto.
+	* libc/stdio/vfprintf.c: Ditto.
+	* libc/stdio64/fopen64.c: Ditto.
+	* libc/stdlib/envlock.c: Add default stubs that use generic
+	locking code.
+	* libc/stdlib/mlock.c: Ditto.
+
+	Jeff Johnston  <jjohnstn@redhat.com>
+	* libc/sys/linux/sys/_types.h (__flock_mutex_t): New subtype.
+	(_flock_t): Change to be a struct containing a single member
+	named mutex which is of type __flock_mutex_t.
+
 2004-06-09  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/Makefile.am: Change siglist.inc to be generated

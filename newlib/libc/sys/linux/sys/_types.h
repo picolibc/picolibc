@@ -32,7 +32,7 @@ typedef struct
   } __value;		/* Value so far.  */
 } _mbstate_t;
 
-struct __flock_t_tmp;
+struct __flock_mutex_t_tmp;
 typedef struct
 {
   int __a;
@@ -43,7 +43,9 @@ typedef struct
     int __c2;
   } __c;
   int __d;
-  struct __flock_t_tmp * __e;
-} _flock_t;
+  struct __flock_mutex_t_tmp * __e;
+} __flock_mutex_t;
+
+typedef struct { __flock_mutex_t mutex; } _flock_t;
 
 #endif	/* _SYS__TYPES_H */

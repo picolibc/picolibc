@@ -255,7 +255,7 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 	fake._bf._size = fake._w = sizeof (buf);
 	fake._lbfsize = 0;	/* not actually used, but Just In Case */
 #ifndef __SINGLE_THREAD__
-	__lock_init_recursive (*(_LOCK_RECURSIVE_T *)&fake._lock);
+	__lock_init_recursive (fake._lock);
 #endif
 
 	/* do the work, then copy any error status */
@@ -266,7 +266,7 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 		fp->_flags |= __SERR;
 
 #ifndef __SINGLE_THREAD__
-	__lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fake._lock);
+	__lock_close_recursive (fake._lock);
 #endif
 	return (ret);
 }

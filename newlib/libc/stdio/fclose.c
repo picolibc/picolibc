@@ -98,7 +98,7 @@ _DEFUN(_fclose_r, (rptr, fp),
   fp->_flags = 0;		/* release this FILE for reuse */
   _funlockfile (fp);
 #ifndef __SINGLE_THREAD__
-  __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
+  __lock_close_recursive (fp->_lock);
 #endif
 
   __sfp_lock_release ();

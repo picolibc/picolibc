@@ -9,6 +9,8 @@
 #ifndef	_SYS__TYPES_H
 #define _SYS__TYPES_H
 
+#include <sys/lock.h>
+
 typedef long _off_t;
 __extension__ typedef long long _off64_t;
 
@@ -32,7 +34,7 @@ typedef struct
   } __value;		/* Value so far.  */
 } _mbstate_t;
 
-typedef int _flock_t;
+typedef _LOCK_RECURSIVE_T _flock_t;
 
 /* Iconv descriptor type */
 typedef void *_iconv_t;

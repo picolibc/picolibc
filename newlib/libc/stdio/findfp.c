@@ -47,7 +47,7 @@ _DEFUN(std, (ptr, flags, file, data),
   ptr->_seek = __sseek;
   ptr->_close = __sclose;
 #if !defined(__SINGLE_THREAD__) && !defined(_REENT_SMALL)
-  __lock_init_recursive (*(_LOCK_RECURSIVE_T *)&ptr->_lock);
+  __lock_init_recursive (ptr->_lock);
   /*
    * #else
    * lock is already initialized in __sfp
@@ -112,7 +112,7 @@ found:
   fp->_file = -1;		/* no file */
   fp->_flags = 1;		/* reserve this slot; caller sets real flags */
 #ifndef __SINGLE_THREAD__
-  __lock_init_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
+  __lock_init_recursive (fp->_lock);
 #endif
   __sfp_lock_release (); 
 
@@ -143,8 +143,8 @@ _VOID
 _DEFUN(_cleanup_r, (ptr),
        struct _reent *ptr)
 {
-  /* _CAST_VOID _fwalk(fclose); */
-  _CAST_VOID _fwalk (ptr, fflush);	/* `cheating' */
+  _CAST_VOID _fwalk(ptr, fclose);
+  /* _CAST_VOID _fwalk (ptr, fflush); */	/* `cheating' */
 }
 
 #ifndef _REENT_ONLY

@@ -381,10 +381,31 @@ struct _reent
 };
 
 #define _REENT_INIT(var) \
-  { (__FILE *)&var.__sf_fake, (__FILE *)&var.__sf_fake, \
-    (__FILE *)&var.__sf_fake, 0, 0, _NULL, 0, 0, \
-    "C", _NULL, _NULL, 0, 0, _NULL, _NULL, _NULL, _NULL, _NULL, \
-    { 0, _NULL, _NULL, 0 }, { _NULL, 0, _NULL }, _NULL, 0, _NULL, _NULL }
+  { (__FILE *)&var.__sf_fake, \
+    (__FILE *)&var.__sf_fake, \
+    (__FILE *)&var.__sf_fake, \
+    0, \
+    0, \
+    _NULL, \
+    0, \
+    0, \
+    "C", \
+    _NULL, \
+    _NULL, \
+    0, \
+    0, \
+    _NULL, \
+    _NULL, \
+    _NULL, \
+    _NULL, \
+    _NULL, \
+    {0, {_NULL}, _NULL}, \
+    {_NULL, 0, _NULL}, \
+    _NULL, \
+    {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL}, \
+    _NULL, \
+    _NULL \
+  }
 
 #define _REENT_INIT_PTR(var) \
   { var->_stdin = (__FILE *)&var->__sf_fake; \
@@ -412,16 +433,17 @@ struct _reent
     var->__sglue._niobs = 0; \
     var->__sglue._iobs = _NULL; \
     var->__sf = 0; \
-    var->_misc = _NULL; \
-    var->_signal_buf = _NULL; \
-    var->_getdate_err = 0; \
     var->__sf_fake._p = _NULL; \
     var->__sf_fake._r = 0; \
     var->__sf_fake._w = 0; \
     var->__sf_fake._flags = 0; \
     var->__sf_fake._file = 0; \
+    var->__sf_fake._bf._base = _NULL; \
+    var->__sf_fake._bf._size = 0; \
     var->__sf_fake._lbfsize = 0; \
     var->__sf_fake._data = _NULL; \
+    var->_misc = _NULL; \
+    var->_signal_buf = _NULL; \
   }
 
 /* Only built the assert() calls if we are built with debugging.  */
@@ -608,23 +630,61 @@ struct _reent
 };
 
 #define _REENT_INIT(var) \
-  { 0, &var.__sf[0], &var.__sf[1], &var.__sf[2], 0, "", 0, "C", \
-    0, _NULL, _NULL, 0, _NULL, _NULL, 0, _NULL, { {0, _NULL, "", \
-    { 0,0,0,0,0,0,0,0}, 0, 1, \
-    {{_RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2}, \
-     {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, _RAND48_ADD}, \
-    {0, {0}}, {0, {0}}, {0, {0}}, "", "", 0, {0, {0}}, {0, {0}}, {0, {0}}, {0, {0}}, {0, {0}} } } }
+  { 0, \
+    &var.__sf[0], \
+    &var.__sf[1], \
+    &var.__sf[2], \
+    0, \
+    "", \
+    0, \
+    "C", \
+    0, \
+    _NULL, \
+    _NULL, \
+    0, \
+    _NULL, \
+    _NULL, \
+    0, \
+    _NULL, \
+    { \
+      { \
+        0, \
+        _NULL, \
+        "", \
+        {0, 0, 0, 0, 0, 0, 0, 0, 0}, \
+        0, \
+        1, \
+        { \
+          {_RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2}, \
+          {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, \
+          _RAND48_ADD \
+        }, \
+        {0, {0}}, \
+        {0, {0}}, \
+        {0, {0}}, \
+        "", \
+        "", \
+        0, \
+        {0, {0}}, \
+        {0, {0}}, \
+        {0, {0}}, \
+        {0, {0}}, \
+        {0, {0}} \
+      } \
+    }, \
+    _NULL, \
+    {_NULL, 0, {_NULL}, {{_NULL}, 0}}, \
+    _NULL, \
+    {_NULL, 0, _NULL} \
+  }
 
 #define _REENT_INIT_PTR(var) \
-  { int i; \
-    char *tmp_ptr; \
-    var->_errno = 0; \
+  { var->_errno = 0; \
     var->_stdin = &var->__sf[0]; \
     var->_stdout = &var->__sf[1]; \
     var->_stderr = &var->__sf[2]; \
     var->_inc = 0; \
-    for (i = 0; i < _REENT_EMERGENCY_SIZE; ++i) \
-      var->_emergency[i] = 0; \
+    memset(&var->_emergency, 0, sizeof(var->_emergency)); \
     var->_current_category = 0; \
     var->_current_locale = "C"; \
     var->__sdidinit = 0; \
@@ -638,9 +698,7 @@ struct _reent
     var->_new._reent._unused_rand = 0; \
     var->_new._reent._strtok_last = _NULL; \
     var->_new._reent._asctime_buf[0] = 0; \
-    tmp_ptr = (char *)&var->_new._reent._localtime_buf; \
-    for (i = 0; i < sizeof(struct __tm); ++i) \
-      tmp_ptr[i] = 0; \
+    memset(&var->_new._reent._localtime_buf, 0, sizeof(var->_new._reent._localtime_buf)); \
     var->_new._reent._gamma_signgam = 0; \
     var->_new._reent._rand_next = 1; \
     var->_new._reent._r48._seed[0] = _RAND48_SEED_0; \
@@ -670,6 +728,7 @@ struct _reent
     var->_new._reent._signal_buf[0] = '\0'; \
     var->_new._reent._getdate_err = 0; \
     var->_atexit = _NULL; \
+    var->_atexit0._next = _NULL; \
     var->_atexit0._ind = 0; \
     var->_atexit0._fns[0] = _NULL; \
     var->_atexit0._on_exit_args._fntypes = 0; \
@@ -678,7 +737,7 @@ struct _reent
     var->__sglue._next = _NULL; \
     var->__sglue._niobs = 0; \
     var->__sglue._iobs = _NULL; \
-    memset(var->__sf,0,sizeof(var->__sf)); \
+    memset(&var->__sf, 0, sizeof(var->__sf)); \
   }
 
 #define _REENT_CHECK_RAND48(ptr)	/* nothing */
@@ -728,6 +787,7 @@ struct _reent
 #endif
 
 extern struct _reent *_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
+extern struct _reent *_CONST _global_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
 
 void _reclaim_reent _PARAMS ((struct _reent *));
 
@@ -746,7 +806,7 @@ void _reclaim_reent _PARAMS ((struct _reent *));
 
 #endif /* !_REENT_ONLY */
 
-#define _GLOBAL_REENT _impure_ptr
+#define _GLOBAL_REENT _global_impure_ptr
 
 #ifdef __cplusplus
 }

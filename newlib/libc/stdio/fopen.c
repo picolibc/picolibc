@@ -143,7 +143,7 @@ _DEFUN(_fopen_r, (ptr, file, mode),
       __sfp_lock_acquire (); 
       fp->_flags = 0;		/* release */
 #ifndef __SINGLE_THREAD__
-      __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
+      __lock_close_recursive (fp->_lock);
 #endif
       __sfp_lock_release (); 
       return NULL;
