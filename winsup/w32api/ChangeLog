@@ -1,3 +1,7 @@
+2003-07-26  Eric R. Krause  <ekrause_98@users.sourceforge.net>
+
+	* include/objidl.h (IMalloc): Fix typo.
+
 2003-07-24  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/dkk/ntifs.h: Fix typo in guard for
