@@ -1,3 +1,11 @@
+2002-09-30  Gavin Romig-Koch  <gavin@redhat.com>
+            Ken Raeburn  <raeburn@cygnus.com>
+            Aldy Hernandez  <aldyh@redhat.com>
+            Eric Christopher  <echristo@redhat.com>
+            Richard Sandiford  <rsandifo@redhat.com>
+
+	* mips.h (E_MIPS_MACH_4120, E_MIPS_MACH_5400, E_MIPS_MACH_5500): New.
+
 2002-09-12  Roland McGrath  <roland@redhat.com>
 
 	* dwarf2.h: Updates from GCC version of thie file:
