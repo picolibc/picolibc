@@ -1,3 +1,7 @@
+2001-03-22  Philip Blundell  <philb@gnu.org>
+
+	* config.sub, config.guess: Import latest from subversions.
+
 2001-03-22  Alexandre Oliva  <aoliva@redhat.com>
 
 	* ltconfig, ltmain.sh, libtool.m4, ltcf-c.sh, ltcf-cxx.sh,
