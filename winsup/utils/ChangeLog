@@ -1,6 +1,6 @@
 2001-11-21  Christopher Faylor  <cgf@redhat.com>
 
-	* path.cc (cygpath): Don't consider cygpath stuff when trying to derive
+	* path.cc (cygpath): Don't consider cygdrive stuff when trying to derive
 	native paths.
 
 2001-11-20  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
