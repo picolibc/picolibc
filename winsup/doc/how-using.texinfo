@@ -203,6 +203,12 @@ under the mount point as executable.  This can be used for individual
 files as well as directories.  Then Cygwin will not bother to read files
 to determine whether they are executable.
 
+@subsection How do I print under Cygwin?
+
+In lieu of a comprehensive FAQ entry (which will come soon), there are a
+couple of messages from the mailing list archives that may be helpful.
+Start at @file{http://cygwin.com/ml/cygwin/2001-04/msg00657.html}.
+
 @subsection Why don't cursor keys work under Win95/Win98?
 
 @strong{(Please note: This section has not yet been updated for the latest
