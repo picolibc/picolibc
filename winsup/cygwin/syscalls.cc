@@ -1973,12 +1973,6 @@ mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
   return symlink_worker (buf, path, true, true);
 }
 
-/* mknod was the call to create directories before the introduction
-   of mkdir in 4.2BSD and SVR3.  Use of mknod required superuser privs
-   so the mkdir command had to be setuid root.
-   Although mknod hasn't been implemented yet, some GNU tools (e.g. the
-   fileutils) assume its existence so we must provide a stub that always
-   fails. */
 extern "C" int
 mknod (const char *path, mode_t mode, dev_t dev)
 {
