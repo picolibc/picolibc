@@ -37,7 +37,7 @@ internal_getlogin (cygheap_user &user)
   struct passwd *pw = NULL;
   HANDLE ptok = INVALID_HANDLE_VALUE;
 
-  myself->gid = DEFAULT_GID;
+  myself->gid = UNKNOWN_GID;
   if (wincap.has_security ())
     {
       DWORD siz;

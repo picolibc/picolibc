@@ -95,6 +95,8 @@ pwdgrp::read_group ()
 	  if ((gr = internal_getgrsid (cygheap->user.groups.pgsid)))
 	    strlcpy (group_name, gr->gr_name, sizeof (group_name));
 	}
+      if (myself->uid == UNKNOWN_UID)
+	strcpy (group_name, "mkpasswd"); /* Feedback... */
       snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:%s",
 		group_name, strbuf, myself->gid, cygheap->user.name ());
       debug_printf ("Completing /etc/group: %s", linebuf);
@@ -171,7 +173,7 @@ getgrgid (__gid16_t gid)
 {
   static struct __group16 g16;	/* FIXME: thread-safe? */
 
-  return grp32togrp16 (&g16, getgrgid32 ((__gid32_t) gid));
+  return grp32togrp16 (&g16, getgrgid32 (gid16togid32 (gid)));
 }
 
 extern "C" struct __group32 *

@@ -87,7 +87,7 @@ pwdgrp::read_passwd ()
       (void) cygheap->user.ontherange (CH_HOME, NULL);
       snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
 		cygheap->user.name (),
-		myself->uid == ILLEGAL_UID ? DEFAULT_UID_NT : myself->uid,
+		myself->uid == ILLEGAL_UID ? UNKNOWN_UID : myself->uid,
 		myself->gid,
 		strbuf, getenv ("HOME") ?: "");
       debug_printf ("Completing /etc/passwd: %s", linebuf);
