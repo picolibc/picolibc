@@ -1,3 +1,12 @@
+2004-08-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* crt1.c: (__mingw_CRTStartup): Change return to void.  Add
+	noreturn attribute. Align stack to 16 bytes before passing args
+	to main.
+	(mainCRTStartup): Change return to void.
+	(WinMainCRTStartup): Likewise.
+
+
 2004-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* profile/COPYING: New file.

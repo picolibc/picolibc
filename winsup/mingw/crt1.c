@@ -9,10 +9,8 @@
  *
  */
 
-/* Hide the declaration of _fmode with dllimport attribute in stdlib.h.
-   This is not necessary with Mumit Khan's patches to gcc's winnt.c,
-   but those patches are still unofficial.  */
-
+/* Hide the declaration of _fmode with dllimport attribute in stdlib.h to
+   avoid problems with older GCC. */
 #define __IN_MINGW_RUNTIME 
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,7 +27,6 @@
  *       be manually synchronized, but it does lead to this not-generally-
  *       a-good-idea use of include. */
 #include "init.c"
-
 
 extern void _pei386_runtime_relocator (void);
 
@@ -62,7 +59,7 @@ extern int* __p__fmode(void); /* To access the dll _fmode */
 extern int _CRT_fmode;
 
 static void
-_mingw32_init_fmode ()
+_mingw32_init_fmode (void)
 {
   /* Don't set the std file mode if the user hasn't set any value for it. */
   if (_CRT_fmode)
@@ -96,7 +93,6 @@ _mingw32_init_fmode ()
 #else
     *_imp___fmode_dll = _fmode;
 #endif
-
 }
 
 /* This function will be called when a trap occurs. Thanks to Jacob
@@ -164,8 +160,8 @@ _gnu_exception_handler (EXCEPTION_POINTERS * exception_data)
 /*
  * The function mainCRTStartup is the entry point for all console programs.
  */
-static int
-__mingw_CRTStartup ()
+static void  __attribute__((noreturn))
+__mingw_CRTStartup (void)
 {
   int nRet;
 
@@ -194,10 +190,13 @@ __mingw_CRTStartup ()
    * NOTE: DLLs don't do this because that would be rude!
    */
   _mingw32_init_fmode ();
-
   
    /* Adust references to dllimported data that have non-zero offsets.  */
   _pei386_runtime_relocator ();
+
+  /* Align the stack to 16 bytes for the sake of SSE ops in main
+     or in functions inlined into main.  */
+  asm  __volatile__  ("andl $-16, %%esp" : : : "%esp");
 
   /*
    * Call the main function. If the user does not supply one
@@ -214,21 +213,18 @@ __mingw_CRTStartup ()
   _cexit ();
 
   ExitProcess (nRet);
-
-  return 0;
 }
 
 /*
  * The function mainCRTStartup is the entry point for all console programs.
  */
-int
-mainCRTStartup ()
+void
+mainCRTStartup (void)
 {
 #ifdef __MSVCRT__
   __set_app_type (__CONSOLE_APP);
 #endif
   __mingw_CRTStartup ();
-  return 0;
 }
 
 /*
@@ -236,14 +232,13 @@ mainCRTStartup ()
  * This simply gets rid of the annoying warning about not being able
  * to find WinMainCRTStartup when linking GUI applications.
  */
-int
-WinMainCRTStartup ()
+void
+WinMainCRTStartup (void)
 {
 #ifdef __MSVCRT__
   __set_app_type (__GUI_APP);
 #endif
   __mingw_CRTStartup ();
-return 0;
 }
 
 /*
