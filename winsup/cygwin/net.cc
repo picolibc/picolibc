@@ -932,6 +932,15 @@ free_servent_ptr (struct servent *&p)
     }
 }
 
+#pragma pack(push,2)
+struct pservent
+{
+  char *s_name;
+  char **s_aliases;
+  short s_port;
+  char *s_proto;
+};
+#pragma pack(pop)
 static struct servent *
 dup_servent_ptr (struct servent *src)
 {
@@ -947,9 +956,16 @@ dup_servent_ptr (struct servent *src)
   dst->s_port = src->s_port;
   if (src->s_name && !(dst->s_name = strdup (src->s_name)))
     goto out;
-  if (src->s_proto && !(dst->s_proto = strdup (src->s_proto)))
-    goto out;
   if (src->s_aliases && !(dst->s_aliases = dup_char_list (src->s_aliases)))
+    goto out;
+  char *s_proto;
+  if (IsBadReadPtr (src->s_proto, sizeof (src->s_proto))
+      && !IsBadReadPtr (((pservent *) src)->s_proto, sizeof (src->s_proto)))
+    s_proto = ((pservent *)src)->s_proto;
+  else
+    s_proto = src->s_proto;
+
+  if (s_proto && !(dst->s_proto = strdup (s_proto)))
     goto out;
 
   debug_printf ("servent: copied %s", dst->s_name);

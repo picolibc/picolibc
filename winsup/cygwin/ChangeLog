@@ -1,3 +1,8 @@
+Sat Sep 15 22:54:49 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* net.cc (dup_servent_ptr): Detect old Windows 95 misaligned structure
+	and realign appropriately.
+
 Sat Sep 15 00:28:40 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Generate libcygwin.a during the link pass rather than as
