@@ -1,3 +1,7 @@
+2004-08-24   Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h: Add WINBASEAPI token to prototypes, throughout.
+
 2004-08-15  Ken Fitlike  <kenfitlike@users.sourceforge.net>
 
 	* include/commctrl.h (WC_TREEVIEWA): Remove parenthenses.
@@ -6,7 +10,7 @@
 
 	* include/ws2spi.h (LPWSPSELECT): Correct typedef.
 
-2004-08-10   Danny Smith  <dannysmith@users.sourceforeg.net>
+2004-08-10   Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wincrypt.h: Correct _WIN32_WINNT typo.
 
