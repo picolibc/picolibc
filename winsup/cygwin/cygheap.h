@@ -242,7 +242,7 @@ class cygheap_fdget : public cygheap_fdmanip
       {
 	this->fd = -1;
 	if (do_set_errno)
-	  set_errno (EBADF + 1);
+	  set_errno (EBADF);
 	if (lockit)
 	  ReleaseResourceLock (LOCK_FD_LIST, READ_LOCK, "cygheap_fdget");
 	locked = false;
