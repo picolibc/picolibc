@@ -362,12 +362,8 @@ cygserver_client_outside.o: cygserver_client.cc
 
 #	gperf -c --key-positions='1-126' -r -t -C -E -L 'ANSI-C' -Hdevhash -N'device::lookup' -Z devstring -7 $? |\
 
-$(srcdir)/devices.cc: devices.gperf
-	gperf -c --key-positions='1-2,5-7,9-10' -r -t -C -E -T -L 'ANSI-C' -Hdevhash -N'device::lookup' -Z devstring -7 $? |\
-	sed -e 's/\[\(str\[[^\]]*\]\)\]/[(unsigned) cyg_tolower (\1)]/' \
-	    -e 's/static \(.* wordlist\)/static NO_COPY \1/g' \
-	    -e 's/\([ 	]*\)if (\*str.*$$/\1if (strncasematch (str, s, len))/' > $@
-#	sed -e 's/\[str\[/[(unsigned) str[/' -e 's/static \([^(]*\)$$/static NO_COPY \1/g'  >$@
+$(srcdir)/devices.cc: devices.gperf devices.h
+	$(srcdir)/cygwin-gperf $^ > $@
 
 cygserver.exe: cygserver.o cygserver_shm.o cygserver_transport_outside.o cygserver_transport_pipes_outside.o cygserver_transport_sockets_outside.o cygserver_client_outside.o cygserver_process.o threaded_queue.o wincap.o version.o smallprint.o
 	$(CXX) -o $@ $^ -lstdc++
