@@ -67,7 +67,7 @@ typedef wchar_t _TCHAR;
  * macro within your programs.  It's name and function could change without
  * notice.
  */
-#define	__TEXT(x)	L##x
+#define	__TEXT(q)	L##q
 
 /*  for porting from other Windows compilers */
 #if 0  // no  wide startup module
@@ -189,6 +189,11 @@ typedef wchar_t _TCHAR;
 #define _tfindnext  _wfindnext
 #define _tfopen     _wfopen
 #define _tgetenv    _wgetenv
+#define _tputenv    _wputenv
+#define _tsearchenv _wsearchenv
+#define _tmakepath  _wmakepath
+#define _tsplitpath _wsplitpath
+#define _tfullpath  _wfullpath
 #define _tmktemp    _wmktemp
 #define _topen      _wopen
 #define _tremove    _wremove
@@ -221,7 +226,7 @@ typedef char	_TCHAR;
  * macro within your programs.  It's name and function could change without
  * notice.
  */
-#define	__TEXT(x)	x
+#define	__TEXT(q)	q
 
 /*  for porting from other Windows compilers */
 #define _tmain      main
@@ -252,6 +257,11 @@ typedef char	_TCHAR;
 #define	_fputts		fputs
 #define	_tfopen		fopen
 #define	_tgetenv	getenv
+#define	_tputenv	_putenv
+#define	_tsearchenv	_searchenv
+#define	_tmakepath	_makepath
+#define	_tsplitpath	_splitpath
+#define	_tfullpath	_fullpath
 #define	_gettc		getc
 #define	_getts		gets
 #define	_puttc		putc

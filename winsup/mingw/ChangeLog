@@ -1,3 +1,16 @@
+2002-04-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/tchar.h (__TEXT): Make same as define in
+	w32api/include/winnt.h.
+
+2002-04-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/tchar.h (_tputenv): Add UNICODE mappings.
+	(_tsearchenv): Likewise.
+	(_tmakepath): Likewise.
+	(_tsplitpath): Likewise.
+	(_tfullpath): Likewise.
+
 2002-04-18  Pascal Obry  <obry@gnat.com>
 
 	* mingwex/dirent.c (opendir): Convert given pathname to
