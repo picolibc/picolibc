@@ -1242,7 +1242,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       int n = mi->native_pathlen;
       memcpy (dst, mi->native_path, n + 1);
       char *p = pathbuf + mi->posix_pathlen;
-      if ((isdrive (dst) && !dst[2]) || (p && dst[n - 1] != '\\'))
+      if ((isdrive (dst) && !dst[2]) || (*p && dst[n - 1] != '\\'))
 	dst[n++] = '\\';
       strcpy (dst + n, p);
       backslashify (dst, dst, 0);
@@ -1251,7 +1251,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 
 out:
   MALLOC_CHECK;
-  debug_printf ("src_path %s, win32 %s, flags %p", dst, *flags, src_path);
+  debug_printf ("src_path %s, dst %s, flags %p", src_path, dst, *flags);
   return 0;
 }
 
