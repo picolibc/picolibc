@@ -338,8 +338,13 @@ fhandler_disk_file::fstat_helper (struct stat *buf)
   return 0;
 }
 
+fhandler_disk_file::fhandler_disk_file (DWORD devtype) :
+  fhandler_base (devtype)
+{
+}
+
 fhandler_disk_file::fhandler_disk_file () :
-	fhandler_base (FH_DISK)
+  fhandler_base (FH_DISK)
 {
 }
 
@@ -348,7 +353,7 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
 {
   if (real_path->case_clash && flags & O_CREAT)
     {
-      debug_printf ("Caseclash detected.");
+      debug_printf ("case clash detected");
       set_errno (ECASECLASH);
       return 0;
     }
@@ -564,14 +569,13 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 }
 
 DIR *
-fhandler_disk_file::opendir (const char *name, path_conv& real_name)
+fhandler_disk_file::opendir (path_conv& real_name)
 {
-  struct stat statbuf;
   DIR *dir;
   DIR *res = NULL;
   size_t len;
 
-  if (fstat (&statbuf, &real_name) ||!(statbuf.st_mode & S_IFDIR))
+  if (!real_name.isdir ())
     set_errno (ENOTDIR);
   else if ((len = strlen (real_name))> MAX_PATH - 3)
     set_errno (ENAMETOOLONG);
@@ -606,12 +610,12 @@ fhandler_disk_file::opendir (const char *name, path_conv& real_name)
       dir->__d_cookie = __DIRENT_COOKIE;
       dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
       dir->__d_position = 0;
-      dir->__d_dirhash = statbuf.st_ino;
+      dir->__d_dirhash = get_namehash ();
 
       res = dir;
     }
 
-  syscall_printf ("%p = opendir (%s)", res, name);
+  syscall_printf ("%p = opendir (%s)", res, get_name ());
   return res;
 }
 
@@ -702,7 +706,7 @@ fhandler_disk_file::readdir (DIR *dir)
       dir->__d_dirent->d_ino = hash_path_name (dino, buf.cFileName);
     }
 
-  ++dir->__d_position;
+  dir->__d_position++;
   res = dir->__d_dirent;
   syscall_printf ("%p = readdir (%p) (%s)",
 		  &dir->__d_dirent, dir, buf.cFileName);
@@ -720,7 +724,7 @@ fhandler_disk_file::seekdir (DIR *dir, off_t loc)
 {
     rewinddir (dir);
     while (loc > dir->__d_position)
-      if (! readdir (dir))
+      if (!readdir (dir))
 	break;
 }
 
@@ -747,4 +751,101 @@ fhandler_disk_file::closedir (DIR *dir)
     }
   syscall_printf ("%d = closedir (%p)", res, dir);
   return 0;
+}
+
+fhandler_cygdrive::fhandler_cygdrive (int unit) :
+  fhandler_disk_file (FH_CYGDRIVE), unit (unit), ndrives (0), pdrive (NULL)
+{
+}
+
+#define DRVSZ sizeof ("x:\\")
+void
+fhandler_cygdrive::set_drives ()
+{
+  const int len = 1 + 26 * DRVSZ;
+  win32_path_name = (char *) crealloc (win32_path_name, len);
+
+  ndrives = GetLogicalDriveStrings (len, win32_path_name) / DRVSZ;
+  pdrive = win32_path_name;
+}
+
+int
+fhandler_cygdrive::fstat (struct stat *buf, path_conv *pc)
+{
+  if (!iscygdrive_root ())
+    return fhandler_disk_file::fstat (buf, pc);
+  buf->st_mode = S_IFDIR | 0555;
+  if (!ndrives)
+    set_drives ();
+  buf->st_nlink = ndrives;
+  return 0;
+}
+
+DIR *
+fhandler_cygdrive::opendir (path_conv& real_name)
+{
+  DIR *dir;
+
+  dir = fhandler_disk_file::opendir (real_name);
+  if (dir && iscygdrive_root () && !ndrives)
+    set_drives ();
+
+  return dir;
+}
+
+struct dirent *
+fhandler_cygdrive::readdir (DIR *dir)
+{
+  if (!iscygdrive_root ())
+    return fhandler_disk_file::readdir (dir);
+  if (!pdrive || !*pdrive)
+    {
+      set_errno (ENMFILE);
+      return NULL;
+    }
+  *dir->__d_dirent->d_name = cyg_tolower (*pdrive);
+  dir->__d_dirent->d_name[1] = '\0';
+  dir->__d_position++;
+  pdrive += DRVSZ;
+  syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
+      		  dir->__d_dirent->d_name);
+  return dir->__d_dirent;
+}
+
+off_t
+fhandler_cygdrive::telldir (DIR *dir)
+{
+  return fhandler_disk_file::telldir (dir);
+}
+
+void
+fhandler_cygdrive::seekdir (DIR *dir, off_t loc)
+{
+  if (!iscygdrive_root ())
+    return fhandler_disk_file::seekdir (dir, loc);
+
+  for (pdrive = win32_path_name, dir->__d_position = -1; *pdrive; pdrive += DRVSZ)
+    if (++dir->__d_position >= loc)
+      break;
+
+  return;
+}
+
+void
+fhandler_cygdrive::rewinddir (DIR *dir)
+{
+  if (!iscygdrive_root ())
+    return fhandler_disk_file::rewinddir (dir);
+  pdrive = win32_path_name;
+  dir->__d_position = 0;
+  return;
+}
+
+int
+fhandler_cygdrive::closedir (DIR *dir)
+{
+  if (!iscygdrive_root ())
+    return fhandler_disk_file::closedir (dir);
+  pdrive = win32_path_name;
+  return -1;
 }

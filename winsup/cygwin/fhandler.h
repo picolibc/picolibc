@@ -67,10 +67,11 @@ enum
   FH_ZERO    = 0x00000014,	/* is the zero device */
   FH_RANDOM  = 0x00000015,	/* is a random device */
   FH_MEM     = 0x00000016,	/* is a mem device */
-  FH_CLIPBOARD = 0x00000017, /* is a clipbaord device */
+  FH_CLIPBOARD = 0x00000017,	/* is a clipboard device */
   FH_OSS_DSP = 0x00000018,	/* is a dsp audio device */
+  FH_CYGDRIVE= 0x00000019,	/* /cygdrive/x */
 
-  FH_NDEV    = 0x00000019,	/* Maximum number of devices */
+  FH_NDEV    = 0x0000001a,	/* Maximum number of devices */
   FH_DEVMASK = 0x00000fff,	/* devices live here */
   FH_BAD     = 0xffffffff
 };
@@ -340,7 +341,7 @@ class fhandler_base
   void operator delete (void *);
   virtual HANDLE get_guard () const {return NULL;}
   virtual void set_eof () {}
-  virtual DIR *opendir (const char *dirname, path_conv& pc);
+  virtual DIR *opendir (path_conv& pc);
   virtual dirent *readdir (DIR *);
   virtual off_t telldir (DIR *);
   virtual void seekdir (DIR *, off_t);
@@ -527,6 +528,7 @@ class fhandler_disk_file: public fhandler_base
 {
  public:
   fhandler_disk_file ();
+  fhandler_disk_file (DWORD devtype);
 
   int open (path_conv * real_path, int flags, mode_t mode);
   int close ();
@@ -540,12 +542,30 @@ class fhandler_disk_file: public fhandler_base
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 			      DWORD size, void *address);
-  DIR *opendir (const char *dirname, path_conv& pc);
+  DIR *opendir (path_conv& pc);
   struct dirent *readdir (DIR *);
   off_t telldir (DIR *);
   void seekdir (DIR *, off_t);
   void rewinddir (DIR *);
   int closedir (DIR *);
+};
+
+class fhandler_cygdrive: public fhandler_disk_file
+{
+  int unit;
+  int ndrives;
+  const char *pdrive;
+  void set_drives ();
+ public:
+  bool iscygdrive_root () const { return !unit; }
+  fhandler_cygdrive (int unit);
+  DIR *opendir (path_conv& pc);
+  struct dirent *readdir (DIR *);
+  off_t telldir (DIR *);
+  void seekdir (DIR *, off_t);
+  void rewinddir (DIR *);
+  int closedir (DIR *);
+  int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
 };
 
 class fhandler_serial: public fhandler_base
@@ -589,12 +609,6 @@ class fhandler_serial: public fhandler_base
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-};
-
-class fhandler_cygdrive: public fhandler_disk_file
-{
- public:
-  fhandler_cygdrive ();
 };
 
 #define acquire_output_mutex(ms) \

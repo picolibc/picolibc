@@ -86,7 +86,7 @@ opendir (const char *name)
 
   fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, pc,
 						PC_SYM_FOLLOW | PC_FULL, NULL);
-  res = fh->opendir (name, pc);
+  res = fh->opendir (pc);
   if (!res)
     delete fh;
   return res;

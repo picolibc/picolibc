@@ -97,7 +97,7 @@ class mount_info
   void mount_slash ();
   void to_registry ();
 
-  int cygdrive_win32_path (const char *src, char *dst, int trailing_slash_p);
+  int cygdrive_win32_path (const char *src, char *dst, int& unit);
   void cygdrive_posix_path (const char *src, char *dst, int trailing_slash_p);
   void read_cygdrive_info_from_registry ();
 };

@@ -1166,7 +1166,7 @@ fhandler_base::set_nonblocking (int yes)
 }
 
 DIR *
-fhandler_base::opendir (const char *, path_conv&)
+fhandler_base::opendir (path_conv&)
 {
   set_errno (ENOTDIR);
   return NULL;

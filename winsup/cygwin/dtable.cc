@@ -301,6 +301,9 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
       case FH_DISK:
 	fh = cnew (fhandler_disk_file) ();
 	break;
+      case FH_CYGDRIVE:
+	fh = cnew (fhandler_cygdrive) (unit);
+	break;
       case FH_FLOPPY:
 	fh = cnew (fhandler_dev_floppy) (unit);
 	break;

@@ -114,7 +114,7 @@ int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
   (path_prefix_p (mount_table->cygdrive, (path), mount_table->cygdrive_len))
 
 #define iscygdrive_device(path) \
-  (iscygdrive(path) && isalpha(path[mount_table->cygdrive_len]) && \
+  (isalpha(path[mount_table->cygdrive_len]) && \
    (isdirsep(path[mount_table->cygdrive_len + 1]) || \
     !path[mount_table->cygdrive_len + 1]))
 
@@ -482,12 +482,19 @@ path_conv::check (const char *src, unsigned opt,
 	  /* devn should not be a device.  If it is, then stop parsing now. */
 	  if (devn != FH_BAD)
 	    {
-	      if (component)
+	      if (devn == FH_CYGDRIVE)
+		fileattr = !unit ? FILE_ATTRIBUTE_DIRECTORY
+				 : GetFileAttributes (full_path);
+	      else
 		{
-		  error = ENOTDIR;
-		  return;
+		  if (component)
+		    {
+		      error = ENOTDIR;
+		      return;
+		    }
+		  fileattr = 0;
 		}
-	      fileattr = 0;
+
 	      goto out;		/* Found a device.  Stop parsing. */
 	    }
 
@@ -510,7 +517,7 @@ path_conv::check (const char *src, unsigned opt,
 
 	  if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
 	    {
-	      fileattr = GetFileAttributesA (full_path);
+	      fileattr = GetFileAttributes (full_path);
 	      goto out;
 	    }
 
@@ -1237,21 +1244,18 @@ conv_path_list (const char *src, char *dst, int to_posix_p)
 
   char *srcbuf = (char *) alloca (strlen (src) + 1);
 
-  do
+  for (;;)
     {
       s = strccpy (srcbuf, &src, src_delim);
       int len = s - srcbuf;
       if (len >= MAX_PATH)
 	srcbuf[MAX_PATH - 1] = '\0';
       (*conv_fn) (len ? srcbuf : ".", d);
-      src += len;
-      if (*src)
-	{
-	  d = strchr (d, '\0');
-	  *d++ = dst_delim;
-	}
+      if (!*src++)
+	break;
+      d = strchr (d, '\0');
+      *d++ = dst_delim;
     }
-  while (*src++);
 }
 
 /* init: Initialize the mount table.  */
@@ -1374,11 +1378,21 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
   /* Check if the cygdrive prefix was specified.  If so, just strip
      off the prefix and transform it into an MS-DOS path. */
   MALLOC_CHECK;
-  if (iscygdrive_device (pathbuf))
+  if (iscygdrive (pathbuf))
     {
-      if (!cygdrive_win32_path (pathbuf, dst, 0))
+      int n = mount_table->cygdrive_len - 1;
+      if (!pathbuf[n] ||
+	  (pathbuf[n] == '/' && pathbuf[n + 1] == '.' && !pathbuf[n + 2]))
+	{
+	  unit = 0;
+	  dst[0] = '\0';
+	}
+      else if (!cygdrive_win32_path (pathbuf, dst, unit))
 	return ENOENT;
-      *flags = cygdrive_flags;
+      else
+	*flags = cygdrive_flags;
+      if (mount_table->cygdrive_len > 1)
+	devn = FH_CYGDRIVE;
       goto out;
     }
 
@@ -1497,15 +1511,23 @@ mount_info::cygdrive_posix_path (const char *src, char *dst, int trailing_slash_
 }
 
 int
-mount_info::cygdrive_win32_path (const char *src, char *dst, int trailing_slash_p)
+mount_info::cygdrive_win32_path (const char *src, char *dst, int& unit)
 {
+  int res;
   const char *p = src + cygdrive_len;
   if (!isalpha (*p) || (!isdirsep (p[1]) && p[1]))
-    return 0;
-  dst[0] = *p;
-  dst[1] = ':';
-  strcpy (dst + 2, p + 1);
-  backslashify (dst, dst, trailing_slash_p || !dst[2]);
+    {
+      res = unit = -1;
+      dst[0] = '\0';
+    }
+  else
+    {
+      dst[0] = cyg_tolower (*p);
+      dst[1] = ':';
+      strcpy (dst + 2, p + 1);
+      backslashify (dst, dst, !dst[2]);
+      unit = dst[0];
+    }
   debug_printf ("src '%s', dst '%s'", src, dst);
   return 1;
 }
@@ -2305,7 +2327,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   /* Remove drivenum from list if we see a x: style path */
   if (strlen (native_path) == 2 && native_path[1] == ':')
     {
-      int drivenum = tolower (native_path[0]) - 'a';
+      int drivenum = cyg_tolower (native_path[0]) - 'a';
       if (drivenum >= 0 && drivenum <= 31)
 	available_drives &= ~(1 << drivenum);
     }
@@ -2657,7 +2679,7 @@ symlink (const char *topath, const char *frompath)
 	  if ((cp && cp[1] == '.') || *win32_path == '.')
 	    attr |= FILE_ATTRIBUTE_HIDDEN;
 #endif
-	  SetFileAttributesA (win32_path.get_win32 (), attr);
+	  SetFileAttributes (win32_path.get_win32 (), attr);
 
 	  if (win32_path.fs_fast_ea ())
 	    set_symlink_ea (win32_path, topath);
@@ -2886,13 +2908,13 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
   while (suffix.next ())
     {
       error = 0;
-      fileattr = GetFileAttributesA (suffix.path);
+      fileattr = GetFileAttributes (suffix.path);
       if (fileattr == (DWORD) -1)
 	{
-	  /* The GetFileAttributesA call can fail for reasons that don't
+	  /* The GetFileAttributes call can fail for reasons that don't
 	     matter, so we just return 0.  For example, getting the
 	     attributes of \\HOST will typically fail.  */
-	  debug_printf ("GetFileAttributesA (%s) failed", suffix.path);
+	  debug_printf ("GetFileAttributes (%s) failed", suffix.path);
 	  error = geterrno_from_win_error (GetLastError (), EACCES);
 	  continue;
 	}

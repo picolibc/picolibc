@@ -1,3 +1,52 @@
+2001-11-22  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (conv_path_list): Fix wild indexing into path due to
+	conflicting methods for setting src pointer.
+
+	* dir.cc (opendir): Only pass path_conv argument to opendir, since name
+	is already part of the fhandler.
+	* dtable.cc (dtable::build_fhandler): Accomodate new FH_CYGDRIVE type.
+	* fhandler.cc (fhandler_base::opendir): Nuke name argument.
+	* fhandler.h: Add FH_CYGDRIVE to "device" enum.
+	(fhandler_base::opendir): Nuke name argument.
+	(fhandler_disk_file::opendir): Ditto.
+	(fhandler_disk_file::fhandler_disk_file): Declare new method which
+	passes devtype through.
+	(fhandler_cygdrive): Add elements for tracking drives.
+	(fhandler_cygdrive::set_drives): Declare new method.
+	(fhandler_cygdrive::iscygdrive_root): Declare new method.
+	(fhandler_cygdrive::opendir): Declare new method.
+	(fhandler_cygdrive::readdir): Declare new method.
+	(fhandler_cygdrive::telldir): Declare new method.
+	(fhandler_cygdrive::seekdir): Declare new method.
+	(fhandler_cygdrive::rewinddir): Declare new method.
+	(fhandler_cygdrive::closedir): Declare new method.
+	(fhandler_cygdrive::fstat): Declare new method.
+	* fhandler_disk_file.cc (fhandler_disk_file::fhandler_disk_file):
+	Define new method which passes devtype through.
+	(fhandler_disk_file::open): Tweak debug output.
+	(fhandler_disk_file::opendir): Nuke first argument.  Use info from
+	path_conv and class rather than calling fstat.
+	(fhandler_cygdrive::set_drives): New method.
+	(fhandler_cygdrive::iscygdrive_root): New method.
+	(fhandler_cygdrive::opendir): New method.
+	(fhandler_cygdrive::readdir): New method.
+	(fhandler_cygdrive::telldir): New method.
+	(fhandler_cygdrive::seekdir): New method.
+	(fhandler_cygdrive::rewinddir): New method.
+	(fhandler_cygdrive::closedir): New method.
+	(fhandler_cygdrive::fstat): New method.
+	* path.cc (iscygdrive_device): Assume cygdriveness is already verified.
+	(path_conv::check): Treat FH_CYGDRIVE "method" as a special case,
+	setting file attributes as needed.
+	(mount_info::conv_to_win32_path): Allow stand-alone /cygdrive, meaning
+	"the directory which contains all of the drives on the system".
+	(fillout_mntent): Use cyg_tolower for conversions.
+	(mount_info::cygdrive_win32_path): Replace unused argument with unit
+	number.
+	* shared_info.h (mount_info::cygdrive_win32_path): Reflect argument
+	change.
+
 2001-11-21  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (DLL_OFILES): Add fhandler_disk_file.o.
