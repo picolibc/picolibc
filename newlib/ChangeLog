@@ -1,5 +1,221 @@
 2002-04-17  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/time/time.tex: Add tzset info.
+
+2002-04-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/time.h (tzset, _tzset_r): Added prototypes.
+	(strptime): Moved prototype to be within !__STRICT_ANSI__.
+	(_tzname, _daylight, _timezone): No long __CYGWIN__ only.
+	(tzname): Defined for all platforms.
+	(daylight, timezone): Defined only for CYGWIN.
+	* libc/sys/linux/machine/i386/crt0.c: Add call to tzset() after
+	environment set up.
+	* libc/stdlib/setenv_r.c (_setenv_r): Call tzset() if the TZ
+	environment variable is set.
+	* libc/time/Makefile.am: Add support for tzset.c, tzlock.c, and
+	tzset_r.c.
+	* libc/time/Makefile.in: Regenerated.
+	* libc/time/gmtime.c (gmtime): Changed to call gmtime_r.
+	* libc/time/gmtime_r.c (gmtime_r): Changed to call _mktm_r.
+	* libc/time/lcltime_r.c (lcltime_r): Ditto.
+	* libc/time/local.h: New local header file.
+	* libc/time/mktime.c (mktime): Add timezone support.
+	* libc/time/mktm_r.c: New file which is the common engine
+	for gmtime_r and lcltime_r.  This code has timezone support.
+	* libc/time/strftime.c (strftime): Add %Z timezone support.
+	* libc/time/tzlock.c: New file containing timezone lock stubs.
+	* libc/time/tzset.c: New file containing tzset() routine.
+	* libc/time/tzset_r.c: New file containing _tzset_r and
+	internal routine for calculating timezone changes for specified year.
+
+2002-04-17  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configure.in (CRT0_DIR): Set to libc/.
+	(CRT1_DIR): Set to ${crt1_dir}/ if crt1_dir is non-empty.
+	* Makefile.am: Change all occurrences of $(CRT0_DIR)/$(CRT0) to
+	$(CRT0_DIR)$(CRT0) to prevent make warnings.  Likewise for
+	$(CRT1_DIR)/$(CRT1).
+	* libc/machine/xstormy16/Makefile.in: Regenerated.
+	* libc/machine/xstormy16/aclocal.m4: Regenerated.
+	* libc/machine/xstormy16/configure: Regenerated.
+
+2002-04-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	* libc/stdlib/mallocr.c (malloc_extend_top): If correction sbrk
+	fails, don't bail out, and try to correct next time.
+
+	* libc/include/sys/config.h: Include limits.h.
+
+2002-04-12  Eric Norum  <eric.norum@usask.com>
+
+	* libc/sys/rtems/crt0.c (rtems_gxx_mutex_init): Dummy
+	routine to allow autoconf to determine that building executables
+	for rtems works.
+	(rtems_gxx_mutex_lock, rtems_gxx_mutex_unlock): Ditto.
+	(rtems_gxx_mutex_once): Ditto.
+
+2002-04-09  Tom Rix  <trix@redhat.com>
+
+	* libc/include/sys/reent.h (_REENT_INIT_PTR): Fix typo.
+
+2002-04-09  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+        * libc/include/time.h: Fix strptime declaration.
+        * libc/time/Makefile.am: Add strptime.c.
+	* libc/time/Makefile.in: Regenerated.
+        * libc/time/strptime.c: New file.
+
+2002-04-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/include/setjmp.h: Add sigjmp_buf type,
+	siglongjmp prototype, and sigsetjmp macro definition.
+	* libc/sys/linux/siglongjmp.c: New file.
+	* libc/sys/linux/Makefile.am: Add support for siglongjmp.
+	* libc/sys/linux/Makefile.in: Regenerated.
+
+2002-04-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am: Add support for installing crt1.o if one exists.
+	* configure.host: Specify crt1.o for linux.
+	* configure.in: Expose CRT1 and CRT1_DIR for Makefile.am to use.
+	* Makefile.in: Regenerated.
+	* configure: Ditto.
+	* libc/include/sys/unistd.h (_SC_STREAM_MAX, _SC_PRIORITY_SCHEDULING):
+	Added for non-Cygwin, non-RTEMS configurations.
+	* libc/sys/linux/Makefile.am: Add support for crt1 and sysconf.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/crt1.c: New empty file to override one defaulted
+	by gcc.  This fixes problem with reconfiguring linux newlib build.
+	* libc/sys/linux/sysconf.c: New file.
+
+2002-04-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host: Add support for machine subdirectory of
+	sys subdirectory.
+	* configure.in: Add check for sys machine subdirectory.
+	* Makefile.am: Ditto.
+	* configure: Regenerated.
+	* Makefile.in: Ditto.
+	* libc/sys/linux/crt0.c: Moved to machine/i386 directory.
+	* libc/sys/linux/sys/syscall.h: Ditto.
+	* libc/sys/linux/sleep.c: New file.
+	* libc/sys/linux/socket.c: Ditto.
+	* libc/sys/linux/sockops.h: Ditto.
+	* libc/sys/linux/stack.c: Ditto.
+	* libc/sys/linux/usleep.c: Ditto.
+	* libc/sys/linux/machine/Makefile.am: Ditto.
+	* libc/sys/linux/machine/Makefile.in: Ditto.
+	* libc/sys/linux/machine/aclocal.m4: Ditto.
+	* libc/sys/linux/machine/configure: Ditto.
+	* libc/sys/linux/machine/configure.in: Ditto.
+	* libc/sys/linux/machine/i386/Makefile.am: Ditto.
+	* libc/sys/linux/machine/i386/Makefile.in: Ditto.
+	* libc/sys/linux/machine/i386/aclocal.m4: Ditto.
+	* libc/sys/linux/machine/i386/configure: Ditto.
+	* libc/sys/linux/machine/i386/configure.in: Ditto.
+	* libc/sys/linux/machine/i386/crt0.c: Ditto.
+	* libc/sys/linux/machine/i386/sigset.c: Ditto.
+	* libc/sys/linux/machine/i386/sigstack.h: Ditto.
+	* libc/sys/linux/machine/i386/socketcall.h: Ditto.
+	* libc/sys/linux/machine/i386/syscall.h: Ditto.
+	* libc/sys/linux/sys/select.h: Ditto.
+	* libc/sys/linux/configure.in: Add support for machine directory.
+	* libc/sys/linux/Makefile.am: Ditto plus add new files above.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/configure: Ditto.
+	* libc/sys/linux/brk.c: Use machine/syscall.h instead of sys/syscall.h.
+	* libc/sys/linux/inode.c: Ditto.
+	* libc/sys/linux/linux.c: Ditto.
+	* libc/sys/linux/process.c: Ditto.
+	* libc/sys/linux/systat.c: Ditto.
+	* libc/sys/linux/time.c: Ditto.
+	* libc/sys/linux/wait.c: Ditto.
+	* libc/sys/linux/ids.c: Change header plus add setfsgid/setfsuid.
+	* libc/sys/linux/io.c: Change header plus add readv/writev.
+	* libc/sys/linux/signal.c: Change header plus change sigsuspend to
+	use __sigsuspend syscall.
+	* libc/sys/linux/select.c: Change header plus change select to
+	use _newselect syscall.
+	* libc/sys/linux/sys/cdefs.h: Add a number of standard definitions
+	used by glibc header files.
+	* libc/sys/linux/sys/types.h: Add __socklen_t and __useconds_t
+	types.
+
+2002-04-01  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h (_REENT_INIT_PTR): New macro for
+	initializing a struct _reent that has been dynamically allocated.
+	(_REENT_CHECK_MISC): New macro that checks _misc struct for
+	_REENT_SMALL and does nothing otherwise.
+	(_REENT_STRTOK_LAST): New macro for reentrant strtok.
+	(_REENT_MBLEN_STATE): New macro for reentrant mblen.
+	(_REENT_MBTOWC_STATE): New macro for reentrant mbtowc.
+	(_REENT_WCTOMB_STATE): New macro for reentrant wctomb.
+	[_REENT_SMALL](struct _misc_reent): New structure containing
+	miscellaneous reentrant areas needed by newlib.
+	[_REENT_SMALL](struct _reent): Add _misc pointer.
+	[_REENT_SMALL](_REENT_INIT_MISC): New macro.
+	* libc/string/strtok (strtok): Change to use _REENT_CHECK_MISC
+	and _REENT_STRTOK_LAST macros.
+	* libc/stdlib/mblen (mblen): Change to use _REENT_CHECK_MISC
+	and _REENT_MBLEN_STATE macros.
+	* libc/stdlib/mbtowc (mbtowc): Change to use _REENT_CHECK_MISC
+	and _REENT_MBTOWC_STATE macros.
+	* libc/stdlib/wctomb (wctomb): Change to use _REENT_CHECK_MISC
+	and _REENT_WCTOMB_STATE macros.
+
+2002-04-01  Till Straumann <strauman@SLAC.Stanford.EDU>
+
+	* libc/stdlib/getenv_r.c (_findenv_r): Add missing ENV_UNLOCK.
+
+Wed Mar 27 07:34:44 2002  Jason Tishler <jason@tishler.net>
+
+	* libc/include/sys/features.h (_POSIX_SEMAPHORES): New Cygwin define.
+
+Tue Mar 26 17:17:10 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/machine/sh/memcpy.S (Large): Fix alignment rounding.
+	Store high part of leading bytes too.
+
+2002-03-22  Richard Sandiford  <rsandifo@redhat.com>
+
+	* libm/math/ef_hypot.c: Increase scale factor to 68.
+
+2002-03-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	* libc/machine/mips/strlen.c (strlen) [__mips16]: Fix off-by-two
+	error.
+
+2002-03-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/sys/go32/access.c: Change license to relaxed license
+        used in identical file throughout newlib/libgloss.
+
+2002-03-12  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/sys/arm/access.c: New file.
+	* libc/sys/arm/Makefile.am (lib_a_SOURCES): Add access.c.
+	* libc/sys/arm/Makefile.in: Regenerate.
+	* libc/sys/arm/syscalls.c (_stat): New function.
+
+2002-03-11  Michael Meissner  <meissner@redhat.com>
+
+	* libc/machine/mips/Makefile.am (lib_a_SOURCES): Add Mips specific
+	variants strlen.c, strcmp.c, strncpy.c, memset.c and memcpy.c.
+	* libc/machine/mips/Makefile.in: Regenerate.
+	* libc/machine/mips/memcpy.c: New file, optimized for MIPS.
+	* libc/machine/mips/memset.c: Dito.
+	* libc/machine/mips/strcmp.c: Dito.
+	* libc/machine/mips/strlen.c: Dito.
+	* libc/machine/mips/strncmp.c: Dito.
+
+2002-03-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/i386/Makefile.am: Add $(oext) for setjmp
+	object so it works for shared library or statici library.
+2002-04-17  Jeff Johnston  <jjohnstn@redhat.com>
+
 	*  libc/include/time.h (tzset, _tzset_r): Added prototypes.
 	(strptime): Moved prototype to be within !__STRICT_ANSI__.
 	(_tzname, _daylight, _timezone): No long __CYGWIN__ only.
