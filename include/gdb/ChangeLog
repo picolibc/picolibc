@@ -3,6 +3,10 @@
 	* sim-ppc.h: Add extern "C" wrapper.
 	(enum sim_ppc_regnum): Add full list of SPRs.
 
+2004-08-04  Jim Blandy  <jimb@redhat.com>
+
+	* sim-ppc.h: New file.
+
 2004-06-25  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* callback.h (host_callback_struct): Replace members fdopen and
