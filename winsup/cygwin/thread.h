@@ -456,7 +456,7 @@ public:
   void *(*function) (void *);
   void *arg;
   void *return_ptr;
-  bool running;
+  bool valid;
   bool suspended;
   int cancelstate, canceltype;
   HANDLE cancel_event;
@@ -521,11 +521,24 @@ public:
     threads.for_each (&pthread::_fixup_after_fork);
   }
 
+  static void suspend_all_except_self ()
+  {
+    threads.for_each (&pthread::suspend_except_self);
+  }
+
+  static void resume_all ()
+  {
+    threads.for_each (&pthread::resume);
+  }
+
 private:
   static List<pthread> threads;
   DWORD thread_id;
   __pthread_cleanup_handler *cleanup_stack;
   pthread_mutex mutex;
+
+  void suspend_except_self ();
+  void resume ();
 
   void _fixup_after_fork ();
 

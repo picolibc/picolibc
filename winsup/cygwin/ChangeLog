@@ -1,3 +1,14 @@
+2003-10-31  Thomas Pfaff  <tpfaff@gmx.net>
+
+	Rename pthread::running to pthread::valid throughout.
+
+	* thread.h: (pthread::suspend_all_except_self): New static method.
+	(pthread::resume_all): Ditto.
+	(pthread::suspend_except_self): New method.
+	(pthread::resume): Ditto.
+	* thread.cc (pthread::suspend_except_self): Implement.
+	(pthread::resume): Ditto.
+
 2003-10-29  Danny Smith  <dannysmith@users.sourceforege.net>
 
 	* include/stdint.h: Prevent signed->unsigned conversion for 32 and

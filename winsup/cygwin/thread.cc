@@ -254,7 +254,7 @@ List<pthread> pthread::threads;
 
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-		    running (false), suspended (false),
+		    valid (false), suspended (false),
 		    cancelstate (0), canceltype (0), cancel_event (0),
 		    joiner (NULL), next (NULL), cleanup_stack (NULL)
 {
@@ -344,7 +344,7 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
 void
 pthread::postcreate ()
 {
-  running = true;
+  valid = true;
 
   InterlockedIncrement (&MT_INTERFACE->threadcount);
   /* FIXME: set the priority appropriately for system contention scope */
@@ -371,7 +371,7 @@ pthread::exit (void *value_ptr)
     delete this;
   else
     {
-      running = false;
+      valid = false;
       return_ptr = value_ptr;
       mutex.unlock ();
     }
@@ -390,7 +390,7 @@ pthread::cancel (void)
 
   mutex.lock ();
 
-  if (!running)
+  if (!valid)
     {
       mutex.unlock ();
       return 0;
@@ -743,6 +743,7 @@ pthread::init_current_thread ()
     win32_obj_id = NULL;
   set_thread_id_to_current ();
   set_tls_self_pointer (this);
+  valid = true;
 }
 
 void
@@ -752,10 +753,24 @@ pthread::_fixup_after_fork ()
   if (this != pthread::self ())
     {
       magic = 0;
-      running = false;
+      valid = false;
       win32_obj_id = NULL;
       cancel_event = NULL;
     }
+}
+
+void
+pthread::suspend_except_self ()
+{
+  if (valid && this != pthread::self ())
+    SuspendThread (win32_obj_id); 
+}
+
+void
+pthread::resume ()
+{
+  if (valid)
+    ResumeThread (win32_obj_id); 
 }
 
 /* static members */
@@ -2332,7 +2347,7 @@ pthread::detach (pthread_t *thread)
     }
 
   // check if thread is still alive
-  if ((*thread)->running && WaitForSingleObject ((*thread)->win32_obj_id, 0) == WAIT_TIMEOUT)
+  if ((*thread)->valid && WaitForSingleObject ((*thread)->win32_obj_id, 0) == WAIT_TIMEOUT)
     {
       // force cleanup on exit
       (*thread)->joiner = *thread;
