@@ -266,7 +266,7 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
   return cnt;
 
 error:
-  set_errno ( EINVAL );
+  set_errno (EINVAL);
   return -1;
 }
 

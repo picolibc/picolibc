@@ -41,7 +41,7 @@ per_module::run_ctors ()
       int i;
       for (i = 1; pfunc[i]; i++);
 
-      for (int j = i - 1; j > 0; j-- )
+      for (int j = i - 1; j > 0; j--)
 	(pfunc[j]) ();
     }
 }

@@ -178,8 +178,8 @@ search_for (uid_t uid, const char *name)
   /* Return default passwd entry if passwd is emulated or it's a
      request for the current user. */
   if (passwd_state != loaded
-      || (! name && uid == myself->uid)
-      || (  name && strcasematch(name, myself->username)))
+      || (!name && uid == myself->uid)
+      || (name && strcasematch(name, myself->username)))
     return default_pw;
 
   return NULL;

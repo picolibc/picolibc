@@ -513,7 +513,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   ciresrv.moreinfo->environ = (char **) cmalloc (HEAP_ARGV, envsize (envp, 1));
   char **c;
   const char * const *e;
-  for (c = ciresrv.moreinfo->environ, e = envp; *e; )
+  for (c = ciresrv.moreinfo->environ, e = envp; *e;)
     *c++ = cstrdup (*e++);
   *c = NULL;
   if (mode != _P_OVERLAY ||

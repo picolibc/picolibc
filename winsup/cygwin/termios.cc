@@ -42,7 +42,7 @@ tcsendbreak (int fd, int duration)
     }
 
 out:
-  syscall_printf ("%d = tcsendbreak (%d, %d )", res, fd, duration);
+  syscall_printf ("%d = tcsendbreak (%d, %d)", res, fd, duration);
   return res;
 }
 

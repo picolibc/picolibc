@@ -36,7 +36,7 @@ fillout_pinfo (pid_t pid, int winpid)
     i = 0;
 
   memset (&ep, 0, sizeof ep);
-  for (; i < pids.npids; )
+  for (; i < pids.npids;)
     {
       DWORD thispid = pids[i++];
       if (!thispid)

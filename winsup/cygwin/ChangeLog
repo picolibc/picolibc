@@ -1,3 +1,9 @@
+2000-09-03  Egor Duda  <deo@logos-m.ru>
+
+	* path.cc (readlink): Check if buffer length is positive.
+	Truncate output to buffer length. Don't terminate buffer
+	with '\0'.
+
 Sun Sep  3 00:38:40 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* environ.cc (environ_init): Don't free the new environment table after

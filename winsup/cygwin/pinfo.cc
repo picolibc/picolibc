@@ -96,7 +96,7 @@ struct sigaction&
 _pinfo::getsig(int sig)
 {
 #ifdef _MT_SAFE
-  if ( thread2signal )
+  if (thread2signal)
     return thread2signal->sigs[sig];
   return sigs[sig];
 #else
@@ -108,7 +108,7 @@ sigset_t&
 _pinfo::getsigmask ()
 {
 #ifdef _MT_SAFE
-  if ( thread2signal )
+  if (thread2signal)
     return *thread2signal->sigmask;
   return sig_mask;
 #else
@@ -120,7 +120,7 @@ void
 _pinfo::setsigmask (sigset_t _mask)
 {
 #ifdef _MT_SAFE
-  if ( thread2signal )
+  if (thread2signal)
 	*(thread2signal->sigmask) = _mask;
   sig_mask=_mask;
 #else
@@ -132,7 +132,7 @@ LONG *
 _pinfo::getsigtodo(int sig)
 {
 #ifdef _MT_SAFE
-  if ( thread2signal )
+  if (thread2signal)
     return thread2signal->sigtodo + __SIGOFFSET + sig;
   return _sigtodo + __SIGOFFSET + sig;
 #else
@@ -146,7 +146,7 @@ HANDLE
 _pinfo::getthread2signal()
 {
 #ifdef _MT_SAFE
-  if ( thread2signal )
+  if (thread2signal)
     return thread2signal->win32_obj_id;
   return hMainThread;
 #else

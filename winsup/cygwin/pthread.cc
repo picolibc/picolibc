@@ -137,7 +137,7 @@ pthread_self ()
 int
 pthread_equal (pthread_t t1, pthread_t t2)
 {
-  return __pthread_equal ( &t1, &t2);
+  return __pthread_equal (&t1, &t2);
 }
 
 /* Mutexes  */

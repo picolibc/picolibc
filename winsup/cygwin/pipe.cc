@@ -29,7 +29,7 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
   if ((fdr = fdtab.find_unused_handle ()) < 0)
     set_errno (ENMFILE);
   else if ((fdw = fdtab.find_unused_handle (fdr + 1)) < 0)
-    set_errno ( ENMFILE);
+    set_errno (ENMFILE);
   else if (!CreatePipe (&r, &w, sa, psize))
     __seterrno ();
   else

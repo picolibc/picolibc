@@ -28,7 +28,7 @@ WINAPI dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_THREAD_ATTACH:
       if (user_data->threadinterface)
 	{
-	  if ( !TlsSetValue(user_data->threadinterface->reent_index,
+	  if (!TlsSetValue(user_data->threadinterface->reent_index,
 		    &user_data->threadinterface->reents))
 	    api_fatal("Sig proc MT init failed\n");
 	}

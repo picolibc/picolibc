@@ -2436,6 +2436,13 @@ int
 readlink (const char *path, char *buf, int buflen)
 {
   extern suffix_info stat_suffixes[];
+
+  if (buflen < 0)
+    {
+      set_errno (ENAMETOOLONG);
+      return -1;
+    }
+
   path_conv pathbuf (path, PC_SYM_CONTENTS, stat_suffixes);
 
   if (pathbuf.error)
@@ -2452,14 +2459,8 @@ readlink (const char *path, char *buf, int buflen)
       return -1;
     }
 
-  int len = strlen (pathbuf.get_win32 ());
-  if (len > (buflen - 1))
-    {
-      set_errno (ENAMETOOLONG);
-      return -1;
-    }
+  int len = max (buflen, (int) strlen (pathbuf.get_win32 ()));
   memcpy (buf, pathbuf.get_win32 (), len);
-  buf[len] = '\0';
 
   /* errno set by symlink.check if error */
   return len;

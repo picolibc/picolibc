@@ -601,8 +601,7 @@ _link (const char *a, const char *b)
 	    &dwBytesWritten,
 	    TRUE,		// abort
 	    FALSE,		// don't process security
-	    &lpContext
-	    );
+	    &lpContext);
 	}
       else
 	syscall_printf ("cannot write streamId, %E");
@@ -1635,7 +1634,7 @@ get_osfhandle (int fd)
 
   if (fdtab.not_open (fd))
     {
-      set_errno ( EBADF);
+      set_errno (EBADF);
     }
   else
     {

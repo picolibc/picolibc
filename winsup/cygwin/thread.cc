@@ -241,13 +241,13 @@ MTinterface::SetItem (int _index, MTitem * _item, MTList * _list)
 int
 CmpPthreadObj (void *_i, void *_value)
 {
-  return ( (MTitem *) _i)->Id () == * (int *) _value;
+  return ((MTitem *) _i)->Id () == *(int *) _value;
 };
 
 int
 CmpThreadId (void *_i, void *_id)
 {
-  return ( (ThreadItem *) _i)->thread_id == * (DWORD *) _id;
+  return ((ThreadItem *) _i)->thread_id == * (DWORD *) _id;
 };
 
 void
