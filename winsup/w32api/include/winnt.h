@@ -2115,15 +2115,34 @@ typedef struct _SECURITY_DESCRIPTOR {
 	PACL Dacl;
 } SECURITY_DESCRIPTOR, *PSECURITY_DESCRIPTOR, *PISECURITY_DESCRIPTOR;
 typedef enum _TOKEN_INFORMATION_CLASS {
-	TokenUser=1,TokenGroups,TokenPrivileges,TokenOwner,
-	TokenPrimaryGroup,TokenDefaultDacl,TokenSource,TokenType,
-	TokenImpersonationLevel,TokenStatistics,TokenRestrictedSids,
-	TokenSessionId
+	TokenUser=1,
+	TokenGroups,
+	TokenPrivileges,
+	TokenOwner,
+	TokenPrimaryGroup,
+	TokenDefaultDacl,
+	TokenSource,
+	TokenType,
+	TokenImpersonationLevel,
+	TokenStatistics,
+	TokenRestrictedSids,
+	TokenSessionId,
+	TokenGroupsAndPrivileges,
+	TokenSessionReference,
+	TokenSandBoxInert,
+	TokenAuditPolicy,
+	TokenOrigin  
 } TOKEN_INFORMATION_CLASS;
 typedef enum _SID_NAME_USE {
-	SidTypeUser=1,SidTypeGroup,SidTypeDomain,SidTypeAlias,
-	SidTypeWellKnownGroup,SidTypeDeletedAccount,SidTypeInvalid,
-	SidTypeUnknown
+	SidTypeUser=1,
+	SidTypeGroup,
+	SidTypeDomain,
+	SidTypeAlias,
+	SidTypeWellKnownGroup,
+	SidTypeDeletedAccount,
+	SidTypeInvalid,
+	SidTypeUnknown,
+	SidTypeComputer
 } SID_NAME_USE,*PSID_NAME_USE;
 typedef struct _QUOTA_LIMITS {
 	SIZE_T PagedPoolLimit;

@@ -1,3 +1,12 @@
+2004-12-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (TOKEN_INFORMATION_CLASS): Add
+	TokenGroupsAndPrivileges, TokenSessionReference,
+	TokenSandBoxInert, TokenAuditPolicy, TokenOrigin.
+	Reformat.
+	(SID_NAME_USE): Add SidTypeComputer.  Reformat.
+	Thanks to Gabriel Linder <mingwlinder@users.sourceforge.net>
+
 2004-12-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/comctl32.def (ImageList_Copy, ImageList_DrawIndirect,
