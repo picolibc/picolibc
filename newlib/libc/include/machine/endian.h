@@ -15,5 +15,6 @@
 #else
 #define BYTE_ORDER BIG_ENDIAN
 #endif
+#endif
 
 #endif /* __MACHINE_ENDIAN_H__ */
