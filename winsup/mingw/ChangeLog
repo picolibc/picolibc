@@ -1,3 +1,11 @@
+2004-07-14  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* Makefile.in (INCLUDES): Designate $(srcdir)/../include as a
+	system dir.
+	* mingwex/Makefile,in (INCLUDES): Ditto.
+	* profile/Makefile,in (INCLUDES): Ditto.
+
+	* mingwex/Makefile,in: Add carg.o to libmingwex.a.
 2004-07-13  Earnie Boyd  <earnie@users.sourcefourge.net>
 
 	* Makefile.in: Move use of --nostdinc++ as GCC3.4 warns to use it

@@ -67,7 +67,7 @@ STDIO_DISTFILES = \
 	vfscanf.c vfwscanf.c vscanf.c vsscanf.c vswscanf.c vwscanf.c
 
 COMPLEX_DISTFILES = \
-	cabs.c cacos.c cacosh.c casin.c casinh.c catan.c catanh.c \
+	cabs.c cacos.c cacosh.c casin.c casinh.c carg.c catan.c catanh.c \
 	ccos.c ccosh.c cexp.c cimag.c clog.c cpow.c cproj.c creal.c \
 	csin.c csinh.c csqrt.c ctan.c ctanh.c
 
@@ -83,7 +83,7 @@ OPTFLAGS= -fomit-frame-pointer
 MNO_CYGWIN = @MNO_CYGWIN@
 
 W32API_INCLUDE = @W32API_INCLUDE@
-INCLUDES = -I$(srcdir) -I$(srcdir)/../include \
+INCLUDES = -I$(srcdir) -isystem$(srcdir)/../include \
   -nostdinc \
   -iwithprefixbefore include
 ALL_CFLAGS = $(CFLAGS) $(OPTFLAGS) $(W32API_INCLUDE) $(INCLUDES) $(MNO_CYGWIN)
@@ -151,9 +151,9 @@ POSIX_OBJS = \
 REPLACE_OBJS = \
 	mingw-fseek.o
 COMPLEX_OBJS = \
-	cabs.o cacos.o cacosh.o casin.o casinh.o catan.o catanh.o \
+	cabs.o cacos.o cacosh.o casin.o casinh.o carg.o catan.o catanh.o \
 	ccos.o ccosh.o cexp.o cimag.o clog.o cpow.o cproj.o creal.o \
-	csin.o csinh.o csqrt.o ctan.o ctanh.o
+	csin.o csinh.o csqrt.o ctan.o ctanh.o 
 
 LIB_OBJS = $(Q8_OBJS) $(STDLIB_OBJS) $(STDLIB_STUB_OBJS) \
 	$(STDIO_OBJS) $(MATH_OBJS)  $(FENV_OBJS) \
