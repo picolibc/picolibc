@@ -1,3 +1,9 @@
+2002-05-01  Manu B  <contact.manu@wanadoo.fr>
+
+	* include/commctrl.h (SNDMSG): Define and use throughout
+	in other macros instead of SendMessage.
+	* include/commdlg.h (SNDMSG): Ditto.
+
 2002-04-22  José Fonseca  <jrfonseca@users.sf.net>
 
 	* include/GL/gl.h: New file.
