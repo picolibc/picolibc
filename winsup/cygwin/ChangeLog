@@ -1,5 +1,12 @@
 2004-02-24  Christopher Faylor  <cgf@redhat.com>
 
+	* gendef (stabilize_sig_stack): Correctly align this pointer for call
+	to _cygtls::call_signal_handler.
+	* gentls_offsets: Output sizeof field.
+	* tlsoffsets.h: Regenerate.
+
+2004-02-24  Christopher Faylor  <cgf@redhat.com>
+
 	* dcrt0.cc (_dll_crt0): Don't check sync_startup if threadfunc_ix is set.
 
 	* external.cc (cygwin_internal): Implement CW_GET_BINMODE.

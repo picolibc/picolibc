@@ -249,8 +249,9 @@ stabilize_sig_stack:
 	jmp	1b
 2:	cmpl	\$0,$tls::sig(%edx)
 	jz	3f
-	decl	$tls::stacklock(%edx)
-	movl	%edx,%eax
+	decl	$tls::stacklock(%edx)			# unlock
+	movl	\$-$tls::sizeof__cygtls,%eax		# point to beginning
+	addl	%edx,%eax				#  of tls block
 	call	__ZN7_cygtls19call_signal_handlerEv
 	jmp	1b
 3:	ret
