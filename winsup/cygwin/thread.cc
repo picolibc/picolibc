@@ -1672,9 +1672,9 @@ __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
   if (pthread_mutex_unlock (&(*cond)->cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
   rv = (*cond)->TimedWait (abstime->tv_sec * 1000);
+  (*cond)->mutex->Lock ();
   if (pthread_mutex_lock (&(*cond)->cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
-  (*cond)->mutex->Lock ();
   if (InterlockedDecrement (&((*cond)->waiting)) == 0)
     (*cond)->mutex = NULL;
   InterlockedDecrement (&((*themutex)->condwaits));
@@ -1719,9 +1719,9 @@ __pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
   if (pthread_mutex_unlock (&(*cond)->cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
   rv = (*cond)->TimedWait (INFINITE);
+  (*cond)->mutex->Lock ();
   if (pthread_mutex_lock (&(*cond)->cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
-  (*cond)->mutex->Lock ();
   if (InterlockedDecrement (&((*cond)->waiting)) == 0)
     (*cond)->mutex = NULL;
   InterlockedDecrement (&((*themutex)->condwaits));
