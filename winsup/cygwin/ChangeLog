@@ -1,3 +1,20 @@
+2002-08-27  Christopher Faylor  <cgf@redhat.com>
+
+	* child_info.h: Add _PROC_WHOOPS enum value.
+	(CURR_CHILD_INFO_MAGIC): Update.
+	(child_info::magic): Make 'long'.
+	* cygheap.h: Export _cygheap_start.
+	* cygheap.cc: Don't declare _cygheap_start.
+	* cygmagic: Use cksum to produce checksums.  Append 'U' to end of
+	checksum.
+	* dcrt0.cc (initial_env): Calculate sleep ms before reusing buffer.
+	(_dll_crt0): Detect cygheap mismatch as indicative of different cygwin
+	version.  Set child_proc_info to NULL when _PROC_WHOOPS.
+	(multiple_cygwin_problem): If child_info specific problem, then set
+	child_proc_info type to _PROC_WHOOPS.
+	* shared_info.h (CURR_MOUNT_MAGIC): Update.
+	(CURR_SHARED_MAGIC): Ditto.
+
 2002-08-25  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler.h (fhandler_socket::recvfrom): Fix prototype.

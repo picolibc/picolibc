@@ -41,7 +41,7 @@ class mount_item
 
 #define MOUNT_VERSION	27	// increment when mount table changes and
 #define MOUNT_VERSION_MAGIC CYGWIN_VERSION_MAGIC (MOUNT_MAGIC, MOUNT_VERSION)
-#define CURR_MOUNT_MAGIC 0xf4e5
+#define CURR_MOUNT_MAGIC 0x4fe431cdU
 #define MOUNT_INFO_CB 16488
 
 class reg_key;
@@ -138,7 +138,7 @@ public:
 
 #define SHARED_INFO_CB 47112
 
-#define CURR_SHARED_MAGIC 0x88e
+#define CURR_SHARED_MAGIC 0x29eb8ccdU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between

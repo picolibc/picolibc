@@ -45,7 +45,6 @@ struct cygheap_entry
 
 extern "C" {
 static void __stdcall _cfree (void *ptr) __attribute__((regparm(1)));
-extern void *_cygheap_start;
 }
 
 inline static void

@@ -796,10 +796,11 @@ initial_env ()
 #ifdef DEBUGGING
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
     {
+      DWORD ms = atoi (buf);
       buf[0] = '\0';
       len = GetModuleFileName (NULL, buf, MAX_PATH);
-      console_printf ("Sleeping %d, pid %u %s\n", atoi (buf), GetCurrentProcessId (), buf);
-      Sleep (atoi (buf));
+      console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
+      Sleep (ms);
     }
   if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
     {
@@ -872,7 +873,11 @@ _dll_crt0 ()
 	multiple_cygwin_problem ("proc", child_proc_info->intro, 0);
       else if (child_proc_info->intro == PROC_MAGIC_GENERIC
 	       && child_proc_info->magic != CHILD_INFO_MAGIC)
-	multiple_cygwin_problem ("proc", child_proc_info->magic, CHILD_INFO_MAGIC);
+	multiple_cygwin_problem ("proc", child_proc_info->magic,
+				 CHILD_INFO_MAGIC);
+      else if (child_proc_info->cygheap != (void *) &_cygheap_start)
+	multiple_cygwin_problem ("cygheap", (DWORD) child_proc_info->cygheap,
+				 (DWORD) &_cygheap_start);
       unsigned should_be_cb = 0;
       switch (child_proc_info->type)
 	{
@@ -896,6 +901,8 @@ _dll_crt0 ()
 	      }
 	  default:
 	    system_printf ("unknown exec type %d", child_proc_info->type);
+	    /* intentionally fall through */
+	  case _PROC_WHOOPS:
 	    child_proc_info = NULL;
 	    break;
 	}
@@ -1071,9 +1078,9 @@ __api_fatal (const char *fmt, ...)
 void
 multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned version)
 {
-  if (_cygwin_testing && strstr (what, "proc"))
+  if (_cygwin_testing && (strstr (what, "proc") || strstr (what, "cygheap")))
     {
-      fork_info = NULL;
+      child_proc_info->type = _PROC_WHOOPS;
       return;
     }
 
