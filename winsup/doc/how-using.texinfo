@@ -248,6 +248,7 @@ in /bin/sh, particularly if you are used to /bin/sh actually being
 bash (Linux) or ksh (Tru64).  For example:
 
 @itemize bullet
+@item No `~' expansion (use $HOME instead)
 @item No job control
 @item No getopts
 @item No let
