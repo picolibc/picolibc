@@ -131,16 +131,7 @@ areas passed to it via shared area and then returns from fork itself.
 
 @subsection How does wildcarding (globbing) work?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-If an application using CYGWIN.DLL starts up, and can't find the
-@code{PID} environment variable, it assumes that it has been started
-from the a DOS style command prompt.  This is pretty safe, since the
-rest of the tools (including bash) set PID so that a new process knows
-what PID it has when it starts up.
-
-If the DLL thinks it has come from a DOS style prompt, it runs a
+If the DLL thinks it was invoked from a DOS style prompt, it runs a
 `globber' over the arguments provided on the command line.  This means
 that if you type @code{LS *.EXE} from DOS, it will do what you might
 expect.
