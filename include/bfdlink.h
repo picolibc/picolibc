@@ -288,6 +288,9 @@ struct bfd_link_info
   /* TRUE if global symbols in discarded sections should be stripped.  */
   unsigned int strip_discarded: 1;
 
+  /* TRUE if relaxation is being finalized.  */
+  unsigned int relax_finalizing: 1;
+
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
 
@@ -481,6 +484,11 @@ struct bfd_link_callbacks
   bfd_boolean (*notice)
     PARAMS ((struct bfd_link_info *, const char *name,
 	     bfd *abfd, asection *section, bfd_vma address));
+  /* A function which is called for reporting a linker error. ID is the
+     error identifier. The remaining input is the same as einfo () in
+     ld.  */
+  bfd_boolean (*error_handler)
+    PARAMS ((int id, const char * fmt, ...));
 };
 
 /* The linker builds link_order structures which tell the code how to

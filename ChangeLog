@@ -1,3 +1,34 @@
+2003-04-30  David Carlton  <carlton@bactrian.org>
+
+	* Merge with mainline; tag is carlton_dictionary-20030430-merge.
+
+2003-04-27  Daniel Jacobowitz  <drow@mvista.com>
+
+	* Makefile.tpl: Clean $(BUILD_SUBDIR).
+	* Makefile.in: Regenerated.
+
+2003-04-18  Gerald Pfeifer  <pfeifer@dbai.tuwien.ac.at>
+
+	* Makefile.tpl (MAKEINFOFLAGS): Default to --split-size=5000000.
+	* Makefile.in: Regenerate.
+
+2003-04-18  Jakub Jelinek  <jakub@redhat.com>
+
+	* configure.in (powerpc64*-*-linux*): Remove.
+	* configure: Rebuilt.
+
+2003-04-17  Phil Edwards  <pme@gcc.gnu.org>
+
+	* Makefile.tpl (GCC_STRAP_TARGETS):  New variable containing all the
+	previous bootstrap targets, plus bubblestrap, quickstrap, cleanstrap,
+	and restrap.
+	* Makefile.in:  Regenerate.
+
+2003-04-16  Richard Earnshaw  <rearnsha@arm.com>
+
+	* configure.in (arm-*-netbsdelf*): Enable building java libraries.
+	* configure: Regenerated.
+
 2003-04-16  David Carlton  <carlton@bactrian.org>
 
 	* Merge with mainline; tag is carlton_dictionary-20030416-merge.
