@@ -1,6 +1,13 @@
-@chapter Known/potential Problems in the Latest Net Release
+@chapter Known Problems in the Latest Net Release
 
 @section Aware of the problem, no solution known.
+
+@subsection Pipe key (@samp{|}) doesn't work on non-US keyboards in Win9x
+
+This might get fixed someday, but meanwhile, just use rxvt, which does
+not have this problem.  This is no real loss, because rxvt has many
+other advantages.  (Do not attempt to use the "broken" pipe key
+(@samp{¦}) as a substitute, it is a different character.)
 
 @subsection On Win9x, scp and cvs/ssh leave ssh processes running
 
@@ -20,4 +27,4 @@ class.  Details at
 
 @section Fixed in the Next Release
 
-Nothing currently.
+(section empty)
