@@ -651,7 +651,7 @@ Usage strace [options] program [args...]
 <para>The <command>strace</command> program executes a program, and
 optionally the children of the program, reporting any Cygwin DLL output
 from the program(s) to file.  This program is mainly useful for debugging
-the Cygwin DLL itself.
+the Cygwin DLL itself.</para>
 </sect2>
 
 <sect2 id="regtool"><title>regtool</title>
