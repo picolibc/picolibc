@@ -83,3 +83,72 @@
 #define fpcr REG (fpcr)
 #define fpsr REG (fpsr)
 #define fpi REG (fpi)
+
+/* Provide a few macros to allow for PIC code support.
+ * With PIC, data is stored A5 relative so we've got to take a bit of special
+ * care to ensure that all loads of global data is via A5.  PIC also requires
+ * jumps and subroutine calls to be PC relative rather than absolute.  We cheat
+ * a little on this and in the PIC case, we use short offset branches and
+ * hope that the final object code is within range (which it should be).
+ */
+#ifndef __PIC__
+
+	/* Non PIC (absolute/relocatable) versions */
+
+	.macro PICCALL addr
+	jbsr	\addr
+	.endm
+
+	.macro PICJUMP addr
+	jmp	\addr
+	.endm
+
+	.macro PICLEA sym, reg
+	lea	\sym, \reg
+	.endm
+
+	.macro PICPEA sym, areg
+	pea	\sym
+	.endm
+
+#else /* __PIC__ */
+
+	/* Common for -mid-shared-libary and -msep-data */
+
+	.macro PICCALL addr
+	bsr	\addr
+	.endm
+
+	.macro PICJUMP addr
+	bra	\addr
+	.endm
+
+# if defined(__ID_SHARED_LIBRARY__)
+
+	/* -mid-shared-library versions  */
+
+	.macro PICLEA sym, reg
+	movel	a5@(_current_shared_library_a5_offset_), \reg
+	movel	\sym@GOT(\reg), \reg
+	.endm
+
+	.macro PICPEA sym, areg
+	movel	a5@(_current_shared_library_a5_offset_), \areg
+	movel	\sym@GOT(\areg), sp@-
+	.endm
+
+# else /* !__ID_SHARED_LIBRARY__ */
+
+	/* Versions for -msep-data */
+
+	.macro PICLEA sym, reg
+	movel	\sym@GOT(a5), \reg
+	.endm
+
+	.macro PICPEA sym, areg
+	movel	\sym@GOT(a5), sp@-
+	.endm
+
+# endif /* !__ID_SHARED_LIBRARY__ */
+#endif /* __PIC__ */
+

@@ -1,3 +1,11 @@
+2003-10-27  Bernardo Innocenti  <bernie@develer.com>
+
+	* m68k/asm.h: Add macros for -fPIC, -msep-data and
+	-mid-shared-library support.     
+	* m68k/crt0.S: Use macros for -fPIC, -msep-data and
+	-mid-shared-library support.
+	* m68k/sim-crt0.S: Likewise.
+
 2003-10-15  Bernardo Innocenti  <bernie@develer.com>
 
 	* m68k/sim-funcs.c (_XOPEN_SOURCE): Define to get the pid_t

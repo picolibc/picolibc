@@ -84,7 +84,7 @@ SYM (start):
 	subql	IMM(1), d0
 2:
 	clrb	(a0)+
-#ifndef __mcf5200__
+#if !defined(__mcoldfire__) && !defined(__mcf5200__)
 	dbra	d0, 2b
 	clrw	d0
 	subql	IMM(1), d0
@@ -100,13 +100,13 @@ SYM (start):
  * initialize target specific stuff. Only execute these
  * functions it they exist.
  */
-	lea	SYM (hardware_init_hook), a0
+	PICLEA	SYM (hardware_init_hook), a0
 	cmpl	IMM(0),a0
 	jbeq	4f
 	jsr     (a0)
 4:
 
-	lea	SYM (software_init_hook), a0
+	PICLEA	SYM (software_init_hook), a0
 	cmpl	IMM(0),a0
 	jbeq	5f
 	jsr     (a0)
@@ -121,18 +121,18 @@ SYM (start):
 #ifdef ADD_DTORS
 	/* put __do_global_dtors in the atexit list so the destructors get run */
 	movel	IMM (SYM(__do_global_dtors)),(sp)
-	jsr	SYM (atexit)
+	PICCALL	SYM (atexit)
 #endif
 	movel	IMM (__FINI_SECTION__),(sp)
-	jsr	SYM (atexit)
+	PICCALL	SYM (atexit)
 
-	jsr	__INIT_SECTION__
+	PICCALL	__INIT_SECTION__
 
         pea     0
-        pea     SYM (environ)
+	PICPEA	SYM (environ),a0
         pea     sp@(4)
         pea     0
-	jsr	SYM (main)
+	PICCALL	SYM (main)
 	movel	d0, sp@-
 
 /*
@@ -140,4 +140,4 @@ SYM (start):
  * control back to the ROM monitor, if there is one. This calls the
  * exit() from the C library so the C++ tables get cleaned up right.
  */
-        jsr     SYM (exit)
+	PICCALL	SYM (exit)
