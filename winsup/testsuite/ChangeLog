@@ -1,18 +1,19 @@
 2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
 
-	* winsup.api/pthread/cancel9.c: New test. Port from pthreads-win32 
-	project.
+	* winsup.api/pthread/cancel10.c: New test.
 
 2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
 
-	* winsup.api/pthread/cancel7.c: New test. Port from pthreads-win32 
-	project.
+	* winsup.api/pthread/cancel9.c: New test.
+
+2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* winsup.api/pthread/cancel7.c: New test.
 	* winsup.api/pthread/cancel8.c: Ditto.
 
 2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
 
-	* winsup.api/pthread/cancel6.c: New test. Port from pthreads-win32 
-	project.
+	* winsup.api/pthread/cancel6.c: New test.
 
 2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
 	
