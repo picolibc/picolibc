@@ -236,6 +236,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    Written in the absense of an ABI.  */
 #define EM_OPENRISC_OLD		0x3426
 
+/* DLX magic number
+   Written in the absense of an ABI.  */
+#define EM_DLX			0x5aa5
+
 #define EM_XSTORMY16	        0xad45
 
 /* See the above comment before you add a new EM_* value here.  */

@@ -1,3 +1,7 @@
+2002-05-28  Kuang Hwa Lin <kuang@sbcglobal.net>
+
+	* dis-asm.h: Prototype print_insn_dlx.
+
 2002-05-23  Andrew Cagney  <ac131313@redhat.com>
 
 	* sim-d10v.h: Delete file.  Moved to include/gdb/.
@@ -12,7 +16,7 @@
 
 	* bfdlink.h (bfd_link_info): Add allow_multiple_definition.
 
-Fri May 17 14:25:40 2002  J"orn Rennecke <joern.rennecke@superh.com>
+2002-05-17  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* dis-asm.h (print_insn_shl, print_insn_sh64l): Remove prototype.
 
