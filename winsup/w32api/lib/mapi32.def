@@ -84,6 +84,8 @@ MAPIOpenFormMgr
 MAPIOpenFormMgr@8
 MAPIOpenLocalFormContainer
 MAPIOpenLocalFormContainer@4
+MAPISendMail
+MAPISendMail@20
 MAPIUninitialize
 MAPIUninitialize@0
 MNLS_CompareStringW@24

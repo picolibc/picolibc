@@ -1,3 +1,6 @@
+Tue May 22 18:58:27 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* lib/mapi32.def: Add MAPISendMail.
 
 2001-05-22  Earnie Boyd  <earnie@users.sourceforge.net>
 
