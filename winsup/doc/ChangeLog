@@ -1,3 +1,7 @@
+2005-03-30  Christopher Faylor  <cgf@timesys.com>
+
+	* how-using.texinfo: Add more words to the "multiple DLL" section.
+
 2005-03-25  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-programming.texinfo: Mention generic-build-script in

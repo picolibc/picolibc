@@ -415,6 +415,12 @@ running at the same time.  This could happen, for example, if you update
 cygwin1.dll without exiting @emph{all} Cygwin apps (including inetd)
 beforehand.
 
+The only DLL that is sanctioned by the Cygwin project is the one that
+you get by running @file{http://cygwin.com/setup.exe}, installed in the
+directory controlled by this program.  If you have other versions on
+your system and desire help from the cygwin project, you should delete
+or rename all DLLs that are not installed by @file{setup.exe}.
+
 If you're trying to find multiple versions of the DLL that are causing
 this problem, reboot first, in case DLLs still loaded in memory are the
 cause.  Then use the Windows System find utility to search your whole
