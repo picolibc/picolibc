@@ -20,9 +20,6 @@
  * $Date$
  *
  */
-
-#ifndef	__STRICT_ANSI__
-
 #ifndef _DIRENT_H_
 #define _DIRENT_H_
 
@@ -140,6 +137,3 @@ void __cdecl _wseekdir (_WDIR*, long);
 #endif	/* Not RC_INVOKED */
 
 #endif	/* Not _DIRENT_H_ */
-
-#endif	/* Not __STRICT_ANSI__ */
-

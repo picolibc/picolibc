@@ -4,7 +4,8 @@
  * unistd.h maps (roughly) to io.h
  */
 
-#ifndef __STRICT_ANSI__
+#ifndef _UNISTD_H
+#define _UNISTD_H
 
 #include <io.h>
 #include <process.h>
@@ -13,5 +14,4 @@
 #include <getopt.h>
 #undef __UNISTD_GETOPT__
 
-#endif 
-
+#endif /* _UNISTD_H */

@@ -46,8 +46,6 @@ typedef	long	time_t;
 #endif
 
 
-#ifndef	__STRICT_ANSI__
-
 #ifndef	_OFF_T_
 #define	_OFF_T_
 typedef long _off_t;
@@ -119,8 +117,6 @@ typedef long _ssize_t;
 typedef _ssize_t ssize_t;
 #endif
 #endif /* Not _SSIZE_T_ */ 
-
-#endif	/* Not __STRICT_ANSI__ */
 
 #endif	/* Not RC_INVOKED */
 

@@ -1,7 +1,6 @@
 
 #include <time.h>
 
-#ifndef __STRICT_ANSI__
 #ifndef _TIMEVAL_DEFINED /* also in winsock[2].h */
 #define _TIMEVAL_DEFINED
 struct timeval {
@@ -15,5 +14,3 @@ struct timeval {
 	((tvp)->tv_usec cmp (uvp)->tv_usec))
 #define timerclear(tvp)	 (tvp)->tv_sec = (tvp)->tv_usec = 0
 #endif /* _TIMEVAL_DEFINED */
-
-#endif /* __STRICT_ANSI__ */

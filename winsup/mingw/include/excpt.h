@@ -34,8 +34,6 @@
 /* All the headers include this file. */
 #include <_mingw.h>
 
-#ifndef	__STRICT_ANSI__
-
 #include <windef.h>
 
 /*
@@ -117,7 +115,5 @@ typedef PEXCEPTION_REGISTRATION PEXCEPTION_REGISTRATION_RECORD;
 #endif
 
 #endif	/* Not RC_INVOKED */
-
-#endif	/* Not strict ANSI */
 
 #endif	/* _EXCPT_H_ not defined */

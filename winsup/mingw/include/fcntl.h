@@ -24,9 +24,6 @@
  * $Date$
  *
  */
-
-#ifndef __STRICT_ANSI__
-
 #ifndef _FCNTL_H_
 #define _FCNTL_H_
 
@@ -86,6 +83,3 @@
 #endif	/* Not _NO_OLDNAMES */
 
 #endif	/* Not _FCNTL_H_ */
-
-#endif	/* Not __STRICT_ANSI__ */
-

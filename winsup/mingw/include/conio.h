@@ -25,8 +25,6 @@
  *
  */
 
-#ifndef	__STRICT_ANSI__
-
 #ifndef	_CONIO_H_
 #define	_CONIO_H_
 
@@ -69,5 +67,3 @@ _CRTIMP int __cdecl	ungetch (int);
 #endif	/* Not RC_INVOKED */
 
 #endif	/* Not _CONIO_H_ */
-
-#endif	/* Not __STRICT_ANSI__ */

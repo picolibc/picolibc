@@ -1,3 +1,29 @@
+2004-03-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/conio.h: Remove __STRICT_ANSI__ guard from non-ANSI header.
+	* include/direct.h:  Ditto.
+	* include/dirent.h:  Ditto.
+	* include/dos.h:  Ditto.
+	* include/excpt.h:  Ditto.
+	* inlude/fcntl,h
+	* include/io.h:  Ditto.
+	* inlude/mem.h:  Ditto.
+	* include/memory.h:  Ditto.
+	* include/process.h:  Ditto.
+	* inlude/search.h:  Ditto.
+	* include/share.h:  Ditto.
+	* include/unistd.h:  Ditto.
+	* include/sys/fcntl.h:  Ditto.
+	* include/file.h:  Ditto.
+	* include/sys/locking.h:  Ditto.
+	* include/sys/param.h:  Ditto.
+	* include/sys/stat,h
+	* include/sys/time.h:  Ditto.
+	* include/sys/timeb.h:  Ditto.
+	* include/sys/types.h:  Ditto.
+	* include/sys/unistd.h:  Ditto.
+	* include/sys/utime.h:  Ditto.
+
 2004-02-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h (__UNUSED_PARAM): Define macro.

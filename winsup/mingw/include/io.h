@@ -23,9 +23,6 @@
  * $Date$
  *
  */
-
-#ifndef	__STRICT_ANSI__
-
 #ifndef	_IO_H_
 #define	_IO_H_
 
@@ -35,7 +32,6 @@
 /* MSVC's io.h contains the stuff from dir.h, so I will too.
  * NOTE: This also defines off_t, the file offset type, through
  *       an inclusion of sys/types.h */
-#ifndef __STRICT_ANSI__
 
 #include <sys/types.h>	/* To get time_t. */
 
@@ -161,8 +157,6 @@ _CRTIMP int __cdecl chmod (const char*, int);
 #endif
 
 #endif	/* Not RC_INVOKED */
-
-#endif	/* Not __STRICT_ANSI__ */
 
 /* TODO: Maximum number of open handles has not been tested, I just set
  * it the same as FOPEN_MAX. */
@@ -299,6 +293,3 @@ wchar_t * 	wmktemp(wchar_t *);
 #endif	/* Not RC_INVOKED */
 
 #endif	/* _IO_H_ not defined */
-
-#endif	/* Not strict ANSI */
-

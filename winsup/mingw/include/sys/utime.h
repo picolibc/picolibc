@@ -23,9 +23,6 @@
  * $Date$
  *
  */
-
-#ifndef	__STRICT_ANSI__
-
 #ifndef	_UTIME_H_
 #define	_UTIME_H_
 
@@ -84,6 +81,3 @@ _CRTIMP int __cdecl	utime (const char*, struct utimbuf*);
 #endif	/* Not RC_INVOKED */
 
 #endif	/* Not _UTIME_H_ */
-
-#endif	/* Not __STRICT_ANSI__ */
-

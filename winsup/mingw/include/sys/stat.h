@@ -25,8 +25,6 @@
  *
  */
 
-#ifndef __STRICT_ANSI__
-
 #ifndef _STAT_H_
 #define _STAT_H_
 
@@ -185,6 +183,3 @@ _CRTIMP int __cdecl	stat (const char*, struct stat*);
 #endif	/* Not RC_INVOKED */
 
 #endif	/* Not _STAT_H_ */
-
-#endif	/* Not __STRICT_ANSI__ */
-

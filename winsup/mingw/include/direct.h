@@ -24,9 +24,6 @@
  * $Date$
  *
  */
-
-#ifndef __STRICT_ANSI__
-
 #ifndef	_DIRECT_H_
 #define	_DIRECT_H_
 
@@ -90,6 +87,3 @@ _CRTIMP int __cdecl _wrmdir(const wchar_t*);
 #endif	/* Not RC_INVOKED */
 
 #endif	/* Not _DIRECT_H_ */
-
-#endif	/* Not __STRICT_ANSI__ */
-

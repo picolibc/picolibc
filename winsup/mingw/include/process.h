@@ -24,8 +24,6 @@
  *
  */
 
-#ifndef	__STRICT_ANSI__
-
 #ifndef	_PROCESS_H_
 #define	_PROCESS_H_
 
@@ -156,4 +154,3 @@ _CRTIMP int __cdecl spawnvpe (int, const char*, const char* const*, const char* 
 #endif	/* _PROCESS_H_ not defined */
 
 #endif	/* Not __STRICT_ANSI__ */
-

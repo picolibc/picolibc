@@ -24,8 +24,6 @@
  *
  */
 
-#ifndef	__STRICT_ANSI__
-
 #ifndef	_LOCKING_H_
 #define	_LOCKING_H_
 
@@ -47,6 +45,3 @@
 #endif	/* Not NO_OLDNAMES */
 
 #endif	/* Not _LOCKING_H_ */
-
-#endif	/* Not __STRICT_ANSI__ */
-

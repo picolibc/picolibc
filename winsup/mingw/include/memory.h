@@ -3,7 +3,5 @@
  *
  * memory.h maps to the standard string.h header.
  */
-#ifndef	__STRICT_ANSI__
-#include	<string.h>
-#endif
 
+#include	<string.h>

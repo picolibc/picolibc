@@ -24,8 +24,6 @@
  *
  */
 
-#ifndef	__STRICT_ANSI__
-
 #ifndef	_SHARE_H_
 #define	_SHARE_H_
 
@@ -38,8 +36,6 @@
 #define	_SH_DENYRD	0x30	/* Deny read */
 #define	_SH_DENYNO	0x40	/* Deny nothing */
 
-#ifndef __STRICT_ANSI__
-
 #ifndef _NO_OLDNAMES
 
 /* Non ANSI names */
@@ -50,9 +46,4 @@
 
 #endif	/* Not _NO_OLDNAMES */
 
-#endif	/* Not __STRICT_ANSI__ */
-
 #endif	/* Not _SHARE_H_ */
-
-#endif	/* Not __STRICT_ANSI__ */
-
