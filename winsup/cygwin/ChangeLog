@@ -6,6 +6,8 @@
 2001-12-03  Christopher Faylor  <cgf@redhat.com>
 
 	* net.cc (cygwin_getsockopt): Allow NULL optval.
+	(cygwin_setsockopt): Ditto.
+	(cygwin_recvfrom): Allow NULL from.
 
 	* path.cc (mount_info::read_cygdrive_info_from_registry): Don't write
 	cygdrive to registry if it doesn't exist.
