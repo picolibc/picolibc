@@ -1,3 +1,9 @@
+Wed Aug 15 12:43:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* times.cc (utimes): Revert previous change. Just open the
+	file using FILE_WRITE_ATTRIBUTES instead of GENERIC_WRITE
+	on NT/W2K.
+
 Wed Aug 15 12:18:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (set_nt_attribute): Return always -1 in case of
