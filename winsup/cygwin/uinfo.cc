@@ -458,6 +458,7 @@ pwdgrp::load (const char *posix_fname)
   if (buf)
     free (buf);
   buf = NULL;
+  curr_lines = 0;
 
   pc.check (posix_fname);
   etc_ix = etc::init (etc_ix, pc);
@@ -496,7 +497,6 @@ pwdgrp::load (const char *posix_fname)
 	      CloseHandle (fh);
 	      buf[read_bytes] = '\0';
 	      char *eptr = buf;
-	      curr_lines = 0;
 	      while ((eptr = add_line (eptr)))
 		continue;
 	      debug_printf ("%s curr_lines %d", posix_fname, curr_lines);

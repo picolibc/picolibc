@@ -1,3 +1,202 @@
+2003-08-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/stat.h: Allow definition of internal stat structures
+	also when compiling newlib.
+
+2003-08-25  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, change USE_CYGSERVER to USE_SERVER.
+	* Makefile.in (LIBSERVER): Define and use.
+	* configure.in: Set LIBSERVER as appropriate.
+	* configure: Regenerate.
+	* acconfig.h: Regenerate.
+	* environ.cc: Rename allow_daemon to allow_server.  Only recognize when
+	USE_SERVER is defined.
+
+2003-08-23  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (_remove_r): Define.
+
+2003-08-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (enum cygheap_types): Add HEAP_MMAP.
+	(CYGHEAPSIZE): Add another 64K.
+	* mmap.cc: Use cmalloc, ccalloc and crealloc with HEAP_MMAP type
+	throughout.
+
+2003-08-22  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (user_heap_info::max): New field.
+	* heap.cc (heap_init): Save pointer to end of heap reserved memory.
+	(sbrk): Don't attempt to commit memory beyond end of heap reserved
+	memory.  Attempt to honor comment and reserve commitbytes if heapchunk
+	fails.
+
+2003-08-20  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* exceptions.cc (sigreturn): Don't clobber ebp in recursive signal
+	calls.
+
+2003-08-22  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sig_handle): Change so that default signals indicate
+	success.
+
+2003-08-21  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (wait_sig): Remove redundant test in do/while.
+
+2003-08-21  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (wait_sig): Avoid infinite loop.
+
+2003-08-20  Christopher Faylor  <cgf@redhat.com>
+
+	* speclib: Reenable removal of temp files.
+
+2003-08-20  Christopher Faylor  <cgf@redhat.com>
+
+	* miscfuncs.cc (low_priority_sleep): Sleep at same priority as main
+	thread.
+	* sigproc.cc (wait_sig): Keep looping if there are more signals to
+	consider and we are flushing signals.
+	(sig_send): Put nonsync signals in the correct bucket.
+
+2003-08-20  Christopher Faylor  <cgf@redhat.com>
+
+	* speclib: Fix created lib to avoid "File truncated" problems.
+
+2003-08-20  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* exceptions.cc (interrupt_setup): Set sigsave.sig last to avoid a
+	race.
+
+2003-08-20  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (wait_sig): Ensure that myself->getsigtodo array is
+	flushed on a __SIGFLUSH.
+
+2003-08-20  Pierre Humblet  <pierre.humblet@ieee.org>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (_sigreturn): Handle nested signals without growing the
+	stack.
+
+2003-08-19  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (pending_signals): Remove unneeded declaration.
+	* sigproc.cc (pending_signals): Make static.
+	(wait_sig): Use defined values rather than integers for rc.  Never scan
+	both todo arrays as this could cause hangs if signals arrive from two
+	different sources.  Rename saw_pending_signals to saw_failed_interrupt.
+	Exit loop when signal found.  Enter low-priority sleep, if necessary,
+	after finished signalling completion.  Set pending_signals when blocked
+	(from Pierre Humblet).
+
+2003-08-19  Christopher Faylor  <cgf@redhat.com>
+
+	* signal.cc (sigpending): Move.
+	* sigproc.cc (sigpending): To here.
+	(getlocal_sigtodo): Return process-local signal array.
+	(sigpending): Accommodate new process-local signal array.
+	(sig_send): Ditto.
+	(sig_set_pending): Ditto.
+	(wait_sig): Ditto.
+
+2003-08-19  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, eliminate argument to sig_dispatch_pending.
+	* exceptions.cc (setup_handler): Move non-interruptible condition
+	handling (back) to wait_sig.
+	(set_process_mask): Don't worry about calling sig_dispatch_pending from
+	sigthread since it is detected in the function anyway.
+	(sig_handle): Eliminate thisproc arg.  Don't call sig_dispatch_pending
+	on SIGCONT since that should happen automatically.
+	* sigproc.cc (sig_dispatch_pending): Eliminate justwake argument.  Just
+	return when called from sigthread.
+	(wait_sig): Change some variables to bool.  Change inner while to an
+	if.  Move uninterruptible signal handling here.
+	(sigproc_terminate): Don't call sig_dispatch_pending.  Just increment
+	semaphore on exit.
+
+	* speclib: Use slightly different (but still flawed) method for
+	determining symbols to extract from libraries.
+
+2003-08-18  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sigdelayed): Fix race where signal handler could get
+	the wrong mask (as suggested by Pierre Humblet).
+
+2003-08-18  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (mount): Add null/empty check for input parameters.
+	(umount): Add null/empty check for input parameters.
+
+2003-08-17  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* grp.cc (read_group): Revert previous change.
+	* uinfo.cc (pwdgrp::load): Always reset curr_lines.
+
+2003-08-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Map ERROR_INVALID_BLOCK_LENGTH to EIO.
+	* fhandler_raw.cc (fhandler_dev_raw::raw_read): Set more accurate
+	errnos instead of EACCES.
+	(fhandler_dev_raw::raw_write): Ditto.
+
+2003-08-17  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (special_name): Accommodate all special names with
+	extensions.
+
+2003-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Avoid crash if file size is less than requested
+	map length.
+
+2003-08-13  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* path.cc (special_name): Add checks for some specials followed by
+	a "." and a FIXME comment.
+
+2003-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Accommodate change from cygwin_lstat to lstat.
+	* syscalls.cc: Add defines to avoid declaration issues when
+	renaming cygwin_lstat back to lstat.
+	(lstat): Reverted name change from cygwin_lstat.
+
+2003-08-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/param.h (NBBY): Define if not defined.
+
+2003-08-12  Nicholas Wourms  <nwourms@netscape.net>
+
+	* include/sys/param.h (setbit): Add new bitmap related macro.
+	(clrbit): Likewise.
+	(isset): Likewise.
+	(isclr): Likewise.
+	(howmany): Add new counting/rounding macro.
+	(rounddown): Likewise.
+	(roundup): Likewise.
+	(roundup2): Likewise.
+	(powerof2): Likewise
+	(MIN): Add macro for calculating min.
+	(MAX): Add macro for calculating max.
+
+2003-08-09  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 3.
+
+2003-08-08  Gerrit P. Haase  <gp@familiehaase.de>
+
+	* include/stdint.h: Correctly define INT32_MIN.
+
+2003-08-08  David Rothenberger  <daveroth@acm.org>
+
+	* grp.cc (read_group): Set __group32.gr_mem pointer back to &null_ptr
+	after free() is called.
+
 2003-08-05  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Rework to accommodate new speclib arguments.
@@ -692,7 +891,7 @@
 	* shared_info.h: Match shared_name declaration with below change.
 	* shared.cc (shared_name): Use incoming char * parameter instead of
 	local static buffer.
-	(open_shared): Accomodate new calling convention for shared_name.
+	(open_shared): Accommodate new calling convention for shared_name.
 	* exceptions.cc (events_init): Ditto.
 	* sigproc.cc (getsem): Ditto.
 	* syscalls.cc (login): Ditto.
@@ -703,7 +902,7 @@
 
 	* fhandler_socket.cc (secret_event_name): Return void.  Use incoming
 	char * parameter instead of local static buffer.
-	(fhandler_socket::create_secret_event): Accomodate new calling
+	(fhandler_socket::create_secret_event): Accommodate new calling
 	convention for secret_event_name.
 	(fhandler_socket::close_secret_event): Ditto.
 
@@ -722,7 +921,7 @@
 	* wincap.cc: Set has_terminal_services capability throughout.
 	(wincap_2003): New global object representing Windows 2003 Server
 	capabilities.
-	(wincapc::init): Accomodate Windows 2003 Server.
+	(wincapc::init): Accommodate Windows 2003 Server.
 	* wincap.h (struct wincaps): Add has_terminal_services capability.
 
 2003-05-20  Charles Wilson  <cygwin@cwilson.fastmail.fm>
@@ -2174,7 +2373,7 @@
 	(mmap_record::fixup_map): Format change.
 	(list::add_record): Add offset and length parameter to call
 	mmap_record::alloc_map() correctly.
-	(mmap64): Rename `l' variable to `map_list'.  Accomodate above changes.
+	(mmap64): Rename `l' variable to `map_list'.  Accommodate above changes.
 	(munmap): Rename `l' variable to `map_list'.
 	(msync): Ditto.
 	(fhandler_disk_file::mmap): Streamline code.

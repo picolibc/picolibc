@@ -42,7 +42,7 @@ set_sigcatchers (void (*oldsig) (int), void (*cursig) (int))
 extern "C" _sig_func_ptr
 signal (int sig, _sig_func_ptr func)
 {
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   _sig_func_ptr prev;
 
   /* check that sig is in right range */
@@ -69,7 +69,7 @@ extern "C" int
 nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
 {
   int res = 0;
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   sigframe thisframe (mainthread);
   pthread_testcancel ();
 
@@ -127,7 +127,7 @@ usleep (unsigned int useconds)
 extern "C" int
 sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
 {
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
     {
@@ -167,7 +167,7 @@ sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
 static int
 kill_worker (pid_t pid, int sig)
 {
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
 
   int res = 0;
   pinfo dest (pid);
@@ -287,7 +287,7 @@ killpg (pid_t pgrp, int sig)
 extern "C" void
 abort (void)
 {
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   sigframe thisframe (mainthread);
   /* Flush all streams as per SUSv2.
      From my reading of this document, this isn't strictly correct.
@@ -313,7 +313,7 @@ abort (void)
 extern "C" int
 sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 {
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   sigproc_printf ("signal %d, newact %p, oldact %p", sig, newact, oldact);
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
@@ -404,17 +404,6 @@ extern "C" int
 sigfillset (sigset_t *set)
 {
   *set = ~((sigset_t) 0);
-  return 0;
-}
-
-extern "C" int
-sigpending (sigset_t *set)
-{
-  unsigned bit;
-  *set = 0;
-  for (int sig = 1; sig < NSIG; sig++)
-    if (*myself->getsigtodo (sig) && myself->getsigmask () & (bit = SIGTOMASK (sig)))
-      *set |= bit;
   return 0;
 }
 

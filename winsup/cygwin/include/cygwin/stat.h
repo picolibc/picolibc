@@ -16,7 +16,7 @@ details. */
 extern "C" {
 #endif
 
-#ifdef __INSIDE_CYGWIN__
+#if defined (__INSIDE_CYGWIN__) || defined (_COMPILING_NEWLIB)
 struct __stat32
 {
   __dev16_t	st_dev;

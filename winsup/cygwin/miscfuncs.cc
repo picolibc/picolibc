@@ -306,12 +306,13 @@ low_priority_sleep (DWORD secs)
       staylow = true;
     }
 
-  if (curr_prio != THREAD_PRIORITY_NORMAL)
+  int main_prio = GetThreadPriority (hMainThread);
+  if (curr_prio != main_prio)
     /* Force any threads in normal priority to be scheduled */
-    SetThreadPriority (thisthread, THREAD_PRIORITY_NORMAL);
+    SetThreadPriority (thisthread, main_prio);
   Sleep (secs);
 
-  if (!staylow || curr_prio == THREAD_PRIORITY_NORMAL)
+  if (!staylow || curr_prio == main_prio)
     SetThreadPriority (thisthread, curr_prio);
   return curr_prio;
 }

@@ -35,8 +35,10 @@ extern bool strip_title_path;
 extern int pcheck_case;
 extern int subauth_id;
 bool reset_com = false;
-bool allow_daemon = false;
 static bool envcache = true;
+#ifdef USE_SERVER
+extern bool allow_server;
+#endif
 
 static char **lastenviron;
 
@@ -506,7 +508,9 @@ static struct parse_thing
   {"binmode", {x: &binmode}, justset, NULL, {{O_TEXT}, {O_BINARY}}},
   {"check_case", {func: &check_case_init}, isfunc, NULL, {{0}, {0}}},
   {"codepage", {func: &codepage_init}, isfunc, NULL, {{0}, {0}}},
-  {"daemon", {&allow_daemon}, justset, NULL, {{false}, {true}}},
+#ifdef USE_SERVER
+  {"server", {&allow_server}, justset, NULL, {{false}, {true}}},
+#endif
   {"envcache", {&envcache}, justset, NULL, {{true}, {false}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{false}, {true}}},

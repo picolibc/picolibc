@@ -1185,19 +1185,21 @@ special_name (const char *s, int inc = 1)
   if (strpbrk (s, special_chars))
     return !strncasematch (s, "%2f", 3);
 
-  if (strcasematch (s, "nul")
-      || strcasematch (s, "aux")
-      || strcasematch (s, "prn")
-      || strcasematch (s, "con")
-      || strcasematch (s, "conin$")
-      || strcasematch (s, "conout$"))
+  const char *p;
+  if (strcasematch (s, "conin$") || strcasematch (s, "conout$"))
     return -1;
-  if (!strncasematch (s, "com", 3)
-      && !strncasematch (s, "lpt", 3))
+
+  if (strncasematch (s, "nul", 3)
+      || strncasematch (s, "aux", 3)
+      || strncasematch (s, "prn", 3)
+      || strncasematch (s, "con", 3))
+    p = s + 3;
+  else if (strncasematch (s, "com", 3) || strncasematch (s, "lpt", 3))
+    (void) strtoul (s + 3, (char **) &p, 10);
+  else
     return false;
-  char *p;
-  (void) strtoul (s + 3, &p, 10);
-  return -(*p == '\0');
+
+  return (*p == '\0' || *p == '.') ? -1 : false;
 }
 
 bool
@@ -2358,7 +2360,10 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 {
   int res = -1;
 
-  if (strpbrk (posix_path, "\\:"))
+  if (check_null_empty_str_errno (win32_path)
+      || check_null_empty_str_errno (posix_path))
+    /* errno set */;
+  else if (strpbrk (posix_path, "\\:"))
     set_errno (EINVAL);
   else if (flags & MOUNT_CYGDRIVE) /* normal mount */
     {
@@ -2383,6 +2388,8 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 extern "C" int
 umount (const char *path)
 {
+  if (check_null_empty_str_errno (path))
+    return -1;
   return cygwin_umount (path, 0);
 }
 

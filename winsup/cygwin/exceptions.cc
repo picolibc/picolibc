@@ -569,7 +569,7 @@ stack (void)
 int __stdcall
 handle_sigsuspend (sigset_t tempmask)
 {
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   sigframe thisframe (mainthread);
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 
@@ -591,7 +591,6 @@ handle_sigsuspend (sigset_t tempmask)
 }
 
 extern DWORD exec_exit;		// Possible exit value for exec
-extern int pending_signals;
 
 extern "C" {
 static void
@@ -694,7 +693,6 @@ interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
   sigsave.newmask = sigsave.oldmask | siga.sa_mask | SIGTOMASK (sig);
   sigsave.sa_flags = siga.sa_flags;
   sigsave.func = (void (*)(int)) handler;
-  sigsave.sig = sig;
   sigsave.saved_errno = -1;		// Flag: no errno to save
   if (handler == sig_handle_tty_stop)
     {
@@ -704,6 +702,7 @@ interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
   /* Clear any waiting threads prior to dispatching to handler function */
   proc_subproc (PROC_CLEARWAIT, 1);
   int res = SetEvent (signal_arrived);	// For an EINTR case
+  sigsave.sig = sig;			// Should ALWAYS be last thing set to avoid a race
   sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
 }
 
@@ -901,14 +900,6 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
       sigproc_printf ("signal successfully delivered");
     }
-  else
-    {
-      pending_signals = 1;	/* FIXME: Probably need to be more tricky here */
-      sig_set_pending (sig);
-      sig_dispatch_pending (1);
-      low_priority_sleep (SLEEP_0_STAY_LOW);	/* Hopefully, other process will be waking up soon. */
-      sigproc_printf ("couldn't send signal %d", sig);
-    }
 
   sigproc_printf ("returning %d", interrupted);
   return interrupted;
@@ -990,7 +981,7 @@ set_process_mask (sigset_t newmask)
   sigproc_printf ("old mask = %x, new mask = %x", myself->getsigmask (), newmask);
   myself->setsigmask (newmask);	// Set a new mask
   mask_sync->release ();
-  if (oldmask != newmask && GetCurrentThreadId () != sigtid)
+  if (oldmask != newmask)
     sig_dispatch_pending ();
   else
     sigproc_printf ("not calling sig_dispatch_pending.  sigtid %p current %p",
@@ -999,9 +990,9 @@ set_process_mask (sigset_t newmask)
 }
 
 int __stdcall
-sig_handle (int sig, bool thisproc)
+sig_handle (int sig)
 {
-  int rc = 0;
+  int rc = 1;
 
   sigproc_printf ("signal %d", sig);
 
@@ -1034,7 +1025,9 @@ sig_handle (int sig, bool thisproc)
       if (stopped)
 	SetEvent (sigCONT);
       /* process pending signals */
-      sig_dispatch_pending (1);
+#if 0 // FIXME?
+      sig_dispatch_pending ();
+#endif
     }
 
 #if 0
@@ -1046,7 +1039,7 @@ sig_handle (int sig, bool thisproc)
   if (handler == (void *) SIG_DFL)
     {
       if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
-	  || sig == SIGURG || (thisproc && hExeced && sig == SIGINT))
+	  || sig == SIGURG || (hExeced && sig == SIGINT))
 	{
 	  sigproc_printf ("default signal %d ignored", sig);
 	  goto done;
@@ -1227,13 +1220,13 @@ __asm__ volatile ("\n\
 	.text								\n\
 _sigreturn:								\n\
 	addl	$4,%%esp	# Remove argument			\n\
-	movl	%%esp,%%ebp						\n\
-	addl	$36,%%ebp						\n\
 	call	_set_process_mask@4					\n\
 									\n\
 	cmpl	$0,%4		# Did a signal come in?			\n\
 	jz	1f		# No, if zero				\n\
-	call	_call_signal_handler_now@0 # yes handle the signal	\n\
+	movl	%2,%%eax						\n\
+	movl	%%eax,36(%%esp)	# Restore return address		\n\
+	jmp	3f							\n\
 									\n\
 1:	popl	%%eax		# saved errno				\n\
 	testl	%%eax,%%eax	# Is it < 0				\n\
@@ -1264,24 +1257,25 @@ _sigdelayed0:								\n\
 	pushl	%%ebx							\n\
 	pushl	%%eax							\n\
 	pushl	%6			# saved errno			\n\
-	pushl	%3			# oldmask			\n\
+3:	pushl	%3			# oldmask			\n\
 	pushl	%4			# signal argument		\n\
 	pushl	$_sigreturn						\n\
 									\n\
 	call	_reset_signal_arrived@0					\n\
 	pushl	%5			# signal number			\n\
 	pushl	%7			# newmask			\n\
+									\n\
+	call	_set_process_mask@4					\n\
 	movl	$0,%0			# zero the signal number as a	\n\
 					# flag to the signal handler thread\n\
 					# that it is ok to set up sigsave\n\
-									\n\
-	call	_set_process_mask@4					\n\
 	popl	%%eax							\n\
 	jmp	*%%eax							\n\
 __no_sig_end:								\n\
 " : "=m" (sigsave.sig):  "X" ((char *) &_impure_ptr->_errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
-    "g" (sigsave.func), "g" (sigsave.saved_errno), "g" (sigsave.newmask)
+    "g" (sigsave.func), "g" (sigsave.saved_errno), "g" (sigsave.newmask),
+    "g" (sigsave.retaddr_on_stack)
 );
 }
 }

@@ -22,7 +22,8 @@ enum cygheap_types
   HEAP_1_ARGV,
   HEAP_1_BUF,
   HEAP_1_EXEC,
-  HEAP_1_MAX = 100
+  HEAP_1_MAX = 100,
+  HEAP_MMAP = 200
 };
 
 #define incygheap(s) (cygheap && ((char *) (s) >= (char *) cygheap) && ((char *) (s) <= ((char *) cygheap_max)))
@@ -234,6 +235,7 @@ struct user_heap_info
   void *base;
   void *ptr;
   void *top;
+  void *max;
   unsigned chunk;
 };
 
@@ -255,7 +257,7 @@ struct init_cygheap
 #endif
 };
 
-#define CYGHEAPSIZE (sizeof (init_cygheap) + (16000 * sizeof (fhandler_union)) + (4 * 65536))
+#define CYGHEAPSIZE (sizeof (init_cygheap) + (16000 * sizeof (fhandler_union)) + (5 * 65536))
 
 extern init_cygheap *cygheap;
 extern void *cygheap_max;

@@ -9,6 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #define fstat __FOOfstat__
+#define lstat __FOOlstat__
 #define stat __FOOstat__
 #define _close __FOO_close__
 #define _lseek __FOO_lseek__
@@ -38,6 +39,7 @@ details. */
 #include <rpc.h>
 
 #undef fstat
+#undef lstat
 #undef stat
 
 #include <cygwin/version.h>
@@ -236,6 +238,21 @@ unlink (const char *ourname)
 }
 
 extern "C" int
+_remove_r (struct _reent *, const char *ourname)
+{
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
+
+  if (win32_name.error)
+    {
+      set_errno (win32_name.error);
+      syscall_printf ("-1 = remove (%s)", ourname);
+      return -1;
+    }
+
+  return win32_name.isdir () ? rmdir (ourname) : unlink (ourname);
+}
+
+extern "C" int
 remove (const char *ourname)
 {
   path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
@@ -373,7 +390,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 
   while (1)
     {
-      sig_dispatch_pending (0);
+      sig_dispatch_pending ();
       sigframe thisframe (mainthread);
 
       cygheap_fdget cfd (fd);
@@ -445,7 +462,7 @@ extern "C" ssize_t
 writev (const int fd, const struct iovec *const iov, const int iovcnt)
 {
   int res = -1;
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   const ssize_t tot = check_iovec_for_write (iov, iovcnt);
 
   sigframe thisframe (mainthread);
@@ -501,7 +518,7 @@ open (const char *unix_path, int flags, ...)
   int res = -1;
   va_list ap;
   mode_t mode = 0;
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   sigframe thisframe (mainthread);
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
@@ -1215,7 +1232,7 @@ lstat64 (const char *name, struct __stat64 *buf)
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
 extern "C" int
-cygwin_lstat (const char *name, struct __stat32 *buf)
+lstat (const char *name, struct __stat32 *buf)
 {
   struct __stat64 buf64;
   int ret = lstat64 (name, &buf64);

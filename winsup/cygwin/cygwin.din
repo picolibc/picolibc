@@ -288,8 +288,8 @@ cygwin_internal
 cygwin32_internal = cygwin_internal
 listen = cygwin_listen
 cygwin_logon_user
-_lstat = cygwin_lstat
-lstat = cygwin_lstat
+lstat
+_lstat = lstat
 cygwin_posix_path_list_p
 cygwin32_posix_path_list_p = cygwin_posix_path_list_p
 cygwin_posix_to_win32_path_list

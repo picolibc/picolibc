@@ -56,6 +56,7 @@ heap_init ()
       if (cygheap->user_heap.base == NULL)
 	api_fatal ("unable to allocate heap, heap_chunk_size %d, %E",
 		   cygheap->user_heap.chunk);
+      cygheap->user_heap.max = (char *) cygheap->user_heap.base + cygheap->user_heap.chunk;
     }
   else
     {
@@ -101,7 +102,7 @@ sbrk (int n)
   unsigned commitbytes, newbrksize;
 
   if (n == 0)
-    return cygheap->user_heap.ptr;			/* Just wanted to find current cygheap->user_heap.ptr address */
+    return cygheap->user_heap.ptr;		/* Just wanted to find current cygheap->user_heap.ptr address */
 
   newbrk = (char *) cygheap->user_heap.ptr + n;	/* Where new cygheap->user_heap.ptr will be */
   newtop = (char *) pround (newbrk);		/* Actual top of allocated memory -
@@ -122,23 +123,33 @@ sbrk (int n)
 
   assert (newtop > cygheap->user_heap.top);
 
-  /* Need to grab more pages from the OS.  If this fails it may be because
-   * we have used up previously reserved memory.  Or, we're just plumb out
-   * of memory.  */
+  /* Find the number of bytes to commit, rounded up to the nearest page. */
   commitbytes = pround (newtop - (char *) cygheap->user_heap.top);
-  if (VirtualAlloc (cygheap->user_heap.top, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL)
-    goto good;
+
+  /* Need to grab more pages from the OS.  If this fails it may be because
+     we have used up previously reserved memory.  Or, we're just plumb out
+     of memory.  Only attempt to commit memory that we know we've previously
+     reserved.  */
+  if (newtop <= cygheap->user_heap.max)
+    {
+      if (VirtualAlloc (cygheap->user_heap.top, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL)
+	goto good;
+    }
 
   /* Couldn't allocate memory.  Maybe we can reserve some more.
-     Reserve either the maximum of the standard cygwin_shared->heap_chunk_size () or the requested
-     amount.  Then attempt to actually allocate it.  */
+     Reserve either the maximum of the standard cygwin_shared->heap_chunk_size ()
+     or the requested amount.  Then attempt to actually allocate it.  */
 
   if ((newbrksize = cygheap->user_heap.chunk) < commitbytes)
     newbrksize = commitbytes;
 
-  if ((VirtualAlloc (cygheap->user_heap.top, newbrksize, MEM_RESERVE, PAGE_NOACCESS) != NULL) &&
-      (VirtualAlloc (cygheap->user_heap.top, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL))
-    goto good;
+   if ((VirtualAlloc (cygheap->user_heap.top, newbrksize, MEM_RESERVE, PAGE_NOACCESS)
+        || VirtualAlloc (cygheap->user_heap.top, newbrksize = commitbytes, MEM_RESERVE, PAGE_NOACCESS))
+       && VirtualAlloc (cygheap->user_heap.top, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL)
+     {
+	(char *) cygheap->user_heap.max += newbrksize;
+	goto good;
+     }
 
 err:
   set_errno (ENOMEM);

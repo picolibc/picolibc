@@ -507,7 +507,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   HANDLE from_master_local, to_master_local;
 
-#ifdef USE_CYGSERVER
+#ifdef USE_SERVER
   if (!wincap.has_security ()
       || cygserver_running == CYGSERVER_UNAVAIL
       || !cygserver_attach_tty (&from_master_local, &to_master_local))
@@ -589,7 +589,7 @@ int
 fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
 					  LPHANDLE to_master_ptr)
 {
-#ifndef USE_CYGSERVER
+#ifndef USE_SERVER
   return 0;
 #else
   if (!from_master_ptr || !to_master_ptr)

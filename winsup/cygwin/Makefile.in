@@ -235,6 +235,7 @@ API_VER:=$(srcdir)/include/cygwin/version.h
 
 PWD:=${shell pwd}
 LIB_NAME:=$(PWD)/libcygwin.a
+LIBSERVER:=@LIBSERVER@
 SUBLIBS:=$(PWD)/libpthread.a $(PWD)/libm.a $(PWD)/libc.a
 EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a
 INSTOBJS:=automode.o binmode.o textmode.o
@@ -336,10 +337,10 @@ maintainer-clean realclean: clean
 
 
 # Rule to build cygwin.dll
-$(TEST_DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
+$(TEST_DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
 	$(CXX) $(CXXFLAGS) $(nostdlib) -Wl,-T$(firstword $^) -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
-	$(MALLOC_OBJ) $(LIBM) $(LIBC) \
+	$(MALLOC_OBJ) $(LIBSERVER) $(LIBM) $(LIBC) \
 	-lgcc $(DLL_IMPORTS)
 	@ln -f $@ new-$(DLL_NAME)
 

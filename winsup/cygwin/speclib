@@ -18,8 +18,8 @@ nm=$1; shift
 ar=$1; shift
 libdll=$1; shift
 cp /dev/null /tmp/$$.objs
-trap "/bin/rm -rf /tmp/$$.dir /tmp/$$.syms /tmp/$$.objs /tmp/$$.raw" 0 1 2 15
-$nm --extern-only --defined-only $* | sed -e '/^[ 	]*$/d' -e '/:$/d' -e 's%^.* _\(.*\)%/ __imp__\1$/p%' | grep -v ' __imp___imp__' > /tmp/$$.syms
+trap "/bin/rm -rf $lib.bak /tmp/$$.dir /tmp/$$.syms /tmp/$$.objs /tmp/$$.raw" 0 1 2 15
+$nm --extern-only --defined-only $* | sed -n -e 's%^.* [TD] \(.*\)$%/ \1\$/p%p' > /tmp/$$.syms
 v || $nm -Ap --extern-only --defined-only $libdll | egrep ' I __head| I _.*_iname' |  awk -F: '{print $2}' > /tmp/$$.objs
 $nm -Ap --extern-only --defined-only $libdll | sed -n -f /tmp/$$.syms | awk -F: '{print $2}' >> /tmp/$$.objs
 sort -o /tmp/$$.objs -u /tmp/$$.objs
@@ -37,3 +37,16 @@ else
 fi
 /bin/rm -f $lib
 $ar crus $lib *.o
+export lib;
+perl -pi.bak -- - $lib << 'EOF'
+BEGIN {
+    binmode STDIN;
+    binmode STDOUT;
+    $lib = ($ENV{lib} =~ m!/([^/]+)$!o)[0] || $ENV{lib};
+    $lib =~ s/\.a//o;
+    my $pad = length('cygwin1_dll') - length($lib);
+    die "speclib: library name too long (" . length($lib) . ")\n" if $pad < 0;
+    $lib = "__head_$lib" . "\0" x $pad;
+}
+    s/__head_cygwin1_dll/$lib/g;
+'EOF'

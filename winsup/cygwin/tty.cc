@@ -408,13 +408,13 @@ tty::common_init (fhandler_pty_master *ptym)
    */
   if (wincap.has_security ())
     {
-#ifdef USE_CYGSERVER
+#ifdef USE_SERVER
       if (cygserver_running == CYGSERVER_UNKNOWN)
 	cygserver_init ();
 #endif
 
       if (
-#ifdef USE_CYGSERVER
+#ifdef USE_SERVER
 	  cygserver_running != CYGSERVER_OK &&
 #endif
 	  !SetKernelObjectSecurity (hMainProc,

@@ -76,7 +76,7 @@ class mmap_record
     caddr_t get_address () const { return base_address_; }
     DWORD *get_map () const { return map_map_; }
     void alloc_map (_off64_t off, DWORD len);
-    void free_map () { if (map_map_) free (map_map_); }
+    void free_map () { if (map_map_) cfree (map_map_); }
 
     DWORD find_empty (DWORD pages);
     _off64_t map_map (_off64_t off, DWORD len);
@@ -113,8 +113,8 @@ void
 mmap_record::alloc_map (_off64_t off, DWORD len)
 {
   /* Allocate one bit per page */
-  map_map_ = (DWORD *) calloc (MAPSIZE (PAGE_CNT (size_to_map_)),
-			       sizeof (DWORD));
+  map_map_ = (DWORD *) ccalloc (HEAP_MMAP, MAPSIZE (PAGE_CNT (size_to_map_)),
+			        sizeof (DWORD));
   if (wincap.virtual_protect_works_on_shared_pages ())
     {
       DWORD old_prot;
@@ -278,14 +278,14 @@ public:
 list::list ()
 : nrecs (0), maxrecs (10), fd (0), hash (0)
 {
-  recs = (mmap_record *) malloc (10 * sizeof (mmap_record));
+  recs = (mmap_record *) cmalloc (HEAP_MMAP, 10 * sizeof (mmap_record));
 }
 
 list::~list ()
 {
   for (mmap_record *rec = recs; nrecs-- > 0; ++rec)
     rec->free_map ();
-  free (recs);
+  cfree (recs);
 }
 
 mmap_record *
@@ -294,7 +294,7 @@ list::add_record (mmap_record r, _off64_t off, DWORD len)
   if (nrecs == maxrecs)
     {
       maxrecs += 5;
-      recs = (mmap_record *) realloc (recs, maxrecs * sizeof (mmap_record));
+      recs = (mmap_record *) crealloc (recs, maxrecs * sizeof (mmap_record));
     }
   recs[nrecs] = r;
   recs[nrecs].alloc_map (off, len);
@@ -374,14 +374,14 @@ public:
 
 map::map ()
 {
-  lists = (list **) malloc (10 * sizeof (list *));
+  lists = (list **) cmalloc (HEAP_MMAP, 10 * sizeof (list *));
   nlists = 0;
   maxlists = 10;
 }
 
 map::~map ()
 {
-  free (lists);
+  cfree (lists);
 }
 
 list *
@@ -409,7 +409,7 @@ map::add_list (list *l, int fd)
   if (nlists == maxlists)
     {
       maxlists += 5;
-      lists = (list **) realloc (lists, maxlists * sizeof (list *));
+      lists = (list **) crealloc (lists, maxlists * sizeof (list *));
     }
   lists[nlists++] = l;
   return lists[nlists-1];
@@ -601,7 +601,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
   }
 
   /* Insert into the list */
-  mmap_record *rec = map_list->add_record (mmap_rec, off, len);
+  mmap_record *rec = map_list->add_record (mmap_rec, off, len > gran_len ? gran_len : len);
   caddr_t ret = rec->get_address () + (off - gran_off);
   syscall_printf ("%x = mmap() succeeded", ret);
   ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");

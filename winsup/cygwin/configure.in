@@ -138,8 +138,10 @@ esac
 AC_ARG_ENABLE(server,
 [ --enable-server		Build a cygwin DLL which can communicate with cygserver],
 [case "${enableval}" in
-yes)	 AC_DEFINE(USE_CYGSERVER) ;;
-no)	 ;;
+yes)
+	 AC_DEFINE(USE_SERVER)
+	 LIBSERVER='$(bupdir)/cygserver/libcygserver.a' ;;
+no)	 LIBSERVER=;;
 esac
 ])
 
@@ -192,6 +194,7 @@ case "$target_cpu" in
 esac
 
 AC_SUBST(MALLOC_OFILES)
+AC_SUBST(LIBSERVER)
 AC_SUBST(DLL_ENTRY)
 AC_SUBST(DEF_DLL_ENTRY)
 AC_SUBST(ALLOCA)
