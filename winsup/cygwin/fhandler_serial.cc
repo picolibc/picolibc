@@ -118,7 +118,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
       if (inq > ulen)
 	inq = ulen;
       debug_printf ("inq %d", inq);
-      if (ReadFile (get_handle(), ptr, min (inq, ulen), &n, &io_status))
+      if (ReadFile (get_handle (), ptr, min (inq, ulen), &n, &io_status))
 	/* Got something */;
       else if (GetLastError () != ERROR_IO_PENDING)
 	goto err;
@@ -162,7 +162,7 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
 
   for (;;)
     {
-      if (WriteFile (get_handle(), ptr, len, &bytes_written, &write_status))
+      if (WriteFile (get_handle (), ptr, len, &bytes_written, &write_status))
 	break;
 
       switch (GetLastError ())
@@ -181,13 +181,13 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
       break;
     }
 
-  ForceCloseHandle(write_status.hEvent);
+  ForceCloseHandle (write_status.hEvent);
 
   return bytes_written;
 
 err:
   __seterrno ();
-  ForceCloseHandle(write_status.hEvent);
+  ForceCloseHandle (write_status.hEvent);
   return -1;
 }
 
@@ -269,22 +269,22 @@ fhandler_serial::open (path_conv *, int flags, mode_t mode)
     }
 
   /* setting rts and dtr to known state so that ioctl() function with
-  request TIOCMGET could return correct value of RTS and DTR lines. 
+  request TIOCMGET could return correct value of RTS and DTR lines.
   Important only for Win 9x systems */
-  
-  if (wincap.is_winnt() == false)
-  {
-    if (EscapeCommFunction (get_handle (), SETDTR) == 0)
-      system_printf ("couldn't set initial state of DTR for %s, %E", get_name ());
-    if (EscapeCommFunction (get_handle (), SETRTS) == 0)
-      system_printf ("couldn't set initial state of RTS for %s, %E", get_name ());
-      
-    /* even though one of above functions fail I have to set rts and dtr
-    variables to initial value. */
-    rts = TIOCM_RTS;
-    dtr = TIOCM_DTR;
-  }
-  
+
+  if (!wincap.is_winnt ())
+    {
+      if (EscapeCommFunction (get_handle (), SETDTR) == 0)
+	system_printf ("couldn't set initial state of DTR for %s, %E", get_name ());
+      if (EscapeCommFunction (get_handle (), SETRTS) == 0)
+	system_printf ("couldn't set initial state of RTS for %s, %E", get_name ());
+
+      /* even though one of above functions fail I have to set rts and dtr
+      variables to initial value. */
+      rts = TIOCM_RTS;
+      dtr = TIOCM_DTR;
+    }
+
   SetCommMask (get_handle (), EV_RXCHAR);
   set_open_status ();
   syscall_printf ("%p = fhandler_serial::open (%s, %p, %p)",
@@ -341,7 +341,7 @@ fhandler_serial::tcflow (int action)
   DWORD win32action = 0;
   DCB dcb;
   char xchar;
-      
+
   termios_printf ("action %d", action);
 
   switch (action)
@@ -390,7 +390,7 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
   bool result;
   int modemStatus;
   int request;
-  
+
   request = *(int *) buffer;
   action = 0;
   modemStatus = 0;
@@ -400,81 +400,73 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
     {
     case TIOCMGET:
       if (GetCommModemStatus (get_handle (), &modemLines) == 0)
-        return -1;
+	return -1;
       if (modemLines & MS_CTS_ON)
-        modemStatus |= TIOCM_CTS;
+	modemStatus |= TIOCM_CTS;
       if (modemLines & MS_DSR_ON)
-        modemStatus |= TIOCM_DSR;
+	modemStatus |= TIOCM_DSR;
       if (modemLines & MS_RING_ON)
-        modemStatus |= TIOCM_RI;
+	modemStatus |= TIOCM_RI;
       if (modemLines & MS_RLSD_ON)
-        modemStatus |= TIOCM_CD;
-      if (wincap.is_winnt() == true)
-        {
-	
-	  /* here is Windows NT or Windows 2000 part */
-	  result = DeviceIoControl (get_handle (),
-                                    0x001B0078,
-				    NULL, 0, &mcr, 4, &cbReturned, 0);
-          if (!result)
-	    return -1;
-          if (cbReturned != 4)
-	    return -1;
-          if (mcr & 2)
-	    modemStatus |= TIOCM_RTS;
-          if (mcr & 1)
-	    modemStatus |= TIOCM_DTR;
-	    
-	}
+	modemStatus |= TIOCM_CD;
+      if (!wincap.is_winnt ())
+	modemStatus |= rts | dtr;
       else
-        {
-	
-	  /* here is Windows 9x part */
-	  modemStatus |= rts | dtr;
-	  
+	{
+	  result = DeviceIoControl (get_handle (),
+				    0x001B0078,
+				    NULL, 0, &mcr, 4, &cbReturned, 0);
+	  if (!result)
+	    return -1;
+	  if (cbReturned != 4)
+	    return -1;
+	  if (mcr & 2)
+	    modemStatus |= TIOCM_RTS;
+	  if (mcr & 1)
+	    modemStatus |= TIOCM_DTR;
 	}
       *(int *) buffer = modemStatus;
       return 0;
     case TIOCMSET:
       if (request & TIOCM_RTS)
-        {
+	{
 	  if (EscapeCommFunction (get_handle (), SETRTS) == 0)
 	    return -1;
-          else
+	  else
 	    rts = TIOCM_RTS;
 	}
       else
-        {
+	{
 	  if (EscapeCommFunction (get_handle (), CLRRTS) == 0)
 	    return -1;
-          else
+	  else
 	    rts = 0;
 	}
       if (request & TIOCM_DTR)
-        {
+	{
 	  if (EscapeCommFunction (get_handle (), SETDTR) == 0)
 	    return -1;
-          else
+	  else
 	    dtr = TIOCM_DTR;
 	}
       else
-        {
+	{
 	  if (EscapeCommFunction (get_handle (), CLRDTR) == 0)
 	    return -1;
-          else
+	  else
 	    dtr = 0;
 	}
       return 0;
    case TIOCINQ:
      if (ev & CE_FRAME | ev & CE_IOE | ev & CE_OVERRUN |
-         ev & CE_RXOVER | ev & CE_RXPARITY)
+	 ev & CE_RXOVER | ev & CE_RXPARITY)
        return -1;
      *(int *) buffer = st.cbInQue;
      return 0;
    default:
      return -1;
    }
-}    
+}
 
 /* tcflush: POSIX 7.2.2.1 */
 int
@@ -727,7 +719,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       EscapeCommFunction (get_handle (), SETDTR);
       tmpDtr = TIOCM_DTR;
     }
-    
+
   rts = tmpRts;
   dtr = tmpDtr;
 

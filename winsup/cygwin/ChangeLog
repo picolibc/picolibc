@@ -1,17 +1,22 @@
+2002-07-22  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_serial.cc: Fix formatting problems introduced by below
+	changes.
+
 2002-07-22  Jacek Trzcinski <jacek@certum.pl>
 
-	* fhandler.h (class fhandler_serial): Add new members of
-	the class - rts,dtr and method ioctl(). Variables rts and dtr
-	important for Win 9x only.
-	* fhandler_serial.cc (fhandler_serial::open): Add initial setting
-	of dtr and rts. Important for Win 9x only.
-	(fhandler_serial::ioctl): New function. Implements commands TIOCMGET,
+	* fhandler.h (class fhandler_serial): Add new members of the class -
+	rts,dtr and method ioctl().  Variables rts and dtr important for Win 9x
+	only.
+	* fhandler_serial.cc (fhandler_serial::open): Add initial setting of
+	dtr and rts.  Important for Win 9x only.
+	(fhandler_serial::ioctl): New function.  Implements commands TIOCMGET,
 	TIOCMSET and TIOCINQ.
 	(fhandler_serial::tcflush): Fixed found error.
-	(fhandler_serial::tcsetattr): Add settings of rts and dtr. Important
+	(fhandler_serial::tcsetattr): Add settings of rts and dtr.  Important
 	for Win 9x only.
-	* termios.h: Add new defines as a support for ioctl() function  
-	on serial device.
+	* termios.h: Add new defines as a support for ioctl() function on
+	serial device.
 
 2002-07-20  Christopher Faylor  <cgf@redhat.com>
 
