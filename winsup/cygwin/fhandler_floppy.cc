@@ -14,6 +14,9 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include <winioctl.h>
+#include <asm/socket.h>
+#include <cygwin/hdreg.h>
+#include <cygwin/fs.h>
 #include "security.h"
 #include "fhandler.h"
 #include "cygerrno.h"
@@ -186,6 +189,124 @@ fhandler_dev_floppy::lseek (__off64_t offset, int whence)
 int
 fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
 {
-  return fhandler_dev_raw::ioctl (cmd, buf);
+  DISK_GEOMETRY di;
+  PARTITION_INFORMATION pi;
+  DWORD bytes_read;
+  __off64_t drive_size = 0;
+  __off64_t start = 0;
+  switch (cmd)
+    {
+    case HDIO_GETGEO:
+      {
+        debug_printf ("HDIO_GETGEO");
+        if (!DeviceIoControl (get_handle (),
+                              IOCTL_DISK_GET_DRIVE_GEOMETRY,
+                              NULL, 0,
+                              &di, sizeof (di),
+                              &bytes_read, NULL))
+          {
+            __seterrno ();
+            return -1;
+          }
+        debug_printf ("disk geometry: (%ld cyl)*(%ld trk)*(%ld sec)*(%ld bps)",
+                      di.Cylinders.LowPart,
+                      di.TracksPerCylinder,
+                      di.SectorsPerTrack,
+                      di.BytesPerSector);
+        if (DeviceIoControl (get_handle (),
+                             IOCTL_DISK_GET_PARTITION_INFO,
+                             NULL, 0,
+                             &pi, sizeof (pi),
+                             &bytes_read, NULL))
+          {
+            debug_printf ("partition info: %ld (%ld)",
+                          pi.StartingOffset.LowPart,
+                          pi.PartitionLength.LowPart);
+            start = pi.StartingOffset.QuadPart >> 9ULL;
+          }
+        struct hd_geometry *geo = (struct hd_geometry *) buf;
+        geo->heads = di.TracksPerCylinder;
+        geo->sectors = di.SectorsPerTrack;
+        geo->cylinders = di.Cylinders.LowPart;
+        geo->start = start;
+        return 0;
+      }
+    case BLKGETSIZE:
+    case BLKGETSIZE64:
+      {
+        debug_printf ("BLKGETSIZE");
+        if (!DeviceIoControl (get_handle (),
+                              IOCTL_DISK_GET_DRIVE_GEOMETRY,
+                              NULL, 0,
+                              &di, sizeof (di),
+                              &bytes_read, NULL))
+          {
+            __seterrno ();
+            return -1;
+          }
+        debug_printf ("disk geometry: (%ld cyl)*(%ld trk)*(%ld sec)*(%ld bps)",
+                      di.Cylinders.LowPart,
+                      di.TracksPerCylinder,
+                      di.SectorsPerTrack,
+                      di.BytesPerSector);
+        if (DeviceIoControl (get_handle (),
+                             IOCTL_DISK_GET_PARTITION_INFO,
+                             NULL, 0,
+                             &pi, sizeof (pi),
+                             &bytes_read, NULL))
+          {
+            debug_printf ("partition info: %ld (%ld)",
+                          pi.StartingOffset.LowPart,
+                          pi.PartitionLength.LowPart);
+            drive_size = pi.PartitionLength.QuadPart;
+          }
+        else
+          {
+            drive_size = di.Cylinders.QuadPart * di.TracksPerCylinder *
+                         di.SectorsPerTrack * di.BytesPerSector;
+          }
+        if (cmd == BLKGETSIZE)
+          *(long *)buf = drive_size >> 9UL;
+        else
+          *(__off64_t *)buf = drive_size;
+        return 0;
+      }
+    case BLKRRPART:
+      {
+        debug_printf ("BLKRRPART");
+        if (!DeviceIoControl (get_handle (),
+                              IOCTL_DISK_UPDATE_DRIVE_SIZE,
+                              NULL, 0,
+                              &di, sizeof (di),
+                              &bytes_read, NULL))
+          {
+            __seterrno ();
+            return -1;
+          }
+        return 0;
+      }
+    case BLKSSZGET:
+      {
+        debug_printf ("BLKSSZGET");
+        if (!DeviceIoControl (get_handle (),
+                              IOCTL_DISK_GET_DRIVE_GEOMETRY,
+                              NULL, 0,
+                              &di, sizeof (di),
+                              &bytes_read, NULL))
+          {
+            __seterrno ();
+            return -1;
+          }
+        debug_printf ("disk geometry: (%ld cyl)*(%ld trk)*(%ld sec)*(%ld bps)",
+                      di.Cylinders.LowPart,
+                      di.TracksPerCylinder,
+                      di.SectorsPerTrack,
+                      di.BytesPerSector);
+        *(int *)buf = di.BytesPerSector;
+        return 0;
+      }
+    default:
+      return fhandler_dev_raw::ioctl (cmd, buf);
+    }
 }
 

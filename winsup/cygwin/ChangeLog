@@ -1,3 +1,10 @@
+2002-11-07  Christopher January  <chris@atomice.net>
+
+	* include/cygwin/fs.h: New file.
+	* include/cygwin/hdreg.h: New file.
+	* fhandler_floppy.cc (fhandler_floppy::ioctl): Add implementation for
+	HDIO_GETGEO, BLKGETSIZE, BLKGETSIZE64, BLKRRPART and BLKSSZGET ioctls.
+
 2002-11-07  Gilles Courcoux  <Gilles.Courcoux@col.bsf.alcatel.fr>
 
 	* fhandler_socket.cc (fhandler_socket::ioctl): Return correct flags
