@@ -839,7 +839,6 @@ out:
     {
       if (fs.update (path))
 	{
-	  set_isdisk ();
 	  debug_printf ("this->path(%s), has_acls(%d)", path, fs.has_acls ());
 	  if (fs.has_acls () && allow_ntsec && wincap.has_security ())
 	    set_exec (0);  /* We really don't know if this is executable or not here

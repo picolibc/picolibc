@@ -511,7 +511,7 @@ pwdgrp::load (const char *posix_fname)
 
   paranoid_printf ("%s", posix_fname);
 
-  if (pc.error || !pc.exists () || !pc.isdisk () || pc.isdir ())
+  if (pc.error || !pc.exists () || pc.isdir ())
     {
       paranoid_printf ("strange path_conv problem");
       res = failed;

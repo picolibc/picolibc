@@ -64,7 +64,6 @@ enum path_types
   PATH_ALL_EXEC = (PATH_CYGWIN_EXEC | PATH_EXEC),
   PATH_LNK =	      0x01000000,
   PATH_TEXT =	      0x02000000,
-  PATH_ISDISK =	      0x04000000,
   PATH_HAS_SYMLINKS = 0x10000000,
   PATH_SOCKET =       0x40000000
 };
@@ -123,7 +122,6 @@ class path_conv
   device dev;
   bool case_clash;
 
-  int isdisk () const { return path_flags & PATH_ISDISK;}
   bool isremote () {return fs.is_remote_drive ();}
   int has_acls () const {return fs.has_acls (); }
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
@@ -165,7 +163,6 @@ class path_conv
   void set_binary () {path_flags |= PATH_BINARY;}
   void set_symlink (DWORD n) {path_flags |= PATH_SYMLINK; symlink_length = n;}
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
-  void set_isdisk () {path_flags |= PATH_ISDISK; dev.devn = FH_FS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
 
   void check (const char *src, unsigned opt = PC_SYM_FOLLOW,

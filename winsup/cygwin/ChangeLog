@@ -1,3 +1,11 @@
+2004-10-02  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* path.h (enum path_types): Delete PATH_ISDISK.
+	(path_conv::isdisk): Delete method.
+	(path_conv::set_isdisk): Ditto.
+	* path.cc (path_conv::check): Do not call set_isdisk.
+	* uinfo.cc(pwdgrp::load): Do not call pc.isdisk. 
+
 2004-09-28  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Disallow attempts
