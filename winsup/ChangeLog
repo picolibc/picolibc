@@ -1,3 +1,8 @@
+2003-02-06  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Make w32api directory optional.
+	* configure: Regenerate.
+
 2003-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.common (MINGW_LDFLAGS): Add mingw/mingwex builddir.
