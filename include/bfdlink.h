@@ -275,9 +275,16 @@ struct bfd_link_info
   /* May be used to set DT_FLAGS_1 for ELF. */
   bfd_vma flags_1;
 
-  /* true if auto-import thunks for DATA items in pei386 DLLs 
+  /* True if auto-import thunks for DATA items in pei386 DLLs 
      should be generated/linked against.  */
   boolean pei386_auto_import;
+
+  /* True if non-PLT relocs should be merged into one reloc section
+     and sorted so that relocs against the same symbol come together.  */
+  boolean combreloc;
+
+  /* How many spare .dynamic DT_NULL entries should be added?  */
+  int spare_dynamic_tags;
 };
 
 /* This structures holds a set of callback functions.  These are
