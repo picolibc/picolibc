@@ -1,3 +1,9 @@
+2003-01-02  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h: Update copyright years to include 2002 (which had
+	been missed previously) and 2003.  Make comments about "+A",
+	"+B", and "+C" operand types more descriptive.
+
 2002-12-31  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips.h: Note that the "+D" operand type name is now used.

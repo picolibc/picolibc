@@ -1,5 +1,5 @@
 /* mips.h.  Mips opcode list for GDB, the GNU debugger.
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
+   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
    Free Software Foundation, Inc.
    Contributed by Ralph Campbell and OSF
    Commented and modified by Ian Lance Taylor, Cygnus Support
@@ -233,11 +233,14 @@ struct mips_opcode
    "x" accept and ignore register name
    "z" must be zero register
    "K" 5 bit Hardware Register (rdhwr instruction) (OP_*_RD)
-   "+A" 5 bit ins/ext position/lsb (OP_*_SHAMT)
-   "+B" 5 bit "ins" size spec (OP_*_INSMSB).  Requires that "+A"
-	occur first!
-   "+C" 5 bit "ext" msbd spec (OP_*_EXTMSBD).  Requires that "+A"
-	occur first!
+   "+A" 5 bit ins/ext position, which becomes LSB (OP_*_SHAMT).
+	Enforces: 0 <= pos < 32.
+   "+B" 5 bit ins size, which becomes MSB (OP_*_INSMSB).
+	Requires that "+A" occur first to set position.
+	Enforces: 0 < (pos+size) <= 32.
+   "+C" 5 bit ext size, which becomes MSBD (OP_*_EXTMSBD).
+	Requires that "+A" occur first to set position.
+	Enforces: 0 < (pos+size) <= 32.
 
    Floating point instructions:
    "D" 5 bit destination register (OP_*_FD)
