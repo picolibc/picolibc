@@ -1,3 +1,9 @@
+2000-12-07  Jay Kulpinski <jskulpin@eng01.gdds.com>
+
+        * libc/stdio/vfprintf.c: Minor modification to avoid requiring
+        a floating point register unless really printing a floating
+        point number.
+
 2000-12-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/ldtoa.c: Removed include of alloca.h.

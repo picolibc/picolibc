@@ -317,9 +317,11 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	char *decimal_point = localeconv()->decimal_point;
 	char softsign;		/* temporary negative sign for floats */
 #ifdef _NO_LONGDBL
-	double _fpvalue;	/* floating point arguments %[eEfgG] */
+	union { int i; double d; } _double_ = {0};
+	#define _fpvalue (_double_.d)
 #else
-	_LONG_DOUBLE _fpvalue;  /* floating point arguments %[eEfgG] */
+	union { int i; _LONG_DOUBLE ld; } _long_double_ = {0};
+	#define _fpvalue (_long_double_.ld)
 #endif
 	int expt;		/* integer value of exponent */
 	int expsize = 0;	/* character count for expstr */
