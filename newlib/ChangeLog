@@ -1,3 +1,10 @@
+2001-04-19  Robert Collins  <rbtcollins@hotmail.com>
+
+	* include/time.h[__CYGWIN__]:  Define tzname to _tzname if not defined.
+	Define daylight to _daylight if it is not defined
+	Prepare a variable export of timezone based on timezonevariable. 
+	(Cannot be used with the timezone() function.)
+
 2001-04-17  Stephen L. Moshier  <moshier@moshier.ne.mediaone.net>
 
         * newlib/libm/math/ef_asin.c (pio2_hi, pio2_lo, pio4_hi):

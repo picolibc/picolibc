@@ -66,8 +66,20 @@ struct tm *_EXFUN(localtime_r,	(const time_t *, struct tm *));
 extern __IMPORT time_t _timezone;
 extern __IMPORT int _daylight;
 extern __IMPORT char *_tzname[2];
-
+/* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
+#ifndef tzname
+#define tzname _tzname
+#endif
+#ifndef daylight
+#define daylight _daylight
+#endif
+#if timezonevar
+#ifndef timezone
+#define timezone ((long int) _timezone)
+#endif
+#else
 char *_EXFUN(timezone, (void));
+#endif
 void _EXFUN(tzset, (void));
 #endif
 #endif /* __CYGWIN__ */
