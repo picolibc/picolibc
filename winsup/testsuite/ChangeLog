@@ -1,3 +1,8 @@
+2004-03-06  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.api/known_bugs.tcl: Remove mknod01 since mknod now works.
+	* winsup.api/ltp/mknod01.c: Remove root check when running on cygwin.
+
 2004-03-04  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* winsup.api/pthread/mutex8e.c: New testcase.
