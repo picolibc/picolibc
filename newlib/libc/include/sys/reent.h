@@ -345,7 +345,7 @@ struct _reent
   _REENT_CHECK(var, _mp, struct _mprec *, sizeof *((var)->_mp), _REENT_INIT_MP(var))
 
 #define _REENT_CHECK_EMERGENCY(var) \
-  _REENT_CHECK(var, _emergency, char *, sizeof *((var)->_emergency), /* nothing */)
+  _REENT_CHECK(var, _emergency, char *, _REENT_EMERGENCY_SIZE, /* nothing */)
 
 #define _REENT_SIGNGAM(ptr)	((ptr)->_gamma_signgam)
 #define _REENT_RAND_NEXT(ptr)	((ptr)->_r48->_rand_next)
