@@ -6,7 +6,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = syscalls.c trap.S creat.c
+lib_a_SOURCES = syscalls.c trap.S creat.c ftruncate.c truncate.c
 
 all: crt0.o
 

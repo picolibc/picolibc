@@ -175,15 +175,17 @@ int     _EXFUN(_unlink, (const char *__path ));
 _READ_WRITE_RETURN_TYPE _EXFUN(_write, (int __fd, const void *__buf, size_t __nbyte ));
 int     _EXFUN(_execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 
+#if defined(__CYGWIN__) || defined(__rtems__) || defined(__sh__)
+#if !defined(__INSIDE_CYGWIN__)
+int     _EXFUN(ftruncate, (int __fd, off_t __length));
+int     _EXFUN(truncate, (const char *, off_t __length));
+#endif
+#endif
 #if defined(__CYGWIN__) || defined(__rtems__)
 int	_EXFUN(getdtablesize, (void));
 int	_EXFUN(setdtablesize, (int));
 useconds_t _EXFUN(ualarm, (useconds_t __useconds, useconds_t __interval));
 unsigned _EXFUN(usleep, (unsigned int __useconds));
-#if !defined(__INSIDE_CYGWIN__)
-int     _EXFUN(ftruncate, (int __fd, off_t __length));
-int     _EXFUN(truncate, (const char *, off_t __length));
-#endif
 #if !(defined  (_WINSOCK_H) || defined (__USE_W32_SOCKETS))
 /* winsock[2].h defines as __stdcall, and with int as 2nd arg */
  int	_EXFUN(gethostname, (char *__name, size_t __len));

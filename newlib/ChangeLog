@@ -1,3 +1,14 @@
+2003-07-10  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/include/sys/unistd.h (ftruncate, truncate): Also declare
+	for __sh__.
+	* libc/sys/sh/Makefile.am (lib_a_SOURCES): Add ftruncate.c and
+	truncate.c.
+	* libc/sys/sh/Makefile.in: Regenerate.
+	* libc/sys/sh/sys/syscall.h: (SYS_truncate, SYS_ftruncate): Define.
+	* libc/sys/sh/ftruncate.c: New file.
+	* libc/sys/sh/truncate.c: Likewise.
+
 2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
 
 	* libc/include/math.h (nan, nanf): Update prototype to C99.
