@@ -1,3 +1,8 @@
+Fri Sep  7 10:53:34 2001  Jason Tishler <jason@tishler.net>
+
+	* poll.cc (poll): Change implementation to only call select() when no
+	invalid file descriptors are specified.
+
 Fri Sep  7 10:27:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/limits.h: Define PIPE_BUF.

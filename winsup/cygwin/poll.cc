@@ -50,6 +50,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
   memset (write_fds, 0, fds_size);
   memset (except_fds, 0, fds_size);
 
+  bool invalid_fds = false;
   for (unsigned int i = 0; i < nfds; ++i)
     if (!cygheap->fdtab.not_open (fds[i].fd))
       {
@@ -61,14 +62,21 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 	if (fds[i].events & POLLPRI)
 	  FD_SET (fds[i].fd, except_fds);
       }
+      else
+	invalid_fds = true;
 
-  int ret = cygwin_select (max_fd + 1, read_fds, write_fds, except_fds,
-			   timeout < 0 ? NULL : &tv);
+  int ret = 0;
+  if (!invalid_fds)
+    ret = cygwin_select (max_fd + 1, read_fds, write_fds, except_fds,
+			 timeout < 0 ? NULL : &tv);
 
   for (unsigned int i = 0; i < nfds; ++i)
     {
       if (!FD_ISSET (fds[i].fd, open_fds))
-	fds[i].revents = POLLNVAL;
+	{
+	  fds[i].revents = POLLNVAL;
+	  ret++;
+	}
       else if (cygheap->fdtab.not_open(fds[i].fd))
 	fds[i].revents = POLLHUP;
       else if (ret < 0)
