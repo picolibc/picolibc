@@ -85,8 +85,14 @@ c=-E
 o=.E
 endif
 
-LIBGCC:=${subst \,/,${shell $(CC_FOR_TARGET) -print-libgcc-file-name; exec $(CC_FOR_TARGET) -print-file-name=libstdc++.a}}
-GCC_INCLUDE:=${dir ${word 1,$(LIBGCC)}}/include
+libstdcxx:=${subst \,/,${shell $(CC_FOR_TARGET) -print-file-name=libstdc++.a}}
+ifeq ($(libstdcxx),${notdir $(libstdcxx)})
+LIBGCC+=${subst \,/,${shell $(CC_FOR_TARGET) -print-libgcc-file-name}}
+else
+LIBGCC:=${subst \,/,${shell $(CC_FOR_TARGET) -print-libgcc-file-name}} $(libstdcxx)
+endif
+
+GCC_INCLUDE:=${word 1,${dir $(LIBGCC)}}/include
 
 COMPILE_CXX:=$(CC) $c -nostdinc++ $(ALL_CXXFLAGS) -I$(GCC_INCLUDE) \
 	     -fno-rtti -fno-exceptions
