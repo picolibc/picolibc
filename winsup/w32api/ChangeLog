@@ -1,3 +1,7 @@
+2002-08-12  Andriy Palamarchuk  <apa3a@yahoo.com>
+
+	* include/shellapi.h (FOF_NOERRORUI): Add define.
+
 2002-08-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/objidl.h (IEnumMoniker): Put 'interface' back.
