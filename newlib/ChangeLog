@@ -1,3 +1,10 @@
+2002-03-12  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/sys/arm/access.c: New file.
+	* libc/sys/arm/Makefile.am (lib_a_SOURCES): Add access.c.
+	* libc/sys/arm/Makefile.in: Regenerate.
+	* libc/sys/arm/syscalls.c (_stat): New function.
+
 2002-03-11  Michael Meissner  <meissner@redhat.com>
 
 	* libc/machine/mips/Makefile.am (lib_a_SOURCES): Add Mips specific

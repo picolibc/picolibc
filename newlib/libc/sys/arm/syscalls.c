@@ -21,6 +21,7 @@ int     _gettimeofday	_PARAMS ((struct timeval *, struct timezone *));
 void    _raise 		_PARAMS ((void));
 int     _unlink		_PARAMS ((void));
 int     _link 		_PARAMS ((void));
+int     _stat 		_PARAMS ((const char *, struct stat *));
 int     _fstat 		_PARAMS ((int, struct stat *));
 caddr_t _sbrk		_PARAMS ((int));
 int     _getpid		_PARAMS ((int));
@@ -513,6 +514,22 @@ _fstat (int file, struct stat * st)
   st->st_blksize = 1024;
   return 0;
   file = file;
+}
+
+int _stat (const char *fname, struct stat *st)
+{
+  int file;
+
+  /* The best we can do is try to open the file readonly.  If it exists,
+     then we can guess a few things about it.  */
+  if ((file = _open (fname, O_RDONLY)) < 0)
+    return -1;
+
+  memset (st, 0, sizeof (* st));
+  st->st_mode = S_IFREG | S_IREAD;
+  st->st_blksize = 1024;
+  _swiclose (file); /* Not interested in the error.  */
+  return 0;
 }
 
 int
