@@ -53,7 +53,7 @@ public:
     return _key == rhs._key;
   }
 
-  void *key () { return _key; }
+  void *key () const { return _key; }
 
   /* MUST BE SYNCHRONOUS */
   virtual void cleanup (class process *) = 0;

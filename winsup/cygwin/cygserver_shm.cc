@@ -79,9 +79,6 @@ details. */
 
 class server_shmmgr
 {
-  class cleanup_t;
-  friend class cleanup_t;
-
 private:
   class attach_t
   {
@@ -147,27 +144,21 @@ private:
   class cleanup_t : public cleanup_routine
   {
   public:
-    cleanup_t (segment_t *const segptr)
-      : cleanup_routine (segptr)
+    cleanup_t (const segment_t *const segptr)
+      : cleanup_routine (reinterpret_cast<void *>(segptr->_shmid))
     {
       assert (key ());
     }
 
-    segment_t *segptr () { return static_cast<segment_t *>(key ()); }
+    int shmid () const { return reinterpret_cast<int>(key ()); }
 
     virtual void cleanup (class process *const client)
     {
-      assert (segptr ());
+      const int res = shmmgr.shmdt (shmid (), client);
 
-      if (!shmmgr.find (segptr ()))
-	debug_printf ("process cleanup called for non-existent segment");
-      else
-	{
-	  const int res = shmmgr.shmdt (segptr ()->_shmid, client);
-
-	  if (res != 0)
-	    debug_printf ("process cleanup failed: %s", strerror (-res));
-	}
+      if (res != 0)
+	debug_printf ("process cleanup failed [shmid = %d]: %s",
+		      shmid (), strerror (-res));
     }
   };
 
@@ -207,8 +198,6 @@ private:
 
   segment_t *find_by_key (key_t);
   segment_t *find (int intid, segment_t **previous = NULL);
-
-  const segment_t *find (const segment_t *) const;
 
   int new_segment (key_t, size_t, int shmflg, pid_t, uid_t, gid_t);
 
@@ -733,27 +722,6 @@ server_shmmgr::find (const int intid, segment_t **previous)
       return NULL;
     else if (previous)
       *previous = segptr;
-
-  return NULL;
-}
-
-
-/*---------------------------------------------------------------------------*
- * server_shmmgr::find ()
- *
- * Used to check that a segptr is still valid.  Since it may just be a
- * random blob of memory, the routine doesn't try to access any of the
- * "object's" fields.
- *---------------------------------------------------------------------------*/
-
-const server_shmmgr::segment_t *
-server_shmmgr::find (const segment_t *segptr) const
-{
-  assert (segptr);
-
-  for (segment_t *ptr = _segments_head; ptr; ptr = ptr->_next)
-    if (ptr == segptr)
-      return segptr;
 
   return NULL;
 }

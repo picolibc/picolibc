@@ -1,3 +1,16 @@
+2002-07-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (class server_shmmgr): Remove `cleanup_t'
+	friend declaration.
+	(cleanup_t::cleanup_t): Use the segment's shmid as the key rather
+	than the segment pointer itself.
+	(cleanup_t::segptr): Remove method.
+	(cleanup_t::shmid): New method.
+	(cleanup_t::cleanup): Update for new key value.
+	(server_shmmgr::find (segment_t *)): Remove method.
+	* include/cygwin/cygserver_process.h (cleanup_routine::key): Make
+	method const.
+
 2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/cygwin/cygserver_process.h
@@ -5,6 +18,7 @@
 	(cleanup_routine::cleanup_routine): Initialise new field with new
 	argument.
 	(cleanup_routine::operator==): New method.
+	(cleanup_routine::key): New method.
 	(cleanup_routine::cleanup): Make argument non-const.
 	(process::is_active): New method.
 	(process::remove): Ditto.
@@ -25,7 +39,7 @@
 	(cleanup_t::segptr): New method.
 	(cleanup_t::cleanup): Add error checking and reporting.
 	(server_shmmgr::shmdt): Make argument non-const.
-	(server_shmmgr::find): New method.
+	(server_shmmgr::find (segment_t *)): New method.
 
 2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
