@@ -13,8 +13,8 @@ LIB_SOURCES = \
 	brk.c flockfile.c funlockfile.c gethostname.c getoptlong.c getreent.c ids.c \
 	inode.c io.c io64.c linux.c mmap.c \
 	pread.c pread64.c process.c pwrite.c pwrite64.c raise.c realpath.c \
-	resource.c sched.c select.c shm_open.c shm_unlink.c seteuid.c signal.c \
-	siglongjmp.c socket.c sleep.c stack.c \
+	rename.c resource.c sched.c select.c seteuid.c shm_open.c \
+	shm_unlink.c signal.c siglongjmp.c socket.c sleep.c stack.c \
 	sysconf.c sysctl.c systat.c system.c tcdrain.c termios.c time.c \
 	usleep.c wait.c
 

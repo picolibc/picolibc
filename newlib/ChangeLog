@@ -1,3 +1,14 @@
+2002-05-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/string.h: Add strnlen and strerror_r prototypes.
+        * libc/string/Makefile.am: Add strnlen.c and strerror_r.c support.
+        * libc/string/Makefile.in: Regenerated.
+        * libc/string/strerror_r.c: New file.
+        * libc/string/strnlen.c: New file.
+        * libc/sys/linux/Makefile.am: Add rename.c.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/rename.c: New file to override default rename.
+
 2002-05-24  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/sys/linux/sys/cdefs.h: Add __weak_reference macros.

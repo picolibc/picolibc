@@ -23,6 +23,7 @@ LIB_SOURCES = \
 	strcpy.c \
 	strcspn.c \
 	strerror.c \
+	strerror_r.c \
 	strlcat.c \
 	strlcpy.c \
 	strlen.c  \
@@ -31,6 +32,7 @@ LIB_SOURCES = \
 	strncmp.c \
 	strncasecmp.c \
 	strncpy.c \
+	strnlen.c \
 	strpbrk.c \
 	strrchr.c \
 	strsep.c \
@@ -62,8 +64,8 @@ bcmp.def	memcpy.def	strcmp.def	strncat.def strstr.def \
 bcopy.def	memmove.def	strcoll.def	strncmp.def strtok.def \
 bzero.def	memset.def	strcpy.def	strncpy.def strxfrm.def \
 index.def	rindex.def	strcspn.def	strpbrk.def swab.def \
-memchr.def	strcat.def	strerror.def	strrchr.def \
-memcmp.def	strchr.def	strlen.def	strspn.def \
+memchr.def	strcat.def	strerror.def	strerror_r.def strrchr.def \
+memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
 strcasecmp.def	strncasecmp.def strlwr.def	strupr.def
 
 SUFFIXES = .def
