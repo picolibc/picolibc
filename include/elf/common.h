@@ -258,6 +258,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* TI msp430 micro controller.  */
 #define EM_MSP430      		0x430
 
+/* Vitesse IQ2000 */
+#define EM_IQ2000		0xFEBA
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version.  */

@@ -1,3 +1,8 @@
+2002-01-02  Ben Elliston  <bje@redhat.com>
+
+	* common.h (EM_IQ2000): Define.
+	* iq2000.h: New file.
+
 2002-12-30  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips.h (E_MIPS_ARCH_32R2): New define.
