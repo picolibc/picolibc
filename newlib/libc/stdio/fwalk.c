@@ -82,12 +82,9 @@ _DEFUN(_fwalk, (ptr, function),
 
   __sfp_lock_acquire ();
 
-  /* Must traverse given list for std streams.  */
-  if (ptr != _GLOBAL_REENT)
-    ret |= __fwalk (ptr, function);
-
-  /* Must traverse global list for all other streams.  */
-  ret |= __fwalk (_GLOBAL_REENT, function);
+  /* Must traverse given list for streams.  Note that _GLOBAL_REENT
+     only walked once in exit().  */
+  ret |= __fwalk (ptr, function);
 
   __sfp_lock_release ();
 
@@ -105,12 +102,9 @@ _DEFUN(_fwalk_reent, (ptr, reent_function),
 
   __sfp_lock_acquire ();
 
-  /* Must traverse given list for std streams.  */
-  if (ptr != _GLOBAL_REENT)
-    ret |= __fwalk_reent (ptr, reent_function);
-
-  /* Must traverse global list for all other streams.  */
-  ret |= __fwalk_reent (_GLOBAL_REENT, reent_function);
+  /* Must traverse given list for streams.  Note that _GLOBAL_REENT
+     only walked once in exit().  */
+  ret |= __fwalk_reent (ptr, reent_function);
 
   __sfp_lock_release ();
 

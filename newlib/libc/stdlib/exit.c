@@ -50,8 +50,6 @@ Supporting OS subroutines required: <<_exit>>.
 #include <reent.h>
 #include "atexit.h"
 
-#ifndef _REENT_ONLY
-
 /*
  * Exit, flushing stdio buffers if necessary.
  */
@@ -66,5 +64,3 @@ _DEFUN (exit, (code),
     (*_GLOBAL_REENT->__cleanup) (_GLOBAL_REENT);
   _exit (code);
 }
-
-#endif

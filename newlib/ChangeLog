@@ -1,5 +1,12 @@
 2004-09-16  Antony King  <antony.king@st.com>
 
+	* libc/stdio/fwalk.c (_fwalk): Remove check for _GLOBAL_REENT
+	and only walk the reentrancy parameter.
+	(_fwalk_reent): Ditto.
+	* libc/stdlib/exit.c: Remove out of date _REENT_ONLY check.
+
+2004-09-16  Antony King  <antony.king@st.com>
+
 	* libc/stdio64/freopen64.c: Remove casting of fp lock to
 	_LOCK_RECURSIVE_T.
 
