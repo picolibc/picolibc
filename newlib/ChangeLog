@@ -1,3 +1,8 @@
+2004-04-26  Aldy Hernandez  <aldyh@redhat.com>
+
+        * libc/machine/powerpc/vfscanf.c (__svfscanf_r): Fix typo in
+        CT_INT case.
+
 2004-04-23  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* configure.in: Define _MB_CAPABLE if mb supported.

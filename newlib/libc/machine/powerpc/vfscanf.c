@@ -800,6 +800,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  continue;
 
 	case CT_INT:
+	  {
 	  unsigned int_width_left = 0;
 	  int_width = width;
 #ifdef hardway
@@ -1005,6 +1006,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	    }
 	  nread += p - buf;
 	  break;
+	  }
 
 #ifdef FLOATING_POINT
 	case CT_FLOAT:
