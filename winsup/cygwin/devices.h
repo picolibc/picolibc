@@ -131,7 +131,7 @@ struct device
   const char *native;
   _mode_t mode;
   bool dev_on_fs;
-  static const device *lookup (const char *, unsigned int = 0xffffffff);
+  static const device *lookup (const char *, unsigned int = UINT32_MAX);
   void parse (const char *);
   void parse (_major_t major, _minor_t minor);
   void parse (_dev_t dev);

@@ -232,7 +232,7 @@ class fhandler_base
   void set_append_p () { FHSETF (APPEND); }
 
   void set_fs_flags (DWORD flags) { fs_flags = flags; }
-  bool get_fs_flags (DWORD flagval = 0xffffffffUL)
+  bool get_fs_flags (DWORD flagval = UINT32_MAX)
     { return (fs_flags & (flagval)); }
 
   bool get_query_open () { return FHISSETF (QUERYOPEN); }

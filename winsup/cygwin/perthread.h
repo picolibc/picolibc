@@ -15,7 +15,7 @@ details. */
 struct _reent;
 extern struct _reent reent_data;
 
-#define PER_THREAD_FORK_CLEAR ((void *)0xffffffff)
+#define PER_THREAD_FORK_CLEAR ((void *)UINT32_MAX)
 class per_thread
 {
   DWORD tls;

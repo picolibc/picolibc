@@ -920,7 +920,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
       return INVALID_HANDLE_VALUE;
     }
 
-  DWORD high = off >> 32, low = off & 0xffffffff;
+  DWORD high = off >> 32, low = off & UINT32_MAX;
   void *base = NULL;
   /* If a non-zero address is given, try mapping using the given address first.
      If it fails and flags is not MAP_FIXED, try again with NULL address. */

@@ -317,7 +317,7 @@ _pinfo::commune_recv ()
 	const char *argv[__argc_safe + 1];
 	for (int i = 0; i < __argc_safe; i++)
 	  {
-	    if (IsBadStringPtr (__argv[i], 0x7fffffff))
+	    if (IsBadStringPtr (__argv[i], INT32_MAX))
 	      argv[i] = "";
 	    else
 	      argv[i] = __argv[i];

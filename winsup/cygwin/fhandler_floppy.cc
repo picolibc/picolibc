@@ -172,7 +172,7 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 	return ret;
       devbufstart = devbufend = 0;
 
-      low = sector_aligned_offset & 0xffffffff;
+      low = sector_aligned_offset & UINT32_MAX;
       high = sector_aligned_offset >> 32;
       if (SetFilePointer (get_handle (), low, &high, FILE_BEGIN)
 	  == INVALID_SET_FILE_POINTER && GetLastError ())

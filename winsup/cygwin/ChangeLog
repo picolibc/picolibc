@@ -1,5 +1,10 @@
 2003-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	Substitute 0x7fffffff and 0xffffffff by INT32_MAX and UINT32_MAX
+	throughout, except in assembler code.
+
+2003-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::lock): Use UINT32_MAX
 	instead of 0xffffffff.  Accomodate Win 9x bug in evaluating length
 	of area to lock when given length is 0.

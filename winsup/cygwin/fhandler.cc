@@ -856,7 +856,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
   DWORD win32_whence = whence == SEEK_SET ? FILE_BEGIN
 		       : (whence == SEEK_CUR ? FILE_CURRENT : FILE_END);
 
-  LONG off_low = ((__uint64_t) offset) & 0xffffffffLL;
+  LONG off_low = ((__uint64_t) offset) & UINT32_MAX;
   LONG *poff_high, off_high;
   if (!wincap.has_64bit_file_access ())
     poff_high = NULL;

@@ -506,9 +506,9 @@ dup_ent (void *old, void *src0, struct_type type)
 	{
 	  /* Windows 95 idiocy.  Structure is misaligned on Windows 95.
 	     Kludge around this by trying a different pointer alignment.  */
-	  if (!IsBadStringPtr (src->s_proto, 0x7fffffff))
+	  if (!IsBadStringPtr (src->s_proto, INT32_MAX))
 	    s_proto = src->s_proto;
-	  else if (!IsBadStringPtr (((pservent *) src)->s_proto, 0x7fffffff))
+	  else if (!IsBadStringPtr (((pservent *) src)->s_proto, INT32_MAX))
 	    s_proto = ((pservent *) src)->s_proto;
 	  sz += (protolen = strlen_round (s_proto));
 	}

@@ -808,7 +808,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   BOOL special_pgrp = FALSE;
   char sa_buf[1024];
   LUID auth_luid = SYSTEM_LUID;
-  LARGE_INTEGER exp = { QuadPart:0x7fffffffffffffffLL };
+  LARGE_INTEGER exp = { QuadPart:INT64_MAX };
 
   TOKEN_USER user;
   PTOKEN_GROUPS new_tok_gsids = NULL;
