@@ -1,3 +1,8 @@
+2001-10-16  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::fork_fixup): Guard against compiler
+	warning.
+
 2001-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc: Add load statement for `NtOpenFile'.

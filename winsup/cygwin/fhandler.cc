@@ -1629,7 +1629,9 @@ fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 void
 fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 {
+#ifdef DEBUGGING
   HANDLE oh = h;
+#endif
   if (/* !is_socket () && */ !get_close_on_exec ())
     debug_printf ("handle %p already opened", h);
   else if (!DuplicateHandle (parent, h, hMainProc, &h, 0, !get_close_on_exec (),
