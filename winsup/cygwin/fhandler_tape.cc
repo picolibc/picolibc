@@ -692,7 +692,7 @@ fhandler_dev_tape::tape_set_blocksize (long count)
   if (lasterr)
     return lasterr;
 
-  if (count < min || count > max)
+  if (count != 0 && (count < min || count > max))
     return tape_error (ERROR_INVALID_PARAMETER, "tape_set_blocksize");
 
   mp.BlockSize = count;

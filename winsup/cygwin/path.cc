@@ -1010,18 +1010,18 @@ win32_device_name (const char *src_path, char *win32_path,
 	__small_sprintf (win32_path, devfmt, unit == 8 ? "" : "u");
         break;
       case FH_TAPE:
-        __small_sprintf (win32_path, "\\device\\tape%d", unit % 128);
+        __small_sprintf (win32_path, "\\Device\\Tape%d", unit % 128);
         break;
       case FH_FLOPPY:
         if (unit < 16)
-	  __small_sprintf (win32_path, "\\device\\floppy%d", unit);
+	  __small_sprintf (win32_path, "\\Device\\Floppy%d", unit);
 	else if (unit < 32)
-	  __small_sprintf (win32_path, "\\device\\cdrom%d", unit - 16);
+	  __small_sprintf (win32_path, "\\Device\\CdRom%d", unit - 16);
 	else if (unit < 224)
-	  __small_sprintf (win32_path, "\\device\\harddisk%d\\partition%d",
+	  __small_sprintf (win32_path, "\\Device\\Harddisk%d\\Partition%d",
 				       (unit - 32) / 16, unit % 16);
 	else
-	  __small_sprintf (win32_path, "\\\\.\\%c:", unit - 224 + 'A');
+	  __small_sprintf (win32_path, "\\DosDevices\\%c:", unit - 224 + 'A');
         break;
       default:
 	__small_sprintf (win32_path, devfmt, unit);

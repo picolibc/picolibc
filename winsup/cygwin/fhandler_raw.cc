@@ -154,42 +154,32 @@ fhandler_dev_raw::open (path_conv *real_path, int flags, mode_t)
   flags &= ~(O_CREAT | O_TRUNC);
   flags |= O_BINARY;
 
-  if (get_device () == FH_FLOPPY && get_unit () >= 224)
+  DWORD access = GENERIC_READ | SYNCHRONIZE;
+  if (get_device () == FH_TAPE
+      || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY
+      || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDWR)
+    access |= GENERIC_WRITE;
+
+  extern void str2buf2uni (UNICODE_STRING &, WCHAR *, const char *);
+  UNICODE_STRING dev;
+  WCHAR devname[MAX_PATH + 1];
+  str2buf2uni (dev, devname, real_path->get_win32 ());
+  OBJECT_ATTRIBUTES attr;
+  InitializeObjectAttributes (&attr, &dev, OBJ_CASE_INSENSITIVE, NULL, NULL);
+
+  HANDLE h;
+  IO_STATUS_BLOCK io;
+  NTSTATUS status = NtOpenFile (&h, access, &attr, &io, wincap.shared (),
+				FILE_SYNCHRONOUS_IO_NONALERT);
+  if (!NT_SUCCESS (status))
     {
-      /* Compatibility mode for old mount table device mapping. */
-      if (!fhandler_base::open (real_path, flags))
-        return 0;
-    }
-  else
-    {
-      DWORD access = GENERIC_READ | SYNCHRONIZE;
-      if (get_device () == FH_TAPE
-	  || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY
-	  || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDWR)
-	access |= GENERIC_WRITE;
-
-      extern void str2buf2uni (UNICODE_STRING &, WCHAR *, const char *);
-      UNICODE_STRING dev;
-      WCHAR devname[MAX_PATH + 1];
-      str2buf2uni (dev, devname, real_path->get_win32 ());
-      OBJECT_ATTRIBUTES attr;
-      InitializeObjectAttributes(&attr, &dev, OBJ_CASE_INSENSITIVE, NULL, NULL);
-
-      HANDLE h;
-      IO_STATUS_BLOCK io;
-      NTSTATUS status = NtOpenFile (&h, access, &attr, &io, wincap.shared (),
-				    FILE_SYNCHRONOUS_IO_NONALERT);
-      if (!NT_SUCCESS (status))
-	{
-	  set_errno (RtlNtStatusToDosError (status));
-	  debug_printf ("NtOpenFile: NTSTATUS: %d, Win32: %E", status);
-	  return 0;
-	}
-
-      set_io_handle (h);
-      set_flags (flags);
+      set_errno (RtlNtStatusToDosError (status));
+      debug_printf ("NtOpenFile: NTSTATUS: %d, Win32: %E", status);
+      return 0;
     }
 
+  set_io_handle (h);
+  set_flags (flags);
   set_r_binary (O_BINARY);
   set_w_binary (O_BINARY);
 

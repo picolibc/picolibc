@@ -1,5 +1,16 @@
 2001-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_raw.cc (fhandler_dev_raw::open): Eliminate compatibility
+	code since no Win32 device names are used anymore.
+	* fhandler_tape.cc (fhandler_dev_tape::tape_set_blocksize): Allow
+	0 as blocksize to indicate variable blocksize.
+	* path.cc (win32_device_name): Generate NT internal device names
+	using upper/lower case names for readability.
+	Generate \DosDevices\<letter>: device name for mount table
+	compatibility devices.
+
+2001-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_tape.cc (fhandler_dev_tape::tape_status): Report
 	EOTWarningZoneSize in get->mt_eotwarningzonesize.
 	* include/cygwin/mtio.h: Define DEFTAPE.
