@@ -1,3 +1,10 @@
+2003-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_nt_attribute): Always return -1 when read_sd()
+	fails.
+	(get_file_attribute): Set permissions to 0 and owner/group to -1
+	if security descriptor is unreadable.
+
 2003-01-09  Christopher Faylor  <cgf@redhat.com>
 
 	Use isdirsep rather than SLASH_P throughout.

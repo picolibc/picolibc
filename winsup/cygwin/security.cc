@@ -1322,7 +1322,7 @@ get_nt_attribute (const char *file, int *attribute,
   if ((ret = read_sd (file, psd, &sd_size)) <= 0)
     {
       debug_printf ("read_sd %E");
-      return ret;
+      return -1;
     }
 
   PSID owner_sid;
@@ -1381,9 +1381,19 @@ get_file_attribute (int use_ntsec, const char *file,
   if (use_ntsec && allow_ntsec)
     {
       res = get_nt_attribute (file, attribute, uidret, gidret);
-      if (attribute && (*attribute & S_IFLNK) == S_IFLNK)
+      if (res)
+        {
+	  /* If reading the security descriptor failed, treat the file
+	     as unreadable. */
+	  *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO);
+	  if (uidret)
+	    *uidret = ILLEGAL_UID;
+	  if (gidret)
+	    *gidret = ILLEGAL_GID;
+	}
+      else if (attribute && (*attribute & S_IFLNK) == S_IFLNK)
 	*attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
-      return res;
+      return 0;
     }
 
   if (uidret)
