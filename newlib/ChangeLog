@@ -1,3 +1,9 @@
+Mon Jun 24 21:17:02 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/machine/sh/strcpy.S: New file.
+	* libc/machine/sh/Makefile.am (lib_a_SOURCES): Add rule for it.
+	* libc/machine/sh/Makefile.am: Regenerate.
+
 2002-06-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/math.h: Remove <sys/types.h>.
