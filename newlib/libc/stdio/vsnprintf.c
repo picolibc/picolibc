@@ -45,10 +45,11 @@ vsnprintf (str, size, fmt, ap)
 
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = size;
+  f._bf._size = f._w = (size > 0 ? size - 1 : 0);
   f._data = _REENT;
   ret = vfprintf (&f, fmt, ap);
-  *f._p = 0;
+  if (size > 0)
+    *f._p = 0;
   return ret;
 }
 
@@ -65,9 +66,10 @@ vsnprintf_r (ptr, str, size, fmt, ap)
 
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = size;
+  f._bf._size = f._w = (size > 0 ? size - 1 : 0);
   f._data = ptr;
   ret = vfprintf (&f, fmt, ap);
-  *f._p = 0;
+  if (size > 0)
+    *f._p = 0;
   return ret;
 }

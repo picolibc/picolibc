@@ -1,3 +1,12 @@
+2000-08-08  Jeff Johnston <jjohnstn@redhat.com>
+
+	* libc/stdio/snprintf.c (snprintf, _snprintf_r): Fixed code
+	so size of 0 results in nothing being written to string.
+	Also fixed code so that when size is non-zero, there is only
+	a maximum of size - 1 characters written to the array and
+	a nul terminator is appended at the end.
+	* libc/stdio/vsnprintf.c (vsnprintf, _vsnprintf_r): Ditto.
+
 2000-08-01  DJ Delorie  <dj@redhat.com>
 
 	* libc/include/sys/config.h: define __IMPORT appropriately

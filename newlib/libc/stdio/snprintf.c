@@ -47,7 +47,7 @@ _snprintf_r (ptr, str, size, fmt, va_alist)
 
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = size;
+  f._bf._size = f._w = (size > 0 ? size - 1 : 0);
   f._data = ptr;
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
@@ -56,7 +56,8 @@ _snprintf_r (ptr, str, size, fmt, va_alist)
 #endif
   ret = vfprintf (&f, fmt, ap);
   va_end (ap);
-  *f._p = 0;
+  if (size > 0)
+    *f._p = 0;
   return (ret);
 }
 
@@ -79,7 +80,7 @@ snprintf (str, size, fmt, va_alist)
 
   f._flags = __SWR | __SSTR;
   f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._w = size;
+  f._bf._size = f._w = (size > 0 ? size - 1 : 0);
   f._data = _REENT;
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
@@ -88,7 +89,8 @@ snprintf (str, size, fmt, va_alist)
 #endif
   ret = vfprintf (&f, fmt, ap);
   va_end (ap);
-  *f._p = 0;
+  if (size > 0)
+    *f._p = 0;
   return (ret);
 }
 
