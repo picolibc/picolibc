@@ -217,7 +217,7 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 void
 dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 {
-  int bin = 0;
+  int bin = -1;
   const char *name;
   CONSOLE_SCREEN_BUFFER_INFO buf;
   struct sockaddr sa;
@@ -238,7 +238,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
       if (__fmode)
 	bin = __fmode;
       else
-	bin = binmode ?: 0;
+	bin = (int) binmode ?: -1;
 
       /* See if we can consoleify it  - if it is a console,
        don't open it in binary.  That will screw up our crlfs*/
@@ -280,7 +280,8 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
   else
     {
       path_conv pc;
-      build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess, bin);
+      build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess,
+							     bin < 0 ? pc.isbinary () : bin);
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }

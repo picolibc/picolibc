@@ -1,5 +1,10 @@
 2002-05-31  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_console.cc (fhandler_console::open): Reinstate setting of
+	flags.
+
+2002-05-31  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_console.cc (fhandler_console::open): Always default to
 	binmode.
 	(fhandler_console::write_normal): Don't honor binmode setting.  There

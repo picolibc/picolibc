@@ -1169,3 +1169,5 @@ fhandler_base::closedir (DIR *)
   set_errno (ENOTDIR);
   return -1;
 }
+bool fhandler_base::get_w_binary () { return FHISSETF (WBINSET) ? FHISSETF (WBINARY) : 1; }
+bool fhandler_base::get_r_binary () { return FHISSETF (RBINSET) ? FHISSETF (RBINARY) : 1; }

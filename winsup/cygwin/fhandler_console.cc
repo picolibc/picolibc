@@ -547,6 +547,7 @@ fhandler_console::open (path_conv *, int flags, mode_t)
   set_io_handle (INVALID_HANDLE_VALUE);
   set_output_handle (INVALID_HANDLE_VALUE);
 
+  set_flags (flags);
   set_w_binary (1);
   set_r_binary (1);
 

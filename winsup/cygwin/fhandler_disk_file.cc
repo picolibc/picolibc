@@ -63,7 +63,7 @@ num_entries (const char *win32_name)
 int __stdcall
 fhandler_disk_file::fstat_by_handle (struct __stat64 *buf, path_conv *pc)
 {
-  int res;
+  int res = 0;
   BY_HANDLE_FILE_INFORMATION local;
 
   /* NT 3.51 seems to have a bug when attempting to get vol serial

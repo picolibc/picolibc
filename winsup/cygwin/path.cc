@@ -741,7 +741,6 @@ out:
       if (tail[1] != '\0')
 	*tail = '/';
       normalized_path = cstrdup (path_copy);
-      debug_printf ("path_copy %s", path_copy);
     }
   /* Deal with Windows stupidity which considers filename\. to be valid
      even when "filename" is not a directory. */
@@ -814,6 +813,7 @@ out:
 	path_flags |= PATH_EXEC;
     }
 
+  debug_printf ("binary %d", isbinary ());
 #if 0
   if (!error)
     {

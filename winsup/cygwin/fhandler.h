@@ -179,8 +179,8 @@ class fhandler_base
   bool is_nonblocking ();
   void set_nonblocking (int yes);
 
-  bool get_w_binary () { return FHISSETF (WBINARY); }
-  bool get_r_binary () { return FHISSETF (RBINARY); }
+  bool get_w_binary () { return FHISSETF (WBINSET) ? FHISSETF (WBINARY) : 1; }
+  bool get_r_binary () { return FHISSETF (RBINSET) ? FHISSETF (RBINARY) : 1; }
 
   bool get_w_binset () { return FHISSETF (WBINSET); }
   bool get_r_binset () { return FHISSETF (RBINSET); }
