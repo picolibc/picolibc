@@ -1,3 +1,9 @@
+Mon Apr  2 00:24:08 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* shared_info.h (mount_info): Remove mnt_ elements.
+	* thread.h (struct _winsup_t): Add mnt_ elements.
+	* path.cc (fillout_mntent): Use mnt_ elements from reent_winsup ().
+
 Sun Apr  1 20:10:34 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (sigframe::call_signal_handler): Return value of

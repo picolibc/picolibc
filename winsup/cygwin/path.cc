@@ -2049,37 +2049,36 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
      table because the mount table might change, causing weird effects
      from the getmntent user's point of view. */
 
-  strcpy (mount_table->mnt_fsname, native_path);
-  ret.mnt_fsname = mount_table->mnt_fsname;
-  strcpy (mount_table->mnt_dir, posix_path);
-  ret.mnt_dir = mount_table->mnt_dir;
+  strcpy (_reent_winsup ()->mnt_fsname, native_path);
+  ret.mnt_fsname = _reent_winsup ()->mnt_fsname;
+  strcpy (_reent_winsup ()->mnt_dir, posix_path);
+  ret.mnt_dir = _reent_winsup ()->mnt_dir;
 
   if (!(flags & MOUNT_SYSTEM))		/* user mount */
-    strcpy (mount_table->mnt_type, (char *) "user");
+    strcpy (_reent_winsup ()->mnt_type, (char *) "user");
   else					/* system mount */
-    strcpy (mount_table->mnt_type, (char *) "system");
+    strcpy (_reent_winsup ()->mnt_type, (char *) "system");
 
-  if ((flags & MOUNT_AUTO))		/* cygdrive */
-    strcat (mount_table->mnt_type, (char *) ",noumount");
-
-  ret.mnt_type = mount_table->mnt_type;
+  ret.mnt_type = _reent_winsup ()->mnt_type;
 
   /* mnt_opts is a string that details mount params such as
      binary or textmode, or exec.  We don't print
      `silent' here; it's a magic internal thing. */
 
   if (!(flags & MOUNT_BINARY))
-    strcpy (mount_table->mnt_opts, (char *) "textmode");
+    strcpy (_reent_winsup ()->mnt_opts, (char *) "textmode");
   else
-    strcpy (mount_table->mnt_opts, (char *) "binmode");
+    strcpy (_reent_winsup ()->mnt_opts, (char *) "binmode");
 
   if (flags & MOUNT_CYGWIN_EXEC)
-    strcat (mount_table->mnt_opts, (char *) ",cygexec");
+    strcat (_reent_winsup ()->mnt_opts, (char *) ",cygexec");
   else if (flags & MOUNT_EXEC)
-    strcat (mount_table->mnt_opts, (char *) ",exec");
+    strcat (_reent_winsup ()->mnt_opts, (char *) ",exec");
 
+  if ((flags & MOUNT_AUTO))		/* cygdrive */
+    strcat (_reent_winsup ()->mnt_opts, (char *) ",noumount");
 
-  ret.mnt_opts = mount_table->mnt_opts;
+  ret.mnt_opts = _reent_winsup ()->mnt_opts;
 
   ret.mnt_freq = 1;
   ret.mnt_passno = 1;

@@ -40,7 +40,7 @@ public:
    scheme should be satisfactory for a long while yet.  */
 #define MAX_MOUNTS 30
 
-#define MOUNT_VERSION	0x01010102
+#define MOUNT_VERSION	0x01010103
 
 class reg_key;
 class mount_info
@@ -50,12 +50,6 @@ public:
   DWORD sys_mount_table_counter;
   int nmounts;
   mount_item mount[MAX_MOUNTS];
-
-  /* Strings used by getmntent(). */
-  char mnt_type[20];
-  char mnt_opts[20];
-  char mnt_fsname[MAX_PATH];
-  char mnt_dir[MAX_PATH];
 
   /* cygdrive_prefix is used as the root of the path automatically
      prepended to a path when the path has no associated mount.

@@ -88,6 +88,10 @@ struct _winsup_t
   struct mntent mntbuf;
   int _iteration;
   DWORD available_drives;
+  char mnt_type[80];
+  char mnt_opts[80];
+  char mnt_fsname[MAX_PATH];
+  char mnt_dir[MAX_PATH];
 
   /* strerror */
   char _strerror_buf[20];
