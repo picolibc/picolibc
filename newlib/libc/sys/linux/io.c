@@ -20,9 +20,9 @@
 #define __NR___flock __NR_flock
 #define __NR___mknod __NR_mknod
 
-_syscall3(int,read,int,fd,void *,buf,size_t,count)
+_syscall3(ssize_t,read,int,fd,void *,buf,size_t,count)
 _syscall3(ssize_t,readv,int,fd,const struct iovec *,vec,int,count)
-_syscall3(int,write,int,fd,const void *,buf,size_t,count)
+_syscall3(ssize_t,write,int,fd,const void *,buf,size_t,count)
 _syscall3(ssize_t,writev,int,fd,const struct iovec *,buf,int,count)
 _syscall3(int,open,const char *,file,int,flag,mode_t,mode)
 _syscall1(int,close,int,fd)

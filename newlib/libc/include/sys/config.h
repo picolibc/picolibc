@@ -59,6 +59,7 @@
 #define __DYNAMIC_REENT__
 #define HAVE_GETDATE
 #define _HAVE_SYSTYPES
+#define _READ_WRITE_RETURN_TYPE _ssize_t
 #endif
 #endif
 

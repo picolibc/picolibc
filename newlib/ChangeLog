@@ -1,5 +1,11 @@
 2002-06-21  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/sys/config.h[__linux__]: Set _READ_WRITE_RETURN_TYPE
+	to _ssize_t.
+	* libc/sys/linux/io.c (read, write): Change to return ssize_t.
+
+2002-06-21  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/stdio.h (__getline, __getdelim): New prototypes.
 	* libc/include/time.h [HAVE_GETDATE](getdate, getdate_r): Ditto.
 	[HAVE_GETDATE](getdate_err): New error code.
