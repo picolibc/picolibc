@@ -1,18 +1,25 @@
+2004-11-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (PPROCESS_INFORMATION): Add typedef.
+	(CreateProcessWithLogonW): Declare.
+	(LOGON_WITH_PROFILE, LOGON_NETCREDENTIALS_ONLY): Add defines.
+	Thanks to: "jkmaki"  <jkmaki@users.sourceforge.net>
+
 2004-11-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/sspi.h (SecPkgContext_Sizes): Fix typo.
-	Thanks to: David Leonard  <leonard@users,sourceforge.net>
+	Thanks to: David Leonard  <leonard@users.sourceforge.net>
 
 2004-11-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/sspi.h (SecPkgCredentials_Names[AW]): Correct name.
 	Thanks to: David Leonard  <leonard@users.sourceforge.net>
 
-2004-11-19  Magnus Olsen  <greatlord@sourceforge.users.net>
+2004-11-19  Magnus Olsen  <greatlord@users.sourceforge.net>
 
 	* include/winuser.h (MSLLHOOKSTRUCT): Add structure.
 
-2004-11-19  Magnus Olsen  <greatlord@sourceforge.users.net>
+2004-11-19  Magnus Olsen  <greatlord@users.sourceforge.net>
 
 	* include/winuser.h (LLKHF_EXTENDED, LLKHF_INJECTED, LLKHF_UP):
 	Add defines.
