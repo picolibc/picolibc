@@ -241,6 +241,7 @@ extern int print_insn_frv		PARAMS ((bfd_vma, disassemble_info *));
 extern disassembler_ftype arc_get_disassembler PARAMS ((void *));
 extern disassembler_ftype cris_get_disassembler PARAMS ((bfd *));
 
+extern void print_ppc_disassembler_options PARAMS ((FILE *));
 extern void print_arm_disassembler_options PARAMS ((FILE *));
 extern void parse_arm_disassembler_option  PARAMS ((char *));
 extern int  get_arm_regname_num_options    PARAMS ((void));
@@ -315,7 +316,7 @@ extern int generic_symbol_at_address
   (INFO).insn_info_valid = 0
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif /* ! defined (DIS_ASM_H) */

@@ -1,3 +1,21 @@
+2002-09-23  Daniel Jacobowitz  <drow@mvista.com>
+
+	Merge from mainline:
+	2002-09-19  Jakub Jelinek  <jakub@redhat.com>
+	* elf/i386.h (R_386_TLS_TPOFF, R_386_TLS_IE, R_386_TLS_GOTIE):
+	Define.
+
+	2002-09-19  Nathan Tallent  <eraxxon@alumni.rice.edu>
+	* dis-asm.h: Remove (errant) trailing semicolon (;) from the
+	extern "C" { } declaration.
+
+	2002-09-04  Nick Clifton  <nickc@redhat.com>
+	* dis-asm.h (print_ppc_disassembler_options): Prototype.
+
+	2002-08-06  H.J. Lu <hjl@gnu.org>
+	* bfdlink.h (bfd_link_info): Add allow_undefined_version.
+	(bfd_elf_version_expr): Add symver and script.
+
 2002-07-10  Jakub Jelinek  <jakub@redhat.com>
 
 	* elf/common.h (SHT_GNU_LIBLIST, DT_GNU_PRELINKED,
