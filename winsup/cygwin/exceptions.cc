@@ -1128,6 +1128,10 @@ call_signal_handler_now ()
   sigdelayed0 ();
   return sa_flags & SA_RESTART;
 }
+/* This kludge seems to keep a copy of call_signal_handler_now around
+   even when compiling with -finline-functions. */
+static int __stdcall call_signal_handler_now_dummy ()
+  __attribute__((alias ("call_signal_handler_now")));
 };
 
 int

@@ -1,3 +1,21 @@
+Sun Apr  8 20:40:58 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Put -lgcc last in list of libraries, since stdc++
+	library needs it.
+	* cygwin.din: Remove obsolete "__empty" export.
+	* exceptions.cc (call_signal_handler_now): Force inclusion of function
+	even when -finline-functions is specified.
+	* sigproc.h: Remove obsolete call_signal_handler declaration.
+
+Sun Apr  8 20:36:55 2001  Benjamin Riefenstahl  <Benjamin.Riefenstahl@epost.de>
+ 
+	* fhandler_console.cc (cp_get_internal): New function.
+	(cp_convert): New function.
+	(con_to_str): New function.
+	(str_to_con): New function.
+	(fhandler_console::read): Replace OemToCharBuff with con_to_str.
+	(fhandler_console::write_normal): Replace CharToOemBuff with str_to_con.
+
 Thu Apr  5 22:41:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (stat_worker): Fix conditional which still allowed

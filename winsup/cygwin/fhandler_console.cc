@@ -18,6 +18,7 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <wincon.h>
+#include <winnls.h>	// MultiByteToWideChar () and friends
 #include <ctype.h>
 #include <sys/cygwin.h>
 #include "cygheap.h"
@@ -28,6 +29,53 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 #include "security.h"
+
+#define CONVERT_LIMIT 4096
+
+/* The codepages are resolved here instead of using CP_ACP and
+   CP_OEMCP, so that they can later be compared for equality. */
+inline UINT
+cp_get_internal ()
+{
+  return current_codepage == ansi_cp ? GetACP() : GetOEMCP();
+}
+
+static BOOL
+cp_convert (UINT destcp, char * dest, UINT srccp, const char * src, DWORD size)
+{
+  if (!size)
+    /* no action */;
+  else if (destcp == srccp)
+    {
+      if (dest != src)
+	memcpy (dest, src, size);
+    }
+  else
+    {
+      WCHAR wbuffer[CONVERT_LIMIT]; /* same size as the maximum input, s.b. */
+      if (!MultiByteToWideChar (srccp, 0, src, size, wbuffer, sizeof (wbuffer)))
+	return FALSE;
+      if (!WideCharToMultiByte (destcp, 0, wbuffer, size, dest, size,
+				NULL, NULL))
+	return FALSE;
+    }
+  return TRUE;
+}
+
+/* The results of GetConsoleCP() and GetConsoleOutputCP() cannot be
+   cached, because a program or the user can change these values at
+   any time. */
+inline BOOL
+con_to_str (char *d, const char *s, DWORD sz)
+{
+  return cp_convert (cp_get_internal (), d, GetConsoleCP (), s, sz);
+}
+
+inline BOOL
+str_to_con (char *d, const char *s, DWORD sz)
+{
+  return cp_convert (GetConsoleOutputCP (), d, cp_get_internal (), s, sz);
+}
 
 /*
  * Scroll the screen context.
@@ -124,7 +172,7 @@ fhandler_console::set_cursor_maybe ()
 {
   CONSOLE_SCREEN_BUFFER_INFO now;
 
-  if (!GetConsoleScreenBufferInfo (get_output_handle(), &now))
+  if (!GetConsoleScreenBufferInfo (get_output_handle (), &now))
     return;
 
   if (dwLastCursorPosition.X != now.dwCursorPosition.X ||
@@ -216,13 +264,13 @@ fhandler_console::read (void *pv, size_t buflen)
 
 	  if (raw_win32_keyboard_mode)
 	    {
-	      __small_sprintf(tmp, "\033{%u;%u;%u;%u;%u;%luK",
-				   input_rec.Event.KeyEvent.bKeyDown,
-				   input_rec.Event.KeyEvent.wRepeatCount,
-				   input_rec.Event.KeyEvent.wVirtualKeyCode,
-				   input_rec.Event.KeyEvent.wVirtualScanCode,
-				   input_rec.Event.KeyEvent.uChar.UnicodeChar,
-				   input_rec.Event.KeyEvent.dwControlKeyState);
+	      __small_sprintf (tmp, "\033{%u;%u;%u;%u;%u;%luK",
+				    input_rec.Event.KeyEvent.bKeyDown,
+				    input_rec.Event.KeyEvent.wRepeatCount,
+				    input_rec.Event.KeyEvent.wVirtualKeyCode,
+				    input_rec.Event.KeyEvent.wVirtualScanCode,
+				    input_rec.Event.KeyEvent.uChar.UnicodeChar,
+				    input_rec.Event.KeyEvent.dwControlKeyState);
 	      toadd = tmp;
 	      nread = strlen (toadd);
 	      break;
@@ -248,8 +296,8 @@ fhandler_console::read (void *pv, size_t buflen)
 	      tmp[1] = ich;
 	      /* Need this check since US code page seems to have a bug when
 		 converting a CTRL-U. */
-	      if ((unsigned char)ich > 0x7f && current_codepage == ansi_cp)
-		OemToCharBuff (tmp + 1, tmp + 1, 1);
+	      if ((unsigned char)ich > 0x7f)
+		con_to_str (tmp + 1, tmp + 1, 1);
 	      /* Determine if the keystroke is modified by META. */
 	      if (!(input_rec.Event.KeyEvent.dwControlKeyState & meta_mask))
 		toadd = tmp + 1;
@@ -273,7 +321,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	      /* Treat the double-click event like a regular button press */
 	      if (mouse_event.dwEventFlags == DOUBLE_CLICK)
 		{
-		  syscall_printf("mouse: double-click -> click");
+		  syscall_printf ("mouse: double-click -> click");
 		  mouse_event.dwEventFlags = 0;
 		}
 
@@ -287,7 +335,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	      int y = mouse_event.dwMousePosition.Y;
 	      if ((x + ' ' + 1 > 0xFF) || (y + ' ' + 1 > 0xFF))
 		{
-		  syscall_printf("mouse: position out of range");
+		  syscall_printf ("mouse: position out of range");
 		  continue;
 		}
 
@@ -300,28 +348,28 @@ fhandler_console::read (void *pv, size_t buflen)
 	      char sz[32];
 	      if (mouse_event.dwButtonState == dwLastButtonState)
 		{
-		  syscall_printf("mouse: button state unchanged");
+		  syscall_printf ("mouse: button state unchanged");
 		  continue;
 		}
 	      else if (mouse_event.dwButtonState < dwLastButtonState)
 		{
 		  b = 3;
-		  strcpy(sz, "btn up");
+		  strcpy (sz, "btn up");
 		}
 	      else if ((mouse_event.dwButtonState & 1) != (dwLastButtonState & 1))
 		{
 		  b = 0;
-		  strcpy(sz, "btn1 down");
+		  strcpy (sz, "btn1 down");
 		}
 	      else if ((mouse_event.dwButtonState & 2) != (dwLastButtonState & 2))
 		{
 		  b = 1;
-		  strcpy(sz, "btn2 down");
+		  strcpy (sz, "btn2 down");
 		}
 	      else if ((mouse_event.dwButtonState & 4) != (dwLastButtonState & 4))
 		{
 		  b = 2;
-		  strcpy(sz, "btn3 down");
+		  strcpy (sz, "btn3 down");
 		}
 
 	      /* Remember the current button state */
@@ -342,8 +390,8 @@ fhandler_console::read (void *pv, size_t buflen)
 	      b |= nModifiers;
 
 	      /* We can now create the code. */
-	      sprintf(tmp, "\033[M%c%c%c", b + ' ', x + ' ' + 1, y + ' ' + 1);
-	      syscall_printf("mouse: %s at (%d,%d)", sz, x, y);
+	      sprintf (tmp, "\033[M%c%c%c", b + ' ', x + ' ' + 1, y + ' ' + 1);
+	      syscall_printf ("mouse: %s at (%d,%d)", sz, x, y);
 
 	      toadd = tmp;
 	      nread = 6;
@@ -399,7 +447,7 @@ fhandler_console::fillin_info (void)
   BOOL ret;
   CONSOLE_SCREEN_BUFFER_INFO linfo;
 
-  if ((ret = GetConsoleScreenBufferInfo (get_output_handle(), &linfo)))
+  if ((ret = GetConsoleScreenBufferInfo (get_output_handle (), &linfo)))
     {
       info.winTop = linfo.srWindow.Top;
       info.winBottom = linfo.srWindow.Bottom;
@@ -513,7 +561,7 @@ fhandler_console::open (const char *, int flags, mode_t)
 
   TTYCLEARF (RSTCONS);
   set_ctty (TTY_CONSOLE, flags);
-  debug_printf("opened conin$ %p, conout$ %p",
+  debug_printf ("opened conin$ %p, conout$ %p",
 		get_io_handle (), get_output_handle ());
 
   return 1;
@@ -539,7 +587,7 @@ fhandler_console::dup (fhandler_base *child)
 {
   fhandler_console *fhc = (fhandler_console *) child;
 
-  if (!fhc->open(get_name (), get_flags (), 0))
+  if (!fhc->open (get_name (), get_flags (), 0))
     system_printf ("error opening console, %E");
 
   fhc->default_color = default_color;
@@ -569,9 +617,9 @@ fhandler_console::dup (fhandler_base *child)
   if (savebuf)
     {
       fhc->savebuf = (PCHAR_INFO) malloc (sizeof (CHAR_INFO) *
-      					  savebufsiz.X * savebufsiz.Y);
+					  savebufsiz.X * savebufsiz.Y);
       memcpy (fhc->savebuf, savebuf, sizeof (CHAR_INFO) *
-      				     savebufsiz.X * savebufsiz.Y);
+				     savebufsiz.X * savebufsiz.Y);
     }
 
   fhc->scroll_region = scroll_region;
@@ -874,11 +922,11 @@ fhandler_console::clear_screen (int x1, int y1, int x2, int y2)
   (void)fillin_info ();
 
   if (x1 < 0)
-    x1 = info.dwWinSize.X-1;
+    x1 = info.dwWinSize.X - 1;
   if (y1 < 0)
     y1 = info.winBottom;
   if (x2 < 0)
-    x2 = info.dwWinSize.X-1;
+    x2 = info.dwWinSize.X - 1;
   if (y2 < 0)
     y2 = info.winBottom;
 
@@ -1097,12 +1145,12 @@ fhandler_console::char_command (char c)
     case 'h':
     case 'l':
       if (!saw_question_mark)
-        {
+	{
 	  switch (args_[0])
 	    {
 	    case 4:    /* Insert mode */
 	      insert_mode = (c == 'h') ? TRUE : FALSE;
-	      syscall_printf("insert mode %sabled", insert_mode ? "en" : "dis");
+	      syscall_printf ("insert mode %sabled", insert_mode ? "en" : "dis");
 	      break;
 	    }
 	  break;
@@ -1116,15 +1164,15 @@ fhandler_console::char_command (char c)
 	      COORD cob = { 0, 0 };
 
 	      if (!GetConsoleScreenBufferInfo (get_output_handle (), &now))
-	        break;
+		break;
 
 	      savebufsiz.X = now.srWindow.Right - now.srWindow.Left;
 	      savebufsiz.Y = now.srWindow.Bottom - now.srWindow.Top;
 
 	      if (savebuf)
-	        free (savebuf);
+		free (savebuf);
 	      savebuf = (PCHAR_INFO) malloc (sizeof (CHAR_INFO) *
-	      				     savebufsiz.X * savebufsiz.Y);
+					     savebufsiz.X * savebufsiz.Y);
 
 	      ReadConsoleOutputA (get_output_handle (), savebuf,
 				  savebufsiz, cob, &now.srWindow);
@@ -1135,13 +1183,13 @@ fhandler_console::char_command (char c)
 	      COORD cob = { 0, 0 };
 
 	      if (!GetConsoleScreenBufferInfo (get_output_handle (), &now))
-	        break;
+		break;
 
 	      if (!savebuf)
-	        break;
+		break;
 
 	      WriteConsoleOutputA (get_output_handle (), savebuf,
-	      			   savebufsiz, cob, &now.srWindow);
+				   savebufsiz, cob, &now.srWindow);
 
 	      free (savebuf);
 	      savebuf = NULL;
@@ -1151,7 +1199,7 @@ fhandler_console::char_command (char c)
 
 	case 1000: /* Mouse support */
 	  use_mouse = (c == 'h') ? TRUE : FALSE;
-	  syscall_printf("mouse support %sabled", use_mouse ? "en" : "dis");
+	  syscall_printf ("mouse support %sabled", use_mouse ? "en" : "dis");
 	  break;
 
 	case 2000: /* Raw keyboard mode */
@@ -1159,7 +1207,7 @@ fhandler_console::char_command (char c)
 	  break;
 
 	default: /* Ignore */
-	  syscall_printf("unknown h/l command: %d", args_[0]);
+	  syscall_printf ("unknown h/l command: %d", args_[0]);
 	  break;
 	}
       break;
@@ -1235,7 +1283,7 @@ fhandler_console::char_command (char c)
       break;
     case 'I':	/* TAB */
       cursor_get (&x, &y);
-      cursor_set (FALSE, 8*(x/8+1), y);
+      cursor_set (FALSE, 8 * (x / 8 + 1), y);
       break;
     case 'L':				/* AL - insert blank lines */
       args_[0] = args_[0] ? args_[0] : 1;
@@ -1259,7 +1307,7 @@ fhandler_console::char_command (char c)
       break;
     case 'S':				/* SF - Scroll forward */
       args_[0] = args_[0] ? args_[0] : 1;
-      scroll_screen(0, args_[0], -1, -1, 0, 0);
+      scroll_screen (0, args_[0], -1, -1, 0, 0);
       break;
     case 'T':				/* SR - Scroll down */
       fillin_info ();
@@ -1279,7 +1327,7 @@ fhandler_console::char_command (char c)
     case 'b':				/* Repeat char #1 #2 times */
       if (insert_mode)
 	{
-          cursor_get (&x, &y);
+	  cursor_get (&x, &y);
 	  scroll_screen (x, y, -1, y, x + args_[1], y);
 	}
       while (args_[1]--)
@@ -1330,33 +1378,42 @@ fhandler_console::write_normal (const unsigned char *src,
 	break;
       found++;
     }
+
   /* Print all the base ones out */
   if (found != src)
     {
-      char buf[4096];
-      size_t len = found - src;
-      do {
-	size_t l2 = min (sizeof (buf), len);
-	if (current_codepage == ansi_cp)
-	  CharToOemBuff ((LPCSTR)src, buf, l2);
-	else
-	  strncpy (buf, (LPCSTR)src, l2);
-        if (insert_mode)
-	  {
-	    int x, y;
-            cursor_get (&x, &y);
-	    scroll_screen (x, y, -1, y, x + l2, y);
-	  }
-	if (!WriteFile (get_output_handle (), buf, l2, &done, 0))
+      DWORD len = found - src;
+      do
 	{
-	  debug_printf ("write failed, handle %p", get_output_handle ());
-	  __seterrno ();
-	  return 0;
+	  DWORD buf_len;
+	  char buf[CONVERT_LIMIT];
+	  done = buf_len = min (sizeof (buf), len);
+	  if (!str_to_con (buf, (const char *) src, buf_len))
+	    {
+	      debug_printf ("conversion error, handle %p", get_output_handle ());
+	      __seterrno ();
+	      return 0;
+	    }
+
+	  if (insert_mode)
+	    {
+	      int x, y;
+	      cursor_get (&x, &y);
+	      scroll_screen (x, y, -1, y, x + buf_len, y);
+	    }
+
+	  if (!WriteFile (get_output_handle (), buf, buf_len, &done, 0))
+	    {
+	      debug_printf ("write failed, handle %p", get_output_handle ());
+	      __seterrno ();
+	      return 0;
+	    }
+	  len -= done;
+	  src += done;
 	}
-	len -= done;
-	src += done;
-      } while (len > 0);
+      while (len > 0);
     }
+
   if (src < end)
     {
       int x, y;
@@ -1368,7 +1425,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	case ESC:
 	  state_ = gotesc;
 	  break;
-	case DWN:		/* WriteFile("\n") always adds CR... */
+	case DWN:		/* WriteFile ("\n") always adds CR... */
 	  cursor_get (&x, &y);
 	  if (y >= srBottom)
 	    {
@@ -1496,7 +1553,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  state_ = normal;
 	  break;
 	case gotrsquare:
-	  if (isdigit(*src))
+	  if (isdigit (*src))
 	    rarg = rarg * 10 + (*src - '0');
 	  else if (*src == ';' && (rarg == 2 || rarg == 0))
 	    state_ = gettitle;
@@ -1663,7 +1720,7 @@ fhandler_console::fixup_after_fork (HANDLE)
   /* Windows does not allow duplication of console handles between processes
      so open the console explicitly. */
 
-  if (!open(get_name (), get_flags (), 0))
+  if (!open (get_name (), get_flags (), 0))
     system_printf ("error opening console after fork, %E");
 
   if (!get_close_on_exec ())
@@ -1678,8 +1735,8 @@ set_console_title (char *title)
 {
   int rc;
   char buf[257];
-  strncpy(buf, title, sizeof(buf) - 1);
-  buf[sizeof(buf) - 1] = '\0';
+  strncpy (buf, title, sizeof (buf) - 1);
+  buf[sizeof (buf) - 1] = '\0';
   if ((rc = WaitForSingleObject (title_mutex, 15000)) != WAIT_OBJECT_0)
     sigproc_printf ("wait for title mutex failed rc %d, %E", rc);
   SetConsoleTitle (buf);
@@ -1693,7 +1750,7 @@ fhandler_console::fixup_after_exec (HANDLE)
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
-  if (!open(get_name (), get_flags (), 0))
+  if (!open (get_name (), get_flags (), 0))
     {
       int sawerr = 0;
       if (!get_io_handle ())

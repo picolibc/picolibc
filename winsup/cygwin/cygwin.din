@@ -938,7 +938,6 @@ getpgrp
 _getpgrp = getpgrp
 getgrent
 _getgrent = getgrent
-__empty
 ntohl
 _ntohl = ntohl
 htonl

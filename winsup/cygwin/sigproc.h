@@ -110,7 +110,6 @@ BOOL __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
 int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_address (0))  __attribute__ ((regparm(3)));
 void __stdcall signal_fixup_after_fork ();
 void __stdcall signal_fixup_after_exec (bool);
-extern "C" int __stdcall call_signal_handler ();
 
 extern char myself_nowait_dummy[];
 extern char myself_nowait_nonmain_dummy[];

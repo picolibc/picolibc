@@ -1079,172 +1079,172 @@ __sem_post (sem_t * sem)
 // empty functions needed when makeing the dll without mt_safe support
 extern "C"
 {
-  int __pthread_create (pthread_t *, const pthread_attr_t *,
-			TFD (start_routine), void *arg)
-  {
-    return -1;
-  }
-  int __pthread_attr_init (pthread_attr_t * attr)
-  {
-    return -1;
-  }
-  int __pthread_attr_destroy (pthread_attr_t * attr)
-  {
-    return -1;
-  }
-  int __pthread_attr_setdetachstate (pthread_attr_t * attr, int detachstate)
-  {
-    return -1;
-  }
-  int
-    __pthread_attr_getdetachstate (const pthread_attr_t * attr,
-				   int *detachstate)
-  {
-    return -1;
-  }
-  int __pthread_attr_setstacksize (pthread_attr_t * attr, size_t size)
-  {
-    return -1;
-  }
-  int __pthread_attr_getstacksize (pthread_attr_t * attr, size_t * size)
-  {
-    return -1;
-  }
+int __pthread_create (pthread_t *, const pthread_attr_t *,
+		      TFD (start_routine), void *arg)
+{
+  return -1;
+}
+int __pthread_attr_init (pthread_attr_t * attr)
+{
+  return -1;
+}
+int __pthread_attr_destroy (pthread_attr_t * attr)
+{
+  return -1;
+}
+int __pthread_attr_setdetachstate (pthread_attr_t * attr, int detachstate)
+{
+  return -1;
+}
+int
+  __pthread_attr_getdetachstate (const pthread_attr_t * attr,
+				 int *detachstate)
+{
+  return -1;
+}
+int __pthread_attr_setstacksize (pthread_attr_t * attr, size_t size)
+{
+  return -1;
+}
+int __pthread_attr_getstacksize (pthread_attr_t * attr, size_t * size)
+{
+  return -1;
+}
 /* these cannot be supported on win32 - the os allocates it's own stack space..
-   __pthread_attr_setstackaddr (...){ return -1; };
-   __pthread_attr_getstackaddr (...){ return -1; };
- */
-  int __pthread_exit (void *value_ptr)
-  {
-    return -1;
-  }
+ __pthread_attr_setstackaddr (...){ return -1; };
+ __pthread_attr_getstackaddr (...){ return -1; };
+*/
+int __pthread_exit (void *value_ptr)
+{
+  return -1;
+}
 
-  int __pthread_join (pthread_t thread_id, void **return_val)
-  {
-    return -1;
-  }
+int __pthread_join (pthread_t thread_id, void **return_val)
+{
+  return -1;
+}
 
-  unsigned long __pthread_getsequence_np (pthread_t * thread)
-  {
-    return 0;
-  }
-  int __pthread_key_create (pthread_key_t * key)
-  {
-    return -1;
-  }
-  int __pthread_key_delete (pthread_key_t * key)
-  {
-    return -1;
-  }
-  int __pthread_setspecific (pthread_key_t * key, const void *value)
-  {
-    return -1;
-  }
-  void *__pthread_getspecific (pthread_key_t * key)
-  {
-    return NULL;
-  }
-  int __pthread_kill (pthread_t * thread, int sig)
-  {
-    return -1;
-  }
-  int __pthread_sigmask (int operation, const sigset_t * set,
-			 sigset_t * old_set)
-  {
-    return -1;
-  }
-  pthread_t __pthread_self ()
-  {
-    return -1;
-  }
-  int __pthread_equal (pthread_t * t1, pthread_t * t2)
-  {
-    return -1;
-  }
-  int __pthread_mutex_init (pthread_mutex_t *, const pthread_mutexattr_t *)
-  {
-    return -1;
-  }
-  int __pthread_mutex_lock (pthread_mutex_t *)
-  {
-    return -1;
-  }
-  int __pthread_mutex_trylock (pthread_mutex_t *)
-  {
-    return -1;
-  }
-  int __pthread_mutex_unlock (pthread_mutex_t *)
-  {
-    return -1;
-  }
-  int __pthread_mutex_destroy (pthread_mutex_t *)
-  {
-    return -1;
-  }
-  int __pthread_cond_destroy (pthread_cond_t *)
-  {
-    return -1;
-  }
-  int __pthread_cond_init (pthread_cond_t *, const pthread_condattr_t *)
-  {
-    return -1;
-  }
-  int __pthread_cond_signal (pthread_cond_t *)
-  {
-    return -1;
-  }
-  int __pthread_cond_broadcast (pthread_cond_t *)
-  {
-    return -1;
-  }
-  int __pthread_cond_timedwait (pthread_cond_t *, pthread_mutex_t *,
-				const struct timespec *)
-  {
-    return -1;
-  }
-  int __pthread_cond_wait (pthread_cond_t *, pthread_mutex_t *)
-  {
-    return -1;
-  }
-  int __pthread_condattr_init (pthread_condattr_t *)
-  {
-    return -1;
-  }
-  int __pthread_condattr_destroy (pthread_condattr_t *)
-  {
-    return -1;
-  }
-  int __pthread_condattr_getpshared (pthread_condattr_t *, int *)
-  {
-    return -1;
-  }
-  int __pthread_condattr_setpshared (pthread_condattr_t *, int)
-  {
-    return -1;
-  }
-  int __sem_init (sem_t * sem, int pshared, unsigned int value)
-  {
-    return -1;
-  }
-  int __sem_destroy (sem_t * sem)
-  {
-    return -1;
-  }
-  int __sem_wait (sem_t * sem)
-  {
-    return -1;
-  }
-  int __sem_trywait (sem_t * sem)
-  {
-    return -1;
-  }
-  int __sem_post (sem_t * sem)
-  {
-    return -1;
-  }
-  struct _reent *_reent_clib ()
-  {
-    return NULL;
+unsigned long __pthread_getsequence_np (pthread_t * thread)
+{
+  return 0;
+}
+int __pthread_key_create (pthread_key_t * key)
+{
+  return -1;
+}
+int __pthread_key_delete (pthread_key_t * key)
+{
+  return -1;
+}
+int __pthread_setspecific (pthread_key_t * key, const void *value)
+{
+  return -1;
+}
+void *__pthread_getspecific (pthread_key_t * key)
+{
+  return NULL;
+}
+int __pthread_kill (pthread_t * thread, int sig)
+{
+  return -1;
+}
+int __pthread_sigmask (int operation, const sigset_t * set,
+		       sigset_t * old_set)
+{
+  return -1;
+}
+pthread_t __pthread_self ()
+{
+  return -1;
+}
+int __pthread_equal (pthread_t * t1, pthread_t * t2)
+{
+  return -1;
+}
+int __pthread_mutex_init (pthread_mutex_t *, const pthread_mutexattr_t *)
+{
+  return -1;
+}
+int __pthread_mutex_lock (pthread_mutex_t *)
+{
+  return -1;
+}
+int __pthread_mutex_trylock (pthread_mutex_t *)
+{
+  return -1;
+}
+int __pthread_mutex_unlock (pthread_mutex_t *)
+{
+  return -1;
+}
+int __pthread_mutex_destroy (pthread_mutex_t *)
+{
+  return -1;
+}
+int __pthread_cond_destroy (pthread_cond_t *)
+{
+  return -1;
+}
+int __pthread_cond_init (pthread_cond_t *, const pthread_condattr_t *)
+{
+  return -1;
+}
+int __pthread_cond_signal (pthread_cond_t *)
+{
+  return -1;
+}
+int __pthread_cond_broadcast (pthread_cond_t *)
+{
+  return -1;
+}
+int __pthread_cond_timedwait (pthread_cond_t *, pthread_mutex_t *,
+			      const struct timespec *)
+{
+  return -1;
+}
+int __pthread_cond_wait (pthread_cond_t *, pthread_mutex_t *)
+{
+  return -1;
+}
+int __pthread_condattr_init (pthread_condattr_t *)
+{
+  return -1;
+}
+int __pthread_condattr_destroy (pthread_condattr_t *)
+{
+  return -1;
+}
+int __pthread_condattr_getpshared (pthread_condattr_t *, int *)
+{
+  return -1;
+}
+int __pthread_condattr_setpshared (pthread_condattr_t *, int)
+{
+  return -1;
+}
+int __sem_init (sem_t * sem, int pshared, unsigned int value)
+{
+  return -1;
+}
+int __sem_destroy (sem_t * sem)
+{
+  return -1;
+}
+int __sem_wait (sem_t * sem)
+{
+  return -1;
+}
+int __sem_trywait (sem_t * sem)
+{
+  return -1;
+}
+int __sem_post (sem_t * sem)
+{
+  return -1;
+}
+struct _reent *_reent_clib ()
+{
+  return NULL;
   }
 }
 
