@@ -29,8 +29,6 @@ details. */
 #include "child_info.h"
 #include "shared_info.h"
 #include "pinfo.h"
-#define NEED_VFORK
-#include "perthread.h"
 #include "registry.h"
 #include "environ.h"
 #include "cygthread.h"
@@ -384,16 +382,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   else
     chtype = PROC_EXEC;
 
-  HANDLE subproc_ready;
-  if (chtype != PROC_EXEC)
-    subproc_ready = NULL;
-  else
-    {
-      subproc_ready = CreateEvent (&sec_all, TRUE, FALSE, NULL);
-      ProtectHandleINH (subproc_ready);
-    }
-
-  init_child_info (chtype, &ciresrv, subproc_ready);
+  init_child_info (chtype, &ciresrv, NULL);
 
   ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
   ciresrv.moreinfo->old_title = NULL;
@@ -603,7 +592,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   ciresrv.moreinfo->argc = newargv.argc;
   ciresrv.moreinfo->argv = newargv;
-  ciresrv.hexec_proc = hexec_proc;
 
   if (mode != _P_OVERLAY ||
       !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
@@ -627,19 +615,35 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   if (mode == _P_DETACH || !set_console_state_for_spawn ())
     flags |= DETACHED_PROCESS;
-  if (mode != _P_OVERLAY)
-    flags |= CREATE_SUSPENDED;
-#if 0 //someday
-  else
-    myself->dwProcessId = 0;
-#endif
 
-  /* Some file types (currently only sockets) need extra effort in the
-     parent after CreateProcess and before copying the datastructures
-     to the child. So we have to start the child in suspend state,
-     unfortunately, to avoid a race condition. */
-  if (cygheap->fdtab.need_fixup_before ())
-    flags |= CREATE_SUSPENDED;
+  HANDLE saved_sendsig;
+  if (mode != _P_OVERLAY)
+    saved_sendsig = NULL;
+  else
+    {
+      /* Reset sendsig so that any process which wants to send a signal
+	 to this pid will wait for the new process to become active.
+	 Save the old value in case the exec fails.  */
+      saved_sendsig = myself->sendsig;
+      myself->sendsig = INVALID_HANDLE_VALUE;
+      /* Save a copy of a handle to the current process around the first time we
+	 exec so that the pid will not be reused.  Why did I stop cygwin from
+	 generating its own pids again? */
+      if (cygheap->pid_handle)
+	/* already done previously */;
+      else if (DuplicateHandle (hMainProc, hMainProc, hMainProc, &cygheap->pid_handle,
+				PROCESS_QUERY_INFORMATION, TRUE, 0))
+	ProtectHandle (cygheap->pid_handle);
+      else
+	system_printf ("duplicate to pid_handle failed, %E");
+    }
+
+  /* Start the process in a suspended state.  Needed so that any potential parent will
+     be able to take notice of the new "execed" process.  This is only really needed
+     to handle exec'ed windows processes since cygwin processes are smart enough that
+     the parent doesn't have to bother but what are you gonna do?  Cygwin lives in
+     a windows world. */
+  flags |= CREATE_SUSPENDED;
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
 
@@ -718,7 +722,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   /* Restore impersonation. In case of _P_OVERLAY this isn't
      allowed since it would overwrite child data. */
   if (mode != _P_OVERLAY || !rc)
-      cygheap->user.reimpersonate ();
+    cygheap->user.reimpersonate ();
 
   MALLOC_CHECK;
   if (envblock)
@@ -732,12 +736,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       __seterrno ();
       syscall_printf ("CreateProcess failed, %E");
-#if 0 // someday
-      if (mode == _P_OVERLAY)
-	myself->dwProcessId = GetCurrentProcessId ();
-#endif
-      if (subproc_ready)
-	ForceCloseHandle (subproc_ready);
+      /* If this was a failed exec, restore the saved sendsig. */
+      if (saved_sendsig)
+	myself->sendsig = saved_sendsig;
       cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);
       return -1;
     }
@@ -765,11 +766,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
       cygheap_setup_for_child_cleanup (newheap, &ciresrv, 1);
-      if (mode == _P_OVERLAY)
-	{
-	  ResumeThread (pi.hThread);
-	  cygthread::terminate ();
-	}
     }
 
   if (mode != _P_OVERLAY)
@@ -784,18 +780,36 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   /* Name the handle similarly to proc_subproc. */
   ProtectHandle1 (pi.hProcess, childhProc);
 
+  int wait_for_myself = false;
+  DWORD exec_cygstarted;
   if (mode == _P_OVERLAY)
     {
-      /* These are both duplicated in the child code.  We do this here,
-	 primarily for strace. */
+      /* Store the old exec_cygstarted since this is used as a crude semaphore for
+	 detecting when the parent has noticed the change in windows pid for this
+	 cygwin pid. */
+      exec_cygstarted = myself->cygstarted;
+      myself->dwProcessId = dwExeced = pi.dwProcessId;  /* Reparenting needs this */
+      myself.alert_parent (__SIGREPARENT);
+      CloseHandle (saved_sendsig);
       strace.execing = 1;
       hExeced = pi.hProcess;
-      dwExeced = pi.dwProcessId;
       strcpy (myself->progname, real_path);
       close_all_files ();
+      /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
+	 process.  So, we need to wait around until the process we've just "execed"
+	 dies.  Use our own wait facility to wait for our own pid to exit (there
+	 is some minor special case code in proc_waiter and friends to accommodeate
+	 this). */
+      if (!myself->wr_proc_pipe)
+	{
+	  myself.hProcess = pi.hProcess;
+	  myself.remember ();
+	  wait_for_myself = true;
+	}
     }
   else
     {
+      exec_cygstarted = 0;
       myself->set_has_pgid_children ();
       ProtectHandle (pi.hThread);
       pinfo child (cygpid, PID_IN_USE);
@@ -808,7 +822,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  goto out;
 	}
       child->dwProcessId = pi.dwProcessId;
-      child->hProcess = pi.hProcess;
+      child.hProcess = pi.hProcess;
       if (!child.remember ())
 	{
 	  syscall_printf ("process table full");
@@ -825,101 +839,31 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 However, we should try to find another way to do this eventually. */
       (void) DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
 			      NULL, 0, 0, DUPLICATE_SAME_ACCESS);
-      /* Start the child running */
-      ResumeThread (pi.hThread);
     }
 
+  /* Start the child running */
+  if (flags & CREATE_SUSPENDED)
+    ResumeThread (pi.hThread);
   ForceCloseHandle (pi.hThread);
+  // ForceCloseHandle (pi.hProcess);  // handled by proc_subproc and friends
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  bool exited;
-
-  res = 0;
-  exited = false;
-  MALLOC_CHECK;
-  if (mode == _P_OVERLAY)
+  if (wait_for_myself)
+    waitpid (myself->pid, &res, 0);
+  else
     {
-      int nwait = 3;
-      HANDLE waitbuf[3] = {pi.hProcess, signal_arrived, subproc_ready};
-      for (int i = 0; i < 100; i++)
-	{
-	  switch (WaitForMultipleObjects (nwait, waitbuf, FALSE, INFINITE))
-	    {
-	    case WAIT_OBJECT_0:
-	      sigproc_printf ("subprocess exited");
-	      DWORD exitcode;
-	      if (!GetExitCodeProcess (pi.hProcess, &exitcode))
-		exitcode = 1;
-	      res |= exitcode;
-	      exited = true;
-	      break;
-	    case WAIT_OBJECT_0 + 1:
-	      sigproc_printf ("signal arrived");
-	      reset_signal_arrived ();
-	      continue;
-	    case WAIT_OBJECT_0 + 2:
-	      if (my_parent_is_alive ())
-		res |= EXIT_REPARENTING;
-	      else if (!myself->ppid_handle)
-		{
-		  nwait = 2;
-		  sigproc_terminate ();
-		  continue;
-		}
-	      break;
-	    case WAIT_FAILED:
-	      system_printf ("wait failed: nwait %d, pid %d, winpid %d, %E",
-			     nwait, myself->pid, myself->dwProcessId);
-	      system_printf ("waitbuf[0] %p %d", waitbuf[0],
-			     WaitForSingleObject (waitbuf[0], 0));
-	      system_printf ("waitbuf[1] %p %d", waitbuf[1],
-			     WaitForSingleObject (waitbuf[1], 0));
-	      system_printf ("waitbuf[w] %p %d", waitbuf[2],
-			     WaitForSingleObject (waitbuf[2], 0));
-	      set_errno (ECHILD);
-	      try_to_debug ();
-	      return -1;
-	    }
-	  break;
-	}
-
-      ForceCloseHandle (subproc_ready);
-
-      sigproc_printf ("res %p", res);
-
-      if (res & EXIT_REPARENTING)
-	{
-	  /* Try to reparent child process.
-	   * Make handles to child available to parent process and exit with
-	   * EXIT_REPARENTING status. Wait() syscall in parent will then wait
-	   * for newly created child.
-	   */
-	  HANDLE oldh = myself->hProcess;
-	  HANDLE h = myself->ppid_handle;
-	  sigproc_printf ("parent handle %p", h);
-	  int rc = DuplicateHandle (hMainProc, pi.hProcess, h, &myself->hProcess,
-				    0, FALSE, DUPLICATE_SAME_ACCESS);
-	  sigproc_printf ("%d = DuplicateHandle, oldh %p, newh %p",
-			  rc, oldh, myself->hProcess);
-	  VerifyHandle (myself->hProcess);
-	  if (!rc && my_parent_is_alive ())
-	    {
-	      system_printf ("Reparent failed, parent handle %p, %E", h);
-	      system_printf ("my dwProcessId %d, myself->dwProcessId %d",
-			     GetCurrentProcessId (), myself->dwProcessId);
-	      system_printf ("old hProcess %p, hProcess %p", oldh, myself->hProcess);
-	    }
-	}
-
+      /* Loop, waiting for parent to notice pid change, if exec_cygstarted.
+         In theory this wait should be a no-op.  */
+      if (exec_cygstarted)
+	while (myself->cygstarted == exec_cygstarted)
+	  low_priority_sleep (0);
+      res = 42;
     }
-
-  MALLOC_CHECK;
 
   switch (mode)
     {
     case _P_OVERLAY:
-      ForceCloseHandle1 (pi.hProcess, childhProc);
       myself->exit (res, 1);
       break;
     case _P_WAIT:
@@ -986,7 +930,6 @@ spawnve (int mode, const char *path, const char *const *argv,
     case _P_WAIT:
     case _P_DETACH:
     case _P_SYSTEM:
-      subproc_init ();
       ret = spawn_guts (path, argv, envp, mode);
 #ifdef NEWVFORK
       if (vf)

@@ -23,7 +23,6 @@ details. */
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
-#include "cygthread.h"
 #include "thread.h"
 #include "cygtls.h"
 #include "sync.h"

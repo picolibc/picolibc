@@ -36,9 +36,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
-#include "perthread.h"
 #include "tty.h"
-#include "cygthread.h"
 #include "ntdll.h"
 #include "cygtls.h"
 #include <asm/byteorder.h>
@@ -209,7 +207,7 @@ select_stuff::test_and_set (int i, fd_set *readfds, fd_set *writefds,
   if (s->read_ready || s->write_ready || s->except_ready)
     always_ready = true;
 
-  if (s->windows_handle || s->windows_handle || s->windows_handle)
+  if (s->windows_handle)
     windows_used = true;
 
   s->next = start.next;

@@ -28,7 +28,6 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "shared_info.h"
-#include "cygthread.h"
 #include "cygtls.h"
 
 #define CONVERT_LIMIT 16384

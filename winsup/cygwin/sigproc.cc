@@ -28,10 +28,8 @@ details. */
 #include "cygheap.h"
 #include "child_info_magic.h"
 #include "shared_info.h"
-#include "cygthread.h"
 #include "cygtls.h"
 #include "sigproc.h"
-#include "perthread.h"
 #include "exceptions.h"
 
 /*
@@ -42,11 +40,9 @@ details. */
 
 #define PSIZE 63		// Number of processes
 
-#define wake_wait_subproc() SetEvent (events[0])
-
 #define no_signals_available() (!hwait_sig || (myself->sendsig == INVALID_HANDLE_VALUE) || exit_state)
 
-#define NZOMBIES	256
+#define NPROCS	256
 
 /*
  * Global variables
@@ -64,30 +60,15 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 
 #define Static static NO_COPY
 
-/* How long to wait for message/signals.  Normally this is infinite.
-  On termination, however, these are set to zero as a flag to exit.  */
-
-Static DWORD proc_loop_wait = 1000;	// Wait for subprocesses to exit
-
 HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 Static cygthread *hwait_sig;		// Handle of wait_sig thread
-Static cygthread *hwait_subproc;	// Handle of sig_subproc thread
 
 Static HANDLE wait_sig_inited;		// Control synchronization of
 					//  message queue startup
 
-/* Used by WaitForMultipleObjects.  These are handles to child processes.
- */
-Static HANDLE events[PSIZE + 1];	  // All my children's handles++
-#define hchildren (events + 1)		// Where the children handles begin
-Static int nchildren;			// Number of active children
-Static char cpchildren[PSIZE * sizeof (pinfo)];		// All my children info
-Static int nzombies;			// Number of deceased children
-Static char czombies[(NZOMBIES + 1) * sizeof (pinfo)];		// All my deceased children info
-
-#define pchildren ((pinfo *) cpchildren)
-#define zombies ((pinfo *) czombies)
-
+Static int nprocs;			// Number of deceased children
+Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];		// All my deceased children info
+#define procs ((pinfo *) cprocs)
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 
 muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
@@ -97,9 +78,8 @@ DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 /* Function declarations */
 static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
 static __inline__ bool get_proc_lock (DWORD, DWORD);
-static void __stdcall remove_zombie (int);
-static int __stdcall stopped_or_terminated (waitq *, _pinfo *);
-static DWORD WINAPI wait_subproc (VOID *);
+static bool __stdcall remove_proc (int);
+static bool __stdcall stopped_or_terminated (waitq *, _pinfo *);
 static DWORD WINAPI wait_sig (VOID *arg);
 
 /* wait_sig bookkeeping */
@@ -152,33 +132,13 @@ bool __stdcall
 my_parent_is_alive ()
 {
   bool res;
-  if (!myself->ppid_handle)
+  if (myself->cygstarted)
+    res = pid_exists (myself->ppid);
+  else
     {
-      debug_printf ("No myself->ppid_handle");
+      debug_printf ("Not started by cygwin app");
       res = false;
     }
-  else
-    for (int i = 0; i < 2; i++)
-      switch (res = WaitForSingleObject (myself->ppid_handle, 0))
-	{
-	  case WAIT_OBJECT_0:
-	    debug_printf ("parent dead.");
-	    res = false;
-	    goto out;
-	  case WAIT_TIMEOUT:
-	    debug_printf ("parent still alive");
-	    res = true;
-	    goto out;
-	  case WAIT_FAILED:
-	    DWORD werr = GetLastError ();
-	    if (werr == ERROR_INVALID_HANDLE && i == 0)
-	      continue;
-	    system_printf ("WFSO for myself->ppid_handle(%p) failed, error %d",
-			   myself->ppid_handle, werr);
-	    res = false;
-	    goto out;
-	}
-out:
   return res;
 }
 
@@ -193,7 +153,7 @@ wait_for_sigthread ()
 }
 
 /* Get the sync_proc_subproc muto to control access to
- * children, zombie arrays.
+ * children, proc arrays.
  * Attempt to handle case where process is exiting as we try to grab
  * the mutex.
  */
@@ -260,16 +220,11 @@ proc_exists (_pinfo *p)
 /* Return 1 if this is one of our children, zero otherwise.
    FIXME: This really should be integrated with the rest of the proc_subproc
    testing.  Scanning these lists twice is inefficient. */
-int __stdcall
+bool __stdcall
 mychild (int pid)
 {
-  for (int i = 0; i < nchildren; i++)
-    if (pchildren[i]->pid == pid)
-      return 1;
-  for (int i = 0; i < nzombies; i++)
-    if (zombies[i]->pid == pid)
-      return 1;
-  return 0;
+  pinfo p (pid);
+  return p && p->ppid == myself->pid;
 }
 
 /* Handle all subprocess requests
@@ -283,7 +238,6 @@ proc_subproc (DWORD what, DWORD val)
   _pinfo *child;
   int clearing;
   waitq *w;
-  int thiszombie;
 
 #define wval	 ((waitq *) val)
 
@@ -301,84 +255,32 @@ proc_subproc (DWORD what, DWORD val)
      * (usually called from the main thread)
      */
     case PROC_ADDCHILD:
-      if (nchildren >= PSIZE - 1)
+      /* Filled up process table? */
+      if (nprocs >= NPROCS)
 	{
+	  sigproc_printf ("proc table overflow: hit %d processes, pid %d\n",
+			  nprocs, vchild->pid);
 	  rc = 0;
+	  set_errno (EMFILE);	// FIXMENOW - what's the right errno?
 	  break;
 	}
-      pchildren[nchildren] = vchild;
-      hchildren[nchildren] = vchild->hProcess;
-      if (!DuplicateHandle (hMainProc, vchild->hProcess, hMainProc, &vchild->pid_handle,
-			    0, 0, DUPLICATE_SAME_ACCESS))
-	system_printf ("Couldn't duplicate child handle for pid %d, %E", vchild->pid);
-      ProtectHandle1 (vchild->pid_handle, pid_handle);
 
-      if (!DuplicateHandle (hMainProc, hMainProc, vchild->hProcess, &vchild->ppid_handle,
-			    SYNCHRONIZE | PROCESS_DUP_HANDLE, TRUE, 0))
-	system_printf ("Couldn't duplicate my handle<%p> for pid %d, %E", hMainProc, vchild->pid);
       vchild->ppid = myself->pid;
       vchild->uid = myself->uid;
       vchild->gid = myself->gid;
       vchild->pgid = myself->pgid;
       vchild->sid = myself->sid;
       vchild->ctty = myself->ctty;
+      vchild->cygstarted = true;
       vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
-
-      sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",
-		  vchild->pid, nchildren, vchild->dwProcessId,
-		  vchild->hProcess);
-      nchildren++;
-
-      wake_wait_subproc ();
-      break;
-
-    /* A child process had terminated.
-       Possibly this is just due to an exec().  Cygwin implements an exec()
-       as a "handoff" from one windows process to another.  If child->hProcess
-       is different from what is recorded in hchildren, then this is an exec().
-       Otherwise this is a normal child termination event.
-       (called from wait_subproc thread) */
-    case PROC_CHILDTERMINATED:
-      if (hchildren[val] != pchildren[val]->hProcess)
+      procs[nprocs] = vchild;
+      rc = procs[nprocs].wait ();
+      if (rc)
 	{
-	  sigproc_printf ("pid %d[%d], reparented old hProcess %p, new %p",
-			  pchildren[val]->pid, val, hchildren[val], pchildren[val]->hProcess);
-	  HANDLE h = hchildren[val];
-	  hchildren[val] = pchildren[val]->hProcess; /* Filled out by child */
-	  ForceCloseHandle1 (h, childhProc);
-	  ProtectHandle1 (pchildren[val]->hProcess, childhProc);
-	  rc = 0;
-	  goto out;			// This was an exec()
+	  sigproc_printf ("added pid %d to proc table, slot %d", vchild->pid,
+			  nprocs);
+	  nprocs++;
 	}
-
-      sigproc_printf ("pid %d[%d] terminated, handle %p, nchildren %d, nzombies %d",
-		  pchildren[val]->pid, val, hchildren[val], nchildren, nzombies);
-
-      thiszombie = nzombies;
-      zombies[nzombies] = pchildren[val];	// Add to zombie array
-      zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
-
-      sigproc_printf ("zombifying [%d], pid %d, handle %p, nchildren %d",
-		      val, pchildren[val]->pid, hchildren[val], nchildren);
-      if ((int) val < --nchildren)
-	{
-	  hchildren[val] = hchildren[nchildren];
-	  pchildren[val] = pchildren[nchildren];
-	}
-
-      /* See if we should care about the this terminated process.  If we've
-	 filled up our table or if we're ignoring SIGCHLD, then we immediately
-	 remove the process and move on. Otherwise, this process becomes a zombie
-	 which must be reaped by a wait() call.  FIXME:  This is a very inelegant
-	 way to deal with this and could lead to process hangs.  */
-      if (nzombies >= NZOMBIES)
-	{
-	  sigproc_printf ("zombie table overflow %d", thiszombie);
-	  remove_zombie (thiszombie);
-	}
-
-      /* Don't scan the wait queue yet.  Caller will send SIGCHLD to this process.
-	 This will cause an eventual scan of waiters. */
       break;
 
     /* Handle a wait4() operation.  Allocates an event for the calling
@@ -401,8 +303,8 @@ proc_subproc (DWORD what, DWORD val)
        */
       if ((wval->ev = wval->thread_ev) == NULL)
 	{
-	  wval->ev = wval->thread_ev = CreateEvent (&sec_none_nih, TRUE,
-						    FALSE, NULL);
+	  wval->ev = wval->thread_ev = CreateEvent (&sec_none_nih, TRUE, FALSE,
+						    NULL);
 	  ProtectHandle1 (wval->ev, wq_ev);
 	}
 
@@ -459,9 +361,8 @@ proc_subproc (DWORD what, DWORD val)
 	}
 
       if (global_sigs[SIGCHLD].sa_handler == (void *) SIG_IGN)
-	while (nzombies)
-	  remove_zombie (0);
-      break;
+	for (int i = 0; i < nprocs; i += remove_proc (i))
+	  continue;
   }
 
 out:
@@ -492,54 +393,29 @@ _cygtls::remove_wq (DWORD wait)
  * Called on process exit.
  * Also called by spawn_guts to disassociate any subprocesses from this
  * process.  Subprocesses will then know to clean up after themselves and
- * will not become zombies.
+ * will not become procs.
  */
 void __stdcall
 proc_terminate (void)
 {
-  sigproc_printf ("nchildren %d, nzombies %d", nchildren, nzombies);
+  sigproc_printf ("nprocs %d", nprocs);
   /* Signal processing is assumed to be blocked in this routine. */
-  if (hwait_subproc)
+  if (nprocs)
     {
-      proc_loop_wait = 0;	// Tell wait_subproc thread to exit
       sync_proc_subproc->acquire (WPSP);
-      wake_wait_subproc ();	// Wake wait_subproc loop
-      hwait_subproc = NULL;
 
       (void) proc_subproc (PROC_CLEARWAIT, 1);
 
-      /* Clean out zombie processes from the pid list. */
+      /* Clean out proc processes from the pid list. */
       int i;
-      for (i = 0; i < nzombies; i++)
+      for (i = 0; i < nprocs; i++)
 	{
-	  if (zombies[i]->hProcess)
-	    {
-	      ForceCloseHandle1 (zombies[i]->hProcess, childhProc);
-	      ForceCloseHandle1 (zombies[i]->pid_handle, pid_handle);
-	    }
-	  zombies[i]->ppid = 1;
-	  zombies[i]->process_state = PID_EXITED;	/* CGF FIXME - still needed? */
-	  zombies[i].release ();	// FIXME: this breaks older gccs for some reason
+	  procs[i]->ppid = 1;
+	  if (!proc_exists (procs[i]))
+	    procs[i]->process_state = PID_EXITED;	/* CGF FIXME - still needed? */
+	  procs[i].release ();
 	}
-
-      /* Disassociate my subprocesses */
-      for (i = 0; i < nchildren; i++)
-	{
-	  if (!pchildren[i]->hProcess)
-	    sigproc_printf ("%d(%d) hProcess cleared already?", pchildren[i]->pid,
-			pchildren[i]->dwProcessId);
-	  else
-	    {
-	      ForceCloseHandle1 (pchildren[i]->hProcess, childhProc);
-	      sigproc_printf ("%d(%d) closed child handle", pchildren[i]->pid,
-			      pchildren[i]->dwProcessId);
-	      pchildren[i]->ppid = 1;
-	      if (pchildren[i]->pgid == myself->pid)
-		pchildren[i]->process_state |= PID_ORPHANED;
-	    }
-	  pchildren[i].release ();
-	}
-      nchildren = nzombies = 0;
+      nprocs = 0;
       sync_proc_subproc->release ();
     }
   sigproc_printf ("leaving");
@@ -610,7 +486,7 @@ sigproc_init ()
   ProtectHandle (wait_sig_inited);
 
   /* sync_proc_subproc is used by proc_subproc.  It serialises
-   * access to the children and zombie arrays.
+   * access to the children and proc arrays.
    */
   new_muto (sync_proc_subproc);
 
@@ -648,7 +524,7 @@ sigproc_terminate (void)
 	  CloseHandle (sendsig);
 	}
     }
-  proc_terminate ();		// Terminate process handling thread
+  proc_terminate ();		// clean up process stuff
 
   return;
 }
@@ -833,25 +709,6 @@ out:
   return rc;
 }
 
-/* Initialize the wait_subproc thread.
- * Called from fork() or spawn() to initialize the handling of subprocesses.
- */
-void __stdcall
-subproc_init (void)
-{
-  if (hwait_subproc)
-    return;
-
-  /* A "wakeup" handle which can be toggled to make wait_subproc reexamine
-   * the hchildren array.
-   */
-  events[0] = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-  hwait_subproc = new cygthread (wait_subproc, NULL, "proc");
-  hwait_subproc->zap_h ();
-  ProtectHandle (events[0]);
-  sigproc_printf ("started wait_subproc thread");
-}
-
 /* Initialize some of the memory block passed to child processes
    by fork/spawn/exec. */
 
@@ -864,7 +721,6 @@ init_child_info (DWORD chtype, child_info *ch, HANDLE subproc_ready)
   ch->magic = CHILD_INFO_MAGIC;
   ch->type = chtype;
   ch->subproc_ready = subproc_ready;
-  ch->pppid_handle = myself->ppid_handle;
   ch->fhandler_union_cb = sizeof (fhandler_union);
   ch->user_h = cygwin_user_h;
 }
@@ -877,132 +733,107 @@ checkstate (waitq *parent_w)
 {
   int potential_match = 0;
 
-  sigproc_printf ("nchildren %d, nzombies %d", nchildren, nzombies);
+  sigproc_printf ("nprocs %d", nprocs);
 
   /* Check already dead processes first to see if they match the criteria
-   * given in w->next.
-   */
-  for (int i = 0; i < nzombies; i++)
-    switch (stopped_or_terminated (parent_w, zombies[i]))
+   * given in w->next.  */
+  int res;
+  for (int i = 0; i < nprocs; i++)
+    if ((res = stopped_or_terminated (parent_w, procs[i])))
       {
-      case -1:
-	potential_match = -1;
-	break;
-      case 1:
-	remove_zombie (i);
+	remove_proc (i);
 	potential_match = 1;
 	goto out;
       }
 
-  sigproc_printf ("checking alive children");
-
-  /* No dead terminated children matched.  Check for stopped children. */
-  for (int i = 0; i < nchildren; i++)
-    switch (stopped_or_terminated (parent_w, pchildren[i]))
-      {
-      case -1:
-	potential_match = -1;
-	break;
-      case 1:
-	potential_match = 1;
-	goto out;
-      }
+  sigproc_printf ("no matching terminated children found");
+  potential_match = -!!nprocs;
 
 out:
   sigproc_printf ("returning %d", potential_match);
   return potential_match;
 }
 
-/* Remove a zombie from zombies by swapping it with the last child in the list.
- */
-static void __stdcall
-remove_zombie (int ci)
+/* Remove a proc from procs by swapping it with the last child in the list.
+   Also releases shared memory of exited processes.  */
+static bool __stdcall
+remove_proc (int ci)
 {
-  sigproc_printf ("removing %d, pid %d, nzombies %d", ci, zombies[ci]->pid,
-		  nzombies);
+  if (proc_exists (procs[ci]))
+    return true;
 
-  if (zombies[ci])
+  sigproc_printf ("removing procs[%d], pid %d, nprocs %d", ci, procs[ci]->pid,
+		  nprocs);
+  if (procs[ci] != myself)
     {
-      ForceCloseHandle1 (zombies[ci]->hProcess, childhProc);
-      ForceCloseHandle1 (zombies[ci]->pid_handle, pid_handle);
-      zombies[ci].release ();
+      procs[ci].release ();
+      if (procs[ci].pid_handle)
+	ForceCloseHandle1 (procs[ci].pid_handle, childhProc);
+      if (procs[ci].hProcess)
+	ForceCloseHandle1 (procs[ci].hProcess, childhProc);
     }
-
-  if (ci < --nzombies)
-    zombies[ci] = zombies[nzombies];
-
-  return;
+  if (ci < --nprocs)
+    procs[ci] = procs[nprocs];
+  return 0;
 }
 
 /* Check status of child process vs. waitq member.
- *
- * parent_w is the pointer to the parent of the waitq member in question.
- * child is the subprocess being considered.
- *
- * Returns
- *   1 if stopped or terminated child matches parent_w->next criteria
- *  -1 if a non-stopped/terminated child matches parent_w->next criteria
- *   0 if child does not match parent_w->next criteria
- */
-static int __stdcall
+  
+   parent_w is the pointer to the parent of the waitq member in question.
+   child is the subprocess being considered.
+  
+   Returns non-zero if waiting thread released.  */
+static bool __stdcall
 stopped_or_terminated (waitq *parent_w, _pinfo *child)
 {
-  int potential_match;
+  int might_match;
   waitq *w = parent_w->next;
 
   sigproc_printf ("considering pid %d", child->pid);
   if (w->pid == -1)
-    potential_match = 1;
+    might_match = 1;
   else if (w->pid == 0)
-    potential_match = child->pgid == myself->pgid;
+    might_match = child->pgid == myself->pgid;
   else if (w->pid < 0)
-    potential_match = child->pgid == -w->pid;
+    might_match = child->pgid == -w->pid;
   else
-    potential_match = (w->pid == child->pid);
+    might_match = (w->pid == child->pid);
 
-  if (!potential_match)
+  if (!might_match)
     return 0;
 
-  bool terminated;
+  int terminated;
 
-  if ((terminated = child->process_state == PID_ZOMBIE) ||
-      ((w->options & WUNTRACED) && child->stopsig))
+  if (!((terminated = (child->process_state == PID_ZOMBIE)) ||
+      ((w->options & WUNTRACED) && child->stopsig)))
+    return 0;
+
+  parent_w->next = w->next;	/* successful wait.  remove from wait queue */
+  w->pid = child->pid;
+
+  if (!terminated)
     {
-      parent_w->next = w->next;	/* successful wait.  remove from wait queue */
-      w->pid = child->pid;
+      sigproc_printf ("stopped child");
+      w->status = (child->stopsig << 8) | 0x7f;
+      child->stopsig = 0;
+    }
+  else /* Should only get here when child has been moved to the procs array */
+    {
+      w->status = child->exitcode;
 
-      if (!terminated)
+      add_rusage (&myself->rusage_children, &child->rusage_children);
+      add_rusage (&myself->rusage_children, &child->rusage_self);
+
+      if (w->rusage)
 	{
-	  sigproc_printf ("stopped child");
-	  w->status = (child->stopsig << 8) | 0x7f;
-	  child->stopsig = 0;
+	  add_rusage ((struct rusage *) w->rusage, &child->rusage_children);
+	  add_rusage ((struct rusage *) w->rusage, &child->rusage_self);
 	}
-      else /* Should only get here when child has been moved to the zombies array */
-	{
-	  DWORD status;
-	  if (!GetExitCodeProcess (child->hProcess, &status))
-	    status = 0xffff;
-	  if (status & EXIT_SIGNAL)
-	    w->status = (status >> 8) & 0xff;	/* exited due to signal */
-	  else
-	    w->status = (status & 0xff) << 8;	/* exited via "exit ()" */
-
-	  add_rusage (&myself->rusage_children, &child->rusage_children);
-	  add_rusage (&myself->rusage_children, &child->rusage_self);
-
-	  if (w->rusage)
-	    {
-	      add_rusage ((struct rusage *) w->rusage, &child->rusage_children);
-	      add_rusage ((struct rusage *) w->rusage, &child->rusage_self);
-	    }
-	}
-
-      if (!SetEvent (w->ev))	/* wake up wait4 () immediately */
-	system_printf ("couldn't wake up wait event %p, %E", w->ev);
-      return 1;
     }
 
-  return -potential_match;
+  if (!SetEvent (w->ev))	/* wake up wait4 () immediately */
+    system_printf ("couldn't wake up wait event %p, %E", w->ev);
+  return true;
 }
 
 static void
@@ -1078,27 +909,10 @@ wait_sig (VOID *self)
      signals.  Prior to this, dwProcessId was set to the windows pid of
      of the original windows process which spawned us unless this was a
      "toplevel" process.  */
-  myself->dwProcessId = GetCurrentProcessId ();
   myself->process_state |= PID_ACTIVE;
   myself->process_state &= ~PID_INITIALIZING;
 
   sigproc_printf ("myself->dwProcessId %u", myself->dwProcessId);
-  /* If we've been execed, then there is still a stub left in the previous
-     windows process waiting to see if it's started a cygwin process or not.
-     Signalling subproc_ready indicates that we are a cygwin process.  */
-  if (child_proc_info && child_proc_info->type == PROC_EXEC)
-    {
-      debug_printf ("subproc_ready %p", child_proc_info->subproc_ready);
-      if (!SetEvent (child_proc_info->subproc_ready))
-	system_printf ("SetEvent (subproc_ready) failed, %E");
-      ForceCloseHandle1 (child_proc_info->subproc_ready, subproc_ready);
-      /* Initialize an "indirect" pid block so that if someone looks up this
-	 process via its Windows PID it will be redirected to the appropriate
-	 Cygwin PID shared memory block. */
-      static pinfo NO_COPY myself_identity;
-      myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED);
-    }
-
   SetEvent (wait_sig_inited);
   sigtid = GetCurrentThreadId ();
 
@@ -1212,88 +1026,6 @@ wait_sig (VOID *self)
 	}
     }
 
-  sigproc_printf ("done");
-  ExitThread (0);
-}
-
-/* Wait for subprocesses to terminate. Executes in a separate thread. */
-static DWORD WINAPI
-wait_subproc (VOID *)
-{
-  sigproc_printf ("starting");
-  int errloop = 0;
-
-  for (;;)
-    {
-      DWORD rc = WaitForMultipleObjects (nchildren + 1, events, FALSE,
-					 proc_loop_wait);
-      if (!proc_loop_wait)
-	break;
-      if (rc == WAIT_TIMEOUT)
-	continue;
-
-      if (rc == WAIT_FAILED)
-	{
-	  /* It's ok to get an ERROR_INVALID_HANDLE since another thread may have
-	     closed a handle in the children[] array.  So, we try looping a couple
-	     of times to stabilize. FIXME - this is not foolproof.  Probably, this
-	     thread should be responsible for closing the children. */
-	  if (!errloop++)
-	    proc_subproc (PROC_NOTHING, 0);	// Just synchronize and continue
-	  if (errloop < 10)
-	    continue;
-
-	  system_printf ("wait failed. nchildren %d, wait %d, %E",
-			nchildren, proc_loop_wait);
-
-	  for (int i = 0; i <= nchildren; i++)
-	    if ((rc = WaitForSingleObject (events[i], 0)) == WAIT_OBJECT_0 ||
-		rc == WAIT_TIMEOUT)
-	      continue;
-	    else if (i == 0)
-		system_printf ("nchildren %d, event[%d] %p, %E", nchildren, i, events[i]);
-	    else
-	      {
-		system_printf ("nchildren %d, event[%d] %p, pchildren[%d] %p, events[0] %p, %E",
-			       nchildren, i, events[i], i - 1, (_pinfo *) pchildren[i - 1], events[0]);
-		system_printf ("pid %d, dwProcessId %u, hProcess %p, progname '%s'",
-			       pchildren[i - 1]->pid, pchildren[i - 1]->dwProcessId,
-			       pchildren[i - 1]->hProcess, pchildren[i - 1]->progname);
-	      }
-	  break;
-	}
-
-      errloop = 0;
-      rc -= WAIT_OBJECT_0;
-      if (rc-- != 0)
-	{
-	  siginfo_t si;
-	  si.si_signo = SIGCHLD;
-	  si.si_code = SI_KERNEL;
-	  si.si_pid = pchildren[rc]->pid;
-	  si.si_uid = pchildren[rc]->uid;
-	  si.si_errno = 0;
-	  GetExitCodeProcess (hchildren[rc], (DWORD *) &si.si_status);
-#if 0	// FIXME: This is tricky to get right
-	  si.si_utime = pchildren[rc]->rusage_self.ru_utime;
-	  si.si_stime = pchildren[rc].rusage_self.ru_stime;
-#else
-	  si.si_utime = 0;
-	  si.si_stime = 0;
-#endif
-	  rc = proc_subproc (PROC_CHILDTERMINATED, rc);
-
-	  /* Send a SIGCHLD to myself.   We do this here, rather than in proc_subproc
-	     to avoid the proc_subproc lock since the signal thread will eventually
-	     be calling proc_subproc and could unnecessarily block. */
-	  if (rc)
-	    sig_send (myself_nowait, si);
-	}
-      sigproc_printf ("looping");
-    }
-
-  ForceCloseHandle (events[0]);
-  events[0] = NULL;
   sigproc_printf ("done");
   ExitThread (0);
 }

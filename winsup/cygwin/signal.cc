@@ -342,7 +342,7 @@ abort (void)
 
   raise (SIGABRT);
   (void) _my_tls.call_signal_handler (); /* Call any signal handler */
-  do_exit (1);	/* signal handler didn't exit.  Goodbye. */
+  do_exit (SIGABRT);	/* signal handler didn't exit.  Goodbye. */
 }
 
 extern "C" int

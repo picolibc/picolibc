@@ -6,6 +6,9 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _CYGTHREAD_H
+#define _CYGTHREAD_H
+
 class cygthread
 {
   LONG inuse;
@@ -25,6 +28,7 @@ class cygthread
   static DWORD WINAPI simplestub (VOID *);
   static DWORD main_thread_id;
   static const char * name (DWORD = 0);
+  void release () { __name = NULL; inuse = false; }
   cygthread (LPTHREAD_START_ROUTINE, LPVOID, const char *);
   cygthread () {};
   static void init ();
@@ -43,3 +47,4 @@ class cygthread
 };
 
 #define cygself NULL
+#endif /*_CYGTHREAD_H*/

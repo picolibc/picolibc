@@ -22,8 +22,7 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "child_info.h"
-#define NEED_VFORK
-#include "perthread.h"
+#include "cygtls.h"
 #include "perprocess.h"
 #include "dll_init.h"
 #include "sync.h"
@@ -41,17 +40,6 @@ details. */
 #define dll_data_end &_data_end__
 #define dll_bss_start &_bss_start__
 #define dll_bss_end &_bss_end__
-
-void
-per_thread::set (void *s)
-{
-  if (s == PER_THREAD_FORK_CLEAR)
-    {
-      tls = TlsAlloc ();
-      s = NULL;
-    }
-  TlsSetValue (get_tls (), s);
-}
 
 static void
 stack_base (child_info_fork &ch)
@@ -296,7 +284,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   (void) ForceCloseHandle1 (fork_info->subproc_ready, subproc_ready);
   (void) ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
-  pinfo_fixup_after_fork ();
   _my_tls.fixup_after_fork ();
   sigproc_init ();
 
@@ -304,13 +291,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
 #endif
-
-  /* Set thread local stuff to zero.  Under Windows 95/98 this is sometimes
-     non-zero, for some reason.
-     FIXME:  There is a memory leak here after a fork. */
-  for (per_thread **t = threadstuff; *t; t++)
-    if ((*t)->clear_on_fork ())
-      (*t)->set ();
 
   pthread::atforkchild ();
   fixup_timers_after_fork ();
@@ -356,8 +336,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   pthread::atforkprepare ();
 
-  subproc_init ();
-
   int c_flags = GetPriorityClass (hMainProc) /*|
 		CREATE_NEW_PROCESS_GROUP*/;
   STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
@@ -384,7 +362,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   /* Create an inheritable handle to pass to the child process.  This will
      allow the child to duplicate handles from the parent to itself. */
   hParent = NULL;
-  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hParent, 0, 1,
+  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hParent, 0, TRUE,
 			DUPLICATE_SAME_ACCESS))
     {
       system_printf ("couldn't create handle to myself for child, %E");
@@ -501,8 +479,8 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   ProtectHandle1 (pi.hProcess, childhProc);
 
   /* Fill in fields in the child's process table entry.  */
-  forked->hProcess = pi.hProcess;
   forked->dwProcessId = pi.dwProcessId;
+  forked.hProcess = pi.hProcess;
 
   /* Hopefully, this will succeed.  The alternative to doing things this
      way is to reserve space prior to calling CreateProcess and then fill

@@ -25,7 +25,6 @@ details. */
 #include "cygheap.h"
 #include "wincap.h"
 #include "heap.h"
-#include "cygthread.h"
 #include "pwdgrp.h"
 #include "cygtls.h"
 
@@ -72,7 +71,6 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.ctty = p->ctty;
 	  ep.pid = p->pid;
 	  ep.ppid = p->ppid;
-	  ep.hProcess = p->hProcess;
 	  ep.dwProcessId = p->dwProcessId;
 	  ep.uid = p->uid;
 	  ep.gid = p->gid;

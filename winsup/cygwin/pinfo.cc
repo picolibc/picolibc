@@ -24,9 +24,9 @@ details. */
 #include "perprocess.h"
 #include "environ.h"
 #include <assert.h>
+#include <sys/wait.h>
 #include <ntdef.h>
 #include "ntdll.h"
-#include "cygthread.h"
 #include "shared_info.h"
 #include "cygheap.h"
 #include "fhandler.h"
@@ -36,23 +36,6 @@ details. */
 static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
-
-HANDLE hexec_proc;
-
-void __stdcall
-pinfo_fixup_after_fork ()
-{
-  if (hexec_proc)
-    CloseHandle (hexec_proc);
-  /* Keeps the cygpid from being reused.  No rights required */
-  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hexec_proc, 0,
-			TRUE, 0))
-    {
-      system_printf ("couldn't save current process handle %p, %E", hMainProc);
-      hexec_proc = NULL;
-    }
-  VerifyHandle (hexec_proc);
-}
 
 /* Initialize the process table.
    This is done once when the dll is first loaded.  */
@@ -70,7 +53,30 @@ set_myself (HANDLE h)
   if (!strace.active)
     strace.hello ();
   debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
-  InitializeCriticalSection (&myself->lock);
+  InitializeCriticalSection (&myself.lock);
+  myself->dwProcessId = GetCurrentProcessId ();
+  if (h)
+    {
+      /* here if execed */
+      static pinfo NO_COPY myself_identity;
+      myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED);
+    }
+  else if (myself->ppid)
+    {
+      /* here if forked/spawned */
+      pinfo parent (myself->ppid);
+      /* We've inherited the parent's wr_proc_pipe.  We don't need it,
+	 so close it.  This could cause problems for the spawn case since there
+	 is no guarantee that a parent will still be around by the time we get
+	 here.  If so, we would have a handle leak.  FIXME?  */
+      if (parent && parent->wr_proc_pipe)
+	CloseHandle (parent->wr_proc_pipe);
+      if (cygheap->pid_handle)
+	{
+	  ForceCloseHandle (cygheap->pid_handle);
+	  cygheap->pid_handle = NULL;
+	}
+    }
   return;
 }
 
@@ -107,17 +113,27 @@ _pinfo::exit (UINT n, bool norecord)
   exit_state = ES_FINAL;
   cygthread::terminate ();
   if (norecord)
-    sigproc_terminate ();
+    sigproc_terminate ();	/* Just terminate signal and process stuff */
+  else
+    exitcode = n;		/* We're really exiting.  Record the UNIX exit code. */
+
   if (this)
     {
-      if (!norecord)
-	process_state = PID_EXITED;
-
       /* FIXME:  There is a potential race between an execed process and its
 	 parent here.  I hated to add a mutex just for this, though.  */
       struct rusage r;
       fill_rusage (&r, hMainProc);
       add_rusage (&rusage_self, &r);
+
+      if (!norecord)
+	{
+	  process_state = PID_EXITED;
+	  /* We could just let this happen automatically when the process
+	     exits but this should gain us a microsecond or so by notifying
+	     the parent early.  */
+	  if (wr_proc_pipe)
+	    CloseHandle (wr_proc_pipe);
+	}
     }
 
   sigproc_printf ("Calling ExitProcess %d", n);
@@ -259,6 +275,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	  procinfo->process_state |= PID_IN_USE | PID_EXECED;
 	  procinfo->pid = myself->pid;
 	}
+
       break;
     }
   destroy = 1;
@@ -505,7 +522,7 @@ _pinfo::commune_send (DWORD code, ...)
       __seterrno ();
       goto err;
     }
-  EnterCriticalSection (&myself->lock);
+  EnterCriticalSection (&myself.lock);
   myself->tothem = tome;
   myself->fromthem = fromme;
   myself->hello_pid = pid;
@@ -609,7 +626,7 @@ err:
 
 out:
   myself->hello_pid = 0;
-  LeaveCriticalSection (&myself->lock);
+  LeaveCriticalSection (&myself.lock);
   return res;
 }
 
@@ -640,6 +657,196 @@ _pinfo::cmdline (size_t& n)
       *p = '\0';
     }
   return s;
+}
+
+/* This is the workhorse which waits for the write end of the pipe
+   created during new process creation.  If the pipe is closed, it is
+   assumed that the cygwin pid has exited.  Otherwise, various "signals"
+   can be sent to the parent to inform the parent to perform a certain
+   action.
+
+   This code was originally written to eliminate the need for "reparenting"
+   but, unfortunately, reparenting is still needed in order to get the
+   exit code of an execed windows process.  Otherwise, the exit code of
+   a cygwin process comes from the exitcode field in _pinfo. */
+static DWORD WINAPI
+proc_waiter (void *arg)
+{
+  extern HANDLE hExeced;
+  pinfo& vchild = *(pinfo *) arg;
+
+  siginfo_t si;
+  si.si_signo = SIGCHLD;
+  si.si_code = SI_KERNEL;
+  si.si_pid = vchild->pid;
+  si.si_errno = 0;
+#if 0	// FIXME: This is tricky to get right
+  si.si_utime = pchildren[rc]->rusage_self.ru_utime;
+  si.si_stime = pchildren[rc].rusage_self.ru_stime;
+#else
+  si.si_utime = 0;
+  si.si_stime = 0;
+#endif
+  pid_t pid = vchild->pid;
+
+  for (;;)
+    {
+      DWORD nb;
+      char buf = '\0';
+      if (!ReadFile (vchild.rd_proc_pipe, &buf, 1, &nb, NULL)
+	  && GetLastError () != ERROR_BROKEN_PIPE)
+	{
+	  system_printf ("error on read of child wait pipe %p, %E", vchild.rd_proc_pipe);
+	  break;
+	}
+
+      si.si_uid = vchild->uid;
+
+      switch (buf)
+	{
+	case 0:
+	  /* Child exited.  Do some cleanup and signal myself.  */
+	  CloseHandle (vchild.rd_proc_pipe);
+	  vchild.rd_proc_pipe = NULL;
+
+	  if (vchild->process_state != PID_EXITED && vchild.hProcess)
+	    {
+	      DWORD exit_code;
+	      if (GetExitCodeProcess (vchild.hProcess, &exit_code))
+		vchild->exitcode = (exit_code & 0xff) << 8;
+	    }
+	  if (WIFEXITED (vchild->exitcode))
+	    si.si_sigval.sival_int = CLD_EXITED;
+	  else if (WCOREDUMP (vchild->exitcode))
+	    si.si_sigval.sival_int = CLD_DUMPED;
+	  else
+	    si.si_sigval.sival_int = CLD_KILLED;
+	  si.si_status = vchild->exitcode;
+	  vchild->process_state = PID_ZOMBIE;
+	  break;
+	case SIGTTIN:
+	case SIGTTOU:
+	case SIGTSTP:
+	case SIGSTOP:
+	  /* Child stopped.  Signal myself.  */
+	  si.si_sigval.sival_int = CLD_STOPPED;
+	  break;
+	case SIGCONT:
+	  continue;
+	case __SIGREPARENT: /* sigh */
+	  /* spawn_guts has signalled us that it has just started a new
+	     subprocess which will take over this cygwin pid.  */
+
+	  /* We need to keep a handle to the original windows process which
+	     represents the cygwin process around to make sure that the
+	     windows pid is not reused before we are through with it.
+	     So, detect the first time that a subprocess calls exec
+	     and save the current hprocess in the pid_handle field.
+	     On subsequent execs just close the handle. */
+	  if (!vchild.hProcess)
+	    /* something went wrong.  oh well. */;
+	  else if (vchild.pid_handle)
+	    ForceCloseHandle1 (vchild.hProcess, childhProc);
+	  else
+	    vchild.pid_handle = vchild.hProcess;
+	  vchild.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, FALSE,
+					 vchild->dwProcessId);
+	  vchild->cygstarted++;
+	  if (vchild.hProcess)
+	    ProtectHandle1 (vchild.hProcess, childhProc);
+	  continue;
+	default:
+	  system_printf ("unknown value %d on proc pipe", buf);
+	  continue;
+	}
+
+      /* Special case:  If the "child process" that died is us, then we're
+	 execing.  Just call proc_subproc directly and then exit this loop.
+	 We're done here.  */
+      if (hExeced && vchild->pid == myself->pid)
+	{
+	  /* execing.  no signals available now. */
+	  proc_subproc (PROC_CLEARWAIT, 0);
+	  break;
+	}
+
+      /* Send a SIGCHLD to myself.   We do this here, rather than in proc_subproc
+	 to avoid the proc_subproc lock since the signal thread will eventually
+	 be calling proc_subproc and could unnecessarily block. */
+      sig_send (myself_nowait, si);
+
+      /* If we're just stopped or got a continue signal, keep looping.
+	 Otherwise, return this thread to the pool. */
+      if (buf != '\0')
+	sigproc_printf ("looping");
+      else
+	break;
+    }
+
+  sigproc_printf ("exiting wait thread for pid %d", pid);
+  _my_tls._ctinfo->release ();	/* return the cygthread to the cygthread pool */
+  return 0;
+}
+
+/* function to set up the process pipe and kick off proc_waiter */
+int
+pinfo::wait ()
+{
+  HANDLE out;
+  /* FIXME: execed processes should be able to wait for pids that were started
+     by the process which execed them. */
+  if (!CreatePipe (&rd_proc_pipe, &out, &sec_none_nih, 16))
+    {
+      system_printf ("Couldn't create pipe tracker for pid %d, %E",
+		     (*this)->pid);
+      return 0;
+    }
+  /* Duplicate the write end of the pipe into the subprocess.  Make it inheritable
+     so that all of the execed children get it.  */
+  if (!DuplicateHandle (hMainProc, out, hProcess, &((*this)->wr_proc_pipe), 0,
+			TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid,
+		     hProcess);
+      return 0;
+    }
+  CloseHandle (out);	/* Don't need this end in this proces */
+
+  preserve ();		/* Preserve the shared memory associated with the pinfo */
+
+  /* Fire up a new thread to track the subprocess */
+  cygthread *h = new cygthread (proc_waiter, this, "sig");
+  if (!h)
+    sigproc_printf ("tracking thread creation failed for pid %d", (*this)->pid);
+  else
+    {
+      h->zap_h ();
+      sigproc_printf ("created tracking thread for pid %d, winpid %p, rd_pipe %p",
+		      (*this)->pid, (*this)->dwProcessId, rd_proc_pipe);
+    }
+
+  return 1;
+}
+
+/* function to send a "signal" to the parent when something interesting happens
+   in the child. */
+void
+pinfo::alert_parent (char sig)
+{
+  DWORD nb;
+  /* Send something to our parent.  If the parent has gone away,
+     close the pipe. */
+  if (myself->wr_proc_pipe
+      && WriteFile (myself->wr_proc_pipe, &sig, 1, &nb, NULL))
+    /* all is well */;
+  else if (GetLastError () != ERROR_BROKEN_PIPE)
+    debug_printf ("sending %d notification to parent failed, %E", sig);
+  else
+    {
+      HANDLE closeit = myself->wr_proc_pipe;
+      myself->wr_proc_pipe = NULL;
+      CloseHandle (closeit);
+    }
 }
 
 void

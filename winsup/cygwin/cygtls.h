@@ -32,6 +32,8 @@ details. */
 
 #define TLS_STACK_SIZE 256
 
+#include "cygthread.h"
+
 #pragma pack(push,4)
 struct _local_storage
 {
@@ -131,6 +133,7 @@ struct _cygtls
       char __dontuse[8 * ((sizeof(struct _reent) + 4) / 8)];
     };
   struct _local_storage locals;
+  class cygthread *_ctinfo;
   waitq wq;
   struct _cygtls *prev, *next;
   __stack_t *stackptr;

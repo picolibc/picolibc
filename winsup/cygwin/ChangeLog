@@ -1,3 +1,134 @@
+2004-11-25  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (child_info_spawn::hexec_proc): Eliminate.
+	* dcrt0.cc (dll_crt0_0): Remove hexec_proc stuff.
+	* fork.cc (fork_child): Remove call to pinfo_fixup_after_fork.
+	* pinfo.cc (set_myself): Close and zero pid_handle if set.
+	(pinfo_fixup_after_fork): Delete.
+	(proc_waiter): Don't close vchild.hProcess here.  Do that when we are
+	remove the vchild from procs.  Save hProcess as pid_handle only on
+	first reparent operation.
+	(pinfo::wait): Don't set pid_handle here.
+	(pinfo::alert_parent): Always try to send signal.  If unsuccessful then
+	close and zero wr_proc_pipe.
+	* pinfo.h (pinfo::pinfo): Make sure that appropriate parts of the class
+	are zeroed on construction.
+	(pinfo::alert_parent): Take char argument.
+	(pinfo_fixup_after_fork): Delete declaration.
+	(hexec_proc): Ditto.
+	* sigproc.cc (remove_proc): Close pid_handle and hProcess if
+	appropriate.
+	* spawn.cc (spawn_guts): Set cygheap->pid_handle on first exec.
+
+2004-11-25  Christopher Faylor  <cgf@timesys.com>
+
+	* cygheap.h (init_cygheap::pid_handle): New element.
+	* pinfo.cc (set_myself): Clear previously existing cygheap->pid_handle
+	when a new process has been started.
+	(pinfo::wait): Make sure that a handle to the newly forked/spawned
+	process is kept around so that the pid will not be reused.
+	* pinfo.h (_pinfo::pid_handle): Move.
+	(pinfo::pid_handle): to here.
+	* spawn.cc (spawn_guts): Create a pid_handle in cygheap prior to
+	spawning to ensure that the pid does not get reused during the lifetime
+	of the "cygwin pid".
+
+2004-11-25  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.h (pinfo::alert_parent): New function.
+	* exceptions.cc (sig_handle_tty_stop): Use alert_parent to send
+	"signals" to parent.
+	* fork.cc (fork_parent): Don't close pi.hProcess.  Let the waiter
+	thread do that.
+	* pinfo.cc (proc_waiter): Detect case where process exits without
+	setting the exit code and use value from GetExitCodeProcess.
+	Reluctantly implement __SIGREPARENT.
+	(pinfo::alert_parent): Define.
+	* sigproc.h (__SIGREPARENT): New enum.
+	* spawn.cc (spawn_guts): Send reparent signal to parent on exec.
+	Always create process in suspended state to avoid races.
+
+2004-11-25  Christopher Faylor  <cgf@timesys.com>
+
+	Remove cygthread.h in favor of cygtls.h throughout since cygtls now
+	includes cygthread.h.  Eliminate ppid_handle usage throughout.
+	* child_info.h: Regenerate magic number
+	(child_info): Remove pppid_handle.
+	* cygthread.h (cygthread::release): New method.  Frees thread without
+	waiting.
+	* cygthread.cc (cygthread::stub): Set _ctinfo in _mytls to point to
+	information for executing thread.  Don't call SetEvent if thread is no
+	longer in use.
+	(cygthread::simplestub): Ditto.
+	* cygtls.h (_cygtls::_ctinfo): New element contains pointer to
+	information about executing cygthread, if any.
+	* dcrt0.cc: Remove last vestiges of per_thread stuff.
+	(dll_crt0_0): Ditto.  Remove accommodation for ppid_handle.
+	(do_exit): Remove obsolete reparenting test.
+	(_exit): Exit with a more SUSv3-like exit value.
+	* dtable.cc (dtable::stdio_init): Check for myself->cygstarted rather
+	than myself->ppid_handle to see if we were started by a cygwin process.
+	* exceptions.cc (open_stackdumpfile): Ditto.
+	(handle_exceptions): Ditto.
+	(ctrl_c_handler): Ditto.
+	(sig_handle_tty_stop): Ditto.  Let parent send signal to itself on
+	STOP.
+	(sigpacket::process): Comment out vfork test.
+	(signal_exit): Use more SUSv3-like exit value on signal.
+	* external.cc (fillout_pinfo): Don't set hProcess.
+	* fork.cc: Remove VFORK cruft.
+	(per_thread::set): Delete.
+	(fork_child): Remove perthread stuff.
+	(fork_parent): Remove obsolete subproc_init.  Accommodate new method
+	for tracking subprocesses.
+	* pinfo.cc (set_myself): Accommodate new pinfo/_pinfo layout.  Set some
+	things here that used to be set in wait_sig.
+	(_pinfo::exit): Set exitcode here.  Close process pipe.
+	(_pinfo::commune_send): Accommodeate new pinfo/_pinfo layout.
+	(proc_waiter): New function.  Waits, in a thread for subprocess to go
+	away.
+	(pinfo::wait): New function.  Initialization for proc_waiter.
+	* pinfo.h (_pinfo::exitcode): New element.
+	(_pinfo::cygstarted): Ditto.
+	(_pinfo::wr_proc_pipe): Ditto.
+	(_pinfo::ppid_handle): Delete.
+	(_pinfo::hProcess): Delete.
+	(_pinfo::lock): Delete.
+	(pinfo::hProcess): New element.
+	(pinfo::lock): Ditto.
+	(pinfo::wait): Declare new function.
+	(pinfo::preserve): Define new function.
+	* sigproc.cc: Remove old stuff from wait_subproc thread based method.
+	(zombies): Remove.
+	(procs): New.
+	(my_parent_is_alive): Just check that the parent pid exists.
+	(mychild): Just use pinfo methods to determine if child is mine.
+	(proc_subproc): Revamp PROC_ADDCHILD to use pinfo::wait.  Remove
+	PROC_CHILDTERMINATED logic.  Use different method to remove processes
+	from list when SIGCHLD == SIG_IGN.
+	(proc_terminate): Gut.
+	(subproc_init): Delete.
+	(init_child_info): Remove setting of pppid_handle.
+	(checkstate): Revamp to only scan procs array.
+	(remove_proc): Rename from remove_zombie.  Don't close hProcess or
+	pid_handle.  Don't release memory if it's myself.
+	(stopped_or_terminated): Change logic to handle new consolidated
+	proc/zombie array.
+	(wait_subproc): Delete.
+	* sigproc.h: Remove obsolete EXIT_* defines.
+	(subproc_init): Remove declaration.
+	* spawn.cc (spawn_guts): Remove reparenting stuff.  Use standard wait
+	logic to wait for child if started from a non-cygwin process.
+	* tlsoffsets.h: Regenerate.
+	* tty.cc (tty_init): Check for myself->cygstarted rather than
+	myself->ppid_handle to see if we were started by a cygwin process.
+	* include/sys/signal.h (external_pinfo::exitcode): Replace hProcess.
+	* include/sys/wait.h (WCOREDUMP): Define.
+
+	* fhandler_tty.cc (fhandler_tty_slave::read): Add debugging output for
+	timeout case.
+	* signal.cc (abort): Flag that we are exiting with the ABORT signal.
+
 2004-11-22  Christopher Faylor  <cgf@timesys.com>
 
 	* select.cc (select_stuff::test_and_set): Remove extraneous tests of

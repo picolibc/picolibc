@@ -1,6 +1,6 @@
 /* sys/wait.h
 
-   Copyright 1997, 1998, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -36,6 +36,7 @@ extern "C" {
 #define WEXITSTATUS(w)	(((w) >> 8) & 0xff)
 #define WTERMSIG(w)	((w) & 0x7f)
 #define WSTOPSIG	WEXITSTATUS
+#define WCOREDUMP(w)	(WIFSIGNALED(w) && (w & 0x80))
 
 pid_t wait (int *);
 pid_t waitpid (pid_t, int *, int);

@@ -57,7 +57,7 @@ ttyslot (void)
 void __stdcall
 tty_init (void)
 {
-  if (!myself->ppid_handle && NOTSTATE (myself, PID_CYGPARENT))
+  if (!myself->cygstarted && NOTSTATE (myself, PID_CYGPARENT))
     cygheap->fdtab.get_debugger_info ();
 
   if (NOTSTATE (myself, PID_USETTY))

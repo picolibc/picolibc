@@ -29,11 +29,10 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "child_info_magic.h"
-#include "perthread.h"
+#include "cygtls.h"
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
-#include "cygthread.h"
 #include "sync.h"
 #include "heap.h"
 
@@ -43,16 +42,6 @@ details. */
 
 HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
-
-#ifdef NEWVFORK
-per_thread_vfork NO_COPY vfork_storage;
-#endif
-
-per_thread NO_COPY *threadstuff[] = {
-#ifdef NEWVFORK
-				     &vfork_storage,
-#endif
-				     NULL};
 
 bool display_title;
 bool strip_title_path;
@@ -656,8 +645,6 @@ dll_crt0_0 ()
     memory_init ();
   else
     {
-      bool close_ppid_handle = false;
-      bool close_hexec_proc = false;
       switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:
@@ -665,16 +652,9 @@ dll_crt0_0 ()
 	    cygheap_fixup_in_child (false);
 	    memory_init ();
 	    set_myself (NULL);
-	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    break;
 	  case _PROC_SPAWN:
-	    /* Have to delay closes until after cygheap is setup */
-	    close_hexec_proc = !!spawn_info->hexec_proc;
-	    close_ppid_handle = !!child_proc_info->pppid_handle;
-	    goto around;
 	  case _PROC_EXEC:
-	    hexec_proc = spawn_info->hexec_proc;
-	  around:
 	    HANDLE h;
 	    cygheap_fixup_in_child (true);
 	    memory_init ();
@@ -697,10 +677,6 @@ dll_crt0_0 ()
 	      }
 	    break;
 	}
-      if (close_hexec_proc)
-	CloseHandle (spawn_info->hexec_proc);
-      if (close_ppid_handle)
-	CloseHandle (child_proc_info->pppid_handle);
     }
 
   _cygtls::init ();
@@ -1014,13 +990,10 @@ do_exit (int status)
   if (exit_state < ES_SIGNAL)
     {
       exit_state = ES_SIGNAL;
-      if (!(n & EXIT_REPARENTING))
-	{
-	  signal (SIGCHLD, SIG_IGN);
-	  signal (SIGHUP, SIG_IGN);
-	  signal (SIGINT, SIG_IGN);
-	  signal (SIGQUIT, SIG_IGN);
-	}
+      signal (SIGCHLD, SIG_IGN);
+      signal (SIGHUP, SIG_IGN);
+      signal (SIGINT, SIG_IGN);
+      signal (SIGQUIT, SIG_IGN);
     }
 
   if (exit_state < ES_CLOSEALL)
@@ -1112,7 +1085,7 @@ cygwin_exit (int n)
 extern "C" void
 _exit (int n)
 {
-  do_exit ((DWORD) n & 0xffff);
+  do_exit (((DWORD) n & 0xff) << 8);
 }
 
 extern "C" void

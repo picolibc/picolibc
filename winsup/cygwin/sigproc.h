@@ -12,10 +12,6 @@ details. */
 #define _SIGPROC_H
 #include <signal.h>
 
-#define EXIT_SIGNAL	 0x010000
-#define EXIT_REPARENTING 0x020000
-#define EXIT_NOCLOSEALL  0x040000
-
 #ifdef NSIG
 enum
 {
@@ -26,7 +22,8 @@ enum
   __SIGDELETE	    = -(NSIG + 5),
   __SIGFLUSHFAST    = -(NSIG + 6),
   __SIGHOLD	    = -(NSIG + 7),
-  __SIGNOHOLD	    = -(NSIG + 8)
+  __SIGNOHOLD	    = -(NSIG + 8),
+  __SIGREPARENT	    = (NSIG + 2)
 };
 #endif
 
@@ -77,7 +74,6 @@ int __stdcall proc_subproc (DWORD, DWORD) __attribute__ ((regparm (2)));
 class _pinfo;
 void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
-void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
 bool __stdcall proc_exists (_pinfo *) __attribute__ ((regparm(1)));
 bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));

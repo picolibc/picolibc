@@ -140,7 +140,7 @@ dtable::stdio_init ()
      Also, always set them even if we're to pick up our parent's fds
      in case they're missed.  */
 
-  if (myself->ppid_handle || ISSTATE (myself, PID_CYGPARENT))
+  if (myself->cygstarted || ISSTATE (myself, PID_CYGPARENT))
     return;
 
   HANDLE in = GetStdHandle (STD_INPUT_HANDLE);

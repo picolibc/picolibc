@@ -29,7 +29,7 @@ enum
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0x19c16fb6U
+#define CURR_CHILD_INFO_MAGIC 0x83e9a7b7U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -45,7 +45,6 @@ public:
   HANDLE subproc_ready;	// used for synchronization with parent
   HANDLE user_h;
   HANDLE parent;
-  HANDLE pppid_handle;
   init_cygheap *cygheap;
   void *cygheap_max;
   DWORD cygheap_reserve_sz;
@@ -83,7 +82,6 @@ class child_info_spawn: public child_info
 {
 public:
   cygheap_exec_info *moreinfo;
-  HANDLE hexec_proc;
 
   child_info_spawn (): moreinfo (NULL) {}
   ~child_info_spawn ()

@@ -12,7 +12,6 @@ details. */
 #include <stdlib.h>
 #include "thread.h"
 #include "perprocess.h"
-#include "cygthread.h"
 #include "cygtls.h"
 
 int NO_COPY dynamically_loaded;

@@ -232,7 +232,7 @@ struct external_pinfo
   {
   pid_t pid;
   pid_t ppid;
-  HANDLE hProcess;
+  DWORD exitcode;
   DWORD dwProcessId, dwSpawnedProcessId;
   __uid16_t uid;
   __gid16_t gid;

@@ -289,6 +289,7 @@ struct init_cygheap
   size_t sthreads;
   int open_fhs;
   pid_t pid;			/* my pid */
+  HANDLE pid_handle;		/* handle for my pid */
   void close_ctty ();
 };
 

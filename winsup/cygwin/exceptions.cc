@@ -20,12 +20,9 @@ details. */
 #include "cygtls.h"
 #include "sigproc.h"
 #include "cygerrno.h"
-#define NEED_VFORK
-#include "perthread.h"
 #include "shared_info.h"
 #include "perprocess.h"
 #include "security.h"
-#include "cygthread.h"
 
 #define CALL_HANDLER_RETRY 20
 
@@ -159,7 +156,7 @@ open_stackdumpfile ()
 			     CREATE_ALWAYS, 0, 0);
       if (h != INVALID_HANDLE_VALUE)
 	{
-	  if (!myself->ppid_handle)
+	  if (!myself->cygstarted)
 	    system_printf ("Dumping stack trace to %s", corefile);
 	  else
 	    debug_printf ("Dumping stack trace to %s", corefile);
@@ -514,7 +511,7 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR)
     {
       /* Print the exception to the console */
-      if (!myself->ppid_handle)
+      if (!myself->cygstarted)
 	for (int i = 0; status_info[i].name; i++)
 	  if (status_info[i].code == e.ExceptionCode)
 	    {
@@ -596,31 +593,15 @@ sig_handle_tty_stop (int sig)
   _my_tls.incyg = 1;
   /* Silently ignore attempts to suspend if there is no accommodating
      cygwin parent to deal with this behavior. */
-  if (!myself->ppid_handle)
+  if (!myself->cygstarted)
     {
       myself->process_state &= ~PID_STOPPED;
       return;
     }
 
   myself->stopsig = sig;
-  /* See if we have a living parent.  If so, send it a special signal.
-     It will figure out exactly which pid has stopped by scanning
-     its list of subprocesses.  */
-  if (my_parent_is_alive ())
-    {
-      pinfo parent (myself->ppid);
-      if (NOTSTATE (parent, PID_NOCLDSTOP))
-	{
-	  siginfo_t si;
-	  si.si_signo = SIGCHLD;
-	  si.si_code = SI_KERNEL;
-	  si.si_sigval.sival_int = CLD_STOPPED;
-	  si.si_errno = si.si_pid = si.si_uid = si.si_errno = 0;
-	  sig_send (parent, si);
-	}
-    }
-  sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
-		  myself->pid, sig, myself->ppid_handle);
+  myself.alert_parent (sig);
+  sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
   HANDLE w4[2];
   w4[0] = sigCONT;
   w4[1] = signal_arrived;
@@ -629,6 +610,7 @@ sig_handle_tty_stop (int sig)
     case WAIT_OBJECT_0:
     case WAIT_OBJECT_0 + 1:
       reset_signal_arrived ();
+      myself.alert_parent (SIGCONT);
       break;
     default:
       api_fatal ("WaitSingleObject failed, %E");
@@ -807,7 +789,7 @@ ctrl_c_handler (DWORD type)
 
   if (!cygwin_finished_initializing)
     {
-      if (myself->ppid_handle)	/* Was this process created by a cygwin process? */
+      if (myself->cygstarted)	/* Was this process created by a cygwin process? */
 	return TRUE;		/* Yes.  Let the parent eventually handle CTRL-C issues. */
       debug_printf ("exiting with status %p", STATUS_CONTROL_C_EXIT);
       ExitProcess (STATUS_CONTROL_C_EXIT);
@@ -982,7 +964,7 @@ sigpacket::process ()
   bool special_case;
   bool insigwait_mask;
   insigwait_mask = masked = false;
-  if (special_case = (VFORKPID || ISSTATE (myself, PID_STOPPED)))
+  if (special_case = (/*VFORKPID || */ISSTATE (myself, PID_STOPPED)))
     /* nothing to do */;
   else if (tls && sigismember (&tls->sigwait_mask, si.si_signo))
     insigwait_mask = true;
@@ -1097,7 +1079,6 @@ static void
 signal_exit (int rc)
 {
   EnterCriticalSection (&exit_lock);
-  rc = EXIT_SIGNAL | (rc << 8);
   if (exit_already++)
     myself->exit (rc);
 
