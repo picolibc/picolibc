@@ -69,7 +69,11 @@ typedef CHAR *PCHAR,*LPCH,*PCH,*NPSTR,*LPSTR,*PSTR;
 typedef CONST CHAR *LPCCH,*PCSTR,*LPCSTR;
 #ifndef _TCHAR_DEFINED
 #define _TCHAR_DEFINED
-#ifdef _UNICODE
+#ifdef UNICODE
+/*
+ * NOTE: This tests UNICODE, which is different from the _UNICODE define
+ *       used to differentiate standard C runtime calls.
+ */
 typedef WCHAR TCHAR;
 #else
 typedef CHAR TCHAR;
@@ -78,27 +82,24 @@ typedef CHAR TCHAR;
 typedef TCHAR TBYTE,*PTCH,*PTBYTE;
 typedef TCHAR *LPTCH,*PTSTR,*LPTSTR,*LP,*PTCHAR;
 typedef const TCHAR *LPCTSTR;
-#ifdef _UNICODE
+#ifdef UNICODE
 /*
  * __TEXT is a private macro whose specific use is to force the expansion of a
- * macro passed as an argument to the macros _T or _TEXT.  DO NOT use this
+ * macro passed as an argument to the macro TEXT.  DO NOT use this
  * macro within your programs.  It's name and function could change without
  * notice.
  */
-#undef __TEXT
 #define __TEXT(q) L##q
 #else
-#undef __TEXT
 #define __TEXT(q) q
 #endif
 /*
- * UNICODE a constant string when _UNICODE is defined else returns the string
- * unmodified.  Also defined in mingw/tchar.h.
+ * UNICODE a constant string when UNICODE is defined, else returns the string
+ * unmodified.
+ * The corresponding macros  _TEXT() and _T() for mapping _UNICODE strings
+ * passed to C runtime functions are defined in mingw/tchar.h
  */
-#undef _TEXT
-#define _TEXT(q) __TEXT(q)
-#undef _T
-#define _T(q) __TEXT(q)
+#define TEXT(q) __TEXT(q)    
 typedef SHORT *PSHORT;
 typedef LONG *PLONG;
 typedef void *HANDLE;
@@ -300,30 +301,30 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define DOMAIN_ALIAS_RID_PRINT_OPS	0x226L
 #define DOMAIN_ALIAS_RID_BACKUP_OPS	0x227L
 #define DOMAIN_ALIAS_RID_REPLICATOR	0x228L
-#define SE_CREATE_TOKEN_NAME	_TEXT("SeCreateTokenPrivilege")
-#define SE_ASSIGNPRIMARYTOKEN_NAME	_TEXT("SeAssignPrimaryTokenPrivilege")
-#define SE_LOCK_MEMORY_NAME	_TEXT("SeLockMemoryPrivilege")
-#define SE_INCREASE_QUOTA_NAME	_TEXT("SeIncreaseQuotaPrivilege")
-#define SE_UNSOLICITED_INPUT_NAME	_TEXT("SeUnsolicitedInputPrivilege")
-#define SE_MACHINE_ACCOUNT_NAME _TEXT("SeMachineAccountPrivilege")
-#define SE_TCB_NAME	_TEXT("SeTcbPrivilege")
-#define SE_SECURITY_NAME	_TEXT("SeSecurityPrivilege")
-#define SE_TAKE_OWNERSHIP_NAME	_TEXT("SeTakeOwnershipPrivilege")
-#define SE_LOAD_DRIVER_NAME	_TEXT("SeLoadDriverPrivilege")
-#define SE_SYSTEM_PROFILE_NAME	_TEXT("SeSystemProfilePrivilege")
-#define SE_SYSTEMTIME_NAME	_TEXT("SeSystemtimePrivilege")
-#define SE_PROF_SINGLE_PROCESS_NAME	_TEXT("SeProfileSingleProcessPrivilege")
-#define SE_INC_BASE_PRIORITY_NAME	_TEXT("SeIncreaseBasePriorityPrivilege")
-#define SE_CREATE_PAGEFILE_NAME _TEXT("SeCreatePagefilePrivilege")
-#define SE_CREATE_PERMANENT_NAME	_TEXT("SeCreatePermanentPrivilege")
-#define SE_BACKUP_NAME _TEXT("SeBackupPrivilege")
-#define SE_RESTORE_NAME	_TEXT("SeRestorePrivilege")
-#define SE_SHUTDOWN_NAME	_TEXT("SeShutdownPrivilege")
-#define SE_DEBUG_NAME	_TEXT("SeDebugPrivilege")
-#define SE_AUDIT_NAME	_TEXT("SeAuditPrivilege")
-#define SE_SYSTEM_ENVIRONMENT_NAME	_TEXT("SeSystemEnvironmentPrivilege")
-#define SE_CHANGE_NOTIFY_NAME	_TEXT("SeChangeNotifyPrivilege")
-#define SE_REMOTE_SHUTDOWN_NAME	_TEXT("SeRemoteShutdownPrivilege")
+#define SE_CREATE_TOKEN_NAME	TEXT("SeCreateTokenPrivilege")
+#define SE_ASSIGNPRIMARYTOKEN_NAME	TEXT("SeAssignPrimaryTokenPrivilege")
+#define SE_LOCK_MEMORY_NAME	TEXT("SeLockMemoryPrivilege")
+#define SE_INCREASE_QUOTA_NAME	TEXT("SeIncreaseQuotaPrivilege")
+#define SE_UNSOLICITED_INPUT_NAME	TEXT("SeUnsolicitedInputPrivilege")
+#define SE_MACHINE_ACCOUNT_NAME TEXT("SeMachineAccountPrivilege")
+#define SE_TCB_NAME	TEXT("SeTcbPrivilege")
+#define SE_SECURITY_NAME	TEXT("SeSecurityPrivilege")
+#define SE_TAKE_OWNERSHIP_NAME	TEXT("SeTakeOwnershipPrivilege")
+#define SE_LOAD_DRIVER_NAME	TEXT("SeLoadDriverPrivilege")
+#define SE_SYSTEM_PROFILE_NAME	TEXT("SeSystemProfilePrivilege")
+#define SE_SYSTEMTIME_NAME	TEXT("SeSystemtimePrivilege")
+#define SE_PROF_SINGLE_PROCESS_NAME	TEXT("SeProfileSingleProcessPrivilege")
+#define SE_INC_BASE_PRIORITY_NAME	TEXT("SeIncreaseBasePriorityPrivilege")
+#define SE_CREATE_PAGEFILE_NAME TEXT("SeCreatePagefilePrivilege")
+#define SE_CREATE_PERMANENT_NAME	TEXT("SeCreatePermanentPrivilege")
+#define SE_BACKUP_NAME TEXT("SeBackupPrivilege")
+#define SE_RESTORE_NAME	TEXT("SeRestorePrivilege")
+#define SE_SHUTDOWN_NAME	TEXT("SeShutdownPrivilege")
+#define SE_DEBUG_NAME	TEXT("SeDebugPrivilege")
+#define SE_AUDIT_NAME	TEXT("SeAuditPrivilege")
+#define SE_SYSTEM_ENVIRONMENT_NAME	TEXT("SeSystemEnvironmentPrivilege")
+#define SE_CHANGE_NOTIFY_NAME	TEXT("SeChangeNotifyPrivilege")
+#define SE_REMOTE_SHUTDOWN_NAME	TEXT("SeRemoteShutdownPrivilege")
 #define LANG_NEUTRAL	0x00
 #define LANG_ARABIC 	0x01
 #define LANG_BULGARIAN 	0x02

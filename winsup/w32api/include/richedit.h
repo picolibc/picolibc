@@ -6,9 +6,9 @@ extern "C" {
 #pragma pack(push,4)
 
 #define RICHEDIT_CLASS "RichEdit20A"
-#define CF_RTF _TEXT("Rich Text Format")
-#define CF_RTFNOOBJS _TEXT("Rich Text Format Without Objects")
-#define CF_RETEXTOBJ _TEXT("RichEdit Text and Objects")
+#define CF_RTF TEXT("Rich Text Format")
+#define CF_RTFNOOBJS TEXT("Rich Text Format Without Objects")
+#define CF_RETEXTOBJ TEXT("RichEdit Text and Objects")
 #define CFM_BOLD	1
 #define CFM_ITALIC	2
 #define CFM_UNDERLINE	4

@@ -96,10 +96,10 @@ extern "C" {
 #define SAM_PASSWORD_CHANGE_NOTIFY_ROUTINE "PasswordChangeNotify"
 #define SAM_INIT_NOTIFICATION_ROUTINE "InitializeChangeNotify"
 #define SAM_PASSWORD_FILTER_ROUTINE "PasswordFilter"
-#define SE_INTERACTIVE_LOGON_NAME _TEXT("SeInteractiveLogonRight")
-#define SE_NETWORK_LOGON_NAME _TEXT("SeNetworkLogonRight")
-#define SE_BATCH_LOGON_NAME _TEXT("SeBatchLogonRight")
-#define SE_SERVICE_LOGON_NAME _TEXT("SeServiceLogonRight")
+#define SE_INTERACTIVE_LOGON_NAME TEXT("SeInteractiveLogonRight")
+#define SE_NETWORK_LOGON_NAME TEXT("SeNetworkLogonRight")
+#define SE_BATCH_LOGON_NAME TEXT("SeBatchLogonRight")
+#define SE_SERVICE_LOGON_NAME TEXT("SeServiceLogonRight")
 #define TRUST_ATTRIBUTE_NON_TRANSITIVE 1
 #define TRUST_ATTRIBUTE_UPLEVEL_ONLY 2
 #define TRUST_ATTRIBUTE_TREE_PARENT 4194304

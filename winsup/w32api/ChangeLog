@@ -1,4 +1,19 @@
 
+2001-02-21  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h: Revert TEXT change.
+	* include/lmalert.h: Ditto.
+	* include/lmcons.h: Ditto.
+	* include/lmsname.h: Ditto.
+	* include/lmsvc.h: Ditto.
+	* include/ntsecapi.h: Ditto.
+	* include/oledlg.h: Ditto.
+	* include/ras.h: Ditto.
+	* include/regstr.h: Ditto.
+	* include/richedit.h: Ditto.
+	* include/wininet.h: Ditto.
+	* include/winnt.h: Ditto.
+
 2001-02-15  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/commctrl.h: Use _TEXT() instead of TEXT() throughout.

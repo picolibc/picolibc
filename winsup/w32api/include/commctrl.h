@@ -11,7 +11,7 @@ extern "C" {
 #endif
 #endif
 
-#define DRAGLISTMSGSTRING _TEXT("commctrl_DragListMsg")
+#define DRAGLISTMSGSTRING TEXT("commctrl_DragListMsg")
 #define ANIMATE_CLASSW	L"SysAnimate32"
 #define ANIMATE_CLASSA	"SysAnimate32"
 #define HOTKEY_CLASSA	"msctls_hotkey32"
