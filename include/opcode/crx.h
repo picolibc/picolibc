@@ -168,10 +168,9 @@ operand_type;
 #define DIV_INS		 14
 #define COP_BRANCH_INS   15
 #define COP_REG_INS      16
-#define COPS_REG_INS     17
-#define DCR_BRANCH_INS   18
-#define MMC_INS          19
-#define MMU_INS          20
+#define DCR_BRANCH_INS   17
+#define MMC_INS          18
+#define MMU_INS          19
 
 /* Maximum value supported for instruction types.  */
 #define CRX_INS_MAX	(1 << 5)

@@ -1,5 +1,5 @@
 /* Internal definitions for configurable Xtensa ISA support.
-   Copyright 2003, 2004 Free Software Foundation, Inc.
+   Copyright 2003 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -17,215 +17,98 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-#ifndef XTENSA_ISA_INTERNAL_H
-#define XTENSA_ISA_INTERNAL_H
+/* Use the statically-linked version for the GNU tools.  */
+#define STATIC_LIBISA 1
 
-/* Flags.  */
+#define ISA_INTERFACE_VERSION 3
 
-#define XTENSA_OPERAND_IS_REGISTER	0x00000001
-#define XTENSA_OPERAND_IS_PCRELATIVE	0x00000002
-#define XTENSA_OPERAND_IS_INVISIBLE	0x00000004
-#define XTENSA_OPERAND_IS_UNKNOWN	0x00000008
+struct config_struct
+{
+    char *param_name;
+    char *param_value;
+};
 
-#define XTENSA_OPCODE_IS_BRANCH		0x00000001
-#define XTENSA_OPCODE_IS_JUMP		0x00000002
-#define XTENSA_OPCODE_IS_LOOP		0x00000004
-#define XTENSA_OPCODE_IS_CALL		0x00000008
+/* Encode/decode function types for immediate operands.  */
+typedef uint32 (*xtensa_immed_decode_fn) (uint32);
+typedef xtensa_encode_result (*xtensa_immed_encode_fn) (uint32 *);
 
-#define XTENSA_STATE_IS_EXPORTED	0x00000001
-
-#define XTENSA_INTERFACE_HAS_SIDE_EFFECT 0x00000001
-
-/* Function pointer typedefs */
-typedef void (*xtensa_format_encode_fn) (xtensa_insnbuf);
-typedef void (*xtensa_get_slot_fn) (const xtensa_insnbuf, xtensa_insnbuf);
-typedef void (*xtensa_set_slot_fn) (xtensa_insnbuf, const xtensa_insnbuf);
-typedef int (*xtensa_opcode_decode_fn) (const xtensa_insnbuf);
+/* Field accessor function types.  */
 typedef uint32 (*xtensa_get_field_fn) (const xtensa_insnbuf);
 typedef void (*xtensa_set_field_fn) (xtensa_insnbuf, uint32);
-typedef int (*xtensa_immed_decode_fn) (uint32 *);
-typedef int (*xtensa_immed_encode_fn) (uint32 *);
-typedef int (*xtensa_do_reloc_fn) (uint32 *, uint32);
-typedef int (*xtensa_undo_reloc_fn) (uint32 *, uint32);
-typedef void (*xtensa_opcode_encode_fn) (xtensa_insnbuf);
-typedef int (*xtensa_format_decode_fn) (const xtensa_insnbuf);
-typedef int (*xtensa_length_decode_fn) (const char *);
 
-typedef struct xtensa_format_internal_struct
-{
-  const char *name;			/* Instruction format name.  */
-  int length;				/* Instruction length in bytes.  */
-  xtensa_format_encode_fn encode_fn;
-  int num_slots;
-  int *slot_id;				/* Array[num_slots] of slot IDs.  */
-} xtensa_format_internal;
+/* PC-relative relocation function types.  */
+typedef uint32 (*xtensa_do_reloc_fn) (uint32, uint32);
+typedef uint32 (*xtensa_undo_reloc_fn) (uint32, uint32);
 
-typedef struct xtensa_slot_internal_struct
-{
-  const char *name;			/* Not necessarily unique.  */
-  const char *format;
-  int position;
-  xtensa_get_slot_fn get_fn;
-  xtensa_set_slot_fn set_fn;
-  xtensa_get_field_fn *get_field_fns;	/* Array[field_id].  */
-  xtensa_set_field_fn *set_field_fns;	/* Array[field_id].  */
-  xtensa_opcode_decode_fn opcode_decode_fn;
-  const char *nop_name;
-} xtensa_slot_internal;
+/* Instruction decode function type.  */
+typedef int (*xtensa_insn_decode_fn) (const xtensa_insnbuf);
+
+/* Instruction encoding template function type (each of these functions
+   returns a constant template; they exist only to make it easier for the
+   TIE compiler to generate endian-independent DLLs).  */
+typedef xtensa_insnbuf (*xtensa_encoding_template_fn) (void);
+
 
 typedef struct xtensa_operand_internal_struct
 {
-  const char *name;
-  int field_id;
-  xtensa_regfile regfile;		/* Register file.  */
-  int num_regs;				/* Usually 1; 2 for reg pairs, etc.  */
-  uint32 flags;				/* See XTENSA_OPERAND_* flags.  */
+  char *operand_kind;			/* e.g., "a", "f", "i", "l"....  */
+  char inout;				/* '<', '>', or '='.  */
+  char isPCRelative;			/* Is this a PC-relative offset?  */
+  xtensa_get_field_fn get_field;	/* Get encoded value of the field.  */
+  xtensa_set_field_fn set_field;	/* Set field with an encoded value.  */
   xtensa_immed_encode_fn encode;	/* Encode the operand value.  */
   xtensa_immed_decode_fn decode;	/* Decode the value from the field.  */
-  xtensa_do_reloc_fn do_reloc;		/* Perform a PC-relative reloc.  */
+  xtensa_do_reloc_fn do_reloc;		/* Perform a PC-relative relocation.  */
   xtensa_undo_reloc_fn undo_reloc;	/* Undo a PC-relative relocation.  */
 } xtensa_operand_internal;
 
-typedef struct xtensa_arg_internal_struct
-{
-  union {
-    int operand_id;			/* For normal operands.  */
-    xtensa_state state;			/* For stateOperands.  */
-  } u;
-  char inout;				/* Direction: 'i', 'o', or 'm'.  */
-} xtensa_arg_internal;
 
 typedef struct xtensa_iclass_internal_struct
 {
   int num_operands;			/* Size of "operands" array.  */
-  xtensa_arg_internal *operands;	/* Array[num_operands].  */
-
-  int num_stateOperands;		/* Size of "stateOperands" array.  */
-  xtensa_arg_internal *stateOperands;	/* Array[num_stateOperands].  */
-
-  int num_interfaceOperands;		/* Size of "interfaceOperands".  */
-  xtensa_interface *interfaceOperands;	/* Array[num_interfaceOperands].  */
+  xtensa_operand_internal **operands;	/* Array of operand structures.  */
 } xtensa_iclass_internal;
+
 
 typedef struct xtensa_opcode_internal_struct
 {
   const char *name;			/* Opcode mnemonic.  */
-  int iclass_id;			/* Iclass for this opcode.  */
-  uint32 flags;				/* See XTENSA_OPCODE_* flags.  */
-  xtensa_opcode_encode_fn *encode_fns;	/* Array[slot_id].  */
-  int num_funcUnit_uses;		/* Number of funcUnit_use entries.  */
-  xtensa_funcUnit_use *funcUnit_uses;	/* Array[num_funcUnit_uses].  */
+  int length;				/* Length in bytes of the insn.  */
+  xtensa_encoding_template_fn template;	/* Fn returning encoding template.  */
+  xtensa_iclass_internal *iclass;	/* Iclass for this opcode.  */
 } xtensa_opcode_internal;
 
-typedef struct xtensa_regfile_internal_struct
-{
-  const char *name;			/* Full name of the regfile.  */
-  const char *shortname;		/* Abbreviated name.  */
-  xtensa_regfile parent;		/* View parent (or identity).  */
-  int num_bits;				/* Width of the registers.  */
-  int num_entries;			/* Number of registers.  */
-} xtensa_regfile_internal;
 
-typedef struct xtensa_interface_internal_struct
+typedef struct opname_lookup_entry_struct
 {
-  const char *name;			/* Interface name.  */
-  int num_bits;				/* Width of the interface.  */
-  uint32 flags;				/* See XTENSA_INTERFACE_* flags.  */
-  char inout;				/* "i" or "o".  */
-} xtensa_interface_internal;
+  const char *key;			/* Opcode mnemonic.  */
+  xtensa_opcode opcode;			/* Internal opcode number.  */
+} opname_lookup_entry;
 
-typedef struct xtensa_funcUnit_internal_struct
-{
-  const char *name;			/* Functional unit name.  */
-  int num_copies;			/* Number of instances.  */
-} xtensa_funcUnit_internal;
-
-typedef struct xtensa_state_internal_struct
-{
-  const char *name;			/* State name.  */
-  int num_bits;				/* Number of state bits.  */
-  uint32 flags;				/* See XTENSA_STATE_* flags.  */
-} xtensa_state_internal;
-
-typedef struct xtensa_sysreg_internal_struct
-{
-  const char *name;			/* Register name.  */
-  int number;				/* Register number.  */
-  int is_user;				/* Non-zero if a "user register".  */
-} xtensa_sysreg_internal;
-
-typedef struct xtensa_lookup_entry_struct
-{
-  const char *key;
-  union
-  {
-    xtensa_opcode opcode;		/* Internal opcode number.  */
-    xtensa_sysreg sysreg;		/* Internal sysreg number.  */
-    xtensa_state state;			/* Internal state number.  */
-    xtensa_interface intf;		/* Internal interface number.  */
-    xtensa_funcUnit fun;		/* Internal funcUnit number.  */
-  } u;
-} xtensa_lookup_entry;
 
 typedef struct xtensa_isa_internal_struct
 {
   int is_big_endian;			/* Endianness.  */
   int insn_size;			/* Maximum length in bytes.  */
   int insnbuf_size;			/* Number of insnbuf_words.  */
-
-  int num_formats;
-  xtensa_format_internal *formats;
-  xtensa_format_decode_fn format_decode_fn;
-  xtensa_length_decode_fn length_decode_fn;
-
-  int num_slots;
-  xtensa_slot_internal *slots;
-
-  int num_fields;
-
-  int num_operands;
-  xtensa_operand_internal *operands;
-
-  int num_iclasses;
-  xtensa_iclass_internal *iclasses;
-
-  int num_opcodes;
-  xtensa_opcode_internal *opcodes;
-  xtensa_lookup_entry *opname_lookup_table;
-
-  int num_regfiles;
-  xtensa_regfile_internal *regfiles;
-
-  int num_states;
-  xtensa_state_internal *states;
-  xtensa_lookup_entry *state_lookup_table;
-
-  int num_sysregs;
-  xtensa_sysreg_internal *sysregs;
-  xtensa_lookup_entry *sysreg_lookup_table;
-
-  /* The current Xtensa ISA only supports 256 of each kind of sysreg so
-     we can get away with implementing lookups with tables indexed by
-     the register numbers.  If we ever allow larger sysreg numbers, this
-     may have to be reimplemented.  The first entry in the following
-     arrays corresponds to "special" registers and the second to "user"
-     registers.  */
-  int max_sysreg_num[2];
-  xtensa_sysreg *sysreg_table[2];
-
-  int num_interfaces;
-  xtensa_interface_internal *interfaces;
-  xtensa_lookup_entry *interface_lookup_table;
-
-  int num_funcUnits;
-  xtensa_funcUnit_internal *funcUnits;
-  xtensa_lookup_entry *funcUnit_lookup_table;
-
+  int num_opcodes;			/* Total number for all modules.  */
+  xtensa_opcode_internal **opcode_table;/* Indexed by internal opcode #.  */
+  int num_modules;			/* Number of modules (DLLs) loaded.  */
+  int *module_opcode_base;		/* Starting opcode # for each module.  */
+  xtensa_insn_decode_fn *module_decode_fn; /* Decode fn for each module.  */
+  opname_lookup_entry *opname_lookup_table; /* Lookup table for each module.  */
+  struct config_struct *config;		/* Table of configuration parameters.  */
+  int has_density;			/* Is density option available?  */
 } xtensa_isa_internal;
 
-extern int xtensa_isa_name_compare (const void *, const void *);
 
-extern xtensa_isa_status xtisa_errno;
-extern char xtisa_error_msg[];
+typedef struct xtensa_isa_module_struct
+{
+  int (*get_num_opcodes_fn) (void);
+  xtensa_opcode_internal **(*get_opcodes_fn) (void);
+  int (*decode_insn_fn) (const xtensa_insnbuf);
+  struct config_struct *(*get_config_table_fn) (void);
+} xtensa_isa_module;
 
-#endif /* !XTENSA_ISA_INTERNAL_H */
+extern xtensa_isa_module xtensa_isa_modules[];
+
