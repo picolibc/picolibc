@@ -393,6 +393,10 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
       goto done;
     }
 
+  /* If mode has no write bits set, we set the R/O attribute. */
+  if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
+    file_attributes |= FILE_ATTRIBUTE_READONLY;
+
   /* If the file should actually be created and ntsec is on,
      set files attributes. */
   if (flags & O_CREAT && get_device () == FH_DISK && allow_ntsec && has_acls ())

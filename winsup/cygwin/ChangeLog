@@ -1,3 +1,8 @@
+2002-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Set read-only bit in
+	file_attributes when adequate.
+
 2002-03-28  Christopher Faylor  <cgf@redhat.com>
 
 	* times.cc (gettimeofday): Fix typo in previous patch.
@@ -37,7 +42,7 @@
 	(winpids::add): Use PID_ALLPIDS when looking for all pids.
 	* cygwin.h (PID_ALLPIDS): New enum element.
 
-2002-03-15  Corinna Vinschen  <corina@vinschen.de>
+2002-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* glob.c (stat32_to_STAT): New function.   
 	(g_lstat): Call user space functions always with 32 bit struct stat
@@ -56,23 +61,23 @@
 	* poll.cc (poll): Remove variable open_fds.  Rearrange and add code to
 	fix settings of revents.
 
-2002-03-13  Corinna Vinschen  <corina@vinschen.de>
+2002-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap_record::map_map): Return -1 if VirtualProtect fails.
 	(list::erase): New method with no argument.  Erase latest record
 	added.
 	(mmap64): Fail if map_map() fails.
 
-2002-03-12  Corinna Vinschen  <corina@vinschen.de>
+2002-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sysconf.cc (sysconf): Fix condition.
 
-2002-03-11  Corinna Vinschen  <corina@vinschen.de>
+2002-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (msync): Check area given by addr and len for being a
 	contigeous mmap'd region.
 
-2002-03-11  Corinna Vinschen  <corina@vinschen.de>
+2002-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fork.cc (fork_child): Call fixup_mmaps_after_fork() before
 	closing parent process handle.  Call fixup_mmaps_after_fork()
@@ -82,7 +87,7 @@
 	In case of FILE_MAP_COPY access, copy valid memory regions to child.
 	* pinfo.h (fixup_mmaps_after_fork): Change prototype accordingly.
 
-2002-03-07  Corinna Vinschen  <corina@vinschen.de>
+2002-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (NetGetDCName): Add symbol.
 	(NetServerEnum): Remove symbol.
