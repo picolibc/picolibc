@@ -27,15 +27,29 @@ details. */
 #define PGBITS		(sizeof (DWORD)*8)
 #define MAPSIZE(pages)	howmany ((pages), PGBITS)
 
-#define MAP_SET(n)	(map_map_[(n)/PGBITS] |= (1L << ((n) % PGBITS)))
-#define MAP_CLR(n)	(map_map_[(n)/PGBITS] &= ~(1L << ((n) % PGBITS)))
-#define MAP_ISSET(n)	(map_map_[(n)/PGBITS] & (1L << ((n) % PGBITS)))
+#define MAP_SET(n)	(page_map_[(n)/PGBITS] |= (1L << ((n) % PGBITS)))
+#define MAP_CLR(n)	(page_map_[(n)/PGBITS] &= ~(1L << ((n) % PGBITS)))
+#define MAP_ISSET(n)	(page_map_[(n)/PGBITS] & (1L << ((n) % PGBITS)))
 
-/*
- * Simple class used to keep a record of all current
- * mmap areas in a process. Needed so that
- * they can be duplicated after a fork().
- */
+/* Used for accessing the page file (anonymous mmaps). */
+static fhandler_disk_file fh_paging_file;
+
+/* Class structure used to keep a record of all current mmap areas
+   in a process.  Needed for bookkeeping all mmaps in a process and
+   for duplicating all mmaps after fork() since mmaps are not propagated
+   to child processes by Windows.  All information must be duplicated
+   by hand, see fixup_mmaps_after_fork().
+  
+   The class structure:
+  
+   One member of class map per process, global variable mmapped_areas.
+   Contains a dynamic class list array.  Each list entry represents all
+   mapping to a file, keyed by file descriptor and file name hash.
+   Each list entry contains a dynamic class mmap_record array.  Each
+   mmap_record represents exactly one mapping.  For each mapping, there's
+   an additional so called `page_map'.  It's an array of bits, one bit
+   per mapped memory page.  The bit is set if the page is accessible,
+   unset otherwise. */
 
 class mmap_record
 {
@@ -46,7 +60,7 @@ class mmap_record
     _off64_t offset_;
     DWORD size_to_map_;
     caddr_t base_address_;
-    DWORD *map_map_;
+    DWORD *page_map_;
     device dev;
 
   public:
@@ -57,16 +71,13 @@ class mmap_record
        offset_ (o),
        size_to_map_ (s),
        base_address_ (b),
-       map_map_ (NULL)
+       page_map_ (NULL)
       {
 	dev.devn = 0;
 	if (fd >= 0 && !cygheap->fdtab.not_open (fd))
 	  dev = cygheap->fdtab[fd]->dev ();
       }
 
-    /* Default Copy constructor/operator=/destructor are ok */
-
-    /* Simple accessors */
     int get_fd () const { return fdesc_; }
     HANDLE get_handle () const { return mapping_handle_; }
     device& get_device () { return dev; }
@@ -74,22 +85,61 @@ class mmap_record
     DWORD get_offset () const { return offset_; }
     DWORD get_size () const { return size_to_map_; }
     caddr_t get_address () const { return base_address_; }
-    DWORD *get_map () const { return map_map_; }
-    void alloc_map (_off64_t off, DWORD len);
-    void free_map () { if (map_map_) cfree (map_map_); }
 
-    DWORD find_empty (DWORD pages);
-    _off64_t map_map (_off64_t off, DWORD len);
-    BOOL unmap_map (caddr_t addr, DWORD len);
-    void fixup_map (void);
+    bool alloc_page_map (_off64_t off, DWORD len);
+    void free_page_map () { if (page_map_) cfree (page_map_); }
+    void fixup_page_map (void);
+
+    DWORD find_unused_pages (DWORD pages);
+    _off64_t map_pages (_off64_t off, DWORD len);
+    BOOL unmap_pages (caddr_t addr, DWORD len);
     int access (caddr_t address);
 
     fhandler_base *alloc_fh ();
     void free_fh (fhandler_base *fh);
 };
 
+class list
+{
+  private:
+    mmap_record *recs;
+    int nrecs, maxrecs;
+    int fd;
+    DWORD hash;
+
+  public:
+    int get_fd () const { return fd; }
+    DWORD get_hash () const { return hash; }
+    mmap_record *get_record (int i) { return i >= nrecs ? NULL : recs + i; }
+
+    void set (int nfd);
+    mmap_record *add_record (mmap_record r, _off64_t off, DWORD len);
+    bool del_record (int i);
+    void free_recs () { if (recs) cfree (recs); }
+    mmap_record *search_record (_off64_t off, DWORD len);
+    long search_record (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
+		long start);
+};
+
+class map
+{
+  private:
+    list *lists;
+    int nlists, maxlists;
+
+  public:
+    list *get_list (int i) { return i >= nlists ? NULL : lists + i; }
+    list *get_list_by_fd (int fd);
+    list *add_list (int fd);
+    void del_list (int i);
+};
+
+/* This is the global map structure pointer.  It's allocated once on the
+   first call to mmap64(). */
+static map *mmapped_areas;
+
 DWORD
-mmap_record::find_empty (DWORD pages)
+mmap_record::find_unused_pages (DWORD pages)
 {
   DWORD mapped_pages = PAGE_CNT (size_to_map_);
   DWORD start;
@@ -109,12 +159,15 @@ mmap_record::find_empty (DWORD pages)
   return (DWORD)-1;
 }
 
-void
-mmap_record::alloc_map (_off64_t off, DWORD len)
+bool
+mmap_record::alloc_page_map (_off64_t off, DWORD len)
 {
   /* Allocate one bit per page */
-  map_map_ = (DWORD *) ccalloc (HEAP_MMAP, MAPSIZE (PAGE_CNT (size_to_map_)),
-			        sizeof (DWORD));
+  if (!(page_map_ = (DWORD *) ccalloc (HEAP_MMAP,
+				       MAPSIZE (PAGE_CNT (size_to_map_)),
+				       sizeof (DWORD))))
+    return false;
+
   if (wincap.virtual_protect_works_on_shared_pages ())
     {
       DWORD old_prot;
@@ -135,15 +188,16 @@ mmap_record::alloc_map (_off64_t off, DWORD len)
       while (len-- > 0)
 	MAP_SET (off + len);
     }
+  return true;
 }
 
 _off64_t
-mmap_record::map_map (_off64_t off, DWORD len)
+mmap_record::map_pages (_off64_t off, DWORD len)
 {
   /* Used ONLY if this mapping matches into the chunk of another already
      performed mapping in a special case of MAP_ANON|MAP_PRIVATE.
 
-     Otherwise it's job is now done by alloc_map(). */
+     Otherwise it's job is now done by alloc_page_map(). */
   DWORD prot, old_prot;
   switch (access_mode_)
     {
@@ -158,10 +212,10 @@ mmap_record::map_map (_off64_t off, DWORD len)
       break;
     }
 
-  debug_printf ("map_map (fd=%d, off=%D, len=%u)", fdesc_, off, len);
+  debug_printf ("map_pages (fd=%d, off=%D, len=%u)", fdesc_, off, len);
   len = PAGE_CNT (len);
 
-  if ((off = find_empty (len)) == (DWORD)-1)
+  if ((off = find_unused_pages (len)) == (DWORD)-1)
     return 0L;
   if (wincap.virtual_protect_works_on_shared_pages ()
       && !VirtualProtect (base_address_ + off * getpagesize (),
@@ -177,7 +231,7 @@ mmap_record::map_map (_off64_t off, DWORD len)
 }
 
 BOOL
-mmap_record::unmap_map (caddr_t addr, DWORD len)
+mmap_record::unmap_pages (caddr_t addr, DWORD len)
 {
   DWORD old_prot;
   DWORD off = addr - base_address_;
@@ -186,20 +240,20 @@ mmap_record::unmap_map (caddr_t addr, DWORD len)
   if (wincap.virtual_protect_works_on_shared_pages ()
       && !VirtualProtect (base_address_ + off * getpagesize (),
 			  len * getpagesize (), PAGE_NOACCESS, &old_prot))
-    syscall_printf ("-1 = unmap_map (): %E");
+    syscall_printf ("-1 = unmap_pages (): %E");
 
   for (; len-- > 0; ++off)
     MAP_CLR (off);
   /* Return TRUE if all pages are free'd which may result in unmapping
      the whole chunk. */
   for (len = MAPSIZE (PAGE_CNT (size_to_map_)); len > 0; )
-    if (map_map_[--len])
+    if (page_map_[--len])
       return FALSE;
   return TRUE;
 }
 
 void
-mmap_record::fixup_map ()
+mmap_record::fixup_page_map ()
 {
   if (!wincap.virtual_protect_works_on_shared_pages ())
     return;
@@ -232,8 +286,6 @@ mmap_record::access (caddr_t address)
   return MAP_ISSET (off);
 }
 
-static fhandler_disk_file fh_paging_file;
-
 fhandler_base *
 mmap_record::alloc_fh ()
 {
@@ -259,57 +311,38 @@ mmap_record::free_fh (fhandler_base *fh)
     cfree (fh);
 }
 
-class list {
-public:
-  mmap_record *recs;
-  int nrecs, maxrecs;
-  int fd;
-  DWORD hash;
-  list ();
-  ~list ();
-  mmap_record *add_record (mmap_record r, _off64_t off, DWORD len);
-  void erase (int i);
-  void erase ();
-  mmap_record *match (_off64_t off, DWORD len);
-  long match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
-	      long start);
-};
-
-list::list ()
-: nrecs (0), maxrecs (10), fd (0), hash (0)
-{
-  recs = (mmap_record *) cmalloc (HEAP_MMAP, 10 * sizeof (mmap_record));
-}
-
-list::~list ()
-{
-  for (mmap_record *rec = recs; nrecs-- > 0; ++rec)
-    rec->free_map ();
-  cfree (recs);
-}
-
 mmap_record *
 list::add_record (mmap_record r, _off64_t off, DWORD len)
 {
   if (nrecs == maxrecs)
     {
+      mmap_record *new_recs;
+      if (maxrecs == 0)
+        new_recs = (mmap_record *)
+			cmalloc (HEAP_MMAP, 5 * sizeof (mmap_record));
+      else
+	new_recs = (mmap_record *)
+			crealloc (recs, (maxrecs + 5) * sizeof (mmap_record));
+      if (!new_recs)
+        return NULL;
       maxrecs += 5;
-      recs = (mmap_record *) crealloc (recs, maxrecs * sizeof (mmap_record));
+      recs = new_recs;
     }
   recs[nrecs] = r;
-  recs[nrecs].alloc_map (off, len);
+  if (!recs[nrecs].alloc_page_map (off, len))
+    return NULL;
   return recs + nrecs++;
 }
 
 /* Used in mmap() */
 mmap_record *
-list::match (_off64_t off, DWORD len)
+list::search_record (_off64_t off, DWORD len)
 {
   if (fd == -1 && !off)
     {
       len = PAGE_CNT (len);
       for (int i = 0; i < nrecs; ++i)
-	if (recs[i].find_empty (len) != (DWORD)-1)
+	if (recs[i].find_unused_pages (len) != (DWORD)-1)
 	  return recs + i;
     }
   else
@@ -325,7 +358,7 @@ list::match (_off64_t off, DWORD len)
 
 /* Used in munmap() */
 long
-list::match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
+list::search_record (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
 	     _off_t start)
 {
   caddr_t low, high;
@@ -347,41 +380,27 @@ list::match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
 }
 
 void
-list::erase (int i)
+list::set (int nfd)
 {
-  recs[i].free_map ();
-  for (; i < nrecs-1; i++)
-    recs[i] = recs[i+1];
-  nrecs--;
+  if ((fd = nfd) != -1)
+    hash = cygheap->fdtab[fd]->get_namehash ();
+  nrecs = maxrecs = 0;
+  recs = NULL;
 }
 
-void
-list::erase ()
+bool
+list::del_record (int i)
 {
-  erase (nrecs-1);
-}
-
-class map {
-public:
-  list **lists;
-  int nlists, maxlists;
-  map ();
-  ~map ();
-  list *get_list_by_fd (int fd);
-  list *add_list (list *l, int fd);
-  void erase (int i);
-};
-
-map::map ()
-{
-  lists = (list **) cmalloc (HEAP_MMAP, 10 * sizeof (list *));
-  nlists = 0;
-  maxlists = 10;
-}
-
-map::~map ()
-{
-  cfree (lists);
+  if (i < nrecs)
+    {
+      recs[i].free_page_map ();
+      for (; i < nrecs - 1; i++)
+	recs[i] = recs[i + 1];
+      nrecs--;
+    }
+  /* Return true if the list is empty which allows the caller to remove
+     this list from the list array. */
+  return !nrecs;
 }
 
 list *
@@ -389,52 +408,49 @@ map::get_list_by_fd (int fd)
 {
   int i;
   for (i=0; i<nlists; i++)
-#if 0 /* The fd isn't sufficient since it could already be another file. */
-    if (lists[i]->fd == fd
-#else /* so we use the name hash value to identify the file unless
-	 it's not an anonymous mapping. */
-    if ((fd == -1 && lists[i]->fd == -1)
-	|| (fd != -1 && lists[i]->hash == cygheap->fdtab[fd]->get_namehash ()))
-#endif
-      return lists[i];
+    /* The fd isn't sufficient since it could already be the fd of another
+       file.  So we use the name hash value to identify the file unless
+       it's an anonymous mapping in which case the fd (-1) is sufficient. */
+    if ((fd == -1 && lists[i].get_fd () == -1)
+	|| (fd != -1
+	    && lists[i].get_hash () == cygheap->fdtab[fd]->get_namehash ()))
+      return lists + i;
   return 0;
 }
 
 list *
-map::add_list (list *l, int fd)
+map::add_list (int fd)
 {
-  l->fd = fd;
-  if (fd != -1)
-    l->hash = cygheap->fdtab[fd]->get_namehash ();
   if (nlists == maxlists)
     {
+      list *new_lists;
+      if (maxlists == 0)
+        new_lists = (list *) cmalloc (HEAP_MMAP, 5 * sizeof (list));
+      else
+	new_lists = (list *) crealloc (lists, (maxlists + 5) * sizeof (list));
+      if (!new_lists)
+        return NULL;
       maxlists += 5;
-      lists = (list **) crealloc (lists, maxlists * sizeof (list *));
+      lists = new_lists;
     }
-  lists[nlists++] = l;
-  return lists[nlists-1];
+  lists[nlists].set (fd);
+  return lists + nlists++;
 }
 
 void
-map::erase (int i)
+map::del_list (int i)
 {
-  for (; i < nlists-1; i++)
-    lists[i] = lists[i+1];
-  nlists--;
+  if (i < nlists)
+    {
+      lists[i].free_recs ();
+      for (; i < nlists - 1; i++)
+        lists[i] = lists[i + 1];
+      nlists--;
+    }
 }
 
-/*
- * Code to keep a record of all mmap'ed areas in a process.
- * Needed to duplicate tham in a child of fork().
- * mmap_record classes are kept in an STL list in an STL map, keyed
- * by file descriptor. This is *NOT* duplicated across a fork(), it
- * needs to be specially handled by the fork code.
- */
-
-static map *mmapped_areas;
-
-extern "C" caddr_t
-mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
+extern "C" void *
+mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 {
   syscall_printf ("addr %x, len %u, prot %x, flags %x, fd %d, off %D",
 		  addr, len, prot, flags, fd, off);
@@ -464,7 +480,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
   if (mmapped_areas == NULL)
     {
       /* First mmap call, create STL map */
-      mmapped_areas = new map;
+      mmapped_areas = (map *) ccalloc (HEAP_MMAP, 1, sizeof (map));
       if (mmapped_areas == NULL)
 	{
 	  set_errno (ENOMEM);
@@ -531,9 +547,9 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
   if (map_list && fd == -1 && off == 0 && !(flags & MAP_FIXED))
     {
       mmap_record *rec;
-      if ((rec = map_list->match (off, len)) != NULL)
+      if ((rec = map_list->search_record (off, len)) != NULL)
 	{
-	  if ((off = rec->map_map (off, len)) == (_off64_t)-1)
+	  if ((off = rec->map_pages (off, len)) == (_off64_t)-1)
 	    {
 	      syscall_printf ("-1 = mmap()");
 	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK|WRITE_LOCK, "mmap");
@@ -561,7 +577,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
       && (wincap.has_working_copy_on_write () || fd != -1))
     access = FILE_MAP_COPY;
 
-  caddr_t base = addr;
+  caddr_t base = (caddr_t)addr;
   /* This shifts the base address to the next lower 64K boundary.
      The offset is re-added when evaluating the return value. */
   if (base)
@@ -575,9 +591,8 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
       return MAP_FAILED;
     }
 
-  /* Now we should have a successfully mmapped area.
-     Need to save it so forked children can reproduce it.
-  */
+  /* At this point we should have a successfully mmapped area.
+     Now it's time for bookkeeping stuff. */
   if (fd == -1)
     gran_len = PAGE_CNT (gran_len) * getpagesize ();
   mmap_record mmap_rec (fd, h, access, gran_off, gran_len, base);
@@ -588,7 +603,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
   if (!map_list)
     {
       /* Create a new one */
-      map_list = new list;
+      map_list = mmapped_areas->add_list (fd);
       if (!map_list)
 	{
 	  fh->munmap (h, base, gran_len);
@@ -597,19 +612,28 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return MAP_FAILED;
 	}
-      map_list = mmapped_areas->add_list (map_list, fd);
   }
 
   /* Insert into the list */
-  mmap_record *rec = map_list->add_record (mmap_rec, off, len > gran_len ? gran_len : len);
+  mmap_record *rec = map_list->add_record (mmap_rec, off,
+					   len > gran_len ? gran_len : len);
+  if (!rec)
+    {
+      fh->munmap (h, base, gran_len);
+      set_errno (ENOMEM);
+      syscall_printf ("-1 = mmap(): ENOMEM");
+      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+      return MAP_FAILED;
+    }
+
   caddr_t ret = rec->get_address () + (off - gran_off);
   syscall_printf ("%x = mmap() succeeded", ret);
   ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
   return ret;
 }
 
-extern "C" caddr_t
-mmap (caddr_t addr, size_t len, int prot, int flags, int fd, _off_t off)
+extern "C" void *
+mmap (void *addr, size_t len, int prot, int flags, int fd, _off_t off)
 {
   return mmap64 (addr, len, prot, flags, fd, (_off64_t)off);
 }
@@ -617,7 +641,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, _off_t off)
 /* munmap () removes all mmapped pages between addr and addr+len. */
 
 extern "C" int
-munmap (caddr_t addr, size_t len)
+munmap (void *addr, size_t len)
 {
   syscall_printf ("munmap (addr %x, len %u)", addr, len);
 
@@ -640,27 +664,33 @@ munmap (caddr_t addr, size_t len)
 
   /* Iterate through the map, unmap pages between addr and addr+len
      in all maps. */
-
-  for (int it = 0; it < mmapped_areas->nlists; ++it)
+  list *map_list;
+  for (int list_idx = 0;
+       (map_list = mmapped_areas->get_list (list_idx));
+       ++list_idx)
     {
-      list *map_list = mmapped_areas->lists[it];
-      if (map_list)
+      long record_idx = -1;
+      caddr_t u_addr;
+      DWORD u_len;
+
+      while ((record_idx = map_list->search_record((caddr_t)addr, len, u_addr,
+      						   u_len, record_idx)) >= 0)
 	{
-	  long li = -1;
-	  caddr_t u_addr;
-	  DWORD u_len;
-
-	  while ((li = map_list->match(addr, len, u_addr, u_len, li)) >= 0)
+	  mmap_record *rec = map_list->get_record (record_idx);
+	  if (rec->unmap_pages (u_addr, u_len))
 	    {
-	      mmap_record *rec = map_list->recs + li;
-	      if (rec->unmap_map (u_addr, u_len))
-		{
-		  fhandler_base *fh = rec->alloc_fh ();
-		  fh->munmap (rec->get_handle (), addr, len);
-		  rec->free_fh (fh);
+	      /* The whole record has been unmapped, so... */
+	      fhandler_base *fh = rec->alloc_fh ();
+	      fh->munmap (rec->get_handle (), (caddr_t)addr, len);
+	      rec->free_fh (fh);
 
-		  /* Delete the entry. */
-		  map_list->erase (li);
+	      /* ...delete the record. */
+	      if (map_list->del_record (record_idx--))
+		{
+		  /* Yay, the last record has been removed from the list,
+		     we can remove the list now, too. */
+		  mmapped_areas->del_list (list_idx--);
+		  break;
 		}
 	    }
 	}
@@ -674,7 +704,7 @@ munmap (caddr_t addr, size_t len)
 /* Sync file with memory. Ignore flags for now. */
 
 extern "C" int
-msync (caddr_t addr, size_t len, int flags)
+msync (void *addr, size_t len, int flags)
 {
   syscall_printf ("addr = %x, len = %u, flags = %x",
 		  addr, len, flags);
@@ -701,33 +731,35 @@ msync (caddr_t addr, size_t len, int flags)
   /* Iterate through the map, looking for the mmapped area.
      Error if not found. */
 
-  for (int it = 0; it < mmapped_areas->nlists; ++it)
+  list *map_list;
+  for (int list_idx = 0;
+       (map_list = mmapped_areas->get_list (list_idx));
+       ++list_idx)
     {
-      list *map_list = mmapped_areas->lists[it];
-      if (map_list != 0)
+      mmap_record *rec;
+      for (int record_idx = 0;
+      	   (rec = map_list->get_record (record_idx));
+	   ++record_idx)
 	{
-	  for (int li = 0; li < map_list->nrecs; ++li)
+	  if (rec->access ((caddr_t)addr))
 	    {
-	      mmap_record *rec = map_list->recs + li;
-	      if (rec->access (addr))
-		{
-		  /* Check whole area given by len. */
-		  for (DWORD i = getpagesize (); i < len; ++i)
-		    if (!rec->access (addr + i))
-		      goto invalid_address_range;
-		  fhandler_base *fh = rec->alloc_fh ();
-		  int ret = fh->msync (rec->get_handle (), addr, len, flags);
-		  rec->free_fh (fh);
+	      /* Check whole area given by len. */
+	      for (DWORD i = getpagesize (); i < len; ++i)
+		if (!rec->access ((caddr_t)addr + i))
+		  goto invalid_address_range;
+	      fhandler_base *fh = rec->alloc_fh ();
+	      int ret = fh->msync (rec->get_handle (), (caddr_t)addr, len,
+	      			   flags);
+	      rec->free_fh (fh);
 
-		  if (ret)
-		    syscall_printf ("%d = msync(): %E", ret);
-		  else
-		    syscall_printf ("0 = msync()");
+	      if (ret)
+		syscall_printf ("%d = msync(): %E", ret);
+	      else
+		syscall_printf ("0 = msync()");
 
-		  ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK,
-				       "msync");
-		  return 0;
-		}
+	      ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK,
+				   "msync");
+	      return 0;
 	    }
 	}
     }
@@ -739,6 +771,62 @@ invalid_address_range:
 
   ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
   return -1;
+}
+
+/* Set memory protection */
+
+extern "C" int
+mprotect (void *addr, size_t len, int prot)
+{
+  DWORD old_prot;
+  DWORD new_prot = 0;
+
+  syscall_printf ("mprotect (addr %x, len %u, prot %x)", addr, len, prot);
+
+  if (!wincap.virtual_protect_works_on_shared_pages ()
+      && addr >= (caddr_t)0x80000000 && addr <= (caddr_t)0xBFFFFFFF)
+    {
+      syscall_printf ("0 = mprotect (9x: No VirtualProtect on shared memory)");
+      return 0;
+    }
+
+  switch (prot)
+    {
+      case PROT_READ | PROT_WRITE | PROT_EXEC:
+      case PROT_WRITE | PROT_EXEC:
+	new_prot = PAGE_EXECUTE_READWRITE;
+	break;
+      case PROT_READ | PROT_WRITE:
+      case PROT_WRITE:
+	new_prot = PAGE_READWRITE;
+	break;
+      case PROT_READ | PROT_EXEC:
+	new_prot = PAGE_EXECUTE_READ;
+	break;
+      case PROT_READ:
+	new_prot = PAGE_READONLY;
+	break;
+      case PROT_EXEC:
+	new_prot = PAGE_EXECUTE;
+	break;
+      case PROT_NONE:
+	new_prot = PAGE_NOACCESS;
+	break;
+      default:
+	syscall_printf ("-1 = mprotect (): invalid prot value");
+	set_errno (EINVAL);
+	return -1;
+     }
+
+  if (VirtualProtect (addr, len, new_prot, &old_prot) == 0)
+    {
+      __seterrno ();
+      syscall_printf ("-1 = mprotect (): %E");
+      return -1;
+    }
+
+  syscall_printf ("0 = mprotect ()");
+  return 0;
 }
 
 /*
@@ -900,62 +988,6 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
   return base == address;
 }
 
-/* Set memory protection */
-
-extern "C" int
-mprotect (caddr_t addr, size_t len, int prot)
-{
-  DWORD old_prot;
-  DWORD new_prot = 0;
-
-  syscall_printf ("mprotect (addr %x, len %u, prot %x)", addr, len, prot);
-
-  if (!wincap.virtual_protect_works_on_shared_pages ()
-      && addr >= (caddr_t)0x80000000 && addr <= (caddr_t)0xBFFFFFFF)
-    {
-      syscall_printf ("0 = mprotect (9x: No VirtualProtect on shared memory)");
-      return 0;
-    }
-
-  switch (prot)
-    {
-      case PROT_READ | PROT_WRITE | PROT_EXEC:
-      case PROT_WRITE | PROT_EXEC:
-	new_prot = PAGE_EXECUTE_READWRITE;
-	break;
-      case PROT_READ | PROT_WRITE:
-      case PROT_WRITE:
-	new_prot = PAGE_READWRITE;
-	break;
-      case PROT_READ | PROT_EXEC:
-	new_prot = PAGE_EXECUTE_READ;
-	break;
-      case PROT_READ:
-	new_prot = PAGE_READONLY;
-	break;
-      case PROT_EXEC:
-	new_prot = PAGE_EXECUTE;
-	break;
-      case PROT_NONE:
-	new_prot = PAGE_NOACCESS;
-	break;
-      default:
-	syscall_printf ("-1 = mprotect (): invalid prot value");
-	set_errno (EINVAL);
-	return -1;
-     }
-
-  if (VirtualProtect (addr, len, new_prot, &old_prot) == 0)
-    {
-      __seterrno ();
-      syscall_printf ("-1 = mprotect (): %E");
-      return -1;
-    }
-
-  syscall_printf ("0 = mprotect ()");
-  return 0;
-}
-
 /*
  * Call to re-create all the file mappings in a forked
  * child. Called from the child in initialization. At this
@@ -976,94 +1008,94 @@ fixup_mmaps_after_fork (HANDLE parent)
     return 0;
 
   /* Iterate through the map */
-  for (int it = 0; it < mmapped_areas->nlists; ++it)
+  list *map_list;
+  for (int list_idx = 0;
+       (map_list = mmapped_areas->get_list (list_idx));
+       ++list_idx)
     {
-      list *map_list = mmapped_areas->lists[it];
-      if (map_list)
+      mmap_record *rec;
+      for (int record_idx = 0;
+      	   (rec = map_list->get_record (record_idx));
+	   ++record_idx)
 	{
-	  int li;
-	  for (li = 0; li < map_list->nrecs; ++li)
+
+	  debug_printf ("fd %d, h %x, access %x, offset %D, size %u, address %p",
+	      rec->get_fd (), rec->get_handle (), rec->get_access (),
+	      rec->get_offset (), rec->get_size (), rec->get_address ());
+
+	  fhandler_base *fh = rec->alloc_fh ();
+	  BOOL ret = fh->fixup_mmap_after_fork (rec->get_handle (),
+						rec->get_access (),
+						rec->get_offset (),
+						rec->get_size (),
+						rec->get_address ());
+	  rec->free_fh (fh);
+
+	  if (!ret)
+	    return -1;
+	  if (rec->get_access () == FILE_MAP_COPY)
 	    {
-	      mmap_record *rec = map_list->recs + li;
+	      for (char *address = rec->get_address ();
+		   address < rec->get_address () + rec->get_size ();
+		   address += getpagesize ())
+		if (rec->access (address)
+		    && !ReadProcessMemory (parent, address, address,
+					   getpagesize (), NULL))
+		  {
+		    DWORD old_prot;
+		    DWORD last_error = GetLastError ();
 
-	      debug_printf ("fd %d, h %x, access %x, offset %D, size %u, address %p",
-		  rec->get_fd (), rec->get_handle (), rec->get_access (),
-		  rec->get_offset (), rec->get_size (), rec->get_address ());
-
-	      fhandler_base *fh = rec->alloc_fh ();
-	      BOOL ret = fh->fixup_mmap_after_fork (rec->get_handle (),
-						    rec->get_access (),
-						    rec->get_offset (),
-						    rec->get_size (),
-						    rec->get_address ());
-	      rec->free_fh (fh);
-
-	      if (!ret)
-		return -1;
-	      if (rec->get_access () == FILE_MAP_COPY)
-		{
-		  for (char *address = rec->get_address ();
-		       address < rec->get_address () + rec->get_size ();
-		       address += getpagesize ())
-		    if (rec->access (address)
-			&& !ReadProcessMemory (parent, address, address,
-					       getpagesize (), NULL))
+		    if (last_error != ERROR_PARTIAL_COPY
+			&& last_error != ERROR_NOACCESS
+			|| !wincap.virtual_protect_works_on_shared_pages ())
 		      {
-			DWORD old_prot;
-			DWORD last_error = GetLastError ();
+			system_printf ("ReadProcessMemory failed for "
+				       "MAP_PRIVATE address %p, %E",
+				       rec->get_address ());
+			return -1;
+		      }
+		    if (!VirtualProtectEx (parent,
+					   address, getpagesize (),
+					   PAGE_READONLY, &old_prot))
+		      {
+			system_printf ("VirtualProtectEx failed for "
+				       "MAP_PRIVATE address %p, %E",
+				       rec->get_address ());
+			return -1;
+		      }
+		    else
+		      {
+			BOOL ret;
+			DWORD dummy_prot;
 
-			if (last_error != ERROR_PARTIAL_COPY
-			    && last_error != ERROR_NOACCESS
-			    || !wincap.virtual_protect_works_on_shared_pages ())
+			ret = ReadProcessMemory (parent, address, address,
+						 getpagesize (), NULL);
+			if (!VirtualProtectEx(parent,
+					      address, getpagesize (),
+					      old_prot, &dummy_prot))
+			  system_printf ("WARNING: VirtualProtectEx to "
+					 "return to previous state "
+					 "in parent failed for "
+					 "MAP_PRIVATE address %p, %E",
+					 rec->get_address ());
+			if (!VirtualProtect (address, getpagesize (),
+					     old_prot, &dummy_prot))
+			  system_printf ("WARNING: VirtualProtect to copy "
+					 "protection to child failed for"
+					 "MAP_PRIVATE address %p, %E",
+					 rec->get_address ());
+			if (!ret)
 			  {
-			    system_printf ("ReadProcessMemory failed for "
+			    system_printf ("ReadProcessMemory (2nd try) "
+					   "failed for "
 					   "MAP_PRIVATE address %p, %E",
 					   rec->get_address ());
 			    return -1;
-			  }
-			if (!VirtualProtectEx (parent,
-					       address, getpagesize (),
-					       PAGE_READONLY, &old_prot))
-			  {
-			    system_printf ("VirtualProtectEx failed for "
-					   "MAP_PRIVATE address %p, %E",
-					   rec->get_address ());
-			    return -1;
-			  }
-			else
-			  {
-			    BOOL ret;
-			    DWORD dummy_prot;
-
-			    ret = ReadProcessMemory (parent, address, address,
-						     getpagesize (), NULL);
-			    if (!VirtualProtectEx(parent,
-						  address, getpagesize (),
-						  old_prot, &dummy_prot))
-			      system_printf ("WARNING: VirtualProtectEx to "
-					     "return to previous state "
-					     "in parent failed for "
-					     "MAP_PRIVATE address %p, %E",
-					     rec->get_address ());
-			    if (!VirtualProtect (address, getpagesize (),
-						 old_prot, &dummy_prot))
-			      system_printf ("WARNING: VirtualProtect to copy "
-					     "protection to child failed for"
-					     "MAP_PRIVATE address %p, %E",
-					     rec->get_address ());
-			    if (!ret)
-			      {
-				system_printf ("ReadProcessMemory (2nd try) "
-					       "failed for "
-					       "MAP_PRIVATE address %p, %E",
-					       rec->get_address ());
-				return -1;
-			      }
 			  }
 		      }
-		}
-	      rec->fixup_map ();
+		  }
 	    }
+	  rec->fixup_page_map ();
 	}
     }
 

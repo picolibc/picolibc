@@ -142,11 +142,13 @@ totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
   dst->tv_sec = x / (long long) (1e6);
 }
 
+hires_ms gtod;
+UINT NO_COPY hires_ms::minperiod;
+
 /* FIXME: Make thread safe */
 extern "C" int
 gettimeofday (struct timeval *tv, struct timezone *tz)
 {
-  static hires_ms gtod;
   static bool tzflag;
   LONGLONG now = gtod.usecs (false);
   if (now == (LONGLONG) -1)
@@ -620,45 +622,45 @@ hires_us::usecs (bool justdelta)
   return justdelta ? now.QuadPart : primed_ft.QuadPart + now.QuadPart;
 }
 
-void
+UINT
 hires_ms::prime ()
 {
   TIMECAPS tc;
   FILETIME f;
-  int priority = GetThreadPriority (GetCurrentThread ());
-  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
 
-  if (timeGetDevCaps (&tc, sizeof (tc)) != TIMERR_NOERROR)
-    minperiod = 0;
-  else
+  if (!minperiod)
+    if (timeGetDevCaps (&tc, sizeof (tc)) != TIMERR_NOERROR)
+      minperiod = 1;
+    else
+      {
+	minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
+	timeBeginPeriod (minperiod);
+      }
+
+  if (!inited)
     {
-      minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
-      timeBeginPeriod (minperiod);
+      int priority = GetThreadPriority (GetCurrentThread ());
+      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+      initime_ms = timeGetTime ();
+      GetSystemTimeAsFileTime (&f);
+      SetThreadPriority (GetCurrentThread (), priority);
+
+      inited = 1;
+      initime_us.HighPart = f.dwHighDateTime;
+      initime_us.LowPart = f.dwLowDateTime;
+      initime_us.QuadPart -= FACTOR;
+      initime_us.QuadPart /= 10;
     }
-
-  initime_ms = timeGetTime ();
-  GetSystemTimeAsFileTime (&f);
-  SetThreadPriority (GetCurrentThread (), priority);
-
-  inited = 1;
-  initime_us.HighPart = f.dwHighDateTime;
-  initime_us.LowPart = f.dwLowDateTime;
-  initime_us.QuadPart -= FACTOR;
-  initime_us.QuadPart /= 10;
+  return minperiod;
 }
 
 LONGLONG
 hires_ms::usecs (bool justdelta)
 {
-  if (!inited)
+  if (!minperiod) /* NO_COPY variable */
     prime ();
   DWORD now = timeGetTime ();
   // FIXME: Not sure how this will handle the 49.71 day wrap around
   LONGLONG res = initime_us.QuadPart + ((LONGLONG) (now - initime_ms) * 1000);
   return res;
-}
-
-hires_ms::~hires_ms ()
-{
-  timeEndPeriod (minperiod);
 }

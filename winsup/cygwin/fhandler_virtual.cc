@@ -77,9 +77,9 @@ fhandler_virtual::opendir ()
 	  fd = this;
 	  fd->set_nohandle (true);
 	  dir->__d_dirent->d_fd = fd;
-	  dir->__d_u.__d_data.__fh = this;
+	  dir->__fh = this;
 	  dir->__d_cookie = __DIRENT_COOKIE;
-	  dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+	  dir->__handle = INVALID_HANDLE_VALUE;
 	  dir->__d_position = 0;
 	  dir->__d_dirhash = get_namehash ();
 
@@ -179,18 +179,18 @@ fhandler_virtual::read (void *ptr, size_t& len)
   if (openflags & O_DIROPEN)
     {
       set_errno (EISDIR);
-      (ssize_t) len = -1;
+      len = (size_t) -1;
       return;
     }
   if (!filebuf)
     {
-      (ssize_t) len = 0;
+      len = (size_t) 0;
       return;
     }
   if ((ssize_t) len > filesize - position)
-    (ssize_t) len = filesize - position;
+    len = (size_t) (filesize - position);
   if ((ssize_t) len < 0)
-    (ssize_t) len = 0;
+    len = 0;
   else
     memcpy (ptr, filebuf + position, len);
   position += len;

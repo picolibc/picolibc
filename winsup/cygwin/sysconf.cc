@@ -69,7 +69,6 @@ sysconf (int in)
 	  return 1;
 	/*FALLTHRU*/
       case _SC_PHYS_PAGES:
-      case _SC_AVPHYS_PAGES:
 	if (wincap.supports_smp ())
 	  {
 	    NTSTATUS ret;
@@ -100,11 +99,27 @@ sysconf (int in)
 	       }
 	      case _SC_PHYS_PAGES:
 		return sbi.NumberOfPhysicalPages;
-	      case _SC_AVPHYS_PAGES:
-		return sbi.HighestPhysicalPage - sbi.LowestPhysicalPage + 1;
 	      }
 	  }
 	break;
+      case _SC_AVPHYS_PAGES:
+        if (wincap.supports_smp ())
+	  {
+	    NTSTATUS ret;
+	    SYSTEM_PERFORMANCE_INFORMATION spi;
+	    if ((ret = NtQuerySystemInformation (SystemPerformanceInformation,
+						   (PVOID) &spi,
+						 sizeof spi, NULL))
+		  != STATUS_SUCCESS)
+	      {
+		__seterrno_from_win_error (RtlNtStatusToDosError (ret));
+		debug_printf ("NtQuerySystemInformation: ret = %d, "
+			      "Dos(ret) = %d",
+			      ret, RtlNtStatusToDosError (ret));
+		return -1;
+	      }
+	    return spi.AvailablePages;
+	  }
     }
 
   /* Invalid input or unimplemented sysconf name */

@@ -1,3 +1,48 @@
+2003-09-09  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sig_handle_tty_stop): Check parent PID_NOCLDSTOP
+	rather than erroneously checking *my own* sigtodo.
+	(set_process_mask): Remove pending_signals setting.
+	(sig_handle): Per SUSv3 allow any SIGCONT to clear stopped signals and
+	continue execution.  Accept a mask argument.
+	* pinfo.h: Remove signal enums.
+	(_pinfo::getsigmask): Simplify for now.
+	(_pinfo::setsigmask): Ditto.
+	(_pinfo::getsigtodo): Ditto.
+	(_pinfo::setthread2signal): Ditto.
+	(_pinfo::sendsig): New variable.
+	(_pinfo::sigtodo): Eliminate.
+	* signal.cc (kill_worker): Remove reference to thread2signal.
+	* sigproc.cc: Massive signal handling rewrite.
+	(sigelem): New class.
+	(pending_signals): Ditto.
+	(sigqueue): New variable.
+	(sigcatch_nonmain): Delete.
+	(sigcatch_main): Ditto.
+	(sigcatch_nosync): Ditto.
+	(pending_signals): Delete variable.
+	(sig_clear): Send negative signal to signal thread to clear it.
+	(sigpending): Send __SIGPENDING signal to signal thread to have it fill
+	out pending signal mask.
+	(sig_dispatch_pending): Check sigqueue.next flag to determine if
+	anything queued.
+	(sigproc_terminate): Remove semaphore stuff.  Just close write side of
+	signal pipe.
+	(sig_send): Rewrite to use new signal pipe stuff.
+	(wait_sig): Ditto.
+	(sig_set_pending): Delete.
+	(getevent): Delete.
+	(pending_signals::add): New function.
+	(pending_signals::del): Ditto.
+	(pending_signals::next): Ditto.
+	* sigproc.h: Move signal enum here.
+	(sig_dispatch_pending): Make this a standard c++ function rather than a
+	"C" function.
+	(sig_handle): Accept an extra argument.
+	* thread.cc (pthread::thread_init_wrapper): Remove nonsensical setting
+	of sigtodo to a local array (!?!).
+	(pthread_kill): Comment out calls to setthread2signal.
+
 2003-03-19  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (cygwin_attach_handle_to_fd): Eliminate unused variable.

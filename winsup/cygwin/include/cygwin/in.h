@@ -170,6 +170,7 @@ struct sockaddr_in
 
 #endif
 
+#ifdef USE_IPV6
 /* IPv6 definitions as we start to include them. This is just
    a beginning dont get excited 8) */
 struct in6_addr
@@ -184,4 +185,5 @@ struct sockaddr_in6
   unsigned long sin6_flowinfo;
   struct in6_addr sin6_addr;
 };
+#endif
 #endif	/* _CYGWIN_IN_H */

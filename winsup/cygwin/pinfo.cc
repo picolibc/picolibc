@@ -292,18 +292,27 @@ _pinfo::commune_recv ()
       {
 	unsigned n = 1;
 	CloseHandle (__fromthem); __fromthem = NULL;
-	for (char **a = __argv; *a; a++)
-	  n += strlen (*a) + 1;
+	extern int __argc_safe;
+	const char *argv[__argc_safe + 1];
+	for (int i = 0; i < __argc_safe; i++)
+	  {
+	    if (IsBadStringPtr (__argv[i], 0x7fffffff))
+	      argv[i] = "";
+	    else
+	      argv[i] = __argv[i];
+	    n += strlen (argv[i]) + 1;
+	  }
+	argv[__argc_safe] = NULL;
 	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
 	  {
 	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
 	    sigproc_printf ("WriteFile sizeof argv failed, %E");
 	  }
 	else
-	  for (char **a = __argv; *a; a++)
+	  for (const char **a = argv; *a; a++)
 	    if (!WriteFile (__tothem, *a, strlen (*a) + 1, &nr, NULL))
 	      {
-		sigproc_printf ("WriteFile arg %d failed, %E", a - __argv);
+		sigproc_printf ("WriteFile arg %d failed, %E", a - argv);
 		break;
 	      }
 	if (!WriteFile (__tothem, "", 1, &nr, NULL))

@@ -185,7 +185,7 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
   if (!(get_access () & GENERIC_READ))
     {
       set_errno (EINVAL);
-      (ssize_t) ulen = -1;
+      ulen = (size_t) -1;
       return;
     }
 
@@ -210,7 +210,7 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
 				 PAGE_READONLY)) != STATUS_SUCCESS)
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-      (ssize_t) ulen = -1;
+      ulen = (size_t) -1;
       return;
     }
 
@@ -219,7 +219,7 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
   if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-      (ssize_t) ulen = -1;
+      ulen = (size_t) -1;
       return;
     }
 

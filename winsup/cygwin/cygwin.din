@@ -141,6 +141,30 @@ alarm
 _alarm = alarm
 alphasort
 _alphasort = alphasort
+argz_add
+__argz_add = argz_add
+argz_add_sep
+__argz_add_sep = argz_add_sep
+argz_append
+__argz_append = argz_append
+argz_count
+__argz_count = argz_count
+argz_create
+__argz_create = argz_create
+argz_create_sep
+__argz_create_sep = argz_create_sep
+argz_delete
+__argz_delete = argz_delete
+argz_extract
+__argz_extract = argz_extract
+argz_insert
+__argz_insert = argz_insert
+argz_next
+__argz_next = argz_next
+argz_replace
+__argz_replace = argz_replace
+argz_stringify
+__argz_stringify = argz_stringify
 asctime
 _asctime = asctime
 asctime_r
@@ -265,6 +289,7 @@ cygwin32_detach_dll = cygwin_detach_dll
 cygwin_dll_init
 endprotoent = cygwin_endprotoent
 endservent = cygwin_endservent
+endusershell
 gethostbyaddr = cygwin_gethostbyaddr
 gethostbyname = cygwin_gethostbyname
 _gethostname = cygwin_gethostname
@@ -278,6 +303,7 @@ getservbyport = cygwin_getservbyport
 getservent = cygwin_getservent
 getsockname = cygwin_getsockname
 getsockopt = cygwin_getsockopt
+getusershell
 herror = cygwin_herror
 hstrerror = cygwin_hstrerror
 inet_addr = cygwin_inet_addr
@@ -311,6 +337,7 @@ cygwin_set_impersonation_token
 setprotoent = cygwin_setprotoent
 setservent = cygwin_setservent
 setsockopt = cygwin_setsockopt
+setusershell
 shutdown = cygwin_shutdown
 socket = cygwin_socket
 cygwin_split_path
@@ -323,6 +350,7 @@ cygwin_win32_to_posix_path_list_buf_size
 cygwin32_win32_to_posix_path_list_buf_size = cygwin_win32_to_posix_path_list_buf_size
 cygwin_winpid_to_pid
 cygwin32_winpid_to_pid = cygwin_winpid_to_pid
+daemon
 difftime
 _difftime = difftime
 dirfd
@@ -362,6 +390,18 @@ endpwent
 _endpwent = endpwent
 endutent
 _endutent = endutent
+envz_add
+__envz_add = envz_add
+envz_entry
+__envz_entry = envz_entry
+envz_get
+__envz_get = envz_get
+envz_merge
+__envz_merge = envz_merge
+envz_remove
+__envz_remove = envz_remove
+envz_strip
+__envz_strip = envz_strip
 erand48
 _erand48 = erand48
 erf
@@ -470,6 +510,7 @@ _fopen = fopen
 _fopen64 = fopen64
 fork
 _fork = fork
+forkpty
 fpathconf
 fprintf
 _fprintf = fprintf
@@ -777,7 +818,10 @@ _logbf = logbf
 logf
 _logf = logf
 login
+login_tty
 logout
+logwtmp
+updwtmp
 longjmp
 _longjmp = longjmp
 lrand48
@@ -878,6 +922,7 @@ opendir
 _opendir = opendir
 openlog
 _openlog = openlog
+openpty
 pathconf
 _pathconf = pathconf
 pause
@@ -1022,6 +1067,7 @@ remquo
 remquof
 rename
 _rename = rename
+revoke
 rewind
 _rewind = rewind
 rewinddir

@@ -1,6 +1,6 @@
 /* Posix dirent.h for WIN32.
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2002, 2003 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -23,7 +23,7 @@ struct dirent
   __ino64_t d_ino;	/* still junk but with more bits */
   long d_fd;		/* File descriptor of open directory.
 			   Used since Cygwin 1.3.3. */
-  __ino32_t old_d_ino;	/* Just for compatibility, it's junk */
+  unsigned __ino32;
   char d_name[256];	/* FIXME: use NAME_MAX? */
 };
 #else
@@ -33,7 +33,7 @@ struct dirent
   long d_version;
   ino_t d_ino;
   long d_fd;
-  unsigned long old_d_ino;
+  unsigned long __ino32;
   char d_name[256];
 };
 #else
@@ -51,6 +51,7 @@ struct dirent
 
 #define __DIRENT_COOKIE 0xdede4242
 
+#pragma pack(push,4)
 typedef struct __DIR
 {
   /* This is first to set alignment in non _COMPILING_NEWLIB case.  */
@@ -58,20 +59,12 @@ typedef struct __DIR
   struct dirent *__d_dirent;
   char *__d_dirname;		/* directory name with trailing '*' */
   _off_t __d_position;		/* used by telldir/seekdir */
-  unsigned long __d_dirhash;	/* hash of directory name for use by
-				   readdir */
-  union
-    {
-#ifdef __INSIDE_CYGWIN__
-      struct
-	{
-	  void *__handle;
-	  void *__fh;
-	} __d_data;
-#endif
-      char __d_filler[16];
-    } __d_u;
+  __ino64_t __d_dirhash;	/* hash of directory name for use by readdir */
+  void *__handle;
+  void *__fh;
+  unsigned __flags;
 } DIR;
+#pragma pack(pop)
 
 DIR *opendir (const char *);
 struct dirent *readdir (DIR *);

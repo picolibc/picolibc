@@ -74,6 +74,10 @@ fhandler_tty_CFLAGS:=-fomit-frame-pointer
 fhandler_virtual_CFLAGS:=-fomit-frame-pointer
 fhandler_windows_CFLAGS:=-fomit-frame-pointer
 fhandler_zero_CFLAGS:=-fomit-frame-pointer
+regcomp_CFLAGS=-fomit-frame-pointer
+regerror_CFLAGS=-fomit-frame-pointer
+regexec_CFLAGS=-fomit-frame-pointer
+regfree_CFLAGS=-fomit-frame-pointer
 
 CC:=@CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
@@ -144,9 +148,9 @@ DLL_IMPORTS:=$(w32api_lib)/libkernel32.a
 
 MT_SAFE_OBJECTS:=
 # Please maintain this list in sorted order, with maximum files per 80 col line
-DLL_OFILES:=assert.o autoload.o cxx.o cygheap.o cygthread.o dcrt0.o debug.o \
-	delqueue.o devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o \
-	exceptions.o exec.o external.o fcntl.o fhandler.o \
+DLL_OFILES:=assert.o autoload.o cxx.o bsdlib.o cygheap.o cygthread.o dcrt0.o \
+	debug.o delqueue.o devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o \
+	errno.o exceptions.o exec.o external.o fcntl.o fhandler.o \
 	fhandler_clipboard.o fhandler_console.o fhandler_disk_file.o \
 	fhandler_dsp.o fhandler_fifo.o fhandler_floppy.o fhandler_mem.o \
 	fhandler_nodevice.o fhandler_proc.o fhandler_process.o \

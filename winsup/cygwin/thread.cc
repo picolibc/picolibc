@@ -1786,12 +1786,11 @@ pthread::thread_init_wrapper (void *_arg)
 
   struct sigaction _sigs[NSIG];
   sigset_t _sig_mask;		/* one set for everything to ignore. */
-  LONG _sigtodo[NSIG + __SIGOFFSET];
 
   // setup signal structures
   thread->sigs = _sigs;
   thread->sigmask = &_sig_mask;
-  thread->sigtodo = _sigtodo;
+  thread->sigtodo = NULL;
 
   memset (&local_winsup, 0, sizeof (struct _winsup_t));
 
@@ -2784,8 +2783,10 @@ pthread_kill (pthread_t thread, int sig)
   if (!pthread::is_good_object (&thread))
     return EINVAL;
 
+#if 0
   if (thread->sigs)
     myself->setthread2signal (thread);
+#endif
 
   int rval = raise (sig);
 
@@ -2796,6 +2797,7 @@ pthread_kill (pthread_t thread, int sig)
 extern "C" int
 pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 {
+#if 0
   pthread *thread = pthread::self ();
 
   // lock this myself, for the use of thread2signal
@@ -2803,6 +2805,7 @@ pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 
   if (thread->sigs)
     myself->setthread2signal (thread);
+#endif
 
   int rval = sigprocmask (operation, set, old_set);
 

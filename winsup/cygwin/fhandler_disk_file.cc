@@ -612,7 +612,7 @@ fhandler_disk_file::opendir ()
 	  fd = this;
 	  fd->set_nohandle (true);
 	  dir->__d_dirent->d_fd = fd;
-	  dir->__d_u.__d_data.__fh = this;
+	  dir->__fh = this;
 	  /* FindFirstFile doesn't seem to like duplicate /'s. */
 	  len = strlen (dir->__d_dirname);
 	  if (len == 0 || isdirsep (dir->__d_dirname[len - 1]))
@@ -620,7 +620,7 @@ fhandler_disk_file::opendir ()
 	  else
 	    strcat (dir->__d_dirname, "\\*");  /**/
 	  dir->__d_cookie = __DIRENT_COOKIE;
-	  dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+	  dir->__handle = INVALID_HANDLE_VALUE;
 	  dir->__d_position = 0;
 	  dir->__d_dirhash = get_namehash ();
 
@@ -641,25 +641,25 @@ fhandler_disk_file::readdir (DIR *dir)
   HANDLE handle;
   struct dirent *res = NULL;
 
-  if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE
+  if (dir->__handle == INVALID_HANDLE_VALUE
       && dir->__d_position == 0)
     {
       handle = FindFirstFileA (dir->__d_dirname, &buf);
       DWORD lasterr = GetLastError ();
-      dir->__d_u.__d_data.__handle = handle;
+      dir->__handle = handle;
       if (handle == INVALID_HANDLE_VALUE && (lasterr != ERROR_NO_MORE_FILES))
 	{
 	  seterrno_from_win_error (__FILE__, __LINE__, lasterr);
 	  return res;
 	}
     }
-  else if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE)
+  else if (dir->__handle == INVALID_HANDLE_VALUE)
     return res;
-  else if (!FindNextFileA (dir->__d_u.__d_data.__handle, &buf))
+  else if (!FindNextFileA (dir->__handle, &buf))
     {
       DWORD lasterr = GetLastError ();
-      (void) FindClose (dir->__d_u.__d_data.__handle);
-      dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+      (void) FindClose (dir->__handle);
+      dir->__handle = INVALID_HANDLE_VALUE;
       /* POSIX says you shouldn't set errno when readdir can't
 	 find any more files; so, if another error we leave it set. */
       if (lasterr != ERROR_NO_MORE_FILES)
@@ -716,10 +716,10 @@ fhandler_disk_file::seekdir (DIR *dir, _off64_t loc)
 void
 fhandler_disk_file::rewinddir (DIR *dir)
 {
-  if (dir->__d_u.__d_data.__handle != INVALID_HANDLE_VALUE)
+  if (dir->__handle != INVALID_HANDLE_VALUE)
     {
-      (void) FindClose (dir->__d_u.__d_data.__handle);
-      dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+      (void) FindClose (dir->__handle);
+      dir->__handle = INVALID_HANDLE_VALUE;
     }
   dir->__d_position = 0;
 }
@@ -728,8 +728,8 @@ int
 fhandler_disk_file::closedir (DIR *dir)
 {
   int res = 0;
-  if (dir->__d_u.__d_data.__handle != INVALID_HANDLE_VALUE &&
-      FindClose (dir->__d_u.__d_data.__handle) == 0)
+  if (dir->__handle != INVALID_HANDLE_VALUE &&
+      FindClose (dir->__handle) == 0)
     {
       __seterrno ();
       res = -1;
@@ -747,12 +747,9 @@ fhandler_cygdrive::fhandler_cygdrive () :
 void
 fhandler_cygdrive::set_drives ()
 {
-  const int len = 1 + 26 * DRVSZ;
+  const int len = 2 + 26 * DRVSZ;
   char *p = const_cast<char *> (get_win32_name ());
   pdrive = p;
-  strcpy (p, ".");
-  strcpy (p + sizeof ("."), "..");
-  p += sizeof (".") + sizeof ("..");
   ndrives = GetLogicalDriveStrings (len, p) / DRVSZ;
 }
 

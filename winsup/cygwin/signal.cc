@@ -17,6 +17,7 @@ details. */
 #include <sys/cygwin.h>
 #include "sigproc.h"
 #include "pinfo.h"
+#include "hires.h"
 
 int sigcatchers;	/* FIXME: Not thread safe. */
 
@@ -73,20 +74,22 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
   sigframe thisframe (mainthread);
   pthread_testcancel ();
 
-  if (rqtp->tv_sec < 0 || rqtp->tv_nsec < 0 || rqtp->tv_nsec > 999999999)
+  if ((unsigned int) rqtp->tv_sec > (HIRES_DELAY_MAX / 1000 - 1)
+      || (unsigned int) rqtp->tv_nsec > 999999999)
     {
       set_errno (EINVAL);
       return -1;
     }
-
-  DWORD req = rqtp->tv_sec * 1000 + (rqtp->tv_nsec + 500000) / 1000000;
-  DWORD start_time = GetTickCount ();
-  DWORD end_time = start_time + req;
+  DWORD resolution = gtod.resolution ();
+  DWORD req = ((rqtp->tv_sec * 1000 + (rqtp->tv_nsec + 999999) / 1000000
+		+ resolution - 1) / resolution ) * resolution;
+  DWORD end_time = gtod.dmsecs () + req;
   syscall_printf ("nanosleep (%ld)", req);
 
   int rc = pthread::cancelable_wait (signal_arrived, req);
-  DWORD now = GetTickCount ();
-  DWORD rem = (rc == WAIT_TIMEOUT || now >= end_time) ? 0 : end_time - now;
+  DWORD rem;
+  if ((rem = end_time - gtod.dmsecs ()) > HIRES_DELAY_MAX)
+    rem = 0;
   if (rc == WAIT_OBJECT_0)
     {
       (void) thisframe.call_signal_handler ();
@@ -111,7 +114,7 @@ sleep (unsigned int seconds)
   req.tv_sec = seconds;
   req.tv_nsec = 0;
   nanosleep (&req, &rem);
-  return rem.tv_sec + (rem.tv_nsec + 500000000) / 1000000000;
+  return rem.tv_sec + (rem.tv_nsec > 0);
 }
 
 extern "C" unsigned int
@@ -178,8 +181,6 @@ kill_worker (pid_t pid, int sig)
       set_errno (ESRCH);
       return -1;
     }
-
-  dest->setthread2signal (NULL);
 
   if ((sendSIGCONT = (sig < 0)))
     sig = -sig;

@@ -11,12 +11,14 @@ details. */
 #include "winsup.h"
 #include <imagehlp.h>
 #include <stdlib.h>
+#include <setjmp.h>
 
 #include "exceptions.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
+#define NEED_VFORK
 #include "perthread.h"
 #include "shared_info.h"
 #include "perprocess.h"
@@ -611,14 +613,13 @@ sig_handle_tty_stop (int sig)
   if (my_parent_is_alive ())
     {
       pinfo parent (myself->ppid);
-      if (!(parent->getsig (SIGCHLD).sa_flags & SA_NOCLDSTOP))
+      if (NOTSTATE (parent, PID_NOCLDSTOP))
 	sig_send (parent, SIGCHLD);
     }
   sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
 		  myself->pid, sig, myself->ppid_handle);
   if (WaitForSingleObject (sigCONT, INFINITE) != WAIT_OBJECT_0)
     api_fatal ("WaitSingleObject failed, %E");
-  (void) ResetEvent (sigCONT);
   return;
 }
 }
@@ -963,7 +964,7 @@ set_process_mask (sigset_t newmask)
   sigproc_printf ("old mask = %x, new mask = %x", myself->getsigmask (), newmask);
   myself->setsigmask (newmask);	// Set a new mask
   mask_sync->release ();
-  if (oldmask != newmask)
+  if (oldmask & ~newmask)
     sig_dispatch_pending ();
   else
     sigproc_printf ("not calling sig_dispatch_pending.  sigtid %p current %p",
@@ -972,12 +973,33 @@ set_process_mask (sigset_t newmask)
 }
 
 int __stdcall
-sig_handle (int sig)
+sig_handle (int sig, sigset_t mask)
 {
+  if (sig == SIGCONT)
+    {
+      DWORD stopped = myself->process_state & PID_STOPPED;
+      myself->stopsig = 0;
+      myself->process_state &= ~PID_STOPPED;
+      /* Clear pending stop signals */
+      sig_clear (SIGSTOP);
+      sig_clear (SIGTSTP);
+      sig_clear (SIGTTIN);
+      sig_clear (SIGTTOU);
+      if (stopped)
+	SetEvent (sigCONT);
+    }
+
+  if (sig != SIGKILL && sig != SIGSTOP
+      && (sigismember (&mask, sig) || main_vfork->pid
+	  || ISSTATE (myself, PID_STOPPED)))
+    {
+      sigproc_printf ("signal %d blocked", sig);
+      return -1;
+    }
+
   int rc = 1;
 
-  sigproc_printf ("signal %d", sig);
-
+  sigproc_printf ("signal %d processing", sig);
   struct sigaction thissig = myself->getsig (sig);
   void *handler = (void *) thissig.sa_handler;
 
@@ -992,25 +1014,6 @@ sig_handle (int sig)
 
   if (sig == SIGSTOP)
     goto stop;
-
-  /* FIXME: Should we still do this if SIGCONT has a handler? */
-  if (sig == SIGCONT)
-    {
-      DWORD stopped = myself->process_state & PID_STOPPED;
-      myself->stopsig = 0;
-      myself->process_state &= ~PID_STOPPED;
-      /* Clear pending stop signals */
-      sig_clear (SIGSTOP);
-      sig_clear (SIGTSTP);
-      sig_clear (SIGTTIN);
-      sig_clear (SIGTTOU);
-      if (stopped)
-	SetEvent (sigCONT);
-      /* process pending signals */
-#if 0 // FIXME?
-      sig_dispatch_pending ();
-#endif
-    }
 
 #if 0
   char sigmsg[24];
@@ -1044,23 +1047,23 @@ sig_handle (int sig)
 
   goto dosig;
 
- stop:
+stop:
   /* Eat multiple attempts to STOP */
   if (ISSTATE (myself, PID_STOPPED))
     goto done;
   handler = (void *) sig_handle_tty_stop;
   thissig = myself->getsig (SIGSTOP);
 
- dosig:
+dosig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", sig, handler);
   rc = setup_handler (sig, handler, thissig);
 
- done:
+done:
   sigproc_printf ("returning %d", rc);
   return rc;
 
- exit_sig:
+exit_sig:
   if (sig == SIGQUIT || sig == SIGABRT)
     {
       CONTEXT c;

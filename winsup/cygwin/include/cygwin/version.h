@@ -210,12 +210,20 @@ details. */
        88: Export _getreent
        89: Export __mempcpy
        90: Export _fopen64
+       91: Export argz_add argz_add_sep argz_append argz_count argz_create
+	   argz_create_sep argz_delete argz_extract argz_insert
+	   argz_next argz_replace argz_stringify envz_add envz_entry
+	   envz_get envz_merge envz_remove envz_strip
+       92: Export getusershell, setusershell, endusershell
+       93: Export daemon, forkpty, openpty, iruserok, ruserok, login_tty,
+	   openpty, forkpty, revoke, logwtmp, updwtmp
+
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 90
+#define CYGWIN_VERSION_API_MINOR 93
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

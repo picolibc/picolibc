@@ -291,13 +291,13 @@ fhandler_registry::readdir (DIR * dir)
       res = dir->__d_dirent;
       goto out;
     }
-  if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE
+  if (dir->__handle == INVALID_HANDLE_VALUE
       && dir->__d_position == 0)
     {
       handle = open_key (path + 1, KEY_READ, false);
-      dir->__d_u.__d_data.__handle = handle;
+      dir->__handle = handle;
     }
-  if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE)
+  if (dir->__handle == INVALID_HANDLE_VALUE)
     goto out;
   if (dir->__d_position < SPECIAL_DOT_FILE_COUNT)
     {
@@ -311,12 +311,12 @@ retry:
     /* For the moment, the type of key is ignored here. when write access is added,
      * maybe add an extension for the type of each value?
      */
-    error = RegEnumValue ((HKEY) dir->__d_u.__d_data.__handle,
+    error = RegEnumValue ((HKEY) dir->__handle,
 			  (dir->__d_position & ~REG_ENUM_VALUES_MASK) >> 16,
 			  buf, &buf_size, NULL, NULL, NULL, NULL);
   else
     error =
-      RegEnumKeyEx ((HKEY) dir->__d_u.__d_data.__handle, dir->__d_position -
+      RegEnumKeyEx ((HKEY) dir->__handle, dir->__d_position -
 		    SPECIAL_DOT_FILE_COUNT, buf, &buf_size, NULL, NULL, NULL,
 		    NULL);
   if (error == ERROR_NO_MORE_ITEMS
@@ -329,8 +329,8 @@ retry:
     }
   if (error != ERROR_SUCCESS && error != ERROR_MORE_DATA)
     {
-      RegCloseKey ((HKEY) dir->__d_u.__d_data.__handle);
-      dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+      RegCloseKey ((HKEY) dir->__handle);
+      dir->__handle = INVALID_HANDLE_VALUE;
       if (error != ERROR_NO_MORE_ITEMS)
 	seterrno_from_win_error (__FILE__, __LINE__, error);
       goto out;
@@ -372,10 +372,10 @@ fhandler_registry::seekdir (DIR * dir, _off64_t loc)
 void
 fhandler_registry::rewinddir (DIR * dir)
 {
-  if (dir->__d_u.__d_data.__handle != INVALID_HANDLE_VALUE)
+  if (dir->__handle != INVALID_HANDLE_VALUE)
     {
-      (void) RegCloseKey ((HKEY) dir->__d_u.__d_data.__handle);
-      dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+      (void) RegCloseKey ((HKEY) dir->__handle);
+      dir->__handle = INVALID_HANDLE_VALUE;
     }
   dir->__d_position = 0;
   return;
@@ -385,8 +385,8 @@ int
 fhandler_registry::closedir (DIR * dir)
 {
   int res = 0;
-  if (dir->__d_u.__d_data.__handle != INVALID_HANDLE_VALUE &&
-      RegCloseKey ((HKEY) dir->__d_u.__d_data.__handle) != ERROR_SUCCESS)
+  if (dir->__handle != INVALID_HANDLE_VALUE &&
+      RegCloseKey ((HKEY) dir->__handle) != ERROR_SUCCESS)
     {
       __seterrno ();
       res = -1;

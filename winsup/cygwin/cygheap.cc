@@ -179,14 +179,14 @@ _csbrk (int sbs)
 {
   void *prebrk = cygheap_max;
   void *prebrka = pagetrunc (prebrk);
-  (char *) cygheap_max += sbs;
+  cygheap_max = (char *) cygheap_max + sbs;
   if (!sbs || (prebrk != prebrka && prebrka == pagetrunc (cygheap_max)))
     /* nothing to do */;
   else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
     {
       malloc_printf ("couldn't commit memory for cygwin heap, %E");
       __seterrno ();
-      (char *) cygheap_max -= sbs;
+      cygheap_max = (char *) cygheap_max - sbs;
       return NULL;
     }
 

@@ -3486,6 +3486,10 @@ conv_path_list_buf_size (const char *path_list, bool to_posix)
     + (num_elms * max_mount_path_len)
     + (nrel * strlen (to_posix ? pc.normalized_path : pc.get_win32 ()))
     + 100;
+
+  cfree (pc.normalized_path);		// FIXME - probably should be in a destructor but
+  					// it's hard to justify a destructor for the few
+   					// places where this is needed
   return size;
 }
 

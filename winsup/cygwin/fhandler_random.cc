@@ -119,7 +119,7 @@ fhandler_dev_random::read (void *ptr, size_t& len)
   if (!ptr)
     {
       set_errno (EINVAL);
-      (ssize_t) len = -1;
+      len = (size_t) -1;
       return;
     }
 
@@ -136,7 +136,7 @@ fhandler_dev_random::read (void *ptr, size_t& len)
     }
 
   __seterrno ();
-  (ssize_t) len = -1;
+  len = (size_t) -1;
 }
 
 _off64_t

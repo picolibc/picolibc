@@ -16,6 +16,18 @@ details. */
 #define EXIT_REPARENTING 0x020000
 #define EXIT_NOCLOSEALL  0x040000
 
+#ifdef NSIG
+enum
+{
+  __SIGFLUSH	    = -(NSIG + 1),
+  __SIGSTRACE	    = -(NSIG + 2),
+  __SIGCOMMUNE	    = -(NSIG + 3),
+  __SIGPENDING	    = -(NSIG + 4)
+};
+#endif
+
+#define SIG_BAD_MASK (1 << (SIGKILL - 1))
+
 enum procstuff
 {
   PROC_ADDCHILD		= 1,	// add a new subprocess to list
@@ -75,10 +87,10 @@ public:
     if (!oframe)
       t.get_winapi_lock ();
   }
-  inline void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
+  inline void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0), bool is_exception = 0)
   {
-    if (!t.frame && t.id == GetCurrentThreadId ())
-      set (t, ebp);
+    if (is_exception || (!t.frame && t.id == GetCurrentThreadId ()))
+      set (t, ebp, is_exception);
     else
       st = NULL;
   }
@@ -98,10 +110,10 @@ extern HANDLE signal_arrived;
 extern HANDLE sigCONT;
 
 BOOL __stdcall my_parent_is_alive ();
-extern "C" int __stdcall sig_dispatch_pending ();
+int __stdcall sig_dispatch_pending ();
 extern "C" void __stdcall set_process_mask (sigset_t newmask);
 extern "C" void __stdcall reset_signal_arrived ();
-int __stdcall sig_handle (int) __attribute__ ((regparm (1)));
+int __stdcall sig_handle (int, sigset_t) __attribute__ ((regparm (2)));
 void __stdcall sig_clear (int) __attribute__ ((regparm (1)));
 void __stdcall sig_set_pending (int) __attribute__ ((regparm (1)));
 int __stdcall handle_sigsuspend (sigset_t);

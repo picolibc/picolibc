@@ -40,6 +40,13 @@ unlockpt (int fd)
 }
 
 extern "C" int
+revoke (char *ttyname)
+{
+  set_errno (ENOSYS);
+  return -1;
+}
+
+extern "C" int
 ttyslot (void)
 {
   if (NOTSTATE (myself, PID_USETTY))

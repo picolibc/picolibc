@@ -633,15 +633,6 @@ fork ()
   grouped.hParent = grouped.first_dll = NULL;
   grouped.load_dlls = 0;
 
-  if (ISSTATE(myself, PID_SPLIT_HEAP))
-    {
-      system_printf ("The heap has been split, CYGWIN can't fork this process.");
-      system_printf ("Increase the heap_chunk_size in the registry and try again.");
-      set_errno (ENOMEM);
-      syscall_printf ("-1 = fork (), split heap");
-      return -1;
-    }
-
   void *esp;
   __asm__ volatile ("movl %%esp,%0": "=r" (esp));
 

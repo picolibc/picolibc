@@ -87,11 +87,11 @@ fhandler_windows::read (void *buf, size_t& len)
   if (len < sizeof (MSG))
     {
       set_errno (EINVAL);
-      (ssize_t) len = -1;
+      len = (size_t) -1;
       return;
     }
 
-  (ssize_t) len = GetMessage (ptr, hWnd_, 0, 0);
+  len = (size_t) GetMessage (ptr, hWnd_, 0, 0);
 
   if ((ssize_t) len == -1)
     __seterrno ();

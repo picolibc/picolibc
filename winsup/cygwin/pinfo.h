@@ -12,14 +12,6 @@ details. */
 #define _PINFO_H
 /* Signal constants (have to define them here, unfortunately) */
 
-enum
-{
-  __SIGFLUSH	    = -2,
-  __SIGSTRACE	    = -1,
-  __SIGCOMMUNE	    =  0,
-  __SIGOFFSET	    =  2
-};
-
 #define PSIZE 63
 
 #include <sys/resource.h>
@@ -119,24 +111,19 @@ public:
 
   inline sigset_t& getsigmask ()
   {
-    return thread2signal ? *thread2signal->sigmask : sig_mask;
+    return sig_mask;
   }
 
   inline void setsigmask (sigset_t mask)
   {
-    if (thread2signal)
-      *(thread2signal->sigmask) = mask;
     sig_mask = mask;
   }
 
-  inline LONG* getsigtodo (int sig) {return _sigtodo + __SIGOFFSET + sig;}
-
   inline HANDLE getthread2signal ()
   {
-    return thread2signal ? thread2signal->win32_obj_id : hMainThread;
+    return hMainThread;
   }
 
-  inline void setthread2signal (void *thr) {thread2signal = (pthread *) thr;}
   void commune_recv ();
   commune_result commune_send (DWORD, ...);
   bool alive ();
@@ -144,10 +131,10 @@ public:
 
   friend void __stdcall set_myself (pid_t, HANDLE);
 
+  /* signals */
+  HANDLE sendsig;
 private:
-  sigset_t sig_mask;		/* one set for everything to ignore. */
-  LONG _sigtodo[NSIG + __SIGOFFSET];
-  pthread *thread2signal;  // NULL means thread any other means a pthread
+  sigset_t sig_mask;
   CRITICAL_SECTION lock;
 };
 
