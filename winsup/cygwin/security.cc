@@ -230,19 +230,20 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
       (ret = NetGetDCName(NULL, primary, (LPBYTE *) &buf)) == STATUS_SUCCESS)
     {
       sys_wcstombs (name, buf, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      strcpy (logonserver, name);
       if (domain)
 	sys_wcstombs (domain, primary, INTERNET_MAX_HOST_NAME_LENGTH + 1);
     }
   else
     {
       sys_wcstombs (name, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      strcpy (logonserver, "\\\\");
+      strcat (logonserver, name);
       if (domain)
 	sys_wcstombs (domain, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
     }
   if (ret == STATUS_SUCCESS)
     NetApiBufferFree (buf);
-  strcpy (logonserver, "\\\\");
-  strcat (logonserver, name);
   return TRUE;
 }
 

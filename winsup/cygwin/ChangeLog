@@ -1,3 +1,8 @@
+Wed Apr 17 11:27:04 2002  Jason Tishler <jason@tishler.net>
+
+	* security.cc (get_lsa_srv_inf): Prevent extraneous backslashes for
+	the NT Domain case.
+
 2002-04-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_accept): Set socket type for accepted socket.
