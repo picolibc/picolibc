@@ -26,6 +26,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 mkinstalldirs = $(SHELL) $(srcdir)/../mkinstalldirs
 DISTFILES = Makefile.in configure configure.in \
+	mingw-fseek.c \
 	_Exit.c \
 	atoll.c \
 	dirent.c \
@@ -139,9 +140,12 @@ FENV_OBJS = fesetround.o  fegetround.o \
 	feraiseexcept.o fetestexcept.o fesetexceptflag.o
 POSIX_OBJS = \
 	dirent.o
+REPLACE_OBJS = \
+	mingw-fseek.o
 
 LIB_OBJS = $(Q8_OBJS) $(STDLIB_STUB_OBJS) $(STDIO_STUB_OBJS) \
-	$(MATH_OBJS) $(MATH_STUB_OBJS) $(FENV_OBJS) $(POSIX_OBJS) 
+	$(MATH_OBJS) $(MATH_STUB_OBJS) $(FENV_OBJS) $(POSIX_OBJS) \
+	$(REPLACE_OBJS)
 
 LIBS = $(LIBMINGWEX_A)
 DLLS = 

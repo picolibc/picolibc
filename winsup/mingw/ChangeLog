@@ -1,3 +1,19 @@
+2002-04-10  Danny Smith  <dannysmith@sourceforge.users.net>
+
+	* mingwex/mingw-fseek.c: New file, based on Mumit Khan
+	mingw-local patch to binutils.
+	Sun Nov  7 04:27:07 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+	(__mingw_fseek): New function to work around Win9x f/lseek bug.
+	(__mingw_fwrite): Likewise.
+	(__mingw_is_win9x): New helper function.
+	* include/stdio.h (__USE_MINGW_FSEEK): New define,guarding...
+	(__mingw_fseek): New prototype and define to replace fseek.
+	(__mingw_fwrite): New prototype and define to replace fwrite.
+	* mingwex/Makefile.in: Add mingw-fseek.o to libmingwex.a.
+
+	* moldname-crtdll.def: Remove CR from end of line.
+	* moldname-msvcrt.def: Ditto.
+
 2002-04-09  Danny Smith  <dannysmith@sourceforge.users.net>
 
 	* profile/configure.in (CRT0S): Configure name of gcrt?.o

@@ -261,6 +261,19 @@ int	fseek (FILE*, long, int);
 long	ftell (FILE*);
 void	rewind (FILE*);
 
+#ifdef __USE_MINGW_FSEEK  /* These are in libmingwex.a */
+/*
+ * Workaround for limitations on win9x where a file contents are
+ * not zero'd out if you seek past the end and then write.
+ */
+
+int __mingw_fseek (FILE *, long, int);
+int __mingw_fwrite (const void*, size_t, size_t, FILE*);
+#define fseek(fp, offset, whence)  __mingw_fseek(fp, offset, whence)
+#define fwrite(buffer, size, count, fp)  __mingw_fwrite(buffer, size, count, fp)
+#endif /* __USE_MINGW_FSEEK */
+
+
 /*
  * An opaque data type used for storing file positions... The contents of
  * this type are unknown, but we (the compiler) need to know the size
