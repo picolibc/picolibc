@@ -152,22 +152,31 @@ DESCRIPTION
 
 
 .Modifier   Type(s)
-.   h       d, i, o, u, x     convert input to short,
+.   hh      d, i, o, u, x, n  convert input to char,
+.                             store in char object
+.
+.   h       d, i, o, u, x, n  convert input to short,
 .                             store in short object
 .
 .   h       D, I, O, U, X     no effect
-.           e, f, c, s, n, p
+.           e, f, c, s, p
 .
-.   l       d, i, o, u, x     convert input to long,
+.   l       d, i, o, u, x, n  convert input to long,
 .                             store in long object
 .
 .   l       e, f, g           convert input to double
 .                             store in a double object
 .
 .   l       D, I, O, U, X     no effect
-.           c, s, n, p
+.           c, s, p
 .
-.   L       d, i, o, u, x     convert to long double,
+.   ll      d, i, o, u, x, n  convert to long long,
+.                             store in long long
+.
+.   L       d, i, o, u, x, n  convert to long long,
+.                             store in long long
+.
+.   L       e, f, g, E, G     convert to long double,
 .                             store in long double
 .
 .   L      all others         no effect

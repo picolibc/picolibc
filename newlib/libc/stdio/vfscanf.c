@@ -151,11 +151,12 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
  */
 
 #define	LONG		0x01	/* l: long or double */
-#define	LONGDBL		0x02	/* L: long double or long long */
+#define	LONGDBL		0x02	/* L/ll: long double or long long */
 #define	SHORT		0x04	/* h: short */
-#define	SUPPRESS	0x08	/* suppress assignment */
-#define	POINTER		0x10	/* weird %p pointer (`fake hex') */
-#define	NOSKIP		0x20	/* do not skip blanks */
+#define CHAR		0x08	/* hh: 8 bit integer */
+#define	SUPPRESS	0x10	/* suppress assignment */
+#define	POINTER		0x20	/* weird %p pointer (`fake hex') */
+#define	NOSKIP		0x40	/* do not skip blanks */
 
 /*
  * The following are used in numeric conversions only:
@@ -163,14 +164,14 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
  * SIGNOK, NDIGITS, PFXOK, and NZDIGITS are for integral.
  */
 
-#define	SIGNOK		0x40	/* +/- is (still) legal */
-#define	NDIGITS		0x80	/* no digits detected */
+#define	SIGNOK		0x80	/* +/- is (still) legal */
+#define	NDIGITS		0x100	/* no digits detected */
 
-#define	DPTOK		0x100	/* (float) decimal point is still legal */
-#define	EXPOK		0x200	/* (float) exponent (e+3, etc) still legal */
+#define	DPTOK		0x200	/* (float) decimal point is still legal */
+#define	EXPOK		0x400	/* (float) exponent (e+3, etc) still legal */
 
-#define	PFXOK		0x100	/* 0x prefix is (still) legal */
-#define	NZDIGITS	0x200	/* no zero digits detected */
+#define	PFXOK		0x200	/* 0x prefix is (still) legal */
+#define	NZDIGITS	0x400	/* no zero digits detected */
 
 /*
  * Conversion types.
@@ -262,6 +263,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   mbstate_t state;                /* value to keep track of multibyte state */
 #endif
 
+  char *cp;
   short *sp;
   int *ip;
   float *flp;
@@ -335,13 +337,25 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  flags |= SUPPRESS;
 	  goto again;
 	case 'l':
-	  flags |= LONG;
+	  if (*fmt == 'l')	/* Check for 'll' = long long (SUSv3) */
+	    {
+	      ++fmt;
+	      flags |= LONGDBL;
+	    }
+	  else
+	    flags |= LONG;
 	  goto again;
 	case 'L':
 	  flags |= LONGDBL;
 	  goto again;
 	case 'h':
-	  flags |= SHORT;
+	  if (*fmt == 'h')	/* Check for 'hh' = char int (SUSv3) */
+	    {
+	      ++fmt;
+	      flags |= CHAR;
+	    }
+	  else
+	    flags |= SHORT;
 	  goto again;
 
 	case '0':
@@ -440,7 +454,12 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	case 'n':
 	  if (flags & SUPPRESS)	/* ??? */
 	    continue;
-	  if (flags & SHORT)
+	  if (flags & CHAR)
+	    {
+	      cp = va_arg (ap, char *);
+	      *cp = nread;
+	    }
+	  else if (flags & SHORT)
 	    {
 	      sp = va_arg (ap, short *);
 	      *sp = nread;
@@ -808,6 +827,11 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
 	      if (flags & POINTER)
 		*(va_arg (ap, _PTR *)) = (_PTR) (unsigned _POINTER_INT) res;
+	      else if (flags & CHAR)
+		{
+		  cp = va_arg (ap, char *);
+		  *cp = res;
+		}
 	      else if (flags & SHORT)
 		{
 		  sp = va_arg (ap, short *);
