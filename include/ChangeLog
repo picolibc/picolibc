@@ -1,3 +1,43 @@
+2003-01-31  Grant Grundler  <grundler@dsl2.external.hp.com>
+
+        * hppa.h (ldwa, ldda): Add ordered opcodes.
+
+2003-01-26  Daniel Jacobowitz  <drow@mvista.com>
+
+	* hashtab.h (htab_alloc_with_arg, htab_free_with_arg): Add new types.
+	(struct htab): Add alloc_arg, alloc_with_arg_f, free_with_arg_f.
+	(htab_create_alloc_ex): New prototype.
+	(htab_set_functions_ex): New prototype.
+
+2003-01-25  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/sparc.h: Add TLS relocs.  Move R_SPARC_REV32 to 252.
+
+2003-01-20  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* coff/tic4x.h (TICOFF_TARGET_MACHINE_GET): Fixed define bug
+	* coff/ti.h (TICOFF_TARGET_MACHINE_GET): Added macros
+
+2002-07-17  Geoffrey Keating  <geoffk@redhat.com>
+
+	* splay-tree.h (GTY): Define if undefined.
+	(splay_tree_allocate_fn): Return PTR for compatibility, not void *.
+	(struct splay_tree_node_s): Support gengtype.
+	(struct splay_tree_s): Likewise.  Make allocate_data a PTR,
+	not a void *.
+
+2002-01-02  Ben Elliston  <bje@redhat.com>
+
+	* dis-asm.h (print_insn_iq2000): Declare.
+
+2002-12-24    Dmitry Diky <diwil@mail.ru>
+
+	* dis-asm.h: Add msp430 disassembler prototype.
+
+2002-12-27  Chris Demetriou  <cgd@broadcom.com>
+
+	* dis-asm.h (print_mips_disassembler_options): Prototype.
+
 2002-12-23  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (struct bfd_link_info): Add "strip_discarded".

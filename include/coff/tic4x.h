@@ -30,14 +30,14 @@
 /* We use COFF2.  */
 #define TICOFF_DEFAULT_MAGIC 	TICOFF2MAGIC 
 
-#define TICOFF_TARGET_MACHINE_GET (FLAGS) \
+#define TICOFF_TARGET_MACHINE_GET(FLAGS) \
   (((FLAGS) & F_VERS) ? bfd_mach_c4x : bfd_mach_c3x)
 
-#define TICOFF_TARGET_MACHINE_SET (FLAGSP, MACHINE)	\
+#define TICOFF_TARGET_MACHINE_SET(FLAGSP, MACHINE)	\
   do							\
     {							\
       if ((MACHINE) == bfd_mach_c4x)			\
-        *(FLAGSP) = F_VERS;				\
+        *(FLAGSP) |= F_VERS;				\
     }							\
   while (0)
 

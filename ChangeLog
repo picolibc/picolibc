@@ -1,3 +1,208 @@
+2003-02-06  Keith R Seitz  <keiths@redhat.com>
+
+	* Makefile.def: Remove "snavigator", "grep", and "db" modules.
+	* Makefile.tpl: Remove "all-snavigator" and "all-grep".
+	* Makefile.in: Regenerated.
+	* configure.in: Remove all traces of snavigator, db, and grep.
+	* configure: Regenerated.
+
+2003-01-31  Frank Ch. Eigler  <fche@redhat.com>
+
+	* Makefile.tpl (all-sid): Add libiberty/bfd/opcodes dependencies.
+	* Makefile.in: Regenerated.
+
+2003-01-30  Alexandre Oliva  <aoliva@redhat.com>
+
+	* config.if: Copy from GCC.
+
+2003-01-27  Phil Edwards  <pme@gcc.gnu.org>
+
+	* configure.in:  Revert 24Jan change.
+	* configure:  Regenerate.
+
+2003-01-23  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Revert previous change.
+	* configure: Regenerate.
+
+2003-01-23  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Make rda native-only.
+	* configure: Regenerate.
+
+2003-01-19  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Add missing \.
+	* configure: Rebuilt.
+
+2003-01-17  Jakub Jelinek  <jakub@redhat.com>
+
+	* configure.in (baseargs): Avoid using \| in sed regular
+	expressions.
+	* configure: Rebuilt.
+
+2003-01-16  Jakub Jelinek  <jakub@redhat.com>
+
+	* configure.in (baseargs): Remove all supported forms of
+	--cache-file, --srcdir, --host, --build and --target options
+	from argument lists.
+	* configure: Rebuilt.
+
+2003-01-15  Alexandre Oliva  <aoliva@redhat.com>
+
+	* configure.in (noconfigdirs): Don't skip gas on IRIX 6.
+	* configure: Rebuilt.
+
+2003-01-09  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Substitute TOPLEVEL_CONFIGURE_ARGUMENTS.
+	* Makefile.tpl: Pass TOPLEVEL_CONFIGURE_ARGUMENTS to gcc.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
+
+2003-01-09  Christian Cornelssen  <ccorn@cs.tu-berlin.de>
+
+	* Makefile.tpl (BASE_FLAGS_TO_PASS): Also pass DESTDIR.
+	(install-info, dir.info): Prepend $(DESTDIR) to $(infodir).
+	* Makefile.in: Regenerate.
+
+2003-01-09  Alexandre Oliva  <aoliva@redhat.com>
+
+	* configure.in: Remove Makefile in build, host and target modules
+	unless configure was run with --no-recursion.
+	* configure: Rebuilt.
+
+2003-01-08  Chris Demetriou  <cgd@broadcom.com>
+
+	* config.guess: Update to 2003-01-03 version.
+	* config.sub: Update to 2003-01-03 version.
+
+2003-01-07  Christopher Faylor  <cgf@redhat.com>
+
+	* configure: Regenerate with proper autoconf 2.13.
+
+2003-01-07  Christopher Faylor  <cgf@redhat.com>
+
+        * configure.in: Add AC_PREREQ for consistency.
+        * configure: Regenerate.
+
+2003-01-06  Andrew Cagney  <ac131313@redhat.com>
+
+	* configure.in (GDB_TK): Add tcl directories conditional on
+	gdb/gdbtk directory being present.
+	* configure: Regenerate.
+	
+2003-01-04 John David Anglin  <dave.anglin@nrc.ca>
+
+	* configure.in (LD): Improve test for gcc.  Try to set LD to the ld used
+	by gcc if LD is not defined and we are not doing a Canadian Cross.
+	* configure: Rebuilt.
+
+2003-01-01  Daniel Jacobowitz  <drow@mvista.com>
+
+	* src-release (ETC_SUPPORT): Add fdl.texi and texi2pod.pl.
+
+2002-12-31  Tom Tromey  <tromey@redhat.com>
+
+	* Makefile.in: Rebuilt.
+	* Makefile.def (target_modules) [libffi]: Allow installation.
+
+2002-12-31  Andreas Schwab  <schwab@suse.de>
+
+	* configure.in: Fix use of $program_transform_name.
+	* configure: Regenerated.
+
+2002-12-30  Daniel Jacobowitz  <drow@mvista.com>
+
+	* configure.in (baseargs): Don't remove first configure argument.
+	* configure: Regenerated.
+
+2002-12-29  Alexandre Oliva  <aoliva@redhat.com>
+
+	* Makefile.tpl (local-distclean): Don't remove...
+	(multilib.ts): ... this.  Moved into...
+	(multilib.out): ... this.  Don't use sub-make.
+	($(BUILD_SUBDIR)/[+module+]/Makefile, [+module+]/Makefile,
+	$(TARGET_SUBDIR)/[+module+]/Makefile, gcc/Makefile): Moved into...
+	(configure-build-[+module+], configure-[+module+],
+	configure-target-[+module+], configure-gcc): ... these.  Test
+	for Makefile existence.  Drop config.status from dependencies.
+	* Makefile.in: Rebuilt.
+	* configure.in: Move gcc-version-trigger to the end of
+	ac_configure_args.  Add comments to maybedep.tmp and
+	serdep.tmp.  Introduce --disable-serial-configure.  Remove
+	nonopt from baseargs, matching and removing corresponding
+	whitespace while at it.
+	* configure: Rebuilt.
+
+2002-12-28  Alexandre Oliva  <aoliva@redhat.com>
+
+	* configure.in (host_configargs): Replace reference to
+	no-longer-defined buildopts with --build=${build_alias}.
+	* configure: Rebuilt.
+
+2002-12-28  Alexandre Oliva  <aoliva@redhat.com>
+
+	* Makefile.tpl ($(NOTPARALLEL)): Move to the end.  Bring uses of
+	program_transform_name to standard idiom.
+	(AUTOGEN, AUTOCONF): Define.
+	(Makefile.in): Use $(AUTOGEN).
+	(Makefile): Depend on config.status, and use autoconf-style rule to
+	build it.  Move original commands to...
+	(config.status): ... this new target.
+	(configure): Add $(srcdir).  Depend on config/acx.m4.  Use
+	$(AUTOCONF).
+	* Makefile.in: Rebuilt.
+
+2002-12-28  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Fix dramatic bustage due to change in
+	program_transform_name.
+	* Makefile.in: Regenerate.
+
+	* configure.in: Remove unnecessary PATH setting.
+	* configure: Regnerate.
+
+	* configure.in: Don't default to unprefixed tools unless
+	the native tools will work.
+	* configure: Regenerate.
+
+	* configure.in: Convert to autoconf script.  Blow away lots
+	of now-redundant Makefile fragments.
+	* configure: Generate using Autoconf.
+	* Makefile.tpl: Rewrite to reflect autoconfiscation.
+	* Makefile.in: Regenerate.
+
+2002-12-27  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure: Remove unneeded 'export's.  Make CC_FOR_TARGET, 
+	CXX_FOR_TARGET, GCJ_FOR_TARGET substituted in configure.in only.
+
+	* ChangeLog: Move a couple of entries from here to winsup/cygwin, 
+	where they belong.
+
+2002-12-24  Andreas Schwab  <schwab@suse.de>
+
+	* Makefile.tpl (multilib.out): Fix missing space.
+	* Makefile.in: Regenerate.
+
+2002-12-23  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Use shared multilib.out.  Use move-if-change for it.
+	Convert (cd foo; make) to (cd foo && make).  Clean up multilib.out.
+	* Makefile.in: Regenerate.
+	* configure.in: Remove unnecessary leftovers.
+
+2002-12-22  Geoffrey Keating  <geoffk@apple.com>
+
+	* config/mt-aix43: Delete.
+
+2002-12-21  Geoffrey Keating  <geoffk@apple.com>
+
+	* configure.in (extra_ranlibflags_for_target): New variable.
+	(*-*-darwin): Add -c to ranlib commands.
+	* configure (tooldir): Handle extra_ranlibflags_for_target.
+
 2002-12-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.NEWLIB: Updated.

@@ -57,6 +57,14 @@ struct external_filehdr
 #error "TICOFF_TARGET_ARCH needs to be defined for your CPU"
 #endif
 
+#ifndef TICOFF_TARGET_MACHINE_GET
+#define TICOFF_TARGET_MACHINE_GET(FLAGS) 0
+#endif
+
+#ifndef TICOFF_TARGET_MACHINE_SET
+#define TICOFF_TARGET_MACHINE_SET(FLAGSP, MACHINE)
+#endif
+
 /* Default to COFF2 for file output */
 #ifndef TICOFF_DEFAULT_MAGIC
 #define TICOFF_DEFAULT_MAGIC TICOFF2MAGIC

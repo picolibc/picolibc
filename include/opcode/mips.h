@@ -1,5 +1,5 @@
 /* mips.h.  Mips opcode list for GDB, the GNU debugger.
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
+   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
    Free Software Foundation, Inc.
    Contributed by Ralph Campbell and OSF
    Commented and modified by Ian Lance Taylor, Cygnus Support
@@ -142,6 +142,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define OP_SH_VECBYTE		22
 #define OP_MASK_VECALIGN	0x7	/* Vector byte-align (alni.ob) op.  */
 #define OP_SH_VECALIGN		21
+#define OP_MASK_INSMSB		0x1f	/* "ins" MSB.  */
+#define OP_SH_INSMSB		11
+#define OP_MASK_EXTMSBD		0x1f	/* "ext" MSBD.  */
+#define OP_SH_EXTMSBD		11
+
+#define	OP_OP_COP0		0x10
+#define	OP_OP_COP1		0x11
+#define	OP_OP_COP2		0x12
+#define	OP_OP_COP3		0x13
+#define	OP_OP_LWC1		0x31
+#define	OP_OP_LWC2		0x32
+#define	OP_OP_LWC3		0x33	/* a.k.a. pref */
+#define	OP_OP_LDC1		0x35
+#define	OP_OP_LDC2		0x36
+#define	OP_OP_LDC3		0x37	/* a.k.a. ld */
+#define	OP_OP_SWC1		0x39
+#define	OP_OP_SWC2		0x3a
+#define	OP_OP_SWC3		0x3b
+#define	OP_OP_SDC1		0x3d
+#define	OP_OP_SDC2		0x3e
+#define	OP_OP_SDC3		0x3f	/* a.k.a. sd */
 
 /* Values in the 'VSEL' field.  */
 #define MDMX_FMTSEL_IMM_QH	0x1d
@@ -211,6 +232,15 @@ struct mips_opcode
    "J" 19 bit wait function code (OP_*_CODE19)
    "x" accept and ignore register name
    "z" must be zero register
+   "K" 5 bit Hardware Register (rdhwr instruction) (OP_*_RD)
+   "+A" 5 bit ins/ext position, which becomes LSB (OP_*_SHAMT).
+	Enforces: 0 <= pos < 32.
+   "+B" 5 bit ins size, which becomes MSB (OP_*_INSMSB).
+	Requires that "+A" occur first to set position.
+	Enforces: 0 < (pos+size) <= 32.
+   "+C" 5 bit ext size, which becomes MSBD (OP_*_EXTMSBD).
+	Requires that "+A" occur first to set position.
+	Enforces: 0 < (pos+size) <= 32.
 
    Floating point instructions:
    "D" 5 bit destination register (OP_*_FD)
@@ -230,6 +260,8 @@ struct mips_opcode
    "e" 5 bit vector register byte specifier (OP_*_VECBYTE)
    "%" 3 bit immediate vr5400 vector alignment operand (OP_*_VECALIGN)
    see also "k" above
+   "+D" Combined destination register ("G") and sel ("H") for CP0 ops,
+	for pretty-printing in disassembly only.
 
    Macro instructions:
    "A" General 32 bit expression
@@ -251,11 +283,16 @@ struct mips_opcode
    "()" parens surrounding optional value
    ","  separates operands
    "[]" brackets around index for vector-op scalar operand specifier (vr5400)
+   "+"  Start of extension sequence.
 
    Characters used so far, for quick reference when adding more:
-   "%[]<>(),"
-   "ABCDEFGHIJLMNOPQRSTUVWXYZ"
+   "%[]<>(),+"
+   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
    "abcdefhijklopqrstuvwxz"
+
+   Extension character sequences used so far ("+" followed by the
+   following), for quick reference when adding more:
+   "ABCD"
 */
 
 /* These are the bits which may be set in the pinfo field of an
@@ -336,17 +373,18 @@ struct mips_opcode
 
 /* Masks used to mark instructions to indicate which MIPS ISA level
    they were introduced in.  ISAs, as defined below, are logical
-   ORs of these bits, indicatingthat they support the instructions
+   ORs of these bits, indicating that they support the instructions
    defined at the given level.  */
 
 #define INSN_ISA_MASK		  0x00000fff
-#define INSN_ISA1                 0x00000010
-#define INSN_ISA2                 0x00000020
-#define INSN_ISA3                 0x00000040
-#define INSN_ISA4                 0x00000080
-#define INSN_ISA5                 0x00000100
-#define INSN_ISA32                0x00000200
-#define INSN_ISA64                0x00000400
+#define INSN_ISA1                 0x00000001
+#define INSN_ISA2                 0x00000002
+#define INSN_ISA3                 0x00000004
+#define INSN_ISA4                 0x00000008
+#define INSN_ISA5                 0x00000010
+#define INSN_ISA32                0x00000020
+#define INSN_ISA64                0x00000040
+#define INSN_ISA32R2              0x00000080
 
 /* Masks used for MIPS-defined ASEs.  */
 #define INSN_ASE_MASK		  0x0000f000
@@ -389,8 +427,11 @@ struct mips_opcode
 #define       ISA_MIPS3       (ISA_MIPS2 | INSN_ISA3)
 #define       ISA_MIPS4       (ISA_MIPS3 | INSN_ISA4)
 #define       ISA_MIPS5       (ISA_MIPS4 | INSN_ISA5)
+
 #define       ISA_MIPS32      (ISA_MIPS2 | INSN_ISA32)
 #define       ISA_MIPS64      (ISA_MIPS5 | INSN_ISA32 | INSN_ISA64)
+
+#define       ISA_MIPS32R2    (ISA_MIPS32 | INSN_ISA32R2)
 
 /* CPU defines, use instead of hardcoding processor number. Keep this
    in sync with bfd/archures.c in order for machine selection to work.  */
@@ -415,6 +456,7 @@ struct mips_opcode
 #define CPU_R12000	12000
 #define CPU_MIPS16	16
 #define CPU_MIPS32	32
+#define CPU_MIPS32R2	33
 #define CPU_MIPS5       5
 #define CPU_MIPS64      64
 #define CPU_SB1         12310201        /* octal 'SB', 01.  */
