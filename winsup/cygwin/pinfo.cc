@@ -132,7 +132,6 @@ _pinfo::exit (UINT n, bool norecord)
   sigproc_printf ("Calling ExitProcess %d", n);
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
-  myself.procinfo = NULL;	// This breaks the abstraction a little doesn't it?
   ExitProcess (exitcode);
 }
 

@@ -1,5 +1,13 @@
 2004-12-26  Christopher Faylor  <cgf@timesys.com>
 
+	* init.cc (dll_entry): Previous code reversion was ill-advised.  Revert
+	it.
+	* sigproc.cc (child_info::sync): Ditto.
+	* pinfo.cc (_pinfo::exit): Don't set myself.procinfo to NULL since it
+	is no longer required.
+
+2004-12-26  Christopher Faylor  <cgf@timesys.com>
+
 	* init.cc (dll_entry): Remove exit code setting.
 	* pinfo.cc (pinfo::init): Initialize exitcode to unset state rather
 	than SIGTERM.
