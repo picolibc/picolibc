@@ -652,7 +652,7 @@ case "$target_os" in
   CRT_ID=1
   MNO_CYGWIN=
   RUNTIME=crtdll
-  CRT0S=gcrt1.o
+  CRT0S="gcrt1.o gcrt2.o"
   ;;
 *cygwin*)
   CRT_ID=2
@@ -667,7 +667,7 @@ case "$target_os" in
   CRT_ID=2
   MNO_CYGWIN=
   RUNTIME=msvcrt
-  CRT0S=gcrt2.o
+  CRT0S="gcrt1.o gcrt2.o"
   ;;
 esac
 

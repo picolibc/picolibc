@@ -152,7 +152,6 @@ double	frexp (double, int*);
 double	modf (double, double*);
 double	fmod (double, double);
 
-
 #ifndef	__STRICT_ANSI__
 
 /* Complex number (for cabs) */
@@ -379,8 +378,9 @@ extern float truncf (float);
 
 
 /* fmax and fmin.
-   NaN arguments are treated as missing data: if one argument is a NaN and the other numeric, then the
-   these functions choose the numeric value.
+   NaN arguments are treated as missing data: if one argument is a NaN
+   and the other numeric, then the these functions choose the numeric
+   value.
 */
 
 extern double fmax  (double, double);

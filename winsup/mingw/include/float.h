@@ -191,7 +191,14 @@ unsigned int	_statusfp (void);	/* Report the FPU status word */
 #define		_clear87	_clearfp
 #define		_status87	_statusfp
 
-void		_fpreset (void);	/* Reset the FPU */
+
+/*
+   _fpreset initializes the control register to 0x27f,
+   the status register to zero and the tag word to 0FFFFh.
+   This differs from asm instruction fninit which sets control
+   word to 0x37f (64 bit mantissa precison rather than 53 bit)
+*/  
+void		_fpreset (void);
 void		fpreset (void);
 
 /* Global 'variable' for the current floating point error code. */

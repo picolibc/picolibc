@@ -1,3 +1,28 @@
+2002-04-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* CRT_fp8.c: New file.
+	* CRT_fp10.c: New file.
+	* crt1.c (__CRT_PC) Declare.
+	(__CRT_fesetenv): New static function, using _CRT_PC.
+	(__mingw_CRTStartup):Use __CRT_fesetenv instead of _fpreset.
+	(_gnu_exception_handler): Likewise.
+	* Makefile.in (CRT0S): Add CRT_fp10.o.
+	(MINGW_OBJS): Add  CRT_fp8.o.
+	(SRCDIST_FILES): Add CRT_fp8.c, CRT_fp10.c.
+	Add CRT_fp8.o, CRT_fp10.o dependancies.
+	* include/float.h (_fpreset): Expand comment.
+	* include/fenv.h (FE_PC64_ENV): New define for Intel x87
+	(extended precison) environmemt.
+	(FE_PC53_ENV): New define for MSVCRT default environmemt.
+	(FE_DFL_ENV): Define as FE_PC53_ENV.
+	* mingwex/fesetenv.c: Use FE_PC53_ENV, FE_PC64_ENV to determine
+	precision control for default environment.
+
+	* include/math.h: Fix long comment line.
+	* profile/configure.in (CRT0S): Set to both gcrt1.o and gcrt2.o
+	for mingw.
+	* profile/configure: Regenerate.
+
 2002-04-12  Danny Smith  <dannysmith@sourceforge.users.net>
 
 	* mingwex/Makefile.in (DISTFILES): Add suffix to wcstof.c.

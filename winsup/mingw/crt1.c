@@ -61,6 +61,21 @@ __MINGW_IMPORT void __set_app_type(int);
  */
 extern unsigned int _CRT_fmode;
 
+/*
+ * If the user links in CRT_fp10.o or a different object
+ * defining __CRT_PC this will override default FP precison set
+ * in CRT_fp8.o in libmingw.a.
+ */
+extern unsigned int __CRT_PC;
+static inline void
+__CRT_fesetenv (void)
+{
+  if (__CRT_PC == 8)
+    _fpreset();
+  else
+    __asm__ volatile ("fninit");
+}
+
 static void
 _mingw32_init_fmode ()
 {
@@ -136,7 +151,7 @@ _gnu_exception_handler (EXCEPTION_POINTERS * exception_data)
 	{
 	  signal (SIGFPE, SIG_IGN);
 	  if (reset_fpu)
-	    _fpreset ();
+	    __CRT_fesetenv();
 	  action = EXCEPTION_CONTINUE_EXECUTION;
 	}
       else if (old_handler != SIG_DFL)
@@ -172,7 +187,7 @@ __mingw_CRTStartup ()
   /*
    * Initialize floating point unit.
    */
-  _fpreset ();			/* Supplied by the runtime library. */
+  __CRT_fesetenv();
 
   /*
    * Set up __argc, __argv and _environ.
@@ -231,4 +246,3 @@ WinMainCRTStartup ()
 #endif
   __mingw_CRTStartup ();
 }
-

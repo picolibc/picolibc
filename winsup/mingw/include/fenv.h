@@ -44,9 +44,18 @@ typedef struct
 #define FE_TOWARDZERO	0x0c00
 
 
-/* The default floating point environment */
-#define FE_DFL_ENV ((const fenv_t *)-1)
+/*The C99 standard (7.6.9) allows us to define implementation-specific macros for
+  different fp environments */
+  
+/* The default Intel x87 floating point environment (64-bit mantissa) */
+#define FE_PC64_ENV ((const fenv_t *)-1)
 
+/* The floating point environment set by MSVCRT _fpreset (53-bit mantissa) */
+#define FE_PC53_ENV ((const fenv_t *)-2)
+
+/* The FE_DFL_ENV macro is required by standard. *
+/* For now, define the MSVCRT version as default. */
+#define FE_DFL_ENV FE_PC53_ENV
 
 #ifndef RC_INVOKED
 #ifdef __cplusplus
