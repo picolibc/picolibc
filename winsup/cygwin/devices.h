@@ -62,7 +62,7 @@ enum fh_devices
   FH_MAXNTAPE= FHDEV (DEV_TAPE_MAJOR, 255),
 
   DEV_SD_MAJOR = 8,
-  FH_SD      = FHDEV (8, 0),
+  FH_SD      = FHDEV (DEV_SD_MAJOR, 0),
 
   FH_MEM     = FHDEV (1, 1),
   FH_KMEM    = FHDEV (1, 2),	/* not implemented yet */

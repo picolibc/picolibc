@@ -77,11 +77,8 @@ extern char __declspec(dllimport) *__progname;
 #define IGNORE_FIRST	(*options == '-' || *options == '+')
 #define PRINT_ERROR	((opterr) && ((*options != ':') \
 				      || (IGNORE_FIRST && options[1] != ':')))
-#if defined(__CYGWIN__) || defined(__MINGW32__)
-# define IS_POSIXLY_CORRECT (1)
-#else
-# define IS_POSIXLY_CORRECT (getenv("POSIXLY_CORRECT") != NULL)
-#endif
+
+#define IS_POSIXLY_CORRECT (getenv("POSIXLY_INCORRECT_GETOPT") == NULL)
 
 #define PERMUTE         (!IS_POSIXLY_CORRECT && !IGNORE_FIRST)
 /* XXX: GNU ignores PC if *options == '-' */

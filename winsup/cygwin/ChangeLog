@@ -1,3 +1,18 @@
+2003-01-29  Christopher Faylor  <cgf@redhat.com>
+
+	* lib/getopt.c: Allow environment variable control of POSIXLY_CORRECT
+	behavior.
+
+2003-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::accept): On successful execution
+	set connection state of returned socket to CONNECTED.
+
+2003-01-27  Christopher Faylor  <cgf@redhat.com>
+
+	* passwd.cc (pwdgrp::parse_passwd): Be more unforgiving about
+	non-numeric fields.
+
 2003-01-26  Christopher Faylor  <cgf@redhat.com>
 
 	* uinfo.cc (pwdgrp::next_num): Remove check for NULL since it is no
@@ -70,7 +85,7 @@
 	* syscalls.cc (seteuid32): On Win95 get the pw entry. If it exists
 	update the euid and call cygheap->user.set_name. Remove special
 	handling of ILLEGAL_UID.
-	(setgid32): Add a debug_printf. On Win95, always set the egid. 
+	(setgid32): Add a debug_printf. On Win95, always set the egid.
 	Remove special handling of ILLEGAL_GID. Do not compare gid and gr_gid.
 	* child_info.h (class cygheap_exec_info): Remove uid.
 	* spawn.cc (spawn_guts): Do not set ciresrv.moreinfo->uid.
