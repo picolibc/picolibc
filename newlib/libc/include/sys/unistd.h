@@ -228,6 +228,12 @@ extern const unsigned _cygwin_X_OK;
 # define	_PC_ASYNC_IO            9
 # define	_PC_PRIO_IO            10
 # define	_PC_SYNC_IO            11
+#ifdef __CYGWIN__
+/* Ask for POSIX permission bits support. */
+# define	_PC_POSIX_PERMISSIONS   90
+/* Ask for full POSIX permission support including uid/gid settings. */
+# define	_PC_POSIX_SECURITY     91
+#endif
 
 /* FIXME: This is temporary until winsup gets sorted out.  */
 #ifdef __CYGWIN__
