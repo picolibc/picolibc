@@ -1140,6 +1140,30 @@ write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
       return -1;
     }
 
+  BOOL dummy;
+  cygpsid owner;
+
+  if (!GetSecurityDescriptorOwner (sd_buf, (PSID *) &owner, &dummy))
+    {
+      __seterrno ();
+      return -1;
+    }
+  /* Try turning privilege on, may not have WRITE_OWNER or WRITE_DAC access.
+     Must have privilege to set different owner, else BackupWrite misbehaves */
+  static int NO_COPY saved_res; /* 0: never, 1: failed, 2 & 3: OK */
+  int res;
+  if (!saved_res || cygheap->user.issetuid ())
+    {
+      res = 2 + set_process_privilege (SE_RESTORE_NAME, true,
+				       cygheap->user.issetuid ());
+      if (!cygheap->user.issetuid ())
+	saved_res = res;
+    }
+  else
+    res = saved_res;
+  if (res == 1 && owner != cygheap->user.sid ())
+    return -1;
+
   HANDLE fh;
   fh = CreateFile (file,
 		   WRITE_OWNER | WRITE_DAC,
@@ -1560,22 +1584,6 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
       return NULL;
     }
   owner_sid.debug_print ("alloc_sd: owner SID =");
-
-  /* Try turning privilege on, may not have WRITE_OWNER or WRITE_DAC access.
-     Must have privilege to set different owner, else BackupWrite misbehaves */
-  static int NO_COPY saved_res; /* 0: never, 1: failed, 2 & 3: OK */
-  int res;
-  if (!saved_res || cygheap->user.issetuid ())
-    {
-      res = 2 + set_process_privilege (SE_RESTORE_NAME, true,
-				       cygheap->user.issetuid ());
-      if (!cygheap->user.issetuid ())
-	saved_res = res;
-    }
-  else
-    res = saved_res;
-  if (res == 1 && owner_sid != cygheap->user.sid ())
-    return NULL;
 
   /* Get SID of new group. */
   cygsid group_sid;

@@ -1,3 +1,89 @@
+2003-02-07  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (try_to_debug): Set priority of current thread rather
+	than the main thread.  Make busy waiting loop less busy.  Restore
+	priority when function returns.
+
+2003-02-07  Christopher Faylor  <cgf@redhat.com>
+
+	* malloc.cc (DEFAULT_MMAP_THRESHOLD): Set high to avoid mmaps.
+
+2003-02-07  Christopher Faylor  <cgf@redhat.com>
+
+	* pipe.cc (fhandler_pipe::close): Avoid extraneous this->.
+
+2003-02-06  Christopher Faylor  <cgf@redhat.com>
+
+	* heap.cc (heap_init): Remove debugging code.
+
+2003-02-06  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.h: Introduce names UNKNOWN_UID and UNKNOWN_GID and delete
+	declaration of is_grp_member.
+	* uinfo.cc (internal_getlogin): Use UNKNOWN_GID.
+	* passwd.cc (pwdgrp::read_passwd): Use UNKNOWN_UID.
+	* grp.cc (pwdgrp::read_group): Change group name to provide better
+	feedback.
+	(getgrgid): Use gid16togid32.
+	* sec_helper.cc (is_grp_member): Delete.
+
+2003-02-05  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc: Change 'to_posix_p' to 'to_posix' throughout.
+	(conv_path_list_buf_size): Accommodate relative paths.
+
+2003-02-05  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (etc::dir_changed): Fix debug printf.
+
+2003-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (setacl): Move all permission settings to beginning of
+	loop.  Set default rights to same values as in alloc_sd().  Set DELETE
+	for owner and default owner only if S_IWOTH is given.
+
+2003-02-05  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* sec_acl.cc: Change all  __aclent16_t to  __aclent32_t except in
+	wrapper function definitions. Replace call to the aclXYZ functions by
+	calls aclXYZ32.
+	(searchace): Change type of third argument to __uid32_t and use
+	ILLEGAL_UID instead of -1;
+	(setacl): Remove some initializations. Only give STANDARD_RIGHTS_WRITE
+	for S_IWOTH. Replace -1 by ILLEGAL_UID.
+	(getacl): Change type of owner_sid, group_sid and ace_sid to cygpsid.
+	In last else clause, suppress second call to ace_sid.get_id and use
+	TRUE in first call. Replace EqualSid by ==.
+	(acl_access): Call internal_getgroups in USER and GROUP cases.
+	(acecmp: Define static.
+	(acl32): Create from 16 bit type.
+	(facl32): Ditto.
+	(lacl32): Ditto.
+	(aclcheck32): Ditto.
+	(aclsort32): Ditto.
+	(acltomode32): Ditto.
+	(aclfrommode32): Ditto.
+	(acltopbits32): Ditto.
+	(aclfrompbits32): Ditto.
+	(acltotext32): Ditto.
+	(aclfromtext32): Ditto, and use strechr.
+	(acl16to32): Create.
+	(acl): Make it a wrapper function.
+	(facl): Ditto.
+	(lacl): Ditto.
+	(aclcheck): Ditto.
+	(aclsort): Ditto.
+	(acltomode): Ditto.
+	(aclfrommode): Ditto.
+	(acltopbits): Ditto.
+	(aclfrompbits): Ditto.
+	(acltotext): Ditto.
+	(aclfromtext): Ditto.
+	* security.cc (write_sd): Call set_process_privilege and check
+	ownership.
+	(alloc_sd): Remove call to set_process_privilege and the owner check.
+
 2003-02-05  Christopher Faylor  <cgf@redhat.com>
 
 	* include/sys/cygwin.h: Use C-style comments.
@@ -48,7 +134,7 @@
 	* pwdgrp.h: Change arguments of internal_getpwsid,
 	internal_getgrsid and internal_getgroups to cygpsid.
 	* passwd.cc (internal_getpwsid): Change argument from cygsid to cygpsid.
-	* grp.cc (internal_getgrsid): Ditto. 
+	* grp.cc (internal_getgrsid): Ditto.
 	(internal_getgroups): Ditto.
 
 2003-02-03  Christopher Faylor  <cgf@redhat.com>

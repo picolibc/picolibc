@@ -223,47 +223,6 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, __uid32_t * uidret, __gid32
   return ret;
 }
 
-BOOL
-is_grp_member (__uid32_t uid, __gid32_t gid)
-{
-  struct passwd *pw;
-  struct __group32 *gr;
-  int idx;
-
-  /* Evaluate current user info by examining the info given in cygheap and
-     the current access token if ntsec is on. */
-  if (uid == myself->uid)
-    {
-      /* If gid == primary group of current user, return immediately. */
-      if (gid == myself->gid)
-	return TRUE;
-      /* Calling getgroups only makes sense when reading the access token. */
-      if (allow_ntsec)
-	{
-	  __gid32_t grps[NGROUPS_MAX];
-	  int cnt = internal_getgroups (NGROUPS_MAX, grps);
-	  for (idx = 0; idx < cnt; ++idx)
-	    if (grps[idx] == gid)
-	      return TRUE;
-	  return FALSE;
-	}
-    }
-
-  /* Otherwise try getting info from examining passwd and group files. */
-  if ((pw = internal_getpwuid (uid)))
-    {
-      /* If gid == primary group of uid, return immediately. */
-      if ((__gid32_t) pw->pw_gid == gid)
-	return TRUE;
-      /* Otherwise search for supplementary user list of this group. */
-      if ((gr = internal_getgrgid (gid)))
-	for (idx = 0; gr->gr_mem[idx]; ++idx)
-	  if (strcasematch (cygheap->user.name (), gr->gr_mem[idx]))
-	    return TRUE;
-    }
-  return FALSE;
-}
-
 #if 0 // unused
 #define SIDLEN	(sidlen = MAX_SID_LEN, &sidlen)
 #define DOMLEN	(domlen = INTERNET_MAX_HOST_NAME_LENGTH, &domlen)

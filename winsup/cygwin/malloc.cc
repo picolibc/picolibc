@@ -1455,6 +1455,8 @@ void     public_mSTATs();
 
 #define M_MMAP_THRESHOLD      -3
 
+#define DEFAULT_MMAP_THRESHOLD (128 * 1024 * 1024)
+
 #ifndef DEFAULT_MMAP_THRESHOLD
 #define DEFAULT_MMAP_THRESHOLD (256 * 1024)
 #endif

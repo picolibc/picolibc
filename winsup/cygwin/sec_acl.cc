@@ -32,23 +32,23 @@ details. */
 #include "cygheap.h"
 #include "pwdgrp.h"
 
-extern "C" int aclsort (int nentries, int, __aclent16_t *aclbufp);
-extern "C" int acl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp);
+extern "C" int aclsort32 (int nentries, int, __aclent32_t *aclbufp);
+extern "C" int acl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp);
 
 static int
-searchace (__aclent16_t *aclp, int nentries, int type, int id = -1)
+searchace (__aclent32_t *aclp, int nentries, int type, __uid32_t id = ILLEGAL_UID)
 {
   int i;
 
   for (i = 0; i < nentries; ++i)
-    if ((aclp[i].a_type == type && (id == -1 || aclp[i].a_id == id))
+    if ((aclp[i].a_type == type && (id == ILLEGAL_UID || aclp[i].a_id == id))
 	|| !aclp[i].a_type)
       return i;
   return -1;
 }
 
 static int
-setacl (const char *file, int nentries, __aclent16_t *aclbufp)
+setacl (const char *file, int nentries, __aclent32_t *aclbufp)
 {
   DWORD sd_size = 4096;
   char sd_buf[4096];
@@ -63,7 +63,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
   BOOL dummy;
 
   /* Get owner SID. */
-  PSID owner_sid = NULL;
+  PSID owner_sid;
   if (!GetSecurityDescriptorOwner (psd, &owner_sid, &dummy))
     {
       __seterrno ();
@@ -72,7 +72,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
   cygsid owner (owner_sid);
 
   /* Get group SID. */
-  PSID group_sid = NULL;
+  PSID group_sid;
   if (!GetSecurityDescriptorGroup (psd, &group_sid, &dummy))
     {
       __seterrno ();
@@ -92,8 +92,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
       __seterrno ();
       return -1;
     }
-  if (group
-      && !SetSecurityDescriptorGroup (&sd, group, FALSE))
+  if (!SetSecurityDescriptorGroup (&sd, group, FALSE))
     {
       __seterrno ();
       return -1;
@@ -117,12 +116,22 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
     }
   for (int i = 0; i < nentries; ++i)
     {
-      DWORD allow = STANDARD_RIGHTS_READ
-		    | FILE_READ_ATTRIBUTES | FILE_READ_EA;
+      DWORD allow;
+      /* Owner has more standard rights set. */
+      if ((aclbufp[i].a_type & ~ACL_DEFAULT) == USER_OBJ)
+	allow = (STANDARD_RIGHTS_ALL & ~DELETE)
+		| FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA;
+      else
+	allow = STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES | FILE_READ_EA;
       if (aclbufp[i].a_perm & S_IROTH)
 	allow |= FILE_GENERIC_READ;
       if (aclbufp[i].a_perm & S_IWOTH)
-	allow |= STANDARD_RIGHTS_ALL | FILE_GENERIC_WRITE;
+        {
+	  allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
+	  /* Owner gets DELETE right, too. */
+	  if ((aclbufp[i].a_type & ~ACL_DEFAULT) == USER_OBJ)
+	    allow |= DELETE;
+	}
       if (aclbufp[i].a_perm & S_IXOTH)
 	allow |= FILE_GENERIC_EXECUTE;
       if ((aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH))
@@ -141,7 +150,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	  && (pos = searchace (aclbufp + i + 1, nentries - i - 1,
 			       aclbufp[i].a_type | ACL_DEFAULT,
 			       (aclbufp[i].a_type & (USER|GROUP))
-			       ? aclbufp[i].a_id : -1)) >= 0
+			       ? aclbufp[i].a_id : ILLEGAL_UID)) >= 0
 	  && aclbufp[i].a_perm == aclbufp[pos].a_perm)
 	{
 	  inheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
@@ -151,13 +160,11 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
       switch (aclbufp[i].a_type)
 	{
 	case USER_OBJ:
-	  allow |= STANDARD_RIGHTS_ALL & ~DELETE;
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
 					owner, acl_len, inheritance))
 	    return -1;
 	  break;
 	case DEF_USER_OBJ:
-	  allow |= STANDARD_RIGHTS_ALL & ~DELETE;
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
 				       well_known_creator_owner_sid, acl_len, inheritance))
 	    return -1;
@@ -167,12 +174,12 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	  if (!(pw = internal_getpwuid (aclbufp[i].a_id))
 	      || !sid.getfrompw (pw)
 	      || !add_access_allowed_ace (acl, ace_off++, allow,
-					   sid, acl_len, inheritance))
+					  sid, acl_len, inheritance))
 	    return -1;
 	  break;
 	case GROUP_OBJ:
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-					group, acl_len, inheritance))
+				       group, acl_len, inheritance))
 	    return -1;
 	  break;
 	case DEF_GROUP_OBJ:
@@ -185,7 +192,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	  if (!(gr = internal_getgrgid (aclbufp[i].a_id))
 	      || !sid.getfromgr (gr)
 	      || !add_access_allowed_ace (acl, ace_off++, allow,
-					   sid, acl_len, inheritance))
+					  sid, acl_len, inheritance))
 	    return -1;
 	  break;
 	case OTHER_OBJ:
@@ -229,7 +236,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 #define DENY_X 010000
 
 static void
-getace (__aclent16_t &acl, int type, int id, DWORD win_ace_mask,
+getace (__aclent32_t &acl, int type, int id, DWORD win_ace_mask,
 	DWORD win_ace_type)
 {
   acl.a_type = type;
@@ -255,7 +262,7 @@ getace (__aclent16_t &acl, int type, int id, DWORD win_ace_mask,
 }
 
 static int
-getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
+getacl (const char *file, DWORD attr, int nentries, __aclent32_t *aclbufp)
 {
   DWORD sd_size = 4096;
   char sd_buf[4096];
@@ -268,30 +275,30 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
       return ret;
     }
 
-  PSID owner_sid;
-  PSID group_sid;
+  cygpsid owner_sid;
+  cygpsid group_sid;
   BOOL dummy;
   __uid32_t uid;
   __gid32_t gid;
 
-  if (!GetSecurityDescriptorOwner (psd, &owner_sid, &dummy))
+  if (!GetSecurityDescriptorOwner (psd, (PSID *) &owner_sid, &dummy))
     {
       debug_printf ("GetSecurityDescriptorOwner %E");
       __seterrno ();
       return -1;
     }
-  uid = cygsid (owner_sid).get_uid ();
+  uid = owner_sid.get_uid ();
 
-  if (!GetSecurityDescriptorGroup (psd, &group_sid, &dummy))
+  if (!GetSecurityDescriptorGroup (psd, (PSID *) &group_sid, &dummy))
     {
       debug_printf ("GetSecurityDescriptorGroup %E");
       __seterrno ();
       return -1;
     }
-  gid = cygsid (group_sid).get_gid ();
+  gid = group_sid.get_gid ();
 
-  __aclent16_t lacl[MAX_ACL_ENTRIES];
-  memset (&lacl, 0, MAX_ACL_ENTRIES * sizeof (__aclent16_t));
+  __aclent32_t lacl[MAX_ACL_ENTRIES];
+  memset (&lacl, 0, MAX_ACL_ENTRIES * sizeof (__aclent32_t));
   lacl[0].a_type = USER_OBJ;
   lacl[0].a_id = uid;
   lacl[1].a_type = GROUP_OBJ;
@@ -326,7 +333,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
 	  if (!GetAce (acl, i, (PVOID *) &ace))
 	    continue;
 
-	  cygsid ace_sid ((PSID) &ace->SidStart);
+	  cygpsid ace_sid ((PSID) &ace->SidStart);
 	  int id;
 	  int type = 0;
 
@@ -356,19 +363,8 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
 	      id = ILLEGAL_GID;
 	    }
 	  else
-	    {
-	      id = ace_sid.get_id (FALSE, &type);
-	      if (type != GROUP)
-		{
-		  int type2 = 0;
-		  int id2 = ace_sid.get_id (TRUE, &type2);
-		  if (type2 == GROUP)
-		    {
-		      id = id2;
-		      type = GROUP;
-		    }
-		}
-	    }
+	    id = ace_sid.get_id (TRUE, &type);
+
 	  if (!type)
 	    continue;
 	  if (!(ace->Header.AceFlags & INHERIT_ONLY || type & ACL_DEFAULT))
@@ -401,17 +397,17 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
   if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
     pos = MAX_ACL_ENTRIES;
   if (aclbufp) {
-    if (EqualSid (owner_sid, group_sid))
+    if (owner_sid == group_sid)
       lacl[0].a_perm = lacl[1].a_perm;
     if (pos > nentries)
       {
 	set_errno (ENOSPC);
 	return -1;
       }
-    memcpy (aclbufp, lacl, pos * sizeof (__aclent16_t));
+    memcpy (aclbufp, lacl, pos * sizeof (__aclent32_t));
     for (i = 0; i < pos; ++i)
       aclbufp[i].a_perm &= ~(DENY_R | DENY_W | DENY_X);
-    aclsort (pos, 0, aclbufp);
+    aclsort32 (pos, 0, aclbufp);
   }
   syscall_printf ("%d = getacl (%s)", pos, file);
   return pos;
@@ -420,13 +416,13 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
 int
 acl_access (const char *path, int flags)
 {
-  __aclent16_t acls[MAX_ACL_ENTRIES];
+  __aclent32_t acls[MAX_ACL_ENTRIES];
   int cnt;
 
-  if ((cnt = acl (path, GETACL, MAX_ACL_ENTRIES, acls)) < 1)
+  if ((cnt = acl32 (path, GETACL, MAX_ACL_ENTRIES, acls)) < 1)
     return -1;
 
-  /* Only check existance. */
+  /* Only check existence. */
   if (!(flags & (R_OK | W_OK | X_OK)))
     return 0;
 
@@ -440,25 +436,31 @@ acl_access (const char *path, int flags)
 	    {
 	      /*
 	       * Check if user is a NT group:
-	       * Take SID from passwd, search SID in group, check is_grp_member.
+	       * Take SID from passwd, search SID in token groups
 	       */
 	      cygsid owner;
 	      struct passwd *pw;
-	      struct __group32 *gr = NULL;
 
 	      if ((pw = internal_getpwuid (acls[i].a_id)) != NULL
 		  && owner.getfrompw (pw)
-		  && (gr = internal_getgrsid (owner))
-		  && is_grp_member (myself->uid, gr->gr_gid))
+		  && internal_getgroups (0, NULL, &owner) > 0)
 		break;
 	      continue;
 	    }
 	  break;
 	case GROUP_OBJ:
 	case GROUP:
-	  if (acls[i].a_id != myself->gid &&
-	      !is_grp_member (myself->uid, acls[i].a_id))
-	    continue;
+	  if (acls[i].a_id != myself->gid)
+            {
+	      cygsid group;
+	      struct __group32 *gr = NULL;
+
+	      if ((gr = internal_getgrgid (acls[i].a_id)) != NULL
+		  && group.getfromgr (gr)
+		  && internal_getgroups (0, NULL, &group) > 0)
+		break;
+	      continue;
+	    }
 	  break;
 	case OTHER_OBJ:
 	  break;
@@ -476,7 +478,7 @@ acl_access (const char *path, int flags)
 
 static
 int
-acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
+acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
 	    int nofollow)
 {
   extern suffix_info stat_suffixes[];
@@ -530,7 +532,7 @@ acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
   switch (cmd)
     {
       case SETACL:
-	if (!aclsort (nentries, 0, aclbufp))
+	if (!aclsort32 (nentries, 0, aclbufp))
 	  return setacl (real_path.get_win32 (),
 			 nentries, aclbufp);
 	break;
@@ -556,21 +558,21 @@ acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
 
 extern "C"
 int
-acl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
+acl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
 {
   return acl_worker (path, cmd, nentries, aclbufp, 0);
 }
 
 extern "C"
 int
-lacl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
+lacl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
 {
   return acl_worker (path, cmd, nentries, aclbufp, 1);
 }
 
 extern "C"
 int
-facl (int fd, int cmd, int nentries, __aclent16_t *aclbufp)
+facl32 (int fd, int cmd, int nentries, __aclent32_t *aclbufp)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0)
@@ -591,7 +593,7 @@ facl (int fd, int cmd, int nentries, __aclent16_t *aclbufp)
 
 extern "C"
 int
-aclcheck (__aclent16_t *aclbufp, int nentries, int *which)
+aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 {
   BOOL has_user_obj = FALSE;
   BOOL has_group_obj = FALSE;
@@ -722,10 +724,10 @@ aclcheck (__aclent16_t *aclbufp, int nentries, int *which)
   return 0;
 }
 
-extern "C"
+static
 int acecmp (const void *a1, const void *a2)
 {
-#define ace(i) ((const __aclent16_t *) a##i)
+#define ace(i) ((const __aclent32_t *) a##i)
   int ret = ace (1)->a_type - ace (2)->a_type;
   if (!ret)
     ret = ace (1)->a_id - ace (2)->a_id;
@@ -735,22 +737,22 @@ int acecmp (const void *a1, const void *a2)
 
 extern "C"
 int
-aclsort (int nentries, int, __aclent16_t *aclbufp)
+aclsort32 (int nentries, int, __aclent32_t *aclbufp)
 {
-  if (aclcheck (aclbufp, nentries, NULL))
+  if (aclcheck32 (aclbufp, nentries, NULL))
     return -1;
   if (!aclbufp || nentries < 1)
     {
       set_errno (EINVAL);
       return -1;
     }
-  qsort ((void *) aclbufp, nentries, sizeof (__aclent16_t), acecmp);
+  qsort ((void *) aclbufp, nentries, sizeof (__aclent32_t), acecmp);
   return 0;
 }
 
 extern "C"
 int
-acltomode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
+acltomode32 (__aclent32_t *aclbufp, int nentries, mode_t *modep)
 {
   int pos;
 
@@ -790,7 +792,7 @@ acltomode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
 
 extern "C"
 int
-aclfrommode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
+aclfrommode32 (__aclent32_t *aclbufp, int nentries, mode_t *modep)
 {
   int pos;
 
@@ -828,16 +830,16 @@ aclfrommode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
 
 extern "C"
 int
-acltopbits (__aclent16_t *aclbufp, int nentries, mode_t *pbitsp)
+acltopbits32 (__aclent32_t *aclbufp, int nentries, mode_t *pbitsp)
 {
-  return acltomode (aclbufp, nentries, pbitsp);
+  return acltomode32 (aclbufp, nentries, pbitsp);
 }
 
 extern "C"
 int
-aclfrompbits (__aclent16_t *aclbufp, int nentries, mode_t *pbitsp)
+aclfrompbits32 (__aclent32_t *aclbufp, int nentries, mode_t *pbitsp)
 {
-  return aclfrommode (aclbufp, nentries, pbitsp);
+  return aclfrommode32 (aclbufp, nentries, pbitsp);
 }
 
 static char *
@@ -854,10 +856,10 @@ permtostr (mode_t perm)
 
 extern "C"
 char *
-acltotext (__aclent16_t *aclbufp, int aclcnt)
+acltotext32 (__aclent32_t *aclbufp, int aclcnt)
 {
   if (!aclbufp || aclcnt < 1 || aclcnt > MAX_ACL_ENTRIES
-      || aclcheck (aclbufp, aclcnt, NULL))
+      || aclcheck32 (aclbufp, aclcnt, NULL))
     {
       set_errno (EINVAL);
       return NULL;
@@ -930,8 +932,8 @@ permfromstr (char *perm)
 }
 
 extern "C"
-__aclent16_t *
-aclfromtext (char *acltextp, int *)
+__aclent32_t *
+aclfromtext32 (char *acltextp, int *)
 {
   if (!acltextp)
     {
@@ -939,7 +941,7 @@ aclfromtext (char *acltextp, int *)
       return NULL;
     }
   char buf[strlen (acltextp) + 1];
-  __aclent16_t lacl[MAX_ACL_ENTRIES];
+  __aclent32_t lacl[MAX_ACL_ENTRIES];
   memset (lacl, 0, sizeof lacl);
   int pos = 0;
   strcpy (buf, acltextp);
@@ -970,11 +972,11 @@ aclfromtext (char *acltextp, int *)
 		      return NULL;
 		    }
 		  lacl[pos].a_id = pw->pw_uid;
-		  c = strchr (c, ':');
+		  c = strechr (c, ':');
 		}
 	      else if (isdigit (*c))
 		lacl[pos].a_id = strtol (c, &c, 10);
-	      if (!c || *c != ':')
+	      if (*c != ':')
 		{
 		  set_errno (EINVAL);
 		  return NULL;
@@ -998,11 +1000,11 @@ aclfromtext (char *acltextp, int *)
 		      return NULL;
 		    }
 		  lacl[pos].a_id = gr->gr_gid;
-		  c = strchr (c, ':');
+		  c = strechr (c, ':');
 		}
 	      else if (isdigit (*c))
 		lacl[pos].a_id = strtol (c, &c, 10);
-	      if (!c || *c != ':')
+	      if (*c != ':')
 		{
 		  set_errno (EINVAL);
 		  return NULL;
@@ -1036,9 +1038,97 @@ aclfromtext (char *acltextp, int *)
 	}
       ++pos;
     }
-  __aclent16_t *aclp = (__aclent16_t *) malloc (pos * sizeof (__aclent16_t));
+  __aclent32_t *aclp = (__aclent32_t *) malloc (pos * sizeof (__aclent32_t));
   if (aclp)
-    memcpy (aclp, lacl, pos * sizeof (__aclent16_t));
+    memcpy (aclp, lacl, pos * sizeof (__aclent32_t));
   return aclp;
 }
 
+/* __aclent16_t and __aclent32_t have same size and same member offsets */
+static __aclent32_t *
+acl16to32 (__aclent16_t *aclbufp, int nentries)
+{
+  __aclent32_t *aclbufp32 = (__aclent32_t *) aclbufp;
+  if (aclbufp32)
+    for (int i = 0; i < nentries; i++)
+      aclbufp32[i].a_id &= USHRT_MAX;
+  return aclbufp32;
+}
+
+extern "C"
+int
+acl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
+{
+  return acl32 (path, cmd, nentries, acl16to32 (aclbufp, nentries));
+}
+
+extern "C"
+int
+facl (int fd, int cmd, int nentries, __aclent16_t *aclbufp)
+{
+  return facl32 (fd, cmd, nentries, acl16to32 (aclbufp, nentries));
+}
+
+extern "C"
+int
+lacl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
+{
+  return lacl32 (path, cmd, nentries, acl16to32 (aclbufp, nentries));
+}
+
+extern "C"
+int
+aclcheck (__aclent16_t *aclbufp, int nentries, int *which)
+{
+  return aclcheck32 (acl16to32 (aclbufp, nentries), nentries, which);
+}
+
+extern "C"
+int
+aclsort (int nentries, int i, __aclent16_t *aclbufp)
+{
+  return aclsort32 (nentries, i, acl16to32 (aclbufp, nentries));
+}
+
+
+extern "C"
+int
+acltomode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
+{
+  return acltomode32 (acl16to32 (aclbufp, nentries), nentries, modep);
+}
+
+extern "C"
+int
+aclfrommode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
+{
+  return aclfrommode32 ((__aclent32_t *)aclbufp, nentries, modep);
+}
+
+extern "C"
+int
+acltopbits (__aclent16_t *aclbufp, int nentries, mode_t *pbitsp)
+{
+  return acltopbits32 (acl16to32 (aclbufp, nentries), nentries, pbitsp);
+}
+
+extern "C"
+int
+aclfrompbits (__aclent16_t *aclbufp, int nentries, mode_t *pbitsp)
+{
+  return aclfrompbits32 ((__aclent32_t *)aclbufp, nentries, pbitsp);
+}
+
+extern "C"
+char *
+acltotext (__aclent16_t *aclbufp, int aclcnt)
+{
+  return acltotext32 (acl16to32 (aclbufp, aclcnt), aclcnt);
+}
+
+extern "C"
+__aclent16_t *
+aclfromtext (char *acltextp, int * aclcnt)
+{
+  return (__aclent16_t *) aclfromtext32 (acltextp, aclcnt);
+}

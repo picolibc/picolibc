@@ -11,8 +11,8 @@ details. */
 #include <accctrl.h>
 
 #define DEFAULT_UID DOMAIN_USER_RID_ADMIN
-#define DEFAULT_UID_NT 400 /* Non conflicting number */
-#define DEFAULT_GID 401
+#define UNKNOWN_UID 400 /* Non conflicting number */
+#define UNKNOWN_GID 401
 
 #define MAX_SID_LEN 40
 #define MAX_DACL_LEN(n) (sizeof (ACL) \
@@ -244,7 +244,6 @@ void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);
 BOOL get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL);
 
 /* sec_helper.cc: Security helper functions. */
-BOOL __stdcall is_grp_member (__uid32_t uid, __gid32_t gid);
 int set_process_privilege (const char *privilege, bool enable = true, bool use_thread = false);
 
 /* shared.cc: */
