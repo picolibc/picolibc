@@ -44,6 +44,7 @@ struct wincaps
   unsigned has_negative_pids                            : 1;
   unsigned has_unreliable_pipes                         : 1;
   unsigned has_try_enter_critical_section		: 1;
+  unsigned has_raw_devices				: 1;
   unsigned has_valid_processorlevel			: 1;
 };
 
@@ -93,6 +94,7 @@ public:
   bool  IMPLEMENT (has_negative_pids)
   bool  IMPLEMENT (has_unreliable_pipes)
   bool  IMPLEMENT (has_try_enter_critical_section)
+  bool  IMPLEMENT (has_raw_devices)
   bool  IMPLEMENT (has_valid_processorlevel)
 
 #undef IMPLEMENT

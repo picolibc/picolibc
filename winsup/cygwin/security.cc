@@ -157,7 +157,7 @@ str2buf2lsa (LSA_STRING &tgt, char *buf, const char *srcstr)
   memcpy(buf, srcstr, tgt.MaximumLength);
 }
 
-static void
+void
 str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
 {
   tgt.Length = strlen (srcstr) * sizeof (WCHAR);

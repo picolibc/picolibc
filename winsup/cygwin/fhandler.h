@@ -476,13 +476,13 @@ protected:
 public:
   ~fhandler_dev_raw (void);
 
+  int get_unit () { return unit; }
+
   int open (path_conv *, int flags, mode_t mode = 0);
   int close (void);
 
   int raw_read (void *ptr, size_t ulen);
   int raw_write (const void *ptr, size_t ulen);
-
-  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (2)));
 
   int dup (fhandler_base *child);
 
@@ -511,8 +511,9 @@ public:
 
 class fhandler_dev_tape: public fhandler_dev_raw
 {
-  int norewind;
   int lasterr;
+
+  bool is_rewind_device () { return get_unit () < 128; }
 
 protected:
   virtual void clear (void);

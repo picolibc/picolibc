@@ -29,7 +29,6 @@ details. */
 void
 fhandler_dev_tape::clear (void)
 {
-  norewind = 0;
   lasterr = 0;
   fhandler_dev_raw::clear ();
 }
@@ -66,7 +65,6 @@ fhandler_dev_tape::open (path_conv *real_path, int flags, mode_t)
 {
   int ret;
 
-  norewind = (real_path->get_unitn () >= 128);
   devbufsiz = 1L;
 
   ret = fhandler_dev_raw::open (real_path, flags);
@@ -132,7 +130,7 @@ fhandler_dev_tape::close (void)
   // To protected reads on signaling (e.g. Ctrl-C)
   eof_detected = 1;
 
-  if (! norewind)
+  if (is_rewind_device ())
     {
       debug_printf ("rewinding\n");
       op.mt_op = MTREW;
@@ -153,7 +151,7 @@ fhandler_dev_tape::fstat (struct stat *buf, path_conv *pc)
 {
   int ret;
 
-  if (!(ret = fhandler_dev_raw::fstat (buf, pc)))
+  if (!(ret = fhandler_base::fstat (buf, pc)))
     {
       struct mtget get;
 
@@ -227,7 +225,6 @@ fhandler_dev_tape::dup (fhandler_base *child)
 {
   fhandler_dev_tape *fhc = (fhandler_dev_tape *) child;
 
-  fhc->norewind = norewind;
   fhc->lasterr = lasterr;
   return fhandler_dev_raw::dup (child);
 }

@@ -854,31 +854,112 @@ get_devn (const char *name, int &unit)
   return devn;
 }
 
+/*
+    major      minor    POSIX filename	NT filename
+    -----      -----	--------------	-------------------------	
+    FH_TAPE	  0	/dev/st0	\device\tape0
+    FH_TAPE	  1	/dev/st1	\device\tape1
+    ...
+    FH_TAPE	128	/dev/nst0	\device\tape0
+    FH_TAPE	129	/dev/nst1	\device\tape1
+    ...
+
+    FH_FLOPPY     0	/dev/fd0	\device\floppy0
+    FH_FLOPPY	  1	/dev/fd1	\device\floppy1
+    ...
+
+    FH_FLOPPY	 16	/dev/scd0	\device\cdrom0
+    FH_FLOPPY	 17	/dev/scd0	\device\cdrom1
+    ...
+
+    FH_FLOPPY	 32	/dev/sda	\device\harddisk0\partition0
+    FH_FLOPPY	 33	/dev/sda1	\device\harddisk0\partition1
+    ...
+    FH_FLOPPY	 47	/dev/sda15	\device\harddisk0\partition15
+
+    FH_FLOPPY	 48	/dev/sdb	\device\harddisk1\partition0
+    FH_FLOPPY    33     /dev/sdb1       \device\harddisk1\partition1
+    ...
+    FH_FLOPPY	208	/dev/sdl	\device\harddisk11\partition0
+    ...
+    FH_FLOPPY	223	/dev/sdl15	\device\harddisk11\partition15
+
+    The following are needed to maintain backward compatibility with
+    the old Win32 partitioning scheme on W2K/XP.
+
+    FH_FLOPPY	224	from mount tab	\\.\A:
+    ...
+    FH_FLOPPY	250	from mount tab	\\.\Z:
+*/
 static int
-get_raw_device_number (const char *unix_path, const char *w32_path, int &unit)
+get_raw_device_number (const char *name, const char *w32_path, int &unit)
 {
-  int devn;
-  w32_path += 4;
-  if (wdeveqn ("tape", 4))
+  DWORD devn = FH_BAD;
+
+  if (!w32_path)  /* New approach using fixed device names. */
     {
-      unit = digits (w32_path + 4);
-      // norewind tape devices have leading n in name
-      if (udeveqn ("/dev/n", 6))
-	unit += 128;
-      devn = FH_TAPE;
+      if (deveqn ("st", 2))
+	{
+	  unit = digits (name + 2);
+	  if (unit >= 0 && unit < 128)
+	    devn = FH_TAPE;
+	}
+      else if (deveqn ("nst", 3))
+	{
+	  unit = digits (name + 3) + 128;
+	  if (unit >= 128 && unit < 256)
+	    devn = FH_TAPE;
+	}
+      else if (deveqn ("fd", 2))
+	{
+	  unit = digits (name + 2);
+	  if (unit >= 0 && unit < 16)
+	    devn = FH_FLOPPY;
+	}
+      else if (deveqn ("scd", 3))
+	{
+	  unit = digits (name + 3) + 16;
+	  if (unit >= 16 && unit < 32)
+	    devn = FH_FLOPPY;
+	}
+      else if (deveqn ("sd", 2) && isalpha (name[2]))
+	{
+	  unit = (cyg_tolower (name[2]) - 'a') * 16 + 32;
+	  if (unit >= 32 && unit < 224)
+	    if (!name[3])
+	      devn = FH_FLOPPY;
+	    else
+	      {
+		int d = digits (name + 3);
+		if (d >= 1 && d < 16)
+		  {
+		    unit += d;
+		    devn = FH_FLOPPY;
+		  }
+	      }
+	}
     }
-  else if (isdrive (w32_path))
+  else /* Backward compatible checking of mount table device mapping. */
     {
-      unit = cyg_tolower (w32_path[0]) - 'a';
-      devn = FH_FLOPPY;
+      if (wdeveqn ("tape", 4))
+        {
+	  unit = digits (w32_path + 4);
+	  /* Norewind tape devices have leading n in name. */
+	  if (deveqn ("n", 1))
+	    unit += 128;
+	  devn = FH_TAPE;
+	}
+      else if (wdeveqn ("physicaldrive", 13))
+        {
+	  unit = digits (w32_path + 13) * 16 + 32;
+	  devn = FH_FLOPPY;
+	}
+      else if (isdrive (w32_path))
+        {
+	  unit = cyg_tolower (w32_path[0]) - 'a' + 224;
+	  devn = FH_FLOPPY;
+	}
     }
-  else if (wdeveqn ("physicaldrive", 13))
-    {
-      unit = digits (w32_path + 13) + 128;
-      devn = FH_FLOPPY;
-    }
-  else
-    devn = FH_BAD;
   return devn;
 }
 
@@ -892,15 +973,18 @@ get_device_number (const char *unix_path, const char *w32_path, int &unit)
   unit = 0;
 
   if (*unix_path == '/' && udeveqn ("/dev/", 5))
-    devn = get_devn (unix_path, unit);
-  if (devn == FH_BAD && *w32_path == '\\' && wdeveqn ("\\dev\\", 5))
-    devn = get_devn (w32_path, unit);
-  if (devn == FH_BAD && udeveqn ("com", 3)
-      && (unit = digits (unix_path + 3)) >= 0)
-    devn = FH_SERIAL;
-  else if (strncmp (w32_path, "\\\\.\\", 4) == 0)
-    devn = get_raw_device_number (unix_path, w32_path, unit);
-
+    {
+      devn = get_devn (unix_path, unit);
+      if (devn == FH_BAD && *w32_path == '\\' && wdeveqn ("\\dev\\", 5))
+	devn = get_devn (w32_path, unit);
+      if (devn == FH_BAD && udeveqn ("com", 3)
+	  && (unit = digits (unix_path + 3)) >= 0)
+	devn = FH_SERIAL;
+      if (devn == FH_BAD && wdeveqn ("\\\\.\\", 4))
+	devn = get_raw_device_number (unix_path + 5, w32_path + 4, unit);
+      if (devn == FH_BAD)
+	devn = get_raw_device_number (unix_path + 5, NULL, unit);
+    }
   return devn;
 }
 
@@ -913,17 +997,36 @@ win32_device_name (const char *src_path, char *win32_path,
 {
   const char *devfmt;
 
-  devn = get_device_number (src_path, "", unit);
+  devn = get_device_number (src_path, win32_path, unit);
 
   if (devn == FH_BAD)
     return FALSE;
 
   if ((devfmt = windows_device_names[FHDEVN (devn)]) == NULL)
     return FALSE;
-  if (devn == FH_RANDOM)
-    __small_sprintf (win32_path, devfmt, unit == 8 ? "" : "u");
-  else
-    __small_sprintf (win32_path, devfmt, unit);
+  switch (devn)
+    {
+      case FH_RANDOM:
+	__small_sprintf (win32_path, devfmt, unit == 8 ? "" : "u");
+        break;
+      case FH_TAPE:
+        __small_sprintf (win32_path, "\\device\\tape%d", unit % 128);
+        break;
+      case FH_FLOPPY:
+        if (unit < 16)
+	  __small_sprintf (win32_path, "\\device\\floppy%d", unit);
+	else if (unit < 32)
+	  __small_sprintf (win32_path, "\\device\\cdrom%d", unit - 16);
+	else if (unit < 224)
+	  __small_sprintf (win32_path, "\\device\\harddisk%d\\partition%d",
+				       (unit - 32) / 16, unit % 16);
+	else
+	  __small_sprintf (win32_path, "\\\\.\\%c:", unit - 224 + 'A');
+        break;
+      default:
+	__small_sprintf (win32_path, devfmt, unit);
+        break;
+    }
   return TRUE;
 }
 
@@ -1335,7 +1438,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       *flags = mi->flags;
     }
 
-  devn =  get_device_number (src_path, dst, unit);
+  win32_device_name (src_path, dst, devn, unit);
 
  out:
   MALLOC_CHECK;

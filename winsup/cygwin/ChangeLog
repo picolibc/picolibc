@@ -1,3 +1,32 @@
+2001-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Add load statement for `NtOpenFile'.
+	* fhandler.h (fhandler_dev_raw::get_unit): New method.
+	(fhandler_dev_tape::norewind): Eliminate.
+	(fhandler_dev_tape::is_rewind_device): New method.
+	* fhandler_raw.cc (fhandler_dev_raw::open): Open new
+	fixed device name devices using NT internal method. 
+	Keep calling fhandler_base::open() for old mount table
+	device mapping compatibility devices.
+	(fhandler_dev_raw::fstat): Eliminate.  Settings are done
+	by fhandler_base::fstat() already.
+	* fhandler_tape.cc: Remove `norewind' usage throughout.
+	* ntdll.h: Define FILE_SYNCHRONOUS_IO_NONALERT.
+	Define struct _IO_STATUS_BLOCK.
+	Declare NtOpenFile().
+	* path.cc (get_raw_device_number): Add new approach for
+	using fixed device names.
+	(win32_device_name): Ditto.
+	(get_device_number): Ditto.  Require POSIX path to begin
+	with "/dev/".
+	(mount_info::conv_to_win32_path): Call win32_device_name()
+	instead of get_device_number() after evaluating mount points
+	to allow changing the win32 destination path again.
+	* security.cc (str2buf2uni): Remove `static' to be able to
+	call function from fhandler_dev_raw::open().
+	* wincap.cc: Set flag has_raw_devices appropriately.
+	* wincap.h: Add flag has_raw_devices.
+
 2001-10-16  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.h (cygheap_fdget::cygheap_fdget): Remove debugging operation

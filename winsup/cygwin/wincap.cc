@@ -43,6 +43,7 @@ static NO_COPY wincaps wincap_unknown = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
   has_valid_processorlevel:false,
 };
 
@@ -78,6 +79,7 @@ static NO_COPY wincaps wincap_95 = {
   has_negative_pids:true,
   has_unreliable_pipes:true,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
   has_valid_processorlevel:false,
 };
 
@@ -113,6 +115,7 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_negative_pids:true,
   has_unreliable_pipes:true,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
   has_valid_processorlevel:false,
 };
 
@@ -148,6 +151,7 @@ static NO_COPY wincaps wincap_98 = {
   has_negative_pids:true,
   has_unreliable_pipes:true,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
   has_valid_processorlevel:true,
 };
 
@@ -183,6 +187,7 @@ static NO_COPY wincaps wincap_98se = {
   has_negative_pids:true,
   has_unreliable_pipes:true,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
   has_valid_processorlevel:true,
 };
 
@@ -218,6 +223,7 @@ static NO_COPY wincaps wincap_me = {
   has_negative_pids:true,
   has_unreliable_pipes:true,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
   has_valid_processorlevel:true,
 };
 
@@ -253,6 +259,7 @@ static NO_COPY wincaps wincap_nt3 = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:false,
+  has_raw_devices:true,
   has_valid_processorlevel:true,
 };
 
@@ -288,6 +295,7 @@ static NO_COPY wincaps wincap_nt4 = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:true,
+  has_raw_devices:true,
   has_valid_processorlevel:true,
 };
 
@@ -323,6 +331,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:true,
+  has_raw_devices:true,
   has_valid_processorlevel:true,
 };
 
@@ -358,6 +367,7 @@ static NO_COPY wincaps wincap_2000 = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:true,
+  has_raw_devices:true,
   has_valid_processorlevel:true,
 };
 
@@ -393,6 +403,7 @@ static NO_COPY wincaps wincap_xp = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:true,
+  has_raw_devices:true,
   has_valid_processorlevel:true,
 };
 
