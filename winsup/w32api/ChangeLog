@@ -1,3 +1,8 @@
+2003-09-05  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/w32api.h (_NT5, etc): Reverse the changes of 2003-07-01.
+	* include/winbase.h (_NT5, etc): Ditto.
+	
 2003-09-02  Bart Oldeman  <bartoldeman@users.sourceforge.net>
 
 	* lib/snmpapi.def (LIBRARY) Add library name.
