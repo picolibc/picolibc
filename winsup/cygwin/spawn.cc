@@ -494,10 +494,6 @@ skip_arg_parsing:
     }
 
   init_child_info (chtype, ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1, spr);
-  if (mode != _P_OVERLAY ||
-      !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc, &ciresrv->myself_pinfo, 0,
-		       TRUE, DUPLICATE_SAME_ACCESS))
-   ciresrv->myself_pinfo = NULL;
 
   LPBYTE resrv = si.lpReserved2 + sizeof *ciresrv;
 # undef ciresrv

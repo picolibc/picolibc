@@ -67,7 +67,6 @@ public:
   HANDLE shared_h;
   HANDLE console_h;
   HANDLE parent_alive;	// handle of thread used to track children
-  HANDLE myself_pinfo;
 };
 
 class child_info_fork: public child_info

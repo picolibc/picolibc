@@ -283,6 +283,7 @@ long __stdcall to_time_t (FILETIME * ptr);
 int __stdcall lock_pinfo_for_update (DWORD timeout);
 #endif
 void unlock_pinfo (void);
+void _stdcall set_myself (pid_t pid);
 
 /* Retrieve a security descriptor that allows all access */
 SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);

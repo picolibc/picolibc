@@ -666,7 +666,7 @@ dll_crt0_1 ()
 				  //  should be blocked.
 
   if (mypid)
-    set_myself ((pid_t) mypid, NULL);
+    set_myself ((pid_t) mypid);
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 
@@ -834,7 +834,6 @@ _dll_crt0 ()
   DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
 		   &hMainThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
 
-  HANDLE h;
   GetStartupInfo (&si);
   if (si.cbReserved2 >= EXEC_MAGIC_SIZE &&
       memcmp (ciresrv->zero, zeros, sizeof (zeros)) == 0)
@@ -869,14 +868,6 @@ _dll_crt0 ()
 		  case PROC_EXEC:
 		  case PROC_SPAWN:
 		    info = si.lpReserved2 + ciresrv->cb;
-		    if (child_proc_info->myself_pinfo &&
-			DuplicateHandle (hMainProc, child_proc_info->myself_pinfo,
-					 hMainProc, &h, 0, 0,
-					 DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-		      {
-			set_myself (mypid, h);
-			mypid = 0;
-		      }
 		    break;
 		  case PROC_FORK:
 		  case PROC_FORK1:
