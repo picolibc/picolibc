@@ -94,9 +94,10 @@ DEF_FILES = $(notdir $(wildcard $(srcdir)/*.def))
 IMPLIBS = $(addprefix lib,$(subst .def,.a,$(DEF_FILES)))
 EXTRA_LIBS=libuuid.a libscrnsave.a libscrnsavw.a libdxguid.a liblargeint.a
 LIBS = $(IMPLIBS) $(EXTRA_LIBS)
-EXTRA_OBJS=uuid.o shell32.o dxguid.o scrnsave.o scrnsavw.o largeint.o $(UUID_OBJS) dinput.o
+EXTRA_OBJS=uuid.o shell32.o dxguid.o scrnsave.o scrnsavw.o largeint.o \
+	$(UUID_OBJS) dinput.o kernel32.o
 SOURCES = scrnsave.c shell32.c uuid.c largeint.c dinput.c dxguid.c \
-res.rc test.c
+res.rc test.c kernel32.c
 
 DISTFILES = Makefile.in $(DEF_FILES) $(SOURCES)
 

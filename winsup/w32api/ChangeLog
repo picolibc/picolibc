@@ -1,3 +1,17 @@
+2001-08-10 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* lib/test.c (Win32_Winsock): Replace with __USE_W32_SOCKETS.
+	Add more includes of w32api headers.
+
+2001-08-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (GetCurrentFiber): Change __inline to __inline__.
+	Swap asm code with that of GetFiberData.
+	(GetFiberData): Ditto.
+	* lib/kernels.c: New file, containing library versions of
+	GetCurrentFiber and GetFiberData.
+	* lib/makefile.in: Add kernel32.o as static object to libkernal32.a.
+
 2001-08-08 Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (GET_WHEEL_DELTA_WPARAM): Add macro.

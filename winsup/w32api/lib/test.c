@@ -1,5 +1,6 @@
 /* Perform simple test of headers to avoid typos and such */
-#define Win32_Winsock
+#define __USE_W32_SOCKETS
+#include <w32api.h>
 #include <windows.h>
 
 #ifdef __OBJC__
@@ -25,9 +26,49 @@
 #include <regstr.h>
 #include <custcntl.h>
 
-#ifndef __OBJC__
+#include <dbt.h>
+#include <httpext.h>
+#include <imagehlp.h>
+#include <initguid.h>
+#include <ipexport.h>
+#include <iphlpapi.h>
+#include <ipifcons.h>
+#include <iprtrmib.h>
+#include <iptypes.h>
+#include <isguids.h>
+#include <lmbrowsr.h>
+#include <mswsock.h>
+#include <nddeapi.h>
+#include <ntdef.h>
+#include <ntsecapi.h>
+#include <odbcinst.h>
+#include <psapi.h>
+#include <ras.h>
+#include <raserror.h>
+#include <rassapi.h>
+#include <richedit.h>
+#include <rpcdce2.h>
+#include <subauth.h>
+#include <tlhelp32.h>
+#include <userenv.h>
+#include <winioctl.h>
+#include <winresrc.h>
+#include <winsock.h>
+#include <ws2tcpip.h>
+
+
+#ifndef __OBJC__  /* problems with BOOL */
 #include <ole2.h>
 #include <shlobj.h>
+#include <intshcut.h>
+#include <ocidl.h>
+#include <ole2ver.h>
+#include <olectl.h>
+#include <oledlg.h>
+#include <rapi.h>
+#include <richole.h>
+#include <rpcproxy.h>
+
 #else
 #undef BOOL
 #endif
