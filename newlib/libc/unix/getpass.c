@@ -42,6 +42,14 @@ static char sccsid[] = "@(#)getpass.c	5.9 (Berkeley) 5/6/91";
 #include <sys/signal.h>
 #include <_syslist.h>
 
+#ifndef _PATH_PASSWD
+#define _PATH_PASSWD            "/etc/passwd"
+#endif
+
+#ifndef _PASSWORD_LEN
+#define _PASSWORD_LEN           128     /* max length, not counting NULL */
+#endif
+
 char *
 getpass (prompt)
      const char *prompt;

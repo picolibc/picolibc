@@ -243,6 +243,24 @@ case "${host}" in
 	sys_dir=sysvi386
 	unix_dir=unix
 	;;
+
+  i[3456]86-pc-linux-*)
+	sys_dir=linux
+	unix_dir=unix
+	posix_dir=posix
+	gcc_dir=`gcc -print-search-dirs | awk '/^install:/{print $2}'`
+	#newlib_cflags="${newlib_cflags} -Werror" # DEBUGGING ONLY;BREAKS BUILD
+	newlib_cflags="${newlib_cflags} -Wall"
+	newlib_cflags="${newlib_cflags} -D_I386MACH_ALLOW_HW_INTERRUPTS"
+	newlib_cflags="${newlib_cflags} -D_LOOSE_KERNEL_NAMES"
+	# --- Required when building a shared library ------------------------ 
+	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
+	# --- The three lines below are optional ------------------------------
+	##newlib_cflags="${newlib_cflags} -nostdinc"
+	##newlib_cflags="${newlib_cflags} -I`newlib-flags --kernel-dir`/include"
+	##newlib_cflags="${newlib_cflags} -idirafter ${gcc_dir}include"
+	;;
+
   m68k-sun-sunos*)
 	unix_dir=unix
 	;;

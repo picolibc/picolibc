@@ -1,3 +1,49 @@
+2000-12-08  Werner Almesberger  <Werner.Almesberger@epfl.ch>
+
+	* configure.host: Added x86 linux target.
+	* libc/unix/getpass.c (_PATH_PASSWD, _PASSWORD_LEN): Default
+	definitions provided if not already defined.
+	* libc/sys/linux/crt0.c: New file.
+	* libc/sys/linux/Makefile.am: Ditto.
+	* libc/sys/linux/Makefile.in: Ditto.
+	* libc/sys/linux/aclocal.m4: Ditto.
+	* libc/sys/linux/brk.c: Ditto.
+	* libc/sys/linux/configure: Ditto.
+	* libc/sys/linux/configure.in: Ditto.
+	* libc/sys/linux/getoptlong.c: Ditto.
+	* libc/sys/linux/ids.c: Ditto.
+	* libc/sys/linux/inode.c: Ditto.
+	* libc/sys/linux/io.c: Ditto.
+	* libc/sys/linux/linux.c: Ditto.
+	* libc/sys/linux/process.c: Ditto.
+	* libc/sys/linux/realpath.c: Ditto.
+	* libc/sys/linux/select.c: Ditto.
+	* libc/sys/linux/signal.c: Ditto.
+	* libc/sys/linux/systat.c: Ditto.
+	* libc/sys/linux/termios.c: Ditto.
+	* libc/sys/linux/time.c: Ditto.
+	* libc/sys/linux/wait.c: Ditto.
+	* libc/sys/linux/include/alloca.h: Ditto.
+	* libc/sys/linux/include/getopt.h: Ditto.
+	* libc/sys/linux/include/stdint.h: Ditto.
+	* libc/sys/linux/include/unistd.h: Ditto.
+	* libc/sys/linux/sys/cdefs.h: Ditto.
+	* libc/sys/linux/sys/dirent.h: Ditto.
+	* libc/sys/linux/sys/errno.h: Ditto.
+	* libc/sys/linux/sys/fcntl.h: Ditto.
+	* libc/sys/linux/sys/file.h: Ditto.
+	* libc/sys/linux/sys/ioctl.h: Ditto.
+	* libc/sys/linux/sys/resource.h: Ditto.
+	* libc/sys/linux/sys/signal.h: Ditto.
+	* libc/sys/linux/sys/stat.h: Ditto.
+	* libc/sys/linux/sys/syscall.h: Ditto.
+	* libc/sys/linux/sys/termios.h: Ditto.
+	* libc/sys/linux/sys/time.h: Ditto.
+	* libc/sys/linux/sys/types.h: Ditto.
+	* libc/sys/linux/sys/utmp.h: Ditto.
+	* libc/sys/linux/sys/utsname.h: Ditto.
+	* libc/sys/linux/sys/wait.h: Ditto.
+
 2000-12-08  Ralf Corsepius <corsepiu@faw.uni-ulm.de>
 
         * Makefile.am: $(INSTALL), $(INSTALL_DATA), and $(INSTALL_PROGRAM)  
