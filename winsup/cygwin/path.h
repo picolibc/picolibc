@@ -97,9 +97,11 @@ class path_conv
     return 0;
   }
   int issymlink () const {return path_flags & PATH_SYMLINK;}
-  int isdevice () const {return dev.devn && dev.devn != FH_FS;}
-  int is_auto_device () const {return isdevice ()  && !is_fs_device ();}
-  int is_fs_device () const {return isdevice () && dev.isfs ();}
+  int isdevice () const {return dev.devn && dev.devn != FH_FS && dev.devn != FH_FIFO;}
+  int isfifo () const {return dev == FH_FIFO;}
+  int isspecial () const {return dev.devn && dev.devn != FH_FS;}
+  int is_auto_device () const {return isdevice ()  && !is_fs_special ();}
+  int is_fs_special () const {return isspecial () && dev.isfs ();}
   int issocket () const {return path_flags & PATH_SOCKET;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
   bool exists () const {return fileattr != INVALID_FILE_ATTRIBUTES;}
