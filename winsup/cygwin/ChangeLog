@@ -1,5 +1,10 @@
 2001-11-24  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc (path_conv::check): Tighten FH_CYGDRIVE check to avoid
+	matching trailing component, like other devices.
+
+2001-11-24  Christopher Faylor  <cgf@redhat.com>
+
 	* autoload.cc (IsDebuggerPresent): Make conditional load since it is
 	not available everywhere.
 
