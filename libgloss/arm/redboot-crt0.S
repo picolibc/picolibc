@@ -45,6 +45,10 @@ __change_mode:
 
 	bl	SYM_NAME(memset)
 	
+	bl	SYM_NAME(__get_memtop)
+	sub	r0, r0, #32
+	mov	sp, r0
+
 	mov 	a1, #0
 	ldr	a2, .LC3
 	mov	a3, a2
