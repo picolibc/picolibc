@@ -1,3 +1,8 @@
+2002-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_dsp.cc (fhandler_dev_dsp::open): Set errno to EACCES if
+	requested mode isn't supported.
+
 2002-06-03  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::open): Don't set binmode if already set.

@@ -434,7 +434,10 @@ fhandler_dev_dsp::open (path_conv *, int flags, mode_t mode)
 {
   // currently we only support writing
   if ((flags & (O_WRONLY | O_RDONLY | O_RDWR)) != O_WRONLY)
-    return 0;
+    {
+      set_errno (EACCES);
+      return 0;
+    }
 
   set_flags (flags);
 
