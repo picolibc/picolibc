@@ -254,7 +254,7 @@ pthread::initMainThread (bool do_init)
     {
       thread = new pthread ();
       if (!thread)
-        api_fatal ("failed to create mainthread object");
+	api_fatal ("failed to create mainthread object");
     }
 
   thread->initCurrentThread ();
@@ -632,7 +632,8 @@ pthread::static_cancel_self (void)
 }
 
 
-DWORD pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel)
+DWORD
+pthread::cancelable_wait (HANDLE object, DWORD timeout, const bool do_cancel)
 {
   DWORD res;
   HANDLE wait_objects[2];
@@ -751,8 +752,8 @@ pthread::initCurrentThread ()
 {
   cancel_event = ::CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
-                        GetCurrentProcess (), &win32_obj_id,
-                        0, FALSE, DUPLICATE_SAME_ACCESS))
+			GetCurrentProcess (), &win32_obj_id,
+			0, FALSE, DUPLICATE_SAME_ACCESS))
     win32_obj_id = NULL;
   setThreadIdtoCurrent ();
   setTlsSelfPointer (this);
@@ -947,7 +948,7 @@ pthread_cond::TimedWait (DWORD dwMilliseconds)
    */
 
   rv = SignalObjectAndWait (mutex->win32_obj_id, win32_obj_id, dwMilliseconds,
-                            false);
+			    false);
 #endif
   switch (rv)
     {
@@ -1093,8 +1094,8 @@ pthread_key::run_destructor ()
       void *oldValue = get ();
       if (oldValue)
 	{
-    	  set (NULL);
-    	  destructor (oldValue);
+	  set (NULL);
+	  destructor (oldValue);
 	}
     }
 }
@@ -1174,7 +1175,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
   lock_counter (MUTEX_LOCK_COUNTER_INITIAL),
   win32_obj_id (NULL), recursion_counter (0),
   condwaits (0), owner (NULL), type (PTHREAD_MUTEX_DEFAULT),
-  pshared(PTHREAD_PROCESS_PRIVATE)
+  pshared (PTHREAD_PROCESS_PRIVATE)
 {
   win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
   if (!win32_obj_id)
@@ -1186,12 +1187,12 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
   if (attr)
     {
       if (attr->pshared == PTHREAD_PROCESS_SHARED)
-        {
-          // fail
-          magic = 0;
-          return;
-        }
-      
+	{
+	  // fail
+	  magic = 0;
+	  return;
+	}
+
       type = attr->mutextype;
     }
 
@@ -1212,7 +1213,7 @@ pthread_mutex::~pthread_mutex ()
     {
       pthread_mutex *tempmutex = MT_INTERFACE->mutexs;
       while (tempmutex->next && tempmutex->next != this)
-        tempmutex = tempmutex->next;
+	tempmutex = tempmutex->next;
       /* but there may be a race between the loop above and this statement */
       /* TODO: printf an error if the return value != this */
       InterlockedExchangePointer (&tempmutex->next, this->next);
@@ -1224,23 +1225,23 @@ pthread_mutex::Lock ()
 {
   int result = 0;
   pthread_t self = pthread::self ();
- 
+
   if (0 == InterlockedIncrement (&lock_counter))
     SetOwner ();
   else if (__pthread_equal (&owner, &self))
     {
       InterlockedDecrement (&lock_counter);
       if (PTHREAD_MUTEX_RECURSIVE == type)
-        result = LockRecursive ();
+	result = LockRecursive ();
       else
-        result = EDEADLK;
+	result = EDEADLK;
     }
   else
     {
       WaitForSingleObject (win32_obj_id, INFINITE);
       SetOwner ();
     }
- 
+
   return result;
 }
 
@@ -1250,7 +1251,7 @@ pthread_mutex::TryLock ()
 {
   int result = 0;
   pthread_t self = pthread::self ();
- 
+
   if (MUTEX_LOCK_COUNTER_INITIAL ==
       InterlockedCompareExchange (&lock_counter, 0, MUTEX_LOCK_COUNTER_INITIAL ))
     SetOwner ();
@@ -1258,7 +1259,7 @@ pthread_mutex::TryLock ()
     result = LockRecursive ();
   else
     result = EBUSY;
- 
+
   return result;
 }
 
@@ -1266,18 +1267,18 @@ int
 pthread_mutex::UnLock ()
 {
   pthread_t self = pthread::self ();
- 
+
   if (!__pthread_equal (&owner, &self))
     return EPERM;
- 
+
   if (0 == --recursion_counter)
     {
       owner = NULL;
       if (MUTEX_LOCK_COUNTER_INITIAL != InterlockedDecrement (&lock_counter))
-        // Another thread is waiting
-        ::ReleaseSemaphore (win32_obj_id, 1, NULL);
+	// Another thread is waiting
+	::ReleaseSemaphore (win32_obj_id, 1, NULL);
     }
- 
+
   return 0;
 }
 
@@ -1293,11 +1294,11 @@ pthread_mutex::Destroy ()
       --recursion_counter;
       return EBUSY;
     }
- 
+
   delete this;
   return 0;
 }
- 
+
 void
 pthread_mutex::SetOwner ()
 {
@@ -1908,23 +1909,23 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->mutex.UnLock ();
 
       switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, false))
-        {
-        case WAIT_OBJECT_0:
-          if (return_val)
-            *return_val = (*thread)->return_ptr;
-          delete (*thread);
-          break;
-        case WAIT_CANCELED:
-          // set joined thread back to joinable since we got canceled
-          (*thread)->joiner = NULL;
-          (*thread)->attr.joinable = PTHREAD_CREATE_JOINABLE;
-          joiner->cancel_self ();
-          // never reached
-          break;
-        default:
-          // should never happen
-          return EINVAL;
-        }
+	{
+	case WAIT_OBJECT_0:
+	  if (return_val)
+	    *return_val = (*thread)->return_ptr;
+	  delete (*thread);
+	  break;
+	case WAIT_CANCELED:
+	  // set joined thread back to joinable since we got canceled
+	  (*thread)->joiner = NULL;
+	  (*thread)->attr.joinable = PTHREAD_CREATE_JOINABLE;
+	  joiner->cancel_self ();
+	  // never reached
+	  break;
+	default:
+	  // should never happen
+	  return EINVAL;
+	}
     }
 
   return 0;
@@ -2609,7 +2610,7 @@ __pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
     return EINVAL;
- 
+
   switch (type)
     {
     case PTHREAD_MUTEX_ERRORCHECK:
@@ -2768,6 +2769,7 @@ void
 pthreadNull::pop_cleanup_handler (int const execute)
 {
 }
+
 unsigned long
 pthreadNull::getsequence_np ()
 {
