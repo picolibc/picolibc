@@ -33,6 +33,7 @@
 #define EF_SH_HAS_FP(flags) ((flags) & 8)
 #define EF_SH3E		   8
 #define EF_SH4		   9
+#define EF_SH2E            11
 
 /* This one can only mix in objects from other EF_SH5 objects.  */
 #define EF_SH5		  10
@@ -45,6 +46,13 @@
    : (((mach1) < EF_SH3 && (mach2) == EF_SH_UNKNOWN) \
       || ((mach2) < EF_SH3 && (mach1) == EF_SH_UNKNOWN)) \
    ? EF_SH3 \
+   : ((mach1) == EF_SH2E && EF_SH_HAS_FP (mach2)) \
+   ? (mach2) \
+   : ((mach2) == EF_SH2E && EF_SH_HAS_FP (mach1)) \
+   ? (mach1) \
+   : (((mach1) == EF_SH2E && (mach2) == EF_SH_UNKNOWN) \
+      || ((mach2) == EF_SH2E && (mach1) == EF_SH_UNKNOWN)) \
+   ? EF_SH2E \
    : (((mach1) == EF_SH3E && (mach2) == EF_SH_UNKNOWN) \
       || ((mach2) == EF_SH3E && (mach1) == EF_SH_UNKNOWN)) \
    ? EF_SH4 \

@@ -1,3 +1,15 @@
+2003-01-23  Nick Clifton  <nickc@redhat.com>
+
+	* Add sh2e support:
+
+	2002-04-02  Alexandre Oliva  <aoliva@redhat.com>
+
+	 	* sh.h (EF_SH_MERGE_MACH): Handle SH2E.
+
+	2002-04-02  Elena Zannoni  <ezannoni@redhat.com>
+
+		* sh.h (EF_SH2E): New.
+
 2003-01-23  Alan Modra  <amodra@bigpond.net.au>
 
 	* sh.h: Split out various bits to bfd/elf32-sh64.h.
