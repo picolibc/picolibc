@@ -103,6 +103,7 @@
 #include <exdisp.h>
 #include <mshtml.h>
 #include <servprov.h>
+#include <aclui.h>
 
 #else
 #undef BOOL
