@@ -2458,7 +2458,7 @@
 
 2003-08-30  Christopher Faylor  <cgf@redhat.com>
 
-	* heap.cc (sbrk): Save rounded addess in user_heap_max.
+	* heap.cc (sbrk): Save rounded address in user_heap_max.
 
 2003-08-30  Christopher Faylor  <cgf@redhat.com>
 
