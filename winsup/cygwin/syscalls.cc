@@ -1843,21 +1843,6 @@ ffs (int i)
 
 extern "C"
 void
-swab (const void *src, void *dst, ssize_t n)
-{
-  const char *from = (const char *) src;
-  char *to = (char *) dst;
-
-  while (n > 1)
-    {
-      const char b0 = from[--n], b1 = from[--n];
-      to[n] = b0;
-      to[n + 1] = b1;
-    }
-}
-
-extern "C"
-void
 login (struct utmp *ut)
 {
   register int fd;

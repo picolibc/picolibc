@@ -307,7 +307,7 @@ struct signal_dispatch
   void (*func) (int);
   int sig;
   int saved_errno;
-  CONTEXT *cx;
+  DWORD ebp;
   DWORD oldmask;
   DWORD retaddr;
 };

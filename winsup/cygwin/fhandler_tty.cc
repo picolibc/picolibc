@@ -110,7 +110,10 @@ fhandler_tty_common::__acquire_output_mutex (const char *fn, int ln,
   DWORD res = WaitForSingleObject (output_mutex, ms);
   if (res == WAIT_OBJECT_0)
     {
-#ifdef DEBUGGING
+#ifndef DEBUGGING
+      if (strace.active)
+	strace.prntf (_STRACE_TERMIOS, "%F (%d): tty output_mutex: acquired", fn, ln, res);
+#else
       ostack[osi].fn = fn;
       ostack[osi].ln = ln;
       ostack[osi].tname = threadname (0, 0);
@@ -118,8 +121,6 @@ fhandler_tty_common::__acquire_output_mutex (const char *fn, int ln,
       osi++;
 #endif
     }
-  if (strace.active)
-    strace.prntf (_STRACE_TERMIOS, "%F (%d): tty output_mutex: acquired", fn, ln, res);
   return res;
 }
 
@@ -128,7 +129,10 @@ fhandler_tty_common::__release_output_mutex (const char *fn, int ln)
 {
   if (ReleaseMutex (output_mutex))
     {
-#ifdef DEBUGGING
+#ifndef DEBUGGING
+      if (strace.active)
+	strace.prntf (_STRACE_TERMIOS, "%F (%d): tty output_mutex released", fn, ln);
+#else
       if (osi > 0)
 	osi--;
       termios_printf ("released at %s:%d, osi %d", fn, ln, osi);
@@ -136,8 +140,6 @@ fhandler_tty_common::__release_output_mutex (const char *fn, int ln)
       ostack[osi].ln = -ln;
 #endif
     }
-  if (strace.active)
-    strace.prntf (_STRACE_TERMIOS, "%F (%d): tty output_mutex released", fn, ln);
 }
 
 #define acquire_output_mutex(ms) \
@@ -288,7 +290,10 @@ again:
     }
 
   if (get_ttyp ()->OutputStopped)
-    WaitForSingleObject (restart_output_event, INFINITE);
+    {
+      termios_printf ("waiting for restart_output_event");
+      WaitForSingleObject (restart_output_event, INFINITE);
+    }
 
   if (get_ttyp ()->ti.c_oflag & OPOST)	// post-process output
     {
@@ -575,7 +580,6 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 
   while (len)
     {
-    wait:
       termios_printf ("reading %d bytes (vtime %d)",
 		      min ((unsigned) vmin, min (len, sizeof (buf))), vtime);
       if (ReadFile (get_handle (), (unsigned *) buf,
@@ -614,7 +618,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	  if (get_flags () & (O_NONBLOCK | O_NDELAY))
 	    break;
 
-	  /* We can't enter to blocking Readfile - signals will be lost!
+	  /* We can't enter the blocking Readfile as signals will be lost.
 	   * So, poll the pipe for data.
 	   * FIXME: try to avoid polling...
 	   * FIXME: Current EINTR scheme does not take vmin/vtime into account.
@@ -625,7 +629,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	      if (vmin == 0 && vtime == 0)
 		return 0;		// min = 0, time = 0
 	      if (vtime == 0)
-		goto wait;		// min > 0, time = 0
+		continue;		// min > 0, time = 0
 	      while (vtime--)
 		{
 		  PeekNamedPipe (get_handle (), NULL, 0, NULL, &n, NULL);

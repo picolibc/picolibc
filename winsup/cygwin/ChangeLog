@@ -1,3 +1,33 @@
+Thu Mar  9 15:25:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc: Eliminate oldstack CYGWIN option.
+	* exceptions.cc (sfta): Eliminate obsolete function.
+	(sgmb): Eliminate obsolete function.
+	(class stack_info): Remove MS method for walking the stack.
+	(stack_info::init): Just initialize required fields.
+	(stack_info::brute_force): Rename to stack_info::walk.
+	(handle_exceptions): Pass derived frame pointer to sig_send.
+	(interrupt_setup): Clear saved frame pointer here.
+	(interrupt_on_return): thestack is no longer a pointer.
+	(call_handler): Accept a flag to indicate when a signal was sent from
+	other than the main thread.  Use saved frame pointer for determining
+	where to place signal handler call.
+	(sig_handle): Accept "nonmain" argument.  Pass it to call_handler.
+	* fhandler_tty.cc (fhandler_tty_common::__acquire_output_mutex): Change
+	debugging output slightly.
+	* (fhandler_tty_common::__release_output_mutex): Ditto.
+	(fhandler_tty_slave::read): Fix a comment, remove a goto.
+	* sigproc.cc (sig_send): Accept an optional frame pointer argument for
+	use when suspending the main process.  sigcomplete_main is an autoreset
+	event now.  Save frame pointer for non-main operation.
+	(wait_sig): Make sigcomplete_main an autoreset event.  Eliminate
+	NOSIGQUEUE.  Pass rc to sig_handle to signify if this was a nonmain
+	process.
+	* sigproc.h: Reflect change to sig_send argument.
+	* syscalls.cc (swab): Eliminate swab function since it is now available
+	in newlib.
+	* winsup.h (signal_dispatch): Change CONTEXT cx to DWORD ebp.
+
 Tue Mar  7 13:31:10 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (sig_send): Eliminate sync_sig_send synchronization since

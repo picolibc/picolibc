@@ -708,7 +708,7 @@ sigproc_terminate (void)
  * completed before returning.
  */
 int __stdcall
-sig_send (pinfo *p, int sig)
+sig_send (pinfo *p, int sig, DWORD ebp)
 {
   int rc = 1;
   DWORD tid = GetCurrentThreadId ();
@@ -716,6 +716,7 @@ sig_send (pinfo *p, int sig)
   HANDLE thiscatch = NULL;
   HANDLE thiscomplete = NULL;
   BOOL wait_for_completion;
+  extern signal_dispatch sigsave;
 
   if (p == myself_nowait_nonmain)
     p = (tid == maintid) ? myself : myself_nowait;
@@ -756,7 +757,7 @@ sig_send (pinfo *p, int sig)
 	{
 	  thiscatch = sigcatch_main;
 	  thiscomplete = sigcomplete_main;
-	  ResetEvent (thiscomplete);
+	  sigsave.ebp = ebp ?: (DWORD) __builtin_frame_address (1);
 	}
     }
   else if (!(thiscatch = getsem (p, "sigcatch", 0, 0)))
@@ -1158,7 +1159,7 @@ wait_sig (VOID *)
   sigcatch_nonmain = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
   sigcatch_main = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
   sigcomplete_nonmain = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
-  sigcomplete_main = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  sigcomplete_main = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
   sigproc_printf ("sigcatch_nonmain %p", sigcatch_nonmain);
 
   /* Setting dwProcessId flags that this process is now capable of receiving
@@ -1231,11 +1232,7 @@ wait_sig (VOID *)
       int dispatched_sigchld = 0;
       for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
 	{
-#ifdef NOSIGQUEUE
-	  if (InterlockedExchange (myself->getsigtodo(sig), 0L) > 0)
-#else
 	  while (InterlockedDecrement (myself->getsigtodo(sig)) >= 0)
-#endif
 	    {
 	      if (sig == SIGCHLD)
 		saw_sigchld = 1;
@@ -1263,7 +1260,7 @@ wait_sig (VOID *)
 		/* Signalled from a child process that it has stopped */
 		case __SIGCHILDSTOPPED:
 		  sip_printf ("Received child stopped notification");
-		  dispatched |= sig_handle (SIGCHLD);
+		  dispatched |= sig_handle (SIGCHLD, rc);
 		  if (proc_subproc (PROC_CHILDSTOPPED, 0))
 		    dispatched |= 1;
 		  break;
@@ -1271,18 +1268,16 @@ wait_sig (VOID *)
 		/* A normal UNIX signal */
 		default:
 		  sip_printf ("Got signal %d", sig);
-		  int wasdispatched = sig_handle (sig);
+		  int wasdispatched = sig_handle (sig, rc);
 		  dispatched |= wasdispatched;
 		  if (sig == SIGCHLD && wasdispatched)
 		    dispatched_sigchld = 1;
 		  goto nextsig;
 		}
 	    }
-#ifndef NOSIGQUEUE
 	  /* Decremented too far. */
 	  if (InterlockedIncrement (myself->getsigtodo(sig)) > 0)
 	    pending_signals = 1;
-#endif
 	nextsig:
 	  continue;
 	}

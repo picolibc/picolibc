@@ -37,7 +37,7 @@ extern HANDLE signal_arrived;
 BOOL __stdcall my_parent_is_alive ();
 extern "C" int __stdcall sig_dispatch_pending (int force = FALSE) __asm__ ("sig_dispatch_pending");
 extern "C" void __stdcall set_process_mask (sigset_t newmask);
-int __stdcall sig_handle (int);
+int __stdcall sig_handle (int, int);
 void __stdcall sig_clear (int);
 void __stdcall sig_set_pending (int);
 int __stdcall handle_sigsuspend (sigset_t);
@@ -48,7 +48,7 @@ void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
 BOOL __stdcall proc_exists (pinfo *);
 int __stdcall proc_subproc (DWORD, DWORD);
-int __stdcall sig_send (pinfo *, int);
+int __stdcall sig_send (pinfo *, int, DWORD ebp = 0);
 
 extern char myself_nowait_dummy[];
 extern char myself_nowait_nonmain_dummy[];

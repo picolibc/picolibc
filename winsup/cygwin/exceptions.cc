@@ -191,26 +191,10 @@ exception (EXCEPTION_RECORD *e,  CONTEXT *in)
 #endif
 }
 
-extern "C" {
-static LPVOID __stdcall
-sfta(HANDLE, DWORD)
-{
-  return NULL;
-}
-
-static DWORD __stdcall
-sgmb(HANDLE, DWORD)
-{
-  return 4;
-}
-
 #ifdef __i386__
 /* Print a stack backtrace. */
 
 #define HAVE_STACK_TRACE
-
-/* Set from CYGWIN environment variable if want to use old method. */
-BOOL NO_COPY oldstack = 0;
 
 /* The function used to load the imagehlp DLL.  Returns TRUE if the
    DLL was found. */
@@ -227,53 +211,38 @@ LoadDLLfunc (StackWalk, StackWalk@36, imagehlp)
 class stack_info
 {
   int first_time;		/* True if just starting to iterate. */
-  HANDLE hproc;			/* Handle of process to inspect. */
-  HANDLE hthread;		/* Handle of thread to inspect. */
-  int (stack_info::*get) (HANDLE, HANDLE); /* Gets the next stack frame */
+  int walk ();		 	/* Uses the "old" method */
 public:
   STACKFRAME sf;		/* For storing the stack information */
-  int walk (HANDLE, HANDLE);	/* Uses the StackWalk function */
-  int brute_force (HANDLE, HANDLE); /* Uses the "old" method */
-  void init (CONTEXT *);	/* Called the first time that stack info is needed */
+  void init (DWORD);		/* Called the first time that stack info is needed */
+  stack_info (): first_time(1) {}
 
-  /* The constructor remembers hproc and hthread and determines which stack walking
-     method to use */
-  stack_info (int use_old_stack, HANDLE hp, HANDLE ht): hproc(hp), hthread(ht)
-  {
-    if (!use_old_stack && LoadDLLinitnow (imagehlp))
-      get = &stack_info::walk;
-    else
-      get = &stack_info::brute_force;
-  }
   /* Postfix ++ iterates over the stack, returning zero when nothing is left. */
-  int operator ++(int) { return (this->*get) (hproc, hthread); }
+  int operator ++(int) { return this->walk (); }
 };
 
 /* The number of parameters used in STACKFRAME */
-#define NPARAMS (sizeof(thestack->sf.Params) / sizeof(thestack->sf.Params[0]))
+#define NPARAMS (sizeof(thestack.sf.Params) / sizeof(thestack.sf.Params[0]))
 
 /* This is the main stack frame info for this process. */
-static stack_info *thestack = NULL;
-static signal_dispatch sigsave;
+static NO_COPY stack_info thestack;
+signal_dispatch NO_COPY sigsave;
 
 /* Initialize everything needed to start iterating. */
 void
-stack_info::init (CONTEXT *cx)
+stack_info::init (DWORD ebp)
 {
   first_time = 1;
   memset (&sf, 0, sizeof(sf));
-  sf.AddrPC.Offset = cx->Eip;
-  sf.AddrPC.Mode = AddrModeFlat;
-  sf.AddrStack.Offset = cx->Esp;
-  sf.AddrStack.Mode = AddrModeFlat;
-  sf.AddrFrame.Offset = cx->Ebp;
+  sf.AddrFrame.Offset = ebp;
+  sf.AddrPC.Offset = ((DWORD *) ebp)[1];
   sf.AddrFrame.Mode = AddrModeFlat;
 }
 
 /* Walk the stack by looking at successive stored 'bp' frames.
    This is not foolproof. */
 int
-stack_info::brute_force (HANDLE, HANDLE)
+stack_info::walk ()
 {
   char **ebp;
   if (first_time)
@@ -300,44 +269,20 @@ stack_info::brute_force (HANDLE, HANDLE)
   return 1;
 }
 
-/* Use Win32 StackWalk() API to display the stack.  This is theoretically
-   more foolproof than the brute force method above. */
-int
-stack_info::walk (HANDLE hproc, HANDLE hthread)
-{
-#ifdef SOMEDAY
-  /* It would be nice to get more information (like DLL symbols and module name)
-     for each stack frame but in order to do that we have to call SymInitialize.
-     It doesn't seem to be possible to do this inside of an excaption handler for
-     some reason. */
-  static int initialized = 0;
-  if (!initialized && !SymInitialize(hproc, NULL, TRUE))
-    small_printf("SymInitialize error, %E\n");
-  initialized = 1;
-#endif
-
-  return StackWalk (IMAGE_FILE_MACHINE_I386, hproc, hthread, &sf, NULL, NULL,
-		    sfta, sgmb, NULL) && !!sf.AddrFrame.Offset;
-}
-
 /* Dump the stack using either the old method or the new Win32 API method */
 void
 stack (HANDLE hproc, HANDLE hthread, CONTEXT *cx)
 {
   int i;
 
-  /* Set this up if it's the first time. */
-  if (!thestack)
-    thestack = new stack_info (oldstack, hproc, hthread);
-
-  thestack->init (cx);	/* Initialize from the input CONTEXT */
+  thestack.init (cx->Ebp);	/* Initialize from the input CONTEXT */
   small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
-  for (i = 0; i < 16 && (*thestack)++ ; i++)
+  for (i = 0; i < 16 && thestack++ ; i++)
     {
-      small_printf ("%08x  %08x ", thestack->sf.AddrFrame.Offset,
-		    thestack->sf.AddrPC.Offset);
+      small_printf ("%08x  %08x ", thestack.sf.AddrFrame.Offset,
+		    thestack.sf.AddrPC.Offset);
       for (unsigned j = 0; j < NPARAMS; j++)
-	small_printf ("%s%08x", j == 0 ? " (" : ", ", thestack->sf.Params[j]);
+	small_printf ("%s%08x", j == 0 ? " (" : ", ", thestack.sf.Params[j]);
       small_printf (")\r\n");
     }
   small_printf ("End of stack trace%s",
@@ -551,18 +496,15 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
   debug_printf ("In cygwin_except_handler calling %p",
 		 myself->getsig(sig).sa_handler);
 
-  DWORD *bp = (DWORD *)in->Esp;
-  for (DWORD *bpend = bp - 8; bp > bpend; bp--)
-    if (*bp == in->SegCs && bp[-1] == in->Eip)
+  DWORD *ebp = (DWORD *)in->Esp;
+  for (DWORD *bpend = ebp - 8; ebp > bpend; ebp--)
+    if (*ebp == in->SegCs && ebp[-1] == in->Eip)
       {
-	bp -= 2;
+	ebp -= 2;
 	break;
       }
 
-  in->Ebp = (DWORD) bp;
-  sigsave.cx = in;
-  sig_send (NULL, sig);		// Signal myself
-  sigsave.cx = NULL;
+  sig_send (NULL, sig, (DWORD) ebp);		// Signal myself
   return 0;
 }
 #endif /* __i386__ */
@@ -574,7 +516,6 @@ stack (void)
   system_printf ("Stack trace not yet supported on this machine.");
 }
 #endif
-}
 
 /* Utilities to call a user supplied exception handler.  */
 
@@ -659,6 +600,7 @@ interrupt_setup (int sig, struct sigaction& siga, void *handler, DWORD retaddr)
   sigsave.func = (void (*)(int)) handler;
   sigsave.sig = sig;
   sigsave.saved_errno = -1;		// Flag: no errno to save
+  sigsave.ebp = 0;
 }
 
 static void
@@ -670,24 +612,19 @@ interrupt_now (CONTEXT *ctx, int sig, struct sigaction& siga, void *handler)
 }
 
 static int
-interrupt_on_return (CONTEXT *ctx, int sig, struct sigaction& siga, void *handler)
+interrupt_on_return (DWORD ebp, int sig, struct sigaction& siga, void *handler)
 {
   int i;
 
   if (sigsave.sig)
     return 0;	/* Already have a signal stacked up */
 
-  /* Set this up if it's the first time. */
-  /* FIXME: Eventually augment to handle more than one thread */
-  if (!thestack)
-    thestack = new stack_info (oldstack, hMainProc, hMainThread);
-
-  thestack->init (ctx);  /* Initialize from the input CONTEXT */
-  for (i = 0; i < 32 && (*thestack)++ ; i++)
-    if (interruptible (thestack->sf.AddrReturn.Offset))
+  thestack.init (ebp);  /* Initialize from the input CONTEXT */
+  for (i = 0; i < 32 && thestack++ ; i++)
+    if (interruptible (thestack.sf.AddrReturn.Offset))
       {
-	DWORD *addr_retaddr = ((DWORD *)thestack->sf.AddrFrame.Offset) + 1;
-	if (*addr_retaddr  == thestack->sf.AddrReturn.Offset)
+	DWORD *addr_retaddr = ((DWORD *)thestack.sf.AddrFrame.Offset) + 1;
+	if (*addr_retaddr  == thestack.sf.AddrReturn.Offset)
 	  {
 	    interrupt_setup (sig, siga, handler, *addr_retaddr);
 	    *addr_retaddr = (DWORD) sigdelayed;
@@ -707,11 +644,12 @@ set_sig_errno (int e)
 }
 
 static int
-call_handler (int sig, struct sigaction& siga, void *handler)
+call_handler (int sig, struct sigaction& siga, void *handler, int nonmain)
 {
-  CONTEXT *cx, orig;
+  CONTEXT cx;
+  DWORD ebp;
   int interrupted = 1;
-  HANDLE hth;
+  HANDLE hth = NULL;
   int res;
 
   if (hExeced != NULL && hExeced != INVALID_HANDLE_VALUE)
@@ -721,56 +659,52 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       exec_exit = sig;			// Maybe we'll exit with this value
       goto out1;
     }
-  hth = myself->getthread2signal ();
 
-  /* Suspend the thread which will receive the signal.  But first ensure that
-     this thread doesn't have the sync_proc_subproc and mask_sync mutos, since
-     we need those (hack alert).  If the thread-to-be-suspended has either of
-     these mutos, enter a busy loop until it is released.  If the thread is
-     already suspended (which should never occur) then just queue the signal. */
-  for (;;)
-    {
-      sigproc_printf ("suspending mainthread");
-      res = SuspendThread (hth);
-
-      /* FIXME: Make multi-thread aware */
-      for (muto *m = muto_start.next;  m != NULL; m = m->next)
-	if (m->unstable () || m->owner () == maintid)
-	  goto keep_looping;
-
-      break;
-
-    keep_looping:
-      sigproc_printf ("suspended thread owns a muto");
-      if (res)
-	  goto set_pending;
-
-      ResumeThread (hth);
-      Sleep (0);
-    }
-
-  sigproc_printf ("SuspendThread returned %d", res);
-
-  if (sigsave.cx)
-    {
-      cx = sigsave.cx;
-      sigsave.cx = NULL;
-    }
+  if (!nonmain)
+    ebp = sigsave.ebp;
   else
     {
-      cx = &orig;
-      /* FIXME - this does not preserve FPU state */
-      orig.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-      if (!GetThreadContext (hth, cx))
+      hth = myself->getthread2signal ();
+      /* Suspend the thread which will receive the signal.  But first ensure that
+	 this thread doesn't have the sync_proc_subproc and mask_sync mutos, since
+	 we need those (hack alert).  If the thread-to-be-suspended has either of
+	 these mutos, enter a busy loop until it is released.  If the thread is
+	 already suspended (which should never occur) then just queue the signal. */
+      for (;;)
+	{
+	  sigproc_printf ("suspending mainthread");
+	  res = SuspendThread (hth);
+
+	  /* FIXME: Make multi-thread aware */
+	  for (muto *m = muto_start.next;  m != NULL; m = m->next)
+	    if (m->unstable () || m->owner () == maintid)
+	      goto keep_looping;
+
+	  break;
+
+	keep_looping:
+	  sigproc_printf ("suspended thread owns a muto");
+	  if (res)
+	      goto set_pending;
+
+	  ResumeThread (hth);
+	  Sleep (0);
+	}
+
+      sigproc_printf ("SuspendThread returned %d", res);
+
+      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+      if (!GetThreadContext (hth, &cx))
 	{
 	  system_printf ("couldn't get context of main thread, %E");
 	  goto out;
 	}
+      ebp = cx.Ebp;
     }
 
-  if (cx == &orig && interruptible (cx->Eip))
-    interrupt_now (cx, sig, siga, handler);
-  else if (!interrupt_on_return (cx, sig, siga, handler))
+  if (nonmain && interruptible (cx.Eip))
+    interrupt_now (&cx, sig, siga, handler);
+  else if (!interrupt_on_return (ebp, sig, siga, handler))
     {
     set_pending:
       pending_signals = 1;	/* FIXME: Probably need to be more tricky here */
@@ -780,15 +714,20 @@ call_handler (int sig, struct sigaction& siga, void *handler)
 
   if (interrupted)
     {
-      (void) SetEvent (signal_arrived);	// For an EINTR case
+      res = SetEvent (signal_arrived);	// For an EINTR case
       sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
       /* Clear any waiting threads prior to dispatching to handler function */
       proc_subproc(PROC_CLEARWAIT, 1);
     }
 
 out:
-  res = ResumeThread (hth);
-  sigproc_printf ("ResumeThread returned %d", res);
+  if (!hth)
+    sigproc_printf ("modified main-thread stack");
+  else
+    {
+      res = ResumeThread (hth);
+      sigproc_printf ("ResumeThread returned %d", res);
+    }
 
 out1:
   sigproc_printf ("returning %d", interrupted);
@@ -892,7 +831,7 @@ sig_handle_tty_stop (int sig)
 }
 
 int __stdcall
-sig_handle (int sig)
+sig_handle (int sig, int nonmain)
 {
   int rc = 0;
 
@@ -971,7 +910,7 @@ stop:
 dosig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", sig, thissig.sa_handler);
-  rc = call_handler (sig, thissig, handler);
+  rc = call_handler (sig, thissig, handler, nonmain);
 
 done:
   sigproc_printf ("returning %d", rc);
