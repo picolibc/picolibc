@@ -1,3 +1,9 @@
+2002-07-02  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.in: Don't try to build gdbtest, tgas, ispell, inet, or
+	cvs[src].
+	* configure.in: Ditto.
+
 2002-07-01  Nathanael Nerode <neroden@gcc.gnu.org>
 
 	* Makefile.in: Eliminate 'apache' targets.
