@@ -15,7 +15,8 @@
 
 struct dirent
 {
-  long __d_reserved[4];
+  long __d_reserved[3];
+  long d_fd; /* File descriptor of open directory. Used since Cygwin 1.3.3. */
   ino_t d_ino; /* Just for compatibility, it's junk */
   char d_name[256];		/* FIXME: use NAME_MAX? */
 };
@@ -48,6 +49,8 @@ DIR *opendir (const char *);
 struct dirent *readdir (DIR *);
 void rewinddir (DIR *);
 int closedir (DIR *);
+
+int dirfd (DIR *);
 
 #ifndef _POSIX_SOURCE
 off_t telldir (DIR *);
