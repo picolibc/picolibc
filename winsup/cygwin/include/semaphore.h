@@ -1,6 +1,6 @@
 /* semaphore.h: POSIX semaphore interface
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2003 Red Hat, Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
