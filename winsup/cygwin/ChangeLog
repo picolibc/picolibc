@@ -1,3 +1,8 @@
+2002-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* speclib: Use rm -f to remove temp file just to quiet any potential
+	warnings.
+
 2002-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (create_token): Use sec_user() to create
