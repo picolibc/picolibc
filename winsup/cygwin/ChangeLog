@@ -1,5 +1,31 @@
 2002-08-01  Christopher Faylor  <cgf@redhat.com>
 
+	* cygthread.cc (cygthread::exit_thread): Define new method.
+	* cygthread.h (cygthread::exit_thread): Declare new method.
+	* fhandler.h (fhandler_tty_master::hThread): Delete.
+	(fhandler_tty_master::output_thread): Define.
+	* fhandler_tty.cc (fhandler_tty_master::fhandler_tty_master): Adjust
+	constructor.
+	(fhandler_tty_master::init): Use cygthread rather than handle.
+	(process_output): Use cygthread method to exit.
+	(fhandler_tty_master::fixup_after_fork): Set output_thread to NULL
+	after fork.
+	(fhandler_tty_master::fixup_after_exec): Set output_thread to NULL
+	after spawn/exec.
+	* tty.cc (tty_list::terminate): Detach from output_thread using
+	cygthread method.
+
+2002-08-01  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (_link): Revert previous change and just always
+	dereference the oldpath.
+
+2002-08-01  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (link): Properly deal with a link to a symlink.
+
+2002-08-01  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc: Remove cruft.
 
 2002-08-01  Christopher Faylor  <cgf@redhat.com>

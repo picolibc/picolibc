@@ -27,4 +27,5 @@ class cygthread
   operator HANDLE ();
   static bool is ();
   void * operator new (size_t);
+  void exit_thread ();
 };

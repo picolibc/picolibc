@@ -36,7 +36,7 @@ static DWORD WINAPI process_output (void *);		// Output queue thread
 static DWORD WINAPI process_ioctl (void *);		// Ioctl requests thread
 
 fhandler_tty_master::fhandler_tty_master (int unit)
-  : fhandler_pty_master (FH_TTYM, unit), console (NULL), hThread (NULL)
+  : fhandler_pty_master (FH_TTYM, unit), console (NULL), output_thread (NULL)
 {
 }
 
@@ -68,9 +68,8 @@ fhandler_tty_master::init (int ntty)
   h = new cygthread (process_ioctl, NULL, "ttyioctl");
   SetThreadPriority (*h, THREAD_PRIORITY_HIGHEST);
 
-  h = new cygthread (process_output, NULL, "ttyout");
-  hThread = *h;
-  SetThreadPriority (h, THREAD_PRIORITY_HIGHEST);
+  output_thread = new cygthread (process_output, NULL, "ttyout");
+  SetThreadPriority (*output_thread, THREAD_PRIORITY_HIGHEST);
 
   return 0;
 }
@@ -376,15 +375,13 @@ process_output (void *)
   for (;;)
     {
       int n = tty_master->process_slave_output (buf, OUT_BUFFER_SIZE, 0);
-      if (n < 0)
+      if (n <= 0)
 	{
-	  termios_printf ("ReadFile %E");
-	  ExitThread (0);
-	}
-      if (n == 0)
-	{
-	  /* End of file.  */
-	  ExitThread (0);
+	  if (n < 0)
+	    termios_printf ("ReadFile %E");
+	  cygthread *t = tty_master->output_thread;
+	  tty_master->output_thread = NULL;
+	  t->exit_thread ();
 	}
       n = tty_master->console->write ((void *) buf, (size_t) n);
       tty_master->get_ttyp ()->write_error = n == -1 ? get_errno () : 0;
@@ -1171,6 +1168,7 @@ fhandler_tty_master::fixup_after_fork (HANDLE child)
 {
   this->fhandler_pty_master::fixup_after_fork (child);
   console->fixup_after_fork (child);
+  output_thread = NULL;		// It's unreachable now
 }
 
 void
@@ -1178,7 +1176,7 @@ fhandler_tty_master::fixup_after_exec (HANDLE)
 {
   console->close ();
   init_console ();
-  return;
+  output_thread = NULL;		// It's unreachable now
 }
 
 int

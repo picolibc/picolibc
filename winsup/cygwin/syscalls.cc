@@ -615,8 +615,8 @@ _link (const char *a, const char *b)
 {
   int res = -1;
   sigframe thisframe (mainthread);
+  path_conv real_a (a, PC_SYM_FOLLOW | PC_FULL);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
-  path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
 
   if (real_a.error)
     {
