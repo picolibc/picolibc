@@ -1,5 +1,10 @@
 2001-11-04  Christopher Faylor  <cgf@redhat.com>
 
+	* dtable.cc (dtable::build_fhandler): Fix debug_printf to avoid SEGV
+	due to incorrect parameter placement.
+
+2001-11-04  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.h (fhandler_pipe::broken_pipe): Renamed from saweof.
 	(fhandler_pipe::set_eof): Reflect above change.
 	* pipe.cc (fhandler_pipe::fhandler_pipe): Ditto.
