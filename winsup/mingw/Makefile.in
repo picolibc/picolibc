@@ -202,11 +202,14 @@ DLL_DLLTOOL_STUFF = --as=$(AS) --dllname $(THREAD_DLL_NAME) \
 
 $(THREAD_DLL_NAME) mingwthrd.def: $(DLL_OFILES) Makefile
 	$(DLLTOOL) --as $(AS) --output-def mingwthrd.def $(DLL_OFILES)
-	$(CC) -Wl,--base-file=mingwthrd.base $(DLL_CC_STUFF)
+	$(CC) -Wl,--base-file=mingwthrd.base $(DLL_CC_STUFF) \
+		-o mingwthrd_dummy.exe
 	$(DLLTOOL) $(DLL_DLLTOOL_STUFF)
-	$(CC) -Wl,--base-file=mingwthrd.base mingwthrd.exp $(DLL_CC_STUFF)
+	$(CC) -Wl,--base-file=mingwthrd.base mingwthrd.exp $(DLL_CC_STUFF) \
+		-o mingwthrd_dummy.exe
 	$(DLLTOOL) $(DLL_DLLTOOL_STUFF) 
 	$(CC) mingwthrd.exp -o $(THREAD_DLL_NAME) $(DLL_CC_STUFF)
+	rm -f mingwthrd_dummy.exe
 
 libmingw32.a: $(MINGW_OBJS)
 	$(AR) rc $@ $(MINGW_OBJS)
@@ -249,7 +252,7 @@ crt2.o dllcrt2.o:
 
 clean:
 	-rm -f *.o *.a *~ core a.out mingwthrd.def mingwthrd.base mingwthrd.exp
-	-rm -f $(THREAD_DLL_NAME)
+	-rm -f $(THREAD_DLL_NAME) mingwthrd_dummy.exe
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
 
 distclean:
