@@ -1,3 +1,16 @@
+2002-02-28  dannysmith@users.sourceforge.net
+
+	* include/windows.h; Remove test for __W32API_MAJOR_VERSION
+	when selecting winsock interface.
+	* include/winsock.h (SOCKET_ADDRESS_LIST): Add structure
+	and typedefs. Thanks to: 'Lorenzo' <conte0@infinito.it>.
+	Expand FIXME comment.
+	(WSACOMPLETIONTYPE): Add enum.
+	(WSACOMPLETION): Add structure and typedefs.
+	(WSANSPIoctl): Add function prototpe and callback typedef.
+	(SIO_NSP_NOTIFY_CHANGE): Add define.
+	(sockaddr_storage): Add structure and typedefs.
+
 2002-02-16  Andriy Palamarchuk  <apa3a@yahoo.com>
 
 	* include/winuser.h (OIC_*): Add resource constants.

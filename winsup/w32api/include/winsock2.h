@@ -313,6 +313,16 @@ struct sockaddr {
 };
 #endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
+/* Portable IPv6/IPv4 version of sockaddr.
+   Uses padding to force 8 byte alignment
+   and maximum size of 128 bytes */
+struct sockaddr_storage {
+    short ss_family;
+    char __ss_pad1[6];    /* pad to 8 */
+    long long __ss_align; /* force alignment */
+    char __ss_pad2[112];  /* pad to 128 */
+};
+
 struct sockproto {
 	u_short sp_family;
 	u_short sp_protocol;
@@ -503,6 +513,7 @@ int PASCAL gethostname(char*,int);
 typedef struct sockaddr SOCKADDR;
 typedef struct sockaddr *PSOCKADDR;
 typedef struct sockaddr *LPSOCKADDR;
+typedef struct sockaddr_storage SOCKADDR_STORAGE, *PSOCKADDR_STORAGE;
 typedef struct sockaddr_in SOCKADDR_IN;
 typedef struct sockaddr_in *PSOCKADDR_IN;
 typedef struct sockaddr_in *LPSOCKADDR_IN;
@@ -701,10 +712,21 @@ typedef struct _WSAVersion
 } WSAVERSION, *PWSAVERSION, *LPWSAVERSION;
 
 /*
- * nspapi.h has definition of  LPCSADDR_INFO, needed in WSAQuery
- * but itself needs LPSOCKADDR which is defined earlier in this file 
-*/
+ * FIXME: nspapi.h has definition of SOCKET_ADDRESS needed by
+ * SOCKET_ADDRESS_LIST and  LPCSADDR_INFO, needed in WSAQuery
+ * but itself needs LPSOCKADDR which is defined earlier in this file
+ * Incuding nspapi.h here works for now, but may need to change
+ * as nspapi.h actually starts to define the Name Space Provider API.
+ * MSDN docs say that SOCKET_ADDRESS is defined in winsock2.h. 
+ */
+
 #include <nspapi.h>
+
+typedef struct _SOCKET_ADDRESS_LIST {
+    INT             iAddressCount;
+    SOCKET_ADDRESS  Address[1];
+} SOCKET_ADDRESS_LIST, * LPSOCKET_ADDRESS_LIST;
+
 #ifndef __BLOB_T_DEFINED /* also in wtypes.h */
 #define __BLOB_T_DEFINED
 typedef struct _BLOB {
@@ -906,6 +928,37 @@ typedef WSAPROTOCOL_INFOA WSAPROTOCOL_INFO;
 typedef LPWSAPROTOCOL_INFOA LPWSAPROTOCOL_INFO;
 #endif
 
+/* Needed for XP & .NET Server function WSANSPIoctl.  */
+typedef enum _WSACOMPLETIONTYPE {
+    NSP_NOTIFY_IMMEDIATELY = 0,
+    NSP_NOTIFY_HWND,
+    NSP_NOTIFY_EVENT,
+    NSP_NOTIFY_PORT,
+    NSP_NOTIFY_APC
+} WSACOMPLETIONTYPE, * PWSACOMPLETIONTYPE, * LPWSACOMPLETIONTYPE;
+typedef struct _WSACOMPLETION {
+    WSACOMPLETIONTYPE Type;
+    union {
+        struct {
+            HWND hWnd;
+            UINT uMsg;
+            WPARAM context;
+        } WindowMessage;
+        struct {
+            LPWSAOVERLAPPED lpOverlapped;
+        } Event;
+        struct {
+            LPWSAOVERLAPPED lpOverlapped;
+            LPWSAOVERLAPPED_COMPLETION_ROUTINE lpfnCompletionProc;
+        } Apc;
+        struct {
+            LPWSAOVERLAPPED lpOverlapped;
+            HANDLE hPort;
+            ULONG_PTR Key;
+        } Port;
+    } Parameters;
+} WSACOMPLETION, *PWSACOMPLETION, *LPWSACOMPLETION;
+
 #define PFL_MULTIPLE_PROTO_ENTRIES          0x00000001
 #define PFL_RECOMMENDED_PROTO_ENTRY         0x00000002
 #define PFL_HIDDEN                          0x00000004
@@ -970,6 +1023,8 @@ typedef LPWSAPROTOCOL_INFOA LPWSAPROTOCOL_INFO;
 #define SIO_ADDRESS_LIST_QUERY        _WSAIOR(IOC_WS2,22)
 #define SIO_ADDRESS_LIST_CHANGE       _WSAIO(IOC_WS2,23)
 #define SIO_QUERY_TARGET_PNP_HANDLE   _WSAIOR(IOC_WS2,24)
+#define SIO_NSP_NOTIFY_CHANGE         _WSAIOW(IOC_WS2,25)
+
 #define TH_NETDEV	0x00000001
 #define TH_TAPI	0x00000002
 
@@ -1004,6 +1059,7 @@ INT WINAPI WSALookupServiceBeginW(LPWSAQUERYSETW lpqsRestrictions, DWORD, LPHAND
 INT WINAPI WSALookupServiceNextA(HANDLE, DWORD, LPDWORD, LPWSAQUERYSETA);
 INT WINAPI WSALookupServiceNextW(HANDLE, DWORD, LPDWORD, LPWSAQUERYSETW);
 INT WINAPI WSALookupServiceEnd(HANDLE);
+int WINAPI WSANSPIoctl(HANDLE,DWORD,LPVOID,DWORD,LPVOID,DWORD,LPDWORD,LPWSACOMPLETION); /* XP or .NET Server */
 int WINAPI WSANtohl(SOCKET, unsigned long, unsigned long *);
 int WINAPI WSANtohs(SOCKET, unsigned short, unsigned short *);
 int WINAPI WSARecv(SOCKET, LPWSABUF, DWORD, LPDWORD, LPDWORD, LPWSAOVERLAPPED, LPWSAOVERLAPPED_COMPLETION_ROUTINE);
@@ -1022,7 +1078,6 @@ SOCKET WINAPI WSASocketW(int, int, int, LPWSAPROTOCOL_INFOW, GROUP, DWORD);
 INT WINAPI WSAStringToAddressA(LPSTR, INT, LPWSAPROTOCOL_INFOA, LPSOCKADDR, LPINT);
 INT WINAPI WSAStringToAddressW(LPWSTR, INT, LPWSAPROTOCOL_INFOW, LPSOCKADDR, LPINT);
 DWORD WINAPI WSAWaitForMultipleEvents(DWORD, const WSAEVENT *, BOOL, DWORD, BOOL);
-
 typedef SOCKET (WINAPI *LPFN_WSAACCEPT)(SOCKET, struct sockaddr *, LPINT, LPCONDITIONPROC, DWORD);
 typedef INT (WINAPI *LPFN_WSAADDRESSTOSTRINGA)(LPSOCKADDR, DWORD, LPWSAPROTOCOL_INFOA, LPSTR, LPDWORD);
 typedef INT (WINAPI *LPFN_WSAADDRESSTOSTRINGW)(LPSOCKADDR, DWORD, LPWSAPROTOCOL_INFOW, LPWSTR, LPDWORD);
@@ -1054,6 +1109,7 @@ typedef INT (WINAPI *LPFN_WSALOOKUPSERVICEBEGINW)(LPWSAQUERYSETW, DWORD, LPHANDL
 typedef INT (WINAPI *LPFN_WSALOOKUPSERVICENEXTA)(HANDLE, DWORD, LPDWORD, LPWSAQUERYSETA);
 typedef INT (WINAPI *LPFN_WSALOOKUPSERVICENEXTW)(HANDLE, DWORD, LPDWORD, LPWSAQUERYSETW);
 typedef INT (WINAPI *LPFN_WSALOOKUPSERVICEEND)(HANDLE);
+typedef int (WINAPI *LPFN_WSANSPIoctl)(HANDLE, DWORD,LPVOID,DWORD,LPVOID,DWORD,LPDWORD,LPWSACOMPLETION);
 typedef int (WINAPI *LPFN_WSANTOHL)(SOCKET, unsigned long, unsigned long *);
 typedef int (WINAPI *LPFN_WSANTOHS)(SOCKET, unsigned short, unsigned short *);
 typedef int (WINAPI *LPFN_WSARECV)(SOCKET, LPWSABUF, DWORD, LPDWORD, LPDWORD, LPWSAOVERLAPPED, LPWSAOVERLAPPED_COMPLETION_ROUTINE);
