@@ -108,7 +108,6 @@ main(int argc, char *argv[])
 
 	Tst_count = 0;
 
-#if 0
 	/*
 	 * Install a SIGSYS handler so that we can exit gracefully if
 	 * System V Message Queue support isn't in the kernel.
@@ -117,8 +116,7 @@ main(int argc, char *argv[])
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	if (sigaction(SIGSYS, &sa, NULL) == -1)
-		err(1, "sigaction SIGSYS");
-#endif
+		tst_brkm (TBROK, cleanup, "sigaction SIGSYS");
 
 	/*
 	 * Install and SIGCHLD handler to deal with all possible exit
@@ -140,19 +138,7 @@ main(int argc, char *argv[])
 	 */
 	child_pid = getpid();
 
-#if 0
-	/*
-	 * Make sure that when the sender exits, the message queue is
-	 * removed.
-	 */
-	if (atexit(cleanup) == -1)
-		err(1, "atexit");
-#endif
-
 	sender_msqid = msgget(msgkey, IPC_CREAT | 0640);
-	if (sender_msqid == -1 && errno == ENOSYS)
-		tst_brkm (TRETR, cleanup,
-		 "System V Message Queue support is not present in the kernel");
 	tst_resm (sender_msqid == -1 ? TFAIL : TPASS, "sender calls msgget");
 
 	tst_resm (msgctl(sender_msqid, IPC_STAT, &m_ds) == -1 ? TFAIL : TPASS,

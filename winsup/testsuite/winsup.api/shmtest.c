@@ -90,7 +90,6 @@ main(argc, argv)
 
 	Tst_count = 0;
 
-#if 0
 	/*
 	 * Install a SIGSYS handler so that we can exit gracefully if
 	 * System V Shared Memory support isn't in the kernel.
@@ -99,8 +98,7 @@ main(argc, argv)
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	if (sigaction(SIGSYS, &sa, NULL) == -1)
-		err(1, "sigaction SIGSYS");
-#endif
+		tst_brkm (TBROK, cleanup, "sigaction SIGSYS");
 
 	/*
 	 * Install and SIGCHLD handler to deal with all possible exit
@@ -125,9 +123,6 @@ main(argc, argv)
 	child_pid = getpid();
 
 	sender_shmid = shmget(shmkey, pgsize, IPC_CREAT | 0640);
-	if (sender_shmid == -1 && errno == ENOSYS)
-		tst_brkm (TRETR, cleanup,
-		"System V Shared Memory support is not present in the kernel");
 	tst_resm (sender_shmid == -1 ? TFAIL : TPASS, "sender calls shmget");
 
 	tst_resm (shmctl(sender_shmid, IPC_STAT, &s_ds) == -1 ? TFAIL : TPASS,

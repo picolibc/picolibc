@@ -104,7 +104,6 @@ main(int argc, char *argv[])
 
 	Tst_count = 0;
 
-#if 0
 	/*
 	 * Install a SIGSYS handler so that we can exit gracefully if
 	 * System V Semaphore support isn't in the kernel.
@@ -113,8 +112,7 @@ main(int argc, char *argv[])
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	if (sigaction(SIGSYS, &sa, NULL) == -1)
-		err(1, "sigaction SIGSYS");
-#endif
+		tst_brkm (TBROK, cleanup, "sigaction SIGSYS");
 
 	/*
 	 * Install and SIGCHLD handler to deal with all possible exit
@@ -137,9 +135,6 @@ main(int argc, char *argv[])
 	child_pid = getpid();
 
 	sender_semid = semget(semkey, 1, IPC_CREAT | 0640);
-	if (sender_semid == -1 && errno == ENOSYS)
-		tst_brkm (TRETR, cleanup,
-		    "System V Semaphore support is not present in the kernel");
 	tst_resm (sender_semid == -1 ? TFAIL : TPASS, "sender calls semget");
 	
 	sun.buf = &s_ds;

@@ -1,3 +1,9 @@
+2003-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.api/msgtest.c (main): Revert to use the SIGSYS signal handler.
+	* winsup.api/semtest.c (main): Ditto.
+	* winsup.api/shmtest.c (main): Ditto.
+
 2003-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.api/msgtest.c: New file derived from FreeBSD, testing
