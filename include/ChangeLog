@@ -1,3 +1,7 @@
+2001-04-27  Johan Rydberg  <jrydberg@opencores.org>
+
+        * dis-asm.h (print_insn_openrisc): Add prototype.
+
 2001-04-15  Daniel Berlin  <dan@cgsoftware.com>
 
 	* ternary.h: New file - Ternary search tree header.
