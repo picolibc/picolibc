@@ -39,6 +39,7 @@ static char sccsid[] = "@(#)seekdir.c	5.7 (Berkeley) 6/1/90";
 
 #include <sys/param.h>
 #include <dirent.h>
+#include <sys/lock.h>
 
 /*
  * Seek to an entry in a directory.
@@ -49,8 +50,13 @@ seekdir(dirp, loc)
 	DIR *dirp;
 	long loc;
 {
-
+#ifdef HAVE_DD_LOCK
+	__lock_acquire_recursive(dirp->dd_lock);
+#endif
 	_seekdir(dirp, loc);
+#ifdef HAVE_DD_LOCK
+	__lock_release_recursive(dirp->dd_lock);
+#endif
 }
 
 #endif /* ! HAVE_OPENDIR */

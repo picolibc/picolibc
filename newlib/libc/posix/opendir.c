@@ -41,6 +41,7 @@ static char sccsid[] = "@(#)opendir.c	5.11 (Berkeley) 2/23/91";
 #include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/lock.h>
 
 /*
  * open a directory.
@@ -78,6 +79,12 @@ opendir(name)
 	/*
 	 * Set up seek point for rewinddir.
 	 */
+
+#ifdef HAVE_DD_LOCK
+	/* if we have a locking mechanism, initialize it */
+	__lock_init_recursive(dirp->dd_lock);
+#endif
+
 	return dirp;
 }
 

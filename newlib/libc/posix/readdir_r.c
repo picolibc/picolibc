@@ -33,28 +33,37 @@
  * SUCH DAMAGE.
  */
 
+/* this code is modified from readdir.c by Jeff Johnston, June 5, 2002 */
+
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)readdir.c	5.7 (Berkeley) 6/1/90";
 #endif /* LIBC_SCCS and not lint */
 
 #include <dirent.h>
+#include <errno.h>
+#include <string.h>
 
 extern int getdents (int fd, void *dp, int count);
 
 /*
- * get next entry in a directory.
+ * get next entry in a directory using supplied dirent structure.
  */
-struct dirent *
-readdir(dirp)
-register DIR *dirp; {
-  register struct dirent *dp;
+int
+readdir_r(dirp, dp, dpp)
+	register DIR *dirp;
+	struct dirent *dp;
+	struct dirent **dpp; {
+
+struct dirent *tmpdp;
  
 #ifdef HAVE_DD_LOCK
   __lock_acquire_recursive(dirp->dd_lock);
 #endif
 
-  if (dirp->dd_fd == -1)
-    return NULL;
+  if (dirp->dd_fd == -1) {
+    *dpp = NULL;
+    return errno = EBADF;
+  }
  
   for (;;) {
     if (dirp->dd_loc == 0) {
@@ -66,26 +75,24 @@ register DIR *dirp; {
 #ifdef HAVE_DD_LOCK
         __lock_release_recursive(dirp->dd_lock);
 #endif
-	return NULL;
+        *dpp = NULL;
+        return errno;
       }
     }
     if (dirp->dd_loc >= dirp->dd_size) {
       dirp->dd_loc = 0;
       continue;
     }
-    dp = (struct dirent *)(dirp->dd_buf + dirp->dd_loc);
-    if ((int)dp & 03) {	/* bogus pointer check */
-#ifdef HAVE_DD_LOCK
-      __lock_release_recursive(dirp->dd_lock);
-#endif
-      return NULL;
-    }
+    tmpdp = (struct dirent *)(dirp->dd_buf + dirp->dd_loc);
+    memcpy (dp, tmpdp, sizeof(struct dirent));
+
     if (dp->d_reclen <= 0 ||
 	dp->d_reclen > dirp->dd_len + 1 - dirp->dd_loc) {
 #ifdef HAVE_DD_LOCK
       __lock_release_recursive(dirp->dd_lock);
 #endif
-      return NULL;
+      *dpp = NULL;
+      return -1;
     }
     dirp->dd_loc += dp->d_reclen;
     if (dp->d_ino == 0)
@@ -93,7 +100,8 @@ register DIR *dirp; {
 #ifdef HAVE_DD_LOCK
     __lock_release_recursive(dirp->dd_lock);
 #endif
-    return (dp);
+    *dpp = dp;
+    return 0;
   }
 }
 

@@ -41,6 +41,7 @@ static char sccsid[] = "@(#)telldir.c	5.9 (Berkeley) 2/23/91";
 #include <dirent.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/lock.h>
 
 /*
  * The option SINGLEUSE may be defined to say that a telldir
@@ -60,6 +61,7 @@ struct ddloc {
 	long	loc_index;	/* key associated with structure */
 	long	loc_seek;	/* magic cookie returned by getdirentries */
 	long	loc_loc;	/* offset of entry in buffer */
+	DIR    *loc_dirp;       /* DIR pointer */
 };
 
 #define	NDIRHASH	32	/* Num of hash lists, must be a power of 2 */
@@ -67,6 +69,7 @@ struct ddloc {
 
 static long	dd_loccnt;	/* Index of entry for sequential readdir's */
 static struct	ddloc *dd_hash[NDIRHASH];   /* Hash list heads for ddlocs */
+__LOCK_INIT(static, dd_hash_lock);
 
 /*
  * return a pointer into a directory
@@ -80,12 +83,22 @@ telldir(dirp)
 
 	if ((lp = (struct ddloc *)malloc(sizeof(struct ddloc))) == NULL)
 		return (-1);
+
+#ifdef HAVE_DD_LOCK
+	__lock_acquire_recursive(dirp->dd_lock);
+	__lock_acquire(dd_hash_lock);
+#endif
 	index = dd_loccnt++;
 	lp->loc_index = index;
 	lp->loc_seek = dirp->dd_seek;
 	lp->loc_loc = dirp->dd_loc;
+	lp->loc_dirp = dirp;
 	lp->loc_next = dd_hash[LOCHASH(index)];
 	dd_hash[LOCHASH(index)] = lp;
+#ifdef HAVE_DD_LOCK
+	__lock_release(dd_hash_lock);
+	__lock_release_recursive(dirp->dd_lock);
+#endif
 	return (index);
 }
 
@@ -103,6 +116,9 @@ _seekdir(dirp, loc)
 	struct dirent *dp;
 	extern long lseek();
 
+#ifdef HAVE_DD_LOCK
+	__lock_acquire(dd_hash_lock);
+#endif
 	prevlp = &dd_hash[LOCHASH(loc)];
 	lp = *prevlp;
 	while (lp != NULL) {
@@ -111,8 +127,12 @@ _seekdir(dirp, loc)
 		prevlp = &lp->loc_next;
 		lp = lp->loc_next;
 	}
-	if (lp == NULL)
+	if (lp == NULL) {
+#ifdef HAVE_DD_LOCK
+		__lock_release(dd_hash_lock);
+#endif
 		return;
+	}
 	if (lp->loc_loc == dirp->dd_loc && lp->loc_seek == dirp->dd_seek)
 		goto found;
 	(void) lseek(dirp->dd_fd, lp->loc_seek, 0);
@@ -128,6 +148,46 @@ found:
 	*prevlp = lp->loc_next;
 	free((caddr_t)lp);
 #endif
+#ifdef HAVE_DD_LOCK
+	__lock_release(dd_hash_lock);
+#endif
 }
 
+/* clean out any hash entries from a closed directory */
+void
+_cleanupdir (dirp)
+	register DIR *dirp;
+{
+	int i;
+
+#ifdef HAVE_DD_LOCK
+	__lock_acquire(dd_hash_lock);
+#endif
+	for (i = 0; i < NDIRHASH; ++i) {
+		register struct ddloc *lp;
+		register struct ddloc *prevlp;
+		lp = dd_hash[i];
+		while (lp != NULL && lp->loc_dirp == dirp) {
+			dd_hash[i] = lp->loc_next;
+			prevlp = lp;
+			free((caddr_t)lp);
+			lp = prevlp->loc_next;
+		}
+		prevlp = lp;
+		while (lp != NULL) {
+			lp = lp->loc_next;
+			if (lp != NULL && lp->loc_dirp == dirp) {
+				prevlp->loc_next = lp->loc_next;
+				free((caddr_t)lp);
+				lp = prevlp;
+			}
+			else
+				prevlp = lp;
+		}
+	}
+#ifdef HAVE_DD_LOCK
+	__lock_release(dd_hash_lock);
+#endif
+
+}
 #endif /* ! HAVE_OPENDIR */

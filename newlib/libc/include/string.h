@@ -74,6 +74,8 @@ char	*_EXFUN(strupr,(char *));
 const char  *_EXFUN(strsignal, (int __signo));
 #endif
 int     _EXFUN(strtosigno, (const char *__name));
+#elif defined(__linux__)
+char	*_EXFUN(strsignal, (int __signo));
 #endif
 
 /* These function names are used on Windows and perhaps other systems.  */

@@ -1,3 +1,27 @@
+2002-06-05  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/string.h[__linux__]: Add strsignal prototype.
+        * libc/include/sys/lock.h: New file with default locking support.
+        * libc/include/sys/reent.h: Add signal buffer support for strsignal
+        and psignal.
+        * libc/posix/Makefile.am: Add support for readdir_r.c.
+        * libc/posix/Makefile.in: Regenerated.
+        * libc/posix/closedir.c: Add locking support and hash table cleanup.
+        * libc/posix/opendir.c: Add lock support.
+        * libc/posix/readdir.c: Ditto.
+        * libc/posix/rewinddir.c: Ditto.
+        * libc/posix/scandir.c: Ditto.
+        * libc/posix/seekdir.c: Ditto.
+        * libc/posix/telldir.c: Ditto plus add _cleanupdir routine to
+        clean up leftover hash table entries.
+        * libc/posix/readdir_r.c: New file.
+        * libc/sys/linux/Makefile.am: Add psignal.c and strsignal.c support.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/sys/dirent.h: Add dd_lock to DIR structure.
+        * libc/sys/linux/sys/signal.h: Add psignal prototype.
+        * libc/sys/linux/psignal.c: New file.
+        * libc/sys/linux/strsignal.c: Ditto.
+
 2002-06-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/types.h: Don't define dev_t when compiling for

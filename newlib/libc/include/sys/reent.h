@@ -229,6 +229,7 @@ struct _rand48 {
 /* How big the some arrays are.  */
 #define _REENT_EMERGENCY_SIZE 25
 #define _REENT_ASCTIME_SIZE 26
+#define _REENT_SIGNAL_SIZE 24
 
 /*
  * struct _reent
@@ -305,13 +306,14 @@ struct _reent
   struct __sFILE *__sf;			/* file descriptors */
   struct __sFILE_fake __sf_fake;	/* fake initial stdin/out/err */
   struct _misc_reent *_misc;            /* strtok, multibyte states */
+  char *_signal_buf;                    /* strsignal */
 };
 
 #define _REENT_INIT(var) \
   { (struct __sFILE *)&var.__sf_fake, (struct __sFILE *)&var.__sf_fake, \
     (struct __sFILE *)&var.__sf_fake, 0, 0, _NULL, 0, 0, \
     "C", _NULL, _NULL, 0, 0, _NULL, _NULL, _NULL, _NULL, _NULL, \
-    { 0, _NULL, _NULL, 0 }, { _NULL, 0, _NULL }, _NULL, 0, _NULL }
+    { 0, _NULL, _NULL, 0 }, { _NULL, 0, _NULL }, _NULL, 0, _NULL, _NULL }
 
 #define _REENT_INIT_PTR(var) \
   { var->_stdin = (struct __sFILE *)&var->__sf_fake; \
@@ -341,6 +343,7 @@ struct _reent
     var->__sglue._iobs = _NULL; \
     var->__sf = 0; \
     var->_misc = _NULL; \
+    var->_signal_buf = _NULL; \
     var->__sf_fake._p = _NULL; \
     var->__sf_fake._r = 0; \
     var->__sf_fake._w = 0; \
@@ -414,6 +417,9 @@ struct _reent
 #define _REENT_CHECK_MISC(var) \
   _REENT_CHECK(var, _misc, struct _misc_reent *, sizeof *((var)->_misc), _REENT_INIT_MISC(var))
 
+#define _REENT_CHECK_SIGNAL_BUF(var) \
+  _REENT_CHECK(var, _signal_buf, char *, _REENT_SIGNAL_SIZE, /* nothing */)
+
 #define _REENT_SIGNGAM(ptr)	((ptr)->_gamma_signgam)
 #define _REENT_RAND_NEXT(ptr)	((ptr)->_r48->_rand_next)
 #define _REENT_RAND48_SEED(ptr)	((ptr)->_r48->_seed)
@@ -431,6 +437,7 @@ struct _reent
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_misc->_mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_misc->_wctomb_state)
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_misc->_l64a_buf)
+#define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_signal_buf)
 
 #else /* !_REENT_SMALL */
 
@@ -469,7 +476,7 @@ struct _reent
         {
           unsigned int _unused_rand;
           char * _strtok_last;
-          char _asctime_buf[26];
+          char _asctime_buf[_REENT_ASCTIME_SIZE];
           struct __tm _localtime_buf;
           int _gamma_signgam;
           __extension__ unsigned long long _rand_next;
@@ -478,6 +485,7 @@ struct _reent
           int _mbtowc_state;
           int _wctomb_state;
           char _l64a_buf[8];
+          char _signal_buf[_REENT_SIGNAL_SIZE];
         } _reent;
   /* Two next two fields were once used by malloc.  They are no longer
      used. They are used to preserve the space used before so as to
@@ -551,6 +559,7 @@ struct _reent
     var->_new._reent._mbtowc_state = 0; \
     var->_new._reent._wctomb_state = 0; \
     var->_new._reent._l64a_buf[0] = '\0'; \
+    var->_new._reent._signal_buf[0] = '\0'; \
     var->_atexit = _NULL; \
     var->_atexit0._ind = 0; \
     var->_atexit0._fns[0] = _NULL; \
@@ -568,6 +577,7 @@ struct _reent
 #define _REENT_CHECK_ASCTIME_BUF(ptr)	/* nothing */
 #define _REENT_CHECK_EMERGENCY(ptr)	/* nothing */
 #define _REENT_CHECK_MISC(ptr)	        /* nothing */
+#define _REENT_CHECK_SIGNAL_BUF(ptr)	/* nothing */
 
 #define _REENT_SIGNGAM(ptr)	((ptr)->_new._reent._gamma_signgam)
 #define _REENT_RAND_NEXT(ptr)	((ptr)->_new._reent._rand_next)
@@ -586,6 +596,7 @@ struct _reent
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_new._reent._mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_new._reent._wctomb_state)
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_new._reent._l64a_buf)
+#define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_new._reent._signal_buf)
 
 #endif /* !_REENT_SMALL */
 

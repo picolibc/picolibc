@@ -105,7 +105,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 LIB_SOURCES = \
 	closedir.c opendir.c readdir.c rewinddir.c scandir.c seekdir.c \
 	telldir.c execl.c execle.c execlp.c execv.c execve.c execvp.c \
-	popen.c creat.c isatty.c
+	popen.c creat.c isatty.c readdir_r.c
 
 
 libposix_la_LDFLAGS = -Xcompiler -nostdlib
@@ -138,14 +138,15 @@ lib_a_LIBADD =
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  closedir.o opendir.o readdir.o \
 @USE_LIBTOOL_FALSE@rewinddir.o scandir.o seekdir.o telldir.o execl.o \
 @USE_LIBTOOL_FALSE@execle.o execlp.o execv.o execve.o execvp.o popen.o \
-@USE_LIBTOOL_FALSE@creat.o isatty.o
+@USE_LIBTOOL_FALSE@creat.o isatty.o readdir_r.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libposix_la_LIBADD = 
 @USE_LIBTOOL_TRUE@libposix_la_OBJECTS =  closedir.lo opendir.lo \
 @USE_LIBTOOL_TRUE@readdir.lo rewinddir.lo scandir.lo seekdir.lo \
 @USE_LIBTOOL_TRUE@telldir.lo execl.lo execle.lo execlp.lo execv.lo \
-@USE_LIBTOOL_TRUE@execve.lo execvp.lo popen.lo creat.lo isatty.lo
+@USE_LIBTOOL_TRUE@execve.lo execvp.lo popen.lo creat.lo isatty.lo \
+@USE_LIBTOOL_TRUE@readdir_r.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

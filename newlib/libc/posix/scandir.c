@@ -49,6 +49,7 @@ static char sccsid[] = "@(#)scandir.c	5.10 (Berkeley) 2/23/91";
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/lock.h>
 
 /*
  * The DIRSIZ macro gives the minimum record length which will hold
@@ -84,8 +85,15 @@ scandir(dirname, namelist, select, dcomp)
 
 	if ((dirp = opendir(dirname)) == NULL)
 		return(-1);
-	if (fstat(dirp->dd_fd, &stb) < 0)
+#ifdef HAVE_DD_LOCK
+	__lock_acquire_recursive(dirp->dd_lock);
+#endif
+	if (fstat(dirp->dd_fd, &stb) < 0) {
+#ifdef HAVE_DD_LOCK
+		__lock_release_recursive(dirp->dd_lock);
+#endif
 		return(-1);
+	}
 
 	/*
 	 * estimate the array size by taking the size of the directory file
@@ -93,8 +101,12 @@ scandir(dirname, namelist, select, dcomp)
 	 */
 	arraysz = (stb.st_size / 24);
 	names = (struct dirent **)malloc(arraysz * sizeof(struct dirent *));
-	if (names == NULL)
+	if (names == NULL) {
+#ifdef HAVE_DD_LOCK
+		__lock_release_recursive(dirp->dd_lock);
+#endif
 		return(-1);
+	}
 
 	nitems = 0;
 	while ((d = readdir(dirp)) != NULL) {
@@ -104,8 +116,12 @@ scandir(dirname, namelist, select, dcomp)
 		 * Make a minimum size copy of the data
 		 */
 		p = (struct dirent *)malloc(DIRSIZ(d));
-		if (p == NULL)
+		if (p == NULL) {
+#ifdef HAVE_DD_LOCK
+			__lock_release_recursive(dirp->dd_lock);
+#endif
 			return(-1);
+		}
 		p->d_ino = d->d_ino;
 		p->d_reclen = d->d_reclen;
 #ifdef _DIRENT_HAVE_D_NAMLEN
@@ -119,13 +135,21 @@ scandir(dirname, namelist, select, dcomp)
 		 * realloc the maximum size.
 		 */
 		if (++nitems >= arraysz) {
-			if (fstat(dirp->dd_fd, &stb) < 0)
+			if (fstat(dirp->dd_fd, &stb) < 0) {
+#ifdef HAVE_DD_LOCK
+				__lock_release_recursive(dirp->dd_lock);
+#endif
 				return(-1);	/* just might have grown */
+			}
 			arraysz = stb.st_size / 12;
 			names = (struct dirent **)realloc((char *)names,
 				arraysz * sizeof(struct dirent *));
-			if (names == NULL)
+			if (names == NULL) {
+#ifdef HAVE_DD_LOCK
+				__lock_release_recursive(dirp->dd_lock);
+#endif
 				return(-1);
+			}
 		}
 		names[nitems-1] = p;
 	}
@@ -133,6 +157,9 @@ scandir(dirname, namelist, select, dcomp)
 	if (nitems && dcomp != NULL)
 		qsort(names, nitems, sizeof(struct dirent *), dcomp);
 	*namelist = names;
+#ifdef HAVE_DD_LOCK
+	__lock_release_recursive(dirp->dd_lock);
+#endif
 	return(nitems);
 }
 
