@@ -182,7 +182,7 @@ struct h8_opcode
 
 #define NEW_SOP(code, in,x,name) \
 {code, in, x,  name 
-#define EOP  ,0,0,0 }
+#define EOP  ,0,0,0,0 }
 
 #define TWOOP(code, name, op1, op2,op3) \
 { code,1, 2,name, {{IMM8, RD8, E}},	{{ op1, RD8, IMM8, IGNORE, E, 0, 0, 0, 0}}, 0, 0, 0, 0},\
