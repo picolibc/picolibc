@@ -893,7 +893,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 #error "Need to supply machine dependent setup_handler"
 #endif
 
-/* CGF Keyboard interrupt handler.  */
+/* Keyboard interrupt handler.  */
 static BOOL WINAPI
 ctrl_c_handler (DWORD type)
 {
@@ -963,7 +963,7 @@ set_process_mask (sigset_t newmask)
 }
 
 int __stdcall
-sig_handle (int sig)
+sig_handle (int sig, bool thisproc)
 {
   int rc = 0;
 
@@ -1011,7 +1011,7 @@ sig_handle (int sig)
   if (handler == (void *) SIG_DFL)
     {
       if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
-          || sig == SIGURG || (hExeced && sig == SIGINT))
+          || sig == SIGURG || (thisproc && hExeced && sig == SIGINT))
 	{
 	  sigproc_printf ("default signal %d ignored", sig);
 	  goto done;

@@ -1190,7 +1190,7 @@ wait_sig (VOID *)
 		/* A normal UNIX signal */
 		default:
 		  sigproc_printf ("Got signal %d", sig);
-		  int wasdispatched = sig_handle (sig);
+		  int wasdispatched = sig_handle (sig, rc != 2);
 		  if (sig == SIGCHLD && wasdispatched)
 		    dispatched_sigchld = 1;
 		  /* Need to decrement again to offset increment below since
