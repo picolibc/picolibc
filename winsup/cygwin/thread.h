@@ -333,6 +333,7 @@ public:
   /* we may get 0 for the Tls index.. grrr */
   int indexallocated;
   int concurrency;
+  long int threadcount;
 
   // Used for main thread data, and sigproc thread
   struct __reent_t reents;
@@ -346,7 +347,7 @@ public:
 
   void Init (int);
 
-    MTinterface ():reent_index (0), indexallocated (0) 
+    MTinterface ():reent_index (0), indexallocated (0), threadcount (1)
   {
     pthread_prepare = NULL;
     pthread_child   = NULL;

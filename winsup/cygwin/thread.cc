@@ -291,6 +291,7 @@ MTinterface::Init (int forked)
     }
 
   concurrency = 0;
+  threadcount = 1; /* 1 current thread when Init occurs.*/
 
   if (forked)
     return;
@@ -664,6 +665,7 @@ __pthread_create (pthread_t * thread, const pthread_attr_t * attr,
       *thread = NULL;
       return EAGAIN;
     }
+  InterlockedIncrement(&MT_INTERFACE->threadcount);
 
   return 0;
 }
@@ -1214,10 +1216,12 @@ __pthread_exit (void *value_ptr)
   class pthread *thread = __pthread_self ();
 
   MT_INTERFACE->destructors.IterateNull ();
-// FIXME: run the destructors of thread_key items here
 
   thread->return_ptr = value_ptr;
-  ExitThread (0);
+  if (InterlockedDecrement(&MT_INTERFACE->threadcount) == 0)
+    exit (0);
+  else
+    ExitThread (0);
 }
 
 int

@@ -1,3 +1,10 @@
+Sat Apr 14 17:04:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.h (MTinterface): Add threadcount.
+	* thread.cc (MTinterface::Init): Set threadcount to 1.
+	(__pthread_create): Increment threadcount.
+	(__pthread_exit): Decrement threadcount and call exit() from the last thread.
+
 Fri Apr 13 11:34:24 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* fork.cc (fork_child): Call the __pthread_atforkchild function.
