@@ -1,3 +1,8 @@
+Tue Aug  8 13:20:00 2000  Bob Wilson  <bwilson@tensilica.com>
+
+	* fhandler_serial.cc (tcsendbreak): "sleeptime" argument to usleep()
+	must be in units of microseconds, not milliseconds.
+
 Mon Aug  7 00:11:35 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/cygwin_dll.h: Remove extraneous (and incorrect)

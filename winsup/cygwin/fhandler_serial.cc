@@ -285,7 +285,7 @@ fhandler_serial::close ()
 int
 fhandler_serial::tcsendbreak (int duration)
 {
-  unsigned int sleeptime = 300;
+  unsigned int sleeptime = 300000;
 
   if (duration > 0)
     sleeptime *= duration;
