@@ -377,7 +377,6 @@ struct mips_opcode
 /* CPU defines, use instead of hardcoding processor number. Keep this
    in sync with bfd/archures.c in order for machine selection to work.  */
 #define CPU_UNKNOWN	0               /* Gas internal use.  */
-#define CPU_R2000	2000
 #define CPU_R3000	3000
 #define CPU_R3900	3900
 #define CPU_R4000	4000
