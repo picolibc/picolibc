@@ -1,3 +1,10 @@
+2002-06-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winsock2.h (int32): Remove typedef.
+	(SEVICETYPE): Add typedef.
+	(struct _flowspec):Revise struct definition,  Comment
+	on types used for members.
+
 2002-05-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (EVENT_*, SEMAPHORE_*,MUTEX_*): Remove

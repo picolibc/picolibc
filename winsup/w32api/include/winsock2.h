@@ -659,19 +659,28 @@ typedef enum
 	GuaranteedService
 } GUARANTEE;
 
-typedef long int32;
+/* TODO: FLOWSPEC and related definitions belong in qos.h */
 
+/*
+   Windows Sockets 2 Application Programming Interface,
+   revision 2.2.2 (1997) uses the type uint32 for SERVICETYPE
+   and the elements of _flowspec, but the type uint32 is not defined
+   or used anywhere else in the w32api. For now, just use
+   unsigned int, which is 32 bits on _WIN32 and _WIN64.
+*/
+
+typedef unsigned int	SERVICETYPE;
 typedef struct _flowspec
 {
-	int32	TokenRate;
-	int32	TokenBucketSize;
-	int32	PeakBandwidth;
-	int32	Latency;
-	int32	DelayVariation;
-	GUARANTEE	LevelOfGuarantee;
-	int32	CostOfCall;
-	int32	NetworkAvailability;
-} FLOWSPEC, *LPFLOWSPEC;
+	unsigned int	TokenRate;
+	unsigned int	TokenBucketSize;
+	unsigned int	PeakBandwidth;
+	unsigned int	Latency;
+	unsigned int	DelayVariation;
+	SERVICETYPE	ServiceType;
+	unsigned int	MaxSduSize;
+	unsigned int	MinimumPolicedSize;
+   } FLOWSPEC, *PFLOWSPEC, *LPFLOWSPEC;
 
 typedef struct _QualityOfService
 {
