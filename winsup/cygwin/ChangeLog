@@ -1,3 +1,7 @@
+Thu Aug 24 18:02:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ps.cc (main): Always print a cygwin process using cygwin paths.
+
 Thu Aug 24 17:16:14 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (cygwin_select): Correct logic for "always_ready" fds or
