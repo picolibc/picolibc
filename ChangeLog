@@ -1,3 +1,7 @@
+2001-10-03  Alan Modra  <amodra@bigpond.net.au>
+
+	* gettext.m4: Test po/POTFILES.in exists before trying to read.
+
 2001-07-26  DJ Delorie  <dj@redhat.com>
 
 	* MAINTAINERS: Clarify libiberty merge rules and procedures.
