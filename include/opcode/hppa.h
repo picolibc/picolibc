@@ -227,6 +227,7 @@ Floating point registers all have 'f' as a prefix:
    fb	operand 2 register at 15
    fB   operand 2 register with L/R halves at 15
    fC   operand 3 register with L/R halves at 16:18,21:23
+   fe   Like fT, but encoding is different.
 
 Float registers for fmpyadd and fmpysub:
 
@@ -626,6 +627,10 @@ static const struct pa_opcode pa_opcodes[] =
 { "fldw",       0x24000000, 0xfc001f80, "cxx(b),fT", pa10, FLAG_STRICT},
 { "fldw",       0x24001000, 0xfc001f80, "cm5(s,b),fT", pa10, FLAG_STRICT},
 { "fldw",       0x24001000, 0xfc001f80, "cm5(b),fT", pa10, FLAG_STRICT},
+{ "fldw",       0x5c000000, 0xfc000004, "d(s,b),fe", pa20, FLAG_STRICT},
+{ "fldw",       0x5c000000, 0xfc000004, "d(b),fe", pa20, FLAG_STRICT},
+{ "fldw",       0x58000000, 0xfc000004, "cJd(s,b),fe", pa20, FLAG_STRICT},
+{ "fldw",       0x58000000, 0xfc000004, "cJd(b),fe", pa20, FLAG_STRICT},
 { "fldd",       0x2c000000, 0xfc001fc0, "cxx(s,b),ft", pa10, FLAG_STRICT},
 { "fldd",       0x2c000000, 0xfc001fc0, "cxx(b),ft", pa10, FLAG_STRICT},
 { "fldd",       0x2c001000, 0xfc001fc0, "cm5(s,b),ft", pa10, FLAG_STRICT},
@@ -636,6 +641,10 @@ static const struct pa_opcode pa_opcodes[] =
 { "fstw",       0x24000200, 0xfc001f80, "cxfT,x(b)", pa10, FLAG_STRICT},
 { "fstw",       0x24001200, 0xfc001f80, "cmfT,5(s,b)", pa10, FLAG_STRICT},
 { "fstw",       0x24001200, 0xfc001f80, "cmfT,5(b)", pa10, FLAG_STRICT},
+{ "fstw",       0x78000000, 0xfc000004, "fe,d(s,b)", pa20, FLAG_STRICT},
+{ "fstw",       0x78000000, 0xfc000004, "fe,d(b)", pa20, FLAG_STRICT},
+{ "fstw",       0x7c000000, 0xfc000004, "cJfe,d(s,b)", pa20, FLAG_STRICT},
+{ "fstw",       0x7c000000, 0xfc000004, "cJfe,d(b)", pa20, FLAG_STRICT},
 { "fstd",       0x2c000200, 0xfc001fc0, "cxft,x(s,b)", pa10, FLAG_STRICT},
 { "fstd",       0x2c000200, 0xfc001fc0, "cxft,x(b)", pa10, FLAG_STRICT},
 { "fstd",       0x2c001200, 0xfc001fc0, "cmft,5(s,b)", pa10, FLAG_STRICT},
