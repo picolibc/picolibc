@@ -28,7 +28,6 @@ details. */
 #undef WaitForSingleObject
 
 DWORD NO_COPY muto::exiting_thread;
-CRITICAL_SECTION NO_COPY muto::init_lock;
 
 void
 muto::grab ()

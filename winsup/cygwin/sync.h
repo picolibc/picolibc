@@ -17,7 +17,6 @@ details. */
 class muto
 {
   static DWORD exiting_thread;
-  static CRITICAL_SECTION init_lock;
   LONG sync;	/* Used to serialize access to this class. */
   LONG waiters;	/* Number of threads waiting for lock. */
   HANDLE bruteforce; /* event handle used to control waiting for lock. */

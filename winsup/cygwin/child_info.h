@@ -109,6 +109,8 @@ public:
 
 void __stdcall init_child_info (DWORD, child_info *, HANDLE);
 
+extern "C" {
 extern child_info *child_proc_info;
-extern child_info_spawn *spawn_info __attribute__ ((alias ("child_proc_info")));
-extern child_info_fork *fork_info __attribute__ ((alias ("child_proc_info")));
+extern child_info_spawn *spawn_info asm ("_child_proc_info");
+extern child_info_fork *fork_info asm ("_child_proc_info");
+}

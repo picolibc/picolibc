@@ -24,11 +24,7 @@ int __small_vsprintf (char *dst, const char *fmt, va_list ap);
 #define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, long), len, pad, LMASK)
 #define rnargLL(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, unsigned long long), len, pad, LLMASK)
 
-static char * __rn (char *, int, int, long long, int, int,
-		    unsigned long long) __attribute__ ((regparm (3)));
-
-
-static char *
+static char __fastcall *
 __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned long long mask)
 {
   /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */

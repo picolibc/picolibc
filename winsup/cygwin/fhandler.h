@@ -141,7 +141,7 @@ class fhandler_base
   bool exists () const {return pc.exists ();}
   int pc_binmode () const {return pc.binmode ();}
   device& dev () {return pc.dev;}
-  operator DWORD& () {return (DWORD) pc;}
+  operator DWORD& () {return (DWORD&) pc;}
   virtual size_t size () const {return sizeof (*this);}
 
   virtual fhandler_base& operator =(fhandler_base &x);

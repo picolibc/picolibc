@@ -1,3 +1,18 @@
+2005-03-19  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (fork_info): Use different method to alias variable.
+	(spawn_info): Ditto.
+	* cxx.cc (__cxa_guard_acquire): New function (needed for gcc 4.x).
+	(__cxa_guard_release): Ditto.
+	* devices.in: Make sure stuff is correctly bracketed (for gcc 4.x).
+	* devices.cc: Regenerate.
+	* fhandler.h (fhandler_disk_file::fchmod): Avoid left coercion (for gcc
+	4.x).
+	* smallprint.c (__rn): Declare as __fastcall since gcc 4.x complains
+	about use of regparm, for some reason.
+	* sync.h (sync::init_lock): Remove.
+	* sync.cc (sync::init_lock): Ditto.
+
 2005-03-18  Christopher Faylor  <cgf@timesys.com>
 
 	* net.cc (cygwin_getprotobyname): Don't try to be fancy with return

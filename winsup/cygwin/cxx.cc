@@ -43,4 +43,14 @@ __cxa_pure_virtual (void)
 {
   api_fatal ("pure virtual method called");
 }
+
+extern "C" void
+__cxa_guard_acquire ()
+{
+}
+
+extern "C" void
+__cxa_guard_release ()
+{
+}
 #endif
