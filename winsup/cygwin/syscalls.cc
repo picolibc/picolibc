@@ -2031,6 +2031,11 @@ seteuid (uid_t uid)
 	 retrieving user's SID. */
       user.token = cygheap->user.impersonated ? cygheap->user.token
 					      : INVALID_HANDLE_VALUE;
+      /* Unsetting these both env vars is necessary to get NetUserGetInfo()
+         called in internal_getlogin ().  Otherwise the wrong path is used
+	 after a user switch, probably. */
+      unsetenv ("HOMEDRIVE");
+      unsetenv ("HOMEPATH");
       struct passwd *pw_cur = internal_getlogin (user);
       if (pw_cur != pw_new)
 	{

@@ -1,5 +1,13 @@
 2001-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	Patch suggested by Ian Ray <ian.ray@nokia.com>:
+	* syscalls.cc (seteuid): Unset environment variables HOMEDRIVE and
+	HOMEPATH before calling internal_getlogin().
+	* uinfo.cc (internal_getlogin): Use default HOMEPATH and HOMEDRIVE
+	from environment if both are present, else query NetUserGetInfo().
+
+2001-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (get_2k_ifconf): Change multiple IP address naming scheme
 	to Linux style.
 
