@@ -78,8 +78,8 @@ EXPECT = `if [ -f $${rootme}/../../expect/expect$(EXEEXT) ] ; then \
             echo $${rootme}/../../expect/expect$(EXEEXT) ; \
           else echo expect ; fi`
 
-RUNTEST = `if [ -f $${srcdir}/../dejagnu/runtest ] ; then \
-	       echo $${srcdir}/../dejagnu/runtest ; \
+RUNTEST = `if [ -f $${srcdir}/../../dejagnu/runtest ] ; then \
+	       echo $${srcdir}/../../dejagnu/runtest ; \
 	    else echo runtest; fi`
 RUNTESTFLAGS =
 

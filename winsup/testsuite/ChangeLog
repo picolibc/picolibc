@@ -1,3 +1,8 @@
+2001-03-09  Egor Duda  <deo@logos-m.ru>
+
+	* config/default.exp: Remove unneeded debugging output.
+	* Makefile.in: Use correct path to find dejagnu in local tree.
+
 2000-09-06  Egor Duda  <deo@logos-m.ru>
 
 	Add 'const' qualifiers where needed to avoid compiler warnings.
