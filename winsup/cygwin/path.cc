@@ -593,8 +593,8 @@ normalize_posix_path (const char *src, char *dst)
 	{
 	  while (*++src)
 	    {
-	      while (isslash (*src))
-		src++;
+	      if (isslash (*src))
+		continue;
 
 	      if (*src != '.')
 		break;
@@ -602,13 +602,15 @@ normalize_posix_path (const char *src, char *dst)
 	    sawdot:
 	      if (src[1] != '.')
 		{
-		  if (!src[1] || !isslash (src[1]))
+		  if (!src[1])
+		    goto done;
+		  if (!isslash (src[1]))
 		    break;
 		}
+	      else if (src[2] && !isslash (src[2]))
+		break;
 	      else
 		{
-		  if (src[2] && !isslash (src[2]))
-		    break;
 		  if (!ischrootpath (dst_start) ||
 		      dst - dst_start != (int) myself->rootlen)
 		    while (dst > dst_start && !isslash (*--dst))
@@ -621,6 +623,7 @@ normalize_posix_path (const char *src, char *dst)
 	}
     }
 
+done:
   *dst = '\0';
   if (--dst > dst_start && isslash (*dst))
     *dst = '\0';
