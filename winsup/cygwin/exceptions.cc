@@ -1205,7 +1205,8 @@ _sigreturn:								\n\
 1:	popl	%%eax		# saved errno				\n\
 	testl	%%eax,%%eax	# Is it < 0				\n\
 	jl	2f		# yup.  ignore it			\n\
-	movl	%%eax,%1						\n\
+	movl	%1,%%ebx						\n\
+	movl	%%eax,(%%ebx)						\n\
 2:	popl	%%eax							\n\
 	popl	%%ebx							\n\
 	popl	%%ecx							\n\
@@ -1245,7 +1246,7 @@ _sigdelayed0:								\n\
 	popl	%%eax							\n\
 	jmp	*%%eax							\n\
 __no_sig_end:								\n\
-" : "=m" (sigsave.sig):  "X" (errno),
+" : "=m" (sigsave.sig):  "X" ((char *) &_impure_ptr->_errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
     "g" (sigsave.func), "g" (sigsave.saved_errno), "g" (sigsave.newmask)
 );

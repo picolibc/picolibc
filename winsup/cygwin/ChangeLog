@@ -1,3 +1,8 @@
+2002-09-30  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (unused_sig_wrapper): Still need additional level of
+	indirection when setting errno.
+
 2002-09-30  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (pthread_mutex::initMutex): Use the wrapper init call.
