@@ -392,10 +392,14 @@ pthread::exit (void *value_ptr)
 
   (_reclaim_reent) (_REENT);
 
+
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     ::exit (0);
   else
-    ExitThread (0);
+    {
+      _my_tls.remove ();
+      ExitThread (0);
+    }
 }
 
 int

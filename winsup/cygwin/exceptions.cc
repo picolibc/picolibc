@@ -40,6 +40,8 @@ _threadinfo NO_COPY dummy_thread;
 _threadinfo NO_COPY *_last_thread = &dummy_thread;
 extern _threadinfo *_main_tls;
 
+CRITICAL_SECTION NO_COPY _threadinfo::protect_linked_list;
+
 extern DWORD sigtid;
 
 extern HANDLE hExeced;
@@ -157,18 +159,28 @@ _threadinfo::call (void (*func) (void *, void *), void *arg)
 void
 _threadinfo::call2 (void (*func) (void *, void *), void *arg, void *buf)
 {
-  init (buf);
+  init_thread (buf);
   func (arg, buf);
 }
 
 void
-_threadinfo::init (void *)
+_threadinfo::init ()
+{
+  InitializeCriticalSection (&protect_linked_list);
+}
+
+void
+_threadinfo::init_thread (void *)
 {
   memset (this, 0, sizeof (*this));
   stackptr = stack;
+
+  EnterCriticalSection (&protect_linked_list);
   prev = _last_thread;
   _last_thread->next = this;
   _last_thread = this;
+  LeaveCriticalSection (&protect_linked_list);
+
   set_state (false);
   errno_addr = &errno;
 }
@@ -177,6 +189,7 @@ void
 _threadinfo::remove ()
 {
   _threadinfo *t;
+  EnterCriticalSection (&protect_linked_list);
   for (t = _last_thread; t && t != this; t = t->prev)
     continue;
   if (!t)
@@ -186,6 +199,7 @@ _threadinfo::remove ()
     t->next->prev = t->prev;
   if (t == _last_thread)
     _last_thread = t->prev;
+  LeaveCriticalSection (&protect_linked_list);
 }
 
 void

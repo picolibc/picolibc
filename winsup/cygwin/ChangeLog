@@ -1,3 +1,24 @@
+2003-12-06  Christopher Faylor  <cgf@redhat.com>
+
+	* cygtls.h: Add more "don't parse this" guards.
+	(_threadinfo::init_thread): Rename from 'init'.
+	(_threadinfo::init): Declare new function.
+	(_threadinfo::protect_linked_list): Declare new critical section.
+	* dcrt0.cc (dll_crt0_1): Call init_thread to initialize thread stuff.
+	(_dll_crt0): Call _threadinfo::init prior to invoking dll_crt0_1.
+	* exceptions.cc (_threadinfo::init_thread): Rename from 'init'.
+	(_threadinfo::init): Define new function.  Protect linked list
+	manipulation with new critical section.
+	(_threadinfo::call): Reflect function name change.
+	(_threadinfo::remove): Protect linked list manipulation with new
+	critical section
+	* gentls_offsets: Rework to allow multi-line "don't parse this"
+	protection.
+	* init.cc (dll_entry): Don't remove threads info stuff here since the
+	remove function uses a critical section which can't be used during
+	thread creation or destruction.
+	* thread.cc (pthread::exit): Call _threadinfo remove function here.
+
 2003-12-05  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.cc (cygthread::stub2): Remove myself from the list of

@@ -16,7 +16,7 @@ details. */
 
 /* Please keep this file simple.  Changes to the below structure may require
    acompanying changes to the very simple parser in the perl script
-   'gentls_offsets'.  */
+   'gentls_offsets' (<<-- start parsing here).  */
 
 #pragma pack(push,4)
 typedef __uint32_t __stack_t;
@@ -40,7 +40,10 @@ struct _threadinfo
   int sig;
   __stack_t *stackptr;
 
-  void init (void *);
+  /*gentls_offsets*/
+  static CRITICAL_SECTION protect_linked_list;
+  static void init ();
+  void init_thread (void *);
   static void call (void (*) (void *, void *), void *);
   void call2 (void (*) (void *, void *), void *, void *);
   void remove ();
@@ -54,6 +57,7 @@ struct _threadinfo
   void __stdcall interrupt_setup (int sig, void *handler, struct sigaction& siga, __stack_t retaddr)
     __attribute__((regparm(3)));
   operator HANDLE () const {return tid->win32_obj_id;}
+  /*gentls_offsets*/
 };
 #pragma pack(pop)
 

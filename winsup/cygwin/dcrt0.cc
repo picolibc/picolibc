@@ -534,7 +534,7 @@ dll_crt0_1 ()
 {
   char padding[CYGTLS_PADSIZE];
   _main_tls = &_my_tls;
-  _main_tls->init (padding);
+  _main_tls->init_thread (padding);
 
   /* According to onno@stack.urc.tue.nl, the exception handler record must
      be on the stack.  */
@@ -901,6 +901,8 @@ _dll_crt0 ()
 	    break;
 	}
     }
+
+  _threadinfo::init ();
   dll_crt0_1 ();
 }
 

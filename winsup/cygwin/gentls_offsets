@@ -5,8 +5,10 @@ open(TLS, $tls) or die "$0: couldn't open tls file \"$tls\" - $!\n";
 my $struct = '';
 my @fields = ();
 my $def = '';
-while (<TLS>) {
-    next if $struct && (!/gentls_offsets/o && /\(/o);
+my $tls = join('', <TLS>);
+$tls =~ s/\A.*?gentls_offsets[^\n]*\n//os;
+$tls =~ s%/\*\s*gentls_offsets.*?/\*\s*gentls_offsets\s*\*/%%ogs;
+foreach ($tls =~ /^.*\n/mg) {
     $def .= $_ if $struct;
     last if /^};/o;
     /^\s*typedef/o and do {
@@ -20,7 +22,6 @@ while (<TLS>) {
 	}
 	next;
     }
-    s%/\*\s*gentls_offsets.*/\*\s*gentls_offsets\s*\*/%%og;
     s/(?:\[[^\]]*\]|struct|class)//o;
     s/^\s+\S+\s+//o;
     s/[\*\s()]+//go;
@@ -31,6 +32,7 @@ while (<TLS>) {
 close TLS;
 open(TMP, '>', "/tmp/$$.cc") or die "$0: couldn't open temporary index file \"/tmp/$$.c\" - $!\n";
 print TMP <<EOF;
+#define __attribute__(X)
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>

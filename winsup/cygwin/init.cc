@@ -32,9 +32,6 @@ WINAPI dll_entry (HANDLE h, DWORD reason, void *static_load)
       if (MT_INTERFACE->reent_key.set (&MT_INTERFACE->reents))
 	    api_fatal ("thread initialization failed");
       break;
-    case DLL_THREAD_DETACH:
-      _my_tls.remove ();
-      break;
     }
   return 1;
 }
