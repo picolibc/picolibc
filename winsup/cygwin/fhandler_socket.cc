@@ -675,7 +675,7 @@ fhandler_socket::read (void *ptr, size_t len)
 }
 
 int
-fhandler_socket::recvfrom (void *ptr, size_t len, unsigned int flags,
+fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 			   struct sockaddr *from, int *fromlen)
 {
   int res = -1;
@@ -763,7 +763,7 @@ fhandler_socket::write (const void *ptr, size_t len)
 }
 
 int
-fhandler_socket::sendto (const void *ptr, size_t len, unsigned int flags,
+fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 			 const struct sockaddr *to, int tolen)
 {
   int res = -1;

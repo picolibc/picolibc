@@ -38,7 +38,7 @@ shared_name (const char *str, int num)
   extern bool _cygwin_testing;
 
   __small_sprintf (buf, "%s.%s.%d", cygwin_version.shared_id, str, num);
-  if (!_cygwin_testing)
+  if (_cygwin_testing)
     strcat (buf, cygwin_version.dll_build_date);
   return buf;
 }

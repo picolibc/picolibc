@@ -1202,6 +1202,95 @@ write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
   return 0;
 }
 
+static void
+get_attribute_from_acl(int * attribute, PACL acl, PSID owner_sid,
+		       PSID group_sid, BOOL grp_member)
+{
+  ACCESS_ALLOWED_ACE *ace;
+  int allow = 0;
+  int deny = 0;
+  int *flags, *anti;
+
+  for (DWORD i = 0; i < acl->AceCount; ++i)
+    {
+      if (!GetAce (acl, i, (PVOID *) &ace))
+	continue;
+      if (ace->Header.AceFlags & INHERIT_ONLY)
+	continue;
+      switch (ace->Header.AceType)
+	{
+	case ACCESS_ALLOWED_ACE_TYPE:
+	  flags = &allow;
+	  anti = &deny;
+	  break;
+	case ACCESS_DENIED_ACE_TYPE:
+	  flags = &deny;
+	  anti = &allow;
+	  break;
+	default:
+	  continue;
+	}
+
+      cygsid ace_sid ((PSID) &ace->SidStart);
+      if (ace_sid == well_known_world_sid)
+	{
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_IROTH
+		      | ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
+		      | ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_IWOTH
+		      | ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
+		      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
+	  if (ace->Mask & FILE_EXECUTE)
+	    {
+	      *flags |= S_IXOTH
+			| ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
+			| ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
+	    }
+	  if ((*attribute & S_IFDIR) &&
+	      (ace->Mask & (FILE_WRITE_DATA | FILE_EXECUTE | FILE_DELETE_CHILD))
+	      == (FILE_WRITE_DATA | FILE_EXECUTE))
+	    *flags |= S_ISVTX;
+	}
+      else if (ace_sid == well_known_null_sid)
+	{
+	  /* Read SUID, SGID and VTX bits from NULL ACE. */
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_ISVTX;
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_ISGID;
+	  if (ace->Mask & FILE_APPEND_DATA)
+	    *flags |= S_ISUID;
+	}
+      else if (owner_sid && ace_sid == owner_sid)
+	{
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_IRUSR;
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_IWUSR;
+	  if (ace->Mask & FILE_EXECUTE)
+	    *flags |= S_IXUSR;
+	}
+      else if (group_sid && ace_sid == group_sid)
+	{
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_IRGRP
+		      | ((grp_member && !(*anti & S_IRUSR)) ? S_IRUSR : 0);
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_IWGRP
+		      | ((grp_member && !(*anti & S_IWUSR)) ? S_IWUSR : 0);
+	  if (ace->Mask & FILE_EXECUTE)
+	    *flags |= S_IXGRP
+		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
+	}
+    }
+  *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
+  *attribute |= allow;
+  *attribute &= ~deny;
+  return;
+}
+
 static int
 get_nt_attribute (const char *file, int *attribute,
 		  __uid32_t *uidret, __gid32_t *gidret)
@@ -1264,89 +1353,8 @@ get_nt_attribute (const char *file, int *attribute,
 		      file, *attribute, uid, gid);
       return 0;
     }
+  get_attribute_from_acl (attribute, acl, owner_sid, group_sid, grp_member);
 
-  ACCESS_ALLOWED_ACE *ace;
-  int allow = 0;
-  int deny = 0;
-  int *flags, *anti;
-
-  for (DWORD i = 0; i < acl->AceCount; ++i)
-    {
-      if (!GetAce (acl, i, (PVOID *) &ace))
-	continue;
-      if (ace->Header.AceFlags & INHERIT_ONLY)
-	continue;
-      switch (ace->Header.AceType)
-	{
-	case ACCESS_ALLOWED_ACE_TYPE:
-	  flags = &allow;
-	  anti = &deny;
-	  break;
-	case ACCESS_DENIED_ACE_TYPE:
-	  flags = &deny;
-	  anti = &allow;
-	  break;
-	default:
-	  continue;
-	}
-
-      cygsid ace_sid ((PSID) &ace->SidStart);
-      if (owner_sid && ace_sid == owner_sid)
-	{
-	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_IRUSR;
-	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_IWUSR;
-	  if (ace->Mask & FILE_EXECUTE)
-	    *flags |= S_IXUSR;
-	}
-      else if (group_sid && ace_sid == group_sid)
-	{
-	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_IRGRP
-		      | ((grp_member && !(*anti & S_IRUSR)) ? S_IRUSR : 0);
-	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_IWGRP
-		      | ((grp_member && !(*anti & S_IWUSR)) ? S_IWUSR : 0);
-	  if (ace->Mask & FILE_EXECUTE)
-	    *flags |= S_IXGRP
-		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	}
-      else if (ace_sid == well_known_world_sid)
-	{
-	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_IROTH
-		      | ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
-		      | ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
-	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_IWOTH
-		      | ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
-		      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
-	  if (ace->Mask & FILE_EXECUTE)
-	    {
-	      *flags |= S_IXOTH
-			| ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
-			| ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	    }
-	  if ((*attribute & S_IFDIR) &&
-	      (ace->Mask & (FILE_WRITE_DATA | FILE_EXECUTE | FILE_DELETE_CHILD))
-	      == (FILE_WRITE_DATA | FILE_EXECUTE))
-	    *flags |= S_ISVTX;
-	}
-      else if (ace_sid == well_known_null_sid)
-	{
-	  /* Read SUID, SGID and VTX bits from NULL ACE. */
-	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_ISVTX;
-	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_ISGID;
-	  if (ace->Mask & FILE_APPEND_DATA)
-	    *flags |= S_ISUID;
-	}
-    }
-  *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
-  *attribute |= allow;
-  *attribute &= ~deny;
   syscall_printf ("file: %s %x, uid %d, gid %d", file, *attribute, uid, gid);
   return 0;
 }
@@ -1437,88 +1445,7 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
       return 0;
     }
 
-  ACCESS_ALLOWED_ACE *ace;
-  int allow = 0;
-  int deny = 0;
-  int *flags, *anti;
-
-  for (DWORD i = 0; i < acl->AceCount; ++i)
-    {
-      if (!GetAce (acl, i, (PVOID *) & ace))
-	continue;
-      if (ace->Header.AceFlags & INHERIT_ONLY)
-	continue;
-      switch (ace->Header.AceType)
-	{
-	case ACCESS_ALLOWED_ACE_TYPE:
-	  flags = &allow;
-	  anti = &deny;
-	  break;
-	case ACCESS_DENIED_ACE_TYPE:
-	  flags = &deny;
-	  anti = &allow;
-	  break;
-	default:
-	  continue;
-	}
-
-      cygsid ace_sid ((PSID) & ace->SidStart);
-      if (owner_sid && ace_sid == owner_sid)
-	{
-	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_IRUSR;
-	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_IWUSR;
-	  if (ace->Mask & FILE_EXECUTE)
-	    *flags |= S_IXUSR;
-	}
-      else if (group_sid && ace_sid == group_sid)
-	{
-	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_IRGRP
-		      | ((grp_member && !(*anti & S_IRUSR)) ? S_IRUSR : 0);
-	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_IWGRP
-		      | ((grp_member && !(*anti & S_IWUSR)) ? S_IWUSR : 0);
-	  if (ace->Mask & FILE_EXECUTE)
-	    *flags |= S_IXGRP
-		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	}
-      else if (ace_sid == well_known_world_sid)
-	{
-	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_IROTH
-		      | ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
-		      | ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
-	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_IWOTH
-		      | ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
-		      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
-	  if (ace->Mask & FILE_EXECUTE)
-	    {
-	      *flags |= S_IXOTH
-			| ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
-			| ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	    }
-	  if ((*attribute & S_IFDIR) &&
-	      (ace->Mask & (FILE_WRITE_DATA | FILE_EXECUTE | FILE_DELETE_CHILD))
-	      == (FILE_WRITE_DATA | FILE_EXECUTE))
-	    *flags |= S_ISVTX;
-	}
-      else if (ace_sid == well_known_null_sid)
-	{
-	  /* Read SUID, SGID and VTX bits from NULL ACE. */
-	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_ISVTX;
-	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_ISGID;
-	  if (ace->Mask & FILE_APPEND_DATA)
-	    *flags |= S_ISUID;
-	}
-    }
-  *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
-  *attribute |= allow;
-  *attribute &= ~deny;
+  get_attribute_from_acl (attribute, acl, owner_sid, group_sid, grp_member);
 
   LocalFree (psd);
 

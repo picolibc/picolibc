@@ -564,7 +564,7 @@ done:
 
 /* exported as sendto: standards? */
 extern "C" int
-cygwin_sendto (int fd, const void *buf, int len, unsigned int flags,
+cygwin_sendto (int fd, const void *buf, int len, int flags,
 	       const struct sockaddr *to, int tolen)
 {
   int res;
@@ -577,15 +577,16 @@ cygwin_sendto (int fd, const void *buf, int len, unsigned int flags,
   else if ((res = len) != 0)
     res = fh->sendto (buf, len, flags, to, tolen);
 
-  syscall_printf ("%d = sendto (%d, %x, %x, %x)", res, fd, buf, len, flags);
+  syscall_printf ("%d = sendto (%d, %p, %d, %x, %p, %d)",
+		  res, fd, buf, len, flags, to, tolen);
 
   return res;
 }
 
 /* exported as recvfrom: standards? */
 extern "C" int
-cygwin_recvfrom (int fd, void *buf, int len, int flags, struct sockaddr *from,
-		 int *fromlen)
+cygwin_recvfrom (int fd, void *buf, int len, int flags,
+		 struct sockaddr *from, int *fromlen)
 {
   int res;
   fhandler_socket *fh = get (fd);
@@ -599,7 +600,8 @@ cygwin_recvfrom (int fd, void *buf, int len, int flags, struct sockaddr *from,
   else if ((res = len) != 0)
     res = fh->recvfrom (buf, len, flags, from, fromlen);
 
-  syscall_printf ("%d = recvfrom (%d, %x, %x, %x)", res, fd, buf, len, flags);
+  syscall_printf ("%d = recvfrom (%d, %p, %d, %x, %p, %p)",
+		  res, fd, buf, len, flags, from, fromlen);
 
   return res;
 }
@@ -662,7 +664,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	set_winsock_errno ();
     }
 
-  syscall_printf ("%d = setsockopt (%d, %d, %x (%s), %x, %d)",
+  syscall_printf ("%d = setsockopt (%d, %d, %x (%s), %p, %d)",
 		  res, fd, level, optname, name, optval, optlen);
   return res;
 }
@@ -730,7 +732,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
 	set_winsock_errno ();
     }
 
-  syscall_printf ("%d = getsockopt (%d, %d, %x (%s), %x, %d)",
+  syscall_printf ("%d = getsockopt (%d, %d, %x (%s), %p, %p)",
 		  res, fd, level, optname, name, optval, optlen);
   return res;
 }
@@ -747,7 +749,7 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
   else
     res = fh->connect (name, namelen);
 
-  syscall_printf ("%d = connect (%d, %x, %x)", res, fd, name, namelen);
+  syscall_printf ("%d = connect (%d, %p, %d)", res, fd, name, namelen);
 
   return res;
 }
@@ -1009,7 +1011,7 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
   else
     res = fh->accept (peer, len);
 
-  syscall_printf ("%d = accept (%d, %x, %x)", res, fd, peer, len);
+  syscall_printf ("%d = accept (%d, %p, %d)", res, fd, peer, len);
   return res;
 }
 
@@ -1025,7 +1027,7 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
   else
     res = fh->bind (my_addr, addrlen);
 
-  syscall_printf ("%d = bind (%d, %x, %d)", res, fd, my_addr, addrlen);
+  syscall_printf ("%d = bind (%d, %p, %d)", res, fd, my_addr, addrlen);
   return res;
 }
 
@@ -1043,7 +1045,7 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
   else
     res = fh->getsockname (addr, namelen);
 
-  syscall_printf ("%d = getsockname (%d, %x, %d)", res, fd, addr, namelen);
+  syscall_printf ("%d = getsockname (%d, %p, %d)", res, fd, addr, namelen);
   return res;
 }
 
@@ -1146,14 +1148,14 @@ cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 
 /* exported as recv: standards? */
 extern "C" int
-cygwin_recv (int fd, void *buf, int len, unsigned int flags)
+cygwin_recv (int fd, void *buf, int len, int flags)
 {
   return cygwin_recvfrom (fd, buf, len, flags, NULL, NULL);
 }
 
 /* exported as send: standards? */
 extern "C" int
-cygwin_send (int fd, const void *buf, int len, unsigned int flags)
+cygwin_send (int fd, const void *buf, int len, int flags)
 {
   return cygwin_sendto (fd, buf, len, flags, NULL, 0);
 }
@@ -2096,7 +2098,7 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
   else
     res = fh->recvmsg (msg, flags);
 
-  syscall_printf ("%d = recvmsg (%d, %x, %x)", res, fd, msg, flags);
+  syscall_printf ("%d = recvmsg (%d, %p, %d)", res, fd, msg, flags);
   return res;
 }
 
@@ -2116,6 +2118,6 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
   else
     res = fh->sendmsg (msg, flags);
 
-  syscall_printf ("%d = recvmsg (%d, %x, %x)", res, fd, msg, flags);
+  syscall_printf ("%d = recvmsg (%d, %p, %d)", res, fd, msg, flags);
   return res;
 }

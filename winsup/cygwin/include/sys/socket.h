@@ -32,13 +32,14 @@ extern "C"
   int getpeername (int, struct sockaddr *__peer, int *);
   int getsockname (int, struct sockaddr *__addr, int *);
   int listen (int, int __n);
-  int recv (int, void *__buff, int __len, unsigned int __flags);
-  int recvfrom (int, char *__buff, int __len, int __flags,
-			 struct sockaddr *__from, int *__fromlen);
+  int recv (int, void *__buff, int __len, int __flags);
+  int recvfrom (int, void *__buff, int __len, int __flags,
+		struct sockaddr *__from, int *__fromlen);
   int recvmsg(int s, struct msghdr *msg, int flags);
-  int send (int, const void *__buff, int __len, unsigned int __flags);
+  int send (int, const void *__buff, int __len, int __flags);
   int sendmsg(int s, const struct msghdr *msg, int flags);
-  int sendto (int, const void *, int, unsigned int, const struct sockaddr *, int);
+  int sendto (int, const void *, int __len, int __flags,
+	      const struct sockaddr *__to, int __tolen);
   int setsockopt (int __s, int __level, int __optname, const void *optval, int __optlen);
   int getsockopt (int __s, int __level, int __optname, void *__optval, int *__optlen);
   int shutdown (int, int);
