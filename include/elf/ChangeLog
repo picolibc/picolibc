@@ -1,3 +1,7 @@
+Mon Oct  4 17:42:38 1999  Doug Evans  <devans@canuck.cygnus.com>
+
+	* m32r.h (E_M32RX_ARCH): Define.
+
 1999-09-15  Ulrich Drepper  <drepper@cygnus.com>
 
 	* hppa.h: Add DT_HP_GST_SIZE, DT_HP_GST_VERSION, and DT_HP_GST_HASHVAL.
