@@ -1,3 +1,7 @@
+Thu Mar 30 23:45:00 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* MAINTAINERS: Add Ron Parker as maintainer of cinstall stuff.
+
 Sun Feb  6 18:15:44 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Do the standard CC/CFLAGS stuff for propagation to
