@@ -1,6 +1,6 @@
 /* Table of opcodes for the PA-RISC.
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1998, 1999, 2000,
-   2001
+   2001, 2002
    Free Software Foundation, Inc.
 
    Contributed by the Center for Software Science at the
@@ -271,10 +271,12 @@ Float registers for fmpyadd and fmpysub:
 */
 
 
+#if 0
 /* List of characters not to put a space after.  Note that
    "," is included, as the "spopN" operations use literal
    commas in their completer sections.  */
 static const char *const completer_chars = ",CcY<>?!@+&U~FfGHINnOoZMadu|/=0123%e$m}";
+#endif
 
 /* The order of the opcodes in this table is significant:
 

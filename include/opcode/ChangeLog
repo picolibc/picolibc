@@ -1,5 +1,7 @@
 2002-12-16  Alan Modra  <amodra@bigpond.net.au>
 
+	* hppa.h (completer_chars): #if 0 out.
+
 	* ns32k.h (struct ns32k_opcode): Constify "name", "operands" and
 	"default_args".
 	(struct not_wot): Constify "args".
