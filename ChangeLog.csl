@@ -1,3 +1,8 @@
+2005-03-29  Julian Brown  <julian@codesourcery.com>
+
+	* elf32-arm.c (elf32_arm_final_link_relocate): Use blx to get to
+	symbian plt entries from thumb mode.
+
 2005-03-28  Daniel Jacobowitz  <dan@codesourcery.com>
 	    Phil Blundell  <philb@gnu.org>
 
