@@ -94,6 +94,13 @@ public:
   char root[MAX_PATH+1];
   size_t rootlen;
 
+  /* Resources used by process. */
+  long start_time;
+  struct rusage rusage_self;
+  struct rusage rusage_children;
+  /* Pointer to mmap'ed areas for this process.  Set up by fork. */
+  void *mmap_ptr;
+
   /* Non-zero if process was stopped by a signal. */
   char stopsig;
 
@@ -104,21 +111,13 @@ public:
   LONG* getsigtodo (int);
   HANDLE getthread2signal ();
   void setthread2signal (void *);
-
-  /* Resources used by process. */
-  long start_time;
-  struct rusage rusage_self;
-  struct rusage rusage_children;
+  void exit (UINT n) __attribute__ ((noreturn));
 
 private:
   struct sigaction sigs[NSIG];
   sigset_t sig_mask;		/* one set for everything to ignore. */
   LONG _sigtodo[NSIG + __SIGOFFSET];
   ThreadItem* thread2signal;  // NULL means means thread any other means a pthread
-
-public:
-  /* Pointer to mmap'ed areas for this process.  Set up by fork. */
-  void *mmap_ptr;
 };
 
 class pinfo
@@ -128,7 +127,7 @@ class pinfo
   int destroy;
 public:
   void init (pid_t n, DWORD create = 0, HANDLE h = NULL);
-  pinfo (): h (NULL), procinfo (0), destroy (0) {}
+  pinfo () {}
   pinfo (_pinfo *x): procinfo (x) {}
   pinfo (pid_t n) {init (n);}
   pinfo (pid_t n, int create) {init (n, create);}
@@ -181,7 +180,8 @@ extern pinfo myself;
 extern "C" int _spawnve (HANDLE hToken, int mode, const char *path,
 			 const char *const *argv, const char *const *envp);
 
-extern void __stdcall exec_fixup_after_fork ();
+extern void __stdcall pinfo_fixup_after_fork ();
+extern void __stdcall pinfo_fixup_in_spawned_child (HANDLE hchild);
 
 /* For mmaps across fork(). */
 int __stdcall recreate_mmaps_after_fork (void *);

@@ -29,7 +29,7 @@ extern "C"
 #if defined (_CYG_THREAD_FAILSAFE) && defined (_MT_SAFE)
   void AssertResourceOwner (int, int);
 #else
-#define AssertResourceOwner(i,ii)
+# define AssertResourceOwner(i,ii)
 #endif
 }
 
@@ -126,17 +126,17 @@ class pinfo;
 class ResourceLocks
 {
 public:
-ResourceLocks ():inited (false) {};
-LPCRITICAL_SECTION Lock (int);
-void Init ();
-void Delete ();
+  ResourceLocks () {};
+  LPCRITICAL_SECTION Lock (int);
+  void Init ();
+  void Delete ();
 #ifdef _CYG_THREAD_FAILSAFE
-DWORD owner;
-DWORD count;
+  DWORD owner;
+  DWORD count;
 #endif
-private:
-CRITICAL_SECTION lock;
-bool inited;
+  private:
+  CRITICAL_SECTION lock;
+  bool inited;
 };
 
 
@@ -146,100 +146,99 @@ bool inited;
 
 class MTitem
 {
-public:
-HANDLE win32_obj_id;
-UINT return_value;
-bool used;
-char joinable;       // for thread only
-bool HandleOke () {return win32_obj_id;}
-virtual void Destroy ();
-virtual int Id () {return (int) win32_obj_id;}
+  public:
+  HANDLE win32_obj_id;
+  UINT return_value;
+  bool used;
+  char joinable;       // for thread only
+  bool HandleOke () {return win32_obj_id;}
+  virtual void Destroy ();
+  virtual int Id () {return (int) win32_obj_id;}
 };
 
-class ThreadItem:public MTitem
+class ThreadItem: public MTitem
 {
 public:
-pthread_attr_t attr;
-TFD (function);
-void *arg;
-void *return_ptr;
-bool suspended;
-DWORD thread_id;
-DWORD GetThreadId () {return thread_id;}
+  pthread_attr_t attr;
+  TFD (function);
+  void *arg;
+  void *return_ptr;
+  bool suspended;
+  DWORD thread_id;
+  DWORD GetThreadId () {return thread_id;}
 
-/* signal handling */
-struct sigaction *sigs;
-sigset_t *sigmask;
-LONG *sigtodo;
+  /* signal handling */
+  struct sigaction *sigs;
+  sigset_t *sigmask;
+  LONG *sigtodo;
 };
 
-class MutexItem:public MTitem
+class MutexItem: public MTitem
 {
 public:
-int Lock ();
-int TryLock ();
-int UnLock ();
+  int Lock ();
+  int TryLock ();
+  int UnLock ();
 };
 
-class SemaphoreItem:public MTitem
+class SemaphoreItem: public MTitem
 {
 public:
-int shared;
-int Wait ();
-int Post ();
-int TryWait ();
+  int shared;
+  int Wait ();
+  int Post ();
+  int TryWait ();
 };
 
 
 typedef struct
 {
-MTitem *items[MT_MAX_ITEMS];
-int index;
-}
-MTList;
+  MTitem *items[MT_MAX_ITEMS];
+  int index;
+} MTList;
 
 class MTinterface
 {
 public:
-// General
-DWORD reent_index;
-DWORD thread_key;
+  // General
+  DWORD reent_index;
+  DWORD thread_key;
 
-// Used for main thread data, and sigproc thread
-struct __reent_t reents;
-struct _winsup_t winsup_reent;
-ThreadItem mainthread;
+  // Used for main thread data, and sigproc thread
+  struct __reent_t reents;
+  struct _winsup_t winsup_reent;
+  ThreadItem mainthread;
 
-void Init0 ();
-void Init1 ();
-void ClearReent ();
+  void Init0 ();
+  void Init1 ();
+  void ClearReent ();
 
-void ReleaseItem (MTitem *);
+  void ReleaseItem (MTitem *);
 
-// Thread functions
-ThreadItem *CreateThread (pthread_t *, TFD (func), void *, pthread_attr_t);
-ThreadItem *GetCallingThread ();
-ThreadItem *GetThread (pthread_t *);
+  // Thread functions
+  ThreadItem *CreateThread (pthread_t *, TFD (func), void *, pthread_attr_t);
+  ThreadItem *GetCallingThread ();
+  ThreadItem *GetThread (pthread_t *);
 
-// Mutex functions
-MutexItem *CreateMutex (pthread_mutex_t *);
-MutexItem *GetMutex (pthread_mutex_t *);
+  // Mutex functions
+  MutexItem *CreateMutex (pthread_mutex_t *);
+  MutexItem *GetMutex (pthread_mutex_t *);
 
-// Semaphore functions
-SemaphoreItem *CreateSemaphore (sem_t *, int, int);
-SemaphoreItem *GetSemaphore (sem_t * t);
+  // Semaphore functions
+  SemaphoreItem *CreateSemaphore (sem_t *, int, int);
+  SemaphoreItem *GetSemaphore (sem_t * t);
 
 private:
-// General Administration
-MTitem * Find (void *, int (*compare) (void *, void *), int &, MTList *);
-MTitem *GetItem (int, MTList *);
-MTitem *SetItem (int, MTitem *, MTList *);
-int Find (MTitem &, MTList *);
-int FindNextUnused (MTList *);
+  // General Administration
+  MTitem * Find (void *, int (*compare) (void *, void *), int &, MTList *);
+  MTitem *GetItem (int, MTList *);
+  MTitem *SetItem (int, MTitem *, MTList *);
+  int Find (MTitem &, MTList *);
+  int FindNextUnused (MTList *);
 
-MTList threadlist;
-MTList mutexlist;
-MTList semalist;
+  MTList threadlist;
+  MTList mutexlist;
+  MTList semalist;
 };
 
 

@@ -65,6 +65,7 @@ fill_rusage (struct rusage *r, HANDLE h)
 
   struct timeval tv;
 
+  memset (r, 0, sizeof (*r));
   GetProcessTimes (h, &creation_time, &exit_time, &kernel_time, &user_time);
   totimeval (&tv, &kernel_time, 0, 0);
   add_timeval (&r->ru_stime, &tv);

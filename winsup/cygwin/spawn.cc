@@ -219,16 +219,6 @@ linebuf::prepend (const char *what, int len)
   ix = newix;
 }
 
-static HANDLE hexec_proc = NULL;
-
-void __stdcall
-exec_fixup_after_fork ()
-{
-  if (hexec_proc)
-    CloseHandle (hexec_proc);
-  hexec_proc = NULL;
-}
-
 class av
 {
   char **argv;
@@ -351,7 +341,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
      }
 
   ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
-  ciresrv.moreinfo->old_title = old_title ? cstrdup (old_title) : NULL;
+  ciresrv.moreinfo->old_title = NULL;
   ciresrv.moreinfo->fds = fdtab;
   ciresrv.moreinfo->nfds = fdtab.size;
 
@@ -562,14 +552,6 @@ skip_arg_parsing:
   if (!hToken && myself->token != INVALID_HANDLE_VALUE)
     hToken = myself->token;
 
-  /* FIXME:  This leaves a handle to the process open so that the pid is not
-     duplicated.  However, if a process execs another process two handles are
-     left open, which is unnecessary. */
-  if (mode == _P_OVERLAY && !hexec_proc &&
-      !DuplicateHandle (hMainProc, hMainProc, hMainProc, &hexec_proc, 0,
-			TRUE, DUPLICATE_SAME_ACCESS))
-    system_printf ("couldn't save current process handle %p, %E", hMainProc);
-
   if (hToken)
     {
       /* allow the child to interact with our window station/desktop */
@@ -631,18 +613,18 @@ skip_arg_parsing:
 	seteuid (uid);
     }
   else
-    rc = CreateProcessA (real_path,	/* image name - with full path */
-		       one_line.buf,	/* what was passed to exec */
+    rc = CreateProcess (real_path,	/* image name - with full path */
+		        one_line.buf,	/* what was passed to exec */
 					/* process security attrs */
-		       allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
+		        allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
 					/* thread security attrs */
-		       allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
-		       TRUE,	/* inherit handles from parent */
-		       flags,
-		       envblock,/* environment */
-		       0,	/* use current drive/directory */
-		       &si,
-		       &pi);
+		        allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
+		        TRUE,	/* inherit handles from parent */
+		        flags,
+		        envblock,/* environment */
+		        0,	/* use current drive/directory */
+		        &si,
+		        &pi);
 
   MALLOC_CHECK;
   if (envblock)
@@ -691,6 +673,7 @@ skip_arg_parsing:
     }
   else
     {
+      pinfo_fixup_in_spawned_child (pi.hProcess);
       pinfo child (cygpid, 1);
       if (!child)
 	{
@@ -859,6 +842,9 @@ skip_arg_parsing:
     {
     case _P_OVERLAY:
       proc_terminate ();
+      struct rusage r;
+      fill_rusage (&r, hMainProc);
+      add_rusage (&myself->rusage_self, &r);
       ExitProcess (0);
       break;
     case _P_WAIT:

@@ -683,8 +683,8 @@ dll_crt0_1 ()
 	    cygheap_fixup_in_child (spawn_info->parent, 1);
 	    if (!spawn_info->moreinfo->myself_pinfo ||
 		!DuplicateHandle (hMainProc, spawn_info->moreinfo->myself_pinfo,
-				 hMainProc, &h, 0, 0,
-				 DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+				  hMainProc, &h, 0, 0,
+				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	      h = NULL;
 	    set_myself (mypid, h);
 	    __argc = spawn_info->moreinfo->argc;
@@ -769,18 +769,6 @@ dll_crt0_1 ()
 
   line = strcpy ((char *) alloca (strlen (line) + 1), line);
 
-  /* Set new console title if appropriate. */
-
-  if (display_title && !dynamically_loaded)
-    {
-      char *cp = line;
-      if (strip_title_path)
-	for (char *ptr = cp; *ptr && *ptr != ' '; ptr++)
-	  if (isdirsep (*ptr))
-	    cp = ptr + 1;
-      set_console_title (cp);
-    }
-
   /* Allocate fdtab */
   dtable_init ();
 
@@ -822,6 +810,18 @@ dll_crt0_1 ()
 
   /* Set up __progname for getopt error call. */
   __progname = __argv[0];
+
+  /* Set new console title if appropriate. */
+
+  if (display_title && !dynamically_loaded)
+    {
+      char *cp = __progname;
+      if (strip_title_path)
+	for (char *ptr = cp; *ptr && *ptr != ' '; ptr++)
+	  if (isdirsep (*ptr))
+	    cp = ptr + 1;
+      set_console_title (cp);
+    }
 
   cygwin_finished_initializing = 1;
   /* Call init of loaded dlls. */
@@ -1057,9 +1057,8 @@ do_exit (int status)
 
   shared_terminate ();
 
-  sigproc_printf ("calling ExitProcess %d", n);
   minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
-  ExitProcess (n);
+  myself->exit (n);
 }
 
 extern "C" void
@@ -1099,7 +1098,7 @@ __api_fatal (const char *fmt, ...)
 #ifdef DEBUGGING
   (void) try_to_debug ();
 #endif
-  ExitProcess (1);
+  myself->exit (1);
 }
 
 extern "C" {

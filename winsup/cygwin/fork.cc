@@ -225,8 +225,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 {
   debug_printf ("child is running.  pid %d, ppid %d, stack here %p",
 		myself->pid, myself->ppid, __builtin_frame_address (0));
-  child_info_fork ch;
-  stack_base (ch);
 
   /* Restore the inheritance state as in parent
      Don't call setuid here! The flags are already set. */
@@ -240,9 +238,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     }
 
   sync_with_parent ("after longjmp.", TRUE);
-debug_printf ("hParent %p", hParent);
   ProtectHandle (hParent);
-// small_printf ("child 1 first_dll %p, load_dlls %d\n", first_dll, load_dlls);
+  sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d\n", hParent, first_dll, load_dlls);
 
 #ifdef DEBUGGING
   char c;
@@ -270,9 +267,9 @@ debug_printf ("hParent %p", hParent);
 
   MALLOC_CHECK;
 
+  pinfo_fixup_after_fork ();
   fdtab.fixup_after_fork (hParent);
   signal_fixup_after_fork ();
-  exec_fixup_after_fork ();
 
   MALLOC_CHECK;
 

@@ -24,10 +24,40 @@ details. */
 #include "perprocess.h"
 #include "environ.h"
 #include "security.h"
+#include <assert.h>
 
 static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
 
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
+
+static HANDLE hexec_proc = NULL;
+
+void __stdcall
+pinfo_fixup_after_fork ()
+{
+  if (hexec_proc)
+    CloseHandle (hexec_proc);
+
+  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hexec_proc, 0,
+			TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      system_printf ("couldn't save current process handle %p, %E", hMainProc);
+      hexec_proc = NULL;
+    }
+}
+
+void __stdcall
+pinfo_fixup_in_spawned_child (HANDLE hchild)
+{
+  HANDLE h;
+  if (!hexec_proc)
+    return;
+  if (!DuplicateHandle (hchild, hexec_proc, hMainProc, &h, 0, TRUE,
+			DUPLICATE_CLOSE_SOURCE))
+    system_printf ("couldn't close handle %p in child, %E", hexec_proc);
+  else
+    CloseHandle (h);
+}
 
 /* Initialize the process table.
    This is done once when the dll is first loaded.  */
@@ -94,6 +124,14 @@ pinfo_init (char **envp)
     }
 
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
+}
+
+void
+_pinfo::exit (UINT n)
+{
+  process_state = PID_EXITED;
+  sigproc_printf ("Calling ExitProcess %d", n);
+  ExitProcess (n);
 }
 
 struct sigaction&
@@ -185,66 +223,82 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
       return;
     }
 
-  int created;
-  char mapname[MAX_PATH];
-  __small_sprintf (mapname, "cygpid.%x", n);
-
-  int mapsize;
-  if (create & PID_EXECED)
-    mapsize = PINFO_REDIR_SIZE;
-  else
-    mapsize = sizeof (_pinfo);
-
-  if (in_h)
+  for (int i = 0; i < 10; i++)
     {
-      h = in_h;
-      created = 0;
-    }
-  else if (!create)
-    {
-      /* CGF FIXME -- deal with inheritance after an exec */
-      h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE, FALSE, mapname);
-      created = 0;
-    }
-  else
-    {
-      h = CreateFileMapping ((HANDLE) 0xffffffff, &sec_all_nih,
-			      PAGE_READWRITE, 0, mapsize, mapname);
-      created = h && GetLastError () != ERROR_ALREADY_EXISTS;
-    }
+      int created;
+      char mapname[MAX_PATH];
+      __small_sprintf (mapname, "cygpid.%x", n);
 
-  if (!h)
-    {
-      if (create)
-	__seterrno ();
-      procinfo = NULL;
-      return;
-    }
+      int mapsize;
+      if (create & PID_EXECED)
+	mapsize = PINFO_REDIR_SIZE;
+      else
+	mapsize = sizeof (_pinfo);
 
-  ProtectHandle1 (h, pinfo_shared_handle);
-  procinfo = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+      if (in_h)
+	{
+	  h = in_h;
+	  created = 0;
+	}
+      else if (!create)
+	{
+	  /* CGF FIXME -- deal with inheritance after an exec */
+	  h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE, FALSE, mapname);
+	  created = 0;
+	}
+      else
+	{
+	  h = CreateFileMapping ((HANDLE) 0xffffffff, &sec_all_nih,
+				  PAGE_READWRITE, 0, mapsize, mapname);
+	  created = h && GetLastError () != ERROR_ALREADY_EXISTS;
+	}
 
-  if (procinfo->process_state & PID_EXECED)
-    {
-      pid_t realpid = procinfo->pid;
-      debug_printf ("execed process windows pid %d, cygwin pid %d", n, realpid);
-      release ();
-      if (realpid == n)
-	api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
-      return init (realpid);
-    }
+      if (!h)
+	{
+	  if (create)
+	    __seterrno ();
+	  procinfo = NULL;
+	  return;
+	}
 
-  if (created)
-    {
-      if (!(create & PID_EXECED))
+      procinfo = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+      ProtectHandle1 (h, pinfo_shared_handle);
+
+      if (procinfo->process_state & PID_EXECED)
+	{
+	  assert (!i);
+	  pid_t realpid = procinfo->pid;
+	  debug_printf ("execed process windows pid %d, cygwin pid %d", n, realpid);
+	  if (realpid == n)
+	    api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
+	  n = realpid;
+	  release ();
+	  continue;
+	}
+
+	/* In certain rare, pathological cases, it is possible for the shared
+	   memory region to exist for a while after a process has exited.  This
+	   should only be a brief occurrence, so rather than introduce some kind
+	   of locking mechanism, just loop.  FIXME: I'm sure I'll regret doing it
+	   this way at some point.  */
+      if (i < 9 && !created && create && (procinfo->process_state & PID_EXITED))
+	{
+	  Sleep (5);
+	  release ();
+	  continue;
+	}
+
+      if (!created)
+	/* nothing */;
+      else if (!(create & PID_EXECED))
 	procinfo->pid = n;
       else
 	{
 	  procinfo->pid = myself->pid;
 	  procinfo->process_state |= PID_IN_USE | PID_EXECED;
 	}
+      break;
     }
-
   destroy = 1;
 }
 

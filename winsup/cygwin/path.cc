@@ -2396,8 +2396,8 @@ hash_path_name (unsigned long hash, const char *name)
 	{
 	  char *nn, *newname = (char *) alloca (strlen (name) + 2);
 	  nn = strncpy (newname, name, 2);
-	  if (islower (*nn))
-	    *newname = toupper (*nn);
+	  if (isupper (*nn))
+	    *newname = tolower (*nn);
 	  *(nn += 2) = '\0';
 	  name += 2;
 	  if (*name != '\\')
@@ -2415,12 +2415,12 @@ hash_path_name (unsigned long hash, const char *name)
 	 Otherwise the inodes same will differ depending on whether a file is
 	 referenced with an absolute value or relatively. */
 
-      if (*name != '\\')
+      if (!hash && !isabspath (name))
 	{
 	  hash = cygcwd.get_hash ();
 	  if (name[0] == '.' && name[1] == '\0')
 	    return hash;
-	  hash = hash_path_name (hash, "\\");
+	  hash += hash_path_name (hash, "\\");
 	}
     }
 
@@ -2429,7 +2429,8 @@ hashit:
      \a\b\.  but allow a single \ if that's all there is. */
   do
     {
-      hash += *name + (*name << 17);
+      int ch = tolower(*name);
+      hash += ch + (ch << 17);
       hash ^= hash >> 2;
     }
   while (*++name != '\0' &&

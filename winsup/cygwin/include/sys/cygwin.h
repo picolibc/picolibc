@@ -66,7 +66,6 @@ typedef enum
 /* Flags associated with process_state */
 enum
 {
-  PID_NOT_IN_USE       = 0x0000, // Free entry.
   PID_IN_USE	       = 0x0001, // Entry in use.
   PID_ZOMBIE	       = 0x0002, // Child exited: no parent wait.
   PID_STOPPED	       = 0x0004, // Waiting for SIGCONT.
@@ -86,7 +85,8 @@ enum
 				 //  all execed or forked processes.
   PID_UNUSED2	       = 0x2000, // child has execed
   PID_EXECED	       = 0x4000, // redirect to original pid info block
-  PID_NOREDIR	       = 0x8000  // don't redirect if execed
+  PID_NOREDIR	       = 0x8000, // don't redirect if execed
+  PID_EXITED	       = 0x80000000 // Free entry.
 };
 
 #ifdef WINVER

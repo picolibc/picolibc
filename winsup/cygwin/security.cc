@@ -602,7 +602,6 @@ write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 int
 set_process_privileges ()
 {
-  HANDLE hProcess = NULL;
   HANDLE hToken = NULL;
   LUID restore_priv;
   LUID backup_priv;
@@ -610,14 +609,7 @@ set_process_privileges ()
   TOKEN_PRIVILEGES *new_priv = (TOKEN_PRIVILEGES *) buf;
   int ret = -1;
 
-  hProcess = OpenProcess (PROCESS_ALL_ACCESS, FALSE, GetCurrentProcessId ());
-  if (! hProcess)
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  if (! OpenProcessToken (hProcess,
+  if (! OpenProcessToken (hMainProc,
 			  TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
 			  &hToken))
     {
@@ -656,8 +648,6 @@ set_process_privileges ()
 out:
   if (hToken)
     CloseHandle (hToken);
-  if (hProcess)
-    CloseHandle (hProcess);
 
   syscall_printf ("%d = set_process_privileges ()", ret);
   return ret;

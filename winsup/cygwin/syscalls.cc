@@ -53,10 +53,16 @@ extern BOOL allow_ntsec;
 void __stdcall
 close_all_files (void)
 {
-  for (int i = 0; i < (int)fdtab.size; i++)
-    if (!fdtab.not_open (i))
-      _close (i);
+  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
 
+  for (int i = 0; i < (int) fdtab.size; i++)
+    if (!fdtab.not_open (i))
+      {
+	fdtab[i]->close ();
+	fdtab.release (i);
+      }
+
+  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
   cygwin_shared->delqueue.process_queue ();
 }
 
@@ -200,6 +206,7 @@ extern "C" int
 _read (int fd, void *ptr, size_t len)
 {
   sigframe thisframe (mainthread);
+  extern int sigcatchers;
   if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
@@ -211,10 +218,10 @@ _read (int fd, void *ptr, size_t len)
   DWORD wait = (fh->get_flags () & (O_NONBLOCK | OLD_O_NDELAY)) ? 0 : INFINITE;
 
   /* Could block, so let user know we at least got here.  */
-  syscall_printf ("read (%d, %p, %d) %sblocking", fd, ptr, len, wait ? "" : "non");
+  syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d", fd, ptr, len, wait ? "" : "non", sigcatchers);
 
   int res;
-  if (wait && (!fh->is_slow () || fh->get_r_no_interrupt ()))
+  if (wait && (!sigcatchers || !fh->is_slow () || fh->get_r_no_interrupt ()))
     debug_printf ("non-interruptible read\n");
   else if (!fh->ready_for_read (fd, wait, 0))
     {
@@ -235,7 +242,6 @@ _read (int fd, void *ptr, size_t len)
       res = fh->read (ptr, len);
       myself->process_state &= ~PID_TTYIN;
     }
-
 
 out:
   syscall_printf ("%d = read (%d<%s>, %p, %d), errno %d", res, fd, fh->get_name (),
@@ -988,7 +994,7 @@ suffix_info stat_suffixes[] =
 /* Cygwin internal */
 static int
 stat_worker (const char *caller, const char *name, struct stat *buf,
-	      int nofollow)
+	     int nofollow)
 {
   int res = -1;
   int oret = 1;

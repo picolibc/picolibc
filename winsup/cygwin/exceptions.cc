@@ -47,7 +47,6 @@ static NO_COPY int exit_already = 0;
 static NO_COPY muto *mask_sync = NULL;
 
 HMODULE NO_COPY cygwin_hmodule;
-HANDLE NO_COPY console_handler_thread_waiter = NULL;
 
 static const struct
 {
@@ -126,10 +125,6 @@ set_console_handler ()
   sec_all.lpSecurityDescriptor = sec_all_nih.lpSecurityDescriptor =
     get_null_sd ();
 
-  /* Allocate the event needed for ctrl_c_handler synchronization with
-     wait_sig. */
-  if (!console_handler_thread_waiter)
-    CreateEvent (&sec_none_nih, TRUE, TRUE, NULL);
   (void) SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
   if (!SetConsoleCtrlHandler (ctrl_c_handler, TRUE))
     system_printf ("SetConsoleCtrlHandler failed, %E");
@@ -825,11 +820,6 @@ ctrl_c_handler (DWORD type)
   if (type == CTRL_LOGOFF_EVENT)
     return TRUE;
 
-  /* Wait for sigproc_init to tell us that it's safe to send something.
-     This event will always be in a signalled state when wait_sig is
-     ready to process signals. */
-  (void) WaitForSingleObject (console_handler_thread_waiter, 5000);
-
   if ((type == CTRL_CLOSE_EVENT) || (type == CTRL_SHUTDOWN_EVENT))
     /* Return FALSE to prevent an "End task" dialog box from appearing
        for each Cygwin process window that's open when the computer
@@ -1005,7 +995,7 @@ signal_exit (int rc)
 {
   rc = EXIT_SIGNAL | (rc << 8);
   if (exit_already++)
-    ExitProcess (rc);
+    myself->exit (rc);
 
   /* We'd like to stop the main thread from executing but when we do that it
      causes random, inexplicable hangs.  So, instead, we set up the priority

@@ -16,12 +16,22 @@ details. */
 #endif
 
 extern "C" {
+#ifndef DEBUGGING0
 DWORD __stdcall WFSO (HANDLE, DWORD);
 DWORD __stdcall WFMO (DWORD, CONST HANDLE *, BOOL, DWORD);
+#else
+DWORD __stdcall WFSO (const char *fn, int ln, HANDLE, DWORD);
+DWORD __stdcall WFMO (const char *fn, int ln, DWORD, CONST HANDLE *, BOOL, DWORD);
+#endif
 }
 
+#ifndef DEBUGGING0
 #define WaitForSingleObject WFSO
 #define WaitForMultipleObject WFMO
+#else
+#define WaitForSingleObject(a, b) WFSO (__FUNCTION__, __LINE__, a, b)
+#define WaitForMultipleObject(a, b, c, d) WFMO (__FUNCTION__, __LINE__, a, b, c, d)
+#endif
 
 #if !defined(_DEBUG_H_)
 #define _DEBUG_H_

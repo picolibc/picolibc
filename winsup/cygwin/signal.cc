@@ -19,6 +19,10 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 
+int sigcatchers;	/* FIXME: Not thread safe. */
+
+#define sigtrapped(func) ((func) != SIG_IGN && (func) != SIG_DFL)
+
 extern "C" _sig_func_ptr
 signal (int sig, _sig_func_ptr func)
 {
@@ -35,6 +39,11 @@ signal (int sig, _sig_func_ptr func)
   prev = myself->getsig (sig).sa_handler;
   myself->getsig (sig).sa_handler = func;
   myself->getsig (sig).sa_mask = 0;
+  if (!sigtrapped (prev) && sigtrapped (func))
+    sigcatchers++;
+  else if (sigtrapped (prev) && !sigtrapped (func))
+    sigcatchers--;
+  
   syscall_printf ("%p = signal (%d, %p)", prev, sig, func);
   return prev;
 }
@@ -224,12 +233,8 @@ killpg (int pgrp, int sig)
 }
 
 extern "C" int
-sigaction (int sig,
-		const struct sigaction *newaction,
-		struct sigaction *oldaction)
+sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 {
-  struct sigaction out_oldaction;
-
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
     {
@@ -238,25 +243,28 @@ sigaction (int sig,
       return -1;
     }
 
-  if (oldaction)
-    out_oldaction = myself->getsig (sig);
+  struct sigaction oa = myself->getsig (sig);
 
-  if (newaction)
+  if (newact)
     {
-      if ((sig == SIGKILL || sig == SIGSTOP) && newaction->sa_handler != SIG_DFL)
+      if ((sig == SIGKILL || sig == SIGSTOP) && newact->sa_handler != SIG_DFL)
 	{
 	  set_errno (EINVAL);
 	  return -1;
 	}
-      myself->getsig (sig) = *newaction;
-      if (newaction->sa_handler == SIG_IGN)
+      myself->getsig (sig) = *newact;
+      if (newact->sa_handler == SIG_IGN)
 	sig_clear (sig);
-      if (newaction->sa_handler == SIG_DFL && sig == SIGCHLD)
+      if (newact->sa_handler == SIG_DFL && sig == SIGCHLD)
 	sig_clear (sig);
+      if (!sigtrapped (oa.sa_handler) && sigtrapped (newact->sa_handler))
+	sigcatchers++;
+      else if (sigtrapped (oa.sa_handler) && !sigtrapped (newact->sa_handler))
+	sigcatchers--;
     }
 
-  if (oldaction)
-    *oldaction = out_oldaction;
+  if (oldact)
+    *oldact = oa;
 
   return 0;
 }

@@ -39,7 +39,6 @@ struct sigthread
   DWORD id;
   DWORD frame;
   muto *lock;
-  sigthread () : id (0), frame (0), lock (0) {}
   void init (const char *s);
 };
 

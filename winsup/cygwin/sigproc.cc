@@ -97,8 +97,8 @@ Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
  */
 Static HANDLE events[PSIZE + 1] = {0};	// All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
-Static pinfo pchildren[PSIZE] = {pinfo ()};// All my children info
-Static pinfo zombies[PSIZE] = {pinfo ()};	// All my deceased children info
+Static pinfo pchildren[PSIZE];		// All my children info
+Static pinfo zombies[PSIZE];		// All my deceased children info
 Static int nchildren = 0;		// Number of active children
 Static int nzombies = 0;		// Number of deceased children
 
@@ -195,18 +195,12 @@ pid_exists (pid_t pid)
   return proc_exists (p);
 }
 
-/* Test to determine if a process really exists and is processing
- * signals.
+/* Test to determine if a process really exists and is processing signals.
  */
 BOOL __stdcall
 proc_exists (_pinfo *p)
 {
-  HANDLE h;
-
-  if (p == NULL)
-    return FALSE;
-  else
-    return TRUE;
+  return p && !(p->process_state & (PID_INITIALIZING | PID_EXITED));
 }
 
 /* Return 1 if this is one of our children, zero otherwise.
@@ -266,7 +260,7 @@ proc_subproc (DWORD what, DWORD val)
       hchildren[nchildren] = vchild->hProcess;
       ProtectHandle1 (vchild->hProcess, childhProc);
       if (!DuplicateHandle (hMainProc, vchild->hProcess, hMainProc, &vchild->pid_handle,
-		     0, 0, DUPLICATE_SAME_ACCESS))
+			    0, 0, DUPLICATE_SAME_ACCESS))
 	system_printf ("Couldn't duplicate child handle for pid %d, %E", vchild->pid);
       ProtectHandle1 (vchild->pid_handle, pid_handle);
       sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",
@@ -301,11 +295,6 @@ proc_subproc (DWORD what, DWORD val)
       zombies[nzombies] = pchildren[val];	// Add to zombie array
       zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
       remove_child (val);		// Remove from children array
-      if (!proc_loop_wait)		// Don't bother if wait_subproc is
-	break;				//  exiting
-
-      /* Send a SIGCHLD to myself. */
-      rc = sig_send (myself_nowait, SIGCHLD);	// Send a SIGCHLD
       break;
 
     /* A child is in the stopped state.  Scan wait() queue to see if anyone
@@ -445,15 +434,13 @@ proc_terminate (void)
 	      ForceCloseHandle1 (zombies[i]->hProcess, childhProc);
 	      ForceCloseHandle1 (zombies[i]->pid_handle, pid_handle);
 	    }
-	  zombies[i]->process_state = PID_NOT_IN_USE;	/* CGF FIXME - still needed? */
+	  zombies[i]->process_state = PID_EXITED;	/* CGF FIXME - still needed? */
 	  zombies[i].release();		// FIXME: this breaks older gccs for some reason
 	}
 
       /* Disassociate my subprocesses */
       for (i = 0; i < nchildren; i++)
 	{
-	  if (pchildren[i]->process_state == PID_NOT_IN_USE)
-	    continue;		// Should never happen
 	  if (!pchildren[i]->hProcess)
 	    sigproc_printf ("%d(%d) hProcess cleared already?", pchildren[i]->pid,
 			pchildren[i]->dwProcessId);
@@ -596,10 +583,10 @@ sigproc_terminate (void)
       ForceCloseHandle (sigcomplete_main);
       for (int i = 0; i < 20; i++)
 	(void) ReleaseSemaphore (sigcomplete_nonmain, 1, NULL);
-      ForceCloseHandle (sigcomplete_nonmain);
-      ForceCloseHandle (sigcatch_main);
-      ForceCloseHandle (sigcatch_nonmain);
-      ForceCloseHandle (sigcatch_nosync);
+      // ForceCloseHandle (sigcomplete_nonmain);
+      // ForceCloseHandle (sigcatch_main);
+      // ForceCloseHandle (sigcatch_nonmain);
+      // ForceCloseHandle (sigcatch_nosync);
     }
   proc_terminate ();		// Terminate process handling thread
 
@@ -610,19 +597,19 @@ sigproc_terminate (void)
       sigproc_printf ("entering");
       sig_loop_wait = 0;	// Tell wait_sig to exit when it is
 				//  finished with anything it is doing
-      sig_dispatch_pending (TRUE);	// wake up and die
+      // sig_dispatch_pending (TRUE);	// wake up and die
+      /* In case of a sigsuspend */
+      SetEvent (signal_arrived);
 
       /* If !hwait_sig, then the process probably hasn't even finished
        * its initialization phase.
        */
-      if (hwait_sig)
+      if (0 && hwait_sig)
 	{
 	  if (GetCurrentThreadId () != sigtid)
 	    WaitForSingleObject (h, 10000);
 	  ForceCloseHandle1 (h, hwait_sig);
 
-	  /* In case of a sigsuspend */
-	  SetEvent (signal_arrived);
 
 	  if (GetCurrentThreadId () != sigtid)
 	    {
@@ -636,9 +623,11 @@ sigproc_terminate (void)
       sigproc_printf ("done");
     }
 
+#if 0
   /* Set this so that subsequent tests will succeed. */
   if (!myself->dwProcessId)
     myself->dwProcessId = GetCurrentProcessId ();
+#endif
 
   return;
 }
@@ -1128,7 +1117,7 @@ wait_sig (VOID *)
    * Signalling subproc_ready indicates that we are a cygwin process.
    */
   if (child_proc_info &&
-      (child_proc_info->type == PROC_FORK || child_proc_info->type == PROC_SPAWN))
+      (child_proc_info->type == PROC_EXEC || child_proc_info->type == PROC_SPAWN))
     {
       debug_printf ("subproc_ready %p", child_proc_info->subproc_ready);
       if (!SetEvent (child_proc_info->subproc_ready))
@@ -1143,13 +1132,6 @@ wait_sig (VOID *)
 
   SetEvent (wait_sig_inited);
   sigtid = GetCurrentThreadId ();
-
-  /* If we got something like a SIGINT while we were initializing, the
-     signal thread should be waiting for this event.  This signals the
-     thread that it's ok to send the signal since the wait_sig thread
-     is now active. */
-  extern HANDLE console_handler_thread_waiter;
-  SetEvent (console_handler_thread_waiter);
 
   HANDLE catchem[] = {sigcatch_main, sigcatch_nonmain, sigcatch_nosync};
   sigproc_printf ("Ready.  dwProcessid %d", myself->dwProcessId);
@@ -1306,7 +1288,14 @@ wait_subproc (VOID *)
       errloop = 0;
       rc -= WAIT_OBJECT_0;
       if (rc-- != 0)
-	(void)proc_subproc (PROC_CHILDTERMINATED, rc);
+	{
+	  (void) proc_subproc (PROC_CHILDTERMINATED, rc);
+	  if (!proc_loop_wait)		// Don't bother if wait_subproc is
+	    break;			//  exiting
+
+	  /* Send a SIGCHLD to myself. */
+	  rc = sig_send (myself_nowait, SIGCHLD);
+	}
       sigproc_printf ("looping");
     }
 
@@ -1327,7 +1316,6 @@ WFSO (HANDLE hHandle, DWORD dwMilliseconds)
   DWORD ret;
   sigframe thisframe (mainthread);
   ret = WaitForSingleObject (hHandle, dwMilliseconds);
-if (dwMilliseconds > 10 && ret == WAIT_TIMEOUT) system_printf ("TIMED OUT %d\n", dwMilliseconds);
   return ret;
 }
 
@@ -1339,7 +1327,6 @@ WFMO (DWORD nCount, CONST HANDLE *lpHandles, BOOL fWaitAll, DWORD dwMilliseconds
   DWORD ret;
   sigframe thisframe (mainthread);
   ret = WaitForMultipleObjects (nCount, lpHandles, fWaitAll, dwMilliseconds);
-if (dwMilliseconds > 10 && ret == WAIT_TIMEOUT) system_printf ("TIMED OUT %d\n", dwMilliseconds);
   return ret;
 }
 }

@@ -12,7 +12,7 @@ struct suffix_info
 {
   const char *name;
   int addon;
-  suffix_info (const char *s, int addit = 0) {name = s, addon = addit;}
+  suffix_info (const char *s, int addit = 0): name (s), addon (addit) {}
 };
 
 enum pathconv_arg

@@ -27,10 +27,8 @@ public:
   void operator delete (void *) {;} /* can't handle allocated mutos
 					currently */
 
-  /* This simple constructor is used for cases where no bruteforce
-     event handling is required. */
-  muto(): sync(0), visits(0), waiters(-1), bruteforce(0), tid(0), next (NULL) {;}
-  /* A more complicated constructor. */
+  muto() {}
+  /* The real constructor. */
   muto(int inh, const char *name);
   ~muto ();
   int acquire (DWORD ms = INFINITE); /* Acquire the lock. */

@@ -1,3 +1,60 @@
+Sat Oct 14 21:24:16 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (set_console_handler): Don't allocate
+	console_handler_thread_waiter.  It is obsolete.
+	(ctrl_c_handler): Don't use console_handler_thread_waiter.
+	* path.cc (hash_path_name): Fix handling of relative names.  Make case
+	insensitive.
+	* path.h (suffix_info): Use initializers.
+	* pinfo.h (_pinfo): Avoid initializers for null case.
+	* resource.cc (fill_rusage): Zero rest of rusage structure.
+	* security.cc (set_process_privileges): Don't reopen parent process.
+	Just use hMainProc.
+	* signal.cc (signal): Track when a signal handler has been used.
+	(sigaction): Ditto.
+	* sigproc.cc (pchildren): Use default initializer.
+	(zombies): Ditto.
+	(sigproc_terminate): Avoid closing handles that will be closed on exit
+	anyway.
+	(wait_sig): Send signal to "parent" on EXECing, not FORKing.
+	(wait_subproc): Send SIGCHLD here rather than in proc_wait to avoid
+	potential muto conflicts.
+	* sigproc.h (sigthread): Don't initialize to zero.  It's the default.
+	* spawn.cc (spawn_guts): Fill in resources from exec parent prior to
+	termination.
+	* sync.h (muto): Don't initialize to zero.
+	* syscalls.cc (close_all_files): Use one lock around entire loop and
+	call fhandler close/release stuff directly.
+	(_read): Don't use ready_for_read if there are not signal handlers
+	active.
+
+Sat Oct 14 12:24:24 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Fix display of "title".
+	(do_exit): Use pinfo exit method to exit.
+	(__api_fatal): Ditto.
+	* exceptions.cc (signal_exit): Ditto.
+	* fork.cc (fork_child): Remove debugging stuff.  Use pinfo_fixup_after
+	fork in place of exec_fixup_after_fork.
+	* pinfo.cc (pinfo_fixup_after_fork): New method.
+	(pinfo_fixup_in_spawned_child): Ditto.
+	(_pinfo::exit): New method.
+	(_pinfo::init): Remove recursion.  Detect pathological case where pinfo
+	structure already exists for new pid.
+	* pinfo.h (_pinfo): Reorganize slightly.  Add new method and new
+	function declarations.
+	* sigproc.cc (proc_exists): Previous simplification was a little to
+	simple.  Try harder to detect if a process exists.
+	(proc_terminate): Use PID_EXITED setting to determine if process is
+	still around.
+	(WFSO): Remove debugging statement.
+	(WFMO): Ditto.
+	* spawn.cc (exec_fixup_after_fork): Eliminate.
+	(spawn_guts): Always set old_title to NULL.  Is it really needed?  Move
+	hexec_proc to pinfo.cc.  Call pinfo_fixup_in_spawned_child to eliminate
+	handle link after a spawn.
+	* include/sys/cygwin.h: Remove PID_NOT_IN_USE.  Add PID_EXITED.
+
 Sat Oct 14 10:54:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* cygwin.din: Add symbol hstrerror.
