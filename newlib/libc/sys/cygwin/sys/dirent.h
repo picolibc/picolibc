@@ -13,9 +13,12 @@
 
 #include <sys/types.h>
 
+#define __DIRENT_VERSION	1
+
 struct dirent
 {
-  long __d_reserved[3];
+  long d_version; /* Used since Cygwin 1.3.3. */
+  long __d_reserved[2];
   long d_fd; /* File descriptor of open directory. Used since Cygwin 1.3.3. */
   ino_t d_ino; /* Just for compatibility, it's junk */
   char d_name[256];		/* FIXME: use NAME_MAX? */

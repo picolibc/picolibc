@@ -1,5 +1,11 @@
 2001-09-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/sys/cygwin/sys/dirent.h (struct dirent): Add version number
+	field.
+	(__DIRENT_VERSION): New define.
+
+2001-09-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/sys/cygwin/sys/dirent.h (struct dirent): Add `d_fd' member.
 	Shrink __d_reserved accordingly to keep structure size.
 	(dirfd): Declare external.
