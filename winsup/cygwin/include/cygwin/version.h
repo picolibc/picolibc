@@ -162,12 +162,13 @@ details. */
        62: Erroneously bumped.
        63: Export pututline.
        64: Export fseeko, ftello
+       65: Export fseeko, ftello
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 64
+#define CYGWIN_VERSION_API_MINOR 65
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -407,3 +407,16 @@ pause (void)
 {
   return handle_sigsuspend (myself->getsigmask ());
 }
+
+extern "C" int
+siginterrupt (int sig, int flag)
+{
+  struct sigaction act;
+  (void)sigaction(sig, NULL, &act);
+  if (flag)
+    act.sa_flags &= ~SA_RESTART;
+  else
+    act.sa_flags |= SA_RESTART;
+  return sigaction(sig, &act, NULL);
+}
+

@@ -1,3 +1,13 @@
+2002-11-15  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump API_MINOR to accommodate below
+	changes.
+
+002-11-14  Sergey Okhapkin  <sos@prospect.com.ru>
+
+	* cygwin.din (siginterrupt): New export.
+	* signal.cc (siginterrupt): New.
+
 2002-11-15  Sergey Okhapkin  <sos@prospect.com.ru>
 
 	* select.cc (peek_serial): Don't call PurgeComm() to avoid characters

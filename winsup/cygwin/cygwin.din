@@ -740,6 +740,8 @@ sigemptyset
 _sigemptyset = sigemptyset
 sigfillset
 _sigfillset = sigfillset
+siginterrupt
+_siginterrupt = siginterrupt
 signal
 _signal = signal
 significand
