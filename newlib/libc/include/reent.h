@@ -83,6 +83,11 @@ extern _ssize_t _write_r _PARAMS ((struct _reent *, int, const void *, size_t));
 extern int _gettimeofday_r _PARAMS ((struct _reent *, struct timeval *tp, struct timezone *tzp));
 
 #ifdef __LARGE64_FILES
+
+#if defined(__CYGWIN__) && defined(_COMPILING_NEWLIB)
+#define stat64 __stat64
+#endif
+
 struct stat64;
 
 extern _off64_t _lseek64_r _PARAMS ((struct _reent *, int, _off64_t, int));

@@ -1,3 +1,8 @@
+2003-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/reent.h: Define stat64 as __stat64 when
+	compiling newlib for Cygwin.
+
 2003-08-26  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/stat.h[__CYGWIN__]: Only define stat64 as
