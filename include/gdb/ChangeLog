@@ -1,3 +1,7 @@
+2002-07-23  Andrey Volkov  <avolkov@transas.com>
+
+	* sim-h8300.h: New file.
+
 2002-07-17  Andrew Cagney  <cagney@redhat.com>
 
 	* remote-sim.h: Update copyright.
