@@ -1,3 +1,9 @@
+Thu May 18 17:28:19 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Remove external.h dependency.
+	* dcrt0.cc (sigthread::init): Move here from sigproc.h.
+	* sigproc.h (sigthread): Move init to dcrt0.cc.
+
 Thu May 18 01:28:02 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (thread_pipe): Add paranoid check to ensure thread

@@ -40,11 +40,7 @@ struct sigthread
   DWORD frame;
   muto *lock;
   sigthread () : id (0), frame (0), lock (0) {}
-  void init (const char *s)
-  {
-    lock = new_muto (FALSE, s);
-    id = GetCurrentThreadId ();
-  }
+  void init (const char *s);
 };
 
 class sigframe

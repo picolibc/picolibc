@@ -283,7 +283,7 @@ environ.o: $(WINSUP_H)
 errno.o: $(WINSUP_H)
 exceptions.o: $(WINSUP_H) include/exceptions.h sync.h autoload.h
 exec.o: $(WINSUP_H)
-external.o: $(WINSUP_H) external.h
+external.o: $(WINSUP_H)
 fcntl.o: $(WINSUP_H)
 fhandler.o: $(WINSUP_H)
 fhandler_console.o: $(WINSUP_H)

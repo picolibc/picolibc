@@ -558,6 +558,13 @@ ResourceLocks _reslock NO_COPY;
 MTinterface _mtinterf NO_COPY;
 #endif
 
+void
+sigthread::init (const char *s)
+{
+  lock = new_muto (FALSE, s);
+  id = GetCurrentThreadId ();
+}
+
 /* Take over from libc's crt0.o and start the application. Note the
    various special cases when Cygwin DLL is being runtime loaded (as
    opposed to being link-time loaded by Cygwin apps) from a non
