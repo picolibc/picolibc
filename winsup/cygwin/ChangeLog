@@ -1,5 +1,19 @@
 2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver.cc (version): New static variable.
+	(server_request_queue::add_connection): Remove my gratuitous use
+	of studly caps.
+	(setup_privileges): Declare static.
+	(handle_signal): Ditto.
+	(longopts): Make a local variable of main().
+	(opts): Ditto.
+	(print_usage): New function.
+	(print_version): Ditto (tip of the hat to Joshua Daniel Franklin
+	for inspiration here).
+	(main): More argument checking.  Add --help and --version options.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* include/cygwin/cygserver.h (client_request::serve): Make pure
 	virtual.
 	* cygserver.cc (client_request::serve): Remove definition of pure

@@ -4,40 +4,46 @@
 
    Written by Egor Duda <deo@logos-m.ru>
 
-   This file is part of Cygwin.
+This file is part of Cygwin.
 
-   This software is a copyrighted work licensed under the terms of the
-   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-   details. */
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
 
 #include "woutsup.h"
+
+#include <sys/socket.h>
+#include <sys/types.h>
 
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
+#include <getopt.h>
 #include <netdb.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <ostream.h>
+
 #include "cygwin_version.h"
 
-#include "getopt.h"
-
+#include "cygserver_shm.h"
+#include "cygwin/cygserver.h"
+#include "cygwin/cygserver_process.h"
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver_transport_pipes.h"
 #include "cygwin/cygserver_transport_sockets.h"
 #include "threaded_queue.h"
-#include "cygwin/cygserver_process.h"
-#include "cygwin/cygserver.h"
-#include "cygserver_shm.h"
 
 GENERIC_MAPPING access_mapping;
-static class transport_layer_base *transport;
 
 DWORD request_count = 0;
+
+// Version string.
+static const char version[] = "$Revision$";
 
 /*
  * Support function for the XXX_printf() macros in "woutsup.h".
@@ -113,7 +119,7 @@ __cygserver__printf (const char * const function, const char * const fmt, ...)
   return;
 }
 
-BOOL
+static BOOL
 setup_privileges ()
 {
   BOOL rc, ret_val;
@@ -403,7 +409,7 @@ class server_request_queue : public threaded_queue
   public:
     class process_cache *cache;
     void process_requests (transport_layer_base *transport);
-    void addConnection (transport_layer_base *conn);
+    void add_connection (transport_layer_base *conn);
 };
 class server_request_queue request_queue;
 
@@ -422,7 +428,7 @@ request_loop (LPVOID LpParam)
      * _AFTER_ the shutdown request. And sending ourselves a request is ugly
      */
      if (new_conn && queue->active)
-	 queue->addConnection (new_conn);
+	 queue->add_connection (new_conn);
   }
   return 0;
 }
@@ -527,7 +533,7 @@ server_request::process ()
 }
 
 void
-server_request_queue::addConnection (transport_layer_base *conn)
+server_request_queue::add_connection (transport_layer_base *conn)
 {
   /* safe to not "Try" because workers don't hog this, they wait on the event
    */
@@ -544,7 +550,7 @@ server_request_queue::addConnection (transport_layer_base *conn)
   LeaveCriticalSection (&queuelock);
 }
 
-void
+static void
 handle_signal (int signal)
 {
   /* any signal makes us die :} */
@@ -555,68 +561,146 @@ handle_signal (int signal)
   request_queue.active=false;
 }
 
-struct option longopts[] = {
-  {"shutdown", no_argument, NULL, 's'},
-  {0, no_argument, NULL, 0}
-};
+/*
+ * print_usage()
+ */
 
-char opts[] = "s";
+static void
+print_usage (const char * const pgm)
+{
+  cout << "Usage: " << pgm << "[OPTIONS]\n"
+       << ( "  -h, --help       output usage information and exit\n"
+	    "  -s, --shutdown   shutdown the current instance of the daemon\n"
+	    "  -v, --version    output version information and exit\n" )
+       << flush;
+}
+
+/*
+ * print_version()
+ */
+
+static void
+print_version (const char * const pgm)
+{
+  char * vn = NULL;
+
+  const char * colon = strchr (version, ':');
+
+  if (!colon)
+    {
+      vn = strdup ("?");
+    }
+  else
+    {
+      vn = strdup (colon + 2);	// Skip ": "
+
+      char * const spc = strchr (vn, ' ');
+
+      if (spc)
+	*spc = '\0';
+    }
+
+  char buf[200];
+  snprintf (buf, sizeof (buf), "%d.%d.%d(%d.%d/%d/%d)-(%d.%d.%d.%d) %s",
+	    cygwin_version.dll_major / 1000,
+	    cygwin_version.dll_major % 1000,
+	    cygwin_version.dll_minor,
+	    cygwin_version.api_major,
+	    cygwin_version.api_minor,
+	    cygwin_version.shared_data,
+	    CYGWIN_SERVER_VERSION_MAJOR,
+	    CYGWIN_SERVER_VERSION_API,
+	    CYGWIN_SERVER_VERSION_MINOR,
+	    CYGWIN_SERVER_VERSION_PATCH,
+	    cygwin_version.mount_registry,
+	    cygwin_version.dll_build_date);
+
+  cout << pgm << " (cygwin) " << vn << endl
+       << "API version " << buf << endl
+       << "Copyright 2001, 2002 Red Hat, Inc." << endl
+       << "Compiled on " __DATE__ << endl;
+
+  free (vn);
+}
+
+/*
+ * main()
+ */
 
 int
-main (int argc, char **argv)
+main (const int argc, char *argv[])
 {
-  int shutdown=0;
-  char i;
+  const struct option longopts[] = {
+    {"help", no_argument, NULL, 'h'},
+    {"shutdown", no_argument, NULL, 's'},
+    {"version", no_argument, NULL, 'v'},
+    {0, no_argument, NULL, 0}
+  };
 
-  while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
-    switch (i)
-      {
-      case 's':
-	shutdown = 1;
-	break;
-      default:
-	break;
-       /*NOTREACHED*/
-      }
+  const char opts[] = "hsv";
+
+  bool shutdown = false;
+
+  const char * pgm = NULL;
+
+  if (!(pgm = strrchr (*argv, '\\')) && !(pgm = strrchr (*argv, '/')))
+    pgm = *argv;
+  else
+    pgm++;
 
   wincap.init();
   if (wincap.has_security ())
     setup_privileges ();
-  transport = create_server_transport ();
+
+  int opt;
+
+  while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+    switch (opt)
+      {
+      case 'h':
+	print_usage (pgm);
+	return 0;
+
+      case 's':
+	shutdown = true;
+	break;
+
+      case 'v':
+	print_version (pgm);
+	return 0;
+
+      case '?':
+	cerr << "Try `" << pgm << " --help' for more information." << endl;
+	return 1;
+      }
+
+  if (optind != argc)
+    {
+      cerr << pgm << ": too many arguments" << endl;
+      return 1;
+    }
+
+  transport_layer_base * const transport = create_server_transport ();
+
+  assert (transport);
 
   if (shutdown)
     {
       if (!transport->connect())
 	{
 	  system_printf ("couldn't establish connection with server");
-	  exit (1);
+	  return 1;
 	}
-      client_request_shutdown *request =
-	new client_request_shutdown ();
-      request->send (transport);
+
+      client_request_shutdown request;
+      request.send (transport);
       transport->close();
-      delete transport;
-      delete request;
-      exit(0);
+      return 0;
     }
 
-  char version[200];
-  /* Cygwin dll release */
-  snprintf (version, 200, "%d.%d.%d(%d.%d/%d/%d)-(%d.%d.%d.%d) %s",
-		 cygwin_version.dll_major / 1000,
-		 cygwin_version.dll_major % 1000,
-		 cygwin_version.dll_minor,
-		 cygwin_version.api_major,
-		 cygwin_version.api_minor,
-		 cygwin_version.shared_data,
-		 CYGWIN_SERVER_VERSION_MAJOR,
-		 CYGWIN_SERVER_VERSION_API,
-		 CYGWIN_SERVER_VERSION_MINOR,
-		 CYGWIN_SERVER_VERSION_PATCH,
-		 cygwin_version.mount_registry,
-		 cygwin_version.dll_build_date);
   setbuf (stdout, NULL);
-  printf ("daemon version %s starting up", version);
+  printf ("daemon starting up");
+  print_version (pgm);
   if (signal (SIGQUIT, handle_signal) == SIG_ERR)
     {
       system_printf ("could not install signal handler (%d)- aborting startup",
@@ -647,7 +731,7 @@ main (int argc, char **argv)
    */
   /* WaitForMultipleObjects abort && request_queue && process_queue && signal
      -- if signal event then retrigger it
-   */
+  */
   while (1 && request_queue.active)
     {
       sleep (1);
