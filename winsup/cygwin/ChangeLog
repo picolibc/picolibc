@@ -1,3 +1,8 @@
+Thu Oct 12 23:11:05 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dtable.cc (dtable::fixup_after_fork): Revert thinko below.
+	* pinfo.cc (set_myself): Show pid in initial strace line.
+
 Thu Oct 12 17:58:03 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* child_info: Bump child_info "version".

@@ -54,7 +54,7 @@ set_myself (pid_t pid, HANDLE h)
     {
       extern char osname[];
       strace.prntf (1, NULL, "**********************************************");
-      strace.prntf (1, NULL, "Program name: %s", myself->progname);
+      strace.prntf (1, NULL, "Program name: %s (%d)", myself->progname, myself->pid);
       strace.prntf (1, NULL, "App version:  %d.%d, api: %d.%d",
 		       user_data->dll_major, user_data->dll_minor,
 		       user_data->api_major, user_data->api_minor);
