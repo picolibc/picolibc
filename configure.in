@@ -739,7 +739,7 @@ case "${target}" in
     ;;
   i[3456]86-*-mingw32*)
     target_configdirs="$target_configdirs target-mingw"
-    noconfigdirs="$noconfigdirs expect target-libgloss target-libffi"
+    noconfigdirs="$noconfigdirs expect target-libgloss ${libgcj}"
 
     # Can't build gdb for mingw32 if not native.
     case "${host}" in
@@ -750,7 +750,7 @@ case "${target}" in
     ;;    
   *-*-cygwin*)
     target_configdirs="$target_configdirs target-libtermcap target-winsup"
-    noconfigdirs="$noconfigdirs target-gperf target-libgloss target-libffi"
+    noconfigdirs="$noconfigdirs target-gperf target-libgloss ${libgcj}"
     # always build newlib.
     skipdirs=`echo " ${skipdirs} " | sed -e 's/ target-newlib / /'`
 
@@ -785,7 +785,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs emacs emacs19 target-libgloss target-libffi"
     ;;
   i[3456]86-*-beos*)
-     noconfigdirs="$noconfigdirs gdb target-newlib target-libgloss"
+     noconfigdirs="$noconfigdirs gdb target-newlib target-libgloss ${libgcj}"
      ;;
  m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
     noconfigdirs="$noconfigdirs target-libiberty target-librx target-libg++ target-libstdc++ target-libio target-libf2c target-libchill target-zlib target-libobjc"
