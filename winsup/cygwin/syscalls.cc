@@ -1430,6 +1430,24 @@ ttyname (int fd)
   return (char *)(dtable[fd]->ttyname ());
 }
 
+/* internal newlib function */
+extern "C" int _fwalk (struct _reent *ptr, int (*function)(FILE *));
+
+static int setmode_mode;
+static int setmode_file;
+
+static int
+setmode_helper (FILE *f)
+{
+  if (fileno(f) != setmode_file)
+    return 0;
+  if (setmode_mode & O_TEXT)
+    f->_flags |= __SCLE;
+  else
+    f->_flags &= ~__SCLE;
+  return 0;
+}
+
 /* Set a file descriptor into text or binary mode, returning the
    previous mode.  */
 
@@ -1471,6 +1489,10 @@ setmode (int fd, int mode)
       p->set_w_binary (0);
       p->set_r_binary (0);
     }
+
+  setmode_mode = mode;
+  setmode_file = fd;
+  _fwalk(_REENT, setmode_helper);
 
   return res;
 }

@@ -1,3 +1,7 @@
+2000-05-19  DJ Delorie  <dj@cygnus.com>
+
+	* syscalls.cc (setmode): change mode of any matching FILE* also.
+
 Thu May 18 17:28:19 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Remove external.h dependency.
