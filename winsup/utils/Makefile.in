@@ -74,7 +74,7 @@ MINGW_CXX:=${patsubst %/cygwin/include,%/mingw/include,${filter-out -I$(newlib_s
 
 PROGS:=	cygcheck.exe cygpath.exe getfacl.exe kill.exe mkgroup.exe \
 	mkpasswd.exe mount.exe passwd.exe ps.exe regtool.exe setfacl.exe \
-	ssp.exe strace.exe umount.exe
+	ssp.exe strace.exe umount.exe ipcrm.exe ipcs.exe
 
 CLEAN_PROGS:=$(PROGS)
 ifndef build_dumper
