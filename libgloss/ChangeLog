@@ -1,3 +1,11 @@
+2001-07-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * hp74x/configure: Regenerated with current autoconf.
+        * m32r/configure: Ditto.
+        * m68k/configure: Ditto.
+        * pa/configure: Ditto.
+        * sparc/configure: Ditto.
+
 2001-03-08  Geoffrey Keating  <geoffk@redhat.com>
 
 	* rs6000/simulator.S (dup): New syscall.
