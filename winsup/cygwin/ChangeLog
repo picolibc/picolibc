@@ -29,6 +29,83 @@ Tue Sep 25 16:22:00 2001 Robert Collins <rbtcollins@hotmail.com>
 	* include/sys/ipc.h: New file.
 	* include/sys/shm.h: New file.
 
+Wed Sep 26 16:02:35 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (peek_pipe): REALLY only grab mutex when we actually got
+	something from the pipe.
+
+Tue Sep 25 21:25:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (pthread_cond::BroadCast): Use address with verifyable_object_isvalid().
+	(pthread_cond::Signal): Ditto.
+	(__pthread_create): Ditto.
+	(__pthread_cleanup): Ditto.
+	(__pthread_attr_init): Ditto.
+	(__pthread_attr_getinheritsched): Ditto.
+	(__pthread_attr_getschedparam): Ditto.
+	(__pthread_attr_getschedpolicy): Ditto.
+	(__pthread_attr_getscope): Ditto.
+	(__pthread_attr_setdetachstate): Ditto.
+	(__pthread_attr_getdetachstate): Ditto.
+	(__pthread_attr_setinheritsched): Ditto.
+	(__pthread_attr_setschedparam): Ditto.
+	(__pthread_attr_setschedpolicy): Ditto.
+	(__pthread_attr_setscope): Ditto.
+	(__pthread_attr_setstacksize): Ditto.
+	(__pthread_attr_getstacksize): Ditto.
+	(__pthread_attr_destroy): Ditto.
+	(__pthread_join): Ditto.
+	(__pthread_detach): Ditto.
+	(__pthread_suspend): Ditto.
+	(__pthread_continue): Ditto.
+	(__pthread_getschedparam): Ditto.
+	(__pthread_getsequence_np): Ditto.
+	(__pthread_key_create): Ditto.
+	(__pthread_key_delete): Ditto.
+	(__pthread_setschedparam): Ditto.
+	(__pthread_setspecific): Ditto.
+	(__pthread_getspecific): Ditto.
+	(__pthread_cond_destroy): Ditto.
+	(__pthread_cond_init): Ditto.
+	(__pthread_cond_broadcast): Ditto.
+	(__pthread_cond_signal): Ditto.
+	(__pthread_cond_timedwait): Ditto.
+	(__pthread_cond_wait): Ditto.
+	(__pthread_condattr_init): Ditto.
+	(__pthread_condattr_getpshared): Ditto.
+	(__pthread_condattr_setpshared): Ditto.
+	(__pthread_condattr_destroy): Ditto.
+	(__pthread_kill): Ditto.
+	(__pthread_mutex_init): Ditto.
+	(__pthread_mutex_getprioceiling): Ditto.
+	(__pthread_mutex_lock): Ditto.
+	(__pthread_mutex_trylock): Ditto.
+	(__pthread_mutex_unlock): Ditto.
+	(__pthread_mutex_destroy): Ditto.
+	(__pthread_mutex_setprioceiling): Ditto.
+	(__pthread_mutexattr_getprotocol): Ditto.
+	(__pthread_mutexattr_getpshared): Ditto.
+	(__pthread_mutexattr_gettype): Ditto.
+	(__pthread_mutexattr_init): Ditto.
+	(__pthread_mutexattr_destroy): Ditto.
+	(__pthread_mutexattr_setprotocol): Ditto.
+	(__pthread_mutexattr_setprioceiling): Ditto.
+	(__pthread_mutexattr_getprioceiling): Ditto.
+	(__pthread_mutexattr_setpshared): Ditto.
+	(__pthread_mutexattr_settype): Ditto.
+	(__sem_init): Ditto.
+	(__sem_destroy): Ditto.
+	(__sem_wait): Ditto.
+	(__sem_trywait): Ditto.
+	(__sem_post): Ditto.
+	(verifyable_object_isvalid): Recieve a pointer to a pointer for verification.
+	(__pthread_mutexattr_getprotocol): Fix typo in magic number.
+	(__pthread_mutexattr_getpshared): Ditto.
+	(__pthread_mutexattr_gettype): Ditto.
+	* thread.h (verifyable_object_isvalid): Change prototype to recieve a pointer to a 
+	pointer for verification.
+	* include/pthread.h: Fix typo for __cleanup_routine_type typedef. (Contrib from Net).
+
 Tue Sep 25 02:09:42 2001  Christopher Faylor <cgf@redhat.com>
 
 	* select.cc (fhandler_tty_common::ready_for_read): Rewrite to correctly

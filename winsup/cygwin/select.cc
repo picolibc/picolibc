@@ -454,7 +454,8 @@ peek_pipe (select_record *s, int ignra, HANDLE guard_mutex = NULL)
       select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
       n = -1;
     }
-  else if (guard_mutex && WaitForSingleObject (guard_mutex, 0) != WAIT_OBJECT_0)
+  else if (n && guard_mutex
+	   && WaitForSingleObject (guard_mutex, 0) != WAIT_OBJECT_0)
     {
       select_printf ("%s, couldn't get mutex %p, %E", fh->get_name (),
 	  	     guard_mutex);

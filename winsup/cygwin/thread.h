@@ -164,7 +164,7 @@ public:
    ~verifyable_object ();
 };
 
-int verifyable_object_isvalid (verifyable_object *, long);
+int verifyable_object_isvalid (void const *, long);
 
 class pthread_key:public verifyable_object
 {
