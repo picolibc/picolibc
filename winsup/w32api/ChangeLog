@@ -1,3 +1,7 @@
+2002-10-04  "KJK::Hyperion"  <noog@libero.it>
+
+	* include/shlobj.h (CSIDL_*): Add defines.
+
 2002-09-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ws2tcpip.h: Throw error if winsock.h, not winsock2.h
