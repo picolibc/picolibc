@@ -56,6 +56,7 @@ typedef	long	clock_t;
 #define _CLOCK_T_DEFINED
 #endif
 
+#ifndef _TM_DEFINED
 /*
  * A structure for storing all kinds of useful information about the
  * current (or another) time.
@@ -73,6 +74,8 @@ struct tm
 	int	tm_isdst;	/* +1 Daylight Savings Time, 0 No DST,
 				 * -1 don't know */
 };
+#define _TM_DEFINED
+#endif
 
 #ifdef	__cplusplus
 extern "C" {
@@ -187,9 +190,9 @@ __MINGW_IMPORT char 	*tzname[2];
 #endif	/* Not _NO_OLDNAMES */
 #endif	/* Not __STRICT_ANSI__ */
 
-#ifndef __STRICT_ANSI__
 #ifndef _WTIME_DEFINED
 /* wide function prototypes, also declared in wchar.h */
+#ifndef __STRICT_ANSI__
 #ifdef __MSVCRT__
 _CRTIMP wchar_t* __cdecl	_wasctime(const struct tm*);
 _CRTIMP wchar_t* __cdecl	_wctime(const time_t*);
@@ -199,10 +202,10 @@ _CRTIMP wchar_t* __cdecl	_wstrtime(wchar_t*);
 _CRTIMP wchar_t* __cdecl	_wctime64 (const __time64_t*);
 #endif
 #endif /*  __MSVCRT__ */
+#endif /* __STRICT_ANSI__ */
 _CRTIMP size_t __cdecl		wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
 #define _WTIME_DEFINED
 #endif /* _WTIME_DEFINED */ 
-#endif /* __STRICT_ANSI__ */
 
 #ifdef	__cplusplus
 }

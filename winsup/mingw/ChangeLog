@@ -1,3 +1,9 @@
+2004-07-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/time.h (wcsftime): Move out of !__STRICT_ANSI
+ 	block.
+	(struct tm): Protect with _TM_DEFINED.
+
 2004-07-17  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in (CC): Strip inappropriate include file settings from any
