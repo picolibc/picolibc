@@ -1,3 +1,7 @@
+2002-11-21  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* external.cc (cygwin_internal): Fix va_arg references.
+
 2002-11-21  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (sigthread::get_winapi_lock): Just do standard 'give up

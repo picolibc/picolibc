@@ -182,7 +182,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	return (DWORD) fillout_pinfo (va_arg (arg, pid_t), 1);
 
       case CW_INIT_EXCEPTIONS:
-	init_exceptions ((exception_list *) arg);
+	init_exceptions (va_arg (arg, exception_list *));
 	return 0;
 
       case CW_GET_CYGDRIVE_INFO:
@@ -196,16 +196,15 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 
       case CW_SET_CYGWIN_REGISTRY_NAME:
 	{
-#	  define cr ((char *) arg)
+	  const char *cr = va_arg (arg, char *);
 	  if (check_null_empty_str_errno (cr))
 	    return (DWORD) NULL;
 	  cygheap->cygwin_regname = (char *) crealloc (cygheap->cygwin_regname,
 						       strlen (cr) + 1);
 	  strcpy (cygheap->cygwin_regname, cr);
+	}
       case CW_GET_CYGWIN_REGISTRY_NAME:
 	  return (DWORD) cygheap->cygwin_regname;
-#	  undef cr
-	}
 
       case CW_STRACE_TOGGLE:
 	{
