@@ -18,7 +18,7 @@
 # This makefile requires GNU make.
 
 PACKAGE = mingw-runtime
-VERSION = 1.1
+VERSION = 1.2
 CYGRELEASE = 1
 
 VPATH = @srcdir@
@@ -47,9 +47,9 @@ datadir = @datadir@
 infodir = @infodir@
 includedir = @includedir@
 ifneq (,$(findstring cygwin,$(target_alias)))
-inst_bindir:=$(tooldir)/usr/bin
-inst_includedir:=$(tooldir)/usr/include/mingw
-inst_libdir:=$(tooldir)/usr/lib/mingw
+inst_bindir:=$(tooldir)/bin
+inst_includedir:=$(tooldir)/include/mingw
+inst_libdir:=$(tooldir)/lib/mingw
 else
 inst_bindir:=$(bindir)
 inst_includedir:=$(includedir)
