@@ -228,12 +228,20 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 }
 
 fhandler_base *
-dtable::build_fhandler (int fd, const char *name, HANDLE handle)
+dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv *pc)
 {
   int unit;
   DWORD devn;
 
-  if ((devn = get_device_number (name, unit)) == FH_BAD)
+  if (!pc)
+    devn = get_device_number (name, unit);
+  else
+    {
+      pc->check (name);
+      devn = pc->get_devn ();
+    }
+
+  if (devn == FH_BAD)
     {
       struct sockaddr sa;
       int sal = sizeof (sa);

@@ -289,6 +289,12 @@ fhandler_base::get_default_fmode (int flags)
   return __fmode;
 }
 
+int
+fhandler_base::open (path_conv& real_path, int flags, mode_t mode)
+{
+  return open ((char *) real_path, flags, mode);
+}
+
 /* Open system call handler function.
    Path is now already checked for symlinks */
 int

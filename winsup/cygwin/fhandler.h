@@ -320,6 +320,7 @@ public:
   {
     return open (flags, mode);
   }
+  virtual int open (path_conv& real_path, int flags, mode_t mode);
   virtual int open (int flags, mode_t mode = 0);
   virtual int close ();
   virtual int fstat (struct stat *buf) { return stat_dev (get_device (), get_unit (), get_namehash (), buf); }

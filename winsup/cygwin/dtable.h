@@ -49,7 +49,8 @@ public:
   void fixup_after_fork (HANDLE);
   fhandler_base *build_fhandler (int fd, DWORD dev, const char *name,
 				 int unit = -1);
-  fhandler_base *build_fhandler (int fd, const char *name, HANDLE h);
+  fhandler_base *build_fhandler (int fd, const char *name, HANDLE h = NULL,
+      				 path_conv *pc = NULL);
   inline int not_open (int fd)
   {
     SetResourceLock (LOCK_FD_LIST, READ_LOCK, "not_open");

@@ -484,15 +484,19 @@ _open (const char *unix_path, int flags, ...)
 
       if (fd < 0)
 	set_errno (ENMFILE);
-      else if ((fh = cygheap->fdtab.build_fhandler (fd, unix_path, NULL)) == NULL)
-	res = -1;		// errno already set
-      else if (!fh->open (unix_path, flags, (mode & 07777) & ~cygheap->umask))
+      else
 	{
-	  cygheap->fdtab.release (fd);
-	  res = -1;
+	  path_conv pc;
+	  if ((fh = cygheap->fdtab.build_fhandler (fd, unix_path, NULL, &pc)) == NULL)
+	    res = -1;		// errno already set
+	  else if (!fh->open (pc, flags, (mode & 07777) & ~cygheap->umask))
+	    {
+	      cygheap->fdtab.release (fd);
+	      res = -1;
+	    }
+	  else if ((res = fd) <= 2)
+	    set_std_handle (res);
 	}
-      else if ((res = fd) <= 2)
-	set_std_handle (res);
       ReleaseResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," open");
     }
 

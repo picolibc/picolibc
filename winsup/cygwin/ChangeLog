@@ -1,3 +1,16 @@
+Sat Sep 22 17:33:45 2001  Christopher Faylor <cgf@cygnus.com>
+			  Corinna Vinschen <corinna@vinschen.de>
+
+	* dtable.cc (dtable::build_fhandler): Accept an optional path_conv
+	argument.  If available, use this to calculate path name and device
+	number.
+	* dtable.h (dtable): Reflect above change.
+	* fhandler.h (fhandler_base): Declare virtual method which accepts
+	path_conv rather than path string as first argument.
+	* fhandler.cc (fhandler_base::open): Define above new method.
+	* syscalls.cc (_open): Set aside a path_conv variable for use in
+	build_fhandler and subsequent call to open.
+
 Sat Sep 22 12:44:57 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (setup_handler): Always relinquish lock after we've
