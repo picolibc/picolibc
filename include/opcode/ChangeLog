@@ -1,3 +1,7 @@
+2003-05-13  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* m68hc11.h (M68HC12_BANK_VIRT): Define to 0x010000
+
 2003-04-07  Michael Snyder  <msnyder@redhat.com>
 
 	* h8300.h (ldc/stc): Fix up src/dst swaps.
