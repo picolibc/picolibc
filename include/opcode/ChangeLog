@@ -1,5 +1,8 @@
 Sat Aug 28 00:25:25 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
+	* hppa.h (pa_opcodes):  Add pa2.0 instructions hadd, hshl,
+	hshr, hsub, mixh, mixw, permh.
+
 	* hppa.h (pa_opcodes): Change completers in instructions to
 	use 'c' prefix.
 

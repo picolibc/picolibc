@@ -70,9 +70,9 @@ struct pa_opcode
 
    In the args field, the following characters are unused:
 
-	'  "# %&   *+-  /          :;< > @'
+	'  "# %&    +-  /          :;< > @'
 	'  C        LM       U   YZ[\]  '
-	'a  d       l              {|} '
+	'   d       l              {|} '
 
    Here are all the characters:
 
@@ -84,6 +84,7 @@ Kinds of operands:
    x    integer register field at 15.
    b    integer register field at 10.
    t    integer register field at 31.
+   a	integer register field at 10 and 15 (for PERMH)
    y    floating point register field at 31
    5    5 bit immediate at 15.
    s    2 bit space specifier at 17.
@@ -104,6 +105,10 @@ Completer operands all have 'c' as the prefix:
    cm   short load and store completer.
    cs   store bytes short completer.
    cZ   System Control Completer (to support LPA, LHA, etc.)
+   ch	left/right half completer
+   cH	signed/unsigned saturation completer
+   cS	signed/unsigned completer at 21
+   c*	permutation completer
 
 Condition operands all have '?' as the prefix:
 
@@ -143,6 +148,7 @@ Condition operands all have '?' as the prefix:
 Also these:
 
    .    2 bit shift amount at 25
+   *    4 bit shift amount at 25
    p    5 bit shift count at 26 (to support the SHD instruction) encoded as
         31-p
    ~    6 bit shift count at 20,22:26 encoded as 63-~.
@@ -305,8 +311,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "addibt",	0xa4000000, 0xfc000000, "?dn5,b,w", pa10},
 { "addibf",	0xac000000, 0xfc000000, "?dn5,b,w", pa10},
 { "bb",		0xc0006000, 0xffe06000, "?Bnx,!,w", pa20, FLAG_STRICT}, 
-{ "bb",		0xc0004000, 0xffe06000, "?bnx,!,w", pa10, FLAG_STRICT}, 
 { "bb",		0xc4006000, 0xfc006000, "?Bnx,Q,w", pa20, FLAG_STRICT}, 
+{ "bb",		0xc0004000, 0xffe06000, "?bnx,!,w", pa10, FLAG_STRICT}, 
 { "bb",		0xc4004000, 0xfc004000, "?bnx,Q,w", pa10}, 
 { "bvb",	0xc0004000, 0xffe04000, "?bnx,w", pa10},
 { "clrbts",	0xe8004005, 0xffffffff, "", pa20, FLAG_STRICT},
@@ -368,9 +374,16 @@ static const struct pa_opcode pa_opcodes[] =
 
 /* Subword Operation Instructions */
 
+{ "hadd",       0x08000300, 0xfc00ff20, "cHx,b,t", pa20, FLAG_STRICT},
 { "havg",       0x080002c0, 0xfc00ffe0, "x,b,t", pa20, FLAG_STRICT},
+{ "hshl",       0xf8008800, 0xffe0fc20, "x,*,t", pa20, FLAG_STRICT},
 { "hshladd",    0x08000700, 0xfc00ff20, "x,.,b,t", pa20, FLAG_STRICT},
+{ "hshr",       0xf800c800, 0xfc10f820, "cSb,*,t", pa20, FLAG_STRICT},
 { "hshradd",    0x08000500, 0xfc00ff20, "x,.,b,t", pa20, FLAG_STRICT},
+{ "hsub",       0x08000100, 0xfc00ff20, "cHx,b,t", pa20, FLAG_STRICT},
+{ "mixh",       0xf8008400, 0xfc009fe0, "chx,b,t", pa20, FLAG_STRICT},
+{ "mixw",       0xf8008000, 0xfc009fe0, "chx,b,t", pa20, FLAG_STRICT},
+{ "permh",      0xf8000000, 0xfc009020, "c*a,t", pa20, FLAG_STRICT},
 
 
 /* Extract and Deposit Instructions */
