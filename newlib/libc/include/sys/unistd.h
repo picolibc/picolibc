@@ -126,7 +126,9 @@ int     _EXFUN(vhangup, (void ));
 _READ_WRITE_RETURN_TYPE _EXFUN(write, (int __fd, const void *__buf, size_t __nbyte ));
 
 #ifdef __CYGWIN__
+# define __UNISTD_GETOPT__
 # include <getopt.h>
+# undef __UNISTD_GETOPT__
 #else
 extern char *optarg;			/* getopt(3) external variables */
 extern int optind, opterr, optopt;

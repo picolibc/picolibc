@@ -1,3 +1,9 @@
+2003-03-07  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/sys/unistd.h: Guard getopt.h call to force only
+	declaration of getopt and avoid getopt_long declaration.
+	* libc/sys/cygwin/include/unistd.h: Remove.
+
 2003-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.host: Define stdio64_dir for Cygwin.
