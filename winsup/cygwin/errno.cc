@@ -12,9 +12,7 @@ details. */
 #define sys_nerr FOOsys_nerr
 #define _sys_errlist FOO_sys_errlist
 #include "winsup.h"
-#define _REENT_ONLY
 #include <stdio.h>
-#include <errno.h>
 #include "cygerrno.h"
 #include "thread.h"
 #undef _sys_nerr

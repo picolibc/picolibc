@@ -15,7 +15,6 @@ details. */
 #include <sys/types.h>
 #include <cygwin/sem.h>
 
-#include <errno.h>
 
 #include "cygerrno.h"
 

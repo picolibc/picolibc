@@ -8,7 +8,6 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
-#include <errno.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "dll_init.h"

@@ -14,7 +14,6 @@ details. */
 #include <unistd.h>
 #include <process.h>
 #include <sys/wait.h>
-#include <errno.h>
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>

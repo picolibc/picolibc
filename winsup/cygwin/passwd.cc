@@ -12,7 +12,6 @@ details. */
 #include <stdlib.h>
 #include <pwd.h>
 #include <stdio.h>
-#include <errno.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"

@@ -14,7 +14,6 @@ details. */
 #include <stdlib.h>
 #include <time.h>
 #include <sys/wait.h>
-#include <errno.h>
 #include <stdlib.h>
 #include <sys/cygwin.h>
 #include <assert.h>

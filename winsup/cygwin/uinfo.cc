@@ -17,7 +17,6 @@ details. */
 #include <limits.h>
 #include <stdlib.h>
 #include <lm.h>
-#include <errno.h>
 #include <sys/cygwin.h>
 #include "pinfo.h"
 #include "security.h"

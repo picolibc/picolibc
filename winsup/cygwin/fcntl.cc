@@ -10,7 +10,6 @@ details. */
 
 #include "winsup.h"
 #include <stdarg.h>
-#include <errno.h>
 #include <unistd.h>
 #include "security.h"
 #include "fhandler.h"

@@ -13,7 +13,6 @@ details. */
 
 #include "winsup.h"
 #include <sys/ioctl.h>
-#include <errno.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"

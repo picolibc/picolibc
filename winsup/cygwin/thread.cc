@@ -45,16 +45,21 @@ details. */
 
 extern int threadsafe;
 
-struct _reent *
-_reent_clib ()
+extern "C" struct _reent *
+__getreent ()
 {
   struct __reent_t *_r =
     (struct __reent_t *) MT_INTERFACE->reent_key.get ();
 
-#ifdef _CYG_THREAD_FAILSAFE
   if (_r == 0)
-    system_printf ("local thread storage not inited");
+    {
+#ifdef _CYG_THREAD_FAILSAFE
+      system_printf ("local thread storage not inited");
 #endif
+      /* Return _impure_ptr as long as MTinterface is not initialized */
+      return _impure_ptr;
+    }
+
   return _r->_clib;
 }
 
@@ -64,10 +69,14 @@ _reent_winsup ()
   struct __reent_t *_r =
     (struct __reent_t *) MT_INTERFACE->reent_key.get ();
 
-#ifdef _CYG_THREAD_FAILSAFE
   if (_r == 0)
-    system_printf ("local thread storage not inited");
+    {
+#ifdef _CYG_THREAD_FAILSAFE
+      system_printf ("local thread storage not inited");
 #endif
+      return NULL;
+    }
+
   return _r->_winsup;
 }
 
@@ -211,6 +220,20 @@ void
 MTinterface::fixup_after_fork (void)
 {
   pthread_key::fixup_after_fork ();
+
+#ifndef __SIGNALS_ARE_MULTITHREADED__
+  /* As long as the signal handling not multithreaded
+     switch reents storage back to _impure_ptr for the mainthread
+     to support fork from threads other than the mainthread */
+  struct _reent *reent_old = __getreent ();
+
+  if (reent_old && _impure_ptr != reent_old)
+    *_impure_ptr = *reent_old;
+  reents._clib = _impure_ptr;
+  reents._winsup = &winsup_reent;
+  winsup_reent._process_logmask = LOG_UPTO (LOG_DEBUG);
+  reent_key.set (&reents);
+#endif
 
   threadcount = 1;
   pthread::init_mainthread ();

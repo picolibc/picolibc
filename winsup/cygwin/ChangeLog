@@ -1,3 +1,27 @@
+2003-06-15  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, remove "include <errno.h>" from files which already include
+	cygerrno.h.
+
+2003-06-15  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* include/cygwin/config.h (__DYNAMIC_REENT__): Define.
+	* include/cygwin/version.h: Bump API minor version.
+	* cygwin.din: Export __getreent
+	* cygerrno.h: Include errno.h.  Fix places where _impure_ptr is used
+	directly to store the errno value.
+	* debug.cc (__set_errno): Ditto.
+	* errno.cc: Remove _RRENT_ONLY define to get errno.cc compiled.
+	* signal.cc: Rename _reent_clib to _REENT throughout.
+	* thread.h (reent_clib): Remove prototype.
+	* thread.cc (reent_clib): Rename reent_clib to __getreent.  Return
+	_impure_ptr until MTinterface is initialized.
+	(reent_winsup): Fix a possible SEGV when _r == NULL.  Return NULL
+	instead.
+	* MTinterface::fixup_after_fork: Switch reent back to _impure_ptr to
+	keep signal handling running when fork is called from a thread other
+	than the mainthread.
+
 2003-06-12  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc (pthread_attr_init): Revert change from 2003-06-11

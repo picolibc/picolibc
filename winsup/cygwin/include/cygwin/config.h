@@ -19,6 +19,7 @@ extern "C" {
 #endif
 #define _CYGWIN_CONFIG_H
 
+#define __DYNAMIC_REENT__
 #define __FILENAME_MAX__ (260 - 1 /* NUL */)
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #define __LARGE64_FILES 1

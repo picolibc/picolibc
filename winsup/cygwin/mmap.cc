@@ -13,7 +13,6 @@ details. */
 #include <stdlib.h>
 #include <stddef.h>
 #include <sys/mman.h>
-#include <errno.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"

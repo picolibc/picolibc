@@ -26,6 +26,7 @@ __eprintf
 __errno
 __fpclassifyd
 __fpclassifyf
+__getreent
 __infinity
 __main
 __signbitd

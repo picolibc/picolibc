@@ -53,7 +53,6 @@ details. */
 #include <sys/mount.h>
 #include <mntent.h>
 #include <unistd.h>
-#include <errno.h>
 #include <ctype.h>
 #include <winioctl.h>
 #include <wingdi.h>

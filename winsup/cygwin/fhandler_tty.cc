@@ -14,7 +14,6 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <ctype.h>
 #include <limits.h>
 #include "cygerrno.h"

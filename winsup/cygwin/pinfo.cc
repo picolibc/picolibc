@@ -11,7 +11,6 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <time.h>
-#include <errno.h>
 #include <limits.h>
 #include "security.h"
 #include "fhandler.h"

@@ -20,7 +20,6 @@ details. */
 #include <sys/types.h>
 
 #include <assert.h>
-#include <errno.h>
 #include <netdb.h>
 #include <pthread.h>
 #include <unistd.h>

@@ -14,7 +14,6 @@ details. */
 #include <stdlib.h>
 #include <grp.h>
 #include <pwd.h>
-#include <errno.h>
 #include "pinfo.h"
 #include "security.h"
 #include "fhandler.h"

@@ -110,7 +110,6 @@ struct __reent_t
   struct _winsup_t *_winsup;
 };
 
-_reent *_reent_clib ();
 _winsup_t *_reent_winsup ();
 void SetResourceLock (int, int, const char *) __attribute__ ((regparm (3)));
 void ReleaseResourceLock (int, int, const char *)

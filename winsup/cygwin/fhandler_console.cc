@@ -12,7 +12,6 @@ details. */
 #include <sys/termios.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <unistd.h>
 #include <wingdi.h>
 #include <winuser.h>

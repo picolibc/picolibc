@@ -15,7 +15,6 @@ details. */
 #include <utime.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"

@@ -10,7 +10,6 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
-#include <errno.h>
 #include <time.h>
 #include <limits.h>
 #include <ntdef.h>

@@ -15,7 +15,6 @@
 #include <sys/time.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
-#include <errno.h>
 #include <stdlib.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>

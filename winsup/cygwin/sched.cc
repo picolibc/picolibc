@@ -16,7 +16,6 @@
 
 #include "winsup.h"
 #include <limits.h>
-#include <errno.h>
 #include "cygerrno.h"
 #include <assert.h>
 #include <stdlib.h>

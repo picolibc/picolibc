@@ -13,7 +13,6 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <errno.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"

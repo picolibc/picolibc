@@ -15,7 +15,6 @@ details. */
 #include "security.h"
 #include "cygerrno.h"
 #ifdef DEBUGGING
-#include <errno.h>
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
@@ -222,6 +221,6 @@ int __stdcall
 __set_errno (const char *func, int ln, int val)
 {
   debug_printf ("%s:%d val %d", func, ln, val);
-  return _impure_ptr->_errno = val;
+  return errno = val;
 }
 #endif /*DEBUGGING*/

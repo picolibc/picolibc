@@ -12,7 +12,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <errno.h>
 #include <stdlib.h>
 #include "cygerrno.h"
 #include <sys/cygwin.h>
@@ -297,8 +296,8 @@ abort (void)
      be flushed.
      However this is the way FreeBSD does it, and it is much easier to
      do things this way, so... */
-  if (_reent_clib ()->__cleanup)
-    _reent_clib ()->__cleanup (_reent_clib ());
+  if (_REENT->__cleanup)
+    _REENT->__cleanup (_REENT);
 
   /* Ensure that SIGABRT can be caught regardless of blockage. */
   sigset_t sig_mask;

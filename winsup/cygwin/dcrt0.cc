@@ -17,7 +17,6 @@ details. */
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
-#include <errno.h>
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
