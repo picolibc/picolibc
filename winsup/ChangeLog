@@ -1,3 +1,9 @@
+Sun Oct  1 22:02:38 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.common: Extend VERBOSE default.
+	* Makefile.in: Don't clean the testsuite separately.  It's already part
+	of CLEAN_SUBDIRS.
+
 2000-09-30  Christopher Faylor  <cgf@cygnus.com>
 
 	* Makefile.common: Default to VERBOSE when part of overall source

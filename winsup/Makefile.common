@@ -11,8 +11,8 @@
 # This makefile requires GNU make.
 
 CFLAGS_COMMON:=-Wall -Wwrite-strings # -finline-functions
-MALLOC_DEBUG:=#-DMALLOC_DEBUG -I/cygnus/src/sourceware/winsup/cygwin/dlmalloc
-MALLOC_OBJ:=#/cygnus/src/sourceware/winsup/cygwin/dlmalloc/malloc.o
+MALLOC_DEBUG:=#-DMALLOC_DEBUG -I/cygnus/src/uberbaum/winsup/cygwin/dlmalloc
+MALLOC_OBJ:=#/cygnus/src/uberbaum/winsup/cygwin/dlmalloc/malloc.o
 
 override srcdir:=${shell cd $(srcdir); pwd}
 ifneq (,${filter-out /%,$(srcdir)})
@@ -103,6 +103,10 @@ ifneq ($(MAKEOVERRIDES_WORKAROUND),)
 endif
 
 ifdef RPATH_ENVVAR
+VERBOSE=1
+endif
+
+ifneq "${findstring -B,$(COMPILE_CXX) $(COMPILE_CC)}" ""
 VERBOSE=1
 endif
 

@@ -73,7 +73,6 @@ $(INSTALL_SUBDIRS):
 
 $(CLEAN_SUBDIRS):
 	@$(MAKE) -C ${patsubst clean_%,%,$@} clean
-	@$(MAKE) -C testsuite clean
 
 .PRECIOUS: Makefile
 
