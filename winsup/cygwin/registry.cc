@@ -171,6 +171,17 @@ reg_key::kill (const char *name)
   return RegDeleteKeyA (key, name);
 }
 
+/* Delete the value specified by name of current key.  Returns the error code
+   from the RegDeleteValueA invocation. */
+
+int
+reg_key::killvalue (const char *name)
+{
+  if (key_is_invalid)
+    return key_is_invalid;
+  return RegDeleteValueA (key, name);
+}
+
 reg_key::~reg_key ()
 {
   if (!key_is_invalid)

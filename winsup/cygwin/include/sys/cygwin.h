@@ -59,7 +59,8 @@ typedef enum
     CW_GETVERSIONINFO,
     CW_READ_V1_MOUNT_TABLES,
     CW_USER_DATA,
-    CW_PERFILE
+    CW_PERFILE,
+	CW_GET_CYGDRIVE_PREFIXES
   } cygwin_getinfo_types;
 
 #define CW_NEXTPID 0x80000000	// or with pid to get next one

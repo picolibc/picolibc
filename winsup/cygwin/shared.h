@@ -247,6 +247,7 @@ public:
   int error () {return key == (HKEY) INVALID_HANDLE_VALUE;}
 
   int kill (const char *child);
+  int killvalue (const char *name);
 
   HKEY get_key ();
   int get_int (const char *,int def);
@@ -336,6 +337,8 @@ public:
   struct mntent *getmntent (int x);
 
   int write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsigned flags);
+  int remove_cygdrive_info_from_registry (const char *cygdrive_prefix, unsigned flags);
+  int get_cygdrive_prefixes (char *user, char *system);
 
   void import_v1_mounts ();
 

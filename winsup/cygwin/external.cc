@@ -63,6 +63,14 @@ fillout_pinfo (DWORD pid)
   return &ep;
 }
 
+static DWORD
+get_cygdrive_prefixes (char *user, char *system)
+{
+  shared_info *info = cygwin_getshared();
+  int res = info->mount.get_cygdrive_prefixes(user, system);
+  return (res == ERROR_SUCCESS) ? 1 : 0;
+}
+
 extern "C" DWORD
 cygwin_internal (cygwin_getinfo_types t, ...)
 {
@@ -106,6 +114,13 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_PERFILE:
 	perfile_table = va_arg (arg, struct __cygwin_perfile *);
 	return 0;
+
+      case CW_GET_CYGDRIVE_PREFIXES:
+	{
+	  char *user = va_arg (arg, char *);
+	  char *system = va_arg (arg, char *);
+	  return get_cygdrive_prefixes (user, system);
+	}
 
       default:
 	return (DWORD) -1;

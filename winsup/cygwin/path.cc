@@ -1497,17 +1497,39 @@ mount_info::del_reg_mount (const char * posix_path, unsigned flags)
 void
 mount_info::read_cygdrive_info_from_registry ()
 {
-  /* reg_key for user mounts in HKEY_CURRENT_USER. */
+  /* reg_key for user path prefix in HKEY_CURRENT_USER. */
   reg_key r;
 
   if (r.get_string ("cygdrive prefix", cygdrive, sizeof (cygdrive), "") != 0)
     {
-      /* Didn't find it so write the default to the registry and use it. */
-      write_cygdrive_info_to_registry ("/cygdrive", MOUNT_AUTO);
+      /* Didn't find the user path prefix so check the system path prefix. */
+
+      /* reg_key for system path prefix in HKEY_LOCAL_MACHINE.  */
+      reg_key r2 (HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, "SOFTWARE",
+		 CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
+		 CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
+		 CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
+		 NULL);
+
+    if (r2.get_string ("cygdrive prefix", cygdrive, sizeof (cygdrive), "") != 0)
+      {
+        /* Didn't find either so write the default to the registry and use it.
+	   NOTE: We are writing and using the user path prefix.  */
+        write_cygdrive_info_to_registry ("/cygdrive", MOUNT_AUTO);
+      }
+    else
+      {
+        /* Fetch system cygdrive_flags from registry; returns MOUNT_AUTO on
+	   error. */
+        cygdrive_flags = r2.get_int ("cygdrive flags", MOUNT_AUTO);
+        slashify (cygdrive, cygdrive, 1);
+        cygdrive_len = strlen(cygdrive);
+      }
     }
   else
     {
-      /* Fetch cygdrive_flags from registry; returns MOUNT_AUTO on error. */
+      /* Fetch user cygdrive_flags from registry; returns MOUNT_AUTO on
+         error. */
       cygdrive_flags = r.get_int ("cygdrive flags", MOUNT_AUTO);
       slashify (cygdrive, cygdrive, 1);
       cygdrive_len = strlen(cygdrive);
@@ -1521,8 +1543,16 @@ mount_info::read_cygdrive_info_from_registry ()
 int
 mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsigned flags)
 {
-  /* reg_key for user mounts in HKEY_CURRENT_USER. */
-  reg_key r;
+  /* Determine whether to modify user or system cygdrive path prefix. */
+  HKEY top = (flags & MOUNT_SYSTEM) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+
+  /* reg_key for user path prefix in HKEY_CURRENT_USER or system path prefix in
+     HKEY_LOCAL_MACHINE.  */
+  reg_key r (top, KEY_ALL_ACCESS, "SOFTWARE",
+	     CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
+	     CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
+	     CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
+	     NULL);
 
   /* Verify cygdrive prefix starts with a forward slash and if there's
      another character, it's not a slash. */
@@ -1541,12 +1571,62 @@ mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsign
   r.set_string ("cygdrive prefix", hold_cygdrive_prefix);
   r.set_int ("cygdrive flags", flags);
 
-  /* This also needs to go in the in-memory copy of "cygdrive" */
-  slashify (cygdrive_prefix, cygwin_shared->mount.cygdrive, 1);
-  cygwin_shared->mount.cygdrive_flags = flags;
-  cygwin_shared->mount.cygdrive_len = strlen(cygwin_shared->mount.cygdrive);
+  /* This also needs to go in the in-memory copy of "cygdrive", but only if
+     appropriate:
+       1. setting user path prefix, or
+       2. overwriting (a previous) system path prefix */
+  if ((flags & MOUNT_SYSTEM) == 0 ||
+      (cygwin_shared->mount.cygdrive_flags & MOUNT_SYSTEM) != 0)
+    {
+      slashify (cygdrive_prefix, cygwin_shared->mount.cygdrive, 1);
+      cygwin_shared->mount.cygdrive_flags = flags;
+      cygwin_shared->mount.cygdrive_len = strlen(cygwin_shared->mount.cygdrive);
+    }
 
   return 0;
+}
+
+int
+mount_info::remove_cygdrive_info_from_registry (const char *cygdrive_prefix, unsigned flags)
+{
+  /* Determine whether to modify user or system cygdrive path prefix. */
+  HKEY top = (flags & MOUNT_SYSTEM) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+
+  /* reg_key for user path prefix in HKEY_CURRENT_USER or system path prefix in
+     HKEY_LOCAL_MACHINE.  */
+  reg_key r (top, KEY_ALL_ACCESS, "SOFTWARE",
+	     CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
+	     CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
+	     CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
+	     NULL);
+
+  /* Delete cygdrive prefix and flags. */
+  int res = r.killvalue ("cygdrive prefix");
+  int res2 = r.killvalue ("cygdrive flags");
+
+  /* Reinitialize the cygdrive path prefix to reflect to removal from the
+     registry. */
+  read_cygdrive_info_from_registry ();
+
+  return (res != ERROR_SUCCESS) ? res : res2;
+}
+
+int
+mount_info::get_cygdrive_prefixes (char *user, char *system)
+{
+  /* Get the user path prefix from HKEY_CURRENT_USER. */
+  reg_key r;
+  int res = r.get_string ("cygdrive prefix", user, MAX_PATH, "");
+
+  /* Get the system path prefix from HKEY_LOCAL_MACHINE. */
+  reg_key r2 (HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, "SOFTWARE",
+	      CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
+	      CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
+	      CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
+	      NULL);
+  int res2 = r2.get_string ("cygdrive prefix", system, MAX_PATH, "");
+
+  return (res != ERROR_SUCCESS) ? res : res2;
 }
 
 struct mntent *
@@ -1982,7 +2062,19 @@ extern "C"
 int
 cygwin_umount (const char *path, unsigned flags)
 {
-  int res = cygwin_shared->mount.del_item (path, flags, TRUE);
+  int res = -1;
+
+  if (flags & MOUNT_AUTO)
+    {
+      /* When flags include MOUNT_AUTO, take this to mean that we actually want
+         to remove the cygdrive prefix and flags without actually unmounting
+	 anything. */
+      res = cygwin_shared->mount.remove_cygdrive_info_from_registry (path, flags);
+    }
+  else
+    {
+      res = cygwin_shared->mount.del_item (path, flags, TRUE);
+    }
 
   syscall_printf ("%d = cygwin_umount (%s, %d)", res,  path, flags);
   return res;

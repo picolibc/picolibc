@@ -1,3 +1,23 @@
+Thu Jul 27 22:54:28 2000  Jason Tishler <jt@dothill.com>
+
+	* dcrt0.cc (dummy_autoload): Add load statement for RegDeleteValueA.
+	* external.cc (get_cygdrive_prefixes): New function.
+	(cygwin_internal): Add CW_GET_CYGDRIVE_PREFIXES case.
+	* path.cc (mount_info::read_cygdrive_info_from_registry): Read system
+	cygdrive prefix if user one is undefined.
+	(mount_info::write_cygdrive_info_to_registry): Write cygdrive prefix to
+	the appropriate registry hive.  Overwrite in-memory copy of cygdrive,
+	if appropriate.
+	(mount_info::remove_cygdrive_info_from_registry): New method.
+	(mount_info::get_cygdrive_prefixes): New method.
+	(cygwin_umount): Remove cygdrive prefix, if appropriate.
+	* registry.cc (reg_key::killvalue): New method.
+	* shared.h (class reg_key): Add killvalue,
+	remove_cygdrive_info_to_registry, and get_cygdrive_prefixes
+	declarations.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add
+	CW_GET_CYGDRIVE_PREFIXES.
+
 Thu Jul 27 23:33:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 4.
