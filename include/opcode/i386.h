@@ -1140,7 +1140,7 @@ static const template i386_optab[] = {
 {"movmskps",  2, 0x0f50,    X, CpuSSE, FP|Modrm,	{ RegXMM|InvMem, Reg32, 0 } },
 {"movntps",   2, 0x0f2b,    X, CpuSSE, FP|Modrm, 	{ RegXMM, LLongMem, 0 } },
 {"movntq",    2, 0x0fe7,    X, CpuSSE, FP|Modrm, 	{ RegMMX, LLongMem, 0 } },
-{"movntq",    2, 0x660fe7,  X, CpuSSE2,FP|Modrm, 	{ RegXMM, LLongMem, 0 } },
+{"movntdq",   2, 0x660fe7,  X, CpuSSE2,FP|Modrm, 	{ RegXMM, LLongMem, 0 } },
 {"movss",     2, 0xf30f10,  X, CpuSSE, FP|Modrm,	{ RegXMM|WordMem, RegXMM, 0 } },
 {"movss",     2, 0xf30f11,  X, CpuSSE, FP|Modrm,	{ RegXMM, RegXMM|WordMem, 0 } },
 {"movups",    2, 0x0f10,    X, CpuSSE, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
@@ -1262,7 +1262,7 @@ static const template i386_optab[] = {
 {"cvttsd2si", 2, 0xf20f2c,  X, CpuSSE2, lq_Suf|IgnoreSize|Modrm,{ RegXMM|WordMem, Reg32|Reg64, 0 } },
 {"cvttpd2dq", 2, 0x660fe6,  X, CpuSSE2, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"cvttps2dq", 2, 0xf30f5b,  X, CpuSSE2, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
-{"maskmovdqu",2, 0x660ff7,  X, CpuSSE2, FP|Modrm,	{ RegXMM, RegXMM, 0 } },
+{"maskmovdqu",2, 0x660ff7,  X, CpuSSE2, FP|Modrm,	{ RegXMM|InvMem, RegXMM, 0 } },
 {"movdqa",    2, 0x660f6f,  X, CpuSSE2, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"movdqa",    2, 0x660f7f,  X, CpuSSE2, FP|Modrm,	{ RegXMM, RegXMM|LLongMem, 0 } },
 {"movdqu",    2, 0xf30f6f,  X, CpuSSE2, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
@@ -1277,6 +1277,7 @@ static const template i386_optab[] = {
 {"pslldq",    2, 0x660f73,  7, CpuSSE2, FP|Modrm,	{ Imm8, RegXMM, 0 } },
 {"psrldq",    2, 0x660f73,  3, CpuSSE2, FP|Modrm,	{ Imm8, RegXMM, 0 } },
 {"punpckhqdq",2, 0x660f6d,  X, CpuSSE2, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"punpcklqdq",2, 0x660f6c,  X, CpuSSE2, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 
 /* AMD 3DNow! instructions.  */
 
