@@ -1,3 +1,8 @@
+2001-11-10  Robert Collins  <rbtcollins@hotmail.com>
+
+	* include/winnt.h: Add Danny Smith's text comment about gcc compiler warnings
+	with _AUTHORITY #defines.
+
 2001-11-09  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/winnt.h (GetCurrentFiber): Create a prototype before the implementation;
