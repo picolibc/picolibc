@@ -152,10 +152,10 @@ endif
 
 cygcheck.o: cygcheck.cc
 ifdef VERBOSE
-	${CXX} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
+	${MINGW_CXX} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
 else
-	@echo $(CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
-	${CXX} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
+	@echo $(MINGW_CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
+	${MINGW_CXX} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
 endif
 
 strace.o: strace.cc

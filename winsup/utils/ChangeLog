@@ -1,5 +1,12 @@
 2003-09-10  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in (cygcheck.o): Use MINGW_CXX for compilation.
+	* cygcheck.cc: Just include <getopt.h> rather than cygwin version.
+	(pretty_id): Avoid compiler warnings.
+	* cygpath.cc (usage): Ditto.
+
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in (MINGW_CXX): Define and use for mingw-compiled files.
 	* path.cc: Include more path info in cygwin-specific includes since the
 	cygwin directory is no longer included by default.

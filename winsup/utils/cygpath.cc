@@ -66,7 +66,7 @@ usage (FILE * stream, int status)
 Usage: %s (-d|-m|-u|-w|-t TYPE) [-c HANDLE] [-f FILE] [options] NAME\n\
        %s [-ADHPSW] \n\
 Convert Unix and Windows format paths, or output system path information\n\
-\n\ 
+\n\
 Output type options:\n\
   -d, --dos	        print DOS (short) form of NAME (C:\\PROGRA~1\\)\n\
   -m, --mixed           like --windows, but with regular slashes (C:/WINNT)\n\

@@ -16,9 +16,9 @@
 #include <io.h>
 #include <windows.h>
 #include "path.h"
+#include <getopt.h>
 #include "cygwin/include/sys/cygwin.h"
 #include "cygwin/include/mntent.h"
-#include "cygwin/include/getopt.h"
 
 int verbose = 0;
 int registry = 0;
@@ -775,7 +775,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
   putenv (cygwin);
 
   char *id = cygpath ("/bin/id.exe", NULL);
-  for (char *p = id; p = strchr (p, '/'); p++)
+  for (char *p = id; (p = strchr (p, '/')); p++)
     *p = '\\';
 
   if (access (id, X_OK))
@@ -805,7 +805,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
     }
 
   printf ("\nOutput from %s (%s)\n", id, s);
-  int szmaybe = strlen ("UID: ") + strlen (uid);
+  size_t szmaybe = strlen ("UID: ") + strlen (uid);
   if (sz < szmaybe)
     sz = szmaybe;
   sz += 1;
