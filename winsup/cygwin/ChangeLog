@@ -1,5 +1,10 @@
 2004-01-25  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.cc (fhandler_base::fhaccess): Avoid always setting errno to
+	EACCESS when return value is < 0.  Rely on errno being set properly.
+
+2004-01-25  Christopher Faylor  <cgf@redhat.com>
+
 	* sigproc.cc (proc_subproc): Don't protect *child's* handle.
 
 2004-01-24  Christopher Faylor  <cgf@redhat.com>
