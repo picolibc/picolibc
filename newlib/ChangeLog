@@ -1,3 +1,19 @@
+2002-07-24  Stephane Carrez  <stcarrez@nerim.fr>
+
+        * configure.host: Recognize m6811-elf and m6812-elf targets.
+        * libc/include/machine/setjmp.h (_JBLEN): Define for 68hc11/68hc12.
+        * libc/include/machine/ieeefp.h (__IEEE_BIG_ENDIAN): Define for 68HC11.
+        (_DOUBLE_IS_32BITS): Define when compiling with -fshort-double.
+        * libc/include/sys/config.h (INT_MAX, UINT_MAX): Define
+        according to __INT_MAX__.
+        (_POINTER_INT): Define to short.
+        * libc/machine/m68hc11/Makefile.am: New file.
+        * libc/machine/m68hc11/Makefile.in: New file.
+        * libc/machine/m68hc11/configure.in: New file.
+        * libc/machine/m68hc11/configure: New file.
+        * libc/machine/m68hc11/aclocal.m4: New file.
+        * libc/machine/m68hc11/setjmp.S: New file.
+
 2002-07-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/string.h: Add mempcpy, strndup, and _strndup_r

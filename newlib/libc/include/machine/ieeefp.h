@@ -75,6 +75,13 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#if defined(__mc68hc11__) || defined(__mc68hc12__) || defined(__mc68hc1x__)
+#define __IEEE_BIG_ENDIAN
+#ifdef __HAVE_SHORT_DOUBLE__
+# define _DOUBLE_IS_32BITS
+#endif
+#endif
+
 #if defined (__H8300__) || defined (__H8300H__) || defined (__H8300S__) || defined (__H8500__)
 #define __IEEE_BIG_ENDIAN
 #define _FLOAT_ARG float

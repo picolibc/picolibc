@@ -127,6 +127,13 @@ case "${host_cpu}" in
   m32r*)
 	machine_dir=m32r
 	;;
+
+  m68hc11|m6811|m68hc12|m6812)
+	machine_dir=m68hc11
+	newlib_cflags="-DPREFER_SIZE_OVER_SPEED -Os -mrelax"
+	CFLAGS="-g -Os"
+	;;
+  
   m68*)
 	machine_dir=m68k
 	newlib_cflags="${newlib_cflags} -DCOMPACT_CTYPE"
@@ -324,6 +331,9 @@ case "${host}" in
 	##newlib_cflags="${newlib_cflags} -I`newlib-flags --kernel-dir`/include"
 	##newlib_cflags="${newlib_cflags} -idirafter ${gcc_dir}include"
 	;;
+  m68hc11-*-*|m6811-*-*|m6812-*-*|m68hc12-*-*)
+	;;
+
   m68k-sun-sunos*)
 	unix_dir=unix
 	;;
@@ -482,6 +492,9 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -msdata=sdata"
 	syscall_dir=syscalls
 	;;
+  m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
+        newlib_cflags="${newlib_cflags} -DNO_EXEC -DABORT_PROVIDED -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
+        ;;
   mcore-*-*)
 	newlib_cflags="${newlib_cflags}"
 	syscall_dir=syscalls

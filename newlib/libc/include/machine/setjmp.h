@@ -28,6 +28,14 @@ _BEGIN_STD_C
 #define	_JBLEN	34
 #endif
 
+#if defined(__mc68hc11__) || defined(__mc68hc12__) || defined(__mc68hc1x__)
+/*
+ * D, X, Y are not saved.
+ * Only take into account the pseudo soft registers (max 32).
+ */
+#define _JBLEN  32
+#endif
+
 #if defined(__Z8001__) || defined(__Z8002__)
 /* 16 regs + pc */
 #define _JBLEN 20
