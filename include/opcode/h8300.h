@@ -130,6 +130,8 @@ enum h8_flags {
 
   IMM3NZ_NS =   IMM3NZ | NO_SYMBOLS,
   IMM2_NS =     IMM2 | NO_SYMBOLS,
+  IMM4_NS =	IMM4 | NO_SYMBOLS,
+  IMM8_NS =	IMM8 | NO_SYMBOLS,
   IMM16_NS =    IMM16 | NO_SYMBOLS,
   IMM16U_NS =   IMM16U | NO_SYMBOLS,
 
@@ -1441,8 +1443,8 @@ struct h8_opcode h8_opcodes[] =
 
 
   {O (O_MOV, SB), AV_H8,   2, "mov.b", {{IMM8, RD8,      E}}, {{0xF, RD8,            IMM8LIST,     E}}},
-  {O (O_MOV, SB), AV_H8SX, 0, "mov.b", {{IMM4, ABS16DST, E}}, {{0x6, 0xa, 0xd, IMM4, DSTABS16LIST, E}}},
-  {O (O_MOV, SB), AV_H8SX, 0, "mov.b", {{IMM4, ABS32DST, E}}, {{0x6, 0xa, 0xf, IMM4, DSTABS32LIST, E}}},
+  {O (O_MOV, SB), AV_H8SX, 0, "mov.b", {{IMM4_NS, ABS16DST, E}}, {{0x6, 0xa, 0xd, IMM4, DSTABS16LIST, E}}},
+  {O (O_MOV, SB), AV_H8SX, 0, "mov.b", {{IMM4_NS, ABS32DST, E}}, {{0x6, 0xa, 0xf, IMM4, DSTABS32LIST, E}}},
   MOVFROM_IMM8 (O (O_MOV, SB), PREFIX_017D, "mov.b", IMM8),
 
   {O (O_MOV, SB), AV_H8,   2,    "mov.b", {{RS8, RD8,     E}}, {{0x0, 0xC, RS8, RD8,    E}}},
@@ -1470,10 +1472,10 @@ struct h8_opcode h8_opcodes[] =
 
   {O (O_MOV, SW), AV_H8SX, 0, "mov.w", {{IMM3NZ_NS, RD16, E}}, {{0x0, 0xf, B30 | IMM3NZ, RD16,   E}}},
   {O (O_MOV, SW), AV_H8,   4, "mov.w", {{IMM16,     RD16, E}}, {{0x7, 0x9, 0x0, RD16, IMM16LIST, E}}},
-  {O (O_MOV, SW), AV_H8SX, 0, "mov.w", {{IMM4,  ABS16DST, E}}, {{0x6, 0xb, 0xd, IMM4, DSTABS16LIST, E}}},
-  {O (O_MOV, SW), AV_H8SX, 0, "mov.w", {{IMM4,  ABS32DST, E}}, {{0x6, 0xb, 0xf, IMM4, DSTABS32LIST, E}}},
+  {O (O_MOV, SW), AV_H8SX, 0, "mov.w", {{IMM4_NS,  ABS16DST, E}}, {{0x6, 0xb, 0xd, IMM4, DSTABS16LIST, E}}},
+  {O (O_MOV, SW), AV_H8SX, 0, "mov.w", {{IMM4_NS,  ABS32DST, E}}, {{0x6, 0xb, 0xf, IMM4, DSTABS32LIST, E}}},
 
-  MOVFROM_IMM8 (O (O_MOV, SW), PREFIX_015D,   "mov.w", IMM8),
+  MOVFROM_IMM8 (O (O_MOV, SW), PREFIX_015D,   "mov.w", IMM8_NS),
   MOVFROM_IMM  (O (O_MOV, SW), PREFIX_7974,   "mov.w", IMM16, IMM16LIST),
 
   {O (O_MOV, SW), AV_H8,   2, "mov.w", {{RS16, RD16,      E}}, {{0x0, 0xD, RS16, RD16, E}}},
@@ -1499,8 +1501,8 @@ struct h8_opcode h8_opcodes[] =
 
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{IMM3NZ_NS, RD32, E}}, {{0x0, 0xf, B31 | IMM3NZ, B31 | RD32, E}}},
 
-  MOVFROM_IMM8 (O (O_MOV, SL), PREFIX_010D, "mov.l", IMM8),
-  MOVFROM_IMM  (O (O_MOV, SL), PREFIX_7A7C, "mov.l", IMM16U, IMM16ULIST),
+  MOVFROM_IMM8 (O (O_MOV, SL), PREFIX_010D, "mov.l", IMM8_NS),
+  MOVFROM_IMM  (O (O_MOV, SL), PREFIX_7A7C, "mov.l", IMM16U_NS, IMM16ULIST),
 
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{IMM16U_NS, RD32, E}}, {{0x7, 0xa, 0x0, B31 | RD32, IMM16ULIST, E}}},
   {O (O_MOV, SL), AV_H8H,  4, "mov.l", {{IMM32,     RD32, E}}, {{0x7, 0xa, 0x0, B30 | RD32, IMM32LIST,  E}}},

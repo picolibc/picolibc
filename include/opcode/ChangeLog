@@ -1,3 +1,9 @@
+2003-06-10  Richard Sandiford  <rsandifo@redhat.com>
+
+	* h8300.h (IMM4_NS, IMM8_NS): New.
+	(h8_opcodes): Replace IMM4 with IMM4_NS in mov.b and mov.w entries.
+	Likewise IMM8 for mov.w and mov.l.  Likewise IMM16U for mov.l.
+
 2003-06-03  Michael Snyder  <msnyder@redhat.com>
 
 	* h8sx.h (enum h8_model): Add AV_H8S to distinguish from H8H.
