@@ -1,3 +1,8 @@
+Thu Jun  8 21:18:00 2000  Ranjith Kumaran  <ranjith@cygnus.com>
+
+	* libc/include/stdlib.h: Set RAND_MAX to __RAND_MAX.
+	* libc/include/sys/config.h: Define __RAND_MAX.
+
 Thu Jun  8 17:54:00 2000  Jeff Johnston  <jjohnstn@cygnus.com>
 
         * libc/stdlib/rand_r.c: New algorithm that meets minimal

@@ -111,5 +111,11 @@ typedef unsigned int __uint32_t;
 #define _POINTER_INT long
 #endif
 
+#undef __RAND_MAX
+#if INT_MAX == 32767
+#define __RAND_MAX 32767
+#else
+#define __RAND_MAX 0x7fffffff
+#endif
 
 #endif /* __SYS_CONFIG_H__ */

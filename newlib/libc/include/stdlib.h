@@ -37,7 +37,7 @@ typedef struct
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
 
-#define RAND_MAX 0x7fffffff
+#define RAND_MAX __RAND_MAX
 
 #if (defined(__CYGWIN__) || defined(__CYGWIN__)) && ! defined(_COMPILING_NEWLIB)
 extern __declspec(dllimport) int __mb_cur_max;
