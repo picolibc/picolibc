@@ -1,5 +1,12 @@
 2002-01-19  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (sig_handle_tty_stop): Don't send SIGCHLD if parent
+	doesn't want it.
+	(sig_handle): Don't check for SA_NOCLDSTOP here.  We don't have enough
+	information.
+
+2002-01-19  Christopher Faylor  <cgf@redhat.com>
+
 	* include/cygwin/version.h: Bump DLL minor number.
 
 2002-01-19  Christopher Faylor  <cgf@redhat.com>
