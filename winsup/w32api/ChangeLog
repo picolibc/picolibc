@@ -1,5 +1,12 @@
 2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h [_WIN32_WINNT >= 0x0501] (PrintWindow,
+	PW_CLIENTONLY): Add function and constant.
+
+	* lib/user32.def (PrintWindow): Add function.
+
+2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h (RealGetWindowClassA[AW]): Add function.
 
 	* lib/user32.def (RealGetWindowClassA[AW]): Add function.
