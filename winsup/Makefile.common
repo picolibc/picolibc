@@ -102,6 +102,10 @@ ifneq ($(MAKEOVERRIDES_WORKAROUND),)
     export MAKEOVERRIDES
 endif
 
+ifdef RPATH_ENVVAR
+VERBOSE=1
+endif
+
 .PRECIOUS: %.o
 
 %.o: %.cc

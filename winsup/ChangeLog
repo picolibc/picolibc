@@ -1,3 +1,8 @@
+2000-09-30  Christopher Faylor  <cgf@cygnus.com>
+
+	* Makefile.common: Default to VERBOSE when part of overall source
+	tree build.
+
 2000-09-02  Egor Duda  <deo@logos-m.ru>
 
 	* Makefile.in: Add new goal "check"
