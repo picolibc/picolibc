@@ -109,7 +109,10 @@ shared_info::initialize ()
   if (inited)
     {
       if (inited != SHAREDVER)
-	api_fatal ("shared region is corrupted.  inited %x", inited);
+	api_fatal ("Shared region version mismatch.  Version %x != %x.\n"
+		   "Are you using multiple versions of cygwin1.dll?\n"
+		   "Run 'cygcheck -r -s -v' to find out.",
+		   inited, SHAREDVER);
       return;
     }
 

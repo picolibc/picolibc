@@ -1,3 +1,8 @@
+Sat Jun 24 12:29:59 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* shared.cc (shared_info::initialize): Improve error message clarity.
+	* mkvers.sh: Eliminate debugging output.
+
 Thu Jun 22 17:50:59 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Autogenerate cygwin.def when appropriate.
