@@ -40,7 +40,7 @@ static struct
 
 #define use_tty ISSTATE (myself, PID_USETTY)
 
-const char * get_nonascii_key (INPUT_RECORD& input_rec);
+const char * get_nonascii_key (INPUT_RECORD&, char *);
 
 HANDLE console_shared_h;
 
@@ -206,7 +206,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	  /* arrow/function keys */
 	  (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
 	{
-	  toadd = get_nonascii_key (input_rec);
+	  toadd = get_nonascii_key (input_rec, tmp);
 	  if (!toadd)
 	    continue;
 	  nread = strlen (toadd);
@@ -1297,13 +1297,11 @@ static struct {
   {VK_NUMPAD5,	{"\033[G",	NULL,		NULL,		NULL}},
   {VK_CLEAR,	{"\033[G",	NULL,		NULL,		NULL}},
   {'6',		{NULL,		NULL,		"\036",		NULL}},
-  /* FIXME: Should this be \033OQ? */
-  {VK_DIVIDE,	{"/",		"/",		"/",		"/"}},
   {0,		{"",		NULL,		NULL,		NULL}}
 };
 
 const char *
-get_nonascii_key (INPUT_RECORD& input_rec)
+get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
 {
 #define NORMAL  0
 #define SHIFT	1
@@ -1324,12 +1322,11 @@ get_nonascii_key (INPUT_RECORD& input_rec)
     if (input_rec.Event.KeyEvent.wVirtualKeyCode == keytable[i].vk)
       return keytable[i].val[modifier_index];
 
-  if (input_rec.Event.KeyEvent.wVirtualKeyCode < 127)
+  if (input_rec.Event.KeyEvent.uChar.AsciiChar)
     {
-      /* FIXME: Probably not thread-safe */
-      static char buf[2];
-      buf[0] = input_rec.Event.KeyEvent.wVirtualKeyCode;
-      return buf;
+      tmp[0] = input_rec.Event.KeyEvent.uChar.AsciiChar;
+      tmp[1] = '\0';
+      return tmp;
     }
   return NULL;
 }
