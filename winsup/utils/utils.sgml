@@ -9,11 +9,12 @@ specifically for Cygwin.</para>
 
 <screen>
 Usage: cygcheck [-s] [-v] [-r] [-h] [program ...]
-  -c = check current package setup
-  -s = system information
-  -v = verbose output (indented) (for -s or programs)
-  -r = registry search (requires -s)
-  -h = give help about the info
+  -c   check current package setup
+  -h   give help about the info
+  -s   system information
+  -v   verbose output (indented) (for -s or programs)
+  -r   registry search (requires -s)
+  -V   version info
 You must at least give either -s or a program name
 </screen>
 
@@ -624,9 +625,10 @@ Usage strace [options] program [args...]
   -f, --trace-children         also trace forked child processes
   -h, --help                   display help info
   -m, --mask=MASK              set message filter mask
-  -o, --output=FILENAME        set output file to FILENAME
   -n, --crack-error-numbers    output descriptive text instead of error
                                numbers for Windows errors
+  -o, --output=FILENAME        set output file to FILENAME
+  -p, --pid=pid                attach to a running process
   -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs
   -t, --timestamp              use an absolute hh:mm:ss timestamp insted of the
                                default microsecond timestamp.  Implies -d
