@@ -11,15 +11,20 @@
 #define __NR__exit __NR_exit
 #define __NR__execve __NR_execve
 
-_syscall0(int,fork)
-_syscall3(int,_execve,const char *,file,char * const *,argv,char * const *,envp)
 _syscall0(int,getpid)
-_syscall2(int,setpgid,pid_t,pid,pid_t,pgid)
 _syscall0(pid_t,getppid)
-_syscall0(pid_t,getpgrp)
-_syscall0(pid_t,setsid)
 
 weak_alias(__libc_getpid,__getpid);
+
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 3
+_syscall3(int,_execve,const char *,file,char * const *,argv,char * const *,envp)
+_syscall0(int,fork)
+#endif /* _ELIX_LEVEL >= 3 */
+
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 4
+_syscall0(pid_t,getpgrp)
+_syscall2(int,setpgid,pid_t,pid,pid_t,pgid)
+_syscall0(pid_t,setsid)
 
 /* Here we implement vfork in terms of fork, since
  * Linux's vfork system call is not reliable.
@@ -42,7 +47,10 @@ pid_t vfork(void)
         return pid;
     }
 }
+#endif /* !_ELIX_LEVEL || _ELIX_LEVEL >= 4 */
 
+
+/* Although _exit is listed as level 3, we use it from level 1 interfaces */
 /* FIXME: get rid of noreturn warning */
 
 #define return for (;;)

@@ -109,37 +109,40 @@ sys_dir = @sys_dir@
 AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-
-LIB_SOURCES = \
-	argz_add.c \
-	argz_add_sep.c \
-	argz_append.c \
-	argz_count.c \
-	argz_create.c \
-	argz_create_sep.c \
-	argz_delete.c \
-	argz_extract.c \
-	argz_insert.c \
-	argz_next.c \
-	argz_replace.c \
-	argz_stringify.c \
-	buf_findstr.c \
-	envz_entry.c \
-	envz_get.c \
-	envz_add.c \
-	envz_remove.c \
-	envz_merge.c \
-	envz_strip.c
-
+@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
+@ELIX_LEVEL_1_FALSE@	argz_add.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_add_sep.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_append.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_count.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_create.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_create_sep.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_delete.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_extract.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_insert.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_next.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_replace.$(oext) \
+@ELIX_LEVEL_1_FALSE@	argz_stringify.$(oext) \
+@ELIX_LEVEL_1_FALSE@	buf_findstr.$(oext) \
+@ELIX_LEVEL_1_FALSE@	envz_entry.$(oext) \
+@ELIX_LEVEL_1_FALSE@	envz_get.$(oext) \
+@ELIX_LEVEL_1_FALSE@	envz_add.$(oext) \
+@ELIX_LEVEL_1_FALSE@	envz_remove.$(oext) \
+@ELIX_LEVEL_1_FALSE@	envz_merge.$(oext) \
+@ELIX_LEVEL_1_FALSE@	envz_strip.$(oext)
 
 libargz_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libargz.la
-@USE_LIBTOOL_TRUE@libargz_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@libargz_la_SOURCES = @USE_LIBTOOL_TRUE@dummy.c
+@USE_LIBTOOL_TRUE@libargz_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libargz_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@dummy.c
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
 
 SUFFIXES = .def
 
@@ -158,27 +161,10 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  argz_add.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@argz_add_sep.$(OBJEXT) argz_append.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@argz_count.$(OBJEXT) argz_create.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@argz_create_sep.$(OBJEXT) argz_delete.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@argz_extract.$(OBJEXT) argz_insert.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@argz_next.$(OBJEXT) argz_replace.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@argz_stringify.$(OBJEXT) buf_findstr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@envz_entry.$(OBJEXT) envz_get.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@envz_add.$(OBJEXT) envz_remove.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@envz_merge.$(OBJEXT) envz_strip.$(OBJEXT)
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  dummy.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-libargz_la_LIBADD = 
-@USE_LIBTOOL_TRUE@libargz_la_OBJECTS =  argz_add.lo argz_add_sep.lo \
-@USE_LIBTOOL_TRUE@argz_append.lo argz_count.lo argz_create.lo \
-@USE_LIBTOOL_TRUE@argz_create_sep.lo argz_delete.lo argz_extract.lo \
-@USE_LIBTOOL_TRUE@argz_insert.lo argz_next.lo argz_replace.lo \
-@USE_LIBTOOL_TRUE@argz_stringify.lo buf_findstr.lo envz_entry.lo \
-@USE_LIBTOOL_TRUE@envz_get.lo envz_add.lo envz_remove.lo envz_merge.lo \
-@USE_LIBTOOL_TRUE@envz_strip.lo
+@USE_LIBTOOL_TRUE@libargz_la_OBJECTS =  dummy.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

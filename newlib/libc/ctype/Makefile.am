@@ -4,12 +4,10 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
+GENERAL_SOURCES = \
 	ctype_.c \
 	isalnum.c \
 	isalpha.c \
-	isascii.c \
-	isblank.c \
 	iscntrl.c \
 	isdigit.c \
 	islower.c \
@@ -18,21 +16,34 @@ LIB_SOURCES = \
 	ispunct.c \
 	isspace.c \
 	isxdigit.c \
-	toascii.c \
 	tolower.c \
-	toupper.c \
-	_tolower.c \
-	_toupper.c
+	toupper.c
+
+## The following handles EL/IX level 2 functions
+if ELIX_LEVEL_1
+LIB_OBJS =
+else
+LIB_OBJS = \
+	isascii.$(oext) \
+	isblank.$(oext) \
+	toascii.$(oext) \
+	_tolower.$(oext) \
+	_toupper.$(oext)
+endif
 
 libctype_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libctype.la
-libctype_la_SOURCES = $(LIB_SOURCES)
+libctype_la_SOURCES = $(GENERAL_SOURCES)
+libctype_la_LIBADD = $(LIB_OBJS)
+libctype_la_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
+lib_a_SOURCES = $(GENERAL_SOURCES)
+lib_a_LIBADD = $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

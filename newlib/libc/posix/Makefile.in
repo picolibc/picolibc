@@ -110,20 +110,41 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
-	closedir.c opendir.c readdir.c rewinddir.c scandir.c seekdir.c \
-	telldir.c execl.c execle.c execlp.c execv.c execve.c execvp.c \
-	popen.c creat.c isatty.c readdir_r.c
+GENERAL_SOURCES = \
+	closedir.c creat.c isatty.c \
+	opendir.c readdir.c \
+	readdir_r.c rewinddir.c telldir.c
 
+
+ELIX_2_OBJS = \
+        scandir.$(oext) seekdir.$(oext)
+
+
+ELIX_3_OBJS = \
+	execl.$(oext) execle.$(oext) execlp.$(oext) execv.$(oext) \
+	execve.$(oext) execvp.$(oext)
+
+
+ELIX_4_OBJS = \
+	popen.$(oext) 
+
+@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@$(ELIX_2_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@$(ELIX_2_OBJS) $(ELIX_3_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@$(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
 
 libposix_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libposix.la
-@USE_LIBTOOL_TRUE@libposix_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@libposix_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libposix_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libposix_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
 
 CHEWOUT_FILES = 
 
@@ -142,22 +163,15 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  closedir.$(OBJEXT) opendir.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@readdir.$(OBJEXT) rewinddir.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@scandir.$(OBJEXT) seekdir.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@telldir.$(OBJEXT) execl.$(OBJEXT) execle.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@execlp.$(OBJEXT) execv.$(OBJEXT) execve.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@execvp.$(OBJEXT) popen.$(OBJEXT) creat.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@isatty.$(OBJEXT) readdir_r.$(OBJEXT)
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  closedir.$(OBJEXT) creat.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@isatty.$(OBJEXT) opendir.$(OBJEXT) readdir.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@readdir_r.$(OBJEXT) rewinddir.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@telldir.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-libposix_la_LIBADD = 
-@USE_LIBTOOL_TRUE@libposix_la_OBJECTS =  closedir.lo opendir.lo \
-@USE_LIBTOOL_TRUE@readdir.lo rewinddir.lo scandir.lo seekdir.lo \
-@USE_LIBTOOL_TRUE@telldir.lo execl.lo execle.lo execlp.lo execv.lo \
-@USE_LIBTOOL_TRUE@execve.lo execvp.lo popen.lo creat.lo isatty.lo \
-@USE_LIBTOOL_TRUE@readdir_r.lo
+@USE_LIBTOOL_TRUE@libposix_la_OBJECTS =  closedir.lo creat.lo isatty.lo \
+@USE_LIBTOOL_TRUE@opendir.lo readdir.lo readdir_r.lo rewinddir.lo \
+@USE_LIBTOOL_TRUE@telldir.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -110,6 +110,7 @@ _DEFUN_VOID (mallinfo)
   return _mallinfo_r (_REENT);
 }
 
+#ifndef _ELIX_LEVEL || _ELIX_LEVEL >= 2
 void
 _DEFUN_VOID (malloc_stats)
 {
@@ -124,7 +125,11 @@ _DEFUN (mallopt, (p, v),
   return _mallopt_r (_REENT, p, v);
 }
 
+#endif /* !_ELIX_LEVEL || _ELIX_LEVEL >= 2 */
+
 #endif
+
+#ifndef _ELIX_LEVEL || _ELIX_LEVEL >= 2
 
 /* mstats is now compatibility code.  It used to be real, for a
    previous version of the malloc routines.  It now just calls
@@ -149,4 +154,7 @@ _DEFUN (mstats, (s),
 }
 
 #endif
+
+#endif /* !_ELIX_LEVEL || _ELIX_LEVEL >= 2 */
+
 #endif /* ! defined (MALLOC_PROVIDED) */

@@ -11,9 +11,8 @@ SUBLIBS = \
 	cmath/libcmath.la \
 	$(LINUX_MACH_LIB)
 
-LIB_SOURCES = \
+GENERAL_SOURCES = \
 	aio.c \
-	aio64.c \
 	brk.c \
 	calloc.c \
 	callocr.c \
@@ -22,42 +21,24 @@ LIB_SOURCES = \
 	clock_getres.c \
 	clock_gettime.c \
 	clock_settime.c \
-	confstr.c \
-	ctermid.c \
-	fclean.c \
 	flockfile.c \
-	fpathconf.c \
 	free.c \
 	freer.c \
-	fstab.c \
-	fstatvfs.c \
-	fstatvfs64.c \
 	ftok.c \
-	ftw.c \
-	ftw64.c \
 	funlockfile.c \
 	getdate.c \
 	getdate_err.c \
 	gethostname.c \
-	getoptlong.c \
 	getreent.c \
-	getrlimit64.c \
-	getwd.c \
 	ids.c \
 	inode.c \
 	io.c \
-	io64.c \
 	ipc.c \
 	linux.c \
-	malign.c \
-	malignr.c \
 	mallinfor.c \
 	mallocr.c \
-	malloptr.c \
 	mallstatsr.c \
 	mmap.c \
-	mntent.c \
-	mntent_r.c \
 	mq_close.c \
 	mq_getattr.c \
 	mq_notify.c \
@@ -72,29 +53,21 @@ LIB_SOURCES = \
 	mtrim.c \
 	mtrimr.c \
 	ntp_gettime.c \
-	pathconf.c \
 	pread.c \
-	pread64.c \
 	process.c \
 	prof-freq.c \
 	profile.c \
 	psignal.c \
-	pvallocr.c \
 	pwrite.c \
-	pwrite64.c \
 	raise.c \
-	readdir64.c \
 	realloc.c \
 	reallocr.c \
-	realpath.c \
 	rename.c \
 	resource.c \
-	scandir64.c \
 	sched.c \
 	select.c \
 	seteuid.c \
 	sethostname.c \
-	setrlimit64.c \
 	shm_open.c \
 	shm_unlink.c \
 	sig.c \
@@ -106,26 +79,74 @@ LIB_SOURCES = \
 	sigwait.c \
 	socket.c \
 	sleep.c \
-	stack.c \
-	statvfs.c \
-	statvfs64.c \
 	strsignal.c \
 	strverscmp.c \
 	sysconf.c \
 	sysctl.c \
 	systat.c \
-	system.c \
 	tcdrain.c \
 	tcsendbrk.c \
 	termios.c \
 	time.c \
-	ttyname_r.c \
 	usleep.c \
-	utimes.c \
-	vallocr.c \
-	versionsort.c \
-	versionsort64.c \
-	wait.c
+	versionsort.c 
+
+ELIX_2_OBJS = \
+	aio64.$(oext) \
+	confstr.$(oext) \
+	ctermid.$(oext) \
+	fclean.$(oext) \
+	fpathconf.$(oext) \
+	fstab.$(oext) \
+	fstatvfs.$(oext) \
+	fstatvfs64.$(oext) \
+	ftw.$(oext) \
+	ftw64.$(oext) \
+	getoptlong.$(oext) \
+	getrlimit64.$(oext) \
+	getwd.$(oext) \
+	io64.$(oext) \
+	malign.$(oext) \
+	malignr.$(oext) \
+	malloptr.$(oext) \
+	mcheck.$(oext) \
+	mntent.$(oext) \
+	mntent_r.$(oext) \
+	pathconf.$(oext) \
+	pread64.$(oext) \
+	pvallocr.$(oext) \
+	pwrite64.$(oext) \
+	readdir64.$(oext) \
+	realpath.$(oext) \
+	scandir64.$(oext) \
+	setrlimit64.$(oext) \
+	statvfs.$(oext) \
+	statvfs64.$(oext) \
+	ttyname_r.$(oext) \
+	utimes.$(oext) \
+	vallocr.$(oext) \
+	versionsort64.$(oext)
+
+ELIX_3_OBJS = \
+	system.$(oext) \
+	wait.$(oext)
+
+ELIX_4_OBJS = \
+	stack.$(oext)
+
+if ELIX_LEVEL_1
+LIB_OBJS =
+else
+if ELIX_LEVEL_2
+LIB_OBJS = $(ELIX_2_OBJS)
+else
+if ELIX_LEVEL_3
+LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
+else
+LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
+endif
+endif
+endif
 
 # This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)
 # and also /usr/src/linux/include/asm/signal.h in older versions of Red Hat Linux
@@ -135,25 +156,24 @@ liblinux_la_LDFLAGS = -Xcompiler -nostdlib
 
 ADD_OBJS = \
 	malloc.$(oext) \
-	mcheck.$(oext) \
 	$(LINUX_MACH_LIB)
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = liblinux.la
-liblinux_la_SOURCES = $(LIB_SOURCES)
-liblinux_la_LIBADD = $(ADD_OBJS)
-liblinux_la_DEPENDENCIES = $(ADD_OBJS)
+liblinux_la_SOURCES = $(GENERAL_SOURCES)
+liblinux_la_LIBADD = $(ADD_OBJS) $(LIB_OBJS)
+liblinux_la_DEPENDENCIES = $(ADD_OBJS) $(LIB_OBJS)
 LIBC_COMPILE = $(LTCOMPILE)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
-lib_a_LIBADD = $(ADD_OBJS)
-lib_a_DEPENDENCIES = $(ADD_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES)
+lib_a_LIBADD = $(ADD_OBJS) $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(ADD_OBJS) $(LIB_OBJS)
 LIBC_COMPILE = $(COMPILE)
 noinst_DATA =
 
-lib.a:  $(ADD_OBJS) $(lib_a_OBJECTS)
+lib.a:  $(ADD_OBJS) $(LIB_OBJS) $(lib_a_OBJECTS)
 	rm -f $@
 	rm -rf tmp
 	mkdir tmp

@@ -66,8 +66,10 @@ lio_listio (int mode, struct aiocb * const list[], int nent,
   return -1;
 }
 
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 4
 void 
 aio_init (const struct aioinit *INIT)
 {
   errno = ENOSYS;
 }
+#endif

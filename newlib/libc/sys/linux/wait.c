@@ -22,5 +22,6 @@ pid_t __libc_wait(int *status)
     return __libc_waitpid(-1,status,0);
 }
 
+weak_alias(__libc_waitpid,__libc___waitpid);
 weak_alias(__libc_wait,__wait);
 weak_alias(__libc_wait,wait);

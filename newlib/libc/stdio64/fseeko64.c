@@ -1,5 +1,3 @@
-#ifdef __LARGE64_FILES
-
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -77,17 +75,20 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include "local64.h"
 
 #define	POS_ERR	(-(_fpos64_t)1)
+
+#ifdef __LARGE64_FILES
 
 /*
  * Seek the given file to the given offset.
  * `Whence' must be one of the three SEEK_* macros.
  */
 
-int
+_off64_t
 fseeko64 (fp, offset, whence)
      register FILE *fp;
      _off64_t offset;

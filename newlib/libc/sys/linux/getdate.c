@@ -86,6 +86,12 @@ PORTABILITY
 #include <unistd.h>
 #include <sys/stat.h>
 
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
+# define STAT stat64
+#else
+# define STAT stat
+#endif
+
 #define TM_YEAR_BASE 1900
 
 extern ssize_t __getline (char **, size_t *, FILE *);
@@ -171,14 +177,14 @@ getdate_r (const char *string, struct tm *tp)
   char *result = NULL;
   time_t timer;
   struct tm tm;
-  struct stat64 st;
+  struct STAT st;
   int mday_ok = 0;
 
   datemsk = getenv ("DATEMSK");
   if (datemsk == NULL || *datemsk == '\0')
     return 1;
 
-  if (stat64 (datemsk, &st) < 0)
+  if (STAT (datemsk, &st) < 0)
     return 3;
 
   if (!S_ISREG (st.st_mode))

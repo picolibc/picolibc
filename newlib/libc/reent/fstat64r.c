@@ -1,5 +1,3 @@
-#ifdef __LARGE64_FILES
-
 /* Reentrant versions of fstat system call.  This implementation just
    calls the fstat system call.  */
 
@@ -7,6 +5,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <_syslist.h>
+
+#ifdef __LARGE64_FILES
 
 /* Some targets provides their own versions of these functions.  Those
    targets should define REENTRANT_SYSCALLS_PROVIDED in TARGET_CFLAGS.  */

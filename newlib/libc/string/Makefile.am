@@ -4,23 +4,20 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
-	bcmp.c \
+GENERAL_SOURCES = \
 	bcopy.c \
 	bzero.c \
 	index.c \
-	memccpy.c \
 	memchr.c \
 	memcmp.c \
 	memcpy.c \
 	memmove.c \
-	mempcpy.c \
 	memset.c \
 	rindex.c \
+	strcasecmp.c \
 	strcat.c \
 	strchr.c \
 	strcmp.c \
-	strcasecmp.c \
 	strcoll.c \
 	strcpy.c \
 	strcspn.c \
@@ -32,12 +29,10 @@ LIB_SOURCES = \
 	strlcpy.c \
 	strlen.c  \
 	strlwr.c \
+	strncasecmp.c \
 	strncat.c \
 	strncmp.c \
-	strncasecmp.c \
 	strncpy.c \
-	strndup.c \
-	strndup_r.c \
 	strnlen.c \
 	strpbrk.c \
 	strrchr.c \
@@ -51,15 +46,30 @@ LIB_SOURCES = \
 	swab.c \
 	u_strerr.c
 
+if ELIX_LEVEL_1
+LIB_OBJS =
+else
+LIB_OBJS = \
+	bcmp.$(oext) \
+	memccpy.$(oext) \
+	mempcpy.$(oext) \
+	strndup.$(oext) \
+	strndup_r.$(oext)
+endif
+
 libstring_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstring.la
-libstring_la_SOURCES = $(LIB_SOURCES)
+libstring_la_SOURCES = $(GENERAL_SOURCES)
+libstring_la_LIBADD = $(LIB_OBJS)
+libstring_la_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
+lib_a_SOURCES = $(GENERAL_SOURCES)
+lib_a_LIBADD = $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

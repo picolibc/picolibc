@@ -1,11 +1,11 @@
-#ifdef __LARGE64_FILES
-
 /* Reentrant versions of open system call. */
 
 #include <reent.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <_syslist.h>
+
+#ifdef __LARGE64_FILES
 
 /* Some targets provides their own versions of this functions.  Those
    targets should define REENTRANT_SYSCALLS_PROVIDED in TARGET_CFLAGS.  */

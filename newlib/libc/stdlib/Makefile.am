@@ -4,12 +4,11 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
+GENERAL_SOURCES = \
 	__adjust.c 	\
 	__exp10.c 	\
 	__ten_mu.c 	\
 	_Exit.c		\
-	a64l.c		\
 	abort.c  	\
 	abs.c 		\
 	assert.c  	\
@@ -20,28 +19,17 @@ LIB_SOURCES = \
 	atol.c		\
 	calloc.c	\
 	div.c  		\
-	drand48.c	\
 	dtoa.c 		\
 	dtoastub.c 	\
-	ecvtbuf.c 	\
-	efgcvt.c 	\
 	environ.c	\
 	envlock.c	\
 	eprintf.c	\
-	erand48.c	\
 	exit.c 		\
 	getenv.c  	\
 	getenv_r.c	\
-	getopt.c	\
-	getsubopt.c	\
-	jrand48.c	\
-	l64a.c		\
 	labs.c 		\
-	lcong48.c	\
 	ldiv.c  	\
 	ldtoa.c		\
-	lrand48.c	\
-	malign.c	\
 	malloc.c  	\
 	mblen.c		\
 	mblen_r.c	\
@@ -51,60 +39,100 @@ LIB_SOURCES = \
 	mbtowc_r.c	\
 	mlock.c		\
 	mprec.c		\
-	mrand48.c	\
-	msize.c		\
 	mstats.c	\
-	mtrim.c		\
-	nrand48.c	\
-	on_exit.c	\
-	putenv.c	\
-	putenv_r.c	\
 	rand.c		\
-	rand48.c	\
 	rand_r.c	\
 	realloc.c	\
-	seed48.c	\
-	setenv.c	\
-	setenv_r.c	\
-	srand48.c	\
 	strtod.c	\
 	strtol.c	\
-	strtoll.c	\
-	strtoll_r.c	\
 	strtoul.c	\
-	strtoull.c	\
-	strtoull_r.c	\
-	system.c	\
-	valloc.c	\
 	wcstombs.c	\
 	wcstombs_r.c	\
 	wctomb.c	\
-	wctomb_r.c	\
-	btowc.c		\
-	mbrlen.c	\
-	mbrtowc.c	\
-	mbsinit.c	\
-	mbsrtowcs.c	\
-	wcrtomb.c	\
-	wcsrtombs.c	\
-	wctob.c
+	wctomb_r.c
+
+EXTENDED_SOURCES = \
+	drand48.c	\
+	ecvtbuf.c 	\
+	efgcvt.c 	\
+	erand48.c	\
+	jrand48.c	\
+	lcong48.c	\
+	lrand48.c	\
+	mrand48.c	\
+	msize.c		\
+	mtrim.c		\
+	nrand48.c	\
+	rand48.c	\
+	seed48.c	\
+	srand48.c	\
+	strtoll.c	\
+	strtoll_r.c	\
+	strtoull.c	\
+	strtoull_r.c
+
+ELIX_2_OBJS = \
+	a64l.$(oext)		\
+	btowc.$(oext)		\
+	getopt.$(oext)		\
+	getsubopt.$(oext)	\
+	l64a.$(oext)		\
+	malign.$(oext)		\
+	malignr.$(oext)		\
+	malloptr.$(oext)	\
+	mbrlen.$(oext)		\
+	mbrtowc.$(oext)		\
+	mbsinit.$(oext)		\
+	mbsrtowcs.$(oext)	\
+	on_exit.$(oext)		\
+	pvallocr.$(oext)	\
+	valloc.$(oext)		\
+	vallocr.$(oext)		\
+	wcrtomb.$(oext)		\
+	wcsrtombs.$(oext)	\
+	wctob.$(oext)
+
+ELIX_3_OBJS = \
+	putenv.$(oext)		\
+	putenv_r.$(oext)	\
+	setenv.$(oext)		\
+	setenv_r.$(oext)
+
+ELIX_4_OBJS = \
+	system.$(oext)
+
+if ELIX_LEVEL_1
+LIB_OBJS =
+else
+if ELIX_LEVEL_2
+LIB_OBJS = $(ELIX_2_OBJS)
+else
+if ELIX_LEVEL_3
+LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
+else
+LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
+endif
+endif
+endif
 
 # Because of how libtool moves objects around, mallocr must be built last.
-LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) malignr.$(oext) \
-	vallocr.$(oext) pvallocr.$(oext) mallinfor.$(oext) mallstatsr.$(oext) msizer.$(oext) malloptr.$(oext) mallocr.$(oext)
+LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) \
+	mallinfor.$(oext) msizer.$(oext) mallocr.$(oext)
 
 libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstdlib.la
-libstdlib_la_SOURCES = $(LIB_SOURCES)
-libstdlib_la_LIBADD = $(LIBADD_OBJS)
+libstdlib_la_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES)
+libstdlib_la_LIBADD = $(LIB_OBJS) $(LIBADD_OBJS)
+libstdlib_la_DEPENDENCIES = $(LIB_OBJS) $(LIBADD_OBJS)
 LIB_COMPILE = $(LTCOMPILE)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
-lib_a_LIBADD = $(LIBADD_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES)
+lib_a_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
 LIB_COMPILE = $(COMPILE)
 noinst_DATA =
 endif # USE_LIBTOOL

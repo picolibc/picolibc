@@ -4,26 +4,38 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
-	fgetpos64.c			\
-	fopen64.c 			\
-	freopen64.c 			\
-	fseeko64.c 			\
-	fsetpos64.c 			\
-	ftello64.c			\
-	stdio64.c			\
-	tmpfile64.c
+# need a dummy object so objectlist.awk.in will build every time
+GENERAL_SOURCES = dummy.c local64.h
+
+## All interfaces are EL/IX level 2
+if ELIX_LEVEL_1
+LIB_OBJS =
+else
+LIB_OBJS = \
+	fgetpos64.$(oext)	\
+	fopen64.$(oext) 	\
+	freopen64.$(oext) 	\
+	fseeko64.$(oext) 	\
+	fsetpos64.$(oext) 	\
+	ftello64.$(oext)	\
+	stdio64.$(oext)		\
+	tmpfile64.$(oext)
+endif
 
 libstdio64_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstdio64.la
-libstdio64_la_SOURCES = $(LIB_SOURCES)
+libstdio64_la_SOURCES = $(GENERAL_SOURCES)
+libstdio64_la_LIBADD = $(LIB_OBJS)
+libstdio64_la_DEPENDENCIES = $(LIB_OBJS)
 LIB_COMPILE = $(LTCOMPILE)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
+lib_a_SOURCES = $(GENERAL_SOURCES)
+lib_a_LIBADD = $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(LIB_OBJS)
 LIB_COMPILE = $(COMPILE)
 noinst_DATA =
 endif # USE_LIBTOOL

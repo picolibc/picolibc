@@ -1,5 +1,3 @@
-#ifdef __LARGE64_FILES
-
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -72,6 +70,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #ifdef __CYGWIN__
 #include <fcntl.h>
 #endif
+
+#ifdef __LARGE64_FILES
 
 FILE *
 _DEFUN (_fopen64_r, (ptr, file, mode),

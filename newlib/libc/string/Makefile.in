@@ -110,23 +110,20 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
-	bcmp.c \
+GENERAL_SOURCES = \
 	bcopy.c \
 	bzero.c \
 	index.c \
-	memccpy.c \
 	memchr.c \
 	memcmp.c \
 	memcpy.c \
 	memmove.c \
-	mempcpy.c \
 	memset.c \
 	rindex.c \
+	strcasecmp.c \
 	strcat.c \
 	strchr.c \
 	strcmp.c \
-	strcasecmp.c \
 	strcoll.c \
 	strcpy.c \
 	strcspn.c \
@@ -138,12 +135,10 @@ LIB_SOURCES = \
 	strlcpy.c \
 	strlen.c  \
 	strlwr.c \
+	strncasecmp.c \
 	strncat.c \
 	strncmp.c \
-	strncasecmp.c \
 	strncpy.c \
-	strndup.c \
-	strndup_r.c \
 	strnlen.c \
 	strpbrk.c \
 	strrchr.c \
@@ -157,15 +152,26 @@ LIB_SOURCES = \
 	swab.c \
 	u_strerr.c
 
+@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
+@ELIX_LEVEL_1_FALSE@	bcmp.$(oext) \
+@ELIX_LEVEL_1_FALSE@	memccpy.$(oext) \
+@ELIX_LEVEL_1_FALSE@	mempcpy.$(oext) \
+@ELIX_LEVEL_1_FALSE@	strndup.$(oext) \
+@ELIX_LEVEL_1_FALSE@	strndup_r.$(oext)
 
 libstring_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstring.la
-@USE_LIBTOOL_TRUE@libstring_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@libstring_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libstring_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libstring_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
 
 CHEWOUT_FILES = \
 bcmp.def	memcpy.def	strcmp.def	strncat.def strstr.def \
@@ -193,39 +199,33 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  bcmp.$(OBJEXT) bcopy.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@bzero.$(OBJEXT) index.$(OBJEXT) memccpy.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@memchr.$(OBJEXT) memcmp.$(OBJEXT) memcpy.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@memmove.$(OBJEXT) mempcpy.$(OBJEXT) memset.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@rindex.$(OBJEXT) strcat.$(OBJEXT) strchr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strcmp.$(OBJEXT) strcasecmp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  bcopy.$(OBJEXT) bzero.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@index.$(OBJEXT) memchr.$(OBJEXT) memcmp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@memcpy.$(OBJEXT) memmove.$(OBJEXT) memset.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@rindex.$(OBJEXT) strcasecmp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strcat.$(OBJEXT) strchr.$(OBJEXT) strcmp.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strcoll.$(OBJEXT) strcpy.$(OBJEXT) strcspn.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strdup.$(OBJEXT) strdup_r.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strerror.$(OBJEXT) strerror_r.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strlcat.$(OBJEXT) strlcpy.$(OBJEXT) strlen.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strlwr.$(OBJEXT) strncat.$(OBJEXT) strncmp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strncasecmp.$(OBJEXT) strncpy.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strndup.$(OBJEXT) strndup_r.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strnlen.$(OBJEXT) strpbrk.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strrchr.$(OBJEXT) strsep.$(OBJEXT) strspn.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strtok.$(OBJEXT) strtok_r.$(OBJEXT) strupr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strxfrm.$(OBJEXT) strstr.$(OBJEXT) swab.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@u_strerr.$(OBJEXT)
+@USE_LIBTOOL_FALSE@strlwr.$(OBJEXT) strncasecmp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strncat.$(OBJEXT) strncmp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strncpy.$(OBJEXT) strnlen.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strpbrk.$(OBJEXT) strrchr.$(OBJEXT) strsep.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strspn.$(OBJEXT) strtok.$(OBJEXT) strtok_r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strupr.$(OBJEXT) strxfrm.$(OBJEXT) strstr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@swab.$(OBJEXT) u_strerr.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-libstring_la_LIBADD = 
-@USE_LIBTOOL_TRUE@libstring_la_OBJECTS =  bcmp.lo bcopy.lo bzero.lo \
-@USE_LIBTOOL_TRUE@index.lo memccpy.lo memchr.lo memcmp.lo memcpy.lo \
-@USE_LIBTOOL_TRUE@memmove.lo mempcpy.lo memset.lo rindex.lo strcat.lo \
-@USE_LIBTOOL_TRUE@strchr.lo strcmp.lo strcasecmp.lo strcoll.lo \
-@USE_LIBTOOL_TRUE@strcpy.lo strcspn.lo strdup.lo strdup_r.lo \
+@USE_LIBTOOL_TRUE@libstring_la_OBJECTS =  bcopy.lo bzero.lo index.lo \
+@USE_LIBTOOL_TRUE@memchr.lo memcmp.lo memcpy.lo memmove.lo memset.lo \
+@USE_LIBTOOL_TRUE@rindex.lo strcasecmp.lo strcat.lo strchr.lo strcmp.lo \
+@USE_LIBTOOL_TRUE@strcoll.lo strcpy.lo strcspn.lo strdup.lo strdup_r.lo \
 @USE_LIBTOOL_TRUE@strerror.lo strerror_r.lo strlcat.lo strlcpy.lo \
-@USE_LIBTOOL_TRUE@strlen.lo strlwr.lo strncat.lo strncmp.lo \
-@USE_LIBTOOL_TRUE@strncasecmp.lo strncpy.lo strndup.lo strndup_r.lo \
-@USE_LIBTOOL_TRUE@strnlen.lo strpbrk.lo strrchr.lo strsep.lo strspn.lo \
-@USE_LIBTOOL_TRUE@strtok.lo strtok_r.lo strupr.lo strxfrm.lo strstr.lo \
-@USE_LIBTOOL_TRUE@swab.lo u_strerr.lo
+@USE_LIBTOOL_TRUE@strlen.lo strlwr.lo strncasecmp.lo strncat.lo \
+@USE_LIBTOOL_TRUE@strncmp.lo strncpy.lo strnlen.lo strpbrk.lo \
+@USE_LIBTOOL_TRUE@strrchr.lo strsep.lo strspn.lo strtok.lo strtok_r.lo \
+@USE_LIBTOOL_TRUE@strupr.lo strxfrm.lo strstr.lo swab.lo u_strerr.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -110,27 +110,33 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
-	fgetpos64.c			\
-	fopen64.c 			\
-	freopen64.c 			\
-	fseeko64.c 			\
-	fsetpos64.c 			\
-	ftello64.c			\
-	stdio64.c			\
-	tmpfile64.c
-
+# need a dummy object so objectlist.awk.in will build every time
+GENERAL_SOURCES = dummy.c local64.h
+@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
+@ELIX_LEVEL_1_FALSE@	fgetpos64.$(oext)	\
+@ELIX_LEVEL_1_FALSE@	fopen64.$(oext) 	\
+@ELIX_LEVEL_1_FALSE@	freopen64.$(oext) 	\
+@ELIX_LEVEL_1_FALSE@	fseeko64.$(oext) 	\
+@ELIX_LEVEL_1_FALSE@	fsetpos64.$(oext) 	\
+@ELIX_LEVEL_1_FALSE@	ftello64.$(oext)	\
+@ELIX_LEVEL_1_FALSE@	stdio64.$(oext)		\
+@ELIX_LEVEL_1_FALSE@	tmpfile64.$(oext)
 
 libstdio64_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstdio64.la
-@USE_LIBTOOL_TRUE@libstdio64_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@libstdio64_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libstdio64_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libstdio64_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
 @USE_LIBTOOL_TRUE@LIB_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
 @USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(COMPILE)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
 
 AM_CFLAGS = -I $(srcdir)/../stdio
 
@@ -159,18 +165,10 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  fgetpos64.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@fopen64.$(OBJEXT) freopen64.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@fseeko64.$(OBJEXT) fsetpos64.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@ftello64.$(OBJEXT) stdio64.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@tmpfile64.$(OBJEXT)
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  dummy.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-libstdio64_la_LIBADD = 
-@USE_LIBTOOL_TRUE@libstdio64_la_OBJECTS =  fgetpos64.lo fopen64.lo \
-@USE_LIBTOOL_TRUE@freopen64.lo fseeko64.lo fsetpos64.lo ftello64.lo \
-@USE_LIBTOOL_TRUE@stdio64.lo tmpfile64.lo
+@USE_LIBTOOL_TRUE@libstdio64_la_OBJECTS =  dummy.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

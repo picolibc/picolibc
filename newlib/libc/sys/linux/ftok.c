@@ -23,15 +23,21 @@
 #include <sys/ipc.h>
 #include <sys/stat.h>
 
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
+#define STAT stat64
+#else
+#define STAT stat
+#endif
+
 key_t
 ftok (pathname, proj_id)
      const char *pathname;
      int proj_id;
 {
-  struct stat64 st;
+  struct STAT st;
   key_t key;
 
-  if (stat64 (pathname, &st) < 0)
+  if (STAT (pathname, &st) < 0)
     return (key_t) -1;
 
   key = ((st.st_ino & 0xffff) | ((st.st_dev & 0xff) << 16)

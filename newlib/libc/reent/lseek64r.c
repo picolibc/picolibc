@@ -1,5 +1,3 @@
-#ifdef __LARGE64_FILES
-
 /* Reentrant versions of lseek system call. */
 
 #include <reent.h>
@@ -8,6 +6,8 @@
 
 /* Some targets provides their own versions of this functions.  Those
    targets should define REENTRANT_SYSCALLS_PROVIDED in TARGET_CFLAGS.  */
+
+#ifdef __LARGE64_FILES
 
 #ifdef _REENT_ONLY
 #ifndef REENTRANT_SYSCALLS_PROVIDED

@@ -117,6 +117,11 @@ if test -n "${unix_dir}"; then
 fi
 AC_SUBST(UNIX_OBJECTLIST)
 
+if test -n "${stdio64_dir}"; then
+  STDIO64_OBJECTLIST=libc/${stdio64_dir}/objectlist.awk.in
+fi
+AC_SUBST(STDIO64_OBJECTLIST)
+
 # Put a plausible default for CC_FOR_BUILD in Makefile.
 if test -z "$CC_FOR_BUILD"; then
   CC_FOR_BUILD=gcc

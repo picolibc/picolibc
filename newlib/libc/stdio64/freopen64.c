@@ -1,5 +1,3 @@
-#ifdef __LARGE64_FILES
-
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -67,6 +65,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 /*
  * Re-direct an existing, open (probably) file to some other file.
  */
+
+#ifdef __LARGE64_FILES
 
 FILE *
 _DEFUN (freopen64, (file, mode, fp),
@@ -160,7 +160,7 @@ _DEFUN (freopen64, (file, mode, fp),
     fp->_flags |= __SCLE;
 #endif
 
-  fp->flags |= __SL64;
+  fp->_flags |= __SL64;
 
   _funlockfile(fp);
   return fp;

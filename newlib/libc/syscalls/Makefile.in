@@ -110,11 +110,9 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
+GENERAL_SOURCES = \
 	sysclose.c	\
-	sysexecve.c	\
 	sysfcntl.c	\
-	sysfork.c	\
 	sysfstat.c	\
 	sysgetpid.c	\
 	sysgettod.c	\
@@ -127,18 +125,27 @@ LIB_SOURCES = \
 	sysstat.c	\
 	systimes.c	\
 	sysunlink.c	\
-	syswait.c	\
 	syswrite.c
 
+@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	sysexecve.$(oext)	\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	sysfork.$(oext)		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	syswait.$(oext)
 
 libsyscalls_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libsyscalls.la
-@USE_LIBTOOL_TRUE@libsyscalls_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@libsyscalls_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libsyscalls_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libsyscalls_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
 
 CHEWOUT_FILES = 
 
@@ -157,25 +164,21 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_LIBADD = 
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  sysclose.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sysexecve.$(OBJEXT) sysfcntl.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sysfork.$(OBJEXT) sysfstat.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sysfcntl.$(OBJEXT) sysfstat.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sysgetpid.$(OBJEXT) sysgettod.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@syskill.$(OBJEXT) syslink.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@syslseek.$(OBJEXT) sysopen.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sysread.$(OBJEXT) syssbrk.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sysstat.$(OBJEXT) systimes.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sysunlink.$(OBJEXT) syswait.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@syswrite.$(OBJEXT)
+@USE_LIBTOOL_FALSE@sysunlink.$(OBJEXT) syswrite.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-libsyscalls_la_LIBADD = 
-@USE_LIBTOOL_TRUE@libsyscalls_la_OBJECTS =  sysclose.lo sysexecve.lo \
-@USE_LIBTOOL_TRUE@sysfcntl.lo sysfork.lo sysfstat.lo sysgetpid.lo \
-@USE_LIBTOOL_TRUE@sysgettod.lo syskill.lo syslink.lo syslseek.lo \
-@USE_LIBTOOL_TRUE@sysopen.lo sysread.lo syssbrk.lo sysstat.lo \
-@USE_LIBTOOL_TRUE@systimes.lo sysunlink.lo syswait.lo syswrite.lo
+@USE_LIBTOOL_TRUE@libsyscalls_la_OBJECTS =  sysclose.lo sysfcntl.lo \
+@USE_LIBTOOL_TRUE@sysfstat.lo sysgetpid.lo sysgettod.lo syskill.lo \
+@USE_LIBTOOL_TRUE@syslink.lo syslseek.lo sysopen.lo sysread.lo \
+@USE_LIBTOOL_TRUE@syssbrk.lo sysstat.lo systimes.lo sysunlink.lo \
+@USE_LIBTOOL_TRUE@syswrite.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

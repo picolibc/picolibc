@@ -4,11 +4,9 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
-	asprintf.c			\
+GENERAL_SOURCES = \
 	clearerr.c 			\
 	fclose.c 			\
-	fcloseall.c			\
 	fdopen.c 			\
 	feof.c 				\
 	ferror.c 			\
@@ -28,10 +26,8 @@ LIB_SOURCES = \
 	freopen.c 			\
 	fscanf.c 			\
 	fseek.c 			\
-	fseeko.c 			\
 	fsetpos.c 			\
 	ftell.c 			\
-	ftello.c 			\
 	fvwrite.c 			\
 	fwalk.c 			\
 	fwrite.c 			\
@@ -42,10 +38,8 @@ LIB_SOURCES = \
 	getdelim.c			\
 	getline.c			\
 	gets.c 				\
-	getw.c				\
 	iprintf.c 			\
 	makebuf.c			\
-	mktemp.c 			\
 	perror.c 			\
 	printf.c 			\
 	putc.c 				\
@@ -53,7 +47,6 @@ LIB_SOURCES = \
 	putc_u.c			\
 	putchar_u.c			\
 	puts.c 				\
-	putw.c				\
 	refill.c 			\
 	remove.c 			\
 	rename.c 			\
@@ -72,7 +65,6 @@ LIB_SOURCES = \
 	tmpfile.c 			\
 	tmpnam.c 			\
 	ungetc.c 			\
-	vasprintf.c			\
 	vfscanf.c 			\
 	vprintf.c 			\
 	vscanf.c			\
@@ -82,20 +74,36 @@ LIB_SOURCES = \
 	wbuf.c 				\
 	wsetup.c 
 
+## The following are EL/IX level 2 interfaces
+if ELIX_LEVEL_1
+LIB_OBJS =
+else
+LIB_OBJS = \
+	asprintf.$(oext)		\
+	fcloseall.$(oext)		\
+	fseeko.$(oext) 			\
+	ftello.$(oext) 			\
+	getw.$(oext)			\
+	mktemp.$(oext) 			\
+	putw.$(oext)
+endif
+
 LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext)
 
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstdio.la
-libstdio_la_SOURCES = $(LIB_SOURCES)
-libstdio_la_LIBADD = $(LIBADD_OBJS)
+libstdio_la_SOURCES = $(GENERAL_SOURCES)
+libstdio_la_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
+libstdio_la_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
 LIB_COMPILE = $(LTCOMPILE)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
-lib_a_LIBADD = $(LIBADD_OBJS)
+lib_a_SOURCES = $(GENERAL_SOURCES)
+lib_a_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
 LIB_COMPILE = $(COMPILE)
 noinst_DATA =
 endif # USE_LIBTOOL

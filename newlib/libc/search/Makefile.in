@@ -110,36 +110,42 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
+GENERAL_SOURCES = \
 	bsearch.c \
 	db_local.h \
 	extern.h \
-	hash.c \
 	hash.h \
-	hash_bigkey.c \
-	hash_buf.c \
-	hash_func.c \
-	hash_log2.c \
-	hash_page.c \
-	hcreate.c \
-	hcreate_r.c \
 	page.h \
-	qsort.c \
-	tdelete.c \
-	tdestroy.c \
-	tfind.c \
-	tsearch.c \
-	twalk.c
+	qsort.c
 
+@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
+@ELIX_LEVEL_1_FALSE@	hash.$(oext) \
+@ELIX_LEVEL_1_FALSE@	hash_bigkey.$(oext) \
+@ELIX_LEVEL_1_FALSE@	hash_buf.$(oext) \
+@ELIX_LEVEL_1_FALSE@	hash_func.$(oext) \
+@ELIX_LEVEL_1_FALSE@	hash_log2.$(oext) \
+@ELIX_LEVEL_1_FALSE@	hash_page.$(oext) \
+@ELIX_LEVEL_1_FALSE@	hcreate.$(oext) \
+@ELIX_LEVEL_1_FALSE@	hcreate_r.$(oext) \
+@ELIX_LEVEL_1_FALSE@	tdelete.$(oext) \
+@ELIX_LEVEL_1_FALSE@	tdestroy.$(oext) \
+@ELIX_LEVEL_1_FALSE@	tfind.$(oext) \
+@ELIX_LEVEL_1_FALSE@	tsearch.$(oext) \
+@ELIX_LEVEL_1_FALSE@	twalk.$(oext)
 
 libsearch_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libsearch.la
-@USE_LIBTOOL_TRUE@libsearch_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@libsearch_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libsearch_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libsearch_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
 
 SUFFIXES = .def
 
@@ -158,21 +164,10 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  bsearch.$(OBJEXT) hash.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@hash_bigkey.$(OBJEXT) hash_buf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@hash_func.$(OBJEXT) hash_log2.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@hash_page.$(OBJEXT) hcreate.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@hcreate_r.$(OBJEXT) qsort.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@tdelete.$(OBJEXT) tdestroy.$(OBJEXT) tfind.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@tsearch.$(OBJEXT) twalk.$(OBJEXT)
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  bsearch.$(OBJEXT) qsort.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-libsearch_la_LIBADD = 
-@USE_LIBTOOL_TRUE@libsearch_la_OBJECTS =  bsearch.lo hash.lo \
-@USE_LIBTOOL_TRUE@hash_bigkey.lo hash_buf.lo hash_func.lo hash_log2.lo \
-@USE_LIBTOOL_TRUE@hash_page.lo hcreate.lo hcreate_r.lo qsort.lo \
-@USE_LIBTOOL_TRUE@tdelete.lo tdestroy.lo tfind.lo tsearch.lo twalk.lo
+@USE_LIBTOOL_TRUE@libsearch_la_OBJECTS =  bsearch.lo qsort.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

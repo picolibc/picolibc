@@ -110,12 +110,11 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
+GENERAL_SOURCES = \
 	__adjust.c 	\
 	__exp10.c 	\
 	__ten_mu.c 	\
 	_Exit.c		\
-	a64l.c		\
 	abort.c  	\
 	abs.c 		\
 	assert.c  	\
@@ -126,28 +125,17 @@ LIB_SOURCES = \
 	atol.c		\
 	calloc.c	\
 	div.c  		\
-	drand48.c	\
 	dtoa.c 		\
 	dtoastub.c 	\
-	ecvtbuf.c 	\
-	efgcvt.c 	\
 	environ.c	\
 	envlock.c	\
 	eprintf.c	\
-	erand48.c	\
 	exit.c 		\
 	getenv.c  	\
 	getenv_r.c	\
-	getopt.c	\
-	getsubopt.c	\
-	jrand48.c	\
-	l64a.c		\
 	labs.c 		\
-	lcong48.c	\
 	ldiv.c  	\
 	ldtoa.c		\
-	lrand48.c	\
-	malign.c	\
 	malloc.c  	\
 	mblen.c		\
 	mblen_r.c	\
@@ -157,62 +145,96 @@ LIB_SOURCES = \
 	mbtowc_r.c	\
 	mlock.c		\
 	mprec.c		\
-	mrand48.c	\
-	msize.c		\
 	mstats.c	\
-	mtrim.c		\
-	nrand48.c	\
-	on_exit.c	\
-	putenv.c	\
-	putenv_r.c	\
 	rand.c		\
-	rand48.c	\
 	rand_r.c	\
 	realloc.c	\
-	seed48.c	\
-	setenv.c	\
-	setenv_r.c	\
-	srand48.c	\
 	strtod.c	\
 	strtol.c	\
-	strtoll.c	\
-	strtoll_r.c	\
 	strtoul.c	\
-	strtoull.c	\
-	strtoull_r.c	\
-	system.c	\
-	valloc.c	\
 	wcstombs.c	\
 	wcstombs_r.c	\
 	wctomb.c	\
-	wctomb_r.c	\
-	btowc.c		\
-	mbrlen.c	\
-	mbrtowc.c	\
-	mbsinit.c	\
-	mbsrtowcs.c	\
-	wcrtomb.c	\
-	wcsrtombs.c	\
-	wctob.c
+	wctomb_r.c
 
+
+EXTENDED_SOURCES = \
+	drand48.c	\
+	ecvtbuf.c 	\
+	efgcvt.c 	\
+	erand48.c	\
+	jrand48.c	\
+	lcong48.c	\
+	lrand48.c	\
+	mrand48.c	\
+	msize.c		\
+	mtrim.c		\
+	nrand48.c	\
+	rand48.c	\
+	seed48.c	\
+	srand48.c	\
+	strtoll.c	\
+	strtoll_r.c	\
+	strtoull.c	\
+	strtoull_r.c
+
+
+ELIX_2_OBJS = \
+	a64l.$(oext)		\
+	btowc.$(oext)		\
+	getopt.$(oext)		\
+	getsubopt.$(oext)	\
+	l64a.$(oext)		\
+	malign.$(oext)		\
+	malignr.$(oext)		\
+	malloptr.$(oext)	\
+	mbrlen.$(oext)		\
+	mbrtowc.$(oext)		\
+	mbsinit.$(oext)		\
+	mbsrtowcs.$(oext)	\
+	on_exit.$(oext)		\
+	pvallocr.$(oext)	\
+	valloc.$(oext)		\
+	vallocr.$(oext)		\
+	wcrtomb.$(oext)		\
+	wcsrtombs.$(oext)	\
+	wctob.$(oext)
+
+
+ELIX_3_OBJS = \
+	putenv.$(oext)		\
+	putenv_r.$(oext)	\
+	setenv.$(oext)		\
+	setenv_r.$(oext)
+
+
+ELIX_4_OBJS = \
+	system.$(oext)
+
+@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@$(ELIX_2_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@$(ELIX_2_OBJS) $(ELIX_3_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@$(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
 
 # Because of how libtool moves objects around, mallocr must be built last.
-LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) malignr.$(oext) \
-	vallocr.$(oext) pvallocr.$(oext) mallinfor.$(oext) mallstatsr.$(oext) msizer.$(oext) malloptr.$(oext) mallocr.$(oext)
+LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) \
+	mallinfor.$(oext) msizer.$(oext) mallocr.$(oext)
 
 
 libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstdlib.la
-@USE_LIBTOOL_TRUE@libstdlib_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@libstdlib_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIBADD_OBJS)
+@USE_LIBTOOL_TRUE@libstdlib_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES) $(EXTENDED_SOURCES)
+@USE_LIBTOOL_TRUE@libstdlib_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS) $(LIBADD_OBJS)
+@USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS) $(LIBADD_OBJS)
 @USE_LIBTOOL_TRUE@LIB_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
 @USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(COMPILE)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES) $(EXTENDED_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS) $(LIB_OBJS)
 
 MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
 
@@ -269,68 +291,46 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES =  freer.$(oext) reallocr.$(oext) \
-@USE_LIBTOOL_FALSE@callocr.$(oext) cfreer.$(oext) malignr.$(oext) \
-@USE_LIBTOOL_FALSE@vallocr.$(oext) pvallocr.$(oext) mallinfor.$(oext) \
-@USE_LIBTOOL_FALSE@mallstatsr.$(oext) msizer.$(oext) malloptr.$(oext) \
-@USE_LIBTOOL_FALSE@mallocr.$(oext)
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  __adjust.$(OBJEXT) __exp10.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@__ten_mu.$(OBJEXT) _Exit.$(OBJEXT) a64l.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@abort.$(OBJEXT) abs.$(OBJEXT) assert.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@atexit.$(OBJEXT) atof.$(OBJEXT) atoff.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@atoi.$(OBJEXT) atol.$(OBJEXT) calloc.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@div.$(OBJEXT) drand48.$(OBJEXT) dtoa.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@dtoastub.$(OBJEXT) ecvtbuf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@efgcvt.$(OBJEXT) environ.$(OBJEXT) envlock.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@eprintf.$(OBJEXT) erand48.$(OBJEXT) exit.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@getenv.$(OBJEXT) getenv_r.$(OBJEXT) getopt.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@getsubopt.$(OBJEXT) jrand48.$(OBJEXT) l64a.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@labs.$(OBJEXT) lcong48.$(OBJEXT) ldiv.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@ldtoa.$(OBJEXT) lrand48.$(OBJEXT) malign.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@malloc.$(OBJEXT) mblen.$(OBJEXT) mblen_r.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mbstowcs.$(OBJEXT) mbstowcs_r.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mbtowc.$(OBJEXT) mbtowc_r.$(OBJEXT) mlock.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mprec.$(OBJEXT) mrand48.$(OBJEXT) msize.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mstats.$(OBJEXT) mtrim.$(OBJEXT) nrand48.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@on_exit.$(OBJEXT) putenv.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@putenv_r.$(OBJEXT) rand.$(OBJEXT) rand48.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@rand_r.$(OBJEXT) realloc.$(OBJEXT) seed48.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@setenv.$(OBJEXT) setenv_r.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@srand48.$(OBJEXT) strtod.$(OBJEXT) strtol.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strtoll.$(OBJEXT) strtoll_r.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strtoul.$(OBJEXT) strtoull.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strtoull_r.$(OBJEXT) system.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@valloc.$(OBJEXT) wcstombs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@__ten_mu.$(OBJEXT) _Exit.$(OBJEXT) abort.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@abs.$(OBJEXT) assert.$(OBJEXT) atexit.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@atof.$(OBJEXT) atoff.$(OBJEXT) atoi.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@atol.$(OBJEXT) calloc.$(OBJEXT) div.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@dtoa.$(OBJEXT) dtoastub.$(OBJEXT) environ.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@envlock.$(OBJEXT) eprintf.$(OBJEXT) exit.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getenv.$(OBJEXT) getenv_r.$(OBJEXT) labs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ldiv.$(OBJEXT) ldtoa.$(OBJEXT) malloc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mblen.$(OBJEXT) mblen_r.$(OBJEXT) mbstowcs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mbstowcs_r.$(OBJEXT) mbtowc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mbtowc_r.$(OBJEXT) mlock.$(OBJEXT) mprec.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mstats.$(OBJEXT) rand.$(OBJEXT) rand_r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@realloc.$(OBJEXT) strtod.$(OBJEXT) strtol.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strtoul.$(OBJEXT) wcstombs.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@wcstombs_r.$(OBJEXT) wctomb.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wctomb_r.$(OBJEXT) btowc.$(OBJEXT) mbrlen.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mbrtowc.$(OBJEXT) mbsinit.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mbsrtowcs.$(OBJEXT) wcrtomb.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcsrtombs.$(OBJEXT) wctob.$(OBJEXT)
+@USE_LIBTOOL_FALSE@wctomb_r.$(OBJEXT) drand48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ecvtbuf.$(OBJEXT) efgcvt.$(OBJEXT) erand48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@jrand48.$(OBJEXT) lcong48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@lrand48.$(OBJEXT) mrand48.$(OBJEXT) msize.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mtrim.$(OBJEXT) nrand48.$(OBJEXT) rand48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@seed48.$(OBJEXT) srand48.$(OBJEXT) strtoll.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strtoll_r.$(OBJEXT) strtoull.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strtoull_r.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-@USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES =  freer.$(oext) \
-@USE_LIBTOOL_TRUE@reallocr.$(oext) callocr.$(oext) cfreer.$(oext) \
-@USE_LIBTOOL_TRUE@malignr.$(oext) vallocr.$(oext) pvallocr.$(oext) \
-@USE_LIBTOOL_TRUE@mallinfor.$(oext) mallstatsr.$(oext) msizer.$(oext) \
-@USE_LIBTOOL_TRUE@malloptr.$(oext) mallocr.$(oext)
 @USE_LIBTOOL_TRUE@libstdlib_la_OBJECTS =  __adjust.lo __exp10.lo \
-@USE_LIBTOOL_TRUE@__ten_mu.lo _Exit.lo a64l.lo abort.lo abs.lo \
-@USE_LIBTOOL_TRUE@assert.lo atexit.lo atof.lo atoff.lo atoi.lo atol.lo \
-@USE_LIBTOOL_TRUE@calloc.lo div.lo drand48.lo dtoa.lo dtoastub.lo \
-@USE_LIBTOOL_TRUE@ecvtbuf.lo efgcvt.lo environ.lo envlock.lo eprintf.lo \
-@USE_LIBTOOL_TRUE@erand48.lo exit.lo getenv.lo getenv_r.lo getopt.lo \
-@USE_LIBTOOL_TRUE@getsubopt.lo jrand48.lo l64a.lo labs.lo lcong48.lo \
-@USE_LIBTOOL_TRUE@ldiv.lo ldtoa.lo lrand48.lo malign.lo malloc.lo \
-@USE_LIBTOOL_TRUE@mblen.lo mblen_r.lo mbstowcs.lo mbstowcs_r.lo \
-@USE_LIBTOOL_TRUE@mbtowc.lo mbtowc_r.lo mlock.lo mprec.lo mrand48.lo \
-@USE_LIBTOOL_TRUE@msize.lo mstats.lo mtrim.lo nrand48.lo on_exit.lo \
-@USE_LIBTOOL_TRUE@putenv.lo putenv_r.lo rand.lo rand48.lo rand_r.lo \
-@USE_LIBTOOL_TRUE@realloc.lo seed48.lo setenv.lo setenv_r.lo srand48.lo \
-@USE_LIBTOOL_TRUE@strtod.lo strtol.lo strtoll.lo strtoll_r.lo \
-@USE_LIBTOOL_TRUE@strtoul.lo strtoull.lo strtoull_r.lo system.lo \
-@USE_LIBTOOL_TRUE@valloc.lo wcstombs.lo wcstombs_r.lo wctomb.lo \
-@USE_LIBTOOL_TRUE@wctomb_r.lo btowc.lo mbrlen.lo mbrtowc.lo mbsinit.lo \
-@USE_LIBTOOL_TRUE@mbsrtowcs.lo wcrtomb.lo wcsrtombs.lo wctob.lo
+@USE_LIBTOOL_TRUE@__ten_mu.lo _Exit.lo abort.lo abs.lo assert.lo \
+@USE_LIBTOOL_TRUE@atexit.lo atof.lo atoff.lo atoi.lo atol.lo calloc.lo \
+@USE_LIBTOOL_TRUE@div.lo dtoa.lo dtoastub.lo environ.lo envlock.lo \
+@USE_LIBTOOL_TRUE@eprintf.lo exit.lo getenv.lo getenv_r.lo labs.lo \
+@USE_LIBTOOL_TRUE@ldiv.lo ldtoa.lo malloc.lo mblen.lo mblen_r.lo \
+@USE_LIBTOOL_TRUE@mbstowcs.lo mbstowcs_r.lo mbtowc.lo mbtowc_r.lo \
+@USE_LIBTOOL_TRUE@mlock.lo mprec.lo mstats.lo rand.lo rand_r.lo \
+@USE_LIBTOOL_TRUE@realloc.lo strtod.lo strtol.lo strtoul.lo wcstombs.lo \
+@USE_LIBTOOL_TRUE@wcstombs_r.lo wctomb.lo wctomb_r.lo drand48.lo \
+@USE_LIBTOOL_TRUE@ecvtbuf.lo efgcvt.lo erand48.lo jrand48.lo lcong48.lo \
+@USE_LIBTOOL_TRUE@lrand48.lo mrand48.lo msize.lo mtrim.lo nrand48.lo \
+@USE_LIBTOOL_TRUE@rand48.lo seed48.lo srand48.lo strtoll.lo \
+@USE_LIBTOOL_TRUE@strtoll_r.lo strtoull.lo strtoull_r.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

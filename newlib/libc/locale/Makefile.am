@@ -4,17 +4,35 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = timelocal.h timelocal.c ldpart.h ldpart.c fix_grouping.c locale.c nl_langinfo.c lnumeric.h lnumeric.c lmonetary.h lmonetary.c lmessages.h lmessages.c
+GENERAL_SOURCES = timelocal.h ldpart.h locale.c lnumeric.h lmonetary.h lmessages.h
+
+## The following interfaces are EL/IX level 2
+if ELIX_LEVEL_1
+LIB_OBJS =
+else
+LIB_OBJS = \
+	fix_grouping.$(oext) \
+	ldpart.$(oext) \
+	lmessages.$(oext) \
+	lnumeric.$(oext) \
+	lmonetary.$(oext) \
+	nl_langinfo.$(oext) \
+	timelocal.$(oext)
+endif
 
 liblocale_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = liblocale.la
-liblocale_la_SOURCES = $(LIB_SOURCES)
+liblocale_la_SOURCES = $(GENERAL_SOURCES)
+liblocale_la_LIBADD = $(LIB_OBJS)
+liblocale_la_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
+lib_a_SOURCES = $(GENERAL_SOURCES)
+lib_a_LIBADD = $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

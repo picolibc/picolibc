@@ -1,5 +1,3 @@
-#ifdef __LARGE64_FILES
-
 /*
 FUNCTION
 <<fsetpos64>>---restore position of a large stream or file
@@ -41,6 +39,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 */
 
 #include <stdio.h>
+
+#ifdef __LARGE64_FILES
 
 int
 _DEFUN (fsetpos64, (iop, pos),

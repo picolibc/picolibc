@@ -65,6 +65,18 @@ AC_ARG_ENABLE(newlib-multithread,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-multithread option) ;;
  esac], [newlib_multithread=yes])dnl
 
+dnl Support --enable-newlib-elix-level
+AC_ARG_ENABLE(newlib-elix-level,
+[  --enable-newlib-elix-level         supply desired elix library level (1-4)],
+[case "${enableval}" in
+  0)   newlib_elix_level=0 ;;
+  1)   newlib_elix_level=1 ;;
+  2)   newlib_elix_level=2 ;;
+  3)   newlib_elix_level=3 ;;
+  4)   newlib_elix_level=4 ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-elix-level option) ;;
+ esac], [newlib_elix_level=0])dnl
+
 dnl Support --disable-newlib-io-float
 AC_ARG_ENABLE(newlib-io-float,
 [  --disable-newlib-io-float disable printf/scanf family float support],
@@ -163,6 +175,12 @@ AC_SUBST(NEWLIB_CFLAGS)
 
 LDFLAGS=${ldflags}
 AC_SUBST(LDFLAGS)
+
+AM_CONDITIONAL(ELIX_LEVEL_0, test x[$]{newlib_elix_level} = x0)
+AM_CONDITIONAL(ELIX_LEVEL_1, test x[$]{newlib_elix_level} = x1)
+AM_CONDITIONAL(ELIX_LEVEL_2, test x[$]{newlib_elix_level} = x2)
+AM_CONDITIONAL(ELIX_LEVEL_3, test x[$]{newlib_elix_level} = x3)
+AM_CONDITIONAL(ELIX_LEVEL_4, test x[$]{newlib_elix_level} = x4)
 
 AM_CONDITIONAL(USE_LIBTOOL, test x[$]{use_libtool} = xyes)
 

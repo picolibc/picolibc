@@ -38,7 +38,7 @@ tcsetattr(int fd,int optional_actions,const struct termios *termios_p)
   return ioctl(fd,cmd,termios_p);
 }
 
-
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 4
 pid_t 
 tcgetpgrp(int fd)
 {
@@ -56,6 +56,7 @@ tcsetpgrp(int fd, pid_t pid)
   int p = (int)pid;
   return ioctl(fd,TIOCSPGRP,&p);
 }
+#endif /* !_ELIX_LEVEL || _ELIX_LEVEL >= 4 */
 
 int
 tcflow (int fd, int action)

@@ -1,3 +1,77 @@
+2002-08-26  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am(LIBC_OBJECTLISTS): Add STDIO64_OBJECTLIST.
+	* Makefile.in: Regenerated.
+	* acinclude.m4: Add support for --enable-newlib-elix-level option.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* configure.host: Add code to define _ELIX_LEVEL if
+	--enable-newlib-elix-level option is used.
+	* configure.in: 
+	* libc/aclocal.m4: Regenerated.
+	* libc/configure: Ditto.
+	* libc/argz/Makefile.am: Add EL/IX level checking.
+	* libc/argz/Makefile.in: Regenerated.
+	* libc/argz/dummy.c: New file.
+	* libc/ctype/Makefile.am: Add EL/IX level checking.
+	* libc/ctype/Makefile.in: Regenerated.
+	* libc/locale/Makefile.am: Add EL/IX level checking.
+	* libc/locale/Makefile.in: Regenerated.
+	* libc/posix/Makefile.am: Add EL/IX level checking.
+	* libc/posix/Makefile.in: Regenerated.
+	* libc/posix/telldir.c: Add EL/IX level checking.
+	* libc/reent/Makefile.am: Ditto.
+	* libc/reent/fstat64r.c: Ditto.
+	* libc/reent/lseek64r.c: Ditto.
+	* libc/reent/open64r.c: Ditto.
+	* libc/reent/Makefile.in: Regenerated.
+	* libc/search/Makefile.am: Add EL/IX level checking.
+	* libc/search/Makefile.in: Regenerated.
+	* libc/stdio/Makefile.am: Add EL/IX level checking.
+	* libc/stdio/Makefile.in: Regenerated.
+	* libc/stdio64/Makefile.am: Add EL/IX level checking.
+	* libc/stdio64/Makefile.in: Regenerated.
+	* libc/stdio64/dummy.c: New file.
+	* libc/stdio64/fgetpos64.c: Fix so _LARGEFILE_64 macro is checked
+	after first include.
+	* libc/stdio64/fopen64.c: Ditto.
+	* libc/stdio64/freopen64.c: Ditto.
+	* libc/stdio64/fseeko64.c: Ditto.
+	* libc/stdio64/fsetpos64.c: Ditto.
+	* libc/stdio64/ftello64.c: Ditto.
+	* libc/stdio64/tmpfile64.c: Ditto.
+	* libc/stdlib/Makefile.am: Add EL/IX level checking.
+	* libc/stdlib/Makefile.in: Regenerated.
+	* libc/stdlib/mstats.c: Add EL/IX level checking.
+	* libc/string/Makefile.am: Ditto.
+	* libc/string/Makefile.in: Regenerated.
+	* libc/sys/linux/Makefile.am: Add EL/IX level checking.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/aclocal.m4: Ditto.
+	* libc/sys/linux/configure: Ditto.
+	* libc/sys/linux/aio.c: Add EL/IX level checking.
+	* libc/sys/linux/ftok.c: Ditto.
+	* libc/sys/linux/getdate.c: Ditto.
+	* libc/sys/linux/ids.c: Ditto.
+	* libc/sys/linux/inode.c: Ditto.
+	* libc/sys/linux/io.c: Ditto.
+	* libc/sys/linux/process.c: Ditto.
+	* libc/sys/linux/resource.c: Ditto.
+	* libc/sys/linux/sched.c: Ditto.
+	* libc/sys/linux/sig.c: Ditto.
+	* libc/sys/linux/termios.c: Ditto.
+	* libc/sys/linux/wait.c: Ditto plus add __waitpid and
+	__libc___waitpid weak aliases.
+	* libc/sys/linux/machine/i386/syscall.h: Add new _base macros
+	that generate the code for a syscall, but do not create a
+	weak alias.
+	* libc/syscalls/Makefile.am: Add EL/IX level checking.
+	* libc/syscalls/Makefile.in: Regenerated.
+	* libc/time/tzset_r.c: Change to replace strdup with equivalent
+	functionality.
+	* libc/unix/Makefile.am: Add EL/IX level checking.
+	* libc/unix/Makefile.in: Regenerated.
+
 2002-08-26  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/malloc.h: On cygwin, define malloc _r functions as

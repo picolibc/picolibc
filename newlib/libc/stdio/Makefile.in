@@ -110,11 +110,9 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
-	asprintf.c			\
+GENERAL_SOURCES = \
 	clearerr.c 			\
 	fclose.c 			\
-	fcloseall.c			\
 	fdopen.c 			\
 	feof.c 				\
 	ferror.c 			\
@@ -134,10 +132,8 @@ LIB_SOURCES = \
 	freopen.c 			\
 	fscanf.c 			\
 	fseek.c 			\
-	fseeko.c 			\
 	fsetpos.c 			\
 	ftell.c 			\
-	ftello.c 			\
 	fvwrite.c 			\
 	fwalk.c 			\
 	fwrite.c 			\
@@ -148,10 +144,8 @@ LIB_SOURCES = \
 	getdelim.c			\
 	getline.c			\
 	gets.c 				\
-	getw.c				\
 	iprintf.c 			\
 	makebuf.c			\
-	mktemp.c 			\
 	perror.c 			\
 	printf.c 			\
 	putc.c 				\
@@ -159,7 +153,6 @@ LIB_SOURCES = \
 	putc_u.c			\
 	putchar_u.c			\
 	puts.c 				\
-	putw.c				\
 	refill.c 			\
 	remove.c 			\
 	rename.c 			\
@@ -178,7 +171,6 @@ LIB_SOURCES = \
 	tmpfile.c 			\
 	tmpnam.c 			\
 	ungetc.c 			\
-	vasprintf.c			\
 	vfscanf.c 			\
 	vprintf.c 			\
 	vscanf.c			\
@@ -188,21 +180,32 @@ LIB_SOURCES = \
 	wbuf.c 				\
 	wsetup.c 
 
+@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
+@ELIX_LEVEL_1_FALSE@	asprintf.$(oext)		\
+@ELIX_LEVEL_1_FALSE@	fcloseall.$(oext)		\
+@ELIX_LEVEL_1_FALSE@	fseeko.$(oext) 			\
+@ELIX_LEVEL_1_FALSE@	ftello.$(oext) 			\
+@ELIX_LEVEL_1_FALSE@	getw.$(oext)			\
+@ELIX_LEVEL_1_FALSE@	mktemp.$(oext) 			\
+@ELIX_LEVEL_1_FALSE@	putw.$(oext)
 
 LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext)
 
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstdio.la
-@USE_LIBTOOL_TRUE@libstdio_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@libstdio_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIBADD_OBJS)
+@USE_LIBTOOL_TRUE@libstdio_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libstdio_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libstdio_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIBADD_OBJS) $(LIB_OBJS)
 @USE_LIBTOOL_TRUE@LIB_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
 @USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(COMPILE)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS) $(LIB_OBJS)
 
 CHEWOUT_FILES = \
 	clearerr.def		\
@@ -274,56 +277,46 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES =  vfiprintf.$(oext) \
-@USE_LIBTOOL_FALSE@vfprintf.$(oext)
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  asprintf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@clearerr.$(OBJEXT) fclose.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@fcloseall.$(OBJEXT) fdopen.$(OBJEXT) feof.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@ferror.$(OBJEXT) fflush.$(OBJEXT) fgetc.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@fgetpos.$(OBJEXT) fgets.$(OBJEXT) fileno.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@findfp.$(OBJEXT) fiprintf.$(OBJEXT) flags.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@fopen.$(OBJEXT) fprintf.$(OBJEXT) fputc.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@fputs.$(OBJEXT) fread.$(OBJEXT) freopen.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@fscanf.$(OBJEXT) fseek.$(OBJEXT) fseeko.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@fsetpos.$(OBJEXT) ftell.$(OBJEXT) ftello.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  clearerr.$(OBJEXT) fclose.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fdopen.$(OBJEXT) feof.$(OBJEXT) ferror.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fflush.$(OBJEXT) fgetc.$(OBJEXT) fgetpos.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fgets.$(OBJEXT) fileno.$(OBJEXT) findfp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fiprintf.$(OBJEXT) flags.$(OBJEXT) fopen.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fprintf.$(OBJEXT) fputc.$(OBJEXT) fputs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fread.$(OBJEXT) freopen.$(OBJEXT) fscanf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fseek.$(OBJEXT) fsetpos.$(OBJEXT) ftell.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@fvwrite.$(OBJEXT) fwalk.$(OBJEXT) fwrite.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@getc.$(OBJEXT) getchar.$(OBJEXT) getc_u.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@getchar_u.$(OBJEXT) getdelim.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@getline.$(OBJEXT) gets.$(OBJEXT) getw.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@iprintf.$(OBJEXT) makebuf.$(OBJEXT) mktemp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@perror.$(OBJEXT) printf.$(OBJEXT) putc.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@putchar.$(OBJEXT) putc_u.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@putchar_u.$(OBJEXT) puts.$(OBJEXT) putw.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@refill.$(OBJEXT) remove.$(OBJEXT) rename.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@rewind.$(OBJEXT) rget.$(OBJEXT) scanf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@setbuf.$(OBJEXT) setbuffer.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@setlinebuf.$(OBJEXT) setvbuf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@siprintf.$(OBJEXT) snprintf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sprintf.$(OBJEXT) sscanf.$(OBJEXT) stdio.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@tmpfile.$(OBJEXT) tmpnam.$(OBJEXT) ungetc.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@vasprintf.$(OBJEXT) vfscanf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getline.$(OBJEXT) gets.$(OBJEXT) iprintf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@makebuf.$(OBJEXT) perror.$(OBJEXT) printf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@putc.$(OBJEXT) putchar.$(OBJEXT) putc_u.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@putchar_u.$(OBJEXT) puts.$(OBJEXT) refill.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@remove.$(OBJEXT) rename.$(OBJEXT) rewind.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@rget.$(OBJEXT) scanf.$(OBJEXT) setbuf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@setbuffer.$(OBJEXT) setlinebuf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@setvbuf.$(OBJEXT) siprintf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@snprintf.$(OBJEXT) sprintf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sscanf.$(OBJEXT) stdio.$(OBJEXT) tmpfile.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@tmpnam.$(OBJEXT) ungetc.$(OBJEXT) vfscanf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@vprintf.$(OBJEXT) vscanf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@vsnprintf.$(OBJEXT) vsprintf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@vsscanf.$(OBJEXT) wbuf.$(OBJEXT) wsetup.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-@USE_LIBTOOL_TRUE@libstdio_la_DEPENDENCIES =  vfiprintf.$(oext) \
-@USE_LIBTOOL_TRUE@vfprintf.$(oext)
-@USE_LIBTOOL_TRUE@libstdio_la_OBJECTS =  asprintf.lo clearerr.lo \
-@USE_LIBTOOL_TRUE@fclose.lo fcloseall.lo fdopen.lo feof.lo ferror.lo \
-@USE_LIBTOOL_TRUE@fflush.lo fgetc.lo fgetpos.lo fgets.lo fileno.lo \
-@USE_LIBTOOL_TRUE@findfp.lo fiprintf.lo flags.lo fopen.lo fprintf.lo \
-@USE_LIBTOOL_TRUE@fputc.lo fputs.lo fread.lo freopen.lo fscanf.lo \
-@USE_LIBTOOL_TRUE@fseek.lo fseeko.lo fsetpos.lo ftell.lo ftello.lo \
+@USE_LIBTOOL_TRUE@libstdio_la_OBJECTS =  clearerr.lo fclose.lo fdopen.lo \
+@USE_LIBTOOL_TRUE@feof.lo ferror.lo fflush.lo fgetc.lo fgetpos.lo \
+@USE_LIBTOOL_TRUE@fgets.lo fileno.lo findfp.lo fiprintf.lo flags.lo \
+@USE_LIBTOOL_TRUE@fopen.lo fprintf.lo fputc.lo fputs.lo fread.lo \
+@USE_LIBTOOL_TRUE@freopen.lo fscanf.lo fseek.lo fsetpos.lo ftell.lo \
 @USE_LIBTOOL_TRUE@fvwrite.lo fwalk.lo fwrite.lo getc.lo getchar.lo \
 @USE_LIBTOOL_TRUE@getc_u.lo getchar_u.lo getdelim.lo getline.lo gets.lo \
-@USE_LIBTOOL_TRUE@getw.lo iprintf.lo makebuf.lo mktemp.lo perror.lo \
-@USE_LIBTOOL_TRUE@printf.lo putc.lo putchar.lo putc_u.lo putchar_u.lo \
-@USE_LIBTOOL_TRUE@puts.lo putw.lo refill.lo remove.lo rename.lo \
-@USE_LIBTOOL_TRUE@rewind.lo rget.lo scanf.lo setbuf.lo setbuffer.lo \
-@USE_LIBTOOL_TRUE@setlinebuf.lo setvbuf.lo siprintf.lo snprintf.lo \
-@USE_LIBTOOL_TRUE@sprintf.lo sscanf.lo stdio.lo tmpfile.lo tmpnam.lo \
-@USE_LIBTOOL_TRUE@ungetc.lo vasprintf.lo vfscanf.lo vprintf.lo \
+@USE_LIBTOOL_TRUE@iprintf.lo makebuf.lo perror.lo printf.lo putc.lo \
+@USE_LIBTOOL_TRUE@putchar.lo putc_u.lo putchar_u.lo puts.lo refill.lo \
+@USE_LIBTOOL_TRUE@remove.lo rename.lo rewind.lo rget.lo scanf.lo \
+@USE_LIBTOOL_TRUE@setbuf.lo setbuffer.lo setlinebuf.lo setvbuf.lo \
+@USE_LIBTOOL_TRUE@siprintf.lo snprintf.lo sprintf.lo sscanf.lo stdio.lo \
+@USE_LIBTOOL_TRUE@tmpfile.lo tmpnam.lo ungetc.lo vfscanf.lo vprintf.lo \
 @USE_LIBTOOL_TRUE@vscanf.lo vsnprintf.lo vsprintf.lo vsscanf.lo wbuf.lo \
 @USE_LIBTOOL_TRUE@wsetup.lo
 CFLAGS = @CFLAGS@

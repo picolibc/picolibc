@@ -1,5 +1,3 @@
-#ifdef __LARGE64_FILES
-
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -76,6 +74,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <errno.h>
 
 #include "local64.h"
+
+#ifdef __LARGE64_FILES
 
 _off64_t
 _DEFUN (ftello64, (fp),

@@ -4,11 +4,9 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
+GENERAL_SOURCES = \
 	sysclose.c	\
-	sysexecve.c	\
 	sysfcntl.c	\
-	sysfork.c	\
 	sysfstat.c	\
 	sysgetpid.c	\
 	sysgettod.c	\
@@ -21,18 +19,36 @@ LIB_SOURCES = \
 	sysstat.c	\
 	systimes.c	\
 	sysunlink.c	\
-	syswait.c	\
 	syswrite.c
+
+
+## Weed out EL/IX level 3 interfaces if necessary
+if ELIX_LEVEL_1
+LIB_OBJS =
+else
+if ELIX_LEVEL_2
+LIB_OBJS =
+else
+LIB_OBJS = \
+	sysexecve.$(oext)	\
+	sysfork.$(oext)		\
+	syswait.$(oext)
+endif
+endif
 
 libsyscalls_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libsyscalls.la
-libsyscalls_la_SOURCES = $(LIB_SOURCES)
+libsyscalls_la_SOURCES = $(GENERAL_SOURCES)
+libsyscalls_la_LIBADD = $(LIB_OBJS)
+libsyscalls_la_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
+lib_a_SOURCES = $(GENERAL_SOURCES)
+lib_a_LIBADD = $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif
 

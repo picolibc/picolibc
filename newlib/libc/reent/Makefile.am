@@ -16,11 +16,23 @@ STDIO64_DEFS = \
 	open64r.def
 endif
 
-LIB_SOURCES = \
+ELIX_2_OBJS = $(STDIO64_OBJECTS)
+ELIX_3_OBJS = execr.$(oext)
+
+if ELIX_LEVEL_1
+LIB_OBJS =
+else
+if ELIX_LEVEL_2
+LIB_OBJS = $(ELIX_2_OBJS)
+else
+LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
+endif
+endif
+
+GENERAL_SOURCES = \
 	closer.c \
 	reent.c \
 	impure.c \
-	execr.c \
 	fstatr.c \
 	getreent.c \
 	linkr.c \
@@ -39,15 +51,15 @@ libreent_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libreent.la
-libreent_la_SOURCES = $(LIB_SOURCES)
-libreent_la_LIBADD = $(STDIO64_OBJECTS)
-libreent_la_DEPENDENCIES = $(STDIO64_OBJECTS)
+libreent_la_SOURCES = $(GENERAL_SOURCES)
+libreent_la_LIBADD = $(LIB_OBJS)
+libreent_la_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
-lib_a_LIBADD = $(STDIO64_OBJECTS)
-lib_a_DEPENDENCIES = $(STDIO64_OBJECTS)
+lib_a_SOURCES = $(GENERAL_SOURCES)
+lib_a_LIBADD = $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

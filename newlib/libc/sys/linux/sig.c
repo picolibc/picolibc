@@ -21,8 +21,6 @@ _syscall2(__sighandler_t,signal,int,signum,__sighandler_t,handler)
 _syscall0(int,pause)
 _syscall1(unsigned int,alarm,unsigned int,seconds)
 
-static _syscall0(int,__sgetmask)
-static _syscall1(int,__ssetmask,int,newmask)
 static _syscall2(int,__rt_sigpending,sigset_t *,set,size_t,size)
 static _syscall4(int,__rt_sigprocmask,int,how,const sigset_t *,set,sigset_t *,oldset,size_t,size)
 static _syscall2(int,__rt_sigsuspend,const sigset_t *,mask,size_t,size)
@@ -34,19 +32,9 @@ int __sigsuspend (const sigset_t *mask)
 }
 weak_alias(__sigsuspend,sigsuspend)
 
-int sigsetmask(int newmask) /* BSD */
-{
-    return __ssetmask(newmask);
-}
-
 int sigmask(int signum) /* BSD */
 {
     return 1 << signum;
-}
-
-int sigblock(int mask) /* BSD */
-{
-    return __ssetmask(mask | __sgetmask());
 }
 
 int __libc_raise(int sig)
@@ -77,6 +65,22 @@ int sigwaitinfo(const sigset_t *set, siginfo_t *info)
 {
   return __rt_sigtimedwait(set, info, NULL, NSIG/8);
 }
+
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 4
+
+static _syscall1(int,__ssetmask,int,newmask)
+static _syscall0(int,__sgetmask)
+
+int sigblock(int mask) /* BSD */
+{
+    return __ssetmask(mask | __sgetmask());
+}
+
+int sigsetmask(int newmask) /* BSD */
+{
+    return __ssetmask(newmask);
+}
+#endif
 
 const char *const sys_siglist[] = {
 #include "siglist.inc"

@@ -1,5 +1,3 @@
-#ifdef __LARGE64_FILES
-
 /*
 FUNCTION
 <<tmpfile64>>---create a large temporary file
@@ -51,6 +49,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 
 #include <stdio.h>
 #include <errno.h>
+
+#ifdef __LARGE64_FILES
 
 FILE *
 _DEFUN (_tmpfile64_r, (ptr),

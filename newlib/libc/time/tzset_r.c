@@ -51,7 +51,9 @@ _DEFUN (_tzset_r, (reent_ptr),
     }
 
   free(prev_tzenv);
-  prev_tzenv = _strdup_r (reent_ptr, tzenv);
+  prev_tzenv = _malloc_r (reent_ptr, strlen(tzenv) + 1);
+  if (prev_tzenv != NULL)
+    strcpy (prev_tzenv, tzenv);
 
   /* ignore implementation-specific format specifier */
   if (*tzenv == ':')

@@ -4,20 +4,48 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
-	closedir.c opendir.c readdir.c rewinddir.c scandir.c seekdir.c \
-	telldir.c execl.c execle.c execlp.c execv.c execve.c execvp.c \
-	popen.c creat.c isatty.c readdir_r.c
+GENERAL_SOURCES = \
+	closedir.c creat.c isatty.c \
+	opendir.c readdir.c \
+	readdir_r.c rewinddir.c telldir.c
+
+ELIX_2_OBJS = \
+        scandir.$(oext) seekdir.$(oext)
+
+ELIX_3_OBJS = \
+	execl.$(oext) execle.$(oext) execlp.$(oext) execv.$(oext) \
+	execve.$(oext) execvp.$(oext)
+
+ELIX_4_OBJS = \
+	popen.$(oext) 
+
+if ELIX_LEVEL_1
+LIB_OBJS =
+else 
+if ELIX_LEVEL_2
+LIB_OBJS = $(ELIX_2_OBJS)
+else 
+if ELIX_LEVEL_3
+LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
+else
+LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
+endif
+endif
+endif
 
 libposix_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libposix.la
-libposix_la_SOURCES = $(LIB_SOURCES)
+libposix_la_SOURCES = $(GENERAL_SOURCES)
+libposix_la_LIBADD = $(LIB_OBJS)
+libposix_la_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(LIB_SOURCES)
+lib_a_SOURCES = $(GENERAL_SOURCES)
+lib_a_LIBADD = $(LIB_OBJS)
+lib_a_DEPENDENCIES = $(LIB_OBJS)
 noinst_DATA =
 endif # USE_LIBTOOL
 

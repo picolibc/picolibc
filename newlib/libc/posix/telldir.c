@@ -74,6 +74,9 @@ __LOCK_INIT(static, dd_hash_lock);
 /*
  * return a pointer into a directory
  */
+
+#ifndef _ELIX_LEVEL || _ELIX_LEVEL >= 2
+
 long
 telldir(dirp)
        DIR *dirp;
@@ -101,6 +104,8 @@ telldir(dirp)
 #endif
 	return (index);
 }
+
+#endif /* !_ELIX_LEVEL || _ELIX_LEVEL >= 2 */
 
 /*
  * seek to an entry in a directory.

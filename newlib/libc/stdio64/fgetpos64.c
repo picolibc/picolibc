@@ -1,5 +1,3 @@
-#ifdef __LARGE64_FILES
-
 /*
 FUNCTION
 <<fgetpos64>>---record position in a large stream or file
@@ -45,6 +43,8 @@ No supporting OS subroutines are required.
 */
 
 #include <stdio.h>
+
+#ifdef __LARGE64_FILES
 
 int
 _DEFUN (fgetpos64, (fp, pos),

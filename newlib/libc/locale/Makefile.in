@@ -110,16 +110,29 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = timelocal.h timelocal.c ldpart.h ldpart.c fix_grouping.c locale.c nl_langinfo.c lnumeric.h lnumeric.c lmonetary.h lmonetary.c lmessages.h lmessages.c
+GENERAL_SOURCES = timelocal.h ldpart.h locale.c lnumeric.h lmonetary.h lmessages.h
+@ELIX_LEVEL_1_TRUE@LIB_OBJS = 
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
+@ELIX_LEVEL_1_FALSE@	fix_grouping.$(oext) \
+@ELIX_LEVEL_1_FALSE@	ldpart.$(oext) \
+@ELIX_LEVEL_1_FALSE@	lmessages.$(oext) \
+@ELIX_LEVEL_1_FALSE@	lnumeric.$(oext) \
+@ELIX_LEVEL_1_FALSE@	lmonetary.$(oext) \
+@ELIX_LEVEL_1_FALSE@	nl_langinfo.$(oext) \
+@ELIX_LEVEL_1_FALSE@	timelocal.$(oext)
 
 liblocale_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@liblocale.la
-@USE_LIBTOOL_TRUE@liblocale_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@liblocale_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@liblocale_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
+@USE_LIBTOOL_TRUE@liblocale_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
 
 CHEWOUT_FILES = locale.def
 
@@ -138,17 +151,10 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  timelocal.$(OBJEXT) ldpart.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@fix_grouping.$(OBJEXT) locale.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@nl_langinfo.$(OBJEXT) lnumeric.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@lmonetary.$(OBJEXT) lmessages.$(OBJEXT)
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  locale.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-liblocale_la_LIBADD = 
-@USE_LIBTOOL_TRUE@liblocale_la_OBJECTS =  timelocal.lo ldpart.lo \
-@USE_LIBTOOL_TRUE@fix_grouping.lo locale.lo nl_langinfo.lo lnumeric.lo \
-@USE_LIBTOOL_TRUE@lmonetary.lo lmessages.lo
+@USE_LIBTOOL_TRUE@liblocale_la_OBJECTS =  locale.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
