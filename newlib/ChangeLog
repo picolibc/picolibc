@@ -1,4 +1,9 @@
-2002-02-25   D.Venkatasubramanian <dvenkat@noida.hcltech.com>
+2003-03-07   Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h: Remove extraneous _sig_func
+	declaration.
+
+2003-02-25   D.Venkatasubramanian <dvenkat@noida.hcltech.com>
 
 	* libc/sys/h8300hms/Makefile.am: Add support for new files.
 	* libc/sys/h8300hms/Makefile.in: Regenerated.

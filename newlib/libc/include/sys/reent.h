@@ -421,8 +421,6 @@ struct _reent
     var->__sf_fake._data = _NULL; \
   }
 
-  /* signal info */
-  void (**(_sig_func))(int);
 /* Only built the assert() calls if we are built with debugging.  */
 #if DEBUG 
 #include <assert.h>
