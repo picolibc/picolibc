@@ -31,7 +31,7 @@ CXX:=@CXX@
 CXX_FOR_TARGET:=$(CXX)
 
 CFLAGS:=@CFLAGS@
-CXXFLAGS:=@CXXFLAGS@ -fno-exceptions -nostdinc++ -fno-rtti
+CXXFLAGS:=@CXXFLAGS@ -fno-exceptions -fno-rtti
 
 include $(srcdir)/../Makefile.common
 
@@ -97,27 +97,27 @@ endif
 
 dumper.o: dumper.cc dumper.h
 ifdef VERBOSE
-	$(COMPILE_CC) $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
+	$(COMPILE_CXX) $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
 else
-	@echo $(CC) $c $(CFLAGS) $(DUMPER_INCLUDES) ... $(basename $@).cc;\
-	$(COMPILE_CC) $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
+	@echo $(CXX) $c $(CFLAGS) $(DUMPER_INCLUDES) ... $(basename $@).cc;\
+	$(COMPILE_CXX) $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
 endif
 
 
 module_info.o: module_info.cc
 ifdef VERBOSE
-	$(COMPILE_CC) $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
+	$(COMPILE_CXX) $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
 else
-	@echo $(CC) $c $(CFLAGS) $(DUMPER_INCLUDES) ... $(basename $@).cc;\
-	$(COMPILE_CC) $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
+	@echo $(CXX) $c $(CFLAGS) $(DUMPER_INCLUDES) ... $(basename $@).cc;\
+	$(COMPILE_CXX) $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
 endif
 
 parse_pe.o: parse_pe.cc dumper.h
 ifdef VERBOSE
-	$(COMPILE_CC) $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
+	$(COMPILE_CXX) $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
 else
-	@echo $(CC) $c $(CFLAGS) $(DUMPER_INCLUDES) ... $(basename $@).cc;\
-	$(COMPILE_CC) $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
+	@echo $(CXX) $c $(CFLAGS) $(DUMPER_INCLUDES) ... $(basename $@).cc;\
+	$(COMPILE_CXX) $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
 endif
 
 mingw_getopt.o: $(cygwin_source)/lib/getopt.c

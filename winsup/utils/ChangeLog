@@ -1,3 +1,7 @@
+Sun Dec 10 19:08:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Compile/link dumper.exe with c++.
+
 Tue Dec  7 11:15:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* mkpasswd.c: Slight formatting changes to the below patch.
