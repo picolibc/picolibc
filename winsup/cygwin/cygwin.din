@@ -3,10 +3,12 @@ LIBRARY "cygwin1.dll" BASE=0x61000000
 EXPORTS
 __argc DATA
 __argv DATA
+__check_rhosts_file DATA
 __cygwin_environ DATA
 __cygwin_user_data DATA
 __mb_cur_max DATA
 __progname DATA
+__rcmd_errstr DATA
 _check_for_executable DATA
 _ctype_ DATA
 _daylight DATA
@@ -17,6 +19,11 @@ sys_nerr = _sys_nerr DATA
 _timezone DATA
 _tzname DATA
 h_errno DATA
+optarg DATA
+opterr DATA
+optind DATA
+optopt DATA
+optreset DATA
 reent_data DATA
 @ALLOCA@
 @DEF_DLL_ENTRY@
@@ -617,6 +624,8 @@ getmntent
 _getmntent = getmntent
 getmode
 _getmode = getmode
+getopt
+getopt_long
 getpagesize
 _getpagesize = getpagesize
 getpass
@@ -704,6 +713,8 @@ ioctl
 _ioctl = ioctl
 iprintf
 _iprintf = iprintf
+iruserok
+ruserok
 isalnum
 _isalnum = isalnum
 isalpha

@@ -127,12 +127,14 @@ readdir (DIR *dir)
 	  res = dir->__d_dirent;
 	  strcpy (res->d_name, ".");
 	  dir->__flags |= opendir_saw_dot;
+	  dir->__d_position++;
 	}
       else if (!(dir->__flags & opendir_saw_dot_dot))
 	{
 	  res = dir->__d_dirent;
 	  strcpy (res->d_name, "..");
 	  dir->__flags |= opendir_saw_dot_dot;
+	  dir->__d_position++;
 	}
     }
 

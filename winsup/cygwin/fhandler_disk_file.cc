@@ -53,14 +53,18 @@ num_entries (const char *win32_name)
 
   if (handle == INVALID_HANDLE_VALUE)
     return 2; /* 2 is the minimum number of links to a dir, so... */
-  count ++;
+  int saw_dot = 2;
   while (FindNextFileA (handle, &buf))
     {
-      if ((buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-	count ++;
+      if (buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	count++;
+      if (buf.cFileName[0] == '.'
+	  && (buf.cFileName[1] == '\0'
+	      || (buf.cFileName[1] == '.' && buf.cFileName[2] == '\0')))
+	saw_dot--;
     }
   FindClose (handle);
-  return count;
+  return count + saw_dot;
 }
 
 int __stdcall
@@ -761,7 +765,7 @@ fhandler_cygdrive::fstat (struct __stat64 *buf)
   buf->st_mode = S_IFDIR | 0555;
   if (!ndrives)
     set_drives ();
-  buf->st_nlink = ndrives;
+  buf->st_nlink = ndrives + 2;
   return 0;
 }
 
@@ -784,19 +788,14 @@ fhandler_cygdrive::readdir (DIR *dir)
     return fhandler_disk_file::readdir (dir);
   if (!pdrive || !*pdrive)
     return NULL;
-  else if (dir->__d_position > 1
-	   && GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
+  if (GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
     {
       pdrive = strchr (pdrive, '\0') + 1;
       return readdir (dir);
     }
-  else if (*pdrive == '.')
-    strcpy (dir->__d_dirent->d_name, pdrive);
-  else
-    {
-      *dir->__d_dirent->d_name = cyg_tolower (*pdrive);
-      dir->__d_dirent->d_name[1] = '\0';
-    }
+
+  *dir->__d_dirent->d_name = cyg_tolower (*pdrive);
+  dir->__d_dirent->d_name[1] = '\0';
   dir->__d_position++;
   pdrive = strchr (pdrive, '\0') + 1;
   syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,

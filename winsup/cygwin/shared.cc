@@ -1,6 +1,6 @@
 /* shared.cc: shared data area support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -67,7 +67,8 @@ static char *offsets[] =
 };
 
 void * __stdcall
-open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locations m)
+open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
+	     shared_locations m, PSECURITY_ATTRIBUTES psa)
 {
   void *shared;
 
@@ -96,7 +97,7 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
 				       TRUE, mapname);
 	}
       if (!shared_h &&
-	  !(shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_all,
+	  !(shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
 					  PAGE_READWRITE, 0, size, mapname)))
 	api_fatal ("CreateFileMapping, %E.  Terminating.");
     }
@@ -145,7 +146,54 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
 }
 
 void
-shared_info::initialize (const char *user_name)
+user_shared_initialize ()
+{
+  char name[UNLEN > 127 ? UNLEN + 1 : 128] = "";
+
+  if (wincap.has_security ())
+    {
+      cygsid tu (cygheap->user.sid ());
+      tu.string (name);
+    }
+  else
+    strcpy (name, cygheap->user.name ());
+
+  if (cygwin_mount_h) /* Reinit */
+    {
+      if (!UnmapViewOfFile (mount_table))
+	debug_printf("UnmapViewOfFile %E");
+      if (!ForceCloseHandle (cygwin_mount_h))
+	debug_printf("CloseHandle %E");
+      cygwin_mount_h = NULL;
+    }
+
+  mount_table = (mount_info *) open_shared (name, MOUNT_VERSION,
+					    cygwin_mount_h, sizeof (mount_info),
+					    SH_MOUNT_TABLE, &sec_none);
+  debug_printf ("opening mount table for '%s' at %p", name,
+		mount_table);
+  ProtectHandleINH (cygwin_mount_h);
+  debug_printf ("mount table version %x at %p", mount_table->version, mount_table);
+
+  /* Initialize the Cygwin per-user mount table, if necessary */
+  if (!mount_table->version)
+    {
+      mount_table->version = MOUNT_VERSION_MAGIC;
+      debug_printf ("initializing mount table");
+      mount_table->cb = sizeof (*mount_table);
+      if (mount_table->cb != MOUNT_INFO_CB)
+	system_printf ("size of mount table region changed from %u to %u",
+		       MOUNT_INFO_CB, mount_table->cb);
+      mount_table->init ();	/* Initialize the mount table.  */
+    }
+  else if (mount_table->version != MOUNT_VERSION_MAGIC)
+    multiple_cygwin_problem ("mount", mount_table->version, MOUNT_VERSION);
+  else if (mount_table->cb !=  MOUNT_INFO_CB)
+    multiple_cygwin_problem ("mount table size", mount_table->cb, MOUNT_INFO_CB);
+}
+
+void
+shared_info::initialize ()
 {
   DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &version, SHARED_VERSION_MAGIC);
   if (!sversion)
@@ -171,7 +219,7 @@ shared_info::initialize (const char *user_name)
   if (!cygheap)
     {
       cygheap_init ();
-      cygheap->user.set_name (user_name);
+      cygheap->user.init ();
     }
 
   heap_init ();
@@ -189,12 +237,6 @@ memory_init ()
 {
   getpagesize ();
 
-  char user_name[UNLEN + 1];
-  DWORD user_name_len = UNLEN + 1;
-
-  if (!GetUserName (user_name, &user_name_len))
-    strcpy (user_name, "unknown");
-
   /* Initialize general shared memory */
   HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
   cygwin_shared = (shared_info *) open_shared ("shared",
@@ -203,36 +245,11 @@ memory_init ()
 					       sizeof (*cygwin_shared),
 					       SH_CYGWIN_SHARED);
 
-  cygwin_shared->initialize (user_name);
-
+  cygwin_shared->initialize ();
   cygheap->shared_h = shared_h;
   ProtectHandleINH (cygheap->shared_h);
 
-  /* Allocate memory for the per-user mount table */
-  mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
-					    cygwin_mount_h, sizeof (mount_info),
-					    SH_MOUNT_TABLE);
-  debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
-		mount_table);
-  ProtectHandleINH (cygwin_mount_h);
-  debug_printf ("mount table version %x at %p", mount_table->version, mount_table);
-
-  /* Initialize the Cygwin per-user mount table, if necessary */
-  if (!mount_table->version)
-    {
-      mount_table->version = MOUNT_VERSION_MAGIC;
-      debug_printf ("initializing mount table");
-      mount_table->cb = sizeof (*mount_table);
-      if (mount_table->cb != MOUNT_INFO_CB)
-	system_printf ("size of mount table region changed from %u to %u",
-		       MOUNT_INFO_CB, mount_table->cb);
-      mount_table->init ();	/* Initialize the mount table.  */
-    }
-  else if (mount_table->version != MOUNT_VERSION_MAGIC)
-    multiple_cygwin_problem ("mount", mount_table->version, MOUNT_VERSION);
-  else if (mount_table->cb !=  MOUNT_INFO_CB)
-    multiple_cygwin_problem ("mount table size", mount_table->cb, MOUNT_INFO_CB);
-
+  user_shared_initialize ();
 }
 
 unsigned

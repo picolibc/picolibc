@@ -1,3 +1,304 @@
+2003-09-10  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* shared_info.h (shared_info::initialize): Remove argument.
+	* cygheap.h (cygheap_user::init): New declaration.
+	* uinfo.cc (cygheap_user::init): New.
+	(internal_getlogin): Move functionality to cygheap_user::init.  Open
+	the process token to update the group sid.
+	* shared.cc (user_shared_initialize): Get the user information from
+	cygheap->user.
+	(shared_info::initialize): Remove argument.  Call cygheap->user.init
+	instead of cygheap->user.set_name.
+	(memory_init): Do not get the user name and do not pass it to
+	shared_info::initialize.
+	* registry.cc (get_registry_hive_path): Make csid a cygpsid.
+	(load_registry_hive): Ditto.
+
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (num_entries): Take .  and ..  into account if
+	they do not exist since cygwin simulates them.
+	(fhandler_cygdrive::fstat): Ditto.
+	(fhandler_cygdrive::readdir): Don't do any specific tests on
+	__d_position when seeing if a drive exists.
+
+2003-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add getopt.o and iruserok.o.
+	* cygwin.din: Export __check_rhosts_file, __rcmd_errstr, optarg,
+	opterr, optind, optopt, optreset, getopt, getopt_long, iruserok
+	and ruserok.
+	* getopt.c: Moved from lib to here.  Define opt* variables as
+	dllexport.
+	* iruserok.c: Moved from lib to here.  Rearrange function order.
+	Prefer using 64/32 bit functions.
+	* syscalls.cc (shell_fp): Define as struct __sFILE64.
+	(getusershell): Use fopen64 instead of fopen.
+	* winsup.h: Add declarations for seteuid32, fopen64,
+	cygwin_gethostbyname and cygwin_inet_addr.
+	* include/getopt.h: Declare opt* variables dllimport.
+	* include/cygwin/version.h: Bump API minor number.
+
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sig_handle_tty_stop): Check parent PID_NOCLDSTOP
+	rather than erroneously checking *my own* sigtodo.
+
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Add some more -fomit-frame-pointer files.
+
+	* path.cc (conv_path_list_buf_size): Free normalized_path or suffer
+	memory leak.
+	* syscalls.cc (chroot): Ditto.
+
+2003-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add bsdlib.o.
+	* autoload.cc (RegisterServiceProcess): Add.
+	* bsdlib.cc: New file.
+	(daemon): New function.
+	(login_tty): Ditto.
+	(openpty): Ditto.
+	(forkpty): Ditto.
+	* cygwin.din: Export daemon, forkpty, login_tty, logwtmp, updwtmp,
+	openpty and revoke.
+	* syscalls.cc (updwtmp): New function, writing to wtmp exclusively.
+	(logwtmp): Ditto.
+	(login): Call updwtmp instead of writing to wtmp by itself.
+	(logout): Ditto.
+	* tty.cc (revoke): New funtion.
+	* include/paths.h: Define _PATH_DEVNULL.
+	* include/pty.h: New header.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/utmp.h: Declare logwtmp with const arguments.
+	Declare updwtmp.
+	* lib/iruserok.c: New file.
+	(ruserok): New function.
+	(iruserok): Ditto.
+	(__ivaliduser): Ditto.
+	(__icheckhost): Ditto.
+
+2003-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::fstat): Don't use PC_POSIX.
+
+2003-09-09  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* shared_info.h: Include security.h.
+	(open_shared): Add psa argument.
+	(user_shared_initialize): New declaration.
+	* security.h: Add _SECURITY_H guard.
+	(sec_user): Use sec_none in the no ntsec case.
+	* spawn.cc (spawn_guts): Remove call to load_registry_hive.
+	* syscalls (seteuid32): If warranted, call load_registry_hive,  
+	user_shared_initialize and RegCloseKey(HKEY_CURRENT_USER).
+	* shared.cc (user_shared_initialize): New.
+	(open_shared): Add and use psa argument.
+	(memory_init): Move mount table initialization to 
+	user_shared_initialize. Call it.
+
+2003-09-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Change address types from caddr_t to void *
+	according to SUSv3.
+	(mmap): Ditto.
+	(munmap): Ditto.
+	(msync): Ditto.
+	(mprotect): Ditto.  Move to before the fhandler methods.
+	* include/sys/mman.h: Change prototypes accordingly.
+
+2003-09-08  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (dlL_crt0_1): Set __argc_safe after __argc is absolutely
+	know to be set.
+	* exceptions.cc (sig_handle_tty_stop): Don't reset sigCONT event since
+	it is reset automatically.
+	* fork.cc (fork): Remove obsolete usage of PID_SPLIT_HEAP.
+	* include/sys/cygwin.h: Ditto.
+	* sigproc.cc (sig_send): Use sigframe init method to set frame since it
+	checks for previous ownership of the frame.
+	* sigproc.h (sigframe::init): Accept an "is_exception" argument.
+
+2003-09-08  Christopher Faylor  <cgf@redhat.com>
+
+	* dir.cc (readdir): Reinstate setting of old ino field for legacy
+	applications.
+	* dirent.h (dirent): Rename unused field to __ino32.
+
+2003-09-08  Christopher Faylor  <cgf@redhat.com>
+
+	* passwd.cc (getpwnam_r): Initialize pw_comment field.
+
+2003-09-08  Christopher Faylor  <cgf@redhat.com>
+
+	* passwd.cc (getpwuid_r32): Initialize pw_comment field.
+
+2003-09-08  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (wait_sig_inited): Remove assertion since it is racy.
+
+2003-09-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export endusershell, getusershell and setusershell.
+	* syscalls.cc (getusershell): New function.
+	(setusershell): Ditto.
+	(endusershell): Ditto.
+	* include/cygwin/version.h: Bump API minor number.
+
+2003-09-08  Nicholas Wourms  <nwourms@netscape.net>
+
+	* cygwin.din: Export argz_add argz_add_sep argz_append argz_count
+	argz_create argz_create_sep argz_delete argz_extract argz_insert
+	argz_next argz_replace argz_stringify envz_add envz_entry envz_get
+	envz_merge envz_remove envz_strip
+	* include/cygwin/version.h: Bump api minor number.
+
+2003-09-07  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, remove __d_u.__d_data fields from DIR structure.
+	* include/sys/dirent.h (dirent): Remvoe old_d_ino.
+	(DIR): Make __d_dirhash a 64 bit value.  Remove __d_data and __d_u.
+	Add __flags.
+	* dir.cc (opendir_states): New enum.
+	(opendir): Clear new DIR __flags field.
+	(readdir): Fill in '.' and '..' entries if we hit EOF and we haven't
+	seen them already.  Nuke setting of old_d_ino.
+	(rewinddir): Reset DIR __flags field.
+	(seekdir64): Ditto.
+	* fhandler_disk_file.cc (fhandler_cygdrive::fhandler_cygdrive): Remove
+	special handling of "." and ".." since they are now handled
+	automatically.
+
+2003-09-07  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/in.h: Don't define ipv6 stuff unless we call for it
+	specifically since it isn't really implemented yet.
+
+2003-09-07  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (_csbrk): More left coercion cleanup.
+	* fhandler_tty.cc (fhandler_tty_slave::read): Ditto.
+	(fhandler_tty_slave::write): Ditto.
+	* fhandler_windows.cc (fhandler_windows::read): Ditto.
+	* heap.cc (sbrk): Ditto.
+
+2003-09-07  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* signal.cc (nanosleep): Improve test for valid values.  Round delay up
+	to resolution.  Fix test for negative remainder.  Use timeGetTime
+	through gtod.
+	(sleep): Round up return value.
+
+2003-09-07  Pierre Humblet <pierre.humblet@ieee.org>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* hires.h (HIRES_DELAY_MAX): Define.
+	(hires_ms::minperiod): Declare static.
+	(hires_ms::resolution): New.
+	(hires_ms::dmsecs): New.
+	(hires_ms::prime): Return UINT.
+	(gtod): Declare.
+	* times.cc (hires_ms::prime): Always calculate minperiod and set it to
+	1 in case of failure.  Return minperiod.
+	(hires_ms::resolution): Define.
+	(hires_ms::~hires_ms): Delete.
+	(hires_ms::usecs): Check minperiod to prime.
+	(gtod) Define as global.
+
+2003-09-06  Christopher Faylor  <cgf@redhat.com>
+
+	Remove left coercion throughout.
+
+2003-09-04  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* hires.h (hires_ms::~hires_ms): Delete declaration.
+	* times.cc (hires_ms::~hires_ms): Delete definition..
+
+2003-09-04  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (__argc_safe): New variable.
+	(dll_crt0_1): Store argc in __argc_safe, which will theoretically
+	remain untouched by the user.
+	* fhandler_console.cc (fhandler_console::read): Silence some compiler
+	warnings.
+	* fhandler_raw.cc (fhandler_dev_raw::raw_read): Ditto.
+	* pinfo.cc (_pinfo::commune_recv): Carefully bound argv scan and check
+	for potentially bad pointers since user could have set argv cell to
+	anythinw.
+	* cygheap.h (CYGHEAPSIZE): Bump up size.
+
+2003-09-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysconf.cc (sysconf): Return more accurate value for _SC_AVPHYS_PAGES.
+
+2003-09-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc: Restructure. Add, remove and rewrite comments throughout
+	for better readability.  Change function names for better
+	understanding.
+	(MAP_SET): Accomodate name change from map_map_ to page_map_.
+	(MAP_CLR): Ditto.
+	(MAP_ISSET): Ditto.
+	(mmap_record::page_map_): Rename from page_map_.
+	(mmap_record::get_map): Remove.
+	(mmap_record::alloc_page_map): Rename from alloc_map. Return bool
+	indicating success of cygheap memory allocation.
+	(mmap_record::free_page_map): Rename from free_map.
+	(mmap_record::fixup_page_map): Rename from fixup_map.
+	(mmap_record::find_unused_pages): Rename from find_empty.
+	(mmap_record::map_pages): Rename from map_map.
+	(mmap_record::unmap_pages): Rename from unmap_map.
+	(class list): Make all class members private.
+	(list::list): Remove.
+	(list::~list): Remove.
+	(list::get_fd): New attribute reader.
+	(list::get_hash): Ditto.
+	(list::get_record): Ditto.
+	(list::add_record): Manage all allocation for mmap_records.  Check
+	for failed memory allocation and return NULL if so.
+	(list::set): New function.
+	(list::del_record): Rename from erase. Return true if last mmap_record
+	has been deleted, false otherwise. Check for legal incoming index
+	value.
+	(list::erase): Remove erase/0.
+	(list::search_record): Rename from match.
+	(map::map): Remove.
+	(map::~map): Remove.
+	(map::add_list): Manage all allocation for lists.  Check for failed
+	memory allocation and return NULL if so.
+	(map::get_list): New method.
+	(map::del_list): Rename from erase. Check for legal incoming index
+	value.
+	(mmap64): Check for failed mmap_record memory allocation.  Return
+	with MAP_FAILED and errno set to ENOMEM if so.
+	(munmap): Rearrange loop using new list and mmap_record accessor
+	functions.  Rename loop index variables for better understanding.
+	Check if list can be deleted after last mmap_record in it has been
+	deleted.
+	(msync): Rearrange loop using new list and mmap_record accessor
+	functions.  Rename loop index variables for better understanding.
+	(fixup_mmaps_after_fork): Ditto.
+
+2003-09-03  Christopher Faylor  <cgf@redhat.com>
+
+	* cxx.cc (new): Fix formatting.  Just return result of ccalloc rather
+	than calling memset explicitly.
+
+2003-09-03  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (set_process_mask): Set pending signals only when
+	signals become unmasked.
+	* sigproc.cc (pending_signals): Flip back to a global.
+	(wait_sig): Don't set pending signals when there is an armed semaphore
+	or signal is blocked.
+
+	* shared.cc (shared_info::initialize): Add a username parameter for
+	user-mode mounts.  Reorganize to try to avoid startup race.
+	(memory_init): Move some stuff into shared_info::initialize.
+	* shared_info.h (shared_info::initialize): Change declaration.
+	(CURR_SHARED_MAGIC): Update.
+
 2003-09-01  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 4.

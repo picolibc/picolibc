@@ -8,6 +8,9 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _SECURITY_H
+#define _SECURITY_H
+
 #include <accctrl.h>
 
 #define DEFAULT_UID DOMAIN_USER_RID_ADMIN
@@ -271,5 +274,6 @@ sec_user_nih (char sa_buf[], PSID sid = NULL)
 extern inline SECURITY_ATTRIBUTES *
 sec_user (char sa_buf[], PSID sid = NULL)
 {
-  return allow_ntsec ? __sec_user (sa_buf, sid, TRUE) : &sec_none_nih;
+  return allow_ntsec ? __sec_user (sa_buf, sid, TRUE) : &sec_none;
 }
+#endif /*_SECURITY_H*/

@@ -30,42 +30,55 @@ details. */
 #include "environ.h"
 #include "pwdgrp.h"
 
+/* Initialize the part of cygheap_user that does not depend on files.
+   The information is used in shared.cc for the user shared.
+   Final initialization occurs in uinfo_init */
+void
+cygheap_user::init()
+{
+  char user_name[UNLEN + 1];
+  DWORD user_name_len = UNLEN + 1;
+
+  set_name (GetUserName (user_name, &user_name_len) ? user_name : "unknown");
+
+  if (wincap.has_security ())
+    {
+      HANDLE ptok = NULL;
+      DWORD siz, ret;
+      cygsid tu;
+
+      /* Get the SID from current process and store it in user.psid */
+      if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
+			     &ptok))
+	system_printf ("OpenProcessToken(): %E");
+      else
+	{
+	  if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
+	    system_printf ("GetTokenInformation (TokenUser): %E");
+	  else if (!(ret = set_sid (tu)))
+	    system_printf ("Couldn't retrieve SID from access token!");
+	  /* Set token owner to the same value as token user */
+	  else if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
+	    debug_printf ("SetTokenInformation(TokenOwner): %E");
+	  if (!GetTokenInformation (ptok, TokenPrimaryGroup,
+				    &groups.pgsid, sizeof tu, &siz))
+	    system_printf ("GetTokenInformation (TokenPrimaryGroup): %E");
+	  CloseHandle (ptok);
+	}
+    }
+}
+
 void
 internal_getlogin (cygheap_user &user)
 {
   struct passwd *pw = NULL;
-  HANDLE ptok = INVALID_HANDLE_VALUE;
 
   myself->gid = UNKNOWN_GID;
+
   if (wincap.has_security ())
     {
-      DWORD siz;
-      cygsid tu;
-      DWORD ret = 0;
-
-      /* Try to get the SID either from current process and
-	 store it in user.psid */
-      if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
-			     &ptok))
-	system_printf ("OpenProcessToken(): %E");
-      else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
-	system_printf ("GetTokenInformation (TokenUser): %E");
-      else if (!(ret = user.set_sid (tu)))
-	system_printf ("Couldn't retrieve SID from access token!");
-      else if (!GetTokenInformation (ptok, TokenPrimaryGroup,
-				     &user.groups.pgsid, sizeof tu, &siz))
-	system_printf ("GetTokenInformation (TokenPrimaryGroup): %E");
-       /* We must set the user name, uid and gid.
-	 If we have a SID, try to get the corresponding Cygwin
-	 password entry. Set user name which can be different
-	 from the Windows user name */
-      if (ret)
-	{
-	  pw = internal_getpwsid (tu);
-	  /* Set token owner to the same value as token user */
-	  if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
-	    debug_printf ("SetTokenInformation(TokenOwner): %E");
-	 }
+      cygpsid psid = user.sid ();
+      pw = internal_getpwsid (psid);
     }
 
   if (!pw && !(pw = internal_getpwnam (user.name ()))
@@ -81,19 +94,24 @@ internal_getlogin (cygheap_user &user)
 	  cygsid gsid;
 	  if (gsid.getfromgr (internal_getgrgid (pw->pw_gid)))
 	    {
-	      /* Set primary group to the group in /etc/passwd. */
-	      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
-					&gsid, sizeof gsid))
-		debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
-	      else
-		user.groups.pgsid = gsid;
+	      HANDLE ptok;
+	      if (gsid != user.groups.pgsid
+		  && OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
+				     &ptok))
+	        {
+		  /* Set primary group to the group in /etc/passwd. */
+		  if (!SetTokenInformation (ptok, TokenPrimaryGroup,
+					    &gsid, sizeof gsid))
+		    debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
+		  else
+		    user.groups.pgsid = gsid;
+		  CloseHandle (ptok);
+		}
 	    }
 	  else
 	    debug_printf ("gsid not found in augmented /etc/group");
 	}
     }
-  if (ptok != INVALID_HANDLE_VALUE)
-    CloseHandle (ptok);
   (void) cygheap->user.ontherange (CH_HOME, pw);
 
   return;

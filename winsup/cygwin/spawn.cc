@@ -654,9 +654,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       /* Set security attributes with sid */
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf, sid);
 
-      /* Load users registry hive. */
-      load_registry_hive (sid);
-
       /* allow the child to interact with our window station/desktop */
       HANDLE hwst, hdsk;
       SECURITY_INFORMATION dsi = DACL_SECURITY_INFORMATION;

@@ -2141,9 +2141,9 @@ seteuid32 (__uid32_t uid)
   user_groups &groups = cygheap->user.groups;
   HANDLE ptok, new_token = INVALID_HANDLE_VALUE;
   struct passwd * pw_new;
-  PSID origpsid, psid2 = NO_SID;
-  BOOL token_is_internal;
-
+  cygpsid origpsid, psid2 (NO_SID);
+  BOOL token_is_internal, issamesid;
+  
   pw_new = internal_getpwuid (uid);
   if (!wincap.has_security () && pw_new)
     goto success_9x;
@@ -2219,6 +2219,9 @@ seteuid32 (__uid32_t uid)
     }
   else if (new_token != ptok)
     {
+      /* Avoid having HKCU use default user */
+      load_registry_hive (usersid);
+      
       /* Try setting owner to same value as user. */
       if (!SetTokenInformation (new_token, TokenOwner,
 				&usersid, sizeof usersid))
@@ -2233,10 +2236,16 @@ seteuid32 (__uid32_t uid)
     }
 
   CloseHandle (ptok);
+  issamesid = (usersid == (psid2 = cygheap->user.sid ())); 
   cygheap->user.set_sid (usersid);
   cygheap->user.current_token = new_token == ptok ? INVALID_HANDLE_VALUE
-						  : new_token;
+                                                  : new_token;
+  if (!issamesid) /* MS KB 199190 */
+    RegCloseKey(HKEY_CURRENT_USER); 
   cygheap->user.reimpersonate ();
+  if (!issamesid)
+    user_shared_initialize ();
+
 success_9x:
   cygheap->user.set_name (pw_new->pw_name);
   myself->uid = uid;
@@ -2975,7 +2984,7 @@ long gethostid(void)
 
 #define ETC_SHELLS "/etc/shells"
 static int shell_index;
-static FILE *shell_fp;
+static struct __sFILE64 *shell_fp;
 
 extern "C" char *
 getusershell ()
@@ -2994,7 +3003,7 @@ getusershell ()
   static char buf[MAX_PATH];
   int ch, buf_idx;
 
-  if (!shell_fp && !(shell_fp = fopen (ETC_SHELLS, "rt")))
+  if (!shell_fp && !(shell_fp = fopen64 (ETC_SHELLS, "rt")))
     {
       if (def_shells[shell_index])
         return strcpy (buf, def_shells[shell_index++]);
