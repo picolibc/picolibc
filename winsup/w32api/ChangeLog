@@ -1,3 +1,6 @@
+Fri Jan 26 11:34:04 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/winnt.h: Add PTOKEN_USER.
 
 Tue Jan 16 13:53:30  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
@@ -123,7 +126,7 @@ Fri Nov  3 21:50:47 2000  Christopher Faylor <cgf@cygnus.com>
 
 Mon Oct 19 13:55:00 2000  Earnie Boyd <earnie_boyd@yahoo.com>
 
-        * Makefile.in: increment VERSION.  Change tar file name for dist and
+	* Makefile.in: increment VERSION.  Change tar file name for dist and
 	bindist targets to be more standard.
 	* config.guess: Update with the currently published file.
 	* config.sub: ditto.
@@ -165,9 +168,9 @@ Sun Oct  8 18:26:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 Mon Oct  2 11:15:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * include/ras.h: New file.
-        * lib/rasapi32.def: Add symbols for RasEnumDevicesA and
-        RasEnumDevicesW.
+	* include/ras.h: New file.
+	* lib/rasapi32.def: Add symbols for RasEnumDevicesA and
+	RasEnumDevicesW.
 
 Mon Oct  2 10:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
@@ -175,29 +178,29 @@ Mon Oct  2 10:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 Sun Oct  1 23:55:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * include/ipexport.h: Add missing `extern "C"' directives.
-        * include/iphlpapi.h: Ditto.
-        * include/iprtrmib.h: Ditto.
-        * include/iptypes.h: Ditto.
+	* include/ipexport.h: Add missing `extern "C"' directives.
+	* include/iphlpapi.h: Ditto.
+	* include/iprtrmib.h: Ditto.
+	* include/iptypes.h: Ditto.
 
 Sun Oct  1 22:09:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * include/ipifcons.h: New header file.
-        * include/iprtrmib.h: Move operational states to ipifcons.h.
-        * include/iphlpapi.h: Add missing parameters to GetIfTable()
-        declaration.
+	* include/ipifcons.h: New header file.
+	* include/iprtrmib.h: Move operational states to ipifcons.h.
+	* include/iphlpapi.h: Add missing parameters to GetIfTable()
+	declaration.
 
 Sun Oct  1 16:30:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * include/iprtrmib.h: Add missing MIB_IF_OPER_STATUS_xxx definitions.
+	* include/iprtrmib.h: Add missing MIB_IF_OPER_STATUS_xxx definitions.
 
 Sun Oct  1 16:13:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * lib/iphlpapi.def: New stub for iphlpapi.dll.
-        * include/iptypes.h: New header file.
-        * include/ipexport.h: Ditto.
-        * include/iphlpapi.h: Ditto.
-        * include/iprtrmib.h: Ditto.
+	* lib/iphlpapi.def: New stub for iphlpapi.dll.
+	* include/iptypes.h: New header file.
+	* include/ipexport.h: Ditto.
+	* include/iphlpapi.h: Ditto.
+	* include/iprtrmib.h: Ditto.
 
 Sun Oct  1  2:54:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
