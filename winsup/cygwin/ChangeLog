@@ -1,3 +1,12 @@
+2003-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Fix vendor id in cpuid case.
+
+2003-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_rcmd): Use correct file descriptor in call to fdsock.
+	(cygwin_rexec): Ditto.
+
 2003-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::dup): Don't call
