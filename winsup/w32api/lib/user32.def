@@ -4,6 +4,7 @@ ActivateKeyboardLayout@8
 AdjustWindowRect@12
 AdjustWindowRectEx@16
 AllowSetForegroundWindow@4
+AnimateWindow@12
 AnyPopup@0
 AppendMenuA@16
 AppendMenuW@16

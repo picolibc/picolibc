@@ -1,5 +1,14 @@
 2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h [WINVER >= 0x0500] (AnimateWindow): Add
+	function.
+
+	* lib/user32.def (AnimateWindow): Add function. By the way
+	there are ~ 140 symbols missing from this file when comparing
+	to user32.dll on Windows XP.
+
+2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h [WINVER >= 0x0500] (AW_SLIDE, AW_ACTIVATE,
 	AW_BLEND, AW_HIDE, AW_CENTER, AW_HOR_POSITIVE, AW_HOR_NEGATIVE,
 	AW_VER_POSITIVE, AW_VER_NEGATIVE): Add constants. For use by
