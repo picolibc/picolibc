@@ -94,7 +94,7 @@ __END_CSTD_NAMESPACE
 #ifndef _WSTDIO_DEFINED
 
 #ifndef __VALIST
-#if defined __GNUC__ && __GNUC__ > = 3
+#if defined __GNUC__ && __GNUC__ >= 3
 #define __VALIST __builtin_va_list
 #else
 #define __VALIST char*
@@ -131,16 +131,16 @@ __BEGIN_CGLOBAL_NAMESPACE
 #ifndef __STRICT_ANSI__
 wchar_t* _getws (wchar_t*);
 int	_putws (const wchar_t*);
-FILE*	_wfdopen(int, wchar_t *);
-FILE*	_wfopen (const wchar_t*, const wchar_t*);
-FILE*	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
-FILE*	_wfsopen (const wchar_t*, const wchar_t*, int);
+__CSTD FILE*	_wfdopen(int, wchar_t *);
+__CSTD FILE*	_wfopen (const wchar_t*, const wchar_t*);
+__CSTD FILE*	_wfreopen (const wchar_t*, const wchar_t*, __CSTD FILE*);
+__CSTD FILE*	_wfsopen (const wchar_t*, const wchar_t*, int);
 wchar_t* _wtmpnam (wchar_t*);
 wchar_t* _wtempnam (const wchar_t*, const wchar_t*);
 int	_wrename (const wchar_t*, const wchar_t*);
 int	_wremove (const wchar_t*);
 void	_wperror (const wchar_t*);
-FILE*	_wpopen (const wchar_t*, const wchar_t*);
+__CSTD FILE*	_wpopen (const wchar_t*, const wchar_t*);
 #endif	/* Not __STRICT_ANSI__ */
 #endif	/* __MSVCRT__ */
 
