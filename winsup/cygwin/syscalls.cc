@@ -2004,7 +2004,7 @@ seteuid32 (__uid32_t uid)
       else
 	{
 	  CloseHandle (ptok);
-	  return 0; /* No change */
+	  goto success; /* No change */
 	}
     }
 
@@ -2025,7 +2025,7 @@ seteuid32 (__uid32_t uid)
 	      CloseHandle (ptok);
 	      if (!ImpersonateLoggedOnUser (cygheap->user.token))
 		system_printf ("Impersonating in seteuid failed: %E");
-	      return 0; /* No change */
+	      goto success; /* No change */
 	    }
 	}
     }
@@ -2097,6 +2097,7 @@ seteuid32 (__uid32_t uid)
       CloseHandle (sav_token);
   cygheap->user.set_name (pw_new->pw_name);
   cygheap->user.set_sid (usersid);
+success:
   myself->uid = uid;
   groups.ischanged = FALSE;
   return 0;

@@ -365,7 +365,8 @@ getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
 	      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 		if (sid.getfromgr (gr))
 		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
-		    if (sid == groups->Groups[pg].Sid)
+		    if (sid == groups->Groups[pg].Sid && 
+			sid != well_known_world_sid)
 		      {
 			if (cnt < gidsetsize)
 			  grouplist[cnt] = gr->gr_gid;
@@ -516,5 +517,4 @@ setgroups (int ngroups, const __gid16_t *grouplist)
         grouplist32[i] = grouplist[i];
     }
   return setgroups32 (ngroups, grouplist32);
-
 }
