@@ -1,3 +1,8 @@
+Thu Mar  1 21:06:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (sig_handle_tty_stop): Ignore attempts to suspend a
+	process if started by non-cygwin parent.
+
 Thu Mar  1 20:48:11 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (peek_console): Don't report read_ready on mouse events
