@@ -1,3 +1,9 @@
+2002-03-19  Christopher Faylor  <cgf@redhat.com>
+
+	* mkgroup.c (usage): Use one just fprintf + string concatenation for
+	output message.
+	(print_version): Add void to function type and update copyright.
+
 2002-03-16  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* mkgroup.c (usage): Simplify usage output.  Generalize to allow use

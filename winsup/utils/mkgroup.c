@@ -1,6 +1,6 @@
 /* mkgroup.c:
 
-   Copyright 1997, 1998, 2002 Cygnus Solutions.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -406,21 +406,21 @@ print_special (int print_sids,
 int
 usage (FILE * stream, int status)
 {
-  fprintf (stream, "Usage: mkgroup [OPTION]... [domain]\n\n");
-  fprintf (stream, "This program prints a /etc/group file to stdout\n\n");
-  fprintf (stream, "Options:\n");
-  fprintf (stream, "   -l,--local             print local group information\n");
-  fprintf (stream, "   -d,--domain            print global group information from the domain\n");
-  fprintf (stream, "                          specified (or from the current domain if there is\n");
-  fprintf (stream, "                          no domain specified)\n");
-  fprintf (stream, "   -o,--id-offset offset  change the default offset (10000) added to uids\n");
-  fprintf (stream, "                          in domain accounts.\n");
-  fprintf (stream, "   -s,--no-sids           don't print SIDs in pwd field\n");
-  fprintf (stream, "                          (this affects ntsec)\n");
-  fprintf (stream, "   -u,--users             print user list in gr_mem field\n");
-  fprintf (stream, "   -h,--help              print this message\n\n");
-  fprintf (stream, "   -v,--version           print version information and exit\n\n");
-  fprintf (stream, "One of `-l' or `-d' must be given on NT/W2K.\n");
+  fprintf (stream, "Usage: mkgroup [OPTION]... [domain]\n\n"
+		   "This program prints a /etc/group file to stdout\n\n"
+		   "Options:\n"
+		   "   -l,--local             print local group information\n"
+		   "   -d,--domain            print global group information from the domain\n"
+		   "                          specified (or from the current domain if there is\n"
+		   "                          no domain specified)\n"
+		   "   -o,--id-offset offset  change the default offset (10000) added to uids\n"
+		   "                          in domain accounts.\n"
+		   "   -s,--no-sids           don't print SIDs in pwd field\n"
+		   "                          (this affects ntsec)\n"
+		   "   -u,--users             print user list in gr_mem field\n"
+		   "   -h,--help              print this message\n\n"
+		   "   -v,--version           print version information and exit\n\n"
+		   "One of `-l' or `-d' must be given on NT/W2K.\n");
   return status;
 }
 
@@ -437,6 +437,7 @@ struct option longopts[] = {
 
 char opts[] = "ldo:suhv";
 
+void
 print_version ()
 {
   const char *v = strchr (version, ':');
@@ -454,7 +455,7 @@ print_version ()
   printf ("\
 mkgroup (cygwin) %.*s\n\
 group File Generator\n\
-Copyright 1997, 1998, 2002 Red Hat, Inc.\n\
+Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
 Compiled on %s", len, v, __DATE__);
 }
 

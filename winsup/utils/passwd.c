@@ -1,6 +1,6 @@
 /* passwd.c: Changing passwords and managing account information
 
-   Copyright 1999 Cygnus Solutions.
+   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 
