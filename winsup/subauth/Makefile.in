@@ -1,0 +1,89 @@
+# Copyright (c) 2001, Red Hat, Inc.
+#
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 2 of the License, or
+#     (at your option) any later version.
+#
+#     A copy of the GNU General Public License can be found at
+#     http://www.gnu.org/
+#
+# Written by Corinna Vinschen <vinschen@redhat.de>
+#
+# Makefile for Cygwin subauthentication DLL.
+
+SHELL := @SHELL@
+
+srcdir          := @srcdir@
+VPATH           := @srcdir@
+prefix          := @prefix@
+exec_prefix     := @exec_prefix@
+
+bindir          := @bindir@
+etcdir          := $(exec_prefix)/etc
+
+program_transform_name := @program_transform_name@
+
+INSTALL         := @INSTALL@
+INSTALL_PROGRAM := @INSTALL_PROGRAM@
+INSTALL_DATA    := @INSTALL_DATA@
+
+CC              := @CC@
+CC_FOR_TARGET   := $(CC)
+
+CFLAGS          := @CFLAGS@ -nostdinc
+
+include $(srcdir)/../Makefile.common
+
+WIN32_COMMON	:= -mno-cygwin
+WIN32_INCLUDES  := -I. -I$(srcdir) -I$(w32api_include)
+WIN32_CFLAGS    := $(CFLAGS) $(WIN32_COMMON) $(WIN32_INCLUDES)
+WIN32_LDFLAGS	:= $(CFLAGS) $(WIN32_COMMON) -L$(mingw_build) -nostdlib -Wl,-shared
+
+STARTFILE	:= $(mingw_build)/dllcrt2.o
+LIBS		:= -lmingw32 -lkernel32
+
+DLL	:=	cygsuba.dll
+DEF_FILE:=	cygsuba.def
+
+OBJ	=	cygsuba.o
+
+.SUFFIXES:
+.NOEXPORT:
+
+all: Makefile $(DLL)
+
+$(DEF_FILE): cygsuba.din config.status
+	$(SHELL) config.status
+
+$(DLL): $(OBJ) $(DEF_FILE)
+ifdef VERBOSE
+	$(CC) -s $(WIN32_LDFLAGS) -o $@ $(DEF_FILE) $(STARTFILE) $(OBJ) $(LIBS)
+else
+	@echo $(CC) .. -o $@ $(OBJ)
+	@$(CC) -s $(WIN32_LDFLAGS) -o $@ $(DEF_FILE) $(STARTFILE) $(OBJ) $(LIBS)
+endif
+
+.PHONY: all install clean realclean
+
+realclean: clean
+	rm -f  Makefile config.cache
+
+clean:
+	rm *.o *.dll
+
+install: all
+	$(SHELL) $(updir1)/mkinstalldirs $(bindir)
+	for i in $(PROGS) ; do \
+	  n=`echo $$i | sed '$(program_transform_name)'`; \
+	  $(INSTALL_PROGRAM) $$i $(bindir)/$$n; \
+	done
+
+%.o: %.c
+ifdef VERBOSE
+	$(CC) $(WIN32_CFLAGS) -c -o $@ $<
+else
+	@echo $(CC) -c $(CFLAGS) ... $(<F)
+	@$(CC) $(WIN32_CFLAGS) -c -o $@ $<
+endif
+

@@ -1,0 +1,5 @@
+LIBRARY "cygsuba"
+
+EXPORTS
+Msv1_0SubAuthenticationRoutine = Msv1_0SubAuthenticationRoutine@36
+Msv1_0SubAuthenticationFilter = Msv1_0SubAuthenticationFilter@36
