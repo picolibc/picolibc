@@ -1,3 +1,9 @@
+2004-10-21  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR 463
+	* bfdlink.h (bfd_link_callbacks): Add a pointer to struct
+	bfd_link_hash_entry to reloc_overflow.
+
 2004-10-12  Paul Brook  <paul@codesourcery.com>
 
 	* elf/arm.h (EF_ARM_EABI_VER4): Define.
