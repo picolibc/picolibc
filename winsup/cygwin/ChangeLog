@@ -1,5 +1,9 @@
 2002-06-26  Christopher Faylor  <cgf@redhat.com>
 
+	* cygheap.cc (cygheap_user::set_name): Correct thinko in below change.
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (cygheap_user::set_name): Avoid clearing things when just
 	setting name to itself or during first time initialization.
 

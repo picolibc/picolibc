@@ -103,11 +103,13 @@ fhandler_disk_file::fstat_by_name (struct __stat64 *buf, path_conv *pc)
 
   if (!pc->exists ())
     {
+      debug_printf ("already determined that pc does not exist");
       set_errno (ENOENT);
       res = -1;
     }
-  else if ((handle = FindFirstFile (pc->get_win32 (), &local)) == INVALID_HANDLE_VALUE)
+  else if ((handle = FindFirstFile ((char *) pc, &local)) == INVALID_HANDLE_VALUE)
     {
+      debug_printf ("FindFirstFile failed, %E");
       __seterrno ();
       res = -1;
     }
