@@ -113,6 +113,13 @@ struct sigaction
 
 #define SA_NOCLDSTOP 1  /* only value supported now for sa_flags */
 
+#ifdef __CYGWIN__
+# define SA_RESTART   0x10000000 /* Restart syscall on signal return.  */
+# define SA_NODEFER   0x40000000 /* Don't automatically block the signal when
+                                    its handler is being executed.  */
+# define SA_RESETHAND 0x80000000 /* Reset to SIG_DFL on entry to handler.  */
+#endif
+
 #endif /* defined(__rtems__) */
 
 #define SIG_SETMASK 0	/* set mask with sigprocmask() */

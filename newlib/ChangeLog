@@ -1,3 +1,7 @@
+Fri Jan 12 00:34:31 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/sys/signal.h: Add some SA_* defines for Cygwin.
+
 Thu Jan 11 20:42:06  2001  Earnie Boyd  <earnie_boyd@yahoo.com>
 
 	* libc/include/sys/features.h: __CYGWIN__ preferred over __CYGWIN32__
