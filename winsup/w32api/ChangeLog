@@ -1,3 +1,7 @@
+Wed Apr 26 11:04:18 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/wininet.h: Add another "INTERNET_OPTIONS".
+
 2000-04-25  Mumit Khan  <khan@xraylith.wisc.edu>
 
 	* include/winspool.h: Add 2 more PRINTER_ATTRIBUTE_* macros.
