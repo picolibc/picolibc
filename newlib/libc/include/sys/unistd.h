@@ -147,7 +147,7 @@ pid_t   _EXFUN(tcgetpgrp, (int __fildes ));
 int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
 char    _EXFUN(*ttyname, (int __fildes ));
 #if defined(__CYGWIN__)
-int     _EXFUN(ttyname_r, (int, char * size_t)); 
+int     _EXFUN(ttyname_r, (int, char *, size_t)); 
 #endif
 int     _EXFUN(unlink, (const char *__path ));
 int     _EXFUN(vhangup, (void ));
