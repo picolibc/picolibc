@@ -20,13 +20,14 @@
  * 6 Oct 02	Modified for MinGW by inlining utility routines,
  * 		removing global variables and splitting out strtold
  *		from _IO_ldtoa and _IO_ldtostr.
- *  
+ *
+ * 4 Feb 04	Reorganize __asctoe64 to fix setting error codes,
+ *		and handling special chars.
+ *	
  *		Danny Smith <dannysmith@users.sourceforge.net> 
  */
 
-
 #include "math/cephes_emath.h"
-
 #if NE == 10
 
 /* 1.0E0 */
@@ -89,15 +90,19 @@ static const unsigned short __etens[NTEN+1][NE] = {
 int __asctoe64(const char * __restrict__ ss, short unsigned int * __restrict__ y)
 {
 unsigned short yy[NI], xt[NI], tt[NI];
-int esign, decflg, sgnflg, nexp, exp, prec, lost;
-int k, trail, c;
+int esign, decflg, nexp, exp, lost;
+int k, c;
+int valid_lead_string = 0;
+int have_non_zero_mant = 0;
+int prec = 0;
+/* int trail = 0; */
 long lexp;
-unsigned short nsign;
+unsigned short nsign = 0;
 const unsigned short *p;
 char *sp,  *lstr;
 char *s;
 
-char dec_sym = *(localeconv ()->decimal_point); 
+const char dec_sym = *(localeconv ()->decimal_point); 
 
 int lenldstr = 0;
 
@@ -119,23 +124,58 @@ for( k=0; k<c; k++ )
 *sp = '\0';
 s = lstr;
 
+if (*s == '-')
+  {
+    nsign = 0xffff;
+    ++s;
+  }
+else if (*s == '+')
+  {
+   ++s;
+  }
+
+if (_strnicmp("INF", s , 3) == 0)
+ {
+    valid_lead_string = 1;
+    s += 3;
+    if ( _strnicmp ("INITY", s, 5) == 0)
+       s += 5;
+    __ecleaz(yy);
+    yy[E] = 0x7fff;  /* infinity */
+    goto aexit;
+ }
+else if(_strnicmp ("NAN", s, 3) == 0)
+ {
+   valid_lead_string = 1;
+   s += 3;
+   __enan_NI16( yy );
+   goto aexit;
+ }
+
+/* FIXME: Handle case of strtold ("NAN(n_char_seq)",endptr)  */ 
+
+/*  Now get some digits.  */
 lost = 0;
-nsign = 0;
 decflg = 0;
-sgnflg = 0;
 nexp = 0;
 exp = 0;
-prec = 0;
 __ecleaz( yy );
-trail = 0;
+
+/* Ignore leading zeros */
+while (*s == '0')
+  {
+    valid_lead_string = 1;
+    s++;
+  }
 
 nxtcom:
+
 k = *s - '0';
 if( (k >= 0) && (k <= 9) )
 	{
-/* Ignore leading zeros */
-	if( (prec == 0) && (decflg == 0) && (k == 0) )
-		goto donchr;
+#if 0
+/* The use of a special char as a flag for trailing zeroes causes problems when input
+   actually contains the char  */
 /* Identify and strip trailing zeros after the decimal point. */
 	if( (trail == 0) && (decflg != 0) )
 		{
@@ -144,11 +184,15 @@ if( (k >= 0) && (k <= 9) )
 			++sp;
 		--sp;
 		while( *sp == '0' )
-			*sp-- = 'z';
-		trail = 1;
-		if( *s == 'z' )
+		   {	
+		     *sp-- = (char)-1;
+		     trail++;
+		   }
+		if( *s == (char)-1 )
 			goto donchr;
 		}
+#endif
+
 /* If enough digits were given to more than fill up the yy register,
  * continuing until overflow into the high guard word yy[2]
  * guarantees that there will be a roundoff bit at the top
@@ -175,70 +219,36 @@ if( (k >= 0) && (k <= 9) )
 		if (decflg == 0)
 		        nexp -= 1;
 		}
-	prec += 1;
-	goto donchr;
+	have_non_zero_mant |= k;
+	prec ++;
+	/* goto donchr; */
 	}
-if (*s == dec_sym)
+else if (*s == dec_sym)
   {
     if( decflg )
       goto daldone;
     ++decflg;
   }
-else
-  switch( *s )
-    {
-	case 'z':
-		break;
-	case 'E':
-	case 'e':
-		goto expnt;
-	case '-':
-		nsign = 0xffff;
-		if( sgnflg )
-			goto daldone;
-		++sgnflg;
-		break;
-	case '+':
-		if( sgnflg )
-			goto daldone;
-		++sgnflg;
-		break;
-	case 'i':
-	case 'I':
-    	{
-	  s++;
-	  if (*s != 'n' && *s != 'N')
-	    goto zero;
-	  s++;
-	  if (*s != 'f' && *s != 'F')
-	    goto zero;
-	  s++;
-	  if ((*s == 'i' || *s == 'I') && (s[1] == 'n' || s[1] == 'N')
-	       && (s[2] == 'i' || s[2] == 'I')
-	       && (s[3] == 't' || s[3] == 'T')
-	       && (s[4] == 'y' || s[4] == 'Y'))
-	    s += 5;
-	  goto infinite;
-    	}
-	case 'n':
-	case 'N':
-    	{
-	  s++;
-	  if (*s != 'a' && *s != 'A')
-	    goto zero;
-	  s++;
-	  if (*s != 'n' && *s != 'N')
-	    goto zero;
-	  s++;
-	  __enan_NI16( yy );
-	  goto aexit;
-    	}
-	default:
-	  goto daldone;
-    }
-donchr:
+else if ((*s == 'E') || (*s == 'e') )
+  {
+    if (prec || valid_lead_string)
+	goto expnt;
+     else	
+	goto daldone;
+  }
+
+#if 0
+else if (*s == (char)-1)
+  goto donchr;
+#endif
+
+else  /* an invalid char */
+    goto daldone;
+
+/* donchr: */
 ++s;
 goto nxtcom;
+
 
 /* Exponent interpretation */
 expnt:
@@ -254,31 +264,39 @@ if( *s == '-' )
 	}
 if( *s == '+' )
 	++s;
-while( (*s >= '0') && (*s <= '9') && exp < 4978)
-	{
-	exp *= 10;
-	exp += *s++ - '0';
-	}
+
+while( (*s >= '0') && (*s <= '9') )
+{
+  /* Stop modifying exp if we are going to overflow anyway,
+     but keep parsing the string. */	
+  if (exp < 4978)
+    {
+      exp *= 10;
+      exp += *s - '0';
+    }
+  s++;
+}
+
 if( esign < 0 )
 	exp = -exp;
-if( exp > 4932 )
+
+if (exp > 4977) /* maybe overflow */
 	{
-	errno = ERANGE;
-infinite:
 	__ecleaz(yy);
-	yy[E] = 0x7fff;  /* infinity */
+	if (have_non_zero_mant)
+	  yy[E] = 0x7fff;
 	goto aexit;
 	}
-if( exp < -4977 )
+else if (exp < -4977) /* underflow */
 	{
-	errno = ERANGE;
-zero:
 	__ecleaz(yy);
 	goto aexit;
-	}
+  	}
 
 daldone:
+
 nexp = exp - nexp;
+
 /* Pad trailing zeros to minimize power of 10, per IEEE spec. */
 while( (nexp > 0) && (yy[2] == 0) )
 	{
@@ -363,8 +381,17 @@ __emdnorm( yy, k, 0, lexp, 64, 64 );
 aexit:
 
 yy[0] = nsign;
+
 __toe64( yy, y );
-return (lenldstr + s - lstr);
+
+/* Check for overflow, undeflow  */
+if (have_non_zero_mant &&
+    (*((long double*) y) == 0.0L || isinf (*((long double*) y)))) 
+  errno = ERANGE;
+
+if (prec || valid_lead_string)
+  return (lenldstr + (s - lstr));
+return 0;
 }
 
 
@@ -380,5 +407,6 @@ long double strtold (const char * __restrict__ s, char ** __restrict__ se)
   lenldstr =  __asctoe64( s, xx.us);
   if (se)
     *se = (char*)s + lenldstr;
+
   return xx.ld;
 }
