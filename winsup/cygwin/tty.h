@@ -1,4 +1,4 @@
-/* tty.h: shared info for cygwin
+/* tty.h: shared tty info for cygwin
 
    Copyright 2000 Cygnus Solutions.
 

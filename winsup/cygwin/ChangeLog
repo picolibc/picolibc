@@ -1,3 +1,7 @@
+Fri Oct 27 11:37:20 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (wait_sig): Add braces to avoid confusion.
+
 Fri Oct 27 11:48:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_socket.cc: New file.

@@ -1121,10 +1121,12 @@ wait_sig (VOID *)
        * this thread should terminate.
        */
       if (rc == WAIT_TIMEOUT)
-	if (!sig_loop_wait)
-	  break;			// Exiting
-	else
-	  continue;
+	{
+	  if (!sig_loop_wait)
+	    break;			// Exiting
+	  else
+	    continue;
+	}
 
       if (rc == WAIT_FAILED)
 	{
