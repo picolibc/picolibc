@@ -1,6 +1,6 @@
 /* version.h -- Cygwin version numbers and accompanying documentation.
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -58,7 +58,7 @@ details. */
 
 #define CYGWIN_VERSION_DLL_MAKE_COMBINED(maj, min) (((maj) * 1000) + min)
 #define CYGWIN_VERSION_DLL_COMBINED \
-  CYGWIN_VERSION_DLL_MAKE_COMBINED (CYGWIN_DLL_VERSION_MAJOR, CYGWIN_DLL_VERSION_MINOR)
+  CYGWIN_VERSION_DLL_MAKE_COMBINED (CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR)
 
      /* Every version of cygwin <= this uses an old, incorrect method
 	to determine signal masks. */
