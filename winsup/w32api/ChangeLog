@@ -1,3 +1,8 @@
+2004-12-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/directx/strmiids.c (MEDIASUBTYPE_YV12): Correct GUID.
+	Thanks to "Pete" <pross@xvid.org>
+
 2004-11-21 Benoit Blanchon  <bblanchon@users.sourceforge.net>
 
 	* include/wingdi.h (AC_SRC_ALPHA, AC_SRC_NO_ALPHA, 
