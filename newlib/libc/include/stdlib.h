@@ -89,6 +89,7 @@ int	_EXFUN(rand,(_VOID));
 _PTR	_EXFUN(realloc,(_PTR __r, size_t __size));
 _VOID	_EXFUN(srand,(unsigned __seed));
 double	_EXFUN(strtod,(const char *__n, char **_end_PTR));
+double	_EXFUN(_strtod_r,(struct _reent *,const char *__n, char **_end_PTR));
 #ifndef __STRICT_ANSI__
 float	_EXFUN(strtodf,(const char *__n, char **_end_PTR));
 #endif

@@ -1,3 +1,7 @@
+2001-04-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdlib.h: Add prototype for _strtod_r.
+
 2001-04-24  Charles Wilson  <cwilson@ece.gatech.edu
 
         * libc/stdio/vprintf.c (vprintf): fix signature to use _DEFUN
