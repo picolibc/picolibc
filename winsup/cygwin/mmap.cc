@@ -140,6 +140,7 @@ mmap_record::map_map (__off64_t off, DWORD len)
       break;
     }
 
+  debug_printf ("map_map (fd=%d, off=%D, len=%d)", fdesc_, off, len);
   len = PAGE_CNT (len);
   if (fdesc_ == -1 && !off)
     {
@@ -468,7 +469,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
 
   /* Map always in multipliers of `granularity'-sized chunks. */
   __off64_t gran_off = off & ~(granularity - 1);
-  DWORD gran_len = howmany (len, granularity) * granularity;
+  DWORD gran_len = howmany (off + len, granularity) * granularity - gran_off;
 
   fhandler_base *fh;
   caddr_t base = addr;

@@ -1,3 +1,8 @@
+2002-09-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (map_map): Add debug output.
+	(mmap64): Evaluate gran_len correctly even if offset isn't 0.
+
 2002-09-22  Christopher Faylor  <cgf@redhat.com>
 
 	More GNUify non-GNU formatted functions calls throughout.
