@@ -1,3 +1,10 @@
+2004-02-18  Christopher Faylor  <cgf@redhat.com>
+
+	* gendef (stabilize_sig_stack): New function.
+	(setjmp): Import, add sig stack handling.  Store sig stack info.
+	(longjmp): Call stabilize_sig_stack.  Restore sig stack info.
+	* config/i386/setjmp.c: Remove.
+
 2004-02-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fork.cc (fork_child): Move fixup_shms_after_fork so that

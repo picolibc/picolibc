@@ -236,9 +236,8 @@ EOF
 sub longjmp {
     return <<EOF;
 
-	.globl	_longjmp
-
-_longjmp:
+	.extern	__ZN7_cygtls19call_signal_handlerEv
+stabilize_sig_stack:
 1:	movl	%fs:4,%edx
 	movl	\$1,%eax
 	lock	xchgl %eax,$tls::stacklock(%edx)
@@ -248,12 +247,63 @@ _longjmp:
 	xorl	%eax,%eax
 	call	_low_priority_sleep
 	jmp	1b
-2:	leal	($tls::stack)(%edx),%eax
-	movl	%eax,($tls::stackptr)(%edx)
+2:	cmpl	\$0,$tls::sig(%edx)
+	jz	3f
+	decl	$tls::stacklock(%edx)
+	movl	%edx,%eax
+	call	__ZN7_cygtls19call_signal_handlerEv
+	jmp	1b
+3:	ret
 
+	.globl	_setjmp
+_setjmp:
 	pushl	%ebp
 	movl	%esp,%ebp
+	pushl	%edi
 	movl	8(%ebp),%edi
+	movl	%eax,0(%edi)
+	movl	%ebx,4(%edi)
+	movl	%ecx,8(%edi)
+	movl	%edx,12(%edi)
+	movl	%esi,16(%edi)
+	movl	-4(%ebp),%eax
+	movl	%eax,20(%edi)
+	movl	0(%ebp),%eax
+	movl	%eax,24(%edi)
+	movl	%esp,%eax
+	addl	\$12,%eax
+	movl	%eax,28(%edi)
+	movl	4(%ebp),%eax
+	movl	%eax,32(%edi)
+	movw	%es,%ax
+	movw	%ax,36(%edi)
+	movw	%fs,%ax
+	movw	%ax,38(%edi)
+	movw	%gs,%ax
+	movw	%ax,40(%edi)
+	movw	%ss,%ax
+	movw	%ax,42(%edi)
+	pushl	%edx
+	call	stabilize_sig_stack
+	movl	$tls::stackptr(%edx),%eax		# save stack pointer contents
+	decl	$tls::stacklock(%edx)
+	popl	%edx
+	movl	%eax,44(%edi)
+	popl	%edi
+	movl	\$0,%eax
+	leave
+	ret
+
+	.globl	_longjmp
+_longjmp:
+	pushl	%ebp
+	movl	%esp,%ebp
+	movl	8(%ebp),%edi				# address of buffer
+	call	stabilize_sig_stack
+	movl	44(%edi),%eax				# get old signal stack
+	movl	%eax,$tls::stackptr(%edx)		# restore
+	decl	$tls::stacklock(%edx)			# relinquish lock
+
 	movl	12(%ebp),%eax
 	testl	%eax,%eax
 	jne	3f
@@ -276,7 +326,6 @@ _longjmp:
 	movl	4(%edi),%ebx
 	movl	8(%edi),%ecx
 	movl	16(%edi),%esi
-	decl	$tls::stacklock(%edx)
 	movl	12(%edi),%edx
 	movl	20(%edi),%edi
 	popfl
