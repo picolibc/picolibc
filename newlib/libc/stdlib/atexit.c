@@ -53,6 +53,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stddef.h>
 #include <stdlib.h>
 #include <reent.h>
+#include <sys/lock.h>
 
 /*
  * Register a function to be performed at exit.
@@ -65,6 +66,12 @@ _DEFUN (atexit,
 {
   register struct _atexit *p;
 
+#ifndef __SINGLE_THREAD__
+  __LOCK_INIT(static, lock);
+
+  __lock_acquire(lock);
+#endif
+      
   /* _REENT_SMALL atexit() doesn't allow more than the required 32 entries.  */
 #ifndef _REENT_SMALL
   if ((p = _GLOBAL_REENT->_atexit) == NULL)
@@ -72,7 +79,12 @@ _DEFUN (atexit,
   if (p->_ind >= _ATEXIT_SIZE)
     {
       if ((p = (struct _atexit *) malloc (sizeof *p)) == NULL)
-        return -1;
+        {
+#ifndef __SINGLE_THREAD__
+          __lock_release(lock);
+#endif
+          return -1;
+        }
       p->_ind = 0;
       p->_on_exit_args._fntypes = 0;
       p->_next = _GLOBAL_REENT->_atexit;
@@ -81,8 +93,16 @@ _DEFUN (atexit,
 #else
   p = &_GLOBAL_REENT->_atexit;
   if (p->_ind >= _ATEXIT_SIZE)
-    return -1;
+    {
+#ifndef __SINGLE_THREAD__
+      __lock_release(lock);
+#endif
+      return -1;
+    }
 #endif
   p->_fns[p->_ind++] = fn;
+#ifndef __SINGLE_THREAD__
+  __lock_release(lock);
+#endif
   return 0;
 }

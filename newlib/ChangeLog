@@ -1,3 +1,8 @@
+2004-01-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/atexit.c: Protect global atexit list with a
+	lock when newlib is multithreaded.
+
 2004-01-27  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* configure.in: Add support to generate iconv converter flags
