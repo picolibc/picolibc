@@ -1,3 +1,8 @@
+2003-11-28  Christopher Faylor  <cgf@redhat.com>
+
+	* speclib: Use correct EOF marker.  Ensure that directory is actually
+	deleted when running under Windows.
+
 2003-11-27  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Reorganize to
