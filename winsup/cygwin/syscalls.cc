@@ -974,7 +974,7 @@ fstat64 (int fd, struct __stat64 *buf)
       if (!res)
 	{
 	  if (!buf->st_ino)
-	    buf->st_ino = hash_path_name (0, cfd->get_win32_name ());
+	    buf->st_ino = cfd->get_namehash ();
 	  if (!buf->st_dev)
 	    buf->st_dev = cfd->get_device ();
 	  if (!buf->st_rdev)
