@@ -1,3 +1,8 @@
+2000-04-17  Timothy Wall  <twall@cygnus.com>
+	
+	* ti.h: Load page cleanup.
+	* intental.h: Add load page field.
+	
 Mon Apr 17 16:44:01 2000  David Mosberger  <davidm@hpl.hp.com>
 
 	* pe.h (PEP64AOUTHDR): New header for PE+.

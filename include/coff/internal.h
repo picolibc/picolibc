@@ -303,6 +303,7 @@ struct internal_scnhdr
   unsigned long s_nlnno;	/* number of line number entries*/
   long s_flags;			/* flags			*/
   long s_align;			/* used on I960			*/
+  unsigned char s_page;         /* TI COFF load page            */
 };
 
 /*
