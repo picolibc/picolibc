@@ -1,6 +1,6 @@
 /* sys/cygwin.h
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -208,6 +208,8 @@ extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 
 #define TTY_CONSOLE	0x40000000
 
+#define EXTERNAL_PINFO_VERSION 1
+
 #ifndef _SYS_TYPES_H
 typedef unsigned short __uid16_t;
 typedef unsigned short __gid16_t;
@@ -235,7 +237,7 @@ struct external_pinfo
   char progname[MAX_PATH];
 
   DWORD strace_mask;
-  HANDLE strace_file;
+  DWORD version;
 
   DWORD process_state;
 

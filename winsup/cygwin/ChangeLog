@@ -1,3 +1,10 @@
+2002-05-29  Christopher Faylor  <cgf@redhat.com>
+
+	* external.cc (fillout_pinfo): Set new version field in external_pinfo
+	structure.
+	* include/sys/cygwin.h (external_pinfo): Replace strace_file with
+	version field.
+
 2002-05-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	Change internal uid datatype from __uid16_t to __uid32_t

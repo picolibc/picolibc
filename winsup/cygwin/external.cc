@@ -1,6 +1,6 @@
 /* external.cc: Interface to Cygwin internals from external programs.
 
-   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -83,7 +83,7 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.rusage_children = p->rusage_children;
 	  strcpy (ep.progname, p->progname);
 	  ep.strace_mask = 0;
-	  ep.strace_file = 0;
+	  ep.version = EXTERNAL_PINFO_VERSION;
 
 	  ep.process_state = p->process_state;
 
