@@ -171,6 +171,7 @@ EnableScrollBar@12
 EnableWindow@8
 EndDeferWindowPos@4
 EndDialog@8
+EndMenu@0
 EndPaint@8
 EnumChildWindows@12
 EnumClipboardFormats@4
@@ -198,6 +199,9 @@ FindWindowW@8
 FlashWindow@8
 FrameRect@12
 FreeDDElParam@8
+GetAltTabInfo@20
+GetAltTabInfoA@20	
+GetAltTabInfoW@20	
 GetActiveWindow@0
 GetAsyncKeyState@4
 GetCapture@0
@@ -219,7 +223,9 @@ GetClipboardFormatNameA@12
 GetClipboardFormatNameW@12
 GetClipboardOwner@0
 GetClipboardViewer@0
+GetComboBoxInfo@8
 GetCursor@0
+GetCursorInfo@4
 GetCursorPos@4
 GetDC@4
 GetDCEx@12
@@ -247,10 +253,14 @@ GetKeyboardLayoutNameW@4
 GetKeyboardState@4
 GetKeyboardType@4
 GetLastActivePopup@4
+GetLastInputInfo@4
+GetListBoxInfo@4
 GetMenu@4
+GetMenuBarInfo@16
 GetMenuCheckMarkDimensions@0
 GetMenuContextHelpId@4
 GetMenuDefaultItem@12
+GetMenuInfo@8
 GetMenuItemCount@4
 GetMenuItemID@8
 GetMenuItemInfoA@16
@@ -264,6 +274,8 @@ GetMessageExtraInfo@0
 GetMessagePos@0
 GetMessageTime@0
 GetMessageW@16
+GetMonitorInfoA@8
+GetMonitorInfoW@8
 GetNextDlgGroupItem@12
 GetNextDlgTabItem@12
 GetOpenClipboardWindow@0
@@ -273,6 +285,7 @@ GetProcessWindowStation@0
 GetPropA@8
 GetPropW@8
 GetQueueStatus@4
+GetScrollBarInfo@12
 GetScrollInfo@12
 GetScrollPos@8
 GetScrollRange@16
@@ -285,6 +298,7 @@ GetSystemMetrics@4
 GetTabbedTextExtentA@20
 GetTabbedTextExtentW@20
 GetThreadDesktop@4
+GetTitleBarInfo@8
 GetTopWindow@4
 GetUpdateRect@12
 GetUpdateRgn@12
@@ -295,8 +309,12 @@ GetWindow@8
 GetWindowContextHelpId@4
 _imp__GetWindowContextHelpId@4
 GetWindowDC@4
+GetWindowInfo@8
 GetWindowLongA@8
 GetWindowLongW@8
+GetWindowModuleFileName@12
+GetWindowModuleFileNameA@12
+GetWindowModuleFileNameW@12
 GetWindowPlacement@8
 GetWindowRect@8
 GetWindowRgn@8
@@ -467,6 +485,7 @@ SetMenu@8
 SetMenuContextHelpId@8
 _imp__SetMenuContextHelpId@8
 SetMenuDefaultItem@12
+SetMenuInfo@8
 SetMenuItemBitmaps@20
 SetMenuItemInfoA@16
 SetMenuItemInfoW@16

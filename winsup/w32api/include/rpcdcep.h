@@ -81,7 +81,7 @@ long __stdcall I_RpcFreeBuffer(RPC_MESSAGE*);
 void __stdcall I_RpcRequestMutex(I_RPC_MUTEX*);
 void __stdcall I_RpcClearMutex(I_RPC_MUTEX);
 void __stdcall I_RpcDeleteMutex(I_RPC_MUTEX);
-__stdcall void *I_RpcAllocate(unsigned int);
+DECLARE_STDCALL_P(void *) I_RpcAllocate(unsigned int);
 void __stdcall I_RpcFree(void*);
 void __stdcall I_RpcPauseExecution(unsigned long);
 typedef void(__stdcall *PRPC_RUNDOWN) (void*);

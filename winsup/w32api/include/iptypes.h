@@ -50,6 +50,12 @@ typedef struct _IP_ADAPTER_INFO {
   time_t LeaseObtained;
   time_t LeaseExpires;
 } IP_ADAPTER_INFO, *PIP_ADAPTER_INFO;
+typedef struct _IP_PER_ADAPTER_INFO {
+  UINT AutoconfigEnabled;
+  UINT AutoconfigActive;
+  PIP_ADDR_STRING CurrentDnsServer;
+  IP_ADDR_STRING DnsServerList;
+} IP_PER_ADAPTER_INFO, *PIP_PER_ADAPTER_INFO;
 typedef struct _FIXED_INFO {
   char HostName[MAX_HOSTNAME_LEN+4] ;
   char DomainName[MAX_DOMAIN_NAME_LEN+4];
@@ -61,6 +67,7 @@ typedef struct _FIXED_INFO {
   UINT EnableProxy;
   UINT EnableDns;
 } FIXED_INFO, *PFIXED_INFO;
+
 #ifdef __cplusplus
 }
 #endif

@@ -88,7 +88,13 @@ extern "C" {
 
 #define DECLSPEC_IMPORT __declspec(dllimport)
 #define DECLSPEC_EXPORT __declspec(dllexport)
+#ifdef __GNUC__
 #define DECLSPEC_NORETURN __declspec(noreturn)
+#define DECLARE_STDCALL_P( type ) __stdcall type
+#elif defined(__WATCOMC__)
+#define DECLSPEC_NORETURN
+#define DECLARE_STDCALL_P( type ) type __stdcall
+#endif /* __GNUC__/__WATCOMC__ */
 #define MAKEWORD(a,b)	((WORD)(((BYTE)(a))|(((WORD)((BYTE)(b)))<<8)))
 #define MAKELONG(a,b)	((LONG)(((WORD)(a))|(((DWORD)((WORD)(b)))<<16)))
 #define LOWORD(l)	((WORD)((DWORD)(l)))

@@ -117,7 +117,9 @@ typedef WORD LANGID;
 #define _INTEGRAL_MAX_BITS 64
 #undef __int64
 #define __int64 long long
-#endif
+#elif defined(__WATCOMC__) && (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 64 )
+#define _HAVE_INT64
+#endif /* __GNUC__/__WATCOMC */
 #if defined(_HAVE_INT64) || (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 64)
 typedef __int64 LONGLONG;
 typedef unsigned __int64 DWORDLONG;
@@ -1057,6 +1059,12 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define TAPE_LOCK 3
 #define TAPE_UNLOCK 4
 #define TAPE_FORMAT 5
+#define VER_PLATFORM_WIN32s 0
+#define VER_PLATFORM_WIN32_WINDOWS 1
+#define VER_PLATFORM_WIN32_NT 2
+#define VER_NT_WORKSTATION 1
+#define VER_NT_DOMAIN_CONTROLLER 2
+#define VER_NT_SERVER 3
 #define BTYPE(x) ((x)&N_BTMASK)
 #define ISPTR(x) (((x)&N_TMASK)==(IMAGE_SYM_DTYPE_POINTER<<N_BTSHFT))
 #define ISFCN(x) (((x)&N_TMASK)==(IMAGE_SYM_DTYPE_FUNCTION<<N_BTSHFT))
@@ -1089,7 +1097,7 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define VER_SUITE_DATACENTER 128
 #define VER_SUITE_PERSONAL 512
 #ifndef RC_INVOKED
-typedef DWORD ACCESS_MASK;
+typedef DWORD ACCESS_MASK, *PACCESS_MASK;
 #ifndef _GUID_DEFINED /* also defined in basetyps.h */
 #define _GUID_DEFINED
 typedef struct _GUID {
@@ -1790,7 +1798,6 @@ typedef struct _SE_IMPERSONATION_STATE {
 	BOOLEAN EffectiveOnly;
 	SECURITY_IMPERSONATION_LEVEL Level;
 } SE_IMPERSONATION_STATE,*PSE_IMPERSONATION_STATE;
-
 typedef struct _SID_IDENTIFIER_AUTHORITY {
 	BYTE Value[6];
 } SID_IDENTIFIER_AUTHORITY,*PSID_IDENTIFIER_AUTHORITY,*LPSID_IDENTIFIER_AUTHORITY;
@@ -2015,6 +2022,48 @@ typedef struct _EVENTLOGRECORD {
 	DWORD DataLength;
 	DWORD DataOffset;
 } EVENTLOGRECORD,*PEVENTLOGRECORD;
+typedef struct _OSVERSIONINFOA {
+	DWORD dwOSVersionInfoSize;
+	DWORD dwMajorVersion;
+	DWORD dwMinorVersion;
+	DWORD dwBuildNumber;
+	DWORD dwPlatformId;
+	CHAR szCSDVersion[128];
+} OSVERSIONINFOA,*POSVERSIONINFOA,*LPOSVERSIONINFOA;
+typedef struct _OSVERSIONINFOW {
+	DWORD dwOSVersionInfoSize;
+	DWORD dwMajorVersion;
+	DWORD dwMinorVersion;
+	DWORD dwBuildNumber;
+	DWORD dwPlatformId;
+	WCHAR szCSDVersion[128];
+} OSVERSIONINFOW,*POSVERSIONINFOW,*LPOSVERSIONINFOW;
+typedef struct _OSVERSIONINFOEXA {
+	DWORD dwOSVersionInfoSize;
+	DWORD dwMajorVersion;
+	DWORD dwMinorVersion;
+	DWORD dwBuildNumber;
+	DWORD dwPlatformId;
+	CHAR szCSDVersion[128];
+	WORD wServicePackMajor;
+	WORD wServicePackMinor;
+	WORD wSuiteMask;
+	BYTE wProductType;
+	BYTE wReserved;
+} OSVERSIONINFOEXA, *POSVERSIONINFOEXA, *LPOSVERSIONINFOEXA;
+typedef struct _OSVERSIONINFOEXW {
+	DWORD dwOSVersionInfoSize;
+	DWORD dwMajorVersion;
+	DWORD dwMinorVersion;
+	DWORD dwBuildNumber;
+	DWORD dwPlatformId;
+	WCHAR szCSDVersion[128];
+	WORD wServicePackMajor;
+	WORD wServicePackMinor;
+	WORD wSuiteMask;
+	BYTE wProductType;
+	BYTE wReserved;
+} OSVERSIONINFOEXW, *POSVERSIONINFOEXW, *LPOSVERSIONINFOEXW;
 #pragma pack(push,2)
 typedef struct _IMAGE_VXD_HEADER {
 	WORD e32_magic;
@@ -2542,6 +2591,20 @@ typedef struct _REPARSE_POINT_INFORMATION {
 	WORD   ReparseDataLength;
 	WORD   UnparsedNameLength;
 } REPARSE_POINT_INFORMATION, *PREPARSE_POINT_INFORMATION;
+
+#ifdef UNICODE
+typedef OSVERSIONINFOW OSVERSIONINFO,*POSVERSIONINFO,*LPOSVERSIONINFO;
+typedef OSVERSIONINFOEXW OSVERSIONINFOEX,*POSVERSIONINFOEX,*LPOSVERSIONINFOEX;
+#else
+typedef OSVERSIONINFOA OSVERSIONINFO,*POSVERSIONINFO,*LPOSVERSIONINFO;
+typedef OSVERSIONINFOEXA OSVERSIONINFOEX,*POSVERSIONINFOEX,*LPOSVERSIONINFOEX;
+#endif
+
+#if defined(__GNUC__)
+
+PVOID GetCurrentFiber(void);
+PVOID GetFiberData(void);
+
 PVOID GetCurrentFiber(void);
 extern __inline__ PVOID GetCurrentFiber(void)
 {
@@ -2553,6 +2616,7 @@ extern __inline__ PVOID GetCurrentFiber(void)
 		);
     return ret;
 }
+
 PVOID GetFiberData(void);
 extern __inline__ PVOID GetFiberData(void)
 {
@@ -2565,6 +2629,23 @@ extern __inline__ PVOID GetFiberData(void)
 	      );
     return ret;
 }
+
+#else
+
+extern PVOID GetCurrentFiber(void);
+#pragma aux GetCurrentFiber = \
+        "mov	eax, dword ptr fs:0x10" \
+        value [eax] \
+        modify [eax];
+
+extern PVOID GetFiberData(void);
+#pragma aux GetFiberData = \
+	"mov	eax, dword ptr fs:0x10" \
+	"mov	eax, [eax]" \
+        value [eax] \
+        modify [eax];
+        
+#endif /* __GNUC__ */
 
 #endif
 #ifdef __cplusplus

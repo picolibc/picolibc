@@ -48,10 +48,13 @@
 #else
 #if defined(__cplusplus)
 #define _ANONYMOUS_UNION __extension__
-#endif
+#endif /* __cplusplus */
 #endif /* __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95) */
 #endif /* NONAMELESSUNION */
-#endif /* __GNUC__ */
+#elif defined(__WATCOMC__)
+#define _ANONYMOUS_UNION
+#define _ANONYMOUS_STRUCT
+#endif /* __GNUC__/__WATCOMC__ */
 
 #ifndef _ANONYMOUS_UNION
 #define _ANONYMOUS_UNION

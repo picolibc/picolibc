@@ -1,9 +1,61 @@
+2001-12-03  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/accctrl.h: Change \r\n to \n.
+
+2001-11-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ipexport.h (IP_UNIDIRECTIONAL_ADAPTER_ADDRESS):
+	Add structure definition.
+	* include/iptypes.h (IP_PER_ADAPTER_INFO): Ditto.
+	* include/iphlpapi.h (AddIPAddress,CreateProxyArpEntry,
+	DeleteIPAddress,DeleteProxyArpEntry,EnableRouter,
+	FlushIpNetTable,GetAdapterIndex,GetPerAdapterInfo,
+	GetUniDirectionalAdapterInfo,SendARP,SetAdapterIpAddress,
+	UnenableRouter) Declare functions.
+	* lib/iphlpapi.def: Add function names to import lib.
+
+2001-11-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (PACCESS_MASK): Add typedef.
+	* include/aclapi.h: New file.
+	* include/acctrl.h: New file.
+	* lib/advapi32.def: Add missing symbols.
+	* lib/test.c: Add #include <aclapi.h>.
+
+2001-11-23  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (OSVERSIONINFO[AW],VER_PLATFORM_WIN32s,
+	VER_PLATFORM_WIN32_WINDOWS,VER_PLATFORM_WIN32_NT): Move from
+	here ...
+	* include/winnt.h: ... to here.
+	* include/winbase.h (VerifyVersionInfo[AW]): Add declaration.
+	* include/winnt.h (OSVERSIONINFOEX[AW]): Add structure definitions
+	and typedefs.
+	(VER_NT_WORKSTATION,VER_NT_DOMAIN_CONTROLLER,VER_NT_SERVER):
+	Add defines.
+
 2001-11-19  Pierre Muller  <muller@ics.u-strasbg.fr>
 
 	* w32api/include/winnt.h: prepare SSE register support.
 	(CONTEXT_EXTENDED_REGISTERS): Add new define.
 	(MAXIMUM_SUPPORTED_EXTENSION): New define.
 	(struct CONTEXT): ExtendedRegisters field added.
+
+2001-11-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (tagALTTABINFO, tagCOMBOBOXINFO, 
+	tagCURSORINFO, tagMENUBARINFO, tagMENUINFO, tagMONITORINFO
+	tagSCROLLBARINFO, tagTITLEBARINFO. tagWINDOWINFO,
+	tagLASTINPUTINFO ): Define new structures. 
+	(EndMenu, GetAltTabInfo[AW],GetComboBoxInfo,GetCursorInfo,
+	GetLastInputInfo, GetListBoxInfo, GetMenuBarInfo,
+	GetMonitorInfo[AW], GetScrollBarInfo, GetTitleBarInfo,
+	GetWindowInfo, GetWindowModuleFileName[AW],GetMenuInfo
+	SetMenuInfo): Add new prototypes.
+	* lib/user32.def: Add import stubs for above functions.
+
+	* include/winuser.h (IDC_STATIC): Protect against prior
+	definition.
 
 2001-11-12  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -12,12 +64,13 @@
 
 2001-11-10  Robert Collins  <rbtcollins@hotmail.com>
 
-	* include/winnt.h: Add Danny Smith's text comment about gcc compiler warnings
-	with _AUTHORITY #defines.
+	* include/winnt.h: Add Danny Smith's text comment about gcc compiler 
+	warnings with _AUTHORITY #defines.
 
 2001-11-09  Robert Collins  <rbtcollins@hotmail.com>
 
-	* include/winnt.h (GetCurrentFiber): Create a prototype before the implementation;
+	* include/winnt.h (GetCurrentFiber): Create a prototype before the 
+	implementation;
 	(GetFiberData): Ditto.
 
 2001-11-09  Robert Collins  <rbtcollins@hotmail.com>
@@ -26,10 +79,62 @@
 
 2001-11-08  Robert Collins  <rbtcollins@hotmail.com>
 
-	* include/winnt.h: Define *_SID_AUTHORITY appropriately. (nested
-	structures.)
+	* include/winnt.h: Define *_SID_AUTHORITY appropriately,
 	GetCurrentFiber: Create a prototype before the implementation;
 	GetFiberData: Ditto.
+
+2001-11-06  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (IDC_STATIC): Add define.
+	Thanks to: Benoit Laniel.
+
+2001-11-05  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commdlg.h: Include <unknwn.h> rather than local
+	definition of LPUKNOWN. 
+	* include/rpcproxy.h: Don't include if ndef CINTERFACE.
+	Emit warning.
+
+2001-11-05  Mattia Barbon  <mbarbon@dsi.unive.it>
+
+	* include/windef.h (DECLSPEC_NORTEURN): Add an empty version
+	for Watcom.
+	(DECLARE_STDCALL_P): Use it to add __stdcall decoration for
+	functions of the form 'type * function(...)' in a way compatible
+	with both Watcom and GCC.
+	* include/rpcdcep.h (I_RpcAllocate): Use DECLARE_STDCALL_P.
+	* include/rpcproxy.h (CInterfaceProxyVtbl): Do not declare
+	zero-sized arrays for Watcom. Mark as __extension for __GNUC__.
+	* include/windows.h: Watcom can use anonymous structs/unions.
+	* include/winnt.h: Watcom can use 64 bit ints.
+	(GetCurrentFiber): Add another inline definition using
+	Watcom inline assembly syntax.
+	(GetFiberData): Likewise.
+	* include/winsock.h (inet_ntoa): Use DECLARE_STDCALL_P.
+	(gethostbyname): Likewise.
+	(gethostbyaddr}: Likewise.
+	(getservbyport}: Likewise.
+	(getservbyname}: Likewise.
+	(getprotobynumber}: Likewise.
+	(getprotobyname}: Likewise.
+	* include/winsock2.h (inet_ntoa): Use DECLARE_STDCALL_P.
+	(gethostbyname}: Likewise.
+	(gethostbyaddr}: Likewise.
+	(getservbyport}: Likewise.
+	(getservbyname}: Likewise.
+	(getprotobynumber}: Likewise.
+	(getprotobyname}: Likewise.
+	* lib/diinut.c: Correction for Watcom.
+	* lib/kernel32.c (GetCurrentFiber): Add another definition
+	using Watcom inline assembly syntax.
+	(GetFiberData): Likewise.
+	* lib/scrnsave.c (WinMain): Add break after default:
+	clause.
+
+2001-11-04  "stefan"  <stefan@lkcc.org>
+
+	* include/winnt.h (GetCurrentFiber): Add prototype.
+	(GetFiberData): Likewise.
 
 2001-11-04  Christopher Faylor  <cgf@redhat.com>
 
@@ -53,7 +158,6 @@
 	(PrintDlgEx[AW]): Add function declaration.
 	* lib/comdlg32.def (PrintDlgEx[AW]): Add function stubs.
 	* ChangeLog: Fix typo in last entry.
-	
 
 2001-11-01  TAMURA Kent  <tkent@users.sourceforge.net>
 

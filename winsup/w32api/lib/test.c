@@ -56,6 +56,7 @@
 #include <winsock.h>
 #include <ws2tcpip.h>
 #include <setupapi.h>
+#include <aclapi.h>
 
 #ifndef __OBJC__  /* problems with BOOL */
 #include <ole2.h>

@@ -544,6 +544,9 @@ extern "C" {
 #define GCL_MENUNAME (-8)
 #define GCL_STYLE (-26)
 #define GCL_WNDPROC (-24)
+#ifndef IDC_STATIC  /* May be predefined by resource compiler.  */
+#define IDC_STATIC (-1)
+#endif
 #define IDC_ARROW MAKEINTRESOURCE(32512)
 #define IDC_IBEAM MAKEINTRESOURCE(32513)
 #define IDC_WAIT MAKEINTRESOURCE(32514)
@@ -2447,6 +2450,88 @@ typedef struct tagSTYLESTRUCT {
 	DWORD styleOld;
 	DWORD styleNew;
 } STYLESTRUCT,*LPSTYLESTRUCT;
+typedef struct tagALTTABINFO {
+	DWORD cbSize;
+	int   cItems;
+	int   cColumns;
+	int   cRows;
+	int   iColFocus;
+	int   iRowFocus;
+	int   cxItem;
+	int   cyItem;
+	POINT ptStart;
+} ALTTABINFO, *PALTTABINFO, *LPALTTABINFO;
+typedef struct tagCOMBOBOXINFO {
+	DWORD cbSize;
+	RECT rcItem;
+	RECT rcButton;
+	DWORD stateButton;
+	HWND hwndCombo;
+	HWND hwndItem;
+	HWND hwndList;
+} COMBOBOXINFO, *PCOMBOBOXINFO, *LPCOMBOBOXINFO;
+typedef struct tagCURSORINFO {
+	DWORD cbSize;
+	DWORD flags;
+	HCURSOR hCursor;
+	POINT ptScreenPos;
+} CURSORINFO,*PCURSORINFO,*LPCURSORINFO;
+typedef struct tagMENUBARINFO {
+	DWORD cbSize;
+	RECT  rcBar;
+	HMENU hMenu;
+	HWND  hwndMenu;
+	BOOL  fBarFocused:1;
+	BOOL  fFocused:1;
+} MENUBARINFO, *PMENUBARINFO;
+typedef struct tagMENUINFO {
+	DWORD cbSize;
+	DWORD fMask;
+	DWORD dwStyle;
+	UINT cyMax;
+	HBRUSH  hbrBack;
+	DWORD   dwContextHelpID;
+	ULONG_PTR dwMenuData;
+} MENUINFO, *LPMENUINFO;
+typedef MENUINFO CONST *LPCMENUINFO; 
+#define CCHILDREN_SCROLLBAR 5
+typedef struct tagSCROLLBARINFO {
+	DWORD cbSize;
+	RECT  rcScrollBar;
+	int   dxyLineButton;
+	int   xyThumbTop;
+	int   xyThumbBottom;
+	int   reserved;
+	DWORD rgstate[CCHILDREN_SCROLLBAR + 1];
+} SCROLLBARINFO, *PSCROLLBARINFO, *LPSCROLLBARINFO;
+#define CCHILDREN_TITLEBAR 5
+typedef struct tagTITLEBARINFO {
+	DWORD cbSize;
+	RECT  rcTitleBar;
+	DWORD rgstate[CCHILDREN_TITLEBAR + 1];
+} TITLEBARINFO, *PTITLEBARINFO, *LPTITLEBARINFO;
+typedef struct tagWINDOWINFO {
+	DWORD cbSize;
+	RECT  rcWindow;
+	RECT  rcClient;
+	DWORD dwStyle;
+	DWORD dwExStyle;
+	DWORD dwWindowStatus;
+	UINT  cxWindowBorders;
+	UINT  cyWindowBorders;
+	ATOM  atomWindowType;
+	WORD  wCreatorVersion;
+} WINDOWINFO, *PWINDOWINFO, *LPWINDOWINFO;
+typedef struct tagLASTINPUTINFO {
+	UINT cbSize;
+	DWORD dwTime;
+} LASTINPUTINFO, * PLASTINPUTINFO;
+typedef struct tagMONITORINFO {
+	DWORD cbSize;
+	RECT rcMonitor;
+	RECT rcWork;
+	DWORD dwFlags;
+} MONITORINFO,*LPMONITORINFO;
 
 #define AnsiToOem CharToOemA
 #define OemToAnsi OemToCharA
@@ -2613,6 +2698,7 @@ BOOL WINAPI EnableScrollBar(HWND,UINT,UINT);
 BOOL WINAPI EnableWindow(HWND,BOOL);
 BOOL WINAPI EndDeferWindowPos(HDWP);
 BOOL WINAPI EndDialog(HWND,int);
+BOOL WINAPI EndMenu(VOID);
 BOOL WINAPI EndPaint(HWND,const PAINTSTRUCT*);
 BOOL WINAPI EnumChildWindows(HWND,ENUMWINDOWSPROC,LPARAM);
 UINT WINAPI EnumClipboardFormats(UINT);
@@ -2747,6 +2833,21 @@ int WINAPI GetWindowTextLengthA(HWND);
 int WINAPI GetWindowTextLengthW(HWND);
 int WINAPI GetWindowTextW(HWND,LPWSTR,int);
 WORD WINAPI GetWindowWord(HWND,int);
+BOOL WINAPI GetAltTabInfoA(HWND,int,PALTTABINFO,LPSTR,UINT);
+BOOL WINAPI GetAltTabInfoW(HWND,int,PALTTABINFO,LPWSTR,UINT);
+BOOL WINAPI GetComboBoxInfo(HWND,PCOMBOBOXINFO);
+BOOL WINAPI GetCursorInfo(PCURSORINFO);
+BOOL WINAPI GetLastInputInfo(PLASTINPUTINFO);
+DWORD WINAPI GetListBoxInfo(HWND);
+BOOL WINAPI GetMenuBarInfo(HWND,LONG,LONG,PMENUBARINFO);
+BOOL WINAPI GetMenuInfo(HMENU,LPMENUINFO);
+BOOL WINAPI GetScrollBarInfo(HWND,LONG,PSCROLLBARINFO);
+BOOL WINAPI GetTitleBarInfo(HWND,PTITLEBARINFO);
+BOOL WINAPI GetWindowInfo(HWND,PWINDOWINFO);
+BOOL WINAPI GetMonitorInfoA(HMONITOR,LPMONITORINFO);
+BOOL WINAPI GetMonitorInfoW(HMONITOR,LPMONITORINFO);
+UINT WINAPI GetWindowModuleFileNameA(HWND,LPSTR,UINT);
+UINT WINAPI GetWindowModuleFileNameW(HWND,LPWSTR,UINT);
 BOOL WINAPI GrayStringA(HDC,HBRUSH,GRAYSTRINGPROC,LPARAM,int,int,int,int,int);
 BOOL WINAPI GrayStringW(HDC,HBRUSH,GRAYSTRINGPROC,LPARAM,int,int,int,int,int);
 BOOL WINAPI HideCaret(HWND);
@@ -2903,6 +3004,7 @@ BOOL WINAPI SetKeyboardState(PBYTE);
 BOOL WINAPI SetMenu(HWND,HMENU);
 BOOL WINAPI SetMenuContextHelpId(HMENU,DWORD);
 BOOL WINAPI SetMenuDefaultItem(HMENU,UINT,UINT);
+BOOL WINAPI SetMenuInfo(HMENU,LPCMENUINFO);
 BOOL WINAPI SetMenuItemBitmaps(HMENU,UINT,UINT,HBITMAP,HBITMAP);
 BOOL WINAPI SetMenuItemInfoA(HMENU,UINT,BOOL,LPCMENUITEMINFOA);
 BOOL WINAPI SetMenuItemInfoW( HMENU,UINT,BOOL,LPCMENUITEMINFOW);
@@ -3070,12 +3172,15 @@ typedef MULTIKEYHELPW MULTIKEYHELP,*PMULTIKEYHELP,*LPMULTIKEYHELP;
 #define GetMenuItemInfo GetMenuItemInfoW
 #define GetMenuString GetMenuStringW
 #define GetMessage GetMessageW
+#define GetMonitorInfo  GetMonitorInfoW
 #define GetProp GetPropW
 #define GetTabbedTextExtent GetTabbedTextExtentW
 #define GetUserObjectInformation GetUserObjectInformationW
 #define GetWindowLong GetWindowLongW
 #define GetWindowText GetWindowTextW
 #define GetWindowTextLength GetWindowTextLengthW
+#define GetAltTabInfo GetAltTabInfoW
+#define GetWindowModuleFileName GetWindowModuleFileNameW
 #define GrayString GrayStringW
 #define InsertMenu InsertMenuW
 #define InsertMenuItem InsertMenuItemW
@@ -3218,12 +3323,15 @@ typedef MULTIKEYHELPA MULTIKEYHELP,*PMULTIKEYHELP,*LPMULTIKEYHELP;
 #define GetMenuItemInfo GetMenuItemInfoA
 #define GetMenuString GetMenuStringA
 #define GetMessage GetMessageA
+#define GetMonitorInfo  GetMonitorInfoA
 #define GetProp GetPropA
 #define GetTabbedTextExtent GetTabbedTextExtentA
 #define GetUserObjectInformation GetUserObjectInformationA
 #define GetWindowLong GetWindowLongA
 #define GetWindowText GetWindowTextA
 #define GetWindowTextLength GetWindowTextLengthA
+#define GetAltTabInfo GetAltTabInfoA
+#define GetWindowModuleFileName GetWindowModuleFileNameA
 #define GrayString GrayStringA
 #define InsertMenu InsertMenuA
 #define InsertMenuItem InsertMenuItemA

@@ -74,6 +74,10 @@ typedef struct {
   LONG NumAdapters;
   IP_ADAPTER_INDEX_MAP Adapter[ANY_SIZE];
 } IP_INTERFACE_INFO, *PIP_INTERFACE_INFO;
+typedef struct _IP_UNIDIRECTIONAL_ADAPTER_ADDRESS {
+  ULONG NumAdapters;
+  IPAddr Address[1];
+} IP_UNIDIRECTIONAL_ADAPTER_ADDRESS, *PIP_UNIDIRECTIONAL_ADAPTER_ADDRESS;
 #ifdef __cplusplus
 }
 #endif

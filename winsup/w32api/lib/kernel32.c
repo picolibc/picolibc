@@ -1,5 +1,7 @@
 /* extern (library) versions of inline functions defined in winnt.h */
 
+#if defined(__GNUC__)
+
 void* GetCurrentFiber(void)
 {
     void* ret;
@@ -23,3 +25,27 @@ void* GetFiberData(void)
     return ret;
 }
 
+#else
+
+void* GetCurrentFiber(void)
+{
+    void* res;
+    _asm {
+    	mov	eax, dword ptr fs:0x10
+    	mov	res, eax
+    };
+    return res;
+}
+
+void* GetFiberData(void)
+{
+    void* res;
+    _asm {
+	mov	eax, dword ptr fs:0x10
+	mov	eax, [eax]
+	mov	res, eax
+    };
+    return res;
+}
+
+#endif /* __GNUC__ */

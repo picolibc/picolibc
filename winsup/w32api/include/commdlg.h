@@ -427,21 +427,8 @@ typedef struct tagPDW {
 	HANDLE hSetupTemplate;
 } PRINTDLGW,*LPPRINTDLGW;
 #if (WINVER >= 0x0500)
-/* We could  #include <unknwn.h> here but that would bring
-in a cascade of rpc dependencies */
-#ifndef __IUnknown_INTERFACE_DEFINED__
-#define __IUnknown_INTERFACE_DEFINED__
-#undef INTERFACE
-#define INTERFACE IUnknown
-DECLARE_INTERFACE(IUnknown)
-{
-	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
-	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
-	STDMETHOD_(ULONG,Release)(THIS) PURE;
-};
-typedef IUnknown *LPUNKNOWN;
-#endif
-#include <prsht.h> /* for HPROPSHEETPAGE */
+#include <unknwn.h>  /* for LPUNKNOWN  */ 
+#include <prsht.h>   /* for HPROPSHEETPAGE  */
 typedef struct tagPRINTPAGERANGE {
    DWORD  nFromPage;
    DWORD  nToPage;
