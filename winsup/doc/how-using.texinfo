@@ -346,16 +346,24 @@ things you might add in the future?)
 
 @subsection How do anti-virus programs like Cygwin?
 
-Users have reported that McAfee (now NAI) VirusScan for NT (and others?) is
-incompatible with Cygwin.  This is because it tries to scan the
-newly loaded shared memory in the cygwin.dll, which can cause fork()s
-to fail, wreaking havoc on many of the tools.
+Users have reported that NAI (formerly McAfee) VirusScan for NT (and
+others?) is incompatible with Cygwin.  This is because it tries to scan
+the newly loaded shared memory in cygwin1.dll, which can cause fork() to
+fail, wreaking havoc on many of the tools.  (It is not confirmed that
+this is still a problem, however.)
 
-There are also reports of NAI VirusScan causing the system to hang when
-unpacking tar.gz archives.  This is surely a bug in VirusScan, and
-should be reported to NAI.  The only workaround is to disable VirusScan
-when accessing these files.  This can be an issue during setup, and is
-discussed in that FAQ entry.
+There have been several reports of NAI VirusScan causing the system to
+hang when unpacking tar.gz archives.  This is surely a bug in VirusScan,
+and should be reported to NAI.  The only workaround is to disable
+VirusScan when accessing these files.  This can be an issue during
+setup, and is discussed in that FAQ entry.
+
+Some users report a significant performance hit using Cygwin when their
+anti-virus software is enabled.  Rather than disable the anti-virus
+software completely, it may be possible to specify directories whose
+contents are exempt from scanning.  In a default installation, this
+would be @samp{@code{C:\cygwin\bin}}.  Obviously, this could be
+exploited by a hostile non-Cygwin program, so do this at your own risk.
 
 @subsection Why can't I run bash as a shell under NT Emacs?
 
