@@ -1,3 +1,8 @@
+2004-11-22  Christopher Faylor  <cgf@timesys.com>
+
+	* select.cc (select_stuff::test_and_set): Remove extraneous tests of
+	"window_handle".
+
 2004-11-20  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* fhandler.cc (fhandler::write): Remove debug_printf.
