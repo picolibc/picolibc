@@ -1,3 +1,7 @@
+2004-09-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tape.cc (fhandler_dev_tape::open): Fix typo.
+
 2004-09-09  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* pipe.cc (create_selectable_pipe): Work around bug in Windows 95

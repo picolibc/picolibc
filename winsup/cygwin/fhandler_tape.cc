@@ -1241,7 +1241,7 @@ fhandler_dev_tape::open (int flags, mode_t)
 					 TAPE_SPACE_FILEMARKS, 1, true);
 
       devbufsiz = mt->drive (driveno ())->dp ()->MaximumBlockSize;
-      devbuf = new char (devbufsiz);
+      devbuf = new char [devbufsiz];
       devbufstart = devbufend = 0;
     }
   else
