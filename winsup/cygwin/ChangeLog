@@ -1,5 +1,22 @@
 2002-07-01  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_clipboard.c (fhandler_dev_clipboard::open): Force text mode.
+	* fhandler_console.cc (fhandler_console::open): *Really* force binary
+	mode rather than make it optional.
+	* fhandler_proc.cc (fhandler_proc::open): Ditto.
+	* fhandler_process.cc (fhandler_process::open): Ditto.
+	* fhandler_random.cc (fhandler_dev_random::fhandler_dev_random): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::open): Ditto.
+	* fhandler_registry.cc (fhandler_registry::open): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Ditto.
+	* fhandler_virtual.cc (fhandler_virtual::open): Ditto.
+	* fhandler_windows.cc (fhandler_windows::open): Ditto.
+	* fhandler_zero.cc (fhandler_dev_zero::open): Ditto.
+	* net.cc (fdsock): Ditto.
+	* path.cc (set_flags): Add more debugging.
+
+2002-07-01  Christopher Faylor  <cgf@redhat.com>
+
 	* debug.cc (threads): Avoid initialization.
 	* uinfo.cc (cygheap_user::ontherange): (from Corinna Vinschen) Actually
 	make below changes work.

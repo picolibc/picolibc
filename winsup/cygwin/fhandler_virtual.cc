@@ -207,7 +207,7 @@ fhandler_virtual::open (path_conv *, int flags, mode_t mode)
   set_execable_p (not_executable);
   set_socket_p (false);
 
-  set_flags (flags & ~O_TEXT, O_BINARY);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
 
   set_nohandle (true);
 

@@ -480,7 +480,7 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
 
 success:
   res = 1;
-  set_flags (flags & ~O_TEXT, O_BINARY);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
   if (hKey != (HKEY) INVALID_HANDLE_VALUE)

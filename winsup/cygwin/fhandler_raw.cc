@@ -175,7 +175,7 @@ fhandler_dev_raw::open (path_conv *real_path, int flags, mode_t)
     }
 
   set_io_handle (h);
-  set_flags (flags & ~O_TEXT, O_BINARY);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
 
   if (devbufsiz > 1L)
     devbuf = new char [devbufsiz];

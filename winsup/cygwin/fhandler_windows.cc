@@ -54,7 +54,7 @@ fhandler_windows::fhandler_windows ()
 int
 fhandler_windows::open (path_conv *, int flags, mode_t)
 {
-  set_flags (flags & ~O_TEXT, O_BINARY);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_close_on_exec_flag (1);
   set_open_status ();
   return 1;

@@ -1338,7 +1338,15 @@ set_flags (unsigned *flags, unsigned val)
 {
   *flags = val;
   if (!(*flags & PATH_BINARY))
-    *flags = PATH_TEXT;
+    {
+      *flags |= PATH_TEXT;
+      debug_printf ("flags: text (%p)", *flags & (PATH_TEXT | PATH_BINARY));
+    }
+  else
+    {
+      *flags |= PATH_BINARY;
+      debug_printf ("flags: binary (%p)", *flags & (PATH_TEXT | PATH_BINARY));
+    }
 }
 
 /* conv_to_win32_path: Ensure src_path is a pure Win32 path and store

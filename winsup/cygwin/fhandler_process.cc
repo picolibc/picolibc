@@ -237,7 +237,7 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
 
 success:
   res = 1;
-  set_flags (flags & ~O_TEXT, O_BINARY);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
   syscall_printf ("%d = fhandler_proc::open (%p, %d)", res, flags, mode);
