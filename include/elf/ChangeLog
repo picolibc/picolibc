@@ -1,3 +1,9 @@
+2000-03-10  Geoffrey Keating  <geoffk@cygnus.com>
+
+	* mips.h: Add R_MIPS_GNU_REL_HI16, R_MIPS_GNU_REL_LO16,
+ 	R_MIPS_GNU_REL16_S2, R_MIPS_PC64 and R_MIPS_PC32 relocation
+ 	numbers.
+
 2000-02-23  Linas Vepstas <linas@linas.org>
 
 	* i370.h: New file.
