@@ -4,11 +4,11 @@
 
    Originally written by Robert Collins <robert.collins@hotmail.com>
 
-   This file is part of Cygwin.
+This file is part of Cygwin.
 
-   This software is a copyrighted work licensed under the terms of the
-   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-   details. */
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
 
 #include "woutsup.h"
 
@@ -154,7 +154,11 @@ client_request_shm::serve (transport_layer_base * const conn,
   HANDLE token_handle = NULL;
   DWORD rc;
 
-  from_process_handle = cache->process (parameters.in.winpid)->handle ();
+  class process *const process = cache->process (parameters.in.winpid);
+  assert (process);
+  from_process_handle = process->handle ();
+  process->release ();
+
   /* possible TODO: reduce the access on the handle before we use it */
   /* Note that unless we do this, we don't need to call CloseHandle - it's kept open
    * by the process cache until the process terminates.

@@ -1,3 +1,48 @@
+2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* threaded_queue.h (class queue_request): Re-write.
+	(threaded_queue_thread_function): Remove.
+	(class queue_process_param): Remove.
+	(class threaded_queue): Re-write.
+	(class queue_submission_loop): New version of the old
+	`queue_process_param' class.
+	(TInterlockedExchangePointer): New templated function.
+	(TInterlockedCompareExchangePointer): Ditto.
+	* threaded_queue.cc (worker_function): Remove.
+	(class threaded_queue): Re-write.
+	(class queue_process_param): Remove.
+	(class queue_submission_loop): New version of the old
+	`queue_process_param' class.
+	* include/cygwin/cygserver_process.h (process_cleanup): Re-write.
+	(class process_process_param): Remove.
+	(class cleanup_routine): Re-write.
+	(class process): Re-write.
+	(class process_cache): Re-write.
+	* cygserver_process.cc (process_cleanup): Re-write.
+	(class process_process_param): Remove.
+	(class cleanup_routine): Re-write.
+	(class process): Re-write.
+	(class process_cache): Re-write.
+	* cygserver.cc (request_count): Remove unused variable.
+	(class server_request): Move methods inline.
+	(class server_process_param): Remove.
+	(class server_request_queue): Remove.
+	(request_queue): Move into `main ()' and change type to
+	`threaded_queue'.
+	(request_loop): Remove.
+	(class server_submission_loop): New version of the old
+	`server_process_param' class.
+	(shutdown_server): New variable.
+	(client_request_shutdown::serve): Set `shutdown_server' to trigger
+	shutdown.
+	(handle_signal): Ditto.
+	(main): Install signal handler for SIGINT rather than SIGQUIT.
+	Use new interfaces for the `request_queue' and the `cache'.
+	Create a `server_submission_loop' and add to the `request_queue'.
+	Add check for the `shutdown_server' variable to the main loop.
+	* cygserver_shm.cc (client_request_shm::serve): Release the
+	process object after use.
+
 2002-06-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_client.cc (client_request::handle_request): Correct

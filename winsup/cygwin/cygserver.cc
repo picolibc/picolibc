@@ -12,14 +12,12 @@ details. */
 
 #include "woutsup.h"
 
-#include <sys/socket.h>
 #include <sys/types.h>
 
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
-#include <netdb.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,10 +32,6 @@ details. */
 #include "cygwin/cygserver.h"
 #include "cygwin/cygserver_process.h"
 #include "cygwin/cygserver_transport.h"
-
-GENERIC_MAPPING access_mapping;
-
-DWORD request_count = 0;
 
 // Version string.
 static const char version[] = "$Revision$";
@@ -126,6 +120,8 @@ __set_errno (const char *func, int ln, int val)
 }
 
 #endif /* DEBUGGING */
+
+GENERIC_MAPPING access_mapping;
 
 static BOOL
 setup_privileges ()
@@ -257,7 +253,7 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
  */
 
 void
-client_request_attach_tty::serve (transport_layer_base * const conn,
+client_request_attach_tty::serve (transport_layer_base *const conn,
 				  process_cache *)
 {
   assert (conn);
@@ -283,9 +279,9 @@ client_request_attach_tty::serve (transport_layer_base * const conn,
 
   msglen (0);			// Until we fill in some fields.
 
-  // verbose: debug_printf ("pid %ld:(%p,%p) -> pid %ld", req.master_pid,
-  //				from_master, to_master,
-  //				req.pid);
+  // verbose: debug_printf ("pid %ld:(%p,%p) -> pid %ld",
+  //			    req.master_pid, req.from_master, req.to_master,
+  //			    req.pid);
 
   // verbose: debug_printf ("opening process %ld", req.master_pid);
 
@@ -401,66 +397,68 @@ client_request_get_version::serve(transport_layer_base *, process_cache *)
 
 class server_request : public queue_request
 {
-  public:
-    server_request (transport_layer_base *newconn,
-		    class process_cache *newcache);
-    virtual ~server_request();
-    virtual void process ();
-  private:
-    transport_layer_base *conn;
-    class process_cache *cache;
-};
+public:
+  server_request (transport_layer_base *const conn, process_cache *const cache)
+    : _conn (conn), _cache (cache)
+  {}
 
-class server_process_param : public queue_process_param
-{
-  public:
-    transport_layer_base *transport;
-    server_process_param () : queue_process_param (false) {};
-};
-
-class server_request_queue : public threaded_queue
-{
-  public:
-    class process_cache *cache;
-    void process_requests (transport_layer_base *transport);
-    void add_connection (transport_layer_base *conn);
-};
-
-class server_request_queue request_queue;
-
-static DWORD WINAPI
-request_loop (LPVOID LpParam)
-{
-  class server_process_param *params = (server_process_param *) LpParam;
-  class server_request_queue *queue = (server_request_queue *) params->queue;
-  class transport_layer_base * transport = params->transport;
-  while (queue->active)
+  virtual ~server_request()
   {
-    bool recoverable = false;
-    transport_layer_base * const new_conn = transport->accept (&recoverable);
-    if (!new_conn && !recoverable)
-      {
-	system_printf ("fatal error on IPC transport: closing down");
-	queue->active = false;
-      }
-    /* FIXME: this is a little ugly. What we really want is to wait on two objects:
-     * one for the pipe/socket, and one for being told to shutdown. Otherwise
-     * this will stay a problem (we won't actually shutdown until the request
-     * _AFTER_ the shutdown request. And sending ourselves a request is ugly
-     */
-     if (new_conn && queue->active)
-	 queue->add_connection (new_conn);
+    delete _conn;
   }
-  return 0;
-}
 
-/* TODO: check we are not being asked to service a already serviced transport */
-void
-server_request_queue::process_requests (transport_layer_base *transport)
+  virtual void process ()
+  {
+    client_request::handle_request (_conn, _cache);
+  }
+
+private:
+  transport_layer_base *const _conn;
+  process_cache *const _cache;
+};
+
+class server_submission_loop : public queue_submission_loop
 {
-  class server_process_param *params = new server_process_param;
-  params->transport = transport;
-  threaded_queue::process_requests (params, request_loop);
+public:
+  server_submission_loop (threaded_queue *const queue,
+			  transport_layer_base *const transport,
+			  process_cache *const cache)
+    : queue_submission_loop (queue, false),
+      _transport (transport),
+      _cache (cache)
+  {
+    assert (_transport);
+    assert (_cache);
+  }
+
+private:
+  transport_layer_base *const _transport;
+  process_cache *const _cache;
+
+  virtual void request_loop ();
+};
+
+/* FIXME: this is a little ugly.  What we really want is to wait on
+ * two objects: one for the pipe/socket, and one for being told to
+ * shutdown.  Otherwise this will stay a problem (we won't actually
+ * shutdown until the request _AFTER_ the shutdown request.  And
+ * sending ourselves a request is ugly
+ */
+void
+server_submission_loop::request_loop ()
+{
+  while (_running)
+    {
+      bool recoverable = false;
+      transport_layer_base *const conn = _transport->accept (&recoverable);
+      if (!conn && !recoverable)
+	{
+	  system_printf ("fatal error on IPC transport: closing down");
+	  return;
+	}
+      if (conn)
+	_queue->add (new server_request (conn, _cache));
+    }
 }
 
 client_request_shutdown::client_request_shutdown ()
@@ -468,6 +466,8 @@ client_request_shutdown::client_request_shutdown ()
 {
   syscall_printf ("created");
 }
+
+static volatile sig_atomic_t shutdown_server = false;
 
 void
 client_request_shutdown::serve (transport_layer_base *, process_cache *)
@@ -480,55 +480,18 @@ client_request_shutdown::serve (transport_layer_base *, process_cache *)
   /* FIXME: link upwards, and then this becomes a trivial method call to
    * only shutdown _this queue_
    */
-  /* tell the main thread to shutdown */
-  request_queue.active = false;
+
+  shutdown_server = true;
 
   msglen (0);
-}
-
-server_request::server_request (transport_layer_base *newconn,
-				class process_cache *newcache)
-  : conn(newconn), cache(newcache)
-{}
-
-server_request::~server_request ()
-{
-  delete conn;
-}
-
-void
-server_request::process ()
-{
-  client_request::handle_request (conn, cache);
-}
-
-void
-server_request_queue::add_connection (transport_layer_base *conn)
-{
-  /* safe to not "Try" because workers don't hog this, they wait on the event
-   */
-  /* every derived ::add must enter the section! */
-  EnterCriticalSection (&queuelock);
-  if (!running)
-    {
-      delete conn;
-      LeaveCriticalSection (&queuelock);
-      return;
-    }
-  queue_request * listrequest = new server_request (conn, cache);
-  add (listrequest);
-  LeaveCriticalSection (&queuelock);
 }
 
 static void
 handle_signal (int signal)
 {
   /* any signal makes us die :} */
-  /* FIXME: link upwards, and then this becomes a trivial method call to
-   * only shutdown _this queue_
-   */
-  /* tell the main thread to shutdown */
-  request_queue.active=false;
+
+  shutdown_server = true;
 }
 
 /*
@@ -669,53 +632,66 @@ main (const int argc, char *argv[])
       return 0;
     }
 
-  if (signal (SIGQUIT, handle_signal) == SIG_ERR)
+  if (signal (SIGINT, handle_signal) == SIG_ERR)
     {
       system_printf ("could not install signal handler (%d)- aborting startup",
 		     errno);
       exit (1);
     }
 
-  transport_layer_base * const transport = create_server_transport ();
-  assert (transport);
 
   print_version (pgm);
   setbuf (stdout, NULL);
   printf ("daemon starting up");
+
+  threaded_queue request_queue (10);
+  printf (".");
+
+  transport_layer_base *const transport = create_server_transport ();
+  assert (transport);
+  printf (".");
+
+  process_cache cache (2);
+  printf (".");
+
+  server_submission_loop submission_loop (&request_queue, transport, &cache);
+  printf (".");
+
+  request_queue.add_submission_loop (&submission_loop);
+  printf (".");
+
   transport->listen ();
   printf (".");
-  class process_cache cache (2);
-  request_queue.initial_workers = 10;
-  request_queue.cache = &cache;
-  request_queue.create_workers ();
+
+  cache.start ();
   printf (".");
-  request_queue.process_requests (transport);
+
+  request_queue.start ();
   printf (".");
-  cache.create_workers ();
-  printf (".");
-  cache.process_requests ();
-  printf (".complete\n");
-  /* TODO: wait on multiple objects - the thread handle for each request loop +
-   * all the process handles. This should be done by querying the request_queue and
-   * the process cache for all their handles, and then waiting for (say) 30 seconds.
-   * after that we recreate the list of handles to wait on, and wait again.
-   * the point of all this abstraction is that we can trivially server both sockets
-   * and pipes simply by making a new transport, and then calling
-   * request_queue.process_requests (transport2);
+
+  printf ("complete\n");
+
+  /* TODO: wait on multiple objects - the thread handle for each
+   * request loop + all the process handles. This should be done by
+   * querying the request_queue and the process cache for all their
+   * handles, and then waiting for (say) 30 seconds.  after that we
+   * recreate the list of handles to wait on, and wait again.  the
+   * point of all this abstraction is that we can trivially server
+   * both sockets and pipes simply by making a new transport, and then
+   * calling request_queue.process_requests (transport2);
    */
   /* WaitForMultipleObjects abort && request_queue && process_queue && signal
      -- if signal event then retrigger it
   */
-  while (1 && request_queue.active)
-    {
-      sleep (1);
-    }
+  while (!shutdown_server && request_queue.running () && cache.running ())
+    sleep (1);
+
   printf ("\nShutdown request received - new requests will be denied\n");
-  request_queue.cleanup ();
+  request_queue.stop ();
   printf ("All pending requests processed\n");
   delete transport;
   printf ("No longer accepting requests - cygwin will operate in daemonless mode\n");
-  cache.cleanup ();
+  cache.stop ();
   printf ("All outstanding process-cache activities completed\n");
   printf ("daemon shutdown\n");
 

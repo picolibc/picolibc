@@ -4,387 +4,395 @@
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
-   This file is part of Cygwin.
+This file is part of Cygwin.
 
-   This software is a copyrighted work licensed under the terms of the
-   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-   details. */
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
 
 #include "woutsup.h"
 
-#include <sys/socket.h>
 #include <sys/types.h>
 
+#include <assert.h>
 #include <errno.h>
-#include <netdb.h>
 #include <pthread.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+
+#include "cygerrno.h"
 
 #include "cygwin/cygserver_process.h"
 
-/* the cache structures and classes are designed for one cache per server process.
- * To make multiple process caches, a redesign will be needed
- */
+/*****************************************************************************/
 
-/* process cache */
-process_cache::process_cache (unsigned int num_initial_workers):
-head (NULL)
+#define elements(ARRAY) (sizeof (ARRAY) / sizeof (*ARRAY))
+
+/*****************************************************************************/
+
+process_cleanup::~process_cleanup ()
 {
-  /* there can only be one */
-  InitializeCriticalSection (&cache_write_access);
-  if ((cache_add_trigger = CreateEvent (NULL, FALSE, FALSE, NULL)) == NULL)
-    {
-      system_printf ("Failed to create cache add trigger (%lu), terminating",
-		     GetLastError ());
-      exit (1);
-    }
-  initial_workers = num_initial_workers;
+  delete _process;
 }
 
-process_cache::~process_cache ()
+void
+process_cleanup::process ()
+{
+  _process->cleanup ();
+}
+
+/*****************************************************************************/
+
+/* cleanup_routine */
+cleanup_routine::~cleanup_routine ()
 {
 }
 
-class process *
-process_cache::process (DWORD winpid)
+/*****************************************************************************/
+
+process::process (const DWORD winpid)
+  : _winpid (winpid),
+    _next (NULL),
+    _cleaning_up (false),
+    _routines_head (NULL),
+    _exit_status (STILL_ACTIVE),
+    _hProcess (NULL)
 {
-  class process *entry = head;
-  /* TODO: make this more granular, so a search doesn't involve the write lock */
-  EnterCriticalSection (&cache_write_access);
-  if (!entry)
+  _hProcess = OpenProcess (PROCESS_ALL_ACCESS, FALSE, winpid);
+  if (!_hProcess)
     {
-      entry = new class process (winpid);
-      entry->next =
-	(class process *) InterlockedExchangePointer (&head, entry);
-      PulseEvent (cache_add_trigger);
+      system_printf ("unable to obtain handle for new cache process %lu",
+		     winpid);
+      _hProcess = INVALID_HANDLE_VALUE;
+      _exit_status = 0;
     }
   else
-    {
-      while (entry->winpid != winpid && entry->next)
-	entry = entry->next;
-      if (entry->winpid != winpid)
-	{
-	  class process *new_entry = new class process (winpid);
-	  new_entry->next =
-	    (class process *) InterlockedExchangePointer (&entry->next,
-							  new_entry);
-	  entry = new_entry;
-	  PulseEvent (cache_add_trigger);
-	}
-    }
-  LeaveCriticalSection (&cache_write_access);
-  return entry;
-}
-
-static DWORD WINAPI
-request_loop (LPVOID LpParam)
-{
-  class process_process_param *params = (process_process_param *) LpParam;
-  return params->request_loop ();
-}
-
-void
-process_cache::process_requests ()
-{
-  class process_process_param *params = new process_process_param;
-  threaded_queue::process_requests (params, request_loop);
-}
-
-void
-process_cache::add_task (class process * theprocess)
-{
-  /* safe to not "Try" because workers don't hog this, they wait on the event
-   */
-  /* every derived ::add must enter the section! */
-  EnterCriticalSection (&queuelock);
-  queue_request *listrequest = new process_cleanup (theprocess);
-  add (listrequest);
-  LeaveCriticalSection (&queuelock);
-}
-
-/* NOT fully MT SAFE: must be called by only one thread in a program */
-void
-process_cache::remove_process (class process *theprocess)
-{
-  class process *entry = head;
-  /* unlink */
-  EnterCriticalSection (&cache_write_access);
-  if (entry == theprocess)
-    {
-      entry = (class process *) InterlockedExchangePointer (&head, theprocess->next);
-      if (entry != theprocess)
-	{
-	  system_printf ("Bug encountered, process cache corrupted");
-	  exit (1);
-	}
-    }
-  else
-    {
-      while (entry->next && entry->next != theprocess)
-	entry = entry->next;
-      class process *temp = (class process *) InterlockedExchangePointer (&entry->next, theprocess->next);
-      if (temp != theprocess)
-	{
-	  system_printf ("Bug encountered, process cache corrupted");
-	  exit (1);
-	}
-    }
-  LeaveCriticalSection (&cache_write_access);
-  /* Process any cleanup tasks */
-  add_task (theprocess);
-}
-
-/* copy <= max_copy HANDLEs to dest[], starting at an offset into _our list_ of
- * begin_at. (Ie begin_at = 5, the first copied handle is still written to dest[0]
- * NOTE: Thread safe, but not thread guaranteed - a newly added process may be missed.
- * Who cares - It'll get caught the next time.
- */
-int
-process_cache::handle_snapshot (HANDLE * hdest, class process ** edest,
-				ssize_t max_copy, int begin_at)
-{
-  /* TODO:? grab a delete-lock, to prevent deletes during this process ? */
-  class process *entry = head;
-  int count = begin_at;
-  /* skip begin_at entries */
-  while (entry && count)
-    {
-      if (entry->exit_code () == STILL_ACTIVE)
-	count--;
-      entry = entry->next;
-    }
-  /* hit the end of the list within begin_at entries */
-  if (count)
-    return 0;
-  HANDLE *hto = hdest;
-  class process **eto = edest;
-  while (entry && count < max_copy)
-    {
-      /* hack */
-      if (entry->exit_code () == STILL_ACTIVE)
-	{
-	  *hto = entry->handle ();
-	  *eto = entry;
-	  count++;
-	  hto++;
-	  eto++;
-	}
-      entry = entry->next;
-    }
-  return count;
-}
-
-/* process's */
-/* global process crit section */
-static CRITICAL_SECTION process_access;
-static pthread_once_t process_init;
-
-void
-do_process_init (void)
-{
-  InitializeCriticalSection (&process_access);
-  /* we don't have a cache shutdown capability today */
-}
-
-process::process (DWORD winpid):
-winpid (winpid), next (NULL), cleaning_up (0), head (NULL), _exit_status (STILL_ACTIVE)
-{
-  pthread_once (&process_init, do_process_init);
-  EnterCriticalSection (&process_access);
-  thehandle = OpenProcess (PROCESS_ALL_ACCESS, FALSE, winpid);
-  if (!thehandle)
-    {
-      system_printf ("unable to obtain handle for new cache process %lu", winpid);
-      thehandle = INVALID_HANDLE_VALUE;
-    }
-  debug_printf ("Got handle %p for new cache process %lu", thehandle, winpid);
-  InitializeCriticalSection (&access);
-  LeaveCriticalSection (&process_access);
+    debug_printf ("got handle %p for new cache process %lu",
+		  _hProcess, _winpid);
+  InitializeCriticalSection (&_access);
 }
 
 process::~process ()
 {
-  DeleteCriticalSection (&access);
+  DeleteCriticalSection (&_access);
+  (void) CloseHandle (_hProcess);
 }
 
-HANDLE
-process::handle ()
+/* No need to be thread-safe as this is only ever called by
+ * process_cache::remove_process().  If it has to be made thread-safe
+ * later on, it should not use the `access' critical section as that
+ * is held by the client request handlers for an arbitrary length of
+ * time, i.e. while they do whatever processing is required for a
+ * client request.
+ */
+DWORD
+process::exit_code ()
 {
-//  DWORD exitstate = exit_code ();
-//  if (exitstate == STILL_ACTIVE)
-  return thehandle;
-
-  /* FIXME: call the cleanup list ? */
-
-//  CloseHandle (thehandle);
-//  debug_printf ("Process id %ld has terminated, attempting to open a new handle",
-//       winpid);
-//  thehandle = OpenProcess (PROCESS_ALL_ACCESS, FALSE, winpid);
-//  debug_printf ("Got handle %p when refreshing cache process %ld", thehandle, winpid);
-//  /* FIXME: what if OpenProcess fails ? */
-//  if (thehandle)
-//    {
-//      _exit_status = STILL_ACTIVE;
-//      exit_code ();
-//    }
-//  else
-//    thehandle = INVALID_HANDLE_VALUE;
-//  return thehandle;
-}
-
-DWORD process::exit_code ()
-{
-  if (_exit_status != STILL_ACTIVE)
-    return _exit_status;
-  bool
-    err = GetExitCodeProcess (thehandle, &_exit_status);
-  if (!err)
+  if (_hProcess && _hProcess != INVALID_HANDLE_VALUE
+      && _exit_status == STILL_ACTIVE
+      && !GetExitCodeProcess (_hProcess, &_exit_status))
     {
-      system_printf ("Failed to retrieve exit code (%ld)", GetLastError ());
-      thehandle = INVALID_HANDLE_VALUE;
-      return _exit_status;
+      system_printf ("failed to retrieve exit code (%lu)", GetLastError ());
+      _hProcess = INVALID_HANDLE_VALUE;
     }
-  else if (_exit_status == STILL_ACTIVE)
-    return _exit_status;
-  /* add new cleanup task etc etc ? */
   return _exit_status;
 }
 
-/* this is single threaded. It's called after the process is removed from the cache,
- * but inserts may be attemped by worker threads that have a pointer to it */
-void
-process::cleanup ()
-{
-  /* Serialize this */
-  EnterCriticalSection (&access);
-  InterlockedIncrement (&(long)cleaning_up);
-  class cleanup_routine *entry = head;
-  while (entry)
-    {
-      class cleanup_routine *temp;
-      entry->cleanup (winpid);
-      temp = entry->next;
-      delete entry;
-      entry = temp;
-    }
-  LeaveCriticalSection (&access);
-}
-
 bool
-process::add_cleanup_routine (class cleanup_routine *new_cleanup)
+process::add (cleanup_routine *const new_cleanup)
 {
-  if (cleaning_up)
+  if (_cleaning_up)
     return false;
-  EnterCriticalSection (&access);
-  /* check that we didn't block with ::cleanup ()
-   * This rigmarole is to get around win9x's glaring missing TryEnterCriticalSection call
-   * which would be a whole lot easier
+  EnterCriticalSection (&_access);
+  /* Check that we didn't block with ::cleanup ().  This rigmarole is
+   * to get around win9x's glaring missing TryEnterCriticalSection
+   * call which would be a whole lot easier.
    */
-  if (cleaning_up)
+  if (_cleaning_up)
     {
-      LeaveCriticalSection (&access);
+      LeaveCriticalSection (&_access);
       return false;
     }
-  new_cleanup->next = head;
-  head = new_cleanup;
-  LeaveCriticalSection (&access);
+  new_cleanup->_next = _routines_head;
+  _routines_head = new_cleanup;
+  LeaveCriticalSection (&_access);
   return true;
 }
 
-/* process_cleanup */
+/* This is single threaded. It's called after the process is removed
+ * from the cache, but inserts may be attemped by worker threads that
+ * have a pointer to it.
+ */
 void
-process_cleanup::process ()
+process::cleanup ()
 {
-  theprocess->cleanup ();
-  delete theprocess;
+  EnterCriticalSection (&_access);
+  assert (!_cleaning_up);
+  InterlockedExchange (&_cleaning_up, true);
+  cleanup_routine *entry = _routines_head;
+  _routines_head = NULL;
+  LeaveCriticalSection (&_access);
+
+  while (entry)
+    {
+      cleanup_routine *const ptr = entry;
+      entry = entry->_next;
+      ptr->cleanup (_winpid);
+      delete ptr;
+    }
 }
 
-/* process_process_param */
-DWORD
-process_process_param::request_loop ()
+/*****************************************************************************/
+
+void
+process_cache::submission_loop::request_loop ()
 {
-  process_cache *cache = (process_cache *) queue;
-  /* always malloc one, so there is no special case in the loop */
-  ssize_t HandlesSize = 2;
-  HANDLE *Handles = (HANDLE *) malloc (sizeof (HANDLE) * HandlesSize);
-  process **Entries = (process **) malloc (sizeof (LPVOID) * HandlesSize);
-  /* TODO: put [1] at the end as it will also get done if a process dies? */
-  Handles[0] = interrupt;
-  Handles[1] = cache->cache_add_trigger;
-  while (cache->active && !shutdown)
+  assert (this);
+  assert (_cache);
+  assert (_interrupt_event);
+
+  while (_running)
+    _cache->wait_for_processes (_interrupt_event);
+}
+
+/*****************************************************************************/
+
+process_cache::process_cache (const unsigned int initial_workers)
+  : _queue (initial_workers),
+    _submitter (this, &_queue),	// true == interruptible
+    _processes_count (0),
+    _processes_head (NULL),
+    _cache_add_trigger (NULL)
+{
+  /* there can only be one */
+  InitializeCriticalSection (&_cache_write_access);
+
+  _cache_add_trigger = CreateEvent (NULL,  // SECURITY_ATTRIBUTES
+				    FALSE, // Auto-reset
+				    FALSE, // Initially non-signalled
+				    NULL); // Anonymous
+
+  if (!_cache_add_trigger)
     {
-      int copied;
-      copied = -1;
-      int offset;
-      offset = 1;
-      int count;
-      count = 2;
-      while ((copied == HandlesSize - 2 - offset) || copied < 0)
+      system_printf ("failed to create cache add trigger (%lu), terminating",
+		     GetLastError ());
+      abort ();
+    }
+
+  _queue.add_submission_loop (&_submitter);
+}
+
+process_cache::~process_cache ()
+{
+  (void) CloseHandle (_cache_add_trigger);
+  DeleteCriticalSection (&_cache_write_access);
+}
+
+/* This returns the process object to the caller already locked, that
+ * is, with the object's `access' critical region entered.  Thus the
+ * caller must unlock the object when it's finished with it (via
+ * process::release ()).  It must then not try to access the object
+ * afterwards, except by going through this routine again, as it may
+ * have been deleted once it has been unlocked.
+ */
+class process *
+process_cache::process (const DWORD winpid)
+{
+  /* TODO: make this more granular, so a search doesn't involve the
+   * write lock.
+   */
+  EnterCriticalSection (&_cache_write_access);
+  class process *previous = NULL;
+  class process *entry = find (winpid, &previous);
+
+  if (!entry)
+    {
+      if (_processes_count + SPECIALS_COUNT >= MAXIMUM_WAIT_OBJECTS)
 	{
-	  /* we need more storage to cope with all the HANDLES */
-	  if (copied == HandlesSize - 2 - offset)
-	    {
-	      HANDLE *temp = (HANDLE *) realloc (Handles,
-						 sizeof (HANDLE) *
-						 HandlesSize + 10);
-	      if (!temp)
-		{
-		  system_printf
-		    ("cannot allocate more storage for the handle array!");
-		  exit (1);
-		}
-	      Handles = temp;
-	      process **ptemp = (process **) realloc (Entries,
-						      sizeof (LPVOID) *
-						      HandlesSize + 10);
-	      if (!ptemp)
-		{
-		  system_printf
-		    ("cannot allocate more storage for the handle array!");
-		  exit (1);
-		}
-	      Entries = ptemp;
-	      HandlesSize += 10;
-	    }
-	  offset += copied;
-	  copied =
-	    cache->handle_snapshot (&Handles[2], &Entries[2],
-				    HandlesSize - 2 - offset, offset);
-	  count += copied;
+	  LeaveCriticalSection (&_cache_write_access);
+	  system_printf (("process limit (%d processes) reached; "
+			  "new connection refused"),
+			 MAXIMUM_WAIT_OBJECTS - SPECIALS_COUNT);
+	  set_errno (EAGAIN);
+	  return NULL;
 	}
-      // verbose: debug_printf ("waiting on %u objects", count);
-      DWORD rc = WaitForMultipleObjects (count, Handles, FALSE, INFINITE);
-      if (rc == WAIT_FAILED)
+
+      entry = new class process (winpid);
+      if (entry->_exit_status != STILL_ACTIVE)
 	{
-	  system_printf ("Could not wait on the process handles (%ld)!",
-			 GetLastError ());
-	  exit (1);
+	  LeaveCriticalSection (&_cache_write_access);
+	  delete entry;
+	  set_errno (ESRCH);
+	  return NULL;
 	}
-      int objindex = rc - WAIT_OBJECT_0;
-      if (objindex > 1 && objindex < count)
+
+      if (previous)
 	{
-	  debug_printf ("Process %ld has left the building",
-			Entries[objindex]->winpid);
-	  /* fire off the termination routines */
-	  cache->remove_process (Entries[objindex]);
-	}
-      else if (objindex >= 0 && objindex < 2)
-	{
-	  /* 0 is shutdown - do nothing */
-	  /* 1 is a cache add event - just rebuild the object list */
+	  entry->_next = previous->_next;
+	  previous->_next = entry;
 	}
       else
 	{
-	  system_printf
-	    ("unexpected return code from WaitForMultiple objects in process_process_param::request_loop");
+	  entry->_next = _processes_head;
+	  _processes_head = entry;
 	}
+
+      _processes_count += 1;
+      SetEvent (_cache_add_trigger);
     }
-  running = false;
-  return 0;
+
+  EnterCriticalSection (&entry->_access); // To be released by the caller.
+  LeaveCriticalSection (&_cache_write_access);
+  assert (entry);
+  assert (entry->_winpid == winpid);
+  return entry;
 }
 
-/* cleanup_routine */
-cleanup_routine::~cleanup_routine ()
-{}
+void
+process_cache::wait_for_processes (const HANDLE interrupt_event)
+{
+  // Update `_wait_array' with handles of all current processes.
+  const size_t count = sync_wait_array (interrupt_event);
+
+  debug_printf ("waiting on %u objects (out of %u processes)",
+		count, _processes_count);
+
+  const DWORD rc = WaitForMultipleObjects (count, _wait_array,
+					   FALSE, INFINITE);
+
+  if (rc == WAIT_FAILED)
+    {
+      system_printf ("could not wait on the process handles, error = %lu",
+		     GetLastError ());
+      abort ();
+    }
+
+  const size_t start = rc - WAIT_OBJECT_0;
+
+  if (rc < WAIT_OBJECT_0 || start > count)
+    {
+      system_printf (("unexpected return code %rc "
+		      "from WaitForMultipleObjects: "
+		      "expected [%u .. %u)"),
+		     rc, WAIT_OBJECT_0, WAIT_OBJECT_0 + count);
+      abort ();
+    }
+
+  // Tell all the processes, from the signalled point up, the bad news.
+  for (size_t index = start; index != count; index++)
+    if (_process_array[index])
+      check_and_remove_process (index);
+}
+
+/*
+ * process_cache::sync_wait_array ()
+ *
+ * Fill-in the wait array with the handles that the cache needs to wait on.
+ * These handles are:
+ *  - the process_process_param's interrupt event
+ *  - the process_cache's cache_add_trigger event
+ *  - the handle for each live process in the cache.
+ *
+ * Return value: the number of live handles in the array.
+ */
+
+size_t
+process_cache::sync_wait_array (const HANDLE interrupt_event)
+{
+  assert (this);
+  assert (_cache_add_trigger && _cache_add_trigger != INVALID_HANDLE_VALUE);
+  assert (interrupt_event && interrupt_event != INVALID_HANDLE_VALUE);
+
+  EnterCriticalSection (&_cache_write_access);
+
+  assert (_processes_count + SPECIALS_COUNT < elements (_wait_array));
+
+  size_t index = 0;
+
+  for (class process *ptr = _processes_head; ptr; ptr = ptr->_next)
+    {
+      assert (ptr->_hProcess && ptr->_hProcess != INVALID_HANDLE_VALUE);
+      assert (ptr->_exit_status == STILL_ACTIVE);
+
+      _wait_array[index] = ptr->handle ();
+      _process_array[index++] = ptr;
+
+      assert (index <= elements (_wait_array));
+    }
+
+  /* Sorry for shouting, but THESE MUST BE ADDED AT THE END! */
+  /* Well, not strictly `must', but it's more efficient if they are :-) */
+
+  _wait_array[index] = interrupt_event;
+  _process_array[index++] = NULL;
+
+  _wait_array[index] = _cache_add_trigger;
+  _process_array[index++] = NULL;
+
+  /* Phew, back to normal volume now. */
+
+  assert (index <= elements (_wait_array));
+
+  LeaveCriticalSection (&_cache_write_access);
+
+  return index;
+}
+
+void
+process_cache::check_and_remove_process (const size_t index)
+{
+  assert (this);
+  assert (index < elements (_wait_array) - SPECIALS_COUNT);
+
+  class process *const process = _process_array[index];
+
+  assert (process);
+  assert (process->handle () == _wait_array[index]);
+
+  if (process->exit_code () == STILL_ACTIVE)
+    return;
+
+  debug_printf ("process %lu has left the building ($? = %lu)",
+		process->_winpid, process->_exit_status);
+
+  /* Unlink the process object from the process list. */
+
+  EnterCriticalSection (&_cache_write_access);
+
+  class process *previous = NULL;
+
+  const class process *const tmp = find (process->_winpid, &previous);
+
+  assert (tmp == process);
+  assert (previous ? previous->_next == process : _processes_head == process);
+
+  if (previous)
+    previous->_next = process->_next;
+  else
+    _processes_head = process->_next;
+
+  _processes_count -= 1;
+  SetEvent (_cache_add_trigger);
+  LeaveCriticalSection (&_cache_write_access);
+
+  /* Schedule any cleanup tasks for this process. */
+  _queue.add (new process_cleanup (process));
+}
+
+class process *
+process_cache::find (const DWORD winpid, class process **previous)
+{
+  if (previous)
+    *previous = NULL;
+
+  for (class process *ptr = _processes_head; ptr; ptr = ptr->_next)
+    if (ptr->_winpid == winpid)
+      return ptr;
+    else if (ptr->_winpid > winpid) // The list is sorted by winpid.
+      return NULL;
+    else if (previous)
+      *previous = ptr;
+
+  return NULL;
+}
+
+/*****************************************************************************/
