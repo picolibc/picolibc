@@ -26,9 +26,9 @@ details. */
 #include "cygerrno.h"
 #include "cygwin_version.h"
 
-#include "cygwin/cygserver.h"
-#include "cygwin/cygserver_process.h"
-#include "cygwin/cygserver_transport.h"
+#include "cygserver.h"
+#include "cygserver_process.h"
+#include "cygserver_transport.h"
 
 // Version string.
 static const char version[] = "$Revision$";

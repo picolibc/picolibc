@@ -1,3 +1,17 @@
+2003-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	Accomodate moving cygserver header files from cygwin/include/cygwin
+	to here and cygwin dir.
+	* Makefile.in (EXEEXT): Drop as unused.
+	(EXEEXT_FOR_BUILD): Ditto.
+	(all): Don't build libcygserver.a.
+	* cygserver_process.h: Moved from cygwin/include/cygwin to here.
+	* cygserver_transport.h: Ditto.
+	* cygserver_transport_pipes.h: Ditto.
+	* cygserver_transport_sockets.h: Ditto.
+	* ipc.h: Moved to ../cygwin and renamed to cygserver_ipc.h.
+	* shm.h: Moved to ../cygwin and renamed to cygserver_shm.h.
+
 2003-08-30  Christopher Faylor  <cgf@redhat.com>
 
 	* msg.cc: New file.

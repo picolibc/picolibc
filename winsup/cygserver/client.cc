@@ -25,8 +25,8 @@ details. */
 #include "cygserver_shm.h"
 #include "safe_memory.h"
 
-#include "cygwin/cygserver.h"
-#include "cygwin/cygserver_transport.h"
+#include "cygserver.h"
+#include "cygserver_transport.h"
 
 int cygserver_running = CYGSERVER_UNKNOWN; // Nb: inherited by children.
 

@@ -25,11 +25,11 @@ details. */
 #include <unistd.h>
 
 #include "cygerrno.h"
-#include "cygwin/cygserver_transport.h"
-#include "cygwin/cygserver_transport_pipes.h"
+#include "cygserver_transport.h"
+#include "cygserver_transport_pipes.h"
 
 #ifndef __INSIDE_CYGWIN__
-#include "cygwin/cygserver.h"
+#include "cygserver.h"
 #endif
 
 enum

@@ -19,7 +19,7 @@ details. */
 
 #include "cygerrno.h"
 
-#include "cygwin/cygserver_process.h"
+#include "cygserver_process.h"
 
 /*****************************************************************************/
 

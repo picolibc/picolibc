@@ -22,9 +22,6 @@ INSTALL:=@INSTALL@
 INSTALL_PROGRAM:=@INSTALL_PROGRAM@
 INSTALL_DATA:=@INSTALL_DATA@
 
-EXEEXT:=@EXEEXT@
-EXEEXT_FOR_BUILD:=@EXEEXT_FOR_BUILD@
-
 CC:=@CC@
 CC_FOR_TARGET:=$(CC)
 CXX:=@CXX@
@@ -44,7 +41,7 @@ LIBOBJS:=${patsubst %.o,lib%.o,$(OBJS)}
 CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o \
 	$(cygwin_build)/wincap.o
 
-all: cygserver.exe libcygserver.a
+all: cygserver.exe
 
 install: all
 

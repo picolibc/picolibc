@@ -21,9 +21,9 @@ details. */
 
 #include "safe_memory.h"
 
-#include "cygwin/cygserver_transport.h"
-#include "cygwin/cygserver_transport_pipes.h"
-#include "cygwin/cygserver_transport_sockets.h"
+#include "cygserver_transport.h"
+#include "cygserver_transport_pipes.h"
+#include "cygserver_transport_sockets.h"
 
 /* The factory */
 transport_layer_base *

@@ -23,9 +23,9 @@ details. */
 #include "cygserver_shm.h"
 #include "security.h"
 
-#include "cygwin/cygserver.h"
-#include "cygwin/cygserver_process.h"
-#include "cygwin/cygserver_transport.h"
+#include "cygserver.h"
+#include "cygserver_process.h"
+#include "cygserver_transport.h"
 
 /*---------------------------------------------------------------------------*
  * class server_shmmgr
