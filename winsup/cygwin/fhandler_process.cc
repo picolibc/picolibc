@@ -42,7 +42,6 @@ static const int PROCESS_SID = 10;
 static const int PROCESS_CTTY = 11;
 static const int PROCESS_STAT = 12;
 static const int PROCESS_STATM = 13;
-static const int PROCESS_CMDLINE = 14;
 
 static const char * const process_listing[] =
 {
@@ -60,7 +59,6 @@ static const char * const process_listing[] =
   "ctty",
   "stat",
   "statm",
-  "cmdline",
   NULL
 };
 
@@ -266,7 +264,8 @@ fhandler_process::fill_filebuf ()
     case PROCESS_CTTY:
     case PROCESS_PPID:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 40);
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
 	int num;
 	switch (fileid)
 	  {
@@ -296,18 +295,10 @@ fhandler_process::fill_filebuf ()
 	filesize = strlen (filebuf);
 	break;
       }
-    case PROCESS_CMDLINE:
-      {
-	if (filebuf)
-	  free (filebuf);
-	filebuf = p->cmdline (filesize);
-	if (!*filebuf)
-	  filebuf = strdup ("<defunct>");
-	break;
-      }
     case PROCESS_EXENAME:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = MAX_PATH);
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = MAX_PATH);
 	if (p->process_state & (PID_ZOMBIE | PID_EXITED))
 	  strcpy (filebuf, "<defunct>");
 	else
@@ -326,7 +317,8 @@ fhandler_process::fill_filebuf ()
       }
     case PROCESS_WINPID:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 40);
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
 	__small_sprintf (filebuf, "%d\n", p->dwProcessId);
 	filesize = strlen (filebuf);
 	break;
@@ -334,7 +326,8 @@ fhandler_process::fill_filebuf ()
     case PROCESS_WINEXENAME:
       {
 	int len = strlen (p->progname);
-	filebuf = (char *) realloc (filebuf, bufalloc = (len + 2));
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = (len + 2));
 	strcpy (filebuf, p->progname);
 	filebuf[len] = '\n';
 	filesize = len + 1;
@@ -342,19 +335,22 @@ fhandler_process::fill_filebuf ()
       }
     case PROCESS_STATUS:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 2048);
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
 	filesize = format_process_status (*p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_STAT:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 2048);
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
 	filesize = format_process_stat (*p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_STATM:
       {
-	filebuf = (char *) realloc (filebuf, bufalloc = 2048);
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
 	filesize = format_process_statm (*p, filebuf, bufalloc);
 	break;
       }
