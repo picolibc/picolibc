@@ -151,7 +151,7 @@ DLL_OFILES:=assert.o autoload.o cxx.o cygheap.o cygserver_client.o \
 	delqueue.o devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o \
 	exceptions.o exec.o external.o fcntl.o fhandler.o \
 	fhandler_clipboard.o fhandler_console.o fhandler_disk_file.o \
-	fhandler_dsp.o fhandler_floppy.o fhandler_mem.o \
+	fhandler_dsp.o fhandler_fifo.o fhandler_floppy.o fhandler_mem.o \
 	fhandler_proc.o fhandler_process.o fhandler_random.o \
 	fhandler_raw.o fhandler_registry.o fhandler_serial.o \
 	fhandler_socket.o fhandler_tape.o fhandler_termios.o \
