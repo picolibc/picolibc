@@ -160,9 +160,9 @@ LIBC_OBJECTLISTS =  	$(POSIX_OBJECTLIST) 	$(SIGNAL_OBJECTLIST) 	$(SYSCALL_OBJECT
 LIBM_OBJECTLISTS =  	libm/$(MATHDIR)/objectlist.awk.in 	libm/common/objectlist.awk.in 	$(LIBM_MACHINE_OBJECTLIST)
 
 
-libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -objectlist libm-libtool-objectlist
+libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -lgcc -objectlist libm-libtool-objectlist
 
-libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -objectlist libc-libtool-objectlist
+libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -lgcc -objectlist libc-libtool-objectlist
 
 @USE_LIBTOOL_TRUE@libm_la_SOURCES = 
 @USE_LIBTOOL_TRUE@libm_la_DEPENDENCIES = libm-libtool-objectlist

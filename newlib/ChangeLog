@@ -1,3 +1,10 @@
+2004-12-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am (libc_la_LDFLAGS): Add -lgcc to handle any
+	libgcc dependencies.
+	(libm_la_LDFLAGS): Ditto.
+	* Makefile.in: Regenerated.
+
 2004-12-03  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/sys/linux/linuxthreads/Makefile.am (install-data-local): Fix
