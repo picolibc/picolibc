@@ -8,6 +8,7 @@
 #include <sys/lock.h>
 #include "atexit.h"
 
+
 /*
  * Register a function to be performed at exit or on shared library unload.
  */
@@ -47,7 +48,9 @@ _DEFUN (__register_exitproc,
       _GLOBAL_REENT->_atexit = p;
 #ifndef _REENT_SMALL
       p->_on_exit_args._fntypes = 0;
+#ifdef __REENT_HAS_CXA_SUPPORT
       p->_on_exit_args._is_cxa = 0;
+#endif
 #endif
     }
 
@@ -67,16 +70,20 @@ _DEFUN (__register_exitproc,
 	    }
 	  args->_fntypes = 0;
 	  args->_is_cxa = 0;
+#ifdef __REENT_HAS_CXA_SUPPORT
 	  p->_on_exit_args_ptr = args;
+#endif
 	}
 #else
       args = &p->_on_exit_args;
 #endif
       args->_fnargs[p->_ind] = arg;
-      args->_dso_handle[p->_ind] = d;
       args->_fntypes |= (1 << p->_ind);
+#ifdef __REENT_HAS_CXA_SUPPORT
+      args->_dso_handle[p->_ind] = d;
       if (type == __et_cxa)
 	args->_is_cxa |= (1 << p->_ind);
+#endif
     }
   p->_fns[p->_ind++] = fn;
 #ifndef __SINGLE_THREAD__

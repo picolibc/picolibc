@@ -8,6 +8,7 @@
 #include <sys/lock.h>
 #include "atexit.h"
 
+#ifdef __REENT_HAS_CXA_SUPPORT
 /*
  * Register a function to be performed at exit or DSO unload.
  */
@@ -21,3 +22,5 @@ _DEFUN (__cxa_atexit,
 {
   return __register_exitproc (__et_cxa, (void (*)(void)) fn, arg, d);
 }
+
+#endif /* __REENT_HAS_CXA_SUPPORT */

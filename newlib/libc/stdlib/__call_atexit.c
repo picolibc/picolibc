@@ -36,9 +36,11 @@ _DEFUN (__call_exitprocs, (code, d),
 	{
 	  i = 1 << n;
 
+#ifdef __REENT_HAS_CXA_SUPPORT
 	  /* Skip functions not from this dso.  */
 	  if (d && (!args || args->_dso_handle[n] != d))
 	    continue;
+#endif
 
 	  /* Remove the function now to protect against the
 	     function calling exit recursively.  */
@@ -55,8 +57,10 @@ _DEFUN (__call_exitprocs, (code, d),
 	  /* Call the function.  */
 	  if (!args || (args->_fntypes & i) == 0)
 	    fn ();
+#ifdef __REENT_HAS_CXA_SUPPORT
 	  else if ((args->_is_cxa & i) == 0)
 	    (*((void (*)(int, _PTR)) fn))(code, args->_fnargs[n]);
+#endif
 	  else
 	    (*((void (*)(_PTR)) fn))(args->_fnargs[n]);
 	}

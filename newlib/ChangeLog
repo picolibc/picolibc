@@ -1,3 +1,27 @@
+2004-09-14  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host: Add Cygwin sys directory.
+	* configure.in: Do not set CRT0 for cygwin.
+	* libc/configure.in: Ditto.
+	* libc/sys/configure.in: Ditto.
+	* configure: Regenerated.
+	* libc/configure: Ditto.
+	* libc/sys/configure: Ditto.
+	* libc/include/sys/reent.h: Add __REENT_HAS_CXA_SUPPORT flag.
+	* libc/stdlib/__atexit.c: Keep cxa support protected by new
+	__REENT_HAS_CXA_SUPPORT flag.
+	* libc/stdlib/__call_atexit.c: Ditto.
+	* libc/stdlib/cxa_atexit.c: Ditto.
+	* libc/stdlib/cxa_finalize.c: Ditto.
+	* libc/sys/cygwin/Makefile.am: New file.
+	* libc/sys/cygwin/Makefile.in: Ditto.
+	* libc/sys/cygwin/aclocal.m4: Ditto.
+	* libc/sys/cygwin/configure: Ditto.
+	* libc/sys/cygwin/configure.in: Ditto.
+	* libc/sys/cygwin/dummy.c: Ditto.
+	* libc/sys/cygwin/sys/reent.h: Ditto.  This file is stabilized
+	version of reent.h.
+
 2004-09-13 Artem B. Bityuckiy  <dedekind@oktetlabs.ru>
 
 	* libc/iconv/iconv.tex: Updated with new content.

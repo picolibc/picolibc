@@ -139,7 +139,7 @@ AC_CONFIG_SUBDIRS(${configdirs})
 
 CRT0=
 CRT0_DIR=
-if test -n "${sys_dir}"; then
+if test x${sys_dir} != xcygwin && test -n "${sys_dir}"; then
   CRT0=crt0.o
   CRT0_DIR=libc/
 fi
