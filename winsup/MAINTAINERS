@@ -6,21 +6,24 @@ Makefile.*			Chris Faylor <cgf@cygnus.com>
 configure.*			Chris Faylor <cgf@cygnus.com>
 MAINTAINERS			Chris Faylor <cgf@cygnus.com>
 cygwin/security.cc and
-ntsec stuff			Corinna Vinschen <corinna@vinschen.de>
-cygwin/fhandler_raw.cc		Corinna Vinschen <corinna@vinschen.de>
-cygwin/fhandler_floppy.cc	Corinna Vinschen <corinna@vinschen.de>
-cygwin/fhandler_tape.cc		Corinna Vinschen <corinna@vinschen.de>
-utils/getfacl.c			Corinna Vinschen <corinna@vinschen.de>
-utils/mkgroup.c			Corinna Vinschen <corinna@vinschen.de>
-utils/mkpasswd.c		Corinna Vinschen <corinna@vinschen.de>
-utils/passwd.c			Corinna Vinschen <corinna@vinschen.de>
-utils/setfacl.c			Corinna Vinschen <corinna@vinschen.de>
+ntsec stuff			Corinna Vinschen <vinschen@cygnus.com>
+cygwin/fhandler_raw.cc		Corinna Vinschen <vinschen@cygnus.com>
+cygwin/fhandler_floppy.cc	Corinna Vinschen <vinschen@cygnus.com>
+cygwin/fhandler_tape.cc		Corinna Vinschen <vinschen@cygnus.com>
+utils/getfacl.c			Corinna Vinschen <vinschen@cygnus.com>
+utils/mkgroup.c			Corinna Vinschen <vinschen@cygnus.com>
+utils/mkpasswd.c		Corinna Vinschen <vinschen@cygnus.com>
+utils/passwd.c			Corinna Vinschen <vinschen@cygnus.com>
+utils/setfacl.c			Corinna Vinschen <vinschen@cygnus.com>
 mingw/*				Mumit Khan <xraylith.wisc.edu>
 w32api/*			Mumit Khan <xraylith.wisc.edu>
 cinstall/*			Ron Parker <rparker1@kc.rr.com>
+				Chris Faylor <cgf@cygnus.com>
 cygwin/{everything else}	Chris Faylor <cgf@cygnus.com>,
 				DJ Delorie <dj@cygnus.com>
+				Corinna Vinschen <vinschen@cygnus.com>
 doc/*.texinfo			David Starks-Browning <starksb@ebi.ac.uk>
 doc/{everything else}		DJ Delorie <dj@cygnus.com>
 utils/*				Chris Faylor <cgf@cygnus.com>,
 				DJ Delorie <dj@cygnus.com>
+				Corinna Vinschen <vinschen@cygnus.com>

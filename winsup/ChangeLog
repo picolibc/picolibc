@@ -1,3 +1,7 @@
+Thu May 18 14:33:05 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* MAINTAINERS: Add Corinna to general list.
+
 2000-04-17  DJ Delorie  <dj@cygnus.com>
 
 	* Makefile.common (srcdir): remove dependence on where pwd is
