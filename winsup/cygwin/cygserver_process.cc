@@ -16,7 +16,6 @@ details. */
 
 #include <assert.h>
 #include <errno.h>
-#include <pthread.h>
 #include <stdlib.h>
 
 #include "cygerrno.h"
@@ -31,7 +30,7 @@ details. */
 
 process_cleanup::~process_cleanup ()
 {
-  delete _process;
+  safe_delete (process, _process);
 }
 
 void
@@ -137,7 +136,7 @@ process::cleanup ()
       cleanup_routine *const ptr = entry;
       entry = entry->_next;
       ptr->cleanup (_winpid);
-      delete ptr;
+      safe_delete (cleanup_routine, ptr);
     }
 }
 
@@ -216,11 +215,11 @@ process_cache::process (const DWORD winpid)
 	  return NULL;
 	}
 
-      entry = new class process (winpid);
+      entry = safe_new (class process, winpid);
       if (entry->_exit_status != STILL_ACTIVE)
 	{
 	  LeaveCriticalSection (&_cache_write_access);
-	  delete entry;
+	  safe_delete (process, entry);
 	  set_errno (ESRCH);
 	  return NULL;
 	}
@@ -375,7 +374,7 @@ process_cache::check_and_remove_process (const size_t index)
   LeaveCriticalSection (&_cache_write_access);
 
   /* Schedule any cleanup tasks for this process. */
-  _queue.add (new process_cleanup (process));
+  _queue.add (safe_new (process_cleanup, process));
 }
 
 class process *

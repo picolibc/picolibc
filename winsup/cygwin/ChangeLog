@@ -1,5 +1,38 @@
 2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* woutsup.h: Remove all uses of the C++ new and delete operators
+	throughout cygserver until they are fully thread-safe.
+	(safe_new0): New macro to replace the C++ new operator.
+	(safe_new): Ditto.
+	(safe_delete): New macro to replace the C++ delete operator.
+	* cygserver_client.cc (client_request::handle_request): Replace
+	all uses of the C++ new and delete operators with the new macros
+	from "woutsup.h".
+	(client_request::make_request): Ditto.
+	* cygserver_process.cc (~process_cleanup): Ditto.
+	(process::cleanup): Ditto.
+	(process_cache::process): Ditto.
+	(process_cache::check_and_remove_process): Ditto.
+	* cygserver_shm.cc (server_shmmgr::new_segment): Ditto.
+	(server_shmmgr::delete_segment): Ditto.
+	* cygserver_transport.cc (create_server_transport): Ditto.
+	* cygserver_transport_pipes.cc
+	(transport_layer_pipes::accept): Ditto.
+	* cygserver_transport_sockets.cc
+	(transport_layer_sockets::accept): Ditto.
+	* threaded_queue.cc (~threaded_queue): Ditto.
+	(threaded_queue::worker_loop): Ditto.
+	(threaded_queue::stop): Replace sleep(3) with win32 Sleep.
+	* cygserver.cc (~server_request): Replace all uses of the C++ new
+	and delete operators with the new macros from "woutsup.h".
+	(server_submission_loop::request_loop): Ditto.
+	(main): Ditto.  Replace sleep(3) with win32 Sleep.  Replace
+	iostreams with FILEs.
+	(print_usage): Replace iostreams with FILEs.
+	(print_version): Ditto.
+
+2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_transport_sockets.cc
 	(transport_layer_sockets::accept): Rename local variable
 	`accept_fd' to avoid shadowing the `fd' field.

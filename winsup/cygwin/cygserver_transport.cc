@@ -24,15 +24,20 @@ details. */
 #include "cygwin/cygserver_transport_sockets.h"
 
 /* The factory */
-class transport_layer_base *create_server_transport()
+transport_layer_base *
+create_server_transport ()
 {
-  transport_layer_base *temp;
-  /* currently there is only the base class! */
+#ifdef safe_new0
   if (wincap.is_winnt ())
-    temp = new transport_layer_pipes ();
+    return safe_new0 (transport_layer_pipes);
   else
-    temp = new transport_layer_sockets ();
-  return temp;
+    return safe_new0 (transport_layer_pipes);
+#else
+  if (wincap.is_winnt ())
+    return new transport_layer_pipes;
+  else
+    return new transport_layer_pipes;
+#endif
 }
 
 #ifndef __INSIDE_CYGWIN__

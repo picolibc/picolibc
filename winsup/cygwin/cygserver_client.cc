@@ -17,8 +17,6 @@ details. */
 #include "winsup.h"
 #endif
 
-#include <sys/socket.h>
-
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
@@ -281,17 +279,17 @@ client_request::handle_request (transport_layer_base *const conn,
 
   switch (header.request_code)
     {
-    case CYGSERVER_REQUEST_GET_VERSION:		
-      req = new client_request_get_version ();	
+    case CYGSERVER_REQUEST_GET_VERSION:
+      req = safe_new0 (client_request_get_version);
       break;
-    case CYGSERVER_REQUEST_SHUTDOWN:		
-      req = new client_request_shutdown ();	
+    case CYGSERVER_REQUEST_SHUTDOWN:
+      req = safe_new0 (client_request_shutdown);
       break;
-    case CYGSERVER_REQUEST_ATTACH_TTY:		
-      req = new client_request_attach_tty ();	
+    case CYGSERVER_REQUEST_ATTACH_TTY:
+      req = safe_new0 (client_request_attach_tty);
       break;
-    case CYGSERVER_REQUEST_SHM:		
-      req = new client_request_shm ();	
+    case CYGSERVER_REQUEST_SHM:
+      req = safe_new0 (client_request_shm);
       break;
     default:
       syscall_printf ("unknown request code %d received: request ignored",
@@ -304,7 +302,7 @@ client_request::handle_request (transport_layer_base *const conn,
   req->msglen (header.msglen);
   req->handle (conn, cache);
 
-  delete (req);
+  safe_delete (client_request, req);
   printf (".");
 }
 
@@ -357,7 +355,11 @@ client_request::make_request ()
 	error_code (errno);
       else
 	error_code (ENOSYS);
+#ifdef safe_delete
+      safe_delete (transport_layer_base, transport);
+#else
       delete transport;
+#endif
       return -1;
     }
 
@@ -365,7 +367,11 @@ client_request::make_request ()
 
   send (transport);
 
+#ifdef safe_delete
+  safe_delete (transport_layer_base, transport);
+#else
   delete transport;
+#endif
 
   return 0;
 }
@@ -501,13 +507,13 @@ check_cygserver_available (const bool check_version_too)
       syscall_printf ("process will continue without cygserver support");
       return false;
     }
-  
+
   if (check_version_too && !req.check_version ())
     {
       return false;
     }
 
-  return true; 
+  return true;
 }
 
 /*

@@ -163,7 +163,7 @@ transport_layer_pipes::accept (bool * const recoverable)
       return NULL;
     }
 
-  return new transport_layer_pipes (accept_pipe);
+  return safe_new (transport_layer_pipes, accept_pipe);
 }
 
 #endif /* !__INSIDE_CYGWIN__ */

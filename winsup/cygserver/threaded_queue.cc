@@ -73,7 +73,7 @@ threaded_queue::~threaded_queue ()
     {
       queue_request *const ptr = reqptr;
       reqptr = reqptr->_next;
-      delete ptr;
+      safe_delete (queue_request, ptr);
     }
 
   DeleteCriticalSection (&_queue_lock);
@@ -146,7 +146,7 @@ threaded_queue::stop ()
 	  debug_printf (("waiting for worker threads to terminate: "
 			 "%lu still running"),
 			_workers_count);
-	  sleep (1);
+	  Sleep (1000);
 	}
       debug_printf ("all worker threads have terminated");
     }
@@ -265,7 +265,7 @@ threaded_queue::worker_loop ()
 
       assert (reqptr);
       reqptr->process ();
-      delete reqptr;
+      safe_delete (queue_request, reqptr);
     }
 }
 

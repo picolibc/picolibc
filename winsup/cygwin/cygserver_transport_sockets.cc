@@ -112,7 +112,7 @@ transport_layer_sockets::accept (bool * const recoverable)
       return NULL;
     }
 
-  return new transport_layer_sockets (accept_fd);
+  return safe_new (transport_layer_sockets, accept_fd);
 }
 
 #endif /* !__INSIDE_CYGWIN__ */

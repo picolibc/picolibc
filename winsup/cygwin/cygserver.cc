@@ -24,8 +24,6 @@ details. */
 #include <string.h>
 #include <unistd.h>
 
-#include <ostream.h>
-
 #include "cygerrno.h"
 #include "cygwin_version.h"
 
@@ -78,14 +76,14 @@ getfunc (char *in_dst, const char *func)
  * Support function for the XXX_printf() macros in "woutsup.h".
  */
 extern "C" void
-__cygserver__printf (const char * const function, const char * const fmt, ...)
+__cygserver__printf (const char *const function, const char *const fmt, ...)
 {
   const DWORD lasterror = GetLastError ();
   const int lasterrno = errno;
 
   va_list ap;
 
-  char * const buf = (char *) alloca(BUFSIZ);
+  char *const buf = (char *) alloca(BUFSIZ);
 
   assert (buf);
 
@@ -172,7 +170,7 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 		      HANDLE from_process_token,
 		      DWORD access,
 		      HANDLE from_handle,
-		      HANDLE* to_handle_ptr, BOOL bInheritHandle = FALSE)
+		      HANDLE *to_handle_ptr, BOOL bInheritHandle = FALSE)
 {
   HANDLE local_handle = NULL;
   int ret_val = EACCES;
@@ -404,7 +402,7 @@ public:
 
   virtual ~server_request()
   {
-    delete _conn;
+    safe_delete (transport_layer_base, _conn);
   }
 
   virtual void process ()
@@ -457,7 +455,7 @@ server_submission_loop::request_loop ()
 	  return;
 	}
       if (conn)
-	_queue->add (new server_request (conn, _cache));
+	_queue->add (safe_new (server_request, conn, _cache));
     }
 }
 
@@ -487,7 +485,7 @@ client_request_shutdown::serve (transport_layer_base *, process_cache *)
 }
 
 static void
-handle_signal (int signal)
+handle_signal (const int signum)
 {
   /* any signal makes us die :} */
 
@@ -499,13 +497,12 @@ handle_signal (int signal)
  */
 
 static void
-print_usage (const char * const pgm)
+print_usage (const char *const pgm)
 {
-  cout << "Usage: " << pgm << "[OPTIONS]\n"
-       << ( "  -h, --help       output usage information and exit\n"
-	    "  -s, --shutdown   shutdown the current instance of the daemon\n"
-	    "  -v, --version    output version information and exit\n" )
-       << flush;
+  printf ("Usage: %s [OPTIONS]\n", pgm);
+  printf ("  -h, --help       output usage information and exit\n");
+  printf ("  -s, --shutdown   shutdown the current instance of the daemon\n");
+  printf ("  -v, --version    output version information and exit\n");
 }
 
 /*
@@ -513,11 +510,11 @@ print_usage (const char * const pgm)
  */
 
 static void
-print_version (const char * const pgm)
+print_version (const char *const pgm)
 {
-  char * vn = NULL;
+  char *vn = NULL;
 
-  const char * colon = strchr (version, ':');
+  const char *const colon = strchr (version, ':');
 
   if (!colon)
     {
@@ -527,7 +524,7 @@ print_version (const char * const pgm)
     {
       vn = strdup (colon + 2);	// Skip ": "
 
-      char * const spc = strchr (vn, ' ');
+      char *const spc = strchr (vn, ' ');
 
       if (spc)
 	*spc = '\0';
@@ -548,10 +545,10 @@ print_version (const char * const pgm)
 	    cygwin_version.mount_registry,
 	    cygwin_version.dll_build_date);
 
-  cout << pgm << " (cygwin) " << vn << endl
-       << "API version " << buf << endl
-       << "Copyright 2001, 2002 Red Hat, Inc." << endl
-       << "Compiled on " __DATE__ << endl;
+  printf ("%s (cygwin) %s\n", pgm, vn);
+  printf ("API version %s\n", buf);
+  printf ("Copyright 2001, 2002 Red Hat, Inc.\n");
+  printf ("Compiled on %s\n", __DATE__);
 
   free (vn);
 }
@@ -574,7 +571,7 @@ main (const int argc, char *argv[])
 
   bool shutdown = false;
 
-  const char * pgm = NULL;
+  const char *pgm = NULL;
 
   if (!(pgm = strrchr (*argv, '\\')) && !(pgm = strrchr (*argv, '/')))
     pgm = *argv;
@@ -603,13 +600,13 @@ main (const int argc, char *argv[])
 	return 0;
 
       case '?':
-	cerr << "Try `" << pgm << " --help' for more information." << endl;
+	fprintf (stderr, "Try `%s --help' for more information.\n", pgm);
 	exit (1);
       }
 
   if (optind != argc)
     {
-      cerr << pgm << ": too many arguments" << endl;
+      fprintf (stderr, "%s: too many arguments\n", pgm);
       exit (1);
     }
 
@@ -622,8 +619,8 @@ main (const int argc, char *argv[])
 
       if (req.make_request () == -1 || req.error_code ())
 	{
-	  cout << pgm << ": shutdown request failed: "
-	       << strerror(errno) << endl;
+	  fprintf (stderr, "%s: shutdown request failed: %s\n",
+		   pgm, strerror (errno));
 	  exit (1);
 	}
 
@@ -638,7 +635,6 @@ main (const int argc, char *argv[])
 		     errno);
       exit (1);
     }
-
 
   print_version (pgm);
   setbuf (stdout, NULL);
@@ -684,12 +680,12 @@ main (const int argc, char *argv[])
      -- if signal event then retrigger it
   */
   while (!shutdown_server && request_queue.running () && cache.running ())
-    sleep (1);
+    Sleep (1000);
 
   printf ("\nShutdown request received - new requests will be denied\n");
   request_queue.stop ();
   printf ("All pending requests processed\n");
-  delete transport;
+  safe_delete (transport_layer_base, transport);
   printf ("No longer accepting requests - cygwin will operate in daemonless mode\n");
   cache.stop ();
   printf ("All outstanding process-cache activities completed\n");

@@ -447,7 +447,7 @@ server_shmmgr::new_segment (const key_t key, const HANDLE hFileMap)
       previous = segptr;
     }
 
-  segment_t *const segptr = new segment_t (key, shmid, hFileMap);
+  segment_t *const segptr = safe_new (segment_t, key, shmid, hFileMap);
 
   assert (segptr);
 
@@ -501,7 +501,7 @@ server_shmmgr::delete_segment (segment_t *const segptr)
   assert (_shmid_cnt > 0);
   _shmid_cnt -= 1;
 
-  delete segptr;
+  safe_delete (segment_t, segptr);
 }
 
 /*---------------------------------------------------------------------------*
