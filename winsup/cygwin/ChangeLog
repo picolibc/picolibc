@@ -1,3 +1,8 @@
+2002-07-26  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump API version to indicate that ntsec is
+	on by default now.
+
 2002-07-26  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler_registry.cc (fhandler_registry::close): Return any error
