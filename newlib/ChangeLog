@@ -1,3 +1,8 @@
+2002-05-22  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/types.h: Include cygwin/types.h always under
+	Cygwin, not only if _POSIX_THREADS is defined.
+
 2002-05-21 Dhananjay Deshpande <dhananjayd@kpit.com>
 
 	* configure.host: Specify sys_dir=h8300hms for h8300-*-coff* target.
