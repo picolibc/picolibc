@@ -24,7 +24,7 @@ details. */
 #define PSEUDO_SHIFTVAL		(21)
 
 fhandler_dev_random::fhandler_dev_random ()
-  : fhandler_base (FH_RANDOM), crypt_prov ((HCRYPTPROV) NULL)
+  : fhandler_base (), crypt_prov ((HCRYPTPROV) NULL)
 {
 }
 
