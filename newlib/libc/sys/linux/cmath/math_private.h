@@ -24,14 +24,14 @@
 
 #define INFINITY HUGE_VALF
 
-#define __nan(x) nan()
+#define __nan nan
 #define __isnan isnan
 #define __isinf isinf
 #define __copysignf copysignf
 #define __copysign copysign
 #define __isnanf isnanf
 #define __isinff isinff
-#define __nanf(x) nanf()
+#define __nanf nanf
 #define feraiseexcept(x) /* nothing */
 #define __sincos sincos
 #define __sincosf sincosf

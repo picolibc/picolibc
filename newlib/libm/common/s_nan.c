@@ -14,8 +14,8 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <math.h>
-	double nan(void);
-	float nanf(void);
+	double nan(const char *);
+	float nanf(const char *);
 
 TRAD_SYNOPSIS
 	#include <math.h>
@@ -25,7 +25,8 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 	<<nan>> and <<nanf>> return an IEEE NaN (Not a Number) in
-	double and single precision arithmetic respectivly.
+	double and single precision arithmetic respectivly.  The
+	argument is currently disregarded.
 
 QUICKREF
 	nan - pure
@@ -36,7 +37,7 @@ QUICKREF
 
 #ifndef _DOUBLE_IS_32BITS
 
-	double nan()
+	double nan(const char *unused)
 {
 	double x;
 

@@ -1,3 +1,10 @@
+2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
+
+	* libc/include/math.h (nan, nanf): Update prototype to C99.
+	* libm/common/s_nan.c (nan): Likewise.
+	* libm/common/s_nanf.c (nanf, nan): Likewise.
+	* libc/sys/linux/cmath/math_private.h (nan, nanf): Likewise.
+
 2003-07-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdbool.h: Removed as this is defined by gcc.

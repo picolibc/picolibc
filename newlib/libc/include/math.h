@@ -119,7 +119,7 @@ extern int __fpclassifyd (double x);
 /* Non ANSI double precision functions.  */
 
 extern double infinity _PARAMS((void));
-extern double nan _PARAMS((void));
+extern double nan _PARAMS((const char *));
 extern int isnan _PARAMS((double));
 extern int isinf _PARAMS((double));
 extern int finite _PARAMS((double));
@@ -234,7 +234,7 @@ extern float fminf _PARAMS((float, float));
 extern float fmaf _PARAMS((float, float, float));
 
 extern float infinityf _PARAMS((void));
-extern float nanf _PARAMS((void));
+extern float nanf _PARAMS((const char *));
 extern int isnanf _PARAMS((float));
 extern int isinff _PARAMS((float));
 extern int finitef _PARAMS((float));
