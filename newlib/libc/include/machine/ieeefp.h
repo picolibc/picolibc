@@ -54,11 +54,7 @@
 /* ARM traditionally used big-endian words; and within those words the
    byte ordering was big or little endian depending upon the target.
    Modern floating-point formats are naturally ordered; in this case
-   __VFP_FP__ will be defined, even if soft-float.  
- 
-   FIXME: long double support is broken for the ARM when __ARMEL__
-          is specified.  New long double formats need to be added
-          to the long double conversion routines.  */
+   __VFP_FP__ will be defined, even if soft-float.  */
 #ifdef __VFP_FP__
 # ifdef __ARMEL__
 #  define __IEEE_LITTLE_ENDIAN
