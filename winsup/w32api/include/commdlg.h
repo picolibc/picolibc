@@ -436,7 +436,7 @@ typedef struct tagPDW {
 	HANDLE hPrintTemplate;
 	HANDLE hSetupTemplate;
 } PRINTDLGW,*LPPRINTDLGW;
-#if (WINVER >= 0x0500)
+#if (WINVER >= 0x0500) && !defined (__OBJC__)
 #include <unknwn.h>  /* for LPUNKNOWN  */ 
 #include <prsht.h>   /* for HPROPSHEETPAGE  */
 typedef struct tagPRINTPAGERANGE {
@@ -510,7 +510,7 @@ BOOL WINAPI PrintDlgA(LPPRINTDLGA);
 BOOL WINAPI PrintDlgW(LPPRINTDLGW);
 HWND WINAPI ReplaceTextA(LPFINDREPLACEA);
 HWND WINAPI ReplaceTextW(LPFINDREPLACEW);
-#if (WINVER >= 0x0500) 
+#if (WINVER >= 0x0500) && !defined (__OBJC__)
 HRESULT WINAPI PrintDlgExA(LPPRINTDLGEXA);
 HRESULT WINAPI PrintDlgExW(LPPRINTDLGEXW);
 #endif /* WINVER >= 0x0500 */
@@ -539,7 +539,7 @@ typedef PRINTDLGW PRINTDLG,*LPPRINTDLG;
 #define PageSetupDlg PageSetupDlgW
 #define PrintDlg PrintDlgW
 #define ReplaceText ReplaceTextW
-#if (WINVER >= 0x0500) 
+#if (WINVER >= 0x0500) && !defined (__OBJC__)
 typedef PRINTDLGEXW PRINTDLGEX, *LPPRINTDLGEX;
 #define PrintDlgEx PrintDlgExW
 #endif /* WINVER >= 0x0500 */
@@ -567,7 +567,7 @@ typedef PRINTDLGA PRINTDLG,*LPPRINTDLG;
 #define PageSetupDlg PageSetupDlgA
 #define PrintDlg PrintDlgA
 #define ReplaceText ReplaceTextA
-#if (WINVER >= 0x0500) 
+#if (WINVER >= 0x0500) && !defined (__OBJC__)
 typedef PRINTDLGEXA PRINTDLGEX, *LPPRINTDLGEX;
 #define PrintDlgEx PrintDlgExA
 #endif /* WINVER >= 0x0500 */
