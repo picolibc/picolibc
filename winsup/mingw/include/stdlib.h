@@ -263,6 +263,8 @@ __MINGW_IMPORT unsigned int	_winminor_dll;
 double	atof	(const char*);
 int	atoi	(const char*);
 long	atol	(const char*);
+int	_wtoi (const wchar_t *);
+long _wtol (const wchar_t *);
 
 double	strtod	(const char*, char**);
 double	wcstod	(const wchar_t*, wchar_t**);
@@ -332,8 +334,6 @@ void	_exit	(int) _ATTRIB_NORETURN;
 int	_putenv	(const char*);
 void	_searchenv (const char*, const char*, char*);
 
-char*	_itoa (int, char*, int);
-char*	_ltoa (long, char*, int);
 
 char*	_ecvt (double, int, int*, int*);
 char*	_fcvt (double, int, int*, int*);
@@ -342,17 +342,30 @@ char*	_gcvt (double, int, char*);
 void	_makepath (char*, const char*, const char*, const char*, const char*);
 void	_splitpath (const char*, char*, char*, char*, char*);
 char*	_fullpath (char*, const char*, size_t);
-int	_wtoi (const wchar_t *);
-long	_wtol (const wchar_t *);
 
+
+char*	_itoa (int, char*, int);
+char*	_ltoa (long, char*, int);
+char*   _ultoa(unsigned long, char*, int);
+wchar_t*  _itow (int, wchar_t*, int);
+wchar_t*  _ltow (long, wchar_t*, int);
+wchar_t*  _ultow (unsigned long, wchar_t*, int);
+
+#ifdef __MSVCRT__
+__int64	_atoi64(const char *);
 char*	_i64toa(__int64, char *, int);
 char*	_ui64toa(unsigned __int64, char *, int);
-__int64	_atoi64(const char *);
-
+__int64	_wtoi64(const wchar_t *);
 wchar_t* _i64tow(__int64, wchar_t *, int);
 wchar_t* _ui64tow(unsigned __int64, wchar_t *, int);
-__int64	_wtoi64(const wchar_t *);
 
+int	    _wgetenv(const wchar_t*);
+int	    _wputenv(const wchar_t*);
+void	_wsearchenv(const wchar_t*, const wchar_t*, wchar_t*);
+void    _wmakepath(wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*);
+void	_wsplitpath (const wchar_t*, wchar_t*, wchar_t*, wchar_t*, wchar_t*);
+wchar_t*    _wfullpath (wchar_t*, const wchar_t*, size_t);
+#endif
 
 #ifndef	_NO_OLDNAMES
 

@@ -75,6 +75,16 @@ struct _finddata_t
 	char		name[FILENAME_MAX];	/* may include spaces. */
 };
 
+struct _finddatai64_t {
+    unsigned    attrib;
+    time_t      time_create;
+    time_t      time_access;
+    time_t      time_write;
+    __int64     size;
+    char        name[FILENAME_MAX];
+};
+
+
 #ifndef _WFINDDATA_T_DEFINED
 struct _wfinddata_t {
     	unsigned	attrib;
@@ -84,6 +94,15 @@ struct _wfinddata_t {
     	_fsize_t	size;
     	wchar_t		name[FILENAME_MAX];	/* may include spaces. */
 };
+struct _wfinddatai64_t {
+    unsigned    attrib;
+    time_t      time_create;
+    time_t      time_access;
+    time_t      time_write;
+    __int64     size;
+    wchar_t     name[FILENAME_MAX];
+};
+
 #define _WFINDDATA_T_DEFINED
 #endif
 
@@ -106,6 +125,14 @@ char*	_getcwd (char*, int);
 int	_mkdir (const char*);
 char*	_mktemp (char*);
 int	_rmdir (const char*);
+
+#ifdef __MSVCRT__
+__int64  _filelengthi64(int);
+long _findfirsti64(const char*, struct _finddatai64_t*);
+int _findnexti64(long, struct _finddatai64_t*);
+__int64  _lseeki64(int, __int64, int);
+__int64  _telli64(int);
+#endif /* __MSVCRT__ */
 
 
 #ifndef _NO_OLDNAMES
@@ -193,17 +220,23 @@ int		_unlink (const char*);
 int		_write (int, const void*, unsigned int);
 
 /* Wide character versions. Also declared in wchar.h. */
-int 		_waccess(const wchar_t *, int);
-int 		_wchmod(const wchar_t *, int);
-int 		_wcreat(const wchar_t *, int);
-long 		_wfindfirst(wchar_t *, struct _wfinddata_t *);
+/* Not in crtdll.dll */
+#if !defined (_WIO_DEFINED)
+#if defined (__MSVCRT__)
+int 		_waccess(const wchar_t*, int);
+int 		_wchmod(const wchar_t*, int);
+int 		_wcreat(const wchar_t*, int);
+long 		_wfindfirst(wchar_t*, struct _wfinddata_t*);
 int 		_wfindnext(long, struct _wfinddata_t *);
-int 		_wunlink(const wchar_t *);
-int 		_wrename(const wchar_t *, const wchar_t *);
-int 		_wopen(const wchar_t *, int, ...);
-int 		_wsopen(const wchar_t *, int, int, ...);
-wchar_t * 	_wmktemp(wchar_t *);
-
+int 		_wunlink(const wchar_t*);
+int 		_wopen(const wchar_t*, int, ...);
+int 		_wsopen(const wchar_t*, int, int, ...);
+wchar_t * 	_wmktemp(wchar_t*);
+long  _wfindfirsti64(const wchar_t*, struct _wfinddatai64_t*);
+int  _wfindnexti64(long, struct _wfinddatai64_t*);
+#endif /* defined (__MSVCRT__) */
+#define _WIO_DEFINED
+#endif /* _WIO_DEFINED */
 
 #ifndef	_NO_OLDNAMES
 /*
@@ -233,6 +266,8 @@ int		write (int, const void*, unsigned int);
 #endif /* _UWIN */
 
 /* Wide character versions. Also declared in wchar.h. */
+/* Where do these live? Not in libmoldname.a nor in libmsvcrt.a */
+#if 0
 int 		waccess(const wchar_t *, int);
 int 		wchmod(const wchar_t *, int);
 int 		wcreat(const wchar_t *, int);
@@ -243,6 +278,7 @@ int 		wrename(const wchar_t *, const wchar_t *);
 int 		wopen(const wchar_t *, int, ...);
 int 		wsopen(const wchar_t *, int, int, ...);
 wchar_t * 	wmktemp(wchar_t *);
+#endif
 
 #endif	/* Not _NO_OLDNAMES */
 

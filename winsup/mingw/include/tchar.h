@@ -70,10 +70,17 @@ typedef	wchar_t	TCHAR;
 #define	_T(x)		L ## x
 #endif
 
+/*  for porting from other Windows compilers */
+#if 0  // no  wide startup module
+#define _tmain      wmain
+#define _tWinMain   wWinMain
+#define _tenviron   _wenviron
+#define __targv     __wargv
+#endif
+
 /*
  * Unicode functions
  */
-
 #define	_tprintf	wprintf
 #define	_ftprintf	fwprintf
 #define	_stprintf	swprintf
@@ -143,14 +150,55 @@ typedef	wchar_t	TCHAR;
 #define	_istascii	iswascii
 #define _totupper	towupper
 #define	_totlower	towlower
+#define _tcsftime	wcsftime
+/* Macro functions */ 
+#define _tcsdec     _wcsdec
+#define _tcsinc     _wcsinc
+#define _tcsnbcnt   _wcsncnt
+#define _tcsnccnt   _wcsncnt
+#define _tcsnextc   _wcsnextc
+#define _tcsninc    _wcsninc
+#define _tcsspnp    _wcsspnp
+#define _wcsdec(_wcs1, _wcs2) ((_wcs1)>=(_wcs2) ? NULL : (_wcs2)-1)
+#define _wcsinc(_wcs)  ((_wcs)+1)
+#define _wcsnextc(_wcs) ((unsigned int) *(_wcs))
+#define _wcsninc(_wcs, _inc) (((_wcs)+(_inc)))
+#define _wcsncnt(_wcs, _cnt) ((wcslen(_wcs)>_cnt) ? _count : wcslen(_wcs))
+#define _wcsspnp(_wcs1, _wcs2) ((*((_wcs1)+wcsspn(_wcs1,_wcs2))) ? ((_wcs1)+wcsspn(_wcs1,_wcs2)) : NULL)
+
+#if 1  // defined __MSVCRT__
+/*
+ *   These wide functions not in crtdll.dll.
+ *   Define macros anyway so that _wfoo rather than _tfoo is undefined
+ */
+#define _ttoi64     _wtoi64
+#define _i64tot     _i64tow
+#define _ui64tot    _ui64tow
 #define	_tasctime	_wasctime
 #define	_tctime		_wctime
 #define	_tstrdate	_wstrdate
 #define	_tstrtime	_wstrtime
 #define	_tutime		_wutime
-#define _tcsftime	wcsftime
-#define _ttoi		_wtoi
-#define _ttol		_wtol
+#define _tcsnccoll  _wcsncoll
+#define _tcsncoll   _wcsncoll
+#define _tcsncicoll _wcsnicoll
+#define _tcsnicoll  _wcsnicoll
+#define _taccess    _waccess
+#define _tchmod     _wchmod
+#define _tcreat     _wcreat
+#define _tfindfirst _wfindfirst
+#define _tfindnext  _wfindnext
+#define _tmktemp    _wmktemp
+#define _topen      _wopen
+#define _tremove    _wremove
+#define _trename    _wrename
+#define _tsopen     _wsopen
+#define _tunlink    _wunlink
+#define _tfinddata_t    _wfinddata_t
+#define _tfindfirsti64  _wfindfirsti64
+#define _tfindnexti64   _wfindnexti64
+#define _tfinddatai64_t _wfinddatai64_t
+#endif  /* __MSVCRT__ */
 
 #else	/* Not _UNICODE */
 
@@ -172,6 +220,12 @@ typedef char	TCHAR;
 #ifndef	_T
 #define	_T(x)		x
 #endif
+
+/*  for porting from other Windows compilers */
+#define _tmain      main
+#define _tWinMain   WinMain
+#define _tenviron  _environ
+#define __targv     __argv
 
 /*
  * Non-unicode (standard) functions
@@ -252,8 +306,48 @@ typedef char	TCHAR;
 #define	_tstrtime	_strtime
 #define	_tutime		_utime
 #define _tcsftime	strftime
-#define _ttoi		atoi
-#define _ttol		atol
+/* Macro functions */ 
+#define _tcsdec     _strdec
+#define _tcsinc     _strinc
+#define _tcsnbcnt   _strncnt
+#define _tcsnccnt   _strncnt
+#define _tcsnextc   _strnextc
+#define _tcsninc    _strninc
+#define _tcsspnp    _strspnp
+#define _strdec(_str1, _str2) ((_str1)>=(_str2) ? NULL : (_str2)-1)
+#define _strinc(_str)  ((_str)+1)
+#define _strnextc(_str) ((unsigned int) *(_str))
+#define _strninc(_str, _inc) (((_str)+(_inc)))
+#define _strncnt(_str, _cnt) ((strlen(_str)>_cnt) ? _count : strlen(_str))
+#define _strspnp(_str1, _str2) ((*((_str1)+strspn(_str1,_str2))) ? ((_str1)+strspn(_str1,_str2)) : NULL)
+
+#define _tchmod     _chmod
+#define _tcreat     _creat
+#define _tfindfirst _findfirst
+#define _tfindnext  _findnext
+#define _tmktemp    _mktemp
+#define _topen      _open
+#define _taccess    _access
+#define _tremove    remove
+#define _trename    rename
+#define _tsopen     _sopen
+#define _tunlink    _unlink
+#define _tfinddata_t    _finddata_t
+
+
+#if 1  // defined __MSVCRT__
+/* Not in crtdll.dll. Define macros anyway? */
+#define _ttoi64     _atoi64
+#define _i64tot     _i64toa
+#define _ui64tot    _ui64toa
+#define _tcsnccoll  _strncoll
+#define _tcsncoll   _strncoll
+#define _tcsncicoll _strnicoll
+#define _tcsnicoll  _strnicoll
+#define _tfindfirsti64  _findfirsti64
+#define _tfindnexti64   _findnexti64
+#define _tfinddatai64_t _finddatai64_t
+#endif  /* __MSVCRT__ */
 
 #endif	/* Not _UNICODE */
 

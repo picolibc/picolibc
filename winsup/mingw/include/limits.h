@@ -104,6 +104,11 @@
 
 #define ULONG_LONG_MAX	(2ULL * LONG_LONG_MAX + 1)
 
+/* ISO C9x macro names */
+#define LLONG_MAX LONG_LONG_MAX
+#define LLONG_MIN LONG_LONG_MIN
+#define ULLONG_MAX ULONG_LONG_MAX
+
 #endif /* Not Strict ANSI and GNU C compiler */
 
 

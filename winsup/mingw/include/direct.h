@@ -72,15 +72,14 @@ unsigned _getdiskfree (unsigned, struct _diskfree_t *);
 #endif
 
 #ifndef _WDIRECT_DEFINED
-
 /* wide character versions. Also in wchar.h */
-
+#ifdef __MSVCRT__ 
 int _wchdir(const wchar_t*);
 wchar_t* _wgetcwd(wchar_t*, int);
 wchar_t* _wgetdcwd(int, wchar_t*, int);
 int _wmkdir(const wchar_t*);
 int _wrmdir(const wchar_t*);
-
+#endif	/* __MSVCRT__ */
 #define _WDIRECT_DEFINED
 #endif
 

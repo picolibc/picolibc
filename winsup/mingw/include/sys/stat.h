@@ -132,7 +132,21 @@ struct stat
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
 };
-
+#if defined (__MSVCRT__)
+struct _stati64 {
+    _dev_t st_dev;
+    _ino_t st_ino;
+    unsigned short st_mode;
+    short st_nlink;
+    short st_uid;
+    short st_gid;
+    _dev_t st_rdev;
+    __int64 st_size;
+    time_t st_atime;
+    time_t st_mtime;
+    time_t st_ctime;
+};
+#endif /* __MSVCRT__ */
 #define _STAT_DEFINED
 #endif /* _STAT_DEFINED */
 
@@ -144,14 +158,15 @@ int	_fstat (int, struct _stat*);
 int	_chmod (const char*, int);
 int	_stat (const char*, struct _stat*);
 
-#ifndef _WSTAT_DEFINED
-
-/* also declared in wchar.h */
-
+#if defined (__MSVCRT__)
+int  _fstati64(int, struct _stati64 *);
+int  _stati64(const char *, struct _stati64 *);
+#if !defined ( _WSTAT_DEFINED) /* also declared in wchar.h */
 int	_wstat(const wchar_t*, struct _stat*);
-
+int	_wstati64 (const wchar_t*, struct _stati64*);
 #define _WSTAT_DEFINED
 #endif /* _WSTAT_DEFIND */
+#endif /* __MSVCRT__ */
 
 #ifndef	_NO_OLDNAMES
 

@@ -98,8 +98,12 @@ unsigned char*	_mbschr (unsigned char*, unsigned char*);
 unsigned char*	_mbsncat (unsigned char*, const unsigned char*, size_t);
 unsigned char*	_mbstok (unsigned char*, unsigned char*);
 
-#endif	/* Not __STRICT_ANSI__ */
+#ifdef __MSVCRT__
+int  _strncoll(const char*, const char*, size_t);
+int  _strnicoll(const char*, const char*, size_t);
+#endif
 
+#endif	/* Not __STRICT_ANSI__ */
 
 /*
  * Unicode versions of the standard calls.
@@ -122,7 +126,6 @@ wchar_t* wcsstr(const wchar_t*, const wchar_t*);
 wchar_t* wcstok(wchar_t*, const wchar_t*);
 size_t	wcsxfrm(wchar_t*, const wchar_t*, size_t);
 
-
 #ifndef	__STRICT_ANSI__
 /*
  * Unicode versions of non-ANSI functions provided by CRTDLL.
@@ -140,6 +143,12 @@ wchar_t* _wcsnset (wchar_t*, wchar_t, size_t);
 wchar_t* _wcsrev (wchar_t*);
 wchar_t* _wcsset (wchar_t*, wchar_t);
 wchar_t* _wcsupr (wchar_t*);
+
+#ifdef __MSVCRT__
+int  _wcsncoll(const wchar_t*, const wchar_t*, size_t);
+int  _wcsnicoll(const wchar_t*, const wchar_t*, size_t);
+#endif
+
 
 #endif	/* Not __STRICT_ANSI__ */
 

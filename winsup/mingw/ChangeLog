@@ -1,3 +1,22 @@
+2000-11-20  Earnie Boyd  <earnie_boyd@yahoo.com>
+
+	* Merge in changes from
+	2000-10-23  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+	* include/direct.h: add guard around MSVCRT-only prototytpes
+	* include/io.h: add __int64 struct definitions and function prototypes;
+		 add guard for MSVCRT-only prototypes
+	* include/limits.h: add ISO C9x macros LLONG_MIN, LLONG_MAX, ULLONG_MAX
+	* include/stdio.h: add wchar function prototypes (__MSVCRT__);
+		 put wchar functions together to make sync with wchar.h easier
+	* include/stdlib.h: add wide char functions (__MSVCRT__)
+	* include/string.h: add string collation functions ( __MSVCRT__)
+	* include/sys/stat.h: add __int64 struct and function ( __MSVCRT__)
+	* include/tchar.h: add macros and macro function definitions
+	* include/wchar.h: add wide char function prototypes ( __MSVCRT__ );
+		enclose more functions in __MSVCRT__ guard;
+		some oldname wide char function prototypes #if (0)'d
+	* profile/gmon.h: add guard around BSD-ish typedefs
+
 Mon Nov 20 18:58:12 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Use a different variable name for subdirectory since the

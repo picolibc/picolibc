@@ -83,14 +83,9 @@
  */
 #define	L_tmpnam	(260)
 
-/*
- * The three possible buffering mode (nMode) values for setvbuf.
- * NOTE: _IOFBF works, but _IOLBF seems to work like unbuffered...
- * maybe I'm testing it wrong?
- */
-#define	_IOFBF	0	/* fully buffered */
-#define	_IOLBF	1	/* line buffered */
-#define	_IONBF	2	/* unbuffered */
+#define _IOFBF		0x0000
+#define _IOLBF		0x0040
+#define _IONBF		0x0004
 
 /*
  * The buffer size as used by setbuf such that it is equivalent to
@@ -175,11 +170,11 @@ extern "C" {
 /*
  * File Operations
  */
-
 FILE*	fopen (const char*, const char*);
 FILE*	freopen (const char*, const char*, FILE*);
 int	fflush (FILE*);
 int	fclose (FILE*);
+/* MS puts remove & rename (but not wide versions) in io.h  also */
 int	remove (const char*);
 int	rename (const char*, const char*);
 FILE*	tmpfile (void);
@@ -207,13 +202,6 @@ int	vprintf (const char*, va_list);
 int	vsprintf (char*, const char*, va_list);
 int     _vsnprintf (char*, size_t, const char*, va_list);
 
-/* Wide character versions */
-int	fwprintf (FILE*, const wchar_t*, ...);
-int	wprintf (const wchar_t*, ...);
-int	swprintf (wchar_t*, const wchar_t*, ...);
-int	vfwprintf (FILE*, const wchar_t*, va_list);
-int	vwprintf (const wchar_t*, va_list);
-int	vswprintf (wchar_t*, const wchar_t*, va_list);
 
 /*
  * Formatted Input
@@ -222,12 +210,6 @@ int	vswprintf (wchar_t*, const wchar_t*, va_list);
 int	fscanf (FILE*, const char*, ...);
 int	scanf (const char*, ...);
 int	sscanf (const char*, const char*, ...);
-
-/* Wide character versions */
-int	fwscanf (FILE*, const wchar_t*, ...);
-int	wscanf (const wchar_t*, ...);
-int	swscanf (wchar_t*, const wchar_t*, ...);
-
 /*
  * Character Input and Output Functions
  */
@@ -244,30 +226,12 @@ int	putchar (int);
 int	puts (const char*);
 int	ungetc (int, FILE*);
 
-/* Wide character versions */
-wint_t	fgetwc (FILE*);
-wint_t	fputwc (wchar_t, FILE*);
-wint_t	ungetwc (wchar_t, FILE*);
-
-
-#ifdef __MSVCRT__ 
-wchar_t*	fgetws (wchar_t*, int, FILE*);
-int		fputws (const wchar_t*, FILE*);
-wint_t		getwc (FILE*);
-wint_t		getwchar (void);
-wchar_t*	_getws (wchar_t*);
-wint_t		putwc (wint_t, FILE*);
-int		_putws (const wchar_t*);
-wint_t		putwchar (wint_t);
-#endif	/* __MSVCRT__ */
-
 /*
  * Direct Input and Output Functions
  */
 
 size_t	fread (void*, size_t, size_t, FILE*);
 size_t	fwrite (const void*, size_t, size_t, FILE*);
-
 
 /*
  * File Positioning Functions
@@ -306,7 +270,6 @@ void	perror (const char*);
 
 
 #ifndef __STRICT_ANSI__
-
 /*
  * Pipes
  */
@@ -318,11 +281,64 @@ FILE*	popen (const char*, const char*);
 int	pclose (FILE*);
 #endif
 
-/* The wide character version, only available in MSVCRT DLL versions, not
- * CRTDLL. */
-#ifdef __MSVCRT__
-FILE*	_wpopen (const wchar_t*, const wchar_t*);
+/*
+ * Other Non ANSI functions
+ */
+int  _flushall(void);
+int	_fgetchar (void);
+int	_fputchar (int);
+FILE*	_fdopen (int, const char*);
+int	_fileno (FILE*);
 
+#ifndef _NO_OLDNAMES
+int	fgetchar (void);
+int	fputchar (int);
+FILE*	fdopen (int, const char*);
+int	fileno (FILE*);
+#endif	/* Not _NO_OLDNAMES */
+
+#endif	/* Not __STRICT_ANSI__ */
+
+/* Wide  versions */
+
+#ifndef _WSTDIO_DEFINED
+/*  also in wchar.h - keep in sync */
+int	fwprintf (FILE*, const wchar_t*, ...);
+int	wprintf (const wchar_t*, ...);
+int	swprintf (wchar_t*, const wchar_t*, ...);
+int	vfwprintf (FILE*, const wchar_t*, va_list);
+int	vwprintf (const wchar_t*, va_list);
+int	vswprintf (wchar_t*, const wchar_t*, va_list);
+int	fwscanf (FILE*, const wchar_t*, ...);
+int	wscanf (const wchar_t*, ...);
+int	swscanf (wchar_t*, const wchar_t*, ...);
+wint_t	fgetwc (FILE*);
+wint_t	fputwc (wchar_t, FILE*);
+wint_t	ungetwc (wchar_t, FILE*);
+#ifdef __MSVCRT__ 
+wchar_t*    fgetws (wchar_t*, int, FILE*);
+int         fputws (const wchar_t*, FILE*);
+wint_t		getwc (FILE*);
+wint_t	    getwchar (void);
+wchar_t*    _getws (wchar_t*);
+wint_t	    putwc (wint_t, FILE*);
+int         _putws (const wchar_t*);
+wint_t	    putwchar (wint_t);
+FILE*	_wfopen (const wchar_t*, const wchar_t*);
+FILE*	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
+FILE*   _wfsopen(const wchar_t*, const wchar_t*, int);
+wchar_t*	_wtmpnam (wchar_t*);
+wchar_t*	_wtempnam (const wchar_t*, const wchar_t*);
+int 	_wrename(const wchar_t*, const wchar_t*);
+int 	_wremove (const wchar_t*);
+void  _wperror(const wchar_t*);
+FILE*  _wpopen(const wchar_t*, const wchar_t*);
+#endif	/* __MSVCRT__ */
+#define _WSTDIO_DEFINED
+#endif /* _WSTDIO_DEFINED */
+
+#ifndef __STRICT_ANSI__
+#ifdef __MSVCRT__
 #ifndef NO_OLDNAMES
 #if 0
 FILE*	wpopen (const wchar_t*, const wchar_t*);
@@ -335,34 +351,25 @@ FILE*	wpopen (const wchar_t*, const wchar_t*);
  */
 #define wpopen _wpopen
 #endif	/* Always true */
-
 #endif /* not NO_OLDNAMES */
 #endif /* MSVCRT runtime */
 
 /*
- * Other Non ANSI functions
+ * Other Non ANSI wide functions
  */
-int	_fgetchar (void);
-int	_fputchar (int);
-FILE*	_fdopen (int, const char*);
 wint_t	_fgetwchar(void);
 wint_t	_fputwchar(wint_t);
-int	_fileno (FILE*);
 int	_getw (FILE*);
 int	_putw (int, FILE*);
 
 #ifndef _NO_OLDNAMES
-int	fgetchar (void);
-int	fputchar (int);
-FILE*	fdopen (int, const char*);
 wint_t	fgetwchar(void);
 wint_t	fputwchar(wint_t);
-int	fileno (FILE*);
 int	getw (FILE*);
 int	putw (int, FILE*);
 #endif	/* Not _NO_OLDNAMES */
 
-#endif	/* Not __STRICT_ANSI__ */
+#endif /* __STRICT_ANSI */
 
 #ifdef __cplusplus
 }
