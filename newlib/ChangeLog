@@ -1,3 +1,13 @@
+2002-05-01  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.am (site.exp): Remove newlib_cflags.  Add
+	multibuildtop.
+	* testsuite/newlib.locale/UTF-8.c: Change fprintf's to printf's.
+	* testsuite/lib/flags.exp: New file.
+	* testsuite/lib/newlib.exp: Load flags.exp.
+	(newlib_target_compile): Remove libgloss directory references.
+	(newlib_init): Remove newlib_cflags references.
+
 2002-04-30  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* testsuite/lib/newlib.exp (newlib_target_compile): Change

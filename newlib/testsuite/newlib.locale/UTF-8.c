@@ -141,11 +141,11 @@ int main()
 
     if (!setlocale(LC_CTYPE, "UTF-8"))
       {
-        fprintf(stderr, "Failed to set UTF-8 locale.\n");
+        printf("Failed to set UTF-8 locale.\n");
         return 1;
       }
     else
-      fprintf(stderr, "Set UTF-8 locale.\n");
+      printf("Set UTF-8 locale.\n");
 
     /* 2  Boundary condition test cases */
     /* 2.1  First possible sequence of a certain length */

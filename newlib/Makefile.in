@@ -804,7 +804,7 @@ site.exp: Makefile
 	@echo 'set tool_version $(VERSION)' >> $@-t
 	@echo 'set srcdir $(srcdir)/testsuite' >> $@-t
 	@echo 'set objdir' `pwd` >> $@-t
-	@echo 'set newlib_cflags "$(NEWLIB_CFLAGS)"' >> $@-t
+	@echo 'set multibuildtop ./$(MULTIBUILDTOP)' >> $@-t
 	@echo 'set host_alias $(build_alias)' >> $@-t
 	@echo 'set host_triplet $(build_triplet)' >> $@-t
 	@echo 'set target_alias $(host_alias)' >> $@-t

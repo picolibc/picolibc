@@ -4,6 +4,10 @@
 # is freely granted, provided that this notice is preserved.
 #
 
+# flags.exp overrides the dejagnu versions of libgloss_link_flags,
+# newlib_link_flags, and newlib_include_flags.
+load_lib flags.exp
+
 proc newlib_version { } {
     global tool_version
 
@@ -18,26 +22,19 @@ proc newlib_init { args } {
     global gluefile wrap_flags
     global newlib_initialized
     global target_info
-    global CFLAGS_FOR_TARGET
     # These values are initialized in the local site.exp file.
     global srcdir objdir
     global host_triplet target_triplet
-    # newlib_cflags comes from acinclude.m4, through the site.exp file.
-    global newlib_cflags
     global old_ld_library_path
 
     verbose "In newlib_init...\n"
 
     if { $newlib_initialized == 1 } { return; }
 
-    set CFLAGS_FOR_TARGET $newlib_cflags
-
-    set_currtarget_info "wrap_compile_flags" "$newlib_cflags"
-
     if {[target_info needs_status_wrapper] != "" && \
 	    [target_info needs_status_wrapper] != "0" && \
 	    ![info exists gluefile]} {
-	set gluefile ${objdir}/testglue.o;
+	set gluefile ${objdir}/testsuite/testglue.o;
 	set result [build_wrapper $gluefile];
 	if { $result != "" } {
 	    set gluefile [lindex $result 0];
@@ -66,18 +63,13 @@ proc newlib_target_compile { source dest type options } {
 	    [target_info needs_status_wrapper] != "0" && \
 	    [info exists gluefile] } {
 	lappend options "libs=$gluefile"
-	# This method of finding libgloss_target_dir may not work for some targets
-	set libgloss_target_dir [lindex [split $target_triplet "-"] 0]
-	lappend options "ldflags=$wrap_flags -B$objdir/../libgloss/$libgloss_target_dir \
-                                             -L$objdir/../libgloss/$libgloss_target_dir \
-                                             -L$srcdir/../../libgloss/$libgloss_target_dir \
-                                             -L$objdir"
+	lappend options "ldflags=$wrap_flags"
     }
 
     if [string match $host_triplet $target_triplet] then {
 	if [string match "i686-pc-linux-gnu" $host_triplet] then {
-	    lappend options "libs=$objdir/crt0.o -lc"
-	    lappend options "ldflags=-nostdlib -L$objdir/.libs -lgcc"
+	    lappend options "libs=$objdir/crt0.o -lc -lgcc"
+	    lappend options "ldflags=-nostdlib -L$objdir/.libs"
 	}
     }
 
