@@ -245,12 +245,6 @@ if [ "${newlib_io_pos_args}" = "yes" ] ; then
 	newlib_cflags="${newlib_cflags} -DWANT_IO_POS_ARGS"
 fi
 
-# Specify EL/IX level
-
-if [ "${newlib_elix_level}" != "0" ] ; then
-	newlib_cflags="${newlib_cflags} -D_ELIX_LEVEL=${newlib_elix_level}"
-fi
-
 # Verify if shared newlib support is allowed and set appropriate variables
 # We don't want to use libtool for platforms that we are not going to
 # support shared libraries.  This is because it adds executable tests which
