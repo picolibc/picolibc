@@ -338,9 +338,9 @@ Fri Apr 27 14:02:24 2001  Christopher Faylor <cgf@cygnus.com>
 
 Wed Apr 25 15:07:37 2001  Christopher Faylor <cgf@cygnus.com>
 
-	* sigproc.h [sigthread]: Add exception field.  [sigframe::~sigframe]:
-	Clear exception field.  [sigframe::set]: Set exception field from
-	caller.
+	* sigproc.h [sigthread]: Add exception field.
+	[sigframe::~sigframe]: Clear exception field.
+	[sigframe::set]: Set exception field from caller.
 	* sigproc.cc (sig_send): Set exception field when frame pointer is
 	passed in.
 	* exceptions.cc (interrupt_on_return): Always treat exception as
@@ -1417,7 +1417,7 @@ Mon Mar  5 01:25:03 2001  Christopher Faylor <cgf@cygnus.com>
 	* dcrt0.cc (dll_crt0_1): Set _check_for_executable for older binaries.
 	Pass user_data to premain functions.
 	* fhandler.cc (fhandler_disk_file::open): Only check for executable if
-	the linked program is intereested in the executable bit.
+	the linked program is interested in the executable bit.
 	(fhandler_disk_file::check_execable_p): Delete.
 	* fhandler.h (executable_states): New enumeration of various states of
 	executable bit caring.
