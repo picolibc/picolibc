@@ -1,3 +1,8 @@
+2003-12-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/fcntl.h: Don't define struct flock when on
+	Cygwin.  This is done in winsup/cygwin/include/cygwin/types.h now.
+
 2003-11-28  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/sys/signal.h: Use system specific signal file when

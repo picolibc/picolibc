@@ -135,6 +135,7 @@ extern "C" {
 
 /*#include <sys/stdtypes.h>*/
 
+#ifndef __CYGWIN__
 /* file segment locking set data type - information passed to system by user */
 struct flock {
 	short	l_type;		/* F_RDLCK, F_WRLCK, or F_UNLCK */
@@ -144,6 +145,7 @@ struct flock {
 	short	l_pid;		/* returned with F_GETLK */
 	short	l_xxx;		/* reserved for future use */
 };
+#endif /* __CYGWIN__ */
 
 #ifndef	_POSIX_SOURCE
 /* extended file segment locking set data type */
