@@ -745,7 +745,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       (void) sigprocmask (SIG_BLOCK, &child_block, &cleanup.oldmask);
     }
 
-  /* Fixup the parent datastructure if needed and resume the child's
+  /* Fixup the parent data structures if needed and resume the child's
      main thread. */
   if (!cygheap->fdtab.need_fixup_before ())
     cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);
@@ -908,7 +908,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
     case _P_OVERLAY:
       ForceCloseHandle1 (pi.hProcess, childhProc);
-      proc_terminate ();
       myself->exit (res, 1);
       break;
     case _P_WAIT:

@@ -23,7 +23,7 @@ extern void __stdcall check_sanity_and_sync (per_process *);
 
 dll_list NO_COPY dlls;
 
-static NO_COPY int in_forkee = 0;
+static int NO_COPY in_forkee;
 static int dll_global_dtors_recorded;
 
 /* Run destructors for all DLLs on exit. */
@@ -183,7 +183,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 void
 dll_list::detach (void *retaddr)
 {
-  if (!myself || myself->process_state == PID_EXITED)
+  if (!myself || exit_state)
     return;
   MEMORY_BASIC_INFORMATION m;
   if (!VirtualQuery (retaddr, &m, sizeof m))
@@ -358,6 +358,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
     p = &__cygwin_user_data;
   else
     *(p->impure_ptr_ptr) = __cygwin_user_data.impure_ptr;
+  bool initializing = in_forkee || cygwin_finished_initializing;
 
   /* Partially initialize Cygwin guts for non-cygwin apps. */
   if (dynamically_loaded && user_data->magic_biscuit == 0)
@@ -371,7 +372,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      initializing, then the DLL must be a cygwin-aware DLL
      that was explicitly linked into the program rather than
      a dlopened DLL. */
-  if (!in_forkee && !cygwin_finished_initializing)
+  if (!initializing)
     type = DLL_LINK;
   else
     {
@@ -387,7 +388,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
      initialize the DLL.  If we haven't finished initializing,
      it may not be safe to call the dll's "main" since not
      all of cygwin's internal structures may have been set up. */
-  if (!d || ((in_forkee || cygwin_finished_initializing) && !d->init ()))
+  if (!d || (initializing && !d->init ()))
     return -1;
 
   return (DWORD) d;

@@ -56,7 +56,7 @@ prime_threads ()
 /* If possible, redirect the thread entry point to a cygwin routine which
    adds tls stuff to the stack. */
 static void
-munge_threadfunc (HANDLE cygwin_hmodule)
+munge_threadfunc ()
 {
   char **ebp = (char **) __builtin_frame_address (0);
   if (!threadfunc_ix)
@@ -67,7 +67,7 @@ munge_threadfunc (HANDLE cygwin_hmodule)
 	    threadfunc_ix = peb - ebp;
 	    goto foundit;
 	  }
-#ifdef DEBUGGING
+#ifdef DEBUGGING_HARD
       system_printf ("non-fatal warning: unknown thread! search_for %p, cygthread::stub %p, calibration_thread %p, possible func offset %p",
 		     search_for, cygthread::stub, calibration_thread, ebp[137]);
 #endif
@@ -102,7 +102,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_ATTACH:
-      munge_threadfunc (h);
+      munge_threadfunc ();
       break;
     case DLL_THREAD_DETACH:
       _my_tls.remove (0);

@@ -788,12 +788,12 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 #endif
       res = SuspendThread (hth);
       /* Just set pending if thread is already suspended */
-      if (res)
+      if (res || tls->stackptr > tls->stack)
 	{
 	  (void) ResumeThread (hth);
 	  break;
 	}
-      if (!tls->locked ())
+      if (!tls->locked () && !tls->spinning)
 	{
 	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
 	  if (!GetThreadContext (hth, &cx))

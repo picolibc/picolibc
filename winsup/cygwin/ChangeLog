@@ -1,3 +1,31 @@
+2004-02-13  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (clean): Remove sigfe.s.
+	(sigfe.s): Ensure that sigfe.s will be regenerated if it does not exist.
+	* dll_init.cc (dll_dllcrt0): Simplify initializing tests.
+
+	* exceptions.cc (setup_handler): Detect when stub caller is either
+	spinning or has acquired the lock after being suspended to avoid
+	windows problems with suspending a win32 API call.
+
+	* cygtls.h (_cygtls::spinning): Declare new element.
+	* gendef: Remove unused _siglist_index and _siglist declaration.
+	(_sigfe): Set spinning element when potentially looping, waiting for lock.
+	(_sigbe): Ditto.
+	(_cygtls::lock): Ditto.
+	(_longjmp): Ditto.
+	* tlsoffsets.h: Regenerate.
+	* pinfo.cc (_pinfo::exit): Set final exit state here.  Call sigproc_terminate if
+	invoked with 'norecord'.  Clear any residual _cygtls stuff.
+	* winsup.h (exit_states): Define ES_FINAL.
+	* spawn.cc (spawn_guts): Don't call proc_terminate specifically when
+	execing.  Let _pinfo::exit handle that case.
+
+	* sigproc.cc (wait_subproc): Always exit loop early when proc_loop_wait.
+
+	* init.cc (munge_threadfunc): Eliminate unused argument.
+	(dll_entry): Reflect above change in call to munge_threadfunc.
+
 2004-02-11  Christopher Faylor  <cgf@redhat.com>
 
 	* gendef (_sigbe): Zero location on pop.
@@ -88,7 +116,7 @@
 	(_sigbe): Ditto.
 	(_threadinfo::lock): Ditto.
 	(_threadinfo::pop): Eliminate left-over stack unlock.
-	* sigproc.cc (proc_subproc): Chnage debugging output to printed
+	* sigproc.cc (proc_subproc): Change debugging output to printed
 	warning.
 
 2004-02-08  Christopher Faylor  <cgf@redhat.com>

@@ -70,26 +70,6 @@ static pending_signals sigqueue;
 
 struct sigaction *global_sigs;
 
-void __stdcall
-sigalloc ()
-{
-  cygheap->sigs = global_sigs =
-    (struct sigaction *) ccalloc (HEAP_SIGS, NSIG, sizeof (struct sigaction));
-}
-
-void __stdcall
-signal_fixup_after_exec ()
-{
-  global_sigs = cygheap->sigs;
-  /* Set up child's signal handlers */
-  for (int i = 0; i < NSIG; i++)
-    {
-      global_sigs[i].sa_mask = 0;
-      if (global_sigs[i].sa_handler != SIG_IGN)
-	global_sigs[i].sa_handler = SIG_DFL;
-    }
-}
-
 /*
  * Global variables
  */
@@ -101,19 +81,15 @@ char NO_COPY myself_nowait_dummy[1] = {'0'};// Flag to sig_send that signal goes
 HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 					//  resulted in a user-specified
 					//  function call
-/*
- * Common variables
- */
-
-
-/* How long to wait for message/signals.  Normally this is infinite.
- * On termination, however, these are set to zero as a flag to exit.
- */
 
 #define Static static NO_COPY
 
+/* How long to wait for message/signals.  Normally this is infinite.
+  On termination, however, these are set to zero as a flag to exit.  */
+
 Static DWORD proc_loop_wait = 1000;	// Wait for subprocesses to exit
 
+Static HANDLE sendsig_tome;
 HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 Static cygthread *hwait_sig;		// Handle of wait_sig thread
 Static cygthread *hwait_subproc;	// Handle of sig_subproc thread
@@ -148,6 +124,26 @@ static void __stdcall remove_zombie (int);
 static DWORD WINAPI wait_sig (VOID *arg);
 static int __stdcall stopped_or_terminated (waitq *, _pinfo *);
 static DWORD WINAPI wait_subproc (VOID *);
+
+void __stdcall
+sigalloc ()
+{
+  cygheap->sigs = global_sigs =
+    (struct sigaction *) ccalloc (HEAP_SIGS, NSIG, sizeof (struct sigaction));
+}
+
+void __stdcall
+signal_fixup_after_exec ()
+{
+  global_sigs = cygheap->sigs;
+  /* Set up child's signal handlers */
+  for (int i = 0; i < NSIG; i++)
+    {
+      global_sigs[i].sa_mask = 0;
+      if (global_sigs[i].sa_handler != SIG_IGN)
+	global_sigs[i].sa_handler = SIG_DFL;
+    }
+}
 
 /* Determine if the parent process is alive.
  */
@@ -1215,17 +1211,13 @@ wait_subproc (VOID *)
     {
       DWORD rc = WaitForMultipleObjects (nchildren + 1, events, FALSE,
 					 proc_loop_wait);
+      if (!proc_loop_wait)
+	break;
       if (rc == WAIT_TIMEOUT)
-	if (!proc_loop_wait)
-	  break;			// Exiting
-	else
-	  continue;
+	continue;
 
       if (rc == WAIT_FAILED)
 	{
-	  if (!proc_loop_wait)
-	    break;
-
 	  /* It's ok to get an ERROR_INVALID_HANDLE since another thread may have
 	     closed a handle in the children[] array.  So, we try looping a couple
 	     of times to stabilize. FIXME - this is not foolproof.  Probably, this
@@ -1274,8 +1266,6 @@ wait_subproc (VOID *)
 	  si.si_stime = 0;
 #endif
 	  rc = proc_subproc (PROC_CHILDTERMINATED, rc);
-	  if (!proc_loop_wait)		// Don't bother if wait_subproc is
-	    break;			//  exiting
 
 	  /* Send a SIGCHLD to myself.   We do this here, rather than in proc_subproc
 	     to avoid the proc_subproc lock since the signal thread will eventually

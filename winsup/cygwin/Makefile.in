@@ -224,6 +224,7 @@ cygthread_CFLAGS:=-fomit-frame-pointer
 cygtls_CFLAGS:=-fomit-frame-pointer
 devices_CFLAGS:=-fomit-frame-pointer -Os
 dir_CFLAGS:=-fomit-frame-pointer
+dll_init_CFLAGS:=-fomit-frame-pointer
 fcntl_CFLAGS:=-fomit-frame-pointer
 fhandler_CFLAGS:=-fomit-frame-pointer
 fhandler_clipboard_CFLAGS:=-fomit-frame-pointer
@@ -346,7 +347,7 @@ uninstall-man:
 	done
 
 clean:
-	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp* *_magic.h
+	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s
 
 maintainer-clean realclean: clean
 	@echo "This command is intended for maintainers to use;"
@@ -437,7 +438,9 @@ $(srcdir)/tlsoffsets.h: gentls_offsets cygtls.h
 	$^ $@ $(COMPILE_CXX)
 
 sigfe.s: $(DEF_FILE)
-	@touch $@
+	@[ -s $@ ] || \
+	{ rm -f $(DEF_FILE); $(MAKE) -s -j1 $(DEF_FILE); }; \
+	[ -s $@ ] && touch $@
 
 sigfe.o: sigfe.s
 	$(CC) -c -o $@ $?

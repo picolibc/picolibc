@@ -76,8 +76,6 @@ sub fefunc {
     my $fe = '_' . shift;
     my $extra;
     my $res = <<EOF;
-	.extern	_siglist_index
-	.extern	_siglist
 	.extern	$func
 	.global	$fe
 $fe:
@@ -96,6 +94,7 @@ __sigfe:
 1:	movl	%fs:4,%edx				# location of bottom of stack
 	movl	\$1,%eax				# potential lock value
 	lock	xchgl %eax,$tls::stacklock(%edx)	# see if we can grab it
+	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
 	orl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
 	xorl	%eax,%eax				# nope.  It was not zero
@@ -120,6 +119,7 @@ __sigbe:
 1:	movl	%fs:4,%edx				# address of bottom of tls
 	movl	\$1,%eax				# potential lock value
 	lock	xchgl %eax,$tls::stacklock(%edx)	# see if we can grab it
+	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
 	orl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
 	xorl	%eax,%eax				# nope.  not zero
@@ -242,6 +242,7 @@ _longjmp:
 1:	movl	%fs:4,%edx
 	movl	\$1,%eax
 	lock	xchgl %eax,$tls::stacklock(%edx)
+	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
 	orl	%eax,%eax
 	jz	2f
 	xorl	%eax,%eax

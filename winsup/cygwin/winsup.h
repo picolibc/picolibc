@@ -197,7 +197,8 @@ enum exit_states
     ES_TITLE,
     ES_HUP_PGRP,
     ES_HUP_SID,
-    ES_TTY_TERMINATE
+    ES_TTY_TERMINATE,
+    ES_FINAL
   };
 
 extern exit_states exit_state;

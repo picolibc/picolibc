@@ -31,6 +31,7 @@ details. */
 #include "cygheap.h"
 #include "fhandler.h"
 #include "cygmalloc.h"
+#include "cygtls.h"
 
 static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
@@ -104,6 +105,10 @@ pinfo_init (char **envp, int envc)
 void
 _pinfo::exit (UINT n, bool norecord)
 {
+  exit_state = ES_FINAL;
+  cygthread::terminate ();
+  if (norecord)
+    sigproc_terminate ();
   if (this)
     {
       if (!norecord)
@@ -116,8 +121,9 @@ _pinfo::exit (UINT n, bool norecord)
       add_rusage (&rusage_self, &r);
     }
 
-  cygthread::terminate ();
   sigproc_printf ("Calling ExitProcess %d", n);
+  _my_tls.stacklock = 0;
+  _my_tls.stackptr = _my_tls.stack;
   ExitProcess (n);
 }
 
