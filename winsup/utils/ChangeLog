@@ -1,3 +1,9 @@
+Wed Sep  5 22:37:21 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in (dumper): Change logic for libbfd and libintl so that
+	they will be found either in the build tree or the installed directory.
+	* mkpasswd.c (enum_users): Add a comment as a password for NT.
+
 2001-09-03  Michael A Chase <mchase@ix.netcom.com>
 
 	* mount.cc (mount_commands): Don't write /cygdrive/u mount points.

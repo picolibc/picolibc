@@ -37,9 +37,9 @@ include $(srcdir)/../Makefile.common
 
 MINGW_INCLUDES:=-I$(mingw_source)/include -I$(cygwin_source)/include -I$(w32api_include)
 
-libbfd:=$(bupdir2)/bfd/libbfd.a
-libintl:=$(bupdir2)/intl/libintl.a
-build_dumper:=${shell test -r $(libbfd) -a -r $(libintl) -a -d $(updir1)/include && echo 1}
+libbfd:=${shell $(CC) -L$(bupdir2)/bfd --print-file-name=libbfd.a}
+libintl:=${shell $(CC) -L$(bupdir2)/intl --print-file-name=libintl.a}
+build_dumper:=${shell test -r $(libbfd) && test -r ${libintl} &&  echo 1}
 
 DUMPER_INCLUDES:=-I$(bupdir2)/bfd -I$(updir1)/include
 
@@ -59,7 +59,7 @@ ALL_LDLIBS:=${patsubst $(w32api_lib)/lib%.a,-l%,\
 		${filter-out $(libcygwin), $(ALL_DEP_LDLIBS)}}}}
 
 MINGW_LIB:=$(mingw_build)/libmingw32.a
-DUMPER_LIB:=-L$(bupdir2)/bfd -lbfd -L$(bupdir1)/libiberty -liberty -L$(bupdir2)/intl -lintl
+DUMPER_LIB:=${libbfd} ${libintl} -L$(bupdir1)/libiberty -liberty
 MINGW_LDLIBS:=$(ALL_LDLIBS) $(MINGW_LIB)
 MINGW_DEP_LDLIBS:=${ALL_DEP_LDLIBS} ${MINGW_LIB}
 ALL_LDFLAGS:=-B$(newlib_build)/libc/ -B$(newlib_build)/libm/ -B$(w32api_lib)/ \
