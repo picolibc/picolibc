@@ -1,5 +1,10 @@
 2002-05-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/_mingw.h (__MINGW_IMPORT): Put extern at start 
+	to avoid warnings.  Thanks to: Oscar Fuentes  <ofv@wanadoo.es>.
+
+2002-05-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/snprintf.c: Split out vsnprintf to....
 	* mingwex/vsnprintf.c: New file.
 	* mingwex/snwprintf.c: Split out vsnwprintf to...

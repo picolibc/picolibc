@@ -48,9 +48,9 @@
 # define __DECLSPEC_SUPPORTED
 #else /* __GNUC__ */
 # ifdef __declspec
-   /* note the extern at the end. This is needed to work around GCC's
+   /* Note the extern. This is needed to work around GCC's
       limitations in handling dllimport attribute.  */
-#  define __MINGW_IMPORT __attribute__((dllimport)) extern
+#  define __MINGW_IMPORT  extern __attribute__((dllimport))
 #  define __DECLSPEC_SUPPORTED
 # else
 #  undef __DECLSPEC_SUPPORTED
