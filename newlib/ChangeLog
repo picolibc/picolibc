@@ -1,3 +1,11 @@
+2004-03-11  Kazu Hirata  <kazu@cs.umass.edu>
+
+	* libc/sys/h8300hms/Makefile.am (lib_a_SOURCES): Replace
+	_exit.c with _exit.S.
+	* libc/sys/h8300hms/Makefile.in: Regenerate.
+	* libc/sys/h8300hms/_exit.c: Remove.
+	* libc/sys/h8300hms/_exit.S: New.
+
 2004-03-09  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* libc/stdio/findfp.c (__sfp): Rename lock to __sfp_lock.
