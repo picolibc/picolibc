@@ -378,7 +378,7 @@ static const struct pa_opcode pa_opcodes[] =
 { "havg",       0x080002c0, 0xfc00ffe0, "x,b,t", pa20, FLAG_STRICT},
 { "hshl",       0xf8008800, 0xffe0fc20, "x,*,t", pa20, FLAG_STRICT},
 { "hshladd",    0x08000700, 0xfc00ff20, "x,.,b,t", pa20, FLAG_STRICT},
-{ "hshr",       0xf800c800, 0xfc10f820, "cSb,*,t", pa20, FLAG_STRICT},
+{ "hshr",       0xf800c800, 0xfc1ff820, "cSb,*,t", pa20, FLAG_STRICT},
 { "hshradd",    0x08000500, 0xfc00ff20, "x,.,b,t", pa20, FLAG_STRICT},
 { "hsub",       0x08000100, 0xfc00ff20, "cHx,b,t", pa20, FLAG_STRICT},
 { "mixh",       0xf8008400, 0xfc009fe0, "chx,b,t", pa20, FLAG_STRICT},
