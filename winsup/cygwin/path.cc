@@ -882,6 +882,15 @@ out:
 #endif
 }
 
+path_conv::~path_conv ()
+{
+  if (!normalized_path_size && normalized_path)
+    {
+      cfree (normalized_path);
+      normalized_path = NULL;
+    }
+}
+
 static __inline int
 digits (const char *name)
 {
@@ -3500,10 +3509,6 @@ conv_path_list_buf_size (const char *path_list, bool to_posix)
     + (nrel * strlen (to_posix ? pc.normalized_path : pc.get_win32 ()))
     + 100;
 
-  if (!pc.normalized_path_size && pc.normalized_path)
-    cfree (pc.normalized_path);		// FIXME - probably should be in a destructor but
-  					// it's hard to justify a destructor for the few
-   					// places where this is needed
   return size;
 }
 

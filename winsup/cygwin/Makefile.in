@@ -352,6 +352,7 @@ uninstall-man:
 
 clean:
 	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s
+	-@$(MAKE) -C $(bupdir)/cygserver libclean
 
 maintainer-clean realclean: clean
 	@echo "This command is intended for maintainers to use;"

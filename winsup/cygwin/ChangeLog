@@ -1,3 +1,13 @@
+2004-02-17  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (clean): Clean libserver, too.
+
+	* fhandler.cc (fhandler_base::~fhandler_base): Remove path_conv cleanup.
+	* syscalls.cc (chroot): Ditto.
+	* path.cc (path_conv::~path_conv): Define new destructor.
+	(conv_path_list_buf_size): Remove explicit path_conv cleanup.
+	* path.h (path_conv::~path_conv): Declare new destructor.
+
 2004-02-16  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Compile flock.o with -fomit-frame-pointer.

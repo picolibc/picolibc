@@ -172,6 +172,7 @@ class path_conv
   		known_suffix (NULL), error (0), normalized_path (NULL)
     {path[0] = '\0';}
 
+  ~path_conv ();
   inline char *get_win32 () { return path; }
   operator char *() {return path;}
   operator const char *() {return path;}

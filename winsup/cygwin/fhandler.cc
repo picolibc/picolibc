@@ -1278,8 +1278,6 @@ fhandler_base::fhandler_base ():
 /* Normal I/O destructor */
 fhandler_base::~fhandler_base (void)
 {
-  if (!pc.normalized_path_size && pc.normalized_path)
-    cfree (pc.normalized_path);
   if (rabuf)
     free (rabuf);
 }

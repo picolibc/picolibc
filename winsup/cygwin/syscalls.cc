@@ -2320,8 +2320,6 @@ chroot (const char *newroot)
 
   syscall_printf ("%d = chroot (%s)", ret ? get_errno () : 0,
 				      newroot ? newroot : "NULL");
-  if (!path.normalized_path_size && path.normalized_path)
-    cfree (path.normalized_path);
   return ret;
 }
 
