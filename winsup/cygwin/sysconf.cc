@@ -62,7 +62,7 @@ sysconf (int in)
 	/*FALLTHRU*/
       case _SC_PHYS_PAGES:
       case _SC_AVPHYS_PAGES:
-	if (!wincap.supports_smp ())
+	if (wincap.supports_smp ())
 	  {
 	    NTSTATUS ret;
 	    SYSTEM_BASIC_INFORMATION sbi;
