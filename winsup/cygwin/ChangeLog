@@ -1,3 +1,7 @@
+2003-11-06  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.h: Declare access_worker.
+
 2003-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/types.h: Fix preprocessor guards for vm_offset_t and
