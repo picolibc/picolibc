@@ -440,12 +440,11 @@ utimes (const char *path, struct timeval *tvp)
     }
 
   /* MSDN suggests using FILE_FLAG_BACKUP_SEMANTICS for accessing
-     the times of directories.  FIXME: what about Win95??? */
+     the times of directories.  */
   /* Note: It's not documented in MSDN that FILE_WRITE_ATTRIBUTES is
      sufficient to change the timestamps... */
   HANDLE h = CreateFileA (win32.get_win32 (),
-			  wincap.has_specific_access_rights () ?
-			  FILE_WRITE_ATTRIBUTES : GENERIC_WRITE,
+			  FILE_WRITE_ATTRIBUTES,
 			  FILE_SHARE_READ | FILE_SHARE_WRITE,
 			  &sec_none_nih,
 			  OPEN_EXISTING,
