@@ -1078,6 +1078,12 @@ else
 	GDB_TK=""
 fi
 
+all_build_modules=
+if test x"${build_alias}" != x"${host_alias}"
+then
+  all_build_modules='$(ALL_BUILD_MODULES_LIST)'
+fi
+
 for subdir in . ${subdirs} ; do
 
     # ${subdir} is relative path from . to the directory we're currently
@@ -1378,6 +1384,7 @@ EOF
                     -e "s|^oldincludedir[ 	]*=.*$|oldincludedir = ${oldincludedir}|" \
                     -e "s|^infodir[ 	]*=.*$|infodir = ${infodir}|" \
                     -e "s|^mandir[ 	]*=.*$|mandir = ${mandir}|" \
+		    -e "s|^ALL_BUILD_MODULES =.*|ALL_BUILD_MODULES =${all_build_modules}|" \
 		    -e "/^CC[ 	]*=/{
 			:loop1
 			/\\\\$/ N
