@@ -19,6 +19,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
   fd_set open_fds, read_fds, write_fds, except_fds;
   struct timeval tv = { timeout / 1000, (timeout % 1000) * 1000 };
 
+  FD_ZERO (&open_fds);
   FD_ZERO (&read_fds);
   FD_ZERO (&write_fds);
   FD_ZERO (&except_fds);
