@@ -1,5 +1,10 @@
 2002-04-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/mbstring.h: New file.
+	* include/mbctype.h: New file.
+
+2002-04-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/tchar.h (__TEXT): Make same as define in
 	w32api/include/winnt.h.
 
@@ -23,7 +28,7 @@
 	* profile/Makefile.in (INCLUDES): Likewise.
 	* mingwex/Makefile.in (INCLUDES): Likewise.
 	* include/stdarg.h: Replace with stub that just guards the
-	real gcc system header with #ifndef RCINVOKED
+	real gcc system header with #ifndef RC_INVOKED
 	* include/varargs.h: Likewise.
 	* include/stddef.h: Likewise.
 	* include/stdio.h: Include stdarg.h after defining
@@ -78,11 +83,11 @@
 	for mingw.
 	* profile/configure: Regenerate.
 
-2002-04-12  Danny Smith  <dannysmith@sourceforge.users.net>
+2002-04-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/Makefile.in (DISTFILES): Add suffix to wcstof.c.
 
-2002-04-11  Danny Smith  <dannysmith@sourceforge.users.net>
+2002-04-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 2.0.
 	* Makefile.in: Ditto.
@@ -91,7 +96,7 @@
 	2002-04-09  Earnie Boyd  <earnie@users.sf.net>
 	* Makefile.in: Use bzip2 compression for Cygwin target.
 
-2002-04-10  Danny Smith  <dannysmith@sourceforge.users.net>
+2002-04-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/mingw-fseek.c: New file, based on Mumit Khan
 	mingw-local patch to binutils.
@@ -107,7 +112,7 @@
 	* moldname-crtdll.def: Remove CR from end of line.
 	* moldname-msvcrt.def: Ditto.
 
-2002-04-09  Danny Smith  <dannysmith@sourceforge.users.net>
+2002-04-09  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* profile/configure.in (CRT0S): Configure name of gcrt?.o
 	based on target, building gcrt0.o for cygwin -mno-cygwin.
@@ -116,7 +121,7 @@
 	(gcrt0.o): New rule.   
 	(ALL_CRT0S): New define, used to cleanup all gcrt?.o's.
 
-2002-04-04  Danny Smith  <dannysmith@sourceforge.users.net>
+2002-04-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/math.h (DOMAIN, SING, OVERFLOW, UNDERFLOW,
 	TLOSS, PLOSS): Move oldname defines back, following
@@ -130,7 +135,7 @@
 	* mingwex/_Exit.c : New file.
 	* mingwex/Makefile.in: Add _Exit.o to libmingwex.a.
 
-2002-04-04  Danny Smith  <dannysmith@sourceforge.users.net>
+2002-04-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	Add libgmon.a and libmingwex.a for cygwin -mno-cygwin.
 	* configure.in (SUBDIRS): Add  profile and mingwex to cygwin target.
@@ -150,7 +155,7 @@
 	(ALL_CXXFLAGS): Same.
 	(.c.o:): Remove ALL_CXXFLAGS. 
 
-2002-03-29  Danny Smith  <dannysmith@sourceforge.users.net>
+2002-03-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdint.h: Add missing newline at eof. 
 	* include/stdio.h (_snwprintf): Correct spelling.
@@ -168,7 +173,7 @@
 	* mingwex/snprintf.c: New file.
 	* mingwex/snwprintf.c: New file.
 
-2002-03-26  Danny Smith  <dannysmith@sourceforge.users.net>
+2002-03-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* moldname.def.in (__MSVCRT__): Replace with !(__CRTDLL__).
 	(wpopen): Add if !(__CRTDLL__).
@@ -185,7 +190,7 @@
 	(_vswnprintf): Likewise.
 	Tidy up whitespace.
 
-2002-03-22  Danny Smith   <dannysmith@users.sourceforge>
+2002-03-22  Danny Smith   <dannysmith@users.sourceforge.net>
 
 	* configure.in: Add mingwex as SUBDIRS and configdirs.
 	* configure: Regenerate.
