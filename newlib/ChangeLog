@@ -1,4 +1,14 @@
+2000-12-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/ldtoa.c: Removed include of alloca.h.
+	Also removed \r's.
+	(asctoeg): Replaced alloca call with stack array and malloc
+	when storage exceeds reasonable limit.
+	(e53toe): Fixed einfin calls missing ldp parameter.
+	(eiisinf): Hide behind check for LDBL_MANT_DIG == 64.
+
 2000-12-06  Jeff Johnston  <jjohnstn@redhat.com>
+
 
 	* libc/stdio/vfscanf.c: Fix typo for _NO_LONGDBL macro.
 

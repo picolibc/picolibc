@@ -7,7 +7,6 @@
 #include <reent.h>
 #include <string.h>
 #include <stdlib.h>
-#include <alloca.h>
 #include "mprec.h"
 
 /* These are the externally visible entries. */
@@ -76,6 +75,7 @@ static void eclear(register short unsigned int *x);
 static void einfin(register short unsigned int *x, register LDPARMS *ldp);
 static void efloor(short unsigned int *x, short unsigned int *y, LDPARMS *ldp);
 static void etoasc(short unsigned int *x, char *string, int ndigs, int outformat, LDPARMS *ldp);
+
 #if LDBL_MANT_DIG == 24
 static void e24toe(short unsigned int *pe, short unsigned int *y, LDPARMS *ldp);
 #elif LDBL_MANT_DIG == 53
@@ -706,8 +706,9 @@ if( (x[E] & 0x7fff) == 0x7fff )
 return(0);
 }
 
-/* Return nonzero if internal format number is infinite. */
+#if LDBL_MANT_DIG == 64
 
+/* Return nonzero if internal format number is infinite. */
 static int 
 eiisinf (x)
      unsigned short x[];
@@ -721,6 +722,7 @@ eiisinf (x)
     return (1);
   return (0);
 }
+#endif /* LDBL_MANT_DIG == 64 */
 
 /*
 ;	Compare significands of numbers in internal format.
@@ -1732,7 +1734,7 @@ if( r == 0x7fff )
 #endif /* !IBMPC */
 #endif /* NANS */
 	eclear( y );
-	einfin( y );
+	einfin( y, ldp );
 	if( *e & 0x8000 )
 		eneg(y);
 	return;
@@ -2019,7 +2021,7 @@ if( r == 0x7ff0 )
 #endif /* !IBMPC */
 #endif  /* NANS */
 	eclear( y );
-	einfin( y );
+	einfin( y, ldp );
 	if( yy[0] )
 		eneg(y);
 	return;
@@ -2209,7 +2211,7 @@ if( r == 0x7f80 )
 #endif /* !MIEEE */
 #endif  /* NANS */
 	eclear( y );
-	einfin( y );
+	einfin( y, ldp );
 	if( yy[0] )
 		eneg(y);
 	return;
@@ -3172,7 +3174,7 @@ long double _strtold (char *s, char **se)
   return x;
 }
 
-
+#define REASONABLE_LEN 200
 
 static int
 asctoeg(char *ss, short unsigned int *y, int oprec, LDPARMS *ldp)
@@ -3184,10 +3186,18 @@ long lexp;
 unsigned short nsign, *p;
 char *sp, *s, *lstr;
 int lenldstr;
+int mflag = 0;
+char tmpstr[REASONABLE_LEN];
 
 /* Copy the input string. */
 c = strlen (ss) + 2;
-lstr = (char *) alloca (c);
+if (c <= REASONABLE_LEN)
+  lstr = tmpstr;
+else
+  {
+    lstr = (char *) calloc (c, 1);
+    mflag = 1;
+  }
 s = ss;
 lenldstr = 0;
 while( *s == ' ' ) /* skip leading spaces */
@@ -3485,6 +3495,8 @@ switch( oprec )
 #endif
 	}
 lenldstr += s - lstr;
+if (mflag)
+  free (lstr);
 return lenldstr;
 }
 
