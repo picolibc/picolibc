@@ -1,5 +1,10 @@
 2003-07-06  Christopher Faylor  <cgf@redhat.com>
 
+	* winsup.api/known_bugs.tcl: Remove gethostid01 from list of known
+	bugs.
+
+2003-07-06  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: Remove .dat files when cleaning.
 
 2003-07-06  Christopher Faylor  <cgf@redhat.com>
