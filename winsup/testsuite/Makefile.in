@@ -172,7 +172,7 @@ testsuite/site.exp: site.exp
 
 # Note: we set the PATH so that we can pick up new-cygwin1.dll
 
-check: $(TESTSUP_LIB_NAME) $(RUNTIME) testsuite/site.exp
+check: $(TESTSUP_LIB_NAME) $(RUNTIME) cygrun.exe testsuite/site.exp
 	cd testsuite; \
 	EXPECT=${EXPECT} ; export EXPECT ; \
 	if [ -f $(bupdir2)/expect/expect ] ; then  \

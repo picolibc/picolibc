@@ -1,5 +1,9 @@
 2003-01-23  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile (check): Add cygrun.exe dependency.
+
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
 	Perform more C warning fixup on all C source files and headers.
 
 2003-01-23  Christopher Faylor  <cgf@redhat.com>
