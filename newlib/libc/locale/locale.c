@@ -110,9 +110,6 @@ _DEFUN(_setlocale_r, (p, category, locale),
        int category _AND
        _CONST char *locale)
 {
-  static char lc_ctype[8] = "C";
-  static char last_lc_ctype[8] = "C";
-
 #ifndef MB_CAPABLE
   if (locale)
     { 
@@ -123,6 +120,9 @@ _DEFUN(_setlocale_r, (p, category, locale),
     }
   return "C";
 #else
+  static char lc_ctype[8] = "C";
+  static char last_lc_ctype[8] = "C";
+
   if (locale)
     {
       if (category != LC_CTYPE) 

@@ -56,10 +56,9 @@ _DEFUN (memset, (m, c, n),
   return m;
 #else
   char *s = (char *) m;
-  int count, i;
+  int i;
   unsigned long buffer;
   unsigned long *aligned_addr;
-  unsigned char *unaligned_addr;
 
   if (!TOO_SMALL (n) && !UNALIGNED (m))
     {

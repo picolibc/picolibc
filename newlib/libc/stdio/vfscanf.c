@@ -116,7 +116,9 @@ __svfscanf (fp, fmt0, ap)
   char ccltab[256];		/* character class table for %[...] */
   char buf[BUF];		/* buffer for numeric conversions */
   char *lptr;                   /* literal pointer */
+#ifdef MB_CAPABLE
   int state = 0;                /* value to keep track of multibyte state */
+#endif
 
   short *sp;
   int *ip;

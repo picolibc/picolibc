@@ -22,7 +22,6 @@ getpwnam (name)
      const char *name;
 {
   FILE *fp;
-  int uid, gid;
   char buf[1024];
 
   if ((fp = fopen ("/etc/passwd", "r")) == NULL)

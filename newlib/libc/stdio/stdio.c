@@ -66,7 +66,10 @@ __swrite (cookie, buf, n)
      int n;
 {
   register FILE *fp = (FILE *) cookie;
-  int w, oldmode=0;
+  int w;
+#ifdef __SCLE
+  int oldmode=0;
+#endif
 
   if (fp->_flags & __SAPP)
     (void) _lseek_r (fp->_data, fp->_file, (off_t) 0, SEEK_END);
