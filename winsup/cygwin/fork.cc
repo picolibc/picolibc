@@ -275,9 +275,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   MALLOC_CHECK;
 
   cygheap->fdtab.fixup_after_fork (hParent);
-  ProtectHandle (hParent);
+  ProtectHandleINH (hParent);
 
-  debug_fixup_after_fork ();
   pinfo_fixup_after_fork ();
   signal_fixup_after_fork ();
 
@@ -299,8 +298,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     }
 
   ForceCloseHandle (hParent);
-  (void) ForceCloseHandle (fork_info->subproc_ready);
-  (void) ForceCloseHandle (fork_info->forker_finished);
+  (void) ForceCloseHandle1 (fork_info->subproc_ready, subproc_ready);
+  (void) ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
@@ -358,16 +357,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   __pthread_atforkprepare ();
 
   subproc_init ();
-
-#ifdef DEBUGGING_NOTNEEDED
-  /* The ProtectHandle call allocates memory so we need to make sure
-     that enough is set aside here so that the sbrk pointer does not
-     move when ProtectHandle is called after the child is started.
-     Otherwise the sbrk pointers in the parent will not agree with
-     the child and when user_data is (regrettably) copied over,
-     the user_data->ptr field will not be accurate. */
-  free (malloc (4096));
-#endif
 
   int c_flags = GetPriorityClass (hMainProc) /*|
 		CREATE_NEW_PROCESS_GROUP*/;
@@ -428,8 +417,8 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       return -1;
     }
 
-  ProtectHandle (subproc_ready);
-  ProtectHandle (forker_finished);
+  ProtectHandleINH (subproc_ready);
+  ProtectHandleINH (forker_finished);
 
   init_child_info (PROC_FORK, &ch, 1, subproc_ready);
 

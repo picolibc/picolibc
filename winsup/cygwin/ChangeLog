@@ -1,9 +1,64 @@
+2002-07-13  Christopher Faylor  <cgf@redhat.com>
+
+	* debug.h (handle_list): Move here from debug.cc.  Add "inherit" flag
+	functionality.
+	* cygheap.cc (init_cheap): Move cygheap_max calculation to _csbrk.
+	(_csbrk): Reorganize to not assume first allocation is <= 1 page.
+	(cygheap_setup_for_child): Mark protected handle as inheritable.
+	* cygheap.h (cygheap_debug): New struct.
+	(init_cygheap): Add new structure when debugging.
+	* dcrt0.cc (dll_crt0_1): Remove call to debug_init.  Close ppid_handle
+	here, if appropriate.  Don't protect subproc_ready, since it is already
+	protected in the parent.  Call memory_init prior to ProtectHandle to
+	ensure that cygheap is set up.  Call debug_fixup_after_fork_exec when
+	appropriate.
+	(_dll_crt0): Don't close ppid_handle here.
+	* debug.cc: Use cygheap debug structure rather than static elements
+	throughout.
+	(add_handle): Don't issue a warning if attempt to protect handle in
+	exactly the same way from exactly the same place.  Add pid info to
+	warning output.  Accept additional argument controlling whether handle
+	is to be inherited.  Add pid to stored information.
+	(debug_fixup_after_fork_exec): Renamed from debug_fixup_after_fork.
+	Reorganize to avoid erroneously skipping handles.
+	(mark_closed): Add pid info to warning output.
+	(setclexec): Rename from setclexec_pid.
+	* fhandler.cc (fhandler_base::get_default_fmode): Minor reorg.
+	(fhandler_base::fstat): Add debugging output.
+	(fhandler_base::set_inheritance): Call setclexec rather than
+	setclexec_pid.
+	(fhandler_base::fork_fixup): Ditto.
+	* fhandler_console.cc (get_tty_stuff): Mark protected handle as
+	inheritable.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Ditto.
+	* tty.cc (tty::make_pipes): Ditto.
+	(tty::common_init): Ditto.
+	* fork.cc (fork_parent): Ditto.
+	(fork_child): Close protected handles with correct name.  Remove
+	debug_fixup_after_fork call.
+	* fhandler_socket.cc (fhandler_socket::create_secret_event): Mark
+	protected handle as inheritable/non-inheritable, as appropriate.
+	* shared.cc (memory_init): Mark protected handle as inheritable.
+	Call debug_init here.
+	* sigproc.cc (wait_sig): Close protected handle with correct name.
+	* spawn.cc (spawn_guts): Rename spr to subproc_ready and mark it as
+	inheritable.
+
+	* exceptions.cc (debugger_command): Try to run dumper.exe, if found.
+
+	* syscalls.cc (fstat64): Don't follow symlinks for path_conv lookup
+	since path is already resolved.
+
 2002-07-13  Nicholas Wourms  <nwourms@netscape.com>
 
 	* threaded_queue.h (class queue_submission_loop): Correct friend
 	declaration for GCC 3.1.1.
 	* include/cygwin/cygserver_process.h (class process): Ditto.
 	(class process_cache): Ditto.
+
+2002-07-12  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Change erroneous entries.
 
 2002-07-12  Conrad Scott  <conrad.scott@dsl.pipex.com>
 

@@ -313,13 +313,17 @@ fhandler_base::raw_write (const void *ptr, size_t len)
 int
 fhandler_base::get_default_fmode (int flags)
 {
+  int fmode = __fmode;
   if (perfile_table)
     {
       size_t nlen = strlen (get_name ());
       unsigned accflags = ACCFLAGS (flags);
       for (__cygwin_perfile *pf = perfile_table; pf->name; pf++)
 	if (!*pf->name && ACCFLAGS (pf->flags) == accflags)
-	  return pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
+	  {
+	    fmode = pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
+	    break;
+	  }
 	else
 	  {
 	    size_t pflen = strlen (pf->name);
@@ -327,10 +331,13 @@ fhandler_base::get_default_fmode (int flags)
 	    if (pflen > nlen || (stem != get_name () && !isdirsep (stem[-1])))
 	      continue;
 	    else if (ACCFLAGS (pf->flags) == accflags && strcasematch (stem, pf->name))
-	      return pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
+	      {
+		fmode = pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
+		break;
+	      }
 	  }
     }
-  return __fmode;
+  return fmode;
 }
 
 /* Open system call handler function. */
@@ -827,6 +834,7 @@ rootdir(char *full_path)
 int __stdcall
 fhandler_base::fstat (struct __stat64 *buf, path_conv *)
 {
+  debug_printf ("here");
   switch (get_device ())
     {
     case FH_PIPE:
@@ -1072,7 +1080,7 @@ fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
     debug_printf ("DuplicateHandle failed, %E");
 #ifdef DEBUGGING
   if (h)
-    setclexec_pid (oh, h, not_inheriting);
+    setclexec (oh, h, not_inheriting);
 #endif
 }
 
@@ -1092,7 +1100,7 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
     {
       debug_printf ("%s success - oldh %p, h %p", get_name (), oh, h);
       // someday, maybe ProtectHandle2 (h, name);
-      setclexec_pid (oh, h, !get_close_on_exec ());
+      setclexec (oh, h, !get_close_on_exec ());
     }
 #endif
 }

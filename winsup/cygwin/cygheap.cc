@@ -61,7 +61,6 @@ init_cheap ()
       api_fatal ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
 		 m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
     }
-  cygheap_max = cygheap + 1;
 }
 
 static void dup_now (void *, child_info *, unsigned) __attribute__ ((regparm(3)));
@@ -82,7 +81,7 @@ cygheap_setup_for_child (child_info *ci, bool dup_later)
   ci->cygheap_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none,
 				     CFMAP_OPTIONS, 0, CYGHEAPSIZE, NULL);
   newcygheap = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
-  ProtectHandle1 (ci->cygheap_h, passed_cygheap_h);
+  ProtectHandle1INH (ci->cygheap_h, passed_cygheap_h);
   if (!dup_later)
     dup_now (newcygheap, ci, n);
   cygheap_protect->release ();
@@ -171,27 +170,27 @@ cygheap_fixup_in_child (bool execed)
 static void *__stdcall
 _csbrk (int sbs)
 {
-  void *lastheap;
-  bool needalloc;
+  void *prebrk;
 
-  if (cygheap)
-    needalloc = 0;
-  else
+  if (!cygheap)
     {
       init_cheap ();
-      needalloc = 1;
+      cygheap_max = cygheap;
+      (void) _csbrk ((int) pagetrunc (4095 + sbs + sizeof (*cygheap)));
+      prebrk = (char *) (cygheap + 1) + sbs;
+    }
+  else
+    {
+      prebrk = cygheap_max;
+      void *prebrka = pagetrunc (prebrk);
+      (char *) cygheap_max += sbs;
+      if (!sbs || (prebrk != prebrka && prebrka == pagetrunc (cygheap_max)))
+	/* nothing to do */;
+      else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
+	api_fatal ("couldn't commit memory for cygwin heap, %E");
     }
 
-  lastheap = cygheap_max;
-  (char *) cygheap_max += sbs;
-  void *heapalign = (void *) pagetrunc (lastheap);
-
-  if (!needalloc)
-    needalloc = sbs && ((heapalign == lastheap) || heapalign != pagetrunc (cygheap_max));
-  if (needalloc && !VirtualAlloc (lastheap, (DWORD) sbs ?: 1, MEM_COMMIT, PAGE_READWRITE))
-    api_fatal ("couldn't commit memory for cygwin heap, %E");
-
-  return lastheap;
+  return prebrk;
 }
 
 extern "C" void __stdcall

@@ -554,9 +554,9 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
       get_ttyp ()->to_master, to_master_local);
 
   set_io_handle (from_master_local);
-  ProtectHandle1 (from_master_local, from_pty);
+  ProtectHandle1INH (from_master_local, from_pty);
   set_output_handle (to_master_local);
-  ProtectHandle1 (to_master_local, to_pty);
+  ProtectHandle1INH (to_master_local, to_pty);
 
   set_open_status ();
   termios_printf ("tty%d opened", ttynum);

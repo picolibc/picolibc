@@ -191,7 +191,7 @@ fhandler_proc (FH_REGISTRY)
 }
 
 int
-fhandler_registry::fstat (struct __stat64 *buf, path_conv * pc)
+fhandler_registry::fstat (struct __stat64 *buf, path_conv *pc)
 {
   this->fhandler_base::fstat (buf, pc);
   buf->st_mode &= ~_IFMT & NO_W;

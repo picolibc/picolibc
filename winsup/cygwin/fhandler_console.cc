@@ -97,7 +97,7 @@ get_tty_stuff (int flags = 0)
   shared_console_info = (tty_min *) open_shared (NULL, 0, cygheap->console_h,
 						 sizeof (*shared_console_info),
 						 NULL);
-  ProtectHandle (cygheap->console_h);
+  ProtectHandleINH (cygheap->console_h);
   if (!shared_console_info->ntty)
     {
       shared_console_info->setntty (TTY_CONSOLE);

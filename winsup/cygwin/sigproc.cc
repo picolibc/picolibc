@@ -29,7 +29,6 @@ details. */
 #include "child_info_magic.h"
 #define NEED_VFORK
 #include "perthread.h"
-#include <assert.h>
 #include "shared_info.h"
 
 /*
@@ -1119,7 +1118,7 @@ wait_sig (VOID *)
       debug_printf ("subproc_ready %p", child_proc_info->subproc_ready);
       if (!SetEvent (child_proc_info->subproc_ready))
 	system_printf ("SetEvent (subproc_ready) failed, %E");
-      ForceCloseHandle (child_proc_info->subproc_ready);
+      ForceCloseHandle1 (child_proc_info->subproc_ready, subproc_ready);
       /* Initialize an "indirect" pid block so that if someone looks up this
 	 process via its Windows PID it will be redirected to the appropriate
 	 Cygwin PID shared memory block. */

@@ -570,7 +570,6 @@ dll_crt0_1 ()
   user_data->threadinterface->Init (user_data->forkee);
 
   threadname_init ();
-  debug_init ();
   (void) getpagesize ();	/* initialize page size constant */
 
   regthread ("main", GetCurrentThreadId ());
@@ -588,11 +587,12 @@ dll_crt0_1 ()
 	    cygheap_fixup_in_child (0);
 	    alloc_stack (fork_info);
 	    set_myself (mypid);
-	    ProtectHandle (fork_info->forker_finished);
 	    break;
 	  case _PROC_SPAWN:
 	    if (spawn_info->hexec_proc)
 	      CloseHandle (spawn_info->hexec_proc);
+	    if (child_proc_info->pppid_handle)
+	      CloseHandle (child_proc_info->pppid_handle);
 	    goto around;
 	  case _PROC_EXEC:
 	    hexec_proc = spawn_info->hexec_proc;
@@ -617,17 +617,17 @@ dll_crt0_1 ()
 		old_title = strcpy (title_buf, spawn_info->moreinfo->old_title);
 		cfree (spawn_info->moreinfo->old_title);
 	      }
-	    if (child_proc_info->subproc_ready)
-	      ProtectHandle (child_proc_info->subproc_ready);
 	    break;
 	}
+      debug_fixup_after_fork_exec ();
     }
-  ProtectHandle (hMainProc);
-  ProtectHandle (hMainThread);
 
   /* Initialize the cygwin subsystem if this is the first process,
      or attach to shared data structures if it's already running. */
   memory_init ();
+  ProtectHandle (hMainProc);
+  ProtectHandle (hMainThread);
+
   cygheap->fdtab.vfork_child_fixup ();
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
@@ -843,9 +843,6 @@ _dll_crt0 ()
 	    should_be_cb = sizeof (child_info_fork);
 	    /* fall through */;
 	  case _PROC_SPAWN:
-	    if (child_proc_info->pppid_handle)
-	      CloseHandle (child_proc_info->pppid_handle);
-	    /* fall through */;
 	  case _PROC_EXEC:
 	    if (!should_be_cb)
 	      should_be_cb = sizeof (child_info);

@@ -15,6 +15,13 @@ details. */
 #include "perprocess.h"
 #include "security.h"
 #include "cygerrno.h"
+#ifdef DEBUGGING
+#include <errno.h>
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "cygheap.h"
+#endif
 
 #undef CloseHandle
 
@@ -164,23 +171,7 @@ threadname (DWORD tid, int lockit)
 /* Here lies extra debugging routines which help track down internal
    Cygwin problems when compiled with -DDEBUGGING . */
 #include <stdlib.h>
-
-typedef struct _h
-  {
-    BOOL allocated;
-    HANDLE h;
-    const char *name;
-    const char *func;
-    int ln;
-    DWORD clexec_pid;
-    struct _h *next;
-  } handle_list;
-
-static NO_COPY handle_list starth;
-static NO_COPY handle_list *endh;
-
-static NO_COPY handle_list freeh[1000];
-#define NFREEH (sizeof (freeh) / sizeof (freeh[0]))
+#define NFREEH (sizeof (cygheap->debug.freeh) / sizeof (cygheap->debug.freeh[0]))
 
 void debug_init ();
 
@@ -222,10 +213,10 @@ static handle_list * __stdcall
 find_handle (HANDLE h)
 {
   handle_list *hl;
-  for (hl = &starth; hl->next != NULL; hl = hl->next)
+  for (hl = &cygheap->debug.starth; hl->next != NULL; hl = hl->next)
     if (hl->next->h == h)
       goto out;
-  endh = hl;
+  cygheap->debug.endh = hl;
   hl = NULL;
 
 out:
@@ -233,12 +224,12 @@ out:
 }
 
 void
-setclexec_pid (HANDLE oh, HANDLE nh, bool setit)
+setclexec (HANDLE oh, HANDLE nh, bool setit)
 {
   handle_list *hl = find_handle (oh);
   if (hl)
     {
-      hl->clexec_pid = setit ? GetCurrentProcessId () : 0;
+      hl->clexec = setit;
       hl->h = nh;
     }
 }
@@ -250,7 +241,7 @@ newh ()
   handle_list *hl;
   lock_debug here;
 
-  for (hl = freeh; hl < freeh + NFREEH; hl++)
+  for (hl = cygheap->debug.freeh; hl < cygheap->debug.freeh + NFREEH; hl++)
     if (hl->name == NULL)
       goto out;
 
@@ -267,7 +258,7 @@ out:
 
 /* Add a handle to the linked list of known handles. */
 void __stdcall
-add_handle (const char *func, int ln, HANDLE h, const char *name)
+add_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
 {
   handle_list *hl;
   lock_debug here;
@@ -275,10 +266,12 @@ add_handle (const char *func, int ln, HANDLE h, const char *name)
   if ((hl = find_handle (h)))
     {
       hl = hl->next;
+      if (hl->name == name && hl->func == func && hl->ln == ln)
+	return;
       system_printf ("%s:%d - multiple attempts to add handle %s<%p>", func,
 		     ln, name, h);
-      system_printf (" previously allocated by %s:%d(%s<%p>)",
-		     hl->func, hl->ln, hl->name, hl->h);
+      system_printf (" previously allocated by %s:%d(%s<%p>) winpid %d",
+		     hl->func, hl->ln, hl->name, hl->h, hl->pid);
       return;
     }
 
@@ -294,8 +287,11 @@ add_handle (const char *func, int ln, HANDLE h, const char *name)
   hl->func = func;
   hl->ln = ln;
   hl->next = NULL;
-  endh->next = hl;
-  endh = hl;
+  hl->clexec = !inh;
+  hl->pid = GetCurrentProcessId ();
+  cygheap->debug.endh->next = hl;
+  cygheap->debug.endh = hl;
+  debug_printf ("protecting handle '%s', clexec flag %d", hl->name, hl->clexec);
 
   return;
 }
@@ -312,13 +308,18 @@ delete_handle (handle_list *hl)
 }
 
 void
-debug_fixup_after_fork ()
+debug_fixup_after_fork_exec ()
 {
   /* No lock needed at this point */
   handle_list *hl;
-  for (hl = &starth; hl->next != NULL; hl = hl->next)
-    if (hl->next->clexec_pid)
-      delete_handle (hl);
+  for (hl = &cygheap->debug.starth; hl->next != NULL; /* nothing */)
+    if (!hl->next->clexec)
+      hl = hl->next;
+    else
+      {
+	debug_printf ("nuking handle '%s'", hl->next->name);
+	delete_handle (hl);	// removes hl->next
+      }
 }
 
 static bool __stdcall
@@ -331,8 +332,8 @@ mark_closed (const char *func, int ln, HANDLE h, const char *name, BOOL force)
     {
       hl = hl->next;
       here.unlock ();	// race here
-      system_printf ("attempt to close protected handle %s:%d(%s<%p>)",
-		     hl->func, hl->ln, hl->name, hl->h);
+      system_printf ("attempt to close protected handle %s:%d(%s<%p>) winpid %d",
+		     hl->func, hl->ln, hl->name, hl->h, hl->pid);
       system_printf (" by %s:%d(%s<%p>)", func, ln, name, h);
       return FALSE;
     }

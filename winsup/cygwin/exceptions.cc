@@ -25,7 +25,7 @@ details. */
 
 #define CALL_HANDLER_RETRY 20
 
-char debugger_command[2 * MAX_PATH + 20];
+char debugger_command[2 * MAX_PATH + 20] = "dumper.exe";
 
 extern "C" {
 static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);

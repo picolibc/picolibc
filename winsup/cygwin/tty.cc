@@ -360,14 +360,14 @@ tty::make_pipes (fhandler_pty_master *ptym)
       return FALSE;
     }
 
-  ProtectHandle1 (to_slave, to_pty);
+  ProtectHandle1INH (to_slave, to_pty);
   if (CreatePipe (&from_slave, &to_master, &sec_all, 0) == FALSE)
     {
       termios_printf ("can't create output pipe");
       set_errno (ENOENT);
       return FALSE;
     }
-  ProtectHandle1 (from_slave, from_pty);
+  ProtectHandle1INH (from_slave, from_pty);
   termios_printf ("tty%d from_slave %p, to_slave %p", ntty, from_slave,
 		  to_slave);
 
@@ -447,8 +447,8 @@ tty::common_init (fhandler_pty_master *ptym)
       return FALSE;
     }
 
-  ProtectHandle1 (ptym->output_mutex, output_mutex);
-  ProtectHandle1 (ptym->input_mutex, input_mutex);
+  ProtectHandle1INH (ptym->output_mutex, output_mutex);
+  ProtectHandle1INH (ptym->input_mutex, input_mutex);
   winsize.ws_col = 80;
   winsize.ws_row = 25;
 
