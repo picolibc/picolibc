@@ -33,7 +33,7 @@ include $(srcdir)/../Makefile.common
 
 CFLAGS:=@CFLAGS@ -I$(cygwin_source)
 CXXFLAGS:=@CXXFLAGS@ -I$(cygwin_source)
-override CXXFLAGS+=-MMD -fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0 -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""
+override CXXFLAGS+=-MMD -DHAVE_DECL_GETOPT=0 -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""
 
 .SUFFIXES: .c .cc .a .o .d
 
