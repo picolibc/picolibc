@@ -160,6 +160,14 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	done
 	cd etc && $(MAKE) info
 	$(MAKE) distclean
+	# Kludge for pr gdb/708.  'configure' configures in
+	# dejagnu/example/calc, but 'make distclean' does not clean in
+	# dejagnu/example.  Someday somebody might fix this in dejagnu,
+	# and then import a new dejagnu into sourceware.  Right now, a
+	# couple of 'rm' commands will get the gdb snapshots working
+	# again.  -- chastain 2003-08-15
+	rm -f dejagnu/example/calc/config.status
+	rm -f dejagnu/example/calc/config.log
 	#
 	mkdir proto-toplev/etc
 	(cd proto-toplev/etc; \

@@ -1,3 +1,9 @@
+2003-08-15  Michael Chastain  <mec@shout.net>
+
+	* src-release (do-proto-toplev): Remove junk files
+	dejagnu/example/calc/config.status,
+	dejagnu/example/calc/config.log.
+
 2003-08-14  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* config-ml.in, symlink-tree: Add license.
