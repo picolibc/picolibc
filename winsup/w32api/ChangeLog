@@ -1,3 +1,7 @@
+2001-12-21  Robert Collins  <rbtcollins@hotmail.com>
+
+	* include/wingdi.h: Add GetRandomRgn and SYSRGN.
+
 2001-12-20  Christopher Faylor  <cgf@redhat.com>
 
 	* lib/Makefile.in: Revert inst_installdir definitions to working
