@@ -89,9 +89,13 @@ System information:\n\
   -S, --sysdir		output system directory and exit\n\
   -W, --windir		output `Windows' directory and exit\n\
 ", prog_name, prog_name);
-  if (stream == stdout)
+  if (ignore_flag)
+    /* nothing to do */;
+  else if (stream != stdout)
+    fprintf(stream, "Try `%s --help' for more information.\n", prog_name);
+  else
     {
-    fprintf (stream, "\
+      fprintf (stream, "\
 Other options:\n\
   -f, --file FILE       read FILE for input; use - to read from STDIN\n\
   -o, --option          read options from FILE as well (for use with --file)\n\
@@ -101,8 +105,6 @@ Other options:\n\
   -v, --version		output version information and exit\n\
 ");
     }
-  else
-    fprintf(stream, "Try `%s --help' for more information.\n", prog_name);
   exit (ignore_flag ? 0 : status);
 }
 
