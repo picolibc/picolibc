@@ -1,3 +1,8 @@
+2001-08-14  Joerg Schaible <joerg.schaible@gmx.de>
+
+	* cygpath.cc (main): Support -w for Windows (System) directories and
+	return physical correct orthography for the Windows System dir.
+
 2001-07-14   Chris Genly  <chgenly@alum.mit.edu>
 
 	* regtool.cc (find_key): Handle keys with only one subkey.

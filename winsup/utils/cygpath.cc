@@ -208,6 +208,7 @@ main (int argc, char **argv)
   int options_from_file_flag;
   char *filename;
   char buf[MAX_PATH], buf2[MAX_PATH];
+  WIN32_FIND_DATA w32_fd;
 
   prog_name = strrchr (argv[0], '/');
   if (prog_name == NULL)
@@ -266,13 +267,21 @@ main (int argc, char **argv)
 
 	case 'W':
 	  GetWindowsDirectory(buf, MAX_PATH);
-	  cygwin_conv_to_posix_path(buf, buf2);
+	  if (!windows_flag)
+	    cygwin_conv_to_posix_path(buf, buf2);
+	  else
+	    strcpy(buf2, buf);
 	  printf("%s\n", buf2);
 	  exit(0);
 
 	case 'S':
 	  GetSystemDirectory(buf, MAX_PATH);
-	  cygwin_conv_to_posix_path(buf, buf2);
+	  FindFirstFile(buf, &w32_fd);
+	  strcpy(strrchr(buf, '\\')+1, w32_fd.cFileName);
+	  if (!windows_flag)
+	    cygwin_conv_to_posix_path(buf, buf2);
+	  else
+	    strcpy(buf2, buf);
 	  printf("%s\n", buf2);
 	  exit(0);
 
