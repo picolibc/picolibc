@@ -1,3 +1,8 @@
+2003-06-18  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Remove BUILD_CC stuff.
+	* Makefile.in: Regenerate.
+
 2003-06-14  H.J. Lu <hongjiu.lu@intel.com>
  
 	* config.guess: Update to 2003-06-12 version.
