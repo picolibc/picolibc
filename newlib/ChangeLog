@@ -1,7 +1,7 @@
 Mon May  7 20:39:25 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/sys/stat.h: Revert March 3, Cygwin change.
-	* libc/include/sys/Ditto.h: Ditto.
+	* libc/include/sys/unistd.h: Ditto.
 
 2001-05-04  Earnie Boyd  <earnie@users.sourceforge.net>
 
