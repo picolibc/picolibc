@@ -278,12 +278,12 @@ wsock_init ()
 	}
     }
 
-  InterlockedDecrement (&here);
-
   /* Kludge alert.  Redirects the return address to dll_chain. */
   __asm__ __volatile__ ("		\n\
 	movl	$dll_chain,4(%ebp)	\n\
   ");
+
+  InterlockedDecrement (&here);
 
   volatile retchain ret;
   /* Set "arguments for dll_chain. */
