@@ -252,6 +252,9 @@ __sbprintf(fp, fmt, ap)
 	fake._bf._base = fake._p = buf;
 	fake._bf._size = fake._w = sizeof(buf);
 	fake._lbfsize = 0;	/* not actually used, but Just In Case */
+#ifndef __SINGLE_THREAD__
+	memset (&fake._lock, 0, sizeof(fake._lock));
+#endif
 
 	/* do the work, then copy any error status */
 	ret = VFPRINTF(&fake, fmt, ap);

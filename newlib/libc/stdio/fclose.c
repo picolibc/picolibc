@@ -50,6 +50,7 @@ Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
 #include <stdio.h>
 #include <stdlib.h>
 #include "local.h"
+#include <sys/lock.h>
 
 /*
  * Close a file.
@@ -84,5 +85,9 @@ _DEFUN (fclose, (fp),
     FREELB (fp);
   fp->_flags = 0;		/* release this FILE for reuse */
   _funlockfile(fp);
+#ifndef __SINGLE_THREAD__
+  __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
+#endif
+
   return (r);
 }

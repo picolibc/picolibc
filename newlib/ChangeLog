@@ -1,3 +1,14 @@
+2004-01-15  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* libc/stdio/fclose.c: Include sys/lock.h.
+	(fclose): Destroy lock when file is closed.
+	* libc/stdio/findfp.c (__sfp): Initialize file pointers _lock
+	member.
+	* libc/stdio/freopen.c: Include sys/lock.h.
+	(_freopen_r): Destroy lock when file is closed.
+	* libc/stdio/vfprintf.c (__sbprintf): Initialize file pointers
+	_lock member.
+
 2004-01-08  Joel Sherrill  <joel@oarcorp.com>
 
         * libc/ctype/iswctype.c, include/sys/reent.h, libc/stdlib/a64l.c:

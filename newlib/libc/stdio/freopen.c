@@ -71,6 +71,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <fcntl.h>
 #include <stdlib.h>
 #include "local.h"
+#include <sys/lock.h>
 
 /*
  * Re-direct an existing, open (probably) file to some other file.
@@ -150,6 +151,9 @@ _DEFUN (_freopen_r, (ptr, file, mode, fp),
       fp->_flags = 0;		/* set it free */
       ptr->_errno = e;		/* restore in case _close clobbered */
       _funlockfile(fp);
+#ifndef __SINGLE_THREAD__
+      __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
+#endif
       return NULL;
     }
 
