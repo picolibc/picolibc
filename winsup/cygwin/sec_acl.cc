@@ -142,11 +142,11 @@ setacl (const char *file, int nentries, __aclent32_t *aclbufp)
 			       aclbufp[i].a_type | ACL_DEFAULT,
 			       (aclbufp[i].a_type & (USER|GROUP))
 			       ? aclbufp[i].a_id : ILLEGAL_UID)) >= 0
-	  && aclbufp[i].a_perm == aclbufp[pos].a_perm)
+	  && aclbufp[i].a_perm == aclbufp[i + 1 + pos].a_perm)
 	{
 	  inheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
 	  /* This invalidates the corresponding default entry. */
-	  aclbufp[pos].a_type = USER|GROUP|ACL_DEFAULT;
+	  aclbufp[i + 1 + pos].a_type = USER|GROUP|ACL_DEFAULT;
 	}
       switch (aclbufp[i].a_type)
 	{
