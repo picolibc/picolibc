@@ -291,7 +291,7 @@ attach_process (pid_t pid)
   if (!DebugActiveProcess (child_pid))
     error (0, "couldn't attach to pid %d<%d> for debugging", pid, child_pid);
 
-  (void) cygwin_internal (CW_STRACE_ON, pid);
+  (void) cygwin_internal (CW_STRACE_TOGGLE, pid);
   printf ("Attached to pid %d (windows pid %u)\n", pid, (unsigned) child_pid);
   return;
 }

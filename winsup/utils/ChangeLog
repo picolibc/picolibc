@@ -1,3 +1,7 @@
+2002-02-14  Christopher Faylor  <cgf@redhat.com>
+
+	* strace.cc (attach_process): Change CW_STRACE_ON to CW_STRACE_TOGGLE.
+
 2002-01-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkpasswd.c (main): Set default home path for 9x/Me if --path-to-home
