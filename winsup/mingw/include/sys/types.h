@@ -42,10 +42,15 @@
 
 
 #ifndef _TIME_T_DEFINED
+#define	_TIME_T_DEFINED
 __BEGIN_CSTD_NAMESPACE
 typedef	long	time_t;
 __END_CSTD_NAMESPACE
-#define	_TIME_T_DEFINED
+#endif
+
+/* If we include this non-std header, we inject time_t into global */ 
+#if defined (__cplusplus) && (__HAVE_STD_CXX)
+using __CSTD time_t;
 #endif
 
 

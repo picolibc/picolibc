@@ -257,7 +257,7 @@ int	iscsymf (int);
 int	iscsym (int);
 #endif	/* Not _NO_OLDNAMES */
 
-int	is_wctype(wint_t, __CSTD wctype_t);	/* Obsolete! */
+int	is_wctype(__CSTD wint_t, __CSTD wctype_t);	/* Obsolete! */
 
 __END_CGLOBAL_NAMESPACE
 #endif	/* Not __STRICT_ANSI__ */

@@ -123,7 +123,7 @@ extern void	_tzset (void);
 extern void	tzset (void);
 #endif
 
-size_t	strftime(char*, size_t, const char*, const struct tm*);
+size_t	strftime(char*, __CSTD size_t, const char*, const struct __CSTD tm*);
 char*	_strdate(char*);
 char*	_strtime(char*);
 

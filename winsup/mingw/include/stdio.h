@@ -42,7 +42,6 @@
 #include <stddef.h>
 #endif	/* Not RC_INVOKED */
 
-
 /* Flags for the iobuf structure  */
 #define	_IOREAD	1 /* currently reading */
 #define	_IOWRT	2 /* currently writing */
@@ -226,13 +225,13 @@ int	vsprintf (char*, const char*, __VALIST);
 __END_CSTD_NAMESPACE
 __BEGIN_CGLOBAL_NAMESPACE
 
-int	_snprintf (char*, size_t, const char*, ...);
-int	_vsnprintf (char*, size_t, const char*, __VALIST);
+int	_snprintf (char*, __CSTD size_t, const char*, ...);
+int	_vsnprintf (char*, __CSTD size_t, const char*, __VALIST);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
-int snprintf(char* s, size_t n, const char*  format, ...);
+int snprintf(char* s, __CSTD size_t, const char*, ...);
 extern __inline__ int
-vsnprintf (char* __s, size_t __n, const char* __format, __VALIST __arg)
+vsnprintf (char* __s, __CSTD size_t __n, const char* __format, __VALIST __arg)
   { return _vsnprintf ( __s, __n, __format, __arg); }
 #endif
 
@@ -335,6 +334,7 @@ __END_CGLOBAL_NAMESPACE
 #ifndef _WSTDIO_DEFINED
 __BEGIN_CSTD_NAMESPACE
 /*  also in wchar.h - keep in sync */
+
 int	fwprintf (FILE*, const wchar_t*, ...);
 int	wprintf (const wchar_t*, ...);
 int	swprintf (wchar_t*, const wchar_t*, ...);
@@ -377,12 +377,12 @@ __CSTD FILE* _wpopen (const wchar_t*, const wchar_t*);
 #endif	/* __MSVCRT__ */
 
 /* C99 names, but non-standard behaviour */
-int	_snwprintf (wchar_t*, size_t, const wchar_t*, ...);
+int	_snwprintf (wchar_t*, __CSTD size_t, const wchar_t*, ...);
 int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VALIST);
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
-int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
+int snwprintf(wchar_t* s, __CSTD size_t n, const wchar_t*  format, ...);
 extern __inline__ int
-vsnwprintf (wchar_t* __s, size_t __n, const wchar_t* __format,
+vsnwprintf (wchar_t* __s, __CSTD size_t __n, const wchar_t* __format,
 	    __VALIST __arg)
   { return _vsnwprintf ( __s, __n, __format, __arg);}
 #endif
@@ -404,14 +404,14 @@ __CSTD FILE*	wpopen (const wchar_t*, const wchar_t*);
 /*
  * Other Non ANSI wide functions
  */
-wint_t	_fgetwchar (void);
-wint_t	_fputwchar (wint_t);
+__CSTD wint_t	_fgetwchar (void);
+__CSTD wint_t	_fputwchar (__CSTD wint_t);
 int	_getw (__CSTD FILE*);
 int	_putw (int, __CSTD FILE*);
 
 #ifndef _NO_OLDNAMES
-wint_t	fgetwchar (void);
-wint_t	fputwchar (wint_t);
+__CSTD wint_t	fgetwchar (void);
+__CSTD wint_t	fputwchar (__CSTD wint_t);
 int	getw (__CSTD FILE*);
 int	putw (int, __CSTD FILE*);
 #endif	/* Not _NO_OLDNAMES */
@@ -422,7 +422,7 @@ int	putw (int, __CSTD FILE*);
  * not zero'd out if you seek past the end and then write.
  */
 int __mingw_fseek (__CSTD FILE *, long, int);
-int __mingw_fwrite (const void*, size_t, size_t, __CSTD FILE*);
+int __mingw_fwrite (const void*, __CSTD size_t, __CSTD size_t, __CSTD FILE*);
 #define fseek(fp, offset, whence)  __mingw_fseek(fp, offset, whence)
 #define fwrite(buffer, size, count, fp)  __mingw_fwrite(buffer, size, count, fp)
 #endif /* __USE_MINGW_FSEEK */

@@ -131,7 +131,7 @@ __END_CSTD_NAMESPACE
 
 #ifndef __STRICT_ANSI__
 __BEGIN_CGLOBAL_NAMESPACE
-int	is_wctype(wint_t, __CSTD wctype_t);	/* Obsolete! */
+int	is_wctype(__CSTD wint_t, __CSTD wctype_t);	/* Obsolete! */
 __END_CGLOBAL_NAMESPACE
 #endif /* __STRICT_ANSI__ */
 

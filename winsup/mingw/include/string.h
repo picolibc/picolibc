@@ -77,23 +77,23 @@ __BEGIN_CGLOBAL_NAMESPACE
  * Extra non-ANSI functions provided by the CRTDLL library
  */
 char*	_strerror (const char *);
-void*	_memccpy (void*, const void*, int, size_t);
-int 	_memicmp (const void*, const void*, size_t);
+void*	_memccpy (void*, const void*, int, __CSTD size_t);
+int 	_memicmp (const void*, const void*, __CSTD size_t);
 char* 	_strdup (const char*);
 int	_strcmpi (const char*, const char*);
 int	_stricmp (const char*, const char*);
 int	_stricoll (const char*, const char*);
 char*	_strlwr (char*);
-int	_strnicmp (const char*, const char*, size_t);
-char*	_strnset (char*, int, size_t);
+int	_strnicmp (const char*, const char*, __CSTD size_t);
+char*	_strnset (char*, int, __CSTD size_t);
 char*	_strrev (char*);
 char*	_strset (char*, int);
 char*	_strupr (char*);
-void	_swab (const char*, char*, size_t);
+void	_swab (const char*, char*, __CSTD size_t);
 
 #ifdef __MSVCRT__
-int  _strncoll(const char*, const char*, size_t);
-int  _strnicoll(const char*, const char*, size_t);
+int  _strncoll(const char*, const char*, __CSTD size_t);
+int  _strnicoll(const char*, const char*, __CSTD size_t);
 #endif
 
 #ifndef	_NO_OLDNAMES
@@ -104,22 +104,22 @@ int  _strnicoll(const char*, const char*, size_t);
  * strcasecmp.
  */
 
-void*	memccpy (void*, const void*, int, size_t);
-int	memicmp (const void*, const void*, size_t);
+void*	memccpy (void*, const void*, int, __CSTD size_t);
+int	memicmp (const void*, const void*, __CSTD size_t);
 char*	strdup (const char*);
 int	strcmpi (const char*, const char*);
 int	stricmp (const char*, const char*);
 int	strcasecmp (const char*, const char*);
 int	stricoll (const char*, const char*);
 char*	strlwr (char*);
-int	strnicmp (const char*, const char*, size_t);
-int	strncasecmp (const char*, const char*, size_t);
-char*	strnset (char*, int, size_t);
+int	strnicmp (const char*, const char*, __CSTD size_t);
+int	strncasecmp (const char*, const char*, __CSTD size_t);
+char*	strnset (char*, int, __CSTD size_t);
 char*	strrev (char*);
 char*	strset (char*, int);
 char*	strupr (char*);
 #ifndef _UWIN
-void	swab (const char*, char*, size_t);
+void	swab (const char*, char*, __CSTD size_t);
 #endif /* _UWIN */
 
 #endif	/* Not _NO_OLDNAMES */
@@ -167,15 +167,15 @@ wchar_t* _wcsdup (const wchar_t*);
 int	_wcsicmp (const wchar_t*, const wchar_t*);
 int	_wcsicoll (const wchar_t*, const wchar_t*);
 wchar_t* _wcslwr (wchar_t*);
-int	_wcsnicmp (const wchar_t*, const wchar_t*, size_t);
-wchar_t* _wcsnset (wchar_t*, wchar_t, size_t);
+int	_wcsnicmp (const wchar_t*, const wchar_t*, __CSTD size_t);
+wchar_t* _wcsnset (wchar_t*, wchar_t, __CSTD size_t);
 wchar_t* _wcsrev (wchar_t*);
 wchar_t* _wcsset (wchar_t*, wchar_t);
 wchar_t* _wcsupr (wchar_t*);
 
 #ifdef __MSVCRT__
-int  _wcsncoll(const wchar_t*, const wchar_t*, size_t);
-int  _wcsnicoll(const wchar_t*, const wchar_t*, size_t);
+int  _wcsncoll(const wchar_t*, const wchar_t*, __CSTD size_t);
+int  _wcsnicoll(const wchar_t*, const wchar_t*, __CSTD size_t);
 #endif
 
 #ifndef __NO_OLDNAMES
@@ -185,8 +185,8 @@ wchar_t* wcsdup (wchar_t*);
 int	wcsicmp (const wchar_t*, const wchar_t*);
 int	wcsicoll (const wchar_t*, const wchar_t*);
 wchar_t* wcslwr (wchar_t*);
-int	wcsnicmp (const wchar_t*, const wchar_t*, size_t);
-wchar_t* wcsnset (wchar_t*, wchar_t, size_t);
+int	wcsnicmp (const wchar_t*, const wchar_t*, __CSTD size_t);
+wchar_t* wcsnset (wchar_t*, wchar_t, __CSTD size_t);
 wchar_t* wcsrev (wchar_t*);
 wchar_t* wcsset (wchar_t*, wchar_t);
 wchar_t* wcsupr (wchar_t*);

@@ -445,7 +445,7 @@ int	 _wputenv(const wchar_t*);
 void	_wsearchenv(const wchar_t*, const wchar_t*, wchar_t*);
 void    _wmakepath(wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*);
 void	_wsplitpath (const wchar_t*, wchar_t*, wchar_t*, wchar_t*, wchar_t*);
-wchar_t*    _wfullpath (wchar_t*, const wchar_t*, size_t);
+wchar_t*    _wfullpath (wchar_t*, const wchar_t*, __CSTD size_t);
 
 unsigned int _rotl(unsigned int, int);
 unsigned int _rotr(unsigned int, int);
