@@ -501,7 +501,21 @@ extern long double powl (long double, long double);
 extern float sqrtf (float);
 extern long double sqrtl (long double);
 
-/* 7.12.8 Error and gamma functions: TODO */
+/* TODO */ 
+/* 7.12.8.1 The erf functions  */
+/* 7.12.8.2 The erfc functions  */
+
+/* 7.12.8.3 The lgamma functions */
+
+extern double lgamma (double);
+extern float lgammaf (float);
+extern long double lgammal (long double);
+
+/* 77.12.8.4 The tgamma functions */
+
+extern double tgamma (double);
+extern float tgammaf (float);
+extern long double tgammal (long double);
 
 /* 7.12.9.1 Double in C89 */
 extern float ceilf (float);

@@ -46,7 +46,8 @@ MATH_DISTFILES = \
 	fmodl.c fp_consts.c fp_consts.h fp_constsf.c  fp_constsl.c \
 	fpclassify.c fpclassifyf.c fpclassifyl.c \
 	frexpf.c frexpl.S fucom.c hypotf.c hypotl.c ilogb.S ilogbf.S \
-	ilogbl.S isnan.c isnanf.c isnanl.c ldexpf.c ldexpl.c llrint.c \
+	ilogbl.S isnan.c isnanf.c isnanl.c ldexpf.c ldexpl.c \
+	lgamma.c lgammaf.c lgammal.c llrint.c \
 	llrintf.c llrintl.c llround.c llroundf.c llroundl.c \
 	log10f.S log10l.S log1p.S log1pf.S log1pl.S log2.S log2f.S \
 	log2l.S logb.c logbf.c logbl.c logf.S logl.S lrint.c lrintf.c \
@@ -57,7 +58,8 @@ MATH_DISTFILES = \
 	remquof.S remquol.S rint.c rintf.c rintl.c round.c roundf.c \
 	roundl.c scalbn.S scalbnf.S scalbnl.S signbit.c signbitf.c \
 	signbitl.c sinf.S sinhf.c sinhl.c sinl.S  sqrtf.c sqrtl.c \
-	tanf.S tanhf.c tanhl.c tanl.S trunc.c truncf.c truncl.c
+	tanf.S tanhf.c tanhl.c tanl.S tgamma.c tgammaf.c tgammal.c \
+	trunc.c truncf.c truncl.c
 
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
@@ -115,7 +117,8 @@ MATH_OBJS = \
 	fmodl.o fp_consts.o fp_constsf.o fp_constsl.o \
 	fpclassify.o fpclassifyf.o fpclassifyl.o \
 	frexpf.o frexpl.o fucom.o hypotf.o hypotl.o ilogb.o ilogbf.o \
-	ilogbl.o isnan.o isnanf.o isnanl.o ldexpf.o ldexpl.o llrint.o \
+	ilogbl.o isnan.o isnanf.o isnanl.o ldexpf.o ldexpl.o \
+	lgamma.o lgammaf.o lgammal.o llrint.o \
 	llrintf.o llrintl.o llround.o llroundf.o llroundl.o \
 	log10f.o log10l.o log1p.o log1pf.o log1pl.o log2.o log2f.o \
 	log2l.o logb.o logbf.o logbl.o logf.o logl.o lrint.o lrintf.o \
@@ -126,7 +129,8 @@ MATH_OBJS = \
 	remquof.o remquol.o rint.o rintf.o rintl.o round.o roundf.o \
 	roundl.o scalbn.o scalbnf.o scalbnl.o signbit.o signbitf.o \
 	signbitl.o sinf.o sinhf.o sinhl.o sinl.o sqrtf.o sqrtl.o \
-	tanf.o tanhf.o tanhl.o tanl.o trunc.o truncf.o truncl.o
+	tanf.o tanhf.o tanhl.o tanl.o tgamma.o tgammaf.o tgammal.o \
+	trunc.o truncf.o truncl.o
 FENV_OBJS = fesetround.o  fegetround.o \
 	fegetenv.o fesetenv.o feupdateenv.o \
 	feclearexcept.o feholdexcept.o fegetexceptflag.o \
