@@ -9,7 +9,7 @@
 	test_file_changed.  When the handle is invalid, return true.
 	(etc::file_changed): Remove unneeded check for !fn[n].
 	* uinfo.cc (pwdgrp::load): Eliminate spurious setting of fh to NULL.
-	(pwdgrp::operator =): Eliminate.
+	* pwdgrp.h (pwdgrp::operator =): Eliminate.
 
 2003-01-19  Christopher Faylor  <cgf@redhat.com>
 
