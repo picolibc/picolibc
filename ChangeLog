@@ -1,3 +1,7 @@
+2000-07-01  Koundinya K  <kk@ddeorg.soft.net>
+
+        * ltconfig: Add support for mips-dde-sysv4.2MP
+	
 2000-06-28  Corinna Vinschen  <vinschen@cygnus.com>
 
 	* ltconfig: Check for host_os beeing one of `cygwin', `mingw' or

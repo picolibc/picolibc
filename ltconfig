@@ -759,10 +759,15 @@ else
     pic_flag='-pic'
     link_static_flag='-Bstatic'
     ;;
+
   sysv4*MP*)
     if test -d /usr/nec ;then
       pic_flag='-Kconform_pic'
       link_static_flag='-Bstatic'
+    elif test -d /usr/dde ;then
+      pic_flag='-KPIC'
+      link_static_flag='-Bstatic'
+      wl='-Wl,'
     fi
     ;;
   *)
@@ -1516,6 +1521,12 @@ else
       runpath_var=LD_RUN_PATH
       hardcode_runpath_var=yes
       ld_shlibs=yes
+    elif test -d /usr/dde; then
+      archive_cmds='$CC -V -dy -G -z text -h $soname -o $lib $libobjs'
+      hardcode_shlibpath_var=no
+      runpath_var=LD_RUN_PATH
+      no_undefined_flag='-z text'
+      ld_shlibs=yes
     fi
     ;;
 
@@ -2112,6 +2123,12 @@ sysv4*MP*)
     version_type=linux
     library_names_spec='$libname.so.$versuffix $libname.so.$major $libname.so'
     soname_spec='$libname.so.$major'
+    shlibpath_var=LD_LIBRARY_PATH
+  elif test -d /usr/dde ;then
+    dynamic_linker="/usr/lib/libc.so.1"
+    version_type=osf
+    library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so$major $libname.so'
+    soname_spec='${libname}${release}.so$major'
     shlibpath_var=LD_LIBRARY_PATH
   fi
   ;;
