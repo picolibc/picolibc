@@ -1,5 +1,9 @@
 2003-12-26  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (setup_handler): Protect against a race.
+
+2003-12-26  Christopher Faylor  <cgf@redhat.com>
+
 	* path.cc (mount_item::build_win32): Backslashify paths in non-managed
 	case.
 
