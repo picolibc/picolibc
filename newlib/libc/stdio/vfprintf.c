@@ -291,7 +291,7 @@ static int exponent _PARAMS((char *, int, int));
 
 #endif /* FLOATING_POINT */
 
-#ifndef _NO_LONG_LONG
+#ifndef _NO_LONGLONG
 #define quad_t long long
 #define u_quad_t unsigned long long
 #else
@@ -1536,7 +1536,7 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
 		      spec_type = LONG_INT;
 		    else if (flags & SHORTINT)
 		      spec_type = SHORT_INT;
-#ifndef _NO_LONG_LONG
+#ifndef _NO_LONGLONG
 		    else if (flags & QUADINT)
 		      spec_type = QUAD_INT;
 #endif

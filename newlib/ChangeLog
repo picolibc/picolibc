@@ -1,3 +1,8 @@
+2003-11-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Fix typos that should be
+	referring to _NO_LONGLONG macro.
+
 2003-11-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/linuxthreads/td_init.c: Replace function name
