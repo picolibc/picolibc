@@ -85,7 +85,7 @@
 	* fhandler_proc.cc (cpuid): Move to cpuid.h.
 	(can_set_flag): Move to cpuid.h.
 	* syscalls.cc (gethostid): New function.
-	* version.h: Bump DLL minor version number to 83.
+	* version.h: Bump api minor version number to 83.
 
 2003-04-15  Thomas Pfaff  <tpfaff@gmx.net>
 
