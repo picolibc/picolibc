@@ -213,6 +213,15 @@ cygthread::exit_thread ()
   ExitThread (0);
 }
 
+void
+cygthread::release ()
+{
+  h = NULL;
+  __name = NULL;
+  stack_ptr = NULL;
+  (void) InterlockedExchange (&inuse, 0); /* No longer in use */
+}
+
 /* Forcibly terminate a thread. */
 void
 cygthread::terminate_thread ()
@@ -242,12 +251,7 @@ cygthread::terminate_thread ()
   if (is_freerange)
     free (this);
   else
-    {
-      h = NULL;
-      __name = NULL;
-      stack_ptr = NULL;
-      (void) InterlockedExchange (&inuse, 0); /* No longer in use */
-    }
+    release ();
 }
 
 /* Detach the cygthread from the current thread.  Note that the

@@ -28,7 +28,7 @@ class cygthread
   static DWORD WINAPI simplestub (VOID *);
   static DWORD main_thread_id;
   static const char * name (DWORD = 0);
-  void release () { __name = NULL; inuse = false; }
+  void release ();
   cygthread (LPTHREAD_START_ROUTINE, LPVOID, const char *);
   cygthread () {};
   static void init ();

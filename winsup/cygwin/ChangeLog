@@ -1,3 +1,10 @@
+2004-12-22  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.h (cygthread::release): Just declare here.
+	* cygthread.cc (cygthread::release): Define here.  Use
+	InterlockedExchange to set inuse or suffer potential races.
+	(cygthread::terminate): Use release().
+
 2004-12-22  Chris January  <chris@atomice.net>
 
 	* fhandler_process.cpp (format_process_status): Use tabs in formatting
