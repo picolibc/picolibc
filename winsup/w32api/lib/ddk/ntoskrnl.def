@@ -644,7 +644,7 @@ MmAllocateContiguousMemory@8
 MmAllocateContiguousMemorySpecifyCache@20
 MmAllocateMappingAddress@8
 MmAllocateNonCachedMemory@4
-MmAllocatePagesForMdl@16
+MmAllocatePagesForMdl@28
 MmBuildMdlForNonPagedPool@4
 ;MmCanFileBeTruncated
 MmCreateMdl@12
@@ -672,7 +672,7 @@ MmIsVerifierEnabled@4
 MmLockPagableDataSection@4
 MmLockPagableImageSection@4
 MmLockPagableSectionByHandle@4
-MmMapIoSpace@12
+MmMapIoSpace@16
 MmMapLockedPages@8
 MmMapLockedPagesSpecifyCache@24
 MmMapLockedPagesWithReservedMapping@16

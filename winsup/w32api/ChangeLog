@@ -1,4 +1,10 @@
-2004-03-16  Martin Fuchs <martin-fuchs@gmx.net>
+2004-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/ddk/ntoskrnl.def (MmAllocatePagesForMdl): Correct suffix.
+	(MmMapIoSpace): Likewise.
+	Thanks to Dan Aloni  <da-x@colinux.org>
+
+2004-03-16  Martin Fuchs  <martin-fuchs@gmx.net>
 
 	* include/shellapi.h (NIM_* NIS_*): Define constants for
 	notification icons with _WIN32_IE >= 0x0500.
