@@ -1,3 +1,7 @@
+2003-04-09  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips/cfe.c (_flush_cache): New function.
+
 2003-02-18  Richard Sandiford  <rsandifo@redhat.com>
 
 	* mips/nullmon.c (_ftext, _end): Adjust declaration.

@@ -127,3 +127,13 @@ get_mem_info (mem)
      don't have enough stack to do that (yet).  */
   mem->size = 0x4000000;	/* Assume 64 MB of RAM */
 }
+
+/* This is the MIPS cache flush function call.  No defines are provided
+   by libgloss for 'cache', and CFE doesn't let you flush ranges, so
+   we just flush all I & D for every call.  */
+int
+_flush_cache (char *addr, int nbytes, int cache)
+{
+  cfe_flushcache (0);
+  return 0;
+}
