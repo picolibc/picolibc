@@ -1,3 +1,11 @@
+2004-02-25  Brian Ford <ford@vss.fsi.com>,
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (check_invalid_virtual_addr): New function.
+	* winsup.h (check_invalid_virtual_addr): Declare.
+	* mmap.cc (munmap): Call check_invalid_virtual_addr instead of
+	IsBadReadPtr.
+
 2004-02-24  Christopher Faylor  <cgf@redhat.com>
 
 	* gendef (stabilize_sig_stack): Correctly align this pointer for call

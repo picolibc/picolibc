@@ -276,6 +276,7 @@ int __stdcall __check_null_invalid_struct (void *s, unsigned sz) __attribute__ (
 int __stdcall __check_null_invalid_struct_errno (void *s, unsigned sz) __attribute__ ((regparm(2)));
 int __stdcall __check_invalid_read_ptr (const void *s, unsigned sz) __attribute__ ((regparm(2)));
 int __stdcall __check_invalid_read_ptr_errno (const void *s, unsigned sz) __attribute__ ((regparm(2)));
+int __stdcall check_invalid_virtual_addr (const void *s, unsigned sz) __attribute__ ((regparm(2)));
 
 #define check_null_invalid_struct(s) \
   __check_null_invalid_struct ((s), sizeof (*(s)))

@@ -641,7 +641,7 @@ munmap (void *addr, size_t len)
 
   /* Error conditions according to SUSv3 */
   if (!addr || ((DWORD)addr % getpagesize ()) || !len
-      || IsBadReadPtr (addr, len))
+      || check_invalid_virtual_addr (addr, len))
     {
       set_errno (EINVAL);
       syscall_printf ("-1 = munmap(): Invalid parameters");

@@ -214,6 +214,18 @@ __check_invalid_read_ptr_errno (const void *s, unsigned sz)
   return set_errno (EFAULT);
 }
 
+int __stdcall
+check_invalid_virtual_addr (const void *s, unsigned sz)
+{
+  MEMORY_BASIC_INFORMATION mbuf;
+  void *end;
+
+  for (end = (char *) s + sz; s < end; s = (char *) s + mbuf.RegionSize)
+    if (!VirtualQuery (s, &mbuf, sizeof mbuf))
+      return EINVAL;
+  return 0;
+}
+
 ssize_t
 check_iovec_for_read (const struct iovec *iov, int iovcnt)
 {
