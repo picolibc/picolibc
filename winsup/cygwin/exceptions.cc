@@ -624,7 +624,7 @@ interrupt_setup (int sig, struct sigaction& siga, void *handler,
   sigsave.retaddr_on_stack = retaddr_on_stack;
   sigsave.oldmask = myself->getsigmask ();	// Remember for restoration
   /* FIXME: Not multi-thread aware */
-  set_process_mask (myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig));
+  sigsave.newmask = myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig);
   sigsave.func = (void (*)(int)) handler;
   sigsave.sig = sig;
   sigsave.saved_errno = -1;		// Flag: no errno to save
@@ -687,6 +687,7 @@ interrupt_on_return (sigthread *th, int sig, struct sigaction& siga, void *handl
 	return 1;
       }
 
+  sigproc_printf ("couldn't find a stack frame, i %d\n", i);
   return 0;
 }
 
@@ -806,7 +807,7 @@ set_pending:
     LeaveCriticalSection (&th->lock);
 
   if (!hth)
-    sigproc_printf ("modified main-thread stack");
+    sigproc_printf ("didn't suspend main thread, th %p", th);
   else
     {
       res = ResumeThread (hth);
@@ -856,8 +857,7 @@ ctrl_c_handler (DWORD type)
 }
 
 /* Set the signal mask for this process.
- * Note that some signals are unmaskable, as in UNIX.
- */
+   Note that some signals are unmaskable, as in UNIX.  */
 extern "C" void __stdcall
 set_process_mask (sigset_t newmask)
 {
@@ -1105,43 +1105,38 @@ _sigreturn:
 	popl	%%edx
 	popl	%%edi
 	popl	%%esi
-	popl	%%ebp
 	popf
+	popl	%%ebp
 	ret
 
 __no_sig_start:
 _sigdelayed:
-	pushl	%2	# original return address
-	pushf
+	pushl	%2			# original return address
 	pushl	%%ebp
+	movl	%%esp,%%ebp
+	pushf
 	pushl	%%esi
 	pushl	%%edi
 	pushl	%%edx
 	pushl	%%ecx
 	pushl	%%ebx
 	pushl	%%eax
-	pushl	%7	# saved errno
-	pushl	%3	# oldmask
-	pushl	%4	# signal argument
+	pushl	%7			# saved errno
+	pushl	%3			# oldmask
+	pushl	%4			# signal argument
 	pushl	$_sigreturn
-	pushl	%%ebp
-	movl	%%esp,%%esp
 
 	call	_reset_signal_arrived@0
 	movl	$0,%0
 
-	cmpl	$0,_pending_signals
-	je	2f
-	pushl	$0
-	call	_sig_dispatch_pending@4
-
-2:	popl	%%ebp
+	pushl	%8
+	call	_set_process_mask@4
 	jmp	*%5
 __no_sig_end:
 
 " : "=m" (sigsave.sig) : "m" (&_impure_ptr->_errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
-    "g" (sigsave.func), "o" (pid_offset), "g" (sigsave.saved_errno)
+    "g" (sigsave.func), "o" (pid_offset), "g" (sigsave.saved_errno), "g" (sigsave.newmask)
 );
 }
 }

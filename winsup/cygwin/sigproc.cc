@@ -70,8 +70,8 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 
 #define Static static NO_COPY
 
-Static DWORD proc_loop_wait = 500;	// Wait for subprocesses to exit
-Static DWORD sig_loop_wait = 500;	// Wait for signals to arrive
+Static DWORD proc_loop_wait = 1000;	// Wait for subprocesses to exit
+Static DWORD sig_loop_wait = INFINITE;	// Wait for signals to arrive
 
 Static HANDLE sigcatch_nonmain = NULL;	// The semaphore signaled when
 					//  signals are available for
@@ -1109,7 +1109,7 @@ wait_sig (VOID *)
 
   HANDLE catchem[] = {sigcatch_main, sigcatch_nonmain, sigcatch_nosync};
   sigproc_printf ("Ready.  dwProcessid %d", myself->dwProcessId);
-  for (int i = 0; ; i++)
+  for (;;)
     {
       DWORD rc = WaitForMultipleObjects (3, catchem, FALSE, sig_loop_wait);
 
@@ -1196,18 +1196,7 @@ wait_sig (VOID *)
 
       /* FIXME: The dispatched stuff probably isn't needed anymore. */
       if (dispatched >= 0 && pending_signals < 0 && !saw_pending_signals)
-	{
-	  pending_signals = 0;
-	  /* FIXME FIXME FIXME FIXME FIXME
-	     This is a real kludge designed to handle runaway processes who
-	     missed a signal and never processed a signal handler.  We have
-	     to reset signal_arrived or stuff goes crazy. */
-	  if (i >= 20)
-	    {
-	      i = 0;
-	      ResetEvent (signal_arrived);
-	    }
-	}
+	pending_signals = 0;
 
       if (nzombies && saw_sigchld && !dispatched_sigchld)
 	proc_subproc (PROC_CLEARWAIT, 0);

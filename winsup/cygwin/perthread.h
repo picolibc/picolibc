@@ -97,6 +97,7 @@ struct signal_dispatch
   int sig;
   int saved_errno;
   DWORD oldmask;
+  DWORD newmask;
   DWORD retaddr;
   DWORD *retaddr_on_stack;
 };

@@ -1,3 +1,18 @@
+Thu Nov 16 00:15:59 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (wait_sig): Remove unneeded for loop iteration.
+
+Wed Nov 15 21:02:56 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (interrupt_setup): Don't set signal mask here or races
+	occur with main thread.  Set it in sigdelayed instead.
+	(sigreturn): Reflect change in stack order of ebp and flags.
+	(sigdelayed): Set stack frame correctly.  Call set_process_mask here
+	with flags for last trapped signal.
+	(signal_dispatch): Add newmask.
+	* sigproc.cc (wait_sig): Eliminate ill-considered attempt to halt
+	looping signal processors.
+
 Wed Nov 15 22:08:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* uinfo.cc (internal_getlogin): Change parameter list to reflect
