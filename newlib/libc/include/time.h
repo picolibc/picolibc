@@ -202,7 +202,11 @@ extern "C" {
 /* Flag indicating time is "absolute" with respect to the clock
    associated with a time.  */
 
-#define TIMER_ABSTIME  4
+#define TIMER_ABSTIME	4
+#ifdef __CYGWIN__
+# define TIMER_RELTIME	0	/* For compatibility with HP/UX, Solaris,
+				   others? */
+#endif
 
 /* Manifest Constants, P1003.4b/D8, p. 55 */
 

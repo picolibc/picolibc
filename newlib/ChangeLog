@@ -1,3 +1,7 @@
+2004-02-09  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/time.h (TIMER_RELTIME): New define.
+
 2004-02-09  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/Makefile.am: Add mallstatsr to LIBADD_OBJS.
