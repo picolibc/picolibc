@@ -36,10 +36,13 @@ main (int argc, char **argv)
     {
       char buf[4096];
       if (!p)
-	p[0] = '\0';
+	{
+	  p = buf;
+	  p[0] = '\0';
+	}
       else
 	{
-	  strcat (buf, p);
+	  strcpy (buf, p);
 	  strcat (buf, " ");
 	}
       strcat(buf, "ntsec");
