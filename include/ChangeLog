@@ -1,3 +1,7 @@
+2001-10-24  Neil Booth  <neil@daikokuya.demon.co.uk>
+
+	* include/safe-ctype.h (_sch_isbasic, IS_ISOBASIC): New.
+
 2002-01-31  Ivan Guzvinec  <ivang@opencores.org>
 
 	* dis-asm.h : Add support for or32 targets
