@@ -1,3 +1,7 @@
+2002-03-31  Victor Porton  <porton@narod.ru>
+
+	* include/shellapi.h (SHGFI_ATTR_SPECIFIED): Add define.
+
 2002-03-29  David Robinow  <drobinow@yahoo.com>
 
 	* include/wingdi.h (SetPixelFormat): Correct prototype.
