@@ -36,11 +36,8 @@ static DWORD WINAPI process_output (void *);		// Output queue thread
 static DWORD WINAPI process_ioctl (void *);		// Ioctl requests thread
 
 fhandler_tty_master::fhandler_tty_master (int unit) :
-	fhandler_pty_master (FH_TTYM, unit)
+	fhandler_pty_master (FH_TTYM, unit), console (NULL), hThread (NULL)
 {
-  set_cb (sizeof *this);
-  console = NULL;
-  hThread = NULL;
 }
 
 int
@@ -440,17 +437,11 @@ process_ioctl (void *)
 fhandler_tty_slave::fhandler_tty_slave (int num)
   : fhandler_tty_common (FH_TTYS, num)
 {
-  set_cb (sizeof *this);
-  ttynum = num;
-  debug_printf ("unix '%s', win32 '%s'", unix_path_name, win32_path_name);
-  inuse = NULL;
 }
 
 fhandler_tty_slave::fhandler_tty_slave ()
   : fhandler_tty_common (FH_TTYS, 0)
 {
-  set_cb (sizeof *this);
-  inuse = NULL;
 }
 
 /* FIXME: This function needs to close handles when it has
@@ -953,11 +944,6 @@ out:
 fhandler_pty_master::fhandler_pty_master (DWORD devtype, int unit)
   : fhandler_tty_common (devtype, unit)
 {
-  set_cb (sizeof *this);
-  ioctl_request_event = NULL;
-  ioctl_done_event = NULL;
-  pktmode = need_nl = 0;
-  inuse = NULL;
 }
 
 int

@@ -1330,6 +1330,7 @@ fhandler_base::operator delete (void *p)
 
 /* Normal I/O constructor */
 fhandler_base::fhandler_base (DWORD devtype, int unit):
+  status (devtype),
   access (0),
   io_handle (NULL),
   namehash (0),
@@ -1343,7 +1344,6 @@ fhandler_base::fhandler_base (DWORD devtype, int unit):
   win32_path_name (NULL),
   open_status (0)
 {
-  status = devtype;
   int bin = __fmode & O_TEXT ? 0 : 1;
   if (status != FH_DISK && status != FH_CONSOLE)
     {
@@ -1372,7 +1372,6 @@ fhandler_base::~fhandler_base (void)
 fhandler_disk_file::fhandler_disk_file () :
 	fhandler_base (FH_DISK)
 {
-  set_cb (sizeof *this);
 }
 
 int
@@ -1601,7 +1600,6 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 fhandler_dev_null::fhandler_dev_null () :
 	fhandler_base (FH_NULL)
 {
-  set_cb (sizeof *this);
 }
 
 void

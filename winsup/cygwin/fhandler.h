@@ -160,7 +160,6 @@ class fhandler_base
 protected:
   DWORD status;
 public:
-  int cb;
 private:
   int access;
   HANDLE io_handle;
@@ -194,7 +193,6 @@ public:
   /* Non-virtual simple accessor functions. */
   void set_io_handle (HANDLE x) { io_handle = x; }
 
-  void set_cb (size_t size) { cb = size; }
   DWORD get_device () { return status & FH_DEVMASK; }
   virtual int get_unit () { return 0; }
   virtual BOOL is_slow () { return get_device () < FH_SLOW; }
@@ -778,7 +776,9 @@ class fhandler_tty_common: public fhandler_termios
 {
 public:
   fhandler_tty_common (DWORD dev, int unit = 0)
-    : fhandler_termios (dev, unit), ttynum (unit)
+    : fhandler_termios (dev, unit), output_done_event (NULL),
+    ioctl_request_event (NULL), ioctl_done_event (NULL), output_mutex (NULL),
+    input_mutex (NULL), input_available_event (NULL), inuse (NULL), ttynum (unit)
   {
     // nothing to do
   }
@@ -791,12 +791,11 @@ public:
   HANDLE output_mutex, input_mutex;
   HANDLE input_available_event;
   HANDLE inuse;			// used to indicate that a tty is in use
-
+  int ttynum;			// Master tty num.
 
   DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
   void __release_output_mutex (const char *fn, int ln);
 
-  int ttynum;			// Master tty num.
   virtual int dup (fhandler_base *child);
 
   tty *get_ttyp () { return (tty *)tc; }
@@ -866,10 +865,10 @@ class fhandler_tty_master: public fhandler_pty_master
 {
 public:
   /* Constructor */
-  fhandler_tty_master (int unit);
   fhandler_console *console;	// device handler to perform real i/o.
   HANDLE hThread;		// process_output thread handle.
 
+  fhandler_tty_master (int unit);
   int init (int);
   int init_console ();
   void fixup_after_fork (HANDLE parent);

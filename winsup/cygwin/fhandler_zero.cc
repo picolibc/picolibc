@@ -18,7 +18,6 @@ details. */
 fhandler_dev_zero::fhandler_dev_zero ()
   : fhandler_base (FH_ZERO)
 {
-  set_cb (sizeof *this);
 }
 
 int

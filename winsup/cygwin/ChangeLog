@@ -1,3 +1,23 @@
+2001-10-22  Christopher Faylor  <cgf@redhat.com>
+
+	Remove 'cb' parameter and modify fhandler_* constructors throughout.
+	* dtable.cc (dtable::build_fhandler): Remove debugging output which
+	uses 'cb'.
+	* exec.cc (execvp): New function.
+	(execvpe): Ditto.
+	* fhandler.cc (fhandler_base::fhandler_base): Use constructor
+	initialization.
+	* fhandler.h (fhandler_tty_common::fhandler_tty_common): Ditto.
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::fhandler_dev_clipboard):
+	Ditto.
+	* fhandler_console.cc (fhandler_console::fhandler_console): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::fhandler_dev_raw): Ditto.
+	* fhandler_serial.cc (fhandler_serial::fhandler_serial): Ditto.
+	* fhandler_tty.cc (fhandler_tty_master::fhandler_tty_master): Ditto.
+	(fhandler_tty_slave::fhandler_tty_slave): Ditto.
+	(fhandler_pty_master::fhandler_pty_master): Ditto.
+	* fhandler_windows.cc (fhandler_windows::fhandler_windows): Ditto.
+
 2001-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	Patch suggested by Ian Ray <ian.ray@nokia.com>:
@@ -8,6 +28,7 @@
 
 2001-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+>>>>>>> 1.975
 	* net.cc (get_2k_ifconf): Change multiple IP address naming scheme
 	to Linux style.
 

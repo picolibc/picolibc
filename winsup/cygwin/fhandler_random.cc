@@ -24,9 +24,8 @@ details. */
 #define PSEUDO_SHIFTVAL		(21)
 
 fhandler_dev_random::fhandler_dev_random (int nunit)
-  : fhandler_base (FH_RANDOM), unit(nunit), crypt_prov((HCRYPTPROV)NULL)
+  : fhandler_base (FH_RANDOM), unit(nunit), crypt_prov((HCRYPTPROV) NULL)
 {
-  set_cb (sizeof *this);
 }
 
 int

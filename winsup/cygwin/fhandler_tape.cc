@@ -57,7 +57,6 @@ fhandler_dev_tape::is_eof (int win_error)
 fhandler_dev_tape::fhandler_dev_tape (int unit)
   : fhandler_dev_raw (FH_TAPE, unit)
 {
-  set_cb (sizeof *this);
 }
 
 int

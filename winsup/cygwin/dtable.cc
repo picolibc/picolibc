@@ -332,8 +332,7 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 	}
     }
 
-  debug_printf ("%s - cb %d, fd %d, fh %p", fh->get_name () ?: "", fh->cb,
-		fd, fh);
+  debug_printf ("%s - fd %d, fh %p", fh->get_name () ?: "", fd, fh);
   return fd >= 0 ? (fds[fd] = fh) : fh;
 }
 

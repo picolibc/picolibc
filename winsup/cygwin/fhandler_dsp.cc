@@ -423,7 +423,6 @@ fhandler_dev_dsp::setupwav (const char *pData, int nBytes)
 fhandler_dev_dsp::fhandler_dev_dsp ():
   fhandler_base (FH_OSS_DSP)
 {
-  set_cb (sizeof *this);
 }
 
 fhandler_dev_dsp::~fhandler_dev_dsp ()

@@ -47,11 +47,8 @@ The following unix-style calls are supported:
 */
 
 fhandler_windows::fhandler_windows ()
-  : fhandler_base (FH_WINDOWS)
+  : fhandler_base (FH_WINDOWS), hWnd_ (NULL), method_ (WINDOWS_POST)
 {
-  set_cb (sizeof *this);
-  hWnd_ = NULL;
-  method_ = WINDOWS_POST;
 }
 
 int

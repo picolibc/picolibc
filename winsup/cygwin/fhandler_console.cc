@@ -858,29 +858,21 @@ fhandler_console::tcgetattr (struct termios *t)
   return res;
 }
 
-/*
- * Constructor.
- */
-
 fhandler_console::fhandler_console () :
-  fhandler_termios (FH_CONSOLE, -1)
+  fhandler_termios (FH_CONSOLE, -1),
+  default_color (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE),
+  underline_color (FOREGROUND_GREEN | FOREGROUND_BLUE),
+  dim_color (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE),
+  meta_mask (LEFT_ALT_PRESSED), state_ (normal), nargs_ (0), savex (0),
+  savey (0), savebuf (NULL), dwLastButtonState (0), nModifiers (0),
+  insert_mode (false), use_mouse (false), raw_win32_keyboard_mode (false)
 {
-  set_cb (sizeof *this);
-  default_color = dim_color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-  underline_color = FOREGROUND_GREEN | FOREGROUND_BLUE;
-  state_ = normal;
-  nargs_ = 0;
   for (int i = 0; i < MAXARGS; i++) args_ [i] = 0;
-  savex = savey = 0;
   savebufsiz.X = savebufsiz.Y = 0;
-  savebuf = NULL;
   scroll_region.Top = 0;
   scroll_region.Bottom = -1;
   dwLastCursorPosition.X = -1;
   dwLastCursorPosition.Y = -1;
-  dwLastButtonState = 0;
-  nModifiers = 0;
-  insert_mode = use_mouse = raw_win32_keyboard_mode = FALSE;
   /* Set the mask that determines if an input keystroke is modified by
      META.  We set this based on the keyboard layout language loaded
      for the current thread.  The left <ALT> key always generates
@@ -890,7 +882,6 @@ fhandler_console::fhandler_console () :
      language-specific characters (umlaut, accent grave, etc.).  On
      these keyboards right <ALT> (called AltGr) is used to produce the
      shell symbols and should not be interpreted as META. */
-  meta_mask = LEFT_ALT_PRESSED;
   if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
     meta_mask |= RIGHT_ALT_PRESSED;
 

@@ -24,13 +24,9 @@ details. */
 /**********************************************************************/
 /* fhandler_serial */
 
-fhandler_serial::fhandler_serial (DWORD devtype, int unit) :
-	fhandler_base (devtype, unit)
+fhandler_serial::fhandler_serial (DWORD devtype, int unit)
+  : fhandler_base (devtype, unit), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
 {
-  set_cb (sizeof *this);
-  vmin_ = 0;
-  vtime_ = 0;
-  pgrp_ = myself->pgid;
   set_need_fork_fixup ();
 }
 

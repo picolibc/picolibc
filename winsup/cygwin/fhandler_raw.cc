@@ -118,11 +118,10 @@ fhandler_dev_raw::writebuf (void)
   return ret;
 }
 
-fhandler_dev_raw::fhandler_dev_raw (DWORD devtype, int unit)
-  : fhandler_base (devtype)
+fhandler_dev_raw::fhandler_dev_raw (DWORD devtype, int nunit)
+  : fhandler_base (devtype), unit (nunit)
 {
   clear ();
-  this->unit = unit;
   set_need_fork_fixup ();
 }
 
