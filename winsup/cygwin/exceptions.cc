@@ -1117,6 +1117,7 @@ signal_exit (int rc)
     TerminateProcess (hExeced, rc);
 
   sigproc_printf ("about to call do_exit (%x)", rc);
+  (void) SetEvent (signal_arrived);
   do_exit (rc);
 }
 

@@ -22,6 +22,7 @@ details. */
 #include "cygheap.h"
 #include "thread.h"
 #include "pinfo.h"
+#include "cygthread.h"
 
 static unsigned pipecount;
 static const NO_COPY char pipeid_fmt[] = "stupid_pipe.%u.%u";
@@ -50,14 +51,36 @@ fhandler_pipe::set_close_on_exec (int val)
     set_inheritance (writepipe_exists, val);
 }
 
+struct pipeargs
+{
+  fhandler_base *fh;
+  void *ptr;
+  size_t len;
+  int res;
+};
+
+static DWORD WINAPI
+read_pipe (void *arg)
+{
+  pipeargs *pi = (pipeargs *) arg;
+  pi->res = pi->fh->fhandler_base::read (pi->ptr, pi->len);
+  return 0;
+}
+
 int __stdcall
 fhandler_pipe::read (void *in_ptr, size_t in_len)
 {
   if (broken_pipe)
     return 0;
-  int res = this->fhandler_base::read (in_ptr, in_len);
+  pipeargs pi;
+  pi.fh = this;
+  pi.ptr = in_ptr;
+  pi.len = in_len;
+  pi.res = -1;
+  cygthread *th = new cygthread (read_pipe, &pi, "read_pipe");
+  th->detach (1);
   (void) ReleaseMutex (guard);
-  return res;
+  return pi.res;
 }
 
 int fhandler_pipe::close ()

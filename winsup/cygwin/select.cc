@@ -431,7 +431,7 @@ peek_pipe (select_record *s, bool from_select)
 	{
 	case FH_PTYM:
 	case FH_TTYM:
-	  if (((fhandler_pty_master *)fh)->need_nl)
+	  if (((fhandler_pty_master *) fh)->need_nl)
 	    {
 	      gotone = s->read_ready = true;
 	      goto out;
@@ -521,7 +521,7 @@ struct pipeinf
 static DWORD WINAPI
 thread_pipe (void *arg)
 {
-  pipeinf *pi = (pipeinf *)arg;
+  pipeinf *pi = (pipeinf *) arg;
   BOOL gotone = FALSE;
 
   for (;;)
@@ -563,18 +563,18 @@ start_thread_pipe (select_record *me, select_stuff *stuff)
   pipeinf *pi = new pipeinf;
   pi->start = &stuff->start;
   pi->stop_thread_pipe = FALSE;
-  pi->thread = new cygthread (thread_pipe, (LPVOID)pi, "select_pipe");
+  pi->thread = new cygthread (thread_pipe, (LPVOID) pi, "select_pipe");
   me->h = *pi->thread;
   if (!me->h)
     return 0;
-  stuff->device_specific[FHDEVN (FH_PIPE)] = (void *)pi;
+  stuff->device_specific[FHDEVN (FH_PIPE)] = (void *) pi;
   return 1;
 }
 
 static void
 pipe_cleanup (select_record *, select_stuff *stuff)
 {
-  pipeinf *pi = (pipeinf *)stuff->device_specific[FHDEVN (FH_PIPE)];
+  pipeinf *pi = (pipeinf *) stuff->device_specific[FHDEVN (FH_PIPE)];
   if (pi && pi->thread)
     {
       pi->stop_thread_pipe = true;
@@ -582,6 +582,16 @@ pipe_cleanup (select_record *, select_stuff *stuff)
       delete pi;
       stuff->device_specific[FHDEVN (FH_PIPE)] = NULL;
     }
+}
+
+int
+fhandler_pipe::ready_for_read (int fd, DWORD howlong)
+{
+  if (!howlong)
+    return this->fhandler_base::ready_for_read (fd, howlong);
+
+  get_guard ();
+  return true;
 }
 
 select_record *
@@ -631,7 +641,7 @@ static int
 peek_console (select_record *me, bool)
 {
   extern const char * get_nonascii_key (INPUT_RECORD& input_rec, char *);
-  fhandler_console *fh = (fhandler_console *)me->fh;
+  fhandler_console *fh = (fhandler_console *) me->fh;
 
   if (!me->read_selected)
     return me->write_ready;
@@ -748,19 +758,19 @@ fhandler_console::select_except (select_record *s)
 select_record *
 fhandler_tty_common::select_read (select_record *s)
 {
-  return ((fhandler_pipe*)this)->fhandler_pipe::select_read (s);
+  return ((fhandler_pipe *) this)->fhandler_pipe::select_read (s);
 }
 
 select_record *
 fhandler_tty_common::select_write (select_record *s)
 {
-  return ((fhandler_pipe *)this)->fhandler_pipe::select_write (s);
+  return ((fhandler_pipe *) this)->fhandler_pipe::select_write (s);
 }
 
 select_record *
 fhandler_tty_common::select_except (select_record *s)
 {
-  return ((fhandler_pipe *)this)->fhandler_pipe::select_except (s);
+  return ((fhandler_pipe *) this)->fhandler_pipe::select_except (s);
 }
 
 static int
@@ -846,7 +856,7 @@ peek_serial (select_record *s, bool)
 {
   COMSTAT st;
 
-  fhandler_serial *fh = (fhandler_serial *)s->fh;
+  fhandler_serial *fh = (fhandler_serial *) s->fh;
 
   if (fh->get_readahead_valid () || fh->overlapped_armed < 0)
     return s->read_ready = true;
@@ -944,7 +954,7 @@ err:
 static DWORD WINAPI
 thread_serial (void *arg)
 {
-  serialinf *si = (serialinf *)arg;
+  serialinf *si = (serialinf *) arg;
   BOOL gotone= FALSE;
 
   for (;;)
@@ -980,16 +990,16 @@ start_thread_serial (select_record *me, select_stuff *stuff)
   serialinf *si = new serialinf;
   si->start = &stuff->start;
   si->stop_thread_serial = FALSE;
-  si->thread = new cygthread (thread_serial, (LPVOID)si, "select_serial");
+  si->thread = new cygthread (thread_serial, (LPVOID) si, "select_serial");
   me->h = *si->thread;
-  stuff->device_specific[FHDEVN (FH_SERIAL)] = (void *)si;
+  stuff->device_specific[FHDEVN (FH_SERIAL)] = (void *) si;
   return 1;
 }
 
 static void
 serial_cleanup (select_record *, select_stuff *stuff)
 {
-  serialinf *si = (serialinf *)stuff->device_specific[FHDEVN (FH_SERIAL)];
+  serialinf *si = (serialinf *) stuff->device_specific[FHDEVN (FH_SERIAL)];
   if (si && si->thread)
     {
       si->stop_thread_serial = true;
@@ -1200,7 +1210,7 @@ static int start_thread_socket (select_record *, select_stuff *);
 static DWORD WINAPI
 thread_socket (void *arg)
 {
-  socketinf *si = (socketinf *)arg;
+  socketinf *si = (socketinf *) arg;
 
   select_printf ("stuff_start %p", &si->start);
   int r = WINSOCK_SELECT (0, &si->readfds, &si->writefds, &si->exceptfds, NULL);
@@ -1243,7 +1253,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 {
   socketinf *si;
 
-  if ((si = (socketinf *)stuff->device_specific[FHDEVN (FH_SOCKET)]))
+  if ((si = (socketinf *) stuff->device_specific[FHDEVN (FH_SOCKET)]))
     {
       me->h = *si->thread;
       return 1;
@@ -1314,7 +1324,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   stuff->device_specific[FHDEVN (FH_SOCKET)] = (void *) si;
   si->start = &stuff->start;
   select_printf ("stuff_start %p", &stuff->start);
-  si->thread = new cygthread (thread_socket, (LPVOID)si, "select_socket");
+  si->thread = new cygthread (thread_socket, (LPVOID) si, "select_socket");
   me->h = *si->thread;
   return 1;
 
@@ -1327,7 +1337,7 @@ err:
 void
 socket_cleanup (select_record *, select_stuff *stuff)
 {
-  socketinf *si = (socketinf *)stuff->device_specific[FHDEVN (FH_SOCKET)];
+  socketinf *si = (socketinf *) stuff->device_specific[FHDEVN (FH_SOCKET)];
   select_printf ("si %p si->thread %p", si, si ? si->thread : NULL);
   if (si && si->thread)
     {

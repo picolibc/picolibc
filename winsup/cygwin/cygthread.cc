@@ -9,14 +9,17 @@ details. */
 #include "winsup.h"
 #include <windows.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "exceptions.h"
 #include "security.h"
 #include "cygthread.h"
 #include "sync.h"
+#include "cygerrno.h"
+#include "sigproc.h"
 
 #undef CloseHandle
 
-static cygthread NO_COPY threads[9];
+static cygthread NO_COPY threads[18];
 #define NTHREADS (sizeof (threads) / sizeof (threads[0]))
 
 DWORD NO_COPY cygthread::main_thread_id;
@@ -37,11 +40,12 @@ cygthread::stub (VOID *arg)
 
   cygthread *info = (cygthread *) arg;
   if (info->arg == cygself)
-    info->ev = info->thread_sync = NULL;
+    info->ev = info->thread_sync = info->stack_ptr = NULL;
   else
     {
       info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
       info->thread_sync = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+      info->stack_ptr = &arg;
     }
   while (1)
     {
@@ -231,22 +235,72 @@ cygthread::exit_thread ()
   ExitThread (0);
 }
 
+/* Forcibly terminate a thread. */
+void
+cygthread::terminate_thread ()
+{
+  if (!is_freerange)
+    SetEvent (*this);
+  (void) TerminateThread (h, 0);
+  (void) WaitForSingleObject (h, INFINITE);
+
+  MEMORY_BASIC_INFORMATION m;
+  memset (&m, 0, sizeof (m));
+  (void) VirtualQuery (stack_ptr, &m, sizeof m);
+
+  if (m.RegionSize)
+    (void) VirtualFree (m.AllocationBase, m.RegionSize, MEM_DECOMMIT);
+
+  if (is_freerange)
+    is_freerange = false;
+  else
+    {
+      CloseHandle (ev);
+      CloseHandle (thread_sync);
+    }
+  CloseHandle (h);
+  thread_sync = ev = h = NULL;
+  __name = NULL;
+  id = 0;
+}
+
 /* Detach the cygthread from the current thread.  Note that the
    theory is that cygthreads are only associated with one thread.
    So, there should be no problems with multiple threads doing waits
    on the one cygthread. */
 void
-cygthread::detach ()
+cygthread::detach (bool wait_for_sig)
 {
   if (avail)
     system_printf ("called detach on available thread %d?", avail);
   else
     {
       DWORD avail = id;
-      DWORD res = WaitForSingleObject (*this, INFINITE);
-      thread_printf ("WFSO returns %d, id %p", res, id);
+      DWORD res;
 
-      if (is_freerange)
+      if (!wait_for_sig)
+	res = WaitForSingleObject (*this, INFINITE);
+      else
+	{
+	  HANDLE w4[2];
+	  w4[0] = signal_arrived;
+	  w4[1] = *this;
+	  res = WaitForMultipleObjects (2, w4, FALSE, INFINITE);
+	  if (res == WAIT_OBJECT_0)
+	    {
+	      terminate_thread ();
+	      set_errno (EINTR);	/* caller should be dealing with return
+					   values. */
+	      avail = 0;
+	    }
+	}
+
+      thread_printf ("%s returns %d, id %p", wait_for_sig ? "WFMO" : "WFSO",
+		     res, id);
+
+      if (!avail)
+	/* already handled */;
+      else if (is_freerange)
 	{
 	  CloseHandle (h);
 	  free (this);

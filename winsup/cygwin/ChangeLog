@@ -1,3 +1,24 @@
+2002-12-10  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.h (cygthread::stack_ptr): New element.
+	(cygthread::detach): Accept a "wait_for_signal" argument.
+	(cygthread::terminate_thread): New function.
+	* cygthread.cc (cygthread::stub): Set stack pointer argument.
+	(cygthread::terminate_thread): New function.  Forcibly terminate
+	thread.
+	(cygthread::detach): Optionally wait for signals and kill thread when
+	signal arrives.
+	* exceptions.cc (signal_exit): Set signal_arrived prior to exiting to
+	wake up anything blocking on signals.
+	* fhandler.h (fhandler_base::set_r_no_interrupt): Change to accept bool
+	argument.
+	(fhandler_pipe::ready_for_read): Declare.
+	* pipe.cc (pipeargs): New structure.
+	(read_pipe): New thread stub wrapper for normal pipe read.
+	(fhandler_pipe::read): Modify to call reader in a cygthread,
+	terminating on signal, as appropriate.
+	* select.cc (fhandler_pipe::ready_for_read): Define new function.
+
 2002-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (free_protoent_ptr): Add missing free() for base structure.
@@ -6,16 +27,17 @@
 
 2002-12-10 Craig McGeachie <slapdau@yahoo.com.au>
 
-	* netdb.cc (parse_alias_list, parse_services_line)
-	(parse_protocol_line): Change strtok calls to strtok_r.
+	* netdb.cc (parse_alias_list): Change strtok calls to strtok_r.
+	(parse_services_line): Ditto.
+	(parse_protocol_line): Ditto.
 
 2002-12-10  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* pwdgrp.h (pwdgrp_check::pwdgrp_state): Replace by
 	pwdgrp_check::isinitializing ().
 	(pwdgrp_check::isinitializing): Create.
-	* passwd.cc (grab_int): Change type to unsigned, use strtoul and
-	set the pointer content to 0 if the field is invalid.
+	* passwd.cc (grab_int): Change type to unsigned, use strtoul and set
+	the pointer content to 0 if the field is invalid.
 	(parse_pwd): Move validity test after getting pw_gid.
 	(read_etc_passwd): Replace "passwd_state <= " by
 	passwd_state::isinitializing ().
@@ -23,7 +45,7 @@
 	(internal_getpwnam): Ditto.
 	(getpwent): Ditto.
 	(getpass): Ditto.
-	* grp.cc (parse_grp): Use strtoul for gr_gid and verify the validity.   
+	* grp.cc (parse_grp): Use strtoul for gr_gid and verify the validity.
 	(read_etc_group): Replace "group_state <= " by
 	group_state::isinitializing ().
 	(internal_getgrgid): Ditto.

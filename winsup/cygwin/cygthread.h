@@ -13,6 +13,7 @@ class cygthread
   HANDLE h;
   HANDLE ev;
   HANDLE thread_sync;
+  void *stack_ptr;
   const char *__name;
   LPTHREAD_START_ROUTINE func;
   VOID *arg;
@@ -26,12 +27,13 @@ class cygthread
   cygthread (LPTHREAD_START_ROUTINE, LPVOID, const char *);
   cygthread () {};
   static void init ();
-  void detach ();
+  void detach (bool = false);
   operator HANDLE ();
   static bool is ();
   void * operator new (size_t);
   static cygthread *freerange ();
   void exit_thread ();
+  void terminate_thread ();
   static void terminate ();
   bool SetThreadPriority (int nPriority) {return ::SetThreadPriority (h, nPriority);}
   void zap_h ()

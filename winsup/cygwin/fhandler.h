@@ -219,7 +219,7 @@ class fhandler_base
   int get_default_fmode (int flags);
 
   bool get_r_no_interrupt () { return FHISSETF (NOEINTR); }
-  void set_r_no_interrupt (int b) { FHCONDSETF (b, NOEINTR); }
+  void set_r_no_interrupt (bool b) { FHCONDSETF (b, NOEINTR); }
 
   bool get_close_on_exec () { return FHISSETF (CLOEXEC); }
   int set_close_on_exec_flag (int b) { return FHCONDSETF (b, CLOEXEC); }
@@ -473,6 +473,7 @@ class fhandler_pipe: public fhandler_base
   void set_eof () {broken_pipe = true;}
   friend int make_pipe (int fildes[2], unsigned int psize, int mode);
   HANDLE get_guard () const {return guard;}
+  int ready_for_read (int fd, DWORD howlong);
 };
 
 class fhandler_dev_raw: public fhandler_base
