@@ -1,3 +1,8 @@
+2003-06-03  Michael Snyder  <msnyder@redhat.com>
+	and Bernd Schmidt   <bernds@redhat.com>
+	and Alexandre Oliva <aoliva@redhat.com>
+	* h8300.h: Add support for h8300sx instruction set.
+
 2003-05-23  Jason Eckhardt  <jle@rice.edu>
 
 	* i860.h (expand_type): Add XP_ONLY.
