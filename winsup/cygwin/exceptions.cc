@@ -1113,8 +1113,8 @@ void unused_sig_wrapper ()
 {
 /* Signal cleanup stuff.  Cleans up stack (too bad that we didn't
    prototype signal handlers as __stdcall), calls _set_process_mask
-   to restore any mask, restores any potentially clobbered registered
-   and returns to orignal caller. */
+   to restore any mask, restores any potentially clobbered registers
+   and returns to original caller. */
 __asm__ volatile ("
 	.text
 
@@ -1167,8 +1167,10 @@ _sigdelayed0:
 	pushl	$_sigreturn
 
 	call	_reset_signal_arrived@0
-	pushl	%5
-	movl	$0,%0
+	pushl	%5			# signal number
+	movl	$0,%0			# zero the signal number as a
+					# flag to the signal handler thread
+					# that it is ok to set up sigsave
 
 	pushl	%8
 	call	_set_process_mask@4
