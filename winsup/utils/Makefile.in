@@ -41,7 +41,7 @@ libintl:=${shell $(CC) -B$(bupdir2)/intl/ --print-file-name=libintl.a}
 build_dumper:=${shell test -r $(libbfd) && test -r ${libintl} &&  echo 1}
 
 libz:=${shell $(CC) -mno-cygwin --print-file-name=libz.a}
-zlib_h:=-include ${patsubst %/lib/libz.a,%/include/libz.h,$(libz)}
+zlib_h:=-include ${patsubst %/lib/libz.a,%/include/zlib.h,$(libz)}
 zconf_h:=-include ${patsubst %/lib/libz.a,%/include/zconf.h,$(libz)}
 ifeq "${dir $(libz)}" "./"
 zlib_h:=
