@@ -5,8 +5,10 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 SUBDIRS = machine \
+	cmath \
 	.
 SUBLIBS = \
+	cmath/libcmath.la \
 	$(LINUX_MACH_LIB)
 
 LIB_SOURCES = \

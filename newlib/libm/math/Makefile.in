@@ -112,6 +112,7 @@ src = k_standard.c k_rem_pio2.c \
 	w_j1.c w_jn.c w_lgamma.c wr_lgamma.c \
 	w_log.c w_log10.c w_pow.c w_remainder.c \
 	w_scalb.c w_sinh.c w_sqrt.c \
+	w_sincos.c \
 	w_cabs.c w_drem.c \
 	s_asinh.c s_atan.c s_ceil.c \
 	s_cos.c s_erf.c s_fabs.c s_floor.c \
@@ -136,6 +137,7 @@ fsrc = kf_rem_pio2.c \
 	wf_j1.c wf_jn.c wf_lgamma.c wrf_lgamma.c \
 	wf_log.c wf_log10.c wf_pow.c wf_remainder.c \
 	wf_scalb.c wf_sinh.c wf_sqrt.c \
+	wf_sincos.c \
 	wf_cabs.c wf_drem.c \
 	sf_asinh.c sf_atan.c sf_ceil.c \
 	sf_cos.c sf_erf.c sf_fabs.c sf_floor.c \
@@ -200,13 +202,13 @@ lib_a_LIBADD =
 @USE_LIBTOOL_FALSE@wr_lgamma.$(OBJEXT) w_log.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@w_log10.$(OBJEXT) w_pow.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@w_remainder.$(OBJEXT) w_scalb.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@w_sinh.$(OBJEXT) w_sqrt.$(OBJEXT) w_cabs.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@w_drem.$(OBJEXT) s_asinh.$(OBJEXT) s_atan.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_ceil.$(OBJEXT) s_cos.$(OBJEXT) s_erf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_fabs.$(OBJEXT) s_floor.$(OBJEXT) s_frexp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_isnan.$(OBJEXT) s_ldexp.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_signif.$(OBJEXT) s_sin.$(OBJEXT) s_tan.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@s_tanh.$(OBJEXT) s_isinf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_sinh.$(OBJEXT) w_sqrt.$(OBJEXT) w_sincos.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_cabs.$(OBJEXT) w_drem.$(OBJEXT) s_asinh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_atan.$(OBJEXT) s_ceil.$(OBJEXT) s_cos.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_erf.$(OBJEXT) s_fabs.$(OBJEXT) s_floor.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_frexp.$(OBJEXT) s_isnan.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_ldexp.$(OBJEXT) s_signif.$(OBJEXT) s_sin.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_tan.$(OBJEXT) s_tanh.$(OBJEXT) s_isinf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@s_infconst.$(OBJEXT) w_exp2.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@w_tgamma.$(OBJEXT) kf_rem_pio2.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@kf_cos.$(OBJEXT) kf_sin.$(OBJEXT) kf_tan.$(OBJEXT) \
@@ -231,13 +233,14 @@ lib_a_LIBADD =
 @USE_LIBTOOL_FALSE@wf_log10.$(OBJEXT) wf_pow.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@wf_remainder.$(OBJEXT) wf_scalb.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@wf_sinh.$(OBJEXT) wf_sqrt.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wf_cabs.$(OBJEXT) wf_drem.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_asinh.$(OBJEXT) sf_atan.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_ceil.$(OBJEXT) sf_cos.$(OBJEXT) sf_erf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_fabs.$(OBJEXT) sf_floor.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_frexp.$(OBJEXT) sf_isnan.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_ldexp.$(OBJEXT) sf_signif.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sf_sin.$(OBJEXT) sf_tan.$(OBJEXT) sf_tanh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_sincos.$(OBJEXT) wf_cabs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_drem.$(OBJEXT) sf_asinh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_atan.$(OBJEXT) sf_ceil.$(OBJEXT) sf_cos.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_erf.$(OBJEXT) sf_fabs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_floor.$(OBJEXT) sf_frexp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_isnan.$(OBJEXT) sf_ldexp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_signif.$(OBJEXT) sf_sin.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_tan.$(OBJEXT) sf_tanh.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sf_isinf.$(OBJEXT) wf_exp2.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@wf_tgamma.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
@@ -254,10 +257,10 @@ libmath_la_LIBADD =
 @USE_LIBTOOL_TRUE@wr_gamma.lo w_hypot.lo w_j0.lo w_j1.lo w_jn.lo \
 @USE_LIBTOOL_TRUE@w_lgamma.lo wr_lgamma.lo w_log.lo w_log10.lo w_pow.lo \
 @USE_LIBTOOL_TRUE@w_remainder.lo w_scalb.lo w_sinh.lo w_sqrt.lo \
-@USE_LIBTOOL_TRUE@w_cabs.lo w_drem.lo s_asinh.lo s_atan.lo s_ceil.lo \
-@USE_LIBTOOL_TRUE@s_cos.lo s_erf.lo s_fabs.lo s_floor.lo s_frexp.lo \
-@USE_LIBTOOL_TRUE@s_isnan.lo s_ldexp.lo s_signif.lo s_sin.lo s_tan.lo \
-@USE_LIBTOOL_TRUE@s_tanh.lo s_isinf.lo s_infconst.lo w_exp2.lo \
+@USE_LIBTOOL_TRUE@w_sincos.lo w_cabs.lo w_drem.lo s_asinh.lo s_atan.lo \
+@USE_LIBTOOL_TRUE@s_ceil.lo s_cos.lo s_erf.lo s_fabs.lo s_floor.lo \
+@USE_LIBTOOL_TRUE@s_frexp.lo s_isnan.lo s_ldexp.lo s_signif.lo s_sin.lo \
+@USE_LIBTOOL_TRUE@s_tan.lo s_tanh.lo s_isinf.lo s_infconst.lo w_exp2.lo \
 @USE_LIBTOOL_TRUE@w_tgamma.lo kf_rem_pio2.lo kf_cos.lo kf_sin.lo \
 @USE_LIBTOOL_TRUE@kf_tan.lo ef_acos.lo ef_acosh.lo ef_asin.lo \
 @USE_LIBTOOL_TRUE@ef_atan2.lo ef_atanh.lo ef_cosh.lo ef_exp.lo \
@@ -270,11 +273,11 @@ libmath_la_LIBADD =
 @USE_LIBTOOL_TRUE@wf_hypot.lo wf_j0.lo wf_j1.lo wf_jn.lo wf_lgamma.lo \
 @USE_LIBTOOL_TRUE@wrf_lgamma.lo wf_log.lo wf_log10.lo wf_pow.lo \
 @USE_LIBTOOL_TRUE@wf_remainder.lo wf_scalb.lo wf_sinh.lo wf_sqrt.lo \
-@USE_LIBTOOL_TRUE@wf_cabs.lo wf_drem.lo sf_asinh.lo sf_atan.lo \
-@USE_LIBTOOL_TRUE@sf_ceil.lo sf_cos.lo sf_erf.lo sf_fabs.lo sf_floor.lo \
-@USE_LIBTOOL_TRUE@sf_frexp.lo sf_isnan.lo sf_ldexp.lo sf_signif.lo \
-@USE_LIBTOOL_TRUE@sf_sin.lo sf_tan.lo sf_tanh.lo sf_isinf.lo wf_exp2.lo \
-@USE_LIBTOOL_TRUE@wf_tgamma.lo
+@USE_LIBTOOL_TRUE@wf_sincos.lo wf_cabs.lo wf_drem.lo sf_asinh.lo \
+@USE_LIBTOOL_TRUE@sf_atan.lo sf_ceil.lo sf_cos.lo sf_erf.lo sf_fabs.lo \
+@USE_LIBTOOL_TRUE@sf_floor.lo sf_frexp.lo sf_isnan.lo sf_ldexp.lo \
+@USE_LIBTOOL_TRUE@sf_signif.lo sf_sin.lo sf_tan.lo sf_tanh.lo \
+@USE_LIBTOOL_TRUE@sf_isinf.lo wf_exp2.lo wf_tgamma.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -18,6 +18,7 @@ src = 	k_standard.c k_rem_pio2.c \
 	w_j1.c w_jn.c w_lgamma.c wr_lgamma.c \
 	w_log.c w_log10.c w_pow.c w_remainder.c \
 	w_scalb.c w_sinh.c w_sqrt.c \
+	w_sincos.c \
 	w_cabs.c w_drem.c \
 	s_asinh.c s_atan.c s_ceil.c \
 	s_cos.c s_erf.c s_fabs.c s_floor.c \
@@ -41,6 +42,7 @@ fsrc =	kf_rem_pio2.c \
 	wf_j1.c wf_jn.c wf_lgamma.c wrf_lgamma.c \
 	wf_log.c wf_log10.c wf_pow.c wf_remainder.c \
 	wf_scalb.c wf_sinh.c wf_sqrt.c \
+	wf_sincos.c \
 	wf_cabs.c wf_drem.c \
 	sf_asinh.c sf_atan.c sf_ceil.c \
 	sf_cos.c sf_erf.c sf_fabs.c sf_floor.c \

@@ -13,6 +13,7 @@ src =	s_acos.c s_frexp.c s_mathcnst.c \
 	s_atan2.c s_fabs.c s_log.c s_tanh.c \
 	s_log10.c s_sin.c \
 	s_floor.c s_sine.c \
+	s_sincos.c \
 	s_atangent.c s_logarithm.c \
 	s_sineh.c \
 	s_ceil.c s_isnan.c s_isinf.c \
@@ -32,6 +33,7 @@ fsrc =	sf_ceil.c \
 	sf_atan2.c sf_fabs.c sf_tanh.c \
 	sf_atan.c sf_log10.c sf_sin.c\
 	sf_floor.c sf_sine.c \
+	sf_sincos.c \
 	sf_atangent.c sf_logarithm.c sf_sineh.c \
 	sf_log.c sf_sineh.c \
 	sf_isnan.c sf_isinf.c \

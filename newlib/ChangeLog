@@ -1,3 +1,23 @@
+2002-08-16  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/sys/linux/cmath: New directory.
+	* libc/sys/linux/include/cmathcalls.h: New file.
+	* libc/sys/linux/include/complex.h: New file.
+	* libc/sys/linux/machine/i386/huge_val.h: New file
+	* libm/math/w_sincos.c: New file
+	* libm/math/wf_sincos.c: New file
+	* libm/mathfp/s_sincos.c: New file
+	* libm/mathfp/sf_sincos.c: New file
+	* Makefile.am (LIBC_OBJECTLISTS): Add cmath/objectlist.awk.in.
+	* libc/include/math.h: Add sincos and sincosf declarations.
+	* libc/sys/linux/Makefile.am (SUBDIRS): Add cmath.
+	(SUBLIBS): Likewise.
+	* libc/sys/linux/configure.in (AC_OUTPUT): Add cmath.
+	* libm/math/Makefile.am (src): Add w_sincos.c.
+	(fsrc): Add wf_sincos.c.
+	* libm/mathfp/Makefile.am (src): Add s_sincos.c
+	(fsrc): Add sf_sincos.c.
+
 2002-08-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/machine/i386/crt0.c (__bss_start,_end):

@@ -146,6 +146,7 @@ extern double fdim _PARAMS((double, double));
 extern double fmax _PARAMS((double, double));
 extern double fmin _PARAMS((double, double));
 extern double fma _PARAMS((double, double, double));
+extern void sincos _PARAMS((double, double *, double *));
 
 #ifndef __math_68881
 extern double log1p _PARAMS((double));
@@ -247,6 +248,7 @@ extern float rintf _PARAMS((float));
 extern float scalbnf _PARAMS((float, int));
 extern float log1pf _PARAMS((float));
 extern float expm1f _PARAMS((float));
+extern void sincosf _PARAMS((float, float *, float *));
 
 #ifndef _REENT_ONLY
 extern float acoshf _PARAMS((float));

@@ -114,6 +114,7 @@ LIBC_OBJECTLISTS = \
 	libc/reent/objectlist.awk.in \
 	libc/errno/objectlist.awk.in \
 	libc/stdio/objectlist.awk.in \
+	libc/sys/linux/cmath/objectlist.awk.in \
 	$(MACHINE_OBJECTLIST) \
 	$(SYS_OBJECTLIST) \
 	$(SYS_MACH_OBJECTLIST)
