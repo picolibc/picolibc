@@ -188,6 +188,15 @@ struct cwdstuff
   void set (const char *win32_cwd, const char *posix_cwd = NULL);
 };
 
+#ifdef DEBUGGING
+struct cygheap_debug
+{
+  handle_list starth;
+  handle_list *endh;
+  handle_list freeh[500];
+};
+#endif
+
 struct init_cygheap
 {
   _cmalloc_entry *chain;
@@ -207,6 +216,9 @@ struct init_cygheap
   char *cygwin_regname;
   cwdstuff cwd;
   dtable fdtab;
+#ifdef DEBUGGING
+  cygheap_debug debug;
+#endif
 
   bool etc_changed ();
 };

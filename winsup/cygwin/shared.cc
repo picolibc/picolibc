@@ -143,8 +143,10 @@ memory_init ()
       cygheap->user.set_name (user_name);
     }
 
+  debug_init ();
+
   cygheap->shared_h = shared_h;
-  ProtectHandle (cygheap->shared_h);
+  ProtectHandleINH (cygheap->shared_h);
 
   heap_init ();
   mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
@@ -152,7 +154,7 @@ memory_init ()
 					    sizeof (mount_info), 0);
   debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
 		mount_table_address);
-  ProtectHandle (cygwin_mount_h);
+  ProtectHandleINH (cygwin_mount_h);
   debug_printf ("mount table version %x at %p", mount_table->version, mount_table);
 
   /* Initialize the Cygwin per-user mount table, if necessary */

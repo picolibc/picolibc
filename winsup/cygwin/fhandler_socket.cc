@@ -155,12 +155,17 @@ fhandler_socket::create_secret_event (int* secret)
   __small_sprintf (buf, SECRET_EVENT_NAME, sin.sin_port,
 		   secret_ptr [0], secret_ptr [1],
 		   secret_ptr [2], secret_ptr [3]);
-  secret_event = CreateEvent (get_inheritance(true), FALSE, FALSE, buf);
+  LPSECURITY_ATTRIBUTES sec = get_inheritance (true);
+  secret_event = CreateEvent (sec, FALSE, FALSE, buf);
   if (!secret_event && GetLastError () == ERROR_ALREADY_EXISTS)
     secret_event = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
 
-  if (secret_event)
+  if (!secret_event)
+    /* nothing to do */;
+  else if (sec == &sec_all_nih || sec == &sec_none_nih)
     ProtectHandle (secret_event);
+  else
+    ProtectHandleINH (secret_event);
 
   return secret_event;
 }

@@ -357,17 +357,17 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   else
     chtype = PROC_EXEC;
 
-  HANDLE spr;
+  HANDLE subproc_ready;
   if (chtype != PROC_EXEC)
-    spr = NULL;
+    subproc_ready = NULL;
   else
     {
-      spr = CreateEvent (&sec_all, TRUE, FALSE, NULL);
-      ProtectHandle (spr);
+      subproc_ready = CreateEvent (&sec_all, TRUE, FALSE, NULL);
+      ProtectHandleINH (subproc_ready);
     }
 
   init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1,
-		   spr);
+		   subproc_ready);
   if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &ciresrv.parent, 0, 1,
 			DUPLICATE_SAME_ACCESS))
      {
@@ -689,8 +689,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       __seterrno ();
       syscall_printf ("CreateProcess failed, %E");
-      if (spr)
-	ForceCloseHandle (spr);
+      if (subproc_ready)
+	ForceCloseHandle (subproc_ready);
       cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);
       return -1;
     }
@@ -768,7 +768,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (mode == _P_OVERLAY)
     {
       int nwait = 3;
-      HANDLE waitbuf[3] = {pi.hProcess, signal_arrived, spr};
+      HANDLE waitbuf[3] = {pi.hProcess, signal_arrived, subproc_ready};
       for (int i = 0; i < 100; i++)
 	{
 	  switch (WaitForMultipleObjects (nwait, waitbuf, FALSE, INFINITE))
@@ -811,7 +811,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	  break;
 	}
 
-      ForceCloseHandle (spr);
+      ForceCloseHandle (subproc_ready);
 
       sigproc_printf ("res = %x", res);
 

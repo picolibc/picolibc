@@ -1022,7 +1022,7 @@ fstat64 (int fd, struct __stat64 *buf)
     res = -1;
   else
     {
-      path_conv pc (cfd->get_win32_name ());
+      path_conv pc (cfd->get_win32_name (), PC_SYM_NOFOLLOW);
       memset (buf, 0, sizeof (struct __stat64));
       res = cfd->fstat (buf, &pc);
       if (!res)
