@@ -9,7 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #define MTINFO_MAGIC		0x179b2af0
-#define MTINFO_VERSION		1
+#define MTINFO_VERSION		2
 
 /* Maximum number of supported partitions per drive. */
 #define MAX_PARTITION_NUM	64
@@ -33,7 +33,8 @@ enum dirty_state
 {
   clean,
   has_read,
-  has_written
+  has_written,
+  async_write_pending
 };
 
 enum lock_state
@@ -67,9 +68,11 @@ class mtinfo_drive
   lock_state lock;
   TAPE_GET_DRIVE_PARAMETERS _dp;
   TAPE_GET_MEDIA_PARAMETERS _mp;
+  OVERLAPPED ov;
   struct status_flags
   {
     unsigned buffer_writes : 1;
+    unsigned async_writes  : 1;
     unsigned two_fm        : 1;
     unsigned fast_eom      : 1;
     unsigned auto_lock     : 1;
@@ -101,6 +104,7 @@ class mtinfo_drive
   int set_blocksize (HANDLE mt, long count);
   int get_status (HANDLE mt, struct mtget *get);
   int set_options (HANDLE mt, long options);
+  int async_wait (HANDLE mt, DWORD *bytes_written);
 
 public:
   void initialize (int num, bool first_time);
@@ -108,12 +112,13 @@ public:
   int get_mp (HANDLE mt);
   int open (HANDLE mt);
   int close (HANDLE mt, bool rewind);
-  int read (HANDLE mt, void *ptr, size_t &ulen);
-  int write (HANDLE mt, const void *ptr, size_t &len);
+  int read (HANDLE mt, HANDLE mt_evt, void *ptr, size_t &ulen);
+  int write (HANDLE mt, HANDLE mt_evt, const void *ptr, size_t &len);
   int ioctl (HANDLE mt, unsigned int cmd, void *buf);
   int set_pos (HANDLE mt, int mode, long count, bool sfm_func);
 
   IMPLEMENT_STATUS_FLAG (bool, buffer_writes)
+  IMPLEMENT_STATUS_FLAG (bool, async_writes)
   IMPLEMENT_STATUS_FLAG (bool, two_fm)
   IMPLEMENT_STATUS_FLAG (bool, fast_eom)
   IMPLEMENT_STATUS_FLAG (bool, auto_lock)

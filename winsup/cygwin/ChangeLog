@@ -1,5 +1,38 @@
 2004-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* errno.cc (errmap): Handle ERROR_IO_PENDING.
+	* fhandler.cc (fhandler_base::open): Make tape I/O asynchronous.
+	* fhandler.h (class fhandler_dev_tape): Add mt_evt member.
+	* fhandler_tape.cc (mtinfo_drive::initialize): Initialize async_writes.
+	(mtinfo_drive::close): Handle async writes.
+	(mtinfo_drive::read): Add mt_evt parameter.  Use overlapped I/O.
+	(mtinfo_drive::async_wait): New function.
+	(mtinfo_drive::write): Add mt_evt parameter.  Use overlapped I/O.
+	Handle async writes.
+	(mtinfo_drive::_set_pos): Handle async writes.
+	(mtinfo_drive::set_partition): Ditto.
+	(mtinfo_drive::prepare): Ditto.
+	(mtinfo_drive::get_status): Drop useless "else".  Handle async_writes
+	flag.
+	(mtinfo_drive::set_options): Handle async_writes flags.
+	(fhandler_dev_tape::close): Close mt_evt handle.
+	(fhandler_dev_tape::raw_read): Create mt_evt handle and use in call
+	to mtinfo_drive::read.
+	(fhandler_dev_tape::raw_write): Create mt_evt handle and use in call
+	to mtinfo_drive::write.
+	* mtinfo.h (MTINFO_VERSION): Bump.
+	(enum dirty_state): Add async_write_pending state.
+	(class mtinfo_drive): Add OVERLAPPED struct "ov".  Add async_writes
+	flag.
+	(mtinfo_drive::async_wait): Add declaration.
+	(mtinfo_drive::read): Add mt_evt parameter.
+	(mtinfo_drive::write): Ditto.
+
+	* registry.cc (load_registry_hive): Call enable_restore_privilege
+	instead of set_process_privilege.
+
+2004-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_tape.cc (mtinfo_drive::_set_pos): Take additional dont_wait
 	parameter.  Use in call to SetTapePosition.
 	(mtinfo_drive::set_pos): Accomodate _set_pos calls to above change.

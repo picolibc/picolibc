@@ -610,7 +610,8 @@ fhandler_base::open (int flags, mode_t mode)
 	/* Allow reliable lseek on disk devices. */
 	if (get_major () == DEV_FLOPPY_MAJOR)
 	  access |= GENERIC_READ;
-	else if (get_major () != DEV_SERIAL_MAJOR)
+	else if (get_major () != DEV_SERIAL_MAJOR
+		 && get_major () != DEV_TAPE_MAJOR)
 	  {
 	    create_options |= FILE_SYNCHRONOUS_IO_NONALERT;
 	    access |= SYNCHRONIZE;

@@ -81,6 +81,7 @@ mtinfo_drive::initialize (int num, bool first_time)
   if (first_time)
     {
       buffer_writes (true);
+      async_writes (false);
       two_fm (false);
       fast_eom (false);
       auto_lock (false);
@@ -135,16 +136,22 @@ mtinfo_drive::close (HANDLE mt, bool rewind)
   lasterr = 0;
   if (GetTapeStatus (mt) == ERROR_NO_MEDIA_IN_DRIVE)
     dirty = clean;
-  if (dirty == has_written)
+  if (dirty >= has_written)
     {
-      /* if last operation was writing, write a filemark */
-      debug_printf ("writing filemark");
-      write_marks (mt, TAPE_FILEMARKS, two_fm () ? 2 : 1);
-      if (two_fm () && !lasterr && !rewind) /* Backspace over 2nd filemark. */
+      /* If an async write is still pending, wait for completion. */
+      if (dirty == async_write_pending)
+	lasterr = async_wait (mt, NULL);
+      if (!lasterr)
         {
-	  set_pos (mt, TAPE_SPACE_FILEMARKS, -1, false);
-	  if (!lasterr)
-	    part (partition)->fblock = 0; /* That's obvious, isn't it? */
+	  /* if last operation was writing, write a filemark */
+	  debug_printf ("writing filemark");
+	  write_marks (mt, TAPE_FILEMARKS, two_fm () ? 2 : 1);
+	  if (two_fm () && !lasterr && !rewind) /* Backspace over 2nd fmark. */
+	    {
+	      set_pos (mt, TAPE_SPACE_FILEMARKS, -1, false);
+	      if (!lasterr)
+		part (partition)->fblock = 0; /* That's obvious, isn't it? */
+	    }
 	}
     }
   else if (dirty == has_read && !rewind)
@@ -179,7 +186,7 @@ mtinfo_drive::close (HANDLE mt, bool rewind)
 }
 
 int
-mtinfo_drive::read (HANDLE mt, void *ptr, size_t &ulen)
+mtinfo_drive::read (HANDLE mt, HANDLE mt_evt, void *ptr, size_t &ulen)
 {
   BOOL ret;
   DWORD bytes_read = 0;
@@ -191,6 +198,9 @@ mtinfo_drive::read (HANDLE mt, void *ptr, size_t &ulen)
       ulen = 0;
       goto out;
     }
+  /* If an async write is still pending, wait for completion. */
+  if (dirty == async_write_pending)
+    lasterr = async_wait (mt, NULL);
   dirty = clean;
   if (part (partition)->emark == eof_hit)
     {
@@ -225,8 +235,12 @@ mtinfo_drive::read (HANDLE mt, void *ptr, size_t &ulen)
   part (partition)->smark = false;
   if (auto_lock () && lock < auto_locked)
     prepare (mt, TAPE_LOCK, true);
-  ret = ReadFile (mt, ptr, ulen, &bytes_read, 0);
+  ov.Offset = ov.OffsetHigh = 0;
+  ov.hEvent = mt_evt;
+  ret = ReadFile (mt, ptr, ulen, &bytes_read, &ov);
   lasterr = ret ? 0 : GetLastError ();
+  if (lasterr == ERROR_IO_PENDING)
+    lasterr = async_wait (mt, &bytes_read);
   ulen = (size_t) bytes_read;
   if (bytes_read > 0)
     {
@@ -273,10 +287,22 @@ out:
 }
 
 int
-mtinfo_drive::write (HANDLE mt, const void *ptr, size_t &len)
+mtinfo_drive::async_wait (HANDLE mt, DWORD *bytes_written)
+{
+  DWORD written;
+
+  bool ret = GetOverlappedResult (mt, &ov, &written, TRUE);
+  if (bytes_written)
+    *bytes_written = written;
+  return ret ? 0 : GetLastError ();
+}
+
+int
+mtinfo_drive::write (HANDLE mt, HANDLE mt_evt, const void *ptr, size_t &len)
 {
   BOOL ret;
   DWORD bytes_written = 0;
+  int async_err = 0;
 
   if (GetTapeStatus (mt) == ERROR_NO_MEDIA_IN_DRIVE)
     return lasterr = ERROR_NO_MEDIA_IN_DRIVE;
@@ -285,12 +311,24 @@ mtinfo_drive::write (HANDLE mt, const void *ptr, size_t &len)
       len = 0;
       return error ("write");
     }
+  if (dirty == async_write_pending)
+    async_err = async_wait (mt, &bytes_written);
   dirty = clean;
   part (partition)->smark = false;
   if (auto_lock () && lock < auto_locked)
     prepare (mt, TAPE_LOCK, true);
-  ret = WriteFile (mt, ptr, len, &bytes_written, 0);
+  ov.Offset = ov.OffsetHigh = 0;
+  ov.hEvent = mt_evt;
+  ret = WriteFile (mt, ptr, len, &bytes_written, &ov);
   lasterr = ret ? 0: GetLastError ();
+  if (lasterr == ERROR_IO_PENDING)
+    {
+      if (async_writes () && mp ()->BlockSize == 0)
+        dirty = async_write_pending;
+      else
+	/* Wait for completion if a non-async write. */
+	lasterr = async_wait (mt, &bytes_written);
+    }
   len = (size_t) bytes_written;
   if (bytes_written > 0)
     {
@@ -301,6 +339,8 @@ mtinfo_drive::write (HANDLE mt, const void *ptr, size_t &len)
       if (part (partition)->fblock >= 0)
 	part (partition)->fblock += blocks_written;
     }
+  if (!lasterr && async_err)
+    lasterr = async_err;
   if (lasterr == ERROR_EOM_OVERFLOW)
     part (partition)->emark = eom;
   else if (lasterr == ERROR_END_OF_MEDIA)
@@ -310,6 +350,8 @@ mtinfo_drive::write (HANDLE mt, const void *ptr, size_t &len)
       part (partition)->emark = no_eof;
       if (!lasterr)
         dirty = has_written;
+      else if (lasterr == ERROR_IO_PENDING)
+        dirty = async_write_pending;
     }
   return error ("write");
 }
@@ -344,9 +386,12 @@ int
 mtinfo_drive::_set_pos (HANDLE mt, int mode, long count, int partition,
 			BOOL dont_wait)
 {
+  /* If an async write is still pending, wait for completion. */
+  if (dirty == async_write_pending)
+    lasterr = async_wait (mt, NULL);
+  dirty = clean;
   TAPE_FUNC (SetTapePosition (mt, mode, partition, count, count < 0 ? -1 : 0,
 			      dont_wait));
-  dirty = clean;
   return lasterr;
 }
 
@@ -575,6 +620,12 @@ mtinfo_drive::set_partition (HANDLE mt, long count)
 int
 mtinfo_drive::write_marks (HANDLE mt, int marktype, DWORD count)
 {
+  /* If an async write is still pending, wait for completion. */
+  if (dirty == async_write_pending)
+    {
+      lasterr = async_wait (mt, NULL);
+      dirty = has_written;
+    }
   if (marktype != TAPE_SETMARKS)
     dirty = clean;
   if (marktype == TAPE_FILEMARKS
@@ -639,6 +690,9 @@ mtinfo_drive::prepare (HANDLE mt, int action, bool is_auto)
 {
   BOOL dont_wait = FALSE;
 
+  /* If an async write is still pending, wait for completion. */
+  if (dirty == async_write_pending)
+    lasterr = async_wait (mt, NULL);
   dirty = clean;
   if (action == TAPE_UNLOAD || action == TAPE_LOAD || action == TAPE_TENSION)
     dont_wait = nowait () ? TRUE : FALSE;
@@ -781,7 +835,7 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
   if (buffer_writes ())
     get->mt_gstat |= GMT_IM_REP_EN (-1);	/* TODO: Async writes */
 
-  else if (tstat == ERROR_DEVICE_REQUIRES_CLEANING)
+  if (tstat == ERROR_DEVICE_REQUIRES_CLEANING)
     get->mt_gstat |= GMT_CLN (-1);
 
   /* Cygwin specials: */
@@ -803,6 +857,8 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
     get->mt_gstat |= GMT_SYSV (-1);
   if (nowait ())
     get->mt_gstat |= GMT_NOWAIT (-1);
+  if (async_writes ())
+    get->mt_gstat |= GMT_ASYNC (-1);
 
   get->mt_erreg = 0;				/* FIXME: No softerr counting */
 
@@ -842,6 +898,7 @@ mtinfo_drive::set_options (HANDLE mt, long options)
         break;
       case MT_ST_BOOLEANS:
 	buffer_writes (!!(options & MT_ST_BUFFER_WRITES));
+	async_writes (!!(options & MT_ST_ASYNC_WRITES));
 	two_fm (!!(options & MT_ST_TWO_FM));
 	fast_eom (!!(options & MT_ST_FAST_MTEOM));
 	auto_lock (!!(options & MT_ST_AUTO_LOCK));
@@ -862,6 +919,8 @@ mtinfo_drive::set_options (HANDLE mt, long options)
         set = (what == MT_ST_SETBOOLEANS);
 	if (options & MT_ST_BUFFER_WRITES)
 	  buffer_writes (set);
+	if (options & MT_ST_ASYNC_WRITES)
+	  async_writes (set);
 	if (options & MT_ST_TWO_FM)
 	  two_fm (set);
 	if (options & MT_ST_FAST_MTEOM)
@@ -1197,6 +1256,8 @@ fhandler_dev_tape::close (void)
 
   lock (-1);
   ret = mt->drive (driveno ())->close (get_handle (), is_rewind_device ());
+  if (mt_evt)
+    CloseHandle (mt_evt);
   if (ret)
     __seterrno_from_win_error (ret);
   cret = fhandler_dev_raw::close ();
@@ -1245,12 +1306,15 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
     }
   if (len > 0)
     {
+      if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
+	debug_printf ("Creating event failed: %E");
       size_t block_fit = !block_size ? len : rounddown(len,  block_size);
       if (block_fit)
         {
 	  debug_printf ("read %d bytes from tape (rest %d)",
 			block_fit, len - block_fit);
-	  ret = mt->drive (driveno ())->read (get_handle (), buf, block_fit);
+	  ret = mt->drive (driveno ())->read (get_handle (), mt_evt, buf,
+					      block_fit);
 	  if (ret)
 	    __seterrno_from_win_error (ret);
 	  else if (block_fit)
@@ -1271,7 +1335,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
       if (!ret && len > 0)
         {
 	  debug_printf ("read %d bytes from tape (one block)", block_size);
-	  ret = mt->drive (driveno ())->read (get_handle (), devbuf,
+	  ret = mt->drive (driveno ())->read (get_handle (), mt_evt, devbuf,
 					      block_size);
 	  if (ret)
 	    __seterrno_from_win_error (ret);
@@ -1297,7 +1361,9 @@ int
 fhandler_dev_tape::raw_write (const void *ptr, size_t len)
 {
   lock (-1);
-  int ret = mt->drive (driveno ())->write (get_handle (), ptr, len);
+  if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
+    debug_printf ("Creating event failed: %E");
+  int ret = mt->drive (driveno ())->write (get_handle (), mt_evt, ptr, len);
     __seterrno_from_win_error (ret);
   return unlock (len);
 }

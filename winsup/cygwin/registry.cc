@@ -241,7 +241,7 @@ load_registry_hive (PSID psid)
       RegCloseKey (hkey);
       return;
     }
-  set_process_privilege (SE_RESTORE_NAME);
+  enable_restore_privilege ();
   if (get_registry_hive_path (psid, path))
     {
       strcat (path, "\\NTUSER.DAT");
