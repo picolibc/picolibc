@@ -171,15 +171,26 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 	  uni2ansi (buffer[i].usri3_name, username, sizeof (username));
 	  uni2ansi (buffer[i].usri3_full_name, fullname, sizeof (fullname));
 	  homedir_w32[0] = homedir_psx[0] = '\0';
-	  uni2ansi (buffer[i].usri3_home_dir, homedir_w32, sizeof (homedir_w32));
-	  if (print_cygpath)
-	    cygwin_conv_to_posix_path (homedir_w32, homedir_psx);
-	  else
-	    psx_dir (homedir_w32, homedir_psx);
-
-	  if (homedir_psx[0] == '\0')
+	  if (passed_home_path[0] == '\0')
 	    {
-	      strcat (homedir_psx, passed_home_path);
+	      uni2ansi (buffer[i].usri3_home_dir, homedir_w32,
+			sizeof (homedir_w32));
+	      if (homedir_w32[0] != '\0')
+		{
+		  if (print_cygpath)
+		    cygwin_conv_to_posix_path (homedir_w32, homedir_psx);
+		  else
+		    psx_dir (homedir_w32, homedir_psx);
+		}
+	      else
+		{
+		  strcpy (homedir_psx, "/home/");
+		  strcat (homedir_psx, username);
+		}
+	    }
+	  else
+	    {
+	      strcpy (homedir_psx, passed_home_path);
 	      strcat (homedir_psx, username);
 	    }
 
@@ -394,8 +405,7 @@ usage ()
   fprintf (stderr, "   -m,--no-mount           don't use mount points for home dir\n");
   fprintf (stderr, "   -s,--no-sids            don't print SIDs in GCOS field\n");
   fprintf (stderr, "                           (this affects ntsec)\n");
-  fprintf (stderr, "   -p,--path-to-home path  if user account has no home dir, use\n");
-  fprintf (stderr, "                           path instead of /home/\n");
+  fprintf (stderr, "   -p,--path-to-home path  use specified path instead of user account home dir\n");
   fprintf (stderr, "   -u,--username username  only return information for the specified user\n");
   fprintf (stderr, "   -?,--help               displays this message\n\n");
   fprintf (stderr, "One of `-l', `-d' or `-g' must be given on NT/W2K.\n");
@@ -504,9 +514,6 @@ main (int argc, char **argv)
 	    }
 	}
     }
-
-  if (passed_home_path[0] == '\0')
-      strcpy (passed_home_path, "/home/");
 
   /* This takes Windows 9x/ME into account. */
   if (GetVersion () >= 0x80000000)

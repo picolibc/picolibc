@@ -1,3 +1,11 @@
+Fri Dec 14 14:04:37 2001  Jason Tishler <jason@tishler.net>
+
+	* mkpasswd.c (enum_users): Change to unconditionally use
+	the --path-to-home option, if supplied by the user.  Use default
+	--path-to-home option value, if appropriate.
+	(usage): Change usage statement to reflect new semantics.
+	(main): Remove defaulting of the --path-to-home option.
+
 Fri Dec 14 12:10:39 2001  Jason Tishler <jason@tishler.net>
 
 	* mkpasswd.c (opts): Add indication that '-p' option requires an
