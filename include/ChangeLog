@@ -1,3 +1,9 @@
+2002-11-16  Klee Dienes  <kdienes@apple.com>
+
+	* opcode/m88k.h (INSTAB): Remove 'next' field.
+	(instruction): Remove definition; replace with extern declaration
+	and mark as const.
+
 2002-11-16  Svein E. Seldal  <Svein.Seldal@solidas.com>
 
 	* opcode/tic4x.h: Major rewrite of entire file. Define
