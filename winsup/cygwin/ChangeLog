@@ -1,3 +1,11 @@
+2003-05-27  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* fhandler_socket.cc (sock_event::~sock_event): New method.
+	(sock_event::load): Change to void. Check if winsock2 is available.
+	(socke_event::wait): Return 0 if interruptible mode is not available.
+	(fhandler_socket::connect): Remove checks for winsock2 availability.
+	(fhandler_socket::accept): Ditto.
+
 2003-05-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::dup): First try duplicating

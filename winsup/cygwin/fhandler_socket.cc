@@ -131,31 +131,44 @@ public:
       ev[0] = WSA_INVALID_EVENT;
       ev[1] = signal_arrived;
     }
-  bool load (SOCKET sock, int type_bit)
+  ~sock_event ()
     {
-      if ((ev[0] = WSACreateEvent ()) == WSA_INVALID_EVENT)
-	return false;
+      if (ev[0] != WSA_INVALID_EVENT)
+        WSACloseEvent (ev[0]);
+    }
+  void load (SOCKET sock, int type_bit)
+    {
+      if (!winsock2_active)
+        /* Can not wait for signal if winsock2 is not active */
+        return;
+
+      if (ev[0] == WSA_INVALID_EVENT)
+        if ((ev[0] = WSACreateEvent ()) == WSA_INVALID_EVENT)
+          return;
+
       evt_sock = sock;
       evt_type_bit = type_bit;
       if (WSAEventSelect (evt_sock, ev[0], 1 << evt_type_bit))
 	{
 	  WSACloseEvent (ev[0]);
 	  ev[0] = WSA_INVALID_EVENT;
-	  return false;
 	}
-      return true;
     }
   int wait ()
     {
       WSANETWORKEVENTS sock_event;
-      int wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
+      int wait_result;
+
+      if (ev[0] == WSA_INVALID_EVENT)
+        return 0;
+
+      wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
 						  FALSE);
       if (wait_result == WSA_WAIT_EVENT_0)
 	WSAEnumNetworkEvents (evt_sock, ev[0], &sock_event);
 
       /* Cleanup,  Revert to blocking. */
       WSAEventSelect (evt_sock, ev[0], 0);
-      WSACloseEvent (ev[0]);
       unsigned long nonblocking = 0;
       ioctlsocket (evt_sock, FIONBIO, &nonblocking);
 
@@ -565,17 +578,13 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
 
-  if (winsock2_active && !is_nonblocking () && !is_connect_pending ())
-    if (!evt.load (get_socket (), FD_CONNECT_BIT))
-      {
-	set_winsock_errno ();
-	return -1;
-      }
+  if (!is_nonblocking () && !is_connect_pending ())
+    evt.load (get_socket (), FD_CONNECT_BIT);
 
   res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
 
-  if (winsock2_active && res && !is_nonblocking () && !is_connect_pending () &&
-      WSAGetLastError () == WSAEWOULDBLOCK)
+  if (res && !is_nonblocking () && !is_connect_pending ()
+      && WSAGetLastError () == WSAEWOULDBLOCK)
     switch (evt.wait ())
       {
 	case 1: /* Signal */
@@ -685,14 +694,10 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
     *len = sizeof (struct sockaddr_in);
 
-  if (winsock2_active && !is_nonblocking ())
+  if (!is_nonblocking ())
     {
       sock_event evt;
-      if (!evt.load (get_socket (), FD_ACCEPT_BIT))
-	{
-	  set_winsock_errno ();
-	  return -1;
-	}
+      evt.load (get_socket (), FD_ACCEPT_BIT);
       switch (evt.wait ())
 	{
 	  case 1: /* Signal */
