@@ -1,6 +1,0 @@
-@chapter Question and Answers
-
-@include how-resources.texinfo
-@include how-using.texinfo
-@include how-api.texinfo
-@include how-programming.texinfo
