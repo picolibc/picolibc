@@ -119,7 +119,8 @@ dtable::get_debugger_info ()
 	    if (!fh)
 	      continue;
 	    fds[i] = fh;
-	    if (!fh->open ((i ? O_WRONLY : O_RDONLY) | O_BINARY, 0777))
+	    if (!fh->open ((i ? (i == 2 ? O_RDWR : O_WRONLY) : O_RDONLY)
+			   | O_BINARY, 0777))
 	      release (i);
 	    else
 	      CloseHandle (h);
