@@ -165,7 +165,7 @@ all_host: new-$(LIB_NAME) cygrun.exe
 
 force:
 
-install: install-bin install-libs install-headers install-man install_target \
+install: install-libs install-headers install-man install_target \
 	$(install_host) $(install_target)
 
 uninstall: uninstall-libs uninstall-headers uninstall-man 
