@@ -2,7 +2,7 @@
 
 	* profile/profil.c: Update copyright info.
 	* profile/profil.h: Likewise.
-	* profile/gcrt0.c.c: Likewise.
+	* profile/gcrt0.c: Likewise.
 
 2002-01-25  Pascal Obry  <obry@gnat.com>
 
@@ -10,12 +10,6 @@
 	avoid overflow.
 	* profile/gmon.c: Define bzero as memset if mingw32.
 	(monstartup): Use it.
-
-2002-01-25  Danny Smith  <dannysmith@users.sourceforge.net>
-
-	* profile/profil.c: Update copyright info.
-	* profile/profil.h: Likewise.
-	* profile/gcrt0.c.c: Likewise.
 
 2002-01-25  Danny Smith  <dannysmith@users.sourceforge.net> 
 
