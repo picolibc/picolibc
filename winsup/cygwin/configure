@@ -533,7 +533,7 @@ fi
 
 
 
-INSTALL="/bin/sh "`cd $srcdir/../..; echo $(pwd)/install-sh`
+INSTALL="/bin/sh "`cd $srcdir/../..; echo $(pwd)/install-sh -c`
 
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
