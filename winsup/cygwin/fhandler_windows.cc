@@ -47,7 +47,7 @@ The following unix-style calls are supported:
 */
 
 fhandler_windows::fhandler_windows ()
-  : fhandler_base (FH_WINDOWS), hWnd_ (NULL), method_ (WINDOWS_POST)
+  : fhandler_base (), hWnd_ (NULL), method_ (WINDOWS_POST)
 {
 }
 
