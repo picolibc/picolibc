@@ -1,3 +1,19 @@
+2002-01-07  Mark Salter  <msalter@redhat.com>
+
+	* configure.in: Add support for arm, strongarm, and xscale.
+	* configure: Regenerated.
+	* arm/coff-iq80310.specs: New file.
+	* arm/coff-redboot.ld: New file.
+	* arm/coff-redboot.specs: New file.
+	* arm/configure: New file.
+	* arm/configure.in: New file.
+	* arm/elf-iq80310.specs: New file.
+	* arm/elf-redboot.ld: New file.
+	* arm/elf-redboot.specs: New file.
+	* arm/Makefile.in: New file.
+	* arm/redboot-crt0.S: New file.
+	* arm/redboot-syscalls.c: New file.
+
 2001-12-22  Geoffrey Keating  <geoffk@redhat.com>
 	    Mark Salter  <msalter@redhat.com>
 	    Catherine Moore  <clm@redhat.com>
