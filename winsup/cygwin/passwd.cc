@@ -66,6 +66,7 @@ pwdgrp::read_passwd ()
 
   if (wincap.has_security ())
     {
+      /* must be static */
       static char NO_COPY pretty_ls[] = "????????:*:-1:-1:";
       add_line (pretty_ls);
       cygsid tu = cygheap->user.sid ();
@@ -81,7 +82,7 @@ pwdgrp::read_passwd ()
 	myself->uid != (__uid32_t) pw->pw_uid  &&
 	!internal_getpwuid (myself->uid))))
     {
-      char linebuf[1024];
+      static char NO_COPY linebuf[1024];	// must be static
       (void) cygheap->user.ontherange (CH_HOME, NULL);
       snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
 		cygheap->user.name (),
