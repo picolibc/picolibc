@@ -15,7 +15,7 @@ struct external_filehdr {
 
 
 #define MIPS_ARCH_MAGIC_WINCE	0x0166  /* Windows CE - little endian */
-
+#define MIPS_PE_MAGIC		0x010b
 
 #define MIPSBADMAG(x) \
  ((x).f_magic!=MIPS_ARCH_MAGIC_WINCE)

@@ -17,6 +17,7 @@ struct external_filehdr {
 #define	SH_ARCH_MAGIC_BIG	0x0500
 #define	SH_ARCH_MAGIC_LITTLE	0x0550  /* Little endian SH */
 #define SH_ARCH_MAGIC_WINCE	0x01a2  /* Windows CE - little endian */
+#define SH_PE_MAGIC		0x010b
 
 
 #define SHBADMAG(x) \
