@@ -1251,6 +1251,14 @@ for signal/process handling-related info, to name two.  The strace
 mechanism is well documented in the Cygwin library sources in the file
 <CODE>winsup/include/sys/strace.h</CODE>.
 
+@subsection Why doesn't gdb handle signals?
+
+Unfortunately, there is only minimal signal handling support in gdb
+currently.  Signal handling only works with Windows-type signals.
+SIGINT may work, SIGFPE may work, SIGSEGV definitely does.  You cannot
+'stop', 'print' or 'nopass' signals like SIGUSR1 or SIGHUP to the
+process being debugged.
+
 @subsection The linker complains that it can't find something.
 
 @strong{(Please note: This section has not yet been updated for the latest
