@@ -17,7 +17,7 @@ SGMLDIRS =  -d $(srcdir) -d $(utils_source) -d $(cygwin_source)
 # Put them back when we figure out what to do with them. (davisb)
 #DOC=faq.txt faq.info readme.txt readme.info
 DOC=faq.txt readme.txt
-HTMLDOC=faq.html readme.html
+HTMLDOC=faq0.html faq.html readme.html
 
 CC:=@CC@
 CC_FOR_TARGET:=@CC@
@@ -103,6 +103,15 @@ cygwin-api-int.sgml : cygwin-api.in.sgml ./doctool Makefile
 readme.txt: $(srcdir)/readme.texinfo $(srcdir)/*.texinfo
 	-$(MAKEINFO) -I$(srcdir) --no-split --no-headers $< -o - |\
 	sed '/^Concept Index/,$$d' > $@
+
+faq0.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
+	-rm -f faq_toc.html; \
+	for i in $(srcdir)/*.texinfo ; do \
+		sed < $$i -e 's?@file{\([fth]*p://[^}]*\)}?@strong{<A HREF="\1">\1</A>}?' \
+	    -e 's?\([.+a-zA-Z0-9-]*@@[.a-zA-Z0-9-]*[a-zA-Z0-9]\)?<A HREF="mailto:\1">\1</A>?' >./`basename $$i` ; done; \
+	$(TEXI2HTML) -monolithic ./faq.texinfo; \
+	rm -f *.texinfo; \
+	[ -r faq.html ] && mv faq.html faq0.html; exit 0
 
 faq.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
 	-rm -f faq_toc.html; \
