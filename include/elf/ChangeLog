@@ -1,3 +1,7 @@
+1999-06-21  Philip Blundell  <pb@nexus.co.uk>
+
+	* arm.h (EF_SOFT_FLOAT, F_SOFT_FLOAT): Define.
+
 1999-07-13  Andreas Schwab  <schwab@suse.de>
 
 	* m68k.h (EF_CPU32): Move definition inside multiple inclusion

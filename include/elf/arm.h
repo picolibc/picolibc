@@ -32,12 +32,14 @@
 #define EF_ALIGN8	   0x40		/* 8-bit structure alignment is in use */
 #define EF_NEW_ABI         0x80
 #define EF_OLD_ABI         0x100
+#define EF_SOFT_FLOAT      0x200
 
 /* Local aliases for some flags to match names used by COFF port.  */
 #define F_INTERWORK	   EF_INTERWORK
 #define F_APCS26	   EF_APCS_26
 #define F_APCS_FLOAT	   EF_APCS_FLOAT
 #define F_PIC              EF_PIC
+#define F_SOFT_FLOAT	   EF_SOFT_FLOAT
 
 /* Additional symbol types for Thumb */
 #define STT_ARM_TFUNC     0xd
