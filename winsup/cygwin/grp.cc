@@ -29,18 +29,14 @@ details. */
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */
 
-static struct __group32 *group_buf;		/* group contents in memory */
-static int curr_lines;
-static int max_lines;
+static struct __group32 NO_COPY *group_buf;		/* group contents in memory */
+static int NO_COPY curr_lines;
+static int NO_COPY max_lines;
 
 /* Position in the group cache */
-#ifdef _MT_SAFE
 #define grp_pos _reent_winsup ()->_grp_pos
-#else
-static int grp_pos = 0;
-#endif
 
-static pwdgrp gr;
+static pwdgrp NO_COPY gr;
 static char * NO_COPY null_ptr;
 
 static int
@@ -107,7 +103,7 @@ class group_lock
 {
   bool armed;
   static NO_COPY pthread_mutex_t mutex;
- public:
+public:
   group_lock (bool doit)
     {
       if (armed = doit)
@@ -162,7 +158,7 @@ read_etc_group ()
 	  debug_printf ("Completing /etc/group: %s", linebuf);
 	  add_grp_line (linebuf);
 	}
-      static char pretty_ls[] = "????????::-1:";
+      static char NO_COPY pretty_ls[] = "????????::-1:";
       if (wincap.has_security ())
 	add_grp_line (pretty_ls);
     }
@@ -185,7 +181,7 @@ internal_getgrsid (cygsid &sid)
 }
 
 struct __group32 *
-internal_getgrgid (__gid32_t gid, BOOL check)
+internal_getgrgid (__gid32_t gid, bool check)
 {
   if (gr.isuninitialized () || (check && gr.isinitializing ()))
     read_etc_group ();
@@ -197,7 +193,7 @@ internal_getgrgid (__gid32_t gid, BOOL check)
 }
 
 struct __group32 *
-internal_getgrnam (const char *name, BOOL check)
+internal_getgrnam (const char *name, bool check)
 {
   if (gr.isuninitialized () || (check && gr.isinitializing ()))
     read_etc_group ();
@@ -236,7 +232,7 @@ getgrgid32 (__gid32_t gid)
 extern "C" struct __group16 *
 getgrgid (__gid16_t gid)
 {
-  static struct __group16 g16;
+  static struct __group16 g16;	/* FIXME: thread-safe? */
 
   return grp32togrp16 (&g16, getgrgid32 ((__gid32_t) gid));
 }
@@ -250,7 +246,7 @@ getgrnam32 (const char *name)
 extern "C" struct __group16 *
 getgrnam (const char *name)
 {
-  static struct __group16 g16;
+  static struct __group16 g16;	/* FIXME: thread-safe? */
 
   return grp32togrp16 (&g16, getgrnam32 (name));
 }
@@ -276,7 +272,7 @@ getgrent32 ()
 extern "C" struct __group16 *
 getgrent ()
 {
-  static struct __group16 g16;
+  static struct __group16 g16;	/* FIXME: thread-safe? */
 
   return grp32togrp16 (&g16, getgrent32 ());
 }

@@ -809,7 +809,7 @@ initial_env ()
       len = GetModuleFileName (NULL, buf1, MAX_PATH);
       strlwr (buf1);
       strlwr (buf);
-      char *p = strchr (buf, '=');
+      char *p = strchr (buf, ':');
       if (!p)
 	p = (char *) "gdb.exe -nw";
       else

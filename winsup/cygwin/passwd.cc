@@ -26,18 +26,14 @@ details. */
 /* Read /etc/passwd only once for better performance.  This is done
    on the first call that needs information from it. */
 
-static struct passwd *passwd_buf;	/* passwd contents in memory */
-static int curr_lines;
-static int max_lines;
+static struct passwd NO_COPY *passwd_buf;	/* passwd contents in memory */
+static int NO_COPY curr_lines;
+static int NO_COPY max_lines;
 
-static pwdgrp pr;
+static NO_COPY pwdgrp pr;
 
 /* Position in the passwd cache */
-#ifdef _MT_SAFE
 #define pw_pos  _reent_winsup ()->_pw_pos
-#else
-static int pw_pos = 0;
-#endif
 
 /* Remove a : terminated string from the buffer, and increment the pointer */
 static char *
@@ -139,9 +135,8 @@ read_etc_passwd ()
       if (!pr.load ("/etc/passwd", add_pwd_line))
 	debug_printf ("pr.load failed");
 
-      static char linebuf[1024];
       char strbuf[128] = "";
-      BOOL searchentry = TRUE;
+      bool searchentry = true;
       struct passwd *pw;
 
       if (wincap.has_security ())
@@ -161,6 +156,7 @@ read_etc_passwd ()
 	    myself->uid != (__uid32_t) pw->pw_uid  &&
 	    !internal_getpwuid (myself->uid))))
 	{
+	  char linebuf[1024];
 	  (void) cygheap->user.ontherange (CH_HOME, NULL);
 	  snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
 		    cygheap->user.name (),
@@ -198,10 +194,9 @@ internal_getpwsid (cygsid &sid)
 }
 
 struct passwd *
-internal_getpwuid (__uid32_t uid, BOOL check)
+internal_getpwuid (__uid32_t uid, bool check)
 {
-  if (pr.isuninitialized ()
-      || (check && pr.isinitializing ()))
+  if (pr.isuninitialized () || (check && pr.isinitializing ()))
     read_etc_passwd ();
 
   for (int i = 0; i < curr_lines; i++)
@@ -211,10 +206,9 @@ internal_getpwuid (__uid32_t uid, BOOL check)
 }
 
 struct passwd *
-internal_getpwnam (const char *name, BOOL check)
+internal_getpwnam (const char *name, bool check)
 {
-  if (pr.isuninitialized ()
-      || (check && pr.isinitializing ()))
+  if (pr.isuninitialized () || (check && pr.isinitializing ()))
     read_etc_passwd ();
 
   for (int i = 0; i < curr_lines; i++)
@@ -372,11 +366,7 @@ setpassent ()
 extern "C" char *
 getpass (const char * prompt)
 {
-#ifdef _MT_SAFE
   char *pass=_reent_winsup ()->_pass;
-#else
-  static char pass[_PASSWORD_LEN];
-#endif
   struct termios ti, newti;
 
   if (pr.isinitializing ())
