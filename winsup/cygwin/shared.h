@@ -301,11 +301,10 @@ public:
   int had_to_create_mount_areas;
 
   void init ();
-  int add_item (const char *dev, const char *path, unsigned flags);
-  int del_item (const char *path, unsigned flags);
+  int add_item (const char *dev, const char *path, unsigned flags, int reg_p);
+  int del_item (const char *path, unsigned flags, int reg_p);
 
   void from_registry ();
-  void from_v1_registry ();
   int add_reg_mount (const char * native_path, const char * posix_path,
 		      unsigned mountflags);
   int del_reg_mount (const char * posix_path, unsigned mountflags);

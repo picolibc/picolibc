@@ -80,6 +80,7 @@ details. */
 #include <errno.h>
 #include "winsup.h"
 #include <ctype.h>
+#include <winioctl.h>
 
 static int normalize_win32_path (const char *cwd, const char *src, char *dst);
 static char *getcwd_inner (char *buf, size_t ulen, int posix_p);
@@ -385,12 +386,14 @@ out:
       debug_printf ("GetVolumeInformation(%s) = ERR, full_path(%s), set_has_acls(FALSE)",
                     tmp_buf, full_path, GetLastError ());
       set_has_acls (FALSE);
+      set_has_reparse_points (FALSE);
     }
   else
     {
       debug_printf ("GetVolumeInformation(%s) = OK, full_path(%s), set_has_acls(%d)",
                     tmp_buf, full_path, volflags & FS_PERSISTENT_ACLS);
       set_has_acls (volflags & FS_PERSISTENT_ACLS);
+      set_has_reparse_points (volflags & FILE_SUPPORTS_REPARSE_POINTS);
     }
 }
 
@@ -845,44 +848,12 @@ conv_path_list (const char *src, char *dst, int to_posix_p)
 void
 mount_info::init ()
 {
-  int found_slash = 0;
-
   nmounts = 0;
   had_to_create_mount_areas = 0;
 
   /* Fetch the mount table and cygdrive-related information from
      the registry.  */
   from_registry ();
-
-  if (dynamically_loaded)
-    return;
-
-  /* If slash isn't already mounted, mount system directory as slash. */
-  if (nmounts != 0)
-    for (int i = 0; i < nmounts; i++)
-      {
-	if (strcmp (mount[i].posix_path, "/") == 0)
-	  {
-	    found_slash = 1;
-	    break;
-	  }
-      }
-
-  if (!found_slash)
-    mount_slash ();
-}
-
-/* mount_slash: mount the system partition as slash. */
-
-void
-mount_info::mount_slash ()
-{
-  char drivestring[MAX_PATH];
-  GetSystemDirectory (drivestring, MAX_PATH);
-  drivestring[2] = 0;   /* truncate path to "<drive>:" */
-
-  if (add_reg_mount (drivestring, "/", 0) == 0)
-    add_item (drivestring, "/", 0);
 }
 
 /* conv_to_win32_path: Ensure src_path is a pure Win32 path and store
@@ -1270,30 +1241,13 @@ mount_info::read_mounts (reg_key& r)
   char posix_path[MAX_PATH];
   HKEY key = r.get_key ();
   DWORD i, posix_path_size;
-
-loop:
-  for (i = 0; ;i++)
-    {
-      posix_path_size = MAX_PATH;
-      LONG err = RegEnumKeyEx (key, i, posix_path, &posix_path_size, NULL,
-			  NULL, NULL, NULL);
-
-      if (err != ERROR_SUCCESS)
-	break;
-
-      if (iscygdrive (posix_path))
-	{
-	  /* This shouldn't be in the mount table. */
-	  (void) r.kill (posix_path);
-	  goto loop;
-	}
-    }
+  int found_cygdrive = FALSE;
 
   /* Loop through subkeys */
   /* FIXME: we would like to not check MAX_MOUNTS but the heap in the
      shared area is currently statically allocated so we can't have an
      arbitrarily large number of mounts. */
-  for (DWORD i = 0; i < MAX_MOUNTS; i++)
+  for (DWORD i = 0; ; i++)
     {
       char native_path[MAX_PATH];
       int mount_flags;
@@ -1315,27 +1269,42 @@ loop:
 
       if (iscygdrive (posix_path))
 	{
-	  /* This shouldn't be in the mount table. */
-	  // (void) r.kill (posix_path);
+	  found_cygdrive = TRUE;
 	  continue;
 	}
 
       /* Get a reg_key based on i. */
       reg_key subkey = reg_key (key, KEY_READ, posix_path, NULL);
 
-      /* Check the mount table for prefix matches. */
-      for (int j = 0; j < nmounts; j++)
-	if (strcasematch (mount[j].posix_path, posix_path))
-	  goto next;	/* Can't have more than one */
-
       /* Fetch info from the subkey. */
       subkey.get_string ("native", native_path, sizeof (native_path), "");
       mount_flags = subkey.get_int ("flags", 0);
 
       /* Add mount_item corresponding to registry mount point. */
-      cygwin_shared->mount.add_item (native_path, posix_path, mount_flags);
-    next:
-      continue;
+      int res = cygwin_shared->mount.add_item (native_path, posix_path, mount_flags, FALSE);
+      if (res && get_errno () == EMFILE)
+	break; /* The number of entries exceeds MAX_MOUNTS */
+    }
+
+  if (!found_cygdrive)
+    return;
+
+loop:
+  for (i = 0; ;i++)
+    {
+      posix_path_size = MAX_PATH;
+      LONG err = RegEnumKeyEx (key, i, posix_path, &posix_path_size, NULL,
+			  NULL, NULL, NULL);
+
+      if (err != ERROR_SUCCESS)
+	break;
+
+      if (iscygdrive (posix_path))
+	{
+	  /* This shouldn't be in the mount table. */
+	  (void) r.kill (posix_path);
+	  goto loop;
+	}
     }
 }
 
@@ -1370,8 +1339,6 @@ mount_info::from_registry ()
      old mounts. */
   if (had_to_create_mount_areas == 2)
     import_v1_mounts ();
-
-  sort ();
 }
 
 /* add_reg_mount: Add mount item to registry.  Return zero on success,
@@ -1622,22 +1589,15 @@ mount_info::sort ()
   qsort (native_sorted, nmounts, sizeof (native_sorted[0]), sort_by_native_name);
 }
 
-/* Add an entry to the in-memory mount table.
+/* Add an entry to the mount table.
    Returns 0 on success, -1 on failure and errno is set.
 
    This is where all argument validation is done.  It may not make sense to
    do this when called internally, but it's cleaner to keep it all here.  */
 
 int
-mount_info::add_item (const char *native, const char *posix, unsigned mountflags)
+mount_info::add_item (const char *native, const char *posix, unsigned mountflags, int reg_p)
 {
-  /* Can't add more than MAX_MOUNTS. */
-  if (nmounts == MAX_MOUNTS)
-    {
-      set_errno (EMFILE);
-      return -1;
-    }
-
   /* Something's wrong if either path is NULL or empty, or if it's
      not a UNC or absolute path. */
 
@@ -1679,20 +1639,27 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
 
   /* Write over an existing mount item with the same POSIX path if
      it exists and is from the same registry area. */
-  for (int i = 0; i < nmounts; i++)
+  int i;
+  for (i = 0; i < nmounts; i++)
     {
-      if ((strcmp (mount[i].posix_path, posixtmp) == 0) &&
-	  ((mount[i].flags & MOUNT_SYSTEM) == (mountflags & MOUNT_SYSTEM)))
-	{
-	  /* replace existing mount item */
-	  mount[i].init (nativetmp, posixtmp, mountflags);
-	  goto sortit;
-	}
+      if (strcasematch (mount[i].posix_path, posixtmp) &&
+	  (mount[i].flags & MOUNT_SYSTEM) == (mountflags & MOUNT_SYSTEM))
+	break;
     }
 
-  mount[nmounts++].init (nativetmp, posixtmp, mountflags);
+  /* Can't add more than MAX_MOUNTS. */
+  if (i == nmounts && nmounts < MAX_MOUNTS)
+    i = nmounts++;
+  else
+    {
+      set_errno (EMFILE);
+      return -1;
+    }
 
-sortit:
+  if (reg_p && add_reg_mount (nativetmp, posixtmp, mountflags))
+    return -1;
+
+  mount[i].init (nativetmp, posixtmp, mountflags);
   sort ();
 
   return 0;
@@ -1707,12 +1674,12 @@ sortit:
 */
 
 int
-mount_info::del_item (const char *path, unsigned flags)
+mount_info::del_item (const char *path, unsigned flags, int reg_p)
 {
   char pathtmp[MAX_PATH];
 
   /* Something's wrong if path is NULL or empty. */
-  if ((path == NULL) || (*path == 0))
+  if (path == NULL || *path == 0)
     {
       set_errno (EINVAL);
       return -1;
@@ -1723,18 +1690,22 @@ mount_info::del_item (const char *path, unsigned flags)
 
   debug_printf ("%s[%s]", path, pathtmp);
 
+  if (reg_p && del_reg_mount (pathtmp, flags)
+      && del_reg_mount (path, flags)) /* for old irregular entries */
+    return -1;
+
   for (int i = 0; i < nmounts; i++)
     {
       /* Delete if paths and mount locations match. */
-      if (((strcmp (mount[i].posix_path, pathtmp) == 0
-	    || strcmp (mount[i].native_path, pathtmp) == 0)) &&
-	  ((mount[i].flags & MOUNT_SYSTEM) == (flags & MOUNT_SYSTEM)))
+      if ((strcasematch (mount[i].posix_path, pathtmp)
+	   || strcasematch (mount[i].native_path, pathtmp)) &&
+	  (mount[i].flags & MOUNT_SYSTEM) == (flags & MOUNT_SYSTEM))
 	{
 	  nmounts--;		/* One less mount table entry */
 	  /* Fill in the hole if not at the end of the table */
 	  if (i < nmounts)
-	    memcpy (mount + i, mount + i + 1,
-		    sizeof (mount[i]) * (nmounts - i));
+	    memmove (mount + i, mount + i + 1,
+		     sizeof (mount[i]) * (nmounts - i));
 	  sort ();		/* Resort the table */
 	  return 0;
 	}
@@ -1781,16 +1752,18 @@ mount_info::read_v1_mounts (reg_key r, unsigned which)
 	     we're reading. */
 	  mountflags |= which;
 
-	  cygwin_shared->mount.add_item (win32path, unixpath, mountflags);
+	  int res = cygwin_shared->mount.add_item (win32path, unixpath, mountflags, TRUE);
+	  if (res && get_errno () == EMFILE)
+	    break; /* The number of entries exceeds MAX_MOUNTS */
 	}
     }
 }
 
-/* from_v1_registry: Build the entire mount table from the old v1 registry
-   mount area.  */
+/* import_v1_mounts: If v1 mounts are present, load them and write
+   the new entries to the new registry area. */
 
 void
-mount_info::from_v1_registry ()
+mount_info::import_v1_mounts ()
 {
   reg_key r (HKEY_CURRENT_USER, KEY_ALL_ACCESS,
 	     "SOFTWARE",
@@ -1814,43 +1787,6 @@ mount_info::from_v1_registry ()
 	      "mounts",
 	      NULL);
   read_v1_mounts (r1, MOUNT_SYSTEM);
-
-  /* Note: we don't need to sort internal table here since it is
-     done in main from_registry call after this function would be
-     run. */
-}
-
-/* import_v1_mounts: If v1 mounts are present, load them and write
-   the new entries to the new registry area. */
-
-void
-mount_info::import_v1_mounts ()
-{
-  /* Read in old mounts into memory. */
-  from_v1_registry ();
-
-  /* Write all mounts to the new registry. */
-  to_registry ();
-}
-
-/* to_registry: For every mount point in memory, add a corresponding
-   registry mount point. */
-
-void
-mount_info::to_registry ()
-{
-  for (int i = 0; i < MAX_MOUNTS; i++)
-    {
-      if (i < nmounts)
-	{
-	  mount_item *p = mount + i;
-
-	  add_reg_mount (p->native_path, p->posix_path, p->flags);
-
-	  debug_printf ("%02x: %s, %s, %d",
-			i, p->native_path, p->posix_path, p->flags);
-	}
-    }
 }
 
 /************************* mount_item class ****************************/
@@ -1951,10 +1887,7 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 	  return res;	/* Don't try to add cygdrive prefix. */
 	}
 
-      res = cygwin_shared->mount.add_reg_mount (win32_path, posix_path, flags);
-
-      if (res == 0)
-	cygwin_shared->mount.add_item (win32_path, posix_path, flags);
+      res = cygwin_shared->mount.add_item (win32_path, posix_path, flags, TRUE);
     }
 
   syscall_printf ("%d = mount (%s, %s, %p)", res, win32_path, posix_path, flags);
@@ -1981,10 +1914,7 @@ extern "C"
 int
 cygwin_umount (const char *path, unsigned flags)
 {
-  int res = cygwin_shared->mount.del_reg_mount (path, flags);
-
-  if (res == 0)
-    cygwin_shared->mount.del_item (path, flags);
+  int res = cygwin_shared->mount.del_item (path, flags, TRUE);
 
   syscall_printf ("%d = cygwin_umount (%s, %d)", res,  path, flags);
   return res;
