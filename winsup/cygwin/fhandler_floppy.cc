@@ -1,7 +1,7 @@
 /* fhandler_floppy.cc.  See fhandler.h for a description of the
    fhandler classes.
 
-   Copyright 1999, 2000 Cygnus Solutions.
+   Copyright 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 

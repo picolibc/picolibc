@@ -1,6 +1,6 @@
 /* dlfcn.cc
 
-   Copyright 1998, 2000 Cygnus Solutions
+   Copyright 1998, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
