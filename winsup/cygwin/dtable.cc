@@ -217,6 +217,7 @@ dtable::build_fhandler (int fd, const char *name, HANDLE handle)
 {
   int unit;
   DWORD devn;
+  extern bool wsock_started;
 
   if ((devn = get_device_number (name, unit)) == FH_BAD)
     {
@@ -231,7 +232,7 @@ dtable::build_fhandler (int fd, const char *name, HANDLE handle)
 	devn = FH_CONIN;
       else if (GetConsoleScreenBufferInfo (handle, &cinfo))
 	devn= FH_CONOUT;
-      else if (wsock32_handle && getpeername ((SOCKET) handle, &sa, &sal))
+      else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal))
 	devn = FH_SOCKET;
       else if (GetFileType (handle) == FILE_TYPE_PIPE)
 	devn = FH_PIPE;

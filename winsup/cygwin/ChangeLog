@@ -1,3 +1,14 @@
+Wed May 16 01:01:48 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* autoload.h: Eliminate.
+	* autoload.cc: Pull in autoload.h.  Eliminate many macros.  Rewrite to
+	avoid necessity of initialization routines.  Just use a standard one.
+	(wsock_init): New function.  Moved from net.cc.
+	* net.cc (wsock_init): Move to autoload.cc.
+	(wsadata): Make global.
+	* dtable.cc (dtable::build_fhandler): Use more reliable method for
+	checking if net stuff has been loaded.
+
 Tue May 15 19:52:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fork.cc (fork): Eliminate superfluous call to getuid().
@@ -94,7 +105,7 @@ Fri May 11 01:04:17 2001  Christopher Faylor <cgf@cygnus.com>
 	win32-style environment if they don't already exist.
 
 2001-05-10  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
-        
+
 	* path.cc (mount_info::conv_to_win32_path): Treat UNC paths the same as
 	paths including `:' or `\'.
 
@@ -262,7 +273,7 @@ Mon Apr 30 22:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: Add LoadDLLinitfunc for secur32.dll.
 	Add LoadDLLfuncEx statements for AllocateLocallyUniqueId@4,
-	DuplicateTokenEx@24, LsaNtStatusToWinError@4, 
+	DuplicateTokenEx@24, LsaNtStatusToWinError@4,
 	LsaDeregisterLogonProcess@4, LsaFreeReturnBuffer@4,
 	LsaLogonUser@56, LsaLookupAuthenticationPackage@12,
 	LsaRegisterLogonProcess@12,
@@ -401,7 +412,7 @@ Fri Apr 27 14:02:24 2001  Christopher Faylor <cgf@cygnus.com>
 
 2001-04-26  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
-        * security.cc (alloc_sd): Add unrelated ACCESS_ALLOWED_ACE behind
+	* security.cc (alloc_sd): Add unrelated ACCESS_ALLOWED_ACE behind
 	the `everyone' ACE.
 
 Wed Apr 25 15:07:37 2001  Christopher Faylor <cgf@cygnus.com>
@@ -580,7 +591,7 @@ Sun Apr 22 00:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(__pthread_mutex_unlock): Ditto.
 	(__pthread_mutex_destroy): Ditto.
 	(__pthread_mutex_setprioceiling): Ditto.
-	(__pthread_mutexattr_setpshared): Support PTHREAD_PROCESS_PSHARED requests. 
+	(__pthread_mutexattr_setpshared): Support PTHREAD_PROCESS_PSHARED requests.
 
 Fri Apr 20 19:38:29 2001  Christopher Faylor <cgf@cygnus.com>
 
@@ -595,7 +606,7 @@ Fri Apr 20 22:25:00 2001  Corinna Vinschen <corinna@vinschen.de>
 	* security.h: Add prototype for `set_process_privileges'.
 
 2001-04-19  Egor Duda  <deo@logos-m.ru>
-  
+
 	* path.cc (path_conv::check): Always initialize member variables.
 
 Fri Apr 20 12:27:49 2001  Christopher Faylor <cgf@cygnus.com>

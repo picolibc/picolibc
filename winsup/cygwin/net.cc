@@ -103,7 +103,7 @@ wsock_event::wait (int socket, LPDWORD flags)
   return ret;
 }
 
-static WSADATA wsadata;
+WSADATA wsadata;
 
 /* Cygwin internal */
 static SOCKET __stdcall
@@ -2065,42 +2065,3 @@ extern "C" void
 endhostent (void)
 {
 }
-
-extern "C" void
-wsock_init ()
-{
-  static LONG NO_COPY here = -1L;
-  static int NO_COPY wsock_started = 0;
-
-  while (InterlockedIncrement (&here))
-    {
-      InterlockedDecrement (&here);
-      Sleep (0);
-    }
-  if (!wsock_started && (wsock32_handle || ws2_32_handle))
-    {
-      /* Don't use autoload to load WSAStartup to eliminate recursion. */
-      int (*wsastartup) (int, WSADATA *);
-
-      wsastartup = (int (*)(int, WSADATA *))
-      		   GetProcAddress ((HMODULE) (wsock32_handle ?: ws2_32_handle),
-				   "WSAStartup");
-      if (wsastartup)
-        {
-	  int res = wsastartup ((2<<8) | 2, &wsadata);
-
-	  debug_printf ("res %d", res);
-	  debug_printf ("wVersion %d", wsadata.wVersion);
-	  debug_printf ("wHighVersion %d", wsadata.wHighVersion);
-	  debug_printf ("szDescription %s", wsadata.szDescription);
-	  debug_printf ("szSystemStatus %s", wsadata.szSystemStatus);
-	  debug_printf ("iMaxSockets %d", wsadata.iMaxSockets);
-	  debug_printf ("iMaxUdpDg %d", wsadata.iMaxUdpDg);
-	  debug_printf ("lpVendorInfo %d", wsadata.lpVendorInfo);
-
-	  wsock_started = 1;
-        }
-    }
-  InterlockedDecrement (&here);
-}
-
