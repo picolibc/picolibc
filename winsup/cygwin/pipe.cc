@@ -259,6 +259,7 @@ create_selectable_pipe (PHANDLE read_pipe_ptr,
          the pipe was not created earlier by some other process, even if
          the pid has been reused.  We avoid FILE_FLAG_FIRST_PIPE_INSTANCE
          because that is only available for Win2k SP2 and WinXP.  */
+      SetLastError (0);
       read_pipe = CreateNamedPipe (pipename,
                                    PIPE_ACCESS_INBOUND,
                                    PIPE_TYPE_BYTE | PIPE_READMODE_BYTE,
@@ -268,13 +269,14 @@ create_selectable_pipe (PHANDLE read_pipe_ptr,
                                    NMPWAIT_USE_DEFAULT_WAIT,
                                    sa_ptr);
 
-      if (read_pipe != INVALID_HANDLE_VALUE)
+      DWORD err = GetLastError ();
+      /* Win 95 seems to return NULL instead of INVALID_HANDLE_VALUE */
+      if ((read_pipe || !err) && read_pipe != INVALID_HANDLE_VALUE)
         {
           debug_printf ("pipe read handle %p", read_pipe);
           break;
         }
 
-      DWORD err = GetLastError ();
       switch (err)
         {
         case ERROR_PIPE_BUSY:
