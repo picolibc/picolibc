@@ -1,5 +1,10 @@
 2003-08-26  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/sys/stat.h[__CYGWIN__]: Only define stat64 as
+	__stat64 when compiling newlib.
+
+2003-08-26  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/stdio.h: Allow the io64 function prototypes for
 	Cygwin when compiling newlib.
 	* libc/include/sys/stat.h[__CYGWIN__]: Define stat64 as __stat64
