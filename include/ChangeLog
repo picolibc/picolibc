@@ -1,3 +1,7 @@
+2002-07-25  Richard Sandiford  <rsandifo@redhat.com>
+
+	* opcode/mips.h (CPU_R2000): Remove.
+
 2002-07-19  Denis Chertykov  <denisc@overta.ru>
 	    Matthew Green  <mrg@redhat.com>
 
