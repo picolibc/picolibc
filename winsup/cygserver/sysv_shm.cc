@@ -808,6 +808,12 @@ shmget(struct thread *td, struct shmget_args *uap)
 	mode = uap->shmflg & ACCESSPERMS;
 	if (uap->key != IPC_PRIVATE) {
 	again:
+#ifdef __CYGWIN__
+		if (uap->shmflg & IPC_KEY_IS_SHMID)
+		  segnum = shm_find_segment_by_shmid ((int) uap->key) ?
+			   IPCID_TO_IX((int) uap->key) : -1;
+		else
+#endif
 		segnum = shm_find_segment_by_key(uap->key);
 		if (segnum >= 0) {
 			error = shmget_existing(td, uap, mode, segnum);
