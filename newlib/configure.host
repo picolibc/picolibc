@@ -113,7 +113,7 @@ case "${host_cpu}" in
   i[3456]86)
 	# Don't use for these since they provide their own setjmp.
 	case ${host} in
-	*-*-go32 | *-*-sco* | *-*-cygwin*) 
+	*-*-sco* | *-*-cygwin*) 
 		libm_machine_dir=i386
 		machine_dir=i386
 		;;
@@ -323,9 +323,6 @@ case "${host}" in
   h8500-*-elf*)
 	sys_dir=h8500hms
 	;;
-  i[3456]86-*-go32)
-	sys_dir=go32
-	;;
   i[3456]86-*-sco*)
 	sys_dir=sysvi386
 	unix_dir=unix
@@ -495,9 +492,6 @@ case "${host}" in
 	;;
   i[3456]86-*-netware*)
 	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC -DABORT_PROVIDED -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DHAVE_FCNTL"
-	;;
-  i[3456]86-*-go32)
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC -DHAVE_FCNTL"
 	;;
   m32r-*-*)
 	# Pass -msdata=sdata so _impure_ptr goes in .sdata.

@@ -1,3 +1,8 @@
+2002-12-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host: Remove references to go32.
+	* libc/sys/go32/*: Removed.
+
 2002-12-16  Kazu Hirata  <kazu@cs.umass.edu>
 
 	* libc/include/sys/config.h: Change setting of INT_MAX
