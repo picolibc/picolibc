@@ -29,6 +29,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "shared_info.h"
+#include "cygthread.h"
 
 #define CONVERT_LIMIT 4096
 
@@ -205,7 +206,7 @@ fhandler_console::read (void *pv, size_t buflen)
   char tmp[60];
 
   w4[0] = h;
-  if (iscygthread ())
+  if (cygthread::is ())
     nwait = 1;
   else
     {

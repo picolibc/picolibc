@@ -30,6 +30,7 @@ details. */
 #define NEED_VFORK
 #include "perthread.h"
 #include "shared_info.h"
+#include "cygthread.h"
 
 /*
  * Convenience defines
@@ -92,8 +93,8 @@ Static HANDLE sigcomplete_main = NULL;	// Event signaled when a signal has
 Static HANDLE sigcomplete_nonmain = NULL;// Semaphore raised for non-main
 					//  threads when a signal has finished
 					//  processing
-Static HANDLE hwait_sig = NULL;		// Handle of wait_sig thread
-Static HANDLE hwait_subproc = NULL;	// Handle of sig_subproc thread
+Static cygthread *hwait_sig;		// Handle of wait_sig thread
+Static cygthread *hwait_subproc;	// Handle of sig_subproc thread
 
 Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
 					//  message queue startup
@@ -459,20 +460,10 @@ proc_terminate (void)
   /* Signal processing is assumed to be blocked in this routine. */
   if (hwait_subproc)
     {
-      int rc;
       proc_loop_wait = 0;	// Tell wait_subproc thread to exit
       wake_wait_subproc ();	// Wake wait_subproc loop
-
-      /* Wait for wait_subproc thread to exit (but not *too* long) */
-      if ((rc = WaitForSingleObject (hwait_subproc, WWSP)) != WAIT_OBJECT_0)
-	if (rc == WAIT_TIMEOUT)
-	  system_printf ("WFSO(hwait_subproc) timed out");
-	else
-	  system_printf ("WFSO(hwait_subproc), rc %d, %E", rc);
-
-      HANDLE h = hwait_subproc;
+      hwait_subproc->detach ();
       hwait_subproc = NULL;
-      ForceCloseHandle1 (h, hwait_subproc);
 
       sync_proc_subproc->acquire(WPSP);
       (void) proc_subproc (PROC_CLEARWAIT, 1);
@@ -580,13 +571,7 @@ sigproc_init ()
   signal_arrived = CreateEvent(&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (signal_arrived);
 
-  if (!(hwait_sig = makethread (wait_sig, NULL, 0, "sig")))
-    {
-      system_printf ("cannot create wait_sig thread, %E");
-      api_fatal ("terminating");
-    }
-
-  ProtectHandle (hwait_sig);
+  hwait_sig = new cygthread (wait_sig, NULL, "sig");
 
   /* sync_proc_subproc is used by proc_subproc.  It serialises
    * access to the children and zombie arrays.
@@ -615,7 +600,6 @@ sigproc_init ()
 void __stdcall
 sigproc_terminate (void)
 {
-  HANDLE h = hwait_sig;
   hwait_sig = NULL;
 
   if (GetCurrentThreadId () == sigtid)
@@ -637,29 +621,6 @@ sigproc_terminate (void)
       sigproc_printf ("entering");
       sig_loop_wait = 0;	// Tell wait_sig to exit when it is
 				//  finished with anything it is doing
-      // sig_dispatch_pending (TRUE);	// wake up and die
-      /* In case of a sigsuspend */
-      // SetEvent (signal_arrived);
-
-      /* If !hwait_sig, then the process probably hasn't even finished
-       * its initialization phase.
-       */
-      if (0 && hwait_sig)
-	{
-	  if (GetCurrentThreadId () != sigtid)
-	    WaitForSingleObject (h, 10000);
-	  ForceCloseHandle1 (h, hwait_sig);
-
-
-	  if (GetCurrentThreadId () != sigtid)
-	    {
-	      ForceCloseHandle (sigcomplete_main);
-	      ForceCloseHandle (sigcomplete_nonmain);
-	      ForceCloseHandle (sigcatch_main);
-	      ForceCloseHandle (sigcatch_nonmain);
-	      ForceCloseHandle (sigcatch_nosync);
-	    }
-	}
       sigproc_printf ("done");
     }
 
@@ -847,11 +808,9 @@ subproc_init (void)
    * the hchildren array.
    */
   events[0] = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-  if (!(hwait_subproc = makethread (wait_subproc, NULL, 0, "proc")))
-    system_printf ("cannot create wait_subproc thread, %E");
+  hwait_subproc = new cygthread (wait_subproc, NULL, "proc");
   ProtectHandle (events[0]);
-  ProtectHandle (hwait_subproc);
-  sigproc_printf ("started wait_subproc thread %p", hwait_subproc);
+  sigproc_printf ("started wait_subproc thread %p", (HANDLE) *hwait_subproc);
 }
 
 /* Initialize some of the memory block passed to child processes
@@ -1074,7 +1033,7 @@ static DWORD WINAPI
 wait_sig (VOID *)
 {
   /* Initialization */
-  (void) SetThreadPriority (hwait_sig, WAIT_SIG_PRIORITY);
+  (void) SetThreadPriority (*hwait_sig, WAIT_SIG_PRIORITY);
 
   /* sigcatch_nosync       - semaphore incremented by sig_dispatch_pending and
    *			     by foreign processes to force an examination of

@@ -24,6 +24,7 @@ details. */
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
+#include "cygthread.h"
 
 static NO_COPY UINT timer_active = 0;
 static NO_COPY struct itimerval itv;
@@ -131,19 +132,11 @@ gethwnd ()
   if (ourhwnd != NULL)
     return ourhwnd;
 
-  HANDLE hThread;
+  cygthread *h;
 
   window_started = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  hThread = makethread (Winmain, NULL, 0, "win");
-  if (!hThread)
-    {
-      system_printf ("Cannot start window thread");
-    }
-  else
-    {
-      SetThreadPriority (hThread, THREAD_PRIORITY_HIGHEST);
-      CloseHandle (hThread);
-    }
+  h = new cygthread (Winmain, NULL, "win");
+  SetThreadPriority (*h, THREAD_PRIORITY_HIGHEST);
   WaitForSingleObject (window_started, INFINITE);
   CloseHandle (window_started);
   return ourhwnd;
