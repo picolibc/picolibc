@@ -1,4 +1,10 @@
-Sat Sep 29 20:40:00 2001 Robert Collins <rbtcollins@hotmail.com>
+Sun Sep 30  8:52:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* include/cygwin/cygserver_transport.h: Add copyright header.
+	* include/cygwin/cygserver_transport_pipes.h: Ditto.
+	* include/cygwin/cygserver_transport_sockets.h: Ditto.
+
+Sat Sep 29 20:40:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* Makefile.in: Add cygserver_transport_sockets.o to DLL_OFILES.
 	Add cygserver_transport_sockets_outside.o to cygserver.exe.
@@ -24,7 +30,7 @@ Sat Sep 29 20:40:00 2001 Robert Collins <rbtcollins@hotmail.com>
 	* include/cygwin/cygserver_transport_pipes.h: New file.
 	* include/cygwin/cygserver_transport_sockets.h: New file.
 
-Tue Sep 25 16:22:00 2001 Robert Collins <rbtcollins@hotmail.com>
+Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* autoload.cc: Add dynamic load statement for 'ImpersonateNamedPipeClient'.
 	* Makefile.in: Add new object files, and build instructions for cygserver.exe.

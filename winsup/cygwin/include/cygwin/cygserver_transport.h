@@ -1,3 +1,15 @@
+/* cygserver.cc
+
+   Copyright 2001 Red Hat Inc.
+
+   Written by Robert Collins <rbtcollins@hotmail.com>
+
+   This file is part of Cygwin.
+
+   This software is a copyrighted work licensed under the terms of the
+   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+   details. */
+
 #ifndef _CYGSERVER_TRANSPORT_
 #define _CYGSERVER_TRANSPORT_
 class transport_layer_base *create_server_transport();
