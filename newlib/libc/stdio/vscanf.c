@@ -1,4 +1,6 @@
-/*
+/*-
+ * Code created by modifying scanf.c which has following copyright.
+ *
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
@@ -25,55 +27,28 @@
 #include <varargs.h>
 #endif
 
-#include "local.h"
+/*
+ * vscanf
+ */
 
 #ifndef _REENT_ONLY
 
 int
-#ifdef _HAVE_STDC
-scanf (const char *fmt, ...)
-#else
-scanf (fmt, va_alist)
-     char *fmt;
-     va_dcl
-#endif
+_DEFUN (vscanf, (fmt, ap), 
+    _CONST char *fmt _AND 
+    va_list ap)
 {
-  int ret;
-  va_list ap;
-
-#ifdef _HAVE_STDC
-  va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = __svfscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
-  va_end (ap);
-  return ret;
+  return __svfscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
 }
 
 #endif /* !_REENT_ONLY */
 
 int
-#ifdef _HAVE_STDC
-_scanf_r (struct _reent *ptr, const char *fmt, ...)
-#else
-_scanf_r (ptr, fmt, va_alist)
-     struct _reent *ptr;
-     char *fmt;
-     va_dcl
-#endif
+_DEFUN (_vscanf_r, (ptr, fmt, ap),
+    struct _reent *ptr _AND 
+    _CONST char *fmt _AND 
+    va_list ap)
 {
-  int ret;
-  va_list ap;
-
-#ifdef _HAVE_STDC
-  va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = __svfscanf_r (ptr, _stdin_r (ptr), fmt, ap);
-  va_end (ap);
-  return (ret);
+  return __svfscanf_r (ptr, _stdin_r (ptr), fmt, ap);
 }
-
 

@@ -1,6 +1,91 @@
-/* No user fns here. Pesch 15apr92. */
-
 /*
+FUNCTION
+<<vscanf>>, <<vfscanf>>, <<vsscanf>>---format argument list
+
+INDEX
+	vscanf
+INDEX
+	vfscanf
+INDEX
+	vsscanf
+
+ANSI_SYNOPSIS
+	#include <stdio.h>
+	#include <stdarg.h>
+	int vscanf(const char *<[fmt]>, va_list <[list]>);
+	int vfscanf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
+	int vsscanf(const char *<[str]>, const char *<[fmt]>, va_list <[list]>);
+
+	int _vscanf_r(void *<[reent]>, const char *<[fmt]>, 
+                       va_list <[list]>);
+	int _vfscanf_r(void *<[reent]>, FILE *<[fp]>, const char *<[fmt]>, 
+                       va_list <[list]>);
+	int _vsscanf_r(void *<[reent]>, const char *<[str]>, const char *<[fmt]>, 
+                       va_list <[list]>);
+
+TRAD_SYNOPSIS
+	#include <stdio.h>
+	#include <varargs.h>
+	int vscanf( <[fmt]>, <[ist]>)
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int vfscanf( <[fp]>, <[fmt]>, <[list]>)
+	FILE *<[fp]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+	
+	int vsscanf( <[str]>, <[fmt]>, <[list]>)
+	char *<[str]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int _vscanf_r( <[reent]>, <[fmt]>, <[ist]>)
+	char *<[reent]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int _vfscanf_r( <[reent]>, <[fp]>, <[fmt]>, <[list]>)
+	char *<[reent]>;
+	FILE *<[fp]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+	
+	int _vsscanf_r( <[reent]>, <[str]>, <[fmt]>, <[list]>)
+	char *<[reent]>;
+	char *<[str]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+DESCRIPTION
+<<vscanf>>, <<vfscanf>>, and <<vsscanf>> are (respectively) variants
+of <<scanf>>, <<fscanf>>, and <<sscanf>>.  They differ only in 
+allowing their caller to pass the variable argument list as a 
+<<va_list>> object (initialized by <<va_start>>) rather than 
+directly accepting a variable number of arguments.
+
+RETURNS
+The return values are consistent with the corresponding functions:
+<<vscanf>> returns the number of input fields successfully scanned,
+converted, and stored; the return value does not include scanned
+fields which were not stored.  
+
+If <<vscanf>> attempts to read at end-of-file, the return value 
+is <<EOF>>.
+
+If no fields were stored, the return value is <<0>>.
+
+The routines <<_vscanf_r>>, <<_vfscanf_f>>, and <<_vsscanf_r>> are
+reentrant versions which take an additional first parameter which points to the
+reentrancy structure.
+
+PORTABILITY
+These are GNU extensions.
+
+Supporting OS subroutines required:
+*/
+
+/*-
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
@@ -104,8 +189,43 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 
 #define BufferEmpty (fp->_r <= 0 && __srefill(fp))
 
+#ifndef _REENT_ONLY
+
+int
+_DEFUN (vfscanf, (fp, fmt, ap), 
+    register FILE *fp _AND 
+    _CONST char *fmt _AND 
+    va_list ap)
+{
+  CHECK_INIT(fp);
+  return __svfscanf_r (fp->_data, fp, fmt, ap);
+}
+
 int
 __svfscanf (fp, fmt0, ap)
+     register FILE *fp;
+     char _CONST *fmt0;
+     va_list ap;
+{
+  return __svfscanf_r (_REENT, fp, fmt0, ap);
+}
+
+#endif /* !_REENT_ONLY */
+
+int
+_DEFUN (_vfscanf_r, (data, fp, fmt, ap),
+    struct _reent *data _AND 
+    register FILE *fp _AND 
+    _CONST char *fmt _AND 
+    va_list ap)
+{
+  return __svfscanf_r (data, fp, fmt, ap);
+}
+
+
+int
+__svfscanf_r (rptr, fp, fmt0, ap)
+     struct _reent *rptr;
      register FILE *fp;
      char _CONST *fmt0;
      va_list ap;
@@ -149,7 +269,7 @@ __svfscanf (fp, fmt0, ap)
 #ifndef MB_CAPABLE
       wc = *fmt;
 #else
-      nbytes = _mbtowc_r (_REENT, &wc, fmt, MB_CUR_MAX, &state);
+      nbytes = _mbtowc_r (rptr, &wc, fmt, MB_CUR_MAX, &state);
 #endif
       fmt += nbytes;
       if (wc == 0)
@@ -235,13 +355,13 @@ __svfscanf (fp, fmt0, ap)
 	  /* FALLTHROUGH */
 	case 'd':
 	  c = CT_INT;
-	  ccfn = (u_long (*)())strtol;
+	  ccfn = (u_long (*)())_strtol_r;
 	  base = 10;
 	  break;
 
 	case 'i':
 	  c = CT_INT;
-	  ccfn = (u_long (*)())strtol;
+	  ccfn = (u_long (*)())_strtol_r;
 	  base = 0;
 	  break;
 
@@ -250,13 +370,13 @@ __svfscanf (fp, fmt0, ap)
 	  /* FALLTHROUGH */
 	case 'o':
 	  c = CT_INT;
-	  ccfn = strtoul;
+	  ccfn = _strtoul_r;
 	  base = 8;
 	  break;
 
 	case 'u':
 	  c = CT_INT;
-	  ccfn = strtoul;
+	  ccfn = _strtoul_r;
 	  base = 10;
 	  break;
 
@@ -264,7 +384,7 @@ __svfscanf (fp, fmt0, ap)
 	case 'x':
 	  flags |= PFXOK;	/* enable 0x prefixing */
 	  c = CT_INT;
-	  ccfn = strtoul;
+	  ccfn = _strtoul_r;
 	  base = 16;
 	  break;
 
@@ -298,7 +418,7 @@ __svfscanf (fp, fmt0, ap)
 	case 'p':		/* pointer format is like hex */
 	  flags |= POINTER | PFXOK;
 	  c = CT_INT;
-	  ccfn = strtoul;
+	  ccfn = _strtoul_r;
 	  base = 16;
 	  break;
 
@@ -332,7 +452,7 @@ __svfscanf (fp, fmt0, ap)
 	  if (isupper (c))
 	    flags |= LONG;
 	  c = CT_INT;
-	  ccfn = (u_long (*)())strtol;
+	  ccfn = (u_long (*)())_strtol_r;
 	  base = 10;
 	  break;
 	}
@@ -663,7 +783,7 @@ __svfscanf (fp, fmt0, ap)
 	      u_long res;
 
 	      *p = 0;
-	      res = (*ccfn) (buf, (char **) NULL, base);
+	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
 	      if (flags & POINTER)
 		*(va_arg (ap, _PTR *)) = (_PTR) (unsigned _POINTER_INT) res;
 	      else if (flags & SHORT)
@@ -835,7 +955,7 @@ __svfscanf (fp, fmt0, ap)
 		  exp_start = p;
 		}
 	      else if (exp_adjust)
-		new_exp = atol (exp_start + 1) - exp_adjust;
+                new_exp = _strtol_r (rptr, (exp_start + 1), NULL, 10) - exp_adjust;
 	      if (exp_adjust)
 		{
 
@@ -846,7 +966,7 @@ __svfscanf (fp, fmt0, ap)
                  sprintf (exp_start, "e%ld", new_exp);
 		}
 #ifdef _NO_LONGDBL
-	      res = atof (buf);
+	      res = _strtod_r (rptr, buf, NULL);
 #else  /* !_NO_LONGDBL */
 	      res = _strtold (buf, NULL);
 #endif /* !_NO_LONGDBL */

@@ -725,7 +725,7 @@ _DEFUN (strtodf, (s00, se),
 	_CONST char *s00 _AND
 	char **se)
 {
-  return strtod (s00, se);
+  return _strtod_r (_REENT, s00, se);
 }
 
 #endif

@@ -1,3 +1,34 @@
+2001-04-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdio.h[!_REENT_ONLY]: Moved various functions together
+	into one list.
+	[!__STRICT_ANSI__]: Moved non-ANSI I/O functions in this list.
+	(vfscanf, vscanf, vsscanf, _vfscanf_r, _vscanf_r, _vsscanf_r): New
+	function prototypes.
+	(_fscanf_r, _sscanf_r): Ditto.
+	* libc/include/stdlib.h: Added _strtod_r prototype.
+	* libc/stdio/Makefile.am: Add new v*scanf functions.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio/fscanf.c: Reorganized so HAVE_STDC only affects prototype
+	and code is shared.  Added reentrant _fscanf_r which calls __svfscanf_r.
+	* libc/stdio/scanf.c: Changed to call __svfscanf_r.
+	* libc/stdio/sscanf.c: Changed documentation to add reentrant routines.
+	(sscanf): Changed to call __svfscanf_r with _REENT argument.
+	(_sscanf_r): New routine.
+	* libc/stdio/local.h: Removed __svfscanf prototype and replaced it
+	with __svfscanf_r prototype.
+	* libc/stdio/vfscanf.c (vfscanf, _vfscanf_r: New
+	routines.
+	(__svfscanf_r): Reentrant version of __svfscanf which takes reetrancy
+	structure as argument as calls reentrant versions of helper functions
+	(e.g. _strtol_r, _strtoul_r). Also replaced calls to atol and atof
+	to _strtol_r and _strtod_r respectively.
+	* libc/stdio/vfscanf.c: Also changed __svfscanf to call __svfscanf_r.
+	* libc/stdlib/strtod.c (strtod): Changed to call _strtod_r with
+	_REENT argument.
+	* libc/stdio/vscanf.c: New file.
+	* libc/stdio/vsscanf.c: Ditto.
+
 2001-04-19  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/time.h[__CYGWIN__]:  Define tzname to _tzname if not defined.

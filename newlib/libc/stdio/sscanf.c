@@ -35,6 +35,11 @@ ANSI_SYNOPSIS
         int sscanf(const char *<[str]>, const char *<[format]> 
                    [, <[arg]>, ...]);
 
+        int _scanf_r(struct _reent *<[ptr]>, const char *<[format]> [, <[arg]>, ...]);
+        int _fscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
+        int _sscanf_r(struct _reent *<[ptr]>, const char *<[str]>, const char *<[format]> 
+                   [, <[arg]>, ...]);
+
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -47,6 +52,20 @@ TRAD_SYNOPSIS
 	char *<[format]>;
 
 	int sscanf(<[str]>, <[format]> [, <[arg]>, ...]);
+	char *<[str]>;
+	char *<[format]>;
+
+	int _scanf_r(<[ptr]>, <[format]> [, <[arg]>, ...])
+        struct _reent *<[ptr]>;
+	char *<[format]>;
+
+	int _fscanf_r(<[ptr]>, <[fd]>, <[format]> [, <[arg]>, ...]);
+        struct _reent *<[ptr]>;
+	FILE *<[fd]>;
+	char *<[format]>;
+
+	int _sscanf_r(<[ptr]>, <[str]>, <[format]> [, <[arg]>, ...]);
+        struct _reent *<[ptr]>;
 	char *<[str]>;
 	char *<[format]>;
 
@@ -73,6 +92,10 @@ DESCRIPTION
         <<fscanf>> and <<sscanf>> are identical to <<scanf>>, other than the
         source of input: <<fscanf>> reads from a file, and <<sscanf>>
 		from a string.
+
+        The routines <<_scanf_r>>, <<_fscanf_r>>, and <<_sscanf_r>> are reentrant
+        versions of <<scanf>>, <<fscanf>>, and <<sscanf>> that take an additional
+        first argument pointing to a reentrancy structure.
 
         The string at <<*<[format]>>> is a character sequence composed
         of zero or more directives. Directives are composed of
@@ -353,6 +376,8 @@ eofread (cookie, buf, len)
   return 0;
 }
 
+#ifndef _REENT_ONLY 
+
 #ifdef _HAVE_STDC
 int 
 _DEFUN (sscanf, (str, fmt), _CONST char *str _AND _CONST char *fmt _DOTS)
@@ -380,7 +405,42 @@ sscanf (str, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = __svfscanf (&f, fmt, ap);
+  ret = __svfscanf_r (_REENT, &f, fmt, ap);
+  va_end (ap);
+  return ret;
+}
+
+#endif /* !_REENT_ONLY */
+
+#ifdef _HAVE_STDC
+int 
+_DEFUN (_sscanf_r, (ptr, str, fmt), struct _reent *ptr _AND _CONST char *str _AND _CONST char *fmt _DOTS)
+#else
+int 
+_sscanf_r (ptr, str, fmt, va_alist)
+     struct _reent *ptr;
+     _CONST char *str;
+     _CONST char *fmt;
+     va_dcl
+#endif
+{
+  int ret;
+  va_list ap;
+  FILE f;
+
+  f._flags = __SRD;
+  f._bf._base = f._p = (unsigned char *) str;
+  f._bf._size = f._r = strlen (str);
+  f._read = eofread;
+  f._ub._base = NULL;
+  f._lb._base = NULL;
+  f._data = _REENT;
+#ifdef _HAVE_STDC
+  va_start (ap, fmt);
+#else
+  va_start (ap);
+#endif
+  ret = __svfscanf_r (ptr, &f, fmt, ap);
   va_end (ap);
   return ret;
 }

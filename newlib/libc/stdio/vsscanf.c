@@ -1,4 +1,6 @@
 /*
+ * Code created by modifying scanf.c which has following copyright.
+ *
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
@@ -16,64 +18,59 @@
  */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
-#include "local.h"
-
+#include <string.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
 #include <varargs.h>
 #endif
-
 #include "local.h"
+
+static
+_READ_WRITE_RETURN_TYPE
+eofread1 (cookie, buf, len)
+    _PTR cookie;
+    char *buf;
+    int len;
+{
+  return 0;
+}
+
+/*
+ * vsscanf
+ */
 
 #ifndef _REENT_ONLY
 
 int
-#ifdef _HAVE_STDC
-scanf (const char *fmt, ...)
-#else
-scanf (fmt, va_alist)
-     char *fmt;
-     va_dcl
-#endif
+_DEFUN (vsscanf, (str, fmt, ap), 
+    _CONST char *str _AND 
+    _CONST char *fmt _AND 
+    va_list ap)
 {
-  int ret;
-  va_list ap;
-
-#ifdef _HAVE_STDC
-  va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = __svfscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
-  va_end (ap);
-  return ret;
+  return _vsscanf_r (_REENT, str, fmt, ap);
 }
 
 #endif /* !_REENT_ONLY */
 
 int
-#ifdef _HAVE_STDC
-_scanf_r (struct _reent *ptr, const char *fmt, ...)
-#else
-_scanf_r (ptr, fmt, va_alist)
-     struct _reent *ptr;
-     char *fmt;
-     va_dcl
-#endif
+_DEFUN (_vsscanf_r, (ptr, str, fmt, ap),
+    struct _reent *ptr _AND 
+    _CONST char *str _AND 
+    _CONST char *fmt _AND 
+    va_list ap)
 {
-  int ret;
-  va_list ap;
+  FILE f;
 
-#ifdef _HAVE_STDC
-  va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
-  ret = __svfscanf_r (ptr, _stdin_r (ptr), fmt, ap);
-  va_end (ap);
-  return (ret);
+  f._flags = __SRD;
+  f._bf._base = f._p = (unsigned char *) str;
+  f._bf._size = f._r = strlen (str);
+  f._read = eofread1;
+  f._ub._base = NULL;
+  f._lb._base = NULL;
+  f._data = ptr;
+  return __svfscanf_r (ptr, &f, fmt, ap);    
 }
-
 

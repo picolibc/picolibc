@@ -118,7 +118,7 @@ lib_a_SOURCES = \
 	getc.c 				\
 	getchar.c 			\
 	gets.c 				\
-	getw.c 				\
+	getw.c				\
 	iprintf.c 			\
 	makebuf.c			\
 	mktemp.c 			\
@@ -127,7 +127,7 @@ lib_a_SOURCES = \
 	putc.c 				\
 	putchar.c 			\
 	puts.c 				\
-	putw.c 				\
+	putw.c				\
 	refill.c 			\
 	remove.c 			\
 	rename.c 			\
@@ -147,8 +147,10 @@ lib_a_SOURCES = \
 	vfprintf.c 			\
 	vfscanf.c 			\
 	vprintf.c 			\
+	vscanf.c			\
 	vsnprintf.c			\
 	vsprintf.c 			\
+	vsscanf.c			\
 	wbuf.c 				\
 	wsetup.c 
 
@@ -197,7 +199,8 @@ CHEWOUT_FILES = \
 	sscanf.def		\
 	tmpfile.def		\
 	tmpnam.def		\
-	vfprintf.def
+	vfprintf.def		\
+	vfscanf.def
 
 
 SUFFIXES = .def
@@ -220,11 +223,12 @@ lib_a_DEPENDENCIES =  vfiprintf.o
 lib_a_OBJECTS =  clearerr.o fclose.o fdopen.o feof.o ferror.o fflush.o \
 fgetc.o fgetpos.o fgets.o fileno.o findfp.o fiprintf.o flags.o fopen.o \
 fprintf.o fputc.o fputs.o fread.o freopen.o fscanf.o fseek.o fsetpos.o \
-ftell.o fvwrite.o fwalk.o fwrite.o getc.o getchar.o gets.o getw.o iprintf.o \
-makebuf.o mktemp.o perror.o printf.o putc.o putchar.o puts.o putw.o refill.o \
-remove.o rename.o rewind.o rget.o scanf.o setbuf.o setvbuf.o siprintf.o \
-snprintf.o sprintf.o sscanf.o stdio.o tmpfile.o tmpnam.o ungetc.o \
-vfprintf.o vfscanf.o vprintf.o vsnprintf.o vsprintf.o wbuf.o wsetup.o
+ftell.o fvwrite.o fwalk.o fwrite.o getc.o getchar.o gets.o getw.o \
+iprintf.o makebuf.o mktemp.o perror.o printf.o putc.o putchar.o puts.o \
+putw.o refill.o remove.o rename.o rewind.o rget.o scanf.o setbuf.o \
+setvbuf.o siprintf.o snprintf.o sprintf.o sscanf.o stdio.o tmpfile.o \
+tmpnam.o ungetc.o vfprintf.o vfscanf.o vprintf.o vscanf.o vsnprintf.o \
+vsprintf.o vsscanf.o wbuf.o wsetup.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -234,7 +238,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 SOURCES = $(lib_a_SOURCES)
 OBJECTS = $(lib_a_OBJECTS)
@@ -320,7 +324,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
@@ -437,6 +441,8 @@ ungetc.o: local.h
 vfiprintf.o: local.h
 vfprintf.o: local.h
 vfscanf.o: local.h floatio.h
+vscanf.o: local.h
+vsscanf.o: local.h
 wbuf.o: local.h fvwrite.h
 wsetup.o: local.h
 

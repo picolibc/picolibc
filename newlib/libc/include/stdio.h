@@ -142,11 +142,6 @@ typedef struct __sFILE FILE;
 #define __VALIST char*
 #endif
 
-#ifndef _REENT_ONLY
-int	_EXFUN(remove, (const char *));
-int	_EXFUN(rename, (const char *, const char *));
-#endif
-char *	_EXFUN(tempnam, (const char *, const char *));
 FILE *	_EXFUN(tmpfile, (void));
 char *	_EXFUN(tmpnam, (char *));
 int	_EXFUN(fclose, (FILE *));
@@ -162,7 +157,6 @@ int	_EXFUN(sscanf, (const char *, const char *, ...));
 int	_EXFUN(vfprintf, (FILE *, const char *, __VALIST));
 int	_EXFUN(vprintf, (const char *, __VALIST));
 int	_EXFUN(vsprintf, (char *, const char *, __VALIST));
-int	_EXFUN(vsnprintf, (char *, size_t, const char *, __VALIST));
 int	_EXFUN(fgetc, (FILE *));
 char *  _EXFUN(fgets, (char *, int, FILE *));
 int	_EXFUN(fputc, (int, FILE *));
@@ -188,13 +182,22 @@ void    _EXFUN(perror, (const char *));
 #ifndef _REENT_ONLY
 FILE *	_EXFUN(fopen, (const char *_name, const char *_type));
 int	_EXFUN(sprintf, (char *, const char *, ...));
-int	_EXFUN(snprintf, (char *, size_t, const char *, ...));
+int	_EXFUN(remove, (const char *));
+int	_EXFUN(rename, (const char *, const char *));
 #endif
 #ifndef __STRICT_ANSI__
 int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST));
 int	_EXFUN(iprintf, (const char *, ...));
 int	_EXFUN(fiprintf, (FILE *, const char *, ...));
 int	_EXFUN(siprintf, (char *, const char *, ...));
+char *	_EXFUN(tempnam, (const char *, const char *));
+int	_EXFUN(vsnprintf, (char *, size_t, const char *, __VALIST));
+int	_EXFUN(vfscanf, (FILE *, const char *, __VALIST));
+int	_EXFUN(vscanf, (const char *, __VALIST));
+int	_EXFUN(vsscanf, (const char *, const char *, __VALIST));
+#ifndef _REENT_ONLY
+int	_EXFUN(snprintf, (char *, size_t, const char *, ...));
+#endif
 #endif
 
 /*
@@ -220,6 +223,7 @@ int	_EXFUN(setlinebuf, (FILE *));
 
 FILE *	_EXFUN(_fdopen_r, (struct _reent *, int, const char *));
 FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
+int	_EXFUN(_fscanf_r, (struct _reent *, FILE *, const char *, ...));
 int	_EXFUN(_getchar_r, (struct _reent *));
 char *	_EXFUN(_gets_r, (struct _reent *, char *));
 int	_EXFUN(_iprintf_r, (struct _reent *, const char *, ...));
@@ -235,6 +239,7 @@ int	_EXFUN(_rename_r, (struct _reent *,
 int	_EXFUN(_scanf_r, (struct _reent *, const char *, ...));
 int	_EXFUN(_sprintf_r, (struct _reent *, char *, const char *, ...));
 int	_EXFUN(_snprintf_r, (struct _reent *, char *, size_t, const char *, ...));
+int	_EXFUN(_sscanf_r, (struct _reent *, const char *, const char *, ...));
 char *	_EXFUN(_tempnam_r, (struct _reent *, const char *, const char *));
 FILE *	_EXFUN(_tmpfile_r, (struct _reent *));
 char *	_EXFUN(_tmpnam_r, (struct _reent *, char *));
@@ -242,6 +247,9 @@ int	_EXFUN(_vfprintf_r, (struct _reent *, FILE *, const char *, __VALIST));
 int	_EXFUN(_vprintf_r, (struct _reent *, const char *, __VALIST));
 int	_EXFUN(_vsprintf_r, (struct _reent *, char *, const char *, __VALIST));
 int	_EXFUN(_vsnprintf_r, (struct _reent *, char *, size_t, const char *, __VALIST));
+int	_EXFUN(_vfscanf_r, (struct _reent *, FILE *, const char *, __VALIST));
+int	_EXFUN(_vscanf_r, (struct _reent *, const char *, __VALIST));
+int	_EXFUN(_vsscanf_r, (struct _reent *, const char *, const char *, __VALIST));
 
 /*
  * Routines internal to the implementation.

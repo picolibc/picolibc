@@ -65,8 +65,10 @@ lib_a_SOURCES = \
 	vfprintf.c 			\
 	vfscanf.c 			\
 	vprintf.c 			\
+	vscanf.c			\
 	vsnprintf.c			\
 	vsprintf.c 			\
+	vsscanf.c			\
 	wbuf.c 				\
 	wsetup.c 
 
@@ -117,7 +119,8 @@ CHEWOUT_FILES = \
 	sscanf.def		\
 	tmpfile.def		\
 	tmpnam.def		\
-	vfprintf.def
+	vfprintf.def		\
+	vfscanf.def
 
 SUFFIXES = .def
 
@@ -161,5 +164,7 @@ ungetc.o: local.h
 vfiprintf.o: local.h
 vfprintf.o: local.h
 vfscanf.o: local.h floatio.h
+vscanf.o: local.h
+vsscanf.o: local.h
 wbuf.o: local.h fvwrite.h
 wsetup.o: local.h

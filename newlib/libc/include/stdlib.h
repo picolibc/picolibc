@@ -93,6 +93,7 @@ double	_EXFUN(strtod,(const char *__n, char **_end_PTR));
 float	_EXFUN(strtodf,(const char *__n, char **_end_PTR));
 #endif
 long	_EXFUN(strtol,(const char *__n, char **_end_PTR, int __base));
+long	_EXFUN(_strtol_r,(struct _reent *,const char *__n, char **_end_PTR, int __base));
 unsigned long _EXFUN(strtoul,(const char *_n_PTR, char **_end_PTR, int __base));
 unsigned long _EXFUN(_strtoul_r,(struct _reent *,const char *_n_PTR, char **_end_PTR, int __base));
 int	_EXFUN(system,(const char *__string));
