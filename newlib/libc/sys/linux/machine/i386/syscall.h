@@ -55,6 +55,12 @@ __asm__ volatile ("push %%ebx; movl %2,%%ebx; int $0x80; pop %%ebx" \
 	: "0" (__NR_##name),"m" ((long)(arg1)),"c" ((long)(arg2)), \
 	  "d" ((long)(arg3)),"S" ((long)(arg4)),"D" ((long)(arg5)));
 
+#undef __inline_syscall6
+#define __inline_syscall6(name,ret,arg1,arg2,arg3,arg4,arg5,arg6) \
+__asm__ volatile ("push %%ebx; lea 8(%%ebp),%%ebx; int $0x80; pop %%ebx" \
+	: "=a" (ret) \
+	: "0" (__NR_##name));
+
 #undef _syscall1
 #define _syscall1(type,name,type1,arg1) \
 type name(type1 arg1) \
@@ -102,6 +108,14 @@ __syscall_return(type,__res); \
 }
 
 #undef _syscall6
+#define _syscall6(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4, \
+          type5,arg5,type6,arg6) \
+type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,type6 arg6) \
+{ \
+long __res; \
+__inline_syscall6(name,__res,arg1,arg2,arg3,arg4,arg5,arg6) \
+__syscall_return(type,__res); \
+}
 
 #endif /* __PIC__ && __i386__ */
 

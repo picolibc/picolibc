@@ -1,9 +1,18 @@
+2002-04-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+        *  libc/include/machine/types.h (__pid_t, __off_t, __loff_t): Added.
+        *  libc/sys/linux/Makefile.am: Add support for mmap.c.
+        *  libc/sys/linux/Makefile.in: Regenerated.
+        *  libc/sys/linux/mmap.c: New file.
+        *  libc/sys/linux/machine/i386/syscall.h: Add _syscall6 macro.
+        *  libc/sys/linux/sys/types.h (pid_t, off_t, loff_t): Added.
+
 2002-04-22  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* acinclude.m4 (newlib_cflags): Remove include directories that
 	are already specified in the top-level configure.in's FLAGS_FOR_TARGET.
 
-2002-04-19  Bill Siegmund 
+2002-04-19  Bill Siegmund  <ctc-dsl@pacbell.net>
 
 	* libc/machine/xscale/memchr.c: Don't use multi-line strings.
 	* libc/machine/xscale/memcmp.c: Ditto.

@@ -25,7 +25,11 @@ typedef _CLOCK_T_ clock_t;
 #endif
 
 typedef unsigned int __socklen_t;
-typedef long int __useconds_t;
+typedef unsigned int __useconds_t;
+
+typedef __pid_t pid_t;
+typedef __off_t off_t;
+typedef __loff_t loff_t;
 
 #include <linux/types.h>
 
