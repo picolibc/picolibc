@@ -1,3 +1,7 @@
+2003-10-31  Kevin Buettner  <kevin@redhat.com>
+
+	* sim-frv.h: New file.
+
 2003-10-15  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* callback.h (struct host_callback_struct): New members ftruncate
