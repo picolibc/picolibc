@@ -1,3 +1,8 @@
+2002-01-28  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/sys/strace.h (_STRACE_ON): Define.
+	(_STRACE_OFF): Ditto.
+
 2002-01-24  Christopher Faylor  <cgf@redhat.com>
 
 	* speclib: Ensure that temporary def file is removed.

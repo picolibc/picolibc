@@ -77,6 +77,13 @@ extern strace strace;
 #define _STRACE_MALLOC	 0x20000 // trace malloc calls
 #define _STRACE_THREAD	 0x40000 // thread-locking calls
 #define _STRACE_NOTALL	 0x80000 // don't include if _STRACE_ALL
+#if defined (DEBUGGING)
+# define _STRACE_ON strace.active = 1;
+# define _STRACE_OFF strace.active = 0;
+#else
+# define _STRACE_ON
+# define _STRACE_OFF
+#endif
 
 #ifdef __cplusplus
 extern "C" {
