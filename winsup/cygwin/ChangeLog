@@ -1,3 +1,15 @@
+2002-11-12  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* syscalls.cc (chmod): Simplify conditional.
+	* sec_helper (cygsid::getfromstr): Reorganize to remove
+	calls to strcpy and strtok_r.
+	(cygsid::getfromgr): Change type to __uid32_t instead of int.
+	Keep only the allow_ntsec branch. Never call LookupAccountSid 
+	which calls PDCs, simply return -1 in case of failure.
+	Use cygsid == instead of calling EqualSid and remove test 
+	for NULL psid.
+	* security.h: Declare cygsid::getfromgr as __uid32_t.
+
 2002-11-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc: Run indent.

@@ -964,12 +964,9 @@ chmod (const char *path, mode_t mode)
 
       if (!SetFileAttributes (win32_path, win32_path))
 	__seterrno ();
-      else
-	{
-	  /* Correct NTFS security attributes have higher priority */
-	  if (res == 0 || !allow_ntsec)
-	    res = 0;
-	}
+      else if (!allow_ntsec)
+	/* Correct NTFS security attributes have higher priority */
+	res = 0;
     }
 
 done:

@@ -57,7 +57,7 @@ public:
   BOOL getfrompw (const struct passwd *pw);
   BOOL getfromgr (const struct __group32 *gr);
 
-  int get_id (BOOL search_grp, int *type = NULL);
+  __uid32_t get_id (BOOL search_grp, int *type = NULL);
   inline int get_uid () { return get_id (FALSE); }
   inline int get_gid () { return get_id (TRUE); }
 

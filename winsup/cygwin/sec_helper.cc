@@ -99,29 +99,19 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r)
 const PSID
 cygsid::getfromstr (const char *nsidstr)
 {
-  char sid_buf[256];
-  char *t, *lasts;
-  DWORD cnt = 0;
-  DWORD s = 0;
-  DWORD i, r[8];
+  char *lasts;
+  DWORD s, cnt = 0;
+  DWORD r[8];
 
-  if (!nsidstr || strncmp (nsidstr, "S-1-", 4))
+  if (nsidstr && !strncmp (nsidstr, "S-1-", 4))
     {
-      psid = NO_SID;
-      return NULL;
+      s = strtoul (nsidstr + 4, &lasts, 10);
+      while ( cnt < 8 && *lasts == '-')
+	r[cnt++] = strtoul (lasts + 1, &lasts, 10);
+      if (!*lasts)
+	return get_sid (s, cnt, r);
     }
-
-  strcpy (sid_buf, nsidstr);
-
-  for (t = sid_buf + 4, i = 0;
-       cnt < 8 && (t = strtok_r (t, "-", &lasts));
-       t = NULL, ++i)
-    if (i == 0)
-      s = strtoul (t, NULL, 10);
-    else
-      r[cnt++] = strtoul (t, NULL, 10);
-
-  return get_sid (s, cnt, r);
+  return psid = NO_SID;
 }
 
 BOOL
@@ -138,124 +128,54 @@ cygsid::getfromgr (const struct __group32 *gr)
   return (*this = sp ?: "") != NULL;
 }
 
-int
+__uid32_t
 cygsid::get_id (BOOL search_grp, int *type)
 {
-  if (!psid)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-  if (!IsValidSid (psid))
-    {
-      __seterrno ();
-      system_printf ("IsValidSid failed with %E");
-      return -1;
-    }
-
   /* First try to get SID from passwd or group entry */
-  if (allow_ntsec)
+  cygsid sid;
+  __uid32_t id = ILLEGAL_UID;
+
+  if (!search_grp)
     {
-      cygsid sid;
-      int id = -1;
-
-      if (!search_grp)
+      struct passwd *pw;
+      if (*this == cygheap->user.sid ())
+	id = myself->uid;
+      else
+	for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
+          {
+	    if (sid.getfrompw (pw) && sid == psid)
+	      {
+		id = pw->pw_uid;
+		break;
+	      }
+	  }
+      if (id != ILLEGAL_UID)
 	{
-	  struct passwd *pw;
-	 if (EqualSid(psid, cygheap->user.sid ()))
-	   id = myself->uid;
-	 else
-	   for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
-	     {
-	       if (sid.getfrompw (pw) && sid == psid)
-		 {
-		   id = pw->pw_uid;
-		   break;
-		 }
-	     }
-	  if (id >= 0)
-	    {
-	      if (type)
-		*type = USER;
-	      return id;
-	    }
-	}
-      if (search_grp || type)
-	{
-	  struct __group32 *gr;
-	 if (cygheap->user.groups.pgsid == psid)
-	   id = myself->gid;
-	 else
-	   for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-	     {
-	       if (sid.getfromgr (gr) && sid == psid)
-		 {
-		   id = gr->gr_gid;
-		   break;
-		 }
-	     }
-	  if (id >= 0)
-	    {
-	      if (type)
-		*type = GROUP;
-	      return id;
-	    }
-	}
+	  if (type)
+	    *type = USER;
+	   return id;
+	 }
     }
-
-  /* We use the RID as default UID/GID */
-  int id = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount (psid) - 1);
-
-  /*
-   * The RID maybe -1 if accountname == computername.
-   * In this case we search for the accountname in the passwd and group files.
-   * If type is needed, we search in each case.
-   */
-  if (id == -1 || type)
+  if (search_grp || type)
     {
-      char account[UNLEN + 1];
-      char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-      DWORD acc_len = UNLEN + 1;
-      DWORD dom_len = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-      SID_NAME_USE acc_type;
-
-      if (!LookupAccountSid (NULL, psid, account, &acc_len,
-			     domain, &dom_len, &acc_type))
-	{
-	  __seterrno ();
-	  return -1;
-	}
-
-      switch (acc_type)
-	{
-	  case SidTypeGroup:
-	  case SidTypeAlias:
-	  case SidTypeWellKnownGroup:
-	    if (type)
-	      *type = GROUP;
-	    if (id == -1)
+      struct __group32 *gr;
+      if (cygheap->user.groups.pgsid == psid)
+	id = myself->gid;
+      else
+	for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+	  {
+	    if (sid.getfromgr (gr) && sid == psid)
 	      {
-		struct __group32 *gr = getgrnam32 (account);
-		if (gr)
-		  id = gr->gr_gid;
+		id = gr->gr_gid;
+		break;
 	      }
-	    break;
-	  case SidTypeUser:
-	    if (type)
-	      *type = USER;
-	    if (id == -1)
-	      {
-		struct passwd *pw = getpwnam (account);
-		if (pw)
-		  id = pw->pw_uid;
-	      }
-	    break;
-	  default:
-	    break;
+	  }
+      if (id != ILLEGAL_UID)
+	{
+	  if (type)
+	    *type = GROUP;
 	}
-    }
-  if (id == -1)
-    id = getuid32 ();
+     }
   return id;
 }
 
