@@ -476,7 +476,7 @@ acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
     }
   if (!real_path.has_acls ())
     {
-      struct stat st;
+      struct __stat64 st;
       int ret = -1;
 
       switch (cmd)
@@ -487,8 +487,8 @@ acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
 	case GETACL:
 	  if (nentries < 1)
 	    set_errno (EINVAL);
-	  else if ((nofollow && !lstat (path, &st))
-		   || (!nofollow && !stat (path, &st)))
+	  else if ((nofollow && !lstat64 (path, &st))
+		   || (!nofollow && !stat64 (path, &st)))
 	    {
 	      __aclent16_t lacl[4];
 	      if (nentries > 0)

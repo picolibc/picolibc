@@ -527,10 +527,10 @@ _open (const char *unix_path, int flags, ...)
   return res;
 }
 
-extern "C" __off32_t
-_lseek (int fd, __off32_t pos, int dir)
+extern "C" __off64_t
+lseek64 (int fd, __off64_t pos, int dir)
 {
-  __off32_t res;
+  __off64_t res;
   sigframe thisframe (mainthread);
 
   if (dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END)
@@ -546,9 +546,15 @@ _lseek (int fd, __off32_t pos, int dir)
       else
 	res = -1;
     }
-  syscall_printf ("%d = lseek (%d, %d, %d)", res, fd, pos, dir);
+  syscall_printf ("%d = lseek (%d, %D, %d)", res, fd, pos, dir);
 
   return res;
+}
+
+extern "C" __off32_t
+_lseek (int fd, __off32_t pos, int dir)
+{
+  return lseek64 (fd, (__off64_t) pos, dir);
 }
 
 extern "C" int
@@ -956,8 +962,26 @@ fchmod (int fd, mode_t mode)
   return chmod (path, mode);
 }
 
+static void
+stat64_to_stat32 (struct __stat64 *src, struct __stat32 *dst)
+{
+  dst->st_dev = src->st_dev;
+  dst->st_ino = src->st_ino;
+  dst->st_mode = src->st_mode;
+  dst->st_nlink = src->st_nlink;
+  dst->st_uid = src->st_uid;
+  dst->st_gid = src->st_gid;
+  dst->st_rdev = src->st_rdev;
+  dst->st_size = src->st_size;
+  dst->st_atime = src->st_atime;
+  dst->st_mtime = src->st_mtime;
+  dst->st_ctime = src->st_ctime;
+  dst->st_blksize = src->st_blksize;
+  dst->st_blocks = src->st_blocks;
+}
+
 extern "C" int
-_fstat (int fd, struct stat *buf)
+fstat64 (int fd, struct __stat64 *buf)
 {
   int res;
   sigframe thisframe (mainthread);
@@ -967,12 +991,22 @@ _fstat (int fd, struct stat *buf)
     res = -1;
   else
     {
-      memset (buf, 0, sizeof (struct stat));
+      memset (buf, 0, sizeof (struct __stat64));
       res = cfd->fstat (buf, NULL);
     }
 
   syscall_printf ("%d = fstat (%d, %p)", res, fd, buf);
   return res;
+}
+
+extern "C" int
+_fstat (int fd, struct __stat32 *buf)
+{
+  struct __stat64 buf64;
+  int ret = fstat64 (fd, &buf64);
+  if (!ret)
+    stat64_to_stat32 (&buf64, buf);
+  return ret;
 }
 
 /* fsync: P96 6.6.1.1 */
@@ -1011,7 +1045,8 @@ suffix_info stat_suffixes[] =
 
 /* Cygwin internal */
 int __stdcall
-stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
+stat_worker (const char *name, struct __stat64 *buf, int nofollow,
+	     path_conv *pc)
 {
   int res = -1;
   path_conv real_path;
@@ -1038,7 +1073,7 @@ stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
     {
       debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
 		    pc, (DWORD) real_path);
-      memset (buf, 0, sizeof (struct stat));
+      memset (buf, 0, sizeof (struct __stat64));
       res = fh->fstat (buf, pc);
     }
 
@@ -1051,20 +1086,41 @@ stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
 }
 
 extern "C" int
-_stat (const char *name, struct stat *buf)
+stat64 (const char *name, struct __stat64 *buf)
 {
   sigframe thisframe (mainthread);
   syscall_printf ("entering");
   return stat_worker (name, buf, 0);
 }
 
+extern "C" int
+_stat (const char *name, struct __stat32 *buf)
+{
+  struct __stat64 buf64;
+  int ret = stat64 (name, &buf64);
+  if (!ret)
+    stat64_to_stat32 (&buf64, buf);
+  return ret;
+}
+
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
 extern "C" int
-lstat (const char *name, struct stat *buf)
+lstat64 (const char *name, struct __stat64 *buf)
 {
   sigframe thisframe (mainthread);
   syscall_printf ("entering");
   return stat_worker (name, buf, 1);
+}
+
+/* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
+extern "C" int
+cygwin_lstat (const char *name, struct __stat32 *buf)
+{
+  struct __stat64 buf64;
+  int ret = lstat64 (name, &buf64);
+  if (!ret)
+    stat64_to_stat32 (&buf64, buf);
+  return ret;
 }
 
 extern int acl_access (const char *, int);
@@ -1083,7 +1139,7 @@ access (const char *fn, int flags)
   if (allow_ntsec)
     return acl_access (fn, flags);
 
-  struct stat st;
+  struct __stat64 st;
   int r = stat_worker (fn, &st, 0);
   if (r)
     return -1;
@@ -1607,9 +1663,8 @@ setmode (int fd, int mode)
   return res;
 }
 
-/* ftruncate: P96 5.6.7.1 */
 extern "C" int
-ftruncate (int fd, __off32_t length)
+ftruncate64 (int fd, __off64_t length)
 {
   sigframe thisframe (mainthread);
   int res = -1;
@@ -1626,7 +1681,7 @@ ftruncate (int fd, __off32_t length)
 	  if (cfd->get_handle ())
 	    {
 	      /* remember curr file pointer location */
-	      __off32_t prev_loc = cfd->lseek (0, SEEK_CUR);
+	      __off64_t prev_loc = cfd->lseek (0, SEEK_CUR);
 
 	      cfd->lseek (length, SEEK_SET);
 	      if (!SetEndOfFile (h))
@@ -1635,7 +1690,7 @@ ftruncate (int fd, __off32_t length)
 		res = 0;
 
 	      /* restore original file pointer location */
-	      cfd->lseek (prev_loc, 0);
+	      cfd->lseek (prev_loc, SEEK_SET);
 	    }
 	}
     }
@@ -1644,9 +1699,16 @@ ftruncate (int fd, __off32_t length)
   return res;
 }
 
+/* ftruncate: P96 5.6.7.1 */
+extern "C" int
+ftruncate (int fd, __off32_t length)
+{
+  return ftruncate64 (fd, (__off64_t)length);
+}
+
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
 extern "C" int
-truncate (const char *pathname, __off32_t length)
+truncate64 (const char *pathname, __off64_t length)
 {
   sigframe thisframe (mainthread);
   int fd;
@@ -1664,6 +1726,13 @@ truncate (const char *pathname, __off32_t length)
   syscall_printf ("%d = truncate (%s, %d)", res, pathname, length);
 
   return res;
+}
+
+/* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
+extern "C" int
+truncate (const char *pathname, __off32_t length)
+{
+  return truncate64 (pathname, (__off64_t)length);
 }
 
 extern "C" long
@@ -2377,6 +2446,7 @@ logout (char *line)
     {
       struct utmp *ut;
       struct utmp ut_buf[100];
+      /* FIXME: utmp file access is not 64 bit clean for now. */
       __off32_t pos = 0;		/* Position in file */
       DWORD rd;
 

@@ -1,3 +1,62 @@
+2002-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (fstat64): New symbol.
+	(ftruncate64): Ditto.
+	(lseek64): Ditto.
+	(lstat64): Ditto.
+	(mmap64): Ditto.
+	(seekdir64): Ditto.
+	(stat64): Ditto.
+	(telldir64): Ditto.
+	(truncate64): Ditto.
+	* dir.cc (telldir64): New function.
+	(telldir): Call telldir64().
+	(seekdir64): New function.
+	(seekdir): Call seekdir64().
+	* fhandler.h: Redefine all methods using __off32_t to use __off64_t.
+	* fhandler.cc: Use __off64_t and struct __stat64 throughout.
+	* fhandler_clipboard.cc: Ditto.
+	* fhandler_disk_file.cc: Ditto.
+	* fhandler_dsp.cc: Ditto.
+	* fhandler_floppy.cc: Ditto.
+	* fhandler_mem.cc: Ditto.
+	* fhandler_random.cc: Ditto.
+	* fhandler_socket.cc: Ditto.
+	* fhandler_tape.cc: Ditto.
+	* fhandler_zero.cc: Ditto.
+	* pipe.cc: Ditto.
+	* glob.c: Ditto, call lstat64 and stat64 in Cygwin.
+	* mmap.cc: Use __off64_t throughout.
+	(mmap64): New function.
+	* sec_acl.cc (acl_worker): Use struct __stat64, call stat64 and lstat64.
+	* syscalls.cc (lseek64): New function.
+	(stat64_to_stat32): Ditto.
+	(fstat64): Ditto.
+	(stat64): Ditto.
+	(lstat64): Ditto.
+	(ftruncate64): Ditto.
+	(truncate64): Ditto.
+	(_fstat): Call fstat64.
+	(_stat): Call stat64.
+	(cygwin_lstat): Rename to avoid declaration problem.  Call lstat64.
+	(stat_worker): Use struct __stat64.
+	(access): Ditto.
+	(ftruncate): Call ftruncate64.
+	(truncate): Call truncate64.
+	* wincap.cc: Set flag has_64bit_file_access appropriately.
+	* wincap.h: Add flag has_64bit_file_access.
+	* winsup.h (ILLEGAL_SEEK): Define as __off64_t.
+	(stat_dev): Declare using struct __stat64.
+	(stat_worker): Ditto.
+	* include/cygwin/stat.h (struct __stat32): Define if compiling Cygwin.
+	(struct __stat64): Ditto.
+	(struct stat): Revert definition with explicitly sized datatypes.
+	Eliminate sized field names.
+	* include/cygwin/types.h (blksize_t): New type.
+	(__blkcnt32_t): Ditto.
+	(__blkcnt64_t): Ditto.
+	(blkcnt_t): Ditto.
+
 2002-02-22  Christopher Faylor  <cgf@redhat.com>
 
 	* sync.h (new_muto): Just accept an argument which denotes the name of

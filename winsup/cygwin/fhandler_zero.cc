@@ -41,8 +41,8 @@ fhandler_dev_zero::read (void *ptr, size_t len)
   return len;
 }
 
-__off32_t
-fhandler_dev_zero::lseek (__off32_t, int)
+__off64_t
+fhandler_dev_zero::lseek (__off64_t, int)
 {
   return 0;
 }

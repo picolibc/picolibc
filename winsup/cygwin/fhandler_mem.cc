@@ -231,8 +231,8 @@ fhandler_dev_mem::close (void)
   return fhandler_base::close ();
 }
 
-__off32_t
-fhandler_dev_mem::lseek (__off32_t offset, int whence)
+__off64_t
+fhandler_dev_mem::lseek (__off64_t offset, int whence)
 {
   switch (whence)
     {
@@ -265,11 +265,11 @@ fhandler_dev_mem::lseek (__off32_t offset, int whence)
 
 HANDLE
 fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
-			int flags, __off32_t off)
+			int flags, __off64_t off)
 {
-  if ((DWORD) off >= mem_size
+  if (off >= mem_size
       || (DWORD) len >= mem_size
-      || (DWORD) off + len >= mem_size)
+      || off + len >= mem_size)
     {
       set_errno (EINVAL);
       syscall_printf ("-1 = mmap(): illegal parameter, set EINVAL");
@@ -402,7 +402,7 @@ fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 }
 
 int
-fhandler_dev_mem::fstat (struct stat *buf, path_conv *pc)
+fhandler_dev_mem::fstat (struct __stat64 *buf, path_conv *pc)
 {
   this->fhandler_base::fstat (buf, pc);
   buf->st_mode = S_IFCHR;

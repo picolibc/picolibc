@@ -25,6 +25,16 @@ typedef __off64_t off_t;
 typedef __off32_t off_t;
 #endif
 
+typedef long blksize_t;
+
+typedef long __blkcnt32_t;
+typedef long long __blkcnt64_t;
+#ifdef __CYGWIN_USE_BIG_TYPES__
+typedef __blkcnt64_t  blkcnt_t;
+#else
+typedef __blkcnt32_t  blkcnt_t;
+#endif
+
 typedef unsigned short __uid16_t;
 typedef unsigned short __gid16_t;
 typedef unsigned long  __uid32_t;

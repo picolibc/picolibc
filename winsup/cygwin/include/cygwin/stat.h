@@ -16,36 +16,75 @@ details. */
 extern "C" {
 #endif
 
-struct  stat
-{ 
-  dev_t     st_dev;
-  ino_t     st_ino;
-  mode_t    st_mode;
-  nlink_t   st_nlink;
-  __uid16_t __st_uid16;
-  __gid16_t __st_gid16;
-  dev_t     st_rdev;
-  __off32_t __st_size32;
-  time_t    st_atime;
-  __uid32_t __st_uid32;
-  time_t    st_mtime;
-  __uid32_t __st_gid32;
-  time_t    st_ctime;
-  long      st_spare3;
-  long      st_blksize;
-  long      st_blocks;
-  __off64_t __st_size64;
+#ifdef __INSIDE_CYGWIN__
+struct __stat32
+{
+  dev_t         st_dev;
+  ino_t         st_ino;
+  mode_t        st_mode;
+  nlink_t       st_nlink;
+  __uid16_t     st_uid;
+  __gid16_t     st_gid;
+  dev_t         st_rdev;
+  __off32_t     st_size;
+  time_t        st_atime;
+  long          st_spare1;
+  time_t        st_mtime;
+  long          st_spare2;
+  time_t        st_ctime;
+  long          st_spare3;
+  blksize_t     st_blksize;
+  __blkcnt32_t  st_blocks;
+  long          st_spare4[2];
 };
 
-#ifdef __CYGWIN_USE_BIG_TYPES__
-#define st_uid  __st_uid32
-#define st_gid  __st_gid32
-#define st_size __st_size64
-#else
-#define st_uid  __st_uid16
-#define st_gid  __st_gid16
-#define st_size __st_size32
-#endif /* __CYGWIN_USE_BIG_TYPES__ */
+struct __stat64
+{
+  dev_t         st_dev;
+  ino_t         st_ino;
+  mode_t        st_mode;
+  nlink_t       st_nlink;
+  __uid32_t     st_uid;
+  __gid32_t     st_gid;
+  dev_t         st_rdev;
+  __off64_t     st_size;
+  time_t        st_atime;
+  long          st_spare1;
+  time_t        st_mtime;
+  long          st_spare2;
+  time_t        st_ctime;
+  long          st_spare3;
+  blksize_t     st_blksize;
+  __blkcnt64_t  st_blocks;
+  long          st_spare4[2];
+};
+
+extern int fstat64 (int fd, struct __stat64 *buf);
+extern int stat64 (const char *file_name, struct __stat64 *buf);
+extern int lstat64 (const char *file_name, struct __stat64 *buf);
+
+#endif
+
+struct stat
+{ 
+  dev_t         st_dev;
+  ino_t         st_ino;
+  mode_t        st_mode;
+  nlink_t       st_nlink;
+  uid_t         st_uid;
+  gid_t         st_gid;
+  dev_t         st_rdev;
+  off_t         st_size;
+  time_t        st_atime;
+  long          st_spare1;
+  time_t        st_mtime;
+  long          st_spare2;
+  time_t        st_ctime;
+  long          st_spare3;
+  blksize_t     st_blksize;
+  blkcnt_t      st_blocks;
+  long          st_spare4[2];
+};
 
 #ifdef __cplusplus
 }
