@@ -1,3 +1,8 @@
+2004-09 05  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/w32api.h: Increment version to 3.1.
+	* Makefile.in: Ditto.
+
 2004-09-05  Hosaka Yuji  <hos@tamanegi.org>
 
 	* include/winuser.h (MonitorFromPoint, MonitorFromRect,
@@ -512,6 +517,13 @@
 
 	* include/GL/glu.h: Include <stddef.h>.
 	Thanks to Greg Couch <gregcouch@users.sourceforge.net>
+
+2004-02-15  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/w32api.h: Increment version to 3.0.
+	* Makefile.in: Ditto.
+	* README.win32api: Modify license to Public Domain per agreement as
+	found in the mingw-dvlpr list archive.
 
 2004-02-13  Earnie Boyd  <earnie@users.sourceforge.net>
 
