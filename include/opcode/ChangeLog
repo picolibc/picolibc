@@ -1,3 +1,7 @@
+Sat May  8 23:27:35 1999  Richard Henderson  <rth@cygnus.com>
+
+	* ppc.h (PPC_OPCODE_64_BRIDGE): New.
+
 1999-04-14  Doug Evans  <devans@casey.cygnus.com>
 
 	* cgen.h (CGEN_ATTR): Delete member num_nonbools.
