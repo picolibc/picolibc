@@ -1,3 +1,23 @@
+2002-11-20  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (get_attribute_from_acl): Always test "anti",
+	just in case an access_denied ACE follows an access_allowed.
+	Handle the case owner_sid == group_sid, with a FIXME.
+	Remove unnecessary tests for non-NULL PSIDs.
+	(alloc_sd): Use existing owner and group sids if {ug}id == -1.
+	Handle case where owner_sid == group_sid.
+	Do not call is_grp_member. Try to preserve canonical ACE order.
+	Remove unnecessary tests for non-NULL PSIDs. Reorganize
+	debug_printf's.
+	(get_initgroups_sidlist): Put well_known_system_sid on left
+	side of ==.
+	(add_access_denied_ace): Only call GetAce if inherit != 0.
+	(add_access_allowed_ace): Ditto. Use appropriate sizeof.
+	* syscalls.cc (chown_worker): Pass {ug}id equal to -1 to
+	alloc_sd, which removes the need to obtain old_{ug}id.
+	(chmod): Remove call to get_file_attribute (), simply pass
+	{ug}id equal to -1 to alloc_sd.
+
 2002-11-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* poll.cc (poll): Don't set POLLERR if a listening socket has a

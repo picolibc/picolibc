@@ -773,8 +773,6 @@ static int
 chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 {
   int res;
-  __uid32_t old_uid;
-  __gid32_t old_gid;
 
   if (check_null_empty_str_errno (name))
     return -1;
@@ -806,20 +804,10 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 	attrib |= S_IFDIR;
       res = get_file_attribute (win32_path.has_acls (),
 				win32_path.get_win32 (),
-				(int *) &attrib,
-				&old_uid,
-				&old_gid);
+				(int *) &attrib);
       if (!res)
-	{
-	  if (uid == ILLEGAL_UID)
-	    uid = old_uid;
-	  if (gid == ILLEGAL_GID)
-	    gid = old_gid;
-	  if (win32_path.isdir ())
-	    attrib |= S_IFDIR;
-	  res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
-				    gid, attrib);
-	}
+         res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
+				   gid, attrib);
       if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
 	{
 	  /* fake - if not supported, pretend we're like win95
@@ -936,19 +924,10 @@ chmod (const char *path, mode_t mode)
       /* temporary erase read only bit, to be able to set file security */
       SetFileAttributes (win32_path, (DWORD) win32_path & ~FILE_ATTRIBUTE_READONLY);
 
-      __uid32_t uid;
-      __gid32_t gid;
-
       if (win32_path.isdir ())
 	mode |= S_IFDIR;
-      get_file_attribute (win32_path.has_acls (),
-			  win32_path.get_win32 (),
-			  NULL, &uid, &gid);
-      /* FIXME: Do we really need this to be specified twice? */
-      if (win32_path.isdir ())
-	mode |= S_IFDIR;
-      if (!set_file_attribute (win32_path.has_acls (), win32_path, uid, gid,
-				mode)
+      if (!set_file_attribute (win32_path.has_acls (), win32_path,
+			       ILLEGAL_UID, ILLEGAL_GID, mode)
 	  && allow_ntsec)
 	res = 0;
 

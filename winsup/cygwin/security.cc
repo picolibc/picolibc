@@ -449,7 +449,7 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
   BOOL retval = FALSE;
   UCHAR count = 0;
 
-  if (pusersid == well_known_system_sid)
+  if (well_known_system_sid == pusersid)
     {
       pgrpsid = well_known_system_sid;
       return TRUE;
@@ -540,7 +540,7 @@ get_initgroups_sidlist (cygsidlist &grp_list,
 {
   grp_list += well_known_world_sid;
   grp_list += well_known_authenticated_users_sid;
-  if (usersid == well_known_system_sid)
+  if (well_known_system_sid == usersid)
     {
       auth_pos = -1;
       grp_list += well_known_admins_sid;
@@ -1238,19 +1238,17 @@ get_attribute_from_acl (int * attribute, PACL acl, PSID owner_sid,
       if (ace_sid == well_known_world_sid)
 	{
 	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_IROTH
+	    *flags |= ((!(*anti & S_IROTH)) ? S_IROTH : 0)
 		      | ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
 		      | ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
 	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_IWOTH
+	    *flags |= ((!(*anti & S_IWOTH)) ? S_IWOTH : 0)
 		      | ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
 		      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
 	  if (ace->Mask & FILE_EXECUTE)
-	    {
-	      *flags |= S_IXOTH
-			| ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
-			| ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	    }
+	    *flags |= ((!(*anti & S_IXOTH)) ? S_IXOTH : 0)
+	              | ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
+	              | ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	  if ((*attribute & S_IFDIR) &&
 	      (ace->Mask & (FILE_WRITE_DATA | FILE_EXECUTE | FILE_DELETE_CHILD))
 	      == (FILE_WRITE_DATA | FILE_EXECUTE))
@@ -1266,31 +1264,39 @@ get_attribute_from_acl (int * attribute, PACL acl, PSID owner_sid,
 	  if (ace->Mask & FILE_APPEND_DATA)
 	    *flags |= S_ISUID;
 	}
-      else if (owner_sid && ace_sid == owner_sid)
+      else if (ace_sid == owner_sid)
 	{
 	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_IRUSR;
+	    *flags |= ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
 	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_IWUSR;
+	    *flags |= ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
 	  if (ace->Mask & FILE_EXECUTE)
-	    *flags |= S_IXUSR;
+	    *flags |= ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	}
-      else if (group_sid && ace_sid == group_sid)
+      else if (ace_sid == group_sid)
 	{
 	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_IRGRP
+	    *flags |= ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
 		      | ((grp_member && !(*anti & S_IRUSR)) ? S_IRUSR : 0);
 	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_IWGRP
+	    *flags |= ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
 		      | ((grp_member && !(*anti & S_IWUSR)) ? S_IWUSR : 0);
 	  if (ace->Mask & FILE_EXECUTE)
-	    *flags |= S_IXGRP
+	    *flags |= ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
 		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	}
     }
   *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
+  if (owner_sid && group_sid && EqualSid (owner_sid, group_sid)
+      /* FIXME: temporary exception for /var/empty */
+      && well_known_system_sid != group_sid)
+    {
+      allow &= ~(S_IRGRP | S_IWGRP | S_IXGRP);
+      allow |= (((allow & S_IRUSR) ? S_IRGRP : 0)
+		| ((allow & S_IWUSR) ? S_IWGRP : 0)
+		| ((allow & S_IXUSR) ? S_IXGRP : 0));
+    }
   *attribute |= allow;
-  *attribute &= ~deny;
   return;
 }
 
@@ -1494,9 +1500,9 @@ add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
       return FALSE;
     }
   ACCESS_ALLOWED_ACE *ace;
-  if (GetAce (acl, offset, (PVOID *) &ace))
+  if (inherit && GetAce (acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
-  len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD) + GetLengthSid (sid);
+  len_add += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + GetLengthSid (sid);
   return TRUE;
 }
 
@@ -1510,7 +1516,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
       return FALSE;
     }
   ACCESS_DENIED_ACE *ace;
-  if (GetAce (acl, offset, (PVOID *) &ace))
+  if (inherit && GetAce (acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD) + GetLengthSid (sid);
   return TRUE;
@@ -1522,36 +1528,32 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 {
   BOOL dummy;
 
-  if (!wincap.has_security ())
-    return NULL;
-
+  debug_printf("uid %d, gid %d, attribute %x", uid, gid, attribute);
   if (!sd_ret || !sd_size_ret)
     {
       set_errno (EINVAL);
       return NULL;
     }
 
+  /* Get owner and group from current security descriptor. */
+  PSID cur_owner_sid = NULL;
+  PSID cur_group_sid = NULL;
+  if (!GetSecurityDescriptorOwner (sd_ret, &cur_owner_sid, &dummy))
+    debug_printf ("GetSecurityDescriptorOwner %E");
+  if (!GetSecurityDescriptorGroup (sd_ret, &cur_group_sid, &dummy))
+    debug_printf ("GetSecurityDescriptorGroup %E");
+
   /* Get SID of owner. */
   cygsid owner_sid (NO_SID);
   /* Check for current user first */
   if (uid == myself->uid)
     owner_sid = cygheap->user.sid ();
-  else
+  else if (uid == ILLEGAL_UID)
+    owner_sid = cur_owner_sid;
+  else if (!owner_sid.getfrompw (getpwuid32 (uid)))
     {
-      /* Otherwise retrieve user data from /etc/passwd */
-      struct passwd *pw = getpwuid32 (uid);
-      if (!pw)
-	{
-	  debug_printf ("no /etc/passwd entry for %d", uid);
-	  set_errno (EINVAL);
-	  return NULL;
-	}
-      else if (!owner_sid.getfrompw (pw))
-	{
-	  debug_printf ("no SID for user %d", uid);
-	  set_errno (EINVAL);
-	  return NULL;
-	}
+      set_errno (EINVAL);
+      return NULL;
     }
   owner_sid.debug_print ("alloc_sd: owner SID =");
 
@@ -1560,14 +1562,15 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
   /* Check for current user first */
   if (gid == myself->gid)
     group_sid = cygheap->user.groups.pgsid;
-  else
-   {
-      struct __group32 *grp = getgrgid32 (gid);
-      if (!grp)
-	debug_printf ("no /etc/group entry for %d", gid);
-      else if (!group_sid.getfromgr (grp))
-	debug_printf ("no SID for group %d", gid);
-   }
+  else if (gid == ILLEGAL_GID)
+    group_sid = cur_group_sid;
+  else if (!group_sid.getfromgr (getgrgid32 (gid)))
+    {
+      set_errno (EINVAL);
+      return NULL;
+    }
+  group_sid.debug_print ("alloc_sd: group SID =");
+
   /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;
   PSECURITY_DESCRIPTOR psd = NULL;
@@ -1594,7 +1597,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     }
 
   /* Create group for local security descriptor. */
-  if (group_sid && !SetSecurityDescriptorGroup (&sd, group_sid, FALSE))
+  if (!SetSecurityDescriptorGroup (&sd, group_sid, FALSE))
     {
       __seterrno ();
       return NULL;
@@ -1665,17 +1668,24 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 	null_allow |= FILE_READ_DATA;
     }
 
-  /* Construct deny attributes for owner and group. */
-  DWORD owner_deny = 0;
-  if (is_grp_member (uid, gid))
-    owner_deny = ~owner_allow & (group_allow | other_allow);
+  /* Add owner and group permissions if SIDs are equal
+     and construct deny attributes for group and owner. */
+  DWORD group_deny;
+  if (owner_sid == group_sid)
+    {
+      owner_allow |= group_allow;
+      group_allow = group_deny = 0L;
+    }
   else
-    owner_deny = ~owner_allow & other_allow;
+    {
+      group_deny = ~group_allow & other_allow;
+      group_deny &= ~(STANDARD_RIGHTS_READ
+		      | FILE_READ_ATTRIBUTES | FILE_READ_EA);
+    }
+  DWORD owner_deny = ~owner_allow & (group_allow | other_allow);
   owner_deny &= ~(STANDARD_RIGHTS_READ
 		  | FILE_READ_ATTRIBUTES | FILE_READ_EA
 		  | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA);
-  DWORD group_deny = ~group_allow & other_allow;
-  group_deny &= ~(STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES | FILE_READ_EA);
 
   /* Construct appropriate inherit attribute. */
   DWORD inherit = (attribute & S_IFDIR) ? SUB_CONTAINERS_AND_OBJECTS_INHERIT
@@ -1686,18 +1696,28 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
       && !add_access_denied_ace (acl, ace_off++, owner_deny,
 				 owner_sid, acl_len, inherit))
     return NULL;
+  /* Set deny ACE for group here to respect the canonical order,
+     if this does not impact owner */
+  if (group_deny && !(owner_allow & group_deny))
+    {
+      if (!add_access_denied_ace (acl, ace_off++, group_deny,
+				 group_sid, acl_len, inherit))
+	return NULL;
+      group_deny = 0;
+    }
   /* Set allow ACE for owner. */
   if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
 			       owner_sid, acl_len, inherit))
     return NULL;
-  /* Set deny ACE for group. */
+  /* Set deny ACE for group, if still needed. */
   if (group_deny
       && !add_access_denied_ace (acl, ace_off++, group_deny,
 				 group_sid, acl_len, inherit))
     return NULL;
   /* Set allow ACE for group. */
-  if (!add_access_allowed_ace (acl, ace_off++, group_allow,
-			       group_sid, acl_len, inherit))
+  if (group_allow
+      && !add_access_allowed_ace (acl, ace_off++, group_allow,
+				  group_sid, acl_len, inherit))
     return NULL;
 
   /* Set allow ACE for everyone. */
@@ -1710,14 +1730,6 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 				  well_known_null_sid, acl_len, NO_INHERITANCE))
     return NULL;
 
-  /* Get owner and group from current security descriptor. */
-  PSID cur_owner_sid = NULL;
-  PSID cur_group_sid = NULL;
-  if (!GetSecurityDescriptorOwner (sd_ret, &cur_owner_sid, &dummy))
-    debug_printf ("GetSecurityDescriptorOwner %E");
-  if (!GetSecurityDescriptorGroup (sd_ret, &cur_group_sid, &dummy))
-    debug_printf ("GetSecurityDescriptorGroup %E");
-
   /* Fill ACL with unrelated ACEs from current security descriptor. */
   PACL oacl;
   BOOL acl_exists;
@@ -1729,10 +1741,10 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 	{
 	  cygsid ace_sid ((PSID) &ace->SidStart);
 	  /* Check for related ACEs. */
-	  if ((cur_owner_sid && ace_sid == cur_owner_sid)
-	      || (owner_sid && ace_sid == owner_sid)
-	      || (cur_group_sid && ace_sid == cur_group_sid)
-	      || (group_sid && ace_sid == group_sid)
+	  if ((ace_sid == cur_owner_sid)
+	      || (ace_sid == owner_sid)
+	      || (ace_sid == cur_group_sid)
+	      || (ace_sid == group_sid)
 	      || (ace_sid == well_known_world_sid)
 	      || (ace_sid == well_known_null_sid))
 	    continue;
