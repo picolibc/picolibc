@@ -1,5 +1,9 @@
 2004-06-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* times.cc (hires_ms::usecs): Don't overreact.
+
+2004-06-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* times.cc (hires_ms::usecs): Reinit timer when system time overflows.
 
 2004-06-27  Christopher Faylor  <me@cgf.cx>
