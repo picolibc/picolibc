@@ -1,3 +1,7 @@
+2004-08-10  Sebastian Nowak  <snowak1@users.sourceforge.net>
+
+	* include/ws2spi.h (LPWSPSELECT): Correct typedef.
+
 2004-08-10   Danny Smith  <dannysmith@users.sourceforeg.net>
 
 	* include/wincrypt.h: Correct _WIN32_WINNT typo.
