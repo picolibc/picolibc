@@ -1,3 +1,7 @@
+2002-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_group_sidlist): Fix formatting.
+
 2002-07-14  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (initial_env): Force path and CYGWIN_DEBUG contents to lower

@@ -535,10 +535,11 @@ get_group_sidlist (cygsidlist &grp_list,
   /* special_pgrp true if pgrpsid is not null and not in normal groups */
   if (!pgrpsid)
     {
-      * special_pgrp = FALSE;
+      *special_pgrp = FALSE;
       get_user_primary_group (wserver, user, usersid, pgrpsid);
     }
-  else * special_pgrp = TRUE;
+  else
+    *special_pgrp = TRUE;
   if (pw->pw_name && get_supplementary_group_sidlist (pw->pw_name, sup_list))
     {
       for (int i = 0; i < sup_list.count; ++i)
@@ -547,7 +548,8 @@ get_group_sidlist (cygsidlist &grp_list,
     }
   if (!grp_list.contains (pgrpsid))
     grp_list += pgrpsid;
-  else * special_pgrp = FALSE;
+  else
+    *special_pgrp = FALSE;
   return TRUE;
 }
 
