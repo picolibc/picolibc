@@ -117,6 +117,7 @@ enum h8_flags {
   B31 =		0x40000000,		/* Bit 3 must be high.  */
   E =  		0x80000000,		/* End of nibble sequence.  */
 
+  /* Immediates smaller than 8 bits are always unsigned.  */
   IMM3 =	IMM | L_3,
   IMM4 =	IMM | L_4,
   IMM5 =	IMM | L_5,
@@ -124,15 +125,14 @@ enum h8_flags {
   IMM2 =	IMM | L_2,
 
   IMM8 =	IMM | SRC | L_8,
+  IMM8U =	IMM | SRC | L_8U,
   IMM16 =	IMM | SRC | L_16,
   IMM16U =	IMM | SRC | L_16U,
   IMM32 =	IMM | SRC | L_32,
 
   IMM3NZ_NS =   IMM3NZ | NO_SYMBOLS,
-  IMM2_NS =     IMM2 | NO_SYMBOLS,
   IMM4_NS =	IMM4 | NO_SYMBOLS,
-  IMM8_NS =	IMM8 | NO_SYMBOLS,
-  IMM16_NS =    IMM16 | NO_SYMBOLS,
+  IMM8U_NS =	IMM8U | NO_SYMBOLS,
   IMM16U_NS =   IMM16U | NO_SYMBOLS,
 
   RD8  =	DST | L_8  | REG,
@@ -1475,7 +1475,7 @@ struct h8_opcode h8_opcodes[] =
   {O (O_MOV, SW), AV_H8SX, 0, "mov.w", {{IMM4_NS,  ABS16DST, E}}, {{0x6, 0xb, 0xd, IMM4, DSTABS16LIST, E}}},
   {O (O_MOV, SW), AV_H8SX, 0, "mov.w", {{IMM4_NS,  ABS32DST, E}}, {{0x6, 0xb, 0xf, IMM4, DSTABS32LIST, E}}},
 
-  MOVFROM_IMM8 (O (O_MOV, SW), PREFIX_015D,   "mov.w", IMM8_NS),
+  MOVFROM_IMM8 (O (O_MOV, SW), PREFIX_015D,   "mov.w", IMM8U_NS),
   MOVFROM_IMM  (O (O_MOV, SW), PREFIX_7974,   "mov.w", IMM16, IMM16LIST),
 
   {O (O_MOV, SW), AV_H8,   2, "mov.w", {{RS16, RD16,      E}}, {{0x0, 0xD, RS16, RD16, E}}},
@@ -1501,7 +1501,7 @@ struct h8_opcode h8_opcodes[] =
 
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{IMM3NZ_NS, RD32, E}}, {{0x0, 0xf, B31 | IMM3NZ, B31 | RD32, E}}},
 
-  MOVFROM_IMM8 (O (O_MOV, SL), PREFIX_010D, "mov.l", IMM8_NS),
+  MOVFROM_IMM8 (O (O_MOV, SL), PREFIX_010D, "mov.l", IMM8U_NS),
   MOVFROM_IMM  (O (O_MOV, SL), PREFIX_7A7C, "mov.l", IMM16U_NS, IMM16ULIST),
 
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{IMM16U_NS, RD32, E}}, {{0x7, 0xa, 0x0, B31 | RD32, IMM16ULIST, E}}},
