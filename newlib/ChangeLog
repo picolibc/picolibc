@@ -1,3 +1,7 @@
+2001-12-13 Anita Kulkarni <anitak@kpit.com>
+
+        * libc/sys/sh/crt0.S: Remove stack symbol definition 0xdeaddead.
+
 2001-12-06  John Peacock <jpeacock@rowman.com>
 
 	* libc/include/sys/unistd.h: Correct ualarm declaration.

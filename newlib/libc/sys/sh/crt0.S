@@ -52,4 +52,3 @@ exit_k:
 #else
 	.section .stack
 #endif
-_stack:	.long	0xdeaddead
