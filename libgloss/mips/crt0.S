@@ -37,9 +37,9 @@
 # else
 #  define LA(t,x) la t,x-PICBASE ; addu t,s0,t
 # endif
-#else /* __mips_embedded_pic */ 
+#else /* __mips_embedded_pic */
 # define LA(t,x) la t,x
-#endif /* __mips_embedded_pic */ 
+#endif /* __mips_embedded_pic */
 
 	.comm	__memsize, 12
 	.comm	__lstack, STARTUP_STACK_SIZE
@@ -116,7 +116,7 @@ _start:
 2:
 
 
-/* Fix high bits, if any, of the PC so that exception handling 
+/* Fix high bits, if any, of the PC so that exception handling
    doesn't get confused.  */
 	LA (v0, 3f)
 	jr	v0
@@ -161,7 +161,7 @@ zerobss:
 	   case main wants to write them back to the stack.  The caller is
 	   supposed to allocate stack space for parameters in registers in
 	   the old MIPS ABIs.  We must do this even though we aren't passing
-	   arguments, because main might be declared to have them. 
+	   arguments, because main might be declared to have them.
 
 	   Some ports need a larger alignment for the stack, so we subtract
 	   32, which satisifes the stack for the arguments and keeps the
@@ -209,6 +209,7 @@ init:
 	nop
 #endif
 
+
 	jal	_init				# run global constructors
 	nop
 
@@ -222,6 +223,7 @@ init:
 	move	a0,v0				# pass through the exit code
 	.end	init
 
+ 
 /* Assume the PICBASE set up above is no longer valid below here.  */
 #ifdef __mips_embedded_pic
 #undef PICBASE
@@ -263,11 +265,10 @@ _exit:
 
 	# break instruction can cope with 0xfffff, but GAS limits the range:
 	break	1023
-	nop
 	b	7b				# but loop back just in-case
 	nop
 	.end _exit
-
+ 
 /* Assume the PICBASE set up above is no longer valid below here.  */
 #ifdef __mips_embedded_pic
 #undef PICBASE

@@ -1,3 +1,13 @@
+2002-11-12 Jeff Johnston  <jjohnstn@redhat.com> 
+
+	*  mips/Makefile.in: Add cygmon support.
+	*  mips/configure.in: Ditto.
+	*  mips/configure: Regenerated.
+	*  mips/crt0_cygmon.S: New file.
+	*  mips/cygmon.c: Ditto.
+	*  mips/pmon.S: Minor formatting and copyright changes.
+	*  mips/crt0.S: Ditto.
+
 2002-11-08 Jeff Johnston  <jjohnstn@redhat.com> 
 
 	* arm/Makefile.in: Add support for new pid specs.

@@ -1,7 +1,7 @@
 /*
  * pmon.S -- low-level entry points into PMON monitor.
  *
- * Copyright (c) 1996, 1997 Cygnus Support
+ * Copyright (c) 1996, 1997, 2002 Cygnus Support
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
