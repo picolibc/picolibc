@@ -29,7 +29,7 @@ Wed Nov 15  0:51:00 2000  Corinna Vinschen <corinna@vinschen.de>
 	when creating Windows environment. Use new `cygheap_user' class.
 	* syscalls.cc: Use new `cygheap_user' class throughout.
 	* uinfo.cc: Ditto.
-	* uinfo.cc (internal_getlogin): Change parameters to reflect the
+	(internal_getlogin): Change parameters to reflect the
 	move of user information to cygheap.
 
 Tue Nov 14 17:05:00 2000  Eric Fifer <efifer@dircon.co.uk>
