@@ -171,7 +171,7 @@ case $basic_machine in
 		| 1750a | dsp16xx | pdp11 | mips16 | mips64 | mipsel | mips64el \
 		| mips64orion | mips64orionel | mipstx39 | mipstx39el \
 		| mips64vr4300 | mips64vr4300el | mips64vr4100 | mips64vr4100el \
-		| mips64vr5000 | miprs64vr5000el \
+		| mips64vr5000 | miprs64vr5000el | mcore \
 	        | m88110 | m680[012346]0 | m683?2 | m68360 | m5200 | z8k | v70 \
 		| sparc | sparclet | sparclite | sparc64 | sparc86x | sparcv9 \
 		| thumb | v850 | c4x | d10v | h8500 | w65)
@@ -202,7 +202,7 @@ case $basic_machine in
 	      | sparc64-* | sparcv9-* | sparc86x-* | mips16-* | mips64-* | mipsel-* \
 	      | mips64el-* | mips64orion-* | mips64orionel-* \
 	      | mips64vr4100-* | mips64vr4100el-* | mips64vr4300-* | mips64vr4300el-* \
-	      | mipstx39-* | mipstx39el-* \
+	      | mipstx39-* | mipstx39el-* | mcore-* \
 	      | f301-* | arm*-* | t3e-* \
 	      | m88110-* | m680[01234]0-* | m683?2-* | m68360-* | z8k-* | d10v-* \
 	      | thumb-* | v850-* | d30v-* | tic30-* | c30-* )
