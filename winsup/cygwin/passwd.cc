@@ -17,6 +17,7 @@ details. */
 #include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "path.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -40,7 +41,48 @@ enum pwd_state {
   emulated,
   loaded
 };
-static pwd_state passwd_state = uninitialized;
+class pwd_check {
+  pwd_state state;
+  FILETIME  last_modified;
+  char	    pwd_w32[MAX_PATH];
+
+public:
+  pwd_check () : state (uninitialized)
+    {
+      last_modified.dwLowDateTime = last_modified.dwHighDateTime = 0;
+      pwd_w32[0] = '\0';
+    }
+  operator pwd_state ()
+    {
+      HANDLE h;
+      WIN32_FIND_DATA data;
+
+      if (!pwd_w32[0])	/* First call. */
+	{
+	  path_conv p ("/etc/passwd", PC_SYM_FOLLOW | PC_FULL);
+	  if (!p.error)
+	    strcpy (pwd_w32, p.get_win32 ());
+	}
+
+      if ((h = FindFirstFile (pwd_w32, &data)) != INVALID_HANDLE_VALUE)
+	{
+	  if (CompareFileTime (&data.ftLastWriteTime, &last_modified) > 0)
+	    {
+	      state = uninitialized;
+	      last_modified = data.ftLastWriteTime;
+	    }
+	  FindClose (h);
+        }
+      return state;
+    }
+  void operator = (pwd_state nstate)
+    {
+      state = nstate;
+    }
+};
+
+static pwd_check passwd_state;
+
 
 /* Position in the passwd cache */
 #ifdef _MT_SAFE
@@ -140,6 +182,13 @@ read_etc_passwd ()
     if (passwd_state != initializing)
       {
 	passwd_state = initializing;
+	if (max_lines) /* When rereading, free allocated memory first. */
+	  {
+	    for (int i = 0; i < curr_lines; ++i)
+	      free (passwd_buf[i].pw_name);
+	    free (passwd_buf);
+	    curr_lines = max_lines = 0;
+	  }
 
 	FILE *f = fopen ("/etc/passwd", "rt");
 

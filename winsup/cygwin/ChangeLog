@@ -1,3 +1,12 @@
+Tue Aug  7 10:54:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+        * grp.cc (class grp_check): New class. Make `group_state'
+        a member of class grp_check.
+        (read_etc_group): Free former allocated memory on reread.
+        * passwd.cc (class pwd_check): New class Make `passwd_state'
+        a member of class pwd_check.
+        (read_etc_passwd): Free former allocated memory on reread.
+
 Tue Aug  7 01:13:58 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_console.cc (get_tty_stuff): Don't initialize shared memory
