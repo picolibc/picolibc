@@ -1,6 +1,7 @@
 /* Header file for targets using CGEN: Cpu tools GENerator.
 
-Copyright 1996, 1997, 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002
+Free Software Foundation, Inc.
 
 This file is part of GDB, the GNU debugger, and the GNU Binutils.
 
@@ -620,8 +621,9 @@ typedef struct cgen_maybe_multi_ifield
 		n: indexed by array of more cgen_maybe_multi_ifields.  */
   union
   {
-    struct cgen_maybe_multi_ifield * multi;
-    struct cgen_ifld * leaf;
+    const PTR p;
+    const struct cgen_maybe_multi_ifield * multi;
+    const struct cgen_ifld * leaf;
   } val;
 }
 CGEN_MAYBE_MULTI_IFLD;

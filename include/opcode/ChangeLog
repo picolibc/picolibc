@@ -1,3 +1,8 @@
+2002-12-03  Alan Modra  <amodra@bigpond.net.au>
+
+	* cgen.h (struct cgen_maybe_multi_ifield): Add "const PTR p" to union.
+	Constify "leaf" and "multi".
+
 2002-11-19  Klee Dienes  <kdienes@apple.com>
 
 	* h8300.h (h8_opcode): Remove 'noperands', 'idx', and 'size'
