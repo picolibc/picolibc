@@ -9,6 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <psapi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -112,7 +113,27 @@ dlopen (const char *name, int)
 void *
 dlsym (void *handle, const char *name)
 {
-  void *ret = (void *) GetProcAddress ((HMODULE) handle, name);
+  void *ret = NULL;
+  if (handle == RTLD_DEFAULT)
+    { /* search all modules */
+      HANDLE cur_proc = GetCurrentProcess ();
+      HMODULE *modules;
+      DWORD needed, i;
+      if (!EnumProcessModules (cur_proc, NULL, 0, &needed))
+        {
+        dlsym_fail:
+          set_dl_error ("dlsym");
+          return NULL;
+        }
+      modules = (HMODULE*) alloca (needed);
+      if (!EnumProcessModules (cur_proc, modules, needed, &needed))
+        goto dlsym_fail;
+      for (i = 0; i < needed / sizeof (HMODULE); i++)
+        if ((ret = (void *) GetProcAddress (modules[i], name)))
+          break;
+    }
+  else
+    ret = (void *) GetProcAddress ((HMODULE)handle, name);
   if (!ret)
     set_dl_error ("dlsym");
   debug_printf ("ret %p", ret);

@@ -1,3 +1,9 @@
+2004-09-14  Sam Steingold  <sds@gnu.org>
+
+	* autoload.cc (EnumProcessModules): Add.
+	* dlfcn.cc (dlsym): Handle RTLD_DEFAULT using EnumProcessModules().
+	* include/dlfcn.h (RTLD_DEFAULT): Define to NULL.
+
 2004-09-13  Christopher Faylor  <cgf@timesys.com>
 
 	* fork.cc (slow_pid_reuse): Temporarily double the number of pids held

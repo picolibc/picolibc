@@ -28,6 +28,7 @@ extern char *dlerror (void);
 extern void dlfork (int);
 
 /* following doesn't exist in Win32 API .... */
+#define RTLD_DEFAULT    NULL
 
 /* valid values for mode argument to dlopen */
 #define RTLD_LAZY	1	/* lazy function call binding */
