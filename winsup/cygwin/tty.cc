@@ -358,7 +358,7 @@ tty::make_pipes (fhandler_pty_master *ptym)
   /* Create communication pipes */
 
   /* FIXME: should this be sec_none_nih? */
-  if (CreatePipe (&from_master, &to_slave, &sec_all, 0) == FALSE)
+  if (CreatePipe (&from_master, &to_slave, &sec_all, 64 * 1024) == FALSE)
     {
       termios_printf ("can't create input pipe");
       set_errno (ENOENT);
@@ -366,7 +366,7 @@ tty::make_pipes (fhandler_pty_master *ptym)
     }
 
   // ProtectHandle1INH (to_slave, to_pty);
-  if (CreatePipe (&from_slave, &to_master, &sec_all, 0) == FALSE)
+  if (CreatePipe (&from_slave, &to_master, &sec_all, 64 * 1024) == FALSE)
     {
       termios_printf ("can't create output pipe");
       set_errno (ENOENT);
