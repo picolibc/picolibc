@@ -110,7 +110,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES =  	clearerr.c 				fclose.c 				fdopen.c 				feof.c 					ferror.c 				fflush.c 				fgetc.c 				fgetpos.c 				fgets.c 				fileno.c				findfp.c 				fiprintf.c 				flags.c 				fopen.c 				fprintf.c 				fputc.c 				fputs.c 				fread.c 				freopen.c 				fscanf.c 				fseek.c 				fsetpos.c 				ftell.c 				fvwrite.c 				fwalk.c 				fwrite.c 				getc.c 					getchar.c 				getc_u.c				getchar_u.c				getdelim.c				getline.c				gets.c 					iprintf.c 				makebuf.c				perror.c 				printf.c 				putc.c 					putchar.c 				putc_u.c				putchar_u.c				puts.c 					refill.c 				remove.c 				rename.c 				rewind.c 				rget.c 					scanf.c 				setbuf.c 				setbuffer.c 				setlinebuf.c 				setvbuf.c 				siprintf.c 				snprintf.c				sprintf.c 				sscanf.c 				stdio.c 				tmpfile.c 				tmpnam.c 				ungetc.c 				vfscanf.c 				vprintf.c 				vscanf.c				vsnprintf.c				vsprintf.c 				vsscanf.c				wbuf.c 					wsetup.c 
+GENERAL_SOURCES =  	clearerr.c 				fclose.c 				fdopen.c 				feof.c 					ferror.c 				fflush.c 				fgetc.c 				fgetpos.c 				fgets.c 				fileno.c				findfp.c 				fiprintf.c 				flags.c 				fopen.c 				fprintf.c 				fputc.c 				fputs.c 				fread.c 				freopen.c 				fscanf.c 				fseek.c 				fsetpos.c 				ftell.c 				fvwrite.c 				fwalk.c 				fwrite.c 				getc.c 					getchar.c 				getc_u.c				getchar_u.c				getdelim.c				getline.c				gets.c 					iprintf.c 				makebuf.c				perror.c 				printf.c 				putc.c 					putchar.c 				putc_u.c				putchar_u.c				puts.c 					refill.c 				remove.c 				rename.c 				rewind.c 				rget.c 					scanf.c 				setbuf.c 				setbuffer.c 				setlinebuf.c 				setvbuf.c 				siprintf.c 				sniprintf.c				snprintf.c				sprintf.c 				sscanf.c 				stdio.c 				tmpfile.c 				tmpnam.c 				ungetc.c 				vfscanf.c 				vprintf.c 				vscanf.c				vsnprintf.c				vsprintf.c 				vsscanf.c				wbuf.c 					wsetup.c 
 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
 @ELIX_LEVEL_1_FALSE@LIB_OBJS = 	asprintf.$(oext)			fcloseall.$(oext)			fseeko.$(oext) 				ftello.$(oext) 				getw.$(oext)				mktemp.$(oext) 				putw.$(oext) 				vasprintf.$(oext)
@@ -132,7 +132,7 @@ libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
 @USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
 
-CHEWOUT_FILES =  	clearerr.def			fclose.def			fcloseall.def			fdopen.def			feof.def			ferror.def			fflush.def			fgetc.def			fgetpos.def			fgets.def			fileno.def			fiprintf.def			fopen.def			fputc.def			fputs.def			fread.def			freopen.def			fseek.def			fsetpos.def			ftell.def			fwrite.def			getc.def			getchar.def			getc_u.def			getchar_u.def			getdelim.def			getline.def			gets.def			getw.def			iprintf.def			mktemp.def			perror.def			putc.def			putchar.def			putc_u.def			putchar_u.def			puts.def			putw.def			remove.def			rename.def			rewind.def			setbuf.def			setbuffer.def			setlinebuf.def			setvbuf.def			siprintf.def			sprintf.def			sscanf.def			tmpfile.def			tmpnam.def			vfprintf.def			vfscanf.def
+CHEWOUT_FILES =  	clearerr.def			fclose.def			fcloseall.def			fdopen.def			feof.def			ferror.def			fflush.def			fgetc.def			fgetpos.def			fgets.def			fileno.def			fiprintf.def			fopen.def			fputc.def			fputs.def			fread.def			freopen.def			fseek.def			fsetpos.def			ftell.def			fwrite.def			getc.def			getchar.def			getc_u.def			getchar_u.def			getdelim.def			getline.def			gets.def			getw.def			iprintf.def			mktemp.def			perror.def			putc.def			putchar.def			putc_u.def			putchar_u.def			puts.def			putw.def			remove.def			rename.def			rewind.def			setbuf.def			setbuffer.def			setlinebuf.def			setvbuf.def			siprintf.def			sniprintf.def			sprintf.def			sscanf.def			tmpfile.def			tmpnam.def			vfprintf.def			vfscanf.def
 
 
 SUFFIXES = .def
@@ -169,10 +169,10 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@rget.$(OBJEXT) scanf.$(OBJEXT) setbuf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@setbuffer.$(OBJEXT) setlinebuf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@setvbuf.$(OBJEXT) siprintf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@snprintf.$(OBJEXT) sprintf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sscanf.$(OBJEXT) stdio.$(OBJEXT) tmpfile.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@tmpnam.$(OBJEXT) ungetc.$(OBJEXT) vfscanf.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@vprintf.$(OBJEXT) vscanf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sniprintf.$(OBJEXT) snprintf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sprintf.$(OBJEXT) sscanf.$(OBJEXT) stdio.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@tmpfile.$(OBJEXT) tmpnam.$(OBJEXT) ungetc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@vfscanf.$(OBJEXT) vprintf.$(OBJEXT) vscanf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@vsnprintf.$(OBJEXT) vsprintf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@vsscanf.$(OBJEXT) wbuf.$(OBJEXT) wsetup.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
@@ -188,10 +188,10 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@putchar.lo putc_u.lo putchar_u.lo puts.lo refill.lo \
 @USE_LIBTOOL_TRUE@remove.lo rename.lo rewind.lo rget.lo scanf.lo \
 @USE_LIBTOOL_TRUE@setbuf.lo setbuffer.lo setlinebuf.lo setvbuf.lo \
-@USE_LIBTOOL_TRUE@siprintf.lo snprintf.lo sprintf.lo sscanf.lo stdio.lo \
-@USE_LIBTOOL_TRUE@tmpfile.lo tmpnam.lo ungetc.lo vfscanf.lo vprintf.lo \
-@USE_LIBTOOL_TRUE@vscanf.lo vsnprintf.lo vsprintf.lo vsscanf.lo wbuf.lo \
-@USE_LIBTOOL_TRUE@wsetup.lo
+@USE_LIBTOOL_TRUE@siprintf.lo sniprintf.lo snprintf.lo sprintf.lo \
+@USE_LIBTOOL_TRUE@sscanf.lo stdio.lo tmpfile.lo tmpnam.lo ungetc.lo \
+@USE_LIBTOOL_TRUE@vfscanf.lo vprintf.lo vscanf.lo vsnprintf.lo \
+@USE_LIBTOOL_TRUE@vsprintf.lo vsscanf.lo wbuf.lo wsetup.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

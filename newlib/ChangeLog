@@ -1,3 +1,11 @@
+2004-11-19  Shaun Jackman  <sjackman@gmail.com>
+                                                                                
+        * libc/include/stdio.h: Add sniprintf.
+        * libc/stdio/Makefile.am: Add sniprintf.c.
+        * libc/stdio/Makefile.in: Regenerated.
+        * libc/stdio/sniprintf.c: New file.
+        * libc/stdio/stdio.tex: Add sniprintf.
+                                                                                
 2004-11-17  Christopher Faylor  <cgf@timesys.com>
 
 	* libc/stdio/refill.c (__srefill): Try again after EOF on Cygwin.  Clear

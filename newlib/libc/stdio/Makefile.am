@@ -58,6 +58,7 @@ GENERAL_SOURCES = \
 	setlinebuf.c 			\
 	setvbuf.c 			\
 	siprintf.c 			\
+	sniprintf.c			\
 	snprintf.c			\
 	sprintf.c 			\
 	sscanf.c 			\
@@ -167,6 +168,7 @@ CHEWOUT_FILES = \
 	setlinebuf.def		\
 	setvbuf.def		\
 	siprintf.def		\
+	sniprintf.def		\
 	sprintf.def		\
 	sscanf.def		\
 	tmpfile.def		\

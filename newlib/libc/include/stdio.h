@@ -240,6 +240,7 @@ int	_EXFUN(vsscanf, (const char *, const char *, __VALIST));
 #ifndef _REENT_ONLY
 int	_EXFUN(fcloseall, (_VOID));
 int	_EXFUN(snprintf, (char *, size_t, const char *, ...));
+int	_EXFUN(sniprintf, (char *, size_t, const char *, ...));
 #endif
 #endif
 

@@ -69,7 +69,8 @@ structure.
 * setbuffer::   Specify full buffering for a file or stream with size
 * setlinebuf::  Specify line buffering for a file or stream
 * setvbuf::     Specify buffering for a file or stream
-* siprintf::    Write formatted output (integer only)
+* siprintf::    Write formatted output to string (integer only)
+* sniprintf::   Write formatted output to string up to max size (integer only)
 * printf::      Write formatted output
 * scanf::       Scan and format input
 * tmpfile::     Create a temporary file
@@ -215,6 +216,9 @@ structure.
 
 @page 
 @include stdio/siprintf.def 
+
+@page 
+@include stdio/sniprintf.def 
 
 @page 
 @include stdio/sprintf.def 
