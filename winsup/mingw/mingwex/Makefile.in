@@ -70,12 +70,15 @@ STDIO_DISTFILES = \
 	vfscanf.c vfwscanf.c vscanf.c vsscanf.c vswscanf.c vwscanf.c
 
 COMPLEX_DISTFILES = \
-	cabs.c cabsf.c cacos.c cacosf.c cacosh.c cacoshf.c carg.c \
-	cargf.c casin.c casinf.c casinh.c casinhf.c catan.c catanf.c \
-	catanh.c catanhf.c ccos.c ccosf.c ccosh.c ccoshf.c cexp.c \
-	cexpf.c cimag.c cimagf.c clog.c clogf.c cpow.c cpowf.c cproj.c \
-	cprojf.c creal.c crealf.c csin.c csinf.c csinh.c csinhf.c \
-	csqrt.c csqrtf.c ctan.c ctanf.c ctanh.c ctanhf.c
+	cabs.c cabsf.c cabsl.c cacos.c cacosf.c cacosl.c cacosh.c \
+	cacoshf.c cacoshl.c carg.c cargf.c cargl.c casin.c casinf.c \
+	casinl.c casinh.c casinhf.c casinhl.c catan.c catanf.c catanl.c \
+	catanh.c catanhf.c catanhl.c ccos.c ccosf.c ccosl.c ccosh.c \
+	ccoshf.c ccoshl.c cexp.c cexpf.c cexpl.c cimag.c cimagf.c \
+	cimagl.c clog.c clogf.c clogl.c cpow.c cpowf.c cpowl.c cproj.c \
+	cprojf.c cprojl.c creal.c crealf.c creall.c csin.c csinf.c \
+	csinl.c csinh.c csinhf.c csinhl.c csqrt.c csqrtf.c csqrtl.c \
+	ctan.c ctanf.c ctanl.c ctanh.c ctanhf.c ctanhl.c
 
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
@@ -159,12 +162,15 @@ POSIX_OBJS = \
 REPLACE_OBJS = \
 	mingw-aligned-malloc.o mingw-fseek.o
 COMPLEX_OBJS = \
-	cabs.o cabsf.o cacos.o cacosf.o cacosh.o cacoshf.o carg.o \
-	cargf.o casin.o casinf.o casinh.o casinhf.o catan.o catanf.o \
-	catanh.o catanhf.o ccos.o ccosf.o ccosh.o ccoshf.o cexp.o \
-	cexpf.o cimag.o cimagf.o clog.o clogf.o cpow.o cpowf.o cproj.o \
-	cprojf.o creal.o crealf.o csin.o csinf.o csinh.o csinhf.o \
-	csqrt.o csqrtf.o ctan.o ctanf.o ctanh.o ctanhf.o
+	cabs.o cabsf.o cabsl.o cacos.o cacosf.o cacosl.o cacosh.o \
+	cacoshf.o cacoshl.o carg.o cargf.o cargl.o casin.o casinf.o \
+	casinl.o casinh.o casinhf.o casinhl.o catan.o catanf.o catanl.o \
+	catanh.o catanhf.o catanhl.o ccos.o ccosf.o ccosl.o ccosh.o \
+	ccoshf.o ccoshl.o cexp.o cexpf.o cexpl.o cimag.o cimagf.o \
+	cimagl.o clog.o clogf.o clogl.o cpow.o cpowf.o cpowl.o cproj.o \
+	cprojf.o cprojl.o creal.o crealf.o creall.o csin.o csinf.o \
+	csinl.o csinh.o csinhf.o csinhl.o csqrt.o csqrtf.o csqrtl.o \
+	ctan.o ctanf.o ctanl.o ctanh.o ctanhf.o ctanhl.o
 
 LIB_OBJS = $(Q8_OBJS) $(STDLIB_OBJS) $(STDLIB_STUB_OBJS) \
 	$(STDIO_OBJS) $(MATH_OBJS)  $(FENV_OBJS) \

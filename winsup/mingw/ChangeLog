@@ -1,3 +1,16 @@
+2005-01-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/complex/(cabsl.c cacosl.c cacoshl.c cargl.c casinl.c
+	casinhl.c catanl.c catanhl.c ccosl.c ccoshl.c cexpl.c cimagl.c
+	clogl.c cpowl.c cprojl.c creall.c csinl.c csinhl.c csqrtl.c
+	ctanl.c ctanhl.c): New files.
+	* mingwex/Makefile.in (COMPLEX_DISTFILES): Adjust.
+	(COMPLEX_OBJS): Adjust. 
+	* include/complex.h (cabsl, cacosl, cacoshl, cargl, casinf. 
+	casinhl, catanl, catanhl, ccosl, ccoshl, cexpl, cimagl, clogl,
+	cpowl, cprojl, creall, csinl, csinhl, csqrtl, ctanl, ctanhl):
+	Declare.
+
 2005-01-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h (__int16): Define as short.
@@ -23,7 +36,7 @@
 	clogf.c cpowf.c cprojf.c crealf.c csinf.c csinhf.c csqrtf.c
 	ctanf.c ctanhf.c): New files.
 	* mingwex/Makefile.in (COMPLEX_DISTFILES): Adjust.
-	(COMPLEX_OBJS(: Adjust.
+	(COMPLEX_OBJS): Adjust.
 	* include/complex.h (cabsf, cacosf, cacoshf, cargf, casinf. 
 	casinhf, catanf, catanhf, ccosf, ccoshf, cexpf, cimagf, clogf,
 	cpowf, cprojf, crealf, csinf, csinhf, csqrtf, ctanf, ctanhf):
