@@ -13,7 +13,10 @@
  */
 
 #include <stdio.h>
-#include <fcntl.h>
+#include <stdlib.h>	/* _fmode */
+#include <fcntl.h>	/*  _O_BINARY */
+#include <io.h>		/* _setmode */
+
 
 unsigned int _CRT_fmode = _O_BINARY;
 

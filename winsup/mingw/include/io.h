@@ -193,6 +193,7 @@ int		_open (const char*, int, ...);
 int		_open_osfhandle (long, int);
 int		_pipe (int *, unsigned int, int);
 int		_read (int, void*, unsigned int);
+int		_setmode (int, int);
 
 /* SH_... flags for nShFlags defined in share.h
  * Optional fourth argument is unsigned unPermissions */
@@ -223,6 +224,7 @@ int		isatty (int);
 long		lseek (int, long, int);
 int		open (const char*, int, ...);
 int		read (int, void*, unsigned int);
+int		setmode (int, int);
 int		sopen (const char*, int, int, ...);
 long		tell (int);
 int		umask (int);

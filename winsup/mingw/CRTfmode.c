@@ -17,4 +17,4 @@
  *
  */
 
-unsigned int _CRT_fmode = 0;
+int _CRT_fmode = 0;
