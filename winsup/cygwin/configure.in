@@ -145,7 +145,7 @@ no)	 LIBSERVER=;;
 esac
 ])
 
-MALLOC_OFILES=
+MALLOC_OFILES=malloc.o
 AC_ARG_ENABLE(malloc-debugging,
 [ --enable-malloc-debugging		Build a cygwin DLL with heap sanity checking (this is very slow, use only if you have heap corruption problems)],
 [case "${enableval}" in

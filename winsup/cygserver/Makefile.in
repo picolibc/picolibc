@@ -37,8 +37,8 @@ override CXXFLAGS+=-fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0 -D__OUTSIDE_CY
 
 include $(srcdir)/../Makefile.common
 
-OBJS:=	cygserver.o client.o process.o shm.o threaded_queue.o transport.o \
-	transport_pipes.o transport_sockets.o
+OBJS:=	cygserver.o client.o process.o msg.o sem.o shm.o threaded_queue.o \
+	transport.o transport_pipes.o transport_sockets.o
 LIBOBJS:=${patsubst %.o,lib%.o,$(OBJS)}
 
 CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o \

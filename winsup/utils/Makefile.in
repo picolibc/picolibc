@@ -207,6 +207,6 @@ endif
 ifdef VERBOSE
 	$(CXX) -o $@ ${firstword $^} -B$(cygwin_build)/ $(ALL_LDFLAGS)
 else
-	@echo $(CXX) -o $@ ${firstword $^} ${filter-out -B%, $(ALL_LDFLAGS)};\
+	@echo $(CXX) -o $@ ${firstword $^} ... ${filter-out -B%, $(ALL_LDFLAGS)};\
 	$(CXX) -o $@ ${firstword $^} -B$(cygwin_build)/ $(ALL_LDFLAGS)
 endif

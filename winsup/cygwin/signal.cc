@@ -338,6 +338,12 @@ sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
       if (newact->sa_handler == SIG_DFL && sig == SIGCHLD)
 	sig_clear (sig);
       set_sigcatchers (oa.sa_handler, newact->sa_handler);
+      if (sig == SIGCHLD)
+	{
+	  myself->process_state &= ~PID_NOCLDSTOP;
+	  if (newact->sa_flags & SA_NOCLDSTOP);
+	    myself->process_state |= PID_NOCLDSTOP;
+	}
     }
 
   if (oldact)

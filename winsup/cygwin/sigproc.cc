@@ -17,6 +17,7 @@ details. */
 #include <stdlib.h>
 #include <sys/cygwin.h>
 #include <assert.h>
+#include <sys/signal.h>
 #include "cygerrno.h"
 #include "sync.h"
 #include "sigproc.h"
@@ -48,10 +49,33 @@ details. */
 
 #define NZOMBIES	256
 
-LONG local_sigtodo[TOTSIGS];
-inline LONG* getlocal_sigtodo (int sig)
+static LONG local_sigtodo[TOTSIGS];
+struct sigaction *global_sigs;
+
+inline LONG *
+getlocal_sigtodo (int sig)
 {
   return local_sigtodo + __SIGOFFSET + sig;
+}
+
+void __stdcall
+sigalloc ()
+{
+  cygheap->sigs = global_sigs =
+    (struct sigaction *) ccalloc (HEAP_SIGS, NSIG, sizeof (struct sigaction));
+}
+
+void __stdcall
+signal_fixup_after_exec ()
+{
+  global_sigs = cygheap->sigs;
+  /* Set up child's signal handlers */
+  for (int i = 0; i < NSIG; i++)
+    {
+      myself->getsig (i).sa_mask = 0;
+      if (myself->getsig (i).sa_handler != SIG_IGN)
+	myself->getsig (i).sa_handler = SIG_DFL;
+    }
 }
 
 /*
@@ -300,7 +324,6 @@ proc_subproc (DWORD what, DWORD val)
       vchild->sid = myself->sid;
       vchild->ctty = myself->ctty;
       vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
-      vchild->copysigs (myself);
 
       sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",
 		  vchild->pid, nchildren, vchild->dwProcessId,
@@ -540,12 +563,11 @@ sig_dispatch_pending ()
 
   sigframe thisframe (mainthread);
 
-  int was_pending = pending_signals;
 #ifdef DEBUGGING
-  sigproc_printf ("pending_signals %d", was_pending);
+  sigproc_printf ("pending_signals %d", pending_signals);
 #endif
 
-  if (!was_pending)
+  if (!pending_signals)
 #ifdef DEBUGGING
     sigproc_printf ("no need to wake anything up");
 #else
@@ -559,10 +581,7 @@ sig_dispatch_pending ()
 #endif
     }
 
-  if (was_pending)
-    thisframe.call_signal_handler ();
-
-  return was_pending;
+  return thisframe.call_signal_handler ();
 }
 
 /* Message initialization.  Called from dll_crt0_1
