@@ -38,6 +38,39 @@ fhandler_pipe::fhandler_pipe ()
 int
 fhandler_pipe::open (int flags, mode_t mode)
 {
+  const char *path = get_name ();
+  debug_printf ("path: %s", path);
+  if (!strncmp (get_name (), "/proc/", 6))
+    {
+      char *c;
+      HANDLE hdl;
+      int pid = strtol (path += 6, &c, 10);
+      if (!pid || !c || *c != '/')
+        goto out;
+      path = c;
+      if (strncmp (path, "/fd/pipe:[", 10))
+        goto out;
+      path += 10;
+      hdl = (HANDLE) atoi (path);
+      if (pid == myself->pid)
+        {
+	  cygheap_fdenum cfd;
+	  while (cfd.next () >= 0)
+	    {
+	      if (cfd->get_handle () == hdl)
+	        {
+		  if (!cfd->dup (this))
+		    return 1;
+		  return 0;
+		}
+	    }
+	}
+      else
+        {
+	  /* TODO: Open pipes of different process.  Is that possible? */
+	}
+    }
+out:
   set_errno (ENXIO);
   return 0;
 }
