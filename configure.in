@@ -669,6 +669,10 @@ case "${target}" in
     esac
     noconfigdirs="$noconfigdirs ld shellutils"
     ;;
+  ia64*-*-elf*)
+    # No gdb support yet.
+    noconfigdirs="$noconfigdirs tix readline mmalloc libgui itcl gdb"
+    ;;
   i[3456]86-*-coff | i[3456]86-*-elf)
     if [ x${is_cross_compiler} != xno ] ; then
          target_configdirs="${target_configdirs} target-libstub target-cygmon"
