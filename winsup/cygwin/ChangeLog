@@ -16,6 +16,18 @@ Tue Sep 25 16:22:00 2001 Robert Collins <rbtcollins@hotmail.com>
 	* tty.cc: Additonal includes to support cygserver.
 	(tty::common_init): Don't allow others to open us if the cygserver is running.
 	* winsup.h: Declare cygserver_running.
+	* cygserver.cc: New file.
+	* cygserver_client.cc: New file.
+	* cygserver_shm.cc: New file.
+	* cygserver_shm.h: New file.
+	* cygserver_transport.cc: New file.
+	* cygserver_transport_pipes.cc: New file.
+	* ipc.cc: New file.
+	* shm.cc: New file.
+	* include/cygwin/cygserver.h: New file.
+	* include/cygwin/cygserver_transport.h: New file.
+	* include/sys/ipc.h: New file.
+	* include/sys/shm.h: New file.
 
 Tue Sep 25 02:09:42 2001  Christopher Faylor <cgf@redhat.com>
 
