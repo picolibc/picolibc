@@ -1,3 +1,7 @@
+2004-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc (shmget): Explicitely set td_retval[0] to -1 on error.
+
 2004-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sysv_shm.cc (shmget): Allow to retrieve shared memory segments

@@ -831,6 +831,8 @@ done2:
 #ifdef __CYGWIN__
 	if (!error)
 		ipcexit_creat_hookthread (td);
+	else
+		td->td_retval[0] = -1;
 #endif
 	mtx_unlock(&Giant);
 	return (error);
