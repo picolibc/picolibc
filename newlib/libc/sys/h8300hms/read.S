@@ -1,12 +1,7 @@
 ;ssize_t read(int fd, void *buf, size_t count);
 ;Integer arguments have to be zero extended.
 
-#if defined(__H8300H__)
-	.h8300h
-#endif
-#if defined(__H8300S__)
-	.h8300s
-#endif
+#include "setarch.h"
 
 	.section .text
 	.align 2

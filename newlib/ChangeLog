@@ -1,3 +1,11 @@
+2003-06-10  Richard Sandiford  <rsandifo@redhat.com>
+
+	* libc/sys/h8300hms/setarch.h: New file.
+	* libc/sys/h8300hms/close.S, libc/sys/h8300hms/fstat.S,
+	libc/sys/h8300hms/lseek.S, libc/sys/h8300hms/open.S,
+	libc/sys/h8300hms/read.S, libc/sys/h8300hms/stat.S,
+	libc/sys/h8300hms/write.S, libc/sys/h8300hms/crt0.S: Use it.
+
 2003-06-06  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/argz/argz_add.c: Change to use _DEFUN macro for function

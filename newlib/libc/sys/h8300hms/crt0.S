@@ -1,5 +1,7 @@
 ; h8/300 and h8/300h start up file.
 
+#include "setarch.h"
+
 #ifdef __H8300__
 
 	.section .text
@@ -36,11 +38,6 @@ _stack:	.word 	1
 
 #ifdef __H8300H__
 
-#ifdef __NORMAL_MODE__
-	.h8300hn
-#else
-	.h8300h
-#endif
 	.section .text
 	.global	_start
 _start:
@@ -74,11 +71,7 @@ _stack:	.long 	1
 #endif
 
 #ifdef __H8300S__
-#ifdef __NORMAL_MODE__
-	.h8300sn
-#else
-	.h8300s
-#endif
+
 	.section .text
 	.global	_start
 _start:

@@ -3,12 +3,7 @@
 ;The second argument is taken from the stack,
 ;hence it is not zero extended here.
 
-#if defined(__H8300H__)
-	.h8300h
-#endif
-#if defined(__H8300S__)
-	.h8300s
-#endif
+#include "setarch.h"
 
 	.section .text
 	.align 2
