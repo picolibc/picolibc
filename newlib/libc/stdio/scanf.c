@@ -25,8 +25,6 @@
 #include <varargs.h>
 #endif
 
-#include "local.h"
-
 #ifndef _REENT_ONLY
 
 int
