@@ -1,4 +1,4 @@
-Thu May 25 18:28:10 2000  Christopher Faylor <cgf@cygnus.com>
+Thu May 25 18:39:24 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Don't assume that cinstall directory exists.
 
