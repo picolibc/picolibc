@@ -627,7 +627,7 @@ winenv (const char * const *envp, int keep_posix)
    did not seem to know about importing data variables from the DLL.
    So, we have to synchronize cygwin's idea of the environment with the
    main program's with each reference to the environment. */
-char ** __stdcall
+extern "C" char ** __stdcall
 cur_environ ()
 {
   if (*main_environ != __cygwin_environ)
