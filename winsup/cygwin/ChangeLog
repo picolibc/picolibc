@@ -1,3 +1,8 @@
+Fri Aug 25 21:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* exec.cc (_execve): Change definition according to declaration in
+	newlib/libc/include/sys/unistd.h.
+
 Thu Aug 24 22:17:19 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* external.cc (cygwin_internal): Add CW_INIT_EXCEPTIONS to allow cygwin

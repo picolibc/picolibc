@@ -20,8 +20,8 @@ details. */
    in libc/posix/execve.c.  It calls us.  */
 
 extern "C"
-pid_t
-_execve (const char *path, const char *const argv[], const char *const envp[])
+int
+_execve (const char *path, char *const argv[], char *const envp[])
 {
   static char *const empty_env[] = { 0 };
   MALLOC_CHECK;
