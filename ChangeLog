@@ -1,5 +1,22 @@
 2001-11-13  Jeff Holcomb  <jeffh@redhat.com>
 
+	Merged from net gcc:
+	2001-07-30  Jeff Sturm  <jsturm@one-pont.com>
+	* ltcf-c.sh: Use $objext, not $ac_objext.
+	2001-07-27  Mark Kettenis  <kettenis@gnu.org>
+	* ltcf-cxx.sh: Add support for GNU.
+	2001-07-22  Timothy Wall  <twall@redhat.com>
+	* ltcf-c.sh: Don't disable shared libraries for AIX5/IA64.  Preserve
+	default settings if using GNU tools with that configuration.
+	* ltcf-cxx.sh: Ditto.
+	* ltcf-gcj.sh: Ditto.
+	2001-07-21  Michael Chastain  <chastain@redhat.com>
+	* ltconfig: Set max_cmd_len to a maximum of 512Kb, as it seems some
+	HPUX 11.0 systems have trouble with 1MB.  Mark as gcc-local.
+	* ltmain.sh: Mark as gcc-local.
+
+2001-11-13  Jeff Holcomb  <jeffh@redhat.com>
+
 	* Makefile.in (all-bison): Revert 2001-10-24.
 	Don't depend on texinfo.
 
