@@ -386,7 +386,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   DWORD gran_len = howmany (len, granularity) * granularity;
 
   fhandler_disk_file fh_paging_file (NULL);
-  fhandler_base *fh;
+  fhandler_base *fh = NULL;
   caddr_t base = addr;
   HANDLE h;
 

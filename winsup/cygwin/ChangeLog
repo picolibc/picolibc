@@ -1,3 +1,7 @@
+Tue Jan 16 18:01:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap): Initialize fh to avoid compiler warnings.
+
 Mon Jan 15 21:07:00 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* wait.cc (wait4): Rename variable for consistency.  Allow restartable
