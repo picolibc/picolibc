@@ -107,7 +107,10 @@ fhandler_process::fstat (struct __stat64 *buf)
   int file_type = exists ();
   (void) fhandler_base::fstat (buf);
   path += proc_len + 1;
-  pid = atoi (path);
+  if (path_prefix_p ("self", path, 4))
+    pid = getpid ();
+  else
+    pid = atoi (path);
   pinfo p (pid);
   if (!p)
     {
@@ -167,7 +170,10 @@ fhandler_process::open (int flags, mode_t mode)
 
   const char *path;
   path = get_name () + proc_len + 1;
-  pid = atoi (path);
+  if (path_prefix_p ("self", path, 4))
+    pid = getpid ();
+  else
+    pid = atoi (path);
   while (*path != 0 && !isdirsep (*path))
     path++;
 
@@ -313,7 +319,8 @@ fhandler_process::fill_filebuf ()
 	  strcpy (filebuf, "<defunct>");
 	else
 	  {
-	    mount_table->conv_to_posix_path (p->progname, filebuf, 1);
+	    charplus x (p->progname);
+	    mount_table->conv_to_posix_path (x, filebuf, 1);
 	    int len = strlen (filebuf);
 	    if (len > 4)
 	      {

@@ -1,3 +1,10 @@
+2004-12-18  Chris January  <chris@atomice.net>
+
+	* fhandler_proc.cc (proc_listing): Add entry for "self".
+	(proc_fhandlers): Add entry for "self".
+	* fhandler_process.cc (fhandler_process::fstate): Handle "self".
+	(fhandler_process::open): Handle "self".
+
 2004-12-17  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (proc_subproc): Fix long-standing problem.  Only wait for
@@ -194,14 +201,14 @@
 	* registry.h (reg_key::reg_key): Change arguments.
 	* shared_info.h (class mount_info): Remove had_to_create_mount_areas.
 	* registry.cc (reg_key::reg_key): Change constructors to always handle
-	HKLM and to avoid relying on HKCU. 
-	Do not set mount_table->had_to_create_mount_areas. 
-	* path.cc (mount_info::conv_to_win32_path): Improve update of 
+	HKLM and to avoid relying on HKCU.
+	Do not set mount_table->had_to_create_mount_areas.
+	* path.cc (mount_info::conv_to_win32_path): Improve update of
 	sys_mount_table_counter.
 	(mount_info::read_mounts): Use new reg_key constructor.	
-	(mount_info::add_reg_mount): Ditto. 
+	(mount_info::add_reg_mount): Ditto.
 	(mount_info::del_reg_mount): Ditto.
-	(mount_info::read_cygdrive_info_from_registry): Ditto. 
+	(mount_info::read_cygdrive_info_from_registry): Ditto.
 	(mount_info::write_cygdrive_info_to_registry): Ditto.
 	Update cygwin_shared->sys_mount_table_counter after registry update.
 	(mount_info::get_cygdrive_info): Ditto.
@@ -392,7 +399,7 @@
 	accessing HKLM.
 	(mount_info::read_cygdrive_info_from_registry): Ditto.
 	* cygheap.h: Define NO_IMPERSONATION.
-	(cygheap_user::issetuid): Replace INVALID_HANDLE_VALUE by 
+	(cygheap_user::issetuid): Replace INVALID_HANDLE_VALUE by
 	NO_IMPERSONATION.
 	(cygheap_user::has_impersonation_tokens): Ditto.
 	(cygheap_user::close_impersonation_tokens): Ditto.

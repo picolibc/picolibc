@@ -54,6 +54,7 @@ static const char *proc_listing[] = {
   "uptime",
   "cpuinfo",
   "partitions",
+  "self",
   NULL
 };
 
@@ -73,6 +74,7 @@ static const DWORD proc_fhandlers[PROC_LINK_COUNT] = {
   FH_PROC,
   FH_PROC,
   FH_PROC,
+  FH_PROCESS,
 };
 
 /* name of the /proc filesystem */
