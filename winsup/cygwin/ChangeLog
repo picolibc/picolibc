@@ -1,3 +1,8 @@
+Mon Apr 24 17:38:25 2000  Thorsten Otto <cgf@cygnus.com>
+
+	* fhandler_console.cc (fhandler_console::read): Detect extended keycode
+	information for Windows 9x so that function keys will work correctly.
+
 2000-04-24  Vadim Egorov  <egorovv@mailandnews.com>
 
 	* net.cc (cygwin_inet_network): new function.

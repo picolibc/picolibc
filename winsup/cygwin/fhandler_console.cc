@@ -179,7 +179,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	  !input_rec.Event.KeyEvent.bKeyDown)
 	continue;
 
-      if (ich == 0)  /* arrow/function keys */
+      if (ich == 0 || (ich & 0xff) == 0xe0)  /* arrow/function keys */
 	{
 	  toadd = get_nonascii_key (input_rec);
 	  if (!toadd)
