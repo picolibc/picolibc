@@ -237,6 +237,13 @@ struct bfd_link_info
   MPC860 C0 (or earlier) should be checked for and modified.  It gives the
   number of bytes that should be checked at the end of each text page. */
   int mpc860c0;
+
+  /* The function to call when the executable or shared object is
+     loaded.  */
+  const char *init_function;
+  /* The function to call when the executable or shared object is
+     unloaded.  */
+  const char *fini_function;
 };
 
 /* This structures holds a set of callback functions.  These are

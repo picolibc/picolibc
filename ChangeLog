@@ -1,3 +1,35 @@
+1999-07-11  Ian Lance Taylor  <ian@zembu.com>
+
+	* configure: Add -W -Wall to the default CFLAGS when compiling with
+	gcc.
+
+Thu Jul  8 12:32:23 1999  John David Anglin <dave@hiauly1.hia.nrc.ca>
+
+	* configure.in: Build ld, binutils & gas for hppa*-*-linux-gnu*.
+
+1999-06-30  Mark Mitchell  <mark@codesourcery.com>
+
+	* configure.in: Build ld on IRIX6.
+
+1999-06-12  Ian Lance Taylor  <ian@zembu.com>
+
+	* Makefile.in: Change distribution targets to use bzip2 instead of
+	gzip.
+	(TEXINFO_SUPPORT): Set to just texinfo/texinfo.tex.
+	(taz): Don't use texinfo/gpl.texinfo or texinfo/lgpl.texinfo.
+
+1999-06-04  Nick Clifton  <nickc@cygnus.com>
+
+	* config.sub: Add mcore target.
+
+Sun May 30 16:03:16 1999  Cort Dougan  <cort@cs.nmt.edu>
+
+	* config.guess (ppc-*-linux-gnu): Also use ld emul elf32ppclinux.
+
+1999-05-24  Nick Clifton  <nickc@cygnus.com>
+
+	* config.sub: Updated to match latest EGCS version.
+
 1999-04-30  Tom Tromey  <tromey@cygnus.com>
 
 	* ltmain.sh: [mode link] Always use CC given by ltconfig.

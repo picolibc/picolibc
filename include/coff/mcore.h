@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define IMAGE_REL_MCORE_PCREL_IMM4BY2		0x0004
 #define IMAGE_REL_MCORE_PCREL_32		0x0005
 #define IMAGE_REL_MCORE_PCREL_JSR_IMM11BY2	0x0006
+#define IMAGE_REL_MCORE_RVA			0x0007
 
 #define PEMCORE
 

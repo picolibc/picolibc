@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EF_SPARC_32PLUS		0x000100	/* generic V8+ features */
 #define EF_SPARC_SUN_US1	0x000200	/* Sun UltraSPARC1 extensions */
 #define EF_SPARC_HAL_R1		0x000400	/* HAL R1 extensions */
+#define EF_SPARC_SUN_US3	0x000800	/* Sun UltraSPARCIII extensions */
 
 #define EF_SPARC_LEDATA         0x800000	/* little endian data */
 
@@ -128,6 +129,8 @@ START_RELOC_NUMBERS (elf_sparc_reloc_type)
   /* little endian data relocs */
   RELOC_NUMBER (R_SPARC_REV32, 56)
 
+  EMPTY_RELOC  (R_SPARC_max_std)
+
   RELOC_NUMBER (R_SPARC_GNU_VTINHERIT, 250)
   RELOC_NUMBER (R_SPARC_GNU_VTENTRY, 251)
 
@@ -136,21 +139,15 @@ END_RELOC_NUMBERS
 
 /* Relocation macros.  */
 
-#define ELF64_R_TYPE_DATA(info)		(((bfd_vma) (info) << 32) >> 40)
-#define ELF64_R_TYPE_ID(info)		(((bfd_vma) (info) << 56) >> 56)
-#define ELF64_R_TYPE_INFO(data, type)	(((bfd_vma) (data) << 8) \
-					 + (bfd_vma) (type))
+#define ELF64_R_TYPE_DATA(info) \
+  (((bfd_signed_vma)(ELF64_R_TYPE(info) >> 8) ^ 0x800000) - 0x800000)
+#define ELF64_R_TYPE_ID(info) \
+  ((info) & 0xff)
+#define ELF64_R_TYPE_INFO(data, type) \
+  (((bfd_vma) ((data) & 0xffffff) << 8) | (bfd_vma) (type))
+
+/* Values for Elf64_Dyn.d_tag.  */
 
 #define DT_SPARC_REGISTER	0x70000001
-
-/*
- * FIXME: NOT ABI -- GET RID OF THIS
- * Defines the format used by the .plt.  Currently defined values are
- *   0 -- reserved to SI
- *   1 -- absolute address in .got.plt
- *   2 -- got-relative address in .got.plt
- */
-
-#define DT_SPARC_PLTFMT		0x70000001
 
 #endif /* _ELF_SPARC_H */
