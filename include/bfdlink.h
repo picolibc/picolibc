@@ -294,6 +294,10 @@ struct bfd_link_info
      and sorted so that relocs against the same symbol come together.  */
   boolean combreloc;
 
+  /* True if executable should not contain copy relocs.
+     Setting this true may result in a non-sharable text segment.  */
+  boolean nocopyreloc;
+
   /* How many spare .dynamic DT_NULL entries should be added?  */
   unsigned int spare_dynamic_tags;
 };

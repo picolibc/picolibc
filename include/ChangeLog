@@ -1,3 +1,7 @@
+2001-10-03  Vassili Karpov  <malc@pulsesoft.com>
+
+	* bfdlink.h (struct bfd_link_info): Add nocopyreloc field.
+
 2001-09-24  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* libiberty.h (reconcat): New function.
