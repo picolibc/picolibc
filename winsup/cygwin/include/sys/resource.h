@@ -1,3 +1,13 @@
+/* sys/resource.h
+
+   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+
+This file is part of Cygwin.
+
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
+
 #ifndef _SYS_RESOURCE_H_
 #define _SYS_RESOURCE_H_
 

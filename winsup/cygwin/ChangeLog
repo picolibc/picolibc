@@ -1,3 +1,53 @@
+Mon Mar  5 20:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/a.out.h: Add copyright hint.
+	* include/fcntl.h: Ditto.
+	* include/lastlog.h: Ditto.
+	* include/memory.h: Ditto.
+	* include/mntent.h: Ditto.
+	* include/paths.h: Ditto.
+	* include/poll.h: Ditto.
+	* include/syslog.h: Ditto.
+	* include/termio.h: Ditto.
+	* include/tzfile.h: Ditto.
+	* include/arpa/inet.h: Ditto.
+	* include/asm/byteorder.h: Ditto.
+	* include/asm/socket.h: Ditto.
+	* include/asm/types.h: Ditto.
+	* include/cygwin/if.h: Ditto.
+	* include/cygwin/mtio.h: Ditto.
+	* include/cygwin/rdevio.h: Ditto.
+	* include/cygwin/socket.h: Ditto.
+	* include/net/if.h: Ditto.
+	* include/netinet/in.h: Ditto.
+	* include/netinet/in_systm.h: Ditto.
+	* include/netinet/ip.h: Ditto.
+	* include/netinet/ip_icmp.h: Ditto.
+	* include/netinet/tcp.h: Ditto.
+	* include/sys/cdefs.h: Ditto.
+	* include/sys/cygwin.h: Ditto.
+	* include/sys/ioctl.h: Ditto.
+	* include/sys/mman.h: Ditto.
+	* include/sys/mount.h: Ditto.
+	* include/sys/mtio.h: Ditto.
+	* include/sys/procfs.h: Ditto.
+	* include/sys/resource.h: Ditto.
+	* include/sys/smallprint.h: Ditto.
+	* include/sys/socket.h: Ditto.
+	* include/sys/strace.h: Ditto.
+	* include/sys/syslog.h: Ditto.
+	* include/sys/sysmacros.h: Ditto.
+	* include/sys/termio.h: Ditto.
+	* include/sys/termios.h: Ditto.
+	* include/sys/uio.h: Ditto.
+	* include/sys/un.h: Ditto.
+	* include/sys/utsname.h: Ditto.
+	* include/sys/vfs.h: Ditto.
+	* include/sys/wait.h: Ditto.
+	* regexp/regerror.c: Ditto.
+	* regexp/regexp.h: Ditto.
+	* regexp/regmagic.h: Ditto.
+
 Mon Mar  5 01:25:03 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dlopen.c (dlopen): Return NULL when name is NULL (suggested by

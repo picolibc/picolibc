@@ -1,3 +1,15 @@
+/* cygwin/mtio.h
+
+   Copyright 1999, 2001 Red Hat, Inc.
+
+   Written by Corinna Vinschen <corinna@vinschen.de>
+
+This file is part of Cygwin.
+
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
+
 /* cygwin/mtio.h header file for Cygwin.
 
    by C. Vinschen.  */
