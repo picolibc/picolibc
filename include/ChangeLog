@@ -1,3 +1,7 @@
+2001-12-07  Geoffrey Keating  <geoffk@redhat.com>
+
+	* dis-asm.h (print_insn_xstormy16): Declare.
+
 2001-12-06  Richard Henderson  <rth@redhat.com>
 
 	* demangle.h (no_demangling): New.

@@ -1,3 +1,9 @@
+2001-12-07  Geoffrey Keating  <geoffk@redhat.com>
+	    Richard Henderson  <rth@redhat.com>
+
+	* common.h (EM_XSTORMY16): Define.
+	* xstormy16.h: New file.
+
 2001-11-15  Alan Modra  <amodra@bigpond.net.au>
 
 	* common.h (NT_ARCH): Define.  Remove incorrect comment.
