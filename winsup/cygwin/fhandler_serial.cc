@@ -18,6 +18,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include <sys/termios.h>
+#include <ddk/ntddser.h>
 
 /**********************************************************************/
 /* fhandler_serial */
@@ -56,7 +57,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
       ResetEvent (io_status.hEvent);
     }
 
-  for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *)ptr + n)
+  for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *) ptr + n)
     {
       COMSTAT st;
       DWORD inq = 1;
@@ -407,41 +408,28 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 	  }
 	else
 	  {
-	    unsigned modem_status = 0;
+	    ipbuffer = 0;
 	    if (modem_lines & MS_CTS_ON)
-	      modem_status |= TIOCM_CTS;
+	      ipbuffer |= TIOCM_CTS;
 	    if (modem_lines & MS_DSR_ON)
-	      modem_status |= TIOCM_DSR;
+	      ipbuffer |= TIOCM_DSR;
 	    if (modem_lines & MS_RING_ON)
-	      modem_status |= TIOCM_RI;
+	      ipbuffer |= TIOCM_RI;
 	    if (modem_lines & MS_RLSD_ON)
-	      modem_status |= TIOCM_CD;
-	    if (!wincap.supports_reading_modem_output_lines ())
-	      modem_status |= rts | dtr;
+	      ipbuffer |= TIOCM_CD;
+
+	    DWORD cb;
+	    DWORD mcr;
+	    if (!DeviceIoControl (get_handle (), IOCTL_SERIAL_GET_DTRRTS,
+				  NULL, 0, &mcr, 4, &cb, 0) || cb != 4)
+	      ipbuffer |= rts | dtr;
 	    else
 	      {
-		DWORD cb;
-		DWORD mcr;
-		BOOL result = DeviceIoControl (get_handle (), 0x001B0078, NULL,
-					       0, &mcr, 4, &cb, 0);
-		if (!result)
-		  {
-		    __seterrno ();
-		    res = -1;
-		    goto out;
-		  }
-		if (cb != 4)
-		  {
-		    set_errno (EINVAL);	/* FIXME: right errno? */
-		    res = -1;
-		    goto out;
-		  }
 		if (mcr & 2)
-		  modem_status |= TIOCM_RTS;
+		  ipbuffer |= TIOCM_RTS;
 		if (mcr & 1)
-		  modem_status |= TIOCM_DTR;
+		  ipbuffer |= TIOCM_DTR;
 	      }
-	    ipbuffer = modem_status;
 	  }
 	break;
       case TIOCMSET:
@@ -475,15 +463,12 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 		res = -1;
 	      }
 	  }
+	else if (EscapeCommFunction (get_handle (), CLRDTR))
+	  dtr = 0;
 	else
 	  {
-	    if (EscapeCommFunction (get_handle (), CLRDTR))
-	      dtr = 0;
-	    else
-	      {
-		__seterrno ();
-		res = -1;
-	      }
+	    __seterrno ();
+	    res = -1;
 	  }
 	break;
      case TIOCINQ:
@@ -502,7 +487,6 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
        break;
      }
 
-out:
   termios_printf ("%d = ioctl (%p, %p)", res, cmd, buffer);
 # undef ibuffer
 # undef ipbuffer
