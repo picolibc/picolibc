@@ -1,3 +1,7 @@
+2001-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap_record::find_empty): Add input parameter check.
+
 2001-11-04  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::build_fhandler): Fix debug_printf to avoid SEGV

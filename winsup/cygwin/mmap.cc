@@ -109,6 +109,8 @@ mmap_record::find_empty (DWORD pages)
   DWORD mapped_pages = PAGE_CNT (size_to_map_);
   DWORD start;
 
+  if (pages > mapped_pages)
+    return (DWORD)-1;
   for (start = 0; start <= mapped_pages - pages; ++start)
     if (!MAP_ISSET (start))
       {
