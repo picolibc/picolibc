@@ -104,7 +104,7 @@ class path_conv
   void set_binary () {path_flags |= PATH_BINARY;}
   void set_symlink () {path_flags |= PATH_SYMLINK;}
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
-  void set_isdisk () {path_flags |= PATH_ISDISK;}
+  void set_isdisk () {path_flags |= PATH_ISDISK; devn = FH_DISK;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
   void set_has_acls (int x = 1) {path_flags |= x ? PATH_HASACLS : PATH_NOTHING;}
   void set_has_buggy_open (int x = 1) {path_flags |= x ? PATH_HASBUGGYOPEN : PATH_NOTHING;}
@@ -130,7 +130,7 @@ class path_conv
   operator char *() {return path; }
   operator DWORD &() {return fileattr; }
   operator int &() {return (int) fileattr; }
-  BOOL is_device () {return devn != FH_BAD;}
+  BOOL is_device () {return devn != FH_BAD && devn != FH_DISK;}
   DWORD get_devn () {return devn == FH_BAD ? (DWORD) FH_DISK : devn;}
   short get_unitn () {return devn == FH_BAD ? 0 : unit;}
   DWORD file_attributes () {return fileattr;}

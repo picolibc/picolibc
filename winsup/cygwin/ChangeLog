@@ -1,3 +1,27 @@
+Mon Oct  1 16:52:23 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dtable.h (dtable::build_fhandler): Make path_conv parameter
+	non-optional.
+	(dtable::init_std_file_from_handle): Eliminate name parameter.
+	* dtable.cc (stdio_init): Don't pass bogus name to
+	init_std_file_from_handle.  The function will figure out the name
+	itself.
+	(dtable::init_std_file_from_handle): Eliminate name parameter.  Assume
+	that we're always called with an appropriate fd.  Pass name as NULL if
+	we can't simply figure it out from context.
+	(cygwin_attach_handle_to_fd): Pass path_conv argument to
+	build_fhandler.
+	(dtable::build_fhandler): Make path_conv argument mandatory.  Eliminate
+	specific call to get_device_number.  With unknown device names, set
+	name from handle context for parsing by path_conv.
+	(dtable::build_fhandler): Pass path_conv argument to build_fhandler.
+	* path.h (path_conv::set_isdisk): Set disk device type.
+	(path_conv::is_device): Don't consider FH_DISK a "device".
+	* syscalls.cc (_open): Pass path_conv argument by reference.
+	(stat_worker): Ditto.
+	(_rename): Use path_conv operators.  Add bounds to DeleteFile/MoveFile
+	for loop.
+
 Mon Oct 1 14:25:00 2001  Charles Wilson  <cwilson@ece.gatech.edu>
 
 	* cygwin.din: export strtoll and strtoull

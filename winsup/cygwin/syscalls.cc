@@ -499,7 +499,7 @@ _open (const char *unix_path, int flags, ...)
       else
 	{
 	  path_conv pc;
-	  if (!(fh = cygheap->fdtab.build_fhandler (fd, unix_path, NULL, &pc)))
+	  if (!(fh = cygheap->fdtab.build_fhandler (fd, unix_path, NULL, pc)))
 	    res = -1;		// errno already set
 	  else if (!fh->open (pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
@@ -1087,7 +1087,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   if (check_null_invalid_struct_errno (buf))
     goto done;
 
-  fh = cygheap->fdtab.build_fhandler (-1, name, NULL, &real_path,
+  fh = cygheap->fdtab.build_fhandler (-1, name, NULL, real_path,
 				      (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
 				      | PC_FULL, stat_suffixes);
 
@@ -1327,8 +1327,7 @@ _rename (const char *oldpath, const char *newpath)
       return -1;
     }
 
-  if (!writable_directory (real_old.get_win32 ())
-      || !writable_directory (real_new.get_win32 ()))
+  if (!writable_directory (real_old) || !writable_directory (real_new))
     {
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
       set_errno (EACCES);
@@ -1353,7 +1352,7 @@ _rename (const char *oldpath, const char *newpath)
       (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
      *lnk_suffix = '\0';
 
-  if (!MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
+  if (!MoveFile (real_old, real_new))
     res = -1;
 
   if (res == 0 || (GetLastError () != ERROR_ALREADY_EXISTS
@@ -1369,7 +1368,7 @@ _rename (const char *oldpath, const char *newpath)
   else
     {
       syscall_printf ("try win95 hack");
-      for (;;)
+      for (int i = 0; i < 2; i++)
 	{
 	  if (!DeleteFileA (real_new.get_win32 ()) &&
 	      GetLastError () != ERROR_FILE_NOT_FOUND)
@@ -1378,13 +1377,10 @@ _rename (const char *oldpath, const char *newpath)
 			      real_new.get_win32 ());
 	      break;
 	    }
-	  else
+	  else if (MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
 	    {
-	      if (MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
-		{
-		  res = 0;
-		  break;
-		}
+	      res = 0;
+	      break;
 	    }
 	}
     }
