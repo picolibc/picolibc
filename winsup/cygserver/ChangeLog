@@ -1,3 +1,7 @@
+2004-07-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.conf: Describe relation between shmmaxpgs and SHMMAX.
+
 2004-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.cc: Whitespace fixes.
