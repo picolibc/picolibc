@@ -2779,6 +2779,11 @@ static const void *lt_preloaded_setup() {
 
       # Quote the relink command for shipping.
       if test -n "$relink_command"; then
+        # Preserve any variables that may affect compiler behavior
+	variables_saved_for_relink="GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH"
+	for var in $variables_saved_for_relink; do
+	  relink_command="$var=\""`eval \$echo \"X'$'$var\" | $Xsed -e "$sed_quote_subst"`"\"; export $var; $relink_command"
+	done
 	relink_command=`$echo "X$relink_command" | $Xsed -e "$sed_quote_subst"`
       fi
 

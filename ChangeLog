@@ -1,3 +1,8 @@
+2000-05-13 Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
+
+	* ltmain.sh: Preserve in relink_command any environment
+	variables that may affect the linker behavior.
+
 Fri May 12 11:23:17 2000  Jeffrey A Law  (law@cygnus.com)
 
 	* config.sub (basic_machine): Recognize hppa64 as a valid cpu type.
