@@ -868,13 +868,18 @@ cygwin_connect (int fd,
       if (res)
 	{
 	  /* Special handling for connect to return the correct error code
-	     when called to early on a non-blocking socket. */
-	  if (WSAGetLastError () == WSAEWOULDBLOCK)
+	     when called on a non-blocking socket. */
+	  if (sock->is_nonblocking ())
 	    {
-	      WSASetLastError (WSAEINPROGRESS);
-	      in_progress = TRUE;
+	      DWORD err = WSAGetLastError ();
+	      if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
+		{
+		  WSASetLastError (WSAEINPROGRESS);
+		  in_progress = TRUE;
+		}
+	      else if (err == WSAEINVAL)
+	        WSASetLastError (WSAEISCONN);
 	    }
-
 	  set_winsock_errno ();
 	}
       if (sock->get_addr_family () == AF_UNIX)

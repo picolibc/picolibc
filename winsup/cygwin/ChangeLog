@@ -1,3 +1,8 @@
+Wed Sep  5 10:14:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (cygwin_connect): Add WSAEALREADY and WSAEINVAL handling
+	for non-blocking sockets.
+
 Tue Sep  4 22:42:13 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (ctrl_c_handler): Only send SIGINT when we have a
