@@ -1123,11 +1123,10 @@ fsync (int fd)
   return 0;
 }
 
-/* sync: standards? */
-extern "C" int
+/* sync: SUSv3 */
+extern "C" void
 sync ()
 {
-  return 0;
 }
 
 suffix_info stat_suffixes[] =

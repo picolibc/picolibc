@@ -1,5 +1,9 @@
 2004-04-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (sync): Define void according to SUSv3.
+
+2004-04-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.cc (setacl): Use correct offset when trying to combine
 	standard and default entry of same type.
 
