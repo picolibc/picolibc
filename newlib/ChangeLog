@@ -1,3 +1,10 @@
+2002-06-13  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdlib.h: Add _Exit prototype.
+	* libc/stdlib/Makefile.am: Add _Exit.c support.
+	* libc/stdlib/Makefile.in: Ditto.
+	* libc/stdlib/_Exit.c: New file.
+
 2002-06-13  Stephen L. Moshier  <steve@moshier.net>
 
 	* libm/math/e_pow.c (__ieee754_pow): Fix case whereby

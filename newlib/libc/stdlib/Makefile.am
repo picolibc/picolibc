@@ -8,6 +8,7 @@ LIB_SOURCES = \
 	__adjust.c 	\
 	__exp10.c 	\
 	__ten_mu.c 	\
+	_Exit.c		\
 	a64l.c		\
 	abort.c  	\
 	abs.c 		\
@@ -144,6 +145,7 @@ malloptr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/mallocr.c -o $@
 
 CHEWOUT_FILES= \
+	_Exit.def	\
 	a64l.def	\
 	abort.def	\
 	abs.def		\
