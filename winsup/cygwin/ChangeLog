@@ -1,3 +1,8 @@
+Thu May 25 13:29:23 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dir.cc (rmdir): Use file attributes that have already been discovered
+	by path_conv.
+
 2000-05-25  Kazuhiro Fujieda <fujieda@jaist.ac.jp>
 
 	* dir.cc (rmdir): Correct the manner in checking the target directory.
@@ -58,7 +63,7 @@ Mon May 16 23:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* dir.cc (rmdir): Care for misleading error messages
 	when trying to remove a directory on a samba share.
-        Eliminate superfluous else branch.
+	Eliminate superfluous else branch.
 	* syscalls.cc (_rename): Additional check for ERROR_FILE_EXISTS
 	if MoveFile fails.
 
