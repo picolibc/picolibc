@@ -26,6 +26,7 @@ details. */
 #include "shared_info_magic.h"
 #include "registry.h"
 #include "cygwin_version.h"
+#include "child_info.h"
 
 shared_info NO_COPY *cygwin_shared;
 mount_info NO_COPY *mount_table;
@@ -43,10 +44,48 @@ shared_name (const char *str, int num)
   return buf;
 }
 
+#define page_const (65535)
+#define pround(n) (((size_t) (n) + page_const) & ~page_const)
+
 void * __stdcall
-open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, void *addr)
+open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locations m)
 {
   void *shared;
+  static char *offsets[] =
+  {
+    (char *) cygwin_shared_address,
+    (char *) cygwin_shared_address
+      + pround (sizeof (shared_info)),
+    (char *) cygwin_shared_address
+      + pround (sizeof (shared_info))
+      + pround (sizeof (mount_info)),
+    (char *) cygwin_shared_address
+      + pround (sizeof (shared_info))
+      + pround (sizeof (mount_info))
+      + pround (sizeof (console_state)),
+    (char *) cygwin_shared_address
+      + pround (sizeof (shared_info))
+      + pround (sizeof (mount_info))
+      + pround (sizeof (console_state))
+      + pround (sizeof (_pinfo))
+  };
+
+  if (m == SH_CYGWIN_SHARED)
+    {
+      for (int i = SH_CYGWIN_SHARED; i < SH_TOTAL_SIZE; i++)
+	if (!VirtualAlloc (offsets[i], offsets[i + 1] - offsets[i],
+			   MEM_RESERVE, PAGE_NOACCESS))
+	  continue;  /* oh well */
+      if (!child_proc_info)
+	for (DWORD s = 0x950000; s <= 0xa40000; s += 0x1000)
+	  VirtualAlloc ((void *) s, 4, MEM_RESERVE, PAGE_NOACCESS);
+    }
+
+  void *addr = offsets[m];
+  (void) VirtualFree (addr, 0, MEM_RELEASE);
+
+  if (!size)
+    return addr;
 
   if (!shared_h)
     {
@@ -65,9 +104,8 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, void *addr)
 	api_fatal ("CreateFileMapping, %E.  Terminating.");
     }
 
-  shared = (shared_info *) MapViewOfFileEx (shared_h,
-				       FILE_MAP_READ | FILE_MAP_WRITE,
-				       0, 0, 0, addr);
+  shared = (shared_info *)
+    MapViewOfFileEx (shared_h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0, addr);
 
   if (!shared)
     {
@@ -115,13 +153,14 @@ shared_info::initialize ()
 void __stdcall
 memory_init ()
 {
+  getpagesize ();
   /* Initialize general shared memory */
   HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
   cygwin_shared = (shared_info *) open_shared ("shared",
 					       CYGWIN_VERSION_SHARED_DATA,
 					       shared_h,
 					       sizeof (*cygwin_shared),
-					       cygwin_shared_address);
+					       SH_CYGWIN_SHARED);
 
   cygwin_shared->initialize ();
 
@@ -142,13 +181,13 @@ memory_init ()
   cygheap->shared_h = shared_h;
   ProtectHandleINH (cygheap->shared_h);
 
-  getpagesize ();
   heap_init ();
+
   mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
 					    cygwin_mount_h, sizeof (mount_info),
-					    mount_table);
+					    SH_MOUNT_TABLE);
   debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
-		mount_table_address);
+		mount_table);
   ProtectHandleINH (cygwin_mount_h);
   debug_printf ("mount table version %x at %p", mount_table->version, mount_table);
 

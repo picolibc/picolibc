@@ -85,14 +85,7 @@ str_to_con (char *d, const char *s, DWORD sz)
 
 const char * get_nonascii_key (INPUT_RECORD&, char *);
 
-struct console_state
-{
-  tty_min tty_min_state;
-  dev_console dev_state;
-};
-
 static console_state NO_COPY *shared_console_info;
-static console_state *shared_console_info_save;
 
 dev_console NO_COPY *fhandler_console::dev_state;
 
@@ -104,10 +97,10 @@ fhandler_console::get_tty_stuff (int flags = 0)
   if (dev_state)
     return &shared_console_info->tty_min_state;
 
-  shared_console_info = shared_console_info_save =
+  shared_console_info =
     (console_state *) open_shared (NULL, 0, cygheap->console_h,
 				   sizeof (*shared_console_info),
-				   shared_console_info_save);
+				   SH_SHARED_CONSOLE);
   dev_state = &shared_console_info->dev_state;
 
   ProtectHandleINH (cygheap->console_h);

@@ -27,13 +27,13 @@ details. */
 #include <ntdef.h>
 #include "ntdll.h"
 #include "cygthread.h"
+#include "shared_info.h"
 
 static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 
 HANDLE hexec_proc;
-_pinfo NO_COPY *myself_addr;
 
 void __stdcall
 pinfo_fixup_after_fork ()
@@ -128,17 +128,13 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
     }
 
   void *mapaddr;
-  bool itsme;
   if (!(flag & PID_MYSELF))
-    {
-      mapaddr = NULL;
-      itsme = false;
-    }
+    mapaddr = NULL;
   else
     {
       flag &= ~PID_MYSELF;
-      mapaddr = myself_addr;
-      itsme = true;
+      HANDLE hdummy;
+      mapaddr = open_shared (NULL, 0, hdummy, 0, SH_MYSELF);
     }
 
   int createit = flag & (PID_IN_USE | PID_EXECED);
@@ -182,8 +178,6 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       procinfo = (_pinfo *) MapViewOfFileEx (h, FILE_MAP_READ | FILE_MAP_WRITE,
 					     0, 0, 0, mapaddr);
       ProtectHandle1 (h, pinfo_shared_handle);
-      if (itsme)
-	myself_addr = procinfo;
 
       if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
 	  && cygwin_pid (procinfo->dwProcessId) != procinfo->pid)

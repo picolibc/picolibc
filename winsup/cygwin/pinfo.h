@@ -202,7 +202,6 @@ cygwin_pid (pid_t pid)
 void __stdcall pinfo_init (char **, int);
 void __stdcall set_myself (pid_t pid, HANDLE h = NULL);
 extern pinfo myself;
-extern _pinfo *myself_addr;
 
 #define _P_VFORK 0
 extern void __stdcall pinfo_fixup_after_fork ();

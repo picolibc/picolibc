@@ -161,6 +161,14 @@ extern shared_info *cygwin_shared;
 extern mount_info *mount_table;
 extern HANDLE cygwin_mount_h;
 
+enum shared_locations
+{
+  SH_CYGWIN_SHARED,
+  SH_MOUNT_TABLE,
+  SH_SHARED_CONSOLE,
+  SH_MYSELF,
+  SH_TOTAL_SIZE
+};
 void __stdcall memory_init ();
 
 #define shared_align_past(p) \
@@ -169,8 +177,14 @@ void __stdcall memory_init ();
 	      system_info.dwAllocationGranularity)))
 
 #define cygwin_shared_address	((void *) 0xa000000)
-#define mount_table_address	shared_align_past (cygwin_shared)
-#define cygheap_address		shared_align_past ((mount_info *) shared_align_past (cygwin_shared))
+
+#ifdef FHDEVN
+struct console_state
+{
+  tty_min tty_min_state;
+  dev_console dev_state;
+};
+#endif
 
 char *__stdcall shared_name (const char *, int);
-void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, void *addr);
+void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locations);

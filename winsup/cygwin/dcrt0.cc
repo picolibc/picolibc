@@ -572,7 +572,9 @@ dll_crt0_1 ()
   int envc = 0;
   char **envp = NULL;
 
-  if (child_proc_info)
+  if (!child_proc_info)
+    memory_init ();
+  else
     {
       bool close_ppid_handle = false;
       bool close_hexec_proc = false;
@@ -581,10 +583,9 @@ dll_crt0_1 ()
 	  case _PROC_FORK:
 	    cygheap_fixup_in_child (0);
 	    alloc_stack (fork_info);
-	    mount_table = fork_info->mount_table;
-	    myself_addr = fork_info->myself_addr;
-	    set_myself (mypid);
 	    close_ppid_handle = !!child_proc_info->pppid_handle;
+	    memory_init ();
+	    set_myself (mypid);
 	    break;
 	  case _PROC_SPAWN:
 	    /* Have to delay closes until after cygheap is setup */
@@ -596,6 +597,7 @@ dll_crt0_1 ()
 	  around:
 	    HANDLE h;
 	    cygheap_fixup_in_child (1);
+	    memory_init ();
 	    if (!spawn_info->moreinfo->myself_pinfo ||
 		!DuplicateHandle (hMainProc, spawn_info->moreinfo->myself_pinfo,
 				  hMainProc, &h, 0, 0,
@@ -622,9 +624,6 @@ dll_crt0_1 ()
 	CloseHandle (child_proc_info->pppid_handle);
     }
 
-  /* Initialize the cygwin subsystem if this is the first process,
-     or attach to shared data structures if it's already running. */
-  memory_init ();
   cygthread::init ();
 
   ProtectHandle (hMainProc);

@@ -422,8 +422,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   init_child_info (PROC_FORK, &ch, 1, subproc_ready);
 
   ch.forker_finished = forker_finished;
-  ch.mount_table = mount_table;
-  ch.myself_addr = myself_addr;
 
   stack_base (ch);
 
