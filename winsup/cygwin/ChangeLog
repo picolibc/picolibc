@@ -1,5 +1,9 @@
 2004-09-20  Christopher Faylor  <cgf@timesys.com>
 
+	* exceptions.cc (sig_handle_tty_stop): Set flag earlier.
+
+2004-09-20  Christopher Faylor  <cgf@timesys.com>
+
 	* exceptions.cc (sig_handle_tty_stop): Set flag that we are in a cygwin
 	function to avoid a probably erroneous stack walk.
 

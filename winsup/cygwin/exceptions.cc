@@ -593,6 +593,7 @@ extern "C" {
 static void
 sig_handle_tty_stop (int sig)
 {
+  _my_tls.incyg = 1;
   /* Silently ignore attempts to suspend if there is no accommodating
      cygwin parent to deal with this behavior. */
   if (!myself->ppid_handle)
@@ -623,7 +624,6 @@ sig_handle_tty_stop (int sig)
   HANDLE w4[2];
   w4[0] = sigCONT;
   w4[1] = signal_arrived;
-  _my_tls.incyg = 1;
   switch (WaitForMultipleObjects (2, w4, TRUE, INFINITE))
     {
     case WAIT_OBJECT_0:
