@@ -106,6 +106,22 @@ uni2ansi (LPWSTR wcs, char *mbs, int size)
     *mbs = '\0';
 }
 
+void
+print_win_error(DWORD code)
+{
+  char buf[4096];
+
+  if (FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM
+      | FORMAT_MESSAGE_IGNORE_INSERTS,
+      NULL,
+      code,
+      MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+      (LPTSTR) buf, sizeof (buf), NULL))
+    fprintf (stderr, "mkpasswd: [%lu] %s", code, buf);
+  else
+    fprintf (stderr, "mkpasswd: error %lu", code);
+}
+
 int
 enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 	    const char * passed_home_path, int id_offset, char *disp_username)
@@ -139,7 +155,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
-	  fprintf (stderr, "Access denied\n");
+	  print_win_error(rc);
 	  exit (1);
 
 	case ERROR_MORE_DATA:
@@ -147,9 +163,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 	  break;
 
 	default:
-	  fprintf (stderr, "NetUserEnum() failed with error %ld.\n", rc);
-	  if (rc == NERR_UserNotFound) 
-	    fprintf (stderr, "That user doesn't exist.\n");
+	  print_win_error(rc);
 	  exit (1);
 	}
 
@@ -202,11 +216,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 				      domain_name, &domname_len,
 				      &acc_type))
 		{
-		  fprintf (stderr,
-			   "LookupAccountName(%s,%s) failed with error %ld\n",
-			   servername ? ansi_srvname : "NULL",
-			   username,
-			   GetLastError ());
+	  	  print_win_error(GetLastError ());
 		  continue;
 		}
 	      else if (acc_type == SidTypeDomain)
@@ -224,11 +234,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 					  domain_name, &domname_len,
 					  &acc_type))
 		    {
-		      fprintf (stderr,
-			       "LookupAccountName(%s,%s) failed with error %ld\n",
-			       servername ? ansi_srvname : "NULL",
-			       domname,
-			       GetLastError ());
+		      print_win_error(GetLastError ());
 		      continue;
 		    }
 		}
@@ -277,7 +283,7 @@ enum_local_groups (int print_sids)
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
-	  fprintf (stderr, "Access denied\n");
+	  print_win_error(rc);
 	  exit (1);
 
 	case ERROR_MORE_DATA:
@@ -285,7 +291,7 @@ enum_local_groups (int print_sids)
 	  break;
 
 	default:
-	  fprintf (stderr, "NetLocalGroupEnum() failed with %ld\n", rc);
+	  print_win_error(rc);
 	  exit (1);
 	}
 
@@ -305,8 +311,7 @@ enum_local_groups (int print_sids)
 				  &sid_length, domain_name, &domname_len,
 				  &acc_type))
 	    {
-	      fprintf (stderr, "LookupAccountName(%s) failed with %ld\n",
-		       localgroup_name, GetLastError ());
+	      print_win_error(GetLastError ());
 	      continue;
 	    }
 	  else if (acc_type == SidTypeDomain)
@@ -323,9 +328,7 @@ enum_local_groups (int print_sids)
 				      domain_name, &domname_len,
 				      &acc_type))
 		{
-		  fprintf (stderr,
-			   "LookupAccountName(%s) failed with error %ld\n",
-			   localgroup_name, GetLastError ());
+		  print_win_error(GetLastError ());
 		  continue;
 		}
 	    }
@@ -533,8 +536,7 @@ main (int argc, char **argv)
 
   if (!load_netapi ())
     {
-      fprintf (stderr, "Failed loading symbols from netapi32.dll "
-		       "with error %lu\n", GetLastError ());
+      print_win_error(GetLastError ());
       return 1;
     }
 
@@ -571,7 +573,7 @@ main (int argc, char **argv)
 
       if (rc != ERROR_SUCCESS)
 	{
-	  fprintf (stderr, "Cannot get DC, code = %ld\n", rc);
+	  print_win_error(rc);
 	  exit (1);
 	}
 

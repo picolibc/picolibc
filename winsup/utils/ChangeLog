@@ -1,3 +1,10 @@
+2002-01-15  Mark Bradshaw  <bradshaw@crosswalk.com>
+
+	* mkpasswd.c (print_win_error): Add a new function.
+	(enum_users): Use print_win_error.
+	(enum_local_groups): Ditto.
+	(main): Ditto.
+
 2001-12-26  Jonathan Kamens  <jik@curl.com>
 
 	* cygpath.cc (doit): Detect and warn about an empty path.  Detect and
