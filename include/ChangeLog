@@ -1,3 +1,9 @@
+2004-09-17  Paul Brook  <paul@codesourcery.com>
+
+	* elf/arm.h: Remove R_ARM_STKCHK and R_ARM_THM_STKCHK.
+	Add R_ARM_TARGET2, R_ARM_PREL31, R_ARM_GOT_ABS, R_ARM_GOT_PREL,
+	R_ARM_GOT_BREL12, R_ARM_GOTOFF12 and R_ARM_GOTRELAX.
+
 2004-09-17  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (struct bfd_link_hash_entry): Move und_next into elements
