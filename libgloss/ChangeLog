@@ -1,3 +1,7 @@
+2003-02-17  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips/cfe.c (__cfe_handle, __cfe_entrypt): Fix types.
+
 2003-02-05  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips/configure.in (mipsisa32el-*-*): Handle in the same way

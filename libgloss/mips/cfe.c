@@ -48,9 +48,14 @@ static void *force_prestart = &_prestart;
    either you compile specially (with -fno-zero-initialized-in-bss), or
    you init to non-zero.  In this case, initting to non-zero is OK (and
    even beneficial; alignment fault via jump to odd if not properly
-   set up by _prestart()), so we do the latter.  */
-unsigned int __cfe_handle = 0xdeadbeef;
-unsigned int __cfe_entrypt = 0xdeadbeef;
+   set up by _prestart()), so we do the latter.
+
+   These variables are 'int's so they can be reliably stored w/ "sw".
+   (longs fall victim to -mlong64.)  They are signed so that they remain
+   valid pointers when extended to cfe_xuint_t in the call to cfe_init().
+   This assumes that they are compatibility-space pointers.  */
+int __cfe_handle = 0xdeadbeef;
+int __cfe_entrypt = 0xdeadbeef;
 
 /* Echo input characters?  */
 int	__cfe_echo_input = 0;
