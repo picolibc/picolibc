@@ -1,3 +1,10 @@
+2001-09-03  Michael A Chase <mchase@ix.netcom.com>
+
+	* mount.cc (longopts): Add mount-commands to options list.
+	(usage): Add mount-commands option.
+	(mount_commands): New function.  Write commands to recreate current
+	mounts.
+
 Sat Sep  1 15:58:11 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* mount.cc (main): Eliminate excess arguments in printf.

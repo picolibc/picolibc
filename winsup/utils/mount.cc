@@ -22,6 +22,7 @@ details. */
 #endif
 #include <errno.h>
 
+static void mount_commands (void);
 static void show_mounts (void);
 static void show_cygdrive_info (void);
 static void change_cygdrive_prefix (const char *new_prefix, int flags);
@@ -98,10 +99,11 @@ struct option longopts[] =
   {"cygwin-executable", no_argument, NULL, 'X'},
   {"show-cygdrive-prefix", no_argument, NULL, 'p'},
   {"import-old-mounts", no_argument, NULL, 'i'},
+  {"mount-commands", no_argument, NULL, 'm'},
   {NULL, 0, NULL, 0}
 };
 
-char opts[] = "hbfstuxXpic";
+char opts[] = "hbfstuxXpicm";
 
 static void
 usage (void)
@@ -121,6 +123,8 @@ usage (void)
   -x, --executable              treat all files under mount point as executables\n\
   -X, --cygwin-executable       treat all files under mount point as cygwin\n\
 				executables\n\
+  -m, --mount-commands          write mount commands to replace user and\n\
+				system mount points and cygdrive prefixes\n\
 ", progname);
   exit (1);
 }
@@ -135,7 +139,8 @@ main (int argc, char **argv)
     nada,
     saw_change_cygdrive_prefix,
     saw_import_old_mounts,
-    saw_show_cygdrive_prefix
+    saw_show_cygdrive_prefix,
+    saw_mount_commands
   } do_what = nada;
 
   progname = argv[0];
@@ -188,6 +193,12 @@ main (int argc, char **argv)
       case 'x':
 	flags |= MOUNT_EXEC;
 	break;
+      case 'm':
+	if (do_what == nada)
+	  do_what = saw_mount_commands;
+	else
+	  usage ();
+	break;
       default:
 	usage ();
       }
@@ -211,6 +222,11 @@ main (int argc, char **argv)
 	usage ();
       show_cygdrive_info ();
       break;
+    case saw_mount_commands:
+      if (optind <= argc)
+	usage ();
+      mount_commands ();
+      break;
     default:
       if (optind != (argc - 1))
 	{
@@ -231,6 +247,62 @@ main (int argc, char **argv)
 
   /* NOTREACHED */
   return 0;
+}
+
+static void
+mount_commands (void)
+{
+  FILE *m = setmntent ("/-not-used-", "r");
+  struct mntent *p;
+  char *c;
+  const char *format_mnt = "mount%s \"%s\" \"%s\"\n";
+  const char *format_cyg = "mount%s --change-cygdrive-prefix \"%s\"\n";
+  char opts[MAX_PATH];
+  char user[MAX_PATH];
+  char system[MAX_PATH];
+  char user_flags[MAX_PATH];
+  char system_flags[MAX_PATH];
+
+  // write mount commands for user and system mount points
+  while ((p = getmntent (m)) != NULL) {
+    strcpy(opts, " -f");
+    if      (p->mnt_type[0] == 'u')
+      strcat (opts, " -u");
+    else if (p->mnt_type[0] == 's')
+      strcat (opts, " -s");
+    if      (p->mnt_opts[0] == 'b')
+      strcat (opts, " -b");
+    else if (p->mnt_opts[0] == 't')
+      strcat (opts, " -t");
+    if (strstr (p->mnt_opts, ",exec"))
+      strcat (opts, " -x");
+    while ((c = strchr (p->mnt_fsname, '\\')) != NULL)
+      *c = '/';
+    printf (format_mnt, opts, p->mnt_fsname, p->mnt_dir);
+  }
+  endmntent (m);
+
+  // write mount commands for cygdrive prefixes
+  cygwin_internal (CW_GET_CYGDRIVE_INFO, user, system, user_flags,
+		   system_flags);
+  if (strlen (user) > 0) {
+    strcpy (opts, "   ");
+    if      (user_flags[0] == 'b')
+      strcat (opts, " -b");
+    else if (user_flags[0] == 't')
+      strcat (opts, " -t");
+    printf (format_cyg, opts, user);
+  }
+  if (strlen (system) > 0) {
+    strcpy (opts, " -s");
+    if      (system_flags[0] == 'b')
+      strcat (opts, " -b");
+    else if (system_flags[0] == 't')
+      strcat (opts, " -t");
+    printf (format_cyg, opts, system);
+  }
+
+  exit(0);
 }
 
 static void
