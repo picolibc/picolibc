@@ -1,3 +1,8 @@
+Mon Oct  1 00:34:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (pthread_cond_dowait): Hopefully eliminate a race on multiple thread
+	wakeups.
+
 Sat Sep 29 18:26:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* pthread.cc (pthread_cond_timedwait): Deleted - exported from thread.cc.

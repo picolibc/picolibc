@@ -1773,8 +1773,8 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   bool last = false;
   if (InterlockedDecrement (&((*cond)->waiting)) == 0)
     last = true;
-  (*cond)->mutex->Lock ();
-  if (last)
+  (*themutex)->Lock ();
+  if (last == true)
     (*cond)->mutex = NULL;
   if (pthread_mutex_lock (&(*cond)->cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
