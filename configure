@@ -655,8 +655,8 @@ case "${TMPDIR}" in
 *) ;;
 esac
 
-# keep this filename short for &%*%$*# 14 char file names
-tmpfile=${TMPDIR}/cONf$$
+# keep this filename short for &%*%$*# 14 char file names and 8+3 file names
+tmpfile=${TMPDIR}/cNf$$
 # Note that under many versions of sh a trap handler for 0 will *override* any
 # exit status you explicitly specify!  At this point, the only non-error exit
 # is at the end of the script; these actions are duplicated there, minus

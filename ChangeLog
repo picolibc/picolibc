@@ -1,3 +1,9 @@
+1999-08-08  Ian Lance Taylor  <ian@zembu.com>
+
+	From Eli Zaretskii <eliz@is.elta.co.il>:
+	* configure (tmpfile): Change cONf$$ to cNf$$ to avoid an overly
+	long file name when using DJGPP on MS-DOS.
+
 1999-07-30  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	* Makefile.in (check-target-libio): Remove all-target-libstdc++
