@@ -1042,6 +1042,7 @@ do_exit (int status)
 	  if (tp->getsid () == myself->sid)
 	    kill (-tp->getpgid (), SIGHUP);
 	}
+
       tty_terminate ();
       cleanup_pinfo = TRUE;
     }
@@ -1085,7 +1086,21 @@ __api_fatal (const char *fmt, ...)
   va_start (ap, fmt);
   __small_vsprintf (buf, fmt, ap);
   va_end (ap);
-  small_printf ("%s\n", buf);
+  strcat (buf, "\n");
+  int len = strlen (buf);
+  DWORD done;
+  (void) WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, len, &done, 0);
+
+  /* Make sure that the message shows up on the screen, too, since this is
+     a serious error. */
+  if (GetFileType (GetStdHandle (STD_ERROR_HANDLE)) != FILE_TYPE_CHAR)
+    {
+      HANDLE h = CreateFileA ("CONOUT$", GENERIC_READ|GENERIC_WRITE,
+			      FILE_SHARE_WRITE | FILE_SHARE_WRITE, &sec_none,
+			      OPEN_EXISTING, 0, 0);
+      if (h)
+	(void) WriteFile (h, buf, len, &done, 0);
+    }
 
   /* We are going down without mercy.  Make sure we reset
      our process_state. */
@@ -1159,7 +1174,6 @@ LoadDLLinitfunc (user32)
   while (InterlockedIncrement (&here))
     {
       InterlockedDecrement (&here);
-small_printf ("Multiple tries to read user32.dll\n");
       Sleep (0);
     }
 
@@ -1182,7 +1196,6 @@ LoadDLLinitfunc (advapi32)
   while (InterlockedIncrement (&here))
     {
       InterlockedDecrement (&here);
-small_printf ("Multiple tries to read advapi32.dll\n");
       Sleep (0);
     }
 

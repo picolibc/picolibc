@@ -49,7 +49,7 @@ private:
   sigthread *st;
 
 public:
-  void set (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
+  void set (sigthread &t, DWORD ebp)
   {
     t.lock->acquire ();
     st = &t;
@@ -58,10 +58,10 @@ public:
   }
 
   sigframe () {st = NULL;}
-  sigframe (sigthread &t, int up = 0)
+  sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
   {
     if (!t.frame && t.id == GetCurrentThreadId ())
-      set (t, up);
+      set (t, ebp);
     else
       st = NULL;
   }

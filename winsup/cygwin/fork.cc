@@ -130,7 +130,8 @@ sync_with_child (PROCESS_INFORMATION &pi, HANDLE subproc_ready,
   */
   HANDLE w4[2];
 
-  debug_printf ("waiting for child.  reason: %s", s);
+  debug_printf ("waiting for child.  reason: %s, hang_child %d", s,
+		hang_child);
   w4[1] = pi.hProcess;
   w4[0] = subproc_ready;
   DWORD rc = WaitForMultipleObjects (2, w4, FALSE, FORK_WAIT_TIMEOUT);

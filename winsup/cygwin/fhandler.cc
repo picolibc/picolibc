@@ -764,13 +764,6 @@ fhandler_base::lock (int, struct flock *)
   return -1;
 }
 
-int
-fhandler_base::fstat (struct stat *buf)
-{
-  return stat_dev (get_device (), get_unit (), get_namehash (), buf);
-  return 0;
-}
-
 extern "C" char * __stdcall
 rootdir(char *full_path)
 {
@@ -978,13 +971,6 @@ void
 fhandler_base::dump (void)
 {
   paranoid_printf ("here");
-}
-
-void
-fhandler_base::set_io_handle (HANDLE x)
-{
-  debug_printf ("set handle to %p", x);
-  io_handle = x;
 }
 
 int

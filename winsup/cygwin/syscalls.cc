@@ -64,6 +64,7 @@ extern "C" int
 _unlink (const char *ourname)
 {
   int res = -1;
+  sigframe thisframe (mainthread);
 
   path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
 
@@ -247,6 +248,7 @@ extern "C" int
 _write (int fd, const void *ptr, size_t len)
 {
   int res = -1;
+  sigframe thisframe (mainthread);
 
   if (fdtab.not_open (fd))
     {
@@ -380,6 +382,7 @@ _open (const char *unix_path, int flags, ...)
   va_list ap;
   mode_t mode = 0;
   fhandler_base *fh;
+  sigframe thisframe (mainthread);
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
   if (!check_null_empty_path_errno(unix_path))
@@ -415,6 +418,7 @@ extern "C" off_t
 _lseek (int fd, off_t pos, int dir)
 {
   off_t res;
+  sigframe thisframe (mainthread);
 
   if (fdtab.not_open (fd))
     {
@@ -434,6 +438,7 @@ extern "C" int
 _close (int fd)
 {
   int res;
+  sigframe thisframe (mainthread);
 
   syscall_printf ("close (%d)", fd);
 
@@ -461,6 +466,7 @@ extern "C" int
 isatty (int fd)
 {
   int res;
+  sigframe thisframe (mainthread);
 
   if (fdtab.not_open (fd))
     {
@@ -484,6 +490,7 @@ extern "C" int
 _link (const char *a, const char *b)
 {
   int res = -1;
+  sigframe thisframe (mainthread);
   path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
 
@@ -714,18 +721,21 @@ done:
 extern "C" int
 chown (const char * name, uid_t uid, gid_t gid)
 {
+  sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
 }
 
 extern "C" int
 lchown (const char * name, uid_t uid, gid_t gid)
 {
+  sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_IGNORE, uid, gid);
 }
 
 extern "C" int
 fchown (int fd, uid_t uid, gid_t gid)
 {
+  sigframe thisframe (mainthread);
   if (fdtab.not_open (fd))
     {
       syscall_printf ("-1 = fchown (%d,...)", fd);
@@ -763,6 +773,7 @@ extern "C" int
 chmod (const char *path, mode_t mode)
 {
   int res = -1;
+  sigframe thisframe (mainthread);
 
   path_conv win32_path (path);
 
@@ -836,6 +847,7 @@ done:
 extern "C" int
 fchmod (int fd, mode_t mode)
 {
+  sigframe thisframe (mainthread);
   if (fdtab.not_open (fd))
     {
       syscall_printf ("-1 = fchmod (%d, 0%o)", fd, mode);
@@ -891,6 +903,7 @@ extern "C" int
 _fstat (int fd, struct stat *buf)
 {
   int r;
+  sigframe thisframe (mainthread);
 
   if (fdtab.not_open (fd))
     {
@@ -912,6 +925,7 @@ _fstat (int fd, struct stat *buf)
 extern "C" int
 fsync (int fd)
 {
+  sigframe thisframe (mainthread);
   if (fdtab.not_open (fd))
     {
       syscall_printf ("-1 = fsync (%d)", fd);
@@ -939,6 +953,7 @@ sync ()
 int __stdcall
 stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
 {
+  sigframe thisframe (mainthread);
   switch (devn)
     {
     case FH_CONOUT:
@@ -1084,6 +1099,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 extern "C" int
 _stat (const char *name, struct stat *buf)
 {
+  sigframe thisframe (mainthread);
   return stat_worker ("stat", name, buf, 0);
 }
 
@@ -1091,6 +1107,7 @@ _stat (const char *name, struct stat *buf)
 extern "C" int
 lstat (const char *name, struct stat *buf)
 {
+  sigframe thisframe (mainthread);
   return stat_worker ("lstat", name, buf, 1);
 }
 
@@ -1099,6 +1116,7 @@ extern int acl_access (const char *, int);
 extern "C" int
 access (const char *fn, int flags)
 {
+  sigframe thisframe (mainthread);
   // flags were incorrectly specified
   if (flags & ~(F_OK|R_OK|W_OK|X_OK))
     {
@@ -1169,6 +1187,7 @@ done:
 extern "C" int
 _rename (const char *oldpath, const char *newpath)
 {
+  sigframe thisframe (mainthread);
   int res = 0;
 
   path_conv real_old (oldpath, PC_SYM_NOFOLLOW);
@@ -1265,6 +1284,7 @@ done:
 extern "C" int
 system (const char *cmdstring)
 {
+  sigframe thisframe (mainthread);
   int res;
   const char* command[4];
   _sig_func_ptr oldint, oldquit;
@@ -1532,6 +1552,7 @@ setmode (int fd, int mode)
 extern "C" int
 ftruncate (int fd, off_t length)
 {
+  sigframe thisframe (mainthread);
   int res = -1;
 
   if (fdtab.not_open (fd))
@@ -1570,6 +1591,7 @@ ftruncate (int fd, off_t length)
 extern "C" int
 truncate (const char *pathname, off_t length)
 {
+  sigframe thisframe (mainthread);
   int fd;
   int res = -1;
 
@@ -1610,6 +1632,7 @@ get_osfhandle (int fd)
 extern "C" int
 statfs (const char *fname, struct statfs *sfs)
 {
+  sigframe thisframe (mainthread);
   if (!sfs)
     {
       set_errno (EFAULT);
@@ -1650,6 +1673,7 @@ statfs (const char *fname, struct statfs *sfs)
 extern "C" int
 fstatfs (int fd, struct statfs *sfs)
 {
+  sigframe thisframe (mainthread);
   if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
@@ -1663,6 +1687,7 @@ fstatfs (int fd, struct statfs *sfs)
 extern "C" int
 setpgid (pid_t pid, pid_t pgid)
 {
+  sigframe thisframe (mainthread);
   int res = -1;
   if (pid == 0)
     pid = getpid ();
@@ -1702,6 +1727,7 @@ out:
 extern "C" pid_t
 getpgid (pid_t pid)
 {
+  sigframe thisframe (mainthread);
   if (pid == 0)
     pid = getpid ();
 
@@ -1717,18 +1743,21 @@ getpgid (pid_t pid)
 extern "C" int
 setpgrp (void)
 {
+  sigframe thisframe (mainthread);
   return setpgid (0, 0);
 }
 
 extern "C" pid_t
 getpgrp (void)
 {
+  sigframe thisframe (mainthread);
   return getpgid (0);
 }
 
 extern "C" char *
 ptsname (int fd)
 {
+  sigframe thisframe (mainthread);
   if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
@@ -1784,6 +1813,7 @@ extern char *internal_getlogin (_pinfo *pi);
 extern "C" int
 seteuid (uid_t uid)
 {
+  sigframe thisframe (mainthread);
   if (os_being_run == winNT)
     {
       if (uid != (uid_t) -1)
@@ -1849,6 +1879,7 @@ seteuid (uid_t uid)
 extern "C" int
 setegid (gid_t gid)
 {
+  sigframe thisframe (mainthread);
   if (os_being_run == winNT)
     {
       if (gid != (gid_t) -1)
@@ -1871,6 +1902,7 @@ setegid (gid_t gid)
 extern "C" int
 chroot (const char *newroot)
 {
+  sigframe thisframe (mainthread);
   int ret = -1;
   path_conv path(newroot, PC_SYM_FOLLOW | PC_FULL);
 
@@ -1907,6 +1939,7 @@ done:
 extern "C" int
 creat (const char *path, mode_t mode)
 {
+  sigframe thisframe (mainthread);
   return open (path, O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
 
@@ -1919,6 +1952,7 @@ __assertfail ()
 extern "C" int
 getw (FILE *fp)
 {
+  sigframe thisframe (mainthread);
   int w, ret;
   ret = fread (&w, sizeof (int), 1, fp);
   return ret != 1 ? EOF : w;
@@ -1927,6 +1961,7 @@ getw (FILE *fp)
 extern "C" int
 putw (int w, FILE *fp)
 {
+  sigframe thisframe (mainthread);
   int ret;
   ret = fwrite (&w, sizeof (int), 1, fp);
   if (feof (fp) || ferror (fp))
@@ -1997,6 +2032,7 @@ memccpy (_PTR out, const _PTR in, int c, size_t len)
 extern "C" int
 nice (int incr)
 {
+  sigframe thisframe (mainthread);
   DWORD priority[] =
     {
       IDLE_PRIORITY_CLASS,
@@ -2066,6 +2102,7 @@ ffs (int i)
 extern "C" void
 login (struct utmp *ut)
 {
+  sigframe thisframe (mainthread);
   register int fd;
   int currtty = ttyslot ();
 
@@ -2090,6 +2127,7 @@ FIXME (cgf): huh?
 extern "C" int
 logout (char *line)
 {
+  sigframe thisframe (mainthread);
   int res = 0;
   HANDLE ut_fd;
   static const char path_utmp[] = _PATH_UTMP;

@@ -1,3 +1,24 @@
+Thu Oct 12 00:25:29 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* errno.cc (seterrno_from_win_error): Fix debugging output.
+	* fhandler.cc (fhandler_base::fstat): Move to inline method in
+	fhandler.h.
+	(fhandler_base::set_io_handle): Ditto.
+	* fhandler.h (fhandler_base): Make some methods inline.
+	* fhandler_console.cc (fhandler_console::write_normal): Make buffer
+	larger.
+	* sigproc.h (sigframe::sigframe): Actually use set ebp parameter
+	correctly.
+	* spawn.cc (spawn_guts): Set dwProcessId when exec'ing.  Just exit
+	immediately after reparenting.
+	* syscalls.cc: Sprinkle sigframe stuff throughout.
+	* wait.cc (wait4): Set signal frame here.
+
+Tue Oct 10 19:54:06 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (__api_fatal): Don't rely on small_printf to display errors.
+	Always display problems to the console, if possible.
+
 Tue Oct 10 15:21:10 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (cwdstuff::get): Set EINVAL when length is zero.

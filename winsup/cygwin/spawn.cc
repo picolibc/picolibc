@@ -699,6 +699,7 @@ skip_arg_parsing:
       // close_all_files ();
       proc_terminate ();
       hExeced = pi.hProcess;
+      myself->dwProcessId = pi.dwProcessId;
 
       /* Set up child's signal handlers */
       /* CGF FIXME - consolidate with signal stuff below */
@@ -880,7 +881,7 @@ skip_arg_parsing:
 
       MALLOC_CHECK;
       if (mode == _P_OVERLAY)
-	do_exit (res | EXIT_NOCLOSEALL);
+	ExitProcess (res);
     }
 
   switch (mode)

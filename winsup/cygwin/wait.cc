@@ -50,6 +50,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
   int rc;
   waitq *w;
   HANDLE waitfor;
+  sigframe thisframe (mainthread);
 
 sigproc_printf ("here");
  if (options & ~(WNOHANG | WUNTRACED))

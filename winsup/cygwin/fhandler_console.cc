@@ -266,7 +266,6 @@ fhandler_console::set_input_state ()
     input_tcsetattr (0, &tc->ti);
 }
 
-
 static struct
   {
     SHORT winTop;
@@ -1076,10 +1075,10 @@ fhandler_console::write_normal (const unsigned char *src,
   /* Print all the base ones out */
   if (found != src)
     {
-      char buf[256];
-      int len = found - src;
+      char buf[4096];
+      size_t len = found - src;
       do {
-	int l2 = min (256, len);
+	size_t l2 = min (sizeof (buf), len);
 	CharToOemBuff ((LPCSTR)src, buf, l2);
 	if (! WriteFile (get_output_handle (), buf, l2, &done, 0))
 	{

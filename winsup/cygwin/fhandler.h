@@ -154,7 +154,7 @@ public:
   virtual ~fhandler_base ();
 
   /* Non-virtual simple accessor functions. */
-  void set_io_handle (HANDLE);
+  void set_io_handle (HANDLE x) { io_handle = x; }
 
   void set_cb (size_t size) { cb = size; }
   DWORD get_device () { return status & FH_DEVMASK; }
@@ -250,7 +250,7 @@ public:
   }
   virtual int open (int flags, mode_t mode = 0);
   virtual int close ();
-  virtual int fstat (struct stat *buf);
+  virtual int fstat (struct stat *buf) { return stat_dev (get_device (), get_unit (), get_namehash (), buf); }
   virtual int ioctl (unsigned int cmd, void *);
   virtual char const * ttyname () { return get_name(); }
   virtual int read (void *ptr, size_t len);
