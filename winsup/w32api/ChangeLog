@@ -1,3 +1,12 @@
+2004-01-31  Jiri Malak  <Jiri.Malak@geac.cz>
+
+	* include/winuser.h (RT_MANIFEST): Make conditional on
+	RC_INVOKED.
+	(CREATEPROCESS_MANIFEST_RESOURCE_ID,
+	ISOLATIONAWARE_MANIFEST_RESOURCE_ID,
+	ISOLATIONAWARE_NOSTATICIMPORT_MANIFEST_RESOURCE_ID): Add
+	defines.
+
 2004-01-16 Martin Fuchs  <martin-fuchs@gmx.net>
 
 	* include/shlobj.h (SHGDN_INCLUDE_NONFILESYS): Add define.
