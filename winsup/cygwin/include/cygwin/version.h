@@ -251,7 +251,7 @@ details. */
       122: Export statvfs, fstatvfs.
       123: Export utmpxname.
       124: Add MAP_AUTOGROW flag to mmap.
-      125: Export __ctype_ptr.
+      125: LD_PRELOAD/CW_HOOK available.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
