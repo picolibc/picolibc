@@ -110,6 +110,10 @@ This is not to be confused with 'MinGW' (Minimalist GNU for Windows),
 which is a completely separate effort.  That project's home page is
 @file{http://www.mingw.org/index.shtml}.
 
+@subsection Can I link with both MSVCRT*.DLL and cygwin1.dll?
+
+No, you must use one or the other, they are mutually exclusive.
+
 @subsection How do I make the console window go away?
 
 The default during compilation is to produce a console application.
