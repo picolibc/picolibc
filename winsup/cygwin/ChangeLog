@@ -1,0 +1,246 @@
+2003-01-15  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* cmalloc.cc (_cmalloc): Fix memory leak.
+
+2003-01-15  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Fix copyright date.
+	* fhandler_dsp.cc: Ditto.
+	* mmap.cc: Ditto.
+	* net.cc: Ditto.
+	* ntdll.h: Ditto.
+	* signal.cc: Ditto.
+	* syscalls.cc: Ditto.
+	* uname.cc: Ditto.
+	* wait.cc: Ditto.
+
+2003-01-14  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (fixup_mmaps_after_fork): Copy protection to child process.
+	Change ambiguous debug output.
+
+2003-01-14  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap_record::access): Change argument type to caddr_t
+	for strictness.
+	(mprotect): Protect against calling VirtualProtect() for shared
+	pages on 9x/Me.
+	(fixup_mmaps_after_fork): If ReadProcessMemory() fails, try to
+	change protection of parent page to PAGE_READONLY, then try again.
+	Revert protection afterwards.
+
+2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* syscalls.cc (system): Add pthread_testcancel call.
+	* thread.cc: Update list of cancellation points.
+
+2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* wait.cc: Include thread.h
+	(wait4): Add pthread_testcancel call.
+	Wait for child process and cancellation event.
+	* thread.cc: Update list of cancellation points.
+
+2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* signal.cc (sleep): Add pthread_testcancel call.
+	Wait for signal and cancellation event.
+	(usleep): Ditto.
+
+2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* exceptions.cc (handle_sigsuspend): Add pthread_testcancel call.
+	Wait for signal and cancellation event.
+	* thread.cc: Update list of cancellation points.
+
+2003-01-14  David Huang  <davehzhr@hotmail.com>
+
+	* fhandler_dsp.cc (fhandler_dsp::ioctl): Add limited support for
+	SNDCTL_DSP_GETFMTS.
+
+2003-01-12  Christopher Faylor  <cgf@redhat.com>
+
+	* ntdll.h: Fix typo.
+
+2003-01-12  Corinna Vinschen <corinna@vinschen.de>
+
+	* uname.cc (uname): Use cygwin_gethostname() to retrieve hostname.
+
+2003-01-12  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* sec_acl.cc (search_ace): Use id == -1, instead of < 0, as wildcard.
+	(setacl): Start the search for a matching default at the next entry.
+	Invalidate the type of merged entries instead of clearing it.
+	Use well_known_creator for default owner and owning group and do
+	not try to merge non-default and default entries in these cases.
+	(getacl): Recognize well_known_creator for default owner and group.
+	(acl_worker): Improve errno settings and streamline the nontsec case.
+	* security.cc (write_sd): Remove the call to set_process_privilege.
+	(alloc_sd): If the owner changes, call set_process_privilege and return
+	immediately on failure. Change inheritance rules: on new directories add
+	inherit only allow ACEs for creator_owner, creator_group and everyone.
+	Preserve all inheritances through chmod and chown calls. Introduce
+	isownergroup to implement the uid == gid case, to keep the inheritance
+	code simple. Do not initialize owner_sid and group_sid and stop using
+	the variable psd.
+
+2003-01-10  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc: Use gethostname define from winsock2.h.
+
+2003-01-10  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc: Unrevert below reversion except for
+	mount_info::conv_to_posix_path part.
+
+2003-01-10  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc: Revert patch from 2003-01-09 to normalize a windows path
+	rather than converting to posix.
+
+2003-01-10  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc (gethostname): Make call optional, return 1 if function
+	can't get loaded.
+	* net.cc (cygwin_gethostname): Call GetComputerName if return value
+	of gethostname is non-zero.
+
+2003-01-10  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* cygwin.din: Add asprintf and vasprintf, as well as the reentrant
+	versions and underscore variants.
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR.
+
+2003-01-10  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (cygwin_gethostname): Fix call to wsock function gethostname.
+
+2003-01-09  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::cygthread): Be more noisy about odd
+	condition.
+	* miscfuncs.cc (low_priority_sleep): Sleep in regular priority if
+	that's what we're currently running at.
+
+2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* include/semaphore.h: Modify typedef for sem_t.
+	* include/cygwin/types.h: Modify typedefs for pthread_t,
+	pthread_mutex_t, pthread_key_t, pthread_attr_t,
+	pthread_mutexattr_t, pthread_condattr_t, pthread_cond_t,
+	pthread_rwlock_t and pthread_rwlockattr_t.
+
+2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (WAIT_CANCELED): New define.
+	(pthread::cancelable_wait): New static method.
+	* thread.cc (pthread::cancelable_wait): Implement.
+	(semaphore::Wait): Wait on semaphore and thread cancellation.
+	(pthread::join): Wait on joined thread and thread cancellation.
+	(semaphore::wait): Add testcancel to check for thread
+	cancellation even if the semaphore is available.
+
+2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* include/pthread.h: Add define for errorchecking mutexes.
+	Change default mutex type.
+	* thread.cc (pthread_cond::TimedWait): Update mutex unlock
+	calls.
+	(pthread_mutex::pthread_mutex): New implement.
+	(pthread_mutex::~pthread_mutex): Ditto.
+	(pthread_mutex::Lock): Ditto.
+	(pthread_mutex::TryLock): Ditto.
+	(pthread_mutex::UnLock): Ditto.
+	(pthread_mutex::Destroy): Implement new method.
+	(pthread_mutex::SetOwner): Ditto.
+	(pthread_mutex::LockRecursive): Ditto.
+	(pthread_mutex::fixup_after_fork): Restore locking state after
+	fork.
+	(__pthread_mutex_lock): Return pthread_mutex::Lock errorcode.
+	(__pthread_mutex_trylock): Return pthread_mutex::TryLock
+	errorcode.
+	(__pthread_mutex_unlock): Return pthread_mutex::UnLock
+	errorcode.
+	(__pthread_mutex_destroy): Call pthread_mutex::Destroy to
+	destroy mutex.
+	(__pthread_mutexattr_settype): Allow errorchecking and recursive
+	types.
+	* thread.h (MUTEX_LOCK_COUNTER_INITIAL): New define.
+	(pthread_mutex::criticalsection): Remove.
+	(pthread_mutex::lock_counter): New member.
+	(pthread_mutex::recursion_counter): Ditto.
+	(pthread_mutex::owner): Ditto.
+	(pthread_mutex::type): Ditto.
+	(pthread_mutex::Destroy): New method.
+	(pthread_mutex::SetOwner): Ditto.
+	(pthread_mutex::LockRecursive): Ditto.
+
+2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* pthread.cc (pthread_cond_init): Use new pthread_cond::init.
+	* thread.cc: Some white spaces cleanups.
+	Change __pthread_cond_init to pthread_cond::init throughout.
+	(nativeMutex): Move class methods outside pthread_mutex.
+	(MTinterface::Init): Initialize pthread_cond init lock.
+	(pthread_cond::condInitializationLock): Instantiate.
+	(pthread_cond::initMutex): New Method.
+	(pthread_cond::isGoodInitializerOrBadObject): Ditto.
+	* thread.h: Some white spaces cleanups.
+	(nativeMutex): Move class declaration outside pthread_mutex.
+	(pthread_cond::condInitializationLock): New static member.
+	(pthread_cond::initMutex): New Method.
+	(pthread_cond::isGoodInitializerOrBadObject): Ditto.
+	(__pthread_cond_init): Remove prototype.
+
+2003-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (num_entries): Return 2 as link count if
+	directory unreadable.
+
+2003-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_nt_attribute): Always return -1 when read_sd()
+	fails.
+	(get_file_attribute): Set permissions to 0 and owner/group to -1
+	if security descriptor is unreadable.
+
+2003-01-09  Christopher Faylor  <cgf@redhat.com>
+
+	Use isdirsep rather than SLASH_P throughout.
+	* path.cc (iscygdrive): Disallow /cygdrive\x.
+	(normalize_posix_path): "Normalize" a windows path, if detected, rather
+	than converting to posix.
+
+2003-01-06  Troy Curtiss <troyc@usa.net>
+
+	* fhandler_serial.cc (fhandler_serial::tcsetattr): Add support and
+	capability checking for B230400 bitrate.
+	(fhandler_serial::tcgetattr): Add support for B230400 bitrate.
+	* include/sys/termios.h: Add B230400 definition for Posix support of
+	230.4Kbps.
+
+2003-01-05  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::commune_send): Use myself->lock rather than just
+	lock when leaving.
+
+2003-01-03  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.h (dtable::in_vfork_cleanup): New function.  True if vfork
+	cleanup needed.
+	* dtable.cc (dtable::vfork_parent_restore): Remove assertion.
+	* pipe.cc (fhandler_pipe::close): Don't close read_state during
+	fork_fixup since it wasn't inherited.
+
+2003-01-01  Christopher Faylor  <cgf@redhat.com>
+
+	* passwd.cc (getpwuid_r32): Revert previous change.
+
+2003-01-01  Christopher Faylor  <cgf@redhat.com>
+
+	* sysconf.cc (sysconf): Return arbitrary values for
+	_SC_GETGR_R_SIZE_MAX, _SC_LOGIN_NAME_MAX, _SC_GETPW_R_SIZE_MAX.
+
+	* passwd.cc (getpwuid_r32): Add uid/gid fields to size check
+	calculation.
+
