@@ -1,5 +1,10 @@
 2003-09-10  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (sig_handle_tty_stop): Check parent PID_NOCLDSTOP
+	rather than erroneously checking *my own* sigtodo.
+
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: Add some more -fomit-frame-pointer files.
 
 	* path.cc (conv_path_list_buf_size): Free normalized_path or suffer
