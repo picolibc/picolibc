@@ -547,7 +547,8 @@ fhandler_console::open (path_conv *, int flags, mode_t)
   set_io_handle (INVALID_HANDLE_VALUE);
   set_output_handle (INVALID_HANDLE_VALUE);
 
-  set_flags (flags);
+  set_w_binary (1);
+  set_r_binary (1);
 
   /* Open the input handle as handle_ */
   h = CreateFileA ("CONIN$", GENERIC_READ|GENERIC_WRITE,
@@ -1443,21 +1444,19 @@ fhandler_console::write_normal (const unsigned char *src,
 	case ESC:
 	  state_ = gotesc;
 	  break;
-	case DWN:		/* WriteFile ("\n") always adds CR... */
+	case DWN:
 	  cursor_get (&x, &y);
 	  if (y >= srBottom)
 	    {
-	      if (y < info.winBottom || scroll_region.Top)
+	      if (y >= info.winBottom && !scroll_region.Top)
+		WriteFile (get_output_handle (), "\n", 1, &done, 0);
+	      else
 		{
 		  scroll_screen (0, srTop + 1, -1, srBottom, 0, srTop);
 		  y--;
 		}
-	      else
-		WriteFile (get_output_handle (), "\n", 1, &done, 0);
 	    }
-	  if (!get_w_binary ())
-	    x = 0;
-	  cursor_set (FALSE, x, y + 1);
+	  cursor_set (FALSE, ((tc->ti.c_oflag & ONLCR) ? 0 : x), y + 1);
 	  break;
 	case BAK:
 	  cursor_rel (-1, 0);
@@ -1698,7 +1697,7 @@ get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
 void
 fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
 {
-  this->fhandler_termios::init (f, bin, a);
+  this->fhandler_termios::init (f, a, bin);
 
   /* Ensure both input and output console handles are open */
   int mode = 0;
