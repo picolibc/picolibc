@@ -532,8 +532,11 @@ proc_terminate (void)
        * non-raceable manner.
        */
       muto *m = sync_proc_subproc;
-      sync_proc_subproc = NULL;
-      delete m;
+      if (m)
+	{
+	  sync_proc_subproc = NULL;
+	  delete m;
+	}
     }
   sip_printf ("leaving");
 }

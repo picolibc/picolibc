@@ -149,7 +149,7 @@ host_dependent_constants NO_COPY host_dependent;
 /* Constructor for host_dependent_constants.  */
 
 void
-host_dependent_constants::init (void)
+host_dependent_constants::init ()
 {
   /* fhandler_disk_file::lock needs a platform specific upper word
      value for locking entire files.

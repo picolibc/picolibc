@@ -1,3 +1,10 @@
+Sat Mar 25 00:22:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc: Add TMPDIR to the list of environment variables which are
+	converted to POSIX format.
+	* sigproc.cc (proc_terminate): Don't attempt to delete when a muto
+	pointer is NULL.
+
 Sun Mar 19 12:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * syscalls.cc (stat_worker): Set st_nlink to 1 on remote drives.
