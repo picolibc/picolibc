@@ -1,5 +1,12 @@
 2003-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (OBSOLETE_FUNCTION):  Add tmpfile.
+	(NEW_FUNCTIONS): Add _tmpfile64 -> tmpfile translation.
+	* cygwin.din: Export _tmpfile64
+	* include/cygwin/version.h: Bump api minor number.
+
+2003-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din: Add sem_close, sem_getvalue, sem_open and sem_timedwait.
 	* pthread.cc (+mangle_sem_name): New function.
 	(sem_open): Ditto.

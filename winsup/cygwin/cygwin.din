@@ -1411,6 +1411,7 @@ _times = times
 timezone
 tmpfile
 _tmpfile = tmpfile
+_tmpfile64 = tmpfile64
 tmpnam
 _tmpnam = tmpnam
 toascii

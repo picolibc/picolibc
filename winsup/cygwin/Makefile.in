@@ -148,7 +148,7 @@ OBSOLETE_FUNCTIONS:=regcomp regerror regexec regfree regsub \
 		    getgroups getpwuid getpwuid_r getuid initgroups \
 		    lchown lseek lstat mknod mmap seekdir setegid seteuid \
 		    setgid setgroups setregid setreuid setuid stat \
-		    telldir truncate
+		    telldir tmpfile truncate
 
 NEW_FUNCTIONS:=regcomp posix_regcomp \
 	       regerror posix_regerror \
@@ -202,6 +202,7 @@ NEW_FUNCTIONS:=regcomp posix_regcomp \
 	       setuid _setuid32 \
 	       stat _stat64 \
 	       telldir _telldir64 \
+	       tmpfile _tmpfile64 \
 	       truncate _truncate64
 
 API_VER:=$(srcdir)/include/cygwin/version.h
