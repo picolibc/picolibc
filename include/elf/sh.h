@@ -56,7 +56,8 @@
    : (((mach1) == EF_SH3E && (mach2) == EF_SH_UNKNOWN) \
       || ((mach2) == EF_SH3E && (mach1) == EF_SH_UNKNOWN)) \
    ? EF_SH4 \
-   : ((mach1) > (mach2) ? (mach1) : (mach2)))
+   : (((mach1) == EF_SH2E ? 7 : (mach1)) > ((mach2) == EF_SH2E ? 7 : (mach2)) \
+      ? (mach1) : (mach2)))
 
 /* Flags for the st_other symbol field.
    Keep away from the STV_ visibility flags (bit 0..1).  */
