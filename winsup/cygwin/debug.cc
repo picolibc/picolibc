@@ -229,6 +229,7 @@ setclexec (HANDLE oh, HANDLE nh, bool setit)
   handle_list *hl = find_handle (oh);
   if (hl)
     {
+      hl = hl->next;
       hl->clexec = setit;
       hl->h = nh;
     }
