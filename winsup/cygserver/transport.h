@@ -33,6 +33,7 @@ public:
   virtual bool revert_to_self ();
 #endif
 
+  virtual ~transport_layer_base ();
 };
 
 #endif /* _TRANSPORT_H */

@@ -48,3 +48,6 @@ transport_layer_base::revert_to_self ()
 }
 
 #endif /* !__INSIDE_CYGWIN__ */
+
+transport_layer_base::~transport_layer_base ()
+{}

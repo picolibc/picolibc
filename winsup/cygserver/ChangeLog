@@ -1,3 +1,8 @@
+2004-08-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* transport.cc (transport_layer_base::~transport_layer_base): Resurrect.
+	* transport.h (transport_layer_base::~transport_layer_base): Ditto.
+
 2004-07-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_mutex.cc (_msleep): Reset event object and close it before
