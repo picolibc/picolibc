@@ -1,3 +1,11 @@
+2003-07-01  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/w32api.h (_NT4, _W98, _WME, _NT5, _W2000, _WXP, _W2003,
+	_IE3, _IE4, _IE5, _IE6): Add definitions.
+	* include/winbase.h (GetLongPathName[AW]): Add guard for OS >= NT5 or
+	>= Win98.
+	Change existing guards to use the above macro names as appropriate.
+
 2003-06-28  Steven Edwards  <Steven_Ed4153@yahoo.com>
 
 	* include/shlwapi.h (UrlGetLocationA, UrlGetLocationW,
