@@ -115,10 +115,11 @@ details. */
 	   with crt0 startup code.
        24: Export poll and _poll.
        25: Export getmode and _getmode.
+       26: CW_GET_CYGDRIVE_PREFIXES addition to external.cc
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 24
+#define CYGWIN_VERSION_API_MINOR 26
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
