@@ -320,6 +320,7 @@ fhandler_socket::dup (fhandler_base *child)
   if (get_addr_family () == AF_LOCAL)
     fhs->set_sun_path (get_sun_path ());
   fhs->set_socket_type (get_socket_type ());
+  fhs->set_connect_state (get_connect_state ());
 
   if (winsock2_active)
     {

@@ -1997,7 +1997,10 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
       if (res_fd >= 0)
 	fh = fdsock (res_fd, "/dev/tcp", res);
       if (fh)
-	res = res_fd;
+	{
+	  fh->set_connect_state (CONNECTED);
+	  res = res_fd;
+	}
       else
 	{
 	  closesocket (res);
@@ -2011,8 +2014,11 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 	  fh = NULL;
 	  if (newfd >= 0)
 	    fh = fdsock (newfd, "/dev/tcp", fd2s);
-	  if (fh)
-	    *fd2p = newfd;
+	  if (fh) 
+	    {
+	      *fd2p = newfd;
+	      fh->set_connect_state (CONNECTED);
+	    }
 	  else
 	    {
 	      closesocket (res);
@@ -2081,7 +2087,10 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
       if (res_fd >= 0)
 	fh = fdsock (res_fd, "/dev/tcp", res);
       if (fh)
-	res = res_fd;
+	{
+	  fh->set_connect_state (CONNECTED);
+	  res = res_fd;
+	}
       else
 	{
 	  closesocket (res);
@@ -2096,7 +2105,10 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
 	  if (newfd >= 0)
 	    fh = fdsock (newfd, "/dev/tcp", fd2s);
 	  if (fh)
-	    *fd2p = newfd;
+	    {
+	      fh->set_connect_state (CONNECTED);
+	      *fd2p = newfd;
+	    }
 	  else
 	    {
 	      closesocket (res);
@@ -2272,6 +2284,7 @@ socketpair (int family, int type, int protocol, int *sb)
 	fh->set_sun_path ("");
 	fh->set_addr_family (family);
 	fh->set_socket_type (type);
+	fh->set_connect_state (CONNECTED);
 
 	cygheap_fdnew sb1 (sb0, false);
 
@@ -2283,6 +2296,7 @@ socketpair (int family, int type, int protocol, int *sb)
 	    fh->set_sun_path ("");
 	    fh->set_addr_family (family);
 	    fh->set_socket_type (type);
+	    fh->set_connect_state (CONNECTED);
 
 	    sb[0] = sb0;
 	    sb[1] = sb1;

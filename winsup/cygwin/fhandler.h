@@ -412,6 +412,7 @@ class fhandler_socket: public fhandler_base
   bool is_connect_pending () const {return had_connect_or_listen == CONNECT_PENDING;}
   bool is_connected () const {return had_connect_or_listen == CONNECTED;}
   void set_connect_state (int newstate) { had_connect_or_listen = newstate; }
+  int get_connect_state () const { return had_connect_or_listen; }
 
   int bind (const struct sockaddr *name, int namelen);
   int connect (const struct sockaddr *name, int namelen);

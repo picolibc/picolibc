@@ -1,3 +1,14 @@
+2003-07-04  N Stephens  <nigel@mips.com>
+
+	* fhandler.h (fhandler_socket::get_connect_state): New method to
+	return socket connection state.
+	* fhandler_socket.cc (dup): Copy socket connect state to new file
+	handle.
+	* net.cc (cygwin_rcmd): Mark file handles of sockets returned by
+	rcmd() as CONNECTED state.
+	(cygwin_rexec): Similarly for rexec().
+	(socketpair): Mark both ends of a new socket pair as CONNECTED.
+
 2003-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (fhandler_disk_file::mmap): Fix address test.
