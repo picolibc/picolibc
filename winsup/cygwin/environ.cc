@@ -113,10 +113,11 @@ posify (char **here, const char *value)
 {
   char *src = *here;
   win_env *conv;
-  int len = strcspn (src, "=") + 1;
 
   if (!(conv = getwinenv (src)))
     return;
+
+  int len = strcspn (src, "=") + 1;
 
   /* Turn all the items from c:<foo>;<bar> into their
      mounted equivalents - if there is one.  */

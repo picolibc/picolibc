@@ -1,3 +1,14 @@
+Wed Oct 18 00:48:49 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (call_handler): Make signal pending if sigsave.sig is
+	still active.
+	* syscalls.cc (_read): Don't clear errno.
+	* sigproc.cc (wait_sig): Don't scan the waiting process list after a
+	SIGCHLD if there are no zombies to reap.
+	* winsup.h: Use __builtin_strcmp.
+	* environ.cc (posify): Don't initialize len unless it is required
+	(from DJ Delorie <dj@redhat.com>).
+
 Tue Oct 17 14:50:31 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (proc_subproc): Remove unneeded test for correct process

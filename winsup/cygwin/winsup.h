@@ -16,8 +16,9 @@ details. */
 
 #ifdef __cplusplus
 
-#define alloca(x) __builtin_alloca (x)
+#define alloca __builtin_alloca
 #define strlen __builtin_strlen
+#define strcmp __builtin_strcmp
 #define strcpy __builtin_strcpy
 #define memcpy __builtin_memcpy
 #define memcmp __builtin_memcmp

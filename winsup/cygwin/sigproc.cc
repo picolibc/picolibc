@@ -1195,7 +1195,7 @@ wait_sig (VOID *)
 	  continue;
 	}
 
-      if (saw_sigchld && !dispatched_sigchld)
+      if (nzombies && saw_sigchld && !dispatched_sigchld)
 	proc_subproc (PROC_CLEARWAIT, 0);
       /* Signal completion of signal handling depending on which semaphore
        * woke up the WaitForMultipleObjects above.

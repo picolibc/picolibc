@@ -212,7 +212,7 @@ _read (int fd, void *ptr, size_t len)
       return -1;
     }
 
-  set_sig_errno (0);
+  // set_sig_errno (0);
   fhandler_base *fh = fdtab[fd];
   DWORD wait = (fh->get_flags () & (O_NONBLOCK | OLD_O_NDELAY)) ? 0 : INFINITE;
 
@@ -225,7 +225,7 @@ _read (int fd, void *ptr, size_t len)
   else if (!fh->ready_for_read (fd, wait, 0))
     {
       if (!wait)
-	set_sig_errno (EAGAIN);
+	set_sig_errno (EAGAIN);	/* Don't really need 'set_sig_errno' here, but... */
       else
 	set_sig_errno (EINTR);
       res = -1;

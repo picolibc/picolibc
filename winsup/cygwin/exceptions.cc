@@ -216,7 +216,7 @@ public:
 
 /* This is the main stack frame info for this process. */
 static NO_COPY stack_info thestack;
-signal_dispatch sigsave;
+static signal_dispatch sigsave;
 
 /* Initialize everything needed to start iterating. */
 void
@@ -710,6 +710,9 @@ call_handler (int sig, struct sigaction& siga, void *handler)
   int using_mainthread_frame;
 
   mainthread.lock->acquire ();
+
+  if (sigsave.sig)
+    goto set_pending;
 
   if (mainthread.frame)
     {
