@@ -72,7 +72,7 @@ DISTFILES = Makefile.in configure configure.in \
 	trunc.c \
 	ulltoa.c \
 	ulltow.c \
-	wcstof \
+	wcstof.c \
 	wcstoimax.c \
 	wcstoumax.c \
 	wmemchr.c \
