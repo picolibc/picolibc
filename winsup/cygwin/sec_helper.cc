@@ -432,7 +432,7 @@ sec_acl (PACL acl, BOOL admins, PSID sid1, PSID sid2)
   if (sid1)
     if (!AddAccessAllowedAce (acl, ACL_REVISION,
 			      GENERIC_ALL, sid1))
-      debug_printf ("AddAccessAllowedAce(sid1) %E", sid1);
+      debug_printf ("AddAccessAllowedAce(sid1) %E");
   if (admins)
     if (!AddAccessAllowedAce (acl, ACL_REVISION,
 			      GENERIC_ALL, well_known_admins_sid))

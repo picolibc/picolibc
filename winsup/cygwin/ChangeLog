@@ -1,3 +1,73 @@
+2002-08-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler.h (fhandler_socket::recv): Remove method.
+	(fhandler_socket::send): Ditto.
+	* fhandler_socket.cc (fhandler_socket::recv): Ditto.
+	(fhandler_socket::send): Ditto.
+	(fhandler_socket::read): Delegate to fhandler_socket::recvfrom.
+	(fhandler_socket::write): Delegate to fhandler_socket::sendto.
+	(fhandler_socket::sendto): Check for null `to' address.
+	* net.cc (cygwin_sendto): Check for zero request length.
+	(cygwin_recvfrom): Ditto.  Fix signature, use void *buf.
+	(cygwin_recv): Delegate to cygwin_recvfrom.
+	(cygwin_send): Delegate to cygwin_sendto.
+
+2002-08-11  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::cygthread): Close another race.
+
+2002-08-11  Christopher Faylor  <cgf@redhat.com>
+
+	* assert.cc (__assert): Call debugger on assertion failure if
+	debugging.
+	* dcrt0.cc (dll_crt0_1): Just wait for signal thread to go live rather
+	than going through the overhead of invoking it.
+	* fork.cc (fork_child): Ditto.
+	* exceptions.cc (signal_fixup_after_fork): Call sigproc_init here.
+	* sigproc.cc (proc_can_be_signalled): Assume that the signal thread is
+	live.
+	(sig_dispatch): Ditto.
+	(sig_send): Ditto.
+	(wait_for_sigthread): Renamed from "wait_for_me".  Assume that
+	wait_sig_inited has been set and that this function is only called from
+	the main thread.
+	* winsup.h (wait_for_sigthread): Declare new function.
+
+2002-08-08  Christopher Faylor  <cgf@redhat.com>
+
+	* environ.cc (parse_options): Remember the "no" part of any options for
+	later export.
+
+2002-08-07  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* winsup.h (__check_null_invalid_struct): Make ptr argument non-const.
+	(__check_null_invalid_struct_errno): Ditto.
+	* miscfuncs.cc (__check_null_invalid_struct): Ditto.
+	(__check_null_invalid_struct_errno): Ditto.
+	(__check_invalid_read_ptr_errno): Remove superfluous cast.
+	* net.cc (get): Set appropriate errno if fd is not a socket.
+	(cygwin_sendto): Fix parameter checking.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_setsockopt): Ditto.
+	(cygwin_getsockopt): Ditto.
+	(cygwin_connect): Ditto.
+	(cygwin_gethostbyaddr): Ditto.
+	(cygwin_accept): Ditto.
+	(cygwin_bind): Ditto.
+	(cygwin_getsockname): Ditto.
+	(cygwin_listen): Ditto.
+	(cygwin_getpeername): Ditto.
+	(cygwin_send): Ditto.
+	(cygwin_shutdown): Ditto.  Move sigframe to fhandler_socket.
+	(cygwin_recvmsg): Fix parameter checking.  Add tracing.
+	(cygwin_sendmsg): Ditto.
+	* fhandler_socket.cc (fhandler_socket::shutdown): Add sigframe.
+	* resource.cc (setrlimit): Fix parameter checking.
+
+2002-08-08  Joe Buehler  <jbuehler@hekimian.com
+
+	* sec_helper.cc (sec_acl): remove extraneous arg to debug_printf.
+
 2002-08-07  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler_socket.cc (fhandler_socket::accept): Fix FIONBIO call.

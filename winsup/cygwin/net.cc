@@ -101,13 +101,17 @@ WSADATA wsadata;
 
 /* Cygwin internal */
 static fhandler_socket *
-get (int fd)
+get (const int fd)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     return 0;
 
-  return cfd->is_socket ();
+  fhandler_socket *const fh = cfd->is_socket ();
+  if (!fh)
+    set_errno (ENOTSOCK);
+
+  return fh;
 }
 
 /* Cygwin internal */
@@ -567,10 +571,10 @@ cygwin_sendto (int fd, const void *buf, int len, unsigned int flags,
   fhandler_socket *fh = get (fd);
 
   if ((len && __check_invalid_read_ptr_errno (buf, (unsigned) len))
-      || __check_null_invalid_struct_errno (to, tolen)
+      || (to &&__check_invalid_read_ptr_errno (to, tolen))
       || !fh)
     res = -1;
-  else
+  else if ((res = len) != 0)
     res = fh->sendto (buf, len, flags, to, tolen);
 
   syscall_printf ("%d = sendto (%d, %x, %x, %x)", res, fd, buf, len, flags);
@@ -580,18 +584,19 @@ cygwin_sendto (int fd, const void *buf, int len, unsigned int flags,
 
 /* exported as recvfrom: standards? */
 extern "C" int
-cygwin_recvfrom (int fd, char *buf, int len, int flags, struct sockaddr *from,
+cygwin_recvfrom (int fd, void *buf, int len, int flags, struct sockaddr *from,
 		 int *fromlen)
 {
   int res;
   fhandler_socket *fh = get (fd);
 
-  if (__check_null_invalid_struct_errno (buf, (unsigned) len)
-      || check_null_invalid_struct_errno (fromlen)
-      || (from && __check_null_invalid_struct_errno (from, (unsigned) *fromlen))
+  if ((len && __check_null_invalid_struct_errno (buf, (unsigned) len))
+      || (from
+	  && (check_null_invalid_struct_errno (fromlen)
+	      ||__check_null_invalid_struct_errno (from, (unsigned) *fromlen)))
       || !fh)
     res = -1;
-  else
+  else if ((res = len) != 0)
     res = fh->recvfrom (buf, len, flags, from, fromlen);
 
   syscall_printf ("%d = recvfrom (%d, %x, %x, %x)", res, fd, buf, len, flags);
@@ -604,47 +609,49 @@ extern "C" int
 cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 		   int optlen)
 {
+  int res;
   fhandler_socket *fh = get (fd);
-  int res = -1;
   const char *name = "error";
 
-  if ((!optval || !__check_invalid_read_ptr_errno (optval, optlen)) && fh)
+  /* For the following debug_printf */
+  switch (optname)
     {
-      /* For the following debug_printf */
-      switch (optname)
-	{
-	case SO_DEBUG:
-	  name="SO_DEBUG";
-	  break;
-	case SO_ACCEPTCONN:
-	  name="SO_ACCEPTCONN";
-	  break;
-	case SO_REUSEADDR:
-	  name="SO_REUSEADDR";
-	  break;
-	case SO_KEEPALIVE:
-	  name="SO_KEEPALIVE";
-	  break;
-	case SO_DONTROUTE:
-	  name="SO_DONTROUTE";
-	  break;
-	case SO_BROADCAST:
-	  name="SO_BROADCAST";
-	  break;
-	case SO_USELOOPBACK:
-	  name="SO_USELOOPBACK";
-	  break;
-	case SO_LINGER:
-	  name="SO_LINGER";
-	  break;
-	case SO_OOBINLINE:
-	  name="SO_OOBINLINE";
-	  break;
-	case SO_ERROR:
-	  name="SO_ERROR";
-	  break;
-	}
+    case SO_DEBUG:
+      name="SO_DEBUG";
+      break;
+    case SO_ACCEPTCONN:
+      name="SO_ACCEPTCONN";
+      break;
+    case SO_REUSEADDR:
+      name="SO_REUSEADDR";
+      break;
+    case SO_KEEPALIVE:
+      name="SO_KEEPALIVE";
+      break;
+    case SO_DONTROUTE:
+      name="SO_DONTROUTE";
+      break;
+    case SO_BROADCAST:
+      name="SO_BROADCAST";
+      break;
+    case SO_USELOOPBACK:
+      name="SO_USELOOPBACK";
+      break;
+    case SO_LINGER:
+      name="SO_LINGER";
+      break;
+    case SO_OOBINLINE:
+      name="SO_OOBINLINE";
+      break;
+    case SO_ERROR:
+      name="SO_ERROR";
+      break;
+    }
 
+  if ((optval && __check_invalid_read_ptr_errno (optval, optlen)) || !fh)
+    res = -1;
+  else
+    {
       res = setsockopt (fh->get_socket (), level, optname,
 			(const char *) optval, optlen);
 
@@ -664,49 +671,52 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 extern "C" int
 cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
 {
+  int res;
   fhandler_socket *fh = get (fd);
-  int res = -1;
   const char *name = "error";
-  if (!check_null_invalid_struct_errno (optlen)
-      && (!optval
-          || !__check_null_invalid_struct_errno (optval, (unsigned) *optlen))
-      && fh)
-    {
-      /* For the following debug_printf */
-      switch (optname)
-	{
-	case SO_DEBUG:
-	  name="SO_DEBUG";
-	  break;
-	case SO_ACCEPTCONN:
-	  name="SO_ACCEPTCONN";
-	  break;
-	case SO_REUSEADDR:
-	  name="SO_REUSEADDR";
-	  break;
-	case SO_KEEPALIVE:
-	  name="SO_KEEPALIVE";
-	  break;
-	case SO_DONTROUTE:
-	  name="SO_DONTROUTE";
-	  break;
-	case SO_BROADCAST:
-	  name="SO_BROADCAST";
-	  break;
-	case SO_USELOOPBACK:
-	  name="SO_USELOOPBACK";
-	  break;
-	case SO_LINGER:
-	  name="SO_LINGER";
-	  break;
-	case SO_OOBINLINE:
-	  name="SO_OOBINLINE";
-	  break;
-	case SO_ERROR:
-	  name="SO_ERROR";
-	  break;
-	}
 
+  /* For the following debug_printf */
+  switch (optname)
+    {
+    case SO_DEBUG:
+      name="SO_DEBUG";
+      break;
+    case SO_ACCEPTCONN:
+      name="SO_ACCEPTCONN";
+      break;
+    case SO_REUSEADDR:
+      name="SO_REUSEADDR";
+      break;
+    case SO_KEEPALIVE:
+      name="SO_KEEPALIVE";
+      break;
+    case SO_DONTROUTE:
+      name="SO_DONTROUTE";
+      break;
+    case SO_BROADCAST:
+      name="SO_BROADCAST";
+      break;
+    case SO_USELOOPBACK:
+      name="SO_USELOOPBACK";
+      break;
+    case SO_LINGER:
+      name="SO_LINGER";
+      break;
+    case SO_OOBINLINE:
+      name="SO_OOBINLINE";
+      break;
+    case SO_ERROR:
+      name="SO_ERROR";
+      break;
+    }
+
+  if ((optval
+       && (check_null_invalid_struct_errno (optlen)
+	   || __check_null_invalid_struct_errno (optval, (unsigned) *optlen)))
+      || !fh)
+    res = -1;
+  else
+    {
       res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
       			(int *) optlen);
 
@@ -732,10 +742,7 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
   int res;
   fhandler_socket *fh = get (fd);
 
-  if (__check_invalid_read_ptr_errno (name, namelen))
-    return -1;
-
-  if (!fh)
+  if (__check_invalid_read_ptr_errno (name, namelen) || !fh)
     res = -1;
   else
     res = fh->connect (name, namelen);
@@ -970,7 +977,7 @@ cygwin_gethostbyname (const char *name)
 extern "C" struct hostent *
 cygwin_gethostbyaddr (const char *addr, int len, int type)
 {
-  if (__check_null_invalid_struct_errno (addr, len))
+  if (__check_invalid_read_ptr_errno (addr, len))
     return NULL;
 
   free_hostent_ptr (hostent_buf);
@@ -992,15 +999,14 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
 extern "C" int
 cygwin_accept (int fd, struct sockaddr *peer, int *len)
 {
-  if (peer != NULL
-      && (check_null_invalid_struct_errno (len)
-	  || __check_null_invalid_struct_errno (peer, (unsigned) *len)))
-    return -1;
-
-  int res = -1;
-
+  int res;
   fhandler_socket *fh = get (fd);
-  if (fh)
+
+  if ((peer && (check_null_invalid_struct_errno (len)
+		|| __check_null_invalid_struct_errno (peer, (unsigned) *len)))
+      || !fh)
+    res = -1;
+  else
     res = fh->accept (peer, len);
 
   syscall_printf ("%d = accept (%d, %x, %x)", res, fd, peer, len);
@@ -1011,13 +1017,12 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 extern "C" int
 cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
 {
-  if (__check_null_invalid_struct_errno (my_addr, addrlen))
-    return -1;
-
-  int res = -1;
-
+  int res;
   fhandler_socket *fh = get (fd);
-  if (fh)
+
+  if (__check_invalid_read_ptr_errno (my_addr, addrlen) || !fh)
+    res = -1;
+  else
     res = fh->bind (my_addr, addrlen);
 
   syscall_printf ("%d = bind (%d, %x, %d)", res, fd, my_addr, addrlen);
@@ -1028,14 +1033,14 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
 extern "C" int
 cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 {
-  if (check_null_invalid_struct_errno (namelen)
-      || __check_null_invalid_struct_errno (addr, (unsigned) *namelen))
-    return -1;
-
-  int res = -1;
-
+  int res;
   fhandler_socket *fh = get (fd);
-  if (fh)
+
+  if (check_null_invalid_struct_errno (namelen)
+      || __check_null_invalid_struct_errno (addr, (unsigned) *namelen)
+      || !fh)
+    res = -1;
+  else
     res = fh->getsockname (addr, namelen);
 
   syscall_printf ("%d = getsockname (%d, %x, %d)", res, fd, addr, namelen);
@@ -1046,10 +1051,12 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 extern "C" int
 cygwin_listen (int fd, int backlog)
 {
-  int res = -1;
-
+  int res;
   fhandler_socket *fh = get (fd);
-  if (fh)
+
+  if (!fh)
+    res = -1;
+  else
     res = fh->listen (backlog);
 
   syscall_printf ("%d = listen (%d, %d)", res, fd, backlog);
@@ -1060,11 +1067,12 @@ cygwin_listen (int fd, int backlog)
 extern "C" int
 cygwin_shutdown (int fd, int how)
 {
-  int res = -1;
-  sigframe thisframe (mainthread);
-
+  int res;
   fhandler_socket *fh = get (fd);
-  if (fh)
+
+  if (!fh)
+    res = -1;
+  else
     res = fh->shutdown (how);
 
   syscall_printf ("%d = shutdown (%d, %d)", res, fd, how);
@@ -1122,18 +1130,17 @@ cygwin_herror (const char *s)
 extern "C" int
 cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 {
-  int res = -1;
+  int res;
+  fhandler_socket *fh = get (fd);
 
   if (check_null_invalid_struct_errno (len)
-      || __check_null_invalid_struct_errno (name, (unsigned) *len))
-    return -1;
-
-  fhandler_socket *fh = get (fd);
-  if (fh)
+      || __check_null_invalid_struct_errno (name, (unsigned) *len)
+      || !fh)
+    res = -1;
+  else
     res = fh->getpeername (name, len);
 
   syscall_printf ("%d = getpeername %d", res, (fh ? fh->get_socket () : -1));
-
   return res;
 }
 
@@ -1141,34 +1148,14 @@ cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 extern "C" int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
-  int res;
-  fhandler_socket *fh = get (fd);
-
-  if (__check_null_invalid_struct_errno (buf, len) || !fh)
-    res = -1;
-  else
-    res = fh->recv (buf, len, flags);
-
-  syscall_printf ("%d = recv (%d, %x, %x, %x)", res, fd, buf, len, flags);
-
-  return res;
+  return cygwin_recvfrom (fd, buf, len, flags, NULL, NULL);
 }
 
 /* exported as send: standards? */
 extern "C" int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
-  int res;
-  fhandler_socket *fh = get (fd);
-
-  if (__check_invalid_read_ptr_errno (buf, len) || !fh)
-    res = -1;
-  else
-    res = fh->send (buf, len, flags);
-
-  syscall_printf ("%d = send (%d, %x, %d, %x)", res, fd, buf, len, flags);
-
-  return res;
+  return cygwin_sendto (fd, buf, len, flags, NULL, 0);
 }
 
 /* getdomainname: standards? */
@@ -2095,32 +2082,40 @@ endhostent (void)
 
 /* exported as recvmsg: standards? */
 extern "C" int
-cygwin_recvmsg (int s, struct msghdr *msg, int flags)
+cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 {
-  if (check_null_invalid_struct_errno (msg))
-    return -1;
+  int res;
+  fhandler_socket *fh = get (fd);
 
-  fhandler_socket *fh = get (s);
-  if (!fh)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-  return fh->recvmsg (msg, flags);
+  if (check_null_invalid_struct_errno (msg)
+      || (msg->msg_name
+	  && __check_null_invalid_struct_errno (msg->msg_name,
+						(unsigned) msg->msg_namelen))
+      || !fh)
+    res = -1;
+  else
+    res = fh->recvmsg (msg, flags);
+
+  syscall_printf ("%d = recvmsg (%d, %x, %x)", res, fd, msg, flags);
+  return res;
 }
 
 /* exported as sendmsg: standards? */
 extern "C" int
-cygwin_sendmsg (int s, const struct msghdr *msg, int flags)
+cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 {
-    if (__check_invalid_read_ptr_errno (msg, sizeof msg))
-      return -1;
+  int res;
+  fhandler_socket *fh = get (fd);
 
-    fhandler_socket *fh = get (s);
-    if (!fh)
-      {
-        set_errno (EINVAL);
-	return -1;
-      }
-    return fh->sendmsg (msg, flags);
+  if (__check_invalid_read_ptr_errno (msg, sizeof msg)
+      || (msg->msg_name
+	  && __check_invalid_read_ptr_errno (msg->msg_name,
+					     (unsigned) msg->msg_namelen))
+      || !fh)
+    res = -1;
+  else
+    res = fh->sendmsg (msg, flags);
+
+  syscall_printf ("%d = recvmsg (%d, %x, %x)", res, fd, msg, flags);
+  return res;
 }

@@ -559,6 +559,7 @@ parse_options (char *buf)
        p != NULL;
        p = strtok_r (NULL, " \t", &lasts))
     {
+      char *keyword_here = p;
       if (!(istrue = !strncasematch (p, "no", 2)))
 	p += 2;
       else if (!(istrue = *p != '-'))
@@ -602,7 +603,7 @@ parse_options (char *buf)
 	      *--eq = ch;
 
 	    int n = eq - p;
-	    p = strdup (p);
+	    p = strdup (keyword_here);
 	    if (n > 0)
 	      p[n] = ':';
 	    k->remember = p;

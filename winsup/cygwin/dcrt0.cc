@@ -770,7 +770,7 @@ dll_crt0_1 ()
   /* Flush signals and ensure that signal thread is up and running. Can't
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
-  sig_send (NULL, __SIGFLUSH);
+  wait_for_sigthread ();
 
   set_errno (0);
 
