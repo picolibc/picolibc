@@ -278,7 +278,6 @@ struct init_cygheap
   size_t sthreads;
   int open_fhs;
   pid_t pid;			/* my pid */
-  const char *system_root;
   void close_ctty ();
 };
 
