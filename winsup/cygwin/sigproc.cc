@@ -499,7 +499,7 @@ proc_terminate (void)
 	      zombies[i]->hProcess = NULL;
 	    }
 	  zombies[i]->process_state = PID_NOT_IN_USE;	/* CGF FIXME - still needed? */
-	  zombies[i].release();
+	  // zombies[i].release();	// FIXME: this breaks older gccs for some reason
 	}
 
       /* Disassociate my subprocesses */
@@ -530,10 +530,15 @@ proc_terminate (void)
 		    pchildren[i]->process_state |= PID_ORPHANED;
 		}
 	    }
-	  pchildren[i].release ();
+	  // pchildren[i].release (); // FIXME: this breaks older gccs for some reason
 	}
       nchildren = nzombies = 0;
 
+      /* Just zero sync_proc_subproc as the delete below seems to cause
+	 problems for older gccs. */
+      #if 1
+	sync_proc_subproc = NULL;
+      #else
       /* Attempt to close and release sync_proc_subproc in a
        * non-raceable manner.
        */
@@ -541,8 +546,9 @@ proc_terminate (void)
       if (m)
 	{
 	  sync_proc_subproc = NULL;
-	  delete m;
+	  // delete m;
 	}
+      #endif
     }
   sigproc_printf ("leaving");
 }

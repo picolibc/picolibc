@@ -15,6 +15,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include <exceptions.h>
 
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)
@@ -153,6 +154,10 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 
       case CW_GETPINFO_FULL:
 	return (DWORD) fillout_pinfo (va_arg (arg, pid_t), 1);
+
+      case CW_INIT_EXCEPTIONS:
+	init_exceptions ((exception_list *) arg);
+	return 0;
 
       default:
 	return (DWORD) -1;

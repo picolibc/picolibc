@@ -1042,7 +1042,7 @@ do_exit (int status)
     }
 
   if (cleanup_pinfo)
-    myself->record_death ();	// Locks pinfo mutex
+    myself->record_death ();
   else
     sigproc_printf ("not cleanup_pinfo");
 
