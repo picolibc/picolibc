@@ -169,19 +169,16 @@ get_proc_lock (DWORD what, DWORD val)
 static bool __stdcall
 proc_can_be_signalled (_pinfo *p)
 {
-  if (p->sendsig == INVALID_HANDLE_VALUE)
+  if (p->sendsig != INVALID_HANDLE_VALUE)
     {
-      set_errno (EPERM);
-      return false;
+      if (p == myself_nowait || p == myself)
+	return hwait_sig;
+
+      if (ISSTATE (p, PID_INITIALIZING) ||
+	  (((p)->process_state & (PID_ACTIVE | PID_IN_USE)) ==
+	   (PID_ACTIVE | PID_IN_USE)))
+	return true;
     }
-
-  if (p == myself_nowait || p == myself)
-    return hwait_sig;
-
-  if (ISSTATE (p, PID_INITIALIZING) ||
-      (((p)->process_state & (PID_ACTIVE | PID_IN_USE)) ==
-       (PID_ACTIVE | PID_IN_USE)))
-    return true;
 
   set_errno (ESRCH);
   return false;
@@ -278,7 +275,7 @@ proc_subproc (DWORD what, DWORD val)
     case PROC_WAIT:
       wval->ev = NULL;		// Don't know event flag yet
 
-      if (wval->pid <= 0)
+      if (wval->pid == -1)
 	child = NULL;		// Not looking for a specific pid
       else if (!mychild (wval->pid))
 	goto out;		// invalid pid.  flag no such child

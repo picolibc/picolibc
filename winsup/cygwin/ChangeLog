@@ -1,3 +1,10 @@
+2004-12-17  Christopher Faylor  <cgf@timesys.com>
+
+	* sigproc.cc (proc_subproc): Fix long-standing problem.  Only wait for
+	"all processes" if pid == -1 -- not just if pid is negative.
+	(proc_can_be_signalled): Fix another long-standing problem.  Set
+	correct errno when detecting an exited process.
+
 2004-12-16  Thomas Wolff  <towo@computer.org>
 
 	* fhandler_console.cc (get_win32_attr): Avoid inappropriate intensity
