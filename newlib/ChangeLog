@@ -1,3 +1,10 @@
+2002-05-14 Dhananjay Deshpande <dhananjayd@kpit.com>
+
+	* newlib/libc/sys/h8300hms/Makeile.am (lib_a_SOURCES): Add read.c.
+	* newlib/libc/sys/h8300hms/read.c: New file.  Magic trap 0xC8 for sim.
+	* newlib/libc/sys/h8300hms/syscalls.c: Move _read() to read.c.
+	* newlib/libs/sys/h8300hms/sys/syscall.h: New file.
+
 Thu May 16 17:24:57 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/machine/sh/strcpy.S (strcpy): Replace LITTLE_ENDIAN with

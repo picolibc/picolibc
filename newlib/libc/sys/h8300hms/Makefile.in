@@ -88,7 +88,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = syscalls.c write.c _exit.c sbrk.c misc.c crt1.c
+lib_a_SOURCES = syscalls.c write.c _exit.c read.c sbrk.c misc.c crt1.c
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -102,7 +102,7 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-lib_a_OBJECTS =  syscalls.o write.o _exit.o sbrk.o misc.o crt1.o
+lib_a_OBJECTS =  syscalls.o write.o _exit.o read.o sbrk.o misc.o crt1.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)

@@ -5,14 +5,6 @@
 #include <sys/stat.h>
 #include <errno.h>
 
-int _DEFUN(_read,(file, ptr, len),
-	   int file _AND
-	   char *ptr _AND
-	   int len)
-{
-  return 0;
-}
-
 
 int _DEFUN(_lseek,(file, ptr, dir),
 	  int file _AND
