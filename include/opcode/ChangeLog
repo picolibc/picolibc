@@ -1,3 +1,9 @@
+2003-08-16  Jason Eckhardt  <jle@rice.edu>
+
+	* i860.h (fmov.ds): Expand as famov.ds.
+	(fmov.sd): Expand as famov.sd.
+	(pfmov.ds): Expand as pfamov.ds.
+
 2003-08-07  Michael Meissner  <gnu@the-meissners.org>
 
 	* cgen.h: Remove PARAM macro usage in all prototypes.
