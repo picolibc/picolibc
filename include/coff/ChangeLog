@@ -1,3 +1,11 @@
+2001-04-05  Tom Rix <trix@redhat.com>
+
+	* rs6000.h : move xcoff32 external structures from xcofflink. 
+	* rs6k64.h : move xcoff64 external structures from xcofflink. 
+	* internal.h : promote 32 bit structure elements to 64 bit
+	for xcoff64 support
+	* xcoff.h : New file.
+	
 2001-03-23  Nick Clifton  <nickc@redhat.com>
 
 	* a29k.h: Fix compile time warning.

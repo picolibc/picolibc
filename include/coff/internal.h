@@ -173,7 +173,7 @@ struct internal_aouthdr
   unsigned long tagentries;	/* number of tag entries to follow */
 
   /* RS/6000 stuff */
-  unsigned long o_toc;		/* address of TOC			*/
+  bfd_vma o_toc;		/* address of TOC			*/
   short o_snentry;		/* section number for entry point */
   short o_sntext;		/* section number for text	*/
   short o_sndata;		/* section number for data	*/
@@ -184,8 +184,8 @@ struct internal_aouthdr
   short o_algndata;		/* max alignment for data	*/
   short o_modtype;		/* Module type field, 1R,RE,RO	*/
   short o_cputype;		/* Encoded CPU type		*/
-  unsigned long o_maxstack;	/* max stack size allowed.	*/
-  unsigned long o_maxdata;	/* max data size allowed.	*/
+  bfd_vma o_maxstack;	/* max stack size allowed.	*/
+  bfd_vma o_maxdata;	/* max data size allowed.	*/
 
   /* ECOFF stuff */
   bfd_vma bss_start;		/* Base of bss section.		*/
@@ -357,8 +357,8 @@ struct internal_lineno
 {
   union
   {
-    long l_symndx;		/* function name symbol index, iff l_lnno == 0*/
-    long l_paddr;		/* (physical) address of line number	*/
+    bfd_signed_vma l_symndx;		/* function name symbol index, iff l_lnno == 0*/
+    bfd_signed_vma l_paddr;		/* (physical) address of line number	*/
   }     l_addr;
   unsigned long l_lnno;		/* line number		*/
 };
@@ -381,7 +381,7 @@ struct internal_syment
     }      _n_n;
     char *_n_nptr[2];		/* allows for overlaying	*/
   }     _n;
-  long n_value;			/* value of symbol		*/
+  bfd_vma n_value;			/* value of symbol		*/
   short n_scnum;		/* section number		*/
   unsigned short n_flags;	/* copy of flags from filhdr	*/
   unsigned short n_type;	/* type and derived type	*/
@@ -468,7 +468,7 @@ union internal_auxent
     {
       struct
       {				/* if ISFCN, tag, or .bb */
-	long x_lnnoptr;		/* ptr to fcn line # */
+	bfd_signed_vma x_lnnoptr;		/* ptr to fcn line # */
 	union
 	{			/* entry ndx past block end */
 	  long l;
@@ -519,7 +519,7 @@ union internal_auxent
   {
     union
       {				/* csect length or enclosing csect */
-	long l;
+	bfd_signed_vma l;
 	struct coff_ptr_struct *p;
       } x_scnlen;
     long x_parmhash;		/* parm type hash index */
