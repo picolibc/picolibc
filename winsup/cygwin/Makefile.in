@@ -222,6 +222,7 @@ ifneq "${filter -O%,$(CFLAGS)}" ""
 cygheap_CFLAGS:=-fomit-frame-pointer
 cygthread_CFLAGS:=-fomit-frame-pointer
 cygtls_CFLAGS:=-fomit-frame-pointer
+delqueue_CFLAGS:=-fomit-frame-pointer
 devices_CFLAGS:=-fomit-frame-pointer -Os
 dir_CFLAGS:=-fomit-frame-pointer
 dll_init_CFLAGS:=-fomit-frame-pointer

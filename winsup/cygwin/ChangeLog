@@ -1,3 +1,7 @@
+2004-02-16  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Compile delqueue.o with -fomit-frame-pointer.
+
 2004-02-16  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* syscalls.cc (rename): Do not test the MoveFile error code
