@@ -211,7 +211,7 @@ normalize_posix_path (const char *src, char *dst)
   if (isdrive (src) || strpbrk (src, "\\:"))
     {
       int err = normalize_win32_path (src, dst);
-      if (!err)
+      if (!err && isdrive (dst))
 	for (char *p = dst; (p = strchr (p, '\\')); p++)
 	  *p = '/';
       return err;
