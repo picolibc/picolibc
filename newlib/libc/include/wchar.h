@@ -23,10 +23,12 @@
 #define WCHAR_MIN 0
 #endif
 
+#ifndef WCHAR_MAX
 #ifdef __WCHAR_MAX__
 #define WCHAR_MAX __WCHAR_MAX__
 #else
 #define WCHAR_MAX 0x7fffffffu
+#endif
 #endif
 
 #ifndef MBSTATE_T
