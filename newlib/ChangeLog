@@ -1,3 +1,7 @@
+2003-01-08  Richard Sandiford  <rsandifo@redhat.com>
+
+	* configure.host (mips64vr-elf, mips64vrel-elf): New config.
+
 2003-01-07  Charles Wilson  <cwilson@ece.gatech.edu>
 
 	* libc/stdio/sprintf.c: fix typo

@@ -508,6 +508,9 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags}"
 	syscall_dir=syscalls
 	;;
+  mips64vr*-*-*)
+	newlib_cflags="${newlib_cflags} -DWANT_PRINTF_LONG_LONG -DMISSING_SYSCALL_NAMES"
+	;;
   mmix-*)
 	syscall_dir=syscalls
 	# We need every symbol 32-bit aligned, so the invalid
