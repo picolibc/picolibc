@@ -1,3 +1,7 @@
+Fri Sep 14 00:37:54 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fork.cc (vfork): Avoid recursive vforks.
+
 Fri Sep 14 00:18:52 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (fhandler_pipe::is_slow): Return true only if pipes are

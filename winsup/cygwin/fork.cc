@@ -705,6 +705,8 @@ vfork ()
 
   if (vf == NULL)
     vf = vfork_storage.create ();
+  else if (vf->pid)
+    return fork ();
 
   if (!setjmp (vf->j))
     {
@@ -735,6 +737,8 @@ vfork ()
 	exit (exitval);
     }
 
-  return vf->pid;
+  int pid = vf->pid;
+  vf->pid = 0;
+  return pid;
 #endif
 }
