@@ -12,7 +12,7 @@ details. */
 #ifndef _SYS_SEM_H
 #define _SYS_SEM_H
 
-#include <sys/ipc.h>
+#include <cygwin/ipc.h>
 
 #ifdef __cplusplus
 extern "C"

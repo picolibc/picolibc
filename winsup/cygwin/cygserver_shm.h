@@ -15,7 +15,7 @@ details. */
 #define __CYGSERVER_SHM_H__
 
 #include <sys/types.h>
-#include <sys/shm.h>
+#include <cygwin/shm.h>
 
 #include <assert.h>
 #include <limits.h>

@@ -13,7 +13,7 @@ details. */
 #include "winsup.h"
 
 #include <sys/types.h>
-#include <sys/sem.h>
+#include <cygwin/sem.h>
 
 #include <errno.h>
 

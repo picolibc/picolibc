@@ -1,5 +1,19 @@
 2002-09-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* include/sys/ipc.h: Move to "include/cygwin/ipc.h".
+	* include/sys/msg.h: Move to "include/cygwin/msg.h".
+	* include/sys/sem.h: Move to "include/cygwin/sem.h".
+	* include/sys/shm.h: Move to "include/cygwin/shm.h".
+	* include/cygwin/ipc.h: New file.
+	* include/cygwin/msg.h: Ditto.
+	* include/cygwin/sem.h: Ditto.
+	* include/cygwin/shm.h: Ditto.
+	* cygserver_shm.h: Update includes.
+	* msg.cc: Ditto.
+	* sem.cc: Ditto.
+
+2002-09-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygwin_ipc.h: Move to "include/cygwin/ipc.h".
 	* cygwin_shm.h: Move to "include/cygwin/shm.h".
 	* include/cygwin/ipc.h: New file.
