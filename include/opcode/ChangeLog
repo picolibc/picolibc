@@ -1,3 +1,11 @@
+2004-11-23 Jan Beulich <jbeulich@novell.com>
+
+	* i386.h (i386_optab): paddq and psubq, even in their MMX form, are
+	available only with SSE2. Change the MMX additions introduced by SSE
+	and 3DNow!A to CpuMMX2 (rather than CpuMMX). Indicate the 3DNow!A
+	instructions by their now designated identifier (since combining i686
+	and 3DNow! does not really imply 3DNow!A).
+
 2004-11-19  Alan Modra  <amodra@bigpond.net.au>
 
 	* msp430.h (struct rcodes_s, MSP430_RLC, msp430_rcodes,
