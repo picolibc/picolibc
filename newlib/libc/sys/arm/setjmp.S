@@ -64,6 +64,7 @@
 #ifdef __thumb__
 #define	MODE		.thumb_func
 .macro PROLOGUE name
+	.code 16
 	bx	pc
 	nop	
 	.code 32

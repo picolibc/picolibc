@@ -1,3 +1,8 @@
+2001-03-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/arm/setjmp.S: Added .code 16 specifier for thumb-mode
+	prolog to by-pass possible assembler error.
+
 2001-03-21  Egor Duda  <deo@logos-m.ru>
 
         Allow building internal stubs for non-reentrant syscalls
