@@ -1,5 +1,14 @@
 2002-09-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* errno.cc (errmap): Map ERROR_INVALID_ADDRESS to new errno code
+	EOVERFLOW.
+	(_sys_errlist): Add entries for EILSEQ and EOVERFLOW.
+	(strerror): Ditto.
+	* mmap.cc (map_map): Set errno in case of error.
+	(mmap64): Remove setting errno explicitely to ENOMEM.
+
+2002-09-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (map_map): Add debug output.
 	(mmap64): Evaluate gran_len correctly even if offset isn't 0.
 

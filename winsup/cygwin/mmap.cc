@@ -151,7 +151,7 @@ mmap_record::map_map (__off64_t off, DWORD len)
 	      && !VirtualProtect (base_address_ + off * getpagesize (),
 				  len * getpagesize (), prot, &old_prot))
 	    {
-	      debug_printf ("-1 = map_map (): %E");
+	      __seterrno ();
 	      return (__off64_t)-1;
 	    }
 
@@ -167,7 +167,7 @@ mmap_record::map_map (__off64_t off, DWORD len)
       && !VirtualProtect (base_address_ + start * getpagesize (),
 			  len * getpagesize (), prot, &old_prot))
     {
-      debug_printf ("-1 = map_map (): %E");
+      __seterrno ();
       return (__off64_t)-1;
     }
 
@@ -517,8 +517,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
 	{
 	  if ((off = rec->map_map (off, len)) == (__off64_t)-1)
 	    {
-	      set_errno (ENOMEM);
-	      syscall_printf ("-1 = mmap(): ENOMEM");
+	      syscall_printf ("-1 = mmap()");
 	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK|WRITE_LOCK, "mmap");
 	      return MAP_FAILED;
 	    }
@@ -583,8 +582,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
     {
       fh->munmap (h, base, gran_len);
       l->erase ();
-      set_errno (ENOMEM);
-      syscall_printf ("-1 = mmap(): ENOMEM");
+      syscall_printf ("-1 = mmap()");
       ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
       return MAP_FAILED;
     }

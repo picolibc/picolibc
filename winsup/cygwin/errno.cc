@@ -112,6 +112,7 @@ errmap[] =
   X (DISK_FULL,			ENOSPC),
   X (NOACCESS,			EFAULT),
   X (FILE_INVALID,		ENXIO),
+  X (INVALID_ADDRESS,		EOVERFLOW),
   { 0, NULL, 0}
 };
 
@@ -290,6 +291,8 @@ const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 /* ENOMEDIUM 135 */ "no medium",
 /* ENOSHARE 136 */   "No such host or network path",
 /* ECASECLASH 137 */ "Filename exists with different case"
+/* EILSEQ 138 */ "Illegal byte sequence"
+/* EOVERFLOW 139 */ "Value too large for defined data type"
 };
 
 extern int const NO_COPY __declspec(dllexport) _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
@@ -670,6 +673,12 @@ strerror (int errnum)
       break;
     case ECASECLASH:
       error = "Filename exists with different case";
+      break;
+    case EILSEQ:
+      error = "Illegal byte sequence";
+      break;
+    case EOVERFLOW:
+      error = "Value too large for defined data type";
       break;
     default:
 #ifdef _MT_SAFE
