@@ -1903,7 +1903,7 @@ if test "${enable_server+set}" = set; then
   enableval="$enable_server"
   case "${enableval}" in
 yes)	 cat >> confdefs.h <<\EOF
-#define USE_CYGSERVE 1
+#define USE_CYGSERVER 1
 EOF
  ;;
 no)	 ;;
