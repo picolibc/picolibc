@@ -127,7 +127,9 @@ static const template i386_optab[] =
 {"movsx",  2, 0x0fbf, X, Cpu386, w_Suf|Modrm,			{ Reg16|ShortMem, Reg32|Reg64, 0} },
 {"movsx",  2,   0x63, X, Cpu64,  l_Suf|Modrm|Rex64,		{ Reg32|WordMem, Reg64, 0} },
 
-/* Move with zero extend.  */
+/* Move with zero extend.  We can't remove "movzb" since existing
+   assembly codes may use it.  */
+{"movzb",  2, 0x0fb6, X, Cpu386, wl_Suf|Modrm,			{ Reg8|ByteMem, WordReg, 0} },
 /* "movzbl" & "movzbw" should not be unified into "movzb" for
    consistency with the sign extending moves above.  */
 {"movzbl", 2, 0x0fb6, X, Cpu386, NoSuf|Modrm,			{ Reg8|ByteMem, Reg32, 0} },
