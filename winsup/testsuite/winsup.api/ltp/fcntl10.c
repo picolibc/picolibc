@@ -161,7 +161,13 @@ main(int ac, char **av)
 	/* reset Tst_count in case we are looping. */
 	Tst_count=0;
 
+#if 0
+	/* Ouch!  Either read *or* write lock, but not both!
+	   This code depends on F_RDLCK being 0. */
 	flocks.l_type = F_RDLCK | F_WRLCK;
+#else
+	flocks.l_type = F_WRLCK;
+#endif
 	/* 
 	 * Call fcntl(2) with F_SETLKW flocks.l_type = F_UNLCK argument on fname
 	 */

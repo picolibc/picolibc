@@ -1,3 +1,11 @@
+2003-12-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.api/known_bugs.tcl: Remove fcntl09 and fcntl10.  These
+	tests had a compatibility bug.
+	* winsup.api/ltp/fcntl09.c: Don't use F_RDLCK | F_WRLCK but only
+	F_WRLCK to set a write lock.
+	* winsup.api/ltp/fcntl10.c: Ditto.
+
 2003-11-25  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.api/known_bugs.tcl: Remove lseek10 since mknod now works.
