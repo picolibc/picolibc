@@ -1,3 +1,7 @@
+Fri Sep  8 11:50:09 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* lib/_cygwin_crt0_common.cc: Add missing header files.
+
 Thu Sep  7 23:07:21 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.h (sigframe::set): Eliminate second argument.  Default bp to

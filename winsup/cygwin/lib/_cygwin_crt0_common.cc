@@ -9,6 +9,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "perprocess.h"
+#include "cygwin/version.h"
 #include "crt0.h"
 #include <reent.h>
 #include <stdlib.h>
