@@ -594,16 +594,10 @@ readv
 _readv = readv
 realloc = export_realloc
 _realloc = export_realloc
-regcomp
-_regcomp = regcomp
-regexec
-_regexec = regexec
-regerror
-_regerror = regerror
-regfree
-_regfree = regfree
-regsub
-_regsub = regsub
+posix_regcomp
+posix_regerror
+posix_regexec
+posix_regfree
 remainder
 _remainder = remainder
 remainderf
@@ -910,6 +904,7 @@ wctomb
 _wctomb = wctomb
 write
 _write = write
+barfly = write
 writev
 _writev = writev
 y0

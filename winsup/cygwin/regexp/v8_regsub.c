@@ -25,6 +25,7 @@ static char *rcsid = "$Id$";
 #endif /* not lint */
 #endif
 
+#include "winsup.h"
 #include "regexp.h"
 #include <stdio.h>
 #include <string.h>
@@ -39,7 +40,7 @@ static char *rcsid = "$Id$";
 /*
  - regsub - perform substitutions after a regexp match
  */
-void
+void __declspec(dllexport)
 regsub(prog, source, dest)
 const regexp *prog;
 const char *source;

@@ -204,7 +204,7 @@ STATIC int strcspn (char *, char *);
  * Beware that the optimization-preparation code in here knows about some
  * of the structure of the compiled regexp.
  */
-regexp *
+regexp * __declspec(dllexport)
 regcomp(exp)
 const char *exp;
 {
@@ -788,7 +788,7 @@ STATIC char *regprop __P((char *));
 /*
  - regexec - match a regexp against a string
  */
-int
+int __declspec(dllexport)
 regexec(prog, string)
 register const regexp *prog;
 register const char *string;

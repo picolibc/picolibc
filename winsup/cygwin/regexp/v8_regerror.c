@@ -12,7 +12,7 @@ details. */
 #include "regexp.h"
 #include <stdio.h>
 
-void
+void __declspec(dllexport)
 regerror(const char *s __attribute__ ((unused)))
 {
 #ifdef ERRAVAIL

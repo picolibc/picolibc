@@ -1,3 +1,22 @@
+2001-12-19  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (VPATH): Add regex directory.
+	(NM): new variable.
+	(OBSOLETE_FUNCTIONS): Ditto.
+	(NEW_FUNCTIONS): Ditto.
+	(install-headers): Install regex.h.
+	(install-man): New target.
+	(install): Use new target.
+	(DLL_OFILES): Add v8_reg* stuff.
+	(new-cygwin1.dll): Eliminate stamp-cygwin-lib creation.
+	(libcygwin.a): Remove obsolete functions from import lib.  Add new functions.
+	* configure.in: Detect 'nm' tool.
+	* configure: Regenerate.
+	* cygwin.din: Export posix_reg* functions.  Eliminate export of v8 reg* functions.
+	This is now handled in object files themselves.
+	* regex/*: New files.
+	* regexp/v8_*.c: New files, renamed from non v8_ equivalents.
+
 2001-12-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/getopt.h: Don't define getopt_long() and friends when
