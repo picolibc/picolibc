@@ -1,3 +1,9 @@
+2000-02-24  Andrew Haley  <aph@cygnus.com>
+
+	* cgen.h (CGEN_INSN_MACH_HAS_P): New macro.
+	(CGEN_CPU_TABLE): flags: new field.
+	Add prototypes for new functions.
+	
 2000-02-24  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	* i386.h: Add some more UNIXWARE_COMPAT comments.
