@@ -71,6 +71,8 @@ public:
   void add (int sig, int pid, _threadinfo *tls);
   void del ();
   sigelem *next ();
+  sigelem *save () const {return curr;}
+  void restore (sigelem *saved) {curr = saved;}
   friend int __stdcall sig_dispatch_pending ();
 };
 
@@ -562,14 +564,16 @@ sig_clear (int target_sig)
     sig_send (myself, -target_sig);
   else
     {
-      sigqueue.reset ();
       sigelem *q;
+      sigelem *save = sigqueue.save ();
+      sigqueue.reset ();
       while ((q = sigqueue.next ()))
 	if (q->sig == target_sig)
 	  {
-	    sigqueue.del ();
+	    q->sig = __SIGDELETE;
 	    break;
 	  }
+      sigqueue.restore (save);
     }
   return;
 }
@@ -1171,7 +1175,8 @@ wait_sig (VOID *self)
 	case __SIGFLUSH:
 	  sigqueue.reset ();
 	  while ((q = sigqueue.next ()))
-	    if (sig_handle (q->sig, *pack.mask, q->pid, q->tls) > 0)
+	    if (q->sig == __SIGDELETE
+		|| (sig_handle (q->sig, *pack.mask, q->pid, q->tls) > 0))
 	      sigqueue.del ();
 	  break;
 	default:

@@ -1,3 +1,11 @@
+2004-01-20  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (pending_signals::save): New function.
+	(pending_signals::restore): Ditto.
+	(sig_clear): Save/restore current queue pointer.
+	(wait_sig): Delete signals marked as such.
+	* sigproc.h (__SIGDELETE): New enum.
+
 2004-01-16  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::close): Remove obsolete test
