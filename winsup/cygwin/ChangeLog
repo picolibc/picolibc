@@ -1,3 +1,7 @@
+Mon May 14 16:13:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (subauth): Check if Secur32.dll could be loaded.
+
 Sun May 13 22:49:04 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (path_conv::check): Revert allow_ntsec check so that volume

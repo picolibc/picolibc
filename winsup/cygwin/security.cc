@@ -195,6 +195,11 @@ subauth (struct passwd *pw)
       set_errno (LsaNtStatusToWinError(ret));
       return INVALID_HANDLE_VALUE;
     }
+  else if (GetLastError () == ERROR_PROC_NOT_FOUND)
+    {
+      debug_printf ("Couldn't load Secur32.dll");
+      return INVALID_HANDLE_VALUE;
+    }
   /* Get handle to MSV1_0 package. */
   str2lsa (name, MSV1_0_PACKAGE_NAME);
   ret = LsaLookupAuthenticationPackage(lsa_hdl, &name, &package_id);
