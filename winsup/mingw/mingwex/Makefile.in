@@ -29,15 +29,16 @@ DISTFILES = Makefile.in configure configure.in \
 	_Exit.c atoll.c dirent.c feclearexcept.c fegetenv.c \
 	fegetexceptflag.c fegetround.c feholdexcept.c feraiseexcept.c \
 	fesetenv.c fesetexceptflag.c fesetround.c fetestexcept.c \
-	feupdateenv.c fwide.c imaxabs.c imaxdiv.c lltoa.c lltow.c \
+	feupdateenv.c fwide.c imaxabs.c imaxdiv.c ldtoa.c lltoa.c lltow.c \
 	mbsinit.c mingw-fseek.c sitest.c snprintf.c snwprintf.c \
-	strtof.c strtoimax.c strtoumax.c testwmem.c ulltoa.c ulltow.c \
-	vsnprintf.c vsnwprintf.c wcstof.c wcstoimax.c wcstoumax.c \
-	wdirent.c wmemchr.c wmemcmp.c wmemcpy.c wmemmove.c wmemset.c \
-	wtoll.c
+	strtof.c strtoimax.c strtold.c strtoumax.c testwmem.c \
+	ulltoa.c ulltow.c vsnprintf.c vsnwprintf.c wcstof.c \
+	wcstoimax.c wcstold.c wcstoumax.c wdirent.c wmemchr.c \
+	wmemcmp.c wmemcpy.c wmemmove.c wmemset.c wtoll.c
 MATH_DISTFILES = \
 	acosf.c acosl.c asinf.c asinl.c atan2f.c atan2l.c \
-	atanf.c atanl.c cbrt.c cbrtf.c cbrtl.c ceilf.S ceill.S cephes_mconf.h \
+	atanf.c atanl.c cbrt.c cbrtf.c cbrtl.c ceilf.S ceill.S \
+	cephes_emath.h cephes_emath.c cephes_mconf.h \
 	copysign.S copysignf.S copysignl.S cosf.S coshf.c coshl.c cosl.S \
 	exp2.S exp2f.S exp2l.S expf.c expl.c fabs.c fabsf.c fabsl.c \
 	fdim.c fdimf.c fdiml.c floorf.S floorl.S fma.S fmaf.S fmal.c \
@@ -93,6 +94,8 @@ Q8_OBJS = \
 	fwide.o imaxabs.o imaxdiv.o mbsinit.o \
 	strtoimax.o strtoumax.o wcstoimax.o wcstoumax.o \
 	wmemchr.o wmemcmp.o wmemcpy.o wmemmove.o wmemset.o
+STDLIB_OBJS = \
+	strtold.o wcstold.o
 STDLIB_STUB_OBJS = \
 	lltoa.o ulltoa.o \
 	lltow.o ulltow.o \
@@ -104,6 +107,7 @@ STDIO_STUB_OBJS = \
 MATH_OBJS = \
 	acosf.o acosl.o asinf.o asinl.o atan2f.o atan2l.o \
 	atanf.o atanl.o cbrt.o cbrtf.o cbrtl.o ceilf.o ceill.o \
+	cephes_emath.o \
 	copysign.o copysignf.o copysignl.o cosf.o coshf.o coshl.o cosl.o \
 	exp2.o exp2f.o exp2l.o expf.o expl.o fabs.o fabsf.o fabsl.o \
 	fdim.o fdimf.o fdiml.o floorf.o floorl.o fma.o fmaf.o fmal.o \
@@ -132,8 +136,8 @@ POSIX_OBJS = \
 REPLACE_OBJS = \
 	mingw-fseek.o
 
-LIB_OBJS = $(Q8_OBJS) $(STDLIB_STUB_OBJS) $(STDIO_STUB_OBJS) \
-	$(MATH_OBJS)  $(FENV_OBJS) $(POSIX_OBJS) \
+LIB_OBJS = $(Q8_OBJS) $(STDLIB_OBJS) $(STDLIB_STUB_OBJS) \
+	$(STDIO_STUB_OBJS) $(MATH_OBJS)  $(FENV_OBJS) $(POSIX_OBJS) \
 	$(REPLACE_OBJS)
 
 LIBS = $(LIBMINGWEX_A)
@@ -184,6 +188,8 @@ distclean:
 # Dependancies
 #
 wdirent.o: $(srcdir)/dirent.c $(srcdir)/wdirent.c
+strtold.o: $(srcdir)/strtold.c $(srcdir)/math/cephes_emath.h
+wcstold.o: $(srcdir)/wcstold.c $(srcdir)/math/cephes_emath.h
 
 
 dist:

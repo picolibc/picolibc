@@ -1,6 +1,30 @@
+2002-11-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/strtold.c: New file.
+	* mingwex/wcstold.c: New file.
+	* mingwex/ldtoa.c: New file.
+	* mingwex/math/cephes_emath.h: New file.
+	* mingwex/math/cephes_emath.c: New file.
+	* mingwex/Makefile.in (DISTFILES): Add new files.
+	(MATH_DISTFILES): Ditto.
+	(STDLIB_OBJS): New. Define as strtold.c wcstold.c.
+	(MATH_OBJS): Add cephes_emath.o.
+	(LIB_OBJS): Add $(STDLIB_OBJS).
+	* include/stdlib.h (strtold, wcstold): Add prototypes.
+	* include/wchar.h (wcstold): Add prototype.
+
+2002-11-09  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h (sqrt): Remove inline definition.
+	(sqrtf): Replace inline definition with prototype.
+	(sqrtl): Likewise.
+	* mingwex/math/sqrtf.c (sqrtf): Set domain error if
+	argument less than zero.
+	* mingwex/math/sqrtf.c (sqrtl): Likewise.
+
 2002-10-30  Guido Serassio  <serassio@libero.it>
 
-         * include/stdio.h (_getnaxstdio): Add prototype.
+         * include/stdio.h (_getmaxstdio): Add prototype.
          (_setmaxstdio): Likewise.
 
 2002-10-19  Kang Li  <rubylith@users.sourceforge.net>

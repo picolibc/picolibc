@@ -250,6 +250,7 @@ double	wcstod	(const wchar_t*, wchar_t**);
 #if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
 extern __inline__ float wcstof( const wchar_t *nptr, wchar_t **endptr)
 {  return (wcstod(nptr, endptr)); }
+long double wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
 #endif /* __NO_ISOCEXT */
 #define  _WSTDLIB_DEFINED
 #endif
