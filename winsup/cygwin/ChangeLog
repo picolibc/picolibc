@@ -1,5 +1,11 @@
 2002-06-29  Christopher Faylor  <cgf@redhat.com>
 
+	* uinfo.cc (cygheap_user::test_uid): Return NULL or further tests are
+	sorta useless.
+	(cygheap_user::env_domain): Recalculate if name is missing.
+
+2002-06-29  Christopher Faylor  <cgf@redhat.com>
+
 	* environ.cc (spenv::from_cygheap): Still need to take setuid into
 	consideration.
 

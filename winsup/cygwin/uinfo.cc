@@ -309,7 +309,7 @@ cygheap_user::test_uid (char *&what, const char *name, size_t namelen)
   if (what)
     return what;
   if (orig_uid == myself->uid)
-    what = getwinenveq (name, namelen, HEAP_STR) ?: almost_null;
+    what = getwinenveq (name, namelen, HEAP_STR);
   return what;
 }
 
@@ -332,7 +332,7 @@ cygheap_user::env_logsrv (const char *name, size_t namelen)
 const char *
 cygheap_user::env_domain (const char *name, size_t namelen)
 {
-  if (test_uid (pdomain, name, namelen))
+  if (pwinname && test_uid (pdomain, name, namelen))
     return pdomain;
 
   char username[UNLEN + 1];
