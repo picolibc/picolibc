@@ -1,3 +1,14 @@
+Mon Feb 11 12:53:19 CET 2002  Jan Hubicka  <jh@suse.cz>
+
+	* i386.h (push,pop): Allow 16bit operands in 64bit mode.
+	(xchg): Fix.
+	(in, out): Disable 64bit operands.
+	(call, jmp): Avoid REX prefixes.
+	(jcxz): Prohibit in 64bit mode
+	(jrcxz, loop): Add 64bit variants.
+	(movq): Fix patterns.
+	(movmskps, pextrw, pinstrw): Add 64bit variants.
+
 2002-01-31  Ivan Guzvinec  <ivang@opencores.org>
 
 	* or32.h: New file.
