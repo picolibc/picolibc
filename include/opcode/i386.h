@@ -1,6 +1,7 @@
 /* opcode/i386.h -- Intel 80386 opcode table
-   Copyright 1989, 91, 92, 93, 94, 95, 96, 97, 98, 99, 2000
-   Free Software Foundation.
+   Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+   2000, 2001
+   Free Software Foundation, Inc.
 
 This file is part of GAS, the GNU Assembler, and GDB, the GNU Debugger.
 
@@ -992,6 +993,8 @@ static const template i386_optab[] = {
 {"paddw",    2, 0x660ffd,X,CpuSSE2,FP|Modrm,		{ RegXMM|LLongMem, RegXMM, 0 } },
 {"paddd",    2, 0x0ffe, X, CpuMMX, FP|Modrm,		{ RegMMX|LongMem, RegMMX, 0 } },
 {"paddd",    2, 0x660ffe,X,CpuSSE2,FP|Modrm,		{ RegXMM|LLongMem, RegXMM, 0 } },
+{"paddq",    2, 0x0fd4, X, CpuMMX, FP|Modrm,		{ RegMMX|LLongMem, RegMMX, 0 } },
+{"paddq",    2, 0x660fd4,X,CpuSSE2,FP|Modrm,		{ RegXMM|LLongMem, RegXMM, 0 } },
 {"paddsb",   2, 0x0fec, X, CpuMMX, FP|Modrm,		{ RegMMX|LongMem, RegMMX, 0 } },
 {"paddsb",   2, 0x660fec,X,CpuSSE2,FP|Modrm,		{ RegXMM|LLongMem, RegXMM, 0 } },
 {"paddsw",   2, 0x0fed, X, CpuMMX, FP|Modrm,		{ RegMMX|LongMem, RegMMX, 0 } },
@@ -1062,6 +1065,8 @@ static const template i386_optab[] = {
 {"psubw",    2, 0x660ff9,X,CpuSSE2,FP|Modrm,		{ RegXMM|LLongMem, RegXMM, 0 } },
 {"psubd",    2, 0x0ffa, X, CpuMMX, FP|Modrm,		{ RegMMX|LongMem, RegMMX, 0 } },
 {"psubd",    2, 0x660ffa,X,CpuSSE2,FP|Modrm,		{ RegXMM|LLongMem, RegXMM, 0 } },
+{"psubq",    2, 0x0ffb, X, CpuMMX, FP|Modrm,		{ RegMMX|LLongMem, RegMMX, 0 } },
+{"psubq",    2, 0x660ffb,X,CpuSSE2,FP|Modrm,		{ RegXMM|LLongMem, RegXMM, 0 } },
 {"psubsb",   2, 0x0fe8, X, CpuMMX, FP|Modrm,		{ RegMMX|LongMem, RegMMX, 0 } },
 {"psubsb",   2, 0x660fe8,X,CpuSSE2,FP|Modrm,		{ RegXMM|LLongMem, RegXMM, 0 } },
 {"psubsw",   2, 0x0fe9, X, CpuMMX, FP|Modrm,		{ RegMMX|LongMem, RegMMX, 0 } },
