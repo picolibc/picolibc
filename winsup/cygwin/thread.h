@@ -173,49 +173,60 @@ typedef enum
 verifyable_object_state verifyable_object_isvalid (void const *, long);
 verifyable_object_state verifyable_object_isvalid (void const *, long, void *);
 
+/* interface */
+template <class ListNode> class List {
+public:
+  List();
+  void Insert (ListNode *aNode);
+  ListNode *Remove ( ListNode *aNode);
+  ListNode *Pop ();
+  void forEach (void (*)(ListNode *aNode));
+protected:
+  ListNode *head;
+};
+
 class pthread_key:public verifyable_object
 {
 public:
   static bool isGoodObject (pthread_key_t const *);
+  static void runAllDestructors ();
 
   DWORD dwTlsIndex;
-  void *fork_buf;
-  class pthread_key *next;
 
   int set (const void *);
   void *get () const;
-  void run_destructor () const;
 
   pthread_key (void (*)(void *));
    ~pthread_key ();
   static void fixup_before_fork();
   static void fixup_after_fork();
+
+  /* List support calls */
+  class pthread_key *next;
 private:
   // lists of objects. USE THREADSAFE INSERTS AND DELETES.
-  static pthread_key * keys;
+  static List<pthread_key> keys;
+  static void saveAKey (pthread_key *);
+  static void restoreAKey (pthread_key *);
+  static void destroyAKey (pthread_key *);
   void saveKeyToBuffer ();
   void recreateKeyFromBuffer ();
   void (*destructor) (void *);
+  void run_destructor () const;
+  void *fork_buf;
 };
 
-/* interface */
-template <class ListNode> class List {
-public:
-  void Insert (ListNode *aNode);
-  ListNode *Remove ( ListNode *aNode);
-  ListNode *Pop ();
-protected:
-  ListNode *head;
-};
 /* implementation */
+template <class ListNode>
+List<ListNode>::List<ListNode> () : head(NULL)
+{
+}
 template <class ListNode> void
 List<ListNode>::Insert (ListNode *aNode)
 {
   if (!aNode)
     return;
-  head = aNode->InsertAfter (head);
-  if (!head)
-    head = aNode;                /*first node special case */
+  aNode->next = (ListNode *) InterlockedExchangePointer (&head, aNode);
 }
 template <class ListNode> ListNode *
 List<ListNode>::Remove ( ListNode *aNode)
@@ -227,42 +238,28 @@ List<ListNode>::Remove ( ListNode *aNode)
   if (aNode == head)
     return Pop ();
   ListNode *resultPrev = head;
-  while (resultPrev && resultPrev->Next() && !(aNode == resultPrev->Next()))
-    resultPrev = resultprev->Next();
+  while (resultPrev && resultPrev->next && !(aNode == resultPrev->next))
+    resultPrev = resultPrev->next;
   if (resultPrev)
-    return resultPrev->UnlinkNext ();
+    return (ListNode *)InterlockedExchangePointer (&resultPrev->next, resultPrev->next->next);
   return NULL;
 }
 template <class ListNode> ListNode *
 List<ListNode>::Pop ()
 {
-  ListNode *result = head;
-  head = head->Next();
-  return result;
+  return (ListNode *) InterlockedExchangePointer (&head, head->next);
 }
-
-
-/* FIXME: test using multiple inheritance and merging key_destructor into pthread_key
- * for efficiency */
-class pthread_key_destructor
+/* poor mans generic programming. */
+template <class ListNode> void
+List<ListNode>::forEach (void (*callback)(ListNode *))
 {
-public:
-  void (*destructor) (void *);
-  pthread_key_destructor *InsertAfter (pthread_key_destructor * node);
-  pthread_key_destructor *UnlinkNext ();
-  pthread_key_destructor *Next ();
-
-    pthread_key_destructor (void (*thedestructor) (void *), pthread_key * key);
-  pthread_key_destructor *next;
-  pthread_key *key;
-};
-
-class pthread_key_destructor_list : public List<pthread_key_destructor>
-{
-public:
-  pthread_key_destructor *Remove (pthread_key * key);
-  void IterateNull ();
-};
+  ListNode *aNode = head;
+  while (aNode) 
+    {
+      callback (aNode);
+      aNode = aNode->next;
+    }
+}
 
 class pthread_attr:public verifyable_object
 {
@@ -478,7 +475,6 @@ public:
   struct _winsup_t winsup_reent;
   pthread mainthread;
 
-  pthread_key_destructor_list destructors;
   callback *pthread_prepare;
   callback *pthread_child;
   callback *pthread_parent;

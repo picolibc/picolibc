@@ -1,5 +1,36 @@
 2002-09-21  Robert Collins <rbtcollins@hotmail.com>
 
+	* thread.cc: Finish the removal of the separate pthread_key
+	destructor list.
+	Remove all pthread_key_destructor and pthread_key_destructor_list
+	references throughout.
+	(pthread::exit): Call the new pthread_key interface to activate
+	destructors.
+	(pthread_key::keys): Change into a list.
+	(pthread_key::saveAKey): New method, used via forEach.
+	(pthread_key::restoreAKey): Ditto.
+	(pthread_key::destroyAKey): Ditto.
+	(pthread_key::fixup_before_fork): Use the List::forEach functionality.
+	(pthread_key::fixup_after_fork): Ditto.
+	(pthread_key::runAllDestructors): New method implementation.
+	(pthread_key::pthread_key): Use List::Insert rather than custom list
+	code.
+	(pthread_key::~pthread_key): Use List::Remove for the same reason.
+	* thread.h: Remove all pthread_key_destructor and
+	pthread_key_destructor_list references throughout.
+	(List): Move the interface above pthread_key in the header.
+	Use atomic operations during insert and delete.
+	(List::forEach): A generic interface for doing something on each node.
+	(pthread_key::runAllDestructors): New method, run all destructors.
+	(pthread_key::fork_buf): Make private.
+	(pthread_key::run_destructor): Ditto.
+	(pthread_key::saveAKey): New method for clearer source.
+	(pthread_key::restoreAKey): Ditto.
+	(pthread_key::destroyAKey): Ditto.
+	(MTinterface::destructors): Remove.
+
+2002-09-21  Robert Collins <rbtcollins@hotmail.com>
+
 	* thread.cc: Partial refactoring of pthread_key destructor 
 	handling. Loosely based on Thomas Pfaff's work.
 	(pthread_key_destructor_list::Insert): Remove.

@@ -46,73 +46,6 @@ details. */
 
 extern int threadsafe;
 
-/*pthread_key_destructor_list class: to-be threadsafe single linked list
- *FIXME: Put me in a dedicated file, or a least a tools area !
- */
-
-pthread_key_destructor *
-pthread_key_destructor::InsertAfter (pthread_key_destructor *node)
-{
-  pthread_key_destructor *temp = next;
-  next = node;
-  return temp;
-}
-
-pthread_key_destructor *
-pthread_key_destructor::UnlinkNext ()
-{
-  pthread_key_destructor *temp = next;
-  if (next)
-    next = next->Next ();
-  return temp;
-}
-
-pthread_key_destructor *
-pthread_key_destructor::Next ()
-{
-  return next;
-}
-
-  /*remove a given dataitem, wherever in the list it is */
-pthread_key_destructor *
-pthread_key_destructor_list::Remove (pthread_key *key)
-{
-  if (!key)
-    return NULL;
-  if (!head)
-    return NULL;
-  if (key == head->key)
-    return Pop ();
-  pthread_key_destructor *temp = head;
-  while (temp && temp->Next () && !(key == temp->Next ()->key))
-    {
-      temp = temp->Next ();
-    }
-  if (temp)
-    return temp->UnlinkNext ();
-  return NULL;
-}
-
-pthread_key_destructor::
-pthread_key_destructor (void (*thedestructor) (void *), pthread_key *key)
-{
-  destructor = thedestructor;
-  next = NULL;
-  this->key = key;
-}
-
-void
-pthread_key_destructor_list::IterateNull ()
-{
-  pthread_key_destructor *temp = head;
-  while (temp)
-    {
-      temp->key->run_destructor ();
-      temp = temp->Next ();
-    }
-}
-
-
 #define MT_INTERFACE user_data->threadinterface
 
 struct _reent *
@@ -438,7 +371,7 @@ pthread::exit (void *value_ptr)
   // run cleanup handlers
   pop_all_cleanup_handlers ();
 
-  MT_INTERFACE->destructors.IterateNull ();
+  pthread_key::runAllDestructors ();
 
   mutex.Lock ();
   // cleanup if thread is in detached state and not joined
@@ -1001,30 +934,42 @@ pthread_cond::fixup_after_fork ()
 
 /* pthread_key */
 /* static members */
-pthread_key *pthread_key::keys = NULL;
+List<pthread_key> pthread_key::keys;
+
+void
+pthread_key::saveAKey (pthread_key *key)
+{
+  key->saveKeyToBuffer ();
+}
 
 void
 pthread_key::fixup_before_fork ()
 {
-  pthread_key *key = keys;
-  debug_printf ("keys is %x",keys);
-  while (key)
-    {
-      key->saveKeyToBuffer ();
-      key = key->next;
-    }
+  keys.forEach (saveAKey);
+}
+
+void
+pthread_key::restoreAKey (pthread_key *key)
+{
+  key->recreateKeyFromBuffer ();
 }
 
 void
 pthread_key::fixup_after_fork ()
 {
-  pthread_key *key = keys;
-  debug_printf ("keys is %x",keys);
-  while (key)
-    {
-      key->recreateKeyFromBuffer ();
-      key = key->next;
-    }
+  keys.forEach (restoreAKey);
+}
+
+void
+pthread_key::destroyAKey (pthread_key *key)
+{
+  key->run_destructor ();
+}
+
+void
+pthread_key::runAllDestructors ()
+{
+  keys.forEach (destroyAKey);
 }
 
 bool
@@ -1042,31 +987,18 @@ pthread_key::pthread_key (void (*aDestructor) (void *)):verifyable_object (PTHRE
   dwTlsIndex = TlsAlloc ();
   if (dwTlsIndex == TLS_OUT_OF_INDEXES)
     magic = 0;
-  else if (destructor)
-    {
-      MT_INTERFACE->destructors.
-	Insert (new pthread_key_destructor (destructor, this));
-    }
-  /* threadsafe addition is easy */
-  next = (pthread_key *) InterlockedExchangePointer (&keys, this);
+  else
+    keys.Insert (this);
 }
 
 pthread_key::~pthread_key ()
 {
-  if (pthread_key_destructor *dest = MT_INTERFACE->destructors.Remove (this))
-    delete dest;
-  TlsFree (dwTlsIndex);
-
-  /* I'm not 100% sure the next bit is threadsafe. I think it is... */
-  if (keys == this)
-    InterlockedExchangePointer (keys, this->next);
-  else
+  /* We may need to make the list code lock the list during operations
+   */
+  if (magic != 0) 
     {
-      pthread_key *tempkey = keys;
-      while (tempkey->next && tempkey->next != this)
-        tempkey = tempkey->next;
-      /* but there may be a race between the loop above and this statement */
-      InterlockedExchangePointer (&tempkey->next, this->next);
+      keys.Remove (this);
+      TlsFree (dwTlsIndex);
     }
 }
 
