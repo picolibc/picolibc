@@ -1138,8 +1138,8 @@ typedef struct _CM_EISA_FUNCTION_INFORMATION {
 #define EISA_HAS_MEMORY_ENTRY           0x02
 #define EISA_HAS_TYPE_ENTRY             0x01
 #define EISA_HAS_INFORMATION \
-  EISA_HAS_PORT_RANGE + EISA_HAS_DMA_ENTRY + EISA_HAS_IRQ_ENTRY \
-  + EISA_HAS_MEMORY_ENTRY + EISA_HAS_TYPE_ENTRY
+  (EISA_HAS_PORT_RANGE + EISA_HAS_DMA_ENTRY + EISA_HAS_IRQ_ENTRY \
+  + EISA_HAS_MEMORY_ENTRY + EISA_HAS_TYPE_ENTRY)
 
 typedef struct _CM_EISA_SLOT_INFORMATION {
   UCHAR  ReturnCode;
@@ -3803,7 +3803,7 @@ InterlockedExchangeAdd(
  *   IN PVOID  Value)
  */
 #define InterlockedExchangePointer(Target, Value) \
-  (PVOID) InterlockedExchange((PLONG) Target, (LONG) Value);
+  ((PVOID) InterlockedExchange((PLONG) Target, (LONG) Value))
 
 /*
  * PVOID
@@ -3813,7 +3813,7 @@ InterlockedExchangeAdd(
  *   IN PVOID  Comparand)
  */
 #define InterlockedCompareExchangePointer(Destination, Exchange, Comparand) \
-  (PVOID) InterlockedCompareExchange((PLONG) Destination, (LONG) Exchange, (LONG) Comparand);
+  ((PVOID) InterlockedCompareExchange((PLONG) Destination, (LONG) Exchange, (LONG) Comparand))
 
 #endif /* !__INTERLOCKED_DECLARED */
 
@@ -3845,7 +3845,7 @@ KefReleaseSpinLockFromDpcLevel(
 */
 
 #define ARGUMENT_PRESENT(ArgumentPointer) \
-  (BOOLEAN) ((PVOID)ArgumentPointer != (PVOID)NULL);
+  ((BOOLEAN) ((PVOID)ArgumentPointer != (PVOID)NULL))
 
 /*
  * ULONG
@@ -3853,7 +3853,7 @@ KefReleaseSpinLockFromDpcLevel(
  *   IN PVOID  Va)
  */
 #define BYTE_OFFSET(Va) \
-  (ULONG) ((ULONG_PTR) (Va) & (PAGE_SIZE - 1));
+  ((ULONG) ((ULONG_PTR) (Va) & (PAGE_SIZE - 1)))
 
 /*
  * ULONG
@@ -3861,7 +3861,7 @@ KefReleaseSpinLockFromDpcLevel(
  *   IN ULONG  Size)
  */
 #define BYTES_TO_PAGES(Size) \
-  (ULONG) ((ULONG_PTR) (Size) >> PAGE_SHIFT) + (((ULONG) (Size) & (PAGE_SIZE - 1)) != 0);
+  ((ULONG) ((ULONG_PTR) (Size) >> PAGE_SHIFT) + (((ULONG) (Size) & (PAGE_SIZE - 1)) != 0))
 
 /*
  * PCHAR
@@ -3891,7 +3891,7 @@ KefReleaseSpinLockFromDpcLevel(
  *   IN PVOID  Va)
  */
 #define PAGE_ALIGN(Va) \
-  (PVOID) ((ULONG_PTR)(Va) & ~(PAGE_SIZE - 1));
+  ((PVOID) ((ULONG_PTR)(Va) & ~(PAGE_SIZE - 1)))
 
 /*
  * ULONG_PTR
@@ -3899,7 +3899,7 @@ KefReleaseSpinLockFromDpcLevel(
  *   IN ULONG_PTR  Size)
  */
 #define ROUND_TO_PAGES(Size) \
-  (ULONG_PTR) (((ULONG_PTR) Size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1));
+  ((ULONG_PTR) (((ULONG_PTR) Size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1)))
 
 NTOSAPI
 VOID
@@ -4399,7 +4399,7 @@ RtlEqualUnicodeString(
  */
 #ifndef RtlFillMemory
 #define RtlFillMemory(Destination, Length, Fill) \
-  memset(Destination, Fill, Length);
+  memset(Destination, Fill, Length)
 #endif
 
 #ifndef RtlFillBytes
@@ -4961,7 +4961,7 @@ RtlxUnicodeStringToAnsiSize(
  */
 #ifndef RtlZeroMemory
 #define RtlZeroMemory(Destination, Length) \
-  memset(Destination, 0, Length);
+  memset(Destination, 0, Length)
 #endif
 
 #ifndef RtlZeroBytes
@@ -5255,7 +5255,7 @@ ExInitializeResourceLite(
  *   IN PSLIST_HEADER  SListHead)
  */
 #define InitializeSListHead(_SListHead) \
-	(_SListHead)->Alignment = 0;
+	(_SListHead)->Alignment = 0
 
 #define ExInitializeSListHead InitializeSListHead
 
@@ -5778,7 +5778,7 @@ IoAcquireRemoveLockEx(
  */
 #define IoAcquireRemoveLock(_RemoveLock, \
                             _Tag) \
-  IoAcquireRemoveLockEx(_RemoveLock, _Tag, __FILE__, __LINE__, sizeof(IO_REMOVE_LOCK));
+  IoAcquireRemoveLockEx(_RemoveLock, _Tag, __FILE__, __LINE__, sizeof(IO_REMOVE_LOCK))
 
 /*
  * VOID
@@ -6315,7 +6315,7 @@ IoGetFileObjectGenericMapping(
  *   IN ULONG  ControlCode)
  */
 #define IoGetFunctionCodeFromCtlCode(_ControlCode) \
-  (((_ControlCode) >> 2) & 0x00000FFF);
+  (((_ControlCode) >> 2) & 0x00000FFF)
 
 NTOSAPI
 PVOID
@@ -6360,7 +6360,7 @@ KeInitializeDpc(
                                _DpcRoutine) \
   KeInitializeDpc(&(_DeviceObject)->Dpc, \
     (PKDEFERRED_ROUTINE) (_DpcRoutine), \
-    _DeviceObject);
+    _DeviceObject)
 
 NTOSAPI
 VOID
@@ -6390,7 +6390,7 @@ IoInitializeRemoveLockEx(
 #define IoInitializeRemoveLock( \
   Lock, AllocateTag, MaxLockedMinutes, HighWatermark) \
   IoInitializeRemoveLockEx(Lock, AllocateTag, MaxLockedMinutes, \
-    HighWatermark, sizeof(IO_REMOVE_LOCK));
+    HighWatermark, sizeof(IO_REMOVE_LOCK))
 
 NTOSAPI
 NTSTATUS
@@ -6606,7 +6606,7 @@ IoReleaseRemoveLockEx(
  */
 #define IoReleaseRemoveLockAndWait(_RemoveLock, \
                                    _Tag) \
-  IoReleaseRemoveLockEx(_RemoveLock, _Tag, sizeof(IO_REMOVE_LOCK));
+  IoReleaseRemoveLockEx(_RemoveLock, _Tag, sizeof(IO_REMOVE_LOCK))
 
 NTOSAPI
 VOID
@@ -6701,8 +6701,8 @@ IoReuseIrp(
  */
 #define IoSetCancelRoutine(_Irp, \
                            _CancelRoutine) \
-  (PDRIVER_CANCEL) InterlockedExchangePointer( \
-    (PVOID *) &(_Irp)->CancelRoutine, (PVOID) (_CancelRoutine));
+  ((PDRIVER_CANCEL) InterlockedExchangePointer( \
+    (PVOID *) &(_Irp)->CancelRoutine, (PVOID) (_CancelRoutine)))
 
 /*
  * VOID
@@ -7808,7 +7808,7 @@ MmMarkPhysicalMemoryAsGood(
     | MDL_SOURCE_IS_NONPAGED_POOL)) ? \
     (_Mdl)->MappedSystemVa : \
     (PVOID) MmMapLockedPagesSpecifyCache((_Mdl), \
-      KernelMode, MmCached, NULL, FALSE, _Priority);
+      KernelMode, MmCached, NULL, FALSE, _Priority)
 
 NTOSAPI
 PVOID
@@ -7824,8 +7824,8 @@ MmGetSystemRoutineAddress(
  */
 #define ADDRESS_AND_SIZE_TO_SPAN_PAGES(_Va, \
                                        _Size) \
-  (ULONG) ((((ULONG_PTR) (_Va) & (PAGE_SIZE - 1)) \
-    + (_Size) + (PAGE_SIZE - 1)) >> PAGE_SHIFT)
+  ((ULONG) ((((ULONG_PTR) (_Va) & (PAGE_SIZE - 1)) \
+    + (_Size) + (PAGE_SIZE - 1)) >> PAGE_SHIFT))
 
 /*
  * VOID

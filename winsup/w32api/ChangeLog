@@ -1,4 +1,14 @@
-2003-7-31  Martin Fuchs  <Martin-Fuchs@gmx.net>
+2003-08-01  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/ddk/atm.h: Remove stray '.';
+
+2003-08-01  Gisle Vanem  <gvanem@broadpark.no>
+
+	* include/ddk/winddk.h; Remove trailing ';' from macros,
+	throughout. Add () around defines with cast returns, throughout.
+
+
+2003-07-31  Martin Fuchs  <Martin-Fuchs@gmx.net>
 
 	* include/shlobj.h (SFGAO_COMPRESSED): Add define.
 	(SFGAOF, SHGDNF): Add typedef's. 

@@ -135,7 +135,7 @@ typedef struct _AAL_PARAMETERS_IE {
 
 /* FIXME: Should the union be anonymous in C++ too?  If so,
    can't define named types _ATM_AAL5_INFO and _ATM_AAL0_INFO
-   within anonymous union for C++. */ 	.  
+   within anonymous union for C++. */
 typedef struct _ATM_AAL_OOB_INFO
 {
 	ATM_AAL_TYPE  AalType;
