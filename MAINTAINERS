@@ -23,6 +23,7 @@ cgen/, cgen parts of opcodes/, sim/, include/
 
 config.guess, config.sub
 	config: http://gnu.org
+	Patches to config-patches@gnu.org.
 	Changes need to be done in tandem with the official CONFIG
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
@@ -41,6 +42,7 @@ ltconfig, ltmain.sh
 
 mkinstalldirs, move-if-change, symlink-tree
 	autoconf: http://gnu.org
+	Patches to autoconf-patches@gnu.org.
 	Changes need to be done in tandem with the official AUTOCONF
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
