@@ -1,3 +1,13 @@
+2002-06-02  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* regtool.cc (prog_name): New global variable.
+	(longopts): Ditto.
+	(opts): Ditto.
+	(usage): Standardize usage output.  Rearrange/add descriptions.
+	(print_version): New function.
+	(main): Accomodate longopts and new --help, --version options.  Add
+	check for (_argv[optind+1] == NULL).
+
 2002-06-02  Christopher Faylor  <cgf@redhat.com>
 
 	* strace.cc (forkdebug): Make true by default.
@@ -55,11 +65,11 @@
 
 2002-05-23  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
-        * setfacl.c (usage): Standardize usage output. Change return type to
-        static void.
-        (print_version): New function.
-        (longopts): Added longopts for all options.
-        (main): Accommodate changes in usage function and new version option.
+	* setfacl.c (usage): Standardize usage output. Change return type to
+	static void.
+	(print_version): New function.
+	(longopts): Added longopts for all options.
+	(main): Accommodate changes in usage function and new version option.
 
 2002-05-23  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
@@ -84,7 +94,7 @@
 
 2002-05-20  Joerg Schaible <joerg.schaible@gmx.de>
 
-	* cygpath.cc (main): Add option l to support conversion to   
+	* cygpath.cc (main): Add option l to support conversion to
 	Windows long file names.  Refactured code for capital options.
 	Support of options from file for capital options.
 	(dowin): New function.  Refactured from main.
@@ -92,7 +102,7 @@
 	(get_long_name): New function.
 	(get_long_paths): New function.
 	(get_long_path_name_w32impl): New function.  Reimplementation
-	of Windows API function GetLongPathName (only 98/Me/2000/XP or  
+	of Windows API function GetLongPathName (only 98/Me/2000/XP or
 	higher).
 	(get_short_name): Call GetShortPathName only once.
 	(get_short_paths): Fix calculating buffer size.

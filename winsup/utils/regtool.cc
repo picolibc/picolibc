@@ -1,6 +1,6 @@
 /* regtool.cc
 
-   Copyright 2000 Red Hat Inc.
+   Copyright 2000, 2001, 2002 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -23,6 +23,27 @@ enum
 #define LIST_VALS	0x02
 #define LIST_ALL	(LIST_KEYS | LIST_VALS)
 
+static const char version[] = "$Revision$";
+static char *prog_name;
+
+static struct option longopts[] =
+{
+  {"expand-string", no_argument, NULL, 'e' },
+  {"help", no_argument, NULL, 'h' },
+  {"integer", no_argument, NULL, 'i' },
+  {"keys", no_argument, NULL, 'k'},
+  {"list", no_argument, NULL, 'l'},
+  {"multi-string", no_argument, NULL, 'm'},
+  {"postfix", no_argument, NULL, 'p'},
+  {"quiet", no_argument, NULL, 'q'},
+  {"string", no_argument, NULL, 's'},
+  {"verbose", no_argument, NULL, 'v'},
+  {"version", no_argument, NULL, 'V'},
+  {NULL, 0, NULL, 0}
+};
+
+static char opts[] = "ehiklmpqsvV";
+
 int listwhat = 0;
 int postfix = 0;
 int verbose = 0;
@@ -32,38 +53,78 @@ char **argv;
 HKEY key;
 char *value;
 
-const char *usage_msg[] = {
-  "Regtool Copyright (c) 2000 Red Hat Inc",
-  " regtool -h  - print this message",
-  " regtool [-v|-p|-k|-l] list [key]  - list subkeys and values",
-  "     -p=postfix, like ls -p, appends \\ postfix to key names",
-  "     -k=keys, lists only keys",
-  "     -l=values, lists only values",
-  " regtool [-v] add [key\\subkey]  - add new subkey",
-  " regtool [-v] remove [key]  - remove key",
-  " regtool [-v|-q] check [key]  - exit 0 if key exists, 1 if not",
-  " regtool [-i|-s|-e|-m] set [key\\value] [data ...]  - set value",
-  "     -i=integer -s=string -e=expand-string -m=multi-string",
-  " regtool [-v] unset [key\\value]  - removes value from key",
-  " regtool [-q] get [key\\value]  - prints value to stdout",
-  "     -q=quiet, no error msg, just return nonzero exit if key/value missing",
-  " keys are like \\prefix\\key\\key\\key\\value, where prefix is any of:",
-  "   root     HKCR  HKEY_CLASSES_ROOT",
-  "   config   HKCC  HKEY_CURRENT_CONFIG",
-  "   user     HKCU  HKEY_CURRENT_USER",
-  "   machine  HKLM  HKEY_LOCAL_MACHINE",
-  "   users    HKU   HKEY_USERS",
-  " example: \\user\\software\\Microsoft\\Clock\\iFormat",
-  0
-};
-
-void
-usage (void)
+static void
+usage (FILE *where = stderr)
 {
-  int i;
-  for (i = 0; usage_msg[i]; i++)
-    fprintf (stderr, "%s\n", usage_msg[i]);
-  exit (1);
+  fprintf (where, ""
+  "Usage: %s [OPTION] (add | check | get | list | remove | unset) KEY\n"
+  "\n"
+  "", prog_name);
+  if (where == stdout)
+    fprintf (where, ""
+    "Actions:\n"
+    " add KEY\\SUBKEY             add new SUBKEY\n"
+    " check KEY                  exit 0 if KEY exists, 1 if not\n"
+    " get KEY\\VALUE              prints VALUE to stdout\n"
+    " list KEY                   list SUBKEYs and VALUEs\n"
+    " remove KEY                 remove KEY\n"
+    " set KEY\\VALUE [data ...]   set VALUE\n"
+    " unset KEY\\VALUE            removes VALUE from KEY\n"
+    "\n");
+  fprintf (where, ""
+  "Options for 'list' Action:\n"
+  " -k, --keys           print only KEYs\n"
+  " -l, --list           print only VALUEs\n"
+  " -p, --postfix        like ls -p, appends '\\' postfix to KEY names\n"
+  "\n"
+  "Options for 'set' Action:\n"
+  " -e, --expand-string  set type to REG_EXPAND_SZ\n"
+  " -i, --integer        set type to REG_DWORD\n"
+  " -m, --multi-string   set type to REG_MULTI_SZ\n"
+  " -s, --string         set type to REG_SZ\n"
+  "\n"
+  "Other Options:\n"
+  " -h, --help     output usage information and exit\n"
+  " -q, --quiet    no error output, just nonzero return if KEY/VALUE missing\n"
+  " -v, --verbose  verbose output, including VALUE contents when applicable\n"
+  " -V, --version  output version information and exit\n"
+  "\n");
+  if (where == stdout)
+    fprintf (where, ""
+    "KEY is in the format \\prefix\\KEY\\KEY\\VALUE, where prefix is any of:\n"
+    "  \\root     HKCR  HKEY_CLASSES_ROOT\n"
+    "  \\config   HKCC  HKEY_CURRENT_CONFIG\n"
+    "  \\user     HKCU  HKEY_CURRENT_USER\n"
+    "  \\machine  HKLM  HKEY_LOCAL_MACHINE\n"
+    "  \\users    HKU   HKEY_USERS\n"
+    "");
+  fprintf (where, ""
+  "Example: %s get '\\user\\software\\Microsoft\\Clock\\iFormat'\n", prog_name);
+  if (where == stderr)
+    fprintf (where, "Try '%s --help' for more information.", prog_name);
+  exit (where == stderr ? 1 : 0);
+}
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+%s (cygwin) %.*s\n\
+Registry Tool\n\
+Copyright 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", prog_name, len, v, __DATE__);
 }
 
 void
@@ -515,48 +576,56 @@ struct
 int
 main (int argc, char **_argv)
 {
-  while (1)
-    {
-      int g = getopt (argc, _argv, "hvqisempkl");
-      if (g == -1)
-	break;
-      switch (g)
+  int g;
+
+  prog_name = strrchr (_argv[0], '/');
+  if (prog_name == NULL)
+    prog_name = strrchr (_argv[0], '\\');
+  if (prog_name == NULL)
+    prog_name = _argv[0];
+  else
+    prog_name++;
+
+  while ((g = getopt_long (argc, _argv, opts, longopts, NULL)) != EOF)
+    switch (g)
 	{
-	case 'v':
-	  verbose++;
-	  break;
-	case 'q':
-	  quiet++;
-	  break;
-	case 'p':
-	  postfix++;
+	case 'e':
+	  key_type = KT_EXPAND;
 	  break;
 	case 'k':
 	  listwhat |= LIST_KEYS;
 	  break;
-	case 'l':
-	  listwhat |= LIST_VALS;
-	  break;
-
+	case 'h':
+	  usage (stdout);
 	case 'i':
 	  key_type = KT_INT;
 	  break;
-	case 's':
-	  key_type = KT_STRING;
-	  break;
-	case 'e':
-	  key_type = KT_EXPAND;
+	case 'l':
+	  listwhat |= LIST_VALS;
 	  break;
 	case 'm':
 	  key_type = KT_MULTI;
 	  break;
-
-	case '?':
-	case 'h':
+	case 'p':
+	  postfix++;
+	  break;
+	case 'q':
+	  quiet++;
+	  break;
+	case 's':
+	  key_type = KT_STRING;
+	  break;
+	case 'v':
+	  verbose++;
+	  break;
+	case 'V':
+	  print_version ();
+	  exit (0);
+	default :
 	  usage ();
 	}
-    }
-  if (_argv[optind] == NULL)
+
+  if ((_argv[optind] == NULL) || (_argv[optind+1] == NULL))
     usage ();
 
   argv = _argv + optind;
