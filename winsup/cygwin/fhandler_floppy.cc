@@ -42,7 +42,7 @@ fhandler_dev_floppy::is_eof (int)
   return ret;
 }
 
-fhandler_dev_floppy::fhandler_dev_floppy (int unit) : fhandler_dev_raw (FH_FLOPPY, unit)
+fhandler_dev_floppy::fhandler_dev_floppy () : fhandler_dev_raw (FH_FLOPPY)
 {
 }
 
