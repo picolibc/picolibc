@@ -660,7 +660,8 @@ _pinfo::cmdline (size_t& n)
 static DWORD WINAPI
 proc_waiter (void *arg)
 {
-  pinfo vchild = *(pinfo *) arg;
+  pinfo& vchild = *(pinfo *) arg;
+  // SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_NORMAL);
 
   siginfo_t si;
   si.si_signo = SIGCHLD;
