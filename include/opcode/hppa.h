@@ -390,6 +390,16 @@ static const struct pa_opcode pa_opcodes[] =
 { "fice",       0x040002c0, 0xfc001fdf, "Zx(b)", pa10},
 { "diag",       0x14000000, 0xfc000000, "D", pa10},
 
+/* These may be specific to certain versions of the PA.  Joel claimed
+   they were 72000 (7200?) specific.  However, I'm almost certain the
+   mtcpu/mfcpu were undocumented, but available in the older 700 machines.  */
+{ "mtcpu",      0x14001600, 0xfc00ffff, "x,^"},
+{ "mfcpu",      0x14001A00, 0xfc00ffff, "^,x"},
+{ "tocen",      0x14403600, 0xffffffff, ""},
+{ "tocdis",     0x14401620, 0xffffffff, ""},
+{ "shdwgr",     0x14402600, 0xffffffff, ""},
+{ "grshdw",     0x14400620, 0xffffffff, ""},
+
 /* gfw and gfr are not in the HP PA 1.1 manual, but they are in either
    the Timex FPU or the Mustang ERS (not sure which) manual.  */
 { "gfw",	0x04001680, 0xfc003fdf, "Zx(s,b)", pa11},

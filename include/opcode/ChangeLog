@@ -1,3 +1,8 @@
+Thu May 27 04:13:54 1999  Joel Sherrill (joel@OARcorp.com
+
+	* hppa.h (pa_opcodes): Add several processor specific system
+	instructions.
+
 Wed May 26 16:57:44 1999  Jeffrey A Law  (law@cygnus.com)
 
 	* hppa.h (pa_opcodes): Add second entry for "comb", "comib", 
