@@ -1,5 +1,10 @@
 2002-08-28  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/sys/param.h: Add ENDIAN defines.
+	* test_headers.c: Include sys/param.h.
+
+2002-08-28  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* test_headers.c: Don't include varargs.h.
 	* Makefile.in (test_headers): Don't use -std=xx
 	with -xc++.
