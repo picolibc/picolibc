@@ -1,3 +1,9 @@
+2002-05-09  Pierre Humblet <pierre.humblet@ieee.org>  
+
+	* shared.cc (__sec_user): Split into sec_acl() and call orig_sid().
+	(sec_acl): Create from part of __sec_user(), except creator/owner.
+	* security.h: Define sec_acl() and MAX_DACL_LEN.
+
 2002-05-12  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::open): Avoid using
