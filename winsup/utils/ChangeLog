@@ -1,7 +1,7 @@
 2004-05-27  Christopher Faylor  <cgf@alum.bu.edu>
 
-	* kill.cc (listsig): NSIG includes Signal 0, so we need to avoid
-	calling strtosigno with NSIG - 1.
+	* kill.cc (listsig): Fix "kill -l" segv.  NSIG includes Signal 0, so we
+	need to avoid calling strtosigno with NSIG - 1.
 
 2004-03-21  Christopher Faylor  <cgf@redhat.com>
 
