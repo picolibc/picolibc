@@ -807,7 +807,7 @@ cygwin_bind (int fd, struct sockaddr *my_addr, int addrlen)
 	    {
 	      _close (fd);
 	      chmod (un_addr->sun_path,
-		(S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~myself->umask);
+		(S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask);
 	      res = 0;
 	    }
 #undef un_addr

@@ -24,6 +24,7 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "security.h"
+#include "cygheap.h"
 
 /* Cygwin internal */
 /* Return whether the directory of a file is writable.  Return 1 if it
@@ -75,7 +76,7 @@ opendir (const char *dirname)
       goto failed;
     }
 
-  if (stat (myself->rootlen ? dirname : real_dirname.get_win32 (),
+  if (stat (cygheap->rootlen ? dirname : real_dirname.get_win32 (),
 	    &statbuf) == -1)
     goto failed;
 
@@ -298,7 +299,7 @@ mkdir (const char *dir, mode_t mode)
   if (CreateDirectoryA (real_dir.get_win32 (), 0))
     {
       set_file_attribute (real_dir.has_acls (), real_dir.get_win32 (),
-			  S_IFDIR | ((mode & 0777) & ~myself->umask));
+			  S_IFDIR | ((mode & 0777) & ~cygheap->umask));
       res = 0;
     }
   else

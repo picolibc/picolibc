@@ -72,7 +72,6 @@ public:
   pid_t pgid;		/* Process group ID */
   pid_t sid;		/* Session ID */
   int ctty;		/* Control tty */
-  mode_t umask;
   bool has_pgid_children;/* True if we've forked or spawned children with our GID. */
   char username[MAX_USER_NAME]; /* user's name */
 
@@ -92,11 +91,6 @@ public:
   uid_t orig_gid;	/* Ditto */
   uid_t real_uid;	/* Remains intact on seteuid, replaced by setuid */
   gid_t real_gid;	/* Ditto */
-
-  /* Filled when chroot() is called by the process or one of it's parents.
-     Saved without trailing backslash. */
-  char root[MAX_PATH+1];
-  size_t rootlen;
 
   /* Resources used by process. */
   long start_time;

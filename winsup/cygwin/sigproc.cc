@@ -263,7 +263,6 @@ proc_subproc (DWORD what, DWORD val)
       vchild->pgid = myself->pgid;
       vchild->sid = myself->sid;
       vchild->ctty = myself->ctty;
-      vchild->umask = myself->umask;
       vchild->orig_uid = myself->orig_uid;
       vchild->orig_gid = myself->orig_gid;
       vchild->real_uid = myself->real_uid;
@@ -276,9 +275,7 @@ proc_subproc (DWORD what, DWORD val)
         }
       memcpy (vchild->logsrv, myself->logsrv, MAX_HOST_NAME);
       memcpy (vchild->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
-      memcpy (vchild->root, myself->root, MAX_PATH+1);
       vchild->token = myself->token;
-      vchild->rootlen = myself->rootlen;
       vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
 
       sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",

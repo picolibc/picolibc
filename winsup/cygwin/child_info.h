@@ -39,7 +39,7 @@ public:
   HANDLE parent_alive;	// handle of thread used to track children
   HANDLE parent;
   HANDLE pppid_handle;
-  void *cygheap;
+  init_cygheap *cygheap;
   void *cygheap_max;
 };
 

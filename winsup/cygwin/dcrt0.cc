@@ -654,7 +654,6 @@ dll_crt0_1 ()
 
   threadname_init ();
   debug_init ();
-  cygheap_init ();	/* Initialize cygheap muto */
 
   regthread ("main", GetCurrentThreadId ());
   mainthread.init ("mainthread"); // For use in determining if signals
@@ -733,6 +732,9 @@ dll_crt0_1 ()
 
   /* Initialize events. */
   events_init ();
+
+  if (!child_proc_info)
+    cygheap_init ();
 
   cygcwd.init ();
 
@@ -861,14 +863,6 @@ dll_crt0_1 ()
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  char zeros[sizeof (fork_info->zero)] = {0};
-#ifdef DEBUGGING
-  strace.microseconds ();
-#endif
-
-  /* Set the os_being_run global. */
-  set_os_type ();
-
 #ifdef DEBUGGING
   char buf[80];
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf)))
@@ -878,7 +872,16 @@ _dll_crt0 ()
     }
 #endif
 
+  char zeros[sizeof (fork_info->zero)] = {0};
+#ifdef DEBUGGING
+  strace.microseconds ();
+#endif
+
+  /* Set the os_being_run global. */
+  set_os_type ();
+
   main_environ = user_data->envptr;
+  *main_environ = NULL;
   user_data->heapbase = user_data->heapptr = user_data->heaptop = NULL;
 
   set_console_handler ();

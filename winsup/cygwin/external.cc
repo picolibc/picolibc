@@ -65,7 +65,7 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.gid = p->gid;
 	  ep.pgid = p->pgid;
 	  ep.sid = p->sid;
-	  ep.umask = p->umask;
+	  ep.umask = 0;
 	  ep.start_time = p->start_time;
 	  ep.rusage_self = p->rusage_self;
 	  ep.rusage_children = p->rusage_children;

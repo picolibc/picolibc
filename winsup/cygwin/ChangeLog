@@ -1,3 +1,26 @@
+Tue Nov 14 00:51:28 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.h (init_cygheap): New struct holding values that live in the
+	Cygwin heap.
+	* child_info.h (child_info): Change pointer type of cygheap to
+	init_cygheap.
+	* cygheap.cc (init_cheap): Point cygheap_max after contents of cygheap.
+	Move some stuff into cygheap.h.
+	* dir.cc (opendir): Change to use root and rootlen in cygheap rather
+	than in myself.
+	(mkdir): Change to use umask in cygheap rather than in myself.
+	* path.cc: Ditto, throughout.
+	* syscalls.cc (_open): Ditto.  Change to use umask in cygheap rather
+	than in myself.
+	(chroot): Change to allocate root dir on the cygwin heap.
+	(umask): Change to use umask in cygheap rather than in myself.
+	(cygwin_bind): Ditto.
+	* sigproc.cc (proc_subproc): Don't copy umask or root stuff as this
+	happens automatically now.
+	* pinfo.h (_pinfo): Migrate stuff out of here and into init_cheap.
+	* dcrt0.cc (dll_crt0_1): Call cygheap_init later in startup for first
+	cygwin process.
+
 Sun Nov 12 23:01:35 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (get_device_number): Allow /dev/ttySn to designate a com

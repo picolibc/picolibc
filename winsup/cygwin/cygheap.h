@@ -24,12 +24,35 @@ enum cygheap_types
   HEAP_1_MAX = 100
 };
 
-#define CYGHEAPSIZE ((2000 * sizeof (fhandler_union)) + (2 * 65536))
-
-extern HANDLE cygheap;
-extern HANDLE cygheap_max;
+#define CYGHEAPSIZE ((4000 * sizeof (fhandler_union)) + (2 * 65536))
 
 #define incygheap(s) (cygheap && ((char *) (s) >= (char *) cygheap) && ((char *) (s) <= ((char *) cygheap_max)))
+
+struct _cmalloc_entry
+{
+  union
+  {
+    DWORD b;
+    char *ptr;
+  };
+  struct _cmalloc_entry *prev;
+  char data[0];
+};
+
+
+struct init_cygheap
+{
+  _cmalloc_entry *chain;
+  struct
+  {
+    size_t rootlen;
+    char *root;
+  };
+  mode_t umask;
+};
+
+extern init_cygheap *cygheap;
+extern void *cygheap_max;
 
 extern "C" {
 void __stdcall cfree (void *) __attribute__ ((regparm(1)));

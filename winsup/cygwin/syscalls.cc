@@ -36,6 +36,7 @@ details. */
 #include "shared_info.h"
 #include "perprocess.h"
 #include "security.h"
+#include "cygheap.h"
 
 extern BOOL allow_ntsec;
 
@@ -401,7 +402,7 @@ _open (const char *unix_path, int flags, ...)
 	set_errno (ENMFILE);
       else if ((fh = fdtab.build_fhandler (fd, unix_path, NULL)) == NULL)
 	res = -1;		// errno already set
-      else if (!fh->open (unix_path, flags, (mode & 0777) & ~myself->umask))
+      else if (!fh->open (unix_path, flags, (mode & 0777) & ~cygheap->umask))
 	{
 	  fdtab.release (fd);
 	  res = -1;
@@ -764,8 +765,8 @@ umask (mode_t mask)
 {
   mode_t oldmask;
 
-  oldmask = myself->umask;
-  myself->umask = mask & 0777;
+  oldmask = cygheap->umask;
+  cygheap->umask = mask & 0777;
   return oldmask;
 }
 
@@ -1921,16 +1922,19 @@ chroot (const char *newroot)
       set_errno (ENOTDIR);
       goto done;
     }
+  char buf[MAX_PATH + 1];
   ret = cygwin_shared->mount.conv_to_posix_path (path.get_win32 (),
-						 myself->root, 0);
+						 buf, 0);
   if (ret)
     {
       set_errno (ret);
       goto done;
     }
-  myself->rootlen = strlen (myself->root);
-  if (myself->root[myself->rootlen - 1] == '/')
-    myself->root[--myself->rootlen] = '\0';
+  cygheap->rootlen = strlen (cygheap->root);
+  if (cygheap->rootlen > 1 && buf[cygheap->rootlen - 1] == '/')
+    buf[--cygheap->rootlen] = '\0';
+  cygheap->root = (char *) crealloc (cygheap->root, cygheap->rootlen + 1);
+  strcpy (cygheap->root, buf);
   ret = 0;
 
 done:
