@@ -1,5 +1,5 @@
 /* HPPA ELF support for BFD.
-   Copyright (C) 1993, 1994 Free Software Foundation, Inc.
+   Copyright (C) 1993, 1994, 1999 Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.
 
@@ -25,75 +25,80 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* Processor specific flags for the ELF header e_flags field.  */
 
-/* Target processor IDs to be placed in the low 16 bits of the flags
-   field.  Note these names are shared with SOM, and therefore do not
-   follow ELF naming conventions.  */
-
-/* PA 1.0 big endian.  */
-#ifndef CPU_PA_RISC1_0
-#define CPU_PA_RISC1_0		0x0000020b
-#endif
-
-/* PA 1.1 big endian.  */
-#ifndef CPU_PA_RISC1_1
-#define CPU_PA_RISC1_1		0x00000210
-#endif
-
-/* PA 1.0 little endian (unsupported) is 0x0000028b.  */
-/* PA 1.1 little endian (unsupported) is 0x00000290.  */
-
 /* Trap null address dereferences.  */
-#define ELF_PARISC_TRAPNIL	0x00010000
+#define EF_PARISC_TRAPNIL	0x00010000
 
 /* .PARISC.archext section is present.  */
 #define EF_PARISC_EXT		0x00020000
 
+/* Program expects little-endian mode.  */
+#define EF_PARISC_LSB		0x00040000
+
+/* Program expects wide mode.  */
+#define EF_PARISC_WIDE		0x00080000
+
+/* Do not allow kernel-assisted branch prediction.  */
+#define EF_PARISC_NO_KABP	0x00100000
+
+/* Allow lazy swap for dynamically allocated program segments.  */
+#define EF_PARISC_LAZYSWAP	0x00400000
+
+/* Architecture version */
+#define EF_PARISC_ARCH		0x0000ffff
+
+#define EFA_PARISC_1_0			0x020b
+#define EFA_PARISC_1_1			0x0210
+#define EFA_PARISC_2_0			0x0214
+
+/* Special section indices.  */
+/* A symbol that has been declared as a tentative definition in an ANSI C
+   compilation.  */
+#define SHN_PARISC_ANSI_COMMON 	0xff00
+
+/* A symbol that has been declared as a common block using the 
+   huge memory model.  */
+#define SHN_PARISC_HUGE_COMMON	0xff01
+
 /* Processor specific section types.  */
 
-/* Holds the global offset table, a table of pointers to external
-   data.  */
-#define SHT_PARISC_GOT		SHT_LOPROC+0
+/* Section contains product specific extension bits.  */
+#define SHT_PARISC_EXT		0x70000000
 
-/* Nonloadable section containing information in architecture
-   extensions used by the code.  */
-#define SHT_PARISC_ARCH		SHT_LOPROC+1
+/* Section contains unwind table entries.  */
+#define SHT_PARISC_UNWIND	0x70000001
 
-/* Section in which $global$ is defined.  */
-#define SHT_PARISC_GLOBAL	SHT_LOPROC+2
+/* Section contains debug information for optimized code.  */
+#define SHT_PARISC_DOC		0x70000002
 
-/* Section holding millicode routines (mul, div, rem, dyncall, etc.  */
-#define SHT_PARISC_MILLI	SHT_LOPROC+3
+/* Section contains code annotations.  */
+#define SHT_PARISC_ANNOT	0x70000003
 
-/* Section holding unwind information for use by debuggers.  */
-#define SHT_PARISC_UNWIND	SHT_LOPROC+4
-
-/* Section holding the procedure linkage table.  */
-#define SHT_PARISC_PLT		SHT_LOPROC+5
-
-/* Short initialized and uninitialized data.  */
-#define SHT_PARISC_SDATA	SHT_LOPROC+6
-#define SHT_PARISC_SBSS		SHT_LOPROC+7
-
+/* These are strictly for compatibility with the older elf32-hppa
+   implementation.  Hopefully we can eliminate them in the future.  */
 /* Optional section holding argument location/relocation info.  */
-#define SHT_PARISC_SYMEXTN	SHT_LOPROC+8
+#define SHT_PARISC_SYMEXTN    SHT_LOPROC+8
 
 /* Option section for linker stubs.  */
-#define SHT_PARISC_STUBS	SHT_LOPROC+9
+#define SHT_PARISC_STUBS      SHT_LOPROC+9
 
 /* Processor specific section flags.  */
 
-/* This section is near the global data pointer and thus allows short
-   addressing modes to be used.  */
-#define SHF_PARISC_SHORT        0x20000000
+/* Section contains code compiled for static branch prediction.  */
+#define SHF_PARISC_SBP		0x80000000
 
-/* Processor specific symbol types.  */
+/* Section should be allocated from from GP.  */
+#define SHF_PARISC_HUGE		0x40000000
 
-/* Millicode function entry point.  */
-#define STT_PARISC_MILLICODE	STT_LOPROC+0
+/* Section should go near GP.  */
+#define SHF_PARISC_SHORT	0x20000000
 
+
+/* Identifies the entry point of a millicode routine.  */
+#define STT_PARISC_MILLI	13
 
 /* ELF/HPPA relocation types */
 
+/* Note: PA-ELF is defined to use only RELA relocations.  */
 #include "reloc-macros.h"
 
 START_RELOC_NUMBERS (elf32_hppa_reloc_type)
@@ -101,11 +106,11 @@ START_RELOC_NUMBERS (elf32_hppa_reloc_type)
      
      /* These relocation types do simple base + offset relocations.  */
 
-     RELOC_NUMBER (R_PARISC_DIR32,  0x01)
-     RELOC_NUMBER (R_PARISC_DIR21L, 0x02)
-     RELOC_NUMBER (R_PARISC_DIR17R, 0x03)
-     RELOC_NUMBER (R_PARISC_DIR17F, 0x04)
-     RELOC_NUMBER (R_PARISC_DIR14R, 0x06)
+     RELOC_NUMBER (R_PARISC_DIR32,  1)
+     RELOC_NUMBER (R_PARISC_DIR21L, 2)
+     RELOC_NUMBER (R_PARISC_DIR17R, 3)
+     RELOC_NUMBER (R_PARISC_DIR17F, 4)
+     RELOC_NUMBER (R_PARISC_DIR14R, 6)
 
     /* PC-relative relocation types
        Typically used for calls.
@@ -121,17 +126,20 @@ START_RELOC_NUMBERS (elf32_hppa_reloc_type)
        addend being zero.  A consequence of this limitation is GAS
        can not perform relocation reductions for function symbols.  */
      
-     RELOC_NUMBER (R_PARISC_PCREL21L, 0x0a)
-     RELOC_NUMBER (R_PARISC_PCREL17R, 0x0b)
-     RELOC_NUMBER (R_PARISC_PCREL17F, 0x0c)
-     RELOC_NUMBER (R_PARISC_PCREL17C, 0x0d)
-     RELOC_NUMBER (R_PARISC_PCREL14R, 0x0e)
-     RELOC_NUMBER (R_PARISC_PCREL14F, 0x0f)
+    RELOC_NUMBER (R_PARISC_PCREL32, 9)
+    RELOC_NUMBER (R_PARISC_PCREL21L, 10)
+    RELOC_NUMBER (R_PARISC_PCREL17R, 11)
+    RELOC_NUMBER (R_PARISC_PCREL17F, 12)
+    RELOC_NUMBER (R_PARISC_PCREL17C, 13)
+    RELOC_NUMBER (R_PARISC_PCREL14R, 14)
+    RELOC_NUMBER (R_PARISC_PCREL14F, 15)
 
     /* DP-relative relocation types.  */
-     RELOC_NUMBER (R_PARISC_DPREL21L, 0x12)
-     RELOC_NUMBER (R_PARISC_DPREL14R, 0x16)
-     RELOC_NUMBER (R_PARISC_DPREL14F, 0x17)
+    RELOC_NUMBER (R_PARISC_DPREL21L, 18)
+    RELOC_NUMBER (R_PARISC_DPREL14WR, 19)
+    RELOC_NUMBER (R_PARISC_DPREL14DR, 20)
+    RELOC_NUMBER (R_PARISC_DPREL14R, 22)
+    RELOC_NUMBER (R_PARISC_DPREL14F, 23)
 
     /* Data linkage table (DLT) relocation types
 
@@ -139,49 +147,134 @@ START_RELOC_NUMBERS (elf32_hppa_reloc_type)
        from position-independent code within shared libraries.  They are
        similar to the GOT relocation types in some SVR4 implementations.  */
 
-     RELOC_NUMBER (R_PARISC_DLTREL21L, 0x1a)
-     RELOC_NUMBER (R_PARISC_DLTREL14R, 0x1e)
-     RELOC_NUMBER (R_PARISC_DLTREL14F, 0x1f)
+    RELOC_NUMBER (R_PARISC_DLTREL21L, 26)
+    RELOC_NUMBER (R_PARISC_DLTREL14R, 30)
+    RELOC_NUMBER (R_PARISC_DLTREL14F, 31)
 
     /* DLT indirect relocation types  */
-     RELOC_NUMBER (R_PARISC_DLTIND21L, 0x22)
-     RELOC_NUMBER (R_PARISC_DLTIND14R, 0x26)
-     RELOC_NUMBER (R_PARISC_DLTIND14F, 0x27)
+    RELOC_NUMBER (R_PARISC_DLTIND21L, 34)
+    RELOC_NUMBER (R_PARISC_DLTIND14R, 38)
+    RELOC_NUMBER (R_PARISC_DLTIND14F, 39)
 
     /* Base relative relocation types.  Ugh.  These imply lots of state */
-     RELOC_NUMBER (R_PARISC_SETBASE,    0x28)
-     RELOC_NUMBER (R_PARISC_BASEREL32,  0x29)
-     RELOC_NUMBER (R_PARISC_BASEREL21L, 0x2a)
-     RELOC_NUMBER (R_PARISC_BASEREL17R, 0x2b)
-     RELOC_NUMBER (R_PARISC_BASEREL17F, 0x2c)
-     RELOC_NUMBER (R_PARISC_BASEREL14R, 0x2e)
-     RELOC_NUMBER (R_PARISC_BASEREL14F, 0x2f)
+    RELOC_NUMBER (R_PARISC_SETBASE, 40)
+    RELOC_NUMBER (R_PARISC_SECREL32, 41)
+    RELOC_NUMBER (R_PARISC_BASEREL21L, 42)
+    RELOC_NUMBER (R_PARISC_BASEREL17R, 43)
+    RELOC_NUMBER (R_PARISC_BASEREL17F, 44)
+    RELOC_NUMBER (R_PARISC_BASEREL14R, 46)
+    RELOC_NUMBER (R_PARISC_BASEREL14F, 47)
 
     /* Segment relative relocation types.  */
-     RELOC_NUMBER (R_PARISC_TEXTREL32, 0x31)
-     RELOC_NUMBER (R_PARISC_DATAREL32, 0x39)
+    RELOC_NUMBER (R_PARISC_SEGBASE, 48)
+    RELOC_NUMBER (R_PARISC_SEGREL32, 49)
+
+    /* Offsets from the PLT.  */
+    RELOC_NUMBER (R_PARISC_PLTOFF21L, 50)
+    RELOC_NUMBER (R_PARISC_PLTOFF14R, 54)
+    RELOC_NUMBER (R_PARISC_PLTOFF14F, 55)
+
+    RELOC_NUMBER (R_PARISC_LTOFF_FPTR32, 57)
+    RELOC_NUMBER (R_PARISC_LTOFF_FPTR21L, 58)
+    RELOC_NUMBER (R_PARISC_LTOFF_FPTR14R, 62)
+
+    RELOC_NUMBER (R_PARISC_FPTR64, 64)
 
     /* Plabel relocation types.  */
-     RELOC_NUMBER (R_PARISC_PLABEL32,  0x41)
-     RELOC_NUMBER (R_PARISC_PLABEL21L, 0x42)
-     RELOC_NUMBER (R_PARISC_PLABEL14R, 0x46)
+    RELOC_NUMBER (R_PARISC_PLABEL32, 65)
+    RELOC_NUMBER (R_PARISC_PLABEL21L, 66)
+    RELOC_NUMBER (R_PARISC_PLABEL14R, 70)
 
-    /* PLT relocations.  */
-     RELOC_NUMBER (R_PARISC_PLTIND21L, 0x82)
-     RELOC_NUMBER (R_PARISC_PLTIND14R, 0x86)
-     RELOC_NUMBER (R_PARISC_PLTIND14F, 0x87)
+    /* PCREL relocations.  */
+    RELOC_NUMBER (R_PARISC_PCREL64, 72)
+    RELOC_NUMBER (R_PARISC_PCREL22C, 73)
+    RELOC_NUMBER (R_PARISC_PCREL22F, 74)
+    RELOC_NUMBER (R_PARISC_PCREL14WR, 75)
+    RELOC_NUMBER (R_PARISC_PCREL14DR, 76)
+    RELOC_NUMBER (R_PARISC_PCREL16F, 77)
+    RELOC_NUMBER (R_PARISC_PCREL16WF, 78)
+    RELOC_NUMBER (R_PARISC_PCREL16DF, 79)
 
-    /* Misc relocation types.  */
-     RELOC_NUMBER (R_PARISC_COPY,     0x88)
-     RELOC_NUMBER (R_PARISC_GLOB_DAT, 0x89)
-     RELOC_NUMBER (R_PARISC_JMP_SLOT, 0x8a)
-     RELOC_NUMBER (R_PARISC_RELATIVE, 0x8b)
-     
-     EMPTY_RELOC (R_PARISC_UNIMPLEMENTED)
+
+    RELOC_NUMBER (R_PARISC_DIR64, 80)
+    RELOC_NUMBER (R_PARISC_DIR64WR, 81)
+    RELOC_NUMBER (R_PARISC_DIR64DR, 82)
+    RELOC_NUMBER (R_PARISC_DIR14WR, 83)
+    RELOC_NUMBER (R_PARISC_DIR14DR, 84)
+    RELOC_NUMBER (R_PARISC_DIR16F, 85)
+    RELOC_NUMBER (R_PARISC_DIR16WF, 86)
+    RELOC_NUMBER (R_PARISC_DIR16DF, 87)
+
+    RELOC_NUMBER (R_PARISC_GPREL64, 88)
+
+    RELOC_NUMBER (R_PARISC_DLTREL14WR, 91)
+    RELOC_NUMBER (R_PARISC_DLTREL14DR, 92)
+    RELOC_NUMBER (R_PARISC_GPREL16F, 93)
+    RELOC_NUMBER (R_PARISC_GPREL16WF, 94)
+    RELOC_NUMBER (R_PARISC_GPREL16DF, 95)
+
+
+    RELOC_NUMBER (R_PARISC_LTOFF64, 96)
+    RELOC_NUMBER (R_PARISC_DLTIND14WR, 99)
+    RELOC_NUMBER (R_PARISC_DLTIND14DR, 100)
+    RELOC_NUMBER (R_PARISC_LTOFF16F, 101)
+    RELOC_NUMBER (R_PARISC_LTOFF16WF, 102)
+    RELOC_NUMBER (R_PARISC_LTOFF16DF, 103)
+
+    RELOC_NUMBER (R_PARISC_SECREL64, 104)
+
+    RELOC_NUMBER (R_PARISC_BASEREL14WR, 107)
+    RELOC_NUMBER (R_PARISC_BASEREL14DR, 108)
+
+    RELOC_NUMBER (R_PARISC_SEGREL64, 112)
+
+    RELOC_NUMBER (R_PARISC_PLTOFF14WR, 115)
+    RELOC_NUMBER (R_PARISC_PLTOFF14DR, 116)
+    RELOC_NUMBER (R_PARISC_PLTOFF16F, 117)
+    RELOC_NUMBER (R_PARISC_PLTOFF16WF, 118)
+    RELOC_NUMBER (R_PARISC_PLTOFF16DF, 119)
+
+    RELOC_NUMBER (R_PARISC_LTOFF_FPTR64, 120)
+    RELOC_NUMBER (R_PARISC_LTOFF_FPTR14WR, 123)
+    RELOC_NUMBER (R_PARISC_LTOFF_FPTR14DR, 124)
+    RELOC_NUMBER (R_PARISC_LTOFF_FPTR16F, 125)
+    RELOC_NUMBER (R_PARISC_LTOFF_FPTR16WF, 126)
+    RELOC_NUMBER (R_PARISC_LTOFF_FPTR16DF, 127)
+
+ 
+    RELOC_NUMBER (R_PARISC_COPY, 128)
+    RELOC_NUMBER (R_PARISC_IPLT, 129)
+    RELOC_NUMBER (R_PARISC_EPLT, 130)
+
+    RELOC_NUMBER (R_PARISC_TPREL32, 153)
+    RELOC_NUMBER (R_PARISC_TPREL21L, 154)
+    RELOC_NUMBER (R_PARISC_TPREL14R, 158)
+
+    RELOC_NUMBER (R_PARISC_LTOFF_TP21L, 162)
+    RELOC_NUMBER (R_PARISC_LTOFF_TP14R, 166)
+    RELOC_NUMBER (R_PARISC_LTOFF_TP14F, 167)
+
+    RELOC_NUMBER (R_PARISC_TPREL64, 216)
+    RELOC_NUMBER (R_PARISC_TPREL14WR, 219)
+    RELOC_NUMBER (R_PARISC_TPREL14DR, 220)
+    RELOC_NUMBER (R_PARISC_TPREL16F, 221)
+    RELOC_NUMBER (R_PARISC_TPREL16WF, 222)
+    RELOC_NUMBER (R_PARISC_TPREL16DF, 223)
+
+    RELOC_NUMBER (R_PARISC_LTOFF_TP64, 224)
+    RELOC_NUMBER (R_PARISC_LTOFF_TP14WR, 227)
+    RELOC_NUMBER (R_PARISC_LTOFF_TP14DR, 228)
+    RELOC_NUMBER (R_PARISC_LTOFF_TP16F, 229)
+    RELOC_NUMBER (R_PARISC_LTOFF_TP16WF, 230)
+    RELOC_NUMBER (R_PARISC_LTOFF_TP16DF, 231)
+    EMPTY_RELOC (R_PARISC_UNIMPLEMENTED)
 END_RELOC_NUMBERS
 
 #ifndef RELOC_MACROS_GEN_FUNC
 typedef enum elf32_hppa_reloc_type elf32_hppa_reloc_type;
 #endif
 
+#define PT_PARISC_ARCHEXT	0x70000000
+#define PT_PARISC_UNWIND	0x70000001
+#define PF_PARISC_SBP		0x08000000
 #endif /* _ELF_HPPA_H */
