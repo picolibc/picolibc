@@ -1067,23 +1067,18 @@ out:
    of the SD on success. Unfortunately NT returns
    0 in `len' on success, while W2K returns the
    correct size!
+   
+   2003-11-26: Now the function allocates the space needed by itself so
+   it knows the real size and returns it in the security_descriptor object.
 */
 
 LONG
-read_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
+read_sd (const char *file, security_descriptor &sd)
 {
-  /* Check parameters */
-  if (!sd_size)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  debug_printf ("file = %s", file);
 
   DWORD len = 0;
   const char *pfile = file;
-  char fbuf[PATH_MAX];
+  char fbuf[CYG_MAX_PATH];
   if (current_codepage == oem_cp)
     {
       DWORD fname_len = min (sizeof (fbuf) - 1, strlen (file));
@@ -1096,34 +1091,38 @@ read_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
 			OWNER_SECURITY_INFORMATION
 			| GROUP_SECURITY_INFORMATION
 			| DACL_SECURITY_INFORMATION,
-			sd_buf, *sd_size, &len))
+			NULL, 0, &len)
+      && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
     {
+      debug_printf ("file = %s", file);
       __seterrno ();
       return -1;
     }
   debug_printf ("file = %s: len=%d", file, len);
-  if (len > *sd_size)
+  if (!sd.malloc (len))
     {
-      *sd_size = len;
-      return 0;
+      set_errno (ENOMEM);
+      return -1;
     }
-  return 1;
+  if (!GetFileSecurity (pfile,
+			OWNER_SECURITY_INFORMATION
+			| GROUP_SECURITY_INFORMATION
+			| DACL_SECURITY_INFORMATION,
+			sd, len, &len))
+    {
+      __seterrno ();
+      return -1;
+    }
+  return sd.size ();
 }
 
 LONG
-write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
+write_sd (const char *file, security_descriptor &sd)
 {
-  /* Check parameters */
-  if (!sd_buf || !sd_size)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
   BOOL dummy;
   cygpsid owner;
 
-  if (!GetSecurityDescriptorOwner (sd_buf, (PSID *) &owner, &dummy))
+  if (!GetSecurityDescriptorOwner (sd, (PSID *) &owner, &dummy))
     {
       __seterrno ();
       return -1;
@@ -1168,7 +1167,7 @@ write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
   header.dwStreamId = BACKUP_SECURITY_DATA;
   header.dwStreamAttributes = STREAM_CONTAINS_SECURITY;
   header.Size.HighPart = 0;
-  header.Size.LowPart = sd_size;
+  header.Size.LowPart = sd.size ();
   header.dwStreamNameSize = 0;
   if (!BackupWrite (fh, (LPBYTE) &header,
 		    3 * sizeof (DWORD) + sizeof (LARGE_INTEGER),
@@ -1180,7 +1179,7 @@ write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
     }
 
   /* write new security descriptor */
-  if (!BackupWrite (fh, (LPBYTE) sd_buf,
+  if (!BackupWrite (fh, (LPBYTE) (PSECURITY_DESCRIPTOR) sd,
 		    header.Size.LowPart + header.dwStreamNameSize,
 		    &bytes_written, FALSE, TRUE, &context))
     {
@@ -1361,19 +1360,11 @@ static void
 get_nt_attribute (const char *file, mode_t *attribute,
 		  __uid32_t *uidret, __gid32_t *gidret)
 {
-  /* Yeah, sounds too much, but I've seen SDs of 2100 bytes! */
-  DWORD sd_size = 4096;
-  char sd_buf[4096];
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
+  security_descriptor sd;
 
-  if (read_sd (file, psd, &sd_size) <= 0)
-    {
-      debug_printf ("read_sd %E");
-      psd = NULL;
-    }
-
-  get_info_from_sd (psd, attribute, uidret, gidret);
-  return;
+  if (read_sd (file, sd) <= 0)
+    debug_printf ("read_sd %E");
+  get_info_from_sd (sd, attribute, uidret, gidret);
 }
 
 int
@@ -1411,26 +1402,37 @@ get_file_attribute (int use_ntsec, const char *file,
 
 static void
 get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
-			 mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
+			 mode_t *attribute, __uid32_t *uidret,
+			 __gid32_t *gidret)
 {
-  PSECURITY_DESCRIPTOR psd;
-  char sd_buf[4096];
+  security_descriptor sd;
+  PSECURITY_DESCRIPTOR psd = NULL;
 
   if (object_type == SE_REGISTRY_KEY)
     {
       /* use different code for registry handles, for performance reasons */
-      psd = (PSECURITY_DESCRIPTOR) & sd_buf[0];
-      DWORD len = sizeof (sd_buf);
-      if (ERROR_SUCCESS != RegGetKeySecurity ((HKEY) handle,
-					      DACL_SECURITY_INFORMATION |
-					      GROUP_SECURITY_INFORMATION |
-					      OWNER_SECURITY_INFORMATION,
-					      psd, &len))
+      DWORD len = 0;
+      if (RegGetKeySecurity ((HKEY) handle,
+			     DACL_SECURITY_INFORMATION
+			     | GROUP_SECURITY_INFORMATION
+			     | OWNER_SECURITY_INFORMATION,
+			     sd, &len) != ERROR_INSUFFICIENT_BUFFER)
 	{
 	  __seterrno ();
 	  debug_printf ("RegGetKeySecurity %E");
-	  psd = NULL;
 	}
+      if (!sd.malloc (len))
+	set_errno (ENOMEM);
+      else if (RegGetKeySecurity ((HKEY) handle,
+				  DACL_SECURITY_INFORMATION
+				  | GROUP_SECURITY_INFORMATION
+				  | OWNER_SECURITY_INFORMATION,
+				  sd, &len) != ERROR_SUCCESS)
+	{
+	  __seterrno ();
+	  debug_printf ("RegGetKeySecurity %E");
+	}
+	get_info_from_sd (sd, attribute, uidret, gidret);
       }
   else
     {
@@ -1444,13 +1446,10 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 	  debug_printf ("GetSecurityInfo %E");
 	  psd = NULL;
 	}
+      get_info_from_sd (psd, attribute, uidret, gidret);
+      if (psd)
+	LocalFree (psd);
     }
-
-  get_info_from_sd (psd, attribute, uidret, gidret);
-  if (psd != (PSECURITY_DESCRIPTOR) & sd_buf[0])
-    LocalFree (psd);
-
-  return;
 }
 
 int
@@ -1498,18 +1497,13 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
   return TRUE;
 }
 
-PSECURITY_DESCRIPTOR
+static PSECURITY_DESCRIPTOR
 alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
-	  PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret)
+	  security_descriptor &sd_ret)
 {
   BOOL dummy;
 
   debug_printf("uid %d, gid %d, attribute %x", uid, gid, attribute);
-  if (!sd_ret || !sd_size_ret)
-    {
-      set_errno (EINVAL);
-      return NULL;
-    }
 
   /* Get owner and group from current security descriptor. */
   PSID cur_owner_sid = NULL;
@@ -1788,33 +1782,37 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     }
 
   /* Make self relative security descriptor. */
-  *sd_size_ret = 0;
-  MakeSelfRelativeSD (&sd, sd_ret, sd_size_ret);
-  if (*sd_size_ret <= 0)
+  DWORD sd_size = 0;
+  MakeSelfRelativeSD (&sd, sd_ret, &sd_size);
+  if (sd_size <= 0)
     {
       __seterrno ();
       return NULL;
     }
-  if (!MakeSelfRelativeSD (&sd, sd_ret, sd_size_ret))
+  if (!sd_ret.malloc (sd_size))
+    {
+      set_errno (ENOMEM);
+      return NULL;
+    }
+  if (!MakeSelfRelativeSD (&sd, sd_ret, &sd_size))
     {
       __seterrno ();
       return NULL;
     }
-  debug_printf ("Created SD-Size: %d", *sd_size_ret);
+  debug_printf ("Created SD-Size: %u", sd_ret.size ());
 
   return sd_ret;
 }
 
 void
 set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
-			void *sd_buf, DWORD sd_buf_size)
+			security_descriptor &sd)
 {
-  psa->lpSecurityDescriptor = sd_buf;
-  InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR) sd_buf,
+  psa->lpSecurityDescriptor = sd.malloc (SECURITY_DESCRIPTOR_MIN_LENGTH);
+  InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR)psa->lpSecurityDescriptor,
 				SECURITY_DESCRIPTOR_REVISION);
-  psa->lpSecurityDescriptor = alloc_sd (geteuid32 (), getegid32 (), attribute,
-					(PSECURITY_DESCRIPTOR) sd_buf,
-					&sd_buf_size);
+  psa->lpSecurityDescriptor = alloc_sd (geteuid32 (), getegid32 (),
+  					attribute, sd);
 }
 
 static int
@@ -1824,22 +1822,19 @@ set_nt_attribute (const char *file, __uid32_t uid, __gid32_t gid,
   if (!wincap.has_security ())
     return 0;
 
-  DWORD sd_size = 4096;
-  char sd_buf[4096];
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
+  security_descriptor sd;
 
   int ret;
-  if ((ret = read_sd (file, psd, &sd_size)) <= 0)
+  if ((ret = read_sd (file, sd)) <= 0)
     {
       debug_printf ("read_sd %E");
       return -1;
     }
 
-  sd_size = 4096;
-  if (!(psd = alloc_sd (uid, gid, attribute, psd, &sd_size)))
+  if (!alloc_sd (uid, gid, attribute, sd))
     return -1;
 
-  return write_sd (file, psd, sd_size);
+  return write_sd (file, sd);
 }
 
 int
@@ -1872,9 +1867,9 @@ int
 check_file_access (const char *fn, int flags)
 {
   int ret = -1;
-  char sd_buf[4096];
-  DWORD sd_size = sizeof sd_buf;
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
+
+  security_descriptor sd;
+
   HANDLE hToken, hIToken;
   BOOL status;
   char pbuf[sizeof (PRIVILEGE_SET) + 3 * sizeof (LUID_AND_ATTRIBUTES)];
@@ -1883,7 +1878,7 @@ check_file_access (const char *fn, int flags)
 					     FILE_GENERIC_WRITE,
 					     FILE_GENERIC_EXECUTE,
 					     FILE_ALL_ACCESS };
-  if (read_sd (fn, psd, &sd_size) <= 0)
+  if (read_sd (fn, sd) <= 0)
     goto done;
 
   if (cygheap->user.issetuid ())
@@ -1906,7 +1901,7 @@ check_file_access (const char *fn, int flags)
     desired |= FILE_WRITE_DATA;
   if (flags & X_OK)
     desired |= FILE_EXECUTE;
-  if (!AccessCheck (psd, hIToken, desired, &mapping,
+  if (!AccessCheck (sd, hIToken, desired, &mapping,
 		    (PPRIVILEGE_SET) pbuf, &plength, &granted, &status))
     __seterrno ();
   else if (!status)

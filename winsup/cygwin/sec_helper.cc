@@ -225,6 +225,35 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, __uid32_t * uidret, __gid32
   return ret;
 }
 
+PSECURITY_DESCRIPTOR
+security_descriptor::malloc (size_t nsize)
+{
+  if (psd)
+    ::free (psd);
+  psd = (PSECURITY_DESCRIPTOR) ::malloc (nsize);
+  sd_size = psd ? nsize : 0;
+  return psd;
+}
+
+PSECURITY_DESCRIPTOR
+security_descriptor::realloc (size_t nsize)
+{
+  PSECURITY_DESCRIPTOR tmp = (PSECURITY_DESCRIPTOR) ::realloc (psd, nsize);
+  if (!tmp)
+    return NULL;
+  sd_size = nsize;
+  return psd = tmp;
+}
+
+void
+security_descriptor::free (void)
+{
+  if (psd)
+    ::free (psd);
+  psd = NULL;
+  sd_size = 0;
+}
+
 #if 0 // unused
 #define SIDLEN	(sidlen = MAX_SID_LEN, &sidlen)
 #define DOMLEN	(domlen = INTERNET_MAX_HOST_NAME_LENGTH, &domlen)

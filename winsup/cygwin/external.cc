@@ -268,12 +268,17 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
       case CW_GET_POSIX_SECURITY_ATTRIBUTE:
 	{
+	  security_descriptor sd;
 	  int attribute = va_arg (arg, int);
 	  PSECURITY_ATTRIBUTES psa = va_arg (arg, PSECURITY_ATTRIBUTES);
 	  void *sd_buf = va_arg (arg, void *);
 	  DWORD sd_buf_size = va_arg (arg, DWORD);
-	  set_security_attribute (attribute, psa, sd_buf, sd_buf_size);
-	  return psa->lpSecurityDescriptor ? 0 : -1;
+	  set_security_attribute (attribute, psa, sd);
+	  if (!psa->lpSecurityDescriptor || sd.size () > sd_buf_size)
+	    return sd.size ();
+	  memcpy (sd_buf, sd, sd.size ());
+	  psa->lpSecurityDescriptor = sd_buf;
+	  return 0;
         }
       case CW_GET_SHMLBA:
         {

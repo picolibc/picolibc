@@ -1,5 +1,43 @@
 2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dir.cc (mkdir): Use local security_descriptor. Call
+	set_security_attribute appropriately.
+	* external.cc (cygwin_internal): Ditto.
+	* fhandler.cc (fhandler_base::open): Ditto.
+	* fhandler_socket.cc (fhandler_socket::bind): Ditto.
+	* path.cc (symlink_worker): Ditto.
+	* sec_acl.cc (setacl): Ditto. Call read_sd appropriately.
+	(getace): Ditto.
+	* sec_helper.cc (security_descriptor::malloc): New method.
+	(security_descriptor::realloc): New method.
+	(security_descriptor::free): New method.
+	* security.cc (read_sd): Get security_descriptor as parameter instead
+	of PSECURITY_DESCRIPTOR and a size. Drop unnecessary parameter check.
+	Allocate the security_descriptor buffer according to size returned by
+	a call to GetFileSecurity. Return buffer size on success.
+	(write_sd): Get security_descriptor as parameter instead of
+	PSECURITY_DESCRIPTOR and a size.
+	(get_nt_attribute): Use local security_descriptor.
+	(get_nt_object_attribute): Ditto in case of type == SE_REGISTRY_KEY.
+	Allocate security_descriptor buffer according to size returned by
+	a call to RegGetKeySecurity.
+	(alloc_sd): Make static. Get security_descriptor as parameter instead
+	of PSECURITY_DESCRIPTOR and a size. Drop unnecessary parameter check.
+	(set_security_attribute): Get security_descriptor as parameter instead
+	of PSECURITY_DESCRIPTOR and a size.
+	(set_nt_attribute): Use local security_descriptor.
+	(check_file_access): Ditto.
+	* security.h: Add class security_descriptor.
+	(read_sd): Change declaration to get security_descriptor as parameter
+	instead of PSECURITY_DESCRIPTOR and a size.
+	(write_sd): Ditto.
+	(set_security_attribute): Ditto.
+	(alloc_sd): Remove declaration.
+	* thread.cc (semaphore::semaphore): Use local security_descriptor. Call
+	set_security_attribute appropriately.
+
+2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.h (getace): Use FILE_*_BITS as permission mask.
 	* security.cc (get_attribute_from_acl): Ditto.
 	* security.h (FILE_READ_BITS): Define to match also GENERIC bits.

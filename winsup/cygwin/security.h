@@ -167,6 +167,24 @@ public:
     }
 };
 
+/* Wrapper class to allow simple deleting of buffer space allocated
+   by read_sd() */
+class security_descriptor {
+protected:
+  PSECURITY_DESCRIPTOR psd;
+  DWORD sd_size;
+public:
+  security_descriptor () : psd (NULL), sd_size (0) {}
+  ~security_descriptor () { free (); }
+
+  PSECURITY_DESCRIPTOR malloc (size_t nsize);
+  PSECURITY_DESCRIPTOR realloc (size_t nsize);
+  void free (void);
+
+  inline DWORD size (void) const { return sd_size; }
+  inline operator const PSECURITY_DESCRIPTOR () { return psd; }
+};
+
 class user_groups {
 public:
   cygsid pgsid;
@@ -228,14 +246,14 @@ int __stdcall set_file_attribute (int, const char *, int);
 int __stdcall set_file_attribute (int, const char *, __uid32_t, __gid32_t, int);
 int __stdcall get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, mode_t *,
 				  __uid32_t * = NULL, __gid32_t * = NULL);
-LONG __stdcall read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size);
-LONG __stdcall write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size);
+LONG __stdcall read_sd (const char *file, security_descriptor &sd);
+LONG __stdcall write_sd (const char *file, security_descriptor &sd);
 BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 BOOL __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 int __stdcall check_file_access (const char *, int);
 
 void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
-			     void *sd_buf, DWORD sd_buf_size);
+			     security_descriptor &sd_buf);
 
 bool get_sids_info (cygpsid, cygpsid, __uid32_t * , __gid32_t *);
 
@@ -268,8 +286,6 @@ extern BOOL sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID,
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
-PSECURITY_DESCRIPTOR alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
-	  PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
 
 extern inline SECURITY_ATTRIBUTES *
 sec_user_nih (char sa_buf[], PSID sid1 = NULL, PSID sid2 = NULL, DWORD access2 = 0)

@@ -49,11 +49,9 @@ searchace (__aclent32_t *aclp, int nentries, int type, __uid32_t id = ILLEGAL_UI
 static int
 setacl (const char *file, int nentries, __aclent32_t *aclbufp)
 {
-  DWORD sd_size = 4096;
-  char sd_buf[4096];
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
+  security_descriptor sd_ret;
 
-  if (read_sd (file, psd, &sd_size) <= 0)
+  if (read_sd (file, sd_ret) <= 0)
     {
       debug_printf ("read_sd %E");
       return -1;
@@ -63,7 +61,7 @@ setacl (const char *file, int nentries, __aclent32_t *aclbufp)
 
   /* Get owner SID. */
   PSID owner_sid;
-  if (!GetSecurityDescriptorOwner (psd, &owner_sid, &dummy))
+  if (!GetSecurityDescriptorOwner (sd_ret, &owner_sid, &dummy))
     {
       __seterrno ();
       return -1;
@@ -72,7 +70,7 @@ setacl (const char *file, int nentries, __aclent32_t *aclbufp)
 
   /* Get group SID. */
   PSID group_sid;
-  if (!GetSecurityDescriptorGroup (psd, &group_sid, &dummy))
+  if (!GetSecurityDescriptorGroup (sd_ret, &group_sid, &dummy))
     {
       __seterrno ();
       return -1;
@@ -206,21 +204,21 @@ setacl (const char *file, int nentries, __aclent32_t *aclbufp)
       __seterrno ();
       return -1;
     }
-  /* Make self relative security descriptor in psd. */
-  sd_size = 0;
-  MakeSelfRelativeSD (&sd, psd, &sd_size);
+  /* Make self relative security descriptor in sd_ret. */
+  DWORD sd_size = 0;
+  MakeSelfRelativeSD (&sd, sd_ret, &sd_size);
   if (sd_size <= 0)
     {
       __seterrno ();
       return -1;
     }
-  if (!MakeSelfRelativeSD (&sd, psd, &sd_size))
+  if (!MakeSelfRelativeSD (&sd, sd_ret, &sd_size))
     {
       __seterrno ();
       return -1;
     }
-  debug_printf ("Created SD-Size: %d", sd_size);
-  return write_sd (file, psd, sd_size);
+  debug_printf ("Created SD-Size: %d", sd_ret.size ());
+  return write_sd (file, sd_ret);
 }
 
 /* Temporary access denied bits */
@@ -257,12 +255,10 @@ getace (__aclent32_t &acl, int type, int id, DWORD win_ace_mask,
 static int
 getacl (const char *file, DWORD attr, int nentries, __aclent32_t *aclbufp)
 {
-  DWORD sd_size = 4096;
-  char sd_buf[4096];
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
+  security_descriptor sd;
 
   int ret;
-  if ((ret = read_sd (file, psd, &sd_size)) <= 0)
+  if ((ret = read_sd (file, sd)) <= 0)
     {
       debug_printf ("read_sd %E");
       return ret;
@@ -274,7 +270,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent32_t *aclbufp)
   __uid32_t uid;
   __gid32_t gid;
 
-  if (!GetSecurityDescriptorOwner (psd, (PSID *) &owner_sid, &dummy))
+  if (!GetSecurityDescriptorOwner (sd, (PSID *) &owner_sid, &dummy))
     {
       debug_printf ("GetSecurityDescriptorOwner %E");
       __seterrno ();
@@ -282,7 +278,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent32_t *aclbufp)
     }
   uid = owner_sid.get_uid ();
 
-  if (!GetSecurityDescriptorGroup (psd, (PSID *) &group_sid, &dummy))
+  if (!GetSecurityDescriptorGroup (sd, (PSID *) &group_sid, &dummy))
     {
       debug_printf ("GetSecurityDescriptorGroup %E");
       __seterrno ();
@@ -305,7 +301,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent32_t *aclbufp)
   PACL acl;
   BOOL acl_exists;
 
-  if (!GetSecurityDescriptorDacl (psd, &acl_exists, &acl, &dummy))
+  if (!GetSecurityDescriptorDacl (sd, &acl_exists, &acl, &dummy))
     {
       __seterrno ();
       debug_printf ("GetSecurityDescriptorDacl %E");

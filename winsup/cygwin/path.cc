@@ -2491,6 +2491,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
   char w32topath[CYG_MAX_PATH + 1];
   DWORD written;
   SECURITY_ATTRIBUTES sa = sec_none_nih;
+  security_descriptor sd;
 
   /* POSIX says that empty 'frompath' is invalid input whlie empty
      'topath' is valid -- it's symlink resolver job to verify if
@@ -2565,7 +2566,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 
   if (allow_ntsec && win32_path.has_acls ())
     set_security_attribute (S_IFLNK | STD_RBITS | STD_WBITS,
-			    &sa, alloca (4096), 4096);
+			    &sa, sd);
 
   h = CreateFile (win32_path, GENERIC_WRITE, 0, &sa, create_how,
 		  FILE_ATTRIBUTE_NORMAL, 0);

@@ -442,8 +442,9 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
 	attr |= FILE_ATTRIBUTE_READONLY;
       SECURITY_ATTRIBUTES sa = sec_none;
+      security_descriptor sd;
       if (allow_ntsec && pc.has_acls ())
-	set_security_attribute (mode, &sa, alloca (4096), 4096);
+	set_security_attribute (mode, &sa, sd);
       HANDLE fh = CreateFile (pc, GENERIC_WRITE, 0, &sa, CREATE_NEW, attr, 0);
       if (fh == INVALID_HANDLE_VALUE)
 	{

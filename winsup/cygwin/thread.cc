@@ -1676,8 +1676,9 @@ semaphore::semaphore (const char *sem_name, int oflag, mode_t mode,
   if (oflag & O_CREAT)
     {
       SECURITY_ATTRIBUTES sa = sec_all;
+      security_descriptor sd;
       if (allow_ntsec)
-	set_security_attribute (mode, &sa, alloca (4096), 4096);
+	set_security_attribute (mode, &sa, sd);
       this->win32_obj_id = ::CreateSemaphore (&sa, value, LONG_MAX, sem_name);
       if (!this->win32_obj_id)
 	magic = 0;

@@ -342,6 +342,7 @@ fhandler_base::open (int flags, mode_t mode)
   int shared;
   int creation_distribution;
   SECURITY_ATTRIBUTES sa = sec_none;
+  security_descriptor sd;
 
   syscall_printf ("(%s, %p) query_open %d", get_win32_name (), flags, get_query_open ());
 
@@ -421,7 +422,7 @@ fhandler_base::open (int flags, mode_t mode)
   /* If the file should actually be created and ntsec is on,
      set files attributes. */
   if (flags & O_CREAT && get_device () == FH_FS && allow_ntsec && has_acls ())
-    set_security_attribute (mode, &sa, alloca (4096), 4096);
+    set_security_attribute (mode, &sa, sd);
 
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
 		  file_attributes, 0);
