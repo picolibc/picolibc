@@ -1,3 +1,8 @@
+2003-09-13  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (path_conv::ndisk_links): Fix potential
+	off-by-one problem when first file in a directory is a directory.
+
 2003-09-13  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* include/sys/cygwin.h: Rename PID_UNUSED to PID_MAP_RW.

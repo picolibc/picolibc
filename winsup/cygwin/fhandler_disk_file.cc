@@ -66,7 +66,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
       if (nNumberOfLinks > 1)
 	saw_dot--;
       else
-	while (FindNextFileA (h, &buf))
+	do
 	  {
 	    if (buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	      count++;
@@ -75,6 +75,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 		    || (buf.cFileName[1] == '.' && buf.cFileName[2] == '\0')))
 	      saw_dot--;
 	  }
+	while (FindNextFileA (h, &buf));
       FindClose (h);
     }
 
