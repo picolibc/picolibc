@@ -360,9 +360,6 @@ filesystem so we can also access the files under Windows 9x.
 
 @subsection Are mixed-case filenames possible with Cygwin?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 Several Unix programs expect to be able to use to filenames
 spelled the same way, but with different case.  A prime example
 of this is perl's configuration script, which wants @code{Makefile} and
@@ -370,9 +367,14 @@ of this is perl's configuration script, which wants @code{Makefile} and
 just different case, so the configuration fails.
 
 In releases prior to beta 16, mount had a special mixed case option
-which renamed files in such a way as to allow mixed case filenames.
-We chose to remove the support when we rewrote the path handling
-code for beta 16.
+which renamed files in such a way as to allow mixed case filenames.  We
+chose to remove the support when we rewrote the path handling code for
+beta 16.  The standard Windows apps -- explorer.exe,
+cmd.exe/command.com, etc. -- do not distinguish filenames that differed
+only in case, resulting in some (very) undesirable behavior.
+
+Sergey Okhapkin had maintained a mixed-case patch ('coolview') until
+about B20.1, but this has not been updated to recent versions of Cygwin.
 
 @subsection What about DOS special filenames?
 
