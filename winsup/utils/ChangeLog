@@ -1,3 +1,8 @@
+2001-11-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Print more detailed OS information string
+	using OSVERSIONINFOEX information.
+
 2001-11-11  Christopher Faylor  <cgf@redhat.com>
 
 	* cygcheck.cc (scan_registry): Open registry with read-only access.

@@ -771,47 +771,69 @@ dump_sysinfo ()
   switch (osversion.dwPlatformId)
     {
     case VER_PLATFORM_WIN32s:
-      osname = (char *) "win32s";
+      osname = (char *) "32s";
       break;
     case VER_PLATFORM_WIN32_WINDOWS:
       switch (osversion.dwMinorVersion)
 	{
 	case 0:
 	  if (strchr(osversion.szCSDVersion, 'C'))
-	    osname = (char *) "Win95OSR2";
+	    osname = (char *) "95 OSR2";
 	  else
-	    osname = (char *) "Win95";
+	    osname = (char *) "95";
 	  break;
 	case 10:
 	  if (strchr(osversion.szCSDVersion, 'A'))
-	    osname = (char *) "Win98SE";
+	    osname = (char *) "98 SE";
 	  else
-	    osname = (char *) "Win98";
+	    osname = (char *) "98";
 	  break;
 	case 90:
-	  osname = (char *) "WinME";
+	  osname = (char *) "ME";
 	  break;
 	default:
-	  osname = (char *) "Win9X";
+	  osname = (char *) "9X";
 	  break;
 	}
       break;
     case VER_PLATFORM_WIN32_NT:
       if (osversion.dwMajorVersion == 5)
 	{
+	  BOOL more_info = FALSE;
+	  OSVERSIONINFOEX osversionex;
+	  osversionex.dwOSVersionInfoSize = sizeof (osversionex);
+	  if (GetVersionEx ((OSVERSIONINFO *)&osversionex))
+	    more_info = TRUE;
 	  if (osversion.dwMinorVersion == 0)
-	    osname = (char *) "Win2000";
+	    {
+	      if (!more_info)
+		osname = (char *) "2000";
+	      else if (osversionex.wProductType == VER_NT_SERVER)
+	        osname = (char *) "2000 Server";
+	      else
+	        osname = (char *) "2000 Professional";
+	    }
 	  else
-	    osname = (char *) "WinXP";
+	    {
+	      if (!more_info)
+		osname = (char *) "XP";
+	      else if (osversionex.wProductType == VER_NT_SERVER)
+		osname = (char *) ".NET Server";
+	      else if (osversionex.wSuiteMask & VER_SUITE_PERSONAL)
+	        osname = (char *) "XP Home Edition";
+	      else
+	        osname = (char *) "XP Professional";
+		
+	    }
         }
       else
-	osname = (char *) "WinNT";
+	osname = (char *) "NT";
       break;
     default:
-      osname = (char *) "uknown-os";
+      osname = (char *) "??";
       break;
     }
-  printf ("%s Ver %d.%d build %d %s\n\n", osname,
+  printf ("Windows %s Ver %d.%d build %d %s\n\n", osname,
 	  (int) osversion.dwMajorVersion, (int) osversion.dwMinorVersion,
 	  (int) osversion.dwBuildNumber, osversion.szCSDVersion);
 
