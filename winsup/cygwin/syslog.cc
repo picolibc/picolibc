@@ -59,7 +59,7 @@ openlog (const char *ident, int logopt, int facility)
     debug_printf ("openlog called with (%s, %d, %d)",
 		       ident ? ident : "<NULL>", logopt, facility);
 
-    if (process_ident != 0)
+    if (process_ident != NULL)
       {
 	free (process_ident);
 	process_ident = 0;
@@ -122,6 +122,7 @@ class pass_handler
     int print (const char *,...);
     int print_va (const char *, va_list);
     char *get_message () const { return message_; }
+    void set_message (char *s) { message_ = s; }
 };
 
 pass_handler::pass_handler () : fp_ (0), message_ (0), total_len_ (0)
@@ -137,39 +138,27 @@ pass_handler::~pass_handler ()
 void
 pass_handler::shutdown ()
 {
-  if (fp_ != 0)
+  if (fp_ != NULL)
     {
       fclose (fp_);
       fp_ = 0;
     }
-  if (message_ != 0)
-      delete[] message_;
 }
 
 int
 pass_handler::initialize (int pass_number)
 {
     shutdown ();
-    if (pass_number == 0)
+    if (pass_number)
+      return total_len_ + 1;
+
+    fp_ = fopen ("/dev/null", "wb");
+    if (fp_ == NULL)
       {
-	fp_ = fopen ("/dev/null", "wb");
-	if (fp_ == 0)
-	  {
-	    debug_printf ("failed to open /dev/null");
-	    return -1;
-	  }
-	total_len_ = 0;
+	debug_printf ("failed to open /dev/null");
+	return -1;
       }
-    else
-      {
-	message_ = new char[total_len_ + 1];
-	if (message_ == 0)
-	  {
-	    debug_printf ("failed to allocate message_");
-	    return -1;
-	  }
-	message_[0] = '\0';
-      }
+    total_len_ = 0;
     return 0;
 }
 
@@ -190,9 +179,9 @@ pass_handler::print_va (const char *fmt, va_list list)
       {
 	int len = vfprintf (fp_, fmt, list);
 	if (len < 0)
-	    return -1;
-	  total_len_ += len;
-	  return 0;
+	  return -1;
+	total_len_ += len;
+	return 0;
       }
     else if (message_ != 0)
       {
@@ -236,9 +225,10 @@ syslog (int priority, const char *message, ...)
       if (*cp == '%' && cp[1] == 'm')
 	numfound++;
 
-    char *newmessage = new char [strlen (message) + (errlen * numfound)];
+    char *newmessage = (char *) alloca (strlen (message) +
+					(errlen * numfound) + 1);
 
-    if (newmessage == 0)
+    if (newmessage == NULL)
       {
 	debug_printf ("failed to allocate newmessage");
 	return;
@@ -283,14 +273,16 @@ syslog (int priority, const char *message, ...)
        output, then do it again to a malloc'ed string. This
        is ugly, slow, but prevents core dumps :-).
      */
-    int pass_number = 0;
     va_list ap;
 
     pass_handler pass;
-    for (; pass_number < 2; ++pass_number)
+    for (int pass_number = 0; pass_number < 2; ++pass_number)
       {
-	if (pass.initialize (pass_number) == -1)
+	int n = pass.initialize (pass_number);
+	if (n == -1)
 	  return;
+	else if (n > 0)
+	  pass.set_message ((char *) alloca (n));
 
 	/* Deal with ident_string */
 	if (process_ident != 0)
@@ -369,7 +361,7 @@ syslog (int priority, const char *message, ...)
 	   interleaved, we must lock the first byte of the file
 	   This works on Win32 even if we created the file above.
 	*/
-	HANDLE fHandle = dtable[fileno (fp)]->get_handle ();
+	HANDLE fHandle = fdtab[fileno (fp)]->get_handle ();
 	if (LockFile (fHandle, 0, 0, 1, 0) == FALSE)
 	  {
 	    debug_printf ("failed to lock file %s", get_win95_event_log_path());
