@@ -1793,13 +1793,16 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 .PHONY: do-tar-bz2
 do-tar-bz2:
 	echo "==> Making $(PACKAGE)-$(VER).tar.bz2"
-	tar cfh $(PACKAGE)-$(VER).tar $(PACKAGE)-$(VER)
+	-rm -f $(PACKAGE)-$(VER).tar.bz2
+	find $(PACKAGE)-$(VER) -follow -name CVS -prune -o -type f -print \
+		| tar cTfh - $(PACKAGE)-$(VER).tar
 	$(BZIPPROG) -v -9 $(PACKAGE)-$(VER).tar
 
 .PHONY: do-md5sum
 do-md5sum:
 	echo "==> Adding md5 checksum to top-level directory"
-	( cd proto-toplev && find * -follow -type f -print | xargs $(MD5PROG) ) > md5.sum
+	cd proto-toplev && find * -follow -name CVS -prune -o -type f -print \
+		| xargs $(MD5PROG) > ../md5.sum
 	mv md5.sum proto-toplev
 
 .PHONY: do-djunpack
