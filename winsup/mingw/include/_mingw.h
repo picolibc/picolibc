@@ -57,7 +57,7 @@
 #   define __MINGW_IMPORT  extern __attribute__((dllimport))
 #   endif
 #  define __DECLSPEC_SUPPORTED
-# else
+# else /* __declspec */
 #  undef __DECLSPEC_SUPPORTED
 #  undef __MINGW_IMPORT
 # endif 
@@ -65,9 +65,9 @@
 # define __int64 long long
 #endif /* __GNUC__ */
 
-#define __MINGW32_VERSION 2.3
+#define __MINGW32_VERSION 2.4
 #define __MINGW32_MAJOR_VERSION 2
-#define __MINGW32_MINOR_VERSION 3
+#define __MINGW32_MINOR_VERSION 4
 
 /*  ISO C++.  */
 #ifndef __HAVE_STD_CXX

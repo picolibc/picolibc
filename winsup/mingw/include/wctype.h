@@ -108,7 +108,7 @@ extern unsigned short** _imp___ctype;
 #define __WCTYPE_INLINES_DEFINED
 extern __inline__ int iswalnum(wint_t __wc) {return (iswctype(__wc,_ALPHA|_DIGIT));}
 extern __inline__ int iswalpha(wint_t __wc) {return (iswctype(__wc,_ALPHA));}
-extern __inline__ int iswascii(wint_t __wc) {return (((unsigned)__wc & 0x7F) ==0);}
+extern __inline__ int iswascii(wint_t __wc) {return ((__wc & ~0x7F) == 0);}
 extern __inline__ int iswcntrl(wint_t __wc) {return (iswctype(__wc,_CONTROL));}
 extern __inline__ int iswdigit(wint_t __wc) {return (iswctype(__wc,_DIGIT));}
 extern __inline__ int iswgraph(wint_t __wc) {return (iswctype(__wc,_PUNCT|_ALPHA|_DIGIT));}

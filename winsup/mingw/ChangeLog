@@ -1,3 +1,60 @@
+2003-01-27  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	Merge from mingw trunk (changes since 2002-12-10).
+
+	2003-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h (tgamma): Correct typo in comment.
+
+	2003-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/mingw-fseek.c (INLINE): Remove define.
+	(__mingw_is_win9x): Remove static inline function.
+	(_mingw_fwrite): Use _osver instead of __mingw_is_win9x.
+
+	2003-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/llround.c: Correct function name and
+	change return value to long long.
+
+	2003-01-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ctype.h (__isascii): Don't cast arg to unsigned.
+	(iswascii): Likewise.  Correct mask.
+	* include/wctype.h (iswascii): Don't cast arg to unsigned.
+	Correct mask
+
+	2003-01-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdlib.h (_osver, _winver, _winmajor,
+	_winminor): Declare as direct imports from dll if
+	__DECLSPEC_SUPPORTED.
+
+	2003-01-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* pseudo-reloc.c (do_pseudo_reloc): Make static.
+	* pseudo-reloc-list.c: New file.
+	* crt1.c (_pei386_runtime_relocator): Declare.
+	(__mingw_CRTStartup): Call it.
+	* dllcrt1.c (_pei386_runtime_relocator): Declare.
+	(DllMainCRTStartup): Call it.
+	* Makefile.in: Add pseudo-reloc.o pseude-reloc-list.o to
+	libmingw32.a.
+
+	2003-01-01  Egor Duda  <deo@logos-m.ru>
+
+	* pseudo-reloc.c: New file.
+
+	2002-12-20  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/_mingw.h: Increment version to 2.4.
+	Makefile.in: Ditto.
+
+	2002-12-12  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/malloc.h (_alloca): Add definition.
+	(alloca): Ditto.
+
 2002-12-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h (__HAVE_STD_CXX): Define to 0 for

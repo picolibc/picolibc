@@ -47,6 +47,9 @@
  *       a-good-idea use of include. */
 #include "init.c"
 
+
+extern void _pei386_runtime_relocator (void);
+
 extern int main (int, char **, char **);
 
 /*
@@ -202,6 +205,10 @@ __mingw_CRTStartup ()
    * NOTE: DLLs don't do this because that would be rude!
    */
   _mingw32_init_fmode ();
+
+  
+   /* Adust references to dllimported data that have non-zero offsets.  */
+  _pei386_runtime_relocator ();
 
   /*
    * Call the main function. If the user does not supply one
