@@ -843,6 +843,7 @@ static struct servent *servent_buf = NULL;
 extern "C" struct servent *
 cygwin_getservbyname (const char *name, const char *proto)
 {
+  sigframe thisframe (mainthread);
   if (check_null_str_errno (name)
       || (proto != NULL && check_null_str_errno (proto)))
     return NULL;
@@ -860,6 +861,7 @@ cygwin_getservbyname (const char *name, const char *proto)
 extern "C" struct servent *
 cygwin_getservbyport (int port, const char *proto)
 {
+  sigframe thisframe (mainthread);
   if (proto != NULL && check_null_str_errno (proto))
     return NULL;
 
@@ -877,6 +879,7 @@ cygwin_gethostname (char *name, size_t len)
 {
   int PASCAL win32_gethostname (char *, int);
 
+  sigframe thisframe (mainthread);
   if (__check_null_invalid_struct_errno (name, len))
     return -1;
 
@@ -958,6 +961,7 @@ cygwin_gethostbyname (const char *name)
   static char *tmp_addr_list[2];
   static int a, b, c, d;
 
+  sigframe thisframe (mainthread);
   if (check_null_str_errno (name))
     return NULL;
 
@@ -997,6 +1001,7 @@ cygwin_gethostbyname (const char *name)
 extern "C" struct hostent *
 cygwin_gethostbyaddr (const char *addr, int len, int type)
 {
+  sigframe thisframe (mainthread);
   if (__check_invalid_read_ptr_errno (addr, len))
     return NULL;
 
@@ -1040,6 +1045,7 @@ extern "C" int
 cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
 {
   int res;
+  sigframe thisframe (mainthread);
   fhandler_socket *fh = get (fd);
 
   if (__check_invalid_read_ptr_errno (my_addr, addrlen) || !fh)
@@ -1076,6 +1082,7 @@ extern "C" int
 cygwin_listen (int fd, int backlog)
 {
   int res;
+  sigframe thisframe (mainthread);
   fhandler_socket *fh = get (fd);
 
   if (!fh)
@@ -1197,6 +1204,7 @@ getdomainname (char *domain, size_t len)
    * in use and include paths for the Domain name in each ?
    * Punt for now and assume MS-TCP on Win95.
    */
+  sigframe thisframe (mainthread);
   if (__check_null_invalid_struct_errno (domain, len))
     return -1;
 
@@ -1790,6 +1798,7 @@ get_ifconf (struct ifconf *ifc, int what)
   unsigned long lip, lnp;
   struct sockaddr_in *sa;
 
+  sigframe thisframe (mainthread);
   if (check_null_invalid_struct_errno (ifc))
     return -1;
 
@@ -1989,6 +1998,7 @@ socketpair (int family, int type, int protocol, int *sb)
   cygheap_fdnew sb0;
   fhandler_socket *fh;
 
+  sigframe thisframe (mainthread);
   if (__check_null_invalid_struct_errno (sb, 2 * sizeof (int)))
     return -1;
 

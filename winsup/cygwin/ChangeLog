@@ -1,3 +1,7 @@
+2002-11-19  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc: Sprinkle sigframes throughout.
+
 2002-11-16  Christopher Faylor  <cgf@redhat.com>
 
 	* tty.cc (tty::make_pipes): Make pipe buffer larger.
