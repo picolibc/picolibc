@@ -110,19 +110,28 @@ itself a symbolic link, then find will not traverse it unless you
 specify the @samp{-follow} option.  This behavior is different than most
 other UNIX implementations, but is not likely to change.
 
-@subsection Why doesn't man work?
+@subsection Why doesn't man (or apropos) work?
 
 Even after installing the @samp{man} package, you get an error like this:
 
 @example
-	bash-2.03$ man man
+	bash-2.04$ man man
 	Error executing formatting or display command.
 	System command (cd /usr/man ; (echo -e ".pl 1100i"; cat /usr/man/man1/man.1; echo ".pl \n(nlu+10") | /usr/bin/tbl | /usr/bin/groff -Tascii -mandoc | less -is) exited with status 32512.
 	No manual entry for man
 @end example
 
 You also need /bin/sh, which is found in the @samp{ash} package.
-Install this too.
+You must install this too.
+
+In addition, before you can use @samp{man -k} or @samp{apropos}, you
+must create the whatis database.  Just run the command
+
+@example
+	/usr/sbin/makewhatis
+@end example
+
+(it may take a minute to complete).
 
 @subsection Why doesn't chmod work?
 
