@@ -131,9 +131,6 @@ DLL_OFILES:=assert.o autoload.o cygheap.o dcrt0.o debug.o delqueue.o dir.o \
 
 GMON_OFILES:= gmon.o mcount.o profil.o
 
-LD_STUFF=--dll $(DLL_OFILES) version.o winver.o $(DLL_IMPORTS) $(LIBM) $(LIBC) \
-	 $(LIBGCC) -e $(DLL_ENTRY) --image-base=0x61000000
-
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host
 
 .SUFFIXES:
@@ -193,7 +190,7 @@ new-$(LIB_NAME): $(LIB_NAME)
 
 new-$(DLL_NAME): $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
 	$(CXX) $(CXXFLAGS) -nostartfiles -Wl,-shared -o $@ -e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o \
-	winver.o $(DLL_IMPORTS) $(LIBM) $(MALLOC_OBJ) $(LIBC)
+	winver.o $(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC)
 
 dll_ofiles: $(DLL_OFILES)
 
@@ -211,7 +208,7 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 
 cygrun.exe : cygrun.o $(LIB_NAME) $(w32api_lib)/libuser32.a \
 	     $(w32api_lib)/libshell32.a $(w32api_lib)/libkernel32.a
-	$(CC) -nodefaultlibs -o $@ $^ $(LIBGCC)
+	$(CC) -nodefaultlibs -o $@ $^
 
 #
 
