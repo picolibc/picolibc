@@ -713,12 +713,20 @@ normalize_win32_path (const char *src, char *dst)
   char *dst_start = dst;
   char *dst_root_start = dst;
 
-  if (strchr (src, ':') == NULL)
+  if (strchr (src, ':') == NULL && !slash_unc_prefix_p (src))
     {
       if (!cygcwd.get (dst, 0))
 	return get_errno ();
       if (SLASH_P (src[0]))
-	dst[2] = '\0';
+	if (dst[1] == ':')
+	  dst[2] = '\0';
+	else if (slash_unc_prefix_p (dst))
+	  {
+	    char *p = strpbrk (dst + 2, "\\/");
+	    if (p && (p = strpbrk (p + 1, "\\/")))
+		*p = '\0';
+	  }
+	
       else if (strlen (dst) + 1 + strlen (src) >= MAX_PATH)
 	{
 	  debug_printf ("ENAMETOOLONG = normalize_win32_path (%s)", src);
@@ -881,7 +889,7 @@ slash_unc_prefix_p (const char *path)
 	     && isalpha (path[2])
 	     && path[3] != 0
 	     && !isdirsep (path[3])
-	     && ((p = strchr(&path[3], '/')) != NULL));
+	     && ((p = strpbrk(path + 3, "\\/")) != NULL));
   if (!ret || p == NULL)
     return ret;
   return ret && isalnum (p[1]);

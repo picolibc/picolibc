@@ -1,3 +1,8 @@
+Sun Dec  3 01:20:25 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (normalize_win32_path): Handle UNC paths better.
+	(slash_unc_prefix_p): Allow backslash UNC paths.
+
 Sun Dec  3 00:20:25 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Remove some extra cruft.
