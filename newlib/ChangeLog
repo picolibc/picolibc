@@ -1,3 +1,8 @@
+Fri Jan  5 19:57:00 EST 2001  Aaron J. Grier  <aaron@frye.com>
+
+	* src/newlib/configure.host (*-*-rtems*): add printf long long
+	support for RTEMS.
+
 2000-12-19  Graham Stott <grahams@redhat.com>
 
         * libc/machine/xscale/memcmp.c (memcmp): Add clobber for "lr".
