@@ -1,3 +1,7 @@
+Wed Sep 12 23:06:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* wincap.cc (wincapc::init): Simplify W2K/XP case.
+
 Wed Sep 12 23:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* wincap.cc (wincapc::init): Set os name to "NT" on XP, too.

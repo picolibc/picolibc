@@ -402,16 +402,11 @@ wincapc::init ()
 	        caps = &wincap_nt4sp4;
 	      break;
 	    case 5:
+	      os = "NT";
 	      if (version.dwMinorVersion == 0)
-	        {
-		  os = "NT";
-		  caps = &wincap_2000;
-		}
+		caps = &wincap_2000;
 	      else
-	        {
-		  os = "NT";
-		  caps = &wincap_xp;
-		}
+		caps = &wincap_xp;
 	      break;
 	    default:
 	      os = "??";
