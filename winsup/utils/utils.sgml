@@ -662,7 +662,7 @@ set the automount prefix to <filename>/</filename>:</para>
 </screen>
 </example>
 
-<para>Note that you if you set a new prefix in this manner, you can
+<para>Note that if you set a new prefix in this manner, you can
 specify the <literal>-s</literal> flag to make this the system-wide default 
 prefix.  By default, the cygdrive-prefix applies only to the current user.  
 You can always see the user and system cygdrive prefixes with the 
