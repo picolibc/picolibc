@@ -49,11 +49,11 @@ static NO_COPY muto *mask_sync = NULL;
 
 HMODULE NO_COPY cygwin_hmodule;
 
-static const struct
+NO_COPY static struct
 {
   unsigned int code;
   const char *name;
-} status_info[] NO_COPY =
+} status_info[] =
 {
 #define X(s) s, #s
   { X (STATUS_ABANDONED_WAIT_0) },

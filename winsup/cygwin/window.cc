@@ -74,7 +74,7 @@ Winmain (VOID *)
 {
   MSG msg;
   WNDCLASS wc;
-  static const NO_COPY char classname[] = "CygwinWndClass";
+  static NO_COPY char classname[] = "CygwinWndClass";
 
   /* Register the window class for the main window. */
 

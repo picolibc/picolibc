@@ -501,7 +501,7 @@ struct tzhead {
 
 static char wildabbr[] NO_COPY = WILDABBR;
 
-static const char gmt[] NO_COPY = "GMT";
+static char gmt[] NO_COPY = "GMT";
 
 struct ttinfo {				/* time type information */
 	long		tt_gmtoff;	/* UTC offset in seconds */

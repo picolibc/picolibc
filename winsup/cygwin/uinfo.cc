@@ -59,7 +59,7 @@ internal_getlogin (cygheap_user &user)
       if (user.name () && user.domain ())
 	debug_printf ("User: %s, Domain: %s, Logon Server: %s",
 		      user.name (), user.domain (), user.logsrv ());
-      else if (!(ret = NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&wui)))
+      else if (!(ret = NetWkstaUserGetInfo (NULL, 1, (LPBYTE *) &wui)))
 	{
 	  sys_wcstombs (buf, wui->wkui1_username, UNLEN + 1);
 	  user.set_name (buf);
@@ -78,17 +78,17 @@ internal_getlogin (cygheap_user &user)
 	}
       LPUSER_INFO_3 ui = NULL;
       WCHAR wuser[UNLEN + 1];
-      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
 
       /* HOMEDRIVE and HOMEPATH are wrong most of the time, too,
 	 after changing user context! */
       sys_mbstowcs (wuser, user.name (), UNLEN + 1);
       if (NetUserGetInfo (NULL, wuser, 3, (LPBYTE *) &ui) && user.logsrv ())
 	{
+	  WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
 	  strcat (strcpy (buf, "\\\\"), user.logsrv ());
 	  sys_mbstowcs (wlogsrv, buf, INTERNET_MAX_HOST_NAME_LENGTH + 3);
 	  ui = NULL;
-	  if (NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *) &ui))
+	  if (NetUserGetInfo (wlogsrv, wuser, 3, (LPBYTE *) &ui))
 	    ui = NULL;
 	}
       if (ui)

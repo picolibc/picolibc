@@ -1647,7 +1647,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 static struct {
   int vk;
   const char *val[4];
-} const keytable[] NO_COPY = {
+} keytable[] NO_COPY = {
 	       /* NORMAL */  /* SHIFT */    /* CTRL */       /* ALT */
   {VK_LEFT,	{"\033[D",	"\033[D",	"\033[D",	"\033\033[D"}},
   {VK_RIGHT,	{"\033[C",	"\033[C",	"\033[C",	"\033\033[C"}},

@@ -1,3 +1,8 @@
+2001-10-12  Christopher Faylor  <cgf@redhat.com>
+
+	* autoload.cc (wsock_init): Reorganize slightly to accomodate a new
+	compiler.
+
 2001-10-11  Egor Duda  <deo@logos-m.ru>
 
 	* net.cc (cygwin_sendto): Use correct socket address when sending

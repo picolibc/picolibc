@@ -198,7 +198,7 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
     }
   if (new_sock != INVALID_SOCKET && ws2_32_handle)
     {
-      debug_printf ("WSASocket went fine");
+      debug_printf ("WSASocket went fine %p", new_sock);
       set_io_handle ((HANDLE) new_sock);
     }
   else

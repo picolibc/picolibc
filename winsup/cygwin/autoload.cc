@@ -244,7 +244,6 @@ wsock_init ()
   extern WSADATA wsadata;
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
   struct dll_info *dll = func->dll;
-  retchain ret;
 
   __asm__ ("						\n\
 	.section .ws2_32_info				\n\
@@ -293,6 +292,7 @@ wsock_init ()
 	movl	$dll_chain1,4(%ebp)	\n\
   ");
 
+  volatile retchain ret;
   /* Set "arguments for dll_chain1. */
   ret.low = (long) dll_func_load;
   ret.high = (long) func;
