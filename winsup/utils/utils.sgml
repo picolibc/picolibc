@@ -579,7 +579,7 @@ Usage strace [-m mask] [-o output-file] [ft] program [args...]
 -m mask		  mask for reporting cygwin events (default 1)
 -n		  convert Win32 error messages to text
 -o output-file	  output file to hold strace events (default stderr)
--f		  follow forked subprocesses
+-t		  output time in hh:mm:ss format
 -u		  include time in usecs since start for each line (default)
 </screen>
 
