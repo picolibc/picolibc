@@ -929,6 +929,8 @@ EOF
 	  echo s390-ibm-linux && exit 0
 	elif test "${UNAME_MACHINE}" = "x86_64"; then
 	  echo x86_64-unknown-linux-gnu && exit 0
+	elif test "${UNAME_MACHINE}" = "parisc64" -o "${UNAME_MACHINE}" = "hppa64"; then
+	  echo hppa64-unknown-linux-gnu && exit 0
 	elif test "${UNAME_MACHINE}" = "parisc" -o "${UNAME_MACHINE}" = "hppa"; then
 	  # Look for CPU level
 	  case `grep '^cpu[^a-z]*:' /proc/cpuinfo 2>/dev/null | cut -d' ' -f2` in
