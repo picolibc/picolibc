@@ -670,7 +670,7 @@ fhandler_dev_tape::tape_get_blocksize (long *min, long *def, long *max, long *cu
 
   while (((lasterr = GetTapeParameters (get_handle (),
 					GET_TAPE_MEDIA_INFORMATION,
-					(varlen = sizeof mp, &varlen),
+					(varlen = sizeof dp, &varlen),
 					&mp)) == ERROR_MEDIA_CHANGED)
 	 || (lasterr == ERROR_BUS_RESET))
     ;

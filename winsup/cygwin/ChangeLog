@@ -1,3 +1,8 @@
+Fri Jun 22 16:12:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_tape.cc (fhandler_dev_tape::tape_erase): Set size
+	parameter to value expected by GetTapeParameters().
+
 Thu Jun 21 22:01:39 2001  Marius Gedminas <mgedmin@delfi.lt>
 
 	* fhandler_console.cc (fhandler_console::read): Detect AltGr more
