@@ -19,8 +19,18 @@ extern "C"
 
 #include <sys/sysmacros.h>
 
-typedef struct timespec timespec_t, timestruc_t;
+#ifndef __timespec_t_defined
+#define __timespec_t_defined
+typedef struct timespec timespec_t;
+#endif /*__timespec_t_defined*/
 
+#ifndef __timestruc_t_defined
+#define __timestruc_t_defined
+typedef struct timespec timestruc_t;
+#endif /*__timestruc_t_defined*/
+
+#ifndef __off_t_defined
+#define __off_t_defined
 typedef long __off32_t;
 typedef long long __off64_t;
 #ifdef __CYGWIN_USE_BIG_TYPES__
@@ -28,7 +38,10 @@ typedef __off64_t off_t;
 #else
 typedef __off32_t off_t;
 #endif
+#endif /*__off_t_defined*/
 
+#ifndef __dev_t_defined
+#define __dev_t_defined
 typedef short __dev16_t;
 typedef unsigned long __dev32_t;
 #ifdef __CYGWIN_USE_BIG_TYPES__
@@ -36,9 +49,15 @@ typedef __dev32_t dev_t;
 #else
 typedef __dev16_t dev_t;
 #endif
+#endif /*__dev_t_defined*/
 
+#ifndef __blksize_t_defined
+#define __blksize_t_defined
 typedef long blksize_t;
+#endif /*__blksize_t_defined*/
 
+#ifndef __blkcnt_t_defined
+#define __blkcnt_t_defined
 typedef long __blkcnt32_t;
 typedef long long __blkcnt64_t;
 #ifdef __CYGWIN_USE_BIG_TYPES__
@@ -46,18 +65,128 @@ typedef __blkcnt64_t  blkcnt_t;
 #else
 typedef __blkcnt32_t  blkcnt_t;
 #endif
+#endif /*__blkcnt_t_defined*/
 
+#ifndef __uid_t_defined
+#define __uid_t_defined
 typedef unsigned short __uid16_t;
-typedef unsigned short __gid16_t;
 typedef unsigned long  __uid32_t;
-typedef unsigned long  __gid32_t;
 #ifdef __CYGWIN_USE_BIG_TYPES__
 typedef __uid32_t uid_t;
-typedef __gid32_t gid_t;
 #else
 typedef __uid16_t uid_t;
+#endif
+#endif /*__uid_t_defined*/
+
+#ifndef __gid_t_defined
+#define __gid_t_defined
+typedef unsigned short __gid16_t;
+typedef unsigned long  __gid32_t;
+#ifdef __CYGWIN_USE_BIG_TYPES__
+typedef __gid32_t gid_t;
+#else
 typedef __gid16_t gid_t;
 #endif
+#endif /*__gid_t_defined*/
+
+#ifndef __ino_t_defined
+#define __ino_t_defined
+#ifdef __CYGWIN_USE_BIG_TYPES1__
+typedef unsigned long long ino_t;
+#else
+typedef unsigned long ino_t;
+#endif
+#endif /*__ino_t_defined*/
+
+#ifndef __BIT_TYPES_DEFINED
+#define __BIT_TYPES_DEFINED__ 1
+
+#ifndef __vm_offset_t
+#define __vm_offset_t_defined
+typedef unsigned long vm_offset_t;
+#endif /*__vm_offset_t_defined*/
+
+#ifndef __vm_size_t
+#define __vm_size_t_defined
+typedef unsigned long vm_size_t;
+#endif /*__vm_size_t_defined*/
+
+#ifndef __int8_t_defined
+#define __int8_t_defined
+typedef char int8_t;
+#endif
+#ifndef __int16_t_defined
+#define __int16_t_defined
+typedef __int16_t int16_t;
+#endif
+#ifndef __int32_t_defined
+#define __int32_t_defined
+typedef __int32_t int32_t;
+#endif
+#ifndef __int64_t_defined
+#define __int64_t_defined
+typedef __int64_t int64_t;
+#endif
+
+#ifndef __uint8_t_defined
+#define __uint8_t_defined
+typedef unsigned char uint8_t;
+#endif
+#ifndef __uint16_t_defined
+#define __uint16_t_defined
+typedef __uint16_t uint16_t;
+#endif
+#ifndef __uint32_t_defined
+#define __uint32_t_defined
+typedef __uint32_t uint32_t;
+#endif
+#ifndef __uint64_t_defined
+#define __uint64_t_defined
+typedef __uint64_t uint64_t;
+#endif
+
+#ifndef __uint8_t_defined
+#define __uint8_t_defined
+typedef unsigned char u_int8_t;
+#endif
+#ifndef __uint16_t_defined
+#define __uint16_t_defined
+typedef __uint16_t u_int16_t;
+#endif
+#ifndef __uint32_t_defined
+#define __uint32_t_defined
+typedef __uint32_t u_int32_t;
+#endif
+#ifndef __uint64_t_defined
+#define __uint64_t_defined
+typedef __uint64_t u_int64_t;
+#endif
+
+#ifndef __uintptr_t_defined
+#define __uintptr_t_defined
+typedef unsigned long uintptr_t;
+#endif
+
+#ifndef __intptr_t_defined
+#define __intptr_t_defined
+typedef long intptr_t;
+#endif
+
+#ifndef __register_t_defined
+#define __register_t_defined
+typedef __int32_t register_t;
+#endif
+
+#ifndef __addr_t_defined
+#define __addr_t_defined
+typedef char *addr_t;
+#endif
+
+#ifndef __mode_t_defined
+#define __mode_t_defined
+typedef unsigned mode_t;
+#endif
+#endif /*__BIT_TYPES_DEFINED*/
 
 #if !defined(__INSIDE_CYGWIN__) || !defined(__cplusplus)
 

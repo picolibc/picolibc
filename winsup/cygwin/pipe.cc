@@ -62,7 +62,8 @@ static DWORD WINAPI
 read_pipe (void *arg)
 {
   pipeargs *pi = (pipeargs *) arg;
-  pi->fh->fhandler_base::read (pi->ptr, *pi->len);
+  fhandler_base *fh = dynamic_cast<fhandler_base *> (pi->fh);
+  fh->fhandler_base::read (pi->ptr, *pi->len);
   return 0;
 }
 

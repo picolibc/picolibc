@@ -276,7 +276,7 @@ cygthread::detach (HANDLE sigwait)
     system_printf ("called detach on available thread %d?", avail);
   else
     {
-      DWORD avail = id;
+      DWORD newavail = id;
       DWORD res;
 
       if (!sigwait)
@@ -299,7 +299,7 @@ cygthread::detach (HANDLE sigwait)
 	      terminate_thread ();
 	      set_sig_errno (EINTR);	/* caller should be dealing with return
 					   values. */
-	      avail = 0;
+	      newavail = 0;
 	      signalled = true;
 	    }
 	}
@@ -307,7 +307,7 @@ cygthread::detach (HANDLE sigwait)
       thread_printf ("%s returns %d, id %p", sigwait ? "WFMO" : "WFSO",
 		     res, id);
 
-      if (!avail)
+      if (!newavail)
 	/* already handled */;
       else if (is_freerange)
 	{
@@ -318,7 +318,7 @@ cygthread::detach (HANDLE sigwait)
 	{
 	  ResetEvent (*this);
 	  /* Mark the thread as available by setting avail to non-zero */
-	  (void) InterlockedExchange ((LPLONG) &this->avail, avail);
+	  (void) InterlockedExchange ((LPLONG) &avail, newavail);
 	}
     }
   return signalled;

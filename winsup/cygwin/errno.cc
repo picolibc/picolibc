@@ -681,11 +681,7 @@ strerror (int errnum)
       error = "Value too large for defined data type";
       break;
     default:
-#ifdef _MT_SAFE
       char *buf= _reent_winsup ()->_strerror_buf;
-#else
-      static NO_COPY char buf[20];
-#endif
       __small_sprintf (buf, "error %d", errnum);
       error = buf;
       break;
