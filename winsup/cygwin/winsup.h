@@ -14,7 +14,6 @@ details. */
 
 #define __INSIDE_CYGWIN__
 
-#define alloca __builtin_alloca
 #define strlen __builtin_strlen
 #define strcmp __builtin_strcmp
 #define strcpy __builtin_strcpy
