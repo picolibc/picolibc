@@ -54,7 +54,7 @@ int
 fhandler_base::puts_readahead (const char *s, size_t len)
 {
   int success = 1;
-  while ((*s || (len != (size_t) -1 && len--))
+  while ((len == (size_t) -1 ? *s : len--)
 	 && (success = put_readahead (*s++) > 0))
     continue;
   return success;

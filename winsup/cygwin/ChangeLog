@@ -1,3 +1,7 @@
+2004-12-12  Bas van Gompel  <cygwin-patch@bavag.tmfweb.nl>
+
+	* fhandler.cc (fhandler_base::puts_readahead): Fix end-condition.
+
 2004-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (errmap): Map ERROR_INVALID_ADDRESS to EINVAL instead of
