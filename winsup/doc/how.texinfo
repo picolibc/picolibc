@@ -846,6 +846,11 @@ net release.)}
 Did you explicitly call tzset() before checking the value of _timezone?
 If not, you must do so.
 
+@subsection Is there a mouse interface?
+
+There is no way to capture mouse events from Cygwin.  There are
+currently no plans to add support for this.
+
 @section Programming Questions
 
 @subsection Why are compiled executables so huge?!?
