@@ -200,13 +200,26 @@ extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
 static int
 handle_threadlist_exception (EXCEPTION_RECORD *e, void *frame, CONTEXT *, void *)
 {
-  small_printf ("in handle_threadlist_exception!\n");
   if (e->ExceptionCode != STATUS_ACCESS_VIOLATION)
-    return 1;
+    {
+      system_printf ("handle_threadlist_exception called with exception code %d\n",
+		     e->ExceptionCode);
+      return 1;
+    }
 
   sentry here;
-  if (threadlist_ix != BAD_IX || !here.acquired ())
-    return 1;
+  if (threadlist_ix == BAD_IX)
+    {
+      system_printf ("handle_threadlist_exception called with threadlist_ix %d\n",
+		     BAD_IX);
+      return 1;
+    }
+
+  if (!here.acquired ())
+    {
+      system_printf ("handle_threadlist_exception couldn't aquire muto\n");
+      return 1;
+    }
 
   extern void *threadlist_exception_return;
   cygheap->threadlist[threadlist_ix]->remove (INFINITE);
