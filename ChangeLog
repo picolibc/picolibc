@@ -1,3 +1,8 @@
+2003-05-20  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
+
+	* configure.in: Use curly braces in the definition of tooldir.
+	* configure: Regenerate.
+
 2003-05-19  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in: Switch more things to use maybe dependencies.
