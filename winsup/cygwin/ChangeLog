@@ -1,3 +1,7 @@
+Sun Jan 28 01:25:33 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Bump API version.
+
 Sun Jan 28 01:18:22 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (init_cheap): Move username initialization.

@@ -124,10 +124,11 @@ details. */
        31: Export inet_aton
        32: Export getrlimit/setrlimit
        33: Export setlogmask
+       34: Separated out mount table
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 33
+#define CYGWIN_VERSION_API_MINOR 34
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
