@@ -100,7 +100,7 @@ void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
 BOOL __stdcall proc_exists (_pinfo *);
 BOOL __stdcall pid_exists (pid_t);
-int __stdcall sig_send (_pinfo *, int, DWORD ebp = 0);
+int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_address (0));
 void __stdcall signal_fixup_after_fork ();
 
 extern char myself_nowait_dummy[];

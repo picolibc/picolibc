@@ -593,7 +593,7 @@ interruptible (DWORD pc, int testvalid = 0)
       MEMORY_BASIC_INFORMATION m;
       memset (&m, 0, sizeof m);
       if (!VirtualQuery ((LPCVOID) pc, &m, sizeof m))
-	sigproc_printf ("couldn't get memory info, %E");
+	sigproc_printf ("couldn't get memory info, pc %p, %E", pc);
 
       char *checkdir = (char *) alloca (windows_system_directory_length + 4);
       memset (checkdir, 0, sizeof (checkdir));

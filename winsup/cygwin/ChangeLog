@@ -1,3 +1,9 @@
+Thu Oct  5 00:48:40 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (interruptible): Add extra debugging.
+	* sigproc.h (wait_sig): Fill in frame pointer, by default, prior to
+	calling or suffer confusion due to September 7 change below.
+
 Wed Oct  4 23:10:27 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/netinet/tcp.h: Remove winsock.h include.

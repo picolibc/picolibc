@@ -1270,6 +1270,7 @@ wait_sig (VOID *)
 	    {
 	      if (sig == SIGCHLD)
 		saw_sigchld = 1;
+
 	      if (sig > 0 && sig != SIGCONT && sig != SIGKILL && sig != SIGSTOP &&
 		  (sigismember (& myself->getsigmask (), sig) ||
 		   myself->process_state & PID_STOPPED))
