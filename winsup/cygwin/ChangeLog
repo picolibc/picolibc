@@ -1,3 +1,7 @@
+2002-08-08  Joe Buehler  <jbuehler@hekimian.com
+
+	* sec_helper.cc (sec_acl): remove extraneous arg to debug_printf.
+
 2002-08-07  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler_socket.cc (fhandler_socket::accept): Fix FIONBIO call.
