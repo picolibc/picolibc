@@ -26,7 +26,7 @@ from the bash shell (provided) or from the command.com.</para>
 covered by the standard X11 license, some of it is public domain,
 some of it was written by Red Hat and placed under the GPL. None of it
 is shareware. You don't have to pay anyone to use it but you should be
-sure to read the copyright section of the FAQ more more information on
+sure to read the copyright section of the FAQ for more information on
 how the GNU General Public License may affect your use of these
 tools. If you intend to port a proprietary application using the Cygwin
 library, you may want the Cygwin proprietary-use license.

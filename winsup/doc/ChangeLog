@@ -1,3 +1,7 @@
+2002-03-01  Christopher Faylor  <cgf@redhat.com>
+
+	* overview.sgml: Fix 'more more' typo.
+
 2002-01-12  Christopher Faylor  <cgf@redhat.com>
 
 	* overview.sgml: Fix Red Hat cygwin contract link.
