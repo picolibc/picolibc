@@ -82,6 +82,7 @@ thread_start NO_COPY start_buf[NTHREADS] = {{0, NULL,NULL}};
 static DWORD WINAPI
 thread_stub (VOID *arg)
 {
+  DECLARE_TLS_STORAGE;
   LPTHREAD_START_ROUTINE threadfunc = ((thread_start *) arg)->func;
   VOID *threadarg = ((thread_start *) arg)->arg;
 

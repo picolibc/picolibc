@@ -1,3 +1,17 @@
+2001-11-27  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din (ualarm): New export.
+	* dcrt0.cc (_dll_crt0): Add experimental tls storage declaration.
+	(dll_crt0): Ditto.
+	* debug.cc (thread_stub): Ditto.
+	* thread.cc: Minor cleanup.
+	(__pthread_create): Add experimental tls storage declaration.
+	* miscfuncs.cc: Define tls index.
+	* winsup.h: Declare experimental tls storage.
+
+	* window.cc (alarm): Use old timer return from setitimer.
+	(ualarm): New function.
+
 2001-11-26  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (libcygwin.a): Use ar commands to build libcygwin.a since

@@ -803,6 +803,7 @@ initial_env ()
 extern "C" void __stdcall
 _dll_crt0 ()
 {
+  DECLARE_TLS_STORAGE;
   initial_env ();
   char zeros[sizeof (fork_info->zero)] = {0};
 #ifdef DEBUGGING
@@ -853,6 +854,7 @@ _dll_crt0 ()
 void
 dll_crt0 (per_process *uptr)
 {
+  DECLARE_TLS_STORAGE;
   /* Set the local copy of the pointer into the user space. */
   if (uptr && uptr != user_data)
     {

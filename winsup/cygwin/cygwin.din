@@ -858,6 +858,8 @@ ttyname
 _ttyname = ttyname
 tzset
 _tzset = tzset
+ualarm
+_ualarm = ualarm
 umask
 _umask = umask
 uname
@@ -866,6 +868,8 @@ ungetc
 _ungetc = ungetc
 unlink
 _unlink = unlink
+usleep
+_usleep = usleep
 utime
 _utime = utime
 utimes
@@ -963,8 +967,6 @@ wcscmp
 _wcscmp = wcscmp
 wcslen
 _wcslen = wcslen
-usleep
-_usleep = usleep
 wprintf
 _wprintf = wprintf
 memccpy

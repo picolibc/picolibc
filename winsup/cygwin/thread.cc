@@ -289,7 +289,7 @@ MTinterface::Init (int forked)
       thread_self_dwTlsIndex = TlsAlloc ();
       if (thread_self_dwTlsIndex == TLS_OUT_OF_INDEXES)
 	system_printf
-	  ("local storage for thread couldn't be set\nThis means that we are not thread safe!\n");
+	  ("local storage for thread couldn't be set\nThis means that we are not thread safe!");
     }
 
   concurrency = 0;
@@ -323,21 +323,21 @@ void
 MTinterface::fixup_after_fork (void)
 {
   pthread_mutex *mutex = mutexs;
-  debug_printf("mutexs is %x\n",mutexs);
+  debug_printf ("mutexs is %x",mutexs);
   while (mutex)
     {
       mutex->fixup_after_fork ();
       mutex = mutex->next;
     }
   pthread_cond *cond = conds;
-  debug_printf("conds is %x\n",conds);
+  debug_printf ("conds is %x",conds);
   while (cond)
     {
       cond->fixup_after_fork ();
       cond = cond->next;
     }
   semaphore *sem = semaphores;
-  debug_printf("semaphores is %x\n",semaphores);
+  debug_printf ("semaphores is %x",semaphores);
   while (sem)
     {
       sem->fixup_after_fork ();
@@ -375,7 +375,7 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   function = func;
   arg = threadarg;
 
-  win32_obj_id =::CreateThread (&sec_none_nih, attr.stacksize,
+  win32_obj_id = ::CreateThread (&sec_none_nih, attr.stacksize,
 				(LPTHREAD_START_ROUTINE) thread_init_wrapper,
 				this, CREATE_SUSPENDED, &thread_id);
 
@@ -420,14 +420,14 @@ pthread_cond::pthread_cond (pthread_condattr *attr):verifyable_object (PTHREAD_C
   this->mutex = NULL;
   this->waiting = 0;
 
-  this->win32_obj_id =::CreateEvent (&sec_none_nih, false,	/*auto signal reset - which I think is pthreads like ? */
+  this->win32_obj_id = ::CreateEvent (&sec_none_nih, false,	/*auto signal reset - which I think is pthreads like ? */
 				     false,	/*start non signaled */
 				     NULL /*no name */);
   /*TODO: make a shared mem mutex if out attributes request shared mem cond */
-  cond_access=NULL;
+  cond_access = NULL;
   if ((temperr = pthread_mutex_init (&this->cond_access, NULL)))
     {
-      system_printf ("couldn't init mutex, this %0p errno=%d\n", this, temperr);
+      system_printf ("couldn't init mutex, this %p errno %d", this, temperr);
       /*we need the mutex for correct behaviour */
       magic = 0;
     }
@@ -461,33 +461,33 @@ pthread_cond::BroadCast ()
 {
   /* TODO: implement the same race fix as Signal has */
   if (pthread_mutex_lock (&cond_access))
-    system_printf ("Failed to lock condition variable access mutex, this %0p\n", this);
+    system_printf ("Failed to lock condition variable access mutex, this %p", this);
   int count = waiting;
   if (verifyable_object_isvalid (&mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     {
       if (pthread_mutex_unlock (&cond_access))
-	system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
+	system_printf ("Failed to unlock condition variable access mutex, this %p", this);
       /*This isn't and API error - users are allowed to call this when no threads
 	 are waiting
-	 system_printf ("Broadcast called with invalid mutex\n");
+	 system_printf ("Broadcast called with invalid mutex");
       */
       return;
     }
   while (count--)
     PulseEvent (win32_obj_id);
   if (pthread_mutex_unlock (&cond_access))
-    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
+    system_printf ("Failed to unlock condition variable access mutex, this %p", this);
 }
 
 void
 pthread_cond::Signal ()
 {
   if (pthread_mutex_lock (&cond_access))
-    system_printf ("Failed to lock condition variable access mutex, this %0p\n", this);
+    system_printf ("Failed to lock condition variable access mutex, this %p", this);
   if (verifyable_object_isvalid (&mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     {
       if (pthread_mutex_unlock (&cond_access))
-	system_printf ("Failed to unlock condition variable access mutex, this %0p\n",
+	system_printf ("Failed to unlock condition variable access mutex, this %p",
 		       this);
       return;
     }
@@ -496,7 +496,7 @@ pthread_cond::Signal ()
     /* nothing to signal */
     {
       if (pthread_mutex_unlock (&cond_access))
-	system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
+	system_printf ("Failed to unlock condition variable access mutex, this %p", this);
       return;
     }
   PulseEvent (win32_obj_id);
@@ -518,7 +518,7 @@ pthread_cond::Signal ()
     }
   InterlockedDecrement (&waiting);
   if (pthread_mutex_unlock (&cond_access))
-    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
+    system_printf ("Failed to unlock condition variable access mutex, this %p", this);
 }
 
 int
@@ -563,16 +563,16 @@ pthread_cond::TimedWait (DWORD dwMilliseconds)
 void
 pthread_cond::fixup_after_fork ()
 {
-  debug_printf("cond %x in fixup_after_fork\n", this);
+  debug_printf ("cond %x in fixup_after_fork", this);
   if (shared != PTHREAD_PROCESS_PRIVATE)
-    api_fatal("doesn't understand PROCESS_SHARED condition variables\n");
+    api_fatal ("doesn't understand PROCESS_SHARED condition variables");
   /* FIXME: duplicate code here and in the constructor. */
-  this->win32_obj_id =::CreateEvent (&sec_none_nih, false, false, NULL);
+  this->win32_obj_id = ::CreateEvent (&sec_none_nih, false, false, NULL);
   if (!win32_obj_id)
-    api_fatal("failed to create new win32 mutex\n");
+    api_fatal ("failed to create new win32 mutex");
 #if DETECT_BAD_APPS
   if (waiting)
-    api_fatal("Forked() while a condition variable has waiting threads.\nReport to cygwin@cygwin.com\n");
+    api_fatal ("Forked () while a condition variable has waiting threads.\nReport to cygwin@cygwin.com");
 #else
   waiting = 0;
   mutex = NULL;
@@ -641,7 +641,7 @@ pthread_key::get ()
 pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREAD_MUTEX_MAGIC)
 {
   /*attr checked in the C call */
-  if (attr && attr->pshared==PTHREAD_PROCESS_SHARED)
+  if (attr && attr->pshared == PTHREAD_PROCESS_SHARED)
     {
       // fail
       magic = 0;
@@ -651,7 +651,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREA
     InitializeCriticalSection (&criticalsection);
   else
     {
-      this->win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
+      this->win32_obj_id = ::CreateMutex (&sec_none_nih, false, NULL);
       if (!win32_obj_id)
 	magic = 0;
     }
@@ -721,21 +721,21 @@ pthread_mutex::UnLock ()
 void
 pthread_mutex::fixup_after_fork ()
 {
-  debug_printf("mutex %x in fixup_after_fork\n", this);
+  debug_printf ("mutex %x in fixup_after_fork", this);
   if (pshared != PTHREAD_PROCESS_PRIVATE)
-    api_fatal("pthread_mutex::fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's\n");
+    api_fatal ("pthread_mutex::fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's");
   /* FIXME: duplicate code here and in the constructor. */
   if (wincap.has_try_enter_critical_section ())
-    InitializeCriticalSection(&criticalsection);
+    InitializeCriticalSection (&criticalsection);
   else
     {
-      win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
+      win32_obj_id = ::CreateMutex (&sec_none_nih, false, NULL);
       if (!win32_obj_id)
-	api_fatal("pthread_mutex::fixup_after_fork() failed to create new win32 mutex\n");
+	api_fatal ("pthread_mutex::fixup_after_fork () failed to create new win32 mutex");
     }
 #if DETECT_BAD_APPS
   if (condwaits)
-    api_fatal("Forked() while a mutex has condition variables waiting on it.\nReport to cygwin@cygwin.com\n");
+    api_fatal ("Forked () while a mutex has condition variables waiting on it.\nReport to cygwin@cygwin.com");
 #else
   condwaits = 0;
 #endif
@@ -752,7 +752,7 @@ pthread_mutexattr::~pthread_mutexattr ()
 
 semaphore::semaphore (int pshared, unsigned int value):verifyable_object (SEM_MAGIC)
 {
-  this->win32_obj_id =::CreateSemaphore (&sec_none_nih, value, LONG_MAX,
+  this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, value, LONG_MAX,
 					 NULL);
   if (!this->win32_obj_id)
     magic = 0;
@@ -809,13 +809,13 @@ semaphore::Wait ()
 void
 semaphore::fixup_after_fork ()
 {
-  debug_printf("sem %x in fixup_after_fork\n", this);
+  debug_printf ("sem %x in fixup_after_fork", this);
   if (shared != PTHREAD_PROCESS_PRIVATE)
-    api_fatal("doesn't understand PROCESS_SHARED semaphores variables\n");
+    api_fatal ("doesn't understand PROCESS_SHARED semaphores variables");
   /* FIXME: duplicate code here and in the constructor. */
-  this->win32_obj_id =::CreateSemaphore (&sec_none_nih, currentvalue, LONG_MAX, NULL);
+  this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue, LONG_MAX, NULL);
   if (!win32_obj_id)
-    api_fatal("failed to create new win32 semaphore\n");
+    api_fatal ("failed to create new win32 semaphore");
 }
 
 verifyable_object::verifyable_object (long verifyer):
@@ -891,7 +891,7 @@ thread_init_wrapper (void *_arg)
   if (!TlsSetValue (MT_INTERFACE->reent_index, &local_reent))
     system_printf ("local storage for thread couldn't be set");
 
-  /*the OS doesn't check this for <=64 Tls entries (pre win2k) */
+  /*the OS doesn't check this for <= 64 Tls entries (pre win2k) */
   TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thread);
 
 #ifdef _CYG_THREAD_FAILSAFE
@@ -919,6 +919,7 @@ int
 __pthread_create (pthread_t *thread, const pthread_attr_t *attr,
 		  void *(*start_routine) (void *), void *arg)
 {
+  DECLARE_TLS_STORAGE;
   if (attr && verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
@@ -1293,7 +1294,7 @@ __pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(voi
   if (prepcb)
   {
     prepcb->cb = prepare;
-    prepcb->next=(callback *)InterlockedExchangePointer ((LONG *) &MT_INTERFACE->pthread_prepare, (long int) prepcb);
+    prepcb->next = (callback *)InterlockedExchangePointer ((LONG *) &MT_INTERFACE->pthread_prepare, (long int) prepcb);
   }
   if (parentcb)
   {
@@ -1302,7 +1303,7 @@ __pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(voi
     while (*t)
       t = &(*t)->next;
     /*t = pointer to last next in the list */
-    parentcb->next=(callback *)InterlockedExchangePointer ((LONG *) t, (long int) parentcb);
+    parentcb->next = (callback *)InterlockedExchangePointer ((LONG *) t, (long int) parentcb);
   }
   if (childcb)
   {
@@ -1311,7 +1312,7 @@ __pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(voi
     while (*t)
       t = &(*t)->next;
     /*t = pointer to last next in the list */
-    childcb->next=(callback *)InterlockedExchangePointer ((LONG *) t, (long int) childcb);
+    childcb->next = (callback *)InterlockedExchangePointer ((LONG *) t, (long int) childcb);
   }
   return 0;
 }
@@ -1759,13 +1760,13 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 
   /*if the cond variable is blocked, then the above timer test maybe wrong. *shrug**/
   if (pthread_mutex_lock (&(*cond)->cond_access))
-    system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
+    system_printf ("Failed to lock condition variable access mutex, this %p", *cond);
 
   if ((*cond)->waiting)
     if ((*cond)->mutex && ((*cond)->mutex != (*themutex)))
       {
 	if (pthread_mutex_unlock (&(*cond)->cond_access))
-	  system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
+	  system_printf ("Failed to unlock condition variable access mutex, this %p", *cond);
 	return EINVAL;
       }
   InterlockedIncrement (&((*cond)->waiting));
@@ -1773,7 +1774,7 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   (*cond)->mutex = (*themutex);
   InterlockedIncrement (&((*themutex)->condwaits));
   if (pthread_mutex_unlock (&(*cond)->cond_access))
-    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
+    system_printf ("Failed to unlock condition variable access mutex, this %p", *cond);
   rv = (*cond)->TimedWait (waitlength);
   /* this may allow a race on the mutex acquisition and waits..
    * But doing this within the cond access mutex creates a different race
@@ -1785,10 +1786,10 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   if (last == true)
     (*cond)->mutex = NULL;
   if (pthread_mutex_lock (&(*cond)->cond_access))
-    system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
+    system_printf ("Failed to lock condition variable access mutex, this %p", *cond);
   InterlockedDecrement (&((*themutex)->condwaits));
   if (pthread_mutex_unlock (&(*cond)->cond_access))
-    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
+    system_printf ("Failed to unlock condition variable access mutex, this %p", *cond);
 
   return rv;
 }
@@ -1797,11 +1798,11 @@ extern "C" int
 pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 			const struct timespec *abstime)
 {
-  if (check_valid_pointer(abstime))
+  if (check_valid_pointer (abstime))
     return EINVAL;
   struct timeb currSysTime;
   long waitlength;
-  ftime(&currSysTime);
+  ftime (&currSysTime);
   waitlength = (abstime->tv_sec - currSysTime.time) *1000;
   if (waitlength < 0)
     return ETIMEDOUT;
@@ -1945,7 +1946,7 @@ int
 __pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
 				int *prioceiling)
 {
-  pthread_mutex_t *themutex=(pthread_mutex_t *) mutex;
+  pthread_mutex_t *themutex = (pthread_mutex_t *) mutex;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init ((pthread_mutex_t *) mutex, NULL);
   if (verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
