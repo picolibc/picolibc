@@ -1,3 +1,8 @@
+2002-09-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/config.h (MB_LEN_MAX): Removed as this
+	is defined by <limits.h>.
+
 2002-09-05  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* libc/include/wchar.h (WCHAR_MAX): Only define if not already
