@@ -17,40 +17,77 @@
 #include "winsup.h"
 #endif
 
-#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+
+#include <assert.h>
+#include <errno.h>
 #include <netdb.h>
+#include <pthread.h>
+#include <unistd.h>
+
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver_transport_pipes.h"
+
+#ifndef __INSIDE_CYGWIN__
+#include "cygwin/cygserver.h"
+#endif
 
 //SECURITY_DESCRIPTOR transport_layer_pipes::sd;
 //SECURITY_ATTRIBUTES transport_layer_pipes::sec_none_nih, transport_layer_pipes::sec_all_nih;
 //bool transport_layer_pipes::inited = false;
 
-transport_layer_pipes::transport_layer_pipes (HANDLE new_pipe)
+#ifndef __INSIDE_CYGWIN__
+
+// This flag is currently missing from w32api so it's here 'til I get
+// a patch sorted out.
+
+#ifndef FILE_FLAG_FIRST_PIPE_INSTANCE
+#define FILE_FLAG_FIRST_PIPE_INSTANCE 0x00080000
+#endif
+
+static pthread_once_t pipe_instance_lock_once = PTHREAD_ONCE_INIT;
+static CRITICAL_SECTION pipe_instance_lock;
+static long pipe_instance = 0;
+
+static void
+initialise_pipe_instance_lock()
 {
-  inited = false; //FIXME: allow inited, sd, all_nih_.. to be static members
-  pipe = new_pipe;
-  if (inited != true)
-    init_security();
-};
+  assert (pipe_instance == 0);
+  InitializeCriticalSection (&pipe_instance_lock);
+}
+
+#endif /* !__INSIDE_CYGWIN__ */
+
+#ifndef __INSIDE_CYGWIN__
+
+transport_layer_pipes::transport_layer_pipes (const HANDLE new_pipe)
+  : pipe_name (""),
+    pipe (new_pipe),
+    is_accepted_endpoint (true)
+{
+  assert (pipe && pipe != INVALID_HANDLE_VALUE);
+
+  init_security();
+}
+
+#endif /* !__INSIDE_CYGWIN__ */
 
 transport_layer_pipes::transport_layer_pipes ()
+  : pipe_name ("\\\\.\\pipe\\cygwin_lpc"),
+    pipe (NULL),
+    is_accepted_endpoint (false)
 {
-  inited = false;
-  pipe = NULL;
-  strcpy(pipe_name, "\\\\.\\pipe\\cygwin_lpc");
-  if (inited != true)
-    init_security();
+  init_security();
 }
 
 void
 transport_layer_pipes::init_security()
 {
+  assert (wincap.has_security ());
+
   /* FIXME: pthread_once or equivalent needed */
+
   InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
   SetSecurityDescriptorDacl (&sd, TRUE, 0, FALSE);
 
@@ -58,7 +95,6 @@ transport_layer_pipes::init_security()
   sec_none_nih.bInheritHandle = sec_all_nih.bInheritHandle = FALSE;
   sec_none_nih.lpSecurityDescriptor = NULL;
   sec_all_nih.lpSecurityDescriptor = &sd;
-  inited = true;
 }
 
 transport_layer_pipes::~transport_layer_pipes ()
@@ -66,47 +102,79 @@ transport_layer_pipes::~transport_layer_pipes ()
   close ();
 }
 
+#ifndef __INSIDE_CYGWIN__
+
 void
 transport_layer_pipes::listen ()
 {
+  assert (!is_accepted_endpoint);
+  assert (!pipe);
   /* no-op */
 }
 
 class transport_layer_pipes *
-transport_layer_pipes::accept ()
+transport_layer_pipes::accept (bool * const recoverable)
 {
-  if (pipe)
+  assert (!is_accepted_endpoint);
+  assert (!pipe);
+
+  pthread_once (&pipe_instance_lock_once, &initialise_pipe_instance_lock);
+
+  EnterCriticalSection (&pipe_instance_lock);
+
+  // Read: http://www.securityinternals.com/research/papers/namedpipe.php
+  // See also the Microsoft security bulletins MS00-053 and MS01-031.
+
+  // FIXME: Remove FILE_CREATE_PIPE_INSTANCE.
+
+  const bool first_instance = (pipe_instance == 0);
+
+  const HANDLE accept_pipe =
+    CreateNamedPipe (pipe_name,
+		     (PIPE_ACCESS_DUPLEX
+		      | (first_instance ? FILE_FLAG_FIRST_PIPE_INSTANCE : 0)),
+		     (PIPE_TYPE_BYTE | PIPE_WAIT),
+		     PIPE_UNLIMITED_INSTANCES,
+		     0, 0, 1000,
+		     &sec_all_nih);
+
+  const bool duplicate = (accept_pipe == INVALID_HANDLE_VALUE
+			  && pipe_instance == 0
+			  && GetLastError () == ERROR_ACCESS_DENIED);
+
+  if (accept_pipe != INVALID_HANDLE_VALUE)
+    pipe_instance += 1;
+
+  LeaveCriticalSection (&pipe_instance_lock);
+
+  if (duplicate)
     {
-      debug_printf ("Already have a pipe in this %p",this);
+      *recoverable = false;
+      system_printf ("failure creating named pipe: "
+		     "is there another instance of the server running?");
       return NULL;
     }
 
-  pipe = CreateNamedPipe (pipe_name,
-			  PIPE_ACCESS_DUPLEX,
-			  PIPE_TYPE_BYTE | PIPE_WAIT,
-			  PIPE_UNLIMITED_INSTANCES,
-			  0, 0, 1000,
-			  &sec_all_nih );
-  if (pipe == INVALID_HANDLE_VALUE)
+  if (accept_pipe == INVALID_HANDLE_VALUE)
     {
       debug_printf ("error creating pipe (%lu).", GetLastError ());
+      *recoverable = true;	// FIXME: case analysis?
       return NULL;
     }
 
-  if ( !ConnectNamedPipe ( pipe, NULL ) &&
-     GetLastError () != ERROR_PIPE_CONNECTED)
+  if (!ConnectNamedPipe (accept_pipe, NULL)
+      && GetLastError () != ERROR_PIPE_CONNECTED)
     {
-      system_printf ("error connecting to pipe (%lu).", GetLastError ());
-      CloseHandle (pipe);
-      pipe = NULL;
+      debug_printf ("error connecting to pipe (%lu)\n.", GetLastError ());
+      (void) CloseHandle (accept_pipe);
+      *recoverable = true;	// FIXME: case analysis?
       return NULL;
     }
 
-  transport_layer_pipes *new_conn = new transport_layer_pipes (pipe);
-  pipe = NULL;
-
-  return new_conn;
+  return new transport_layer_pipes (accept_pipe);
 }
+
+#endif /* !__INSIDE_CYGWIN__ */
 
 void
 transport_layer_pipes::close()
@@ -116,9 +184,23 @@ transport_layer_pipes::close()
     {
       FlushFileBuffers (pipe);
       DisconnectNamedPipe (pipe);
-      CloseHandle (pipe);
-      pipe = NULL;
+#ifndef __INSIDE_CYGWIN__
+      if (is_accepted_endpoint)
+	{
+	  EnterCriticalSection (&pipe_instance_lock);
+	  (void) CloseHandle (pipe);
+	  assert (pipe_instance > 0);
+	  pipe_instance -= 1;
+	  LeaveCriticalSection (&pipe_instance_lock);
+	}
+      else
+	(void) CloseHandle (pipe);
+#else
+      (void) CloseHandle (pipe);
+#endif
     }
+
+  pipe = INVALID_HANDLE_VALUE;
 }
 
 ssize_t
@@ -181,7 +263,8 @@ transport_layer_pipes::connect ()
 			 FILE_SHARE_READ | FILE_SHARE_WRITE,
 			 &sec_all_nih,
 			 OPEN_EXISTING,
-			 0, NULL);
+			 SECURITY_IMPERSONATION,
+			 NULL);
 
       if (pipe != INVALID_HANDLE_VALUE)
 	/* got the pipe */
@@ -201,9 +284,13 @@ transport_layer_pipes::connect ()
     }
 }
 
+#ifndef __INSIDE_CYGWIN__
+
 void
 transport_layer_pipes::impersonate_client ()
 {
+  assert (is_accepted_endpoint);
+
   // verbose: debug_printf ("impersonating pipe %p", pipe);
   if (pipe && pipe != INVALID_HANDLE_VALUE)
     {
@@ -217,7 +304,10 @@ transport_layer_pipes::impersonate_client ()
 void
 transport_layer_pipes::revert_to_self ()
 {
+  assert (is_accepted_endpoint);
+
   RevertToSelf ();
   // verbose: debug_printf("I am who I yam");
 }
 
+#endif /* !__INSIDE_CYGWIN__ */

@@ -1,3 +1,64 @@
+2002-06-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver.cc: The tests for a duplicate server instance are now
+	the responsibility of the transport layer.
+	(request_loop): Use new `recoverable' flag in call to
+	`cygserver_transport::accept ()' and shutdown on an unrecoverable
+	error.
+	(main): Never call `cygserver_init ()'.  Fake `cygserver_running'
+	just for sending a shutdown request.
+	* cygserver_client.cc (client_request::send): Comment out
+	message-size tracing statements as verbose.
+	(client_request::handle): Ditto.
+	(client_request_get_version::check_version): #ifdef as DLL-only.
+	(check_cygserver_available): Ditto.
+	(cygserver_init): Ditto.
+	* include/cygwin/cygserver.h
+	(client_request_get_version::check_version): #ifdef as DLL-only.
+	(check_cygserver_available): Ditto.
+	(cygserver_init): Ditto.
+	* include/cygwin/cygserver_transport.h
+	(transport_layer_base::impersonate_client): #ifdef as
+	cygserver-only.
+	(transport_layer_base::revert_to_self): Ditto.
+	(transport_layer_base::listen): Ditto.
+	(transport_layer_base::accept): Ditto.  Add a `recoverable' out
+	flag for error handling.
+	* include/cygwin/cygserver_transport_sockets.h: Ditto.
+	* include/cygwin/cygserver_transport_pipes.h: Ditto.
+	(transport_layer_pipes): Change type of the `pipe_name' field.
+	Remove the `inited' field, as unnecessary.  Add new
+	`is_accepted_endpoint' field.
+	* include/cygwin/cygserver_transport.cc
+	(transport_layer_base::impersonate_client): #ifdef as
+	cygserver-only.
+	(transport_layer_base::revert_to_self): Ditto.
+	* include/cygwin/cygserver_transport_sockets.cc
+	(transport_layer_sockets::listen): #ifdef as cygserver-only.
+	(transport_layer_sockets::accept): #ifdef as cygserver-only.
+	Analyse any errno from `accept ()' and set `recoverable' as
+	appropriate.
+	* cygserver_transport_pipes.cc: Add local #define of
+	`FILE_FLAG_FIRST_PIPE_INSTANCE'.
+	(pipe_instance_lock_once): New variable.
+	(pipe_instance_lock): Ditto.
+	(pipe_instance): Ditto.
+	(initialise_pipe_instance_lock): New function.
+	(transport_layer_pipes::transport_layer_pipes): Change
+	initialization of `pipe_name'.  Initialize `is_accepted_endpoint'
+	as appropriate.  Remove use of `inited'.
+	(transport_layer_pipes::impersonate_client): #ifdef as
+	cygserver-only.
+	(transport_layer_pipes::revert_to_self): Ditto.
+	(transport_layer_pipes::listen): Ditto.
+	(transport_layer_pipes::accept): Ditto.  Keep track of how often
+	many named pipes have been created, in the `pipe_instance'
+	variable, and pass the `FILE_FLAG_FIRST_PIPE_INSTANCE' flag on the
+	open of the first instance.  Analyse the error code from
+	`CreateNamedPipe ()' and set the `recoverable' flag as
+	appropriate.
+	(transport_layer_pipes::close): Update the `pipe_instance' count.
+
 2002-06-18  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* woutsup.h (cygserver_running): Add declaration.

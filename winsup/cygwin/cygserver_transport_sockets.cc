@@ -71,6 +71,8 @@ transport_layer_sockets::~transport_layer_sockets ()
   close ();
 }
 
+#ifndef __INSIDE_CYGWIN__
+
 void
 transport_layer_sockets::listen ()
 {
@@ -84,22 +86,36 @@ transport_layer_sockets::listen ()
 }
 
 class transport_layer_sockets *
-transport_layer_sockets::accept ()
+transport_layer_sockets::accept (bool * const recoverable)
 {
   /* FIXME: check we have listened */
-  int new_fd;
+  const int fd = cygwin_accept(fd, &sockdetails, &sdlen);
 
-  if ((new_fd = cygwin_accept(fd, &sockdetails, &sdlen)) < 0)
+  if (fd == -1)
     {
       system_printf ("Nup, couldn't accept. %d", errno);
+      switch (errno)
+	{
+	case ECONNABORTED:
+	case EINTR:
+	case EMFILE:
+	case ENFILE:
+	case ENOBUFS:
+	case ENOMEM:
+	  *recoverable = true;
+	  break;
+
+	default:
+	  *recoverable = false;
+	  break;
+	}
       return NULL;
     }
 
-  transport_layer_sockets *new_conn = new transport_layer_sockets (new_fd);
-
-  return new_conn;
-
+  return new transport_layer_sockets (fd);
 }
+
+#endif /* !__INSIDE_CYGWIN__ */
 
 void
 transport_layer_sockets::close()

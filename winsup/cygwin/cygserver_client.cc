@@ -47,6 +47,8 @@ client_request_get_version::client_request_get_version ()
   syscall_printf ("created");
 }
 
+#ifdef __INSIDE_CYGWIN__
+
 /*
  * client_request_get_version::check_version()
  *
@@ -77,8 +79,6 @@ client_request_get_version::check_version () const
 
   return ok;
 }
-
-#ifdef __INSIDE_CYGWIN__
 
 client_request_attach_tty::client_request_attach_tty (DWORD nmaster_pid,
 						      HANDLE nfrom_master,
@@ -180,8 +180,8 @@ client_request::send (transport_layer_base * const conn)
 	}
     }
 
-  syscall_printf ("request sent (%ld + %ld bytes)",
-		  sizeof (_header), msglen ());
+  // verbose: syscall_printf ("request sent (%ld + %ld bytes)",
+  //			      sizeof (_header), msglen ());
 
   {
     const ssize_t count = conn->read (&_header, sizeof (_header));
@@ -233,8 +233,8 @@ client_request::send (transport_layer_base * const conn)
 	}
     }
 
-  syscall_printf ("reply received (%ld + %ld bytes)",
-		  sizeof (_header), msglen ());
+  // verbose: syscall_printf ("reply received (%ld + %ld bytes)",
+  //			      sizeof (_header), msglen ());
 }
 
 #ifndef __INSIDE_CYGWIN__
@@ -425,8 +425,8 @@ client_request::handle (transport_layer_base * const conn,
 	}
     }
 
-  syscall_printf ("request received (%ld + %ld bytes)",
-		  sizeof (_header), msglen ());
+  // verbose: syscall_printf ("request received (%ld + %ld bytes)",
+  //			      sizeof (_header), msglen ());
 
   error_code (0);		// Overwrites the _header.request_code field.
 
@@ -469,11 +469,13 @@ client_request::handle (transport_layer_base * const conn,
 	}
     }
 
-  syscall_printf ("reply sent (%ld + %ld bytes)",
-		  sizeof (_header), msglen ());
+  // verbose: syscall_printf ("reply sent (%ld + %ld bytes)",
+  //			      sizeof (_header), msglen ());
 }
 
 #endif /* !__INSIDE_CYGWIN__ */
+
+#ifdef __INSIDE_CYGWIN__
 
 bool
 check_cygserver_available (const bool check_version_too)
@@ -539,3 +541,5 @@ cygserver_init (const bool check_version_too)
   if (!check_cygserver_available (check_version_too))
     cygserver_running = CYGSERVER_DEAD;
 }
+
+#endif /* __INSIDE_CYGWIN__ */

@@ -35,6 +35,8 @@ class transport_layer_base *create_server_transport()
   return temp;
 }
 
+#ifndef __INSIDE_CYGWIN__
+
 void
 transport_layer_base::impersonate_client ()
 {}
@@ -42,6 +44,8 @@ transport_layer_base::impersonate_client ()
 void
 transport_layer_base::revert_to_self ()
 {}
+
+#endif /* !__INSIDE_CYGWIN__ */
 
 transport_layer_base::~transport_layer_base ()
 {}

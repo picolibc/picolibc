@@ -16,25 +16,30 @@
 class transport_layer_pipes : public transport_layer_base
 {
   public:
+#ifndef __INSIDE_CYGWIN__
     virtual void listen ();
-    virtual class transport_layer_pipes * accept ();
+    virtual class transport_layer_pipes * accept (bool * recoverable);
+#endif
     virtual void close ();
     virtual ssize_t read (void *buf, size_t len);
     virtual ssize_t write (void *buf, size_t len);
     virtual bool connect();
+#ifndef __INSIDE_CYGWIN__
     virtual void impersonate_client ();
     virtual void revert_to_self ();
+#endif
     transport_layer_pipes ();
     virtual ~transport_layer_pipes ();
 
   private:
     /* for pipe based communications */
     void init_security ();
+    //FIXME: allow inited, sd, all_nih_.. to be static members
     SECURITY_DESCRIPTOR sd;
     SECURITY_ATTRIBUTES sec_none_nih, sec_all_nih;
-    char pipe_name [MAX_PATH];
+    const char * const pipe_name;
     HANDLE pipe;
-    bool inited;
+    const bool is_accepted_endpoint;
     transport_layer_pipes (HANDLE new_pipe);
 };
 #endif /* _CYGSERVER_TRANSPORT_PIPES_ */

@@ -15,8 +15,10 @@
 class transport_layer_sockets : public transport_layer_base
 {
   public:
+#ifndef __INSIDE_CYGWIN__
     virtual void listen ();
-    virtual class transport_layer_sockets * accept ();
+    virtual class transport_layer_sockets * accept (bool * recoverable);
+#endif
     virtual void close ();
     virtual ssize_t read (void *buf, size_t len);
     virtual ssize_t write (void *buf, size_t len);
