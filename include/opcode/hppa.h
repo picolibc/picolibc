@@ -344,6 +344,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "ldsid",      0x000010a0, 0xfc1f3fe0, "(b),t", pa10},
 { "mtsp",       0x00001820, 0xffe01fff, "x,S", pa10},
 { "mtctl",      0x00001840, 0xfc00ffff, "x,^", pa10},
+{ "mtsarcm",    0x016018C0, 0xffe0ffff, "x", pa20},
+{ "mfia",       0x000014A0, 0xffffffe0, "t", pa20},
 { "mfsp",       0x000004a0, 0xffff1fe0, "S,t", pa10},
 { "mfctl",      0x000008a0, 0xfc1fffe0, "^,t", pa10},
 { "sync",       0x00000400, 0xffffffff, "", pa10},

@@ -1,3 +1,8 @@
+Fri Jun 25 04:22:04 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+			  Jeff Law <law@cygnus.com>
+
+	* hppa.h (pa_opcodes):  Add entries for mfia and mtsarcm instructions.
+
 1999-06-23  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	* i386.h: Allow `l' suffix on bswap.  Allow `w' suffix on arpl,
