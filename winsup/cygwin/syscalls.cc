@@ -2540,7 +2540,9 @@ login (struct utmp *ut)
   pututline (ut);
   endutent ();
   /* Writing to wtmp must be atomic to prevent mixed up data. */
-  HANDLE mutex = CreateMutex (NULL, FALSE, shared_name ("wtmp_mutex", 0));
+  char mutex_name[MAX_PATH];
+  HANDLE mutex = CreateMutex (NULL, FALSE,
+			      shared_name (mutex_name, "wtmp_mutex", 0));
   if (mutex)
     while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
       ;
@@ -2578,7 +2580,9 @@ logout (char *line)
       memset (ut_buf.ut_user, 0, sizeof ut_buf.ut_user);
       time (&ut_buf.ut_time);
       /* Writing to wtmp must be atomic to prevent mixed up data. */
-      HANDLE mutex = CreateMutex (NULL, FALSE, shared_name ("wtmp_mutex", 0));
+      char mutex_name[MAX_PATH];
+      HANDLE mutex = CreateMutex (NULL, FALSE,
+      				  shared_name (mutex_name, "wtmp_mutex", 0));
       if (mutex)
 	while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
 	  ;
@@ -2747,7 +2751,9 @@ pututline (struct utmp *ut)
     return;
   /* Read/write to utmp must be atomic to prevent overriding data
      by concurrent processes. */
-  HANDLE mutex = CreateMutex (NULL, FALSE, shared_name ("utmp_mutex", 0));
+  char mutex_name[MAX_PATH];
+  HANDLE mutex = CreateMutex (NULL, FALSE,
+			      shared_name (mutex_name, "utmp_mutex", 0));
   if (mutex)
     while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
       ;

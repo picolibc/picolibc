@@ -33,17 +33,16 @@ mount_info NO_COPY *mount_table;
 HANDLE NO_COPY cygwin_mount_h;
 
 char * __stdcall
-shared_name (const char *str, int num)
+shared_name (char *ret_buf, const char *str, int num)
 {
-  static NO_COPY char buf[MAX_PATH] = {0};
   extern bool _cygwin_testing;
 
-  __small_sprintf (buf, "%s%s.%s.%d",
+  __small_sprintf (ret_buf, "%s%s.%s.%d",
   		   wincap.has_terminal_services () ?  "Global\\" : "",
 		   cygwin_version.shared_id, str, num);
   if (_cygwin_testing)
-    strcat (buf, cygwin_version.dll_build_date);
-  return buf;
+    strcat (ret_buf, cygwin_version.dll_build_date);
+  return ret_buf;
 }
 
 #define page_const (65535)
@@ -88,11 +87,12 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
   if (!shared_h)
     {
       char *mapname;
+      char map_buf[MAX_PATH];
       if (!name)
 	mapname = NULL;
       else
 	{
-	  mapname = shared_name (name, n);
+	  mapname = shared_name (map_buf, name, n);
 	  shared_h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE,
 				       TRUE, mapname);
 	}

@@ -1134,11 +1134,13 @@ void
 events_init (void)
 {
   char *name;
+  char mutex_name[MAX_PATH];
   /* title_mutex protects modification of console title. It's necessary
      while finding console window handle */
 
   if (!(title_mutex = CreateMutex (&sec_all_nih, FALSE,
-				   name = shared_name ("title_mutex", 0))))
+				   name = shared_name (mutex_name,
+						       "title_mutex", 0))))
     api_fatal ("can't create title mutex '%s', %E", name);
 
   ProtectHandle (title_mutex);

@@ -1,7 +1,19 @@
+2003-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared_info.h: Match shared_name declaration with below change.
+	* shared.cc (shared_name): Use incoming char * parameter instead of
+	local static buffer.
+	(open_shared): Accomodate new calling convention for shared_name.
+	* exceptions.cc (events_init): Ditto.
+	* sigproc.cc (getsem): Ditto.
+	* syscalls.cc (login): Ditto.
+	(logout): Ditto.
+	(pututline): Ditto.
+
 2003-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (secret_event_name): Return void.  Use incoming
-	char *parameter instead of local static buffer.
+	char * parameter instead of local static buffer.
 	(fhandler_socket::create_secret_event): Accomodate new calling
 	convention for secret_event_name.
 	(fhandler_socket::close_secret_event): Ditto.

@@ -883,6 +883,7 @@ static HANDLE __stdcall
 getsem (_pinfo *p, const char *str, int init, int max)
 {
   HANDLE h;
+  char sem_name[MAX_PATH];
 
   if (p != NULL)
     {
@@ -906,7 +907,7 @@ getsem (_pinfo *p, const char *str, int init, int max)
 
       DWORD winpid = GetCurrentProcessId ();
       h = CreateSemaphore (sec_user_nih (sa_buf), init, max,
-			   str = shared_name (str, winpid));
+			   str = shared_name (sem_name, str, winpid));
       p = myself;
       if (!h)
 	{
@@ -917,7 +918,7 @@ getsem (_pinfo *p, const char *str, int init, int max)
   else
     {
       h = OpenSemaphore (SEMAPHORE_ALL_ACCESS, FALSE,
-			 shared_name (str, p->dwProcessId));
+			 shared_name (sem_name, str, p->dwProcessId));
 
       if (!h)
 	{

@@ -186,5 +186,5 @@ struct console_state
 };
 #endif
 
-char *__stdcall shared_name (const char *, int);
+char *__stdcall shared_name (char *, const char *, int);
 void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locations);
