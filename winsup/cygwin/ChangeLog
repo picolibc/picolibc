@@ -1,3 +1,8 @@
+Thu Nov 16 10:28:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* uinfo.cc (uinfo_init): Call `cygwin_set_impersonation_token' to
+	reset `cygheap->user.token' to INVALID_HANDLE_VALUE.
+
 Thu Nov 16 00:18:15 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interrupt_setup): Don't set signal mask here or races
