@@ -124,9 +124,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 fhandler_socket::fhandler_socket () :
   fhandler_base (),
   sun_path (NULL),
-  sock_saw_shut_rd (0),
-  sock_saw_shut_wr (0),
-  had_connect_or_listen (unconnected)
+  status ()
 {
   set_need_fork_fixup ();
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,

@@ -1,5 +1,27 @@
 2004-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_base::status): Declare private.
+	(fhandler_base::open_status): Ditto.
+	(class fhandler_socket): Move status bits into private bitfield struct
+	type status_flags.  Change accessor methods appropriately.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Accomodate
+	above status bit changes.
+	* tty.h: Remove status bit enumerator.
+	(TTYISSETF): Remove.
+	(TTYSETF): Remove.
+	(TTYCLEARF): Remove.
+	(TTYCONDSETF): Remove.
+	(tty_min::status): Define as private bitfield struct type status_flags.
+	Add appropriate accessor methods.
+	* fhandler_console.cc: Use tty_min::status accessor methods throughout.
+	* fhandler_termios.cc: Ditto.
+	* winsup.h (__ISSETF): Remove.
+	(__SETF): Remove.
+	(__CLEARF): Remove.
+	(__CONDSETF): Remove.
+
+2004-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::write): Use bool parameter in calls to
 	set_did_lseek.
 	(fhandler_base::fhandler_base): Accomodate new status and open_status

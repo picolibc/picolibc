@@ -154,10 +154,8 @@ set_console_state_for_spawn ()
   if (shared_console_info != NULL)
     {
       /* ACK.  Temporarily define for use in TTYSETF macro */
-#     define tc &shared_console_info->tty_min_state
       SetConsoleMode (h, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
-      TTYSETF (RSTCONS);
-#     undef tc
+      shared_console_info->tty_min_state.set_rstcons ();
     }
 
   CloseHandle (h);
@@ -538,7 +536,7 @@ sig_exit:
 void
 fhandler_console::set_input_state ()
 {
-  if (TTYISSETF (RSTCONS))
+  if (tc->needs_rstcons ())
     input_tcsetattr (0, &tc->ti);
 }
 
@@ -660,7 +658,7 @@ fhandler_console::open (int flags, mode_t)
       SetConsoleMode (get_io_handle (), ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | cflags);
     }
 
-  TTYCLEARF (RSTCONS);
+  tc->clear_rstcons ();
   set_open_status ();
   cygheap->open_fhs++;
   debug_printf ("incremented open_fhs, now %d", cygheap->open_fhs);
@@ -844,7 +842,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
 		      res, t, flags, t->c_lflag, t->c_iflag);
     }
 
-  TTYCLEARF (RSTCONS);
+  tc->clear_rstcons ();
   return res;
 }
 

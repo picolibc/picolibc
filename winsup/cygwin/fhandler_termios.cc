@@ -31,7 +31,7 @@ fhandler_termios::tcinit (tty_min *this_tc, bool force)
 
   tc = this_tc;
 
-  if (force || !TTYISSETF (INITIALIZED))
+  if (force || !tc->is_initialized ())
     {
       tc->ti.c_iflag = BRKINT | ICRNL | IXON;
       tc->ti.c_oflag = OPOST | ONLCR;
@@ -58,7 +58,7 @@ fhandler_termios::tcinit (tty_min *this_tc, bool force)
 
       tc->ti.c_ispeed = tc->ti.c_ospeed = B38400;
       tc->pgid = myself->pgid;
-      TTYSETF (INITIALIZED);
+      tc->initialize ();
     }
 }
 

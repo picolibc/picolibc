@@ -71,7 +71,6 @@ class fhandler_base
   friend class dtable;
   friend void close_all_files ();
 
- protected:
   struct status_flags
   {
     unsigned rbinary            : 1; /* binary read mode */
@@ -92,7 +91,7 @@ class fhandler_base
     unsigned close_on_exec      : 1; /* close-on-exec */
     unsigned need_fork_fixup    : 1; /* Set if need to fixup after fork. */
 
-    public:
+   public:
     status_flags () :
       rbinary (0), rbinset (0), wbinary (0), wbinset (0), no_handle (0),
       async_io (0), uninterruptible_io (0), append_mode (0), lseeked (0),
@@ -355,9 +354,17 @@ class fhandler_socket: public fhandler_base
   HANDLE secret_event;
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
   char *sun_path;
-  unsigned sock_saw_shut_rd      : 1; /* Socket saw a SHUT_RD */
-  unsigned sock_saw_shut_wr      : 1; /* Socket saw a SHUT_WR */
-  unsigned had_connect_or_listen : 2;
+  struct status_flags
+  {
+    unsigned sock_saw_shut_rd      : 1; /* Socket saw a SHUT_RD */
+    unsigned sock_saw_shut_wr      : 1; /* Socket saw a SHUT_WR */
+    unsigned had_connect_or_listen : 2;
+   public:
+    status_flags () :
+      sock_saw_shut_rd (0), sock_saw_shut_wr (0),
+      had_connect_or_listen (unconnected)
+      {}
+  } status;
 
  public:
   fhandler_socket ();
@@ -365,20 +372,22 @@ class fhandler_socket: public fhandler_base
   int get_socket () { return (int) get_handle(); }
   fhandler_socket *is_socket () { return this; }
 
-  bool saw_shutdown_read () const {return sock_saw_shut_rd;}
-  bool saw_shutdown_write () const {return sock_saw_shut_wr;}
+  bool saw_shutdown_read () const { return status.sock_saw_shut_rd; }
+  bool saw_shutdown_write () const { return status.sock_saw_shut_wr; }
 
-  void set_shutdown_read () { sock_saw_shut_rd = 1;}
-  void set_shutdown_write () { sock_saw_shut_wr = 1;}
+  void set_shutdown_read () { status.sock_saw_shut_rd = 1;}
+  void set_shutdown_write () { status.sock_saw_shut_wr = 1;}
 
-  bool is_unconnected () const { return had_connect_or_listen == unconnected; }
+  bool is_unconnected () const
+  	{ return status.had_connect_or_listen == unconnected; }
   bool is_connect_pending () const
-    { return had_connect_or_listen == connect_pending; }
-  bool is_connected () const { return had_connect_or_listen == connected; }
+    { return status.had_connect_or_listen == connect_pending; }
+  bool is_connected () const
+  	{ return status.had_connect_or_listen == connected; }
   void set_connect_state (connect_state newstate)
-    { had_connect_or_listen = newstate; }
+	{ status.had_connect_or_listen = newstate; }
   connect_state get_connect_state () const
-    { return (connect_state) had_connect_or_listen; }
+	{ return (connect_state) status.had_connect_or_listen; }
 
   int bind (const struct sockaddr *name, int namelen);
   int connect (const struct sockaddr *name, int namelen);

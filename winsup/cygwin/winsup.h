@@ -131,16 +131,6 @@ extern int cygserver_running;
 
 #define TITLESIZE 1024
 
-/* status bit manipulation */
-#define __ISSETF(what, x, prefix) \
-  ((what)->status & prefix##_##x)
-#define __SETF(what, x, prefix) \
-  ((what)->status |= prefix##_##x)
-#define __CLEARF(what, x, prefix) \
-  ((what)->status &= ~prefix##_##x)
-#define __CONDSETF(n, what, x, prefix) \
-  ((n) ? __SETF (what, x, prefix) : __CLEARF (what, x, prefix))
-
 #include "debug.h"
 
 /* Events/mutexes */

@@ -30,17 +30,6 @@ details. */
 
 #include <sys/termios.h>
 
-enum
-{
-  TTY_INITIALIZED = 1,		/* Set if tty is initialized */
-  TTY_RSTCONS = 2		/* Set if console needs to be set to "non-cooked" */
-};
-
-#define TTYISSETF(x)	__ISSETF (tc, x, TTY)
-#define TTYSETF(x)	__SETF (tc, x, TTY)
-#define TTYCLEARF(x)	__CLEARF (tc, x, TTY)
-#define TTYCONDSETF(n, x) __CONDSETF(n, tc, x, TTY)
-
 #ifndef MIN_CTRL_C_SLOP
 #define MIN_CTRL_C_SLOP 50
 #endif
@@ -48,12 +37,23 @@ enum
 class tty_min
 {
   pid_t sid;	/* Session ID of tty */
+  struct status_flags
+  {
+    unsigned initialized : 1; /* Set if tty is initialized */
+    unsigned rstcons     : 1; /* Set if console needs to be set to "non-cooked" */
+  } status;
+
 public:
-  DWORD status;
   pid_t pgid;
   int output_stopped;
   int ntty;
   DWORD last_ctrl_c;	// tick count of last ctrl-c
+
+  void initialize () { status.initialized = 1; }
+  bool is_initialized () { return status.initialized; }
+  void set_rstcons () { status.rstcons = 1; }
+  void clear_rstcons () { status.rstcons = 1; }
+  bool needs_rstcons () { return status.rstcons; }
 
   tty_min (int t = -1, pid_t s = -1) : sid (s), ntty (t) {}
   void setntty (int n) {ntty = n;}
