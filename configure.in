@@ -321,6 +321,9 @@ if [ x${shared} = xyes ]; then
     powerpc*-*-*)
       host_makefile_frag="${host_makefile_frag} config/mh-ppcpic"
       ;;
+    s390-* | s390x-*)
+      host_makefile_frag="${host_makefile_frag} config/mh-s390pic"
+      ;;
     *-*-*)
       if test -f ${srcdir}/config/mh-${host_cpu}pic; then
         host_makefile_frag="${host_makefile_frag} config/mh-${host_cpu}pic"
@@ -555,7 +558,7 @@ case "${host}" in
      noconfigdirs="$noconfigdirs tk itcl tix libgui gdb"
      ;;
   *-*-cygwin*)
-     noconfigdirs="autoconf automake send-pr rcs guile perl texinfo apache inet"
+     noconfigdirs="autoconf automake send-pr rcs guile perl apache inet"
     ;;
   *-*-netbsd*)
     noconfigdirs="rcs"

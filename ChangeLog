@@ -1,3 +1,51 @@
+2001-02-22  Jeff Johnston <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Remove DJ Delorie's address because it is no
+	longer valid.
+
+2001-02-16  Nick Clifton  <nickc@redhat.com>
+
+	* configure.in (noconfigdirs): Allow configuration of texinfo
+	for Cygwin hosts.
+
+2001-02-09  Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* config.guess: Add linux target for S/390.
+	* config.sub: Likewise.
+	* configure.in: Likewise.
+
+2001-02-06  Ben Elliston  <bje@redhat.com>
+
+	* configure: Output host type to stdout, not stderr.
+
+2001-02-04  Michael Sokolov  <msokolov@ivan.Harhan.ORG>
+
+	* config.guess: Import from subversions.gnu.org (revision 1.181).
+	* config.sub: Import from subversions.gnu.org (revision 1.199).
+
+2001-01-30  Alan Modra  <alan@linuxcare.com.au>
+
+	* config.guess: Handle hppa64-linux systems.
+
+2001-01-27  Michael Sokolov  <msokolov@ivan.Harhan.ORG>
+
+	* ltcf-cxx.sh (ac_cv_prog_cc_pic_works, ac_cv_prog_cc_static_works):
+	Don't unset, it's non-portable and no longer necessary, set to empty
+	instead.
+
+2001-01-27  Michael Sokolov  <msokolov@ivan.Harhan.ORG>,  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
+
+	* ltconfig: Shell portability fix for the tagname validity check.
+
+2001-01-27  Michael Sokolov  <msokolov@ivan.Harhan.ORG>
+
+	* ltcf-cxx.sh: Use parentheses around eval $ac_compile.
+
+2001-01-27  Alexandre Oliva  <aoliva@redhat.com>
+
+	* ltcf-c.sh (ld_shlibs) [aix5*]: Disable on unknown CPU types.
+	* ltcf-cxx.sh, ltcf-gcj.sh: Likewise.
+
 2001-01-24  Alexandre Oliva  <aoliva@redhat.com>
 
 	* ltmain.sh (TAG disable-shared, TAG disable-static): Make sure we

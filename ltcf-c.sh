@@ -2,7 +2,7 @@
 
 # ltcf-c.sh - Create a C compiler specific configuration
 #
-# Copyright (C) 1996-2000 Free Software Foundation, Inc.
+# Copyright (C) 1996-2000, 2001 Free Software Foundation, Inc.
 # Originally by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 #
 # This file is free software; you can redistribute it and/or modify it
@@ -282,6 +282,12 @@ else
     case "$host_os" in aix4.[01]|aix4.[01].*)
       # According to Greg Wooledge, -bexpall is only supported from AIX 4.2 on
       always_export_symbols=yes ;;
+    esac
+
+    # We don't want to build shared libraries on unknown CPU types.
+    case $host_cpu in
+    powerpc | rs6000) ;;
+    *) ld_shlibs=no ;;
     esac
    ;;
 
