@@ -6,13 +6,12 @@
 
 2005-03-02  Christopher Faylor  <cgf@timesys.com>
 
-	* cygtls.cc (_cygtls::init_thread): Move exitsock setting later.  It
-
-2005-03-02  Christopher Faylor  <cgf@timesys.com>
-
 	* cygtls.cc (_cygtls::remove): Don't attempt any removal activities if
 	exitsock is zero.
 
+2005-03-02  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (_cygtls::init_thread): Move exitsock setting later.  It
 	should always be set.
 	(_cygtls::remove): Detect zero exitsock.  Not quite sure why this is needed.
 
