@@ -1,3 +1,9 @@
+Sat Sep  1 10:40:37 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/winnt.h: Use defined(_ANONYMOUS_STRUCT) to determine if
+	anonymous structs are available rather than just testing preprocessor
+	variable directly.
+
 Fri Aug 31 21:46:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/winnt.h: Change definition of `SYSTEM_LUID' to comply
