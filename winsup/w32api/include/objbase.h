@@ -176,6 +176,10 @@ WINOLEAPI CoQueryAuthenticationServices(DWORD*, SOLE_AUTHENTICATION_SERVICE**);
 WINOLEAPI CoSwitchCallContext(IUnknown*,IUnknown**);
 WINOLEAPI CoGetInstanceFromFile(COSERVERINFO*, CLSID*,IUnknown*,DWORD,DWORD,OLECHAR*,DWORD,MULTI_QI*);
 WINOLEAPI CoGetInstanceFromIStorage(COSERVERINFO*,CLSID*, IUnknown*,DWORD,struct IStorage*, DWORD,MULTI_QI*);
+WINOLEAPI_(ULONG) CoAddRefServerProcess(void);
+WINOLEAPI_(ULONG) CoReleaseServerProcess(void);
+WINOLEAPI CoResumeClassObjects(void);
+WINOLEAPI CoSuspendClassObjects(void);
 
 #pragma pack(pop)
 #endif

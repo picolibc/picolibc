@@ -1,3 +1,12 @@
+2003-03-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/objbase.h (CoAddRefServerProcess): Add prototype.
+	(CoAddReleaseServerProcess): Ditto.
+	(CoResumeClassObjects): Ditto.
+	(CoSuspendClassObjects): Ditto.
+	* include/oleauto.h (V_I1): Define.
+	Thanks to: "Timofei"  <mmttmm@users.sourceforge.net>
+
 2003-03-01  Heiko Gerdau  <hg@technosis.de> 
 
 	* include/oleidl.h (USERCLASSTYPE): Add enum.

@@ -79,6 +79,7 @@
 #define V_BYREF(X) V_UNION(X,byref)
 #define V_DECIMAL(X) V_UNION(X,decVal)
 #define V_DECIMALREF(X) V_UNION(X,pdecVal)
+#define V_I1(X) V_UNION(X,cVal)
 
 #include <oaidl.h>
 
