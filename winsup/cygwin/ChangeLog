@@ -1,3 +1,7 @@
+2003-07-03  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (fillout_mntent): Change "posix" to "managed".
+
 2003-07-02  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (FH_ENC): New enum.

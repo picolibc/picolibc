@@ -2505,7 +2505,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   else if (flags & MOUNT_NOTEXEC)
     strcat (_reent_winsup ()->mnt_opts, (char *) ",noexec");
   if (flags & MOUNT_ENC)
-    strcat (_reent_winsup ()->mnt_opts, ",posix");
+    strcat (_reent_winsup ()->mnt_opts, ",managed");
 
   if ((flags & MOUNT_CYGDRIVE))		/* cygdrive */
     strcat (_reent_winsup ()->mnt_opts, (char *) ",noumount");
