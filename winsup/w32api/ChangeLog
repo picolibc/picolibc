@@ -1,5 +1,10 @@
 2003-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/ras.h (RASCONN[AW]): Add dwSessionId for
+	(WINVER >= 0x501).
+
+2003-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/ras.h (RASCONN[AW]): Guard szDeviceType,
 	szDeviceName fields with (WINVER >= 0x400). Add dwFlags, luid
 	fields for (WINVER >= 0x501).
