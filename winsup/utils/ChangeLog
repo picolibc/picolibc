@@ -1,3 +1,11 @@
+2004-02-24  Christopher Faylor  <cgf@redhat.com>
+
+	* cygpath.cc (long_options): Add "mode" option.
+	(options): Ditto.
+	(usage): Report on new option.
+	(report_mode): New function.
+	(main): Implement -M option.
+
 2004-02-20  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (build_dumper): Detect missing iconv library.

@@ -41,6 +41,7 @@ static struct option long_options[] = {
   {(char *) "ignore", no_argument, NULL, 'i'},
   {(char *) "long-name", no_argument, NULL, 'l'},
   {(char *) "mixed", no_argument, NULL, 'm'},
+  {(char *) "mode", no_argument, NULL, 'M'},
   {(char *) "option", no_argument, NULL, 'o'},
   {(char *) "path", no_argument, NULL, 'p'},
   {(char *) "short-name", no_argument, NULL, 's'},
@@ -57,7 +58,7 @@ static struct option long_options[] = {
   {0, no_argument, 0, 0}
 };
 
-static char options[] = "ac:df:hilmopst:uvwADHPSW";
+static char options[] = "ac:df:hilmMopst:uvwADHPSW";
 
 static void
 usage (FILE * stream, int status)
@@ -71,6 +72,7 @@ Convert Unix and Windows format paths, or output system path information\n\
 Output type options:\n\
   -d, --dos	        print DOS (short) form of NAME (C:\\PROGRA~1\\)\n\
   -m, --mixed           like --windows, but with regular slashes (C:/WINNT)\n\
+  -M, --mode		report on mode of file (binmode or textmode)\n\
   -u, --unix	        (default) print Unix form of NAME (/cygdrive/c/winnt)\n\
   -w, --windows         print Windows form of NAME (C:\\WINNT)\n\
   -t, --type TYPE       print TYPE form: 'dos', 'mixed', 'unix', or 'windows'\n\
@@ -410,6 +412,24 @@ dowin (char option)
 }
 
 static void
+report_mode (char *filename)
+{
+  switch (cygwin_internal (CW_GET_BINMODE, filename))
+    {
+    case O_BINARY:
+      printf ("%s: binary\n", filename);
+      break;
+    case O_TEXT:
+      printf ("%s: text\n", filename);
+      break;
+    default:
+      fprintf (stderr, "%s: file '%s' - %s\n", prog_name, filename,
+	       strerror (errno));
+      break;
+    }
+}
+
+static void
 doit (char *filename)
 {
   char *buf;
@@ -522,7 +542,7 @@ main (int argc, char **argv)
 {
   int c, o = 0;
   int options_from_file_flag;
-  char *filename;
+  int mode_flag;
 
   prog_name = strrchr (argv[0], '/');
   if (prog_name == NULL)
@@ -542,6 +562,7 @@ main (int argc, char **argv)
   options_from_file_flag = 0;
   allusers_flag = 0;
   output_flag = 0;
+  mode_flag = 0;
   while ((c = getopt_long (argc, argv, options,
 			   long_options, (int *) NULL)) != EOF)
     {
@@ -565,6 +586,10 @@ main (int argc, char **argv)
 
 	case 'f':
 	  file_arg = optarg;
+	  break;
+
+	case 'M':
+	  mode_flag = 1;
 	  break;
 
 	case 'o':
@@ -690,10 +715,11 @@ main (int argc, char **argv)
       if (optind > argc - 1)
 	usage (stderr, 1);
 
-      for (int i=optind; argv[i]; i++) {
-	filename = argv[i];
-	doit (filename);
-      }
+      for (int i = optind; argv[i]; i++)
+	if (mode_flag)
+	  report_mode (argv[i]);
+	else
+	  doit (argv[i]);
     }
   else
     {

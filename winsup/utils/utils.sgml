@@ -119,6 +119,7 @@ Convert Unix and Windows format paths, or output system path information
 Output type options:
   -d, --dos             print DOS (short) form of NAME (C:\PROGRA~1\)
   -m, --mixed           like --windows, but with regular slashes (C:/WINNT)
+  -M, --mode		report on mode of file (currently binmode or textmode)
   -u, --unix            (default) print Unix form of NAME (/cygdrive/c/winnt)
   -w, --windows         print Windows form of NAME (C:\WINNT)
   -t, --type TYPE       print TYPE form: 'dos', 'mixed', 'unix', or 'windows'
