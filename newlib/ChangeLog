@@ -1,4 +1,18 @@
-002-11-06  Sergey Okhapkin  <sos@prospect.com.ru>
+2002-11-07  Joel Sherrill <joel@OARcorp.com>
+
+        * libc/sys/rtems/machine: New directory.
+        * libc/sys/rtems/machine/limits.h, libc/sys/rtems/machine/param.h,
+        libc/sys/rtems/sys/param.h, libc/sys/rtems/sys/syslimits.h,
+        libc/sys/rtems/sys/utime.h: New files added to make *-rtems newlib
+        targets more BSD like when installed without requiring files to
+        be overwritten at install point when RTEMS itself is installed.
+        * Makefile.am: Pick up system dependent machine .h files such as
+        might be found on a BSD-ish system.
+        * Makefile.in: Regenerate.
+        * libc/include/machine/types.h: When on an RTEMS target, define a
+        few BSD flavor types. 
+
+2002-11-06  Sergey Okhapkin  <sos@prospect.com.ru>
 
 	* include/utmp.h: Define WTMP_FILE.  Define and use UT_IDLEN.
 

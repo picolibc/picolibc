@@ -1,6 +1,32 @@
 #ifndef	_MACHTYPES_H_
 #define	_MACHTYPES_H_
 
+/*
+ *  The following section is RTEMS specific and is needed to more
+ *  closely match the types defined in the BSD machine/types.h.
+ *  This is needed to let the RTEMS/BSD TCP/IP stack compile.
+ */
+
+#if defined(__rtems__)
+typedef long long          int64_t;
+#if defined( __h8300__)
+typedef long               int32_t;
+#else
+typedef int                int32_t;
+#endif
+typedef short              int16_t;
+typedef char               int8_t;
+
+typedef unsigned long long u_int64_t;
+#if defined( __h8300__)
+typedef unsigned long      u_int32_t;
+#else
+typedef unsigned int       u_int32_t;
+#endif
+typedef unsigned short     u_int16_t;
+typedef unsigned char      u_int8_t;
+#endif
+
 #define	_CLOCK_T_	unsigned long		/* clock() */
 #define	_TIME_T_	long			/* time() */
 #define _CLOCKID_T_ 	unsigned long
