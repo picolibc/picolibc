@@ -62,24 +62,24 @@ get_inet_addr (const struct sockaddr *in, int inlen,
     {
       path_conv pc (in->sa_data, PC_SYM_FOLLOW);
       if (pc.error)
-        {
+	{
 	  set_errno (pc.error);
 	  return 0;
 	}
       if (!pc.exists ())
-        {
+	{
 	  set_errno (ENOENT);
 	  return 0;
 	}
       if (!pc.issocket ())
-        {
+	{
 	  set_errno (EBADF);
 	  return 0;
 	}
       HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), &sec_none,
 			      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
       if (fh == INVALID_HANDLE_VALUE)
-        {
+	{
 	  __seterrno ();
 	  return 0;
 	}
@@ -88,7 +88,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
       char buf[128];
       memset (buf, 0, sizeof buf);
       if (ReadFile (fh, buf, 128, &len, 0))
-        {
+	{
 	  sockaddr_in sin;
 	  sin.sin_family = AF_INET;
 	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
@@ -125,11 +125,11 @@ public:
   bool load (SOCKET sock, int type_bit)
     {
       if ((ev[0] = WSACreateEvent ()) == WSA_INVALID_EVENT)
-        return false;
+	return false;
       evt_sock = sock;
       evt_type_bit = type_bit;
       if (WSAEventSelect (evt_sock, ev[0], 1 << evt_type_bit))
-        {
+	{
 	  WSACloseEvent (ev[0]);
 	  ev[0] = WSA_INVALID_EVENT;
 	  return false;
@@ -142,7 +142,7 @@ public:
       int wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
 						  FALSE);
       if (wait_result == WSA_WAIT_EVENT_0)
-        WSAEnumNetworkEvents (evt_sock, ev[0], &sock_event);
+	WSAEnumNetworkEvents (evt_sock, ev[0], &sock_event);
 
       /* Cleanup,  Revert to blocking. */
       WSAEventSelect (evt_sock, ev[0], 0);
@@ -151,12 +151,12 @@ public:
       ioctlsocket (evt_sock, FIONBIO, &nonblocking);
 
       switch (wait_result)
-        {
+	{
 	  case WSA_WAIT_EVENT_0:
 	    if ((sock_event.lNetworkEvents & (1 << evt_type_bit))
-	        && sock_event.iErrorCode[evt_type_bit])
+		&& sock_event.iErrorCode[evt_type_bit])
 	      {
-	        WSASetLastError (sock_event.iErrorCode[evt_type_bit]);
+		WSASetLastError (sock_event.iErrorCode[evt_type_bit]);
 		set_winsock_errno ();
 		return -1;
 	      }
@@ -452,25 +452,25 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 
       path_conv pc (un_addr->sun_path, PC_SYM_FOLLOW);
       if (pc.error)
-        {
-          set_errno (pc.error);
+	{
+	  set_errno (pc.error);
 	  goto out;
 	}
       if (pc.exists ())
-        {
+	{
 	  set_errno (EADDRINUSE);
 	  goto out;
 	}
       mode_t mode = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
       DWORD attr = FILE_ATTRIBUTE_SYSTEM;
       if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
-        attr |= FILE_ATTRIBUTE_READONLY;
+	attr |= FILE_ATTRIBUTE_READONLY;
       SECURITY_ATTRIBUTES sa = sec_none;
       if (allow_ntsec && pc.has_acls ())
-        set_security_attribute (mode, &sa, alloca (4096), 4096);
+	set_security_attribute (mode, &sa, alloca (4096), 4096);
       HANDLE fh = CreateFile (pc, GENERIC_WRITE, 0, &sa, CREATE_NEW, attr, 0);
       if (fh == INVALID_HANDLE_VALUE)
-        {
+	{
 	  if (GetLastError () == ERROR_ALREADY_EXISTS)
 	    set_errno (EADDRINUSE);
 	  else
@@ -484,13 +484,13 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       get_connect_secret (strchr (buf, '\0'));
       DWORD blen = strlen (buf) + 1;
       if (!WriteFile (fh, buf, blen, &blen, 0))
-        {
+	{
 	  __seterrno ();
 	  CloseHandle (fh);
 	  DeleteFile (pc);
 	}
       else
-        {
+	{
 	  CloseHandle (fh);
 	  set_sun_path (un_addr->sun_path);
 	  res = 0;
@@ -644,12 +644,12 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
     {
       sock_event evt;
       if (!evt.load (get_socket (), FD_ACCEPT_BIT))
-        {
+	{
 	  set_winsock_errno ();
 	  return -1;
 	}
       switch (evt.wait ())
-        {
+	{
 	  case 1: /* Signal */
 	    return -1;
 	  case 0:
@@ -709,7 +709,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	  res = res_fd;
 	}
       else
-        {
+	{
 	  closesocket (res);
 	  res = -1;
 	}
@@ -815,9 +815,9 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
   if (res == SOCKET_ERROR)
     {
       /* According to SUSv3, errno isn't set in that case and no error
-         condition is returned. */
+	 condition is returned. */
       if (WSAGetLastError () == WSAEMSGSIZE)
-        return len;
+	return len;
 
       res = -1;
       set_winsock_errno ();

@@ -379,13 +379,13 @@ extern "C"
   NTSTATUS NTAPI NtQueryInformationFile (HANDLE, IO_STATUS_BLOCK *, VOID *,
 					 DWORD, DWORD);
   NTSTATUS NTAPI NtQueryInformationProcess (HANDLE, PROCESSINFOCLASS,
-                                            PVOID, ULONG, PULONG);
+					    PVOID, ULONG, PULONG);
   NTSTATUS NTAPI NtQueryObject (HANDLE, OBJECT_INFORMATION_CLASS, VOID *,
-  				ULONG, ULONG *);
+				ULONG, ULONG *);
   NTSTATUS NTAPI NtQuerySystemInformation (SYSTEM_INFORMATION_CLASS,
 					   PVOID, ULONG, PULONG);
   NTSTATUS NTAPI NtQueryVirtualMemory (HANDLE, PVOID, MEMORY_INFORMATION_CLASS,
-                                       PVOID, ULONG, PULONG);
+				       PVOID, ULONG, PULONG);
   NTSTATUS NTAPI NtUnmapViewOfSection (HANDLE, PVOID);
   VOID NTAPI RtlInitUnicodeString (PUNICODE_STRING, PCWSTR);
   ULONG NTAPI RtlNtStatusToDosError (NTSTATUS);

@@ -35,8 +35,7 @@
  * SUCH DAMAGE.
  */
 
-extern "C"
-char *
+extern "C" char *
 strsep (char **stringp,
 	 const char *delim)
 {

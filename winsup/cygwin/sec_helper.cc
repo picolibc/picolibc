@@ -83,7 +83,7 @@ cygpsid::get_id (BOOL search_grp, int *type)
       else if ((gr = internal_getgrsid (*this)))
 	id = gr->gr_gid;
       if (id != ILLEGAL_UID)
-        {
+	{
 	  if (type)
 	    *type = GROUP;
 	  return id;
@@ -97,7 +97,7 @@ cygpsid::get_id (BOOL search_grp, int *type)
       else if ((pw = internal_getpwsid (*this)))
 	id = pw->pw_uid;
       if (id != ILLEGAL_UID && type)
-        *type = USER;
+	*type = USER;
     }
   return id;
 }

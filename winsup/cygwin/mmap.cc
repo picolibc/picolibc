@@ -123,7 +123,7 @@ mmap_record::alloc_map (__off64_t off, DWORD len)
       off -= offset_;
       len = PAGE_CNT (len) * getpagesize ();
       if (off > 0 &&
-          !VirtualProtect (base_address_, off, PAGE_NOACCESS, &old_prot))
+	  !VirtualProtect (base_address_, off, PAGE_NOACCESS, &old_prot))
 	syscall_printf ("VirtualProtect(%x,%d) failed: %E", base_address_, off);
       if (off + len < size_to_map_
 	  && !VirtualProtect (base_address_ + off + len,
@@ -143,7 +143,7 @@ mmap_record::map_map (__off64_t off, DWORD len)
 {
   /* Used ONLY if this mapping matches into the chunk of another already
      performed mapping in a special case of MAP_ANON|MAP_PRIVATE.
-     
+
      Otherwise it's job is now done by alloc_map(). */
   DWORD prot, old_prot;
   switch (access_mode_)
@@ -422,8 +422,7 @@ map::erase (int i)
 
 static map *mmapped_areas;
 
-extern "C"
-caddr_t
+extern "C" caddr_t
 mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
 {
   syscall_printf ("addr %x, len %d, prot %x, flags %x, fd %d, off %D",
@@ -584,8 +583,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
   return ret;
 }
 
-extern "C"
-caddr_t
+extern "C" caddr_t
 mmap (caddr_t addr, size_t len, int prot, int flags, int fd, __off32_t off)
 {
   return mmap64 (addr, len, prot, flags, fd, (__off64_t)off);
@@ -594,8 +592,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, __off32_t off)
 /* munmap () removes an mmapped area.  It insists that base area
    requested is the same as that mmapped, error if not. */
 
-extern "C"
-int
+extern "C" int
 munmap (caddr_t addr, size_t len)
 {
   syscall_printf ("munmap (addr %x, len %d)", addr, len);
@@ -655,8 +652,7 @@ munmap (caddr_t addr, size_t len)
 
 /* Sync file with memory. Ignore flags for now. */
 
-extern "C"
-int
+extern "C" int
 msync (caddr_t addr, size_t len, int flags)
 {
   syscall_printf ("addr = %x, len = %d, flags = %x",
@@ -776,11 +772,11 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
   switch (access)
     {
       case FILE_MAP_WRITE:
-        protect = PAGE_READWRITE;
-        break;
+	protect = PAGE_READWRITE;
+	break;
       case FILE_MAP_READ:
-        protect = PAGE_READONLY;
-        break;
+	protect = PAGE_READONLY;
+	break;
       default:
 	protect = PAGE_WRITECOPY;
 	break;
@@ -879,8 +875,7 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 
 /* Set memory protection */
 
-extern "C"
-int
+extern "C" int
 mprotect (caddr_t addr, size_t len, int prot)
 {
   DWORD old_prot;
@@ -995,7 +990,7 @@ fixup_mmaps_after_fork (HANDLE parent)
 			    || !wincap.virtual_protect_works_on_shared_pages ())
 			  {
 			    system_printf ("ReadProcessMemory failed for "
-			    		   "MAP_PRIVATE address %p, %E",
+					   "MAP_PRIVATE address %p, %E",
 					   rec->get_address ());
 			    return -1;
 			  }
@@ -1019,7 +1014,7 @@ fixup_mmaps_after_fork (HANDLE parent)
 						  address, getpagesize (),
 						  old_prot, &dummy_prot))
 			      system_printf ("WARNING: VirtualProtectEx to "
-			      		     "return to previous state "
+					     "return to previous state "
 					     "in parent failed for "
 					     "MAP_PRIVATE address %p, %E",
 					     rec->get_address ());

@@ -26,8 +26,7 @@
 #include "cygheap.h"
 #include "sigproc.h"
 
-extern "C"
-int
+extern "C" int
 poll (struct pollfd *fds, unsigned int nfds, int timeout)
 {
   int max_fd = 0;

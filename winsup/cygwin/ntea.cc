@@ -142,8 +142,7 @@ NTReadEA (const char *file, const char *attrname, char *attrbuf, int len)
  *	pointer to buffer with file's EAs, or NULL if any error occured.
  */
 
-static
-PFILE_FULL_EA_INFORMATION
+static PFILE_FULL_EA_INFORMATION
 NTReadEARaw (HANDLE hFileSource, int *len)
 {
   WIN32_STREAM_ID StreamId;

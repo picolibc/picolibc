@@ -20,8 +20,7 @@ details. */
 #include "cygheap.h"
 #include "thread.h"
 
-extern "C"
-int
+extern "C" int
 _fcntl (int fd, int cmd,...)
 {
   void *arg = NULL;

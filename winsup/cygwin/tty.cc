@@ -28,22 +28,19 @@ details. */
 
 extern fhandler_tty_master *tty_master;
 
-extern "C"
-int
+extern "C" int
 grantpt (int fd)
 {
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 unlockpt (int fd)
 {
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 ttyslot (void)
 {
   if (NOTSTATE (myself, PID_USETTY))

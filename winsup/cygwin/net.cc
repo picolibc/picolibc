@@ -2190,7 +2190,7 @@ socketpair (int family, int type, int protocol, int *sb)
 
     if (res == -1)
       {
-        closesocket (insock);
+	closesocket (insock);
 	closesocket (outsock);
       }
   }
