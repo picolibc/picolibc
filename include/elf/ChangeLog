@@ -1,3 +1,39 @@
+2000-06-03  Alan Modra  <alan@linuxcare.com.au>
+
+	* reloc-macros.h (START_RELOC_NUMBERS): Fix name clash for
+	!__STDC__ case.
+	(RELOC_NUMBER): Use ansi stringify if ALMOST_STDC defined.
+
+2000-05-22  Richard Henderson  <rth@cygnus.com>
+
+	* ia64.h (R_IA64_PCREL60B, R_IA64_PCREL21BI): New.
+	(R_IA64_PCREL22, R_IA64_PCREL64I): New.
+
+2000-05-02  H.J. Lu  <hjl@gnu.org>
+
+	* common.h (ELFOSABI_NONE): Renamed from ELFOSABI_SYSV.
+	(ELFOSABI_MODESTO): Defined.
+	(ELFOSABI_OPENBSD): Likewise.
+
+Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
+			  David Mosberger  <davidm@hpl.hp.com>
+
+	* ia64.h: New file.
+
+2000-04-14  H.J. Lu  <hjl@gnu.org>
+
+	* common.h (ELFOSABI_TRUE64): Renamed to ELFOSABI_TRU64.
+
+2000-04-14  H.J. Lu  <hjl@gnu.org>
+
+	* common.h (ELFOSABI_NETBSD): Defined.
+	(ELFOSABI_HURD): Likewise.
+	(ELFOSABI_SOLARIS): Likewise.
+	(ELFOSABI_MONTEREY): Likewise.
+	(ELFOSABI_IRIX): Likewise.
+	(ELFOSABI_FREEBSD): Likewise.
+	(ELFOSABI_TRUE64): Likewise.
+
 2000-04-07  Nick Clifton  <nickc@cygnus.com>
 
 	* arm-oabi.h: Delete.

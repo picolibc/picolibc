@@ -6,7 +6,7 @@ COPYING, COPYING.LIB, README
 
 Makefile.in, configure, configure.in
 	Please notify the following of any committed patches.
-		bfd@sourceware.cygnus.com
+		binutils@sourceware.cygnus.com
 		gdb-patches@sourceware.cygnus.com
 
 bfd/, binutils/, gas/, gprof/, ld/, opcodes/ & BFD's part of include/

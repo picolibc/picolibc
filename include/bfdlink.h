@@ -179,6 +179,8 @@ struct bfd_link_info
   const struct bfd_link_callbacks *callbacks;
   /* true if BFD should generate a relocateable object file.  */
   boolean relocateable;
+  /* true if BFD should generate relocation information in the final executable.  */
+  boolean emitrelocations;
   /* true if BFD should generate a "task linked" object file,
      similar to relocatable but also with globals converted to statics. */
   boolean task_link;

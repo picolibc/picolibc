@@ -75,7 +75,6 @@ struct external_filehdr {
 #define COFF_ADJUST_FILEHDR_IN_POST(abfd,src,dst) \
 do { ((struct internal_filehdr *)(dst))->f_target_id = \
 bfd_h_get_16(abfd, (bfd_byte *)(((FILHDR *)(src))->f_target_id)); \
-((struct internal_filehdr *)(dst))->f_flags |= F_LDPAGE; \
 } while(0)
 #endif
 
@@ -160,9 +159,6 @@ struct external_scnhdr {
 /*
  * Special section flags
  */
-/* recognized load pages */
-#define PG_PROG         0x0         /* PROG page */
-#define PG_DATA         0x1         /* DATA page */
 
 /* TI COFF defines these flags; 
    STYP_CLINK: the section should be excluded from the final
@@ -233,25 +229,26 @@ PUT_SCNHDR_PAGE(ABFD,((struct internal_scnhdr *)(INT))->s_page, \
                 (bfd_byte *)((SCNHDR *)(EXT))->s_page); \
 } while(0)
 
-/* page macros
+/* Page macros
 
-   the first GDB port requires flags in its remote memory access commands to
-   distinguish between data/prog space.  hopefully we can make this go away
-   eventually.  stuff the page in the upper bits of a 32-bit address, since
+   The first GDB port requires flags in its remote memory access commands to
+   distinguish between data/prog space.  Hopefully we can make this go away
+   eventually.  Stuff the page in the upper bits of a 32-bit address, since
    the c5x family only uses 16 or 23 bits.
 
    c2x, c5x and most c54x devices have 16-bit addresses, but the c548 has
-   23-bit program addresses.  make sure the page flags don't interfere 
+   23-bit program addresses.  Make sure the page flags don't interfere.
    These flags are used by GDB to identify the destination page for
    addresses. 
 */
 
-#define LONG_ADDRESSES  1
-#define PG_SHIFT        (LONG_ADDRESSES ? 30 : 16)
-#define ADDR_MASK       ((1ul<<PG_SHIFT)-1)/* 16 or 24-bit addresses */
-#define PG_MASK         (3ul<<PG_SHIFT)
-#define PG_TO_FLAG(p)   ((p)<<PG_SHIFT)
-#define FLAG_TO_PG(f)   (((f)&PG_MASK)>>PG_SHIFT)
+/* recognized load pages */
+#define PG_PROG         0x0         /* PROG page */
+#define PG_DATA         0x1         /* DATA page */
+
+#define ADDR_MASK       0x00FFFFFF
+#define PG_TO_FLAG(p)   (((unsigned long)(p) & 0xFF) << 24)
+#define FLAG_TO_PG(f)   (((f) >> 24) & 0xFF)
 
 /*
  * names of "special" sections

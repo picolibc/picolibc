@@ -89,12 +89,22 @@
 #define IMAGE_FILE_MACHINE_SH4               0x1a6
 #define IMAGE_FILE_MACHINE_THUMB             0x1c2
                                                                            
+#define IMAGE_SUBSYSTEM_UNKNOWN			 0
+#define IMAGE_SUBSYSTEM_NATIVE			 1
+#define IMAGE_SUBSYSTEM_WINDOWS_GUI		 2
+#define IMAGE_SUBSYSTEM_WINDOWS_CUI		 3
+#define IMAGE_SUBSYSTEM_POSIX_CUI		 7
+#define IMAGE_SUBSYSTEM_WINDOWS_CE_GUI		 9
+#define IMAGE_SUBSYSTEM_EFI_APPLICATION		10
+#define IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER	11
+#define IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER	12
+  
 /* Magic values that are true for all dos/nt implementations */
 #define DOSMAGIC       0x5a4d  
 #define NT_SIGNATURE   0x00004550
 
-  /* NT allows long filenames, we want to accommodate this.  This may break
-     some of the bfd functions */
+/* NT allows long filenames, we want to accommodate this.  This may break
+   some of the bfd functions */
 #undef  FILNMLEN
 #define FILNMLEN	18	/* # characters in a file name		*/
 
@@ -132,7 +142,6 @@ struct external_PEI_filehdr
   char f_nsyms[4];		/* number of symtab entries	*/
   char f_opthdr[2];		/* sizeof(optional hdr)		*/
   char f_flags[2];		/* flags			*/
-
 };
 
 #ifdef COFF_IMAGE_WITH_PE
@@ -145,6 +154,8 @@ struct external_PEI_filehdr
 #define FILHSZ 152
 
 #endif /* COFF_IMAGE_WITH_PE */
+
+/* 32-bit PE a.out header: */
 
 typedef struct 
 {
@@ -174,13 +185,44 @@ typedef struct
   char  NumberOfRvaAndSizes[4];
   /* IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES]; */
   char  DataDirectory[16][2][4]; /* 16 entries, 2 elements/entry, 4 chars */
-
 } PEAOUTHDR;
-
-
 #undef AOUTSZ
 #define AOUTSZ (AOUTHDRSZ + 196)
 
+/* Like PEAOUTHDR, except that the "standard" member has no BaseOfData
+   (aka data_start) member and that some of the members are 8 instead
+   of just 4 bytes long.  */
+typedef struct 
+{
+  AOUTHDR standard;
+
+  /* NT extra fields; see internal.h for descriptions */
+  char  ImageBase[8];
+  char  SectionAlignment[4];
+  char  FileAlignment[4];
+  char  MajorOperatingSystemVersion[2];
+  char  MinorOperatingSystemVersion[2];
+  char  MajorImageVersion[2];
+  char  MinorImageVersion[2];
+  char  MajorSubsystemVersion[2];
+  char  MinorSubsystemVersion[2];
+  char  Reserved1[4];
+  char  SizeOfImage[4];
+  char  SizeOfHeaders[4];
+  char  CheckSum[4];
+  char  Subsystem[2];
+  char  DllCharacteristics[2];
+  char  SizeOfStackReserve[8];
+  char  SizeOfStackCommit[8];
+  char  SizeOfHeapReserve[8];
+  char  SizeOfHeapCommit[8];
+  char  LoaderFlags[4];
+  char  NumberOfRvaAndSizes[4];
+  /* IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES]; */
+  char  DataDirectory[16][2][4]; /* 16 entries, 2 elements/entry, 4 chars */
+} PEP64AOUTHDR;
+#define PEP64AOUTSZ	240
+  
 #undef  E_FILNMLEN
 #define E_FILNMLEN	18	/* # characters in a file name		*/
 

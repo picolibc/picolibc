@@ -656,7 +656,8 @@ case "${target}" in
     ;;
   hppa*-*-*elf* | \
   hppa*-*-linux-gnu* | \
-  hppa*-*-lites*)
+  hppa*-*-lites* | \
+  hppa*64*-*-*)
     # Do configure ld/binutils/gas for the above cases.
     ;;
   hppa*-*-*)
@@ -668,6 +669,10 @@ case "${target}" in
         *) ;;
     esac
     noconfigdirs="$noconfigdirs ld shellutils"
+    ;;
+  ia64*-*-elf*)
+    # No gdb support yet.
+    noconfigdirs="$noconfigdirs tix readline mmalloc libgui itcl gdb"
     ;;
   i[3456]86-*-coff | i[3456]86-*-elf)
     if [ x${is_cross_compiler} != xno ] ; then
@@ -1046,6 +1051,9 @@ if [ x${shared} = xyes ]; then
       ;;
     i[3456]86-*)
       target_makefile_frag="${target_makefile_frag} config/mt-x86pic"
+      ;;
+    powerpc*-*-aix*)
+      # We don't want -fPIC on AIX.
       ;;
     powerpc*-*)
       target_makefile_frag="${target_makefile_frag} config/mt-ppcpic"

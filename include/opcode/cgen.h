@@ -735,9 +735,17 @@ typedef struct
    into the operand table.  The operand table doesn't exist in C, per se, as
    the data is recorded in the parse/insert/extract/print switch statements. */
 
-#ifndef CGEN_MAX_SYNTAX_BYTES
-#define CGEN_MAX_SYNTAX_BYTES 16
+/* This should be at least as large as necessary for any target. */
+#define CGEN_MAX_SYNTAX_BYTES 32
+
+/* A target may know its own precise maximum.  Assert that it falls below
+   the above limit. */
+#ifdef CGEN_ACTUAL_MAX_SYNTAX_BYTES
+#if CGEN_ACTUAL_MAX_SYNTAX_BYTES > CGEN_MAX_SYNTAX_BYTES
+#error "CGEN_ACTUAL_MAX_SYNTAX_BYTES too high - enlarge CGEN_MAX_SYNTAX_BYTES"
 #endif
+#endif
+
 
 typedef struct
 {
@@ -824,9 +832,17 @@ typedef struct {
 #define CGEN_IFMT_IFLD_IFLD(ii) ((ii)->ifld)
 } CGEN_IFMT_IFLD;
 
-#ifndef CGEN_MAX_IFMT_OPERANDS
-#define CGEN_MAX_IFMT_OPERANDS 1
+/* This should be at least as large as necessary for any target. */
+#define CGEN_MAX_IFMT_OPERANDS 16
+
+/* A target may know its own precise maximum.  Assert that it falls below
+   the above limit. */
+#ifdef CGEN_ACTUAL_MAX_IFMT_OPERANDS
+#if CGEN_ACTUAL_MAX_IFMT_OPERANDS > CGEN_MAX_IFMT_OPERANDS
+#error "CGEN_ACTUAL_MAX_IFMT_OPERANDS too high - enlarge CGEN_MAX_IFMT_OPERANDS"
 #endif
+#endif
+
 
 typedef struct
 {

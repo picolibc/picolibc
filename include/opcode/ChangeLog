@@ -1,3 +1,64 @@
+Wed Apr 12 17:11:20 2000  Donald Lindsay  <dlindsay@hound.cygnus.com>
+
+	* d10v.h: added ALONE attribute for d10v_opcode.exec_type.
+
+2000-05-23  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
+
+	* i386.h: Allow d suffix on iret, and add DefaultSize modifier.
+
+2000-05-17  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
+
+	* i386.h: Use sl_FP, not sl_Suf for fild.
+
+2000-05-16  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cgen.h (CGEN_MAX_SYNTAX_BYTES): Increase to 32.  Check that
+	it exceeds CGEN_ACTUAL_MAX_SYNTAX_BYTES, if set.
+	(CGEN_MAX_IFMT_OPERANDS): Increase to 16.  Check that it exceeds
+	CGEN_ACTUAL_MAX_IFMT_OPERANDS, if set.
+
+2000-05-13  Alan Modra  <alan@linuxcare.com.au>,
+
+	* i386.h (i386_optab): Cpu686 for sysenter,sysexit,fxsave,fxrestore.
+
+2000-05-13  Alan Modra  <alan@linuxcare.com.au>,
+	    Alexander Sokolov <robocop@netlink.ru>
+
+	* i386.h (i386_optab): Add cpu_flags for all instructions.
+
+2000-05-13  Alan Modra  <alan@linuxcare.com.au>
+
+	From Gavin Romig-Koch <gavin@cygnus.com>
+	* i386.h (wld_Suf): Define.  Use on pushf, popf, pusha, popa.
+
+2000-05-04  Timothy Wall  <twall@cygnus.com>
+
+	* tic54x.h: New.
+
+2000-05-03  J.T. Conklin  <jtc@redback.com>
+
+	* ppc.h (PPC_OPCODE_ALTIVEC): New opcode flag for vector unit.
+	(PPC_OPERAND_VR): New operand flag for vector registers.
+
+2000-05-01  Kazu Hirata  <kazu@hxi.com>
+
+	* h8300.h (EOP): Add missing initializer.
+
+Fri Apr 21 15:03:37 2000  Jason Eckhardt  <jle@cygnus.com>
+
+	* hppa.h (pa_opcodes): New opcodes for PA2.0 wide mode
+	forms of ld/st{b,h,w,d} and fld/fst{w,d} (16-bit displacements).
+	New operand types l,y,&,fe,fE,fx added to support above forms.
+	(pa_opcodes): Replaced usage of 'x' as source/target for
+	floating point double-word loads/stores with 'fx'.
+
+Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
+			  David Mosberger  <davidm@hpl.hp.com>
+			  Timothy Wall <twall@cygnus.com>
+			  Jim Wilson  <wilson@cygnus.com>
+
+	* ia64.h: New file.
+
 2000-03-27  Nick Clifton  <nickc@cygnus.com>
 
 	* d30v.h (SHORT_A1): Fix value.
