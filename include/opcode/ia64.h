@@ -133,6 +133,7 @@ enum ia64_opnd
     IA64_OPND_TGT25b,	/* signed 25-bit (ip + 16*bits 6-12, 20-32, 36) */
     IA64_OPND_TGT25c,	/* signed 25-bit (ip + 16*bits 13-32, 36) */
     IA64_OPND_TGT64,    /* 64-bit (ip + 16*bits 13-32, 36, 2-40(L)) */
+    IA64_OPND_LDXMOV,	/* any symbol, generates R_IA64_LDXMOV.  */
 
     IA64_OPND_COUNT	/* # of operand types (MUST BE LAST!) */
   };

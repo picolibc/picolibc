@@ -1,3 +1,7 @@
+2002-12-03  Richard Henderson  <rth@redhat.com>
+
+	* ia64.h (enum ia64_opnd): Add IA64_OPND_LDXMOV.
+
 2002-12-03  Alan Modra  <amodra@bigpond.net.au>
 
 	* cgen.h (struct cgen_maybe_multi_ifield): Add "const PTR p" to union.
