@@ -1,3 +1,8 @@
+Wed Jul 28 02:04:24 1999  "Jerry Quinn" <jquinn@nortelnetworks.com>
+
+	* hppa.h (pa_opcodes):  Change xmpyu, fmpyfadd, 
+	and fmpynfadd to use 'J' and 'K' instead of 'E' and 'X'.
+
 1999-07-13  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	* i386.h: Add "undocumented" AMD 3DNow! pf2iw, pi2fw, pswapw insns.
