@@ -1,3 +1,11 @@
+2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
+
+	2000-04-01  Alexandre Oliva  <aoliva@cygnus.com>
+	* mn10300.h (E_MN10300_MACH_AM33_2): Renamed from
+	E_MN10300_MACH_AM332.
+	2000-03-31  Alexandre Oliva  <aoliva@cygnus.com>
+	* mn10300.h (E_MN10300_MACH_AM332): Defined.
+
 2003-07-01  Martin Schwidefsky  <schwidefsky@de.ibm.com>
 
 	* s390.h (elf_s390_reloc_type): Add long displacement relocations
