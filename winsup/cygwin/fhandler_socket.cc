@@ -184,7 +184,7 @@ fhandler_socket::fixup_before_fork_exec (DWORD win_proc_id)
 
 extern "C" void __stdcall load_wsock32 ();
 void
-fhandler_socket::fixup_after_fork (HANDLE parent)
+fhandler_socket::fixup_after_fork (bool dup, HANDLE parent)
 {
   SOCKET new_sock;
 
@@ -208,6 +208,10 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
   else
     {
       debug_printf ("WSASocket went fine new_sock %p, old_sock %p", new_sock, get_io_handle ());
+#if 1
+      if (!dup && new_sock != (SOCKET) get_socket ())
+        closesocket (get_socket ());
+#endif
       set_io_handle ((HANDLE) new_sock);
     }
 
@@ -216,11 +220,17 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
 }
 
 void
+fhandler_socket::fixup_after_fork (HANDLE parent)
+{
+  fixup_after_fork (false, parent);
+}
+
+void
 fhandler_socket::fixup_after_exec (HANDLE parent)
 {
   debug_printf ("here");
   if (!get_close_on_exec ())
-    fixup_after_fork (parent);
+    fixup_after_fork (false, parent);
 #if 0
   else if (!winsock2_active)
     closesocket (get_socket ());
@@ -238,7 +248,7 @@ fhandler_socket::dup (fhandler_base *child)
   fhs->fixup_before_fork_exec (GetCurrentProcessId ());
   if (winsock2_active)
     {
-      fhs->fixup_after_fork (hMainProc);
+      fhs->fixup_after_fork (true, hMainProc);
       return 0;
     }
   return fhandler_base::dup (child);

@@ -367,6 +367,8 @@ class fhandler_socket: public fhandler_base
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
   char *sun_path;
 
+  void fixup_after_fork (bool, HANDLE);
+
  public:
   fhandler_socket ();
   ~fhandler_socket ();
