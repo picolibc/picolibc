@@ -1,3 +1,7 @@
+2002-06-21  Christopher Faylor  <cgf@redhat.com>
+
+	* what.texinfo: Fix typo.
+
 2002-06-02  Christopher Faylor  <cgf@redhat.com>
 
 	* how-programming.texinfo: Add more words to the "how to build".

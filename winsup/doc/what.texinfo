@@ -152,7 +152,7 @@ So, how do you get the most up-to-date version of cygwin?  Easy.  Just
 download the setup.exe program from your closest mirror.  This program
 will handle the task of updating the packages on your system to the
 latest version.  The Cygwin team frequently updates and adds new
-packages to the soureware web site.  The setup.exe program is the
+packages to the sourceware web site.  The setup.exe program is the
 easiest way to determine what you need on your system.
 
 For some "ancient" history of the project (rather, just woefully out of
