@@ -1,12 +1,12 @@
+#ifndef COM_NO_WINDOWS_H
+#include <windows.h>
+#include <ole2.h>
+#endif
+
 #ifndef _UNKNWN_H
 #define _UNKNWN_H
 #if __GNUC__ >=3
 #pragma GCC system_header
-#endif
-
-#ifndef COM_NO_WINDOWS_H
-#include <windows.h>
-#include <ole2.h>
 #endif
 
 #ifdef __cplusplus
