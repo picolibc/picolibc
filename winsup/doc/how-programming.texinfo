@@ -397,16 +397,6 @@ programs with various debug and trace messages enabled.  For information
 on using @code{strace}, see the Cygwin User's Guide or the file
 @code{winsup/utils/utils.sgml}.
 
-Alternatively, you can set the @code{STRACE} environment variable to
-@code{1}, and get a whole load of debug information on your screen
-whenever a Cygwin app runs.  This is an especially useful tool to use
-when tracking bugs down inside the Cygwin library.  @code{STRACE} can be
-set to different values to achieve different amounts of granularity.
-You can set it to @code{0x10} for information about syscalls or
-@code{0x800} for signal/process handling-related info, to name two.  The
-strace mechanism is well documented in the Cygwin library sources in the
-file @code{winsup/cygwin/include/sys/strace.h}.
-
 @subsection Why doesn't gdb handle signals?
 
 Unfortunately, there is only minimal signal handling support in gdb

@@ -145,7 +145,7 @@ etc...) using a syntax like this in the DOS shell, before launching bash.
 </para>
 
 <screen>
-<prompt>C:\Cygnus\&gt;</prompt> <userinput>set CYGWIN=tty notitle strace=0x1</userinput>
+<prompt>C:\Cygnus\&gt;</prompt> <userinput>set CYGWIN=tty notitle glob</userinput>
 </screen>
 
 <para>

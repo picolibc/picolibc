@@ -1,3 +1,9 @@
+Sat Nov 18 23:50:12 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygwinenv.sgml: Remove CYGWIN=strace option.  Update CYGWIN options.
+	* setup2.sgml: Remove CYGWIN=strace example.
+	* how-programming.texinfo: Remove stuff about CYGWIN=strace.
+
 Thu Oct 26 10:00:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* ntsec.sgml: Slight changes. Fix some errors.

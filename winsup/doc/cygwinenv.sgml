@@ -29,12 +29,18 @@ contents. Defaults to set.</para>
 settings are re-exported to the environment as $CYGWIN again.</para>
 </listitem>
 <listitem>
-<para><FirstTerm>(no)glob</FirstTerm> - if set, command line arguments
+<para><FirstTerm>error_start:filepath</FirstTerm> - if set, runs <filename>filepath</filepath>
+when cygwin encounters a fatal error.  This is useful for debugging.
+<filename>filepath</filename> is usually set to the path to the <filename>gdb</filename>
+program.
+<para><FirstTerm>(no)glob[:ignorecase]</FirstTerm> - if set, command line arguments
 containing UNIX-style file wildcard characters (brackets, question mark,
 asterisk, escaped with \) are expanded into lists of files that match 
 those wildcards.
 This is applicable only to programs running from a DOS command line prompt.
 Default is set.</para>
+<para>This option also accepts an optional <literal>[no]ignorecase</literal> modifer.
+If supplied, wildcard matching is case insensitive.  The default is <literal>noignorecase</literal></para>
 </listitem>
 <listitem>
 <para><FirstTerm>(no)ntea</FirstTerm> - if set, use the full NT Extended
@@ -54,16 +60,6 @@ in <citation>ntsec.sgml</citation>.</para>
 <para><FirstTerm>(no)reset_com</FirstTerm> - if set, serial ports are reset
 to 9600-8-N-1 with no flow control when used. This is done at open
 time and when handles are inherited.  Defaults to set.</para>
-</listitem>
-<listitem>
-<para><FirstTerm>strace=n[:cache][,filename]</FirstTerm> - configures system
-tracing.  Off by default, setting various bits in <literal>n</literal> (a
-bit flag) enables various types of system messages.  Setting
-<literal>n</literal> to 1 enables most messages.  Other values can be found
-in <filename>sys/strace.h</filename>.  The <literal>:cache</literal> option
-lets you specify how many lines to cache before flushing the output
-(example: <literal>strace=1:20</literal>).  The <literal>filename</literal>
-option lets you send the messages to a file instead of the screen. </para>
 </listitem>
 <listitem>
 <para><FirstTerm>(no)strip_title</FirstTerm> - if set, strips the directory
