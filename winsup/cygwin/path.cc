@@ -916,7 +916,7 @@ get_devn (const char *name, int &unit)
       devn = FH_MEM;
       unit = 4;
     }
-  else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
+  else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0 && unit < 100)
     devn = FH_SERIAL;
   else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
     {
@@ -1070,7 +1070,7 @@ get_device_number (const char *unix_path, const char *w32_path, int &unit)
       if (p)
 	unix_path = p + 1;
       if (udeveqn ("com", 3)
-	 && (unit = digits (unix_path + 3)) >= 0)
+	 && (unit = digits (unix_path + 3)) >= 0 && unit < 100)
 	devn = FH_SERIAL;
     }
 

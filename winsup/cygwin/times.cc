@@ -46,7 +46,7 @@ __to_clock_t (FILETIME * src, int flag)
 
 /* times: POSIX 4.5.2.1 */
 extern "C" clock_t
-times (struct tms * buf)
+_times (struct tms * buf)
 {
   FILETIME creation_time, exit_time, kernel_time, user_time;
 
@@ -84,12 +84,6 @@ times (struct tms * buf)
     }
 
    return tc;
-}
-
-extern "C" clock_t
-_times (struct tms * buf)
-{
-  return times (buf);
 }
 
 /* settimeofday: BSD */

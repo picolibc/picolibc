@@ -106,8 +106,8 @@ clearerr
 _clearerr = clearerr
 clock
 _clock = clock
-close
-_close = close
+_close
+close = _close
 closedir
 _closedir = closedir
 copysign
@@ -209,8 +209,8 @@ _fchown = fchown
 fchown32
 fclose
 _fclose = fclose
-fcntl
-_fcntl = fcntl
+_fcntl
+fcntl = _fcntl
 fcvt
 _fcvt = fcvt
 fcvtbuf
@@ -304,8 +304,8 @@ fseek
 _fseek = fseek
 fsetpos
 _fsetpos = fsetpos
-fstat
-_fstat = fstat
+_fstat
+fstat = _fstat
 fstat64
 fstatfs
 _fstatfs = fstatfs
@@ -472,8 +472,8 @@ jn
 _jn = jn
 jnf
 _jnf = jnf
-kill
-_kill = kill
+_kill
+kill = _kill
 labs
 _labs = labs
 lchown
@@ -521,8 +521,8 @@ login
 logout
 longjmp
 _longjmp = longjmp
-lseek
-_lseek = lseek
+_lseek
+lseek = _lseek
 lseek64
 lstat = cygwin_lstat
 _lstat = cygwin_lstat
@@ -630,8 +630,8 @@ remainderf
 _remainderf = remainderf
 remove
 _remove = remove
-rename
-_rename = rename
+_rename
+rename = _rename
 rewind
 _rewind = rewind
 rewinddir
@@ -764,8 +764,8 @@ sscanf
 _sscanf = sscanf
 _sscanf_r
 sscanf_r = _sscanf_r
-stat
-_stat = stat
+_stat
+stat = _stat
 stat64
 statfs
 _statfs = statfs
@@ -868,8 +868,8 @@ tempnam
 _tempnam = tempnam
 time
 _time = time
-times
-_times = times
+_times
+times = _times
 timezone
 tmpfile
 _tmpfile = tmpfile
@@ -930,8 +930,8 @@ vsscanf
 _vsscanf = vsscanf
 _vsscanf_r
 vsscanf_r = _vsscanf_r
-wait
-_wait = wait
+_wait
+wait = _wait
 waitpid
 _waitpid = waitpid
 wait3

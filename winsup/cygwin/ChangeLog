@@ -1,5 +1,13 @@
 2002-06-05  Christopher Faylor  <cgf@redhat.com>
 
+	* cygwin.din: Eliminate some newlib wrappers.
+	* path.cc (get_devn): Only consider first 99 potential com devices.
+	(get_device_number): Ditto.
+	* times.cc (_times): Eliminate.
+	(_times): Renamed from times().
+
+2002-06-05  Christopher Faylor  <cgf@redhat.com>
+
 	* dir.cc (rmdir): Streamline.  Detect attempts to remove directories
 	from "read-only" virtual devices. (Suggested by Pavel Tsekov)
 	* syscalls.cc (unlink): Detect attempts to remove directories
