@@ -35,7 +35,7 @@ int     _EXFUN(execlp, (const char *__file, const char *, ... ));
 int     _EXFUN(execv, (const char *__path, char * const __argv[] ));
 int     _EXFUN(execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 int     _EXFUN(execvp, (const char *__file, char * const __argv[] ));
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(__rtems__)
 int     _EXFUN(fchdir, (int __fildes));
 #endif
 int     _EXFUN(fchmod, (int __fildes, mode_t __mode ));

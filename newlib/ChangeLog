@@ -1,7 +1,7 @@
 2001-10-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Add prototype for fchdir() when
-	__CYGWIN__ is defined.
+	__CYGWIN__ or __rtems__ is defined.
 
 2001-10-01  Charles Wilson  <cwilson@ece.gatech.edu>
 
