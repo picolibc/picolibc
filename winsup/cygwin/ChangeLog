@@ -1,3 +1,21 @@
+2003-08-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/param.h (NBBY): Define if not defined.
+
+2003-08-12  Nicholas Wourms  <nwourms@netscape.net>
+
+	* include/sys/param.h (setbit): Add new bitmap related macro.
+	(clrbit): Likewise.
+	(isset): Likewise.
+	(isclr): Likewise.
+	(howmany): Add new counting/rounding macro.
+	(rounddown): Likewise.
+	(roundup): Likewise.
+	(roundup2): Likewise.
+	(powerof2): Likewise
+	(MIN): Add macro for calculating min.
+	(MAX): Add macro for calculating max.
+
 2003-08-09  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 3.

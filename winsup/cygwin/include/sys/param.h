@@ -53,4 +53,27 @@
 #define NULL            0L
 #endif
 
+#ifndef NBBY
+#define    NBBY 8
+#endif
+
+/* Bit map related macros. */
+#define    setbit(a,i) ((a)[(i)/NBBY] |= 1<<((i)%NBBY))
+#define    clrbit(a,i) ((a)[(i)/NBBY] &= ~(1<<((i)%NBBY)))
+#define    isset(a,i)  ((a)[(i)/NBBY] & (1<<((i)%NBBY)))
+#define    isclr(a,i)  (((a)[(i)/NBBY] & (1<<((i)%NBBY))) == 0)
+
+/* Macros for counting and rounding. */
+#ifndef howmany
+#define    howmany(x, y)   (((x)+((y)-1))/(y))
+#endif
+#define    rounddown(x, y) (((x)/(y))*(y))
+#define    roundup(x, y)   ((((x)+((y)-1))/(y))*(y))  /* to any y */
+#define    roundup2(x, y)  (((x)+((y)-1))&(~((y)-1))) /* if y is powers of two */
+#define powerof2(x)    ((((x)-1)&(x))==0)
+
+/* Macros for min/max. */
+#define    MIN(a,b)    (((a)<(b))?(a):(b))
+#define    MAX(a,b)    (((a)>(b))?(a):(b))
+
 #endif
