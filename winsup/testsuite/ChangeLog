@@ -1,3 +1,7 @@
+2001-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.api/winsup.exp: Force linking all tests against binmode.o.
+
 2001-04-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.api/mmaptest04.c: Take care for binmode explicitely.

@@ -39,7 +39,7 @@ foreach src [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.c] {
         set add_libs $ltp_libs
     }
 
-    ws_spawn "$CC -g3 $CFLAGS $src $add_includes $add_libs $runtime_root/new-libcygwin.a -o $base.exe"
+    ws_spawn "$CC -g3 $CFLAGS $src $add_includes $add_libs $runtime_root/binmode.o $runtime_root/new-libcygwin.a -o $base.exe"
     if { $rv != "" } {
 	verbose -log "$rv"
 	fail "$testcase (compile)"
