@@ -700,7 +700,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 	  todo = getlocal_sigtodo (sig);
 	}
     }
-  else if (thiscatch = getsem (p, "sigcatch", 0, 0))
+  else if ((thiscatch = getsem (p, "sigcatch", 0, 0)))
     todo = p->getsigtodo (sig);
   else
     goto out;		  // Couldn't get the semaphore.  getsem issued
@@ -1137,8 +1137,7 @@ wait_sig (VOID *self)
       (void) SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
       /* sigproc_terminate sets sig_loop_wait to zero to indicate that
-       * this thread should terminate.
-       */
+         this thread should terminate.  */
       if (rc == WAIT_TIMEOUT)
 	{
 	  if (!sig_loop_wait)
@@ -1163,76 +1162,86 @@ wait_sig (VOID *self)
 	todo = todos[1];
 
       /* A sigcatch semaphore has been signaled.  Scan the sigtodo
-       * array looking for any unprocessed signals.
-       */
+         array looking for any unprocessed signals.  */
       pending_signals = false;
-      bool more_signals = false;
+      unsigned more_signals = 0;
       bool saw_failed_interrupt = false;
       do
-	for (int sig = -__SIGOFFSET, more_signals = false; sig < NSIG; sig++)
-	  {
-	    LONG x = InterlockedDecrement (todo + sig);
-	    if (x < 0)
-	      InterlockedIncrement (todo + sig);
-	    else if (x >= 0)
-	      {
-		if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
-		    (sigismember (&myself->getsigmask (), sig) ||
-		     main_vfork->pid ||
-		     (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
-		  {
-		    sigproc_printf ("signal %d blocked", sig);
-		    pending_signals = true;	// FIXME: This will cause unnecessary sig_dispatch_pending spins
-		    InterlockedIncrement (myself->getsigtodo (sig));
-		  }
-		else
-		  {
-		    /* Found a signal to process */
-		    if (rc != RC_NOSYNC)
-		      pending_signals = true;	// There should be an armed semaphore, in this case
+	{
+	  more_signals = 0;
+	  for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
+	    {
+	      LONG x = InterlockedDecrement (todo + sig);
+	      if (x < 0)
+		InterlockedIncrement (todo + sig);
+	      else if (x >= 0)
+		{
+		  /* If x > 0, we have to deal with a signal at some later point */
+		  if (rc != RC_NOSYNC && x > 0)
+		    pending_signals = true;	// There should be an armed semaphore, in this case
 
-		    sigproc_printf ("processing signal %d", sig);
-		    switch (sig)
-		      {
-		      case __SIGFLUSH:
-			if (rc == RC_MAIN)
-			  {
-			    flush = true;
-			    ReleaseSemaphore (sigcatch_nosync, 1, NULL);
-			    goto out1;
-			  }
-			break;
+		  if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
+		      (sigismember (&myself->getsigmask (), sig) ||
+		       main_vfork->pid ||
+		       (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
+		    {
+		      sigproc_printf ("signal %d blocked", sig);
+		      x = InterlockedIncrement (myself->getsigtodo (sig));
+		      pending_signals = true;
+		    }
+		  else
+		    {
+		      sigproc_printf ("processing signal %d", sig);
+		      switch (sig)
+			{
+			case __SIGFLUSH:
+			  if (rc == RC_MAIN)
+			    {
+			      flush = true;
+			      ReleaseSemaphore (sigcatch_nosync, 1, NULL);
+			      goto out1;
+			    }
+			  break;
 
-		      /* Internal signal to turn on stracing. */
-		      case __SIGSTRACE:
-			strace.hello ();
-			break;
+			/* Internal signal to turn on stracing. */
+			case __SIGSTRACE:
+			  strace.hello ();
+			  break;
 
-		      case __SIGCOMMUNE:
-			talktome ();
-			break;
+			case __SIGCOMMUNE:
+			  talktome ();
+			  break;
 
-		      /* A normal UNIX signal */
-		      default:
-			sigproc_printf ("Got signal %d", sig);
-			if (!sig_handle (sig))
-			  {
-			    pending_signals = saw_failed_interrupt = true;
-			    sigproc_printf ("couldn't send signal %d", sig);
-			    InterlockedIncrement (myself->getsigtodo (sig));
-			  }
-		      }
-		    if (rc == RC_NOSYNC)
-		      more_signals = x > 0;
-		  }
+			/* A normal UNIX signal */
+			default:
+			  sigproc_printf ("Got signal %d", sig);
+			  if (!sig_handle (sig))
+			    {
+			      saw_failed_interrupt = true;
+			      sigproc_printf ("couldn't send signal %d", sig);
+			      x = InterlockedIncrement (myself->getsigtodo (sig));
+			      pending_signals = true;
+			    }
+			}
+		      if (rc == RC_NOSYNC && x > 0)
+			more_signals++;
+		    }
 
-		if (sig == SIGCHLD)
-		  proc_subproc (PROC_CLEARWAIT, 0);
-		if (saw_failed_interrupt || rc != RC_NOSYNC)
-		  goto out;
-	      }
-	  }
-      while (more_signals);
+		  if (sig == SIGCHLD)
+		    proc_subproc (PROC_CLEARWAIT, 0);
+
+		  /* Need to take special action if an interrupt failed due to main thread not
+		     getting around to calling handler yet.  */
+		  if (saw_failed_interrupt || rc != RC_NOSYNC)
+		    goto out;
+		}
+	    }
+#ifdef DEBUGGING
+	  if (more_signals > 100)
+	    system_printf ("hmm.  infinite loop? more_signals %u\n", more_signals);
+#endif
+	}
+      while (more_signals && sig_loop_wait);
 
     out:
       /* Signal completion of signal handling depending on which semaphore
@@ -1245,6 +1254,7 @@ wait_sig (VOID *self)
 	  sigproc_printf ("set main thread completion event");
 	  flush = false;
 	}
+
     out1:
       if (saw_failed_interrupt)
 	{

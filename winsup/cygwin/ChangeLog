@@ -1,3 +1,9 @@
+2003-08-27  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (wait_sig): Count number of iterations through
+	'more_signals' loop and issue a warning if DEBUGGING and excessive.
+	(WFSO): When debugging and infinite timeout, loop.
+
 2003-08-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/stat.h: Allow definition of internal stat structures
