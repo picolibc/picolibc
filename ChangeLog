@@ -1,5 +1,7 @@
 2002-12-05  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* configure.in: Revert unintentional change.
+
 	* src-release: Configure host subdirs.
 
 	* Makefile.tpl: Change dependency for */multilib.out so that
