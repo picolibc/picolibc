@@ -1,3 +1,8 @@
+2003-11-22  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (check_sanity_and_sync): Correct api major version check so
+	that newer dlls will work with older apps but not vice versa.
+
 2003-11-21  Christopher Faylor  <cgf@redhat.com>
 
 	* sem.cc: Always include signal.h to handle SIGSYS raise when

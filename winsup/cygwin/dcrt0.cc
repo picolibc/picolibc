@@ -436,8 +436,8 @@ check_sanity_and_sync (per_process *p)
 	       p->magic_biscuit, SIZEOF_PER_PROCESS);
 
   /* Complain if incompatible API changes made */
-  if (p->api_major != cygwin_version.api_major)
-    api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %d < %d",
+  if (p->api_major > cygwin_version.api_major)
+    api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %d > %d",
 	       p->api_major, cygwin_version.api_major);
 
   if (CYGWIN_VERSION_DLL_MAKE_COMBINED (p->dll_major, p->dll_minor) <=
