@@ -1,3 +1,8 @@
+2003-02-27  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* uinfo.cc (internal_getlogin): Only update user.groups.pgsid
+	if the call to set the primary group succeeds.
+
 2003-02-27  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread::detach: Improve error message.
