@@ -1,0 +1,40 @@
+# Copyright (C) 2002 by Red Hat, Incorporated. All rights reserved.
+#
+# Permission to use, copy, modify, and distribute this software
+# is freely granted, provided that this notice is preserved.
+#
+
+# newlib_check_output takes the basename of the test source file, and
+# a list of pairs of the form "testname" "expectedoutput"
+# "testname" "expectedoutput"...  It assumes one line of output
+# per test.
+
+proc newlib_check_output { srcfile expectlist } {
+    global objdir subdir srcdir
+
+    set srcfullname "$srcdir/$subdir/$srcfile"
+    set test_driver "$objdir/testsuite/[file tail [file rootname $srcfullname].x]"
+
+    set comp_output [newlib_target_compile "$srcfullname" "$test_driver" "executable" ""]
+
+    if { $comp_output != "" } {
+	fail "Failed to compile $srcfile.\n"
+    } else {
+	pass "Compiled $srcfile.\n"
+    }
+
+    set result [newlib_load $test_driver ""]
+    set status [lindex $result 0]
+    set output [lindex $result 1]
+
+    set output_lines [split $output "\n"]
+
+    foreach { testname expectedval } $expectlist {
+	if [string match "$expectedval" "[lindex $output_lines 0]"] then {
+	    pass $testname
+	} else {
+	    fail $testname
+	}
+	set output_lines [lrange $output_lines 1 end]
+    }
+}

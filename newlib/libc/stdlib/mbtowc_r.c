@@ -66,6 +66,193 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
   if (r->_current_locale == NULL ||
       (strlen (r->_current_locale) <= 1))
     { /* fall-through */ }
+  else if (!strcmp (r->_current_locale, "UTF-8"))
+    {
+      wchar_t char1 = 0;
+
+      if (s == NULL)
+        return 0; /* UTF-8 character encodings are not state-dependent */
+
+      /* we know n >= 1 if we get here */
+      *pwc = 0;
+      char1 = (wchar_t)*t;
+
+      if (char1 == '\0')
+        return 0; /* s points to the null character */
+
+      if (char1 >= 0x0 && char1 <= 0x7f)
+        {
+          /* single-byte sequence */
+          *pwc = char1;
+          return 1;
+        }
+      else if (char1 >= 0xc0 && char1 <= 0xdf)
+        {
+          /* two-byte sequence */
+          if (n >= 2)
+            {
+              wchar_t char2 = (wchar_t)*(t+1);
+
+              if (char2 < 0x80 || char2 > 0xbf)
+                return -1;
+
+              if (char1 < 0xc2)
+                /* overlong UTF-8 sequence */
+                return -1;
+
+              *pwc = ((char1 & 0x1f) << 6)
+                |     (char2 & 0x3f);
+              return 2;
+            }
+          else
+            return -1;
+        }
+      else if (char1 >= 0xe0 && char1 <= 0xef)
+        {
+          /* three-byte sequence */
+          if (n >= 3)
+            {
+              wchar_t char2 = (wchar_t)*(t+1);
+              wchar_t char3 = (wchar_t)*(t+2);
+
+              if (char2 < 0x80 || char2 > 0xbf)
+                return -1;
+              if (char3 < 0x80 || char3 > 0xbf)
+                return -1;
+
+              if (char1 == 0xe0)
+                {
+                  if (char2 < 0xa0)
+                    /* overlong UTF-8 sequence */
+                    return -1;
+                }
+
+              *pwc = ((char1 & 0x0f) << 12)
+                |    ((char2 & 0x3f) << 6)
+                |     (char3 & 0x3f);
+
+              if (*pwc >= 0xd800 && *pwc <= 0xdfff)
+                {
+                  return -1;
+                }
+              else
+                return 3;
+            }
+          else
+            return -1;
+        }
+      else if (char1 >= 0xf0 && char1 <= 0xf7)
+        {
+          /* four-byte sequence */
+          if (n >= 4)
+            {
+              wchar_t char2 = (wchar_t)*(t+1);
+              wchar_t char3 = (wchar_t)*(t+2);
+              wchar_t char4 = (wchar_t)*(t+3);
+
+              if (char2 < 0x80 || char2 > 0xbf)
+                return -1;
+              if (char3 < 0x80 || char3 > 0xbf)
+                return -1;
+              if (char4 < 0x80 || char4 > 0xbf)
+                return -1;
+
+              if (char1 == 0xf0)
+                {
+                  if (char2 < 0x90)
+                    /* overlong UTF-8 sequence */
+                    return -1;
+                }
+                    
+              *pwc = ((char1 & 0x07) << 18)
+                |    ((char2 & 0x3f) << 12)
+                |    ((char3 & 0x3f) << 6)
+                |     (char4 & 0x3f);
+
+              return 4;
+            }
+          else
+            return -1;
+        }
+      else if (char1 >= 0xf8 && char1 <= 0xfb)
+        {
+          /* five-byte sequence */
+          if (n >= 5)
+            {
+              wchar_t char2 = (wchar_t)*(t+1);
+              wchar_t char3 = (wchar_t)*(t+2);
+              wchar_t char4 = (wchar_t)*(t+3);
+              wchar_t char5 = (wchar_t)*(t+4);
+
+              if (char2 < 0x80 || char2 > 0xbf)
+                return -1;
+              if (char3 < 0x80 || char3 > 0xbf)
+                return -1;
+              if (char4 < 0x80 || char4 > 0xbf)
+                return -1;
+              if (char5 < 0x80 || char5 > 0xbf)
+                return -1;
+
+              if (char1 == 0xf8)
+                {
+                  if (char2 < 0x88)
+                    /* overlong UTF-8 sequence */
+                    return -1;
+                }
+                    
+              *pwc = ((char1 & 0x03) << 24)
+                |    ((char2 & 0x3f) << 18)
+                |    ((char3 & 0x3f) << 12)
+                |    ((char4 & 0x3f) << 6)
+                |     (char5 & 0x3f);
+              return 5;
+            }
+          else
+            return -1;
+        }
+      else if (char1 >= 0xfc && char1 <= 0xfd)
+        {
+          /* six-byte sequence */
+          if (n >= 6)
+            {
+              wchar_t char2 = (wchar_t)*(t+1);
+              wchar_t char3 = (wchar_t)*(t+2);
+              wchar_t char4 = (wchar_t)*(t+3);
+              wchar_t char5 = (wchar_t)*(t+4);
+              wchar_t char6 = (wchar_t)*(t+5);
+
+              if (char2 < 0x80 || char2 > 0xbf)
+                return -1;
+              if (char3 < 0x80 || char3 > 0xbf)
+                return -1;
+              if (char4 < 0x80 || char4 > 0xbf)
+                return -1;
+              if (char5 < 0x80 || char5 > 0xbf)
+                return -1;
+              if (char6 < 0x80 || char6 > 0xbf)
+                return -1;
+
+              if (char1 == 0xfc)
+                {
+                  if (char2 < 0x84)
+                    /* overlong UTF-8 sequence */
+                    return -1;
+                }
+
+              *pwc = ((char1 & 0x01) << 30)
+                |    ((char2 & 0x3f) << 24)
+                |    ((char3 & 0x3f) << 18)
+                |    ((char4 & 0x3f) << 12)
+                |    ((char5 & 0x3f) << 6)
+                |     (char6 & 0x3f);
+              return 6;
+            }
+          else
+            return -1;
+        }
+      else
+        return -1;
+    }      
   else if (!strcmp (r->_current_locale, "C-SJIS"))
     {
       int char1;

@@ -70,7 +70,7 @@ else
 fi
 AC_SUBST(newlib_basedir)
 
-AC_CANONICAL_HOST
+AC_CANONICAL_SYSTEM
 
 AM_INIT_AUTOMAKE(newlib, 1.10.0)
 
@@ -113,12 +113,6 @@ fi
 ])
 
 LIB_AC_PROG_CC
-
-# AC_CHECK_TOOL does AC_REQUIRE (AC_CANONICAL_BUILD).  If we don't
-# run it explicitly here, it will be run implicitly before
-# NEWLIB_CONFIGURE, which doesn't work because that means that it will
-# be run before AC_CANONICAL_HOST.
-AC_CANONICAL_BUILD
 
 AC_CHECK_TOOL(AS, as)
 AC_CHECK_TOOL(AR, ar)

@@ -140,13 +140,16 @@ _DEFUN(_setlocale_r, (p, category, locale),
         { 
           if (strcmp (locale, "C") && strcmp (locale, "") &&
               strcmp (locale, "C") && strcmp (locale, "C-JIS") && 
-              strcmp (locale, "C-EUCJP") && strcmp (locale, "C-SJIS"))
+              strcmp (locale, "C-EUCJP") && strcmp (locale, "C-SJIS") &&
+              strcmp (locale, "UTF-8"))
             return 0;
 
           strcpy (last_lc_ctype, lc_ctype);
           strcpy (lc_ctype, locale);
 
-          if (!strcmp (locale, "C-JIS"))
+          if (!strcmp (locale, "UTF-8"))
+            __mb_cur_max = 6;
+          else if (!strcmp (locale, "C-JIS"))
             __mb_cur_max = 8;
           else if (strlen (locale) > 1)
             __mb_cur_max = 2;

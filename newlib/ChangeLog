@@ -1,3 +1,27 @@
+2002-04-24  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.am (check-DEJAGNU): New target.
+	(site.exp): Likewise.
+	* acinclude.m4 (NEWLIB_CONFIGURE): Replace AC_CANONICAL_HOST
+	with AC_CANONICAL_SYSTEM.  Remove AC_CANONICAL_BUILD.
+	* libc/locale/locale.c (_setlocale_r): Add UTF-8 support.
+	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Likewise.
+	* libc/stdlib/wctomb_r.c (_wctomb_r): Likewise.
+	* testsuite: New directory.
+	* testsuite/config: Likewise.
+	* testsuite/lib: Likewise.
+	* testsuite/newlib.locale: Likewise.
+	* testsuite/newlib.string: Likewise.
+	* testsuite/config/default.exp: New file.
+	* testsuite/lib/checkoutput.exp: New file.
+	* testsuite/lib/newlib.exp: New file.
+	* testsuite/lib/passfail.exp: New file.
+	* testsuite/newlib.locale/UTF-8.c: New file.
+	* testsuite/newlib.locale/UTF-8.exp: New file.
+	* testsuite/newlib.locale/locale.exp: New file.
+	* testsuite/newlib.string/string.exp: New file.
+	* testsuite/newlib.string/tstring.c: New file.
+
 2002-04-23  Jeff Johnston  <jjohnstn@redhat.com>
 
         *  libc/include/machine/types.h (__pid_t, __off_t, __loff_t): Added.
