@@ -728,8 +728,19 @@ usage ()
 {
   fprintf (stderr, "\
 Usage: strace [OPTIONS] <command-line>\n\
-  -b, --buffer-size=SIZE       Set size of output file buffer.\n\
-  -m, --mask=MASK              Set message filter mask.\n\
+  -b, --buffer-size=SIZE       set size of output file buffer\n\
+  -d, --no-delta               don't display the delta-t microsecond timestamp\n\
+  -f, --trace-children         also trace forked child processes\n\
+  -h, --help                   display this help info\n\
+  -m, --mask=MASK              set message filter mask\n\
+  -o, --output=FILENAME        set output file to FILENAME\n\
+  -n, --crack-error-numbers    output descriptive text instead of error\n\
+                               numbers for Windows errors\n\
+  -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs\n\
+  -t, --timestamp              use an absolute hh:mm:ss timestamp insted of the\n\
+                               default microsecond timestamp.  Implies -d\n\
+  -v, --version                display version info\n\
+  -w, --new-window             spawn program under test in a new window\n\
 \n\
     MASK can be any combination of the following mnemonics and/or hex values\n\
     (0x is optional).  Combine masks with '+' or ',' like so:\n\
@@ -756,18 +767,6 @@ Usage: strace [OPTIONS] <command-line>\n\
     nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.\n\
     malloc   0x20000 (_STRACE_MALLOC)   Trace malloc calls.\n\
     thread   0x40000 (_STRACE_THREAD)   Thread-locking calls.\n\
-\n\
-  -o, --output=FILENAME        Set output file to FILENAME.\n\
-  -f, --trace-children         Also trace forked child processes.\n\
-  -n, --crack-error-numbers    Output descriptive text instead of error\n\
-                                 numbers for Windows errors.\n\
-  -d, --no-delta               Don't display the delta-t microsecond timestamp.\n\
-  -t, --timestamp              Use an absolute hh:mm:ss timestamp insted of the\n\
-                                 default microsecond timestamp.  Implies -d.\n\
-  -w, --new-window             Spawn program under test in a new window.\n\
-  -S, --flush-period=PERIOD    Flush buffered strace output every PERIOD secs.\n\
-  -v, --version                Display version info.\n\
-  -h, --help                   Display this help info.\n\
 ");
 }
 

@@ -31,7 +31,7 @@ it reports on both.</para>
 <para>The <literal>-c</literal> option causes the "program" arguments
 to be interpreted as package names.  <command>cygcheck</command> will
 report the current version of the package that you specify.  With no
-arguments, <command>cygcheck</command> will report on all packages.
+arguments, <command>cygcheck</command> will report on all packages.</para>
 
 <para>The <command>cygcheck</command> program should be used to send
 information about your system to Cygnus for troubleshooting (if your
@@ -73,14 +73,17 @@ or if you know what everything is already, just leave this out.</para>
 Usage: cygpath [-p|--path] (-u|--unix)|(-w|--windows [-s|--short-name]) filename
        cygpath [-v|--version]
        cygpath [-W|--windir|-S|--sysdir]
-  -u|--unix       print UNIX form of filename
-  -w|--windows    print Windows form of filename
-  -s|--short-name print Windows short form of filename
-  -p|--path       filename argument is a path
-  -v|--version    print program version
-  -W|--windir     print Windows directory
-  -S|--sysdir     print Windows system directory
-  -i|--ignore     ignore missing filename argument
+  -a|--absolute      output absolute path
+  -c|--close handle  close handle (for use in captured process)
+  -f|--file file     read file for path information
+  -i|--ignore        ignore missing filename argument
+  -p|--path          filename argument is a path
+  -s|--short-name    print Windows short form of filename
+  -S|--sysdir        print Windows system directory
+  -u|--unix          print UNIX form of filename
+  -v|--version       print program version
+  -w|--windows       print Windows form of filename
+  -W|--windir        print Windows directory
 </screen>
 
 <para>The <command>cygpath</command> program is a utility that
@@ -201,15 +204,20 @@ SIGUSR2     31    user defined signal 2
 <sect2 id="mkgroup"><title>mkgroup</title>
 
 <screen>
-usage: mkgroup &lt;options&gt; [domain]
-This program prints group information to stdout
-Options:\n");
-    -l,--local           print pseudo group information if there is
-                         no domain
-    -d,--domain          print global group information from the domain
-                         specified (or from the current domain if there is
-                         no domain specified)
-    -?,--help            print this message
+usage: mkgroup [options] [domain]
+  This program prints a /etc/group file to stdout
+  Options:
+     -l,--local             print local group information
+     -d,--domain            print global group information from the domain
+                            specified (or from the current domain if there is
+                            no domain specified)
+     -o,--id-offset offset  change the default offset (10000) added to uids
+                            in domain accounts.
+     -s,--no-sids           don't print SIDs in pwd field
+                            (this affects ntsec)
+     -u,--users             print user list in gr_mem field
+     -?,--help              print this message
+  One of `-l' or `-d' must be given on NT/W2K.
 </screen>
 
 <para>The <command>mkgroup</command> program can be used to help
@@ -240,14 +248,24 @@ local machine or the default (or given) domain.</para>
 
 <screen>
 Usage: mkpasswd [options] [domain]
-This program prints a /etc/passwd file to stdout
-Options are
-   -l,--local              print local accounts
-   -d,--domain             print domain accounts (from current domain
-                           if no domain specified
-   -g,--local-groups       print local group information too
-   -?,--help               displays this message
-This program does only work on Windows NT
+  Usage: mkpasswd [OPTION]... [domain]
+  This program prints a /etc/passwd file to stdout
+  Options:
+     -l,--local              print local user accounts
+     -d,--domain             print domain accounts (from current domain
+                             if no domain specified)
+     -o,--id-offset offset   change the default offset (10000) added to uids
+                             in domain accounts.
+     -g,--local-groups       print local group information too
+                             if no domain specified
+     -m,--no-mount           don't use mount points for home dir
+     -s,--no-sids            don't print SIDs in GCOS field
+                             (this affects ntsec)
+     -p,--path-to-home path  if user account has no home dir, use
+                             path instead of /home/
+     -u,--username username  only return information for the specified user
+     -?,--help               displays this message
+  One of `-l', `-d' or `-g' must be given on NT/W2K.
 </screen>
 
 <para>The <command>mkpasswd</command> program can be used to help
@@ -346,17 +364,24 @@ some systems.</para>
 
 <screen>
 Usage mount
-      mount [-bfs] &lt;win32path&gt; &lt;posixpath&gt;
-      mount [-bs] --change-cygdrive-prefix&lt;posixpath&gt;
-      mount --import-old-mounts
+      mount [options] &lt;win32path&gt; &lt;posixpath&gt;
 
-  -b = text files are equivalent to binary files (newline = \n)
-  -x = files in the mounted directory are automatically given execute permission.
-  -X = files in the mounted directory are automatically given execute permission and are assumed to be Cygwin (i.e., not generic windows) executables only.
-  -f = force mount, don't warn about missing mount point directories
-  -s = add mount point to system-wide registry location
-  --change-automount-prefix = change path prefix used for automatic mount points
-  --import-old-mounts = copy old registry mount table mounts into the current mount areas
+  -b, --binary                  text files are equivalent to binary files
+                                (newline = \n)
+  -c, --change-cygdrive-prefix  change the cygdrive path prefix to &lt;posixpath&gt;
+  -f, --force                   force mount, don't warn about missing mount
+                                point directories
+  -i, --import-old-mounts copy  old registry mount table mounts into the current
+                                mount areas
+  -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix
+  -s, --system                  add mount point to system-wide registry location
+  -t, --text       (default)    text files get \r\n line endings
+  -u, --user       (default)    add mount point to user registry location
+  -x, --executable              treat all files under mount point as executables
+  -X, --cygwin-executable       treat all files under mount point as cygwin
+                                executables
+  -m, --mount-commands          write mount commands to replace user and
+                                system mount points and cygdrive prefixes
 
   When invoked without any arguments, mount displays the current mount table.
 </screen>
@@ -551,13 +576,13 @@ program.</para>
 <sect2 id="umount"><title>umount</title>
 
 <screen>
-Usage umount [-s] &lt;posixpath&gt;
--s = remove mount point from system-wide registry location
-
---remove-all-mounts = remove all mounts
---remove-auto-mounts = remove all automatically mounted mounts
---remove-user-mounts = remove all mounts in the current user mount registry area, including auto mounts
---remove-system-mounts = Remove all mounts in the system-wide mount registry area
+Usage umount [options] &lt;posixpath&gt;
+  -A, --remove-all-mounts       remove all mounts
+  -c, --remove-cygdrive-prefix  remove cygdrive prefix
+  -s, --system                  remove system mount
+  -S, --remove-system-mounts    remove all system mounts
+  -u, --user                    remove user mount
+  -U, --remove-user-mounts      remove all user mounts
 </screen>
 
 <para>The <command>umount</command> program removes mounts from the
@@ -571,7 +596,7 @@ removing the mount from the system-wide registry area instead
 all mounts of a particular type.  With the extended options it is
 possible to remove all mounts, all automatically-mounted mounts, all
 mounts in the current user's registry area, or all mounts in the
-system-wide registry area (with Administrator priviledges).</para>
+system-wide registry area (with Administrator privileges).</para>
 
 <para>See <Xref Linkend="mount">) for more information on the mount
 table.</para>
@@ -580,16 +605,47 @@ table.</para>
 <sect2 id="strace"><title>strace</title>
 
 <screen>
-Usage strace [-m mask] [-o output-file] [ft] program [args...]
+Usage strace [options] program [args...]
 
--b n		  use buffer of size 'n' when writing output file
--d		  include delta time in usecs for each line (default)
--f		  follow all forks and execs
--m mask		  mask for reporting cygwin events (default 1)
--n		  convert Win32 error messages to text
--o output-file	  output file to hold strace events (default stderr)
--t		  output time in hh:mm:ss format
--u		  include time in usecs since start for each line (default)
+  -b, --buffer-size=SIZE       set size of output file buffer
+  -d, --no-delta               don't display the delta-t microsecond timestamp
+  -f, --trace-children         also trace forked child processes
+  -h, --help                   display help info
+  -m, --mask=MASK              set message filter mask
+  -o, --output=FILENAME        set output file to FILENAME
+  -n, --crack-error-numbers    output descriptive text instead of error
+                               numbers for Windows errors
+  -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs
+  -t, --timestamp              use an absolute hh:mm:ss timestamp insted of the
+                               default microsecond timestamp.  Implies -d
+  -v, --version                display version info
+  -w, --new-window             spawn program under test in a new window
+
+    MASK can be any combination of the following mnemonics and/or hex values
+    (0x is optional).  Combine masks with '+' or ',' like so:
+
+                      --mask=wm+system,malloc+0x00800
+
+    Mnemonic Hex     Corresponding Def  Description
+    =========================================================================
+    all      0x00001 (_STRACE_ALL)      All strace messages.
+    flush    0x00002 (_STRACE_FLUSH)    Flush output buffer after each message.
+    inherit  0x00004 (_STRACE_INHERIT)  Children inherit mask from parent.
+    uhoh     0x00008 (_STRACE_UHOH)     Unusual or weird phenomenon.
+    syscall  0x00010 (_STRACE_SYSCALL)  System calls.
+    startup  0x00020 (_STRACE_STARTUP)  argc/envp printout at startup.
+    debug    0x00040 (_STRACE_DEBUG)    Info to help debugging. 
+    paranoid 0x00080 (_STRACE_PARANOID) Paranoid info.
+    termios  0x00100 (_STRACE_TERMIOS)  Info for debugging termios stuff.
+    select   0x00200 (_STRACE_SELECT)   Info on ugly select internals.
+    wm       0x00400 (_STRACE_WM)       Trace Windows msgs (enable _strace_wm).
+    sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.
+    minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.
+    exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.
+    system   0x08000 (_STRACE_SYSTEM)   Cache strace messages.
+    nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.
+    malloc   0x20000 (_STRACE_MALLOC)   Trace malloc calls.
+    thread   0x40000 (_STRACE_THREAD)   Thread-locking calls.
 </screen>
 
 <para>The <command>strace</command> program executes a program, and

@@ -1220,15 +1220,13 @@ void
 usage ()
 {
   fprintf (stderr, "Usage: cygcheck [OPTIONS] [program ...]\n");
-  fprintf (stderr, "  -s, --sysinfo  = system information (not with -k)\n");
-  fprintf (stderr,
-	   "  -v, --verbose  = verbose output (indented) (for -s or programs)\n");
-  fprintf (stderr, "  -r, --registry = registry search (requires -s)\n");
-  fprintf (stderr,
-	   "  -k, --keycheck = perform a keyboard check session (not with -s)\n");
-  fprintf (stderr, "  -h, --help     = give help about the info\n");
-  fprintf (stderr,
-	   "You must at least give either -s or -k or a program name\n");
+  fprintf (stderr, "  -c, --check-setup = check packages installed via setup.exe\n");
+  fprintf (stderr, "  -s, --sysinfo     = system information (not with -k)\n");
+  fprintf (stderr, "  -v, --verbose     = verbose output (indented) (for -s or programs)\n");
+  fprintf (stderr, "  -r, --registry    = registry search (requires -s)\n");
+  fprintf (stderr, "  -k, --keycheck    = perform a keyboard check session (not with -s)\n");
+  fprintf (stderr, "  -h, --help        = give help about the info (not with -c)\n");
+  fprintf (stderr, "You must at least give either -s or -k or a program name\n");
   exit (1);
 }
 
