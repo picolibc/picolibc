@@ -45,13 +45,13 @@ class mmap_record
     HANDLE mapping_handle_;
     int devtype_;
     DWORD access_mode_;
-    __off64_t offset_;
+    _off64_t offset_;
     DWORD size_to_map_;
     caddr_t base_address_;
     DWORD *map_map_;
 
   public:
-    mmap_record (int fd, HANDLE h, DWORD ac, __off64_t o, DWORD s, caddr_t b) :
+    mmap_record (int fd, HANDLE h, DWORD ac, _off64_t o, DWORD s, caddr_t b) :
        fdesc_ (fd),
        mapping_handle_ (h),
        devtype_ (0),
@@ -76,11 +76,11 @@ class mmap_record
     DWORD get_size () const { return size_to_map_; }
     caddr_t get_address () const { return base_address_; }
     DWORD *get_map () const { return map_map_; }
-    void alloc_map (__off64_t off, DWORD len);
+    void alloc_map (_off64_t off, DWORD len);
     void free_map () { if (map_map_) free (map_map_); }
 
     DWORD find_empty (DWORD pages);
-    __off64_t map_map (__off64_t off, DWORD len);
+    _off64_t map_map (_off64_t off, DWORD len);
     BOOL unmap_map (caddr_t addr, DWORD len);
     void fixup_map (void);
     int access (caddr_t address);
@@ -111,7 +111,7 @@ mmap_record::find_empty (DWORD pages)
 }
 
 void
-mmap_record::alloc_map (__off64_t off, DWORD len)
+mmap_record::alloc_map (_off64_t off, DWORD len)
 {
   /* Allocate one bit per page */
   map_map_ = (DWORD *) calloc (MAPSIZE (PAGE_CNT (size_to_map_)),
@@ -138,8 +138,8 @@ mmap_record::alloc_map (__off64_t off, DWORD len)
     }
 }
 
-__off64_t
-mmap_record::map_map (__off64_t off, DWORD len)
+_off64_t
+mmap_record::map_map (_off64_t off, DWORD len)
 {
   /* Used ONLY if this mapping matches into the chunk of another already
      performed mapping in a special case of MAP_ANON|MAP_PRIVATE.
@@ -169,7 +169,7 @@ mmap_record::map_map (__off64_t off, DWORD len)
 			  len * getpagesize (), prot, &old_prot))
     {
       __seterrno ();
-      return (__off64_t)-1;
+      return (_off64_t)-1;
     }
 
   while (len-- > 0)
@@ -267,10 +267,10 @@ public:
   DWORD hash;
   list ();
   ~list ();
-  mmap_record *add_record (mmap_record r, __off64_t off, DWORD len);
+  mmap_record *add_record (mmap_record r, _off64_t off, DWORD len);
   void erase (int i);
   void erase ();
-  mmap_record *match (__off64_t off, DWORD len);
+  mmap_record *match (_off64_t off, DWORD len);
   long match (caddr_t addr, DWORD len, long start);
 };
 
@@ -288,7 +288,7 @@ list::~list ()
 }
 
 mmap_record *
-list::add_record (mmap_record r, __off64_t off, DWORD len)
+list::add_record (mmap_record r, _off64_t off, DWORD len)
 {
   if (nrecs == maxrecs)
     {
@@ -302,7 +302,7 @@ list::add_record (mmap_record r, __off64_t off, DWORD len)
 
 /* Used in mmap() */
 mmap_record *
-list::match (__off64_t off, DWORD len)
+list::match (_off64_t off, DWORD len)
 {
   if (fd == -1 && !off)
     {
@@ -324,7 +324,7 @@ list::match (__off64_t off, DWORD len)
 
 /* Used in munmap() */
 long
-list::match (caddr_t addr, DWORD len, __off32_t start)
+list::match (caddr_t addr, DWORD len, _off_t start)
 {
   for (int i = start + 1; i < nrecs; ++i)
     if (addr >= recs[i].get_address ()
@@ -422,7 +422,7 @@ map::erase (int i)
 static map *mmapped_areas;
 
 extern "C" caddr_t
-mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
+mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
 {
   syscall_printf ("addr %x, len %d, prot %x, flags %x, fd %d, off %D",
 		  addr, len, prot, flags, fd, off);
@@ -466,7 +466,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
     fd = -1;
 
   /* Map always in multipliers of `granularity'-sized chunks. */
-  __off64_t gran_off = off & ~(granularity - 1);
+  _off64_t gran_off = off & ~(granularity - 1);
   DWORD gran_len = howmany (off + len, granularity) * granularity - gran_off;
 
   fhandler_base *fh;
@@ -488,7 +488,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
 	{
 	  DWORD high;
 	  DWORD low = GetFileSize (fh->get_handle (), &high);
-	  __off64_t fsiz = ((__off64_t)high << 32) + low;
+	  _off64_t fsiz = ((_off64_t)high << 32) + low;
 	  fsiz -= gran_off;
 	  if (gran_len > fsiz)
 	    gran_len = fsiz;
@@ -513,7 +513,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
       mmap_record *rec;
       if ((rec = map_list->match (off, len)) != NULL)
 	{
-	  if ((off = rec->map_map (off, len)) == (__off64_t)-1)
+	  if ((off = rec->map_map (off, len)) == (_off64_t)-1)
 	    {
 	      syscall_printf ("-1 = mmap()");
 	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK|WRITE_LOCK, "mmap");
@@ -583,9 +583,9 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
 }
 
 extern "C" caddr_t
-mmap (caddr_t addr, size_t len, int prot, int flags, int fd, __off32_t off)
+mmap (caddr_t addr, size_t len, int prot, int flags, int fd, _off_t off)
 {
-  return mmap64 (addr, len, prot, flags, fd, (__off64_t)off);
+  return mmap64 (addr, len, prot, flags, fd, (_off64_t)off);
 }
 
 /* munmap () removes an mmapped area.  It insists that base area
@@ -733,7 +733,7 @@ invalid_address_range:
 */
 HANDLE
 fhandler_base::mmap (caddr_t *addr, size_t len, DWORD access,
-		     int flags, __off64_t off)
+		     int flags, _off64_t off)
 {
   set_errno (ENODEV);
   return INVALID_HANDLE_VALUE;
@@ -764,7 +764,7 @@ fhandler_base::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 /* Implementation for disk files. */
 HANDLE
 fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
-			  int flags, __off64_t off)
+			  int flags, _off64_t off)
 {
   DWORD protect;
 

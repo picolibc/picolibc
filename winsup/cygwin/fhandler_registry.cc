@@ -32,8 +32,8 @@ static const int registry_len = sizeof ("registry") - 1;
  * the bottom 16 bits are the absolute position and the top 15 bits
  * make up the value index if we are enuerating values.
  */
-static const __off32_t REG_ENUM_VALUES_MASK = 0x8000000;
-static const __off32_t REG_POSITION_MASK = 0xffff;
+static const _off_t REG_ENUM_VALUES_MASK = 0x8000000;
+static const _off_t REG_POSITION_MASK = 0xffff;
 
 /* List of root keys in /proc/registry.
  * Possibly we should filter out those not relevant to the flavour of Windows
@@ -351,14 +351,14 @@ out:
   return res;
 }
 
-__off64_t
+_off64_t
 fhandler_registry::telldir (DIR * dir)
 {
   return dir->__d_position & REG_POSITION_MASK;
 }
 
 void
-fhandler_registry::seekdir (DIR * dir, __off64_t loc)
+fhandler_registry::seekdir (DIR * dir, _off64_t loc)
 {
   /* Unfortunately cannot simply set __d_position due to transition from sub-keys to
    * values.

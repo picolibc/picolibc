@@ -1,3 +1,30 @@
+2003-04-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc: Change __off32_t to _off_t and __off64_t to _off64_t
+	throughout.
+	* fhandler.cc: Ditto.
+	* fhandler.h: Ditto.
+	* fhandler_clipboard.cc: Ditto.
+	* fhandler_disk_file.cc: Ditto.
+	* fhandler_dsp.cc: Ditto.
+	* fhandler_floppy.cc: Ditto.
+	* fhandler_mem.cc: Ditto.
+	* fhandler_proc.cc: Ditto.
+	* fhandler_process.cc: Ditto.
+	* fhandler_random.cc: Ditto.
+	* fhandler_registry.cc: Ditto.
+	* fhandler_tape.cc: Ditto.
+	* fhandler_termios.cc: Ditto.
+	* fhandler_virtual.cc: Ditto.
+	* fhandler_zero.cc: Ditto.
+	* mmap.cc: Ditto.
+	* pipe.cc: Ditto.
+	* syscalls.cc: Ditto.
+	* winsup.h: Ditto.
+	* include/cygwin/stat.h: Ditto.
+	* include/cygwin/types.h: Ditto.  Remove definition of __off32_t
+	and __off64_t.
+
 2003-03-31  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (setup_handler): Make sure winapi lock is released when

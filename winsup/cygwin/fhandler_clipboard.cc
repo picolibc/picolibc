@@ -244,8 +244,8 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
     }
 }
 
-__off64_t
-fhandler_dev_clipboard::lseek (__off64_t offset, int whence)
+_off64_t
+fhandler_dev_clipboard::lseek (_off64_t offset, int whence)
 {
   /* On reads we check this at read time, not seek time.
    * On writes we use this to decide how to write - empty and write, or open, copy, empty

@@ -356,8 +356,8 @@ fhandler_termios::fixup_after_fork (HANDLE parent)
   fork_fixup (parent, get_output_handle (), "output_handle");
 }
 
-__off64_t
-fhandler_termios::lseek (__off64_t, int)
+_off64_t
+fhandler_termios::lseek (_off64_t, int)
 {
   set_errno (ESPIPE);
   return -1;

@@ -26,7 +26,7 @@ struct __stat32
   __uid16_t     st_uid;
   __gid16_t     st_gid;
   __dev16_t     st_rdev;
-  __off32_t     st_size;
+  _off_t        st_size;
   timestruc_t   st_atim;
   timestruc_t   st_mtim;
   timestruc_t   st_ctim;
@@ -44,7 +44,7 @@ struct __stat64
   __uid32_t     st_uid;
   __gid32_t     st_gid;
   __dev32_t     st_rdev;
-  __off64_t     st_size;
+  _off64_t      st_size;
   timestruc_t   st_atim;
   timestruc_t   st_mtim;
   timestruc_t   st_ctim;

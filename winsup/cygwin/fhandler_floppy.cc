@@ -79,16 +79,16 @@ fhandler_dev_floppy::close (void)
   return fhandler_dev_raw::close ();
 }
 
-__off64_t
-fhandler_dev_floppy::lseek (__off64_t offset, int whence)
+_off64_t
+fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 {
   int ret;
   char buf[512];
-  __off64_t drive_size = 0;
-  __off64_t lloffset = offset;
-  __off64_t current_position;
-  __off64_t sector_aligned_offset;
-  __off64_t bytes_left;
+  _off64_t drive_size = 0;
+  _off64_t lloffset = offset;
+  _off64_t current_position;
+  _off64_t sector_aligned_offset;
+  _off64_t bytes_left;
   DWORD low;
   LONG high = 0;
 
@@ -142,7 +142,7 @@ fhandler_dev_floppy::lseek (__off64_t offset, int whence)
 	  __seterrno ();
 	  return -1;
 	}
-      current_position = low + ((__off64_t) high << 32);
+      current_position = low + ((_off64_t) high << 32);
       if (is_writing)
 	current_position += devbufend - devbufstart;
       else
@@ -195,8 +195,8 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
   DISK_GEOMETRY di;
   PARTITION_INFORMATION pi;
   DWORD bytes_read;
-  __off64_t drive_size = 0;
-  __off64_t start = 0;
+  _off64_t drive_size = 0;
+  _off64_t start = 0;
   switch (cmd)
     {
     case HDIO_GETGEO:
@@ -271,7 +271,7 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
 	if (cmd == BLKGETSIZE)
 	  *(long *)buf = drive_size >> 9UL;
 	else
-	  *(__off64_t *)buf = drive_size;
+	  *(_off64_t *)buf = drive_size;
 	return 0;
       }
     case BLKRRPART:

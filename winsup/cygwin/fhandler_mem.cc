@@ -236,8 +236,8 @@ fhandler_dev_mem::close (void)
   return fhandler_base::close ();
 }
 
-__off64_t
-fhandler_dev_mem::lseek (__off64_t offset, int whence)
+_off64_t
+fhandler_dev_mem::lseek (_off64_t offset, int whence)
 {
   switch (whence)
     {
@@ -270,7 +270,7 @@ fhandler_dev_mem::lseek (__off64_t offset, int whence)
 
 HANDLE
 fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
-			int flags, __off64_t off)
+			int flags, _off64_t off)
 {
   if (off >= mem_size
       || (DWORD) len >= mem_size

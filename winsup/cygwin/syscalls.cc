@@ -533,10 +533,10 @@ extern "C" int _open (const char *, int flags, ...)
 extern "C" int _open64 (const char *, int flags, ...)
   __attribute__ ((alias ("open")));
 
-extern "C" __off64_t
-lseek64 (int fd, __off64_t pos, int dir)
+extern "C" _off64_t
+lseek64 (int fd, _off64_t pos, int dir)
 {
-  __off64_t res;
+  _off64_t res;
   sigframe thisframe (mainthread);
 
   if (dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END)
@@ -557,16 +557,16 @@ lseek64 (int fd, __off64_t pos, int dir)
   return res;
 }
 
-extern "C" int _lseek64 (int fd, __off64_t pos, int dir)
+extern "C" int _lseek64 (int fd, _off64_t pos, int dir)
   __attribute__ ((alias ("lseek64")));
 
-extern "C" __off32_t
-lseek (int fd, __off32_t pos, int dir)
+extern "C" _off_t
+lseek (int fd, _off_t pos, int dir)
 {
-  return lseek64 (fd, (__off64_t) pos, dir);
+  return lseek64 (fd, (_off64_t) pos, dir);
 }
 
-extern "C" __off32_t _lseek (int, __off32_t, int)
+extern "C" _off_t _lseek (int, _off_t, int)
   __attribute__ ((alias ("lseek")));
 
 extern "C" int
@@ -1030,7 +1030,7 @@ fstat64 (int fd, struct __stat64 *buf)
   return res;
 }
 
-extern "C" int _fstat64 (int fd, __off64_t pos, int dir)
+extern "C" int _fstat64 (int fd, _off64_t pos, int dir)
   __attribute__ ((alias ("fstat64")));
 
 extern "C" int
@@ -1043,7 +1043,7 @@ fstat (int fd, struct __stat32 *buf)
   return ret;
 }
 
-extern "C" int _fstat (int fd, __off64_t pos, int dir)
+extern "C" int _fstat (int fd, _off64_t pos, int dir)
   __attribute__ ((alias ("fstat")));
 
 /* fsync: P96 6.6.1.1 */
@@ -1130,7 +1130,7 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
   return res;
 }
 
-extern "C" int _stat (int fd, __off64_t pos, int dir)
+extern "C" int _stat (int fd, _off64_t pos, int dir)
   __attribute__ ((alias ("stat")));
 
 extern "C" int
@@ -1736,7 +1736,7 @@ setmode (int fd, int mode)
 }
 
 extern "C" int
-ftruncate64 (int fd, __off64_t length)
+ftruncate64 (int fd, _off64_t length)
 {
   sigframe thisframe (mainthread);
   int res = -1;
@@ -1753,7 +1753,7 @@ ftruncate64 (int fd, __off64_t length)
 	  if (cfd->get_handle ())
 	    {
 	      /* remember curr file pointer location */
-	      __off64_t prev_loc = cfd->lseek (0, SEEK_CUR);
+	      _off64_t prev_loc = cfd->lseek (0, SEEK_CUR);
 
 	      cfd->lseek (length, SEEK_SET);
 	      if (!SetEndOfFile (h))
@@ -1773,14 +1773,14 @@ ftruncate64 (int fd, __off64_t length)
 
 /* ftruncate: P96 5.6.7.1 */
 extern "C" int
-ftruncate (int fd, __off32_t length)
+ftruncate (int fd, _off_t length)
 {
-  return ftruncate64 (fd, (__off64_t)length);
+  return ftruncate64 (fd, (_off64_t)length);
 }
 
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
 extern "C" int
-truncate64 (const char *pathname, __off64_t length)
+truncate64 (const char *pathname, _off64_t length)
 {
   sigframe thisframe (mainthread);
   int fd;
@@ -1802,9 +1802,9 @@ truncate64 (const char *pathname, __off64_t length)
 
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
 extern "C" int
-truncate (const char *pathname, __off32_t length)
+truncate (const char *pathname, _off_t length)
 {
-  return truncate64 (pathname, (__off64_t)length);
+  return truncate64 (pathname, (_off64_t)length);
 }
 
 extern "C" long

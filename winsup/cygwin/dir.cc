@@ -149,7 +149,7 @@ readdir (DIR *dir)
   return res;
 }
 
-extern "C" __off64_t
+extern "C" _off64_t
 telldir64 (DIR *dir)
 {
   if (check_null_invalid_struct_errno (dir))
@@ -161,14 +161,14 @@ telldir64 (DIR *dir)
 }
 
 /* telldir */
-extern "C" __off32_t
+extern "C" _off_t
 telldir (DIR *dir)
 {
   return telldir64 (dir);
 }
 
 extern "C" void
-seekdir64 (DIR *dir, __off64_t loc)
+seekdir64 (DIR *dir, _off64_t loc)
 {
   if (check_null_invalid_struct_errno (dir))
     return;
@@ -180,9 +180,9 @@ seekdir64 (DIR *dir, __off64_t loc)
 
 /* seekdir */
 extern "C" void
-seekdir (DIR *dir, __off32_t loc)
+seekdir (DIR *dir, _off_t loc)
 {
-  seekdir64 (dir, (__off64_t)loc);
+  seekdir64 (dir, (_off64_t)loc);
 }
 
 /* rewinddir: POSIX 5.1.2.1 */

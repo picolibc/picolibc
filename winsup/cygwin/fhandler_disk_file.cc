@@ -230,7 +230,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
   to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
   to_timestruc_t (&ftCreationTime, &buf->st_ctim);
   buf->st_dev = pc->volser ();
-  buf->st_size = ((__off64_t)nFileSizeHigh << 32) + nFileSizeLow;
+  buf->st_size = ((_off64_t)nFileSizeHigh << 32) + nFileSizeLow;
   /* Unfortunately the count of 2 confuses `find (1)' command. So
      let's try it with `1' as link count. */
   if (pc->isdir () && !pc->isremote () && nNumberOfLinks == 1)
@@ -269,7 +269,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
     /* On systems supporting compressed (and sparsed) files,
        GetCompressedFileSize() returns the actual amount of
        bytes allocated on disk.  */
-    buf->st_blocks = (((__off64_t)nFileSizeHigh << 32)
+    buf->st_blocks = (((_off64_t)nFileSizeHigh << 32)
 		     + nFileSizeLow + S_BLKSIZE - 1) / S_BLKSIZE;
   else
     /* Just compute no. of blocks from file size. */
@@ -457,10 +457,10 @@ fhandler_disk_file::close ()
 int
 fhandler_disk_file::lock (int cmd, struct flock *fl)
 {
-  __off64_t win32_start;
+  _off64_t win32_start;
   int win32_len;
   DWORD win32_upper;
-  __off64_t startpos;
+  _off64_t startpos;
 
   /*
    * We don't do getlck calls yet.
@@ -494,7 +494,7 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 	      __seterrno ();
 	      return -1;
 	    }
-	  startpos = ((__off64_t)finfo.nFileSizeHigh << 32)
+	  startpos = ((_off64_t)finfo.nFileSizeHigh << 32)
 		     + finfo.nFileSizeLow;
 	  break;
 	}
@@ -715,14 +715,14 @@ fhandler_disk_file::readdir (DIR *dir)
   return res;
 }
 
-__off64_t
+_off64_t
 fhandler_disk_file::telldir (DIR *dir)
 {
   return dir->__d_position;
 }
 
 void
-fhandler_disk_file::seekdir (DIR *dir, __off64_t loc)
+fhandler_disk_file::seekdir (DIR *dir, _off64_t loc)
 {
     rewinddir (dir);
     while (loc > dir->__d_position)
@@ -829,14 +829,14 @@ fhandler_cygdrive::readdir (DIR *dir)
   return dir->__d_dirent;
 }
 
-__off64_t
+_off64_t
 fhandler_cygdrive::telldir (DIR *dir)
 {
   return fhandler_disk_file::telldir (dir);
 }
 
 void
-fhandler_cygdrive::seekdir (DIR *dir, __off64_t loc)
+fhandler_cygdrive::seekdir (DIR *dir, _off64_t loc)
 {
   if (!iscygdrive_root ())
     return fhandler_disk_file::seekdir (dir, loc);

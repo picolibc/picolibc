@@ -161,8 +161,8 @@ fhandler_dev_tape::fstat (struct __stat64 *buf, path_conv *pc)
   return ret;
 }
 
-__off64_t
-fhandler_dev_tape::lseek (__off64_t offset, int whence)
+_off64_t
+fhandler_dev_tape::lseek (_off64_t offset, int whence)
 {
   struct mtop op;
   struct mtpos pos;

@@ -93,13 +93,13 @@ fhandler_virtual::opendir (path_conv& pc)
   return res;
 }
 
-__off64_t fhandler_virtual::telldir (DIR * dir)
+_off64_t fhandler_virtual::telldir (DIR * dir)
 {
   return dir->__d_position;
 }
 
 void
-fhandler_virtual::seekdir (DIR * dir, __off64_t loc)
+fhandler_virtual::seekdir (DIR * dir, _off64_t loc)
 {
   dir->__d_position = loc;
   return;
@@ -118,15 +118,15 @@ fhandler_virtual::closedir (DIR * dir)
   return 0;
 }
 
-__off64_t
-fhandler_virtual::lseek (__off64_t offset, int whence)
+_off64_t
+fhandler_virtual::lseek (_off64_t offset, int whence)
 {
   /*
    * On Linux, when you lseek within a /proc file,
    * the contents of the file are updated.
    */
   if (!fill_filebuf ())
-    return (__off64_t) -1;
+    return (_off64_t) -1;
   switch (whence)
     {
     case SEEK_SET:
@@ -140,7 +140,7 @@ fhandler_virtual::lseek (__off64_t offset, int whence)
       break;
     default:
       set_errno (EINVAL);
-      return (__off64_t) -1;
+      return (_off64_t) -1;
     }
   return position;
 }
