@@ -1353,12 +1353,11 @@ getdtablesize ()
   return fdtab.size;
 }
 
-static DWORD sys_page_size = 0;
-
 extern "C" size_t
 getpagesize ()
 {
-  return sysconf (_SC_PAGESIZE);
+  static DWORD sys_page_size = 0;
+
   if (!sys_page_size)
     {
       SYSTEM_INFO si;

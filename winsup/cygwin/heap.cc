@@ -21,6 +21,8 @@ details. */
 
 static unsigned page_const = 0;
 
+extern "C" size_t getpagesize ();
+
 /* Initialize the heap at process start up.  */
 
 void
@@ -29,7 +31,6 @@ heap_init ()
   /* If we're the forkee, we must allocate the heap at exactly the same place
      as our parent.  If not, we don't care where it ends up.  */
 
-  extern size_t getpagesize ();
   page_const = getpagesize ();
   if (brkbase)
     {
