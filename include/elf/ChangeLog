@@ -1,3 +1,7 @@
+2003-04-24 Dhananjay Deshpande <dhananjayd@kpitcummins.com> 
+
+	* elf/h8.h (E_H8_MACH_H8300HN, E_H8_MACH_H8300SN): New
+
 2003-04-23  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* common.h (EM_SH): Amend comment to refer to SuperH.
