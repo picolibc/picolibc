@@ -244,10 +244,17 @@ properly).
 You should only have one copy of the Cygwin DLL on your system.  If you
 have multiple versions, they will conflict and cause problems.
 
-If you get the error "shared region is corrupted" it means you have
-multiple versions of cygwin1.dll running at the same time.  This could
-happen, for example, if you update cygwin1.dll without exiting @emph{all}
-Cygwin apps (including inetd) beforehand.
+If you get the error "shared region is corrupted" or "shared region
+version mismatch" it means you have multiple versions of cygwin1.dll
+running at the same time.  This could happen, for example, if you update
+cygwin1.dll without exiting @emph{all} Cygwin apps (including inetd)
+beforehand.
+
+If you're trying to find multiple versions of the DLL that are causing
+this problem, reboot first, in case DLL's still loaded in memory are the
+cause.  Then use the Windows System find utility to search your whole
+machine, not just components in your PATH (as 'type' would do) or
+cygwin-mounted filesystems (as Cygwin 'find' would do).
 
 @subsection Where can I find "more"?
 
