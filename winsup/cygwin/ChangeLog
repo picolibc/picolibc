@@ -1,3 +1,9 @@
+2004-05-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_mem.cc (fhandler_dev_mem::fhandler_dev_mem): Move
+	initialization of "mem_size" from here...
+	(fhandler_dev_mem::open): ...to here.  Fix typo in FH_PORT case.
+
 2004-05-07  Gerd Spalink  <Gerd.Spalink@t-online.de>
 
 	* fhandler_dsp.cc (fhandler_dev_dsp::Audio_out::stop): Move delete of

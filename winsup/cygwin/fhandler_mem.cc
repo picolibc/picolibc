@@ -25,11 +25,20 @@
 fhandler_dev_mem::fhandler_dev_mem ()
   : fhandler_base ()
 {
-  /* Reading physical memory only supported on NT/W2K. */
+}
+
+fhandler_dev_mem::~fhandler_dev_mem (void)
+{
+}
+
+int
+fhandler_dev_mem::open (int flags, mode_t)
+{
   if (!wincap.has_physical_mem_access ())
     {
-      mem_size = 0;
-      return;
+      set_errno (ENOENT);
+      debug_printf ("%s is accessible under NT/W2K only", dev ().name);
+      return 0;
     }
 
   if (dev () == FH_MEM) /* /dev/mem */
@@ -53,7 +62,7 @@ fhandler_dev_mem::fhandler_dev_mem ()
       mem_size = 0;
       debug_printf ("KMemSize: %d MB", mem_size >> 20);
     }
-  else if (dev () == FH_ZERO) /* /dev/port == First 64K of /dev/mem */
+  else if (dev () == FH_PORT) /* /dev/port == First 64K of /dev/mem */
     {
       mem_size = 65536;
       debug_printf ("PortSize: 64 KB");
@@ -62,21 +71,6 @@ fhandler_dev_mem::fhandler_dev_mem ()
     {
       mem_size = 0;
       debug_printf ("Illegal minor number!!!");
-    }
-}
-
-fhandler_dev_mem::~fhandler_dev_mem (void)
-{
-}
-
-int
-fhandler_dev_mem::open (int flags, mode_t)
-{
-  if (!wincap.has_physical_mem_access ())
-    {
-      set_errno (ENOENT);
-      debug_printf ("%s is accessible under NT/W2K only", dev ().name);
-      return 0;
     }
 
   /* Check for illegal flags. */
