@@ -2,6 +2,8 @@ Mon Jul 17 14:57:53 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Throughout, eliminate third argument to path_conv and use new PC_*
 	constants for second argument.
+	* dcrt0.cc (dll_crt0_1): Reorganize to allow more initialization prior
+	to returning due to dynamic loading.
 	* path.h: Generalize SYMLINK_* constants to PC_*.
 	(path_conv): Create a new method.  Fold third argument into second.
 	* dll_init.cc (dll_list::alloc): Try harder to find space to allocate
