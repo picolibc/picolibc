@@ -1,3 +1,15 @@
+Sat Mar 17 02:05:38 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dir.cc (readdir): Use strcasematch for consistency.
+	* path.cc (symlink_info): Eliminate known_suffix.
+	(path_conv::check): Always copy ext_here to end of buffer, if found.
+	(suffix_scan): Eliminate ext_here, add suffixes_start.
+	(suffix_scan::has): Eliminate an argument.  Reorganize.  Always return
+	pointer to end of input path.
+	(suffix_scan::next): Take a second pass through the suffix list looking
+	for .lnk.
+	(symlink_info::check): Eliminate known_suffix usage.
+
 Sat Mar 17 00:10:52 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (stat_dev): Give devices full read/write by default.

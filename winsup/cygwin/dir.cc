@@ -181,7 +181,7 @@ readdir (DIR * dir)
     {
       char *c = dir->__d_dirent->d_name;
       int len = strlen (c);
-      if (!strcasecmp (c + len - 4, ".lnk"))
+      if (strcasematch (c + len - 4, ".lnk"))
         {
 	  char fbuf[MAX_PATH + 1];
 	  strcpy (fbuf, dir->__d_dirname);

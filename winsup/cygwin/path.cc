@@ -85,14 +85,13 @@ static int path_prefix_p_ (const char *path1, const char *path2, int len1);
 struct symlink_info
 {
   char buf[3 + MAX_PATH * 3];
-  char *known_suffix;
   char *ext_here;
   char *contents;
   unsigned pflags;
   DWORD fileattr;
   int is_symlink;
   int error;
-  symlink_info (): known_suffix (NULL), contents (buf + MAX_PATH + 1) {}
+  symlink_info (): contents (buf + MAX_PATH + 1) {}
   int check (const char *path, const suffix_info *suffixes);
 };
 
@@ -370,9 +369,7 @@ path_conv::check (const char *src, unsigned opt,
     }
 
 fillin:
-  if (sym.known_suffix)
-    known_suffix = this->path + (sym.known_suffix - path_copy);
-  else if (sym.ext_here && !(opt & PC_SYM_CONTENTS))
+  if (sym.ext_here && !(opt & PC_SYM_CONTENTS))
     {
       known_suffix = strchr (this->path, '\0');
       strcpy (known_suffix, sym.ext_here);
@@ -2400,57 +2397,56 @@ enum
   SCAN_LNK,
   SCAN_HASLNK,
   SCAN_JUSTCHECK,
-  SCAN_DONE,
-  SCAN_CHECKEDLNK,
   SCAN_APPENDLNK,
+  SCAN_EXTRALNK,
+  SCAN_DONE,
 };
 
 class suffix_scan
 {
-  char *ext_here;
-  const suffix_info *suffixes;
+  const suffix_info *suffixes, *suffixes_start;
   int nextstate;
-  int nullterm;
+  char *eopath;
 public:
   const char *path;
-  char *has (const char *, const suffix_info *, char **);
+  char *has (const char *, const suffix_info *);
   int next ();
-  int lnk_match () {return nextstate >= SCAN_CHECKEDLNK;}
+  int lnk_match () {return nextstate >= SCAN_EXTRALNK;}
 };
 
 char *
-suffix_scan::has (const char *in_path, const suffix_info *in_suffixes, char **ext_where)
+suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
 {
-  path = in_path;
-  suffixes = in_suffixes;
-  nullterm = 0;
   nextstate = SCAN_BEG;
-  ext_here = *ext_where = strrchr (in_path, '.');
-  if (ext_here)
+  suffixes = suffixes_start = in_suffixes;
+
+  char *ext_here = strrchr (in_path, '.');
+  if (!ext_here)
+    goto done;
+
+  if (suffixes)
     {
-      if (suffixes)
-	{
-	  /* Check if the extension matches a known extension */
-	  for (const suffix_info *ex = in_suffixes; ex->name != NULL; ex++)
-	    if (strcasematch (ext_here, ex->name))
-	      {
-		nextstate = SCAN_JUSTCHECK;
-		suffixes = NULL;	/* Has an extension so don't scan for one. */
-		return ext_here;
-	      }
-	}
-      /* Didn't match.  Use last resort -- .lnk. */
-      if (strcasematch (ext_here, ".lnk"))
-	{
-	  nextstate = SCAN_HASLNK;
-	  suffixes = NULL;
-	}
+      /* Check if the extension matches a known extension */
+      for (const suffix_info *ex = in_suffixes; ex->name != NULL; ex++)
+	if (strcasematch (ext_here, ex->name))
+	  {
+	    nextstate = SCAN_JUSTCHECK;
+	    suffixes = NULL;	/* Has an extension so don't scan for one. */
+	    goto done;
+	  }
     }
 
-  /* Didn't find a matching suffix. */
-  ext_here = *ext_where = strchr (path, '\0');
-  nullterm = 1;
-  return NULL;
+  /* Didn't match.  Use last resort -- .lnk. */
+  if (strcasematch (ext_here, ".lnk"))
+    {
+      nextstate = SCAN_HASLNK;
+      suffixes = NULL;
+    }
+
+ done:
+  path = in_path;
+  eopath = strchr (path, '\0');
+  return eopath;
 }
 
 int
@@ -2463,7 +2459,9 @@ suffix_scan::next ()
 	  suffixes++;
 	else
 	  {
-	    strcpy (ext_here, suffixes->name);
+	    strcpy (eopath, suffixes->name);
+	    if (nextstate == SCAN_EXTRALNK)
+	      strcat (eopath, ".lnk");
 	    suffixes++;
 	    return 1;
 	  }
@@ -2473,22 +2471,29 @@ suffix_scan::next ()
   switch (nextstate)
     {
     case SCAN_BEG:
-      nextstate = SCAN_LNK;
+      suffixes = suffixes_start;
+      if (suffixes)
+	nextstate = SCAN_EXTRALNK;
+      else
+	nextstate = SCAN_LNK;
       return 1;
     case SCAN_HASLNK:
-      nextstate = SCAN_APPENDLNK;	/* Skip SCAN_BEG */
+      nextstate = SCAN_EXTRALNK;	/* Skip SCAN_BEG */
       return 1;
     case SCAN_LNK:
-    case SCAN_APPENDLNK:
-      strcpy (ext_here, ".lnk");
-      nextstate = SCAN_CHECKEDLNK;
+    case SCAN_EXTRALNK:
+      strcpy (eopath, ".lnk");
+      nextstate = SCAN_DONE;
       return 1;
     case SCAN_JUSTCHECK:
+      nextstate = SCAN_APPENDLNK;
+      return 1;
+    case SCAN_APPENDLNK:
+      strcat (eopath, ".lnk");
       nextstate = SCAN_DONE;
       return 1;
     default:
-      if (nullterm && ext_here)
-	*ext_here = '\0';
+      *eopath = '\0';
       return 0;
     }
 }
@@ -2518,7 +2523,7 @@ symlink_info::check (const char *path, const suffix_info *suffixes)
   suffix_scan suffix;
 
   is_symlink = TRUE;
-  known_suffix = suffix.has (path, suffixes, &ext_here);
+  ext_here = suffix.has (path, suffixes);
 
   while (suffix.next ())
     {
