@@ -1,3 +1,24 @@
+Thu Feb 22 13:38:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* shortcut.c: New file. Provides a C interface to reading of
+	Windows shortcuts to avoid compiler flag `-fvtable-thunks'.
+	* shortcut.h: Ditto.
+	* Makefile.in: Add shortcut.o to DLL_OFILES.
+	* cygerrno.h: Provide a C interface to `geterrno_from_win_error' for
+	using in shortcut.c.
+	* errno.cc (geterrno_from_win_error): Define as extern "C".
+	* path.cc (struct symlink_info): Remove methods `check_shortcut' and
+	`check_sysfile'.
+	(shortcut_header): Move to shortcut.c.
+	(shortcut_initalized): Ditto.
+	(create_shortcut_header): Ditto.
+	(cmp_shortcut_header): Ditto.
+	(symlink_info::check_shortcut): Ditto. Reorganize as a plain C function.
+	(symlink_info::check_sysfile): Redefine as a global function using the
+	same parameter list as `check_shortcut' for clearness.
+	(symlink_info::check): Change parameter list for calls to
+	`check_shortcut' and `check_sysfile'.
+
 Thu Feb 22 12:04:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_disk_file::open): Use `inner_suffixes' when

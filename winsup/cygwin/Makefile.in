@@ -124,7 +124,8 @@ DLL_OFILES:=assert.o autoload.o cygheap.o dcrt0.o debug.o delqueue.o dir.o \
 	miscfuncs.o mmap.o \
 	net.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o pthread.o regexp.o \
 	regerror.o regsub.o registry.o resource.o scandir.o security.o select.o \
-	shared.o signal.o sigproc.o smallprint.o spawn.o strace.o strsep.o \
+	shared.o \
+	shortcut.o signal.o sigproc.o smallprint.o spawn.o strace.o strsep.o \
 	sync.o syscalls.o sysconf.o syslog.o termios.o thread.o times.o tty.o \
 	uinfo.o uname.o wait.o window.o \
 	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MT_SAFE_OBJECTS)

@@ -110,7 +110,7 @@ errmap[] =
   { 0, NULL, 0}
 };
 
-int __stdcall
+extern "C" int __stdcall
 geterrno_from_win_error (DWORD code, int deferrno)
 {
   for (int i = 0; errmap[i].w != 0; ++i)
