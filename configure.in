@@ -754,7 +754,10 @@ case "${target}" in
   i[3456]86-*-beos*)
      noconfigdirs="$noconfigdirs gdb target-newlib target-libgloss"
      ;;
-  m68k-*-elf*)
+ m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
+    noconfigdirs="$noconfigdirs target-libiberty target-librx target-libg++ target-libstdc++ target-libio target-libf2c target-libchill target-zlib target-libobjc"
+    ;;
+ m68k-*-elf*)
     if [ x${is_cross_compiler} != xno ] ; then
 	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
     fi

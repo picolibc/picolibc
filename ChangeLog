@@ -1,3 +1,8 @@
+2000-10-30  Stephane Carrez  <stcarrez@worldnet.fr>
+
+        * configure.in (noconfigdirs): Don't compile some
+        of the libraries for 68HC11 & 68hc12 targets.
+
 2000-09-30  Alexandre Oliva  <aoliva@redhat.com>
 
 	* ltconfig, ltmain.sh, libtool.m4: Updated from libtool
