@@ -161,7 +161,7 @@ host_dependent_constants::init (void)
     {
     case winNT:
       win32_upper = 0xffffffff;
-      shared = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+      shared = FILE_SHARE_READ | FILE_SHARE_WRITE;
       break;
 
     case win98:

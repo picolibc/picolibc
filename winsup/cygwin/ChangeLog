@@ -1,3 +1,8 @@
+Sat Mar 18 01:32:04 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (host_dependent_constants::init): Eliminate DELETE flag
+	from shared constant.
+
 Sat Mar 18 01:24:25 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* delqueue.cc (delqueue_list::queue_file): Add some debugging.
