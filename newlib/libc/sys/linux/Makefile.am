@@ -20,6 +20,7 @@ LIB_SOURCES = \
 	clock_gettime.c \
 	clock_settime.c \
 	flockfile.c \
+	fpathconf.c \
 	free.c \
 	freer.c \
 	ftok.c \
@@ -57,6 +58,7 @@ LIB_SOURCES = \
 	mtrim.c \
 	mtrimr.c \
 	ntp_gettime.c \
+	pathconf.c \
 	pread.c \
 	pread64.c \
 	process.c \

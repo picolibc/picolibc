@@ -32,6 +32,8 @@ _syscall1(int,dup,int,fd)
 _syscall2(int,dup2,int,oldfd,int,newfd)
 _syscall3(int,fcntl,int,fd,int,cmd,long,arg)
 _syscall1(int,fdatasync,int,fd)
+_syscall2(int,ftruncate,int,fd,off_t,len)
+_syscall2(int,truncate,const char *,path,off_t,len)
 _syscall1(int,fsync,int,fd)
 _syscall3(int,poll,struct pollfd *,fds,nfds_t,nfds,int,timeout)
 

@@ -1,5 +1,16 @@
 2002-07-19  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * libc/sys/linux/Makefile.am: Add pathconf.c and fpathconf.c.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/inode.c: Add chmod, fchmod, and chown syscalls.
+        * libc/sys/linux/io.c: Add ftruncate syscall.
+        * libc/sys/linux/fpathconf.c: New file.
+        * libc/sys/linux/pathconf.c: Ditto.
+	* libc/sys/linux/linux_fsinfo.h: Ditto.
+        * libc/sys/linux/sys/unistd.h: Ditto.
+
+2002-07-19  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/stdio64/Makefile.am: Remove missing files.
 	* libc/stdio64/Makefile.in: Regenerated.
 
