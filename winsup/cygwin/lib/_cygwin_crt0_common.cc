@@ -13,6 +13,8 @@ details. */
 #include <reent.h>
 #include <stdlib.h>
 
+#undef environ
+
 extern "C"
 {
 char **environ;
