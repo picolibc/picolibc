@@ -1,5 +1,11 @@
 2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winnt.h (ACE_INHERITED_OBJECT_TYPE_PRESENT,
+	ACE_OBJECT_TYPE_PRESENT): Add constants. For use with
+	OBJECTS_AND_NAME structure.
+
+2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/aclapi.h [_WIN32_WINNT >= 0x0501] (GetInheritanceSource[AW]):
 	Add functions. Don't know what PFN_OBJECT_MGR_FUNCTS is so use
 	void* instead.

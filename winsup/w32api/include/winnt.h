@@ -162,6 +162,8 @@ typedef DWORD FLONG;
 
 #define NTAPI __stdcall
 #include <basetsd.h>
+#define ACE_OBJECT_TYPE_PRESENT           0x00000001
+#define ACE_INHERITED_OBJECT_TYPE_PRESENT 0x00000002
 #define APPLICATION_ERROR_MASK       0x20000000
 #define ERROR_SEVERITY_SUCCESS       0x00000000
 #define ERROR_SEVERITY_INFORMATIONAL 0x40000000
@@ -3211,10 +3213,9 @@ extern PVOID GetFiberData(void);
         
 #endif /* __GNUC__ */
 
-#endif  /* RC_INVOKED */
+#endif /* RC_INVOKED */
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-
