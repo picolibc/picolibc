@@ -1530,7 +1530,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	case gettitle:
 	  {
 	    int n = strlen (dev_state->my_title_buf);
-	    if (*src < ' ' || *src >= '\177')
+	    if (*src < ' ')
 	      {
 		if (*src == '\007' && dev_state->state_ == gettitle)
 		  {
