@@ -1,7 +1,10 @@
-Sat Jun 17 13:41:50 2000  Christopher Faylor <cgf@cygnus.com>
+Sat Jun 17 13:49:12 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Avoid installing dll if we're cross building and the
 	cross-host system isn't a Windows system.
+	* configure.in: Detect cross-hosting situation and set appropriate
+	variables in Makefile.in.
+	* configure: Regenerate.
 
 Wed Apr 19 13:10:54 2000  Christopher Faylor <cgf@cygnus.com>
 
