@@ -1,3 +1,16 @@
+2002-07-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/windef.h (PVOID): Move typedef to...
+	* include/winnt: ...here.
+	(PVOID64): New typeddef.
+
+	* include/winnt,h (FILE_SEGMENT_ELEMENT): Define union.
+	* include/winbase.h: (ReadFileScatter, WriteFileGather):
+	Add prototypes.
+
+	* include/winnt,h (PROCESSOR_ARCHITECTURE_*): Add defines.
+	(PROCESSOR_INTEL_IA64): Add define.
+
 2002-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/oleidl.h (MK_ALT): Define.

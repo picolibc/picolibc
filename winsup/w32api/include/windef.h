@@ -228,7 +228,6 @@ typedef int *PINT,*LPINT;
 typedef WORD *PWORD,*LPWORD;
 typedef long *LPLONG;
 typedef DWORD *PDWORD,*LPDWORD;
-typedef void *PVOID,*LPVOID;
 typedef CONST void *PCVOID,*LPCVOID;
 typedef int INT;
 typedef unsigned int UINT,*PUINT,*LPUINT;
