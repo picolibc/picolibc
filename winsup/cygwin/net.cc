@@ -17,10 +17,10 @@ details. */
 #include <sys/un.h>
 
 #define Win32_Winsock
-#include "winsup.h"
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "winsup.h"
 #include "autoload.h"
 #include <winsock.h>
 
