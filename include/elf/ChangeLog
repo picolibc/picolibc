@@ -1,3 +1,13 @@
+2002-08-13  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* m68hc11.h (E_M68HC12_BANKS, E_M68HC11_I32, E_M68HC11_F64,
+	EF_M68HC11_ABI): Define for ABI specification.
+	(STO_M68HC12_FAR, STO_M68HC12_INTERRUPT): Symbol flags for
+	linker and debugger.
+	(R_M68HC11_24, R_M68HC11_LO16, R_M68HC11_PAGE): New relocs.
+	(R_M68HC11_RL_JUMP, R_M68HC11_RL_GROUP): New reloc for linker
+	relaxation.
+
 2002-07-15  Denis Chertykov  <denisc@overta.ru>
 	    Frank Ch. Eigler  <fche@redhat.com>
 	    Ben Elliston  <bje@redhat.com>
