@@ -12,6 +12,8 @@
 #define mtherr(fname, code) 
 #define XPD 0,
 
+#define _CEPHES_USE_ERRNO
+
 #ifdef _CEPHES_USE_ERRNO
 #define _SET_ERRNO(x) errno = (x)
 #else
@@ -275,3 +277,99 @@ while( --n );
 return( y );
 }
 
+/* Float version */
+
+/*							polevlf.c
+ *							p1evlf.c
+ *
+ *	Evaluate polynomial
+ *
+ *
+ *
+ * SYNOPSIS:
+ *
+ * int N;
+ * float x, y, coef[N+1], polevlf[];
+ *
+ * y = polevlf( x, coef, N );
+ *
+ *
+ *
+ * DESCRIPTION:
+ *
+ * Evaluates polynomial of degree N:
+ *
+ *                     2          N
+ * y  =  C  + C x + C x  +...+ C x
+ *        0    1     2          N
+ *
+ * Coefficients are stored in reverse order:
+ *
+ * coef[0] = C  , ..., coef[N] = C  .
+ *            N                   0
+ *
+ *  The function p1evl() assumes that coef[N] = 1.0 and is
+ * omitted from the array.  Its calling arguments are
+ * otherwise the same as polevl().
+ *
+ *
+ * SPEED:
+ *
+ * In the interest of speed, there are no checks for out
+ * of bounds arithmetic.  This routine is used by most of
+ * the functions in the library.  Depending on available
+ * equipment features, the user may wish to rewrite the
+ * program in microcode or assembly language.
+ *
+ */
+
+/*
+Cephes Math Library Release 2.1:  December, 1988
+Copyright 1984, 1987, 1988 by Stephen L. Moshier
+Direct inquiries to 30 Frost Street, Cambridge, MA 02140
+*/
+
+static __inline__ float polevlf(float x, const float* coef, int N )
+{
+float ans;
+float *p;
+int i;
+
+p = (float*)coef;
+ans = *p++;
+
+/*
+for( i=0; i<N; i++ )
+	ans = ans * x  +  *p++;
+*/
+
+i = N;
+do
+	ans = ans * x  +  *p++;
+while( --i );
+
+return( ans );
+}
+
+/*							p1evl()	*/
+/*                                          N
+ * Evaluate polynomial when coefficient of x  is 1.0.
+ * Otherwise same as polevl.
+ */
+
+static __inline__ float p1evlf( float x, const float *coef, int N )
+{
+float ans;
+float *p;
+int i;
+
+p = (float*)coef;
+ans = x + *p++;
+i = N-1;
+
+do
+	ans = ans * x  + *p++;
+while( --i );
+
+return( ans );
+}

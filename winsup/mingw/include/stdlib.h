@@ -323,6 +323,7 @@ double	strtod	(const char*, char**);
 #if !defined __NO_ISOCEXT  /* extern stubs in static libmingwex.a */
 extern __inline__ float strtof (const char *__nptr, char **__endptr)
   { return (strtod (__nptr, __endptr));}
+long double strtold (const char * __restrict__, char ** __restrict__);
 #endif /* __NO_ISOCEXT */
 
 long	strtol	(const char*, char**, int);
@@ -343,6 +344,7 @@ double	wcstod	(const wchar_t*, wchar_t**);
 #if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
 extern __inline__ float wcstof( const wchar_t *__nptr, wchar_t **__endptr)
 {  return (wcstod(__nptr, __endptr)); }
+long double wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
 #endif /* __NO_ISOCEXT */
 
 long	wcstol	(const wchar_t*, wchar_t**, int);

@@ -29,15 +29,16 @@ DISTFILES = Makefile.in configure configure.in \
 	_Exit.c atoll.c dirent.c feclearexcept.c fegetenv.c \
 	fegetexceptflag.c fegetround.c feholdexcept.c feraiseexcept.c \
 	fesetenv.c fesetexceptflag.c fesetround.c fetestexcept.c \
-	feupdateenv.c fwide.c imaxabs.c imaxdiv.c lltoa.c lltow.c \
+	feupdateenv.c fwide.c imaxabs.c imaxdiv.c ldtoa.c lltoa.c lltow.c \
 	mbsinit.c mingw-fseek.c sitest.c snprintf.c snwprintf.c \
-	strtof.c strtoimax.c strtoumax.c testwmem.c ulltoa.c ulltow.c \
-	vsnprintf.c vsnwprintf.c wcstof.c wcstoimax.c wcstoumax.c \
-	wdirent.c wmemchr.c wmemcmp.c wmemcpy.c wmemmove.c wmemset.c \
-	wtoll.c
+	strtof.c strtoimax.c strtold.c strtoumax.c testwmem.c \
+	ulltoa.c ulltow.c vsnprintf.c vsnwprintf.c wcstof.c \
+	wcstoimax.c wcstold.c wcstoumax.c wdirent.c wmemchr.c \
+	wmemcmp.c wmemcpy.c wmemmove.c wmemset.c wtoll.c
 MATH_DISTFILES = \
 	acosf.c acosl.c asinf.c asinl.c atan2f.c atan2l.c \
-	atanf.c atanl.c cbrt.c cbrtf.c cbrtl.c ceilf.S ceill.S cephes_mconf.h \
+	atanf.c atanl.c cbrt.c cbrtf.c cbrtl.c ceilf.S ceill.S \
+	cephes_emath.h cephes_emath.c cephes_mconf.h \
 	copysign.S copysignf.S copysignl.S cosf.S coshf.c coshl.c cosl.S \
 	exp2.S exp2f.S exp2l.S expf.c expl.c fabs.c fabsf.c fabsl.c \
 	fdim.c fdimf.c fdiml.c floorf.S floorl.S fma.S fmaf.S fmal.c \
@@ -45,7 +46,8 @@ MATH_DISTFILES = \
 	fmodl.c fp_consts.c fp_consts.h fp_constsf.c  fp_constsl.c \
 	fpclassify.c fpclassifyf.c fpclassifyl.c \
 	frexpf.c frexpl.S fucom.c hypotf.c hypotl.c ilogb.S ilogbf.S \
-	ilogbl.S isnan.c isnanf.c isnanl.c ldexpf.c ldexpl.c llrint.c \
+	ilogbl.S isnan.c isnanf.c isnanl.c ldexpf.c ldexpl.c \
+	lgamma.c lgammaf.c lgammal.c llrint.c \
 	llrintf.c llrintl.c llround.c llroundf.c llroundl.c \
 	log10f.S log10l.S log1p.S log1pf.S log1pl.S log2.S log2f.S \
 	log2l.S logb.c logbf.c logbl.c logf.S logl.S lrint.c lrintf.c \
@@ -54,9 +56,10 @@ MATH_DISTFILES = \
 	pow.c powf.c powi.c powif.c powil.c powl.c \
 	remainder.S remainderf.S remainderl.S remquo.S \
 	remquof.S remquol.S rint.c rintf.c rintl.c round.c roundf.c \
-	roundl.c scalbn.S scalbnf.S scalbnl.S signbit.c signbitf.c \
-	signbitl.c sinf.S sinhf.c sinhl.c sinl.S  sqrtf.c sqrtl.c \
-	tanf.S tanhf.c tanhl.c tanl.S trunc.c truncf.c truncl.c
+	roundl.c scalbn.S scalbnf.S scalbnl.S s_erf.c sf_erf.c \
+	signbit.c signbitf.c signbitl.c sinf.S sinhf.c sinhl.c sinl.S \
+	sqrtf.c sqrtl.c tanf.S tanhf.c tanhl.c tanl.S tgamma.c \
+	tgammaf.c tgammal.c trunc.c truncf.c truncl.c
 
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
@@ -93,6 +96,8 @@ Q8_OBJS = \
 	fwide.o imaxabs.o imaxdiv.o mbsinit.o \
 	strtoimax.o strtoumax.o wcstoimax.o wcstoumax.o \
 	wmemchr.o wmemcmp.o wmemcpy.o wmemmove.o wmemset.o
+STDLIB_OBJS = \
+	strtold.o wcstold.o
 STDLIB_STUB_OBJS = \
 	lltoa.o ulltoa.o \
 	lltow.o ulltow.o \
@@ -104,6 +109,7 @@ STDIO_STUB_OBJS = \
 MATH_OBJS = \
 	acosf.o acosl.o asinf.o asinl.o atan2f.o atan2l.o \
 	atanf.o atanl.o cbrt.o cbrtf.o cbrtl.o ceilf.o ceill.o \
+	cephes_emath.o \
 	copysign.o copysignf.o copysignl.o cosf.o coshf.o coshl.o cosl.o \
 	exp2.o exp2f.o exp2l.o expf.o expl.o fabs.o fabsf.o fabsl.o \
 	fdim.o fdimf.o fdiml.o floorf.o floorl.o fma.o fmaf.o fmal.o \
@@ -111,7 +117,8 @@ MATH_OBJS = \
 	fmodl.o fp_consts.o fp_constsf.o fp_constsl.o \
 	fpclassify.o fpclassifyf.o fpclassifyl.o \
 	frexpf.o frexpl.o fucom.o hypotf.o hypotl.o ilogb.o ilogbf.o \
-	ilogbl.o isnan.o isnanf.o isnanl.o ldexpf.o ldexpl.o llrint.o \
+	ilogbl.o isnan.o isnanf.o isnanl.o ldexpf.o ldexpl.o \
+	lgamma.o lgammaf.o lgammal.o llrint.o \
 	llrintf.o llrintl.o llround.o llroundf.o llroundl.o \
 	log10f.o log10l.o log1p.o log1pf.o log1pl.o log2.o log2f.o \
 	log2l.o logb.o logbf.o logbl.o logf.o logl.o lrint.o lrintf.o \
@@ -120,9 +127,10 @@ MATH_OBJS = \
 	pow.o powf.o powi.o powif.o powil.o powl.o \
 	remainder.o remainderf.o remainderl.o remquo.o \
 	remquof.o remquol.o rint.o rintf.o rintl.o round.o roundf.o \
-	roundl.o scalbn.o scalbnf.o scalbnl.o signbit.o signbitf.o \
-	signbitl.o sinf.o sinhf.o sinhl.o sinl.o sqrtf.o sqrtl.o \
-	tanf.o tanhf.o tanhl.o tanl.o trunc.o truncf.o truncl.o
+	roundl.o scalbn.o scalbnf.o scalbnl.o s_erf.o sf_erf.o \
+	signbit.o signbitf.o signbitl.o sinf.o sinhf.o sinhl.o sinl.o \
+	sqrtf.o sqrtl.o tanf.o tanhf.o tanhl.o tanl.o tgamma.o \
+	tgammaf.o tgammal.o trunc.o truncf.o truncl.o
 FENV_OBJS = fesetround.o  fegetround.o \
 	fegetenv.o fesetenv.o feupdateenv.o \
 	feclearexcept.o feholdexcept.o fegetexceptflag.o \
@@ -132,8 +140,8 @@ POSIX_OBJS = \
 REPLACE_OBJS = \
 	mingw-fseek.o
 
-LIB_OBJS = $(Q8_OBJS) $(STDLIB_STUB_OBJS) $(STDIO_STUB_OBJS) \
-	$(MATH_OBJS)  $(FENV_OBJS) $(POSIX_OBJS) \
+LIB_OBJS = $(Q8_OBJS) $(STDLIB_OBJS) $(STDLIB_STUB_OBJS) \
+	$(STDIO_STUB_OBJS) $(MATH_OBJS)  $(FENV_OBJS) $(POSIX_OBJS) \
 	$(REPLACE_OBJS)
 
 LIBS = $(LIBMINGWEX_A)
@@ -184,6 +192,8 @@ distclean:
 # Dependancies
 #
 wdirent.o: $(srcdir)/dirent.c $(srcdir)/wdirent.c
+strtold.o: $(srcdir)/strtold.c $(srcdir)/math/cephes_emath.h
+wcstold.o: $(srcdir)/wcstold.c $(srcdir)/math/cephes_emath.h
 
 
 dist:

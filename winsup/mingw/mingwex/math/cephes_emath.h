@@ -8,8 +8,6 @@
  * This program has been placed in the public domain.
  */
 
-   
-
 /*
  * Revision history:
  *
@@ -28,7 +26,6 @@
  * 
  */
 
-  
 
 /*							ieee.c
  *
