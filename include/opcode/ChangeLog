@@ -1,4 +1,13 @@
 2003-06-03  Michael Snyder  <msnyder@redhat.com>
+
+	* h8sx.h (enum h8_model): Add AV_H8S to distinguish from H8H.
+	(ldc): Split ccr ops from exr ops (which are only available 
+	on H8S or H8SX).
+	(stc): Ditto.
+	(andc, orc, xorc): Ditto.
+	(ldmac, stmac, clrmac, mac): Change access to AV_H8S.
+
+2003-06-03  Michael Snyder  <msnyder@redhat.com>
 	and Bernd Schmidt   <bernds@redhat.com>
 	and Alexandre Oliva <aoliva@redhat.com>
 	* h8300.h: Add support for h8300sx instruction set.
