@@ -67,7 +67,9 @@ char 	*_EXFUN(strsep,(char **, const char *));
 char	*_EXFUN(strlwr,(char *));
 char	*_EXFUN(strupr,(char *));
 #ifdef __CYGWIN__
+#ifndef DEFS_H	/* Kludge to work around problem compiling in gdb */
 const char  *_EXFUN(strsignal, (int __signo));
+#endif
 int     _EXFUN(strtosigno, (const char *__name));
 #endif
 void	 _EXFUN(swab,(const void *, void *, ssize_t));

@@ -1,3 +1,7 @@
+Fri Jun  2 23:02:11 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/string.h: Work around problem with strsignal and gdb.
+
 Tue May 30 13:13:01 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/ctype.h: __CYGWIN32__ -> __CYGWIN__
