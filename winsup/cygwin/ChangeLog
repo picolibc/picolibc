@@ -1,3 +1,7 @@
+2001-04-19  Egor Duda  <deo@logos-m.ru>
+  
+	* path.cc (path_conv::check): Always initialize member variables.
+
 Fri Apr 20 12:27:49 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/sys/file.h: More cleanup for X_OK.

@@ -229,6 +229,13 @@ path_conv::check (const char *src, unsigned opt,
 
   char *rel_path, *full_path;
 
+  int loop = 0;
+  path_flags = 0;
+  known_suffix = NULL;
+  fileattr = (DWORD) -1;
+  case_clash = FALSE;
+  devn = unit = 0;
+
   if (!(opt & PC_NULLEMPTY))
     error = 0;
   else if ((error = check_null_empty_path (src)))
@@ -240,11 +247,6 @@ path_conv::check (const char *src, unsigned opt,
     rel_path = this->path, full_path = path_buf;
 
   /* This loop handles symlink expansion.  */
-  int loop = 0;
-  path_flags = 0;
-  known_suffix = NULL;
-  fileattr = (DWORD) -1;
-  case_clash = FALSE;
   for (;;)
     {
       MALLOC_CHECK;
