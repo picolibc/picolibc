@@ -24,7 +24,7 @@ enum cygheap_types
   HEAP_1_MAX = 100
 };
 
-#define CYGHEAPSIZE ((1000 * sizeof (fhandler_union)) + (2 * 65536))
+#define CYGHEAPSIZE ((2000 * sizeof (fhandler_union)) + (2 * 65536))
 
 extern HANDLE cygheap;
 extern HANDLE cygheap_max;
