@@ -1,10 +1,14 @@
 2000-12-04  Joel Sherrill <joel@OARcorp.com>
 
+        * libc/include/ieeefp.h: Added entries for OpenCores CPUs.
+
+2000-12-04  Joel Sherrill <joel@OARcorp.com>
+
         * configure.host (or16, or32): New entries for OpenCores
 	OpenRisc CPUs.
         (*-*-rtems*): Add -DNO_EXEC.
 
-2000-12-04 Keith Outwater <vac4050@cae597.rsc.raytheon.com>
+2000-12-04  Keith Outwater <vac4050@cae597.rsc.raytheon.com>
 
         * libc/include/sys/errno.h: Added comments on many error numbers.
         * libc/string/strerror.c: Added some more strings.
