@@ -1,3 +1,15 @@
+Mon Mar  5 21:48:54 2001  J"orn Rennecke <amylaar@redhat.com>
+
+        * libc/include/sys/config.h (_READ_WRITE_RETURN_TYPE): Define.
+        For RTEMS, define to be ssize_t.  Default to int if not defined.
+        * libc/stdio/sscanf.c (eofread): Return _READ_WRITE_RETURN_TYPE.
+        * libc/stdio/stdio.c (__sread, __swrite): Likewise.
+        * libc/stdio/local.h (__sread, __swrite): Likewise.
+        * libc/include/sys/reent.h (_read, _write): Likewise.
+        * libc/include/sys/unistd.h (read, write, _read, _write): Likewise.
+        * libc/syscalls/sysread.c (read): Likewise.
+        * libc/syscalls/syswrite.c (write): Likewise.
+
 2001-03-05  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/time/mktime.c: Add L suffix to _SEC_IN_xxxx constants.

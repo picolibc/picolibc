@@ -3,7 +3,7 @@
 #include <reent.h>
 #include <unistd.h>
 
-int
+_READ_WRITE_RETURN_TYPE
 write (fd, buf, cnt)
      int fd;
      const void *buf;

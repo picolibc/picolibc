@@ -137,11 +137,18 @@ typedef unsigned int __uint32_t;
 
 #if defined(__rtems__)
 #define __FILENAME_MAX__ 255
+#define _READ_WRITE_RETURN_TYPE ssize_t
 #endif
 
 #ifndef __IMPORT
 #define __IMPORT
 #endif
 
+/* Define return type of read/write routines.  In POSIX, the return type
+   for read()/write() is "ssize_t" but legacy newlib code has been using
+   "int" for some time.  If not specified, "int" is defaulted.  */
+#ifndef _READ_WRITE_RETURN_TYPE
+#define _READ_WRITE_RETURN_TYPE int
+#endif
 
 #endif /* __SYS_CONFIG_H__ */

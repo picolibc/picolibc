@@ -28,7 +28,7 @@
  * These maintain the `known seek offset' for seek optimisation.
  */
 
-int
+_READ_WRITE_RETURN_TYPE
 __sread (cookie, buf, n)
      _PTR cookie;
      char *buf;
@@ -59,7 +59,7 @@ __sread (cookie, buf, n)
   return ret;
 }
 
-int
+_READ_WRITE_RETURN_TYPE
 __swrite (cookie, buf, n)
      _PTR cookie;
      char _CONST *buf;

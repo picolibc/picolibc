@@ -344,7 +344,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 /* | ARGSUSED */
 /*SUPPRESS 590*/
 static
-int
+_READ_WRITE_RETURN_TYPE
 eofread (cookie, buf, len)
      _PTR cookie;
      char *buf;

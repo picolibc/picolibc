@@ -111,8 +111,9 @@ struct __sFILE {
   /* operations */
   _PTR	_cookie;	/* cookie passed to io functions */
 
-  int	_EXFUN((*_read),(_PTR _cookie, char *_buf, int _n));
-  int	_EXFUN((*_write),(_PTR _cookie, const char *_buf, int _n));
+  _READ_WRITE_RETURN_TYPE _EXFUN((*_read),(_PTR _cookie, char *_buf, int _n));
+  _READ_WRITE_RETURN_TYPE _EXFUN((*_write),(_PTR _cookie, const char *_buf,
+					    int _n));
   _fpos_t _EXFUN((*_seek),(_PTR _cookie, _fpos_t _offset, int _whence));
   int	_EXFUN((*_close),(_PTR _cookie));
 

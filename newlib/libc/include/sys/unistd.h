@@ -66,12 +66,7 @@ off_t   _EXFUN(lseek, (int __fildes, off_t __offset, int __whence ));
 long    _EXFUN(pathconf, (const char *__path, int __name ));
 int     _EXFUN(pause, (void ));
 int     _EXFUN(pipe, (int __fildes[2] ));
-/* POSIX 1003.1b-1993 says read() returns ssize_t */
-#if defined(__rtems__)
-ssize_t	_EXFUN(read, (int __fildes, void *__buf, size_t __nbyte ));
-#else
-int	_EXFUN(read, (int __fildes, void *__buf, size_t __nbyte ));
-#endif
+_READ_WRITE_RETURN_TYPE _EXFUN(read, (int __fd, void *__buf, size_t __nbyte ));
 int     _EXFUN(rmdir, (const char *__path ));
 #if defined(__rtems__)
 void *  _EXFUN(sbrk,  (ptrdiff_t __incr));
@@ -95,12 +90,7 @@ int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
 char    _EXFUN(*ttyname, (int __fildes ));
 int     _EXFUN(unlink, (const char *__path ));
 int     _EXFUN(vhangup, (void ));
-/* POSIX 1003.1b-1993 says write() returns ssize_t */
-#if defined(__rtems__)
-ssize_t     _EXFUN(write, (int __fildes, const void *__buf, size_t __nbyte ));
-#else
-int     _EXFUN(write, (int __fildes, const void *__buf, size_t __nbyte ));
-#endif
+_READ_WRITE_RETURN_TYPE _EXFUN(write, (int __fd, const void *__buf, size_t __nbyte ));
 
 #ifndef        _POSIX_SOURCE
 pid_t   _EXFUN(vfork, (void ));
@@ -113,10 +103,10 @@ pid_t   _EXFUN(_fork, (void ));
 pid_t   _EXFUN(_getpid, (void ));
 int     _EXFUN(_link, (const char *__path1, const char *__path2 ));
 off_t   _EXFUN(_lseek, (int __fildes, off_t __offset, int __whence ));
-int     _EXFUN(_read, (int __fildes, void *__buf, size_t __nbyte ));
+_READ_WRITE_RETURN_TYPE _EXFUN(_read, (int __fd, void *__buf, size_t __nbyte ));
 void *  _EXFUN(_sbrk,  (size_t __incr));
 int     _EXFUN(_unlink, (const char *__path ));
-int     _EXFUN(_write, (int __fildes, const void *__buf, size_t __nbyte ));
+_READ_WRITE_RETURN_TYPE _EXFUN(_write, (int __fd, const void *__buf, size_t __nbyte ));
 int     _EXFUN(_execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 
 #if defined(__CYGWIN__) || defined(__rtems__)
