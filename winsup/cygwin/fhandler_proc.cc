@@ -663,7 +663,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	{
 	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
 	  unsigned maxf, vendor_id[4], unused;
-	  cpuid (&maxf, &vendor_id[0], &vendor_id[1], &vendor_id[2], 0);
+	  cpuid (&maxf, &vendor_id[0], &vendor_id[2], &vendor_id[1], 0);
 	  maxf &= 0xffff;
 	  vendor_id[3] = 0;
 	  bufptr += __small_sprintf (bufptr, "vendor id       : %s\n", (char *)vendor_id);
