@@ -24,7 +24,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 
-#define FACTOR (0x19db1ded53ea710LL)
+#define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL
 
 static void __stdcall timeval_to_filetime (timeval *time, FILETIME *out);
@@ -134,12 +134,9 @@ gettimeofday (struct timeval *p, struct timezone *z)
 
   if (p != NULL)
     {
-      SYSTEMTIME t;
       FILETIME f;
 
-      GetSystemTime (&t);
-      if (! SystemTimeToFileTime (&t, &f))
-        res = -1;
+      GetSystemTimeAsFileTime (&f);
       totimeval (p, &f, 0, 1);
     }
 
@@ -170,12 +167,12 @@ genf ()
   FILETIME f;
   s.wYear = 1970;
   s.wMonth = 1;
-  s.wDayOfWeek = 5;
+  s.wDayOfWeek = 4;
   s.wDay = 1;
   s.wHour = 0;
   s.wMinute = 0;
   s.wSecond = 0;
-  s.wMilliseconds = 1;
+  s.wMilliseconds = 0;
   SystemTimeToFileTime (&s, &f);
 
   small_printf ("FILE TIME is %08x%08x\n",

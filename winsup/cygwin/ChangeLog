@@ -1,3 +1,10 @@
+2000-08-30  DJ Delorie  <dj@redhat.com>
+
+	* times.cc (gettimeofday): use GetSystemTimeAsFileTime to avoid a
+	conversion
+	(FACTOR): correct value
+	(genf): set milliseconds to zero, DOW to 4.
+
 2000-08-29  Egor Duda  <deo@logos-m.ru>
 
 	* grp.cc (getgroups): fail with EINVAL if array is not large
