@@ -1,3 +1,8 @@
+2001-04-26  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+        * security.cc (alloc_sd): Add unrelated ACCESS_ALLOWED_ACE behind
+	the `everyone' ACE.
+
 Wed Apr 25 15:07:37 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.h [sigthread]: Add exception field.  [sigframe::~sigframe]:

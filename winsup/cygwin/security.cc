@@ -622,6 +622,11 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 				group_sid, acl_len, inherit))
     return NULL;
 
+  /* Set allow ACE for everyone. */
+  if (!add_access_allowed_ace (acl, ace_off++, other_allow,
+				get_world_sid (), acl_len, inherit))
+    return NULL;
+
   /* Get owner and group from current security descriptor. */
   PSID cur_owner_sid = NULL;
   PSID cur_group_sid = NULL;
@@ -649,8 +654,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 	    continue;
 	  /*
 	   * Add unrelated ACCESS_DENIED_ACE to the beginning but
-	   * behind the owner_deny, ACCESS_ALLOWED_ACE to the end
-	   * but in front of the `everyone' ACE.
+	   * behind the owner_deny, ACCESS_ALLOWED_ACE to the end.
 	   */
 	  if (!AddAce(acl, ACL_REVISION,
 		       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE ?
@@ -661,13 +665,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 	      return NULL;
 	    }
 	  acl_len += ace->Header.AceSize;
-	  ++ace_off;
 	}
-
-  /* Set allow ACE for everyone. */
-  if (!add_access_allowed_ace (acl, ace_off++, other_allow,
-				get_world_sid (), acl_len, inherit))
-    return NULL;
 
   /* Set AclSize to computed value. */
   acl->AclSize = acl_len;
