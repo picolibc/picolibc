@@ -1882,9 +1882,9 @@ seteuid (uid_t uid)
             }
           myself->uid = uid;
           strcpy (myself->username, pi.username);
-          CopySid (MAX_SID_LEN, myself->psid, pi.psid);
           strcpy (myself->logsrv, pi.logsrv);
           strcpy (myself->domain, pi.domain);
+          memcpy (myself->sidbuf, pi.sidbuf, MAX_SID_LEN);
         }
     }
   else

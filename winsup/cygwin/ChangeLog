@@ -1,3 +1,10 @@
+Sun Jul  9 21:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* spawn.cc (spawn_guts): Close handle `hToken' only if it's not
+	copied from myself->token.
+	* syscalls.cc (seteuid): Replace CopySid by memcpy which is foolproof
+	here.
+
 Sun Jul  9 01:19:06 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* cygwin.din: Export _getmode and getmode to allow querying of binary

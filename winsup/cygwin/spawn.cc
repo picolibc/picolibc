@@ -640,7 +640,7 @@ skip_arg_parsing:
   ResumeThread (pi.hThread);
   ForceCloseHandle (pi.hThread);
 
-  if (hToken)
+  if (hToken && hToken != myself->token)
     CloseHandle (hToken);
 
   DWORD res;
