@@ -31,7 +31,7 @@
 
 	* strace.cc (add_child): Use calloc since new requires working
 	libstdc++.a.
-	(fhandler_disk_file::fstat): Ditto for delete/free.
+	(remove_child): Ditto for delete/free.
 
 2002-05-15  Mark Blackburn  <marklist@fangorn.ca>
 
