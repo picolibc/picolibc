@@ -1,3 +1,7 @@
+2002-10-18  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* m68hc11/syscalls.c (sbrk): Use ptrdiff_t for increment parameter.
+
 2002-10-07  Richard Sandiford  <rsandifo@redhat.com>
 
 	* mips/ddb.ld: KEEP .init and .fini.

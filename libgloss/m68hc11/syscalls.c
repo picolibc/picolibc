@@ -49,7 +49,7 @@ write(int file, const void *p, size_t len)
 }
 
 void *
-sbrk(size_t incr)
+sbrk(ptrdiff_t incr)
 {
   extern char _end;		/* Defined by the linker */
   static char *heap_end;
