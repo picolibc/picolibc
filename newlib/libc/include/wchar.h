@@ -31,9 +31,7 @@
 #endif
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 #ifndef _MBSTATE_T
 #define _MBSTATE_T
@@ -69,8 +67,6 @@ wchar_t	*_EXFUN(wmemcpy, (wchar_t * , const wchar_t * , size_t));
 wchar_t	*_EXFUN(wmemmove, (wchar_t *, const wchar_t *, size_t));
 wchar_t	*_EXFUN(wmemset, (wchar_t *, wchar_t, size_t));
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif /* _WCHAR_H_ */

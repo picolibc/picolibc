@@ -1,3 +1,8 @@
+2002-11-06  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+        * libc/include/wchar.h: Use _{BEGIN,END}_STD_C instead of extern "C".
+        * libc/include/wctype.h: Ditto.
+
 2002-11-04  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/include/wchar.h: Add extern "C" specifier if C++.
