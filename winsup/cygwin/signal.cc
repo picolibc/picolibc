@@ -478,9 +478,18 @@ siginterrupt (int sig, int flag)
   return sigaction (sig, &act, NULL);
 }
 
+extern "C" int
+sigwait (const sigset_t *set, int *sig_ptr)
+{
+  siginfo_t si;
+  int pid = sigwaitinfo (set, NULL);
+  if (pid > 0)
+    *sig_ptr = pid;
+  return pid > 0 ? 0 : -1;
+}
 
 extern "C" int
-sigwait (const sigset_t *set, int *sig)
+sigwaitinfo (const sigset_t *set, siginfo_t *info)
 {
   pthread_testcancel ();
   HANDLE h;
@@ -497,15 +506,16 @@ sigwait (const sigset_t *set, int *sig)
   switch (WaitForSingleObject (_my_tls.event, INFINITE))
     {
     case WAIT_OBJECT_0:
-      *sig = InterlockedExchange ((LONG *) &_my_tls.sig, (LONG) 0);
-      res = 0;
+      res = _my_tls.infodata.si_pid;
+      if (info)
+	*info = _my_tls.infodata;
       break;
     default:
       __seterrno ();
       res = -1;
     }
   _my_tls.event = NULL;
-  _my_tls.sig = 0;
+  InterlockedExchange ((LONG *) &_my_tls.sig, (LONG) 0);
   CloseHandle (h);
   sig_dispatch_pending ();
   return res;

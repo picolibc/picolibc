@@ -1,6 +1,10 @@
 #ifndef _CYGWIN_SIGNAL_H
 #define _CYGWIN_SIGNAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if 0
 struct ucontext
 {
@@ -184,4 +188,10 @@ struct sigaction
 #define	SIGUSR1 30	/* user defined signal 1 */
 #define	SIGUSR2 31	/* user defined signal 2 */
 #define NSIG	32      /* signal 0 implied */
+
+int sigwait (const sigset_t *, int *);
+int sigwaitinfo (const sigset_t *, siginfo_t *);
+#ifdef __cplusplus
+}
+#endif
 #endif /*_CYGWIN_SIGNAL_H*/

@@ -1,3 +1,15 @@
+2004-01-17  Christopher Faylor  <cgf@redhat.com>
+
+	* signal.cc (sigwaitinfo): Define new function.
+	(sigwait): Redefine based on sigwaitinfo.
+	* include/cygwin/signal.h (sigwaitinfo): Declare.
+	(sigwait): Ditto.
+
+2004-01-17  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::vfork_parent_restore): Avoid double close of ctty
+	when ctty == ctty_on_hold.
+
 2004-01-16  Christopher Faylor  <cgf@redhat.com>
 
 	* cygtls.h (_threadinfo::threadkill): New element.
