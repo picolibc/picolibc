@@ -2,6 +2,8 @@
 
 	* winsup.api/known_bugs.tcl: Remove dup05, fcntl07B, lseek04, select03,
 	unlink06.
+	* winsup.api/mmaptest03.c: Make a little more verbose so that it is
+	easier to figure out where something failed.
 
 2005-01-09  Christopher Faylor  <cgf@timesys.com>
 
