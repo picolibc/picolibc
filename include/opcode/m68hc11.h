@@ -378,7 +378,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define M6811_OP_HIGH_ADDR    0x01000000 /* Used internally by gas.  */
 #define M6811_OP_LOW_ADDR     0x02000000
 
-#define M68HC12_BANK_VIRT 0x01000000
+#define M68HC12_BANK_VIRT 0x010000
 #define M68HC12_BANK_MASK 0x00003fff
 #define M68HC12_BANK_BASE 0x00008000
 #define M68HC12_BANK_SHIFT 14
