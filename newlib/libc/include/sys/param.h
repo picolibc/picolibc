@@ -6,27 +6,20 @@
 # define _SYS_PARAM_H
 
 #include <sys/config.h>
+#include <machine/endian.h>
+#include <machine/param.h>
 
-#ifndef BIG_ENDIAN
-#define BIG_ENDIAN 4321
-#endif
-#ifndef LITTLE_ENDIAN
-#define LITTLE_ENDIAN 1234
-#endif
-
+#ifndef HZ
 # define HZ (60)
+#endif
+#ifndef NOFILE
 # define NOFILE	(60)
+#endif
+#ifndef PATHSIZE
 # define PATHSIZE (1024)
+#endif
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
-
-#ifndef BYTE_ORDER
-#ifdef __IEEE_LITTLE_ENDIAN
-#define BYTE_ORDER LITTLE_ENDIAN
-#else
-#define BYTE_ORDER BIG_ENDIAN
-#endif
-#endif
 
 #endif
