@@ -10,15 +10,15 @@ Tue Sep 11 11:14:11 2001  Dmitry Timoshkov  <dmitry@baikal.ru>
 
 Tue Sep 11 21:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
-	* thread.cc (pthread_cond::~pthread_cond): Bugfix: Incorrect use of
+	* thread.cc (pthread_cond::~pthread_cond): Fix incorrect use of
 	InterlockExchangePointer.
 	(pthread_mutex::~pthread_mutex): Ditto.
 	(semaphore::~semaphore): Ditto.
 
 Tue Sep 11 18:15:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
-	* dcrt0.cc (cygwin_finished_initializing): Copy _mtinterf on fork;
-	* fork.cc (fork_child): fixup thread-related structures after fork;
+	* dcrt0.cc (cygwin_finished_initializing): Copy _mtinterf on fork.
+	* fork.cc (fork_child): Fixup thread-related structures after fork.
 	* thread.cc (MTinterface::Init): Initialise the new mutex, condition
 	and semaphore lists.
 	(MTinterface::fixup_after_fork): Iterate through each list and fixup
@@ -37,7 +37,7 @@ Tue Sep 11 18:15:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(semaphore::Post): Increment the current semaphore value.
 	(semaphore::TryWait): Decrement the current semaphore value.
 	(semaphore::Wait): Ditto.
-	(semaphote::fixup_after_fork): Recreate the pre-fork state as best we
+	(semaphore::fixup_after_fork): Recreate the pre-fork state as best we
 	can.
 	* thread.h (pthread_mutex): New members to allow fixup_after_fork.
 	(pthread_cond): Ditto.
@@ -56,7 +56,7 @@ Sun Sep  9 20:09:11 2001  Christopher Faylor <cgf@cygnus.com>
 Mon Sep 10 08:28:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.h (MT_Interface): Remove pshared mutex array. 
-	Add a threadsafe list for mutex tracking (for fixupafter fork). 
+	Add a threadsafe list for mutex tracking (for fixup after fork). 
 	* thread.cc (MTInterface::Init): Remove pshared mutex array.
 	(pthread_mutex::pthread_mutex): Remove pshared mutex functionality. 
 	Fail with EINVAL on attempts to	use pshared functionality.
