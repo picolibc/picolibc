@@ -660,7 +660,7 @@ fhandler_disk_file::readdir (DIR *dir)
 	  strcpy (fbuf, dir->__d_dirname);
 	  strcpy (fbuf + strlen (fbuf) - 1, dir->__d_dirent->d_name);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
-	  if (fpath.issymlink ())
+	  if (fpath.issymlink () || fpath.isdevice ())
 	    c[len - 4] = '\0';
 	}
     }
