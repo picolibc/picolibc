@@ -199,6 +199,8 @@ typedef struct {
   const char *bfd_name;
   /* one of enum mach_attr */
   int num;
+  /* parameter from mach->cpu */
+  unsigned int insn_chunk_bitsize;
 } CGEN_MACH;
 
 /* Parse result (also extraction result).
@@ -1165,6 +1167,10 @@ typedef struct cgen_cpu_desc
      ??? Another alternative is to create a table of selected machs and
      lazily fetch the data from there.  */
   unsigned int word_bitsize;
+
+  /* Instruction chunk size (in bits), for purposes of endianness
+     conversion.  */
+  unsigned int insn_chunk_bitsize;
 
   /* Indicator if sizes are unknown.
      This is used by default_insn_bitsize,base_insn_bitsize if there is a

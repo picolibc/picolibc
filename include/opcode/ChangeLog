@@ -1,3 +1,8 @@
+2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
+
+	* cgen.h (CGEN_MACH): Add insn_chunk_bitsize field.
+	(cgen_cpu_desc): Ditto.
+
 2001-07-07  Ben Elliston  <bje@redhat.com>
 
 	* m88k.h: Clean up and reformat. Remove unused code.
