@@ -1,3 +1,7 @@
+2003-03-03  Andrew Stubbs  <andrew.stubbs@superh.com>
+
+	* sh.h: Add EF_SH4_NOMMU_NOFPU.
+
 2004-03-01  Richard Sandiford  <rsandifo@redhat.com>
 
 	* frv.h (EF_FRV_CPU_FR405, EF_FRV_CPU_FR450): Define.
