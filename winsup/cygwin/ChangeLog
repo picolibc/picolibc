@@ -1,3 +1,7 @@
+Wed Sep  5 21:35:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* winver.rc: Change copyright to include 2001.
+
 Wed Sep  5 12:12:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_floppy.cc (fhandler_floppy::lseek): Remove iswinnt check.
