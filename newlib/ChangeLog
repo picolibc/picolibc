@@ -1,5 +1,41 @@
 2002-09-20  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * libc/ctype/Makefile.am: Add new files.
+        * libc/ctype/Makefile.in: Regenerated.
+        * libc/ctype/ctype.tex: Add new iswxxxx, towxxxx, wctype,
+        and wctrans functions to documentation index.
+        * libc/ctype/iswalnum.c: New file.
+        * libc/ctype/iswalpha.c: Ditto.
+        * libc/ctype/iswblank.c: Ditto.
+        * libc/ctype/iswcntrl.c: Ditto.
+        * libc/ctype/iswctype.c: Ditto.
+        * libc/ctype/iswdigit.c: Ditto.
+        * libc/ctype/iswgraph.c: Ditto.
+        * libc/ctype/iswlower.c: Ditto.
+        * libc/ctype/iswprint.c: Ditto.
+        * libc/ctype/iswpunct.c: Ditto.
+        * libc/ctype/iswspace.c: Ditto.
+        * libc/ctype/iswupper.c: Ditto.
+        * libc/ctype/iswxdigit.c: Ditto.
+        * libc/ctype/jp2uc.c: Ditto.
+        * libc/ctype/jp2uc.h: Ditto.
+        * libc/ctype/local.h: Ditto.
+        * libc/ctype/towctrans.c: Ditto.
+        * libc/ctype/towlower.c: Ditto.
+        * libc/ctype/towupper.c: Ditto.
+        * libc/ctype/utf8alpha.h: Ditto.
+        * libc/ctype/utf8print.h: Ditto.
+        * libc/ctype/utf8punct.h: Ditto.
+        * libc/ctype/wctrans.c: Ditto.
+        * libc/ctype/wctype.c: Ditto.
+        * libc/locale/locale.c (__lc_ctype): New external array to
+        replace static lc_ctype array.
+        * libc/stdlib/mbtowc_r.c: Use __lc_ctype to check current lc_ctype
+        rather than reentrancy structure's _current_locale field.
+        * libc/stdlib/wctomb_r.c: Ditto.
+
+2002-09-20  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* configure.host: Minor comment and formatting changes.
 	* libc/Makefile.am: Add libc_la_DEPENDENCIES.
 	* libc/Makefile.in: Regenerated.

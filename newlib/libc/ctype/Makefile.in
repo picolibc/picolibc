@@ -129,9 +129,28 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
 @ELIX_LEVEL_1_FALSE@	isascii.$(oext) \
 @ELIX_LEVEL_1_FALSE@	isblank.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswalnum.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswalpha.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswblank.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswcntrl.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswctype.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswdigit.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswgraph.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswlower.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswprint.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswpunct.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswspace.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswupper.$(oext) \
+@ELIX_LEVEL_1_FALSE@	iswxdigit.$(oext) \
+@ELIX_LEVEL_1_FALSE@	jp2uc.$(oext) \
 @ELIX_LEVEL_1_FALSE@	toascii.$(oext) \
 @ELIX_LEVEL_1_FALSE@	_tolower.$(oext) \
-@ELIX_LEVEL_1_FALSE@	_toupper.$(oext)
+@ELIX_LEVEL_1_FALSE@	_toupper.$(oext) \
+@ELIX_LEVEL_1_FALSE@	towctrans.$(oext) \
+@ELIX_LEVEL_1_FALSE@	towlower.$(oext) \
+@ELIX_LEVEL_1_FALSE@	towupper.$(oext) \
+@ELIX_LEVEL_1_FALSE@	wctrans.$(oext)	\
+@ELIX_LEVEL_1_FALSE@	wctype.$(oext)
 
 libctype_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -157,10 +176,28 @@ CHEWOUT_FILES = \
 	ispunct.def	\
 	isspace.def	\
 	isupper.def	\
+	iswalnum.def	\
+	iswalpha.def	\
+	iswblank.def 	\
+	iswcntrl.def 	\
+	iswctype.def 	\
+	iswdigit.def 	\
+	iswgraph.def 	\
+	iswlower.def 	\
+	iswprint.def 	\
+	iswpunct.def 	\
+	iswspace.def 	\
+	iswupper.def 	\
+	iswxdigit.def 	\
 	isxdigit.def	\
 	toascii.def	\
 	tolower.def	\
-	toupper.def	
+	toupper.def	\
+	towctrans.def	\
+	towlower.def	\
+	towupper.def	\
+	wctrans.def	\
+	wctype.def	
 
 
 SUFFIXES = .def

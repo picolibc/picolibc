@@ -7,6 +7,8 @@
 /* for some conversions, we use the __count field as a place to store a state value */
 #define __state __count
 
+extern char __lc_ctype[12];
+
 int
 _DEFUN (_wctomb_r, (r, s, wchar, state),
         struct _reent *r     _AND 
@@ -14,9 +16,9 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
         wchar_t        wchar _AND
         mbstate_t     *state)
 {
-  if (strlen (r->_current_locale) <= 1)
+  if (strlen (__lc_ctype) <= 1)
     { /* fall-through */ }
-  else if (!strcmp (r->_current_locale, "C-UTF-8"))
+  else if (!strcmp (__lc_ctype, "C-UTF-8"))
     {
       if (s == NULL)
         return 0; /* UTF-8 encoding is not state-dependent */
@@ -73,7 +75,7 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
       else
         return -1;
     }
-  else if (!strcmp (r->_current_locale, "C-SJIS"))
+  else if (!strcmp (__lc_ctype, "C-SJIS"))
     {
       unsigned char char2 = (unsigned char)wchar;
       unsigned char char1 = (unsigned char)(wchar >> 8);
@@ -94,7 +96,7 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
             return -1;
         }
     }
-  else if (!strcmp (r->_current_locale, "C-EUCJP"))
+  else if (!strcmp (__lc_ctype, "C-EUCJP"))
     {
       unsigned char char2 = (unsigned char)wchar;
       unsigned char char1 = (unsigned char)(wchar >> 8);
@@ -115,7 +117,7 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
             return -1;
         }
     }
-  else if (!strcmp (r->_current_locale, "C-JIS"))
+  else if (!strcmp (__lc_ctype, "C-JIS"))
     {
       int cnt = 0; 
       unsigned char char2 = (unsigned char)wchar;

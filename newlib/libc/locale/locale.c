@@ -112,6 +112,7 @@ static _CONST struct lconv lconv =
 char * _EXFUN(__locale_charset,(_VOID));
 
 static char *charset = "ISO-8859-1";
+char __lc_ctype[12] = "C";
 
 char *
 _DEFUN(_setlocale_r, (p, category, locale),
@@ -129,7 +130,6 @@ _DEFUN(_setlocale_r, (p, category, locale),
     }
   return "C";
 #else
-  static char lc_ctype[12] = "C";
   static char last_lc_ctype[12] = "C";
   static char lc_messages[12] = "C";
   static char last_lc_messages[12] = "C";
@@ -143,8 +143,8 @@ _DEFUN(_setlocale_r, (p, category, locale),
             return 0;
           if (category == LC_ALL)
             {
-              strcpy (last_lc_ctype, lc_ctype);
-              strcpy (lc_ctype, "C");
+              strcpy (last_lc_ctype, __lc_ctype);
+              strcpy (__lc_ctype, "C");
               strcpy (last_lc_messages, lc_messages);
               strcpy (lc_messages, "C");
               __mb_cur_max = 1;
@@ -189,8 +189,8 @@ _DEFUN(_setlocale_r, (p, category, locale),
 
           if (category == LC_CTYPE)
             {
-              strcpy (last_lc_ctype, lc_ctype);
-              strcpy (lc_ctype, locale_name);
+              strcpy (last_lc_ctype, __lc_ctype);
+              strcpy (__lc_ctype, locale_name);
 
               __mb_cur_max = 1;
               if (locale[1] == '-')
@@ -257,7 +257,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
   else
     {
       if (category == LC_CTYPE)
-        return lc_ctype;
+        return __lc_ctype;
       else if (category == LC_MESSAGES)
         return lc_messages;
     }

@@ -26,9 +26,28 @@ else
 LIB_OBJS = \
 	isascii.$(oext) \
 	isblank.$(oext) \
+	iswalnum.$(oext) \
+	iswalpha.$(oext) \
+	iswblank.$(oext) \
+	iswcntrl.$(oext) \
+	iswctype.$(oext) \
+	iswdigit.$(oext) \
+	iswgraph.$(oext) \
+	iswlower.$(oext) \
+	iswprint.$(oext) \
+	iswpunct.$(oext) \
+	iswspace.$(oext) \
+	iswupper.$(oext) \
+	iswxdigit.$(oext) \
+	jp2uc.$(oext) \
 	toascii.$(oext) \
 	_tolower.$(oext) \
-	_toupper.$(oext)
+	_toupper.$(oext) \
+	towctrans.$(oext) \
+	towlower.$(oext) \
+	towupper.$(oext) \
+	wctrans.$(oext)	\
+	wctype.$(oext)
 endif
 
 libctype_la_LDFLAGS = -Xcompiler -nostdlib
@@ -60,10 +79,28 @@ CHEWOUT_FILES= \
 	ispunct.def	\
 	isspace.def	\
 	isupper.def	\
+	iswalnum.def	\
+	iswalpha.def	\
+	iswblank.def 	\
+	iswcntrl.def 	\
+	iswctype.def 	\
+	iswdigit.def 	\
+	iswgraph.def 	\
+	iswlower.def 	\
+	iswprint.def 	\
+	iswpunct.def 	\
+	iswspace.def 	\
+	iswupper.def 	\
+	iswxdigit.def 	\
 	isxdigit.def	\
 	toascii.def	\
 	tolower.def	\
-	toupper.def	
+	toupper.def	\
+	towctrans.def	\
+	towlower.def	\
+	towupper.def	\
+	wctrans.def	\
+	wctype.def	
 
 SUFFIXES = .def
 
