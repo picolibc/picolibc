@@ -1,5 +1,9 @@
 2002-06-29  Christopher Faylor  <cgf@redhat.com>
 
+	* uinfo.cc (cygheap_user::test_uid): Use standard issetuid test.
+
+2002-06-29  Christopher Faylor  <cgf@redhat.com>
+
 	* autoload.cc (NetGetDCName): Change to make this an optional load
 	function.
 	* cygheap.h (cygheap_user::logsrv): Return NULL when operation fails.

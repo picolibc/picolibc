@@ -308,7 +308,7 @@ cygheap_user::test_uid (char *&what, const char *name, size_t namelen)
 {
   if (what)
     return what;
-  if (orig_uid == myself->uid)
+  if (!issetuid ())
     what = getwinenveq (name, namelen, HEAP_STR);
   return what;
 }
