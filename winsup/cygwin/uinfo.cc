@@ -265,10 +265,8 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 				    MAX_PATH);
 		      if (homepath_env_buf[0])
 			strcat (homepath_env_buf, "\\");
-		      else if (!GetSystemDirectory (homepath_env_buf, MAX_PATH))
-			strcpy (homepath_env_buf, "c:\\");
-		      else if ((p = strchr (homepath_env_buf, '\\')))
-			p[1] = '\0';
+		      else
+			cygwin_conv_to_full_posix_path (homepath_env_buf, "/");
 		    }
 		}
 	    }

@@ -1,3 +1,8 @@
+2002-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* uinfo.cc (cygheap_user::ontherange): Make cygwin root the last resort
+	for HOMEPATH/HOMEDRIVE for consistency with HOME.
+
 2002-07-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared.cc (sec_none): Move to sec_helper.cc.
