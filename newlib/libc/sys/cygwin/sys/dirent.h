@@ -17,16 +17,17 @@
 
 struct dirent
 {
-  long d_version; /* Used since Cygwin 1.3.3. */
+  long d_version;	/* Used since Cygwin 1.3.3. */
   long __d_reserved[2];
-  long d_fd; /* File descriptor of open directory. Used since Cygwin 1.3.3. */
-  ino_t d_ino; /* Just for compatibility, it's junk */
-  char d_name[256];		/* FIXME: use NAME_MAX? */
+  long d_fd;		/* File descriptor of open directory.
+			   Used since Cygwin 1.3.3. */
+  ino_t d_ino;		/* Just for compatibility, it's junk */
+  char d_name[256];	/* FIXME: use NAME_MAX? */
 };
 
 #define __DIRENT_COOKIE 0xdede4242
 
-typedef struct
+typedef struct __DIR
 {
   /* This is first to set alignment in non _COMPILING_NEWLIB case.  */
   unsigned long __d_cookie;
@@ -41,7 +42,7 @@ typedef struct
       struct
 	{
 	  void *__handle;
-	  char __open_p;
+	  void *__fh;
 	} __d_data;
 #endif
       char __d_filler[16];

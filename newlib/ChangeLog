@@ -1,3 +1,7 @@
+2001-11-21  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/sys/cygwin/sys/dirent.h (DIR): Add another internal element.
+
 2001-11-19  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* libc/sys/mmixware/*: Tweak license header in all source files.
