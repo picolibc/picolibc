@@ -1,3 +1,11 @@
+2002-09-29  Christopher Faylor  <cgf@redhat.com>
+
+	* cygpath.cc (close_arg): Remove unused static.
+	* mkgroup.c (enum_local_users): Avoid compiler warning.
+	(enum_users): Ditto.
+	* mkpasswd.c: Ditto throughout.
+	* ssp.c: Ditto throughout.
+
 2002-09-18  Christopher Faylor  <cgf@redhat.com>
 
 	* cygcheck.cc: Include sys/time.h rather than time.h to avoid a

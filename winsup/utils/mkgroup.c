@@ -140,7 +140,7 @@ enum_local_users (LPWSTR groupname)
 				MAX_PREFERRED_LENGTH,
 				&entries, &total, &reshdl))
     {
-      int i, first = 1;
+      unsigned i, first = 1;
 
       for (i = 0; i < entries; ++i)
 	if (buf1[i].lgrmi1_sidusage == SidTypeUser)
@@ -259,7 +259,7 @@ enum_users (LPWSTR servername, LPWSTR groupname)
 			 MAX_PREFERRED_LENGTH,
 			 &entries, &total, &reshdl))
     {
-      int i, first = 1;
+      unsigned i, first = 1;
 
       for (i = 0; i < entries; ++i)
 	{

@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <io.h>
+#include <unistd.h>
 #include <sys/cygwin.h>
 #include <getopt.h>
 #include <lmaccess.h>

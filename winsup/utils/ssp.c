@@ -72,8 +72,8 @@ typedef struct {
   unsigned char real_byte;
 } PendingBreakpoints;
 
-int low_pc=0, high_pc=0;
-unsigned int last_pc=0, pc, last_sp=0, sp;
+unsigned low_pc=0, high_pc=0;
+unsigned last_pc=0, pc, last_sp=0, sp;
 int total_cycles, count;
 HANDLE hProcess;
 PROCESS_INFORMATION procinfo;
@@ -94,10 +94,10 @@ int dll_counts = 0;
 int verbose = 0;
 
 #define MAXTHREADS 100
-int active_thread_ids[MAXTHREADS];
+DWORD active_thread_ids[MAXTHREADS];
 HANDLE active_threads[MAXTHREADS];
-int thread_step_flags[MAXTHREADS];
-int thread_return_address[MAXTHREADS];
+DWORD thread_step_flags[MAXTHREADS];
+DWORD thread_return_address[MAXTHREADS];
 int num_active_threads = 0;
 int suspended_count=0;
 
@@ -158,7 +158,7 @@ remove_breakpoint (unsigned int address)
 }
 
 static HANDLE
-lookup_thread_id (int threadId, int *tix)
+lookup_thread_id (DWORD threadId, int *tix)
 {
   int i;
   for (i=0; i<num_active_threads; i++)
@@ -429,7 +429,7 @@ run_program (char *cmdline)
 	      if (remove_breakpoint ((int)event.u.Exception.ExceptionRecord.ExceptionAddress))
 		{
 		  context.Eip --;
-		  if (rv != -1)
+		  if (!rv)
 		    SetThreadContext (hThread, &context);
 		  if (ReadProcessMemory (hProcess, (void *)context.Esp, &rv, 4, &rv))
 		      thread_return_address[tix] = rv;
@@ -515,7 +515,7 @@ run_program (char *cmdline)
 	      break;
 	    }
 
-	  if (rv != -1)
+	  if (!rv)
 	    {
 	      if (pc == thread_return_address[tix])
 		{
@@ -830,7 +830,7 @@ int
 main (int argc, char **argv)
 {
   int c, i;
-  int total_pcount, total_scount;
+  int total_pcount = 0, total_scount = 0;
   FILE *gmon;
 
   setbuf (stdout, 0);
