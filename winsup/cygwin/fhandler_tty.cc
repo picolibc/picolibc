@@ -1,6 +1,6 @@
 /* fhandler_tty.cc
 
-   Copyright 1997, 1998, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1102,17 +1102,19 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
       if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
 	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
 	{
-	  if (!ioctl_request_event)
-	    get_ttyp ()->ioctl_retval = -EINVAL;
+	  get_ttyp ()->arg.winsize = *(struct winsize *) arg;
+	  if (ioctl_request_event)
+	    {
+	      get_ttyp ()->ioctl_retval = -EINVAL;
+	      SetEvent (ioctl_request_event);
+	    }
 	  else
 	    {
-	      get_ttyp ()->arg.winsize = *(struct winsize *) arg;
-	      SetEvent (ioctl_request_event);
 	      get_ttyp ()->winsize = *(struct winsize *) arg;
 	      killsys (-get_ttyp ()->getpgid (), SIGWINCH);
-	      if (ioctl_done_event)
-		WaitForSingleObject (ioctl_done_event, INFINITE);
 	    }
+	  if (ioctl_done_event)
+	    WaitForSingleObject (ioctl_done_event, INFINITE);
 	}
       break;
     case TIOCLINUX:

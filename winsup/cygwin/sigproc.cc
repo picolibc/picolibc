@@ -61,6 +61,8 @@ public:
   void add (sigpacket&);
   void del ();
   sigpacket *next ();
+  sigpacket *save () const {return curr;}
+  void restore (sigpacket *saved) {curr = saved;}
   friend int __stdcall sig_dispatch_pending ();
 };
 
@@ -543,14 +545,16 @@ sig_clear (int target_sig)
     sig_send (myself, -target_sig);
   else
     {
-      sigqueue.reset ();
       sigpacket *q;
+      sigpacket *save = sigqueue.save ();
+      sigqueue.reset ();
       while ((q = sigqueue.next ()))
 	if (q->si.si_signo == target_sig)
 	  {
-	    sigqueue.del ();
+	    q->si.si_signo = __SIGDELETE;
 	    break;
 	  }
+      sigqueue.restore (save);
     }
   return;
 }
@@ -1166,7 +1170,7 @@ wait_sig (VOID *self)
 	case __SIGFLUSH:
 	  sigqueue.reset ();
 	  while ((q = sigqueue.next ()))
-	    if (q->process () > 0)
+	    if (q->si.si_signo == __SIGDELETE || q->process () > 0)
 	      sigqueue.del ();
 	  break;
 	default:

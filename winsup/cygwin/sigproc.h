@@ -22,7 +22,8 @@ enum
   __SIGFLUSH	    = -(NSIG + 1),
   __SIGSTRACE	    = -(NSIG + 2),
   __SIGCOMMUNE	    = -(NSIG + 3),
-  __SIGPENDING	    = -(NSIG + 4)
+  __SIGPENDING	    = -(NSIG + 4),
+  __SIGDELETE	    = -(NSIG + 5)
 };
 #endif
 
