@@ -1,3 +1,7 @@
+2001-11-08  Robert Collins  <rbtcollins@hotmail.com>
+
+	* include/errno.h: Fix "errno is not a prototype" warning.
+
 2001-11-05  Egor Duda  <deo@logos-m.ru>
 
 	* Makefile.in: Delete unused executable after creating base-files.
