@@ -1,3 +1,9 @@
+2000-09-30  Alexandre Oliva  <aoliva@redhat.com>
+
+	* ltconfig, ltmain.sh, libtool.m4: Updated from libtool
+	multi-language branch, to work around Solaris' /bin/sh bug.  Rebuilt
+	all affected `configure' scripts.
+
 2000-09-25  Alexandre Oliva  <aoliva@redhat.com>
 
 	* Makefile.in (DEVO_SUPPORT): Added gettext.m4, libtool.m4 and
