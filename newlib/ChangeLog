@@ -1,3 +1,21 @@
+2003-02-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* acinclude.m4 (--disable-newlib-supplied-syscalls): New configuration 
+	option to allow disabling of syscalls being supplied in newlib.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* configure.host: Add support of new configuration option and add
+	-D__NO_SYSCALLS__ if newlib supplied syscalls are disabled.
+	* doc/aclocal.m4: Regenerated.
+	* doc/configure: Ditto.
+	* libc/*aclocal.m4: Ditto.
+	* libc/*configure: Ditto.
+	* libm/*aclocal.m4: Ditto.
+	* libm/*configure: Ditto.
+	* libc/sys/arm/Makefile.am: Don't build syscalls.o if new option
+	is disabled.
+	* libc/sys/arm/Makefile.in: Regenerated.
+
 2003-02-05  Jonathan Larmour  <jifl@eCosCentric.com>
 
 	* libc/stdio/vsprintf.c (vsprintf, _vsprintf_r): Set _file fd to

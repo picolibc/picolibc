@@ -86,6 +86,16 @@ AC_ARG_ENABLE(newlib-io-float,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-float option) ;;
  esac], [newlib_io_float=yes])dnl
 
+dnl Support --disable-newlib-supplied-syscalls
+AC_ARG_ENABLE(newlib-supplied-syscalls,
+[  --disable-newlib-supplied-syscalls disable newlib from supplying syscalls],
+[case "${enableval}" in
+  yes) newlib_may_supply_syscalls=yes ;;
+  no)  newlib_may_supply_syscalls=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-supplied-syscalls option) ;;
+ esac], [newlib_may_supply_syscalls=yes])dnl
+
+AM_CONDITIONAL(MAY_SUPPLY_SYSCALLS, test x[$]{newlib_may_supply_syscalls} = xyes)
 
 dnl We may get other options which we don't document:
 dnl --with-target-subdir, --with-multisrctop, --with-multisubdir
@@ -289,6 +299,19 @@ else
 fi
 AC_SUBST($1)])
 
+# Define a conditional.
+
+AC_DEFUN(AM_CONDITIONAL,
+[AC_SUBST($1_TRUE)
+AC_SUBST($1_FALSE)
+if $2; then
+  $1_TRUE=
+  $1_FALSE='#'
+else
+  $1_TRUE='#'
+  $1_FALSE=
+fi])
+
 # Add --enable-maintainer-mode option to configure.
 # From Jim Meyering
 
@@ -308,17 +331,4 @@ AC_DEFUN(AM_MAINTAINER_MODE,
   AC_SUBST(MAINT)dnl
 ]
 )
-
-# Define a conditional.
-
-AC_DEFUN(AM_CONDITIONAL,
-[AC_SUBST($1_TRUE)
-AC_SUBST($1_FALSE)
-if $2; then
-  $1_TRUE=
-  $1_FALSE='#'
-else
-  $1_TRUE='#'
-  $1_FALSE=
-fi])
 

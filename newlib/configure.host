@@ -229,6 +229,12 @@ if [ "${newlib_multithread}" = "no" ] ; then
 	newlib_cflags="${newlib_cflags} -D__SINGLE_THREAD__"
 fi
 
+# Disable syscall support if requested.
+
+if [ "${newlib_may_supply_syscalls}" = "no" ] ; then
+        newlib_cflags="${newlib_cflags} -D__NO_SYSCALLS__"
+fi
+
 # Enable multibyte support if requested or it is defaulted
 # for target.
 

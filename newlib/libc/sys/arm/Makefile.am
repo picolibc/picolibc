@@ -6,7 +6,15 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = access.c syscalls.c libcfunc.c trap.S setjmp.S
+if MAY_SUPPLY_SYSCALLS
+extra_objs = syscalls.o
+else
+extra_objs =
+endif
+
+lib_a_SOURCES = access.c libcfunc.c trap.S setjmp.S
+lib_a_LIBADD = $(extra_objs)
+lib_a_DEPENDENCIES = $(extra_objs)
 
 all: crt0.o
 
