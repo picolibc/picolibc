@@ -338,7 +338,7 @@ DECLARE_INTERFACE_(IViewObject,IUnknown)
 EXTERN_C const IID IID_IViewObject2;
 #undef INTERFACE
 #define INTERFACE IViewObject2
-DECLARE_INTERFACE_(IViewObject2,IUnknown)
+DECLARE_INTERFACE_(IViewObject2,IViewObject)
 {
 	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
 	STDMETHOD_(ULONG,AddRef)(THIS) PURE;

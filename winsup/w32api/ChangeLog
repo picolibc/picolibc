@@ -1,3 +1,11 @@
+2003-12-08  Roald Ribe <rrib@users.sourceforge.net>
+
+	* include/winuser.h (RT_MANIFEST): Add define.
+
+2003-12-08  Pascal Buhler <pbuhler@users.sourceforge.net>
+
+	* include/oleidl.h (IViewObject2): Inherit from IViewObject.
+
 2003-12-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (GetCurrentFiber): Remove duplicate prototype.
