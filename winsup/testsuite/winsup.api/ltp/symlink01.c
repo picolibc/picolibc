@@ -1670,8 +1670,8 @@ struct all_test_cases *tc_ptr;
 		}
 	    } else {
 		tst_resm(TFAIL, 
-		    "%sA lstat of %s (ino:%d) and of\n\t\t\
-%s (ino:%d), does not show them being the same ino.", Buffer,
+		    "%sA lstat of %s (ino:%llu) and of\n\t\t\
+%s (ino:%llu), does not show them being the same ino.", Buffer,
 		   tc_ptr->fn_arg[1], asymlink.st_ino, "nick", statter.st_ino);
 	    }
           }

@@ -1,3 +1,8 @@
+2004-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.api/ltp/symlink01.c (do_link): Print inode numbers using %llu
+	format specifier.
+
 2004-08-17 Gerd Spalink <Gerd.Spalink@t-online.de>
 	   Pierre Humblet <Pierre.Humblet@ieee.org>
 
