@@ -1,3 +1,12 @@
+2002-07-05  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* include/winbase.h (OpenThread): Add prototype.
+	* lib/kernel32.def (OpenThread): Add symbol.
+
+2002-07-04  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* include/wtypes.h (HMETAFILEPICT): Add typedef.
+
 2002-07-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/rpc.h: Conditionally include <windows.h> before

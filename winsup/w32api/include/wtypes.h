@@ -166,6 +166,7 @@ typedef struct tagDEC {
 		ULONGLONG Lo64;
 	} DUMMYUNIONNAME2;
 } DECIMAL;
+typedef void *HMETAFILEPICT;
 #ifdef __cplusplus
 }
 #endif

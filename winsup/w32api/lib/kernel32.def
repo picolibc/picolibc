@@ -502,6 +502,7 @@ OpenProcess@12
 OpenProfileUserMapping@0
 OpenSemaphoreA@12
 OpenSemaphoreW@12
+OpenThread@12
 OpenWaitableTimerA@12
 OpenWaitableTimerW@12
 OutputDebugStringA@4
