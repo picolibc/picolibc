@@ -29,20 +29,11 @@ in
 VPATH=@srcdir@
 
 build_alias=@build_alias@
-build_cpu=@build_cpu@
-build_vendor=@build_vendor@
-build_os=@build_os@
-build_canonical=@build_cpu@-@build_vendor@-@build_os@
+build=@build@
 host_alias=@host_alias@
-host_cpu=@host_cpu@
-host_vendor=@host_vendor@
-host_os=@host_os@
-host_canonical=@host_cpu@-@host_vendor@-@host_os@
+host=@host@
 target_alias=@target_alias@
-target_cpu=@target_cpu@
-target_vendor=@target_vendor@
-target_os=@target_os@
-target_canonical=@target_cpu@-@target_vendor@-@target_os@
+target=@target@
 
 program_transform_name = @program_transform_name@
 
@@ -266,7 +257,7 @@ USUAL_AR_FOR_TARGET = ` \
   if [ -f $$r/binutils/ar ] ; then \
     echo $$r/binutils/ar ; \
   else \
-    if [ '$(host_canonical)' = '$(target_canonical)' ] ; then \
+    if [ '$(host)' = '$(target)' ] ; then \
       echo $(AR); \
     else \
        echo ar | sed '$(program_transform_name)' ; \
@@ -280,7 +271,7 @@ USUAL_AS_FOR_TARGET = ` \
   elif [ -f $$r/gcc/xgcc ]; then \
     $(CC_FOR_TARGET) -print-prog-name=as ; \
   else \
-    if [ '$(host_canonical)' = '$(target_canonical)' ] ; then \
+    if [ '$(host)' = '$(target)' ] ; then \
       echo $(AS); \
     else \
        echo as | sed '$(program_transform_name)' ; \
@@ -313,7 +304,7 @@ USUAL_DLLTOOL_FOR_TARGET = ` \
   if [ -f $$r/binutils/dlltool ] ; then \
     echo $$r/binutils/dlltool ; \
   else \
-    if [ '$(host_canonical)' = '$(target_canonical)' ] ; then \
+    if [ '$(host)' = '$(target)' ] ; then \
       echo $(DLLTOOL); \
     else \
        echo dlltool | sed '$(program_transform_name)' ; \
@@ -329,7 +320,7 @@ USUAL_LD_FOR_TARGET = ` \
   elif [ -f $$r/gcc/xgcc ]; then \
     $(CC_FOR_TARGET) -print-prog-name=ld ; \
   else \
-    if [ '$(host_canonical)' = '$(target_canonical)' ] ; then \
+    if [ '$(host)' = '$(target)' ] ; then \
       echo $(LD); \
     else \
        echo ld | sed '$(program_transform_name)' ; \
@@ -345,7 +336,7 @@ USUAL_NM_FOR_TARGET = ` \
   elif [ -f $$r/gcc/xgcc ]; then \
     $(CC_FOR_TARGET) -print-prog-name=nm ; \
   else \
-    if [ '$(host_canonical)' = '$(target_canonical)' ] ; then \
+    if [ '$(host)' = '$(target)' ] ; then \
       echo $(NM); \
     else \
        echo nm | sed '$(program_transform_name)' ; \
@@ -357,7 +348,7 @@ USUAL_RANLIB_FOR_TARGET = ` \
   if [ -f $$r/binutils/ranlib ] ; then \
     echo $$r/binutils/ranlib ; \
   else \
-    if [ '$(host_canonical)' = '$(target_canonical)' ] ; then \
+    if [ '$(host)' = '$(target)' ] ; then \
       if [ x'$(RANLIB)' != x ]; then \
          echo $(RANLIB); \
       else \
@@ -373,7 +364,7 @@ USUAL_WINDRES_FOR_TARGET = ` \
   if [ -f $$r/binutils/windres ] ; then \
     echo $$r/binutils/windres ; \
   else \
-    if [ '$(host_canonical)' = '$(target_canonical)' ] ; then \
+    if [ '$(host)' = '$(target)' ] ; then \
       echo $(WINDRES); \
     else \
        echo windres | sed '$(program_transform_name)' ; \
@@ -657,7 +648,7 @@ maybe-[+make_target+]-[+module+]:
 maybe-[+make_target+]-target-[+module+]:
 [+ IF (match-value? = "missing" (get "make_target") ) +]
 # [+module+] doesn't support [+make_target+].
-[+make_target+]-[+module+]:
+[+make_target+]-target-[+module+]:
 [+ ELSE +]
 [+make_target+]-target-[+module+]: [+
   FOR depend +]\
@@ -740,7 +731,7 @@ clean-target-libgcc:
 
 .PHONY: check do-check
 check:
-	$(MAKE) do-check NOTPARALLEL=parallel-ok
+	$(MAKE) do-check
 
 # Only include modules actually being configured and built.
 do-check: maybe-check-gcc [+
@@ -934,18 +925,16 @@ configure-[+module+]:
 	CFLAGS="$(CFLAGS)"; export CFLAGS; \
 	CXX="$(CXX)"; export CXX; \
 	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
-	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
-	  AR="$(AR)"; export AR; \
-	  AS="$(AS)"; export AS; \
-	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
-	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
-	  LD="$(LD)"; export LD; \
-	  NM="$(NM)"; export NM; \
-	  RANLIB="$(RANLIB)"; export RANLIB; \
-	  WINDRES="$(WINDRES)"; export WINDRES; \
-	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
-	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
-	fi; \
+	AR="$(AR)"; export AR; \
+	AS="$(AS)"; export AS; \
+	CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	LD="$(LD)"; export LD; \
+	NM="$(NM)"; export NM; \
+	RANLIB="$(RANLIB)"; export RANLIB; \
+	WINDRES="$(WINDRES)"; export WINDRES; \
+	OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
 	echo Configuring in [+module+]; \
 	cd [+module+] || exit 1; \
 	case $(srcdir) in \
@@ -981,7 +970,7 @@ check-[+module+]:
 [+ ELIF no_check_cross +]
 # This module is only tested in a native toolchain.
 check-[+module+]:
-	@if [ '$(host_canonical)' = '$(target_canonical)' ] ; then \
+	@if [ '$(host)' = '$(target)' ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -1165,18 +1154,16 @@ configure-gcc:
 	CXX="$(CXX)"; export CXX; \
 	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
 	TOPLEVEL_CONFIGURE_ARGUMENTS="$(TOPLEVEL_CONFIGURE_ARGUMENTS)"; export TOPLEVEL_CONFIGURE_ARGUMENTS; \
-	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
-	  AR="$(AR)"; export AR; \
-	  AS="$(AS)"; export AS; \
-	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
-	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
-	  LD="$(LD)"; export LD; \
-	  NM="$(NM)"; export NM; \
-	  RANLIB="$(RANLIB)"; export RANLIB; \
-	  WINDRES="$(WINDRES)"; export WINDRES; \
-	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
-	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
-	fi; \
+	AR="$(AR)"; export AR; \
+	AS="$(AS)"; export AS; \
+	CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	LD="$(LD)"; export LD; \
+	NM="$(NM)"; export NM; \
+	RANLIB="$(RANLIB)"; export RANLIB; \
+	WINDRES="$(WINDRES)"; export WINDRES; \
+	OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
 	echo Configuring in gcc; \
 	cd gcc || exit 1; \
 	case $(srcdir) in \
@@ -1255,6 +1242,23 @@ $(GCC_STRAP_TARGETS): all-bootstrap configure-gcc
 	echo "Building runtime libraries"; \
 	$(MAKE) $(BASE_FLAGS_TO_PASS) $(RECURSE_FLAGS) all
 
+profiledbootstrap: all-bootstrap configure-gcc
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	echo "Bootstrapping the compiler"; \
+	cd gcc && $(MAKE) $(GCC_FLAGS_TO_PASS) stageprofile_build
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}` ; export s; \
+	$(SET_LIB_PATH) \
+	echo "Building runtime libraries and training compiler"; \
+	$(MAKE) $(BASE_FLAGS_TO_PASS) $(RECURSE_FLAGS) all
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	echo "Building feedback based compiler"; \
+	cd gcc && $(MAKE) $(GCC_FLAGS_TO_PASS) stagefeedback_build
+
 .PHONY: cross
 cross: all-texinfo all-bison all-byacc all-binutils all-gas all-ld
 	@r=`${PWD}`; export r; \
@@ -1294,7 +1298,7 @@ check-gcc-c++:
 
 .PHONY: check-c++
 check-c++:
-	$(MAKE) check-target-libstdc++-v3 check-gcc-c++ NOTPARALLEL=parallel-ok
+	$(MAKE) check-target-libstdc++-v3 check-gcc-c++
 
 .PHONY: install-gcc maybe-install-gcc
 maybe-install-gcc:
@@ -1490,12 +1494,6 @@ $(srcdir)/configure: @MAINT@ $(srcdir)/configure.in $(srcdir)/config/acx.m4
 # ------------------------------
 # Special directives to GNU Make
 # ------------------------------
-
-# Tell GNU make 3.79 not to run the top level in parallel.  This 
-# prevents contention for $builddir/$target/config.cache, as well
-# as minimizing scatter in file system caches.
-NOTPARALLEL = .NOTPARALLEL
-$(NOTPARALLEL):
 
 # Don't pass command-line variables to submakes.
 .NOEXPORT:

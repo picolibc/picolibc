@@ -1,3 +1,36 @@
+2003-06-12  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
+
+	* MAINTAINERS: Add myself as MIPS co-maintainer.
+
+2003-06-12  H.J. Lu <hongjiu.lu@intel.com>
+ 
+	* config.guess: Update to 2003-06-06 version.
+	* config.sub: Update to 2003-06-06 version.
+
+2003-06-11  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
+
+	* configure.in: Don't pass --with-stabs for mips*-sgi-irix6*o32.
+	* configure. Regenerate.
+
+2003-06-10  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Disable serial configure by default.
+	* configure: Regenerate.
+	* Makefile.tpl: Abolish .NOTPARALLEL.
+	* Makefile.in: Regenerate.
+
+	* Makefile.tpl: Replace {build,host,target}_canonical by
+	{build,host,target}.
+	* Makefile.in: Regenerate.
+
+	* Makefile.tpl: Fix stupid pasto.
+	* Makefile.in: Regenerate.
+
+2003-06-09  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Remove bogus conditional.
+	* Makefile.in: Regenerate.
+
 2003-06-03  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* Makefile.tpl: Make 'recursive targets' using autogen rather
