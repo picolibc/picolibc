@@ -518,6 +518,9 @@ case "${host}" in
   powerpc*-*-eabialtivec*)
 	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DWANT_PRINTF_LONG_LONG"
 	;;
+  powerpc*-*-eabispe*)
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DWANT_PRINTF_LONG_LONG"
+	;;
   powerpc*-*-eabi* | \
   powerpc*-*-elf* | \
   powerpc*-*-linux* | \

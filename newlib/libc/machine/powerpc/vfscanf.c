@@ -107,6 +107,8 @@ Supporting OS subroutines required:
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <wchar.h>
+#include <string.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
@@ -128,6 +130,11 @@ Supporting OS subroutines required:
 #if defined WANT_IO_LONG_DBL && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
 extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
+#endif
+
+#ifdef __SPE__
+extern __int64_t _strtosfix64_r _PARAMS((struct _reent *, char *s, char **sptr));
+extern __uint64_t _strtoufix64_r _PARAMS((struct _reent *, char *s, char **sptr));
 #endif
 
 #define _NO_LONGLONG
@@ -171,6 +178,8 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #define	NZDIGITS	0x200	/* no zero digits detected */
 
 #define	VECTOR		0x400	/* v: vector */
+#define	FIXEDPOINT	0x800	/* r/R: fixed-point */
+#define	SIGNED  	0x1000	/* r: signed fixed-point */
 
 /*
  * Conversion types.
@@ -275,7 +284,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   vec_union vec_buf;
   char *lptr;                   /* literal pointer */
 #ifdef MB_CAPABLE
-  int state = 0;                /* value to keep track of multibyte state */
+  mbstate_t state;                /* value to keep track of multibyte state */
 #endif
 
   char *ch_dest;
@@ -302,6 +311,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 #ifndef MB_CAPABLE
       wc = *fmt;
 #else
+      memset (&state, '\0', sizeof (state));
       nbytes = _mbtowc_r (rptr, &wc, fmt, MB_CUR_MAX, &state);
 #endif
       fmt += nbytes;
@@ -467,6 +477,16 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	    vec_read_count = 4;
 	  break;
        
+# ifdef __SPE__
+	  /* treat fixed-point like %f floating point */
+        case 'r':
+	  flags |= SIGNED;
+	  /* fallthrough */
+        case 'R':
+          flags |= FIXEDPOINT;
+	  type = CT_FLOAT;
+          break;
+# endif
 #endif
 
 	case 's':
@@ -1138,6 +1158,34 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		    exp_start = buf + sizeof (buf) - MAX_LONG_LEN - 1;
                  sprintf (exp_start, "e%ld", new_exp);
 		}
+#ifdef __SPE__
+	      if (flags & FIXEDPOINT)
+		{
+		  __uint64_t ufix64;
+		  if (flags & SIGNED)
+		    ufix64 = (__uint64_t)_strtosfix64_r (rptr, buf, NULL);
+                  else
+		    ufix64 = _strtoufix64_r (rptr, buf, NULL);
+		  if (flags & SHORT)
+		    {
+		      __uint16_t *sp = va_arg (ap, __uint16_t *);
+		      *sp = (__uint16_t)(ufix64 >> 48);
+		    }
+		  else if (flags & LONG)
+		    {
+		      __uint64_t *llp = va_arg (ap, __uint64_t *);
+		      *llp = ufix64;
+		    }
+		  else
+		    {
+		      __uint32_t *lp = va_arg (ap, __uint32_t *);
+		      *lp = (__uint32_t)(ufix64 >> 32);
+		    }
+		  nassigned++;
+		  break;
+		}
+	      
+#endif /* __SPE__ */
 #ifdef _NO_LONGDBL
 	      res = _strtod_r (rptr, buf, NULL);
 #else  /* !_NO_LONGDBL */

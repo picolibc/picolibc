@@ -166,6 +166,8 @@ static char *rcsid = "$Id$";
 #include <stdlib.h>
 #include <string.h>
 #include <reent.h>
+#include <wchar.h>
+#include <string.h>
 #ifdef __ALTIVEC__
 #include <altivec.h>
 #endif
@@ -275,6 +277,10 @@ extern int  _ldcheck _PARAMS((_LONG_DOUBLE *));
 
 static int exponent _PARAMS((char *, int, int));
 
+#ifdef __SPE__
+static char *cvt_ufix64 _PARAMS((struct _reent *, unsigned long long, int,  int *, int *));
+#endif /* __SPE__ */
+
 #else /* no FLOATING_POINT */
 
 #define	BUF		40
@@ -308,6 +314,7 @@ static int exponent _PARAMS((char *, int, int));
 #define	ZEROPAD		0x080		/* zero (as opposed to blank) pad */
 #define FPT		0x100		/* Floating point number */
 #define VECTOR		0x200		/* vector */
+#define FIXEDPOINT	0x400		/* fixed-point */
 
 int 
 _DEFUN (VFPRINTF, (fp, fmt0, ap),
@@ -382,7 +389,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	int vec_print_count;    /* number of vector chunks remaining */
 	vec_16_byte_union vec_tmp;
 #endif /* __ALTIVEC__ */ 
-        int state = 0;          /* mbtowc calls from library must not change state */
+        mbstate_t state;          /* mbtowc calls from library must not change state */
 
 	/*
 	 * Choose PADSIZE to trade efficiency vs. size.  If larger printf
@@ -480,6 +487,16 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	    flags&LONGINT ? GET_ULONG(ap) : \
 	    flags&SHORTINT ? (u_long)GET_USHORT(ap) : \
 	    (u_long)GET_UINT(ap))
+#ifdef __SPE__
+#define	SFPARG() \
+	(flags&LONGINT ? va_arg(ap, quad_t) : \
+	    flags&SHORTINT ? (long)GET_SHORT(ap) : \
+	    (long)va_arg(ap, int))
+#define	UFPARG() \
+	(flags&LONGINT ? va_arg(ap, u_quad_t) : \
+	    flags&SHORTINT ? (u_long)GET_USHORT(ap) : \
+	    (u_long)va_arg(ap, u_int))
+#endif /* __SPE__ */
 #else
 #define	SARG() \
 	(flags&LONGINT ? GET_LONG(ap) : \
@@ -489,7 +506,19 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	(flags&LONGINT ? GET_ULONG(ap) : \
 	    flags&SHORTINT ? (u_long)GET_USHORT(ap) : \
 	    (u_long)GET_UINT(ap))
+#ifdef __SPE__
+#define	SFPARG() \
+	(flags&LONGINT ? (va_arg(ap, long) << 32) : \
+	    flags&SHORTINT ? (long)GET_SHORT(ap) : \
+	    (long)va_arg(ap, int))
+#define	UFPARG() \
+	(flags&LONGINT ? (va_arg(ap, u_long) <<32) : \
+	    flags&SHORTINT ? (u_long)GET_USHORT(ap) : \
+	    (u_long)va_arg(ap, u_int))
+#endif /* __SPE__ */
 #endif
+
+        memset (&state, '\0', sizeof (state));
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
 	if (cantwrite(fp))
@@ -863,6 +892,51 @@ reswitch:	switch (ch) {
 			  }
 			break;
 #endif /* FLOATING_POINT */
+#ifdef __SPE__
+                case 'r':
+		        flags |= FIXEDPOINT;
+	     	        _uquad = SFPARG();
+			if ((quad_t)_uquad < 0)
+			  {
+			    sign = '-';
+			    _uquad = -(quad_t)_uquad;
+			  }
+			if (flags & SHORTINT)
+			  _uquad <<= 49;
+			else if (flags & LONGINT)
+			  _uquad <<= 1;
+			else
+			  _uquad <<= 33;
+
+			if (_uquad == 0 && sign)
+			  {
+			    /* we have -1.0 which has to be handled special */
+			    cp = "100000";
+			    expt = 1;
+			    ndig = 6;
+			    break;
+			  }
+
+			goto fixed_nosign;
+                case 'R':
+		        flags |= FIXEDPOINT;
+		        _uquad = UFPARG();
+			if (flags & SHORTINT)
+			  _uquad <<= 48;
+			else if (!(flags & LONGINT))
+			  _uquad <<= 32;
+	
+fixed_nosign:
+			if (prec == -1)
+			  prec = DEFPREC;
+
+			cp = cvt_ufix64 (data, _uquad, prec, &expt, &ndig);
+
+			/* act like %f of format "0.X" */
+			size = prec + 2;
+
+                        break;
+#endif /* __SPE__ */
 		case 'n':
 #ifdef __ALTIVEC__
 		        if (flags & VECTOR)
@@ -1107,6 +1181,35 @@ number:			if ((dprec = prec) >= 0)
 		/* the string or number proper */
 #ifdef FLOATING_POINT
 		if ((flags & FPT) == 0) {
+#ifdef __SPE__
+		        if (flags & FIXEDPOINT) {
+				if (_uquad == 0 && !sign) {
+					/* kludge for __dtoa irregularity */
+					PRINT("0", 1);
+					if (expt < ndig || (flags & ALT) != 0) {
+						PRINT(decimal_point, 1);
+						PAD(ndig - 1, zeroes);
+					}
+				} else if (expt <= 0) {
+					PRINT("0", 1);
+					if(expt || ndig) {
+						PRINT(decimal_point, 1);
+						PAD(-expt, zeroes);
+						PRINT(cp, ndig);
+					}
+				} else if (expt >= ndig) {
+					PRINT(cp, ndig);
+					PAD(expt - ndig, zeroes);
+					if (flags & ALT)
+						PRINT(".", 1);
+				} else {
+					PRINT(cp, expt);
+					cp += expt;
+					PRINT(".", 1);
+					PRINT(cp, ndig-expt);
+				}
+		        } else
+#endif /* __SPE__ */
  			        PRINT(cp, size);
 		} else {	/* glue together f_p fragments */
 			if (ch >= 'f') {	/* 'f' or 'g' */
@@ -1297,3 +1400,31 @@ exponent(p0, exp, fmtch)
 }
 #endif /* FLOATING_POINT */
 
+#ifdef __SPE__
+extern char *_ufix64toa_r _PARAMS((struct _reent *, unsigned long long, int,
+			           int, int *, int *, char **));
+static char *
+cvt_ufix64 (data, value, ndigits, decpt, length)
+	struct _reent *data;
+	unsigned long long value;
+	int ndigits, *decpt, *length;
+{
+	int dsgn;
+	char *digits, *bp, *rve;
+
+	/* treat the same as %f format and use mode=3 */
+	digits = _ufix64toa_r (data, value, 3, ndigits, decpt, &dsgn, &rve);
+
+        /* print trailing zeroes */
+	bp = digits + ndigits;
+	if (*digits == '0' && value)
+	  *decpt = -ndigits + 1;
+	bp += *decpt;
+	if (value == 0)	/* kludge for __dtoa irregularity */
+	  rve = bp;
+	while (rve < bp)
+	  *rve++ = '0';
+	*length = rve - digits;
+	return (digits);
+}
+#endif /* __SPE__ */
