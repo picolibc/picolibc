@@ -554,7 +554,7 @@ path_conv::check (const char *src, unsigned opt,
 		fileattr = FILE_ATTRIBUTE_DIRECTORY;
 	      else
 		{
-		  dev.devn = FH_BAD;
+		  dev.devn = FH_FS;
 		  fileattr = GetFileAttributes (this->path);
 		}
 	      goto out;
@@ -581,7 +581,7 @@ path_conv::check (const char *src, unsigned opt,
 	      goto out;
 	    }
 	  /* devn should not be a device.  If it is, then stop parsing now. */
-	  else if (dev.devn != FH_BAD)
+	  else if (dev.devn != FH_FS)
 	    {
 	      fileattr = 0;
 	      path_flags = sym.pflags;
@@ -795,7 +795,7 @@ out:
       return;
     }
 
-  if (dev.devn == FH_BAD)
+  if (dev.devn == FH_FS)
     {
       if (!fs.update (path))
 	{
@@ -891,7 +891,7 @@ win32_device_name (const char *src_path, char *win32_path, device& dev)
 {
   dev.parse (src_path);
 
-  if (dev.devn == FH_BAD)
+  if (dev.devn == FH_FS)
     return false;
 
   switch (dev.devn)
@@ -1176,7 +1176,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
   unsigned dummy_flags;
   int chroot_ok = !cygheap->root.exists ();
 
-  dev.devn = FH_BAD;
+  dev.devn = FH_FS;
 
   if (!flags)
     flags = &dummy_flags;
@@ -1488,7 +1488,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 
       if (!*p || !p[1])
 	nextchar = 0;
-      else if (*p == '/')
+      else if (isdirsep (*p))
 	nextchar = -1;
       else
 	nextchar = 1;

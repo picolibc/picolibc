@@ -167,7 +167,7 @@ class path_conv
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
   char operator [](int i) const {return path[i];}
-  DWORD get_devn () {return dev.devn == FH_BAD ? (DWORD) FH_FS : dev.devn;}
+  DWORD get_devn () {return dev.devn;}
   short get_unitn () {return dev.minor;}
   DWORD file_attributes () {return fileattr;}
   DWORD drive_type () {return fs.drive_type;}

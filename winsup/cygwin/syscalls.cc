@@ -1179,18 +1179,9 @@ cygwin_lstat (const char *name, struct __stat32 *buf)
   return ret;
 }
 
-extern "C" int
-access (const char *fn, int flags)
+int
+access_worker (path_conv& real_path, int flags)
 {
-  sigframe thisframe (mainthread);
-  // flags were incorrectly specified
-  if (flags & ~(F_OK|R_OK|W_OK|X_OK))
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  path_conv real_path (fn, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
   if (real_path.error)
     {
       set_errno (real_path.error);
@@ -1206,13 +1197,14 @@ access (const char *fn, int flags)
   if (!(flags & (R_OK | W_OK | X_OK)))
     return 0;
 
-  if (real_path.has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
+  if (real_path.is_fs_special ())
+    /* short circuit */;
+  else if (real_path.has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
     {
       set_errno (EACCES);
       return -1;
     }
-
-  if (real_path.has_acls () && allow_ntsec)
+  else if (real_path.has_acls () && allow_ntsec)
     return check_file_access (real_path, flags);
 
   struct __stat64 st;
@@ -1270,6 +1262,21 @@ done:
   if (r)
     set_errno (EACCES);
   return r;
+}
+
+extern "C" int
+access (const char *fn, int flags)
+{
+  sigframe thisframe (mainthread);
+  // flags were incorrectly specified
+  if (flags & ~(F_OK|R_OK|W_OK|X_OK))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  path_conv pc (fn, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
+  return access_worker (pc, flags);
 }
 
 extern "C" int
@@ -1413,14 +1420,15 @@ struct system_cleanup_args
   sigset_t old_mask;
 };
 
-static void system_cleanup (void *args)
+static void
+system_cleanup (void *args)
 {
   struct system_cleanup_args *cleanup_args = (struct system_cleanup_args *) args;
 
   signal (SIGINT, cleanup_args->oldint);
   signal (SIGQUIT, cleanup_args->oldquit);
   (void) sigprocmask (SIG_SETMASK, &cleanup_args->old_mask, 0);
-}  
+}
 
 extern "C" int
 system (const char *cmdstring)

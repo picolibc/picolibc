@@ -320,6 +320,8 @@ bool
 fhandler_base::device_access_denied (int flags)
 {
   int mode = 0;
+  int access_worker (path_conv&, int);
+
   if (flags & O_RDWR)
     mode |= R_OK | W_OK;
   if (flags & (O_WRONLY | O_APPEND))
@@ -327,7 +329,7 @@ fhandler_base::device_access_denied (int flags)
   if (!mode)
     mode |= R_OK;
 
-  return ::access (get_win32_name (), mode);
+  return access_worker (pc, mode);
 }
 
 /* Open system call handler function. */

@@ -31,7 +31,7 @@ details. */
 int
 fhandler_nodevice::open (int, mode_t)
 {
-  set_errno (ENODEV);
+  set_errno (ENXIO);
   return 0;
 }
 

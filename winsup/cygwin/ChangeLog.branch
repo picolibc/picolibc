@@ -1,5 +1,22 @@
 2003-02-23  Christopher Faylor  <cgf@redhat.com>
 
+	* cygwin-gperf: Fix typo in FH_FS static storage.
+	* devices.gperf (device::parse): Default to fs "device" when nothing
+	else is found.
+	* fhandler.cc (fhandler_base::device_access_denied): Use access_worker
+	rather than access to avoid reparsing pc.
+	* fhandler_nodevice.cc (fhandler_nodevice::open): Set errno to ENXIO
+	rather than ENODEV.
+	* path.cc (path_conv::check): Default to FH_FS rather than FH_BAD.
+	(mount_info::conv_to_win32_path): Ditto.
+	(win32_device_name): Don't do device handling if FH_FS.
+	* path.h (path_conv::get_devn): Just return raw device number.
+	* syscalls.cc (access_worker): New function, split from access().
+	Correctly deal with special devices in light of recent ntsec changes.
+	(access): Use access_worker.
+
+2003-02-23  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.cc (fhandler_base::set_name): Explicitly set posix name.
 	(fhandler_base::dup): Ditto.
 

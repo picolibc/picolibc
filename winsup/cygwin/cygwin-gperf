@@ -35,7 +35,7 @@ static const device cygdrive_dev_storage =
   {"/cygdrive", FH_CYGDRIVE, "/cygdrive", 0, 0, 0, 0};
 
 static const device fs_dev_storage =
-  {"", FH_CYGDRIVE, "", 0, 0, 0, 0};
+  {"", FH_FS, "", 0, 0, 0, 0};
 
 static const device proc_dev_storage =
   {"", FH_PROC, "", 0, 0, 0, 0};
