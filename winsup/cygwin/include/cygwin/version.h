@@ -223,13 +223,14 @@ details. */
        96: CW_GET_ERRNO_FROM_WINERROR addition to external.cc
        97: Export sem_open, sem_close, sem_timedwait, sem_getvalue.
        98: Export _tmpfile64.
+       99: CW_GET_POSIX_SECURITY_ATTRIBUTE addition to external.cc.
 
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 98
+#define CYGWIN_VERSION_API_MINOR 99
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -126,20 +126,6 @@ init_console_handler ()
     system_printf ("SetConsoleCtrlHandler failed, %E");
 }
 
-void
-init_global_security ()
-{
-  /* Initialize global security attribute stuff */
-
-  sec_none.nLength = sec_none_nih.nLength =
-  sec_all.nLength = sec_all_nih.nLength = sizeof (SECURITY_ATTRIBUTES);
-  sec_none.bInheritHandle = sec_all.bInheritHandle = TRUE;
-  sec_none_nih.bInheritHandle = sec_all_nih.bInheritHandle = FALSE;
-  sec_none.lpSecurityDescriptor = sec_none_nih.lpSecurityDescriptor = NULL;
-  sec_all.lpSecurityDescriptor = sec_all_nih.lpSecurityDescriptor =
-    get_null_sd ();
-}
-
 extern "C" void
 init_exceptions (exception_list *el)
 {

@@ -265,6 +265,15 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  int deferrno = va_arg (arg, int);
 	  return geterrno_from_win_error (error, deferrno);
 	}
+      case CW_GET_POSIX_SECURITY_ATTRIBUTE:
+	{
+	  int attribute = va_arg (arg, int);
+	  PSECURITY_ATTRIBUTES psa = va_arg (arg, PSECURITY_ATTRIBUTES);
+	  void *sd_buf = va_arg (arg, void *);
+	  DWORD sd_buf_size = va_arg (arg, DWORD);
+	  set_security_attribute (attribute, psa, sd_buf, sd_buf_size);
+	  return psa->lpSecurityDescriptor ? 0 : -1;
+        }
       default:
 	return (DWORD) -1;
     }

@@ -371,6 +371,24 @@ get_null_sd ()
   return null_sdp;
 }
 
+/*
+ * Initialize global security attributes.
+ *
+ * Called from dcrt0.cc (_dll_crt0).
+ */
+
+void
+init_global_security ()
+{
+  sec_none.nLength = sec_none_nih.nLength =
+  sec_all.nLength = sec_all_nih.nLength = sizeof (SECURITY_ATTRIBUTES);
+  sec_none.bInheritHandle = sec_all.bInheritHandle = TRUE;
+  sec_none_nih.bInheritHandle = sec_all_nih.bInheritHandle = FALSE;
+  sec_none.lpSecurityDescriptor = sec_none_nih.lpSecurityDescriptor = NULL;
+  sec_all.lpSecurityDescriptor = sec_all_nih.lpSecurityDescriptor =
+    get_null_sd ();
+}
+
 BOOL
 sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD access2)
 {
