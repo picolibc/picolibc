@@ -1,3 +1,8 @@
+2003-12-02  Graham Reed <grahamr@algorithmics.com>
+
+	* internal.h (C_WEAKEXT): Add alternative value for AIX 5.2
+	based targets.
+
 2003-08-23  Jason Eckhardt  <jle@rice.edu>
 
 	* coff/i860.h (COFF860_R_PAIR, COFF860_R_LOW0, COFF860_R_LOW1,
