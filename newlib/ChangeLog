@@ -1,3 +1,13 @@
+2003-08-26  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdio.h: Allow the io64 function prototypes for
+	Cygwin when compiling newlib.
+	* libc/include/sys/stat.h[__CYGWIN__]: Define stat64 as __stat64
+	to expose the Cygwin struct __stat64 type.
+	* libc/stdio64/fseeko64.c: Use _fstat64_r and pass a struct stat64
+	pointer.
+	* libc/stdio64/tmpfile64.c(_tmpfile64_r): Call _fopen64_r.
+
 2003-08-23  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/stdio64/fseeko64.c (fseeko64_r): Rename second fseeko64_r

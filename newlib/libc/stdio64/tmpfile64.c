@@ -63,9 +63,9 @@ _DEFUN (_tmpfile64_r, (ptr),
 
   if ((f = _tmpnam_r (ptr, buf)) == NULL)
     return NULL;
-  fp = fopen64 (f, "wb+");
+  fp = _fopen64_r (ptr, (const char *)f, "wb+");
   e = ptr->_errno;
-  _CAST_VOID remove (f);
+  _CAST_VOID _remove_r (ptr, f);
   ptr->_errno = e;
   return fp;
 }

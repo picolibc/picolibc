@@ -308,7 +308,7 @@ ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
 ssize_t _EXFUN(__getline, (char **, size_t *, FILE *));
 
 #ifdef __LARGE64_FILES
-#ifndef __CYGWIN__
+#if !defined(__CYGWIN__) || defined(_COMPILING_NEWLIB)
 FILE *	_EXFUN(fdopen64, (int, const char *));
 FILE *  _EXFUN(fopen64, (const char *, const char *));
 _off64_t _EXFUN(ftello64, (FILE *));

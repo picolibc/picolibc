@@ -24,6 +24,7 @@ extern "C" {
 
 #ifdef __CYGWIN__
 #include <cygwin/stat.h>
+#define stat64 __stat64
 #else
 struct	stat 
 {

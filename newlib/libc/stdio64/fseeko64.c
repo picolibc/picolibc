@@ -108,8 +108,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
   _fpos64_t target, curoff;
   size_t n;
 
-  /* FIXME: this should be stat64. */
-  struct stat st;
+  struct stat64 st;
   int havepos;
 
   _flockfile(fp);
@@ -205,7 +204,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
     {
       if (seekfn != __sseek64
 	  || fp->_file < 0
-	  || _fstat_r (ptr, fp->_file, &st)
+	  || _fstat64_r (ptr, fp->_file, &st)
 	  || (st.st_mode & S_IFMT) != S_IFREG)
 	{
 	  fp->_flags |= __SNPT;
