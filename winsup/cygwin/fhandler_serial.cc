@@ -591,6 +591,9 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       case B115200:
 	state.BaudRate = CBR_115200;
 	break;
+      case B230400:
+	state.BaudRate = 230400 /* CBR_230400 - not defined */;
+	break;
       default:
 	/* Unsupported baud rate! */
 	termios_printf ("Invalid t->c_ospeed %d", t->c_ospeed);
@@ -722,7 +725,6 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
 
   state.fAbortOnError = TRUE;
 
-  /* -------------- Set state and exit ------------------ */
   if (memcmp (&ostate, &state, sizeof (state)) != 0)
     SetCommState (get_handle (), &state);
 
@@ -890,6 +892,9 @@ fhandler_serial::tcgetattr (struct termios *t)
 	break;
       case CBR_115200:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B115200;
+	break;
+      case 230400: /* CBR_230400 - not defined */
+	t->c_cflag = t->c_ospeed = t->c_ispeed = B230400;
 	break;
       default:
 	/* Unsupported baud rate! */
