@@ -1,3 +1,8 @@
+2004-09-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* lib/_cygwin_crt0_common.cc: Revert patch from 2004-09-16.  Brakes
+	newly built DLLs.
+
 2004-09-24  Christopher Faylor  <cgf@timesys.com>
 	    Sergey Ivanov  <seriv@parkheights.dyndns.org>
 
