@@ -1,3 +1,19 @@
+2005-02-03  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.h (cygthread::terminate_thread): Reflect return value.
+	* cygthread.cc (cygthread::detach): Be more careful about ensuring that
+	sigwait is properly waited for to avoid later missynchronization.
+	(cygthread::terminate_thread): Return true if thread was actually
+	terminated and all handles were closed.
+	* fhandler_base.cc (fhandler_base::raw_read): Use signal_read_state
+	rather than raw calls to win32 api.
+	(fhandler_base::read): Ditto.
+	* fhandler.h (fhandler_pipe::fixup_after_exec): Use method to create
+	read_state signalling.
+	(fhandler_pipe::create): Ditto.
+
+	* Makefile.in: Make some more files -fomit-frame-pointer.
+
 2005-02-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_base::ftruncate): Define new virtual method.

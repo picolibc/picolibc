@@ -27,7 +27,7 @@ class cygthread
   bool is_freerange;
   static bool exiting;
  public:
-  void terminate_thread ();
+  bool terminate_thread ();
   static DWORD WINAPI stub (VOID *);
   static DWORD WINAPI simplestub (VOID *);
   static DWORD main_thread_id;

@@ -177,7 +177,7 @@ fhandler_pipe::fixup_after_exec ()
 {
   if (read_state)
     {
-      read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+      create_read_state (2);
       ProtectHandle (read_state);
     }
 }
@@ -410,7 +410,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fif
 	 fhs[1]->close_on_exec (true);
        }
 
-      fhs[0]->read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+      fhs[0]->create_read_state (2);
       fhs[0]->need_fork_fixup (true);
       ProtectHandle1 (fhs[0]->read_state, read_state);
 

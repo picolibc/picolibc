@@ -243,9 +243,10 @@ cygthread::release (bool nuke_h)
 }
 
 /* Forcibly terminate a thread. */
-void
+bool
 cygthread::terminate_thread ()
 {
+  bool terminated = true;
   /* FIXME: The if (!inuse) stuff below should be handled better.  The
      problem is that terminate_thread could be called while a thread
      is terminating and either the thread could be handling its own
@@ -264,19 +265,19 @@ cygthread::terminate_thread ()
     low_priority_sleep (0);
 
   if (!inuse)
-    return;
+    return false;
 
   (void) TerminateThread (h, 0);
   (void) WaitForSingleObject (h, INFINITE);
   if (ev)
-    WaitForSingleObject (ev, 0);
+    terminated = WaitForSingleObject (ev, 0) != WAIT_OBJECT_0;
   if (!inuse || exiting)
-    return;
+    return false;
 
   CloseHandle (h);
 
   if (!inuse)
-    return;
+    return false;
 
   MEMORY_BASIC_INFORMATION m;
   memset (&m, 0, sizeof (m));
@@ -299,6 +300,7 @@ cygthread::terminate_thread ()
 #endif
       release (true);
     }
+  return terminated;
 }
 
 /* Detach the cygthread from the current thread.  Note that the
@@ -309,6 +311,7 @@ bool
 cygthread::detach (HANDLE sigwait)
 {
   bool signalled = false;
+  bool terminated = false;
   if (!inuse)
     system_printf ("called detach but inuse %d, thread %p?", inuse, id);
   else
@@ -327,22 +330,27 @@ cygthread::detach (HANDLE sigwait)
 	    system_printf ("WFSO sigwait %p failed, res %u, %E", sigwait, res);
 	  res = WaitForMultipleObjects (2, w4, FALSE, INFINITE);
 	  if (res == WAIT_OBJECT_0)
-	    /* nothing */;
-	  else if (WaitForSingleObject (sigwait, 0) == WAIT_OBJECT_0)
-	    res = WaitForSingleObject (*this, INFINITE);
-	  else if ((res = WaitForSingleObject (*this, 0)) != WAIT_OBJECT_0)
+	    signalled = false;
+	  else if (res != WAIT_OBJECT_0 + 1)
+	    api_fatal ("WFMO failed waiting for cygthread '%s'", __name);
+	  else if ((res = WaitForSingleObject (*this, INFINITE)) == WAIT_OBJECT_0)
+	    signalled = false;
+	  else
 	    {
-	      signalled = true;
-	      terminate_thread ();
-	      set_sig_errno (EINTR);	/* caller should be dealing with return
-					   values. */
+	      terminated = true;
+	      signalled = terminate_thread ();
 	    }
+	  if (WaitForSingleObject (sigwait, 0) == WAIT_OBJECT_0)
+	    signalled = false;
+	  else if (signalled)
+	    set_sig_errno (EINTR);    /* caller should be dealing with return
+					 values. */
 	}
 
       thread_printf ("%s returns %d, id %p", sigwait ? "WFMO" : "WFSO",
 		     res, id);
 
-      if (signalled)
+      if (terminated)
 	/* already handled */;
       else if (is_freerange)
 	{

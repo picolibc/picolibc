@@ -193,6 +193,15 @@ class fhandler_base
   virtual void fixup_before_fork_exec (DWORD) {}
   virtual void fixup_after_fork (HANDLE);
   virtual void fixup_after_exec () {}
+  void create_read_state (LONG n)
+  {
+    read_state = CreateSemaphore (&sec_none_nih, 0, n, NULL);
+  }
+
+  void signal_read_state (LONG n)
+  {
+    (void) ReleaseSemaphore (read_state, n, NULL);
+  }
 
   void set_fs_flags (DWORD flags) { fs_flags = flags; }
   bool get_fs_flags (DWORD flagval = UINT32_MAX)
