@@ -1,3 +1,10 @@
+2000-04-25  Martin Kotulla  <martin-k@softmaker.de>
+
+	* include/ddeml.h (DdeCreateStringHandle{A,W}): Fix prototype.
+	* include/shlobj.h (IShellLink{A,W}::GetPath): Fix prototype.
+	* include/wingdi.h: Add LPFNDEVMODE and LPFNDEVCAPS callbacks.
+	* include/winuser.h: Add WM_* macros. Add PCOPYDATASTRUCT typedef.
+
 Mon Apr 10 22:58:25 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/winbase.h: Change first argument of ENUMRES* types to
