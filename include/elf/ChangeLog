@@ -1,3 +1,8 @@
+2001-04-20  Johan Rydberg  <jrydberg@opencores.org>
+
+	* openrisc.h: New file.
+	* common.h (EM_OPENRISC): New constant. 
+
 2001-04-23  Bo Thorsen  <bo@suse.de>
 
 	* x86-64.h: Add vtable support.
