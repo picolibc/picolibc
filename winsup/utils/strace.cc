@@ -1,6 +1,6 @@
 /* strace.cc
 
-   Copyright 2000, 2001 Red Hat Inc.
+   Copyright 2000, 2001, 2002 Red Hat Inc.
 
    Written by Chris Faylor <cgf@redhat.com>
 
@@ -35,7 +35,7 @@ int _impure_ptr;
 #define alloca __builtin_alloca
 
 // Version string.
-static const char *version_string = "@(#)strace V1.0, Copyright (C) 2001 Red Hat Inc., " __DATE__ "\n";
+static const char *version_string = "@(#)strace V1.0, Copyright (C) 2001, 2002 Red Hat Inc., " __DATE__ "\n";
 
 static const char *pgm;
 static int forkdebug = 0;
