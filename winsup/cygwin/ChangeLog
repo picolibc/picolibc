@@ -1,4 +1,9 @@
-Tue Mar  6 13:02:00 2001  Jason Tiller <jtiller@sjm.com>
+Tue Mar  6 14:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (suffix_scan::has): Change order of conditionals
+	to allow checking for .lnk suffixes even if in_suffixes is empty.
+
+Tue Mar  6 13:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.c (cygwin_premain0): Add missing parameter.
 	* binmode.c (cygwin_premain0): Ditto.

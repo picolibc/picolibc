@@ -2426,10 +2426,10 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes, char **ex
   suffixes = in_suffixes;
   nullterm = 0;
   state = SCAN_BEG;
-  if (suffixes)
+  ext_here = *ext_where = strrchr (in_path, '.');
+  if (ext_here)
     {
-      ext_here = *ext_where = strrchr (in_path, '.');
-      if (ext_here)
+      if (suffixes)
 	{
 	  /* Check if the extension matches a known extension */
 	  for (const suffix_info *ex = in_suffixes; ex->name != NULL; ex++)
@@ -2438,12 +2438,12 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes, char **ex
 		state = SCAN_JUSTCHECK;
 		goto known_suffix;
 	      }
-	  /* Didn't match.  Use last resort -- .lnk. */
-	  if (strcasematch (ext_here, ".lnk"))
-	    {
-	      state = SCAN_LNK;
-	      goto known_suffix;
-	    }
+	}
+      /* Didn't match.  Use last resort -- .lnk. */
+      if (strcasematch (ext_here, ".lnk"))
+	{
+	  state = SCAN_LNK;
+	  goto known_suffix;
 	}
     }
 
