@@ -1,3 +1,7 @@
+Mon Jun 21 16:36:02 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (elf_hppa_reloc_type): Renamed from elf32_hppa_reloc_type.
+
 1999-06-10  Jakub Jelinek  <jj@ultra.linux.cz>
 
 	* sparc.h (R_SPARC_max_std): Define.
