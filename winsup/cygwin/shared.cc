@@ -73,7 +73,7 @@ static char *offsets[] =
 };
 
 void * __stdcall
-open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
+open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
 	     shared_locations m, PSECURITY_ATTRIBUTES psa)
 {
   void *shared;

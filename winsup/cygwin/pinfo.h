@@ -144,11 +144,11 @@ public:
   bool waiter_ready;
   /* Handle associated with initial Windows pid which started it all. */
   class cygthread *wait_thread;
-  void init (pid_t, DWORD, HANDLE = NULL) __attribute__ ((regparm(3)));
+  void init (pid_t, DWORD, HANDLE) __attribute__ ((regparm(3)));
   pinfo () {}
   pinfo (_pinfo *x): procinfo (x), hProcess (NULL) {}
-  pinfo (pid_t n) : rd_proc_pipe (NULL), hProcess (NULL) {init (n, 0);}
-  pinfo (pid_t n, DWORD flag) : rd_proc_pipe (NULL), hProcess (NULL) {init (n, flag);}
+  pinfo (pid_t n) : rd_proc_pipe (NULL), hProcess (NULL) {init (n, 0, NULL);}
+  pinfo (pid_t n, DWORD flag) : rd_proc_pipe (NULL), hProcess (NULL) {init (n, flag, NULL);}
   void release ();
   int wait () __attribute__ ((regparm (1)));
   ~pinfo ()

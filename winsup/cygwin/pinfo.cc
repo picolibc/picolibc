@@ -49,7 +49,7 @@ set_myself (HANDLE h)
 {
   if (!h)
     cygheap->pid = cygwin_pid (GetCurrentProcessId ());
-  myself.init (cygheap->pid, PID_IN_USE | PID_MYSELF, h);
+  myself.init (cygheap->pid, PID_IN_USE, h ?: INVALID_HANDLE_VALUE);
   myself->process_state |= PID_IN_USE;
   myself->dwProcessId = GetCurrentProcessId ();
 
@@ -62,7 +62,7 @@ set_myself (HANDLE h)
     {
       /* here if execed */
       static pinfo NO_COPY myself_identity;
-      myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED);
+      myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED, NULL);
       myself->start_time = time (NULL); /* Register our starting time. */
       myself->exec_sendsig = NULL;
       myself->exec_dwProcessId = 0;
@@ -169,74 +169,71 @@ pinfo::exit (DWORD n)
 void
 pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 {
+  h = NULL;
   if (myself && n == myself->pid)
     {
       procinfo = myself;
       destroy = 0;
-      h = NULL;
       return;
     }
 
-  h = NULL;
-  procinfo = NULL;
-
   void *mapaddr;
-  if (!(flag & PID_MYSELF))
+  bool createit = !!(flag & (PID_IN_USE | PID_EXECED));
+  bool created;
+  DWORD access = FILE_MAP_READ
+		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW)
+		    ? FILE_MAP_WRITE : 0);
+  if (!h0)
     mapaddr = NULL;
   else
     {
-      flag &= ~PID_MYSELF;
-      HANDLE hdummy;
-      mapaddr = open_shared (NULL, 0, hdummy, 0, SH_MYSELF);
+      /* Try to enforce that myself is always created in the same place */
+      mapaddr = open_shared (NULL, 0, h0, 0, SH_MYSELF);
+      created = false;
+      if (h0 == INVALID_HANDLE_VALUE)
+	h0 = NULL;
     }
 
-  int createit = flag & (PID_IN_USE | PID_EXECED);
-  DWORD access = FILE_MAP_READ
-		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW) ? FILE_MAP_WRITE : 0);
-
-  bool created;
-  if (h0)
-    created = 0;
-  else
-    {
-      char mapname[CYG_MAX_PATH];
-      shared_name (mapname, "cygpid", n);
-
-      int mapsize;
-      if (flag & PID_EXECED)
-	mapsize = PINFO_REDIR_SIZE;
-      else
-	mapsize = sizeof (_pinfo);
-
-      if (!createit)
-	{
-	  h0 = OpenFileMapping (access, FALSE, mapname);
-	  created = 0;
-	}
-      else
-	{
-	  char sa_buf[1024];
-	  PSECURITY_ATTRIBUTES sec_attribs =
-	    sec_user_nih (sa_buf, cygheap->user.sid(), well_known_world_sid,
-			  FILE_MAP_READ);
-	  h0 = CreateFileMapping (INVALID_HANDLE_VALUE, sec_attribs,
-				  PAGE_READWRITE, 0, mapsize, mapname);
-	  created = GetLastError () != ERROR_ALREADY_EXISTS;
-	}
-
-      if (!h0)
-	{
-	  if (createit)
-	    __seterrno ();
-	  return;
-	}
-    }
-
-  ProtectHandle1 (h0, pinfo_shared_handle);
-
+  procinfo = NULL;
   for (int i = 0; i < 20; i++)
     {
+      if (!h0)
+	{
+	  char mapname[CYG_MAX_PATH];
+	  shared_name (mapname, "cygpid", n);
+
+	  int mapsize;
+	  if (flag & PID_EXECED)
+	    mapsize = PINFO_REDIR_SIZE;
+	  else
+	    mapsize = sizeof (_pinfo);
+
+	  if (!createit)
+	    {
+	      h0 = OpenFileMapping (access, FALSE, mapname);
+	      created = false;
+	    }
+	  else
+	    {
+	      char sa_buf[1024];
+	      PSECURITY_ATTRIBUTES sec_attribs =
+		sec_user_nih (sa_buf, cygheap->user.sid(), well_known_world_sid,
+			      FILE_MAP_READ);
+	      h0 = CreateFileMapping (INVALID_HANDLE_VALUE, sec_attribs,
+				      PAGE_READWRITE, 0, mapsize, mapname);
+	      created = GetLastError () != ERROR_ALREADY_EXISTS;
+	    }
+
+	  if (!h0)
+	    {
+	      if (createit)
+		__seterrno ();
+	      return;
+	    }
+	}
+
       procinfo = (_pinfo *) MapViewOfFileEx (h0, access, 0, 0, 0, mapaddr);
+
       if (!procinfo)
 	{
 	  if (exit_state)
@@ -263,13 +260,15 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	  debug_printf ("execed process windows pid %d, cygwin pid %d", n, realpid);
 	  if (realpid == n)
 	    api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
-	  n = realpid;
 
 	  if ((flag & PID_ALLPIDS))
 	    {
 	      set_errno (ESRCH);
 	      break;
 	    }
+	  n = realpid;
+	  CloseHandle (h0);
+	  h0 = NULL;
 	  goto loop;
 	}
 
@@ -299,7 +298,10 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
     }
 
   if (h)
-    destroy = 1;
+    {
+      destroy = 1;
+      ProtectHandle1 (h, pinfo_shared_handle);
+    }
   else
     {
       h = h0;
@@ -959,7 +961,7 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
     }
 
   pinfolist[nelem].init (cygpid, PID_NOREDIR | (winpid ? PID_ALLPIDS : 0)
-			 | pinfo_access);
+			 | pinfo_access, NULL);
   if (winpid)
     goto out;
 
@@ -967,7 +969,7 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
     {
       if (!pinfo_access)
 	return;
-      pinfolist[nelem].init (cygpid, PID_NOREDIR | (winpid ? PID_ALLPIDS : 0));
+      pinfolist[nelem].init (cygpid, PID_NOREDIR | (winpid ? PID_ALLPIDS : 0), NULL);
       if (!pinfolist[nelem])
 	return;
       }
