@@ -353,12 +353,12 @@ fhandler_base::fhaccess (int flags)
   if (is_fs_special ())
     /* short circuit */;
   else if (has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
+    goto eaccess_done;
+  else if (has_acls () && allow_ntsec)
     {
-      set_errno (EACCES);
+      res = check_file_access (get_win32_name (), flags);
       goto done;
     }
-  else if (has_acls () && allow_ntsec)
-    return check_file_access (get_win32_name (), flags);
 
   struct __stat64 st;
   if (fstat (&st))
@@ -369,15 +369,15 @@ fhandler_base::fhaccess (int flags)
       if (st.st_uid == myself->uid)
 	{
 	  if (!(st.st_mode & S_IRUSR))
-	    goto done;
+	    goto eaccess_done;
 	}
       else if (st.st_gid == myself->gid)
 	{
 	  if (!(st.st_mode & S_IRGRP))
-	    goto done;
+	    goto eaccess_done;
 	}
       else if (!(st.st_mode & S_IROTH))
-	goto done;
+	goto eaccess_done;
     }
 
   if (flags & W_OK)
@@ -385,15 +385,15 @@ fhandler_base::fhaccess (int flags)
       if (st.st_uid == myself->uid)
 	{
 	  if (!(st.st_mode & S_IWUSR))
-	    goto done;
+	    goto eaccess_done;
 	}
       else if (st.st_gid == myself->gid)
 	{
 	  if (!(st.st_mode & S_IWGRP))
-	    goto done;
+	    goto eaccess_done;
 	}
       else if (!(st.st_mode & S_IWOTH))
-	goto done;
+	goto eaccess_done;
     }
 
   if (flags & X_OK)
@@ -401,20 +401,23 @@ fhandler_base::fhaccess (int flags)
       if (st.st_uid == myself->uid)
 	{
 	  if (!(st.st_mode & S_IXUSR))
-	    goto done;
+	    goto eaccess_done;
 	}
       else if (st.st_gid == myself->gid)
 	{
 	  if (!(st.st_mode & S_IXGRP))
-	    goto done;
+	    goto eaccess_done;
 	}
       else if (!(st.st_mode & S_IXOTH))
-	goto done;
+	goto eaccess_done;
     }
+
   res = 0;
+  goto done;
+
+eaccess_done:
+  set_errno (EACCES);
 done:
-  if (res)
-    set_errno (EACCES);
   debug_printf ("returning %d", res);
   return res;
 }
