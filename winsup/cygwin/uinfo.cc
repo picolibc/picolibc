@@ -77,7 +77,7 @@ internal_getlogin (cygheap_user &user)
       myself->gid = pw->pw_gid;
       user.set_name (pw->pw_name);
       if (wincap.has_security ())
-        {
+	{
 	  cygsid gsid;
 	  if (gsid.getfromgr (getgrgid32 (pw->pw_gid)))
 	    {
