@@ -80,7 +80,7 @@ fhandler_process::fhandler_process ():
 int
 fhandler_process::fstat (struct __stat64 *buf, path_conv *pc)
 {
-  int file_type = exists ((const char *) get_name ());
+  int file_type = exists (get_name ());
   (void) fhandler_base::fstat (buf, pc);
   buf->st_mode &= ~_IFMT & NO_W;
 
@@ -126,7 +126,7 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
     goto out;
 
   const char *path;
-  path = (const char *) *pc + proc_len + 1;
+  path = get_name () + proc_len + 1;
   pid = atoi (path);
   while (*path != 0 && !SLASH_P (*path))
     path++;

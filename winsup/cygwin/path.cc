@@ -368,10 +368,20 @@ path_conv::update_fs_info (const char* win32_path)
     }
 }
 
+void
+path_conv::clear_normalized_path ()
+{
+  // not thread safe
+  if (normalized_path)
+    {
+      cfree (normalized_path);
+      normalized_path = NULL;
+    }
+}
+
 path_conv::~path_conv ()
 {
-  if (normalized_path)
-    cfree (normalized_path);
+  clear_normalized_path ();
 }
 
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
@@ -526,8 +536,6 @@ path_conv::check (const char *src, unsigned opt,
                     fileattr = 0;
                 }
               delete fh;
-	      if (!error)
-		strcpy (path, path_copy);
 	      goto out;
             }
 	  /* devn should not be a device.  If it is, then stop parsing now. */
@@ -1428,7 +1436,13 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
   /* Check if the cygdrive prefix was specified.  If so, just strip
      off the prefix and transform it into an MS-DOS path. */
   MALLOC_CHECK;
-  if (iscygdrive (pathbuf))
+  if (isproc (pathbuf))
+    {
+      devn = fhandler_proc::get_proc_fhandler (pathbuf);
+      if (devn == FH_BAD)
+        return ENOENT;
+    }
+  else if (iscygdrive (pathbuf))
     {
       int n = mount_table->cygdrive_len - 1;
       if (!pathbuf[n] ||
@@ -1446,14 +1460,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	}
       else if (mount_table->cygdrive_len > 1)
 	return ENOENT;
-    }
-  if (isproc (pathbuf))
-    {
-      devn = fhandler_proc::get_proc_fhandler (pathbuf);
-      dst[0] = '\0';
-      if (devn == FH_BAD)
-        return ENOENT;
-      goto out;
     }
 
   int chrooted_path_len;

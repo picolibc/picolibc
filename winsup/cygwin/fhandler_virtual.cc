@@ -45,9 +45,9 @@ fhandler_virtual::opendir (path_conv& pc)
   DIR *res = NULL;
   size_t len;
 
-  if (exists (pc) <= 0)
+  if (exists (get_name ()) <= 0)
     set_errno (ENOTDIR);
-  else if ((len = strlen (pc)) > MAX_PATH - 3)
+  else if ((len = strlen (get_name ())) > MAX_PATH - 3)
     set_errno (ENAMETOOLONG);
   else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);
@@ -64,7 +64,7 @@ fhandler_virtual::opendir (path_conv& pc)
     }
   else
     {
-      strcpy (dir->__d_dirname, pc);
+      strcpy (dir->__d_dirname, get_name ());
       dir->__d_dirent->d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
       fd = this;

@@ -124,7 +124,7 @@ fhandler_proc::fhandler_proc (DWORD devtype):
 int
 fhandler_proc::fstat (struct __stat64 *buf, path_conv *pc)
 {
-  debug_printf ("fstat (%s)", (char *) *pc);
+  debug_printf ("fstat (%s)", get_name ());
   const char *path = get_name ();
   path += proc_len;
   (void) fhandler_base::fstat (buf, pc);
@@ -199,7 +199,7 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
 
   const char *path;
 
-  path = (char *) *pc + proc_len;
+  path = get_name () + proc_len;
 
   if (!*path)
     {

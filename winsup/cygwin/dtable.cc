@@ -287,7 +287,9 @@ dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
       return NULL;
     }
 
-  return build_fhandler (fd, pc.get_devn (), pc.normalized_path, pc, pc.get_unitn ());
+  fhandler_base *fh = build_fhandler (fd, pc.get_devn (), pc.normalized_path, pc, pc.get_unitn ());
+  pc.clear_normalized_path ();
+  return fh;
 }
 
 #define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name

@@ -161,9 +161,9 @@ fhandler_registry::fhandler_registry ():
 }
 
 int
-fhandler_registry::fstat (struct __stat64 *buf, path_conv *path)
+fhandler_registry::fstat (struct __stat64 *buf, path_conv *pc)
 {
-  this->fhandler_base::fstat (buf, path);
+  this->fhandler_base::fstat (buf, pc);
   buf->st_mode &= ~_IFMT & NO_W;
   int file_type = exists (get_name ());
   switch (file_type)
@@ -315,7 +315,7 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
     goto out;
 
   const char *path;
-  path = (const char *) *pc + proc_len + 1 + registry_len;
+  path = get_name () + proc_len + 1 + registry_len;
   if (!*path)
     {
       if ((mode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))

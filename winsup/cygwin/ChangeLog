@@ -1,5 +1,25 @@
 2002-05-02  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_proc.cc (fhandler_proc::fstat): Use fhandler name rather
+	than path_conv name.
+	(fhandler_proc::open): Ditto.
+	* fhandler_process.cc (fhandler_process::fstat): Use fhandler name
+	rather than path_conv name.
+	(fhandler_process::open): Ditto.
+	* fhandler_registry.cc (fhandler_registry::fstat): Use fhandler name
+	rather than path_conv name.
+	(fhandler_registry::open): Ditto.
+	* path.cc (path_conv::check): Don't copy posix path when virtual.
+	(mount_info::conv_to_win32_path): Don't zero string when isproc.  Just
+	derive normal windows path.
+
+	* path.h (path_conv::clear_normalized_path): Declare new method.
+	* path.cc (path_conv::clear_normalized_path): Define new method.
+	* dtable.cc (build_fhandler_from_name): Clear normalized path when
+	finished to conserve space.
+
+2002-05-02  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_proc.cc (fhandler_proc::fstat): Prime with information from
 	fhandler_base::fstat.  Use defines rather than constants for permission
 	settings.

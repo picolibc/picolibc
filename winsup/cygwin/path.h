@@ -141,6 +141,7 @@ class path_conv
   DWORD get_drive_type () {return drive_type;}
   BOOL fs_fast_ea () {return sym_opt & PC_CHECK_EA;}
   void set_path (const char *p) {strcpy (path, p);}
+  void clear_normalized_path ();
 };
 
 /* Symlink marker */
