@@ -62,8 +62,9 @@ enum bg_check_types
 
 enum query_state {
   no_query = 0,
-  query_read_control = 1,
-  query_null_access = 2
+  query_null_access = 1,
+  query_read_control = 2,
+  query_write_control = 3
 };
 
 class fhandler_base
@@ -243,6 +244,7 @@ class fhandler_base
   int __stdcall fstat_by_handle (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));
   virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
+  virtual int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const *ttyname () { return get_name (); }
@@ -568,6 +570,7 @@ class fhandler_disk_file: public fhandler_base
   bool isdevice () { return false; }
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
+  int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
@@ -1101,6 +1104,7 @@ class fhandler_virtual : public fhandler_base
   int close (void);
   int __stdcall fstat (struct stat *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
+  int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   virtual bool fill_filebuf ();
   void fixup_after_exec ();
 };

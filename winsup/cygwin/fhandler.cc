@@ -443,7 +443,18 @@ fhandler_base::open (int flags, mode_t mode)
     }
 
   if (query_open ())
-    access = (query_open () == query_read_control ? READ_CONTROL : 0);
+    switch (query_open ())
+      {
+	case query_null_access:
+	  access = 0;
+	  break;
+	case query_read_control:
+	  access = READ_CONTROL;
+	  break;
+	case query_write_control:
+	  access = READ_CONTROL | WRITE_OWNER | WRITE_DAC;
+	  break;
+      }
   else if (get_major () == DEV_TAPE_MAJOR)
     access = GENERIC_READ | GENERIC_WRITE;
   else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
@@ -1407,6 +1418,13 @@ fhandler_base::closedir (DIR *)
 
 int
 fhandler_base::fchmod (mode_t mode)
+{
+  /* By default, just succeeds. */
+  return 0;
+}
+
+int
+fhandler_base::fchown (__uid32_t uid, __gid32_t gid)
 {
   /* By default, just succeeds. */
   return 0;

@@ -223,7 +223,7 @@ setacl (const char *file, int nentries, __aclent32_t *aclbufp)
       return -1;
     }
   debug_printf ("Created SD-Size: %d", sd_ret.size ());
-  return write_sd (file, sd_ret);
+  return write_sd (NULL, file, sd_ret);
 }
 
 /* Temporary access denied bits */

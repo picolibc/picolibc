@@ -234,3 +234,11 @@ fhandler_virtual::fchmod (mode_t mode)
   set_errno (EPERM);
   return -1;
 }
+
+int
+fhandler_virtual::fchown (__uid32_t uid, __gid32_t gid)
+{
+  /* Same as on Linux. */
+  set_errno (EPERM);
+  return -1;
+}

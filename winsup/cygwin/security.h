@@ -256,7 +256,7 @@ int __stdcall set_file_attribute (bool, HANDLE, const char *, __uid32_t, __gid32
 int __stdcall get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, mode_t *,
 				  __uid32_t * = NULL, __gid32_t * = NULL);
 LONG __stdcall read_sd (const char *file, security_descriptor &sd);
-LONG __stdcall write_sd (const char *file, security_descriptor &sd);
+LONG __stdcall write_sd (HANDLE fh, const char *file, security_descriptor &sd);
 bool __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 bool __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 int __stdcall check_file_access (const char *, int);

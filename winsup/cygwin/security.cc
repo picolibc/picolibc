@@ -1117,16 +1117,8 @@ read_sd (const char *file, security_descriptor &sd)
 }
 
 LONG
-write_sd (const char *file, security_descriptor &sd)
+write_sd (HANDLE fh, const char *file, security_descriptor &sd)
 {
-  BOOL dummy;
-  cygpsid owner;
-
-  if (!GetSecurityDescriptorOwner (sd, (PSID *) &owner, &dummy))
-    {
-      __seterrno ();
-      return -1;
-    }
   /* Try turning privilege on, may not have WRITE_OWNER or WRITE_DAC access.
      Must have privilege to set different owner, else BackupWrite misbehaves */
   static int NO_COPY saved_res; /* 0: never, 1: failed, 2 & 3: OK */
@@ -1140,29 +1132,42 @@ write_sd (const char *file, security_descriptor &sd)
     }
   else
     res = saved_res;
-  if (res == 1 && owner != cygheap->user.sid ())
+  if (res == 1)
     {
-      set_errno (EPERM);
-      return -1;
+      BOOL dummy;
+      cygpsid owner;
+
+      if (!GetSecurityDescriptorOwner (sd, (PSID *) &owner, &dummy))
+	{
+	  __seterrno ();
+	  return -1;
+	}
+      if (owner != cygheap->user.sid ())
+	{
+	  set_errno (EPERM);
+	  return -1;
+	}
     }
-  HANDLE fh;
-  if ((fh = CreateFile (file,
-		        WRITE_OWNER | WRITE_DAC,
-		        FILE_SHARE_READ | FILE_SHARE_WRITE,
-		        &sec_none_nih,
-		        OPEN_EXISTING,
-		        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-		        NULL)) == INVALID_HANDLE_VALUE)
+  NTSTATUS ret;
+  int retry = 0;
+  for (; retry < 2; ++retry)
     {
-      __seterrno ();
-      return -1;
+      if (retry && (fh = CreateFile (file, WRITE_OWNER | WRITE_DAC,
+				     FILE_SHARE_READ | FILE_SHARE_WRITE,
+				     &sec_none_nih, OPEN_EXISTING,
+				     FILE_ATTRIBUTE_NORMAL
+				     | FILE_FLAG_BACKUP_SEMANTICS,
+				     NULL)) == INVALID_HANDLE_VALUE)
+	break;
+      if (fh && (ret = NtSetSecurityObject (fh,
+					    DACL_SECURITY_INFORMATION 
+					    | GROUP_SECURITY_INFORMATION
+					    | OWNER_SECURITY_INFORMATION,
+					    sd)) == STATUS_SUCCESS)
+	break;
     }
-  NTSTATUS ret = NtSetSecurityObject (fh,
-				      DACL_SECURITY_INFORMATION 
-				      | GROUP_SECURITY_INFORMATION
-				      | OWNER_SECURITY_INFORMATION,
-				      sd);
-  CloseHandle (fh);
+  if (retry && fh != INVALID_HANDLE_VALUE)
+    CloseHandle (fh);
   if (ret != STATUS_SUCCESS)
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
@@ -1802,7 +1807,7 @@ set_nt_attribute (HANDLE handle, const char *file,
   if (!alloc_sd (uid, gid, attribute, sd))
     return -1;
 
-  return write_sd (file, sd);
+  return write_sd (handle, file, sd);
 }
 
 int

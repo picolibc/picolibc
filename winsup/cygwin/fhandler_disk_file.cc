@@ -377,14 +377,18 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (pc.is_fs_special ())
     return chmod_device (pc, mode);
 
-  query_open (query_read_control);
-  if (!get_io_handle () && !(oret = open_fs (O_BINARY, 0)))
-    return -1;
+  if (!get_io_handle ())
+    {
+      query_open (query_write_control);
+      if (!(oret = open_fs (O_BINARY, 0)))
+	return -1;
+    }
 
-  SetFileAttributes (get_win32_name (), (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
+  if (!allow_ntsec && allow_ntea) /* Not necessary when manipulating SD. */
+    SetFileAttributes (pc, (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
   if (pc.isdir ())
     mode |= S_IFDIR;
-  if (!set_file_attribute (pc.has_acls (), get_io_handle (), get_win32_name (),
+  if (!set_file_attribute (pc.has_acls (), get_io_handle (), pc,
 			   ILLEGAL_UID, ILLEGAL_GID, mode)
       && allow_ntsec)
     res = 0;
@@ -403,6 +407,37 @@ fhandler_disk_file::fchmod (mode_t mode)
   else if (!allow_ntsec)
     /* Correct NTFS security attributes have higher priority */
     res = 0;
+
+  if (oret)
+    close_fs ();
+
+  return res;
+}
+
+int __stdcall
+fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
+{
+  int oret = 0;
+  if (!get_io_handle ())
+    {
+      query_open (query_write_control);
+      if (!(oret = open_fs (O_BINARY, 0)))
+	return -1;
+    }
+
+  mode_t attrib = 0;
+  if (pc.isdir ())
+    attrib |= S_IFDIR;
+  int res = get_file_attribute (pc.has_acls (), get_io_handle (), pc, &attrib);
+  if (!res)
+    res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
+			      uid, gid, attrib);
+  if (res && (!pc.has_acls () || !allow_ntsec))
+    {
+      /* fake - if not supported, pretend we're like win95
+         where it just works */
+      res = 0;
+    }
 
   if (oret)
     close_fs ();

@@ -1,5 +1,25 @@
 2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Accomodate query_write_control
+	query_state.
+	(fhandler_base::fchown): New method.
+	* fhandler.h: Declare fchown method in fhandler_base,
+	fhandler_disk_file and fhandler_virtual.
+	(enum query_state): Add query_write_control.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Set query_state
+	to query_write_control.  Only remove FILE_ATTRIBUTE_READONLY if not
+	setting security descriptor.
+	(fhandler_disk_file::fchown): New method.
+	* fhandler_virtual.cc (fhandler_virtual::fchown): New method.
+	* sec_acl.cc (setacl): Call write_sd with additional handle attribute.
+	* security.cc (write_sd): Take handle argument.  Only request owner
+	if getting SE_RESTORE_NAME privilege failed.  Only open file if
+	NtSetSecurityObject failed or handle is NULL.
+	(set_nt_attribute): Call write_sd with additional handle attribute.
+	* security.h (write_sd): Declare with additional handle argument.
+
+2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (NtSetSecurityObject): Add.
 	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Only request
 	READ_CONTROL rights when opening the file.
