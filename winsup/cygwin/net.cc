@@ -1628,8 +1628,8 @@ getdomainname (char *domain, int len)
   reg_key r (HKEY_LOCAL_MACHINE, KEY_READ,
 	     (!wincap.is_winnt ()) ? "System" : "SYSTEM",
 	     "CurrentControlSet", "Services",
-	     (!wincap.is_winnt ()) ? "MSTCP" : "Tcpip",
-	     (!wincap.is_winnt ()) ? NULL : "Parameters",
+	     (!wincap.is_winnt ()) ? "VxD" : "Tcpip",
+	     (!wincap.is_winnt ()) ? "MSTCP" : "Parameters",
 	     NULL);
 
   /* FIXME: Are registry keys case sensitive? */
