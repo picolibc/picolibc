@@ -309,7 +309,7 @@ typedef struct tagOCPFIPARAMS {
 	DISPID dispidInitialProperty;
 } OCPFIPARAMS,*LPOCPFIPARAMS;
 typedef struct tagPROPPAGEINFO {
-	size_t cb;
+	ULONG cb;
 	LPOLESTR pszTitle;
 	SIZE size;
 	LPOLESTR pszDocString;
