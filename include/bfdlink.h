@@ -340,6 +340,11 @@ struct bfd_link_info
      is explicitly requested by the user, -1 if enabled by default.  */
   int pei386_auto_import;
 
+  /* Non-zero if runtime relocs for DATA items with non-zero addends
+     in pei386 DLLs should be generated.  Set to 1 if this feature
+     is explicitly requested by the user, -1 if enabled by default.  */
+  int pei386_runtime_pseudo_reloc;
+
   /* True if non-PLT relocs should be merged into one reloc section
      and sorted so that relocs against the same symbol come together.  */
   boolean combreloc;

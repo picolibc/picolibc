@@ -304,8 +304,10 @@ static const c4x_inst_t c3x_insts[] =
   { "addi_mpyi",    0x89000000, 0xff000000, Q_rSr_rSr },
   { "addi_mpyi",    0x8a000000, 0xff000000, Q_SSr_rrr },
   { "addi_mpyi",    0x8b000000, 0xff000000, Q_Srr_Srr },
+  { "addi_mpyi",    0x8b000000, 0xff000000, Q_Srr_rSr },
   { "addi3_mpyi3",  0x88000000, 0xff000000, Q_rrr_SSr },
   { "addi3_mpyi3",  0x89000000, 0xff000000, Q_rSr_Srr },
+  { "addi3_mpyi3",  0x89000000, 0xff000000, Q_rSr_rSr },
   { "addi3_mpyi3",  0x8a000000, 0xff000000, Q_SSr_rrr },
   { "addi3_mpyi3",  0x8b000000, 0xff000000, Q_Srr_Srr },
   { "addi3_mpyi3",  0x8b000000, 0xff000000, Q_Srr_rSr },
@@ -390,6 +392,8 @@ static const c4x_inst_t c3x_insts[] =
   { "negf_stf",     0xe2000000, 0xfe000000, P_Sr_rS },
   { "negi_sti",     0xe4000000, 0xfe000000, P_Sr_rS },
   { "not_sti",      0xe6000000, 0xfe000000, P_Sr_rS },
+  { "or_sti",       0xe8000000, 0xfe000000, P_Srr_rS },
+  { "or_sti",       0xe8000000, 0xfe000000, P_rSr_rS },
   { "or3_sti",      0xe8000000, 0xfe000000, P_Srr_rS },
   { "or3_sti",      0xe8000000, 0xfe000000, P_rSr_rS },
   { "stf_absf",     0xc8000000, 0xfe000000, Q_rS_Sr },
@@ -402,6 +406,7 @@ static const c4x_inst_t c3x_insts[] =
   { "stf_mpyf",     0xde000000, 0xfe000000, Q_rS_rSr },
   { "stf_mpyf3",    0xde000000, 0xfe000000, Q_rS_Srr },
   { "stf_mpyf3",    0xde000000, 0xfe000000, Q_rS_rSr },
+  { "stf_ldf",      0xd8000000, 0xfe000000, Q_rS_Sr  },
   { "stf_negf",     0xe2000000, 0xfe000000, Q_rS_Sr },
   { "stf_stf",      0xc0000000, 0xfe000000, P_rS_rS },
   { "stf1_stf2",    0xc0000000, 0xfe000000, Q_rS_rS }, /* synonym */
@@ -417,6 +422,7 @@ static const c4x_inst_t c3x_insts[] =
   { "sti_and",      0xd0000000, 0xfe000000, Q_rS_rSr },
   { "sti_and3",     0xd0000000, 0xfe000000, Q_rS_Srr },
   { "sti_and3",     0xd0000000, 0xfe000000, Q_rS_rSr },
+  { "sti_ash",      0xd2000000, 0xfe000000, Q_rS_rSr },
   { "sti_ash3",     0xd2000000, 0xfe000000, Q_rS_rSr },
   { "sti_fix",      0xd4000000, 0xfe000000, Q_rS_Sr },
   { "sti_ldi",      0xda000000, 0xfe000000, Q_rS_Sr },
@@ -1007,9 +1013,9 @@ static const c4x_inst_t c3x_insts[] =
   { "xor3",   0x38000000, 0xffe00000, T_rJr }, /* C4x */
   { "xor3",   0x38200000, 0xffe00000, T_rRr }, /* C4x */
   { "xor3",   0x38200000, 0xffe00000, T_Rrr }, /* C4x */
-  { "xor3",   0x3c400000, 0xffe00000, T_JRr }, /* C4x */
-  { "xor3",   0x3c400000, 0xffe00000, T_RJr }, /* C4x */
-  { "xor3",   0x3c600000, 0xffe00000, T_RRr }, /* C4x */
+  { "xor3",   0x38400000, 0xffe00000, T_JRr }, /* C4x */
+  { "xor3",   0x38400000, 0xffe00000, T_RJr }, /* C4x */
+  { "xor3",   0x38600000, 0xffe00000, T_RRr }, /* C4x */
     
   /* Dummy entry, not included in c3x_num_insts.  This
      lets code examine entry i + 1 without checking
@@ -1025,6 +1031,8 @@ static const c4x_inst_t c4x_insts[] =
   /* Parallel instructions.  */
   { "frieee_stf",    0xf2000000, 0xfe000000, P_Sr_rS },
   { "toieee_stf",    0xf0000000, 0xfe000000, P_Sr_rS },
+  { "stf_frieee",    0xf2000000, 0xfe000000, Q_rS_Sr },
+  { "stf_toieee",    0xf0000000, 0xfe000000, Q_rS_Sr },
 
   { "bBaf",    0x68a00000, 0xffe00000, "Q" },
   { "bBaf",    0x6aa00000, 0xffe00000, "P" },
@@ -1038,12 +1046,10 @@ static const c4x_inst_t c4x_insts[] =
   { "lajB",    0x70200000, 0xffe00000, "Q" },
   { "lajB",    0x72200000, 0xffe00000, "P" },
   { "latB",    0x74800000, 0xffe00000, "V" },
-
   { "frieee",  0x1c000000, 0xffe00000, G_r_r },
   { "frieee",  0x1c200000, 0xffe00000, G_T_r },
   { "frieee",  0x1c400000, 0xffe00000, G_Q_r },
   { "frieee",  0x1c600000, 0xffe00000, G_F_r },
-
   { "lb0",     0xb0000000, 0xffe00000, G_r_r },
   { "lb0",     0xb0200000, 0xffe00000, G_T_r },
   { "lb0",     0xb0400000, 0xffe00000, G_Q_r },
