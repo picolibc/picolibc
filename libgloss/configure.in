@@ -34,6 +34,9 @@ case "${target}" in
   m32r-*-*)
 	configdirs="${configdirs} m32r testsuite"
 	;;
+  m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
+	configdirs="m68hc11 testsuite"
+	;;
   m68*-*-*)
 	configdirs="${configdirs} m68k testsuite"
 	;;
