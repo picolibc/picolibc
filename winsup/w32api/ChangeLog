@@ -1,3 +1,7 @@
+2004-11-19  Benoit Blanchon  <benoit.blanchon@free.fr>
+
+	* include/shellapi.h (NIF_GUID): Add another define.
+
 2004-11-18  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/wincon.h (AttachConsole): Correct the _WIN32_WINNT filter.
@@ -37,7 +41,7 @@
 
 2004-11-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/wingdi.h (NIF_INFO): Add define.
+	* include/shellapi.h (NIF_INFO): Add define.
 	(NIIF_*) Add defines..
 	Thanks to: Benoit Blanchon <benoit.blanchon@free.fr>
 	(NIF_*): Convert constants to hex.

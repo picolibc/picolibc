@@ -57,6 +57,11 @@ extern "C" {
 #define NIF_STATE	0x00000008
 #if (_WIN32_IE >= 0x0500)
 #define NIF_INFO	0x00000010
+#endif
+#if (_WIN32_IE >= 0x0600)
+#define NIF_GUID	0x00000020
+#endif
+#if (_WIN32_IE >= 0x0500)
 #define NIIF_NONE	0x00000000
 #define NIIF_INFO	0x00000001
 #define NIIF_WARNING	0x00000002
