@@ -1,3 +1,7 @@
+Mon Dec 11 13:11:36 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* lib/Makefile.in: Install headers and libraries in tooldir.
+
 2000-12-04  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
 
 	* include/winnls.h: NORM_IGNORE* remove duplicate defines. 

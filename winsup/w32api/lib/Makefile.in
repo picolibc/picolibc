@@ -22,7 +22,15 @@ program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
-tooldir = $(exec_prefix)/$(target_alias)
+ifeq ($(target_alias),$(host_alias))
+ifeq ($(build_alias),$(host_alias))
+tooldir:=$(exec_prefix)
+else
+tooldir:=$(exec_prefix)/$(target_alias)
+endif
+else
+tooldir:=$(exec_prefix)/$(target_alias)
+endif
 datadir = @datadir@
 infodir = @infodir@
 includedir = @includedir@
@@ -158,16 +166,16 @@ xuninstall-headers:
 install: install-libraries install-headers
 
 install-libraries: all
-	$(mkinstalldirs) $(exec_prefix)/lib
+	$(mkinstalldirs) $(tooldir)/lib
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(exec_prefix)/lib/$$i ; \
+		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
 	done
 
 install-headers:
-	$(mkinstalldirs) $(exec_prefix)/include/w32api
+	$(mkinstalldirs) $(tooldir)/include/w32api
 	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/$$i $(exec_prefix)/include/w32api/$$i ; \
-		echo "#include <w32api/$$i>" > $(exec_prefix)/include/$$i ; \
+		$(INSTALL_DATA) $(srcdir)/../include/$$i $(tooldir)/include/w32api/$$i ; \
+		echo "#include <w32api/$$i>" > $(tooldir)/include/$$i ; \
 	done
 
 # uninstall headers and libraries 
@@ -175,14 +183,14 @@ uninstall: uninstall-libraries uninstall-headers
 
 uninstall-libraries:
 	@for i in $(LIBS); do \
-		rm -f $(exec_prefix)/lib/$$i ; \
+		rm -f $(tooldir)/lib/$$i ; \
 	done
 
 uninstall-headers:
 	@for i in $(HEADERS); do \
-		rm -f $(exec_prefix)/include/w32api/$$i ; \
+		rm -f $(tooldir)/include/w32api/$$i ; \
 	done
-	rmdir $(exec_prefix)/include/w32api
+	rmdir $(tooldir)/include/w32api
 
 dist:
 	mkdir $(distdir)/include
