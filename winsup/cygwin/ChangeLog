@@ -1,3 +1,7 @@
+2002-01-29  Robert Collins  <rbtcollins@hotmail.com>
+
+	* Makefile.in (OBJS): Remove duplicate localtime.o.
+
 2002-01-17  Robert Collins  <rbtcollins@hotmail.com>
 
 	* cygserver.cc (check_and_dup_handle): Consolidate the two variants for 

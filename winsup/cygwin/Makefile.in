@@ -128,7 +128,7 @@ DLL_OFILES:=assert.o autoload.o cygheap.o cygserver_client.o \
 	fhandler_tape.o fhandler_termios.o fhandler_tty.o fhandler_windows.o \
 	fhandler_zero.o fnmatch.o \
 	fork.o glob.o grp.o heap.o init.o ioctl.o ipc.o localtime.o \
-	localtime.o malloc.o miscfuncs.o mmap.o net.o ntea.o passwd.o path.o \
+	malloc.o miscfuncs.o mmap.o net.o ntea.o passwd.o path.o \
 	pinfo.o pipe.o poll.o pthread.o regcomp.o regerror.o regexec.o \
 	regfree.o registry.o resource.o scandir.o sched.o sec_acl.o \
 	sec_helper.o security.o select.o shared.o shm.o shortcut.o signal.o \
