@@ -1,6 +1,6 @@
 /* dumper.cc
 
-   Copyright 1999, 2001, 2002 Red Hat Inc.
+   Copyright 1999, 2001, 2002, 2004 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -689,7 +689,8 @@ dumper::prepare_core_dump ()
 	{
 	  if (!bfd_set_section_size (core_bfd,
 				     status_section,
-				     status_section->_raw_size + sect_size))
+				     (bfd_get_section_size (status_section)
+				      + sect_size)))
 	    {
 	      bfd_perror ("resizing status section");
 	      goto failed;
@@ -746,7 +747,7 @@ dumper::write_core_dump ()
       deb_printf ("writing section type=%u base=%08x size=%08x flags=%08x\n",
 		  p->type,
 		  p->section->vma,
-		  p->section->_raw_size,
+		  bfd_get_section_size (p->section),
 		  p->section->flags);
 
       switch (p->type)

@@ -1,3 +1,10 @@
+2004-06-15  Alan Modra  <amodra@bigpond.net.au>
+
+	* dumper.cc (dumper::prepare_core_dump): Use bfd_get_section_size
+	instead of _raw_size.
+	(dumper::write_core_dump): Likewise.
+	* parse_pe.cc (select_data_section): Likewise.
+
 2004-05-29  John Paul Wallington  <jpw@gnu.org>
 
 	* ssp.c (usage): Add missing linefeed. 

@@ -1,6 +1,6 @@
 /* parse_pe.cc
 
-   Copyright 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -64,10 +64,11 @@ select_data_section (bfd * abfd, asection * sect, PTR obj)
   exclusion *excl_list = (exclusion *) obj;
 
   if ((sect->flags & (SEC_CODE | SEC_DEBUGGING)) &&
-      sect->vma && sect->_raw_size)
+      sect->vma && bfd_get_section_size (sect))
     {
-      excl_list->add ((LPBYTE) sect->vma, (DWORD) sect->_raw_size);
-      deb_printf ("excluding section: %20s %08lx\n", sect->name, sect->_raw_size);
+      excl_list->add ((LPBYTE) sect->vma, (DWORD) bfd_get_section_size (sect));
+      deb_printf ("excluding section: %20s %08lx\n", sect->name,
+		  bfd_get_section_size (sect));
     }
 }
 
