@@ -1,5 +1,28 @@
 2005-01-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din: Export getpriority and setpriority.
+	* fork.cc (fork_parent): Copy parent's nice value into child.
+	* spawn.cc (spawn_guts): Ditto.
+	* miscfuncs.cc (winprio_to_nice): New function.
+	(nice_to_winprio): Ditto.
+	* pinfo.cc (pinfo_init): If parent is not a Cygwin process, set
+	default nice value according to current Win32 priority class.
+	* pinfo.h (class _pinfo): Add nice member.
+	* syscalls.cc (setpriority): New function, only implementing
+	PRIO_PROCESS for now.
+	(getpriority): Ditto.
+	(nice): Just call setpriority.
+	* wincap.h (wincaps::has_extended_priority_class): New element.
+	* wincap.cc: Implement above element throughout.
+	* winsup.h: Add prototypes for winprio_to_nice and nice_to_winprio.
+	* include/limits.h (NZERO): New define.
+	* include/cygwin/types.h (id_t): New datatype.
+	* include/cygwin/version.h: Bump API minor version.
+	* include/sys/resource.h: Add PRIO_XXX defines and prototypes for
+	getpriority and setpriority.
+
+2005-01-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (realpath): Allow to expand with .exe suffix.
 
 2005-01-22  Christopher Faylor  <cgf@timesys.com>

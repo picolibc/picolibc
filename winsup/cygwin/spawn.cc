@@ -845,6 +845,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       (void) DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
 			      NULL, 0, 0, DUPLICATE_SAME_ACCESS);
       child->start_time = time (NULL); /* Register child's starting time. */
+      child->nice = myself->nice;
       if (!child.remember (mode == _P_DETACH))
 	{
 	  /* FIXME: Child in strange state now */

@@ -99,6 +99,12 @@ typedef __ino32_t ino_t;
 #endif
 #endif /*__ino_t_defined*/
 
+/* Generic ID type, must match at least pid_t, uid_t and gid_t in size. */
+#ifndef __id_t_defined
+#define __id_t_defined
+typedef unsigned long id_t;
+#endif /* __id_t_defined */
+
 #if defined (__INSIDE_CYGWIN__)
 struct __flock32 {
 	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */

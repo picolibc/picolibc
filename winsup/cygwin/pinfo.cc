@@ -98,6 +98,8 @@ pinfo_init (char **envp, int envc)
       myself->uid = ILLEGAL_UID;
       myself->gid = UNKNOWN_GID;
       environ_init (NULL, 0);	/* call after myself has been set up */
+      myself->nice = winprio_to_nice (GetPriorityClass (hMainProc));
+      debug_printf ("Set nice to %d", myself->nice);
     }
 
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);

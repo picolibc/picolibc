@@ -383,6 +383,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   int child_pid = cygwin_pid (pi.dwProcessId);
   pinfo child (child_pid, 1);
   child->start_time = time (NULL); /* Register child's starting time. */
+  child->nice = myself->nice;
 
   if (!child)
     {

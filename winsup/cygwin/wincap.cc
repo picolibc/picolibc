@@ -54,7 +54,8 @@ static NO_COPY wincaps wincap_unknown = {
   has_switch_to_thread:false,
   cant_debug_dll_entry:false,
   has_ioctl_storage_get_media_types_ex:false,
-  start_proc_suspended:true
+  start_proc_suspended:true,
+  has_extended_priority_class:false
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -100,7 +101,8 @@ static NO_COPY wincaps wincap_95 = {
   has_switch_to_thread:false,
   cant_debug_dll_entry:true,
   has_ioctl_storage_get_media_types_ex:false,
-  start_proc_suspended:true
+  start_proc_suspended:true,
+  has_extended_priority_class:false
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -146,7 +148,8 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_switch_to_thread:false,
   cant_debug_dll_entry:true,
   has_ioctl_storage_get_media_types_ex:false,
-  start_proc_suspended:true
+  start_proc_suspended:true,
+  has_extended_priority_class:false
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -192,7 +195,8 @@ static NO_COPY wincaps wincap_98 = {
   has_switch_to_thread:false,
   cant_debug_dll_entry:true,
   has_ioctl_storage_get_media_types_ex:false,
-  start_proc_suspended:true
+  start_proc_suspended:true,
+  has_extended_priority_class:false
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -238,7 +242,8 @@ static NO_COPY wincaps wincap_98se = {
   has_switch_to_thread:false,
   cant_debug_dll_entry:true,
   has_ioctl_storage_get_media_types_ex:false,
-  start_proc_suspended:true
+  start_proc_suspended:true,
+  has_extended_priority_class:false
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -284,7 +289,8 @@ static NO_COPY wincaps wincap_me = {
   has_switch_to_thread:false,
   cant_debug_dll_entry:true,
   has_ioctl_storage_get_media_types_ex:false,
-  start_proc_suspended:true
+  start_proc_suspended:true,
+  has_extended_priority_class:false
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -330,7 +336,8 @@ static NO_COPY wincaps wincap_nt3 = {
   has_switch_to_thread:false,
   cant_debug_dll_entry:false,
   has_ioctl_storage_get_media_types_ex:false,
-  start_proc_suspended:false
+  start_proc_suspended:false,
+  has_extended_priority_class:false
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -376,7 +383,8 @@ static NO_COPY wincaps wincap_nt4 = {
   has_switch_to_thread:true,
   cant_debug_dll_entry:false,
   has_ioctl_storage_get_media_types_ex:false,
-  start_proc_suspended:false
+  start_proc_suspended:false,
+  has_extended_priority_class:false
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -422,7 +430,8 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_switch_to_thread:true,
   cant_debug_dll_entry:false,
   has_ioctl_storage_get_media_types_ex:false,
-  start_proc_suspended:false
+  start_proc_suspended:false,
+  has_extended_priority_class:false
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -468,7 +477,8 @@ static NO_COPY wincaps wincap_2000 = {
   has_switch_to_thread:true,
   cant_debug_dll_entry:false,
   has_ioctl_storage_get_media_types_ex:false,
-  start_proc_suspended:false
+  start_proc_suspended:false,
+  has_extended_priority_class:true
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -514,7 +524,8 @@ static NO_COPY wincaps wincap_xp = {
   has_switch_to_thread:true,
   cant_debug_dll_entry:false,
   has_ioctl_storage_get_media_types_ex:true,
-  start_proc_suspended:false
+  start_proc_suspended:false,
+  has_extended_priority_class:true
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -560,7 +571,8 @@ static NO_COPY wincaps wincap_2003 = {
   has_switch_to_thread:true,
   cant_debug_dll_entry:false,
   has_ioctl_storage_get_media_types_ex:true,
-  start_proc_suspended:false
+  start_proc_suspended:false,
+  has_extended_priority_class:true
 };
 
 wincapc wincap;

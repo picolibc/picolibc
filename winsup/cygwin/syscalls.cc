@@ -2443,46 +2443,41 @@ memccpy (_PTR out, const _PTR in, int c, size_t len)
 }
 
 extern "C" int
-nice (int incr)
+setpriority (int which, id_t who, int value)
 {
-  DWORD priority[] =
+  /* TODO: Support PRIO_PGRP and PRIO_USER. */
+  if (which != PRIO_PROCESS || (who != 0 && (pid_t) who != myself->pid))
     {
-      IDLE_PRIORITY_CLASS,
-      IDLE_PRIORITY_CLASS,
-      NORMAL_PRIORITY_CLASS,
-      HIGH_PRIORITY_CLASS,
-      REALTIME_PRIORITY_CLASS,
-      REALTIME_PRIORITY_CLASS
-    };
-  int curr = 2;
-
-  switch (GetPriorityClass (hMainProc))
-    {
-      case IDLE_PRIORITY_CLASS:
-	curr = 1;
-	break;
-      case NORMAL_PRIORITY_CLASS:
-	curr = 2;
-	break;
-      case HIGH_PRIORITY_CLASS:
-	curr = 3;
-	break;
-      case REALTIME_PRIORITY_CLASS:
-	curr = 4;
-	break;
+      set_errno (EINVAL);
+      return -1;
     }
-  if (incr > 0)
-    incr = -1;
-  else if (incr < 0)
-    incr = 1;
-
-  if (SetPriorityClass (hMainProc, priority[curr + incr]) == FALSE)
+  DWORD prio = nice_to_winprio (value);
+  if (SetPriorityClass (hMainProc, prio) == FALSE)
     {
       __seterrno ();
       return -1;
     }
-
+  myself->nice = value;
+  debug_printf ("Set nice to %d", myself->nice);
   return 0;
+}
+
+extern "C" int
+getpriority (int which, id_t who)
+{
+  /* TODO: Support PRIO_PGRP and PRIO_USER. */
+  if (which != PRIO_PROCESS || (who != 0 && (pid_t) who != myself->pid))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  return myself->nice;
+}
+
+extern "C" int
+nice (int incr)
+{
+  return setpriority (PRIO_PROCESS, myself->pid, myself->nice + incr);
 }
 
 /*
@@ -2588,7 +2583,7 @@ endutent ()
 }
 
 extern "C" void
-utmpname (_CONST char *file)
+utmpname (const char *file)
 {
   if (check_null_empty_str (file))
     {

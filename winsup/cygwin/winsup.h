@@ -306,6 +306,9 @@ extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
 
 size_t getshmlba (void);
 
+int winprio_to_nice (DWORD) __attribute__ ((regparm (1)));
+DWORD nice_to_winprio (int &) __attribute__ ((regparm (1)));
+
 /**************************** Exports ******************************/
 
 extern "C" {

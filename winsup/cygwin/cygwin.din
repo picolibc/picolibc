@@ -653,6 +653,7 @@ getpid NOSIGFE
 _getpid = getpid NOSIGFE
 getppid NOSIGFE
 _getppid = getppid NOSIGFE
+getpriority NOSIGFE
 getpwduid NOSIGFE
 _getpwduid = getpwduid NOSIGFE
 getpwent SIGFE
@@ -1198,6 +1199,7 @@ setpgid SIGFE
 _setpgid = setpgid SIGFE
 setpgrp SIGFE
 _setpgrp = setpgrp SIGFE
+setpriority NOSIGFE
 setpwent NOSIGFE
 _setpwent = setpwent NOSIGFE
 setregid SIGFE

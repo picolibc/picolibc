@@ -75,6 +75,7 @@ public:
   long start_time;
   struct rusage rusage_self;
   struct rusage rusage_children;
+  int nice;
 
   /* Non-zero if process was stopped by a signal. */
   char stopsig;

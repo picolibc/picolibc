@@ -356,3 +356,87 @@ low_priority_sleep (DWORD secs)
 
   return curr_prio;
 }
+
+/* Get a default value for the nice factor.  When changing these values,
+   have a look into the below function nice_to_winprio.  The values must
+   match the layout of the static "priority" array. */
+int
+winprio_to_nice (DWORD prio)
+{
+  switch (prio)
+    {
+      case REALTIME_PRIORITY_CLASS:
+	return -20;
+      case HIGH_PRIORITY_CLASS:
+	return -16;
+      case ABOVE_NORMAL_PRIORITY_CLASS:
+	return -8;
+      case NORMAL_PRIORITY_CLASS:
+	return 0;
+      case BELOW_NORMAL_PRIORITY_CLASS:
+	return 8;
+      case IDLE_PRIORITY_CLASS:
+	return 16;
+    }
+  return 0;
+}
+
+/* Get a Win32 priority matching the incoming nice factor.  The incoming
+   nice is limited to the interval [-NZERO,NZERO-1]. */
+DWORD 
+nice_to_winprio (int &nice)
+{
+  static const DWORD priority[] NO_COPY =
+    {
+      REALTIME_PRIORITY_CLASS,		/*  0 */
+      HIGH_PRIORITY_CLASS,		/*  1 */
+      HIGH_PRIORITY_CLASS,
+      HIGH_PRIORITY_CLASS,
+      HIGH_PRIORITY_CLASS,
+      HIGH_PRIORITY_CLASS,
+      HIGH_PRIORITY_CLASS,
+      HIGH_PRIORITY_CLASS,		/*  7 */
+      ABOVE_NORMAL_PRIORITY_CLASS,	/*  8 */
+      ABOVE_NORMAL_PRIORITY_CLASS,
+      ABOVE_NORMAL_PRIORITY_CLASS,
+      ABOVE_NORMAL_PRIORITY_CLASS,
+      ABOVE_NORMAL_PRIORITY_CLASS,
+      ABOVE_NORMAL_PRIORITY_CLASS,
+      ABOVE_NORMAL_PRIORITY_CLASS,
+      ABOVE_NORMAL_PRIORITY_CLASS,	/* 15 */
+      NORMAL_PRIORITY_CLASS,		/* 16 */
+      NORMAL_PRIORITY_CLASS,
+      NORMAL_PRIORITY_CLASS,
+      NORMAL_PRIORITY_CLASS,
+      NORMAL_PRIORITY_CLASS,
+      NORMAL_PRIORITY_CLASS,
+      NORMAL_PRIORITY_CLASS,
+      NORMAL_PRIORITY_CLASS,		/* 23 */
+      BELOW_NORMAL_PRIORITY_CLASS,	/* 24 */
+      BELOW_NORMAL_PRIORITY_CLASS,
+      BELOW_NORMAL_PRIORITY_CLASS,
+      BELOW_NORMAL_PRIORITY_CLASS,
+      BELOW_NORMAL_PRIORITY_CLASS,
+      BELOW_NORMAL_PRIORITY_CLASS,
+      BELOW_NORMAL_PRIORITY_CLASS,
+      BELOW_NORMAL_PRIORITY_CLASS,	/* 31 */
+      IDLE_PRIORITY_CLASS,		/* 32 */
+      IDLE_PRIORITY_CLASS,
+      IDLE_PRIORITY_CLASS,
+      IDLE_PRIORITY_CLASS,
+      IDLE_PRIORITY_CLASS,
+      IDLE_PRIORITY_CLASS,
+      IDLE_PRIORITY_CLASS,
+      IDLE_PRIORITY_CLASS		/* 39 */
+    };
+  if (nice < -NZERO)
+    nice = -NZERO;
+  else if (nice > NZERO - 1)
+    nice = NZERO - 1;
+  DWORD prio = priority[nice + NZERO];
+  if (!wincap.has_extended_priority_class ()
+      && (prio == BELOW_NORMAL_PRIORITY_CLASS
+	  || prio == ABOVE_NORMAL_PRIORITY_CLASS))
+    prio = NORMAL_PRIORITY_CLASS;
+  return prio;
+}

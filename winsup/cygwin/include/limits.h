@@ -182,5 +182,8 @@ details. */
 
 #define RTSIG_MAX		_POSIX_RTSIG_MAX
 
+/* Used for nice and get/setpriority. */
+#define NZERO			20
+
 #endif /* _MACH_MACHLIMITS_H_ */
 #endif /* _LIMITS_H___ */

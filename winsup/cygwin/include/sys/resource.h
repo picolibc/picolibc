@@ -17,6 +17,11 @@ details. */
 extern "C" {
 #endif
 
+/* Used for get/setpriority */
+#define PRIO_PROCESS	0
+#define PRIO_PGRP	1
+#define PRIO_USER	2
+
 #define RLIMIT_CPU	0		/* CPU time in seconds */
 #define RLIMIT_FSIZE	1		/* Maximum filesize */
 #define RLIMIT_DATA	2		/* max data size */
@@ -67,6 +72,9 @@ int getrlimit (int __resource, struct rlimit *__rlp);
 int setrlimit (int __resource, const struct rlimit *__rlp);
 
 int getrusage (int __who, struct rusage *__rusage);
+
+int getpriority (int which, id_t who);
+int setpriority (int which, id_t who, int value);
 
 #ifdef __cplusplus
 }
