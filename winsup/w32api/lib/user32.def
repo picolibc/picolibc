@@ -12,6 +12,7 @@ ArrangeIconicWindows@4
 AttachThreadInput@12
 BeginDeferWindowPos@4
 BeginPaint@8
+BlockInput@4
 BringWindowToTop@4
 BroadcastSystemMessage@20
 BroadcastSystemMessageA@20
@@ -382,6 +383,7 @@ IsHungAppWindow@4
 IsIconic@4
 IsMenu@4
 IsRectEmpty@4
+IsWinEventHookInstalled@4
 IsWindow@4
 IsWindowEnabled@4
 IsWindowUnicode@4
@@ -411,6 +413,7 @@ LoadStringA@16
 LoadStringW@16
 LockSetForegroundWindow@4
 LockWindowUpdate@4
+LockWorkStation@0
 LookupIconIdFromDirectory@8
 LookupIconIdFromDirectoryEx@20
 MapDialogRect@8
@@ -590,6 +593,7 @@ TranslateAcceleratorA@12
 TranslateAcceleratorW@12
 TranslateMDISysAccel@8
 TranslateMessage@4
+UnhookWinEvent@4
 UnhookWindowsHook@8
 UnhookWindowsHookEx@4
 UnionRect@12

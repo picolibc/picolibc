@@ -1,5 +1,56 @@
 2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winable.h (BlockInput): Add function.
+
+	* include/winable.h (WS_ACTIVECAPTION): Add constant.
+	For use with WINDOWINFO structure.
+
+	* include/winuser.h [_WIN32_WINNT >= 0x0500] (LockWorkStation):
+	Add function.
+
+	* include/winuser.h [_WIN32_WINNT >= 0x0501] (IsWinEventHookInstalled):
+	Add function.
+
+	* include/winuser.h [WINVER >= 0x0500] (UnhookWinEvent):
+	Add function...
+
+	* include/winable.h [WINVER < 0x0500] (UnhookWinEvent):
+	...and duplicate.
+
+	* include/winuser.h [_WIN32_WINNT >= 0x0403] (SendInput):
+	Guard function...
+
+	* include/winable.h [_WIN32_WINNT < 0x0403] (SendInput):
+	...and duplicate.
+
+	* include/winuser.h [WINVER >= 0x0500] (NotifyWinEvent):
+	Guard function...
+
+	* include/winable.h [WINVER < 0x0500] (NotifyWinEvent):
+	...and duplicate.
+
+	* include/winuser.h [WINVER >= 0x0500] (MOUSEINPUT, KEYBDINPUT,
+	HARDWAREINPUT, INPUT): Guard structures...
+
+	* include/winable.h [WINVER < 0x0500] (MOUSEINPUT, KEYBDINPUT,
+	HARDWAREINPUT, INPUT): ...and duplicate.
+
+	* include/winuser.h [_WIN32_WINNT >= 0x0403] (INPUT_MOUSE,
+	INPUT_KEYBOARD, INPUT_HARDWARE): Guard constants...
+
+	* include/winable.h [_WIN32_WINNT < 0x0403] (INPUT_MOUSE,
+	INPUT_KEYBOARD, INPUT_HARDWARE): ...and duplicate.
+
+	* include/winuser.h: Move around some lines. Reformat according
+	to recommended or dominant style. Remove FAR keyword.
+
+	* include/winable.h: Move around some lines.
+
+	* lib/user32.def (BlockInput, IsWinEventHookInstalled,
+	LockWorkStation, UnhookWinEvent): Add functions.
+
+2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h [_WIN32_WINNT >= 0x0501] (PrintWindow,
 	PW_CLIENTONLY): Add function and constant.
 
@@ -38,8 +89,8 @@
 2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winnt.h (ACE_INHERITED_OBJECT_TYPE_PRESENT,
-	ACE_OBJECT_TYPE_PRESENT): Add constants. For use with
-	OBJECTS_AND_NAME structure.
+	ACE_OBJECT_TYPE_PRESENT): Add constants.
+	For use with OBJECTS_AND_NAME structure.
 
 2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
