@@ -1,3 +1,11 @@
+2003-05-30  Kelley Cook  <kelleycook@wideopenwest.com>
+
+	* configure.host:  Allow i[34567]86 variant.
+	* configure.in: Likewise.
+	* README: Likewise to the docs.
+	* configure: Regenerated.
+	* Makefile.in: Ditto.
+
 2003-05-28  Jeff Johnston  <jjohnstn@redhat.com>
 	    Tom Fitzsimmons  <fitzsim@redhat.com>
 

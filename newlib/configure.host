@@ -115,7 +115,7 @@ case "${host_cpu}" in
   i960)
 	machine_dir=i960
 	;;
-  i[3456]86)
+  i[34567]86)
 	# Don't use for these since they provide their own setjmp.
 	case ${host} in
 	*-*-sco* | *-*-cygwin*) 
@@ -242,7 +242,7 @@ fi
 
 if [ "x${newlib_mb}" = "x" ]; then
 	case "${host}" in
-  	  i[3456]86-pc-linux-*|*-*-cygwin*)
+  	  i[34567]86-pc-linux-*|*-*-cygwin*)
 		newlib_mb=yes
 	  	;;
 	esac
@@ -269,7 +269,7 @@ fi
 # support shared libraries.  This is because it adds executable tests which
 # we don't want for most embedded platforms.
 case "${host}" in
-  i[3456]86-pc-linux-*)
+  i[34567]86-pc-linux-*)
     use_libtool=yes
     have_sys_mach_dir=yes
     stdio64_dir=stdio64
@@ -334,11 +334,11 @@ case "${host}" in
   h8500-*-elf*)
 	sys_dir=h8500hms
 	;;
-  i[3456]86-*-sco*)
+  i[34567]86-*-sco*)
 	sys_dir=sysvi386
 	unix_dir=unix
 	;;
-  i[3456]86-pc-linux-*)
+  i[34567]86-pc-linux-*)
 	sys_dir=linux
 	unix_dir=unix
 	posix_dir=posix
@@ -509,10 +509,10 @@ case "${host}" in
 	syscall_dir=syscalls	
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
 	;;	
-  i[3456]86-*-sco*)
+  i[34567]86-*-sco*)
 	newlib_cflags="${newlib_cflags} -DSIGNAL_PROVIDED -DHAVE_FCNTL"
 	;;
-  i[3456]86-*-netware*)
+  i[34567]86-*-netware*)
 	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC -DABORT_PROVIDED -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DHAVE_FCNTL"
 	;;
   m32r-*-*)

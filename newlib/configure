@@ -3091,7 +3091,7 @@ fi
 
 EXTRA_DIRS=
 case $host in
-  i345686-pc-linux-*)
+  i[34567]86-pc-linux-*)
 	configdirs="${configdirs} iconvdata"
 	EXTRA_DIRS=iconvdata
 	;;

@@ -275,7 +275,7 @@ Shared newlib
 =============
 
 newlib uses libtool when it is being compiled natively (with
---target=i[3456]86-pc-linux-gnu) on an i[3456]86-pc-linux-gnu
+--target=i[34567]86-pc-linux-gnu) on an i[34567]86-pc-linux-gnu
 host. This allows newlib to be compiled as a shared library.
 
 To configure newlib, do the following from your build directory:
@@ -283,12 +283,12 @@ To configure newlib, do the following from your build directory:
 $(source_dir)/src/configure --with-newlib --prefix=$(install_dir)
 
 configure will recognize that host == target ==
-i[3456]86-pc-linux-gnu, so it will tell newlib to compile itself using
+i[34567]86-pc-linux-gnu, so it will tell newlib to compile itself using
 libtool. By default, libtool will build shared and static versions of
 newlib.
 
 To compile a program against shared newlib, do the following (where
-target_install_dir = $(install_dir)/i[3456]86-pc-linux-gnu):
+target_install_dir = $(install_dir)/i[34567]86-pc-linux-gnu):
 
 gcc -nostdlib $(target_install_dir)/lib/crt0.o progname.c -I $(target_install_dir)/include -L $(target_install_dir)/lib -lc -lm -lgcc
 

@@ -52,7 +52,7 @@ AM_CONDITIONAL(HAVE_DOC, test x$have_doc = xyes)
 
 EXTRA_DIRS=
 case $host in
-  i[3456]86-pc-linux-*)
+  i[[34567]]86-pc-linux-*)
 	configdirs="${configdirs} iconvdata"
 	EXTRA_DIRS=iconvdata
 	;;
