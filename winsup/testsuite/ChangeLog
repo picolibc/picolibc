@@ -1,3 +1,8 @@
+2005-02-10  Christopher Faylor  <cgf@timesys.com>
+
+	* winsup.api/known_bugs.tcl: Remove dup05, fcntl07B, lseek04, select03,
+	unlink06.
+
 2005-01-09  Christopher Faylor  <cgf@timesys.com>
 
 	* cygrun.c (main): Fix exit code so that it reflects UNIX style.

@@ -18,6 +18,8 @@
 sigset_t unblock_sigsegv;
 jmp_buf r;
 
+static const char *msg;
+static const char *what;
 /* filler for file */
 char const line[] = "y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1 y1";
 
@@ -25,6 +27,7 @@ void
 perror_exit (const char *str)
 {    
   printf ("%s: %s\n", str, strerror (errno));
+  fflush (stdout);
   exit (1);
 }
 
@@ -32,6 +35,13 @@ void
 sigsegv (int unused)
 { 
   sigprocmask (SIG_UNBLOCK, &unblock_sigsegv, 0);
+  if (msg)
+    {
+      char buf[132];
+      sprintf (buf, "%s %s\n", what, msg);
+      write (1, buf, strlen (buf));
+      msg = NULL;
+    }
   longjmp (r, 1);
 }
 
@@ -82,7 +92,16 @@ main(int argc, char **argv)
   if (setjmp (r))
     perror_exit ("SEGV in fork");
 
-  pid = fork();
+  if ((pid = fork()))
+    {
+      // write (1, "continuing in parent\n", strlen ("continuing in parent\n"));
+      what = "parent";
+    }
+  else
+    {
+      // write (1, "continuing in child\n", strlen ("continuing in child\n"));
+      what = "child";
+    }
 
   if (pid == -1)
     perror_exit ("fork failed");
@@ -90,7 +109,9 @@ main(int argc, char **argv)
   if (setjmp (r))
     perror_exit (pid ? "SEGV in parent" : "SEGV in child");
 
+  msg = "testing buf1";
   c = buf1[0];
+  msg = "testing buf2";
   c = buf2[0];
 
   if (setjmp (r))
@@ -101,6 +122,7 @@ main(int argc, char **argv)
 
   if (setjmp (r) == 0)
     {
+      msg = "testing buf1 after unmap";
       c = buf1[0];
       perror_exit (pid ? "no SEGV in parent after munmap" : "no SEGV in child after munmap");
     }
@@ -108,6 +130,7 @@ main(int argc, char **argv)
   if (setjmp (r))
     perror_exit (pid ? "SEGV in parent after munmap" : "SEGV in child after munmap");
 
+  msg = "testing buf2 again";
   c = buf2[0];
 
   if (setjmp (r))
@@ -121,7 +144,10 @@ main(int argc, char **argv)
       waitpid (pid, &status, 0);
       unlink ("y.txt");
       if (!WIFEXITED (status) || WEXITSTATUS (status))
-        return 1;
+	{
+	  printf ("forked process exited with status %p\n", (char *) status);
+	  return 1;
+	}
     }
 
   return 0;
