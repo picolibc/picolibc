@@ -730,9 +730,13 @@ void
 fhandler_cygdrive::set_drives ()
 {
   const int len = 1 + 26 * DRVSZ;
-  char *p = (char *) crealloc ((void *) win32_path_name, len);
+  char *p = (char *) crealloc ((void *) win32_path_name,
+				sizeof (".") + sizeof ("..") + len);
 
   win32_path_name = pdrive = p;
+  strcpy (p, ".");
+  strcpy (p + sizeof ("."), "..");
+  p += sizeof (".") + sizeof ("..");
   ndrives = GetLogicalDriveStrings (len, p) / DRVSZ;
 }
 
@@ -770,28 +774,21 @@ fhandler_cygdrive::readdir (DIR *dir)
       set_errno (ENMFILE);
       return NULL;
     }
-  if (dir->__d_position == 0)
+  else if (dir->__d_position > 1
+	   && GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
     {
-      *dir->__d_dirent->d_name = '.';
-      dir->__d_dirent->d_name[1] = '\0';
-    }
-  else if (dir->__d_position == 1)
-    {
-      dir->__d_dirent->d_name[0] = dir->__d_dirent->d_name[1] = '.';
-      dir->__d_dirent->d_name[2] = '\0';
-    }
-  else if (GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
-    {
-      pdrive += DRVSZ;
+      pdrive = strchr (pdrive, '\0') + 1;
       return readdir (dir);
     }
+  else if (*pdrive == '.')
+    strcpy (dir->__d_dirent->d_name, pdrive);
   else
     {
       *dir->__d_dirent->d_name = cyg_tolower (*pdrive);
       dir->__d_dirent->d_name[1] = '\0';
     }
   dir->__d_position++;
-  pdrive += DRVSZ;
+  pdrive = strchr (pdrive, '\0') + 1;
   syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
       		  dir->__d_dirent->d_name);
   return dir->__d_dirent;
@@ -809,7 +806,8 @@ fhandler_cygdrive::seekdir (DIR *dir, __off64_t loc)
   if (!iscygdrive_root ())
     return fhandler_disk_file::seekdir (dir, loc);
 
-  for (pdrive = win32_path_name, dir->__d_position = -1; *pdrive; pdrive += DRVSZ)
+  for (pdrive = win32_path_name, dir->__d_position = -1; *pdrive;
+       pdrive = strchr (pdrive, '\0') + 1)
     if (++dir->__d_position >= loc)
       break;
 
