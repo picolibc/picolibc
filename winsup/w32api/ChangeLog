@@ -1,3 +1,18 @@
+2003-01-31  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (CreateFiber): Change first parameter
+	to SIZE_T.
+	(CreateJobObject[AW], CreateHardLink[AW]):Guard with
+	if (_WIN32_WINNT >= 0x0500). 
+
+2003-01-31  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* include/winbase.h (PWIN32_FIND_DATAA, PWIN32_FIND_DATAW):
+	Add missing typedefs.
+	(CreateFiberEx, CreateJobObjectA,CreateJobObjectW): Add missing
+	prototypes.
+	(CreateHardLinkA, CreateHardLinkW): Return BOOL, not HANDLE.
+
 2003-01-27  Krzysztof Nikiel  <kni@poczta.onet.pl>
 
 	* include/mmsystem.h (MIXERCONTROL_CONTROLF_MULTIPLE): Correct
