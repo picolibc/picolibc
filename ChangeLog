@@ -1,5 +1,9 @@
 2002-12-02  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* Makefile.tpl: Restore bkorb's style patch, accidentally lost
+	during replay.
+	* Makefile.in: Regenerate.
+
 	(finishing slow-motion replay)
 	* configure: Remove skip-this-dir support.
 	* Makefile.tpl: Remove skip-this-dir support.

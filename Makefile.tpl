@@ -1,4 +1,4 @@
-[+ AutoGen5 template
+[+ AutoGen5 template -*- Mode: Makefile -*-
 in
 +]
 
@@ -527,18 +527,28 @@ GCC_FLAGS_TO_PASS = $(BASE_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS)
 
 # This is a list of the configure targets for all of the modules which
 # are compiled using the target tools.
-CONFIGURE_TARGET_MODULES = [+ FOR target_modules +]\
-	configure-target-[+module+] [+ ENDFOR target_modules +]
+CONFIGURE_TARGET_MODULES =[+
+    FOR target_modules +] \
+	configure-target-[+module+][+
+    ENDFOR target_modules +]
 
 configure-target: $(CONFIGURE_TARGET_MODULES)
 
 # This is a list of the targets for which we can do a clean-{target}.
-CLEAN_MODULES = [+ FOR host_modules +][+ IF no_clean +][+ ELIF with_x +][+ ELSE clean +]\
-	clean-[+module+] [+ ENDIF no_clean +][+ ENDFOR host_modules +]
+CLEAN_MODULES =[+
+    FOR host_modules +][+
+        IF (not (or (exist? "no_clean") (exist? "with_x"))) +] \
+	clean-[+module+][+
+        ENDIF no_clean +][+
+    ENDFOR host_modules +]
 
 # All of the target modules that can be cleaned
-CLEAN_TARGET_MODULES = [+ FOR target_modules +][+ IF no_clean +][+ ELSE clean +]\
-	clean-target-[+module+] [+ ENDIF no_clean +][+ ENDFOR target_modules +]
+CLEAN_TARGET_MODULES =[+
+    FOR target_modules +][+
+        IF (not (exist? "no_clean")) +] \
+	clean-target-[+module+][+
+        ENDIF no_clean +][+
+    ENDFOR target_modules +]
 
 # All of the x11 modules that can be cleaned
 CLEAN_X11_MODULES = [+ FOR host_modules +][+ IF with_x +]\

@@ -540,7 +540,7 @@ CONFIGURE_TARGET_MODULES = \
 	configure-target-zlib \
 	configure-target-boehm-gc \
 	configure-target-qthreads \
-	configure-target-rda 
+	configure-target-rda
 
 configure-target: $(CONFIGURE_TARGET_MODULES)
 
@@ -606,7 +606,7 @@ CLEAN_MODULES = \
 	clean-wdiff \
 	clean-zip \
 	clean-zlib \
-	clean-utils 
+	clean-utils
 
 # All of the target modules that can be cleaned
 CLEAN_TARGET_MODULES = \
@@ -624,7 +624,7 @@ CLEAN_TARGET_MODULES = \
 	clean-target-zlib \
 	clean-target-boehm-gc \
 	clean-target-qthreads \
-	clean-target-rda 
+	clean-target-rda
 
 # All of the x11 modules that can be cleaned
 CLEAN_X11_MODULES = \
