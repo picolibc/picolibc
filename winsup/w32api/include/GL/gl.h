@@ -65,11 +65,11 @@
 
 /* GLAPI, part 2 */
 #if !defined(GLAPI)
-#  if defined(_MSC_VER)                        // Microsoft Visual C++
+#  if defined(_MSC_VER)                        /* Microsoft Visual C++ */
 #    define GLAPI __declspec(dllimport)
-#  elif defined(__LCC__) && defined(__WIN32__) // LCC-Win32
+#  elif defined(__LCC__) && defined(__WIN32__) /* LCC-Win32 */
 #    define GLAPI __stdcall
-#  else                                        // Others (e.g. MinGW, Cygwin, non-win32)
+#  else                                        /* Others (e.g. MinGW, Cygwin, non-win32) */
 #    define GLAPI extern
 #  endif
 #endif

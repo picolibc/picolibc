@@ -162,7 +162,7 @@ extern PACL                         SeSystemDefaultDacl;
 #define FILE_PIPE_READ_DATA             0x00000000
 #define FILE_PIPE_WRITE_SPACE           0x00000001
 
-#define FILE_STORAGE_TYPE_SPECIFIED             0x00000041  // FILE_DIRECTORY_FILE | FILE_NON_DIRECTORY_FILE
+#define FILE_STORAGE_TYPE_SPECIFIED             0x00000041  /* FILE_DIRECTORY_FILE | FILE_NON_DIRECTORY_FILE */
 #define FILE_STORAGE_TYPE_DEFAULT               (StorageTypeDefault << FILE_STORAGE_TYPE_SHIFT)
 #define FILE_STORAGE_TYPE_DIRECTORY             (StorageTypeDirectory << FILE_STORAGE_TYPE_SHIFT)
 #define FILE_STORAGE_TYPE_FILE                  (StorageTypeFile << FILE_STORAGE_TYPE_SHIFT)
@@ -385,7 +385,7 @@ extern PACL                         SeSystemDefaultDacl;
 #define FSCTL_GET_HFS_INFORMATION       CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 31, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define FSCTL_ALLOW_EXTENDED_DASD_IO    CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 32, METHOD_NEITHER,  FILE_ANY_ACCESS)
 
-#endif // (VER_PRODUCTBUILD >= 1381)
+#endif /* (VER_PRODUCTBUILD >= 1381) */
 
 #if (VER_PRODUCTBUILD >= 2195)
 
@@ -430,7 +430,7 @@ extern PACL                         SeSystemDefaultDacl;
 #define FSCTL_READ_FROM_PLEX            CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 71, METHOD_OUT_DIRECT, FILE_READ_DATA)
 #define FSCTL_FILE_PREFETCH             CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 72, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 #define FSCTL_MAILSLOT_PEEK             CTL_CODE(FILE_DEVICE_MAILSLOT, 0, METHOD_NEITHER, FILE_READ_DATA)
 
@@ -658,7 +658,7 @@ typedef struct _MMSUPPORT {
     ULONG           NextAgingSlot;
     ULONG           EstimatedAvailable;
     ULONG           GrowthSinceLastEstimate;
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 } MMSUPPORT, *PMMSUPPORT;
 
 #endif
@@ -978,7 +978,7 @@ typedef struct _FILE_FS_OBJECT_ID_INFORMATION {
     UCHAR ExtendedInfo[48];
 } FILE_FS_OBJECT_ID_INFORMATION, *PFILE_FS_OBJECT_ID_INFORMATION;
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 typedef struct _FILE_FS_SIZE_INFORMATION {
     LARGE_INTEGER   TotalAllocationUnits;
@@ -1043,14 +1043,14 @@ typedef struct _FILE_LOCK_INFO {
     LARGE_INTEGER   EndingByte;
 } FILE_LOCK_INFO, *PFILE_LOCK_INFO;
 
-// raw internal file lock struct returned from FsRtlGetNextFileLock
+/* raw internal file lock struct returned from FsRtlGetNextFileLock */
 typedef struct _FILE_SHARED_LOCK_ENTRY {
     PVOID           Unknown1;
     PVOID           Unknown2;
     FILE_LOCK_INFO  FileLock;
 } FILE_SHARED_LOCK_ENTRY, *PFILE_SHARED_LOCK_ENTRY;
 
-// raw internal file lock struct returned from FsRtlGetNextFileLock
+/* raw internal file lock struct returned from FsRtlGetNextFileLock */
 typedef struct _FILE_EXCLUSIVE_LOCK_ENTRY {
     LIST_ENTRY      ListEntry;
     PVOID           Unknown1;
@@ -1282,7 +1282,7 @@ typedef struct _FSRTL_COMMON_FCB_HEADER {
 #if (VER_PRODUCTBUILD >= 1381)
     UCHAR           Flags2;
     UCHAR           Reserved;
-#endif // (VER_PRODUCTBUILD >= 1381)
+#endif /* (VER_PRODUCTBUILD >= 1381) */
     PERESOURCE      Resource;
     PERESOURCE      PagingIoResource;
     LARGE_INTEGER   AllocationSize;
@@ -1683,7 +1683,7 @@ typedef struct _VAD_HEADER {
     PVAD_HEADER ParentLink;
     PVAD_HEADER LeftLink;
     PVAD_HEADER RightLink;
-    ULONG       Flags;          // LSB = CommitCharge
+    ULONG       Flags;          /* LSB = CommitCharge */
     PVOID       ControlArea;
     PVOID       FirstProtoPte;
     PVOID       LastPTE;
@@ -1823,7 +1823,7 @@ CcGetFlushedValidData (
     IN BOOLEAN                  BcbListHeld
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 LARGE_INTEGER
@@ -2004,7 +2004,7 @@ CcRemapBcb (
     IN PVOID Bcb
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 VOID
@@ -2082,8 +2082,8 @@ VOID
 NTAPI
 CcSetReadAheadGranularity (
     IN PFILE_OBJECT FileObject,
-    IN ULONG        Granularity     // default: PAGE_SIZE
-                                    // allowed: 2^n * PAGE_SIZE
+    IN ULONG        Granularity     /* default: PAGE_SIZE */
+                                    /* allowed: 2^n * PAGE_SIZE */
 );
 
 NTKERNELAPI
@@ -2128,7 +2128,7 @@ CcWaitForCurrentLazyWriterActivity (
     VOID
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 BOOLEAN
@@ -2179,7 +2179,7 @@ FsRtlAllocateFileLock (
     IN PUNLOCK_ROUTINE              UnlockRoutine OPTIONAL
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 PVOID
@@ -2389,7 +2389,7 @@ FsRtlFastUnlockAll (
     IN PEPROCESS            Process,
     IN PVOID                Context OPTIONAL
 );
-//ret: STATUS_RANGE_NOT_LOCKED
+/* ret: STATUS_RANGE_NOT_LOCKED */
 
 NTKERNELAPI
 NTSTATUS
@@ -2401,7 +2401,7 @@ FsRtlFastUnlockAllByKey (
     IN ULONG                Key,
     IN PVOID                Context OPTIONAL
 );  
-//ret: STATUS_RANGE_NOT_LOCKED
+/* ret: STATUS_RANGE_NOT_LOCKED */
 
 NTKERNELAPI
 NTSTATUS
@@ -2416,7 +2416,7 @@ FsRtlFastUnlockSingle (
     IN PVOID                Context OPTIONAL,
     IN BOOLEAN              AlreadySynchronized
 );                      
-//ret:  STATUS_RANGE_NOT_LOCKED
+/* ret:  STATUS_RANGE_NOT_LOCKED */
 
 NTKERNELAPI
 BOOLEAN
@@ -2440,7 +2440,7 @@ FsRtlFreeFileLock (
     IN PFILE_LOCK FileLock
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 NTSTATUS
@@ -2654,7 +2654,7 @@ FsRtlNotifyVolumeEvent (
     IN ULONG        EventCode
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 NTSTATUS
@@ -2827,7 +2827,7 @@ IoCheckQuotaBufferValidity (
     OUT PULONG                  ErrorOffset
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 PFILE_OBJECT
@@ -2847,7 +2847,7 @@ IoCreateStreamFileObjectLite (
     IN PDEVICE_OBJECT   DeviceObject OPTIONAL
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 BOOLEAN
@@ -2890,7 +2890,7 @@ IoGetRequestorProcessId (
     IN PIRP Irp
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 PIRP
@@ -2931,7 +2931,7 @@ IoIsValidNameGraftingBuffer (
     IN PREPARSE_DATA_BUFFER ReparseBuffer
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 NTSTATUS
@@ -2988,7 +2988,7 @@ IoRegisterFsRegistrationChange (
     IN PDRIVER_FS_NOTIFICATION  DriverNotificationRoutine
 );
 
-#endif // (VER_PRODUCTBUILD >= 1381)
+#endif /* (VER_PRODUCTBUILD >= 1381) */
 
 NTKERNELAPI
 VOID
@@ -3057,7 +3057,7 @@ IoUnregisterFsRegistrationChange (
     IN PDRIVER_FS_NOTIFICATION  DriverNotificationRoutine
 );
 
-#endif // (VER_PRODUCTBUILD >= 1381)
+#endif /* (VER_PRODUCTBUILD >= 1381) */
 
 NTKERNELAPI
 NTSTATUS
@@ -3155,7 +3155,7 @@ KeUnstackDetachProcess (
     IN PKAPC_STATE ApcState
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 BOOLEAN
@@ -3663,7 +3663,7 @@ RtlSelfRelativeToAbsoluteSD (
     IN PULONG                   PrimaryGroupSize
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
@@ -3779,7 +3779,7 @@ SeCreateClientSecurityFromSubjectContext (
     OUT PSECURITY_CLIENT_CONTEXT    ClientContext
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 #define SeDeleteClientSecurity(C)  {                                           \
             if (SeTokenType((C)->ClientToken) == TokenPrimary) {               \
@@ -3824,7 +3824,7 @@ SeImpersonateClientEx (
     IN PETHREAD                 ServerThread OPTIONAL
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 VOID
@@ -3898,7 +3898,7 @@ SeQueryInformationToken (
     OUT PVOID                  *TokenInformation
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 NTSTATUS
@@ -3920,7 +3920,7 @@ SeQuerySessionIdToken (
     IN PULONG           SessionId
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 #define SeQuerySubjectContextToken( SubjectContext )                \
     ( ARGUMENT_PRESENT(                                             \
@@ -3996,7 +3996,7 @@ SeTokenIsRestricted (
     IN PACCESS_TOKEN Token
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTKERNELAPI
 TOKEN_TYPE
@@ -4032,7 +4032,7 @@ ZwAdjustPrivilegesToken (
     OUT PULONG              ReturnLength
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
@@ -4080,7 +4080,7 @@ ZwCancelIoFile (
     OUT PIO_STATUS_BLOCK    IoStatusBlock
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
@@ -4205,7 +4205,7 @@ ZwFlushVirtualMemory (
     OUT PIO_STATUS_BLOCK    IoStatusBlock
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
@@ -4245,13 +4245,13 @@ ZwInitiatePowerAction (
     IN BOOLEAN              Asynchronous
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
 NTAPI
 ZwLoadDriver (
-    // "\\Registry\\Machine\\System\\CurrentControlSet\\Services\\<DriverName>"
+    /* "\\Registry\\Machine\\System\\CurrentControlSet\\Services\\<DriverName>" */
     IN PUNICODE_STRING RegistryPath
 );
 
@@ -4349,7 +4349,7 @@ ZwPowerInformation (
     IN ULONG                    OutputBufferLength
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
@@ -4414,7 +4414,7 @@ ZwQueryEaFile (
     IN BOOLEAN              RestartScan
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
@@ -4520,7 +4520,7 @@ ZwRestoreKey (
     IN ULONG    Flags
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
@@ -4557,7 +4557,7 @@ ZwSetEaFile (
     IN ULONG                Length
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
@@ -4598,7 +4598,7 @@ ZwSetSecurityObject (
     IN PSECURITY_DESCRIPTOR SecurityDescriptor
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
@@ -4630,7 +4630,7 @@ ZwSetVolumeInformationFile (
     IN FS_INFORMATION_CLASS FsInformationClass
 );
 
-#endif // (VER_PRODUCTBUILD >= 2195)
+#endif /* (VER_PRODUCTBUILD >= 2195) */
 
 NTSYSAPI
 NTSTATUS
@@ -4644,7 +4644,7 @@ NTSYSAPI
 NTSTATUS
 NTAPI
 ZwUnloadDriver (
-    // "\\Registry\\Machine\\System\\CurrentControlSet\\Services\\<DriverName>"
+    /* "\\Registry\\Machine\\System\\CurrentControlSet\\Services\\<DriverName>" */
     IN PUNICODE_STRING RegistryPath
 );
 
@@ -4688,4 +4688,4 @@ ZwYieldExecution (
 }
 #endif
 
-#endif // _NTIFS_
+#endif /* _NTIFS_ */
