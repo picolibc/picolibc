@@ -1,3 +1,8 @@
+2002-06-01  Richard Henderson  <rth@redhat.com>
+
+	* alpha.h (LITUSE_ALPHA_ADDR, LITUSE_ALPHA_BASE, LITUSE_ALPHA_BYTOFF,
+	LITUSE_ALPHA_JSR, LITUSE_ALPHA_TLSGD, LITUSE_ALPHA_TLSLDM): New.
+
 2002-05-30  Richard Henderson  <rth@redhat.com>
 
 	* alpha.h (R_ALPHA_TLSGD, R_ALPHA_TLSLDM, R_ALPHA_DTPMOD64,
