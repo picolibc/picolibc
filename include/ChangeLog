@@ -1,3 +1,7 @@
+2002-09-26  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/x86-64.h: Add TLS relocs.
+
 2002-09-26  Andrew Cagney  <ac131313@redhat.com>
 
 	* regs/: Delete directory.
