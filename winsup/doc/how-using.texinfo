@@ -628,6 +628,17 @@ Emacs 21.1:
 	          'comint-strip-ctrl-m)
 @end example
 
+@subsection Is there a Cygwin port of GNU Emacs?
+
+No.  If you want NT Emacs to understand Cygwin paths, get
+cygwin-mount.el from @file{http://www.emacswiki.org/elisp/index.html}.
+
+If you want to run ``emacs -nw'', say from a remote login shell, you
+can't.  (The error is ``emacs: standard input is not a tty''.)
+Instead, use a Cygwin version of XEmacs, from
+@file{http://www.xemacs.org/}.  Using ``xemacs -nw'' from a remote
+shell works fine.
+
 @subsection info error "dir: No such file or directory"
 
 Cygwin packages install their info documentation in the /usr/info
