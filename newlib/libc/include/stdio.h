@@ -24,9 +24,6 @@
  */
 
 #ifndef _STDIO_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define	_STDIO_H_
 
 #include "_ansi.h"
@@ -47,6 +44,8 @@ extern "C" {
 
 #include <sys/reent.h>
 #include <sys/types.h>
+
+_BEGIN_STD_C
 
 typedef _fpos_t fpos_t;
 typedef struct __sFILE FILE;
@@ -385,7 +384,6 @@ static __inline int __sputc(int _c, FILE *_p) {
 #endif
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* _STDIO_H_ */

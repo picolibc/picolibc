@@ -7,10 +7,6 @@
 #ifndef _STRING_H_
 #define	_STRING_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "_ansi.h"
 #include <sys/reent.h>
 
@@ -20,6 +16,8 @@ extern "C" {
 #ifndef NULL
 #define NULL 0
 #endif
+
+_BEGIN_STD_C
 
 _PTR 	 _EXFUN(memchr,(const _PTR, int, size_t));
 int 	 _EXFUN(memcmp,(const _PTR, const _PTR, size_t));
@@ -94,7 +92,6 @@ char	*_EXFUN(strsignal, (int __signo));
 
 #endif /* ! __STRICT_ANSI__ */
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* _STRING_H_ */

@@ -5,9 +5,6 @@
 */
 
 #ifndef _LOCALE_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define _LOCALE_H_
 
 #include "_ansi.h"
@@ -23,6 +20,8 @@ extern "C" {
 #define LC_NUMERIC  4
 #define LC_TIME     5
 #define LC_MESSAGES 6
+
+_BEGIN_STD_C
 
 struct lconv
 {
@@ -55,7 +54,6 @@ struct _reent;
 char *_EXFUN(_setlocale_r,(struct _reent *, int category, const char *locale));
 struct lconv *_EXFUN(_localeconv_r,(struct _reent *));
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* _LOCALE_H_ */

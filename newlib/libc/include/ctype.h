@@ -1,10 +1,9 @@
 #ifndef _CTYPE_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define _CTYPE_H_
 
 #include "_ansi.h"
+
+_BEGIN_STD_C
 
 int _EXFUN(isalnum, (int __c));
 int _EXFUN(isalpha, (int __c));
@@ -66,7 +65,6 @@ extern	__IMPORT _CONST char	_ctype_[];
 #define toascii(c)	((c)&0177)
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* _CTYPE_H_ */

@@ -1,3 +1,18 @@
+2002-06-27  Benjamin Kosnik  <bkoz@redhat.com>
+
+        * libc/include/stdio.h: Untangle, add _BEGIN_STD_C and _END_STD_C.
+        * libc/include/time.h: Same.
+        * libc/include/string.h: Same.
+        * libc/include/stdlib.h: Same.
+        * libc/include/signal.h: Same.
+        * libc/include/setjmp.h: Same.
+        * libc/include/math.h: Same.
+        * libc/include/locale.h: Same.
+        * libc/include/ctype.h: Same.
+        * libc/include/machine/setjmp.h: Same.
+        * libc/include/_ansi.h (_BEGIN_STD_C): Add.
+        (_END_STD_C): Add.
+
 2002-06-27  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/include/sys/_types.h: Define _ssize_t as int if int is

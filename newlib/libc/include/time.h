@@ -10,10 +10,6 @@
 #include "_ansi.h"
 #include <sys/reent.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef NULL
 #define	NULL	0
 #endif
@@ -31,6 +27,8 @@ extern "C" {
 #include <stddef.h>
 
 #include <sys/types.h>
+
+_BEGIN_STD_C
 
 struct tm
 {
@@ -61,6 +59,12 @@ char	  *_EXFUN(asctime_r,	(const struct tm *, char *));
 char	  *_EXFUN(ctime_r,	(const time_t *, char *));
 struct tm *_EXFUN(gmtime_r,	(const time_t *, struct tm *));
 struct tm *_EXFUN(localtime_r,	(const time_t *, struct tm *));
+
+_END_STD_C
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef __STRICT_ANSI__
 char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
@@ -115,11 +119,19 @@ char *_EXFUN(timezone, (void));
 #endif /* __CYGWIN__ */
 #endif /* !__STRICT_ANSI__ */
 
+#ifdef __cplusplus
+}
+#endif
+
 #include <sys/features.h>
 
 #if defined(_POSIX_TIMERS)
 
 #include <signal.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Clocks, P1003.1b-1993, p. 263 */
 
@@ -148,7 +160,14 @@ int _EXFUN(timer_getoverrun, (timer_t timerid));
 
 int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _POSIX_TIMERS */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* CPU-time Clock Attributes, P1003.4b/D8, p. 54 */
 
@@ -217,5 +236,6 @@ int _EXFUN(clock_getenable_attr, (clockid_t clock_id, int *attr));
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* _TIME_H_ */
 

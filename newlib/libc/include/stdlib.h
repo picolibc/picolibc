@@ -5,9 +5,6 @@
  */
 
 #ifndef _STDLIB_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define _STDLIB_H_
 
 #include "_ansi.h"
@@ -21,6 +18,8 @@ extern "C" {
 #ifndef __STRICT_ANSI__
 #include <alloca.h>
 #endif
+
+_BEGIN_STD_C
 
 typedef struct 
 {
@@ -176,7 +175,6 @@ int	_EXFUN(_system_r,(struct _reent *, const char *));
 
 _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *));
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* _STDLIB_H_ */

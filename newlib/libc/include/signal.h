@@ -1,11 +1,10 @@
 #ifndef _SIGNAL_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define _SIGNAL_H_
 
 #include "_ansi.h"
 #include <sys/signal.h>
+
+_BEGIN_STD_C
 
 typedef int	sig_atomic_t;		/* Atomic entity type (ANSI) */
 
@@ -31,7 +30,6 @@ _sig_func_ptr _EXFUN(signal, (int, _sig_func_ptr));
 int	_EXFUN(raise, (int));
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* _SIGNAL_H_ */

@@ -1,14 +1,13 @@
 /* math.h -- Definitions for the math floating point package.  */
 
 #ifndef  _MATH_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define  _MATH_H_
 
 #include <sys/reent.h>
 #include <machine/ieeefp.h>
 #include "_ansi.h"
+
+_BEGIN_STD_C
 
 #ifndef HUGE_VAL
 
@@ -359,11 +358,10 @@ extern __IMPORT _CONST _LIB_VERSION_TYPE _LIB_VERSION;
 
 #endif /* ! defined (__STRICT_ANSI__) */
 
+_END_STD_C
+
 #ifdef __FAST_MATH__
 #include <machine/fastmath.h>
 #endif
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _MATH_H_ */

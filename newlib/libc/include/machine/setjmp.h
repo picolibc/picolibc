@@ -1,3 +1,6 @@
+
+_BEGIN_STD_C
+
 #if defined(__arm__) || defined(__thumb__)
 /*
  * All callee preserved registers:
@@ -176,8 +179,14 @@ typedef	_JBTYPE jmp_buf[_JBLEN];
 typedef	int jmp_buf[_JBLEN];
 #endif
 
+_END_STD_C
+
 #if defined(__CYGWIN__) || defined(__rtems__)
 #include <signal.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* POSIX sigsetjmp/siglongjmp macros */
 typedef int sigjmp_buf[_JBLEN+2];
@@ -197,5 +206,8 @@ typedef int sigjmp_buf[_JBLEN+2];
                sigprocmask (SIG_SETMASK, (sigset_t *) ((env) + _SIGMASK), 0):0),\
                longjmp (env, val))
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* __CYGWIN__ or __rtems__ */
 #endif
