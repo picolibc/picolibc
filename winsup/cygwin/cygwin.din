@@ -1239,6 +1239,7 @@ pthread_equal
 pthread_exit
 pthread_getconcurrency
 pthread_getschedparam
+pthread_getsequence_np
 pthread_getspecific
 pthread_join
 pthread_key_create

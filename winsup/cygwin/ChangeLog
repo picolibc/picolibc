@@ -1,3 +1,8 @@
+2002-11-27  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Export pthread_getsequence_np.
+	* include/cygwin/version.h: Bump API minor version.
+
 2002-11-26  Jason Tishler  <jason@tishler.net>
 
 	* cygwin.din: Export nl_langinfo().
