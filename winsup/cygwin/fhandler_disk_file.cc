@@ -174,16 +174,16 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
      then just do a "query open" as it is apparently much faster. */
   if (pc.exec_state () != dont_know_if_executable)
     {
-      query_open (query_read_control);
       if (pc.fs_is_fat () && !strpbrk (get_win32_name (), "?*|<>"))
 	return fstat_by_name (buf);
+      query_open (query_stat_control);
     }
   if (!(oret = open_fs (open_flags, 0)) && get_errno () == EACCES)
     {
       /* If we couldn't open the file, try a query open with no permissions.
 	 This allows us to determine *some* things about the file, at least. */
       pc.set_exec (0);
-      query_open (query_null_access);
+      query_open (query_read_control);
       oret = open_fs (open_flags, 0);
     }
 
@@ -378,15 +378,15 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (pc.is_fs_special ())
     return chmod_device (pc, mode);
 
-  if (!get_io_handle ())
+  if (wincap.has_security ())
     {
-      query_open (query_write_control);
-      if (!(oret = open_fs (O_BINARY, 0)))
-        {
-	  query_open (query_read_control);
+      enable_restore_privilege ();
+      if (!get_io_handle ())
+	{
+	  query_open (query_write_control);
 	  if (!(oret = open_fs (O_BINARY, 0)))
 	    return -1;
-        }
+	}
     }
 
   if (!allow_ntsec && allow_ntea) /* Not necessary when manipulating SD. */
@@ -423,15 +423,13 @@ int __stdcall
 fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 {
   int oret = 0;
+
+  enable_restore_privilege ();
   if (!get_io_handle ())
     {
       query_open (query_write_control);
       if (!(oret = open_fs (O_BINARY, 0)))
-        {
-	  query_open (query_read_control);
-	  if (!(oret = open_fs (O_BINARY, 0)))
-	    return -1;
-        }
+	return -1;
     }
 
   mode_t attrib = 0;
@@ -460,17 +458,6 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
   int res = -1;
   int oret = 0;
 
-  if (!get_io_handle ())
-    {
-      query_open (query_write_control);
-      if (!(oret = open_fs (O_BINARY, 0)))
-        {
-	  query_open (query_read_control);
-	  if (!(oret = open_fs (O_BINARY, 0)))
-	    return -1;
-        }
-    }
-
   if (!pc.has_acls () || !allow_ntsec)
     {
       switch (cmd)
@@ -485,30 +472,50 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	      set_errno(EFAULT);
 	    else if (nentries < MIN_ACL_ENTRIES)
 	      set_errno (ENOSPC);
-	    else if (!fstat_by_handle (&st))
+	    else
 	      {
-		aclbufp[0].a_type = USER_OBJ;
-		aclbufp[0].a_id = st.st_uid;
-		aclbufp[0].a_perm = (st.st_mode & S_IRWXU) >> 6;
-		aclbufp[1].a_type = GROUP_OBJ;
-		aclbufp[1].a_id = st.st_gid;
-		aclbufp[1].a_perm = (st.st_mode & S_IRWXG) >> 3;
-		aclbufp[2].a_type = OTHER_OBJ;
-		aclbufp[2].a_id = ILLEGAL_GID;
-		aclbufp[2].a_perm = st.st_mode & S_IRWXO;
-		aclbufp[3].a_type = CLASS_OBJ; 
-		aclbufp[3].a_id = ILLEGAL_GID;
-		aclbufp[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
-		res = MIN_ACL_ENTRIES;
+		if (!get_io_handle ())
+		  {
+		    query_open (query_read_control);
+		    if (!(oret = open_fs (O_BINARY, 0)))
+		      return -1;
+		  }
+	        if (!fstat_by_handle (&st))
+		  {
+		    aclbufp[0].a_type = USER_OBJ;
+		    aclbufp[0].a_id = st.st_uid;
+		    aclbufp[0].a_perm = (st.st_mode & S_IRWXU) >> 6;
+		    aclbufp[1].a_type = GROUP_OBJ;
+		    aclbufp[1].a_id = st.st_gid;
+		    aclbufp[1].a_perm = (st.st_mode & S_IRWXG) >> 3;
+		    aclbufp[2].a_type = OTHER_OBJ;
+		    aclbufp[2].a_id = ILLEGAL_GID;
+		    aclbufp[2].a_perm = st.st_mode & S_IRWXO;
+		    aclbufp[3].a_type = CLASS_OBJ; 
+		    aclbufp[3].a_id = ILLEGAL_GID;
+		    aclbufp[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
+		    res = MIN_ACL_ENTRIES;
+		  }
 	      }
 	    break;
 	  case GETACLCNT:
 	    res = MIN_ACL_ENTRIES;
 	    break;
+	  default:
+	    set_errno (EINVAL);
+	    break;
 	}
     }
   else
     {
+      if (cmd == SETACL)
+	enable_restore_privilege ();
+      if (!get_io_handle ())
+	{
+	  query_open (cmd == SETACL ? query_write_control : query_read_control);
+	  if (!(oret = open_fs (O_BINARY, 0)))
+	    return -1;
+	}
       switch (cmd)
 	{
 	  case SETACL:

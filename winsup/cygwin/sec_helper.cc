@@ -375,6 +375,20 @@ out:
   return ret;
 }
 
+/* Helper function to set the SE_RESTORE_NAME privilege once. */
+void
+enable_restore_privilege ()
+{
+  static int NO_COPY saved_res;
+  bool issetuid = cygheap->user.issetuid ();
+  if (!saved_res || issetuid)
+    {
+      int res = 2 + set_process_privilege (SE_RESTORE_NAME, true, issetuid);
+      if (!issetuid)
+        saved_res = res;
+    }
+}
+
 /*
  * Function to return a common SECURITY_DESCRIPTOR * that
  * allows all access.

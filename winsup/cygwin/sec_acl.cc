@@ -261,7 +261,7 @@ getacl (HANDLE handle, const char *file, DWORD attr, int nentries,
 {
   security_descriptor sd;
 
-  if (!handle || get_nt_object_security (handle, SE_FILE_OBJECT, sd)
+  if ((!handle || get_nt_object_security (handle, SE_FILE_OBJECT, sd))
       && read_sd (file, sd) <= 0)
     {
       debug_printf ("read_sd %E");

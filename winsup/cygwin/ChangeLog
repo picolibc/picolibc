@@ -1,3 +1,38 @@
+2004-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (NtCreateFile): Add.
+	* dir.cc (mkdir): Change set_file_attribute call to indicate that
+	NT security isn't used.
+	* fhandler.cc (fhandler_base::open_9x): New method, created from
+	fhandler_base::open.
+	(fhandler_base::open): Rearrange to use NtCreateFile instead of
+	CreateFile.
+	* fhandler.h (enum query_state): Redefine query_null_access to
+	query_stat_control.  query_null_access isn't allowed in NtCreateFile.
+	(fhandler_base::open_9x): Declare.
+	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Use
+	query_stat_control first, query_read_control if that fails.
+	(fhandler_disk_file::fchmod): Call enable_restore_privilege before
+	trying to open for query_write_control.  Don't fall back to
+	opening for query_read_control.
+	(fhandler_disk_file::fchown): Ditto.
+	(fhandler_disk_file::facl):  Only request restore privilege and query
+	access necessary for given cmd.
+	* fhandler_raw.cc (fhandler_dev_raw::open): Call fhandler_base::open
+	instead of opening device here.
+	* ntdll.h (NtCreateFile): Declare.
+	* path.cc (symlink_worker): Change set_file_attribute call to indicate
+	that NT security isn't used.
+	* sec_acl.cc (getacl): Fix bracketing.
+	* sec_helper.cc (enable_restore_privilege): New function.
+	* security.cc (str2buf2uni_cat): New function.
+	(write_sd): Don't request restore permission here.
+	* security.h (set_process_privileges): Drop stale declaration.
+	(str2buf2uni): Declare.
+	(str2buf2uni_cat): Declare.
+	(enable_restore_privilege): Declare.
+	* syscalls.cc (fchown32): Return immediate success on 9x.
+
 2004-04-15  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* autoload.cc (dll_chain1): Rename to dll_chain.  Remove old dll_chain

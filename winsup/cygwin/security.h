@@ -248,7 +248,6 @@ extern bool allow_ntsec;
 extern bool allow_smbntsec;
 
 /* File manipulation */
-int __stdcall set_process_privileges ();
 int __stdcall get_file_attribute (int, HANDLE, const char *, mode_t *,
 				  __uid32_t * = NULL, __gid32_t * = NULL);
 int __stdcall set_file_attribute (bool, HANDLE, const char *, int);
@@ -275,6 +274,10 @@ extern "C" int acl32 (const char *, int, int, __acl32 *);
 int getacl (HANDLE, const char *, DWORD, int, __acl32 *);
 int setacl (HANDLE, const char *, int, __acl32 *);
 
+struct _UNICODE_STRING;
+void __stdcall str2buf2uni (_UNICODE_STRING &, WCHAR *, const char *) __attribute__ ((regparm (3)));
+void __stdcall str2buf2uni_cat (_UNICODE_STRING &, const char *) __attribute__ ((regparm (2)));
+
 /* Try a subauthentication. */
 HANDLE subauth (struct passwd *pw);
 /* Try creating a token directly. */
@@ -289,6 +292,7 @@ bool get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL
 
 /* sec_helper.cc: Security helper functions. */
 int set_process_privilege (const char *privilege, bool enable = true, bool use_thread = false);
+void enable_restore_privilege (void);
 
 /* shared.cc: */
 /* Retrieve a security descriptor that allows all access */

@@ -63,8 +63,8 @@ enum bg_check_types
 
 enum query_state {
   no_query = 0,
-  query_null_access = 1,
-  query_read_control = 2,
+  query_read_control = 1,
+  query_stat_control = 2,
   query_write_control = 3
 };
 
@@ -226,6 +226,7 @@ class fhandler_base
   void fork_fixup (HANDLE parent, HANDLE &h, const char *name);
   virtual bool need_fixup_before () const {return false;}
 
+  int open_9x (int flags, mode_t mode = 0);
   virtual int open (int flags, mode_t mode = 0);
   int open_fs (int flags, mode_t mode = 0);
   virtual int close ();

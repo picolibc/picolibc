@@ -144,41 +144,16 @@ fhandler_dev_raw::open (int flags, mode_t)
   flags &= ~(O_CREAT | O_TRUNC);
   flags |= O_BINARY;
 
-  DWORD access = GENERIC_READ | SYNCHRONIZE;
   if (get_major () == DEV_TAPE_MAJOR
       || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY
       || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDWR)
-    access |= GENERIC_WRITE;
+    flags = ((flags & ~(O_WRONLY | O_RDWR)) | O_RDWR);
 
-  extern void str2buf2uni (UNICODE_STRING &, WCHAR *, const char *);
-  UNICODE_STRING dev;
-  WCHAR devname[CYG_MAX_PATH + 1];
-  str2buf2uni (dev, devname, get_win32_name ());
-  OBJECT_ATTRIBUTES attr;
-  ULONG options = FILE_SYNCHRONOUS_IO_NONALERT;
-  /* The O_TEXT flag is used to indicate write-through on tape devices */
-  if (get_major () == DEV_TAPE_MAJOR && (flags & O_TEXT))
-    options |= FILE_WRITE_THROUGH;
-  flags &= ~O_TEXT;
-  InitializeObjectAttributes (&attr, &dev, OBJ_CASE_INSENSITIVE, NULL, NULL);
-
-  HANDLE h;
-  IO_STATUS_BLOCK io;
-  NTSTATUS status = NtOpenFile (&h, access, &attr, &io, 0 /* excl. access */,
-				options);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_win_error (RtlNtStatusToDosError (status));
-      return 0;
-    }
-
-  set_io_handle (h);
-  set_flags ((flags & ~O_TEXT) | O_BINARY);
-
-  if (devbufsiz > 1L)
+  int res = fhandler_base::open (flags, 0);
+  if (res && devbufsiz > 1L)
     devbuf = new char [devbufsiz];
 
-  return 1;
+  return res;
 }
 
 int

@@ -28,6 +28,8 @@ details. */
 #include <assert.h>
 #include <limits.h>
 #include <winioctl.h>
+#include <ntdef.h>
+#include "ntdll.h"
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
@@ -425,7 +427,7 @@ done:
 
 /* Open system call handler function. */
 int
-fhandler_base::open (int flags, mode_t mode)
+fhandler_base::open_9x (int flags, mode_t mode)
 {
   int res = 0;
   HANDLE x;
@@ -435,7 +437,7 @@ fhandler_base::open (int flags, mode_t mode)
   SECURITY_ATTRIBUTES sa = sec_none;
   security_descriptor sd;
 
-  syscall_printf ("(%s, %p) query_open %d", get_win32_name (), flags, query_open ());
+  syscall_printf ("(%s, %p)", get_win32_name (), flags);
 
   if (get_win32_name () == NULL)
     {
@@ -443,34 +445,12 @@ fhandler_base::open (int flags, mode_t mode)
       goto done;
     }
 
-  switch (query_open ())
-    {
-      case query_null_access:
-	access = 0;
-	break;
-      case query_read_control:
-	access = READ_CONTROL;
-	break;
-      case query_write_control:
-	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC;
-	break;
-      default:
-	if (get_major () == DEV_TAPE_MAJOR)
-	  access = GENERIC_READ | GENERIC_WRITE;
-	else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
-	  access = GENERIC_READ;
-	else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
-	  access = GENERIC_WRITE;
-	else
-	  access = GENERIC_READ | GENERIC_WRITE;
-        break;
-    }
-
-  /* Allow reliable lseek on disk devices. */
-  if (get_major () == DEV_FLOPPY_MAJOR)
-    access |= GENERIC_READ;
-
-  /* FIXME: O_EXCL handling?  */
+  if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
+    access = GENERIC_READ;
+  else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
+    access = GENERIC_WRITE;
+  else
+    access = GENERIC_READ | GENERIC_WRITE;
 
   if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))
     {
@@ -508,16 +488,6 @@ fhandler_base::open (int flags, mode_t mode)
     }
 #endif
 
-  /* CreateFile() with dwDesiredAccess == 0 when called on remote
-     share returns some handle, even if file doesn't exist. This code
-     works around this bug. */
-  if (query_open () && isremote () &&
-      creation_distribution == OPEN_EXISTING && !pc.exists ())
-    {
-      set_errno (ENOENT);
-      goto done;
-    }
-
   /* If mode has no write bits set, we set the R/O attribute. */
   if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
     file_attributes |= FILE_ATTRIBUTE_READONLY;
@@ -552,6 +522,162 @@ fhandler_base::open (int flags, mode_t mode)
   syscall_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
 		  x, get_win32_name (), access, shared, &sa,
 		  creation_distribution, file_attributes);
+
+  set_io_handle (x);
+  set_flags (flags, pc.binmode ());
+
+  res = 1;
+  set_open_status ();
+done:
+  syscall_printf ("%d = fhandler_base::open (%s, %p)", res, get_win32_name (),
+		  flags);
+  return res;
+}
+
+/* Open system call handler function. */
+int
+fhandler_base::open (int flags, mode_t mode)
+{
+  if (!wincap.is_winnt ())
+    return fhandler_base::open_9x (flags, mode);
+
+  int res = 0;
+  HANDLE x;
+  ULONG file_attributes = 0;
+  ULONG shared = wincap.shared ();
+  ULONG create_disposition;
+  ULONG create_options;
+  SECURITY_ATTRIBUTES sa = sec_none;
+  security_descriptor sd;
+  UNICODE_STRING upath;
+  WCHAR wpath[CYG_MAX_PATH + 10];
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  NTSTATUS status;
+
+  syscall_printf ("(%s, %p)", get_win32_name (), flags);
+  if (get_win32_name () == NULL)
+    {
+      set_errno (ENOENT);
+      goto done;
+    }
+  if (get_win32_name ()[0] == '\\')
+    {
+      if (get_win32_name ()[1] == '\\')
+        {
+	  str2buf2uni (upath, wpath, "\\??\\UNC");
+	  str2buf2uni_cat (upath, get_win32_name () + 1);
+	}
+      else
+	str2buf2uni (upath, wpath, get_win32_name ());
+    }
+  else
+    {
+      str2buf2uni (upath, wpath, "\\??\\");
+      str2buf2uni_cat (upath, get_win32_name ());
+    }
+  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			      sa.lpSecurityDescriptor, NULL);
+
+  switch (query_open ())
+    {
+      case query_read_control:
+        access = READ_CONTROL;
+        create_options = FILE_OPEN_FOR_BACKUP_INTENT;
+        break;
+      case query_stat_control:
+        access = READ_CONTROL | FILE_READ_ATTRIBUTES;
+        create_options = FILE_OPEN_FOR_BACKUP_INTENT;
+        break;
+      case query_write_control:
+        access = READ_CONTROL | WRITE_OWNER | WRITE_DAC;
+        create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
+        break;
+      default:
+        create_options = 0;
+	if (get_major () == DEV_TAPE_MAJOR && (flags & O_TEXT))
+	  {
+	    /* O_TEXT is used to indicate write-through on tape devices */
+	    create_options |= FILE_WRITE_THROUGH;
+	    flags &= ~O_TEXT;
+	  }
+	if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
+	  access = GENERIC_READ;
+	else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
+	  access = GENERIC_WRITE;
+	else
+	  access = GENERIC_READ | GENERIC_WRITE;
+	/* Allow reliable lseek on disk devices. */
+	if (get_major () == DEV_FLOPPY_MAJOR)
+	  access |= GENERIC_READ;
+	else if (get_major () != DEV_SERIAL_MAJOR)
+	  {
+	    create_options |= FILE_SYNCHRONOUS_IO_NONALERT;
+	    access |= SYNCHRONIZE;
+	  }
+	break;
+    }
+
+  if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))
+    {
+      if (flags & O_CREAT)
+	create_disposition = FILE_SUPERSEDE;
+      else
+	create_disposition = FILE_OVERWRITE;
+    }
+  else if (flags & O_CREAT)
+    create_disposition = FILE_OPEN_IF;
+  else
+    create_disposition = FILE_OPEN;
+
+  if ((flags & O_EXCL) && (flags & O_CREAT))
+    create_disposition = FILE_CREATE;
+
+  if (flags & O_APPEND)
+    append_mode (true);
+
+  if (flags & O_CREAT && get_device () == FH_FS)
+    {
+      file_attributes = FILE_ATTRIBUTE_NORMAL;
+      /* If mode has no write bits set, we set the R/O attribute. */
+      if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
+	file_attributes |= FILE_ATTRIBUTE_READONLY;
+#ifdef HIDDEN_DOT_FILES
+      char *c = strrchr (get_win32_name (), '\\');
+      if ((c && c[1] == '.') || *get_win32_name () == '.')
+	file_attributes |= FILE_ATTRIBUTE_HIDDEN;
+#endif
+      /* If the file should actually be created and ntsec is on,
+	 set files attributes. */
+      if (allow_ntsec && has_acls ())
+	{
+	  set_security_attribute (mode, &sa, sd);
+	  attr.SecurityDescriptor = sa.lpSecurityDescriptor;
+	}
+    }
+
+  status = NtCreateFile (&x, access, &attr, &io, NULL, file_attributes, shared,
+  			 create_disposition, create_options, NULL, 0);
+  if (!NT_SUCCESS (status))
+    {
+      if (!wincap.can_open_directories () && pc.isdir ())
+	{
+	  if (flags & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
+	    set_errno (EEXIST);
+	  else if (flags & (O_WRONLY | O_RDWR))
+	    set_errno (EISDIR);
+	  else
+	    nohandle (true);
+	}
+      __seterrno_from_win_error (RtlNtStatusToDosError (status));
+      if (!nohandle ())
+	goto done;
+   }
+
+  syscall_printf ("%x = NtCreateFile "
+  		  "(%p, %x, %s, io, NULL, %x, %x, %x, %x, NULL, 0)",
+		  status, x, access, get_win32_name (), file_attributes, shared,
+		  create_disposition, create_options);
 
   set_io_handle (x);
   set_flags (flags, pc.binmode ());

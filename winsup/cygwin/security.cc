@@ -165,6 +165,16 @@ str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
   sys_mbstowcs (buf, srcstr, tgt.MaximumLength);
 }
 
+void
+str2buf2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
+{
+  DWORD len = strlen (srcstr) * sizeof (WCHAR);
+  sys_mbstowcs (tgt.Buffer + tgt.Length / sizeof (WCHAR), srcstr,
+		len + tgt.MaximumLength);
+  tgt.Length += len;
+  tgt.MaximumLength += len;
+}
+
 #if 0				/* unused */
 static void
 lsa2wchar (WCHAR *tgt, LSA_UNICODE_STRING &src, int size)
@@ -1119,38 +1129,9 @@ read_sd (const char *file, security_descriptor &sd)
 LONG
 write_sd (HANDLE fh, const char *file, security_descriptor &sd)
 {
-  /* Try turning privilege on, may not have WRITE_OWNER or WRITE_DAC access.
-     Must have privilege to set different owner, else BackupWrite misbehaves */
-  static int NO_COPY saved_res; /* 0: never, 1: failed, 2 & 3: OK */
-  int res;
-  if (!saved_res || cygheap->user.issetuid ())
-    {
-      res = 2 + set_process_privilege (SE_RESTORE_NAME, true,
-				       cygheap->user.issetuid ());
-      if (!cygheap->user.issetuid ())
-	saved_res = res;
-    }
-  else
-    res = saved_res;
-  if (res == 1)
-    {
-      BOOL dummy;
-      cygpsid owner;
-
-      if (!GetSecurityDescriptorOwner (sd, (PSID *) &owner, &dummy))
-	{
-	  __seterrno ();
-	  return -1;
-	}
-      if (owner != cygheap->user.sid ())
-	{
-	  set_errno (EPERM);
-	  return -1;
-	}
-    }
   NTSTATUS ret = STATUS_SUCCESS;
   int retry = 0;
-  res = -1;
+  int res = -1;
   for (; retry < 2; ++retry)
     {
       if (retry && (fh = CreateFile (file, WRITE_OWNER | WRITE_DAC,

@@ -872,6 +872,9 @@ lchown (const char * name, __uid16_t uid, __gid16_t gid)
 extern "C" int
 fchown32 (int fd, __uid32_t uid, __gid32_t gid)
 {
+  if (!wincap.has_security ())  // real chown only works on NT
+    return 0;			// return zero (and do nothing) under Windows 9x
+
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     {
