@@ -13,7 +13,7 @@
 
 2002-06-19  Christopher Faylor  <cgf@redhat.com>
 
-	Use hMainProc where appropriate, throughout. 
+	Use hMainProc where appropriate, throughout.
 	* environ.cc (spenv::retrieve): Add debugging statements.
 
 	* pinfo.cc (set_myself): Don't call strace.hello if already stracing.
@@ -273,7 +273,7 @@
 2002-06-10  Robert Collins  <rbtcollins@hotmail.com>
 
 	* thread.cc: Variation of a patch from Thomas Pffaf.
-       	(__pthread_detach): Cleanup thread object if the thread has terminated.
+	(__pthread_detach): Cleanup thread object if the thread has terminated.
 	(__pthread_join): Change order of error checks, and lock against
 	join/detach/exit races.
 	(__pthread_exit): Lock object against join/detach/exit races.
