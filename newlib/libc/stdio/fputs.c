@@ -60,6 +60,7 @@ _DEFUN (fputs, (s, fp),
 	char _CONST * s _AND
 	FILE * fp)
 {
+  int result;
   struct __suio uio;
   struct __siov iov;
 
@@ -67,5 +68,8 @@ _DEFUN (fputs, (s, fp),
   iov.iov_len = uio.uio_resid = strlen (s);
   uio.uio_iov = &iov;
   uio.uio_iovcnt = 1;
-  return __sfvwrite (fp, &uio);
+  _flockfile(fp);
+  result = __sfvwrite (fp, &uio);
+  _funlockfile(fp);
+  return result;
 }

@@ -53,9 +53,14 @@ _DEFUN (fgetpos, (fp, pos),
 	FILE * fp _AND
 	fpos_t * pos)
 {
+  _flockfile(fp);
   *pos = ftell (fp);
 
   if (*pos != -1)
-    return 0;
+    {
+      _funlockfile(fp);
+      return 0;
+    }
+  _funlockfile(fp);
   return 1;
 }

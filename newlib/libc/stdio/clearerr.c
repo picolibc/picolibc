@@ -59,5 +59,7 @@ _VOID
 _DEFUN (clearerr, (fp),
 	FILE * fp)
 {
+  _flockfile(fp);
   __sclearerr (fp);
+  _funlockfile(fp);
 }

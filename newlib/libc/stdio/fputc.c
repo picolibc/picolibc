@@ -47,5 +47,9 @@ _DEFUN (fputc, (ch, file),
 	int ch _AND
 	FILE * file)
 {
-  return putc (ch, file);
+  int result;
+   _flockfile(file);
+  result = putc (ch, file);
+  _funlockfile(file);
+  return result;
 }

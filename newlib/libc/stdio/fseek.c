@@ -96,6 +96,8 @@ fseek (fp, offset, whence)
   struct stat st;
   int havepos;
 
+  _flockfile(fp);
+
   /* Make sure stdio is set up.  */
 
   CHECK_INIT (fp);
@@ -115,6 +117,7 @@ fseek (fp, offset, whence)
   if ((seekfn = fp->_seek) == NULL)
     {
       ptr->_errno = ESPIPE;	/* ??? */
+      _funlockfile(fp);
       return EOF;
     }
 
@@ -138,6 +141,7 @@ fseek (fp, offset, whence)
 	{
 	  curoff = (*seekfn) (fp->_cookie, (fpos_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
+            _funlockfile(fp);
 	    return EOF;
 	}
       if (fp->_flags & __SRD)
@@ -161,6 +165,7 @@ fseek (fp, offset, whence)
 
     default:
       ptr->_errno = EINVAL;
+      _funlockfile(fp);
       return (EOF);
     }
 
@@ -262,6 +267,7 @@ fseek (fp, offset, whence)
       if (HASUB (fp))
 	FREEUB (fp);
       fp->_flags &= ~__SEOF;
+      _funlockfile(fp);
       return 0;
     }
 
@@ -290,6 +296,7 @@ fseek (fp, offset, whence)
       fp->_p += n;
       fp->_r -= n;
     }
+  _funlockfile(fp);
   return 0;
 
   /*
@@ -299,7 +306,10 @@ fseek (fp, offset, whence)
 
 dumb:
   if (fflush (fp) || (*seekfn) (fp->_cookie, offset, whence) == POS_ERR)
-    return EOF;
+    {
+      _funlockfile(fp);
+      return EOF;
+    }
   /* success: clear EOF indicator and discard ungetc() data */
   if (HASUB (fp))
     FREEUB (fp);
@@ -307,5 +317,6 @@ dumb:
   fp->_r = 0;
   /* fp->_w = 0; *//* unnecessary (I think...) */
   fp->_flags &= ~__SEOF;
+  _funlockfile(fp);
   return 0;
 }

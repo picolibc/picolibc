@@ -76,12 +76,15 @@ _DEFUN (freopen, (file, mode, fp),
   int flags, oflags, e;
   struct _reent *ptr;
 
+  _flockfile(fp);
+
   CHECK_INIT (fp);
   ptr = fp->_data;
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
       (void) fclose (fp);
+      _funlockfile(fp);
       return NULL;
     }
 
@@ -137,6 +140,7 @@ _DEFUN (freopen, (file, mode, fp),
     {				/* did not get it after all */
       fp->_flags = 0;		/* set it free */
       ptr->_errno = e;		/* restore in case _close clobbered */
+      _funlockfile(fp);
       return NULL;
     }
 
@@ -153,5 +157,6 @@ _DEFUN (freopen, (file, mode, fp),
     fp->_flags |= __SCLE;
 #endif
 
+  _funlockfile(fp);
   return fp;
 }

@@ -98,7 +98,12 @@ _DEFUN (fwrite, (buf, size, count, fp),
    * generally slow and since this occurs whenever size==0.
    */
 
+  _flockfile(fp);
   if (__sfvwrite (fp, &uio) == 0)
-    return count;
+    {
+      _funlockfile(fp);
+      return count;
+    }
+  _funlockfile(fp);
   return (n - uio.uio_resid) / size;
 }

@@ -298,8 +298,12 @@ _DEFUN (VFPRINTF, (fp, fmt0, ap),
 	_CONST char *fmt0 _AND
 	va_list ap)
 {
+  int result;
+  _flockfile(fp);
   CHECK_INIT (fp);
-  return _VFPRINTF_R (fp->_data, fp, fmt0, ap);
+  result = _VFPRINTF_R (fp->_data, fp, fmt0, ap);
+  _funlockfile(fp);
+  return result;
 }
 
 int 

@@ -42,5 +42,9 @@ int
 _DEFUN (fgetc, (fp),
 	FILE * fp)
 {
-  return __sgetc (fp);
+  int result;
+  _flockfile(fp);
+  result = __sgetc (fp);
+  _funlockfile(fp);
+  return result;
 }

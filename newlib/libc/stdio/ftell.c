@@ -80,6 +80,8 @@ _DEFUN (ftell, (fp),
 {
   fpos_t pos;
 
+  _flockfile(fp);
+
   /* Ensure stdio is set up.  */
 
   CHECK_INIT (fp);
@@ -87,6 +89,7 @@ _DEFUN (ftell, (fp),
   if (fp->_seek == NULL)
     {
       fp->_data->_errno = ESPIPE;
+      _funlockfile(fp);
       return -1L;
     }
 
@@ -99,7 +102,10 @@ _DEFUN (ftell, (fp),
     {
       pos = (*fp->_seek) (fp->_cookie, (fpos_t) 0, SEEK_CUR);
       if (pos == -1L)
-	return pos;
+        {
+          _funlockfile(fp);
+          return pos;
+        }
     }
   if (fp->_flags & __SRD)
     {
@@ -122,5 +128,6 @@ _DEFUN (ftell, (fp),
       pos += fp->_p - fp->_bf._base;
     }
 
+  _funlockfile(fp);
   return pos;
 }

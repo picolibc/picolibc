@@ -122,6 +122,8 @@ _DEFUN (fread, (buf, size, count, fp),
 
   if ((resid = count * size) == 0)
     return 0;
+
+  _flockfile(fp);
   if (fp->_r < 0)
     fp->_r = 0;
   total = resid;
@@ -139,8 +141,12 @@ _DEFUN (fread, (buf, size, count, fp),
 	  /* no more input: return partial result */
 #ifdef __SCLE
           if (fp->_flags & __SCLE)
-            return crlf(fp, buf, total-resid, 1) / size;
+            {
+              _funlockfile(fp);
+              return crlf(fp, buf, total-resid, 1) / size;
+            }
 #endif
+          _funlockfile(fp);
 	  return (total - resid) / size;
 	}
     }
@@ -149,7 +155,11 @@ _DEFUN (fread, (buf, size, count, fp),
   fp->_p += resid;
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
-    return crlf(fp, buf, total, 0) / size;
+    {
+      _funlockfile(fp);
+      return crlf(fp, buf, total, 0) / size;
+    }
 #endif
+  _funlockfile(fp);
   return count;
 }

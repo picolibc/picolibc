@@ -47,6 +47,8 @@ extern "C" {
 
 #include <sys/reent.h>
 
+#include <sys/stdio.h>
+
 typedef _fpos_t fpos_t;
 
 typedef struct __sFILE FILE;
@@ -220,6 +222,9 @@ FILE *  _EXFUN(popen, (const char *, const char *));
 int	_EXFUN(putw, (int, FILE *));
 void    _EXFUN(setbuffer, (FILE *, char *, int));
 int	_EXFUN(setlinebuf, (FILE *));
+void    _EXFUN(flockfile, (FILE *));
+int     _EXFUN(ftrylockfile, (FILE *));
+void    _EXFUN(funlockfile, (FILE *));
 #endif
 
 /*

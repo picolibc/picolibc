@@ -80,6 +80,7 @@ _DEFUN (fgets, (buf, n, fp),
 
   s = buf;
 
+  _flockfile(fp);
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
     {
@@ -92,8 +93,12 @@ _DEFUN (fgets, (buf, n, fp),
 	    break;
 	}
       if (c == EOF && s == buf)
-	return NULL;
+        {
+          _funlockfile(fp);
+          return NULL;
+        }
       *s = 0;
+      _funlockfile(fp);
       return buf;
     }
 #endif
@@ -110,7 +115,10 @@ _DEFUN (fgets, (buf, n, fp),
 	    {
 	      /* EOF: stop with partial or no line */
 	      if (s == buf)
-		return 0;
+                {
+                  _funlockfile(fp);
+                  return 0;
+                }
 	      break;
 	    }
 	  len = fp->_r;
@@ -133,6 +141,7 @@ _DEFUN (fgets, (buf, n, fp),
 	  fp->_p = t;
 	  (void) memcpy ((_PTR) s, (_PTR) p, len);
 	  s[len] = 0;
+          _funlockfile(fp);
 	  return (buf);
 	}
       fp->_r -= len;
@@ -142,5 +151,6 @@ _DEFUN (fgets, (buf, n, fp),
     }
   while ((n -= len) != 0);
   *s = 0;
+  _funlockfile(fp);
   return buf;
 }

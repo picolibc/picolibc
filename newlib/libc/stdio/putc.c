@@ -78,7 +78,10 @@ putc (c, fp)
      int c;
      register FILE *fp;
 {
+  int result;
+  _flockfile(fp);
   /* CHECK_INIT is (eventually) called by __swbuf.  */
-
-  return __sputc (c, fp);
+  result = __sputc (c, fp);
+  _funlockfile(fp);
+  return result;
 }

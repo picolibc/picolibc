@@ -1,3 +1,31 @@
+2002-05-07  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/include/sys/stdio.h: New file.
+	* libc/sys/linux/sys/stdio.h: New file.
+	* libc/include/stdio.h: Add declarations for flockfile,
+	ftrylockfile, and funlockfile.  Include <sys/stdio.h>.
+	* libc/stdio/clearerr.c: Add file locking.
+	* libc/stdio/fclose.c: Likewise.
+	* libc/stdio/feof.c: Likewise.
+	* libc/stdio/ferror.c: Likewise.
+	* libc/stdio/fflush.c: Likewise.
+	* libc/stdio/fgetc.c: Likewise.
+	* libc/stdio/fgetpos.c: Likewise.
+	* libc/stdio/fgets.c: Likewise.
+	* libc/stdio/fileno.c: Likewise.
+	* libc/stdio/fputc.c: Likewise.
+	* libc/stdio/fputs.c: Likewise.
+	* libc/stdio/fread.c: Likewise.
+	* libc/stdio/freopen.c: Likewise.
+	* libc/stdio/fseek.c: Likewise.
+	* libc/stdio/ftell.c: Likewise.
+	* libc/stdio/fwrite.c: Likewise.
+	* libc/stdio/getc.c: Likewise.
+	* libc/stdio/putc.c: Likewise.
+	* libc/stdio/setvbuf.c: Likewise.
+	* libc/stdio/ungetc.c: Likewise.
+	* libc/stdio/vfprintf.c: Likewise.
+
 2002-05-06  Jeff Johnston  <jjohnstn@redhat.com>
 
         *  libc/include/stdlib.h (a64l, l64a, _l64a_r): Added prototypes.

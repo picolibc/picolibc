@@ -36,5 +36,9 @@ int
 _DEFUN (feof, (fp),
 	FILE * fp)
 {
-  return __sfeof (fp);
+  int result;
+  _flockfile(fp);
+  result = __sfeof (fp);
+  _funlockfile(fp);
+  return result;
 }

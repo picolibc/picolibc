@@ -73,6 +73,8 @@ ungetc (c, fp)
   if (c == EOF)
     return (EOF);
 
+  _flockfile(fp);
+  
   /* Ensure stdio has been initialized.
      ??? Might be able to remove this as some other stdio routine should
      have already been called to get the char we are un-getting.  */
@@ -89,11 +91,17 @@ ungetc (c, fp)
        * Otherwise, flush any current write stuff.
        */
       if ((fp->_flags & __SRW) == 0)
-	return EOF;
+        {
+          _funlockfile(fp);
+          return EOF;
+        }
       if (fp->_flags & __SWR)
 	{
 	  if (fflush (fp))
-	    return EOF;
+            {
+              _funlockfile(fp);
+              return EOF;
+            }
 	  fp->_flags &= ~__SWR;
 	  fp->_w = 0;
 	  fp->_lbfsize = 0;
@@ -110,9 +118,13 @@ ungetc (c, fp)
   if (HASUB (fp))
     {
       if (fp->_r >= fp->_ub._size && __submore (fp))
-	return EOF;
+        {
+          _funlockfile(fp);
+          return EOF;
+        }
       *--fp->_p = c;
       fp->_r++;
+      _funlockfile(fp);
       return c;
     }
 
@@ -126,6 +138,7 @@ ungetc (c, fp)
     {
       fp->_p--;
       fp->_r++;
+      _funlockfile(fp);
       return c;
     }
 
@@ -141,5 +154,6 @@ ungetc (c, fp)
   fp->_ubuf[sizeof (fp->_ubuf) - 1] = c;
   fp->_p = &fp->_ubuf[sizeof (fp->_ubuf) - 1];
   fp->_r = 1;
+  _funlockfile(fp);
   return c;
 }

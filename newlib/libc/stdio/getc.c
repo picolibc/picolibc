@@ -74,7 +74,10 @@ int
 getc (fp)
      register FILE *fp;
 {
+  int result;
+  _flockfile(fp);
   /* CHECK_INIT is called (eventually) by __srefill.  */
-
-  return __sgetc (fp);
+  result = __sgetc (fp);
+  _funlockfile(fp);
+  return result;
 }

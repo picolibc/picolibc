@@ -64,10 +64,15 @@ _DEFUN (fclose, (fp),
   if (fp == NULL)
     return (0);			/* on NULL */
 
+  _flockfile(fp);
+  
   CHECK_INIT (fp);
 
   if (fp->_flags == 0)		/* not open! */
-    return (0);
+    {
+      _funlockfile(fp);
+      return (0);
+    }
   r = fp->_flags & __SWR ? fflush (fp) : 0;
   if (fp->_close != NULL && (*fp->_close) (fp->_cookie) < 0)
     r = EOF;
@@ -78,5 +83,6 @@ _DEFUN (fclose, (fp),
   if (HASLB (fp))
     FREELB (fp);
   fp->_flags = 0;		/* release this FILE for reuse */
+  _funlockfile(fp);
   return (r);
 }

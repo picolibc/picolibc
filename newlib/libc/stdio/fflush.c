@@ -69,11 +69,16 @@ _DEFUN (fflush, (fp),
   if (fp == NULL)
     return _fwalk (_REENT, fflush);
 
+  _flockfile(fp);
+
   CHECK_INIT (fp);
 
   t = fp->_flags;
   if ((t & __SWR) == 0 || (p = fp->_bf._base) == NULL)
-    return 0;
+    {
+      _funlockfile(fp);
+      return 0;
+    }
   n = fp->_p - p;		/* write this much */
 
   /*
@@ -89,11 +94,13 @@ _DEFUN (fflush, (fp),
       t = (*fp->_write) (fp->_cookie, (char *) p, n);
       if (t <= 0)
 	{
-	  fp->_flags |= __SERR;
-	  return EOF;
+          fp->_flags |= __SERR;
+          _funlockfile(fp);
+          return EOF;
 	}
       p += t;
       n -= t;
     }
+  _funlockfile(fp);
   return 0;
 }

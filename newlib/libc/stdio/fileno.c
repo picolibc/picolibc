@@ -35,6 +35,10 @@ int
 _DEFUN (fileno, (f),
 	FILE * f)
 {
+  int result;
+  _flockfile(f);
   CHECK_INIT (f);
-  return __sfileno (f);
+  result = __sfileno (f);
+  _funlockfile(f);
+  return result;
 }

@@ -103,6 +103,9 @@ _DEFUN (setvbuf, (fp, buf, mode, size),
 	register size_t size)
 {
   int ret = 0;
+
+  _flockfile(fp);
+
   CHECK_INIT (fp);
 
   /*
@@ -111,7 +114,10 @@ _DEFUN (setvbuf, (fp, buf, mode, size),
    */
 
   if ((mode != _IOFBF && mode != _IOLBF && mode != _IONBF) || (int)(_POINTER_INT) size < 0)
-    return (EOF);
+    {
+      _funlockfile(fp);
+      return (EOF);
+    }
 
   /*
    * Write current buffer, if any; drop read count, if any.
@@ -145,15 +151,16 @@ _DEFUN (setvbuf, (fp, buf, mode, size),
 	  size = BUFSIZ;
 	}
       if (buf == NULL)
-	{
-	  /* Can't allocate it, let's try another approach */
+        {
+          /* Can't allocate it, let's try another approach */
 nbf:
-	  fp->_flags |= __SNBF;
-	  fp->_w = 0;
-	  fp->_bf._base = fp->_p = fp->_nbuf;
-	  fp->_bf._size = 1;
-	  return (ret);
-	}
+          fp->_flags |= __SNBF;
+          fp->_w = 0;
+          fp->_bf._base = fp->_p = fp->_nbuf;
+          fp->_bf._size = 1;
+          _funlockfile(fp);
+          return (ret);
+        }
       fp->_flags |= __SMBF;
     }
   /*
@@ -186,5 +193,6 @@ nbf:
   if (fp->_flags & __SWR)
     fp->_w = fp->_flags & (__SLBF | __SNBF) ? 0 : size;
 
+  _funlockfile(fp);
   return 0;
 }
