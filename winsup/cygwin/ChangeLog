@@ -1,5 +1,37 @@
 2003-01-04  Christopher Faylor  <cgf@redhat.com>
 
+	Replace is_fs_device with is_fs_special throughout.
+	* Makefile.in (DLL_OFILES): Add fhandler_fifo.o.
+	* devices.h (fh_devices): Renumber some minor numbers to fit in 8 bits.
+	* dtable.cc (dtable::build_fhandler): Handle FH_FIFO.  Set errno to
+	ENODEV if device not found.
+	* dtable::find_fifo: Define new function.
+	* dtable.h (dtable::find_fifo): Declare new function.
+	* fhandler.cc (fhandler_base::device_access_denied): Fix O_RDONLY test.
+	(fhandler_base::write): Use output file handle for writing.
+	(fhandler_base::fstat): Use is_fs_special rather than is_fs_device.
+	* fhandler.h (fhandler_base::is_fs_special): Rename from is_fs_device.
+	(fhandler_pipe): Make private elements protected so that fhandler_fifo
+	can use them too.
+	(fhandler_pipe::create): New function derived from make_pipe.
+	(fhandler_fifo): Add more needed elements.
+	(fhandler_pty_master::slave): Add to track slave device.
+	(fhandler_pty_master::get_unit): Define.
+	* fhandler_tty.cc (fhandler_tty_master::init): Register slave device.
+	(fhandler_pty_master::open): Ditto.
+	(symlink_info::parse_device): Handle fifo specially.
+	* pinfo.cc (_pinfo::commune_recv): Initial fifo implementation.
+	(_pinfo::commune_send): Ditto.
+	* pinfo.h (picom): Add PICOM_FIFO.
+	* pipe.cc (fhandler_pipe::close): Close input handle here specifically.
+	(fhandler_pipe::create): Rename from make_pipe.  Create fhandlers
+	rather than fds.
+	(pipe): Use fhandler_pipe::create to create pipe.
+	(_pipe): Ditto.
+	* syscalls.cc (mknod): Accommodate fifos.
+
+2003-01-04  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_tty.cc (fhandler_tty_slave::get_unit): Fix test for tty unit
 	number based on whether this is just a /dev/tty or a /dev/ttyN.
 
