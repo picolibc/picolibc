@@ -1,5 +1,16 @@
 2003-08-28  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.h: Make some functions regparm.
+	* sigproc.cc (checkstate): Make regparm.
+	(getevent): Change parameters in declaration, rename from getsem, make regparm.
+	(sig_send): Recognize that nosync is now an event.  Remove some old
+	cruft from previous interrupt anywhere signal handler.
+	(getevent): Change parameters in definition, rename from getsem.
+	Allocate event rather than semaphore.
+	(wait_sig): Treat sigcatch_nosync as an event.
+
+2003-08-28  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (sigreturn): Fix problem where old return address was
 	not properly restored for a nested signal.
 
