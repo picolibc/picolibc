@@ -6,22 +6,22 @@
 #ifndef _SYS_TYPES_H
 #define _SYS_TYPES_H
 
-/*
- * Okay, newlib has its own time_t and clock_t in libc/include/time.h
- * Since they're equivalent but not identical, we'll just skip the kernel's
- * definitions.
- */
+/* Newlib has it's own time_t and clock_t definitions in 
+ * libc/include/sys/types.h.  Repeat those here and
+ * skip the kernel's definitions. */
 
-#ifdef __time_t_defined
+#include <machine/types.h>
+
+#ifndef __time_t_defined
 #define _TIME_T
-#else
 #define __time_t_defined
+typedef _TIME_T_ time_t;
 #endif
 
-#ifdef __clock_t_defined
+#ifndef __clock_t_defined
 #define _CLOCK_T
-#else
 #define __clock_t_defined
+typedef _CLOCK_T_ clock_t;
 #endif
 
 #include <linux/types.h>

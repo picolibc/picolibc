@@ -1,3 +1,38 @@
+2000-12-11  Joel Sherrill <joel@OARcorp.com>
+
+        * Merge RTEMS specific .h files into main libc/include.
+        * libc/sys/rtems/include/signal.h: Removed.
+        * libc/sys/rtems/include/time.h: Removed.
+        * libc/sys/rtems/sys/features.h: Removed.
+        * libc/sys/rtems/sys/sched.h: Removed.
+        * libc/sys/rtems/sys/siginfo.h: Removed.
+        * libc/sys/rtems/sys/signal.h: Removed.
+        * libc/sys/rtems/sys/time.h: Removed.
+        * libc/sys/rtems/sys/times.h: Removed.
+	definitions for time_t and clock_t since these are
+	no longer in time.h.
+        * libc/include/pthread.h: New file.
+        * libc/include/sys/sched.h: New file.
+        * libc/include/sys/features.h: New file.
+        * libc/include/time.h: Removed duplicate definition of clock_t
+        and time_t, get them from <sys/types.h> instead.  Add prototypes
+        for POSIX clock and timer functionality.
+	* libc/sys/linux/sys/types.h: Changed to include
+        * libc/include/machine/types.h: Add _CLOCKID_T_ and _TIMER_T_.
+        * libc/include/sys/signal.h: Add more complete set of POSIX
+        signal functionality including real-time and threaded signals.
+        * libc/include/sys/types.h: Add clock_t, time_t, struct
+	timespec, and struct itimerspec.  Centralizing these makes 
+	things cleaner.  RTEMS uses 64-bit dev_t.
+        Added numerous primitive definitions
+        for pthreads including macros, pthread_attr_t,
+	pthread_mutexattr_t, pthread_condattr_t, pthread_key_t, 
+	pthread_once_t, and pthread_t.
+        * libc/include/sys/unistd.h: Added getlogin_r() prototype.
+        If RTEMS follow POSIX on read(), write() and sbrk() prototype.
+        Feature flags removed and moved to new file <sys/features.h>.
+        Full set of POSIX sysconf() constants
+
 2000-12-08  Werner Almesberger  <Werner.Almesberger@epfl.ch>
 
 	* configure.host: Added x86 linux target.

@@ -60,9 +60,26 @@ typedef	unsigned short	ushort;		/* System V compatibility */
 typedef	unsigned int	uint;		/* System V compatibility */
 # endif	/*!_POSIX_SOURCE */
 
+#ifndef __clock_t_defined
+typedef _CLOCK_T_ clock_t;
+#define __clock_t_defined
+#endif
+
 #ifndef __time_t_defined
 typedef _TIME_T_ time_t;
 #define __time_t_defined
+
+/* Time Value Specification Structures, P1003.1b-1993, p. 261 */
+
+struct timespec {
+  time_t  tv_sec;   /* Seconds */
+  long    tv_nsec;  /* Nanoseconds */
+};
+
+struct itimerspec {
+  struct timespec  it_interval;  /* Timer period */
+  struct timespec  it_value;     /* Timer expiration */
+};
 #endif
 
 typedef	long	daddr_t;
@@ -102,7 +119,12 @@ typedef int32_t register_t;
  * how the file was compiled (e.g. -mint16 vs -mint32, etc.).
  */
 
+#if defined(__rtems__)
+/* device numbers are 32-bit major and and 32-bit minor */
+typedef unsigned long long dev_t;
+#else
 typedef	short	dev_t;
+#endif
 
 typedef	long	off_t;
 
@@ -175,5 +197,121 @@ typedef	struct _types_fd_set {
 
 #undef __MS_types__
 #undef _ST_INT32
+
+/* The following are actually standard POSIX 1003.1b-1993 threads, mutexes,
+   condition variables, and keys.  But since RTEMS is currently the only
+   newlib user of these, the ifdef is just on RTEMS. */
+
+#if defined(__rtems__)
+
+#ifndef __clockid_t_defined
+typedef _CLOCKID_T_ clockid_t;
+#define __clockid_t_defined
+#endif
+
+#ifndef __timer_t_defined
+typedef _TIMER_T_ timer_t;
+#define __timer_t_defined
+#endif
+
+#include <sys/features.h>
+
+#if defined(_POSIX_THREADS)
+
+#include <sys/sched.h>
+
+/*
+ *  2.5 Primitive System Data Types,  P1003.1c/D10, p. 19.
+ */
+
+typedef __uint32_t pthread_t;            /* identify a thread */
+
+/* P1003.1c/D10, p. 118-119 */
+#define PTHREAD_SCOPE_PROCESS 0
+#define PTHREAD_SCOPE_SYSTEM  1
+
+/* P1003.1c/D10, p. 111 */
+#define PTHREAD_INHERIT_SCHED  1      /* scheduling policy and associated */
+                                      /*   attributes are inherited from */
+                                      /*   the calling thread. */
+#define PTHREAD_EXPLICIT_SCHED 2      /* set from provided attribute object */
+
+/* P1003.1c/D10, p. 141 */
+#define PTHREAD_CREATE_DETACHED 0
+#define PTHREAD_CREATE_JOINABLE  1
+
+typedef struct {
+  int is_initialized;
+  void *stackaddr;
+  int stacksize;
+  int contentionscope;
+  int inheritsched;
+  int schedpolicy;
+  struct sched_param schedparam;
+
+  /* P1003.4b/D8, p. 54 adds cputime_clock_allowed attribute.  */
+#if defined(_POSIX_THREAD_CPUTIME)
+  int  cputime_clock_allowed;  /* see time.h */
+#endif
+  int  detachstate;
+
+} pthread_attr_t;
+
+#if defined(_POSIX_THREAD_PROCESS_SHARED)
+/* NOTE: P1003.1c/D10, p. 81 defines following values for process_shared.  */
+
+#define PTHREAD_PROCESS_PRIVATE 0 /* visible within only the creating process */
+#define PTHREAD_PROCESS_SHARED  1 /* visible too all processes with access to */
+                                  /*   the memory where the resource is */
+                                  /*   located */
+#endif
+
+#if defined(_POSIX_THREAD_PRIO_PROTECT)
+/* Mutexes */
+
+/* Values for blocking protocol. */
+
+#define PTHREAD_PRIO_NONE    0
+#define PTHREAD_PRIO_INHERIT 1
+#define PTHREAD_PRIO_PROTECT 2
+#endif
+
+typedef __uint32_t pthread_mutex_t;      /* identify a mutex */
+
+typedef struct {
+  int   is_initialized;
+#if defined(_POSIX_THREAD_PROCESS_SHARED)
+  int   process_shared;  /* allow mutex to be shared amongst processes */
+#endif
+#if defined(_POSIX_THREAD_PRIO_PROTECT)
+  int   prio_ceiling;
+  int   protocol;
+#endif
+  int   recursive;
+} pthread_mutexattr_t;
+
+/* Condition Variables */
+
+typedef __uint32_t pthread_cond_t;       /* identify a condition variable */
+
+typedef struct {
+  int   is_initialized;
+#if defined(_POSIX_THREAD_PROCESS_SHARED)
+  int   process_shared;       /* allow this to be shared amongst processes */
+#endif
+} pthread_condattr_t;         /* a condition attribute object */
+
+/* Keys */
+
+typedef __uint32_t pthread_key_t;        /* thread-specific data keys */
+
+typedef struct {
+  int   is_initialized;  /* is this structure initialized? */
+  int   init_executed;   /* has the initialization routine been run? */
+} pthread_once_t;       /* dynamic package initialization */
+
+#endif /* defined(_POSIX_THREADS) */
+
+#endif  /* defined(__rtems__) */
 
 #endif	/* _SYS_TYPES_H */

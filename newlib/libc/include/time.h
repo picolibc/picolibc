@@ -29,18 +29,7 @@ extern "C" {
 #define __need_size_t
 #include <stddef.h>
 
-/* Get _CLOCK_T_ and _TIME_T_.  */
-#include <machine/types.h>
-
-#ifndef __clock_t_defined
-typedef _CLOCK_T_ clock_t;
-#define __clock_t_defined
-#endif
-
-#ifndef __time_t_defined
-typedef _TIME_T_ time_t;
-#define __time_t_defined
-#endif
+#include <sys/types.h>
 
 struct tm
 {
@@ -82,6 +71,106 @@ char *_EXFUN(timezone, (void));
 void _EXFUN(tzset, (void));
 #endif
 #endif /* __CYGWIN__ */
+
+#include <sys/features.h>
+
+
+#if defined(_POSIX_TIMERS)
+
+#include <signal.h>
+
+/* Clocks, P1003.1b-1993, p. 263 */
+
+int _EXFUN(clock_settime, (clockid_t clock_id, const struct timespec *tp));
+int _EXFUN(clock_gettime, (clockid_t clock_id, struct timespec *tp));
+int _EXFUN(clock_getres,  (clockid_t clock_id, struct timespec *res));
+
+/* Create a Per-Process Timer, P1003.1b-1993, p. 264 */
+
+int _EXFUN(timer_create,
+  (clockid_t clock_id, struct sigevent *evp, timer_t *timerid));
+
+/* Delete a Per_process Timer, P1003.1b-1993, p. 266 */
+
+int _EXFUN(timer_delete, (timer_t timerid));
+
+/* Per-Process Timers, P1003.1b-1993, p. 267 */
+
+int _EXFUN(timer_settime,
+  (timer_t timerid, int flags, const struct itimerspec *value,
+   struct itimerspec *ovalue));
+int _EXFUN(timer_gettime, (timer_t timerid, struct itimerspec *value));
+int _EXFUN(timer_getoverrun, (timer_t timerid));
+
+/* High Resolution Sleep, P1003.1b-1993, p. 269 */
+
+int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
+
+#endif /* _POSIX_TIMERS */
+
+/* CPU-time Clock Attributes, P1003.4b/D8, p. 54 */
+
+/* values for the clock enable attribute */
+
+#define CLOCK_ENABLED  1  /* clock is enabled, i.e. counting execution time */
+#define CLOCK_DISABLED 0  /* clock is disabled */
+
+/* values for the pthread cputime_clock_allowed attribute */
+
+#define CLOCK_ALLOWED    1 /* If a thread is created with this value a */
+                           /*   CPU-time clock attached to that thread */
+                           /*   shall be accessible. */
+#define CLOCK_DISALLOWED 0 /* If a thread is created with this value, the */
+                           /*   thread shall not have a CPU-time clock */
+                           /*   accessible. */
+
+/* Manifest Constants, P1003.1b-1993, p. 262 */
+
+#define CLOCK_REALTIME (clockid_t)1
+
+/* Flag indicating time is "absolute" with respect to the clock
+   associated with a time.  */
+
+#define TIMER_ABSTIME  4
+
+/* Manifest Constants, P1003.4b/D8, p. 55 */
+
+#if defined(_POSIX_CPUTIME)
+
+/* When used in a clock or timer function call, this is interpreted as
+   the identifier of the CPU_time clock associated with the PROCESS
+   making the function call.  */
+
+#define CLOCK_PROCESS_CPUTIME (clockid_t)2
+
+#endif
+
+#if defined(_POSIX_THREAD_CPUTIME)
+
+/*  When used in a clock or timer function call, this is interpreted as
+    the identifier of the CPU_time clock associated with the THREAD
+    making the function call.  */
+
+#define CLOCK_THREAD_CPUTIME (clockid_t)3
+
+#endif
+
+#if defined(_POSIX_CPUTIME)
+
+/* Accessing a Process CPU-time CLock, P1003.4b/D8, p. 55 */
+
+int _EXFUN(clock_getcpuclockid, (pid_t pid, clockid_t *clock_id));
+
+#endif /* _POSIX_CPUTIME */
+
+#if defined(_POSIX_CPUTIME) || defined(_POSIX_THREAD_CPUTIME)
+
+/* CPU-time Clock Attribute Access, P1003.4b/D8, p. 56 */
+
+int _EXFUN(clock_setenable_attr, (clockid_t clock_id, int attr));
+int _EXFUN(clock_getenable_attr, (clockid_t clock_id, int *attr));
+
+#endif /* _POSIX_CPUTIME or _POSIX_THREAD_CPUTIME */
 
 #ifdef __cplusplus
 }
