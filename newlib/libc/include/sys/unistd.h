@@ -20,7 +20,9 @@ int	_EXFUN(access,(const char *__path, int __amode ));
 unsigned  _EXFUN(alarm, (unsigned __secs ));
 int     _EXFUN(chdir, (const char *__path ));
 int     _EXFUN(chmod, (const char *__path, mode_t __mode ));
+#if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(chown, (const char *__path, uid_t __owner, gid_t __group ));
+#endif
 #if defined(__CYGWIN__) || defined(__rtems__)
 int     _EXFUN(chroot, (const char *__path ));
 #endif
@@ -42,7 +44,9 @@ int     _EXFUN(execvp, (const char *__file, char * const __argv[] ));
 int     _EXFUN(fchdir, (int __fildes));
 #endif
 int     _EXFUN(fchmod, (int __fildes, mode_t __mode ));
+#if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(fchown, (int __fildes, uid_t __owner, gid_t __group ));
+#endif
 pid_t   _EXFUN(fork, (void ));
 long    _EXFUN(fpathconf, (int __fd, int __name ));
 int     _EXFUN(fsync, (int __fd));
@@ -50,9 +54,11 @@ char    _EXFUN(*getcwd, (char *__buf, size_t __size ));
 #if defined(__CYGWIN__)
 int	_EXFUN(getdomainname ,(char *__name, size_t __len));
 #endif
+#if !defined(__INSIDE_CYGWIN__)
 gid_t   _EXFUN(getegid, (void ));
 uid_t   _EXFUN(geteuid, (void ));
 gid_t   _EXFUN(getgid, (void ));
+#endif
 int     _EXFUN(getgroups, (int __gidsetsize, gid_t __grouplist[] ));
 char    _EXFUN(*getlogin, (void ));
 #if defined(_POSIX_THREAD_SAFE_FUNCTIONS)
@@ -67,17 +73,23 @@ pid_t   _EXFUN(getppid, (void ));
 #ifdef __CYGWIN__
 pid_t   _EXFUN(getsid, (pid_t));
 #endif
+#if !defined(__INSIDE_CYGWIN__)
 uid_t   _EXFUN(getuid, (void ));
+#endif
 #ifdef __CYGWIN__
 char *	_EXFUN(getusershell, (void));
 char    _EXFUN(*getwd, (char *__buf ));
 int	_EXFUN(iruserok, (unsigned long raddr, int superuser, const char *ruser, const char *luser));
 #endif
 int     _EXFUN(isatty, (int __fildes ));
+#if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(lchown, (const char *__path, uid_t __owner, gid_t __group ));
+#endif
 int     _EXFUN(link, (const char *__path1, const char *__path2 ));
 int	_EXFUN(nice, (int __nice_value ));
+#if !defined(__INSIDE_CYGWIN__)
 off_t   _EXFUN(lseek, (int __fildes, off_t __offset, int __whence ));
+#endif
 long    _EXFUN(pathconf, (const char *__path, int __name ));
 int     _EXFUN(pause, (void ));
 #ifdef __CYGWIN__
@@ -96,22 +108,26 @@ int     _EXFUN(rmdir, (const char *__path ));
 int	_EXFUN(ruserok, (const char *rhost, int superuser, const char *ruser, const char *luser));
 #endif
 void *  _EXFUN(sbrk,  (ptrdiff_t __incr));
+#if !defined(__INSIDE_CYGWIN__)
 #if defined(__CYGWIN__)
 int     _EXFUN(setegid, (gid_t __gid ));
 int     _EXFUN(seteuid, (uid_t __uid ));
 #endif
 int     _EXFUN(setgid, (gid_t __gid ));
+#endif
 #if defined(__CYGWIN__)
 int	_EXFUN(setgroups, (int ngroups, const gid_t *grouplist ));
 #endif
 int     _EXFUN(setpgid, (pid_t __pid, pid_t __pgid ));
 int     _EXFUN(setpgrp, (void ));
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) && !defined(__INSIDE_CYGWIN__)
 int	_EXFUN(setregid, (gid_t __rgid, gid_t __egid));
 int	_EXFUN(setreuid, (uid_t __ruid, uid_t __euid));
 #endif
 pid_t   _EXFUN(setsid, (void ));
+#if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(setuid, (uid_t __uid ));
+#endif
 #if defined(__CYGWIN__)
 void	_EXFUN(setusershell, (void));
 #endif
@@ -161,8 +177,10 @@ int	_EXFUN(getdtablesize, (void));
 int	_EXFUN(setdtablesize, (int));
 useconds_t _EXFUN(ualarm, (useconds_t __useconds, useconds_t __interval));
 unsigned _EXFUN(usleep, (unsigned int __useconds));
+#if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(ftruncate, (int __fd, off_t __length));
 int     _EXFUN(truncate, (const char *, off_t __length));
+#endif
 #if !(defined  (_WINSOCK_H) || defined (__USE_W32_SOCKETS))
 /* winsock[2].h defines as __stdcall, and with int as 2nd arg */
  int	_EXFUN(gethostname, (char *__name, size_t __len));

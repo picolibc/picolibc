@@ -57,8 +57,10 @@ int closedir (DIR *);
 int dirfd (DIR *);
 
 #ifndef _POSIX_SOURCE
+#ifndef __INSIDE_CYGWIN__
 off_t telldir (DIR *);
 void seekdir (DIR *, off_t loc);
+#endif
 
 int scandir (const char *__dir,
 	     struct dirent ***__namelist,

@@ -1,3 +1,11 @@
+2003-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/pwd.h: Add guards to avoid type clashes when compiling
+	Cygwin.
+	* libc/include/sys/stat.h: Ditto.
+	* libc/include/sys/unistd.h: Ditto.
+	* libc/sys/cygwin/sys/dirent.h: Ditto.
+
 2003-03-07  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/sys/unistd.h: Guard getopt.h call to force only
