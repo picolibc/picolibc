@@ -53,6 +53,7 @@ struct wincaps
   unsigned pty_needs_alloc_console			: 1;
   unsigned has_terminal_services			: 1;
   unsigned has_switch_to_thread				: 1;
+  unsigned cant_debug_dll_entry				: 1;
 };
 
 class wincapc
@@ -110,6 +111,7 @@ public:
   bool  IMPLEMENT (pty_needs_alloc_console)
   bool  IMPLEMENT (has_terminal_services)
   bool  IMPLEMENT (has_switch_to_thread)
+  bool	IMPLEMENT (cant_debug_dll_entry)
 
 #undef IMPLEMENT
 };

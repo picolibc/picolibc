@@ -25,6 +25,7 @@ program_transform_name:=@program_transform_name@
 exec_prefix:=@exec_prefix@
 bindir:=@bindir@
 libdir:=@libdir@
+mandir:=@mandir@
 ifeq ($(target_alias),$(host_alias))
 ifeq ($(build_alias),$(host_alias))
 tooldir:=$(exec_prefix)
@@ -298,16 +299,16 @@ install-headers:
 install-man:
 	cd $(srcdir); \
 	for i in `find . -type f -name '*.2'`; do \
-	    $(INSTALL_DATA) $$i $(tooldir)/man/man2/`basename $$i` ; \
+	    $(INSTALL_DATA) $$i $(mandir)/man2/`basename $$i` ; \
 	done; \
 	for i in `find . -type f -name '*.3'`; do \
-	    $(INSTALL_DATA) $$i $(tooldir)/man/man3/`basename $$i` ; \
+	    $(INSTALL_DATA) $$i $(mandir)/man3/`basename $$i` ; \
 	done; \
 	for i in `find . -type f -name '*.5'`; do \
-	    $(INSTALL_DATA) $$i $(tooldir)/man/man5/`basename $$i` ; \
+	    $(INSTALL_DATA) $$i $(mandir)/man5/`basename $$i` ; \
 	done; \
 	for i in `find . -type f -name '*.7'`; do \
-	    $(INSTALL_DATA) $$i $(tooldir)/man/man7/`basename $$i` ; \
+	    $(INSTALL_DATA) $$i $(mandir)/man7/`basename $$i` ; \
 	done
 
 install_target:

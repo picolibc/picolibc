@@ -212,6 +212,11 @@ setacl (const char *file, int nentries, __aclent32_t *aclbufp)
       __seterrno ();
       return -1;
     }
+  if (!sd_ret.realloc (sd_size))
+    {
+      set_errno (ENOMEM);
+      return -1;
+    }
   if (!MakeSelfRelativeSD (&sd, sd_ret, &sd_size))
     {
       __seterrno ();
