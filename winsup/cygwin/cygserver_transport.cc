@@ -17,11 +17,8 @@
 #include "winsup.h"
 #endif
 
-#include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <netdb.h>
+
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver_transport_pipes.h"
 #include "cygwin/cygserver_transport_sockets.h"
@@ -36,46 +33,6 @@ class transport_layer_base *create_server_transport()
   else
     temp = new transport_layer_sockets ();
   return temp;
-}
-
-
-transport_layer_base::transport_layer_base ()
-{
-  /* should we throw an error of some sort ? */
-}
-
-void
-transport_layer_base::listen ()
-{
-}
-
-class transport_layer_base *
-transport_layer_base::accept ()
-{
-  return NULL;
-}
-
-void
-transport_layer_base::close()
-{
-}
-
-ssize_t
-transport_layer_base::read (char *buf, size_t len)
-{
-  return 0;
-}
-
-ssize_t
-transport_layer_base::write (char *buf, size_t len)
-{
-  return 0;
-}
-
-bool
-transport_layer_base::connect ()
-{
-  return false;
 }
 
 void

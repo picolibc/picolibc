@@ -1,5 +1,27 @@
 2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* include/cygwin/cygserver_transport.h
+	(transport_layer_base::transport_layer_base): Remove since it is
+	now redundant.
+	(transport_layer_base::listen): Make a pure virtual method.
+	(transport_layer_base::accept): Ditto.
+	(transport_layer_base::close): Ditto.
+	(transport_layer_base::read): Ditto.
+	(transport_layer_base::write): Ditto.
+	(transport_layer_base::connect): Ditto.
+	* cygserver_transport.cc
+	(transport_layer_base::transport_layer_base): Remove since it is
+	now redundant.
+	(transport_layer_base::listen): Remove since it is now a pure
+	virtual method.
+	(transport_layer_base::accept): Ditto.
+	(transport_layer_base::close): Ditto.
+	(transport_layer_base::read): Ditto.
+	(transport_layer_base::write): Ditto.
+	(transport_layer_base::connect): Ditto.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver.cc (check_and_dup_handle): Only use security code if
 	running on NT, i.e. if wincap.has_security().
 	(client_request_attach_tty::serve): Add check for has_security().
