@@ -462,7 +462,7 @@ format_proc_stat (char *destbuf, size_t maxsize)
 
   char *eobuf = destbuf;
   if (!wincap.is_winnt ())
-    eobuf += __small_sprintf (destbuf, "cpu %U %U %U %U\n", 0, 0, 0, 0);
+    eobuf += __small_sprintf (destbuf, "cpu %U %U %U %U\n", 0ULL, 0ULL, 0ULL, 0ULL);
   else
     {
       NTSTATUS ret;

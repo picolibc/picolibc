@@ -1,6 +1,7 @@
 2003-07-09  Christopher Faylor  <cgf@redhat.com>
 
-	* include/cygwin/version.h: Bump DLL minor number to 1.
+	* fhandler_proc.cc (format_proc_stat): Use correctly sized constants
+	for filling in zeros on 98.
 
 2003-07-09  Christopher Faylor  <cgf@redhat.com>
 
@@ -2804,4 +2805,3 @@
 
 	* passwd.cc (getpwuid_r32): Add uid/gid fields to size check
 	calculation.
-
