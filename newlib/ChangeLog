@@ -1,3 +1,8 @@
+2002-02-19  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configure.host (newlib_cflags): When host is in m68* add
+	-DCOMPACT_CTYPE.
+
 2002-02-15  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/include/sys/config.h: Add definitions for

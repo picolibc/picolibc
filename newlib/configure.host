@@ -121,6 +121,7 @@ case "${host_cpu}" in
 	;;
   m68*)
 	machine_dir=m68k
+	newlib_cflags="${newlib_cflags} -DCOMPACT_CTYPE"
 	;;
   m88k)
 	machine_dir=m88k
