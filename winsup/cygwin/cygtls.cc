@@ -113,9 +113,9 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 	}
       local_clib._current_locale = "C";
       locals.process_logmask = LOG_UPTO (LOG_DEBUG);
-      locals.exitsock = INVALID_SOCKET;
     }
 
+  locals.exitsock = INVALID_SOCKET;
   set_state (false);
   errno_addr = &(local_clib._errno);
 
@@ -154,7 +154,7 @@ _cygtls::remove (DWORD wait)
   debug_printf ("wait %p\n", wait);
   // FIXME: Need some sort of atthreadexit function to allow things like
   // select to control this themselves
-  if (_my_tls.locals.exitsock != INVALID_SOCKET)
+  if (locals.exitsock && locals.exitsock != INVALID_SOCKET)
     closesocket (locals.exitsock);
   do
     {

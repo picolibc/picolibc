@@ -1,5 +1,11 @@
 2005-03-02  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.cc (_cygtls::init_thread): Move exitsock setting later.  It
+	should always be set.
+	(_cygtls::remove): Detect zero exitsock.  Not quite sure why this is needed.
+
+2005-03-02  Christopher Faylor  <cgf@timesys.com>
+
 	* autoload.cc (LoadDLLprime): Mask error code to low-order 16 bits.
 	(noload): Preserve sign when returning error code.
 
