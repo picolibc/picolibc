@@ -1,3 +1,7 @@
+Mon Jul  9 10:43:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* uinfo.cc (internal_getlogin): Add pointer check.
+
 Mon Jul  9 10:05:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (alloc_sd): Don't set inheritance attribute for

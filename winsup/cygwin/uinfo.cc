@@ -82,10 +82,14 @@ internal_getlogin (cygheap_user &user)
       /* HOMEDRIVE and HOMEPATH are wrong most of the time, too,
 	 after changing user context! */
       sys_mbstowcs (wuser, user.name (), UNLEN + 1);
-      strcat (strcpy (buf, "\\\\"), user.logsrv ());
-      sys_mbstowcs (wlogsrv, buf, INTERNET_MAX_HOST_NAME_LENGTH + 3);
+      wlogsrv[0] = '\0';
+      if (user.logsrv ())
+        {
+	  strcat (strcpy (buf, "\\\\"), user.logsrv ());
+	  sys_mbstowcs (wlogsrv, buf, INTERNET_MAX_HOST_NAME_LENGTH + 3);
+	}
       if (!NetUserGetInfo (NULL, wuser, 3, (LPBYTE *)&ui)
-	  || !NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui))
+	  || (wlogsrv[0] && !NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui)))
 	{
 	  sys_wcstombs (buf, ui->usri3_home_dir, MAX_PATH);
 	  if (!buf[0])
