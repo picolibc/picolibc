@@ -1,3 +1,7 @@
+2001-01-24  Karsten Keil  <kkeil@suse.de>
+
+	* i386.h (i386_optab): Fix swapgs
+
 2001-01-14  Alan Modra  <alan@linuxcare.com.au>
 
 	* hppa.h: Describe new '<' and '>' operand types, and tidy

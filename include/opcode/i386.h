@@ -1304,9 +1304,9 @@ static const template i386_optab[] = {
 {"pswapd",   2, 0x0f0f, 0xbb, Cpu3dnow|Cpu686, FP|Modrm|ImmExt,	{ RegMMX|LongMem, RegMMX, 0 } },
 
 /* AMD extensions. */
-{"syscall",	0,0x0f05, X, CpuK6,	 NoSuf,			{ 0, 0, 0} },
-{"sysret",	0,0x0f07, X, CpuK6,	 lq_Suf|DefaultSize,	{ 0, 0, 0} },
-{"swapgs",	0,0x0f01, 7, Cpu64,	 NoSuf,			{ 0, 0, 0} },
+{"syscall",  0, 0x0f05,    X, CpuK6,	NoSuf,			{ 0, 0, 0} },
+{"sysret",   0, 0x0f07,    X, CpuK6,	lq_Suf|DefaultSize,	{ 0, 0, 0} },
+{"swapgs",   0, 0x0f01, 0xf8, Cpu64,	NoSuf|ImmExt,		{ 0, 0, 0} },
 
 /* sentinel */
 {NULL, 0, 0, 0, 0, 0, { 0, 0, 0} }
