@@ -741,9 +741,12 @@ fhandler_dev_tape::tape_status (struct mtget *get)
 	 || (lasterr == ERROR_BUS_RESET))
     ;
 
+  /* Setting varlen to sizeof DP is by intention, actually! Never set
+     it to sizeof MP which seems to be more correct but results in a
+     ERROR_MORE_DATA error at least on W2K. */
   if ((lasterr) || (lasterr = GetTapeParameters (get_handle (),
 						 GET_TAPE_MEDIA_INFORMATION,
-						 (varlen = sizeof mp, &varlen),
+						 (varlen = sizeof dp, &varlen),
 						 &mp)))
     notape = 1;
 

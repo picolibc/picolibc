@@ -1,3 +1,8 @@
+Fri Jun 15 11:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_tape.cc (fhandler_dev_tape::tape_status): Set size
+	parameter to value expected by GetTapeParameters().
+
 Thu Jun 14 20:19:46 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.cc (fhandler_disk_file::fstat): Properly set executable bits
