@@ -1,3 +1,9 @@
+Tue Jan  9 16:55:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	Patch suggested by René Møller Fonseca <fonseca@mip.sdu.dk>
+	* include/sys/socket.h: Change prototype to have 2nd parameter `const'.
+	* net.cc (cygwin_bind): Change 2nd parameter to `const'.
+
 Sun Jan  7 22:59:37 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo.cc (codepage_init): Move function.
@@ -8,7 +14,7 @@ Sun Jan  7 22:59:37 2001  Christopher Faylor <cgf@cygnus.com>
 	* sigproc.cc (wait_sig): Ditto.
 	* winsup.h: Eliminate global declaration of codepage_init.
 
-Thu Jan  5  9:33:00  2001  Corinna Vinschen <corina@vinschen.de>
+Thu Jan  5  9:33:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* resource.cc (getrlimit): Set errno on EFAULT instead of returning
 	it.

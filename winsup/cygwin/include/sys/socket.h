@@ -17,7 +17,7 @@ extern "C"
 
 #ifndef __INSIDE_CYGWIN_NET__
   int accept (int, struct sockaddr *__peer, int *);
-  int bind (int, struct sockaddr *__my_addr, int __addrlen);
+  int bind (int, const struct sockaddr *__my_addr, int __addrlen);
   int connect (int, const struct sockaddr *, int);
   int getpeername (int, struct sockaddr *__peer, int *);
   int getsockname (int, struct sockaddr *__addr, int *);
