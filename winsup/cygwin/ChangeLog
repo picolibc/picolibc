@@ -1,3 +1,10 @@
+2003-10-28  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* path.cc (dot_special_chars): New global variable.
+	(special_name): Make files ending in "." special.
+	(fnunmunge): Allow encoded ".".
+	(mount_item::fnmunge): Handle trailing ".".
+
 2003-10-28  Christopher Faylor  <cgf@redhat.com>
 
 	* include/stdint.h: Duplicate below effort for rest of *64_*.

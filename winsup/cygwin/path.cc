@@ -1141,7 +1141,8 @@ set_flags (unsigned *flags, unsigned val)
     }
 }
 
-static char special_chars[] =
+static char dot_special_chars[] =
+    "."
     "\001" "\002" "\003" "\004" "\005" "\006" "\007" "\010"
     "\011" "\012" "\013" "\014" "\015" "\016" "\017" "\020"
     "\021" "\022" "\023" "\024" "\025" "\026" "\027" "\030"
@@ -1151,6 +1152,7 @@ static char special_chars[] =
     "I"    "J"    "K"    "L"    "M"    "N"    "O"    "P"
     "Q"    "R"    "S"    "T"    "U"    "V"    "W"    "X"
     "Y"    "Z";
+static char *special_chars = dot_special_chars + 1;
 static char special_introducers[] =
     "anpcl";
 
@@ -1177,6 +1179,11 @@ special_name (const char *s, int inc = 1)
   s += inc;
   if (strpbrk (s, special_chars))
     return !strncasematch (s, "%2f", 3);
+
+  if (strcasematch (s, ".") || strcasematch (s, ".."))
+    return false;
+  if (s[strlen (s)-1] == '.')
+    return true;
 
   const char *p;
   if (strcasematch (s, "conin$") || strcasematch (s, "conout$"))
@@ -1212,7 +1219,7 @@ fnunmunge (char *dst, const char *src)
     }
 
   while (*src)
-    if (!(c = special_char (src)))
+    if (!(c = special_char (src, dot_special_chars)))
       *dst++ = *src++;
     else
       {
@@ -1243,6 +1250,12 @@ mount_item::fnmunge (char *dst, const char *src)
 	  *d++ = *src++;
 	else
 	  d += __small_sprintf (d, "%%%02x", (unsigned char) *src++);
+
+      if (*--d != '.')
+	d++;
+      else
+	d += __small_sprintf (d, "%%%02x", (unsigned char) '.');
+
       *d = *src;
     }
 
