@@ -1,3 +1,7 @@
+Mon 16 Jul 2001 15:21:00  Corinna Vinschen <corinna@vinschen.de>
+
+	* grp.cc: Add missing Copyright date 2001.
+
 Mon 16 Jul 2001 00:11:00  Corinna Vinschen <corinna@vinschen.de>
 
 	Change well_known_admin_sid to well_known_admins_sid throughout.
