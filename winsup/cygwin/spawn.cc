@@ -480,17 +480,31 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	  else
 	    {
 	      one_line.add ("\"", 1);
+	      /* Handle embedded special characters " and \.
+		 A " is always preceded by a \.
+		 A \ is not special unless it precedes a ".  If it does,
+		 then all preceding \'s must be doubled to avoid having
+		 the Windows command line parser interpret the \ as quoting
+		 the ".  This rule applies to a string of \'s before the end
+		 of the string, since cygwin/windows uses a " to delimit the
+		 argument. */
 	      for (; (p = strpbrk (a, "\"\\")); a = ++p)
 		{
 		  one_line.add (a, p - a);
-		  if (*p == '\\' && p[1] == '\\')
+		  /* Find length of string of backslashes */
+		  int n = strspn (p, "\\");
+		  if (!n)
+		    one_line.add ("\\\"", 2);	/* No backslashes, so it must be a ".
+						   The " has to be protected with a backslash. */
+		  else
 		    {
-		      one_line.add ("\\\\\\", 3);
-		      p++;
+		      one_line.add (p, n);	/* Add the run of backslashes */
+		      /* Need to double up all of the preceding
+			 backslashes if they precede a quote or EOS. */
+		      if (!p[n] || p[n] == '"')
+			one_line.add (p, n);
+		      p += n - 1;		/* Point to last backslash */
 		    }
-		  else if ((*p == '\\' && p[1] == '"') || *p == '"')
-		    one_line.add ("\\", 1);
-		  one_line.add (p, 1);
 		}
 	      if (*a)
 		one_line.add (a);

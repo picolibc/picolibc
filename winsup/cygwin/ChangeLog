@@ -1,3 +1,8 @@
+Mon Nov 20 17:04:43 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (spawn_guts): Quoting was still wrong.  Keep trying to
+	fix it.
+
 Mon Nov 20 14:26:38 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* spawn.cc (spawn_guts): YA tweak for dealing with arcane rules of
