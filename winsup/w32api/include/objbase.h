@@ -92,7 +92,7 @@ WINOLEAPI_(DWORD) CoGetCurrentProcess(void);
 WINOLEAPI CoRegisterMallocSpy(LPMALLOCSPY);
 WINOLEAPI CoRevokeMallocSpy(void);
 WINOLEAPI CoCreateStandardMalloc(DWORD,IMalloc**);
-#if DBG == 1
+#ifdef DBG
 WINOLEAPI_(ULONG) DebugCoGetRpcFault(void);
 WINOLEAPI_(void) DebugCoSetRpcFault(ULONG);
 #endif

@@ -1,5 +1,20 @@
 2004-01-01  Filip Navara  <xnavara@volny.cz>
 
+	* include/objbase.h:  Don't care about value of DBG define.
+	* include/objidl.h: Add some COBJMACROS.
+	* include/ocidl.h: Ditto.
+	* include/oleidl.h: Ditto.
+	* include/servprov.h: Ditto.
+	* include/shlobj.h: Ditto.
+	* include/shlobj.h (IContextMenu2): Correct parent in
+	DECLARE_INTERFACE.
+	* include/oleidl.h (IOleCache, IOleCache2, IOleCacheControl):
+	Define interfaces.
+	* include/setupapi.h (SetupGetLineTextA): Correct prototype.
+	Add new constants for _SETUPAPI_VER >= 0x501.
+
+2004-01-01  Filip Navara  <xnavara@volny.cz>
+
 	* include/winnt.h (NtCurrentTeb): Add inline definition.
 
 2004-01-01  Martin Fuchs  <martin-fuchs@gmx.net>

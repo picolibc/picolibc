@@ -110,6 +110,19 @@ DECLARE_INTERFACE_(IOleControlSite,IUnknown)
 	STDMETHOD(ShowPropertyFrame)(THIS) PURE;
 };
 
+#ifdef COBJMACROS
+#define IOleControlSite_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IOleControlSite_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IOleControlSite_Release(T) (T)->lpVtbl->Release(T)
+#define IOleControlSite_OnControlInfoChanged(T) (T)->lpVtbl->OnControlInfoChanged(T)
+#define IOleControlSite_LockInPlaceActive(T,a) (T)->lpVtbl->LockInPlaceActive(T,a)
+#define IOleControlSite_GetExtendedControl(T,a) (T)->lpVtbl->GetExtendedControl(T,a)
+#define IOleControlSite_TransformCoords(T,a,b,c) (T)->lpVtbl->TransformCoords(T,a,b,c)
+#define IOleControlSite_TranslateAccelerator(T,a,b) (T)->lpVtbl->TranslateAccelerator(T,a,b)
+#define IOleControlSite_OnFocus(T,a) (T)->lpVtbl->OnFocus(T,a)
+#define IOleControlSite_ShowPropertyFrame(T) (T)->lpVtbl->ShowPropertyFrame(T)
+#endif
+
 EXTERN_C const IID IID_ISimpleFrameSite;
 #undef INTERFACE
 #define INTERFACE ISimpleFrameSite
@@ -159,6 +172,16 @@ DECLARE_INTERFACE_(IPersistPropertyBag,IPersist)
 	STDMETHOD(Save)(THIS_ LPPROPERTYBAG,BOOL,BOOL) PURE;
 };
 
+#ifdef COBJMACROS
+#define IPersistPropertyBag_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IPersistPropertyBag_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IPersistPropertyBag_Release(T) (T)->lpVtbl->Release(T)
+#define IPersistPropertyBag_GetClassID(T,a) (T)->lpVtbl->GetClassID(T,a)
+#define IPersistPropertyBag_InitNew(T) (T)->lpVtbl->InitNew(T)
+#define IPersistPropertyBag_Load(T,a,b) (T)->lpVtbl->Load(T,a,b)
+#define IPersistPropertyBag_Save(T,a,b,c) (T)->lpVtbl->Save(T,a,b,c)
+#endif
+
 EXTERN_C const IID IID_IPersistStreamInit;
 #undef INTERFACE
 #define INTERFACE IPersistStreamInit
@@ -203,6 +226,14 @@ DECLARE_INTERFACE_(IPropertyNotifySink,IUnknown)
 	STDMETHOD(OnRequestEdit)(THIS_ DISPID) PURE;
 };
 
+#ifdef COBJMACROS
+#define IPropertyNotifySink_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IPropertyNotifySink_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IPropertyNotifySink_Release(T) (T)->lpVtbl->Release(T)
+#define IPropertyNotifySink_OnChanged(T,a) (T)->lpVtbl->OnChanged(T,a)
+#define IPropertyNotifySink_OnRequestEdit(T,a) (T)->lpVtbl->OnRequestEdit(T,a)
+#endif
+
 EXTERN_C const IID IID_IProvideClassInfo;
 #undef INTERFACE
 #define INTERFACE IProvideClassInfo
@@ -238,6 +269,14 @@ DECLARE_INTERFACE_(IConnectionPointContainer,IUnknown)
 	STDMETHOD(FindConnectionPoint)(THIS_ REFIID,LPCONNECTIONPOINT*) PURE;
 };
 
+#ifdef COBJMACROS
+#define IConnectionPointContainer_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IConnectionPointContainer_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IConnectionPointContainer_Release(T) (T)->lpVtbl->Release(T)
+#define IConnectionPointContainer_EnumConnectionPoints(T,a) (T)->lpVtbl->EnumConnectionPoints(T,a)
+#define IConnectionPointContainer_FindConnectionPoint(T,a,b) (T)->lpVtbl->FindConnectionPoint(T,a,b)
+#endif
+
 EXTERN_C const IID IID_IEnumConnectionPoints;
 #undef INTERFACE
 #define INTERFACE IEnumConnectionPoints
@@ -267,6 +306,17 @@ DECLARE_INTERFACE_(IConnectionPoint,IUnknown)
 	STDMETHOD(EnumConnections)(THIS_ LPENUMCONNECTIONS*) PURE;
 };
 
+#ifdef COBJMACROS
+#define IConnectionPoint_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IConnectionPoint_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IConnectionPoint_Release(T) (T)->lpVtbl->Release(T)
+#define IConnectionPoint_GetConnectionInterface(T,a) (T)->lpVtbl->GetConnectionInterface(T,a)
+#define IConnectionPoint_GetConnectionPointContainer(T,a) (T)->lpVtbl->GetConnectionPointContainer(T,a)
+#define IConnectionPoint_Advise(T,a,b) (T)->lpVtbl->Advise(T,a,b)
+#define IConnectionPoint_Unadvise(T,a) (T)->lpVtbl->Unadvise(T,a)
+#define IConnectionPoint_EnumConnections(T,a) (T)->lpVtbl->EnumConnections(T,a)
+#endif
+
 EXTERN_C const IID IID_IEnumConnections;
 #undef INTERFACE
 #define INTERFACE IEnumConnections
@@ -280,6 +330,16 @@ DECLARE_INTERFACE_(IEnumConnections,IUnknown)
 	STDMETHOD(Reset)(THIS) PURE;
 	STDMETHOD(Clone)(THIS_ LPENUMCONNECTIONS*) PURE;
 };
+
+#ifdef COBJMACROS
+#define IEnumConnections_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IEnumConnections_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IEnumConnections_Release(T) (T)->lpVtbl->Release(T)
+#define IEnumConnections_Next(T,a,b,c) (T)->lpVtbl->Next(T,a,b,c)
+#define IEnumConnections_Skip(T,a) (T)->lpVtbl->Skip(T,a)
+#define IEnumConnections_Reset(T) (T)->lpVtbl->Reset(T)
+#define IEnumConnections_Clone(T,a) (T)->lpVtbl->Clone(T,a)
+#endif
 
 EXTERN_C const IID IID_IClassFactory2;
 #undef INTERFACE

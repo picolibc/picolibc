@@ -20,6 +20,13 @@ DECLARE_INTERFACE_(IServiceProvider,IUnknown)
 	STDMETHOD(QueryService)(THIS_ REFGUID,REFIID,void**) PURE;
 };
 
+#ifdef COBJMACROS
+#define IServiceProvider_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IServiceProvider_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IServiceProvider_Release(T) (T)->lpVtbl->Release(T)
+#define IServiceProvider_QueryService(T,a,b,c) (T)->lpVtbl->QueryService(T,a,b,c)
+#endif
+
 #ifdef __cplusplus
 }
 #endif

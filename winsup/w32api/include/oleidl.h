@@ -27,6 +27,9 @@ typedef interface IOleInPlaceFrame *LPOLEINPLACEFRAME;
 typedef interface IOleAdviseHolder *LPOLEADVISEHOLDER;
 typedef interface IViewObject *LPVIEWOBJECT;
 typedef interface IViewObject2 *LPVIEWOBJECT2;
+typedef interface IOleCache *LPOLECACHE;
+typedef interface IOleCache2 *LPOLECACHE2;
+typedef interface IOleCacheControl *LPOLECACHECONTROL;
 
 typedef enum tagOLEWHICHMK {
 	OLEWHICHMK_CONTAINER=1,
@@ -140,6 +143,18 @@ DECLARE_INTERFACE_(IOleClientSite,IUnknown)
 	STDMETHOD(RequestNewObjectLayout)(THIS) PURE;
 };
 
+#ifdef COBJMACROS
+#define IOleClientSite_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IOleClientSite_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IOleClientSite_Release(T) (T)->lpVtbl->Release(T)
+#define IOleClientSite_SaveObject(T) (T)->lpVtbl->SaveObject(T)
+#define IOleClientSite_GetMoniker(T,a,b,c) (T)->lpVtbl->GetMoniker(T,a,b,c)
+#define IOleClientSite_GetContainer(T,a) (T)->lpVtbl->GetContainer(T,a)
+#define IOleClientSite_ShowObject(T) (T)->lpVtbl->ShowObject(T)
+#define IOleClientSite_OnShowWindow(T,a) (T)->lpVtbl->OnShowWindow(T,a)
+#define IOleClientSite_RequestNewObjectLayout(T) (T)->lpVtbl->RequestNewObjectLayout(T)
+#endif
+
 EXTERN_C const IID IID_IOleObject;
 #undef INTERFACE
 #define INTERFACE IOleObject
@@ -182,6 +197,14 @@ DECLARE_INTERFACE_(IOleWindow,IUnknown)
 	STDMETHOD(GetWindow)(THIS_ HWND*) PURE;
 	STDMETHOD(ContextSensitiveHelp)(THIS_ BOOL) PURE;
 };
+
+#ifdef COBJMACROS
+#define IOleWindow_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IOleWindow_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IOleWindow_Release(T) (T)->lpVtbl->Release(T)
+#define IOleWindow_GetWindow(T,a) (T)->lpVtbl->GetWindow(T,a)
+#define IOleWindow_ContextSensitiveHelp(T,a) (T)->lpVtbl->ContextSensitiveHelp(T,a)
+#endif
 
 EXTERN_C const IID IID_IOleInPlaceUIWindow;
 #undef INTERFACE
@@ -254,6 +277,24 @@ DECLARE_INTERFACE_(IOleInPlaceFrame,IOleInPlaceUIWindow)
 	STDMETHOD(TranslateAccelerator)(THIS_ LPMSG,WORD) PURE;
 };
 
+#ifdef COBJMACROS
+#define IOleInPlaceFrame_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IOleInPlaceFrame_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IOleInPlaceFrame_Release(T) (T)->lpVtbl->Release(T)
+#define IOleInPlaceFrame_GetWindow(T,a) (T)->lpVtbl->GetWindow(T,a)
+#define IOleInPlaceFrame_ContextSensitiveHelp(T,a) (T)->lpVtbl->ContextSensitiveHelp(T,a)
+#define IOleInPlaceFrame_GetBorder(T,a) (T)->lpVtbl->GetBorder(T,a)
+#define IOleInPlaceFrame_RequestBorderSpace(T,a) (T)->lpVtbl->RequestBorderSpace(T,a)
+#define IOleInPlaceFrame_SetBorderSpace(T,a) (T)->lpVtbl->SetBorderSpace(T,a)
+#define IOleInPlaceFrame_SetActiveObject(T,a,b) (T)->lpVtbl->SetActiveObject(T,a,b)
+#define IOleInPlaceFrame_InsertMenus(T,a,b) (T)->lpVtbl->InsertMenus(T,a,b)
+#define IOleInPlaceFrame_SetMenu(T,a,b,c) (T)->lpVtbl->SetMenu(T,a,b,c)
+#define IOleInPlaceFrame_RemoveMenus(T,a) (T)->lpVtbl->RemoveMenus(T,a)
+#define IOleInPlaceFrame_SetStatusText(T,a) (T)->lpVtbl->SetStatusText(T,a)
+#define IOleInPlaceFrame_EnableModeless(T,a) (T)->lpVtbl->EnableModeless(T,a)
+#define IOleInPlaceFrame_TranslateAccelerator(T,a,b) (T)->lpVtbl->TranslateAccelerator(T,a,b)
+#endif
+
 EXTERN_C const IID IID_IOleInPlaceSite;
 #undef INTERFACE
 #define INTERFACE IOleInPlaceSite
@@ -291,6 +332,18 @@ DECLARE_INTERFACE_(IOleAdviseHolder,IUnknown)
 	STDMETHOD(SendOnSave)(THIS) PURE;
 	STDMETHOD(SendOnClose)(THIS) PURE;
 };
+
+#ifdef COBJMACROS
+#define IOleAdviseHolder_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IOleAdviseHolder_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IOleAdviseHolder_Release(T) (T)->lpVtbl->Release(T)
+#define IOleAdviseHolder_Advise(T,a,b) (T)->lpVtbl->Advise(T,a,b)
+#define IOleAdviseHolder_Unadvise(T,a) (T)->lpVtbl->Unadvise(T,a)
+#define IOleAdviseHolder_EnumAdvise(T,a) (T)->lpVtbl->EnumAdvise(T,a)
+#define IOleAdviseHolder_SendOnRename(T,a) (T)->lpVtbl->SendOnRename(T,a)
+#define IOleAdviseHolder_SendOnSave(T) (T)->lpVtbl->SendOnSave(T)
+#define IOleAdviseHolder_SendOnClose(T) (T)->lpVtbl->SendOnClose(T)
+#endif
 
 EXTERN_C const IID IID_IDropSource;
 #undef INTERFACE
@@ -335,6 +388,18 @@ DECLARE_INTERFACE_(IViewObject,IUnknown)
 	STDMETHOD(GetAdvise)(THIS_ PDWORD,PDWORD,IAdviseSink**) PURE;
 };
 
+#ifdef COBJMACROS
+#define IViewObject_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IViewObject_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IViewObject_Release(T) (T)->lpVtbl->Release(T)
+#define IViewObject_Draw(T,a,b,c,d,e,f,g,h,i,j) (T)->lpVtbl->Draw(T,a,b,c,d,e,f,g,h,i,j)
+#define IViewObject_GetColorSet(T,a,b,c,d,e,f) (T)->lpVtbl->GetColorSet(T,a,b,c,d,e,f)
+#define IViewObject_Freeze(T,a,b,c,d) (T)->lpVtbl->Freeze(T,a,b,c,d)
+#define IViewObject_Unfreeze(T,a) (T)->lpVtbl->Unfreeze(T,a)
+#define IViewObject_SetAdvise(T,a,b,c) (T)->lpVtbl->SetAdvise(T,a,b,c)
+#define IViewObject_GetAdvise(T,a,b,c) (T)->lpVtbl->GetAdvise(T,a,b,c)
+#endif
+
 EXTERN_C const IID IID_IViewObject2;
 #undef INTERFACE
 #define INTERFACE IViewObject2
@@ -352,6 +417,86 @@ DECLARE_INTERFACE_(IViewObject2,IViewObject)
 	STDMETHOD(GetExtent)(THIS_ DWORD,LONG,DVTARGETDEVICE*,LPSIZEL) PURE;
 };
 
+#ifdef COBJMACROS
+#define IViewObject2_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IViewObject2_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IViewObject2_Release(T) (T)->lpVtbl->Release(T)
+#define IViewObject2_Draw(T,a,b,c,d,e,f,g,h,i,j) (T)->lpVtbl->Draw(T,a,b,c,d,e,f,g,h,i,j)
+#define IViewObject2_GetColorSet(T,a,b,c,d,e,f) (T)->lpVtbl->GetColorSet(T,a,b,c,d,e,f)
+#define IViewObject2_Freeze(T,a,b,c,d) (T)->lpVtbl->Freeze(T,a,b,c,d)
+#define IViewObject2_Unfreeze(T,a) (T)->lpVtbl->Unfreeze(T,a)
+#define IViewObject2_SetAdvise(T,a,b,c) (T)->lpVtbl->SetAdvise(T,a,b,c)
+#define IViewObject2_GetAdvise(T,a,b,c) (T)->lpVtbl->GetAdvise(T,a,b,c)
+#define IViewObject2_GetExtent(T,a,b,c,d) (T)->lpVtbl->GetExtent(T,a,b,c,d)
+#endif
+
+EXTERN_C const IID IID_IOleCache;
+#undef INTERFACE
+#define INTERFACE IOleCache
+DECLARE_INTERFACE_(IOleCache,IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(Cache)(THIS_ FORMATETC*,DWORD,DWORD*) PURE;
+	STDMETHOD(Uncache)(THIS_ DWORD) PURE; 
+	STDMETHOD(EnumCache)(THIS_ IEnumSTATDATA**); 
+	STDMETHOD(InitCache)(THIS_ LPDATAOBJECT); 
+	STDMETHOD(SetData)(THIS_ FORMATETC*,STGMEDIUM*,BOOL); 
+};
+
+#ifdef COBJMACROS
+#define IOleCache_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IOleCache_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IOleCache_Release(T) (T)->lpVtbl->Release(T)
+#define IOleCache_Cache(T,a,b,c) (T)->lpVtbl->Cache(T,a,b,c)
+#define IOleCache_Uncache(T,a) (T)->lpVtbl->Uncache(T,a)
+#define IOleCache_EnumCache(T,a) (T)->lpVtbl->EnumCache(T,a)
+#define IOleCache_InitCache(T,a) (T)->lpVtbl->InitCache(T,a)
+#define IOleCache_SetData(T,a,b,c) (T)->lpVtbl->SetData(T,a,b,c)
+#endif
+
+EXTERN_C const IID IID_IOleCache2;
+#undef INTERFACE
+#define INTERFACE IOleCache2
+DECLARE_INTERFACE_(IOleCache2,IOleCache)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(Cache)(THIS_ FORMATETC*,DWORD,DWORD*) PURE;
+	STDMETHOD(Uncache)(THIS_ DWORD) PURE; 
+	STDMETHOD(EnumCache)(THIS_ IEnumSTATDATA**) PURE; 
+	STDMETHOD(InitCache)(THIS_ LPDATAOBJECT) PURE; 
+	STDMETHOD(SetData)(THIS_ FORMATETC*,STGMEDIUM*,BOOL) PURE; 
+	STDMETHOD(UpdateCache)(THIS_ LPDATAOBJECT,DWORD,LPVOID) PURE; 
+	STDMETHOD(DiscardCache)(THIS_ DWORD) PURE;
+};
+
+#ifdef COBJMACROS
+#define IOleCache2_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IOleCache2_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IOleCache2_Release(T) (T)->lpVtbl->Release(T)
+#define IOleCache2_Cache(T,a,b,c) (T)->lpVtbl->Cache(T,a,b,c)
+#define IOleCache2_Uncache(T,a) (T)->lpVtbl->Uncache(T,a)
+#define IOleCache2_EnumCache(T,a) (T)->lpVtbl->EnumCache(T,a)
+#define IOleCache2_InitCache(T,a) (T)->lpVtbl->InitCache(T,a)
+#define IOleCache2_SetData(T,a,b,c) (T)->lpVtbl->SetData(T,a,b,c)
+#define IOleCache2_UpdateCache(T,a,b,c) (T)->lpVtbl->UpdateCache(T,a,b,c)
+#define IOleCache2_DiscardCache(T,a) (T)->lpVtbl->DiscardCache(T,a)
+#endif
+
+EXTERN_C const IID IID_IOleCacheControl;
+#undef INTERFACE
+#define INTERFACE IOleCacheControl
+DECLARE_INTERFACE_(IOleCacheControl,IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(OnRun)(THIS_ LPDATAOBJECT) PURE;
+	STDMETHOD(OnStop)(THIS) PURE;
+};
 
 #ifdef __cplusplus
 }

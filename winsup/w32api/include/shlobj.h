@@ -466,9 +466,18 @@ DECLARE_INTERFACE_(IContextMenu,IUnknown)
 };
 typedef IContextMenu *LPCONTEXTMENU;
 
+#ifdef COBJMACROS
+#define IContextMenu_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IContextMenu_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IContextMenu_Release(T) (T)->lpVtbl->Release(T)
+#define IContextMenu_QueryContextMenu(T,a,b,c,d,e) (T)->lpVtbl->QueryContextMenu(T,a,b,c,d,e)
+#define IContextMenu_InvokeCommand(T,a) (T)->lpVtbl->InvokeCommand(T,a)
+#define IContextMenu_GetCommandString(T,a,b,c,d,e) (T)->lpVtbl->GetCommandString(T,a,b,c,d,e)
+#endif
+
 #undef INTERFACE
 #define INTERFACE IContextMenu2
-DECLARE_INTERFACE_(IContextMenu2,IUnknown)
+DECLARE_INTERFACE_(IContextMenu2,IContextMenu)
 {
 	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
 	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
@@ -532,6 +541,16 @@ typedef enum {
 	SHCOLSTATE_HIDDEN = 0x00000100,
 	SHCOLSTATE_PREFER_VARCMP = 0x00000200
 } SHCOLSTATE;
+
+#ifdef COBJMACROS
+#define IContextMenu2_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IContextMenu2_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IContextMenu2_Release(T) (T)->lpVtbl->Release(T)
+#define IContextMenu2_QueryContextMenu(T,a,b,c,d,e) (T)->lpVtbl->QueryContextMenu(T,a,b,c,d,e)
+#define IContextMenu2_InvokeCommand(T,a) (T)->lpVtbl->InvokeCommand(T,a)
+#define IContextMenu2_GetCommandString(T,a,b,c,d,e) (T)->lpVtbl->GetCommandString(T,a,b,c,d,e)
+#define IContextMenu2_HandleMenuMsg(T,a,b,c) (T)->lpVtbl->HandleMenuMsg(T,a,b,c)
+#endif
 
 #undef INTERFACE
 #define INTERFACE IColumnProvider
@@ -685,6 +704,22 @@ DECLARE_INTERFACE_(IShellFolder, IUnknown)
 };
 typedef IShellFolder *LPSHELLFOLDER;
 
+#ifdef COBJMACROS
+#define IShellFolder_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IShellFolder_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IShellFolder_Release(T) (T)->lpVtbl->Release(T)
+#define IShellFolder_ParseDisplayName(T,a,b,c,d,e,f) (T)->lpVtbl->ParseDisplayName(T,a,b,c,d,e,f)
+#define IShellFolder_EnumObjects(T,a,b,c) (T)->lpVtbl->EnumObjects(T,a,b,c)
+#define IShellFolder_BindToObject(T,a,b,c,d) (T)->lpVtbl->BindToObject(T,a,b,c,d)
+#define IShellFolder_BindToStorage(T,a,b,c,d) (T)->lpVtbl->BindToStorage(T,a,b,c,d)
+#define IShellFolder_CompareIDs(T,a,b,c) (T)->lpVtbl->CompareIDs(T,a,b,c)
+#define IShellFolder_CreateViewObject(T,a,b) (T)->lpVtbl->CreateViewObject(T,a,b)
+#define IShellFolder_GetAttributesOf(T,a,b,c) (T)->lpVtbl->GetAttributesOf(T,a,b,c)
+#define IShellFolder_GetUIObjectOf(T,a,b,c,d,e,f) (T)->lpVtbl->GetUIObjectOf(T,a,b,c,d,e,f)
+#define IShellFolder_GetDisplayNameOf(T,a,b,c) (T)->lpVtbl->GetDisplayNameOf(T,a,b,c)
+#define IShellFolder_SetNameOf(T,a,b,c,d,e) (T)->lpVtbl->SetNameOf(T,a,b,c,d,e)
+#endif
+
 #undef INTERFACE
 #define INTERFACE ICopyHook
 DECLARE_INTERFACE_(ICopyHook, IUnknown)
@@ -748,8 +783,8 @@ DECLARE_INTERFACE_(IShellBrowser,IOleWindow)
 	STDMETHOD(InsertMenusSB)(THIS_ HMENU,LPOLEMENUGROUPWIDTHS) PURE;
 	STDMETHOD(SetMenuSB)(THIS_ HMENU,HOLEMENU,HWND) PURE;
 	STDMETHOD(RemoveMenusSB)(THIS_ HMENU) PURE;
-	STDMETHOD(SetStatusTextSB) (THIS_ LPCOLESTR) PURE;
-	STDMETHOD(EnableModelessSB) (THIS_ BOOL	) PURE;
+	STDMETHOD(SetStatusTextSB)(THIS_ LPCOLESTR) PURE;
+	STDMETHOD(EnableModelessSB)(THIS_ BOOL) PURE;
 	STDMETHOD(TranslateAcceleratorSB) (THIS_ LPMSG,WORD) PURE;
 	STDMETHOD(BrowseObject)(THIS_ LPCITEMIDLIST,UINT) PURE;
 	STDMETHOD(GetViewStateStream)(THIS_ DWORD,LPSTREAM*) PURE;
@@ -759,6 +794,27 @@ DECLARE_INTERFACE_(IShellBrowser,IOleWindow)
 	STDMETHOD(OnViewWindowActive)(THIS_ LPSHELLVIEW) PURE;
 	STDMETHOD(SetToolbarItems)(THIS_ LPTBBUTTON,UINT,UINT) PURE;
 };
+
+#ifdef COBJMACROS
+#define IShellBrowser_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IShellBrowser_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IShellBrowser_Release(T) (T)->lpVtbl->Release(T)
+#define IShellBrowser_GetWindow(T,a) (T)->lpVtbl->GetWindow(T,a)
+#define IShellBrowser_ContextSensitiveHelp(T,a) (T)->lpVtbl->ContextSensitiveHelp(T,a)
+#define IShellBrowser_InsertMenusSB(T,a,b) (T)->lpVtbl->InsertMenusSB(T,a,b)
+#define IShellBrowser_SetMenuSB(T,a,b,c) (T)->lpVtbl->SetMenuSB(T,a,b,c)
+#define IShellBrowser_RemoveMenusSB(T,a) (T)->lpVtbl->RemoveMenusSB(T,a)
+#define IShellBrowser_SetStatusTextSB(T,a) (T)->lpVtbl->SetStatusTextSB(T,a)
+#define IShellBrowser_EnableModelessSB(T,a) (T)->lpVtbl->EnableModelessSB(T,a)
+#define IShellBrowser_TranslateAcceleratorSB(T,a,b) (T)->lpVtbl->TranslateAcceleratorSB(T,a,b)
+#define IShellBrowser_BrowseObject(T,a,b) (T)->lpVtbl->BrowseObject(T,a,b)
+#define IShellBrowser_GetViewStateStream(T,a,b) (T)->lpVtbl->GetViewStateStream(T,a,b)
+#define IShellBrowser_GetControlWindow(T,a,b) (T)->lpVtbl->GetControlWindow(T,a,b)
+#define IShellBrowser_SendControlMsg(T,a,b,c,d,e) (T)->lpVtbl->SendControlMsg(T,a,b,c,d,e)
+#define IShellBrowser_QueryActiveShellView(T,a) (T)->lpVtbl->QueryActiveShellView(T,a)
+#define IShellBrowser_OnViewWindowActive(T,a) (T)->lpVtbl->OnViewWindowActive(T,a)
+#define IShellBrowser_SetToolbarItems(T,a,b,c) (T)->lpVtbl->SetToolbarItems(T,a,b,c)
+#endif
 
 #undef INTERFACE
 #define INTERFACE IShellView

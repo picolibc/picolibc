@@ -1702,6 +1702,10 @@ HRESULT STDMETHODCALLTYPE ILockBytes_WriteAt_Stub(ILockBytes*,ULARGE_INTEGER,BYT
 #define IPSFactoryBuffer_Release(This)	(This)->lpVtbl->Release(This)
 #define IPSFactoryBuffer_CreateProxy(T,U,r,P,p) (T)->lpVtbl->CreateProxy(T,U,r,P,p)
 #define IPSFactoryBuffer_CreateStub(T,r,U,p) (T)->lpVtbl->CreateStub(T,r,U,p)
+#define IClassActivator_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IClassActivator_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IClassActivator_Release(T) (T)->lpVtbl->Release(T)
+#define IClassActivator_GetClassObject(T,a,b,c,d,e) (T)->lpVtbl->GetClassObject(T,a,b,c,d,e)
 #endif /* COBJMACROS */
 
 #endif
