@@ -1,5 +1,10 @@
 2002-07-15  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * libc/sys/linux/callocr.c: Fix so code references
+        calloc.
+
+2002-07-15  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/sys/linux/Makefile.am: Add new files.
         * libc/sys/linux/Makefile.in: Regenerated.
         * libc/sys/linux/bp-sym.h: Moved to include directory.
