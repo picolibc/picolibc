@@ -1,5 +1,9 @@
 2003-11-28  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/signal.h: New file.
+
+2003-11-28  Christopher Faylor  <cgf@redhat.com>
+
 	Eliminate use of sigframe and sigthread throughout.
 	* Makefile.in (DLL_OFILES): Add sigfe.o.  Remove reliance on cygwin.def
 	from cygwin0.dll dependency since dependence on sigfe.o implies that.
