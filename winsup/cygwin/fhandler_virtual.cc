@@ -27,7 +27,8 @@ details. */
 #include <dirent.h>
 
 fhandler_virtual::fhandler_virtual (DWORD devtype):
-  fhandler_base (devtype), filebuf (NULL), bufalloc (-1)
+  fhandler_base (devtype), filebuf (NULL), bufalloc ((size_t) -1),
+  fileid (-1)
 {
 }
 
@@ -89,7 +90,7 @@ __off64_t fhandler_virtual::telldir (DIR * dir)
 }
 
 void
-fhandler_virtual::seekdir (DIR * dir, __off32_t loc)
+fhandler_virtual::seekdir (DIR * dir, __off64_t loc)
 {
   dir->__d_position = loc;
   return;
@@ -109,8 +110,13 @@ fhandler_virtual::closedir (DIR * dir)
 }
 
 __off64_t
-fhandler_virtual::lseek (__off32_t offset, int whence)
+fhandler_virtual::lseek (__off64_t offset, int whence)
 {
+  /*
+   * On Linux, when you lseek within a /proc file,
+   * the contents of the file are updated.
+   */
+  fill_filebuf ();
   switch (whence)
     {
     case SEEK_SET:
@@ -124,7 +130,7 @@ fhandler_virtual::lseek (__off32_t offset, int whence)
       break;
     default:
       set_errno (EINVAL);
-      return (__off32_t) -1;
+      return (__off64_t) -1;
     }
   return position;
 }
@@ -213,4 +219,9 @@ int
 fhandler_virtual::exists (const char *path)
 {
   return 0;
+}
+
+void
+fhandler_virtual::fill_filebuf ()
+{
 }

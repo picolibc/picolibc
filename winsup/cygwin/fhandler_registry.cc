@@ -292,7 +292,7 @@ fhandler_registry::telldir (DIR * dir)
 }
 
 void
-fhandler_registry::seekdir (DIR * dir, __off32_t loc)
+fhandler_registry::seekdir (DIR * dir, __off64_t loc)
 {
   /* Unfortunately cannot simply set __d_position due to transition from sub-keys to
    * values.
@@ -488,6 +488,11 @@ out:
     RegCloseKey (hKey);
   syscall_printf ("%d = fhandler_registry::open (%p, %d)", res, flags, mode);
   return res;
+}
+
+void
+fhandler_registry::fill_filebuf ()
+{
 }
 
 /* Auxillary member function to open registry keys.  */

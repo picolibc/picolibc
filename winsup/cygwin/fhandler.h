@@ -1043,8 +1043,9 @@ class fhandler_virtual : public fhandler_base
 {
  protected:
   char *filebuf;
-  int bufalloc, filesize;
-  __off32_t position;
+  size_t bufalloc, filesize;
+  __off64_t position;
+  int fileid; // unique within each class
  public:
 
   fhandler_virtual (DWORD devtype);
@@ -1053,16 +1054,17 @@ class fhandler_virtual : public fhandler_base
   virtual int exists(const char *path);
   DIR *opendir (path_conv& pc);
   __off64_t telldir (DIR *);
-  void seekdir (DIR *, __off32_t);
+  void seekdir (DIR *, __off64_t);
   void rewinddir (DIR *);
   int closedir (DIR *);
   int write (const void *ptr, size_t len);
   int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
-  __off64_t lseek (__off32_t, int);
+  __off64_t lseek (__off64_t, int);
   int dup (fhandler_base * child);
   int open (path_conv *, int flags, mode_t mode = 0);
   int close (void);
   int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
+  virtual void fill_filebuf ();
 };
 
 class fhandler_proc: public fhandler_virtual
@@ -1076,6 +1078,7 @@ class fhandler_proc: public fhandler_virtual
 
   int open (path_conv *real_path, int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+  void fill_filebuf ();
 };
 
 class fhandler_registry: public fhandler_proc
@@ -1085,23 +1088,29 @@ class fhandler_registry: public fhandler_proc
   int exists(const char *path);
   struct dirent *readdir (DIR *);
   __off64_t telldir (DIR *);
-  void seekdir (DIR *, __off32_t);
+  void seekdir (DIR *, __off64_t);
   void rewinddir (DIR *);
   int closedir (DIR *);
 
   int open (path_conv *real_path, int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
   HKEY open_key(const char *name, REGSAM access = KEY_READ, bool isValue = false);
+  void fill_filebuf ();
 };
 
+struct _pinfo;
 class fhandler_process: public fhandler_proc
 {
+ private:
+  pid_t saved_pid;
+  _pinfo *saved_p;
  public:
   fhandler_process ();
   int exists(const char *path);
   struct dirent *readdir (DIR *);
   int open (path_conv *real_path, int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
+  void fill_filebuf ();
 };
 
 typedef union

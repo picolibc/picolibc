@@ -1,4 +1,47 @@
-2002-05-09  Christopher Faylor  <cgf@redhat.com>
+2002-05-10  Christopher January <chris@atomice.net>
+
+	* autoload.cc: Add dynamic load statements for
+	'ZwQueryInformationProcess' and 'ZwQueryVirtualMemory'.
+	* fhandler.h: Change type of bufalloc and filesize members of
+	fhandler_virtual from int to size_t.  Change type of position member
+	from __off32_t to __off64_t.  Add new fileid member to fhandler_virtual
+	class.  Make seekdir take an __off64_t argument.  Make lseek take an
+	__off64_t argument.  Add fill_filebuf method to fhandler_virtual.  Add
+	fill_filebuf method to fhandler_proc.  Add fill_filebuf method to
+	fhandler_registry.  Add fill_filebuf method to fhandler_process.  Add
+	saved_pid and saved_p members to fhandler_process.
+	* fhandler_proc.cc (proc_listing_array): Add 'loadavg', 'meminfo', and 'stat'.
+	(proc_fhandlers array): Ditto.
+	(fhandler_proc::open): Use fill_filebuf to flesh out the file contents.
+	(fhandler_proc::fill_filebuf): New method.
+	(fhandler_proc::format_proc_meminfo): Ditto.
+	(fhandler_proc::format_proc_stat): Ditto.
+	(fhandler_proc::format_proc_uptime): Ditto.
+	* fhandler_process.cc (process_listing): Add 'stat' and 'statm'.
+	(fhandler_process::fstat): Find the _pinfo structure for the process
+	named in the filename.  Return ENOENT if the process is no longer
+	around.  Set the gid and uid fields of the stat structure.
+	(fhandler_process::open): Store pid and pointer to _pinfo structure in
+	saved_pid and saved_p respectively.  Use fill_filebuf to flesh out file
+	contents.
+	(fhandler_proc::fill_filebuf): New method.
+	(format_process_stat): New function.
+	(format_process_status): Ditto.
+	(format_process_statm): Ditto.
+	(get_process_state): Ditto.
+	(get_mem_values): Ditto.
+	* fhandler_registry.cc (fhandler_registry::seekdir): Change argument
+	type from __off32_t to __off64_t.
+	(fhandler_registry::fill_filebuf): New method.
+	* fhandler_virtual.cc (fhandler_virtual::seekdir): Change argument type
+	from __off32_t to __off64_t.
+	(fhandler_virtual::lseek): Ditto.
+	(fhandler_virtual::fill_filebuf): New method.
+	(fhandler_virtual::fhandler_virtual): Initialise fileid to -1.
+	* wincap.cc: Set flag has_process_io_counters appropriately.
+	* wincap.h: Add flag has_process_io_counters.
+
+2002-05-09 Christopher Faylor <cgf@redhat.com>
 
 	* syscalls.cc (_write): Change error to EBADF if attempt to write to a
 	non-writable fd.

@@ -47,6 +47,7 @@ struct wincaps
   unsigned has_raw_devices				: 1;
   unsigned has_valid_processorlevel			: 1;
   unsigned has_64bit_file_access			: 1;
+  unsigned has_process_io_counters                      : 1;
 };
 
 class wincapc
@@ -99,6 +100,7 @@ public:
   bool  IMPLEMENT (has_raw_devices)
   bool  IMPLEMENT (has_valid_processorlevel)
   bool  IMPLEMENT (has_64bit_file_access)
+  bool  IMPLEMENT (has_process_io_counters)
 
 #undef IMPLEMENT
 };
