@@ -7,6 +7,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 #define WC_DIALOG MAKEINTATOM(0x8002)
 #define FALT	16
 #define FCONTROL	8
@@ -401,7 +402,7 @@ extern "C" {
 #if (_WIN32_WINNT >= 0x0501)
 #define DC_BUTTONS	0x00001000
 #endif
-/* Where are these documented?   */
+/* Where are these documented? */
 #define DC_CAPTION	(DC_ICON|DC_TEXT|DC_BUTTONS)
 #define DC_NC	(DC_CAPTION|DC_FRAME)
 
@@ -595,7 +596,7 @@ extern "C" {
     /* This is supposed to be defined by the program using it not defined
        in the w32api headers.  I've left it here for documentation purposes.
     */
-#ifndef IDC_STATIC  /* May be predefined by resource compiler.  */
+#ifndef IDC_STATIC  /* May be predefined by resource compiler. */
 #define IDC_STATIC (-1)
 #endif
 #endif
@@ -679,7 +680,7 @@ extern "C" {
 #define SW_RESTORE 9
 #define SW_SHOWDEFAULT 10
 #define SW_FORCEMINIMIZE 11
-#define SW_MAX  11
+#define SW_MAX 11
 #define MB_USERICON 128
 #define MB_ICONASTERISK 64
 #define MB_ICONEXCLAMATION 0x30
@@ -705,11 +706,11 @@ extern "C" {
 #define MB_RETRYCANCEL 5
 #ifdef _WIN32_WINNT
 #if (_WIN32_WINNT >= 0x0400)
-#define MB_SERVICE_NOTIFICATION  0x00200000
+#define MB_SERVICE_NOTIFICATION 0x00200000
 #else
-#define MB_SERVICE_NOTIFICATION  0x00040000
+#define MB_SERVICE_NOTIFICATION 0x00040000
 #endif
-#define MB_SERVICE_NOTIFICATION_NT3X  0x00040000
+#define MB_SERVICE_NOTIFICATION_NT3X 0x00040000
 #endif
 #define MB_SETFOREGROUND 0x10000
 #define MB_SYSTEMMODAL 4096
@@ -2070,6 +2071,10 @@ extern "C" {
 #if (_WIN32_WINNT >= 0x0501)
 #define GUI_16BITTASK 0x00000020
 #endif
+#define WINEVENT_OUTOFCONTEXT   0x0000
+#define WINEVENT_SKIPOWNTHREAD  0x0001
+#define WINEVENT_SKIPOWNPROCESS 0x0002
+#define WINEVENT_INCONTEXT      0x0004
 #define AW_HOR_POSITIVE 0x00000001
 #define AW_HOR_NEGATIVE 0x00000002
 #define AW_VER_POSITIVE 0x00000004
@@ -2883,6 +2888,7 @@ typedef struct tagGUITHREADINFO {
 	HWND hwndCaret;
 	RECT rcCaret;
 } GUITHREADINFO,*PGUITHREADINFO,*LPGUITHREADINFO;
+typedef VOID (*WINEVENTPROC)(HWINEVENTHOOK,DWORD,HWND,LONG,LONG,DWORD,DWORD);
 #endif /* (WINVER >= 0x0500) */
 #if (_WIN32_WINNT >= 0x0501)
 typedef struct {
@@ -3461,6 +3467,9 @@ UINT WINAPI SetTimer(HWND,UINT,UINT,TIMERPROC);
 BOOL WINAPI SetUserObjectInformationA(HANDLE,int,PVOID,DWORD);
 BOOL WINAPI SetUserObjectInformationW(HANDLE,int,PVOID,DWORD);
 BOOL WINAPI SetUserObjectSecurity(HANDLE,PSECURITY_INFORMATION,PSECURITY_DESCRIPTOR);
+#if (WINVER >= 0x0500)
+HWINEVENTHOOK WINAPI SetWinEventHook(UINT,UINT,HMODULE,WINEVENTPROC,DWORD,DWORD,UINT);
+#endif
 BOOL WINAPI SetWindowContextHelpId(HWND,DWORD);
 LONG WINAPI SetWindowLongA(HWND,int,LONG);
 LONG WINAPI SetWindowLongW(HWND,int,LONG);
@@ -3516,6 +3525,9 @@ BOOL WINAPI UnregisterClassA(LPCSTR,HINSTANCE);
 BOOL WINAPI UnregisterClassW(LPCWSTR,HINSTANCE);
 BOOL WINAPI UnregisterHotKey(HWND,int);
 BOOL WINAPI UpdateWindow(HWND);
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI UserHandleGrantAccess(HANDLE,HANDLE,BOOL);
+#endif
 BOOL WINAPI ValidateRect(HWND,LPCRECT);
 BOOL WINAPI ValidateRgn(HWND,HRGN);
 SHORT WINAPI VkKeyScanA(CHAR);
@@ -3533,7 +3545,7 @@ int WINAPIV wsprintfA(LPSTR,LPCSTR,...);
 int WINAPIV wsprintfW(LPWSTR,LPCWSTR,...);
 int WINAPI wvsprintfA(LPSTR,LPCSTR,va_list arglist);
 int WINAPI wvsprintfW(LPWSTR,LPCWSTR,va_list arglist);
-#if (_WIN32_WINNT >= 0x0500  || _WIN32_WINDOWS >= 0x0490)
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0490)
 BOOL WINAPI AllowSetForegroundWindow(DWORD);
 BOOL WINAPI LockSetForegroundWindow(UINT);
 #endif
@@ -3626,7 +3638,7 @@ typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 #define GetMenuItemInfo GetMenuItemInfoW
 #define GetMenuString GetMenuStringW
 #define GetMessage GetMessageW
-#define GetMonitorInfo  GetMonitorInfoW
+#define GetMonitorInfo GetMonitorInfoW
 #define GetProp GetPropW
 #define GetTabbedTextExtent GetTabbedTextExtentW
 #define GetUserObjectInformation GetUserObjectInformationW
@@ -3787,7 +3799,7 @@ typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 #define GetMenuItemInfo GetMenuItemInfoA
 #define GetMenuString GetMenuStringA
 #define GetMessage GetMessageA
-#define GetMonitorInfo  GetMonitorInfoA
+#define GetMonitorInfo GetMonitorInfoA
 #define GetProp GetPropA
 #define GetTabbedTextExtent GetTabbedTextExtentA
 #define GetUserObjectInformation GetUserObjectInformationA
@@ -3870,6 +3882,7 @@ typedef NONCLIENTMETRICSA NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
 #endif /* NOGDI */
 #endif /* UNICODE */
 #endif /* RC_INVOKED */
+
 #ifdef __cplusplus
 }
 #endif

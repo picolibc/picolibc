@@ -1,5 +1,21 @@
 2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h [WINVER >= 0x0500] (SetWinEventHook, WINEVENTPROC,
+	WINEVENT_OUTOFCONTEXT, WINEVENT_SKIPOWNTHREAD, WINEVENT_SKIPOWNPROCESS,
+	WINEVENT_INCONTEXT): Add function, typedef, and constants.
+
+	* include/winable.h [WINVER < 0x0500] (SetWinEventHook, WINEVENTPROC,
+	WINEVENT_OUTOFCONTEXT, WINEVENT_SKIPOWNTHREAD, WINEVENT_SKIPOWNPROCESS,
+	WINEVENT_INCONTEXT): Add function, typedef, and constants.
+
+	* include/winuser.h [_WIN32_WINNT >= 0x0500] (UserHandleGrantAccess):
+	Add function.
+
+	* lib/user32.def (SetWinEventHook, UserHandleGrantAccess):
+	Add functions.
+
+2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winnt.h (ACE_INHERITED_OBJECT_TYPE_PRESENT,
 	ACE_OBJECT_TYPE_PRESENT): Add constants. For use with
 	OBJECTS_AND_NAME structure.

@@ -542,6 +542,7 @@ SetTimer@16
 SetUserObjectInformationA@16
 SetUserObjectInformationW@16
 SetUserObjectSecurity@12
+SetWinEventHook@28
 SetWindowContextHelpId@8
 _imp__SetWindowContextHelpId@8
 SetWindowLongA@12
@@ -594,6 +595,7 @@ UnregisterClassW@8
 UnregisterHotKey@8
 UpdateLayeredWindow@36
 UpdateWindow@4
+UserHandleGrantAccess@12
 ValidateRect@8
 ValidateRgn@8
 VkKeyScanA@4
