@@ -1,3 +1,10 @@
+2001-10-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uname.cc (uname):  Use `wProcessorLevel' unless OS sets it wrong.
+	Use `dwProcessorType' then instead.
+	* wincap.cc: Set flag has_valid_processorlevel appropriately.
+	* wincap.h: Add flag has_valid_processorlevel.
+
 2001-10-14  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::build_fhandler_from_name): Use PC_FULL to
