@@ -37,8 +37,6 @@
 extern "C" {
 #endif
 
-#pragma pack(push,4)
-
 #include "ntddk.h"
 #include "ntddndis.h"
 #include "netpnp.h"
@@ -537,6 +535,7 @@ typedef struct _NDIS_DMA_BLOCK {
   PVOID  MapRegisterBase;
   KEVENT  AllocationEvent;
   PADAPTER_OBJECT  SystemAdapterObject;
+  PVOID  Miniport;
   BOOLEAN  InProgress;
 } NDIS_DMA_BLOCK, *PNDIS_DMA_BLOCK;
 
@@ -703,10 +702,9 @@ typedef struct _CO_FLOW_PARAMETERS {
   ULONG  PeakBandwidth;
   ULONG  Latency;
   ULONG  DelayVariation;
-  GUARANTEE  LevelOfGuarantee;
-  ULONG  CostOfCall;
-  ULONG  NetworkAvailability;
+  SERVICETYPE  ServiceType;
   ULONG  MaxSduSize;
+  ULONG  MinimumPolicedSize;
 } CO_FLOW_PARAMETERS, *PCO_FLOW_PARAMETERS;
 
 typedef struct _CO_SPECIFIC_PARAMETERS {
@@ -2020,6 +2018,48 @@ NdisFreeBuffer(
                                                                           \
   if (BufferCount)                                                        \
       *((PUINT)BufferCount) = (Packet)->Private.Count;                    \
+                                                                          \
+  if (TotalPacketLength)                                                  \
+      *((PUINT)TotalPacketLength) = (Packet)->Private.TotalLength;        \
+  } \
+}
+
+/*
+ * VOID
+ * NdisQueryPacketLength(
+ *   IN PNDIS_PACKET  Packet,
+ *   OUT PUINT  PhysicalBufferCount  OPTIONAL,
+ *   OUT PUINT  BufferCount  OPTIONAL,
+ *   OUT PNDIS_BUFFER  *FirstBuffer  OPTIONAL,
+ *   OUT PUINT  TotalPacketLength  OPTIONAL);
+ */
+#define NdisQueryPacketLength(Packet,                                     \
+                              TotalPacketLength)                          \
+{                                                                         \
+  if ((TotalPacketLength))                                                \
+  {                                                                       \
+    if (!(Packet)->Private.ValidCounts) {                                 \
+      UINT _Offset;                                                       \
+      UINT _PacketLength;                                                 \
+      PNDIS_BUFFER _NdisBuffer;                                           \
+      UINT _PhysicalBufferCount = 0;                                      \
+      UINT _TotalPacketLength   = 0;                                      \
+      UINT _Count               = 0;                                      \
+                                                                          \
+      for (_NdisBuffer = (Packet)->Private.Head;                          \
+        _NdisBuffer != (PNDIS_BUFFER)NULL;                                \
+        _NdisBuffer = _NdisBuffer->Next)                                  \
+      {                                                                   \
+        _PhysicalBufferCount += NDIS_BUFFER_TO_SPAN_PAGES(_NdisBuffer);   \
+        NdisQueryBufferOffset(_NdisBuffer, &_Offset, &_PacketLength);     \
+        _TotalPacketLength += _PacketLength;                              \
+        _Count++;                                                         \
+      }                                                                   \
+      (Packet)->Private.PhysicalCount = _PhysicalBufferCount;             \
+      (Packet)->Private.TotalLength   = _TotalPacketLength;               \
+      (Packet)->Private.Count         = _Count;                           \
+      (Packet)->Private.ValidCounts   = TRUE;                             \
+  }                                                                       \
                                                                           \
   if (TotalPacketLength)                                                  \
       *((PUINT)TotalPacketLength) = (Packet)->Private.TotalLength;        \
@@ -5177,8 +5217,6 @@ typedef struct _NDIS_MAC_CHARACTERISTICS {
 
 typedef	NDIS_MAC_CHARACTERISTICS        NDIS_WAN_MAC_CHARACTERISTICS;
 typedef	NDIS_WAN_MAC_CHARACTERISTICS    *PNDIS_WAN_MAC_CHARACTERISTICS;
-
-#pragma pack(pop)
 
 #ifdef __cplusplus
 }

@@ -31,8 +31,6 @@
 extern "C" {
 #endif
 
-#pragma pack(push,4)
-
 /*
 ** Definitions specific to this Device Driver Kit
 */
@@ -428,100 +426,100 @@ typedef enum _IO_ALLOCATION_ACTION {
   DeallocateObjectKeepRegisters
 } IO_ALLOCATION_ACTION, *PIO_ALLOCATION_ACTION;
 
-typedef IO_ALLOCATION_ACTION DDKAPI
-(*PDRIVER_CONTROL)(
+typedef IO_ALLOCATION_ACTION
+(DDKAPI *PDRIVER_CONTROL)(
   IN struct _DEVICE_OBJECT  *DeviceObject,
   IN struct _IRP  *Irp,
   IN PVOID  MapRegisterBase,
   IN PVOID  Context);
 
-typedef VOID DDKAPI
-(*PDRIVER_LIST_CONTROL)(
+typedef VOID
+(DDKAPI *PDRIVER_LIST_CONTROL)(
   IN struct _DEVICE_OBJECT  *DeviceObject,
   IN struct _IRP  *Irp,
   IN struct _SCATTER_GATHER_LIST  *ScatterGather,
   IN PVOID  Context);
 
-typedef NTSTATUS DDKAPI
-(*PDRIVER_ADD_DEVICE)(
+typedef NTSTATUS
+(DDKAPI *PDRIVER_ADD_DEVICE)(
   IN struct _DRIVER_OBJECT  *DriverObject,
   IN struct _DEVICE_OBJECT  *PhysicalDeviceObject);
 
-typedef NTSTATUS DDKAPI
-(*PIO_COMPLETION_ROUTINE)(
+typedef NTSTATUS
+(DDKAPI *PIO_COMPLETION_ROUTINE)(
   IN struct _DEVICE_OBJECT  *DeviceObject,
   IN struct _IRP  *Irp,
   IN PVOID  Context);
 
-typedef VOID DDKAPI
-(*PDRIVER_CANCEL)(
+typedef VOID
+(DDKAPI *PDRIVER_CANCEL)(
   IN struct _DEVICE_OBJECT  *DeviceObject,
   IN struct _IRP  *Irp);
 
-typedef VOID DDKAPI
-(*PKDEFERRED_ROUTINE)(
+typedef VOID
+(DDKAPI *PKDEFERRED_ROUTINE)(
   IN struct _KDPC  *Dpc,
   IN PVOID  DeferredContext,
   IN PVOID  SystemArgument1,
   IN PVOID  SystemArgument2);
 
-typedef NTSTATUS DDKAPI
-(*PDRIVER_DISPATCH)(
+typedef NTSTATUS
+(DDKAPI *PDRIVER_DISPATCH)(
   IN struct _DEVICE_OBJECT  *DeviceObject,
   IN struct _IRP  *Irp);
 
-typedef VOID DDKAPI
-(*PIO_DPC_ROUTINE)(
+typedef VOID
+(DDKAPI *PIO_DPC_ROUTINE)(
   IN struct _KDPC  *Dpc,
   IN struct _DEVICE_OBJECT  *DeviceObject,
   IN struct _IRP  *Irp,
   IN PVOID  Context);
 
-typedef NTSTATUS DDKAPI
-(*PMM_DLL_INITIALIZE)(
+typedef NTSTATUS
+(DDKAPI *PMM_DLL_INITIALIZE)(
   IN PUNICODE_STRING  RegistryPath);
 
-typedef NTSTATUS DDKAPI
-(*PMM_DLL_UNLOAD)(
+typedef NTSTATUS
+(DDKAPI *PMM_DLL_UNLOAD)(
   VOID);
 
-typedef NTSTATUS DDKAPI
-(*PDRIVER_ENTRY)( 
+typedef NTSTATUS
+(DDKAPI *PDRIVER_ENTRY)( 
   IN struct _DRIVER_OBJECT  *DriverObject, 
   IN PUNICODE_STRING  RegistryPath); 
 
-typedef NTSTATUS DDKAPI
-(*PDRIVER_INITIALIZE)(
+typedef NTSTATUS
+(DDKAPI *PDRIVER_INITIALIZE)(
   IN struct _DRIVER_OBJECT  *DriverObject, 
   IN PUNICODE_STRING  RegistryPath);
 
-typedef BOOLEAN DDKAPI
-(*PKSERVICE_ROUTINE)(
+typedef BOOLEAN
+(DDKAPI *PKSERVICE_ROUTINE)(
   IN struct _KINTERRUPT  *Interrupt,
   IN PVOID  ServiceContext);
 
-typedef VOID DDKAPI
-(*PIO_TIMER_ROUTINE)(
+typedef VOID
+(DDKAPI *PIO_TIMER_ROUTINE)(
   IN struct _DEVICE_OBJECT  *DeviceObject,
   IN PVOID  Context);
 
-typedef VOID DDKAPI
-(*PDRIVER_REINITIALIZE)( 
+typedef VOID
+(DDKAPI *PDRIVER_REINITIALIZE)( 
   IN struct _DRIVER_OBJECT  *DriverObject, 
   IN PVOID  Context, 
   IN ULONG  Count); 
 
-typedef NTSTATUS DDKAPI
-(*PDRIVER_STARTIO)(
+typedef NTSTATUS
+(DDKAPI *PDRIVER_STARTIO)(
   IN struct _DEVICE_OBJECT  *DeviceObject,
   IN struct _IRP  *Irp);
 
-typedef BOOLEAN DDKAPI
-(*PKSYNCHRONIZE_ROUTINE)(
+typedef BOOLEAN
+(DDKAPI *PKSYNCHRONIZE_ROUTINE)(
   IN PVOID  SynchronizeContext);
 
-typedef VOID DDKAPI
-(*PDRIVER_UNLOAD)( 
+typedef VOID
+(DDKAPI *PDRIVER_UNLOAD)( 
   IN struct _DRIVER_OBJECT  *DriverObject); 
 
 
@@ -1094,6 +1092,7 @@ typedef struct _EISA_MEMORY_TYPE {
   UCHAR  MoreEntries : 1;
 } EISA_MEMORY_TYPE, *PEISA_MEMORY_TYPE;
 
+#include <pshpack1.h>
 typedef struct _EISA_MEMORY_CONFIGURATION {
   EISA_MEMORY_TYPE  ConfigurationByte;
   UCHAR  DataSize;
@@ -1101,6 +1100,7 @@ typedef struct _EISA_MEMORY_CONFIGURATION {
   UCHAR  AddressHighByte;
   USHORT  MemorySize;
 } EISA_MEMORY_CONFIGURATION, *PEISA_MEMORY_CONFIGURATION;
+#include <poppack.h>
 
 typedef struct _EISA_IRQ_DESCRIPTOR {
   UCHAR  Interrupt : 4;
@@ -1134,6 +1134,7 @@ typedef struct _EISA_DMA_CONFIGURATION {
   DMA_CONFIGURATION_BYTE1  ConfigurationByte1;
 } EISA_DMA_CONFIGURATION, *PEISA_DMA_CONFIGURATION;
 
+#include <pshpack1.h>
 typedef struct _EISA_PORT_DESCRIPTOR {
   UCHAR  NumberPorts : 5;
   UCHAR  Reserved : 1;
@@ -1145,6 +1146,7 @@ typedef struct _EISA_PORT_CONFIGURATION {
   EISA_PORT_DESCRIPTOR  Configuration;
   USHORT  PortAddress;
 } EISA_PORT_CONFIGURATION, *PEISA_PORT_CONFIGURATION;
+#include <poppack.h>
 
 typedef struct _CM_EISA_FUNCTION_INFORMATION {
   ULONG  CompressedId;
@@ -1243,6 +1245,7 @@ typedef struct _PNP_BUS_INFORMATION {
   ULONG  BusNumber;
 } PNP_BUS_INFORMATION, *PPNP_BUS_INFORMATION;
 
+#include <pshpack1.h>
 typedef struct _CM_PARTIAL_RESOURCE_DESCRIPTOR {
   UCHAR Type;
   UCHAR ShareDisposition;
@@ -1373,6 +1376,7 @@ typedef struct _CM_INT13_DRIVE_PARAMETER {
   USHORT  MaxHeads;
   USHORT  NumberDrives;
 } CM_INT13_DRIVE_PARAMETER, *PCM_INT13_DRIVE_PARAMETER;
+#include <poppack.h>
 
 typedef struct _CM_KEYBOARD_DEVICE_DATA {
   USHORT  Version;
@@ -1966,7 +1970,7 @@ typedef struct _FILE_NAME_INFORMATION {
   WCHAR  FileName[1];                                      
 } FILE_NAME_INFORMATION, *PFILE_NAME_INFORMATION;           
 
-typedef struct FILE_BASIC_INFORMATION {
+typedef struct _FILE_BASIC_INFORMATION {
   LARGE_INTEGER  CreationTime;
   LARGE_INTEGER  LastAccessTime;
   LARGE_INTEGER  LastWriteTime;
@@ -2331,7 +2335,6 @@ typedef struct _FAST_IO_DISPATCH {
   PFAST_IO_RELEASE_FOR_CCFLUSH  ReleaseForCcFlush;
 } FAST_IO_DISPATCH, *PFAST_IO_DISPATCH;
 
-/* NOTE: PVOID for methods to avoid 'assignment from incompatible pointer type' warning */
 typedef struct _DRIVER_OBJECT {
   CSHORT  Type;
   CSHORT  Size;
@@ -2343,11 +2346,11 @@ typedef struct _DRIVER_OBJECT {
   PDRIVER_EXTENSION  DriverExtension;
   UNICODE_STRING  DriverName;
   PUNICODE_STRING  HardwareDatabase;
-  PVOID  FastIoDispatch;
-  PVOID  DriverInit;
-  PVOID  DriverStartIo;
-  PVOID  DriverUnload;
-  PVOID  MajorFunction[IRP_MJ_MAXIMUM_FUNCTION + 1];
+  PFAST_IO_DISPATCH  FastIoDispatch;
+  PDRIVER_INITIALIZE  DriverInit;
+  PDRIVER_STARTIO  DriverStartIo;
+  PDRIVER_UNLOAD  DriverUnload;
+  PDRIVER_DISPATCH  MajorFunction[IRP_MJ_MAXIMUM_FUNCTION + 1];
 } DRIVER_OBJECT;
 typedef struct _DRIVER_OBJECT *PDRIVER_OBJECT;
 
@@ -2443,6 +2446,7 @@ typedef struct _SECURITY_SUBJECT_CONTEXT {
   PVOID  ProcessAuditId;
 } SECURITY_SUBJECT_CONTEXT, *PSECURITY_SUBJECT_CONTEXT;
 
+#include <pshpack4.h>
 typedef struct _ACCESS_STATE {
   LUID  OperationID;
   BOOLEAN  SecurityEvaluated;
@@ -2465,6 +2469,7 @@ typedef struct _ACCESS_STATE {
   UNICODE_STRING  ObjectName;
   UNICODE_STRING  ObjectTypeName;
 } ACCESS_STATE, *PACCESS_STATE;
+#include <poppack.h>
 
 typedef struct _IO_SECURITY_CONTEXT {
   PSECURITY_QUALITY_OF_SERVICE  SecurityQos;
@@ -2523,6 +2528,7 @@ typedef struct _IO_CSQ {
   PVOID  ReservePointer;
 } IO_CSQ, *PIO_CSQ;
 
+#include <pshpack4.h>
 typedef struct _IO_STACK_LOCATION {
   UCHAR  MajorFunction;
   UCHAR  MinorFunction;
@@ -2663,6 +2669,7 @@ typedef struct _IO_STACK_LOCATION {
   PIO_COMPLETION_ROUTINE  CompletionRoutine;
   PVOID  Context;
 } IO_STACK_LOCATION, *PIO_STACK_LOCATION;
+#include <poppack.h>
 
 /* IO_STACK_LOCATION.Control */
 
@@ -3703,6 +3710,7 @@ typedef ULONG PFN_NUMBER, *PPFN_NUMBER;
 #define LOW_LEVEL                          0
 #define APC_LEVEL                          1
 #define DISPATCH_LEVEL                     2
+#define SYNCH_LEVEL                       27
 #define PROFILE_LEVEL                     27
 #define CLOCK1_LEVEL                      28
 #define CLOCK2_LEVEL                      28
@@ -3720,31 +3728,31 @@ typedef struct _KPCR_TIB {
     DWORD  Version;             /* 10 */
   } DUMMYUNIONNAME;
   PVOID  ArbitraryUserPointer;  /* 14 */
-} KPCR_TIB, *PKPCR_TIB;         /* 18 */
+  struct _NT_TIB *Self;         /* 18 */
+} KPCR_TIB, *PKPCR_TIB;         /* 1C */
 
 #define PCR_MINOR_VERSION 1
 #define PCR_MAJOR_VERSION 1
 
 typedef struct _KPCR {
   KPCR_TIB  Tib;                /* 00 */
-  struct _KPCR  *Self;          /* 18 */
-  struct _KPRCB  *PCRCB;        /* 1C */
-  KIRQL  Irql;                  /* 20 */
-  ULONG  IRR;                   /* 24 */
-  ULONG  IrrActive;             /* 28 */
-  ULONG  IDR;                   /* 2C */
-  PVOID  KdVersionBlock;        /* 30 */
-  PUSHORT  IDT;                 /* 34 */
-  PUSHORT  GDT;                 /* 38 */
-  struct _KTSS  *TSS;           /* 3C */
-  USHORT  MajorVersion;         /* 40 */
-  USHORT  MinorVersion;         /* 42 */
-  KAFFINITY  SetMember;         /* 44 */
-  ULONG  StallScaleFactor;      /* 48 */
-  UCHAR  DebugActive;           /* 4C */
-  UCHAR  ProcessorNumber;       /* 4D */
-  UCHAR  Reserved[2];           /* 4E */
-} KPCR, *PKPCR;                 /* 50 */
+  struct _KPCR  *Self;          /* 1C */
+  struct _KPRCB  *PCRCB;        /* 20 */
+  KIRQL  Irql;                  /* 24 */
+  ULONG  IRR;                   /* 28 */
+  ULONG  IrrActive;             /* 2C */
+  ULONG  IDR;                   /* 30 */
+  PVOID  KdVersionBlock;        /* 34 */
+  PUSHORT  IDT;                 /* 38 */
+  PUSHORT  GDT;                 /* 3C */
+  struct _KTSS  *TSS;           /* 40 */
+  USHORT  MajorVersion;         /* 44 */
+  USHORT  MinorVersion;         /* 46 */
+  KAFFINITY  SetMember;         /* 48 */
+  ULONG  StallScaleFactor;      /* 4C */
+  UCHAR  SpareUnused;           /* 50 */
+  UCHAR  Number;                /* 51 */
+} KPCR, *PKPCR;                 /* 54 */
 
 typedef struct _KFLOATING_SAVE {
   ULONG  ControlWord;
@@ -4142,6 +4150,8 @@ RemoveTailList(
   return Entry;
 }
 
+#if !defined(_WINBASE_H) || _WIN32_WINNT < 0x0501
+
 NTOSAPI
 PSLIST_ENTRY
 DDKFASTAPI
@@ -4154,6 +4164,8 @@ DDKFASTAPI
 InterlockedPushEntrySList(
   IN PSLIST_HEADER  ListHead,
   IN PSLIST_ENTRY  ListEntry);
+
+#endif
 
 /*
  * USHORT
@@ -4398,12 +4410,12 @@ RtlDeleteRegistryValue(
 /*
  * BOOLEAN
  * RtlEqualLuid( 
- *   IN LUID*  Luid1,
- *   IN LUID*  Luid2)
+ *   IN LUID  Luid1,
+ *   IN LUID  Luid2)
  */
-#define RtlEqualLuid(_Luid1,_Luid2) \
-  ((BOOLEAN) (((_Luid1)->LowPart == (_Luid2)->LowPart) \
-	      && ((_Luid1)->HighPart == (_Luid2)->HighPart)))
+#define RtlEqualLuid(_Luid1, \
+                     _Luid2) \
+  ((Luid1.LowPart == Luid2.LowPart) && (Luid1.HighPart == Luid2.HighPart))
 
 /*
  * ULONG
@@ -5790,8 +5802,6 @@ WRITE_REGISTER_USHORT(
   IN PUSHORT  Register,
   IN USHORT  Value);
 
-
-
 /** I/O manager routines **/
 
 NTOSAPI
@@ -7116,14 +7126,11 @@ KeAcquireSpinLock(
   OUT PKIRQL  OldIrql);
 
 /* System Service Dispatch Table */
-typedef struct _SSDT {
-  ULONG  SysCallPtr;
-} SSDT, *PSSDT;
+typedef PVOID (NTAPI * SSDT)(VOID);
+typedef SSDT * PSSDT;
 
 /* System Service Parameters Table */
-typedef struct _SSPT {
-  ULONG  ParamBytes;
-} SSPT, *PSSPT;
+typedef UCHAR SSPT, * PSSPT;
 
 typedef struct _SSDT_ENTRY {
 	PSSDT  SSDT;
@@ -7318,12 +7325,6 @@ KeLeaveCriticalRegion(
   VOID);
 
 NTOSAPI
-VOID
-DDKAPI
-KeLowerIrql(
-  IN KIRQL  NewIrql);
-
-NTOSAPI
 NTSTATUS
 DDKAPI
 KePulseEvent(
@@ -7365,19 +7366,6 @@ NTOSAPI
 ULONG
 DDKAPI
 KeQueryTimeIncrement(
-  VOID);
-
-NTOSAPI
-VOID
-DDKAPI
-KeRaiseIrql(
-  IN KIRQL  NewIrql,
-  OUT PKIRQL  OldIrql);
-
-NTOSAPI
-KIRQL
-DDKAPI
-KeRaiseIrqlToDpcLevel(
   VOID);
 
 NTOSAPI
@@ -7606,7 +7594,44 @@ KeWaitForSingleObject(
   IN BOOLEAN  Alertable,
   IN PLARGE_INTEGER  Timeout  OPTIONAL);
 
+#if defined(_X86_)
 
+NTOSAPI
+VOID
+FASTCALL
+KfLowerIrql(
+  IN KIRQL  NewIrql);
+
+NTOSAPI
+KIRQL
+FASTCALL
+KfRaiseIrql(
+  IN KIRQL  NewIrql);
+
+#define KeLowerIrql(a) KfLowerIrql(a)
+#define KeRaiseIrql(a,b) *(b) = KfRaiseIrql(a)
+
+#else
+
+NTOSAPI
+VOID
+DDKAPI
+KeLowerIrql(
+  IN KIRQL  NewIrql);
+
+NTOSAPI
+KIRQL
+DDKAPI
+KeRaiseIrql(
+  IN KIRQL  NewIrql);
+
+#endif
+
+NTOSAPI
+KIRQL
+DDKAPI
+KeRaiseIrqlToDpcLevel(
+  VOID);
 
 /** Memory manager routines **/
 
@@ -9091,8 +9116,6 @@ extern NTOSAPI PBOOLEAN KdDebuggerNotPresent;
 extern NTOSAPI PBOOLEAN KdDebuggerEnabled;
 #define KD_DEBUGGER_ENABLED     *KdDebuggerEnabled
 #define KD_DEBUGGER_NOT_PRESENT *KdDebuggerNotPresent
-
-#pragma pack(pop)
 
 #ifdef __cplusplus
 }

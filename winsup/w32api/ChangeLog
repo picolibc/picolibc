@@ -1,3 +1,41 @@
+2004-09-29  Filip Navara  <xnavara@volny.cz>
+
+	* include/ddk/(atm.h, batclass.h, cfg.h, cfgmgr32.h, d4drvif.h,
+	d4iface.h, ddkmapi.h, hidclass.h, hidpi.h, mcd.h, miniport.h,
+	mountdev.h, mountmgr.h, ndis.h, ndistapi.h, ndiswan.h, netpnp.h,
+	newdev.h, ntapi.h, ntdd8042.h, ntddbeep.h, ntddcdrm.h, ntddcdvd.h,
+	ntddchgr.h, ntdddisk.h, ntddkbd.h, ntddmou.h, ntddpar.h, ntddpcm.h,
+	ntddscsi.h, ntddser.h, ntddstor.h, ntddtape.h, ntddtdi.h,
+	ntddvdeo.h, ntddvol.h, ntpoapi.h, parallel.h, pfhook.h, poclass.h,
+	scsi.h, scsiscan.h, smbus.h, srb.h, storport.h, tdiinfo.h,
+	tdikrnl.h, tvout.h, upssvc.h, usb.h, usb100.h, usbdi.h, usbioctl.h,
+	usbiodef.h, usbscan.h, usbuser.h, videoagp.h, winddi.h, winddk.h,
+	winnt4.h, ws2san.h): Fixed packing.
+	* include/ddk/atm.h (ATM_TRAFFIC_DESCRIPTOR_IE): Fixed declaration.
+	* include/ddk/hidclass.h (HID_INTERFACE_HIDPARSE,
+	HID_INTERFACE_NOTIFY_PNP): Likewise.
+	* include/ddk/ndis.h (NDIS_DMA_BLOCK, CO_FLOW_PARAMETERS): Likewise.
+	(NdisQueryPacketLength): Added macro. Thanks to Art Yerkes
+	<ayerkes@speakeasy.net>.
+	* include/ddk/usb100.h (USB_CONFIGURATION_DESCRIPTOR): Fixed
+	declaration.
+	* include/ddk/winddi.h (PATHDATA, GLYPHPOS): Likewise.
+	* include/ddk/winddk.h (PDRIVER_CONTROL, PDRIVER_LIST_CONTROL,
+	PDRIVER_ADD_DEVICE, PIO_COMPLETION_ROUTINE, PDRIVER_CANCEL,
+	PKDEFERRED_ROUTINE, PDRIVER_DISPATCH, PIO_DPC_ROUTINE,
+	PMM_DLL_INITIALIZE, PMM_DLL_UNLOAD, PDRIVER_ENTRY,
+	PDRIVER_INITIALIZE, PKSERVICE_ROUTINE, PIO_TIMER_ROUTINE,
+	PDRIVER_REINITIALIZE, PDRIVER_STARTIO, PKSYNCHRONIZE_ROUTINE,
+	PDRIVER_UNLOAD, DRIVER_OBJECT): Fixed callback declarations.
+	(struct FILE_BASIC_INFORMATION): Renamed to _FILE_BASIC_INFORMATION.
+	(SYNCH_LEVEL): Added definition.
+	(KPCR, KPCR_TIB): Fixed declaration.
+	(Interlocked[Push/Pop]EntrySList): Declare only if winbase.h isn't
+	included and _WIN32_WINNT >= 0x0501.
+	(RtlEqualLuid): Fixed macro definition.
+	(KfLowerIrql, KfRaiseIrql): Declare and use instead of KeLowerIrql and
+	KeRaiseIrql on i386 architectures.
+
 2004-09-06  Hosaka Yuji  <hos@tamanegi.org>
  
 	* include/mshtml.h (IHTMLDocument2): Correct get_selection
