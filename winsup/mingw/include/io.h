@@ -126,6 +126,7 @@ int	_mkdir (const char*);
 char*	_mktemp (char*);
 int	_rmdir (const char*);
 
+
 #ifdef __MSVCRT__
 __int64  _filelengthi64(int);
 long _findfirsti64(const char*, struct _finddatai64_t*);
@@ -176,6 +177,7 @@ extern "C" {
 int		_access (const char*, int);
 int		_chsize (int, long);
 int		_close (int);
+int		_commit(int);
 
 /* NOTE: The only significant bit in unPermissions appears to be bit 7 (0x80),
  *       the "owner write permission" bit (on FAT). */

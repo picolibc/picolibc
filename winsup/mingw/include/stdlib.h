@@ -48,7 +48,7 @@
  * These values may be used as exit status codes.
  */
 #define	EXIT_SUCCESS	0
-#define	EXIT_FAILURE	-1
+#define	EXIT_FAILURE	1
 
 /*
  * Definitions for path name functions.
@@ -150,8 +150,8 @@ int*	__doserrno(void);
  */
 
 #ifdef __MSVCRT__
-  extern char *** __p__environ();
-  extern wchar_t *** __p__wenviron();
+  extern char *** __p__environ(void);
+  extern wchar_t *** __p__wenviron(void);
 # define _environ (*__p__environ())
 # define _wenviron (*__p__wenviron())
 #else /* ! __MSVCRT__ */
