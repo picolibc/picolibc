@@ -177,7 +177,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
     low_priority_sleep (0);
 #else
     {
-      thread_printf ("waiting for %s<%p> to become active", __name, h);
+      system_printf ("waiting for %s<%p> to become active", __name, h);
       low_priority_sleep (0);
     }
 #endif

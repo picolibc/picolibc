@@ -1,3 +1,10 @@
+2003-01-09  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::cygthread): Be more noisy about odd
+	condition.
+	* miscfuncs.cc (low_priority_sleep): Sleep in regular priority if
+	that's what we're currently running at.
+
 2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* include/semaphore.h: Modify typedef for sem_t.
@@ -198,12 +205,12 @@
 
 2002-12-19  Pierre Humblet <pierre.humblet@ieee.org>
 
-        * localtime.cc (tzsetwall): Set lcl_is_set and lcl_TZname
-        in the Cygwin specific part of the routine.
+	* localtime.cc (tzsetwall): Set lcl_is_set and lcl_TZname
+	in the Cygwin specific part of the routine.
 
 2002-12-19  Pierre Humblet <pierre.humblet@ieee.org>
 
-        * fhandler.cc (fhandler_base::open): Use "flags" rather than "mode"
+	* fhandler.cc (fhandler_base::open): Use "flags" rather than "mode"
 	in Win9X directory code.
 
 2002-12-19  Steve Osborn  <bub@io.com>
