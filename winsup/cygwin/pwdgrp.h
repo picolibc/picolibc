@@ -71,9 +71,9 @@ public:
   {
     if (!check && initialized)
       return;
-    pglock->acquire ();
-    if (!initialized || (check && etc::file_changed (etc_ix)))
-      (this->*read) ();
+    if (pglock->acquire () == 1 &&
+        (!initialized || (check && etc::file_changed (etc_ix))))
+	(this->*read) ();
     pglock->release ();
   }
 
