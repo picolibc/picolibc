@@ -895,6 +895,7 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define ISTAG(x) ((x)==IMAGE_SYM_CLASS_STRUCT_TAG||(x)==IMAGE_SYM_CLASS_UNION_TAG||(x)==IMAGE_SYM_CLASS_ENUM_TAG)
 #define INCREF(x) ((((x)&~N_BTMASK)<<N_TSHIFT)|(IMAGE_SYM_DTYPE_POINTER<<N_BTSHFT)|((x)&N_BTMASK))
 #define DECREF(x) ((((x)>>N_TSHIFT)&~N_BTMASK)|((x)&N_BTMASK))
+#define TLS_MINIMUM_AVAILABLE 64
 
 #ifndef RC_INVOKED
 typedef DWORD ACCESS_MASK;
@@ -2221,7 +2222,18 @@ typedef enum _CM_ERROR_CONTROL_TYPE {
 	SevereError=SERVICE_ERROR_SEVERE,
 	CriticalError=SERVICE_ERROR_CRITICAL
 } SERVICE_ERROR_TYPE;
-
+typedef struct _NT_TIB {
+	struct _EXCEPTION_REGISTRATION_RECORD *ExceptionList;
+	PVOID StackBase;
+	PVOID StackLimit;
+	PVOID SubSystemTib;
+	union {
+		PVOID FiberData;
+		DWORD Version;
+	} DUMMYUNIONNAME;
+	PVOID ArbitraryUserPointer;
+	struct _NT_TIB *Self;
+} NT_TIB,*PNT_TIB;
 PVOID GetCurrentFiber(void);
 PVOID GetFiberData(void);
 #endif
@@ -2229,3 +2241,4 @@ PVOID GetFiberData(void);
 }
 #endif
 #endif
+

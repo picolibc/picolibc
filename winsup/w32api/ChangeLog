@@ -1,3 +1,10 @@
+2000-02-28  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/winbase.h (TLS_MINIMUM_AVAILABLE): Move macro from here
+	* include/winnt.h (TLS_MINIMUM_AVAILABLE): to here.
+	(NT_TIB): Define.
+	* include/tlhelp32.h: New file.
+
 Mon Feb 28 17:08:03 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/rapi.h: New file.
