@@ -14,7 +14,7 @@ ENTRY(strcpy)
 	ldlo.q r3,0,r4
 	ptabs r18,tr4
 	shlli r3,3,r7
-	add r2,r63,r0
+	addi r2, 8, r0
 	mcmpeq.b r4,r63,r6
 	SHHI r6,r7,r6
 	bnei/u r6,0,tr1 // shortstring
@@ -38,6 +38,7 @@ ENTRY(strcpy)
 	beqi/l r6, 0, tr0 // loop
 
 	add r5, r63, r4
+	addi r0, 8, r0
 	blink tr1, r63 // shortstring
 no_lddst:
 	stlo.q r2, 0, r4
@@ -46,13 +47,14 @@ no_lddst:
 	beqi/l r6, 0, tr0 // loop
 
 	add r5, r63, r4
+	addi r0, 8, r0
 shortstring:
 #ifndef __LITTLE_ENDIAN__
 	pta/l shortstring2,tr1
 	byterev r4,r4
 #endif
 shortstring2:
-	st.b r0,0,r4
+	st.b r0,-8,r4
 	andi r4,0xff,r5
 	shlri r4,8,r4
 	addi r0,1,r0
@@ -74,6 +76,7 @@ loop:
 	beqi/l r6, 0, tr0 // loop
 
 	add r5, r63, r4
+	addi r0, 8, r0
 	blink tr1, r63 // shortstring
 
 #else /* ! __SHMEDIA__, i.e. SH 1..4 / SHcompact */
