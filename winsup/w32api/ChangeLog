@@ -1,3 +1,9 @@
+2004-12-23  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (CDRF_NOTIFYSUBITEMDRAW): Add define.
+	Thanks to: Chris Sutcliffe  <ironhead@walled.net>
+	(CDRF_*): Use hex notation for constants.
+
 2004-12-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/sqlext.h (SQL_INTERVAL_*): Correct macros.
