@@ -10,9 +10,15 @@ by prefixing with <literal>no </literal>.</para>
 <listitem>
 <para><FirstTerm>(no)binmode</FirstTerm> - if set, non-disk 
 (e.g. pipe and COM ports) file opens default to binary mode 
-(no CR/LF/Ctrl-Z translations) instead of text mode.
-Defaults to set (binary mode). This option must be set
-before starting a Cygwin shell to have an effect on redirection.
+(no CRLF translation) instead of text mode.  Defaults to set (binary
+mode).  By default, devices are opened in binary mode, so this option
+has little effect on normal cygwin operations.
+
+It does affect two things, however.  For non-NTFS filesystems, this
+option will control the line endings for standard output/input/error
+for redirection from the Windows command shell.  It will also affect
+the default translation mode of a pipe, although most shells set the
+pipe to binary by default.
 </para>
 <warning><title>Warning!</title><para>If set in 12/98 b20.1, all files 
 always open in binary mode.</para></warning>

@@ -171,9 +171,7 @@ sources.</para>
 
 <para>Unfortunately, UNIX and Win32 use different end-of-line terminators in
 text files.  Consequently, carriage-return newlines have to be translated on
-the fly by Cygwin into a single newline when reading in text mode.  The
-control-z character is interpreted as a valid end-of-file character for a
-similar reason.</para>
+the fly by Cygwin into a single newline when reading in text mode.</para>
 
 <para>This solution addresses the compatibility requirement at the expense of
 violating the POSIX standard that states that text and binary mode will be

@@ -1,3 +1,8 @@
+2002-12-18  Christopher Faylor  <cgf@redhat.com>
+
+	* overview2.sgml: Remove CTRL-Z discussion.
+	* cygwinenv.sgml: Expand on CYGWIN=binmode.
+
 2002-11-10  Christopher Faylor  <cgf@redhat.com>
 
 	* how-programming.texinfo: Document _WIN32 more fully.
