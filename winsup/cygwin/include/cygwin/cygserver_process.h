@@ -38,6 +38,7 @@ class process_cache
     class process *process (long);
   private:
     class process_entry *head;
+    CRITICAL_SECTION cache_write_access;
 };
 
 #endif /* _CYGSERVER_PROCESS_ */

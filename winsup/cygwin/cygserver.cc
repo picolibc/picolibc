@@ -163,6 +163,15 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 }
 
 void
+client_request::serve (transport_layer_base *conn, class process_cache *cache)
+{
+  printf ("*****************************************\n"
+	  "A call to the base client_request class has occured\n"
+	  "This indicates a mismatch in a virtual function definition somewhere\n");
+  exit (1);
+}
+
+void
 client_request_attach_tty::serve(transport_layer_base *conn, class process_cache *cache)
 {
   HANDLE from_process_handle = NULL;

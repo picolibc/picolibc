@@ -87,7 +87,7 @@ class client_request
   public:
   client_request (cygserver_request_code id);
   virtual void send (transport_layer_base *conn);
-  virtual void serve (transport_layer_base *conn, class process_cache *cache) {};
+  virtual void serve (transport_layer_base *conn, class process_cache *cache);
   virtual operator struct request_header ();
   cygserver_request_code req_id () {return header.req_id;};
   virtual ~client_request();

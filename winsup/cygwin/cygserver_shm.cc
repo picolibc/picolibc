@@ -45,6 +45,7 @@
 #endif
 //#include "perprocess.h"
 #include "cygserver_shm.h"
+#include <cygwin/cygserver_process.h>
 
 // FIXME IS THIS CORRECT
 /* Implementation notes: We use two shared memory regions per key:
@@ -55,7 +56,8 @@
  * Also, IPC_PRIVATE keys create unique mappings each time. The shm_ids just
  * keep monotonically incrementing - system wide.
  */
-size_t getsystemallocgranularity ()
+size_t
+getsystemallocgranularity ()
 {
   SYSTEM_INFO sysinfo;
   static size_t buffer_offset = 0;
@@ -66,14 +68,15 @@ size_t getsystemallocgranularity ()
   return buffer_offset;
 }
 
-client_request_shm_get::client_request_shm_get () : client_request (CYGSERVER_REQUEST_SHM_GET)
+client_request_shm_get::client_request_shm_get ():client_request (CYGSERVER_REQUEST_SHM_GET)
 {
   header.cb = sizeof (parameters);
   buffer = (char *) &parameters;
   header.error_code = 0;
 }
 
-client_request_shm_get::client_request_shm_get (int nshm_id, pid_t npid) : client_request (CYGSERVER_REQUEST_SHM_GET)
+client_request_shm_get::client_request_shm_get (int nshm_id, pid_t npid):
+client_request (CYGSERVER_REQUEST_SHM_GET)
 {
   header.cb = sizeof (parameters);
   buffer = (char *) &parameters;
@@ -84,7 +87,10 @@ client_request_shm_get::client_request_shm_get (int nshm_id, pid_t npid) : clien
 }
 
 client_request_shm_get::client_request_shm_get (key_t nkey, size_t nsize,
-						int nshmflg, char psdbuf[4096], pid_t npid):	client_request (CYGSERVER_REQUEST_SHM_GET)
+						int nshmflg,
+						char psdbuf[4096],
+						pid_t npid):
+client_request (CYGSERVER_REQUEST_SHM_GET)
 {
   header.cb = sizeof (parameters);
   buffer = (char *) &parameters;
@@ -115,10 +121,9 @@ shmat (int shmid, const void *shmaddr, int parameters.in.shmflg)
 
   void *rv = MapViewOfFile (shm->attachmap,
 
-			    
-			    (parameters.in.
-			     shmflg & SHM_RDONLY) ? FILE_MAP_READ :
-			    FILE_MAP_WRITE, 0,
+
+			    (parameters.in.shmflg & SHM_RDONLY) ?
+			    FILE_MAP_READ : FILE_MAP_WRITE, 0,
 			    0, 0);
 
   if (!rv)
@@ -161,7 +166,8 @@ shmat (int shmid, const void *shmaddr, int parameters.in.shmflg)
 /* for dll size */
 #ifdef __INSIDE_CYGWIN__
 void
-client_request_shm_get::serve (transport_layer_base * conn)
+client_request_shm_get::serve (transport_layer_base * conn,
+			       process_cache * cache)
 {
 }
 #else
@@ -171,9 +177,9 @@ extern GENERIC_MAPPING access_mapping;
 extern int
 check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 		      HANDLE from_process_token,
-                      DWORD access,
-                      HANDLE from_handle,
-                      HANDLE* to_handle_ptr, BOOL bInheritHandle);
+		      DWORD access,
+		      HANDLE from_handle,
+		      HANDLE * to_handle_ptr, BOOL bInheritHandle);
 
 //FIXME: where should this live
 static shmnode *shm_head = NULL;
@@ -182,7 +188,8 @@ static long new_id = 0;
 static long new_private_key = 0;
 
 void
-client_request_shm_get::serve (transport_layer_base * conn)
+client_request_shm_get::serve (transport_layer_base * conn,
+			       process_cache * cache)
 {
 //  DWORD sd_size = 4096;
 //  char sd_buf[4096];
@@ -195,26 +202,29 @@ client_request_shm_get::serve (transport_layer_base * conn)
   HANDLE token_handle = NULL;
   DWORD rc;
 
-  from_process_handle = OpenProcess (PROCESS_DUP_HANDLE, FALSE, parameters.in.pid);
+  from_process_handle = cache->process (parameters.in.pid)->handle ();
+  /* possible TODO: reduce the access on the handle before we use it */
+  /* Note that unless we do this, we don't need to call CloseHandle - it's kept open
+   * by the process cache until the process terminates. 
+   * We may need a refcount on the cache however... 
+   */
   if (!from_process_handle)
     {
-      printf ("error opening process (%lu)\n", GetLastError ());
+      debug_printf ("error opening process (%lu)\n", GetLastError ());
       header.error_code = EACCES;
       return;
     }
 
   conn->impersonate_client ();
-  
+
   rc = OpenThreadToken (GetCurrentThread (),
-  			TOKEN_QUERY,
-                        TRUE,
-			&token_handle);
+			TOKEN_QUERY, TRUE, &token_handle);
 
   conn->revert_to_self ();
 
   if (!rc)
     {
-      printf ("error opening thread token (%lu)\n", GetLastError ());
+      debug_printf ("error opening thread token (%lu)\n", GetLastError ());
       header.error_code = EACCES;
       CloseHandle (from_process_handle);
       return;
@@ -229,7 +239,7 @@ client_request_shm_get::serve (transport_layer_base * conn)
   SECURITY_ATTRIBUTES sa;
   sa.nLength = sizeof (sa);
   sa.lpSecurityDescriptor = psd;
-  sa.bInheritHandle = TRUE; /* the memory structures inherit ok */
+  sa.bInheritHandle = TRUE;	/* the memory structures inherit ok */
 
   char *shmname = NULL, *shmaname = NULL;
   char stringbuf[29], stringbuf1[29];
@@ -237,37 +247,39 @@ client_request_shm_get::serve (transport_layer_base * conn)
   if (parameters.in.type == SHM_REATTACH)
     {
       /* just find and fill out the existing shm_id */
-  shmnode *tempnode = shm_head;
-  while (tempnode)
-    {
-      if (tempnode->shm_id == parameters.in.shm_id)
-        {
-          parameters.out.shm_id = tempnode->shm_id;
- 	  parameters.out.key = tempnode->key;
-  if (check_and_dup_handle (GetCurrentProcess (),from_process_handle,
-                           token_handle,
-                           DUPLICATE_SAME_ACCESS,
-		    tempnode->filemap, &parameters.out.filemap, TRUE) != 0)
-    {
-      printf ("error duplicating filemap handle (%lu)\n", GetLastError ());
-      header.error_code = EACCES;
-      CloseHandle (from_process_handle);
-    }
-     if (check_and_dup_handle (GetCurrentProcess (),from_process_handle,
-		token_handle,
-                DUPLICATE_SAME_ACCESS,
-          tempnode->attachmap, &parameters.out.attachmap, TRUE) != 0)
-    {
-      printf ("error duplicating attachmap handle (%lu)\n", GetLastError ());
-      header.error_code = EACCES;
-      CloseHandle (from_process_handle);
-    }
-          return;
-        }
-      tempnode = tempnode->next;
-    }     
-  header.error_code = EINVAL;
-  return;
+      shmnode *tempnode = shm_head;
+      while (tempnode)
+	{
+	  if (tempnode->shm_id == parameters.in.shm_id)
+	    {
+	      parameters.out.shm_id = tempnode->shm_id;
+	      parameters.out.key = tempnode->key;
+	      if (check_and_dup_handle
+		  (GetCurrentProcess (), from_process_handle, token_handle,
+		   DUPLICATE_SAME_ACCESS, tempnode->filemap,
+		   &parameters.out.filemap, TRUE) != 0)
+		{
+		  debug_printf ("error duplicating filemap handle (%lu)\n",
+				GetLastError ());
+		  header.error_code = EACCES;
+		}
+	      if (check_and_dup_handle
+		  (GetCurrentProcess (), from_process_handle, token_handle,
+		   DUPLICATE_SAME_ACCESS, tempnode->attachmap,
+		   &parameters.out.attachmap, TRUE) != 0)
+		{
+		  debug_printf ("error duplicating attachmap handle (%lu)\n",
+				GetLastError ());
+		  header.error_code = EACCES;
+		}
+	      CloseHandle (token_handle);
+	      return;
+	    }
+	  tempnode = tempnode->next;
+	}
+      header.error_code = EINVAL;
+      CloseHandle (token_handle);
+      return;
     }
   /* it's a original request from the users */
 
@@ -280,22 +292,22 @@ client_request_shm_get::serve (transport_layer_base * conn)
       /* create the mapping name (CYGWINSHMKPRIVATE_0x01234567 */
       /* The K refers to Key, the actual mapped area has D */
       long private_key = (int) InterlockedIncrement (&new_private_key);
-      snprintf (stringbuf , 29, "CYGWINSHMKPRIVATE_0x%0x", private_key);
-	shmname = stringbuf;
-	snprintf (stringbuf1, 29, "CYGWINSHMDPRIVATE_0x%0x", private_key);
-	shmaname = stringbuf1;
+      snprintf (stringbuf, 29, "CYGWINSHMKPRIVATE_0x%0x", private_key);
+      shmname = stringbuf;
+      snprintf (stringbuf1, 29, "CYGWINSHMDPRIVATE_0x%0x", private_key);
+      shmaname = stringbuf1;
     }
   else
     {
-  /* create the mapping name (CYGWINSHMK0x0123456789abcdef */
-  /* The K refers to Key, the actual mapped area has D */
+      /* create the mapping name (CYGWINSHMK0x0123456789abcdef */
+      /* The K refers to Key, the actual mapped area has D */
 
-  snprintf (stringbuf , 29, "CYGWINSHMK0x%0qx", parameters.in.key);
-  shmname = stringbuf;
-  snprintf (stringbuf1, 29, "CYGWINSHMD0x%0qx", parameters.in.key);
-  shmaname = stringbuf1;
-  debug_printf ("system id strings are \n%s\n%s\n",shmname,shmaname);
-  debug_printf ("key input value is 0x%0qx\n", parameters.in.key);
+      snprintf (stringbuf, 29, "CYGWINSHMK0x%0qx", parameters.in.key);
+      shmname = stringbuf;
+      snprintf (stringbuf1, 29, "CYGWINSHMD0x%0qx", parameters.in.key);
+      shmaname = stringbuf1;
+      debug_printf ("system id strings are \n%s\n%s\n", shmname, shmaname);
+      debug_printf ("key input value is 0x%0qx\n", parameters.in.key);
     }
 
   /* attempt to open the key */
@@ -322,6 +334,7 @@ client_request_shm_get::serve (transport_layer_base * conn)
 	      && tempnode->shmds->shm_segsz < parameters.in.size)
 	    {
 	      header.error_code = EINVAL;
+	      CloseHandle (token_handle);
 	      return;
 	    }
 	  /* FIXME: can the same process call this twice without error ? test 
@@ -331,8 +344,11 @@ client_request_shm_get::serve (transport_layer_base * conn)
 	      && (parameters.in.shmflg & IPC_EXCL))
 	    {
 	      header.error_code = EEXIST;
-	      debug_printf ("attempt to exclusively create already created shm_area with key 0x%0qx\n",parameters.in.key);
+	      debug_printf
+		("attempt to exclusively create already created shm_area with key 0x%0qx\n",
+		 parameters.in.key);
 	      // FIXME: free the mutex
+	      CloseHandle (token_handle);
 	      return;
 	    }
 	  // FIXME: do we need to other tests of the requested mode with the 
@@ -345,29 +361,34 @@ client_request_shm_get::serve (transport_layer_base * conn)
 	   * let them attempt the open.
 	   */
 	  parameters.out.shm_id = tempnode->shm_id;
-if (check_and_dup_handle (GetCurrentProcess (),from_process_handle,
-                           token_handle,
-              DUPLICATE_SAME_ACCESS,
-                    tempnode->filemap, &parameters.out.filemap,TRUE) != 0)
-    {
-      printf ("error duplicating filemap handle (%lu)\n", GetLastError ());
-      header.error_code = EACCES;
+	  if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
+				    token_handle,
+				    DUPLICATE_SAME_ACCESS,
+				    tempnode->filemap,
+				    &parameters.out.filemap, TRUE) != 0)
+	    {
+	      printf ("error duplicating filemap handle (%lu)\n",
+		      GetLastError ());
+	      header.error_code = EACCES;
 /*mutex*/
-      CloseHandle (from_process_handle);
- return;
-    }
-if (check_and_dup_handle (GetCurrentProcess (),from_process_handle,
-                            token_handle,
-                            DUPLICATE_SAME_ACCESS,
-          tempnode->attachmap, &parameters.out.attachmap, TRUE) != 0)
-    {
-      printf ("error duplicating attachmap handle (%lu)\n", GetLastError ());
-      header.error_code = EACCES;
+	      CloseHandle (token_handle);
+	      return;
+	    }
+	  if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
+				    token_handle,
+				    DUPLICATE_SAME_ACCESS,
+				    tempnode->attachmap,
+				    &parameters.out.attachmap, TRUE) != 0)
+	    {
+	      printf ("error duplicating attachmap handle (%lu)\n",
+		      GetLastError ());
+	      header.error_code = EACCES;
 /*mutex*/
-      CloseHandle (from_process_handle);
-return;
-    }
+	      CloseHandle (token_handle);
+	      return;
+	    }
 
+	  CloseHandle (token_handle);
 	  return;
 	}
       tempnode = tempnode->next;
@@ -395,6 +416,7 @@ return;
       // free the mutex
       // we can assume that it exists, and that it was an access problem.
       header.error_code = EACCES;
+      CloseHandle (token_handle);
       return;
     }
 
@@ -412,19 +434,21 @@ return;
 	  /* FIXME free mutex */
 	  CloseHandle (filemap);
 	  header.error_code = EEXIST;
+	  CloseHandle (token_handle);
 	  return;
 	}
     }
 
-    /* we created a new mapping */
-    if (parameters.in.key != IPC_PRIVATE &&
-	(parameters.in.shmflg & IPC_CREAT) == 0)
-      {
-        CloseHandle (filemap);
-        /* FIXME free mutex */
-        header.error_code = ENOENT;
-        return;
-      }
+  /* we created a new mapping */
+  if (parameters.in.key != IPC_PRIVATE &&
+      (parameters.in.shmflg & IPC_CREAT) == 0)
+    {
+      CloseHandle (filemap);
+      /* FIXME free mutex */
+      header.error_code = ENOENT;
+      CloseHandle (token_handle);
+      return;
+    }
 
   conn->impersonate_client ();
   void *mapptr = MapViewOfFile (filemap, FILE_MAP_WRITE, 0, 0, 0);
@@ -436,6 +460,7 @@ return;
       //FIXME: close filemap and free the mutex
       /* we couldn't access the mapped area with the requested permissions */
       header.error_code = EACCES;
+      CloseHandle (token_handle);
       return;
     }
 
@@ -459,6 +484,7 @@ return;
       UnmapViewOfFile (mapptr);
       CloseHandle (filemap);
       /* FIXME exit the mutex */
+      CloseHandle (token_handle);
       return;
     }
 
@@ -471,6 +497,7 @@ return;
       CloseHandle (filemap);
       CloseHandle (attachmap);
       /* FIXME exit mutex */
+      CloseHandle (token_handle);
       return;
     }
 
@@ -501,31 +528,35 @@ return;
 
   /* we now have the area in the daemon list, opened. 
 
-  FIXME: leave the system wide shm mutex */
+     FIXME: leave the system wide shm mutex */
 
   parameters.out.shm_id = tempnode->shm_id;
-if (check_and_dup_handle (GetCurrentProcess (),from_process_handle,
-                           token_handle,
-              DUPLICATE_SAME_ACCESS,
-                    tempnode->filemap, &parameters.out.filemap, TRUE) != 0)
+  if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
+			    token_handle,
+			    DUPLICATE_SAME_ACCESS,
+			    tempnode->filemap, &parameters.out.filemap,
+			    TRUE) != 0)
     {
       printf ("error duplicating filemap handle (%lu)\n", GetLastError ());
       header.error_code = EACCES;
-      CloseHandle (from_process_handle);
+      CloseHandle (token_handle);
 /* mutex et al */
-return;
+      return;
     }
-if (check_and_dup_handle (GetCurrentProcess (),from_process_handle,
-                            token_handle,
-                           DUPLICATE_SAME_ACCESS,
-          tempnode->attachmap, &parameters.out.attachmap, TRUE) != 0)
+  if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
+			    token_handle,
+			    DUPLICATE_SAME_ACCESS,
+			    tempnode->attachmap, &parameters.out.attachmap,
+			    TRUE) != 0)
     {
       printf ("error duplicating attachmap handle (%lu)\n", GetLastError ());
       header.error_code = EACCES;
       CloseHandle (from_process_handle);
+      CloseHandle (token_handle);
 /* more cleanup... yay! */
-return;
+      return;
     }
+  CloseHandle (token_handle);
   return;
 }
 #endif

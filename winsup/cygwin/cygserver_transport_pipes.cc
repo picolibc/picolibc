@@ -25,7 +25,8 @@
 #ifndef __OUTSIDE_CYGWIN__
 #include "winsup.h"
 #else
-#define debug_printf printf
+#define DEBUG 0
+#define debug_printf if (DEBUG) printf
 #endif
 
 transport_layer_pipes::transport_layer_pipes (HANDLE new_pipe)

@@ -1,3 +1,24 @@
+Mon Oct  1 12:38:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* cygserver.cc (client_request::serve): New function.
+	* cygserver_process.cc: Inlude <pthread.h> for pthread_once.
+	(process_cache::process_cache): Initialise a crtiical section for write access.
+	(process_cache::process): Use the critical section. Also add missing entries to 
+	the cache.
+	(do_process_init): New function to initalise class process static variables.
+	(process::process): Ensure that the process access critical section is initialised.
+	(process::handle): Close the handle of old process's when they have terminated
+	and we are returning the handle for a process with the same pid.
+	* cygserver_shm.cc: Run indent.
+	Include cygserver_process.h to allow process cache functionality.
+	(client_request_shm_get::serve): New parameter for process cache support.
+	Use the process cache, not OpenProcess to get a handle to the originating process.
+	Fix a handle leak with token_handle.
+	* cygserver_shm.h (class client_request_shm_get): Update ::serve for process cache support.
+	* cygserver_transport_pipes.cc: Redefine debug_printf to be conditional on DEBUG.
+	* include/cygwin/cygserver.h: Do not implement client_request::serve in the header.
+	* include/cygwin/cygserver_process.h (class process_cache): Add a write access critical section to prevent races when requests from a  multithreaded application arrive.
+
 Sun Sep 30 23:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* Makefile.in: Add cygserver_process.o to cygserver.exe.
