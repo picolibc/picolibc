@@ -18,7 +18,7 @@ _DEFUN (asctime_r, (tim_p, result),
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   };
 
-  sprintf (result, "%.3s %.3s %.2d %.2d:%.2d:%.2d %d\n",
+  sprintf (result, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
 	   day_name[tim_p->tm_wday], 
 	   mon_name[tim_p->tm_mon],
 	   tim_p->tm_mday, tim_p->tm_hour, tim_p->tm_min,

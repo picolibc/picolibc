@@ -1,3 +1,9 @@
+Wed May 10 13:52:24 2000  Egor Duda <deo@logos-m.ru>
+
+        * libc/time/asctime_r.c (asctime_r): Change output format. Day of
+        month is now padded with space, not zero.  This now conforms to
+	ANSI standard.
+
 Wed May 03 17:57:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * libc/include/sys/errno.h: Add define for ENOSHARE ("No such
