@@ -1,3 +1,21 @@
+2005-01-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (CoInitialize): Remove.
+	(CoUninitialize): Remove.
+	(CoCreateInstance): Remove.
+	(CoTaskMemFree): Add.
+	(SHGetDesktopFolder): Add.
+	* path.cc (shortcut_header): Remove.
+	(shortcut_initalized): Remove.
+	(GUID_shortcut): New static GUID.
+	(struct win_shortcut_hdr): New struct describing Windows shortcut
+	header structure.
+	(symlink_worker): Rewrite creating Windows shortcuts.  Create
+	ITEMIDLIST if target exists.  Only write once.
+	(cmp_shortcut_header): Use win_shortcut_hdr structure for comparison.
+	(check_shortcut): Rewrite to read only once from file.  Allow skipping
+	an ITIMIDLIST in the file.
+
 2005-01-16  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.h (maybe_set_exit_code_from_windows): Renamed from

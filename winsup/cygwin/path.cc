@@ -59,6 +59,7 @@ details. */
 #include <winuser.h>
 #include <winnls.h>
 #include <winnetwk.h>
+#include <shlobj.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
 #include "cygerrno.h"
@@ -100,25 +101,38 @@ struct symlink_info
 
 int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
 
-static char shortcut_header[SHORTCUT_HDR_SIZE];
-static bool shortcut_initalized;
+static const GUID GUID_shortcut
+			= { 0x00021401L, 0, 0, 0xc0, 0, 0, 0, 0, 0, 0, 0x46 };
 
-static void
-create_shortcut_header (void)
-{
-  if (!shortcut_initalized)
-    {
-      shortcut_header[0] = 'L';
-      shortcut_header[4] = '\001';
-      shortcut_header[5] = '\024';
-      shortcut_header[6] = '\002';
-      shortcut_header[12] = '\300';
-      shortcut_header[19] = 'F';
-      shortcut_header[20] = '\f';
-      shortcut_header[60] = '\001';
-      shortcut_initalized = true;
-    }
-}
+enum {
+  WSH_FLAG_IDLIST = 0x01,	/* Contains an ITEMIDLIST. */
+  WSH_FLAG_FILE = 0x02,		/* Contains a file locator element. */
+  WSH_FLAG_DESC = 0x04,		/* Contains a description. */
+  WSH_FLAG_RELPATH = 0x08,	/* Contains a relative path. */
+  WSH_FLAG_WD = 0x10,		/* Contains a working dir. */
+  WSH_FLAG_CMDLINE = 0x20,	/* Contains command line args. */
+  WSH_FLAG_ICON = 0x40		/* Contains a custom icon. */
+};
+
+struct win_shortcut_hdr
+  {
+    DWORD size;		/* Header size in bytes.  Must contain 0x4c. */
+    GUID magic;		/* GUID of shortcut files. */
+    DWORD flags;	/* Content flags.  See above. */
+
+    /* The next fields from attr to icon_no are always set to 0 in Cygwin
+       and U/Win shortcuts. */
+    DWORD attr;	/* Target file attributes. */
+    FILETIME ctime;	/* These filetime items are never touched by the */
+    FILETIME mtime;	/* system, apparently. Values don't matter. */
+    FILETIME atime;
+    DWORD filesize;	/* Target filesize. */
+    DWORD icon_no;	/* Icon number. */
+
+    DWORD run;		/* Values defined in winuser.h. Use SW_NORMAL. */
+    DWORD hotkey;	/* Hotkey value. Set to 0.  */
+    DWORD dummy[2];	/* Future extension probably. Always 0. */
+  };
 
 /* Determine if path prefix matches current cygdrive */
 #define iscygdrive(path) \
@@ -2490,11 +2504,12 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
   char from[CYG_MAX_PATH + 5];
   char cwd[CYG_MAX_PATH + 1], *cp = NULL, c = 0;
   char w32topath[CYG_MAX_PATH + 1];
+  char reltopath[CYG_MAX_PATH + 1] = { 0 };
   DWORD written;
   SECURITY_ATTRIBUTES sa = sec_none_nih;
   security_descriptor sd;
 
-  /* POSIX says that empty 'frompath' is invalid input whlie empty
+  /* POSIX says that empty 'frompath' is invalid input while empty
      'topath' is valid -- it's symlink resolver job to verify if
      symlink contents point to existing filesystem object */
   if (check_null_empty_str_errno (topath) == EFAULT ||
@@ -2549,18 +2564,34 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	      *cp = '\0';
 	      chdir (from);
 	    }
-	  backslashify (topath, w32topath, 0);
+	  backslashify (topath, reltopath, 0);
+	  /* Creating an ITEMIDLIST requires an absolute path.  So if we
+	     create a shortcut file, we create relative and absolute Win32
+	     paths, the first for the relpath field and the latter for the
+	     ITEMIDLIST field. */
+	  if (GetFileAttributes (reltopath) == INVALID_FILE_ATTRIBUTES)
+	    {
+	      win32_topath.check (topath, PC_SYM_NOFOLLOW);
+	      if (win32_topath.error != ENOENT)
+	        strcpy (use_winsym ? reltopath : w32topath, win32_topath);
+	    }
+	  else if (!use_winsym)
+	    strcpy (w32topath, reltopath);
+	  if (use_winsym)
+	    {
+	      win32_topath.check (topath, PC_FULL | PC_SYM_NOFOLLOW);
+	      strcpy (w32topath, win32_topath);
+	    }
+	  if (cp)
+	    {
+	      *cp = c;
+	      chdir (cwd);
+	    }
 	}
-      if (!cp || GetFileAttributes (w32topath) == INVALID_FILE_ATTRIBUTES)
-	{
-	  win32_topath.check (topath, PC_SYM_NOFOLLOW);
-	  if (!cp || win32_topath.error != ENOENT)
-	    strcpy (w32topath, win32_topath);
-	}
-      if (cp)
-	{
-	  *cp = c;
-	  chdir (cwd);
+      else
+        {
+	  win32_topath.check (topath, PC_FULL | PC_SYM_NOFOLLOW);
+	  strcpy (w32topath, win32_topath);
 	}
       create_how = CREATE_NEW;
     }
@@ -2575,26 +2606,66 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
     __seterrno ();
   else
     {
-      BOOL success;
+      bool success = false;
 
       if (use_winsym)
 	{
-	  create_shortcut_header ();
-	  /* Don't change the datatypes of `len' and `win_len' since
-	     their sizeof is used when writing. */
-	  unsigned short len = strlen (topath);
-	  unsigned short win_len = strlen (w32topath);
-	  success = WriteFile (h, shortcut_header, SHORTCUT_HDR_SIZE,
-			       &written, NULL)
-		    && written == SHORTCUT_HDR_SIZE
-		    && WriteFile (h, &len, sizeof len, &written, NULL)
-		    && written == sizeof len
-		    && WriteFile (h, topath, len, &written, NULL)
-		    && written == len
-		    && WriteFile (h, &win_len, sizeof win_len, &written, NULL)
-		    && written == sizeof win_len
-		    && WriteFile (h, w32topath, win_len, &written, NULL)
-		    && written == win_len;
+	  /* A path of 240 chars with 120 one character directories in it
+	     can result in a 6K shortcut. */
+	  char *buf = (char *) alloca (8192);
+	  win_shortcut_hdr *shortcut_header = (win_shortcut_hdr *) buf;
+	  HRESULT hres;
+	  IShellFolder *psl;
+	  WCHAR wc_path[CYG_MAX_PATH + 1];
+	  ITEMIDLIST *pidl = NULL, *p;
+	  unsigned short len;
+
+	  memset (shortcut_header, 0, sizeof *shortcut_header);
+	  shortcut_header->size = sizeof *shortcut_header;
+	  shortcut_header->magic = GUID_shortcut;
+	  shortcut_header->flags = (WSH_FLAG_DESC | WSH_FLAG_RELPATH);
+	  shortcut_header->run = SW_NORMAL;
+	  cp = buf + sizeof (win_shortcut_hdr);
+	  /* Creating an IDLIST */
+	  hres = SHGetDesktopFolder (&psl);
+	  if (SUCCEEDED (hres))
+	    {
+	      MultiByteToWideChar (CP_ACP, 0, w32topath, -1, wc_path,
+				   CYG_MAX_PATH + 1);
+	      hres = psl->ParseDisplayName (NULL, NULL, wc_path, NULL,
+					    &pidl, NULL);
+	      if (SUCCEEDED (hres))
+		{
+		  shortcut_header->flags |= WSH_FLAG_IDLIST;
+		  for (p = pidl; p->mkid.cb > 0;
+		       p = (ITEMIDLIST *)((char *) p + p->mkid.cb))
+		    ;
+		  len = (char *) p - (char *) pidl + 2;
+		  *(unsigned short *)cp = len;
+		  memcpy (cp += 2, pidl, len);
+		  cp += len;
+		  CoTaskMemFree (pidl);
+		}
+	      psl->Release ();
+	    }
+	  /* Creating a description */
+	  *(unsigned short *)cp = len = strlen (topath);
+	  memcpy (cp += 2, topath, len);
+	  cp += len;
+	  /* Creating a relpath */
+	  if (reltopath[0])
+	    {
+	      *(unsigned short *)cp = len = strlen (reltopath);
+	      memcpy (cp += 2, reltopath, len);
+	    }
+	  else
+	    {
+	      *(unsigned short *)cp = len = strlen (w32topath);
+	      memcpy (cp += 2, w32topath, len);
+	    }
+	  cp += len;
+	  success = WriteFile (h, buf, cp - buf, &written, NULL)
+		    && written == (DWORD) (cp - buf);
 	}
       else
 	{
@@ -2644,50 +2715,49 @@ done:
 }
 
 static bool
-cmp_shortcut_header (const char *file_header)
+cmp_shortcut_header (win_shortcut_hdr *file_header)
 {
-  create_shortcut_header ();
-  return memcmp (shortcut_header, file_header, SHORTCUT_HDR_SIZE);
+  /* A Cygwin or U/Win shortcut only contains a description and a relpath.
+     Cygwin shortcuts also might contain an ITEMIDLIST. The run type is
+     always set to SW_NORMAL. */
+  return file_header->size == sizeof (win_shortcut_hdr)
+      && !memcmp (&file_header->magic, &GUID_shortcut, sizeof GUID_shortcut)
+      && (file_header->flags & ~WSH_FLAG_IDLIST)
+         == (WSH_FLAG_DESC | WSH_FLAG_RELPATH)
+      && file_header->run == SW_NORMAL;
 }
 
 static int
 check_shortcut (const char *path, DWORD fileattr, HANDLE h,
 		char *contents, int *error, unsigned *pflags)
 {
-  char file_header[SHORTCUT_HDR_SIZE];
+  win_shortcut_hdr *file_header;
+  char *buf, *cp;
   unsigned short len;
   int res = 0;
-  DWORD got = 0;
+  DWORD size, got = 0;
 
   /* Valid Cygwin & U/WIN shortcuts are R/O. */
   if (!(fileattr & FILE_ATTRIBUTE_READONLY))
     goto file_not_symlink;
-  /* Read the files header information. This is used to check for a
-     Cygwin or U/WIN shortcut or later to check for executable files. */
-  if (!ReadFile (h, file_header, SHORTCUT_HDR_SIZE, &got, 0))
+
+  if ((size = GetFileSize (h, NULL)) > 8192) /* Not a Cygwin symlink. */
+    goto file_not_symlink;
+  buf = (char *) alloca (size);
+  if (!ReadFile (h, buf, size, &got, 0))
     {
       *error = EIO;
       goto close_it;
     }
-  /* Check header if the shortcut is really created by Cygwin or U/WIN. */
-  if (got != SHORTCUT_HDR_SIZE || cmp_shortcut_header (file_header))
+  file_header = (win_shortcut_hdr *) buf;
+  if (got != size || !cmp_shortcut_header (file_header))
     goto file_not_symlink;
-  /* Next 2 byte are USHORT, containing length of description entry. */
-  if (!ReadFile (h, &len, sizeof len, &got, 0))
-    {
-      *error = EIO;
-      goto close_it;
-    }
-  if (got != sizeof len || len == 0 || len > CYG_MAX_PATH)
+  cp = buf + sizeof (win_shortcut_hdr);
+  if (file_header->flags & WSH_FLAG_IDLIST) /* Skip ITEMIDLIST */
+    cp += *(unsigned short *) cp + 2;
+  if ((len = *(unsigned short *) cp) == 0 || len > CYG_MAX_PATH)
     goto file_not_symlink;
-  /* Now read description entry. */
-  if (!ReadFile (h, contents, len, &got, 0))
-    {
-      *error = EIO;
-      goto close_it;
-    }
-  if (got != len)
-    goto file_not_symlink;
+  strncpy (contents, cp += 2, len);
   contents[len] = '\0';
   res = len;
   if (res) /* It's a symlink.  */
@@ -2696,7 +2766,7 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
 
 file_not_symlink:
   /* Not a symlink, see if executable.  */
-  if (!(*pflags & PATH_ALL_EXEC) && has_exec_chars (file_header, got))
+  if (!(*pflags & PATH_ALL_EXEC) && has_exec_chars ((const char *) &file_header, got))
     *pflags |= PATH_EXEC;
 
 close_it:

@@ -492,9 +492,7 @@ LoadDLLfuncEx (GetIfEntry, 4, iphlpapi, 1)
 LoadDLLfuncEx (GetIpAddrTable, 12, iphlpapi, 1)
 LoadDLLfuncEx (GetNetworkParams, 8, iphlpapi, 1)
 
-LoadDLLfunc (CoInitialize, 4, ole32)
-LoadDLLfunc (CoUninitialize, 0, ole32)
-LoadDLLfunc (CoCreateInstance, 20, ole32)
+LoadDLLfunc (CoTaskMemFree, 4, ole32)
 
 LoadDLLfuncEx (CancelIo, 4, kernel32, 1)
 LoadDLLfuncEx (CreateHardLinkA, 12, kernel32, 1)
@@ -512,6 +510,8 @@ LoadDLLfuncEx (Process32Next, 8, kernel32, 1)
 LoadDLLfuncEx (RegisterServiceProcess, 8, kernel32, 1)
 LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)
 LoadDLLfuncEx (SwitchToThread, 0, kernel32, 1)
+
+LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
 
 LoadDLLfuncEx (waveOutGetNumDevs, 0, winmm, 1)
 LoadDLLfuncEx (waveOutOpen, 24, winmm, 1)
