@@ -1,3 +1,15 @@
+Mon Dec 31 16:45:41 2001  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (call, ret): Move to end of table.
+	(addb, addib): PA2.0 variants should have been PA2.0W.
+	(ldw, ldh, ldb, stw, sth, stb, stwa): Reorder to keep disassembler
+	happy.
+	(fldw, fldd, fstw, fstd, bb): Likewise.
+	(short loads/stores): Tweak format specifier slightly to keep
+	disassembler happy.
+	(indexed loads/stores): Likewise.
+	(absolute loads/stores): Likewise.
+
 2001-12-04  Alexandre Oliva  <aoliva@redhat.com>
 
 	* d10v.h (OPERAND_NOSP): New macro.
