@@ -1,6 +1,10 @@
 @chapter Known/potential Problems in the B20.1 Release
 
 @section Windows 95 freezing up
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
 While this problem may have been worse under B19, Control-c's in bash
 under Win 95 may still be able to lock up the Win 95 kernel, freezing
 your machine.  This problem can be fixed if you are running the OSR2
@@ -9,6 +13,10 @@ on MSDN subscription CDs.  More information about OSR2 and the USB patch
 is available from @file{http://www.compuclinic.com/osr2faq/index.html}.
 
 @section Some programs can't deal with // pathname scheme in arguments
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
 gcc and other tools aren't fully compatible with the current pathname
 scheme: it can't grok an argument of -I//d/foo which means it is vital
 that when attempting to configure/build UNIX packages, that only normal

@@ -1,5 +1,8 @@
 @chapter Who's behind the project?
 
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
 Chris Faylor (cgf@@cygnus.com) is behind many of the recent
 changes in Cygwin.  Prior to joining Cygnus, he contributed significant
 fixes to the process control and environ code, reworked the strace

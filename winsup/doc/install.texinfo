@@ -1,6 +1,9 @@
 @chapter Installation Instructions
 @section Contents
 
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
 The following packages are included in the full release:
 
 Development tools:
@@ -17,6 +20,9 @@ Full source code is available for these tools.  It is split into
 these two units.
 
 @section Installing the binary release:
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
 
 Important!  Be sure to remove any older versions of the Cygwin tools
 from your PATH environment variable so you do not execute them by
@@ -89,6 +95,9 @@ via the "Add/Remove Programs" control panel.
 
 @section Installing the source code
 
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
 Before downloading the source code corresponding to the release,
 you should install the latest release of the tools (either the full
 release or just the user tools).
@@ -133,6 +142,9 @@ the user-src.tar.bz2 and dev-src.tar.bz2 source archives!
 And you should be done...
 
 @section Upgrading to B20.1
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.  Even the section's title is wrong!)}
 
 If you downloaded the original B20.0 release, you should definitely at
 least upgrade the Cygwin library to the version present in B20.1.  To do

@@ -2,21 +2,32 @@
 
 @section FTP Sites
 
+@emph{(Please note: The mirrors listed in this section are not monitored
+automatically.  If you notice an error here, such as a broken link, a
+site that's down, or an ommission, please notify the FAQ maintainer.
+You can always find an up-to-date list of mirrors at
+@file{http://sourceware.cygnus.com/cygwin/mirrors.html}.)}
+
+@c Just commenting out unreachable sites now, though problem could have
+@c been transient or a simple typo.  It would be nice to automate this,
+@c perhaps against the cygwin/mirrors.html page.
+
 @itemize @bullet
 @item North America:
 @itemize @bullet
-@item Alberta: @file{ftp://ftp.reversion.ca/pub/mirrors/cygwin/}
-@item Arizona: @file{ftp://ftp.ninemoons.com/pub/cygwin/}
+@c @item Alberta: @file{ftp://ftp.reversion.ca/pub/mirrors/cygwin/}
+@c @item Arizona: @file{ftp://ftp.ninemoons.com/pub/cygwin/}
 @item California: @file{ftp://ftp.yggdrasil.com/mirrors/site/sourceware.cygnus.com/pub/cygwin/}
-@item California (secondary): @file{ftp://sourceware.cygnus.com/pub/cygwin/}
-@item Kansas: @file{ftp://ftp.the-b.org/pub/cygwin/}
-@item Tennessee: @file{ftp://ftp.sunsite.utk.edu/pub/cygwin/}
+@item California : @file{ftp://sourceware.cygnus.com/pub/cygwin/} (This
+is the "master" site, and is almost always too busy to permit logins.)
+@c @item Kansas: @file{ftp://ftp.the-b.org/pub/cygwin/}
+@c @item Tennessee: @file{ftp://ftp.sunsite.utk.edu/pub/cygwin/}
 @end itemize
 
-@item Central America:
-@itemize @bullet
-@item Costa Rica: @file{ftp://sunsite.ulatina.ac.cr/cygwin/}
-@end itemize
+@c @item Central America:
+@c @itemize @bullet
+@c @item Costa Rica: @file{ftp://sunsite.ulatina.ac.cr/cygwin/}
+@c @end itemize
 
 @item South America:
 @itemize @bullet
@@ -36,48 +47,50 @@
 @item Japan: @file{ftp://ring.crl.go.jp/archives/pc/gnu-win32/}
 @item Japan: @file{ftp://ring.astem.or.jp/archives/pc/gnu-win32/}
 @item Japan: @file{ftp://ring.jah.ne.jp/archives/pc/gnu-win32/}
-@item Japan: @file{ftp://ring.saitama-u.ac.jp/archives/pc/gnu-win32/}
+@c @item Japan: @file{ftp://ring.saitama-u.ac.jp/archives/pc/gnu-win32/}
 @item Japan: @file{ftp://ring.nacsis.ac.jp/archives/pc/gnu-win32/}
 @item Japan: @file{ftp://ring.exp.fujixerox.co.jp/archives/pc/gnu-win32/}
 @item Japan: @file{ftp://ring.so-net.ne.jp/archives/pc/gnu-win32/}
 @item Japan: @file{ftp://ring.ip-kyoto.ad.jp/archives/pc/gnu-win32/}
 @item Japan: @file{ftp://sysg.kek.jp/cygnus/cygwin/}
 @item Japan: @file{ftp://ftp.u-aizu.ac.jp/pub/gnu/gnu-win32/}
-@item Taiwan: @file{ftp://ftp1.sinica.edu.tw/pub3/CYGNUS/cygwin/}
+@c @item Taiwan: @file{ftp://ftp1.sinica.edu.tw/pub3/CYGNUS/cygwin/}
+@c (mixed w/ old!)
 @end itemize
 
-@item Australasia:
-@itemize @bullet
-@item Australia: @file{ftp://mirror.aarnet.edu.au/pub/cygwin/}
-@end itemize
+@c @item Australasia:
+@c @itemize @bullet
+@c @item Australia: @file{ftp://mirror.aarnet.edu.au/pub/cygwin/}
+@c @end itemize
 
 @item Europe:
 @itemize @bullet
 @item Austria: @file{ftp://gd.tuwien.ac.at/gnu/cygwin/}
 @item Czech Republic: @file{ftp://sunsite.ms.mff.cuni.cz/MIRRORS/sourceware.cygnus.com/pub/cygwin/}
 @item Denmark: @file{ftp://sunsite.auc.dk/pub/cygwin/}
-@item Finland: @file{ftp://ftp.funet.fi/mirrors/sourceware.cygnus.com/pub/cygwin/}
-@item Germany: @file{ftp://ftp.franken.de/pub/win32/develop/gnuwin32/cygwin32/mirrors/cygnus/}
+@c @item Finland: @file{ftp://ftp.funet.fi/mirrors/sourceware.cygnus.com/pub/cygwin/}
+@item Germany: @file{ftp://ftp.franken.de/pub/win32/develop/gnuwin32/cygwin/mirrors/cygnus/}
 @item Greece: @file{ftp://ftp.ntua.gr/pub/pc/cygwin/}
-@item Hungary: @file{ftp://ftp.szrmkk.hu/pub/gnu-win32/ftp.cygnus.com/}
+@c @item Hungary: @file{ftp://ftp.szrmkk.hu/pub/gnu-win32/ftp.cygnus.com/}
 @item Italy: @file{ftp://ftp.unina.it/pub/Unix/cygnus/cygwin/}
 @item Poland: @file{ftp://sunsite.icm.edu.pl/pub/cygnus/cygwin/}
-@item Slovenia: @file{ftp://sunsite.fri.uni-lj.si/pub/gnu-win32/}
+@c @item Slovenia: @file{ftp://sunsite.fri.uni-lj.si/pub/gnu-win32/}
 @item Spain: @file{ftp://ftp.rediris.es/mirror/cygwin}
 @item Sweden: @file{ftp://ftp.sunet.se/pub/lang/cygwin/}
 @item Switzerland: @file{ftp://sunsite.cnlab-switch.ch/mirror/cygwin/}
 @item UK: @file{ftp://sunsite.org.uk/Mirrors/sourceware.cygnus.com/pub/cygwin/}
-@item UK: @file{ftp://ftp.ccp14.dl.ac.uk/ccp14/ftp-mirror/programming/cygnus-gnu-win32/pub/gnu-win32/}
+@c @item UK: @file{ftp://ftp.ccp14.dl.ac.uk/ccp14/ftp-mirror/programming/cygnus-gnu-win32/pub/gnu-win32/}
+@item UK: @file{ftp://ftp.mirror.ac.uk/sites/sourceware.cygnus.com/pub/cygwin/}
 @end itemize
 @end itemize
 
 @section The Cygwin Project WWW Site
 
 The main WWW page for the Cygwin project is
-@file{http://sourceware.cygnus.com/cygwin/}.
+@file{http://sourceware.cygnus.com/cygwin/}.  There you will find a
+great many links to additional resources and related sites.
 
-A page containing tool-specific information is
-@file{http://www.cygnus.com/pubs/gnupro/}.
-
-Links to additional documentation are accessible from the main
-web page.
+You can find documentation for the individual Gnu tools at
+@file{http://www.fsf.org/manual/}.  (You should read Gnu manuals from a
+local mirror, check @file{http://www.fsf.org/server/list-mirrors.html}
+for a list of them.)

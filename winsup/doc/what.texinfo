@@ -39,17 +39,22 @@ it with their friends, etc.  The Cygwin license allows you those
 freedoms, so it is free software.
 
 The Cygwin 1.0 product is a "commercial" distribution of cygwin.  As
-such, it includes such non-software things as printed manuals,
-support, and aggregation of useful utilities.  There is nothing
-(software-wise) in there that you can't already get off the net
-already, if you take the time to find and download everything (and
-usually, build it yourself).  We test it all to make sure it works
-together, and package it in a convenient form.  We consider such
-testing and packaging to be a valuable service and thus charge a fee
-for it.  Plus, it provides income for the cygwin project so we can
-continue working on it :-)
+such, it includes such non-software things as printed manuals, support,
+and aggregation of useful utilities.  There is nothing (software-wise)
+in there that you can't already get off the net already, if you take the
+time to find and download everything (and usually, build it yourself),
+although the @emph{versions} available for download may be different
+than those distributed with the commercial product.  We test it all to
+make sure it works together, and package it in a convenient form.  We
+consider such testing and packaging to be a valuable service and thus
+charge a fee for it.  Plus, it provides income for the cygwin project so
+we can continue working on it.  For further details about the commercial
+product, see @file{http://www.cygnus.com/cygwin/}.
 
 @section A brief history of the project
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
 
 The first thing done was to enhance the development tools (gcc, gdb,
 gas, et al) so that they could generate/interpret Win32 native object

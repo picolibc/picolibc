@@ -22,6 +22,9 @@ Calls starting with "cygwin_" are Cygwin-specific calls.
 
 @section ANSI C Library Functions
 
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
 @itemize @code
 
 @item libc stdio (newlib/libc/stdio)
@@ -202,6 +205,9 @@ Calls starting with "cygwin_" are Cygwin-specific calls.
 @end itemize
 
 @section POSIX.1/96 Functions
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
 
 @item Process Primitives (Section 3)
 @itemize @code
@@ -530,6 +536,9 @@ Calls starting with "cygwin_" are Cygwin-specific calls.
 @end itemize
 
 @section Misc Functions
+
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
 
 @item Networking (net.cc) (Standardized by POSIX 1.g, which is probably still in draft?)
 @itemize @code

@@ -1,5 +1,8 @@
 @chapter History
 
+@strong{(Please note: This section has not yet been updated for the latest
+net release.)}
+
 @include changes.texinfo
 
 @section Release Beta 19 (Feb 26 1998)
