@@ -1,5 +1,12 @@
 2002-09-30  Christopher Faylor  <cgf@redhat.com>
 
+	* thread.cc (pthread::precreate): Use explicit "no inherit" option when
+	creating mutex.
+	(pthread_mutex::nativeMutex::init): Ditto.
+	(semaphore::semaphore): Ditto.
+
+2002-09-30  Christopher Faylor  <cgf@redhat.com>
+
 	* thread.cc (pthread_key::keys): Do not copy on fork.
 	(pthread_mutex::mutexInitializationLock): Ditto.
 	(pthreadNull::_instance): Ditto.

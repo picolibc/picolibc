@@ -317,7 +317,7 @@ pthread::precreate (pthread_attr *newattr)
       return;
     }
 
-  cancel_event = ::CreateEvent (NULL,TRUE,FALSE,NULL);
+  cancel_event = ::CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   if (!cancel_event)
     {
       system_printf ("couldn't create cancel event, this %p LastError %E", this);
@@ -762,8 +762,8 @@ pthread_cond::pthread_cond (pthread_condattr *attr):verifyable_object (PTHREAD_C
   this->waiting = 0;
 
   this->win32_obj_id = ::CreateEvent (&sec_none_nih, false,	/* auto signal reset - which I think is pthreads like ? */
-				     false,	/* start non signaled */
-				     NULL /* no name */);
+				      false,	/* start non signaled */
+				      NULL /* no name */);
   /* TODO: make a shared mem mutex if out attributes request shared mem cond */
   cond_access = NULL;
   if ((temperr = pthread_mutex_init (&this->cond_access, NULL)))
@@ -1105,7 +1105,7 @@ pthread_mutex::nativeMutex pthread_mutex::mutexInitializationLock NO_COPY;
 void
 pthread_mutex::initMutex ()
 {
-  if (!mutexInitializationLock.init())
+  if (!mutexInitializationLock.init ())
     api_fatal ("Could not create win32 Mutex for pthread mutex static initializer support.\n");
 }
 
@@ -1213,9 +1213,9 @@ pthread_mutex::fixup_after_fork ()
 }
 
 bool
-pthread_mutex::nativeMutex::init()
+pthread_mutex::nativeMutex::init ()
 {
-  theHandle = CreateMutex (NULL, FALSE, NULL);
+  theHandle = CreateMutex (&sec_none_nih, FALSE, NULL);
   if (!theHandle)
     {
       debug_printf ("CreateMutex failed. %E");
@@ -1225,7 +1225,7 @@ pthread_mutex::nativeMutex::init()
 }
 
 bool
-pthread_mutex::nativeMutex::lock()
+pthread_mutex::nativeMutex::lock ()
 {
   DWORD waitResult = WaitForSingleObject (theHandle, INFINITE);
   if (waitResult != WAIT_OBJECT_0)
@@ -1237,7 +1237,7 @@ pthread_mutex::nativeMutex::lock()
 }
 
 void
-pthread_mutex::nativeMutex::unlock()
+pthread_mutex::nativeMutex::unlock ()
 {
   if (!ReleaseMutex (theHandle))
     system_printf ("Received a unexpected result releasing mutex. %E");
@@ -1263,7 +1263,7 @@ pthread_mutexattr::~pthread_mutexattr ()
 semaphore::semaphore (int pshared, unsigned int value):verifyable_object (SEM_MAGIC)
 {
   this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, value, LONG_MAX,
-					 NULL);
+					  NULL);
   if (!this->win32_obj_id)
     magic = 0;
   this->shared = pshared;
@@ -2251,13 +2251,13 @@ pthread_mutex::init (pthread_mutex_t *mutex,
 {
   if (attr && !pthread_mutexattr::isGoodObject (attr) || check_valid_pointer (mutex))
     return EINVAL;
-  if (!mutexInitializationLock.lock())
+  if (!mutexInitializationLock.lock ())
     return EINVAL;
 
   /* FIXME: bugfix: we should check *mutex being a valid address */
   if (isGoodObject (mutex))
     {
-      mutexInitializationLock.unlock();
+      mutexInitializationLock.unlock ();
       return EBUSY;
     }
 
@@ -2266,10 +2266,10 @@ pthread_mutex::init (pthread_mutex_t *mutex,
     {
       delete (*mutex);
       *mutex = NULL;
-      mutexInitializationLock.unlock();
+      mutexInitializationLock.unlock ();
       return EAGAIN;
     }
-  mutexInitializationLock.unlock();
+  mutexInitializationLock.unlock ();
   return 0;
 }
 
@@ -2312,7 +2312,7 @@ __pthread_mutex_lock (pthread_mutex_t *mutex)
 	    return rv;
 	}
       /* No else needed. If it's been initialized while we waited,
-         we can just attempt to lock it */
+	 we can just attempt to lock it */
       break;
     case VALID_OBJECT:
       break;
