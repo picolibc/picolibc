@@ -426,7 +426,7 @@ struct __stat64
     short st_uid;
     short st_gid;
     _dev_t st_rdev;
-    _off_t st_size;
+    __int64 st_size;
     __time64_t st_atime;
     __time64_t st_mtime;
     __time64_t st_ctime;
