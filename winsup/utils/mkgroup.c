@@ -1,6 +1,6 @@
 /* mkgroup.c:
 
-   Copyright 1997, 1998 Cygnus Solutions.
+   Copyright 1997, 1998, 2002 Cygnus Solutions.
 
    This file is part of Cygwin.
 
@@ -19,6 +19,8 @@
 #include <lmapibuf.h>
 #include <ntsecapi.h>
 #include <ntdef.h>
+
+static const char version[] = "$Revision$";
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
@@ -402,23 +404,24 @@ print_special (int print_sids,
 }
 
 int
-usage ()
+usage (FILE * stream, int status)
 {
-  fprintf (stderr, "Usage: mkgroup [OPTION]... [domain]\n\n");
-  fprintf (stderr, "This program prints a /etc/group file to stdout\n\n");
-  fprintf (stderr, "Options:\n");
-  fprintf (stderr, "   -l,--local             print local group information\n");
-  fprintf (stderr, "   -d,--domain            print global group information from the domain\n");
-  fprintf (stderr, "                          specified (or from the current domain if there is\n");
-  fprintf (stderr, "                          no domain specified)\n");
-  fprintf (stderr, "   -o,--id-offset offset  change the default offset (10000) added to uids\n");
-  fprintf (stderr, "                          in domain accounts.\n");
-  fprintf (stderr, "   -s,--no-sids           don't print SIDs in pwd field\n");
-  fprintf (stderr, "                          (this affects ntsec)\n");
-  fprintf (stderr, "   -u,--users             print user list in gr_mem field\n");
-  fprintf (stderr, "   -?,--help              print this message\n\n");
-  fprintf (stderr, "One of `-l' or `-d' must be given on NT/W2K.\n");
-  return 1;
+  fprintf (stream, "Usage: mkgroup [OPTION]... [domain]\n\n");
+  fprintf (stream, "This program prints a /etc/group file to stdout\n\n");
+  fprintf (stream, "Options:\n");
+  fprintf (stream, "   -l,--local             print local group information\n");
+  fprintf (stream, "   -d,--domain            print global group information from the domain\n");
+  fprintf (stream, "                          specified (or from the current domain if there is\n");
+  fprintf (stream, "                          no domain specified)\n");
+  fprintf (stream, "   -o,--id-offset offset  change the default offset (10000) added to uids\n");
+  fprintf (stream, "                          in domain accounts.\n");
+  fprintf (stream, "   -s,--no-sids           don't print SIDs in pwd field\n");
+  fprintf (stream, "                          (this affects ntsec)\n");
+  fprintf (stream, "   -u,--users             print user list in gr_mem field\n");
+  fprintf (stream, "   -h,--help              print this message\n\n");
+  fprintf (stream, "   -v,--version           print version information and exit\n\n");
+  fprintf (stream, "One of `-l' or `-d' must be given on NT/W2K.\n");
+  return status;
 }
 
 struct option longopts[] = {
@@ -428,10 +431,32 @@ struct option longopts[] = {
   {"no-sids", no_argument, NULL, 's'},
   {"users", no_argument, NULL, 'u'},
   {"help", no_argument, NULL, 'h'},
+  {"version", no_argument, NULL, 'v'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "ldo:suh";
+char opts[] = "ldo:suhv";
+
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+mkgroup (cygwin) %.*s\n\
+group File Generator\n\
+Copyright 1997, 1998, 2002 Red Hat, Inc.\n\
+Compiled on %s", len, v, __DATE__);
+}
 
 int
 main (int argc, char **argv)
@@ -461,7 +486,7 @@ main (int argc, char **argv)
   if (GetVersion () < 0x80000000)
     {
       if (argc == 1)
-	return usage ();
+	return usage(stderr, 1);
       else
 	{
 	  while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
@@ -483,7 +508,10 @@ main (int argc, char **argv)
 		print_users = 1;
 		break;
 	      case 'h':
-		return usage ();
+		return usage (stdout, 0);
+	      case 'v':
+		print_version ();
+		exit (0);
 	      default:
 		fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
 		return 1;

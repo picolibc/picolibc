@@ -1,3 +1,13 @@
+2002-03-16  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* mkgroup.c (usage): Simplify usage output.  Generalize to allow use
+	for help. Correct '?' typo to 'h'.
+	(longopts): Add version option.
+	(opts): Add 'v' version option.
+	(print_version): New function.
+	(main): Accommodate new version option.  Accommodate usage parameter
+	changes.  Use usage to output help message.
+
 2002-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (main): When generating group 513, check for computer's
