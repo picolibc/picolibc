@@ -1241,7 +1241,6 @@
 
 2003-09-26  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
 
-	* Makefile.in: Add libusr32.a to DLL_IMPORTS.
 	* wincap.h (wincaps::is_server): New flag.
 	(wincapc::version): Change type to OSVERSIONINFOEX.
 	(wincapc::is_server): New function.
