@@ -1,3 +1,11 @@
+Sun Dec  3 00:13:26 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Use CXX to build the DLL.
+	* configure.in: Find correct c++ compiler.
+	* configure: Regenerate.
+	* path.cc (normalize_posix_path): Put correct drive at beginning of \foo style paths.
+	(chdir): Don't send non-posix path to cygcwd.set.
+
 Sat Dec  2 22:26:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (get_inet_addr ): Close AF_UNIX socket file after reading.

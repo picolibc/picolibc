@@ -713,11 +713,13 @@ normalize_win32_path (const char *src, char *dst)
   char *dst_start = dst;
   char *dst_root_start = dst;
 
-  if (!SLASH_P (src[0]) && strchr (src, ':') == NULL)
+  if (strchr (src, ':') == NULL)
     {
       if (!cygcwd.get (dst, 0))
 	return get_errno ();
-      if (strlen (dst) + 1 + strlen (src) >= MAX_PATH)
+      if (SLASH_P (src[0]))
+	dst[2] = '\0';
+      else if (strlen (dst) + 1 + strlen (src) >= MAX_PATH)
 	{
 	  debug_printf ("ENAMETOOLONG = normalize_win32_path (%s)", src);
 	  return ENAMETOOLONG;
@@ -2557,7 +2559,7 @@ chdir (const char *dir)
   if (res == -1)
     __seterrno ();
   else
-    cygcwd.set (path, dir);
+    cygcwd.set (path, strpbrk (dir, ":\\") != NULL ? NULL : dir);
 
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */

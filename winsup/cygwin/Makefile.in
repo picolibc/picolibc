@@ -52,6 +52,7 @@ CC:=@CC@
 CC_FOR_TARGET:=$(CC)
 CFLAGS:=@CFLAGS@
 CFLAGS+=-MD -fbuiltin
+CXX:=@CXX@
 CXXFLAGS:=@CXXFLAGS@
 
 # For linking mount, etc. crt0.o isn't accessable in a fresh build.
@@ -191,8 +192,8 @@ new-$(LIB_NAME): $(LIB_NAME)
 # Rule to build cygwin.dll
 
 new-$(DLL_NAME): $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
-	$(LD) -shared -o $@ -e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o \
-	winver.o $(DLL_IMPORTS) $(LIBM) $(LIBGCC) $(MALLOC_OBJ) $(LIBC) $(LIBGCC)
+	$(CXX) $(CXXFLAGS) -nostartfiles -Wl,-shared -o $@ -e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o \
+	winver.o $(DLL_IMPORTS) $(LIBM) $(MALLOC_OBJ) $(LIBC)
 
 dll_ofiles: $(DLL_OFILES)
 
