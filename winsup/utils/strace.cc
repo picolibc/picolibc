@@ -909,6 +909,7 @@ main (int argc, char **argv)
   else
     pgm++;
 
+  (void) putenv("POSIXLY_CORRECT=1");
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (opt)
       {

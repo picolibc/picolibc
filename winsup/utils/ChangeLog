@@ -1,3 +1,8 @@
+2004-02-10  Christopher Faylor  <cgf@redhat.com>
+
+	* strace.cc (main): Ensure POSIXLY_CORRECT argument ordering.
+	* cygcheck.cc (main): Ditto.
+
 2004-01-23  Christopher Faylor  <cgf@redhat.com>
 
 	* cygcheck.cc (pretty_id): Make more robust in absence of id.exe.

@@ -1390,6 +1390,7 @@ main (int argc, char **argv)
 {
   int i;
 
+  (void) putenv("POSIXLY_CORRECT=1");
   while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (i)
       {
