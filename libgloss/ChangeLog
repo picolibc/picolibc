@@ -1,5 +1,11 @@
 2005-01-18  Hans-Peter Nilsson  <hp@axis.com>
 
+	* libnosys/warning.h (link_warning) [HAVE_GNU_LD and HAVE_ELF]:
+	Prefix symbol in section name with __SYMBOL_PREFIX.  Do not use
+	__make_section_unallocated.  Mark magic variable as used.
+
+2005-01-18  Hans-Peter Nilsson  <hp@axis.com>
+
 	* libnosys/configure.in (libc_cv_asm_previous_directive): Set
 	cache-id variable.
 	(libc_cv_asm_popsection_directive): Ditto.
