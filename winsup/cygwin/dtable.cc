@@ -158,8 +158,10 @@ dtable::release (int fd)
 	{
 	case FH_SOCKET:
 	  dec_need_fixup_before ();
+	  break;
 	case FH_CONSOLE:
 	  dec_console_fds ();
+	  break;
 	}
       delete fds[fd];
       fds[fd] = NULL;
