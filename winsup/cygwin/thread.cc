@@ -377,8 +377,8 @@ pthread::setTlsSelfPointer(pthread *thisThread)
 
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-                    cancelstate (0), canceltype (0), cancel_event(0),
-                    joiner (NULL), cleanup_stack(NULL) 
+		    cancelstate (0), canceltype (0), cancel_event(0),
+		    joiner (NULL), cleanup_stack(NULL)
 {
 }
 
@@ -434,7 +434,7 @@ pthread::precreate (pthread_attr *newattr)
 void
 pthread::create (void *(*func) (void *), pthread_attr *newattr,
 		 void *threadarg)
-{ 
+{
   precreate (newattr);
   if (!magic)
       return;
@@ -483,7 +483,7 @@ pthread::exit (void *value_ptr)
   if( __pthread_equal(&joiner, &thread ) )
     delete this;
   else
-    {  
+    {
       return_ptr = value_ptr;
       mutex.UnLock ();
     }
@@ -739,7 +739,7 @@ pthread::setcancelstate (int state, int *oldstate)
   else
     {
       if (oldstate)
-        *oldstate = cancelstate;
+	*oldstate = cancelstate;
       cancelstate = state;
     }
 
@@ -760,7 +760,7 @@ pthread::setcanceltype (int type, int *oldtype)
   else
     {
       if (oldtype)
-        *oldtype = canceltype;
+	*oldtype = canceltype;
       canceltype = type;
     }
 
@@ -774,7 +774,7 @@ pthread::push_cleanup_handler (__pthread_cleanup_handler *handler)
 {
   if (this != self ())
     // TODO: do it?
-    api_fatal ("Attempt to push a cleanup handler across threads"); 
+    api_fatal ("Attempt to push a cleanup handler across threads");
   handler->next = cleanup_stack;
   InterlockedExchangePointer( &cleanup_stack, handler );
 }
@@ -785,7 +785,7 @@ pthread::pop_cleanup_handler (int const execute)
   if (this != self ())
     // TODO: send a signal or something to the thread ?
     api_fatal ("Attempt to execute a cleanup handler across threads");
-  
+
   mutex.Lock ();
 
   if (cleanup_stack != NULL)
@@ -793,7 +793,7 @@ pthread::pop_cleanup_handler (int const execute)
       __pthread_cleanup_handler *handler = cleanup_stack;
 
       if (execute)
-        (*handler->function) (handler->arg);
+	(*handler->function) (handler->arg);
       cleanup_stack = handler->next;
     }
 

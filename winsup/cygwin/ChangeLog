@@ -1,11 +1,15 @@
+2002-09-16  Christopher Faylor  <cgf@redhat.com>
+
+	* init.cc: Cleanup slightly and remove obsolete code.
+
 2002-09-11  Robert Collins  <rbtcollins@hotmail.com>
 
 	* init.cc (dll_entry): On thread detach, if the thread hasn't
 	exit()ed, do so.
-	* pthread.cc (pthread_getsequence_np): Remove the 
+	* pthread.cc (pthread_getsequence_np): Remove the
 	__pthread_getsequence_np wrapper. This requires errno.h.
-	* thread.cc (pthread::self): Instantiate a new pthread object 
-	when called and none exists. return a NULL object if instantiation 
+	* thread.cc (pthread::self): Instantiate a new pthread object
+	when called and none exists. return a NULL object if instantiation
 	fails.
 	(pthread::precreate): Factor out common code.
 	(pthread::postcreate): Ditto.
@@ -38,7 +42,7 @@
 	(__pthread_getsequence_np): Remove.
 	(__pthread_setschedparam): Apply Extract Method to the object
 	validation.
-	(pthreadNull::getNullpthread): New method, return the pthreadNull 
+	(pthreadNull::getNullpthread): New method, return the pthreadNull
 	object.
 	(pthreadNull::pthreadNull): Private constructor to prevent accidental
 	use.

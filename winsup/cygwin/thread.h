@@ -318,7 +318,7 @@ private:
 
 class pthreadNull : public pthread
 {
-  public: 
+  public:
     static pthread *getNullpthread();
     ~pthreadNull();
 
