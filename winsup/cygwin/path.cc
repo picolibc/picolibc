@@ -536,9 +536,12 @@ path_conv::check (const char *src, unsigned opt,
 		  case 2:
 		    fileattr = FILE_ATTRIBUTE_DIRECTORY;
 		    break;
-		  default:
 		  case -1:
 		    fileattr = 0;
+		    break;
+		  default:
+		    fileattr = INVALID_FILE_ATTRIBUTES;
+		    break;
 		}
 	      delete fh;
 	      goto out;
@@ -3304,6 +3307,11 @@ chdir (const char *in_dir)
   int devn = path.get_devn();
   if (!isvirtual_dev (devn))
     res = SetCurrentDirectory (native_dir) ? 0 : -1;
+  else if (!path.exists ())
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
   else
     {
       native_dir = "c:\\";

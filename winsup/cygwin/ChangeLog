@@ -1,5 +1,12 @@
 2002-05-30  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc (path_conv::check): Set fileattr to INVALID_FILE_ATTRIBUTES
+	for nonexistent virtual device path.
+	(chdir): Set correct errno when attempt is made to cd to nonexistent
+	virtual device path.
+
+2002-05-30  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat): Always call
 	fstat_by_name if fd is not opened to allow fstat_by_name to properly
 	set errno.
