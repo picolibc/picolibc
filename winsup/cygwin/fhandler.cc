@@ -887,8 +887,9 @@ fhandler_disk_file::fstat (struct stat *buf)
   buf->st_dev     = local.dwVolumeSerialNumber;
   buf->st_size    = local.nFileSizeLow;
 
-  /* Allocate some place to determine the root directory. */
-  char root[strlen (get_win32_name ()) + 1];
+  /* Allocate some place to determine the root directory. Need to allocate
+     enough so that rootdir can add a trailing slash if path starts with \\. */
+  char root[strlen (get_win32_name ()) + 3];
   strcpy (root, get_win32_name ());
 
   /* Assume that if a drive has ACL support it MAY have valid "inodes".
