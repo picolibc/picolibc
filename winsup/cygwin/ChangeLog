@@ -29,7 +29,7 @@
 	* init.cc (respawn_wow64_process): New function.
 	(dll_entry): If process has been started from a 64 bit
 	process, call respawn_wow64_process.
-	* uname.cc (uname): On 64 bit systems, use GetNativeSystemInfo. 
+	* uname.cc (uname): On 64 bit systems, use GetNativeSystemInfo.
 	Show actual CPU type.
 
 2004-07-23  Corinna Vinschen  <corinna@vinschen.de>
