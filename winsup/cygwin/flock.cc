@@ -15,9 +15,9 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#include "winsup.h"
+#include "cygerrno.h"
 #include <sys/file.h>
-#include <sys/types.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -25,7 +25,7 @@ int
 flock (int fd, int operation)
 {
   int i, cmd;
-  struct flock l = { 0, 0, 0, 0, 0 };
+  struct __flock64 l = { 0, 0, 0, 0, 0 };
   if (operation & LOCK_NB)
     {
       cmd = F_SETLK;
@@ -39,40 +39,40 @@ flock (int fd, int operation)
     {
     case LOCK_EX:
       l.l_type = F_WRLCK;
-      i = fcntl (fd, cmd, &l);
+      i = fcntl_worker (fd, cmd, &l);
       if (i == -1)
 	{
-	  if ((errno == EAGAIN) || (errno == EACCES))
+	  if ((get_errno () == EAGAIN) || (get_errno () == EACCES))
 	    {
-	      errno = EWOULDBLOCK;
+	      set_errno (EWOULDBLOCK);
 	    }
 	}
       break;
     case LOCK_SH:
       l.l_type = F_RDLCK;
-      i = fcntl (fd, cmd, &l);
+      i = fcntl_worker (fd, cmd, &l);
       if (i == -1)
 	{
-	  if ((errno == EAGAIN) || (errno == EACCES))
+	  if ((get_errno () == EAGAIN) || (get_errno () == EACCES))
 	    {
-	      errno = EWOULDBLOCK;
+	      set_errno (EWOULDBLOCK);
 	    }
 	}
       break;
     case LOCK_UN:
       l.l_type = F_UNLCK;
-      i = fcntl (fd, cmd, &l);
+      i = fcntl_worker (fd, cmd, &l);
       if (i == -1)
 	{
-	  if ((errno == EAGAIN) || (errno == EACCES))
+	  if ((get_errno () == EAGAIN) || (get_errno () == EACCES))
 	    {
-	      errno = EWOULDBLOCK;
+	      set_errno (EWOULDBLOCK);
 	    }
 	}
       break;
     default:
       i = -1;
-      errno = EINVAL;
+      set_errno (EINVAL);
       break;
     }
   return i;

@@ -19,7 +19,7 @@ details. */
 #include "cygheap.h"
 #include "thread.h"
 
-static int
+int
 fcntl_worker (int fd, int cmd, void *arg)
 {
   int res;

@@ -298,6 +298,8 @@ int symlink_worker (const char *, const char *, bool, bool)
 class path_conv;
 int access_worker (path_conv&, int) __attribute__ ((regparm (2)));
 
+int fcntl_worker (int fd, int cmd, void *arg);
+
 extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
 #define SLEEP_0_STAY_LOW INFINITE
 
