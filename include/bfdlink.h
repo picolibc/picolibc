@@ -298,6 +298,10 @@ struct bfd_link_info
      Setting this true may result in a non-sharable text segment.  */
   boolean nocopyreloc;
 
+  /* True if .eh_frame_hdr section and PT_GNU_EH_FRAME ELF segment
+     should be created.  */
+  boolean eh_frame_hdr;
+
   /* How many spare .dynamic DT_NULL entries should be added?  */
   unsigned int spare_dynamic_tags;
 };

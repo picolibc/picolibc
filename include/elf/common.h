@@ -256,6 +256,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define PT_LOPROC	0x70000000	/* Processor-specific */
 #define PT_HIPROC	0x7FFFFFFF	/* Processor-specific */
 
+#define PT_GNU_EH_FRAME	(PT_LOOS + 0x474e550)
+
 /* Program segment permissions, in program header p_flags field.  */
 
 #define PF_X		(1 << 0)	/* Segment is executable */

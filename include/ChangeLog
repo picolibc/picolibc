@@ -1,3 +1,8 @@
+2001-12-13  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/common.h (PT_GNU_EH_FRAME): Define.
+	* bfdlink.h (struct bfd_link_info): Add eh_frame_hdr field.
+
 2001-12-07  Geoffrey Keating  <geoffk@redhat.com>
 
 	* dis-asm.h (print_insn_xstormy16): Declare.
