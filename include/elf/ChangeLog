@@ -1,3 +1,8 @@
+2004-07-27  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* crx.h: Add BFD_RELOC_CRX_SWITCH8, BFD_RELOC_CRX_SWITCH16,
+	BFD_RELOC_CRX_SWITCH32.
+
 2004-07-06  Tomer Levi  <Tomer.Levi@nsc.com>
 
 	* common.h (EM_CRX): Define.
