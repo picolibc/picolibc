@@ -789,7 +789,7 @@ path_conv::check (const char *src, unsigned opt,
 	}
 
      /* Copy the symlink contents to the end of tmp_buf.
-	Convert slashes.  FIXME? I think it's fine / Pierre */
+	Convert slashes. */
       for (char *p = sym.contents; *p; p++)
 	*headptr++ = *p == '\\' ? '/' : *p;
       *headptr = '\0';
@@ -1007,18 +1007,26 @@ normalize_win32_path (const char *src, char *dst, char **tail)
       /* Backup if "..".  */
       else if (src[0] == '.' && src[1] == '.'
 	       /* dst must be greater than dst_start */
-	       && dst[-1] == '\\'
-	       && (isdirsep (src[2]) || src[2] == 0))
-	{
-	  /* Back up over /, but not if it's the first one.  */
-	  if (dst > dst_root_start + 1)
-	    dst--;
-	  /* Now back up to the next /.  */
-	  while (dst > dst_root_start + 1 && dst[-1] != '\\' && dst[-2] != ':')
-	    dst--;
-	  src += 2;
-	  if (isdirsep (*src))
-	    src++;
+	       && dst[-1] == '\\')
+        {
+	  if (isdirsep (src[2]) || src[2] == 0)
+	    {
+	      /* Back up over /, but not if it's the first one.  */
+	      if (dst > dst_root_start + 1)
+		dst--;
+	      /* Now back up to the next /.  */
+	      while (dst > dst_root_start + 1 && dst[-1] != '\\' && dst[-2] != ':')
+		dst--;
+	      src += 2;
+	      if (isdirsep (*src))
+		src++;
+	    }
+	  else
+	    {
+	      int n = strspn (src, ".");
+	      if (!src[n] || isdirsep (src[n])) /* just dots... */
+		return ENOENT;
+	    }
 	}
       /* Otherwise, add char to result.  */
       else
@@ -1032,6 +1040,8 @@ normalize_win32_path (const char *src, char *dst, char **tail)
       if ((dst - dst_start) >= CYG_MAX_PATH)
 	return ENAMETOOLONG;
     }
+   if (dst > dst_start + 1 && dst[-1] == '.' && dst[-2] == '\\')
+     dst--;
   *dst = '\0';
   *tail = dst;
   debug_printf ("%s = normalize_win32_path (%s)", dst_start, src_start);
@@ -1502,11 +1512,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       chroot_ok = true;
     }
   else
-    {
-      if (strchr (src_path, ':') == NULL && !is_unc_share (src_path))
-	set_flags (flags, PATH_BINARY);
-      backslashify (src_path, dst, 0);
-    }
+    backslashify (src_path, dst, 0);
 
  out:
   MALLOC_CHECK;
@@ -3302,24 +3308,6 @@ chdir (const char *in_dir)
     {
       set_errno (path.error);
       syscall_printf ("-1 = chdir (%s)", dir);
-      return -1;
-    }
-
-
-  /* Look for trailing path component consisting entirely of dots.  This
-     is needed only in case of chdir since Windows simply ignores count
-     of dots > 2 here instead of returning an error code.  Counts of dots
-     <= 2 are already eliminated by normalize_posix_path. */
-  const char *p = strrchr (dir, '/');
-  if (!p)
-    p = dir;
-  else
-    p++;
-
-  size_t len = strlen (p);
-  if (len > 2 && strspn (p, ".") == len)
-    {
-      set_errno (ENOENT);
       return -1;
     }
 
