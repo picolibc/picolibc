@@ -27,6 +27,8 @@ details. */
 #include "perthread.h"
 #include "perprocess.h"
 #include "dll_init.h"
+#include "sync.h"
+#include "cygmalloc.h"
 
 #ifdef DEBUGGING
 static int npid;
@@ -456,7 +458,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
-  __malloc_lock (_reent_clib ());
+  __malloc_lock ();
   void *newheap;
   newheap = cygheap_setup_for_child (&ch,cygheap->fdtab.need_fixup_before ());
   rc = CreateProcess (myself->progname, /* image to run */
@@ -555,7 +557,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 		  dll_data_start, dll_data_end,
 		  dll_bss_start, dll_bss_end, NULL);
 
-  __malloc_unlock (_reent_clib ());
+  __malloc_unlock ();
   MALLOC_CHECK;
   if (!rc)
     goto cleanup;

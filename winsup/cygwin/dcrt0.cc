@@ -78,11 +78,6 @@ char NO_COPY almost_null[1];
 
 extern "C"
 {
-  void *export_malloc (unsigned int);
-  void export_free (void *);
-  void *export_realloc (void *, unsigned int);
-  void *export_calloc (unsigned int, unsigned int);
-
   /* This is an exported copy of environ which can be used by DLLs
      which use cygwin.dll.  */
   char **__cygwin_environ;
@@ -95,12 +90,12 @@ extern "C"
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
    /* dll_major */ CYGWIN_VERSION_DLL_MINOR,
    /* impure_ptr_ptr */ NULL, /* envptr */ NULL,
-   /* malloc */ export_malloc, /* free */ export_free,
-   /* realloc */ export_realloc,
+   /* malloc */ malloc, /* free */ free,
+   /* realloc */ realloc,
    /* fmode_ptr */ NULL, /* main */ NULL, /* ctors */ NULL,
    /* dtors */ NULL, /* data_start */ NULL, /* data_end */ NULL,
    /* bss_start */ NULL, /* bss_end */ NULL,
-   /* calloc */ export_calloc,
+   /* calloc */ calloc,
    /* premain */ {NULL, NULL, NULL, NULL},
    /* run_ctors_p */ 0,
    /* unused */ {0, 0, 0, 0, 0, 0, 0},
@@ -158,10 +153,10 @@ do_global_ctors (void (**in_pfunc)(), int force)
 }
 
 /*
- * Replaces -@file in the command line with the contents of the file.
- * There may be multiple -@file's in a single command line
- * A \-@file is replaced with -@file so that echo \-@foo would print
- * -@foo and not the contents of foo.
+ * Replaces @file in the command line with the contents of the file.
+ * There may be multiple @file's in a single command line
+ * A \@file is replaced with @file so that echo \@foo would print
+ * @foo and not the contents of foo.
  */
 static int __stdcall
 insert_file (char *name, char *&cmd)
@@ -455,7 +450,8 @@ check_sanity_and_sync (per_process *p)
 child_info NO_COPY *child_proc_info = NULL;
 static MEMORY_BASIC_INFORMATION NO_COPY sm;
 
-#define CYGWIN_GUARD ((wincap.has_page_guard ()) ? PAGE_GUARD : PAGE_NOACCESS)
+#define CYGWIN_GUARD ((wincap.has_page_guard ()) ? \
+                     PAGE_EXECUTE_READWRITE|PAGE_GUARD : PAGE_NOACCESS)
 
 // __inline__ void
 extern void
@@ -496,7 +492,7 @@ alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
     {
       m.BaseAddress = (LPVOID)((DWORD)m.BaseAddress - 1);
       if (!VirtualAlloc ((LPVOID) m.BaseAddress, 1, MEM_COMMIT,
-			 PAGE_EXECUTE_READWRITE|CYGWIN_GUARD))
+			 CYGWIN_GUARD))
 	api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
 		   m.BaseAddress);
     }

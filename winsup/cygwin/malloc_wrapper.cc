@@ -1,4 +1,4 @@
-/* malloc.cc
+/* malloc_wrapper.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
@@ -24,6 +24,7 @@ details. */
 #include "heap.h"
 #include "sync.h"
 #include "perprocess.h"
+#include "cygmalloc.h"
 
 /* we provide these stubs to call into a user's
    provided malloc if there is one - otherwise
@@ -103,38 +104,181 @@ strdup (const char *s)
   return strdup_dbg (s, __FILE__, __LINE__);
 }
 #else
-/* Call though the application pointer,
-   which either points to export_malloc, or the application's
-   own version. */
+#endif
+/* These routines are used by the application if it
+   doesn't provide its own malloc. */
 
-void *
+extern "C" void
+free (void *p)
+{
+  malloc_printf ("(%p), called by %x", p, ((int *)&p)[-1]);
+  if (!use_internal_malloc)
+    user_data->free (p);
+  else
+    {
+      __malloc_lock ();
+      dlfree (p);
+      __malloc_unlock ();
+    }
+}
+
+extern "C" void *
 malloc (size_t size)
 {
   void *res;
-  res = user_data->malloc (size);
+  export_malloc_called = 1;
+  if (!use_internal_malloc)
+    res = user_data->malloc (size);
+  else
+    {
+      __malloc_lock ();
+      res = dlmalloc (size);
+      __malloc_unlock ();
+    }
+  malloc_printf ("(%d) = %x, called by %x", size, res, ((int *)&size)[-1]);
   return res;
 }
 
-void
-free (void *p)
-{
-  user_data->free (p);
-}
-
-void *
+extern "C" void *
 realloc (void *p, size_t size)
 {
   void *res;
-  res = user_data->realloc (p, size);
+  if (!use_internal_malloc)
+    res = user_data->realloc (p, size);
+  else
+    {
+      __malloc_lock ();
+      res = dlrealloc (p, size);
+      __malloc_unlock ();
+    }
+  malloc_printf ("(%x, %d) = %x, called by %x", p, size, res, ((int *)&p)[-1]);
   return res;
 }
 
-void *
+extern "C" void *
 calloc (size_t nmemb, size_t size)
 {
   void *res;
-  res = user_data->calloc (nmemb, size);
+  if (!use_internal_malloc)
+    res = user_data->calloc (nmemb, size);
+  else
+    {
+      __malloc_lock ();
+      res = dlcalloc (nmemb, size);
+      __malloc_unlock ();
+    }
+  malloc_printf ("(%d, %d) = %x, called by %x", nmemb, size, res, ((int *)&nmemb)[-1]);
   return res;
+}
+
+extern "C" void *
+memalign (size_t alignment, size_t bytes)
+{
+  void *res;
+  if (!use_internal_malloc)
+    {
+      set_errno (ENOSYS);
+      res = NULL;
+    }
+  else
+    {
+      __malloc_lock ();
+      res = dlmemalign (alignment, bytes);
+      __malloc_unlock ();
+    }
+
+  return res;
+}
+
+extern "C" void *
+valloc (size_t bytes)
+{
+  void *res;
+  if (!use_internal_malloc)
+    {
+      set_errno (ENOSYS);
+      res = NULL;
+    }
+  else
+    {
+      __malloc_lock ();
+      res = dlvalloc (bytes);
+      __malloc_unlock ();
+    }
+
+  return res;
+}
+
+extern "C" size_t
+malloc_usable_size (void *p)
+{
+  size_t res;
+  if (!use_internal_malloc)
+    {
+      set_errno (ENOSYS);
+      res = 0;
+    }
+  else
+    {
+      __malloc_lock ();
+      res = dlmalloc_usable_size (p);
+      __malloc_unlock ();
+    }
+
+  return res;
+}
+
+extern "C" int
+malloc_trim (size_t pad)
+{
+  size_t res;
+  if (!use_internal_malloc)
+    {
+      set_errno (ENOSYS);
+      res = 0;
+    }
+  else
+    {
+      __malloc_lock ();
+      res = dlmalloc_trim (pad);
+      __malloc_unlock ();
+    }
+
+  return res;
+}
+
+extern "C" int
+mallopt (int p, int v)
+{
+  int res;
+  if (!use_internal_malloc)
+    {
+      set_errno (ENOSYS);
+      res = 0;
+    }
+  else
+    {
+      __malloc_lock ();
+      res = dlmallopt (p, v);
+      __malloc_unlock ();
+    }
+
+  return res;
+}
+
+extern "C" void
+malloc_stats ()
+{
+  if (!use_internal_malloc)
+    set_errno (ENOSYS);
+  else
+    {
+      __malloc_lock ();
+      dlmalloc_stats ();
+      __malloc_unlock ();
+    }
+
+  return;
 }
 
 extern "C" char *
@@ -143,65 +287,8 @@ strdup (const char *s)
   char *p;
   size_t len = strlen (s) + 1;
   if ((p = (char *) malloc (len)) != NULL)
-      memcpy (p, s, len);
+    memcpy (p, s, len);
   return p;
-}
-
-extern "C" char *
-_strdup_r (struct _reent *, const char *s)
-{
-  return strdup (s);
-}
-#endif
-
-/* These routines are used by the application if it
-   doesn't provide its own malloc. */
-
-extern "C" void
-export_free (void *p)
-{
-  malloc_printf ("(%p), called by %x", p, ((int *)&p)[-1]);
-  if (use_internal_malloc)
-    _free_r (_impure_ptr, p);
-  else
-    user_data->free (p);
-}
-
-extern "C" void *
-export_malloc (int size)
-{
-  void *res;
-  export_malloc_called = 1;
-  if (use_internal_malloc)
-    res = _malloc_r (_impure_ptr, size);
-  else
-    res = user_data->malloc (size);
-  malloc_printf ("(%d) = %x, called by %x", size, res, ((int *)&size)[-1]);
-  return res;
-}
-
-extern "C" void *
-export_realloc (void *p, int size)
-{
-  void *res;
-  if (use_internal_malloc)
-    res = _realloc_r (_impure_ptr, p, size);
-  else
-    res = user_data->realloc (p, size);
-  malloc_printf ("(%x, %d) = %x, called by %x", p, size, res, ((int *)&p)[-1]);
-  return res;
-}
-
-extern "C" void *
-export_calloc (size_t nmemb, size_t size)
-{
-  void *res;
-  if (use_internal_malloc)
-    res = _calloc_r (_impure_ptr, nmemb, size);
-  else
-    res = user_data->calloc (nmemb, size);
-  malloc_printf ("(%d, %d) = %x, called by %x", nmemb, size, res, ((int *)&nmemb)[-1]);
-  return res;
 }
 
 /* We use a critical section to lock access to the malloc data
@@ -211,14 +298,14 @@ export_calloc (size_t nmemb, size_t size)
    newlib will call __malloc_lock and __malloc_unlock at appropriate
    times.  */
 
-static NO_COPY muto *mprotect = NULL;
+NO_COPY muto *mallock = NULL;
 
 void
 malloc_init ()
 {
-  new_muto (mprotect);
+  new_muto (mallock);
   /* Check if mallock is provided by application. If so, redirect all
-     calls to export_malloc/free/realloc to application provided. This may
+     calls to malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides
      its own malloc */
   if (!user_data->forkee)
@@ -231,16 +318,4 @@ malloc_init ()
       if (!export_malloc_called)
 	use_internal_malloc = 0;
     }
-}
-
-extern "C" void
-__malloc_lock (struct _reent *)
-{
-  mprotect->acquire ();
-}
-
-extern "C" void
-__malloc_unlock (struct _reent *)
-{
-  mprotect->release ();
 }

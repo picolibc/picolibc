@@ -29,14 +29,14 @@ public:
 #if 0	/* FIXME: See comment in sync.cc */
   ~muto ()
 #endif
-  int acquire (DWORD ms = INFINITE) __attribute__ ((regparm (1))); /* Acquire the lock. */
-  int release ();		     /* Release the lock. */
+  int acquire (DWORD ms = INFINITE) __attribute__ ((regparm (2))); /* Acquire the lock. */
+  int release () __attribute__ ((regparm (1)));		     /* Release the lock. */
 
   /* Return true if caller thread owns the lock. */
   int ismine () {return tid == GetCurrentThreadId ();}
   DWORD owner () {return tid;}
   int unstable () {return !tid && (sync || waiters >= 0);}
-  void reset ();
+  void reset () __attribute__ ((regparm (1)));
 };
 
 extern muto muto_start;
