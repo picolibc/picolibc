@@ -38,15 +38,15 @@ public:
   cleanup_routine () : next (NULL) {};
   class cleanup_routine * next;
   /* MUST BE SYNCHRONOUS */
-  virtual void cleanup (long winpid);
+  virtual void cleanup (DWORD winpid);
 };
 
 class process
 {
 public:
   HANDLE handle ();
-  long winpid;
-  process (long);
+  DWORD winpid;
+  process (DWORD winpid);
   ~process ();
   DWORD exit_code ();
   class process * next;
@@ -67,7 +67,7 @@ class process_cache:public threaded_queue
 public:
   process_cache (unsigned int initial_workers);
   virtual ~ process_cache ();
-  class process *process (long);
+  class process *process (DWORD winpid);
   /* remove a process from the cache */
   int handle_snapshot (HANDLE *, class process **, ssize_t, int);
   void remove_process (class process *);

@@ -166,49 +166,57 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 {
   HANDLE local_handle = NULL;
   int ret_val = EACCES;
-  char sd_buf [1024];
-  PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) &sd_buf;
-  DWORD bytes_needed;
-  PRIVILEGE_SET ps;
-  DWORD ps_len = sizeof (ps);
-  BOOL status;
 
   if (from_process != GetCurrentProcess ())
     {
+      if (!DuplicateHandle (from_process, from_handle,
+			    GetCurrentProcess (), &local_handle,
+			    0, bInheritHandle,
+			    DUPLICATE_SAME_ACCESS))
+	{
+	  system_printf ("error getting handle(%u) to server (%lu)",
+			 (unsigned int)from_handle, GetLastError ());
+	  goto out;
+	}
+    } else
+      local_handle = from_handle;
 
-  if (!DuplicateHandle (from_process, from_handle,
-			GetCurrentProcess (), &local_handle,
-			0, bInheritHandle,
-			DUPLICATE_SAME_ACCESS))
+  if (!wincap.has_security ())
+    assert (!from_process_token);
+  else
     {
-      system_printf ("error getting handle(%u) to server (%lu)",
-		     (unsigned int)from_handle, GetLastError ());
-      goto out;
-    }
-} else
- local_handle = from_handle;
+      char sd_buf [1024];
+      PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) &sd_buf;
+      DWORD bytes_needed;
+      PRIVILEGE_SET ps;
+      DWORD ps_len = sizeof (ps);
+      BOOL status;
 
-  if (!GetKernelObjectSecurity (local_handle,
-				OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION	| DACL_SECURITY_INFORMATION,
-				sd, sizeof (sd_buf), &bytes_needed))
-    {
-      system_printf ("error getting handle SD (%lu)", GetLastError ());
-      goto out;
-    }
+      if (!GetKernelObjectSecurity (local_handle,
+				    (OWNER_SECURITY_INFORMATION
+				     | GROUP_SECURITY_INFORMATION
+				     | DACL_SECURITY_INFORMATION),
+				    sd, sizeof (sd_buf), &bytes_needed))
+	{
+	  system_printf ("error getting handle SD (%lu)", GetLastError ());
+	  goto out;
+	}
 
-  MapGenericMask (&access, &access_mapping);
+      MapGenericMask (&access, &access_mapping);
 
-  if (!AccessCheck (sd, from_process_token, access, &access_mapping,
-		    &ps, &ps_len, &access, &status))
-    {
-      system_printf ("error checking access rights (%lu)", GetLastError ());
-      goto out;
-    }
+      if (!AccessCheck (sd, from_process_token, access, &access_mapping,
+			&ps, &ps_len, &access, &status))
+	{
+	  system_printf ("error checking access rights (%lu)",
+			 GetLastError ());
+	  goto out;
+	}
 
-  if (!status)
-    {
-      system_printf ("access to object denied");
-      goto out;
+      if (!status)
+	{
+	  system_printf ("access to object denied");
+	  goto out;
+	}
     }
 
   if (!DuplicateHandle (from_process, from_handle,
@@ -222,7 +230,7 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 
   ret_val = 0;
 
-out:
+ out:
   if (local_handle && from_process != GetCurrentProcess ())
     CloseHandle (local_handle);
 
@@ -245,6 +253,13 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
   HANDLE to_process_handle = NULL;
   HANDLE token_handle = NULL;
   DWORD rc;
+
+  if (!wincap.has_security ())
+    {
+      debug_printf ("this should not be called in a system without security");
+      header.error_code = EINVAL;
+      return;
+    }
 
   if (header.cb != sizeof (req))
     {

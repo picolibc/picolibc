@@ -47,25 +47,25 @@ process_cache::~process_cache ()
 }
 
 class process *
-process_cache::process (long pid)
+process_cache::process (DWORD winpid)
 {
   class process *entry = head;
   /* TODO: make this more granular, so a search doesn't involve the write lock */
   EnterCriticalSection (&cache_write_access);
   if (!entry)
     {
-      entry = new class process (pid);
+      entry = new class process (winpid);
       entry->next =
 	(class process *) InterlockedExchangePointer (&head, entry);
       PulseEvent (cache_add_trigger);
     }
   else
     {
-      while (entry->winpid != pid && entry->next)
+      while (entry->winpid != winpid && entry->next)
 	entry = entry->next;
-      if (entry->winpid != pid)
+      if (entry->winpid != winpid)
 	{
-	  class process *new_entry = new class process (pid);
+	  class process *new_entry = new class process (winpid);
 	  new_entry->next =
 	    (class process *) InterlockedExchangePointer (&entry->next,
 							  new_entry);
@@ -187,18 +187,18 @@ do_process_init (void)
   /* we don't have a cache shutdown capability today */
 }
 
-process::process (long pid):
-winpid (pid), next (NULL), cleaning_up (0), head (NULL), _exit_status (STILL_ACTIVE)
+process::process (DWORD winpid):
+winpid (winpid), next (NULL), cleaning_up (0), head (NULL), _exit_status (STILL_ACTIVE)
 {
   pthread_once (&process_init, do_process_init);
   EnterCriticalSection (&process_access);
-  thehandle = OpenProcess (PROCESS_ALL_ACCESS, FALSE, pid);
+  thehandle = OpenProcess (PROCESS_ALL_ACCESS, FALSE, winpid);
   if (!thehandle)
     {
-      system_printf ("unable to obtain handle for new cache process %ld", pid);
+      system_printf ("unable to obtain handle for new cache process %lu", winpid);
       thehandle = INVALID_HANDLE_VALUE;
     }
-  debug_printf ("Got handle %p for new cache process %ld", thehandle, pid);
+  debug_printf ("Got handle %p for new cache process %lu", thehandle, winpid);
   InitializeCriticalSection (&access);
   LeaveCriticalSection (&process_access);
 }

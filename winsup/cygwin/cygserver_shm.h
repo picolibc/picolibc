@@ -26,12 +26,11 @@ class client_request_shm : public client_request
 #ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, process_cache *cache);
 #endif
-  client_request_shm (key_t, size_t, int, char psdbuf[4096], pid_t);
+  client_request_shm (key_t ntype, size_t nsize, int shmflg);
   client_request_shm ();
-  client_request_shm (int, int, pid_t);
-  client_request_shm (int, int);
+  client_request_shm (int ntype, int nshmid);
   union {
-   struct {int type; pid_t pid; int shm_id; key_t key; size_t size; int shmflg; char sd_buf[4096];} in;
+   struct {int type; pid_t cygpid; DWORD winpid; int shm_id; key_t key; size_t size; int shmflg; char sd_buf[4096];} in;
    struct {int shm_id; HANDLE filemap; HANDLE attachmap; key_t key;} out;
   } parameters;
 };

@@ -12,6 +12,7 @@ details. */
 
 #include "winsup.h"
 #include <sys/stat.h>
+#include <assert.h>
 #include <errno.h>
 #include "cygerrno.h"
 #include <unistd.h>
@@ -44,37 +45,61 @@ getsystemallocgranularity ()
   return buffer_offset;
 }
 
-client_request_shm::client_request_shm (int ntype, int nshm_id):
-client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+/*
+ * Used for: SHM_ATTACH, SHM_DETACH, SHM_REATTACH, and SHM_DEL.
+ */
+client_request_shm::client_request_shm (int ntype, int nshmid)
+  : client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
 {
-  buffer = (char *) &parameters;
-  parameters.in.shm_id = nshm_id;
-  parameters.in.type = SHM_REATTACH;
-  parameters.in.pid = GetCurrentProcessId ();
-}
+  assert (ntype == SHM_REATTACH			\
+	  || ntype == SHM_ATTACH		\
+	  || ntype == SHM_DETACH		\
+	  || ntype == SHM_DEL);
 
-client_request_shm::client_request_shm (int ntype, int nshm_id, pid_t npid):
-client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
-{
   buffer = (char *) &parameters;
-  parameters.in.shm_id = nshm_id;
+
   parameters.in.type = ntype;
-  parameters.in.pid = npid;
+  parameters.in.cygpid = getpid ();
+  parameters.in.winpid = GetCurrentProcessId ();
+  parameters.in.shm_id = nshmid;
+
+  assert (parameters.in.cygpid > 0);
+  assert (parameters.in.winpid != 0);
+
+  debug_printf ("created: ntype = %d, shmid = %d", ntype, nshmid);
 }
 
-client_request_shm::client_request_shm (key_t nkey, size_t nsize,
-						int nshmflg,
-						char psdbuf[4096],
-						pid_t npid):
-client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+/*
+ * Used for: SHM_CREATE.
+ */
+client_request_shm::client_request_shm (key_t nkey, size_t nsize, int nshmflg)
+  : client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
 {
+  assert (nkey != (key_t) -1);
+  assert (nsize >= 0);
+
   buffer = (char *) &parameters;
+
+  parameters.in.type = SHM_CREATE;
+  parameters.in.cygpid = getpid ();
+  parameters.in.winpid = GetCurrentProcessId ();
   parameters.in.key = nkey;
   parameters.in.size = nsize;
   parameters.in.shmflg = nshmflg;
-  parameters.in.type = SHM_CREATE;
-  parameters.in.pid = npid;
-  memcpy (parameters.in.sd_buf, psdbuf, 4096);
+
+  assert (parameters.in.cygpid > 0);
+  assert (parameters.in.winpid != 0);
+
+  if (wincap.has_security ())
+    {
+      SECURITY_ATTRIBUTES sa = sec_none;
+      set_security_attribute (nshmflg & 0777, &sa,
+			      parameters.in.sd_buf,
+			      sizeof (parameters.in.sd_buf));
+    }
+
+  debug_printf ("created: key = 0x%0llx, size = %ld, shmflg = %o",
+		nkey, nsize, nshmflg);
 }
 
 static shmnode *shm_head = NULL;
@@ -223,8 +248,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       /* couldn't find a currently open shm control area for the key - probably because
        * shmget hasn't been called.
        * Allocate a new control block - this has to be handled by the daemon */
-      client_request_shm *req =
-	new client_request_shm (SHM_REATTACH, shmid, GetCurrentProcessId ());
+      client_request_shm *req = new client_request_shm (SHM_REATTACH, shmid);
 
       int rc;
       if ((rc = cygserver_request (req)))
@@ -276,8 +300,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       return (void *) -1;
     }
   /* tell the daemon we have attached */
-  client_request_shm *req =
-    new client_request_shm (SHM_ATTACH, shmid);
+  client_request_shm *req = new client_request_shm (SHM_ATTACH, shmid);
   int rc;
   if ((rc = cygserver_request (req)))
     {
@@ -326,7 +349,7 @@ shmdt (const void *shmaddr)
   UnmapViewOfFile (attachnode->data);
   /* tell the daemon we have attached */
   client_request_shm *req =
-      new client_request_shm (SHM_DETACH, tempnode->shm_id);
+    new client_request_shm (SHM_DETACH, tempnode->shm_id);
   int rc;
   if ((rc = cygserver_request (req)))
     {
@@ -349,8 +372,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
       /* couldn't find a currently open shm control area for the key - probably because
        * shmget hasn't been called.
        * Allocate a new control block - this has to be handled by the daemon */
-      client_request_shm *req =
-	new client_request_shm (SHM_REATTACH, shmid, GetCurrentProcessId ());
+      client_request_shm *req = new client_request_shm (SHM_REATTACH, shmid);
 
       int rc;
       if ((rc = cygserver_request (req)))
@@ -409,8 +431,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 	   * daemon has an attach. The daemon gets asked to detach immediately.
 	 */
 	//waiting for the daemon to handle terminating process's
-	client_request_shm *req =
-	  new client_request_shm (SHM_DEL, shmid, GetCurrentProcessId ());
+	client_request_shm *req = new client_request_shm (SHM_DEL, shmid);
 	int rc;
 	if ((rc = cygserver_request (req)))
 	  {
@@ -455,15 +476,6 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 extern "C" int
 shmget (key_t key, size_t size, int shmflg)
 {
-  DWORD sd_size = 4096;
-  char sd_buf[4096];
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
-  /* create a sd for our open requests based on shmflag & 0x01ff */
-  InitializeSecurityDescriptor (psd,
-				    SECURITY_DESCRIPTOR_REVISION);
-  psd = alloc_sd (getuid32 (), getgid32 (),
-		  shmflg & 0x01ff, psd, &sd_size);
-
   if (key == (key_t) - 1)
     {
       set_errno (ENOENT);
@@ -503,9 +515,7 @@ shmget (key_t key, size_t size, int shmflg)
     }
   /* couldn't find a currently open shm control area for the key.
    * Allocate a new control block - this has to be handled by the daemon */
-  client_request_shm *req =
-    new client_request_shm (key, size, shmflg, sd_buf,
-				GetCurrentProcessId ());
+  client_request_shm *req = new client_request_shm (key, size, shmflg);
 
   int rc;
   if ((rc = cygserver_request (req)))

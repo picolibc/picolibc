@@ -1,3 +1,31 @@
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver.cc (check_and_dup_handle): Only use security code if
+	running on NT, i.e. if wincap.has_security().
+	(client_request_attach_tty::serve): Add check for has_security().
+	* cygserver_process.cc (process_cache::process): Use DWORD winpid
+	throughout to avoid win32 vs. cygwin pid confusion.
+	(process::process): Ditto.
+	* cygserver_shm.cc (client_request_shm::serve): Only use security
+	code if running on NT, i.e. if wincap.has_security().
+	* cygserver_shm.h (client_request_shm::parameters.in): Replace the
+	ambiguous pid field with cygpid and winpid fields.
+	(client_request_shm::client_request_shm): Reduce to only two
+	client-side constructors: one for SHM_CREATE, another for all the
+	other requests.
+	* shm.cc (client_request_shm::client_request_shm):
+	Ditto. Initialize cygpid and winpid fields here. On NT initialize
+	sd_buf here using set_security_attribute() to make use of the euid
+	and egid.
+	(shmat): Use new client_request_shm constructor.
+	(shmdt): Ditto.
+	(shmctl): Ditto.
+	(shmget): Ditto. Remove security code, now performed in the
+	relevant client_request_shm constructor.
+	* include/cygwin/cygserver_process.h: (class cleanup_routine):
+	Change winpid type to DWORD.
+	(class process): Ditto.
+
 2002-06-15  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* woutsup.h: New file.
@@ -447,7 +475,7 @@
 	mount entry is not found.
 	(mount_info::set_flags_from_win32_path): Ditto.
 
-2002-06-04  Christopher Faylor  <cgf@redhat.com>
+2002-06-04  Christopher Faylor  <ccygserver_shm.ccgf@redhat.com>
 
 	* dtable.cc (handle_to_fn): Correct placement and length of name
 	buffer.  (Suggested by Pavel Tsekov)
@@ -583,7 +611,7 @@
 
 2002-06-02  Christopher Faylor  <cgf@redhat.com>
 
-	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Check
+	* fhandler_disk_file.cc (fhacygserver_shm.ccndler_disk_file::fstat_by_name): Check
 	specifically for non-existent file, first.
 	(fhandler_disk_file::fstat): Perform fd open on files with funny
 	characters.

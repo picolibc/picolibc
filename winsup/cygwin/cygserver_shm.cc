@@ -1,14 +1,14 @@
 /* cygserver_shm.cc: Single unix specification IPC interface for Cygwin
 
-Copyright 2001, 2002 Red Hat, Inc.
+   Copyright 2001, 2002 Red Hat, Inc.
 
-Originally written by Robert Collins <robert.collins@hotmail.com>
+   Originally written by Robert Collins <robert.collins@hotmail.com>
 
-This file is part of Cygwin.
+   This file is part of Cygwin.
 
-This software is a copyrighted work licensed under the terms of the
-Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-details. */
+   This software is a copyrighted work licensed under the terms of the
+   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+   details. */
 
 #include "woutsup.h"
 
@@ -54,7 +54,7 @@ getsystemallocgranularity ()
 
 
 client_request_shm::client_request_shm ():client_request (CYGSERVER_REQUEST_SHM_GET,
-		sizeof (parameters))
+	       sizeof (parameters))
 {
   buffer = (char *) &parameters;
 }
@@ -185,18 +185,11 @@ delete_shmnode (shmnode **nodeptr)
 void
 client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 {
-//  DWORD sd_size = 4096;
-//  char sd_buf[4096];
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) parameters.in.sd_buf;
-//  /* create a sd for our open requests based on shmflag & 0x01ff */
-//  psd = alloc_sd (getuid (), getgid (), cygheap->user.logsrv (),
-//		    parameters.in.shmflg & 0x01ff, psd, &sd_size);
-
   HANDLE from_process_handle = NULL;
   HANDLE token_handle = NULL;
   DWORD rc;
 
-  from_process_handle = cache->process (parameters.in.pid)->handle ();
+  from_process_handle = cache->process (parameters.in.winpid)->handle ();
   /* possible TODO: reduce the access on the handle before we use it */
   /* Note that unless we do this, we don't need to call CloseHandle - it's kept open
    * by the process cache until the process terminates.
@@ -209,31 +202,23 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
       return;
     }
 
-  conn->impersonate_client ();
-
-  rc = OpenThreadToken (GetCurrentThread (),
-			TOKEN_QUERY, TRUE, &token_handle);
-
-  conn->revert_to_self ();
-
-  if (!rc)
+  if (wincap.has_security ())
     {
-      debug_printf ("error opening thread token (%lu)", GetLastError ());
-      header.error_code = EACCES;
-      CloseHandle (from_process_handle);
-      return;
+      conn->impersonate_client ();
+
+      rc = OpenThreadToken (GetCurrentThread (),
+			    TOKEN_QUERY, TRUE, &token_handle);
+
+      conn->revert_to_self ();
+
+      if (!rc)
+	{
+	  debug_printf ("error opening thread token (%lu)", GetLastError ());
+	  header.error_code = EACCES;
+	  CloseHandle (from_process_handle);
+	  return;
+	}
     }
-
-
-  /* we trust the clients request - we will be doing it as them, and
-   * the worst they can do is open their own permissions
-   */
-
-
-  SECURITY_ATTRIBUTES sa;
-  sa.nLength = sizeof (sa);
-  sa.lpSecurityDescriptor = psd;
-  sa.bInheritHandle = TRUE;	/* the memory structures inherit ok */
 
   char *shmname = NULL, *shmaname = NULL;
   char stringbuf[29], stringbuf1[29];
@@ -473,6 +458,16 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
       /* couldn't find a currently open shm area. */
 
       /* create one */
+
+      /* we trust the clients request - we will be doing it as them, and
+       * the worst they can do is open their own permissions
+       */
+
+      SECURITY_ATTRIBUTES sa;
+      sa.nLength = sizeof (sa);
+      sa.lpSecurityDescriptor = (PSECURITY_DESCRIPTOR) parameters.in.sd_buf;
+      sa.bInheritHandle = TRUE;	/* the memory structures inherit ok */
+
       /* do this as the client */
       conn->impersonate_client ();
       /* This may need sh_none... it's only a control structure */
@@ -482,8 +477,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 					  0x00000000,
 					  getsystemallocgranularity (),
 					  shmname	// object name
-	);
-      int lasterr = GetLastError ();
+					  );
+      DWORD lasterr = GetLastError ();
       conn->revert_to_self ();
 
       if (filemap == NULL)
