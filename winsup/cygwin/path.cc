@@ -549,6 +549,7 @@ path_conv::check (const char *src, unsigned opt,
 	  else if (devn != FH_BAD)
 	    {
 	      fileattr = 0;
+	      path_flags = sym.pflags;
 	      if (component)
 		{
 		  error = ENOTDIR;
