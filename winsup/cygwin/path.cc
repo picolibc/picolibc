@@ -2690,7 +2690,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	    }
 	  /* If searching for `foo' and then finding a `foo.lnk' which is
 	     no shortcut, return the same as if file not found. */
-	  if (!suffix.lnk_match ())
+	  if (!suffix.lnk_match () || pathmatch(path, suffix.path))
 	    goto file_not_symlink;
 
 	  fileattr = (DWORD) -1;

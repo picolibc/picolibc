@@ -1,3 +1,8 @@
+Fri May 25 10:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Add a check to return correctly
+	if incoming `*.lnk' file is not a symlink.
+
 Thu May 24 15:46:50 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (slash_drive_prefix_p): Remove.
