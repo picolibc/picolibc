@@ -1,3 +1,9 @@
+2001-08-13  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/malloc.h (M_MXFAST, M_NLBLKS, M_GRAIN, M_KEEP): New
+	macro constants for mallopt options.
+	(M_TRIM_THRESHOLD, M_TOP_PAD, M_MMAP_THRESHOLD, M_MMAP_MAX): Ditto.
+
 2001-08-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdio.h (BUFSIZ): Define to __BUFSIZ__ if provided,

@@ -75,6 +75,20 @@ extern int _malloc_trim_r _PARAMS ((struct _reent *, size_t));
 extern _VOID mstats _PARAMS ((char *));
 extern _VOID _mstats_r _PARAMS ((struct _reent *, char *));
 
+/* SVID2/XPG mallopt options */
+
+#define M_MXFAST  1    /* UNUSED in this malloc */
+#define M_NLBLKS  2    /* UNUSED in this malloc */
+#define M_GRAIN   3    /* UNUSED in this malloc */
+#define M_KEEP    4    /* UNUSED in this malloc */
+
+/* mallopt options that actually do something */
+  
+#define M_TRIM_THRESHOLD    -1
+#define M_TOP_PAD           -2
+#define M_MMAP_THRESHOLD    -3 
+#define M_MMAP_MAX          -4
+
 #ifndef __CYGWIN__
 /* Some systems provide this, so do too for compatibility.  */
 extern void cfree _PARAMS ((_PTR));
