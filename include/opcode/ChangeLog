@@ -1,3 +1,8 @@
+2002-05-17  Andrey Volkov  <avolkov@sources.redhat.com>
+
+        * h8300.h: Corrected defs of all control regs 
+	and eepmov instr.
+		      
 2002-04-11  Alan Modra  <amodra@bigpond.net.au>
 
 	* i386.h: Add intel mode cmpsd and movsd.
