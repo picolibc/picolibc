@@ -1,3 +1,8 @@
+2003-10-14  Bob Wilson  <bob.wilson@acm.org>
+
+	* elf/xtensa.h: Formatting.  Fix comments about property section
+	names for linkonce sections.
+
 2003-09-22  Andrew Cagney  <cagney@redhat.com>
 
 	* floatformat.h (struct floatformat): Add field "is_valid".
