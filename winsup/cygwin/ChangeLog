@@ -1,3 +1,23 @@
+2001-11-21  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (DLL_OFILES): Add fhandler_disk_file.o.
+	* cygheap.h (cygheap_fdnew::operator =): New operator.
+	* dir.cc: Add invalid struct checking throughout.  Use methods for all
+	directory manipulation throughout.
+	* fhandler.cc: Move fhandler_disk_file stuff to own file.
+	(fhandler_base::opendir): New method.
+	(fhandler_base::readdir): New method.
+	(fhandler_base::telldir): New method.
+	(fhandler_base::seekdir): New method.
+	(fhandler_base::rewinddir): New method.
+	(fhandler_base::closedir): New method.
+	* fhandler_disk_file.cc: New file.
+	* fhandler.h (fhandler_base): Declare new virtual methods.
+	(fhandler_disk_file): Ditto.
+	(fhandler_cygdrive): New class.
+
+	* path.cc (conv_path_list): Use strccpy to break apart path.
+
 2001-11-17  Nick Duffek  <nick@duffek.com>
 
 	* path.cc (conv_path_list): Copy source paths before modifying them.

@@ -231,6 +231,7 @@ class cygheap_fdnew : public cygheap_fdmanip
 	locked = false;
       }
   }
+  void operator = (fhandler_base *fh) {*this->fh = fh;}
 };
 
 class cygheap_fdget : public cygheap_fdmanip

@@ -1234,31 +1234,24 @@ conv_path_list (const char *src, char *dst, int to_posix_p)
   int (*conv_fn) (const char *, char *) = (to_posix_p
 					   ? cygwin_conv_to_posix_path
 					   : cygwin_conv_to_win32_path);
-  char srcbuf[MAX_PATH];
-  int len;
+
+  char *srcbuf = (char *) alloca (strlen (src) + 1);
 
   do
     {
-      s = strchr (src, src_delim);
-      if (s)
+      s = strccpy (srcbuf, &src, src_delim);
+      int len = s - srcbuf;
+      if (len >= MAX_PATH)
+	srcbuf[MAX_PATH - 1] = '\0';
+      (*conv_fn) (len ? srcbuf : ".", d);
+      src += len;
+      if (*src)
 	{
-	  len = s - src;
-	  if (len >= MAX_PATH)
-	    len = MAX_PATH - 1;
-	  memcpy (srcbuf, src, len);
-	  srcbuf[len] = 0;
-	  (*conv_fn) (len ? srcbuf : ".", d);
-	  d += strlen (d);
+	  d = strchr (d, '\0');
 	  *d++ = dst_delim;
-	  src = s + 1;
-	}
-      else
-	{
-	  /* Last one.  */
-	  (*conv_fn) (src[0] != 0 ? src : ".", d);
 	}
     }
-  while (s != NULL);
+  while (*src++);
 }
 
 /* init: Initialize the mount table.  */

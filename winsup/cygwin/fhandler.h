@@ -103,6 +103,8 @@ extern struct __cygwin_perfile *perfile_table;
 class select_record;
 class path_conv;
 class fhandler_disk_file;
+typedef struct __DIR DIR;
+struct dirent;
 
 enum bg_check_types
 {
@@ -338,6 +340,12 @@ class fhandler_base
   void operator delete (void *);
   virtual HANDLE get_guard () const {return NULL;}
   virtual void set_eof () {}
+  virtual DIR *opendir (const char *dirname, path_conv& pc);
+  virtual dirent *readdir (DIR *);
+  virtual off_t telldir (DIR *);
+  virtual void seekdir (DIR *, off_t);
+  virtual void rewinddir (DIR *);
+  virtual int closedir (DIR *);
 };
 
 class fhandler_socket: public fhandler_base
@@ -532,6 +540,12 @@ class fhandler_disk_file: public fhandler_base
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 			      DWORD size, void *address);
+  DIR *opendir (const char *dirname, path_conv& pc);
+  struct dirent *readdir (DIR *);
+  off_t telldir (DIR *);
+  void seekdir (DIR *, off_t);
+  void rewinddir (DIR *);
+  int closedir (DIR *);
 };
 
 class fhandler_serial: public fhandler_base
@@ -575,6 +589,12 @@ class fhandler_serial: public fhandler_base
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
+};
+
+class fhandler_cygdrive: public fhandler_disk_file
+{
+ public:
+  fhandler_cygdrive ();
 };
 
 #define acquire_output_mutex(ms) \
