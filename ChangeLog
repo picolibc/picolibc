@@ -1,3 +1,8 @@
+20000-05-18  H.J. Lu  (hjl@gnu.org)
+
+	* configure: Ask to create the gcc directory for cross
+	compiling if necessary.
+
 Thu May 18 10:58:13 2000  Jeffrey A Law  (law@cygnus.com)
 
 	* configure.in (hppa*64*-*-*): Do build ld for this configuration.

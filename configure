@@ -753,6 +753,17 @@ target_vendor=`echo $result | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
 target_os=`echo $result | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 target=${target_cpu}-${target_vendor}-${target_os}
 
+if [ x${target} != x${build} -a x${build} = x${host} ]; then
+    if [ x${gcc_version} != x -a ! -d ${prefix}/lib/gcc-lib/${target_alias}/${gcc_version} ]; then
+    	echo "Please create the directory:" 1>&2
+    	echo 1>&2
+	echo "	${prefix}/lib/gcc-lib/${target_alias}/${gcc_version}" 1>&2
+    	echo 1>&2
+    	echo "first for successful cross-compilation." 1>&2
+	exit 1
+    fi
+fi
+
 . ${tmpfile}.tgt
 
 # Find the source files, if location was not specified.
