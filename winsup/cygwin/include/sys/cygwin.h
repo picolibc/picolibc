@@ -39,11 +39,10 @@ extern void cygwin_premain1 (int argc, char **argv);
 extern void cygwin_premain2 (int argc, char **argv);
 extern void cygwin_premain3 (int argc, char **argv);
 
-#ifdef _GNU_H_WINDOWS32_BASE
+#ifdef WINVER
 /* included if <windows.h> is included */
 extern int cygwin32_attach_handle_to_fd (char *, int, HANDLE, int, int);
 extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, unsigned);
-#endif
 
 #include <sys/resource.h>
 
@@ -87,6 +86,7 @@ struct external_pinfo
 };
 
 DWORD cygwin_internal (cygwin_getinfo_types, ...);
+#endif /*WINVER*/
 
 #define CW_NEXTPID 0x80000000	// or with pid to get next one
 

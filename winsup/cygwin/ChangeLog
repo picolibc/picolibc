@@ -1,3 +1,8 @@
+Thu Jun 22 15:51:17 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/sys/cygwin.h: Don't define parts of this file that rely on
+	Windows headers unless the Windows header was previously included.
+
 Thu Jun 22 20:45:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* registry.cc (load_registry_hive): Use HKEY_USERS when checking
