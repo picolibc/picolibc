@@ -1,3 +1,12 @@
+2000-09-14  Alexandre Oliva  <aoliva@redhat.com>
+
+	* sh.h (R_SH_GOT32, R_SH_PLT32, R_SH_COPY, R_SH_GLOB_DAT,
+	R_SH_JMP_SLOT, R_SH_RELATIVE, R_SH_GOTOFF, R_SH_GOTPC): Change
+	numbers to the range from 160 to 167.
+	(R_SH_FIRST_INVALID_RELOC): Adjust.
+	(R_SH_FIRST_INVALID_RELOC_2, R_SH_LAST_INVALID_RELOC_2):
+	New relocs to fill in the gap.
+
 2000-09-13  Anders Norlander  <anorland@acc.umu.se>
 
  	* mips.h (E_MIPS_MACH_4K): New define.
