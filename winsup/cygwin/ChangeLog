@@ -1,3 +1,8 @@
+Sun Jul 16 00:32:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (build_argv): Strip quotes from argv[0] since it should
+	never be globified.
+
 Sat Jul 15 00:32:41 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dll_init.cc (dll_list::alloc): Round correctly.  Use VirtualAlloc

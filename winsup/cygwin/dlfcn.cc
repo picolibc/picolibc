@@ -16,13 +16,8 @@ details. */
 #include "dlfcn.h"
 #include "dll_init.h"
 
-#ifdef _MT_SAFE
 #define _dl_error _reent_winsup()->_dl_error
 #define _dl_buffer _reent_winsup()->_dl_buffer
-#else
-static int _dl_error = 0;
-static char _dl_buffer[256];
-#endif
 
 static void __stdcall
 set_dl_error (const char *str)
@@ -31,11 +26,9 @@ set_dl_error (const char *str)
   _dl_error = 1;
 }
 
-//
-// this function checks for existence of a file specified by the
-// directory and name components. If successful, return a pointer
-// the full pathname (static buffer), or else return 0.
-//
+/* Check for existence of a file specified by the directory
+   and name components. If successful, return a pointer the
+   full pathname (static buffer), else return 0. */
 static const char * __stdcall
 check_access (const char *dir, const char *name)
 {
@@ -52,11 +45,9 @@ check_access (const char *dir, const char *name)
   return ret;
 }
 
-//
-// this function looks for an executable file given the name and the
-// environment variable to use for searching (eg., PATH); returns
-// the full pathname (static buffer) if found or NULL if not.
-//
+/* Look for an executable file given the name and the environment
+   variable to use for searching (eg., PATH); returns the full
+   pathname (static buffer) if found or NULL if not. */
 static const char * __stdcall
 check_path_access (const char *mywinenv, const char *name)
 {
@@ -64,22 +55,20 @@ check_path_access (const char *mywinenv, const char *name)
   return find_exec (name, buf, mywinenv, TRUE);
 }
 
-//
-// This function simulates the same search as LoadLibary + check
-// environment variable LD_LIBRARY_PATH. If found, return the full
-// pathname (static buffer); if illegal, return the input string
-// unchanged and let the caller deal with it; return NULL otherwise.
-//
-// Note that this should never be called with a NULL string, since
-// that is the introspective case, and the caller should not call
-// this function at all.
-//
+/* Simulate the same search as LoadLibary + check environment
+   variable LD_LIBRARY_PATH. If found, return the full pathname
+   (static buffer); if illegal, return the input string unchanged
+   and let the caller deal with it; return NULL otherwise.
+
+   Note that this should never be called with a NULL string, since
+   that is the introspective case, and the caller should not call
+   this function at all.  */
 static const char * __stdcall
 get_full_path_of_dll (const char* str)
 {
   int len = (str) ? strlen (str) : 0;
 
-  // NULL or empty string or too long to be legal win32 pathname?
+  /* NULL or empty string or too long to be legal win32 pathname? */
   if (len == 0 || len >= MAX_PATH - 1)
     return str;
 
@@ -89,29 +78,27 @@ get_full_path_of_dll (const char* str)
 
   strcpy (name, str);
 
-  // add extension if necessary, but leave a trailing '.', if any, alone.
-  // Files with trailing '.'s are handled differently by win32 API.
+  /* Add extension if necessary, but leave a trailing '.', if any, alone.
+     Files with trailing '.'s are handled differently by win32 API. */
   if (str[len - 1] != '.')
     {
-      // add .dll only if no extension provided. Handle various cases:
-      //
-      //   ./shlib		-->	./shlib.dll
-      //   ./dir/shlib.so	-->	./dir/shlib.so
-      //   shlib		-->	shlib.dll
-      //   shlib.dll		-->	shlib.dll
-      //   shlib.so		-->	shlib.so
-      //
+      /* Add .dll only if no extension provided. Handle various cases:
+	   ./shlib		-->	./shlib.dll
+	   ./dir/shlib.so	-->	./dir/shlib.so
+	   shlib		-->	shlib.dll
+	   shlib.dll		-->	shlib.dll
+	   shlib.so		-->	shlib.so */
       const char *p = strrchr (str, '.');
       if (!p || isdirsep (p[1]))
 	strcat (name, ".dll");
     }
 
-  // deal with fully qualified filename right away. Do the actual
-  // conversion to win32 filename just before returning however.
+  /* Deal with fully qualified filename right away. Do the actual
+     conversion to win32 filename just before returning however. */
   if (isabspath (str))
     ret = name;
 
-  // current directory
+  /* current directory */
   if (!ret)
     {
       if (GetCurrentDirectory (MAX_PATH, buf) == 0)
@@ -120,29 +107,28 @@ get_full_path_of_dll (const char* str)
 	ret = check_access (buf, name);
     }
 
-  // LD_LIBRARY_PATH
+  /* LD_LIBRARY_PATH */
   if (!ret)
     ret = check_path_access ("LD_LIBRARY_PATH=", name);
 
   if (!ret)
     {
-      // system directory
       if (GetSystemDirectory (buf, MAX_PATH) == 0)
 	small_printf ("WARNING: get_full_path_of_dll can't get system directory win32 %E\n");
       else
 	ret = check_access (buf, name);
     }
 
-  // 16 bits system directory
+  /* 16 bits system directory */
   if (!ret && (os_being_run == winNT))
     {
-      // we assume last dir was xxxxx\SYSTEM32, so we remove 32
+      /* we assume last dir was xxxxx\SYSTEM32, so we remove 32 */
       len = strlen (buf);
       buf[len - 2] = 0;
       ret = check_access (buf, name);
     }
 
-  // windows directory
+  /* windows directory */
   if (!ret)
     {
       if (GetWindowsDirectory (buf, MAX_PATH) == 0)
@@ -151,14 +137,12 @@ get_full_path_of_dll (const char* str)
 	ret = check_access (buf, name);
     }
 
-  // PATH
+  /* PATH */
   if (!ret)
     ret = check_path_access ("PATH=", name);
 
-  //
-  // now do a final conversion to win32 pathname. This step is necessary
-  // to resolve symlinks etc so that win32 API finds the underlying file.
-  //
+  /* Now do a final conversion to win32 pathname. This step is necessary
+     to resolve symlinks etc so that win32 API finds the underlying file.  */
   if (ret)
     {
       path_conv real_filename (ret, SYMLINK_FOLLOW, 1);
@@ -182,12 +166,12 @@ dlopen (const char *name, int)
 
   if (!name)
     {
-      // handle for the current module
+      /* handle for the current module */
       ret = (void *) GetModuleHandle (NULL);
     }
   else
     {
-      // handle for the named library
+      /* handle for the named library */
       const char *fullpath = get_full_path_of_dll (name);
       ret = (void *) LoadLibrary (fullpath);
     }
