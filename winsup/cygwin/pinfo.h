@@ -114,37 +114,29 @@ public:
 class pinfo
 {
   HANDLE h;
-  _pinfo *child;
+  _pinfo *procinfo;
   int destroy;
 public:
   void init (pid_t n, DWORD create = 0, HANDLE h = NULL);
-  pinfo () {}
-  pinfo (_pinfo *x): child (x) {}
+  pinfo (): h (NULL), procinfo (0), destroy (0) {}
+  pinfo (_pinfo *x): procinfo (x) {}
   pinfo (pid_t n) {init (n);}
   pinfo (pid_t n, int create) {init (n, create);}
-  void release ()
-  {
-    if (h)
-      {
-	UnmapViewOfFile (child);
-	ForceCloseHandle1 (h, pinfo_shared_handle);
-	h = NULL;
-      }
-  }
+  void release ();
   ~pinfo ()
   {
-    if (destroy && child)
+    if (destroy && procinfo)
       release ();
   }
     
-  _pinfo *operator -> () const {return child;}
-  int operator == (pinfo *x) const {return x->child == child;}
-  int operator == (pinfo &x) const {return x.child == child;}
-  int operator == (void *x) const {return child == x;}
-  int operator == (int x) const {return (int) child == (int) x;}
-  int operator == (char *x) const {return (char *) child == x;}
-  _pinfo *operator * () const {return child;}
-  operator _pinfo * () const {return child;}
+  _pinfo *operator -> () const {return procinfo;}
+  int operator == (pinfo *x) const {return x->procinfo == procinfo;}
+  int operator == (pinfo &x) const {return x.procinfo == procinfo;}
+  int operator == (void *x) const {return procinfo == x;}
+  int operator == (int x) const {return (int) procinfo == (int) x;}
+  int operator == (char *x) const {return (char *) procinfo == x;}
+  _pinfo *operator * () const {return procinfo;}
+  operator _pinfo * () const {return procinfo;}
   // operator bool () const {return (int) h;}
   void remember () {destroy = 0; proc_subproc (PROC_ADDCHILD, (DWORD) this);}
   HANDLE shared_handle () {return h;}

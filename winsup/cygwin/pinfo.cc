@@ -197,7 +197,7 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
 {
   if (n == myself->pid)
     {
-      child = myself;
+      procinfo = myself;
       destroy = 0;
       h = NULL;
       return;
@@ -235,16 +235,16 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
     {
       if (create)
 	__seterrno ();
-      child = NULL;
+      procinfo = NULL;
       return;
     }
 
   ProtectHandle1 (h, pinfo_shared_handle);
-  child = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+  procinfo = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
 
-  if (child->process_state & PID_EXECED)
+  if (procinfo->process_state & PID_EXECED)
     {
-      pid_t realpid = child->pid;
+      pid_t realpid = procinfo->pid;
       debug_printf ("execed process windows pid %d, cygwin pid %d", n, realpid);
       release ();
       if (realpid == n)
@@ -255,15 +255,28 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
   if (created)
     {
       if (!(create & PID_EXECED))
-	child->pid = n;
+	procinfo->pid = n;
       else
 	{
-	  child->pid = myself->pid;
-	  child->process_state |= PID_IN_USE | PID_EXECED;
+	  procinfo->pid = myself->pid;
+	  procinfo->process_state |= PID_IN_USE | PID_EXECED;
 	}
     }
 
   destroy = 1;
+}
+void
+pinfo::release ()
+{
+  if (h)
+    {
+#ifdef DEBUGGING
+      if (((DWORD) procinfo & 0x77000000) == 0x61000000) try_to_debug ();
+#endif
+      UnmapViewOfFile (procinfo);
+      ForceCloseHandle1 (h, pinfo_shared_handle);
+      h = NULL;
+    }
 }
 
 /* DOCTOOL-START

@@ -1,3 +1,11 @@
+Fri Aug 25 23:44:48 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.h (pinfo): Un-inline release.
+	* pinfo.cc (pinfo::release): Move here from pinfo.h.
+	* sigproc.cc (proc_terminate): Remove bogus 'pinfo child' which caused
+	strange destruction of random regions of memory when destructor was
+	invoked.
+
 Fri Aug 25 21:25:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (dll_crt0_1): Move set_os_type.

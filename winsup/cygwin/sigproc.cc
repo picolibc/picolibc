@@ -499,13 +499,12 @@ proc_terminate (void)
 	      zombies[i]->hProcess = NULL;
 	    }
 	  zombies[i]->process_state = PID_NOT_IN_USE;	/* CGF FIXME - still needed? */
-	  // zombies[i].release();	// FIXME: this breaks older gccs for some reason
+	  zombies[i].release();		// FIXME: this breaks older gccs for some reason
 	}
 
       /* Disassociate my subprocesses */
       for (i = 0; i < nchildren; i++)
 	{
-	  pinfo child; /* CGF FIXME */
 	  if (pchildren[i]->process_state == PID_NOT_IN_USE)
 	    continue;		// Should never happen
 	  if (!pchildren[i]->hProcess)
@@ -530,7 +529,7 @@ proc_terminate (void)
 		    pchildren[i]->process_state |= PID_ORPHANED;
 		}
 	    }
-	  // pchildren[i].release (); // FIXME: this breaks older gccs for some reason
+	  pchildren[i].release (); // FIXME: this breaks older gccs for some reason
 	}
       nchildren = nzombies = 0;
 
