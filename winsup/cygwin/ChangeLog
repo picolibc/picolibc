@@ -1,3 +1,9 @@
+Fri Sep  1 21:17:03 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (mychild): New function.
+	(proc_subproc): Use mychild() to determine if a specific pid is valid
+	for wait()ing.
+
 Fri Sep  1 16:57:44 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (sigproc_init): Create wait_sig_inited without auto-reset

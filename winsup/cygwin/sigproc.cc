@@ -22,8 +22,7 @@ details. */
 #include "pinfo.h"
 #include "child_info.h"
 #include "perthread.h"
-
-extern BOOL allow_ntsec;
+#include <assert.h>
 
 /*
  * Convenience defines
@@ -244,6 +243,21 @@ proc_exists (_pinfo *p)
   return FALSE;
 }
 
+/* Return 1 if this is one of our children, zero otherwise.
+   FIXME: This really should be integrated with the rest of the proc_subproc
+   testing.  Scanning these lists twice is inefficient. */
+int __stdcall
+mychild (int pid)
+{
+  for (int i = 0; i < nchildren; i++)
+    if (pchildren[i]->pid == pid)
+      return 1;
+  for (int i = 0; i < nzombies; i++)
+    if (zombies[i]->pid == pid)
+      return 1;
+  return 0;
+}
+
 /* Handle all subprocess requests
  */
 #define vchild (*((pinfo *) val))
@@ -252,7 +266,6 @@ proc_subproc (DWORD what, DWORD val)
 {
   int rc = 1;
   int potential_match;
-  DWORD exitcode;
   _pinfo *child;
   int clearing;
   waitq *w;
@@ -303,8 +316,7 @@ proc_subproc (DWORD what, DWORD val)
      */
     case PROC_CHILDTERMINATED:
       rc = 0;
-      if (GetExitCodeProcess (hchildren[val], &exitcode) &&
-	  hchildren[val] != pchildren[val]->hProcess)
+      if (hchildren[val] != pchildren[val]->hProcess)
 	{
 	  sigproc_printf ("pid %d[%d], reparented old hProcess %p, new %p",
 		      pchildren[val]->pid, val, hchildren[val], pchildren[val]->hProcess);
@@ -391,7 +403,7 @@ proc_subproc (DWORD what, DWORD val)
 
       if (wval->pid <= 0)
 	child = NULL;		// Not looking for a specific pid
-      else if (!pid_exists (wval->pid)) /* CGF FIXME -- test that this is one of mine */
+      else if (!mychild (wval->pid))
 	goto out;		// invalid pid.  flag no such child
 
       wval->status = 0;		// Don't know status yet
@@ -595,7 +607,7 @@ sig_dispatch_pending (int justwake)
 	/*sigproc_printf ("I'm going away now")*/;
       else
 	system_printf ("%E releasing sigcatch_nosync(%p)", sigcatch_nosync);
- 
+
     }
   return was_pending;
 }
