@@ -675,11 +675,9 @@ environ_init (char **envp, int envc)
   if (myself->progname[0])
     got_something_from_registry = regopt (myself->progname) || got_something_from_registry;
 
-#ifdef NTSEC_ON_BY_DEFAULT
   /* Set ntsec explicit as default, if NT is running */
   if (wincap.has_security ())
     allow_ntsec = TRUE;
-#endif
 
   if (!envp)
     envp_passed_in = 0;

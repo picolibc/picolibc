@@ -1,5 +1,11 @@
 2002-09-29  Christopher Faylor  <cgf@redhat.com>
 
+	* security.cc (allow_ntsec): Default to zero.
+	* environ.cc (environ_init): Set allow_ntsec to TRUE by default,
+	assuming OS allows it.
+
+2002-09-29  Christopher Faylor  <cgf@redhat.com>
+
 	* environ.cc (environ_init): Avoid a compiler warning.
 	* path.cc (path_conv::check): Ditto.
 	* path.h (path_conv::operator int): Ditto.

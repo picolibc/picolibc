@@ -41,7 +41,7 @@ details. */
 #include "lm.h"
 
 extern BOOL allow_ntea;
-BOOL allow_ntsec = true;
+BOOL allow_ntsec;
 /* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
    It's defined here because of it's strong relationship to allow_ntsec.
    The default is TRUE to reflect the old behaviour. */
