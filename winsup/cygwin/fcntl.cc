@@ -31,7 +31,7 @@ fcntl_worker (int fd, int cmd, void *arg)
       goto done;
     }
   if (cmd != F_DUPFD)
-    res = cfd->fcntl(cmd, arg);
+    res = cfd->fcntl (cmd, arg);
   else
     res = dup2 (fd, cygheap_fdnew (((int) arg) - 1));
 done:
@@ -40,7 +40,7 @@ done:
 }
 
 extern "C" int
-fcntl64 (int fd, int cmd,...)
+fcntl64 (int fd, int cmd, ...)
 {
   void *arg = NULL;
   va_list args;
@@ -52,7 +52,7 @@ fcntl64 (int fd, int cmd,...)
 }
 
 extern "C" int
-_fcntl (int fd, int cmd,...)
+_fcntl (int fd, int cmd, ...)
 {
   void *arg = NULL;
   va_list args;

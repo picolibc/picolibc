@@ -1,3 +1,7 @@
+2003-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fcntl.cc (_fcntl): Whitespace cleanup.
+
 2003-12-03  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.cc (cygthread::stub): Properly establish _threadinfo
