@@ -1,3 +1,7 @@
+2003-04-02  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (EXTRA_OFILES): Remove debugging object.
+
 2003-04-02  Jason Tishler <jason@tishler.net>
 	    Christopher Faylor  <cgf@redhat.com>
 
