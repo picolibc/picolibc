@@ -91,7 +91,6 @@ public:
 #ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, class process_cache *cache);
 #endif
-  virtual operator struct request_header ();
   cygserver_request_code req_id () {return header.req_id;};
   virtual ~client_request();
   request_header header;

@@ -26,6 +26,7 @@ class transport_layer_base
     virtual bool connect() = 0;
     virtual void impersonate_client ();
     virtual void revert_to_self ();
+    virtual ~transport_layer_base();
 };
 
 #endif /* _CYGSERVER_TRANSPORT_ */

@@ -19,8 +19,9 @@ class queue_request
 {
   public:
     class queue_request *next;
-    virtual void process ();
+    virtual void process () = 0;
     queue_request();
+    virtual ~queue_request();
 };
 
 

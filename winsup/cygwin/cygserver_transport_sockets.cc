@@ -66,6 +66,11 @@ transport_layer_sockets::transport_layer_sockets (): fd (-1)
   sdlen = strlen(sockdetails.sa_data) + sizeof(sockdetails.sa_family);
 }
 
+transport_layer_sockets::~transport_layer_sockets ()
+{
+  close ();
+}
+
 void
 transport_layer_sockets::listen ()
 {
@@ -100,7 +105,11 @@ void
 transport_layer_sockets::close()
 {
   /* FIXME - are we open? */
-  ::close (fd);
+  if (fd != -1)
+    {
+      ::close (fd);
+      fd = -1;
+    }
 }
 
 ssize_t

@@ -236,14 +236,9 @@ queue_process_param::stop ()
 }
 
 /* queue_request */
-queue_request::queue_request ():next (NULL)
-{
-}
+queue_request::queue_request ()
+  : next (NULL)
+{}
 
-void
-queue_request::process (void)
-{
-  system_printf ("**********************************************\n"
-		 "Oh no! we've hit the base queue_request process() function, and this indicates a coding\n"
-		 "fault !!!" "***********************************************");
-}
+queue_request::~queue_request ()
+{}

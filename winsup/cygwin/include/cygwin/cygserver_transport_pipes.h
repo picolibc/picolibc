@@ -25,6 +25,7 @@ class transport_layer_pipes : public transport_layer_base
     virtual void impersonate_client ();
     virtual void revert_to_self ();
     transport_layer_pipes ();
+    virtual ~transport_layer_pipes ();
 
   private:
     /* for pipe based communications */

@@ -365,8 +365,10 @@ client_request_get_version::serve(transport_layer_base *conn, class process_cach
 class server_request : public queue_request
 {
   public:
-  server_request (transport_layer_base *newconn, class process_cache *newcache);
-  virtual void process ();
+    server_request (transport_layer_base *newconn,
+		    class process_cache *newcache);
+    virtual ~server_request();
+    virtual void process ();
   private:
     char request_buffer [MAX_REQUEST_SIZE];
     transport_layer_base *conn;
@@ -385,7 +387,7 @@ class server_request_queue : public threaded_queue
   public:
     class process_cache *cache;
     void process_requests (transport_layer_base *transport);
-    virtual void add (transport_layer_base *conn);
+    void addConnection (transport_layer_base *conn);
 };
 class server_request_queue request_queue;
 
@@ -404,7 +406,7 @@ request_loop (LPVOID LpParam)
      * _AFTER_ the shutdown request. And sending ourselves a request is ugly
      */
      if (new_conn && queue->active)
-	 queue->add (new_conn);
+	 queue->addConnection (new_conn);
   }
   return 0;
 }
@@ -428,10 +430,14 @@ client_request_shutdown::serve (transport_layer_base *conn, class process_cache 
   request_queue.active=false;
 }
 
-server_request::server_request (transport_layer_base *newconn, class process_cache *newcache)
+server_request::server_request (transport_layer_base *newconn,
+				class process_cache *newcache)
+  : conn(newconn), cache(newcache)
+{}
+
+server_request::~server_request ()
 {
-  conn = newconn;
-  cache = newcache;
+  delete conn;
 }
 
 void
@@ -500,14 +506,12 @@ server_request::process ()
   printf (".");
 
 out:
-  conn->close ();
-  delete conn;
   if (req)
     delete (req);
 }
 
 void
-server_request_queue::add (transport_layer_base *conn)
+server_request_queue::addConnection (transport_layer_base *conn)
 {
   /* safe to not "Try" because workers don't hog this, they wait on the event
    */
@@ -515,13 +519,12 @@ server_request_queue::add (transport_layer_base *conn)
   EnterCriticalSection (&queuelock);
   if (!running)
     {
-      conn->close ();
       delete conn;
       LeaveCriticalSection (&queuelock);
       return;
     }
   queue_request * listrequest = new server_request (conn, cache);
-  threaded_queue::add (listrequest);
+  add (listrequest);
   LeaveCriticalSection (&queuelock);
 }
 

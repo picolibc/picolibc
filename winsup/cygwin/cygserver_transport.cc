@@ -37,10 +37,11 @@ class transport_layer_base *create_server_transport()
 
 void
 transport_layer_base::impersonate_client ()
-{
-}
+{}
 
 void
 transport_layer_base::revert_to_self ()
-{
-}
+{}
+
+transport_layer_base::~transport_layer_base ()
+{}

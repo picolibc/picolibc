@@ -36,9 +36,10 @@ class cleanup_routine
 {
 public:
   cleanup_routine () : next (NULL) {};
+  virtual ~cleanup_routine ();
   class cleanup_routine * next;
   /* MUST BE SYNCHRONOUS */
-  virtual void cleanup (DWORD winpid);
+  virtual void cleanup (DWORD winpid) = 0;
 };
 
 class process
@@ -66,7 +67,7 @@ class process_cache:public threaded_queue
 {
 public:
   process_cache (unsigned int initial_workers);
-  virtual ~ process_cache ();
+  ~process_cache ();
   class process *process (DWORD winpid);
   /* remove a process from the cache */
   int handle_snapshot (HANDLE *, class process **, ssize_t, int);
@@ -76,7 +77,7 @@ public:
   HANDLE cache_add_trigger;
 
 private:
-  virtual void add_task (class process *);
+  void add_task (class process *);
   class process *head;
   CRITICAL_SECTION cache_write_access;
 };

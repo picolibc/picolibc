@@ -61,6 +61,11 @@ transport_layer_pipes::init_security()
   inited = true;
 }
 
+transport_layer_pipes::~transport_layer_pipes ()
+{
+  close ();
+}
+
 void
 transport_layer_pipes::listen ()
 {
@@ -112,6 +117,7 @@ transport_layer_pipes::close()
       FlushFileBuffers (pipe);
       DisconnectNamedPipe (pipe);
       CloseHandle (pipe);
+      pipe = NULL;
     }
 }
 

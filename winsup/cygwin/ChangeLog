@@ -1,5 +1,50 @@
 2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver.cc (class server_request): Add virtual destructor.
+	(server_request_queue::addConnection): New method to replace bad
+	virtual add() method.
+	(request_loop): Replace call to queue->add() with call to
+	queue->addConnection().
+	(server_request::server_request): Use field initialization.
+	(server_request::~server_request): New virtual destructor.
+	(server_request::process): Remove close and delete of
+	transport_layer_base object. It is deleted by the server_request's
+	own destructor and closed by its own destructor.
+	* include/cygwin/cygserver.h
+	(client_request::operator request_header): Remove unused method.
+	* cygserver_client.cc: Ditto.
+	* include/cygwin/cygserver_process.h
+	(class cleanup_routine): Add virtual destructor.
+	(cleanup_routine::cleanup): Make pure virtual.
+	(class process_cache): Make destructor non-virtual.
+	(process_cache::add): Ditto.
+	* cygserver_process.cc
+	(cleanup_routine::~cleanup_routine): New virtual destructor.
+	* include/cygwin/cygserver_transport.h
+	(class transport_layer_base): Add virtual destructor.
+	* cygserver_transport.cc
+	(transport_layer_base::~transport_layer_base): New virtual
+	destructor.
+	* include/cygwin/cygserver_transport_pipes.h
+	(class transport_layer_pipes): Add virtual destructor.
+	* cygserver_transport_pipes.cc
+	(transport_layer_pipes::~transport_layer_pipes): New virtual
+	destructor.
+	(transport_layer_pipes::close): Null out handle after closing.
+	* include/cygwin/cygserver_transport_sockets.h
+	(class transport_layer_sockets): Add virtual destructor.
+	* cygserver_transport_sockets.cc
+	(transport_layer_sockets::~transport_layer_sockets): New virtual
+	destructor.
+	(transport_layer_sockets::close): Null out fd after closing.
+	* threaded_queue.h (class queue_request): Add virtual destructor.
+	(queue_request::process): Make pure virtual.
+	* threaded_queue.cc (~queue_request): New virtual destructor.
+	(queue_request::process): Remove definition of pure virtual
+	method.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* include/cygwin/cygserver.h (client_request::send): Make
 	non-virtual.
 	(class client_request_attach_tty): Put client- and server-specific

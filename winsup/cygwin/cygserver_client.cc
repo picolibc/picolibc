@@ -73,11 +73,6 @@ client_request::~client_request ()
 {
 }
 
-client_request::operator class request_header ()
-{
-  return header;
-}
-
 void
 client_request::send (transport_layer_base *conn)
 {

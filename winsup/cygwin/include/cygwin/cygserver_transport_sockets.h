@@ -22,6 +22,7 @@ class transport_layer_sockets : public transport_layer_base
     virtual ssize_t write (char *buf, size_t len);
     virtual bool connect();
     transport_layer_sockets ();
+    virtual ~transport_layer_sockets ();
 
   private:
     /* for socket based communications */

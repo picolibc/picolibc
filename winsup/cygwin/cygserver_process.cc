@@ -99,7 +99,7 @@ process_cache::add_task (class process * theprocess)
   /* every derived ::add must enter the section! */
   EnterCriticalSection (&queuelock);
   queue_request *listrequest = new process_cleanup (theprocess);
-  threaded_queue::add (listrequest);
+  add (listrequest);
   LeaveCriticalSection (&queuelock);
 }
 
@@ -383,3 +383,7 @@ process_process_param::request_loop ()
   running = false;
   return 0;
 }
+
+/* cleanup_routine */
+cleanup_routine::~cleanup_routine ()
+{}
