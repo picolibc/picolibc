@@ -1,3 +1,8 @@
+2003-06-30  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa-config.h (XCHAL_HAVE_CONST16, XCHAL_HAVE_ABS,
+	XCHAL_HAVE_ADDX, XCHAL_HAVE_L32R): Define.
+
 2003-06-25  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h: Correct spelling of "relocatable".

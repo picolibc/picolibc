@@ -1,5 +1,5 @@
 /* Xtensa configuration settings.
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2001,2002,2003 Free Software Foundation, Inc.
    Contributed by Bob Wilson (bwilson@tensilica.com) at Tensilica.
 
    This program is free software; you can redistribute it and/or modify
@@ -26,6 +26,10 @@
 
 #define XCHAL_HAVE_BE			1
 #define XCHAL_HAVE_DENSITY		1
+#define XCHAL_HAVE_CONST16		0
+#define XCHAL_HAVE_ABS			1
+#define XCHAL_HAVE_ADDX			1
+#define XCHAL_HAVE_L32R			1
 #define XCHAL_HAVE_MAC16		0
 #define XCHAL_HAVE_MUL16		0
 #define XCHAL_HAVE_MUL32		0
