@@ -289,6 +289,17 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  struct __group32 *gr = internal_getgrsid (sid);
 	  return gr ? gr->gr_gid : (__gid32_t)-1;
 	}
+      case CW_GET_BINMODE:
+	{
+	  const char *path = va_arg (arg, const char *);
+	  path_conv p (path, PC_SYM_FOLLOW | PC_FULL | PC_NULLEMPTY);
+	  if (p.error)
+	    {
+	      set_errno (p.error);
+	      return (unsigned long) -1;
+	    }
+	  return p.binmode ();
+	}
       default:
 	return (DWORD) -1;
     }
