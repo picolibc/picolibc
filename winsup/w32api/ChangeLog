@@ -1,3 +1,9 @@
+2005-01-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winerror.h (ERROR_EXE_CANNOT_MODIFY_STRONG_SIGNED_BINARY):
+	Correct typo.
+	Thanks to: Aidan France  <aidan1@users.sourceforge.net>
+
 2004-12-29 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	*include/winuser.h (MNS_*, WM_MENUCOMMAND,
