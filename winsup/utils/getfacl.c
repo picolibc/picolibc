@@ -44,7 +44,7 @@ username (uid_t uid)
   if ((pw = getpwuid (uid)))
     strcpy (ubuf, pw->pw_name);
   else
-    sprintf (ubuf, "%d <unknown>", uid);
+    sprintf (ubuf, "%lu <unknown>", (unsigned long)uid);
   return ubuf;
 }
 
@@ -57,7 +57,7 @@ groupname (gid_t gid)
   if ((gr = getgrgid (gid)))
     strcpy (gbuf, gr->gr_name);
   else
-    sprintf (gbuf, "%d <unknown>", gid);
+    sprintf (gbuf, "%lu <unknown>", (unsigned long)gid);
   return gbuf;
 }
 
@@ -200,8 +200,8 @@ main (int argc, char **argv)
       printf ("# file: %s\n", argv[c]);
       if (nopt)
         {
-	  printf ("# owner: %d\n", st.st_uid);
-	  printf ("# group: %d\n", st.st_gid);
+	  printf ("# owner: %lu\n", (unsigned long)st.st_uid);
+	  printf ("# group: %lu\n", (unsigned long)st.st_gid);
 	}
       else
         {
@@ -230,7 +230,7 @@ main (int argc, char **argv)
 	      break;
 	    case USER:
 	      if (nopt)
-		printf ("user:%d:", acls[i].a_id);
+		printf ("user:%lu\n", (unsigned long)acls[i].a_id);
 	      else
 		printf ("user:%s:", username (acls[i].a_id));
 	      break;
@@ -239,7 +239,7 @@ main (int argc, char **argv)
 	      break;
 	    case GROUP:
 	      if (nopt)
-		printf ("group:%d:", acls[i].a_id);
+		printf ("group:%lu\n", (unsigned long)acls[i].a_id);
 	      else
 		printf ("group:%s:", groupname (acls[i].a_id));
 	      break;
