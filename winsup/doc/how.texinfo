@@ -1227,8 +1227,7 @@ the thing that needs things from it.
 This is wrong @code{gcc -lstdc++ hello.cc}.
 This is right @code{gcc hello.cc -lstdc++}.
 
-@subsection I use a function I know is in the API, but I still get a link
-error.
+@subsection I use a function I know is in the API, but I still get a link error.
 
 @strong{(Please note: This section has not yet been updated for the latest
 net release.)}

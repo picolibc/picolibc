@@ -8,7 +8,7 @@ site that's down, or an ommission, please notify the FAQ maintainer at
 @file{mailto:starksb@@ebi.ac.uk}.  You can always find an up-to-date list of
 mirrors at @file{http://sources.redhat.com/cygwin/mirrors.html}.)}
 
-@strong{You must read the file @code{latest/README} before downloading
+@strong{You must read the file @samp{latest/README} before downloading
 and installing Cygwin.  It contains important setup instructions.}
 
 @c Just commenting out unreachable sites now, though problem could have
