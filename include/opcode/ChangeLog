@@ -1,3 +1,11 @@
+2002-05-30  Chris G. Demetriou  <cgd@broadcom.com>
+
+	* mips.h (OP_SH_ALN, OP_MASK_ALN, OP_SH_VSEL, OP_MASK_VSEL)
+	(MDMX_FMTSEL_IMM_QH, MDMX_FMTSEL_IMM_OB, MDMX_FMTSEL_VEC_QH)
+	(MDMX_FMTSEL_VEC_OB, INSN_READ_MDMX_ACC, INSN_WRITE_MDMX_ACC)
+	(INSN_MDMX): New constants, for MDMX support.
+	(opcode character list): Add "O", "Q", "X", "Y", and "Z" for MDMX.
+
 2002-05-28  Kuang Hwa Lin <kuang@sbcglobal.net>
 
 	* dlx.h: New file.

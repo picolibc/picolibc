@@ -133,6 +133,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define OP_MASK_SEL		0x7	/* The sel field of mfcZ and mtcZ.  */
 #define OP_SH_CODE19		6       /* 19 bit wait code.  */
 #define OP_MASK_CODE19		0x7ffff
+#define OP_SH_ALN		21
+#define OP_MASK_ALN		0x7
+#define OP_SH_VSEL		21
+#define OP_MASK_VSEL		0x1f
+
+/* Values in the 'VSEL' field.  */
+#define MDMX_FMTSEL_IMM_QH	0x1d
+#define MDMX_FMTSEL_IMM_OB	0x1e
+#define MDMX_FMTSEL_VEC_QH	0x15
+#define MDMX_FMTSEL_VEC_OB	0x16
 
 /* This structure holds information for a particular instruction.  */
 
@@ -220,13 +230,21 @@ struct mips_opcode
    "f" 32 bit floating point constant
    "l" 32 bit floating point constant in .lit4
 
+   MDMX instruction operands (note that while these use the FP register
+   fields, they accept both $fN and $vN names for the registers):  
+   "O"	MDMX alignment offset (OP_*_ALN)
+   "Q"	MDMX vector/scalar/immediate source (OP_*_VSEL and OP_*_FT)
+   "X"	MDMX destination register (OP_*_FD) 
+   "Y"	MDMX source register (OP_*_FS)
+   "Z"	MDMX source register (OP_*_FT)
+
    Other:
    "()" parens surrounding optional value
    ","  separates operands
 
    Characters used so far, for quick reference when adding more:
    "<>(),"
-   "ABCDEFGHIJLMNPRSTUVW"
+   "ABCDEFGHIJLMNOPQRSTUVWXYZ"
    "abcdfhijklopqrstuvwxz"
 */
 
@@ -297,6 +315,10 @@ struct mips_opcode
 #define INSN_MULT                   0x40000000
 /* Instruction synchronize shared memory.  */
 #define INSN_SYNC		    0x80000000
+/* Instruction reads MDMX accumulator.  XXX FIXME: No bits left!  */
+#define INSN_READ_MDMX_ACC	    0
+/* Instruction writes MDMX accumulator.  XXX FIXME: No bits left!  */
+#define INSN_WRITE_MDMX_ACC	    0
 
 /* Instruction is actually a macro.  It should be ignored by the
    disassembler, and requires special treatment by the assembler.  */
@@ -320,6 +342,8 @@ struct mips_opcode
 
 /* MIPS-3D ASE */
 #define INSN_MIPS3D               0x00004000
+/* MDMX ASE */ 
+#define INSN_MDMX                 0x00008000
 
 /* Chip specific instructions.  These are bitmasks.  */
 
