@@ -33,27 +33,27 @@ extern "C" {
 /*
  * Prototypes of the ANSI Standard C library string functions.
  */
-_CRTIMP void* __cdecl	memchr (const void*, int, size_t);
-_CRTIMP int __cdecl 	memcmp (const void*, const void*, size_t);
+_CRTIMP void* __cdecl	memchr (const void*, int, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP int __cdecl 	memcmp (const void*, const void*, size_t) __MINGW_ATTRIB_PURE;
 _CRTIMP void* __cdecl 	memcpy (void*, const void*, size_t);
 _CRTIMP void* __cdecl	memmove (void*, const void*, size_t);
 _CRTIMP void* __cdecl	memset (void*, int, size_t);
 _CRTIMP char* __cdecl	strcat (char*, const char*);
-_CRTIMP char* __cdecl	strchr (const char*, int);
-_CRTIMP int __cdecl	strcmp (const char*, const char*);
+_CRTIMP char* __cdecl	strchr (const char*, int)  __MINGW_ATTRIB_PURE;
+_CRTIMP int __cdecl	strcmp (const char*, const char*)  __MINGW_ATTRIB_PURE;
 _CRTIMP int __cdecl	strcoll (const char*, const char*);	/* Compare using locale */
 _CRTIMP char* __cdecl	strcpy (char*, const char*);
-_CRTIMP size_t __cdecl	strcspn (const char*, const char*);
+_CRTIMP size_t __cdecl	strcspn (const char*, const char*)  __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl	strerror (int); /* NOTE: NOT an old name wrapper. */
 
-_CRTIMP size_t __cdecl	strlen (const char*);
+_CRTIMP size_t __cdecl	strlen (const char*)  __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl	strncat (char*, const char*, size_t);
-_CRTIMP int __cdecl	strncmp (const char*, const char*, size_t);
+_CRTIMP int __cdecl	strncmp (const char*, const char*, size_t)  __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl	strncpy (char*, const char*, size_t);
-_CRTIMP char* __cdecl	strpbrk (const char*, const char*);
-_CRTIMP char* __cdecl	strrchr (const char*, int);
-_CRTIMP size_t __cdecl	strspn (const char*, const char*);
-_CRTIMP char* __cdecl	strstr (const char*, const char*);
+_CRTIMP char* __cdecl	strpbrk (const char*, const char*)  __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strrchr (const char*, int)  __MINGW_ATTRIB_PURE;
+_CRTIMP size_t __cdecl	strspn (const char*, const char*)  __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strstr (const char*, const char*)  __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl	strtok (char*, const char*);
 _CRTIMP size_t __cdecl	strxfrm (char*, const char*, size_t);
 
