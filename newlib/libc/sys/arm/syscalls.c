@@ -470,8 +470,6 @@ _getpid (int n)
   n = n;
 }
 
-extern void abort (void);
-
 caddr_t
 _sbrk (int incr)
 {
@@ -486,8 +484,18 @@ _sbrk (int incr)
   
   if (heap_end + incr > stack_ptr)
     {
+      /* Some of the libstdc++-v3 tests rely upon detecting
+	 out of memory errors, so do not abort here.  */
+#if 0
+      extern void abort (void);
+
       _write (1, "_sbrk: Heap and stack collision\n", 32);
+      
       abort ();
+#else
+      errno = ENOMEM;
+      return -1;
+#endif
     }
   
   heap_end += incr;
