@@ -148,7 +148,7 @@ _CRTIMP __CSTD FILE* __cdecl _wpopen (const wchar_t*, const wchar_t*);
 int __cdecl _snwprintf (wchar_t*, __CSTD size_t, const wchar_t*, ...);
 int __cdecl _vsnwprintf (wchar_t*, __CSTD size_t, const wchar_t*, __VALIST);
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
-int __cdecl snwprintf(wchar_t* s, __CSTD size_t n, const wchar_t*  format, ...);
+int __cdecl snwprintf (wchar_t* s, __CSTD size_t n, const wchar_t*  format, ...);
 extern __inline__ int __cdecl
 vsnwprintf (wchar_t* __s, __CSTD size_t __n, const wchar_t* __format,
 	    __VALIST __arg)
@@ -409,12 +409,14 @@ __BEGIN_CSTD_NAMESPACE
 _CRTIMP long __cdecl wcstol (const wchar_t*, wchar_t**, int);
 _CRTIMP unsigned long __cdecl wcstoul (const wchar_t*, wchar_t**, int);
 _CRTIMP double __cdecl	wcstod (const wchar_t*, wchar_t**);
-#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-extern __inline__ float __cdecl wcstof( const wchar_t *__nptr, wchar_t **__endptr)
-	{  return (wcstod(__nptr, __endptr)); }
-long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
-#endif /* __NO_ISOCEXT */
 __END_CSTD_NAMESPACE
+#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
+__BEGIN_CGLOBAL_NAMESPACE
+extern __inline__ float __cdecl wcstof( const wchar_t *__nptr, wchar_t **__endptr)
+	{  return __CSTD wcstod(__nptr, __endptr); }
+long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
+__END_CGLOBAL_NAMESPACE
+#endif /* __NO_ISOCEXT */
 #define  _WSTDLIB_DEFINED
 #endif
 
@@ -423,7 +425,6 @@ typedef wchar_t _Wint_t; /* Used only by MSVC C++ headers?  */
 #endif
 
 __BEGIN_CSTD_NAMESPACE
-
 typedef int mbstate_t;
 
 /* These are resolved by -lmsvcp60 */
@@ -438,8 +439,10 @@ size_t __cdecl mbsrtowcs(wchar_t *, const char **, size_t, mbstate_t *);
 size_t __cdecl wcrtomb(char *, wchar_t, mbstate_t *);
 size_t __cdecl wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
 int __cdecl wctob(wint_t);
+__END_CSTD_NAMESPACE
 
 #ifndef __NO_ISOCEXT /* these need static lib libmingwex.a */
+__BEGIN_CSTD_NAMESPACE
 extern __inline__ int fwide(FILE* __stream, int __mode)
   {return -1;} /* limited to byte orientation */ 
 extern __inline__ int mbsinit(const mbstate_t* __ps)
@@ -450,14 +453,14 @@ int __cdecl wmemcmp(const wchar_t* s1, const wchar_t * s2, size_t n);
 wchar_t* __cdecl wmemcpy(wchar_t* __restrict__ s1, const wchar_t* __restrict__ s2,
 			 size_t n);
 wchar_t* __cdecl wmemmove(wchar_t* s1, const wchar_t* s2, size_t n);
+__END_CSTD_NAMESPACE
+__BEGIN_CGLOBAL_NAMESPACE
 long long __cdecl wcstoll(const wchar_t* __restrict__ nptr,
 			  wchar_t** __restrict__ endptr, int base);
 unsigned long long __cdecl wcstoull(const wchar_t* __restrict__ nptr,
 				    wchar_t ** __restrict__ endptr, int base);
-
+__END_CGLOBAL_NAMESPACE
 #endif /* __NO_ISOCEXT */
-
-__END_CSTD_NAMESPACE
 
 #endif /* Not RC_INVOKED */
 

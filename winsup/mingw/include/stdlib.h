@@ -30,7 +30,6 @@
 /* All the headers include this file. */
 #include <_mingw.h>
 
-
 #define __need_size_t
 #define __need_wchar_t
 #define __need_NULL
@@ -69,7 +68,6 @@
 #define	_MAX_EXT	256
 
 #endif	/* Not __STRICT_ANSI__ */
-
 
 #ifndef RC_INVOKED
 
@@ -327,38 +325,35 @@ _CRTIMP int __cdecl	atoi (const char*);
 _CRTIMP long __cdecl	atol (const char*);
 
 _CRTIMP double __cdecl	strtod (const char*, char**);
-#if !defined __NO_ISOCEXT  /* extern stubs in static libmingwex.a */
-extern __inline__ float __cdecl strtof (const char *__nptr, char **__endptr)
-  { return (strtod (__nptr, __endptr));}
-long double __cdecl strtold (const char * __restrict__, char ** __restrict__);
-#endif /* __NO_ISOCEXT */
-
 _CRTIMP long __cdecl strtol (const char*, char**, int);
 _CRTIMP unsigned long __cdecl strtoul (const char*, char**, int);
-
 __END_CSTD_NAMESPACE
-__BEGIN_CGLOBAL_NAMESPACE
 
-_CRTIMP int __cdecl _wtoi (const wchar_t *);
-_CRTIMP long __cdecl _wtol (const wchar_t *);
-
+#if !defined __NO_ISOCEXT  /* extern stubs in static libmingwex.a */
+__BEGIN_CGLOBAL_NAMESPACE  /* C99 */
+extern __inline__ float __cdecl strtof (const char *__nptr, char **__endptr)
+  { return (__CSTD strtod (__nptr, __endptr));}
+long double __cdecl strtold (const char * __restrict__, char ** __restrict__);
 __END_CGLOBAL_NAMESPACE
-__BEGIN_CSTD_NAMESPACE
-
-#ifndef _WSTDLIB_DEFINED
-/*  also declared in wchar.h */
-_CRTIMP double __cdecl	wcstod (const wchar_t*, wchar_t**);
-#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-extern __inline__ float __cdecl wcstof (const wchar_t *__nptr, wchar_t **__endptr)
-{  return (wcstod(__nptr, __endptr)); }
-long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
 #endif /* __NO_ISOCEXT */
 
+#ifndef _WSTDLIB_DEFINED /* also declared in wchar.h */
+__BEGIN_CSTD_NAMESPACE
 _CRTIMP long __cdecl wcstol (const wchar_t*, wchar_t**, int);
 _CRTIMP unsigned long __cdecl wcstoul (const wchar_t*, wchar_t**, int);
-#define _WSTDLIB_DEFINED
+_CRTIMP double __cdecl	wcstod (const wchar_t*, wchar_t**);
+__END_CSTD_NAMESPACE
+#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
+__BEGIN_CGLOBAL_NAMESPACE /* C99 */
+extern __inline__ float __cdecl wcstof( const wchar_t *__nptr, wchar_t **__endptr)
+	{  return __CSTD wcstod(__nptr, __endptr); }
+long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
+__END_CGLOBAL_NAMESPACE
+#endif /* __NO_ISOCEXT */
+#define  _WSTDLIB_DEFINED
 #endif
 
+__BEGIN_CSTD_NAMESPACE
 _CRTIMP size_t __cdecl wcstombs (char*, const wchar_t*, size_t);
 _CRTIMP int __cdecl wctomb (char*, wchar_t);
 
@@ -441,6 +436,9 @@ wchar_t*  _itow (int, wchar_t*, int);
 _CRTIMP wchar_t* __cdecl  _ltow (long, wchar_t*, int);
 _CRTIMP wchar_t* __cdecl  _ultow (unsigned long, wchar_t*, int);
 
+_CRTIMP int __cdecl _wtoi (const wchar_t *);
+_CRTIMP long __cdecl _wtol (const wchar_t *);
+
 #ifdef __MSVCRT__
 __int64	_atoi64(const char *);
 _CRTIMP char* __cdecl _i64toa(__int64, char *, int);
@@ -479,11 +477,9 @@ _CRTIMP char* __cdecl gcvt (double, int, char*);
 
 #endif	/* Not __STRICT_ANSI__ */
 
-/* C99 names */
+/* C99 */
 /* NOTE: These are in global namespace for now. */
-
 #if !defined __NO_ISOCEXT /* externs in static libmingwex.a */
-
 void __cdecl _Exit(int) _ATTRIB_NORETURN; /* Declare to get noreturn attribute.  */
 #ifndef __STRICT_ANSI__ /* inline using non-ANSI exit */
 extern __inline__ void _Exit(int __status)

@@ -87,16 +87,14 @@
 #define __MINGW32_MINOR_VERSION 0
 
 /*  ISO C++.  */
-#ifdef __cplusplus
-#include <bits/c++config.h>
 
-# ifndef __MINGW_USE_NAMESPACES
-#  if  _GLIBCPP_USE_NAMESPACES
-#   define __MINGW_USE_NAMESPACES 1
-#  else
-#   define __MINGW_USE_NAMESPACES 0
-#  endif
-# endif
+#ifdef __cplusplus
+
+#if defined _GLIBCPP_USE_NAMESPACES
+# define __MINGW_USE_NAMESPACES _GLIBCPP_USE_NAMESPACES
+#else
+# define __MINGW_USE_NAMESPACES 0
+#endif
 
 # if !(defined(__BEGIN_CSTD_NAMESPACE) \
        && defined(__END_CSTD_NAMESPACE))

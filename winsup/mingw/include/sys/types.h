@@ -49,7 +49,7 @@ __END_CSTD_NAMESPACE
 #endif
 
 /* If we include this non-std header, we inject time_t into global */ 
-#if defined (__cplusplus) && (__HAVE_STD_CXX)
+#if defined (__cplusplus) && (__MINGW_USE_NAMESPACES)
 using __CSTD time_t;
 #endif
 

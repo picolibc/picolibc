@@ -1,3 +1,18 @@
+2003-04-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h: Don't include <bits/c++config.h>.
+	(__MINGW_USE_NAMESPACES): Define as _GLIBCPP_USE_NAMESPACES.
+	* include/ctype.h: Whitespace changes.
+	* include/locale.h: Remove duplicate inclusion of <stddef.h>.
+	* include/stdlib.h: (strtof, strtold): Move out of std namespace.
+	(wcstof, wcstold): Likewise.
+	* include/time.h (strftime): Remove duplicate declaration.
+	(_wasctime): Qualify tm with __CSTD.
+	* include/wchar.h (wcstof, wcstold): Move out of std namespace.
+	(wcstoll, wcstoull): Likewise.
+	* include/sys/types.h (__MINGW_USE_NAMESPACES): Use instead of
+	__USE_STD_CXX.
+
 2003-04-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h:[__cplusplus] Include <bits/c++config.h>.

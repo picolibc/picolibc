@@ -122,7 +122,6 @@ extern _CRTIMP void __cdecl	_tzset (void);
 extern _CRTIMP void __cdecl	tzset (void);
 #endif
 
-_CRTIMP size_t __cdecl	strftime(char*, size_t, const char*, const struct tm*);
 _CRTIMP char* __cdecl	_strdate(char*);
 _CRTIMP char* __cdecl	_strtime(char*);
   
@@ -182,7 +181,7 @@ __MINGW_IMPORT char 	*tzname[2];
 
 /* wide function prototypes, also declared in wchar.h */
 
-_CRTIMP wchar_t* __cdecl	_wasctime(const struct tm*);
+_CRTIMP wchar_t* __cdecl	_wasctime(const struct __CSTD tm*);
 _CRTIMP wchar_t* __cdecl	_wctime(const __CSTD time_t*);
 _CRTIMP wchar_t* __cdecl	_wstrdate(wchar_t*);
 _CRTIMP wchar_t* __cdecl	_wstrtime(wchar_t*);

@@ -136,7 +136,7 @@ __MINGW_IMPORT unsigned short _ctype[];
 # define  _pctype _pctype_dll
 # endif 
 
-#else		/*  __DECLSPEC_SUPPORTED */
+#else	/*  __DECLSPEC_SUPPORTED */
 extern unsigned short** _imp___ctype;
 #define _ctype (*_imp___ctype)
 # ifdef __MSVCRT__
@@ -162,8 +162,8 @@ extern unsigned short** _imp___ctype;
  * optimise away the constant condition.			
  */
 
-#if ! (defined (__NO_INLINE__)  || defined (__NO_CTYPE_INLINES) \
-      || defined (__STRICT_ANSI__ ))
+#if !(defined (__NO_INLINE__)  || defined (__NO_CTYPE_INLINES) \
+      || defined (__STRICT_ANSI__))
 /* use  simple lookup if SB locale, else  _isctype()  */
 #define __ISCTYPE(__c, __mask) \
   (MB_CUR_MAX == 1 ? (_pctype[__c] & __mask) : __CGLOBAL _isctype(__c, __mask))
@@ -181,7 +181,6 @@ extern __inline__ int __cdecl isxdigit(int __c) {return __ISCTYPE(__c, _HEX);}
 
 /* TODO? Is it worth inlining ANSI tolower, toupper? Probably only
    if we only want C-locale. */
-
 #endif /* _NO_CTYPE_INLINES */
 
 /* Wide character equivalents
@@ -215,7 +214,7 @@ _CRTIMP wchar_t	__cdecl towupper(wchar_t);
 
 _CRTIMP int __cdecl isleadbyte (int);
 
-#if ! (defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED))
+#if !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED))
 #define __WCTYPE_INLINES_DEFINED
 extern __inline__ int __cdecl iswalnum(wint_t __wc) {return (iswctype(__wc,_ALPHA|_DIGIT));}
 extern __inline__ int __cdecl iswalpha(wint_t __wc) {return (iswctype(__wc,_ALPHA));}
@@ -241,7 +240,7 @@ __BEGIN_CGLOBAL_NAMESPACE
 _CRTIMP int __cdecl __isascii (int);
 _CRTIMP int __cdecl __toascii (int);
 _CRTIMP int __cdecl __iscsymf (int);	/* Valid first character in C symbol */
-_CRTIMP int __cdecl __iscsym (int);		/* Valid character in C symbol (after first) */
+_CRTIMP int __cdecl __iscsym (int);	/* Valid character in C symbol (after first) */
 
 #ifndef __NO_CTYPE_INLINES
 extern __inline__ int __cdecl __isascii(int __c) {return ((__c & ~0x7F) == 0);} 

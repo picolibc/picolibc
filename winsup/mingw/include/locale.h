@@ -51,15 +51,11 @@
 
 #ifndef RC_INVOKED
 
-/* According to C89 std, NULL is defined in locale.h too */
+/* According to C89 std, NULL is defined in locale.h too.  */
 #define __need_NULL
 #include <stddef.h>
 
 __BEGIN_CSTD_NAMESPACE
-
-/* According to C89 std, NULL is defined in locale.h too.  */
-#define __need_NULL
-#include <stddef.h>
 
 /*
  * The structure returned by 'localeconv'.
