@@ -114,6 +114,7 @@
 #include <errno.h>
 #include <unistd.h> /* fork, getpid, sleep */
 #include <string.h>
+#include <stdlib.h>
 #include "forker.h"
 
 extern int errno;

@@ -1,3 +1,8 @@
+2001-11-02  Egor Duda  <deo@logos-m.ru>
+
+	* libltp/lib/forker.c: Include proper header to avoid compiler
+	warning.
+
 2001-10-29  Egor Duda  <deo@logos-m.ru>
 
 	* winsup.api/ltp/stat03.c: Supress compiler warning.
