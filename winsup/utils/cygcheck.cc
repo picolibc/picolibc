@@ -98,6 +98,15 @@ static common_apps[] = {
 static int num_paths = 0, max_paths = 0;
 static char **paths = 0;
 
+void
+eprintf (const char *format, ...)
+{
+  va_list ap;
+  va_start (ap, format);
+  vfprintf (stderr, format, ap);
+  va_end (ap);
+}
+
 /*
  * display_error() is used to report failure modes
  */

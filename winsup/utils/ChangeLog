@@ -1,3 +1,7 @@
+2004-11-18  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* cygcheck.cc (eprintf): New function.
+
 2004-11-16  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* cygcheck.cc (find_on_path): Clear show_error and/or print_failed
