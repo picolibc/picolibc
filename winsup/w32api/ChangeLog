@@ -1,5 +1,28 @@
 2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h (BroadcastSystemMessage, BroadcastSystemMessageA,
+	BroadcastSystemMessageW, BroadcastSystemMessageEx,
+	BroadcastSystemMessageExA, BroadcastSystemMessageExW,
+	BSMINFO, BSF_ALLOWSFW, BSF_SENDNOTIFYMESSAGE, BSF_LUID,
+	BSF_RETURNHDESK): Add functions and constants.
+
+	* include/winuser.h (EnumDisplaySettingsEx, EnumDisplaySettingsExA,
+	EnumDisplaySettingsExW, EDS_RAWMODE): Add functions and constant.
+
+	* include/winuser.h (IsGUIThread, IsHungAppWindow, FlashWindowEx,
+	GetProcessDefaultLayout, SetProcessDefaultLayout,
+	RealChildWindowFromPoint, SetProcessDefaultLayout,
+	SwitchToThisWindow): Add functions.
+
+	* lib/user32.def (BroadcastSystemMessageA, BroadcastSystemMessageW,
+	BroadcastSystemMessageExA, BroadcastSystemMessageExW,
+	EnumDisplaySettingsExA, EnumDisplaySettingsExW, FlashWindowEx,
+	GetProcessDefaultLayout, IsGUIThread, IsHungAppWindow,
+	RealChildWindowFromPoint, SetProcessDefaultLayout,
+	SwitchToThisWindow): Add function.
+
+2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h (DeregisterShellHookWindow): Add function.
 
 	* include/winuser.h [_WIN32_WINNT >= 0x0500] (EndTask): Add function.

@@ -14,6 +14,10 @@ BeginDeferWindowPos@4
 BeginPaint@8
 BringWindowToTop@4
 BroadcastSystemMessage@20
+BroadcastSystemMessageA@20
+BroadcastSystemMessageExA@24
+BroadcastSystemMessageExW@24
+BroadcastSystemMessageW@20
 CalcChildScroll@8
 CallMsgFilter@8
 CallMsgFilterA@8
@@ -188,6 +192,8 @@ EnumDisplayDevicesA@16
 EnumDisplayDevicesW@16
 EnumDisplayMonitors@16
 EnumDisplaySettingsA@12
+EnumDisplaySettingsExA@16
+EnumDisplaySettingsExW@16
 EnumDisplaySettingsW@12
 EnumPropsA@8
 EnumPropsExA@12
@@ -206,6 +212,7 @@ FindWindowExA@16
 FindWindowExW@16
 FindWindowW@8
 FlashWindow@8
+FlashWindowEx@4
 FrameRect@12
 FreeDDElParam@8
 GetAltTabInfo@20
@@ -293,6 +300,7 @@ GetNextDlgTabItem@12
 GetOpenClipboardWindow@0
 GetParent@4
 GetPriorityClipboardFormat@8
+GetProcessDefaultLayout@4
 GetProcessWindowStation@0
 GetPropA@8
 GetPropW@8
@@ -365,6 +373,8 @@ IsDialogMessage@8
 IsDialogMessageA@8
 IsDialogMessageW@8
 IsDlgButtonChecked@8
+IsGUIThread@4
+IsHungAppWindow@4
 IsIconic@4
 IsMenu@4
 IsRectEmpty@4
@@ -442,6 +452,7 @@ PostQuitMessage@4
 PostThreadMessageA@16
 PostThreadMessageW@16
 PtInRect@12
+RealChildWindowFromPoint@12
 RedrawWindow@16
 RegisterClassA@4
 RegisterClassExA@4
@@ -508,6 +519,7 @@ SetMenuItemInfoW@16
 SetMessageExtraInfo@4
 SetMessageQueue@4
 SetParent@8
+SetProcessDefaultLayout@4
 SetProcessWindowStation@4
 SetPropA@12
 SetPropW@12
@@ -549,6 +561,7 @@ ShowWindowAsync@8
 SubtractRect@12
 SwapMouseButton@4
 SwitchDesktop@4
+SwitchToThisWindow@8
 SystemParametersInfoA@16
 SystemParametersInfoW@16
 TabbedTextOutA@32

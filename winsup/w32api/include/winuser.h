@@ -115,13 +115,21 @@ extern "C" {
 #define MF_USECHECKBITMAPS 512
 #define MF_UNHILITE 0
 #define MF_HILITE 128
-#define BSF_IGNORECURRENTTASK	2
-#define BSF_QUERY	1
-#define BSF_FLUSHDISK	4
-#define BSF_NOHANG	8
-#define BSF_POSTMESSAGE 16
-#define BSF_FORCEIFHUNG	32
-#define BSF_NOTIMEOUTIFNOTHUNG 64
+#define BSF_FLUSHDISK 0x00000004
+#define BSF_FORCEIFHUNG 0x00000020
+#define BSF_IGNORECURRENTTASK 0x00000002
+#define BSF_NOHANG 0x00000008
+#define BSF_NOTIMEOUTIFNOTHUNG 0x00000040
+#define BSF_POSTMESSAGE 0x00000010
+#define BSF_QUERY 0x00000001
+#if (_WIN32_WINNT >= 0x0500)
+#define BSF_ALLOWSFW 0x00000080
+#define BSF_SENDNOTIFYMESSAGE 0x00000100
+#endif /* (_WIN32_WINNT >= 0x0500) */
+#if (_WIN32_WINNT >= 0x0501)
+#define BSF_LUID 0x00000400
+#define BSF_RETURNHDESK 0x00000200
+#endif /* (_WIN32_WINNT >= 0x0501) */
 #define BSM_ALLCOMPONENTS	0
 #define BSM_APPLICATIONS	8
 #define BSM_ALLDESKTOPS		16
@@ -382,16 +390,16 @@ extern "C" {
 #define DDL_POSTMSGS	8192
 #define DDL_DRIVES	16384
 #define DDL_EXCLUSIVE	32768
-#define DC_ACTIVE	1
-#define DC_SMALLCAP	2
-#define DC_ICON	4
-#define DC_TEXT	8
-#define DC_INBUTTON	16
+#define DC_ACTIVE	0x00000001
+#define DC_SMALLCAP	0x00000002
+#define DC_ICON	0x00000004
+#define DC_TEXT	0x00000008
+#define DC_INBUTTON	0x00000010
 #if (_WIN32_WINDOWS >= 0x0410 || _WIN32_WINNT >= 0x0500)
-#define DC_GRADIENT	32
+#define DC_GRADIENT	0x00000020
 #endif
-#if ( _WIN32_WINNT >= 0x0501)
-#define DC_BUTTONS	0x1000
+#if (_WIN32_WINNT >= 0x0501)
+#define DC_BUTTONS	0x00001000
 #endif
 /* Where are these documented?   */
 #define DC_CAPTION	(DC_ICON|DC_TEXT|DC_BUTTONS)
@@ -2090,6 +2098,9 @@ extern "C" {
 #define MONITOR_DEFAULTTONEAREST 2 
 #define MONITORINFOF_PRIMARY 1 
 #endif
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
+#define EDS_RAWMODE 0x00000002
+#endif
 
 #ifndef RC_INVOKED
 typedef BOOL(CALLBACK *DLGPROC)(HWND,UINT,WPARAM,LPARAM);
@@ -2860,6 +2871,14 @@ typedef struct tagGUITHREADINFO {
 	RECT rcCaret;
 } GUITHREADINFO,*PGUITHREADINFO,*LPGUITHREADINFO;
 #endif /* (WINVER >= 0x0500) */
+#if (_WIN32_WINNT >= 0x0501)
+typedef struct {
+	UINT  cbSize;
+	HDESK hdesk;
+	HWND  hwnd;
+	LUID  luid;
+} BSMINFO,*PBSMINFO;
+#endif /* (WINVER >= 0x0501) */
 
 #define AnsiToOem CharToOemA
 #define OemToAnsi OemToCharA
@@ -2895,6 +2914,14 @@ HDWP WINAPI BeginDeferWindowPos(int);
 HDC WINAPI BeginPaint(HWND,LPPAINTSTRUCT);
 BOOL WINAPI BringWindowToTop(HWND);
 long WINAPI BroadcastSystemMessage(DWORD,LPDWORD,UINT,WPARAM,LPARAM);
+#if (_WIN32_WINNT >= 0x0400)
+long WINAPI BroadcastSystemMessageA(DWORD,LPDWORD,UINT,WPARAM,LPARAM);
+long WINAPI BroadcastSystemMessageW(DWORD,LPDWORD,UINT,WPARAM,LPARAM);
+#endif /* (_WIN32_WINNT >= 0x0400) */
+#if (_WIN32_WINNT >= 0x0501)
+long WINAPI BroadcastSystemMessageExA(DWORD,LPDWORD,UINT,WPARAM,LPARAM,PBSMINFO);
+long WINAPI BroadcastSystemMessageExW(DWORD,LPDWORD,UINT,WPARAM,LPARAM,PBSMINFO);
+#endif /* (_WIN32_WINNT >= 0x0501) */
 BOOL WINAPI CallMsgFilter(PMSG,int);
 LRESULT WINAPI CallNextHookEx(HHOOK,int,WPARAM,LPARAM);
 LRESULT WINAPI CallWindowProcA(WNDPROC,HWND,UINT,WPARAM,LPARAM);
@@ -3050,6 +3077,10 @@ BOOL WINAPI EnumDisplayMonitors(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 #ifndef NOGDI
 BOOL WINAPI EnumDisplaySettingsA(LPCSTR,DWORD,PDEVMODEA);
 BOOL WINAPI EnumDisplaySettingsW(LPCWSTR,DWORD,PDEVMODEW);
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
+BOOL WINAPI EnumDisplaySettingsExA(LPCSTR,DWORD,LPDEVMODEA,DWORD);
+BOOL WINAPI EnumDisplaySettingsExW(LPCWSTR,DWORD,LPDEVMODEW,DWORD);
+#endif
 BOOL WINAPI EnumDisplayDevicesA(LPCSTR,DWORD,PDISPLAY_DEVICEA,DWORD);
 BOOL WINAPI EnumDisplayDevicesW(LPCWSTR,DWORD,PDISPLAY_DEVICEW,DWORD);
 #endif
@@ -3070,6 +3101,9 @@ HWND WINAPI FindWindowExA(HWND,HWND,LPCSTR,LPCSTR);
 HWND WINAPI FindWindowExW(HWND,HWND,LPCWSTR,LPCWSTR);
 HWND WINAPI FindWindowW(LPCWSTR,LPCWSTR);
 BOOL WINAPI FlashWindow(HWND,BOOL);
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
+BOOL WINAPI FlashWindowEx(PFLASHWINFO);
+#endif
 int WINAPI FrameRect(HDC,LPCRECT,HBRUSH);
 BOOL WINAPI FrameRgn(HDC,HRGN,HBRUSH,int,int);
 HWND WINAPI GetActiveWindow(void);
@@ -3201,6 +3235,9 @@ BOOL WINAPI GetLastInputInfo(PLASTINPUTINFO);
 DWORD WINAPI GetListBoxInfo(HWND);
 BOOL WINAPI GetMenuBarInfo(HWND,LONG,LONG,PMENUBARINFO);
 BOOL WINAPI GetMenuInfo(HMENU,LPMENUINFO);
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI GetProcessDefaultLayout(DWORD*);
+#endif /* (_WIN32_WINNT >= 0x0500) */
 BOOL WINAPI GetScrollBarInfo(HWND,LONG,PSCROLLBARINFO);
 BOOL WINAPI GetTitleBarInfo(HWND,PTITLEBARINFO);
 BOOL WINAPI GetWindowInfo(HWND,PWINDOWINFO);
@@ -3235,6 +3272,12 @@ BOOL WINAPI IsClipboardFormatAvailable(UINT);
 BOOL WINAPI IsDialogMessageA(HWND,LPMSG);
 BOOL WINAPI IsDialogMessageW(HWND,LPMSG);
 UINT WINAPI IsDlgButtonChecked(HWND,int);
+#if(_WIN32_WINNT >= 0x0501)
+BOOL WINAPI IsGUIThread(BOOL);
+#endif /* (_WIN32_WINNT >= 0x0501) */
+#if(_WIN32_WINNT >= 0x0500)
+BOOL WINAPI IsHungAppWindow(HWND);
+#endif /* (_WIN32_WINNT >= 0x0500) */
 BOOL WINAPI IsIconic(HWND);
 BOOL WINAPI IsMenu(HMENU);
 BOOL WINAPI IsRectEmpty(LPCRECT);
@@ -3313,6 +3356,7 @@ void WINAPI PostQuitMessage(int);
 BOOL WINAPI PostThreadMessageA(DWORD,UINT,WPARAM,LPARAM);
 BOOL WINAPI PostThreadMessageW(DWORD,UINT,WPARAM,LPARAM);
 BOOL WINAPI PtInRect(LPCRECT,POINT);
+HWND WINAPI RealChildWindowFromPoint(HWND,POINT);
 BOOL WINAPI RedrawWindow(HWND,LPCRECT,HRGN,UINT);
 ATOM WINAPI RegisterClassA(CONST WNDCLASSA*);
 ATOM WINAPI RegisterClassW(CONST WNDCLASSW*);
@@ -3373,6 +3417,9 @@ BOOL WINAPI SetMenuItemInfoW( HMENU,UINT,BOOL,LPCMENUITEMINFOW);
 LPARAM WINAPI SetMessageExtraInfo(LPARAM);
 BOOL WINAPI SetMessageQueue(int);
 HWND WINAPI SetParent(HWND,HWND);
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI SetProcessDefaultLayout(DWORD);
+#endif /* (_WIN32_WINNT >= 0x0500) */
 BOOL WINAPI SetProcessWindowStation(HWINSTA);
 BOOL WINAPI SetPropA(HWND,LPCSTR,HANDLE);
 BOOL WINAPI SetPropW(HWND,LPCWSTR,HANDLE);
@@ -3417,6 +3464,9 @@ BOOL WINAPI ShowWindowAsync(HWND,int);
 BOOL WINAPI SubtractRect(LPRECT,LPCRECT,LPCRECT);
 BOOL WINAPI SwapMouseButton(BOOL);
 BOOL WINAPI SwitchDesktop(HDESK);
+#if(_WIN32_WINNT >= 0x0500)
+VOID WINAPI SwitchToThisWindow(HWND,BOOL);
+#endif /* (_WIN32_WINNT >= 0x0500) */
 BOOL WINAPI SystemParametersInfoA(UINT,UINT,PVOID,UINT);
 BOOL WINAPI SystemParametersInfoW(UINT,UINT,PVOID,UINT);
 LONG WINAPI TabbedTextOutA(HDC,int,int,LPCSTR,int,int,LPINT,int);
@@ -3494,6 +3544,8 @@ typedef MDICREATESTRUCTW MDICREATESTRUCT,*LPMDICREATESTRUCT;
 typedef MULTIKEYHELPW MULTIKEYHELP,*PMULTIKEYHELP,*LPMULTIKEYHELP;
 typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 #define AppendMenu AppendMenuW
+#define BroadcastSystemMessage BroadcastSystemMessageW
+#define BroadcastSystemMessageEx BroadcastSystemMessageExW
 #define CallWindowProc CallWindowProcW
 #define ChangeMenu ChangeMenuW
 #define CharLower CharLowerW
@@ -3627,6 +3679,7 @@ typedef NONCLIENTMETRICSW NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
 #define ChangeDisplaySettingsEx ChangeDisplaySettingsExW
 #define CreateDesktop CreateDesktopW
 #define EnumDisplaySettings EnumDisplaySettingsW
+#define EnumDisplaySettingsEx EnumDisplaySettingsExW
 #define EnumDisplayDevices EnumDisplayDevicesW
 #endif /* NOGDI */
 #else /* UNICODE */
@@ -3652,6 +3705,8 @@ typedef MDICREATESTRUCTA MDICREATESTRUCT,*LPMDICREATESTRUCT;
 typedef MULTIKEYHELPA MULTIKEYHELP,*PMULTIKEYHELP,*LPMULTIKEYHELP;
 typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 #define AppendMenu AppendMenuA
+#define BroadcastSystemMessage BroadcastSystemMessageA
+#define BroadcastSystemMessageEx BroadcastSystemMessageExA
 #define CallWindowProc CallWindowProcA
 #define ChangeMenu ChangeMenuA
 #define CharLower CharLowerA
@@ -3785,6 +3840,7 @@ typedef NONCLIENTMETRICSA NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
 #define ChangeDisplaySettingsEx ChangeDisplaySettingsExA
 #define CreateDesktop CreateDesktopA
 #define EnumDisplaySettings EnumDisplaySettingsA
+#define EnumDisplaySettingsEx EnumDisplaySettingsExA
 #define EnumDisplayDevices EnumDisplayDevicesA
 #endif /* NOGDI */
 #endif /* UNICODE */
