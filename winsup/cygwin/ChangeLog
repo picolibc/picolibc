@@ -1,3 +1,9 @@
+2002-05-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (class cygheap_user): Add member `orig_psid'.
+	Add method `orig_sid()'.
+	* cygheap.cc (cygheap_user::set_sid): Maintain orig_psid.
+
 2002-04-28  Norbert Schulze  <norbert.schulze@web.de>
 
 	* localtime.cc (tzsetwall): Use wildabbr if generated timezone name

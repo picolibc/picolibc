@@ -94,6 +94,7 @@ class cygheap_user
   char  *plogsrv;       /* Logon server, may be FQDN */
   char  *pdomain;       /* Logon domain of the user */
   PSID   psid;          /* buffer for user's SID */
+  PSID   orig_psid;     /* Remains intact even after impersonation */
 public:
   __uid16_t orig_uid;      /* Remains intact even after impersonation */
   __uid16_t orig_gid;      /* Ditto */
@@ -120,6 +121,7 @@ public:
 
   BOOL set_sid (PSID new_sid);
   PSID sid () const { return psid; }
+  PSID orig_sid () const { return orig_psid; }
 
   void operator =(cygheap_user &user)
   {
