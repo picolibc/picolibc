@@ -3011,7 +3011,7 @@ getcwd (char *buf, size_t ulen)
   char* res = NULL;
   if (ulen == 0)
     set_errno (EINVAL);
-  else if (!__check_null_invalid_struct_errno (buf, ulen))
+  else if (buf == NULL || !__check_null_invalid_struct_errno (buf, ulen))
     res = cygheap->cwd.get (buf, 1, 1, ulen);
   return res;
 }
