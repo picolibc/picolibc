@@ -1,0 +1,6 @@
+Wed Apr 18 15:58:28 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Initial checkin from net sources.
+	Makefile.in: New file.
+	configure.in: New file.
+	configure: New file.

@@ -1,0 +1,118 @@
+# Copyright (c) 2000, Red Hat, Inc.
+#
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 2 of the License, or
+#     (at your option) any later version.
+#
+#     A copy of the GNU General Public License can be found at
+#     http://www.gnu.org/
+#
+# Written by Christopher Faylor <cgf@redhat.com>
+#
+# Makefile for Cygwin installer
+
+SHELL :=@SHELL@
+
+srcdir:=@srcdir@
+VPATH:=@srcdir@
+prefix:=@prefix@
+exec_prefix:=@exec_prefix@
+
+bindir:=@bindir@
+etcdir:=$(exec_prefix)/etc
+
+program_transform_name :=@program_transform_name@
+
+INSTALL:=@INSTALL@
+INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+INSTALL_DATA:=@INSTALL_DATA@
+
+EXEEXT:=@EXEEXT@
+EXEEXT_FOR_BUILD :=@EXEEXT_FOR_BUILD@
+
+CC:=@CC@
+CC_FOR_TARGET:=$(CC)
+CXX:=@CXX@
+
+CFLAGS:=@CFLAGS@ -nostdinc
+CXXFLAGS:=@CXXFLAGS@ -fno-exceptions -fno-rtti
+CXX:=@CXX@
+
+WINDRES:=@WINDRES@
+OBJCOPY:=@OBJCOPY@
+AR:=@AR@
+RANLIB:=@RANLIB@
+
+include $(srcdir)/../Makefile.common
+
+MINGW_INCLUDES:=-I. -I$(srcdir) -I$(mingw_source)/include -I$(w32api_include) -I$(updir)/bz2lib
+
+MINGW_CXXFLAGS:=-MMD $(CXXFLAGS) -mno-cygwin $(MINGW_INCLUDES) -mwindows
+MINGW_CFLAGS:=-MMD $(CFLAGS) -mno-cygwin $(MINGW_INCLUDES) -mwindows
+
+ZLIB:=zlib/libzcygw.a
+BZ2LIB:=$(bupdir)/bz2lib/libbz2.a
+libmingw32.a:=$(mingw_build)/libmingw32.a
+libuser32:=$(w32api_lib)/libuser32.a
+libkernel32:=$(w32api_lib)/libkernel32.a
+
+ALL_DEP_LDLIBS:=$(ZLIB) $(BZ2LIB) $(w32api_lib)/libole32.a $(w32api_lib)/libwsock32.a \
+		$(w32api_lib)/libnetapi32.a $(w32api_lib)/libadvapi32.a \
+		$(w32api_lib)/libuuid.a $(libkernel32) $(w32api_lib)/libuser32.a \
+		$(libmingw32)
+
+ALL_LDLIBS:=${patsubst $(mingw_build)/lib%.a,-l%,\
+	      ${patsubst $(w32api_lib)/lib%.a,-l%,\
+		${filter-out $(libmingw32),\
+		  ${filter-out $(libuser32),\
+		    ${filter-out $(libkernel32), $(ALL_DEP_LDLIBS)}}}}}
+
+ALL_LDFLAGS:=${filter-out -I%, \
+	       ${filter-out -W%, \
+		-B$(w32api_lib)/ -B${mingw_build}/ $(MINGW_CFLAGS) $(LDFLAGS)}}
+
+LIBS:=libbz2.a
+
+OBJS:=blocksort.o bzlib.o compress.o decompress.o huffman.o crctable.o randtable.o
+
+.SUFFIXES:
+.NOEXPORT:
+
+.PHONY: all install clean realclean
+
+all: Makefile $(LIBS)
+
+$(LIBS): $(OBJS)
+	$(AR) cru $@ $?
+	$(RANLIB) $@
+
+clean:
+	rm -f *.o *.rc *.a
+
+realclean: clean
+	rm -f  Makefile config.cache
+
+install: all
+: Nothing to install
+
+%.o: %.c
+ifdef VERBOSE
+	$(CC) $(MINGW_CFLAGS) -c -o $@ $<
+else
+	@echo $(CC) -c $(CFLAGS) ... $(<F)
+	@$(CC) $(MINGW_CFLAGS) -c -o $@ $<
+endif
+
+%.o: %.cc
+ifdef VERBOSE
+	$(CXX) $(MINGW_CXXFLAGS) -c -o $@ $<
+else
+	@echo $(CXX) -c $(CXXFLAGS) ... $(<F)
+	@$(CXX) $(MINGW_CXXFLAGS) -c -o $@ $<
+endif
+
+D=$(wildcard *.d)
+ifneq ($D,)
+include $D
+endif
