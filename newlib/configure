@@ -2386,6 +2386,15 @@ else
   HAVE_DOC_FALSE=
 fi
 
+# These get added in the top-level configure.in, except in the case where
+# newlib is being built natively.
+if test -z `echo ${CC} | grep \/libc\/include`; then
+  CC_FOR_NEWLIB="${CC} -isystem $PWD/targ-include -isystem ${newlib_basedir}/libc/include"
+else
+  CC_FOR_NEWLIB="${CC}"
+fi
+
+
 subdirs="${configdirs}"
 
 
@@ -2452,11 +2461,6 @@ if test -z "$CC_FOR_BUILD"; then
 fi
 
 
-# These get added in the top-level configure.in, except in the case where
-# newlib is being built natively.
-if test -z `echo ${CC} | grep \/libc\/include`; then
-  CC="${CC} -isystem $PWD/targ-include -isystem ${newlib_basedir}/libc/include"
-fi
 
 if test "${multilib}" = "yes"; then
   multilib_arg="--enable-multilib"
@@ -2662,6 +2666,7 @@ s%@NEWLIB_HW_FP_TRUE@%$NEWLIB_HW_FP_TRUE%g
 s%@NEWLIB_HW_FP_FALSE@%$NEWLIB_HW_FP_FALSE%g
 s%@HAVE_DOC_TRUE@%$HAVE_DOC_TRUE%g
 s%@HAVE_DOC_FALSE@%$HAVE_DOC_FALSE%g
+s%@CC_FOR_NEWLIB@%$CC_FOR_NEWLIB%g
 s%@subdirs@%$subdirs%g
 s%@CRT0@%$CRT0%g
 s%@CRT0_DIR@%$CRT0_DIR%g

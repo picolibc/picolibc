@@ -37,6 +37,15 @@ else
 fi
 AM_CONDITIONAL(HAVE_DOC, test x$have_doc = xyes)
 
+# These get added in the top-level configure.in, except in the case where
+# newlib is being built natively.
+if test -z `echo ${CC} | grep \/libc\/include`; then
+  CC_FOR_NEWLIB="${CC} -isystem $PWD/targ-include -isystem ${newlib_basedir}/libc/include"
+else
+  CC_FOR_NEWLIB="${CC}"
+fi
+AC_SUBST(CC_FOR_NEWLIB)
+
 AC_CONFIG_SUBDIRS(${configdirs})
 
 CRT0=
@@ -102,11 +111,6 @@ if test -z "$CC_FOR_BUILD"; then
 fi
 AC_SUBST(CC_FOR_BUILD)
 
-# These get added in the top-level configure.in, except in the case where
-# newlib is being built natively.
-if test -z `echo ${CC} | grep \/libc\/include`; then
-  CC="${CC} -isystem $PWD/targ-include -isystem ${newlib_basedir}/libc/include"
-fi
 
 if test "${multilib}" = "yes"; then
   multilib_arg="--enable-multilib"
