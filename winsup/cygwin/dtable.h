@@ -14,6 +14,8 @@ details. */
 #include "thread.h"
 
 class suffix_info;
+class fhandler_fifo;
+
 class dtable
 {
   fhandler_base **fds;
@@ -80,6 +82,7 @@ public:
   void get_debugger_info ();
   void set_file_pointers_for_exec ();
   bool in_vfork_cleanup () {return fds_on_hold == fds;}
+  fhandler_fifo *find_fifo (ATOM);
 };
 
 void dtable_init (void);
