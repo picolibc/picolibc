@@ -6,7 +6,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "oaidl.h"
+#include <oaidl.h>
 #include <ocidl.h>
 #include <docobj.h>
 
