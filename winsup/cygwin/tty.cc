@@ -138,6 +138,7 @@ tty_list::terminate (void)
       termios_printf ("tty %d master about to finish", ttynum);
       ForceCloseHandle1 (t->to_slave, to_pty);
       ForceCloseHandle1 (t->from_slave, from_pty);
+      CloseHandle (tty_master->inuse);
       WaitForSingleObject (tty_master->hThread, INFINITE);
       t->init ();
 
@@ -299,13 +300,13 @@ tty::alive (const char *fmt)
 }
 
 HANDLE
-tty::create_inuse (const char *fmt)
+tty::create_inuse (const char *fmt, BOOL inherit)
 {
   HANDLE h;
   char buf[sizeof (TTY_MASTER_ALIVE) + 16];
 
   __small_sprintf (buf, fmt, ntty);
-  h = CreateEvent (&sec_all, TRUE, FALSE, buf);
+  h = CreateEvent ((inherit ? &sec_all : &sec_all_nih), TRUE, FALSE, buf);
   termios_printf ("%s = %p", buf, h);
   if (!h)
     termios_printf ("couldn't open inuse event, %E", buf);

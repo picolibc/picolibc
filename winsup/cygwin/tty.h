@@ -99,7 +99,7 @@ public:
   BOOL was_opened;	/* True if opened at least once. */
 
   void init ();
-  HANDLE create_inuse (const char *);
+  HANDLE create_inuse (const char *, BOOL);
   BOOL common_init (fhandler_pty_master *);
   BOOL alive (const char *fmt);
   BOOL slave_alive ();

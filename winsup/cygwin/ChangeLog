@@ -1,3 +1,16 @@
+2001-03-19  Egor Duda  <deo@logos-m.ru>
+
+	* tty.h (tty::create_inuse): Add new parameter to allow non-
+	inheritable 'inuse' events.
+	* tty.cc (tty::create_inuse): Use new parameter.
+	* fhandler_tty.cc (fhandler_tty_master::init): Ditto.
+	* fhandler_tty.cc (fhandler_pty_master::open): Ditto.
+	* fhandler_tty.cc (fhandler_tty_master::init): Create master_alive
+	event.
+	* tty.cc (tty_list::terminate): Close master_alive event.
+	* fhandler_tty.cc (fhandler_tty_common::close): Send EOF to slaves
+	when master side is closed.
+
 Mon Mar 19 14:32:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (map::get_list_by_fd): Avoid calling `get_namehash' when

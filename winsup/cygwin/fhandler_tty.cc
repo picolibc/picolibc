@@ -61,6 +61,8 @@ fhandler_tty_master::init (int ntty)
 
   cygwin_shared->tty[ttynum]->common_init (this);
 
+  inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE, FALSE);
+
   h = makethread (process_input, NULL, 0, "ttyin");
   if (h == NULL)
     {
@@ -482,7 +484,7 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
   /* FIXME: Needs a method to eliminate tty races */
   {
     acquire_output_mutex (500);
-    inuse = get_ttyp ()->create_inuse (TTY_SLAVE_ALIVE);
+    inuse = get_ttyp ()->create_inuse (TTY_SLAVE_ALIVE, TRUE);
     get_ttyp ()->was_opened = TRUE;
     release_output_mutex ();
   }
@@ -947,7 +949,7 @@ fhandler_pty_master::open (const char *, int flags, mode_t)
     return 0;
 
   cygwin_shared->tty[ttynum]->common_init (this);
-  inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
+  inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE, FALSE);
   set_flags (flags);
 
   termios_printf ("opened pty master tty%d<%p>", ttynum, this);
@@ -969,6 +971,14 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
   if (!ForceCloseHandle (input_mutex))
     termios_printf ("CloseHandle (input_mutex<%p>), %E", input_mutex);
+
+  /* Send EOF to slaves if master side is closed */
+  if (!get_ttyp ()->master_alive ())
+    {
+      termios_printf ("no more masters left. sending EOF" );
+      SetEvent (input_available_event);
+    }
+
   if (!ForceCloseHandle (input_available_event))
     termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
   if (!ForceCloseHandle1 (get_handle (), from_pty))
