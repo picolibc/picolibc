@@ -408,12 +408,7 @@ _CRTIMP void __cdecl	_seterrormode (int);
 _CRTIMP void __cdecl	_sleep (unsigned long);
 
 _CRTIMP void __cdecl	_exit	(int) _ATTRIB_NORETURN;
-#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-/* C99 function name */
-void __cdecl _Exit(int) _ATTRIB_NORETURN; /* Declare to get noreturn attribute.  */
-extern __inline__ void __cdecl _Exit(int status)
-	{  _exit(status); }
-#endif
+
 /* _onexit is MS extension. Use atexit for portability.  */
 /* Note: This is in startup code, not imported directly from dll */
 typedef  int (* _onexit_t)(void);
@@ -430,7 +425,6 @@ _CRTIMP char* __cdecl	_gcvt (double, int, char*);
 _CRTIMP void __cdecl	_makepath (char*, const char*, const char*, const char*, const char*);
 _CRTIMP void __cdecl	_splitpath (const char*, char*, char*, char*, char*);
 _CRTIMP char* __cdecl	_fullpath (char*, const char*, size_t);
-
 
 _CRTIMP char* __cdecl	_itoa (int, char*, int);
 _CRTIMP char* __cdecl	_ltoa (long, char*, int);
@@ -480,6 +474,13 @@ _CRTIMP char* __cdecl	gcvt (double, int, char*);
 /* C99 names */
 
 #if !defined __NO_ISOCEXT /* externs in static libmingwex.a */
+
+/* C99 name for _exit */
+void __cdecl _Exit(int) _ATTRIB_NORETURN;
+#ifndef __STRICT_ANSI__   /* inline using non-ansi functions */
+extern __inline__ void __cdecl _Exit(int status)
+	{  _exit(status); }
+#endif 
 
 typedef struct { long long quot, rem; } lldiv_t;
 

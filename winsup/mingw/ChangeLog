@@ -1,3 +1,8 @@
+2003-05-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdlib.h (_Exit): Move out of __STRICT_ANSI__ block,
+	but still protect inline definition with __STRICT_ANSI__.
+
 2003-05-14  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* string_old.c: Remove, splitting into...
