@@ -1,3 +1,50 @@
+2003-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	Switch to 32/64 datatypes:
+	* Makefile.in (OBSOLETE_FUNCTIONS): Add open acl aclcheck aclfrommode
+	aclfrompbits aclfromtext aclsort acltomode acltopbits acltotext chown
+	facl fchown fgetpos fopen freopen fseeko fsetpos fstat ftello
+	ftruncate getegid geteuid getgid getgrent getgrgid getgrnam getgroups
+	getpwuid getpwuid_r getuid initgroups lchown lseek lstat mknod mmap
+	seekdir setegid seteuid setgid setgroups setregid setreuid setuid stat
+	telldir truncate.
+	(NEW_FUNCTIONS): Add _open64 acl32 aclcheck32 aclfrommode32
+	aclfrompbits32 aclfromtext32 aclsort32 acltomode32 acltopbits32
+	acltotext32 chown32 facl32 fchown32 fgetpos64 fopen64 freopen64
+	fseeko64 fsetpos64 fstat64 ftello64 ftruncate64 getegid32 geteuid32
+	getgid32 getgrent32 getgrgid32 getgrnam32 getgroups32 getpwuid32
+	getpwuid_r32 getuid32 initgroups32 lchown32 lseek64 lstat64 mknod32
+	mmap64 seekdir64 setegid32 seteuid32 setgid32 setgroups32 setregid32
+	setreuid32 setuid32 stat64 telldir64 truncate64 to substitute the
+	above.
+	* cygserver_shm.h (class client_request_shm): Change uid_t and gid_t
+	members to __uid32_t and __gid32_t.
+	* cygwin.din: Add symbols acl32 aclcheck32 aclfrommode32
+	aclfrompbits32 aclfromtext32 aclsort32 acltomode32 acltopbits32
+	acltotext32 facl32 fgetpos64 fopen64 freopen64 fseeko64 fsetpos64
+	_fstat64 ftello64 _lseek64 mknod32 _open64.
+	* glob.c: Include perprocess.h.
+	(globtilde): Call getpwuid32 and getuid32 instead of getpwuid and
+	getuid.
+	(g_lstat): Check for applications API version to call the appropriate
+	typed gl_lstat function.
+	(g_stat): Ditto for gl_stat.
+	* shm.cc (client_request_shm::client_request_shm): Call geteuid32
+	and getegid32 instead of geteuid and getegid throughout.
+	* syscalls.cc (_open64): New alias for open.
+	(_lseek64): New alias for lseek64.
+	(_fstat64): New alias for fseek64.
+	(mknod32): New function.
+	(mknod): Calls mknod32 now.
+	* winsup.h: Make function declarations for getuid32, geteuid32,
+	and getpwuid32 accessible for plain C sources.  Add declarations
+	for getegid32 and getpwnam.
+	* include/cygwin/version.h: Bum API minor number to 78.
+	* include/sys/cygwin.h: Guard C++ specific members of struct
+	per_process against inclusion in plain C sources.
+	* include/sys/mman.h (mman): Add guard to avoid type clash when
+	compiling Cygwin.
+
 2003-03-09  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 22.

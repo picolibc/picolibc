@@ -13,6 +13,9 @@ details. */
 #define _open __FOO_open__
 #define _read __FOO_read__
 #define _write __FOO_write__
+#define _open64 __FOO_open64__
+#define _lseek64 __FOO_lseek64__
+#define _fstat64 __FOO_fstat64__
 
 #include "winsup.h"
 #include <sys/stat.h>
@@ -52,6 +55,9 @@ details. */
 #undef _open
 #undef _read
 #undef _write
+#undef _open64
+#undef _lseek64
+#undef _fstat64
 
 SYSTEM_INFO system_info;
 
@@ -503,6 +509,9 @@ open (const char *unix_path, int flags, ...)
 extern "C" int _open (const char *, int flags, ...)
   __attribute__ ((alias ("open")));
 
+extern "C" int _open64 (const char *, int flags, ...)
+  __attribute__ ((alias ("open")));
+
 extern "C" __off64_t
 lseek64 (int fd, __off64_t pos, int dir)
 {
@@ -526,6 +535,9 @@ lseek64 (int fd, __off64_t pos, int dir)
 
   return res;
 }
+
+extern "C" int _lseek64 (int fd, __off64_t pos, int dir)
+  __attribute__ ((alias ("lseek64")));
 
 extern "C" __off32_t
 lseek (int fd, __off32_t pos, int dir)
@@ -996,6 +1008,9 @@ fstat64 (int fd, struct __stat64 *buf)
   syscall_printf ("%d = fstat (%d, %p)", res, fd, buf);
   return res;
 }
+
+extern "C" int _fstat64 (int fd, __off64_t pos, int dir)
+  __attribute__ ((alias ("fstat64")));
 
 extern "C" int
 _fstat (int fd, struct __stat32 *buf)
@@ -1928,10 +1943,16 @@ regfree ()
    fileutils) assume its existence so we must provide a stub that always
    fails. */
 extern "C" int
-mknod (const char *_path, mode_t mode, dev_t dev)
+mknod32 (const char *_path, mode_t mode, __dev32_t dev)
 {
   set_errno (ENOSYS);
   return -1;
+}
+
+extern "C" int
+mknod (const char *_path, mode_t mode, __dev16_t dev)
+{
+  return mknod32 (_path, mode, (__dev32_t) dev);
 }
 
 extern "C" int

@@ -170,11 +170,69 @@ DLL_OFILES:=assert.o autoload.o cxx.o cygheap.o cygserver_client.o \
 
 GMON_OFILES:=gmon.o mcount.o profil.o
 
-OBSOLETE_FUNCTIONS:=regcomp regerror regexec regfree regsub
+OBSOLETE_FUNCTIONS:=regcomp regerror regexec regfree regsub \
+		    open acl aclcheck aclfrommode aclfrompbits \
+		    aclfromtext aclsort acltomode acltopbits \
+		    acltotext chown facl fchown fgetpos fopen \
+		    freopen fseeko fsetpos fstat ftello ftruncate \
+		    getegid geteuid getgid getgrent getgrgid getgrnam \
+		    getgroups getpwuid getpwuid_r getuid initgroups \
+		    lchown lseek lstat mknod mmap seekdir setegid seteuid \
+		    setgid setgroups setregid setreuid setuid stat \
+		    telldir truncate
+
 NEW_FUNCTIONS:=regcomp posix_regcomp \
 	       regerror posix_regerror \
 	       regexec posix_regexec \
-	       regfree posix_regfree
+	       regfree posix_regfree \
+	       open _open64 \
+	       acl acl32 \
+	       aclcheck aclcheck32 \
+	       aclfrommode aclfrommode32 \
+	       aclfrompbits aclfrompbits32 \
+	       aclfromtext aclfromtext32 \
+	       aclsort aclsort32 \
+	       acltomode acltomode32 \
+	       acltopbits acltopbits32 \
+	       acltotext acltotext32 \
+	       chown chown32 \
+	       facl facl32 \
+	       fchown fchown32 \
+	       fgetpos fgetpos64 \
+	       fopen fopen64 \
+	       freopen freopen64 \
+	       fseeko fseeko64 \
+	       fsetpos fsetpos64 \
+	       fstat fstat64 \
+	       ftello ftello64 \
+	       ftruncate ftruncate64 \
+	       getegid getegid32 \
+	       geteuid geteuid32 \
+	       getgid getgid32 \
+	       getgrent getgrent32 \
+	       getgrgid getgrgid32 \
+	       getgrnam getgrnam32 \
+	       getgroups getgroups32 \
+	       getpwuid getpwuid32 \
+	       getpwuid_r getpwuid_r32 \
+	       getuid getuid32 \
+	       initgroups initgroups32 \
+	       lchown lchown32 \
+	       lseek lseek64 \
+	       lstat lstat64 \
+	       mknod mknod32 \
+	       mmap mmap64 \
+	       seekdir seekdir64 \
+	       setegid setegid32 \
+	       seteuid seteuid32 \
+	       setgid setgid32 \
+	       setgroups setgroups32 \
+	       setregid setregid32 \
+	       setreuid setreuid32 \
+	       setuid setuid32 \
+	       stat stat64 \
+	       telldir telldir64 \
+	       truncate truncate64
 
 API_VER:=$(srcdir)/include/cygwin/version.h
 

@@ -25,8 +25,6 @@ details. */
 
 #define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
 
-#ifdef __cplusplus
-
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
 #define NEW_MACRO_VARARGS
 #endif
@@ -37,6 +35,20 @@ details. */
 
 #include <sys/types.h>
 #include <sys/strace.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern __uid32_t getuid32 (void);
+extern __uid32_t geteuid32 (void);
+extern __gid32_t getegid32 (void);
+extern struct passwd *getpwuid32 (__uid32_t);
+struct passwd *getpwnam (const char *);
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
 
 extern const char case_folded_lower[];
 #define cyg_tolower(c) (case_folded_lower[(unsigned char)(c)])
@@ -154,10 +166,6 @@ void uinfo_init (void);
 
 #define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(__uid32_t)(u16))
 #define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(__gid32_t)(g16))
-
-extern "C" __uid32_t getuid32 (void);
-extern "C" __uid32_t geteuid32 (void);
-extern "C" struct passwd *getpwuid32 (__uid32_t);
 
 /* various events */
 void events_init (void);

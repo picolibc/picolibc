@@ -620,8 +620,8 @@ client_request_shm::client_request_shm (const int shmid, const int shmflg)
 
   _parameters.in.cygpid = getpid ();
   _parameters.in.winpid = GetCurrentProcessId ();
-  _parameters.in.uid = geteuid ();
-  _parameters.in.gid = getegid ();
+  _parameters.in.uid = geteuid32 ();
+  _parameters.in.gid = getegid32 ();
 
   msglen (sizeof (_parameters.in));
 }
@@ -644,8 +644,8 @@ client_request_shm::client_request_shm (const int shmid,
 
   _parameters.in.cygpid = getpid ();
   _parameters.in.winpid = GetCurrentProcessId ();
-  _parameters.in.uid = geteuid ();
-  _parameters.in.gid = getegid ();
+  _parameters.in.uid = geteuid32 ();
+  _parameters.in.gid = getegid32 ();
 
   msglen (sizeof (_parameters.in));
 }
@@ -663,8 +663,8 @@ client_request_shm::client_request_shm (const int shmid)
 
   _parameters.in.cygpid = getpid ();
   _parameters.in.winpid = GetCurrentProcessId ();
-  _parameters.in.uid = geteuid ();
-  _parameters.in.gid = getegid ();
+  _parameters.in.uid = geteuid32 ();
+  _parameters.in.gid = getegid32 ();
 
   msglen (sizeof (_parameters.in));
 }
@@ -686,8 +686,8 @@ client_request_shm::client_request_shm (const key_t key,
 
   _parameters.in.cygpid = getpid ();
   _parameters.in.winpid = GetCurrentProcessId ();
-  _parameters.in.uid = geteuid ();
-  _parameters.in.gid = getegid ();
+  _parameters.in.uid = geteuid32 ();
+  _parameters.in.gid = getegid32 ();
 
   msglen (sizeof (_parameters.in));
 }

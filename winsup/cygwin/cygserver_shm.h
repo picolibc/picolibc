@@ -118,8 +118,8 @@ private:
       int cmd;
       pid_t cygpid;
       DWORD winpid;
-      uid_t uid;
-      gid_t gid;
+      __uid32_t uid;
+      __gid32_t gid;
       struct shmid_ds ds;
     } in;
 

@@ -102,22 +102,31 @@ access
 _access = access
 acl
 _acl = acl
+acl32
 aclcheck
 _aclcheck = aclcheck
+aclcheck32
 aclfrommode
 _aclfrommode = aclfrommode
+aclfrommode32
 aclfrompbits
 _aclfrompbits = aclfrompbits
+aclfrompbits32
 aclfromtext
 _aclfromtext = aclfromtext
+aclfromtext32
 aclsort
 _aclsort = aclsort
+aclsort32
 acltomode
 _acltomode = acltomode
+acltomode32
 acltopbits
 _acltopbits = acltopbits
+acltopbits32
 acltotext
 _acltotext = acltotext
+acltotext32
 acos
 _acos = acos
 acosf
@@ -389,6 +398,7 @@ fabsf
 _fabsf = fabsf
 facl
 _facl = facl
+facl32
 fchdir
 _fchdir = fchdir
 fchmod
@@ -424,6 +434,7 @@ fgetc
 _fgetc = fgetc
 fgetpos
 _fgetpos = fgetpos
+fgetpos64
 fgets
 _fgets = fgets
 fileno
@@ -452,6 +463,7 @@ fnmatch
 _fnmatch = fnmatch
 fopen
 _fopen = fopen
+fopen64
 fork
 _fork = fork
 fpathconf
@@ -467,6 +479,7 @@ free
 _free = free
 freopen
 _freopen = freopen
+freopen64
 frexp
 _frexp = frexp
 frexpf
@@ -477,9 +490,12 @@ fseek
 _fseek = fseek
 fseeko
 _fseeko = fseeko
+fseeko64
 fsetpos
 _fsetpos = fsetpos
+fsetpos64
 fstat64
+_fstat64 = fstat64
 fstatfs
 _fstatfs = fstatfs
 fsync
@@ -488,6 +504,7 @@ ftell
 _ftell = ftell
 ftello
 _ftello = ftello
+ftello64
 ftime
 _ftime = ftime
 ftruncate
@@ -766,6 +783,7 @@ lroundf
 lseek
 _lseek = lseek
 lseek64
+_lseek64 = lseek64
 lstat64
 mallinfo
 mallinfo
@@ -806,6 +824,7 @@ _mkdir = mkdir
 mkfifo
 mknod
 _mknod = mknod
+mknod32
 mkstemp
 _mkstemp = mkstemp
 mktemp
@@ -849,6 +868,7 @@ _ntohs = ntohs
 on_exit
 open
 _open = open
+_open64
 opendir
 _opendir = opendir
 openlog
