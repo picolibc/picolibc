@@ -1,3 +1,14 @@
+2004-08-10  Ed Schaller  <schallee@darkmist.net>
+
+	* include/wincrypt.h (MS_ENH_RSA_AES_PROV_A, MS_ENH_RSA_AES_PROV_W)
+	(ALG_SID_AES_128, ALG_SID_AES_192, ALG_SID_AES_256, ALG_SID_AES 17)
+	(CALG_AES_128, CALG_AES_192, CALG_AES_256, CALG_AES,PROV_RSA_AES):
+	Add defines.
+	(CALG_SHA1): Add define.
+	(HP_HMAC_INFO): Add define.
+	(HMAC_INFO): Add struct.
+	(BLOBHEADER): Add typedef.
+
 2004-07-26  Hartmut Honisch  <hhonisch@users.sourceforge.net>
 
 	* include/commctrl.h (TreeView_SetItemState): Define macro.
@@ -35,7 +46,7 @@
 
 2004-06-16  Bang Jun-Young <junyoung@NetBSD.org>
 
-	* w32api/include/winnt.h (WAITORTIMERCALLBACKFUNC): Protect with 
+	* w32api/include/winnt.h (WAITORTIMERCALLBACKFUNC): Protect with
 	_WIN32_WINNT >= 0x0500.
 
 2004-06-05  Luke Dunstan  <infidel@users.sourceforge.net>

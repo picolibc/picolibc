@@ -27,6 +27,14 @@ extern "C" {
 #define MS_DEF_DH_SCHANNEL_PROV_W	L"Microsoft DH SChannel Cryptographic Provider"
 #define MS_SCARD_PROV_A	"Microsoft Base Smart Card Crypto Provider"
 #define MS_SCARD_PROV_W	L"Microsoft Base Smart Card Crypto Provider"
+#if (WIN32_WINNT == 0x0501)
+#define MS_ENH_RSA_AES_PROV_A "Microsoft Enhanced RSA and AES Cryptographic Provider (Prototype)"
+#define MS_ENH_RSA_AES_PROV_W L"Microsoft Enhanced RSA and AES Cryptographic Provider (Prototype)"
+#elif (WIN32_WINNT > 0x0501)
+#define MS_ENH_RSA_AES_PROV_A "Microsoft Enhanced RSA and AES Cryptographic Provider"
+#define MS_ENH_RSA_AES_PROV_W L"Microsoft Enhanced RSA and AES Cryptographic Provider"
+#endif
+
 #define GET_ALG_CLASS(x) (x&57344)
 #define GET_ALG_TYPE(x) (x&7680)
 #define GET_ALG_SID(x) (x&511)
@@ -78,12 +86,17 @@ extern "C" {
 #define ALG_SID_SSL3SHAMD5 8
 #define ALG_SID_HMAC 9
 #define ALG_SID_TLS1PRF 10
+#define ALG_SID_AES_128 14
+#define ALG_SID_AES_192 15
+#define ALG_SID_AES_256 16
+#define ALG_SID_AES 17
 #define ALG_SID_EXAMPLE 80
 
 #define CALG_MD2 (ALG_CLASS_HASH|ALG_TYPE_ANY|ALG_SID_MD2)
 #define CALG_MD4 (ALG_CLASS_HASH|ALG_TYPE_ANY|ALG_SID_MD4)
 #define CALG_MD5 (ALG_CLASS_HASH|ALG_TYPE_ANY|ALG_SID_MD5)
 #define CALG_SHA (ALG_CLASS_HASH|ALG_TYPE_ANY|ALG_SID_SHA)
+#define CALG_SHA1 CALG_SHA
 #define CALG_MAC (ALG_CLASS_HASH|ALG_TYPE_ANY|ALG_SID_MAC)
 #define CALG_3DES (ALG_CLASS_DATA_ENCRYPT|ALG_TYPE_BLOCK|3)
 #define CALG_CYLINK_MEK (ALG_CLASS_DATA_ENCRYPT|ALG_TYPE_BLOCK|12)
@@ -99,6 +112,10 @@ extern "C" {
 #define CALG_DH_EPHEM (ALG_CLASS_KEY_EXCHANGE|ALG_TYPE_STREAM|ALG_TYPE_DSS|ALG_SID_DSS_DMS)
 #define CALG_DESX (ALG_CLASS_DATA_ENCRYPT|ALG_TYPE_BLOCK|ALG_SID_DESX)
 #define CALG_TLS1PRF (ALG_CLASS_DHASH|ALG_TYPE_ANY|ALG_SID_TLS1PRF)
+#define CALG_AES_128 (ALG_CLASS_DATA_ENCRYPT|ALG_TYPE_BLOCK|ALG_SID_AES_128)
+#define CALG_AES_192 (ALG_CLASS_DATA_ENCRYPT|ALG_TYPE_BLOCK|ALG_SID_AES_192)
+#define CALG_AES_256 (ALG_CLASS_DATA_ENCRYPT|ALG_TYPE_BLOCK|ALG_SID_AES_256)
+#define CALG_AES (ALG_CLASS_DATA_ENCRYPT|ALG_TYPE_BLOCK|ALG_SID_AES)
 
 #define CRYPT_VERIFYCONTEXT 0xF0000000
 #define CRYPT_NEWKEYSET 8
@@ -139,6 +156,7 @@ extern "C" {
 #define HP_ALGID 1
 #define HP_HASHVAL 2
 #define HP_HASHSIZE 4
+#define HP_HMAC_INFO 5
 #define CRYPT_FAILED FALSE
 #define CRYPT_SUCCEED TRUE
 #define RCRYPT_SUCCEEDED(r) ((r)==CRYPT_SUCCEED)
@@ -200,6 +218,7 @@ extern "C" {
 #define PROV_SPYRUS_LYNKS 20
 #define PROV_RNG 21
 #define PROV_INTEL_SEC 22
+#define PROV_RSA_AES 24
 #define MAXUIDLEN 64
 #define CUR_BLOB_VERSION 2
 #define X509_ASN_ENCODING 1
@@ -595,12 +614,20 @@ typedef struct _PUBLICKEYSTRUC {
 	BYTE bVersion;
 	WORD reserved;
 	ALG_ID aiKeyAlg;
-} PUBLICKEYSTRUC;
+} BLOBHEADER, PUBLICKEYSTRUC;
 typedef struct _RSAPUBKEY {
 	DWORD magic;
 	DWORD bitlen;
 	DWORD pubexp;
 } RSAPUBKEY;
+typedef struct _HMAC_Info
+{
+	ALG_ID HashAlgid;
+	BYTE* pbInnerString;
+	DWORD cbInnerString;
+	BYTE* pbOuterString;
+	DWORD cbOuterString;
+} HMAC_INFO, *PHMAC_INFO;
 
 BOOL WINAPI CertCloseStore(HCERTSTORE,DWORD);
 BOOL WINAPI CertGetCertificateChain(HCERTCHAINENGINE,PCCERT_CONTEXT,LPFILETIME,HCERTSTORE,PCERT_CHAIN_PARA,DWORD,LPVOID,PCCERT_CHAIN_CONTEXT*);
@@ -669,6 +696,9 @@ BOOL WINAPI CryptSetProviderW(LPCWSTR,DWORD);
 #define MS_ENH_DSS_DH_PROV MS_ENH_DSS_DH_PROV_W
 #define MS_DEF_DH_SCHANNEL_PROV MS_DEF_DH_SCHANNEL_PROV_W
 #define MS_SCARD_PROV MS_SCARD_PROV_W
+#if (WIN32_WINNT >= 0x0501)
+#define MS_ENH_RSA_AES_PROV MS_ENH_RSA_AES_PROV_W
+#endif
 #else
 #define CertNameToStr CertNameToStrA
 #define CryptAcquireContext CryptAcquireContextA
@@ -688,6 +718,9 @@ BOOL WINAPI CryptSetProviderW(LPCWSTR,DWORD);
 #define MS_ENH_DSS_DH_PROV MS_ENH_DSS_DH_PROV_A
 #define MS_DEF_DH_SCHANNEL_PROV MS_DEF_DH_SCHANNEL_PROV_A
 #define MS_SCARD_PROV MS_SCARD_PROV_A
+#if (WIN32_WINNT >= 0x0501)
+#define MS_ENH_RSA_AES_PROV MS_ENH_RSA_AES_PROV_A
+#endif
 #endif
 #ifdef __cplusplus
 }
