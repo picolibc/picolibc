@@ -577,7 +577,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
 
   /* Insert into the list */
   mmap_record *rec = map_list->add_record (mmap_rec, off, len);
-  caddr_t ret = rec->get_address () + off;
+  caddr_t ret = rec->get_address () + (off - gran_off);
   syscall_printf ("%x = mmap() succeeded", ret);
   ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
   return ret;
