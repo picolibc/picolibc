@@ -107,7 +107,7 @@
 #endif
 #ifndef NOGDI
 #if !defined (__OBJC__)
-#if  __GNUC__ >= 3  /* what about Watcom? */
+#if (__GNUC__ >= 3) || defined (__WATCOMC__)
 #include <ole2.h>
 #endif
 #endif /* __OBJC__ */

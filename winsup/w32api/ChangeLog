@@ -1,3 +1,12 @@
+2003-01-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/dinput.c: Don't #include <objbase.h>.
+
+2003-01-08  Bart Oldeman  <bartoldeman@users.sourceforge.net>
+
+	* include/windows.h (ole2.h):Do #include for
+	__WATCOMC__.
+
 2003-01-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (SPI_SETWHEELSCROLLLINES) Add define.
