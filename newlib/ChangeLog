@@ -1,3 +1,8 @@
+2001-01-25  Alexandre Oliva  <aoliva@redhat.com>
+
+	* configure.host (sh*-*-*): Add -DHAVE_GETTIMEOFDAY to newlib_cflags.
+	* libc/sys/sh/syscalls.c (_gettimeofday): New.
+
 2001-01-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/math.h (signgam): Regress previous fix as

@@ -429,6 +429,7 @@ case "${host}" in
 	syscall_dir=syscalls
 	;;
   sh*-*-*)
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 	syscall_dir=syscalls
 	;;
   sparc-sun-sunos*)

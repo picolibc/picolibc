@@ -1,6 +1,7 @@
 #include <_ansi.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include "sys/syscall.h"
 int errno;
 
@@ -173,4 +174,12 @@ int
 _pipe (int *fd)
 {
   return __trap34 (SYS_pipe, fd);
+}
+
+int
+_gettimeofday (struct timeval *tv, struct timezone *tz)
+{
+  tv->tv_usec = 0;
+  tv->tv_sec = __trap34 (SYS_time);
+  return 0;
 }
