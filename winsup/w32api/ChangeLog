@@ -1,3 +1,8 @@
+2002-06-16  Egor Duda  <deo@logos-m.ru>
+
+	* include/ntdll.h: New file.
+	* lib/ntdll.def: Add NtShutdownSystem.
+
 2002-06-16  Steven Edwards  <Steven_Ed4153@yahoo.com>
 
 	* lib/dinput.def (DirectInputCreateEx): Add stub.

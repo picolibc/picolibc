@@ -30,6 +30,7 @@ NtProtectVirtualMemory@20
 NtQueryVirtualMemory@24
 NtReadFile@36
 NtReadVirtualMemory@20
+NtShutdownSystem@4
 NtUnlockVirtualMemory@16
 NtWriteFile@36
 NtWriteVirtualMemory@20
