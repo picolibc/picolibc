@@ -2834,7 +2834,7 @@ typedef struct {
   UINT  uCount;
   DWORD dwTimeout;
 } FLASHWINFO, *PFLASHWINFO;
-#endif /* (WINVER >= 0x0500) */
+#endif /* (WINVER >= 0x0500 || _WIN32_WINDOWS >= 0x0410) */
 #if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0490)
 typedef struct tagMOUSEMOVEPOINT {
   int x;

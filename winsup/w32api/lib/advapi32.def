@@ -193,6 +193,8 @@ GetExplicitEntriesFromAclA@12
 GetExplicitEntriesFromAclW@12
 GetFileSecurityA@20
 GetFileSecurityW@20
+GetInheritanceSourceA@40
+GetInheritanceSourceW@40
 GetKernelObjectSecurity@20
 GetLengthSid@4
 GetLocalManagedApplications@12

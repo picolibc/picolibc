@@ -256,27 +256,36 @@ typedef struct _EXPLICIT_ACCESS_W {
 	DWORD        grfInheritance;
 	TRUSTEE_W    Trustee;
 } EXPLICIT_ACCESS_W, *PEXPLICIT_ACCESS_W, EXPLICIT_ACCESSW, *PEXPLICIT_ACCESSW;
-typedef struct  _OBJECTS_AND_SID {
+typedef struct _OBJECTS_AND_SID {
 	DWORD   ObjectsPresent;
 	GUID    ObjectTypeGuid;
 	GUID    InheritedObjectTypeGuid;
 	SID     * pSid;
 } OBJECTS_AND_SID, *POBJECTS_AND_SID;
-typedef struct  _OBJECTS_AND_NAME_A {
+typedef struct _OBJECTS_AND_NAME_A {
 	DWORD    ObjectsPresent;
 	SE_OBJECT_TYPE ObjectType;
 	LPSTR    ObjectTypeName;
 	LPSTR    InheritedObjectTypeName;
 	LPSTR    ptstrName;
 } OBJECTS_AND_NAME_A, *POBJECTS_AND_NAME_A;
-typedef struct  _OBJECTS_AND_NAME_W {
+typedef struct _OBJECTS_AND_NAME_W {
 	DWORD          ObjectsPresent;
 	SE_OBJECT_TYPE ObjectType;
 	LPWSTR   ObjectTypeName;
 	LPWSTR   InheritedObjectTypeName;
 	LPWSTR   ptstrName;
 } OBJECTS_AND_NAME_W, *POBJECTS_AND_NAME_W;
-
+#if (_WIN32_WINNT >= 0x0501)
+typedef struct {
+	LONG     GenerationGap;
+	LPSTR    AncestorName;
+} INHERITED_FROMA, *PINHERITED_FROMA;
+typedef struct {
+	LONG     GenerationGap;
+	LPWSTR   AncestorName;
+} INHERITED_FROMW, *PINHERITED_FROMW;
+#endif /* (_WIN32_WINNT >= 0x0501) */
 
 #ifdef UNICODE
 #define ACCCTRL_DEFAULT_PROVIDER ACCCTRL_DEFAULT_PROVIDERW
@@ -292,6 +301,9 @@ typedef EXPLICIT_ACCESS_W EXPLICIT_ACCESS_, *PEXPLICIT_ACCESS_;
 typedef EXPLICIT_ACCESSW EXPLICIT_ACCESS, *PEXPLICIT_ACCESS;
 typedef TRUSTEE_ACCESSW TRUSTEE_ACCESS, *PTRUSTEE_ACCESS;
 typedef OBJECTS_AND_NAME_W OBJECTS_AND_NAME_, *POBJECTS_AND_NAME_;
+#if (_WIN32_WINNT >= 0x0501)
+typedef INHERITED_FROMW INHERITED_FROM, *PINHERITED_FROM;
+#endif
 #else
 #define ACCCTRL_DEFAULT_PROVIDER ACCCTRL_DEFAULT_PROVIDERA
 typedef TRUSTEE_A TRUSTEE_, *PTRUSTEE_;
@@ -306,10 +318,12 @@ typedef EXPLICIT_ACCESS_A EXPLICIT_ACCESS_, *PEXPLICIT_ACCESS_;
 typedef EXPLICIT_ACCESSA EXPLICIT_ACCESS, *PEXPLICIT_ACCESS;
 typedef TRUSTEE_ACCESSA TRUSTEE_ACCESS, *PTRUSTEE_ACCESS;
 typedef OBJECTS_AND_NAME_A OBJECTS_AND_NAME_, *POBJECTS_AND_NAME_;
+#if (_WIN32_WINNT >= 0x0501)
+typedef INHERITED_FROMA INHERITED_FROM, *PINHERITED_FROM;
 #endif
+#endif /* UNICODE */
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _ACCCTRL_H */
+#endif 

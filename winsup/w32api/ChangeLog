@@ -1,3 +1,14 @@
+2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/aclapi.h [_WIN32_WINNT >= 0x0501] (GetInheritanceSource[AW]):
+	Add functions. Don't know what PFN_OBJECT_MGR_FUNCTS is so use
+	void* instead.
+
+	* include/accctrl.h [_WIN32_WINNT >= 0x0501] (INHERITED_FROM[AW],
+	PINHERITED_FROM[AW]): Add structures.
+
+	* lib/user32.def (GetInheritanceSource[AW]): Add functions.
+
 2003-09-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winuser.h (FLASHWINFO, PFLASHWINFO): Define for 98/Me, too.
