@@ -1,3 +1,8 @@
+2003-10-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (unlink): Don't even try DELETE_ON_CLOSE technique on
+	systems not supporting it.
+
 2003-10-02  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (dll_crt0_1): Call newlib __sinit routine to ensure that

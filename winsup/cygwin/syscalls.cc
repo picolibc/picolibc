@@ -171,26 +171,29 @@ unlink (const char *ourname)
     }
   /* Attempt to use "delete on close" semantics to handle removing
      a file which may be open. */
-  HANDLE h;
-  h = CreateFile (win32_name, 0, FILE_SHARE_READ, &sec_none_nih,
-		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
-  if (h != INVALID_HANDLE_VALUE)
+  if (wincap.has_delete_on_close ())
     {
-      if (wincap.has_hard_links () && setattrs)
-	(void) SetFileAttributes (win32_name, (DWORD) win32_name);
-      BOOL res = CloseHandle (h);
-      syscall_printf ("%d = CloseHandle (%p)", res, h);
-      if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
-	  || !win32_name.isremote ())
+      HANDLE h;
+      h = CreateFile (win32_name, 0, FILE_SHARE_READ, &sec_none_nih,
+		      OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
+      if (h != INVALID_HANDLE_VALUE)
 	{
-	  syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) succeeded");
-	  goto ok;
-	}
-      else
-	{
-	  syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) failed");
-	  if (setattrs)
-	    SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
+	  if (wincap.has_hard_links () && setattrs)
+	    (void) SetFileAttributes (win32_name, (DWORD) win32_name);
+	  BOOL res = CloseHandle (h);
+	  syscall_printf ("%d = CloseHandle (%p)", res, h);
+	  if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
+	      || !win32_name.isremote ())
+	    {
+	      syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) succeeded");
+	      goto ok;
+	    }
+	  else
+	    {
+	      syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) failed");
+	      if (setattrs)
+		SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
+	    }
 	}
     }
 
