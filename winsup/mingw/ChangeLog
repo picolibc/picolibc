@@ -1,3 +1,8 @@
+2002-12-20  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/_mingw.h: Increment version to 2.4.
+	Makefile.in: Ditto.
+
 2002-12-12  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/malloc.h (_alloca): Add definition.
