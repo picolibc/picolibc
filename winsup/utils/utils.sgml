@@ -82,6 +82,7 @@ Usage: cygpath.exe [-p|--path] (-u|--unix)|(-w|--windows [-s|--short-name]) file
   -v|--version          output version information and exit
   -w|--windows          print Windows form of filename
   -A|--allusers         use `All Users' instead of current user for -D, -P
+  -H|--homeroot		output `Profiles' directory (home root) and exit\n\
   -D|--desktop          output `Desktop' directory and exit
   -P|--smprograms       output Start Menu `Programs' directory and exit
   -S|--sysdir           output system directory and exit
@@ -127,15 +128,18 @@ done
 </example>
 
 <para>The capital options 
-<literal>-D</literal>, <literal>-P</literal>, <literal>-S</literal>, and
-<literal>-W</literal> output directories used by Windows that are not the
-same on all systems, for example <literal>-S</literal> might output 
-C:\WINNT\SYSTEM32 or C:\WINDOWS\SYSTEM. The <literal>-A</literal> option
-forces use of the "All Users" directories instead of the current user
-for the <literal>-D</literal> and <literal>-P</literal> options.
+<literal>-D</literal>, <literal>-H</literal>, <literal>-P</literal>, 
+<literal>-S</literal>, and <literal>-W</literal> output directories used 
+by Windows that are not the same on all systems, for example 
+<literal>-S</literal> might output C:\WINNT\SYSTEM32 or C:\WINDOWS\SYSTEM. 
+The <literal>-A</literal> option forces use of the "All Users" directories 
+instead of the current user for the <literal>-D</literal> and 
+<literal>-P</literal> options. The <literal>-H</literal> shows the Windows'
+profiles directory that can be used as root of home.
 On Win9x systems with only a single user, <literal>-A</literal> has no
 effect; <literal>-D</literal> and <literal>-AD</literal> would have the
 same output.
+The <literal>-ws</literal> options can be combined with the capital options.
 
 </sect2>
 

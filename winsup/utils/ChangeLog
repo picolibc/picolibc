@@ -1,6 +1,18 @@
+2002-05-15  Mark Blackburn  <marklist@fangorn.ca>
+
+	* cygpath.cc (get_short_paths): Fix more error checking.
+	(get_short_name): Ditto.
+
+2002-05-14  Joerg Schaible <joerg.schaible@gmx.de>
+
+	* cygpath.cc (main): Add option H to show the Windows' profiles
+	directory.  Support short names for options DPSW.  Clean up
+	copied code lines.
+	* utils.sgml: Update cygpath section for H option and s support.
+
 2002-05-14  Mark Blackburn  <marklist@fangorn.ca>
 
-	* cygpath.cc (get_short_name): Fix error checking.
+	* cygpath.cc (get_short_paths): Fix error checking.
 
 2002-05-13  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 

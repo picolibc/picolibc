@@ -46,6 +46,7 @@ static struct option long_options[] = {
   {(char *) "allusers", no_argument, NULL, 'A'},
   {(char *) "desktop", no_argument, NULL, 'D'},
   {(char *) "smprograms", no_argument, NULL, 'P'},
+  {(char *) "homeroot", no_argument, NULL, 'H'},
   {0, no_argument, 0, 0}
 };
 
@@ -66,6 +67,7 @@ Usage: %s [-p|--path] (-u|--unix)|(-w|--windows [-s|--short-name]) filename\n\
   -w|--windows		print Windows form of filename\n\
   -A|--allusers		use `All Users' instead of current user for -D, -P\n\
   -D|--desktop		output `Desktop' directory and exit\n\
+  -H|--homeroot		output `Profiles' directory (home root) and exit\n\
   -P|--smprograms	output Start Menu `Programs' directory and exit\n\
   -S|--sysdir		output system directory and exit\n\
   -W|--windir		output `Windows' directory and exit\n", prog_name);
@@ -90,7 +92,7 @@ get_short_paths (char *path)
       if (ptr)
 	*ptr++ = 0;
       len = GetShortPathName (next, NULL, 0);
-      if (len ==0 && GetLastError () == ERROR_INVALID_PARAMETER)
+      if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
 	{
 	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
 		   next);
@@ -107,7 +109,8 @@ get_short_paths (char *path)
   ptr = path;
   for (;;)
     {
-      if (GetShortPathName (ptr, sptr, acc) == ERROR_INVALID_PARAMETER)
+      len = GetShortPathName (ptr, sptr, acc);
+      if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
 	{
 	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
 		   ptr);
@@ -129,7 +132,7 @@ get_short_name (const char *filename)
 {
   char *sbuf;
   DWORD len = GetShortPathName (filename, NULL, 0);
-  if (len == ERROR_INVALID_PARAMETER)
+  if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
     {
       fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
 	       filename);
@@ -141,7 +144,8 @@ get_short_name (const char *filename)
       fprintf (stderr, "%s: out of memory\n", prog_name);
       exit (1);
     }
-  if (GetShortPathName (filename, sbuf, len) == ERROR_INVALID_PARAMETER)
+  len = GetShortPathName (filename, sbuf, len);
+  if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
     {
       fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
 	       filename);
@@ -261,9 +265,6 @@ main (int argc, char **argv)
   int c, o = 0;
   int options_from_file_flag;
   char *filename;
-  char buf[MAX_PATH], buf2[MAX_PATH];
-  WIN32_FIND_DATA w32_fd;
-  LPITEMIDLIST id;
 
   prog_name = strrchr (argv[0], '/');
   if (prog_name == NULL)
@@ -282,7 +283,7 @@ main (int argc, char **argv)
   allusers_flag = 0;
   output_flag = 0;
   while ((c =
-	  getopt_long (argc, argv, (char *) "hac:f:opsSuvwWiDPA",
+	  getopt_long (argc, argv, (char *) "hac:f:opsSuvwWiDPAH",
 		       long_options, (int *) NULL)) != EOF)
     {
       switch (c)
@@ -330,31 +331,14 @@ main (int argc, char **argv)
 	  break;
 
 	case 'D':
-	  if (output_flag)
-	    usage (stderr, 1);
-	  output_flag = 1;
-	  o = 'D';
-	  break;
-
+	case 'H':
 	case 'P':
-	  if (output_flag)
-	    usage (stderr, 1);
-	  output_flag = 1;
-	  o = 'P';
-	  break;
-
 	case 'S':
-	  if (output_flag)
-	    usage (stderr, 1);
-	  output_flag = 1;
-	  o = 'S';
-	  break;
-
 	case 'W':
 	  if (output_flag)
 	    usage (stderr, 1);
 	  output_flag = 1;
-	  o = 'W';
+	  o = c;
 	  break;
 
 	case 'i':
@@ -378,6 +362,14 @@ main (int argc, char **argv)
 
   if (output_flag)
     {
+      char *buf, buf1[MAX_PATH], buf2[MAX_PATH];
+      DWORD len = MAX_PATH;
+      WIN32_FIND_DATA w32_fd;
+      LPITEMIDLIST id;
+      HINSTANCE hinst;
+      BOOL (*GetProfilesDirectoryAPtr) (LPSTR, LPDWORD) = 0;
+      
+      buf = buf1;
       switch (o)
 	{
 	case 'D':
@@ -393,12 +385,7 @@ main (int argc, char **argv)
 	      SHGetSpecialFolderLocation (NULL, CSIDL_DESKTOPDIRECTORY, &id);
 	      SHGetPathFromIDList (id, buf);
 	    }
-	  if (!windows_flag)
-	    cygwin_conv_to_posix_path (buf, buf2);
-	  else
-	    strcpy (buf2, buf);
-	  printf ("%s\n", buf2);
-	  exit (0);
+	  break;
 
 	case 'P':
 	  if (!allusers_flag)
@@ -412,36 +399,48 @@ main (int argc, char **argv)
 	      SHGetSpecialFolderLocation (NULL, CSIDL_PROGRAMS, &id);
 	      SHGetPathFromIDList (id, buf);
 	    }
-	  if (!windows_flag)
-	    cygwin_conv_to_posix_path (buf, buf2);
+	  break;
+
+	case 'H':
+	  hinst = LoadLibrary ("userenv");
+	  if (hinst)
+	    GetProfilesDirectoryAPtr = (BOOL (*) (LPSTR, LPDWORD))
+	      GetProcAddress (hinst, "GetProfilesDirectoryA");
+	  if (GetProfilesDirectoryAPtr)
+	    (*GetProfilesDirectoryAPtr) (buf, &len);
 	  else
-	    strcpy (buf2, buf);
-	  printf ("%s\n", buf2);
-	  exit (0);
+	    {
+	      GetWindowsDirectory (buf, MAX_PATH);
+	      strcat (buf, "\\Profiles");
+	    }
+	  break;
 
 	case 'S':
 	  GetSystemDirectory (buf, MAX_PATH);
 	  FindFirstFile (buf, &w32_fd);
 	  strcpy (strrchr (buf, '\\') + 1, w32_fd.cFileName);
-	  if (!windows_flag)
-	    cygwin_conv_to_posix_path (buf, buf2);
-	  else
-	    strcpy (buf2, buf);
-	  printf ("%s\n", buf2);
-	  exit (0);
+	  break;
 
 	case 'W':
 	  GetWindowsDirectory (buf, MAX_PATH);
-	  if (!windows_flag)
-	    cygwin_conv_to_posix_path (buf, buf2);
-	  else
-	    strcpy (buf2, buf);
-	  printf ("%s\n", buf2);
-	  exit (0);
+	  break;
 
 	default:
-	  fprintf (stderr, "ERROR: main: switch (o)!\n");
+    	  usage (stderr, 1);
 	}
+
+	if (!windows_flag)
+	  {
+	    cygwin_conv_to_posix_path (buf, buf2);
+	    buf = buf2;
+	  }
+	else
+	  {
+	    if (shortname_flag)
+	      buf = get_short_name (buf);
+	  }
+	printf ("%s\n", buf);
+	exit (0);
     }
 
   if (options_from_file_flag && !file_arg)
