@@ -11,10 +11,10 @@ respective directories:
 @table @samp
 
 @item latest
-bison common diff flex gperf inetutils make opengl shellutils texinfo
-ash byacc crypt expect gawk grep less man patch tar textutils bash bzip2
-cygwin fileutils gcc groff login sed tcltk time binutils clear dejagnu
-findutils gdb gzip m4 mt termcap vim
+ash bash binutils bison byacc bzip2 clear common crypt cygwin dejagnu
+diff expect fileutils findutils flex gawk gcc gdb gperf grep groff gzip
+inetutils less login m4 make man mt opengl openssh openssl patch sed
+shellutils tar tcltk termcap texinfo textutils time vim
 
 @item contrib
 cvs gdbm jbigkit jpeg libpng tiff zlib
@@ -24,7 +24,7 @@ cvs gdbm jbigkit jpeg libpng tiff zlib
 Full source code is available for all packages and tools.
 
 There is one recommended way to install Cygwin, which is to use the GUI
-installer @code{setup.exe}.  There are some variations on how you go
+installer @samp{setup.exe}.  There are some variations on how you go
 about that.
 
 Do it any other way, and you're on your own!  That said, keep in mind
@@ -34,14 +34,14 @@ specific requirements.  If something doesn't work right for you, and
 it's not covered here or elsewhere, then by all means report it to the
 mailing list.
 
-@section Installation using the @code{setup.exe} program
+@section Installation using the @samp{setup.exe} program
 
-@strong{IMPORTANT: First read the README file in the '@code{latest}'
+@strong{IMPORTANT: First read the README file in the @samp{latest}
 directory at any ftp mirror.  DO THIS NOW!  Information in the README
 file is not repeated here.  You can find a mirror site near you from
 @file{http://sources.redhat.com/cygwin/mirrors.html}.}
 
-The '@code{setup.exe}' program is the recommended way to install Cygwin,
+The @samp{setup.exe} program is the recommended way to install Cygwin,
 but it is still a work in progress.  Expect features and functionality
 to change.  For this reason, it is a good idea to note the version and
 build time reported by @code{setup.exe} when you run it.  This will help
@@ -51,7 +51,7 @@ for the latest news about @code{setup.exe}.
 @subsection Why not install in C:\?
 
 The @code{setup.exe} program will prompt you for a "root" directory.
-The default is 'C:\cygwin', but you can change it.  You are urged not to
+The default is @samp{C:\cygwin}, but you can change it.  You are urged not to
 choose something like 'C:\' (the root directory on the system drive) for
 your Cygwin root.  If you do, then critical Cygwin system directories
 like 'etc', 'lib' and 'bin' could easily be corrupted by other (non-Cygwin)
@@ -110,8 +110,8 @@ creates for you won't actually do anything.
 
 @item ash
 This is often forgotten because it's not obvious that @samp{ash}
-contains @code{/bin/sh}, which is essential for running scripts, (and
-@code{make} and ...).
+contains @code{/bin/sh}, which is essential for running scripts (and
+@samp{make} and ...).
 
 @end table
 
@@ -136,9 +136,9 @@ another mirror, or try again tomorrow.
 
 @subsection What's the difference between packages in @samp{latest} and @samp{contrib}?
 
-Good question!  That very issue is sometimes debated on the
+Good question!  That very issue has been debated on the
 @samp{cygwin-apps} mailing list.  Check the list archives if you want to
-know more.
+know more.  Start at @file{http://sources.redhat.com/cygwin/lists.html}.
 
 @subsection How do I uninstall Cygwin?
 
