@@ -126,6 +126,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define OP_MASK_MMISUB          0x1f
 #define OP_MASK_PERFREG		0x1f	/* Performance monitoring */
 #define OP_SH_PERFREG		1
+#define OP_SH_SEL		0	/* Coprocessor select field */
+#define OP_MASK_SEL		0x7	/* The sel field of mfcZ and mtcZ. */
+#define OP_SH_CODE20		6	/* 20 bit breakpoint code */
+#define OP_MASK_CODE20		0xfffff
 
 /* This structure holds information for a particular instruction.  */
 
@@ -172,6 +176,7 @@ struct mips_opcode
    "i" 16 bit unsigned immediate (OP_*_IMMEDIATE)
    "j" 16 bit signed immediate (OP_*_DELTA)
    "k" 5 bit cache opcode in target register position (OP_*_CACHE)
+   "m" 20 bit breakpoint code (OP_*_CODE20)
    "o" 16 bit signed offset (OP_*_DELTA)
    "p" 16 bit PC relative branch target address (OP_*_DELTA)
    "q" 10 bit extra breakpoint code (OP_*_CODE2)
@@ -200,6 +205,7 @@ struct mips_opcode
    "E" 5 bit target register (OP_*_RT)
    "G" 5 bit destination register (OP_*_RD)
    "P" 5 bit performance-monitor register (OP_*_PERFREG)
+   "H" 3 bit sel field (OP_*_SEL)
 
    Macro instructions:
    "A" General 32 bit expression
@@ -215,8 +221,8 @@ struct mips_opcode
 
    Characters used so far, for quick reference when adding more:
    "<>(),"
-   "ABCDEFGILMNSTRVW"
-   "abcdfhijklopqrstuvwxz"
+   "ABCDEFGHILMNPSTRVW"
+   "abcdfhijklmopqrstuvwxz"
 */
 
 /* These are the bits which may be set in the pinfo field of an
@@ -319,9 +325,31 @@ struct mips_opcode
 #define INSN_4100                   0x00000040
 /* Toshiba R3900 instruction.  */
 #define INSN_3900                   0x00000080
-
+/* MIPS32 instruction (4Kc, 4Km, 4Kp).  */
+#define INSN_MIPS32                 0x00000100
 /* 32-bit code running on a ISA3+ CPU. */
 #define INSN_GP32                   0x00001000
+
+/* CPU defines, use instead of hardcoding processor number. Keep this
+   in sync with bfd/archures.c in order for machine selection to work.  */
+#define CPU_R2000	2000
+#define CPU_R3000	3000
+#define CPU_R3900	3900
+#define CPU_R4000	4000
+#define CPU_R4010	4010
+#define CPU_VR4100	4100
+#define CPU_R4111	4111
+#define CPU_R4300	4300
+#define CPU_R4400	4400
+#define CPU_R4600	4600
+#define CPU_R4650	4650
+#define CPU_R5000	5000
+#define CPU_R6000	6000
+#define CPU_R8000	8000
+#define CPU_R10000	10000
+#define CPU_MIPS16	16
+#define CPU_MIPS32	32
+#define CPU_4K		CPU_MIPS32
 
 /* Test for membership in an ISA including chip specific ISAs.
    INSN is pointer to an element of the opcode table; ISA is the
@@ -331,20 +359,16 @@ struct mips_opcode
    a machine with 64-bit registers; see the documentation under -mgp32
    in the MIPS gas docs. */
 
-#define OPCODE_IS_MEMBER(insn,isa,cpu,gp32) 	       		\
-    ((((insn)->membership & INSN_ISA) != 0			\
-      && ((insn)->membership & INSN_ISA) <= isa			\
-      && ((insn)->membership & INSN_GP32 ? gp32 : 1))		\
-     || (cpu == 4650						\
-	 && ((insn)->membership & INSN_4650) != 0)		\
-     || (cpu == 4010						\
-	 && ((insn)->membership & INSN_4010) != 0)		\
-     || ((cpu == 4100						\
-	  || cpu == 4111					\
-	  )							\
-	 && ((insn)->membership & INSN_4100) != 0)		\
-     || (cpu == 3900						\
-	 && ((insn)->membership & INSN_3900) != 0))
+#define OPCODE_IS_MEMBER(insn, isa, cpu, gp32)				\
+    ((((insn)->membership & INSN_ISA) != 0				\
+      && ((insn)->membership & INSN_ISA) <= (unsigned) isa		\
+      && ((insn)->membership & INSN_GP32 ? gp32 : 1))			\
+     || (cpu == CPU_R4650 && ((insn)->membership & INSN_4650) != 0)	\
+     || (cpu == CPU_R4010 && ((insn)->membership & INSN_4010) != 0)	\
+     || ((cpu == CPU_VR4100 || cpu == CPU_R4111)			\
+	 && ((insn)->membership & INSN_4100) != 0)			\
+     || (cpu == CPU_MIPS32 && ((insn)->membership & INSN_MIPS32) != 0)	\
+     || (cpu == CPU_R3900  && ((insn)->membership & INSN_3900) != 0))
 
 /* This is a list of macro expanded instructions.
  *

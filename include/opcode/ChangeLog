@@ -1,3 +1,20 @@
+2000-09-13  Anders Norlander  <anorland@acc.umu.se>
+	
+	* mips.h: Use defines instead of hard-coded processor numbers.
+	(CPU_R2000, CPU_R3000, CPU_R3900, CPU_R4000, CPU_R4010,
+	CPU_VR4100, CPU_R4111, CPU_R4300, CPU_R4400, CPU_R4600, CPU_R4650, 
+	CPU_R5000, CPU_R6000, CPU_R8000, CPU_R10000, CPU_MIPS32, CPU_4K,
+	CPU_4KC, CPU_4KM, CPU_4KP): Define..
+	(OPCODE_IS_MEMBER): Use new defines.
+ 	(OP_MASK_SEL, OP_SH_SEL): Define.
+	(OP_MASK_CODE20, OP_SH_CODE20): Define.
+ 	Add 'P' to used characters.
+ 	Use 'H' for coprocessor select field.
+	Use 'm' for 20 bit breakpoint code.
+ 	Document new arg characters and add to used characters.
+ 	(INSN_MIPS32): New define for MIPS32 extensions.
+ 	(OPCODE_IS_MEMBER): Recognize MIPS32 instructions.
+
 2000-09-05  Alan Modra  <alan@linuxcare.com.au>
 
 	* hppa.h: Mention cz completer.

@@ -1,3 +1,7 @@
+2000-09-13  Anders Norlander  <anorland@acc.umu.se>
+
+ 	* mips.h (E_MIPS_MACH_4K): New define.
+
 2000-09-05  Alan Modra  <alan@linuxcare.com.au>
 
 	* hppa.h: Fix a comment.

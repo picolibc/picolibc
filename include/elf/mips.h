@@ -153,7 +153,9 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 #define E_MIPS_MACH_4100	0x00830000
 #define E_MIPS_MACH_4650	0x00850000
 #define E_MIPS_MACH_4111	0x00880000
-
+/* -mips32 code.
+   It is easier to treat MIPS32 as a machine rather than an architecture.  */
+#define E_MIPS_MACH_MIPS32	0x00890000
 
 /* Processor specific section indices.  These sections do not actually
    exist.  Symbols with a st_shndx field corresponding to one of these
