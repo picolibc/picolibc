@@ -1,5 +1,17 @@
 2002-12-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (dll_crt0_1): Call well known SID initializer function.
+	* security.h (cygsid::init): Declare new static method.
+	* sec_helper.cc (cygsid::init): New method for initializing well
+	known SIDs.
+
+2002-12-14  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.h: Declare well_known_creator_group_sid.
+	* sec_helper.cc: Define and initialize well_known_creator_group_sid.
+
+2002-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* netdb.cc: Remove strtok_r comment.
 
 2002-12-14  Pierre Humblet  <pierre.humblet@ieee.org>

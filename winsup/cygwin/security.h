@@ -40,6 +40,7 @@ class cygsid {
     }
 
 public:
+  static void init();
   inline operator const PSID () { return psid; }
 
   inline const PSID operator= (cygsid &nsid)
@@ -184,6 +185,7 @@ extern cygsid well_known_null_sid;
 extern cygsid well_known_world_sid;
 extern cygsid well_known_local_sid;
 extern cygsid well_known_creator_owner_sid;
+extern cygsid well_known_creator_group_sid;
 extern cygsid well_known_dialup_sid;
 extern cygsid well_known_network_sid;
 extern cygsid well_known_batch_sid;

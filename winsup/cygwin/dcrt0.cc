@@ -681,6 +681,9 @@ dll_crt0_1 ()
   /* Allocate cygheap->fdtab */
   dtable_init ();
 
+  /* Init global well known SID objects */
+  cygsid::init ();
+
   /* Initialize uid, gid if necessary. */
   if (child_proc_info == NULL || spawn_info->moreinfo->uid == ILLEGAL_UID)
     uinfo_init ();
