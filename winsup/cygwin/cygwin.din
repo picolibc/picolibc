@@ -319,8 +319,8 @@ inet_addr = cygwin_inet_addr SIGFE
 inet_aton = cygwin_inet_aton SIGFE
 inet_network = cygwin_inet_network SIGFE
 inet_ntoa = cygwin_inet_ntoa SIGFE
-cygwin_internal SIGFE
-cygwin32_internal = cygwin_internal SIGFE
+cygwin_internal NOSIGFE
+cygwin32_internal = cygwin_internal NOSIGFE
 listen = cygwin_listen SIGFE
 cygwin_logon_user SIGFE
 lstat SIGFE
@@ -370,9 +370,9 @@ _div = div NOSIGFE
 dlclose SIGFE
 dlerror NOSIGFE
 dlfork NOSIGFE
-dll_crt0__FP11per_process SIGFE
-dll_dllcrt0 SIGFE
-dll_noncygwin_dllcrt0 SIGFE
+dll_crt0__FP11per_process NOSIGFE
+dll_dllcrt0 NOSIGFE
+dll_noncygwin_dllcrt0 NOSIGFE
 dlopen SIGFE
 dlsym SIGFE
 drand48 NOSIGFE

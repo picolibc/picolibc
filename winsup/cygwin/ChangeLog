@@ -1,3 +1,9 @@
+2003-12-31  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Make crt0 functions NOSIGFE.
+	* include/cygwin/version.h: Gratuitous comment change.
+	* lib/_cygwin_crt0_common.cc: Remove unneeded declaration.
+
 2003-12-29  Christopher Faylor  <cgf@redhat.com>
 
 	* cygtls.h (_threadinfo::stack): Increase stack size to accommodate

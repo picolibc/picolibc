@@ -20,7 +20,6 @@ details. */
 extern "C"
 {
 char **environ;
-void cygwin_crt0 (MainFunc);
 int cygwin_attach_dll (HMODULE, MainFunc);
 int cygwin_attach_noncygwin_dll (HMODULE, MainFunc);
 int main (int, char **, char **);

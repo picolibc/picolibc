@@ -38,7 +38,7 @@ details. */
    means of Cygwin versioning: */
 
       /* The DLL major and minor numbers correspond to the "version of
-	 the Cygwin library".  This version is used to track important
+	 the Cygwin shared library".  This version is used to track important
 	 changes to the DLL and is mainly informative in nature. */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1005
