@@ -71,7 +71,7 @@ public:
 
     fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL, OPEN_EXISTING,
 		     FILE_ATTRIBUTE_NORMAL, 0);
-    if (fh)
+    if (fh != INVALID_HANDLE_VALUE)
       {
 	DWORD size = GetFileSize (fh, NULL), read_bytes;
 	buf = (char *) malloc (size + 1);
@@ -84,7 +84,7 @@ public:
 	    fh = NULL;
 	    return false;
 	  }
-        buf[read_bytes] = '\0';
+	buf[read_bytes] = '\0';
 	return true;
       }
     return false;

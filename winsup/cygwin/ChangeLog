@@ -1,3 +1,7 @@
+2002-10-24  Pierre Humblet <pierre.humblet@ieee.org>
+  
+	* pwdgrp.h (pwdgrp_read::open): Compare fh to INVALID_HANDLE_VALUE.
+
 2002-10-22  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Nevermind.
@@ -112,7 +116,6 @@
 
 	* shared.cc (open_shared): Remove reserving of memory since previous
 	change eliminate the need for this hack.
-
 
 2002-10-19  Christopher Faylor  <cgf@redhat.com>
 
