@@ -1,3 +1,7 @@
+2003-05-05  H.J. Lu <hjl@gnu.org>
+
+	* config-ml.in: Restored from gcc repository.
+
 2003-05-02  Chris Demetriou  <cgd@broadcom.com>
 
         * Makefile.tpl: Require "makeinfo" from texinfo 4.2 or later.
