@@ -1,3 +1,7 @@
+Wed May 16 21:34:00 2001  Fred Yankowski <fred@ontosys.com>
+
+	* net.cc (errmap): Add missing mapping from WSAEINTR to EINTR.
+
 Wed May 16 09:20:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* sec_helper.cc (legal_sid_type): Fix conditional. Change to
