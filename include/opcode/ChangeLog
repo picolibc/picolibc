@@ -1,3 +1,8 @@
+2001-02-28  Igor Shevlyakov  <igor@windriver.com>
+
+	* m68k.h: new defines for Coldfire V4. Update mcf to know
+	about mcf5407.
+
 2001-02-18  lars brinkhoff  <lars@nocrew.org>
 
 	* pdp11.h: New file.
