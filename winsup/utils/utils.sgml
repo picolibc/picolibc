@@ -9,6 +9,7 @@ specifically for Cygwin.</para>
 
 <screen>
 Usage: cygcheck [-s] [-v] [-r] [-h] [program ...]
+  -c = check current package setup
   -s = system information
   -v = verbose output (indented) (for -s or programs)
   -r = registry search (requires -s)
@@ -26,6 +27,11 @@ of that program or programs.  If you specify the <literal>-s</literal>
 option, it will give general system information.  If you specify
 <literal>-s</literal> and list one or more programs on the command line,
 it reports on both.</para>
+
+<para>The <literal>-c</literal> option causes the "program" arguments
+to be interpreted as package names.  <command>cygcheck</command> will
+report the current version of the package that you specify.  With no
+arguments, <command>cygcheck</command> will report on all packages.
 
 <para>The <command>cygcheck</command> program should be used to send
 information about your system to Cygnus for troubleshooting (if your
@@ -120,7 +126,7 @@ done
 <sect2 id="kill"><title>kill</title>
 
 <screen>
-Usage: kill [-sigN] pid1 [pid2 ...]
+Usage: kill [-f] [-sigN] pid1 [pid2 ...]
 </screen>
 
 <para>The <command>kill</command> program allows you to send arbitrary
@@ -130,20 +136,22 @@ also send program-specified signals such as SIGUSR1 to trigger actions
 within the program, like enabling debugging or re-opening log files.
 Each program defines the signals they understand.</para>
 
-<para>Note that the "pid" values are the Cygwin pids, not the Windows
-pids.  To get a list of running programs and their Cygwin pids, use
-the Cygwin <command>ps</command> program.</para>
+<para>Note that, unless you specific the <literal>-f</literal> option,
+the "pid" values are the Cygwin pids, not the Windows pids.  To get a
+list of running programs and their Cygwin pids, use the Cygwin
+<command>ps</command> program. <command>ps -W</command> will display
+<emphasis>all</emphasis> windows pids.</para>
 
-<para>To send a specific signal, use the
-<literal>-signN</literal> option, either
-with a signal number or a signal name (minus the "SIG" part), like
-these examples:</para>
+<para>To send a specific signal, use the <literal>-signN</literal>
+option, either with a signal number or a signal name (minus the "SIG"
+part), like these examples:</para>
 
-<example><title>Specifying signals with the kill command</title>
+<example><title>Using the kill command</title>
 <screen>
 <prompt>$</prompt> <userinput>kill 123</userinput>
 <prompt>$</prompt> <userinput>kill -1 123</userinput>
 <prompt>$</prompt> <userinput>kill -HUP 123</userinput>
+<prompt>$</prompt> <userinput>kill -f 123</userinput>
 </screen>
 </example>
 

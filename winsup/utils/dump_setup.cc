@@ -175,7 +175,7 @@ match_argv (char **argv, const char *name)
 }
 
 void
-dump_setup (int verbose, char **argv)
+dump_setup (int verbose, char **argv, bool /*check_files*/)
 {
   char *setup = cygpath ("/etc/setup/installed.db", NULL);
   FILE *fp = fopen (setup, "rt");

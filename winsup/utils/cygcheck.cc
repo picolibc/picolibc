@@ -33,7 +33,7 @@ typedef long long longlong;
 typedef __int64 longlong;
 #endif
 
-void dump_setup (int, char **);
+void dump_setup (int, char **, bool);
 
 const char *known_env_vars[] = {
   "c_include_path",
@@ -739,7 +739,7 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
 	  ERROR_SUCCESS)
 	{
 	  HKEY sKey;
-	  if (RegOpenKeyEx (hKey, subkey_name, 0, KEY_ALL_ACCESS, &sKey)
+	  if (RegOpenKeyEx (hKey, subkey_name, 0, KEY_READ, &sKey)
 	      == ERROR_SUCCESS)
 	    {
 	      scan_registry (&ri, sKey, subkey_name, cygnus);
@@ -1270,7 +1270,7 @@ main (int argc, char **argv)
 
   if (check_setup)
     {
-      dump_setup (verbose, argv);
+      dump_setup (verbose, argv, true);
       puts ("");
     }
   else
@@ -1285,13 +1285,13 @@ main (int argc, char **argv)
       dump_sysinfo ();
       if (!check_setup)
 	{
-	  dump_setup (verbose, NULL);
+	  dump_setup (verbose, NULL, false);
 	  puts ("");
 	}
     }
 
   if (!givehelp)
-    printf ("Use -h to see help about each section\n");
+    puts ("Use -h to see help about each section");
 
   return 0;
 }

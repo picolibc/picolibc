@@ -119,7 +119,7 @@ read_mounts ()
 	       CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME);
 
       HKEY key = issystem ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
-      if (RegCreateKeyEx (key, buf, 0, (LPTSTR) "Cygwin", 0, KEY_ALL_ACCESS,
+      if (RegCreateKeyEx (key, buf, 0, (LPTSTR) "Cygwin", 0, KEY_READ,
 			  0, &key, &disposition) != ERROR_SUCCESS)
 	break;
       for (int i = 0; ;i++, m++)
