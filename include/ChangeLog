@@ -1,3 +1,7 @@
+2001-08-01  Aldy Hernandez  <aldyh@redhat.com>
+
+	* opcode/mips.h (INSN_ISA_MASK): Nuke bits 12-15.
+
 2001-07-18  Andreas Jaeger  <aj@suse.de>
 
 	* xregex2.h: Place under LGPL version 2.1.
