@@ -1,3 +1,7 @@
+Tue Aug 28 23:32:34 2001  J"orn Rennecke <amylaar@redhat.com>
+
+	* h8.h: New file.
+
 2001-08-27  Staffan Ulfberg  <staffanu@swox.se>
 
 	* ppc.h: Add relocs from the 64-bit PowerPC ELF ABI revision 1.2.
