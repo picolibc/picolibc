@@ -1,3 +1,7 @@
+2001-09-28  Hans-Peter Nilsson  <hp@axis.com>
+
+	* config.sub, config.guess: Import latest from subversions.
+
 2001-09-21  Alexandre Oliva  <aoliva@redhat.com>
 
 	* Makefile.in (AS_FOR_TARGET, LD_FOR_TARGET,
