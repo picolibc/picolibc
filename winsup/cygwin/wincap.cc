@@ -418,7 +418,7 @@ static NO_COPY wincaps wincap_xp = {
   has_process_io_counters:true,
 };
 
-wincapc NO_COPY wincap;
+wincapc wincap;
 
 void
 wincapc::init ()

@@ -56,7 +56,6 @@ class wincapc
   void          *caps;
 
 public:
-  wincapc (): caps (NULL) {}
   void init ();
 
   void set_chunksize (DWORD nchunksize);
