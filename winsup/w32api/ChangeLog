@@ -1,3 +1,15 @@
+2001-09-05  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wininet.h (InternetAutodial): Add prototype. 
+	(InternetAutodialHangup): Ditto.
+	(InternetDial): Ditto.
+	(InternetGetConnectedState): Ditto.
+	(InternetGoOnline): Ditto.
+	(InternetHangUp): Ditto. 
+	(InternetSetDialState): Ditto.
+	Add associated INTERNET_* auto dial flags.
+	Guard typedefs and prototypes with #ifndef RC_INVOKED.
+
 2001-09-04  Earnie Boyd  <earnie@SF.Net>
 
 	* lib/Makefile.in: Move the setting of variable libdir to after the
