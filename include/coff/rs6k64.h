@@ -14,9 +14,9 @@ struct external_filehdr {
 };
 
         /* IBM RS/6000 */
-#define U802TOC64MAGIC	0757	/* readonly text segments and TOC, XCOFF64 */
+#define U803XTOCMAGIC 0757	/* readonly text segments and TOC, XCOFF64 */
 
-#define BADMAG(x) ((x).f_magic != U802TOC64MAGIC)
+#define BADMAG(x) ((x).f_magic != U803XTOCMAGIC)
 
 #define	FILHDR	struct external_filehdr
 #define	FILHSZ	24
@@ -49,11 +49,11 @@ typedef struct
   unsigned char	entry[8];		/* entry pt.			*/
   unsigned char	o_maxstack[8];	/* max stack size (??) 		*/
   unsigned char o_maxdata[8];	/* max data size (??) 		*/
-  unsigned char	o_resv3[116];		/* reserved 			*/
+  unsigned char	o_resv3[16];		/* reserved 			*/
 }
 AOUTHDR;
 
-#define AOUTSZ 220
+#define AOUTSZ 120
 #define SMALL_AOUTSZ (0)
 #define AOUTHDRSZ 72
 

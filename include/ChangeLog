@@ -1,3 +1,7 @@
+Fri May  5 16:51:03 2000  Clinton Popetz  <cpopetz@cygnus.com>
+
+	* coff/rs6k64.h (U802TOC64MAGIC): Change to U803XTOCMAGIC.
+
 Mon Apr 24 15:20:51 2000  Clinton Popetz  <cpopetz@cygnus.com>
 
 	* include/coff/rs6k64.h: New file.
