@@ -1,3 +1,9 @@
+Mon May 17 13:35:35 1999  Stan Cox  <scox@cygnus.com>
+
+	* coff/arm.h (F_PIC, F_ARM_2, F_ARM_2a, F_ARM_3, F_ARM_3M,
+	F_ARM_4, F_ARM_4T, F_APCS26): Changed values to distinguish
+	F_ARM_2a, F_ARM_3M, F_ARM_4T.
+
 1999-05-15  Nick Clifton  <nickc@cygnus.com>
 
 	* mcore.h (IMAGE_REL_MCORE_RVA): Define.
