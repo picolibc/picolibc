@@ -234,6 +234,7 @@ struct user_heap_info
   void *base;
   void *ptr;
   void *top;
+  void *max;
   unsigned chunk;
 };
 

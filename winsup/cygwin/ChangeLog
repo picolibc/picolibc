@@ -1,3 +1,8 @@
+2003-08-20  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* exceptions.cc (sigreturn): Don't clobber ebp in recursive signal
+	calls.
+
 2003-08-22  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (sig_handle): Change so that default signals indicate

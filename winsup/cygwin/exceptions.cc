@@ -1225,8 +1225,7 @@ _sigreturn:								\n\
 	cmpl	$0,%4		# Did a signal come in?			\n\
 	jz	1f		# No, if zero				\n\
 	movl	%2,%%eax						\n\
-	movl	%%esp,%%ebp						\n\
-	movl	%%eax,36(%%ebp)	# Restore return address		\n\
+	movl	%%eax,36(%%esp)	# Restore return address		\n\
 	jmp	3f							\n\
 									\n\
 1:	popl	%%eax		# saved errno				\n\
@@ -1275,7 +1274,8 @@ _sigdelayed0:								\n\
 __no_sig_end:								\n\
 " : "=m" (sigsave.sig):  "X" ((char *) &_impure_ptr->_errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
-    "g" (sigsave.func), "g" (sigsave.saved_errno), "g" (sigsave.newmask)
+    "g" (sigsave.func), "g" (sigsave.saved_errno), "g" (sigsave.newmask),
+    "g" (sigsave.retaddr_on_stack)
 );
 }
 }
