@@ -359,8 +359,8 @@ __int64	_wtoi64(const wchar_t *);
 wchar_t* _i64tow(__int64, wchar_t *, int);
 wchar_t* _ui64tow(unsigned __int64, wchar_t *, int);
 
-int	    _wgetenv(const wchar_t*);
-int	    _wputenv(const wchar_t*);
+wchar_t* _wgetenv(const wchar_t*);
+int	 _wputenv(const wchar_t*);
 void	_wsearchenv(const wchar_t*, const wchar_t*, wchar_t*);
 void    _wmakepath(wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*);
 void	_wsplitpath (const wchar_t*, wchar_t*, wchar_t*, wchar_t*, wchar_t*);

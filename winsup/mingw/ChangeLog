@@ -1,4 +1,10 @@
 
+Tue Jan 16 11:37:31  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/stdlib.h: Apply Danny Smith patch 102730
+	2000-12-09  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+	(_wgetenv) Correction to return type.
+
 Tue Jan 16 09:41:41  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/locale.h: Apply Danny Smith patch 101834
