@@ -4,7 +4,7 @@ Please do not make ChangeLog entries.
 COPYING, COPYING.LIB, README
 	http://gnu.org.
 
-Makefile.in; configure; configure.in; src-release
+Makefile.*; configure; configure.in; src-release
 	Please notify the following of any committed patches.
 		binutils@sources.redhat.com
 		gdb-patches@sources.redhat.com
