@@ -519,7 +519,7 @@ greatly reducing the amount of time it takes in a large domain.</para>
 
 <screen>
 Usage: mount [OPTION] [&lt;win32path&gt; &lt;posixpath&gt;]
-  -b, --binary                  text files are equivalent to binary files
+  -b, --binary     (default)    text files are equivalent to binary files
                                 (newline = \n)
   -c, --change-cygdrive-prefix  change the cygdrive path prefix to &lt;posixpath&gt;
   -f, --force                   force mount, don't warn about missing mount
@@ -529,7 +529,7 @@ Usage: mount [OPTION] [&lt;win32path&gt; &lt;posixpath&gt;]
                                 system mount points and cygdrive prefixes
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix
   -s, --system     (default)    add system-wide mount point
-  -t, --text       (default)    text files get \r\n line endings
+  -t, --text                    text files get \r\n line endings
   -u, --user                    add user-only mount point
   -v, --version                 output version information and exit
   -x, --executable              treat all files under mount point as executables
