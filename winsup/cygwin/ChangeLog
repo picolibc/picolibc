@@ -1,3 +1,7 @@
+Fri Apr 20 12:27:49 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/sys/file.h: More cleanup for X_OK.
+
 Fri Apr 20 11:48:45 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/sys/file.h: Move X_OK protection earlier.
