@@ -1,5 +1,9 @@
 2003-08-31  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in: Oops.  Put the '...' in the right place.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: Display "..." when not-verbose.
 
 	* kill.cc (forcekill): Default to entered pid when pinfo fails.  Issue
