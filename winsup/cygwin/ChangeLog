@@ -1,3 +1,7 @@
+Sat Aug 12 01:08:11 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Use dtable.o rather than hinfo.o.
+
 Sat Aug 12 00:47:11 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Rename hinfo -> dtable.  Name the former dtable array 'fdtab'.

@@ -117,11 +117,11 @@ EXTRA_OFILES=$(bupdir1)/libiberty/random.o $(bupdir1)/libiberty/strsignal.o
 DLL_IMPORTS:=$(w32api_lib)/libkernel32.a
 
 DLL_OFILES:=assert.o dcrt0.o debug.o delqueue.o dir.o dlfcn.o dll_init.o \
-	environ.o  errno.o exceptions.o exec.o external.o fcntl.o fhandler.o \
-	fhandler_console.o fhandler_floppy.o fhandler_random.o fhandler_raw.o \
-	fhandler_serial.o fhandler_tape.o fhandler_termios.o fhandler_tty.o \
-	fhandler_windows.o fhandler_zero.o fork.o glob.o grp.o heap.o hinfo.o \
-	init.o ioctl.o localtime.o malloc.o mmap.o net.o ntea.o passwd.o \
+	dtable.o environ.o  errno.o exceptions.o exec.o external.o fcntl.o \
+	fhandler.o fhandler_console.o fhandler_floppy.o fhandler_random.o \
+	fhandler_raw.o fhandler_serial.o fhandler_tape.o fhandler_termios.o \
+	fhandler_tty.o fhandler_windows.o fhandler_zero.o fork.o glob.o grp.o \
+	heap.o init.o ioctl.o localtime.o malloc.o mmap.o net.o ntea.o passwd.o \
 	path.o pinfo.o pipe.o poll.o regexp.o regerror.o regsub.o registry.o \
 	resource.o scandir.o security.o select.o shared.o signal.o sigproc.o \
 	smallprint.o spawn.o strace.o strsep.o sync.o syscalls.o sysconf.o \
