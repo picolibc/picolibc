@@ -166,15 +166,25 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   syscall_printf ("addr %x, len %d, prot %x, flags %x, fd %d, off %d",
 		  addr, len, prot, flags, fd, off);
 
+  DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;
+  if (flags & MAP_PRIVATE)
+    access = FILE_MAP_COPY;
+
   SetResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
 
+#if 0
   /* Windows 95 does not have fixed addresses */
+  /*
+   * CV: This assumption isn't correct. See Microsoft Platform SDK, Memory,
+   * description of call `MapViewOfFileEx'.
+   */
   if ((os_being_run != winNT) && (flags & MAP_FIXED))
     {
       set_errno (EINVAL);
       syscall_printf ("-1 = mmap(): win95 and MAP_FIXED");
       return (caddr_t) -1;
     }
+#endif
 
   if (mmapped_areas == 0)
     {
@@ -188,22 +198,16 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	}
     }
 
-  DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;
-  if (flags & MAP_PRIVATE)
-    access = FILE_MAP_COPY;
-  DWORD protect;
-
-  if (access & FILE_MAP_COPY)
-    protect = PAGE_WRITECOPY;
-  else if (access & FILE_MAP_WRITE)
-    protect = PAGE_READWRITE;
-  else
-    protect = PAGE_READONLY;
-
-  HANDLE hFile;
+  fhandler_disk_file fh_paging_file (NULL);
+  fhandler_base *fh;
+  caddr_t base = addr;
+  HANDLE h;
 
   if (fd == -1)
-    hFile = (HANDLE) 0xFFFFFFFF;
+    {
+      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
+      fh = &fh_paging_file;
+    }
   else
     {
       /* Ensure that fd is open */
@@ -214,69 +218,38 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
 	  return (caddr_t) -1;
 	}
-      hFile = fdtab[fd]->get_handle ();
+      fh = fdtab[fd];
     }
 
-  HANDLE h = CreateFileMapping (hFile, &sec_none, protect, 0, len, NULL);
-  if (h == 0)
+  h = fh->mmap (&base, len, access, flags, off);
+
+  if (h == INVALID_HANDLE_VALUE)
     {
-      __seterrno ();
-      syscall_printf ("-1 = mmap(): CreateFileMapping failed with %E");
       ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
-      return (caddr_t) -1;
-    }
-
-  void *base;
-
-  if (flags & MAP_FIXED)
-    {
-      base = MapViewOfFileEx (h, access, 0, off, len, addr);
-      if (base != addr)
-	{
-	  __seterrno ();
-	  syscall_printf ("-1 = mmap(): MapViewOfFileEx failed with %E");
-	  CloseHandle (h);
-	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
-	  return (caddr_t) -1;
-	}
-    }
-  else
-    {
-      base = MapViewOfFile (h, access, 0, off, len);
-      if (base == 0)
-	{
-	  __seterrno ();
-	  syscall_printf ("-1 = mmap(): MapViewOfFile failed with %E");
-	  CloseHandle (h);
-	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
-	  return (caddr_t) -1;
-	}
+      return MAP_FAILED;
     }
 
   /* Now we should have a successfully mmaped area.
      Need to save it so forked children can reproduce it.
   */
-
   mmap_record mmap_rec (h, access, off, len, base);
 
   /* Get list of mmapped areas for this fd, create a new one if
      one does not exist yet.
   */
-
   list *l = mmapped_areas->get_list_by_fd (fd);
   if (l == 0)
     {
       /* Create a new one */
       l = new list;
       if (l == 0)
-	{
-	  UnmapViewOfFile (base);
-	  CloseHandle (h);
-	  set_errno (ENOMEM);
-	  syscall_printf ("-1 = mmap(): ENOMEM");
-	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
-	  return (caddr_t) -1;
-	}
+        {
+          fh->munmap (h, base, len);
+          set_errno (ENOMEM);
+          syscall_printf ("-1 = mmap(): ENOMEM");
+          ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+          return MAP_FAILED;
+        }
       l = mmapped_areas->add_list (l, fd);
   }
 
@@ -285,7 +258,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 
   syscall_printf ("%x = mmap() succeeded", base);
   ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
-  return (caddr_t) base;
+  return base;
 }
 
 /* munmap () removes an mmapped area.  It insists that base area
@@ -322,9 +295,19 @@ munmap (caddr_t addr, size_t len)
 	      mmap_record rec = l->recs[li];
 	      if (rec.get_address () == addr)
 		{
-		  /* Unmap the area */
-		  UnmapViewOfFile (addr);
-		  CloseHandle (rec.get_handle ());
+                  int fd = l->fd;
+                  fhandler_disk_file fh_paging_file (NULL);
+                  fhandler_base *fh;
+
+                  if (fd == -1 || fdtab.not_open (fd))
+                    {
+                      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
+                      fh = &fh_paging_file;
+                    }
+                  else
+                    fh = fdtab[fd];
+                  fh->munmap (rec.get_handle (), addr, len);
+
 		  /* Delete the entry. */
 		  l->erase (li);
 		  syscall_printf ("0 = munmap(): %x", addr);
@@ -334,8 +317,8 @@ munmap (caddr_t addr, size_t len)
 	     }
 	 }
      }
-  set_errno (EINVAL);
 
+  set_errno (EINVAL);
   syscall_printf ("-1 = munmap(): EINVAL");
 
   ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
@@ -351,13 +334,161 @@ msync (caddr_t addr, size_t len, int flags)
   syscall_printf ("addr = %x, len = %d, flags = %x",
 		  addr, len, flags);
 
+  /* However, check flags for validity. */
+  if ((flags & ~(MS_ASYNC | MS_SYNC | MS_INVALIDATE))
+      || ((flags & MS_ASYNC) && (flags & MS_SYNC)))
+    {
+      syscall_printf ("-1 = msync(): Invalid flags");
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  SetResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," msync");
+  /* Check if a mmap'ed area was ever created */
+  if (mmapped_areas == 0)
+    {
+      syscall_printf ("-1 = msync(): mmapped_areas == 0");
+      set_errno (EINVAL);
+      ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," msync");
+      return -1;
+    }
+
+  /* Iterate through the map, looking for the mmapped area.
+     Error if not found. */
+
+  int it;
+  for (it = 0; it < mmapped_areas->nlists; ++it)
+    {
+      list *l = mmapped_areas->lists[it];
+      if (l != 0)
+	{
+	  int li;
+	  for (li = 0; li < l->nrecs; ++li)
+	    {
+	      mmap_record rec = l->recs[li];
+	      if (rec.get_address () == addr)
+		{
+                  int fd = l->fd;
+                  fhandler_disk_file fh_paging_file (NULL);
+                  fhandler_base *fh;
+
+                  if (fd == -1 || fdtab.not_open (fd))
+                    {
+                      fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
+                      fh = &fh_paging_file;
+                    }
+                  else
+                    fh = fdtab[fd];
+
+                  int ret = fh->msync (rec.get_handle (), addr, len, flags);
+
+                  if (ret)
+		    syscall_printf ("%d = msync(): %E", ret);
+                  else
+		    syscall_printf ("0 = msync()");
+
+		  ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," msync");
+		  return 0;
+		}
+	     }
+	 }
+     }
+
+  /* SUSv2: Return code if indicated memory was not mapped is ENOMEM. */
+  set_errno (ENOMEM);
+  syscall_printf ("-1 = msync(): ENOMEM");
+
+  ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," msync");
+  return -1;
+}
+
+/*
+ * Base implementation:
+ *
+ * `mmap' returns ENODEV as documented in SUSv2.
+ * In contrast to the global function implementation, the member function
+ * `mmap' has to return the mapped base address in `addr' and the handle to
+ * the mapping object as return value. In case of failure, the fhandler
+ * mmap has to close that handle by itself and return INVALID_HANDLE_VALUE.
+ *
+ * `munmap' and `msync' get the handle to the mapping object as first parameter
+ * additionally.
+*/
+HANDLE
+fhandler_base::mmap (caddr_t *addr, size_t len, DWORD access,
+                     int flags, off_t off)
+{
+  set_errno (ENODEV);
+  return INVALID_HANDLE_VALUE;
+}
+
+int
+fhandler_base::munmap (HANDLE h, caddr_t addr, size_t len)
+{
+  set_errno (ENODEV);
+  return -1;
+}
+
+int
+fhandler_base::msync (HANDLE h, caddr_t addr, size_t len, int flags)
+{
+  set_errno (ENODEV);
+  return -1;
+}
+
+/* Implementation for disk files. */
+HANDLE
+fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
+                          int flags, off_t off)
+{
+  DWORD protect;
+
+  if (access & FILE_MAP_COPY)
+    protect = PAGE_WRITECOPY;
+  else if (access & FILE_MAP_WRITE)
+    protect = PAGE_READWRITE;
+  else
+    protect = PAGE_READONLY;
+
+  HANDLE h = CreateFileMapping (get_handle(), &sec_none, protect, 0, len, NULL);
+  if (h == 0)
+    {
+      __seterrno ();
+      syscall_printf ("-1 = mmap(): CreateFileMapping failed with %E");
+      return INVALID_HANDLE_VALUE;
+    }
+
+  void *base = MapViewOfFileEx (h, access, 0, off, len,
+                               (flags & MAP_FIXED) ? addr : NULL);
+
+  if (!base || ((flags & MAP_FIXED) && base != addr))
+    {
+      __seterrno ();
+      syscall_printf ("-1 = mmap(): MapViewOfFileEx failed with %E");
+      CloseHandle (h);
+      return INVALID_HANDLE_VALUE;
+    }
+
+  *addr = (caddr_t) base;
+  return h;
+}
+
+int
+fhandler_disk_file::munmap (HANDLE h, caddr_t addr, size_t len)
+{
+  UnmapViewOfFile (addr);
+  CloseHandle (h);
+  return 0;
+}
+
+int
+fhandler_disk_file::msync (HANDLE h, caddr_t addr, size_t len, int flags)
+{
   if (FlushViewOfFile (addr, len) == 0)
     {
-      syscall_printf ("-1 = msync: %E");
       __seterrno ();
       return -1;
     }
-  syscall_printf ("0 = msync");
   return 0;
 }
 

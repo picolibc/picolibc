@@ -263,6 +263,11 @@ public:
   virtual void dump ();
   virtual int dup (fhandler_base *child);
 
+  virtual HANDLE mmap (caddr_t *addr, size_t len, DWORD access,
+                       int flags, off_t off);
+  virtual int munmap (HANDLE h, caddr_t addr, size_t len);
+  virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
+
   void *operator new (size_t, void *p) {return p;}
 
   virtual void init (HANDLE, DWORD, mode_t);
@@ -461,6 +466,11 @@ public:
   int lock (int, struct flock *);
   BOOL is_device () { return FALSE; }
   int fstat (struct stat *buf);
+
+  virtual HANDLE mmap (caddr_t *addr, size_t len, DWORD access,
+                       int flags, off_t off);
+  virtual int munmap (HANDLE h, caddr_t addr, size_t len);
+  virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
 };
 
 class fhandler_serial: public fhandler_base

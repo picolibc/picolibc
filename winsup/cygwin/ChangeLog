@@ -1,3 +1,18 @@
+Thu Oct  5 14:58:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h: Add mmap(), munmap() and msync() to fhandler_base
+	and fhandler_disk_file.
+	* mmem.cc (mmap): Eliminated device dependent implementation details.
+	These are moved to the appropriate fhandler class.
+	(munmap): Ditto.
+	(msync): Ditto.
+	(fhandler_base::mmap): New method.
+	(fhandler_base::munmap): Ditto.
+	(fhandler_base::msync): Ditto.
+	(fhandler_disk_file::mmap): Ditto.
+	(fhandler_disk_file::munmap): Ditto.
+	(fhandler_disk_file::msync): Ditto.
+
 Thu Oct  5 01:52:43 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* net.cc: General cleanup.
