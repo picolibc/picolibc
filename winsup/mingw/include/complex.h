@@ -47,47 +47,47 @@ extern "C" {
 #ifndef RC_INVOKED
 
 /* TODO: float and long double versions */ 
-double __attribute__ ((const)) creal (double _Complex);
-double __attribute__ ((const)) cimag (double _Complex);
-double __attribute__ ((const)) carg (double _Complex);
-double __attribute__ ((const)) cabs (double _Complex);
-double _Complex __attribute__ ((const)) conj (double _Complex);
-double _Complex __attribute__ ((const)) cacos (double _Complex);
-double _Complex __attribute__ ((const)) casin (double _Complex);
-double _Complex __attribute__ ((const)) catan (double _Complex);
-double _Complex __attribute__ ((const)) ccos (double _Complex);
-double _Complex __attribute__ ((const)) csin (double _Complex);
-double _Complex __attribute__ ((const)) ctan (double _Complex);
-double _Complex __attribute__ ((const)) cacosh (double _Complex);
-double _Complex __attribute__ ((const)) casinh (double _Complex);
-double _Complex __attribute__ ((const)) catanh (double _Complex);
-double _Complex __attribute__ ((const)) ccosh (double _Complex);
-double _Complex __attribute__ ((const)) csinh (double _Complex);
-double _Complex __attribute__ ((const)) ctanh (double _Complex);
-double _Complex __attribute__ ((const)) cexp (double _Complex);
-double _Complex __attribute__ ((const)) clog (double _Complex);
-double _Complex __attribute__ ((const)) cpow (double _Complex, double _Complex);
-double _Complex __attribute__ ((const)) csqrt (double _Complex);
-double _Complex __attribute__ ((const)) cproj (double _Complex);
+double __MINGW_ATTRIB_CONST creal (double _Complex);
+double __MINGW_ATTRIB_CONST cimag (double _Complex);
+double __MINGW_ATTRIB_CONST carg (double _Complex);
+double __MINGW_ATTRIB_CONST cabs (double _Complex);
+double _Complex __MINGW_ATTRIB_CONST conj (double _Complex);
+double _Complex  cacos (double _Complex);
+double _Complex  casin (double _Complex);
+double _Complex  catan (double _Complex);
+double _Complex  ccos (double _Complex);
+double _Complex  csin (double _Complex);
+double _Complex  ctan (double _Complex);
+double _Complex  cacosh (double _Complex);
+double _Complex  casinh (double _Complex);
+double _Complex  catanh (double _Complex);
+double _Complex  ccosh (double _Complex);
+double _Complex  csinh (double _Complex);
+double _Complex  ctanh (double _Complex);
+double _Complex  cexp (double _Complex);
+double _Complex  clog (double _Complex);
+double _Complex  cpow (double _Complex, double _Complex);
+double _Complex  csqrt (double _Complex);
+double _Complex __MINGW_ATTRIB_CONST cproj (double _Complex);
 
 #ifdef __GNUC__
 
-__CRT_INLINE double __attribute__ ((const)) creal (double _Complex _Z)
+__CRT_INLINE double __MINGW_ATTRIB_CONST creal (double _Complex _Z)
 {
   return __real__ _Z;
 }
 
-__CRT_INLINE double __attribute__ ((const)) cimag (double _Complex _Z)
+__CRT_INLINE double __MINGW_ATTRIB_CONST cimag (double _Complex _Z)
 {
   return __imag__ _Z;
 }
 
-__CRT_INLINE double _Complex __attribute__ ((const)) conj (double _Complex _Z)
+__CRT_INLINE double _Complex __MINGW_ATTRIB_CONST conj (double _Complex _Z)
 {
   return __extension__ ~_Z;
 }
 
-__CRT_INLINE  double __attribute__ ((const)) carg (double _Complex _Z)
+__CRT_INLINE  double __MINGW_ATTRIB_CONST carg (double _Complex _Z)
 {
   double res;
   __asm__  ("fpatan;"

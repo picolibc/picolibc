@@ -1,5 +1,11 @@
 2004-08-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/complex.h:  Remove __attribute__ ((const)) from
+	transcendantal and trig functions.  Replace __attribute__ ((const))
+	with __MINGW_ATTRIB_CONST on other declarations.
+
+2004-08-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/wchar.h: Reorganize, avoid including other headers.
 
 2004-08-07  Danny Smith  <dannysmith@users.sourceforge.net>
