@@ -1,3 +1,10 @@
+2005-02-24  Ralf Corsepious  <ralf.corsepius@rtems.org>
+
+	* libc/include/sys/types.h [__rtems__]: Include new
+	header file machine/_types.h.
+	* libc/include/machine/types.h: Ditto.
+	* libc/sys/rtems/machine/_types.h: New file.
+
 2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/time.h (_timezone): Change to long also for Cygwin.

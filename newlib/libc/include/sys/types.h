@@ -21,6 +21,8 @@
 
 #ifndef __INTTYPES_DEFINED__
 #define __INTTYPES_DEFINED__
+
+#if !defined (__rtems__)
 typedef short int __int16_t;
 typedef unsigned short int __uint16_t;
 
@@ -39,6 +41,38 @@ typedef unsigned long int __uint64_t;
 __extension__ typedef long long __int64_t;
 __extension__ typedef unsigned long long __uint64_t;
 #endif
+#else /* __rtems__ */
+
+/*
+ *  The following section is RTEMS specific and is needed to more
+ *  closely match the types defined in the BSD sys/types.h.
+ *  This is needed to let the RTEMS/BSD TCP/IP stack compile.
+ */
+
+#include <machine/_types.h>
+
+/* deprecated */
+#if ___int8_t_defined
+typedef __uint8_t	u_int8_t;
+#endif
+#if ___int16_t_defined
+typedef __uint16_t	u_int16_t;
+#endif 
+#if ___int32_t_defined
+typedef __uint32_t	u_int32_t;
+#endif
+
+#if ___int64_t_defined
+typedef __uint64_t	u_int64_t;
+
+/* deprecated */
+typedef	__uint64_t	u_quad_t;
+typedef	__int64_t	quad_t;
+typedef	quad_t *	qaddr_t;
+#endif
+
+#endif
+
 #endif /* ! __INTTYPES_DEFINED */
 
 #ifndef __need_inttypes
