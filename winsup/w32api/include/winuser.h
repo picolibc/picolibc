@@ -3361,6 +3361,7 @@ int WINAPI wvsprintfW(LPWSTR,LPCWSTR,va_list arglist);
 #if(WINVER >= 0x0500)
 BOOL WINAPI AllowSetForegroundWindow(DWORD);
 BOOL WINAPI LockSetForegroundWindow(UINT);
+BOOL WINAPI SetLayeredWindowAttributes(HWND,COLORREF,BYTE,DWORD);
 #endif
 
 #ifdef UNICODE

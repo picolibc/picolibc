@@ -1,3 +1,12 @@
+2003-05-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/shlguid.h (CGID_ShellServiceObject): Declare.
+	* lib/uuid.c (CGID_ShellServiceObject): Define guid.
+	Thanks to Chris Sutcliffe  <ir0nh34d#users.sourceforge.net> 
+	* include/winuser.h (SetLayeredWindowAttributes): Add prototype.
+	* lib/user32.def (SetLayeredWindowAttributes): Add stub.
+	* lib/uuid.c (CGID_Explorer, CGID_ShellDocView): Define guids.
+
 2003-05-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
  	* include/commctrl.h (STATUSCLASSNAME, TOOLBARCLASSNAME,

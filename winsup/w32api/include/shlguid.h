@@ -15,6 +15,7 @@ extern const GUID FMTID_Intshcut;
 extern const GUID FMTID_InternetSite;
 extern const GUID CGID_Explorer;
 extern const GUID CGID_ShellDocView;
+extern const GUID CGID_ShellServiceObject;
 extern const GUID IID_INewShortcutHookA;
 extern const GUID IID_IShellBrowser;
 extern const GUID IID_IShellView;

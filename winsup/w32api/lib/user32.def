@@ -486,6 +486,7 @@ SetFocus@4
 SetForegroundWindow@4
 SetKeyboardState@4
 SetLastErrorEx@8
+SetLayeredWindowAttributes@16
 SetMenu@8
 SetMenuContextHelpId@8
 _imp__SetMenuContextHelpId@8
