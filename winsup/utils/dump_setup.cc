@@ -403,8 +403,7 @@ dump_setup (int verbose, char **argv, bool check_files)
 		check_package_files (verbose, packages[i].name)
 		  ? "     OK" : "     Incomplete");
       else
-	printf ("%-*s %-*s\n", package_len, packages[i].name,
-	      strlen(packages[i].ver), packages[i].ver);
+	printf ("%-*s %s\n", package_len, packages[i].name, packages[i].ver);
       fflush(stdout);
     }
 
