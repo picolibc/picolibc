@@ -91,14 +91,30 @@ Previously, we let the "OS" choose where to allocate the cygwin heap in
 the initial cygwin process and attempted to use this same location in
 subsequent cygwin processes started from this parent.
 
-This was basically done to accomodate Windows XP, although there were
-sporadic complaints of cygwin heap failures in other pathological
-situations with both NT and 9x.  In Windows XP, Microsoft made the
-allocation of memory less deterministic.  This is certainly their right.
-Cygwin was previously relying on undocumented and "iffy" behavior before.
+The reason for putting cygheap at a fixed, known location is that we
+need to put this information at a fixed location since it incorporates
+pointers to entities within itself.  So, when a process forks or execs,
+the memory referred to by the pointers has to exist at the same place in
+both the parent or the child.
 
-We're not exactly on completely firm ground now, though.  We are assuming
-that there is sufficient space after the cygwin DLL for the allocation
-of the cygwin heap.  So far this assumption has proved workable but there
-is no guarantee that newer versions of Windows won't break this assumption
-too.
+(It "might be nice" to used something like Microsoft's "based pointers"
+for the cygheap.  Unfortunately gcc does not support that feature, as of
+this writing.)
+
+The reason for choosing a fixed, arbitrary location is to accomodate
+Windows XP, although there were sporadic complaints of cygwin heap
+failures in other pathological situations with both NT and 9x.  In
+Windows XP, Microsoft made the allocation of memory less deterministic.
+This is certainly their right.  Cygwin was previously relying on
+undocumented and "iffy" behavior before.  So, now we always allocate
+space immediately after the dll in the theory that there is not going
+to be anything else living there.
+
+Recent (2001-09-20) cygwin email threads have indicated that we're not
+exactly on completely firm ground now, though.  We are assuming that
+there is sufficient space after the cygwin DLL for the allocation of the
+cygwin heap.  Unfortunately the ld option '--enable-auto-image-base'
+has a tendency to allocate DLLs immediately after cygwin1.dll.  This
+causes the dreaded "Couldn't reserve space for cygwin's heap" message.
+
+Solutions for this behavior are currently in the musing state.
