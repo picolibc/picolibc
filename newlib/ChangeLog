@@ -1,3 +1,20 @@
+2000-05-26  Marek Michalkiewicz  <marekm@linux.org.pl>
+
+	* libm/common/s_expm1.c (expm1): Add curly braces, avoid warnings.
+	* libm/common/s_log1p.c (log1p): Likewise.
+	* libm/common/s_scalbn.c (scalbn): Likewise.
+	* libm/math/e_log.c: Likewise.
+	* libm/math/e_asin.c: Likewise.
+	* libm/math/ef_asin.c: Likewise.
+	* libm/math/e_j0.c (pzero, qzero): Remove redundant test.
+	* libm/math/e_j1.c (pone, qone): Likewise.
+	* libm/math/ef_j0.c (pzerof, qzerof): Likewise.
+	* libm/math/ef_j1.c (ponef, qonef): Likewise.
+	* libm/mathfp/e_j0.c (pzero, qzero): Likewise.
+	* libm/mathfp/e_j1.c (pone, qone): Likewise.
+	* libm/mathfp/ef_j0.c (pzerof, qzerof): Likewise.
+	* libm/mathfp/ef_j1.c (ponef, qonef): Likewise.
+
 2000-05-19  DJ Delorie  <dj@cygnus.com>
 
 	* libc/stdio/stdio.c (__stextmode): new, see if file is text mode
