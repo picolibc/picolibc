@@ -1,3 +1,8 @@
+Wed Oct 18 18:57:46 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ps.cc (main): Add some extra space to Windows pid output for
+	Windows 95.
+
 Tue Oct 17 23:49:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* ps.cc (main): Add some extra space to pid output for Windows 95.

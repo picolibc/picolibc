@@ -175,8 +175,8 @@ main (int argc, char *argv[])
   const char *dfmt   = "%7d%4d%10s %s\n";
   const char *ftitle = "     UID     PID    PPID TTY     STIME COMMAND\n";
   const char *ffmt   = "%8.8s%8d%8d%4d%10s %s\n";
-  const char *ltitle = "      PID    PPID    PGID   WINPID TTY  UID    STIME COMMAND\n";
-  const char *lfmt   = "%c %7d %7d %7d %8u %3d %4d %8s %s\n";
+  const char *ltitle = "      PID    PPID    PGID     WINPID TTY  UID    STIME COMMAND\n";
+  const char *lfmt   = "%c %7d %7d %7d %10u %3d %4d %8s %s\n";
   char ch;
 
   aflag = lflag = fflag = sflag = 0;
