@@ -1,3 +1,8 @@
+2003-10-01  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (win32_device_name): Only fill out destination buffer when
+	it's really a device.
+
 2003-09-30  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Add YA method for generating devices.cc.

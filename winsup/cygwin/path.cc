@@ -895,12 +895,14 @@ digits (const char *name)
 /* Return TRUE if src_path is a Win32 device name, filling out the device
    name in win32_path */
 
-static BOOL
+static bool
 win32_device_name (const char *src_path, char *win32_path, device& dev)
 {
   dev.parse (src_path);
+  if (dev.devn == FH_FS)
+    return false;
   strcpy (win32_path, dev.native);
-  return dev.devn != FH_FS;
+  return true;
 }
 
 /* Normalize a Win32 path.

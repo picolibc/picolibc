@@ -261,7 +261,6 @@ static const device dev_storage[] =
   {"/dev/sdx", FH_SDX, "\\Device\\Harddisk23\\Partition0"},
   {"/dev/sdy", FH_SDY, "\\Device\\Harddisk24\\Partition0"},
   {"/dev/sdz", FH_SDZ, "\\Device\\Harddisk25\\Partition0"},
-  {"/dev/sda0", FH_SDA | 0, "\\Device\\Harddisk0\\Partition0"},
   {"/dev/sda1", FH_SDA | 1, "\\Device\\Harddisk0\\Partition1"},
   {"/dev/sda2", FH_SDA | 2, "\\Device\\Harddisk0\\Partition2"},
   {"/dev/sda3", FH_SDA | 3, "\\Device\\Harddisk0\\Partition3"},
@@ -277,7 +276,6 @@ static const device dev_storage[] =
   {"/dev/sda13", FH_SDA | 13, "\\Device\\Harddisk0\\Partition13"},
   {"/dev/sda14", FH_SDA | 14, "\\Device\\Harddisk0\\Partition14"},
   {"/dev/sda15", FH_SDA | 15, "\\Device\\Harddisk0\\Partition15"},
-  {"/dev/sdb0", FH_SDB | 0, "\\Device\\Harddisk1\\Partition0"},
   {"/dev/sdb1", FH_SDB | 1, "\\Device\\Harddisk1\\Partition1"},
   {"/dev/sdb2", FH_SDB | 2, "\\Device\\Harddisk1\\Partition2"},
   {"/dev/sdb3", FH_SDB | 3, "\\Device\\Harddisk1\\Partition3"},
@@ -293,7 +291,6 @@ static const device dev_storage[] =
   {"/dev/sdb13", FH_SDB | 13, "\\Device\\Harddisk1\\Partition13"},
   {"/dev/sdb14", FH_SDB | 14, "\\Device\\Harddisk1\\Partition14"},
   {"/dev/sdb15", FH_SDB | 15, "\\Device\\Harddisk1\\Partition15"},
-  {"/dev/sdc0", FH_SDC | 0, "\\Device\\Harddisk2\\Partition0"},
   {"/dev/sdc1", FH_SDC | 1, "\\Device\\Harddisk2\\Partition1"},
   {"/dev/sdc2", FH_SDC | 2, "\\Device\\Harddisk2\\Partition2"},
   {"/dev/sdc3", FH_SDC | 3, "\\Device\\Harddisk2\\Partition3"},
@@ -309,7 +306,6 @@ static const device dev_storage[] =
   {"/dev/sdc13", FH_SDC | 13, "\\Device\\Harddisk2\\Partition13"},
   {"/dev/sdc14", FH_SDC | 14, "\\Device\\Harddisk2\\Partition14"},
   {"/dev/sdc15", FH_SDC | 15, "\\Device\\Harddisk2\\Partition15"},
-  {"/dev/sdd0", FH_SDD | 0, "\\Device\\Harddisk3\\Partition0"},
   {"/dev/sdd1", FH_SDD | 1, "\\Device\\Harddisk3\\Partition1"},
   {"/dev/sdd2", FH_SDD | 2, "\\Device\\Harddisk3\\Partition2"},
   {"/dev/sdd3", FH_SDD | 3, "\\Device\\Harddisk3\\Partition3"},
@@ -325,7 +321,6 @@ static const device dev_storage[] =
   {"/dev/sdd13", FH_SDD | 13, "\\Device\\Harddisk3\\Partition13"},
   {"/dev/sdd14", FH_SDD | 14, "\\Device\\Harddisk3\\Partition14"},
   {"/dev/sdd15", FH_SDD | 15, "\\Device\\Harddisk3\\Partition15"},
-  {"/dev/sde0", FH_SDE | 0, "\\Device\\Harddisk4\\Partition0"},
   {"/dev/sde1", FH_SDE | 1, "\\Device\\Harddisk4\\Partition1"},
   {"/dev/sde2", FH_SDE | 2, "\\Device\\Harddisk4\\Partition2"},
   {"/dev/sde3", FH_SDE | 3, "\\Device\\Harddisk4\\Partition3"},
@@ -341,7 +336,6 @@ static const device dev_storage[] =
   {"/dev/sde13", FH_SDE | 13, "\\Device\\Harddisk4\\Partition13"},
   {"/dev/sde14", FH_SDE | 14, "\\Device\\Harddisk4\\Partition14"},
   {"/dev/sde15", FH_SDE | 15, "\\Device\\Harddisk4\\Partition15"},
-  {"/dev/sdf0", FH_SDF | 0, "\\Device\\Harddisk5\\Partition0"},
   {"/dev/sdf1", FH_SDF | 1, "\\Device\\Harddisk5\\Partition1"},
   {"/dev/sdf2", FH_SDF | 2, "\\Device\\Harddisk5\\Partition2"},
   {"/dev/sdf3", FH_SDF | 3, "\\Device\\Harddisk5\\Partition3"},
@@ -357,7 +351,6 @@ static const device dev_storage[] =
   {"/dev/sdf13", FH_SDF | 13, "\\Device\\Harddisk5\\Partition13"},
   {"/dev/sdf14", FH_SDF | 14, "\\Device\\Harddisk5\\Partition14"},
   {"/dev/sdf15", FH_SDF | 15, "\\Device\\Harddisk5\\Partition15"},
-  {"/dev/sdg0", FH_SDG | 0, "\\Device\\Harddisk6\\Partition0"},
   {"/dev/sdg1", FH_SDG | 1, "\\Device\\Harddisk6\\Partition1"},
   {"/dev/sdg2", FH_SDG | 2, "\\Device\\Harddisk6\\Partition2"},
   {"/dev/sdg3", FH_SDG | 3, "\\Device\\Harddisk6\\Partition3"},
@@ -373,7 +366,6 @@ static const device dev_storage[] =
   {"/dev/sdg13", FH_SDG | 13, "\\Device\\Harddisk6\\Partition13"},
   {"/dev/sdg14", FH_SDG | 14, "\\Device\\Harddisk6\\Partition14"},
   {"/dev/sdg15", FH_SDG | 15, "\\Device\\Harddisk6\\Partition15"},
-  {"/dev/sdh0", FH_SDH | 0, "\\Device\\Harddisk7\\Partition0"},
   {"/dev/sdh1", FH_SDH | 1, "\\Device\\Harddisk7\\Partition1"},
   {"/dev/sdh2", FH_SDH | 2, "\\Device\\Harddisk7\\Partition2"},
   {"/dev/sdh3", FH_SDH | 3, "\\Device\\Harddisk7\\Partition3"},
@@ -389,7 +381,6 @@ static const device dev_storage[] =
   {"/dev/sdh13", FH_SDH | 13, "\\Device\\Harddisk7\\Partition13"},
   {"/dev/sdh14", FH_SDH | 14, "\\Device\\Harddisk7\\Partition14"},
   {"/dev/sdh15", FH_SDH | 15, "\\Device\\Harddisk7\\Partition15"},
-  {"/dev/sdi0", FH_SDI | 0, "\\Device\\Harddisk8\\Partition0"},
   {"/dev/sdi1", FH_SDI | 1, "\\Device\\Harddisk8\\Partition1"},
   {"/dev/sdi2", FH_SDI | 2, "\\Device\\Harddisk8\\Partition2"},
   {"/dev/sdi3", FH_SDI | 3, "\\Device\\Harddisk8\\Partition3"},
@@ -405,7 +396,6 @@ static const device dev_storage[] =
   {"/dev/sdi13", FH_SDI | 13, "\\Device\\Harddisk8\\Partition13"},
   {"/dev/sdi14", FH_SDI | 14, "\\Device\\Harddisk8\\Partition14"},
   {"/dev/sdi15", FH_SDI | 15, "\\Device\\Harddisk8\\Partition15"},
-  {"/dev/sdj0", FH_SDJ | 0, "\\Device\\Harddisk9\\Partition0"},
   {"/dev/sdj1", FH_SDJ | 1, "\\Device\\Harddisk9\\Partition1"},
   {"/dev/sdj2", FH_SDJ | 2, "\\Device\\Harddisk9\\Partition2"},
   {"/dev/sdj3", FH_SDJ | 3, "\\Device\\Harddisk9\\Partition3"},
@@ -421,7 +411,6 @@ static const device dev_storage[] =
   {"/dev/sdj13", FH_SDJ | 13, "\\Device\\Harddisk9\\Partition13"},
   {"/dev/sdj14", FH_SDJ | 14, "\\Device\\Harddisk9\\Partition14"},
   {"/dev/sdj15", FH_SDJ | 15, "\\Device\\Harddisk9\\Partition15"},
-  {"/dev/sdk0", FH_SDK | 0, "\\Device\\Harddisk10\\Partition0"},
   {"/dev/sdk1", FH_SDK | 1, "\\Device\\Harddisk10\\Partition1"},
   {"/dev/sdk2", FH_SDK | 2, "\\Device\\Harddisk10\\Partition2"},
   {"/dev/sdk3", FH_SDK | 3, "\\Device\\Harddisk10\\Partition3"},
@@ -437,7 +426,6 @@ static const device dev_storage[] =
   {"/dev/sdk13", FH_SDK | 13, "\\Device\\Harddisk10\\Partition13"},
   {"/dev/sdk14", FH_SDK | 14, "\\Device\\Harddisk10\\Partition14"},
   {"/dev/sdk15", FH_SDK | 15, "\\Device\\Harddisk10\\Partition15"},
-  {"/dev/sdl0", FH_SDL | 0, "\\Device\\Harddisk11\\Partition0"},
   {"/dev/sdl1", FH_SDL | 1, "\\Device\\Harddisk11\\Partition1"},
   {"/dev/sdl2", FH_SDL | 2, "\\Device\\Harddisk11\\Partition2"},
   {"/dev/sdl3", FH_SDL | 3, "\\Device\\Harddisk11\\Partition3"},
@@ -453,7 +441,6 @@ static const device dev_storage[] =
   {"/dev/sdl13", FH_SDL | 13, "\\Device\\Harddisk11\\Partition13"},
   {"/dev/sdl14", FH_SDL | 14, "\\Device\\Harddisk11\\Partition14"},
   {"/dev/sdl15", FH_SDL | 15, "\\Device\\Harddisk11\\Partition15"},
-  {"/dev/sdm0", FH_SDM | 0, "\\Device\\Harddisk12\\Partition0"},
   {"/dev/sdm1", FH_SDM | 1, "\\Device\\Harddisk12\\Partition1"},
   {"/dev/sdm2", FH_SDM | 2, "\\Device\\Harddisk12\\Partition2"},
   {"/dev/sdm3", FH_SDM | 3, "\\Device\\Harddisk12\\Partition3"},
@@ -469,7 +456,6 @@ static const device dev_storage[] =
   {"/dev/sdm13", FH_SDM | 13, "\\Device\\Harddisk12\\Partition13"},
   {"/dev/sdm14", FH_SDM | 14, "\\Device\\Harddisk12\\Partition14"},
   {"/dev/sdm15", FH_SDM | 15, "\\Device\\Harddisk12\\Partition15"},
-  {"/dev/sdn0", FH_SDN | 0, "\\Device\\Harddisk13\\Partition0"},
   {"/dev/sdn1", FH_SDN | 1, "\\Device\\Harddisk13\\Partition1"},
   {"/dev/sdn2", FH_SDN | 2, "\\Device\\Harddisk13\\Partition2"},
   {"/dev/sdn3", FH_SDN | 3, "\\Device\\Harddisk13\\Partition3"},
@@ -485,7 +471,6 @@ static const device dev_storage[] =
   {"/dev/sdn13", FH_SDN | 13, "\\Device\\Harddisk13\\Partition13"},
   {"/dev/sdn14", FH_SDN | 14, "\\Device\\Harddisk13\\Partition14"},
   {"/dev/sdn15", FH_SDN | 15, "\\Device\\Harddisk13\\Partition15"},
-  {"/dev/sdo0", FH_SDO | 0, "\\Device\\Harddisk14\\Partition0"},
   {"/dev/sdo1", FH_SDO | 1, "\\Device\\Harddisk14\\Partition1"},
   {"/dev/sdo2", FH_SDO | 2, "\\Device\\Harddisk14\\Partition2"},
   {"/dev/sdo3", FH_SDO | 3, "\\Device\\Harddisk14\\Partition3"},
@@ -501,7 +486,6 @@ static const device dev_storage[] =
   {"/dev/sdo13", FH_SDO | 13, "\\Device\\Harddisk14\\Partition13"},
   {"/dev/sdo14", FH_SDO | 14, "\\Device\\Harddisk14\\Partition14"},
   {"/dev/sdo15", FH_SDO | 15, "\\Device\\Harddisk14\\Partition15"},
-  {"/dev/sdp0", FH_SDP | 0, "\\Device\\Harddisk15\\Partition0"},
   {"/dev/sdp1", FH_SDP | 1, "\\Device\\Harddisk15\\Partition1"},
   {"/dev/sdp2", FH_SDP | 2, "\\Device\\Harddisk15\\Partition2"},
   {"/dev/sdp3", FH_SDP | 3, "\\Device\\Harddisk15\\Partition3"},
@@ -517,7 +501,6 @@ static const device dev_storage[] =
   {"/dev/sdp13", FH_SDP | 13, "\\Device\\Harddisk15\\Partition13"},
   {"/dev/sdp14", FH_SDP | 14, "\\Device\\Harddisk15\\Partition14"},
   {"/dev/sdp15", FH_SDP | 15, "\\Device\\Harddisk15\\Partition15"},
-  {"/dev/sdq0", FH_SDQ | 0, "\\Device\\Harddisk16\\Partition0"},
   {"/dev/sdq1", FH_SDQ | 1, "\\Device\\Harddisk16\\Partition1"},
   {"/dev/sdq2", FH_SDQ | 2, "\\Device\\Harddisk16\\Partition2"},
   {"/dev/sdq3", FH_SDQ | 3, "\\Device\\Harddisk16\\Partition3"},
@@ -533,7 +516,6 @@ static const device dev_storage[] =
   {"/dev/sdq13", FH_SDQ | 13, "\\Device\\Harddisk16\\Partition13"},
   {"/dev/sdq14", FH_SDQ | 14, "\\Device\\Harddisk16\\Partition14"},
   {"/dev/sdq15", FH_SDQ | 15, "\\Device\\Harddisk16\\Partition15"},
-  {"/dev/sdr0", FH_SDR | 0, "\\Device\\Harddisk17\\Partition0"},
   {"/dev/sdr1", FH_SDR | 1, "\\Device\\Harddisk17\\Partition1"},
   {"/dev/sdr2", FH_SDR | 2, "\\Device\\Harddisk17\\Partition2"},
   {"/dev/sdr3", FH_SDR | 3, "\\Device\\Harddisk17\\Partition3"},
@@ -549,7 +531,6 @@ static const device dev_storage[] =
   {"/dev/sdr13", FH_SDR | 13, "\\Device\\Harddisk17\\Partition13"},
   {"/dev/sdr14", FH_SDR | 14, "\\Device\\Harddisk17\\Partition14"},
   {"/dev/sdr15", FH_SDR | 15, "\\Device\\Harddisk17\\Partition15"},
-  {"/dev/sds0", FH_SDS | 0, "\\Device\\Harddisk18\\Partition0"},
   {"/dev/sds1", FH_SDS | 1, "\\Device\\Harddisk18\\Partition1"},
   {"/dev/sds2", FH_SDS | 2, "\\Device\\Harddisk18\\Partition2"},
   {"/dev/sds3", FH_SDS | 3, "\\Device\\Harddisk18\\Partition3"},
@@ -565,7 +546,6 @@ static const device dev_storage[] =
   {"/dev/sds13", FH_SDS | 13, "\\Device\\Harddisk18\\Partition13"},
   {"/dev/sds14", FH_SDS | 14, "\\Device\\Harddisk18\\Partition14"},
   {"/dev/sds15", FH_SDS | 15, "\\Device\\Harddisk18\\Partition15"},
-  {"/dev/sdt0", FH_SDT | 0, "\\Device\\Harddisk19\\Partition0"},
   {"/dev/sdt1", FH_SDT | 1, "\\Device\\Harddisk19\\Partition1"},
   {"/dev/sdt2", FH_SDT | 2, "\\Device\\Harddisk19\\Partition2"},
   {"/dev/sdt3", FH_SDT | 3, "\\Device\\Harddisk19\\Partition3"},
@@ -581,7 +561,6 @@ static const device dev_storage[] =
   {"/dev/sdt13", FH_SDT | 13, "\\Device\\Harddisk19\\Partition13"},
   {"/dev/sdt14", FH_SDT | 14, "\\Device\\Harddisk19\\Partition14"},
   {"/dev/sdt15", FH_SDT | 15, "\\Device\\Harddisk19\\Partition15"},
-  {"/dev/sdu0", FH_SDU | 0, "\\Device\\Harddisk20\\Partition0"},
   {"/dev/sdu1", FH_SDU | 1, "\\Device\\Harddisk20\\Partition1"},
   {"/dev/sdu2", FH_SDU | 2, "\\Device\\Harddisk20\\Partition2"},
   {"/dev/sdu3", FH_SDU | 3, "\\Device\\Harddisk20\\Partition3"},
@@ -597,7 +576,6 @@ static const device dev_storage[] =
   {"/dev/sdu13", FH_SDU | 13, "\\Device\\Harddisk20\\Partition13"},
   {"/dev/sdu14", FH_SDU | 14, "\\Device\\Harddisk20\\Partition14"},
   {"/dev/sdu15", FH_SDU | 15, "\\Device\\Harddisk20\\Partition15"},
-  {"/dev/sdv0", FH_SDV | 0, "\\Device\\Harddisk21\\Partition0"},
   {"/dev/sdv1", FH_SDV | 1, "\\Device\\Harddisk21\\Partition1"},
   {"/dev/sdv2", FH_SDV | 2, "\\Device\\Harddisk21\\Partition2"},
   {"/dev/sdv3", FH_SDV | 3, "\\Device\\Harddisk21\\Partition3"},
@@ -613,7 +591,6 @@ static const device dev_storage[] =
   {"/dev/sdv13", FH_SDV | 13, "\\Device\\Harddisk21\\Partition13"},
   {"/dev/sdv14", FH_SDV | 14, "\\Device\\Harddisk21\\Partition14"},
   {"/dev/sdv15", FH_SDV | 15, "\\Device\\Harddisk21\\Partition15"},
-  {"/dev/sdw0", FH_SDW | 0, "\\Device\\Harddisk22\\Partition0"},
   {"/dev/sdw1", FH_SDW | 1, "\\Device\\Harddisk22\\Partition1"},
   {"/dev/sdw2", FH_SDW | 2, "\\Device\\Harddisk22\\Partition2"},
   {"/dev/sdw3", FH_SDW | 3, "\\Device\\Harddisk22\\Partition3"},
@@ -629,7 +606,6 @@ static const device dev_storage[] =
   {"/dev/sdw13", FH_SDW | 13, "\\Device\\Harddisk22\\Partition13"},
   {"/dev/sdw14", FH_SDW | 14, "\\Device\\Harddisk22\\Partition14"},
   {"/dev/sdw15", FH_SDW | 15, "\\Device\\Harddisk22\\Partition15"},
-  {"/dev/sdx0", FH_SDX | 0, "\\Device\\Harddisk23\\Partition0"},
   {"/dev/sdx1", FH_SDX | 1, "\\Device\\Harddisk23\\Partition1"},
   {"/dev/sdx2", FH_SDX | 2, "\\Device\\Harddisk23\\Partition2"},
   {"/dev/sdx3", FH_SDX | 3, "\\Device\\Harddisk23\\Partition3"},
@@ -645,7 +621,6 @@ static const device dev_storage[] =
   {"/dev/sdx13", FH_SDX | 13, "\\Device\\Harddisk23\\Partition13"},
   {"/dev/sdx14", FH_SDX | 14, "\\Device\\Harddisk23\\Partition14"},
   {"/dev/sdx15", FH_SDX | 15, "\\Device\\Harddisk23\\Partition15"},
-  {"/dev/sdy0", FH_SDY | 0, "\\Device\\Harddisk24\\Partition0"},
   {"/dev/sdy1", FH_SDY | 1, "\\Device\\Harddisk24\\Partition1"},
   {"/dev/sdy2", FH_SDY | 2, "\\Device\\Harddisk24\\Partition2"},
   {"/dev/sdy3", FH_SDY | 3, "\\Device\\Harddisk24\\Partition3"},
@@ -661,7 +636,6 @@ static const device dev_storage[] =
   {"/dev/sdy13", FH_SDY | 13, "\\Device\\Harddisk24\\Partition13"},
   {"/dev/sdy14", FH_SDY | 14, "\\Device\\Harddisk24\\Partition14"},
   {"/dev/sdy15", FH_SDY | 15, "\\Device\\Harddisk24\\Partition15"},
-  {"/dev/sdz0", FH_SDZ | 0, "\\Device\\Harddisk25\\Partition0"},
   {"/dev/sdz1", FH_SDZ | 1, "\\Device\\Harddisk25\\Partition1"},
   {"/dev/sdz2", FH_SDZ | 2, "\\Device\\Harddisk25\\Partition2"},
   {"/dev/sdz3", FH_SDZ | 3, "\\Device\\Harddisk25\\Partition3"},
@@ -913,11 +887,11 @@ const device *dgram_dev = dev_storage + 39;
 const device *icmp_dev = dev_storage + 40;
 const device *stream_dev = dev_storage + 41;
 const device *tcp_dev = dev_storage + 42;
-const device *ttym_dev = dev_storage + 863;
-const device *ttys_dev = dev_storage + 783;
+const device *ttym_dev = dev_storage + 837;
+const device *ttys_dev = dev_storage + 757;
 const device *udp_dev = dev_storage + 43;
 const device *unix_dev = dev_storage + 44;
-const device *urandom_dev = dev_storage + 864;
+const device *urandom_dev = dev_storage + 838;
 
 
 static KR_device_t KR_find_keyword (const char *KR_keyword, int KR_length)
@@ -950,7 +924,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/tty", 8) == 0)
                 {
 {
-return dev_storage + 782;
+return dev_storage + 756;
 
 }
                 }
@@ -1397,7 +1371,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st9", 8) == 0)
                 {
 {
-return dev_storage + 663;
+return dev_storage + 637;
 
 }
                 }
@@ -1412,7 +1386,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sr9", 8) == 0)
                 {
 {
-return dev_storage + 647;
+return dev_storage + 621;
 
 }
                 }
@@ -1451,7 +1425,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st8", 8) == 0)
                 {
 {
-return dev_storage + 662;
+return dev_storage + 636;
 
 }
                 }
@@ -1466,7 +1440,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sr8", 8) == 0)
                 {
 {
-return dev_storage + 646;
+return dev_storage + 620;
 
 }
                 }
@@ -1505,7 +1479,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st7", 8) == 0)
                 {
 {
-return dev_storage + 661;
+return dev_storage + 635;
 
 }
                 }
@@ -1520,7 +1494,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sr7", 8) == 0)
                 {
 {
-return dev_storage + 645;
+return dev_storage + 619;
 
 }
                 }
@@ -1559,7 +1533,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st6", 8) == 0)
                 {
 {
-return dev_storage + 660;
+return dev_storage + 634;
 
 }
                 }
@@ -1574,7 +1548,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sr6", 8) == 0)
                 {
 {
-return dev_storage + 644;
+return dev_storage + 618;
 
 }
                 }
@@ -1613,7 +1587,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st5", 8) == 0)
                 {
 {
-return dev_storage + 659;
+return dev_storage + 633;
 
 }
                 }
@@ -1628,7 +1602,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sr5", 8) == 0)
                 {
 {
-return dev_storage + 643;
+return dev_storage + 617;
 
 }
                 }
@@ -1667,7 +1641,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st4", 8) == 0)
                 {
 {
-return dev_storage + 658;
+return dev_storage + 632;
 
 }
                 }
@@ -1682,7 +1656,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sr4", 8) == 0)
                 {
 {
-return dev_storage + 642;
+return dev_storage + 616;
 
 }
                 }
@@ -1721,7 +1695,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st3", 8) == 0)
                 {
 {
-return dev_storage + 657;
+return dev_storage + 631;
 
 }
                 }
@@ -1736,7 +1710,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sr3", 8) == 0)
                 {
 {
-return dev_storage + 641;
+return dev_storage + 615;
 
 }
                 }
@@ -1775,7 +1749,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st2", 8) == 0)
                 {
 {
-return dev_storage + 656;
+return dev_storage + 630;
 
 }
                 }
@@ -1790,7 +1764,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sr2", 8) == 0)
                 {
 {
-return dev_storage + 640;
+return dev_storage + 614;
 
 }
                 }
@@ -1829,7 +1803,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st1", 8) == 0)
                 {
 {
-return dev_storage + 655;
+return dev_storage + 629;
 
 }
                 }
@@ -1844,7 +1818,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sr1", 8) == 0)
                 {
 {
-return dev_storage + 639;
+return dev_storage + 613;
 
 }
                 }
@@ -1883,7 +1857,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st0", 8) == 0)
                 {
 {
-return dev_storage + 654;
+return dev_storage + 628;
 
 }
                 }
@@ -1898,7 +1872,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sr0", 8) == 0)
                 {
 {
-return dev_storage + 638;
+return dev_storage + 612;
 
 }
                 }
@@ -1976,7 +1950,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/zero", 9) == 0)
                 {
 {
-return dev_storage + 866;
+return dev_storage + 840;
 
 }
                 }
@@ -2015,7 +1989,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/ttym", 9) == 0)
                 {
 {
-return dev_storage + 863;
+return dev_storage + 837;
 
 }
                 }
@@ -2084,7 +2058,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz9", 9) == 0)
                 {
 {
-return dev_storage + 631;
+return dev_storage + 605;
 
 }
                 }
@@ -2102,7 +2076,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty9", 9) == 0)
                     {
 {
-return dev_storage + 792;
+return dev_storage + 766;
 
 }
                     }
@@ -2117,7 +2091,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdy9", 9) == 0)
                     {
 {
-return dev_storage + 615;
+return dev_storage + 590;
 
 }
                     }
@@ -2138,7 +2112,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx9", 9) == 0)
                 {
 {
-return dev_storage + 599;
+return dev_storage + 575;
 
 }
                 }
@@ -2153,7 +2127,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw9", 9) == 0)
                 {
 {
-return dev_storage + 583;
+return dev_storage + 560;
 
 }
                 }
@@ -2168,7 +2142,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv9", 9) == 0)
                 {
 {
-return dev_storage + 567;
+return dev_storage + 545;
 
 }
                 }
@@ -2183,7 +2157,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu9", 9) == 0)
                 {
 {
-return dev_storage + 551;
+return dev_storage + 530;
 
 }
                 }
@@ -2201,7 +2175,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdt9", 9) == 0)
                     {
 {
-return dev_storage + 535;
+return dev_storage + 515;
 
 }
                     }
@@ -2237,7 +2211,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds9", 9) == 0)
                 {
 {
-return dev_storage + 519;
+return dev_storage + 500;
 
 }
                 }
@@ -2252,7 +2226,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr9", 9) == 0)
                 {
 {
-return dev_storage + 503;
+return dev_storage + 485;
 
 }
                 }
@@ -2267,7 +2241,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq9", 9) == 0)
                 {
 {
-return dev_storage + 487;
+return dev_storage + 470;
 
 }
                 }
@@ -2282,7 +2256,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp9", 9) == 0)
                 {
 {
-return dev_storage + 471;
+return dev_storage + 455;
 
 }
                 }
@@ -2297,7 +2271,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo9", 9) == 0)
                 {
 {
-return dev_storage + 455;
+return dev_storage + 440;
 
 }
                 }
@@ -2312,7 +2286,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn9", 9) == 0)
                 {
 {
-return dev_storage + 439;
+return dev_storage + 425;
 
 }
                 }
@@ -2330,7 +2304,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm9", 9) == 0)
                     {
 {
-return dev_storage + 423;
+return dev_storage + 410;
 
 }
                     }
@@ -2366,7 +2340,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl9", 9) == 0)
                 {
 {
-return dev_storage + 407;
+return dev_storage + 395;
 
 }
                 }
@@ -2381,7 +2355,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk9", 9) == 0)
                 {
 {
-return dev_storage + 391;
+return dev_storage + 380;
 
 }
                 }
@@ -2396,7 +2370,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj9", 9) == 0)
                 {
 {
-return dev_storage + 375;
+return dev_storage + 365;
 
 }
                 }
@@ -2411,7 +2385,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi9", 9) == 0)
                 {
 {
-return dev_storage + 359;
+return dev_storage + 350;
 
 }
                 }
@@ -2426,7 +2400,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh9", 9) == 0)
                 {
 {
-return dev_storage + 343;
+return dev_storage + 335;
 
 }
                 }
@@ -2441,7 +2415,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg9", 9) == 0)
                 {
 {
-return dev_storage + 327;
+return dev_storage + 320;
 
 }
                 }
@@ -2456,7 +2430,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf9", 9) == 0)
                 {
 {
-return dev_storage + 311;
+return dev_storage + 305;
 
 }
                 }
@@ -2471,7 +2445,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde9", 9) == 0)
                 {
 {
-return dev_storage + 295;
+return dev_storage + 290;
 
 }
                 }
@@ -2489,7 +2463,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd9", 9) == 0)
                     {
 {
-return dev_storage + 279;
+return dev_storage + 275;
 
 }
                     }
@@ -2525,7 +2499,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc9", 9) == 0)
                 {
 {
-return dev_storage + 263;
+return dev_storage + 260;
 
 }
                 }
@@ -2540,7 +2514,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb9", 9) == 0)
                 {
 {
-return dev_storage + 247;
+return dev_storage + 245;
 
 }
                 }
@@ -2555,7 +2529,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda9", 9) == 0)
                 {
 {
-return dev_storage + 231;
+return dev_storage + 230;
 
 }
                 }
@@ -2570,7 +2544,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st99", 9) == 0)
                 {
 {
-return dev_storage + 753;
+return dev_storage + 727;
 
 }
                 }
@@ -2585,7 +2559,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st89", 9) == 0)
                 {
 {
-return dev_storage + 743;
+return dev_storage + 717;
 
 }
                 }
@@ -2600,7 +2574,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st79", 9) == 0)
                 {
 {
-return dev_storage + 733;
+return dev_storage + 707;
 
 }
                 }
@@ -2615,7 +2589,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st69", 9) == 0)
                 {
 {
-return dev_storage + 723;
+return dev_storage + 697;
 
 }
                 }
@@ -2630,7 +2604,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st59", 9) == 0)
                 {
 {
-return dev_storage + 713;
+return dev_storage + 687;
 
 }
                 }
@@ -2645,7 +2619,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st49", 9) == 0)
                 {
 {
-return dev_storage + 703;
+return dev_storage + 677;
 
 }
                 }
@@ -2660,7 +2634,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st39", 9) == 0)
                 {
 {
-return dev_storage + 693;
+return dev_storage + 667;
 
 }
                 }
@@ -2675,7 +2649,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st29", 9) == 0)
                 {
 {
-return dev_storage + 683;
+return dev_storage + 657;
 
 }
                 }
@@ -2690,7 +2664,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st19", 9) == 0)
                 {
 {
-return dev_storage + 673;
+return dev_storage + 647;
 
 }
                 }
@@ -2714,7 +2688,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz8", 9) == 0)
                 {
 {
-return dev_storage + 630;
+return dev_storage + 604;
 
 }
                 }
@@ -2732,7 +2706,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty8", 9) == 0)
                     {
 {
-return dev_storage + 791;
+return dev_storage + 765;
 
 }
                     }
@@ -2747,7 +2721,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdy8", 9) == 0)
                     {
 {
-return dev_storage + 614;
+return dev_storage + 589;
 
 }
                     }
@@ -2768,7 +2742,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx8", 9) == 0)
                 {
 {
-return dev_storage + 598;
+return dev_storage + 574;
 
 }
                 }
@@ -2783,7 +2757,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw8", 9) == 0)
                 {
 {
-return dev_storage + 582;
+return dev_storage + 559;
 
 }
                 }
@@ -2798,7 +2772,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv8", 9) == 0)
                 {
 {
-return dev_storage + 566;
+return dev_storage + 544;
 
 }
                 }
@@ -2813,7 +2787,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu8", 9) == 0)
                 {
 {
-return dev_storage + 550;
+return dev_storage + 529;
 
 }
                 }
@@ -2831,7 +2805,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdt8", 9) == 0)
                     {
 {
-return dev_storage + 534;
+return dev_storage + 514;
 
 }
                     }
@@ -2867,7 +2841,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds8", 9) == 0)
                 {
 {
-return dev_storage + 518;
+return dev_storage + 499;
 
 }
                 }
@@ -2882,7 +2856,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr8", 9) == 0)
                 {
 {
-return dev_storage + 502;
+return dev_storage + 484;
 
 }
                 }
@@ -2897,7 +2871,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq8", 9) == 0)
                 {
 {
-return dev_storage + 486;
+return dev_storage + 469;
 
 }
                 }
@@ -2912,7 +2886,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp8", 9) == 0)
                 {
 {
-return dev_storage + 470;
+return dev_storage + 454;
 
 }
                 }
@@ -2927,7 +2901,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo8", 9) == 0)
                 {
 {
-return dev_storage + 454;
+return dev_storage + 439;
 
 }
                 }
@@ -2942,7 +2916,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn8", 9) == 0)
                 {
 {
-return dev_storage + 438;
+return dev_storage + 424;
 
 }
                 }
@@ -2960,7 +2934,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm8", 9) == 0)
                     {
 {
-return dev_storage + 422;
+return dev_storage + 409;
 
 }
                     }
@@ -2996,7 +2970,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl8", 9) == 0)
                 {
 {
-return dev_storage + 406;
+return dev_storage + 394;
 
 }
                 }
@@ -3011,7 +2985,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk8", 9) == 0)
                 {
 {
-return dev_storage + 390;
+return dev_storage + 379;
 
 }
                 }
@@ -3026,7 +3000,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj8", 9) == 0)
                 {
 {
-return dev_storage + 374;
+return dev_storage + 364;
 
 }
                 }
@@ -3041,7 +3015,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi8", 9) == 0)
                 {
 {
-return dev_storage + 358;
+return dev_storage + 349;
 
 }
                 }
@@ -3056,7 +3030,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh8", 9) == 0)
                 {
 {
-return dev_storage + 342;
+return dev_storage + 334;
 
 }
                 }
@@ -3071,7 +3045,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg8", 9) == 0)
                 {
 {
-return dev_storage + 326;
+return dev_storage + 319;
 
 }
                 }
@@ -3086,7 +3060,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf8", 9) == 0)
                 {
 {
-return dev_storage + 310;
+return dev_storage + 304;
 
 }
                 }
@@ -3101,7 +3075,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde8", 9) == 0)
                 {
 {
-return dev_storage + 294;
+return dev_storage + 289;
 
 }
                 }
@@ -3119,7 +3093,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd8", 9) == 0)
                     {
 {
-return dev_storage + 278;
+return dev_storage + 274;
 
 }
                     }
@@ -3155,7 +3129,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc8", 9) == 0)
                 {
 {
-return dev_storage + 262;
+return dev_storage + 259;
 
 }
                 }
@@ -3170,7 +3144,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb8", 9) == 0)
                 {
 {
-return dev_storage + 246;
+return dev_storage + 244;
 
 }
                 }
@@ -3185,7 +3159,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda8", 9) == 0)
                 {
 {
-return dev_storage + 230;
+return dev_storage + 229;
 
 }
                 }
@@ -3200,7 +3174,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st98", 9) == 0)
                 {
 {
-return dev_storage + 752;
+return dev_storage + 726;
 
 }
                 }
@@ -3215,7 +3189,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st88", 9) == 0)
                 {
 {
-return dev_storage + 742;
+return dev_storage + 716;
 
 }
                 }
@@ -3230,7 +3204,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st78", 9) == 0)
                 {
 {
-return dev_storage + 732;
+return dev_storage + 706;
 
 }
                 }
@@ -3245,7 +3219,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st68", 9) == 0)
                 {
 {
-return dev_storage + 722;
+return dev_storage + 696;
 
 }
                 }
@@ -3260,7 +3234,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st58", 9) == 0)
                 {
 {
-return dev_storage + 712;
+return dev_storage + 686;
 
 }
                 }
@@ -3275,7 +3249,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st48", 9) == 0)
                 {
 {
-return dev_storage + 702;
+return dev_storage + 676;
 
 }
                 }
@@ -3290,7 +3264,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st38", 9) == 0)
                 {
 {
-return dev_storage + 692;
+return dev_storage + 666;
 
 }
                 }
@@ -3305,7 +3279,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st28", 9) == 0)
                 {
 {
-return dev_storage + 682;
+return dev_storage + 656;
 
 }
                 }
@@ -3320,7 +3294,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st18", 9) == 0)
                 {
 {
-return dev_storage + 672;
+return dev_storage + 646;
 
 }
                 }
@@ -3344,7 +3318,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz7", 9) == 0)
                 {
 {
-return dev_storage + 629;
+return dev_storage + 603;
 
 }
                 }
@@ -3362,7 +3336,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty7", 9) == 0)
                     {
 {
-return dev_storage + 790;
+return dev_storage + 764;
 
 }
                     }
@@ -3377,7 +3351,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdy7", 9) == 0)
                     {
 {
-return dev_storage + 613;
+return dev_storage + 588;
 
 }
                     }
@@ -3398,7 +3372,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx7", 9) == 0)
                 {
 {
-return dev_storage + 597;
+return dev_storage + 573;
 
 }
                 }
@@ -3413,7 +3387,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw7", 9) == 0)
                 {
 {
-return dev_storage + 581;
+return dev_storage + 558;
 
 }
                 }
@@ -3428,7 +3402,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv7", 9) == 0)
                 {
 {
-return dev_storage + 565;
+return dev_storage + 543;
 
 }
                 }
@@ -3443,7 +3417,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu7", 9) == 0)
                 {
 {
-return dev_storage + 549;
+return dev_storage + 528;
 
 }
                 }
@@ -3461,7 +3435,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdt7", 9) == 0)
                     {
 {
-return dev_storage + 533;
+return dev_storage + 513;
 
 }
                     }
@@ -3497,7 +3471,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds7", 9) == 0)
                 {
 {
-return dev_storage + 517;
+return dev_storage + 498;
 
 }
                 }
@@ -3512,7 +3486,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr7", 9) == 0)
                 {
 {
-return dev_storage + 501;
+return dev_storage + 483;
 
 }
                 }
@@ -3527,7 +3501,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq7", 9) == 0)
                 {
 {
-return dev_storage + 485;
+return dev_storage + 468;
 
 }
                 }
@@ -3542,7 +3516,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp7", 9) == 0)
                 {
 {
-return dev_storage + 469;
+return dev_storage + 453;
 
 }
                 }
@@ -3557,7 +3531,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo7", 9) == 0)
                 {
 {
-return dev_storage + 453;
+return dev_storage + 438;
 
 }
                 }
@@ -3572,7 +3546,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn7", 9) == 0)
                 {
 {
-return dev_storage + 437;
+return dev_storage + 423;
 
 }
                 }
@@ -3590,7 +3564,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm7", 9) == 0)
                     {
 {
-return dev_storage + 421;
+return dev_storage + 408;
 
 }
                     }
@@ -3626,7 +3600,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl7", 9) == 0)
                 {
 {
-return dev_storage + 405;
+return dev_storage + 393;
 
 }
                 }
@@ -3641,7 +3615,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk7", 9) == 0)
                 {
 {
-return dev_storage + 389;
+return dev_storage + 378;
 
 }
                 }
@@ -3656,7 +3630,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj7", 9) == 0)
                 {
 {
-return dev_storage + 373;
+return dev_storage + 363;
 
 }
                 }
@@ -3671,7 +3645,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi7", 9) == 0)
                 {
 {
-return dev_storage + 357;
+return dev_storage + 348;
 
 }
                 }
@@ -3686,7 +3660,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh7", 9) == 0)
                 {
 {
-return dev_storage + 341;
+return dev_storage + 333;
 
 }
                 }
@@ -3701,7 +3675,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg7", 9) == 0)
                 {
 {
-return dev_storage + 325;
+return dev_storage + 318;
 
 }
                 }
@@ -3716,7 +3690,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf7", 9) == 0)
                 {
 {
-return dev_storage + 309;
+return dev_storage + 303;
 
 }
                 }
@@ -3731,7 +3705,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde7", 9) == 0)
                 {
 {
-return dev_storage + 293;
+return dev_storage + 288;
 
 }
                 }
@@ -3749,7 +3723,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd7", 9) == 0)
                     {
 {
-return dev_storage + 277;
+return dev_storage + 273;
 
 }
                     }
@@ -3785,7 +3759,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc7", 9) == 0)
                 {
 {
-return dev_storage + 261;
+return dev_storage + 258;
 
 }
                 }
@@ -3800,7 +3774,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb7", 9) == 0)
                 {
 {
-return dev_storage + 245;
+return dev_storage + 243;
 
 }
                 }
@@ -3815,7 +3789,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda7", 9) == 0)
                 {
 {
-return dev_storage + 229;
+return dev_storage + 228;
 
 }
                 }
@@ -3830,7 +3804,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st97", 9) == 0)
                 {
 {
-return dev_storage + 751;
+return dev_storage + 725;
 
 }
                 }
@@ -3845,7 +3819,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st87", 9) == 0)
                 {
 {
-return dev_storage + 741;
+return dev_storage + 715;
 
 }
                 }
@@ -3860,7 +3834,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st77", 9) == 0)
                 {
 {
-return dev_storage + 731;
+return dev_storage + 705;
 
 }
                 }
@@ -3875,7 +3849,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st67", 9) == 0)
                 {
 {
-return dev_storage + 721;
+return dev_storage + 695;
 
 }
                 }
@@ -3890,7 +3864,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st57", 9) == 0)
                 {
 {
-return dev_storage + 711;
+return dev_storage + 685;
 
 }
                 }
@@ -3905,7 +3879,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st47", 9) == 0)
                 {
 {
-return dev_storage + 701;
+return dev_storage + 675;
 
 }
                 }
@@ -3920,7 +3894,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st37", 9) == 0)
                 {
 {
-return dev_storage + 691;
+return dev_storage + 665;
 
 }
                 }
@@ -3935,7 +3909,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st27", 9) == 0)
                 {
 {
-return dev_storage + 681;
+return dev_storage + 655;
 
 }
                 }
@@ -3950,7 +3924,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st17", 9) == 0)
                 {
 {
-return dev_storage + 671;
+return dev_storage + 645;
 
 }
                 }
@@ -3974,7 +3948,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz6", 9) == 0)
                 {
 {
-return dev_storage + 628;
+return dev_storage + 602;
 
 }
                 }
@@ -3992,7 +3966,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty6", 9) == 0)
                     {
 {
-return dev_storage + 789;
+return dev_storage + 763;
 
 }
                     }
@@ -4007,7 +3981,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdy6", 9) == 0)
                     {
 {
-return dev_storage + 612;
+return dev_storage + 587;
 
 }
                     }
@@ -4028,7 +4002,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx6", 9) == 0)
                 {
 {
-return dev_storage + 596;
+return dev_storage + 572;
 
 }
                 }
@@ -4043,7 +4017,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw6", 9) == 0)
                 {
 {
-return dev_storage + 580;
+return dev_storage + 557;
 
 }
                 }
@@ -4058,7 +4032,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv6", 9) == 0)
                 {
 {
-return dev_storage + 564;
+return dev_storage + 542;
 
 }
                 }
@@ -4073,7 +4047,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu6", 9) == 0)
                 {
 {
-return dev_storage + 548;
+return dev_storage + 527;
 
 }
                 }
@@ -4091,7 +4065,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdt6", 9) == 0)
                     {
 {
-return dev_storage + 532;
+return dev_storage + 512;
 
 }
                     }
@@ -4127,7 +4101,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds6", 9) == 0)
                 {
 {
-return dev_storage + 516;
+return dev_storage + 497;
 
 }
                 }
@@ -4142,7 +4116,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr6", 9) == 0)
                 {
 {
-return dev_storage + 500;
+return dev_storage + 482;
 
 }
                 }
@@ -4157,7 +4131,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq6", 9) == 0)
                 {
 {
-return dev_storage + 484;
+return dev_storage + 467;
 
 }
                 }
@@ -4172,7 +4146,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp6", 9) == 0)
                 {
 {
-return dev_storage + 468;
+return dev_storage + 452;
 
 }
                 }
@@ -4187,7 +4161,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo6", 9) == 0)
                 {
 {
-return dev_storage + 452;
+return dev_storage + 437;
 
 }
                 }
@@ -4202,7 +4176,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn6", 9) == 0)
                 {
 {
-return dev_storage + 436;
+return dev_storage + 422;
 
 }
                 }
@@ -4220,7 +4194,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm6", 9) == 0)
                     {
 {
-return dev_storage + 420;
+return dev_storage + 407;
 
 }
                     }
@@ -4256,7 +4230,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl6", 9) == 0)
                 {
 {
-return dev_storage + 404;
+return dev_storage + 392;
 
 }
                 }
@@ -4271,7 +4245,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk6", 9) == 0)
                 {
 {
-return dev_storage + 388;
+return dev_storage + 377;
 
 }
                 }
@@ -4286,7 +4260,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj6", 9) == 0)
                 {
 {
-return dev_storage + 372;
+return dev_storage + 362;
 
 }
                 }
@@ -4301,7 +4275,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi6", 9) == 0)
                 {
 {
-return dev_storage + 356;
+return dev_storage + 347;
 
 }
                 }
@@ -4316,7 +4290,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh6", 9) == 0)
                 {
 {
-return dev_storage + 340;
+return dev_storage + 332;
 
 }
                 }
@@ -4331,7 +4305,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg6", 9) == 0)
                 {
 {
-return dev_storage + 324;
+return dev_storage + 317;
 
 }
                 }
@@ -4346,7 +4320,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf6", 9) == 0)
                 {
 {
-return dev_storage + 308;
+return dev_storage + 302;
 
 }
                 }
@@ -4361,7 +4335,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde6", 9) == 0)
                 {
 {
-return dev_storage + 292;
+return dev_storage + 287;
 
 }
                 }
@@ -4379,7 +4353,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd6", 9) == 0)
                     {
 {
-return dev_storage + 276;
+return dev_storage + 272;
 
 }
                     }
@@ -4415,7 +4389,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc6", 9) == 0)
                 {
 {
-return dev_storage + 260;
+return dev_storage + 257;
 
 }
                 }
@@ -4430,7 +4404,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb6", 9) == 0)
                 {
 {
-return dev_storage + 244;
+return dev_storage + 242;
 
 }
                 }
@@ -4445,7 +4419,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda6", 9) == 0)
                 {
 {
-return dev_storage + 228;
+return dev_storage + 227;
 
 }
                 }
@@ -4460,7 +4434,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st96", 9) == 0)
                 {
 {
-return dev_storage + 750;
+return dev_storage + 724;
 
 }
                 }
@@ -4475,7 +4449,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st86", 9) == 0)
                 {
 {
-return dev_storage + 740;
+return dev_storage + 714;
 
 }
                 }
@@ -4490,7 +4464,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st76", 9) == 0)
                 {
 {
-return dev_storage + 730;
+return dev_storage + 704;
 
 }
                 }
@@ -4505,7 +4479,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st66", 9) == 0)
                 {
 {
-return dev_storage + 720;
+return dev_storage + 694;
 
 }
                 }
@@ -4520,7 +4494,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st56", 9) == 0)
                 {
 {
-return dev_storage + 710;
+return dev_storage + 684;
 
 }
                 }
@@ -4535,7 +4509,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st46", 9) == 0)
                 {
 {
-return dev_storage + 700;
+return dev_storage + 674;
 
 }
                 }
@@ -4550,7 +4524,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st36", 9) == 0)
                 {
 {
-return dev_storage + 690;
+return dev_storage + 664;
 
 }
                 }
@@ -4565,7 +4539,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st26", 9) == 0)
                 {
 {
-return dev_storage + 680;
+return dev_storage + 654;
 
 }
                 }
@@ -4580,7 +4554,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st16", 9) == 0)
                 {
 {
-return dev_storage + 670;
+return dev_storage + 644;
 
 }
                 }
@@ -4604,7 +4578,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz5", 9) == 0)
                 {
 {
-return dev_storage + 627;
+return dev_storage + 601;
 
 }
                 }
@@ -4622,7 +4596,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty5", 9) == 0)
                     {
 {
-return dev_storage + 788;
+return dev_storage + 762;
 
 }
                     }
@@ -4637,7 +4611,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdy5", 9) == 0)
                     {
 {
-return dev_storage + 611;
+return dev_storage + 586;
 
 }
                     }
@@ -4658,7 +4632,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx5", 9) == 0)
                 {
 {
-return dev_storage + 595;
+return dev_storage + 571;
 
 }
                 }
@@ -4673,7 +4647,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw5", 9) == 0)
                 {
 {
-return dev_storage + 579;
+return dev_storage + 556;
 
 }
                 }
@@ -4688,7 +4662,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv5", 9) == 0)
                 {
 {
-return dev_storage + 563;
+return dev_storage + 541;
 
 }
                 }
@@ -4703,7 +4677,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu5", 9) == 0)
                 {
 {
-return dev_storage + 547;
+return dev_storage + 526;
 
 }
                 }
@@ -4721,7 +4695,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdt5", 9) == 0)
                     {
 {
-return dev_storage + 531;
+return dev_storage + 511;
 
 }
                     }
@@ -4757,7 +4731,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds5", 9) == 0)
                 {
 {
-return dev_storage + 515;
+return dev_storage + 496;
 
 }
                 }
@@ -4772,7 +4746,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr5", 9) == 0)
                 {
 {
-return dev_storage + 499;
+return dev_storage + 481;
 
 }
                 }
@@ -4787,7 +4761,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq5", 9) == 0)
                 {
 {
-return dev_storage + 483;
+return dev_storage + 466;
 
 }
                 }
@@ -4802,7 +4776,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp5", 9) == 0)
                 {
 {
-return dev_storage + 467;
+return dev_storage + 451;
 
 }
                 }
@@ -4817,7 +4791,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo5", 9) == 0)
                 {
 {
-return dev_storage + 451;
+return dev_storage + 436;
 
 }
                 }
@@ -4832,7 +4806,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn5", 9) == 0)
                 {
 {
-return dev_storage + 435;
+return dev_storage + 421;
 
 }
                 }
@@ -4850,7 +4824,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm5", 9) == 0)
                     {
 {
-return dev_storage + 419;
+return dev_storage + 406;
 
 }
                     }
@@ -4886,7 +4860,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl5", 9) == 0)
                 {
 {
-return dev_storage + 403;
+return dev_storage + 391;
 
 }
                 }
@@ -4901,7 +4875,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk5", 9) == 0)
                 {
 {
-return dev_storage + 387;
+return dev_storage + 376;
 
 }
                 }
@@ -4916,7 +4890,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj5", 9) == 0)
                 {
 {
-return dev_storage + 371;
+return dev_storage + 361;
 
 }
                 }
@@ -4931,7 +4905,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi5", 9) == 0)
                 {
 {
-return dev_storage + 355;
+return dev_storage + 346;
 
 }
                 }
@@ -4946,7 +4920,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh5", 9) == 0)
                 {
 {
-return dev_storage + 339;
+return dev_storage + 331;
 
 }
                 }
@@ -4961,7 +4935,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg5", 9) == 0)
                 {
 {
-return dev_storage + 323;
+return dev_storage + 316;
 
 }
                 }
@@ -4976,7 +4950,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf5", 9) == 0)
                 {
 {
-return dev_storage + 307;
+return dev_storage + 301;
 
 }
                 }
@@ -4991,7 +4965,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde5", 9) == 0)
                 {
 {
-return dev_storage + 291;
+return dev_storage + 286;
 
 }
                 }
@@ -5009,7 +4983,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd5", 9) == 0)
                     {
 {
-return dev_storage + 275;
+return dev_storage + 271;
 
 }
                     }
@@ -5045,7 +5019,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc5", 9) == 0)
                 {
 {
-return dev_storage + 259;
+return dev_storage + 256;
 
 }
                 }
@@ -5060,7 +5034,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb5", 9) == 0)
                 {
 {
-return dev_storage + 243;
+return dev_storage + 241;
 
 }
                 }
@@ -5075,7 +5049,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda5", 9) == 0)
                 {
 {
-return dev_storage + 227;
+return dev_storage + 226;
 
 }
                 }
@@ -5090,7 +5064,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st95", 9) == 0)
                 {
 {
-return dev_storage + 749;
+return dev_storage + 723;
 
 }
                 }
@@ -5105,7 +5079,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st85", 9) == 0)
                 {
 {
-return dev_storage + 739;
+return dev_storage + 713;
 
 }
                 }
@@ -5120,7 +5094,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st75", 9) == 0)
                 {
 {
-return dev_storage + 729;
+return dev_storage + 703;
 
 }
                 }
@@ -5135,7 +5109,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st65", 9) == 0)
                 {
 {
-return dev_storage + 719;
+return dev_storage + 693;
 
 }
                 }
@@ -5150,7 +5124,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st55", 9) == 0)
                 {
 {
-return dev_storage + 709;
+return dev_storage + 683;
 
 }
                 }
@@ -5165,7 +5139,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st45", 9) == 0)
                 {
 {
-return dev_storage + 699;
+return dev_storage + 673;
 
 }
                 }
@@ -5180,7 +5154,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st35", 9) == 0)
                 {
 {
-return dev_storage + 689;
+return dev_storage + 663;
 
 }
                 }
@@ -5195,7 +5169,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st25", 9) == 0)
                 {
 {
-return dev_storage + 679;
+return dev_storage + 653;
 
 }
                 }
@@ -5213,7 +5187,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st15", 9) == 0)
                     {
 {
-return dev_storage + 669;
+return dev_storage + 643;
 
 }
                     }
@@ -5228,7 +5202,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sr15", 9) == 0)
                     {
 {
-return dev_storage + 653;
+return dev_storage + 627;
 
 }
                     }
@@ -5273,7 +5247,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz4", 9) == 0)
                 {
 {
-return dev_storage + 626;
+return dev_storage + 600;
 
 }
                 }
@@ -5291,7 +5265,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty4", 9) == 0)
                     {
 {
-return dev_storage + 787;
+return dev_storage + 761;
 
 }
                     }
@@ -5306,7 +5280,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdy4", 9) == 0)
                     {
 {
-return dev_storage + 610;
+return dev_storage + 585;
 
 }
                     }
@@ -5327,7 +5301,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx4", 9) == 0)
                 {
 {
-return dev_storage + 594;
+return dev_storage + 570;
 
 }
                 }
@@ -5342,7 +5316,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw4", 9) == 0)
                 {
 {
-return dev_storage + 578;
+return dev_storage + 555;
 
 }
                 }
@@ -5357,7 +5331,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv4", 9) == 0)
                 {
 {
-return dev_storage + 562;
+return dev_storage + 540;
 
 }
                 }
@@ -5372,7 +5346,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu4", 9) == 0)
                 {
 {
-return dev_storage + 546;
+return dev_storage + 525;
 
 }
                 }
@@ -5390,7 +5364,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdt4", 9) == 0)
                     {
 {
-return dev_storage + 530;
+return dev_storage + 510;
 
 }
                     }
@@ -5426,7 +5400,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds4", 9) == 0)
                 {
 {
-return dev_storage + 514;
+return dev_storage + 495;
 
 }
                 }
@@ -5441,7 +5415,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr4", 9) == 0)
                 {
 {
-return dev_storage + 498;
+return dev_storage + 480;
 
 }
                 }
@@ -5456,7 +5430,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq4", 9) == 0)
                 {
 {
-return dev_storage + 482;
+return dev_storage + 465;
 
 }
                 }
@@ -5471,7 +5445,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp4", 9) == 0)
                 {
 {
-return dev_storage + 466;
+return dev_storage + 450;
 
 }
                 }
@@ -5486,7 +5460,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo4", 9) == 0)
                 {
 {
-return dev_storage + 450;
+return dev_storage + 435;
 
 }
                 }
@@ -5501,7 +5475,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn4", 9) == 0)
                 {
 {
-return dev_storage + 434;
+return dev_storage + 420;
 
 }
                 }
@@ -5519,7 +5493,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm4", 9) == 0)
                     {
 {
-return dev_storage + 418;
+return dev_storage + 405;
 
 }
                     }
@@ -5555,7 +5529,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl4", 9) == 0)
                 {
 {
-return dev_storage + 402;
+return dev_storage + 390;
 
 }
                 }
@@ -5570,7 +5544,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk4", 9) == 0)
                 {
 {
-return dev_storage + 386;
+return dev_storage + 375;
 
 }
                 }
@@ -5585,7 +5559,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj4", 9) == 0)
                 {
 {
-return dev_storage + 370;
+return dev_storage + 360;
 
 }
                 }
@@ -5600,7 +5574,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi4", 9) == 0)
                 {
 {
-return dev_storage + 354;
+return dev_storage + 345;
 
 }
                 }
@@ -5615,7 +5589,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh4", 9) == 0)
                 {
 {
-return dev_storage + 338;
+return dev_storage + 330;
 
 }
                 }
@@ -5630,7 +5604,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg4", 9) == 0)
                 {
 {
-return dev_storage + 322;
+return dev_storage + 315;
 
 }
                 }
@@ -5645,7 +5619,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf4", 9) == 0)
                 {
 {
-return dev_storage + 306;
+return dev_storage + 300;
 
 }
                 }
@@ -5660,7 +5634,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde4", 9) == 0)
                 {
 {
-return dev_storage + 290;
+return dev_storage + 285;
 
 }
                 }
@@ -5678,7 +5652,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd4", 9) == 0)
                     {
 {
-return dev_storage + 274;
+return dev_storage + 270;
 
 }
                     }
@@ -5714,7 +5688,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc4", 9) == 0)
                 {
 {
-return dev_storage + 258;
+return dev_storage + 255;
 
 }
                 }
@@ -5729,7 +5703,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb4", 9) == 0)
                 {
 {
-return dev_storage + 242;
+return dev_storage + 240;
 
 }
                 }
@@ -5744,7 +5718,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda4", 9) == 0)
                 {
 {
-return dev_storage + 226;
+return dev_storage + 225;
 
 }
                 }
@@ -5759,7 +5733,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st94", 9) == 0)
                 {
 {
-return dev_storage + 748;
+return dev_storage + 722;
 
 }
                 }
@@ -5774,7 +5748,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st84", 9) == 0)
                 {
 {
-return dev_storage + 738;
+return dev_storage + 712;
 
 }
                 }
@@ -5789,7 +5763,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st74", 9) == 0)
                 {
 {
-return dev_storage + 728;
+return dev_storage + 702;
 
 }
                 }
@@ -5804,7 +5778,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st64", 9) == 0)
                 {
 {
-return dev_storage + 718;
+return dev_storage + 692;
 
 }
                 }
@@ -5819,7 +5793,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st54", 9) == 0)
                 {
 {
-return dev_storage + 708;
+return dev_storage + 682;
 
 }
                 }
@@ -5834,7 +5808,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st44", 9) == 0)
                 {
 {
-return dev_storage + 698;
+return dev_storage + 672;
 
 }
                 }
@@ -5849,7 +5823,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st34", 9) == 0)
                 {
 {
-return dev_storage + 688;
+return dev_storage + 662;
 
 }
                 }
@@ -5864,7 +5838,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st24", 9) == 0)
                 {
 {
-return dev_storage + 678;
+return dev_storage + 652;
 
 }
                 }
@@ -5882,7 +5856,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st14", 9) == 0)
                     {
 {
-return dev_storage + 668;
+return dev_storage + 642;
 
 }
                     }
@@ -5897,7 +5871,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sr14", 9) == 0)
                     {
 {
-return dev_storage + 652;
+return dev_storage + 626;
 
 }
                     }
@@ -5942,7 +5916,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz3", 9) == 0)
                 {
 {
-return dev_storage + 625;
+return dev_storage + 599;
 
 }
                 }
@@ -5960,7 +5934,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty3", 9) == 0)
                     {
 {
-return dev_storage + 786;
+return dev_storage + 760;
 
 }
                     }
@@ -5975,7 +5949,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdy3", 9) == 0)
                     {
 {
-return dev_storage + 609;
+return dev_storage + 584;
 
 }
                     }
@@ -5996,7 +5970,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx3", 9) == 0)
                 {
 {
-return dev_storage + 593;
+return dev_storage + 569;
 
 }
                 }
@@ -6011,7 +5985,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw3", 9) == 0)
                 {
 {
-return dev_storage + 577;
+return dev_storage + 554;
 
 }
                 }
@@ -6026,7 +6000,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv3", 9) == 0)
                 {
 {
-return dev_storage + 561;
+return dev_storage + 539;
 
 }
                 }
@@ -6041,7 +6015,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu3", 9) == 0)
                 {
 {
-return dev_storage + 545;
+return dev_storage + 524;
 
 }
                 }
@@ -6059,7 +6033,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdt3", 9) == 0)
                     {
 {
-return dev_storage + 529;
+return dev_storage + 509;
 
 }
                     }
@@ -6095,7 +6069,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds3", 9) == 0)
                 {
 {
-return dev_storage + 513;
+return dev_storage + 494;
 
 }
                 }
@@ -6110,7 +6084,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr3", 9) == 0)
                 {
 {
-return dev_storage + 497;
+return dev_storage + 479;
 
 }
                 }
@@ -6125,7 +6099,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq3", 9) == 0)
                 {
 {
-return dev_storage + 481;
+return dev_storage + 464;
 
 }
                 }
@@ -6140,7 +6114,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp3", 9) == 0)
                 {
 {
-return dev_storage + 465;
+return dev_storage + 449;
 
 }
                 }
@@ -6155,7 +6129,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo3", 9) == 0)
                 {
 {
-return dev_storage + 449;
+return dev_storage + 434;
 
 }
                 }
@@ -6170,7 +6144,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn3", 9) == 0)
                 {
 {
-return dev_storage + 433;
+return dev_storage + 419;
 
 }
                 }
@@ -6188,7 +6162,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm3", 9) == 0)
                     {
 {
-return dev_storage + 417;
+return dev_storage + 404;
 
 }
                     }
@@ -6224,7 +6198,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl3", 9) == 0)
                 {
 {
-return dev_storage + 401;
+return dev_storage + 389;
 
 }
                 }
@@ -6239,7 +6213,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk3", 9) == 0)
                 {
 {
-return dev_storage + 385;
+return dev_storage + 374;
 
 }
                 }
@@ -6254,7 +6228,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj3", 9) == 0)
                 {
 {
-return dev_storage + 369;
+return dev_storage + 359;
 
 }
                 }
@@ -6269,7 +6243,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi3", 9) == 0)
                 {
 {
-return dev_storage + 353;
+return dev_storage + 344;
 
 }
                 }
@@ -6284,7 +6258,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh3", 9) == 0)
                 {
 {
-return dev_storage + 337;
+return dev_storage + 329;
 
 }
                 }
@@ -6299,7 +6273,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg3", 9) == 0)
                 {
 {
-return dev_storage + 321;
+return dev_storage + 314;
 
 }
                 }
@@ -6314,7 +6288,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf3", 9) == 0)
                 {
 {
-return dev_storage + 305;
+return dev_storage + 299;
 
 }
                 }
@@ -6329,7 +6303,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde3", 9) == 0)
                 {
 {
-return dev_storage + 289;
+return dev_storage + 284;
 
 }
                 }
@@ -6347,7 +6321,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd3", 9) == 0)
                     {
 {
-return dev_storage + 273;
+return dev_storage + 269;
 
 }
                     }
@@ -6383,7 +6357,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc3", 9) == 0)
                 {
 {
-return dev_storage + 257;
+return dev_storage + 254;
 
 }
                 }
@@ -6398,7 +6372,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb3", 9) == 0)
                 {
 {
-return dev_storage + 241;
+return dev_storage + 239;
 
 }
                 }
@@ -6413,7 +6387,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda3", 9) == 0)
                 {
 {
-return dev_storage + 225;
+return dev_storage + 224;
 
 }
                 }
@@ -6428,7 +6402,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st93", 9) == 0)
                 {
 {
-return dev_storage + 747;
+return dev_storage + 721;
 
 }
                 }
@@ -6443,7 +6417,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st83", 9) == 0)
                 {
 {
-return dev_storage + 737;
+return dev_storage + 711;
 
 }
                 }
@@ -6458,7 +6432,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st73", 9) == 0)
                 {
 {
-return dev_storage + 727;
+return dev_storage + 701;
 
 }
                 }
@@ -6473,7 +6447,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st63", 9) == 0)
                 {
 {
-return dev_storage + 717;
+return dev_storage + 691;
 
 }
                 }
@@ -6488,7 +6462,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st53", 9) == 0)
                 {
 {
-return dev_storage + 707;
+return dev_storage + 681;
 
 }
                 }
@@ -6503,7 +6477,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st43", 9) == 0)
                 {
 {
-return dev_storage + 697;
+return dev_storage + 671;
 
 }
                 }
@@ -6518,7 +6492,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st33", 9) == 0)
                 {
 {
-return dev_storage + 687;
+return dev_storage + 661;
 
 }
                 }
@@ -6533,7 +6507,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st23", 9) == 0)
                 {
 {
-return dev_storage + 677;
+return dev_storage + 651;
 
 }
                 }
@@ -6551,7 +6525,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st13", 9) == 0)
                     {
 {
-return dev_storage + 667;
+return dev_storage + 641;
 
 }
                     }
@@ -6566,7 +6540,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sr13", 9) == 0)
                     {
 {
-return dev_storage + 651;
+return dev_storage + 625;
 
 }
                     }
@@ -6611,7 +6585,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz2", 9) == 0)
                 {
 {
-return dev_storage + 624;
+return dev_storage + 598;
 
 }
                 }
@@ -6629,7 +6603,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty2", 9) == 0)
                     {
 {
-return dev_storage + 785;
+return dev_storage + 759;
 
 }
                     }
@@ -6644,7 +6618,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdy2", 9) == 0)
                     {
 {
-return dev_storage + 608;
+return dev_storage + 583;
 
 }
                     }
@@ -6665,7 +6639,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx2", 9) == 0)
                 {
 {
-return dev_storage + 592;
+return dev_storage + 568;
 
 }
                 }
@@ -6680,7 +6654,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw2", 9) == 0)
                 {
 {
-return dev_storage + 576;
+return dev_storage + 553;
 
 }
                 }
@@ -6695,7 +6669,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv2", 9) == 0)
                 {
 {
-return dev_storage + 560;
+return dev_storage + 538;
 
 }
                 }
@@ -6710,7 +6684,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu2", 9) == 0)
                 {
 {
-return dev_storage + 544;
+return dev_storage + 523;
 
 }
                 }
@@ -6728,7 +6702,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdt2", 9) == 0)
                     {
 {
-return dev_storage + 528;
+return dev_storage + 508;
 
 }
                     }
@@ -6764,7 +6738,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds2", 9) == 0)
                 {
 {
-return dev_storage + 512;
+return dev_storage + 493;
 
 }
                 }
@@ -6779,7 +6753,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr2", 9) == 0)
                 {
 {
-return dev_storage + 496;
+return dev_storage + 478;
 
 }
                 }
@@ -6794,7 +6768,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq2", 9) == 0)
                 {
 {
-return dev_storage + 480;
+return dev_storage + 463;
 
 }
                 }
@@ -6809,7 +6783,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp2", 9) == 0)
                 {
 {
-return dev_storage + 464;
+return dev_storage + 448;
 
 }
                 }
@@ -6824,7 +6798,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo2", 9) == 0)
                 {
 {
-return dev_storage + 448;
+return dev_storage + 433;
 
 }
                 }
@@ -6839,7 +6813,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn2", 9) == 0)
                 {
 {
-return dev_storage + 432;
+return dev_storage + 418;
 
 }
                 }
@@ -6857,7 +6831,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm2", 9) == 0)
                     {
 {
-return dev_storage + 416;
+return dev_storage + 403;
 
 }
                     }
@@ -6893,7 +6867,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl2", 9) == 0)
                 {
 {
-return dev_storage + 400;
+return dev_storage + 388;
 
 }
                 }
@@ -6908,7 +6882,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk2", 9) == 0)
                 {
 {
-return dev_storage + 384;
+return dev_storage + 373;
 
 }
                 }
@@ -6923,7 +6897,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj2", 9) == 0)
                 {
 {
-return dev_storage + 368;
+return dev_storage + 358;
 
 }
                 }
@@ -6938,7 +6912,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi2", 9) == 0)
                 {
 {
-return dev_storage + 352;
+return dev_storage + 343;
 
 }
                 }
@@ -6953,7 +6927,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh2", 9) == 0)
                 {
 {
-return dev_storage + 336;
+return dev_storage + 328;
 
 }
                 }
@@ -6968,7 +6942,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg2", 9) == 0)
                 {
 {
-return dev_storage + 320;
+return dev_storage + 313;
 
 }
                 }
@@ -6983,7 +6957,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf2", 9) == 0)
                 {
 {
-return dev_storage + 304;
+return dev_storage + 298;
 
 }
                 }
@@ -6998,7 +6972,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde2", 9) == 0)
                 {
 {
-return dev_storage + 288;
+return dev_storage + 283;
 
 }
                 }
@@ -7016,7 +6990,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd2", 9) == 0)
                     {
 {
-return dev_storage + 272;
+return dev_storage + 268;
 
 }
                     }
@@ -7052,7 +7026,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc2", 9) == 0)
                 {
 {
-return dev_storage + 256;
+return dev_storage + 253;
 
 }
                 }
@@ -7067,7 +7041,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb2", 9) == 0)
                 {
 {
-return dev_storage + 240;
+return dev_storage + 238;
 
 }
                 }
@@ -7082,7 +7056,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda2", 9) == 0)
                 {
 {
-return dev_storage + 224;
+return dev_storage + 223;
 
 }
                 }
@@ -7097,7 +7071,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st92", 9) == 0)
                 {
 {
-return dev_storage + 746;
+return dev_storage + 720;
 
 }
                 }
@@ -7112,7 +7086,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st82", 9) == 0)
                 {
 {
-return dev_storage + 736;
+return dev_storage + 710;
 
 }
                 }
@@ -7127,7 +7101,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st72", 9) == 0)
                 {
 {
-return dev_storage + 726;
+return dev_storage + 700;
 
 }
                 }
@@ -7142,7 +7116,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st62", 9) == 0)
                 {
 {
-return dev_storage + 716;
+return dev_storage + 690;
 
 }
                 }
@@ -7157,7 +7131,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st52", 9) == 0)
                 {
 {
-return dev_storage + 706;
+return dev_storage + 680;
 
 }
                 }
@@ -7172,7 +7146,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st42", 9) == 0)
                 {
 {
-return dev_storage + 696;
+return dev_storage + 670;
 
 }
                 }
@@ -7187,7 +7161,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st32", 9) == 0)
                 {
 {
-return dev_storage + 686;
+return dev_storage + 660;
 
 }
                 }
@@ -7202,7 +7176,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st22", 9) == 0)
                 {
 {
-return dev_storage + 676;
+return dev_storage + 650;
 
 }
                 }
@@ -7220,7 +7194,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st12", 9) == 0)
                     {
 {
-return dev_storage + 666;
+return dev_storage + 640;
 
 }
                     }
@@ -7235,7 +7209,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sr12", 9) == 0)
                     {
 {
-return dev_storage + 650;
+return dev_storage + 624;
 
 }
                     }
@@ -7280,7 +7254,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz1", 9) == 0)
                 {
 {
-return dev_storage + 623;
+return dev_storage + 597;
 
 }
                 }
@@ -7298,7 +7272,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty1", 9) == 0)
                     {
 {
-return dev_storage + 784;
+return dev_storage + 758;
 
 }
                     }
@@ -7313,7 +7287,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdy1", 9) == 0)
                     {
 {
-return dev_storage + 607;
+return dev_storage + 582;
 
 }
                     }
@@ -7334,7 +7308,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx1", 9) == 0)
                 {
 {
-return dev_storage + 591;
+return dev_storage + 567;
 
 }
                 }
@@ -7349,7 +7323,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw1", 9) == 0)
                 {
 {
-return dev_storage + 575;
+return dev_storage + 552;
 
 }
                 }
@@ -7364,7 +7338,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv1", 9) == 0)
                 {
 {
-return dev_storage + 559;
+return dev_storage + 537;
 
 }
                 }
@@ -7379,7 +7353,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu1", 9) == 0)
                 {
 {
-return dev_storage + 543;
+return dev_storage + 522;
 
 }
                 }
@@ -7397,7 +7371,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdt1", 9) == 0)
                     {
 {
-return dev_storage + 527;
+return dev_storage + 507;
 
 }
                     }
@@ -7433,7 +7407,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds1", 9) == 0)
                 {
 {
-return dev_storage + 511;
+return dev_storage + 492;
 
 }
                 }
@@ -7448,7 +7422,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr1", 9) == 0)
                 {
 {
-return dev_storage + 495;
+return dev_storage + 477;
 
 }
                 }
@@ -7463,7 +7437,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq1", 9) == 0)
                 {
 {
-return dev_storage + 479;
+return dev_storage + 462;
 
 }
                 }
@@ -7478,7 +7452,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp1", 9) == 0)
                 {
 {
-return dev_storage + 463;
+return dev_storage + 447;
 
 }
                 }
@@ -7493,7 +7467,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo1", 9) == 0)
                 {
 {
-return dev_storage + 447;
+return dev_storage + 432;
 
 }
                 }
@@ -7508,7 +7482,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn1", 9) == 0)
                 {
 {
-return dev_storage + 431;
+return dev_storage + 417;
 
 }
                 }
@@ -7526,7 +7500,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm1", 9) == 0)
                     {
 {
-return dev_storage + 415;
+return dev_storage + 402;
 
 }
                     }
@@ -7562,7 +7536,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl1", 9) == 0)
                 {
 {
-return dev_storage + 399;
+return dev_storage + 387;
 
 }
                 }
@@ -7577,7 +7551,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk1", 9) == 0)
                 {
 {
-return dev_storage + 383;
+return dev_storage + 372;
 
 }
                 }
@@ -7592,7 +7566,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj1", 9) == 0)
                 {
 {
-return dev_storage + 367;
+return dev_storage + 357;
 
 }
                 }
@@ -7607,7 +7581,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi1", 9) == 0)
                 {
 {
-return dev_storage + 351;
+return dev_storage + 342;
 
 }
                 }
@@ -7622,7 +7596,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh1", 9) == 0)
                 {
 {
-return dev_storage + 335;
+return dev_storage + 327;
 
 }
                 }
@@ -7637,7 +7611,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg1", 9) == 0)
                 {
 {
-return dev_storage + 319;
+return dev_storage + 312;
 
 }
                 }
@@ -7652,7 +7626,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf1", 9) == 0)
                 {
 {
-return dev_storage + 303;
+return dev_storage + 297;
 
 }
                 }
@@ -7667,7 +7641,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde1", 9) == 0)
                 {
 {
-return dev_storage + 287;
+return dev_storage + 282;
 
 }
                 }
@@ -7685,7 +7659,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd1", 9) == 0)
                     {
 {
-return dev_storage + 271;
+return dev_storage + 267;
 
 }
                     }
@@ -7721,7 +7695,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc1", 9) == 0)
                 {
 {
-return dev_storage + 255;
+return dev_storage + 252;
 
 }
                 }
@@ -7736,7 +7710,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb1", 9) == 0)
                 {
 {
-return dev_storage + 239;
+return dev_storage + 237;
 
 }
                 }
@@ -7751,7 +7725,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda1", 9) == 0)
                 {
 {
-return dev_storage + 223;
+return dev_storage + 222;
 
 }
                 }
@@ -7766,7 +7740,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st91", 9) == 0)
                 {
 {
-return dev_storage + 745;
+return dev_storage + 719;
 
 }
                 }
@@ -7781,7 +7755,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st81", 9) == 0)
                 {
 {
-return dev_storage + 735;
+return dev_storage + 709;
 
 }
                 }
@@ -7796,7 +7770,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st71", 9) == 0)
                 {
 {
-return dev_storage + 725;
+return dev_storage + 699;
 
 }
                 }
@@ -7811,7 +7785,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st61", 9) == 0)
                 {
 {
-return dev_storage + 715;
+return dev_storage + 689;
 
 }
                 }
@@ -7826,7 +7800,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st51", 9) == 0)
                 {
 {
-return dev_storage + 705;
+return dev_storage + 679;
 
 }
                 }
@@ -7841,7 +7815,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st41", 9) == 0)
                 {
 {
-return dev_storage + 695;
+return dev_storage + 669;
 
 }
                 }
@@ -7856,7 +7830,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st31", 9) == 0)
                 {
 {
-return dev_storage + 685;
+return dev_storage + 659;
 
 }
                 }
@@ -7871,7 +7845,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st21", 9) == 0)
                 {
 {
-return dev_storage + 675;
+return dev_storage + 649;
 
 }
                 }
@@ -7889,7 +7863,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st11", 9) == 0)
                     {
 {
-return dev_storage + 665;
+return dev_storage + 639;
 
 }
                     }
@@ -7904,7 +7878,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sr11", 9) == 0)
                     {
 {
-return dev_storage + 649;
+return dev_storage + 623;
 
 }
                     }
@@ -7945,110 +7919,11 @@ return	NULL;
         case '0':
           switch (KR_keyword [7])
             {
-            case 'z':
-              if (strncmp (KR_keyword, "/dev/sdz0", 9) == 0)
-                {
-{
-return dev_storage + 622;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
             case 'y':
-              switch (KR_keyword [5])
-                {
-                case 't':
-                  if (strncmp (KR_keyword, "/dev/tty0", 9) == 0)
-                    {
-{
-return dev_storage + 783;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                case 's':
-                  if (strncmp (KR_keyword, "/dev/sdy0", 9) == 0)
-                    {
-{
-return dev_storage + 606;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                default:
-{
-return	NULL;
-
-}
-                }
-            case 'x':
-              if (strncmp (KR_keyword, "/dev/sdx0", 9) == 0)
+              if (strncmp (KR_keyword, "/dev/tty0", 9) == 0)
                 {
 {
-return dev_storage + 590;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'w':
-              if (strncmp (KR_keyword, "/dev/sdw0", 9) == 0)
-                {
-{
-return dev_storage + 574;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'v':
-              if (strncmp (KR_keyword, "/dev/sdv0", 9) == 0)
-                {
-{
-return dev_storage + 558;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'u':
-              if (strncmp (KR_keyword, "/dev/sdu0", 9) == 0)
-                {
-{
-return dev_storage + 542;
+return dev_storage + 757;
 
 }
                 }
@@ -8060,124 +7935,10 @@ return	NULL;
 }
                 }
             case 't':
-              switch (KR_keyword [5])
+              if (strncmp (KR_keyword, "/dev/nst0", 9) == 0)
                 {
-                case 's':
-                  if (strncmp (KR_keyword, "/dev/sdt0", 9) == 0)
-                    {
-{
-return dev_storage + 526;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                case 'n':
-                  if (strncmp (KR_keyword, "/dev/nst0", 9) == 0)
-                    {
 {
 return dev_storage + 47;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                default:
-{
-return	NULL;
-
-}
-                }
-            case 's':
-              if (strncmp (KR_keyword, "/dev/sds0", 9) == 0)
-                {
-{
-return dev_storage + 510;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'r':
-              if (strncmp (KR_keyword, "/dev/sdr0", 9) == 0)
-                {
-{
-return dev_storage + 494;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'q':
-              if (strncmp (KR_keyword, "/dev/sdq0", 9) == 0)
-                {
-{
-return dev_storage + 478;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'p':
-              if (strncmp (KR_keyword, "/dev/sdp0", 9) == 0)
-                {
-{
-return dev_storage + 462;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'o':
-              if (strncmp (KR_keyword, "/dev/sdo0", 9) == 0)
-                {
-{
-return dev_storage + 446;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'n':
-              if (strncmp (KR_keyword, "/dev/sdn0", 9) == 0)
-                {
-{
-return dev_storage + 430;
 
 }
                 }
@@ -8189,154 +7950,10 @@ return	NULL;
 }
                 }
             case 'm':
-              switch (KR_keyword [5])
+              if (strncmp (KR_keyword, "/dev/com0", 9) == 0)
                 {
-                case 's':
-                  if (strncmp (KR_keyword, "/dev/sdm0", 9) == 0)
-                    {
-{
-return dev_storage + 414;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                case 'c':
-                  if (strncmp (KR_keyword, "/dev/com0", 9) == 0)
-                    {
 {
 return dev_storage + 1;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                default:
-{
-return	NULL;
-
-}
-                }
-            case 'l':
-              if (strncmp (KR_keyword, "/dev/sdl0", 9) == 0)
-                {
-{
-return dev_storage + 398;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'k':
-              if (strncmp (KR_keyword, "/dev/sdk0", 9) == 0)
-                {
-{
-return dev_storage + 382;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'j':
-              if (strncmp (KR_keyword, "/dev/sdj0", 9) == 0)
-                {
-{
-return dev_storage + 366;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'i':
-              if (strncmp (KR_keyword, "/dev/sdi0", 9) == 0)
-                {
-{
-return dev_storage + 350;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'h':
-              if (strncmp (KR_keyword, "/dev/sdh0", 9) == 0)
-                {
-{
-return dev_storage + 334;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'g':
-              if (strncmp (KR_keyword, "/dev/sdg0", 9) == 0)
-                {
-{
-return dev_storage + 318;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'f':
-              if (strncmp (KR_keyword, "/dev/sdf0", 9) == 0)
-                {
-{
-return dev_storage + 302;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'e':
-              if (strncmp (KR_keyword, "/dev/sde0", 9) == 0)
-                {
-{
-return dev_storage + 286;
 
 }
                 }
@@ -8348,79 +7965,10 @@ return	NULL;
 }
                 }
             case 'd':
-              switch (KR_keyword [6])
+              if (strncmp (KR_keyword, "/dev/scd0", 9) == 0)
                 {
-                case 'd':
-                  if (strncmp (KR_keyword, "/dev/sdd0", 9) == 0)
-                    {
-{
-return dev_storage + 270;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                case 'c':
-                  if (strncmp (KR_keyword, "/dev/scd0", 9) == 0)
-                    {
 {
 return dev_storage + 180;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                default:
-{
-return	NULL;
-
-}
-                }
-            case 'c':
-              if (strncmp (KR_keyword, "/dev/sdc0", 9) == 0)
-                {
-{
-return dev_storage + 254;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'b':
-              if (strncmp (KR_keyword, "/dev/sdb0", 9) == 0)
-                {
-{
-return dev_storage + 238;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'a':
-              if (strncmp (KR_keyword, "/dev/sda0", 9) == 0)
-                {
-{
-return dev_storage + 222;
 
 }
                 }
@@ -8435,7 +7983,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st90", 9) == 0)
                 {
 {
-return dev_storage + 744;
+return dev_storage + 718;
 
 }
                 }
@@ -8450,7 +7998,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st80", 9) == 0)
                 {
 {
-return dev_storage + 734;
+return dev_storage + 708;
 
 }
                 }
@@ -8465,7 +8013,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st70", 9) == 0)
                 {
 {
-return dev_storage + 724;
+return dev_storage + 698;
 
 }
                 }
@@ -8480,7 +8028,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st60", 9) == 0)
                 {
 {
-return dev_storage + 714;
+return dev_storage + 688;
 
 }
                 }
@@ -8495,7 +8043,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st50", 9) == 0)
                 {
 {
-return dev_storage + 704;
+return dev_storage + 678;
 
 }
                 }
@@ -8510,7 +8058,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st40", 9) == 0)
                 {
 {
-return dev_storage + 694;
+return dev_storage + 668;
 
 }
                 }
@@ -8525,7 +8073,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st30", 9) == 0)
                 {
 {
-return dev_storage + 684;
+return dev_storage + 658;
 
 }
                 }
@@ -8540,7 +8088,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st20", 9) == 0)
                 {
 {
-return dev_storage + 674;
+return dev_storage + 648;
 
 }
                 }
@@ -8558,7 +8106,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st10", 9) == 0)
                     {
 {
-return dev_storage + 664;
+return dev_storage + 638;
 
 }
                     }
@@ -8573,7 +8121,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sr10", 9) == 0)
                     {
 {
-return dev_storage + 648;
+return dev_storage + 622;
 
 }
                     }
@@ -8642,7 +8190,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/ttyS9", 10) == 0)
                 {
 {
-return dev_storage + 856;
+return dev_storage + 830;
 
 }
                 }
@@ -8720,7 +8268,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty59", 10) == 0)
                     {
 {
-return dev_storage + 842;
+return dev_storage + 816;
 
 }
                     }
@@ -8759,7 +8307,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty49", 10) == 0)
                     {
 {
-return dev_storage + 832;
+return dev_storage + 806;
 
 }
                     }
@@ -8798,7 +8346,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty39", 10) == 0)
                     {
 {
-return dev_storage + 822;
+return dev_storage + 796;
 
 }
                     }
@@ -8837,7 +8385,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty29", 10) == 0)
                     {
 {
-return dev_storage + 812;
+return dev_storage + 786;
 
 }
                     }
@@ -8876,7 +8424,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty19", 10) == 0)
                     {
 {
-return dev_storage + 802;
+return dev_storage + 776;
 
 }
                     }
@@ -8891,7 +8439,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st119", 10) == 0)
                     {
 {
-return dev_storage + 773;
+return dev_storage + 747;
 
 }
                     }
@@ -8927,7 +8475,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st109", 10) == 0)
                 {
 {
-return dev_storage + 763;
+return dev_storage + 737;
 
 }
                 }
@@ -8951,7 +8499,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/ttyS8", 10) == 0)
                 {
 {
-return dev_storage + 855;
+return dev_storage + 829;
 
 }
                 }
@@ -9029,7 +8577,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty58", 10) == 0)
                     {
 {
-return dev_storage + 841;
+return dev_storage + 815;
 
 }
                     }
@@ -9068,7 +8616,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty48", 10) == 0)
                     {
 {
-return dev_storage + 831;
+return dev_storage + 805;
 
 }
                     }
@@ -9107,7 +8655,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty38", 10) == 0)
                     {
 {
-return dev_storage + 821;
+return dev_storage + 795;
 
 }
                     }
@@ -9146,7 +8694,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty28", 10) == 0)
                     {
 {
-return dev_storage + 811;
+return dev_storage + 785;
 
 }
                     }
@@ -9185,7 +8733,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty18", 10) == 0)
                     {
 {
-return dev_storage + 801;
+return dev_storage + 775;
 
 }
                     }
@@ -9200,7 +8748,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st118", 10) == 0)
                     {
 {
-return dev_storage + 772;
+return dev_storage + 746;
 
 }
                     }
@@ -9236,7 +8784,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st108", 10) == 0)
                 {
 {
-return dev_storage + 762;
+return dev_storage + 736;
 
 }
                 }
@@ -9260,7 +8808,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/ttyS7", 10) == 0)
                 {
 {
-return dev_storage + 854;
+return dev_storage + 828;
 
 }
                 }
@@ -9338,7 +8886,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty57", 10) == 0)
                     {
 {
-return dev_storage + 840;
+return dev_storage + 814;
 
 }
                     }
@@ -9377,7 +8925,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty47", 10) == 0)
                     {
 {
-return dev_storage + 830;
+return dev_storage + 804;
 
 }
                     }
@@ -9416,7 +8964,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty37", 10) == 0)
                     {
 {
-return dev_storage + 820;
+return dev_storage + 794;
 
 }
                     }
@@ -9455,7 +9003,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty27", 10) == 0)
                     {
 {
-return dev_storage + 810;
+return dev_storage + 784;
 
 }
                     }
@@ -9470,7 +9018,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st127", 10) == 0)
                     {
 {
-return dev_storage + 781;
+return dev_storage + 755;
 
 }
                     }
@@ -9509,7 +9057,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty17", 10) == 0)
                     {
 {
-return dev_storage + 800;
+return dev_storage + 774;
 
 }
                     }
@@ -9524,7 +9072,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st117", 10) == 0)
                     {
 {
-return dev_storage + 771;
+return dev_storage + 745;
 
 }
                     }
@@ -9560,7 +9108,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st107", 10) == 0)
                 {
 {
-return dev_storage + 761;
+return dev_storage + 735;
 
 }
                 }
@@ -9584,7 +9132,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/ttyS6", 10) == 0)
                 {
 {
-return dev_storage + 853;
+return dev_storage + 827;
 
 }
                 }
@@ -9662,7 +9210,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty56", 10) == 0)
                     {
 {
-return dev_storage + 839;
+return dev_storage + 813;
 
 }
                     }
@@ -9701,7 +9249,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty46", 10) == 0)
                     {
 {
-return dev_storage + 829;
+return dev_storage + 803;
 
 }
                     }
@@ -9740,7 +9288,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty36", 10) == 0)
                     {
 {
-return dev_storage + 819;
+return dev_storage + 793;
 
 }
                     }
@@ -9779,7 +9327,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty26", 10) == 0)
                     {
 {
-return dev_storage + 809;
+return dev_storage + 783;
 
 }
                     }
@@ -9794,7 +9342,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st126", 10) == 0)
                     {
 {
-return dev_storage + 780;
+return dev_storage + 754;
 
 }
                     }
@@ -9833,7 +9381,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty16", 10) == 0)
                     {
 {
-return dev_storage + 799;
+return dev_storage + 773;
 
 }
                     }
@@ -9848,7 +9396,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st116", 10) == 0)
                     {
 {
-return dev_storage + 770;
+return dev_storage + 744;
 
 }
                     }
@@ -9899,7 +9447,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/st106", 10) == 0)
                 {
 {
-return dev_storage + 760;
+return dev_storage + 734;
 
 }
                 }
@@ -9923,7 +9471,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz15", 10) == 0)
                 {
 {
-return dev_storage + 637;
+return dev_storage + 611;
 
 }
                 }
@@ -9941,7 +9489,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS5", 10) == 0)
                     {
 {
-return dev_storage + 852;
+return dev_storage + 826;
 
 }
                     }
@@ -9956,7 +9504,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty55", 10) == 0)
                     {
 {
-return dev_storage + 838;
+return dev_storage + 812;
 
 }
                     }
@@ -9971,7 +9519,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty45", 10) == 0)
                     {
 {
-return dev_storage + 828;
+return dev_storage + 802;
 
 }
                     }
@@ -9986,7 +9534,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty35", 10) == 0)
                     {
 {
-return dev_storage + 818;
+return dev_storage + 792;
 
 }
                     }
@@ -10001,7 +9549,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty25", 10) == 0)
                     {
 {
-return dev_storage + 808;
+return dev_storage + 782;
 
 }
                     }
@@ -10019,7 +9567,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/tty15", 10) == 0)
                         {
 {
-return dev_storage + 798;
+return dev_storage + 772;
 
 }
                         }
@@ -10034,7 +9582,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdy15", 10) == 0)
                         {
 {
-return dev_storage + 621;
+return dev_storage + 596;
 
 }
                         }
@@ -10061,7 +9609,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx15", 10) == 0)
                 {
 {
-return dev_storage + 605;
+return dev_storage + 581;
 
 }
                 }
@@ -10076,7 +9624,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw15", 10) == 0)
                 {
 {
-return dev_storage + 589;
+return dev_storage + 566;
 
 }
                 }
@@ -10091,7 +9639,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv15", 10) == 0)
                 {
 {
-return dev_storage + 573;
+return dev_storage + 551;
 
 }
                 }
@@ -10106,7 +9654,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu15", 10) == 0)
                 {
 {
-return dev_storage + 557;
+return dev_storage + 536;
 
 }
                 }
@@ -10247,7 +9795,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdt15", 10) == 0)
                         {
 {
-return dev_storage + 541;
+return dev_storage + 521;
 
 }
                         }
@@ -10289,7 +9837,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds15", 10) == 0)
                 {
 {
-return dev_storage + 525;
+return dev_storage + 506;
 
 }
                 }
@@ -10304,7 +9852,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr15", 10) == 0)
                 {
 {
-return dev_storage + 509;
+return dev_storage + 491;
 
 }
                 }
@@ -10319,7 +9867,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq15", 10) == 0)
                 {
 {
-return dev_storage + 493;
+return dev_storage + 476;
 
 }
                 }
@@ -10334,7 +9882,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp15", 10) == 0)
                 {
 {
-return dev_storage + 477;
+return dev_storage + 461;
 
 }
                 }
@@ -10349,7 +9897,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo15", 10) == 0)
                 {
 {
-return dev_storage + 461;
+return dev_storage + 446;
 
 }
                 }
@@ -10364,7 +9912,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn15", 10) == 0)
                 {
 {
-return dev_storage + 445;
+return dev_storage + 431;
 
 }
                 }
@@ -10382,7 +9930,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm15", 10) == 0)
                     {
 {
-return dev_storage + 429;
+return dev_storage + 416;
 
 }
                     }
@@ -10418,7 +9966,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl15", 10) == 0)
                 {
 {
-return dev_storage + 413;
+return dev_storage + 401;
 
 }
                 }
@@ -10433,7 +9981,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk15", 10) == 0)
                 {
 {
-return dev_storage + 397;
+return dev_storage + 386;
 
 }
                 }
@@ -10448,7 +9996,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj15", 10) == 0)
                 {
 {
-return dev_storage + 381;
+return dev_storage + 371;
 
 }
                 }
@@ -10463,7 +10011,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi15", 10) == 0)
                 {
 {
-return dev_storage + 365;
+return dev_storage + 356;
 
 }
                 }
@@ -10478,7 +10026,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh15", 10) == 0)
                 {
 {
-return dev_storage + 349;
+return dev_storage + 341;
 
 }
                 }
@@ -10493,7 +10041,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg15", 10) == 0)
                 {
 {
-return dev_storage + 333;
+return dev_storage + 326;
 
 }
                 }
@@ -10508,7 +10056,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf15", 10) == 0)
                 {
 {
-return dev_storage + 317;
+return dev_storage + 311;
 
 }
                 }
@@ -10523,7 +10071,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde15", 10) == 0)
                 {
 {
-return dev_storage + 301;
+return dev_storage + 296;
 
 }
                 }
@@ -10541,7 +10089,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd15", 10) == 0)
                     {
 {
-return dev_storage + 285;
+return dev_storage + 281;
 
 }
                     }
@@ -10577,7 +10125,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc15", 10) == 0)
                 {
 {
-return dev_storage + 269;
+return dev_storage + 266;
 
 }
                 }
@@ -10592,7 +10140,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb15", 10) == 0)
                 {
 {
-return dev_storage + 253;
+return dev_storage + 251;
 
 }
                 }
@@ -10607,7 +10155,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda15", 10) == 0)
                 {
 {
-return dev_storage + 237;
+return dev_storage + 236;
 
 }
                 }
@@ -10625,7 +10173,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st125", 10) == 0)
                     {
 {
-return dev_storage + 779;
+return dev_storage + 753;
 
 }
                     }
@@ -10640,7 +10188,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st115", 10) == 0)
                     {
 {
-return dev_storage + 769;
+return dev_storage + 743;
 
 }
                     }
@@ -10655,7 +10203,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st105", 10) == 0)
                     {
 {
-return dev_storage + 759;
+return dev_storage + 733;
 
 }
                     }
@@ -10685,7 +10233,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz14", 10) == 0)
                 {
 {
-return dev_storage + 636;
+return dev_storage + 610;
 
 }
                 }
@@ -10703,7 +10251,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS4", 10) == 0)
                     {
 {
-return dev_storage + 851;
+return dev_storage + 825;
 
 }
                     }
@@ -10718,7 +10266,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty54", 10) == 0)
                     {
 {
-return dev_storage + 837;
+return dev_storage + 811;
 
 }
                     }
@@ -10733,7 +10281,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty44", 10) == 0)
                     {
 {
-return dev_storage + 827;
+return dev_storage + 801;
 
 }
                     }
@@ -10748,7 +10296,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty34", 10) == 0)
                     {
 {
-return dev_storage + 817;
+return dev_storage + 791;
 
 }
                     }
@@ -10763,7 +10311,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty24", 10) == 0)
                     {
 {
-return dev_storage + 807;
+return dev_storage + 781;
 
 }
                     }
@@ -10781,7 +10329,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/tty14", 10) == 0)
                         {
 {
-return dev_storage + 797;
+return dev_storage + 771;
 
 }
                         }
@@ -10796,7 +10344,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdy14", 10) == 0)
                         {
 {
-return dev_storage + 620;
+return dev_storage + 595;
 
 }
                         }
@@ -10823,7 +10371,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx14", 10) == 0)
                 {
 {
-return dev_storage + 604;
+return dev_storage + 580;
 
 }
                 }
@@ -10838,7 +10386,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw14", 10) == 0)
                 {
 {
-return dev_storage + 588;
+return dev_storage + 565;
 
 }
                 }
@@ -10853,7 +10401,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv14", 10) == 0)
                 {
 {
-return dev_storage + 572;
+return dev_storage + 550;
 
 }
                 }
@@ -10868,7 +10416,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu14", 10) == 0)
                 {
 {
-return dev_storage + 556;
+return dev_storage + 535;
 
 }
                 }
@@ -11009,7 +10557,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdt14", 10) == 0)
                         {
 {
-return dev_storage + 540;
+return dev_storage + 520;
 
 }
                         }
@@ -11051,7 +10599,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds14", 10) == 0)
                 {
 {
-return dev_storage + 524;
+return dev_storage + 505;
 
 }
                 }
@@ -11066,7 +10614,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr14", 10) == 0)
                 {
 {
-return dev_storage + 508;
+return dev_storage + 490;
 
 }
                 }
@@ -11081,7 +10629,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq14", 10) == 0)
                 {
 {
-return dev_storage + 492;
+return dev_storage + 475;
 
 }
                 }
@@ -11096,7 +10644,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp14", 10) == 0)
                 {
 {
-return dev_storage + 476;
+return dev_storage + 460;
 
 }
                 }
@@ -11111,7 +10659,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo14", 10) == 0)
                 {
 {
-return dev_storage + 460;
+return dev_storage + 445;
 
 }
                 }
@@ -11126,7 +10674,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn14", 10) == 0)
                 {
 {
-return dev_storage + 444;
+return dev_storage + 430;
 
 }
                 }
@@ -11144,7 +10692,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm14", 10) == 0)
                     {
 {
-return dev_storage + 428;
+return dev_storage + 415;
 
 }
                     }
@@ -11180,7 +10728,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl14", 10) == 0)
                 {
 {
-return dev_storage + 412;
+return dev_storage + 400;
 
 }
                 }
@@ -11195,7 +10743,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk14", 10) == 0)
                 {
 {
-return dev_storage + 396;
+return dev_storage + 385;
 
 }
                 }
@@ -11210,7 +10758,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj14", 10) == 0)
                 {
 {
-return dev_storage + 380;
+return dev_storage + 370;
 
 }
                 }
@@ -11225,7 +10773,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi14", 10) == 0)
                 {
 {
-return dev_storage + 364;
+return dev_storage + 355;
 
 }
                 }
@@ -11240,7 +10788,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh14", 10) == 0)
                 {
 {
-return dev_storage + 348;
+return dev_storage + 340;
 
 }
                 }
@@ -11255,7 +10803,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg14", 10) == 0)
                 {
 {
-return dev_storage + 332;
+return dev_storage + 325;
 
 }
                 }
@@ -11270,7 +10818,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf14", 10) == 0)
                 {
 {
-return dev_storage + 316;
+return dev_storage + 310;
 
 }
                 }
@@ -11285,7 +10833,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde14", 10) == 0)
                 {
 {
-return dev_storage + 300;
+return dev_storage + 295;
 
 }
                 }
@@ -11303,7 +10851,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd14", 10) == 0)
                     {
 {
-return dev_storage + 284;
+return dev_storage + 280;
 
 }
                     }
@@ -11339,7 +10887,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc14", 10) == 0)
                 {
 {
-return dev_storage + 268;
+return dev_storage + 265;
 
 }
                 }
@@ -11354,7 +10902,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb14", 10) == 0)
                 {
 {
-return dev_storage + 252;
+return dev_storage + 250;
 
 }
                 }
@@ -11369,7 +10917,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda14", 10) == 0)
                 {
 {
-return dev_storage + 236;
+return dev_storage + 235;
 
 }
                 }
@@ -11387,7 +10935,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st124", 10) == 0)
                     {
 {
-return dev_storage + 778;
+return dev_storage + 752;
 
 }
                     }
@@ -11402,7 +10950,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st114", 10) == 0)
                     {
 {
-return dev_storage + 768;
+return dev_storage + 742;
 
 }
                     }
@@ -11417,7 +10965,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st104", 10) == 0)
                     {
 {
-return dev_storage + 758;
+return dev_storage + 732;
 
 }
                     }
@@ -11447,7 +10995,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz13", 10) == 0)
                 {
 {
-return dev_storage + 635;
+return dev_storage + 609;
 
 }
                 }
@@ -11465,7 +11013,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS3", 10) == 0)
                     {
 {
-return dev_storage + 850;
+return dev_storage + 824;
 
 }
                     }
@@ -11480,7 +11028,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty63", 10) == 0)
                     {
 {
-return dev_storage + 846;
+return dev_storage + 820;
 
 }
                     }
@@ -11495,7 +11043,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty53", 10) == 0)
                     {
 {
-return dev_storage + 836;
+return dev_storage + 810;
 
 }
                     }
@@ -11510,7 +11058,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty43", 10) == 0)
                     {
 {
-return dev_storage + 826;
+return dev_storage + 800;
 
 }
                     }
@@ -11525,7 +11073,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty33", 10) == 0)
                     {
 {
-return dev_storage + 816;
+return dev_storage + 790;
 
 }
                     }
@@ -11540,7 +11088,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty23", 10) == 0)
                     {
 {
-return dev_storage + 806;
+return dev_storage + 780;
 
 }
                     }
@@ -11558,7 +11106,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/tty13", 10) == 0)
                         {
 {
-return dev_storage + 796;
+return dev_storage + 770;
 
 }
                         }
@@ -11573,7 +11121,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdy13", 10) == 0)
                         {
 {
-return dev_storage + 619;
+return dev_storage + 594;
 
 }
                         }
@@ -11600,7 +11148,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx13", 10) == 0)
                 {
 {
-return dev_storage + 603;
+return dev_storage + 579;
 
 }
                 }
@@ -11615,7 +11163,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw13", 10) == 0)
                 {
 {
-return dev_storage + 587;
+return dev_storage + 564;
 
 }
                 }
@@ -11630,7 +11178,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv13", 10) == 0)
                 {
 {
-return dev_storage + 571;
+return dev_storage + 549;
 
 }
                 }
@@ -11645,7 +11193,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu13", 10) == 0)
                 {
 {
-return dev_storage + 555;
+return dev_storage + 534;
 
 }
                 }
@@ -11786,7 +11334,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdt13", 10) == 0)
                         {
 {
-return dev_storage + 539;
+return dev_storage + 519;
 
 }
                         }
@@ -11828,7 +11376,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds13", 10) == 0)
                 {
 {
-return dev_storage + 523;
+return dev_storage + 504;
 
 }
                 }
@@ -11843,7 +11391,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr13", 10) == 0)
                 {
 {
-return dev_storage + 507;
+return dev_storage + 489;
 
 }
                 }
@@ -11858,7 +11406,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq13", 10) == 0)
                 {
 {
-return dev_storage + 491;
+return dev_storage + 474;
 
 }
                 }
@@ -11873,7 +11421,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp13", 10) == 0)
                 {
 {
-return dev_storage + 475;
+return dev_storage + 459;
 
 }
                 }
@@ -11888,7 +11436,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo13", 10) == 0)
                 {
 {
-return dev_storage + 459;
+return dev_storage + 444;
 
 }
                 }
@@ -11903,7 +11451,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn13", 10) == 0)
                 {
 {
-return dev_storage + 443;
+return dev_storage + 429;
 
 }
                 }
@@ -11921,7 +11469,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm13", 10) == 0)
                     {
 {
-return dev_storage + 427;
+return dev_storage + 414;
 
 }
                     }
@@ -11957,7 +11505,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl13", 10) == 0)
                 {
 {
-return dev_storage + 411;
+return dev_storage + 399;
 
 }
                 }
@@ -11972,7 +11520,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk13", 10) == 0)
                 {
 {
-return dev_storage + 395;
+return dev_storage + 384;
 
 }
                 }
@@ -11987,7 +11535,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj13", 10) == 0)
                 {
 {
-return dev_storage + 379;
+return dev_storage + 369;
 
 }
                 }
@@ -12002,7 +11550,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi13", 10) == 0)
                 {
 {
-return dev_storage + 363;
+return dev_storage + 354;
 
 }
                 }
@@ -12017,7 +11565,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh13", 10) == 0)
                 {
 {
-return dev_storage + 347;
+return dev_storage + 339;
 
 }
                 }
@@ -12032,7 +11580,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg13", 10) == 0)
                 {
 {
-return dev_storage + 331;
+return dev_storage + 324;
 
 }
                 }
@@ -12047,7 +11595,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf13", 10) == 0)
                 {
 {
-return dev_storage + 315;
+return dev_storage + 309;
 
 }
                 }
@@ -12062,7 +11610,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde13", 10) == 0)
                 {
 {
-return dev_storage + 299;
+return dev_storage + 294;
 
 }
                 }
@@ -12080,7 +11628,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd13", 10) == 0)
                     {
 {
-return dev_storage + 283;
+return dev_storage + 279;
 
 }
                     }
@@ -12116,7 +11664,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc13", 10) == 0)
                 {
 {
-return dev_storage + 267;
+return dev_storage + 264;
 
 }
                 }
@@ -12131,7 +11679,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb13", 10) == 0)
                 {
 {
-return dev_storage + 251;
+return dev_storage + 249;
 
 }
                 }
@@ -12146,7 +11694,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda13", 10) == 0)
                 {
 {
-return dev_storage + 235;
+return dev_storage + 234;
 
 }
                 }
@@ -12164,7 +11712,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st123", 10) == 0)
                     {
 {
-return dev_storage + 777;
+return dev_storage + 751;
 
 }
                     }
@@ -12179,7 +11727,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st113", 10) == 0)
                     {
 {
-return dev_storage + 767;
+return dev_storage + 741;
 
 }
                     }
@@ -12194,7 +11742,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st103", 10) == 0)
                     {
 {
-return dev_storage + 757;
+return dev_storage + 731;
 
 }
                     }
@@ -12224,7 +11772,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz12", 10) == 0)
                 {
 {
-return dev_storage + 634;
+return dev_storage + 608;
 
 }
                 }
@@ -12242,7 +11790,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS2", 10) == 0)
                     {
 {
-return dev_storage + 849;
+return dev_storage + 823;
 
 }
                     }
@@ -12257,7 +11805,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty62", 10) == 0)
                     {
 {
-return dev_storage + 845;
+return dev_storage + 819;
 
 }
                     }
@@ -12272,7 +11820,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty52", 10) == 0)
                     {
 {
-return dev_storage + 835;
+return dev_storage + 809;
 
 }
                     }
@@ -12287,7 +11835,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty42", 10) == 0)
                     {
 {
-return dev_storage + 825;
+return dev_storage + 799;
 
 }
                     }
@@ -12302,7 +11850,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty32", 10) == 0)
                     {
 {
-return dev_storage + 815;
+return dev_storage + 789;
 
 }
                     }
@@ -12317,7 +11865,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty22", 10) == 0)
                     {
 {
-return dev_storage + 805;
+return dev_storage + 779;
 
 }
                     }
@@ -12335,7 +11883,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/tty12", 10) == 0)
                         {
 {
-return dev_storage + 795;
+return dev_storage + 769;
 
 }
                         }
@@ -12350,7 +11898,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdy12", 10) == 0)
                         {
 {
-return dev_storage + 618;
+return dev_storage + 593;
 
 }
                         }
@@ -12377,7 +11925,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx12", 10) == 0)
                 {
 {
-return dev_storage + 602;
+return dev_storage + 578;
 
 }
                 }
@@ -12392,7 +11940,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw12", 10) == 0)
                 {
 {
-return dev_storage + 586;
+return dev_storage + 563;
 
 }
                 }
@@ -12407,7 +11955,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv12", 10) == 0)
                 {
 {
-return dev_storage + 570;
+return dev_storage + 548;
 
 }
                 }
@@ -12422,7 +11970,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu12", 10) == 0)
                 {
 {
-return dev_storage + 554;
+return dev_storage + 533;
 
 }
                 }
@@ -12563,7 +12111,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdt12", 10) == 0)
                         {
 {
-return dev_storage + 538;
+return dev_storage + 518;
 
 }
                         }
@@ -12605,7 +12153,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds12", 10) == 0)
                 {
 {
-return dev_storage + 522;
+return dev_storage + 503;
 
 }
                 }
@@ -12620,7 +12168,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr12", 10) == 0)
                 {
 {
-return dev_storage + 506;
+return dev_storage + 488;
 
 }
                 }
@@ -12635,7 +12183,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq12", 10) == 0)
                 {
 {
-return dev_storage + 490;
+return dev_storage + 473;
 
 }
                 }
@@ -12650,7 +12198,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp12", 10) == 0)
                 {
 {
-return dev_storage + 474;
+return dev_storage + 458;
 
 }
                 }
@@ -12665,7 +12213,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo12", 10) == 0)
                 {
 {
-return dev_storage + 458;
+return dev_storage + 443;
 
 }
                 }
@@ -12680,7 +12228,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn12", 10) == 0)
                 {
 {
-return dev_storage + 442;
+return dev_storage + 428;
 
 }
                 }
@@ -12698,7 +12246,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm12", 10) == 0)
                     {
 {
-return dev_storage + 426;
+return dev_storage + 413;
 
 }
                     }
@@ -12734,7 +12282,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl12", 10) == 0)
                 {
 {
-return dev_storage + 410;
+return dev_storage + 398;
 
 }
                 }
@@ -12749,7 +12297,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk12", 10) == 0)
                 {
 {
-return dev_storage + 394;
+return dev_storage + 383;
 
 }
                 }
@@ -12764,7 +12312,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj12", 10) == 0)
                 {
 {
-return dev_storage + 378;
+return dev_storage + 368;
 
 }
                 }
@@ -12779,7 +12327,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi12", 10) == 0)
                 {
 {
-return dev_storage + 362;
+return dev_storage + 353;
 
 }
                 }
@@ -12794,7 +12342,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh12", 10) == 0)
                 {
 {
-return dev_storage + 346;
+return dev_storage + 338;
 
 }
                 }
@@ -12809,7 +12357,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg12", 10) == 0)
                 {
 {
-return dev_storage + 330;
+return dev_storage + 323;
 
 }
                 }
@@ -12824,7 +12372,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf12", 10) == 0)
                 {
 {
-return dev_storage + 314;
+return dev_storage + 308;
 
 }
                 }
@@ -12839,7 +12387,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde12", 10) == 0)
                 {
 {
-return dev_storage + 298;
+return dev_storage + 293;
 
 }
                 }
@@ -12857,7 +12405,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd12", 10) == 0)
                     {
 {
-return dev_storage + 282;
+return dev_storage + 278;
 
 }
                     }
@@ -12893,7 +12441,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc12", 10) == 0)
                 {
 {
-return dev_storage + 266;
+return dev_storage + 263;
 
 }
                 }
@@ -12908,7 +12456,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb12", 10) == 0)
                 {
 {
-return dev_storage + 250;
+return dev_storage + 248;
 
 }
                 }
@@ -12923,7 +12471,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda12", 10) == 0)
                 {
 {
-return dev_storage + 234;
+return dev_storage + 233;
 
 }
                 }
@@ -12941,7 +12489,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st122", 10) == 0)
                     {
 {
-return dev_storage + 776;
+return dev_storage + 750;
 
 }
                     }
@@ -12956,7 +12504,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st112", 10) == 0)
                     {
 {
-return dev_storage + 766;
+return dev_storage + 740;
 
 }
                     }
@@ -12971,7 +12519,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st102", 10) == 0)
                     {
 {
-return dev_storage + 756;
+return dev_storage + 730;
 
 }
                     }
@@ -13001,7 +12549,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz11", 10) == 0)
                 {
 {
-return dev_storage + 633;
+return dev_storage + 607;
 
 }
                 }
@@ -13019,7 +12567,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS1", 10) == 0)
                     {
 {
-return dev_storage + 848;
+return dev_storage + 822;
 
 }
                     }
@@ -13034,7 +12582,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty61", 10) == 0)
                     {
 {
-return dev_storage + 844;
+return dev_storage + 818;
 
 }
                     }
@@ -13049,7 +12597,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty51", 10) == 0)
                     {
 {
-return dev_storage + 834;
+return dev_storage + 808;
 
 }
                     }
@@ -13064,7 +12612,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty41", 10) == 0)
                     {
 {
-return dev_storage + 824;
+return dev_storage + 798;
 
 }
                     }
@@ -13079,7 +12627,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty31", 10) == 0)
                     {
 {
-return dev_storage + 814;
+return dev_storage + 788;
 
 }
                     }
@@ -13094,7 +12642,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty21", 10) == 0)
                     {
 {
-return dev_storage + 804;
+return dev_storage + 778;
 
 }
                     }
@@ -13112,7 +12660,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/tty11", 10) == 0)
                         {
 {
-return dev_storage + 794;
+return dev_storage + 768;
 
 }
                         }
@@ -13127,7 +12675,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdy11", 10) == 0)
                         {
 {
-return dev_storage + 617;
+return dev_storage + 592;
 
 }
                         }
@@ -13154,7 +12702,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx11", 10) == 0)
                 {
 {
-return dev_storage + 601;
+return dev_storage + 577;
 
 }
                 }
@@ -13169,7 +12717,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw11", 10) == 0)
                 {
 {
-return dev_storage + 585;
+return dev_storage + 562;
 
 }
                 }
@@ -13184,7 +12732,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv11", 10) == 0)
                 {
 {
-return dev_storage + 569;
+return dev_storage + 547;
 
 }
                 }
@@ -13199,7 +12747,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu11", 10) == 0)
                 {
 {
-return dev_storage + 553;
+return dev_storage + 532;
 
 }
                 }
@@ -13340,7 +12888,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdt11", 10) == 0)
                         {
 {
-return dev_storage + 537;
+return dev_storage + 517;
 
 }
                         }
@@ -13382,7 +12930,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds11", 10) == 0)
                 {
 {
-return dev_storage + 521;
+return dev_storage + 502;
 
 }
                 }
@@ -13397,7 +12945,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr11", 10) == 0)
                 {
 {
-return dev_storage + 505;
+return dev_storage + 487;
 
 }
                 }
@@ -13412,7 +12960,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq11", 10) == 0)
                 {
 {
-return dev_storage + 489;
+return dev_storage + 472;
 
 }
                 }
@@ -13427,7 +12975,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp11", 10) == 0)
                 {
 {
-return dev_storage + 473;
+return dev_storage + 457;
 
 }
                 }
@@ -13442,7 +12990,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo11", 10) == 0)
                 {
 {
-return dev_storage + 457;
+return dev_storage + 442;
 
 }
                 }
@@ -13457,7 +13005,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn11", 10) == 0)
                 {
 {
-return dev_storage + 441;
+return dev_storage + 427;
 
 }
                 }
@@ -13475,7 +13023,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm11", 10) == 0)
                     {
 {
-return dev_storage + 425;
+return dev_storage + 412;
 
 }
                     }
@@ -13511,7 +13059,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl11", 10) == 0)
                 {
 {
-return dev_storage + 409;
+return dev_storage + 397;
 
 }
                 }
@@ -13526,7 +13074,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk11", 10) == 0)
                 {
 {
-return dev_storage + 393;
+return dev_storage + 382;
 
 }
                 }
@@ -13541,7 +13089,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj11", 10) == 0)
                 {
 {
-return dev_storage + 377;
+return dev_storage + 367;
 
 }
                 }
@@ -13556,7 +13104,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi11", 10) == 0)
                 {
 {
-return dev_storage + 361;
+return dev_storage + 352;
 
 }
                 }
@@ -13571,7 +13119,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh11", 10) == 0)
                 {
 {
-return dev_storage + 345;
+return dev_storage + 337;
 
 }
                 }
@@ -13586,7 +13134,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg11", 10) == 0)
                 {
 {
-return dev_storage + 329;
+return dev_storage + 322;
 
 }
                 }
@@ -13601,7 +13149,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf11", 10) == 0)
                 {
 {
-return dev_storage + 313;
+return dev_storage + 307;
 
 }
                 }
@@ -13616,7 +13164,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde11", 10) == 0)
                 {
 {
-return dev_storage + 297;
+return dev_storage + 292;
 
 }
                 }
@@ -13634,7 +13182,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd11", 10) == 0)
                     {
 {
-return dev_storage + 281;
+return dev_storage + 277;
 
 }
                     }
@@ -13670,7 +13218,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc11", 10) == 0)
                 {
 {
-return dev_storage + 265;
+return dev_storage + 262;
 
 }
                 }
@@ -13685,7 +13233,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb11", 10) == 0)
                 {
 {
-return dev_storage + 249;
+return dev_storage + 247;
 
 }
                 }
@@ -13700,7 +13248,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda11", 10) == 0)
                 {
 {
-return dev_storage + 233;
+return dev_storage + 232;
 
 }
                 }
@@ -13718,7 +13266,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st121", 10) == 0)
                     {
 {
-return dev_storage + 775;
+return dev_storage + 749;
 
 }
                     }
@@ -13733,7 +13281,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st111", 10) == 0)
                     {
 {
-return dev_storage + 765;
+return dev_storage + 739;
 
 }
                     }
@@ -13748,7 +13296,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st101", 10) == 0)
                     {
 {
-return dev_storage + 755;
+return dev_storage + 729;
 
 }
                     }
@@ -13778,7 +13326,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdz10", 10) == 0)
                 {
 {
-return dev_storage + 632;
+return dev_storage + 606;
 
 }
                 }
@@ -13796,7 +13344,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS0", 10) == 0)
                     {
 {
-return dev_storage + 847;
+return dev_storage + 821;
 
 }
                     }
@@ -13811,7 +13359,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty60", 10) == 0)
                     {
 {
-return dev_storage + 843;
+return dev_storage + 817;
 
 }
                     }
@@ -13826,7 +13374,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty50", 10) == 0)
                     {
 {
-return dev_storage + 833;
+return dev_storage + 807;
 
 }
                     }
@@ -13841,7 +13389,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty40", 10) == 0)
                     {
 {
-return dev_storage + 823;
+return dev_storage + 797;
 
 }
                     }
@@ -13856,7 +13404,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty30", 10) == 0)
                     {
 {
-return dev_storage + 813;
+return dev_storage + 787;
 
 }
                     }
@@ -13871,7 +13419,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/tty20", 10) == 0)
                     {
 {
-return dev_storage + 803;
+return dev_storage + 777;
 
 }
                     }
@@ -13889,7 +13437,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/tty10", 10) == 0)
                         {
 {
-return dev_storage + 793;
+return dev_storage + 767;
 
 }
                         }
@@ -13904,7 +13452,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdy10", 10) == 0)
                         {
 {
-return dev_storage + 616;
+return dev_storage + 591;
 
 }
                         }
@@ -13931,7 +13479,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdx10", 10) == 0)
                 {
 {
-return dev_storage + 600;
+return dev_storage + 576;
 
 }
                 }
@@ -13946,7 +13494,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdw10", 10) == 0)
                 {
 {
-return dev_storage + 584;
+return dev_storage + 561;
 
 }
                 }
@@ -13961,7 +13509,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdv10", 10) == 0)
                 {
 {
-return dev_storage + 568;
+return dev_storage + 546;
 
 }
                 }
@@ -13976,7 +13524,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdu10", 10) == 0)
                 {
 {
-return dev_storage + 552;
+return dev_storage + 531;
 
 }
                 }
@@ -14117,7 +13665,7 @@ return	NULL;
                       if (strncmp (KR_keyword, "/dev/sdt10", 10) == 0)
                         {
 {
-return dev_storage + 536;
+return dev_storage + 516;
 
 }
                         }
@@ -14159,7 +13707,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sds10", 10) == 0)
                 {
 {
-return dev_storage + 520;
+return dev_storage + 501;
 
 }
                 }
@@ -14174,7 +13722,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdr10", 10) == 0)
                 {
 {
-return dev_storage + 504;
+return dev_storage + 486;
 
 }
                 }
@@ -14189,7 +13737,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdq10", 10) == 0)
                 {
 {
-return dev_storage + 488;
+return dev_storage + 471;
 
 }
                 }
@@ -14204,7 +13752,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdp10", 10) == 0)
                 {
 {
-return dev_storage + 472;
+return dev_storage + 456;
 
 }
                 }
@@ -14219,7 +13767,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdo10", 10) == 0)
                 {
 {
-return dev_storage + 456;
+return dev_storage + 441;
 
 }
                 }
@@ -14234,7 +13782,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdn10", 10) == 0)
                 {
 {
-return dev_storage + 440;
+return dev_storage + 426;
 
 }
                 }
@@ -14252,7 +13800,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdm10", 10) == 0)
                     {
 {
-return dev_storage + 424;
+return dev_storage + 411;
 
 }
                     }
@@ -14288,7 +13836,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdl10", 10) == 0)
                 {
 {
-return dev_storage + 408;
+return dev_storage + 396;
 
 }
                 }
@@ -14303,7 +13851,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdk10", 10) == 0)
                 {
 {
-return dev_storage + 392;
+return dev_storage + 381;
 
 }
                 }
@@ -14318,7 +13866,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdj10", 10) == 0)
                 {
 {
-return dev_storage + 376;
+return dev_storage + 366;
 
 }
                 }
@@ -14333,7 +13881,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdi10", 10) == 0)
                 {
 {
-return dev_storage + 360;
+return dev_storage + 351;
 
 }
                 }
@@ -14348,7 +13896,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdh10", 10) == 0)
                 {
 {
-return dev_storage + 344;
+return dev_storage + 336;
 
 }
                 }
@@ -14363,7 +13911,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdg10", 10) == 0)
                 {
 {
-return dev_storage + 328;
+return dev_storage + 321;
 
 }
                 }
@@ -14378,7 +13926,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdf10", 10) == 0)
                 {
 {
-return dev_storage + 312;
+return dev_storage + 306;
 
 }
                 }
@@ -14393,7 +13941,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sde10", 10) == 0)
                 {
 {
-return dev_storage + 296;
+return dev_storage + 291;
 
 }
                 }
@@ -14411,7 +13959,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/sdd10", 10) == 0)
                     {
 {
-return dev_storage + 280;
+return dev_storage + 276;
 
 }
                     }
@@ -14447,7 +13995,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdc10", 10) == 0)
                 {
 {
-return dev_storage + 264;
+return dev_storage + 261;
 
 }
                 }
@@ -14462,7 +14010,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sdb10", 10) == 0)
                 {
 {
-return dev_storage + 248;
+return dev_storage + 246;
 
 }
                 }
@@ -14477,7 +14025,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/sda10", 10) == 0)
                 {
 {
-return dev_storage + 232;
+return dev_storage + 231;
 
 }
                 }
@@ -14495,7 +14043,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st120", 10) == 0)
                     {
 {
-return dev_storage + 774;
+return dev_storage + 748;
 
 }
                     }
@@ -14510,7 +14058,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st110", 10) == 0)
                     {
 {
-return dev_storage + 764;
+return dev_storage + 738;
 
 }
                     }
@@ -14525,7 +14073,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/st100", 10) == 0)
                     {
 {
-return dev_storage + 754;
+return dev_storage + 728;
 
 }
                     }
@@ -14786,7 +14334,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS15", 11) == 0)
                     {
 {
-return dev_storage + 862;
+return dev_storage + 836;
 
 }
                     }
@@ -14825,7 +14373,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS14", 11) == 0)
                     {
 {
-return dev_storage + 861;
+return dev_storage + 835;
 
 }
                     }
@@ -14864,7 +14412,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS13", 11) == 0)
                     {
 {
-return dev_storage + 860;
+return dev_storage + 834;
 
 }
                     }
@@ -14903,7 +14451,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS12", 11) == 0)
                     {
 {
-return dev_storage + 859;
+return dev_storage + 833;
 
 }
                     }
@@ -14942,7 +14490,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS11", 11) == 0)
                     {
 {
-return dev_storage + 858;
+return dev_storage + 832;
 
 }
                     }
@@ -14981,7 +14529,7 @@ return	NULL;
                   if (strncmp (KR_keyword, "/dev/ttyS10", 11) == 0)
                     {
 {
-return dev_storage + 857;
+return dev_storage + 831;
 
 }
                     }
@@ -15191,7 +14739,7 @@ return	NULL;
           if (strncmp (KR_keyword, "/dev/windows", 12) == 0)
             {
 {
-return dev_storage + 865;
+return dev_storage + 839;
 
 }
             }
@@ -15206,7 +14754,7 @@ return	NULL;
           if (strncmp (KR_keyword, "/dev/urandom", 12) == 0)
             {
 {
-return dev_storage + 864;
+return dev_storage + 838;
 
 }
             }
