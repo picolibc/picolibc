@@ -1,6 +1,11 @@
+Thu Jun  8 15:53:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_disk_file::open): Check for directory
+	to set O_DIROPEN on directories anyway.
+
 2000-06-07  Kazuhiro Fujieda <fujieda@jaist.ac.jp>
 
-        path.cc (mount_info::init): Eliminate the mount_slash feature.
+        * path.cc (mount_info::init): Eliminate the mount_slash feature.
         (mount_slash): Eliminated.
         (mount_info::read_mounts): Eliminate looking up existing entries. The
         loop for deleting cygpath entries is done only when such entries exist.
@@ -13,7 +18,7 @@
         (mount_info::to_registry): Eliminated.
         (mount_info::from_v1_registry): Eliminated.
         (cygwin_umount): Simply call del_item.
-        shared.h: Modify the declaration of add_item and del_item. Remove the
+        * shared.h: Modify the declaration of add_item and del_item. Remove the
         declaration of from_v1_registry.
 
 Wed Jun  7 23:56:10 2000  Christopher Faylor <cgf@cygnus.com>

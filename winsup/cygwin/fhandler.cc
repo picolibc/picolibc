@@ -1181,6 +1181,10 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
 
   set_has_acls (real_path.has_acls ());
 
+  if (real_path.file_attributes () != (DWORD)-1
+      && (real_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
+    flags |= O_DIROPEN;
+
   int res = this->fhandler_base::open (flags, mode);
 
   if (!res)
