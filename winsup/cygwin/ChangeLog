@@ -1,5 +1,26 @@
 2002-11-22  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (handle_sigsuspend): Force pending signal delivery
+	before waiting for signals to happen.
+	* signal.cc (sleep): Force pending signal delivery before sleeping.
+	(usleep): Ditto.
+	(signal): Force pending signal delivery before manipulating signal
+	stuff.
+	(sigprocmask): Ditto.
+	(kill_worker): Ditto.
+	(abort): Ditto.
+	(sigaction): Ditto.
+	* syscalls.cc (readv): Force pending signal delivery before I/O.
+	(writev): Ditto.
+	(open): Ditto.
+	* net.cc: Ditto, throughout.
+	* sigproc.cc (sig_dispatch_pending): Deliver any pending signals prior
+	to returning.
+
+	* tty.cc (tty::make_pipes): Increase pipe buffer size.
+
+2002-11-22  Christopher Faylor  <cgf@redhat.com>
+
 	* include/cygwin/version.h: Fix comment.
 
 2002-11-21  Igor Pechtchanski  <pechtcha@cs.nyu.edu>

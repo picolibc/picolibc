@@ -568,6 +568,7 @@ stack (void)
 int __stdcall
 handle_sigsuspend (sigset_t tempmask)
 {
+  sig_dispatch_pending (0);
   sigframe thisframe (mainthread);
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 

@@ -43,6 +43,7 @@ set_sigcatchers (void (*oldsig) (int), void (*cursig) (int))
 extern "C" _sig_func_ptr
 signal (int sig, _sig_func_ptr func)
 {
+  sig_dispatch_pending (0);
   _sig_func_ptr prev;
 
   /* check that sig is in right range */
@@ -69,6 +70,7 @@ extern "C" unsigned int
 sleep (unsigned int seconds)
 {
   int rc;
+  sig_dispatch_pending (0);
   sigframe thisframe (mainthread);
   DWORD ms, start_time, end_time;
 
@@ -95,6 +97,7 @@ sleep (unsigned int seconds)
 extern "C" unsigned int
 usleep (unsigned int useconds)
 {
+  sig_dispatch_pending (0);
   syscall_printf ("usleep (%d)", useconds);
   WaitForSingleObject (signal_arrived, (useconds + 500) / 1000);
   syscall_printf ("0 = usleep (%d)", useconds);
@@ -104,6 +107,7 @@ usleep (unsigned int useconds)
 extern "C" int
 sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
 {
+  sig_dispatch_pending (0);
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
     {
@@ -143,6 +147,8 @@ sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
 static int
 kill_worker (pid_t pid, int sig)
 {
+  sig_dispatch_pending (0);
+
   int res = 0;
   pinfo dest (pid);
   BOOL sendSIGCONT;
@@ -261,6 +267,7 @@ killpg (pid_t pgrp, int sig)
 extern "C" void
 abort (void)
 {
+  sig_dispatch_pending (0);
   sigframe thisframe (mainthread);
   /* Flush all streams as per SUSv2.
      From my reading of this document, this isn't strictly correct.
@@ -286,6 +293,7 @@ abort (void)
 extern "C" int
 sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 {
+  sig_dispatch_pending (0);
   sigproc_printf ("signal %d, newact %p, oldact %p", sig, newact, oldact);
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)

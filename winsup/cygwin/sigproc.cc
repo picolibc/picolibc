@@ -516,6 +516,12 @@ sig_dispatch_pending (int justwake)
 {
   if (!hwait_sig)
     return 0;
+  DWORD tid = GetCurrentThreadId ();
+
+  sigframe thisframe (mainthread);
+
+  if (tid == sigtid && !justwake)
+    justwake = 1;
 
   int was_pending = pending_signals;
 #ifdef DEBUGGING
@@ -544,6 +550,9 @@ sig_dispatch_pending (int justwake)
 	system_printf ("%E releasing sigcatch_nosync(%p)", sigcatch_nosync);
 
     }
+  if (was_pending && !justwake)
+    thisframe.call_signal_handler ();
+
   return was_pending;
 }
 
