@@ -1,5 +1,9 @@
 2003-09-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sysconf.cc (sysconf): Return more accurate value for _SC_AVPHYS_PAGES.
+
+2003-09-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc: Restructure. Add, remove and rewrite comments throughout
 	for better readability.  Change function names for better
 	understanding.
