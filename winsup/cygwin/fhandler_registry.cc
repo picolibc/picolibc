@@ -533,7 +533,7 @@ fhandler_registry::close ()
     }
   if (value_name)
     cfree (value_name);
-  return 0;
+  return res;
 }
 
 bool

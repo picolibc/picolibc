@@ -578,9 +578,8 @@ _close (int fd)
     res = -1;
   else
     {
-      cfd->close ();
+      res = cfd->close ();
       cfd.release ();
-      res = 0;
     }
 
   syscall_printf ("%d = close (%d)", res, fd);

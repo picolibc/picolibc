@@ -1,3 +1,9 @@
+2002-07-26  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler_registry.cc (fhandler_registry::close): Return any error
+	result to the caller.
+	* syscalls.cc (_close): Return result of fhandler::close to the caller.
+
 2002-07-25  Christopher Faylor  <cgf@redhat.com>
 
 	* security.cc (allow_ntsec): Default to on.
