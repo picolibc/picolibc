@@ -1,3 +1,8 @@
+2000-09-06  Jeff Johnston <jjohnstn@redhat.com>
+
+        * libc/include/sys/types.h (FD_ZERO): Remove call to bzero and
+        inline code to prevent having to include another header file.
+
 Wed Sep  6 15:06:40 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.am: Fix space vs. tab problem in install-data-local.
