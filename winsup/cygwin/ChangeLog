@@ -1,3 +1,7 @@
+Fri Sep 27 07:35:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* Makefile.in: Only stamp winver_stamp on success.
+
 Wed Sep 26 16:02:35 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (peek_pipe): REALLY only grab mutex when we actually got
