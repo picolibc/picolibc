@@ -108,7 +108,7 @@ bindist:
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 755 $(distdir)
-	$(MAKE) install prefix=../$(distdir)
+	$(MAKE) install prefix=../$(distdir) exec_prefix=../$(distdir)
 	rm -f $(distdir).tar.gz
 	cd $(distdir); $(TAR) czf ../$(distdir).tar.gz .
 
