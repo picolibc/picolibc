@@ -79,6 +79,22 @@ FUNC_START(dup)
 	b	FUNC_NAME(_cerror)
 FUNC_END(dup)
 
+FUNC_START(gettimeofday)
+	li	r0,116
+	sc
+	bns+	0f
+	b	FUNC_NAME(_cerror)
+0:	blr
+FUNC_END(gettimeofday)
+
+FUNC_START(getrusage)
+	li	r0,117
+	sc
+	bns+	0f
+	b	FUNC_NAME(_cerror)
+0:	blr
+FUNC_END(getrusage)
+
 FUNC_START(lseek)
 	li	r0,199
 	sc

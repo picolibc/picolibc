@@ -1,3 +1,8 @@
+2002-07-22  Aldy Hernandez  <aldyh@redhat.com>
+
+        * rs6000/simulator.S (gettimeofday): New.
+        (getrusage): New.
+
 2002-07-18  Chris Demetriou  <cgd@broadcom.com>
 
         * read.c (read): Don't assign past end of buffer, fix return value.
