@@ -642,7 +642,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
       rc = WaitForMultipleObjects (2, w4, FALSE, time_to_wait);
       if (rc == WAIT_OBJECT_0)
 	{
-	  /* if we've recieved signal after successfully reading some data,
+	  /* if we've received signal after successfully reading some data,
 	     just return all data successfully read */
 	  if (totalread > 0)
 	    break;
