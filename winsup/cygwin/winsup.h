@@ -435,6 +435,7 @@ int _raise (int sig);
 int getdtablesize ();
 void setdtablesize (int);
 
+extern DWORD binmode;
 extern char _data_start__, _data_end__, _bss_start__, _bss_end__;
 extern void (*__CTOR_LIST__) (void);
 extern void (*__DTOR_LIST__) (void);

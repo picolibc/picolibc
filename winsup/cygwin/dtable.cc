@@ -151,7 +151,7 @@ void
 hinfo::init_std_file_from_handle (int fd, HANDLE handle,
 				  DWORD myaccess, const char *name)
 {
-  int bin = __fmode;
+  int bin = binmode ? O_BINARY : 0;
   /* Check to see if we're being redirected - if not then
      we open then as consoles */
   if (fd == 0 || fd == 1 || fd == 2)

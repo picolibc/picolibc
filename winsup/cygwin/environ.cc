@@ -18,8 +18,6 @@ extern BOOL allow_glob;
 extern BOOL allow_ntea;
 extern BOOL strip_title_path;
 extern DWORD chunksize;
-extern BOOL binmode;
-BOOL threadsafe;
 BOOL reset_com = TRUE;
 static BOOL envcache = TRUE;
 
@@ -369,7 +367,7 @@ struct parse_thing
       } values[2];
   } known[] =
 {
-  {"binmode", {&binmode}, justset, NULL, {{FALSE}, {TRUE}}},
+  {"binmode", {x: &binmode}, justset, NULL, {{0}, {O_BINARY}}},
   {"envcache", {&envcache}, justset, NULL, {{TRUE}, {FALSE}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{FALSE}, {TRUE}}},
@@ -381,7 +379,6 @@ struct parse_thing
   {"strip_title", {&strip_title_path}, justset, NULL, {{FALSE}, {TRUE}}},
   {"title", {&display_title}, justset, NULL, {{FALSE}, {TRUE}}},
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},
-  {"threadsafe", {&threadsafe}, justset, NULL, {{TRUE}, {FALSE}}},
   {NULL, {0}, justset, 0, {{0}, {0}}}
 };
 
