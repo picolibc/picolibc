@@ -682,23 +682,7 @@ fi
 
 ### do common part of configure.in
 
-# If the language specific compiler does not exist, but the "gcc" directory does,
-# we will skip this directory; in this case the sub-directory's common part
-# of configure.in will create a small shell script "skip-this-dir" containing
-# commands to completely clean up any temporary or created files.
-
 . ${tmpfile}.com
-
-if test -f skip-this-dir; then
-	# Perform the same cleanup as the trap handler, minus the "exit 1" of course,
-	# and reset the trap handler.
-	trap 0
-	rm -rf Makefile* ${tmpdir}
-	# Execute the final clean-up actions
-	${config_shell} skip-this-dir
-	# and stop configuring this directory.
-	exit 0
-fi
 
 # some sanity checks on configure.in
 case "${srctrigger}" in
@@ -1107,12 +1091,6 @@ export CXX
 export CFLAGS
 export CXXFLAGS
 
-all_build_modules=
-if test x"${build_alias}" != x"${host_alias}"
-then
-  all_build_modules='$(ALL_BUILD_MODULES_LIST)'
-fi
-
 # FIXME Should this be done recursively ??? (Useful for e.g. gdbtest)
 # Set up the list of links to be made.
 # ${links} is the list of link names, and ${files} is the list of names to link to.
@@ -1323,7 +1301,6 @@ if [ -f ${srcdir}/${Makefile_in} ] ; then
       -e "s|@oldincludedir@|${oldincludedir}|" \
       -e "s|@infodir@|${infodir}|" \
       -e "s|@mandir@|${mandir}|" \
-      -e "s|@all_build_modules@|${all_build_modules}|" \
       -e "/^CC[ 	]*=/{
           :loop1
           /\\\\$/ N
@@ -1362,8 +1339,6 @@ if [ -f ${srcdir}/${Makefile_in} ] ; then
       -e "s:@DEFAULT_LEX@:${DEFAULT_LEX}:" \
       -e "s:@DEFAULT_M4@:${DEFAULT_M4}:" \
           ./Makefile.tem > ${Makefile}
-  sed -e "s:@GDB_TK@:${GDB_TK}:" ${Makefile} >${Makefile}.tem
-  mv -f ${Makefile}.tem ${Makefile}
 
   # If this is a Canadian Cross, preset the values of many more
   # tools.

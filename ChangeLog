@@ -1,3 +1,43 @@
+2002-12-02  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	(finishing slow-motion replay)
+	* configure: Remove skip-this-dir support.
+	* Makefile.tpl: Remove skip-this-dir support.
+
+	* Makefile.tpl: Remove leftover support for non-autoconfiscated
+	subdirectories.
+	* Makefile.in: Regenerate.
+
+	* Makefile.tpl: Strip out useless setting of 'dir'.
+	* Makefile.in: Regenerate.
+	
+2002-12-02  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	(finishing slow-motion replay)
+	* configure.in: Fix deeply stupid bug.
+
+	* configure.in: Introduce RAW_CXX_FOR_TARGET and simplify embedded
+	shell code in CXX_FOR_TARGET
+	* Makefile.def: Introduce raw_cxx.
+	* Makefile.tpl: Use raw_cxx to select between CXX_FOR_TARGET and
+	RAW_CXX_FOR_TARGET.
+	* Makefile.in: Regenerate.
+
+2002-12-02  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	(finishing slow-motion replay)
+	* Makefile.tpl: Remove unnecessary ifs.
+	* Makefile.in: Regenerate.
+
+	* Makefile.tpl: Implement soft dependency machinery.  Maybe-ize 
+	dependencies.  Maybe-ize build-libiberty.  Create dummy install
+	targets for 'no_install' modules.
+	* configure: Move GDB_TK substitution to configure.in.  Move 
+	build_modules stuff to configure.in.
+	* configure.in: Implement soft dependency machinery.  Maybe-ize 
+	GDB_TK, rearrange slightly.  Move build_modules stuff from configure.
+	* Makefile.in: Regenerate.
+
 2002-12-01  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	(continuing slow-motion replay)

@@ -848,13 +848,6 @@ case "$host" in
   *msdosdjgpp*)
     enable_gdbtk=no ;;
 esac
-# Determine whether gdb needs tk/tcl or not.
-case "$enable_gdbtk" in
-  no)
-    GDB_TK="" ;;
-  *)
-    GDB_TK="all-tcl all-tk all-itcl all-tix all-libgui" ;;
-esac
 
 copy_dirs=
 
@@ -1350,24 +1343,66 @@ target_configdirs=`echo "${target_configdirs}" | sed -e 's/target-//g'`
 
 # This is the final value for target_configdirs.  configdirs already
 # has its final value.  It's time to create some lists of valid targets.
+
+all_build_modules=
+configure_build_modules=
+# Only make build modules if build != host.
+# This should be done more generally, but at the moment it doesn't matter.
+if test ${host_alias} != ${build_alias} ; then
+  all_build_modules=all-build-libiberty
+  configure_build_modules=configure-build-libiberty
+fi
+
 all_host_modules=
 check_host_modules=
 install_host_modules=
+configure_host_modules=
 for module in ${configdirs} ; do
   all_host_modules="${all_host_modules} all-${module}"
   check_host_modules="${check_host_modules} check-${module}"
   install_host_modules="${install_host_modules} install-${module}"
+  configure_host_modules="${configure_host_modules} configure-${module}"
 done
 install_host_modules_nogcc=`echo "${install_host_modules}" | sed -e 's/install-gcc//g'`
 
 all_target_modules=
 check_target_modules=
 install_target_modules=
+configure_target_modules=
 for module in ${target_configdirs} ; do
   all_target_modules="${all_target_modules} all-target-${module}"
   check_target_modules="${check_target_modules} check-target-${module}"
   install_target_modules="${install_target_modules} install-target-${module}"
+  configure_target_modules="${configure_target_modules} configure-target-${module}"
 done
+
+# Determine whether gdb needs tk/tcl or not.
+# Use 'maybe' since enable_gdbtk might be true even if tk isn't available
+# and in that case we want gdb to be built without tk.  Ugh!
+# In fact I believe gdb is the *only* package directly dependent on tk,
+# so we should be able to put the 'maybe's in unconditionally and
+# leave out the maybe dependencies when enable_gdbtk is false.  I'm not
+# 100% sure that that's safe though.
+case "$enable_gdbtk" in
+  no)
+    GDB_TK="" ;;
+  *)
+    GDB_TK="maybe-all-tcl maybe-all-tk maybe-all-itcl maybe-all-tix maybe-all-libgui" ;;
+esac
+
+# Create the 'maybe dependencies'.  This uses a temporary file.
+rm -f maybedep.tmp
+for item in ${all_build_modules} ${all_host_modules} ${all_target_modules} \
+	${install_host_modules} ${install_target_modules} \
+	${configure_build_modules} ${configure_host_modules} ${configure_target_modules} \
+	; do
+  echo "maybe-${item}: ${item}" >> maybedep.tmp
+done
+sed -e '/@maybe_dependencies@/r maybedep.tmp' \
+    -e 's/@maybe_dependencies@//' Makefile > Makefile.tem
+rm -f Makefile
+mv -f Makefile.tem Makefile
+rm -f maybedep.tmp
 
 # Base args.  Strip norecursion, cache-file, srcdir, host, build, target.
 # These are the ones we might not want to pass down to subconfigures.
@@ -1535,7 +1570,8 @@ case $GCJ_FOR_TARGET in
 esac
 
 # Don't use libstdc++-v3's flags to configure/build itself.
-libstdcxx_flags='`case $$dir in libstdc++-v3 | libjava) ;; *) test ! -f $$r/$(TARGET_SUBDIR)/libstdc++-v3/testsuite_flags || $(SHELL) $$r/$(TARGET_SUBDIR)/libstdc++-v3/testsuite_flags --build-includes;; esac` -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs'
+libstdcxx_flags='`test ! -f $$r/$(TARGET_SUBDIR)/libstdc++-v3/testsuite_flags || $(SHELL) $$r/$(TARGET_SUBDIR)/libstdc++-v3/testsuite_flags --build-includes` -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs'
+raw_libstdcxx_flags=' -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs'
 
 if test "x${CXX_FOR_TARGET+set}" = xset; then
   :
@@ -1543,17 +1579,28 @@ elif test -d ${srcdir}/gcc; then
   # We add -shared-libgcc to CXX_FOR_TARGET whenever we use xgcc instead
   # of g++ for linking C++ or Java, because g++ has -shared-libgcc by
   # default whereas gcc does not.
-  CXX_FOR_TARGET='$$r/gcc/`case $$dir in libstdc++-v3 | libjava) echo xgcc -shared-libgcc ;; *) echo g++ ;; esac` -B$$r/gcc/ -nostdinc++ '$libstdcxx_flags
+  # RAW_CXX_FOR_TARGET is for linking C++ or java; CXX_FOR_TARGET is for
+  # all other cases.
+  CXX_FOR_TARGET='$$r/gcc/g++ -B$$r/gcc/ -nostdinc++ '$libstdcxx_flags
+  RAW_CXX_FOR_TARGET='$$r/gcc/xgcc -shared-libgcc -B$$r/gcc/ -nostdinc++ '$raw_libstdcxx_flags
 elif test "$host" = "$target"; then
   CXX_FOR_TARGET='$(CXX)'
+  RAW_CXX_FOR_TARGET=${CXX_FOR_TARGET}
 else
   CXX_FOR_TARGET=`echo c++ | sed -e 's/x/x/' ${program_transform_name}`
+  RAW_CXX_FOR_TARGET=${CXX_FOR_TARGET}
 fi
 case $CXX_FOR_TARGET in
 *' $(FLAGS_FOR_TARGET)') ;;
 *) CXX_FOR_TARGET=$CXX_FOR_TARGET' $(FLAGS_FOR_TARGET)' ;;
 esac
+case $RAW_CXX_FOR_TARGET in
+*' $(FLAGS_FOR_TARGET)') ;;
+*) RAW_CXX_FOR_TARGET=$RAW_CXX_FOR_TARGET' $(FLAGS_FOR_TARGET)' ;;
+esac
+
 qCXX_FOR_TARGET=`echo "$CXX_FOR_TARGET" | sed 's,[&%],\\\&,g'`
+qRAW_CXX_FOR_TARGET=`echo "$RAW_CXX_FOR_TARGET" | sed 's,[&%],\\\&,g'`
 
 # We want to defer the evaluation of `cmd`s and shell variables in
 # CXX_FOR_TARGET when recursing in the top-level Makefile, such as for
@@ -1562,9 +1609,13 @@ qCXX_FOR_TARGET=`echo "$CXX_FOR_TARGET" | sed 's,[&%],\\\&,g'`
 # can be expanded by the nested make as shell variables, not as make
 # macros.
 qqCXX_FOR_TARGET=`echo "$qCXX_FOR_TARGET" | sed -e 's,[$][$],$$$$,g'`
+qqRAW_CXX_FOR_TARGET=`echo "$qRAW_CXX_FOR_TARGET" | sed -e 's,[$][$],$$$$,g'`
 
 sedtemp=sed.$$
 cat >$sedtemp <<EOF
+s%@GDB_TK@%${GDB_TK}%
+s%@all_build_modules@%${all_build_modules}%
+s%@configure_build_modules@%${configure_build_modules}%
 s%@all_host_modules@%${all_host_modules}%
 s%@check_host_modules@%${check_host_modules}%
 s%@install_host_modules@%${install_host_modules}%
@@ -1578,7 +1629,9 @@ s%@FLAGS_FOR_TARGET@%${FLAGS_FOR_TARGET}%
 s%@CC_FOR_TARGET@%\$(STAGE_CC_WRAPPER) ${CC_FOR_TARGET}%
 s%@GCJ_FOR_TARGET@%\$(STAGE_CC_WRAPPER) ${GCJ_FOR_TARGET}%
 s%@CXX_FOR_TARGET@%\$(STAGE_CC_WRAPPER) ${qCXX_FOR_TARGET}%
+s%@RAW_CXX_FOR_TARGET@%\$(STAGE_CC_WRAPPER) ${qRAW_CXX_FOR_TARGET}%
 s%@CXX_FOR_TARGET_FOR_RECURSIVE_MAKE@%\$(STAGE_CC_WRAPPER) ${qqCXX_FOR_TARGET}%
+s%@RAW_CXX_FOR_TARGET_FOR_RECURSIVE_MAKE@%\$(STAGE_CC_WRAPPER) ${qqRAW_CXX_FOR_TARGET}%
 s%@target_subdir@%${target_subdir}%
 s%@build_subdir@%${build_subdir}%
 s%@build_configargs@%${buildargs}%
