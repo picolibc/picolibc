@@ -1,5 +1,9 @@
 2002-05-31  Christopher Faylor  <cgf@redhat.com>
 
+	* dll_init.cc (dll_list::init): Eliminate unneeded debugging statement.
+
+2002-05-31  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_proc.cc (fhandler_proc::readdir): Set errno when no more
 	files.
 	* fhandler_process.cc (fhandler_process::readdir): Ditto.

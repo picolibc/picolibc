@@ -203,7 +203,6 @@ dll_list::detach (dll *d)
 void
 dll_list::init ()
 {
-  debug_printf ("here");
   /* Make sure that destructors are called on exit. */
   if (!dll_global_dtors_recorded)
     {
