@@ -41,26 +41,27 @@ __BEGIN_CSTD_NAMESPACE
  * NOTE: This was determined on an i386 (actually a Pentium). The
  *       contents could be different on an Alpha or something else.
  */
+
 #define _JBLEN 16
 #define _JBTYPE int
-typedef _JBTYPE jmp_buf[_JBLEN];
-
-/*
- * The function provided by CRTDLL which appears to do the actual work
- * of setjmp.
- */
-int	_setjmp (jmp_buf);
-
-#define	setjmp(x)	_setjmp(x)
+typedef  _JBTYPE jmp_buf[_JBLEN];
 
 /*
  * Return to the last setjmp call and act as if setjmp had returned
  * nVal (which had better be non-zero!).
  */
 void	longjmp (jmp_buf, int);
-
 __END_CSTD_NAMESPACE
 
+__BEGIN_CGLOBAL_NAMESPACE
+/*
+ * The function provided by CRTDLL which appears to do the actual work
+ * of setjmp.
+ */
+int	_setjmp (__CSTD jmp_buf);
+
+#define	setjmp(x)	_setjmp(x)
+__END_CGLOBAL_NAMESPACE
 
 #endif	/* Not RC_INVOKED */
 
