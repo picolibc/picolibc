@@ -340,6 +340,14 @@ _read (int fd, void *ptr, size_t len)
 	}
 
     out:
+
+      if (res && get_errno () == EACCES &&
+	  !(cfd->get_flags () & (O_RDONLY | O_RDWR)))
+	{
+	  set_errno (EBADF);
+	  break;
+	}
+
       if (res >= 0 || get_errno () != EINTR || !thisframe.call_signal_handler ())
 	break;
       set_errno (e);

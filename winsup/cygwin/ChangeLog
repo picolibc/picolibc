@@ -1,3 +1,8 @@
+2002-05-12  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (_read): Change error to EBADF if attempt to write to a
+	non-writable fd.
+
 2002-05-11  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (executable_states): For now, make dont_care_if_executable
