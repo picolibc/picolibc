@@ -1,3 +1,8 @@
+2002-01-03  matthew green  <mrg@redhat.com>
+
+	* ppc.h (PPC_OPCODE_BOOKE): BookE is not Motorola specific.
+	(PPC_OPCODE_BOOKE64): Likewise.
+
 Mon Dec 31 16:45:41 2001  Jeffrey A Law  (law@cygnus.com)
 
 	* hppa.h (call, ret): Move to end of table.

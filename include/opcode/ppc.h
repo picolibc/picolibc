@@ -94,10 +94,10 @@ extern const int powerpc_num_opcodes;
 /* Opcode is supported by PowerPC 403 processor.  */
 #define PPC_OPCODE_403 (02000)
 
-/* Opcode is supported by Motorola BookE processor.  */
+/* Opcode is supported by PowerPC BookE processor.  */
 #define PPC_OPCODE_BOOKE (04000)
 
-/* Opcode is only supported by 64-bit Motorola BookE processor.  */
+/* Opcode is only supported by 64-bit PowerPC BookE processor.  */
 #define PPC_OPCODE_BOOKE64 (010000)
 
 /* A macro to extract the major opcode from an instruction.  */
