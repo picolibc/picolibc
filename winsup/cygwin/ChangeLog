@@ -1,3 +1,7 @@
+Tue Oct 24 23:58:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (do_exit): Remove debugging statement.
+
 Tue Oct 24 23:45:09 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (do_exit): Don't bother looking for pgrp children to send
