@@ -1,3 +1,7 @@
+2003-10-28  Christopher Faylor  <cgf@redhat.com>
+
+	* include/stdint.h: Correctly define INT64_MAX.
+
 2003-10-27  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.h (fast_mutex::init): Initialize lock_counter.
