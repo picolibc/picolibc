@@ -907,6 +907,9 @@ class fhandler_tty_slave: public fhandler_tty_common
   int tcgetattr (struct termios *t);
   int tcflush (int);
   int ioctl (unsigned int cmd, void *);
+  int close ();
+  int dup (fhandler_base *child);
+  void fixup_after_fork (HANDLE parent);
 
   __off64_t lseek (__off64_t, int) { return 0; }
   select_record *select_read (select_record *s);

@@ -1,5 +1,19 @@
 2003-03-03  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.h (fhandler_tty_slave::close): Declare new function.
+	(fhandler_tty_slave::dup): Declare new function.
+	(fhandler_tty_slave::fixup_after_function): Declare new function.
+	* fhandler_tty.cc (fhandler_tty_slave_open): Only increment
+	fhandler_console::open_fhs when associated with a pty.
+	(fhandler_tty_slave::close): Define new function.  Decrement
+	fhandler_console::open_fhs when associated with a pty.
+	(fhandler_tty_slave::dup): Define new function.  Increment
+	fhandler_console::open_fhs when associated with a pty.
+	(fhandler_tty_slave::fixup_after_fork): Define new function.  Increment
+	fhandler_console::open_fhs when associated with a pty.
+
+2003-03-03  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_tty.cc (fhandler_pty_slave::open): Grudgingly increment
 	fhandler_console::open_fhs here.
 	(fhandler_pty_slave::close): Ditto for close.

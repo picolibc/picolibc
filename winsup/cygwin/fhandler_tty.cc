@@ -552,10 +552,25 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
   set_output_handle (to_master_local);
 
   set_open_status ();
-  fhandler_console::open_fhs++;
+  if (!output_done_event)
+    {
+      fhandler_console::open_fhs++;
+      termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
+    }
   termios_printf ("tty%d opened", ttynum);
 
   return 1;
+}
+
+int
+fhandler_tty_slave::close ()
+{
+  if (!output_done_event)
+    {
+      fhandler_console::open_fhs--;
+      termios_printf ("decremeted open_fhs %d", fhandler_console::open_fhs);
+    }
+  return fhandler_tty_common::close ();
 }
 
 int
@@ -815,6 +830,17 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 }
 
 int
+fhandler_tty_slave::dup (fhandler_base *child)
+{
+  if (!output_done_event)
+    {
+      fhandler_console::open_fhs++;
+      termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
+    }
+  return fhandler_tty_common::dup (child);
+}
+
+int
 fhandler_tty_common::dup (fhandler_base *child)
 {
   fhandler_tty_slave *fts = (fhandler_tty_slave *) child;
@@ -1058,7 +1084,6 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
   inuse = NULL;
-  fhandler_console::open_fhs++;
   termios_printf ("tty%d <%p,%p> closed", ttynum, get_handle (), get_output_handle ());
   return 0;
 }
@@ -1200,6 +1225,17 @@ fhandler_tty_common::set_close_on_exec (int val)
   set_inheritance (input_mutex, val);
   set_inheritance (input_available_event, val);
   set_inheritance (output_handle, val);
+}
+
+void
+fhandler_tty_slave::fixup_after_fork (HANDLE parent)
+{
+  if (!output_done_event)
+    {
+      fhandler_console::open_fhs++;
+      termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
+    }
+  fhandler_tty_common::fixup_after_fork (parent);
 }
 
 void
