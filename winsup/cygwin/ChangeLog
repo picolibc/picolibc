@@ -1,5 +1,10 @@
 2004-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (set_nt_attribute): Only call get_nt_object_security
+	if handle is NULL.
+
+2004-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dir.cc (mkdir): Call set_file_attribute with additional handle
 	argument.
 	* fhandler.cc (fhandler_base::fchmod): New method.
