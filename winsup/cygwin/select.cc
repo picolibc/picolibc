@@ -451,6 +451,7 @@ peek_pipe (select_record *s, int ignra)
 	gotone = s->except_ready = TRUE;
       if (s->read_selected)
 	gotone += s->read_ready = TRUE;
+      select_printf ("saw eof on '%s'", fh->get_name ());
     }
 
 out:
