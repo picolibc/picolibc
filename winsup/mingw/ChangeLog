@@ -8,6 +8,8 @@
 	(FLAGS_TO_PASS): Include inst_docdir.
 	(install-dirs): Add inst_docdir.
 	(install): Add loop for INSTDOCS.
+	* strncasecmp.c: Reword copyright and disclaimer.  Move Contributors
+	section to CONTRIBUTORS file.  Remove RCS tags.
 	
 2004-04-22  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -23,7 +25,7 @@
 	* CONTRIBUTORS: New file.
 	* DISCLAIMER: Ditto.
 	* CRT_noglob.c: Reword copyright and disclaimer.  Move Contributors
-	section CONTRIBUTORS file.  Remove RCS tags.
+	section to CONTRIBUTORS file.  Remove RCS tags.
 	* CRTFmode.c: Ditto.
 	* CRTglob.c: Ditto.
 	* CRTinit.c: Ditto.
