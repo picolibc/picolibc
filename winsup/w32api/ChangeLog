@@ -1,3 +1,8 @@
+2002-08-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wincrypt.h (CryptDuplicateHash, CryptDuplicateKey):
+	Add prototypes.
+
 2002-08-12  Andriy Palamarchuk  <apa3a@yahoo.com>
 
 	* include/shellapi.h (FOF_NOERRORUI): Add define.
