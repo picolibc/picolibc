@@ -1,3 +1,8 @@
+2004-01-01  Martin Fuchs  <martin-fuchs@gmx.net>
+
+	* include/shlobj.h (SHCoCreateInstance): Add prototype..
+	* lib/shell32.def (SHCoCreateInstance): Add export stub.
+
 2004-01-01  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
 
 	* lib/setupapi.def (CM_Request_Device_Eject[AW]): Add export.

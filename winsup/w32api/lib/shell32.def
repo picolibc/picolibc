@@ -118,6 +118,7 @@ SHCreateQueryCancelAutoPlayMoniker@4
 SHCreateProcessAsUserW@4
 SHCreateDirectoryExW@12
 SHCreateDirectoryExA@12
+SHCoCreateInstance@20
 SHChangeNotify@16
 SHBrowseForFolderW@4
 SHBrowseForFolderA@4
