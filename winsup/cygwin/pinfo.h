@@ -234,6 +234,8 @@ void __stdcall set_myself (pid_t pid, HANDLE h = NULL);
 extern pinfo myself;
 
 #define _P_VFORK 0
+#define _P_SYSTEM 512
+
 extern void __stdcall pinfo_fixup_after_fork ();
 extern HANDLE hexec_proc;
 

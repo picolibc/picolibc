@@ -1,3 +1,10 @@
+2003-09-19  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (system): Strip signal considerations from here so that
+	they are not inherited by a child process.
+	* spawn.cc (spawn_guts): Handle system() signal stuff here.
+	* winsup.h (_P_SYSTEM): Define.
+
 2003-09-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_pty_master::process_slave_output):  
