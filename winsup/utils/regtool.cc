@@ -14,10 +14,14 @@ details. */
 #include <getopt.h>
 #include <windows.h>
 
+#define DEFAULT_KEY_SEPARATOR '\\'
+
 enum
 {
   KT_AUTO, KT_INT, KT_STRING, KT_EXPAND, KT_MULTI
 } key_type = KT_AUTO;
+
+char key_sep = DEFAULT_KEY_SEPARATOR;
 
 #define LIST_KEYS	0x01
 #define LIST_VALS	0x02
@@ -39,10 +43,11 @@ static struct option longopts[] =
   {"string", no_argument, NULL, 's'},
   {"verbose", no_argument, NULL, 'v'},
   {"version", no_argument, NULL, 'V'},
+  {"key-separator", required_argument, NULL, 'K'},
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "ehiklmpqsvV";
+static char opts[] = "ehiklmpqsvVK::";
 
 int listwhat = 0;
 int postfix = 0;
@@ -82,6 +87,9 @@ usage (FILE *where = stderr)
   " -i, --integer        set type to REG_DWORD\n"
   " -m, --multi-string   set type to REG_MULTI_SZ\n"
   " -s, --string         set type to REG_SZ\n"
+  "\n"
+  "Options for 'set' and 'unset' Actions:\n"
+  " -K<c>, --key-separator[=]<c>  set key separator to <c> instead of '\\'\n"
   "\n"
   "Other Options:\n"
   " -h, --help     output usage information and exit\n"
@@ -308,9 +316,9 @@ find_key (int howmanyparts, REGSAM access)
   e = n + strlen (n);
   if (howmanyparts > 1)
     {
-      while (n < e && *e != '\\')
+      while (n < e && *e != key_sep)
 	e--;
-      if (*e != '\\')
+      if (*e != key_sep)
 	{
 	  key = wkprefixes[i].key;
 	  value = n;
@@ -661,6 +669,9 @@ main (int argc, char **_argv)
 	case 'V':
 	  print_version ();
 	  exit (0);
+	case 'K':
+	  key_sep = *optarg;
+	  break;
 	default :
 	  usage ();
 	}
