@@ -1,3 +1,7 @@
+2002-01-31  Ivan Guzvinec  <ivang@opencores.org>
+
+	* or32.h: New file.
+
 2002-01-22  Graydon Hoare  <graydon@redhat.com>
 
 	* cgen.h (CGEN_MAYBE_MULTI_IFLD): New structure.
@@ -118,10 +122,25 @@ Mon Dec 31 16:45:41 2001  Jeffrey A Law  (law@cygnus.com)
 
 	* ppc.h: Revert 2001-08-08.
 
+2001-08-10  Richard Sandiford  <rsandifo@redhat.com>
+
+	* mips.h (INSN_GP32): Remove.
+	(OPCODE_IS_MEMBER): Remove gp32 parameter.
+	(M_MOVE): New macro identifier.
+
 2001-08-08  Alan Modra  <amodra@one.net.au>
 
 	1999-10-25  Torbjorn Granlund  <tege@swox.com>
 	* ppc.h (struct powerpc_operand): New field `reloc'.
+
+2001-08-01  Aldy Hernandez  <aldyh@redhat.com>
+
+	* mips.h (INSN_ISA_MASK): Nuke bits 12-15.
+
+2001-07-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* cgen.h (CGEN_INSN): Add regex support.
+	(build_insn_regex): Declare.
 
 2001-07-11  Frank Ch. Eigler  <fche@redhat.com>
 

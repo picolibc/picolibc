@@ -1,6 +1,6 @@
-2002-01-28  Jason Merrill  <jason@redhat.com>
+2002-01-31  Ivan Guzvinec  <ivang@opencores.org>
 
-	* elf/dwarf2.h: Sync with gcc version.
+	* dis-asm.h : Add support for or32 targets
 
 2002-01-28  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
@@ -10,11 +10,6 @@
 
 	* cgen.h (BFD_VERSION): Use BFD_VERSION_DATE instead.
 
-2002-01-15  Richard Earnshaw  <rearnsha@arm.com>
-
-	* coff/arm.h (F_VFP_FLOAT): Define.
-	* elf/arm.h (F_VFP_FLOAT, EF_ARM_VFP_FLOAT): Define.
-
 2001-12-14  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* dis-asm.h (INIT_DISASSEMBLE_INFO_NO_ARCH): Initialise the
@@ -22,7 +17,6 @@
 
 2001-12-13  Jakub Jelinek  <jakub@redhat.com>
 
-	* elf/common.h (PT_GNU_EH_FRAME): Define.
 	* bfdlink.h (struct bfd_link_info): Add eh_frame_hdr field.
 
 2001-12-07  Geoffrey Keating  <geoffk@redhat.com>
@@ -48,7 +42,7 @@
 
 2001-10-24  Neil Booth  <neil@daikokuya.demon.co.uk>
 
-	* include/safe-ctype.h (_sch_isbasic, IS_ISOBASIC): New.
+	* safe-ctype.h (_sch_isbasic, IS_ISOBASIC): New.
 
 2001-10-22  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
@@ -160,12 +154,6 @@
 	* libiberty.h (lbasename): Change function declaration to return a
 	const char pointer.
 
-2001-08-10  Richard Sandiford  <rsandifo@redhat.com>
-
-	* opcode/mips.h (INSN_GP32): Remove.
-	(OPCODE_IS_MEMBER): Remove gp32 parameter.
-	(M_MOVE): New macro identifier.
-
 2001-08-02  Mark Kettenis  <kettenis@gnu.org>
 
 	* xregex.h (_REGEX_RE_COMP): Define.
@@ -177,18 +165,9 @@
         * bfdlink.h (struct bfd_link_info): add new boolean
         field pei386_auto_import.
 
-2001-08-01  Aldy Hernandez  <aldyh@redhat.com>
-
-	* opcode/mips.h (INSN_ISA_MASK): Nuke bits 12-15.
-
 2001-07-18  Andreas Jaeger  <aj@suse.de>
 
 	* xregex2.h: Place under LGPL version 2.1.
-
-2001-07-12  Jeff Johnston  <jjohnstn@redhat.com>
-
-        * opcode/cgen.h (CGEN_INSN): Add regex support.
-        (build_insn_regex): Declare.
 
 2001-07-10  Jeff Johnston  <jjohnstn@redhat.com>
 
@@ -206,11 +185,6 @@
 2001-05-10  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* ansidecl.h (NULL_PTR): Delete.
-
-2001-05-11  Jakub Jelinek  <jakub@redhat.com>
-
-	* elf/ia64.h (ELF_STRING_ia64_unwind_once): Define.
-	(ELF_STRING_ia64_unwind_info_once): Define.
 
 2001-05-07  Zack Weinberg  <zackw@stanford.edu>
 

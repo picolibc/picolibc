@@ -1,6 +1,19 @@
+2002-01-31  Ivan Guzvinec  <ivang@opencores.org>
+
+	* or32.h: New file.
+	* common.h: Add support for or32 targets.
+
+2002-01-28  Jason Merrill  <jason@redhat.com>
+
+	* dwarf2.h: Sync with gcc version.
+
 2002-01-16  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (DT_PPC64_GLINK): Define.
+
+2002-01-15  Richard Earnshaw  <rearnsha@arm.com>
+
+	* arm.h (F_VFP_FLOAT, EF_ARM_VFP_FLOAT): Define.
 
 2002-01-09  Jason Thorpe  <thorpej@wasabisystems.com>
 
@@ -23,6 +36,10 @@
 	* internal.h (struct elf_internal_sym <st_shndx>): Make it an
 	unsigned int.
 	* common.h (SHN_BAD): Define.
+
+2001-12-13  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/common.h (PT_GNU_EH_FRAME): Define.
 
 2001-12-11  Alan Modra  <amodra@bigpond.net.au>
 
@@ -90,7 +107,7 @@
 	(E_H8_MACH_H8300, E_H8_MACH_H8300H, E_H8_MACH_H8300S): New
 	machine types.
 
-Tue Aug 26 23:32:34 2001  J"orn Rennecke <amylaar@redhat.com>
+2001-08-26  J"orn Rennecke <amylaar@redhat.com>
 
 	* h8.h: New file.
 
@@ -117,6 +134,11 @@ Tue Aug 26 23:32:34 2001  J"orn Rennecke <amylaar@redhat.com>
 
 	* common.h: Remove definition of EM_MIPS_RS4_BE.  The constant was
 	never in active use and is used otherwise by the ABI.
+
+2001-05-11  Jakub Jelinek  <jakub@redhat.com>
+
+	* ia64.h (ELF_STRING_ia64_unwind_once): Define.
+	(ELF_STRING_ia64_unwind_info_once): Define.
 
 2001-05-07  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
 
@@ -390,8 +412,8 @@ Tue Aug 26 23:32:34 2001  J"orn Rennecke <amylaar@redhat.com>
 	(ELFOSABI_MODESTO): Defined.
 	(ELFOSABI_OPENBSD): Likewise.
 
-Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
-			  David Mosberger  <davidm@hpl.hp.com>
+2000-04-21  Richard Henderson  <rth@cygnus.com>
+	    David Mosberger  <davidm@hpl.hp.com>
 
 	* ia64.h: New file.
 
@@ -425,7 +447,7 @@ Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
 	(PF_ARM_PI): Define.
 	(PF_ARM_ABS): Define.
 
-Wed Apr  5 22:08:59 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
+2000-04-05  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 	* sh.h (R_SH_LOOP_START, R_SH_LOOP_END): New RELOC_NUMBERs.
 
@@ -454,7 +476,7 @@ Wed Apr  5 22:08:59 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 	* common.h (ELFOSABI_LINUX): Define.
 
-Thu Feb 17 00:18:33 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
+2000-02-17  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 	* sh.h: (EF_SH_MACH_MASK, EF_SH_UNKNOWN, EF_SH1, EF_SH2): New macros.
 	(EF_SH3, EF_SH_HAS_DSP, EF_SH_DSP, EF_SH3_DSP): Likewise.

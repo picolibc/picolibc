@@ -1,6 +1,6 @@
 /* Interface between the opcode library and its callers.
 
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 2001, 2002 Free Software Foundation, Inc.
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -212,6 +212,8 @@ extern int print_insn_mn10200		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_mn10300		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_ns32k		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_openrisc		PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_big_or32          PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_little_or32       PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_pdp11		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_pj		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_big_powerpc	PARAMS ((bfd_vma, disassemble_info*));
