@@ -1,3 +1,9 @@
+2004-03-16  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (proc_terminate): Release sync_proc_subproc when done
+	terminating or suffer potential hangs.
+	(get_proc_lock): Reorganize debugging output slightly.
+
 2004-03-15  Christopher Faylor  <cgf@redhat.com>
 
 	* cygtls.cc (_cygtls::fixup_after_fork): Just manipulate the signal

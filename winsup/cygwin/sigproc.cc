@@ -214,7 +214,7 @@ get_proc_lock (DWORD what, DWORD val)
       sigproc_printf ("sync_proc_subproc is NULL (2)");
       return false;
     }
-  system_printf ("Couldn't aquire sync_proc_subproc for(%d,%d), %E, last %d",
+  system_printf ("Couldn't aquire sync_proc_subproc for(%d,%d), last %d, %E",
 		  what, val, lastwhat);
   return true;
 }
@@ -538,6 +538,7 @@ proc_terminate (void)
 	  pchildren[i].release ();
 	}
       nchildren = nzombies = 0;
+      sync_proc_subproc->release ();
     }
   sigproc_printf ("leaving");
 }
