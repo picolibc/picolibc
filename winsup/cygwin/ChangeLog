@@ -1,5 +1,13 @@
 2001-11-03  Christopher Faylor  <cgf@redhat.com>
 
+	* select.cc (verify_console): New function.
+	(verify_windows): Ditto.
+	(fhandler_console::select_read): Really do need to verify that there is
+	something to read.
+	(fhandler_console::select_windows): Ditto.
+
+2001-11-03  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.h (fhandler_base::ready_for_read): Remove unused argument.
 	(fhandler_tty_slave::ready_for_read): Ditto.
 	(select_record): Remove poll, initialize peek.

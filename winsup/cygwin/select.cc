@@ -659,6 +659,14 @@ peek_console (select_record *me, bool)
 
   return me->write_ready;
 }
+ 
+static int
+verify_console (select_record *me, fd_set *rfds, fd_set *wfds,
+	      fd_set *efds)
+{
+  return peek_console (me, true);
+}
+
 
 select_record *
 fhandler_console::select_read (select_record *s)
@@ -667,7 +675,7 @@ fhandler_console::select_read (select_record *s)
     {
       s = new select_record;
       s->startup = no_startup;
-      s->verify = verify_ok;
+      s->verify = verify_console;
       set_cursor_maybe ();
     }
 
@@ -1439,6 +1447,13 @@ peek_windows (select_record *me, bool)
   return me->write_ready;
 }
 
+static int
+verify_windows (select_record *me, fd_set *rfds, fd_set *wfds,
+		fd_set *efds)
+{
+  return peek_windows (me, true);
+}
+
 select_record *
 fhandler_windows::select_read (select_record *s)
 {
@@ -1446,8 +1461,8 @@ fhandler_windows::select_read (select_record *s)
     {
       s = new select_record;
       s->startup = no_startup;
-      s->verify = verify_ok;
     }
+  s->verify = verify_windows;
   s->peek = peek_windows;
   s->read_selected = true;
   s->read_ready = false;
