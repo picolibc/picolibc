@@ -1,3 +1,7 @@
+Tue Sep 12 14:37:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (normalize_posix_path): Fix more slashdot madness.
+
 Tue Sep 12 12:29:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Make clean target remove *.d.
