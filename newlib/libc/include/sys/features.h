@@ -81,6 +81,11 @@ extern "C" {
 # define _POSIX_JOB_CONTROL	1
 # define _POSIX_SAVED_IDS	0
 # define _POSIX_VERSION		199009L
+# define _POSIX_THREADS                          1
+# define _POSIX_THREAD_PROCESS_SHARED            1
+# define _POSIX_THREAD_SAFE_FUNCTIONS            1
+# define _POSIX_THREAD_PRIORITY_SCHEDULING       1
+# define _POSIX_THREAD_ATTR_STACKSIZE            1
 #endif
 
 #ifdef __cplusplus

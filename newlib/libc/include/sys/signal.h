@@ -12,7 +12,7 @@ extern "C" {
 
 /* #ifndef __STRICT_ANSI__*/
 
-#if defined(_POSIX_THREADS) || defined(__CYGWIN__)
+#if defined(_POSIX_THREADS)
 #include <sys/types.h>   /* for pthread data types */
 #endif
 

@@ -206,7 +206,7 @@ typedef	struct _types_fd_set {
    condition variables, and keys.  But since RTEMS is currently the only
    newlib user of these, the ifdef is just on RTEMS. */
 
-#if defined(__rtems__)
+#if defined(__rtems__) || defined(__CYGWIN__)
 
 #ifndef __clockid_t_defined
 typedef _CLOCKID_T_ clockid_t;
@@ -220,7 +220,15 @@ typedef _TIMER_T_ timer_t;
 
 #include <sys/features.h>
 
-#if defined(_POSIX_THREADS)
+
+/* Cygwin will probably never have full posix compliance due to little things
+ * like an inability to set the stackaddress. Cygwin is also using void *  
+ * pointers rather than structs to ensure maximum binary compatability with
+ * previous releases.
+ * This means that we don't use the types defined here, but rather in
+ * <cygwin/types.h>
+ */
+#if defined(_POSIX_THREADS) && !defined(__CYGWIN__)
 
 #include <sys/sched.h>
 
@@ -313,7 +321,10 @@ typedef struct {
   int   is_initialized;  /* is this structure initialized? */
   int   init_executed;   /* has the initialization routine been run? */
 } pthread_once_t;       /* dynamic package initialization */
-
+#else
+#if defined (__CYGWIN__)
+#include <cygwin/types.h>
+#endif
 #endif /* defined(_POSIX_THREADS) */
 
 #endif  /* defined(__rtems__) */

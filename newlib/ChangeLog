@@ -1,3 +1,11 @@
+2001-04-12  Robert Collins <rbtcollins@hotmail.com>
+
+	* libc/include/sys/features.h: Add appropriate defines for Cygwin
+	pthread support.
+	* libc/include/sys/signal.h: Remove unneeded __CYGWIN__ protection.
+	* libc/include/sys/types.h: Protect __CYGWIN__ from the rtems pthreads
+	types.  Include <cygwin/types.h> for the cygwin specific typedefs.
+
 2001-04-04  Richard Sandiford  <rsandifo@redhat.com>
 
 	* libc/include/machine/ieeefp.h: Comment about new configuration
