@@ -154,17 +154,18 @@ MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o  dllmain.o gccmain.o \
 	     pseudo-reloc.o pseudo-reloc-list.o
 MOLD_OBJS = ctype_old.o string_old.o
 
-LIBS = libcrtdll.a libmsvcrt.a libmsvcrt20.a libmsvcrt40.a libmingw32.a \
-       libcoldname.a libmoldname.a $(LIBM_A) libmingwthrd.a
+LIBS = libcrtdll.a libmsvcrt.a libmsvcrtd.a libmsvcrt20.a libmsvcrt40.a \
+       libmingw32.a \
+       libcoldname.a libmoldname.a libmoldnamed.a $(LIBM_A) libmingwthrd.a
 
 DLLS = $(THREAD_DLL_NAME)
 
 SRCDIST_FILES = CRT_noglob.c CRTfmode.c CRTglob.c CRTinit.c ChangeLog \
 Makefile.in README TODO config.guess config.sub configure configure.in \
 crt1.c crtdll.def crtmt.c crtst.c ctype_old.c  dllcrt1.c dllmain.c \
-gccmain.c init.c install-sh jamfile main.c mkinstalldirs moldname-crtdll.def \
-moldname-msvcrt.def moldname.def moldname.def.in msvcrt.def msvcrt20.def \
-msvcrt40.def mthr.c mthr_init.c mthr_stub.c readme.txt string_old.c \
+gccmain.c init.c install-sh jamfile main.c mkinstalldirs \
+moldname.def.in msvcrt.def.in \
+mthr.c mthr_init.c mthr_stub.c readme.txt string_old.c \
 CRT_fp8.c CRT_fp10.c test_headers.c txtmode.c binmode.c pseudo-reloc.c \
 pseudo-reloc-list.c
 
@@ -229,30 +230,44 @@ libmingw32.a: $(MINGW_OBJS)
 	$(AR) rc $@ $(MINGW_OBJS)
 	$(RANLIB) $@
 
-$(srcdir)/moldname-crtdll.def: moldname.def.in
+msvcrt.def msvcrtd.def msvcrt20.def msvcrt40.def: msvcrt.def.in
+	$(CC) -DRUNTIME=$(basename $(notdir $@)) \
+		-D__FILENAME__=$@ \
+		-D__MSVCRT__ -C -E -P \
+		-xc-header $? > $@
+
+moldname-crtdll.def: moldname.def.in
 	$(CC) -DRUNTIME=crtdll \
 		-D__FILENAME__=moldname-crtdll.def \
 		-D__CRTDLL__  -C -E -P \
 		-xc-header $? > $@
 
-$(srcdir)/moldname-msvcrt.def: moldname.def.in
+moldname-msvcrt.def: moldname.def.in
 	$(CC) -DRUNTIME=msvcrt \
 		-D__FILENAME__=moldname-msvcrt.def \
 		-D__MSVCRT__  -C -E -P \
 		-xc-header $? > $@
 
-libcoldname.a: $(srcdir)/moldname-crtdll.def $(MOLD_OBJS)
+libcoldname.a: moldname-crtdll.def $(MOLD_OBJS)
 	$(DLLTOOL) --as $(AS) -k -U	\
 		--dllname crtdll.dll	\
-		--def $(srcdir)/moldname-crtdll.def	\
+		--def moldname-crtdll.def	\
 		--output-lib $@
 	$(AR) rc $@ $(MOLD_OBJS)
 	$(RANLIB) $@
 
-libmoldname.a: $(srcdir)/moldname-msvcrt.def $(MOLD_OBJS)
+libmoldname.a: moldname-msvcrt.def $(MOLD_OBJS)
 	$(DLLTOOL) --as $(AS) -k -U	\
 		--dllname msvcrt.dll	\
-		--def $(srcdir)/moldname-msvcrt.def	\
+		--def moldname-msvcrt.def	\
+		--output-lib $@
+	$(AR) rc $@ $(MOLD_OBJS)
+	$(RANLIB) $@
+
+libmoldnamed.a: moldname-msvcrt.def $(MOLD_OBJS)
+	$(DLLTOOL) --as $(AS) -k -U	\
+		--dllname msvcrtd.dll	\
+		--def moldname-msvcrt.def	\
 		--output-lib $@
 	$(AR) rc $@ $(MOLD_OBJS)
 	$(RANLIB) $@
@@ -287,12 +302,11 @@ test_headers:
 clean:
 	-rm -f *.o *.a *~ core a.out mingwthrd.def mingwthrd.base mingwthrd.exp
 	-rm -f $(THREAD_DLL_NAME) mingwthrd_dummy.exe
+	-rm -f moldname-*.def
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
 
-distclean:
+distclean: clean
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
-	-rm -f *.o *.a *~ core a.out mingwthrd.def mingwthrd.base mingwthrd.exp
-	-rm -f $(THREAD_DLL_NAME)
 	-rm -f config.cache config.status config.log 
 	-rm -f Makefile
 
@@ -398,27 +412,28 @@ force:
 #
 # Dependancies
 #
-libcrtdll.a: $(srcdir)/crtdll.def
-libmsvcrt.a: $(srcdir)/msvcrt.def
-libmsvcrt20.a: $(srcdir)/msvcrt20.def
-libmsvcrt40.a: $(srcdir)/msvcrt40.def
-CRT_noglob.o: $(srcdir)/CRT_noglob.c
-CRTfmode.o: $(srcdir)/CRTfmode.c
-CRTglob.o: $(srcdir)/CRTglob.c
-CRTinit.o: $(srcdir)/CRTinit.c
-crt1.o: $(srcdir)/crt1.c $(srcdir)/init.c
-crt2.o: $(srcdir)/crt1.c $(srcdir)/init.c
-crtmt.o: $(srcdir)/crtmt.c
-crtst.o: $(srcdir)/crtst.c
-ctype_old.o: $(srcdir)/ctype_old.c
-dllcrt1.o: $(srcdir)/dllcrt1.c 
-dllcrt2.o: $(srcdir)/dllcrt1.c 
-dllmain.o: $(srcdir)/dllmain.c
-main.o: $(srcdir)/main.c
-oldnames.o: $(srcdir)/oldnames.c
-string_old.o: $(srcdir)/string_old.c
-CRT_fp8.o: $(srcdir)/CRT_fp8.c
-CRT_fp10.o: $(srcdir)/CRT_fp10.c
+libcrtdll.a: crtdll.def
+libmsvcrt.a: msvcrt.def
+libmsvcrtd.a: msvcrtd.def
+libmsvcrt20.a: msvcrt20.def
+libmsvcrt40.a: msvcrt40.def
+CRT_noglob.o: CRT_noglob.c
+CRTfmode.o: CRTfmode.c
+CRTglob.o: CRTglob.c
+CRTinit.o: CRTinit.c
+crt1.o: crt1.c init.c
+crt2.o: crt1.c init.c
+crtmt.o: crtmt.c
+crtst.o: crtst.c
+ctype_old.o: ctype_old.c
+dllcrt1.o: dllcrt1.c 
+dllcrt2.o: dllcrt1.c 
+dllmain.o: dllmain.c
+main.o: main.c
+oldnames.o: oldnames.c
+string_old.o: string_old.c
+CRT_fp8.o: CRT_fp8.c
+CRT_fp10.o: CRT_fp10.c
 
 
 Makefile: Makefile.in config.status configure

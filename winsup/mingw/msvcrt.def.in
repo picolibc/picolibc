@@ -1,5 +1,6 @@
 ;
-; msvcrt.def
+; __FILENAME__ 
+;    created from msvcrt.def.in
 ;
 ; Exports from msvcrt.dll. Msvcrt.dll appears to be distributed with
 ; Internet Explorer 4.0, and may be more common in the future, but
@@ -9,7 +10,7 @@
 ;
 ; NOTE: All exports, except for what appeared to be C++ mangled names,
 ;       are included. Not all functions have prototypes in the headers
-;       (and some aren't functions at all).
+;       (and some are not functions at all).
 ;
 ; Contributors:
 ;  Created by Colin Peters <colin@bird.fu.is.saga-u.ac.jp>

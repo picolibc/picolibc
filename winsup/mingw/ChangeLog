@@ -1,3 +1,16 @@
+2003-02-21  Earnie Boyd  <earnie@users.sf.net>
+
+	Thanks to David Frasier <davidf@sjsoft.com> who inspired portions of
+	this patch.
+	* Makefile.in (libmsvcrtd.a): Add target library.
+	(libmoldnamed.a): Ditto.
+	(msvcrt.def, msvcrtd.def, msvcrt20.def, msvcrt40.def): Use msvcrt.def.in
+	template to create.
+	($(srcdir)): Remove explicit reference for depencies of object targets.
+	* moldname.def, moldname-msvcrt.def, moldname-crtdll.def, msvcrt.def,
+	msvcrt20.def, msvcrt40.def: Remove.
+	* msvcrt.def.in: New file (Copy of previous msvcrt.def).
+
 2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Make sure libmingwex.a from current build tree is used.
