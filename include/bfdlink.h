@@ -511,14 +511,6 @@ struct bfd_link_callbacks
   bfd_boolean (*notice)
     (struct bfd_link_info *, const char *name,
      bfd *abfd, asection *section, bfd_vma address);
-  /* A function which is called for reporting a linker error. ID is the
-     error identifier. The remaining input is the same as einfo () in
-     ld.  */
-  bfd_boolean (*error_handler)
-    (int id, const char *fmt, ...);
-
-/* Identifiers of linker error messages used by error_handler.  */
-#define LD_DEFINITION_IN_DISCARDED_SECTION	1
 };
 
 /* The linker builds link_order structures which tell the code how to
