@@ -556,7 +556,6 @@ path_conv::check (const char *src, unsigned opt,
     error = 0;
   else if ((error = check_null_empty_str (src)))
     return;
-  unsigned pflags_or = (opt & PC_NO_ACCESS_CHECK);
   /* This loop handles symlink expansion.  */
   for (;;)
     {
@@ -588,7 +587,8 @@ path_conv::check (const char *src, unsigned opt,
       sym.contents[0] = '\0';
 
       int symlen = 0;
-      for (;;)
+      
+      for (unsigned pflags_or = opt & PC_NO_ACCESS_CHECK; ; pflags_or = 0)
 	{
 	  const suffix_info *suff;
 	  char pathbuf[CYG_MAX_PATH];
@@ -782,7 +782,7 @@ is_virtual_symlink:
 		  else
 		    break;
 		}
-	      else if (sym.error != ENOENT && sym.error != ENOSHARE)
+	      else if (sym.error && sym.error != ENOENT && sym.error != ENOSHARE)
 		{
 		  error = sym.error;
 		  goto out;
