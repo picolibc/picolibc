@@ -1,3 +1,8 @@
+1999-08-27  Nick Clifton  <nickc@cygnus.com>
+
+	* configure.in: Do not configure or build ld for AIX
+	platforms.  ld is known to be broken on these platforms.
+
 1999-08-09  Ian Lance Taylor  <ian@zembu.com>
 
 	* Makefile.in (LDFLAGS): Define.
