@@ -72,13 +72,20 @@ enum path_types
 class symlink_info;
 struct fs_info
 {
-  char name[MAX_PATH];
-  char root_dir[MAX_PATH];
-  DWORD flags;
-  DWORD serial;
-  DWORD sym_opt; /* additional options to pass to symlink_info resolver */
-  DWORD is_remote_drive;
-  DWORD drive_type;
+  char name_storage[MAX_PATH];
+  char root_dir_storage[MAX_PATH];
+  DWORD flags_storage;
+  DWORD serial_storage;
+  DWORD sym_opt_storage; /* additional options to pass to symlink_info resolver */
+  bool is_remote_drive_storage;
+  DWORD drive_type_storage;
+  inline char* name () const {return (char *) name_storage;}
+  inline char* root_dir () const {return (char *) root_dir_storage;}
+  inline DWORD& flags () {return flags_storage;};
+  inline DWORD& serial () {return serial_storage;};
+  inline DWORD& sym_opt () {return sym_opt_storage;};
+  inline bool& is_remote_drive () {return is_remote_drive_storage;};
+  inline DWORD& drive_type () {return drive_type_storage;};
   bool update (const char *);
 };
 
@@ -96,7 +103,7 @@ class path_conv
   BOOL case_clash;
 
   int isdisk () const { return path_flags & PATH_ISDISK;}
-  int isremote () const {return fs.is_remote_drive;}
+  bool& isremote () {return fs.is_remote_drive ();}
   int has_acls () const {return path_flags & PATH_HASACLS;}
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int hasgood_inode () const {return path_flags & PATH_HASACLS;}  // Not strictly correct
@@ -172,13 +179,13 @@ class path_conv
   DWORD get_devn () {return dev.devn;}
   short get_unitn () {return dev.minor;}
   DWORD file_attributes () {return fileattr;}
-  DWORD drive_type () {return fs.drive_type;}
-  DWORD fs_flags () {return fs.flags;}
-  BOOL fs_fast_ea () {return fs.sym_opt & PC_CHECK_EA;}
+  DWORD drive_type () {return fs.drive_type ();}
+  DWORD fs_flags () {return fs.flags ();}
+  BOOL fs_fast_ea () {return fs.sym_opt () & PC_CHECK_EA;}
   void set_path (const char *p) {strcpy (path, p);}
-  const char * root_dir () const { return fs.root_dir; }
-  DWORD volser () { return fs.serial; }
-  const char *volname () {return fs.name; }
+  const char * root_dir () const { return fs.root_dir (); }
+  DWORD volser () { return fs.serial (); }
+  const char *volname () {return fs.name (); }
   void fillin (HANDLE h);
   inline size_t size ()
   {

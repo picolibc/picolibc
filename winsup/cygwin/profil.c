@@ -62,6 +62,8 @@ profthr_func (LPVOID arg)
   struct profinfo *p = (struct profinfo *) arg;
   u_long pc, idx;
 
+  SetThreadPriority(p->profthr, THREAD_PRIORITY_TIME_CRITICAL);
+
   for (;;)
     {
       pc = (u_long) get_thrpc (p->targthr);

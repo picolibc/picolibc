@@ -198,7 +198,7 @@ int __stdcall writable_directory (const char *file);
 int __stdcall stat_dev (DWORD, int, unsigned long, struct __stat64 *);
 extern BOOL allow_ntsec;
 
-unsigned long __stdcall hash_path_name (unsigned long hash, const char *name) __attribute__ ((regparm(2)));
+unsigned long __stdcall hash_path_name (ino_t hash, const char *name) __attribute__ ((regparm(2)));
 void __stdcall nofinalslash (const char *src, char *dst) __attribute__ ((regparm(2)));
 extern "C" char *__stdcall rootdir (char *full_path) __attribute__ ((regparm(1)));
 

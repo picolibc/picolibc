@@ -18,7 +18,7 @@
 #ifndef _CYGWIN_IN_H
 #define _CYGWIN_IN_H
 
-#include <sys/types.h>
+#include <stdint.h>
 
 /* Standard well-defined IP protocols.  */
 enum

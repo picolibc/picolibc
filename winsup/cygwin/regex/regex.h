@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 /* === regex2.h === */
-typedef off_t regoff_t;
+typedef _off_t regoff_t;
 typedef struct {
 	int re_magic;
 	size_t re_nsub;		/* number of parenthesized subexpressions */

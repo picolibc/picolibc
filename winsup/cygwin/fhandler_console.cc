@@ -321,13 +321,25 @@ fhandler_console::read (void *pv, size_t& buflen)
 	      break;
 	    }
 
-	  if (!input_rec.Event.KeyEvent.bKeyDown)
-	    continue;
-
 #define ich (input_rec.Event.KeyEvent.uChar.AsciiChar)
 #define wch (input_rec.Event.KeyEvent.uChar.UnicodeChar)
 #define ALT_PRESSED (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)
 #define CTRL_PRESSED (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)
+
+	  /* Ignore key up events, except for left alt events with non-zero character
+	   */
+	  if (!input_rec.Event.KeyEvent.bKeyDown &&
+	      /*
+		Event for left alt, with a non-zero character, comes from
+		"alt + numerics" key sequence.
+		e.g. <left-alt> 0233 => &eacute;
+	      */
+	      !(wch != 0
+		// ?? experimentally determined on an XP system
+		&& virtual_key_code == VK_MENU
+		// left alt -- see http://www.microsoft.com/hwdev/tech/input/Scancode.asp
+		&& input_rec.Event.KeyEvent.wVirtualScanCode == 0x38))
+	    continue;
 
 	  if (wch == 0 ||
 	      /* arrow/function keys */

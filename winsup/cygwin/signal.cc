@@ -88,7 +88,7 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
   int rc = pthread::cancelable_wait (signal_arrived, req);
   DWORD now = GetTickCount ();
   DWORD rem = (rc == WAIT_TIMEOUT || now >= end_time) ? 0 : end_time - now;
-  if (WaitForSingleObject (signal_arrived, 0) == WAIT_OBJECT_0)
+  if (rc == WAIT_OBJECT_0)
     {
       (void) thisframe.call_signal_handler ();
       set_errno (EINTR);

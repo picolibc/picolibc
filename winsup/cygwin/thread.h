@@ -438,6 +438,11 @@ public:
 
   virtual unsigned long getsequence_np();
 
+  static int equal (pthread_t t1, pthread_t t2)
+  {
+    return t1 == t2;
+  }
+
 private:
   DWORD thread_id;
   __pthread_cleanup_handler *cleanup_stack;
@@ -586,6 +591,18 @@ private:
   void add_reader (struct RWLOCK_READER *rd);
   void remove_reader (struct RWLOCK_READER *rd);
   struct RWLOCK_READER *lookup_reader (pthread_t thread);
+
+  void release ()
+  {
+    if (waiting_writers)
+      {
+        if (!readers)
+          cond_writers.unblock (false);
+      }
+    else if (waiting_readers)
+      cond_readers.unblock (true);
+  }
+
 
   static void rdlock_cleanup (void *arg);
   static void wrlock_cleanup (void *arg);

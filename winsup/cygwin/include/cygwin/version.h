@@ -41,8 +41,8 @@ details. */
 	 the Cygwin library".  This version is used to track important
 	 changes to the DLL and is mainly informative in nature. */
 
-#define CYGWIN_VERSION_DLL_MAJOR 1003
-#define CYGWIN_VERSION_DLL_MINOR 23
+#define CYGWIN_VERSION_DLL_MAJOR 1005
+#define CYGWIN_VERSION_DLL_MINOR 0
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -198,12 +198,19 @@ details. */
 		  _open64 _lseek64 _fstat64 _stat64 mknod32
        80: Export pthread_rwlock stuff
        81: CW_CHECK_NTSEC addition to external.cc
+       82: Export wcscoll wcswidth wcwidth
+       83: Export gethostid
+       84: Pty open allocates invisible console.  64 bit interface
+       85: Export new 32/64 functions from API 0.79 only with leading
+           underscore.  No problems with backward compatibility since no
+           official release has been made so far.  This change removes
+           exported symbols like fopen64, which might confuse configure.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 81
+#define CYGWIN_VERSION_API_MINOR 85
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

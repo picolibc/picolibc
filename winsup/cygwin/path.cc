@@ -359,27 +359,27 @@ fs_info::update (const char *win32_path)
   if (!rootdir (tmp_buf))
     {
       debug_printf ("Cannot get root component of path %s", win32_path);
-      name [0] = '\0';
-      sym_opt = flags = serial = 0;
+      name_storage [0] = '\0';
+      sym_opt_storage = flags_storage = serial_storage = 0;
       return false;
     }
 
-  if (strcmp (tmp_buf, root_dir) == 0)
+  if (strcmp (tmp_buf, root_dir_storage) == 0)
     return 1;
 
-  strncpy (root_dir, tmp_buf, MAX_PATH);
-  drive_type = GetDriveType (root_dir);
-  if (drive_type == DRIVE_REMOTE || (drive_type == DRIVE_UNKNOWN && (root_dir[0] == '\\' && root_dir[1] == '\\')))
-    is_remote_drive = 1;
+  strncpy (root_dir_storage, tmp_buf, MAX_PATH);
+  drive_type_storage = GetDriveType (root_dir_storage);
+  if (drive_type_storage == DRIVE_REMOTE || (drive_type_storage == DRIVE_UNKNOWN && (root_dir_storage[0] == '\\' && root_dir_storage[1] == '\\')))
+    is_remote_drive_storage = 1;
   else
-    is_remote_drive = 0;
+    is_remote_drive_storage = 0;
 
-  if (!GetVolumeInformation (root_dir, NULL, 0, &serial, NULL, &flags,
-				 name, sizeof (name)))
+  if (!GetVolumeInformation (root_dir_storage, NULL, 0, &serial_storage, NULL, &flags_storage,
+				 name_storage, sizeof (name_storage)))
     {
-      debug_printf ("Cannot get volume information (%s), %E", root_dir);
-      name [0] = '\0';
-      sym_opt = flags = serial = 0;
+      debug_printf ("Cannot get volume information (%s), %E", root_dir_storage);
+      name_storage[0] = '\0';
+      sym_opt_storage = flags_storage = serial_storage = 0;
       return false;
     }
   /* FIXME: Samba by default returns "NTFS" in file system name, but
@@ -387,7 +387,7 @@ fs_info::update (const char *win32_path)
    * distinguish between samba and real ntfs, it should be implemented
    * here.
    */
-  sym_opt = (!is_remote_drive && strcmp (name, "NTFS") == 0) ? PC_CHECK_EA : 0;
+  sym_opt_storage = (!is_remote_drive_storage && strcmp (name_storage, "NTFS") == 0) ? PC_CHECK_EA : 0;
 
   return true;
 }
@@ -399,14 +399,14 @@ path_conv::fillin (HANDLE h)
   if (!GetFileInformationByHandle (h, &local))
     {
       fileattr = INVALID_FILE_ATTRIBUTES;
-      fs.serial = 0;
+      fs.serial () = 0;
     }
   else
     {
       fileattr = local.dwFileAttributes;
-      fs.serial = local.dwVolumeSerialNumber;
+      fs.serial () = local.dwVolumeSerialNumber;
     }
-    fs.drive_type = DRIVE_UNKNOWN;
+    fs.drive_type () = DRIVE_UNKNOWN;
 }
 
 void
@@ -472,12 +472,12 @@ path_conv::check (const char *src, unsigned opt,
   fileattr = INVALID_FILE_ATTRIBUTES;
   case_clash = false;
   memset (&dev, 0, sizeof (dev));
-  fs.root_dir[0] = '\0';
-  fs.name[0] = '\0';
-  fs.flags = fs.serial = 0;
-  fs.sym_opt = 0;
-  fs.drive_type = 0;
-  fs.is_remote_drive = 0;
+  fs.root_dir ()[0] = '\0';
+  fs.name ()[0] = '\0';
+  fs.flags () = fs.serial () = 0;
+  fs.sym_opt () = 0;
+  fs.drive_type () = 0;
+  fs.is_remote_drive () = 0;
   normalized_path = NULL;
 
   if (!(opt & PC_NULLEMPTY))
@@ -594,7 +594,7 @@ path_conv::check (const char *src, unsigned opt,
 	    }
 
 	  if (!fs.update (full_path))
-	    fs.root_dir[0] = '\0';
+	    fs.root_dir ()[0] = '\0';
 
 	  /* Eat trailing slashes */
 	  char *dostail = strchr (full_path, '\0');
@@ -618,7 +618,7 @@ path_conv::check (const char *src, unsigned opt,
 	      goto out;
 	    }
 
-	  int len = sym.check (full_path, suff, opt | fs.sym_opt);
+	  int len = sym.check (full_path, suff, opt | fs.sym_opt ());
 
 	  if (sym.minor || sym.major)
 	    {
@@ -799,7 +799,7 @@ out:
     {
       if (!fs.update (path))
 	{
-	  fs.root_dir[0] = '\0';
+	  fs.root_dir ()[0] = '\0';
 	  set_has_acls (false);
 	  set_has_buggy_open (false);
 	}
@@ -807,14 +807,14 @@ out:
 	{
 	  set_isdisk ();
 	  debug_printf ("root_dir(%s), this->path(%s), set_has_acls(%d)",
-			fs.root_dir, this->path, fs.flags & FS_PERSISTENT_ACLS);
-	  if (!allow_smbntsec && fs.is_remote_drive)
+			fs.root_dir (), this->path, fs.flags () & FS_PERSISTENT_ACLS);
+	  if (!allow_smbntsec && fs.is_remote_drive ())
 	    set_has_acls (false);
 	  else
-	    set_has_acls (fs.flags & FS_PERSISTENT_ACLS);
+	    set_has_acls (fs.flags () & FS_PERSISTENT_ACLS);
 	  /* Known file systems with buggy open calls. Further explanation
 	     in fhandler.cc (fhandler_disk_file::open). */
-	  set_has_buggy_open (strcmp (fs.name, "SUNWNFS") == 0);
+	  set_has_buggy_open (strcmp (fs.name (), "SUNWNFS") == 0);
 	}
     }
 
@@ -3012,7 +3012,7 @@ readlink (const char *path, char *buf, int buflen)
 /* Cygwin internal */
 
 unsigned long __stdcall
-hash_path_name (unsigned long hash, const char *name)
+hash_path_name (ino_t hash, const char *name)
 {
   if (!*name)
     return hash;

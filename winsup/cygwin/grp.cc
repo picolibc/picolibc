@@ -108,6 +108,22 @@ pwdgrp::read_group ()
   return;
 }
 
+pwdgrp::pwdgrp (passwd *&pbuf) :
+  pwdgrp_buf_elem_size (sizeof (*pbuf)), passwd_buf (&pbuf)
+{
+  read = &pwdgrp::read_passwd;
+  parse = &pwdgrp::parse_passwd;
+  new_muto (pglock);
+}
+
+pwdgrp::pwdgrp (__group32 *&gbuf) :
+  pwdgrp_buf_elem_size (sizeof (*gbuf)), group_buf (&gbuf)
+{
+  read = &pwdgrp::read_group;
+  parse = &pwdgrp::parse_group;
+  new_muto (pglock);
+}
+
 struct __group32 *
 internal_getgrsid (cygpsid &sid)
 {

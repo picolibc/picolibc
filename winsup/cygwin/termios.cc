@@ -247,14 +247,52 @@ cfgetispeed (struct termios *tp)
   return __tonew_termios (tp)->c_ispeed;
 }
 
+static inline int
+setspeed (speed_t &set_speed, speed_t from_speed)
+{
+  int res;
+  switch (from_speed)
+    {
+    case B0:
+    case B50:
+    case B75:
+    case B110:
+    case B134:
+    case B150:
+    case B200:
+    case B300:
+    case B600:
+    case B1200:
+    case B1800:
+    case B2400:
+    case B4800:
+    case B9600:
+    case B19200:
+    case B38400:
+    case B57600:
+    case B115200:
+    case B128000:
+    case B230400:
+    case B256000:
+      set_speed = from_speed;
+      res = 0;
+      break;
+    default:
+      set_errno (EINVAL);
+      res = -1;
+      break;
+    }
+  return res;
+}
+
 /* cfsetospeed: POSIX96 7.1.3.1 */
 extern "C" int
 cfsetospeed (struct termios *in_tp, speed_t speed)
 {
   struct termios *tp = __tonew_termios (in_tp);
-  tp->c_ospeed = speed;
+  int res = setspeed (tp->c_ospeed, speed);
   (void) __toapp_termios (in_tp, tp);
-  return 0;
+  return res;
 }
 
 /* cfsetispeed: POSIX96 7.1.3.1 */
@@ -262,7 +300,7 @@ extern "C" int
 cfsetispeed (struct termios *in_tp, speed_t speed)
 {
   struct termios *tp = __tonew_termios (in_tp);
-  tp->c_ispeed = speed;
+  int res = setspeed (tp->c_ispeed, speed);
   (void) __toapp_termios (in_tp, tp);
-  return 0;
+  return res;
 }

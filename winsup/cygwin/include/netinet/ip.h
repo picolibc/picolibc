@@ -37,6 +37,9 @@
 #ifndef _NETINET_IP_H
 #define _NETINET_IP_H
 
+#include <netinet/in_systm.h>
+#include <netinet/in.h>
+
 /* Added by Wu Yongwei */
 #ifndef LITTLE_ENDIAN
 #define LITTLE_ENDIAN   1234

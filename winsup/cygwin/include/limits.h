@@ -116,9 +116,9 @@ details. */
 #define ULLONG_MAX (LLONG_MAX * 2ULL + 1)
 #endif
 
-/* Maximum number of iovcnt in a writev */
+/* Maximum number of iovcnt in a writev (an arbitrary number) */
 #undef IOV_MAX
-#define IOV_MAX (__INT_MAX__-1)
+#define IOV_MAX 1024
 
 /* Maximum size of ssize_t */
 #undef SSIZE_MAX

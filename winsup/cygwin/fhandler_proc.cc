@@ -28,6 +28,7 @@ details. */
 #include <sys/param.h>
 #include "ntdll.h"
 #include <winioctl.h>
+#include "cpuid.h"
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -545,37 +546,6 @@ format_proc_stat (char *destbuf, size_t maxsize)
 	  bufptr += sizeof (x) - 1; \
 	} while (0)
 
-static inline void
-cpuid (unsigned *a, unsigned *b, unsigned *c, unsigned *d, unsigned in)
-{
-  asm ("cpuid"
-       : "=a" (*a),
-	 "=b" (*b),
-	 "=c" (*c),
-	 "=d" (*d)
-       : "a" (in));
-}
-
-static inline bool
-can_set_flag (unsigned flag)
-{
-  unsigned r1, r2;
-  asm("pushfl\n"
-      "popl %0\n"
-      "movl %0, %1\n"
-      "xorl %2, %0\n"
-      "pushl %0\n"
-      "popfl\n"
-      "pushfl\n"
-      "popl %0\n"
-      "pushl %1\n"
-      "popfl\n"
-      : "=&r" (r1), "=&r" (r2)
-      : "ir" (flag)
-  );
-  return ((r1 ^ r2) & flag) != 0;
-}
-
 static _off64_t
 format_proc_cpuinfo (char *destbuf, size_t maxsize)
 {
@@ -631,7 +601,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	{
 	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
 	  read_value ("VendorIdentifier", REG_SZ);
-	  bufptr += __small_sprintf (bufptr, "vendor id       : %s\n", szBuffer);
+	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", szBuffer);
 	  read_value ("Identifier", REG_SZ);
 	  bufptr += __small_sprintf (bufptr, "identifier      : %s\n", szBuffer);
           if (wincap.is_winnt ())
@@ -665,7 +635,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	  cpuid (&maxf, &vendor_id[0], &vendor_id[2], &vendor_id[1], 0);
 	  maxf &= 0xffff;
 	  vendor_id[3] = 0;
-	  bufptr += __small_sprintf (bufptr, "vendor id       : %s\n", (char *)vendor_id);
+	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", (char *)vendor_id);
           unsigned cpu_mhz  = 0;
           if (wincap.is_winnt ())
             {
