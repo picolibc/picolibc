@@ -1,3 +1,12 @@
+Sat Mar 25 20:46:39 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (symlink_check_one): Recognize symlink settings from the
+	mount table.
+	* path.h: Make PATH_SYMLINK an alias for MOUNT_SYMLINK.
+	* syscalls.cc (stat_worker): Use extension search mechanism in
+	path_conv to look for .exe rather than trying to special case it here.
+	* mount.h: Make MOUNT_SYMLINK a real option.
+
 Sat Mar 25 00:22:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* environ.cc: Add TMPDIR to the list of environment variables which are
@@ -7,7 +16,7 @@ Sat Mar 25 00:22:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 Sun Mar 19 12:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * syscalls.cc (stat_worker): Set st_nlink to 1 on remote drives.
+	* syscalls.cc (stat_worker): Set st_nlink to 1 on remote drives.
 
 Sat Mar 18 23:04:27 2000  Christopher Faylor <cgf@cygnus.com>
 
@@ -30,41 +39,41 @@ Sat Mar 18 01:24:25 2000  Christopher Faylor <cgf@cygnus.com>
 Fri Mar 17 18:16:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	Patch suggested by Eric Fifer <EFifer@sanwaint.com>
-        * fhandler.cc (fhandler_base::open): Call set_file_attribute()
-        only if a file is really created.
+	* fhandler.cc (fhandler_base::open): Call set_file_attribute()
+	only if a file is really created.
 
 Thu Mar 16 14:15:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * security.cc (set_process_privileges): Remove `static'.
-        (get_nt_attribute): Returns uid and gid additionally. Remove call
-        to set_process_privileges().
-        (get_file_attribute): Returns uid and gid additionally. Don't
-        call ntea if ntsec is ON.
-        (set_nt_attribute): Remove call to set_process_privileges().
-        Don't call ntea if ntsec is ON.
-        (acl): Remove call to set_process_privileges().
-        * dcrt0.cc (dll_crt0_1): Call set_process_privileges().
-        * winsup.h: New prototype for set_process_privileges(),
-        changed prototype for get_file_attribute().
-        * fhandler.cc (get_file_owner): Discard function.
-        (get_file_group): Ditto.
-        (fhandler_disk_file::fstat): Discard calls to get_file_owner() and
-        get_file_group().
-        * path.cc (path_conv::path_conv): New debugging output for result
-        of GetVolumeInformation().
-        (mount_info::conv_to_win32_path): Call backslashify() with pathbuf
-        instead of src_path.
-        * syscalls.cc (chown): Reformat slightly.
-        (chmod): Replace get_file_owner() and get_file_group() calls
-        by a call to get_file_attribute(). Discard local variable has_acls.
-        Reformat slightly.
-        (stat_worker): Root dir check now done by a call to rootdir().
-        Don't call num_entries() on remote drives.
-        Discard local variable has_acls.
+	* security.cc (set_process_privileges): Remove `static'.
+	(get_nt_attribute): Returns uid and gid additionally. Remove call
+	to set_process_privileges().
+	(get_file_attribute): Returns uid and gid additionally. Don't
+	call ntea if ntsec is ON.
+	(set_nt_attribute): Remove call to set_process_privileges().
+	Don't call ntea if ntsec is ON.
+	(acl): Remove call to set_process_privileges().
+	* dcrt0.cc (dll_crt0_1): Call set_process_privileges().
+	* winsup.h: New prototype for set_process_privileges(),
+	changed prototype for get_file_attribute().
+	* fhandler.cc (get_file_owner): Discard function.
+	(get_file_group): Ditto.
+	(fhandler_disk_file::fstat): Discard calls to get_file_owner() and
+	get_file_group().
+	* path.cc (path_conv::path_conv): New debugging output for result
+	of GetVolumeInformation().
+	(mount_info::conv_to_win32_path): Call backslashify() with pathbuf
+	instead of src_path.
+	* syscalls.cc (chown): Reformat slightly.
+	(chmod): Replace get_file_owner() and get_file_group() calls
+	by a call to get_file_attribute(). Discard local variable has_acls.
+	Reformat slightly.
+	(stat_worker): Root dir check now done by a call to rootdir().
+	Don't call num_entries() on remote drives.
+	Discard local variable has_acls.
 
 Wed Mar 15 20:38:06 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * errno.cc: Map ERROR_NOACCESS to EFAULT.
+	* errno.cc: Map ERROR_NOACCESS to EFAULT.
 
 Wed Mar 15 14:25:38 2000  Christopher Faylor <cgf@cygnus.com>
 

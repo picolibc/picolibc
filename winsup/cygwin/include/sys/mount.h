@@ -7,7 +7,7 @@ extern "C" {
 
 enum
   {
-    /* MOUNT_SYMLINK = 1, place holder.  Do not use it. */
+    MOUNT_SYMLINK = 1,	/* "mount point" is a symlink */
     MOUNT_BINARY =  2,	/* "binary" format read/writes */
     MOUNT_SYSTEM =  8,	/* mount point came from system table */
     MOUNT_EXEC   = 16,	/* Any file in the mounted directory gets 'x' bit */

@@ -917,6 +917,12 @@ stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
   return 0;
 }
 
+static suffix_info stat_suffixes[] = 
+{
+  suffix_info ("", 1),
+  suffix_info (".exe", 1)
+};
+
 /* Cygwin internal */
 static int
 stat_worker (const char *caller, const char *name, struct stat *buf,
@@ -931,7 +937,9 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 
   debug_printf ("%s (%s, %p)", caller, name, buf);
 
-  path_conv real_path (name, nofollow ? SYMLINK_NOFOLLOW : SYMLINK_FOLLOW, 1);
+  path_conv real_path (name, nofollow ? SYMLINK_NOFOLLOW : SYMLINK_FOLLOW, 1,
+		       stat_suffixes);
+
   if (real_path.error)
     {
       set_errno (real_path.error);
@@ -946,25 +954,6 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 		     hash_path_name (0, win32_name), buf);
 
   atts = real_path.file_attributes ();
-
-/* FIXME: this is of dubious merit and is fundamentally flawed.
-   E.g., what if the .exe file is a symlink?  This is not accounted
-   for here.  Also, what about all of the other special extensions?
-
-   This could be "fixed" by passing the appropriate extension list
-   to path_conv but I'm not sure that this is really justified.  */
-
-  /* If we can't find the name, try again with a .exe suffix
-     [but only if not already present].  */
-  if (atts == -1 && GetLastError () == ERROR_FILE_NOT_FOUND &&
-      !(strrchr (win32_name, '.') > strrchr (win32_name, '\\')))
-    {
-      debug_printf ("trying with .exe suffix");
-      strcat (win32_name, ".exe");
-      atts = (int) GetFileAttributesA (win32_name);
-      if (atts == -1)
-	strchr (win32_name, '\0')[4] = '\0';
-    }
 
   debug_printf ("%d = GetFileAttributesA (%s)", atts, win32_name);
 

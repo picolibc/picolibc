@@ -2156,7 +2156,7 @@ symlink_check_one (const char *in_path, char *buf, int buflen, DWORD& fileattr,
 
       /* A symlink will have the `system' file attribute. */
       /* Only files can be symlinks (which can be symlinks to directories). */
-      if (!SYMLINKATTR (fileattr))
+      if (!(*pflags & PATH_SYMLINK) && !SYMLINKATTR (fileattr))
 	goto file_not_symlink;
 
       /* Check the file's extended attributes, if it has any.  */
