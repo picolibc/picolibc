@@ -1,3 +1,9 @@
+2002-09-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winsock.h (timeval): Guard struct and associated
+	macros with _TIMEVAL_DEFINED.
+	* include/winsock2.h (timeval): Likewise.
+
 2002-09-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/shell32.def (SHBindtoParent,SHCreateDirectoryEx[AW],

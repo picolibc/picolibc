@@ -96,10 +96,19 @@ if (__i == ((fd_set *)(set))->fd_count) {\
     This may cause runtime problems with W32 sockets" 
 #endif /* ndef _SYS_TYPES_FD_SET */
 #if !(defined (__INSIDE_CYGWIN__) || (__INSIDE_MSYS__))
+#ifndef _TIMEVAL_DEFINED /* also in sys/time.h */
+#define _TIMEVAL_DEFINED
 struct timeval {
 	long    tv_sec;
 	long    tv_usec;
 };
+#define timerisset(tvp)	 ((tvp)->tv_sec || (tvp)->tv_usec)
+#define timercmp(tvp, uvp, cmp) \
+	(((tvp)->tv_sec != (uvp)->tv_sec) ? \
+	((tvp)->tv_sec cmp (uvp)->tv_sec) : \
+	((tvp)->tv_usec cmp (uvp)->tv_usec))
+#define timerclear(tvp)	 (tvp)->tv_sec = (tvp)->tv_usec = 0
+#endif /* _TIMEVAL_DEFINED */
 struct  hostent {
 	char	*h_name;
 	char	**h_aliases;
@@ -112,12 +121,6 @@ struct linger {
 	u_short l_onoff;
 	u_short l_linger;
 };
-#define timerisset(tvp)	 ((tvp)->tv_sec || (tvp)->tv_usec)
-#define timercmp(tvp, uvp, cmp) \
-	(((tvp)->tv_sec != (uvp)->tv_sec) ? \
-	((tvp)->tv_sec cmp (uvp)->tv_sec) : \
-	((tvp)->tv_usec cmp (uvp)->tv_usec))
-#define timerclear(tvp)	 (tvp)->tv_sec = (tvp)->tv_usec = 0
 #endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 #define IOCPARM_MASK	0x7f
 #define IOC_VOID	0x20000000
