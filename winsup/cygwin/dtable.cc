@@ -369,6 +369,9 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
       case FH_SERIAL:
 	fh = cnew (fhandler_serial) ();
 	break;
+      case FH_FIFO:
+	fh = cnew (fhandler_fifo) ();
+	break;
       case FH_PIPE:
       case FH_PIPER:
       case FH_PIPEW:
@@ -428,8 +431,14 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
     }
 
   if (!fh)
-    api_fatal ("internal error -- unknown device - %p, '%s', upper %d",
+    {
+      set_errno (ENODEV);
+#ifdef DEBUGGING
+      system_printf ("unknown device - %p, '%s', upper %d",
 	       (int) dev, dev.name, dev.upper);
+      return NULL;
+#endif
+    }
 
   char w32buf[MAX_PATH + 1];
   if (!unix_name || !*unix_name)
@@ -460,6 +469,7 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
 	}
       fh->set_name (unix_name, win32_name);
     }
+
   debug_printf ("fd %d, fh %p", fd, fh);
   return fd >= 0 ? (fds[fd] = fh) : fh;
 }
@@ -544,6 +554,19 @@ done:
   syscall_printf ("%d = dup2 (%d, %d)", res, oldfd, newfd);
 
   return res;
+}
+
+fhandler_fifo *
+dtable::find_fifo (ATOM hill)
+{
+  SetResourceLock (LOCK_FD_LIST, READ_LOCK, "dup");
+  for (unsigned i = 0; i < size; i++)
+    {
+      fhandler_base *fh = fds[0];
+      if (fh && fh->isfifo () && ((fhandler_fifo *) fh)->get_atom () == hill)
+	return (fhandler_fifo *) fh;
+    }
+  return NULL;
 }
 
 select_record *
