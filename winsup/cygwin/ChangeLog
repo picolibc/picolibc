@@ -1,3 +1,10 @@
+Wed Nov 15 22:08:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* uinfo.cc (internal_getlogin): Change parameter list to reflect
+	that `token' is member of cygheap_user now.
+	(uinfo_init): Use modified internal_getlogin.
+	* syscalls.cc (seteuid): Ditto.
+
 Wed Nov 15 21:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* cygheap.h: Move `token' and `impersonated' from class _pinfo

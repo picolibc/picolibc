@@ -25,7 +25,7 @@ details. */
 #include "security.h"
 
 const char *
-internal_getlogin (cygheap_user &user, HANDLE token)
+internal_getlogin (cygheap_user &user)
 {
   char username[MAX_USER_NAME];
   DWORD username_len = MAX_USER_NAME;
@@ -108,8 +108,8 @@ internal_getlogin (cygheap_user &user, HANDLE token)
 	}
       if (allow_ntsec)
 	{
-	  HANDLE ptok = token; /* Which is INVALID_HANDLE_VALUE if no
-				      impersonation took place. */
+	  HANDLE ptok = user.token; /* Which is INVALID_HANDLE_VALUE if no
+				       impersonation took place. */
 	  DWORD siz;
 	  char tu[1024];
 	  int ret = 0;
@@ -127,7 +127,8 @@ internal_getlogin (cygheap_user &user, HANDLE token)
 	  else if (!(ret = user.set_sid (((TOKEN_USER *) &tu)->User.Sid)))
 	    debug_printf ("Couldn't retrieve SID from access token!");
 	  /* Close token only if it's a result from OpenProcessToken(). */
-	  if (ptok != INVALID_HANDLE_VALUE && token == INVALID_HANDLE_VALUE)
+	  if (ptok != INVALID_HANDLE_VALUE
+	      && user.token == INVALID_HANDLE_VALUE)
 	    CloseHandle (ptok);
 
 	  /* If that failes, try to get the SID from localhost. This can only
@@ -190,8 +191,7 @@ uinfo_init ()
   /* If uid is USHRT_MAX, the process is started from a non cygwin
      process or the user context was changed in spawn.cc */
   if (myself->uid == USHRT_MAX)
-    if ((p = getpwnam (internal_getlogin (cygheap->user,
-  					  INVALID_HANDLE_VALUE))) != NULL)
+    if ((p = getpwnam (internal_getlogin (cygheap->user))) != NULL)
       {
 	myself->uid = p->pw_uid;
 	myself->gid = p->pw_gid;

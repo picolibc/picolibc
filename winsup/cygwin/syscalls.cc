@@ -1811,7 +1811,7 @@ setuid (uid_t uid)
   return ret;
 }
 
-extern const char *internal_getlogin (cygheap_user &user, HANDLE token);
+extern const char *internal_getlogin (cygheap_user &user);
 
 /* seteuid: standards? */
 extern "C" int
@@ -1851,12 +1851,12 @@ seteuid (uid_t uid)
 	      }
 
 	  cygheap_user user;
-	  /* token is used in internal_getlogin() to determine if
+	  /* user.token is used in internal_getlogin() to determine if
 	     impersonation is active. If so, the token is used for
 	     retrieving user's SID. */
-	  HANDLE token = cygheap->user.impersonated ? cygheap->user.token
-					      : INVALID_HANDLE_VALUE;
-	  struct passwd *pw_cur = getpwnam (internal_getlogin (user, token));
+	  user.token = cygheap->user.impersonated ? cygheap->user.token
+					          : INVALID_HANDLE_VALUE;
+	  struct passwd *pw_cur = getpwnam (internal_getlogin (user));
 	  if (pw_cur != pw_new)
 	    {
 	      debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
