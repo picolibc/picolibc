@@ -264,7 +264,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     {
       _main_tls = &_my_tls;
       _main_tls->init_thread (NULL);
-      // memcpy (&_main_tls->local_clib, _impure_ptr, sizeof (*_main_tls->local_lib));
+      _main_tls->local_clib = *_impure_ptr;
+      _impure_ptr = &_main_tls->local_clib;
     }
 
   set_file_api_mode (current_codepage);

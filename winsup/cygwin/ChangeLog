@@ -1,5 +1,10 @@
 2003-12-23  Christopher Faylor  <cgf@redhat.com>
 
+	* fork.cc (fork_child): After a pthread/fork, ensure that impure
+	pointer stuff which resides in parent is propagated to child thread.
+
+2003-12-23  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (set_signal_mask): Redefine to not pass by address.
 	Report calculated mask in debugging output.
 	* sigproc.h (set_signal_mask): Reflect above change in declaration.
