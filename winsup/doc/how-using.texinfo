@@ -91,6 +91,11 @@ Make sure you are using the find that came with Cygwin and that you
 aren't picking up the Win32 find command instead.  You can verify that
 you are getting the right one by doing a "type find" in bash.
 
+If the path argument to find, including current directory (default), is
+itself a symbolic link, then find will not traverse it unless you
+specify the @samp{-follow} option.  This behavior is different than most
+other UNIX implementations, but is not likely to change.
+
 @subsection Why doesn't man work?
 
 Even after installing the @samp{man} package, you get an error like this:
