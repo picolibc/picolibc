@@ -155,7 +155,10 @@ int main ()
   buf1[0] = 0x7f;
   tst_resm (memcmp (buf1, buf2, 20) ? TFAIL : TPASS,
 	    "changes are shared between MAP_SHARED mappings of the same file");
-  munmap (buf2, 4096);
+  if (buf1 == buf2) /* Win 9x weirdness */
+    msync (buf2, 4096, MS_SYNC);
+  else
+    munmap (buf2, 4096);
 
   fd2  = open (fnam1, O_RDWR | O_BINARY, 0644);
   memset (buf3, 0, 20);

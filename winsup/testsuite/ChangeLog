@@ -1,5 +1,9 @@
 2004-08-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* winsup.api/mmaptest01.c (main): Accomodate 9x memory usage.
+
+2004-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* winsup.api/ltp/symlink01.c (do_link): Print inode numbers using %llu
 	format specifier.
 
