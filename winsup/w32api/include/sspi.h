@@ -146,10 +146,10 @@ typedef struct _SecPkgContext_PackageInfo {
 } SecPkgContext_PackageInfo, *PSecPkgContext_PackageInfo;
 typedef struct _SecPkgCredentials_NamesW {
 	SEC_WCHAR* sUserName;
-} SecPkgCredentialsNamesW, *PSecPkgCredentialsNamesW;
+} SecPkgCredentials_NamesW, *PSecPkgCredentials_NamesW;
 typedef struct _SecPkgCredentials_NamesA {
 	SEC_CHAR* sUserName;
-} SecPkgCredentialsNamesA, *PSecPkgCredentialsNamesA;
+} SecPkgCredentials_NamesA, *PSecPkgCredentials_NamesA;
 
 /* TODO: missing type in SDK */
 typedef void (*SEC_GET_KEY_FN)();
@@ -276,8 +276,8 @@ PSecurityFunctionTableW WINAPI InitSecurityInterfaceW(VOID);
 #define UNISP_NAME UNISP_NAME_W
 #define SecPkgInfo SecPkgInfoW
 #define PSecPkgInfo PSecPkgInfoW
-#define SecPkgCredentialsNames SecPkgCredentialsNamesW
-#define PSecPkgCredentialsNames PSecPkgCredentialsNamesW
+#define SecPkgCredentials_Names SecPkgCredentials_NamesW
+#define PSecPkgCredentials_Names PSecPkgCredentials_NamesW
 #define SecPkgContext_Authority SecPkgContext_AuthorityW
 #define PSecPkgContext_Authority PSecPkgContext_AuthorityW
 #define SecPkgContext_KeyInfo SecPkgContext_KeyInfoW
@@ -305,8 +305,8 @@ PSecurityFunctionTableW WINAPI InitSecurityInterfaceW(VOID);
 #define UNISP_NAME UNISP_NAME_A
 #define SecPkgInfo SecPkgInfoA
 #define PSecPkgInfo PSecPkgInfoA
-#define SecPkgCredentialsNames SecPkgCredentialsNamesA
-#define PSecPkgCredentialsNames PSecPkgCredentialsNamesA
+#define SecPkgCredentials_Names SecPkgCredentials_NamesA
+#define PSecPkgCredentials_Names PSecPkgCredentials_NamesA
 #define SecPkgContext_Authority SecPkgContext_AuthorityA
 #define PSecPkgContext_Authority PSecPkgContext_AuthorityA
 #define SecPkgContext_KeyInfo SecPkgContext_KeyInfoA

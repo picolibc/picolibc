@@ -1,3 +1,8 @@
+2004-11-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/sspi.h (SecPkgCredentials_Names[AW]): Correct name.
+	Thanks to: David Leonard  <leonard@users.sourceforge.net>
+
 2004-11-19  Magnus Olsen  <greatlord@sourceforge.users.net>
 
 	* include/winuser.h (MSLLHOOKSTRUCT): Add structure.
