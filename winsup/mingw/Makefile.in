@@ -51,7 +51,7 @@ ifneq (,$(findstring cygwin,$(target_alias)))
 inst_bindir:=$(tooldir)/bin
 inst_includedir:=$(tooldir)/include/mingw
 inst_libdir:=$(tooldir)/lib/mingw
-inst_docdir:=$(tooldir)/doc/mingw-runtime
+inst_docdir:=$(tooldir)/share/doc/mingw-runtime
 else
 inst_bindir:=$(bindir)
 inst_includedir:=$(includedir)
