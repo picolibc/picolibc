@@ -1,3 +1,7 @@
+2003-05-21  Nick Clifton  <nickc@redhat.com>
+
+	* bfdlink.h (struct bfd_link_hash_table): Fix typo in comment.
+
 2003-05-15  Jim Blandy  <jimb@redhat.com>
 
 	* libiberty.h (hex_value): Make the value an unsigned int, to
