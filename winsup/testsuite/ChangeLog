@@ -1,3 +1,7 @@
+2001-11-04  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Add check target.
+
 2001-11-02  Egor Duda  <deo@logos-m.ru>
 
 	* libltp/lib/forker.c: Include proper header to avoid compiler

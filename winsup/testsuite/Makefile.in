@@ -100,7 +100,7 @@ TESTSUP_OFILES:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(libltp_sr
 all_host=@all_host@
 install_host=@install_host@
 
-all: $(TESTSUP_LIB_NAME)
+all check: $(TESTSUP_LIB_NAME)
 
 force:
 
