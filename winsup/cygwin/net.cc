@@ -2456,7 +2456,7 @@ endhostent (void)
 }
 
 /* exported as recvmsg: standards? */
-extern "C" int 
+extern "C" int
 cygwin_recvmsg(int s, struct msghdr *msg, int flags)
 {
     int ret, nb;
@@ -2472,7 +2472,7 @@ cygwin_recvmsg(int s, struct msghdr *msg, int flags)
 	errno = ENOMEM;
 	return -1;
     }
-    nb = ret = cygwin_recvfrom (s, buf, tot, flags, 
+    nb = ret = cygwin_recvfrom (s, buf, tot, flags,
       (struct sockaddr *) msg->msg_name, (int *) &msg->msg_namelen);
     p = buf;
     while (nb > 0) {
@@ -2509,7 +2509,7 @@ cygwin_sendmsg(int s, const struct msghdr *msg, int flags)
 	memcpy (p, iov[i].iov_base, iov[i].iov_len);
 	p += iov[i].iov_len;
     }
-    ret = cygwin_sendto (s, buf, tot, flags, 
+    ret = cygwin_sendto (s, buf, tot, flags,
       (struct sockaddr *) msg->msg_name, msg->msg_namelen);
     free (buf);
     return ret;

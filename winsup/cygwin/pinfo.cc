@@ -183,7 +183,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	    api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
 	  n = realpid;
 	  release ();
-	  if (flag & PID_NOREDIR)
+	  if (flag & PID_ALLPIDS)
 	    {
 	      set_errno (ENOENT);
 	      break;
@@ -287,7 +287,7 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
       pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
     }
 
-  pinfolist[nelem].init (cygpid, PID_NOREDIR);
+  pinfolist[nelem].init (cygpid, PID_NOREDIR | (winpid ? PID_ALLPIDS : 0));
   if (winpid)
     /* nothing to do */;
   else if (!pinfolist[nelem])

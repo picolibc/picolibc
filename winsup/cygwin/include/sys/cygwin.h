@@ -94,7 +94,7 @@ enum
   PID_USETTY	       = 0x1000, // Setting this enables or disables cygwin's
 				 //  tty support.  This is inherited by
 				 //  all execed or forked processes.
-  PID_UNUSED2	       = 0x2000, // child has execed
+  PID_ALLPIDS	       = 0x2000, // child has execed
   PID_EXECED	       = 0x4000, // redirect to original pid info block
   PID_NOREDIR	       = 0x8000, // don't redirect if execed
   PID_EXITED	       = 0x80000000 // Free entry.
