@@ -1,3 +1,7 @@
+2002-05-23  Andrew Cagney  <ac131313@redhat.com>
+
+	* sim-d10v.h: Delete file.  Moved to include/gdb/.
+
 2002-05-23  Jakub Jelinek  <jakub@redhat.com>
 
 	* elf/common.h (PT_TLS, SHF_TLS, STT_TLS, DF_STATIC_TLS): Define.
