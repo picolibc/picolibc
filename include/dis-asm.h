@@ -189,7 +189,7 @@ extern int print_insn_vax		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_tic80		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_pj		PARAMS ((bfd_vma, disassemble_info*));
 
-extern int arm_toggle_regnames          PARAMS ((void));
+extern void print_arm_disassembler_options PARAMS ((FILE *));
 
 /* Fetch the disassembler for a given BFD, if that support is available.  */
 extern disassembler_ftype disassembler	PARAMS ((bfd *));
