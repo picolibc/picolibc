@@ -1,3 +1,10 @@
+2003-07-07  Christopher Faylor  <cgf@redhat.com>
+
+	* newsym: Create objects that are closer to those created by dlltool so
+	as not to confuse --export-all-symbols.
+	* rmsym: Be a little more accepting of object filenames now that
+	dlltool can create different format files.
+
 2003-07-06  Christopher Faylor  <cgf@redhat.com>
 
 	* newsym: Oops.  Revert below change.
