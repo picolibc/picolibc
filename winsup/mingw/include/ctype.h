@@ -91,6 +91,12 @@ __BEGIN_CGLOBAL_NAMESPACE
 int	_tolower(int);
 int	_toupper(int);
 
+#if !defined (__NO_CTYPE_INLINES)
+/* these reproduce behaviour of lib underscored versions  */
+extern __inline__ int _tolower(int c) {return ( c -'A'+'a');}
+extern __inline__ int _toupper(int c) {return ( c -'a'+'A');}
+#endif
+
 int	_isctype (int, int);
 #endif
 
@@ -155,7 +161,6 @@ extern unsigned short** _imp___ctype;
  * optimise away the constant condition.			
  */
 
-
 #if ! (defined (__NO_CTYPE_INLINES) || defined (__STRICT_ANSI__ ))
 /* use  simple lookup if SB locale, else  _isctype()  */
 #define __ISCTYPE(c, mask)  (MB_CUR_MAX == 1 ? (_pctype[c] & mask) : __CGLOBAL _isctype(c, mask))
@@ -171,16 +176,13 @@ extern __inline__ int isspace(int c) {return __ISCTYPE(c, _SPACE);}
 extern __inline__ int isupper(int c) {return __ISCTYPE(c, _UPPER);}
 extern __inline__ int isxdigit(int c) {return __ISCTYPE(c, _HEX);}
 
-/* these reproduce behaviour of lib underscored versions  */
-extern __inline__ int _tolower(int c) {return ( c -'A'+'a');}
-extern __inline__ int _toupper(int c) {return ( c -'a'+'A');}
-
 /* TODO? Is it worth inlining ANSI tolower, toupper? Probably only
    if we only want C-locale. */
 
 #endif /* _NO_CTYPE_INLINES */
 
-/* Wide character equivalents */
+/* Wide character equivalents
+   Also in wctype.h */
 
 #ifndef WEOF
 #define	WEOF	(wchar_t)(0xFFFF)
@@ -196,7 +198,6 @@ int	iswalpha(wint_t);
 int	iswascii(wint_t);
 int	iswcntrl(wint_t);
 int	iswctype(wint_t, wctype_t);
-int	is_wctype(wint_t, wctype_t);	/* Obsolete! */
 int	iswdigit(wint_t);
 int	iswgraph(wint_t);
 int	iswlower(wint_t);
@@ -211,7 +212,6 @@ wchar_t	towupper(wchar_t);
 
 int	isleadbyte (int);
 
-/* Also in wctype.h */
 #if ! (defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED))
 #define __WCTYPE_INLINES_DEFINED
 extern __inline__ int iswalnum(wint_t wc) {return (iswctype(wc,_ALPHA|_DIGIT));}
@@ -228,11 +228,12 @@ extern __inline__ int iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
 extern __inline__ int iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
 extern __inline__ int isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
 #endif /* !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED)) */
-
 __END_CSTD_NAMESPACE
-__BEGIN_CGLOBAL_NAMESPACE
+
 
 #ifndef	__STRICT_ANSI__
+__BEGIN_CGLOBAL_NAMESPACE
+
 int	__isascii (int);
 int	__toascii (int);
 int	__iscsymf (int);	/* Valid first character in C symbol */
@@ -252,9 +253,10 @@ int	iscsymf (int);
 int	iscsym (int);
 #endif	/* Not _NO_OLDNAMES */
 
-#endif	/* Not __STRICT_ANSI__ */
+int	is_wctype(wint_t, __CSTD wctype_t);	/* Obsolete! */
 
 __END_CGLOBAL_NAMESPACE
+#endif	/* Not __STRICT_ANSI__ */
 
 #endif	/* Not RC_INVOKED */
 
