@@ -201,7 +201,6 @@ wait_for_sigthread ()
 {
   sigproc_printf ("wait_sig_inited %p", wait_sig_inited);
   HANDLE hsig_inited = wait_sig_inited;
-  assert (hsig_inited);
   (void) WaitForSingleObject (hsig_inited, INFINITE);
   wait_sig_inited = NULL;
   (void) ForceCloseHandle1 (hsig_inited, wait_sig_inited);

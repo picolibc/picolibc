@@ -1,3 +1,7 @@
+2003-09-08  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (wait_sig_inited): Remove assertion since it is racy.
+
 2003-09-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export endusershell, getusershell and setusershell.
