@@ -1,5 +1,9 @@
 2000-03-10  H.J. Lu  <hjl@gnu.org>
 
+	* Makefile.in (all-gcc): Backed out the last change.
+
+2000-03-10  H.J. Lu  <hjl@gnu.org>
+
 	* Makefile.in (all-gcc): Run ld/ld-new if necessary.
 
 Fri Mar  3 18:44:08 2000  Andrew Cagney  <cagney@b1.cygnus.com>
