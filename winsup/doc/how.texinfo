@@ -117,6 +117,34 @@ nobody knows the answer.
 
 @section Using Cygwin
 
+@subsection How should I set my PATH?
+
+If you look at the "Cygwin 1.1.0" (or similar) shortcut created in the
+"Cygnus Solutions" programs folder, you'll see that it runs
+@code{C:\cygwin\bin\cygwin.bat} (assuming your root is
+@code{C:\cygwin}).  The contents should look something like this:
+
+@example
+	@echo off
+	SET MAKE_MODE=unix
+	SET PATH=C:\cygwin\bin;C:\cygwin\usr\local\bin;%PATH%
+	bash
+@end example
+
+Effectively, this @strong{prepends} /usr/bin and /usr/local/bin to your
+Windows system path.  If you choose to reset your PATH, say in
+$HOME/.bashrc, then you should follow this rule.  You @strong{must} have
+@code{/usr/bin} in your PATH @strong{before} any Windows system
+directories.  Otherwise you will likely encounter all sorts of problems
+running Cygwin applications.
+
+If you haven't messed up the default mounts, then @code{/bin} and
+@code{/usr/bin} are the same location, so you only need one of them in
+your PATH.  You should use @code{/usr/local/bin} for installing
+additional Cygwin applications that are not part of the core net
+release.  (That is, anything not found in an ftp mirror of @code{latest}
+and installed by @code{setup.exe}.)
+
 @subsection How do I set /etc up?
 
 @strong{(Please note: This section has not yet been updated for the latest
