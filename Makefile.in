@@ -1,7 +1,7 @@
 #
 # Makefile for directory with subdirs to build.
 #   Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-#   1999, 2000 Free Software Foundation
+#   1999, 2000, 2001 Free Software Foundation
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1729,7 +1729,9 @@ DEVO_SUPPORT= README Makefile.in configure configure.in \
 # ChangeLog omitted because it may refer to files which are not in this
 # distribution (perhaps it would be better to include it anyway).
 ETC_SUPPORT= Makefile.in configure configure.in standards.texi \
-	make-stds.texi standards.info*
+	make-stds.texi standards.info* configure.texi configure.info* \
+	configbuild.* configdev.*
+
 
 # When you use `make setup-dirs' or `make taz' you should always redefine
 # this macro.

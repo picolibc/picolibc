@@ -1,3 +1,7 @@
+2001-01-20  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
+
+	* Makefile.in (ETC_SUPPORT): Add configure.texi and friends.
+
 2001-01-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.NEWLIB: Put into source repository.
