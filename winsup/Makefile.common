@@ -14,7 +14,8 @@ CFLAGS_COMMON:=-Wall -Wwrite-strings # -finline-functions
 MALLOC_DEBUG:=#-DMALLOC_DEBUG -I/gotham/src/comp-tools/winsup/dlmalloc
 MALLOC_OBJ:=#/gotham/src/comp-tools/winsup/dlmalloc/malloc.o
 
-ifeq (,${findstring /,$(srcdir)})
+override srcdir:=${shell cd $(srcdir); /bin/pwd}
+ifneq (,${filter-out /%,$(srcdir)})
     updir:=$(srcdir)/..
     updir1:=$(updir)/..
 else
@@ -28,7 +29,7 @@ endif
 
 
 pwd:=${shell pwd}
-ifeq (,${findstring /,$(pwd)})
+ifneq (,${filter-out /%,$(pwd)})
     bupdir:=..
     bupdir1:=../..
 else
@@ -115,10 +116,10 @@ else
 endif
 
 $(bupdir1)/libiberty/%.o: $(updir1)/libiberty/%.c
-	@$(MAKE) -C $(@D) $(MAKEOVERRIDES) $(@F)
+	@$(MAKE) -C $(@D) $(@F)
 
 $(w32api_lib)/%.a: $(w32api_lib)/Makefile
-	@$(MAKE) --no-print-dir -C $(@D) $(MAKEOVERRIDES) $(@F)
+	@$(MAKE) --no-print-dir -C $(@D) $(@F)
 
 all:
 

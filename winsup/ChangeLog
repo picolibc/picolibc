@@ -1,3 +1,9 @@
+Sun Apr  9 23:47:45 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.common: Resolve srcdir to absolute path or it will confuse
+	usages when passed to submakes.  Eliminate vestigal use of
+	MAKEOVERRIDES.
+
 Sun Apr  9 02:06:49 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Work around MAKEOVERRIDES problem with older versions
