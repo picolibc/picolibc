@@ -1,3 +1,19 @@
+2003-08-20  Chris Demetriou  <cgd@broadcom.com>
+
+        * mips/crt0_cfe.S: New file.
+        * mips/cfe_mem.c: New file.
+        * mips/cfe_prestart.S: Remove.
+        * mips/cfe.ld: Adjust to use crt0_cfe.o as the startup file, and
+        and use _start as the entry point.  Align BSS to 32-byte boundary.
+        * mips/cfe.c: Reimplement to fit on top of a crt0_cfe.o file.
+        * mips/cfe_api.h (__libcfe_stack_size, __libcfe_mem_limit)
+        (__libcfe_meminit, __libcfe_stack_top): New prototypes.
+        * mips/Makefile.in (CFEOBJS): Replace cfe_prestart.o with cfe_mem.o.
+        (cfe.o, cfe_api.o, cfe_mem.o, crt0_cfe.o): New targets.
+        * mips/configure.in: Build and install crt0_cfe.o when CFE support
+        is built.
+        * mips/configure: Regenerate.
+
 2003-08-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* i386/cygmon-salib.c (unlink): New stub.

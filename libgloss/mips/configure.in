@@ -94,7 +94,7 @@ case "${target}" in
         ;;
   mipsisa32-*-* | mipsisa32el-*-* | \
   mipsisa32r2-*-* | mipsisa32r2el-*-*)
-	crt0="crt0_cygmon.o crt0.o"
+	crt0="crt0_cfe.o crt0_cygmon.o crt0.o"
 	pcrt0="pcrt0.o"
 	part_specific_obj=
 	part_specific_defines=
@@ -119,6 +119,7 @@ case "${target}" in
 	bsp_list="libpmon.a libnullmon.a"
 	;;
   *)
+	crt0="crt0_cfe.o crt0.o"
         part_specific_obj="vr4300.o cma101.o"
 	part_specific_defines=
         script_list="idt pmon ddb ddb-kseg0 lsi cfe idtecoff nullmon"

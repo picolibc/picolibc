@@ -71,6 +71,40 @@ typedef unsigned _POINTER_INT uintptr_t;
 
 #define CFE_API_ALL
 #define CFE_API_IMPL_NAMESPACE
+
+/* Return the stack size to be used for the program.  Normally 32KB.  The
+   normal memory allocator uses the bottom of the stack as its heap limit,
+   so if your application uses a lot of stack space define this function
+   appropriately to keep the heap from growing into the stack.  */
+unsigned long __libcfe_stack_size(void) __attribute__((__weak__));
+
+/* Return the (max address + 1) to be used by this program.  (This address
+   minus '_end' is used as the heap size, so the address should be in the
+   same address space segments as _end.  The normal memory allocator
+   queries CFE to determine the available memory.  */
+void *__libcfe_mem_limit(void) __attribute__((__weak__));
+
+/* If the configuration ability provided by __libcfe_mem_limit() and
+   __libcfe_stack_size() do not provide enough flexibility for your
+   application's memory allocation needs, you can replace the normal
+   low-level allocator by providing the functions listed below and
+   also the function:
+
+	void *sbrk(ptrdiff_t incr);
+
+   If you provide any of these functions, you should provide all three,
+   and be sure to link them into your application as a .o file (rather
+   than a .a).
+
+   __libcfe_meminit() is responsible for initializing the low-level
+   memory allocator.
+
+   __libcfe_stack_top() returns a pointer to the top (highest address;
+   the stack grows down from that address) of the stack to be used by
+   the program.  */
+void __libcfe_meminit (void);
+void *__libcfe_stack_top (void);
+
 /* End customization. */
 
 

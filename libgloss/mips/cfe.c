@@ -1,7 +1,7 @@
 /* cfe.c -- I/O code for the MIPS boards running CFE.  */
 
 /*
- * Copyright 2001, 2002
+ * Copyright 2001, 2002, 2003
  * Broadcom Corporation. All rights reserved.
  * 
  * This software is furnished under license and may be used and copied only
@@ -32,36 +32,39 @@
 
 #include "cfe_api.h"
 
+void *__libcfe_init (long handle, long a1, long cfe_entrypoint, long a3);
+void __libcfe_exit (long status);
+
 char inbyte (void);
 int outbyte (char c);
 
-/* Make sure cfe_prestart is used.  It doesn't look like setting the
-   entry symbol in the linker script to a symbol from that fiel will do
-   this!  */
-extern int _prestart;
-static void *force_prestart = &_prestart;
-
-/* The following variables are initialized to non-zero so that they'll be
-   in data, rather than BSS.  Used to be that you could init variables to
-   any value to put them into initialized data sections rather than BSS,
-   but that decades-old idiom went out the window with gcc 3.2.  Now,
-   either you compile specially (with -fno-zero-initialized-in-bss), or
-   you init to non-zero.  In this case, initting to non-zero is OK (and
-   even beneficial; alignment fault via jump to odd if not properly
-   set up by _prestart()), so we do the latter.
-
-   These variables are 'int's so they can be reliably stored w/ "sw".
-   (longs fall victim to -mlong64.)  They are signed so that they remain
-   valid pointers when extended to cfe_xuint_t in the call to cfe_init().
-   This assumes that they are compatibility-space pointers.  */
-int __cfe_handle = 0xdeadbeef;
-int __cfe_entrypt = 0xdeadbeef;
-
 /* Echo input characters?  */
-int	__cfe_echo_input = 0;
+int	__libcfe_echo_input = 0;
 
 /* CFE handle used to access console device.  */
 static int cfe_conshandle;
+
+
+/* Initialize firmware callbacks.  Called from crt0_cfe.  Returns desired
+   stack pointer.  */
+void *
+__libcfe_init (long handle, long a1, long entrypoint, long a3)
+{
+  cfe_init (handle, entrypoint);
+  cfe_conshandle = cfe_getstdhandle (CFE_STDHANDLE_CONSOLE);
+
+  __libcfe_meminit ();
+  return __libcfe_stack_top ();
+}
+
+/* Exit back to monitor, with the given status code.  */
+void
+__libcfe_exit (long status)
+{
+  outbyte ('\r');
+  outbyte ('\n');
+  cfe_exit (CFE_FLG_WARMSTART, status);
+}
 
 char
 inbyte (void)
@@ -73,7 +76,7 @@ inbyte (void)
     ;
   if (c == '\r')
     c = '\n';
-  if (__cfe_echo_input)
+  if (__libcfe_echo_input)
     outbyte (c);
   return c;
 }
@@ -91,41 +94,6 @@ outbyte (char c)
   if (c == '\n')
     outbyte ('\r');
   return 0;
-}
-
-/* Initialize hardware.  Called from crt0.  */
-void
-hardware_init_hook(void)
-{
-  cfe_init (__cfe_handle, __cfe_entrypt);
-  cfe_conshandle = cfe_getstdhandle(CFE_STDHANDLE_CONSOLE);
-}
-
-/* Exit back to monitor, with the given status code.  */
-void
-hardware_exit_hook (int status)
-{
-  	outbyte ('\r');
-  	outbyte ('\n');
-	cfe_exit (CFE_FLG_WARMSTART, status);
-}
-
-/* Structure filled in by get_mem_info.  Only the size field is
-   actually used (by sbrk), so the others aren't even filled in.  */
-struct s_mem
-{
-  unsigned int size;
-  unsigned int icsize;
-  unsigned int dcsize;
-};
-
-void
-get_mem_info (mem)
-     struct s_mem *mem;
-{
-  /* XXX FIXME: Fake this for now.  Should invoke cfe_enummem, but we
-     don't have enough stack to do that (yet).  */
-  mem->size = 0x4000000;	/* Assume 64 MB of RAM */
 }
 
 /* This is the MIPS cache flush function call.  No defines are provided

@@ -1,8 +1,8 @@
 /* The following TEXT start address leaves space for the monitor
    workspace. */
 
-ENTRY(_prestart)
-STARTUP(crt0.o)
+ENTRY(_start)
+STARTUP(crt0_cfe.o)
 OUTPUT_FORMAT("elf32-bigmips", "elf32-bigmips", "elf32-littlemips")
 GROUP(-lc -lcfe -lgcc)
 SEARCH_DIR(.)
@@ -127,6 +127,7 @@ SECTIONS
     *(COMMON)
   }
 
+  . = ALIGN(32);
   PROVIDE (end = .);
   _end = .;
 

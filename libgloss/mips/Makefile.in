@@ -73,8 +73,7 @@ PMONOBJS = pmon.o @part_specific_obj@ ${GENOBJS}
 LSIOBJS = lsipmon.o @part_specific_obj@ ${GENOBJS}
 DVEOBJS = dvemon.o @part_specific_obj@ ${GENOBJS} ${GENOBJS2}
 JMR3904OBJS = jmr3904-io.o @part_specific_obj@ ${GENOBJS} ${GENOBJS2}
-CFEOBJS = cfe.o cfe_api.o cfe_prestart.o \
-	@part_specific_obj@ ${GENOBJS} ${GENOBJS2}
+CFEOBJS = cfe.o cfe_api.o cfe_mem.o @part_specific_obj@ ${GENOBJS} ${GENOBJS2}
 CYGMONOBJS = open.o close.o cygmon.o @part_specific_obj@ ${GENOBJS}
 
 # Nullmon cannot support read and write, but the test cases pull them in via libs
@@ -135,7 +134,6 @@ libjmr3904.a: $(JMR3904OBJS)
 libcygmon.a: $(CYGMONOBJS)
 	${AR} ${ARFLAGS} $@ $(CYGMONOBJS)
 	${RANLIB} $@
-
 
 libcfe.a: $(CFEOBJS)
 	${AR} ${ARFLAGS} $@ $(CFEOBJS)
@@ -219,6 +217,7 @@ test.o:	${srcdir}/test.c
 crt0.o: ${srcdir}/crt0.S
 pcrt0.o: ${srcdir}/crt0.S
 	$(CC) -c $(CFLAGS_FOR_TARGET) $(CFLAGS) -DGCRT0 ${srcdir}/crt0.S -o ${PCRT0}
+crt0_cfe.o: ${srcdir}/crt0_cfe.S
 crt0_cygmon.o: ${srcdir}/crt0_cygmon.S
 idtmon.o: ${srcdir}/idtmon.S
 pmon.o: ${srcdir}/pmon.S
@@ -230,6 +229,12 @@ vr5xxx.o: ${srcdir}/vr5xxx.S
 lsipmon.o: $(srcdir)/lsipmon.S $(srcdir)/pmon.S
 jmr3904-io.o: ${srcdir}/jmr3904-io.c
 	$(CC) -c $(CFLAGS_FOR_TARGET) $(CFLAGS) ${srcdir}/jmr3904-io.c -o $@
+cfe.o: ${srcdir}/cfe.c ${srcdir}/cfe_api.h
+	$(CC) -c $(CFLAGS_FOR_TARGET) $(CFLAGS) ${srcdir}/cfe.c -o $@
+cfe_api.o: ${srcdir}/cfe_api.c ${srcdir}/cfe_api.h ${srcdir}/cfe_api_int.h
+	$(CC) -c $(CFLAGS_FOR_TARGET) $(CFLAGS) ${srcdir}/cfe_api.c -o $@
+cfe_mem.o: ${srcdir}/cfe_mem.c ${srcdir}/cfe_api.h
+	$(CC) -c $(CFLAGS_FOR_TARGET) $(CFLAGS) ${srcdir}/cfe_mem.c -o $@
 
 # cma101 can not be compiled mips16, if a mips16 version is needed then
 # it will have to be built, then this rule can be scrapped, allowing
