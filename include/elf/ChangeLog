@@ -1,3 +1,7 @@
+2001-08-30  Eric Christopher  <echristo@redhat.com>
+
+	* mips.h: Remove E_MIPS_MACH_MIPS32_4K.
+
 2001-08-29  Jeff Law <law@redhat.com>
 
 	* h8.h (EF_H8_MACH): New mask for encoded machine type.
@@ -14,7 +18,7 @@ Tue Aug 26 23:32:34 2001  J"orn Rennecke <amylaar@redhat.com>
 
 2001-06-30  Daniel Berlin  <dan@cgsoftware.com>
 
-	* dwarf2.h: Remerge with gcc version, 
+	* dwarf2.h: Remerge with gcc version,
 	including all new DWARF 2.1 extensions.
 
 2001-06-29  James Cownie <jcownie@etnus.com>
@@ -59,7 +63,7 @@ Tue Aug 26 23:32:34 2001  J"orn Rennecke <amylaar@redhat.com>
 2001-04-20  Johan Rydberg  <jrydberg@opencores.org>
 
 	* openrisc.h: New file.
-	* common.h (EM_OPENRISC): New constant. 
+	* common.h (EM_OPENRISC): New constant.
 
 2001-04-23  Bo Thorsen  <bo@suse.de>
 

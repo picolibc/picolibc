@@ -1,3 +1,7 @@
+2001-08-31  Eric Christopher  <echristo@redhat.com>
+
+	* mips.h: Remove CPU_MIPS32_4K.
+
 2001-08-27  Torbjorn Granlund  <tege@swox.com>
 
 	* ppc.h (PPC_OPERAND_DS): Define.

@@ -361,7 +361,6 @@ struct mips_opcode
 #define CPU_R12000	12000
 #define CPU_MIPS16	16
 #define CPU_MIPS32	32
-#define CPU_MIPS32_4K	3204113         /* 32, 04, octal 'K'.  */
 #define CPU_MIPS5       5
 #define CPU_MIPS64      64
 #define CPU_SB1         12310201        /* octal 'SB', 01.  */
