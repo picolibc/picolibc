@@ -456,7 +456,7 @@ get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
   if (usersid == well_known_system_sid)
     {
       grp_list += well_known_system_sid;
-      grp_list += well_known_admin_sid;
+      grp_list += well_known_admins_sid;
     }
   else
     {
@@ -626,10 +626,10 @@ get_dacl (PACL acl, cygsid usersid, cygsidlist &grp_list)
       __seterrno ();
       return FALSE;
     }
-  if (grp_list.contains (well_known_admin_sid))
+  if (grp_list.contains (well_known_admins_sid))
     {
       if (!AddAccessAllowedAce(acl, ACL_REVISION, GENERIC_ALL,
-			       well_known_admin_sid))
+			       well_known_admins_sid))
         {
 	  __seterrno ();
           return FALSE;
@@ -1162,15 +1162,24 @@ get_nt_attribute (const char *file, int *attribute,
 	      *flags |= S_IXOTH
 			| ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
 			| ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	      /* Sticky bit for directories according to linux rules. */
-	      if (!(ace->Mask & FILE_DELETE_CHILD)
-		  && S_ISDIR(*attribute)
-		  && !(*anti & S_ISVTX))
-		*flags |= S_ISVTX;
 	    }
+	  if ((*attribute & S_IFDIR) &&
+	      (ace->Mask & (FILE_WRITE_DATA | FILE_EXECUTE | FILE_DELETE_CHILD))
+	      == (FILE_WRITE_DATA | FILE_EXECUTE))
+	    *flags |= S_ISVTX;
+	}
+      else if (ace_sid == well_known_null_sid)
+        {
+	  /* Read SUID, SGID and VTX bits from NULL ACE. */
+	  if (ace->Mask & FILE_READ_DATA)
+	    *flags |= S_ISVTX;
+	  if (ace->Mask & FILE_WRITE_DATA)
+	    *flags |= S_ISGID;
+	  if (ace->Mask & FILE_APPEND_DATA)
+	    *flags |= S_ISUID;
 	}
     }
-  *attribute &= ~(S_IRWXU|S_IRWXG|S_IRWXO|S_ISVTX);
+  *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
   *attribute |= allow;
   *attribute &= ~deny;
   syscall_printf ("file: %s %x, uid %d, gid %d", file, *attribute, uid, gid);
@@ -1335,16 +1344,6 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
       return NULL;
     }
 
-  /*
-   * VTX bit may only be set if executable for `other' is set.
-   * For correct handling under WinNT, FILE_DELETE_CHILD has to
-   * be (un)set in each ACE.
-   */
-  if (!(attribute & S_IXOTH))
-    attribute &= ~S_ISVTX;
-  if (!(attribute & S_IFDIR))
-    attribute |= S_ISVTX;
-
   /* From here fill ACL. */
   size_t acl_len = sizeof (ACL);
   int ace_off = 0;
@@ -1355,10 +1354,11 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (attribute & S_IRUSR)
     owner_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWUSR)
-    owner_allow |= FILE_GENERIC_WRITE | DELETE;
+    owner_allow |= FILE_GENERIC_WRITE;
   if (attribute & S_IXUSR)
     owner_allow |= FILE_GENERIC_EXECUTE;
-  if (!(attribute & S_ISVTX))
+  if ((attribute & (S_IFDIR | S_IWUSR | S_IXUSR))
+      == (S_IFDIR | S_IWUSR | S_IXUSR))
     owner_allow |= FILE_DELETE_CHILD;
 
   /* Construct allow attribute for group. */
@@ -1367,10 +1367,11 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (attribute & S_IRGRP)
     group_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWGRP)
-    group_allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE | DELETE;
+    group_allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
   if (attribute & S_IXGRP)
     group_allow |= FILE_GENERIC_EXECUTE;
-  if (!(attribute & S_ISVTX))
+  if ((attribute & (S_IFDIR | S_IWGRP | S_IXGRP))
+      == (S_IFDIR | S_IWGRP | S_IXGRP))
     group_allow |= FILE_DELETE_CHILD;
 
   /* Construct allow attribute for everyone. */
@@ -1379,11 +1380,25 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (attribute & S_IROTH)
     other_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWOTH)
-    other_allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE | DELETE;
+    other_allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
   if (attribute & S_IXOTH)
     other_allow |= FILE_GENERIC_EXECUTE;
-  if (!(attribute & S_ISVTX))
+  if ((attribute & (S_IFDIR | S_IWOTH | S_IXOTH))
+      == (S_IFDIR | S_IWOTH | S_IXOTH)
+      && !(attribute & S_ISVTX))
     other_allow |= FILE_DELETE_CHILD;
+
+  /* Construct SUID, SGID and VTX bits in NULL ACE. */
+  DWORD null_allow = 0L;
+  if (attribute & (S_ISUID | S_ISGID | S_ISVTX))
+    {
+      if (attribute & S_ISUID)
+        null_allow |= FILE_APPEND_DATA;
+      if (attribute & S_ISGID)
+        null_allow |= FILE_WRITE_DATA;
+      if (attribute & S_ISVTX)
+        null_allow |= FILE_READ_DATA;
+    }
 
   /* Construct deny attributes for owner and group. */
   DWORD owner_deny = 0;
@@ -1420,7 +1435,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (owner_deny
       && !add_access_denied_ace (acl, ace_off++, owner_deny,
 				  owner_sid, acl_len, inherit))
-      return NULL;
+    return NULL;
   /* Set allow ACE for owner. */
   if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
 				owner_sid, acl_len, inherit))
@@ -1429,7 +1444,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (group_deny
       && !add_access_denied_ace (acl, ace_off++, group_deny,
 				  group_sid, acl_len, inherit))
-      return NULL;
+    return NULL;
   /* Set allow ACE for group. */
   if (!add_access_allowed_ace (acl, ace_off++, group_allow,
 				group_sid, acl_len, inherit))
@@ -1438,6 +1453,11 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   /* Set allow ACE for everyone. */
   if (!add_access_allowed_ace (acl, ace_off++, other_allow,
 				well_known_world_sid, acl_len, inherit))
+    return NULL;
+  /* Set null ACE for special bits. */
+  if (null_allow
+      && !add_access_allowed_ace (acl, ace_off++, null_allow,
+				  well_known_null_sid, acl_len, inherit))
     return NULL;
 
   /* Get owner and group from current security descriptor. */
@@ -1463,7 +1483,8 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 	      || (owner_sid && ace_sid == owner_sid)
 	      || (cur_group_sid && ace_sid == cur_group_sid)
 	      || (group_sid && ace_sid == group_sid)
-	      || (ace_sid == well_known_world_sid))
+	      || (ace_sid == well_known_world_sid)
+	      || (ace_sid == well_known_null_sid))
 	    continue;
 	  /*
 	   * Add unrelated ACCESS_DENIED_ACE to the beginning but

@@ -174,7 +174,7 @@ read_etc_group ()
 	  SID_NAME_USE acType;
 	  debug_printf ("Emulating /etc/group");
 	  if (! LookupAccountSidA (NULL ,
-				    well_known_admin_sid,
+				    well_known_admins_sid,
 				    group_name,
 				    &group_name_len,
 				    domain_name,

@@ -121,10 +121,11 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
       if (aclbufp[i].a_perm & S_IROTH)
 	allow |= FILE_GENERIC_READ;
       if (aclbufp[i].a_perm & S_IWOTH)
-	allow |= STANDARD_RIGHTS_ALL | FILE_GENERIC_WRITE
-		 | DELETE | FILE_DELETE_CHILD;
+	allow |= STANDARD_RIGHTS_ALL | FILE_GENERIC_WRITE;
       if (aclbufp[i].a_perm & S_IXOTH)
 	allow |= FILE_GENERIC_EXECUTE;
+      if ((aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH))
+        allow |= FILE_DELETE_CHILD;
       /* Set inherit property. */
       DWORD inheritance = (aclbufp[i].a_type & ACL_DEFAULT)
 			  ? INHERIT_ONLY : DONT_INHERIT;

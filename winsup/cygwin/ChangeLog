@@ -1,3 +1,17 @@
+Mon 16 Jul 2001 00:11:00  Corinna Vinschen <corinna@vinschen.de>
+
+	Change well_known_admin_sid to well_known_admins_sid throughout.
+	* sec_acl.cc (setacl): Never set DELETE permission. Set
+	FILE_DELETE_CHILD only on readable and executable directories.
+	* sec_helper.cc: Add constructor for `well_known_null_sid'.
+	* security.cc (get_nt_attribute): Set S_ISVTX for directories if
+	FILE_WRITE_DATA and FILE_EXECUTE but not FILE_DELETE_CHILD is set.
+	Add evaluation of S_ISVTX, S_ISGID and S_ISUID from NULL ACE.
+	(alloc_sd): Never set DELETE permission. Set FILE_DELETE_CHILD
+	only on readable and executable directories.
+	Add creation of NULL ACE for S_ISVTX, S_ISGID and S_ISUID permissions.
+	* security.h: Add extern declaration for `well_known_null_sid'.
+
 Fri 13 Jul 2001 08:08:49 PM EDT  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (stat_worker): Simplify previous change.

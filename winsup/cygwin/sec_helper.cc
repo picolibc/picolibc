@@ -44,6 +44,7 @@ SID_IDENTIFIER_AUTHORITY sid_auth[] = {
         {SECURITY_NT_AUTHORITY}
 };
 
+cygsid well_known_null_sid ("S-1-0-0");
 cygsid well_known_world_sid ("S-1-1-0");
 cygsid well_known_local_sid ("S-1-2-0");
 cygsid well_known_creator_owner_sid ("S-1-3-0");
@@ -54,7 +55,7 @@ cygsid well_known_interactive_sid ("S-1-5-4");
 cygsid well_known_service_sid ("S-1-5-6");
 cygsid well_known_authenticated_users_sid ("S-1-5-11");
 cygsid well_known_system_sid ("S-1-5-18");
-cygsid well_known_admin_sid ("S-1-5-32-544");
+cygsid well_known_admins_sid ("S-1-5-32-544");
 
 char *
 cygsid::string (char *nsidstr) const

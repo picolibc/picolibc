@@ -131,6 +131,7 @@ public:
     }
 };
 
+extern cygsid well_known_null_sid;
 extern cygsid well_known_world_sid;
 extern cygsid well_known_local_sid;
 extern cygsid well_known_creator_owner_sid;
@@ -141,7 +142,7 @@ extern cygsid well_known_interactive_sid;
 extern cygsid well_known_service_sid;
 extern cygsid well_known_authenticated_users_sid;
 extern cygsid well_known_system_sid;
-extern cygsid well_known_admin_sid;
+extern cygsid well_known_admins_sid;
 
 inline BOOL
 legal_sid_type (SID_NAME_USE type)
