@@ -83,8 +83,7 @@ fill_rusage (struct rusage *r, HANDLE h)
     }
 }
 
-extern "C"
-int
+extern "C" int
 getrusage (int intwho, struct rusage *rusage_in)
 {
   int res = 0;

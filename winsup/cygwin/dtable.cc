@@ -36,7 +36,9 @@ details. */
 static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 					   STD_ERROR_HANDLE};
 
-static char *handle_to_fn (HANDLE, char *);
+static const char *handle_to_fn (HANDLE, char *);
+
+static const char NO_COPY unknown_file[] = "some disk file";
 
 /* Set aside space for the table of fds */
 void
@@ -265,8 +267,8 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
   else
     {
       path_conv pc;
-      build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess,
-							     pc.binmode ());
+      build_fhandler_from_name (fd, name, handle, pc)
+	->init (handle, myaccess, (name == unknown_file) ? 0 : pc.binmode ());
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }
@@ -695,7 +697,7 @@ dtable::vfork_child_fixup ()
 #define REMOTE "\\Device\\LanmanRedirector\\"
 #define REMOTE_LEN sizeof (REMOTE) - 1
 
-static char *
+static const char *
 handle_to_fn (HANDLE h, char *posix_fn)
 {
   OBJECT_NAME_INFORMATION *ntfn;
@@ -710,9 +712,9 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
   if (res)
     {
-      strcpy (posix_fn, "some disk file");
+      strcpy (posix_fn, unknown_file);
       debug_printf ("NtQueryObject failed");
-      return posix_fn;
+      return unknown_file;
     }
 
   // NT seems to do this on an unopened file

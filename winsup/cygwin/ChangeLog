@@ -1,5 +1,12 @@
 2002-10-07  Christopher Faylor  <cgf@redhat.com>
 
+	* dtable.cc (unknown_file): New variable.
+	(dtable::init_std_file_from_handle): Don't set binmode if we couldn't
+	determine the actual file name on stdin/stdout/stderr.
+	(handle_to_fn): Return unknown_file when can't determine filename.
+
+2002-10-07  Christopher Faylor  <cgf@redhat.com>
+
 	* dcrt0.cc (do_exit): Call DisableThreadLibraryCalls since we don't
 	need to track thread detaches.
 	* init.cc (dll_entry): Reorganize slightly.  Fix api_fatal message.
