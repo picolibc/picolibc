@@ -1057,10 +1057,10 @@ __api_fatal (const char *fmt, ...)
      a serious error. */
   if (GetFileType (GetStdHandle (STD_ERROR_HANDLE)) != FILE_TYPE_CHAR)
     {
-      HANDLE h = CreateFileA ("CONOUT$", GENERIC_READ|GENERIC_WRITE,
-			      FILE_SHARE_WRITE | FILE_SHARE_WRITE, &sec_none,
-			      OPEN_EXISTING, 0, 0);
-      if (h)
+      HANDLE h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+			     FILE_SHARE_WRITE | FILE_SHARE_WRITE,
+			     &sec_none, OPEN_EXISTING, 0, 0);
+      if (h != INVALID_HANDLE_VALUE)
 	(void) WriteFile (h, buf, len, &done, 0);
     }
 

@@ -362,12 +362,12 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   /* If we don't have a console, then don't create a console for the
      child either.  */
-  HANDLE console_handle = CreateFileA ("CONOUT$", GENERIC_WRITE,
-				       FILE_SHARE_WRITE, &sec_none_nih,
-				       OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-				       NULL);
+  HANDLE console_handle = CreateFile ("CONOUT$", GENERIC_WRITE,
+				      FILE_SHARE_WRITE, &sec_none_nih,
+				      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+				      NULL);
 
-  if (console_handle != INVALID_HANDLE_VALUE && console_handle != 0)
+  if (console_handle != INVALID_HANDLE_VALUE)
     CloseHandle (console_handle);
   else
     c_flags |= DETACHED_PROCESS;

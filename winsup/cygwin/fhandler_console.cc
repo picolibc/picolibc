@@ -135,11 +135,11 @@ tty_list::get_tty (int n)
 int __stdcall
 set_console_state_for_spawn ()
 {
-  HANDLE h = CreateFileA ("CONIN$", GENERIC_READ, FILE_SHARE_WRITE,
-			  &sec_none_nih, OPEN_EXISTING,
-			  FILE_ATTRIBUTE_NORMAL, NULL);
+  HANDLE h = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_WRITE,
+			 &sec_none_nih, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+			 NULL);
 
-  if (h == INVALID_HANDLE_VALUE || h == NULL)
+  if (h == INVALID_HANDLE_VALUE)
     return 0;
 
   if (shared_console_info != NULL)
@@ -547,9 +547,9 @@ fhandler_console::open (path_conv *, int flags, mode_t)
   set_flags ((flags & ~O_TEXT) | O_BINARY);
 
   /* Open the input handle as handle_ */
-  h = CreateFileA ("CONIN$", GENERIC_READ|GENERIC_WRITE,
-		   FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
-		   OPEN_EXISTING, 0, 0);
+  h = CreateFile ("CONIN$", GENERIC_READ | GENERIC_WRITE,
+		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
+		  OPEN_EXISTING, 0, 0);
 
   if (h == INVALID_HANDLE_VALUE)
     {
@@ -559,9 +559,9 @@ fhandler_console::open (path_conv *, int flags, mode_t)
   set_io_handle (h);
   set_r_no_interrupt (1);	// Handled explicitly in read code
 
-  h = CreateFileA ("CONOUT$", GENERIC_READ|GENERIC_WRITE,
-		   FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
-		   OPEN_EXISTING, 0, 0);
+  h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
+		  OPEN_EXISTING, 0, 0);
 
   if (h == INVALID_HANDLE_VALUE)
     {

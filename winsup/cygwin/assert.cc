@@ -28,9 +28,9 @@ __assert (const char *file, int line, const char *failedexpr)
   /* If we don't have a console in a Windows program, then bring up a
      message box for the assertion failure.  */
 
-  h = CreateFileA ("CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, &sec_none_nih,
-		   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  if (h == INVALID_HANDLE_VALUE || h == 0)
+  h = CreateFile ("CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, &sec_none_nih,
+		  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (h == INVALID_HANDLE_VALUE)
     {
       char *buf;
 
