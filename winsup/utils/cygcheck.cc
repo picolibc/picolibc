@@ -276,7 +276,7 @@ get_dword (HANDLE fh, int offset)
 
   if (SetFilePointer (fh, offset, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER
       && GetLastError () != NO_ERROR)
-    keyeprint ("get_word: SetFilePointer()");
+    keyeprint ("get_dword: SetFilePointer()");
 
   if (!ReadFile (fh, &rv, 4, (DWORD *) &r, 0))
     keyeprint ("get_dword: Readfile()");
@@ -359,7 +359,7 @@ cygwin_info (HANDLE h)
   buf_start = buf = (char *) calloc (1, size + 1);
   if (buf == NULL)
     {
-      keyeprint ("cygwin_info: malloc()");
+      keyeprint ("cygwin_info: calloc()");
       return;
     }
 
@@ -537,13 +537,13 @@ track_down (char *file, char *suffix, int lvl)
 {
   if (file == NULL)
     {
-      keyeprint ("track_down: malloc()");
+      keyeprint ("track_down: NULL passed for file");
       return;
     }
 
   if (suffix == NULL)
     {
-      keyeprint ("track_down: malloc()");
+      keyeprint ("track_down: NULL passed for suffix");
       return;
     }
 
@@ -1271,7 +1271,7 @@ check_keys ()
 			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
   if (h == INVALID_HANDLE_VALUE || h == NULL)
-    return (keyeprint ("check_key: Opening CONIN$"));
+    return (keyeprint ("check_keys: Opening CONIN$"));
 
   DWORD mode;
 
@@ -1281,7 +1281,7 @@ check_keys ()
     {
       mode &= ~ENABLE_PROCESSED_INPUT;
       if (!SetConsoleMode (h, mode))
-	keyeprint ("check_keys: GetConsoleMode()");
+	keyeprint ("check_keys: SetConsoleMode()");
     }
 
   fputs ("\nThis key check works only in a console window,", stderr);
@@ -1300,7 +1300,7 @@ check_keys ()
     {
       prev_in = in;
       if (!ReadConsoleInput (h, &in, 1, &mode))
-	keyeprint ("ReadConsoleInput");
+	keyeprint ("check_keys: ReadConsoleInput()");
 
       if (!memcmp (&in, &prev_in, sizeof in))
 	continue;

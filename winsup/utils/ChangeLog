@@ -1,3 +1,10 @@
+2004-10-31  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* cygcheck.cc (get_dword): Fix errormessage.
+	(cygwin_info): Ditto.
+	(track_down): Ditto.
+	(check_keys): Ditto.
+
 2004-10-27  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* cygcheck.cc (dump_sysinfo): Warn about missing or multiple cygwin1
