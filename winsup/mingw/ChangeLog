@@ -1,3 +1,12 @@
+2002-04-29  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	Change FP default precison from 53 to 64-bit mantissa.
+	* Makefile.in (CRT0S): Add CRT_fp8.o.
+	(MINGW_OBJS): Replace CRT_fp8.o with CRT_fp10.o.
+	* include/float.h: Replace standard float.h defines with
+	#include_next<float.h> to use GCC's defines. Adjust comments
+	to reflect change.	
+
 2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/dos.h: Change  prefix "__imp_"  to "_imp__" for

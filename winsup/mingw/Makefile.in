@@ -147,9 +147,9 @@ FLAGS_TO_PASS:=\
 	TARFILEEXT="$(TARFILEEXT)"
 
 CRT0S = crt1.o dllcrt1.o crt2.o dllcrt2.o CRT_noglob.o crtmt.o crtst.o \
-	CRT_fp10.o
+	CRT_fp8.o CRT_fp10.o
 MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o  dllmain.o gccmain.o \
-	     main.o crtst.o mthr_stub.o CRT_fp8.o
+	     main.o crtst.o mthr_stub.o CRT_fp10.o
 MOLD_OBJS = ctype_old.o string_old.o
 
 LIBS = libcrtdll.a libmsvcrt.a libmsvcrt20.a libmsvcrt40.a libmingw32.a \

@@ -6,11 +6,10 @@
  * Also included here are some non-ANSI bits for accessing the floating
  * point controller.
  *
- * NOTE: GCC provides float.h, and it is probably more accurate than this,
- *       but it doesn't include the non-standard stuff for accessing the
- *       fp controller. (TODO: Move those bits elsewhere?) Thus it is
- *       probably not a good idea to use the GCC supplied version instead
- *       of this header.
+ * NOTE: GCC provides float.h, but it doesn't include the non-standard
+ *       stuff for accessing the fp controller. We include_next the
+ *       GCC-supplied header and just define the MS-specific extensions
+ *       here.     
  *
  * This file is part of the Mingw32 package.
  *
@@ -33,79 +32,13 @@
  *
  */
 
-#ifndef _FLOAT_H_
-#define _FLOAT_H_
+#ifndef _MINGW_FLOAT_H_
+#define _MINGW_FLOAT_H_
 
 /* All the headers include this file. */
 #include <_mingw.h>
 
-#define FLT_ROUNDS	1
-#define FLT_GUARD	1
-#define FLT_NORMALIZE	1
-
-/*
- * The characteristics of float.
- */
-
-/* The radix for floating point representation. */
-#define FLT_RADIX	2
-
-/* Decimal digits of precision. */
-#define FLT_DIG		6
-
-/* Smallest number such that 1+x != 1 */
-#define FLT_EPSILON	1.19209290e-07F
-
-/* The number of base FLT_RADIX digits in the mantissa. */
-#define FLT_MANT_DIG	24
-
-/* The maximum floating point number. */
-#define FLT_MAX		3.40282347e+38F
-
-/* Maximum n such that FLT_RADIX^n - 1 is representable. */
-#define FLT_MAX_EXP	128
-
-/* Maximum n such that 10^n is representable. */
-#define FLT_MAX_10_EXP	38
-
-/* Minimum normalized floating-point number. */
-#define FLT_MIN		1.17549435e-38F
-
-/* Minimum n such that FLT_RADIX^n is a normalized number. */
-#define FLT_MIN_EXP	(-125)
-
-/* Minimum n such that 10^n is a normalized number. */
-#define FLT_MIN_10_EXP	(-37)
-
-
-/*
- * The characteristics of double.
- */
-#define DBL_DIG		15
-#define DBL_EPSILON	1.1102230246251568e-16
-#define DBL_MANT_DIG	53
-#define DBL_MAX		1.7976931348623157e+308
-#define DBL_MAX_EXP	1024
-#define DBL_MAX_10_EXP	308
-#define DBL_MIN		2.2250738585072014e-308
-#define DBL_MIN_EXP	(-1021)
-#define DBL_MIN_10_EXP	(-307)
-
-
-/*
- * The characteristics of long double.
- * NOTE: long double is the same as double.
- */
-#define LDBL_DIG	15
-#define LDBL_EPSILON	1.1102230246251568e-16L
-#define LDBL_MANT_DIG	53
-#define LDBL_MAX	1.7976931348623157e+308L
-#define LDBL_MAX_EXP	1024
-#define LDBL_MAX_10_EXP	308
-#define LDBL_MIN	2.2250738585072014e-308L
-#define LDBL_MIN_EXP	(-1021)
-#define LDBL_MIN_10_EXP	(-307)
-
+#include_next<float.h>
 
 /*
  * Functions and definitions for controlling the FPU.
@@ -193,11 +126,14 @@ unsigned int	_statusfp (void);	/* Report the FPU status word */
 
 
 /*
-   _fpreset initializes the control register to 0x27f,
+   MSVCRT.dll _fpreset initializes the control register to 0x27f,
    the status register to zero and the tag word to 0FFFFh.
-   This differs from asm instruction fninit which sets control
-   word to 0x37f (64 bit mantissa precison rather than 53 bit)
-*/  
+   This differs from asm instruction finit/fninit which set control
+   word to 0x37f (64 bit mantissa precison rather than 53 bit).
+   By default, the mingw version of _fpreset sets fp control as
+   per fninit. To use the MSVCRT.dll _fpreset, include CRT_fp8.o when
+   building your application.	 
+*/
 void		_fpreset (void);
 void		fpreset (void);
 
@@ -206,7 +142,8 @@ int *	__fpecode(void);
 #define	_fpecode	(*(__fpecode()))
 
 /*
- * IEEE recommended functions
+ * IEEE recommended functions.  MS puts them in float.h
+ * but they really belong in math.h.
  */
 
 double	_chgsign	(double);
