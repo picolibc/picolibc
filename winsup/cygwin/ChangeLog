@@ -1,5 +1,10 @@
 2002-08-01  Christopher Faylor  <cgf@redhat.com>
 
+	* syscalls.cc (_link): Revert previous change and just always
+	dereference the oldpath.
+
+2002-08-01  Christopher Faylor  <cgf@redhat.com>
+
 	* syscalls.cc (link): Properly deal with a link to a symlink.
 
 2002-08-01  Christopher Faylor  <cgf@redhat.com>

@@ -305,11 +305,10 @@ _read (int fd, void *ptr, size_t len)
       DWORD wait = cfd->is_nonblocking () ? 0 : INFINITE;
 
       /* Could block, so let user know we at least got here.  */
-      syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d",
-		      fd, ptr, len, wait ? "" : "non", sigcatchers);
+      syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d", fd, ptr, len, wait ? "" : "non", sigcatchers);
 
       if (wait && (!cfd->is_slow () || cfd->get_r_no_interrupt ()))
-	debug_printf ("no need to call ready_for_read\n");
+	debug_printf ("non-interruptible read\n");
       else if (!cfd->ready_for_read (fd, wait))
 	{
 	  res = -1;
@@ -319,7 +318,7 @@ _read (int fd, void *ptr, size_t len)
       /* FIXME: This is not thread safe.  We need some method to
 	 ensure that an fd, closed in another thread, aborts I/O
 	 operations. */
-      if (!cfd.isopen ())
+      if (!cfd.isopen())
 	return -1;
 
       /* Check to see if this is a background read from a "tty",
@@ -332,7 +331,7 @@ _read (int fd, void *ptr, size_t len)
       if (res > bg_eof)
 	{
 	  myself->process_state |= PID_TTYIN;
-	  if (!cfd.isopen ())
+	  if (!cfd.isopen())
 	    return -1;
 	  res = cfd->read (ptr, len);
 	  myself->process_state &= ~PID_TTYIN;
@@ -615,9 +614,8 @@ _link (const char *a, const char *b)
 {
   int res = -1;
   sigframe thisframe (mainthread);
+  path_conv real_a (a, PC_SYM_FOLLOW | PC_FULL);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
-  path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
-  extern BOOL allow_winsymlinks;
 
   if (real_a.error)
     {
@@ -648,8 +646,6 @@ _link (const char *a, const char *b)
   /* Try to make hard link first on Windows NT */
   if (wincap.has_hard_links ())
     {
-      if (allow_winsymlinks && real_b.issymlink ())
-	strcat (real_a, ".lnk");
       if (CreateHardLinkA (real_b, real_a, NULL))
 	{
 	  res = 0;
