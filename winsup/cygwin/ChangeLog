@@ -1,3 +1,7 @@
+2005-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* times.cc (utimes): Mark st_ctime for update according to SUSv3.
+
 2005-02-01  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_proc.cc (format_proc_partitions): Remove PartitionType check

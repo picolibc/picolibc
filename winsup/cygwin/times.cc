@@ -1,6 +1,7 @@
 /* times.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -483,18 +484,21 @@ utimes (const char *path, struct timeval *tvp)
     }
   else
     {
+      gettimeofday (&tmp[0], 0);
       if (tvp == 0)
 	{
-	  gettimeofday (&tmp[0], 0);
 	  tmp[1] = tmp[0];
 	  tvp = tmp;
 	}
 
       FILETIME lastaccess;
       FILETIME lastwrite;
+      FILETIME lastchange;
 
       timeval_to_filetime (tvp + 0, &lastaccess);
       timeval_to_filetime (tvp + 1, &lastwrite);
+      /* Mark st_ctime for update */
+      timeval_to_filetime (tmp + 0, &lastchange);
 
       debug_printf ("incoming lastaccess %08x %08x",
 		   tvp->tv_sec,
@@ -507,7 +511,7 @@ utimes (const char *path, struct timeval *tvp)
 	 on the file whose time is being modified.  So calls to utime()
 	 fail for read only files.  */
 
-      if (!SetFileTime (h, 0, &lastaccess, &lastwrite))
+      if (!SetFileTime (h, &lastchange, &lastaccess, &lastwrite))
 	{
 	  __seterrno ();
 	  res = -1;
