@@ -10,7 +10,7 @@
 
 2003-06-03  Michael Snyder  <msnyder@redhat.com>
 
-	* h8sx.h (enum h8_model): Add AV_H8S to distinguish from H8H.
+	* h8300.h (enum h8_model): Add AV_H8S to distinguish from H8H.
 	(ldc): Split ccr ops from exr ops (which are only available
 	on H8S or H8SX).
 	(stc): Ditto.
