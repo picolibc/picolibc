@@ -13,30 +13,70 @@ command-line utilities support the <literal>--help</literal> and
 <sect2 id="cygcheck"><title>cygcheck</title>
 
 <screen>
-Usage: cygcheck [OPTIONS] [program ...]
+Usage: cygcheck [OPTIONS] [PROGRAM...]
 Check system information or PROGRAM library dependencies
 
- -c, --check-setup  check packages installed via setup.exe
- -s, --sysinfo      system information (not with -k)
- -v, --verbose      verbose output (indented) (for -s or programs)
- -r, --registry     registry search (requires -s)
- -k, --keycheck     perform a keyboard check session (not with -s)
- -h, --help         give help about the info (not with -c)
- -V, --version      output version information and exit
-You must at least give either -s or -k or a program name
+ -c, --check-setup   check packages installed via setup.exe
+ -d, --dump-only     no integrity checking of package contents (requires -c)
+ -s, --sysinfo       system information (not with -k)
+ -v, --verbose       verbose output (indented) (for -[cfls] or programs)
+ -r, --registry      registry search (requires -s)
+ -k, --keycheck      perform a keyboard check session (not with -[scfl])
+ -f, --find-package  find installed packages containing files (not with -[cl])
+ -l, --list-package  list the contents of installed packages (not with -[cf])
+ -h, --help          give help about the info (not with -[cfl])
+ -V, --version       output version information and exit
 </screen>
 
-<para>The <command>cygcheck</command> program is a diagnostic utility
-that examines your system and reports the information that is
-significant to the proper operation of Cygwin programs.  It can give
-information about specific programs or libraries you are trying to
-run, general system information, or both.  If you list one or more
-programs on the command line, it will diagnose the runtime environment
-of that program or programs, providing the names of DLL files on which
-the program depends.  If you specify the <literal>-s</literal>
-option, it will give general system information.  If you specify
-<literal>-s</literal> and list one or more programs on the command line,
-it reports on both.</para>
+<para>
+The <command>cygcheck</command> program is a diagnostic utility for
+dealing with Cygwin programs. If you are familiar with
+<command>dpkg</command> or <command>rpm</command>,
+<command>cygcheck</command> is similar in many ways. (The major difference
+is that <command>setup.exe</command> handles installing and uninstalling
+packages; see <xref linkend="internet-setup"> for more information.)
+</para>
+<para>
+The <literal>-c</literal> option checks the version and status of 
+installed Cygwin packages. If you specify one or more package names,
+<command>cygcheck</command> will limit its output to those packages,
+or with no arguments it lists all packages. A package will be marked
+<literal>Incomplete</literal> if files originally installed are no longer
+present. The best thing to do in that situation is reinstall the package
+with <command>setup.exe</command>. To see which files are missing, use the
+<literal>-v</literal> option. If you do not need to know the status
+of each package and want <command>cygcheck</command> to run faster, add the
+<literal>-d</literal> option and <command>cygcheck</command> will only
+output the name and version for each package.
+</para>
+<para>
+If you list one or more programs on the command line,
+<command>cygcheck</command> will diagnose the runtime environment of that
+program or programs, providing the names of DLL files on which the program
+depends.  If you specify the <literal>-s</literal> option,
+<command>cygcheck</command> will give general system information.  If you
+list one or more programs on the command line and specify
+<literal>-s</literal>, <command>cygcheck</command> will report on
+both.</para>
+<para>
+The <literal>-f</literal> option helps you to track down which package a
+file came from, and <literal>-l</literal> lists all files in a package.
+For example, to find out about <filename>/usr/bin/less</filename> and its
+package:
+<example><title>Example <command>cygcheck</command> usage</title>
+<screen>
+$ cygcheck.exe -f /usr/bin/less
+less-381-1
+
+$ cygcheck.exe -l less
+/usr/bin/less.exe
+/usr/bin/lessecho.exe
+/usr/bin/lesskey.exe
+/usr/man/man1/less.1
+/usr/man/man1/lesskey.1
+</screen>
+</example>
+</para>
 
 <para>The <literal>-h</literal> option prints additional helpful
 messages in the report, at the beginning of each section.  It also
@@ -57,11 +97,6 @@ that is relevent to Cygwin programs.  These registry entries are the
 ones that have "Cygwin" in the name.  If you are paranoid about
 privacy, you may remove information from this report, but please keep
 in mind that doing so makes it harder to diagnose your problems.</para>
-
-<para>The <literal>-c</literal> option causes the arguments
-to be interpreted as package names.  <command>cygcheck</command> will
-report the current version of the package that you specify, or with no
-arguments, on all packages.</para>
 
 <para>The <command>cygcheck</command> program should be used to send
 information about your system for troubleshooting when requested.  
@@ -146,7 +181,7 @@ contain spaces (C:\Program Files) so should be enclosed in quotes.
 </para>
 
 
-<example><title>Example cygpath usage</title>
+<example><title>Example <command>cygpath</command> usage</title>
 <screen>
 <![CDATA[
 #!/bin/sh
@@ -155,8 +190,8 @@ if [ "${1}" = "" ];
 		XPATH=".";
 	else
 		XPATH="$(cygpath -w "${1}")";
-	fi
-	explorer $XPATH &
+fi
+explorer $XPATH &
 ]]>
 </screen>
 </example>
