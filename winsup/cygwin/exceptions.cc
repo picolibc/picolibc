@@ -829,7 +829,10 @@ ctrl_c_handler (DWORD type)
   static bool saw_close;
 
   if (!cygwin_finished_initializing)
-    ExitProcess (STATUS_CONTROL_C_EXIT);
+    {
+      debug_printf ("exiting with status %p", STATUS_CONTROL_C_EXIT);
+      ExitProcess (STATUS_CONTROL_C_EXIT);
+    }
 
   _my_tls.remove (INFINITE);
 

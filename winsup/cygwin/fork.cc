@@ -664,7 +664,6 @@ fork ()
   child_info_fork ch;
 
   int res = setjmp (ch.jmp);
-
   if (res)
     res = fork_child (grouped.hParent, grouped.first_dll, grouped.load_dlls);
   else

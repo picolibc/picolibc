@@ -459,9 +459,8 @@ static MEMORY_BASIC_INFORMATION NO_COPY sm;
 #define CYGWIN_GUARD ((wincap.has_page_guard ()) ? \
 		     PAGE_EXECUTE_READWRITE|PAGE_GUARD : PAGE_NOACCESS)
 
-// __inline__ void
-extern void
-alloc_stack_hard_way (child_info_fork *ci)
+static void
+alloc_stack_hard_way (child_info_fork *ci, volatile char *b)
 {
   void *new_stack_pointer;
   MEMORY_BASIC_INFORMATION m;
@@ -496,7 +495,7 @@ alloc_stack_hard_way (child_info_fork *ci)
     api_fatal ("fork: couldn't get new stack info, %E");
   if (!noguard)
     {
-      m.BaseAddress = (LPVOID)((DWORD)m.BaseAddress - 1);
+      m.BaseAddress = (LPVOID) ((DWORD) m.BaseAddress - 1);
       if (!VirtualAlloc ((LPVOID) m.BaseAddress, 1, MEM_COMMIT,
 			 CYGWIN_GUARD))
 	api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
@@ -505,6 +504,7 @@ alloc_stack_hard_way (child_info_fork *ci)
   if (!VirtualQuery ((LPCVOID) m.BaseAddress, &m, sizeof m))
     api_fatal ("fork: couldn't get new stack info, %E");
   ci->stacktop = m.BaseAddress;
+  b[0] = '\0';
 }
 
 /* extend the stack prior to fork longjmp */
@@ -512,16 +512,18 @@ alloc_stack_hard_way (child_info_fork *ci)
 static void
 alloc_stack (child_info_fork *ci)
 {
-  if (!VirtualQuery ((LPCVOID) _tlstop, &sm, sizeof sm))
+  /* FIXME: adding 16384 seems to avoid a stack copy problem during
+     fork on Win95, but I don't know exactly why yet. DJ */
+  volatile char b[ci->stacksize + 16384];
+
+  if (!VirtualQuery ((LPCVOID) &b, &sm, sizeof sm))
     api_fatal ("fork: couldn't get stack info, %E");
 
   if (sm.AllocationBase == ci->stacktop)
-    {
-      ci->stacksize = 0;
-      return;
-    }
+    ci->stacksize = 0;
+  else
+    alloc_stack_hard_way (ci, b + sizeof (b) - 1);
 
-  alloc_stack_hard_way (ci);
   return;
 }
 
@@ -785,7 +787,6 @@ dll_crt0_1 (char *)
 	  _tlsbase = (char *) fork_info->stackbottom;
 	  _tlstop = (char *) fork_info->stacktop;
 	}
-
       longjmp (fork_info->jmp, fork_info->cygpid);
     }
 

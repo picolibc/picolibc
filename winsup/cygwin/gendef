@@ -281,6 +281,5 @@ _longjmp:
 	movl	20(%edi),%edi
 	popfl
 	ret
-
 EOF
 }
