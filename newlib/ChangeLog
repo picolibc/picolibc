@@ -1,3 +1,8 @@
+2004-06-14  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/machine/i386/syscall.h: For now, set up
+	__syscall_return macro for systems with vsyscall.
+
 2004-06-11  Antony King  <antony.king@st.com>
 
 	* libc/include/sys/_types.h: Include <sys/lock.h> and change

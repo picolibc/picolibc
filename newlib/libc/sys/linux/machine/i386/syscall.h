@@ -24,8 +24,20 @@
  * PIC uses %ebx, so we need to save it during system calls
  */
 
-#ifdef __syscall_return
+#ifndef __syscall_return
 
+/* FIXME: remove this and switch over to use vsyscall.  */
+
+#define __syscall_return(type, res) \
+do { \
+  if ((unsigned long)(res) >= (unsigned long)(-125)) { \
+    errno = -(res); \
+    res = -1; \
+  } \
+  return (type) (res); \
+} while (0)
+
+#endif                                                                                
 #undef __inline_syscall0
 #define __inline_syscall0(name,ret) \
 __asm__ volatile ("int $0x80" \
@@ -135,59 +147,6 @@ long __res; \
 __inline_syscall6(name,__res,arg1,arg2,arg3,arg4,arg5,arg6) \
 __syscall_return(type,__res); \
 }
-
-#else /* !__syscall_return */
-
-#undef _syscall0_base
-#define _syscall0_base(type,name) \
-type __libc_##name (void) \
-{ \
-  return (type)syscall (__NR_##name); \
-}
-
-#undef _syscall1_base
-#define _syscall1_base(type,name,type1,arg1) \
-type __libc_##name (type1 arg1) \
-{ \
-  return (type)syscall (__NR_##name, arg1); \
-}
-
-#undef _syscall2_base
-#define _syscall2_base(type,name,type1,arg1,type2,arg2) \
-type __libc_##name (type1 arg1, type2 arg2) \
-{ \
-  return (type)syscall (__NR_##name, arg1, arg2); \
-}
-
-#undef _syscall3_base
-#define _syscall3_base(type,name,type1,arg1,type2,arg2,type3,arg3) \
-type __libc_##name (type1 arg1, type2 arg2, type3 arg3) \
-{ \
-  return (type)syscall (__NR_##name, arg1, arg2, arg3); \
-}
-
-#undef _syscall4_base
-#define _syscall4_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4) \
-type __libc_##name (type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
-{ \
-  return (type)syscall (__NR_##name, arg1, arg2, arg3, arg4); \
-}
-
-#undef _syscall5_base
-#define _syscall5_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5) \
-type __libc_##name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5) \
-{ \
-  return (type)syscall (__NR_##name, arg1, arg2, arg3, arg4, arg5); \
-}
-
-#undef _syscall6_base
-#define _syscall6_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5,type6,arg6) \
-type __libc_##name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,type6 arg6) \
-{ \
-  return (type)syscall (__NR_##name, arg1, arg2, arg3, arg4, arg5, arg6); \
-}
-
-#endif /* !__syscall_return */
 
 #undef _syscall0
 #define _syscall0(type,name) \
