@@ -1,5 +1,5 @@
 /* Internal definitions for configurable Xtensa ISA support.
-   Copyright 2003, 2004 Free Software Foundation, Inc.
+   Copyright 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -49,7 +49,7 @@ typedef int (*xtensa_do_reloc_fn) (uint32 *, uint32);
 typedef int (*xtensa_undo_reloc_fn) (uint32 *, uint32);
 typedef void (*xtensa_opcode_encode_fn) (xtensa_insnbuf);
 typedef int (*xtensa_format_decode_fn) (const xtensa_insnbuf);
-typedef int (*xtensa_length_decode_fn) (const char *);
+typedef int (*xtensa_length_decode_fn) (const unsigned char *);
 
 typedef struct xtensa_format_internal_struct
 {

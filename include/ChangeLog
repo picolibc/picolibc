@@ -1,3 +1,9 @@
+2005-02-21  Alan Modra  <amodra@bigpond.net.au>
+
+	* xtensa-isa-internal.h (xtensa_length_decode_fn): Warning fix.
+	* xtensa-isa.h (xtensa_insnbuf_to_chars): Likewise.
+	(xtensa_insnbuf_from_chars, xtensa_isa_length_from_chars): Likewise.
+
 2005-02-14  Paolo Bonzini  <bonzini@gnu.org>
 
 	PR bootstrap/19818

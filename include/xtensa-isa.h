@@ -1,5 +1,5 @@
 /* Interface definition for configurable Xtensa ISA support.
-   Copyright 2003, 2004 Free Software Foundation, Inc.
+   Copyright 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -209,11 +209,11 @@ xtensa_insnbuf_free (xtensa_isa isa, xtensa_insnbuf buf);
 
 extern int
 xtensa_insnbuf_to_chars (xtensa_isa isa, const xtensa_insnbuf insn,
-			 char *cp, int num_chars);
+			 unsigned char *cp, int num_chars);
 
 extern void
 xtensa_insnbuf_from_chars (xtensa_isa isa, xtensa_insnbuf insn,
-			   const char *cp, int num_chars);
+			   const unsigned char *cp, int num_chars);
 
 
 /* ISA information.  */
@@ -242,7 +242,7 @@ xtensa_isa_maxlength (xtensa_isa isa);
    XTENSA_UNDEFINED on error.  */
 
 extern int
-xtensa_isa_length_from_chars (xtensa_isa isa, const char *cp);
+xtensa_isa_length_from_chars (xtensa_isa isa, const unsigned char *cp);
 
 
 /* Get the number of stages in the processor's pipeline.  The pipeline
