@@ -122,10 +122,19 @@ _pinfo::exit (UINT n, bool norecord)
     sigproc_terminate ();
   else
     exitcode = n;
+
   if (this)
     {
       if (!norecord)
-	process_state = PID_EXITED;
+	{
+	  process_state = PID_EXITED;
+	  if (CGFFAST && myself->ppid != 1)
+	    {
+	      pinfo parent (myself->ppid);
+	      if (parent)
+		sig_send (parent, SIGCHLD);
+	    }
+	}
 
       /* FIXME:  There is a potential race between an execed process and its
 	 parent here.  I hated to add a mutex just for this, though.  */
