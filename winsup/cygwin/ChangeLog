@@ -1,3 +1,9 @@
+2003-06-07  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* fhandler_socket.cc (fhandler_socket::connect): Change error
+	handling for nonblocking connects to return EALREADY when
+	connect is called more than once for the same socket.
+
 2003-06-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Add vsyslog.

@@ -502,6 +502,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   BOOL in_progress = FALSE;
   sockaddr_in sin;
   int secret [4];
+  DWORD err;
 
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
@@ -514,12 +515,12 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	 when called on a non-blocking socket. */
       if (is_nonblocking () || is_connect_pending ())
 	{
-	  DWORD err = WSAGetLastError ();
+	  err = WSAGetLastError ();
 	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
-	    {
-	      WSASetLastError (WSAEINPROGRESS);
-	      in_progress = TRUE;
-	    }
+	    in_progress = TRUE;
+
+	  if (err == WSAEWOULDBLOCK)
+	    WSASetLastError (WSAEINPROGRESS);
 	  else if (err == WSAEINVAL)
 	    WSASetLastError (WSAEISCONN);
 	}
@@ -556,7 +557,8 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	}
     }
 
-  if (WSAGetLastError () == WSAEINPROGRESS)
+  err = WSAGetLastError ();
+  if (err == WSAEINPROGRESS || err == WSAEALREADY)
     set_connect_state (CONNECT_PENDING);
   else
     set_connect_state (CONNECTED);
