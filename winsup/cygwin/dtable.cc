@@ -445,13 +445,13 @@ dtable::fixup_after_exec (HANDLE parent, size_t sz, fhandler_base **f)
   first_fd_for_open = 0;
   for (size_t i = 0; i < size; i++)
     if (fds[i])
-      if (fds[i]->get_close_on_exec ())
-	release (i);
-      else
-	{
-	  fds[i]->clear_readahead ();
+      {
+	fds[i]->clear_readahead ();
+	if (fds[i]->get_close_on_exec ())
+	  release (i);
+	else
 	  fds[i]->fixup_after_exec (parent);
-	}
+      }
 }
 
 void

@@ -2507,7 +2507,7 @@ chdir (const char *dir)
   else
     p++;
 
-  int len = strlen (p);
+  size_t len = strlen (p);
   if (len > 2 && strspn (p, ".") == len)
     {
       set_errno (ENOENT);

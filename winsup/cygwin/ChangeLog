@@ -1,3 +1,11 @@
+Sun Sep 10 12:40:49 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Initialize thread and debug stuff before
+	handling exec/fork.
+	* dtable.cc (dtable::fixup_after_exec): Always clear out the read ahead
+	buffer whether closing or adjusting.
+	* path.cc (chdir): Avoid a compiler warning.
+
 Sat Sep  9 23:29:17 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (chdir): Use the full path for cwd_win32.  Consider attempts

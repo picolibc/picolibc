@@ -644,6 +644,10 @@ dll_crt0_1 ()
 
   user_data->resourcelocks->Init ();
   user_data->threadinterface->Init0 ();
+
+  threadname_init ();
+  debug_init ();
+
   regthread ("main", GetCurrentThreadId ());
 
   char **envp = NULL;
@@ -712,9 +716,6 @@ dll_crt0_1 ()
 
   /* Initialize events. */
   events_init ();
-
-  threadname_init ();
-  debug_init ();
 
   /* Allow backup semantics. It's better done only once on process start
      instead of each time a file is opened. */
