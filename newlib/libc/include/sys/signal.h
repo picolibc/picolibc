@@ -79,7 +79,7 @@ typedef struct {
 /* struct sigaction notes from POSIX:
  *
  *  (1) Routines stored in sa_handler should take a single int as
- *      there argument although the POSIX standard does not require this.
+ *      their argument although the POSIX standard does not require this.
  *  (2) The fields sa_handler and sa_sigaction may overlap, and a conforming
  *      application should not use both simultaneously.
  */
@@ -104,7 +104,10 @@ struct sigaction {
 #define sa_sigaction  _signal_handlers._sigaction
 #endif
 
+#elif defined(__CYGWIN__)
+#include <cygwin/signal.h>
 #else
+#define SA_NOCLDSTOP 1  /* only value supported now for sa_flags */
 
 typedef void (*_sig_func_ptr)(int);
 
@@ -114,16 +117,6 @@ struct sigaction
 	sigset_t sa_mask;
 	int sa_flags;
 };
-
-#define SA_NOCLDSTOP 1  /* only value supported now for sa_flags */
-
-#ifdef __CYGWIN__
-# define SA_RESTART   0x10000000 /* Restart syscall on signal return.  */
-# define SA_NODEFER   0x40000000 /* Don't automatically block the signal when
-                                    its handler is being executed.  */
-# define SA_RESETHAND 0x80000000 /* Reset to SIG_DFL on entry to handler.  */
-#endif
-
 #endif /* defined(__rtems__) */
 
 #define SIG_SETMASK 0	/* set mask with sigprocmask() */
@@ -225,42 +218,7 @@ int _EXFUN(sigqueue, (pid_t pid, int signo, const union sigval value));
 #define SIGUSR1	18
 #define SIGUSR2	19
 #define NSIG    20
-#elif defined(__CYGWIN__)	/* BSD signals semantics */
-#define	SIGHUP	1	/* hangup */
-#define	SIGINT	2	/* interrupt */
-#define	SIGQUIT	3	/* quit */
-#define	SIGILL	4	/* illegal instruction (not reset when caught) */
-#define	SIGTRAP	5	/* trace trap (not reset when caught) */
-#define	SIGABRT 6	/* used by abort */
-#define	SIGEMT	7	/* EMT instruction */
-#define	SIGFPE	8	/* floating point exception */
-#define	SIGKILL	9	/* kill (cannot be caught or ignored) */
-#define	SIGBUS	10	/* bus error */
-#define	SIGSEGV	11	/* segmentation violation */
-#define	SIGSYS	12	/* bad argument to system call */
-#define	SIGPIPE	13	/* write on a pipe with no one to read it */
-#define	SIGALRM	14	/* alarm clock */
-#define	SIGTERM	15	/* software termination signal from kill */
-#define	SIGURG	16	/* urgent condition on IO channel */
-#define	SIGSTOP	17	/* sendable stop signal not from tty */
-#define	SIGTSTP	18	/* stop signal from tty */
-#define	SIGCONT	19	/* continue a stopped process */
-#define	SIGCHLD	20	/* to parent on child stop or exit */
-#define	SIGCLD	20	/* System V name for SIGCHLD */
-#define	SIGTTIN	21	/* to readers pgrp upon background tty read */
-#define	SIGTTOU	22	/* like TTIN for output if (tp->t_local&LTOSTOP) */
-#define	SIGIO	23	/* input/output possible signal */
-#define	SIGPOLL	SIGIO	/* System V name for SIGIO */
-#define	SIGXCPU	24	/* exceeded CPU time limit */
-#define	SIGXFSZ	25	/* exceeded file size limit */
-#define	SIGVTALRM 26	/* virtual time alarm */
-#define	SIGPROF	27	/* profiling time alarm */
-#define	SIGWINCH 28	/* window changed */
-#define	SIGLOST 29	/* resource lost (eg, record-lock lost) */
-#define	SIGUSR1 30	/* user defined signal 1 */
-#define	SIGUSR2 31	/* user defined signal 2 */
-#define NSIG	32      /* signal 0 implied */
-#else
+#elif !defined(SIGTRAP)
 #define	SIGHUP	1	/* hangup */
 #define	SIGINT	2	/* interrupt */
 #define	SIGQUIT	3	/* quit */

@@ -1,3 +1,8 @@
+2003-11-28  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/sys/signal.h: Use system specific signal file when
+	building on cygwin.
+
 2003-11-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdlib.h (_atoi_r): New prototype.
