@@ -41,6 +41,7 @@ via the "Add/Remove Programs" control panel.</para>
 
 DOCTOOL-INSERT-setup-dir
 DOCTOOL-INSERT-setup-env
+DOCTOOL-INSERT-ntsec
 DOCTOOL-INSERT-setup-reg
 DOCTOOL-INSERT-setup-mount
 </chapter>

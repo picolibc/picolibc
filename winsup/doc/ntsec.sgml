@@ -1,5 +1,4 @@
-
-<sect1 id="ntsec"><title>NTSEC Documentation</title>
+<sect1 id="ntsec"><title>NT security and the <literal>ntsec</literal> usage</title>
 
 <para>The design goal of the ntsec patch was to get a more UNIX like
 permission structure based upon the security features of Windows NT.
@@ -7,12 +6,17 @@ To describe the changes, I will give a short overview of NT security
 in chapter one.</para>
 <para>Chapter two discusses the changes in ntsec related to privileges on
 processes.</para>
-<para>Chapter three shows the UNIX like setting of file permissions.</para>
+<para>Chapter three shows the basics of UNIX like setting of
+file permissions.</para>
+<para>Chapter four talks about the advanced settings introduced in
+release 1.1</para>
+<para>Chapter five illustrates the permission mapping leak of Windows NT.</para>
+
+<para>Chapter six describes in short the new acl API since release 1.1</para>
 
 <para>The setting of UNIX like object permissions is controlled by the new
-<EnVar>CYGWIN</EnVar> variable setting <literal>(no)ntsec</literal>.</para>
-
-<para>On NT ntsec is now turned on by default.</para>
+<EnVar>CYGWIN</EnVar> variable setting <literal>(no)ntsec</literal>.
+On NT ntsec is now turned on by default.</para>
 
 <sect2 id="ntsec-common"><title>NT security</title>
 
@@ -25,21 +29,21 @@ threads, semaphores, etc.</para>
 to an object and contains information, that is related to so called
 `security identifiers' (SID).</para>
 
-<para>An SID is a unique identifier for users, groups and domains. 
+<para>A SID is a unique identifier for users, groups and domains. 
 SIDs are comparable to UNIX UIDs and GIDs, but are more complicated
 because they are unique across networks. Example:</para>
 
-<example>
+<para>SID of a system `foo':</para>
+
 <screen>
-SID of a system `foo':
-
   S-1-5-21-165875785-1005667432-441284377
+</screen>
 
-SID of a user `johndoe' of the system `foo':
+<para>SID of a user `johndoe' of the system `foo':</para>
 
+<screen>
   S-1-5-21-165875785-1005667432-441284377-1023
 </screen>
-</example>
 
 <para>The above example shows the convention for printing SIDs. The leading
 `S' should show that it is a SID. The next number is a version number which
@@ -53,21 +57,22 @@ user and another account on his local machine, this accounts are under
 any circumstances DIFFERENT, regardless of the usage of the same user
 name and password!</para>
 
-<example>
+<para>SID of a domain `bar':</para>
+
 <screen>
-SID of a domain `bar':
-
   S-1-5-21-186985262-1144665072-740312968
+</screen>
 
-SID of a user `johndoe' in the domain `bar':
+<para>SID of a user `johndoe' in the domain `bar':</para>
 
+<screen>
   S-1-5-21-186985262-1144665072-740312968-1207
 </screen>
-</example>
 
 <para>The last part of the SID, the so called `relative identifier' (RID),
-is used as UID and/or GID under cygwin. As the name and the above example
-implies, this id is unique only relative to one system or domain.</para>
+is by default used as UID and/or GID under cygwin. As the name and the
+above example implies, this id is unique only relative to one system or
+domain.</para>
 
 <para>Note, that it's possible, that an user has the same RID on two
 different systems. The resulting SIDs are nevertheless different, so
@@ -81,14 +86,12 @@ an NT network but their meanings are unmistakable.
 Examples of well-known groups:</para>
 
 <screen>
-<example>
 everyone                        S-1-1-0
 creator/owner                   S-1-3-0
 batch process (via `at')        S-1-5-3
 authenticated users             S-1-5-11
 system                          S-1-5-18
 </screen>
-</example>
 
 <para>The last important group of SIDs are the `predefined groups'. This
 groups are used mainly on systems outside of domains to simplify the 
@@ -96,21 +99,19 @@ administration of user permissions. The corresponding SIDs are not unique
 across the network so they are interpreted only locally:</para>
 
 <screen>
-<example>
 administrators                  S-1-5-32-544
 users                           S-1-5-32-545
 guests                          S-1-5-32-546
 ...
 </screen>
-</example>
 
 <para>Now, how are permissions given to objects? A process may assign an SD
 to the object. The SD of an object consists of three parts:</para>
 
 <itemizedlist spacing="compact">
-<listitem><para>- the SID of the owner </para></listitem>
-<listitem><para>- the SID of the group </para></listitem>
-<listitem><para>- a list of SIDs with their permissions, called
+<listitem><para>the SID of the owner </para></listitem>
+<listitem><para>the SID of the group </para></listitem>
+<listitem><para>a list of SIDs with their permissions, called
 `access control list' (ACL) </para></listitem>
 </itemizedlist>
 
@@ -120,9 +121,9 @@ has a potentially infinite number of members. Every member is a so called
 `access control element' (ACE). An ACE contains three parts:</para>
 
 <itemizedlist spacing="compact">
-<listitem><para>- the type of the ACE </para></listitem>
-<listitem><para>- permissions, described with a DWORD </para></listitem>
-<listitem><para>- the SID, for which the above mentioned permissions are
+<listitem><para>the type of the ACE </para></listitem>
+<listitem><para>permissions, described with a DWORD </para></listitem>
+<listitem><para>the SID, for which the above mentioned permissions are
 set </para></listitem>
 </itemizedlist>
 
@@ -136,15 +137,17 @@ from the write permission.</para>
 <para>With the aforementioned method NT is able to grant or revoke permissions
 to objects in a far more specific way. But what about cygwin? In a POSIX
 environment it would be fine to have the security behavior of a POSIX
-system. The NT security model is able to reproduce the POSIX model.
+system. The NT security model is MOSTLY able to reproduce the POSIX model.
 The ntsec patch tries to do this in cygwin.</para>
 
+<para>You ask "Mostly? Why mostly???" Because there's a leak in the NT model.
+I will describe that in detail in chapter 4.</para>
 <para>The creation of explicit object security is a bit complicated, so
 typically only two simple variations are used:</para>
 
 <itemizedlist spacing="compact">
-<listitem><para>- default permissions, computed by the operating system </para></listitem>
-<listitem><para>- each permission to everyone </para></listitem>
+<listitem><para>default permissions, computed by the operating system </para></listitem>
+<listitem><para>each permission to everyone </para></listitem>
 </itemizedlist>
 
 <para>For parameters to functions that create or open securable objects another
@@ -189,30 +192,14 @@ an additional entry for the sid of the new user.</para>
 
 <para>If ntsec is turned on, file permissions are set as in UNIX. An SD is
 assigned to the file containing the owner and group and ACEs for the
-owner, the group and `Everyone'. If the group of the file is not the
-administrators' group, the administrators' group gets the permissions
-to read the permissions (yes, this is an own permission flag
-<literal>:-)</literal>) and to take the ownership on this file.
-If the file's group is the administrators group itself, this behaviour
-is modified to support the typical behaviour of NT better:
-As you know, if one is member of admin group, all her files are owned
-by the group instead of by her. This is not the case with ntsec but the
-other admins should have easier access to the administrative files.
-So in this case the admin group gets additionally the permissions to
-write permissions and to write extended attributes, also in the case
-where group permissions are set to 0.</para>
+owner, the group and `Everyone'.</para>
 
 <para>The complete settings of UNIX like permissions can be found in the file
 `security.cc'. The two functions `get_nt_attribute' and `set_nt_attribute'
 are the main code. The reading and writing of the SDs is done by the
-functions `ReadSD' and `WriteSD'. They are using the Backup API functions
-`BackupRead' and `BackupWrite', that have the advantage not to crash,
-if they are used on non NTFS file systems! These crashes are the default
-behavior of the security API, if it's used on, e.g., FAT or SAMBA
-file systems <literal>:-(</literal></para>
-
-<para>Unfortunately, the settings of NT file security are only available
-on NTFS. SAMBA doesn't support them.</para>
+functions `read_sd' and `write_sd'. `write_sd' uses the function `BackupRead'
+instead of the simpler function `SetFileSecurity' because the latter is
+unable to set owners different from the caller.</para>
 
 <para>If you are creating a file `foo' outside of cygwin, you will see something
 like the following on <command>ls -ln</command>:</para>
@@ -245,22 +232,21 @@ This is very confusing but it seems that this has no negativ influences.</para>
 
 <para>To work correctly the ntsec patch depends on reasoned files
 <filename>/etc/passwd/</filename> and <filename>/etc/group</filename>.
-The names and the IDs must correspond to the appropriate
-NT IDs! The IDs used in cygwin are the RID of the NT SID, as aforementioned.
+In cygwin release 1.0 the names and the IDs must correspond to the
+appropriate NT IDs! The IDs used in cygwin are the RID of the NT SID, as
+mentioned earlier.
 An SID of e.g. the user `corinna' on my NT workstation:</para>
 
-<example>
 <screen>
   S-1-5-21-165875785-1005667432-441284377-1000
 </screen>
-</example>
 
 <para>Note the last number: It's the RID 1000, the cygwin's UID.</para>
 
 <para>Unfortunately, workstations and servers outside of domains are not
 able to set primary groups! In these cases, where there is no correlation
 of users to primary groups, NT returns 513 (None) as primary group,
-regardless of the membership to regular groups of these users.</para>
+regardless of the membership to existing local groups.</para>
 
 <para>when using <command>mkpasswd  -l -g</command> on such systems, you
 have to change the primary group by hand if `None' as primary group is
@@ -270,10 +256,9 @@ not what you want (and I'm sure, it's not what you want!)</para>
 the following examples, that are part of my files. With the exception
 of my personal user entry, all entries are well known entries. For a
 better understanding, the names are translated to the equivalents of the
-English NT version:</para>
-
+English NT version.</para> 
 <example>
-<title>/etc/passwd:</title>
+<title>/etc/passwd</title>
 <screen>
 everyone:*:0:0:::
 system:*:18:18:::
@@ -285,7 +270,7 @@ corinna::1000:547:Corinna Vinschen:/home/corinna:/bin/tcsh
 </example>
 
 <example>
-<title>/etc/group:</title>
+<title>/etc/group</title>
 <screen>
 everyone::0:
 system::18:
@@ -300,16 +285,234 @@ powerusers::547:
 <para>Groups may be mentioned in the passwd file, too. This has two
 advantages:</para>
 <itemizedlist spacing="compact">
-<listitem><para>- Because NT assigns them to files as owners, a
-<command>ls -l</command> is often better readable. </para></listitem>
-<listitem><para>- Moreover it's possible to assigned them to files as
-owners with cygwin's <command>chown</command>. </para></listitem>
+<listitem><para>Because NT assigns them to files as owners, a
+<command>ls -l</command> is often better readable.</para></listitem>
+<listitem><para>Moreover it's possible to assigned them to files as
+owners with cygwin's <command>chown</command>.</para></listitem>
 </itemizedlist>
 
 <para>The group `system' is the aforementioned synonym for the operating system
 itself and is normally the owner of processes, that are started through
 service manager. The same is true for files, that are created by
 processes, which are started through service manager.</para>
+
+</sect2>
+
+<sect2 id="ntsec-release1.1"><title>New since Cygwin release 1.1</title>
+
+<para>In Cygwin release 1.1 a new technique of using the 
+<filename>/etc/passwd</filename> and <filename>/etc/group</filename>
+ is introduced.</para>
+
+<para>Both files may now contain SIDs of users and groups. They
+are saved in the last field of pw_gecos in <filename>/etc/passwd</filename>
+and in the gr_passwd field in <filename>/etc/group</filename>.</para>
+
+<para>This has the following advantages:</para>
+<itemizedlist spacing="compact">
+<listitem><para>ntsec works better in domain environments.</para></listitem>
+<listitem><para>Accounts (users and groups) may get another name in
+cygwin that their NT account name. The name in <filename>/etc/passwd</filename>
+or <filename>/etc/group</filename> is transparently used by cygwin
+applications (eg. <command>chown</command>, <command>chmod</command>,
+<command>ls</command>):</para>
+
+<screen>
+root::500:513::/home/root:/bin/sh
+</screen>
+
+<para>instead of</para>
+
+<screen>
+adminstrator::500:513::/home/root:/bin/sh
+</screen>
+
+<para>Caution: If you like to use the account as login account via
+<command>telnet</command> etc. you have to remain the name unchanged or
+you have to use a special version of <command>login</command> which will
+be part of the release 1.1 soon.</para></listitem>
+<listitem><para>Cygwin UIDs and GIDs are now not necessarily the RID
+part of the NT SID:</para>
+
+<screen>
+root::0:513:S-1-5-21-54355234-56236534-345635656-500:/home/root:/bin/sh
+</screen>
+
+<para>instead of</para>
+
+<screen>
+root::500:513::/home/root:/bin/sh
+</screen>
+
+</listitem>
+<listitem><para>As in U*X systems UIDs and GIDs numbering scheme now
+don't influence each other. So it's possible to have same Id's for a
+user and a group:</para>
+<example>
+<title>/etc/passwd:</title>
+<screen>
+root::0:0:S-1-5-21-54355234-56236534-345635656-500:/home/root:/bin/sh
+</screen>
+</example>
+
+<example>
+<title>/etc/group:</title>
+<screen>
+root:S-1-5-32-544:0:
+</screen>
+</example>
+</listitem>
+</itemizedlist>
+
+<para>The tools <command>mkpasswd</command> and <command>mkgroup</command>
+create the needed entries by default. If you don't want that you can use
+the options <literal>-s</literal> or <literal>--no-sids</literal>. In this
+case ntsec behaves like the previous version.</para>
+
+<para>Please note that the pw_gecos field in <filename>/etc/passwd</filename>
+is defined as a comma seperated list. The SID has to be the last field!</para>
+
+<para>As aforementioned you are able to use cygwin account names different
+from the NT account names. If you want to login thru `telnet' or something
+else you have to use the special <command>login</command>. You may then
+add another field to pw_gecos which contains the NT user name including
+it's domain. So you are able to login as each domain user. The syntax
+is easy: Just add an entry of the form U-ntdomain\ntusername to the pw_gecos
+field. Note that the SID must still remain the last field in pw_gecos!</para>
+
+<screen>
+the_king::1:1:Elvis Presley,U-STILLHERE\elvis,S-1-5-21-1234-5678-9012-1000:/bin/sh
+</screen>
+
+<para>For a local user just drop the domain:</para>
+
+<screen>
+the_king::1:1:Elvis Presley,U-elvis,S-1-5-21-1234-5678-9012-1000:/bin/sh
+</screen>
+
+<para>In each case the password of the user is taken from the NT user
+database, NOT from the passwd file!</para>
+
+</sect2>
+
+<sect2 id="ntsec-mapping"><title>The mapping leak</title>
+
+<para>Now its time to point out the leak in the NT permissions.
+The official documentation explains in short the following:</para>
+<itemizedlist spacing="compact">
+<listitem><para>access allow ACEs are accumulated regarding to the
+group membership of the caller.</para></listitem>
+<listitem><para>The order of ACEs is important. The system reads them
+in sequence until either any needed right is denied or all needed rights
+are granted. Later ACEs are then not taken into account.</para></listitem>
+<listitem><para>ALl access denied ACEs _should_ precede any
+access allowed ACE.</para></listitem>
+</itemizedlist>
+
+<para>Note that the last rule is a preference, not a law. NT will correctly
+deal with the ACL regardless of the sequence order. The second rule is
+not modified to get the ACEs in the prefered order.</para>
+
+<para>Unfortunately the security tab of the NT4 explorer is completely
+unable to deal with access denied ACEs while the explorer of W2K rearranges
+the order of the ACEs before you can read them. Thank God, the sort order
+remains unchanged if one presses the Cancel button.</para>
+
+<para>You still ask "Where is the leak?" NT ACLs are unable to reflect each
+possible combination of POSIX permissions. Example:</para>
+
+<screen>
+rw-r-xrw-
+</screen>
+
+<para>1st try:</para>
+
+<screen>
+UserAllow:   110
+GroupAllow:  101
+OthersAllow: 110
+</screen>
+
+<para>Hmm, because of the accumulation of allow rights the user may
+execute because the group may execute.</para>
+
+<para>2st try:</para>
+
+<screen>
+UserDeny:    001
+GroupAllow:  101
+OthersAllow: 110
+</screen>
+
+<para>Now the user may read and write but not execute. Better? No!
+Unfortunately the group may write now because others may write.</para>
+
+<para>3rd try:</para>
+
+<screen>
+UserDeny:    001
+GroupDeny:   010
+GroupAllow:  001
+OthersAllow: 110
+</screen>
+
+<para>Now the group may not write as intended but unfortunately the user may
+not write anymore, too. How should this problem be solved? According to
+the official rules a UserAllow has to follow the GroupDeny but it's
+easy to see that this can never be solved that way.</para>
+
+<para>The only chance:</para>
+
+<screen>
+UserDeny:    001
+UserAllow:   010
+GroupDeny:   010
+GroupAllow:  001
+OthersAllow: 110
+</screen>
+
+<para>Again: This works for both, NT4 and W2K. Only the GUIs aren't
+able to deal with that order.</para>
+
+</sect2>
+
+<sect2 id="ntsec-aclfuncs"><title>New acl API</title>
+
+<para>For dealing with ACLs Cygwin now has the acl API as it's
+implemented in newer versions of Solaris. The new data structure
+for a single ACL entry (ACE in NT terminology) is defined in
+<filename>sys/acl.h</filename> as:</para>
+
+<screen>
+typedef struct acl {
+  int     a_type;  /* entry type */
+  uid_t   a_id;    /* UID | GID */
+  mode_t  a_perm;  /* permissions */
+} aclent_t;
+</screen>
+
+<para>The a_perm member of the aclent_t type contains only the bits
+for read, write and execute as in the file mode. If eg. read permission
+is granted, all read bits (S_IRUSR, S_IRGRP, S_IROTH) are set.
+CLASS_OBJ or MASK ACL entries are not fully implemented yet.</para>
+
+<para>The new API calls are</para>
+
+<screen>
+acl(2), facl(2)
+aclcheck(3),
+aclsort(3),
+acltomode(3), aclfrommode(3),
+acltopbits(3), aclfrompbits(3),
+acltotext(3), aclfromtext(3)
+</screen>
+
+<para>Like in Solaris, Cygwin has two new commands for working with
+ACLs on the command line: <command>getfacl</command> and
+<command>setfacl</command>.</para>
+
+<para>Online man pages for the aforementioned commands and API calls
+can be found on eg. http://docs.sun.com</para>
 
 </sect2>
 

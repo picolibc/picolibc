@@ -127,5 +127,6 @@ the <filename>user-src.tar.bz2</filename> and
 
 DOCTOOL-INSERT-setup-dir
 DOCTOOL-INSERT-setup-env
+DOCTOOL-INSERT-ntsec
 DOCTOOL-INSERT-setup-files
 </chapter>

@@ -1,0 +1,7 @@
+Tue May  3  0:25:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * ntsec.sgml: Revisited description of `ntsec' according to
+        the changes in release 1.1.
+        * setup.sgml: Include ntsec.
+        * setup-net.sgml: Ditto.
+
