@@ -1,3 +1,20 @@
+2003-06-05  Nick Clifton  <nickc@redhat.com>
+	
+	* libc/include/sys/reent.h (struct _on_exit_args): New
+	structure containing fields used by the on_exit() function.
+        (struct _atexit): Include struct _on_exit_args.  For
+	_REENT_SMALL do his via a pointer that is initialised when
+	needed.
+        * libc/reent/reent.c (_reclaim_reent): Free the _on_exit_args
+	structure, if one has been allocated.
+        * libc/stdlib/atexit.c (atexit): Update indirection to
+	_fntypes field.
+        * libc/stdlib/on_exit.c (on_exit): Indirect via the
+	_on_exit_args structure.  For _REENT_SMALL, allocate a
+	structure if one does not exist.
+        * libc/stdlib/exit.c (exit): Indirect via the _on_exit_args
+	structure.
+
 2003-06-04  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/net/Makefile.am: Remove extraneous markers.

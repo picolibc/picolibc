@@ -68,29 +68,40 @@ _DEFUN (on_exit,
 	_VOID _EXFUN ((*fn), (int, _PTR)) _AND
         _PTR arg)
 {
+  struct _on_exit_args * args;
   register struct _atexit *p;
   void (*x)(void) = (void (*)(void))fn;
 
 /* _REENT_SMALL on_exit() doesn't allow more than the required 32 entries.  */
-#ifndef _REENT_SMALL
+#ifdef _REENT_SMALL
+  p = &_REENT->_atexit;
+  if (p->_ind >= _ATEXIT_SIZE)
+    return -1;
+  args = p->_on_exit_args_ptr;
+  if (args == NULL)
+    {
+      args = malloc (sizeof * p->_on_exit_args_ptr);
+      if (args == NULL)
+        return -1;
+      args->_fntypes = 0;
+      p->_on_exit_args_ptr = args;
+    }
+#else
   if ((p = _REENT->_atexit) == NULL)
     _REENT->_atexit = p = &_REENT->_atexit0;
   if (p->_ind >= _ATEXIT_SIZE)
     {
       if ((p = (struct _atexit *) malloc (sizeof *p)) == NULL)
-	return -1;
+        return -1;
       p->_ind = 0;
-      p->_fntypes = 0;
+      p->_on_exit_args._fntypes = 0;
       p->_next = _REENT->_atexit;
       _REENT->_atexit = p;
     }
-#else
-  p = &_REENT->_atexit;
-  if (p->_ind >= _ATEXIT_SIZE)
-    return -1;
+  args = & p->_on_exit_args;
 #endif
-  p->_fntypes |= (1 << p->_ind);
-  p->_fnargs[p->_ind] = arg;
+  args->_fntypes |= (1 << p->_ind);
+  args->_fnargs[p->_ind] = arg;
   p->_fns[p->_ind++] = x;
   return 0;
 }

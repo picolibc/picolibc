@@ -64,20 +64,24 @@ struct __tm
 
 #define	_ATEXIT_SIZE 32	/* must be at least 32 to guarantee ANSI conformance */
 
-#ifndef _REENT_SMALL
+struct _on_exit_args {
+	void *  _fnargs[_ATEXIT_SIZE];	        /* fn args for on_exit */
+	__ULong _fntypes;           	        /* type of exit routine -
+						   Must have at least _ATEXIT_SIZE bits */
+};
+
+#ifdef _REENT_SMALL
+struct _atexit {
+	int	_ind;				/* next index in this table */
+	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
+        struct _on_exit_args * _on_exit_args_ptr;
+};
+#else
 struct _atexit {
 	struct	_atexit *_next;			/* next in list */
 	int	_ind;				/* next index in this table */
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
-	void	*_fnargs[_ATEXIT_SIZE];	        /* fn args for on_exit */
-	__ULong _fntypes;           	        /* type of exit routine */
-};
-#else
-struct _atexit {
-	int	_ind;				/* next index in this table */
-	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
-	void	*_fnargs[_ATEXIT_SIZE];	        /* fn args for on_exit */
-	__ULong _fntypes;           	        /* type of exit routine */
+        struct _on_exit_args _on_exit_args;
 };
 #endif
 

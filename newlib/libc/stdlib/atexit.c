@@ -65,16 +65,16 @@ _DEFUN (atexit,
 {
   register struct _atexit *p;
 
-/* _REENT_SMALL atexit() doesn't allow more than the required 32 entries.  */
+  /* _REENT_SMALL atexit() doesn't allow more than the required 32 entries.  */
 #ifndef _REENT_SMALL
   if ((p = _REENT->_atexit) == NULL)
     _REENT->_atexit = p = &_REENT->_atexit0;
   if (p->_ind >= _ATEXIT_SIZE)
     {
       if ((p = (struct _atexit *) malloc (sizeof *p)) == NULL)
-	return -1;
+        return -1;
       p->_ind = 0;
-      p->_fntypes = 0;
+      p->_on_exit_args._fntypes = 0;
       p->_next = _REENT->_atexit;
       _REENT->_atexit = p;
     }
