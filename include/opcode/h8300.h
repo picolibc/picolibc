@@ -1434,8 +1434,9 @@ struct h8_opcode h8_opcodes[] =
   {O (O_LDC, SW), AV_H8S,  2, "ldc", {{DISP32SRC,  EXR     | DST, E}}, {{PREFIXLDC, 0x7, 0x8, B30 | DISPREG, 0x0, 0x6, 0xB, 0x2, IGNORE, SRC | DISP32LIST, E}}},
   {O (O_LDC, SW), AV_H8H,  2, "ldc", {{ABS16SRC,   CCR     | DST, E}}, {{PREFIXLDC, 0x6, 0xB, 0x0, IGNORE, SRC | ABS16LIST, E}}},
   {O (O_LDC, SW), AV_H8S,  2, "ldc", {{ABS16SRC,   EXR     | DST, E}}, {{PREFIXLDC, 0x6, 0xB, 0x0, IGNORE, SRC | ABS16LIST, E}}},
-  {O (O_LDC, SW), AV_H8H,  2, "ldc", {{ABS32SRC,   CCR     | DST, E}}, {{PREFIXLDC, 0x6, 0xB, 0x2, IGNORE, SRC | ABS32LIST, E}}},
-  {O (O_LDC, SW), AV_H8S,  2, "ldc", {{ABS32SRC,   EXR     | DST, E}}, {{PREFIXLDC, 0x6, 0xB, 0x2, IGNORE, SRC | ABS32LIST, E}}},
+  {O (O_LDC, SW), AV_H8H,  2, "ldc", {{ABS32SRC,   CCR     | DST, E}}, {{PREFIXLDC, 0x6, 0xB, 0x2, IGNORE, SRC | MEMRELAX | ABS32LIST, E}}},
+  {O (O_LDC, SW), AV_H8S,  2, "ldc", {{ABS32SRC,   EXR     | DST, E}}, {{PREFIXLDC, 0x6, 0xB, 0x2, IGNORE, SRC | MEMRELAX | ABS32LIST, E}}},
+
   {O (O_LDC, SL), AV_H8SX, 0, "ldc", {{RS32, B30 | VBR_SBR | DST, E}}, {{0x0, 0x3, B30 | VBR_SBR | DST, RS32, E}}},
 
 
@@ -1809,8 +1810,8 @@ struct h8_opcode h8_opcodes[] =
   {O (O_STC, SW), AV_H8S,  2, "stc", {{EXR | SRC, DISP32DST,      E}}, {{PREFIXSTC, 0x7, 0x8, B30 | DSTDISPREG, 0, 0x6, 0xB, 0xA, IGNORE, DSTDISP32LIST, E}}},
   {O (O_STC, SW), AV_H8H,  2, "stc", {{CCR | SRC, ABS16DST,       E}}, {{PREFIXSTC, 0x6, 0xB, 0x8, IGNORE, DST | ABS16LIST, E}}},
   {O (O_STC, SW), AV_H8S,  2, "stc", {{EXR | SRC, ABS16DST,       E}}, {{PREFIXSTC, 0x6, 0xB, 0x8, IGNORE, DST | ABS16LIST, E}}},
-  {O (O_STC, SW), AV_H8H,  2, "stc", {{CCR | SRC, ABS32DST,       E}}, {{PREFIXSTC, 0x6, 0xB, 0xA, IGNORE, DST | ABS32LIST, E}}},
-  {O (O_STC, SW), AV_H8S,  2, "stc", {{EXR | SRC, ABS32DST,       E}}, {{PREFIXSTC, 0x6, 0xB, 0xA, IGNORE, DST | ABS32LIST, E}}},
+  {O (O_STC, SW), AV_H8H,  2, "stc", {{CCR | SRC, ABS32DST,       E}}, {{PREFIXSTC, 0x6, 0xB, 0xA, IGNORE, DST | MEMRELAX | ABS32LIST, E}}},
+  {O (O_STC, SW), AV_H8S,  2, "stc", {{EXR | SRC, ABS32DST,       E}}, {{PREFIXSTC, 0x6, 0xB, 0xA, IGNORE, DST | MEMRELAX | ABS32LIST, E}}},
   {O (O_STC, SL), AV_H8SX, 0, "stc", {{B30 | VBR_SBR | SRC, RD32, E}}, {{0x0, 0x2, B30 | VBR_SBR | SRC, RD32, E}}},
 
 
