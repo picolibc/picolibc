@@ -130,7 +130,7 @@ ELIX_4_OBJS =  	system.$(oext)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
 
 # Because of how libtool moves objects around, mallocr must be built last.
-LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) 	mallinfor.$(oext) msizer.$(oext) mallocr.$(oext)
+LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) 	mallinfor.$(oext) mallstatsr.$(oext) msizer.$(oext) mallocr.$(oext)
 
 
 libstdlib_la_LDFLAGS = -Xcompiler -nostdlib

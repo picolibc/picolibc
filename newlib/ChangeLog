@@ -1,3 +1,8 @@
+2004-02-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/Makefile.am: Add mallstatsr to LIBADD_OBJS.
+	* libc/stdlib/Makefile.in: Regenerated.
+
 2004-02-08  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/sys/features.h: Add _POSIX_TIMERS define for __CYGWIN__.

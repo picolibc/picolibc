@@ -120,7 +120,7 @@ endif
 
 # Because of how libtool moves objects around, mallocr must be built last.
 LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) \
-	mallinfor.$(oext) msizer.$(oext) mallocr.$(oext)
+	mallinfor.$(oext) mallstatsr.$(oext) msizer.$(oext) mallocr.$(oext)
 
 libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 
