@@ -596,8 +596,8 @@ KeSetPriorityThread@8
 KeSetTargetProcessorDpc@8
 ;KeSetTimeIncrement
 @KeSetTimeUpdateNotifyRoutine@4
-KeSetTimer@12
-KeSetTimerEx@16
+KeSetTimer@16
+KeSetTimerEx@20
 ;KeStackAttachProcess
 KeSynchronizeExecution@12
 ;KeTerminateThread
