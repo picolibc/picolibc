@@ -415,7 +415,7 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "ldo:gsmhpu:";
+char opts[] = "ldo:gsmhp:u:";
 
 int
 main (int argc, char **argv)

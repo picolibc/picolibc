@@ -1,3 +1,8 @@
+Fri Dec 14 12:10:39 2001  Jason Tishler <jason@tishler.net>
+
+	* mkpasswd.c (opts): Add indication that '-p' option requires an
+	argument.
+
 2001-12-11  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Add define to CXXFLAGS.
