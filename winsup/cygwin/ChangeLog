@@ -1,5 +1,10 @@
 2001-12-06  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc (path_conv::check): Reset FH_CYGDRIVE if iterating through
+	path.
+
+2001-12-06  Christopher Faylor  <cgf@redhat.com>
+
 	* path.cc (path_conv::check): Don't complain if /dev/x/foo when x
 	doesn't exist.
 	(mount_info::conv_to_win32_path): Keep translating when a /cygdrive is
