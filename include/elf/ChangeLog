@@ -1,3 +1,7 @@
+2003-04-01  Nick Clifton  <nickc@redhat.com>
+
+	* arm.h (ARM_NOTE_SECTION): Include .gnu in the string.
+
 2003-03-25  Stan Cox   <scox@redhat.com>
 	    Nick Clifton  <nickc@redhat.com>
 	    

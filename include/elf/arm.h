@@ -141,6 +141,6 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
 END_RELOC_NUMBERS (R_ARM_max)
 
 /* The name of the note section used to identify arm variants.  */
-#define ARM_NOTE_SECTION ".note.arm.ident"
+#define ARM_NOTE_SECTION ".note.gnu.arm.ident"
      
 #endif /* _ELF_ARM_H */
