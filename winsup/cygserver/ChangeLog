@@ -1,3 +1,12 @@
+2004-10-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc: Update to FreeBSD version 1.69.
+	1.68: Reduce the overhead of semop() by using the kernel stack
+	instead of malloc'd memory to store the operations array if it
+	is small enough to fit.
+	1.69: Adjust the number of processes waiting on a semaphore properly
+	if we're woken up in the middle of sleeping.
+
 2004-09-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sysv_shm.cc (kern_shmat): Avoid compiler warning.

@@ -17,7 +17,7 @@
 #ifndef __FBSDID
 #define __FBSDID(s)	const char version[] = (s)
 #endif
-__FBSDID("$FreeBSD: /usr/local/www/cvsroot/FreeBSD/src/sys/kern/sysv_sem.c,v 1.67 2003/11/15 11:56:53 tjr Exp $");
+__FBSDID("$FreeBSD: /repoman/r/ncvs/src/sys/kern/sysv_sem.c,v 1.70 2004/05/30 20:34:58 phk Exp $");
 
 #define _KERNEL 1
 #define __BSD_VISIBLE 1
@@ -953,6 +953,8 @@ struct semop_args {
 int
 semop(struct thread *td, struct semop_args *uap)
 {
+#define SMALL_SOPS      8
+	struct sembuf small_sops[SMALL_SOPS];
 	int semid = uap->semid;
 	size_t nsops = uap->nsops;
 	struct sembuf *sops;
@@ -976,16 +978,20 @@ semop(struct thread *td, struct semop_args *uap)
 		return (EINVAL);
 
 	/* Allocate memory for sem_ops */
-	if (nsops > (unsigned long) seminfo.semopm) {
+	if (nsops <= SMALL_SOPS)
+		sops = small_sops;
+	else if (nsops <= (unsigned long) seminfo.semopm)
+		sops = (struct sembuf *) sys_malloc(nsops * sizeof(*sops), M_SEM, M_WAITOK);
+	else {
 		DPRINTF(("too many sops (max=%d, nsops=%d)\n", seminfo.semopm,
 		    nsops));
 		return (E2BIG);
 	}
-	sops = (struct sembuf *) sys_malloc(nsops * sizeof(sops[0]), M_SEM, M_WAITOK);
 	if ((error = copyin(uap->sops, sops, nsops * sizeof(sops[0]))) != 0) {
 		DPRINTF(("error = %d from copyin(%08x, %08x, %d)\n", error,
 		    uap->sops, sops, nsops * sizeof(sops[0])));
-		sys_free(sops, M_SEM);
+		if (sops != small_sops)
+			sys_free(sops, M_SEM);
 		return (error);
 	}
 
@@ -1110,15 +1116,7 @@ semop(struct thread *td, struct semop_args *uap)
 		error = msleep(semaptr, sema_mtxp, (PZERO - 4) | PCATCH,
 		    "semwait", 0);
 		DPRINTF(("semop:  good morning (error=%d)!\n", error));
-
-		if (error != 0) {
-#ifdef __CYGWIN__
-		    if (error != EIDRM)
-#endif /* __CYGWIN__ */
-			error = EINTR;
-			goto done2;
-		}
-		DPRINTF(("semop:  good morning!\n"));
+		/* return code is checked below, after sem[nz]cnt-- */
 
 		/*
 		 * Make sure that the semaphore still exists
@@ -1137,6 +1135,20 @@ semop(struct thread *td, struct semop_args *uap)
 			semptr->semzcnt--;
 		else
 			semptr->semncnt--;
+
+		/*
+		 * Is it really morning, or was our sleep interrupted?
+		 * (Delayed check of msleep() return code because we
+		 * need to decrement sem[nz]cnt either way.)
+		 */
+		if (error != 0) {
+#ifdef __CYGWIN__
+		    if (error != EIDRM)
+#endif /* __CYGWIN__ */
+			error = EINTR;
+			goto done2;
+		}
+		DPRINTF(("semop:  good morning!\n"));
 	}
 
 done:
@@ -1216,7 +1228,8 @@ done:
 	td->td_retval[0] = 0;
 done2:
 	mtx_unlock(sema_mtxp);
-	sys_free(sops, M_SEM);
+	if (sops != small_sops)
+		sys_free(sops, M_SEM);
 	return (error);
 }
 
