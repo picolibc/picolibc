@@ -7,7 +7,7 @@
 
 2004-04-15  Corinna Vinschen  <corinna@vinschen.de>
 
-	* fhandler_disk_file.cc (fhandler_disk_file::fchmo): Try opening
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Try opening
 	in query_read mode if query_write fails.
 	* fhandler_disk_file.cc (fhandler_disk_file::fchown): Ditto.
 	* fhandler_disk_file.cc (fhandler_disk_file::facl): Ditto.
@@ -96,11 +96,11 @@
 2004-04-14  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* path.h (path_conv::set_symlink): Add argument.
-	(path_conv::get_symlink_length): New method. 
+	(path_conv::get_symlink_length): New method.
 	(path_conv::symlink_length): New member.
 	* path.cc (path_conv::check): Pass symlen to set_symlink.
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): For symlinks
-	set st_size from get_symlink_length.    
+	set st_size from get_symlink_length.
 
 2004-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
