@@ -1,3 +1,7 @@
+2004-09-14  Christopher Faylor  <cgf@timesys.com>
+
+	* what.texinfo: Fix two typos reported on cygwin list.
+
 2004-09-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* textbinary.sgml: Change default mode for non-mounted paths to binary.
