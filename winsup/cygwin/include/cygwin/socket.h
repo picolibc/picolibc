@@ -112,6 +112,8 @@ struct msghdr
 #define MSG_OOB         0x1             /* process out-of-band data */
 #define MSG_PEEK        0x2             /* peek at incoming message */
 #define MSG_DONTROUTE   0x4             /* send without using routing tables */
+#define MSG_WINMASK     0x7             /* flags understood by WinSock calls */
+#define MSG_NOSIGNAL    0x20            /* Don't raise SIGPIPE */
 
 /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
 #define SOL_IP		0

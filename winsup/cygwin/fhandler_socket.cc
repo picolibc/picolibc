@@ -674,6 +674,7 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
   wsock_event wsock_evt;
   LPWSAOVERLAPPED ovr;
 
+  flags &= MSG_WINMASK;
   if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
     {
       debug_printf ("Fallback to winsock 1 recvfrom call");
@@ -765,7 +766,8 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
   if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
     {
       debug_printf ("Fallback to winsock 1 sendto call");
-      if ((res = ::sendto (get_socket (), (const char *) ptr, len, flags,
+      if ((res = ::sendto (get_socket (), (const char *) ptr, len,
+			   flags & MSG_WINMASK,
 			   (to ? (sockaddr *) &sin : NULL),
 			   tolen)) == SOCKET_ERROR)
 	{
@@ -777,7 +779,8 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
     {
       WSABUF wsabuf = { len, (char *) ptr };
       DWORD ret = 0;
-      if (WSASendTo (get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
+      if (WSASendTo (get_socket (), &wsabuf, 1, &ret,
+		     (DWORD)(flags & MSG_WINMASK),
 		     (to ? (sockaddr *) &sin : NULL),
 		     tolen,
 		     ovr, NULL) != SOCKET_ERROR)
@@ -791,6 +794,13 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 	set_winsock_errno ();
     }
 
+  /* Special handling for SIGPIPE */
+  if (get_errno () == ESHUTDOWN)
+    {
+      set_errno (EPIPE);
+      if (! (flags & MSG_NOSIGNAL))
+        _raise (SIGPIPE);
+    }
   return res;
 }
 
