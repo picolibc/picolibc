@@ -55,7 +55,11 @@ close SHILKA;
 
 chdir '/tmp';
 system qw'shilka -length -strip -no-definitions', $shilka;
-exit $? if $?;
+if ($? == -1) {
+    die "$0: shilka command missing? - $!\n";
+} else {
+    exit $? if $?;
+}
 chdir $cwd;
 unlink $shilka;
 open(C, $c) or die "$0: couldn't open $c - $!\n";

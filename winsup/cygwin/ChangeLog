@@ -1,5 +1,9 @@
 2003-11-28  Christopher Faylor  <cgf@redhat.com>
 
+	* gendevices: Issue error when shilka is missing.
+
+2003-11-28  Christopher Faylor  <cgf@redhat.com>
+
 	* include/cygwin/signal.h: New file.
 
 2003-11-28  Christopher Faylor  <cgf@redhat.com>
