@@ -46,7 +46,7 @@ int PASCAL __WSAFDIsSet(SOCKET,fd_set*);
 #ifndef FD_CLR
 #define FD_CLR(fd,set) do { u_int __i;\
 for (__i = 0; __i < ((fd_set *)(set))->fd_count ; __i++) {\
-	if (((fd_set *)(set))->fd_array[__i] == fd) {\
+	if (((fd_set *)(set))->fd_array[__i] == (fd)) {\
 	while (__i < ((fd_set *)(set))->fd_count-1) {\
 		((fd_set*)(set))->fd_array[__i] = ((fd_set*)(set))->fd_array[__i+1];\
 		__i++;\
@@ -90,8 +90,9 @@ struct linger {
 #endif /* ndef __INSIDE_CYGWIN__ */
 #define timerisset(tvp)	 ((tvp)->tv_sec || (tvp)->tv_usec)
 #define timercmp(tvp, uvp, cmp) \
-	((tvp)->tv_sec cmp (uvp)->tv_sec || \
-	 (tvp)->tv_sec == (uvp)->tv_sec && (tvp)->tv_usec cmp (uvp)->tv_usec)
+	(((tvp)->tv_sec != (uvp)->tv_sec) ? \
+	((tvp)->tv_sec cmp (uvp)->tv_sec) : \
+	((tvp)->tv_usec cmp (uvp)->tv_usec))
 #define timerclear(tvp)	 (tvp)->tv_sec = (tvp)->tv_usec = 0
 #define IOCPARM_MASK	0x7f
 #define IOC_VOID	0x20000000
@@ -300,8 +301,13 @@ struct ip_mreq {
 #define AF_APPLETALK	16
 #define AF_NETBIOS	17
 #define AF_VOICEVIEW	18
+#define	AF_FIREFOX	19
+#define	AF_UNKNOWN1	20
+#define	AF_BAN	21
+#define AF_ATM	22
+#define AF_INET6	23
 #ifndef __INSIDE_CYGWIN__
-#define AF_MAX	19
+#define AF_MAX	24
 struct sockaddr {
 	u_short sa_family;
 	char	sa_data[14];
@@ -332,6 +338,11 @@ struct sockproto {
 #define PF_HYLINK	AF_HYLINK
 #define PF_APPLETALK	AF_APPLETALK
 #define PF_VOICEVIEW	AF_VOICEVIEW
+#define PF_FIREFOX	AF_FIREFOX
+#define PF_UNKNOWN1	AF_UNKNOWN1
+#define PF_BAN	AF_BAN
+#define PF_ATM	AF_ATM
+#define PF_INET6	AF_INET6
 #define PF_MAX	AF_MAX
 #define SOL_SOCKET	0xffff
 #define SOMAXCONN	5

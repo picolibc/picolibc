@@ -1,5 +1,12 @@
 2000-02-28  Mumit Khan  <khan@xraylith.wisc.edu>
 
+	Patches from Jan Nijtmans <j.nijtmans@chello.nl>:
+	* include/winsock.h (FD_CLR): Add missing ')'.
+	(timercmp): Fix macro to handle all 6 comparison operators.
+	(AF_FIREFOX, AF_UNKNOWN1, AF_BAN, AF_ATM, AF_INET6): Define.
+	(AF_MAX): Update.
+	(PF_FIREFOX, PF_UNKNOWN1, PF_BAN, PF_ATM, PF_INET6): Define.
+
 	* include/largeint.h: Rename HAVE_INT64 macro to _HAVE_INT64 to avoid
 	namespace pollution.
 	* include/rpcndr.h: Likewise.
