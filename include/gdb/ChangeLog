@@ -1,3 +1,8 @@
+Wed Jul 17 19:36:38 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* sim-sh.h: Add enum constants for sh[1-4], sh3e, sh3?-dsp,
+	renumbering the sh-dsp registers to use distinct numbers.
+
 2002-06-15  Andrew Cagney  <ac131313@redhat.com>
 
 	* sim-arm.h (enum sim_arm_regs): Rename sim_arm_regnum.
