@@ -1,3 +1,8 @@
+Wed Jul 26 17:43:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (lookup_name): Search on local machine first if
+	myself->domain is not empty.
+
 2000-07-26  DJ Delorie  <dj@cygnus.com>
 
 	* fhandler_console.cc (fhandler_console::read): Explicitly set cursor

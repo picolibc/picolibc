@@ -344,6 +344,23 @@ lookup_name (const char *name, const char *logsrv, PSID ret_sid)
   if (! name)
     return FALSE;
 
+  if (*myself->domain)
+    {
+      strcat (strcat (strcpy (domuser, myself->domain), "\\"), name);
+      if (LookupAccountName (NULL, domuser,
+                             sid, (sidlen = MAX_SID_LEN, &sidlen),
+                             dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
+                             &acc_type)
+          && legal_sid_type (acc_type))
+        goto got_it;
+      if (logsrv && *logsrv
+          && LookupAccountName (logsrv, domuser,
+                                sid, (sidlen = MAX_SID_LEN, &sidlen),
+                                dom, (domlen = MAX_COMPUTERNAME_LENGTH,&domlen),
+                                &acc_type)
+          && legal_sid_type (acc_type))
+        goto got_it;
+    }
   if (logsrv && *logsrv)
     {
       if (LookupAccountName (logsrv, name,
