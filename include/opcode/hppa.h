@@ -209,6 +209,7 @@ Floating point registers all have 'f' as a prefix:
    fT	target register with L/R halves at 31
    fa	operand 1 register at 10
    fA   operand 1 register with L/R halves at 10
+   fX   Same as fA, except prints a space before register during disasm
    fb	operand 2 register at 15
    fB   operand 2 register with L/R halves at 15
    fC   operand 3 register with L/R halves at 16:18,21:23
@@ -649,7 +650,7 @@ static const struct pa_opcode pa_opcodes[] =
 { "fnegabs",    0x3800e000, 0xfc1fe720, "IfA,fT", pa20, FLAG_STRICT},
 { "fcmp",       0x30000400, 0xfc00e7e0, "F?ffa,fb", pa10},
 { "fcmp",       0x38000400, 0xfc00e720, "I?ffA,fB", pa10},
-{ "xmpyu",	0x38004700, 0xfc00e720, "fA,fB,fT", pa11},
+{ "xmpyu",	0x38004700, 0xfc00e720, "fX,fB,fT", pa11},
 { "fmpyadd",	0x18000000, 0xfc000000, "Hfi,fj,fk,fl,fm", pa11},
 { "fmpysub",	0x98000000, 0xfc000000, "Hfi,fj,fk,fl,fm", pa11},
 { "ftest",      0x30002420, 0xffffffff, "", pa10},

@@ -1,5 +1,8 @@
 Sat Sep 18 11:41:16 1999  Jeffrey A Law  (law@cygnus.com)
 
+	* hppa.h (pa_opcodes): Use 'fX' for first register operand
+	in xmpyu.  
+
 	* hppa.h (pa_opcodes): Fix mask for probe and probei.
 
 	* hppa.h (pa_opcodes): Fix mask for depwi.
