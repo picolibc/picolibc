@@ -1005,14 +1005,14 @@ stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
   switch (devn)
     {
     case FH_PIPEW:
-      buf->st_mode = STD_WBITS;
+      buf->st_mode = STD_WBITS | S_IWGRP | S_IWOTH;
       break;
     case FH_PIPER:
       buf->st_mode = STD_RBITS;
       break;
     case FH_CONIN:
     case FH_CONOUT:
-      buf->st_mode = STD_RBITS | STD_WBITS;
+      buf->st_mode = STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
       break;
     }
 

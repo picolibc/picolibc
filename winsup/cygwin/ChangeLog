@@ -1,3 +1,7 @@
+Sat Mar 17 00:05:36 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (stat_dev): Give devices full read/write.
+
 Saturday Mar 17 3:45 2001 Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (MTinterface::CreateCond): Check for null attr pointer.
