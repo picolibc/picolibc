@@ -60,23 +60,23 @@ extern "C" {
 
 #ifdef __INSIDE_CYGWIN__
 typedef struct __acl16 {
-    int          a_type;    /* entry type */
-    __uid16_t    a_id;      /* UID | GID  */
-    mode_t       a_perm;    /* permissions */
+    int          a_type;
+    __uid16_t    a_id;
+    mode_t       a_perm;
 } __aclent16_t;
 
 typedef struct __acl32 {
-    int          a_type;    /* entry type */
-    __uid32_t    a_id;      /* UID | GID  */
-    mode_t       a_perm;    /* permissions */
+    int          a_type;
+    __uid32_t    a_id;
+    mode_t       a_perm;
 } __aclent32_t;
-#endif
-
-typedef struct __acl {
+#else
+typedef struct acl {
     int          a_type;    /* entry type */
-    uid_t      a_id;      /* UID | GID  */
+    uid_t        a_id;      /* UID | GID  */
     mode_t       a_perm;    /* permissions */
-} __aclent_t;
+} aclent_t;
+#endif
 
 #ifndef __INSIDE_CYGWIN__
 int _EXFUN(acl,(const char *path, int cmd, int nentries, aclent_t *aclbufp));

@@ -1,3 +1,7 @@
+2001-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/acl.h: Fix definition of aclent_t.
+
 2002-02-10  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (DLL_OFILES): Consolidate object files.
