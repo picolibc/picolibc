@@ -2592,7 +2592,10 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 {
   int res = -1;
 
-  if (strpbrk (posix_path, "\\:"))
+  if (check_null_empty_str_errno (win32_path)
+      || check_null_empty_str_errno (posix_path))
+    /* errno set */;
+  else if (strpbrk (posix_path, "\\:"))
     set_errno (EINVAL);
   else if (flags & MOUNT_CYGDRIVE) /* normal mount */
     {
@@ -2617,6 +2620,8 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 extern "C" int
 umount (const char *path)
 {
+  if (check_null_empty_str_errno (path))
+    return -1;
   return cygwin_umount (path, 0);
 }
 

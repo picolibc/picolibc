@@ -1,3 +1,8 @@
+2003-08-18  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (mount): Add null/empty check for input parameters.
+	(umount): Add null/empty check for input parameters.
+
 2003-08-17  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* grp.cc (read_group): Revert previous change.
