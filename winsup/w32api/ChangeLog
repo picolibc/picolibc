@@ -1,3 +1,8 @@
+2002-01-14  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (FILE_ATTRIBUTE_ENCRYPTED): Correct constant.
+	(FILE_ATTRIBUTE_DEVICE): Add define.
+
 2002-01-14  Corinna Vinschen  <vinschen@redhat.com>
 
 	* include/winnt.h: Add INVALID_FILE_ATTRIBUTES.
