@@ -323,18 +323,17 @@ _pinfo::commune_recv ()
 	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
 	    goto out;
 	  }
+
 	fhandler_fifo *fh = cygheap->fdtab.find_fifo ((ATOM) formic);
-	if (!WriteFile (__tothem, &(fh->get_handle ()), sizeof (HANDLE), &nr, NULL))
+	HANDLE it[] = {(fh->get_handle ()), (fh->get_output_handle ())};
+
+	if (!WriteFile (__tothem, it, sizeof (it), &nr, NULL))
 	  {
 	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
 	    sigproc_printf ("WriteFile read handle failed, %E");
 	  }
 
-	if (!WriteFile (__tothem, &(fh->get_output_handle ()), sizeof (HANDLE), &nr, NULL))
-	  {
-	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
-	    sigproc_printf ("WriteFile write handle failed, %E");
-	  }
+	(void) ReadFile (__fromthem, &nr, sizeof (nr), &nr, NULL);
 	break;
       }
     }
@@ -394,8 +393,11 @@ _pinfo::commune_send (DWORD code, ...)
     case PICOM_FIFO:
       {
 	int formic = va_arg (args, int);
-	if (WriteFile (tothem, &formic, sizeof formic, &nr, NULL) != sizeof formic)
-	  goto err;
+	if (!WriteFile (tothem, &formic, sizeof formic, &nr, NULL) || nr != sizeof formic)
+	  {
+	    __seterrno ();
+	    goto err;
+	  }
 	break;
       }
     }
@@ -429,14 +431,14 @@ _pinfo::commune_send (DWORD code, ...)
     }
 
   size_t n;
-  if (!ReadFile (fromthem, &n, sizeof n, &nr, NULL) || nr != sizeof n)
-    {
-      __seterrno ();
-      goto err;
-    }
   switch (code)
     {
     case PICOM_CMDLINE:
+      if (!ReadFile (fromthem, &n, sizeof n, &nr, NULL) || nr != sizeof n)
+	{
+	  __seterrno ();
+	  goto err;
+	}
       res.s = (char *) malloc (n);
       char *p;
       for (p = res.s; ReadFile (fromthem, p, n, &nr, NULL); p += nr)
@@ -449,11 +451,18 @@ _pinfo::commune_send (DWORD code, ...)
       res.n = n;
       break;
     case PICOM_FIFO:
-      if (n != sizeof (res.handles)
-	  || !ReadFile (fromthem, res.handles, sizeof (res.handles), &nr, NULL)
-	  || nr != n)
-	goto err;
-      break;
+      {
+	DWORD x = ReadFile (fromthem, res.handles, sizeof (res.handles), &nr, NULL);
+	WriteFile (tothem, &x, sizeof (x), &x, NULL);
+	if (!x)
+	  goto err;
+	if (nr != sizeof (res.handles))
+	  {
+	    set_errno (EPIPE);
+	    goto err;
+	  }
+	break;
+      }
     }
   CloseHandle (tothem);
   CloseHandle (fromthem);
@@ -472,7 +481,7 @@ err:
 
 out:
   myself->hello_pid = 0;
-  LeaveCriticalSection (&lock);
+  LeaveCriticalSection (&myself->lock);
   return res;
 }
 
