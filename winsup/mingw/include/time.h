@@ -45,7 +45,7 @@
  * Number of clock ticks per second. A clock tick is the unit by which
  * processor time is measured and is returned by 'clock'.
  */
-#define	CLOCKS_PER_SEC	1000.0
+#define	CLOCKS_PER_SEC	1000
 #define	CLK_TCK		CLOCKS_PER_SEC
 
 

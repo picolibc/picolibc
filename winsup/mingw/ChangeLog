@@ -1,4 +1,8 @@
 
+Mon Jan 29 14:03:07  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* time.h: (CLOCKS_PER_SEC) Change from FP to  integer constant.
+
 Sun Jan 28 13:01:08  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/wchar.h: The 2001.01.18 Change was incorrect.  The functions
