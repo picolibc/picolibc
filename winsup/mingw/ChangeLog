@@ -1,5 +1,11 @@
 2003-10-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/math/cephes_mconf.h (NAN, NANF, NANL):
+	Use GCC __builtin's if available.
+	(INFINITY, INFINITYF, INFINITYL): Likewise.
+
+2003-10-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/math/s_erf.c (erf): Set errno to ERANGE if
 	beyond approximation limit.
 	* mingwex/math/sf_erf.c (erff): Likewise.

@@ -33,13 +33,17 @@
 #define PIO4	7.85398163397448309616E-1
 
 #define NEGZERO (-0.0)
-extern double __INF;
+#undef NAN
 #undef INFINITY
+#if (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ > 2))
+#define INFINITY __builtin_huge_val()
+#define NAN __builtin_nan("")
+#else
+extern double __INF;
 #define INFINITY (__INF)
 extern double __QNAN;
-#undef NAN
 #define NAN (__QNAN)
-
+#endif
 
 /*long double*/
 #define MAXNUML 1.189731495357231765021263853E4932L
@@ -57,10 +61,18 @@ extern double __QNAN;
 #define signbitl signbit
 
 #define NEGZEROL (-0.0L)
+
+#undef NANL
+#undef INFINITYL
+#if (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ > 2))
+#define INFINITYL __builtin_huge_vall()
+#define NANL __builtin_nanl("")
+#else
 extern long double __INFL;
 #define INFINITYL (__INFL)
 extern long double __QNANL;
 #define NANL (__QNANL)
+#endif
 
 /* float */
 
@@ -79,10 +91,18 @@ extern long double __QNANL;
 #define signbitf signbit
 
 #define NEGZEROF (-0.0F)
+
+#undef NANF
+#undef INFINITYF
+#if (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ > 2))
+#define INFINITYF __builtin_huge_valf()
+#define NANF __builtin_nanf("")
+#else
 extern float __INFF;
 #define INFINITYF (__INFF)
 extern float __QNANF;
 #define NANF (__QNANF)
+#endif
 
 
 /* double */
