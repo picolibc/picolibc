@@ -413,69 +413,6 @@ getacl (const char *file, DWORD attr, int nentries, __aclent32_t *aclbufp)
   return pos;
 }
 
-int
-acl_access (const char *path, int flags)
-{
-  __aclent32_t acls[MAX_ACL_ENTRIES];
-  int cnt;
-
-  if ((cnt = acl32 (path, GETACL, MAX_ACL_ENTRIES, acls)) < 1)
-    return -1;
-
-  /* Only check existence. */
-  if (!(flags & (R_OK | W_OK | X_OK)))
-    return 0;
-
-  for (int i = 0; i < cnt; ++i)
-    {
-      switch (acls[i].a_type)
-	{
-	case USER_OBJ:
-	case USER:
-	  if (acls[i].a_id != myself->uid)
-	    {
-	      /*
-	       * Check if user is a NT group:
-	       * Take SID from passwd, search SID in token groups
-	       */
-	      cygsid owner;
-	      struct passwd *pw;
-
-	      if ((pw = internal_getpwuid (acls[i].a_id)) != NULL
-		  && owner.getfrompw (pw)
-		  && internal_getgroups (0, NULL, &owner) > 0)
-		break;
-	      continue;
-	    }
-	  break;
-	case GROUP_OBJ:
-	case GROUP:
-	  if (acls[i].a_id != myself->gid)
-            {
-	      cygsid group;
-	      struct __group32 *gr = NULL;
-
-	      if ((gr = internal_getgrgid (acls[i].a_id)) != NULL
-		  && group.getfromgr (gr)
-		  && internal_getgroups (0, NULL, &group) > 0)
-		break;
-	      continue;
-	    }
-	  break;
-	case OTHER_OBJ:
-	  break;
-	default:
-	  continue;
-	}
-      if ((!(flags & R_OK) || (acls[i].a_perm & S_IROTH))
-	  && (!(flags & W_OK) || (acls[i].a_perm & S_IWOTH))
-	  && (!(flags & X_OK) || (acls[i].a_perm & S_IXOTH)))
-	return 0;
-    }
-  set_errno (EACCES);
-  return -1;
-}
-
 static
 int
 acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,

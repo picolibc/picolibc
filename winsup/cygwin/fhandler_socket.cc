@@ -94,8 +94,8 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 /**********************************************************************/
 /* fhandler_socket */
 
-fhandler_socket::fhandler_socket ()
-  : fhandler_base (FH_SOCKET), sun_path (NULL)
+fhandler_socket::fhandler_socket (int nunit)
+  : fhandler_base (FH_SOCKET), unit (nunit), sun_path (NULL)
 {
   set_need_fork_fixup ();
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
@@ -309,12 +309,47 @@ fhandler_socket::dup (fhandler_base *child)
 int __stdcall
 fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
 {
-  int res = fhandler_base::fstat (buf, pc);
+  int res;
+  if (get_addr_family () == AF_LOCAL && get_sun_path ())
+    {
+      path_conv spc (get_sun_path (),
+                     PC_SYM_NOFOLLOW | PC_NULLEMPTY | PC_FULL | PC_POSIX,
+		     NULL);
+      fhandler_base *fh = cygheap->fdtab.build_fhandler (-1, FH_DISK,
+      							 get_sun_path (),
+							 spc, 0);
+      if (fh)
+        {
+	  res = fh->fstat (buf, &spc);
+	  /* Faking Linux like values on top of the file specific values. */
+	  if (get_socket_type ()) /* fstat() */
+	    {
+	      buf->st_dev = 0;
+	      buf->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
+	      buf->st_ino = (ino_t) get_handle ();
+	    }
+	  buf->st_rdev = buf->st_size = buf->st_blocks = 0;
+	  return res;
+	}
+    }
+
+  res = fhandler_base::fstat (buf, pc);
   if (!res)
     {
-      buf->st_mode &= ~_IFMT;
-      buf->st_mode |= _IFSOCK;
-      buf->st_ino = (ino_t) get_handle ();
+      if (get_socket_type ()) /* fstat */
+        {
+	  buf->st_ino = (ino_t) get_handle ();
+	  buf->st_mode &= ~S_IFMT;
+	  buf->st_mode |= S_IFSOCK;
+	}
+      else
+        {
+	  path_conv spc ("/dev", PC_SYM_NOFOLLOW | PC_NULLEMPTY, NULL);
+	  buf->st_dev = spc.volser ();
+	  buf->st_ino = (ino_t) get_namehash ();
+	  buf->st_mode &= ~S_IRWXO;
+	  buf->st_rdev = (get_device () << 16) | get_unit ();
+	}
     }
   return res;
 }

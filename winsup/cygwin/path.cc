@@ -799,10 +799,8 @@ out:
 	  set_has_buggy_open (strcmp (fs.name, "SUNWNFS") == 0);
 	}
     }
-#if 0
   if (issocket ())
     devn = FH_SOCKET;
-#endif
 
   if (!(opt & PC_FULL))
     {
@@ -954,7 +952,10 @@ get_devn (const char *name, int &unit)
     devn = FH_PIPEW;
   else if (deveq ("tcp") || deveq ("udp") || deveq ("streamsocket")
 	   || deveq ("dgsocket"))
-    devn = FH_SOCKET;
+    {
+      devn = FH_SOCKET;
+      unit = tolower (*name) - 'a';
+    }
 
   return devn;
 }
@@ -1118,6 +1119,12 @@ win32_device_name (const char *src_path, char *win32_path,
     return false;
   switch (devn)
     {
+      case FH_SOCKET:
+	char *c;
+	strcpy (win32_path, src_path);
+	while (c = strchr (win32_path, '/'))
+	  *c = '\\';
+        break;
       case FH_RANDOM:
 	__small_sprintf (win32_path, devfmt, unit == 8 ? "" : "u");
 	break;

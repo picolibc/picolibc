@@ -1918,3 +1918,54 @@ set_file_attribute (int use_ntsec, const char *file, int attribute)
   return set_file_attribute (use_ntsec, file,
 			     myself->uid, myself->gid, attribute);
 }
+
+int
+check_file_access (const char *fn, int flags)
+{
+  int ret = -1;
+  char sd_buf[4096];
+  DWORD sd_size = sizeof sd_buf;
+  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
+  HANDLE hToken, hIToken;
+  BOOL status;
+  char pbuf[sizeof (PRIVILEGE_SET) + 3 * sizeof (LUID_AND_ATTRIBUTES)];
+  DWORD desired = 0, granted, plength = sizeof pbuf;
+  static GENERIC_MAPPING NO_COPY mapping = { FILE_GENERIC_READ,
+					     FILE_GENERIC_WRITE,
+					     FILE_GENERIC_EXECUTE,
+					     FILE_ALL_ACCESS };
+  if (read_sd (fn, psd, &sd_size) <= 0)
+    goto done;
+
+  if (cygheap->user.issetuid ())
+    hToken = cygheap->user.token;
+  else if (!OpenProcessToken (hMainProc, TOKEN_DUPLICATE, &hToken))
+    {
+      __seterrno ();
+      goto done;
+    }
+  if (!(status = DuplicateToken (hToken, SecurityIdentification, &hIToken)))
+    __seterrno ();
+  if (hToken != cygheap->user.token)
+    CloseHandle (hToken);
+  if (!status)
+    goto done;
+
+  if (flags & R_OK)
+    desired |= FILE_READ_DATA;
+  if (flags & W_OK)
+    desired |= FILE_WRITE_DATA;
+  if (flags & X_OK)
+    desired |= FILE_EXECUTE;
+  if (!AccessCheck (psd, hIToken, desired, &mapping,
+		    (PPRIVILEGE_SET) pbuf, &plength, &granted, &status))
+    __seterrno ();
+  else if (!status)
+    set_errno (EACCES);
+  else
+    ret = 0;
+  CloseHandle (hIToken);
+ done:
+  debug_printf ("flags %x, ret %d", flags, ret);
+  return ret;
+}

@@ -1,3 +1,35 @@
+2003-02-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::build_fhandler_from_name): Set some fhandler
+	data on sockets to evaluate AF_LOCAL sockets correctly.
+	(dtable::build_fhandler): Set unit number on sockets.
+	* fhandler.h (fhandler_socket): Add unit number.
+	(fhandler_socket::get_unit): New method.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Set unit
+	number.
+	(fhandler_socket::fstat): Reorganize to return more Linux-like
+	values.
+	* net.cc: include ctype.h.
+	(fdsock): Set unit number when building fhandler.
+	* path.cc (path_conv::check): Set device type to FH_SOCKET if file
+	is a AF_UNIX socket.
+	(get_devn): Evaluate unit for virtual socket devices.
+	(win32_device_name): Set windows path for sockets to unix_path with
+	just backslashes to keep the different names.
+	* syscalls.cc (fstat64): Don't override st_ino, st_dev and st_rdev
+	for sockets.
+	(stat_worker): Ditto.
+
+2003-02-21  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* autoload.cc (AccessCheck): Add.
+	(DuplicateToken): Add.
+	* security.h (check_file_access): Declare.
+	* syscalls.cc (access): Convert path to Windows, check existence
+	and readonly attribute. Call check_file_access instead of acl_access.
+	* security.cc (check_file_access): Create.
+	* sec_acl (acl_access): Delete.
+
 2003-02-19  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::open): Move some filesystem specific

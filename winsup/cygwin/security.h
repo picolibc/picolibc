@@ -225,6 +225,7 @@ LONG __stdcall read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd
 LONG __stdcall write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size);
 BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 BOOL __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
+int __stdcall check_file_access (const char *, int);
 
 void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 			     void *sd_buf, DWORD sd_buf_size);

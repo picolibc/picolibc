@@ -299,9 +299,15 @@ dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
   if (!pc.exists () && handle)
     pc.fillin (handle);
 
-  fhandler_base *fh = build_fhandler (fd, pc.get_devn (),
-				      pc.return_and_clear_normalized_path (),
+  char *posix_path = pc.return_and_clear_normalized_path ();
+  fhandler_base *fh = build_fhandler (fd, pc.get_devn (), posix_path,
 				      pc, pc.get_unitn ());
+  if (pc.issocket ()) /* Only true for files pretending an AF_LOCAL socket. */
+    {
+      fhandler_socket * fhs = (fhandler_socket *) fh;
+      fhs->set_addr_family (AF_LOCAL);
+      fhs->set_sun_path (posix_path);
+    }
   return fh;
 }
 
@@ -352,7 +358,7 @@ dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
 	fh = cnew (fhandler_pipe) (dev);
 	break;
       case FH_SOCKET:
-	if ((fh = cnew (fhandler_socket) ()))
+	if ((fh = cnew (fhandler_socket) (unit)))
 	  inc_need_fixup_before ();
 	break;
       case FH_DISK:

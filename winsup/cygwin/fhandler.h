@@ -385,12 +385,14 @@ class fhandler_socket: public fhandler_base
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
   char *sun_path;
   int had_connect_or_listen;
+  int unit;
 
  public:
-  fhandler_socket ();
+  fhandler_socket (int unit);
   ~fhandler_socket ();
   int get_socket () { return (int) get_handle(); }
   fhandler_socket * is_socket () { return this; }
+  int get_unit () { return unit; }
 
   bool saw_shutdown_read () const {return FHISSETF (SHUTRD);}
   bool saw_shutdown_write () const {return FHISSETF (SHUTWR);}

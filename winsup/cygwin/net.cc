@@ -14,6 +14,7 @@ details. */
 
 #include "winsup.h"
 #include <errno.h>
+#include <ctype.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <iphlpapi.h>
@@ -521,8 +522,9 @@ fdsock (int &fd, const char *name, SOCKET soc)
   else
     debug_printf ("not setting socket inheritance since winsock2_active %d",
 		  winsock2_active);
-  fhandler_socket *fh =
-    (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
+  fhandler_socket *fh = (fhandler_socket *)
+  	cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name, NULL,
+				       tolower (name[5]) - 'a');
   if (!fh)
     return NULL;
   fh->set_io_handle ((HANDLE) soc);

@@ -1016,7 +1016,7 @@ fstat64 (int fd, struct __stat64 *buf)
       path_conv pc (cfd->get_win32_name (), PC_SYM_NOFOLLOW);
       memset (buf, 0, sizeof (struct __stat64));
       res = cfd->fstat (buf, &pc);
-      if (!res)
+      if (!res && cfd->get_device () != FH_SOCKET)
 	{
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, cfd->get_win32_name ());
@@ -1106,7 +1106,7 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
 		    pc, (DWORD) real_path);
       memset (buf, 0, sizeof (*buf));
       res = fh->fstat (buf, pc);
-      if (!res)
+      if (!res && fh->get_device () != FH_SOCKET)
 	{
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
@@ -1163,8 +1163,6 @@ cygwin_lstat (const char *name, struct __stat32 *buf)
   return ret;
 }
 
-extern int acl_access (const char *, int);
-
 extern "C" int
 access (const char *fn, int flags)
 {
@@ -1176,11 +1174,33 @@ access (const char *fn, int flags)
       return -1;
     }
 
-  if (allow_ntsec)
-    return acl_access (fn, flags);
+  path_conv real_path (fn, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
+  if (real_path.error)
+    {
+      set_errno (real_path.error);
+      return -1;
+    }
+
+  if (!real_path.exists ())
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
+
+  if (!(flags & (R_OK | W_OK | X_OK)))
+    return 0;
+
+  if (real_path.has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
+    {
+      set_errno (EACCES);
+      return -1;
+    }
+
+  if (real_path.has_acls () && allow_ntsec)
+    return check_file_access (real_path, flags);
 
   struct __stat64 st;
-  int r = stat_worker (fn, &st, 0);
+  int r = stat_worker (real_path, &st, 0);
   if (r)
     return -1;
   r = -1;
