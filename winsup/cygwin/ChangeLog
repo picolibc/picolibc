@@ -1,3 +1,7 @@
+2005-01-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (realpath): Allow to expand with .exe suffix.
+
 2005-01-22  Christopher Faylor  <cgf@timesys.com>
 
 	* spawn.cc (spawn_guts): Perform same "cd" as in pinfo::exit below to

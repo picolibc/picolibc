@@ -3438,9 +3438,10 @@ cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 extern "C" char *
 realpath (const char *path, char *resolved)
 {
+  extern suffix_info stat_suffixes[];
   int err;
 
-  path_conv real_path (path, PC_SYM_FOLLOW | PC_FULL);
+  path_conv real_path (path, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
 
   if (real_path.error)
     err = real_path.error;
