@@ -25,7 +25,6 @@ details. */
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
@@ -512,7 +511,7 @@ cygwin_sendto (int fd,
   if (get_inet_addr (to, tolen, &sin, &tolen) == 0)
     return -1;
 
-  if (!(ovr = wsock_evt.prepare ()))
+  if (h->is_nonblocking () || !(ovr = wsock_evt.prepare ()))
     {
       debug_printf ("Fallback to winsock 1 sendto call");
       if ((res = sendto (h->get_socket (), (const char *) buf, len, flags,
@@ -558,7 +557,7 @@ cygwin_recvfrom (int fd,
   fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sigframe thisframe (mainthread);
 
-  if (!(ovr = wsock_evt.prepare ()))
+  if (h->is_nonblocking () ||!(ovr = wsock_evt.prepare ()))
     {
       debug_printf ("Fallback to winsock 1 recvfrom call");
       if ((res = recvfrom (h->get_socket (), buf, len, flags, from, fromlen))
@@ -1208,7 +1207,7 @@ cygwin_recv (int fd, void *buf, int len, unsigned int flags)
   fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sigframe thisframe (mainthread);
 
-  if (!(ovr = wsock_evt.prepare ()))
+  if (h->is_nonblocking () || !(ovr = wsock_evt.prepare ()))
     {
       debug_printf ("Fallback to winsock 1 recv call");
       if ((res = recv (h->get_socket (), (char *) buf, len, flags))
@@ -1249,7 +1248,7 @@ cygwin_send (int fd, const void *buf, int len, unsigned int flags)
   fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sigframe thisframe (mainthread);
 
-  if (!(ovr = wsock_evt.prepare ()))
+  if (h->is_nonblocking () || !(ovr = wsock_evt.prepare ()))
     {
       debug_printf ("Fallback to winsock 1 send call");
       if ((res = send (h->get_socket (), (const char *) buf, len, flags))

@@ -406,9 +406,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  if (*(int *) p && get_async ())
 	    WSAAsyncSelect (get_socket (), gethwnd (), WM_ASYNCIO, ASYNC_MASK);
 
-	  int current = get_flags () & O_NONBLOCK_MASK;
-	  int new_flags = *(int *) p ? (!current ? O_NONBLOCK : current) : 0;
-	  set_flags ((get_flags () & ~O_NONBLOCK_MASK) | new_flags);
+	  set_nonblocking (*(int *) p);
 	}
       break;
     }

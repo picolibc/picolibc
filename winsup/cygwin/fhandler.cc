@@ -1572,3 +1572,17 @@ fhandler_base::fixup_after_fork (HANDLE parent)
   debug_printf ("inheriting '%s' from parent", get_name ());
   fork_fixup (parent, io_handle, "io_handle");
 }
+
+int
+fhandler_base::is_nonblocking ()
+{
+  return (openflags & O_NONBLOCK_MASK) != 0;
+}
+
+void
+fhandler_base::set_nonblocking (int yes)
+{
+  int current = openflags & O_NONBLOCK_MASK;
+  int new_flags = yes ? (!current ? O_NONBLOCK : current) : 0;
+  openflags = (openflags & ~O_NONBLOCK_MASK) | new_flags;
+}

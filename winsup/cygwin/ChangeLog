@@ -1,3 +1,22 @@
+Wed Aug 15  9:42:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::is_nonblocking): New method.
+	(fhandler_base::set_nonblocking): Ditto.
+	* fhandler.h (fhandler_base): Declare new methods `is_nonblocking' and
+	`set_nonblocking'.
+	* fhandler_socket.cc (fhandler_socket::ioctl): Use `set_nonblocking'.
+	* fhandler_tty.cc (fhandler_pty_master::process_slave_output):
+	Use `is_nonblocking'.
+	(fhandler_tty_slave::read): Ditto.
+	(fhandler_tty_slave::ioctl): Use `set_nonblocking'.
+	(fhandler_pty_master::ioctl): Ditto.
+	* net.cc (cygwin_sendto): Fallback to winsock 1 functionality
+	in case of nonblocking IO.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	* syscalls.cc (_read): Use `is_nonblocking'.
+
 Tue Aug 14 11:05:26 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/version.h: Bump API version.

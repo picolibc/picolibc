@@ -207,6 +207,9 @@ public:
   int get_flags () { return openflags; }
   void set_flags (int x) { openflags = x; }
 
+  int is_nonblocking ();
+  void set_nonblocking (int yes);
+
   int get_w_binary () { return FHISSETF (WBINARY); }
   int get_r_binary () { return FHISSETF (RBINARY); }
 

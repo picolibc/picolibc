@@ -25,8 +25,6 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "shared_info.h"
-#include "cygwin/version.h"
-#include "perprocess.h"
 
 /* Tty master stuff */
 
@@ -297,7 +295,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 		break;
 	      if (hit_eof ())
 		goto out;
-	      if (n == 0 && (get_flags () & O_NONBLOCK_MASK) != 0)
+	      if (n == 0 && is_nonblocking ())
 		{
 		  set_errno (EAGAIN);
 		  rc = -1;
@@ -748,8 +746,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	  termios_printf ("saw EOF");
 	  break;
 	}
-      if (get_ttyp ()->ti.c_lflag & ICANON ||
-	  get_flags () & O_NONBLOCK_MASK)
+      if (get_ttyp ()->ti.c_lflag & ICANON || is_nonblocking ())
 	break;
       if (totalread >= vmin && (vmin > 0 || totalread > 0))
 	break;
@@ -915,11 +912,7 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
     case TIOCSWINSZ:
       break;
     case FIONBIO:
-      {
-	int current = get_flags () & O_NONBLOCK_MASK;
-	int new_flags = *(int *) arg ? (!current ? O_NONBLOCK : current) : 0;
-	set_flags ((get_flags () & ~O_NONBLOCK_MASK) | new_flags);
-      }
+      set_nonblocking (*(int *) arg);
       goto out;
     default:
       set_errno (EINVAL);
@@ -1099,11 +1092,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	_kill (-get_ttyp ()->getpgid (), SIGWINCH);
 	break;
       case FIONBIO:
-	{
-	  int current = get_flags () & O_NONBLOCK_MASK;
-	  int new_flags = *(int *) arg ? (!current ? O_NONBLOCK : current) : 0;
-	  set_flags ((get_flags () & ~O_NONBLOCK_MASK) | new_flags);
-	}
+	set_nonblocking (*(int *) arg);
 	break;
       default:
 	set_errno (EINVAL);
