@@ -59,6 +59,7 @@ No supporting OS subroutines are required.
 */
 
 #include <_ansi.h>
+#include <newlib.h>
 #include <string.h>
 #include <reent.h>
 #include <ctype.h>
@@ -75,7 +76,7 @@ _DEFUN(towupper,(c), wint_t c)
       unicode = 0;
       /* fall-through */ 
     }
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
   else if (!strcmp (__lc_ctype, "C-JIS"))
     {
       c = __jp2uc (c, JP_JIS);
@@ -498,7 +499,7 @@ _DEFUN(towupper,(c), wint_t c)
 	    return (c - 0x28);
 	}
     }     
-#endif /* MB_CAPABLE */
+#endif /* _MB_CAPABLE */
   
   return (c < 0x00ff ? (wint_t)(toupper ((int)c)) : c);
 }

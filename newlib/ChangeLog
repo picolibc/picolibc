@@ -1,3 +1,32 @@
+2004-04-23  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* configure.in: Define _MB_CAPABLE if mb supported.
+	* configure: Regenerated.
+	* configure.host: Remove manual setting of MB_CAPABLE compiler
+	flag.
+	* newlib.hin: Add _MB_CAPABLE flag.
+	* libc/ctype/iswalpha.c, libc/ctype/iswblank.c: Include <newlib.h>
+	and check for _MB_CAPABLE flag instead of MB_CAPABLE.
+	* libc/ctype/iswcntrl.c, libc/ctype/iswprint.c: Ditto.
+	* libc/ctype/iswpunct.c, libc/ctype/iswspace.c: Ditto.
+	* libc/ctype/jp2uc.c: Ditto.
+	* libc/ctype/towlower.c, libc/ctype/towupper.c: Ditto.
+	* libc/locale/locale.c: Ditto
+	* libc/machine/powerpc/vfscanf.c: Ditto
+	* libc/stdio/vfprintf.c, libc/stdio/vfscanf.c: Ditto
+	* libc/stdlib/mblen.c: Ditto
+	* libc/stdlib/mblen_r.c, libc/stdlib/mbrlen.c: Ditto
+	* libc/stdlib/mbrtowc.c, libc/stdlib/mbsrtowcs.c: Ditto
+	* libc/stdlib/mbstowcs.c, libc/stdlib/mbtowc.c: Ditto
+	* libc/stdlib/mbtowc_r.c, libc/stdlib/wcrtomb.c: Ditto
+	* libc/stdlib/wcsrtombs.c, libc/stdlib/wcstombs.c: Ditto
+	* libc/stdlib/wctomb.c, libc/sys/linux/intl/dcigettext.c: Ditto
+	* libc/sys/linux/intl/explodename.c: Ditto
+	* libc/sys/linux/intl/finddomain.c: Ditto
+	* libc/sys/linux/intl/l10nflist.c: Ditto
+	* libc/sys/linux/intl/loadmsgcat.c: Ditto
+	* libc/sys/linux/intl/localealias.c: Ditto
+
 2004-04-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/powerpc/vfscanf.c (NNZDIGITS): New define.

@@ -250,10 +250,6 @@ if [ "x${newlib_mb}" = "x" ]; then
 	esac
 fi
 
-if [ "x${newlib_mb}" = "xyes" ] ; then
-	newlib_cflags="${newlib_cflags} -DMB_CAPABLE"
-fi
-
 # Disable printf/scanf floating-point support if requested.
 
 if [ "${newlib_io_float}" = "no" ] ; then

@@ -44,7 +44,7 @@ locale.
 
 This is a minimal implementation, supporting only the required <<"C">>
 value for <[locale]>; strings representing other locales are not
-honored unless MB_CAPABLE is defined in which case three new
+honored unless _MB_CAPABLE is defined in which case three new
 extensions are allowed for LC_CTYPE or LC_MESSAGES only: <<"C-JIS">>, 
 <<"C-EUCJP">>, <<"C-SJIS">>, or <<"C-ISO-8859-1">>.  (<<"">> is 
 also accepted; it represents the default locale
@@ -86,6 +86,7 @@ No supporting OS subroutines are required.
  *                         (Only "C" or null supported).
  */
 
+#include <newlib.h>
 #include <locale.h>
 #include <string.h>
 #include <limits.h>
@@ -120,7 +121,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
        int category _AND
        _CONST char *locale)
 {
-#ifndef MB_CAPABLE
+#ifndef _MB_CAPABLE
   if (locale)
     { 
       if (strcmp (locale, "C") && strcmp (locale, ""))

@@ -56,14 +56,15 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #include <_ansi.h>
+#include <newlib.h>
 #include <wctype.h>
 #include <string.h>
 #include <ctype.h>
 #include "local.h"
 
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
 #include "utf8print.h"
-#endif /* MB_CAPABLE */
+#endif /* _MB_CAPABLE */
 
 int
 _DEFUN(iswprint,(c), wint_t c)
@@ -74,7 +75,7 @@ _DEFUN(iswprint,(c), wint_t c)
       unicode = 0;
       /* fall-through */ 
     }
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
   else if (!strcmp (__lc_ctype, "C-JIS"))
     {
       c = __jp2uc (c, JP_JIS);
@@ -390,7 +391,7 @@ _DEFUN(iswprint,(c), wint_t c)
       /* not in table */
       return 0;
     }
-#endif /* MB_CAPABLE */
+#endif /* _MB_CAPABLE */
 
   return (c < (wint_t)0x100 ? isprint (c) : 0);
 }

@@ -17,7 +17,7 @@ TRAD_SYNOPSIS
 	size_t <[n]>;
 
 DESCRIPTION
-When MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
 implementation of <<mbtowc>>.  In this case,
 only ``multi-byte character sequences'' recognized are single bytes,
 and they are ``converted'' to themselves.
@@ -25,7 +25,7 @@ Each call to <<mbtowc>> copies one character from <<*<[s]>>> to
 <<*<[pwc]>>>, unless <[s]> is a null pointer.  The argument n
 is ignored.
 
-When MB_CAPABLE is defined, this routine calls <<_mbtowc_r>> to perform
+When _MB_CAPABLE is defined, this routine calls <<_mbtowc_r>> to perform
 the conversion, passing a state variable to allow state dependent
 decoding.  The result is based on the locale setting which may
 be restricted to a defined set of locales.
@@ -33,7 +33,7 @@ be restricted to a defined set of locales.
 RETURNS
 This implementation of <<mbtowc>> returns <<0>> if
 <[s]> is <<NULL>> or is the empty string; 
-it returns <<1>> if not MB_CAPABLE or
+it returns <<1>> if not _MB_CAPABLE or
 the character is a single-byte character; it returns <<-1>>
 if n is <<0>> or the multi-byte character is invalid; 
 otherwise it returns the number of bytes in the multibyte character.
@@ -51,6 +51,7 @@ effects vary with the locale.
 
 #ifndef _REENT_ONLY
 
+#include <newlib.h>
 #include <stdlib.h>
 #include <wchar.h>
 
@@ -60,7 +61,7 @@ _DEFUN (mbtowc, (pwc, s, n),
         const char *s _AND
         size_t n)
 {
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
   int retval = 0;
   mbstate_t *ps;
 
@@ -75,7 +76,7 @@ _DEFUN (mbtowc, (pwc, s, n),
       return -1;
     }
   return retval;
-#else /* not MB_CAPABLE */
+#else /* not _MB_CAPABLE */
   if (s == NULL)
     return 0;
   if (n == 0)
@@ -83,7 +84,7 @@ _DEFUN (mbtowc, (pwc, s, n),
   if (pwc)
     *pwc = (wchar_t) *s;
   return (*s != '\0');
-#endif /* not MB_CAPABLE */
+#endif /* not _MB_CAPABLE */
 }
 
 #endif /* !_REENT_ONLY */

@@ -103,6 +103,7 @@ Supporting OS subroutines required:
  */
 
 #include <_ansi.h>
+#include <newlib.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -279,7 +280,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   char buf[BUF];		/* buffer for numeric conversions */
   vec_union vec_buf;
   char *lptr;                   /* literal pointer */
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
   mbstate_t state;                /* value to keep track of multibyte state */
 #endif
 
@@ -304,7 +305,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   nread = 0;
   for (;;)
     {
-#ifndef MB_CAPABLE
+#ifndef _MB_CAPABLE
       wc = *fmt;
 #else
       memset (&state, '\0', sizeof (state));

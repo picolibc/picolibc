@@ -103,6 +103,7 @@ Supporting OS subroutines required:
 */
 
 #include <_ansi.h>
+#include <newlib.h>
 #include <reent.h>
 #include <ctype.h>
 #include <wctype.h>
@@ -293,7 +294,7 @@ _DEFUN(__svfscanf_r, (rptr, fp, fmt0, ap),
   nread = 0;
   for (;;)
     {
-#ifndef MB_CAPABLE
+#ifndef _MB_CAPABLE
       wc = *fmt;
 #else
       memset (&state, '\0', sizeof (state));

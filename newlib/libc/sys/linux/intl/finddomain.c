@@ -1,4 +1,6 @@
-#ifdef MB_CAPABLE
+#include <newlib.h>
+
+#ifdef _MB_CAPABLE
 
 /* Handle list of needed message catalogs
    Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
@@ -217,4 +219,4 @@ free_mem (void)
 text_set_element (__libc_subfreeres, free_mem);
 #endif
 
-#endif /* MB_CAPABLE */
+#endif /* _MB_CAPABLE */

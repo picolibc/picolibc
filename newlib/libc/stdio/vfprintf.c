@@ -180,6 +180,7 @@ static char *rcsid = "$Id$";
 #endif
 
 #include <_ansi.h>
+#include <newlib.h>
 #include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -440,7 +441,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	struct __siov iov[NIOV];/* ... and individual io vectors */
 	char buf[BUF];		/* space for %c, %[diouxX], %[eEfgG] */
 	char ox[2];		/* space for 0x hex-prefix */
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
 	wchar_t wc;
 	mbstate_t state;        /* mbtowc calls from library must not change state */
 #endif
@@ -457,7 +458,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	static _CONST char zeroes[PADSIZE] =
 	 {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
 
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
         memset (&state, '\0', sizeof (state));
 #endif
 	/*
@@ -560,7 +561,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	 */
 	for (;;) {
 	        cp = fmt;
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
 	        while ((n = _mbtowc_r (data, &wc, fmt, MB_CUR_MAX, &state)) > 0) {
                     if (wc == '%')
                         break;
@@ -574,7 +575,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 			PRINT (cp, m);
 			ret += m;
 		}
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
 		if (n <= 0)
                     goto done;
 #else
@@ -1491,7 +1492,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
   int pos, last_arg;
   int max_pos_arg = n;
   enum types { INT, LONG_INT, SHORT_INT, QUAD_INT, CHAR, CHAR_PTR, DOUBLE, LONG_DOUBLE, WIDE_CHAR };
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
   wchar_t wc;
   mbstate_t wc_state;
   int nbytes; 
@@ -1501,7 +1502,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
   if (*last_fmt != NULL)
     fmt = *last_fmt;
 
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
   memset (&wc_state, '\0', sizeof (wc_state));
 #endif
 
@@ -1509,7 +1510,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
      read the desired parameter from the vararg list. */
   while (*fmt && n >= numargs)
     {
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
       while ((nbytes = _mbtowc_r (data, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0) 
 	{
 	  fmt += nbytes;

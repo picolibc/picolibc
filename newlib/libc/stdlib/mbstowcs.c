@@ -17,13 +17,13 @@ TRAD_SYNOPSIS
 	size_t <[n]>;
 
 DESCRIPTION
-When MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
 implementation of <<mbstowcs>>.  In this case, the
 only ``multi-byte character sequences'' recognized are single bytes,
 and they are ``converted'' to wide-char versions simply by byte
 extension.
 
-When MB_CAPABLE is defined, this routine calls <<_mbstowcs_r>> to perform
+When _MB_CAPABLE is defined, this routine calls <<_mbstowcs_r>> to perform
 the conversion, passing a state variable to allow state dependent
 decoding.  The result is based on the locale setting which may
 be restricted to a defined set of locales.
@@ -31,7 +31,7 @@ be restricted to a defined set of locales.
 RETURNS
 This implementation of <<mbstowcs>> returns <<0>> if
 <[s]> is <<NULL>> or is the empty string; 
-it returns <<-1>> if MB_CAPABLE and one of the
+it returns <<-1>> if _MB_CAPABLE and one of the
 multi-byte characters is invalid or incomplete;
 otherwise it returns the minimum of: <<n>> or the
 number of multi-byte characters in <<s>> plus 1 (to
@@ -49,6 +49,7 @@ effects vary with the locale.
 
 #ifndef _REENT_ONLY
 
+#include <newlib.h>
 #include <stdlib.h>
 #include <wchar.h>
 
@@ -58,12 +59,12 @@ _DEFUN (mbstowcs, (pwcs, s, n),
         const char *s _AND
         size_t n)
 {
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
   mbstate_t state;
   state.__count = 0;
   
   return _mbstowcs_r (_REENT, pwcs, s, n, &state);
-#else /* not MB_CAPABLE */
+#else /* not _MB_CAPABLE */
   
   int count = 0;
   
@@ -76,7 +77,7 @@ _DEFUN (mbstowcs, (pwcs, s, n),
   }
   
   return count;
-#endif /* not MB_CAPABLE */
+#endif /* not _MB_CAPABLE */
 }
 
 #endif /* !_REENT_ONLY */

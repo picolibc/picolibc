@@ -1,10 +1,11 @@
+#include <newlib.h>
 #include <stdlib.h>
 #include <locale.h>
 #include "mbctype.h"
 #include <wchar.h>
 #include <string.h>
 
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
 typedef enum { ESCAPE, DOLLAR, BRACKET, AT, B, J, 
                NUL, JIS_CHAR, OTHER, JIS_C_NUM } JIS_CHAR_TYPE;
 typedef enum { ASCII, JIS, A_ESC, A_ESC_DL, JIS_1, J_ESC, J_ESC_BR,
@@ -39,7 +40,7 @@ static JIS_ACTION JIS_action_table[JIS_S_NUM][JIS_C_NUM] = {
 /* J_ESC */   { ERROR,   ERROR,    NOOP,     ERROR,   ERROR,   ERROR,   ERROR,   ERROR,   ERROR },
 /* J_ESC_BR */{ ERROR,   ERROR,    ERROR,    ERROR,   MAKE_A,  MAKE_A,  ERROR,   ERROR,   ERROR },
 };
-#endif /* MB_CAPABLE */
+#endif /* _MB_CAPABLE */
 
 /* we override the mbstate_t __count field for more complex encodings and use it store a state value */
 #define __state __count
@@ -63,7 +64,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
   if (s != NULL && n == 0)
     return -2;
 
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
   if (__lc_ctype == NULL ||
       (strlen (__lc_ctype) <= 1))
     { /* fall-through */ }
@@ -455,7 +456,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
       state->__state = curr_state;
       return -2;  /* n < bytes needed */
     }
-#endif /* MB_CAPABLE */               
+#endif /* _MB_CAPABLE */               
 
   /* otherwise this must be the "C" locale or unknown locale */
   if (s == NULL)

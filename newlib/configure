@@ -3207,6 +3207,10 @@ fi
 
 if test "${newlib_mb}" = "yes"; then
 cat >> confdefs.h <<EOF
+#define _MB_CAPABLE 1
+EOF
+
+cat >> confdefs.h <<EOF
 #define _MB_LEN_MAX 8
 EOF
 

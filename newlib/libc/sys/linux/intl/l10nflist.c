@@ -1,4 +1,6 @@
-#ifdef MB_CAPABLE
+#include <newlib.h>
+
+#ifdef _MB_CAPABLE
 
 /* Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -418,4 +420,4 @@ stpcpy (dest, src)
 }
 #endif
 
-#endif /* MB_CAPABLE */
+#endif /* _MB_CAPABLE */

@@ -56,6 +56,7 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #include <_ansi.h>
+#include <newlib.h>
 #include <wctype.h>
 #include <ctype.h>
 #include <string.h>
@@ -70,7 +71,7 @@ _DEFUN(iswcntrl,(c), wint_t c)
       unicode = 0;
       /* fall-through */ 
     }
-#ifdef MB_CAPABLE
+#ifdef _MB_CAPABLE
   else if (!strcmp (__lc_ctype, "C-JIS"))
     {
       c = __jp2uc (c, JP_JIS);
@@ -97,7 +98,7 @@ _DEFUN(iswcntrl,(c), wint_t c)
               (c >= 0x007f && c <= 0x009f) ||
               c == 0x2028 || c == 0x2029);
     }
-#endif /* MB_CAPABLE */
+#endif /* _MB_CAPABLE */
 
   return (c < 0x100 ? iscntrl (c) : 0);
 }
