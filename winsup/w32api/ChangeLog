@@ -1,3 +1,21 @@
+2002-07-02  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (WC_*): Remove some duplicate defines.
+
+2002-07-02  Ken Fitlike  <kenfitlike@hotmail.com>
+
+	* include/commctrl.h (WC_IPADDRESS[AW]): Add defines and
+	UNICODE mappings.
+	(IPM*): Add defines.
+	(IPN_*): Add defines.
+	(NMIPADDRESS): Add structure and typedefs.
+	(MAKEIPADDRESS): Add macro.
+	(MAKEIPRANGE): Add macro.
+	(FIRST_IPADDRESS): Add macro.
+	(SECOND_IPADDRESS): Add macro.
+	(THIRD_IPADDRESS): Add macro.
+	(FOURTH_IPADDRESS): Add macro.
+
 2002-06-25  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* include/winbase.h (FILE_FLAG_FIRST_PIPE_INSTANCE): Add constant.
