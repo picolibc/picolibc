@@ -1,3 +1,7 @@
+2003-01-01  Daniel Jacobowitz  <drow@mvista.com>
+
+	* src-release (ETC_SUPPORT): Add fdl.texi and texi2pod.pl.
+
 2002-12-31  Tom Tromey  <tromey@redhat.com>
 
 	* Makefile.in: Rebuilt.
