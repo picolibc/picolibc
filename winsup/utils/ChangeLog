@@ -1,3 +1,7 @@
+Thu Aug 24 18:02:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+        * ps.cc (main): Always print a cygwin process using cygwin paths.
+
 2000-08-24  Egor Duda  <deo@logos-m.ru>
 
 	* Makefile.in: Add dumper.exe target and associated mechanisms for building it.

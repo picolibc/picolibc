@@ -261,7 +261,7 @@ main (int argc, char *argv[])
       char pname[MAX_PATH];
       if (p->process_state & PID_ZOMBIE)
         strcpy (pname, "<defunct>");
-      else if (query != CW_GETPINFO_FULL)
+      else if (p->ppid)
 	{
 	  char *s;
 	  pname[0] = '\0';
@@ -270,7 +270,7 @@ main (int argc, char *argv[])
 	  if (s > pname && strcasecmp (s, ".exe") == 0)
 	    *s = '\0';
 	}
-      else
+      else if (query == CW_GETPINFO_FULL)
 	{
 	  HANDLE h = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, p->dwProcessId);
 	  if (!h)
