@@ -11,7 +11,6 @@ details. */
 #include <stdlib.h>
 #include "exceptions.h"
 #include "security.h"
-#include "cygthread.h"
 #include "sync.h"
 #include "cygerrno.h"
 #include "sigproc.h"
@@ -33,6 +32,7 @@ DWORD WINAPI
 cygthread::stub (VOID *arg)
 {
   cygthread *info = (cygthread *) arg;
+  _my_tls._ctinfo = info;
   if (info->arg == cygself)
     {
       if (info->ev)
@@ -69,7 +69,8 @@ cygthread::stub (VOID *arg)
 	  info->func = NULL;	// catch erroneous activation
 #endif
 	  info->__name = NULL;
-	  SetEvent (info->ev);
+	  if (info->inuse)
+	    SetEvent (info->ev);
 	}
       switch (WaitForSingleObject (info->thread_sync, INFINITE))
 	{
@@ -88,6 +89,7 @@ DWORD WINAPI
 cygthread::simplestub (VOID *arg)
 {
   cygthread *info = (cygthread *) arg;
+  _my_tls._ctinfo = info;
   info->stack_ptr = &arg;
   info->ev = info->h;
   info->func (info->arg == cygself ? info : info->arg);

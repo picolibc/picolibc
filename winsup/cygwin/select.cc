@@ -38,7 +38,6 @@ details. */
 #include "sigproc.h"
 #include "perthread.h"
 #include "tty.h"
-#include "cygthread.h"
 #include "ntdll.h"
 #include "cygtls.h"
 #include <asm/byteorder.h>

@@ -23,7 +23,6 @@ details. */
 #include "pinfo.h"
 #include "hires.h"
 #include "cygtls.h"
-#include "cygthread.h"
 #include "sigproc.h"
 #include "sync.h"
 

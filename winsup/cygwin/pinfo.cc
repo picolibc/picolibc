@@ -27,7 +27,6 @@ details. */
 #include <sys/wait.h>
 #include <ntdef.h>
 #include "ntdll.h"
-#include "cygthread.h"
 #include "shared_info.h"
 #include "cygheap.h"
 #include "fhandler.h"
@@ -685,7 +684,6 @@ proc_waiter (void *arg)
 
       si.si_uid = vchild->uid;
 
-      int proc_todo;
       switch (buf)
 	{
 	case 0:
@@ -729,6 +727,7 @@ proc_waiter (void *arg)
 	break;
     }
   sigproc_printf ("exiting wait thread for pid %d", pid);
+  _my_tls._ctinfo->release ();
   return 0;
 }
 
@@ -754,7 +753,7 @@ pinfo::wait ()
   CloseHandle (out);
 
 
-#if 1
+#if 0
   DWORD tid;
   HANDLE h = CreateThread (&sec_none_nih, 0, proc_waiter, this, 0, &tid);
   if (!h)

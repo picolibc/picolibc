@@ -28,7 +28,6 @@ details. */
 #include "cygheap.h"
 #include "child_info_magic.h"
 #include "shared_info.h"
-#include "cygthread.h"
 #include "cygtls.h"
 #include "sigproc.h"
 #include "perthread.h"

@@ -19,7 +19,6 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "cygthread.h"
 #include "pinfo.h"
 #include "sigproc.h"
 

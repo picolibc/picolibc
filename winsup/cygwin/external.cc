@@ -25,7 +25,6 @@ details. */
 #include "cygheap.h"
 #include "wincap.h"
 #include "heap.h"
-#include "cygthread.h"
 #include "pwdgrp.h"
 #include "cygtls.h"
 

@@ -33,7 +33,6 @@ details. */
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
-#include "cygthread.h"
 #include "sync.h"
 #include "heap.h"
 

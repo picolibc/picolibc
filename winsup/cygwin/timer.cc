@@ -16,7 +16,6 @@ details. */
 #include "hires.h"
 #include "thread.h"
 #include "cygtls.h"
-#include "cygthread.h"
 #include "sigproc.h"
 #include "sync.h"
 

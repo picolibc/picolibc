@@ -25,7 +25,6 @@ details. */
 #include "shared_info.h"
 #include "perprocess.h"
 #include "security.h"
-#include "cygthread.h"
 
 #define CALL_HANDLER_RETRY 20
 
