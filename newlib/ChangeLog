@@ -1,3 +1,13 @@
+2003-06-24  Kazu Hirata  <kazu@cs.umass.edu>
+
+	* libc/machine/h8300/setarch.h: New.
+	* libc/machine/h8300/memcpy.S: Use it.
+	* libc/machine/h8300/memset.S: Likewise.
+	* libc/machine/h8300/reg_memcpy.S: Likewise.
+	* libc/machine/h8300/reg_memset.S: Likewise.
+	* libc/machine/h8300/setjmp.S: Likewise.
+	* libc/machine/h8300/strcmp.S: Likewise.
+
 2003-06-24  Richard Sandiford  <rsandifo@redhat.com>
 
 	* libc/sys/h8300hms/crt0.S (_start): Fix register sizes in call

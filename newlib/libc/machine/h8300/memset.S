@@ -1,21 +1,6 @@
+#include "setarch.h"
+
 #include "defines.h"
-
-#ifdef __H8300H__
-#ifdef __NORMAL_MODE__
-	.h8300hn
-#else
-	.h8300h
-#endif
-#endif
-
-#ifdef __H8300S__
-#ifdef __NORMAL_MODE__
-	.h8300sn
-#else
-	.h8300s
-#endif
-#endif
-
 
 ; A0P pointer to cursor
 ; A1P thing to copy
