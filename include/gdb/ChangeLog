@@ -1,4 +1,4 @@
-2004-12-13  Hans-Peter Nilsson  <hp@bitrange.com>
+2004-12-13  Hans-Peter Nilsson  <hp@axis.com>
 
 	* callback.h (struct host_callback_struct): New member lstat.
 	(CB_SYS_lstat): New macro.
