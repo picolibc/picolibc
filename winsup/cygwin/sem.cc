@@ -136,7 +136,7 @@ semget (key_t key, int nsems, int semflg)
   client_request_sem request (key, nsems, semflg);
   if (request.make_request () == -1 || request.retval () == -1)
     {
-      syscall_printf ("-1 [%d] = semctl ()", request.error_code ());
+      syscall_printf ("-1 [%d] = semget ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
         raise (SIGSYS);
@@ -161,7 +161,7 @@ semop (int semid, struct sembuf *sops, size_t nsops)
   client_request_sem request (semid, sops, nsops);
   if (request.make_request () == -1 || request.retval () == -1)
     {
-      syscall_printf ("-1 [%d] = semctl ()", request.error_code ());
+      syscall_printf ("-1 [%d] = semop ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
         raise (SIGSYS);

@@ -1,3 +1,12 @@
+2004-03-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sem.cc (semget): Fix debug string.
+	(semop): Ditto.
+	* shm.cc (fixup_shms_after_fork): Ditto.
+	(shmat): Ditto.
+	(shmdt): Ditto.
+	(shmget): Ditto.
+
 2004-03-26  Christopher Faylor  <cgf@redhat.com>
 
 	* sigproc.cc (wait_sig): Make sure that SIGCHLD is handled regardless

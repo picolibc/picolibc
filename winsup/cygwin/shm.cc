@@ -124,7 +124,7 @@ fixup_shms_after_fork ()
   client_request_shm request (&parent);
   if (request.make_request () == -1 || request.retval () == -1)
     {
-      syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
+      syscall_printf ("-1 [%d] = fixup_shms_after_fork ()", request.error_code ());
       set_errno (request.error_code ());
       return 0;
     }
@@ -200,7 +200,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   client_request_shm request (shmid, ptr, shmflg & ~SHM_RND);
   if (request.make_request () == -1 || request.ptrval () == NULL)
     {
-      syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
+      syscall_printf ("-1 [%d] = shmat ()", request.error_code ());
       UnmapViewOfFile (ptr);
       delete sph_entry;
       set_errno (request.error_code ());
@@ -286,11 +286,11 @@ extern "C" int
 shmdt (const void *shmaddr)
 {
 #ifdef USE_SERVER
-  syscall_printf ("shmget (shmaddr = %p)", shmaddr);
+  syscall_printf ("shmdt (shmaddr = %p)", shmaddr);
   client_request_shm request (shmaddr);
   if (request.make_request () == -1 || request.retval () == -1)
     {
-      syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
+      syscall_printf ("-1 [%d] = shmdt ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
         raise (SIGSYS);
@@ -333,7 +333,7 @@ shmget (key_t key, size_t size, int shmflg)
   client_request_shm request (key, size, shmflg);
   if (request.make_request () == -1 || request.retval () == -1)
     {
-      syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
+      syscall_printf ("-1 [%d] = shmget ()", request.error_code ());
       delete ssh_new_entry;
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
