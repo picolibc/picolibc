@@ -158,9 +158,9 @@ Good question!  That very issue has been debated on the
 @samp{cygwin-apps} mailing list.  Check the list archives if you want to
 know more.  Start at @file{http://cygwin.com/lists.html}.
 
-In any case, there is no distinction as far as @code{setup.exe} is
-concerned.  It should install all packages from both @code{latest} and
-@code{contrib} directories.
+But it really doesn't matter, and there is no distinction as far as
+@code{setup.exe} is concerned.  By default, it will install all packages
+from both @code{latest} and @code{contrib} directories.
 
 @subsection My Windows logon name has a space in it, will this cause problems?
 
