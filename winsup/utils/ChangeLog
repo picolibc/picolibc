@@ -2,7 +2,7 @@
 
 	* cygcheck.cc (dump_sysinfo): Add leading newline before legend for
 	drive-list.
-			
+
 2004-10-22  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* cygcheck.cc (dump_sysinfo): In legend for drive-list: Add ``ram'' and
