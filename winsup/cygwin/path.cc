@@ -205,10 +205,7 @@ normalize_posix_path (const char *src, char *dst)
   syscall_printf ("src %s", src);
 
   if (isdrive (src) || strpbrk (src, "\\:"))
-    {
-      cygwin_conv_to_full_posix_path (src, dst);
-      return 0;
-    }
+    return normalize_win32_path (src, dst);
 
   if (!isslash (src[0]))
     {
