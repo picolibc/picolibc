@@ -204,10 +204,14 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
   if (what == CH_HOME)
     {
       char *p;
-      if ((p = getenv ("HOMEDRIVE")))
+      if (homedrive)
+	newhomedrive = homedrive;
+      else if ((p = getenv ("HOMEDRIVE")))
 	newhomedrive = p;
 
-      if ((p = getenv ("HOMEPATH")))
+      if (homepath)
+	newhomepath = homepath;
+      else if ((p = getenv ("HOMEPATH")))
 	newhomepath = p;
 
       if ((p = getenv ("HOME")))
@@ -218,18 +222,20 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	    pw = getpwnam (name ());
 	  if (pw && pw->pw_dir && *pw->pw_dir)
 	    {
-	      setenv ("HOME", pw->pw_dir, 1);
 	      debug_printf ("Set HOME (from /etc/passwd) to %s", pw->pw_dir);
+	      setenv ("HOME", pw->pw_dir, 1);
 	    }
-	  else if (newhomedrive && newhomepath)
+	  else if (!newhomedrive || !newhomepath)
+	    setenv ("HOME", "/", 1);
+	  else
 	    {
 	      char home[MAX_PATH];
 	      char buf[MAX_PATH + 1];
 	      strcpy (buf, newhomedrive);
 	      strcat (buf, newhomepath);
 	      cygwin_conv_to_full_posix_path (buf, home);
-	      setenv ("HOME", home, 1);
 	      debug_printf ("Set HOME (from HOMEDRIVE/HOMEPATH) to %s", home);
+	      setenv ("HOME", home, 1);
 	    }
 	}
     }
@@ -285,11 +291,11 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	}
     }
 
-  if (newhomedrive)
+  if (newhomedrive && newhomedrive != homedrive)
     cfree_and_set (homedrive, (newhomedrive == almost_null)
 		   	      ? almost_null : cstrdup (newhomedrive));
 
-  if (newhomepath)
+  if (newhomepath && newhomepath != homepath)
     cfree_and_set (homepath, cstrdup (newhomepath));
 
   switch (what)
@@ -306,9 +312,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 const char *
 cygheap_user::test_uid (char *&what, const char *name, size_t namelen)
 {
-  if (what)
-    return what;
-  if (!issetuid ())
+  if (!what && !issetuid ())
     what = getwinenveq (name, namelen, HEAP_STR);
   return what;
 }

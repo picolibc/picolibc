@@ -1,5 +1,12 @@
 2002-06-30  Christopher Faylor  <cgf@redhat.com>
 
+	* uinfo.cc (cygheap_user::ontherange): Potentially set HOME from
+	existing homepath and homedrive cygheap_user fields (not currently used
+	yet).  Set HOME to / if no other alternative.
+	(cygheap_user::test_uid): Simplify.
+
+2002-06-30  Christopher Faylor  <cgf@redhat.com>
+
 	* environ.cc (parse_options): Use setenv to potentially replace CYGWIN
 	value on export.  Fixes broken behavior since November 2000 changes.
 	(regopt): Return indication of whether or not something has been parsed
