@@ -1,3 +1,85 @@
+2003-08-01  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	Merge from gcc:
+
+	2003-08-01  Matt Kraai  <kraai@alumni.cmu.edu>
+	* Makefile.tpl (check, check-c++): Express dependencies using
+	dependencies rather than commands.
+	* Makefile.in: Regenerate.
+
+	2003-07-31  Geoffrey Keating  <geoffk@apple.com>
+	* Makefile.tpl (libsubdir): Use gcc instead of gcc-lib.
+	* Makefile.in: Update.
+
+2003-08-01  Andrew Cagney  <cagney@redhat.com>
+
+	* configure.in (noconfigdirs): Do not add GDB when m32r-*-*.
+	* configure: Ditto.
+
+2003-07-30  Andreas Tobler  <a.tobler@schweiz.ch>
+
+	* configure.in: Enable libgcj for darwin.
+	* configure: Rebuild.
+
+2003-07-29  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* mkinstalldirs: Import autoconf 2.57 / automake 1.7 version.
+
+2003-07-27  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Use 'mkinstalldirs' rather than 'mkdir' when
+	creating target and build subdirs to build all parent dirs as needed.
+	* Makefile.in: Rebuild.
+	* configure.in: Don't build dirs explicitly here.
+	* configure: Rebuild.
+
+2003-07-22  Alexandre Oliva  <aoliva@redhat.com>
+
+	* Makefile.tpl (all-make): Depend on intl.
+	* Makefile.in: Rebuilt.
+
+2003-07-16  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* config.if: Remove unused libc_interface determination.
+
+2003-07-14  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.in: Regenerate, correctly this time.
+
+2003-07-13  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Set INSTALL and friends using autoconf.  Remove
+	unused INSTALL_PROGRAM_ARGS.
+	* configure.in: Use AC_PROG_INSTALL.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
+
+2003-07-10  Alexandre Oliva  <aoliva@redhat.com>
+
+	* configure: Rebuilt.
+	2001-09-26  Alexandre Oliva  <aoliva@redhat.com>
+	* configure.in (noconfigdirs) [am33_2.0-*-linux*]: Don't build
+	newlib nor libgloss.
+	Wed May  9 10:07:19 2001  Alexandre Oliva  <aoliva@redhat.com>
+	* configure.in (am33_2.0-*-linux*): Added.
+
+2003-07-09  Bob Wilson  <bob.wilson@acm.org>
+
+	* configure.in: Add ${libgcj} to noconfigdirs for xtensa-*-* targets.
+	* configure: Regenerate.
+
+2003-07-06  H.J. Lu <hongjiu.lu@intel.com>
+
+	* config-ml.in: Replace PWD with PWD_COMMAND.
+	* Makefile.tpl: Likewise.
+	* Makefile.in: Regenerated.
+
+2003-06-27  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Clean up config-lang.in handling.  Delete
+	useless assignment to "subdirs".
+	* configure: Regenerate.
+
 2003-06-26  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in: Rename 'target_libs' to 'target_libraries'.
