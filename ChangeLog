@@ -1,3 +1,8 @@
+2001-02-22  Jeff Johnston <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Remove DJ Delorie's address because it is no
+	longer valid.
+
 2001-02-16  Nick Clifton  <nickc@redhat.com>
 
 	* configure.in (noconfigdirs): Allow configuration of texinfo
