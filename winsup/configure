@@ -1121,7 +1121,7 @@ s%@CC@%$CC%g
 s%@CXX@%$CXX%g
 s%@subdirs@%$subdirs%g
 s%@SET_MAKE@%$SET_MAKE%g
-s%@SUBDIRS testsuite@%$SUBDIRS testsuite%g
+s%@SUBDIRS@%$SUBDIRS%g
 
 CEOF
 EOF
