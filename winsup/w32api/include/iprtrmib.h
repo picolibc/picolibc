@@ -1,33 +1,25 @@
-#ifndef _IPRTRMIB_H_
-#define _IPRTRMIB_H_
-
+#ifndef _IPRTRMIB_H
+#define _IPRTRMIB_H
 #include <ipifcons.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 #ifndef ANY_SIZE
 #define ANY_SIZE 1
 #endif
-
 #define MAXLEN_PHYSADDR 8
 #define MAXLEN_IFDESCR 256
-
 #ifndef MAX_INTERFACE_NAME_LEN
 #define MAX_INTERFACE_NAME_LEN 256
 #endif
-
 #define MIB_IPNET_TYPE_OTHER 1
 #define MIB_IPNET_TYPE_INVALID 2
 #define MIB_IPNET_TYPE_DYNAMIC 3
 #define MIB_IPNET_TYPE_STATIC 4
-
 #define MIB_TCP_RTO_OTHER 1
 #define MIB_TCP_RTO_CONSTANT 2
 #define MIB_TCP_RTO_RSRE 3
 #define MIB_TCP_RTO_VANJ 4
-
 #define MIB_TCP_STATE_CLOSED 1                 
 #define MIB_TCP_STATE_LISTEN 2                 
 #define MIB_TCP_STATE_SYN_SENT 3                 
@@ -40,11 +32,9 @@ extern "C" {
 #define MIB_TCP_STATE_LAST_ACK 10                
 #define MIB_TCP_STATE_TIME_WAIT 11                
 #define MIB_TCP_STATE_DELETE_TCB 12                
-
 #define MIB_USE_CURRENT_TTL ((DWORD) -1)
 #define MIB_USE_CURRENT_FORWARDING ((DWORD) -1)
 #define MIB_TCP_MAXCONN_DYNAMIC ((DWORD) -1)
-
 typedef struct {
   DWORD dwAddr;
   DWORD dwIndex;
@@ -54,12 +44,10 @@ typedef struct {
   unsigned short unused1;
   unsigned short unused2;
 } MIB_IPADDRROW, *PMIB_IPADDRROW;
-
 typedef struct {
   DWORD dwNumEntries;
   MIB_IPADDRROW table[ANY_SIZE];
 } MIB_IPADDRTABLE, *PMIB_IPADDRTABLE;
-
 typedef struct {
   DWORD dwForwardDest;
   DWORD dwForwardMask;
@@ -76,12 +64,10 @@ typedef struct {
   DWORD dwForwardMetric4;
   DWORD dwForwardMetric5;
 } MIB_IPFORWARDROW, *PMIB_IPFORWARDROW;
-
 typedef struct {
   DWORD dwNumEntries;
   MIB_IPFORWARDROW table[ANY_SIZE];
 } MIB_IPFORWARDTABLE, *PMIB_IPFORWARDTABLE;
-
 typedef struct {
   DWORD dwIndex;
   DWORD dwPhysAddrLen;
@@ -89,12 +75,10 @@ typedef struct {
   DWORD dwAddr;
   DWORD dwType;
 } MIB_IPNETROW, *PMIB_IPNETROW;
-
 typedef struct {
   DWORD dwNumEntries;
   MIB_IPNETROW table[ANY_SIZE];
 } MIB_IPNETTABLE, *PMIB_IPNETTABLE;
-
 typedef struct {
   DWORD dwMsgs;
   DWORD dwErrors;
@@ -110,16 +94,13 @@ typedef struct {
   DWORD dwAddrMasks;
   DWORD dwAddrMaskReps;
 } MIBICMPSTATS, *PMIBICMPSTATS;
-
 typedef struct {
   MIBICMPSTATS icmpInStats;
   MIBICMPSTATS icmpOutStats;
 } MIBICMPINFO, *PMIBICMPINFO;
-
 typedef struct {
   MIBICMPINFO stats;
 } MIB_ICMP, *PMIB_ICMP;
-
 typedef struct {
   WCHAR wszName[MAX_INTERFACE_NAME_LEN];
   DWORD dwIndex;
@@ -146,12 +127,10 @@ typedef struct {
   DWORD dwDescrLen;
   BYTE  bDescr[MAXLEN_IFDESCR];
 } MIB_IFROW, *PMIB_IFROW;
-
 typedef struct {
   DWORD dwNumEntries;
   MIB_IFROW table[ANY_SIZE];
 } MIB_IFTABLE, *PMIB_IFTABLE;
-
 typedef struct {
   DWORD dwForwarding;
   DWORD dwDefaultTTL;
@@ -177,7 +156,6 @@ typedef struct {
   DWORD dwNumAddr;
   DWORD dwNumRoutes;
 } MIB_IPSTATS, *PMIB_IPSTATS;
-
 typedef struct {
   DWORD dwRtoAlgorithm;
   DWORD dwRtoMin;
@@ -195,7 +173,6 @@ typedef struct {
   DWORD dwOutRsts;
   DWORD dwNumConns;
 } MIB_TCPSTATS, *PMIB_TCPSTATS;
-
 typedef struct {
   DWORD dwState;
   DWORD dwLocalAddr;
@@ -203,12 +180,10 @@ typedef struct {
   DWORD dwRemoteAddr;
   DWORD dwRemotePort;
 } MIB_TCPROW, *PMIB_TCPROW;
-
 typedef struct {
   DWORD dwNumEntries;
   MIB_TCPROW table[ANY_SIZE];
 } MIB_TCPTABLE, *PMIB_TCPTABLE;
-
 typedef struct {
   DWORD dwInDatagrams;
   DWORD dwNoPorts;
@@ -216,19 +191,15 @@ typedef struct {
   DWORD dwOutDatagrams;
   DWORD dwNumAddrs;
 } MIB_UDPSTATS, *PMIB_UDPSTATS;
-
 typedef struct {
   DWORD dwLocalAddr;
   DWORD dwLocalPort;
 } MIB_UDPROW, *PMIB_UDPROW;
-
 typedef struct {
   DWORD dwNumEntries;
   MIB_UDPROW table[ANY_SIZE];
 } MIB_UDPTABLE, *PMIB_UDPTABLE;
-
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _IPRTRMIB_H_ */
+#endif /* _IPRTRMIB_H */

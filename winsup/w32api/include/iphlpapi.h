@@ -1,14 +1,11 @@
-#ifndef _IPHLPAPI_H_
-#define _IPHLPAPI_H_
-
+#ifndef _IPHLPAPI_H
+#define _IPHLPAPI_H
 #include <iprtrmib.h>
 #include <ipexport.h>
 #include <iptypes.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 DWORD WINAPI CreateIpForwardEntry(PMIB_IPFORWARDROW);
 DWORD WINAPI CreateIpNetEntry(PMIB_IPNETROW);
 DWORD WINAPI DeleteIpForwardEntry(PMIB_IPFORWARDROW);
@@ -40,9 +37,7 @@ DWORD WINAPI SetIpNetEntry(PMIB_IPNETROW);
 DWORD WINAPI SetIpStatistics(PMIB_IPSTATS);
 DWORD WINAPI SetIpTTL(UINT);
 DWORD WINAPI SetTcpEntry(PMIB_TCPROW);
-
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _IPHLPAPI_H_ */
+#endif /* _IPHLPAPI_H */
