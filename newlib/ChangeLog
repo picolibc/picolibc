@@ -6,6 +6,7 @@
 
 	* Makefile.am (stmp-targ-include): Support include header files
 	from machine directories.
+	(install-data-local): Ditto.
 	* Makefile.in: Regenerate.
 
 2005-01-24  Jeff Johnston  <jjohnstn@redhat.com>
