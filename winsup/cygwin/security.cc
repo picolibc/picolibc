@@ -1853,10 +1853,6 @@ void
 set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 			void *sd_buf, DWORD sd_buf_size)
 {
-  /* symlinks are anything for everyone! */
-  if ((attribute & S_IFLNK) == S_IFLNK)
-    attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
-
   psa->lpSecurityDescriptor = sd_buf;
   InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR) sd_buf,
 				SECURITY_DESCRIPTOR_REVISION);

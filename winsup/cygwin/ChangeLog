@@ -1,3 +1,10 @@
+2003-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink): Create security attributes so that only the
+	user can modify the symlink.
+	* security.cc (set_security_attribute): Remove symlink special
+	handling.
+
 2003-02-04  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* grp.cc (internal_getgroups): Do not return without closing
