@@ -1,3 +1,11 @@
+2001-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/unistd.h: Add prototypes for endusershell(),
+	getusershell(), iruserok(), revoke(), ruserok() and setusershell()
+	when __CYGWIN__ is defined.
+	* libc/sys/cygwin/sys/utmp.h: Add prototypes for login_tty() and
+	logwtmp().
+
 2001-11-01  Arati Dikey  <aratidikey@hotmail.com>
 
 	* libm/mathfp/sf_isinf.c (isinff): Change to use _DEFUN macro.
