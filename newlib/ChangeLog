@@ -1,3 +1,12 @@
+Wed Mar  8 00:46:41 2000  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
+
+	* libc/reent/Makefile.am (lib_a_SOURCES): Added unlinkr.c.
+	(CHEWOUT_FILES): Added unlinkr.def.
+	* libc/reent/Makefile.in: Rebuilt.
+	* libc/sys.tex: Include unlinkr.def.
+	* libc/reent/linkr.c (_unlink_r): Moved to...
+	* libc/reent/unlinkr.c: ... new file.
+
 Wed Mar  8 00:43:07 2000  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
 
 	* libc/string/Makefile.am (lib_a_SOURCES): Added swab.c.

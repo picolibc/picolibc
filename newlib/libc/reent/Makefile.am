@@ -20,6 +20,7 @@ lib_a_SOURCES = \
 	sbrkr.c \
 	statr.c \
 	timer.c \
+	unlinkr.c \
 	writer.c
 
 CHEWOUT_FILES = \
@@ -35,6 +36,7 @@ CHEWOUT_FILES = \
 	sbrkr.def \
 	statr.def \
 	timer.def \
+	unlinkr.def \
 	writer.def
 
 SUFFIXES = .def .h

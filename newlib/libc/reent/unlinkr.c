@@ -14,11 +14,7 @@
 #endif
 #endif
 
-#ifdef REENTRANT_SYSCALLS_PROVIDED
-
-int _dummy_link_syscalls = 1;
-
-#else
+#ifndef REENTRANT_SYSCALLS_PROVIDED
 
 /* We use the errno variable used by the system dependent layer.  */
 #undef errno
@@ -26,39 +22,36 @@ extern int errno;
 
 /*
 FUNCTION
-	<<_link_r>>---Reentrant version of link
+	<<_unlink_r>>---Reentrant version of unlink
 	
 INDEX
-	_link_r
+	_unlink_r
 
 ANSI_SYNOPSIS
 	#include <reent.h>
-	int _link_r(struct _reent *<[ptr]>,
-		    const char *<[old]>, const char *<[new]>);
+	int _unlink_r(struct _reent *<[ptr]>, const char *<[file]>);
 
 TRAD_SYNOPSIS
 	#include <reent.h>
-	int _link_r(<[ptr]>, <[old]>, <[new]>)
+	int _unlink_r(<[ptr]>, <[file]>)
 	struct _reent *<[ptr]>;
-	char *<[old]>;
-	char *<[new]>;
+	char *<[file]>;
 
 DESCRIPTION
-	This is a reentrant version of <<link>>.  It
+	This is a reentrant version of <<unlink>>.  It
 	takes a pointer to the global data block, which holds
 	<<errno>>.
 */
 
 int
-_link_r (ptr, old, new)
+_unlink_r (ptr, file)
      struct _reent *ptr;
-     _CONST char *old;
-     _CONST char *new;
+     _CONST char *file;
 {
   int ret;
 
   errno = 0;
-  if ((ret = _link (old, new)) == -1 && errno != 0)
+  if ((ret = _unlink (file)) == -1 && errno != 0)
     ptr->_errno = errno;
   return ret;
 }
