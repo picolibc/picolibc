@@ -1,3 +1,7 @@
+2003-01-24  Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* s390.h: Add s390 TLS relocations.
+
 2003-01-23  Nick Clifton  <nickc@redhat.com>
 
 	* Add sh2e support:
