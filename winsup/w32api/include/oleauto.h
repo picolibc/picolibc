@@ -38,8 +38,8 @@
 #define ACTIVEOBJECT_STRONG 0
 #define ACTIVEOBJECT_WEAK 1
 #ifdef NONAMELESSUNION
-#define V_UNION(X,Y) ((X)->n1.n2.n3.Y)
-#define V_VT(X) ((X)->n1.n2.vt)
+#define V_UNION(X,Y) ((X)->__VARIANT_NAME_1.__VARIANT_NAME_2.__VARIANT_NAME_3.Y)
+#define V_VT(X) ((X)->__VARIANT_NAME_1.__VARIANT_NAME_2.vt)
 #else
 #define V_UNION(X,Y) ((X)->Y)
 #define V_VT(X) ((X)->vt)
@@ -93,7 +93,7 @@
 #define V_ARRAYREF(X) V_UNION(X,pparray)
 #define V_BYREF(X) V_UNION(X,byref)
 #if defined(NONAMELESSUNION)
-#define V_DECIMAL(X) ((X)->n1.decVal)
+#define V_DECIMAL(X) ((X)->__VARIANT_NAME_1.decVal)
 #else
 #define V_DECIMAL(X) ((X)->decVal)
 #endif

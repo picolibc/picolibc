@@ -1,3 +1,8 @@
+2004-03-03  Martin Fuchs  <martin-fuchs@gmx.net>
+
+	* include/oleauto.h (V_UNION, V_VT, V_DECIMAL): Use
+	__VARIANT_NAME_ constants.
+
 2004-03-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/uxtheme.h: Include <commctrl.h>
