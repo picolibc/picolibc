@@ -617,7 +617,7 @@ fhandler_disk_file::opendir ()
 
   if (!pc.isdir ())
     set_errno (ENOTDIR);
-  else if ((len = strlen (pc))> CYG_MAX_PATH - 3)
+  else if ((len = strlen (pc)) > CYG_MAX_PATH - 3)
     set_errno (ENAMETOOLONG);
   else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);
