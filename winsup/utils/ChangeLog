@@ -1,3 +1,8 @@
+Fri Aug 25 12:41:53 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Only build dumper.exe when all of its library and
+	include dependencies are available.
+
 Fri Aug 25 11:44:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Make failure to build dumper.exe a non-error.
