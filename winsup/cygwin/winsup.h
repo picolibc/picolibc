@@ -61,13 +61,10 @@ extern const char case_folded_upper[];
 #undef _WINNETWK_H
 #undef _WINSVC_H
 
+#include "wincap.h"
+
 /* The one function we use from winuser.h most of the time */
 extern "C" DWORD WINAPI GetLastError (void);
-
-/* Used for runtime OS check/decisions. */
-enum os_type {winNT = 1, win95, win98, winME, win32s, unknown};
-extern os_type os_being_run;
-extern bool iswinnt;
 
 enum codepage_type {ansi_cp, oem_cp};
 extern codepage_type current_codepage;

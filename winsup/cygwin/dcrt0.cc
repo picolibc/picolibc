@@ -34,7 +34,6 @@ details. */
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
-#include "host_dependent.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
@@ -153,94 +152,6 @@ do_global_ctors (void (**in_pfunc)(), int force)
 
   if (user_data->magic_biscuit == SIZEOF_PER_PROCESS)
     atexit (do_global_dtors);
-}
-
-/* remember the type of Win32 OS being run for future use. */
-os_type NO_COPY os_being_run;
-char NO_COPY osname[40];
-bool iswinnt;
-
-/* set_os_type: Set global variable os_being_run with type of Win32
-   operating system being run.  This information is used internally
-   to manage the inconsistency in Win32 API calls between Win32 OSes. */
-/* Cygwin internal */
-static void
-set_os_type ()
-{
-  OSVERSIONINFO os_version_info;
-  const char *os;
-
-  memset (&os_version_info, 0, sizeof os_version_info);
-  os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-  GetVersionEx (&os_version_info);
-
-  iswinnt = 0;
-  switch (os_version_info.dwPlatformId)
-    {
-      case VER_PLATFORM_WIN32_NT:
-	os_being_run = winNT;
-	os = "NT";
-	iswinnt = 1;
-	break;
-      case VER_PLATFORM_WIN32_WINDOWS:
-	if (os_version_info.dwMinorVersion == 0)
-	  {
-	    os_being_run = win95;
-	    os = "95";
-	  }
-	else if (os_version_info.dwMinorVersion < 90)
-	  {
-	    os_being_run = win98;
-	    os = "98";
-	  }
-	else /* os_version_info.dwMinorVersion == 90 */
-	  {
-	    os_being_run = winME;
-	    os = "ME";
-	  }
-	break;
-      default:
-	os_being_run = unknown;
-	os = "??";
-	break;
-    }
-  __small_sprintf (osname, "%s-%d.%d", os, os_version_info.dwMajorVersion,
-		   os_version_info.dwMinorVersion);
-}
-
-host_dependent_constants NO_COPY host_dependent;
-
-/* Constructor for host_dependent_constants.  */
-
-void
-host_dependent_constants::init ()
-{
-  extern DWORD chunksize;
-  /* fhandler_disk_file::lock needs a platform specific upper word
-     value for locking entire files.
-
-     fhandler_base::open requires host dependent file sharing
-     attributes.  */
-
-  switch (os_being_run)
-    {
-    case winNT:
-      win32_upper = 0xffffffff;
-      shared = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-      break;
-
-    case winME:
-    case win98:
-    case win95:
-    case win32s:
-      win32_upper = 0x00000000;
-      shared = FILE_SHARE_READ | FILE_SHARE_WRITE;
-      chunksize = 32 * 1024 * 1024;
-      break;
-
-    default:
-      api_fatal ("unrecognized system type");
-    }
 }
 
 /*
@@ -544,7 +455,7 @@ static NO_COPY STARTUPINFO si;
 child_info_fork NO_COPY *child_proc_info = NULL;
 static MEMORY_BASIC_INFORMATION sm;
 
-#define CYGWIN_GUARD ((iswinnt) ? PAGE_GUARD : PAGE_NOACCESS)
+#define CYGWIN_GUARD ((wincap.has_page_guard ()) ? PAGE_GUARD : PAGE_NOACCESS)
 
 // __inline__ void
 extern void
@@ -649,7 +560,7 @@ dll_crt0_1 ()
   do_global_ctors (&__CTOR_LIST__, 1);
 
   /* Set the os_being_run global. */
-  set_os_type ();
+  wincap.init ();
   check_sanity_and_sync (user_data);
 
   /* Nasty static stuff needed by newlib -- point to a local copy of
@@ -721,9 +632,6 @@ dll_crt0_1 ()
     }
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
-
-  /* Initialize the host dependent constants object. */
-  host_dependent.init ();
 
   /* Initialize the cygwin subsystem if this is the first process,
      or attach to shared data structures if it's already running. */
@@ -888,8 +796,8 @@ _dll_crt0 ()
   strace.microseconds ();
 #endif
 
-  /* Set the os_being_run global. */
-  set_os_type ();
+  /* Set the os capabilities. */
+  wincap.init ();
 
   main_environ = user_data->envptr;
   *main_environ = NULL;

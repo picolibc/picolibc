@@ -108,7 +108,7 @@ extern "C"
 HANDLE
 cygwin_logon_user (const struct passwd *pw, const char *password)
 {
-  if (!iswinnt)
+  if (!wincap.has_security ())
     {
       set_errno (ENOSYS);
       return INVALID_HANDLE_VALUE;
@@ -1063,7 +1063,7 @@ static int
 get_nt_attribute (const char *file, int *attribute,
 		  uid_t *uidret, gid_t *gidret)
 {
-  if (!iswinnt)
+  if (!wincap.has_security ())
     return 0;
 
   syscall_printf ("file: %s", file);
@@ -1286,7 +1286,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 {
   BOOL dummy;
 
-  if (!iswinnt)
+  if (!wincap.has_security ())
     return NULL;
 
   if (!sd_ret || !sd_size_ret)
@@ -1334,13 +1334,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
    * This flag as well as the SetSecurityDescriptorControl call are available
    * only since Win2K.
    */
-  static int win2KorHigher = -1;
-  if (win2KorHigher == -1)
-    {
-      DWORD version = GetVersion ();
-      win2KorHigher = (version & 0x80000000) || (version & 0xff) < 5 ? 0 : 1;
-    }
-  if (win2KorHigher > 0)
+  if (wincap.has_security_descriptor_control ())
     SetSecurityDescriptorControl (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
 
   /* Create owner for local security descriptor. */
@@ -1559,7 +1553,7 @@ static int
 set_nt_attribute (const char *file, uid_t uid, gid_t gid,
 		  const char *logsrv, int attribute)
 {
-  if (!iswinnt)
+  if (!wincap.has_security ())
     return 0;
 
   DWORD sd_size = 4096;

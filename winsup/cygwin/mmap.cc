@@ -83,7 +83,7 @@ class mmap_record
 	/* Allocate one bit per page */
 	map_map_ = (DWORD *) calloc (MAPSIZE(PAGE_CNT (size_to_map_)),
 				     sizeof (DWORD));
-	if (iswinnt)
+	if (wincap.virtual_protect_works_on_shared_pages ())
 	  {
 	    DWORD old_prot;
 	    if (!VirtualProtect (base_address_, size_to_map_,
@@ -144,7 +144,7 @@ mmap_record::map_map (DWORD off, DWORD len)
       off = find_empty (len);
       if (off != (DWORD)-1)
 	{
-	  if (iswinnt
+	  if (wincap.virtual_protect_works_on_shared_pages ()
 	      && !VirtualProtect (base_address_ + off * getpagesize (),
 				  len * getpagesize (), prot, &old_prot))
 	    syscall_printf ("-1 = map_map (): %E");
@@ -157,7 +157,7 @@ mmap_record::map_map (DWORD off, DWORD len)
     }
   off -= offset_;
   DWORD start = off / getpagesize ();
-  if (iswinnt
+  if (wincap.virtual_protect_works_on_shared_pages ()
       && !VirtualProtect (base_address_ + start * getpagesize (),
 			  len * getpagesize (), prot, &old_prot))
     syscall_printf ("-1 = map_map (): %E");
@@ -174,7 +174,7 @@ mmap_record::unmap_map (caddr_t addr, DWORD len)
   DWORD off = addr - base_address_;
   off /= getpagesize ();
   len = PAGE_CNT (len);
-  if (iswinnt
+  if (wincap.virtual_protect_works_on_shared_pages ()
       && !VirtualProtect (base_address_ + off * getpagesize (),
 			  len * getpagesize (), PAGE_NOACCESS, &old_prot))
     syscall_printf ("-1 = unmap_map (): %E");
@@ -192,7 +192,7 @@ mmap_record::unmap_map (caddr_t addr, DWORD len)
 void
 mmap_record::fixup_map ()
 {
-  if (!iswinnt)
+  if (!wincap.virtual_protect_works_on_shared_pages ())
     return;
 
   DWORD prot, old_prot;
@@ -426,7 +426,8 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   /* copy-on-write doesn't work correctly on 9x. To have at least read
      access we use *READ mapping on 9x when appropriate. It will still
      fail when needing write access, though. */
-  if ((flags & MAP_PRIVATE) && (iswinnt || (prot & ~PROT_READ)))
+  if ((flags & MAP_PRIVATE) && (wincap.has_working_copy_on_write ()
+  				|| (prot & ~PROT_READ)))
     access = FILE_MAP_COPY;
 
   SetResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
@@ -437,7 +438,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
    * CV: This assumption isn't correct. See Microsoft Platform SDK, Memory,
    * description of call `MapViewOfFileEx'.
    */
-  if ((!iswinnt) && (flags & MAP_FIXED))
+  if ((!wincap.is_winnt ()) && (flags & MAP_FIXED))
     {
       set_errno (EINVAL);
       syscall_printf ("-1 = mmap(): win95 and MAP_FIXED");
@@ -745,7 +746,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
   /* On 9x/ME try first to open the mapping by name when opening a
      shared file object. This is needed since 9x/ME only shares
      objects between processes by name. What a mess... */
-  if (!iswinnt
+  if (wincap.share_mmaps_only_by_name ()
       && get_handle () != INVALID_HANDLE_VALUE
       && get_device () == FH_DISK
       && !(access & FILE_MAP_COPY))

@@ -87,7 +87,8 @@ delqueue_list::process_queue ()
 	    int res = GetLastError ();
 	    empty = 0;
 	    if (res == ERROR_SHARING_VIOLATION ||
-		(!iswinnt && res == ERROR_ACCESS_DENIED))
+		(wincap.access_denied_on_delete ()
+		 && res == ERROR_ACCESS_DENIED))
 	      {
 		/* File still inuse, that's ok */
 		syscall_printf ("Still using %s", name[i]);

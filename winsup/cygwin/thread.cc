@@ -499,7 +499,7 @@ int
 pthread_cond::TimedWait (DWORD dwMilliseconds)
 {
   DWORD rv;
-  if (!iswinnt)
+  if (!wincap.has_signal_object_and_wait ())
     {
       // FIXME: race condition (potentially drop events
       // Possible solution (single process only) - place this in a critical section.
@@ -621,7 +621,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREA
       magic = 0;
       return;
     }
-  if (iswinnt)
+  if (wincap.has_try_enter_critical_section ())
     InitializeCriticalSection (&criticalsection);
   else
     {
@@ -637,7 +637,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREA
 
 pthread_mutex::~pthread_mutex ()
 {
-  if (iswinnt)
+  if (wincap.has_try_enter_critical_section ())
     DeleteCriticalSection (&criticalsection);
   else
     {
@@ -663,7 +663,7 @@ pthread_mutex::~pthread_mutex ()
 int
 pthread_mutex::Lock ()
 {
-  if (iswinnt)
+  if (wincap.has_try_enter_critical_section ())
     {
       EnterCriticalSection (&criticalsection);
       return 0;
@@ -676,7 +676,7 @@ pthread_mutex::Lock ()
 int
 pthread_mutex::TryLock ()
 {
-  if (iswinnt)
+  if (wincap.has_try_enter_critical_section ())
     return (!TryEnterCriticalSection (&criticalsection));
   return (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT);
 }
@@ -684,7 +684,7 @@ pthread_mutex::TryLock ()
 int
 pthread_mutex::UnLock ()
 {
-  if (iswinnt)
+  if (wincap.has_try_enter_critical_section ())
     {
       LeaveCriticalSection (&criticalsection);
       return 0;
@@ -699,7 +699,7 @@ pthread_mutex::fixup_after_fork ()
   if (pshared != PTHREAD_PROCESS_PRIVATE)
     api_fatal("pthread_mutex::fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's\n");
   /* FIXME: duplicate code here and in the constructor. */
-  if (iswinnt)
+  if (wincap.has_try_enter_critical_section ())
     InitializeCriticalSection(&criticalsection);
   else
     {

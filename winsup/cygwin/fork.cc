@@ -35,7 +35,6 @@ static int npid_max;
 static pid_t fork_pids[100];
 #endif
 
-DWORD NO_COPY chunksize = 0;
 /* Timeout to wait for child to start, parent to init child, etc.  */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */
 #define FORK_WAIT_TIMEOUT (300 * 1000)     /* 300 seconds */
@@ -87,7 +86,7 @@ fork_copy (PROCESS_INFORMATION &pi, const char *what, ...)
   while ((low = va_arg (args, char *)))
     {
       char *high = va_arg (args, char *);
-      DWORD todo = chunksize ?: high - low;
+      DWORD todo = wincap.chunksize () ?: high - low;
       char *here;
 
       for (here = low; here < high; here += todo)

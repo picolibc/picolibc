@@ -24,7 +24,6 @@ details. */
 #include "cygheap.h"
 #include "path.h"
 #include "shared_info.h"
-#include "host_dependent.h"
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
@@ -364,7 +363,7 @@ fhandler_base::open (int flags, mode_t mode)
     set_append_p();
 
   /* These flags are host dependent. */
-  shared = host_dependent.shared;
+  shared = wincap.shared ();
 
   file_attributes = FILE_ATTRIBUTE_NORMAL;
   if (flags & O_DIROPEN)
@@ -579,7 +578,7 @@ fhandler_base::write (const void *ptr, size_t len)
 
   if (get_append_p ())
     SetFilePointer (get_handle(), 0, 0, FILE_END);
-  else if (!iswinnt && get_check_win95_lseek_bug ())
+  else if (wincap.has_lseek_bug () && get_check_win95_lseek_bug ())
     {
       /* Note: this bug doesn't happen on NT4, even though the documentation
 	 for WriteFile() says that it *may* happen on any OS. */
@@ -1419,14 +1418,14 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
   if (win32_len == 0)
     {
       win32_len = 0xffffffff;
-      win32_upper = host_dependent.win32_upper;
+      win32_upper = wincap.lock_file_highword ();
     }
   else
     win32_upper = 0;
 
   BOOL res;
 
-  if (iswinnt)
+  if (wincap.has_lock_file_ex ())
     {
       DWORD lock_flags = (cmd == F_SETLK) ? LOCKFILE_FAIL_IMMEDIATELY : 0;
       lock_flags |= (fl->l_type == F_WRLCK) ? LOCKFILE_EXCLUSIVE_LOCK : 0;

@@ -185,7 +185,7 @@ public:
 extern __inline pid_t
 cygwin_pid (pid_t pid)
 {
-  return (pid_t) (iswinnt) ? pid : -(int) pid;
+  return (pid_t) (wincap.has_negative_pids ()) ? -(int) pid : pid;
 }
 
 void __stdcall pinfo_init (char **, int);

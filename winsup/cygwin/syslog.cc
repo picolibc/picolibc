@@ -300,10 +300,10 @@ syslog (int priority, const char *message, ...)
 	      return;
 	  }
 
-	if (!iswinnt)
+	if (!wincap.has_eventlog ())
 	  {
-	    /* Add a priority string - not needed for NT
-	       as NT has its own priority codes. */
+	    /* Add a priority string - not needed for systems with
+	       eventlog capability. */
 	    switch (LOG_PRI (priority))
 	      {
 	      case LOG_ERR:
@@ -336,7 +336,7 @@ syslog (int priority, const char *message, ...)
 
     msg_strings[0] = total_msg;
 
-    if (iswinnt)
+    if (wincap.has_eventlog ())
       {
 	/* For NT, open the event log and send the message */
 	HANDLE hEventSrc = RegisterEventSourceA (NULL, (process_ident != NULL) ?

@@ -56,37 +56,39 @@ sysconf (int in)
 #endif
       case _SC_NPROCESSORS_CONF:
       case _SC_NPROCESSORS_ONLN:
-	if (!iswinnt)
+	if (!wincap.supports_smp ())
 	  return 1;
 	/*FALLTHRU*/
       case _SC_PHYS_PAGES:
       case _SC_AVPHYS_PAGES:
-	{
-	  NTSTATUS ret;
-	  SYSTEM_BASIC_INFORMATION sbi;
-	  if ((ret = NtQuerySystemInformation (SystemBasicInformation,
-						 (PVOID) &sbi,
-					       sizeof sbi, NULL))
-		!= STATUS_SUCCESS)
-	    {
-	      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	      debug_printf("NtQuerySystemInformation: ret = %d, "
-			   "Dos(ret) = %d",
-			   ret, RtlNtStatusToDosError (ret));
-	      return -1;
-	    }
-	  switch (in)
-	    {
-	    case _SC_NPROCESSORS_CONF:
-	     return sbi.NumberProcessors;
-	    case _SC_NPROCESSORS_ONLN:
-	     return sbi.ActiveProcessors;
-	    case _SC_PHYS_PAGES:
-	      return sbi.NumberOfPhysicalPages;
-	    case _SC_AVPHYS_PAGES:
-	      return sbi.HighestPhysicalPage - sbi.LowestPhysicalPage + 1;
-	    }
-	}
+	if (!wincap.supports_smp ())
+	  {
+	    NTSTATUS ret;
+	    SYSTEM_BASIC_INFORMATION sbi;
+	    if ((ret = NtQuerySystemInformation (SystemBasicInformation,
+						   (PVOID) &sbi,
+						 sizeof sbi, NULL))
+		  != STATUS_SUCCESS)
+	      {
+		__seterrno_from_win_error (RtlNtStatusToDosError (ret));
+		debug_printf("NtQuerySystemInformation: ret = %d, "
+			     "Dos(ret) = %d",
+			     ret, RtlNtStatusToDosError (ret));
+		return -1;
+	      }
+	    switch (in)
+	      {
+	      case _SC_NPROCESSORS_CONF:
+	       return sbi.NumberProcessors;
+	      case _SC_NPROCESSORS_ONLN:
+	       return sbi.ActiveProcessors;
+	      case _SC_PHYS_PAGES:
+		return sbi.NumberOfPhysicalPages;
+	      case _SC_AVPHYS_PAGES:
+		return sbi.HighestPhysicalPage - sbi.LowestPhysicalPage + 1;
+	      }
+	  }
+        break;
     }
 
   /* Invalid input or unimplemented sysconf name */

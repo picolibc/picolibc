@@ -28,7 +28,7 @@ fhandler_dev_mem::fhandler_dev_mem (const char *name, int nunit)
   unit (nunit)
 {
   /* Reading physical memory only supported on NT/W2K. */
-  if (!iswinnt)
+  if (!wincap.has_physical_mem_access ())
     {
       mem_size = 0;
       return;
@@ -74,7 +74,7 @@ fhandler_dev_mem::~fhandler_dev_mem (void)
 int
 fhandler_dev_mem::open (const char *, int flags, mode_t)
 {
-  if (!iswinnt)
+  if (!wincap.has_physical_mem_access ())
     {
       set_errno (ENOENT);
       debug_printf ("%s is accessible under NT/W2K only",
@@ -413,7 +413,7 @@ fhandler_dev_mem::fstat (struct stat *buf)
 
   memset (buf, 0, sizeof *buf);
   buf->st_mode = S_IFCHR;
-  if (!iswinnt)
+  if (!wincap.has_physical_mem_access ())
     buf->st_mode |= S_IRUSR | S_IWUSR |
 		    S_IRGRP | S_IWGRP |
 		    S_IROTH | S_IWOTH;

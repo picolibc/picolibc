@@ -21,11 +21,10 @@ uname (struct utsname *name)
 {
   DWORD len;
   SYSTEM_INFO sysinfo;
-  extern char osname[];
   char *snp = strstr  (cygwin_version.dll_build_date, "SNP");
 
   memset (name, 0, sizeof (*name));
-  __small_sprintf (name->sysname, "CYGWIN_%s", osname);
+  __small_sprintf (name->sysname, "CYGWIN_%s", wincap.osname ());
 
   GetSystemInfo (&sysinfo);
 

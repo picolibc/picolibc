@@ -121,7 +121,7 @@ WSADATA wsadata;
 static SOCKET __stdcall
 set_socket_inheritance (SOCKET sock)
 {
-  if (iswinnt)
+  if (wincap.has_set_handle_information ())
     (void) SetHandleInformation ((HANDLE) sock, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
   else
     {
@@ -1527,9 +1527,9 @@ getdomainname (char *domain, int len)
    * Punt for now and assume MS-TCP on Win95.
    */
   reg_key r (HKEY_LOCAL_MACHINE, KEY_READ,
-	     (!iswinnt) ? "System" : "SYSTEM",
+	     (!wincap.is_winnt ()) ? "System" : "SYSTEM",
 	     "CurrentControlSet", "Services",
-	     (!iswinnt) ? "MSTCP" : "Tcpip",
+	     (!wincap.is_winnt ()) ? "MSTCP" : "Tcpip",
 	     NULL);
 
   /* FIXME: Are registry keys case sensitive? */
@@ -2107,22 +2107,12 @@ get_ifconf (struct ifconf *ifc, int what)
   memset (&os_version_info, 0, sizeof os_version_info);
   os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
   GetVersionEx (&os_version_info);
-  /* We have a win95 version... */
-  if (os_version_info.dwPlatformId != VER_PLATFORM_WIN32_NT
-      && (os_version_info.dwMajorVersion < 4
-	  || (os_version_info.dwMajorVersion == 4
-	      && os_version_info.dwMinorVersion == 0)))
-    get_95_ifconf (ifc, what);
-  /* ...and a NT <= SP3 version... */
-  else if (os_version_info.dwPlatformId == VER_PLATFORM_WIN32_NT
-	   && (os_version_info.dwMajorVersion < 4
-	       || (os_version_info.dwMajorVersion == 4
-		   && strcmp (os_version_info.szCSDVersion, "Service Pack 4") < 0)))
-    get_nt_ifconf (ifc, what);
-  /* ...and finally a "modern" version for win98/ME, NT >= SP4 and W2K! */
-  else
+  if (wincap.has_ip_helper_lib ())
     get_2k_ifconf (ifc, what);
-
+  else if (wincap.is_winnt ())
+    get_nt_ifconf (ifc, what);
+  else
+    get_95_ifconf (ifc, what);
   return 0;
 }
 

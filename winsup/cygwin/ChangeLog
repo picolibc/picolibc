@@ -1,3 +1,30 @@
+Wed Sep 12 19:00:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* Makefile.in: Build wincap.o.
+	* wincap.cc: New file.
+	* wincap.h: Ditto.
+	* autoload.cc: Add dynamic load statement for `CreateHardLinkA'.
+	* dcrt0.cc (os_being_run): Eliminated.
+	(osname): Ditto.
+	(iswinnt): Ditto.
+	(set_os_type): Ditto.
+	(dll_crt0_1): Call wincap.init() instead of set_os_type().
+	(_dll_crt0): Ditto.
+	* environ.cc (set_chunksize): New function.
+	(parse_thing): `forkchunk' setting now invokes function `set_chunksize'.
+	* fork.cc (chunksize): Eliminated. Moved to be member of wincap.
+	* host_dependent.h: Removed.
+	* syscalls.cc (_link): Try using `CreateHardLinkA' first, if available.
+	* cygheap.cc, dcrt0.cc, delqueue.cc, dir.cc,
+	environ.cc, fhandler.cc, fhandler.h, fhandler_console.cc,
+	fhandler_mem.cc, fork.cc, mmap.cc, net.cc, pinfo.cc, pinfo.h,
+	security.cc, syscalls.cc, sysconf.cc, syslog.cc, thread.cc,
+	times.cc, tty.cc, uinfo.cc, uname.cc, winsup.h: Use new wincap
+	capability check throughout.
+	* winsup.h: Include wincap.h. Eliminate extern declarations of
+	`os_being_run' and `iswinnt'. Eliminate `os_type" definition.
+	* include/cygwin/version.h: Bump version to 1.3.4.
+
 Wed Sep 12 01:03:36 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (call_signal_handler_now): Add additional guard against

@@ -392,7 +392,7 @@ tty::common_init (fhandler_pty_master *ptym)
 
   /* Allow the others to open us (for handle duplication) */
 
-  if ((iswinnt) &&
+  if (wincap.has_security () &&
       (SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION,
 			       get_null_sd ()) == FALSE))
     small_printf ("Can't set process security, %E");

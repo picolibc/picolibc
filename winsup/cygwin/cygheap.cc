@@ -96,7 +96,7 @@ cygheap_fixup_in_child (child_info *ci, bool execed)
 {
   cygheap = ci->cygheap;
   cygheap_max = ci->cygheap_max;
-  void *addr = iswinnt ? cygheap : NULL;
+  void *addr = !wincap.map_view_of_file_ex_sucks () ? cygheap : NULL;
   void *newaddr;
 
   newaddr = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, addr);

@@ -405,7 +405,7 @@ rmdir (const char *dir)
 	{
 	  /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
 	     a non-empty directory. */
-	  if (!iswinnt)
+	  if (wincap.access_denied_on_delete ())
 	    set_errno (ENOTEMPTY);
 	  else
 	    __seterrno ();

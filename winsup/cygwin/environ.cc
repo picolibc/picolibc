@@ -35,7 +35,6 @@ extern BOOL allow_smbntsec;
 extern BOOL allow_winsymlinks;
 extern BOOL strip_title_path;
 extern int pcheck_case;
-extern DWORD chunksize;
 extern int subauth_id;
 BOOL reset_com = TRUE;
 static BOOL envcache = TRUE;
@@ -474,6 +473,12 @@ subauth_id_init (const char *buf)
     subauth_id = i;
 }
 
+static void
+set_chunksize (const char *buf)
+{
+  wincap.set_chunksize (strtol (buf, NULL, 0));
+}
+
 /* The structure below is used to set up an array which is used to
    parse the CYGWIN environment variable or, if enabled, options from
    the registry.  */
@@ -503,7 +508,7 @@ static struct parse_thing
   {"envcache", {&envcache}, justset, NULL, {{TRUE}, {FALSE}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{FALSE}, {TRUE}}},
-  {"forkchunk", {x: &chunksize}, justset, NULL, {{8192}, {0}}},
+  {"forkchunk", {func: set_chunksize}, isfunc, NULL, {{0}, {0}}},
   {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
   {"ntea", {&allow_ntea}, justset, NULL, {{FALSE}, {TRUE}}},
   {"ntsec", {&allow_ntsec}, justset, NULL, {{FALSE}, {TRUE}}},
@@ -658,7 +663,7 @@ environ_init (char **envp, int envc)
 
 #ifdef NTSEC_ON_BY_DEFAULT
   /* Set ntsec explicit as default, if NT is running */
-  if (iswinnt)
+  if (wincap.has_security ())
     allow_ntsec = TRUE;
 #endif
 

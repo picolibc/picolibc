@@ -315,7 +315,7 @@ fhandler_console::read (void *pv, size_t buflen)
 		 part is to distinguish whether the right Alt key should be
 		 recognized as Alt, or as AltGr. */
 	      bool meta;
-	      if (iswinnt)
+	      if (wincap.altgr_is_ctrl_alt ())
 		/* WinNT: AltGr is reported as Ctrl+Alt, and Ctrl+Alt is
 		   treated just like AltGr.  However, if Ctrl+Alt+key generates
 		   an ASCII control character, interpret is as META. */
