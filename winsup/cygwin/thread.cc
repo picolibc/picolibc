@@ -499,24 +499,37 @@ pthread_cond::Signal ()
 	system_printf ("Failed to unlock condition variable access mutex, this %p", this);
       return;
     }
+  /* Prime the detection flag */
+  ExitingWait = 1;
+  /* Signal any waiting thread */
   PulseEvent (win32_obj_id);
   /* No one can start waiting until we release the condition access mutex */
   /* The released thread will decrement waiting when it gets a time slice...
      without waiting for the access mutex
+   * InterLockedIncrement on 98 +, NT4 + returns the incremented value.
+   * On 95, nt 3.51 < it returns a sign correct number - 0=0, + for greater than 0, -
+   * for less than 0.
+   * Because of this we cannot spin on the waiting count, but rather we need a
+   * dedicated flag for a thread exiting the Wait function.
+   * Also not that Interlocked* sync CPU caches with memory.
    */
   int spins = 10;
-  while (InterlockedIncrement (&waiting) != (temp - 1) && spins)
+  /* When ExitingWait is nonzero after a decrement, the leaving thread has
+   * done it's thing
+   */
+  while (InterlockedDecrement (&ExitingWait) == 0 && spins)
     {
-      InterlockedDecrement (&waiting);
+      InterlockedIncrement (&ExitingWait);
       /* give up the cpu to force a context switch. */
       Sleep (0);
       if (spins == 5)
-	/* we've had 5 timeslices, and the woekn thread still hasn't done it's
+	/* we've had 5 timeslices, and the woken thread still hasn't done it's
 	 * thing - maybe we raced it with the event? */
 	PulseEvent (win32_obj_id);
       spins--;
     }
-  InterlockedDecrement (&waiting);
+  if (waiting + 1 != temp)
+    system_printf ("Released too many threads - %d now %d originally", waiting, temp);
   if (pthread_mutex_unlock (&cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %p", this);
 }
@@ -1782,6 +1795,8 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   bool last = false;
   if (InterlockedDecrement (&((*cond)->waiting)) == 0)
     last = true;
+  /* Tell Signal that we have been released */
+  InterlockedDecrement (&((*cond)->ExitingWait));
   (*themutex)->Lock ();
   if (last == true)
     (*cond)->mutex = NULL;

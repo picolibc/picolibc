@@ -1,3 +1,10 @@
+2001-12-26  Robert Collins  <rbtcollins@hotmail.com>
+
+	* thread.cc (pthread_cond::Signal): Use a separate flag for signal detection
+	and broadcast semantics.
+	(__pthread_cond_dowait): Ditto.
+	* thread.h (pthread_cond): New flag for testing when a waiter has woken.
+
 2001-12-26  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Quote arguments to shell scripts.
@@ -116,6 +123,7 @@
 	* net.cc (cygwin_getsockopt): Dereference optlen pointer when passing
 	to __check_null_invalid_struct_errno.
 
+>>>>>>> 1.1060
 2001-12-03  Christopher Faylor  <cgf@redhat.com>
 
 	* net.cc (cygwin_getsockopt): Allow NULL optval.

@@ -306,6 +306,7 @@ class pthread_cond:public verifyable_object
 public:
   int shared;
   LONG waiting;
+  LONG ExitingWait;
   pthread_mutex *mutex;
   /* to allow atomic behaviour for cond_broadcast */
   pthread_mutex_t cond_access;
