@@ -1,5 +1,10 @@
 2003-05-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/prsht.h (PROPSHEETHEADER[AW]: Mark
+	anonymous unions as GCC extension.
+
+2003-05-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/oleidl.h  (LPENUMOLEDOCUMENTVIEWS): Remove typedef.
 	(IEnumOleDocumentViews): Remove commented out DECLARE_ENUMERATOR.
 	* include/docobj.h  (LPENUMOLEDOCUMENTVIEWS): Add typedef (previously

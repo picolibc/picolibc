@@ -185,12 +185,12 @@ typedef struct _PROPSHEETHEADERA {
 	}DUMMYUNIONNAME3;
 	PFNPROPSHEETCALLBACK pfnCallback;
 #if (_WIN32_IE >= 0x0400)
-	union {
+	_ANONYMOUS_UNION union {
 		HBITMAP hbmWatermark;
 		LPCSTR pszbmWatermark;
 	} DUMMYUNIONNAME4;
 	HPALETTE hplWatermark;
-	union {
+	_ANONYMOUS_UNION union {
 		HBITMAP hbmHeader;
 		LPCSTR pszbmHeader;
 	} DUMMYUNIONNAME5;
@@ -218,12 +218,12 @@ typedef struct _PROPSHEETHEADERW {
 	}DUMMYUNIONNAME3;
 	PFNPROPSHEETCALLBACK pfnCallback;
 #if (_WIN32_IE >= 0x0400)
-	union {
+	_ANONYMOUS_UNION union {
 		HBITMAP hbmWatermark;
 		LPCWSTR pszbmWatermark;
 	} DUMMYUNIONNAME4;
 	HPALETTE hplWatermark;
-	union {
+	_ANONYMOUS_UNION union {
 		HBITMAP hbmHeader;
 		LPCWSTR pszbmHeader;
 	} DUMMYUNIONNAME5;
