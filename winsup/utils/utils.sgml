@@ -689,7 +689,7 @@ set the automount prefix to <filename>/</filename>:</para>
 
 <para>Note that if you set a new prefix in this manner, you can
 specify the <literal>-s</literal> flag to make this the system-wide default 
-prefix.  By default, the cygdrive-prefix applies only to the current user.  
+prefix.  By default, the cygdrive-prefix applies only to the system-wide setting.  
 You can always see the user and system cygdrive prefixes with the 
 <literal>-p</literal> option.  Using the <literal>-b</literal>
 flag with <literal>--change-cygdrive-prefix</literal> makes all new 
