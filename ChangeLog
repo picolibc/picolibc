@@ -1,3 +1,8 @@
+2003-05-30  Nick Clifton  <nickc@redhat.com>
+
+	* README-maintainer-mode: Update URL for locating blessed config
+	tools.
+
 2003-05-29  Robert Millan  <rmh@debian.org>
 
 	* ltconfig: Import this patch and modify for use with current
