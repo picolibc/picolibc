@@ -286,6 +286,8 @@ fhandler_socket::dup (fhandler_base *child)
   fhandler_socket *fhs = (fhandler_socket *) child;
   fhs->addr_family = addr_family;
   fhs->set_io_handle (get_io_handle ());
+  if (get_addr_family () == AF_LOCAL)
+    fhs->set_sun_path (get_sun_path ());
 
   fhs->fixup_before_fork_exec (GetCurrentProcessId ());
   if (winsock2_active)
