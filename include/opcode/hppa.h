@@ -492,7 +492,7 @@ static const struct pa_opcode pa_opcodes[] =
 { "depw",       0xd4000000, 0xfc001be0, "cz?xx,!,T,b", pa10, FLAG_STRICT},
 { "depw",       0xd4000800, 0xfc001800, "cz?xx,p,T,b", pa10, FLAG_STRICT},
 { "depwi",      0xd4001000, 0xfc001be0, "cz?x5,!,T,b", pa10, FLAG_STRICT},
-{ "depwi",      0xd4001800, 0xfc001be0, "cz?x5,p,T,b", pa10, FLAG_STRICT},
+{ "depwi",      0xd4001800, 0xfc001800, "cz?x5,p,T,b", pa10, FLAG_STRICT},
 { "zvdep",      0xd4000000, 0xfc001fe0, "?xx,T,b", pa10},
 { "vdep",       0xd4000400, 0xfc001fe0, "?xx,T,b", pa10},
 { "zdep",       0xd4000800, 0xfc001c00, "?xx,p,T,b", pa10},
