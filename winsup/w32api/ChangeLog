@@ -1,5 +1,13 @@
 2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h [WINVER >= 0x0500] (RegisterDeviceNotification[AW],
+	DEVICE_NOTIFY_WINDOW_HANDLE, DEVICE_NOTIFY_SERVICE_HANDLE,
+	DEVICE_NOTIFY_ALL_INTERFACE_CLASSES): Add function and constants.
+
+	* lib/user32.def (RegisterDeviceNotification[AW]): Add function.
+
+2003-09-26  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h [WINVER >= 0x0500] (SetWinEventHook, WINEVENTPROC,
 	WINEVENT_OUTOFCONTEXT, WINEVENT_SKIPOWNTHREAD, WINEVENT_SKIPOWNPROCESS,
 	WINEVENT_INCONTEXT): Add function, typedef, and constants.

@@ -2117,6 +2117,13 @@ extern "C" {
 #define GMMP_USE_DISPLAY_POINTS 1
 #define GMMP_USE_HIGH_RESOLUTION_POINTS 2
 #endif
+#if (WINVER >= 0x0500)
+#define DEVICE_NOTIFY_WINDOW_HANDLE 0x00000000
+#define DEVICE_NOTIFY_SERVICE_HANDLE 0x00000001
+#if(_WIN32_WINNT >= 0x0501)
+#define DEVICE_NOTIFY_ALL_INTERFACE_CLASSES 0x00000004
+#endif
+#endif /* (WINVER >= 0x0500) */
 
 #ifndef RC_INVOKED
 typedef BOOL(CALLBACK *DLGPROC)(HWND,UINT,WPARAM,LPARAM);
@@ -3395,6 +3402,10 @@ ATOM WINAPI RegisterClassExA(CONST WNDCLASSEXA*);
 ATOM WINAPI RegisterClassExW(CONST WNDCLASSEXW*);
 UINT WINAPI RegisterClipboardFormatA(LPCSTR);
 UINT WINAPI RegisterClipboardFormatW(LPCWSTR);
+#if (WINVER >= 0x0500)
+HDEVNOTIFY WINAPI RegisterDeviceNotificationA(HANDLE,LPVOID,DWORD);
+HDEVNOTIFY WINAPI RegisterDeviceNotificationW(HANDLE,LPVOID,DWORD);
+#endif
 BOOL WINAPI RegisterHotKey(HWND,int,UINT,UINT);
 UINT WINAPI RegisterWindowMessageA(LPCSTR);
 UINT WINAPI RegisterWindowMessageW(LPCWSTR);
@@ -3683,6 +3694,7 @@ typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 #define RegisterClass RegisterClassW
 #define RegisterClassEx RegisterClassExW
 #define RegisterClipboardFormat RegisterClipboardFormatW
+#define RegisterDeviceNotification RegisterDeviceNotificationW
 #define RegisterWindowMessage RegisterWindowMessageW
 #define RemoveProp RemovePropW
 #define SendDlgItemMessage SendDlgItemMessageW
@@ -3844,6 +3856,7 @@ typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 #define RegisterClass RegisterClassA
 #define RegisterClassEx RegisterClassExA
 #define RegisterClipboardFormat RegisterClipboardFormatA
+#define RegisterDeviceNotification RegisterDeviceNotificationA
 #define RegisterWindowMessage RegisterWindowMessageA
 #define RemoveProp RemovePropA
 #define SendDlgItemMessage SendDlgItemMessageA
