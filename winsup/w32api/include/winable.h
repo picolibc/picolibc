@@ -4,8 +4,6 @@
 #pragma GCC system_header
 #endif
 
-#include <stdarg.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
