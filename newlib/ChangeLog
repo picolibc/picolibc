@@ -1,5 +1,10 @@
 2002-08-28  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * libc/include/newlib.h: New file for tools that use newlib
+        headers but don't build newlib first (e.g. gcc).
+
+2002-08-28  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/stdlib/wmemchr.c: Explicitly include <_ansi.h>.
 	* libc/stdlib/wmemcmp.c: Ditto.
 	* libc/stdlib/wmemcpy.c: Ditto.
