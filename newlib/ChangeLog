@@ -1,3 +1,9 @@
+2002-07-11  Chris Demetriou  <cgd@broadcom.com>
+
+        * testsuite/newlib.search/hsearchtest.c: New file to test
+        newlib/libc/search.
+        * testsuite/newlib.search/hsearchtest.exp: Likewise.
+
 2002-07-10  Florian Schrack  <florian.schrack@freenet.de>
 
 	* libc/sys/mmixware/read.c: Use SYS_Fgets syscall if dealing with
