@@ -27,15 +27,14 @@ char *
 internal_getlogin (struct pinfo *pi)
 {
   DWORD username_len = MAX_USER_NAME;
-  LPWKSTA_USER_INFO_1 ui = NULL;
 
   if (! pi)
     api_fatal ("pinfo pointer is NULL!\n");
 
   if (os_being_run == winNT)
     {
-      int ret = NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&ui);
-      if (! ret)
+      LPWKSTA_USER_INFO_1 ui;
+      if (allow_ntsec && !NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&ui))
         {
           wcstombs (pi->domain,
                     ui->wkui1_logon_domain,
@@ -56,7 +55,7 @@ internal_getlogin (struct pinfo *pi)
                           (wcslen (logon_srv) + 1) * sizeof (WCHAR));
               if (logon_srv)
                 NetApiBufferFree (logon_srv);
-              debug_printf ("AnyDC Server: %s", pi->logsrv);
+              debug_printf ("DC Server: %s", pi->logsrv);
             }
           else
             debug_printf ("Logon Server: %s", pi->logsrv);
@@ -66,32 +65,28 @@ internal_getlogin (struct pinfo *pi)
           debug_printf ("Windows Username: %s", pi->username);
           NetApiBufferFree (ui);
         }
-      else
+      else if (! GetUserName (pi->username, &username_len))
+        strcpy (pi->username, "unknown");
+      if (!lookup_name (pi->username, pi->logsrv, pi->psid))
         {
-          debug_printf ("%d = NetWkstaUserGetInfo ()\n", ret);
-          if (! GetUserName (pi->username, &username_len))
-            strcpy (pi->username, "unknown");
+          debug_printf ("myself->psid = NULL");
+          pi->psid = NULL;
         }
-        if (!lookup_name (pi->username, pi->logsrv, pi->psid))
-          {
-            debug_printf ("myself->psid = NULL");
-            pi->psid = NULL;
-          }
-        else if (allow_ntsec)
-          {
-            extern BOOL get_pw_sid (PSID, struct passwd*);
-            struct passwd *pw;
-            char psidbuf[40];
-            PSID psid = (PSID) psidbuf;
+      else if (allow_ntsec)
+        {
+          extern BOOL get_pw_sid (PSID, struct passwd*);
+          struct passwd *pw;
+          char psidbuf[40];
+          PSID psid = (PSID) psidbuf;
 
-            while ((pw = getpwent ()) != NULL)
-              if (get_pw_sid (psid, pw) && EqualSid (pi->psid, psid))
-                {
-                  strcpy (pi->username, pw->pw_name);
-                  break;
-                }
-            endpwent ();
-          }
+          while ((pw = getpwent ()) != NULL)
+            if (get_pw_sid (psid, pw) && EqualSid (pi->psid, psid))
+              {
+                strcpy (pi->username, pw->pw_name);
+                break;
+              }
+          endpwent ();
+        }
     }
   else
     {

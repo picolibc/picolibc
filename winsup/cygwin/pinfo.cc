@@ -99,6 +99,8 @@ pinfo_init (LPBYTE info)
       myself->ppid = myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;
       myself->uid = USHRT_MAX;
+      myself->logsrv[0] = '\0';
+      myself->domain[0] = '\0';
 
       environ_init (0);		/* call after myself has been set up */
     }
