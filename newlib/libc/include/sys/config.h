@@ -4,7 +4,7 @@
 #include <machine/ieeefp.h>  /* floating point macros */
 
 /* exceptions first */
-#if defined(__H8300__) || defined(__H8500__) || defined (__H8300H__) ||  defined(__W65__) || defined (__H8300S__)
+#if defined(__H8500__) || defined(__W65__)
 #define __SMALL_BITFIELDS
 /* ???  This conditional is true for the h8500 and the w65, defining H8300
    in those cases probably isn't the right thing to do.  */
@@ -12,12 +12,21 @@
 #endif
 
 /* 16 bit integer machines */
-#if defined(__Z8001__) || defined(__Z8002__) || defined(__H8300__) || defined(__H8500__) || defined(__W65__) || defined (__H8300H__) || defined (__H8300S__) || defined (__mn10200__) || defined (__AVR__)
+#if defined(__Z8001__) || defined(__Z8002__) || defined(__H8500__) || defined(__W65__) || defined (__mn10200__) || defined (__AVR__)
 
 #undef INT_MAX
 #undef UINT_MAX
 #define INT_MAX 32767
 #define UINT_MAX 65535
+#endif
+
+#if defined (__H8300__) || defined (__H8300H__) || defined(__H8300S__)
+#define __SMALL_BITFIELDS
+#define H8300 1
+#undef INT_MAX
+#undef UINT_MAX
+#define INT_MAX __INT_MAX__
+#define UINT_MAX (__INT_MAX__ * 2U + 1)
 #endif
 
 #ifdef __W65__

@@ -1,3 +1,10 @@
+2002-12-16  Kazu Hirata  <kazu@cs.umass.edu>
+
+	* libc/include/sys/config.h: Change setting of INT_MAX
+	and UINT_MAX, to use __INT_MAX__ for __H8300__, __H8300H__,
+	__H8300S__.  Also consolidate flag settings for these
+	platforms.
+
 2002-12-10  Joel Sherrill  <joel@OARcorp.com>
 
 	* libc/include/machine/setjmp.h: Make sure _JBLEN is defined
