@@ -13,7 +13,6 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include "winsup.h"
-#include "sync.h"
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
