@@ -427,10 +427,23 @@ __CRT_INLINE float __cdecl tanhf (float x)
   {return (float) tanh (x);}
 extern long double __cdecl tanhl (long double);
 
-/*
- * TODO: asinh, acosh, atanh
- */ 
+/* Inverse hyperbolic trig functions  */ 
+/* 7.12.5.1 */
+extern double __cdecl acosh (double);
+extern float __cdecl acoshf (float);
+extern long double __cdecl acoshl (long double);
 
+/* 7.12.5.2 */
+extern double __cdecl asinh (double);
+extern float __cdecl asinhf (float);
+extern long double __cdecl asinhl (long double);
+
+/* 7.12.5.3 */
+extern double __cdecl atanh (double);
+extern float __cdecl atanf  (float);
+extern long double __cdecl atanhl (long double);
+
+/* Exponentials and logarithms  */
 /* 7.12.6.1 Double in C89 */
 __CRT_INLINE float __cdecl expf (float x)
   {return (float) exp (x);}

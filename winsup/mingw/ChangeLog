@@ -1,3 +1,20 @@
+2004-10-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/fastmath.h: New file.
+	* mingwex/math/asinh.c: New file.
+	* mingwex/math/asinhf.c: New file.
+	* mingwex/math/asinhl.c: New file.
+	* mingwex/math/acosh.c: New file.
+	* mingwex/math/acoshf.c: New file.
+	* mingwex/math/acoshl.c: New file.
+	* mingwex/math/atanh.c: New file.
+	* mingwex/math/atanhf.c: New file.
+	* include/math.h (asinh, asinhf, asinhl, acosh, acoshf, acoshl,
+	atanh, atanhf, atanhl): Add prototypes.
+	* mingwex/Makefile.in (MATH_OBJS): Add objects for above to list.
+	(MATH_DISTFILES): Add sources for above and fastmath.h to list.
+	Specify dependency on fastmath.h for new objects.
+
 2004-09-08  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/sys/stat.h (_S_IFLNK): Add definition.

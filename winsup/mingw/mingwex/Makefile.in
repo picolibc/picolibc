@@ -60,7 +60,9 @@ MATH_DISTFILES = \
 	roundl.c scalbn.S scalbnf.S scalbnl.S s_erf.c sf_erf.c \
 	signbit.c signbitf.c signbitl.c sinf.S sinhf.c sinhl.c sinl.S \
 	sqrtf.c sqrtl.c tanf.S tanhf.c tanhl.c tanl.S tgamma.c \
-	tgammaf.c tgammal.c trunc.c truncf.c truncl.c
+	tgammaf.c tgammal.c trunc.c truncf.c truncl.c \
+	acosh.c acoshf.c acoshl.c  asinh.c asinhf.c asinhl.c \
+	atanh.c atanhf.c atanhl.c fastmath.h
 
 STDIO_DISTFILES = \
 	fopen64.c fseeko64.c ftello64.c lseek64.c \
@@ -142,7 +144,9 @@ MATH_OBJS = \
 	roundl.o scalbn.o scalbnf.o scalbnl.o s_erf.o sf_erf.o \
 	signbit.o signbitf.o signbitl.o sinf.o sinhf.o sinhl.o sinl.o \
 	sqrtf.o sqrtl.o tanf.o tanhf.o tanhl.o tanl.o tgamma.o \
-	tgammaf.o tgammal.o trunc.o truncf.o truncl.o
+	tgammaf.o tgammal.o trunc.o truncf.o truncl.o \
+	acosh.o acoshf.o acoshl.o asinh.o asinhf.o asinhl.o \
+	atanh.o atanhf.o atanhl.o
 FENV_OBJS = fesetround.o  fegetround.o \
 	fegetenv.o fesetenv.o feupdateenv.o \
 	feclearexcept.o feholdexcept.o fegetexceptflag.o \
@@ -210,6 +214,10 @@ distclean:
 wdirent.o: $(srcdir)/dirent.c $(srcdir)/wdirent.c
 strtold.o: $(srcdir)/strtold.c $(srcdir)/math/cephes_emath.h
 wcstold.o: $(srcdir)/wcstold.c $(srcdir)/math/cephes_emath.h
+
+acosh.o acoshf.o acoshl.o \
+asinh.o asinhf.o asinhl.o \
+atanh.o atanhf.o atanhl.o: fastmath.h
 
 
 dist:
