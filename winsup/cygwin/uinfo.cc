@@ -410,6 +410,12 @@ pwdgrp::next_str (char c)
   return res;
 }
 
+void
+pwdgrp::reparse (char *in_lptr)
+{
+  lptr = in_lptr;
+}
+
 int
 pwdgrp::next_int (char c)
 {

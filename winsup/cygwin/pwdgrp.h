@@ -45,8 +45,9 @@ class pwdgrp
   void read_passwd ();
   void read_group ();
   char *add_line (char *);
-  char *pwdgrp::next_str (char = 0);
-  int pwdgrp::next_int (char = 0);
+  char *next_str (char = 0);
+  int next_int (char = 0);
+  void reparse (char *);
 
 public:
   int curr_lines;

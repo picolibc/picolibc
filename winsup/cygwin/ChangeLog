@@ -1,3 +1,9 @@
+2003-01-25  Christopher Faylor  <cgf@redhat.com>
+
+	* pwdgrp.cc (pwdgrp::reparse): Declare.
+	* uinfo.cc (pwdgrp::reparse): Define.
+	* grp.cc (pwdgrp::parse_group): Use.
+
 2003-01-25  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* syscalls.cc (seteuid32): On Win95 get the pw entry. If it exists
