@@ -832,7 +832,8 @@ extern "C" int
 chown (const char * name, __uid16_t uid, __gid16_t gid)
 {
   sigframe thisframe (mainthread);
-  return chown_worker (name, PC_SYM_FOLLOW, uid, gid16togid32 (gid));
+  return chown_worker (name, PC_SYM_FOLLOW,
+		       uid16touid32 (uid), gid16togid32 (gid));
 }
 
 extern "C" int
@@ -846,7 +847,8 @@ extern "C" int
 lchown (const char * name, __uid16_t uid, __gid16_t gid)
 {
   sigframe thisframe (mainthread);
-  return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid16togid32 (gid));
+  return chown_worker (name, PC_SYM_NOFOLLOW,
+		       uid16touid32 (uid), gid16togid32 (gid));
 }
 
 extern "C" int
@@ -877,7 +879,7 @@ fchown32 (int fd, __uid32_t uid, __gid32_t gid)
 extern "C" int
 fchown (int fd, __uid16_t uid, __gid16_t gid)
 {
-  return fchown32 (fd, uid, gid16togid32 (gid));
+  return fchown32 (fd, uid16touid32 (uid), gid16togid32 (gid));
 }
 
 /* umask: POSIX 5.3.3.1 */

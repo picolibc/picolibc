@@ -1,3 +1,9 @@
+2002-06-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (chown): Convert uid to 32 bit.
+	(lchown): Ditto.
+	(fchown): Ditto.
+
 2002-06-24  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::find_unused_handle): Avoid coercion.
