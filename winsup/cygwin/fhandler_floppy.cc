@@ -15,6 +15,7 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include "fhandler.h"
+#include "cygerrno.h"
 
 /**********************************************************************/
 /* fhandler_dev_floppy */
@@ -78,9 +79,81 @@ fhandler_dev_floppy::close (void)
 off_t
 fhandler_dev_floppy::lseek (off_t offset, int whence)
 {
-  /* FIXME: Need to implement better. */
-  offset = (offset / 512) * 512;
-  return fhandler_base::lseek (offset, whence);
+  int ret;
+  DWORD off;
+  char buf[512];
+
+  if (whence == SEEK_SET)
+    {
+      if (offset < 0)
+        {
+	  set_errno (EINVAL);
+	  return -1;
+	}
+
+      /* Invalidate buffer. */
+      ret = writebuf ();
+      if (ret)
+	return ret;
+      devbufstart = devbufend = 0;
+
+      off = (offset / 512) * 512;
+
+      if (SetFilePointer (get_handle (), off, NULL, FILE_BEGIN)
+          == INVALID_SET_FILE_POINTER)
+        {
+	  __seterrno ();
+	  return -1;
+	}
+      return raw_read (buf, offset - off);
+    }
+  else if (whence == SEEK_CUR)
+    {
+      DWORD low;
+      LONG high = 0;
+
+      low = SetFilePointer (get_handle (), 0, &high, FILE_CURRENT);
+      if (low == INVALID_SET_FILE_POINTER && GetLastError ())
+	{
+	  __seterrno ();
+	  return -1;
+	}
+      long long cur = (long long) high << 32 + low;
+      if (is_writing)
+	cur += devbufend - devbufstart;
+      else
+	cur -= devbufend - devbufstart;
+      
+      /* Invalidate buffer. */
+      ret = writebuf ();
+      if (ret)
+	return ret;
+      devbufstart = devbufend = 0;
+
+      cur += offset;
+      if (cur < 0)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+
+      long long set = (cur / 512) * 512;
+      high = set >> 32;
+      low = set & 0xffffffff;
+
+      off = cur - set;
+
+      low = SetFilePointer (get_handle (), low, &high, FILE_BEGIN);
+      if (low == INVALID_SET_FILE_POINTER && GetLastError ())
+	{
+	  __seterrno ();
+	  return -1;
+	}
+      return raw_read (buf, off);
+    }
+  /* SEEK_END is not supported on raw disk devices. */
+  set_errno (EINVAL);
+  return -1;
 }
 
 int

@@ -135,8 +135,10 @@ fhandler_dev_raw::open (const char *path, int flags, mode_t)
 
   set_name (path, real_path.get_win32 ());
 
-  /* Always open a raw device existing */
-  ret = fhandler_base::open (path, flags & ~(O_CREAT | O_TRUNC));
+  /* Always open a raw device existing and binary. */
+  flags &= ~(O_CREAT | O_TRUNC);
+  flags |= O_BINARY;
+  ret = fhandler_base::open (path, flags);
   if (ret)
     {
       if (devbufsiz > 1L)
@@ -334,7 +336,10 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
     }
 
   if (!is_writing)
-    devbufstart = devbufend = 0;
+    {
+      devbufend = devbufstart;
+      devbufstart = 0;
+    }
   is_writing = 1;
 
   if (devbuf)

@@ -324,6 +324,12 @@ fhandler_base::open (int flags, mode_t mode)
       access_ = GENERIC_READ | GENERIC_WRITE;
     }
 
+  /* Allow reliable lseek on disk devices. */
+  if (get_device () == FH_FLOPPY)
+    {
+      access_ |= GENERIC_READ;
+    }
+
   /* FIXME: O_EXCL handling?  */
 
   if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))

@@ -1,3 +1,14 @@
+Mon Feb  5 17:00:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Always add GENERIC_READ access
+	when opening raw disk devices.
+	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Implement bytewise
+	access.
+	* fhandler_raw.cc (fhandler_dev_raw::open): Always open raw disk device
+	binary.
+	(fhandler_dev_raw::raw_write): Don't drop read buffer content when
+	writing after read.
+
 Mon Feb  5 13:30:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (mmap_record::fixup_map): New method to duplicate
