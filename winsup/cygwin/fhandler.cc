@@ -318,7 +318,7 @@ fhandler_base::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written;
 
-  if (!WriteFile (get_handle (), ptr, len, &bytes_written, 0))
+  if (!WriteFile (get_output_handle (), ptr, len, &bytes_written, 0))
     {
       if (GetLastError () == ERROR_DISK_FULL && bytes_written > 0)
 	return bytes_written;
