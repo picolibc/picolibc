@@ -1,5 +1,10 @@
 2003-10-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h [WINVER >= 0x0500] (EVENT_MAX): Ooops...
+	wrong value for constant.
+
+2003-10-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h [WINVER >= 0x0500] (EVENT_*): Add constants.
 
 	* include/uxtheme.h: Cleanup.

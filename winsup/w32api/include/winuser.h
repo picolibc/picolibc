@@ -2138,7 +2138,7 @@ extern "C" {
 #define EVENT_OBJECT_HELPCHANGE        0x00008010
 #define EVENT_OBJECT_DEFACTIONCHANGE   0x00008011
 #define EVENT_OBJECT_ACCELERATORCHANGE 0x00008012
-#define EVENT_MAX                      0x00008012
+#define EVENT_MAX                      0x7fffffff
 #endif /* (WINVER >= 0x0500) */
 #if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0490)
 #define ASFW_ANY ((DWORD)-1)
