@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #ifndef MAX_1
-#define MAX_1 66000
+#define MAX_1 33000
 #endif
 
 #define MAX_2 (2 * MAX_1 + MAX_1 / 10)

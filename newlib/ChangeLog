@@ -1,3 +1,10 @@
+2002-06-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * testsuite/newlib.stdlib/atexit.c: New file.
+        * testsuite/newlib.stdlib/atexit.exp: Ditto.
+        * testsuite/newlib.string/tstring.c: Change default start size
+        to something more reasonable for embedded platforms.
+
 2002-06-14  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/sys/linux/sys/errno.h (EFTYPE): Add macro.
