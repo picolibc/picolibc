@@ -1,3 +1,9 @@
+2003-05-05  Danny Smith  <dannysmith@users.sourceforge.net>
+
+ 	* include/commctrl.h (STATUSCLASSNAME, TOOLBARCLASSNAME,
+	TOOLTIPS_CLASS, TRACKBAR_CLASS, UPDOWN_CLASS, PROGRESS_CLASS,
+	HOTKEY_CLASS): Remove dupicate defines for UNICODE case.
+
 2003-05-02  Steven Edwards  <Steven_Ed4153@yahoo.com>
 
 	* include/richedit.h (EM_FINDTEXTEXW, EM_FINDTEXTW,
