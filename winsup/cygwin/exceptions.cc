@@ -1127,21 +1127,21 @@ reset_signal_arrived ()
   sigproc_printf ("reset signal_arrived");
 }
 
-int
-sigframe::call_signal_handler ()
-{
-  unregister ();
-  ::call_signal_handler ();
-}
-
-int __stdcall
-call_signal_handler ()
+static int __stdcall
+call_signal_handler_now ()
 {
   int sa_flags = sigsave.sa_flags;
   sigproc_printf ("sa_flags %p", sa_flags);
   *sigsave.retaddr_on_stack = sigsave.retaddr;
   sigdelayed0 ();
   return sa_flags & SA_RESTART;
+}
+
+int
+sigframe::call_signal_handler ()
+{
+  unregister ();
+  call_signal_handler_now ();
 }
 
 void unused_sig_wrapper ()
@@ -1160,7 +1160,7 @@ _sigreturn:\n\
 \n\
 	cmpl	$0,%4		# Did a signal come in?\n\
 	jz	1f		# No, if zero\n\
-	call	_call_signal_handler@0 # yes handle the signal\n\
+	call	_call_signal_handler_now@0 # yes handle the signal\n\
 \n\
 # FIXME: There is a race here.  The signal handler could set up\n\
 # the sigsave structure between _call_signal_handler and the\n\

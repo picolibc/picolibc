@@ -1,3 +1,8 @@
+Sun Apr  1 00:24:14 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (call_signal_handler_now): Rename from
+	call_signal_handler to avoid C++ confusion.
+
 Sun Apr  1 00:08:15 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (fillout_mntent): Always remove drive root directories from
