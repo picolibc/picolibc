@@ -5,9 +5,8 @@
 #
 
 # newlib_check_output takes the basename of the test source file, and
-# a list of pairs of the form "testname" "expectedoutput"
-# "testname" "expectedoutput"...  It assumes one line of output
-# per test.
+# a list of TCL regular expressions representing the expected output.
+# It assumes one line of output per test.
 
 proc newlib_check_output { srcfile expectlist } {
     global objdir subdir srcdir
@@ -19,8 +18,7 @@ proc newlib_check_output { srcfile expectlist } {
 
     if { $comp_output != "" } {
 	fail "Failed to compile $srcfile.\n"
-    } else {
-	pass "Compiled $srcfile.\n"
+	return
     }
 
     set result [newlib_load $test_driver ""]
@@ -29,12 +27,14 @@ proc newlib_check_output { srcfile expectlist } {
 
     set output_lines [split $output "\n"]
 
-    foreach { testname expectedval } $expectlist {
-	if [string match "$expectedval" "[lindex $output_lines 0]"] then {
-	    pass $testname
-	} else {
-	    fail $testname
+    foreach { expectedval } $expectlist {
+	set gotval [string trim [lindex $output_lines 0] "\r"]
+	if { ! [string match $expectedval $gotval] } {
+	    fail "$srcfile: Expected: $expectedval Got: $gotval "
+	    return
 	}
 	set output_lines [lrange $output_lines 1 end]
     }
+
+    pass $srcfile
 }

@@ -151,17 +151,17 @@ int main()
     /* 2.1  First possible sequence of a certain length */
     retval = mbtowc(&wchar, first[0], MAX_BYTES);
     if (retval == 0)
-      printf("2.1.1: U-%08d \n", wchar);
+      printf("2.1.1: U-%08d\n", wchar);
     else
-      printf("2.1.1: Invalid \n");
+      printf("2.1.1: Invalid\n");
 
     for (i = 2; i < 7; i++)
     {
       retval = mbtowc (&wchar, first[i-1], MAX_BYTES);
       if (retval == i)
-        printf("2.1.%d: U-%08x \n", i, wchar);
+        printf("2.1.%d: U-%08x\n", i, wchar);
       else
-        printf("2.1.%d: Invalid \n", i);
+        printf("2.1.%d: Invalid\n", i);
     }
 
     /* 2.2  Last possible sequence of a certain length */
@@ -169,9 +169,9 @@ int main()
     {
       retval = mbtowc (&wchar, last[i-1], MAX_BYTES);
       if (retval == i)
-        printf("2.2.%d: U-%08x \n", i, wchar);
+        printf("2.2.%d: U-%08x\n", i, wchar);
       else
-        printf("2.2.%d: Invalid \n", i);
+        printf("2.2.%d: Invalid\n", i);
     }
 
     /* 2.3  Other boundary conditions */
@@ -179,24 +179,24 @@ int main()
       {
         retval = mbtowc (&wchar, boundary[i-1], MAX_BYTES);
         if ((i < 4 && retval == 3) || (i > 3 && retval == 4))
-          printf("2.3.%d: U-%08x \n", i, wchar);
+          printf("2.3.%d: U-%08x\n", i, wchar);
         else
-          printf("2.3.%d: Invalid \n", i);
+          printf("2.3.%d: Invalid\n", i);
       }
 
     /* 3  Malformed sequences */
     /* 3.1  Unexpected continuation bytes */
     retval = mbtowc (&wchar, continuation_bytes[0], MAX_BYTES);
     if (retval == 1)
-      printf("3.1.1: U-%08x \n", wchar);
+      printf("3.1.1: U-%08x\n", wchar);
     else
-      printf("3.1.1: 1 Invalid \n");
+      printf("3.1.1: 1 Invalid\n");
 
     retval = mbtowc (&wchar, continuation_bytes[1], MAX_BYTES);
     if (retval == 1)
-      printf("3.1.2: U-%08x \n", wchar);
+      printf("3.1.2: U-%08x\n", wchar);
     else
-      printf("3.1.2: 1 Invalid \n");
+      printf("3.1.2: 1 Invalid\n");
 
     for(i=2; i< 8; i++)
       {
@@ -204,7 +204,7 @@ int main()
         if (retval == -1)
           printf("3.1.%d: Valid Character Found\n", i+1);
         else
-          printf("3.1.%d: %d Invalid \n", i+1, retval);
+          printf("3.1.%d: %d Invalid\n", i+1, retval);
       }
 
     for(i = 0x80; i < 0xc0; i++)
@@ -214,7 +214,7 @@ int main()
     if (retval == -1)
       printf("3.1.9: Valid Character Found\n");
     else
-      printf("3.1.9: %d Invalid \n", retval);
+      printf("3.1.9: %d Invalid\n", retval);
 
     /* 3.2  Lonely start characters */
     for(i = 0xc0; i < 0xe0; i++)
@@ -224,7 +224,7 @@ int main()
     if (retval == -1)
       printf("3.2.1: Valid Character Found\n");
     else
-      printf("3.2.1: %d Invalid \n", retval);
+      printf("3.2.1: %d Invalid\n", retval);
 
     for(i = 0xe0; i < 0xf0; i++)
       all_three_byte_seq[i-0xe0] = i;
@@ -233,7 +233,7 @@ int main()
     if (retval == -1)
       printf("3.2.2: Valid Character Found\n");
     else
-      printf("3.2.2: %d Invalid \n", retval);
+      printf("3.2.2: %d Invalid\n", retval);
     
     for(i = 0xf0; i < 0xf8; i++)
       all_four_byte_seq[i-0xf0] = i;
@@ -242,7 +242,7 @@ int main()
     if (retval == -1)
       printf("3.2.3: Valid Character Found\n");
     else
-      printf("3.2.3: %d Invalid \n", retval);
+      printf("3.2.3: %d Invalid\n", retval);
     
     for(i = 0xf8; i < 0xfc; i++)
       all_five_byte_seq[i-0xf8] = i;
@@ -251,7 +251,7 @@ int main()
     if (retval == -1)
       printf("3.2.4: Valid Character Found\n");
     else
-      printf("3.2.4: %d Invalid \n", retval);
+      printf("3.2.4: %d Invalid\n", retval);
 
     for(i = 0xfc; i < 0xfe; i++)
       all_six_byte_seq[i-0xfc] = i;
@@ -260,14 +260,14 @@ int main()
     if (retval == -1)
       printf("3.2.5: Valid Character Found\n");
     else
-      printf("3.2.5: %d Invalid \n", retval);
+      printf("3.2.5: %d Invalid\n", retval);
 
     /* 3.3  Sequences with last continuation byte missing */
     for(i = 1; i < 6; i++)
       {
         retval = mbtowc(&wchar, incomplete_seq[i-1], i);
         if(retval == -1)
-          printf("3.3.%d: 1 Invalid \n", i);
+          printf("3.3.%d: 1 Invalid\n", i);
         else
           printf("3.3.%d: Valid Character Found\n", i);
       }
@@ -276,7 +276,7 @@ int main()
       {
         retval = mbtowc(&wchar, incomplete_seq[i-1], i - 5);
         if(retval == -1)
-          printf("3.3.%d: 1 Invalid \n", i);
+          printf("3.3.%d: 1 Invalid\n", i);
         else
           printf("3.3.%d: Valid Character Found\n", i);
       }
@@ -288,19 +288,19 @@ int main()
     /* 3.5  Impossible bytes */
     retval = mbtowc(&wchar, impossible_bytes[0], 1);
     if(retval == -1)
-      printf("3.5.1: 1 Invalid \n");
+      printf("3.5.1: 1 Invalid\n");
     else
       printf("3.5.1: Valid Character Found\n");
 
     retval = mbtowc(&wchar, impossible_bytes[1], 1);
     if(retval == -1)
-      printf("3.5.2: 1 Invalid \n");
+      printf("3.5.2: 1 Invalid\n");
     else
       printf("3.5.2: Valid Character Found\n");
 
     retval = mbtowc(&wchar, impossible_bytes[2], 4);
     if(retval == -1)
-      printf("3.5.3: 1 Invalid \n");
+      printf("3.5.3: 1 Invalid\n");
     else
       printf("3.5.3: Valid Character Found\n");
 
@@ -310,7 +310,7 @@ int main()
       {
         retval = mbtowc(&wchar, overlong[i-2], i);
         if(retval == -1)
-          printf("4.1.%d: 1 Invalid \n", i-1);
+          printf("4.1.%d: 1 Invalid\n", i-1);
         else
           printf("4.1.%d: Valid Character Found\n", i-1);
       }
@@ -320,7 +320,7 @@ int main()
       {
         retval = mbtowc(&wchar, overlong_max[i-2], i);
         if(retval == -1)
-          printf("4.2.%d: 1 Invalid \n", i-1);
+          printf("4.2.%d: 1 Invalid\n", i-1);
         else
           printf("4.2.%d: Valid Character Found\n", i-1);
       }
@@ -330,7 +330,7 @@ int main()
       {
         retval = mbtowc(&wchar, overlong_nul[i-2], i);
         if(retval == -1)
-          printf("4.3.%d: 1 Invalid \n", i-1);
+          printf("4.3.%d: 1 Invalid\n", i-1);
         else
           printf("4.3.%d: Valid Character Found\n", i-1);
       }
@@ -341,7 +341,7 @@ int main()
       {
         retval = mbtowc(&wchar, single_surrogates[i-1], 3);
         if(retval == -1)
-          printf("5.1.%d: 1 Invalid \n", i);
+          printf("5.1.%d: 1 Invalid\n", i);
         else
           printf("5.1.%d: Valid Character Found\n", i);
       }
@@ -351,7 +351,7 @@ int main()
       {
         retval = mbtowc(&wchar, paired_surrogates[i-1], 6);
         if(retval == -1)
-          printf("5.2.%d: 1 Invalid \n", i);
+          printf("5.2.%d: 1 Invalid\n", i);
         else
           printf("5.2.%d: Valid Character Found\n", i);
       }
@@ -359,13 +359,13 @@ int main()
     /* 5.3 Other illegal code positions */
     retval = mbtowc(&wchar, illegal_pos[0], 3);
     if(retval == -1)
-      printf("5.3.1: 1 Invalid \n");
+      printf("5.3.1: 1 Invalid\n");
     else
       printf("5.3.1: Valid Character Found\n");
 
     retval = mbtowc(&wchar, illegal_pos[1], 3);
     if(retval == -1)
-      printf("5.3.2: 1 Invalid \n");
+      printf("5.3.2: 1 Invalid\n");
     else
       printf("5.3.2: Valid Character Found\n");
     
