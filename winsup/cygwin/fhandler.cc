@@ -150,7 +150,7 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
    be too long (e.g. devices or some such).
    The unix_path_name is also used by virtual fhandlers.  */
 void
-fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit)
+fhandler_base::set_name (const char *unix_path, const char *win32_path)
 {
   if (unix_path == NULL || !*unix_path)
     return;
@@ -161,7 +161,7 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
     {
       const char *fmt = get_native_name ();
       char *w =  (char *) cmalloc (HEAP_STR, strlen (fmt) + 16);
-      __small_sprintf (w, fmt, unit);
+      __small_sprintf (w, fmt, get_unit ());
       win32_path_name = w;
     }
 
@@ -425,7 +425,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
     file_attributes |= FILE_FLAG_OVERLAPPED;
 
 #ifdef HIDDEN_DOT_FILES
-  if (flags & O_CREAT && get_device () == FH_DISK)
+  if (flags & O_CREAT && get_device () == FH_FS)
     {
       char *c = strrchr (get_win32_name (), '\\');
       if ((c && c[1] == '.') || *get_win32_name () == '.')
@@ -449,7 +449,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
 
   /* If the file should actually be created and ntsec is on,
      set files attributes. */
-  if (flags & O_CREAT && get_device () == FH_DISK && allow_ntsec && has_acls ())
+  if (flags & O_CREAT && get_device () == FH_FS && allow_ntsec && has_acls ())
     set_security_attribute (mode, &sa, alloca (4096), 4096);
 
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
@@ -481,7 +481,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
   /* Attributes may be set only if a file is _really_ created.
      This code is now only used for ntea here since the files
      security attributes are set in CreateFile () now. */
-  if (flags & O_CREAT && get_device () == FH_DISK
+  if (flags & O_CREAT && get_device () == FH_FS
       && GetLastError () != ERROR_ALREADY_EXISTS
       && !allow_ntsec && allow_ntea)
     set_file_attribute (has_acls (), get_win32_name (), mode);
