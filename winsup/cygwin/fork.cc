@@ -733,6 +733,7 @@ vfork ()
   if (vf->pid < 0)
     {
       int exitval = -vf->pid;
+      vf->pid = 0;
       if ((vf->pid = fork ()) == 0)
 	exit (exitval);
     }
