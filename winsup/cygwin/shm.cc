@@ -305,8 +305,37 @@ shmdt (const void *shmaddr)
   /* this should be "rare" so a hefty search is ok. If this is common, then we
    * should alter the data structs to allow more optimisation
    */
-  set_errno (ENOTSUP);
-  return -1;
+  shmnode *tempnode = shm_head;
+  _shmattach *attachnode;
+  while (tempnode)
+    {
+      // FIXME: Race potential
+      attachnode = tempnode->attachhead;
+      while (attachnode && attachnode->data != shmaddr)
+	attachnode = attachnode->next;
+      if (attachnode)
+	break;
+      tempnode = tempnode->next;
+    }
+  if (!tempnode)
+    {
+      // dt cannot be called by an app that hasn't alreadu at'd
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  UnmapViewOfFile (attachnode->data);
+  /* tell the daemon we have attached */
+  client_request_shm *req =
+      new client_request_shm (SHM_DETACH, tempnode->shm_id);
+  int rc;
+  if ((rc = cygserver_request (req)))
+    {
+      debug_printf ("failed to tell deaemon that we have detached\n");
+    }
+  delete req;
+  
+  return 0;
 }
 
 //FIXME: who is allowed to perform STAT? 

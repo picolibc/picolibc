@@ -1,5 +1,10 @@
 2002-03-04  Robert Collins  <rbtcollins@hotmail.com>
 
+	* cygserver_shm.cc (client_request_shm::serve): Implement SHM_DETACH.
+	* shm.cc (shmdt): Implement.
+
+2002-03-04  Robert Collins  <rbtcollins@hotmail.com>
+
 	* cygserver_shm.cc: Run indent.
 	(deleted_head): New global for storing shm id's pending deletion.
 	(client_request_shm::serve): Return ENOSYS for invalid request types.

@@ -290,6 +290,26 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
       return;
     }
 
+  /* Someone detached */
+  if (parameters.in.type == SHM_DETACH)
+    {
+      shmnode *tempnode = shm_head;
+      while (tempnode)
+	{
+	  if (tempnode->shm_id == parameters.in.shm_id)
+	    {
+	      InterlockedDecrement (&tempnode->shmds->shm_nattch);
+	      header.error_code = 0;
+	      CloseHandle (token_handle);
+	      return;
+	    }
+	  tempnode = tempnode->next;
+	}
+      header.error_code = EINVAL;
+      CloseHandle (token_handle);
+      return;
+    }
+
   /* Someone wants the ID removed. */
   if (parameters.in.type == SHM_DEL)
     {
