@@ -33,6 +33,7 @@
 #include "sigproc.h"
 #include "wsock_event.h"
 #include "cygthread.h"
+#include "select.h"
 #include <unistd.h>
 
 #define ENTROPY_SOURCE_DEV_UNIT 9
@@ -118,30 +119,6 @@ get_inet_addr (const struct sockaddr *in, int inlen,
       set_errno (EAFNOSUPPORT);
       return 0;
     }
-}
-
-struct sock_thread_data
-{
-  int socket;
-  sockaddr *peer;
-  int *len;
-  int ret;
-};
-
-static DWORD WINAPI
-connect_thread (void *arg)
-{
-  sock_thread_data *std = (sock_thread_data *) arg;
-  std->ret = ::connect (std->socket, std->peer, *std->len);
-  return 0;
-}
-
-static DWORD WINAPI
-accept_thread (void *arg)
-{
-  sock_thread_data *std = (sock_thread_data *) arg;
-  std->ret = ::accept (std->socket, std->peer, std->len);
-  return 0;
 }
 
 /**********************************************************************/
@@ -520,7 +497,6 @@ out:
 int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
-  BOOL interrupted = FALSE;
   int res = -1;
   BOOL secret_check_failed = FALSE;
   BOOL in_progress = FALSE;
@@ -530,18 +506,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
 
-  if (!is_nonblocking ())
-    {
-      sock_thread_data cd = { get_socket (), (sockaddr *) &sin, &namelen, -1 };
-      cygthread *thread = new cygthread (connect_thread, &cd, "connect");
-      HANDLE waitevt = CreateEvent(&sec_none_nih, FALSE, TRUE, NULL);
-      interrupted = thread->detach (waitevt);
-      CloseHandle (waitevt);
-      if (!interrupted)
-        res = cd.ret;
-    }
-  else
-    res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
+  res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
 
   if (res)
     {
@@ -596,9 +561,6 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   else
     set_connect_state (CONNECTED);
 
-  if (interrupted)
-    set_errno (EINTR);
-
   return res;
 }
 
@@ -638,19 +600,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
     *len = sizeof (struct sockaddr_in);
 
-  if (!is_nonblocking ())
-    {
-      sock_thread_data ad = { get_socket (), peer, len, -1 };
-      cygthread *thread = new cygthread (accept_thread, &ad, "accept");
-      HANDLE waitevt = CreateEvent(&sec_none_nih, FALSE, TRUE, NULL);
-      BOOL interrupted = thread->detach (waitevt);
-      CloseHandle (waitevt);
-      if (interrupted)
-	return -1;
-      res = ad.ret;
-    }
-  else
-    res = ::accept (get_socket (), peer, len);
+  res = ::accept (get_socket (), peer, len);
 
   if ((SOCKET) res == INVALID_SOCKET && WSAGetLastError () == WSAEWOULDBLOCK)
     in_progress = TRUE;

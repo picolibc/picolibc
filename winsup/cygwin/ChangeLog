@@ -1,3 +1,14 @@
+2003-06-03  Corinna Vinschen  <corinna@vinschen.de>
+	    Thomas Pfaff <tpfaff@gmx.net>
+
+	* fhandler_socket.cc (connect_thread): Remove.
+	(accept_thread): Remove.
+	(fhandler_socket::connect): Remove all special blocking handling.
+	(fhandler_socket::accept): Ditto.
+	* net.cc (cygwin_connect): Make blocking sockets temporarily
+	non-blocking and call cygwin_select on them to be interruptible.
+	(cygwin_accept):  Ditto.
+
 2003-06-02  Christopher Faylor  <cgf@redhat.com>
 
 	* spawn.cc (spawn_guts): Don't hang around if the parent doesn't exist.
