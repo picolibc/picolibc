@@ -1,4 +1,10 @@
-003-10-13  Filip Navara  <xnavara@volny.cz>
+2003-10-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h: (FILE_SUPERSEDED, FILE_OPENED, FILE_CREATED,
+	FILE_OVERWRITTEN, FILE_EXISTS, FILE_DOES_NOT_EXIST): Remove
+	defines.
+
+2003-10-13  Filip Navara  <xnavara@volny.cz>
 
 	* include/commctrl.h: (DSA_*):Add prototypes, typedefs and
 	defines for Dynamic Storage Arrays.
@@ -8,7 +14,7 @@
 	(SetWindowSubclass, GetWindowSubclass, RemoveWindowSubclass,
 	DefSubclassProc): Add prototypes for subclassing.
 	(DrawShadowText) Add prototype.
-`	(COMCTL32_VERSION): Define.
+	(COMCTL32_VERSION): Define.
 
 2003-10-13  Martin Fuchs  <Martin-Fuchs@gmx.net>
 
