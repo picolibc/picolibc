@@ -1,3 +1,15 @@
+2002-05-13  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/machine/powerpc/vfprintf.c(__VFPRINTF_R)[__ALTIVEC__]: Restore
+        the original format specifier when looping for vectors to compensate
+        for any changes made in vector %g format processing.
+        Also add syntax checking for various invalid scenarios
+        involving vector format extensions.
+        * libc/machine/powerpc/vfscanf.c(__VFSCANF_R)[__ALTIVEC__]: Fix
+        return code setting for vector formats.  Also treat vector
+        separator mismatch as a match error instead of an input error.
+        Perform some syntax checking for vector formats.
+
 2002-05-10  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
 
 	* libc/include/string.h (!__STRICT_ANSI__): Add strlcat and strlcpy.

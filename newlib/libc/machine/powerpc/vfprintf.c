@@ -196,7 +196,7 @@ typedef union
   int   i[16 / sizeof(int)];
   long  l[4];
   short s[8];
-  signed char  c[16];
+  signed char c[16];
 } vec_16_byte_union;
 #endif /* __ALTIVEC__ */
 
@@ -337,6 +337,8 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	int prec;		/* precision from format (%.3d), or -1 */
 	char sign;		/* sign prefix (' ', '+', '-', or \0) */
 	char old_sign;		/* saved value of sign when looping for vectors */
+	int old_ch;		/* saved value of ch when looping for vectors */
+	char *format_anchor;    /* start of format to process */
 	wchar_t wc;
 #ifdef FLOATING_POINT
 	char *decimal_point = localeconv()->decimal_point;
@@ -535,7 +537,9 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 		vec_sep = ' ';
 #endif /* __ALTIVEC__ */
 
+		format_anchor = fmt;
 rflag:		ch = *fmt++;
+		old_ch = ch;
 reswitch:	switch (ch) {
 		case ' ':
 			/*
@@ -571,6 +575,11 @@ reswitch:	switch (ch) {
 		case ';':
 		case ':':
 		case '_':
+		        if (vec_sep != ' ')
+		          {
+		            fmt = format_anchor;
+		            continue;
+		          }
 			vec_sep = ch;
 			goto rflag;
 #endif /* __ALTIVEC__ */
@@ -611,6 +620,11 @@ reswitch:	switch (ch) {
 			goto rflag;
 #endif
 		case 'h':
+		        if (flags & LONGINT)
+		          {
+		            fmt = format_anchor;
+		            continue;
+		          }
 			flags |= SHORTINT;
 #ifdef __ALTIVEC__
 			if (flags & VECTOR)
@@ -618,6 +632,11 @@ reswitch:	switch (ch) {
 #endif
 			goto rflag;
 		case 'l':
+		        if (flags & SHORTINT)
+		          {
+		            fmt = format_anchor;
+		            continue;
+		          }
 			if (*fmt == 'l') {
 				fmt++;
 				flags |= QUADINT;
@@ -632,13 +651,24 @@ reswitch:	switch (ch) {
 			goto rflag;
 #ifdef __ALTIVEC__
 		case 'v':
+		        if (flags & VECTOR) 
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
 			flags |= VECTOR;
 			vec_print_count = (flags & SHORTINT) ? 8 : 
 			  ((flags & LONGINT) ? 4 : 16);
 			goto rflag;
 #endif
                 case 'q':
-			flags &= ~VECTOR;
+#ifdef __ALTIVEC__
+		        if (flags & VECTOR) 
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+#endif /* __ALTIVEC__ */
 			flags |= QUADINT;
 			goto rflag;
 		case 'c':
@@ -646,6 +676,11 @@ reswitch:	switch (ch) {
 			if (flags & VECTOR)
 			  {
 			    int k;
+		            if (flags & (SHORTINT | LONGINT))
+		              {
+		                fmt = format_anchor;
+		                continue;
+		              }
 			    vec_16_byte_union tmp;
 			    tmp.v = va_arg(ap, vector int);
 			    cp = buf;
@@ -673,6 +708,13 @@ reswitch:	switch (ch) {
 			/*FALLTHROUGH*/
 		case 'd':
 		case 'i':
+#ifdef __ALTIVEC__
+		        if (!(flags & VECTOR) && vec_sep != ' ') 
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+#endif /* __ALTIVEC__ */
 			_uquad = SARG();
 #ifndef _NO_LONGLONG
 			if ((quad_t)_uquad < 0)
@@ -705,11 +747,15 @@ reswitch:	switch (ch) {
 #ifdef __ALTIVEC__
 			} else if (flags & VECTOR) {
 				if (vec_print_count >= 4)
-				  {
-				    vec_print_count = 4;
+                                  {
+                                    vec_print_count = 4;
 				    vec_tmp.v = va_arg(ap, vector int);
-				  }
+                                  }
 				_fpvalue = (double)vec_tmp.f[4 - vec_print_count];
+			} else if (vec_sep != ' ') {
+			         fmt = format_anchor;
+			         continue;
+			
 #endif /* __ALTIVEC__ */
 			} else {
 				_fpvalue = va_arg(ap, double);
@@ -740,10 +786,10 @@ reswitch:	switch (ch) {
 #ifdef __ALTIVEC__
 			} else if (flags & VECTOR) {
 				if (vec_print_count >= 4)
-				  {
-				    vec_print_count = 4;
+                                  {
+                                    vec_print_count = 4;
 				    vec_tmp.v = va_arg(ap, vector int);
-				  }
+                                  }
 				_fpvalue = (_LONG_DOUBLE)k.f[4 - vec_print_count];
 #endif /* __ALTIVEC__ */
 			} else {
@@ -776,7 +822,10 @@ reswitch:	switch (ch) {
 
 			if (ch == 'g' || ch == 'G') {
 				if (expt <= -4 || expt > prec)
-					ch = (ch == 'g') ? 'e' : 'E';
+				  {
+				    old_ch = ch;
+				    ch = (ch == 'g') ? 'e' : 'E';
+				  }
 				else
 					ch = 'g';
 			} 
@@ -826,6 +875,13 @@ reswitch:	switch (ch) {
 			flags |= LONGINT;
 			/*FALLTHROUGH*/
 		case 'o':
+#ifdef __ALTIVEC__
+		        if (!(flags & VECTOR) && vec_sep != ' ') 
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+#endif /* __ALTIVEC__ */
 			_uquad = UARG();
 			base = OCT;
 			goto nosign;
@@ -841,7 +897,12 @@ reswitch:	switch (ch) {
 #ifdef __ALTIVEC__
 		        if (flags & VECTOR)
 		          _uquad = UARG();
-		        else
+		        else if (vec_sep != ' ')
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+			else
 #endif /* __ALTIVEC__ */
 		          _uquad = (u_long)(unsigned _POINTER_INT)va_arg(ap, void *);
 			base = HEX;
@@ -850,7 +911,13 @@ reswitch:	switch (ch) {
 			ch = 'x';
 			goto nosign;
 		case 's':
-			flags &= ~VECTOR;
+#ifdef __ALTIVEC__
+		        if (flags & VECTOR)
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+#endif /* __ALTIVEC__ */
 			if ((cp = va_arg(ap, char *)) == NULL)
 				cp = "(null)";
 			if (prec >= 0) {
@@ -875,6 +942,13 @@ reswitch:	switch (ch) {
 			flags |= LONGINT;
 			/*FALLTHROUGH*/
 		case 'u':
+#ifdef __ALTIVEC__
+		        if (!(flags & VECTOR) && vec_sep != ' ') 
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+#endif /* __ALTIVEC__ */
 			_uquad = UARG();
 			base = DEC;
 			goto nosign;
@@ -883,6 +957,13 @@ reswitch:	switch (ch) {
 			goto hex;
 		case 'x':
 			xdigs = "0123456789abcdef";
+#ifdef __ALTIVEC__
+		        if (!(flags & VECTOR) && vec_sep != ' ') 
+			  {
+			    fmt = format_anchor;
+			    continue;
+			  }
+#endif /* __ALTIVEC__ */
 hex:			_uquad = UARG();
 			base = HEX;
 			/* leading 0x/X only if non-zero */
@@ -1078,6 +1159,7 @@ number:			if ((dprec = prec) >= 0)
 		      }
 		    FLUSH();
 		    sign = old_sign;
+		    ch = old_ch;
 		    goto reswitch;
 		  }
 #endif /* __ALTIVEC__ */

@@ -363,6 +363,8 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	    vec_sep = c;
 	  goto again;
 	case 'l':
+	  if (flags & SHORT)
+	    continue; /* invalid format, don't process any further */
 	  if (flags & LONG)
 	    {
 	      flags &= ~LONG;
@@ -382,6 +384,8 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  goto again;
 	case 'h':
 	  flags |= SHORT;
+	  if (flags & LONG)
+	    continue;  /* invalid format, don't process any further */
 	  if (flags & VECTOR)
 	    vec_read_count = 8;
 	  goto again;
@@ -482,6 +486,9 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  type = CT_CHAR;
 	  if (flags & VECTOR)
 	    {
+	      /* not allowed to have h or l with c specifier */
+	      if (flags & (LONG | SHORT))
+		continue;  /* invalid format don't process any further */
 	      width = 0;
 	      vec_read_count = 16;
 	    }
@@ -580,7 +587,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	    {
 	      if (vec_sep == ' ' && last_space_char != ' ' ||
 		  vec_sep != ' ' && *fp->_p != vec_sep)
-		goto input_failure;
+		goto match_failure;
 	      if (vec_sep != ' ')
 		{
 		  nread++;
@@ -958,7 +965,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		      ip = va_arg (ap, int *);
 		      *ip++ = res;
 		    }
-		  else 
+		  else
 		    {
 		      if (!looped)
 			ch_dest = vec_buf.c;
@@ -1172,6 +1179,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  unsigned long *vp = va_arg (ap, unsigned long *);
 	  for (i = 0; i < 4; ++i)
 	    *vp++ = vec_buf.l[i];
+	  nassigned++;
 	}
     }
 input_failure:
