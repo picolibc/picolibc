@@ -78,26 +78,27 @@ fhandler_process::fhandler_process ():
 }
 
 int
-fhandler_process::fstat (struct __stat64 *buf, path_conv *path)
+fhandler_process::fstat (struct __stat64 *buf, path_conv *pc)
 {
   int file_type = exists ((const char *) get_name ());
+  (void) fhandler_base::fstat (buf, pc);
+  buf->st_mode &= ~_IFMT & NO_W;
+
   switch (file_type)
     {
     case 0:
       set_errno (ENOENT);
       return -1;
     case 1:
-      buf->st_mode = S_IFDIR | 0555;
-      buf->st_nlink = 1;
+      buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
       return 0;
     case 2:
-      buf->st_mode = S_IFDIR | 0555;
+      buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
       buf->st_nlink = PROCESS_LINK_COUNT;
       return 0;
     default:
     case -1:
-      buf->st_mode = S_IFREG | 0444;
-      buf->st_nlink = 1;
+      buf->st_mode |= S_IFREG;
       return 0;
     }
 }
