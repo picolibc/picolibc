@@ -1,8 +1,43 @@
+2002-03-02  dannysmith@users.sourceforge.net
+
+	* ChangeLog: Fix typo in last entry. 
+	* include/winsock2.h (IPPROTO_*): Add IPv6 defines.
+	* include/ws2tcpip.h: (IP_*): Add new defines.
+	(INET_ADDRSTRLEN, INET6_ADDRSTRLEN): Add defines.
+	(NI_*): Add getnameinfo constants and bitmasks.
+	(AI_*): Add getaddrinfo flags.
+	(EAI_*): Add getaddrinfo error codes.
+	(ip_mreq_source): Add new structure.
+	(ip_msfilter): Add new structure.
+	(IP_MSFILTER_SIZE): Add new macro.
+	(in_pktinfo): Add new structure.
+	Add preliminary IPv6 support.
+	(in6_addr): Add new structure and some defines.
+	(sockaddr_in6): Add new structure.
+	(in6addr_any, in6addr_loopback): Declare extern structures.
+	(IN6ADDR_ANY_INIT,IN6ADDR_LOOPBACK_INIT): Add
+	initialization macros for above.
+	(IN6_ARE_ADDR_EQUAL): Define macro.
+	(IN6_IS_ADDR_*): Define address testing macros.
+	(socklen_t) Add new typedef.
+	(ipv6_mreq): Add new structure.
+	(in6_pktinfo): Same.
+	(addrinfo): Same.
+	(freeaddrinfo):Add new prototype.
+	(getaddrinfo): Same.
+	(gai_strerror[AW]): Same.
+	(getnameinfo): Same.
+	(sockaddr_in6_old): Add structure.
+	(sockaddr_gen): Add union definition.
+	(INTERFACE_INFO): Use sockaddr_gen as members.
+	(INTERFACE_INFO_OLD): Add comment on workaround for problems
+	with INTERFACE_INFO on NT4 prior to sp4.
+
 2002-02-28  dannysmith@users.sourceforge.net
 
 	* include/windows.h; Remove test for __W32API_MAJOR_VERSION
 	when selecting winsock interface.
-	* include/winsock.h (SOCKET_ADDRESS_LIST): Add structure
+	* include/winsock2.h (SOCKET_ADDRESS_LIST): Add structure
 	and typedefs. Thanks to: 'Lorenzo' <conte0@infinito.it>.
 	Expand FIXME comment.
 	(WSACOMPLETIONTYPE): Add enum.

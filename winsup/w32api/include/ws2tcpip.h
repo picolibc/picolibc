@@ -10,6 +10,9 @@
 #define _WS2TCPIP_H
 
 #include <winsock2.h>
+#ifdef  __cplusplus
+extern "C" {
+#endif
 
 /* 
  * The IP_* macros are also defined in winsock.h, but some values are different there.
@@ -32,14 +35,19 @@
  * These are also be defined in winsock.h,
  * but values have changed for WinSock2 interface
  */
-#define	IP_TOS  3   /* old (winsock 1.1) value 8 */
-#define	IP_TTL  4  /* old value 7 */
-#define	IP_MULTICAST_IF 	9 /* old value 2 */
-#define	IP_MULTICAST_TTL    10 /* old value 3 */
-#define	IP_MULTICAST_LOOP   11 /* old value 4 */
-#define	IP_ADD_MEMBERSHIP   12 /* old value 5 */
-#define	IP_DROP_MEMBERSHIP  13 /* old value 6 */
-#define IP_DONTFRAGMENT 14 /* old value 9 */
+#define IP_TOS			3   /* old (winsock 1.1) value 8 */
+#define IP_TTL			4   /* old value 7 */
+#define IP_MULTICAST_IF		9   /* old value 2 */
+#define IP_MULTICAST_TTL	10  /* old value 3 */
+#define IP_MULTICAST_LOOP	11  /* old value 4 */
+#define IP_ADD_MEMBERSHIP	12  /* old value 5 */
+#define IP_DROP_MEMBERSHIP	13  /* old value 6 */
+#define IP_DONTFRAGMENT		14  /* old value 9 */
+#define IP_ADD_SOURCE_MEMBERSHIP	15
+#define IP_DROP_SOURCE_MEMBERSHIP	16
+#define IP_BLOCK_SOURCE			17
+#define IP_UNBLOCK_SOURCE		18
+#define IP_PKTINFO			19
 
 #define IP_DEFAULT_MULTICAST_TTL 1 
 #define IP_DEFAULT_MULTICAST_LOOP 1 
@@ -47,91 +55,284 @@
 
 #define TCP_EXPEDITED_1122  2
 
-#define UDP_NOCHECKSUM	1
+#define UDP_NOCHECKSUM 1
 
+/* INTERFACE_INFO iiFlags */
 #define IFF_UP  1
 #define IFF_BROADCAST   2
 #define IFF_LOOPBACK    4
 #define IFF_POINTTOPOINT    8
 #define IFF_MULTICAST   16
 
-#define SIO_GET_INTERFACE_LIST  _IOR('t', 127, u_long)	
+#define SIO_GET_INTERFACE_LIST  _IOR('t', 127, u_long)
+
+#define INET_ADDRSTRLEN  16
+#define INET6_ADDRSTRLEN 46
+
+/* getnameinfo constants */ 
+#define NI_MAXHOST	1025
+#define NI_MAXSERV	32
+
+#define NI_NOFQDN 	0x01
+#define NI_NUMERICHOST	0x02
+#define NI_NAMEREQD	0x04
+#define NI_NUMERICSERV	0x08
+#define NI_DGRAM	0x10
+
+/* getaddrinfo constants */
+#define AI_PASSIVE	1
+#define AI_CANONNAME	2
+#define AI_NUMERICHOST	4
+
+/* getaddrinfo error codes */
+#define EAI_AGAIN	WSATRY_AGAIN
+#define EAI_BADFLAGS	WSAEINVAL
+#define EAI_FAIL	WSANO_RECOVERY
+#define EAI_FAMILY	WSAEAFNOSUPPORT
+#define EAI_MEMORY	WSA_NOT_ENOUGH_MEMORY
+#define EAI_NODATA	WSANO_DATA
+#define EAI_NONAME	WSAHOST_NOT_FOUND
+#define EAI_SERVICE	WSATYPE_NOT_FOUND
+#define EAI_SOCKTYPE	WSAESOCKTNOSUPPORT
 
 /*
  *   ip_mreq also in winsock.h for WinSock1.1,
  *   but online msdn docs say it is defined here for WinSock2.
  */ 
+
 struct ip_mreq {
-	struct in_addr imr_multiaddr;
-	struct in_addr imr_interface;
+	struct in_addr	imr_multiaddr;
+	struct in_addr	imr_interface;
 };
 
-typedef struct _INTERFACE_INFO {
-	u_long		iiFlags;
-    struct sockaddr iiAddress;
-	struct sockaddr iiBroadcastAddress;
-	struct sockaddr iiNetmask;
-} INTERFACE_INFO, *LPINTERFACE_INFO;
+struct ip_mreq_source {
+	struct in_addr	imr_multiaddr;
+	struct in_addr	imr_sourceaddr;
+	struct in_addr	imr_interface;
+};
+
+struct ip_msfilter {
+	struct in_addr	imsf_multiaddr;
+	struct in_addr	imsf_interface;
+	u_long		imsf_fmode;
+	u_long		imsf_numsrc;
+	struct in_addr	imsf_slist[1];
+};
+
+#define IP_MSFILTER_SIZE(numsrc) \
+   (sizeof(struct ip_msfilter) - sizeof(struct in_addr) \
+   + (numsrc) * sizeof(struct in_addr))
+
+struct in_pktinfo {
+	IN_ADDR ipi_addr;
+	UINT    ipi_ifindex;
+};
+typedef struct in_pktinfo IN_PKTINFO;
 
 
 /* ipv6 */ 
+/* These require XP or .NET Server or use of add-on IPv6 stacks on NT 4
+  or higher */
 
-/*
- * According to online msdn documentation (12 Dec 2000), two separate implentations
- * of ipv6 are available (1) the Microsoft IPv6 Technology Preview  (requires W2K SP1)
- * and (2) the MS Research IPV6 implementation (requires NT4 or W2K).
- * Neither are production level implementations.    
- */
-
-#if 0
-/*
- * The following is based on what online msdn PSDK docs say as at 5 Dec 2000
- */
-struct in_addr6 /* sic */ { u_char s6_addr[16]; };
-typedef struct in_addr6 IN6_ADDR,  *PIN6_ADDR, *LPIN6_ADDR;
-
-typedef struct sockaddr_in6 {
-		short	sin6_family;
-		u_short sin6_port;
-		u_long	sin6_flowinfo;
-		struct in_addr6 sin6_addr;
-} SOCKADDR_IN6, *PSOCKADDR_IN6, *LPSOCKADDR_IN6;
-
-#elif 0
-/*
- * In the FAQ section of Microsoft IPv6 Technology Preview for Windows 2000
- * (dated 12 Dec 2000) it says that the Preview and the MS Research implemntation
- * support RFC 2553, and in particular, uses the sockaddr_in6 structure defined
- * in Section 3.3. That would look something like this:
-*/
-#include <stdint.h>
-struct in6_addr { /* this is the standard name */
-        union {
-                uint8_t   _u6_addr8[16];
-                uint16_t  _u6_addr16[8];
-                uint32_t  _u6_addr32[4];
-             /* uint64_t  _u6_addr64[2];*/ 
-        } _u6_addr;
+/* This is based on the example given in RFC 2553 with stdint types
+   changed to BSD types.  For now, use these  field names until there
+   is some consistency in MS docs. In this file, we only use the
+   in6_addr structure start address, with casts to get the right offsets
+   when testing addresses */
+  
+struct in6_addr {
+    union {
+        u_char	_S6_u8[16];
+        u_short	_S6_u16[8];
+        u_long	_S6_u32[4];
+        } _S6_un;
 };
+/* s6_addr is the standard name */
+#define s6_addr		_S6_un._S6_u8
+
+/* These are GLIBC names */ 
+#define s6_addr16	_S6_un._S6_u16
+#define s6_addr32	_S6_un._S6_u16
+
+/* These are used in some MS code */
+#define in_addr6	in6_addr
+#define _s6_bytes	_S6_un._S6_u8
+#define _s6_words	_S6_un._S6_u16
+
 typedef struct in6_addr IN6_ADDR,  *PIN6_ADDR, *LPIN6_ADDR;
-#define s6_addr   _u6_addr._u6_addr8
 
 struct sockaddr_in6 {
-    uint16_t sin6_family; /* AF_INET6 */
-	uint16_t sin6_port; /* transport layer port # */
-	uint32_t sin6_flowinfo; /* IPv6 traffic class & flow info */
+	short sin6_family;	/* AF_INET6 */
+	u_short sin6_port; 	/* transport layer port # */
+	u_long sin6_flowinfo;	/* IPv6 traffic class & flow info */
 	struct in6_addr sin6_addr;  /* IPv6 address */
-    uint32_t sin6_scope_id;  /* set of interfaces for a scope */
+	u_long sin6_scope_id;	/* set of interfaces for a scope */
 };
-typedef struct sockaddr_in6  SOCKADDR_IN6, *PSOCKADDR_IN6, *LPSOCKADDR_IN6;
+typedef struct sockaddr_in6 SOCKADDR_IN6, *PSOCKADDR_IN6, *LPSOCKADDR_IN6;
+
+extern const struct in6_addr in6addr_any;
+extern const struct in6_addr in6addr_loopback;
+/* the above can get initialised using: */ 
+#define IN6ADDR_ANY_INIT        { 0 }
+#define IN6ADDR_LOOPBACK_INIT   { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 }
+
+/* Described in RFC 2292, but not in 2553 */
+/* int IN6_ARE_ADDR_EQUAL(const struct in6_addr * a, const struct in6_addr * b) */
+#define IN6_ARE_ADDR_EQUAL(a, b)	\
+    (memcmp ((void*)(a), (void*)(b), sizeof (struct in6_addr)) == 0)
+
+
+/* Address Testing Macros 
+
+ These macro functions all take const struct in6_addr* as arg.
+ Static inlines would allow type checking, but RFC 2553 says they
+ macros.	 
+ NB: These are written specifically for little endian host */
+
+#define IN6_IS_ADDR_UNSPECIFIED(_addr) \
+	(   (((const u_long *)(_addr))[0] == 0)	\
+	 && (((const u_long *)(_addr))[1] == 0)	\
+	 && (((const u_long *)(_addr))[2] == 0)	\
+	 && (((const u_long *)(_addr))[3] == 0))
+
+#define IN6_IS_ADDR_LOOPBACK(_addr) \
+	(   (((const u_long *)(_addr))[0] == 0)	\
+	 && (((const u_long *)(_addr))[1] == 0)	\
+	 && (((const u_long *)(_addr))[2] == 0)	\
+	 && (((const u_long *)(_addr))[3] == 0x01000000)) /* Note byte order reversed */
+/*	    (((const u_long *)(_addr))[3] == ntohl(1))  */
+
+#define IN6_IS_ADDR_MULTICAST(_addr) (((const u_char *) (_addr))[0] == 0xff)
+
+#define IN6_IS_ADDR_LINKLOCAL(_addr) \
+	(   (((const u_char *)(_addr))[0] == 0xfe)	\
+	 && ((((const u_char *)(_addr))[1] & 0xc0) == 0x80))
+
+#define IN6_IS_ADDR_SITELOCAL(_addr) \
+	(   (((const u_char *)(_addr))[0] == 0xfe)	\
+	 && ((((const u_char *)(_addr))[1] & 0xc0) == 0xc0))
+
+#define IN6_IS_ADDR_V4MAPPED(_addr) \
+	(   (((const u_long *)(_addr))[0] == 0)		\
+	 && (((const u_long *)(_addr))[1] == 0)		\
+	 && (((const u_long *)(_addr))[2] == 0xffff0000)) /* Note byte order reversed */
+/* 	    (((const u_long *)(_addr))[2] == ntohl(0x0000ffff))) */
+
+#define IN6_IS_ADDR_V4COMPAT(_addr) \
+	(   (((const u_long *)(_addr))[0] == 0)		\
+	 && (((const u_long *)(_addr))[1] == 0)		\
+	 && (((const u_long *)(_addr))[2] == 0)		\
+	 && (((const u_long *)(_addr))[3] != 0)		\
+	 && (((const u_long *)(_addr))[3] != 0x01000000)) /* Note byte order reversed */
+/*           (ntohl (((const u_long *)(_addr))[3]) > 1 ) */
+
+
+#define IN6_IS_ADDR_MC_NODELOCAL(_addr)	\
+	(   IN6_IS_ADDR_MULTICAST(_addr)		\
+	 && ((((const u_char *)(_addr))[1] & 0xf) == 0x1)) 
+
+#define IN6_IS_ADDR_MC_LINKLOCAL(_addr)	\
+	(   IN6_IS_ADDR_MULTICAST (_addr)		\
+	 && ((((const u_char *)(_addr))[1] & 0xf) == 0x2))
+
+#define IN6_IS_ADDR_MC_SITELOCAL(_addr)	\
+	(   IN6_IS_ADDR_MULTICAST(_addr)		\
+	 && ((((const u_char *)(_addr))[1] & 0xf) == 0x5))
+
+#define IN6_IS_ADDR_MC_ORGLOCAL(_addr)	\
+	(   IN6_IS_ADDR_MULTICAST(_addr)		\
+	 && ((((const u_char *)(_addr))[1] & 0xf) == 0x8))
+
+#define IN6_IS_ADDR_MC_GLOBAL(_addr)	\
+	(   IN6_IS_ADDR_MULTICAST(_addr)	\
+	 && ((((const u_char *)(_addr))[1] & 0xf) == 0xe))
+
+
+typedef int socklen_t;
+
+struct ipv6_mreq {
+	struct in6_addr ipv6mr_multiaddr;
+	unsigned int    ipv6mr_interface;
+};
+typedef struct ipv6_mreq IPV6_MREG;
+
+struct in6_pktinfo {
+	IN6_ADDR ipi6_addr;
+	UINT     ipi6_ifindex;
+};
+typedef struct  in6_pktinfo IN6_PKTINFO;
+
+struct addrinfo {
+	int     ai_flags;
+	int     ai_family;
+	int     ai_socktype;
+	int     ai_protocol;
+	size_t  ai_addrlen;
+	char   *ai_canonname;
+	struct sockaddr  *ai_addr;
+	struct addrinfo  *ai_next;
+};
+
+void WSAAPI freeaddrinfo (struct addrinfo*);
+int WSAAPI getaddrinfo (const char*,const char*,const struct addrinfo*,
+		        struct addrinfo**);
+
+char* WSAAPI gai_strerrorA(int);
+WCHAR* WSAAPI gai_strerrorW(int);
+#ifdef UNICODE
+#define gai_strerror   gai_strerrorW
+#else
+#define gai_strerror   gai_strerrorA
+#endif  /* UNICODE */
+
+int WSAAPI getnameinfo(const struct sockaddr*,socklen_t,char*,DWORD,
+		       char*,DWORD,int);
+
+
+/* Some older IPv4/IPv6 compatability stuff */
+
+/* This struct lacks sin6_scope_id; retained for use in sockaddr_gen */
+struct sockaddr_in6_old {
+	short   sin6_family;
+	u_short sin6_port;
+	u_long  sin6_flowinfo;
+	struct in6_addr sin6_addr;
+};
+
+typedef union sockaddr_gen{
+	struct sockaddr		Address;
+	struct sockaddr_in	AddressIn;
+	struct sockaddr_in6_old	AddressIn6;
+} sockaddr_gen;
+
+
+typedef struct _INTERFACE_INFO {
+	u_long		iiFlags;
+	sockaddr_gen	iiAddress;
+	sockaddr_gen	iiBroadcastAddress;
+	sockaddr_gen	iiNetmask;
+} INTERFACE_INFO, *LPINTERFACE_INFO;
 
 /*
- * Watch this space.
- * These may get moved out to ipv6 specific header(s). along with other
- * standard structures and functions specified in RFC 2553.    
- */
-#endif
+   The definition above can cause problems on NT4,prior to sp4.
+   To workaround, include the following struct and typedef and
+   #define INTERFACE_INFO OLD_INTERFACE_INFO
+   See: FIX: WSAIoctl SIO_GET_INTERFACE_LIST Option Problem
+   (Q181520) in MSDN KB.
 
+   The old definition causes problems on newer NT and on XP.
+
+typedef struct _OLD_INTERFACE_INFO {
+	u_long		iiFlags;
+	struct sockaddr	iiAddress;
+ 	struct sockaddr	iiBroadcastAddress;
+ 	struct sockaddr	iiNetmask;
+} OLD_INTERFACE_INFO;
+*/
+
+#ifdef  __cplusplus
+}
+#endif
 #endif	/* _WS2TCPIP_H */
 
 

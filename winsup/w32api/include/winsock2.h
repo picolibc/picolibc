@@ -167,6 +167,16 @@ struct  protoent {
 #define IPPROTO_ND	77
 #define IPPROTO_RAW	255
 #define IPPROTO_MAX	256
+/* IPv6 options */
+#define IPPROTO_HOPOPTS		0  /* IPv6 Hop-by-Hop options */
+#define IPPROTO_IPV6		41 /* IPv6 header */
+#define IPPROTO_ROUTING		43 /* IPv6 Routing header */
+#define IPPROTO_FRAGMENT	44 /* IPv6 fragmentation header */
+#define IPPROTO_ESP		50 /* encapsulating security payload */
+#define IPPROTO_AH		51 /* authentication header */
+#define IPPROTO_ICMPV6		58 /* ICMPv6 */
+#define IPPROTO_NONE		59 /* IPv6 no next header */
+#define IPPROTO_DSTOPTS		60 /* IPv6 Destination options */
 #define IPPORT_ECHO	7
 #define IPPORT_DISCARD	9
 #define IPPORT_SYSTAT	11
