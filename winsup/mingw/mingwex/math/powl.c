@@ -690,6 +690,14 @@ Fa = reducl(F);
 Fb = F - Fa;
 
 G = Fa + w * ya;
+if (isinf (G))
+  {
+   /* Bail out: G - reducl(G) will result in NAN
+      that will propagate through rest of calculations */ 
+    _SET_ERRNO (ERANGE);
+    mtherr( fname, OVERFLOW );
+    return( MAXNUML );
+  }
 Ga = reducl(G);
 Gb = G - Ga;
 
