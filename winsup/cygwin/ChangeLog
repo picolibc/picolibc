@@ -1,3 +1,8 @@
+2004-05-09  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* environ.cc (build_env): Only try to construct required-but-missing
+	variables while issetuid.
+
 2004-05-08  Pierre Humblet <pierre.humblet@ieee.org>
             Christopher Faylor  <cgf@timesys.com>
 
