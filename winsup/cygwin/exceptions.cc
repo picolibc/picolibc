@@ -393,7 +393,7 @@ try_to_debug (bool waitloop)
       if (!waitloop)
 	return 1;
       SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
-      while (!IsDebuggerPresent ())
+      while (!being_debugged ())
 	/* spin */;
       Sleep (4000);
       small_printf ("*** continuing from debugger call\n");

@@ -92,7 +92,7 @@ dtable::extend (int howmuch)
 void
 dtable::get_debugger_info ()
 {
-  if (IsDebuggerPresent ())
+  if (being_debugged ())
     {
       char std[3][sizeof ("/dev/ttyNNNN")];
       std[0][0] = std[1][0] = std [2][0] = '\0';

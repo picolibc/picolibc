@@ -1,3 +1,11 @@
+2002-05-26  Christopher Faylor  <cgf@redhat.com>
+
+	* debug.h (being_debugged): New macro.
+	* dtable.cc (dtable::extend): Use new macro.
+	* exceptions.cc (try_to_debug): Ditto.
+	* strace.cc (strace::hello): Only output debugging info when we think
+	we're being debugged.
+
 2002-05-25  Robert Collins   <rbtcollins@hotmail.com>
 
 	* winsup.h: Remove duplicate declarations of malloc_lock and

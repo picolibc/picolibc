@@ -38,6 +38,9 @@ strace::hello()
       return;
     }
 
+  if (!being_debugged ())
+    return;
+
   __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR, &active);
   OutputDebugString (buf);
 
