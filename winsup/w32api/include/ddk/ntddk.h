@@ -27,15 +27,13 @@
 #ifndef __NTDDK_H
 #define __NTDDK_H
 
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#pragma pack(push,4)
 
 #include <stdarg.h>
 #include <windef.h>
@@ -80,8 +78,6 @@ typedef CONST char *PCSZ;
 
 /* Definitions only in Windows NT 4 */
 #include "winnt4.h"
-
-#pragma pack(pop)
 
 #ifdef __cplusplus
 }

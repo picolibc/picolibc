@@ -1,3 +1,8 @@
+2004-05-15  Filip Navara  <xnavara@volny.cz>
+
+	* include/ddk/ntddk.h: Don't set 4-byte alignment on included
+	headers.
+
 2004-05-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wingdi.h: Correct non-unicode typedefs of
