@@ -113,14 +113,14 @@ transport_layer_sockets::close()
 }
 
 ssize_t
-transport_layer_sockets::read (char *buf, size_t len)
+transport_layer_sockets::read (void *buf, size_t len)
 {
   /* FIXME: are we open? */
   return ::read (fd, buf, len);
 }
 
 ssize_t
-transport_layer_sockets::write (char *buf, size_t len)
+transport_layer_sockets::write (void *buf, size_t len)
 {
   /* FIXME: are we open? */
   return ::write (fd, buf, len);

@@ -19,8 +19,8 @@ class transport_layer_pipes : public transport_layer_base
     virtual void listen ();
     virtual class transport_layer_pipes * accept ();
     virtual void close ();
-    virtual ssize_t read (char *buf, size_t len);
-    virtual ssize_t write (char *buf, size_t len);
+    virtual ssize_t read (void *buf, size_t len);
+    virtual ssize_t write (void *buf, size_t len);
     virtual bool connect();
     virtual void impersonate_client ();
     virtual void revert_to_self ();

@@ -122,37 +122,47 @@ transport_layer_pipes::close()
 }
 
 ssize_t
-transport_layer_pipes::read (char *buf, size_t len)
+transport_layer_pipes::read (void * const buf, const size_t len)
 {
   // verbose: debug_printf ("reading from pipe %p", pipe);
-  if (!pipe || pipe == INVALID_HANDLE_VALUE)
-    return -1;
 
-  DWORD bytes_read;
-  DWORD rc = ReadFile (pipe, buf, len, &bytes_read, NULL);
-  if (!rc)
+  if (!pipe || pipe == INVALID_HANDLE_VALUE)
     {
-      debug_printf ("error reading from pipe (%lu)", GetLastError ());
+      errno = EBADF;
       return -1;
     }
-  return bytes_read;
+
+  DWORD count;
+  if (!ReadFile (pipe, buf, len, &count, NULL))
+    {
+      debug_printf ("error reading from pipe (%lu)", GetLastError ());
+      errno = EINVAL;		// FIXME?
+      return -1;
+    }
+
+  return count;
 }
 
 ssize_t
-transport_layer_pipes::write (char *buf, size_t len)
+transport_layer_pipes::write (void * const buf, const size_t len)
 {
   // verbose: debug_printf ("writing to pipe %p", pipe);
-  DWORD bytes_written, rc;
-  if (!pipe || pipe == INVALID_HANDLE_VALUE)
-    return -1;
 
-  rc = WriteFile (pipe, buf, len, &bytes_written, NULL);
-  if (!rc)
+  if (!pipe || pipe == INVALID_HANDLE_VALUE)
     {
-      debug_printf ("error writing to pipe (%lu)", GetLastError ());
+      errno = EBADF;
       return -1;
     }
-  return bytes_written;
+
+  DWORD count;
+  if (!WriteFile (pipe, buf, len, &count, NULL))
+    {
+      debug_printf ("error writing to pipe (%lu)", GetLastError ());
+      errno = EINVAL;		// FIXME?
+      return -1;
+    }
+
+  return count;
 }
 
 bool

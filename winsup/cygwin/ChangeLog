@@ -1,3 +1,22 @@
+2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/cygwin/cygserver_transport.h
+	(cygserver_transport::read): Change buffer type to void *.
+	(cygserver_transport::write): Ditto.
+	* include/cygwin/cygserver_transport_sockets.h
+	(cygserver_transport_sockets::read): Ditto.
+	(cygserver_transport_sockets::write): Ditto.
+	* include/cygwin/cygserver_transport_pipes.h
+	(cygserver_transport_pipes::read): Ditto.
+	(cygserver_transport_pipes::write): Ditto.
+	* cygserver_transport_sockets.cc
+	(cygserver_transport_sockets::read): Ditto.
+	(cygserver_transport_sockets::write): Ditto.
+	* cygserver_transport_pipes.cc
+	(cygserver_transport_pipes::read): Ditto. Set errno on error, to
+	match behaviour of cygserver_transport_sockets class.
+	(cygserver_transport_pipes::write): Ditto.
+
 2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver.cc (version): New static variable.
