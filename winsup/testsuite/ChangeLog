@@ -1,3 +1,10 @@
+2003-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.api/msgtest.c: New file derived from FreeBSD, testing
+	XSI Message Queue support.
+	* winsup.api/semtest.c: Ditto, testing XSI Semaphore support.
+	* winsup.api/shmtest.c: Ditto, testing XSI Shared Memory support.
+
 2003-07-06  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.api/known_bugs.tcl: Remove gethostid01 from list of known
