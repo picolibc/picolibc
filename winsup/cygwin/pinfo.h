@@ -138,7 +138,7 @@ public:
   void commune_recv ();
   commune_result commune_send (DWORD);
   bool alive ();
-  char *cmdline (size_t &);
+  char *cmdline (__off64_t &);
 
   friend void __stdcall set_myself (pid_t, HANDLE);
 

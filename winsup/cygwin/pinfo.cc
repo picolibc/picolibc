@@ -429,7 +429,7 @@ out:
 }
 
 char *
-_pinfo::cmdline (size_t& n)
+_pinfo::cmdline (__off64_t& n)
 {
   char *s;
   if (!this || !pid)

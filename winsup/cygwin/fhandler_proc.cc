@@ -70,9 +70,9 @@ static const DWORD proc_fhandlers[PROC_LINK_COUNT] = {
 const char proc[] = "/proc";
 const int proc_len = sizeof (proc) - 1;
 
-static off_t format_proc_meminfo (char *destbuf, size_t maxsize);
-static off_t format_proc_stat (char *destbuf, size_t maxsize);
-static off_t format_proc_uptime (char *destbuf, size_t maxsize);
+static __off64_t format_proc_meminfo (char *destbuf, size_t maxsize);
+static __off64_t format_proc_stat (char *destbuf, size_t maxsize);
+static __off64_t format_proc_uptime (char *destbuf, size_t maxsize);
 
 /* auxillary function that returns the fhandler associated with the given path
  * this is where it would be nice to have pattern matching in C - polymorphism
@@ -368,7 +368,7 @@ fhandler_proc::fill_filebuf ()
 }
 
 static
-off_t
+__off64_t
 format_proc_meminfo (char *destbuf, size_t maxsize)
 {
   unsigned long mem_total = 0UL, mem_free = 0UL, swap_total = 0UL,
@@ -399,7 +399,7 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
 }
 
 static
-off_t
+__off64_t
 format_proc_uptime (char *destbuf, size_t maxsize)
 {
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
@@ -430,7 +430,7 @@ format_proc_uptime (char *destbuf, size_t maxsize)
 }
 
 static
-off_t
+__off64_t
 format_proc_stat (char *destbuf, size_t maxsize)
 {
   unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;

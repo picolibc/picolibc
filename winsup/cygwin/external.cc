@@ -242,7 +242,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
       case CW_CMDLINE:
 	{
-	  size_t n;
+	  __off64_t n;
 	  pid_t pid = va_arg (arg, pid_t);
 	  pinfo p (pid);
 	  return (DWORD) p->cmdline (n);

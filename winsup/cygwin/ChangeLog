@@ -1,3 +1,18 @@
+2003-03-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): Change n to __off64_t to match change
+	of _pinfo::cmdline.
+	* fhandler.h (class fhandler_virtual): Change filesize member to
+	__off64_t.
+	* fhandler_proc.cc (format_proc_meminfo): Change to return __off64_t.
+	(format_proc_stat): Ditto.
+	(format_proc_uptime): Ditto.
+	* fhandler_process.cc (format_process_stat): Ditto.
+	(format_process_status): Ditto.
+	(format_process_statm): Ditto.
+	* pinfo.cc (_pinfo::cmdline): Expect __off64_t parameter.
+	* pinfo.h (class _pinfo): Change declaration of cmdline accordingly.
+
 2003-03-07  Christopher Faylor  <cgf@redhat.com>
 
 	* path.h (PATH_LNK): New enum val.
