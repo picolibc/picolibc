@@ -19,6 +19,7 @@
 #include <netdb.h>
 #include "wincap.h"
 #include "cygwin/cygserver_transport.h"
+#include "cygwin/cygserver_transport_pipes.h"
 
 /* to allow this to link into cygwin and the .dll, a little magic is needed. */
 #ifndef __OUTSIDE_CYGWIN__

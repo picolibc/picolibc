@@ -1,3 +1,29 @@
+Sat Sep 29 20:40:00 2001 Robert Collins <rbtcollins@hotmail.com>
+
+	* Makefile.in: Add cygserver_transport_sockets.o to DLL_OFILES.
+	Add cygserver_transport_sockets_outside.o to cygserver.exe.
+	* cygserver.cc: Include new include files.
+	* cygserver_client.cc: Ditto.
+	* cygserver_shm.h: No need to include <sys/socket.h> now.
+	* cygerver_transport.cc: Include new include files.
+	(transport_layer_base::transport_layer_base): Strip back to a stub.
+	(transport_layer_base::listen): Ditto.
+	(transport_layer_base::accept): Ditto.
+	(transport_layer_base::close): Ditto.
+	(transport_layer_base::read): Ditto.
+	(transport_layer_base::write): Ditto.
+	(transport_layer_base::connect): Ditto.
+	* cygserver_transport_pipes.cc: Include new header 
+	"cygwin/cygserver_transport_pipes.h".
+	* cygserver_transport_sockets.cc: New file.
+	* dcrt0.cc: No need to include <sys/socket.h> now.
+	* fhandler_tty.cc: Ditto.
+	* tty.cc: Ditto.
+	* include/cygwin/cygserver_transport.h: Strip the base class to a stub.
+	Remove the cygserver_transport_pipes class.
+	* include/cygwin/cygserver_transport_pipes.h: New file.
+	* include/cygwin/cygserver_transport_sockets.h: New file.
+
 Tue Sep 25 16:22:00 2001 Robert Collins <rbtcollins@hotmail.com>
 
 	* autoload.cc: Add dynamic load statement for 'ImpersonateNamedPipeClient'.

@@ -22,6 +22,8 @@
 #include "getopt.h"
 
 #include "cygwin/cygserver_transport.h"
+#include "cygwin/cygserver_transport_pipes.h"
+#include "cygwin/cygserver_transport_sockets.h"
 #include "cygwin/cygserver.h"
 #include "cygserver_shm.h"
 

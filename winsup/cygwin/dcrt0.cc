@@ -34,7 +34,6 @@ details. */
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
-#include <sys/socket.h>
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver.h"
 

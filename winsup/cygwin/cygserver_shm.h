@@ -10,7 +10,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include <sys/types.h>
-#include <sys/socket.h>
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver.h"
 

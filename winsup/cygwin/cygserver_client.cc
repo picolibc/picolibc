@@ -27,6 +27,8 @@
 #include <unistd.h>
 //#include "security.h"
 #include "cygwin/cygserver_transport.h"
+#include "cygwin/cygserver_transport_pipes.h"
+#include "cygwin/cygserver_transport_sockets.h"
 #include "cygwin/cygserver.h"
 
 /* 0 = untested, 1 = running, 2 = dead */

@@ -23,7 +23,6 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include <sys/socket.h>
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver.h"
 #include "shared_info.h"
