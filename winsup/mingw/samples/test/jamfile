@@ -1,9 +1,0 @@
-#
-# A very simple example with which you can test your compiler/jam setup.
-# Also an interesting example of a hybrid console/GUI application.
-#
-
-Main test.exe : test.c ;
-
-GuiLibs test.exe ;
-
