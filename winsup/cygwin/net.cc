@@ -1551,7 +1551,7 @@ static void
 get_2k_ifconf (struct ifconf *ifc, int what)
 {
   int cnt = 0;
-  char eth[2] = "/", ppp[2] = "/", slp[2] = "/";
+  char eth[2] = "/", ppp[2] = "/", slp[2] = "/", sub[2] = "0";
 
   /* Union maps buffer to correct struct */
   struct ifreq *ifr = ifc->ifc_req;
@@ -1571,84 +1571,98 @@ get_2k_ifconf (struct ifconf *ifc, int what)
       !GetIfTable(ift, &siz_if_table, TRUE) &&
       !GetIpAddrTable(ipt, &siz_ip_table, TRUE))
     {
+      /* Iterate over all known interfaces */
       for (if_cnt = 0; if_cnt < ift->dwNumEntries; ++if_cnt)
-	{
-	  switch (ift->table[if_cnt].dwType)
+        {
+	  *sub = '0';
+	  /* Iterate over all configured IP-addresses */
+	  for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt) 
 	    {
-	    case MIB_IF_TYPE_ETHERNET:
-	      ++*eth;
-	      strcpy (ifr->ifr_name, "eth");
-	      strcat (ifr->ifr_name, eth);
-	      break;
-	    case MIB_IF_TYPE_PPP:
-	      ++*ppp;
-	      strcpy (ifr->ifr_name, "ppp");
-	      strcat (ifr->ifr_name, ppp);
-	      break;
-	    case MIB_IF_TYPE_SLIP:
-	      ++*slp;
-	      strcpy (ifr->ifr_name, "slp");
-	      strcat (ifr->ifr_name, slp);
-	      break;
-	    case MIB_IF_TYPE_LOOPBACK:
-	      strcpy (ifr->ifr_name, "lo");
-	      break;
-	    default:
-	      continue;
-	    }
-	  for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt)
-	    if (ipt->table[ip_cnt].dwIndex == ift->table[if_cnt].dwIndex)
-	      {
-		switch (what)
-		  {
-		  case SIOCGIFCONF:
-		  case SIOCGIFADDR:
-		    sa = (struct sockaddr_in *) &ifr->ifr_addr;
-		    sa->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr;
-		    sa->sin_family = AF_INET;
-		    sa->sin_port = 0;
-		    break;
-		  case SIOCGIFBRDADDR:
-		    sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+	      /* Does the IP address belong to the interface? */
+	      if (ipt->table[ip_cnt].dwIndex == ift->table[if_cnt].dwIndex)
+		{
+		  /* Setup the interface name */
+		  switch (ift->table[if_cnt].dwType)
+		    {
+		      case MIB_IF_TYPE_ETHERNET:
+			if (*sub == '0')
+			  ++*eth;
+			strcpy (ifr->ifr_name, "eth");
+			strcat (ifr->ifr_name, eth);
+			break;
+		      case MIB_IF_TYPE_PPP:
+			++*ppp;
+			strcpy (ifr->ifr_name, "ppp");
+			strcat (ifr->ifr_name, ppp);
+			break;
+		      case MIB_IF_TYPE_SLIP:
+			++*slp;
+			strcpy (ifr->ifr_name, "slp");
+			strcat (ifr->ifr_name, slp);
+			break;
+		      case MIB_IF_TYPE_LOOPBACK:
+			strcpy (ifr->ifr_name, "lo");
+			break;
+		      default:
+			continue;
+		    }
+		  if (*sub > '0')
+		    {
+		      strcat (ifr->ifr_name, ":");
+		      strcat (ifr->ifr_name, sub);
+		    }
+		  ++*sub;
+		  /* setup sockaddr struct */
+		  switch (what)
+		    {
+		      case SIOCGIFCONF:
+		      case SIOCGIFADDR:
+			sa = (struct sockaddr_in *) &ifr->ifr_addr;
+			sa->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr;
+			sa->sin_family = AF_INET;
+			sa->sin_port = 0;
+			break;
+		      case SIOCGIFBRDADDR:
+			sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
 #if 0
-		    /* Unfortunately, the field returns only crap. */
-		    sa->sin_addr.s_addr = ipt->table[ip_cnt].dwBCastAddr;
+			/* Unfortunately, the field returns only crap. */
+			sa->sin_addr.s_addr = ipt->table[ip_cnt].dwBCastAddr;
 #else
-		    lip = ipt->table[ip_cnt].dwAddr;
-		    lnp = ipt->table[ip_cnt].dwMask;
-		    sa->sin_addr.s_addr = lip & lnp | ~lnp;
-		    sa->sin_family = AF_INET;
-		    sa->sin_port = 0;
+			lip = ipt->table[ip_cnt].dwAddr;
+			lnp = ipt->table[ip_cnt].dwMask;
+			sa->sin_addr.s_addr = lip & lnp | ~lnp;
+			sa->sin_family = AF_INET;
+			sa->sin_port = 0;
 #endif
-		    break;
-		  case SIOCGIFNETMASK:
-		    sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-		    sa->sin_addr.s_addr = ipt->table[ip_cnt].dwMask;
-		    sa->sin_family = AF_INET;
-		    sa->sin_port = 0;
-		    break;
-		  case SIOCGIFHWADDR:
-		    so = &ifr->ifr_hwaddr;
-		    for (UINT i = 0; i < IFHWADDRLEN; ++i)
-		      if (i >= ift->table[if_cnt].dwPhysAddrLen)
-			so->sa_data[i] = '\0';
-		      else
-			so->sa_data[i] = ift->table[if_cnt].bPhysAddr[i];
-		    so->sa_family = AF_INET;
-		    break;
-		  case SIOCGIFMETRIC:
-		    ifr->ifr_metric = 1;
-		    break;
-		  case SIOCGIFMTU:
-		    ifr->ifr_mtu = ift->table[if_cnt].dwMtu;
-		    break;
-		  }
-		++cnt;
-		if ((caddr_t) ++ifr >
-		    ifc->ifc_buf + ifc->ifc_len - sizeof (struct ifreq))
-		  goto done;
-		break;
-	      }
+			break;
+		      case SIOCGIFNETMASK:
+			sa = (struct sockaddr_in *) &ifr->ifr_netmask;
+			sa->sin_addr.s_addr = ipt->table[ip_cnt].dwMask;
+			sa->sin_family = AF_INET;
+			sa->sin_port = 0;
+			break;
+		      case SIOCGIFHWADDR:
+			so = &ifr->ifr_hwaddr;
+			for (UINT i = 0; i < IFHWADDRLEN; ++i)
+			  if (i >= ift->table[if_cnt].dwPhysAddrLen)
+			    so->sa_data[i] = '\0';
+			  else
+			    so->sa_data[i] = ift->table[if_cnt].bPhysAddr[i];
+			so->sa_family = AF_INET;
+			break;
+		      case SIOCGIFMETRIC:
+			ifr->ifr_metric = 1;
+			break;
+		      case SIOCGIFMTU:
+			ifr->ifr_mtu = ift->table[if_cnt].dwMtu;
+			break;
+		    }
+		  ++cnt;
+		  if ((caddr_t) ++ifr >
+		      ifc->ifc_buf + ifc->ifc_len - sizeof (struct ifreq))
+		    goto done;
+		}
+	    }
 	}
     }
 done:
