@@ -35,6 +35,7 @@ extern BOOL allow_winsymlinks;
 extern BOOL strip_title_path;
 extern int pcheck_case;
 extern DWORD chunksize;
+extern int subauth_id;
 BOOL reset_com = TRUE;
 static BOOL envcache = TRUE;
 
@@ -446,6 +447,19 @@ codepage_init (const char *buf)
     }
 }
 
+static void
+subauth_id_init (const char *buf)
+{
+  if (!buf || !*buf)
+    return;
+
+  int i = strtol (buf, NULL, 0);
+
+  /* 0..127 are reserved by Microsoft, 132 is IIS subauthentication. */
+  if (i > 127 && i != 132 && i <= 255)
+    subauth_id = i;
+}
+
 /* The structure below is used to set up an array which is used to
    parse the CYGWIN environment variable or, if enabled, options from
    the registry.  */
@@ -482,6 +496,7 @@ struct parse_thing
   {"smbntsec", {&allow_smbntsec}, justset, NULL, {{FALSE}, {TRUE}}},
   {"reset_com", {&reset_com}, justset, NULL, {{FALSE}, {TRUE}}},
   {"strip_title", {&strip_title_path}, justset, NULL, {{FALSE}, {TRUE}}},
+  {"subauth_id", {func: &subauth_id_init}, isfunc, NULL, {{0}, {0}}},
   {"title", {&display_title}, justset, NULL, {{FALSE}, {TRUE}}},
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},
   {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{FALSE}, {TRUE}}},

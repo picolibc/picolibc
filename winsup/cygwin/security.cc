@@ -24,6 +24,9 @@ details. */
 #include <ctype.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include <wininet.h>
+#include <ntsecapi.h>
+#include <subauth.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "fhandler.h"
@@ -56,6 +59,39 @@ cygwin_set_impersonation_token (const HANDLE hToken)
     }
 }
 
+static void
+extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
+{
+  char buf[INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 2];
+  char *c;
+
+  strcpy (domain, "");
+  strcpy (buf, pw->pw_name);
+  debug_printf ("pw_gecos = %x (%s)", pw->pw_gecos, pw->pw_gecos);
+  if (pw->pw_gecos)
+    {
+      if ((c = strstr (pw->pw_gecos, "U-")) != NULL &&
+          (c == pw->pw_gecos || c[-1] == ','))
+	{
+	  buf[0] = '\0';
+	  strncat (buf, c + 2, INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 1);
+	  if ((c = strchr (buf, ',')) != NULL)
+	    *c = '\0';
+	}
+    }
+  if ((c = strchr (buf, '\\')) != NULL)
+    {
+      *c++ = '\0';
+      strcpy (domain, buf);
+      strcpy (user, c);
+    }
+  else
+    {
+      strcpy (domain, "");
+      strcpy (user, buf);
+    }
+}
+
 extern "C"
 HANDLE
 cygwin_logon_user (const struct passwd *pw, const char *password)
@@ -71,32 +107,13 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
       return INVALID_HANDLE_VALUE;
     }
 
-  char *c, *nt_user, *nt_domain = NULL;
-  char usernamebuf[256];
+  char nt_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  char nt_user[UNLEN + 1];
   HANDLE hToken;
 
-  strcpy (usernamebuf, pw->pw_name);
-  debug_printf ("pw_gecos = %x (%s)", pw->pw_gecos, pw->pw_gecos);
-  if (pw->pw_gecos)
-    {
-      if ((c = strstr (pw->pw_gecos, "U-")) != NULL &&
-	  (c == pw->pw_gecos || c[-1] == ','))
-	{
-	  usernamebuf[0] = '\0';
-	  strncat (usernamebuf, c + 2, 255);
-	  if ((c = strchr (usernamebuf, ',')) != NULL)
-	    *c = '\0';
-	}
-    }
-  nt_user = usernamebuf;
-  if ((c = strchr (nt_user, '\\')) != NULL)
-    {
-      nt_domain = nt_user;
-      *c = '\0';
-      nt_user = c + 1;
-    }
+  extract_nt_dom_user (pw, nt_domain, nt_user);
   debug_printf ("LogonUserA (%s, %s, %s, ...)", nt_user, nt_domain, password);
-  if (!LogonUserA (nt_user, nt_domain, (char *) password,
+  if (!LogonUserA (nt_user, *nt_domain ? nt_domain : NULL, (char *) password,
 		    LOGON32_LOGON_INTERACTIVE,
 		    LOGON32_PROVIDER_DEFAULT,
 		    &hToken)
@@ -109,6 +126,126 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
     }
   debug_printf ("%d = logon_user(%s,...)", hToken, pw->pw_name);
   return hToken;
+}
+
+static void
+str2lsa (LSA_STRING &tgt, const char *srcstr)
+{
+  tgt.Length = strlen(srcstr);
+  tgt.MaximumLength = tgt.Length + 1;
+  tgt.Buffer = (PCHAR) srcstr;
+}
+
+static void
+str2buf2lsa (LSA_STRING &tgt, char *buf, const char *srcstr)
+{
+  tgt.Length = strlen(srcstr);
+  tgt.MaximumLength = tgt.Length + 1;
+  tgt.Buffer = (PCHAR) buf;
+  memcpy(buf, srcstr, tgt.MaximumLength);
+}
+
+static void
+str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
+{
+  tgt.Length = strlen(srcstr) * sizeof (WCHAR);
+  tgt.MaximumLength = tgt.Length + sizeof(WCHAR);
+  tgt.Buffer = (PWCHAR) buf;
+  mbstowcs (buf, srcstr, tgt.MaximumLength);
+}
+
+int subauth_id = 255;
+
+HANDLE
+subauth (struct passwd *pw)
+{
+  LSA_STRING name;
+  HANDLE lsa_hdl;
+  LSA_OPERATIONAL_MODE sec_mode;
+  NTSTATUS ret, ret2;
+  ULONG package_id, size;
+  struct {
+    LSA_STRING str;
+    CHAR buf[16];
+  } origin;
+  struct {
+    MSV1_0_LM20_LOGON auth;
+    WCHAR dombuf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+    WCHAR usrbuf[UNLEN + 1];
+    WCHAR wkstbuf[1];
+    CHAR authinf1[1];
+    CHAR authinf2[1];
+  } subbuf;
+  TOKEN_SOURCE ts;
+  PMSV1_0_LM20_LOGON_PROFILE profile;
+  LUID luid;
+  HANDLE user_token;
+  QUOTA_LIMITS quota;
+  char nt_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  char nt_user[UNLEN + 1];
+
+  set_process_privilege(SE_TCB_NAME);
+
+  /* Register as logon process. */
+  str2lsa (name, "Cygwin");
+  ret = LsaRegisterLogonProcess(&name, &lsa_hdl, &sec_mode);
+  if (ret != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaRegisterLogonProcess: %d", ret);
+      set_errno (LsaNtStatusToWinError(ret));
+      return INVALID_HANDLE_VALUE;
+    }
+  /* Get handle to MSV1_0 package. */
+  str2lsa (name, MSV1_0_PACKAGE_NAME);
+  ret = LsaLookupAuthenticationPackage(lsa_hdl, &name, &package_id);
+  if (ret != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaLookupAuthenticationPackage: %d", ret);
+      set_errno (LsaNtStatusToWinError(ret));
+      LsaDeregisterLogonProcess(lsa_hdl);
+      return INVALID_HANDLE_VALUE;
+    }
+  /* Create origin. */
+  str2buf2lsa (origin.str, origin.buf, "Cygwin");
+  /* Create token source. */
+  memcpy(ts.SourceName, "Cygwin.1", 8);
+  AllocateLocallyUniqueId(&ts.SourceIdentifier);
+  /* Get user information. */
+  extract_nt_dom_user (pw, nt_domain, nt_user);
+  /* Fill subauth with values. */
+  subbuf.auth.MessageType = MsV1_0NetworkLogon;
+  str2buf2uni(subbuf.auth.LogonDomainName, subbuf.dombuf, nt_domain);
+  str2buf2uni(subbuf.auth.UserName, subbuf.usrbuf, nt_user);
+  str2buf2uni(subbuf.auth.Workstation, subbuf.wkstbuf, "");
+  memcpy(subbuf.auth.ChallengeToClient, "12345678", MSV1_0_CHALLENGE_LENGTH);
+  str2buf2lsa(subbuf.auth.CaseSensitiveChallengeResponse, subbuf.authinf1, "");
+  str2buf2lsa(subbuf.auth.CaseInsensitiveChallengeResponse, subbuf.authinf2,"");
+  subbuf.auth.ParameterControl = 0 | (subauth_id << 24);
+  /* Try to logon... */
+  ret = LsaLogonUser(lsa_hdl, (PLSA_STRING) &origin, Network,
+  		     package_id, &subbuf, sizeof subbuf,
+		     NULL, &ts, (PVOID *)&profile, &size,
+		     &luid, &user_token, &quota, &ret2);
+  if (ret != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaLogonUser: %d", ret);
+      set_errno (LsaNtStatusToWinError(ret));
+      LsaDeregisterLogonProcess(lsa_hdl);
+      return INVALID_HANDLE_VALUE;
+    }
+  LsaFreeReturnBuffer(profile);
+  /* Convert to primary token. */
+  SECURITY_ATTRIBUTES sa = { sizeof sa, NULL, TRUE };
+  HANDLE primary_token;
+  if (!DuplicateTokenEx (user_token, TOKEN_ALL_ACCESS, &sa,
+  			 SecurityImpersonation, TokenPrimary,
+			 &primary_token))
+    {
+      CloseHandle (user_token);
+      return INVALID_HANDLE_VALUE;
+    }
+  CloseHandle (user_token);
+  return primary_token;
 }
 
 /* read_sd reads a security descriptor from a file.

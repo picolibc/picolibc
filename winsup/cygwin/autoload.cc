@@ -129,6 +129,28 @@ LoadDLLinitfunc (ntdll)
   return 0;
 }
 
+LoadDLLinitfunc (secur32)
+{
+  HANDLE h;
+  static NO_COPY LONG here = -1L;
+
+  while (InterlockedIncrement (&here))
+    {
+      InterlockedDecrement (&here);
+      Sleep (0);
+    }
+
+  if (secur32_handle)
+    /* nothing to do */;
+  else if ((h = LoadLibrary ("secur32.dll")) != NULL)
+    secur32_handle = h;
+  else if (!secur32_handle)
+    api_fatal ("could not load secur32.dll, %E");
+
+  InterlockedDecrement (&here);
+  return 0;		/* Already done by another thread? */
+}
+
 LoadDLLinitfunc (user32)
 {
   HANDLE h;
@@ -271,12 +293,14 @@ LoadDLLfunc (AddAccessAllowedAce, 16, advapi32)
 LoadDLLfunc (AddAccessDeniedAce, 16, advapi32)
 LoadDLLfunc (AddAce, 20, advapi32)
 LoadDLLfunc (AdjustTokenPrivileges, 24, advapi32)
+LoadDLLfuncEx (AllocateLocallyUniqueId, 4, advapi32, 1)
 LoadDLLfunc (CopySid, 12, advapi32)
 LoadDLLfunc (CreateProcessAsUserA, 44, advapi32)
 LoadDLLfuncEx (CryptAcquireContextA, 20, advapi32, 1)
 LoadDLLfuncEx (CryptGenRandom, 12, advapi32, 1)
 LoadDLLfuncEx (CryptReleaseContext, 8, advapi32, 1)
 LoadDLLfunc (DeregisterEventSource, 4, advapi32)
+LoadDLLfuncEx (DuplicateTokenEx, 24, advapi32, 1)
 LoadDLLfunc (EqualSid, 8, advapi32)
 LoadDLLfunc (GetAce, 12, advapi32)
 LoadDLLfunc (GetFileSecurityA, 20, advapi32)
@@ -298,6 +322,7 @@ LoadDLLfunc (LogonUserA, 24, advapi32)
 LoadDLLfunc (LookupAccountNameA, 28, advapi32)
 LoadDLLfunc (LookupAccountSidA, 28, advapi32)
 LoadDLLfunc (LookupPrivilegeValueA, 12, advapi32)
+LoadDLLfuncEx (LsaNtStatusToWinError, 4, advapi32, 1)
 LoadDLLfunc (MakeSelfRelativeSD, 12, advapi32)
 LoadDLLfunc (OpenProcessToken, 12, advapi32)
 LoadDLLfunc (RegCloseKey, 4, advapi32)
@@ -333,6 +358,13 @@ LoadDLLfuncEx (NtUnmapViewOfSection, 8, ntdll, 1)
 LoadDLLfuncEx (RtlInitUnicodeString, 8, ntdll, 1)
 LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)
 LoadDLLfuncEx (ZwQuerySystemInformation, 16, ntdll, 1)
+
+LoadDLLinit (secur32)
+LoadDLLfuncEx (LsaDeregisterLogonProcess, 4, secur32, 1)
+LoadDLLfuncEx (LsaFreeReturnBuffer, 4, secur32, 1)
+LoadDLLfuncEx (LsaLogonUser, 56, secur32, 1)
+LoadDLLfuncEx (LsaLookupAuthenticationPackage, 12, secur32, 1)
+LoadDLLfuncEx (LsaRegisterLogonProcess, 12, secur32, 1)
 
 LoadDLLinit (user32)
 LoadDLLfunc (CharToOemA, 8, user32)

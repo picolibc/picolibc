@@ -1,3 +1,31 @@
+Mon Apr 30 22:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Add LoadDLLinitfunc for secur32.dll.
+	Add LoadDLLfuncEx statements for AllocateLocallyUniqueId@4,
+	DuplicateTokenEx@24, LsaNtStatusToWinError@4, 
+	LsaDeregisterLogonProcess@4, LsaFreeReturnBuffer@4,
+	LsaLogonUser@56, LsaLookupAuthenticationPackage@12,
+	LsaRegisterLogonProcess@12,
+	* environ.cc: Add extern declaration for `subauth_id'.
+	(subauth_id_init): New function for setting `subauth_id'.
+	(struct parse_thing): Add entry for `subauth_id'.
+	* fork.cc (fork_parent): Call `RevertToSelf' and
+	`ImpersonateLoggedOnUser' instead of `seteuid'.
+	* security.cc: Define global variable `subauth_id'.
+	(extract_nt_dom_user): New function.
+	(cygwin_logon_user): Call `extract_nt_dom_user' now.
+	(str2lsa): New static function.
+	(str2buf2lsa): Ditto.
+	(str2buf2uni): Ditto.
+	(subauth): Ditto.
+	* security.h: Add prototype for `subauth'.
+	* spawn.cc (spawn_guts): Use cygheap->user.token only if impersonated.
+	Use `cygsid' type. Remove impersonation before allowing access to
+	workstation/desktop to everyone. Call `RevertToSelf' and
+	`ImpersonateLoggedOnUser' instead of `seteuid'.
+	* syscalls.cc (seteuid): Rearranged to allow using subauthentication
+	to retrieve user tokens when needed.
+
 Mon Apr 30 20:26:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* uinfo.cc (internal_getlogin): Formatting change.

@@ -436,7 +436,7 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll,
   uid_t uid;
   uid = geteuid();
   if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
-    seteuid (cygheap->user.orig_uid);
+    RevertToSelf ();
 
   ch.parent = hParent;
   ch.cygheap = cygheap;
@@ -484,7 +484,7 @@ out:
       /* Restore impersonation */
       if (cygheap->user.impersonated
           && cygheap->user.token != INVALID_HANDLE_VALUE)
-	seteuid (uid);
+	ImpersonateLoggedOnUser (cygheap->user.token);
       return -1;
     }
 
@@ -508,7 +508,7 @@ out:
 
   /* Restore impersonation */
   if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
-    seteuid (uid);
+    ImpersonateLoggedOnUser (cygheap->user.token);
 
   ProtectHandle (pi.hThread);
   /* Protect the handle but name it similarly to the way it will

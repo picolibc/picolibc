@@ -578,7 +578,8 @@ skip_arg_parsing:
   /* Preallocated buffer for `sec_user' call */
   char sa_buf[1024];
 
-  if (!hToken && cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (!hToken && cygheap->user.impersonated
+      && cygheap->user.token != INVALID_HANDLE_VALUE)
     hToken = cygheap->user.token;
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
@@ -607,6 +608,28 @@ skip_arg_parsing:
     }
   else
     {
+      cygsid sid;
+      DWORD ret_len;
+      if (!GetTokenInformation (hToken, TokenUser, &sid, sizeof sid, &ret_len))
+        {
+	  sid = NULL;
+	  system_printf ("GetTokenInformation: %E");
+	}
+
+      /* Retrieve security attributes before setting psid to NULL
+	 since it's value is needed by `sec_user'. */
+      PSECURITY_ATTRIBUTES sec_attribs = allow_ntsec && sid
+					 ? sec_user (sa_buf, sid)
+					 : &sec_all_nih;
+
+      /* Remove impersonation */
+      if (cygheap->user.impersonated
+          && cygheap->user.token != INVALID_HANDLE_VALUE)
+	RevertToSelf ();
+
+      /* Load users registry hive. */
+      load_registry_hive (sid);
+
       /* allow the child to interact with our window station/desktop */
       HANDLE hwst, hdsk;
       SECURITY_INFORMATION dsi = DACL_SECURITY_INFORMATION;
@@ -625,31 +648,6 @@ skip_arg_parsing:
       strcat (wstname, dskname);
       si.lpDesktop = wstname;
 
-      char tu[1024];
-      PSID sid = NULL;
-      DWORD ret_len;
-      if (GetTokenInformation (hToken, TokenUser,
-			       (LPVOID) &tu, sizeof tu,
-			       &ret_len))
-	sid = ((TOKEN_USER *) &tu)->User.Sid;
-      else
-	system_printf ("GetTokenInformation: %E");
-
-      /* Retrieve security attributes before setting psid to NULL
-	 since it's value is needed by `sec_user'. */
-      PSECURITY_ATTRIBUTES sec_attribs = allow_ntsec && sid
-					 ? sec_user (sa_buf, sid)
-					 : &sec_all_nih;
-
-      /* Remove impersonation */
-      uid_t uid = geteuid ();
-      if (cygheap->user.impersonated
-          && cygheap->user.token != INVALID_HANDLE_VALUE)
-	seteuid (cygheap->user.orig_uid);
-
-      /* Load users registry hive. */
-      load_registry_hive (sid);
-
       rc = CreateProcessAsUser (hToken,
 		       runpath,		/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
@@ -666,7 +664,7 @@ skip_arg_parsing:
       if (mode != _P_OVERLAY && mode != _P_VFORK
 	  && cygheap->user.impersonated
 	  && cygheap->user.token != INVALID_HANDLE_VALUE)
-	seteuid (uid);
+	ImpersonateLoggedOnUser (cygheap->user.token);
     }
 
   MALLOC_CHECK;

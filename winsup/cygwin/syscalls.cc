@@ -1964,68 +1964,96 @@ seteuid (uid_t uid)
 	    }
 
 	  if (uid != myself->uid)
-	    if (uid == cygheap->user.orig_uid)
-	      {
-		debug_printf ("RevertToSelf () (uid == orig_uid, token=%d)",
-			      cygheap->user.token);
-		RevertToSelf ();
-		if (cygheap->user.token != INVALID_HANDLE_VALUE)
-		  cygheap->user.impersonated = FALSE;
-	      }
-	    else if (!cygheap->user.impersonated)
-	      {
-		debug_printf ("Impersonate (uid == %d)", uid);
-		RevertToSelf ();
-		if (cygheap->user.token != INVALID_HANDLE_VALUE)
-		  {
-		    struct group *gr;
-		    cygsid sid;
-		    DWORD siz;
-
-		    /* Try setting owner to same value as user. */
-		    if (!GetTokenInformation (cygheap->user.token, TokenUser,
-					      &sid, sizeof sid, &siz))
-		      debug_printf ("GetTokenInformation(): %E");
-		    else if (!SetTokenInformation (cygheap->user.token,
-		    				   TokenOwner,
-						   &sid, sizeof sid))
-		      debug_printf ("SetTokenInformation(user.token, "
-		      		    "TokenOwner): %E");
-		    /* Try setting primary group in token to current group. */
-	            if ((gr = getgrgid (myself->gid)) &&
-		        get_gr_sid (sid, gr) &&
-		        !SetTokenInformation (cygheap->user.token,
-		      			      TokenPrimaryGroup,
-					      &sid, sizeof sid))
-		      debug_printf ("SetTokenInformation(user.token, "
-		    		    "TokenPrimaryGroup): %E");
-
-		    /* Now try to impersonate. */
-		    if (!ImpersonateLoggedOnUser (cygheap->user.token))
-		      system_printf ("Impersonate (%d) in set(e)uid failed: %E",
-				     cygheap->user.token);
-		    else
-		      cygheap->user.impersonated = TRUE;
-	          }
-	      }
-
-	  cygheap_user user;
-	  /* user.token is used in internal_getlogin () to determine if
-	     impersonation is active. If so, the token is used for
-	     retrieving user's SID. */
-	  user.token = cygheap->user.impersonated ? cygheap->user.token
-						  : INVALID_HANDLE_VALUE;
-	  struct passwd *pw_cur = internal_getlogin (user);
-	  if (pw_cur != pw_new)
 	    {
-	      debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
-			    cygheap->user.token, pw_cur->pw_uid,
-			    pw_new->pw_uid, cygheap->user.orig_uid);
-	      set_errno (EPERM);
-	      return -1;
+	      if (uid == cygheap->user.orig_uid)
+		{
+		  debug_printf ("RevertToSelf () (uid == orig_uid, token=%d)",
+				cygheap->user.token);
+		  RevertToSelf ();
+		  if (cygheap->user.token != INVALID_HANDLE_VALUE)
+		    cygheap->user.impersonated = FALSE;
+		}
+	      else
+	        {
+		  cygsid tsid, psid, gsid;
+		  DWORD siz;
+
+		  /* Check if new user == user of impersonation token. */
+		  if (cygheap->user.token != INVALID_HANDLE_VALUE)
+		    {
+		      if (!GetTokenInformation (cygheap->user.token, TokenUser,
+						&tsid, sizeof tsid, &siz))
+			debug_printf ("GetTokenInformation(): %E");
+		      else if (get_pw_sid (psid, pw_new) && tsid != psid)
+		        {
+			  /* If not, RevertToSelf and close old token. */
+			  RevertToSelf ();
+			  cygwin_set_impersonation_token (INVALID_HANDLE_VALUE);
+			}
+		    }
+		  /* If no impersonation token is available, try to 
+		     authenticate using subauthentication. */
+		  if (cygheap->user.token == INVALID_HANDLE_VALUE)
+		    {
+		      HANDLE ptok = subauth (pw_new);
+		      if (ptok != INVALID_HANDLE_VALUE)
+			cygwin_set_impersonation_token (ptok);
+		      else
+		        cygheap->user.impersonated = TRUE;
+		    }
+		  /* If no impersonation is active but an impersonation
+		     token is available, try to impersonate. */
+		  if (!cygheap->user.impersonated)
+		    {
+		      debug_printf ("Impersonate (uid == %d)", uid);
+		      RevertToSelf ();
+		      if (cygheap->user.token != INVALID_HANDLE_VALUE)
+			{
+			  struct group *gr;
+
+			  /* Try setting owner to same value as user. */
+			  if (!SetTokenInformation (cygheap->user.token,
+							 TokenOwner,
+							 &tsid, sizeof tsid))
+			    debug_printf ("SetTokenInformation(user.token, "
+					  "TokenOwner): %E");
+			  /* Try setting primary group in token to current group. */
+			  if ((gr = getgrgid (myself->gid)) &&
+			      get_gr_sid (gsid, gr) &&
+			      !SetTokenInformation (cygheap->user.token,
+						    TokenPrimaryGroup,
+						    &gsid, sizeof gsid))
+			    debug_printf ("SetTokenInformation(user.token, "
+					  "TokenPrimaryGroup): %E");
+
+			  /* Now try to impersonate. */
+			  if (!ImpersonateLoggedOnUser (cygheap->user.token))
+			    system_printf ("Impersonating (%d) in set(e)uid "
+			    		   "failed: %E", cygheap->user.token);
+			  else
+			    cygheap->user.impersonated = TRUE;
+			}
+		    }
+		}
+
+	      cygheap_user user;
+	      /* user.token is used in internal_getlogin () to determine if
+		 impersonation is active. If so, the token is used for
+		 retrieving user's SID. */
+	      user.token = cygheap->user.impersonated ? cygheap->user.token
+						      : INVALID_HANDLE_VALUE;
+	      struct passwd *pw_cur = internal_getlogin (user);
+	      if (pw_cur != pw_new)
+		{
+		  debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
+				cygheap->user.token, pw_cur->pw_uid,
+				pw_new->pw_uid, cygheap->user.orig_uid);
+		  set_errno (EPERM);
+		  return -1;
+		}
+	      myself->uid = uid;
+	      cygheap->user = user;
 	    }
-	  myself->uid = uid;
-	  cygheap->user = user;
 	}
     }
   else

@@ -66,6 +66,8 @@ LONG __stdcall write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_
 BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 BOOL __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 
+/* Try a subauthentication. */
+HANDLE subauth (struct passwd *pw);
 
 /* sec_helper.cc: Security helper functions. */
 char *__stdcall convert_sid_to_string_sid (PSID psid, char *sid_str);
