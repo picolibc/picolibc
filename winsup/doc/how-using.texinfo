@@ -592,8 +592,9 @@ The Windows port of GNU Emacs (aka "NT emacs") uses the Windows command
 shell by default.  Also, since Emacs is not a Cygwin application, it has
 no knowledge of Cygwin mounts.  With those points in mind, you need to
 add the following code to your ~/.emacs or ~/_emacs file in order to use
-bash.  This is particularly useful for the JDE package
-(@file{http://sunsite.dk/jde/}).
+bash.  This is particularly useful for the JDEE package
+(@file{http://jdee.sunsite.dk/}).  The following settings are for
+Emacs 21.1:
 
 @example
 	;; This assumes that Cygwin is installed in C:\cygwin (the
@@ -607,7 +608,6 @@ bash.  This is particularly useful for the JDE package
 	;; here.
 	;;
 	(setq process-coding-system-alist '(("bash" . undecided-unix)))
-	(setq w32-quote-process-args ?\")
 	(setq shell-file-name "bash")
 	(setenv "SHELL" shell-file-name) 
 	(setq explicit-shell-file-name shell-file-name) 
