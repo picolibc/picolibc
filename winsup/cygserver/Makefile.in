@@ -48,9 +48,10 @@ CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o \
 
 all: cygserver.exe
 
-install: all cygserver.conf
+install: all cygserver.conf cygserver-config
 	$(INSTALL_PROGRAM) cygserver.exe $(sbindir)/cygserver.exe
-	$(INSTALL_DATA) $(srcdir)/cygserver.conf $(sysconfdir)/cygserver.conf
+	$(INSTALL_PROGRAM) cygserver-config $(bindir)/cygserver-config
+	$(INSTALL_DATA) $(srcdir)/cygserver.conf $(sysconfdir)/defaults/etc/cygserver.conf
 
 clean:
 	rm -f $(OBJS) ${patsubst %.o,%.d,$(OBJS)} cygserver.exe

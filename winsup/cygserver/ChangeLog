@@ -1,3 +1,8 @@
+2003-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (install): Install cygserver-config script to bindir.
+	* cygserver-config: New script.
+
 2003-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	Don't use safe_new but new throughout.  Fix copyright dates
