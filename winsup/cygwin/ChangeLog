@@ -1,3 +1,7 @@
+2003-02-05  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (etc::dir_changed): Fix debug printf.
+
 2003-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (setacl): Move all permission settings to beginning of

@@ -3817,8 +3817,7 @@ etc::dir_changed (int n)
 						  | FILE_NOTIFY_CHANGE_FILE_NAME);
 #ifdef DEBUGGING
 	  if (changed_h == INVALID_HANDLE_VALUE)
-	    system_printf ("Can't open /etc for checking, %E", (char *) pwd,
-			   changed_h);
+	    system_printf ("Can't open %s for checking, %E", (char *) pwd);
 #endif
 	  memset (change_possible, true, sizeof (change_possible));
 	}
