@@ -985,17 +985,10 @@ fhandler_serial::tcgetattr (struct termios *t)
   if (!get_w_binary ())
     t->c_oflag |= ONLCR;
 
+  t->c_cc[VTIME] = vtime_ / 100;
+  t->c_cc[VMIN] = vmin_;
+
   debug_printf ("vmin_ %d, vtime_ %d", vmin_, vtime_);
-  if (vmin_ == 0)
-    {
-      t->c_lflag |= ICANON;
-      t->c_cc[VTIME] = t->c_cc[VMIN] = 0;
-    }
-  else
-    {
-      t->c_cc[VTIME] = vtime_ / 100;
-      t->c_cc[VMIN] = vmin_;
-    }
 
   return 0;
 }
