@@ -1,3 +1,7 @@
+2001-10-24  Jeff Holcomb  <jeffh@redhat.com>
+
+	Makefile.in (all-bison): Don't depend on texinfo.
+
 2001-10-03  Alan Modra  <amodra@bigpond.net.au>
 
 	* gettext.m4: Test po/POTFILES.in exists before trying to read.
