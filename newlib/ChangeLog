@@ -1,3 +1,8 @@
+2000-12-04 Keith Outwater <vac4050@cae597.rsc.raytheon.com>
+
+        * libc/include/sys/errno.h: Added comments on many error numbers.
+        * libc/string/strerror.c: Added some more strings.
+
 2000-11-30  Jeff Johnston <jjohnstn@redhat.com>
 
 	* libc/sys/sh/syscalls.c (_link): New stub.

@@ -37,11 +37,20 @@ Arg list too long
 o EACCES
 Permission denied
 
+o EADDRINUSE
+Address already in use
+
 o EADV
 Advertise error
 
+o EAFNOSUPPORT
+Address family not supported by protocol family
+
 o EAGAIN
 No more processes
+
+o EALREADY
+Socket already connected
 
 o EBADF
 Bad file number
@@ -58,8 +67,17 @@ No children
 o ECOMM
 Communication error
 
+o ECONNABORTED
+Software caused connection abort
+
+o ECONNREFUSED
+Connection refused
+
 o EDEADLK
 Deadlock
+
+o EDESTADDRREQ
+Destination address required
 
 o EEXIST
 File exists
@@ -73,8 +91,17 @@ Bad address
 o EFBIG
 File too large
 
+o EHOSTDOWN
+Host is down
+
+o EHOSTUNREACH
+Host is unreachable
+
 o EIDRM
 Identifier removed
+
+o EINPROGRESS
+Connection already in progress
 
 o EINTR
 Interrupted system call
@@ -84,6 +111,9 @@ Invalid argument
 
 o EIO
 I/O error
+
+o EISCONN
+Socket is already connected
 
 o EISDIR
 Is a directory
@@ -109,11 +139,20 @@ Too many open files
 o EMLINK
 Too many links
 
+o EMSGSIZE
+Message too long
+
 o EMULTIHOP
 Multihop attempted
 
 o ENAMETOOLONG
 File or path name too long
+
+o ENETDOWN
+Network interface not configured
+
+o ENETUNREACH
+Network is unreachable
 
 o ENFILE
 Too many open files in system
@@ -145,6 +184,9 @@ Machine is not on the network
 o ENOPKG
 No package
 
+o ENOPROTOOPT
+Protocol not available
+
 o ENOSPC
 No space left on device
 
@@ -160,11 +202,20 @@ Function not implemented
 o ENOTBLK
 Block device required
 
+o ENOTCONN
+Socket is not connected
+
 o ENOTDIR
 Not a directory
 
 o ENOTEMPTY
 Directory not empty
+
+o ENOTSOCK
+Socket operation on non-socket
+
+o ENOTSUP
+Not supported
 
 o ENOTTY
 Not a character device
@@ -181,6 +232,12 @@ Broken pipe
 o EPROTO
 Protocol error
 
+o EPROTOTYPE
+Protocol wrong type for socket
+
+o EPROTONOSUPPORT
+Unknown protocol
+
 o ERANGE
 Result too large
 
@@ -189,6 +246,12 @@ Resource is remote
 
 o EROFS
 Read-only file system
+
+o ESHUTDOWN
+Can't send after socket shutdown
+
+o ESOCKTNOSUPPORT
+Socket type not supported
 
 o ESPIPE
 Illegal seek
@@ -201,6 +264,9 @@ Srmount error
 
 o ETIME
 Stream ioctl timeout
+
+o ETIMEDOUT
+Connection timed out
 
 o ETXTBSY
 Text file busy
@@ -295,6 +361,11 @@ _DEFUN (strerror, (errnum),
       error = "Exec format error";
       break;
 #endif
+#ifdef EALREADY
+    case EALREADY:
+      error = "Socket already connected";
+      break;
+#endif
 #ifdef EBADF
     case EBADF:
       error = "Bad file number";
@@ -303,6 +374,11 @@ _DEFUN (strerror, (errnum),
 #ifdef ECHILD
     case ECHILD:
       error = "No children";
+      break;
+#endif
+#ifdef EDESTADDRREQ
+    case EDESTADDRREQ:
+      error = "Destination address required";
       break;
 #endif
 #ifdef EAGAIN
@@ -355,6 +431,16 @@ _DEFUN (strerror, (errnum),
       error = "Not a directory";
       break;
 #endif
+#ifdef EHOSTDOWN
+    case EHOSTDOWN:
+      error = "Host is down";
+      break;
+#endif
+#ifdef EINPROGRESS 
+    case EINPROGRESS:
+      error = "Connection already in progress";
+      break;
+#endif
 #ifdef EISDIR
     case EISDIR:
       error = "Is a directory";
@@ -363,6 +449,11 @@ _DEFUN (strerror, (errnum),
 #ifdef EINVAL
     case EINVAL:
       error = "Invalid argument";
+      break;
+#endif
+#ifdef ENETDOWN
+    case ENETDOWN:
+      error = "Network interface is not configured";
       break;
 #endif
 #ifdef ENFILE
@@ -390,9 +481,19 @@ _DEFUN (strerror, (errnum),
       error = "File too large";
       break;
 #endif
+#ifdef EHOSTUNREACH
+    case EHOSTUNREACH:
+      error = "Host is unreachable";
+      break;
+#endif
 #ifdef ENOSPC
     case ENOSPC:
       error = "No space left on device";
+      break;
+#endif
+#ifdef ENOTSUP
+    case ENOTSUP:
+      error = "Not supported";
       break;
 #endif
 #ifdef ESPIPE
@@ -438,6 +539,11 @@ _DEFUN (strerror, (errnum),
 #ifdef EDEADLK
     case EDEADLK:
       error = "Deadlock";
+      break;
+#endif
+#ifdef ENETUNREACH 
+    case  ENETUNREACH:
+      error = "Network is unreachable";
       break;
 #endif
 #ifdef ENOLCK
@@ -498,6 +604,11 @@ _DEFUN (strerror, (errnum),
 #ifdef EPROTO
     case EPROTO:
       error = "Protocol error";
+      break;
+#endif
+#ifdef EPROTONOSUPPORT
+    case EPROTONOSUPPORT:
+      error = "Unknown protocol";
       break;
 #endif
 #ifdef EMULTIHOP

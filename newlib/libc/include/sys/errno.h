@@ -107,35 +107,35 @@ extern __IMPORT int _sys_nerr;
 #define EPFNOSUPPORT 96 /* Protocol family not supported */
 #define ECONNRESET 104  /* Connection reset by peer */
 #define ENOBUFS 105	/* No buffer space available */
-#define EAFNOSUPPORT 106
-#define EPROTOTYPE 107
-#define ENOTSOCK 108
-#define ENOPROTOOPT 109
-#define ESHUTDOWN 110
+#define EAFNOSUPPORT 106 /* Address family not supported by protocol family */
+#define EPROTOTYPE 107	/* Protocol wrong type for socket */
+#define ENOTSOCK 108	/* Socket operation on non-socket */
+#define ENOPROTOOPT 109	/* Protocol not available */
+#define ESHUTDOWN 110	/* Can't send after socket shutdown */
 #define ECONNREFUSED 111	/* Connection refused */
 #define EADDRINUSE 112		/* Address already in use */
 #define ECONNABORTED 113	/* Connection aborted */
-#define ENETUNREACH 114
-#define ENETDOWN 115
-#define ETIMEDOUT 116
-#define EHOSTDOWN 117
-#define EHOSTUNREACH 118
-#define EINPROGRESS 119
-#define EALREADY 120
-#define EDESTADDRREQ 121
-#define EMSGSIZE 122
-#define EPROTONOSUPPORT 123
-#define ESOCKTNOSUPPORT 124
-#define EADDRNOTAVAIL 125
+#define ENETUNREACH 114		/* Network is unreachable */
+#define ENETDOWN 115		/* Network interface is not configured */
+#define ETIMEDOUT 116		/* Connection timed out */
+#define EHOSTDOWN 117		/* Host is down */
+#define EHOSTUNREACH 118	/* Host is unreachable */
+#define EINPROGRESS 119		/* Connection already in progress */
+#define EALREADY 120		/* Socket already connected */
+#define EDESTADDRREQ 121	/* Destination address required */
+#define EMSGSIZE 122		/* Message too long */
+#define EPROTONOSUPPORT 123	/* Unknown protocol */
+#define ESOCKTNOSUPPORT 124	/* Socket type not supported */
+#define EADDRNOTAVAIL 125	/* Address not available */
 #define ENETRESET 126
-#define EISCONN 127
-#define ENOTCONN 128
+#define EISCONN 127		/* Socket is already connected */
+#define ENOTCONN 128		/* Socket is not connected */
 #define ETOOMANYREFS 129
 #define EPROCLIM 130
 #define EUSERS 131
 #define EDQUOT 132
 #define ESTALE 133
-#define ENOTSUP 134
+#define ENOTSUP 134		/* Not supported */
 #define ENOMEDIUM 135   /* No medium (in tape drive) */
 #define ENOSHARE 136    /* No such host or network path */
 
